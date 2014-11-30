@@ -2022,7 +2022,7 @@ ConsoleMethod( GuiCanvas, pushDialog, void, 3, 5, "(GuiControl ctrl, int layer=0
 
    if (!	Sim::findObject(argv[2], gui))
    {
-      Con::printf("%s(): Invalid control: %s", argv[0], argv[2]);
+      Con::printf("%s(): Invalid control: %s", (const char*)argv[0], (const char*)argv[2]);
       return;
    }
 
@@ -2067,7 +2067,7 @@ ConsoleMethod( GuiCanvas, popDialog, void, 2, 3, "(GuiControl ctrl=NULL)"
    {
       if (!Sim::findObject(argv[2], gui))
       {
-         Con::printf("%s(): Invalid control: %s", argv[0], argv[2]);
+         Con::printf("%s(): Invalid control: %s", (const char*)argv[0], (const char*)argv[2]);
          return;
       }
    }

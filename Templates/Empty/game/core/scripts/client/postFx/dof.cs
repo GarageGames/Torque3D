@@ -320,6 +320,13 @@ singleton ShaderData( PFX_DOFDownSampleShader )
 {      
    DXVertexShaderFile 	= "shaders/common/postFx/dof/DOF_DownSample_V.hlsl";   
    DXPixelShaderFile 	= "shaders/common/postFx/dof/DOF_DownSample_P.hlsl";            
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/dof/gl/DOF_DownSample_V.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/dof/gl/DOF_DownSample_P.glsl";
+   
+   samplerNames[0] = "$colorSampler";
+   samplerNames[1] = "$depthSampler";
+   
    pixVersion = 3.0;
 };
 
@@ -327,6 +334,12 @@ singleton ShaderData( PFX_DOFBlurYShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/dof/DOF_Gausian_V.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/dof/DOF_Gausian_P.hlsl";
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/dof/gl/DOF_Gausian_V.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/dof/gl/DOF_Gausian_P.glsl";
+   
+   samplerNames[0] = "$diffuseMap";
+   
    pixVersion = 2.0;      
    defines = "BLUR_DIR=float2(0.0,1.0)";         
 };
@@ -340,6 +353,13 @@ singleton ShaderData( PFX_DOFCalcCoCShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/dof/DOF_CalcCoC_V.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/dof/DOF_CalcCoC_P.hlsl";         
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/dof/gl/DOF_CalcCoC_V.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/dof/gl/DOF_CalcCoC_P.glsl"; 
+
+   samplerNames[0] = "$shrunkSampler";
+   samplerNames[1] = "$blurredSampler";
+   
    pixVersion = 3.0;
 };
 
@@ -347,6 +367,12 @@ singleton ShaderData( PFX_DOFSmallBlurShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/dof/DOF_SmallBlur_V.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/dof/DOF_SmallBlur_P.hlsl";            
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/dof/gl/DOF_SmallBlur_V.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/dof/gl/DOF_SmallBlur_P.glsl";
+
+   samplerNames[0] = "$colorSampler";
+   
    pixVersion = 3.0;
 };
 
@@ -354,6 +380,15 @@ singleton ShaderData( PFX_DOFFinalShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/dof/DOF_Final_V.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/dof/DOF_Final_P.hlsl";
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/dof/gl/DOF_Final_V.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/dof/gl/DOF_Final_P.glsl";
+   
+   samplerNames[0] = "$colorSampler";
+   samplerNames[1] = "$smallBlurSampler";
+   samplerNames[2] = "$largeBlurSampler";
+   samplerNames[3] = "$depthSampler";
+   
    pixVersion = 3.0;
 };
 

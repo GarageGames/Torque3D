@@ -266,7 +266,19 @@ void HTTPObject::onConnected()
    char *pt = dStrchr(mHostName, ':');
    if(pt)
       *pt = 0;
-   dSprintf(buffer, sizeof(buffer), "GET %s HTTP/1.1\r\nHost: %s\r\n\r\n", expPath, mHostName);
+
+   //If we want to do a get request
+   if(mPost == NULL)
+   {
+      dSprintf(buffer, sizeof(buffer), "GET %s HTTP/1.1\r\nHost: %s\r\n\r\n", expPath, mHostName);
+   }
+   //Else we want to do a post request
+   else
+   {
+      dSprintf(buffer, sizeof(buffer), "POST %s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: %i\r\n\r\n%s\r\n\r\n",
+         expPath, mHostName, dStrlen(mPost), mPost);
+   }
+
    if(pt)
       *pt = ':';
 
@@ -431,8 +443,6 @@ DefineEngineMethod( HTTPObject, post, void, ( const char* Address, const char* r
    "@param requirstURI Specific location on the server to access (IE: \"index.php\".)\n"
    "@param query Actual data to transmit to the server. Can be anything required providing it sticks with limitations of the HTTP protocol. \n"
    "@param post Submission data to be processed.\n"
-   
-   "@note The post() method is currently non-functional.\n"
 
    "@tsexample\n"
 	   "// Create an HTTP object for communications\n"

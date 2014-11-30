@@ -240,6 +240,18 @@ class T3D_Generator
             array_push( self::$project_cur->defines, $d."=".$v );
     }
     
+    static function isDefined( $d )
+    {
+        foreach( self::$project_cur->defines as $v )
+        {
+            if( $v === $d )
+                return true;
+            else if( strpos( $v, $d . "=" ) === 0 )
+                return true;
+        }
+        return false;
+    }
+    
     static function disableProjectWarning( $warning )
     {
         array_push( self::$project_cur->disabledWarnings, $warning );

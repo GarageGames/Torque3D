@@ -74,14 +74,15 @@ RenderParticleMgr::RenderParticleMgr()
 {
    // Render particles at 1/4 resolution
    mTargetSizeType = WindowSizeScaled;
-   mTargetScale.set(0.25f, 0.25f);
+   mTargetScale.set(0.5f, 0.5f);
 
    // We use the target chain like a texture pool, not like a swap chain
    if(!RenderToSingleTarget)
       setTargetChainLength(5);
    else
       mOffscreenSystems.setSize(1);
-
+   
+   notifyType( RenderPassManager::RIT_Particle );
    LightManager::smActivateSignal.notify( this, &RenderParticleMgr::_onLMActivate );
 }
 
@@ -377,7 +378,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
    // Draw system path, or draw composite path
    if(ri->systemState == PSS_DrawComplete)
       return;
-
+   
    if(ri->systemState != PSS_AwaitingCompositeDraw)
    {
       // Set proper stateblock, and update state
@@ -386,7 +387,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
          GFX->setStateBlock( _getOffscreenStateBlock(ri) );
          ri->systemState = PSS_AwaitingCompositeDraw;
          mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mModelViewProjSC, 
-           *ri->modelViewProj * mOffscreenSystems[ri->targetIndex].clipMatrix );
+            *ri->modelViewProj * mOffscreenSystems[ri->targetIndex].clipMatrix );
       }
       else
       {
@@ -419,6 +420,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
          alphaScale = 0.0f;
          break;
       }
+
       mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaFactorSC, alphaFactor );
       mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaScaleSC, alphaScale );
 
@@ -436,13 +438,13 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       GFX->setShader( mParticleShader );
       GFX->setShaderConstBuffer( mParticleShaderConsts.mShaderConsts );
 
-      GFX->setTexture( 0, ri->diffuseTex );
+      GFX->setTexture( mParticleShaderConsts.mSamplerDiffuse->getSamplerRegister(), ri->diffuseTex );
 
       // Set up the prepass texture.
       if ( mParticleShaderConsts.mPrePassTargetParamsSC->isValid() )
       {
          GFXTextureObject *texObject = mPrepassTarget ? mPrepassTarget->getTexture(0) : NULL;
-         GFX->setTexture( 1, texObject );
+         GFX->setTexture( mParticleShaderConsts.mSamplerPrePassTex->getSamplerRegister(), texObject );
 
          Point4F rtParams( 0.0f, 0.0f, 1.0f, 1.0f );
          if ( texObject )
@@ -475,7 +477,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       // Set offscreen texture
       Point4F rtParams;
       GFXTextureObject *particleSource = mNamedTarget.getTexture();
-      GFX->setTexture( 0, particleSource );
+      GFX->setTexture( mParticleCompositeShaderConsts.mSamplerColorSource->getSamplerRegister(), particleSource );
       if(particleSource)
       {
          ScreenSpace::RenderTargetParameters(particleSource->getSize(), mNamedTarget.getViewport(), rtParams);
@@ -484,11 +486,18 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
 
       // And edges
       GFXTextureObject *texObject = mEdgeTarget ? mEdgeTarget->getTexture() : NULL;
-      GFX->setTexture( 1, texObject );
+      GFX->setTexture( mParticleCompositeShaderConsts.mSamplerEdgeSource->getSamplerRegister(), texObject );
       if(texObject)
       {
          ScreenSpace::RenderTargetParameters(texObject->getSize(), mEdgeTarget->getViewport(), rtParams);
          mParticleCompositeShaderConsts.mShaderConsts->setSafe( mParticleCompositeShaderConsts.mEdgeTargetParamsSC, rtParams );
+      }
+      else
+      {
+         AssertWarn(false, "No edge texture target defined, if you want to use mixed particle"
+            "rendering, then make sure that the EdgeDetectPostEffect is enabled.");
+         ri->systemState == PSS_AwaitingHighResDraw;
+         return;
       }
 
       // Set shader and constant buffer
@@ -548,6 +557,11 @@ bool RenderParticleMgr::_initShader()
       mParticleShaderConsts.mAlphaScaleSC = mParticleShader->getShaderConstHandle( "$alphaScale" );
       mParticleShaderConsts.mFSModelViewProjSC = mParticleShader->getShaderConstHandle( "$fsModelViewProj" );
       mParticleShaderConsts.mPrePassTargetParamsSC = mParticleShader->getShaderConstHandle( "$prePassTargetParams" );
+
+      //samplers
+      mParticleShaderConsts.mSamplerDiffuse = mParticleShader->getShaderConstHandle("$diffuseMap");
+      mParticleShaderConsts.mSamplerPrePassTex = mParticleShader->getShaderConstHandle("$prepassTex");
+      mParticleShaderConsts.mSamplerParaboloidLightMap = mParticleShader->getShaderConstHandle("$paraboloidLightMap");
    }
 
    shaderData = NULL;
@@ -563,6 +577,8 @@ bool RenderParticleMgr::_initShader()
    {
       mParticleCompositeShaderConsts.mShaderConsts = mParticleCompositeShader->allocConstBuffer();
       mParticleCompositeShaderConsts.mScreenRect = mParticleCompositeShader->getShaderConstHandle( "$screenRect" );
+      mParticleCompositeShaderConsts.mSamplerColorSource = mParticleCompositeShader->getShaderConstHandle( "$colorSource" );
+      mParticleCompositeShaderConsts.mSamplerEdgeSource = mParticleCompositeShader->getShaderConstHandle( "$edgeSource" );
       mParticleCompositeShaderConsts.mEdgeTargetParamsSC = mParticleCompositeShader->getShaderConstHandle( "$edgeTargetParams" );
       mParticleCompositeShaderConsts.mOffscreenTargetParamsSC = mParticleCompositeShader->getShaderConstHandle( "$offscreenTargetParams" );
    }
@@ -686,8 +702,8 @@ GFXStateBlockRef RenderParticleMgr::_getHighResStateBlock(ParticleRenderInst *ri
 GFXStateBlockRef RenderParticleMgr::_getMixedResStateBlock(ParticleRenderInst *ri)
 {
    const U8 blendStyle = ri->blendStyle;
-   if ( mHighResBlocks[blendStyle].isValid() )
-      return mHighResBlocks[blendStyle];
+   if ( mMixedResBlocks[blendStyle].isValid() )
+      return mMixedResBlocks[blendStyle];
 
    GFXStateBlockDesc d;
 
@@ -751,8 +767,8 @@ GFXStateBlockRef RenderParticleMgr::_getMixedResStateBlock(ParticleRenderInst *r
    // Prepass sampler
    d.samplers[1] = GFXSamplerStateDesc::getClampPoint();
 
-   mHighResBlocks[blendStyle] = GFX->createStateBlock(d);
-   return mHighResBlocks[blendStyle];
+   mMixedResBlocks[blendStyle] = GFX->createStateBlock(d);
+   return mMixedResBlocks[blendStyle];
 }
 
 GFXStateBlockRef RenderParticleMgr::_getCompositeStateBlock(ParticleRenderInst *ri)

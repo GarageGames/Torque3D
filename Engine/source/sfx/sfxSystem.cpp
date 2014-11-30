@@ -1253,8 +1253,11 @@ DefineEngineFunction( sfxGetAvailableDevices, const char*, (),,
    "@ref SFX_devices\n"
    "@ingroup SFX" )
 {
-   char* deviceList = Con::getReturnBuffer( 2048 );
-   deviceList[0] = 0;
+   const S32 bufferSize = 2048;
+   char* deviceList = Con::getReturnBuffer( bufferSize );
+   S32 len = bufferSize;
+   char *ptr = deviceList;
+   *ptr = 0;
 
    SFXProvider* provider = SFXProvider::getFirstProvider();
    while ( provider )
@@ -1264,16 +1267,15 @@ DefineEngineFunction( sfxGetAvailableDevices, const char*, (),,
       for ( S32 d=0; d < deviceInfo.size(); d++ )
       {
          const SFXDeviceInfo* info = deviceInfo[d];
-         dStrcat( deviceList, provider->getName() );
-         dStrcat( deviceList, "\t" );
-         dStrcat( deviceList, info->name );
-         dStrcat( deviceList, "\t" );
-         dStrcat( deviceList, info->hasHardware ? "1" : "0" );
-         dStrcat( deviceList, "\t" );
-         dStrcat( deviceList, Con::getIntArg( info->maxBuffers ) );         
-         dStrcat( deviceList, "\n" );
-         
-         //TODO: caps
+         const char *providerName = provider->getName().c_str();
+         const char *infoName = info->name.c_str();
+         dSprintf(ptr, len, "%s\t%s\t%s\t%i\n", providerName, infoName, info->hasHardware ? "1" : "0", info->maxBuffers);
+
+         ptr += dStrlen(ptr);
+         len = bufferSize - (ptr - deviceList);
+
+         if (len <= 0)
+            return deviceList;
       }
 
       provider = provider->getNextProvider();
@@ -1455,7 +1457,7 @@ ConsoleFunction( sfxCreateSource, S32, 2, 6,
       description = dynamic_cast< SFXDescription* >( Sim::findObject( argv[1] ) );
       if ( !description )
       {
-         Con::printf( "Unable to locate sound track/description '%s'", argv[1] );
+         Con::printf( "Unable to locate sound track/description '%s'", (const char*)argv[1] );
          return 0;
       }
    }
@@ -1561,7 +1563,7 @@ ConsoleFunction( sfxPlay, S32, 2, 5, "( SFXSource source | ( SFXTrack track [, f
    SFXTrack* track = dynamic_cast<SFXTrack*>( Sim::findObject( argv[1] ) );
    if ( !track )
    {
-      Con::printf( "Unable to locate sfx track '%s'", argv[1] );
+      Con::printf( "Unable to locate sfx track '%s'", (const char*)argv[1] );
       return 0;
    }
 
@@ -1664,7 +1666,7 @@ ConsoleFunction( sfxPlayOnce, S32, 2, 6,
       description = dynamic_cast< SFXDescription* >( Sim::findObject( argv[1] ) );
       if( !description )
       {
-         Con::errorf( "sfxPlayOnce - Unable to locate sound track/description '%s'", argv[1] );
+         Con::errorf( "sfxPlayOnce - Unable to locate sound track/description '%s'", (const char*)argv[1] );
          return 0;
       }
    }

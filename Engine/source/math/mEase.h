@@ -121,18 +121,22 @@ inline F32 mLinearTween(F32 t, F32 b, F32 c, F32 d) {
 // t: current time, b: beginning value, c: change in value, d: duration
 // t and d can be in frames or seconds/milliseconds
 inline F32 mEaseInQuad(F32 t, F32 b, F32 c, F32 d) {
-	return c*(t/=d)*t + b;
+	t /= d;
+	return c*t*t + b;
 };
 
 // quadratic easing out - decelerating to zero velocity
 inline F32 mEaseOutQuad(F32 t, F32 b, F32 c, F32 d) {
-	return -c *(t/=d)*(t-2) + b;
+	t /= d;
+	return -c * t*(t-2) + b;
 };
 
 // quadratic easing in/out - acceleration until halfway, then deceleration
 inline F32 mEaseInOutQuad(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d/2) < 1) return c/2*t*t + b;
-	return -c/2 * ((--t)*(t-2) - 1) + b;
+	t /= d/2;
+	if (t < 1) return c/2*t*t + b;
+	t--;
+	return -c/2 * (t*(t-2) - 1) + b;
 };
 
  ///////////// CUBIC EASING: t^3 ///////////////////////
@@ -141,18 +145,23 @@ inline F32 mEaseInOutQuad(F32 t, F32 b, F32 c, F32 d) {
 // t: current time, b: beginning value, c: change in value, d: duration
 // t and d can be frames or seconds/milliseconds
 inline F32 mEaseInCubic(F32 t, F32 b, F32 c, F32 d) {
-	return c*(t/=d)*t*t + b;
+	t /= d;
+	return c*t*t*t + b;
 };
 
 // cubic easing out - decelerating to zero velocity
 inline F32 mEaseOutCubic(F32 t, F32 b, F32 c, F32 d) {
-	return c*((t=t/d-1)*t*t + 1) + b;
+	t /= d;
+	t--;
+	return c*(t*t*t + 1) + b;
 };
 
 // cubic easing in/out - acceleration until halfway, then deceleration
 inline F32 mEaseInOutCubic(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d/2) < 1) return c/2*t*t*t + b;
-	return c/2*((t-=2)*t*t + 2) + b;
+	t /= d/2;
+	if (t < 1) return c/2*t*t*t + b;
+	t -= 2;
+	return c/2*(t*t*t + 2) + b;
 };
 
 
@@ -162,18 +171,23 @@ inline F32 mEaseInOutCubic(F32 t, F32 b, F32 c, F32 d) {
 // t: current time, b: beginning value, c: change in value, d: duration
 // t and d can be frames or seconds/milliseconds
 inline F32 mEaseInQuart(F32 t, F32 b, F32 c, F32 d) {
-	return c*(t/=d)*t*t*t + b;
+	t /= d;
+	return c*t*t*t*t + b;
 };
 
 // quartic easing out - decelerating to zero velocity
 inline F32 mEaseOutQuart(F32 t, F32 b, F32 c, F32 d) {
-	return -c * ((t=t/d-1)*t*t*t - 1) + b;
+	t /= d;
+	t--;
+	return -c * (t*t*t*t - 1) + b;
 };
 
 // quartic easing in/out - acceleration until halfway, then deceleration
 inline F32 mEaseInOutQuart(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
-	return -c/2 * ((t-=2)*t*t*t - 2) + b;
+	t /= d/2;
+	if (t < 1) return c/2*t*t*t*t + b;
+	t -= 2;
+	return -c/2 * (t*t*t*t - 2) + b;
 };
 
 
@@ -183,18 +197,23 @@ inline F32 mEaseInOutQuart(F32 t, F32 b, F32 c, F32 d) {
 // t: current time, b: beginning value, c: change in value, d: duration
 // t and d can be frames or seconds/milliseconds
 inline F32 mEaseInQuint(F32 t, F32 b, F32 c, F32 d) {
-	return c*(t/=d)*t*t*t*t + b;
+	t /= d;
+	return c*t*t*t*t*t + b;
 };
 
 // quintic easing out - decelerating to zero velocity
 inline F32 mEaseOutQuint(F32 t, F32 b, F32 c, F32 d) {
-	return c*((t=t/d-1)*t*t*t*t + 1) + b;
+	t /= d;
+	t--;
+	return c*(t*t*t*t*t + 1) + b;
 };
 
 // quintic easing in/out - acceleration until halfway, then deceleration
 inline F32 mEaseInOutQuint(F32 t, F32 b, F32 c, F32 d) {
-	if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-	return c/2*((t-=2)*t*t*t*t + 2) + b;
+	t /= d/2;
+	if (t < 1) return c/2*t*t*t*t*t + b;
+	t -= 2;
+	return c/2*(t*t*t*t*t + 2) + b;
 };
 
 
@@ -223,20 +242,20 @@ inline F32 mEaseInOutSine(F32 t, F32 b, F32 c, F32 d) {
 // exponential easing in - accelerating from zero velocity
 // t: current time, b: beginning value, c: change in position, d: duration
 inline F32 mEaseInExpo(F32 t, F32 b, F32 c, F32 d) {
-	return (t==0) ? b : c * mPow(2, 10 * (t/d - 1)) + b;
+	return c * mPow( 2, 10 * (t/d - 1) ) + b;
 };
 
 // exponential easing out - decelerating to zero velocity
 inline F32 mEaseOutExpo(F32 t, F32 b, F32 c, F32 d) {
-	return (t==d) ? b+c : c * (-mPow(2, -10 * t/d) + 1) + b;
+	return c * ( -mPow( 2, -10 * t/d ) + 1 ) + b;
 };
 
 // exponential easing in/out - accelerating until halfway, then decelerating
 inline F32 mEaseInOutExpo(F32 t, F32 b, F32 c, F32 d) {
-	if (t==0) return b;
-	if (t==d) return b+c;
-	if ((t/=d/2) < 1) return c/2 * mPow(2, 10 * (t - 1)) + b;
-	return c/2 * (-mPow(2, -10 * --t) + 2) + b;
+	t /= d/2;
+	if (t < 1) return c/2 * mPow( 2, 10 * (t - 1) ) + b;
+	t--;
+	return c/2 * ( -mPow( 2, -10 * t) + 2 ) + b;
 };
 
 

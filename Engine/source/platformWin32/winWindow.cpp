@@ -366,6 +366,7 @@ extern "C"
 {
 	bool torque_engineinit(S32 argc, const char **argv);
 	S32  torque_enginetick();
+	S32  torque_getreturnstatus();
 	bool torque_engineshutdown();
 };
 
@@ -381,7 +382,7 @@ S32 TorqueMain(int argc, const char **argv)
 
 	torque_engineshutdown();
 
-	return 0;
+	return torque_getreturnstatus();
 
 }
 

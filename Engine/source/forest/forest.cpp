@@ -361,7 +361,7 @@ void Forest::saveDataFile( const char *path )
 
 ConsoleMethod( Forest, saveDataFile, bool, 2, 3, "saveDataFile( [path] )" )
 {   
-   object->saveDataFile( argc == 3 ? argv[2] : NULL );
+   object->saveDataFile( argc == 3 ? (const char*)argv[2] : NULL );
    return true;
 }
 

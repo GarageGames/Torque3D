@@ -31,10 +31,11 @@
 #include "gfx/gfxDevice.h"
 #include "core/util/safeDelete.h"
 
-#if !defined( TORQUE_OS_MAC ) && !defined( TORQUE_OS_LINUX )
+#if defined( TORQUE_OS_WIN ) || defined( TORQUE_OS_XBOX )
 #  include "lighting/advanced/hlsl/gBufferConditionerHLSL.h"
 #  include "lighting/advanced/hlsl/advancedLightingFeaturesHLSL.h"
-#else
+#endif
+#if defined( TORQUE_OPENGL )
 #  include "lighting/advanced/glsl/gBufferConditionerGLSL.h"
 #  include "lighting/advanced/glsl/advancedLightingFeaturesGLSL.h"
 #endif
@@ -54,7 +55,7 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
 
    if(GFX->getAdapterType() == OpenGL)
    {
-#if defined( TORQUE_OS_MAC ) || defined( TORQUE_OS_LINUX )
+#if defined( TORQUE_OPENGL ) 
       cond = new GBufferConditionerGLSL( prepassTargetFormat, GBufferConditionerGLSL::ViewSpace );
       FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatGLSL());
@@ -66,7 +67,7 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
    }
    else
    {
-#if !defined( TORQUE_OS_MAC ) && !defined( TORQUE_OS_LINUX )
+#if defined( TORQUE_OS_WIN )
       cond = new GBufferConditionerHLSL( prepassTargetFormat, GBufferConditionerHLSL::ViewSpace );
       FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatHLSL());

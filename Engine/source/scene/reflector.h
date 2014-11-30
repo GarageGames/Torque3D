@@ -224,7 +224,7 @@ protected:
 public:
 
    GFXTextureTargetRef reflectTarget;
-   GFXTexHandle reflectTex;   
+   GFXTexHandle reflectTex, depthBuff;;   
    PlaneF refplane;
    bool objectSpace;
 };

@@ -494,9 +494,9 @@ ConsoleMethod( FileObject, writeObject, void, 3, 4, "FileObject.writeObject(SimO
       return;
    }
 
-   char *objName = NULL;
+   const char *objName = NULL;
    if( argc == 4 )
-      objName = (char*)argv[3];
+      objName = (const char*)argv[3];
 
    object->writeObject( obj, (const U8*)objName );
 }

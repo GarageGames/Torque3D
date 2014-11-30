@@ -83,10 +83,9 @@ ConsoleMethod( GuiFilterCtrl, setValue, void, 3, 20, "(f1, f2, ...)"
 {
    Filter filter;
 
-   argc -= 2;
-   argv += 2;
+   StringStackWrapper args(argc - 2, argv + 2);
 
-   filter.set(argc, argv);
+   filter.set(args.count(), args);
 	object->set(filter);
 }
 

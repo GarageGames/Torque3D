@@ -281,7 +281,8 @@ ConsoleMethod(GameConnection, setConnectArgs, void, 3, 17,
    
    "@see GameConnection::onConnect()\n\n")
 {
-   object->setConnectArgs(argc - 2, argv + 2);
+   StringStackWrapper args(argc - 2, argv + 2);
+   object->setConnectArgs(args.count(), args);
 }
 
 void GameConnection::onTimedOut()
@@ -323,6 +324,7 @@ void GameConnection::onConnectionEstablished(bool isInitiator)
 
       const char *argv[MaxConnectArgs + 2];
       argv[0] = "onConnect";
+      argv[1] = NULL; // Filled in later
       for(U32 i = 0; i < mConnectArgc; i++)
          argv[i + 2] = mConnectArgv[i];
       // NOTE: Need to fallback to Con::execute() as IMPLEMENT_CALLBACK does not 
@@ -442,7 +444,7 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
       *errorString = "CR_INVALID_ARGS";
       return false;
    }
-   const char *connectArgv[MaxConnectArgs + 3];
+   ConsoleValueRef connectArgv[MaxConnectArgs + 3];
    for(U32 i = 0; i < mConnectArgc; i++)
    {
       char argString[256];
@@ -451,6 +453,7 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
       connectArgv[i + 3] = mConnectArgv[i];
    }
    connectArgv[0] = "onConnectRequest";
+   connectArgv[1] = NULL;
    char buffer[256];
    Net::addressToString(getNetAddress(), buffer);
    connectArgv[2] = buffer;
@@ -974,7 +977,7 @@ bool GameConnection::readDemoStartBlock(BitStream *stream)
 
 void GameConnection::demoPlaybackComplete()
 {
-   static const char *demoPlaybackArgv[1] = { "demoPlaybackComplete" };
+   static ConsoleValueRef demoPlaybackArgv[1] = { "demoPlaybackComplete" };
    Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(1, demoPlaybackArgv, false));
    Parent::demoPlaybackComplete();
 }

@@ -566,7 +566,7 @@ ConsoleMethod( UndoManager, pushCompound, const char*, 2, 3, "( string name=\"\"
 {
    String name;
    if( argc > 2 )
-      name = argv[ 2 ];
+      name = (const char*)argv[ 2 ];
       
    CompoundUndoAction* action = object->pushCompound( name );
    if( !action )
@@ -584,7 +584,7 @@ ConsoleMethod( UndoManager, popCompound, void, 2, 3, "( bool discard=false ) - P
 {
    if( !object->getCompoundStackDepth() )
    {
-      Con::errorf( "%s::popCompound - no compound on stack", argv[ 0 ] );
+      Con::errorf( "%s::popCompound - no compound on stack", (const char*)argv[ 0 ] );
       return;
    }
    

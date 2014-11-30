@@ -1207,7 +1207,9 @@ ConsoleFunction( nextToken, const char *, 4, 4, "( string str, string token, str
    "@endtsexample\n\n"
    "@ingroup Strings" )
 {
-   char *str = (char *) argv[1];
+   char buffer[4096];
+   dStrncpy(buffer, argv[1], 4096);
+   char *str = buffer;
    const char *token = argv[2];
    const char *delim = argv[3];
 
@@ -1240,7 +1242,9 @@ ConsoleFunction( nextToken, const char *, 4, 4, "( string str, string token, str
          str++;
    }
 
-   return str;
+   char *ret = Con::getReturnBuffer(dStrlen(str)+1);
+   dStrncpy(ret, str, dStrlen(str)+1);
+   return ret;
 }
 
 //=============================================================================
@@ -1302,16 +1306,17 @@ ConsoleFunction(getTag, const char *, 2, 2, "(string textTagString)"
    TORQUE_UNUSED(argc);
    if(argv[1][0] == StringTagPrefixByte)
    {
+      const char *arg  = argv[1];
       const char * space = dStrchr(argv[1], ' ');
 
       U32 len;
       if(space)
-         len = space - argv[1];
+         len = space - arg;
       else
-         len = dStrlen(argv[1]) + 1;
+         len = dStrlen(arg) + 1;
 
       char * ret = Con::getReturnBuffer(len);
-      dStrncpy(ret, argv[1] + 1, len - 1);
+      dStrncpy(ret, arg + 1, len - 1);
       ret[len - 1] = 0;
 
       return(ret);
@@ -1517,11 +1522,12 @@ ConsoleFunction( realQuit, void, 1, 1, "" )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message ),,
+DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message, S32 status ), (0),
    "Display an error message box showing the given @a message and then shut down the engine and exit its process.\n"
    "This function cleanly uninitialized the engine and then exits back to the system with a process "
    "exit status indicating an error.\n\n"
-   "@param message The message to log to the console and show in an error message box.\n\n"
+   "@param message The message to log to the console and show in an error message box.\n"
+   "@param status  The status code to return to the OS.\n\n"
    "@see quit\n\n"
    "@ingroup Platform" )
 {
@@ -1532,7 +1538,20 @@ DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message ),,
    //    as the script code should not be allowed to pretty much hard-crash the engine
    //    and prevent proper shutdown.  Changed this to use postQuitMessage.
    
-   Platform::postQuitMessage( -1 );
+   Platform::postQuitMessage( status );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( quitWithStatus, void, ( S32 status ), (0),
+   "Shut down the engine and exit its process.\n"
+   "This function cleanly uninitializes the engine and then exits back to the system with a given "
+   "return status code.\n\n"
+   "@param status The status code to return to the OS.\n\n"
+   "@see quitWithErrorMessage\n\n"
+   "@ingroup Platform" )
+{
+   Platform::postQuitMessage(status);
 }
 
 //-----------------------------------------------------------------------------
@@ -2368,7 +2387,7 @@ ConsoleFunction(isDefined, bool, 2, 3, "(string varName)"
       if (dStrcmp(argv[1], "0") && dStrcmp(argv[1], "") && (Sim::findObject(argv[1]) != NULL))
          return true;
       else if (argc > 2)
-         Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, argv[1]);
+         Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, (const char*)argv[1]);
    }
 
    return false;
@@ -2403,7 +2422,7 @@ ConsoleFunction( pushInstantGroup, void, 1, 2, "([group])"
 				"@internal")
 {
    if( argc > 1 )
-      Con::pushInstantGroup( argv[ 1 ] );
+      Con::pushInstantGroup( (const char*)argv[ 1 ] );
    else
       Con::pushInstantGroup();
 }
@@ -2423,7 +2442,7 @@ ConsoleFunction(getPrefsPath, const char *, 1, 2, "([relativeFileName])"
 				"@note Appears to be useless in Torque 3D, should be deprecated\n"
 				"@internal")
 {
-   const char *filename = Platform::getPrefsPath(argc > 1 ? argv[1] : NULL);
+   const char *filename = Platform::getPrefsPath(argc > 1 ? (const char*)argv[1] : NULL);
    if(filename == NULL || *filename == 0)
       return "";
      

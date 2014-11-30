@@ -321,7 +321,7 @@ S32 TorqueMain(S32 argc, const char **argv)
       Platform::restartInstance();
 
    // Return.
-   return 0;
+   return StandardMainLoop::getReturnStatus();
 }
 
 #endif //TORQUE_SHARED

@@ -37,9 +37,6 @@
 //-----------------------------------------------------------------------------
 // This is a mainly a debugging function for intercepting a nonzero exit code
 // and generating a core dump for a stack trace.
-// Need an S64 here because postQuitMessage uses a U32, and 
-// forceshutdown uses an S32.  So S64 is needed to
-// accomodate them both
 static void CheckExitCode(S64 exitCode)
 {
    if (exitCode != 0)
@@ -141,7 +138,7 @@ void ProcessControlInit()
 }
 
 //-----------------------------------------------------------------------------
-void Platform::postQuitMessage(const U32 in_quitVal)
+void Platform::postQuitMessage(const S32 in_quitVal)
 {
    // if we have a window send a quit event, otherwise just force shutdown
 #if 0
@@ -171,8 +168,6 @@ void Platform::debugBreak()
 //-----------------------------------------------------------------------------
 void Platform::forceShutdown(S32 returnValue)
 {
-   CheckExitCode(returnValue);
-
 #if 0
    // if a dedicated server is running, turn it off
    if (x86UNIXState->isDedicated() && Game->isRunning())

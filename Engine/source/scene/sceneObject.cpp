@@ -1314,6 +1314,13 @@ DefineEngineMethod( SceneObject, getPosition, Point3F, (),,
    return object->getTransform().getPosition();
 }
 
+DefineEngineMethod( SceneObject, setPosition, void, (Point3F pos),,
+   "Set the object's world position.\n"
+   "@param pos the new world position of the object\n" )
+{
+   return object->setPosition(pos);
+}
+
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( SceneObject, getEulerRotation, Point3F, (),,

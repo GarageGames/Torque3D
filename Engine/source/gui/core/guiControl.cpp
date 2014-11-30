@@ -307,7 +307,7 @@ void GuiControl::initPersistFields()
 
 //-----------------------------------------------------------------------------
 
-bool GuiControl::processArguments(S32 argc, const char **argv)
+bool GuiControl::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    // argv[0] - The GuiGroup to add this control to when it's created.  
    //           this is an optional parameter that may be specified at

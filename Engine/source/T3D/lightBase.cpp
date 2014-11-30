@@ -439,7 +439,7 @@ ConsoleMethod( LightBase, playAnimation, void, 2, 3, "( [LightAnimData anim] )\t
     LightAnimData *animData;
     if ( !Sim::findObject( argv[2], animData ) )
     {
-        Con::errorf( "LightBase::playAnimation() - Invalid LightAnimData '%s'.", argv[2] );
+        Con::errorf( "LightBase::playAnimation() - Invalid LightAnimData '%s'.", (const char*)argv[2] );
         return;
     }
 

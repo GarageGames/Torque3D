@@ -25,7 +25,7 @@
 
 #include "core/util/refBase.h"
 #include "gfx/gfxShader.h"
-#include "gfx/gl/ggl/ggl.h"
+#include "gfx/gl/tGL/tGL.h"
 #include "core/util/tSignal.h"
 #include "core/util/tDictionary.h"
 
@@ -43,6 +43,7 @@ public:
    /// @name GFXShader interface
    /// @{
    virtual GFXShaderConstHandle* getShaderConstHandle(const String& name);
+   virtual GFXShaderConstHandle* findShaderConstHandle(const String& name);
 
    /// Returns our list of shader constants, the material can get this and just set the constants it knows about
    virtual const Vector<GFXShaderConstDesc>& getShaderConstDesc() const;

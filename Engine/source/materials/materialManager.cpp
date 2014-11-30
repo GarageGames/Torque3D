@@ -81,13 +81,13 @@ MaterialManager::MaterialManager()
    Con::addVariableNotify( "$pref::Video::defaultAnisotropy", callabck );
 
    Con::NotifyDelegate callabck2( this, &MaterialManager::_onDisableMaterialFeature );
-   Con::setVariable( "$pref::Video::disableNormalMapping", false );
+   Con::setVariable( "$pref::Video::disableNormalMapping", "false" );
    Con::addVariableNotify( "$pref::Video::disableNormalMapping", callabck2 );
-   Con::setVariable( "$pref::Video::disablePixSpecular", false );
+   Con::setVariable( "$pref::Video::disablePixSpecular", "false" );
    Con::addVariableNotify( "$pref::Video::disablePixSpecular", callabck2 );
-   Con::setVariable( "$pref::Video::disableCubemapping", false );
+   Con::setVariable( "$pref::Video::disableCubemapping", "false" );
    Con::addVariableNotify( "$pref::Video::disableCubemapping", callabck2 );
-   Con::setVariable( "$pref::Video::disableParallaxMapping", false );
+   Con::setVariable( "$pref::Video::disableParallaxMapping", "false" );
    Con::addVariableNotify( "$pref::Video::disableParallaxMapping", callabck2 );
 }
 
@@ -416,6 +416,9 @@ void MaterialManager::recalcFeaturesFromPrefs()
    mExclusionFeatures.setFeature(   MFT_NormalMap, 
                                     Con::getBoolVariable( "$pref::Video::disableNormalMapping", false ) );
 
+   mExclusionFeatures.setFeature(   MFT_SpecularMap,
+                                    Con::getBoolVariable( "$pref::Video::disablePixSpecular", false ) );
+
    mExclusionFeatures.setFeature(   MFT_PixSpecular,
                                     Con::getBoolVariable( "$pref::Video::disablePixSpecular", false ) );
 
@@ -465,7 +468,7 @@ ConsoleFunction( addMaterialMapping, void, 3, 3, "(string texName, string matNam
    "block or interior surface using the associated texture.\n\n"
    "@ingroup Materials")
 {
-   MATMGR->mapMaterial(argv[1],argv[2]);
+   MATMGR->mapMaterial(argv[1], argv[2]);
 }
 
 ConsoleFunction( getMaterialMapping, const char*, 2, 2, "(string texName)\n"
@@ -487,5 +490,5 @@ ConsoleFunction( dumpMaterialInstances, void, 1, 1,
 ConsoleFunction( getMapEntry, const char *, 2, 2, 
    "@hide")
 {
-	return MATMGR->getMapEntry( String(argv[1]) );
+	return MATMGR->getMapEntry( argv[1] );
 }
