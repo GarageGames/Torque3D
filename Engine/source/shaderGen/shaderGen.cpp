@@ -443,7 +443,7 @@ void ShaderGen::_printPixShader( Stream &stream )
    mPrinter->printPixelShaderCloser(stream);
 }
 
-GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const GFXVertexFormat *vertexFormat, const Vector<GFXShaderMacro> *macros )
+GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const GFXVertexFormat *vertexFormat, const Vector<GFXShaderMacro> *macros, const Vector<String> &samplers )
 {
    PROFILE_SCOPE( ShaderGen_GetShader );
 
@@ -488,7 +488,7 @@ GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const G
 
    GFXShader *shader = GFX->createShader();
    shader->mInstancingFormat.copy( mInstancingFormat ); // TODO: Move to init() below!
-   if ( !shader->init( vertFile, pixFile, pixVersion, shaderMacros ) )
+   if ( !shader->init( vertFile, pixFile, pixVersion, shaderMacros, samplers ) )
    {
       delete shader;
       return NULL;
