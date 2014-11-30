@@ -207,17 +207,15 @@ void TerrainBlock::_updateBaseTexture(bool writeToCache)
       F32 copyOffsetX = 2.0f * GFX->getFillConventionOffset() / (F32)destSize.x;
       F32 copyOffsetY = 2.0f * GFX->getFillConventionOffset() / (F32)destSize.y;
 
-      const bool needsYFlip = GFX->getAdapterType() == OpenGL;
-
       GFXVertexPT points[4];
       points[0].point      = Point3F( -1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0 );
-      points[0].texCoord   = Point2F(  0.0, needsYFlip ? 0.0f : 1.0f );
+      points[0].texCoord   = Point2F(  0.0, 1.0f );
       points[1].point      = Point3F( -1.0 - copyOffsetX,  1.0 + copyOffsetY, 0.0 );
-      points[1].texCoord   = Point2F(  0.0, needsYFlip ? 1.0f : 0.0f );
+      points[1].texCoord   = Point2F(  0.0, 0.0f );
       points[2].point      = Point3F(  1.0 - copyOffsetX,  1.0 + copyOffsetY, 0.0 );
-      points[2].texCoord   = Point2F(  1.0, needsYFlip ? 1.0f : 0.0f );
+      points[2].texCoord   = Point2F(  1.0, 0.0f );
       points[3].point      = Point3F(  1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0 );
-      points[3].texCoord   = Point2F(  1.0, needsYFlip ? 0.0f : 1.0f );
+      points[3].texCoord   = Point2F(  1.0, 1.0f );
 
       vb.set( GFX, 4, GFXBufferTypeVolatile );
       GFXVertexPT *ptr = vb.lock();

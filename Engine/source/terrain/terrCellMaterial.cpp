@@ -542,10 +542,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
 
    // We write to the zbuffer if this is a prepass
    // material or if the prepass is disabled.
-   // We also write the zbuffer if we're using OpenGL, because in OpenGL the prepass
-   // cannot share the same zbuffer as the backbuffer.
    desc.setZReadWrite( true,  !MATMGR->getPrePassEnabled() || 
-                              GFX->getAdapterType() == OpenGL ||
                               prePassMat ||
                               reflectMat );
 
