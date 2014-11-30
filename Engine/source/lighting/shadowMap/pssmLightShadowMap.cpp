@@ -204,7 +204,10 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
    if (  mShadowMapTex.isNull() || 
          mNumSplits != params->numSplits || 
          mTexSize != texSize )
+   {
       _setNumSplits( params->numSplits, texSize );
+      mShadowMapDepth = _getDepthTarget( mShadowMapTex->getWidth(), mShadowMapTex->getHeight() );   
+   }
    mLogWeight = params->logWeight;
 
    Frustum fullFrustum( diffuseState->getCameraFrustum() );
@@ -216,8 +219,7 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
    // Set our render target
    GFX->pushActiveRenderTarget();
    mTarget->attachTexture( GFXTextureTarget::Color0, mShadowMapTex );
-   mTarget->attachTexture( GFXTextureTarget::DepthStencil, 
-      _getDepthTarget( mShadowMapTex->getWidth(), mShadowMapTex->getHeight() ) );
+   mTarget->attachTexture( GFXTextureTarget::DepthStencil, mShadowMapDepth );
    GFX->setActiveRenderTarget( mTarget );
    GFX->clear( GFXClearStencil | GFXClearZBuffer | GFXClearTarget, ColorI(255,255,255), 1.0f, 0 );
 
