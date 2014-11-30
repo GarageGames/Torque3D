@@ -723,7 +723,7 @@ public:
    virtual U32 getNumRenderTargets() const = 0;
 
    virtual void setShader( GFXShader *shader ) {}
-   virtual void disableShaders() {}
+   virtual void disableShaders() {} // TODO Remove when T3D 4.0
 
    /// Set the buffer! (Actual set happens on the next draw call, just like textures, state blocks, etc)
    void setShaderConstBuffer(GFXShaderConstBuffer* buffer);
