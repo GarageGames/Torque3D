@@ -263,4 +263,35 @@ void fizzle(float2 vpos, float visibility)
 }
 
 
+// #define TORQUE_STOCK_GAMMA
+#ifdef TORQUE_STOCK_GAMMA
+// Sample in linear space. Decodes gamma.
+float4 tex2DLinear(sampler2D tex, float2 texCoord)
+{
+   float4 sampl = tex2D(tex, texCoord);
+   return sampl;
+}
+
+// Sample in linear space. Decodes gamma.
+float4 tex2DLodLinear(sampler2D tex, float4 texCoord)
+{
+   float4 sampl = tex2Dlod(tex, texCoord);
+   return sampl;
+}
+#else
+// Sample in linear space. Decodes gamma.
+float4 tex2DLinear(sampler2D tex, float2 texCoord)
+{
+   float4 sampl = tex2D(tex, texCoord);
+   return float4(pow(abs(sampl.rgb), 2.2), sampl.a);
+}
+
+// Sample in linear space. Decodes gamma.
+float4 tex2DLodLinear(sampler2D tex, float4 texCoord)
+{
+   float4 sampl = tex2Dlod(tex, texCoord);
+   return float4(pow(abs(sampl.rgb), 2.2), sampl.a);
+}
+#endif //
+
 #endif // _TORQUE_HLSL_

@@ -269,4 +269,36 @@ void fizzle(vec2 vpos, float visibility)
 /// @note This macro will only work in the void main() method of a pixel shader.
 #define assert(condition, color) { if(!any(condition)) { OUT_FragColor0 = color; return; } }
 
+
+// define TORQUE_STOCK_GAMMA
+#ifdef TORQUE_STOCK_GAMMA
+// Sample in linear space. Decodes gamma.
+vec4 tex2DLinear(sampler2D tex, vec2 texCoord)
+{
+   vec4 sampl = texture(tex, texCoord);
+   return sampl;
+}
+
+// Sample in linear space. Decodes gamma.
+vec4 tex2DLodLinear(sampler2D tex, vec4 texCoord)
+{
+   vec4 sampl = textureLod(tex, texCoord.xy,texCoord.w);
+   return sampl;
+}
+#else
+// Sample in linear space. Decodes gamma.
+vec4 tex2DLinear(sampler2D tex, vec2 texCoord)
+{
+   vec4 sampl = texture(tex, texCoord);
+   return vec4(pow(abs(sampl.rgb), vec3(2.2)), sampl.a);
+}
+
+// Sample in linear space. Decodes gamma.
+vec4 tex2DLodLinear(sampler2D tex, vec4 texCoord)
+{
+   vec4 sampl = textureLod(tex, texCoord.xy,texCoord.w);
+   return vec4(pow(abs(sampl.rgb), vec3(2.2)), sampl.a);
+}
+#endif
+
 #endif // _TORQUE_GLSL_

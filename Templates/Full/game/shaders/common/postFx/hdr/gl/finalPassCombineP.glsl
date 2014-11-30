@@ -20,23 +20,24 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "../../torque.hlsl"
-#include "../postFx.hlsl"
+#include "../../../gl/torque.glsl"
+#include "../../../gl/hlslCompat.glsl"
+#include "../../gl/postFX.glsl"
 
-uniform sampler2D sceneTex : register( s0 );
-uniform sampler2D luminanceTex : register( s1 );
-uniform sampler2D bloomTex : register( s2 );
-uniform sampler1D colorCorrectionTex : register( s3 );
+uniform sampler2D sceneTex;
+uniform sampler2D luminanceTex;
+uniform sampler2D bloomTex;
+uniform sampler1D colorCorrectionTex;
 
-uniform float2 texSize0;
-uniform float2 texSize2;
+uniform vec2 texSize0;
+uniform vec2 texSize2;
 
 uniform float g_fEnableToneMapping;
 uniform float g_fMiddleGray;
 uniform float g_fWhiteCutoff;
 
 uniform float g_fEnableBlueShift;
-uniform float3 g_fBlueShiftColor; 
+uniform vec3 g_fBlueShiftColor; 
 
 uniform float g_fBloomScale;
 
@@ -44,31 +45,32 @@ uniform float g_fOneOverGamma;
 uniform float Brightness;
 uniform float Contrast;
 
+out vec4 OUT_FragColor0;
 
-float4 main( PFXVertToPix IN ) : COLOR0
+void main()
 {
-   float4 sample = hdrDecode( tex2D( sceneTex, IN.uv0 ) );
-   float adaptedLum = tex2D( luminanceTex, float2( 0.5f, 0.5f ) ).r;
-   float4 bloom = tex2D( bloomTex, IN.uv0 );
+   vec4 _sample = hdrDecode( texture( sceneTex, IN_uv0 ) );
+   float adaptedLum = texture( luminanceTex, vec2( 0.5f, 0.5f ) ).r;
+   vec4 bloom = texture( bloomTex, IN_uv0 );
 
    // For very low light conditions, the rods will dominate the perception
    // of light, and therefore color will be desaturated and shifted
    // towards blue.
    if ( g_fEnableBlueShift > 0.0f )
    {
-      const float3 LUMINANCE_VECTOR = float3(0.2125f, 0.7154f, 0.0721f);
+      const vec3 LUMINANCE_VECTOR = vec3(0.2125f, 0.7154f, 0.0721f);
 
       // Define a linear blending from -1.5 to 2.6 (log scale) which
-      // determines the lerp amount for blue shift
+      // determines the mix amount for blue shift
       float coef = 1.0f - ( adaptedLum + 1.5 ) / 4.1;
       coef = saturate( coef * g_fEnableBlueShift );
 
       // Lerp between current color and blue, desaturated copy
-      float3 rodColor = dot( sample.rgb, LUMINANCE_VECTOR ) * g_fBlueShiftColor;
-      sample.rgb = lerp( sample.rgb, rodColor, coef );
+      vec3 rodColor = dot( _sample.rgb, LUMINANCE_VECTOR ) * g_fBlueShiftColor;
+      _sample.rgb = mix( _sample.rgb, rodColor, coef );
 	  
       rodColor = dot( bloom.rgb, LUMINANCE_VECTOR ) * g_fBlueShiftColor;
-      bloom.rgb = lerp( bloom.rgb, rodColor, coef );
+      bloom.rgb = mix( bloom.rgb, rodColor, coef );
    }
 
    // Map the high range of color values into a range appropriate for
@@ -76,28 +78,28 @@ float4 main( PFXVertToPix IN ) : COLOR0
    // white point, and selected value for for middle gray.
    if ( g_fEnableToneMapping > 0.0f )
    {
-      float Lp = (g_fMiddleGray / (adaptedLum + 0.0001)) * hdrLuminance( sample.rgb );
+      float Lp = (g_fMiddleGray / (adaptedLum + 0.0001)) * hdrLuminance( _sample.rgb );
       //float toneScalar = ( Lp * ( 1.0 + ( Lp / ( g_fWhiteCutoff ) ) ) ) / ( 1.0 + Lp );
 	  float toneScalar = Lp;
-      sample.rgb = lerp( sample.rgb, sample.rgb * toneScalar, g_fEnableToneMapping );
+      _sample.rgb = mix( _sample.rgb, _sample.rgb * toneScalar, g_fEnableToneMapping );
    }
 
    // Add the bloom effect.
-   sample += g_fBloomScale * bloom;
+   _sample += g_fBloomScale * bloom;
 
    // Apply the color correction.
-   sample.r = tex1D( colorCorrectionTex, sample.r ).r;
-   sample.g = tex1D( colorCorrectionTex, sample.g ).g;
-   sample.b = tex1D( colorCorrectionTex, sample.b ).b;
+   _sample.r = texture( colorCorrectionTex, _sample.r ).r;
+   _sample.g = texture( colorCorrectionTex, _sample.g ).g;
+   _sample.b = texture( colorCorrectionTex, _sample.b ).b;
 
    // Apply gamma correction
-   sample.rgb = pow( abs(sample.rgb), g_fOneOverGamma );
+   _sample.rgb = pow( abs(_sample.rgb), vec3(g_fOneOverGamma) );
  
    // Apply contrast
-   sample.rgb = ((sample.rgb - 0.5f) * Contrast) + 0.5f;
+   _sample.rgb = ((_sample.rgb - 0.5f) * Contrast) + 0.5f;
  
    // Apply brightness
-   sample.rgb += Brightness;
+   _sample.rgb += Brightness;
 
-   return sample;
+   OUT_FragColor0 = _sample;
 }
