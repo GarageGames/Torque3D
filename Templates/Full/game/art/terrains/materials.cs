@@ -47,6 +47,8 @@ new TerrainMaterial()
    detailBrightness = "1";
    Enabled = "1";
    diffuseSize = "200";
+   normalMap = "art/terrains/Example/grass1_n";
+   detailDistance = "1000";
 };
 
 singleton Material(TerrainFX_grass2)
@@ -97,6 +99,7 @@ new TerrainMaterial()
    Enabled = "1";
    diffuseSize = "250";
    detailStrength = "2";
+   normalMap = "art/terrains/Example/grass1_dry_n";
 };
 
 singleton Material(TerrainFX_dirt_grass)
@@ -108,6 +111,15 @@ singleton Material(TerrainFX_dirt_grass)
    showFootprints = "1";
    materialTag0 = "Terrain";
    effectColor[0] = "0.63 0.55 0 1";
+   diffuseMap = "art/terrains/Example/dirt_grass";
+   diffuseSize = "200";
+   normalMap = "art/terrains/Example/dirt_grass_n";
+   detailMap = "art/terrains/Example/dirt_grass_d";
+   detailDistance = "100";
+   internalName = "dirt_grass";
+   isManaged = "1";
+   detailBrightness = "1";
+   enabled = "1";
 };
 
 new TerrainMaterial()
@@ -138,6 +150,16 @@ singleton Material(TerrainFX_rocktest)
    impactSoundId = "1";
    effectColor[0] = "0.25 0.25 0.25 1";
    effectColor[1] = "0.25 0.25 0.25 0";
+   diffuseMap = "art/terrains/Example/rocktest";
+   diffuseSize = "400";
+   normalMap = "art/terrains/Example/rocktest_n";
+   detailMap = "art/terrains/Example/rocktest_d";
+   detailSize = "10";
+   detailDistance = "100";
+   internalName = "rocktest";
+   isManaged = "1";
+   detailBrightness = "1";
+   enabled = "1";
 };
 
 new TerrainMaterial()
@@ -168,6 +190,16 @@ singleton Material(TerrainFX_stone)
    impactSoundId = "1";
    effectColor[0] = "0.25 0.25 0.25 1";
    effectColor[1] = "0.25 0.25 0.25 0";
+   diffuseMap = "art/terrains/Example/stone";
+   diffuseSize = "400";
+   normalMap = "art/terrains/Example/stone_n";
+   detailMap = "art/terrains/Example/stone_d";
+   detailSize = "10";
+   detailDistance = "100";
+   internalName = "stone";
+   isManaged = "1";
+   detailBrightness = "1";
+   enabled = "1";
 };
 
 new TerrainMaterial()
@@ -211,4 +243,5 @@ new TerrainMaterial()
    detailBrightness = "1";
    Enabled = "1";
    diffuseSize = "200";
+   normalMap = "art/terrains/Example/sand_n";
 };
