@@ -113,7 +113,7 @@ void TerrainBlock::_updateLayerTexture()
    if (  mLayerTex.isNull() ||
          mLayerTex.getWidth() != layerSize ||
          mLayerTex.getHeight() != layerSize )
-      mLayerTex.set( layerSize, layerSize, GFXFormatR8G8B8A8, &TerrainLayerTexProfile, "" );
+      mLayerTex.set( layerSize, layerSize, GFXFormatB8G8R8A8, &TerrainLayerTexProfile, "" );
 
    AssertFatal(   mLayerTex.getWidth() == layerSize &&
                   mLayerTex.getHeight() == layerSize,
