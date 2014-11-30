@@ -202,8 +202,21 @@ void _GFXGLTextureTargetFBOImpl::applyState()
 
 void _GFXGLTextureTargetFBOImpl::makeActive()
 {
-   glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer);
-   GFXGL->getOpenglCache()->setCacheBinded(GL_FRAMEBUFFER, mFramebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer);
+    GFXGL->getOpenglCache()->setCacheBinded(GL_FRAMEBUFFER, mFramebuffer);
+
+    int i = 0;
+    GLenum draws[16];
+    for( i = 0; i < GFXGL->getNumRenderTargets(); ++i)
+    {
+        _GFXGLTargetDesc* color = mTarget->getTargetDesc( static_cast<GFXTextureTarget::RenderSlot>(GFXTextureTarget::Color0+i ));
+        if(color)
+            draws[i] = GL_COLOR_ATTACHMENT0 + i;
+        else
+            break;
+    }
+
+    glDrawBuffers( i, draws );
 }
 
 void _GFXGLTextureTargetFBOImpl::finish()

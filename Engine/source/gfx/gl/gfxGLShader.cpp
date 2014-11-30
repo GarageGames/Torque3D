@@ -451,6 +451,12 @@ bool GFXGLShader::_init()
    glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord8,   "vTexCoord8");
    glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord9,   "vTexCoord9");
 
+   //bind fragment out color
+   glBindFragDataLocation(mProgram, 0, "OUT_col");
+   glBindFragDataLocation(mProgram, 1, "OUT_col1");
+   glBindFragDataLocation(mProgram, 2, "OUT_col2");
+   glBindFragDataLocation(mProgram, 3, "OUT_col3");
+
    // Link it!
    glLinkProgram( mProgram );
 
