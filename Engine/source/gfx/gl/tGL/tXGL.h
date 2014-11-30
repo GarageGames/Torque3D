@@ -20,34 +20,19 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _GFXGLENUMTRANSLATE_H_
-#define _GFXGLENUMTRANSLATE_H_
+#ifndef GFX_TORQUE_XGL_H
+#define GFX_TORQUE_XGL_H
 
-#include "gfx/gfxEnums.h"
-#include "gfx/gl/gfxGLDevice.h"
+#include "platform/platform.h"
 
-namespace GFXGLEnumTranslate
-{
-   void init();
-};
+#ifdef TORQUE_OS_LINUX
 
-extern GLenum GFXGLPrimType[GFXPT_COUNT];
-extern GLenum GFXGLBlend[GFXBlend_COUNT];
-extern GLenum GFXGLBlendOp[GFXBlendOp_COUNT];
-extern GLenum GFXGLSamplerState[GFXSAMP_COUNT];
-extern GLenum GFXGLTextureFilter[GFXTextureFilter_COUNT];
-extern GLenum GFXGLTextureAddress[GFXAddress_COUNT];
-extern GLenum GFXGLCmpFunc[GFXCmp_COUNT];
-extern GLenum GFXGLStencilOp[GFXStencilOp_COUNT];
+#include "tGL.h"
+#include "GL/glxew.h"
 
-extern GLenum GFXGLTextureInternalFormat[GFXFormat_COUNT];
-extern GLenum GFXGLTextureFormat[GFXFormat_COUNT];
-extern GLenum GFXGLTextureType[GFXFormat_COUNT];
-extern GLint* GFXGLTextureSwizzle[GFXFormat_COUNT];
+#define gglHasXExtension(EXTENSION) GLXEW##EXTENSION
 
-extern GLenum GFXGLBufferType[GFXBufferType_COUNT];
-extern GLenum GFXGLCullMode[GFXCull_COUNT];
-
-extern GLenum GFXGLFillMode[GFXFill_COUNT];
+#endif //TORQUE_OS_LINUX
 
 #endif
+

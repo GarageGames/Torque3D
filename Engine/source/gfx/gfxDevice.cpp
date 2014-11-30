@@ -267,6 +267,8 @@ GFXDevice::~GFXDevice()
       mNewCubemap[i] = NULL;
    }
 
+   mCurrentRT = NULL;
+
    // Release all the unreferenced textures in the cache.
    mTextureManager->cleanupCache();
 

@@ -1073,7 +1073,10 @@ void OverlayTexFeatGLSL::setTexData(   Material::StageData &stageDat,
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_OverlayMap );
    if ( tex )
+   {
+      passData.mSamplerNames[ texIndex ] = "overlayMap";
       passData.mTexSlot[ texIndex++ ].texObject = tex;
+   }
 }
 
 
@@ -2383,7 +2386,7 @@ void GlowMaskGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    // code above that doesn't contribute to the alpha mask.
    Var *color = (Var*)LangElement::find( "col" );
    if ( color )
-      output = new GenOp( "   @.rgb = 0;\r\n", color );
+      output = new GenOp( "   @.rgb = vec3(0);\r\n", color );
 }
 
 
@@ -2395,7 +2398,7 @@ void RenderTargetZeroGLSL::processPix( Vector<ShaderComponent*> &componentList, 
 {
    // Do not actually assign zero, but instead a number so close to zero it may as well be zero.
    // This will prevent a divide by zero causing an FP special on float render targets
-   output = new GenOp( "   @;\r\n", assignColor( new GenOp( "0.00001" ), Material::None, NULL, mOutputTargetMask ) );
+   output = new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(0.00001)" ), Material::None, NULL, mOutputTargetMask ) );
 }
 
 

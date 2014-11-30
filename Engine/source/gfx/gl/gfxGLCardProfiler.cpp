@@ -76,30 +76,30 @@ void GFXGLCardProfiler::setupCardCapabilities()
    setCapability("maxTextureSize", maxTexSize);
 
    // If extensions haven't been inited, we're in trouble here.
-   bool suppVBO = (gglHasExtension(GL_ARB_vertex_buffer_object) || glVersion >= 1.499f);
+   bool suppVBO = (gglHasExtension(ARB_vertex_buffer_object) || glVersion >= 1.499f);
    setCapability("GL::suppVertexBufferObject", suppVBO);
 
    // check if render to texture supported is available
-   bool suppRTT = gglHasExtension(GL_EXT_framebuffer_object);
+   bool suppRTT = gglHasExtension(EXT_framebuffer_object);
    setCapability("GL::suppRenderTexture", suppRTT);
    
-   bool suppBlit = gglHasExtension(GL_EXT_framebuffer_blit);
+   bool suppBlit = gglHasExtension(EXT_framebuffer_blit);
    setCapability("GL::suppRTBlit", suppBlit);
    
-   bool suppFloatTex = gglHasExtension(GL_ATI_texture_float);
+   bool suppFloatTex = gglHasExtension(ARB_texture_float);
    setCapability("GL::suppFloatTexture", suppFloatTex);
 
    // Check for anisotropic filtering support.
-   bool suppAnisotropic = gglHasExtension( GL_EXT_texture_filter_anisotropic );
+   bool suppAnisotropic = gglHasExtension( EXT_texture_filter_anisotropic );
    setCapability( "GL::suppAnisotropic", suppAnisotropic );
 
    // check to see if we have the fragment shader extension or the gl version is high enough for glsl to be core
    // also check to see if the language version is high enough
    F32 glslVersion = dAtof(reinterpret_cast<const char*>(glGetString( GL_SHADING_LANGUAGE_VERSION)));
-   bool suppSPU = (gglHasExtension(GL_ARB_fragment_shader) || glVersion >= 1.999f) && glslVersion >= 1.0999;
+   bool suppSPU = (gglHasExtension(ARB_fragment_shader) || glVersion >= 1.999f) && glslVersion >= 1.0999;
    setCapability("GL::suppFragmentShader", suppSPU);
    
-   bool suppAppleFence = gglHasExtension(GL_APPLE_fence);
+   bool suppAppleFence = gglHasExtension(APPLE_fence);
    setCapability("GL::APPLE::suppFence", suppAppleFence);
    
    // When enabled, call glGenerateMipmapEXT() to generate mipmaps instead of relying on GL_GENERATE_MIPMAP
