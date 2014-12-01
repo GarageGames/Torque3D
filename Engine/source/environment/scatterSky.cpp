@@ -325,13 +325,13 @@ void ScatterSky::initPersistFields()
       addField( "skyBrightness",       TypeF32,    Offset( mSkyBrightness, ScatterSky ),
          "Global brightness and intensity applied to the sky and objects in the level." );
 
-     addField( "sunSize",       TypeF32,    Offset( mSunSize, ScatterSky ),
+      addField( "sunSize",             TypeF32,    Offset( mSunSize, ScatterSky ),
          "Affects the size of the sun's disk." );
 
-    addField( "colorizeAmount",       TypeF32,   Offset( mColorizeAmt, ScatterSky ),
+      addField( "colorizeAmount",      TypeF32,    Offset( mColorizeAmt, ScatterSky ),
          "Controls how much the the alpha component of colorize brigthens the sky. Setting to 0 returns default behavior." );
 
-     addField( "colorize",            TypeColorF,    Offset( mColorize, ScatterSky ),
+      addField( "colorize",            TypeColorF, Offset( mColorize, ScatterSky ),
          "Tints the sky the color specified, the alpha controls the brigthness. The brightness is multipled by the value of colorizeAmt." );
 
       addField( "rayleighScattering",  TypeF32,    Offset( mRayleighScattering, ScatterSky ),
@@ -351,7 +351,7 @@ void ScatterSky::initPersistFields()
       addField( "exposure",            TypeF32,    Offset( mExposure, ScatterSky ),
          "Controls the contrast of the sky and sun during daytime." );
 
-     addField( "zOffset",            TypeF32,    Offset( mZOffset, ScatterSky ),  
+      addField( "zOffset",            TypeF32,     Offset( mZOffset, ScatterSky ),  
          "Offsets the scatterSky to avoid canvas rendering. Use 5000 or greater for the initial adjustment" );  
 
    endGroup( "ScatterSky" );
@@ -477,12 +477,12 @@ U32 ScatterSky::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->write( mAmbientScale );
       stream->write( mSunScale );
       stream->write( mFogScale );
-     stream->write( mColorizeAmt );
+      stream->write( mColorizeAmt );
       stream->write( mColorize );
 
       stream->write( mExposure );
 
-     stream->write( mZOffset );
+      stream->write( mZOffset );
 
       stream->write( mBrightness );
 
@@ -562,7 +562,7 @@ void ScatterSky::unpackUpdate(NetConnection *con, BitStream *stream)
       stream->read( &mAmbientScale );
       stream->read( &mSunScale );
       stream->read( &mFogScale );
-     F32 colorizeAmt;
+      F32 colorizeAmt;
       stream->read( &colorizeAmt );
 
       if(mColorizeAmt != colorizeAmt) {
@@ -583,7 +583,7 @@ void ScatterSky::unpackUpdate(NetConnection *con, BitStream *stream)
 
       stream->read( &mExposure );
 
-     stream->read( &mZOffset );
+      stream->read( &mZOffset );
 
       stream->read( &mBrightness );
 
