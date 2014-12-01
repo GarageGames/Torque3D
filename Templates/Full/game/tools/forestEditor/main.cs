@@ -72,6 +72,7 @@ function initializeForestEditor()
    %map.bindCmd( keyboard, "5", "ForestEditorPaintModeBtn.performClick();", "" );  // Paint
    %map.bindCmd( keyboard, "6", "ForestEditorEraseModeBtn.performClick();", "" );  // Erase
    %map.bindCmd( keyboard, "7", "ForestEditorEraseSelectedModeBtn.performClick();", "" );  // EraseSelected   
+   %map.bindCmd( keyboard, "8", "ForestEditorDropToGroundModeBtn.performClick();", "" );  // EraseSelected
    //%map.bindCmd( keyboard, "backspace", "ForestEditorGui.onDeleteKey();", "" );
    //%map.bindCmd( keyboard, "delete", "ForestEditorGui.onDeleteKey();", "" );   
    ForestEditorPlugin.map = %map;   
