@@ -513,7 +513,7 @@ extern void* dRealloc_r(void* in_pResize, dsize_t in_size, const char*, const ds
 extern void* dRealMalloc(dsize_t);
 extern void  dRealFree(void*);
 
-extern void *dMalloc_aligned(dsize_t in_size, intptr_t alignment);
+extern void *dMalloc_aligned(dsize_t in_size, S32 alignment);
 extern void dFree_aligned(void *);
 
 
