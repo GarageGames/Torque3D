@@ -351,7 +351,7 @@ void ScatterSky::initPersistFields()
       addField( "exposure",            TypeF32,    Offset( mExposure, ScatterSky ),
          "Controls the contrast of the sky and sun during daytime." );
 
-      addField( "zOffset",            TypeF32,     Offset( mZOffset, ScatterSky ),  
+      addField( "zOffset",             TypeF32,     Offset( mZOffset, ScatterSky ),  
          "Offsets the scatterSky to avoid canvas rendering. Use 5000 or greater for the initial adjustment" );  
 
    endGroup( "ScatterSky" );
