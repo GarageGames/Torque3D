@@ -97,8 +97,6 @@ function NavEditorPlugin::onWorldEditorStartup(%this)
    // Add items to World Editor Creator
    EWCreatorWindow.beginGroup("Navigation");
 
-      EWCreatorWindow.registerMissionObject("NavMesh", "Navigation mesh");
-      EWCreatorWindow.registerMissionObject("NavPath", "Path");
       EWCreatorWindow.registerMissionObject("CoverPoint", "Cover point");
 
    EWCreatorWindow.endGroup();
@@ -152,7 +150,7 @@ function NavEditorPlugin::onActivated(%this)
    // Always use Object alignment.
    GlobalGizmoProfile.alignment = "Object";
 
-   // Set the status bar here until all tool have been hooked up
+   // Set the status until some other editing mode adds useful information.
    EditorGuiStatusBar.setInfo("Navigation editor.");
    EditorGuiStatusBar.setSelection("");
 
@@ -231,8 +229,15 @@ function NavEditorPlugin::readSettings(%this)
 {
    EditorSettings.beginGroup("NavEditor", true);
 
-   NavEditorGui.spawnClass     = EditorSettings.value("SpawnClass");
-   NavEditorGui.spawnDatablock = EditorSettings.value("SpawnDatablock");
+   // Currently these are globals because of the way they are accessed in navMesh.cpp.
+   $Nav::Editor::renderMesh       = EditorSettings.value("RenderMesh");
+   $Nav::Editor::renderPortals    = EditorSettings.value("RenderPortals");
+   $Nav::Editor::renderBVTree     = EditorSettings.value("RenderBVTree");
+   NavEditorGui.spawnClass        = EditorSettings.value("SpawnClass");
+   NavEditorGui.spawnDatablock    = EditorSettings.value("SpawnDatablock");
+   NavEditorGui.backgroundBuild   = EditorSettings.value("BackgroundBuild");
+   NavEditorGui.saveIntermediates = EditorSettings.value("SaveIntermediates");
+   NavEditorGui.playSoundWhenDone = EditorSettings.value("PlaySoundWhenDone");
 
    EditorSettings.endGroup();  
 }
@@ -241,8 +246,14 @@ function NavEditorPlugin::writeSettings(%this)
 {
    EditorSettings.beginGroup("NavEditor", true);
 
-   EditorSettings.setValue("SpawnClass",     NavEditorGui.spawnClass);
-   EditorSettings.setValue("SpawnDatablock", NavEditorGui.spawnDatablock);
+   EditorSettings.setValue("RenderMesh",        $Nav::Editor::renderMesh);
+   EditorSettings.setValue("RenderPortals",     $Nav::Editor::renderPortals);
+   EditorSettings.setValue("RenderBVTree",      $Nav::Editor::renderBVTree);
+   EditorSettings.setValue("SpawnClass",        NavEditorGui.spawnClass);
+   EditorSettings.setValue("SpawnDatablock",    NavEditorGui.spawnDatablock);
+   EditorSettings.setValue("BackgroundBuild",   NavEditorGui.backgroundBuild);
+   EditorSettings.setValue("SaveIntermediates", NavEditorGui.saveIntermediates);
+   EditorSettings.setValue("PlaySoundWhenDone", NavEditorGui.playSoundWhenDone);
 
    EditorSettings.endGroup();
 }
