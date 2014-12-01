@@ -67,16 +67,16 @@ public:
 
 
 
-	RenderInstType(const RenderInstType &type)
-	{
-		mName = type.mName;
-	}
+   RenderInstType(const RenderInstType &type)
+   {
+      mName = type.mName;
+   }
 
    RenderInstType()
-	{
-		const RenderInstType &type = Invalid;
-		mName = type.mName;
-	}
+   {
+      const RenderInstType &type = Invalid;
+      mName = type.mName;
+   }
 
    RenderInstType( const String &name )
       :  mName( name )
