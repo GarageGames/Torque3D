@@ -74,6 +74,9 @@ enum ProcessorType
    CPU_AMD_K6_2,
    CPU_AMD_K6_3,
    CPU_AMD_Athlon,
+   CPU_AMD_Phenom,
+   CPU_AMD_PhenomII,
+   CPU_AMD_Bulldozer,
    CPU_AMD_Unknown,
    CPU_Cyrix_6x86,
    CPU_Cyrix_MediaGX,
@@ -510,7 +513,7 @@ extern void* dRealloc_r(void* in_pResize, dsize_t in_size, const char*, const ds
 extern void* dRealMalloc(dsize_t);
 extern void  dRealFree(void*);
 
-extern void *dMalloc_aligned(dsize_t in_size, S32 alignment);
+extern void *dMalloc_aligned(dsize_t in_size, intptr_t alignment);
 extern void dFree_aligned(void *);
 
 
