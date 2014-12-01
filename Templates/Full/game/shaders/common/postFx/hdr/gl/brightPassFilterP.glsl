@@ -33,6 +33,8 @@ uniform float g_fMiddleGray;
 
 const vec3 LUMINANCE_VECTOR = vec3(0.3125f, 0.6154f, 0.0721f);
 
+out vec4 OUT_col;
+
 
 const vec2 gTapOffsets[4] = vec2[]
 (
@@ -59,5 +61,5 @@ void main()
       average = vec4( 0.0f, 0.0f, 0.0f, 1.0f );
 
    // Write the colour to the bright-pass render target
-   OUT_FragColor0 = hdrEncode( average );
+   OUT_col = hdrEncode( average );
 }

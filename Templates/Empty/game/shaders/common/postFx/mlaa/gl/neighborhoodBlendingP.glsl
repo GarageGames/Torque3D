@@ -40,6 +40,7 @@ uniform sampler2D areaMap;
 uniform sampler2D edgesMapL;
 #include "./functions.glsl"
 
+out vec4 OUT_col;
 
 void main()
 {
@@ -83,5 +84,5 @@ void main()
    #endif
 
    // Normalize the resulting color and we are finished!
-   OUT_FragColor0 = color / sum; 
+   OUT_col = color / sum; 
 }

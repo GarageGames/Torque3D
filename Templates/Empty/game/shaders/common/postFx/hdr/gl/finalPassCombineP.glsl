@@ -43,6 +43,8 @@ uniform float g_fBloomScale;
 
 uniform float g_fOneOverGamma;
 
+out vec4 OUT_col;
+
 
 void main()
 {
@@ -92,5 +94,5 @@ void main()
    // Apply gamma correction
    _sample.rgb = pow( abs(_sample.rgb), vec3(g_fOneOverGamma) );
 
-   OUT_FragColor0 = _sample;
+   OUT_col = _sample;
 }

@@ -37,6 +37,8 @@ uniform float velocityMultiplier;
 uniform sampler2D backBuffer;
 uniform sampler2D prepassTex;
 
+out vec4 OUT_col;
+
 void main()
 {
    vec2 IN_uv0 = _IN_uv0;
@@ -72,5 +74,5 @@ void main()
       color += currentColor;
    }
    
-   OUT_FragColor0 = color / samples;
+   OUT_col = color / samples;
 }

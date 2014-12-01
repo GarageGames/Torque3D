@@ -25,7 +25,9 @@
 
 // These are set by the game engine.  
 uniform sampler2D shrunkSampler;  // Output of DofDownsample()  
-uniform sampler2D blurredSampler; // Blurred version of the shrunk sampler  
+uniform sampler2D blurredSampler; // Blurred version of the shrunk sampler
+
+out vec4 OUT_col;
 
 // This is the pixel shader function that calculates the actual  
 // value used for the near circle of confusion.  
@@ -46,8 +48,8 @@ void main()
    coc = 2 * max( blurred.a, shrunk.a ) - shrunk.a;  
    
    
-   //OUT_FragColor0 = vec4( coc.rrr, 1.0 );
-   //OUT_FragColor0 = vec4( color, 1.0 );
-   OUT_FragColor0 = vec4( color, coc );  
-   //OUT_FragColor0 = vec4( 1.0, 0.0, 1.0, 1.0 );
+   //OUT_col = vec4( coc.rrr, 1.0 );
+   //OUT_col = vec4( color, 1.0 );
+   OUT_col = vec4( color, coc );  
+   //OUT_col = vec4( 1.0, 0.0, 1.0, 1.0 );
 }

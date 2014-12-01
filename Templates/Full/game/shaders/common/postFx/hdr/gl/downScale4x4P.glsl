@@ -30,6 +30,8 @@ in vec4 texCoords[8];
 
 uniform sampler2D inputTex;
 
+out vec4 OUT_col;
+
 //-----------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------
@@ -44,5 +46,5 @@ void main()
       _sample += texture( inputTex, IN_texCoords[i].zw );
    }
    
-	OUT_FragColor0 = _sample / 16;
+	OUT_col = _sample / 16;
 }

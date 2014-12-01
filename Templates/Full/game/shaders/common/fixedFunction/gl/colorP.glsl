@@ -22,9 +22,9 @@
 
 in vec4 color;
 
-out vec4 OUT_FragColor0;
+out vec4 OUT_col;
 
 void main()
 {
-   OUT_FragColor0 = color;
+   OUT_col = color;
 }

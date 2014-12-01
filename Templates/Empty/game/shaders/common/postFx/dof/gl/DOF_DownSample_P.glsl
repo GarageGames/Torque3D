@@ -47,6 +47,8 @@ in vec2 tcDepth2;
 in vec2 tcDepth3;
 #define IN_tcDepth3 tcDepth3
 
+out vec4 OUT_col;
+
 void main()
 {  
    //return vec4( 1.0, 0.0, 1.0, 1.0 );
@@ -131,8 +133,8 @@ void main()
    
    maxCoc = max( max( coc[0], coc[1] ), max( coc[2], coc[3] ) );  
    
-   //OUT_FragColor0 = half4( 1.0, 0.0, 1.0, 1.0 );
-   OUT_FragColor0 = half4( color, maxCoc );  
-   //OUT_FragColor0 = half4( color, 1.0f );
-   //OUT_FragColor0 = half4( maxCoc.rrr, 1.0 );
+   //OUT_col = half4( 1.0, 0.0, 1.0, 1.0 );
+   OUT_col = half4( color, maxCoc );  
+   //OUT_col = half4( color, 1.0f );
+   //OUT_col = half4( maxCoc.rrr, 1.0 );
 }  

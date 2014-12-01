@@ -31,6 +31,8 @@ uniform float OneOverGamma;
 
 in vec2 uv0;
 
+out vec4 OUT_col;
+
 void main()
 {
     vec4 color = texture(backBuffer, uv0.xy);
@@ -43,5 +45,5 @@ void main()
    // Apply gamma correction
    color.rgb = pow( abs(color.rgb), vec3(OneOverGamma) );
 
-   OUT_FragColor0 = color;
+   OUT_col = color;
 }

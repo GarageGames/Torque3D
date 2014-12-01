@@ -46,6 +46,7 @@ uniform sampler2D prepassMap ;
 uniform float blurDepthTol;
 uniform float blurNormalTol;
 
+out vec4 OUT_col;
 
 void _sample( vec2 uv, float weight, vec4 centerTap, inout int usedCount, inout float occlusion, inout float total )
 {
@@ -96,7 +97,7 @@ void main()
    //occlusion /= (float)usedCount / 8.0;
    occlusion /= total;
    
-   OUT_FragColor0 = vec4( vec3(occlusion), 1 );   
+   OUT_col = vec4( vec3(occlusion), 1 );   
    
    
    //return vec4( 0,0,0,occlusion );

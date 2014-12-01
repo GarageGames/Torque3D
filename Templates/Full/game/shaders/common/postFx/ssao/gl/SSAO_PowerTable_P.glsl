@@ -25,8 +25,10 @@
 in vec2 uv0;
 #define IN_uv0 uv0
 
+out vec4 OUT_col;
+
 void main()
 {  
    float power = pow( max( IN_uv0.x, 0 ), 0.1 );   
-   OUT_FragColor0 = vec4( power, 0, 0, 1 );
+   OUT_col = vec4( power, 0, 0, 1 );
 }
