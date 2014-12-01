@@ -328,17 +328,14 @@ ThreadPool::ThreadPool( const char* name, U32 numThreads )
       // Use platformCPUInfo directly as in the case of the global pool,
       // Platform::SystemInfo will not yet have been initialized.
       
-      U32 numLogical;
-      U32 numPhysical;
-      U32 numCores;
+      U32 numLogical = 0;
+      U32 numPhysical = 0;
+      U32 numCores = 0;
 
       CPUInfo::CPUCount( numLogical, numCores, numPhysical );
       
       const U32 baseCount = getMax( numLogical, numCores );
-      if( baseCount )
-         mNumThreads = baseCount;
-      else
-         mNumThreads = 2;
+      mNumThreads = (baseCount > 0) ? baseCount : 2;
    }
    
    #ifdef DEBUG_SPEW
