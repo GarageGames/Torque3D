@@ -534,8 +534,8 @@ endif()
 ###############################################################################
 # Always enabled Definitions
 ###############################################################################
-addDef(TORQUE_DEBUG DEBUG)
-addDef(TORQUE_ENABLE_ASSERTS "DEBUG;RelWithDebInfo")
+addDef(TORQUE_DEBUG Debug)
+addDef(TORQUE_ENABLE_ASSERTS "Debug;RelWithDebInfo")
 addDef(TORQUE_DEBUG_GFX_MODE "RelWithDebInfo")
 addDef(TORQUE_SHADERGEN)
 addDef(INITGUID)
