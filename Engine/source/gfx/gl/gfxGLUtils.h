@@ -182,6 +182,13 @@ GFXGLPreserveInteger TORQUE_CONCAT(preserve_, __LINE__) (GL_ARRAY_BUFFER, GL_ARR
 #define PRESERVE_INDEX_BUFFER() \
 GFXGLPreserveInteger TORQUE_CONCAT(preserve_, __LINE__) (GL_ELEMENT_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER_BINDING, (GFXGLPreserveInteger::BindFn)glBindBuffer)
 
+#define _GET_BUFFER_BINDING( BINDING ) \
+BINDING == GL_ARRAY_BUFFER ? GL_ARRAY_BUFFER_BINDING : ( BINDING == GL_ELEMENT_ARRAY_BUFFER ?  GL_ELEMENT_ARRAY_BUFFER_BINDING : 0 )
+
+/// Helper macro to preserve the current element array binding.
+#define PRESERVE_BUFFER( BINDING ) \
+GFXGLPreserveInteger TORQUE_CONCAT(preserve_, __LINE__) (BINDING, _GET_BUFFER_BINDING(BINDING), (GFXGLPreserveInteger::BindFn)glBindBuffer)
+
 /// ASSERT: Never call glActiveTexture for a "bind to modify" or in a PRESERVER_TEXTURE MACRO scope.
 
 /// Helper macro to preserve the current 1D texture binding.
