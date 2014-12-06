@@ -44,8 +44,6 @@ GFXGLWindowTarget::GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d)
 
 void GFXGLWindowTarget::resetMode()
 {
-   PlatformGL::setVSync(GFXDevice::smDisableVSync ? 0 : 2);                             
-
    if(mWindow->getVideoMode().fullScreen != mWindow->isFullscreen())
    {
       _teardownCurrentMode();
