@@ -5,7 +5,10 @@
 
 void PlatformGL::setVSync(const int i)
 {
-   wglSwapIntervalEXT( i );
+    if (WGLEW_EXT_swap_control)
+    {
+        wglSwapIntervalEXT(i);
+    }
 }
 
 #endif
