@@ -147,7 +147,7 @@ void GFXGLDevice::initGLState()
    }
 #endif
 
-   PlatformGL::setVSync(smDisableVSync ? 0 : 2);
+   PlatformGL::setVSync(smDisableVSync ? 0 : 1);
 
    //OpenGL 3 need a binded VAO for render
    GLuint vao;
