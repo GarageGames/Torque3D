@@ -30,7 +30,7 @@ extern U32 HashPointer(StringTableEntry e);
 
 SimNameDictionary::SimNameDictionary()
 {
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    hashTable = NULL;
 #endif
    mutex = Mutex::createMutex();
@@ -38,7 +38,7 @@ SimNameDictionary::SimNameDictionary()
 
 SimNameDictionary::~SimNameDictionary()
 {
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    delete[] hashTable;
 #endif
    Mutex::destroyMutex(mutex);
@@ -55,7 +55,7 @@ void SimNameDictionary::insert(SimObject* obj)
       Con::warnf("Warning! You have a duplicate datablock name of %s. This can cause problems. You should rename one of them.", obj->objectName);
 
    Mutex::lockMutex(mutex);
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    if(!hashTable)
    {
       hashTable = new SimObject *[DefaultTableSize];
@@ -108,7 +108,7 @@ void SimNameDictionary::insert(SimObject* obj)
 
 SimObject* SimNameDictionary::find(StringTableEntry name)
 {
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    // NULL is a valid lookup - it will always return NULL
    if(!hashTable)
       return NULL;
@@ -143,7 +143,7 @@ void SimNameDictionary::remove(SimObject* obj)
       return;
 
    Mutex::lockMutex(mutex);
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    SimObject **walk = &hashTable[HashPointer(obj->objectName) % hashTableSize];
    while(*walk)
    {
@@ -161,7 +161,7 @@ void SimNameDictionary::remove(SimObject* obj)
 #else
    const char* name = StringTable->insert(obj->objectName);
    if (root[name])
-	   root.erase(name);
+      root.erase(name);
 #endif
    Mutex::unlockMutex(mutex);
 }	
@@ -170,7 +170,7 @@ void SimNameDictionary::remove(SimObject* obj)
 
 SimManagerNameDictionary::SimManagerNameDictionary()
 {
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    hashTable = new SimObject *[DefaultTableSize];
    hashTableSize = DefaultTableSize;
    hashEntryCount = 0;
@@ -182,7 +182,7 @@ SimManagerNameDictionary::SimManagerNameDictionary()
 
 SimManagerNameDictionary::~SimManagerNameDictionary()
 {
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    delete[] hashTable;
 #endif
    Mutex::destroyMutex(mutex);
@@ -194,7 +194,7 @@ void SimManagerNameDictionary::insert(SimObject* obj)
       return;
 
    Mutex::lockMutex(mutex);
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    S32 idx = HashPointer(obj->objectName) % hashTableSize;
    obj->nextManagerNameObject = hashTable[idx];
    hashTable[idx] = obj;
@@ -242,7 +242,7 @@ SimObject* SimManagerNameDictionary::find(StringTableEntry name)
 
    Mutex::lockMutex(mutex);
 
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    S32 idx = HashPointer(name) % hashTableSize;
    SimObject *walk = hashTable[idx];
    while(walk)
@@ -258,7 +258,7 @@ SimObject* SimManagerNameDictionary::find(StringTableEntry name)
 
    return NULL;
 #else
-   SimObject* f = root[StringTable->insert(name)];	
+   SimObject* f = root[StringTable->insert(name)];
    Mutex::unlockMutex(mutex);
    return f;
 #endif
@@ -269,7 +269,7 @@ void SimManagerNameDictionary::remove(SimObject* obj)
    if(!obj->objectName)
       return;
 
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    Mutex::lockMutex(mutex);
 
    SimObject **walk = &hashTable[HashPointer(obj->objectName) % hashTableSize];
@@ -287,10 +287,9 @@ void SimManagerNameDictionary::remove(SimObject* obj)
       walk = &((*walk)->nextManagerNameObject);
    }
 #else
-
-	const char* name = StringTable->insert(obj->objectName);
-	if (root[name])
-		root.erase(name);
+   const char* name = StringTable->insert(obj->objectName);
+   if (root[name])
+      root.erase(name);
 #endif
    Mutex::unlockMutex(mutex);
 }	
@@ -300,7 +299,7 @@ void SimManagerNameDictionary::remove(SimObject* obj)
 
 SimIdDictionary::SimIdDictionary()
 {
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    dMemset( table, 0, sizeof( table[ 0 ] ) * DefaultTableSize );
 #endif
    mutex = Mutex::createMutex();
@@ -316,7 +315,7 @@ SimIdDictionary::~SimIdDictionary()
 void SimIdDictionary::insert(SimObject* obj)
 {
    Mutex::lockMutex(mutex);
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    S32 idx = obj->getId() & TableBitMask;
    obj->nextIdObject = table[idx];
    AssertFatal( obj->nextIdObject != obj, "SimIdDictionary::insert - Creating Infinite Loop linking to self!" );
@@ -330,7 +329,7 @@ void SimIdDictionary::insert(SimObject* obj)
 SimObject* SimIdDictionary::find(S32 id)
 {
    Mutex::lockMutex(mutex);
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    S32 idx = id & TableBitMask;
    SimObject *walk = table[idx];
    while(walk)
@@ -355,7 +354,7 @@ SimObject* SimIdDictionary::find(S32 id)
 void SimIdDictionary::remove(SimObject* obj)
 {
    Mutex::lockMutex(mutex);
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    SimObject **walk = &table[obj->getId() & TableBitMask];
    while(*walk && *walk != obj)
       walk = &((*walk)->nextIdObject);

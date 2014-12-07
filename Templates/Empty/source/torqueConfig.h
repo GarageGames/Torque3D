@@ -31,13 +31,6 @@
 //general, the information here is global for your entire codebase, applying
 //not only to your game proper, but also to all of your tools.
 
-//If you plan to have less than 5000 objects use the Classic SimDictionary, if you plan to have more than
-//5000 objects use the new SimDictionary.
-
-//The improved SIMDICTIONARY uses C++ 11 and is designed for games where
-//there are over 10000 simobjects active normally.
-//To enable the new SIMDICTIONARY just comment out the line below.
-#define USE_CLASSIC_SIMDICTIONARY
 /// What's the name of your application? Used in a variety of places.
 #define TORQUE_APP_NAME            "Empty"
 
@@ -58,6 +51,11 @@
 #ifndef TORQUE_DISABLE_MEMORY_MANAGER
 #define TORQUE_DISABLE_MEMORY_MANAGER
 #endif
+
+/// The improved SimDictionary uses C++11 and is designed for games where
+/// there are over 10000 simobjects active normally. To enable the new
+/// SimDictionary just uncomment the line below.
+//#define USE_NEW_SIMDICTIONARY
 
 /// Define me if you want to disable the virtual mount system.
 //#define TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM

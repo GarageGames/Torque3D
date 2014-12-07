@@ -35,38 +35,32 @@
 
 #include "torqueConfig.h"
 
-#ifndef USE_CLASSIC_SIMDICTIONARY
-#include <string>
-#include <unordered_map>
-#endif
-
 class SimObject;
 
-
-#ifndef USE_CLASSIC_SIMDICTIONARY
+#ifdef USE_NEW_SIMDICTIONARY
+#include <string>
+#include <unordered_map>
 
 #include "core/strings/stringFunctions.h"
 
-struct DictionaryHash 
+struct DictionaryHash
 {
-    inline size_t operator()(const char* val) const
-	{
-	    return (long)val;
-	}
+   inline size_t operator()(const char* val) const
+   {
+      return (long)val;
+   }
 };
-	 
-struct eqstr 
-{
-    inline bool operator()(const char *s1, const char *s2) const 
-	{
-	    return dStrcmp(s1, s2) == 0;
-	}
-};
-#endif
 
-#ifndef USE_CLASSIC_SIMDICTIONARY
-typedef std::unordered_map<const char * , SimObject*, DictionaryHash, eqstr>  StringDictDef;	
-typedef std::unordered_map<U32 ,SimObject*> U32DictDef;	
+struct eqstr
+{
+   inline bool operator()(const char *s1, const char *s2) const
+   {
+      return dStrcmp(s1, s2) == 0;
+   }
+};
+
+typedef std::unordered_map<const char *, SimObject*, DictionaryHash, eqstr> StringDictDef;	
+typedef std::unordered_map<U32, SimObject*> U32DictDef;
 #endif
 
 
@@ -78,7 +72,7 @@ typedef std::unordered_map<U32 ,SimObject*> U32DictDef;
 /// for fast removal of an object given object*
 class SimNameDictionary
 {
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    enum
    {
       DefaultTableSize = 29
@@ -90,9 +84,8 @@ class SimNameDictionary
 #else
    StringDictDef root;
 #endif
+
    void *mutex;
-
-
 
 public:
    void insert(SimObject* obj);
@@ -105,7 +98,7 @@ public:
 
 class SimManagerNameDictionary
 {
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    enum
    {
       DefaultTableSize = 29
@@ -114,15 +107,12 @@ class SimManagerNameDictionary
    SimObject **hashTable;  // hash the pointers of the names...
    S32 hashTableSize;
    S32 hashEntryCount;
-
-   
 #else
-
-   
    StringDictDef root;
-
 #endif
+
    void *mutex;
+
 public:
    void insert(SimObject* obj);
    void remove(SimObject* obj);
@@ -139,7 +129,7 @@ public:
 /// for fast removal of an object given object*
 class SimIdDictionary
 {
-#ifdef USE_CLASSIC_SIMDICTIONARY
+#ifndef USE_NEW_SIMDICTIONARY
    enum
    {
       DefaultTableSize = 4096,
@@ -149,6 +139,7 @@ class SimIdDictionary
 #else
    U32DictDef root;
 #endif
+
    void *mutex;
 
 public:
