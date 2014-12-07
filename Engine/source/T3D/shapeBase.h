@@ -324,7 +324,10 @@ struct ShapeBaseImageData: public GameBaseData {
    /// @{
    bool              shakeCamera;
    VectorF           camShakeFreq;
-   VectorF           camShakeAmp;         
+   VectorF           camShakeAmp;
+   F32               camShakeDuration;
+   F32               camShakeRadius;
+   F32               camShakeFalloff;
    /// @}
 
    /// Maximum number of sounds this image can play at a time.
@@ -903,9 +906,6 @@ protected:
 
    bool mFlipFadeVal;
 
-   /// Camera shake caused by weapon fire.
-   CameraShake *mWeaponCamShake;
-
  public:
 
    /// @name Collision Notification
@@ -1101,6 +1101,7 @@ protected:
    virtual void onImageAnimThreadChange(U32 imageSlot, S32 imageShapeIndex, ShapeBaseImageData::StateData* lastState, const char* anim, F32 pos, F32 timeScale, bool reset=false);
    virtual void onImageAnimThreadUpdate(U32 imageSlot, S32 imageShapeIndex, F32 dt);
    virtual void ejectShellCasing( U32 imageSlot );
+   virtual void shakeCamera( U32 imageSlot );
    virtual void updateDamageLevel();
    virtual void updateDamageState();
    virtual void onImpact(SceneObject* obj, VectorF vec);

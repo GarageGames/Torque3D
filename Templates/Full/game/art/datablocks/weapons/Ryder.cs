@@ -192,9 +192,9 @@ datablock ShapeBaseImageData(RyderWeaponImage)
    lightBrightness = 2;
 
    // Shake camera while firing.
-   shakeCamera = false;
-   camShakeFreq = "0 0 0";
-   camShakeAmp = "0 0 0";
+   shakeCamera = "1";
+   camShakeFreq = "10 10 10";
+   camShakeAmp = "5 5 5";
 
    // Images have a state system which controls how the animations
    // are run, which sounds are played, script callbacks, etc. This
@@ -361,4 +361,5 @@ datablock ShapeBaseImageData(RyderWeaponImage)
    stateSequenceTransitionOut[13]   = true;
    stateAllowImageChange[13]        = false;
    stateSequence[13]                = "sprint";
+   camShakeDuration = "0.2";
 };
