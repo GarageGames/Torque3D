@@ -43,6 +43,10 @@
 #include "math/mTransform.h"
 #include "T3D/gameBase/gameProcess.h"
 
+#ifdef GHOSTSCOPING
+#include "T3D/gameBase/gameConnection.h"
+#endif
+
 IMPLEMENT_CONOBJECT(SceneObject);
 
 ConsoleDocClass( SceneObject,
@@ -664,6 +668,16 @@ static void scopeCallback( SceneObject* obj, void* conPtr )
 
 void SceneObject::onCameraScopeQuery( NetConnection* connection, CameraScopeQuery* query )
 {
+
+#ifdef GHOSTSCOPING
+   SceneManager* scenemanager = getSceneManager();
+   GameConnection* conn  = dynamic_cast<GameConnection*> (connection);
+   if (conn && conn->getVisibleGhostDistance() == 0.0f)
+       query->visibleDistance = scenemanager->getVisibleGhostDistance();
+   else
+	   query->visibleDistance = conn->getVisibleGhostDistance();
+#endif
+
    // Object itself is in scope.
 
    if( this->isScopeable() )

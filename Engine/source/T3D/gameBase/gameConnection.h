@@ -39,6 +39,8 @@
 #include "core/bitVector.h"
 #endif
 
+#include "torqueConfig.h"
+
 enum GameConnectionConstants
 {
    MaxClients = 126,
@@ -71,6 +73,10 @@ private:
    char mDisconnectReason[256];
 
    U32  mMissionCRC;             // crc of the current mission file from the server
+
+#ifdef GHOSTSCOPING
+   F32 mConnectionVisibleDistance;
+#endif
 
 private:
    U32 mLastControlRequestTime;
@@ -154,6 +160,11 @@ public:
    /// @}
 
    bool canRemoteCreate();
+
+#ifdef GHOSTSCOPING
+   void setVisibleGhostDistance(F32 dist);
+   F32 getVisibleGhostDistance();
+#endif
 
 private:
    /// @name Connection State

@@ -226,6 +226,10 @@ GameConnection::GameConnection()
    mAddYawToAbsRot = false;
    mAddPitchToAbsRot = false;
 
+#ifdef GHOSTSCOPING
+   mConnectionVisibleDistance = 0.0f;
+#endif
+
    clearDisplayDevice();
 }
 
@@ -239,6 +243,16 @@ GameConnection::~GameConnection()
 }
 
 //----------------------------------------------------------------------------
+#ifdef GHOSTSCOPING
+void GameConnection::setVisibleGhostDistance(F32 dist)
+{
+	mConnectionVisibleDistance = dist;
+}
+F32 GameConnection::getVisibleGhostDistance()
+{
+	return mConnectionVisibleDistance;
+}
+#endif
 
 bool GameConnection::canRemoteCreate()
 {
@@ -2198,4 +2212,27 @@ DefineEngineMethod( GameConnection, getControlSchemeAbsoluteRotation, bool, (),,
    "@see GameConnection::setControlSchemeParameters()\n\n")
 {
    return object->getControlSchemeAbsoluteRotation();
+}
+
+DefineEngineMethod( GameConnection, setVisibleGhostDistance, void, (F32 dist),,
+   "@brief Sets the distance that objects around it will be ghosted.\n\n"
+   "@dist - is the max distance\n\n"
+   )
+{
+#ifdef GHOSTSCOPING
+	object->setVisibleGhostDistance(dist);
+#endif
+}
+
+DefineEngineMethod( GameConnection, getVisibleGhostDistance, F32, (),,
+   "@brief Gets the distance that objects around the connection will be ghosted.\n\n"
+   
+   "@return S32 of distance.\n\n"
+   )
+{
+#ifdef GHOSTSCOPING
+	return object->getVisibleGhostDistance();
+#else
+	return 0;
+#endif
 }

@@ -39,6 +39,19 @@
 /// Version number is major * 1000 + minor * 100 + revision * 10.
 #define TORQUE_APP_VERSION         1000
 
+//Ghost Scoping limits the number of objects being ghosted
+//to a gameConnection to the objects around it within X
+//distance.
+//This is particularly useful for reducing bandwidth usage
+//of games in which there are a lot of players and AI 
+//Basically, anything derived from SceneObject.
+//GHOSTSCOPING_DEFAULT_DISTANCE_IF_NOT_IN_MISSION is the default distance 
+//a game will use if the distance is not defined in the mission file.
+//DO NOT USE IF YOU ARE BUILDING A SIDE SCROLLER.
+//To enable ghost scoping define:
+//#define GHOSTSCOPING
+//#define GHOSTSCOPING_DEFAULT_DISTANCE_IF_NOT_IN_MISSION 200.0f
+
 /// Human readable application version string.
 #define TORQUE_APP_VERSION_STRING  "1.0"
 
