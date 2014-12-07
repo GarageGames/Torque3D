@@ -5,7 +5,6 @@ new SimGroup(MissionGroup) {
 
    new LevelInfo(theLevelInfo) {
       visibleDistance = "1000";
-	  visibleGhostDistance = "1000";
       fogColor = "0.6 0.6 0.7 1";
       fogDensity = "0";
       fogDensityOffset = "700";

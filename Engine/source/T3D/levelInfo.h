@@ -36,8 +36,6 @@
    #include "sfx/sfxCommon.h"
 #endif
 
-#include "torqueConfig.h"
-
 class SFXAmbience;
 class SFXSoundscape;
 
@@ -56,9 +54,8 @@ class LevelInfo : public NetObject
 
       F32 mVisibleDistance;
 
-#ifdef GHOSTSCOPING
       F32 mVisibleGhostDistance;
-#endif
+
       F32 mDecalBias;
 
       ColorI mCanvasClearColor;

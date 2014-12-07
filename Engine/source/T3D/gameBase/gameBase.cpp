@@ -389,12 +389,7 @@ F32 GameBase::getUpdatePriority(CameraScopeQuery *camInfo, U32 updateMask, S32 u
    // will be weighted 1, objects behind will be 0
    F32 dot = mDot(pos,camInfo->orientation);
 
-#ifdef GHOSTSCOPING
-   bool inFov = dot > camInfo->cosFov*1.5f;
-#else
-   bool inFov = dot > camInfo->cosFov;
-#endif
-
+   bool inFov = dot > camInfo->cosFov * 1.5f;
 
    F32 wFov = inFov? 1.0f: 0;
 
@@ -413,11 +408,7 @@ F32 GameBase::getUpdatePriority(CameraScopeQuery *camInfo, U32 updateMask, S32 u
 
    // Weight by interest.
    F32 wInterest;
-#ifdef GHOSTSCOPING
    if (getTypeMask() & (PlayerObjectType || VehicleObjectType ))
-#else
-   if (getTypeMask() & PlayerObjectType)
-#endif
       wInterest = 0.75f;
    else if (getTypeMask() & ProjectileObjectType)
    {
