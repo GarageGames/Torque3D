@@ -111,6 +111,11 @@ TSStatic::TSStatic()
    mMeshCulling = false;
    mUseOriginSort = false;
 
+   mUseAlphaFade     = false;
+   mAlphaFadeStart   = 100.0f;
+   mAlphaFadeEnd     = 150.0f;
+   mInvertAlphaFade  = false;
+   mAlphaFade = 1.0f;
    mPhysicsRep = NULL;
 
    mCollisionType = CollisionMesh;
@@ -191,6 +196,13 @@ void TSStatic::initPersistFields()
          "When set to false, the slightest bump will stop the player from walking on top of the object.\n");
    
    endGroup("Collision");
+
+   addGroup( "AlphaFade" );  
+      addField( "Alpha Fade Enable",   TypeBool,   Offset(mUseAlphaFade,    TSStatic), "Turn on/off Alpha Fade" );  
+      addField( "Alpha Fade Start",    TypeF32,    Offset(mAlphaFadeStart,  TSStatic), "Distance of start Alpha Fade" );  
+      addField( "Alpha Fade End",      TypeF32,    Offset(mAlphaFadeEnd,    TSStatic), "Distance of end Alpha Fade" );  
+      addField( "Alpha Fade Inverse", TypeBool,    Offset(mInvertAlphaFade, TSStatic), "Invert Alpha Fade's Start & End Distance" );  
+   endGroup( "AlphaFade" );
 
    addGroup("Debug");
 
@@ -502,6 +514,36 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    if (dist < 0.01f)
       dist = 0.01f;
 
+   if (mUseAlphaFade)
+   {
+      mAlphaFade = 1.0f;
+      if ((mAlphaFadeStart < mAlphaFadeEnd) && mAlphaFadeStart > 0.1f)
+      {
+         if (mInvertAlphaFade)
+         {
+            if (dist <= mAlphaFadeStart)
+            {
+               return;
+            }
+            if (dist < mAlphaFadeEnd)
+            {
+               mAlphaFade = ((dist - mAlphaFadeStart) / (mAlphaFadeEnd - mAlphaFadeStart));
+            }
+         }
+         else
+         {
+            if (dist >= mAlphaFadeEnd)
+            {
+               return;
+            }
+            if (dist > mAlphaFadeStart)
+            {
+               mAlphaFade -= ((dist - mAlphaFadeStart) / (mAlphaFadeEnd - mAlphaFadeStart));
+            }
+         }
+      }
+   }
+
    F32 invScale = (1.0f/getMax(getMax(mObjScale.x,mObjScale.y),mObjScale.z));   
 
    if ( mForceDetail == -1 )
@@ -545,6 +587,19 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    GFX->setWorldMatrix( mat );
 
    mShapeInstance->animate();
+   if(mShapeInstance)
+   {
+      if (mUseAlphaFade)
+      {
+         mShapeInstance->setAlphaAlways(mAlphaFade);
+         S32 s = mShapeInstance->mMeshObjects.size();
+         
+         for(S32 x = 0; x < s; x++)
+         {
+            mShapeInstance->mMeshObjects[x].visible = mAlphaFade;
+         }
+      }
+   }
    mShapeInstance->render( rdata );
 
    if ( mRenderNormalScalar > 0 )
@@ -625,6 +680,13 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    stream->writeFlag( mPlayAmbient );
 
+   if ( stream->writeFlag(mUseAlphaFade) )  
+   {  
+      stream->write(mAlphaFadeStart);  
+      stream->write(mAlphaFadeEnd);  
+      stream->write(mInvertAlphaFade);  
+   } 
+
    if ( mLightPlugin )
       retMask |= mLightPlugin->packUpdate(this, AdvancedStaticOptionsMask, con, mask, stream);
 
@@ -681,6 +743,14 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
    stream->read( &mForceDetail );
 
    mPlayAmbient = stream->readFlag();
+
+   mUseAlphaFade = stream->readFlag();  
+   if (mUseAlphaFade)
+   {
+      stream->read(&mAlphaFadeStart);  
+      stream->read(&mAlphaFadeEnd);  
+      stream->read(&mInvertAlphaFade);  
+   }
 
    if ( mLightPlugin )
    {
