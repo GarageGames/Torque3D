@@ -33,7 +33,43 @@
 #include "platform/threads/mutex.h"
 #endif
 
+#include "torqueConfig.h"
+
+#ifndef USE_CLASSIC_SIMDICTIONARY
+#include <string>
+#include <unordered_map>
+#endif
+
 class SimObject;
+
+
+#ifndef USE_CLASSIC_SIMDICTIONARY
+
+#include "core/strings/stringFunctions.h"
+
+struct DictionaryHash 
+{
+    inline size_t operator()(const char* val) const
+	{
+	    return (long)val;
+	}
+};
+	 
+struct eqstr 
+{
+    inline bool operator()(const char *s1, const char *s2) const 
+	{
+	    return dStrcmp(s1, s2) == 0;
+	}
+};
+#endif
+
+#ifndef USE_CLASSIC_SIMDICTIONARY
+typedef std::unordered_map<const char * , SimObject*, DictionaryHash, eqstr>  StringDictDef;	
+typedef std::unordered_map<U32 ,SimObject*> U32DictDef;	
+#endif
+
+
 
 //----------------------------------------------------------------------------
 /// Map of names to SimObjects
@@ -42,6 +78,7 @@ class SimObject;
 /// for fast removal of an object given object*
 class SimNameDictionary
 {
+#ifdef USE_CLASSIC_SIMDICTIONARY
    enum
    {
       DefaultTableSize = 29
@@ -50,8 +87,12 @@ class SimNameDictionary
    SimObject **hashTable;  // hash the pointers of the names...
    S32 hashTableSize;
    S32 hashEntryCount;
-
+#else
+   StringDictDef root;
+#endif
    void *mutex;
+
+
 
 public:
    void insert(SimObject* obj);
@@ -64,6 +105,7 @@ public:
 
 class SimManagerNameDictionary
 {
+#ifdef USE_CLASSIC_SIMDICTIONARY
    enum
    {
       DefaultTableSize = 29
@@ -73,8 +115,14 @@ class SimManagerNameDictionary
    S32 hashTableSize;
    S32 hashEntryCount;
 
-   void *mutex;
+   
+#else
 
+   
+   StringDictDef root;
+
+#endif
+   void *mutex;
 public:
    void insert(SimObject* obj);
    void remove(SimObject* obj);
@@ -91,13 +139,16 @@ public:
 /// for fast removal of an object given object*
 class SimIdDictionary
 {
+#ifdef USE_CLASSIC_SIMDICTIONARY
    enum
    {
       DefaultTableSize = 4096,
       TableBitMask = 4095
    };
    SimObject *table[DefaultTableSize];
-
+#else
+   U32DictDef root;
+#endif
    void *mutex;
 
 public:

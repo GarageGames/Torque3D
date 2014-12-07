@@ -31,6 +31,13 @@
 //general, the information here is global for your entire codebase, applying
 //not only to your game proper, but also to all of your tools.
 
+//If you plan to have less than 5000 objects use the Classic SimDictionary, if you plan to have more than
+//5000 objects use the new SimDictionary.
+
+//The improved SIMDICTIONARY uses C++ 11 and is designed for games where
+//there are over 10000 simobjects active normally.
+//To enable the new SIMDICTIONARY just comment out the line below.
+#define USE_CLASSIC_SIMDICTIONARY
 /// What's the name of your application? Used in a variety of places.
 #define TORQUE_APP_NAME            "Full"
 
