@@ -41,12 +41,14 @@
 #ifndef _GFXSTATEBLOCK_H_
 #include "gfx/gfxStateBlock.h"
 #endif
+#ifndef _GFXOCCLUSIONQUERY_H_
+#include "gfx/gfxOcclusionQuery.h"
+#endif
 
 class LightInfo;
 struct ObjectRenderInst;
 class SceneRenderState;
 class BaseMatInstance;
-class GFXOcclusionQuery;
 
 struct LightFlareState
 {  
@@ -65,8 +67,8 @@ struct LightFlareState
    bool visible;   
    F32 occlusion;
    GFXVertexBufferHandle<GFXVertexPCT> vertBuffer;   
-   GFXOcclusionQuery *occlusionQuery;
-   GFXOcclusionQuery *fullPixelQuery;   
+   GFXOcclusionQueryHandle occlusionQuery;
+   GFXOcclusionQueryHandle fullPixelQuery;
 };
 
 class LightFlareData : public SimDataBlock
