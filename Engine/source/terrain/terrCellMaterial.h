@@ -80,10 +80,6 @@ protected:
       GFXShaderConstHandle *detailInfoVConst;
       GFXShaderConstHandle *detailInfoPConst;
 
-	  // New blending
-	  GFXShaderConstHandle *lerpBlend;
-	  GFXShaderConstHandle *blendDepth;
-
 	  GFXShaderConstHandle *macroInfoVConst;
       GFXShaderConstHandle *macroInfoPConst;
    };

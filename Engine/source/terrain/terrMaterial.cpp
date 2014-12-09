@@ -65,8 +65,7 @@ TerrainMaterial::TerrainMaterial()
       mMacroSize( 200.0f ),
       mMacroStrength( 0.7f ),
       mMacroDistance( 500.0f ),
-	  mParallaxScale(0.0f),
-	  mBlendDepth(0.4f)
+      mParallaxScale( 0.0f )
 {
 }
 
@@ -97,9 +96,6 @@ void TerrainMaterial::initPersistFields()
 
    addField( "parallaxScale", TypeF32, Offset( mParallaxScale, TerrainMaterial ), "Used to scale the height from the normal map to give some self "
 	   "occlusion effect (aka parallax) to the terrain material" );
-
-   addField("blendDepth", TypeF32, Offset(mBlendDepth, TerrainMaterial), "Depth for blending the textures using the new blending method by Lukas Joergensen."
-	   "Higher numbers = larger blend radius.");
 
    Parent::initPersistFields();
 
