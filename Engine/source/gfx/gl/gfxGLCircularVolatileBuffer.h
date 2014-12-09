@@ -143,7 +143,7 @@ public:
    {
       glGenBuffers(1, &mBufferName);
 
-      PRESERVE_VERTEX_BUFFER();
+      PRESERVE_BUFFER( mBinding );
       glBindBuffer(mBinding, mBufferName);
      
       const U32 cSizeInMB = 10;
@@ -195,11 +195,11 @@ public:
       }
       else if( GFXGL->glUseMap() )
       {
-         PRESERVE_VERTEX_BUFFER();
-         glBindBuffer(GL_ARRAY_BUFFER, mBufferName);
+         PRESERVE_BUFFER( mBinding );
+         glBindBuffer(mBinding, mBufferName);
 
          const GLbitfield access = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
-         outPtr = glMapBufferRange(GL_ARRAY_BUFFER, outOffset, size, access);
+         outPtr = glMapBufferRange(mBinding, outOffset, size, access);
       }
       else
       {
@@ -224,15 +224,15 @@ public:
       }
       else if( GFXGL->glUseMap() )
       {
-         PRESERVE_VERTEX_BUFFER();
-         glBindBuffer(GL_ARRAY_BUFFER, mBufferName);
+         PRESERVE_BUFFER( mBinding );
+         glBindBuffer(mBinding, mBufferName);
 
-         glUnmapBuffer(GL_ARRAY_BUFFER);
+         glUnmapBuffer(mBinding);
       }
       else
       {
-         PRESERVE_VERTEX_BUFFER();
-         glBindBuffer(GL_ARRAY_BUFFER, mBufferName);
+         PRESERVE_BUFFER( mBinding );
+         glBindBuffer(mBinding, mBufferName);
 
          glBufferSubData( mBinding, _getBufferData.mOffset, _getBufferData.mSize, mFrameAllocator.getlockedPtr() );
 
