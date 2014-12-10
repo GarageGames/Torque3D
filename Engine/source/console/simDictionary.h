@@ -41,26 +41,30 @@ class SimObject;
 #include <string>
 #include <unordered_map>
 
+#ifndef _SIM_H_
+#include "console/sim.h"
+#endif
+
 #include "core/strings/stringFunctions.h"
 
-struct DictionaryHash
+struct StringTableEntryHash
 {
-   inline size_t operator()(const char* val) const
+   inline size_t operator()(StringTableEntry val) const
    {
-      return (long)val;
+      return (size_t)val;
    }
 };
 
-struct eqstr
+struct StringTableEntryEq
 {
-   inline bool operator()(const char *s1, const char *s2) const
+   inline bool operator()(StringTableEntry s1, StringTableEntry s2) const
    {
-      return dStrcmp(s1, s2) == 0;
+      return s1 == s2;
    }
 };
 
-typedef std::unordered_map<const char *, SimObject*, DictionaryHash, eqstr> StringDictDef;	
-typedef std::unordered_map<U32, SimObject*> U32DictDef;
+typedef std::unordered_map<StringTableEntry, SimObject*, StringTableEntryHash, StringTableEntryEq> StringDictDef;	
+typedef std::unordered_map<SimObjectId, SimObject*> SimObjectIdDictDef;
 #endif
 
 
@@ -137,7 +141,7 @@ class SimIdDictionary
    };
    SimObject *table[DefaultTableSize];
 #else
-   U32DictDef root;
+   SimObjectIdDictDef root;
 #endif
 
    void *mutex;

@@ -101,7 +101,7 @@ void SimNameDictionary::insert(SimObject* obj)
       hashTableSize = newHashTableSize;
    }
 #else
-   root[StringTable->insert(obj->objectName)] = obj;
+   root[obj->objectName] = obj;
 #endif
    Mutex::unlockMutex(mutex);
 }
@@ -131,7 +131,8 @@ SimObject* SimNameDictionary::find(StringTableEntry name)
    return NULL;
 #else
   Mutex::lockMutex(mutex);
-  SimObject* f = root[StringTable->insert(name)];
+  StringDictDef::iterator it = root.find(name);
+  SimObject* f = (it == root.end() ? NULL : it->second);
   Mutex::unlockMutex(mutex);
   return f;
 #endif
@@ -159,8 +160,8 @@ void SimNameDictionary::remove(SimObject* obj)
       walk = &((*walk)->nextNameObject);
    }
 #else
-   const char* name = StringTable->insert(obj->objectName);
-   if (root[name])
+   const char* name = obj->objectName;
+   if (root.find(name) != root.end())
       root.erase(name);
 #endif
    Mutex::unlockMutex(mutex);
@@ -231,7 +232,7 @@ void SimManagerNameDictionary::insert(SimObject* obj)
       hashTableSize = newHashTableSize;
    }
 #else
-   root[StringTable->insert(obj->objectName)] = obj;
+   root[obj->objectName] = obj;
 #endif
    Mutex::unlockMutex(mutex);
 }
@@ -258,7 +259,8 @@ SimObject* SimManagerNameDictionary::find(StringTableEntry name)
 
    return NULL;
 #else
-   SimObject* f = root[StringTable->insert(name)];
+   StringDictDef::iterator it = root.find(name);
+   SimObject* f = (it == root.end() ? NULL : it->second);
    Mutex::unlockMutex(mutex);
    return f;
 #endif
@@ -287,8 +289,8 @@ void SimManagerNameDictionary::remove(SimObject* obj)
       walk = &((*walk)->nextManagerNameObject);
    }
 #else
-   const char* name = StringTable->insert(obj->objectName);
-   if (root[name])
+   StringTableEntry name = obj->objectName;
+   if (root.find(name) != root.end())
       root.erase(name);
 #endif
    Mutex::unlockMutex(mutex);
@@ -345,7 +347,8 @@ SimObject* SimIdDictionary::find(S32 id)
 
    return NULL;
 #else
-   SimObject* f = root[id];
+   SimObjectIdDictDef::iterator it = root.find(id);
+   SimObject* f = (it == root.end() ? NULL : it->second);
    Mutex::unlockMutex(mutex);
    return f;
 #endif
