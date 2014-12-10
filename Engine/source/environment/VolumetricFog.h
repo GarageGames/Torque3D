@@ -38,7 +38,7 @@
 #include "materials/matTextureTarget.h"
 #endif
 #ifndef _GFXSHADER_H_
-#include "gfx/gfxshader.h"
+#include "gfx/gfxShader.h"
 #endif
 #ifndef _GFXTARGET_H_
 #include "gfx/gfxtarget.h"
