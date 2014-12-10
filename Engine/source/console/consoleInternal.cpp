@@ -797,6 +797,7 @@ ExprEvalState::ExprEvalState()
    mStackDepth = 0;
    stack.reserve( 64 );
    mShouldReset = false;
+   mResetLocked = false;
 }
 
 ExprEvalState::~ExprEvalState()
