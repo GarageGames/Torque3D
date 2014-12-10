@@ -41,7 +41,7 @@
 #include "T3D/shapeBase.h"
 #include "ts/tsShapeInstance.h"
 #include "console/engineAPI.h"
-#include "gui/core/GUICanvas.h"
+#include "gui/core/guiCanvas.h"
 #include "VolumetricFogRTManager.h"
 
 #define COLBOX_SCALE Point3F(1.02f, 1.02f, 1.02f)
