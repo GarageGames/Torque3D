@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Richard</author>
+      <authoring_tool>OpenCOLLADA for 3ds Max;  Version: 1.4.1;  Revision: exported;  Platform: x64;  Configuration: Release_Max2011_static</authoring_tool>
+      <source_data>file:///G:/Documents%20and%20Settings/Richard/Mijn%20documenten/3dsmax/scenes/FogVolumes.max</source_data>
+    </contributor>
+    <created>2014-08-20T08:23:30</created>
+    <modified>2014-08-20T08:23:30</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects>
+    <effect id="NoMat">
+      <profile_COMMON>
+        <technique sid="common">
+          <blinn>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0.588 0.588 0.588 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.588 0.588 0.588 1</color>
+            </diffuse>
+            <specular>
+              <color>0.9 0.9 0.9 1</color>
+            </specular>
+            <shininess>
+              <float>0</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </blinn>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <apply_reflection_dimming>0</apply_reflection_dimming>
+            <dim_level>0</dim_level>
+            <falloff_type>0</falloff_type>
+            <index_of_refraction>1.5</index_of_refraction>
+            <opacity_type>0</opacity_type>
+            <reflection_level>3</reflection_level>
+            <wire_size>1</wire_size>
+            <wire_units>0</wire_units>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_lock>1</ambient_diffuse_lock>
+            <ambient_diffuse_texture_lock>1</ambient_diffuse_texture_lock>
+            <diffuse_specular_lock>0</diffuse_specular_lock>
+            <soften>0.1</soften>
+            <use_self_illum_color>0</use_self_illum_color>
+          </shader>
+        </technique>
+      </extra>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="NoMat-material" name="NoMat">
+      <instance_effect url="#NoMat"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="geom-FogCone1" name="FogCone1">
+      <mesh>
+        <source id="geom-FogCone1-positions">
+          <float_array id="geom-FogCone1-positions-array" count="39">1 0 -1 0.8660254 0.5 -1 0.5 0.8660254 -1 -4.37114e-8 1 -1 -0.5000001 0.8660254 -1 -0.8660254 0.5000001 -1 -1 1.50996e-7 -1 -0.8660255 -0.4999998 -1 -0.5000003 -0.8660252 -1 -4.64912e-7 -1 -1 0.4999995 -0.8660257 -1 0.8660251 -0.5000006 -1 -1.39078e-7 -9.93411e-9 1</float_array>
+          <technique_common>
+            <accessor source="#geom-FogCone1-positions-array" count="13" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-FogCone1-normals">
+          <float_array id="geom-FogCone1-normals-array" count="75">0.8944272 -9.4796e-8 0.4472137 0.7745967 0.4472136 0.4472137 -1.50139e-6 4.92261e-8 1 0.4472136 0.7745967 0.4472136 -3.15987e-8 0.8944272 0.4472136 -0.4472136 0.7745967 0.4472136 -0.7745966 0.4472136 0.4472136 -0.8944272 1.05329e-7 0.4472136 -0.7745968 -0.4472134 0.4472136 -0.4472139 -0.7745965 0.4472136 -4.10783e-7 -0.8944272 0.4472136 0.4472131 -0.774597 0.4472136 0.7745965 -0.4472139 0.4472136 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0 0 -1</float_array>
+          <technique_common>
+            <accessor source="#geom-FogCone1-normals-array" count="25" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-FogCone1-map1">
+          <float_array id="geom-FogCone1-map1-array" count="117">0 0 0 1 0 0 0 1 0 1 1 0 0 0 0 1 0 0 0 1 0 1 1 0 0 0 0 1 0 0 0 1 0 1 1 0 0.75 4.99517e-4 0.999001 0.8333333 4.99517e-4 0.999001 0.9166666 4.99517e-4 0.999001 0.9999999 4.99517e-4 0.999001 0.08333331 4.99517e-4 0.999001 0.1666666 4.99517e-4 0.999001 0.2499999 4.99517e-4 0.999001 0.3333333 4.99517e-4 0.999001 0.4166666 4.99517e-4 0.999001 0.4999999 4.99517e-4 0.999001 0.5833332 4.99517e-4 0.999001 0.6666665 4.99517e-4 0.999001 0.3333332 0.9995005 0.9990011 1.083333 4.99517e-4 0.999001 0.8749999 0.9995005 0.999001 0.7497506 0.9325799 -0.2497502 0.9325804 0.7497499 -0.2497502 0.9995005 0.4999997 -0.2497502 0.93258 0.2502495 -0.2497502 0.7497501 0.06741977 -0.2497502 0.4999998 4.99487e-4 -0.2497502 0.2502496 0.06741995 -0.2497502 0.06741983 0.2502498 -0.2497502 4.99487e-4 0.5000001 -0.2497502 0.06741992 0.7497503 -0.2497502 0.2502498 0.9325802 -0.2497502 0.5000001 0.9995005 -0.2497502</float_array>
+          <technique_common>
+            <accessor source="#geom-FogCone1-map1-array" count="39" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-FogCone1-map1-textangents">
+          <float_array id="geom-FogCone1-map1-textangents-array" count="81">1.06829e-7 0.9659258 -8.91067e-9 -0.4829629 0.8365163 -6.67926e-9 -0.5277916 0.5277917 -8.18405e-7 -0.8365163 0.4829629 2.63104e-9 -0.9659258 -3.79472e-8 7.64529e-9 -0.8623982 -0.4381342 -0.1035276 -0.8106344 -0.5277917 0.1035276 -0.482963 -0.8365163 1.40098e-8 0.3769941 -0.3769943 5.84575e-7 -1.14117e-7 -0.9659258 -7.36119e-10 0.4829627 -0.8365164 1.2516e-8 0.8365161 -0.4829632 3.86915e-9 0.9659258 -4.46888e-7 -6.53612e-9 0.8365166 0.4829624 6.83675e-9 0.4829633 0.836516 -2.17593e-8 2.63125e-7 -1 0 -2.17705e-8 -1 0 1.65026e-7 -1 0 1.74199e-7 -1 0 2.46574e-7 -1 0 3.58702e-7 -1 0 1.83987e-7 -1 0 -7.4051e-9 -1 0 1.17168e-7 -1 0 2.03914e-7 -1 0 2.75375e-7 -1 0 5.52085e-7 -1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-FogCone1-map1-textangents-array" count="27" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-FogCone1-map1-texbinormals">
+          <float_array id="geom-FogCone1-map1-texbinormals-array" count="81">0.4472137 -5.77119e-8 -0.8944272 0.3872984 0.2236068 -0.8944272 0.7071068 0.7071068 1.02684e-6 0.2236068 0.3872984 -0.8944272 -2.46486e-8 0.4472136 -0.8944272 -0.1189793 0.4440369 -0.8880738 -0.3250576 0.3250576 -0.8880738 -0.3872983 0.2236068 -0.8944272 -0.707107 -0.7071066 -1.02684e-6 -0.4472136 5.35165e-8 -0.8944272 -0.3872984 -0.2236067 -0.8944272 -0.2236069 -0.3872982 -0.8944272 -2.12957e-7 -0.4472136 -0.8944272 0.2236066 -0.3872984 -0.8944272 0.3872982 -0.223607 -0.8944272 1 2.63125e-7 0 1 -2.17705e-8 0 1 1.65026e-7 0 1 1.74199e-7 0 1 2.46574e-7 0 1 3.58702e-7 0 1 1.83987e-7 0 1 -7.4051e-9 0 1 1.17168e-7 0 1 2.03914e-7 0 1 2.75375e-7 0 1 5.52085e-7 0</float_array>
+          <technique_common>
+            <accessor source="#geom-FogCone1-map1-texbinormals-array" count="27" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-FogCone1-vertices">
+          <input semantic="POSITION" source="#geom-FogCone1-positions"/>
+        </vertices>
+        <triangles material="NoMat" count="22">
+          <input semantic="VERTEX" source="#geom-FogCone1-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-FogCone1-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-FogCone1-map1" offset="2" set="0"/>
+          <input semantic="TEXTANGENT" source="#geom-FogCone1-map1-textangents" offset="3" set="1"/>
+          <input semantic="TEXBINORMAL" source="#geom-FogCone1-map1-texbinormals" offset="3" set="1"/>
+          <p>0 0 12 0 1 1 13 1 12 2 26 2 1 1 13 1 2 3 14 3 12 2 26 2 2 3 14 3 3 4 15 4 12 2 26 2 3 4 15 4 4 5 25 5 12 2 26 2 4 5 16 6 5 6 17 7 12 2 24 8 5 6 17 7 6 7 18 9 12 2 24 8 6 7 18 9 7 8 19 10 12 2 24 8 7 8 19 10 8 9 20 11 12 2 24 8 8 9 20 11 9 10 21 12 12 2 24 8 9 10 21 12 10 11 22 13 12 2 24 8 10 11 22 13 11 12 23 14 12 2 24 8 11 12 23 14 0 0 12 0 12 2 26 2 10 13 28 15 9 14 29 16 8 15 30 17 8 15 30 17 7 16 31 18 6 17 32 19 6 17 32 19 5 18 33 20 4 19 34 21 8 15 30 17 6 17 32 19 4 19 34 21 4 19 34 21 3 20 35 22 2 21 36 23 2 21 36 23 1 22 37 24 0 23 38 25 4 19 34 21 2 21 36 23 0 23 38 25 8 15 30 17 4 19 34 21 0 23 38 25 10 13 28 15 8 15 30 17 0 23 38 25 11 24 27 26 10 13 28 15 0 23 38 25</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_lights>
+    <light id="EnvironmentAmbientLight" name="EnvironmentAmbientLight">
+      <technique_common>
+        <ambient>
+          <color>0 0 0</color>
+        </ambient>
+      </technique_common>
+    </light>
+  </library_lights>
+  <library_visual_scenes>
+    <visual_scene id="MaxScene">
+      <node name="EnvironmentAmbientLight">
+        <instance_light url="#EnvironmentAmbientLight"/>
+      </node>
+      <node id="node-FogCone1" name="FogCone1">
+        <instance_geometry url="#geom-FogCone1">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="NoMat" target="#NoMat-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <cast_shadows>1</cast_shadows>
+            <primary_visibility>1</primary_visibility>
+            <receive_shadows>1</receive_shadows>
+            <secondary_visibility>1</secondary_visibility>
+          </technique>
+        </extra>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#MaxScene"/>
+  </scene>
+</COLLADA>

@@ -1,0 +1,17 @@
+<TorsionProjectOptions>
+<Address>127.0.0.1</Address>
+<Password>password</Password>
+<Port>6060</Port>
+<LastConfig>Debug</LastConfig>
+<Breakpoints/>
+<Bookmarks/>
+<OpenFiles>
+<File ScrollX="22" ScrollY="57">core\scripts\client\renderManager.cs</File>
+<File ScrollX="0" ScrollY="72">core\scripts\client\shaders.cs</File>
+<File ScrollX="0" ScrollY="64">core\scripts\client\postFx\glow.cs</File>
+<File ScrollX="0" ScrollY="51">core\scripts\client\postFx\postFxManager.gui.settings.cs</File>
+<File ScrollX="0" ScrollY="0">scripts\server\scriptExec.cs</File>
+<File ScrollX="0" ScrollY="966">tools\worldEditor\gui\objectBuilderGui.ed.gui</File>
+<File ScrollX="0" ScrollY="24" Active="true">tools\worldEditor\scripts\editors\creator.ed.cs</File>
+</OpenFiles>
+</TorsionProjectOptions>

@@ -102,3 +102,22 @@ new ShaderData( fxFoliageReplicatorShader )
    
    pixVersion = 1.4;
 };
+
+singleton ShaderData( VolumetricFogPrePassShader )
+{
+DXVertexShaderFile = "shaders/common/VolumetricFog/VFogPreV.hlsl";
+DXPixelShaderFile = "shaders/common/VolumetricFog/VFogPreP.hlsl";
+pixVersion = 3.0;
+};
+singleton ShaderData( VolumetricFogShader )
+{
+DXVertexShaderFile = "shaders/common/VolumetricFog/VFogV.hlsl";
+DXPixelShaderFile = "shaders/common/VolumetricFog/VFogP.hlsl";
+pixVersion = 3.0;
+};
+singleton ShaderData( VolumetricFogReflectionShader )
+{
+DXVertexShaderFile = "shaders/common/VolumetricFog/VFogPreV.hlsl";
+DXPixelShaderFile = "shaders/common/VolumetricFog/VFogRefl.hlsl";
+pixVersion = 3.0;
+};

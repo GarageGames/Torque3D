@@ -28,6 +28,9 @@
 #include "core/util/safeDelete.h"
 #include "windowManager/platformCursorController.h"
 #include "windowManager/windowInputGenerator.h"
+#ifndef _SIGNAL_H_ //Volumetric Fog
+#include "core/util/tSignal.h"
+#endif
 
 //forward decl's
 class PlatformWindowManager;
@@ -35,6 +38,8 @@ class GFXDevice;
 struct GFXVideoMode;
 class GFXWindowTarget;
 class IProcessInput;
+
+typedef Signal<void(PlatformWindow *PlatformWindow, bool resize)> ScreenResChangeSignal;
 
 /// Abstract representation of a native OS window.
 ///
@@ -65,11 +70,11 @@ protected:
    /// this to the OS.
    Point2I mMinimumSize;
 
-	/// When the resize is locked, this will be used as both minimum and maximum window size
-	Point2I mLockedSize;
+   /// When the resize is locked, this will be used as both minimum and maximum window size
+   Point2I mLockedSize;
 
-	/// When this is true, resizing is locked
-	bool mResizeLocked;
+   /// When this is true, resizing is locked
+   bool mResizeLocked;
 
    /// Is Idle?
    bool mIsBackground;
@@ -98,18 +103,18 @@ protected:
    {
       mIsBackground = false; // This could be toggled to true to prefer performance.
       mMinimumSize.set(0,0);
-		mLockedSize.set(0,0);
-		mResizeLocked = false;
+      mLockedSize.set(0,0);
+      mResizeLocked = false;
       mEnableKeyboardTranslation = false;
       mEnableAccelerators = true;
       mCursorController = NULL;
       // This controller maps window input (Mouse/Keyboard) to a generic input consumer
       mWindowInputGenerator = new WindowInputGenerator( this );
       mSuppressReset = false;
-
       mOffscreenRender = false;
       mDisplayWindow = false;
    }
+   static ScreenResChangeSignal smScreenResChangeSignal;
 
 public:
 
@@ -147,7 +152,7 @@ public:
    virtual GFXWindowTarget *getGFXTarget()=0;
 
    /// Set the video mode for this window.
-   virtual void setVideoMode(const GFXVideoMode &mode)=0;
+   virtual void setVideoMode(const GFXVideoMode &mode);
 
    /// Get our current video mode - if the window has been resized, it will
    /// reflect this.
@@ -365,25 +370,25 @@ public:
       return mMinimumSize;
    }
 
-	/// Locks/unlocks window resizing
-	virtual void lockSize(bool locked)
-	{
-		mResizeLocked = locked;
-		if (mResizeLocked)
-			mLockedSize = getBounds().extent;
-	}
+   /// Locks/unlocks window resizing
+   virtual void lockSize(bool locked)
+   {
+      mResizeLocked = locked;
+      if (mResizeLocked)
+         mLockedSize = getBounds().extent;
+   }
 
-	/// Returns true if the window size is locked
-	virtual bool isSizeLocked()
-	{
-		return mResizeLocked;
-	}
+   /// Returns true if the window size is locked
+   virtual bool isSizeLocked()
+   {
+      return mResizeLocked;
+   }
 
-	/// Returns the locked window size
-	virtual Point2I getLockedSize()
-	{
-		return mLockedSize;
-	}
+   /// Returns the locked window size
+   virtual Point2I getLockedSize()
+   {
+      return mLockedSize;
+   }
    /// @}
 
 
@@ -486,6 +491,8 @@ public:
    IdleEvent         idleEvent;
 
    /// @}
+
+   static ScreenResChangeSignal& getScreenResChangeSignal() { return smScreenResChangeSignal; }
    
    /// Get the platform specific object needed to create or attach an accelerated
    /// graohics drawing context on or to the window
@@ -496,6 +503,7 @@ public:
    virtual void* getPlatformDrawable() const = 0;
 protected:
    virtual void _setFullscreen(const bool fullScreen) {};
+   virtual void _setVideoMode(const GFXVideoMode &mode) {};
 };
 
 #endif
