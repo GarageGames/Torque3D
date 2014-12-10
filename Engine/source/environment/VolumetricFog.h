@@ -41,7 +41,7 @@
 #include "gfx/gfxShader.h"
 #endif
 #ifndef _GFXTARGET_H_
-#include "gfx/gfxtarget.h"
+#include "gfx/gfxTarget.h"
 #endif
 #ifndef _GFXVERTEXBUFFER_H_
 #include "gfx/gfxVertexBuffer.h"
