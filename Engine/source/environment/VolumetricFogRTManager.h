@@ -48,7 +48,7 @@
 #include "materials/matTextureTarget.h"
 #endif
 #ifndef _GFXTARGET_H_
-#include "gfx/gfxtarget.h"
+#include "gfx/gfxTarget.h"
 #endif
 #ifndef _SIGNAL_H_
 #include "core/util/tSignal.h"

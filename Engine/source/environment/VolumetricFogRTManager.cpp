@@ -43,7 +43,7 @@
 #include "scene/sceneManager.h"
 #include "windowManager/platformWindowMgr.h"
 #include "console/engineAPI.h"
-#include "gui/core/GUICanvas.h"
+#include "gui/core/guiCanvas.h"
 
 MODULE_BEGIN(VolumetricFogRTManager)
 
