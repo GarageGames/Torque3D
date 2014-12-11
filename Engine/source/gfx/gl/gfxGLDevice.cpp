@@ -98,6 +98,27 @@ void STDCALL glAmdDebugCallback(GLuint id, GLenum category, GLenum severity, GLs
    Con::errorf("OPENGL: %s",message);
 }
 
+
+// >>>> OPENGL INTEL WORKAROUND @todo OPENGL INTEL remove
+PFNGLBINDFRAMEBUFFERPROC __openglBindFramebuffer = NULL;
+
+void STDCALL _t3d_glBindFramebuffer(GLenum target, GLuint framebuffer)
+{
+    if( target == GL_FRAMEBUFFER )
+    {
+        if( GFXGL->getOpenglCache()->getCacheBinded( GL_DRAW_FRAMEBUFFER ) == framebuffer
+            && GFXGL->getOpenglCache()->getCacheBinded( GL_READ_FRAMEBUFFER ) == framebuffer )
+            return;
+    }
+    else if( GFXGL->getOpenglCache()->getCacheBinded( target ) == framebuffer )
+        return;
+
+    __openglBindFramebuffer(target, framebuffer);
+    GFXGL->getOpenglCache()->setCacheBinded( target, framebuffer);
+}
+// <<<< OPENGL INTEL WORKAROUND
+
+
 void GFXGLDevice::initGLState()
 {  
    // We don't currently need to sync device state with a known good place because we are
@@ -120,8 +141,16 @@ void GFXGLDevice::initGLState()
    mSupportsAnisotropic = mCardProfiler->queryProfile( "GL::suppAnisotropic" );
 
    String vendorStr = (const char*)glGetString( GL_VENDOR );
-   if( vendorStr.find("NVIDIA") != String::NPos)
+   if( vendorStr.find("NVIDIA", 0, String::NoCase | String::Left) != String::NPos)
       mUseGlMap = false;
+
+
+   if( vendorStr.find("INTEL", 0, String::NoCase | String::Left ) != String::NPos)
+   {
+      // @todo OPENGL INTEL - This is a workaround for a warning spam or even crashes with actual framebuffer code, remove when implemented TGL layer.
+      __openglBindFramebuffer = glBindFramebuffer;
+      glBindFramebuffer = &_t3d_glBindFramebuffer;
+   }
 
 #if TORQUE_DEBUG
    if( gglHasExtension(ARB_debug_output) )
