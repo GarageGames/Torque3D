@@ -29,6 +29,11 @@ new ShaderData( BasicRibbonShader )
    DXVertexShaderFile   = "shaders/common/ribbons/basicRibbonShaderV.hlsl";
    DXPixelShaderFile    = "shaders/common/ribbons/basicRibbonShaderP.hlsl";
  
+   OGLVertexShaderFile   = "shaders/common/ribbons/gl/basicRibbonShaderV.glsl";
+   OGLPixelShaderFile    = "shaders/common/ribbons/gl/basicRibbonShaderP.glsl";
+ 
+   samplerNames[0] = "$ribTex";
+ 
    pixVersion = 2.0;
 };
  
@@ -55,7 +60,12 @@ new ShaderData( TexturedRibbonShader )
 {
    DXVertexShaderFile   = "shaders/common/ribbons/texRibbonShaderV.hlsl";
    DXPixelShaderFile    = "shaders/common/ribbons/texRibbonShaderP.hlsl";
- 
+   
+   OGLVertexShaderFile   = "shaders/common/ribbons/gl/texRibbonShaderV.glsl";
+   OGLPixelShaderFile    = "shaders/common/ribbons/gl/texRibbonShaderP.glsl";
+   
+   samplerNames[0] = "$ribTex";
+   
    pixVersion = 2.0;
 };
  

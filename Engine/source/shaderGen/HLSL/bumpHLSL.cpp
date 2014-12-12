@@ -222,12 +222,14 @@ void BumpFeatHLSL::setTexData(   Material::StageData &stageDat,
    if ( fd.features[MFT_NormalMap] )
    {
       passData.mTexType[ texIndex ] = Material::Bump;
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
       passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_NormalMap );
    }
 
    if ( fd.features[ MFT_DetailNormalMap ] )
    {
       passData.mTexType[ texIndex ] = Material::DetailBump;
+      passData.mSamplerNames[ texIndex ] = "detailBumpMap";
       passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_DetailNormalMap );
    }
 }
@@ -382,6 +384,7 @@ void ParallaxFeatHLSL::setTexData(  Material::StageData &stageDat,
    GFXTextureObject *tex = stageDat.getTex( MFT_NormalMap );
    if ( tex )
    {
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
       passData.mTexType[ texIndex ] = Material::Bump;
       passData.mTexSlot[ texIndex++ ].texObject = tex;
    }

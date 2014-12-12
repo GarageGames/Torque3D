@@ -142,7 +142,7 @@ Var *AdvancedLightBufferConditioner::printMethodHeader( MethodType methodType, c
          meta->addStatement( new GenOp( "      -1.0217f,   1.9777f,    0.0439f,\r\n" ) );
          meta->addStatement( new GenOp( "      0.0753f,    -0.2543f,   1.1892f\r\n" ) );
          meta->addStatement( new GenOp( "   };\r\n" ) );
-         meta->addStatement( new GenOp( "   return mul(XYZ2RGB, XYZ);\r\n" ) );
+         meta->addStatement( new GenOp( "   return tMul(XYZ2RGB, XYZ);\r\n" ) );
          meta->addStatement( new GenOp( "}\r\n\r\n" ) );
       }
       else

@@ -43,6 +43,8 @@ uniform float useCubemap;
 uniform vec3 lightDir;
 uniform vec3 sunDir;
 
+out vec4 OUT_col;
+
 void main()
 { 
 
@@ -62,7 +64,7 @@ void main()
 
    float fac = dot( normalize( pos ), sunDir );
    fac = max( nightInterpAndExposure.y, pow( clamp( fac, 0.0, 1.0 ), 2 ) );
-   OUT_FragColor0 = mix( color, nightSkyColor, nightInterpAndExposure.y );
+   OUT_col = mix( color, nightSkyColor, nightInterpAndExposure.y );
    
    // Clip based on the camera-relative
    // z position of the vertex, passed through
@@ -70,6 +72,6 @@ void main()
    if(zPosition < 0.0)
       discard;
 
-   OUT_FragColor0.a = 1;
-   OUT_FragColor0 = hdrEncode( OUT_FragColor0 );
+   OUT_col.a = 1;
+   OUT_col = hdrEncode( OUT_col );
 }

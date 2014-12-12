@@ -672,9 +672,9 @@ void Ribbon::createBuffers(SceneRenderState *state, GFXVertexBufferHandle<GFXVer
    Point3F pointA = verts[count-1].point;
    Point3F pointB = verts[0].point;
 
-   verts.unlock();
    pb.unlock();
-
+   verts.unlock();
+ 
    Point3F diffSize = pointA - pointB;
 
    Box3F objBox;

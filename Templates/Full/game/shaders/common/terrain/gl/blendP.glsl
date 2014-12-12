@@ -33,6 +33,8 @@ uniform sampler2D textureMap;
 uniform float texId;
 uniform float layerSize;
 
+out vec4 OUT_col;
+
 void main()
 {
    vec4 layerSample = round(texture( layerTex, IN_layerCoord ) * 255.0);
@@ -42,5 +44,5 @@ void main()
    if(blend - 0.0001 < 0.0)
       discard;
 
-   OUT_FragColor0 = vec4( texture( textureMap, IN_texCoord ).rgb, blend );
+   OUT_col = vec4( texture( textureMap, IN_texCoord ).rgb, blend );
 }

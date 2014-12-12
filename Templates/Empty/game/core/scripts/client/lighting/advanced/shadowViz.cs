@@ -28,6 +28,9 @@ new ShaderData( AL_ShadowVisualizeShader )
    OGLVertexShaderFile = "shaders/common/gl/guiMaterialV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgShadowVisualizeP.glsl";
    
+   samplerNames[0] = "$shadowMap";
+   samplerNames[1] = "$depthViz";
+   
    pixVersion = 2.0;
 };
 
