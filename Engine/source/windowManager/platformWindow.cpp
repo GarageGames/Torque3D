@@ -53,5 +53,5 @@ bool PlatformWindow::shouldNotTranslate( U32 modifiers, U32 keyCode ) const
 void PlatformWindow::setVideoMode(const GFXVideoMode &mode)
 {
 _setVideoMode(mode);
-smScreenResChangeSignal.trigger(this, true);
+getScreenResChangeSignal().trigger(this, true);
 }
