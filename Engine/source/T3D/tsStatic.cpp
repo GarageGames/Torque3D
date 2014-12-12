@@ -198,10 +198,10 @@ void TSStatic::initPersistFields()
    endGroup("Collision");
 
    addGroup( "AlphaFade" );  
-      addField( "Alpha Fade Enable",   TypeBool,   Offset(mUseAlphaFade,    TSStatic), "Turn on/off Alpha Fade" );  
-      addField( "Alpha Fade Start",    TypeF32,    Offset(mAlphaFadeStart,  TSStatic), "Distance of start Alpha Fade" );  
-      addField( "Alpha Fade End",      TypeF32,    Offset(mAlphaFadeEnd,    TSStatic), "Distance of end Alpha Fade" );  
-      addField( "Alpha Fade Inverse", TypeBool,    Offset(mInvertAlphaFade, TSStatic), "Invert Alpha Fade's Start & End Distance" );  
+      addField( "AlphaFadeEnable",   TypeBool,   Offset(mUseAlphaFade,    TSStatic), "Turn on/off Alpha Fade" );  
+      addField( "AlphaFadeStart",    TypeF32,    Offset(mAlphaFadeStart,  TSStatic), "Distance of start Alpha Fade" );  
+      addField( "AlphaFadeEnd",      TypeF32,    Offset(mAlphaFadeEnd,    TSStatic), "Distance of end Alpha Fade" );  
+      addField( "AlphaFadeInverse", TypeBool,    Offset(mInvertAlphaFade, TSStatic), "Invert Alpha Fade's Start & End Distance" );  
    endGroup( "AlphaFade" );
 
    addGroup("Debug");
