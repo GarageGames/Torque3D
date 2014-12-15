@@ -26,12 +26,14 @@
 uniform vec4 kernel;
 uniform sampler2D diffuseMap;
 
-varying vec2 texc0, texc1, texc2, texc3;
+in vec2 texc0, texc1, texc2, texc3;
+
+out vec4 OUT_col;
 
 void main()
 {
-   gl_FragColor = texture2D(diffuseMap, texc0) * kernel.x;
-   gl_FragColor += texture2D(diffuseMap, texc1) * kernel.y;
-   gl_FragColor += texture2D(diffuseMap, texc2) * kernel.z;
-   gl_FragColor += texture2D(diffuseMap, texc3) * kernel.w;
+   OUT_col = texture(diffuseMap, texc0) * kernel.x;
+   OUT_col += texture(diffuseMap, texc1) * kernel.y;
+   OUT_col += texture(diffuseMap, texc2) * kernel.z;
+   OUT_col += texture(diffuseMap, texc3) * kernel.w;
 }

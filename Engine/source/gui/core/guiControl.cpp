@@ -307,7 +307,7 @@ void GuiControl::initPersistFields()
 
 //-----------------------------------------------------------------------------
 
-bool GuiControl::processArguments(S32 argc, const char **argv)
+bool GuiControl::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    // argv[0] - The GuiGroup to add this control to when it's created.  
    //           this is an optional parameter that may be specified at
@@ -1427,6 +1427,7 @@ bool GuiControl::cursorInControl()
    if (! root) return false;
 
    Point2I pt = root->getCursorPos();
+   pt = root->getPlatformWindow() ? root->getPlatformWindow()->screenToClient(pt) : pt;
    Point2I extent = getExtent();
    Point2I offset = localToGlobalCoord(Point2I(0, 0));
    if (pt.x >= offset.x && pt.y >= offset.y &&

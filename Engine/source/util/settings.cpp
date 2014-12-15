@@ -486,9 +486,9 @@ ConsoleMethod(Settings, findFirstValue, const char*, 2, 5, "settingObj.findFirst
 	if( argc == 3 )
 		return object->findFirstValue( argv[2] );
 	else if( argc == 4 )
-		return object->findFirstValue( argv[2], argv[3] );
+		return object->findFirstValue( argv[2], dAtob(argv[3]) );
 	else if( argc == 5 )
-		return object->findFirstValue( argv[2], argv[3], argv[4] );
+		return object->findFirstValue( argv[2], dAtob(argv[3]), dAtob(argv[4]) );
 	else
 		return "";
 }
@@ -689,8 +689,8 @@ ConsoleMethod(Settings, remove, void, 3, 4, "settingObj.remove(settingName, incl
 	}
 	else if(argc == 4)
 	{
-		object->remove( argv[2], argv[3] );
-		object->remove( argv[2], argv[3] );
+		object->remove( argv[2], dAtob(argv[3]) );
+		object->remove( argv[2], dAtob(argv[3]) );
 	}
 }
 

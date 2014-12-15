@@ -228,11 +228,11 @@ void SimSet::scriptSort( const String &scriptCallbackFn )
 
 //-----------------------------------------------------------------------------
 
-void SimSet::callOnChildren( const String &method, S32 argc, const char *argv[], bool executeOnChildGroups )
+void SimSet::callOnChildren( const String &method, S32 argc, ConsoleValueRef argv[], bool executeOnChildGroups )
 {
    // Prep the arguments for the console exec...
    // Make sure and leave args[1] empty.
-   const char* args[21];
+   ConsoleValueRef args[21];
    args[0] = method.c_str();
    for (S32 i = 0; i < argc; i++)
       args[i + 2] = argv[i];
@@ -834,7 +834,7 @@ SimGroup* SimGroup::deepClone()
 
 //-----------------------------------------------------------------------------
 
-bool SimGroup::processArguments(S32, const char **)
+bool SimGroup::processArguments(S32, ConsoleValueRef *argv)
 {
    return true;
 }
@@ -909,7 +909,7 @@ ConsoleMethod( SimSet, add, void, 3, 0,
       if(obj)
          object->addObject( obj );
       else
-         Con::printf("Set::add: Object \"%s\" doesn't exist", argv[ i ] );
+         Con::printf("Set::add: Object \"%s\" doesn't exist", (const char*)argv[ i ] );
    }
 }
 
@@ -934,7 +934,7 @@ ConsoleMethod( SimSet, remove, void, 3, 0,
       if(obj && object->find(object->begin(),object->end(),obj) != object->end())
          object->removeObject(obj);
       else
-         Con::printf("Set::remove: Object \"%s\" does not exist in set", argv[i]);
+         Con::printf("Set::remove: Object \"%s\" does not exist in set", (const char*)argv[i]);
       object->unlock();
    }
 }
@@ -973,7 +973,7 @@ ConsoleMethod( SimSet, callOnChildren, void, 3, 0,
    "@note This method recurses into all SimSets that are children to the set.\n\n"
    "@see callOnChildrenNoRecurse" )
 {
-   object->callOnChildren( argv[2], argc - 3, argv + 3 );
+   object->callOnChildren( (const char*)argv[2], argc - 3, argv + 3 );
 }
 
 //-----------------------------------------------------------------------------
@@ -985,7 +985,7 @@ ConsoleMethod( SimSet, callOnChildrenNoRecurse, void, 3, 0,
    "@note This method does not recurse into child SimSets.\n\n"
    "@see callOnChildren" )
 {
-   object->callOnChildren( argv[2], argc - 3, argv + 3, false );
+   object->callOnChildren( (const char*)argv[2], argc - 3, argv + 3, false );
 }
 
 //-----------------------------------------------------------------------------
@@ -1121,7 +1121,7 @@ DefineEngineMethod( SimSet, pushToBack, void, ( SimObject* obj ),,
 ConsoleMethod( SimSet, sort, void, 3, 3, "( string callbackFunction ) Sort the objects in the set using the given comparison function.\n"
    "@param callbackFunction Name of a function that takes two object arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal." )
 {
-   object->scriptSort( argv[2] );
+   object->scriptSort( (const char*)argv[2] );
 }
 
 //-----------------------------------------------------------------------------

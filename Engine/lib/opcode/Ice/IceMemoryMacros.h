@@ -47,7 +47,7 @@
 	//!	\warning	writes nb*4 bytes !
 	inline_ void StoreDwords(udword* dest, udword nb, udword value)
 	{
-#ifdef _WIN32
+#if defined( _WIN32 ) && !defined( _WIN64 )
 		// The asm code below **SHOULD** be equivalent to one of those C versions
 		// or the other if your compiled is good: (checked on VC++ 6.0)
 		//

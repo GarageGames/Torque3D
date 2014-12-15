@@ -50,6 +50,15 @@
 #include "core/util/zip/zipVolume.h"
 #include "gfx/bitmap/gBitmap.h"
 
+MODULE_BEGIN( ColladaShapeLoader )
+   MODULE_INIT_AFTER( ShapeLoader )
+   MODULE_INIT
+   {
+      TSShapeLoader::addFormat("Collada", "dae");
+      TSShapeLoader::addFormat("Google Earth", "kmz");
+   }
+MODULE_END;
+
 // 
 static DAE sDAE;                 // Collada model database (holds the last loaded file)
 static Torque::Path sLastPath;   // Path of the last loaded Collada file

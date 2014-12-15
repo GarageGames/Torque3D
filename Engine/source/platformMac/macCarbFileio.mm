@@ -889,7 +889,7 @@ bool Platform::fileTimeToString(FileTime * time, char * string, U32 strLen) { re
 //-----------------------------------------------------------------------------
 #if defined(TORQUE_DEBUG)
 ConsoleFunction(testHasSubdir,void,2,2,"tests platform::hasSubDirectory") {
-   Con::printf("testing %s",argv[1]);
+   Con::printf("testing %s",(const char*)argv[1]);
    Platform::addExcludedDirectory(".svn");
    if(Platform::hasSubDirectory(argv[1]))
       Con::printf(" has subdir");
@@ -906,7 +906,7 @@ ConsoleFunction(testDumpDirectories,void,4,4,"testDumpDirectories('path', int de
    
    Platform::dumpDirectories(argv[1], paths, depth, noBasePath);
    
-   Con::printf("Dumping directories starting from %s with depth %i", argv[1],depth);
+   Con::printf("Dumping directories starting from %s with depth %i", (const char*)argv[1],depth);
    
    for(Vector<StringTableEntry>::iterator itr = paths.begin(); itr != paths.end(); itr++) {
       Con::printf(*itr);

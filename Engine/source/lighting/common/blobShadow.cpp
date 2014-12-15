@@ -331,7 +331,7 @@ void BlobShadow::render( F32 camDist, const TSRenderState &rdata )
    world.mul(mLightToWorld);
    GFX->setWorldMatrix(world);
 
-   GFX->disableShaders();
+   GFX->setupGenericShaders(GFXDevice::GSModColorTexture);
 
    GFX->setStateBlock(mShadowSB);
    GFX->setTexture(0, smGenericShadowTexture);

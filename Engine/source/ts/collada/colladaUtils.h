@@ -430,6 +430,8 @@ public:
 class BasePrimitive
 {
 public:
+   virtual ~BasePrimitive() { }
+
    /// Return true if the element is a geometric primitive type
    static bool isPrimitive(const daeElement* element)
    {

@@ -558,7 +558,12 @@ void GFXDrawUtil::draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinA
 
    verts[0].color = verts[1].color = verts[2].color = verts[3].color = mBitmapModulation;
 
-   if(spinAngle != 0.f)
+   if (spinAngle == 0.0f)
+   {
+      for( S32 i = 0; i < 4; i++ )
+         verts[i].point += offset;
+   }
+   else
    {
       MatrixF rotMatrix( EulerF( 0.0, 0.0, spinAngle ) );
 
@@ -616,6 +621,7 @@ void GFXDrawUtil::drawLine( F32 x1, F32 y1, F32 z1, F32 x2, F32 y2, F32 z2, cons
 
    mDevice->setVertexBuffer( verts );
    mDevice->setStateBlock( mRectFillSB );
+   mDevice->setupGenericShaders();
    mDevice->drawPrimitive( GFXLineList, 0, 1 );
 }
 

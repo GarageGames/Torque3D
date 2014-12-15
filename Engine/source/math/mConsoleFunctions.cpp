@@ -41,8 +41,9 @@ DefineConsoleFunction( mSolveQuadratic, const char*, ( F32 a, F32 b, F32 c ),,
    F32 x[2];
    U32 sol = mSolveQuadratic( a, b, c, x );
 
-   char * retBuffer = Con::getReturnBuffer(256);
-   dSprintf(retBuffer, 256, "%d %g %g", sol, x[0], x[1]);
+   static const U32 bufSize = 256;
+   char * retBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(retBuffer, bufSize, "%d %g %g", sol, x[0], x[1]);
    return retBuffer;
 }
 
@@ -59,8 +60,9 @@ DefineConsoleFunction( mSolveCubic, const char*, ( F32 a, F32 b, F32 c, F32 d ),
    F32 x[3];
    U32 sol = mSolveCubic( a, b, c, d, x );
 
-   char * retBuffer = Con::getReturnBuffer(256);
-   dSprintf(retBuffer, 256, "%d %g %g %g", sol, x[0], x[1], x[2]);
+   static const U32 bufSize = 256;
+   char * retBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(retBuffer, bufSize, "%d %g %g %g", sol, x[0], x[1], x[2]);
    return retBuffer;
 }
 
@@ -76,9 +78,10 @@ DefineConsoleFunction( mSolveQuartic, const char*, ( F32 a, F32 b, F32 c, F32 d,
     "@ingroup Math" )
 {
    F32 x[4];
-   char * retBuffer = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char * retBuffer = Con::getReturnBuffer(bufSize);
    U32 sol = mSolveQuartic(a, b, c, d, e, x);
-   dSprintf(retBuffer, 256, "%d %g %g %g %g", sol, x[0], x[1], x[2], x[3]);
+   dSprintf(retBuffer, bufSize, "%d %g %g %g %g", sol, x[0], x[1], x[2], x[3]);
    return retBuffer;
 }
 
@@ -121,8 +124,9 @@ DefineConsoleFunction( mFloatLength, const char*, ( F32 v, U32 precision ),,
       precision = 9;
    fmtString[2] = '0' + precision;
 
-   char * outBuffer = Con::getReturnBuffer(256);
-   dSprintf(outBuffer, 255, fmtString, v);
+   static const U32 bufSize = 256;
+   char * outBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(outBuffer, bufSize, fmtString, v);
    return outBuffer;
 }
 

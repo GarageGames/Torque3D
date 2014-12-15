@@ -25,8 +25,8 @@ function initializeRiverEditor()
    echo(" % - Initializing River Editor");
      
    exec( "./riverEditor.cs" );
-   exec( "./riverEditorGui.gui" );
-   exec( "./riverEditorToolbar.gui" );
+   exec( "./RiverEditorGui.gui" );
+   exec( "./RiverEditorToolbar.gui" );
    exec( "./riverEditorGui.cs" );
    
    // Add ourselves to EditorGui, where all the other tools reside

@@ -145,9 +145,10 @@ ConsoleFunction(containerFindFirst, const char*, 6, 6, "(int mask, Point3F point
 
    //return the first element
    sgServerQueryIndex = 0;
-   char *buff = Con::getReturnBuffer(100);
+   static const U32 bufSize = 100;
+   char *buff = Con::getReturnBuffer(bufSize);
    if (sgServerQueryList.mList.size())
-      dSprintf(buff, 100, "%d", sgServerQueryList.mList[sgServerQueryIndex++]->getId());
+      dSprintf(buff, bufSize, "%d", sgServerQueryList.mList[sgServerQueryIndex++]->getId());
    else
       buff[0] = '\0';
 
@@ -162,9 +163,10 @@ ConsoleFunction( containerFindNext, const char*, 1, 1, "()"
 	"@ingroup Game")
 {
    //return the next element
-   char *buff = Con::getReturnBuffer(100);
+   static const U32 bufSize = 100;
+   char *buff = Con::getReturnBuffer(bufSize);
    if (sgServerQueryIndex < sgServerQueryList.mList.size())
-      dSprintf(buff, 100, "%d", sgServerQueryList.mList[sgServerQueryIndex++]->getId());
+      dSprintf(buff, bufSize, "%d", sgServerQueryList.mList[sgServerQueryIndex++]->getId());
    else
       buff[0] = '\0';
 

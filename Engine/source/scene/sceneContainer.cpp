@@ -1631,10 +1631,11 @@ DefineEngineFunction( containerRayCast, const char*,
       pExempt->enableCollision();
 
    // add the hit position and normal?
-   char *returnBuffer = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char *returnBuffer = Con::getReturnBuffer(bufSize);
    if(ret)
    {
-      dSprintf(returnBuffer, 256, "%d %g %g %g %g %g %g %g",
+      dSprintf(returnBuffer, bufSize, "%d %g %g %g %g %g %g %g",
                ret, rinfo.point.x, rinfo.point.y, rinfo.point.z,
                rinfo.normal.x, rinfo.normal.y, rinfo.normal.z, rinfo.distance);
    }

@@ -46,6 +46,8 @@ singleton ShaderData( BL_ProjectedShadowShaderData )
    OGLVertexShaderFile     = "shaders/common/gl/projectedShadowV.glsl";
    OGLPixelShaderFile      = "shaders/common/gl/projectedShadowP.glsl";   
       
+   samplerNames[0] = "inputTex";
+   
    pixVersion = 2.0;
 };
 

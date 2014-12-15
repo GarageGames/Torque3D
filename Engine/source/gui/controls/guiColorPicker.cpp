@@ -353,9 +353,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
          Point2I resolution = getRoot()->getExtent();
 
          U32 buf_x = offset.x + mSelectorPos.x + 1;
-         U32 buf_y = ( extent.y - ( offset.y + mSelectorPos.y + 1 ) );
-         if(GFX->getAdapterType() != OpenGL)
-            buf_y = resolution.y - buf_y;
+         U32 buf_y = resolution.y - ( extent.y - ( offset.y + mSelectorPos.y + 1 ) );
 
          GFXTexHandle bb( resolution.x, 
                           resolution.y, 
@@ -528,10 +526,11 @@ void GuiColorPickerCtrl::setScriptValue(const char *value)
 
 ConsoleMethod(GuiColorPickerCtrl, getSelectorPos, const char*, 2, 2, "Gets the current position of the selector")
 {
-   char *temp = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char *temp = Con::getReturnBuffer(bufSize);
    Point2I pos;
    pos = object->getSelectorPos();
-   dSprintf(temp,256,"%d %d",pos.x, pos.y); 
+   dSprintf(temp,bufSize,"%d %d",pos.x, pos.y); 
    return temp;
 }
 

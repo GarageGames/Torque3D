@@ -571,7 +571,7 @@ void GuiInspectorTypeFileName::updateValue()
 
 ConsoleMethod( GuiInspectorTypeFileName, apply, void, 3,3, "apply(newValue);" )
 {
-   String path( argv[2] );
+   String path( (const char*)argv[2] );
    if ( path.isNotEmpty() )
       path = Platform::makeRelativePathName( path, Platform::getMainDotCsDir() );
       
@@ -764,8 +764,7 @@ GuiControl* GuiInspectorTypeShapeFilename::constructEditControl()
 
    // Change filespec
    char szBuffer[512];
-   dSprintf( szBuffer, sizeof(szBuffer), "getLoadFilename(\"%s\", \"%d.apply\", %d.getData());",
-      "DTS Files (*.dts)|*.dts|COLLADA Files (*.dae)|*.dae|(All Files (*.*)|*.*|", getId(), getId() );
+   dSprintf( szBuffer, sizeof(szBuffer), "getLoadFormatFilename(\"%d.apply\", %d.getData());", getId(), getId() );
    mBrowseButton->setField( "Command", szBuffer );
 
    // Create "Open in ShapeEditor" button

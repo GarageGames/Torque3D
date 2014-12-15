@@ -47,7 +47,11 @@ singleton ShaderData( MLAA_EdgeDetectionShader )
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/offsetV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/edgeDetectionP.hlsl";
 
+   OGLVertexShaderFile  = "shaders/common/postFx/mlaa/gl/offsetV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/mlaa/gl/edgeDetectionP.glsl";
+
    samplerNames[0] = "$colorMapG";
+   samplerNames[1] = "$prepassMap";
 
    pixVersion = 3.0;
 };
@@ -71,6 +75,9 @@ singleton ShaderData( MLAA_BlendWeightCalculationShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/passthruV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/blendWeightCalculationP.hlsl";
+
+   OGLVertexShaderFile  = "shaders/common/postFx/mlaa/gl/passthruV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/mlaa/gl/blendWeightCalculationP.glsl";
 
    samplerNames[0] = "$edgesMap";
    samplerNames[1] = "$edgesMapL";
@@ -98,6 +105,9 @@ singleton ShaderData( MLAA_NeighborhoodBlendingShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/offsetV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/neighborhoodBlendingP.hlsl";
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/mlaa/gl/offsetV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/mlaa/gl/neighborhoodBlendingP.glsl";
 
    samplerNames[0] = "$blendMap";
    samplerNames[1] = "$colorMapL";

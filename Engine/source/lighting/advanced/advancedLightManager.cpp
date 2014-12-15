@@ -35,6 +35,8 @@
 #include "math/util/sphereMesh.h"
 #include "console/consoleTypes.h"
 #include "scene/sceneRenderState.h"
+#include "gfx/gfxCardProfile.h"
+#include "gfx/gfxTextureProfile.h"
 
 
 ImplementEnumType( ShadowType,
@@ -81,6 +83,9 @@ bool AdvancedLightManager::isCompatible() const
       return false;
 
    // TODO: Test for the necessary texture formats!
+   bool autoMips;
+   if(!GFX->getCardProfiler()->checkFormat(GFXFormatR16F, &GFXDefaultRenderTargetProfile, autoMips))
+      return false;
 
    return true;
 }
@@ -664,8 +669,9 @@ ConsoleFunction( setShadowVizLight, const char*, 2, 2, "" )
    const Point3I &size = texObject->getSize();
    F32 aspect = (F32)size.x / (F32)size.y;
 
-   char *result = Con::getReturnBuffer( 64 );
-   dSprintf( result, 64, "%d %d %g", size.x, size.y, aspect ); 
+   static const U32 bufSize = 64;
+   char *result = Con::getReturnBuffer( bufSize );
+   dSprintf( result, bufSize, "%d %d %g", size.x, size.y, aspect ); 
    return result;
 }
 

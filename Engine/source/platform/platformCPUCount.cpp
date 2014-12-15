@@ -24,6 +24,8 @@
 #include "platform/platform.h"
 #include "platform/platformCPUCount.h"
 
+#if defined(TORQUE_OS_LINUX) || defined(TORQUE_OS_OSX) || defined(TORQUE_OS_XENON) || defined(TORQUE_OS_PS3)
+
 // Consoles don't need this
 #if defined(TORQUE_OS_XENON) || defined(TORQUE_OS_PS3)
 namespace CPUInfo 
@@ -661,4 +663,6 @@ next:
       }
 
 } // namespace CPUInfo
+#endif
+
 #endif

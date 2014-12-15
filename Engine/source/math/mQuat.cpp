@@ -35,27 +35,27 @@ QuatF& QuatF::set( const EulerF & e )
    F32 cx, sx;
    F32 cy, sy;
    F32 cz, sz;
-   mSinCos( -e.x * 0.5f, sx, cx );
-   mSinCos( -e.y * 0.5f, sy, cy );
-   mSinCos( -e.z * 0.5f, sz, cz );
+   mSinCos( e.x * 0.5f, sx, cx );
+   mSinCos( e.y * 0.5f, sy, cy );
+   mSinCos( e.z * 0.5f, sz, cz );
 
-   // Qyaw(z)   = [ (0, 0, sin z/2), cos z/2 ]
+   // Qyaw(z) = [ (0, 0, sin z/2), cos z/2 ]
    // Qpitch(x) = [ (sin x/2, 0, 0), cos x/2 ]
-   // Qroll(y)  = [ (0, sin y/2, 0), cos y/2 ]
-   // this = Qresult = Qyaw*Qpitch*Qroll  ZXY
+   // Qroll(y) = [ (0, sin y/2, 0), cos y/2 ]
+   // this = Qresult = Qyaw*Qpitch*Qroll ZXY
    //
    // The code that folows is a simplification of:
-   //    roll*=pitch;
-   //    roll*=yaw;
-   //    *this = roll;
+   // roll*=pitch;
+   // roll*=yaw;
+   // *this = roll;
    F32 cycz, sysz, sycz, cysz;
    cycz = cy*cz;
    sysz = sy*sz;
    sycz = sy*cz;
    cysz = cy*sz;
-   w = cycz*cx + sysz*sx;
+   w = cycz*cx - sysz*sx;
    x = cycz*sx + sysz*cx;
-   y = sycz*cx - cysz*sx;
+   y = sycz*cx + cysz*sx;
    z = cysz*cx - sycz*sx;
 
    return *this;

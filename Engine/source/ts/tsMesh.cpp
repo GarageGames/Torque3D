@@ -784,7 +784,7 @@ bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & 
       // gonna depend on what kind of primitive it is...
       if ( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Triangles )
       {
-         for ( S32 j = 0; j < draw.numElements-2; j++)
+         for ( S32 j = 0; j < draw.numElements-2; j += 3 )
          {
             idx0 = mIndices[drawStart + j + 0];
             idx1 = mIndices[drawStart + j + 1];
@@ -2949,7 +2949,11 @@ inline void TSMesh::findTangent( U32 index1,
 void TSMesh::createTangents(const Vector<Point3F> &_verts, const Vector<Point3F> &_norms)
 {
    U32 numVerts = _verts.size();
-   if ( numVerts == 0 )
+   U32 numNorms = _norms.size();
+   if ( numVerts <= 0 || numNorms <= 0 )
+      return;
+
+   if( numVerts != numNorms)
       return;
 
    Vector<Point3F> tan0;

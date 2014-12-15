@@ -46,6 +46,7 @@ function EWCreatorWindow::init( %this )
       %this.registerMissionObject( "SFXEmitter",          "Sound Emitter" );
       %this.registerMissionObject( "Precipitation" );
       %this.registerMissionObject( "ParticleEmitterNode", "Particle Emitter" );
+      %this.registerMissionObject( "RibbonNode", "Ribbon" );
       
       // Legacy features. Users should use Ground Cover and the Forest Editor.   
       //%this.registerMissionObject( "fxShapeReplicator",   "Shape Replicator" );
@@ -324,13 +325,13 @@ function EWCreatorWindow::navigate( %this, %address )
    
    if ( %this.tab $= "Meshes" )
    {      
-      %fullPath = findFirstFileMultiExpr( "*.dts" TAB "*.dae" TAB "*.kmz" TAB "*.dif" );
+      %fullPath = findFirstFileMultiExpr( getFormatExtensions() );
       
       while ( %fullPath !$= "" )
       {
          if (strstr(%fullPath, "cached.dts") != -1)
          {
-            %fullPath = findNextFileMultiExpr( "*.dts" TAB "*.dae" TAB "*.kmz"  TAB "*.dif" );
+            %fullPath = findNextFileMultiExpr( getFormatExtensions() );
             continue;
          }
 
@@ -338,7 +339,7 @@ function EWCreatorWindow::navigate( %this, %address )
          %splitPath = strreplace( %fullPath, "/", " " );     
          if( getWord(%splitPath, 0) $= "tools" )
          {
-            %fullPath = findNextFileMultiExpr( "*.dts" TAB "*.dae" TAB "*.kmz"  TAB "*.dif" );
+            %fullPath = findNextFileMultiExpr( getFormatExtensions() );
             continue;
          }
                       
@@ -396,7 +397,7 @@ function EWCreatorWindow::navigate( %this, %address )
             }
          }         
 
-         %fullPath = findNextFileMultiExpr( "*.dts" TAB "*.dae" TAB "*.kmz" TAB "*.dif" );
+         %fullPath = findNextFileMultiExpr( getFormatExtensions() );
       }
    }
    

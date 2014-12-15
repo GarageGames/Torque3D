@@ -64,6 +64,19 @@ static bool isScreenSaverRunning()
 	return sreensaver;
 }
 
+DISPLAY_DEVICE GetPrimaryDevice()
+{
+	int index = 0;
+	DISPLAY_DEVICE dd;
+	dd.cb = sizeof(DISPLAY_DEVICE);
+
+	while (EnumDisplayDevices(NULL, index++, &dd, 0))
+	{
+		if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) return dd;
+	}
+	return dd;
+}
+
 Win32Window::Win32Window(): mMouseLockPosition(0,0),
 mShouldLockMouse(false),
 mMouseLocked(false),
@@ -125,9 +138,10 @@ const GFXVideoMode & Win32Window::getVideoMode()
 
 void Win32Window::setVideoMode( const GFXVideoMode &mode )
 {
-	bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
+   bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
+   static bool first_load = true;
 
-	if(needCurtain)
+   if(needCurtain)
    {
 		Con::errorf("Win32Window::setVideoMode - invoking curtain");
       mOwningManager->lowerCurtain();
@@ -150,10 +164,35 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 
 	// Set our window to have the right style based on the mode
    if(mode.fullScreen && !Platform::getWebDeployment() && !mOffscreenRender)
-	{
-		SetWindowLong( getHWND(), GWL_STYLE, WS_POPUP);
-		SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-		ShowWindow(getHWND(), SW_SHOWNORMAL);
+   {
+	  WINDOWPLACEMENT wplacement = { sizeof(wplacement) };
+	  DWORD dwStyle = GetWindowLong(getHWND(), GWL_STYLE);
+	  MONITORINFO mi = { sizeof(mi) };
+
+	  if (GetWindowPlacement(getHWND(), &wplacement) && GetMonitorInfo(MonitorFromWindow(getHWND(), MONITOR_DEFAULTTOPRIMARY), &mi))
+	  {
+		   DISPLAY_DEVICE dd = GetPrimaryDevice();
+		   DEVMODE dv;
+		   ZeroMemory(&dv, sizeof(dv));
+		   dv.dmSize = sizeof(DEVMODE);
+		   EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv);
+		   dv.dmPelsWidth = mode.resolution.x;
+		   dv.dmPelsHeight = mode.resolution.y;
+		   dv.dmBitsPerPel = mode.bitDepth;
+		   dv.dmDisplayFrequency = mode.refreshRate;
+		   dv.dmFields = (DM_PELSWIDTH | DM_PELSHEIGHT);
+		   ChangeDisplaySettings(&dv, CDS_FULLSCREEN);
+		   SetWindowLong(getHWND(), GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW);
+		   SetWindowPos(getHWND(), HWND_TOP,	
+		   					mi.rcMonitor.left,
+		   					mi.rcMonitor.top,
+							mi.rcMonitor.right - mi.rcMonitor.left,
+							mi.rcMonitor.bottom - mi.rcMonitor.top,
+							SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+	  }
+
+      if(mDisplayWindow)
+         ShowWindow(getHWND(), SW_SHOWNORMAL);
 
       // Clear the menu bar from the window for full screen
       HMENU menu = GetMenu(getHWND());
@@ -170,7 +209,12 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 	}
 	else
 	{
-      // Reset device *first*, so that when we call setSize() and let it
+	   if (!first_load)
+		  ChangeDisplaySettings(NULL, 0);
+
+	   first_load = false;
+
+       // Reset device *first*, so that when we call setSize() and let it
 	   // access the monitor settings, it won't end up with our fullscreen
 	   // geometry that is just about to change.
 
@@ -216,7 +260,9 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 		   // We have to force Win32 to update the window frame and make the window
 		   // visible and no longer topmost - this code might be possible to simplify.
 		   SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-		   ShowWindow( getHWND(), SW_SHOWNORMAL);
+
+         if(mDisplayWindow)
+            ShowWindow( getHWND(), SW_SHOWNORMAL);
       }
 
       mFullscreen = false;
@@ -657,7 +703,7 @@ void Win32Window::_unregisterWindowClass()
 LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
 	// CodeReview [tom, 4/30/2007] The two casts here seem somewhat silly and redundant ?
-	Win32Window* window = (Win32Window*)((PlatformWindow*)GetWindowLong(hWnd, GWL_USERDATA));
+	Win32Window* window = (Win32Window*)((PlatformWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	const WindowId devId = window ? window->getWindowId() : 0;
 
    if (window && window->getOffscreenRender())
@@ -708,8 +754,8 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 	case WM_CREATE:
 		// CodeReview [tom, 4/30/2007] Why don't we just cast this to a LONG 
 		//            instead of having a ton of essentially pointless casts ?
-		SetWindowLong(hWnd, GWL_USERDATA,
-			(LONG)((PlatformWindow*)((CREATESTRUCT*)lParam)->lpCreateParams));
+		SetWindowLongPtr(hWnd, GWLP_USERDATA,
+			(LONG_PTR)((PlatformWindow*)((CREATESTRUCT*)lParam)->lpCreateParams));
 		break;
 
 	case WM_SETFOCUS:

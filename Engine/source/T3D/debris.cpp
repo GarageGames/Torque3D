@@ -41,7 +41,7 @@
 #include "lighting/lightQuery.h"
 
 
-const U32 csmStaticCollisionMask =  TerrainObjectType;
+const U32 csmStaticCollisionMask = TerrainObjectType | StaticShapeObjectType | StaticObjectType;
 
 const U32 csmDynamicCollisionMask = StaticShapeObjectType;
 
@@ -99,7 +99,6 @@ DebrisData::DebrisData()
    friction   = 0.2f;
    numBounces = 0;
    bounceVariance = 0;
-   minSpinSpeed = maxSpinSpeed = 0.0;
    staticOnMaxBounce = false;
    explodeOnMaxBounce = false;
    snapOnMaxBounce = false;
@@ -511,6 +510,12 @@ bool Debris::onAdd()
       return false;
    }
 
+   if( !mDataBlock )
+   {
+      Con::errorf("Debris::onAdd - Fail - No datablock");
+      return false;
+   }
+
    // create emitters
    for( S32 i=0; i<DebrisData::DDC_NUM_EMITTERS; i++ )
    {
@@ -653,8 +658,7 @@ void Debris::onRemove()
       }
    }
 
-   getSceneManager()->removeObjectFromScene(this);
-   getContainer()->removeObject(this);
+   removeFromScene();
 
    Parent::onRemove();
 }

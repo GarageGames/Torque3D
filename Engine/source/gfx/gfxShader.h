@@ -237,6 +237,13 @@ protected:
    /// The macros to be passed to the shader.      
    Vector<GFXShaderMacro> mMacros;
 
+   /// Ordered SamplerNames
+   /// We need to store a list of sampler for allow OpenGL to
+   /// assign correct location for each sampler.
+   /// GLSL 150 not allow explicit uniform location.
+   /// Only used on OpenGL   
+   Vector<String> mSamplerNamesOrdered;
+
    /// The pixel version this is compiled for.
    F32 mPixVersion;
 
@@ -292,10 +299,20 @@ public:
    virtual ~GFXShader();
 
    ///
+   /// Deprecated. Remove on T3D 4.0
+#ifndef TORQUE_OPENGL
    bool init(  const Torque::Path &vertFile, 
                const Torque::Path &pixFile, 
                F32 pixVersion, 
                const Vector<GFXShaderMacro> &macros );
+#endif
+
+   ///
+   bool init(  const Torque::Path &vertFile, 
+               const Torque::Path &pixFile, 
+               F32 pixVersion, 
+               const Vector<GFXShaderMacro> &macros,
+               const Vector<String> &samplerNames);
 
    /// Reloads the shader from disk.
    bool reload();
@@ -314,6 +331,9 @@ public:
    /// exist originally this will return a handle in an invalid state
    /// if the constant doesn't exist at this time.
    virtual GFXShaderConstHandle* getShaderConstHandle( const String& name ) = 0; 
+
+   /// Returns a shader constant handle for the name constant, if the variable doesn't exist NULL is returned.
+   virtual GFXShaderConstHandle* findShaderConstHandle( const String& name ) = 0;
 
    /// Returns the alignment value for constType
    virtual U32 getAlignmentValue(const GFXShaderConstType constType) const = 0;   

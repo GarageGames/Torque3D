@@ -38,7 +38,10 @@ function createCanvas(%windowTitle)
    }
 
    // Create the Canvas
-   %foo = new GuiCanvas(Canvas);
+   %foo = new GuiCanvas(Canvas)
+   {
+      displayWindow = false;
+   };
    
    // Set the window title
    if (isObject(Canvas))
@@ -246,6 +249,15 @@ if ($displayHelp) {
 else {
    onStart();
    echo("Engine initialized...");
+
+   if( !$isDedicated )
+   {
+      // As we know at this point that the initial load is complete,
+      // we can hide any splash screen we have, and show the canvas.
+      // This keeps things looking nice, instead of having a blank window
+      closeSplashWindow();
+      Canvas.showWindow();
+   }
    
    // Auto-load on the 360
    if( $platform $= "xenon" )

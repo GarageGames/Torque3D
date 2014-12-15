@@ -29,7 +29,7 @@
 // put old skins into object list
 //-------------------------------------------------
 
-void TSShape::fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * detailFirstSkin, S32 * detailNumSkins)
+void TSShape::fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * detFirstSkin, S32 * detailNumSkins)
 {
 #if !defined(TORQUE_MAX_LIB)
    // this method not necessary in exporter, and a couple lines won't compile for exporter
@@ -63,9 +63,9 @@ void TSShape::fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * d
          // find one mesh per detail to add to this object
          // don't really need to be versions of the same object
          i = 0;
-         while (i<detailFirstSkin[dl] || detailFirstSkin[dl]<0)
+         while (i<detFirstSkin[dl] || detFirstSkin[dl]<0)
             i++;
-         for (; i<numSkins && i<detailFirstSkin[dl]+detailNumSkins[dl]; i++)
+         for (; i<numSkins && i<detFirstSkin[dl]+detailNumSkins[dl]; i++)
          {
             if (skins[i])
             {
@@ -77,7 +77,7 @@ void TSShape::fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * d
                break;
             }
          }
-         if (i==numSkins || i==detailFirstSkin[dl]+detailNumSkins[dl])
+         if (i==numSkins || i==detFirstSkin[dl]+detailNumSkins[dl])
          {
             skinsCopy.push_back(NULL);
             object.numMeshes++;

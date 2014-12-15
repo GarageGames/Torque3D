@@ -26,8 +26,10 @@
 uniform sampler2D diffuseMap, refractMap, bumpMap;
 uniform vec4 shadeColor;
 
-varying vec2 TEX0;
-varying vec4 TEX1;
+in vec2 TEX0;
+in vec4 TEX1;
+
+out vec4 OUT_col;
 
 //-----------------------------------------------------------------------------
 // Fade edges of axis for texcoord passed in
@@ -49,7 +51,7 @@ float fadeAxis( float val )
 //-----------------------------------------------------------------------------
 void main()
 {
-   vec3 bumpNorm = texture2D( bumpMap, TEX0 ).rgb * 2.0 - 1.0;
+   vec3 bumpNorm = texture( bumpMap, TEX0 ).rgb * 2.0 - 1.0;
    vec2 offset = vec2( bumpNorm.x, bumpNorm.y );
    vec4 texIndex = TEX1;
 
@@ -61,8 +63,8 @@ void main()
    const float distortion = 0.2;
    texIndex.xy += offset * distortion * fadeVal;
 
-   vec4 diffuseColor = texture2D( diffuseMap, TEX0 );
-   vec4 reflectColor = texture2DProj( refractMap, texIndex );
+   vec4 diffuseColor = texture( diffuseMap, TEX0 );
+   vec4 reflectColor = textureProj( refractMap, texIndex );
 
-   gl_FragColor = diffuseColor + reflectColor * diffuseColor.a;
+   OUT_col = diffuseColor + reflectColor * diffuseColor.a;
 }

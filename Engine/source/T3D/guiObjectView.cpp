@@ -110,7 +110,7 @@ GuiObjectView::GuiObjectView()
 {
    mCameraMatrix.identity();
    mCameraRot.set( 0.0f, 0.0f, 3.9f );
-   mCameraPos.set( 0.0f, 1.75f, 1.25f );
+   mCameraPos.set( 0.0f, 0.0f, 0.0f );
    mCameraMatrix.setColumn( 3, mCameraPos );
    mOrbitPos.set( 0.0f, 0.0f, 0.0f );
 
@@ -520,9 +520,9 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
    (
       gClientSceneGraph,
       SPT_Diffuse,
-      SceneCameraState( GFX->getViewport(), frust, GFX->getWorldMatrix(), GFX->getProjectionMatrix() ),
+      SceneCameraState( GFX->getViewport(), frust, MatrixF::Identity, GFX->getProjectionMatrix() ),
       renderPass,
-      false
+      true
    );
 
    // Set up our TS render state here.   

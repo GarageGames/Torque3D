@@ -20,12 +20,24 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-varying vec4 texCoord12;
-varying vec4 texCoord34;
-varying vec3 vLightTS; // light vector in tangent space, denormalized
-varying vec3 vViewTS;  // view vector in tangent space, denormalized
-varying vec3 vNormalWS; // Normal vector in world space
-varying float worldDist;
+#include "hlslCompat.glsl"
+
+in vec4 vPosition;
+in vec3 vNormal;
+in vec3 vBinormal;
+in vec3 vTangent;
+in vec2 vTexCoord0;
+
+out vec4 texCoord12;
+#define OUT_texCoord12 texCoord12
+out vec4 texCoord34;
+#define OUT_texCoord34 texCoord34
+out vec3 vLightTS; // light vector in tangent space, denormalized
+#define OUT_vLightTS vLightTS
+out vec3 vViewTS;  // view vector in tangent space, denormalized
+#define OUT_vViewTS vViewTS
+out float worldDist;
+#define OUT_worldDist worldDist
 
 //-----------------------------------------------------------------------------
 // Uniforms                                                                        
@@ -43,37 +55,37 @@ uniform vec3  texScale;
 //-----------------------------------------------------------------------------
 void main()
 {   
-   vec4 pos = gl_Vertex;
-   vec3 normal = gl_Normal;
-   vec3 binormal = gl_MultiTexCoord0.xyz;
-   vec3 tangent = gl_MultiTexCoord1.xyz;
-   vec2 uv0 = gl_MultiTexCoord2.st;
+   vec4 IN_pos = vPosition;
+   vec3 IN_normal = vNormal;
+   vec3 IN_binormal = vBinormal;
+   vec3 IN_tangent = vTangent;
+   vec2 IN_uv0 = vTexCoord0.st;
 
-   gl_Position = modelview * pos;
+   gl_Position = modelview * IN_pos;
    
    // Offset the uv so we don't have a seam directly over our head.
-   vec2 uv = uv0 + vec2( 0.5, 0.5 );
+   vec2 uv = IN_uv0 + vec2( 0.5, 0.5 );
    
-   texCoord12.xy = uv * texScale.x;
-   texCoord12.xy += texOffset0;
+   OUT_texCoord12.xy = uv * texScale.x;
+   OUT_texCoord12.xy += texOffset0;
    
-   texCoord12.zw = uv * texScale.y;
-   texCoord12.zw += texOffset1;
+   OUT_texCoord12.zw = uv * texScale.y;
+   OUT_texCoord12.zw += texOffset1;
    
-   texCoord34.xy = uv * texScale.z;
-   texCoord34.xy += texOffset2;  
+   OUT_texCoord34.xy = uv * texScale.z;
+   OUT_texCoord34.xy += texOffset2;
    
-   texCoord34.z = pos.z;
-   texCoord34.w = 0.0;
+   OUT_texCoord34.z = IN_pos.z;
+   OUT_texCoord34.w = 0.0;
 
    // Transform the normal, tangent and binormal vectors from object space to 
    // homogeneous projection space:
-   vNormalWS   = -normal; 
-   vec3 vTangentWS  = -tangent;
-   vec3 vBinormalWS = -binormal;
+   vec3 vNormalWS   = -IN_normal; 
+   vec3 vTangentWS  = -IN_tangent;
+   vec3 vBinormalWS = -IN_binormal;
    
    // Compute position in world space:
-   vec4 vPositionWS = pos + vec4( eyePosWorld, 1 ); //mul( pos, objTrans );
+   vec4 vPositionWS = IN_pos + vec4( eyePosWorld, 1 ); //tMul( IN_pos, objTrans );
 
    // Compute and output the world view vector (unnormalized):
    vec3 vViewWS = eyePosWorld - vPositionWS.xyz;
@@ -81,12 +93,14 @@ void main()
    // Compute denormalized light vector in world space:
    vec3 vLightWS = -sunVec;
 
-   // Normalize the light and view vectors and transform it to the tangent space:
+   // Normalize the light and view vectors and transform it to the IN_tangent space:
    mat3 mWorldToTangent = mat3( vTangentWS, vBinormalWS, vNormalWS );
 
    // Propagate the view and the light vectors (in tangent space):
-   vLightTS = mWorldToTangent * vLightWS;
-   vViewTS  = vViewWS * mWorldToTangent;
-   
-   worldDist = clamp( pow( pos.z, 2.0 ), 0.0, 1.0 );
+   OUT_vLightTS = vLightWS * mWorldToTangent;
+   OUT_vViewTS  = mWorldToTangent * vViewWS;
+
+   OUT_worldDist = clamp( pow( max( IN_pos.z, 0 ), 2 ), 0.0, 1.0 );
+
+   correctSSP(gl_Position);
 }

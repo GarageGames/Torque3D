@@ -382,7 +382,7 @@ class SFXSource : public SimGroup
 
       /// We overload this to disable creation of 
       /// a source via script 'new'.
-      virtual bool processArguments( S32 argc, const char **argv );
+      virtual bool processArguments( S32 argc, ConsoleValueRef *argv );
       
       // Console getters/setters.
       static bool _setDescription( void *obj, const char *index, const char *data );
@@ -434,7 +434,7 @@ class SFXSource : public SimGroup
       virtual bool isVirtualized() const { return false; }
       
       /// Returns true if this is a looping source.
-      bool isLooping() const { return mDescription->mIsLooping; }
+      bool isLooping() const { return mDescription.isValid() && mDescription->mIsLooping; }
 
       /// @}
       

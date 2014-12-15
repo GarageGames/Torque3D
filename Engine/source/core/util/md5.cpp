@@ -154,7 +154,7 @@ void MD5Final( unsigned char digest[16], MD5Context* ctx)
     MD5Transform(ctx->buf, (int *) ctx->in);
     byteReverse((unsigned char *) ctx->buf, 4);
     memcpy(digest, ctx->buf, 16);
-    memset(ctx, 0, sizeof(ctx));        /* In case it's sensitive */
+    memset(ctx, 0, sizeof(MD5Context));        /* In case it's sensitive */
 }
 
 

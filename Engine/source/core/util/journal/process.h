@@ -64,7 +64,7 @@ public:
    static bool processEvents();
 
    /// Ask the processEvents() function to shutdown.
-   static void requestShutdown();
+   static void requestShutdown(S32 status = 0);
 
 
    static void notifyInit(Delegate<bool()> del, F32 order = PROCESS_DEFAULT_ORDER) 
@@ -94,6 +94,11 @@ public:
    static void notify(Delegate<void()> del, F32 order = PROCESS_DEFAULT_ORDER) 
    {
       get()._signalProcess.notify(del,order);
+   }
+
+   static void notify(SignalSlot<void()> &slot, F32 order = PROCESS_DEFAULT_ORDER) 
+   {
+      get()._signalProcess.notify(slot,order);
    }
 
    template <class T>
@@ -144,6 +149,9 @@ public:
    /// Trigger the registered shutdown functions
    static bool shutdown();
 
+   /// get the current return status code we've been asked to end with.
+   static S32 getReturnStatus();
+
 private:
    friend class StandardMainLoop;
 
@@ -162,6 +170,7 @@ private:
    Signal<bool()>                   _signalShutdown;
 
    bool _RequestShutdown;
+   S32 _ReturnStatus;
 };
 
 /// Register a command line handling function.

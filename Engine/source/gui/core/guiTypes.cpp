@@ -719,8 +719,9 @@ ImplementConsoleTypeCasters( TypeRectSpacingI, RectSpacingI )
 ConsoleGetType( TypeRectSpacingI )
 {
    RectSpacingI *rect = (RectSpacingI *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d %d %d %d", rect->top, rect->bottom,
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d %d %d", rect->top, rect->bottom,
       rect->left, rect->right);
    return returnBuffer;
 }

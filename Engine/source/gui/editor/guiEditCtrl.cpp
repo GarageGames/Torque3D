@@ -2540,7 +2540,7 @@ ConsoleMethod( GuiEditCtrl, setCurrentAddSet, void, 3, 3, "(GuiControl ctrl)")
 
    if (!Sim::findObject(argv[2], addSet))
    {
-      Con::printf("%s(): Invalid control: %s", argv[0], argv[2]);
+      Con::printf("%s(): Invalid control: %s", (const char*)argv[0], (const char*)argv[2]);
       return;
    }
    object->setCurrentAddSet(addSet);
@@ -2700,7 +2700,7 @@ ConsoleMethod( GuiEditCtrl, readGuides, void, 3, 4, "( GuiControl ctrl [, int ax
    GuiControl* ctrl;
    if( !Sim::findObject( argv[ 2 ], ctrl ) )
    {
-      Con::errorf( "GuiEditCtrl::readGuides - no control '%s'", argv[ 2 ] );
+      Con::errorf( "GuiEditCtrl::readGuides - no control '%s'", (const char*)argv[ 2 ] );
       return;
    }
    
@@ -2711,7 +2711,7 @@ ConsoleMethod( GuiEditCtrl, readGuides, void, 3, 4, "( GuiControl ctrl [, int ax
       S32 axis = dAtoi( argv[ 3 ] );
       if( axis < 0 || axis > 1 )
       {
-         Con::errorf( "GuiEditCtrl::readGuides - invalid axis '%s'", argv[ 3 ] );
+         Con::errorf( "GuiEditCtrl::readGuides - invalid axis '%s'", (const char*)argv[ 3 ] );
          return;
       }
       
@@ -2733,7 +2733,7 @@ ConsoleMethod( GuiEditCtrl, writeGuides, void, 3, 4, "( GuiControl ctrl [, int a
    GuiControl* ctrl;
    if( !Sim::findObject( argv[ 2 ], ctrl ) )
    {
-      Con::errorf( "GuiEditCtrl::writeGuides - no control '%i'", argv[ 2 ] );
+      Con::errorf( "GuiEditCtrl::writeGuides - no control '%i'", (const char*)argv[ 2 ] );
       return;
    }
    
@@ -2744,7 +2744,7 @@ ConsoleMethod( GuiEditCtrl, writeGuides, void, 3, 4, "( GuiControl ctrl [, int a
       S32 axis = dAtoi( argv[ 3 ] );
       if( axis < 0 || axis > 1 )
       {
-         Con::errorf( "GuiEditCtrl::writeGuides - invalid axis '%s'", argv[ 3 ] );
+         Con::errorf( "GuiEditCtrl::writeGuides - invalid axis '%s'", (const char*)argv[ 3 ] );
          return;
       }
       

@@ -80,6 +80,10 @@ protected:
       GFXShaderConstHandle *detailInfoVConst;
       GFXShaderConstHandle *detailInfoPConst;
 
+	  // New blending
+	  GFXShaderConstHandle *lerpBlend;
+	  GFXShaderConstHandle *blendDepth;
+
 	  GFXShaderConstHandle *macroInfoVConst;
       GFXShaderConstHandle *macroInfoPConst;
    };
@@ -143,6 +147,8 @@ protected:
    Vector<Pass> mPasses;
 
    U32 mCurrPass;
+
+   static const Vector<String> mSamplerNames;
 
    GFXTexHandle mBaseMapTexture;
 

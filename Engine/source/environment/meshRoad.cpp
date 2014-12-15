@@ -49,6 +49,7 @@
 #include "collision/concretePolyList.h"
 #include "T3D/physics/physicsPlugin.h"
 #include "T3D/physics/physicsBody.h"
+#include "T3D/physics/physicsCollision.h"
 #include "environment/nodeListManager.h"
 
 #define MIN_METERS_PER_SEGMENT 1.0f
@@ -1722,6 +1723,8 @@ void MeshRoad::_generateSlices()
 
 void MeshRoad::_generateSegments()
 {
+   SAFE_DELETE( mPhysicsRep );
+
    mSegments.clear();
 
    for ( U32 i = 0; i < mSlices.size() - 1; i++ )
@@ -1736,8 +1739,22 @@ void MeshRoad::_generateSegments()
 
    if ( PHYSICSMGR )
    {
-      SAFE_DELETE( mPhysicsRep );
-      //mPhysicsRep = PHYSICSMGR->createBody();
+      ConcretePolyList polylist;
+      if ( buildPolyList( PLC_Collision, &polylist, getWorldBox(), getWorldSphere() ) )
+      {
+         polylist.triangulate();
+
+         PhysicsCollision *colShape = PHYSICSMGR->createCollision();
+         colShape->addTriangleMesh( polylist.mVertexList.address(),
+            polylist.mVertexList.size(),
+            polylist.mIndexList.address(),
+            polylist.mIndexList.size() / 3,
+            MatrixF::Identity );
+
+         PhysicsWorld *world = PHYSICSMGR->getWorld( isServerObject() ? "server" : "client" );
+         mPhysicsRep = PHYSICSMGR->createBody();
+         mPhysicsRep->init( colShape, 0, 0, this, world );
+      }
    }
 }
 

@@ -328,6 +328,11 @@ SimObject* findObject(const char* fileName, S32 declarationLine)
    return gRootGroup->findObjectByLineNumber(fileName, declarationLine, true);
 }
 
+SimObject* findObject(ConsoleValueRef &ref)
+{
+   return findObject((const char*)ref);
+}
+
 SimObject* findObject(const char* name)
 {
    PROFILE_SCOPE(SimFindObject);
@@ -367,6 +372,8 @@ SimObject* findObject(const char* name)
                return NULL;
             return obj->findObject(temp);
          }
+         else if (c < '0' || c > '9')
+            return NULL;
       }
    }
    S32 len;

@@ -147,6 +147,7 @@ void SpecularMapHLSL::setTexData( Material::StageData &stageDat,
    if ( tex )
    {
       passData.mTexType[ texIndex ] = Material::Standard;
+      passData.mSamplerNames[ texIndex ] = "specularMap";
       passData.mTexSlot[ texIndex++ ].texObject = tex;
    }
 }

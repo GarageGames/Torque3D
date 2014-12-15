@@ -97,6 +97,13 @@ class TSStatic : public SceneObject
    };
 
 public:
+   void setAlphaFade(bool enable, F32 start, F32 end, bool inverse)
+   {
+      mUseAlphaFade     = enable;
+      mAlphaFadeStart   = start;
+      mAlphaFadeEnd     = end;
+      mInvertAlphaFade  = inverse;
+   }
    
    /// The different types of mesh data types
    enum MeshType
@@ -108,6 +115,11 @@ public:
    };
    
 protected:
+   bool mUseAlphaFade;
+   F32  mAlphaFadeStart;
+   F32  mAlphaFadeEnd;
+   F32  mAlphaFade;
+   bool mInvertAlphaFade;
 
    bool onAdd();
    void onRemove();

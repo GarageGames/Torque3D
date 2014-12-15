@@ -792,7 +792,7 @@ ConsoleMethod( GuiDecalEditorCtrl, deleteSelectedDecal, void, 2, 2, "deleteSelec
 
 ConsoleMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, 3, 3, "deleteSelectedDecalDatablock( String datablock )" )
 {
-	String lookupName( argv[2] );
+	String lookupName( (const char*)argv[2] );
 	if( lookupName == String::EmptyString )
 		return;
 	
@@ -801,7 +801,7 @@ ConsoleMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, 3, 3, "deleteSele
 
 ConsoleMethod( GuiDecalEditorCtrl, setMode, void, 3, 3, "setMode( String mode )()" )
 {
-	String newMode = ( argv[2] );
+	String newMode = ( (const char*)argv[2] );
 	object->setMode( newMode );
 }
 
@@ -821,12 +821,13 @@ ConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, 3, 3, "getDec
 	if( decalInstance == NULL )
 		return "";
 
-	char* returnBuffer = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
    returnBuffer[0] = 0;
 
    if ( decalInstance )
    {
-	   dSprintf(returnBuffer, 256, "%f %f %f %f %f %f %f",
+	   dSprintf(returnBuffer, bufSize, "%f %f %f %f %f %f %f",
          decalInstance->mPosition.x, decalInstance->mPosition.y, decalInstance->mPosition.z, 
 		   decalInstance->mTangent.x, decalInstance->mTangent.y, decalInstance->mTangent.z,
 		   decalInstance->mSize);
@@ -868,7 +869,7 @@ ConsoleMethod( GuiDecalEditorCtrl, editDecalDetails, void, 4, 4, "editDecalDetai
 	
 	if ( (count != 7) )
    {
-		Con::printf("Failed to parse decal information \"px py pz tx ty tz s\" from '%s'", argv[3]);
+		Con::printf("Failed to parse decal information \"px py pz tx ty tz s\" from '%s'", (const char*)argv[3]);
       return;
    }
 

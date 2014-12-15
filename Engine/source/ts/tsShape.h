@@ -597,7 +597,7 @@ class TSShape
    /// mem buffer transfer helper (indicate when we don't want to include a particular mesh/decal)
    bool checkSkip(S32 meshNum, S32 & curObject, S32 skipDL);
 
-   void fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * detailFirstSkin, S32 * detailNumSkins);
+   void fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * detFirstSkin, S32 * detailNumSkins);
 
    /// @name Shape Editing
    /// @{

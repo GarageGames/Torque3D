@@ -78,7 +78,7 @@
       new GuiTabBookCtrl(ppOptionsTabBook) {
          tabPosition = "Top";
          tabMargin = "7";
-         minTabWidth = "64";
+         minTabWidth = "32";
          tabHeight = "20";
          allowReorder = "0";
          defaultPage = "-1";
@@ -2197,6 +2197,55 @@
                isContainer = "0";
                canSave = "1";
                canSaveDynamicFields = "0";
+            };
+         };
+         new GuiTabPageCtrl(ppOptionsVignetteTab) {
+            fitBook = "0";
+            text = "Vignette";
+            maxLength = "1024";
+            docking = "Client";
+            margin = "0 0 0 0";
+            padding = "0 0 0 0";
+            anchorTop = "1";
+            anchorBottom = "1";
+            anchorLeft = "1";
+            anchorRight = "1";
+            position = "0 40";
+            extent = "394 193";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "GuiTabPageProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            tooltip = "Options for the Vignette postFX";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+            Enabled = "1";
+
+            new GuiCheckBoxCtrl(ppOptionsEnableVignette) {
+               text = "Enable";
+               groupNum = "-1";
+               buttonType = "ToggleButton";
+               useMouseEvents = "0";
+               position = "329 7";
+               extent = "53 20";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiCheckBoxProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Enable/Disable the vignette postFX";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+               Enabled = "1";
             };
          };
          new GuiTabPageCtrl() {

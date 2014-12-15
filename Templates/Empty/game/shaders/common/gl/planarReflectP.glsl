@@ -26,16 +26,18 @@
 uniform sampler2D diffuseMap, refractMap;
 uniform vec4 shadeColor;
 
-varying vec2 TEX0;
-varying vec4 TEX1;
+in vec2 TEX0;
+in vec4 TEX1;
+
+out vec4 OUT_col;
 
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------
 void main()
 {
-   vec4 diffuseColor = texture2D( diffuseMap, TEX0 );
-   vec4 reflectColor = texture2DProj( refractMap, TEX1 );
+   vec4 diffuseColor = texture( diffuseMap, TEX0 );
+   vec4 reflectColor = textureProj( refractMap, TEX1 );
 
-   gl_FragColor = diffuseColor + reflectColor * diffuseColor.a;
+   OUT_col = diffuseColor + reflectColor * diffuseColor.a;
 }

@@ -53,7 +53,7 @@ new ShaderData( AL_DepthVisualizeShader )
    DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgDepthVisualizeP.hlsl";
 
-   OGLVertexShaderFile = "shaders/common/postFx/postFxV.glsl";
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgDepthVisualizeP.glsl";
 
    samplerNames[0] = "prepassBuffer";
@@ -90,10 +90,10 @@ new ShaderData( AL_NormalsVisualizeShader )
    DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgNormalVisualizeP.hlsl";
 
-   OGLVertexShaderFile = "shaders/common/postFx/postFxV.glsl";
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgNormalVisualizeP.glsl";
    
-   samplerNames[0] = "prepassTex";
+   samplerNames[0] = "prepassBuffer";
    
    pixVersion = 2.0;
 };
@@ -126,8 +126,8 @@ new ShaderData( AL_LightColorVisualizeShader )
    DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgLightColorVisualizeP.hlsl";
 
-   OGLVertexShaderFile = "shaders/common/postFx/postFxV.glsl";
-   OGLPixelShaderFile  = "shaders/common/lighting/advanced/dl/dbgLightColorVisualizeP.glsl";
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgLightColorVisualizeP.glsl";
    
    samplerNames[0] = "lightInfoBuffer";
    
@@ -161,8 +161,8 @@ new ShaderData( AL_LightSpecularVisualizeShader )
    DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgLightSpecularVisualizeP.hlsl";
 
-   OGLVertexShaderFile = "shaders/common/postFx/postFxV.glsl";
-   OGLPixelShaderFile  = "shaders/common/lighting/advanced/dl/dbgLightSpecularVisualizeP.glsl";
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgLightSpecularVisualizeP.glsl";
    
    samplerNames[0] = "lightInfoBuffer";
    

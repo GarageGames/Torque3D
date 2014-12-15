@@ -60,29 +60,27 @@ namespace Compiler
    CompilerFloatTable  *gCurrentFloatTable,  gGlobalFloatTable,  gFunctionFloatTable;
    DataChunker          gConsoleAllocator;
    CompilerIdentTable   gIdentTable;
-   CodeBlock           *gCurBreakBlock;
 
    //------------------------------------------------------------
 
-
-   CodeBlock *getBreakCodeBlock()         { return gCurBreakBlock; }
-   void setBreakCodeBlock(CodeBlock *cb)  { gCurBreakBlock = cb;   }
-
-   //------------------------------------------------------------
-
-   U32 evalSTEtoU32(StringTableEntry ste, U32)
+   void evalSTEtoCode(StringTableEntry ste, U32 ip, U32 *ptr)
    {
-      return *((U32 *) &ste);
+#ifdef TORQUE_CPU_X64
+      *(U64*)(ptr) = (U64)ste;
+#else
+      *ptr = (U32)ste;
+#endif
    }
-
-   U32 compileSTEtoU32(StringTableEntry ste, U32 ip)
+   
+   void compileSTEtoCode(StringTableEntry ste, U32 ip, U32 *ptr)
    {
       if(ste)
          getIdentTable().add(ste, ip);
-      return 0;
+      *ptr = 0;
+      *(ptr+1) = 0;
    }
-
-   U32 (*STEtoU32)(StringTableEntry ste, U32 ip) = evalSTEtoU32;
+   
+   void (*STEtoCode)(StringTableEntry ste, U32 ip, U32 *ptr) = evalSTEtoCode;
 
    //------------------------------------------------------------
 
@@ -286,3 +284,131 @@ void CompilerIdentTable::write(Stream &st)
          st.write(el->ip);
    }
 }
+
+//-------------------------------------------------------------------------
+  
+U8 *CodeStream::allocCode(U32 sz)
+{
+   U8 *ptr = NULL;
+   if (mCodeHead)
+   {
+      const U32 bytesLeft = BlockSize - mCodeHead->size;
+      if (bytesLeft > sz)
+      {
+         ptr = mCodeHead->data + mCodeHead->size;
+         mCodeHead->size += sz;
+         return ptr;
+      }
+   }
+   
+   CodeData *data = new CodeData;
+   data->data = (U8*)dMalloc(BlockSize);
+   data->size = sz;
+   data->next = NULL;
+   
+   if (mCodeHead)
+      mCodeHead->next = data;
+   mCodeHead = data;
+   if (mCode == NULL)
+      mCode = data;
+   return data->data;
+}
+  
+//-------------------------------------------------------------------------
+  
+void CodeStream::fixLoop(U32 loopBlockStart, U32 breakPoint, U32 continuePoint)
+{
+   AssertFatal(mFixStack.size() > 0, "Fix stack mismatch");
+   
+   U32 fixStart = mFixStack[mFixStack.size()-1];
+   for (U32 i=fixStart; i<mFixList.size(); i += 2)
+   {
+      FixType type = (FixType)mFixList[i+1];
+      
+      U32 fixedIp = 0;
+      bool valid = true;
+      
+      switch (type)
+      {
+         case FIXTYPE_LOOPBLOCKSTART:
+            fixedIp = loopBlockStart;
+            break;
+         case FIXTYPE_BREAK:
+            fixedIp = breakPoint;
+            break;
+         case FIXTYPE_CONTINUE:
+            fixedIp = continuePoint;
+            break;
+         default:
+            //Con::warnf("Address %u fixed as %u", mFixList[i], mFixList[i+1]);
+            valid = false;
+            break;
+      }
+      
+      if (valid)
+      {
+         patch(mFixList[i], fixedIp);
+      }
+   }
+}
+
+//-------------------------------------------------------------------------
+  
+void CodeStream::emitCodeStream(U32 *size, U32 **stream, U32 **lineBreaks)
+{
+   // Alloc stream
+   U32 numLineBreaks = getNumLineBreaks();
+   *stream = new U32[mCodePos + (numLineBreaks * 2)];
+   dMemset(*stream, '\0', mCodePos + (numLineBreaks * 2));
+   *size = mCodePos;
+   
+   // Dump chunks & line breaks
+   U32 outBytes = mCodePos * sizeof(U32);
+   U8 *outPtr = *((U8**)stream);
+   for (CodeData *itr = mCode; itr != NULL; itr = itr->next)
+   {
+      U32 bytesToCopy = itr->size > outBytes ? outBytes : itr->size;
+      dMemcpy(outPtr, itr->data, bytesToCopy);
+      outPtr += bytesToCopy;
+      outBytes -= bytesToCopy;
+   }
+   
+   *lineBreaks = *stream + mCodePos;
+   dMemcpy(*lineBreaks, mBreakLines.address(), sizeof(U32) * mBreakLines.size());
+   
+   // Apply patches on top
+   for (U32 i=0; i<mPatchList.size(); i++)
+   {
+      PatchEntry &e = mPatchList[i];
+      (*stream)[e.addr] = e.value;
+   }
+}
+  
+//-------------------------------------------------------------------------
+  
+void CodeStream::reset()
+{
+   mCodePos = 0;
+   mFixStack.clear();
+   mFixLoopStack.clear();
+   mFixList.clear();
+   mBreakLines.clear();
+   
+   // Pop down to one code block
+   CodeData *itr = mCode ? mCode->next : NULL;
+   while (itr != NULL)
+   {
+      CodeData *next = itr->next;
+      dFree(itr->data);
+      dFree(itr);
+      itr = next;
+   }
+   
+   if (mCode)
+   {
+      mCode->size = 0;
+      mCode->next = NULL;
+      mCodeHead = mCode;
+   }
+}
+

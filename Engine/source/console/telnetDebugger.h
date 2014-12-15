@@ -127,7 +127,7 @@ public:
 
    void breakProcess();
 
-   virtual void executionStopped(CodeBlock *code, U32 lineNumber);
+   void executionStopped(CodeBlock *code, U32 lineNumber);
    void send(const char *s);
    void setDebugParameters(S32 port, const char *password, bool waitForClient);
    void processConsoleLine(const char *consoleLine);

@@ -648,7 +648,7 @@ public:
    DECLARE_CALLBACK( void, onCollision, ( ShapeBase* obj, SceneObject* collObj, VectorF vec, F32 len ) );
    DECLARE_CALLBACK( void, onDamage, ( ShapeBase* obj, F32 delta ) );
    DECLARE_CALLBACK( void, onTrigger, ( ShapeBase* obj, S32 index, bool state ) );
-   DECLARE_CALLBACK( void, onEndSequence, ( ShapeBase* obj, S32 slot ) );
+   DECLARE_CALLBACK(void, onEndSequence, (ShapeBase* obj, S32 slot, const char* name));
    DECLARE_CALLBACK( void, onForceUncloak, ( ShapeBase* obj, const char* reason ) );
    /// @}
 };
@@ -729,12 +729,9 @@ protected:
          Play, Stop, Pause, Destroy
       };
       TSThread* thread; ///< Pointer to 3space data.
-      U32 state;        ///< State of the thread
-                        ///
-                        ///  @see Thread::State
+      State state;      ///< State of the thread
       S32 sequence;     ///< The animation sequence which is running in this thread.
-	  F32 timescale;    ///< Timescale
-      U32 sound;        ///< Handle to sound.
+      F32 timescale;    ///< Timescale
       bool atEnd;       ///< Are we at the end of this thread?
       F32 position;
    };
@@ -1353,14 +1350,6 @@ public:
    /// @param   slot   Mount slot ID
    /// @param   timescale   Timescale
    bool setThreadTimeScale( U32 slot, F32 timeScale );
-
-   /// Start the sound associated with an animation thread
-   /// @param   thread   Thread
-   void startSequenceSound(Thread& thread);
-
-   /// Stop the sound associated with an animation thread
-   /// @param   thread   Thread
-   void stopThreadSound(Thread& thread);
 
    /// Advance all animation threads attached to this shapebase
    /// @param   dt   Change in time from last call to this function

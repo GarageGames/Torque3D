@@ -43,6 +43,7 @@ extern GLenum GFXGLStencilOp[GFXStencilOp_COUNT];
 extern GLenum GFXGLTextureInternalFormat[GFXFormat_COUNT];
 extern GLenum GFXGLTextureFormat[GFXFormat_COUNT];
 extern GLenum GFXGLTextureType[GFXFormat_COUNT];
+extern GLint* GFXGLTextureSwizzle[GFXFormat_COUNT];
 
 extern GLenum GFXGLBufferType[GFXBufferType_COUNT];
 extern GLenum GFXGLCullMode[GFXCull_COUNT];

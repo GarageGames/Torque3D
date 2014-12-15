@@ -344,8 +344,9 @@ ConsoleFunction(expandFilename, const char*, 2, 2, "(string filename)"
 				"@ingroup FileSystem")
 {
    TORQUE_UNUSED(argc);
-   char* ret = Con::getReturnBuffer( 1024 );
-   Con::expandScriptFilename(ret, 1024, argv[1]);
+   static const U32 bufSize = 1024;
+   char* ret = Con::getReturnBuffer( bufSize );
+   Con::expandScriptFilename(ret, bufSize, argv[1]);
    return ret;
 }
 
@@ -355,8 +356,9 @@ ConsoleFunction(expandOldFilename, const char*, 2, 2, "(string filename)"
 				"@ingroup FileSystem")
 {
    TORQUE_UNUSED(argc);
-   char* ret = Con::getReturnBuffer( 1024 );
-   Con::expandOldScriptFilename(ret, 1024, argv[1]);
+   static const U32 bufSize = 1024;
+   char* ret = Con::getReturnBuffer( bufSize );
+   Con::expandOldScriptFilename(ret, bufSize, argv[1]);
    return ret;
 }
 
@@ -368,8 +370,9 @@ ConsoleToolFunction(collapseFilename, const char*, 2, 2, "(string filename)"
 					"@internal Editor use only")
 {
    TORQUE_UNUSED(argc);
-   char* ret = Con::getReturnBuffer( 1024 );
-   Con::collapseScriptFilename(ret, 1024, argv[1]);
+   static const U32 bufSize = 1024;
+   char* ret = Con::getReturnBuffer( bufSize );
+   Con::collapseScriptFilename(ret, bufSize, argv[1]);
    return ret;
 }
 

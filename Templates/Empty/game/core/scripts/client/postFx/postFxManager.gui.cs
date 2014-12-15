@@ -94,7 +94,13 @@ function ppOptionsEnableDOF::onAction(%this)
    %toEnable = PostFXManager.getEnableResultFromControl(%this);
    PostFXManager.settingsEffectSetEnabled("DOF", %toEnable);
 }
- 
+
+function ppOptionsEnableVignette::onAction(%this)
+{ 
+   %toEnable = PostFXManager.getEnableResultFromControl(%this);
+   PostFXManager.settingsEffectSetEnabled("Vignette", %toEnable);
+}
+
 function ppOptionsSavePreset::onClick(%this)
 {
    //Stores the current settings into a preset file for loading and use later on 
@@ -377,6 +383,24 @@ function ppOptionsEnableHDRDebug::onAction(%this)
       LuminanceVisPostFX.enable();
    else
       LuminanceVisPostFX.disable();   
+}
+
+function ppOptionsUpdateVignetteSettings()
+{  
+   if($PostFXManager::PostFX::EnableVignette)
+   {
+      VignettePostEffect.enable();
+   }
+   else
+   {
+      VignettePostEffect.disable();
+   }
+}
+
+function ppOptionsVignetteEnableVignette::onAction(%this)
+{
+   $PostFXManager::PostFX::EnableVignette = %this.getValue();
+   ppOptionsUpdateVignetteSettings();
 }
 
 function ppColorCorrection_selectFile()

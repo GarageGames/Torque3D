@@ -615,7 +615,12 @@ GlobalActionMap.bind(keyboard, "ctrl o", bringUpOptions);
 //------------------------------------------------------------------------------
 // Debugging Functions
 //------------------------------------------------------------------------------
-
+function showMetrics(%val)
+{
+   if(%val)
+      metrics("fps gfx shadow sfx terrain groundcover forest net");
+}
+GlobalActionMap.bind(keyboard, "ctrl F2", showMetrics);
 
 //------------------------------------------------------------------------------
 //
@@ -734,3 +739,11 @@ vehicleMap.bindCmd(keyboard, "escape", "", "handleEscape();");
 vehicleMap.bind( keyboard, v, toggleFreeLook ); // v for vanity
 //vehicleMap.bind(keyboard, tab, toggleFirstPerson );
 vehicleMap.bind(keyboard, "alt c", toggleCamera);
+// bind the left thumbstick for steering
+vehicleMap.bind( gamepad, thumblx, "D", "-0.23 0.23", gamepadYaw );
+// bind the gas, break, and reverse buttons
+vehicleMap.bind( gamepad, btn_a, moveforward );
+vehicleMap.bind( gamepad, btn_b, brake );
+vehicleMap.bind( gamepad, btn_x, movebackward );
+// bind exiting the vehicle to a button
+vehicleMap.bindCmd(gamepad, btn_y,"getout();","");

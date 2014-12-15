@@ -158,7 +158,7 @@ SimXMLDocument::~SimXMLDocument()
 // -----------------------------------------------------------------------------
 // Included for completeness.
 // -----------------------------------------------------------------------------
-bool SimXMLDocument::processArguments(S32 argc, const char** argv)
+bool SimXMLDocument::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    return argc == 0;
 }

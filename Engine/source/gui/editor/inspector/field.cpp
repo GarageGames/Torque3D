@@ -455,7 +455,7 @@ void GuiInspectorField::setInspectorProfile()
 {
    GuiControlProfile *profile = NULL;   
    
-   if( mInspector->getNumInspectObjects() > 1 )
+   if( mInspector && (mInspector->getNumInspectObjects() > 1) )
    {
       if( !hasSameValueInAllObjects() )
          Sim::findObject( "GuiInspectorMultiFieldDifferentProfile", profile );

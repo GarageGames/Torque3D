@@ -335,7 +335,7 @@ void Input::log( const char* format, ... )
 ConsoleFunction( inputLog, void, 2, 2, "inputLog( string )" )
 {
    argc;
-   Input::log( "%s\n", argv[1] );
+   Input::log( "%s\n", (const char*)argv[1] );
 }
 #endif // LOG_INPUT
 

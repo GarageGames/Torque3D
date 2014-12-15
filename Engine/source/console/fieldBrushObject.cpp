@@ -383,7 +383,7 @@ ConsoleMethod(FieldBrushObject, copyFields, void, 3, 4, "(simObject, [fieldList]
     }
 
     // Fetch field list.
-    const char* pFieldList = (argc > 3 ) ? argv[3] : NULL;
+    const char* pFieldList = (argc > 3 ) ? (const char*)argv[3] : NULL;
     
     // Copy Fields.
     object->copyFields( pSimObject, pFieldList );

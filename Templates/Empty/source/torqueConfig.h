@@ -143,17 +143,10 @@
 
 /// This #define is used by the FrameAllocator to set the size of the frame.
 ///
-/// It was previously set to 3MB but I've increased it to 16MB due to the
+/// It was previously set to 3MB but I've increased it to 32MB due to the
 /// FrameAllocator being used as temporary storage for bitmaps in the D3D9
 /// texture manager.
-#define TORQUE_FRAME_SIZE     16 << 20
-
-// Default keyboard layout for launching the game. It's fixed crash when a
-// game running with the extend unicode keyboard (cyrillic, for example).
-// Windows only.
-// @see For choice language >
-//      http://msdn.microsoft.com/en-us/library/windows/desktop/dd318693%28v=vs.85%29.aspx
-#define TORQUE_DEFAULT_KEYBOARD_LAYOUT  LANG_ENGLISH
+#define TORQUE_FRAME_SIZE     16 << 21
 
 // Finally, we define some dependent #defines. This enables some subsidiary
 // functionality to get automatically turned on in certain configurations.

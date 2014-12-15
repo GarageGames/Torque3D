@@ -316,7 +316,7 @@ void SFXSource::initPersistFields()
 
 //-----------------------------------------------------------------------------
 
-bool SFXSource::processArguments( S32 argc, const char **argv )
+bool SFXSource::processArguments( S32 argc, ConsoleValueRef *argv )
 {
    // Don't allow subclasses of this to be created via script.  Force
    // usage of the SFXSystem functions.

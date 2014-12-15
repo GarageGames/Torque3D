@@ -118,7 +118,7 @@ static void _BuildCollisionTree(AABBCollisionNode* linear, const udword box_id, 
 		udword PosID = current_id++;	// Get a new id for positive child
 		udword NegID = current_id++;	// Get a new id for negative child
 		// Setup box data as the forthcoming new P pointer
-		linear[box_id].mData = (udword)&linear[PosID];
+		linear[box_id].mData = (size_t)&linear[PosID];
 		// Make sure it's not marked as leaf
 		ASSERT(!(linear[box_id].mData&1));
 		// Recurse with new IDs
@@ -171,7 +171,7 @@ static void _BuildNoLeafTree(AABBNoLeafNode* linear, const udword box_id, udword
 		// Get a new id for positive child
 		udword PosID = current_id++;
 		// Setup box data
-		linear[box_id].mPosData = (udword)&linear[PosID];
+		linear[box_id].mPosData = (size_t)&linear[PosID];
 		// Make sure it's not marked as leaf
 		ASSERT(!(linear[box_id].mPosData&1));
 		// Recurse
@@ -192,7 +192,7 @@ static void _BuildNoLeafTree(AABBNoLeafNode* linear, const udword box_id, udword
 		// Get a new id for negative child
 		udword NegID = current_id++;
 		// Setup box data
-		linear[box_id].mNegData = (udword)&linear[NegID];
+		linear[box_id].mNegData = (size_t)&linear[NegID];
 		// Make sure it's not marked as leaf
 		ASSERT(!(linear[box_id].mNegData&1));
 		// Recurse
@@ -549,8 +549,8 @@ bool AABBNoLeafTree::Walk(GenericWalkingCallback callback, void* user_data) cons
 	if(!(Data&1))													\
 	{																\
 		/* Compute box number */									\
-		udword Nb = (Data - udword(Nodes))/Nodes[i].GetNodeSize();	\
-		Data = udword(&mNodes[Nb]);									\
+		udword Nb = (Data - size_t(Nodes))/Nodes[i].GetNodeSize();	\
+		Data = (size_t) &mNodes[Nb]		;									\
 	}																\
 	/* ...remapped */												\
 	mNodes[i].member = Data;
@@ -612,7 +612,7 @@ bool AABBQuantizedTree::Build(AABBTree* tree)
 		INIT_QUANTIZATION
 
 		// Quantize
-		udword Data;
+		size_t Data;
 		for(udword i=0;i<mNbNodes;i++)
 		{
 			PERFORM_QUANTIZATION
@@ -727,7 +727,7 @@ bool AABBQuantizedNoLeafTree::Build(AABBTree* tree)
 		INIT_QUANTIZATION
 
 		// Quantize
-		udword Data;
+		size_t Data;
 		for(udword i=0;i<mNbNodes;i++)
 		{
 			PERFORM_QUANTIZATION
