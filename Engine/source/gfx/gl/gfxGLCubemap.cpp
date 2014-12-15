@@ -123,24 +123,21 @@ void GFXGLCubemap::initStatic( DDSFile *dds )
    mDDSFile = ResourceManager::get().load( dds->getSourcePath() );
    AssertFatal( mDDSFile == dds, "GFXGLCubemap::initStatic - Couldn't find DDSFile resource!" );
 
+   mWidth = dds->getWidth();
+   mHeight = dds->getHeight();
+   mFaceFormat = dds->getFormat();
+   mMipLevels = dds->getMipLevels();
+
    glGenTextures(1, &mCubemap);
 
    PRESERVE_CUBEMAP_TEXTURE();
    glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemap);
-   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0 );
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, mMipLevels - 1);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-   
-   mWidth = dds->getWidth();
-   mHeight = dds->getHeight();
-   mFaceFormat = dds->getFormat();
-   mMipLevels = 1;
-
-   // TODO: Support mipmaps here as well as decompressing the 
-   // DDS if the format is unsupported.
 
    AssertFatal(mWidth == mHeight, "GFXGLCubemap::initStatic - Width and height must be equal!");
    
@@ -151,13 +148,11 @@ void GFXGLCubemap::initStatic( DDSFile *dds )
          // TODO: The DDS can skip surfaces, but i'm unsure what i should
          // do here when creating the cubemap.  Ignore it for now.
          continue;
-      }
+      }		
 
-      const U8 *buffer = dds->mSurfaces[i]->mMips[0];
-      U32 surfaceSize = dds->getSurfaceSize( mHeight, mWidth, i );
-
-      glCompressedTexImage2D( faceList[i], 0, GFXGLTextureInternalFormat[mFaceFormat], 
-                              mWidth, mHeight, 0, surfaceSize, buffer );
+	  // Now loop thru the mip levels!
+	  for (U32 j = 0; j < mMipLevels; j++)
+		  glCompressedTexImage2D(faceList[i], j, GFXGLTextureInternalFormat[mFaceFormat], mWidth, mHeight, 0, dds->getSurfaceSize(j), dds->mSurfaces[i]->mMips[j]);
    }
 }
 
