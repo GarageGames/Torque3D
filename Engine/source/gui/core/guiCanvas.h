@@ -33,6 +33,10 @@
 #include "platform/platformInput.h"
 #endif
 
+#ifndef _SIGNAL_H_
+#include "core/util/tSignal.h"
+#endif
+
 #include "component/interfaces/IProcessInput.h"
 #include "windowManager/platformWindowMgr.h"
 #include "gfx/gfxFence.h"
@@ -80,6 +84,8 @@
 /// screen will be painted normally. If you are making an animated GuiControl
 /// you need to add your control to the dirty areas of the canvas.
 ///
+class guiCanvas;
+typedef Signal<void(GuiCanvas* canvas)> CanvasSizeChangeSignal;
 class GuiCanvas : public GuiControl, public IProcessInput
 {
 
@@ -189,8 +195,11 @@ protected:
    virtual void setupFences();
    
    void checkLockMouseMove( const GuiEvent& event );
+   //Signal used to let others know this canvas has changed size.
+	static CanvasSizeChangeSignal smCanvasSizeChangeSignal;
 
 public:
+
    DECLARE_CONOBJECT(GuiCanvas);
    DECLARE_CATEGORY( "Gui Core" );
    
@@ -201,6 +210,8 @@ public:
    virtual void onRemove();
 
    static void initPersistFields();
+
+   static CanvasSizeChangeSignal& getCanvasSizeChangeSignal() { return smCanvasSizeChangeSignal; }
 
    /// @name Rendering methods
    ///

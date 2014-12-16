@@ -136,14 +136,14 @@ const GFXVideoMode & Win32Window::getVideoMode()
 	return mVideoMode;
 }
 
-void Win32Window::setVideoMode( const GFXVideoMode &mode )
+void Win32Window::_setVideoMode( const GFXVideoMode &mode )
 {
    bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
    static bool first_load = true;
 
    if(needCurtain)
    {
-		Con::errorf("Win32Window::setVideoMode - invoking curtain");
+		Con::errorf("Win32Window::_setVideoMode - invoking curtain");
       mOwningManager->lowerCurtain();
    }
 

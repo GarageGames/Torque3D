@@ -980,7 +980,19 @@ function ObjectBuilderGui::buildObserverDropPoint(%this)
 //------------------------------------------------------------------------------
 // System
 //------------------------------------------------------------------------------
-
+function ObjectBuilderGui::buildVolumetricFog(%this)
+{
+	// Change this if you want to default to another Folder
+	// Otherwise every time you want to add a Fog you will go this.
+	%defShape = "/art/environment/Fog_Cube.dts";
+	%this.lastPath=getMainDotCsDir() @ %defShape;
+	OBObjectName.setValue( "" );
+	%this.objectClassName = "VolumetricFog";
+	%this.addField( "shapeName", "TypeFile", "Shape (Fog volume)", "", "*.dts;*.dae");
+	%this.addField("Scale", "TypePoint3", "Scale", "1 1 1");
+	%this.addField("FogColor", "TypeColorI", "FogColor", "200 200 200 255");
+	%this.process();
+}
 function ObjectBuilderGui::buildPhysicsEntity(%this)
 {
    %this.objectClassName = "PhysicsEntity";
