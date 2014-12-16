@@ -62,6 +62,8 @@ uniform vec4 farPlaneScalePSSM;
 uniform vec4 overDarkPSSM;
 uniform float shadowSoftness;
 
+out vec4 OUT_col;
+
 void main()             
 {
    // Sample/unpack the normal/z data
@@ -227,6 +229,6 @@ void main()
       lightColorOut = debugColor;
    #endif
    
-   OUT_FragColor0 = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );  
+   OUT_col = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );  
    
 }

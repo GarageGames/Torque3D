@@ -353,9 +353,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
          Point2I resolution = getRoot()->getExtent();
 
          U32 buf_x = offset.x + mSelectorPos.x + 1;
-         U32 buf_y = ( extent.y - ( offset.y + mSelectorPos.y + 1 ) );
-         if(GFX->getAdapterType() != OpenGL)
-            buf_y = resolution.y - buf_y;
+         U32 buf_y = resolution.y - ( extent.y - ( offset.y + mSelectorPos.y + 1 ) );
 
          GFXTexHandle bb( resolution.x, 
                           resolution.y, 

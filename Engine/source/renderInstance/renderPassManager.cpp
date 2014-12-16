@@ -255,7 +255,7 @@ void RenderPassManager::render(SceneRenderState * state)
    GFX->setProjectionMatrix( proj );
       
    // Restore a clean state for subsequent rendering.
-   GFX->disableShaders();
+   GFX->setupGenericShaders();
    for(S32 i = 0; i < GFX->getNumSamplers(); ++i)
       GFX->setTexture(i, NULL);
 }

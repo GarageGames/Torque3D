@@ -155,7 +155,7 @@ public:
                         Vector<GFXShaderMacro> &macros );
 
    // Returns a shader that implements the features listed by dat.
-   GFXShader* getShader( const MaterialFeatureData &dat, const GFXVertexFormat *vertexFormat, const Vector<GFXShaderMacro> *macros );
+   GFXShader* getShader( const MaterialFeatureData &dat, const GFXVertexFormat *vertexFormat, const Vector<GFXShaderMacro> *macros, const Vector<String> &samplers );
 
    // This will delete all of the procedural shaders that we have.  Used to regenerate shaders when
    // the ShaderFeatures have changed (due to lighting system change, or new plugin)

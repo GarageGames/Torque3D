@@ -267,6 +267,6 @@ void fizzle(vec2 vpos, float visibility)
 /// @param condition This should be a bvec[2-4].  If any items is false, condition is considered to fail.
 /// @param color The color that should be outputted if the condition fails.
 /// @note This macro will only work in the void main() method of a pixel shader.
-#define assert(condition, color) { if(!any(condition)) { OUT_FragColor0 = color; return; } }
+#define assert(condition, color) { if(!any(condition)) { OUT_col = color; return; } }
 
 #endif // _TORQUE_GLSL_

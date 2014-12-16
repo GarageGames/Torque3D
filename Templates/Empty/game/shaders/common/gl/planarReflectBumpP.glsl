@@ -29,6 +29,8 @@ uniform vec4 shadeColor;
 in vec2 TEX0;
 in vec4 TEX1;
 
+out vec4 OUT_col;
+
 //-----------------------------------------------------------------------------
 // Fade edges of axis for texcoord passed in
 //-----------------------------------------------------------------------------
@@ -64,5 +66,5 @@ void main()
    vec4 diffuseColor = texture( diffuseMap, TEX0 );
    vec4 reflectColor = textureProj( refractMap, texIndex );
 
-   OUT_FragColor0 = diffuseColor + reflectColor * diffuseColor.a;
+   OUT_col = diffuseColor + reflectColor * diffuseColor.a;
 }

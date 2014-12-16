@@ -155,6 +155,7 @@ switch( T3D_Generator::$platform )
       addEngineSrcDir( 'gfx/gl/ggl' );
       addEngineSrcDir( 'gfx/gl/ggl/generated' );
       addEngineSrcDir( 'shaderGen/GLSL' );
+      addIncludePath( getAppLibSrcDir() . 'glew/include/' );
       break;
    case "linux":
    case "linux_dedicated":
@@ -164,6 +165,7 @@ switch( T3D_Generator::$platform )
       addEngineSrcDir( 'gfx/gl/ggl' );
       addEngineSrcDir( 'gfx/gl/ggl/generated' );
       addEngineSrcDir( 'shaderGen/GLSL' );
+      addIncludePath( getAppLibSrcDir() . 'glew/include/' );
       break;
    case "ps3":
       addEngineSrcDir( 'gfx/gl/ggl/ps3' );
