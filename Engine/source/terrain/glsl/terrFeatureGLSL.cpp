@@ -272,7 +272,7 @@ void TerrainBaseMapFeatGLSL::processPix(  Vector<ShaderComponent*> &componentLis
 
   ShaderFeature::OutputTarget target = ShaderFeature::DefaultTarget;
 
-      target= ShaderFeature::RenderTarget1;
+      //target= ShaderFeature::RenderTarget1;
    meta->addStatement( new GenOp( "   @;\r\n", assignColor( baseColor, Material::Mul,NULL,target ) ) );
    output = meta;
 }
