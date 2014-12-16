@@ -89,6 +89,8 @@ void GFXGLCubemap::fillCubeTextures(GFXTexHandle* faces)
          0, GFXGLTextureFormat[faceFormat], GFXGLTextureType[faceFormat], buf);
       delete[] buf;
    }
+   
+   glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 }
 
 void GFXGLCubemap::initStatic(GFXTexHandle* faces)
