@@ -26,6 +26,7 @@
 #ifndef _TEXTARGETBIN_MGR_H_
 #include "renderInstance/renderTexTargetBinManager.h"
 #endif
+#include <renderInstance/renderParticleMgr.h>
 
 
 class PostEffect;
@@ -82,7 +83,7 @@ protected:
    };
 
    SimObjectPtr<PostEffect> mGlowEffect;
-
+   RenderParticleMgr *mParticleRenderMgr;
 };
 
 

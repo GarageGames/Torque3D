@@ -392,6 +392,8 @@ struct ParticleRenderInst : public RenderInst
    /// The total particle count to render.
    S32 count;
 
+   bool glow;
+
    /// The combined model, camera, and projection transform.
    const MatrixF *modelViewProj;       
         
