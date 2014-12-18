@@ -108,6 +108,7 @@ public:
    static const RenderInstType RIT_Object;   // objects that do their own rendering
    static const RenderInstType RIT_ObjectTranslucent;// self rendering; but sorted with static const RenderInstType RIT_Translucent
    static const RenderInstType RIT_Decal;
+   static const RenderInstType RIT_DecalRoad;
    static const RenderInstType RIT_Water;
    static const RenderInstType RIT_Foliage;
    static const RenderInstType RIT_Translucent;
