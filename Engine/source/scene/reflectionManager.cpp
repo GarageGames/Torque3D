@@ -58,7 +58,7 @@ MODULE_END;
 
 GFX_ImplementTextureProfile( ReflectRenderTargetProfile, 
                              GFXTextureProfile::DiffuseMap, 
-                             GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::RenderTarget | GFXTextureProfile::Pooled, 
+                             GFXTextureProfile::PreserveSize | GFXTextureProfile::RenderTarget | GFXTextureProfile::Pooled, 
                              GFXTextureProfile::NONE );
 
 GFX_ImplementTextureProfile( RefractTextureProfile,
