@@ -162,7 +162,7 @@ void TerrainCellMaterial::setTransformAndEye(   const MatrixF &modelXfm,
    invModelXfm.mulP( objEyePos );
    
    VectorF vEye = invViewXfm.getForwardVector();
-   vEye.normalize( 1.0f / farPlane );
+   vEye.normalize( 1.0f / (farPlane*1.1) );
 
    for ( U32 i=0; i < mPasses.size(); i++ )
    {
