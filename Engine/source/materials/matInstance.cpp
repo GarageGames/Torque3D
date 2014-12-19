@@ -497,6 +497,14 @@ bool MatInstance::hasGlow()
       return false;
 }
 
+bool MatInstance::hasAccumulation() 
+{ 
+   if( mProcessedMaterial )
+      return mProcessedMaterial->hasAccumulation(); 
+   else
+      return false;
+}
+
 const FeatureSet& MatInstance::getFeatures() const 
 {
    return mProcessedMaterial->getFeatures(); 
