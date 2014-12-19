@@ -130,6 +130,7 @@ GFXD3D9OcclusionQuery::OcclusionQueryStatus GFXD3D9OcclusionQuery::getStatus( bo
           //If we're stalled out, proceed with worst-case scenario -BJR
           if(GFX->mFrameTime->getElapsedMs()>4)
           {
+              this->begin();
               this->end();
               return NotOccluded;
           }
