@@ -128,6 +128,8 @@ protected:
    /// RenderInst if available, otherwise, return NULL.
    inline BaseMatInstance* getMaterial( RenderInst *inst ) const;
 
+   // Limits bin to rendering in basic lighting only.
+   bool mBasicOnly;
 };
 
 
