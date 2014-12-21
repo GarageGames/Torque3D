@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "platform/platform.h"
+
 #include "console/console.h"
 #include "console/consoleTypes.h"
 #include "gfx/bitmap/gBitmap.h"
@@ -29,7 +31,7 @@
 #include "gfx/gfxDrawUtil.h"
 #include "console/engineAPI.h"
 
-#include "GuiChunkedBitmapCtrl.h"
+#include "guiChunkedBitmapCtrl.h"
 
 
 IMPLEMENT_CONOBJECT(GuiChunkedBitmapCtrl);
