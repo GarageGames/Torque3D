@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 #include "gui/shiny/guiTickCtrl.h"
+#include "console/engineAPI.h"
 
 IMPLEMENT_CONOBJECT( GuiTickCtrl );
 
@@ -57,10 +58,8 @@ static ConsoleDocFragment _setProcessTicks(
    "GuiTickCtrl",
    "void setProcessTicks( bool tick )"
 );
-ConsoleMethod( GuiTickCtrl, setProcessTicks, void, 2, 3, "( [tick = true] ) - This will set this object to either be processing ticks or not" )
+
+DefineConsoleMethod( GuiTickCtrl, setProcessTicks, void, (bool tick), (true), "( [tick = true] ) - This will set this object to either be processing ticks or not" )
 {
-   if( argc == 3 )
-      object->setProcessTicks( dAtob( argv[2] ) );
-   else
-      object->setProcessTicks();
+   object->setProcessTicks(tick);
 }

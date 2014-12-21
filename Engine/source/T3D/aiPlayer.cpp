@@ -575,23 +575,21 @@ ConsoleDocFragment _setAimObject(
    "AIPlayer",
    "void setAimObject(GameBase targetObject, Point3F offset);"
 );
-ConsoleMethod( AIPlayer, setAimObject, void, 3, 4, "( GameBase obj, [Point3F offset] )"
+
+DefineConsoleMethod( AIPlayer, setAimObject, void, ( const char * objName, Point3F offset ), (Point3F::Zero), "( GameBase obj, [Point3F offset] )"
               "Sets the bot's target object. Optionally set an offset from target location."
 			  "@hide")
 {
-   Point3F off( 0.0f, 0.0f, 0.0f );
 
    // Find the target
    GameBase *targetObject;
-   if( Sim::findObject( argv[2], targetObject ) )
+   if( Sim::findObject( objName, targetObject ) )
    {
-      if (argc == 4)
-         dSscanf( argv[3], "%g %g %g", &off.x, &off.y, &off.z );
 
-      object->setAimObject( targetObject, off );
+      object->setAimObject( targetObject, offset );
    }
    else
-      object->setAimObject( 0, off );
+      object->setAimObject( 0, offset );
 }
 
 DefineEngineMethod( AIPlayer, getAimObject, S32, (),,

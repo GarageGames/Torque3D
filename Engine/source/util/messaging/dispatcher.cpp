@@ -26,6 +26,7 @@
 #include "platform/threads/mutex.h"
 #include "core/tSimpleHashTable.h"
 #include "core/util/safeDelete.h"
+#include "console/engineAPI.h"
 
 namespace Dispatcher
 {
@@ -330,67 +331,67 @@ extern void unlockDispatcherMutex()
 
 using namespace Dispatcher;
 
-ConsoleFunction(isQueueRegistered, bool, 2, 2, "(string queueName)"
+DefineConsoleFunction( isQueueRegistered, bool, (const char * queueName), , "(string queueName)"
 				"@brief Determines if a dispatcher queue exists\n\n"
 				"@param queueName String containing the name of queue\n"
 				"@ingroup Messaging")
 {
-   return isQueueRegistered(argv[1]);
+   return Dispatcher::isQueueRegistered(queueName);
 }
 
-ConsoleFunction(registerMessageQueue, void, 2, 2, "(string queueName)"
+DefineConsoleFunction( registerMessageQueue, void, (const char *queueName), , "(string queueName)"
 				"@brief Registeres a dispatcher queue\n\n"
 				"@param queueName String containing the name of queue\n"
 				"@ingroup Messaging")
 {
-   return registerMessageQueue(argv[1]);
+   return Dispatcher::registerMessageQueue(queueName);
 }
 
-ConsoleFunction(unregisterMessageQueue, void, 2, 2, "(string queueName)"
+DefineConsoleFunction( unregisterMessageQueue, void, (const char *queueName), , "(string queueName)"
 				"@brief Unregisters a dispatcher queue\n\n"
 				"@param queueName String containing the name of queue\n"
 				"@ingroup Messaging")
 {
-   return unregisterMessageQueue(argv[1]);
+   return Dispatcher::unregisterMessageQueue(queueName);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction(registerMessageListener, bool, 3, 3, "(string queueName, string listener)"
+DefineConsoleFunction( registerMessageListener, bool, (const char *queueName, const char *listenerName), , "(string queueName, string listener)"
 				"@brief Registers an event message\n\n"
 				"@param queueName String containing the name of queue to attach listener to\n"
 				"@param listener Name of event messenger\n"
 				"@ingroup Messaging")
 {
-   IMessageListener *listener = dynamic_cast<IMessageListener *>(Sim::findObject(argv[2]));
+   Dispatcher::IMessageListener *listener = dynamic_cast<Dispatcher::IMessageListener *>(Sim::findObject(listenerName));
    if(listener == NULL)
    {
       Con::errorf("registerMessageListener - Unable to find listener object, not an IMessageListener ?!");
       return false;
    }
 
-   return registerMessageListener(argv[1], listener);
+   return Dispatcher::registerMessageListener(queueName, listener);
 }
 
-ConsoleFunction(unregisterMessageListener, void, 3, 3, "(string queueName, string listener)"
+DefineConsoleFunction( unregisterMessageListener, void, (const char *queueName, const char *listenerName), , "(string queueName, string listener)"
 				"@brief Unregisters an event message\n\n"
 				"@param queueName String containing the name of queue\n"
 				"@param listener Name of event messenger\n"
 				"@ingroup Messaging")
 {
-   IMessageListener *listener = dynamic_cast<IMessageListener *>(Sim::findObject(argv[2]));
+   Dispatcher::IMessageListener *listener = dynamic_cast<Dispatcher::IMessageListener *>(Sim::findObject(listenerName));
    if(listener == NULL)
    {
       Con::errorf("unregisterMessageListener - Unable to find listener object, not an IMessageListener ?!");
       return;
    }
 
-   unregisterMessageListener(argv[1], listener);
+   Dispatcher::unregisterMessageListener(queueName, listener);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction(dispatchMessage, bool, 3, 4, "(string queueName, string message, string data)"
+DefineConsoleFunction( dispatchMessage, bool, (const char *queueName, const char *message, const char *data), (""), "(string queueName, string message, string data)"
 				"@brief Dispatch a message to a queue\n\n"
 				"@param queueName Queue to dispatch the message to\n"
 				"@param message Message to dispatch\n"
@@ -399,10 +400,10 @@ ConsoleFunction(dispatchMessage, bool, 3, 4, "(string queueName, string message,
 				"@see dispatchMessageObject\n"
 				"@ingroup Messaging")
 {
-   return dispatchMessage(argv[1], argv[2], argc > 3 ? argv[3] : "" );
+   return Dispatcher::dispatchMessage(queueName, message, data);
 }
 
-ConsoleFunction(dispatchMessageObject, bool, 3, 3, "(string queueName, string message)"
+DefineConsoleFunction( dispatchMessageObject, bool, (const char *queueName, const char *message), ("", ""), "(string queueName, string message)"
 				"@brief Dispatch a message object to a queue\n\n"
 				"@param queueName Queue to dispatch the message to\n"
 				"@param message Message to dispatch\n"
@@ -410,12 +411,12 @@ ConsoleFunction(dispatchMessageObject, bool, 3, 3, "(string queueName, string me
 				"@see dispatchMessage\n"
 				"@ingroup Messaging")
 {
-   Message *msg = dynamic_cast<Message *>(Sim::findObject(argv[2]));
+   Message *msg = dynamic_cast<Message *>(Sim::findObject(message));
    if(msg == NULL)
    {
       Con::errorf("dispatchMessageObject - Unable to find message object");
       return false;
    }
 
-   return dispatchMessageObject(argv[1], msg);
+   return Dispatcher::dispatchMessageObject(queueName, msg);
 }

@@ -181,7 +181,7 @@ function ChooseLevelDlg::onWake( %this )
       %extentX = getWord(ChooseLevelWindow.getExtent(), 0);
       %extentY = getWord(ChooseLevelWindow->SmallPreviews.getPosition(), 1);
 
-      ChooseLevelWIndow.setExtent(%extentX, %extentY);
+      ChooseLevelWIndow.setExtent(%extentX @ " " @ %extentY);
    }
    else
    {
@@ -194,7 +194,7 @@ function ChooseLevelDlg::onWake( %this )
       %extentY = %extentY + getWord(ChooseLevelWindow->SmallPreviews.getExtent(), 1);
       %extentY = %extentY + 9;
 
-      ChooseLevelWIndow.setExtent(%extentX, %extentY);
+      ChooseLevelWIndow.setExtent(%extentX @ " " @ %extentY);
    }
 }
 

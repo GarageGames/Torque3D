@@ -58,15 +58,19 @@ U32 GFXTextureObject::dumpActiveTOs()
    return smActiveTOCount;
 }
 
+
+
+#endif // TORQUE_DEBUG
+
 DefineEngineFunction( dumpTextureObjects, void, (),,
    "Dumps a list of all active texture objects to the console.\n"
    "@note This function is only available in debug builds.\n"
    "@ingroup GFX\n" )
 {
+#ifdef TORQUE_DEBUG
    GFXTextureObject::dumpActiveTOs();
+#endif
 }
-
-#endif // TORQUE_DEBUG
 
 //-----------------------------------------------------------------------------
 // GFXTextureObject

@@ -24,6 +24,7 @@
 #include "gui/worldEditor/guiConvexShapeEditorCtrl.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "T3D/convexShape.h"
 #include "renderInstance/renderPassManager.h"
 #include "collision/collision.h"
@@ -2178,44 +2179,43 @@ void GuiConvexEditorCtrl::splitSelectedFace()
    updateGizmoPos();
 }
 
-ConsoleMethod( GuiConvexEditorCtrl, hollowSelection, void, 2, 2, "" )
+DefineConsoleMethod( GuiConvexEditorCtrl, hollowSelection, void, (), , "" )
 {
    object->hollowSelection();
 }
 
-ConsoleMethod( GuiConvexEditorCtrl, recenterSelection, void, 2, 2, "" )
+DefineConsoleMethod( GuiConvexEditorCtrl, recenterSelection, void, (), , "" )
 {
    object->recenterSelection();
 }
 
-ConsoleMethod( GuiConvexEditorCtrl, hasSelection, S32, 2, 2, "" )
+DefineConsoleMethod( GuiConvexEditorCtrl, hasSelection, S32, (), , "" )
 {
    return object->hasSelection();
 }
 
-ConsoleMethod( GuiConvexEditorCtrl, handleDelete, void, 2, 2, "" )
+DefineConsoleMethod( GuiConvexEditorCtrl, handleDelete, void, (), , "" )
 {
    object->handleDelete();
 }
 
-ConsoleMethod( GuiConvexEditorCtrl, handleDeselect, void, 2, 2, "" )
+DefineConsoleMethod( GuiConvexEditorCtrl, handleDeselect, void, (), , "" )
 {
    object->handleDeselect();
 }
 
-ConsoleMethod( GuiConvexEditorCtrl, dropSelectionAtScreenCenter, void, 2, 2, "" )
+DefineConsoleMethod( GuiConvexEditorCtrl, dropSelectionAtScreenCenter, void, (), , "" )
 {
    object->dropSelectionAtScreenCenter();
 }
 
-ConsoleMethod( GuiConvexEditorCtrl, selectConvex, void, 3, 3, "( ConvexShape )" )
+DefineConsoleMethod( GuiConvexEditorCtrl, selectConvex, void, (ConvexShape *convex), , "( ConvexShape )" )
 {
-   ConvexShape *convex;
-   if ( Sim::findObject( argv[2], convex ) )   
+if (convex)
       object->setSelection( convex, -1 );
 }
 
-ConsoleMethod( GuiConvexEditorCtrl, splitSelectedFace, void, 2, 2, "" )
+DefineConsoleMethod( GuiConvexEditorCtrl, splitSelectedFace, void, (), , "" )
 {
    object->splitSelectedFace();
 }

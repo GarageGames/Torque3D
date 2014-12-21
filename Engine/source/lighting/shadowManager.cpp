@@ -25,6 +25,7 @@
 
 #include "scene/sceneManager.h"
 #include "materials/materialManager.h"
+#include "console/engineAPI.h"
 
 const String ShadowManager::ManagerTypeName("ShadowManager");
 
@@ -53,7 +54,7 @@ SceneManager* ShadowManager::getSceneManager()
 //------------------------------------------------------------------------------
 
 // Runtime switching of shadow systems.  Requires correct world to be pushed at console.
-ConsoleFunction( setShadowManager, bool, 1, 3, "string sShadowSystemName" )
+DefineConsoleFunction( setShadowManager, bool, (const char* sShadowSystemName), (""), "string sShadowSystemName")
 {
    /*
    // Make sure this new one exists
