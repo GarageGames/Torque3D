@@ -437,9 +437,9 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       }
       else
       {
-         AssertWarn(false, "No edge texture target defined, if you want to use mixed particle"
+         AssertFatal(false, "No edge texture target defined, if you want to use mixed particle"
             "rendering, then make sure that the EdgeDetectPostEffect is enabled.");
-         ri->systemState == PSS_AwaitingHighResDraw;
+         ri->systemState = PSS_AwaitingHighResDraw;
          return;
       }
 
