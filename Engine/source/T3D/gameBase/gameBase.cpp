@@ -388,7 +388,9 @@ F32 GameBase::getUpdatePriority(CameraScopeQuery *camInfo, U32 updateMask, S32 u
    // Weight by field of view, objects directly in front
    // will be weighted 1, objects behind will be 0
    F32 dot = mDot(pos,camInfo->orientation);
-   bool inFov = dot > camInfo->cosFov;
+
+   bool inFov = dot > camInfo->cosFov * 1.5f;
+
    F32 wFov = inFov? 1.0f: 0;
 
    // Weight by linear velocity parallel to the viewing plane
@@ -406,7 +408,7 @@ F32 GameBase::getUpdatePriority(CameraScopeQuery *camInfo, U32 updateMask, S32 u
 
    // Weight by interest.
    F32 wInterest;
-   if (getTypeMask() & PlayerObjectType)
+   if (getTypeMask() & (PlayerObjectType || VehicleObjectType ))
       wInterest = 0.75f;
    else if (getTypeMask() & ProjectileObjectType)
    {

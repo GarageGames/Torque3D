@@ -42,6 +42,7 @@
 #include "math/mathIO.h"
 #include "math/mTransform.h"
 #include "T3D/gameBase/gameProcess.h"
+#include "T3D/gameBase/gameConnection.h"
 
 IMPLEMENT_CONOBJECT(SceneObject);
 
@@ -664,6 +665,12 @@ static void scopeCallback( SceneObject* obj, void* conPtr )
 
 void SceneObject::onCameraScopeQuery( NetConnection* connection, CameraScopeQuery* query )
 {
+   SceneManager* sceneManager = getSceneManager();
+   GameConnection* conn  = dynamic_cast<GameConnection*> (connection);
+   if (conn && (query->visibleDistance = conn->getVisibleGhostDistance()) == 0.0f)
+      if ((query->visibleDistance = sceneManager->getVisibleGhostDistance()) == 0.0f)
+         query->visibleDistance = sceneManager->getVisibleDistance();
+
    // Object itself is in scope.
 
    if( this->isScopeable() )
