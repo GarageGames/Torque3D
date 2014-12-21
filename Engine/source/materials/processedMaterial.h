@@ -197,6 +197,9 @@ public:
    /// Returns true if any pass glows
    bool hasGlow() const { return mHasGlow; }
 
+   /// Returns true if any pass accumulates
+   bool hasAccumulation() const { return mHasAccumulation; }
+
    /// Gets the stage number for a pass
    U32 getStageFromPass(U32 pass) const
    {
@@ -243,6 +246,9 @@ protected:
 
    /// If we glow
    bool mHasGlow;
+
+   /// If we have accumulation.
+   bool mHasAccumulation;
 
    /// Number of stages (not to be confused with number of passes)
    U32 mMaxStages;

@@ -33,7 +33,8 @@ TSRenderState::TSRenderState()
       mMaterialHint( NULL ),
       mCuller( NULL ),
       mLightQuery( NULL ),
-      mUseOriginSort( false )
+      mUseOriginSort( false ),
+      mAccuTex( NULL )
 {
 }
 

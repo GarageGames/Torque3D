@@ -366,6 +366,7 @@ struct MeshRenderInst : public RenderInst
    GFXTextureObject *backBuffTex;
    GFXTextureObject *reflectTex;
    GFXTextureObject *miscTex;
+   GFXTextureObject *accuTex;
    GFXCubemap   *cubemap;
 
    void clear();
