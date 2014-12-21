@@ -1779,7 +1779,7 @@
             };
 			
 			new GuiSliderCtrl(ppOptionsLightRaysDensityScalar) {
-               range = "0.01 4";
+               range = "0.01 1";
                ticks = "1000";
                snap = "0";
                value = "0.94";
@@ -1870,7 +1870,7 @@
 			
 			
 			new GuiSliderCtrl(ppOptionsLightRaysDecayScalar) {
-               range = "0.1 4";
+               range = "0.01 1";
                ticks = "1000";
                snap = "0";
                value = "1.0";
