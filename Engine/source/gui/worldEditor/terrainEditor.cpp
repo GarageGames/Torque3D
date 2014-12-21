@@ -2761,9 +2761,9 @@ DefineConsoleMethod(TerrainEditor, getTerrainUnderWorldPoint, S32, (const char *
    if(tEditor == NULL)
       return 0;
    Point3F pos;
-   if(ptOrX != "" && Y == "" && Z == "")
+   if(!dStrIsEmpty(ptOrX) && dStrIsEmpty(Y) && dStrIsEmpty(Z))
       dSscanf(ptOrX, "%f %f %f", &pos.x, &pos.y, &pos.z);
-   else if(ptOrX != "" && Y != "" && Z != "")
+   else if(!dStrIsEmpty(ptOrX) && !dStrIsEmpty(Y) && !dStrIsEmpty(Z))
    {
       pos.x = dAtof(ptOrX);
       pos.y = dAtof(Y);
