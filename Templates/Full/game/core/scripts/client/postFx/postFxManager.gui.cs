@@ -301,12 +301,37 @@ function ppOptionsHDREffectsBlueShiftColorBaseColor::onAction(%this)
 }
 
 
-//Light rays Slider Controls
+//Light rays Brightness Slider Controls
 function ppOptionsLightRaysBrightScalar::onMouseDragged(%this)
 {
    $LightRayPostFX::brightScalar = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
+//Light rays Number of Samples Slider Control
+function ppOptionsLightRaysSampleScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::numSamples = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+//Light rays Density Slider Control
+function ppOptionsLightRaysDensityScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::density = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+//Light rays Weight Slider Control
+function ppOptionsLightRaysWeightScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::weight = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+//Light rays Decay Slider Control
+function ppOptionsLightRaysDecayScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::decay = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+
 
 function ppOptionsUpdateDOFSettings()
 {
