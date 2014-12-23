@@ -6158,7 +6158,10 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->writeFlag(!(mask & NoWarpMask));
    }
    // Ghost need energy to predict reliably
-   stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy,EnergyLevelBits);
+   if (mDataBlock->maxEnergy > 0.f)
+      stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy, EnergyLevelBits);
+   else
+      stream->writeFloat(0.f, EnergyLevelBits);
    return retMask;
 }
 
