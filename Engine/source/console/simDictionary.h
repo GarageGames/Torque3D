@@ -45,8 +45,6 @@ class SimObject;
 #include "console/sim.h"
 #endif
 
-#include "core/strings/stringFunctions.h"
-
 struct StringTableEntryHash
 {
    inline size_t operator()(StringTableEntry val) const
@@ -66,8 +64,6 @@ struct StringTableEntryEq
 typedef std::unordered_map<StringTableEntry, SimObject*, StringTableEntryHash, StringTableEntryEq> StringDictDef;	
 typedef std::unordered_map<SimObjectId, SimObject*> SimObjectIdDictDef;
 #endif
-
-
 
 //----------------------------------------------------------------------------
 /// Map of names to SimObjects

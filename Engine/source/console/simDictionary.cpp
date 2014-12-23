@@ -23,7 +23,6 @@
 #include "console/simDictionary.h"
 #include "console/simBase.h"
 
-
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 extern U32 HashPointer(StringTableEntry e);
@@ -46,7 +45,7 @@ SimNameDictionary::~SimNameDictionary()
 
 void SimNameDictionary::insert(SimObject* obj)
 {
-   if(!obj->objectName)
+   if(!obj || !obj->objectName)
       return;
 
    SimObject* checkForDup = find(obj->objectName);
@@ -140,7 +139,7 @@ SimObject* SimNameDictionary::find(StringTableEntry name)
 
 void SimNameDictionary::remove(SimObject* obj)
 {
-   if(!obj->objectName)
+   if(!obj || !obj->objectName)
       return;
 
    Mutex::lockMutex(mutex);
@@ -191,7 +190,7 @@ SimManagerNameDictionary::~SimManagerNameDictionary()
 
 void SimManagerNameDictionary::insert(SimObject* obj)
 {
-   if(!obj->objectName)
+   if(!obj || !obj->objectName)
       return;
 
    Mutex::lockMutex(mutex);
@@ -268,7 +267,7 @@ SimObject* SimManagerNameDictionary::find(StringTableEntry name)
 
 void SimManagerNameDictionary::remove(SimObject* obj)
 {
-   if(!obj->objectName)
+   if(!obj || !obj->objectName)
       return;
 
 #ifndef USE_NEW_SIMDICTIONARY
@@ -316,6 +315,9 @@ SimIdDictionary::~SimIdDictionary()
 
 void SimIdDictionary::insert(SimObject* obj)
 {
+   if (!obj)
+      return;
+
    Mutex::lockMutex(mutex);
 #ifndef USE_NEW_SIMDICTIONARY
    S32 idx = obj->getId() & TableBitMask;
@@ -356,6 +358,9 @@ SimObject* SimIdDictionary::find(S32 id)
 
 void SimIdDictionary::remove(SimObject* obj)
 {
+   if (!obj)
+      return;
+
    Mutex::lockMutex(mutex);
 #ifndef USE_NEW_SIMDICTIONARY
    SimObject **walk = &table[obj->getId() & TableBitMask];
