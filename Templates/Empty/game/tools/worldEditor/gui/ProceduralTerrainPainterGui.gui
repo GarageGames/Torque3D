@@ -402,4 +402,3 @@ function generateProceduralTerrainMask()
    Canvas.popDialog(ProceduralTerrainPainterGui);  
    ETerrainEditor.autoMaterialLayer($TPPHeightMin, $TPPHeightMax, $TPPSlopeMin, $TPPSlopeMax, $TPPCoverage);  
 }  
-
