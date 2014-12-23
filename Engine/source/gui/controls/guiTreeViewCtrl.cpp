@@ -5137,7 +5137,7 @@ DefineConsoleMethod(GuiTreeViewCtrl, getSelectedItemList,const char*, (), ,"retu
 		//the start of the buffer where we want to write
 		char* buffPart = buff+len;
 		//the size of the remaining buffer (-1 cause dStrlen doesn't count the \0)
-		S32 size	=	1024-len-1;
+		S32 size	=	bufSize-len-1;
 		//write it:
 		if(size < 1)
 		{
