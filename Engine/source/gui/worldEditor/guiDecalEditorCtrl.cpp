@@ -823,8 +823,9 @@ DefineConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, ( U32 i
 		return "";
 
 	static const U32 bufSize = 256;
-    char* returnBuffer = Con::getReturnBuffer(bufSize);
-
+	char* returnBuffer = Con::getReturnBuffer(bufSize);
+	returnBuffer[0] = 0;
+	
 
    if ( decalInstance )
    {

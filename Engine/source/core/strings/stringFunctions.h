@@ -61,7 +61,7 @@ inline S32  dStrcmp(const char *str1, const char *str2)
 
 inline bool dStrIsEmpty(const char *src)
 {
-   return src == 0 || !dStrcmp(src, "");
+   return src == 0 || src[0] == '\0';
 }
 
 inline S32  dStrncmp(const char *str1, const char *str2, dsize_t len)

@@ -1207,8 +1207,11 @@ DefineConsoleFunction( nextToken, const char*, ( const char* str1, const char* t
    "@endtsexample\n\n"
    "@ingroup Strings" )
 {
-	char *str = (char *)str1;
-   if( str )
+	char buffer[4096];
+   dStrncpy(buffer, str1, 4096);
+   char *str = buffer;
+
+   if( str[0] )
    {
       // skip over any characters that are a member of delim
       // no need for special '\0' check since it can never be in delim
@@ -1237,7 +1240,10 @@ DefineConsoleFunction( nextToken, const char*, ( const char* str1, const char* t
          str++;
    }
 
-   return str;
+   U32 returnLen = dStrlen(str)+1;
+   char *ret = Con::getReturnBuffer(returnLen);
+   dStrncpy(ret, str, returnLen);
+   return ret;
 }
 
 //=============================================================================
@@ -2263,7 +2269,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
    "@endtsexample\n\n"
 	"@ingroup Scripting")
 {
-   if(dStrlen(varName) == 0)
+   if(dStrIsEmpty(varName))
    {
       Con::errorf("isDefined() - did you forget to put quotes around the variable name?");
       return false;
@@ -2339,11 +2345,10 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
             {
                if (dStrlen(value) > 0)
                   return true;
-               else if (dStrcmp(varValue,"")!=0)
+               else if (!dStrIsEmpty(varValue))
                { 
                   obj->setDataField(valName, 0, varValue); 
                }
-                  
             }
          }
       }
@@ -2357,7 +2362,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
 
          if (ent)
             return true;
-         else if (dStrcmp (varValue,"")!=0)
+         else if (!dStrIsEmpty(varValue))
          {
             gEvalState.getCurrentFrame().setVariable(name, varValue);
          }
@@ -2372,7 +2377,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
 
       if (ent)
          return true;
-      else if (dStrcmp( varValue,"") != 0)
+      else if (!dStrIsEmpty(varValue))
       {
          gEvalState.globalVars.setVariable(name, varValue);
       }
@@ -2382,7 +2387,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
       // Is it an object?
       if (dStrcmp(varName, "0") && dStrcmp(varName, "") && (Sim::findObject(varName) != NULL))
          return true;
-      else if (dStrcmp(varValue, "" ) != 0)
+      else if (!dStrIsEmpty(varValue))
       {
          Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, varValue);
       }
@@ -2436,7 +2441,7 @@ DefineConsoleFunction( popInstantGroup, void, (), , "()"
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getPrefsPath, const char *, ( const char* relativeFileName ), , "([relativeFileName])" 
+DefineConsoleFunction( getPrefsPath, const char *, ( const char* relativeFileName ), (""), "([relativeFileName])" 
 				"@note Appears to be useless in Torque 3D, should be deprecated\n"
 				"@internal")
 {

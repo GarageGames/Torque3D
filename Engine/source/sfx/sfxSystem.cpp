@@ -1466,7 +1466,7 @@ DefineConsoleFunction( sfxCreateSource, S32, ( const char * SFXType, const char 
 
    if ( track )
    {
-      if (dStrcmp(x, "") == 0)
+      if ( dStrIsEmpty(x) )
       {
          source = SFX->createSource( track );
       }
@@ -1487,7 +1487,7 @@ DefineConsoleFunction( sfxCreateSource, S32, ( const char * SFXType, const char 
       }
       else
       {
-         if ( dStrcmp(x , "")==0 )
+         if ( dStrIsEmpty(x) )
          {
             source = SFX->createSource( tempProfile );
          }
@@ -1550,7 +1550,7 @@ DefineConsoleFunction( sfxPlay, S32, ( const char * trackName, const char * poin
    "Start playing the given source or create a new source for the given track and play it.\n"
    "@hide" )
 {
-   if ( dStrcmp(pointOrX , "")==0 )
+   if ( dStrIsEmpty(pointOrX) )
    {
       SFXSource* source = dynamic_cast<SFXSource*>( Sim::findObject( trackName ) );
       if ( source )
@@ -1568,11 +1568,11 @@ DefineConsoleFunction( sfxPlay, S32, ( const char * trackName, const char * poin
    }
 
    Point3F pos(0.f, 0.f, 0.f);
-   if (dStrcmp( pointOrX, "" ) != 0 && dStrcmp( y, "" ) == 0 && dStrcmp( z, "" ) == 0 )
+   if ( !dStrIsEmpty( pointOrX ) && dStrIsEmpty( y ) && dStrIsEmpty( z )  )
    {
       dSscanf( pointOrX, "%g %g %g", &pos.x, &pos.y, &pos.z );
    }
-   else if(dStrcmp( pointOrX, "" ) != 0 && dStrcmp( y, "" ) != 0 && dStrcmp( z, "" ) != 0 )
+   else if( !dStrIsEmpty( pointOrX ) && !dStrIsEmpty( y ) && !dStrIsEmpty( z ) )
       pos.set( dAtof(pointOrX), dAtof(y), dAtof(z) );
 
    MatrixF transform;
@@ -1676,7 +1676,7 @@ DefineConsoleFunction( sfxPlayOnce, S32, ( const char * SFXType, const char * fi
    SFXSource* source = NULL;
    if( track )
    {
-      if (dStrcmp(x, "") == 0)
+      if (dStrIsEmpty(x))
       {
          source = SFX->playOnce( track );
       }
@@ -1697,7 +1697,7 @@ DefineConsoleFunction( sfxPlayOnce, S32, ( const char * SFXType, const char * fi
       }
       else
       {
-         if (dStrcmp(x, "") == 0) 
+         if (dStrIsEmpty(x))
             source = SFX->playOnce( tempProfile );
          else
          {

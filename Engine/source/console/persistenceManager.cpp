@@ -2205,16 +2205,15 @@ DefineConsoleMethod( PersistenceManager, setDirty, void,  ( const char * objName
    {
       if (!Sim::findObject(objName, dirtyObject))
       {
-         Con::printf("setDirty(): Invalid SimObject: %s", objName);
+         Con::printf("PersistenceManager::setDirty(): Invalid SimObject: %s", objName);
          return;
       }
    }
    
    // Prevent ourselves from shooting us in the foot.
-   
    if( dirtyObject == Sim::getRootGroup() )
    {
-      Con::errorf( "%s(): Cannot save RootGroup", objName );
+      Con::errorf( "PersistenceManager::setDirty(): Cannot save RootGroup" );
       return;
    }
 
@@ -2235,7 +2234,7 @@ DefineConsoleMethod( PersistenceManager, removeDirty, void, ( const char * objNa
    {
       if (!Sim::findObject(objName, dirtyObject))
       {
-			Con::printf("%s(): Invalid SimObject: %s", object->getName(),objName);
+         Con::printf("PersistenceManager::removeDirty(): Invalid SimObject: %s", objName);
          return;
       }
    }
@@ -2252,7 +2251,7 @@ DefineConsoleMethod( PersistenceManager, isDirty, bool, ( const char * objName )
    {
       if (!Sim::findObject(objName, dirtyObject))
       {
-			Con::printf("%s(): Invalid SimObject: %s", object->getName(), objName);
+         Con::printf("PersistenceManager::isDirty(): Invalid SimObject: %s", objName);
          return false;
       }
    }
@@ -2358,7 +2357,7 @@ DefineConsoleMethod( PersistenceManager, removeObjectFromFile, void, (const char
    {
       if (!Sim::findObject(objName, dirtyObject))
       {
-			Con::printf("%s(): Invalid SimObject: %s", object->getName(), objName);
+         Con::printf("PersistenceManager::removeObjectFromFile(): Invalid SimObject: %s", objName);
          return;
       }
    }
@@ -2380,7 +2379,7 @@ DefineConsoleMethod( PersistenceManager, removeField, void, (const char * objNam
    {
       if (!Sim::findObject(objName, dirtyObject))
       {
-			Con::printf("%s(): Invalid SimObject: %s", object->getName(), objName);
+         Con::printf("PersistenceManager::removeField(): Invalid SimObject: %s", objName);
          return;
       }
    }

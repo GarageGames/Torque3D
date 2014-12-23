@@ -379,7 +379,6 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
 
 }
 
-//ConsoleMethod( GuiFileTreeCtrl, getSelectedPath, const char*, 2, 2, "getSelectedPath() - returns the currently selected path in the tree")
 DefineConsoleMethod( GuiFileTreeCtrl, getSelectedPath, const char*, (), , "getSelectedPath() - returns the currently selected path in the tree")
 {
    const String& path = object->getSelectedPath();

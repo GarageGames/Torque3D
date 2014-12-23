@@ -568,12 +568,9 @@ DefineConsoleFunction( queryMasterServer
 
 DefineConsoleFunction( querySingleServer
                      , void, ( const char* addrText, U8 flags )
-                     ,(0) , "querySingleServer(...);" )
+                     , (0), "querySingleServer(address, flags);" )
 {
-
    NetAddress addr;
-
-
    Net::stringToAddress( addrText, &addr );
    querySingleServer(&addr,flags);
 }
@@ -655,7 +652,7 @@ void cancelServerQuery()
    }
 }
 
-DefineConsoleFunction( cancelServerQuery, void, (), , "cancelServerQuery(...);" )
+DefineConsoleFunction( cancelServerQuery, void, (), , "cancelServerQuery();" )
 {
    cancelServerQuery();
 }
@@ -683,14 +680,14 @@ void stopServerQuery()
    }
 }
 
-DefineConsoleFunction( stopServerQuery, void, (), , "stopServerQuery(...);" )
+DefineConsoleFunction( stopServerQuery, void, (), , "stopServerQuery();" )
 {
    stopServerQuery();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( startHeartbeat, void, (), , "startHeartbeat(...);" )
+DefineConsoleFunction( startHeartbeat, void, (), , "startHeartbeat();" )
 {
    if (validateAuthenticatedServer()) {
       gHeartbeatSeq++;
@@ -698,19 +695,19 @@ DefineConsoleFunction( startHeartbeat, void, (), , "startHeartbeat(...);" )
    }
 }
 
-DefineConsoleFunction( stopHeartbeat, void, (), , "stopHeartbeat(...);" )
+DefineConsoleFunction( stopHeartbeat, void, (), , "stopHeartbeat();" )
 {
    gHeartbeatSeq++;
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getServerCount, int, (), , "getServerCount(...);" )
+DefineConsoleFunction( getServerCount, int, (), , "getServerCount();" )
 {
    return gServerList.size();
 }
 
-DefineConsoleFunction( setServerInfo, bool, (U32 index), , "setServerInfo(...);" )
+DefineConsoleFunction( setServerInfo, bool, (U32 index), , "setServerInfo(index);" )
 {
    if (index < gServerList.size()) {
       ServerInfo& info = gServerList[index];

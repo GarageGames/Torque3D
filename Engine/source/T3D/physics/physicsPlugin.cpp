@@ -131,9 +131,8 @@ DefineConsoleFunction( physicsPluginPresent, bool, (), , "physicsPluginPresent()
    return PHYSICSMGR != NULL;
 }
 
-DefineConsoleFunction( physicsInit, bool, (const char * library), (""), "physicsInit( [string library] )")
+DefineConsoleFunction( physicsInit, bool, (const char * library), ("default"), "physicsInit( [string library] )")
 {
-
    return PhysicsPlugin::activate( library );
 }
 
@@ -152,7 +151,7 @@ DefineConsoleFunction( physicsInitWorld, bool, (const char * worldName), , "phys
 DefineConsoleFunction( physicsDestroyWorld, void, (const char * worldName), , "physicsDestroyWorld( String worldName )")
 {
    if ( PHYSICSMGR )
-      { PHYSICSMGR->destroyWorld( String( worldName ) ); }
+      PHYSICSMGR->destroyWorld( worldName );
 }
 
 

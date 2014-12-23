@@ -646,9 +646,9 @@ void SettingSaveNode::buildDocument(SimXMLDocument *document, bool skipWrite)
 
 DefineConsoleMethod(Settings, setValue, void, (const char * settingName, const char * value), (""), "settingObj.setValue(settingName, value);")
 {
-   const char *fieldName = StringTable->insert( settingName );
+   StringTableEntry fieldName = StringTable->insert( settingName );
    
-   if (dStrcmp(value, "") != 0)
+   if (!dStrIsEmpty(value))
       object->setValue( fieldName, value );
    else
       object->setValue( fieldName );
@@ -656,13 +656,13 @@ DefineConsoleMethod(Settings, setValue, void, (const char * settingName, const c
 
 DefineConsoleMethod(Settings, setDefaultValue, void, (const char * settingName, const char * value), , "settingObj.setDefaultValue(settingName, value);")
 {
-   const char *fieldName = StringTable->insert( settingName );
+   StringTableEntry fieldName = StringTable->insert( settingName );
    object->setDefaultValue( fieldName, value );
 }
 
 DefineConsoleMethod(Settings, value, const char*, (const char * settingName, const char * defaultValue), (""), "settingObj.value(settingName, defaultValue);")
 {
-   const char *fieldName = StringTable->insert( settingName );
+   StringTableEntry fieldName = StringTable->insert( settingName );
    
    if (dStrcmp(defaultValue, "") != 0)
       return object->value( fieldName, defaultValue );

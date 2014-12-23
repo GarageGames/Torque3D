@@ -2521,8 +2521,9 @@ DefineConsoleMethod( TerrainEditor, getBrushSize, const char*, (), , "()")
 {
    Point2I size = object->getBrushSize();
 
-   char * ret = Con::getReturnBuffer(32);
-   dSprintf(ret, 32, "%d %d", size.x, size.y);
+   static const U32 bufSize = 32;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%d %d", size.x, size.y);
    return ret;
 }
 

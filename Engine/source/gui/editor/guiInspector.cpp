@@ -804,8 +804,8 @@ DefineConsoleMethod( GuiInspector, addInspect, void, (const char * className, bo
 
 DefineConsoleMethod( GuiInspector, removeInspect, void, (SimObject* obj), , "( id object ) - Remove the object from the list of objects being inspected." )
 {
-	if (object)
-   object->removeInspectObject( obj );
+   if (obj)
+      object->removeInspectObject( obj );
 }
 
 //-----------------------------------------------------------------------------

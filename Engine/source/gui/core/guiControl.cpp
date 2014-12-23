@@ -2810,12 +2810,19 @@ static ConsoleDocFragment _sGuiControlSetExtent2(
    "GuiControl", // The class to place the method in; use NULL for functions.
    "void setExtent( Point2I p );" ); // The definition string.
 
-//ConsoleMethod( GuiControl, setExtent, void, 3, 4,
-DefineConsoleMethod( GuiControl, setExtent, void, ( Point2I ext ), ,
-   " Set the width and height of the control.\n\n"
+DefineConsoleMethod( GuiControl, setExtent, void, ( const char* extOrX, const char* y ), (""),
+   "( Point2I p | int x, int y ) Set the width and height of the control.\n\n"
    "@hide" )
 {
-         object->setExtent( (S32)ext.x, (S32)ext.y );
+   Point2I extent;
+   if(!dStrIsEmpty(extOrX) && dStrIsEmpty(y))
+      dSscanf(extOrX, "%f %f", &extent.x, &extent.y);
+   else if(!dStrIsEmpty(extOrX) && !dStrIsEmpty(y))
+   {
+      extent.x = dAtof(extOrX);
+      extent.y = dAtof(y);
+   }
+   object->setExtent( extent );
 }
 
 //-----------------------------------------------------------------------------

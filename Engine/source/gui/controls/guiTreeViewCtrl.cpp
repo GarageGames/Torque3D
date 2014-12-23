@@ -5124,8 +5124,9 @@ DefineConsoleMethod(GuiTreeViewCtrl, getTextToRoot, const char*, (S32 itemId, co
 
 DefineConsoleMethod(GuiTreeViewCtrl, getSelectedItemList,const char*, (), ,"returns a space seperated list of mulitple item ids")
 {
-	char* buff = Con::getReturnBuffer(1024);
-	dSprintf(buff,1024,"");
+   const U32 bufSize = 1024;
+	char* buff = Con::getReturnBuffer(bufSize);
+	dSprintf(buff, bufSize, "");
 
    const Vector< S32 >& selected = object->getSelected();
 	for(int i = 0; i < selected.size(); i++)
@@ -5163,7 +5164,7 @@ S32 GuiTreeViewCtrl::findItemByObjectId(S32 iObjId)
 		   return mItems[i]->mId;
    }
 
-   return 0;
+   return -1;
 }
 
 //------------------------------------------------------------------------------

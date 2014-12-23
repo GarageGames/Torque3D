@@ -138,10 +138,9 @@ DefineConsoleFunction( spawnObject, S32, (   const char * spawnClass
                                          ,   const char * spawnName
                                          ,   const char * spawnProperties
                                          ,   const char * spawnScript 
-                                         ),("","","","","") ,"spawnObject(class [, dataBlock, name, properties, script])"
+                                         ),("","","","") ,"spawnObject(class [, dataBlock, name, properties, script])"
 				"@hide")
 {
-
    SimObject* spawnObject = Sim::spawnObject(spawnClass, spawnDataBlock, spawnName, spawnProperties, spawnScript);
 
    if (spawnObject)

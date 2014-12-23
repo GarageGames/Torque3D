@@ -3448,10 +3448,10 @@ DefineConsoleMethod( WorldEditor, transformSelection, void,
                      S32 scaleType,
                      Point3F scale,
                      bool sRelative,
-                     bool sLocal ), , "transformSelection(...)\n"
+                     bool sLocal ), ,
+              "transformSelection(...)\n"
               "Transform selection by given parameters.")
 {
-
    object->transformSelection(position, point, relativePos, rotate, rotation, relativeRot, rotLocal, scaleType, scale, sRelative, sLocal);
 }
 

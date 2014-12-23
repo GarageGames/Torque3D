@@ -637,7 +637,7 @@ DefineConsoleMethod( GuiInspectorField, getInspectedFieldType, const char*, (), 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspectorField, apply, void, ( const char * newValue, bool callbacks ), ("", true), "( string newValue, bool callbacks=true ) - Set the field's value. Suppress callbacks for undo if callbacks=false." )
+DefineConsoleMethod( GuiInspectorField, apply, void, ( const char * newValue, bool callbacks ), (true), "( string newValue, bool callbacks=true ) - Set the field's value. Suppress callbacks for undo if callbacks=false." )
 {
    object->setData( newValue, callbacks );
 }

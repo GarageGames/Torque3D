@@ -228,9 +228,9 @@ ConsoleFunction(resourceDump, void, 1, 1, "()"
 				"@ingroup Editors\n"
 				"@internal")
 {
-	#ifdef TORQUE_DEBUG
+#ifdef TORQUE_DEBUG
    ResourceManager::get().dumpToConsole();
-	#endif
+#endif
 }
 
 

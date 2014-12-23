@@ -1205,9 +1205,10 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getGraphName, const char*, (S32 plotID
 	   Con::errorf("Invalid plotID.");
    }
 
-   char *retBuffer = Con::getReturnBuffer(64);
+   const U32 bufSize = 64;
+   char *retBuffer = Con::getReturnBuffer(bufSize);
    const StringTableEntry graphName = object->getGraphName(plotID);
-   dSprintf(retBuffer, 64, "%s", graphName);
+   dSprintf(retBuffer, bufSize, "%s", graphName);
    return retBuffer;
 }
 

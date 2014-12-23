@@ -1470,7 +1470,7 @@ DefineConsoleMethod( GuiRiverEditorCtrl, getSelectedRiver, S32, (), , "" )
    if ( !river )
       return NULL;
 
-	return river->getId();
+   return river->getId();
 }
 
 DefineConsoleMethod( GuiRiverEditorCtrl, regenerate, void, (), , "" )
