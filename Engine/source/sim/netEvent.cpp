@@ -344,6 +344,8 @@ void NetConnection::eventReadPacket(BitStream *bstream)
       if(unguaranteedPhase)
       {
          evt->process(this);
+         if (evt->getRefCount() == 0)
+            evt->incRef();
          evt->decRef();
          if(mErrorBuffer.isNotEmpty())
             return;
