@@ -19,43 +19,46 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#include "netFileUtils.h"
+#include "console/engineAPI.h"
+#include "core/fileObject.h"
 
-#ifndef _FILEOBJECT_H_
-#define _FILEOBJECT_H_
 
-#ifndef _SIMBASE_H_
-#include "console/simBase.h"
-#endif
-#ifndef _FILESTREAM_H_
-#include "core/stream/fileStream.h"
-#endif
-
-class FileObject : public SimObject
+namespace netFileCommands
 {
-   typedef SimObject Parent;
-   U8 *mFileBuffer;
-   U32 mBufferSize;
-   U32 mCurPos;
-   FileStream *stream;
-public:
-   FileObject();
-   ~FileObject();
+const String requestsubmit = String("requestsubmit");
+const String finished = String("finished");
+const String get = String("get");
+const String list = String("list");
+const String listn = String("list\n");
+const String writefile = String("writefile");
+const String denyWrite = String("denyWrite");
+const String acceptWrite = String("acceptWrite");
+const String send = String("send");
+const String progress = String("progress");
+}
 
-   bool openForWrite(const char *fileName, const bool append = false);
-   bool openForRead(const char *fileName);
-   bool readMemory(const char *fileName);
-   const U8 *buffer() { return mFileBuffer; }
-   const U8 *readLine();
-   void peekLine(U8 *line, S32 length);
-   bool isEOF();
-   void writeLine(const U8 *line);
-   void close();
-   void writeObject( SimObject* object, const U8* objectPrepend = NULL );
+char* netFileUtils::uinttochar( U32 n)
+{
+   char* a = Con::getReturnBuffer(20);
+   if (n == 0)
+   {
+      *a = '0';
+      *(a+1) = '\0';
+      return a;
+   }
+   char aux[20];
+   aux[19] = '\0';
+   char* auxp = aux + 19;
+   int c = 1;
+   while (n != 0)
+   {
+      int mod = n % 10;
+      *(--auxp) = mod | 0x30;
+      n /=  10;
+      c++;
+   }
+   memcpy(a, auxp, c);
+   return a;
+}
 
-   void writeBinary(U32 bufferSize, const U8 *buffer) ;
-   U32 getSize() ;
-   U8 * getBuffer() ;
-   DECLARE_CONOBJECT(FileObject);
-};
-
-#endif

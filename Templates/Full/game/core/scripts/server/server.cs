@@ -35,6 +35,7 @@ function initBaseServer()
    exec("./spawn.cs");
    exec("./camera.cs");
    exec("./centerPrint.cs");
+   exec("./netFileServer.cs");
 }
 
 /// Attempt to find an open port to initialize the server with
@@ -115,6 +116,9 @@ function createServer(%serverType, %level)
 
       if ($pref::Net::DisplayOnMaster !$= "Never" )
          schedule(0,0,startHeartbeat);
+      
+      //Start the File Transfer Server
+      StartFileTransferServer();   
    }
 
    // Create the ServerGroup that will persist for the lifetime of the server.

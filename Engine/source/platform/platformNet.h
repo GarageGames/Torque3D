@@ -71,12 +71,12 @@ struct Net
 {
    enum Error
    {
-      NoError,
-      WrongProtocolType,
-      InvalidPacketProtocol,
-      WouldBlock,
-      NotASocket,
-      UnknownError
+      NoError = 0,
+      WrongProtocolType = 1,
+      InvalidPacketProtocol = 2,
+      WouldBlock = 3,
+      NotASocket = 4,
+      UnknownError  = 5
    };
 
    enum ConnectionState {

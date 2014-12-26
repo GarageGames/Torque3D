@@ -19,43 +19,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#include "core/util/str.h"
 
-#ifndef _FILEOBJECT_H_
-#define _FILEOBJECT_H_
-
-#ifndef _SIMBASE_H_
-#include "console/simBase.h"
-#endif
-#ifndef _FILESTREAM_H_
-#include "core/stream/fileStream.h"
-#endif
-
-class FileObject : public SimObject
+namespace netFileCommands
 {
-   typedef SimObject Parent;
-   U8 *mFileBuffer;
-   U32 mBufferSize;
-   U32 mCurPos;
-   FileStream *stream;
-public:
-   FileObject();
-   ~FileObject();
+extern const String requestsubmit;
+extern const String finished;
+extern const String get;
+extern const String list;
+extern const String listn;
+extern const String writefile;
+extern const String denyWrite;
+extern const String acceptWrite;
+extern const String send;
+extern const String progress;
+}
 
-   bool openForWrite(const char *fileName, const bool append = false);
-   bool openForRead(const char *fileName);
-   bool readMemory(const char *fileName);
-   const U8 *buffer() { return mFileBuffer; }
-   const U8 *readLine();
-   void peekLine(U8 *line, S32 length);
-   bool isEOF();
-   void writeLine(const U8 *line);
-   void close();
-   void writeObject( SimObject* object, const U8* objectPrepend = NULL );
-
-   void writeBinary(U32 bufferSize, const U8 *buffer) ;
-   U32 getSize() ;
-   U8 * getBuffer() ;
-   DECLARE_CONOBJECT(FileObject);
-};
-
-#endif
+namespace netFileUtils
+{
+char* uinttochar( U32 n);
+}

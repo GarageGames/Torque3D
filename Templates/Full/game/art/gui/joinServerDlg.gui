@@ -551,12 +551,26 @@ function JoinServerDlg::join(%this)
       LoadingProgress.setValue(1);
       LoadingProgressTxt.setValue("WAITING FOR SERVER");
       Canvas.repaint();
+      
+      //File Xfer
+      JoinServerDlg::CheckForUpdates();
 
-      %conn = new GameConnection(ServerConnection);
-      %conn.setConnectArgs($pref::Player::Name);
-      %conn.setJoinPassword($Client::Password);
-      %conn.connect($ServerInfo::Address);
    }
+}
+
+function JoinServerDlg::CheckForUpdates()
+{
+   %client = new netFileClient(FileXferClient);
+   %client.connect($ServerInfo::Address);
+}
+
+function JoinServerDlg::ConnectToGameServer()
+{
+   FileXferClient.delete();
+   %conn = new GameConnection(ServerConnection);
+   %conn.setConnectArgs($pref::Player::Name);
+   %conn.setJoinPassword($Client::Password);
+   %conn.connect($ServerInfo::Address);
 }
 
 //----------------------------------------
@@ -641,4 +655,34 @@ function onServerQueryStatus(%status, %msg, %value)
          JS_status.setText(%msg);
          JoinServerDlg.update();
    }
+}
+
+function netFileClient::onProgress(%this, %percent)
+{
+   LoadingProgress.setValue(%percent);
+}
+
+function netFileClient::onFileTransferMessage(%this, %msg)
+{
+   LoadingProgressTxt.setText(%msg);
+}
+
+function netFileClient::onFileTransferComplete(%this)
+{
+   JoinServerDlg::ConnectToGameServer();
+}
+
+function netFileClient::onFileTransferError(%this, %error)
+{
+   Progress_Message.setText(%msg);
+}
+
+function netFileClient::onConnectFailed(%this)
+{
+   JoinServerDlg::ConnectToGameServer();
+}
+
+function netFileClient::onDNSFailed(%this)
+{
+   JoinServerDlg::ConnectToGameServer();
 }

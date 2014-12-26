@@ -30,110 +30,455 @@
 #include "platform/platformInput.h"
 #include "torqueConfig.h"
 #include "core/frameAllocator.h"
+#include "fileSystemFunctions.h"
 
-// Buffer for expanding script filenames.
-static char sgScriptFilenameBuffer[1024];
-
-//-------------------------------------- Helper Functions
-static void forwardslash(char *str)
+namespace Torque
 {
-   while(*str)
+   namespace FileSystem
    {
-      if(*str == '\\')
-         *str = '/';
-      str++;
-   }
-}
+      // Buffer for expanding script filenames.
+      char sgScriptFilenameBuffer[1024];
 
-//----------------------------------------------------------------
-
-static Vector<String>   sgFindFilesResults;
-static U32              sgFindFilesPos = 0;
-
-static S32 buildFileList(const char* pattern, bool recurse, bool multiMatch)
-{
-   static const String sSlash( "/" );
-
-   sgFindFilesResults.clear();
-
-   String sPattern(Torque::Path::CleanSeparators(pattern));
-   if(sPattern.isEmpty())
+      //-------------------------------------- Helper Functions
+                              void forwardslash(char *str)
    {
-      Con::errorf("findFirstFile() requires a search pattern");
-      return -1;
-   }
-
-   if(!Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), sPattern.c_str()))
-   {
-      Con::errorf("findFirstFile() given initial directory cannot be expanded: '%s'", pattern);
-      return -1;
-   }
-   sPattern = String::ToString(sgScriptFilenameBuffer);
-
-   String::SizeType slashPos = sPattern.find('/', 0, String::Right);
-//    if(slashPos == String::NPos)
-//    {
-//       Con::errorf("findFirstFile() missing search directory or expression: '%s'", sPattern.c_str());
-//       return -1;
-//    }
-
-   // Build the initial search path
-   Torque::Path givenPath(Torque::Path::CompressPath(sPattern));
-   givenPath.setFileName("*");
-   givenPath.setExtension("*");
-
-   if(givenPath.getPath().length() > 0 && givenPath.getPath().find('*', 0, String::Right) == givenPath.getPath().length()-1)
-   {
-      // Deal with legacy searches of the form '*/*.*'
-      String suspectPath = givenPath.getPath();
-      String::SizeType newLen = suspectPath.length()-1;
-      if(newLen > 0 && suspectPath.find('/', 0, String::Right) == suspectPath.length()-2)
+      while(*str)
       {
-         --newLen;
-      }
-      givenPath.setPath(suspectPath.substr(0, newLen));
-   }
-
-   Torque::FS::FileSystemRef fs = Torque::FS::GetFileSystem(givenPath);
-   //Torque::Path path = fs->mapTo(givenPath);
-   Torque::Path path = givenPath;
-   
-   // Make sure that we have a root so the correct file system can be determined when using zips
-   if(givenPath.isRelative())
-      path = Torque::Path::Join(Torque::FS::GetCwd(), '/', givenPath);
-   
-   path.setFileName(String::EmptyString);
-   path.setExtension(String::EmptyString);
-   if(!Torque::FS::IsDirectory(path))
-   {
-      Con::errorf("findFirstFile() invalid initial search directory: '%s'", path.getFullPath().c_str());
-      return -1;
-   }
-
-   // Build the search expression
-   const String expression(slashPos != String::NPos ? sPattern.substr(slashPos+1) : sPattern);
-   if(expression.isEmpty())
-   {
-      Con::errorf("findFirstFile() requires a search expression: '%s'", sPattern.c_str());
-      return -1;
-   }
-
-   S32 results = Torque::FS::FindByPattern(path, expression, recurse, sgFindFilesResults, multiMatch );
-   if(givenPath.isRelative() && results > 0)
-   {
-      // Strip the CWD out of the returned paths
-      // MakeRelativePath() returns incorrect results (it adds a leading ..) so doing this the dirty way
-      const String cwd = Torque::FS::GetCwd().getFullPath();
-      for(S32 i = 0;i < sgFindFilesResults.size();++i)
-      {
-         String str = sgFindFilesResults[i];
-         if(str.compare(cwd, cwd.length(), String::NoCase) == 0)
-            str = str.substr(cwd.length());
-         sgFindFilesResults[i] = str;
+         if(*str == '\\')
+            *str = '/';
+         str++;
       }
    }
-   return results;
+
+      //----------------------------------------------------------------
+
+      Vector<String>   sgFindFilesResults;
+      U32              sgFindFilesPos = 0;
+   }
 }
+   
+   S32 Torque::FileSystem::buildFileList(const char* pattern, bool recurse, bool multiMatch)
+   {
+      static const String sSlash( "/" );
+
+      sgFindFilesResults.clear();
+
+      String sPattern(Torque::Path::CleanSeparators(pattern));
+      if(sPattern.isEmpty())
+      {
+         Con::errorf("findFirstFile() requires a search pattern");
+         return -1;
+      }
+
+      if(!Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), sPattern.c_str()))
+      {
+         Con::errorf("findFirstFile() given initial directory cannot be expanded: '%s'", pattern);
+         return -1;
+      }
+      sPattern = String::ToString(sgScriptFilenameBuffer);
+
+      String::SizeType slashPos = sPattern.find('/', 0, String::Right);
+   //    if(slashPos == String::NPos)
+   //    {
+   //       Con::errorf("findFirstFile() missing search directory or expression: '%s'", sPattern.c_str());
+   //       return -1;
+   //    }
+
+      // Build the initial search path
+      Torque::Path givenPath(Torque::Path::CompressPath(sPattern));
+      givenPath.setFileName("*");
+      givenPath.setExtension("*");
+
+      if(givenPath.getPath().length() > 0 && givenPath.getPath().find('*', 0, String::Right) == givenPath.getPath().length()-1)
+      {
+         // Deal with legacy searches of the form '*/*.*'
+         String suspectPath = givenPath.getPath();
+         String::SizeType newLen = suspectPath.length()-1;
+         if(newLen > 0 && suspectPath.find('/', 0, String::Right) == suspectPath.length()-2)
+         {
+            --newLen;
+         }
+         givenPath.setPath(suspectPath.substr(0, newLen));
+      }
+
+      Torque::FS::FileSystemRef fs = Torque::FS::GetFileSystem(givenPath);
+      //Torque::Path path = fs->mapTo(givenPath);
+      Torque::Path path = givenPath;
+   
+      // Make sure that we have a root so the correct file system can be determined when using zips
+      if(givenPath.isRelative())
+         path = Torque::Path::Join(Torque::FS::GetCwd(), '/', givenPath);
+   
+      path.setFileName(String::EmptyString);
+      path.setExtension(String::EmptyString);
+      if(!Torque::FS::IsDirectory(path))
+      {
+         Con::errorf("findFirstFile() invalid initial search directory: '%s'", path.getFullPath().c_str());
+         return -1;
+      }
+
+      // Build the search expression
+      const String expression(slashPos != String::NPos ? sPattern.substr(slashPos+1) : sPattern);
+      if(expression.isEmpty())
+      {
+         Con::errorf("findFirstFile() requires a search expression: '%s'", sPattern.c_str());
+         return -1;
+      }
+
+      S32 results = Torque::FS::FindByPattern(path, expression, recurse, sgFindFilesResults, multiMatch );
+      if(givenPath.isRelative() && results > 0)
+      {
+         // Strip the CWD out of the returned paths
+         // MakeRelativePath() returns incorrect results (it adds a leading ..) so doing this the dirty way
+         const String cwd = Torque::FS::GetCwd().getFullPath();
+         for(S32 i = 0;i < sgFindFilesResults.size();++i)
+         {
+            String str = sgFindFilesResults[i];
+            if(str.compare(cwd, cwd.length(), String::NoCase) == 0)
+               str = str.substr(cwd.length());
+            sgFindFilesResults[i] = str;
+         }
+      }
+      return results;
+   }
+
+   String Torque::FileSystem::findFirstFile ( const char* pattern, bool recurse )
+   {
+      S32 numResults = buildFileList( pattern, recurse, false);
+
+      // For Debugging
+      //for ( S32 i = 0; i < sgFindFilesResults.size(); i++ )
+      //   Con::printf( " [%i] [%s]", i, sgFindFilesResults[i].c_str() );
+
+      sgFindFilesPos = 1;
+
+      if(numResults < 0)
+      {
+         Con::errorf("findFirstFile() search directory not found: '%s'", pattern);
+         return String();
+      }
+
+      return numResults ? sgFindFilesResults[0] : String();
+   }
+
+   String Torque::FileSystem::findNextFile ( const char* pattern )
+   {
+      if ( sgFindFilesPos + 1 > sgFindFilesResults.size() )
+         return String();
+
+      return sgFindFilesResults[sgFindFilesPos++];
+   }
+
+   S32 Torque::FileSystem::getFileCount( const char* pattern, bool recurse)
+   {
+      S32 numResults = buildFileList( pattern, recurse, false );
+
+      if(numResults < 0)
+      {
+         return 0;
+      }
+
+      return numResults;
+   }
+
+   String Torque::FileSystem::findFirstFileMultiExpr( const char* pattern, bool recurse )
+   {
+      S32 numResults = buildFileList(pattern, recurse, true);
+
+      // For Debugging
+      //for ( S32 i = 0; i < sgFindFilesResults.size(); i++ )
+      //   Con::printf( " [%i] [%s]", i, sgFindFilesResults[i].c_str() );
+
+      sgFindFilesPos = 1;
+
+      if(numResults < 0)
+      {
+         Con::errorf("findFirstFileMultiExpr() search directory not found: '%s'", pattern);
+         return String();
+      }
+
+      return numResults ? sgFindFilesResults[0] : String();
+   }
+
+   String Torque::FileSystem::findNextFileMultiExpr( const char* pattern )
+   {
+      if ( sgFindFilesPos + 1 > sgFindFilesResults.size() )
+         return String();
+
+      return sgFindFilesResults[sgFindFilesPos++];
+   }
+
+   S32 Torque::FileSystem::getFileCountMultiExpr( const char* pattern, bool recurse )
+   {
+      S32 numResults = buildFileList(pattern, recurse, true);
+
+      if(numResults < 0)
+      {
+         return 0;
+      }
+
+      return numResults;
+   }
+
+   U32 Torque::FileSystem::getFileCRC( const char* fileName )
+   {
+      String cleanfilename(Torque::Path::CleanSeparators(fileName));
+      Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), cleanfilename.c_str());
+
+      Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
+      Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode( givenPath );
+
+      if ( fileRef == NULL )
+      {
+         Con::errorf("getFileCRC() - could not access file: [%s]", givenPath.getFullPath().c_str() );
+         return -1;
+      }
+
+      return fileRef->getChecksum();
+   }
+
+   bool Torque::FileSystem::isFile ( const char* fileName )
+   {
+      String cleanfilename(Torque::Path::CleanSeparators(fileName));
+      Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), cleanfilename.c_str());
+
+      Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
+      return Torque::FS::IsFile(givenPath);
+   }
+
+   bool Torque::FileSystem::IsDirectory ( const char* directory )
+   {
+      String dir(Torque::Path::CleanSeparators(directory));
+      Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), dir.c_str());
+
+      Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
+      return Torque::FS::IsDirectory( givenPath );
+   }
+
+   bool Torque::FileSystem::isWriteableFileName ( const char* fileName )
+   {
+      String filename(Torque::Path::CleanSeparators(fileName));
+      Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), filename.c_str());
+
+      Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
+      Torque::FS::FileSystemRef fs = Torque::FS::GetFileSystem(givenPath);
+      Torque::Path path = fs->mapTo(givenPath);
+
+      return !Torque::FS::IsReadOnly(path);
+   }
+
+   void Torque::FileSystem::startFileChangeNotifications()
+   {
+      Torque::FS::StartFileChangeNotifications();
+   }
+
+   void Torque::FileSystem::stopFileChangeNotifications()
+   {
+      Torque::FS::StopFileChangeNotifications();
+   }
+
+   String Torque::FileSystem::getDirectoryList( const char* path, S32 depth )
+   {
+       // Grab the full path.
+      char fullpath[1024];
+      Platform::makeFullPathName(dStrcmp(path, "/") == 0 ? "" : path, fullpath, sizeof(fullpath));
+
+      //dSprintf(fullpath, 511, "%s/%s", Platform::getWorkingDirectory(), path);
+
+      // Append a trailing backslash if it's not present already.
+      if (fullpath[dStrlen(fullpath) - 1] != '/')
+      {
+         S32 pos = dStrlen(fullpath);
+         fullpath[pos] = '/';
+         fullpath[pos + 1] = '\0';
+      }
+
+      // Dump the directories.
+      Vector<StringTableEntry> directories;
+      Platform::dumpDirectories(fullpath, directories, depth, true);
+
+      if( directories.empty() )
+         return "";
+
+      // Grab the required buffer length.
+      S32 length = 0;
+
+      for (S32 i = 0; i < directories.size(); i++)
+         length += dStrlen(directories[i]) + 1;
+
+      // Get a return buffer.
+      char* buffer = Con::getReturnBuffer(length);
+      char* p = buffer;
+
+      // Copy the directory names to the buffer.
+      for (S32 i = 0; i < directories.size(); i++)
+      {
+         dStrcpy(p, directories[i]);
+         p += dStrlen(directories[i]);
+         // Tab separated.
+         p[0] = '\t';
+         p++;
+      }
+      p--;
+      p[0] = '\0';
+
+      return buffer;
+   }
+
+   S32 Torque::FileSystem::fileSize( const char* fileName )
+   {
+      Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
+      return Platform::getFileSize( sgScriptFilenameBuffer );
+   }
+
+   String Torque::FileSystem::fileModifiedTime ( const char* fileName )
+   {
+      Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
+
+      FileTime ft = {0};
+      Platform::getFileTimes( sgScriptFilenameBuffer, NULL, &ft );
+
+      Platform::LocalTime lt = {0};
+      Platform::fileToLocalTime( ft, &lt );   
+   
+      String fileStr = Platform::localTimeToString( lt );
+   
+      char *buffer = Con::getReturnBuffer( fileStr.size() );
+      dStrcpy( buffer, fileStr );   
+   
+      return buffer;
+   }
+
+   String Torque::FileSystem::fileCreatedTime ( const char* fileName )
+   {
+      Con::expandScriptFilename( sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName );
+
+      FileTime ft = {0};
+      Platform::getFileTimes( sgScriptFilenameBuffer, &ft, NULL );
+
+      Platform::LocalTime lt = {0};
+      Platform::fileToLocalTime( ft, &lt );   
+
+      String fileStr = Platform::localTimeToString( lt );
+
+      char *buffer = Con::getReturnBuffer( fileStr.size() );
+      dStrcpy( buffer, fileStr );  
+
+      return buffer;
+   }
+
+   bool Torque::FileSystem::fileDelete ( const char* path )
+   {
+      static char fileName[1024];
+      static char sandboxFileName[1024];
+
+      Con::expandScriptFilename( fileName, sizeof( fileName ), path );
+      Platform::makeFullPathName(fileName, sandboxFileName, sizeof(sandboxFileName));
+
+      return dFileDelete(sandboxFileName);
+   }
+
+   String Torque::FileSystem::fileExt ( const char* fileName )
+   {
+      const char *ret = dStrrchr(fileName, '.');
+      if(ret)
+         return ret;
+      return "";
+   }
+
+   String Torque::FileSystem::fileBase ( const char* fileName )
+   {
+   
+      S32 pathLen = dStrlen( fileName );
+      FrameTemp<char> szPathCopy( pathLen + 1);
+
+      dStrcpy( szPathCopy, fileName );
+      forwardslash( szPathCopy );
+
+      const char *path = dStrrchr(szPathCopy, '/');
+      if(!path)
+         path = szPathCopy;
+      else
+         path++;
+      char *ret = Con::getReturnBuffer(dStrlen(path) + 1);
+      dStrcpy(ret, path);
+      char *ext = dStrrchr(ret, '.');
+      if(ext)
+         *ext = 0;
+      return ret;
+   }
+
+   String Torque::FileSystem::fileName  ( const char* fileName )
+   {
+      S32 pathLen = dStrlen( fileName );
+      FrameTemp<char> szPathCopy( pathLen + 1);
+
+      dStrcpy( szPathCopy, fileName );
+      forwardslash( szPathCopy );
+
+      const char *name = dStrrchr(szPathCopy, '/');
+      if(!name)
+         name = szPathCopy;
+      else
+         name++;
+      char *ret = Con::getReturnBuffer(dStrlen(name));
+      dStrcpy(ret, name);
+      return ret;
+   }
+
+   String Torque::FileSystem::filePath ( const char* fileName )
+   {
+      S32 pathLen = dStrlen( fileName );
+      FrameTemp<char> szPathCopy( pathLen + 1);
+
+      dStrcpy( szPathCopy, fileName );
+      forwardslash( szPathCopy );
+
+      const char *path = dStrrchr(szPathCopy, '/');
+      if(!path)
+         return "";
+      U32 len = path - (char*)szPathCopy;
+      char *ret = Con::getReturnBuffer(len + 1);
+      dStrncpy(ret, szPathCopy, len);
+      ret[len] = 0;
+      return ret;
+   }
+
+   String Torque::FileSystem::getWorkingDirectory  ()
+   {
+      return Platform::getCurrentDirectory();
+   }
+
+   String Torque::FileSystem::makeFullPath ( const char* path, const char* cwd )
+   {
+      static const U32 bufSize = 512;
+      char *buf = Con::getReturnBuffer(bufSize);
+      Platform::makeFullPathName(path, buf, bufSize, dStrlen(cwd) > 1 ? cwd : NULL);
+      return buf;
+   }
+
+   String Torque::FileSystem::makeRelativePath ( const char* path, const char* to )
+   {
+      return Platform::makeRelativePathName( path, dStrlen(to) > 1 ? to : NULL );
+   }
+
+   String Torque::FileSystem::pathConcat ( const char* path, const char* file)
+   {
+      static const U32 bufSize = 1024;
+      char *buf = Con::getReturnBuffer(bufSize);
+      Platform::makeFullPathName(file, buf, bufSize, path);
+      return buf;
+   }
+
+   String Torque::FileSystem::getExecutableName()
+   {
+      return Platform::getExecutableName();
+   }
+
+   String Torque::FileSystem::getMainDotCsDir()
+   {
+      return Platform::getMainDotCsDir();
+   }
 
 //-----------------------------------------------------------------------------
 
@@ -166,21 +511,7 @@ DefineEngineFunction( findFirstFile, String, ( const char* pattern, bool recurse
    "@see findFirstFileMultiExpr()"
    "@ingroup FileSearches" )
 {
-   S32 numResults = buildFileList( pattern, recurse, false);
-
-   // For Debugging
-   //for ( S32 i = 0; i < sgFindFilesResults.size(); i++ )
-   //   Con::printf( " [%i] [%s]", i, sgFindFilesResults[i].c_str() );
-
-   sgFindFilesPos = 1;
-
-   if(numResults < 0)
-   {
-      Con::errorf("findFirstFile() search directory not found: '%s'", pattern);
-      return String();
-   }
-
-   return numResults ? sgFindFilesResults[0] : String();
+  return Torque::FileSystem::findFirstFile(pattern, recurse);
 }
 
 //-----------------------------------------------------------------------------
@@ -201,10 +532,7 @@ DefineEngineFunction( findNextFile, String, ( const char* pattern ), ( "" ),
    "@see findFirstFile()"
    "@ingroup FileSearches" )
 {
-   if ( sgFindFilesPos + 1 > sgFindFilesResults.size() )
-      return String();
-
-   return sgFindFilesResults[sgFindFilesPos++];
+   return Torque::FileSystem::findNextFile(pattern);
 }
 
 //-----------------------------------------------------------------------------
@@ -233,14 +561,7 @@ DefineEngineFunction( getFileCount, S32, ( const char* pattern, bool recurse ), 
    "@see getFileCountMultiExpr()"
    "@ingroup FileSearches" )
 {
-   S32 numResults = buildFileList( pattern, recurse, false );
-
-   if(numResults < 0)
-   {
-      return 0;
-   }
-
-   return numResults;
+   return Torque::FileSystem::getFileCount(pattern, recurse);
 }
 
 //-----------------------------------------------------------------------------
@@ -282,21 +603,7 @@ DefineEngineFunction(findFirstFileMultiExpr, String, ( const char* pattern, bool
    "@see findFirstFile()"
 	"@ingroup FileSearches")
 {
-   S32 numResults = buildFileList(pattern, recurse, true);
-
-   // For Debugging
-   //for ( S32 i = 0; i < sgFindFilesResults.size(); i++ )
-   //   Con::printf( " [%i] [%s]", i, sgFindFilesResults[i].c_str() );
-
-   sgFindFilesPos = 1;
-
-   if(numResults < 0)
-   {
-      Con::errorf("findFirstFileMultiExpr() search directory not found: '%s'", pattern);
-      return String();
-   }
-
-   return numResults ? sgFindFilesResults[0] : String();
+   return Torque::FileSystem::findFirstFileMultiExpr(pattern, recurse);
 }
 
 DefineEngineFunction(findNextFileMultiExpr, String, ( const char* pattern ), (""),
@@ -321,10 +628,7 @@ DefineEngineFunction(findNextFileMultiExpr, String, ( const char* pattern ), (""
    "@see findFirstFileMultiExpr()"
 	"@ingroup FileSearches")
 {
-   if ( sgFindFilesPos + 1 > sgFindFilesResults.size() )
-      return String();
-
-   return sgFindFilesResults[sgFindFilesPos++];
+   return Torque::FileSystem::findNextFileMultiExpr(pattern);
 }
 
 DefineEngineFunction(getFileCountMultiExpr, S32, ( const char* pattern, bool recurse ), (true),
@@ -349,14 +653,7 @@ DefineEngineFunction(getFileCountMultiExpr, S32, ( const char* pattern, bool rec
    "@see findNextFileMultiExpr()"
 	"@ingroup FileSearches")
 {
-   S32 numResults = buildFileList(pattern, recurse, true);
-
-   if(numResults < 0)
-   {
-      return 0;
-   }
-
-   return numResults;
+  return Torque::FileSystem::getFileCountMultiExpr(pattern, recurse);
 }
 
 DefineEngineFunction(getFileCRC, S32, ( const char* fileName ),,
@@ -368,19 +665,7 @@ DefineEngineFunction(getFileCRC, S32, ( const char* fileName ),,
    
    "@ingroup FileSystem")
 {
-   String cleanfilename(Torque::Path::CleanSeparators(fileName));
-   Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), cleanfilename.c_str());
-
-   Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
-   Torque::FS::FileNodeRef fileRef = Torque::FS::GetFileNode( givenPath );
-
-   if ( fileRef == NULL )
-   {
-      Con::errorf("getFileCRC() - could not access file: [%s]", givenPath.getFullPath().c_str() );
-      return -1;
-   }
-
-   return fileRef->getChecksum();
+   return Torque::FileSystem::getFileCRC(fileName);
 }
 
 DefineEngineFunction(isFile, bool, ( const char* fileName ),,
@@ -391,11 +676,7 @@ DefineEngineFunction(isFile, bool, ( const char* fileName ),,
    
    "@ingroup FileSystem")
 {
-   String cleanfilename(Torque::Path::CleanSeparators(fileName));
-   Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), cleanfilename.c_str());
-
-   Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
-   return Torque::FS::IsFile(givenPath);
+   return Torque::FileSystem::isFile( fileName );
 }
 
 DefineEngineFunction( IsDirectory, bool, ( const char* directory ),,
@@ -408,11 +689,7 @@ DefineEngineFunction( IsDirectory, bool, ( const char* directory ),,
 
 	"@ingroup FileSystem")
 {
-   String dir(Torque::Path::CleanSeparators(directory));
-   Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), dir.c_str());
-
-   Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
-   return Torque::FS::IsDirectory( givenPath );
+   return Torque::FileSystem::IsDirectory(directory);
 }
 
 DefineEngineFunction(isWriteableFileName, bool, ( const char* fileName ),,
@@ -423,14 +700,7 @@ DefineEngineFunction(isWriteableFileName, bool, ( const char* fileName ),,
 
 	"@ingroup FileSystem")
 {
-   String filename(Torque::Path::CleanSeparators(fileName));
-   Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), filename.c_str());
-
-   Torque::Path givenPath(Torque::Path::CompressPath(sgScriptFilenameBuffer));
-   Torque::FS::FileSystemRef fs = Torque::FS::GetFileSystem(givenPath);
-   Torque::Path path = fs->mapTo(givenPath);
-
-   return !Torque::FS::IsReadOnly(path);
+   return Torque::FileSystem::isWriteableFileName( fileName );
 }
 
 DefineEngineFunction(startFileChangeNotifications, void, (),,
@@ -439,7 +709,7 @@ DefineEngineFunction(startFileChangeNotifications, void, (),,
    "@see stopFileChangeNotifications()\n"
 	"@ingroup FileSystem")
 {
-   Torque::FS::StartFileChangeNotifications();
+   Torque::FileSystem::startFileChangeNotifications();
 }
 
 DefineEngineFunction(stopFileChangeNotifications, void, (),,
@@ -448,7 +718,7 @@ DefineEngineFunction(stopFileChangeNotifications, void, (),,
    "@see startFileChangeNotifications()\n"
 	"@ingroup FileSystem")
 {
-   Torque::FS::StopFileChangeNotifications();
+   Torque::FileSystem::stopFileChangeNotifications();
 }
 
 
@@ -461,50 +731,7 @@ DefineEngineFunction(getDirectoryList, String, ( const char* path, S32 depth ), 
 
 	"@ingroup FileSystem")
 {
-   // Grab the full path.
-   char fullpath[1024];
-   Platform::makeFullPathName(dStrcmp(path, "/") == 0 ? "" : path, fullpath, sizeof(fullpath));
-
-   //dSprintf(fullpath, 511, "%s/%s", Platform::getWorkingDirectory(), path);
-
-   // Append a trailing backslash if it's not present already.
-   if (fullpath[dStrlen(fullpath) - 1] != '/')
-   {
-      S32 pos = dStrlen(fullpath);
-      fullpath[pos] = '/';
-      fullpath[pos + 1] = '\0';
-   }
-
-   // Dump the directories.
-   Vector<StringTableEntry> directories;
-   Platform::dumpDirectories(fullpath, directories, depth, true);
-
-   if( directories.empty() )
-      return "";
-
-   // Grab the required buffer length.
-   S32 length = 0;
-
-   for (S32 i = 0; i < directories.size(); i++)
-      length += dStrlen(directories[i]) + 1;
-
-   // Get a return buffer.
-   char* buffer = Con::getReturnBuffer(length);
-   char* p = buffer;
-
-   // Copy the directory names to the buffer.
-   for (S32 i = 0; i < directories.size(); i++)
-   {
-      dStrcpy(p, directories[i]);
-      p += dStrlen(directories[i]);
-      // Tab separated.
-      p[0] = '\t';
-      p++;
-   }
-   p--;
-   p[0] = '\0';
-
-   return buffer;
+  return Torque::FileSystem::getDirectoryList(path, depth);
 }
 
 DefineEngineFunction(fileSize, S32, ( const char* fileName ),,
@@ -515,8 +742,7 @@ DefineEngineFunction(fileSize, S32, ( const char* fileName ),,
 
 	"@ingroup FileSystem")
 {
-   Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
-   return Platform::getFileSize( sgScriptFilenameBuffer );
+   return Torque::FileSystem::fileSize(fileName);
 }
 
 DefineEngineFunction( fileModifiedTime, String, ( const char* fileName ),,
@@ -526,20 +752,7 @@ DefineEngineFunction( fileModifiedTime, String, ( const char* fileName ),,
 	"@return Formatted string (OS specific) containing modified time, \"9/3/2010 12:33:47 PM\" for example\n"
 	"@ingroup FileSystem")
 {
-   Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
-
-   FileTime ft = {0};
-   Platform::getFileTimes( sgScriptFilenameBuffer, NULL, &ft );
-
-   Platform::LocalTime lt = {0};
-   Platform::fileToLocalTime( ft, &lt );   
-   
-   String fileStr = Platform::localTimeToString( lt );
-   
-   char *buffer = Con::getReturnBuffer( fileStr.size() );
-   dStrcpy( buffer, fileStr );   
-   
-   return buffer;
+   return Torque::FileSystem::fileModifiedTime(fileName);
 }
 
 DefineEngineFunction( fileCreatedTime, String, ( const char* fileName ),,
@@ -549,20 +762,7 @@ DefineEngineFunction( fileCreatedTime, String, ( const char* fileName ),,
    "@return Formatted string (OS specific) containing created time, \"9/3/2010 12:33:47 PM\" for example\n"
    "@ingroup FileSystem")
 {
-   Con::expandScriptFilename( sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName );
-
-   FileTime ft = {0};
-   Platform::getFileTimes( sgScriptFilenameBuffer, &ft, NULL );
-
-   Platform::LocalTime lt = {0};
-   Platform::fileToLocalTime( ft, &lt );   
-
-   String fileStr = Platform::localTimeToString( lt );
-
-   char *buffer = Con::getReturnBuffer( fileStr.size() );
-   dStrcpy( buffer, fileStr );  
-
-   return buffer;
+   return Torque::FileSystem::fileCreatedTime(fileName);
 }
 
 DefineEngineFunction(fileDelete, bool, ( const char* path ),,
@@ -573,13 +773,7 @@ DefineEngineFunction(fileDelete, bool, ( const char* path ),,
 	"@return True if file was successfully deleted\n"
 	"@ingroup FileSystem")
 {
-   static char fileName[1024];
-   static char sandboxFileName[1024];
-
-   Con::expandScriptFilename( fileName, sizeof( fileName ), path );
-   Platform::makeFullPathName(fileName, sandboxFileName, sizeof(sandboxFileName));
-
-   return dFileDelete(sandboxFileName);
+   return Torque::FileSystem::fileDelete(path);
 }
 
 
@@ -592,10 +786,7 @@ DefineEngineFunction(fileExt, String, ( const char* fileName ),,
 	"@return String containing the extension, such as \".exe\" or \".cs\"\n"
 	"@ingroup FileSystem")
 {
-   const char *ret = dStrrchr(fileName, '.');
-   if(ret)
-      return ret;
-   return "";
+   return Torque::FileSystem::fileExt(fileName);
 }
 
 DefineEngineFunction(fileBase, String, ( const char* fileName ),,
@@ -605,24 +796,7 @@ DefineEngineFunction(fileBase, String, ( const char* fileName ),,
    "@return String containing the file name, minus extension and path\n"
    "@ingroup FileSystem")
 {
-
-   S32 pathLen = dStrlen( fileName );
-   FrameTemp<char> szPathCopy( pathLen + 1);
-
-   dStrcpy( szPathCopy, fileName );
-   forwardslash( szPathCopy );
-
-   const char *path = dStrrchr(szPathCopy, '/');
-   if(!path)
-      path = szPathCopy;
-   else
-      path++;
-   char *ret = Con::getReturnBuffer(dStrlen(path) + 1);
-   dStrcpy(ret, path);
-   char *ext = dStrrchr(ret, '.');
-   if(ext)
-      *ext = 0;
-   return ret;
+   return Torque::FileSystem::fileBase(fileName);
 }
 
 DefineEngineFunction(fileName, String, ( const char* fileName ),,
@@ -632,20 +806,7 @@ DefineEngineFunction(fileName, String, ( const char* fileName ),,
 	"@return String containing the file name, minus the path\n"
 	"@ingroup FileSystem")
 {
-   S32 pathLen = dStrlen( fileName );
-   FrameTemp<char> szPathCopy( pathLen + 1);
-
-   dStrcpy( szPathCopy, fileName );
-   forwardslash( szPathCopy );
-
-   const char *name = dStrrchr(szPathCopy, '/');
-   if(!name)
-      name = szPathCopy;
-   else
-      name++;
-   char *ret = Con::getReturnBuffer(dStrlen(name));
-   dStrcpy(ret, name);
-   return ret;
+   return Torque::FileSystem::fileName(fileName);
 }
 
 DefineEngineFunction(filePath, String, ( const char* fileName ),,
@@ -655,20 +816,7 @@ DefineEngineFunction(filePath, String, ( const char* fileName ),,
 	"@return String containing the path, minus name and extension\n"
 	"@ingroup FileSystem")
 {
-   S32 pathLen = dStrlen( fileName );
-   FrameTemp<char> szPathCopy( pathLen + 1);
-
-   dStrcpy( szPathCopy, fileName );
-   forwardslash( szPathCopy );
-
-   const char *path = dStrrchr(szPathCopy, '/');
-   if(!path)
-      return "";
-   U32 len = path - (char*)szPathCopy;
-   char *ret = Con::getReturnBuffer(len + 1);
-   dStrncpy(ret, szPathCopy, len);
-   ret[len] = 0;
-   return ret;
+   return Torque::FileSystem::filePath(fileName);
 }
 
 DefineEngineFunction(getWorkingDirectory, String, (),,
@@ -677,7 +825,7 @@ DefineEngineFunction(getWorkingDirectory, String, (),,
 	"@return String containing full file path of working directory\n"
 	"@ingroup FileSystem")
 {
-   return Platform::getCurrentDirectory();
+   return Torque::FileSystem::getWorkingDirectory();
 }
 
 //-----------------------------------------------------------------------------
@@ -695,10 +843,7 @@ DefineEngineFunction(makeFullPath, String, ( const char* path, const char* cwd )
 	"@return String containing non-relative directory of path\n"
 	"@ingroup FileSystem")
 {
-   static const U32 bufSize = 512;
-   char *buf = Con::getReturnBuffer(bufSize);
-   Platform::makeFullPathName(path, buf, bufSize, dStrlen(cwd) > 1 ? cwd : NULL);
-   return buf;
+   return Torque::FileSystem::makeFullPath(path, cwd);
 }
 
 DefineEngineFunction(makeRelativePath, String, ( const char* path, const char* to ), (""),
@@ -711,7 +856,7 @@ DefineEngineFunction(makeRelativePath, String, ( const char* path, const char* t
 	"@returns String containing relative path\n"
 	"@ingroup FileSystem")
 {
-   return Platform::makeRelativePathName( path, dStrlen(to) > 1 ? to : NULL );
+   return Torque::FileSystem::makeRelativePath(path, to);
 }
 
 DefineEngineFunction(pathConcat, String, ( const char* path, const char* file),,
@@ -722,10 +867,7 @@ DefineEngineFunction(pathConcat, String, ( const char* path, const char* file),,
 	"@return String containing concatenated file name and path\n"
 	"@ingroup FileSystem")
 {
-   static const U32 bufSize = 1024;
-   char *buf = Con::getReturnBuffer(bufSize);
-   Platform::makeFullPathName(file, buf, bufSize, path);
-   return buf;
+   return Torque::FileSystem::pathConcat(path, file);
 }
 
 //-----------------------------------------------------------------------------
@@ -736,7 +878,7 @@ DefineEngineFunction(getExecutableName, String, (),,
 	"@return String containing this game's executable name\n"
 	"@ingroup FileSystem")
 {
-   return Platform::getExecutableName();
+   return Torque::FileSystem::getExecutableName();
 }
 
 //-----------------------------------------------------------------------------
@@ -749,7 +891,7 @@ DefineEngineFunction( getMainDotCsDir, String, (),,
    "@return The path to the main game assets.\n\n"
    "@ingroup FileSystem\n")
 {
-   return Platform::getMainDotCsDir();
+   return Torque::FileSystem::getMainDotCsDir();
 }
 
 //-----------------------------------------------------------------------------
