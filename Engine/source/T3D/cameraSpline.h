@@ -80,7 +80,10 @@ public:
 
    F32 advanceTime(F32 t, S32 delta_ms);
    F32 advanceDist(F32 t, F32 meters);
-   void value(F32 t, Knot *result, bool skip_rotation=false);
+//Walkable Shapes   
+//   void value(F32 t, Knot *result, bool skip_rotation=false);
+   void value(F32 t, Knot *result, bool skip_rotation=false, bool skip_ease=false);
+//Walkable Shapes
 
    F32 getDistance(F32 t);
    F32 getTime(F32 d);

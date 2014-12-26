@@ -145,6 +145,26 @@ datablock ParticleEmitterData(TurretFireSmokeEmitter)
    orientParticles   = "0";
 };
 
+datablock ItemData(BulletAmmo)
+{
+   // Mission editor category
+   category = "Ammo";
+
+   // Add the Ammo namespace as a parent.  The ammo namespace provides
+   // common ammo related functions and hooks into the inventory system.
+   className = "Ammo";
+
+   // Basic Item properties
+   shapeFile = "art/shapes/weapons/Lurker/TP_Lurker.DAE";
+   mass = 1;
+   elasticity = 0.2;
+   friction = 0.6;
+
+   // Dynamic properties defined by the scripts
+   pickUpName = "Cheetah ammo";
+   maxInventory = 1000;
+};
+
 datablock ShapeBaseImageData(TurretImage)
 {
    // Basic Item properties

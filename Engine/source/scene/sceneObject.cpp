@@ -141,6 +141,9 @@ SceneObject::SceneObject()
 
    mObjectFlags.set( RenderEnabledFlag | SelectionEnabledFlag );
    mIsScopeAlways = false;
+//Walkable Shapes
+   mAttachedToObj = NULL;
+//Walkable Shapes
 }
 
 //-----------------------------------------------------------------------------
@@ -406,7 +409,7 @@ void SceneObject::setTransform( const MatrixF& mat )
 
 void SceneObject::setScale( const VectorF &scale )
 {
-	AssertFatal( !mIsNaN( scale ), "SceneObject::setScale() - The scale is NaN!" );
+   AssertFatal( !mIsNaN( scale ), "SceneObject::setScale() - The scale is NaN!" );
 
    // Avoid unnecessary scaling operations.
    if ( mObjScale.equal( scale ) )
@@ -897,7 +900,7 @@ Point3F SceneObject::getRenderPosition() const
 
 void SceneObject::setPosition(const Point3F &pos)
 {
-	AssertFatal( !mIsNaN( pos ), "SceneObject::setPosition() - The position is NaN!" );
+   AssertFatal( !mIsNaN( pos ), "SceneObject::setPosition() - The position is NaN!" );
 
    MatrixF xform = mObjToWorld;
    xform.setColumn(3, pos);
@@ -1178,6 +1181,15 @@ void SceneObject::getRenderMountTransform( F32 delta, S32 index, const MatrixF &
    outMat->mul( mRenderObjToWorld, mountTransform );
 }
 
+//Walkable Shapes
+//-----------------------------------------------------------------------------
+
+void SceneObject::getRelativeOrientation(SceneObject *attachedObj, Point3F &relPos, Point3F &relRot)
+{
+   relPos = relRot = Point3F::Zero;
+}
+
+//Walkable Shapes
 //=============================================================================
 //    Console API.
 //=============================================================================
