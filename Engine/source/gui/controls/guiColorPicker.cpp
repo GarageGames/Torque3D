@@ -22,6 +22,7 @@
 #include "console/console.h"
 #include "gfx/gfxDevice.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiCanvas.h"
 #include "gui/buttons/guiButtonCtrl.h"
 #include "gui/core/guiDefaultControlRender.h"
@@ -524,24 +525,17 @@ void GuiColorPickerCtrl::setScriptValue(const char *value)
    setValue(newValue);
 }
 
-ConsoleMethod(GuiColorPickerCtrl, getSelectorPos, const char*, 2, 2, "Gets the current position of the selector")
+DefineConsoleMethod(GuiColorPickerCtrl, getSelectorPos, Point2I, (), , "Gets the current position of the selector")
 {
-   static const U32 bufSize = 256;
-   char *temp = Con::getReturnBuffer(bufSize);
-   Point2I pos;
-   pos = object->getSelectorPos();
-   dSprintf(temp,bufSize,"%d %d",pos.x, pos.y); 
-   return temp;
+   return object->getSelectorPos();
 }
 
-ConsoleMethod(GuiColorPickerCtrl, setSelectorPos, void, 3, 3, "Sets the current position of the selector")
+DefineConsoleMethod(GuiColorPickerCtrl, setSelectorPos, void, (Point2I newPos), , "Sets the current position of the selector")
 {
-   Point2I newPos;
-   dSscanf(argv[2], "%d %d", &newPos.x, &newPos.y);
    object->setSelectorPos(newPos);
 }
 
-ConsoleMethod(GuiColorPickerCtrl, updateColor, void, 2, 2, "Forces update of pick color")
+DefineConsoleMethod(GuiColorPickerCtrl, updateColor, void, (), , "Forces update of pick color")
 {
 	object->updateColor();
 }

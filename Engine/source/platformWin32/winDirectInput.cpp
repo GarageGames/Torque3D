@@ -25,6 +25,7 @@
 #include "platformWin32/winDInputDevice.h"
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "sim/actionMap.h"
 
 #include <xinput.h>
@@ -768,37 +769,34 @@ void DInputManager::processXInput( void )
          mXInputStateReset = false;
    }
 }
-ConsoleFunction( enableJoystick, bool, 1, 1, "()"
+DefineConsoleFunction( enableJoystick, bool, (), , "()"
              "@brief Enables use of the joystick.\n\n"
              "@note DirectInput must be enabled and active to use this function.\n\n"
              "@ingroup Input")
 {
-   argc; argv;
    return( DInputManager::enableJoystick() );
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( disableJoystick, void, 1, 1,"()"
+DefineConsoleFunction( disableJoystick, void, (), , "()"
              "@brief Disables use of the joystick.\n\n"
              "@note DirectInput must be enabled and active to use this function.\n\n"
              "@ingroup Input")
 {
-   argc; argv;
    DInputManager::disableJoystick();
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( isJoystickEnabled, bool, 1, 1, "()"
+DefineConsoleFunction( isJoystickEnabled, bool, (), , "()"
 				"@brief Queries input manager to see if a joystick is enabled\n\n"
 				"@return 1 if a joystick exists and is enabled, 0 if it's not.\n"
 				"@ingroup Input")
 {
-   argc; argv;
    return DInputManager::isJoystickEnabled();
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( enableXInput, bool, 1, 1, "()"
+DefineConsoleFunction( enableXInput, bool, (), , "()"
             "@brief Enables XInput for Xbox 360 controllers.\n\n"
             "@note XInput is enabled by default. Disable to use an Xbox 360 "
             "Controller as a joystick device.\n\n"
@@ -809,21 +807,19 @@ ConsoleFunction( enableXInput, bool, 1, 1, "()"
    // DLL. You would want to disable it if you have 360 controllers and want to
    // read them as joysticks... why you'd want to do that is beyond me
 
-   argc; argv;
    return( DInputManager::enableXInput() );
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( disableXInput, void, 1, 1, "()"
+DefineConsoleFunction( disableXInput, void, (), , "()"
             "@brief Disables XInput for Xbox 360 controllers.\n\n"
             "@ingroup Input")
 {
-   argc; argv;
    DInputManager::disableXInput();
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( resetXInput, void, 1, 1, "()"
+DefineConsoleFunction( resetXInput, void, (), , "()"
             "@brief Rebuilds the XInput section of the InputManager\n\n"
             "Requests a full refresh of events for all controllers. Useful when called at the beginning "
             "of game code after actionMaps are set up to hook up all appropriate events.\n\n"
@@ -834,28 +830,26 @@ ConsoleFunction( resetXInput, void, 1, 1, "()"
    // at the beginning of your game code after your actionMap is set up to hook
    // all of the appropriate events
 
-   argc; argv;
    DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
    if ( mgr && mgr->isEnabled() ) 
       mgr->resetXInput();
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( isXInputConnected, bool, 2, 2, "( int controllerID )"
+DefineConsoleFunction( isXInputConnected, bool, (S32 controllerID), , "( int controllerID )"
 				"@brief Checks to see if an Xbox 360 controller is connected\n\n"
 				"@param controllerID Zero-based index of the controller to check.\n"
             "@return 1 if the controller is connected, 0 if it isn't, and 205 if XInput "
             "hasn't been initialized."
 				"@ingroup Input")
 {
-   argc; argv;
    DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
-   if ( mgr && mgr->isEnabled() ) return mgr->isXInputConnected( atoi( argv[1] ) );
+   if ( mgr && mgr->isEnabled() ) return mgr->isXInputConnected( controllerID );
    return false;
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( getXInputState, S32, 3, 4, "( int controllerID, string property, bool current )"
+DefineConsoleFunction( getXInputState, int, (S32 controllerID, const char * properties, bool current), (false), "( int controllerID, string property, bool currentD )"
 				"@brief Queries the current state of a connected Xbox 360 controller.\n\n"
             "XInput Properties:\n\n"
             " - XI_THUMBLX, XI_THUMBLY - X and Y axes of the left thumbstick. \n"
@@ -874,7 +868,6 @@ ConsoleFunction( getXInputState, S32, 3, 4, "( int controllerID, string property
             "@return %Trigger queried - Int from 0 to 255 representing how far the trigger is displaced."
             "@ingroup Input")
 {
-   argc; argv;
    DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
 
    if ( !mgr || !mgr->isEnabled() ) 
@@ -883,9 +876,9 @@ ConsoleFunction( getXInputState, S32, 3, 4, "( int controllerID, string property
    // Use a little bit of macro magic to simplify this otherwise monolothic
    // block of code.
 #define GET_XI_STATE(constName) \
-   if (!dStricmp(argv[2], #constName)) \
-      return mgr->getXInputState( dAtoi( argv[1] ), constName, ( dAtoi ( argv[3] ) == 1) );
-   
+   if (!dStricmp(properties, #constName)) \
+      return mgr->getXInputState( controllerID, constName, ( current ));
+
    GET_XI_STATE(XI_THUMBLX);
    GET_XI_STATE(XI_THUMBLY);
    GET_XI_STATE(XI_THUMBRX);
@@ -912,11 +905,10 @@ ConsoleFunction( getXInputState, S32, 3, 4, "( int controllerID, string property
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( echoInputState, void, 1, 1, "()"
+DefineConsoleFunction( echoInputState, void, (), , "()"
             "@brief Prints information to the console stating if DirectInput and a Joystick are enabled and active.\n\n"
             "@ingroup Input")
 {
-   argc; argv;
    DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
    if ( mgr && mgr->isEnabled() )
    {
@@ -929,7 +921,7 @@ ConsoleFunction( echoInputState, void, 1, 1, "()"
       Con::printf( "DirectInput is not enabled." );
 }
 
-ConsoleFunction( rumble, void, 4, 4, "(string device, float xRumble, float yRumble)"
+DefineConsoleFunction( rumble, void, (const char * device, F32 xRumble, F32 yRumble), , "(string device, float xRumble, float yRumble)"
       "@brief Activates the vibration motors in the specified controller.\n\n"
       "The controller will constantly at it's xRumble and yRumble intensities until "
       "changed or told to stop."
@@ -944,7 +936,7 @@ ConsoleFunction( rumble, void, 4, 4, "(string device, float xRumble, float yRumb
    DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
    if ( mgr && mgr->isEnabled() )
    {
-      mgr->rumble(argv[1], dAtof(argv[2]), dAtof(argv[3]));
+      mgr->rumble(device, xRumble, yRumble);
    }
    else
    {

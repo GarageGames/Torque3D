@@ -42,6 +42,7 @@ namespace KeyCmp
 #include "core/util/tVector.h"
 #include "core/dataChunker.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 
 #include "math/mMathFn.h"
 
@@ -476,15 +477,18 @@ static U32 sgStringMemBytes;
 /// Tracks the number of Strings which are currently instantiated.
 static U32 sgStringInstances;
 
-ConsoleFunction( dumpStringMemStats, void, 1, 1, "()"
+
+
+#endif
+DefineConsoleFunction( dumpStringMemStats, void, (), , "()"
 				"@brief Dumps information about String memory usage\n\n"
 				"@ingroup Debugging\n"
 				"@ingroup Strings\n")
 {
+#ifdef TORQUE_DEBUG
    Con::printf( "String Data: %i instances, %i bytes", sgStringInstances, sgStringMemBytes );
-}
-
 #endif
+}
 
 //-----------------------------------------------------------------------------
 

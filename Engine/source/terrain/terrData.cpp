@@ -48,6 +48,7 @@
 #include "T3D/physics/physicsCollision.h"
 #include "console/engineAPI.h"
 
+#include "console/engineAPI.h"
 using namespace Torque;
 
 IMPLEMENT_CO_NETOBJECT_V1(TerrainBlock);
@@ -141,36 +142,28 @@ ConsoleDocFragment _getTerrainUnderWorldPoint2(
    "bool getTerrainUnderWorldPoint( F32 x, F32 y, F32 z);"
 );
 
-ConsoleFunction(getTerrainUnderWorldPoint, S32, 2, 4, "(Point3F x/y/z) Gets the terrain block that is located under the given world point.\n"
+DefineConsoleFunction( getTerrainUnderWorldPoint, S32, (const char* ptOrX, const char* y, const char* z), ("", ""),
+                                                      "(Point3F x/y/z) Gets the terrain block that is located under the given world point.\n"
                                                       "@param x/y/z The world coordinates (floating point values) you wish to query at. " 
                                                       "These can be formatted as either a string (\"x y z\") or separately as (x, y, z)\n"
                                                       "@return Returns the ID of the requested terrain block (0 if not found).\n\n"
-													  "@hide")
+                                                      "@hide")
 {
    Point3F pos;
-   if(argc == 2)
-      dSscanf(argv[1], "%f %f %f", &pos.x, &pos.y, &pos.z);
-   else if(argc == 4)
+   if(!dStrIsEmpty(ptOrX) && dStrIsEmpty(y) && dStrIsEmpty(z))
+      dSscanf(ptOrX, "%f %f %f", &pos.x, &pos.y, &pos.z);
+   else if(!dStrIsEmpty(ptOrX) && !dStrIsEmpty(y) && !dStrIsEmpty(z))
    {
-      pos.x = dAtof(argv[1]);
-      pos.y = dAtof(argv[2]);
-      pos.z = dAtof(argv[3]);
+      pos.x = dAtof(ptOrX);
+      pos.y = dAtof(y);
+      pos.z = dAtof(z);
    }
-
-   else
-   {
-      Con::errorf("getTerrainUnderWorldPoint(Point3F): Invalid argument count! Valid arguments are either \"x y z\" or x,y,z\n");
-      return 0;
-   }
-
    TerrainBlock* terrain = getTerrainUnderWorldPoint(pos);
    if(terrain != NULL)
    {
       return terrain->getId();
    }
-
    return 0;
-
 }
 
 
@@ -1326,32 +1319,31 @@ ConsoleDocFragment _getTerrainHeight2(
    "bool getTerrainHeight( F32 x, F32 y);"
 );
 
-ConsoleFunction(getTerrainHeight, F32, 2, 3, "(Point2 pos) - gets the terrain height at the specified position."
+DefineConsoleFunction( getTerrainHeight, F32, (const char* ptOrX, const char* y), (""), "(Point2 pos) - gets the terrain height at the specified position."
 				"@param pos The world space point, minus the z (height) value\n Can be formatted as either (\"x y\") or (x,y)\n"
 				"@return Returns the terrain height at the given point as an F32 value.\n"
 				"@hide")
 {
-	Point2F pos;
-	F32 height = 0.0f;
+   F32 height = 0.0f;
 
-	if(argc == 2)
-		dSscanf(argv[1],"%f %f",&pos.x,&pos.y);
-	else if(argc == 3)
-	{
-		pos.x = dAtof(argv[1]);
-		pos.y = dAtof(argv[2]);
-	}
+   Point2F pos;
+   if(!dStrIsEmpty(ptOrX) && dStrIsEmpty(y))
+      dSscanf(ptOrX, "%f %f", &pos.x, &pos.y);
+   else if(!dStrIsEmpty(ptOrX) && !dStrIsEmpty(y))
+   {
+      pos.x = dAtof(ptOrX);
+      pos.y = dAtof(y);
+   }
 
-	TerrainBlock * terrain = getTerrainUnderWorldPoint(Point3F(pos.x, pos.y, 5000.0f));
-	if(terrain)
-		if(terrain->isServerObject())
-		{
-			Point3F offset;
-			terrain->getTransform().getColumn(3, &offset);
-			pos -= Point2F(offset.x, offset.y);
-			terrain->getHeight(pos, &height);
-		}
-		return height;
+   TerrainBlock * terrain = getTerrainUnderWorldPoint(Point3F(pos.x, pos.y, 5000.0f));
+   if(terrain && terrain->isServerObject())
+   {
+      Point3F offset;
+      terrain->getTransform().getColumn(3, &offset);
+      pos -= Point2F(offset.x, offset.y);
+      terrain->getHeight(pos, &height);
+   }
+   return height;
 }
 
 ConsoleDocFragment _getTerrainHeightBelowPosition1(
@@ -1372,28 +1364,23 @@ ConsoleDocFragment _getTerrainHeightBelowPosition2(
    "bool getTerrainHeightBelowPosition( F32 x, F32 y);"
 );
 
-ConsoleFunction(getTerrainHeightBelowPosition, F32, 2, 4, "(Point3F pos) - gets the terrain height at the specified position."
+DefineConsoleFunction( getTerrainHeightBelowPosition, F32, (const char* ptOrX, const char* y, const char* z), ("", ""),
+            "(Point3F pos) - gets the terrain height at the specified position."
 				"@param pos The world space point. Can be formatted as either (\"x y z\") or (x,y,z)\n"
 				"@note This function is useful if you simply want to grab the terrain height underneath an object.\n"
 				"@return Returns the terrain height at the given point as an F32 value.\n"
 				"@hide")
 {
-	Point3F pos;
 	F32 height = 0.0f;
 
-   if(argc == 2)
-      dSscanf(argv[1], "%f %f %f", &pos.x, &pos.y, &pos.z);
-   else if(argc == 4)
+   Point3F pos;
+   if(!dStrIsEmpty(ptOrX) && dStrIsEmpty(y) && dStrIsEmpty(z))
+      dSscanf(ptOrX, "%f %f %f", &pos.x, &pos.y, &pos.z);
+   else if(!dStrIsEmpty(ptOrX) && !dStrIsEmpty(y) && !dStrIsEmpty(z))
    {
-      pos.x = dAtof(argv[1]);
-      pos.y = dAtof(argv[2]);
-      pos.z = dAtof(argv[3]);
-   }
-
-   else
-   {
-      Con::errorf("getTerrainHeightBelowPosition(Point3F): Invalid argument count! Valid arguments are either \"x y z\" or x,y,z\n");
-      return 0;
+      pos.x = dAtof(ptOrX);
+      pos.y = dAtof(y);
+      pos.z = dAtof(z);
    }
 
 	TerrainBlock * terrain = getTerrainUnderWorldPoint(pos);

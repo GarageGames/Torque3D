@@ -34,6 +34,7 @@
 #include "materials/materialManager.h"
 #include "math/util/sphereMesh.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "scene/sceneRenderState.h"
 #include "gfx/gfxCardProfile.h"
 #include "gfx/gfxTextureProfile.h"
@@ -645,7 +646,7 @@ LightShadowMap* AdvancedLightManager::findShadowMapForObject( SimObject *object 
    return sceneLight->getLight()->getExtended<ShadowMapParams>()->getShadowMap();
 }
 
-ConsoleFunction( setShadowVizLight, const char*, 2, 2, "" )
+DefineConsoleFunction( setShadowVizLight, const char*, (const char* name), (""), "")
 {
    static const String DebugTargetName( "AL_ShadowVizTexture" );
 
@@ -658,7 +659,7 @@ ConsoleFunction( setShadowVizLight, const char*, 2, 2, "" )
       return 0;
 
    SimObject *object;
-   Sim::findObject( argv[1], object );
+   Sim::findObject( name, object );
    LightShadowMap *lightShadowMap = lm->findShadowMapForObject( object );
    if ( !lightShadowMap || !lightShadowMap->getTexture() )
       return 0;

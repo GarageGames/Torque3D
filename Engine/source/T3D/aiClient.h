@@ -70,6 +70,8 @@ class AIClient : public AIConnection {
 		
 		DECLARE_CONOBJECT( AIClient );
 
+	   DECLARE_CALLBACK( void, onConnect, (const char* idString) );
+
 		enum {
 			ModeStop = 0,
 			ModeMove,

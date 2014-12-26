@@ -258,15 +258,12 @@ static ConsoleDocFragment _MessageVectordump2(
    "MessageVector",
    "void dump( string filename, string header);");
 
-ConsoleMethod( MessageVector, dump, void, 3, 4, "(string filename, string header=NULL)"
+DefineConsoleMethod( MessageVector, dump, void, (const char * filename, const char * header), (""), "(string filename, string header=NULL)"
               "Dump the message vector to a file, optionally prefixing a header."
 			  "@hide")
 {
 
-   if ( argc == 4 )
-      object->dump( argv[2], argv[3] );
-   else
-      object->dump( argv[2] );
+   object->dump( filename, header );
 }
 
 DefineEngineMethod( MessageVector, getNumLines, S32, (),,

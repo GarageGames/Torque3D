@@ -26,6 +26,7 @@
 #include "platformWin32/winDirectInput.h"
 #include "windowManager/win32/win32Window.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "math/mRandom.h"
 #include "core/stream/fileStream.h"
 #include "T3D/resource.h"
@@ -603,9 +604,8 @@ bool Platform::setLoginPassword( const char* password )
 //       as commentary on Koreans as a nationality. Thank you for your
 //       attention.
 //--------------------------------------
-ConsoleFunction( isKoreanBuild, bool, 1, 1, "isKoreanBuild()" )
+DefineConsoleFunction( isKoreanBuild, bool, ( ), , "isKoreanBuild()")
 {
-   argc; argv;
    HKEY regKey;
    bool result = false;
    if ( RegOpenKeyEx( HKEY_LOCAL_MACHINE, TorqueRegKey, 0, KEY_QUERY_VALUE, &regKey ) == ERROR_SUCCESS )
