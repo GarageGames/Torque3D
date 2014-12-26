@@ -43,6 +43,7 @@
 #include "math/mTransform.h"
 #include "T3D/gameBase/gameProcess.h"
 #include "T3D/gameBase/gameConnection.h"
+#include "T3D/accumulationVolume.h"
 
 IMPLEMENT_CONOBJECT(SceneObject);
 
@@ -141,6 +142,8 @@ SceneObject::SceneObject()
 
    mObjectFlags.set( RenderEnabledFlag | SelectionEnabledFlag );
    mIsScopeAlways = false;
+
+   mAccuTex = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -152,6 +155,7 @@ SceneObject::~SceneObject()
    AssertFatal( !mSceneObjectLinks,
       "SceneObject::~SceneObject() - object is still linked to SceneTrackers" );
 
+   mAccuTex = NULL;
    unlink();
 }
 
