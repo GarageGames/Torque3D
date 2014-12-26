@@ -48,6 +48,7 @@
 #include "materials/materialFeatureData.h"
 #include "materials/materialFeatureTypes.h"
 #include "console/engineAPI.h"
+#include "T3D/accumulationVolume.h"
 
 using namespace Torque;
 
@@ -198,10 +199,10 @@ void TSStatic::initPersistFields()
    endGroup("Collision");
 
    addGroup( "AlphaFade" );  
-      addField( "Alpha Fade Enable",   TypeBool,   Offset(mUseAlphaFade,    TSStatic), "Turn on/off Alpha Fade" );  
-      addField( "Alpha Fade Start",    TypeF32,    Offset(mAlphaFadeStart,  TSStatic), "Distance of start Alpha Fade" );  
-      addField( "Alpha Fade End",      TypeF32,    Offset(mAlphaFadeEnd,    TSStatic), "Distance of end Alpha Fade" );  
-      addField( "Alpha Fade Inverse", TypeBool,    Offset(mInvertAlphaFade, TSStatic), "Invert Alpha Fade's Start & End Distance" );  
+      addField( "alphaFadeEnable",   TypeBool,   Offset(mUseAlphaFade,    TSStatic), "Turn on/off Alpha Fade" );  
+      addField( "alphaFadeStart",    TypeF32,    Offset(mAlphaFadeStart,  TSStatic), "Distance of start Alpha Fade" );  
+      addField( "alphaFadeEnd",      TypeF32,    Offset(mAlphaFadeEnd,    TSStatic), "Distance of end Alpha Fade" );  
+      addField( "alphaFadeInverse", TypeBool,    Offset(mInvertAlphaFade, TSStatic), "Invert Alpha Fade's Start & End Distance" );  
    endGroup( "AlphaFade" );
 
    addGroup("Debug");
@@ -292,6 +293,13 @@ bool TSStatic::onAdd()
    addToScene();
 
    _updateShouldTick();
+
+   // Accumulation
+   if ( isClientObject() && mShapeInstance )
+   {
+      if ( mShapeInstance->hasAccumulation() ) 
+         AccumulationVolume::addObject(this);
+   }
 
    return true;
 }
@@ -402,6 +410,13 @@ void TSStatic::_updatePhysics()
 void TSStatic::onRemove()
 {
    SAFE_DELETE( mPhysicsRep );
+
+   // Accumulation
+   if ( isClientObject() && mShapeInstance )
+   {
+      if ( mShapeInstance->hasAccumulation() ) 
+         AccumulationVolume::removeObject(this);
+   }
 
    mConvexList->nukeList();
 
@@ -562,6 +577,9 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    rdata.setFadeOverride( 1.0f );
    rdata.setOriginSort( mUseOriginSort );
 
+   // Acculumation
+   rdata.setAccuTex(mAccuTex);
+
    // If we have submesh culling enabled then prepare
    // the object space frustum to pass to the shape.
    Frustum culler;
@@ -648,6 +666,13 @@ void TSStatic::setTransform(const MatrixF & mat)
 
    if ( mPhysicsRep )
       mPhysicsRep->setTransform( mat );
+
+   // Accumulation
+   if ( isClientObject() && mShapeInstance )
+   {
+      if ( mShapeInstance->hasAccumulation() ) 
+         AccumulationVolume::updateObject(this);
+   }
 
    // Since this is a static it's render transform changes 1
    // to 1 with it's collision transform... no interpolation.

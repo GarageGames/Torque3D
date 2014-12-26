@@ -207,10 +207,6 @@ struct ServerFilter
       Favorites   = 3,
    };
 
-   Type  type;
-   char* gameType;
-   char* missionType;
-
    enum // Query Flags
    {
       OnlineQuery       = 0,        // Authenticated with master
@@ -226,17 +222,21 @@ struct ServerFilter
       CurrentVersion    = BIT(7),
       NotXenon          = BIT(6)
    };
-
+   
+   //Rearranging the fields according to their sizes
+   char* gameType;
+   char* missionType;
    U8    queryFlags;
    U8    minPlayers;
    U8    maxPlayers;
    U8    maxBots;
+   U8    filterFlags;
+   U8    buddyCount;
+   U16   minCPU;
    U32   regionMask;
    U32   maxPing;
-   U8    filterFlags;
-   U16   minCPU;
-   U8    buddyCount;
    U32*  buddyList;
+   Type  type;
 
    ServerFilter()
    {
@@ -432,7 +432,7 @@ DefineConsoleFunction( queryAllServers
       maxBots,regionMask,maxPing,minCPU,filterFlags,0,&buddyList);
 
    queryLanServers(lanPort, flags, gameType, missionType, minPlayers, maxPlayers, maxBots,
-	   regionMask, maxPing, minCPU, filterFlags);
+      regionMask, maxPing, minCPU, filterFlags);
    dFree(gameType);
    dFree(missionType);
 
@@ -456,7 +456,7 @@ DefineConsoleFunction( queryLanServers
 
    clearServerList();
    queryLanServers(lanPort, flags, gameType, missionType, minPlayers, maxPlayers, maxBots,
-	   regionMask, maxPing, minCPU, filterFlags);
+      regionMask, maxPing, minCPU, filterFlags);
 
 }
 

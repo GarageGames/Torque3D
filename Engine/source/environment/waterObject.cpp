@@ -891,6 +891,10 @@ void WaterObject::onRemove()
    {
       mPlaneReflector.unregisterReflector();
       cleanupMaterials();
+
+      PostEffect *underWaterEffect = getUnderwaterEffect( );
+      if( underWaterEffect )
+         underWaterEffect->disable( );
    }
 
    Parent::onRemove();

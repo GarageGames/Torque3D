@@ -399,64 +399,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
          mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mModelViewProjSC, *ri->modelViewProj );
       }
 
-      // We want to turn everything into variation on a pre-multiplied alpha blend
-      F32 alphaFactor = 0.0f, alphaScale = 1.0f;
-      switch(ri->blendStyle)
-      {
-         // SrcAlpha, InvSrcAlpha
-      case ParticleRenderInst::BlendNormal:
-         alphaFactor = 1.0f;
-         break;
-
-         // SrcAlpha, One
-      case ParticleRenderInst::BlendAdditive:
-         alphaFactor = 1.0f;
-         alphaScale = 0.0f;
-         break;
-
-         // SrcColor, One
-      case ParticleRenderInst::BlendGreyscale:
-         alphaFactor = -1.0f;
-         alphaScale = 0.0f;
-         break;
-      }
-
-      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaFactorSC, alphaFactor );
-      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaScaleSC, alphaScale );
-
-      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mFSModelViewProjSC, *ri->modelViewProj  );
-      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mOneOverFarSC, 1.0f / state->getFarPlane() );     
-
-      if ( mParticleShaderConsts.mOneOverSoftnessSC->isValid() )
-      {
-         F32 oneOverSoftness = 1.0f;
-         if ( ri->softnessDistance > 0.0f )
-            oneOverSoftness = 1.0f / ( ri->softnessDistance / state->getFarPlane() );
-         mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mOneOverSoftnessSC, oneOverSoftness );
-      }
-
-      GFX->setShader( mParticleShader );
-      GFX->setShaderConstBuffer( mParticleShaderConsts.mShaderConsts );
-
-      GFX->setTexture( mParticleShaderConsts.mSamplerDiffuse->getSamplerRegister(), ri->diffuseTex );
-
-      // Set up the prepass texture.
-      if ( mParticleShaderConsts.mPrePassTargetParamsSC->isValid() )
-      {
-         GFXTextureObject *texObject = mPrepassTarget ? mPrepassTarget->getTexture(0) : NULL;
-         GFX->setTexture( mParticleShaderConsts.mSamplerPrePassTex->getSamplerRegister(), texObject );
-
-         Point4F rtParams( 0.0f, 0.0f, 1.0f, 1.0f );
-         if ( texObject )
-            ScreenSpace::RenderTargetParameters(texObject->getSize(), mPrepassTarget->getViewport(), rtParams);
-
-         mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mPrePassTargetParamsSC, rtParams );
-      }
-
-      GFX->setPrimitiveBuffer( *ri->primBuff );
-      GFX->setVertexBuffer( *ri->vertBuff );
-
-      GFX->drawIndexedPrimitive( GFXTriangleList, 0, 0, ri->count * 4, 0, ri->count * 2 );
+      renderParticle(ri, state);
    }
    else if(ri->systemState == PSS_AwaitingCompositeDraw)
    {
@@ -494,9 +437,9 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       }
       else
       {
-         AssertWarn(false, "No edge texture target defined, if you want to use mixed particle"
+         AssertFatal(false, "No edge texture target defined, if you want to use mixed particle"
             "rendering, then make sure that the EdgeDetectPostEffect is enabled.");
-         ri->systemState == PSS_AwaitingHighResDraw;
+         ri->systemState = PSS_AwaitingHighResDraw;
          return;
       }
 
@@ -528,6 +471,68 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       // Mark this system as having been composited this frame
       systemEntry.drawnThisFrame = true;
    }
+}
+
+void RenderParticleMgr::renderParticle(ParticleRenderInst* ri, SceneRenderState* state)
+{
+   // We want to turn everything into variation on a pre-multiplied alpha blend
+   F32 alphaFactor = 0.0f, alphaScale = 1.0f;
+   switch(ri->blendStyle)
+   {
+      // SrcAlpha, InvSrcAlpha
+   case ParticleRenderInst::BlendNormal:
+      alphaFactor = 1.0f;
+      break;
+
+      // SrcAlpha, One
+   case ParticleRenderInst::BlendAdditive:
+      alphaFactor = 1.0f;
+      alphaScale = 0.0f;
+      break;
+
+      // SrcColor, One
+   case ParticleRenderInst::BlendGreyscale:
+      alphaFactor = -1.0f;
+      alphaScale = 0.0f;
+      break;
+   }
+
+   mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaFactorSC, alphaFactor );
+   mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaScaleSC, alphaScale );
+
+   mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mFSModelViewProjSC, *ri->modelViewProj  );
+   mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mOneOverFarSC, 1.0f / state->getFarPlane() );     
+
+   if ( mParticleShaderConsts.mOneOverSoftnessSC->isValid() )
+   {
+      F32 oneOverSoftness = 1.0f;
+      if ( ri->softnessDistance > 0.0f )
+         oneOverSoftness = 1.0f / ( ri->softnessDistance / state->getFarPlane() );
+      mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mOneOverSoftnessSC, oneOverSoftness );
+   }
+
+   GFX->setShader( mParticleShader );
+   GFX->setShaderConstBuffer( mParticleShaderConsts.mShaderConsts );
+
+      GFX->setTexture( mParticleShaderConsts.mSamplerDiffuse->getSamplerRegister(), ri->diffuseTex );
+
+   // Set up the prepass texture.
+   if ( mParticleShaderConsts.mPrePassTargetParamsSC->isValid() )
+   {
+      GFXTextureObject *texObject = mPrepassTarget ? mPrepassTarget->getTexture(0) : NULL;
+         GFX->setTexture( mParticleShaderConsts.mSamplerPrePassTex->getSamplerRegister(), texObject );
+
+      Point4F rtParams( 0.0f, 0.0f, 1.0f, 1.0f );
+      if ( texObject )
+         ScreenSpace::RenderTargetParameters(texObject->getSize(), mPrepassTarget->getViewport(), rtParams);
+
+      mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mPrePassTargetParamsSC, rtParams );
+   }
+
+   GFX->setPrimitiveBuffer( *ri->primBuff );
+   GFX->setVertexBuffer( *ri->vertBuff );
+
+   GFX->drawIndexedPrimitive( GFXTriangleList, 0, 0, ri->count * 4, 0, ri->count * 2 );
 }
 
 bool RenderParticleMgr::_initShader()

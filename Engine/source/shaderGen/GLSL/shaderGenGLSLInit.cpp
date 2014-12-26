@@ -32,6 +32,7 @@
 #include "shaderGen/GLSL/paraboloidGLSL.h"
 #include "materials/materialFeatureTypes.h"
 #include "core/module.h"
+#include "shaderGen/GLSL/accuFeatureGLSL.h"
 
 
 static ShaderGen::ShaderGenInitDelegate sInitDelegate;
@@ -62,6 +63,7 @@ void _initShaderGenGLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_CubeMap, new ReflectCubeFeatGLSL );
    FEATUREMGR->registerFeature( MFT_PixSpecular, new PixelSpecularGLSL );
    FEATUREMGR->registerFeature( MFT_SpecularMap, new SpecularMapGLSL );
+   FEATUREMGR->registerFeature( MFT_AccuMap, new AccuTexFeatGLSL );
    FEATUREMGR->registerFeature( MFT_GlossMap, new NamedFeatureGLSL( "Gloss Map" ) );
    FEATUREMGR->registerFeature( MFT_IsTranslucent, new NamedFeatureGLSL( "Translucent" ) );
    FEATUREMGR->registerFeature( MFT_Visibility, new VisibilityFeatGLSL );

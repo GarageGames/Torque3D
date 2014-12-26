@@ -133,6 +133,7 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
    }
 
    HWND hWindow = pWindow->getHWND();
+   SetMenu(hWindow, hWindowMenu);
    DrawMenuBar(hWindow);
 
 }
@@ -165,6 +166,7 @@ void MenuBar::removeFromCanvas()
    }
 
    HWND hWindow = pWindow->getHWND();
+   SetMenu(hWindow, NULL);
    DrawMenuBar(hWindow);
 
    mCanvas = NULL;

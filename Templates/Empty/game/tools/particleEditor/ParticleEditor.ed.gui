@@ -442,7 +442,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            text = "";
                         };
                      };
-                     
+                        
                      new GuiControl(){ // Spacer ----------------------------
                         isContainer = "1"; HorizSizing = "width"; Position = "0 0"; Extent = "194 8";
                         new GuiBitmapCtrl(){
@@ -541,6 +541,33 @@ $PE_guielement_ext_colorpicker = "18 18";
                            position = $PE_guielement_pos_value;
                            Extent = $PE_guielement_ext_value;
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateAmountFields( true, $ThisControl.getValue() );";
+                        };
+                     };
+                     
+                     new GuiControl(){ // Particle glow
+                        isContainer = "1";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        Position = $PE_guielement_pos_single_container ;
+                        Extent = $PE_guielement_ext_single_container ;
+                        
+                        new GuiTextCtrl() {
+                           Profile = "ToolsGuiTextProfile";
+                           HorizSizing = "width";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_name;
+                           Extent = $PE_guielement_ext_checkbox_name;
+                           text = "Glow";
+                        };
+                        new GuiCheckBoxCtrl() {
+                           internalName = "PEE_glow";
+                           Profile = "ToolsGuiCheckBoxProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_checkbox;
+                           Extent = $PE_guielement_ext_checkbox;
+                           Command = "PE_EmitterEditor.updateEmitter( \"glow\", $ThisControl.getValue());";
+                           text = "";
                         };
                      };
                   };// end stack

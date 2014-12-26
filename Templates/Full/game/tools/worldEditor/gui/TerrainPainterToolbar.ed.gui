@@ -210,7 +210,7 @@
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
-         position = "250 3";
+         position = "270 3";
          Extent = "2 26";
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
@@ -222,7 +222,7 @@
          Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
-         Position = "242 5";
+         Position = "262 5";
          Extent = "256 50";
          MinExtent = "8 2";
          canSave = "1";
@@ -370,7 +370,7 @@
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
-         position = "495 3";
+         position = "525 3";
          Extent = "2 26";
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
@@ -382,7 +382,7 @@
          Profile = "ToolsGuiTransparentProfile";
          HorizSizing = "right";
          VertSizing = "bottom";
-         position = "510 5";
+         position = "540 5";
          Extent = "120 50";
          MinExtent = "8 2";
          canSave = "1";
@@ -454,53 +454,6 @@
             bitmap = "tools/gui/images/dropslider";
          }; 
       };
-	  
-      new GuiBitmapCtrl() {
-         Enabled = "1";
-         Profile = "ToolsGuiDefaultProfile";
-         position = "618 3";
-         Extent = "2 26";
-         MinExtent = "1 1";
-         bitmap = "tools/gui/images/separator-h.png";
-      };
-	  
-      new GuiControl(LerpBlendCheckButtonContainer,EditorGuiGroup) {
-            position = "628 5";
-            extent = "70 50";
-            minExtent = "8 2";
-            horizSizing = "right";
-            vertSizing = "bottom";
-            profile = "ToolsGuiTransparentProfile";
-            visible = "1";
-            active = "1";
-            tooltipProfile = "GuiToolTipProfile";
-            hovertime = "1000";
-            isContainer = "1";
-            canSave = "1";
-            canSaveDynamicFields = "0";
-
-            new GuiCheckBoxCtrl() {
-               text = " LerpBlend";
-               groupNum = "-1";
-               buttonType = "ToggleButton";
-               useMouseEvents = "0";
-               position = "0 2";
-               extent = "140 18";
-               minExtent = "8 2";
-               horizSizing = "right";
-               vertSizing = "bottom";
-               profile = "GuiCheckBoxProfile";
-               visible = "1";
-               active = "1";
-               command = "ETerrainEditor.toggleBlendType($ThisControl);";
-               tooltipProfile = "GuiToolTipProfile";
-               hovertime = "1000";
-               isContainer = "0";
-               internalName = "LerpBlendCheckBox";
-               canSave = "1";
-               canSaveDynamicFields = "0";
-            };
-         };
    };
 };
 //--- OBJECT WRITE END ---
@@ -681,3 +634,4 @@ new GuiMouseEventCtrl(PaintBrushSoftnessSliderCtrlContainer,EditorGuiGroup) {
       value = "0";
    };
 };
+

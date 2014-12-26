@@ -468,6 +468,8 @@ public:
    bool traceOn;
 
    U32 mStackDepth;
+   bool mShouldReset; ///< Designates if the value stack should be reset
+   bool mResetLocked; ///< mShouldReset will be set at the end
 
    ExprEvalState();
    ~ExprEvalState();
