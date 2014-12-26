@@ -53,7 +53,8 @@ public:
    {
       Paint = 0,
       Erase,
-      EraseSelected
+      EraseSelected,
+	  DropToGround
    };
 
    ForestBrushTool();
@@ -61,6 +62,12 @@ public:
 
    // SimObject
    DECLARE_CONOBJECT( ForestBrushTool );
+
+    DECLARE_CALLBACK(void, onMouseDown, ());
+    DECLARE_CALLBACK(void, onActivated, ());
+    DECLARE_CALLBACK(void, onDeactivated, ());
+    DECLARE_CALLBACK(void, syncBrushToolbar, ());
+
    static void initPersistFields();
    virtual bool onAdd();
    virtual void onRemove();
@@ -90,6 +97,7 @@ protected:
    virtual void _action( const Point3F &point );
    virtual void _paint( const Point3F &point );
    virtual void _erase( const Point3F &point );
+   virtual void _DropToGround( const Point3F &point );
       
    bool _updateBrushPoint( const Gui3DMouseEvent &event_ );   
    virtual void _collectElements();

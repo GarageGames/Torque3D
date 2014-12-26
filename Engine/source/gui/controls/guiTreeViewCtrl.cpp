@@ -5058,15 +5058,13 @@ ConsoleMethod(GuiTreeViewCtrl, getSelectedObject, S32, 2, 3, "( int index=0 ) - 
    return -1;
 }
 
-ConsoleMethod(GuiTreeViewCtrl, getSelectedObjectList, const char*, 2, 2, 
-              "Returns a space sperated list of all selected object ids.")
+const char* GuiTreeViewCtrl::getSelectedObjectList()
 {
-   static const U32 bufSize = 1024;
-   char* buff = Con::getReturnBuffer(bufSize);
-   dSprintf(buff,bufSize,"");
+ char* buff = Con::getReturnBuffer(1024);
+   dSprintf(buff,1024,"");
 
-   const Vector< GuiTreeViewCtrl::Item* > selectedItems = object->getSelectedItems();
-   for(S32 i = 0; i < selectedItems.size(); i++)
+   const Vector< GuiTreeViewCtrl::Item* > selectedItems = this->getSelectedItems();
+   for(int i = 0; i < selectedItems.size(); i++)
    {
       GuiTreeViewCtrl::Item *item = selectedItems[i];
 
@@ -5078,7 +5076,7 @@ ConsoleMethod(GuiTreeViewCtrl, getSelectedObjectList, const char*, 2, 2,
          //the start of the buffer where we want to write
          char* buffPart = buff+len;
          //the size of the remaining buffer (-1 cause dStrlen doesn't count the \0)
-         S32 size = bufSize-len-1;
+         S32 size	=	1024-len-1;
          //write it:
          if(size < 1)
          {

@@ -454,6 +454,8 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       GuiTreeViewCtrl();
       virtual ~GuiTreeViewCtrl();
 
+		const char* getSelectedObjectList();
+
       /// Used for syncing the mSelected and mSelectedItems lists.
       void syncSelection();
 
