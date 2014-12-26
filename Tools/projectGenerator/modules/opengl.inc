@@ -45,8 +45,11 @@ beginModule('openGL');
     
 	addIncludePath( getAppLibSrcDir() . 'glew/include/' );
     
-	if ( T3D_Generator::$platform == "win32" )
-		addProjectLibInput('OpenGL32.lib');
+    if ( T3D_Generator::$platform == "win32" )
+    {
+        addProjectLibInput('OpenGL32.lib');
+        addProjectDefine('GLEW_STATIC');
+    }
 
 endModule();
 
