@@ -255,7 +255,11 @@ U8* GFXGLTextureObject::getTextureData( U32 mip )
    U8* data = new U8[dataSize];
    PRESERVE_TEXTURE(mBinding);
    glBindTexture(mBinding, mHandle);
-   glGetTexImage(mBinding, mip, GFXGLTextureFormat[mFormat], GFXGLTextureType[mFormat], data);
+
+   if( isCompressedFormat(mFormat) )
+      glGetCompressedTexImage( mBinding, mip, data );
+   else
+      glGetTexImage(mBinding, mip, GFXGLTextureFormat[mFormat], GFXGLTextureType[mFormat], data);
    return data;
 }
 
