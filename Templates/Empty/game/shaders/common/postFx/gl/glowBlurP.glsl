@@ -40,7 +40,7 @@ void main()
 {
    vec4 kernel = vec4( 0.175, 0.275, 0.375, 0.475 ) * 0.5f;
    
-   vec4 OUT_col = vec4(0);
+   OUT_col = vec4(0);
    OUT_col += texture( diffuseMap, uv0 ) * kernel.x;
    OUT_col += texture( diffuseMap, uv1 ) * kernel.y;
    OUT_col += texture( diffuseMap, uv2 ) * kernel.z;
