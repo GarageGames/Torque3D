@@ -243,12 +243,23 @@ void GFXGLTextureObject::bind(U32 textureUnit)
    mSampler = ssd;
 }
 
-U8* GFXGLTextureObject::getTextureData()
+U8* GFXGLTextureObject::getTextureData( U32 mip )
 {
-   U8* data = new U8[mTextureSize.x * mTextureSize.y * mBytesPerTexel];
+   AssertFatal( mMipLevels, "");
+   mip = (mip < mMipLevels) ? mip : 0;
+
+   const U32 dataSize = isCompressedFormat(mFormat) 
+       ? getCompressedSurfaceSize( mFormat, mTextureSize.x, mTextureSize.y, mip ) 
+       : (mTextureSize.x >> mip) * (mTextureSize.y >> mip) * mBytesPerTexel;
+
+   U8* data = new U8[dataSize];
    PRESERVE_TEXTURE(mBinding);
    glBindTexture(mBinding, mHandle);
-   glGetTexImage(mBinding, 0, GFXGLTextureFormat[mFormat], GFXGLTextureType[mFormat], data);
+
+   if( isCompressedFormat(mFormat) )
+      glGetCompressedTexImage( mBinding, mip, data );
+   else
+      glGetTexImage(mBinding, mip, GFXGLTextureFormat[mFormat], GFXGLTextureType[mFormat], data);
    return data;
 }
 

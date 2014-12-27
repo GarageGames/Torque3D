@@ -51,7 +51,7 @@ public:
    
    /// @return An array containing the texture data
    /// @note You are responsible for deleting the returned data! (Use delete[])
-   U8* getTextureData();
+   U8* getTextureData( U32 mip = 0);
 
    virtual F32 getMaxUCoord() const;
    virtual F32 getMaxVCoord() const;
