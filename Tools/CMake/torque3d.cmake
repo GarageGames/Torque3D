@@ -534,8 +534,8 @@ endif()
 ###############################################################################
 # Always enabled Definitions
 ###############################################################################
-addDef(TORQUE_DEBUG DEBUG)
-addDef(TORQUE_ENABLE_ASSERTS "DEBUG;RelWithDebInfo")
+addDef(TORQUE_DEBUG Debug)
+addDef(TORQUE_ENABLE_ASSERTS "Debug;RelWithDebInfo")
 addDef(TORQUE_DEBUG_GFX_MODE "RelWithDebInfo")
 addDef(TORQUE_SHADERGEN)
 addDef(INITGUID)
@@ -594,6 +594,17 @@ endif()
 if(UNIX)
 	addInclude("/usr/include/freetype2/freetype")
 	addInclude("/usr/include/freetype2")
+endif()
+
+if(MSVC)
+    # Match projectGenerator naming for executables
+    set(OUTPUT_CONFIG DEBUG MINSIZEREL RELWITHDEBINFO)
+    set(OUTPUT_SUFFIX DEBUG MINSIZE    OPTIMIZEDDEBUG)
+    foreach(INDEX RANGE 2)
+        list(GET OUTPUT_CONFIG ${INDEX} CONF)
+        list(GET OUTPUT_SUFFIX ${INDEX} SUFFIX)
+        set_property(TARGET ${PROJECT_NAME} PROPERTY OUTPUT_NAME_${CONF} ${PROJECT_NAME}_${SUFFIX})
+    endforeach()
 endif()
 
 ###############################################################################
