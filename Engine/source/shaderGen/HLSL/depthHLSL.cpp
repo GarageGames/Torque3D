@@ -25,7 +25,7 @@
 
 #include "materials/materialFeatureTypes.h"
 #include "materials/materialFeatureData.h"
-
+#include "terrain/terrFeatureTypes.h"
 
 void EyeSpaceDepthOutHLSL::processVert(   Vector<ShaderComponent*> &componentList, 
                                           const MaterialFeatureData &fd )
@@ -85,7 +85,12 @@ void EyeSpaceDepthOutHLSL::processPix( Vector<ShaderComponent*> &componentList,
    LangElement *depthOutDecl = new DecOp( depthOut );
 
    meta->addStatement( new GenOp( "#ifndef CUBE_SHADOW_MAP\r\n" ) );
-   meta->addStatement( new GenOp( "   @ = dot(@, (@.xyz / @.w));\r\n", depthOutDecl, vEye, wsEyeVec, wsEyeVec ) );
+
+   if (fd.features.hasFeature(MFT_TerrainBaseMap))
+      meta->addStatement(new GenOp("   @ =min(0.9999, dot(@, (@.xyz / @.w)));\r\n", depthOutDecl, vEye, wsEyeVec, wsEyeVec));
+   else
+      meta->addStatement(new GenOp("   @ = dot(@, (@.xyz / @.w));\r\n", depthOutDecl, vEye, wsEyeVec, wsEyeVec));
+
    meta->addStatement( new GenOp( "#else\r\n" ) );
 
    Var *farDist = (Var*)Var::find( "oneOverFarplane" );
