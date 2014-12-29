@@ -482,7 +482,10 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
    {
       if (gAnonFunctionList)
       {
-         gStatementList->append(gAnonFunctionList);
+         // Prepend anonymous functions to statement list, so they're defined already when
+         // the statements run.
+         gAnonFunctionList->append(gStatementList);
+         gStatementList = gAnonFunctionList;
       }
    }
 
@@ -622,7 +625,10 @@ const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inStri
    {
       if (gAnonFunctionList)
       {
-         gStatementList->append(gAnonFunctionList);
+         // Prepend anonymous functions to statement list, so they're defined already when
+         // the statements run.
+         gAnonFunctionList->append(gStatementList);
+         gStatementList = gAnonFunctionList;
       }
    }
 
