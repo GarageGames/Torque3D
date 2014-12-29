@@ -468,6 +468,7 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
    STEtoCode = compileSTEtoCode;
 
    gStatementList = NULL;
+   gAnonFunctionList = NULL;
 
    // Set up the parser.
    smCurrentParser = getParserForFile(fileName);
@@ -477,6 +478,14 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
    smCurrentParser->setScanBuffer(script, fileName);
    smCurrentParser->restart(NULL);
    smCurrentParser->parse();
+   if (gStatementList)
+   {
+      if (gAnonFunctionList)
+      {
+         gStatementList->append(gAnonFunctionList);
+      }
+   }
+
 
    if(gSyntaxError)
    {
@@ -599,6 +608,7 @@ const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inStri
       addToCodeList();
    
    gStatementList = NULL;
+   gAnonFunctionList = NULL;
 
    // Set up the parser.
    smCurrentParser = getParserForFile(fileName);
@@ -608,6 +618,13 @@ const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inStri
    smCurrentParser->setScanBuffer(string, fileName);
    smCurrentParser->restart(NULL);
    smCurrentParser->parse();
+   if (gStatementList)
+   {
+      if (gAnonFunctionList)
+      {
+         gStatementList->append(gAnonFunctionList);
+      }
+   }
 
    if(!gStatementList)
    {
