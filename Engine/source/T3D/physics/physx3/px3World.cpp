@@ -201,24 +201,27 @@ void Px3World::destroyWorld()
 
 bool Px3World::initWorld( bool isServer, ProcessList *processList )
 {
-	if ( !gPhysics3SDK )
-	{
-		Con::errorf( "Physx3World::init - PhysXSDK not initialized!" );
-		return false;
-	}
+   if ( !gPhysics3SDK )
+   {
+      Con::errorf( "Physx3World::init - PhysXSDK not initialized!" );
+      return false;
+   }
 
-	mIsServer = isServer;
+   mIsServer = isServer;
 	
-	physx::PxSceneDesc sceneDesc(gPhysics3SDK->getTolerancesScale());
+   physx::PxSceneDesc sceneDesc(gPhysics3SDK->getTolerancesScale());
 
-	sceneDesc.gravity = px3Cast<physx::PxVec3>(mGravity);
-	sceneDesc.userData = this;
-	if(!sceneDesc.cpuDispatcher)
-	{
-		smCpuDispatcher = physx::PxDefaultCpuDispatcherCreate(PHYSICSMGR->getThreadCount());
-		sceneDesc.cpuDispatcher = smCpuDispatcher;
-		Con::printf("PhysX3 using Cpu: %d workers", smCpuDispatcher->getWorkerCount());
-	}
+   sceneDesc.gravity = px3Cast<physx::PxVec3>(mGravity);
+   sceneDesc.userData = this;
+   if(!sceneDesc.cpuDispatcher)
+   {
+      //Create shared cpu dispatcher
+      if(!smCpuDispatcher)
+         smCpuDispatcher = physx::PxDefaultCpuDispatcherCreate(PHYSICSMGR->getThreadCount());
+ 
+      sceneDesc.cpuDispatcher = smCpuDispatcher;
+      Con::printf("PhysX3 using Cpu: %d workers", smCpuDispatcher->getWorkerCount());
+   }
 
  	
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_CCD;
