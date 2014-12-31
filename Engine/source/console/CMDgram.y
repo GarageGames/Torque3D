@@ -458,16 +458,18 @@ expr
       { $$ = (ExprNode*)VarNode::alloc( $1.lineNumber, $1.value, $3 ); }
    | rwDEFINE '(' var_list_decl ')' '{' statement_list '}'
       {
-         String fnname = String("__anonymous_function_" + String::ToString(gAnonFunctionID++));
-         StringTableEntry afnName = StringTable->insert(fnname.c_str());
-         StmtNode *fndef = FunctionDeclStmtNode::alloc($1.lineNumber, afnName, NULL, $3, $6);
+         const U32 bufLen = 64;
+         UTF8 buffer[bufLen];
+         dSprintf(buffer, bufLen, "__anonymous_function%d", gAnonFunctionID++);
+         StringTableEntry fName = StringTable->insert(buffer);
+         StmtNode *fndef = FunctionDeclStmtNode::alloc($1.lineNumber, fName, NULL, $3, $6);
 
          if(!gAnonFunctionList)
             gAnonFunctionList = fndef;
          else
             gAnonFunctionList->append(fndef);
 
-         $$ = StrConstNode::alloc( $1.lineNumber, (UTF8*)fnname.utf8(), false );
+         $$ = StrConstNode::alloc( $1.lineNumber, (UTF8*)fName, false );
       }
    ;
 
