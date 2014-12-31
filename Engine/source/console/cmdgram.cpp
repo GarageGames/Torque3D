@@ -332,12 +332,12 @@ static const short yyrline[] = { 0,
    393,   395,   397,   399,   401,   403,   405,   407,   409,   411,
    413,   415,   417,   419,   421,   423,   425,   427,   429,   431,
    433,   435,   437,   439,   441,   443,   445,   447,   449,   451,
-   453,   455,   457,   459,   475,   477,   482,   484,   489,   491,
-   496,   498,   500,   502,   504,   506,   508,   510,   512,   514,
-   516,   518,   523,   525,   527,   529,   531,   533,   535,   537,
-   539,   541,   546,   548,   550,   555,   557,   562,   564,   569,
-   571,   576,   578,   583,   585,   590,   592,   594,   596,   598,
-   603,   605
+   453,   455,   457,   459,   477,   479,   484,   486,   491,   493,
+   498,   500,   502,   504,   506,   508,   510,   512,   514,   516,
+   518,   520,   525,   527,   529,   531,   533,   535,   537,   539,
+   541,   543,   548,   550,   552,   557,   559,   564,   566,   571,
+   573,   578,   580,   585,   587,   592,   594,   596,   598,   600,
+   605,   607
 };
 
 static const char * const yytname[] = {   "$","error","$undefined.","rwDEFINE",
@@ -2042,209 +2042,211 @@ case 113:
     break;}
 case 114:
 #line 460 "cmdgram.y"
-{ 
-         String fnname = String("__anonymous_function_" + String::ToString(gAnonFunctionID++));
-         StringTableEntry afnName = StringTable->insert(fnname.c_str());
-         StmtNode *fndef = FunctionDeclStmtNode::alloc(yyvsp[-6].i.lineNumber, afnName, NULL, yyvsp[-4].var, yyvsp[-1].stmt);
+{
+         const U32 bufLen = 64;
+         UTF8 buffer[bufLen];
+         dSprintf(buffer, bufLen, "__anonymous_function%d", gAnonFunctionID++);
+         StringTableEntry fName = StringTable->insert(buffer);
+         StmtNode *fndef = FunctionDeclStmtNode::alloc(yyvsp[-6].i.lineNumber, fName, NULL, yyvsp[-4].var, yyvsp[-1].stmt);
 
          if(!gAnonFunctionList)
-            gAnonFunctionList = fndef; 
+            gAnonFunctionList = fndef;
          else
-            gAnonFunctionList->append(fndef); 
+            gAnonFunctionList->append(fndef);
 
-         yyval.expr = StrConstNode::alloc( yyvsp[-6].i.lineNumber, (UTF8*)fnname.utf8(), false );
+         yyval.expr = StrConstNode::alloc( yyvsp[-6].i.lineNumber, (UTF8*)fName, false );
       ;
     break;}
 case 115:
-#line 476 "cmdgram.y"
+#line 478 "cmdgram.y"
 { yyval.slot.lineNumber = yyvsp[-2].expr->dbgLineNumber; yyval.slot.object = yyvsp[-2].expr; yyval.slot.slotName = yyvsp[0].s.value; yyval.slot.array = NULL; ;
     break;}
 case 116:
-#line 478 "cmdgram.y"
+#line 480 "cmdgram.y"
 { yyval.slot.lineNumber = yyvsp[-5].expr->dbgLineNumber; yyval.slot.object = yyvsp[-5].expr; yyval.slot.slotName = yyvsp[-3].s.value; yyval.slot.array = yyvsp[-1].expr; ;
     break;}
 case 117:
-#line 483 "cmdgram.y"
+#line 485 "cmdgram.y"
 { yyval.intslot.lineNumber = yyvsp[-2].expr->dbgLineNumber; yyval.intslot.object = yyvsp[-2].expr; yyval.intslot.slotExpr = yyvsp[0].expr; yyval.intslot.recurse = false; ;
     break;}
 case 118:
-#line 485 "cmdgram.y"
+#line 487 "cmdgram.y"
 { yyval.intslot.lineNumber = yyvsp[-2].expr->dbgLineNumber; yyval.intslot.object = yyvsp[-2].expr; yyval.intslot.slotExpr = yyvsp[0].expr; yyval.intslot.recurse = true; ;
     break;}
 case 119:
-#line 490 "cmdgram.y"
+#line 492 "cmdgram.y"
 { yyval.expr = ConstantNode::alloc( yyvsp[0].s.lineNumber, yyvsp[0].s.value ); ;
     break;}
 case 120:
-#line 492 "cmdgram.y"
+#line 494 "cmdgram.y"
 { yyval.expr = yyvsp[-1].expr; ;
     break;}
 case 121:
-#line 497 "cmdgram.y"
+#line 499 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[0].i.lineNumber; yyval.asn.token = '+'; yyval.asn.expr = FloatNode::alloc( yyvsp[0].i.lineNumber, 1 ); ;
     break;}
 case 122:
-#line 499 "cmdgram.y"
+#line 501 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[0].i.lineNumber; yyval.asn.token = '-'; yyval.asn.expr = FloatNode::alloc( yyvsp[0].i.lineNumber, 1 ); ;
     break;}
 case 123:
-#line 501 "cmdgram.y"
+#line 503 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = '+'; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 124:
-#line 503 "cmdgram.y"
+#line 505 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = '-'; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 125:
-#line 505 "cmdgram.y"
+#line 507 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = '*'; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 126:
-#line 507 "cmdgram.y"
+#line 509 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = '/'; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 127:
-#line 509 "cmdgram.y"
+#line 511 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = '%'; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 128:
-#line 511 "cmdgram.y"
+#line 513 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = '&'; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 129:
-#line 513 "cmdgram.y"
+#line 515 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = '^'; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 130:
-#line 515 "cmdgram.y"
+#line 517 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = '|'; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 131:
-#line 517 "cmdgram.y"
+#line 519 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = opSHL; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 132:
-#line 519 "cmdgram.y"
+#line 521 "cmdgram.y"
 { yyval.asn.lineNumber = yyvsp[-1].i.lineNumber; yyval.asn.token = opSHR; yyval.asn.expr = yyvsp[0].expr; ;
     break;}
 case 133:
-#line 524 "cmdgram.y"
-{ yyval.expr = yyvsp[0].expr; ;
-    break;}
-case 134:
 #line 526 "cmdgram.y"
 { yyval.expr = yyvsp[0].expr; ;
     break;}
-case 135:
+case 134:
 #line 528 "cmdgram.y"
+{ yyval.expr = yyvsp[0].expr; ;
+    break;}
+case 135:
+#line 530 "cmdgram.y"
 { yyval.expr = yyvsp[0].od; ;
     break;}
 case 136:
-#line 530 "cmdgram.y"
+#line 532 "cmdgram.y"
 { yyval.expr = AssignExprNode::alloc( yyvsp[-2].s.lineNumber, yyvsp[-2].s.value, NULL, yyvsp[0].expr); ;
     break;}
 case 137:
-#line 532 "cmdgram.y"
+#line 534 "cmdgram.y"
 { yyval.expr = AssignExprNode::alloc( yyvsp[-5].s.lineNumber, yyvsp[-5].s.value, yyvsp[-3].expr, yyvsp[0].expr); ;
     break;}
 case 138:
-#line 534 "cmdgram.y"
+#line 536 "cmdgram.y"
 { yyval.expr = AssignOpExprNode::alloc( yyvsp[-1].s.lineNumber, yyvsp[-1].s.value, NULL, yyvsp[0].asn.expr, yyvsp[0].asn.token); ;
     break;}
 case 139:
-#line 536 "cmdgram.y"
+#line 538 "cmdgram.y"
 { yyval.expr = AssignOpExprNode::alloc( yyvsp[-4].s.lineNumber, yyvsp[-4].s.value, yyvsp[-2].expr, yyvsp[0].asn.expr, yyvsp[0].asn.token); ;
     break;}
 case 140:
-#line 538 "cmdgram.y"
+#line 540 "cmdgram.y"
 { yyval.expr = SlotAssignOpNode::alloc( yyvsp[-1].slot.lineNumber, yyvsp[-1].slot.object, yyvsp[-1].slot.slotName, yyvsp[-1].slot.array, yyvsp[0].asn.token, yyvsp[0].asn.expr); ;
     break;}
 case 141:
-#line 540 "cmdgram.y"
+#line 542 "cmdgram.y"
 { yyval.expr = SlotAssignNode::alloc( yyvsp[-2].slot.lineNumber, yyvsp[-2].slot.object, yyvsp[-2].slot.array, yyvsp[-2].slot.slotName, yyvsp[0].expr); ;
     break;}
 case 142:
-#line 542 "cmdgram.y"
+#line 544 "cmdgram.y"
 { yyval.expr = SlotAssignNode::alloc( yyvsp[-4].slot.lineNumber, yyvsp[-4].slot.object, yyvsp[-4].slot.array, yyvsp[-4].slot.slotName, yyvsp[-1].expr); ;
     break;}
 case 143:
-#line 547 "cmdgram.y"
+#line 549 "cmdgram.y"
 { yyval.expr = FuncCallExprNode::alloc( yyvsp[-3].s.lineNumber, yyvsp[-3].s.value, NULL, yyvsp[-1].expr, false); ;
     break;}
 case 144:
-#line 549 "cmdgram.y"
+#line 551 "cmdgram.y"
 { yyval.expr = FuncCallExprNode::alloc( yyvsp[-5].s.lineNumber, yyvsp[-3].s.value, yyvsp[-5].s.value, yyvsp[-1].expr, false); ;
     break;}
 case 145:
-#line 551 "cmdgram.y"
+#line 553 "cmdgram.y"
 { yyvsp[-5].expr->append(yyvsp[-1].expr); yyval.expr = FuncCallExprNode::alloc( yyvsp[-5].expr->dbgLineNumber, yyvsp[-3].s.value, NULL, yyvsp[-5].expr, true); ;
     break;}
 case 146:
-#line 556 "cmdgram.y"
+#line 558 "cmdgram.y"
 { yyval.expr = AssertCallExprNode::alloc( yyvsp[-3].i.lineNumber, yyvsp[-1].expr, NULL ); ;
     break;}
 case 147:
-#line 558 "cmdgram.y"
+#line 560 "cmdgram.y"
 { yyval.expr = AssertCallExprNode::alloc( yyvsp[-5].i.lineNumber, yyvsp[-3].expr, yyvsp[-1].str.value ); ;
     break;}
 case 148:
-#line 563 "cmdgram.y"
+#line 565 "cmdgram.y"
 { yyval.expr = NULL; ;
     break;}
 case 149:
-#line 565 "cmdgram.y"
+#line 567 "cmdgram.y"
 { yyval.expr = yyvsp[0].expr; ;
     break;}
 case 150:
-#line 570 "cmdgram.y"
+#line 572 "cmdgram.y"
 { yyval.expr = yyvsp[0].expr; ;
     break;}
 case 151:
-#line 572 "cmdgram.y"
+#line 574 "cmdgram.y"
 { (yyvsp[-2].expr)->append(yyvsp[0].expr); yyval.expr = yyvsp[-2].expr; ;
     break;}
 case 152:
-#line 577 "cmdgram.y"
+#line 579 "cmdgram.y"
 { yyval.slist = NULL; ;
     break;}
 case 153:
-#line 579 "cmdgram.y"
+#line 581 "cmdgram.y"
 { yyval.slist = yyvsp[0].slist; ;
     break;}
 case 154:
-#line 584 "cmdgram.y"
+#line 586 "cmdgram.y"
 { yyval.slist = yyvsp[0].slist; ;
     break;}
 case 155:
-#line 586 "cmdgram.y"
+#line 588 "cmdgram.y"
 { yyvsp[-1].slist->append(yyvsp[0].slist); yyval.slist = yyvsp[-1].slist; ;
     break;}
 case 156:
-#line 591 "cmdgram.y"
+#line 593 "cmdgram.y"
 { yyval.slist = SlotAssignNode::alloc( yyvsp[-3].s.lineNumber, NULL, NULL, yyvsp[-3].s.value, yyvsp[-1].expr); ;
     break;}
 case 157:
-#line 593 "cmdgram.y"
+#line 595 "cmdgram.y"
 { yyval.slist = SlotAssignNode::alloc( yyvsp[-4].i.lineNumber, NULL, NULL, yyvsp[-3].s.value, yyvsp[-1].expr, yyvsp[-4].i.value); ;
     break;}
 case 158:
-#line 595 "cmdgram.y"
+#line 597 "cmdgram.y"
 { yyval.slist = SlotAssignNode::alloc( yyvsp[-3].i.lineNumber, NULL, NULL, StringTable->insert("datablock"), yyvsp[-1].expr); ;
     break;}
 case 159:
-#line 597 "cmdgram.y"
+#line 599 "cmdgram.y"
 { yyval.slist = SlotAssignNode::alloc( yyvsp[-6].s.lineNumber, NULL, yyvsp[-4].expr, yyvsp[-6].s.value, yyvsp[-1].expr); ;
     break;}
 case 160:
-#line 599 "cmdgram.y"
+#line 601 "cmdgram.y"
 { yyval.slist = SlotAssignNode::alloc( yyvsp[-7].i.lineNumber, NULL, yyvsp[-4].expr, yyvsp[-6].s.value, yyvsp[-1].expr, yyvsp[-7].i.value); ;
     break;}
 case 161:
-#line 604 "cmdgram.y"
+#line 606 "cmdgram.y"
 { yyval.expr = yyvsp[0].expr; ;
     break;}
 case 162:
-#line 606 "cmdgram.y"
+#line 608 "cmdgram.y"
 { yyval.expr = CommaCatExprNode::alloc( yyvsp[-2].expr->dbgLineNumber, yyvsp[-2].expr, yyvsp[0].expr); ;
     break;}
 }
@@ -2445,6 +2447,6 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 608 "cmdgram.y"
+#line 610 "cmdgram.y"
 
 
