@@ -91,8 +91,23 @@ protected:
    /// @see LightManager::smActivateSignal
    static void _onLMActivate( const char *lm, bool activate );
 
+   enum
+   {
+      NumTextures = 8
+   };
+
+   String mSamplerNames[NumTextures]; 
+   bool mRTParams[NumTextures];
+
+   bool _checkDefinition(GFXShader *shader);   
+
 public:
 
+   void setSamplerName(const String &name, int idx) { mSamplerNames[idx] = name; }
+   String getSamplerName(int idx) const { return mSamplerNames[idx]; }
+
+   bool hasSamplerDef(const String &samplerName, int &pos) const;
+   bool hasRTParamsDef(const int pos) const { return mRTParams[pos]; }
 
    ShaderData();
 

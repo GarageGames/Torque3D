@@ -929,13 +929,10 @@ DefineEngineMethod(Lightning, strikeRandomPoint, void, (),,
       object->strikeRandomPoint();
 }
 
-DefineEngineMethod(Lightning, strikeObject, void, (S32 id), (NULL),
+DefineEngineMethod(Lightning, strikeObject, void, (ShapeBase* pSB),,
    "Creates a LightningStrikeEvent which strikes a specific object.\n"
    "@note This method is currently unimplemented.\n" )
 {
-   ShapeBase* pSB;
-
-   if (object->isServerObject() && Sim::findObject(id, pSB))
       object->strikeObject(pSB);
 }
 

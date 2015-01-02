@@ -985,7 +985,10 @@ void DiffuseMapFeatHLSL::setTexData(   Material::StageData &stageDat,
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_DiffuseMap );
    if ( tex )
+   {
+      passData.mSamplerNames[ texIndex ] = "diffuseMap";
       passData.mTexSlot[ texIndex++ ].texObject = tex;
+   }
 }
 
 
@@ -1069,7 +1072,10 @@ void OverlayTexFeatHLSL::setTexData(   Material::StageData &stageDat,
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_OverlayMap );
    if ( tex )
+   {
+      passData.mSamplerNames[texIndex] = "overlayMap";
       passData.mTexSlot[ texIndex++ ].texObject = tex;
+   }
 }
 
 
@@ -1257,6 +1263,7 @@ void LightmapFeatHLSL::setTexData(  Material::StageData &stageDat,
                                     U32 &texIndex )
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_LightMap );
+   passData.mSamplerNames[ texIndex ] = "lightMap";
    if ( tex )
       passData.mTexSlot[ texIndex++ ].texObject = tex;
    else
@@ -1386,6 +1393,7 @@ void TonemapFeatHLSL::setTexData(  Material::StageData &stageDat,
    if ( tex )
    {
       passData.mTexType[ texIndex ] = Material::ToneMapTex;
+      passData.mSamplerNames[ texIndex ] = "toneMap";
       passData.mTexSlot[ texIndex++ ].texObject = tex;
    }
 }
@@ -1576,7 +1584,10 @@ void DetailFeatHLSL::setTexData( Material::StageData &stageDat,
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_DetailMap );
    if ( tex )
+   {
+      passData.mSamplerNames[texIndex] = "detailMap";
       passData.mTexSlot[ texIndex++ ].texObject = tex;
+   }
 }
 
 
@@ -1670,7 +1681,7 @@ void ReflectCubeFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
     cubeVertPos->setType( "float3" );
     LangElement *cubeVertPosDecl = new DecOp( cubeVertPos );
 
-    meta->addStatement( new GenOp( "   @ = mul((float3x3)@, @).xyz;\r\n", 
+    meta->addStatement( new GenOp( "   @ = mul(@, float4(@,1)).xyz;\r\n", 
                         cubeVertPosDecl, cubeTrans, LangElement::find( "position" ) ) );
 
     // cube normal
@@ -1691,23 +1702,14 @@ void ReflectCubeFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
         eyePos->constSortPos = cspPass;
     }
 
-    // cube position
-    Var * cubePos = new Var;
-    cubePos->setName( "cubePos" );
-    cubePos->setType( "float3" );
-    LangElement *cubePosDecl = new DecOp( cubePos );
-
-    meta->addStatement( new GenOp( "   @ = float3( @[0][3], @[1][3], @[2][3] );\r\n", 
-                        cubePosDecl, cubeTrans, cubeTrans, cubeTrans ) );
-
     // eye to vert
     Var * eyeToVert = new Var;
     eyeToVert->setName( "eyeToVert" );
     eyeToVert->setType( "float3" );
     LangElement *e2vDecl = new DecOp( eyeToVert );
 
-    meta->addStatement( new GenOp( "   @ = @ - ( @ - @ );\r\n", 
-                        e2vDecl, cubeVertPos, eyePos, cubePos ) );
+    meta->addStatement( new GenOp( "   @ = @ - @;\r\n", 
+                        e2vDecl, cubeVertPos, eyePos ) );
 
     // grab connector texcoord register
     ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
@@ -1846,22 +1848,27 @@ void ReflectCubeFeatHLSL::setTexData(  Material::StageData &stageDat,
        !passData.mFeatureData.features[MFT_NormalMap] )
    {
       GFXTextureObject *tex = stageDat.getTex( MFT_DetailMap );
-      if (  tex &&
-            stageFeatures.features[MFT_DiffuseMap] )
+      if (  tex && stageFeatures.features[MFT_DiffuseMap] )
+      {
+         passData.mSamplerNames[ texIndex ] = "diffuseMap";
          passData.mTexSlot[ texIndex++ ].texObject = tex;
+      }
       else
       {
          tex = stageDat.getTex( MFT_NormalMap );
 
-         if (  tex &&
-               stageFeatures.features[ MFT_NormalMap ] )
+         if (  tex && stageFeatures.features[ MFT_NormalMap ] )
+         {
+            passData.mSamplerNames[ texIndex ] = "bumpMap";
             passData.mTexSlot[ texIndex++ ].texObject = tex;
       }
+   }
    }
    
    if( stageDat.getCubemap() )
    {
       passData.mCubeMap = stageDat.getCubemap();
+      passData.mSamplerNames[texIndex] = "cubeMap";
       passData.mTexType[texIndex++] = Material::Cube;
    }
    else
@@ -1869,6 +1876,7 @@ void ReflectCubeFeatHLSL::setTexData(  Material::StageData &stageDat,
       if( stageFeatures.features[MFT_CubeMap] )
       {
          // assuming here that it is a scenegraph cubemap
+         passData.mSamplerNames[texIndex] = "cubeMap";
          passData.mTexType[texIndex++] = Material::SGCube;
       }
    }

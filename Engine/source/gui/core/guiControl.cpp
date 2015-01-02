@@ -2613,17 +2613,21 @@ DefineEngineMethod( GuiControl, setValue, void, ( const char* value ),,
    object->setScriptValue( value );
 }
 
-ConsoleMethod( GuiControl, getValue, const char*, 2, 2, "")
+//ConsoleMethod( GuiControl, getValue, const char*, 2, 2, "")
+DefineConsoleMethod( GuiControl, getValue, const char*, (), , "")
 {
    return object->getScriptValue();
 }
 
-ConsoleMethod( GuiControl, makeFirstResponder, void, 3, 3, "(bool isFirst)")
+//ConsoleMethod( GuiControl, makeFirstResponder, void, 3, 3, "(bool isFirst)")
+DefineConsoleMethod( GuiControl, makeFirstResponder, void, (bool isFirst), , "(bool isFirst)")
 {
-   object->makeFirstResponder(dAtob(argv[2]));
+   //object->makeFirstResponder(dAtob(argv[2]));
+   object->makeFirstResponder(isFirst);
 }
 
-ConsoleMethod( GuiControl, isActive, bool, 2, 2, "")
+//ConsoleMethod( GuiControl, isActive, bool, 2, 2, "")
+DefineConsoleMethod( GuiControl, isActive, bool, (), , "")
 {
    return object->isActive();
 }
@@ -2806,22 +2810,19 @@ static ConsoleDocFragment _sGuiControlSetExtent2(
    "GuiControl", // The class to place the method in; use NULL for functions.
    "void setExtent( Point2I p );" ); // The definition string.
 
-ConsoleMethod( GuiControl, setExtent, void, 3, 4,
+DefineConsoleMethod( GuiControl, setExtent, void, ( const char* extOrX, const char* y ), (""),
    "( Point2I p | int x, int y ) Set the width and height of the control.\n\n"
    "@hide" )
 {
-   if ( argc == 3 )
+   Point2I extent;
+   if(!dStrIsEmpty(extOrX) && dStrIsEmpty(y))
+      dSscanf(extOrX, "%f %f", &extent.x, &extent.y);
+   else if(!dStrIsEmpty(extOrX) && !dStrIsEmpty(y))
    {
-      // We scan for floats because its possible that math 
-      // done on the extent can result in fractional values.
-      Point2F ext;
-      if ( dSscanf( argv[2], "%g %g", &ext.x, &ext.y ) == 2 )
-         object->setExtent( (S32)ext.x, (S32)ext.y );
-      else
-         Con::errorf( "GuiControl::setExtent, not enough parameters!" );
+      extent.x = dAtof(extOrX);
+      extent.y = dAtof(y);
    }
-   else if ( argc == 4 )
-      object->setExtent( dAtoi(argv[2]), dAtoi(argv[3]) );
+   object->setExtent( extent );
 }
 
 //-----------------------------------------------------------------------------

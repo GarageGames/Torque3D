@@ -58,6 +58,12 @@ option(TORQUE_HIFI "HIFI? support" OFF)
 mark_as_advanced(TORQUE_HIFI)
 option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
 mark_as_advanced(TORQUE_EXTENDED_MOVE)
+if(WIN32)
+	option(TORQUE_OPENGL "Allow OpenGL render" OFF)
+	#mark_as_advanced(TORQUE_OPENGL)
+else()
+	set(TORQUE_OPENGL ON) # we need OpenGL to render on Linux/Mac
+endif()
 option(TORQUE_NAVIGATION "Enable Navigation module" OFF)
 #mark_as_advanced(TORQUE_NAVIGATION)
 option(TORQUE_TESTING "Enable unit test module" OFF)
@@ -446,8 +452,12 @@ if( TORQUE_OPENGL )
     if( TORQUE_OPENGL AND NOT TORQUE_DEDICATED )
         addPath("${srcDir}/gfx/gl")
         addPath("${srcDir}/gfx/gl/tGL")        
+    addPath("${srcDir}/shaderGen/GLSL")
         addPath("${srcDir}/terrain/glsl")
         addPath("${srcDir}/forest/glsl")    
+
+    # glew
+    LIST(APPEND ${PROJECT_NAME}_files "${libDir}/glew/src/glew.c")
     endif()
     
     if(WIN32 AND NOT TORQUE_SDL)
@@ -506,6 +516,10 @@ if(WIN32)
     set(TORQUE_EXTERNAL_LIBS "COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib" CACHE STRING "external libs to link against")
     mark_as_advanced(TORQUE_EXTERNAL_LIBS)
     addLib("${TORQUE_EXTERNAL_LIBS}")
+   
+   if(TORQUE_OPENGL)
+      addLib(OpenGL32.lib)
+   endif()
 endif()
 
 if(UNIX)
@@ -520,8 +534,8 @@ endif()
 ###############################################################################
 # Always enabled Definitions
 ###############################################################################
-addDef(TORQUE_DEBUG DEBUG)
-addDef(TORQUE_ENABLE_ASSERTS "DEBUG;RelWithDebInfo")
+addDef(TORQUE_DEBUG Debug)
+addDef(TORQUE_ENABLE_ASSERTS "Debug;RelWithDebInfo")
 addDef(TORQUE_DEBUG_GFX_MODE "RelWithDebInfo")
 addDef(TORQUE_SHADERGEN)
 addDef(INITGUID)
@@ -544,6 +558,12 @@ if(UNIX)
 	addDef(LINUX)	
 endif()
 
+if(TORQUE_OPENGL)
+	addDef(TORQUE_OPENGL)
+   if(WIN32)
+      addDef(GLEW_STATIC)
+    endif()
+endif()
 ###############################################################################
 # Include Paths
 ###############################################################################
@@ -562,6 +582,9 @@ addInclude("${libDir}/libogg/include")
 addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
+if(TORQUE_OPENGL)
+	addInclude("${libDir}/glew/include")
+endif()
 
 # external things
 if(WIN32)
@@ -571,6 +594,17 @@ endif()
 if(UNIX)
 	addInclude("/usr/include/freetype2/freetype")
 	addInclude("/usr/include/freetype2")
+endif()
+
+if(MSVC)
+    # Match projectGenerator naming for executables
+    set(OUTPUT_CONFIG DEBUG MINSIZEREL RELWITHDEBINFO)
+    set(OUTPUT_SUFFIX DEBUG MINSIZE    OPTIMIZEDDEBUG)
+    foreach(INDEX RANGE 2)
+        list(GET OUTPUT_CONFIG ${INDEX} CONF)
+        list(GET OUTPUT_SUFFIX ${INDEX} SUFFIX)
+        set_property(TARGET ${PROJECT_NAME} PROPERTY OUTPUT_NAME_${CONF} ${PROJECT_NAME}_${SUFFIX})
+    endforeach()
 endif()
 
 ###############################################################################

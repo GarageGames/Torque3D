@@ -162,7 +162,7 @@ ConsoleValue* ConsoleValueStack::pop()
 
 void ConsoleValueStack::pushFrame()
 {
-   //Con::printf("CSTK pushFrame");
+   //Con::printf("CSTK pushFrame[%i] (%i)", mFrame, mStackPos);
    mStackFrames[mFrame++] = mStackPos;
 }
 
@@ -179,6 +179,12 @@ void ConsoleValueStack::resetFrame()
    //}
    mStackPos = start;
    //Con::printf("CSTK resetFrame to %i", mStackPos);
+}
+
+void ConsoleValueStack::clearFrames()
+{
+   mStackPos = 0;
+   mFrame = 0;
 }
 
 void ConsoleValueStack::popFrame()

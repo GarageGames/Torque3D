@@ -64,6 +64,7 @@ struct SceneData
    GFXTextureObject *backBuffTex;
    GFXTextureObject *reflectTex;
    GFXTextureObject *miscTex;
+   GFXTextureObject *accuTex;
    
    /// The current lights to use in rendering
    /// in order of the light importance.

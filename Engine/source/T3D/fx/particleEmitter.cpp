@@ -145,6 +145,7 @@ ParticleEmitterData::ParticleEmitterData()
    blendStyle = ParticleRenderInst::BlendUndefined;
    sortParticles = false;
    renderReflection = true;
+   glow = false;
    reverseOrder = false;
    textureName = 0;
    textureHandle = 0;
@@ -289,6 +290,9 @@ void ParticleEmitterData::initPersistFields()
       addField( "renderReflection", TYPEID< bool >(), Offset(renderReflection, ParticleEmitterData),
          "Controls whether particles are rendered onto reflective surfaces like water." );
 
+      addField("glow", TYPEID< bool >(), Offset(glow, ParticleEmitterData),
+         "If true, the particles are rendered to the glow buffer as well.");
+
       //@}
 
    endGroup( "ParticleEmitterData" );
@@ -356,6 +360,7 @@ void ParticleEmitterData::packData(BitStream* stream)
    }
    stream->writeFlag(highResOnly);
    stream->writeFlag(renderReflection);
+   stream->writeFlag(glow);
    stream->writeInt( blendStyle, 4 );
 }
 
@@ -418,6 +423,7 @@ void ParticleEmitterData::unpackData(BitStream* stream)
    }
    highResOnly = stream->readFlag();
    renderReflection = stream->readFlag();
+   glow = stream->readFlag();
    blendStyle = stream->readInt( 4 );
 }
 
@@ -908,6 +914,8 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
    ri->count = n_parts;
 
    ri->blendStyle = mDataBlock->blendStyle;
+
+   ri->glow = mDataBlock->glow;
 
    // use first particle's texture unless there is an emitter texture to override it
    if (mDataBlock->textureHandle)

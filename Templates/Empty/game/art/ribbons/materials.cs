@@ -29,6 +29,11 @@ new ShaderData( BasicRibbonShader )
    DXVertexShaderFile   = "shaders/common/ribbons/basicRibbonShaderV.hlsl";
    DXPixelShaderFile    = "shaders/common/ribbons/basicRibbonShaderP.hlsl";
  
+   OGLVertexShaderFile   = "shaders/common/ribbons/gl/basicRibbonShaderV.glsl";
+   OGLPixelShaderFile    = "shaders/common/ribbons/gl/basicRibbonShaderP.glsl";
+ 
+   samplerNames[0] = "$ribTex";
+ 
    pixVersion = 2.0;
 };
  
@@ -43,6 +48,40 @@ singleton CustomMaterial( BasicRibbonMat )
    translucent = true;
    BlendOp = AddAlpha;
    translucentBlendOp = AddAlpha;
+   
+   preload = true;
+};
+
+// This material can render a texture on top of a ribbon.
+
+//Texture ribbon shader/////////////////////////////////////////////
+ 
+new ShaderData( TexturedRibbonShader )
+{
+   DXVertexShaderFile   = "shaders/common/ribbons/texRibbonShaderV.hlsl";
+   DXPixelShaderFile    = "shaders/common/ribbons/texRibbonShaderP.hlsl";
+   
+   OGLVertexShaderFile   = "shaders/common/ribbons/gl/texRibbonShaderV.glsl";
+   OGLPixelShaderFile    = "shaders/common/ribbons/gl/texRibbonShaderP.glsl";
+   
+   samplerNames[0] = "$ribTex";
+   
+   pixVersion = 2.0;
+};
+ 
+singleton CustomMaterial( TexturedRibbonMat )
+{
+   shader = TexturedRibbonShader;
+   version = 2.0;
+   
+   emissive[0] = true;
+   
+   doubleSided = true;
+   translucent = true;
+   BlendOp = AddAlpha;
+   translucentBlendOp = AddAlpha;
+
+   sampler["ribTex"] = "art/ribbons/ribTex.png";
    
    preload = true;
 };

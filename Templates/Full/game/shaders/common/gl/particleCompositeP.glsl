@@ -38,6 +38,7 @@ uniform sampler2D edgeSource;
 uniform vec4 edgeTargetParams;
 #endif
 
+out vec4 OUT_col;
 
 void main()
 {  
@@ -57,5 +58,5 @@ void main()
 #endif
 	
 	// Sample offscreen target and return
-   OUT_FragColor0 = texture( colorSource, uvScene.xy );
+   OUT_col = texture( colorSource, uvScene.xy );
 }

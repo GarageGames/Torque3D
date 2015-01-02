@@ -138,8 +138,17 @@ ConsoleDocClass( Explosion,
 
 MRandomLCG sgRandom(0xdeadbeef);
 
+//WLE - Vince - The defaults are bad, the whole point of calling this function\
+//is to determine the explosion coverage on a object.  Why would you want them
+//To call this with a null for the ID?  In fact, it just returns a 1f if
+//it can't find the object.  Seems useless to me.  Cause how can I apply
+//damage to a object that doesn't exist?
 
-DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMask),(Point3F(0.0f,0.0f,0.0f), NULL, NULL),
+//I could possible see a use with passing in a null covMask, but even that
+//sounds flaky because it will be 100 percent if your saying not to take
+//any thing in consideration for coverage.  So I'm removing these defaults they are just bad.
+
+DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMask),,
    "@brief Calculates how much an explosion effects a specific object.\n\n"
    "Use this to determine how much damage to apply to objects based on their "
    "distance from the explosion's center point, and whether the explosion is "

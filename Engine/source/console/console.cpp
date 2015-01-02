@@ -275,7 +275,7 @@ bool useTimestamp = false;
 
 ConsoleFunctionGroupBegin( Clipboard, "Miscellaneous functions to control the clipboard and clear the console.");
 
-ConsoleFunction( cls, void, 1, 1, "()"
+DefineConsoleFunction( cls, void, (), , "()"
 				"@brief Clears the console output.\n\n"
 				"@ingroup Console")
 {
@@ -285,18 +285,18 @@ ConsoleFunction( cls, void, 1, 1, "()"
    consoleLog.setSize(0);
 };
 
-ConsoleFunction( getClipboard, const char*, 1, 1, "()"
+DefineConsoleFunction( getClipboard, const char*, (), , "()"
 				"@brief Get text from the clipboard.\n\n"
 				"@internal")
 {
 	return Platform::getClipboard();
 };
 
-ConsoleFunction( setClipboard, bool, 2, 2, "(string text)"
+DefineConsoleFunction( setClipboard, bool, (const char* text), , "(string text)"
                "@brief Set the system clipboard.\n\n"
 			   "@internal")
 {
-	return Platform::setClipboard(argv[1]);
+	return Platform::setClipboard(text);
 };
 
 ConsoleFunctionGroupEnd( Clipboard );

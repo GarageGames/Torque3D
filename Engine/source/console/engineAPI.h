@@ -245,6 +245,19 @@ struct EngineUnmarshallData< F32 >
    }
 };
 template<>
+struct EngineUnmarshallData< U8 >
+{
+   U8 operator()( ConsoleValueRef &ref ) const
+   {
+      return (U8)((S32)ref);
+   }
+
+   U8 operator()( const char* str ) const
+   {
+      return dAtoui( str );
+   }
+};
+template<>
 struct EngineUnmarshallData< const char* >
 {
    const char* operator()( const char* str ) const

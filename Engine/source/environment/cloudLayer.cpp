@@ -143,6 +143,7 @@ bool CloudLayer::onAdd()
       mCoverageSC = mShader->getShaderConstHandle( "$cloudCoverage" );
       mExposureSC = mShader->getShaderConstHandle( "$cloudExposure" );
       mBaseColorSC = mShader->getShaderConstHandle( "$cloudBaseColor" );
+      mNormalHeightMapSC = mShader->getShaderConstHandle( "$normalHeightMap" );
 
       // Create StateBlocks
       GFXStateBlockDesc desc;
@@ -365,7 +366,7 @@ void CloudLayer::renderObject( ObjectRenderInst *ri, SceneRenderState *state, Ba
 
    mShaderConsts->setSafe( mExposureSC, mExposure );
 
-   GFX->setTexture( 0, mTexture );                            
+   GFX->setTexture( mNormalHeightMapSC->getSamplerRegister(), mTexture );                            
    GFX->setVertexBuffer( mVB );            
    GFX->setPrimitiveBuffer( mPB );
 

@@ -24,6 +24,7 @@
 #include "environment/skyBox.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "scene/sceneRenderState.h"
 #include "renderInstance/renderPassManager.h"
 #include "gfx/primBuilder.h"
@@ -637,7 +638,7 @@ BaseMatInstance* SkyBox::_getMaterialInstance()
    return mMatInstance;
 }
 
-ConsoleMethod( SkyBox, postApply, void, 2, 2, "")
+DefineConsoleMethod( SkyBox, postApply, void, (), , "")
 {
 	object->inspectPostApply();
 }

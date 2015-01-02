@@ -26,6 +26,7 @@
 #include "gui/editor/inspector/field.h"
 #include "gui/editor/guiInspector.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 
 
 IMPLEMENT_CONOBJECT( MECreateUndoAction );
@@ -57,10 +58,9 @@ void MECreateUndoAction::addObject( SimObject *object )
    mObjects.last().id = object->getId();
 }
 
-ConsoleMethod( MECreateUndoAction, addObject, void, 3, 3, "( SimObject obj )")
+DefineConsoleMethod( MECreateUndoAction, addObject, void, (SimObject *obj), , "( SimObject obj )")
 {
-   SimObject *obj = NULL;
-   if ( Sim::findObject( argv[2], obj ) && obj )
+	if (obj)
    	object->addObject( obj );
 }
 
@@ -163,10 +163,9 @@ void MEDeleteUndoAction::deleteObject( const Vector<SimObject*> &objectList )
       deleteObject( objectList[i] );
 }
 
-ConsoleMethod( MEDeleteUndoAction, deleteObject, void, 3, 3, "( SimObject obj )")
+DefineConsoleMethod( MEDeleteUndoAction, deleteObject, void, (SimObject *obj ), , "( SimObject obj )")
 {
-   SimObject *obj = NULL;
-   if ( Sim::findObject( argv[2], obj ) && obj )
+	if (obj)
    	object->deleteObject( obj );
 }
 

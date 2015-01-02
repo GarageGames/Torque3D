@@ -200,6 +200,18 @@ inline F32 mFmod(const F32 val, const F32 mod)
    return fmod(val, mod);
 }
 
+inline S32 mRound(const F32 val)  
+{  
+   return (S32)floor(val + 0.5f);  
+}  
+      
+inline F32 mRound(const F32 val, const S32 n)  
+{  
+   S32 place = (S32) pow(10.0f, n);  
+      
+   return mFloor((val*place)+0.5)/place;  
+}  
+
 inline S32 mAbs(const S32 val)
 {
    return abs(val);

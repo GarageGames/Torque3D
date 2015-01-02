@@ -24,6 +24,7 @@
 #include "gui/editor/inspector/dynamicGroup.h"
 #include "gui/editor/guiInspector.h"
 #include "gui/buttons/guiIconButtonCtrl.h"
+#include "console/engineAPI.h"
 
 //-----------------------------------------------------------------------------
 // GuiInspectorDynamicField - Child class of GuiInspectorField 
@@ -315,7 +316,7 @@ void GuiInspectorDynamicField::_executeSelectedCallback()
       Con::executef( mInspector, "onFieldSelected", mDynField->slotName, "TypeDynamicField" );
 }
 
-ConsoleMethod( GuiInspectorDynamicField, renameField, void, 3,3, "field.renameField(newDynamicFieldName);" )
+DefineConsoleMethod( GuiInspectorDynamicField, renameField, void, (const char* newDynamicFieldName),, "field.renameField(newDynamicFieldName);" )
 {
-   object->renameField( argv[ 2 ] );
+   object->renameField( newDynamicFieldName );
 }

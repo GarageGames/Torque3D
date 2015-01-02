@@ -24,6 +24,7 @@
 #include "platform/menus/menuBar.h"
 #include "platform/menus/popupMenu.h"
 #include "gui/core/guiCanvas.h"
+#include "console/engineAPI.h"
 
 //-----------------------------------------------------------------------------
 // Constructor/Destructor
@@ -106,22 +107,21 @@ bool MenuBar::reOrder(SimObject *obj, SimObject *target /*= 0*/)
 // Console Methods
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(MenuBar, attachToCanvas, void, 4, 4, "(GuiCanvas, pos)")
+DefineConsoleMethod(MenuBar, attachToCanvas, void, (const char *canvas, S32 pos), , "(GuiCanvas, pos)")
 {
-   object->attachToCanvas(dynamic_cast<GuiCanvas*>(Sim::findObject(argv[2])), dAtoi(argv[3]));
+   object->attachToCanvas(dynamic_cast<GuiCanvas*>(Sim::findObject(canvas)), pos);
 }
 
-ConsoleMethod(MenuBar, removeFromCanvas, void, 2, 2, "()")
+DefineConsoleMethod(MenuBar, removeFromCanvas, void, (), , "()")
 {
    object->removeFromCanvas();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(MenuBar, insert, void, 4, 4,"(object, pos) insert object at position")
+DefineConsoleMethod(MenuBar, insert, void, (SimObject* pObject, S32 pos), ,"(object, pos) insert object at position")
 {
-   SimObject* pObject = Sim::findObject(argv[2]);
 
    if(pObject)
-      object->insertObject(pObject, dAtoi(argv[3]));
+      object->insertObject(pObject, pos);
 }

@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "console/engineAPI.h"
 #include "platform/platform.h"
 #include "gui/worldEditor/terrainActions.h"
 
@@ -796,11 +797,10 @@ void TerrainSmoothAction::smooth( TerrainBlock *terrain, F32 factor, U32 steps )
    redo();
 }
 
-ConsoleMethod( TerrainSmoothAction, smooth, void, 5, 5, "( TerrainBlock obj, F32 factor, U32 steps )")
+DefineConsoleMethod( TerrainSmoothAction, smooth, void, ( TerrainBlock *terrain, F32 factor, U32 steps ), , "( TerrainBlock obj, F32 factor, U32 steps )")
 {
-   TerrainBlock *terrain = NULL;
-   if ( Sim::findObject( argv[2], terrain ) && terrain )
-   	object->smooth( terrain, dAtof( argv[3] ), mClamp( dAtoi( argv[4] ), 1, 13 ) );
+	if (terrain)
+   	object->smooth( terrain, factor, mClamp( steps, 1, 13 ) );
 }
 
 void TerrainSmoothAction::undo()

@@ -35,6 +35,8 @@
 #include "console/engineAPI.h"
 #include "math/mathIO.h"
 
+#include "torqueConfig.h"
+
 
 IMPLEMENT_CO_NETOBJECT_V1(LevelInfo);
 
@@ -77,6 +79,7 @@ static SFXAmbience sDefaultAmbience;
 LevelInfo::LevelInfo()
    :  mNearClip( 0.1f ),
       mVisibleDistance( 1000.0f ),
+      mVisibleGhostDistance ( 0 ),
       mDecalBias( 0.0015f ),
       mCanvasClearColor( 255, 0, 255, 255 ),
       mSoundAmbience( NULL ),
@@ -113,7 +116,8 @@ void LevelInfo::initPersistFields()
    addGroup( "Visibility" );
 
       addField( "nearClip", TypeF32, Offset( mNearClip, LevelInfo ), "Closest distance from the camera's position to render the world." );
-      addField( "visibleDistance", TypeF32, Offset( mVisibleDistance, LevelInfo ), "Furthest distance fromt he camera's position to render the world." );
+      addField( "visibleDistance", TypeF32, Offset( mVisibleDistance, LevelInfo ), "Furthest distance from the camera's position to render the world." );
+      addField( "visibleGhostDistance", TypeF32, Offset( mVisibleGhostDistance, LevelInfo ), "Furthest distance from the camera's position to render players. Defaults to visibleDistance." );
       addField( "decalBias", TypeF32, Offset( mDecalBias, LevelInfo ),
          "NearPlane bias used when rendering Decal and DecalRoad. This should be tuned to the visibleDistance in your level." );
 
@@ -300,6 +304,7 @@ void LevelInfo::_updateSceneGraph()
    
    scene->setNearClip( mNearClip );
    scene->setVisibleDistance( mVisibleDistance );
+   scene->setVisibleGhostDistance( mVisibleGhostDistance );
 
    gDecalBias = mDecalBias;
 
