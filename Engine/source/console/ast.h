@@ -575,6 +575,8 @@ struct FunctionDeclStmtNode : StmtNode
 };
 
 extern StmtNode *gStatementList;
-extern ExprEvalState gEvalState;;
+extern StmtNode *gAnonFunctionList;
+extern U32 gAnonFunctionID;
+extern ExprEvalState gEvalState;
 
 #endif

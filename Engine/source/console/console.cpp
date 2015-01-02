@@ -47,6 +47,8 @@ extern ConsoleValueStack CSTK;
 ConsoleDocFragment* ConsoleDocFragment::smFirst;
 ExprEvalState gEvalState;
 StmtNode *gStatementList;
+StmtNode *gAnonFunctionList;
+U32 gAnonFunctionID = 0;
 ConsoleConstructor *ConsoleConstructor::first = NULL;
 bool gWarnUndefinedScriptVariables;
 
