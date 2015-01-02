@@ -49,6 +49,26 @@ bool getDllName(std::wstring& dllName, const std::wstring suffix)
    return true;
 }
 
+BOOL CALLBACK enumWindowsProc (HWND hwnd, LPARAM lParam)
+{
+   // The className used here should be equal to:
+   // 1. Engine/source/windowManager/win32/win32Window.cpp: const UTF16* _MainWindowClassName = L"TorqueJuggernaughtWindow";
+   // 2. Engine/source/windowManager/win32/winDispatch.cpp: dStrcmp(classBuf, L"TorqueJuggernaughtWindow")
+   // So if you change it there, don't forget to update it here too.
+   // [2012/09/25 bank]
+   const char* className       = "TorqueJuggernaughtWindow";
+   int         classNameLength = strlen(className)+1;
+   char*       classNameOut    = new char[classNameLength];
+
+   GetClassNameA(hwnd, classNameOut, classNameLength);
+
+   if(!strcmp(className, classNameOut))
+      SendMessageA(hwnd, WM_COPYDATA, NULL, lParam);
+
+   delete [] classNameOut;
+   return TRUE;
+}
+
 int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCommandShow)
 {
    // Try to find the game DLL, which may have one of several file names.
@@ -74,6 +94,22 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
       MessageBoxW(NULL, L"Unable to find game dll", L"Error",  MB_OK|MB_ICONWARNING);
       return -1;
    }
+   const char* externalCommand       = "externalCommand";
+   const int   externalCommandLength = strlen(externalCommand);
+   if(!memcmp(lpszCmdLine, externalCommand, externalCommandLength))
+   {
+      LPSTR path = lpszCmdLine + externalCommandLength + 1;
+
+      COPYDATASTRUCT cds;
+      cds.dwData = 100500; // externalCommand
+      cds.lpData = path;
+      cds.cbData = strlen(path) + 1;
+
+      EnumWindows(enumWindowsProc, (LPARAM)&cds);
+      return 0;
+   }
+   char filename[4096];
+   char gameLib[4096];
 
    if (!hGame)
    {

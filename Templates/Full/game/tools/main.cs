@@ -38,6 +38,47 @@ $Tools::materialEditorList = "";
 //---------------------------------------------------------------------------------------------
 package Tools
 {
+   //---------------------------------------------------------------------------
+   // How to use "externalCommand" it in Torsion:
+   // (instructions for other IDE should be similar)
+   // 1. In Torsion open "Tools" menu and select "External Tools"
+   // 2. Select first empty slot and enter following:
+   // Title: &Reload current script
+   // Command: $(ConfigExe)
+   // Arguments: externalCommand 1 $(FilePath)
+   // Initial Directory: $(ProjectWorkingDir)
+   // Press OK
+   //---------------------------------------------------------------------------
+   // Follow the same routine to add another command as desired. More examples:
+   // Title: E&xit Torque3D
+   // Command: $(ConfigExe)
+   // Arguments: externalCommand 2 quit
+   // Initial Directory: $(ProjectWorkingDir)
+   //---------------------------------------------------------------------------
+   // Title: &Toggle Editor
+   // Command: $(ConfigExe)
+   // Arguments: externalCommand 2 toggleEditor 1
+   // Initial Directory: $(ProjectWorkingDir)
+   function parseExternalCommand(%msg)
+   {
+      %cmd  = firstWord(%msg);
+      %data = restWords(%msg);
+      switch(%cmd)
+      {
+         case 1: // Exec script
+            %filename = strreplace(%data, "\\", "/");
+            exec(%filename);
+         case 2: // Call function
+            %funcName = firstWord(%data);
+            %params = restWords(%data);
+            if(%params !$= "")
+               call(%funcName, %params);
+            else
+               call(%funcName);
+      }
+   }
+   //---------------------------------------------------------------------------
+
    function loadKeybindings()
    {
       Parent::loadKeybindings();

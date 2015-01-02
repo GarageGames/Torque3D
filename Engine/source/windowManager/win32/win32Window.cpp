@@ -711,6 +711,19 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 
 	switch (message)
 	{
+#ifndef TORQUE_SHIPPING
+   case WM_COPYDATA:
+      {
+         COPYDATASTRUCT* cds = (COPYDATASTRUCT*)lParam;
+
+         if(cds->dwData != 100500) // externalCommand
+            break;
+
+         char* message = (char*)cds->lpData;
+         Con::executef("parseExternalCommand", message);
+      }
+      break;
+#endif
 
 	case WM_DISPLAYCHANGE:
       // Update the monitor list
