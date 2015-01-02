@@ -78,6 +78,7 @@ U32 RecastPolyList::addPoint(const Point3F &p)
       verts = newverts;
    }
    Point3F v = p;
+   v.convolve(mScale);
    mMatrix.mulP(v);
    // Insert the new vertex.
    verts[nverts*3] = v.x;
