@@ -4622,10 +4622,13 @@ S32 GuiTreeViewCtrl::findItemByName(const char *name)
 {
    for (S32 i = 0; i < mItems.size(); i++) 
    {
-		if ( !mItems[i] )
-			continue;
-	   if( mItems[i]->mState.test( Item::InspectorData ) )
-		   continue;
+      if ( !mItems[i] )
+      {
+         AssertWarn( false, "This may be an indication of something bad happening." );
+         continue;
+      }
+      if( mItems[i]->mState.test( Item::InspectorData ) )
+         continue;
       if (mItems[i] && dStrcmp(mItems[i]->getText(),name) == 0) 
          return mItems[i]->mId;
    }
@@ -4639,12 +4642,15 @@ S32 GuiTreeViewCtrl::findItemByValue(const char *name)
 {
    for (S32 i = 0; i < mItems.size(); i++) 
    {
-		if ( !mItems[i] )
-			continue;
-	   if( mItems[i]->mState.test( Item::InspectorData ) )
-		   continue;
-	   if (mItems[i] && dStrcmp(mItems[i]->getValue(),name) == 0) 
-		   return mItems[i]->mId;
+      if ( !mItems[i] )
+      {
+         AssertWarn( false, "This may be an indication of something bad happening." );
+         continue;
+      }
+      if( mItems[i]->mState.test( Item::InspectorData ) )
+         continue;
+      if (mItems[i] && dStrcmp(mItems[i]->getValue(),name) == 0) 
+         return mItems[i]->mId;
    }
 
    return 0;
