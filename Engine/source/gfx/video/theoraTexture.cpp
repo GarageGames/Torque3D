@@ -334,7 +334,7 @@ void TheoraTexture::_onTextureEvent( GFXTexCallbackCode code )
          {
             // Blast out work items and then release all texture locks.
             
-            ThreadPool::GLOBAL().flushWorkItems();
+            ThreadPool::Global().flushWorkItems();
             mAsyncState->getFrameStream()->releaseTextureLocks();
             
             // The Theora decoder does not implement seeking at the moment,

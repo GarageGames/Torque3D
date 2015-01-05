@@ -156,7 +156,7 @@ void NetAsync::queueLookup(const char* remoteAddr, NetSocket socket)
    dStrncpy(lookupRequest.remoteAddr, remoteAddr, sizeof(lookupRequest.remoteAddr));
 
    ThreadSafeRef< NameLookupWorkItem > workItem( new NameLookupWorkItem( lookupRequest ) );
-   ThreadPool::GLOBAL().queueWorkItem( workItem );
+   ThreadPool::Global().queueWorkItem( workItem );
 }
 
 bool NetAsync::checkLookup(NetSocket socket, char* out_h_addr, 

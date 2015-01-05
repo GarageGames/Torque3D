@@ -132,7 +132,7 @@ class AsyncBufferedInputStream : public IInputStreamFilter< T, Stream >,
                                  U32 numSourceElementsToRead = 0,
                                  U32 numReadAhead = DEFAULT_STREAM_LOOKAHEAD,
                                  bool isLooping = false,
-                                 ThreadPool* pool = &ThreadPool::GLOBAL(),
+                                 ThreadPool* pool = &ThreadPool::Global(),
                                  ThreadContext* context = ThreadContext::ROOT_CONTEXT() );
 
       virtual ~AsyncBufferedInputStream();
@@ -376,7 +376,7 @@ class AsyncSingleBufferedInputStream : public AsyncBufferedInputStream< T, Strea
                                        U32 numSourceElementsToRead = 0,
                                        U32 numReadAhead = Parent::DEFAULT_STREAM_LOOKAHEAD,
                                        bool isLooping = false,
-                                       ThreadPool* pool = &ThreadPool::GLOBAL(),
+                                       ThreadPool* pool = &ThreadPool::Global(),
                                        ThreadContext* context = ThreadContext::ROOT_CONTEXT() )
          : Parent(   stream,
                      numSourceElementsToRead,
