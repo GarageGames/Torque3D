@@ -1175,11 +1175,9 @@ struct ConsoleDocFragment
    static ConsoleConstructor cc_##className##_##groupName##_GroupEnd(#className,#groupName,NULL)
    
 /// Add a fragment of auto-doc text to the console API reference.
-/// @note There can only be one ConsoleDoc per source file.
+#  include <core/util/preprocessorHelpers.h>
 #  define ConsoleDoc( text )                                \
-      namespace {                                           \
-         ConsoleDocFragment _sDocFragment( text );           \
-      }
+     static ConsoleDocFragment TORQUE_CONCAT(_sDocFragment, __COUNTER__)( text );       \
 
 #else
 

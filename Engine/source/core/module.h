@@ -313,12 +313,16 @@ class Module
 /// }
 /// @endcode
 ///
-#define AFTER_MODULE_INIT( name ) \
+// Make sure we have a unique class name in case there are multiple uses in a file
+#include "core/util/preprocessorHelpers.h"
+#define AFTER_MODULE_INIT( name ) AFTER_MODULE_INIT_( name, TORQUE_CONCAT( _AfterModuleInit, __COUNTER__ ) )
+
+#define AFTER_MODULE_INIT_( name, classname ) \
    namespace { \
-      class _AfterModuleInit : public ::Module { \
+      class classname : public ::Module { \
          public: \
             typedef ::Module Parent; \
-            static _AfterModuleInit smInstance; \
+            static classname smInstance; \
             virtual const char* getName() const { return "AFTER_MODULE_INIT( " #name " ) in " __FILE__; } \
             struct _DepInitAfter : public Parent::Dependency \
             { \
@@ -327,10 +331,9 @@ class Module
             } mDepInitAfter; \
             virtual void initialize(); \
       }; \
-      _AfterModuleInit _AfterModuleInit::smInstance; \
+      classname classname::smInstance; \
    } \
-   void _AfterModuleInit::initialize()
-
+   void classname::initialize()
 
 struct ModuleManager
 {

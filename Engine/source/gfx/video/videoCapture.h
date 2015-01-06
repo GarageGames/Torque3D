@@ -257,6 +257,6 @@ public:
 #define REGISTER_VIDEO_ENCODER(ClassName, EncoderName)   \
    VideoEncoder* EncoderFactory##EncoderName() { return new ClassName(); } \
    struct __VidEncReg##EncoderName { __VidEncReg##EncoderName() { VideoCapture::registerEncoder( #EncoderName, &EncoderFactory##EncoderName ); } }; \
-   static __VidEncReg##EncoderName _gEncoderRegistration;
+   static __VidEncReg##EncoderName _gEncoderRegistration##EncoderName;
 
 #endif // !_VIDEOCAPTURE_H_
