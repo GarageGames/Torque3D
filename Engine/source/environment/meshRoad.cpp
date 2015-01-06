@@ -59,7 +59,7 @@
 #define MAX_NODE_WIDTH 50.0f
 
 
-static U32 gIdxArray[6][2][3] = {
+U32 gIdxArray[6][2][3] = {
    { { 0, 4, 5 }, { 0, 5, 1 }, },   // Top Face
    { { 2, 6, 4 }, { 2, 4, 0 }, },   // Left Face
    { { 1, 5, 7 }, { 1, 7, 3 }, },   // Right Face

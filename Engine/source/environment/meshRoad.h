@@ -45,9 +45,6 @@
 #include "collision/convex.h"
 #endif
 
-
-//extern U32 gIdxArray[6][2][3];
-
 struct MeshRoadHitSegment
 {
    U32 idx;

@@ -76,14 +76,7 @@ ConsoleDocClass( River,
 #define MAX_NODE_WIDTH 1000.0f
 #define NODE_RADIUS 15.0f
 
-static U32 gIdxArray[6][2][3] = {
-	{ { 0, 4, 5 }, { 0, 5, 1 }, },   // Top Face
-	{ { 2, 6, 4 }, { 2, 4, 0 }, },   // Left Face
-	{ { 1, 5, 7 }, { 1, 7, 3 }, },   // Right Face
-	{ { 2, 3, 7 }, { 2, 7, 6 }, },   // Bottom Face
-	{ { 0, 1, 3 }, { 0, 3, 2 }, },   // Front Face
-	{ { 4, 6, 7 }, { 4, 7, 5 }, },   // Back Face
-};
+extern U32 gIdxArray[6][2][3]; // defined in meshRoad.cpp
 
 struct RiverHitSegment
 {
