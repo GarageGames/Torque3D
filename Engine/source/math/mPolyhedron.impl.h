@@ -20,6 +20,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef _MPOLYHEDRON_IMPL_H_
+#define _MPOLYHEDRON_IMPL_H_
+
 #include "math/mPlaneTransformer.h"
 
 
@@ -503,3 +506,5 @@ void PolyhedronData::buildBoxData( Polyhedron& poly, const MatrixF& mat, const B
       edge ++;
    }
 }
+
+#endif // _MPOLYHEDRON_IMPL_H_
