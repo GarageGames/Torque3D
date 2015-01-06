@@ -49,7 +49,7 @@
 #endif
 
 
-MODULE_BEGIN( SFX )
+MODULE_BEGIN( SFXModule )
 
    MODULE_INIT_BEFORE( Sim )
    MODULE_SHUTDOWN_BEFORE( Sim ) // Make sure all SimObjects disappear in time.

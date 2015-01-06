@@ -33,7 +33,7 @@
 #include "console/engineAPI.h"
 
 
-MODULE_BEGIN( MaterialManager )
+MODULE_BEGIN( MaterialManagerModule )
 
    MODULE_INIT_BEFORE( GFX )
    MODULE_SHUTDOWN_BEFORE( GFX )

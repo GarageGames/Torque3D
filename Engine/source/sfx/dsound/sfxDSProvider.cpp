@@ -64,8 +64,8 @@ public:
 
 MODULE_BEGIN( DirectSound )
 
-   MODULE_INIT_BEFORE( SFX )
-   MODULE_SHUTDOWN_AFTER( SFX )
+   MODULE_INIT_BEFORE( SFXModule )
+   MODULE_SHUTDOWN_AFTER( SFXModule )
    
    SFXDSProvider* mProvider;
    

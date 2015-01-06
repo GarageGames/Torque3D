@@ -43,7 +43,7 @@ static const U32 sReverbFlagCore1                  = 0x200;
 static const U32 sReverbFlagHighQualityReverb      = 0x400;
 static const U32 sReverbFlagHighQualityDPL2Reverb  = 0x800;
 
-AFTER_MODULE_INIT( SFX )
+AFTER_MODULE_INIT( SFXModule )
 {
    Con::addConstant( "SFXEnvironment::REVERB_DECAYTIMESCALE", TypeS32, &sReverbFlagDecayTimeScale,
       "SFXEnvironment::envSize affects reverberation decay time.\n"
