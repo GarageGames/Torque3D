@@ -72,10 +72,8 @@ public:
    void onRenderCell(Point2I offset, Point2I cell, bool selected, bool mouseOver);
 };
 
-class GuiPopUpMenuCtrl : public GuiTextCtrl
+class MenuCtrlData
 {
-   typedef GuiTextCtrl Parent;
-
 public:
    struct Entry
    {
@@ -83,8 +81,8 @@ public:
       S32 id;
       U16 ascii;
       U16 scheme;
-      bool usesColorBox;	//  Added
-      ColorI colorbox;		//  Added
+      bool usesColorBox; //  Added
+      ColorI colorbox;   //  Added
    };
 
    struct Scheme
@@ -95,6 +93,34 @@ public:
       ColorI   fontColorSEL;
    };
 
+   GuiScrollCtrl *mSc;
+   Vector<Entry> mEntries;
+   Vector<Scheme> mSchemes;
+   S32 mSelIndex;
+   S32 mMaxPopupHeight;
+   F32 mIncValue;
+   F32 mScrollCount;
+   S32 mLastYvalue;
+   GuiEvent mEventSave;
+   S32 mRevNum;
+   bool mInAction;
+   bool mReplaceText;
+   bool mMouseOver;        //  Added
+   bool mRenderScrollInNA; //  Added
+   bool mReverseTextList;  //  Added - Should we reverse the text list if we display up?
+
+   StringTableEntry mBitmapName; //  Added
+   Point2I mBitmapBounds;        //  Added
+   GFXTexHandle mTextureNormal;  //  Added
+   GFXTexHandle mTextureDepressed; //  Added
+   S32 mIdMax;
+};
+
+class GuiPopUpMenuCtrl : public GuiTextCtrl, protected MenuCtrlData
+{
+   typedef GuiTextCtrl Parent;
+
+public:
    bool mBackgroundCancel; //  Added
 
 protected:
@@ -170,5 +196,23 @@ public:
    static void initPersistFields(void);
 
 };
+
+//------------------------------------------------------------------------------
+inline S32 QSORT_CALLBACK textCompare(const void *a,const void *b)
+{
+   MenuCtrlData::Entry *ea = (MenuCtrlData::Entry *) (a);
+   MenuCtrlData::Entry *eb = (MenuCtrlData::Entry *) (b);
+   return (dStrnatcasecmp(ea->buf, eb->buf));
+}
+
+//  Added to sort by entry ID
+//------------------------------------------------------------------------------
+inline S32 QSORT_CALLBACK idCompare(const void *a,const void *b)
+{
+   MenuCtrlData::Entry *ea = (MenuCtrlData::Entry *) (a);
+   MenuCtrlData::Entry *eb = (MenuCtrlData::Entry *) (b);
+   return ( (ea->id < eb->id) ? -1 : ((ea->id > eb->id) ? 1 : 0) );
+}
+
 
 #endif //_GUI_POPUPMENU_CTRL_H

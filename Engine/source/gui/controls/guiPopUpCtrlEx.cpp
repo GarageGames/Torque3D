@@ -743,23 +743,6 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, clearEntry, void, (S32 entry), , "(S32 
 }
 
 //------------------------------------------------------------------------------
-static S32 QSORT_CALLBACK textCompare(const void *a,const void *b)
-{
-   GuiPopUpMenuCtrlEx::Entry *ea = (GuiPopUpMenuCtrlEx::Entry *) (a);
-   GuiPopUpMenuCtrlEx::Entry *eb = (GuiPopUpMenuCtrlEx::Entry *) (b);
-   return (dStrnatcasecmp(ea->buf, eb->buf));
-} 
-
-//  Added to sort by entry ID
-//------------------------------------------------------------------------------
-static S32 QSORT_CALLBACK idCompare(const void *a,const void *b)
-{
-   GuiPopUpMenuCtrlEx::Entry *ea = (GuiPopUpMenuCtrlEx::Entry *) (a);
-   GuiPopUpMenuCtrlEx::Entry *eb = (GuiPopUpMenuCtrlEx::Entry *) (b);
-   return ( (ea->id < eb->id) ? -1 : ((ea->id > eb->id) ? 1 : 0) );
-} 
-
-//------------------------------------------------------------------------------
 //  Added
 void GuiPopUpMenuCtrlEx::setBitmap(const char *name)
 {

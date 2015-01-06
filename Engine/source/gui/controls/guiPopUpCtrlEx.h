@@ -35,6 +35,8 @@
 #ifndef _GUISCROLLCTRL_H_
 #include "gui/containers/guiScrollCtrl.h"
 #endif
+#include "guiPopUpCtrl.h"
+
 class GuiPopUpMenuCtrlEx;
 class GuiPopupTextListCtrlEx;
 
@@ -72,55 +74,18 @@ class GuiPopupTextListCtrlEx : public GuiTextListCtrl
       void onRenderCell(Point2I offset, Point2I cell, bool selected, bool mouseOver);
 };
 
-class GuiPopUpMenuCtrlEx : public GuiTextCtrl
+class GuiPopUpMenuCtrlEx : public GuiTextCtrl, protected MenuCtrlData
 {
    typedef GuiTextCtrl Parent;
 
   public:
-   struct Entry
-   {
-      char buf[256];
-      S32 id;
-      U16 ascii;
-      U16 scheme;
-	  bool usesColorBox;	//  Added
-	  ColorI colorbox;		//  Added
-   };
-
-   struct Scheme
-   {
-      U32      id;
-      ColorI   fontColor;
-      ColorI   fontColorHL;
-      ColorI   fontColorSEL;
-   };
-
    bool mBackgroundCancel; //  Added
 
   protected:
    GuiPopupTextListCtrlEx *mTl;
-   GuiScrollCtrl *mSc;
    GuiPopUpBackgroundCtrlEx *mBackground;
-   Vector<Entry> mEntries;
-   Vector<Scheme> mSchemes;
-   S32 mSelIndex;
-   S32 mMaxPopupHeight;
-   F32 mIncValue;
-   F32 mScrollCount;
-   S32 mLastYvalue;
-   GuiEvent mEventSave;
-   S32 mRevNum;
-   bool mInAction;
-   bool mReplaceText;
-   bool mMouseOver; //  Added
-   bool mRenderScrollInNA; //  Added
-   bool mReverseTextList;	//  Added - Should we reverse the text list if we display up?
+
    bool mHotTrackItems;
-   StringTableEntry mBitmapName; //  Added
-   Point2I mBitmapBounds; //  Added
-   GFXTexHandle mTextureNormal; //  Added
-   GFXTexHandle mTextureDepressed; //  Added
-	S32 mIdMax;
 
    virtual void addChildren();
    virtual void repositionPopup();
