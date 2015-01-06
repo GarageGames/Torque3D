@@ -52,12 +52,17 @@
 #include "T3D/physics/physicsCollision.h"
 #include "environment/nodeListManager.h"
 
+#undef MIN_METERS_PER_SEGMENT
+#undef MIN_NODE_DEPTH
+#undef MAX_NODE_DEPTH
+#undef MIN_NODE_WIDTH
+#undef MAX_NODE_WIDTH
+
 #define MIN_METERS_PER_SEGMENT 1.0f
 #define MIN_NODE_DEPTH 0.25f
 #define MAX_NODE_DEPTH 50.0f
 #define MIN_NODE_WIDTH 0.25f
 #define MAX_NODE_WIDTH 50.0f
-
 
 U32 gIdxArray[6][2][3] = {
    { { 0, 4, 5 }, { 0, 5, 1 }, },   // Top Face

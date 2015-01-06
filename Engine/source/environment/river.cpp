@@ -69,6 +69,13 @@ ConsoleDocClass( River,
    "@ingroup Water"
 );
 
+#undef MIN_METERS_PER_SEGMENT
+#undef MIN_NODE_DEPTH
+#undef MAX_NODE_DEPTH
+#undef MIN_NODE_WIDTH
+#undef MAX_NODE_WIDTH
+#undef NODE_RADIUS
+
 #define MIN_METERS_PER_SEGMENT 1.0f
 #define MIN_NODE_DEPTH 0.25f
 #define MAX_NODE_DEPTH 500.0f
