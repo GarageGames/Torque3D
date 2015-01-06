@@ -84,7 +84,7 @@ struct RiverHitSegment
    F32 t;
 };
 
-static S32 QSORT_CALLBACK compareHitSegments(const void* a,const void* b)
+static S32 QSORT_CALLBACK compareRiverHitSegments(const void* a,const void* b)
 {
 	const RiverHitSegment *fa = (RiverHitSegment*)a;
 	const RiverHitSegment *fb = (RiverHitSegment*)b;
@@ -1216,7 +1216,7 @@ bool River::castRay(const Point3F &s, const Point3F &e, RayInfo* info)
 		}
 	}
 
-	dQsort( hitSegments.address(), hitSegments.size(), sizeof(RiverHitSegment), compareHitSegments );
+	dQsort( hitSegments.address(), hitSegments.size(), sizeof(RiverHitSegment), compareRiverHitSegments );
 
    U32 idx0, idx1, idx2;
    F32 t;

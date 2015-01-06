@@ -60,23 +60,21 @@ static F32 sWorkingQueryBoxSizeMultiplier = 2.0f;  // How much larger should the
                                                    // will be updated due to motion, but any non-static shape
                                                    // that moves into the query box will not be noticed.
 
-const U32 sMoveRetryCount = 3;
-
 // Client prediction
-const S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
-const S32 sMaxPredictionTicks = 30;    // Number of ticks to predict
+const S32 sVMaxWarpTicks = 3;           // Max warp duration in ticks
+const S32 sVMaxPredictionTicks = 30;    // Number of ticks to predict
 const F32 sVehicleGravity = -20;
 
 // Physics and collision constants
-static F32 sRestTol = 0.5;             // % of gravity energy to be at rest
-static S32 sRestCount = 10;            // Consecutive ticks before comming to rest
+static F32 sVRestTol = 0.5;             // % of gravity energy to be at rest
+static S32 sVRestCount = 10;            // Consecutive ticks before comming to rest
 
 } // namespace {}
 
 // Trigger objects that are not normally collided with.
-static U32 sTriggerMask = ItemObjectType     |
-                          TriggerObjectType  |
-                          CorpseObjectType;
+static U32 sVTriggerMask = ItemObjectType     |
+                           TriggerObjectType  |
+                           CorpseObjectType;
 
 IMPLEMENT_CONOBJECT(VehicleData);
 
@@ -1035,7 +1033,7 @@ void Vehicle::getCameraTransform(F32* pos,MatrixF* mat)
    RayInfo collision;
    Point3F ep = sp + vec + offset + mCameraOffset;
    if (mContainer->castRay(sp, ep,
-         ~(WaterObjectType | GameBaseObjectType | DefaultObjectType | sTriggerMask),
+         ~(WaterObjectType | GameBaseObjectType | DefaultObjectType | sVTriggerMask),
          &collision) == true) {
 
       // Shift the collision point back a little to try and
@@ -1212,7 +1210,7 @@ void Vehicle::updatePos(F32 dt)
          F32 k = mRigid.getKineticEnergy();
          F32 G = sVehicleGravity * dt;
          F32 Kg = 0.5 * mRigid.mass * G * G;
-         if (k < sRestTol * Kg && ++restCount > sRestCount)
+         if (k < sVRestTol * Kg && ++restCount > sVRestCount)
             mRigid.setAtRest();
       }
       else
@@ -1550,7 +1548,7 @@ void Vehicle::updateWorkingCollisionSet(const U32 mask)
 void Vehicle::checkTriggers()
 {
    Box3F bbox = mConvex.getBoundingBox(getTransform(), getScale());
-   gServerContainer.findObjects(bbox,sTriggerMask,findCallback,this);
+   gServerContainer.findObjects(bbox,sVTriggerMask,findCallback,this);
 }
 
 /** The callback used in by the checkTriggers() method.
@@ -1670,7 +1668,7 @@ void Vehicle::unpackUpdate(NetConnection *con, BitStream *stream)
 
    if (stream->readFlag()) 
    {
-      mPredictionCount = sMaxPredictionTicks;
+      mPredictionCount = sVMaxPredictionTicks;
       F32 speed = mRigid.linVelocity.len();
       mDelta.warpRot[0] = mRigid.angPosition;
 
@@ -1696,8 +1694,8 @@ void Vehicle::unpackUpdate(NetConnection *con, BitStream *stream)
          // Cal how many ticks it will take to cover the warp offset.
          // If it's less than what's left in the current tick, we'll just
          // warp in the remaining time.
-         if (!as || (dt = mDelta.warpOffset.len() / as) > sMaxWarpTicks)
-            dt = mDelta.dt + sMaxWarpTicks;
+         if (!as || (dt = mDelta.warpOffset.len() / as) > sVMaxWarpTicks)
+            dt = mDelta.dt + sVMaxWarpTicks;
          else
             dt = (dt <= mDelta.dt)? mDelta.dt : mCeil(dt - mDelta.dt) + mDelta.dt;
 

@@ -43,12 +43,12 @@
 
 //----------------------------------------------------------------------------
 
-const static U32 sCollisionMoveMask = ( TerrainObjectType | WaterObjectType          | 
-                                        PlayerObjectType  | StaticShapeObjectType    | 
-                                        VehicleObjectType | VehicleBlockerObjectType );
+const static U32 sFVCollisionMoveMask = ( TerrainObjectType | WaterObjectType          |
+                                          PlayerObjectType  | StaticShapeObjectType    |
+                                          VehicleObjectType | VehicleBlockerObjectType );
                                         
-static U32 sServerCollisionMask = sCollisionMoveMask; // ItemObjectType
-static U32 sClientCollisionMask = sCollisionMoveMask;
+static U32 sFVServerCollisionMask = sFVCollisionMoveMask; // ItemObjectType
+static U32 sFVClientCollisionMask = sFVCollisionMoveMask;
 
 static F32 sFlyingVehicleGravity = -20.0f;
 
@@ -585,7 +585,7 @@ F32 FlyingVehicle::getHeight()
    ep.y = sp.y;
    ep.z = sp.z - r;
    disableCollision();
-   if( !mContainer->castRay(sp, ep, sClientCollisionMask, &collision) == true )
+   if( !mContainer->castRay(sp, ep, sFVClientCollisionMask, &collision) == true )
       collision.t = 1;
    enableCollision();
    return (r * collision.t - height) / 10;
@@ -596,9 +596,9 @@ F32 FlyingVehicle::getHeight()
 U32 FlyingVehicle::getCollisionMask()
 {
    if (isServerObject())
-      return sServerCollisionMask;
+      return sFVServerCollisionMask;
    else
-      return sClientCollisionMask;
+      return sFVClientCollisionMask;
 }
 
 //----------------------------------------------------------------------------

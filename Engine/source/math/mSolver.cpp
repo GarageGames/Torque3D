@@ -26,7 +26,7 @@
 //--------------------------------------------------------------------------
 #define EQN_EPSILON     (1e-8)
 
-static inline void swap(F32 & a, F32 & b)
+static inline void mSwap(F32 & a, F32 & b)
 {
    F32 t = b;
    b = a;
@@ -76,7 +76,7 @@ static U32 mSolveQuadratic_c(F32 a, F32 b, F32 c, F32 * x)
       x[1] = (-b - sqrdesc) / den;
 
       if(x[1] < x[0])
-         swap(x[0], x[1]);
+         mSwap(x[0], x[1]);
 
       return(2);
    }
@@ -156,7 +156,7 @@ U32 mSolveCubic_c(F32 a, F32 b, F32 c, F32 d, F32 * x)
    for(S32 j = 0; j < (num - 1); j++)
       for(S32 k = j + 1; k < num; k++)
          if(x[k] < x[j])
-            swap(x[k], x[j]);
+            mSwap(x[k], x[j]);
 
    return(num);
 }
@@ -243,7 +243,7 @@ U32 mSolveQuartic_c(F32 a, F32 b, F32 c, F32 d, F32 e, F32 * x)
    for(S32 j = 0; j < (num - 1); j++)
       for(S32 k = j + 1; k < num; k++)
          if(x[k] < x[j])
-            swap(x[k], x[j]);
+            mSwap(x[k], x[j]);
 
    return(num);
 }

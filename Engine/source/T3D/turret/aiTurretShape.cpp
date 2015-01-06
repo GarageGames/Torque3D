@@ -64,7 +64,7 @@ AITurretShapeData::StateData::StateData()
    sequence = -1;
 }
 
-static AITurretShapeData::StateData gDefaultStateData;
+static AITurretShapeData::StateData gAITSDefaultStateData;
 
 //----------------------------------------------------------------------------
 
@@ -300,7 +300,7 @@ void AITurretShapeData::packData(BitStream* stream)
          stream->writeInt(s.transition.activated[1]+1,NumStateBits);
          stream->writeInt(s.transition.timeout+1,NumStateBits);
 
-         if(stream->writeFlag(s.timeoutValue != gDefaultStateData.timeoutValue))
+         if(stream->writeFlag(s.timeoutValue != gAITSDefaultStateData.timeoutValue))
             stream->write(s.timeoutValue);
 
          stream->writeFlag(s.waitForTimeout);
@@ -309,7 +309,7 @@ void AITurretShapeData::packData(BitStream* stream)
          stream->writeFlag(s.scaleAnimation);
          stream->writeFlag(s.direction);
 
-         if(stream->writeFlag(s.sequence != gDefaultStateData.sequence))
+         if(stream->writeFlag(s.sequence != gAITSDefaultStateData.sequence))
             stream->writeSignedInt(s.sequence, 16);
       }
 }
@@ -342,7 +342,7 @@ void AITurretShapeData::unpackData(BitStream* stream)
          if(stream->readFlag())
             stream->read(&s.timeoutValue);
          else
-            s.timeoutValue = gDefaultStateData.timeoutValue;
+            s.timeoutValue = gAITSDefaultStateData.timeoutValue;
 
          s.waitForTimeout = stream->readFlag();
          s.fire = stream->readFlag();

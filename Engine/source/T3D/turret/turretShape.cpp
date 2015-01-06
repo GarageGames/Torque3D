@@ -35,20 +35,10 @@
 
 //----------------------------------------------------------------------------
 
-// Client prediction
-static F32 sMinWarpTicks = 0.5 ;        // Fraction of tick at which instant warp occures
-static S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
-
-const U32 sClientCollisionMask = (TerrainObjectType     |
-                                  StaticShapeObjectType |
-                                  VehicleObjectType);
-
-const U32 sServerCollisionMask = (sClientCollisionMask);
-
 // Trigger objects that are not normally collided with.
-static U32 sTriggerMask = ItemObjectType     |
-                          TriggerObjectType  |
-                          CorpseObjectType;
+static U32 sTSTriggerMask = ItemObjectType     |
+                            TriggerObjectType  |
+                            CorpseObjectType;
 
 //----------------------------------------------------------------------------
 
@@ -1031,7 +1021,7 @@ void TurretShape::getCameraTransform(F32* pos,MatrixF* mat)
    RayInfo collision;
    Point3F ep = sp + vec + offset;
    if (mContainer->castRay(sp, ep,
-         ~(WaterObjectType | GameBaseObjectType | DefaultObjectType | sTriggerMask),
+         ~(WaterObjectType | GameBaseObjectType | DefaultObjectType | sTSTriggerMask),
          &collision) == true) {
 
       // Shift the collision point back a little to try and

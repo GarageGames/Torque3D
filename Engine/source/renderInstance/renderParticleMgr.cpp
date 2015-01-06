@@ -36,7 +36,7 @@
 #include "gfx/gfxDrawUtil.h"
 #include "collision/clippedPolyList.h"
 
-static const Point4F cubePoints[9] = 
+static const Point4F cubePoints4[9] =
 {
    Point4F(-0.5, -0.5, -0.5, 1.0f), Point4F(-0.5, -0.5,  0.5, 1.0f), Point4F(-0.5,  0.5, -0.5, 1.0f), Point4F(-0.5,  0.5,  0.5, 1.0f),
    Point4F( 0.5, -0.5, -0.5, 1.0f), Point4F( 0.5, -0.5,  0.5, 1.0f), Point4F( 0.5,  0.5, -0.5, 1.0f), Point4F( 0.5,  0.5,  0.5, 1.0f)
@@ -170,7 +170,7 @@ void RenderParticleMgr::addElement( RenderInst *inst )
 
       for(S32 i = 0; i < 8; i++)
       {
-         tempPt = cubePoints[i];
+         tempPt = cubePoints4[i];
          pri->bbModelViewProj->mul(tempPt);
          tempPt = tempPt / tempPt.w;
 

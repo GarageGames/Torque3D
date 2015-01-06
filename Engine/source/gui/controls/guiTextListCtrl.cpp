@@ -95,7 +95,7 @@ static const char *getColumn(const char *text)
    return text;
 }
 
-static S32 QSORT_CALLBACK textCompare( const void* a, const void* b )
+static S32 QSORT_CALLBACK textListTextCompare( const void* a, const void* b )
 {
    GuiTextListCtrl::Entry *ea = (GuiTextListCtrl::Entry *) (a);
    GuiTextListCtrl::Entry *eb = (GuiTextListCtrl::Entry *) (b);
@@ -103,7 +103,7 @@ static S32 QSORT_CALLBACK textCompare( const void* a, const void* b )
    return ( sIncreasing ? result : -result );
 }
 
-static S32 QSORT_CALLBACK numCompare(const void *a,const void *b)
+static S32 QSORT_CALLBACK textListNumCompare(const void *a,const void *b)
 {
    GuiTextListCtrl::Entry *ea = (GuiTextListCtrl::Entry *) (a);
    GuiTextListCtrl::Entry *eb = (GuiTextListCtrl::Entry *) (b);
@@ -390,7 +390,7 @@ void GuiTextListCtrl::sort(U32 column, bool increasing)
       return;
    sortColumn = column;
    sIncreasing = increasing;
-   dQsort((void *)&(mList[0]), mList.size(), sizeof(Entry), textCompare);
+   dQsort((void *)&(mList[0]), mList.size(), sizeof(Entry), textListTextCompare);
 }
 
 void GuiTextListCtrl::sortNumerical( U32 column, bool increasing )
@@ -400,7 +400,7 @@ void GuiTextListCtrl::sortNumerical( U32 column, bool increasing )
 
    sortColumn = column;
    sIncreasing = increasing;
-   dQsort( (void*) &( mList[0] ), mList.size(), sizeof( Entry ), numCompare );
+   dQsort( (void*) &( mList[0] ), mList.size(), sizeof( Entry ), textListNumCompare );
 }
 
 void GuiTextListCtrl::onRemove()
