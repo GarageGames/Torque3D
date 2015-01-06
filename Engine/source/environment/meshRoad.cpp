@@ -68,6 +68,12 @@ U32 gIdxArray[6][2][3] = {
    { { 4, 6, 7 }, { 4, 7, 5 }, },   // Back Face
 };
 
+struct MeshRoadHitSegment
+{
+   U32 idx;
+   F32 t;
+};
+
 static S32 QSORT_CALLBACK compareHitSegments(const void* a,const void* b)
 {
    const MeshRoadHitSegment *fa = (MeshRoadHitSegment*)a;

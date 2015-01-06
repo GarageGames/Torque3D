@@ -45,12 +45,6 @@
 #include "collision/convex.h"
 #endif
 
-struct MeshRoadHitSegment
-{
-   U32 idx;
-   F32 t;
-};
-
 class MeshRoad;
 
 //-------------------------------------------------------------------------
