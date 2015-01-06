@@ -29,7 +29,6 @@
 #include "gfx/gfxDrawUtil.h"
 #include "console/engineAPI.h"
 
-static ColorI colorWhite(255,255,255); //  Added
 
 // Function to return the number of columns in 'string' given delimeters in 'set'
 U32 getColumnCount(const char *string, const char *set)
@@ -834,6 +833,8 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
 
    if ( mScrollDir != GuiScrollCtrl::None )
       autoScroll();
+
+   const ColorI colorWhite(255,255,255); //  Added
 
    RectI r( offset, getExtent() );
    if ( mInAction )

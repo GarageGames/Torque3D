@@ -48,9 +48,6 @@
 #include "gui/core/guiDefaultControlRender.h"
 #include "console/engineAPI.h"
 
-static const ColorI colorWhite(255,255,255);
-static const ColorI colorBlack(0,0,0);
-
 IMPLEMENT_CONOBJECT(GuiIconButtonCtrl);
 
 ConsoleDocClass( GuiIconButtonCtrl,

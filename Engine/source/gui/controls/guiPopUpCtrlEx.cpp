@@ -52,7 +52,6 @@ ConsoleDocClass( GuiPopUpMenuCtrlEx,
 
 	"@ingroup GuiControls\n");
 
-static ColorI colorWhite(255,255,255); //  Added
 
 GuiPopUpBackgroundCtrlEx::GuiPopUpBackgroundCtrlEx(GuiPopUpMenuCtrlEx *ctrl, GuiPopupTextListCtrlEx *textList)
 {
@@ -970,6 +969,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
 
    if ( mScrollDir != GuiScrollCtrl::None )
       autoScroll();
+
+   const ColorI colorWhite(255,255,255); //  Added
 
    RectI r( offset, getExtent() );
    if ( mInAction )
