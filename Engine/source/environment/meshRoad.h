@@ -110,7 +110,6 @@ public:
 // MeshRoadSplineNode Class
 //-------------------------------------------------------------------------
 
-class Path;
 class TerrainBlock;
 struct ObjectRenderInst;
 

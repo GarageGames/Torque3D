@@ -92,7 +92,6 @@ inline U32 Path::getPathIndex() const
 class Marker : public SceneObject
 {
    typedef SceneObject Parent;
-   friend class Path;
 
   public:
    enum SmoothingType
