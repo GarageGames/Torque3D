@@ -57,7 +57,6 @@ extern InputObjectInstances DIK_to_Key( U8 dikCode );
 
 // static helper variables
 static HANDLE gMutexHandle = NULL;
-static bool sgDoubleByteEnabled = false;
 
 // track window states
 Win32PlatState winState;
@@ -300,7 +299,6 @@ void Platform::init()
 
    installRedBookDevices();
 
-   sgDoubleByteEnabled = GetSystemMetrics( SM_DBCSENABLED );
    sgQueueEvents = true;
    Con::printf("Done");
 }
