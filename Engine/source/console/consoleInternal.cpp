@@ -36,7 +36,6 @@
 
 #define ST_INIT_SIZE 15
 
-static char scratchBuffer[1024];
 U32 Namespace::mCacheSequence = 0;
 DataChunker Namespace::mCacheAllocator;
 DataChunker Namespace::mAllocator;
@@ -643,6 +642,7 @@ Dictionary::Entry* Dictionary::addVariable(  const char *name,
 
    if(name[0] != '$')
    {
+      static char scratchBuffer[1024];
       scratchBuffer[0] = '$';
       dStrcpy(scratchBuffer + 1, name);
       name = scratchBuffer;
