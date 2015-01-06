@@ -41,6 +41,12 @@
 class GuiPopUpMenuCtrl;
 class GuiPopupTextListCtrl;
 
+// Function to return the number of columns in 'string' given delimeters in 'set'
+U32 getColumnCount(const char *string, const char *set);
+
+// Function to return the 'index' column from 'string' given delimeters in 'set'
+const char *getColumn(const char *string, char* returnbuff, U32 index, const char *set);
+
 class GuiPopUpBackgroundCtrl : public GuiControl
 {
 protected:

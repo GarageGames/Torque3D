@@ -32,7 +32,7 @@
 static ColorI colorWhite(255,255,255); //  Added
 
 // Function to return the number of columns in 'string' given delimeters in 'set'
-static U32 getColumnCount(const char *string, const char *set)
+U32 getColumnCount(const char *string, const char *set)
 {
    U32 count = 0;
    U8 last = 0;
@@ -56,7 +56,7 @@ static U32 getColumnCount(const char *string, const char *set)
 }   
 
 // Function to return the 'index' column from 'string' given delimeters in 'set'
-static const char *getColumn(const char *string, char* returnbuff, U32 index, const char *set)
+const char *getColumn(const char *string, char* returnbuff, U32 index, const char *set)
 {
    U32 sz;
    while(index--)
@@ -75,7 +75,7 @@ static const char *getColumn(const char *string, char* returnbuff, U32 index, co
    dStrncpy(ret, string, sz);
    ret[sz] = '\0';
    return ret;
-}   
+}
 
 GuiPopUpBackgroundCtrl::GuiPopUpBackgroundCtrl(GuiPopUpMenuCtrl *ctrl, GuiPopupTextListCtrl *textList)
 {

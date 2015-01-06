@@ -104,23 +104,6 @@ void FieldBrushObject::destroyFields()
 
 
 //-----------------------------------------------------------------------------
-// Suppress Spaces.
-//-----------------------------------------------------------------------------
-static char replacebuf[1024];
-static char* suppressSpaces(const char* in_pname)
-{
-	U32 i = 0;
-	char chr;
-	do
-	{
-		chr = in_pname[i];
-		replacebuf[i++] = (chr != 32) ? chr : '_';
-	} while(chr);
-
-	return replacebuf;
-}
-
-//-----------------------------------------------------------------------------
 // Query Groups.
 //-----------------------------------------------------------------------------
 DefineConsoleMethod(FieldBrushObject, queryGroups, const char*, (const char* simObjName), , "(simObject) Query available static-field groups for selected object./\n"

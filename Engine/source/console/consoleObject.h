@@ -653,6 +653,10 @@ template< typename T > EnginePropertyTable& ConcreteClassRep< T >::smPropertyTab
 // Forward declaration of this function so  it can be used in the class
 const char *defaultProtectedGetFn( void *obj, const char *data );
 
+//-----------------------------------------------------------------------------
+// Suppress Spaces.
+//-----------------------------------------------------------------------------
+char* suppressSpaces(const char* in_pname);
 
 //=============================================================================
 //    ConsoleObject.

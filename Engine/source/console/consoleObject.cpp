@@ -313,18 +313,18 @@ AbstractClassRep *AbstractClassRep::getCommonParent( const AbstractClassRep *oth
 //------------------------------------------------------------------------------
 //-------------------------------------- ConsoleObject
 
-static char replacebuf[1024];
-static char* suppressSpaces(const char* in_pname)
+char* suppressSpaces(const char* in_pname)
 {
-	U32 i = 0;
-	char chr;
-	do
-	{
-		chr = in_pname[i];
-		replacebuf[i++] = (chr != 32) ? chr : '_';
-	} while(chr);
+   static char replacebuf[1024];
+   U32 i = 0;
+   char chr;
+   do
+   {
+      chr = in_pname[i];
+      replacebuf[i++] = (chr != 32) ? chr : '_';
+   } while(chr);
 
-	return replacebuf;
+   return replacebuf;
 }
 
 void ConsoleObject::addGroup(const char* in_pGroupname, const char* in_pGroupDocs)
