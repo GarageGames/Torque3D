@@ -56,6 +56,9 @@ void torque_mac_engineshutdown();
 
 extern bool LinkConsoleFunctions;
 
+// Defined in c_scripting.cpp
+Namespace::Entry* GetEntry(const char* nameSpace, const char* name);
+
 extern "C" {
 
    // reset the engine, unloading any current level and returning to the main menu
@@ -226,28 +229,6 @@ extern "C" {
 	void torque_setvariable(const char* name, const char* value)
 	{
 		Con::setVariable(StringTable->insert(name), StringTable->insert(value));
-	}
-
-	static Namespace::Entry* GetEntry(const char* nameSpace, const char* name)                                          
-	{
-		Namespace* ns = NULL;
-
-		if (!nameSpace || !dStrlen(nameSpace))
-			ns = Namespace::mGlobalNamespace;
-		else
-		{
-			nameSpace = StringTable->insert(nameSpace);
-			ns = Namespace::find(nameSpace); //can specify a package here, maybe need, maybe not
-		}
-
-		if (!ns)
-			return NULL;
-
-		name = StringTable->insert(name);
-
-		Namespace::Entry* entry = ns->lookupRecursive(name);
-
-		return entry;
 	}
 
    // Export a function to the Torque 3D console system which matches the StringCallback function prototype
