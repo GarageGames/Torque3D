@@ -187,14 +187,25 @@ endif()
 ###############################################################################
 # Always enabled paths first
 ###############################################################################
+setModule(app)
 addPath("${srcDir}/") # must come first :)
+addPath("${srcDir}/main/")
 addPathRec("${srcDir}/app")
+addPathRec("${projectSrcDir}")
+
+setModule(sfx)
 addPath("${srcDir}/sfx/media")
 addPath("${srcDir}/sfx/null")
 addPath("${srcDir}/sfx")
+
+setModule(component)
 addPath("${srcDir}/component")
 addPath("${srcDir}/component/interfaces")
+
+setModule(console)
 addPath("${srcDir}/console")
+
+setModule(core)
 addPath("${srcDir}/core")
 addPath("${srcDir}/core/stream")
 addPath("${srcDir}/core/strings")
@@ -205,15 +216,28 @@ addPath("${srcDir}/core/util/journal/test")
 addPath("${srcDir}/core/util/zip")
 addPath("${srcDir}/core/util/zip/test")
 addPath("${srcDir}/core/util/zip/compressors")
+
+setModule(i18n)
 addPath("${srcDir}/i18n")
+
+setModule(sim)
 addPath("${srcDir}/sim")
+
+setModule(util)
 addPath("${srcDir}/util")
+addPath("${srcDir}/util/messaging")
+
+setModule(windowManager)
 addPath("${srcDir}/windowManager")
 addPath("${srcDir}/windowManager/torque")
 addPath("${srcDir}/windowManager/test")
+
+setModule(math)
 addPath("${srcDir}/math")
 addPath("${srcDir}/math/util")
 addPath("${srcDir}/math/test")
+
+setModule(platform)
 addPath("${srcDir}/platform")
 addPath("${srcDir}/cinterface")
 addPath("${srcDir}/platform/nativeDialogs")
@@ -226,9 +250,8 @@ addPath("${srcDir}/platform/async")
 addPath("${srcDir}/platform/async/test")
 addPath("${srcDir}/platform/input")
 addPath("${srcDir}/platform/output")
-addPath("${srcDir}/app")
-addPath("${srcDir}/app/net")
-addPath("${srcDir}/util/messaging")
+
+setModule(gfx)
 addPath("${srcDir}/gfx/Null")
 addPath("${srcDir}/gfx/test")
 addPath("${srcDir}/gfx/bitmap")
@@ -236,36 +259,43 @@ addPath("${srcDir}/gfx/bitmap/loaders")
 addPath("${srcDir}/gfx/util")
 addPath("${srcDir}/gfx/video")
 addPath("${srcDir}/gfx")
-addPath("${srcDir}/shaderGen")
 addPath("${srcDir}/gfx/sim")
+
+setModule(gui_A)
 addPath("${srcDir}/gui/buttons")
-addPath("${srcDir}/gui/containers")
-addPath("${srcDir}/gui/controls")
 addPath("${srcDir}/gui/core")
 addPath("${srcDir}/gui/game")
 addPath("${srcDir}/gui/shiny")
 addPath("${srcDir}/gui/utility")
 addPath("${srcDir}/gui")
+addPath("${srcDir}/gui/3d")
+
+setModule(gui_B)
+addPath("${srcDir}/gui/containers")
+addPath("${srcDir}/gui/controls")
+
+setModule(collision)
 addPath("${srcDir}/collision")
+
+setModule(materials)
 addPath("${srcDir}/materials")
-addPath("${srcDir}/lighting")
-addPath("${srcDir}/lighting/common")
-addPath("${srcDir}/renderInstance")
-addPath("${srcDir}/scene")
-addPath("${srcDir}/scene/culling")
-addPath("${srcDir}/scene/zones")
-addPath("${srcDir}/scene/mixin")
-addPath("${srcDir}/shaderGen")
+
+setModule(environment)
 addPath("${srcDir}/terrain")
 addPath("${srcDir}/environment")
 addPath("${srcDir}/forest")
 addPath("${srcDir}/forest/ts")
+
+setModule(ts)
 addPath("${srcDir}/ts")
 addPath("${srcDir}/ts/arch")
-addPath("${srcDir}/physics")
-addPath("${srcDir}/gui/3d")
-addPath("${srcDir}/postFx")
+addPathRec("${srcDir}/ts/collada")
+addPathRec("${srcDir}/ts/loader")
+
+setModule(T3D_A)
 addPath("${srcDir}/T3D")
+
+setModule(T3D_B)
 addPath("${srcDir}/T3D/examples")
 addPath("${srcDir}/T3D/fps")
 addPath("${srcDir}/T3D/fx")
@@ -275,10 +305,17 @@ addPath("${srcDir}/T3D/decal")
 addPath("${srcDir}/T3D/sfx")
 addPath("${srcDir}/T3D/gameBase")
 addPath("${srcDir}/T3D/turret")
-addPath("${srcDir}/main/")
-addPathRec("${srcDir}/ts/collada")
-addPathRec("${srcDir}/ts/loader")
-addPathRec("${projectSrcDir}")
+
+setModule(rendering)
+addPath("${srcDir}/lighting")
+addPath("${srcDir}/lighting/common")
+addPath("${srcDir}/postFx")
+addPath("${srcDir}/renderInstance")
+addPath("${srcDir}/scene")
+addPath("${srcDir}/scene/culling")
+addPath("${srcDir}/scene/zones")
+addPath("${srcDir}/scene/mixin")
+addPath("${srcDir}/shaderGen")
 
 ###############################################################################
 # modular paths
@@ -301,7 +338,22 @@ if(TORQUE_BASIC_LIGHTING)
     addDef(TORQUE_BASIC_LIGHTING)
 endif()
 
+# Include tools for non-tool builds (or define player if a tool build)
+if(TORQUE_TOOLS)
+    setModule(editor_world)
+    addPath("${srcDir}/gui/worldEditor")
+
+    setModule(editor_gui)
+    addPath("${srcDir}/gui/editor")
+
+    setModule(editor_other)
+    addPath("${srcDir}/gui/editor/inspector")
+    addPath("${srcDir}/environment/editors")
+    addPath("${srcDir}/forest/editor")
+endif()
+
 # DirectX Sound
+setModule(sfx)
 if(TORQUE_SFX_DirectX)
     addLib(x3daudio.lib)
     addPathRec("${srcDir}/sfx/dsound")
@@ -322,6 +374,8 @@ if(TORQUE_SFX_OPENAL AND NOT TORQUE_DEDICATED)
     
 endif()
 
+setModule(extra)
+
 # Vorbis
 if(TORQUE_SFX_VORBIS)
     addInclude(${libDir}/libvorbis/include)
@@ -333,22 +387,12 @@ endif()
 # Theora
 if(TORQUE_THEORA)
     addPath("${srcDir}/core/ogg")
-    addPath("${srcDir}/gfx/video")
     addPath("${srcDir}/gui/theora")
     
     addDef(TORQUE_OGGTHEORA)
     addDef(TORQUE_OGGVORIBS)
     addInclude(${libDir}/libtheora/include)
     addLib(libtheora)
-endif()
-
-# Include tools for non-tool builds (or define player if a tool build)
-if(TORQUE_TOOLS)
-    addPath("${srcDir}/gui/worldEditor")
-    addPath("${srcDir}/environment/editors")
-    addPath("${srcDir}/forest/editor")
-    addPath("${srcDir}/gui/editor")
-    addPath("${srcDir}/gui/editor/inspector")
 endif()
 
 if(TORQUE_HIFI)
@@ -409,10 +453,10 @@ endif()
 
 include( "modules/module_testing.cmake" )
 
-
 ###############################################################################
 # platform specific things
 ###############################################################################
+setModule(platform)
 if(WIN32)
     addPath("${srcDir}/platformWin32")
     addPath("${srcDir}/platformWin32/nativeDialogs")
