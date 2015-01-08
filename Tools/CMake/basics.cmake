@@ -60,7 +60,7 @@ mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
 set(curModule "")
 set(allModules "")
 
-option(TORQUE_UNIFIED_BUILD "Enable unified build" OFF)
+option(TORQUE_UNIFIED_BUILD "Build files in groups (faster compile time and improved optimization)" OFF)
 
 # sets the current module
 macro(setModule module)
