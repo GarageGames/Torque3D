@@ -1,0 +1,35 @@
+body {
+	background-position: top center;
+	background-color: White;
+	margin: 0px;
+    text-align: center; /* for IE */
+	font-size: 18px;
+	color: #FFFFFF;	
+}
+
+#torqueLogo {
+      position: absolute;
+      left: 0px;
+      margin-top: 2px;
+}
+
+div#main {
+	width: 802px;
+	margin: 0px auto;
+      color: black;
+      font-weight: bold;
+      font-size: 22px;
+      font-family: Arial;
+    text-align: left; /* counter the body center */
+}
+
+div#gameobject {
+	margin: 18px 0px 18px;
+	border:1px solid #393E42;
+	width: 800px;
+	height: 600px;
+}
+
+
+		
+
