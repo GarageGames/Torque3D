@@ -36,6 +36,10 @@
 #include "math/mPoint3.h"
 #endif
 
+GFXDeclareVertexFormat( GFXVertexPad )
+{
+   U32 data;
+};
 
 GFXDeclareVertexFormat( GFXVertexP )
 {

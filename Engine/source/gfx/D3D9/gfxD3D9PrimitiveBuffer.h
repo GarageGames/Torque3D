@@ -35,7 +35,6 @@ class GFXD3D9PrimitiveBuffer : public GFXPrimitiveBuffer
    public:
       IDirect3DIndexBuffer9 *ib;
       StrongRefPtr<GFXD3D9PrimitiveBuffer> mVolatileBuffer;
-      U32 mVolatileStart;
 
 #ifdef TORQUE_DEBUG
    #define _PBGuardString "GFX_PRIMTIVE_BUFFER_GUARD_STRING"

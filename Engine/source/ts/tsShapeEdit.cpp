@@ -892,10 +892,6 @@ TSMesh* TSShape::copyMesh( const TSMesh* srcMesh ) const
       mesh = new TSMesh;
    }
 
-   // Set vertex format (all meshes in this shape must share the same format)
-   mesh->mVertSize = mVertSize;
-   mesh->mVertexFormat = &mVertexFormat;
-
    if ( !srcMesh )
       return mesh;      // return an empty mesh
 
@@ -906,52 +902,15 @@ TSMesh* TSShape::copyMesh( const TSMesh* srcMesh ) const
    mesh->numMatFrames = srcMesh->numMatFrames;
    mesh->vertsPerFrame = srcMesh->vertsPerFrame;
    mesh->setFlags(srcMesh->getFlags());
-   mesh->mHasColor = srcMesh->mHasColor;
-   mesh->mHasTVert2 = srcMesh->mHasTVert2;
    mesh->mNumVerts = srcMesh->mNumVerts;
 
-   if ( srcMesh->mVertexData.isReady() )
-   {
-      mesh->mVertexData.set( NULL, 0, 0, false );
-      void *aligned_mem = dMalloc_aligned( mVertSize * srcMesh->mVertexData.size(), 16 );
+   // Copy vertex data in an *unpacked* form
+   mesh->copySourceVertexDataFrom(srcMesh);
 
-      // Copy the source data (note that the destination shape may have different vertex size)
-      if ( mVertSize == srcMesh->mVertexData.size() )
-      {
-         dMemcpy( aligned_mem, srcMesh->mVertexData.address(), srcMesh->mVertexData.mem_size() );
-      }
-      else
-      {
-         U8* src = (U8*)srcMesh->mVertexData.address();
-         U8* dest = (U8*)aligned_mem;
-         for ( S32 i = 0; i < srcMesh->mVertexData.size(); i++ )
-         {
-            dMemcpy( dest, src, srcMesh->mVertexData.vertSize() );
-            src += srcMesh->mVertexData.vertSize();
-            dest += mVertSize;
-         }
-      }
-      mesh->mVertexData.set( aligned_mem, mVertSize, srcMesh->mVertexData.size() );
-      mesh->mVertexData.setReady( true );
-   }
-   else
-   {
-      mesh->verts = srcMesh->verts;
-      mesh->tverts = srcMesh->tverts;
-      mesh->tverts2 = srcMesh->tverts2;
-      mesh->colors = srcMesh->colors;
-      mesh->norms = srcMesh->norms;
-
-      mesh->createTangents(mesh->verts, mesh->norms);
-      mesh->encodedNorms.set(NULL,0);
-
-      mesh->convertToAlignedMeshData();
-   }
+   mesh->createTangents(mesh->verts, mesh->norms);
+   mesh->encodedNorms.set(NULL, 0);
 
    mesh->computeBounds();
-
-   if ( mesh->getMeshType() != TSMesh::SkinMeshType )
-      mesh->createVBIB();
 
    return mesh;
 }

@@ -44,6 +44,9 @@
 // We need to include customMaterialDefinition for ShaderConstHandles::init
 #include "materials/customMaterialDefinition.h"
 
+
+#include "ts/tsShape.h"
+
 ///
 /// ShaderConstHandles
 ///
@@ -98,6 +101,9 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
 
    for (S32 i = 0; i < TEXTURE_STAGE_COUNT; ++i)
       mRTParamsSC[i] = shader->getShaderConstHandle( String::ToString( "$rtParams%d", i ) );
+
+   // MFT_HardwareSkinning
+   mNodeTransforms = shader->getShaderConstHandle( "$nodeTransforms" );
 
    // Clear any existing texture handles.
    dMemset( mTexHandlesSC, 0, sizeof( mTexHandlesSC ) );
@@ -489,6 +495,12 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
                                        *info.type, 
                                        features, 
                                        &fd );
+   }
+
+   // Need to add the Hardware Skinning feature if its used
+   if ( features.hasFeature( MFT_HardwareSkinning ) )
+   {
+      fd.features.addFeature( MFT_HardwareSkinning );
    }
 
    // Now disable any features that were 
@@ -1215,6 +1227,20 @@ void ProcessedShaderMaterial::setTransforms(const MatrixSet &matrixSet, SceneRen
 
    if ( handles->m_vEyeSC->isValid() )
       shaderConsts->set( handles->m_vEyeSC, state->getVectorEye() );
+}
+
+void ProcessedShaderMaterial::setNodeTransforms(const MatrixF *transforms, const U32 transformCount, const U32 pass)
+{
+   PROFILE_SCOPE( ProcessedShaderMaterial_setNodeTransforms );
+
+   GFXShaderConstBuffer* shaderConsts = _getShaderConstBuffer(pass);
+   ShaderConstHandles* handles = _getShaderConstHandles(pass);
+
+   if ( handles->mNodeTransforms->isValid() )
+   {
+      S32 realTransformCount = getMin( transformCount, TSShape::smMaxSkinBones );
+      shaderConsts->set( handles->mNodeTransforms, transforms, realTransformCount, GFXSCT_Float4x3 );
+   }
 }
 
 void ProcessedShaderMaterial::setSceneInfo(SceneRenderState * state, const SceneData& sgData, U32 pass)

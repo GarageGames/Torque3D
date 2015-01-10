@@ -243,6 +243,12 @@ void RenderTranslucentMgr::render( SceneRenderState *state )
                matrixSet.setProjection(*passRI->projection);
                mat->setTransforms(matrixSet, state);
 
+               // Setup HW skinning transforms if applicable
+               if (mat->usesHardwareSkinning())
+               {
+                  mat->setNodeTransforms(passRI->mNodeTransforms, passRI->mNodeTransformCount);
+               }
+
                // If we're instanced then don't render yet.
                if ( mat->isInstanced() )
                {

@@ -406,9 +406,10 @@ bool VolumetricFog::LoadShape()
                mIsVBDirty = true;
                for (U32 k = 0; k < numNrms; k++)
                   {
-                     Point3F norm = mesh->mVertexData[k].normal();
-                     Point3F vert = mesh->mVertexData[k].vert();
-                     Point2F uv = mesh->mVertexData[k].tvert();
+                     const TSMesh::__TSMeshVertexBase &vd = mesh->mVertexData.getBase(k);
+                     Point3F norm = vd.normal();
+                     Point3F vert = vd.vert();
+                     Point2F uv = vd.tvert();
                      tmpVerts[k].point = vert;
                      tmpVerts[k].texCoord = uv;
                      tmpVerts[k].normal = norm;

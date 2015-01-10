@@ -176,6 +176,12 @@ void RenderMeshMgr::render(SceneRenderState * state)
             matrixSet.setProjection(*passRI->projection);
             mat->setTransforms(matrixSet, state);
 
+            // Setup HW skinning transforms if applicable
+            if (mat->usesHardwareSkinning())
+            {
+               mat->setNodeTransforms(passRI->mNodeTransforms, passRI->mNodeTransformCount);
+            }
+
             setupSGData( passRI, sgData );
             mat->setSceneInfo( state, sgData );
 

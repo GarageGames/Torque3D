@@ -187,6 +187,28 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
 
          buffer += element.getSizeInBytes();
       }
+      else if ( element.isSemantic( GFXSemantic::BLENDWEIGHT ) )
+      {
+         glElement.attrIndex = Torque::GL_VertexAttrib_BlendWeight0 + element.getSemanticIndex();
+         glElement.elementCount = 4;
+         glElement.normalized = false;
+         glElement.type = GL_FLOAT;
+         glElement.stride = vertexSize;
+         glElement.pointerFirst = (void*)buffer;
+
+         buffer += element.getSizeInBytes();
+      }
+      else if ( element.isSemantic( GFXSemantic::BLENDINDICES ) )
+      {
+         glElement.attrIndex = Torque::GL_VertexAttrib_BlendIndex0 + element.getSemanticIndex();
+         glElement.elementCount = 4;
+         glElement.normalized = false;
+         glElement.type = GL_UNSIGNED_BYTE;
+         glElement.stride = vertexSize;
+         glElement.pointerFirst = (void*)buffer;
+
+         buffer += element.getSizeInBytes();
+      }
       else // Everything else is a texture coordinate.
       {
          String name = element.getSemantic();
