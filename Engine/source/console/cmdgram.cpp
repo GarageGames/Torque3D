@@ -89,15 +89,14 @@
 
 // bison --defines=cmdgram.h --verbose -o cmdgram.cpp -p CMD CMDgram.y
 
-// Make sure we don't get gram.h twice.
-#define _CMDGRAM_H_
-
 #include <stdlib.h>
 #include <stdio.h>
 #include "console/console.h"
 #include "console/compiler.h"
 #include "console/consoleInternal.h"
 #include "core/strings/stringFunctions.h"
+
+#include "console/cmdgram_inc.h"
 
 #ifndef YYDEBUG
 #define YYDEBUG 0
@@ -120,24 +119,20 @@ void CMDerror(char *, ...);
 #endif
 #define alloca dMalloc
 
-template< typename T >
-struct Token
-{
-   T value;
-   U32 lineNumber;
-};
-
-#line 44 "cmdgram.y"
+#line 36 "cmdgram.y"
 
         /* Reserved Word Definitions */
-#line 55 "cmdgram.y"
+#line 47 "cmdgram.y"
 
         /* Constants and Identifier Definitions */
-#line 69 "cmdgram.y"
+#line 61 "cmdgram.y"
 
         /* Operator Definitions */
+#line 74 "cmdgram.y"
 
-#line 82 "cmdgram.y"
+#ifndef _CMDGRAM_H_ // Avoid conflict if cmdgram.h was included
+
+#line 78 "cmdgram.y"
 typedef union {
    Token< char >           c;
    Token< int >            i;
@@ -155,6 +150,9 @@ typedef union {
    AssignDecl              asn;
    IfStmtNode*             ifnode;
 } YYSTYPE;
+#line 96 "cmdgram.y"
+
+#endif // _CMDGRAM_H_
 
 #ifndef YYLTYPE
 typedef
