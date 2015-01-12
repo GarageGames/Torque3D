@@ -34,14 +34,7 @@
 
 #include "console/simBase.h"
 
-template< typename T >
-struct Token
-{
-   T value;
-   S32 lineNumber;
-};
-#include "console/cmdgram.h"
-
+#include "console/cmdgram_inc.h"
 
 namespace Compiler
 {
