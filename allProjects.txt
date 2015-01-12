@@ -1,2 +1,3 @@
 Templates\Full\
 Templates\Empty\
+Templates\DarkUI_Empty\
