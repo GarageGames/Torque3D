@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'IEDarkUI_EmptyPlugin'
+		'IEDarkUI_EmptyPlugin.DLL'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}

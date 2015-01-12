@@ -1,0 +1,5 @@
+# Allow the following 3D mesh file formats in this directory:
+!*.obj
+!*.mtl
+!*.3ds
+!*.max
