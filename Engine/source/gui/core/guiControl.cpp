@@ -2816,11 +2816,11 @@ DefineConsoleMethod( GuiControl, setExtent, void, ( const char* extOrX, const ch
 {
    Point2I extent;
    if(!dStrIsEmpty(extOrX) && dStrIsEmpty(y))
-      dSscanf(extOrX, "%f %f", &extent.x, &extent.y);
+      dSscanf(extOrX, "%d %d", &extent.x, &extent.y);
    else if(!dStrIsEmpty(extOrX) && !dStrIsEmpty(y))
    {
-      extent.x = dAtof(extOrX);
-      extent.y = dAtof(y);
+      extent.x = dAtoi(extOrX);
+      extent.y = dAtoi(y);
    }
    object->setExtent( extent );
 }
