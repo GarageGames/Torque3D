@@ -1,0 +1,352 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(CreateNewTerrainGui, EditorGuiGroup) {
+   canSaveDynamicFields = "0";
+   Enabled = "1";
+   isContainer = "1";
+   Profile = "ToolsGuiOverlayProfile";
+   HorizSizing = "right";
+   VertSizing = "bottom";
+   Position = "0 0";
+   Extent = "640 480";
+   MinExtent = "8 2";
+   canSave = "1";
+   isDecoy = "0";
+   Visible = "1";
+   tooltipprofile = "ToolsGuiToolTipProfile";
+   hovertime = "1000";
+
+   new GuiWindowCtrl() {
+      canSaveDynamicFields = "0";
+      Enabled = "1";
+      isContainer = "1";
+      Profile = "ToolsGuiWindowProfile";
+      HorizSizing = "center";
+      VertSizing = "center";
+      Position = "182 94";
+      Extent = "250 140";
+      MinExtent = "8 2";
+      canSave = "1";
+      isDecoy = "0";
+      Visible = "1";
+      tooltipprofile = "ToolsGuiToolTipProfile";
+      hovertime = "1000";
+      Margin = "0 0 0 0";
+      Padding = "0 0 0 0";
+      AnchorTop = "1";
+      AnchorBottom = "1";
+      AnchorLeft = "1";
+      AnchorRight = "1";
+      resizeWidth = "0";
+      resizeHeight = "0";
+      canMove = "1";
+      canClose = "1";
+      canMinimize = "0";
+      canMaximize = "0";
+      minSize = "50 50";
+      closeCommand = "Canvas.popDialog( CreateNewTerrainGui );";
+      EdgeSnap = "0";
+      text = "Create New Terrain";
+
+      new GuiTextEditCtrl() {
+         canSaveDynamicFields = "0";
+         internalName = "theName";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiTextEditProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "68 30";
+         Extent = "171 18";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         maxLength = "1024";
+         historySize = "0";
+         password = "0";
+         tabComplete = "0";
+         sinkAllKeyEvents = "0";
+         text = "myNewTerrain";
+         passwordMask = "*";
+      };
+      new GuiTextCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiTextProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "32 31";
+         Extent = "31 16";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         text = "Name:";
+         maxLength = "1024";
+      };
+      new GuiButtonCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiButtonProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "10 108";
+         Extent = "138 24";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         Command = "CreateNewTerrainGui.create();";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         text = "Create New";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         useMouseEvents = "0";
+         accelerator = "return";
+      };
+      new GuiButtonCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiButtonProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "159 108";
+         Extent = "80 24";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         Command = "Canvas.popDialog( CreateNewTerrainGui );";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         text = "Cancel";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         useMouseEvents = "0";
+         accelerator = "escape";
+      };
+      new GuiRadioCtrl() {
+         canSaveDynamicFields = "0";
+         internalName = "flatRadio";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiRadioProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "155 80";
+         Extent = "40 18";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         text = "Flat";
+         groupNum = "1";
+         buttonType = "RadioButton";
+         useMouseEvents = "0";
+         useInactiveState = "0";
+      };
+      new GuiRadioCtrl() {
+         canSaveDynamicFields = "0";
+         internalName = "noiseRadio";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiRadioProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "195 80";
+         Extent = "45 18";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         text = "Noise";
+         groupNum = "1";
+         buttonType = "RadioButton";
+         useMouseEvents = "0";
+         useInactiveState = "0";
+      };
+      new GuiTextCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiTextProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "23 56";
+         Extent = "40 16";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         text = "Material: ";
+         maxLength = "1024";
+      };
+      new GuiTextCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiTextProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "10 81";
+         Extent = "52 16";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         text = "Resolution:";
+         maxLength = "1024";
+      };
+      new GuiPopUpMenuCtrl() {
+         canSaveDynamicFields = "0";
+         internalName = "theRezList";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiPopUpMenuProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "68 80";
+         Extent = "57 18";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         maxLength = "1024";
+         maxPopupHeight = "200";
+         sbUsesNAColor = "0";
+         reverseTextList = "0";
+         bitmapBounds = "16 16";
+      };
+      new GuiPopUpMenuCtrl() {
+         canSaveDynamicFields = "0";
+         internalName = "theMaterialList";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiPopUpMenuProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "68 55";
+         Extent = "171 18";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         maxLength = "1024";
+         maxPopupHeight = "200";
+         sbUsesNAColor = "0";
+         reverseTextList = "0";
+         bitmapBounds = "16 16";
+      };
+   };
+};
+//--- OBJECT WRITE END ---
+function CreateNewTerrainGui::onWake( %this )
+{   
+   %this-->theName.setText( "" );
+
+   %matList = %this-->theMaterialList;
+   %matList.clear();
+   %count = TerrainMaterialSet.getCount();
+   for ( %i=0; %i < %count; %i++ )
+      %matList.add( TerrainMaterialSet.getObject( %i ).internalName, %i );
+   %matList.setSelected( 0 );
+   
+   %rezList = %this-->theRezList;
+   %rezList.clear();
+   %rezList.add( "256", 256 );
+   %rezList.add( "512", 512 );
+   %rezList.add( "1024", 1024 );
+   %rezList.add( "2048", 2048 );
+   //%rezList.add( "4096", 4096 );
+   %rezList.setSelected( 256 );
+   
+   %this-->flatRadio.setStateOn( true );
+}
+   
+function CreateNewTerrainGui::create( %this )
+{
+   %terrainName = %this-->theName.getText();   
+   %resolution = %this-->theRezList.getSelected();
+   %materialName = %this-->theMaterialList.getText();
+   %genNoise = %this-->noiseRadio.getValue();
+
+   %obj = TerrainBlock::createNew( %terrainName, %resolution, %materialName, %genNoise );
+   
+   if( %genNoise )
+      ETerrainEditor.isDirty = true;
+
+   if( isObject( %obj ) )
+   {
+      // Submit an undo action. 
+      MECreateUndoAction::submit(%obj);
+   
+      assert( isObject( EWorldEditor ), 
+         "ObjectBuilderGui::processNewObject - EWorldEditor is missing!" );
+
+      // Select it in the editor.
+      EWorldEditor.clearSelection();
+      EWorldEditor.selectObject(%obj);
+
+      // When we drop the selection don't store undo
+      // state for it... the creation deals with it.
+      EWorldEditor.dropSelection( true );
+   }
+
+   Canvas.popDialog( %this );
+}
