@@ -27,7 +27,7 @@
    };
    new GuiDynamicCtrlArrayControl(){
       Position = "116 3";
-      extent = "111 32";
+      extent = "146 32";
       colCount = "31";
       colSize = "29";
       rowCount = "1";
@@ -104,6 +104,29 @@
          useMouseEvents = "0";
          useInactiveState = "0";
       };
+      new GuiBitmapButtonCtrl(MeshRoadEditorShowProfileBtn) {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "GuiDefalutProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         Position = "89 3";
+         Extent = "29 27";
+         MinExtent = "8 2";
+         canSave = "1";
+         isDecoy = "0";
+         Visible = "1";
+         Variable = "$MeshRoad::showRoadProfile";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         toolTip = "Show Road Profile (P)";
+         bitmap = "tools/worldEditor/images/road-river/menubar/show-profile";
+         groupNum = "-1";
+         buttonType = "ToggleButton";
+         useMouseEvents = "0";
+         useInactiveState = "0";
+      };
    };
    new GuiControl(MeshRoadDefaultWidthTextEditContainer) {
       canSaveDynamicFields = "0";
@@ -111,7 +134,7 @@
       Profile = "ToolsGuiTransparentProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
-      position = "230 5";
+      position = "265 5";
       Extent = "120 50";
       MinExtent = "8 2";
       canSave = "1";
@@ -189,7 +212,7 @@
       Profile = "ToolsGuiTransparentProfile";
       HorizSizing = "right";
       VertSizing = "bottom";
-      position = "360 5";
+      position = "395 5";
       Extent = "120 50";
       MinExtent = "8 2";
       canSave = "1";

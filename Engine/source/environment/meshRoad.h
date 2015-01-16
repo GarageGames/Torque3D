@@ -45,6 +45,7 @@
 #include "collision/convex.h"
 #endif
 
+#include "math/util/decomposePoly.h"
 
 //extern U32 gIdxArray[6][2][3];
 
@@ -55,6 +56,67 @@ struct MeshRoadHitSegment
 };
 
 class MeshRoad;
+
+class MeshRoadProfileNode
+{
+private:
+   Point3F  mPos;       // The position of the node.  Only x and y are used.
+   bool     mSmooth;    // Is the node smoothed?  Determines the normal at the node.
+
+public:
+   MeshRoadProfileNode()            { mSmooth = false; }
+   MeshRoadProfileNode(Point3F p)      { mPos = p; mSmooth = false; }
+
+   void setPosition(F32 x, F32 y)   { mPos.x = x; mPos.y = y; mPos.z = 0.0f; }
+   Point3F getPosition()            { return mPos; }
+   void setSmoothing(bool isSmooth) { mSmooth = isSmooth; }
+   bool isSmooth()                  { return mSmooth; }
+};
+
+//-------------------------------------------------------------------------
+// MeshRoadProfile Class
+//-------------------------------------------------------------------------
+
+class MeshRoadProfile
+{
+private:
+   friend class GuiMeshRoadEditorCtrl;
+   friend class MeshRoad;
+   friend class GuiMeshRoadEditorUndoAction;
+
+protected:
+   MeshRoad*                     mRoad;         // A pointer to the Road this profile belongs to
+   Vector<MeshRoadProfileNode>   mNodes;        // The list of nodes in the profile
+   Vector<VectorF>               mNodeNormals;  // The list of normals for each node
+   Vector<U8>                    mSegMtrls;     // The list of segment materials
+   MatrixF                       mObjToSlice;   // Transform profile from obj to slice space
+   MatrixF                       mSliceToObj;   // Transform profile from slice to obj space
+   Point3F                       mStartPos;     // Start position of profile in world space
+   decompPoly                    mCap;          // The polygon that caps the ends
+
+public:
+   MeshRoadProfile();
+
+   S32 clickOnLine(Point3F &p);                                // In profile space
+   void addPoint(U32 nodeId, Point3F &p);                      // In profile space
+   void removePoint(U32 nodeId);
+   void setNodePosition(U32 nodeId, Point3F pos);              // In profile space
+   void toggleSmoothing(U32 nodeId);
+   void toggleSegMtrl(U32 seg);                                // Toggle between top, bottom, side
+   void generateNormals();
+   void generateEndCap(F32 width);
+   void setProfileDepth(F32 depth);
+   void setTransform(const MatrixF &mat, const Point3F &p);    // Object to slice space transform
+   void getNodeWorldPos(U32 nodeId, Point3F &p);               // Get node position in world space
+   void getNormToSlice(U32 normId, VectorF &n);                // Get normal vector in slice space
+   void getNormWorldPos(U32 normId, Point3F &p);               // Get normal end pos in world space
+   void worldToObj(Point3F &p);                                // Transform from world to obj space
+   void objToWorld(Point3F &p);                                // Transform from obj to world space
+   F32 getProfileLen();
+   F32 getNodePosPercent(U32 nodeId);
+   Vector<MeshRoadProfileNode> getNodes() { return mNodes; }
+   void resetProfile(F32 defaultDepth);                        // Reset profile to 2 default nodes
+};
 
 //-------------------------------------------------------------------------
 // MeshRoadConvex Class
@@ -276,6 +338,9 @@ struct MeshRoadSlice
    F32 texCoordV;
 
    U32 parentNodeIdx;
+
+   Vector<Point3F> verts;
+   Vector<VectorF> norms;
 };
 typedef Vector<MeshRoadSlice> MeshRoadSliceVector;
 
@@ -414,6 +479,7 @@ private:
    friend class GuiMeshRoadEditorCtrl;
    friend class GuiMeshRoadEditorUndoAction;
    friend class MeshRoadConvex;
+   friend class MeshRoadProfile;
 
    typedef SceneObject		Parent;
 
@@ -425,7 +491,8 @@ private:
       InitialUpdateMask = Parent::NextFreeMask << 3,
       SelectedMask      = Parent::NextFreeMask << 4,
       MaterialMask      = Parent::NextFreeMask << 5,
-      NextFreeMask      = Parent::NextFreeMask << 6,
+      ProfileMask       = Parent::NextFreeMask << 6,
+      NextFreeMask      = Parent::NextFreeMask << 7,
    };   
 
 public:
@@ -503,12 +570,14 @@ public:
 
    /// Protected 'Component' Field setter that will add a component to the list.
    static bool addNodeFromField( void *object, const char *index, const char *data );
+   static bool addProfileNodeFromField(void *obj, const char *index, const char* data);
 
    static bool smEditorOpen;
    static bool smWireframe;
    static bool smShowBatches;
    static bool smShowSpline;
    static bool smShowRoad;
+   static bool smShowRoadProfile;
    static SimObjectPtr<SimSet> smServerMeshRoadSet;   
 
 protected:
@@ -550,6 +619,8 @@ protected:
 
    U32 mVertCount[SurfaceCount];
    U32 mTriangleCount[SurfaceCount];   
+
+   MeshRoadProfile mSideProfile;
       
    // Fields.
    F32 mTextureLength;

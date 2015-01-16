@@ -24,6 +24,8 @@ $MeshRoad::wireframe = true;
 $MeshRoad::showSpline = true;
 $MeshRoad::showReflectPlane = false;
 $MeshRoad::showRoad = true;
+$MeshRoad::showRoadProfile = false;
+
 $MeshRoad::breakAngle = 3.0;
    
 function MeshRoadEditorGui::onWake( %this )

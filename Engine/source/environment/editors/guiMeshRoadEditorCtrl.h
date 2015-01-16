@@ -117,6 +117,7 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
 		};
 
       S32 _getNodeAtScreenPos( const MeshRoad *pRoad, const Point2I &posi );
+      S32 _getProfileNodeAtScreenPos( MeshRoadProfile *pProfile, const Point2I &posi);
       void _drawSpline( MeshRoad *road, const ColorI &color );
       void _drawControlNodes( MeshRoad *road, const ColorI &color );
 
@@ -128,9 +129,14 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
       bool mSavedDrag;
       bool mIsDirty;
 
+      bool mSavedProfileDrag;
+      bool mDeselectProfileNode;
+
       SimSet *mRoadSet;
       S32 mSelNode;
       S32 mHoverNode;
+      S32 mProfileNode;
+      Vector<U32> mSelProfNodeList;
       U32 mAddNodeIdx;
       SimObjectPtr<MeshRoad> mSelRoad;      
       SimObjectPtr<MeshRoad> mHoverRoad;
@@ -146,6 +152,7 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
       ColorI mHoverSplineColor;
       ColorI mSelectedSplineColor;
       ColorI mHoverNodeColor;
+      ColorI mProfileColor;
 
       bool mHasCopied;
 	public:
@@ -164,6 +171,8 @@ class GuiMeshRoadEditorUndoAction : public UndoAction
       GuiMeshRoadEditorCtrl *mEditor;         
 
       Vector<MeshRoadNode> mNodes;
+      Vector<MeshRoadProfileNode> mProfileNodes;
+      Vector<U8> mProfileMtrls;
 
       SimObjectId mObjId;
       F32 mMetersPerSegment;
