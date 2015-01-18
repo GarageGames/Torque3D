@@ -1647,7 +1647,7 @@ StringStackConsoleWrapper::~StringStackConsoleWrapper()
 {
    for (int i=0; i<argc; i++)
    {
-      argv[i] = NULL;
+      argv[i] = 0;
    }
    delete[] argv;
 }

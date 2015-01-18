@@ -1833,7 +1833,7 @@ void SimObject::inspectPostApply()
 
 //-----------------------------------------------------------------------------
 
-String SimObject::_getLogMessage(const char* fmt, void* args) const
+String SimObject::_getLogMessage(const char* fmt, va_list args) const
 {
    String objClass = "UnknownClass";
    if(getClassRep())

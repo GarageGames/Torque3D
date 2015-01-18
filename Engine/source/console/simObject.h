@@ -411,7 +411,7 @@ class SimObject: public ConsoleObject
       virtual void _onUnselected() {}
    
       /// We can provide more detail, like object name and id.
-      virtual String _getLogMessage(const char* fmt, void* args) const;
+      virtual String _getLogMessage(const char* fmt, va_list args) const;
    
       DEFINE_CREATE_METHOD
       {
