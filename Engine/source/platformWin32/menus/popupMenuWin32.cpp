@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef TORQUE_SDL
+
 #include "platform/menus/popupMenu.h"
 #include "platformWin32/platformWin32.h"
 #include "console/consoleTypes.h"
@@ -169,7 +171,7 @@ void PopupMenu::createPlatformMenu()
 // Public Methods
 //////////////////////////////////////////////////////////////////////////
 
-S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accelerator)
+S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accelerator, const char *)
 {
    Win32Window *pWindow = mCanvas ? dynamic_cast<Win32Window*>(mCanvas->getPlatformWindow()) : NULL;
    bool isAttached = isAttachedToMenuBar();
@@ -266,7 +268,7 @@ S32 PopupMenu::insertSubMenu(S32 pos, const char *title, PopupMenu *submenu)
    return -1;
 }
 
-bool PopupMenu::setItem(S32 pos, const char *title, const char* accelerator)
+bool PopupMenu::setItem(S32 pos, const char *title, const char* accelerator, const char *)
 {
    Win32Window *pWindow = mCanvas ? dynamic_cast<Win32Window*>(mCanvas->getPlatformWindow()) : NULL;
    bool isAttached = isAttachedToMenuBar();
@@ -740,3 +742,4 @@ S32 PopupMenu::getPosOnMenuBar()
    return pos;
 }
 
+#endif

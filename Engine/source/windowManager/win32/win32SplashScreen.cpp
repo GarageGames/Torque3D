@@ -121,6 +121,8 @@ void CloseSplashWindow(HINSTANCE hinst)
 	
 }
 
+#ifndef TORQUE_SDL
+
 bool Platform::closeSplashWindow()
 {
    CloseSplashWindow(GetModuleHandle(NULL));
@@ -155,4 +157,4 @@ bool Platform::displaySplashWindow( String path )
 	return true;
 }
 
-
+#endif

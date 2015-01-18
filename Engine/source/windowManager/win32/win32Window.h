@@ -139,6 +139,8 @@ public:
       return mWindowHandle;
    }
 
+   virtual void* getSystemWindow(const WindowSystem system);
+
    HMENU &getMenuHandle()
    {
       return mMenuHandle;
