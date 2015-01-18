@@ -40,6 +40,7 @@ public:
 private:
    static PlatformAssert *platformAssert;
    bool processing;
+   bool ignoreAll;
 
    virtual bool displayMessageBox(const char *title, const char *message, bool retry);
    virtual bool process(Type         assertType,

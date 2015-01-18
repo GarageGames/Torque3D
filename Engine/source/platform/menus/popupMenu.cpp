@@ -195,9 +195,9 @@ bool PopupMenu::onMessageObjectReceived(StringTableEntry queue, Message *msg )
 // Console Methods
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(PopupMenu, insertItem, S32, (S32 pos, const char * title, const char * accelerator), ("", ""), "(pos[, title][, accelerator])")
+DefineConsoleMethod(PopupMenu, insertItem, S32, (S32 pos, const char * title, const char * accelerator, const char* cmd), ("", "", ""), "(pos[, title][, accelerator][, cmd])")
 {
-   return object->insertItem(pos, title, accelerator);
+   return object->insertItem(pos, title, accelerator, cmd);
 }
 
 DefineConsoleMethod(PopupMenu, removeItem, void, (S32 pos), , "(pos)")
@@ -216,9 +216,9 @@ DefineConsoleMethod(PopupMenu, insertSubMenu, S32, (S32 pos, String title, Strin
    return object->insertSubMenu(pos, title, mnu);
 }
 
-DefineConsoleMethod(PopupMenu, setItem, bool, (S32 pos, const char * title, const char * accelerator), (""), "(pos, title[, accelerator])")
+DefineConsoleMethod(PopupMenu, setItem, bool, (S32 pos, const char * title, const char * accelerator, const char *cmd), (""), "(pos, title[, accelerator][, cmd])")
 {
-   return object->setItem(pos, title, accelerator);
+   return object->setItem(pos, title, accelerator, cmd);
 }
 
 //-----------------------------------------------------------------------------

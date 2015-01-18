@@ -39,6 +39,8 @@
 #include "core/util/journal/process.h"
 #include "core/util/journal/journaledSignal.h"
 
+#if !defined( TORQUE_SDL )
+
 static U32 _ModifierKeys=0;
 static BYTE keyboardState[256];
 static bool initKBState = false;
@@ -591,3 +593,6 @@ void DispatchRemove(HWND hWnd)
 {
 	_MessageQueue.remove(hWnd);
 }
+
+
+#endif

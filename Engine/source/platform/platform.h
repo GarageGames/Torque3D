@@ -174,6 +174,15 @@ namespace Platform
       bool isdst;     ///< True if daylight savings time is active
    };
 
+	enum ALERT_ASSERT_RESULT
+	{
+		ALERT_ASSERT_DEBUG,
+		ALERT_ASSERT_IGNORE,
+		ALERT_ASSERT_IGNORE_ALL,
+		ALERT_ASSERT_EXIT
+	};
+
+
    void getLocalTime(LocalTime &);
    
    /// Converts the local time to a formatted string appropriate
@@ -300,6 +309,7 @@ namespace Platform
    void AlertOK(const char *windowTitle, const char *message);
    bool AlertOKCancel(const char *windowTitle, const char *message);
    bool AlertRetry(const char *windowTitle, const char *message);
+   ALERT_ASSERT_RESULT AlertAssert(const char *windowTitle, const char *message);
 
    // Volumes
    struct VolumeInformation

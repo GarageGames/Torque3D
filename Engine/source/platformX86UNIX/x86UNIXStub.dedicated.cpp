@@ -107,6 +107,7 @@ void Platform::AlertOK(const char *, const char *) {}
 bool Platform::AlertOKCancel(const char *, const char *) { return false; }
 S32  Platform::messageBox(char const*, char const*, MBButtons, MBIcons) { return 0; }
 bool Platform::AlertRetry(char const*, char const*) { return false ; }
+Platform::ALERT_ASSERT_RESULT Platform::AlertAssert(const char *windowTitle, const char *message) { return ALERT_ASSERT_EXIT; }
 
 // file dialog
 IMPLEMENT_CONOBJECT(FileDialog);
