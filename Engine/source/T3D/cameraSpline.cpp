@@ -165,8 +165,8 @@ void CameraSpline::buildTimeMap()
 
       if ((segment / sublength) < epsilon || time == (mSize - 1) || mFloor(lt) != mFloor(time)) 
       {
-		 length += sublength;
-		 sublength = 0.0f;
+         length += sublength;
+         sublength = 0.0f;
          map.mTime = time;
          map.mDistance = length;
          mTimeMap.push_back(map);
