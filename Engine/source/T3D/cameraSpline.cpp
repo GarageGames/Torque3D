@@ -145,6 +145,7 @@ void CameraSpline::buildTimeMap()
    Knot ka,kj,ki;
    value(0, &kj, true);
    F32 length = 0.0f;
+   F32 sublength = 0.0f;
    ka = kj;
 
    // Loop through the knots and add nodes. Nodes are added for every knot and
@@ -159,10 +160,13 @@ void CameraSpline::buildTimeMap()
 
       value(time, &ki, true);
       length += (ki.mPosition - kj.mPosition).len();
+	  sublength += (ki.mPosition - kj.mPosition).len();
       F32 segment = (ki.mPosition - ka.mPosition).len();
 
-      if ((segment / length) < epsilon || time == (mSize - 1) || mFloor(lt) != mFloor(time)) 
+      if ((segment / sublength) < epsilon || time == (mSize - 1) || mFloor(lt) != mFloor(time)) 
       {
+		 length += sublength;
+		 sublength = 0.0f;
          map.mTime = time;
          map.mDistance = length;
          mTimeMap.push_back(map);
