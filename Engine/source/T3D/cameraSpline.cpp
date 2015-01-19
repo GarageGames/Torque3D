@@ -160,7 +160,7 @@ void CameraSpline::buildTimeMap()
 
       value(time, &ki, true);
       length += (ki.mPosition - kj.mPosition).len();
-	  sublength += (ki.mPosition - kj.mPosition).len();
+      sublength += (ki.mPosition - kj.mPosition).len();
       F32 segment = (ki.mPosition - ka.mPosition).len();
 
       if ((segment / sublength) < epsilon || time == (mSize - 1) || mFloor(lt) != mFloor(time)) 
