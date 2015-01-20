@@ -159,7 +159,6 @@ U32 convertUTF8toUTF16N(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
    {
       const UTF16Cache &cache = (*cacheItr).value;
       cache.copyToBuffer(outbuffer, len);
-      outbuffer[len-1] = '\0';
       return getMin(cache.mLength,len - 1);
    }
 #endif
