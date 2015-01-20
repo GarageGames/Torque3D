@@ -118,10 +118,6 @@ U32 dStrlen(const UTF16 *unistring);
 U32 dStrlen(const UTF32 *unistring);
 
 //-----------------------------------------------------------------------------
-/// Comparing unicode strings
-U32 dStrncmp(const UTF16* unistring1, const UTF16* unistring2, U32 len);
-
-//-----------------------------------------------------------------------------
 /// Scanning for characters in unicode strings
 UTF16* dStrrchr(UTF16* unistring, U32 c);
 const UTF16* dStrrchr(const UTF16* unistring, U32 c);

@@ -509,21 +509,6 @@ U32 dStrlen(const UTF32 *unistring)
 }
 
 //-----------------------------------------------------------------------------
-U32 dStrncmp(const UTF16* unistring1, const UTF16* unistring2, U32 len)
-{
-   UTF16 c1, c2;
-   for(U32 i = 0; i<len; i++)
-   {
-      c1 = *unistring1++;
-      c2 = *unistring2++;
-      if(c1 < c2) return -1;
-      if(c1 > c2) return 1;
-      if(!c1) return 0;
-   }
-   return 0;
-}
-
-//-----------------------------------------------------------------------------
 
 const UTF16* dStrrchr(const UTF16* unistring, U32 c)
 {
