@@ -362,7 +362,7 @@ S32 WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
    {
       TCHAR buf[ moduleNameSize ];
       GetModuleFileNameW( NULL, buf, moduleNameSize );
-      convertUTF16toUTF8( buf, moduleName, moduleNameSize );
+      convertUTF16toUTF8( buf, moduleName );
    }
 #else
    GetModuleFileNameA(NULL, moduleName, moduleNameSize);
@@ -440,7 +440,7 @@ S32 torque_winmain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
    {
       TCHAR buf[ moduleNameSize ];
       GetModuleFileNameW( NULL, buf, moduleNameSize );
-      convertUTF16toUTF8( buf, moduleName, moduleNameSize );
+      convertUTF16toUTF8( buf, moduleName );
    }
 #else
    GetModuleFileNameA(NULL, moduleName, moduleNameSize);
@@ -541,7 +541,7 @@ bool Platform::openWebBrowser( const char* webAddress )
       RegCloseKey( regKey );
       sHaveKey = true;
 
-      convertUTF16toUTF8(sWebKey,utf8WebKey,512);
+      convertUTF16toUTF8(sWebKey,utf8WebKey);
 
 #ifdef UNICODE
       char *p = dStrstr((const char *)utf8WebKey, "%1"); 

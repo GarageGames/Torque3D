@@ -81,12 +81,18 @@ UTF8*  convertUTF16toUTF8( const UTF16 *unistring);
 /// - If the provided buffer is too small, the output will be truncated.
 U32 convertUTF8toUTF16N(const UTF8 *unistring, UTF16 *outbuffer, U32 len);
 
-U32 convertUTF16toUTF8( const UTF16 *unistring, UTF8  *outbuffer, U32 len);
+U32 convertUTF16toUTF8N( const UTF16 *unistring, UTF8  *outbuffer, U32 len);
 
 template <size_t N>
 inline U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 (&outbuffer)[N])
 {
    return convertUTF8toUTF16N(unistring, outbuffer, (U32) N);
+}
+
+template <size_t N>
+inline U32 convertUTF16toUTF8(const UTF16 *unistring, UTF8 (&outbuffer)[N])
+{
+   return convertUTF16toUTF8N(unistring, outbuffer, (U32) N);
 }
 
 //-----------------------------------------------------------------------------

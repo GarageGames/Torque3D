@@ -601,7 +601,7 @@ static bool recurseDumpPath(const char *path, const char *pattern, Vector<Platfo
    do
    {
 #ifdef UNICODE
-      convertUTF16toUTF8( findData.cFileName, buf, buf.size );
+      convertUTF16toUTF8N( findData.cFileName, buf, buf.size );
       char* fnbuf = buf;
 #else
       char *fnbuf = findData.cFileName;
@@ -1213,10 +1213,10 @@ void Platform::getVolumeInformationList( Vector<VolumeInformation>& out_rVolumeI
 
 #ifdef UNICODE
             char buf[ sizeof( lpszFileSystem ) / sizeof( lpszFileSystem[ 0 ] ) * 3 + 1 ];
-            convertUTF16toUTF8( lpszFileSystem, buf, sizeof( buf ) / sizeof( buf[ 0 ] ) );
+            convertUTF16toUTF8( lpszFileSystem, buf );
             info.FileSystem = StringTable->insert( buf );
 
-            convertUTF16toUTF8( lpszVolumeName, buf, sizeof( buf ) / sizeof( buf[ 0 ] ) );
+            convertUTF16toUTF8( lpszVolumeName );
             info.Name = StringTable->insert( buf );
 #else
             info.FileSystem = StringTable->insert( lpszFileSystem );
@@ -1276,7 +1276,7 @@ bool Platform::hasSubDirectory(const char *pPath)
 
 #ifdef UNICODE
          char fileName[ 1024 ];
-         convertUTF16toUTF8( findData.cFileName, fileName, sizeof( fileName ) / sizeof( fileName[ 0 ] ) );
+         convertUTF16toUTF8( findData.cFileName, fileName );
 #else
          char* fileName = findData.cFileName;
 #endif
@@ -1397,7 +1397,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
             continue;
 
 #ifdef UNICODE
-         convertUTF16toUTF8( findData.cFileName, fileName, fileName.size );
+         convertUTF16toUTF8N( findData.cFileName, fileName, fileName.size );
 #else
          char* fileName = findData.cFileName;
 #endif
@@ -1472,7 +1472,7 @@ StringTableEntry osGetTemporaryDirectory()
 #ifdef UNICODE
    TempAlloc< char > dirBuffer( len * 3 + 1 );
    char* dir = dirBuffer;
-   convertUTF16toUTF8( buffer, dir, dirBuffer.size );
+   convertUTF16toUTF8N( buffer, dir, dirBuffer.size );
 #else
    char* dir = buf;
 #endif

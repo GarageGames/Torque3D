@@ -588,7 +588,7 @@ const char* DInputDevice::getName()
 {
 #ifdef UNICODE
    static UTF8 buf[512];
-   convertUTF16toUTF8(mDeviceInstance.tszInstanceName, buf, sizeof(buf));
+   convertUTF16toUTF8(mDeviceInstance.tszInstanceName, buf);
    return (const char *)buf;
 #else
    return mDeviceInstance.tszInstanceName;
@@ -600,7 +600,7 @@ const char* DInputDevice::getProductName()
 {
 #ifdef UNICODE
    static UTF8 buf[512];
-   convertUTF16toUTF8(mDeviceInstance.tszProductName, buf, sizeof(buf));
+   convertUTF16toUTF8(mDeviceInstance.tszProductName, buf);
    return (const char *)buf;
 #else
    return mDeviceInstance.tszProductName;

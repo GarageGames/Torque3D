@@ -191,7 +191,7 @@ U32 convertUTF8toUTF16N(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
 }
 
 //-----------------------------------------------------------------------------
-U32 convertUTF16toUTF8( const UTF16 *unistring, UTF8  *outbuffer, U32 len)
+U32 convertUTF16toUTF8N( const UTF16 *unistring, UTF8  *outbuffer, U32 len)
 {
    AssertFatal(len >= 1, "Buffer for unicode conversion must be large enough to hold at least the null terminator.");
    PROFILE_START(convertUTF16toUTF8);
@@ -274,7 +274,7 @@ UTF8*  convertUTF16toUTF8( const UTF16* unistring)
    FrameTemp<UTF8> buf(len);
       
    // perform conversion
-   nCodeunits = convertUTF16toUTF8( unistring, buf, len);
+   nCodeunits = convertUTF16toUTF8N( unistring, buf, len);
    
    // add 1 for the NULL terminator the converter promises it included.
    nCodeunits++;

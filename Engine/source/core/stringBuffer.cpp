@@ -359,7 +359,7 @@ void StringBuffer::getCopy8(UTF8 *buff, const U32 buffSize) const
 {
    incRequestCount8();
    AssertFatal(mBuffer.last() == 0, "StringBuffer::get UTF8 - not a null terminated string!");
-   convertUTF16toUTF8(mBuffer.address(), buff, buffSize);
+   convertUTF16toUTF8N(mBuffer.address(), buff, buffSize);
 }
 
 void StringBuffer::getCopy(UTF16 *buff, const U32 buffSize) const
@@ -408,7 +408,7 @@ void StringBuffer::updateBuffer8()
 {
    U32 slackLen = getUTF8BufferSizeEstimate();
    mBuffer8.setSize(slackLen);
-   U32 len = convertUTF16toUTF8(mBuffer.address(), mBuffer8.address(), slackLen);
+   U32 len = convertUTF16toUTF8N(mBuffer.address(), mBuffer8.address(), slackLen);
    mBuffer8.setSize(len+1);
    mBuffer8.compact();
    mDirty8 = false;

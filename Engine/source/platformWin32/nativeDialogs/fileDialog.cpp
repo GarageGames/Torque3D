@@ -79,7 +79,7 @@ static LRESULT PASCAL OKBtnFolderHackProc(HWND hWnd, UINT uMsg, WPARAM wParam, L
             char *filePath;
 #ifdef UNICODE
             char fileBuf[MAX_PATH];
-            convertUTF16toUTF8(ofn->lpstrFile, fileBuf, sizeof(fileBuf));
+            convertUTF16toUTF8(ofn->lpstrFile, fileBuf);
             filePath = fileBuf;
 #else
             filePath = ofn->lpstrFile;
@@ -140,7 +140,7 @@ static UINT_PTR CALLBACK FolderHookProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPA
 
                      char filePath[MAX_PATH];
 #ifdef UNICODE
-                     convertUTF16toUTF8(buf, filePath, sizeof(filePath));
+                     convertUTF16toUTF8(buf, filePath);
 #else
                      dStrcpy( filePath, buf );
 #endif
@@ -158,7 +158,7 @@ static UINT_PTR CALLBACK FolderHookProc(HWND hdlg, UINT uMsg, WPARAM wParam, LPA
                            
 #ifdef UNICODE
                            char buf2[MAX_PATH];
-                           convertUTF16toUTF8(buf, buf2, sizeof(buf2));
+                           convertUTF16toUTF8(buf, buf2);
 #else
                            char *buf2 = buf;
 #endif
@@ -442,7 +442,7 @@ bool FileDialog::Execute()
    // Handle Result Properly for Unicode as well as ANSI
 #ifdef UNICODE
    if(pszFileTitle[0] || ! ( mData.mStyle & FileDialogData::FDS_OPEN && mData.mStyle & FileDialogData::FDS_MULTIPLEFILES ))
-      convertUTF16toUTF8( (UTF16*)pszFile, (UTF8*)pszResult, sizeof(pszResult));
+      convertUTF16toUTF8( (UTF16*)pszFile, pszResult);
    else
       convertUTF16toUTF8DoubleNULL( (UTF16*)pszFile, (UTF8*)pszResult, sizeof(pszResult));
 #else
