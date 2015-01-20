@@ -324,10 +324,10 @@ bool FileDialog::Execute()
    UTF16 pszFileTitle[MAX_PATH];
    UTF16 pszDefaultExtension[MAX_PATH];
    // Convert parameters to UTF16*'s
-   convertUTF8toUTF16((UTF8 *)mData.mDefaultFile, pszFile, sizeof(pszFile));
-   convertUTF8toUTF16((UTF8 *)mData.mDefaultPath, pszInitialDir, sizeof(pszInitialDir));
-   convertUTF8toUTF16((UTF8 *)mData.mTitle, pszTitle, sizeof(pszTitle));
-   convertUTF8toUTF16((UTF8 *)mData.mFilters, pszFilter, sizeof(pszFilter) );
+   convertUTF8toUTF16((UTF8 *)mData.mDefaultFile, pszFile);
+   convertUTF8toUTF16((UTF8 *)mData.mDefaultPath, pszInitialDir);
+   convertUTF8toUTF16((UTF8 *)mData.mTitle, pszTitle);
+   convertUTF8toUTF16((UTF8 *)mData.mFilters, pszFilter);
 #else
    // Not Unicode, All char*'s!
    char pszFile[MAX_PATH];

@@ -423,7 +423,7 @@ U32 GFont::getStrNWidth(const UTF8 *str, U32 n)
 {
    // UTF8 conversion is expensive. Avoid converting in a tight loop.
    FrameTemp<UTF16> str16(n + 1);
-   convertUTF8toUTF16(str, str16, n + 1);
+   convertUTF8toUTF16N(str, str16, n + 1);
    return getStrNWidth(str16, dStrlen(str16));
 }
 
@@ -462,7 +462,7 @@ U32 GFont::getStrNWidth(const UTF16 *str, U32 n)
 U32 GFont::getStrNWidthPrecise(const UTF8 *str, U32 n)
 {
    FrameTemp<UTF16> str16(n + 1);
-   convertUTF8toUTF16(str, str16, n + 1);
+   convertUTF8toUTF16N(str, str16, n + 1);
    return getStrNWidthPrecise(str16, dStrlen(str16));
 }
 

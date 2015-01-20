@@ -54,7 +54,7 @@ bool dFileDelete(const char * name)
    TempAlloc< TCHAR > buf( dStrlen( name ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( name, buf, buf.size );
+   convertUTF8toUTF16N( name, buf, buf.size );
 #else
    dStrcpy( buf, name );
 #endif
@@ -74,8 +74,8 @@ bool dFileRename(const char *oldName, const char *newName)
    TempAlloc< TCHAR > newf( dStrlen( newName ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( oldName, oldf, oldf.size );
-   convertUTF8toUTF16( newName, newf, newf.size );
+   convertUTF8toUTF16N( oldName, oldf, oldf.size );
+   convertUTF8toUTF16N( newName, newf, newf.size );
 #else
    dStrcpy(oldf, oldName);
    dStrcpy(newf, newName);
@@ -93,7 +93,7 @@ bool dFileTouch(const char * name)
    TempAlloc< TCHAR > buf( dStrlen( name ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( name, buf, buf.size );
+   convertUTF8toUTF16N( name, buf, buf.size );
 #else
    dStrcpy( buf, name );
 #endif
@@ -119,8 +119,8 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
    TempAlloc< TCHAR > to( dStrlen( toName ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( fromName, from, from.size );
-   convertUTF8toUTF16( toName, to, to.size );
+   convertUTF8toUTF16N( fromName, from, from.size );
+   convertUTF8toUTF16N( toName, to, to.size );
 #else
    dStrcpy( from, fromName );
    dStrcpy( to, toName );
@@ -187,8 +187,8 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
          backslash(toFile);
          
 #ifdef UNICODE
-         convertUTF8toUTF16( tempBuf, wtempBuf, wtempBuf.size );
-         convertUTF8toUTF16( tempBuf1, wtempBuf1, wtempBuf1.size );
+         convertUTF8toUTF16N( tempBuf, wtempBuf, wtempBuf.size );
+         convertUTF8toUTF16N( tempBuf1, wtempBuf1, wtempBuf1.size );
          WCHAR* f = wtempBuf1;
          WCHAR* t = wtempBuf;
 #else
@@ -256,7 +256,7 @@ File::FileStatus File::open(const char *filename, const AccessMode openMode)
    TempAlloc< TCHAR > fname( dStrlen( filename ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( filename, fname, fname.size );
+   convertUTF8toUTF16N( filename, fname, fname.size );
 #else
    dStrcpy(fname, filename);
 #endif
@@ -586,7 +586,7 @@ static bool recurseDumpPath(const char *path, const char *pattern, Vector<Platfo
 
 #ifdef UNICODE
    TempAlloc< WCHAR > searchBuf( buf.size );
-   convertUTF8toUTF16( buf, searchBuf, searchBuf.size );
+   convertUTF8toUTF16N( buf, searchBuf, searchBuf.size );
    WCHAR* search = searchBuf;
 #else
    char *search = buf;
@@ -665,7 +665,7 @@ bool Platform::getFileTimes(const char *filePath, FileTime *createTime, FileTime
    TempAlloc< TCHAR > fp( dStrlen( filePath ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( filePath, fp, fp.size );
+   convertUTF8toUTF16N( filePath, fp, fp.size );
 #else
    dStrcpy( fp, filePath );
 #endif
@@ -697,7 +697,7 @@ bool Platform::createPath(const char *file)
 
 #ifdef UNICODE
    TempAlloc< WCHAR > fileBuf( pathbuf.size );
-   convertUTF8toUTF16( file, fileBuf, fileBuf.size );
+   convertUTF8toUTF16N( file, fileBuf, fileBuf.size );
    const WCHAR* fileName = fileBuf;
    const WCHAR* dir;
 #else
@@ -820,7 +820,7 @@ bool Platform::setCurrentDirectory(StringTableEntry newDir)
    TempAlloc< TCHAR > buf( dStrlen( newDir ) + 2 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( newDir, buf, buf.size - 1 );
+   convertUTF8toUTF16N( newDir, buf, buf.size - 1 );
 #else
    dStrcpy( buf, newDir );
 #endif
@@ -935,7 +935,7 @@ bool Platform::isFile(const char *pFilePath)
    TempAlloc< TCHAR > buf( dStrlen( pFilePath ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( pFilePath, buf, buf.size );
+   convertUTF8toUTF16N( pFilePath, buf, buf.size );
 #else
    dStrcpy( buf, pFilePath );
 #endif
@@ -974,7 +974,7 @@ S32 Platform::getFileSize(const char *pFilePath)
    TempAlloc< TCHAR > buf( dStrlen( pFilePath ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( pFilePath, buf, buf.size );
+   convertUTF8toUTF16N( pFilePath, buf, buf.size );
 #else
    dStrcpy( buf, pFilePath );
 #endif
@@ -1011,7 +1011,7 @@ bool Platform::isDirectory(const char *pDirPath)
    TempAlloc< TCHAR > buf( dStrlen( pDirPath ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( pDirPath, buf, buf.size );
+   convertUTF8toUTF16N( pDirPath, buf, buf.size );
 #else
    dStrcpy( buf, pDirPath );
 #endif
@@ -1057,8 +1057,8 @@ bool Platform::isSubDirectory(const char *pParent, const char *pDir)
    TempAlloc< TCHAR > dir( dStrlen( pDir ) + 1 );
 
 #ifdef UNICODE
-   convertUTF8toUTF16( fileName, file, file.size );
-   convertUTF8toUTF16( pDir, dir, dir.size );
+   convertUTF8toUTF16N( fileName, file, file.size );
+   convertUTF8toUTF16N( pDir, dir, dir.size );
 #else
    dStrcpy( file, fileName );
    dStrcpy( dir, pDir );
@@ -1251,7 +1251,7 @@ bool Platform::hasSubDirectory(const char *pPath)
 
 #ifdef UNICODE
    WCHAR buf[ 1024 ];
-   convertUTF8toUTF16( searchBuf, buf, sizeof( buf ) / sizeof( buf[ 0 ] ) );
+   convertUTF8toUTF16( searchBuf, buf );
    WCHAR* search = buf;
 #else
    char* search = searchBuf;
@@ -1335,7 +1335,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
 
 #ifdef UNICODE
    TempAlloc< WCHAR > searchStr( dStrlen( search ) + 1 );
-   convertUTF8toUTF16( search, searchStr, searchStr.size );
+   convertUTF8toUTF16N( search, searchStr, searchStr.size );
 #else
    char* searchStr = search;
 #endif

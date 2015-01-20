@@ -79,9 +79,15 @@ UTF8*  convertUTF16toUTF8( const UTF16 *unistring);
 /// - Output is null terminated. Be sure to provide 1 extra byte, U16 or U32 for
 ///   the null terminator, or you will see truncated output.
 /// - If the provided buffer is too small, the output will be truncated.
-U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 *outbuffer, U32 len);
+U32 convertUTF8toUTF16N(const UTF8 *unistring, UTF16 *outbuffer, U32 len);
 
 U32 convertUTF16toUTF8( const UTF16 *unistring, UTF8  *outbuffer, U32 len);
+
+template <size_t N>
+inline U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 (&outbuffer)[N])
+{
+   return convertUTF8toUTF16N(unistring, outbuffer, (U32) N);
+}
 
 //-----------------------------------------------------------------------------
 /// Functions that converts one unicode codepoint at a time

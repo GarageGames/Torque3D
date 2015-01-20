@@ -67,7 +67,7 @@ void WinConsole::enable(bool enabled)
       {
 #ifdef UNICODE
          UTF16 buf[512];
-         convertUTF8toUTF16((UTF8 *)title, buf, sizeof(buf));
+         convertUTF8toUTF16((UTF8 *)title, buf);
          SetConsoleTitle(buf);
 #else
          SetConsoleTitle(title);

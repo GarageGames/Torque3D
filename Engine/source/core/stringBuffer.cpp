@@ -141,7 +141,7 @@ void StringBuffer::set(const UTF8 *in)
    incRequestCount8();
    // Convert and store. Note that a UTF16 version of the string cannot be longer.
    FrameTemp<UTF16> tmpBuff(dStrlen(in)+1);
-   if(!in || in[0] == 0 || !convertUTF8toUTF16(in, tmpBuff, dStrlen(in)+1))
+   if(!in || in[0] == 0 || !convertUTF8toUTF16N(in, tmpBuff, dStrlen(in)+1))
    {
       // Easy out, it's a blank string, or a bad string.
       mBuffer.clear();
