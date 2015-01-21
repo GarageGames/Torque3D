@@ -1338,7 +1338,7 @@ String String::trim() const
 
 String String::expandEscapes() const
 {
-   char* tmp = ( char* ) dMalloc( length() * 2 + 1 ); // worst-case situation.
+   char* tmp = ( char* ) dMalloc( length() * 2 + 1 + 32 ); // worst-case situation.
    expandEscape( tmp, c_str() );
    String str( tmp );
    dFree( tmp );
@@ -1444,11 +1444,12 @@ S32 String::StrFormat::formatAppend( const char *format, void *args )
 {
    // Format into the fixed buffer first.
    S32 startLen = _len;
+   S32 writeLen;
    if (_dynamicBuffer == NULL)
    {
-      _len += vsnprintf(_fixedBuffer + _len, sizeof(_fixedBuffer) - _len, format, *(va_list*)args);
-      if (_len >= 0 && _len < sizeof(_fixedBuffer))
-         return _len;
+	   writeLen = vsnprintf(_fixedBuffer + _len, sizeof(_fixedBuffer) - _len, format, *(va_list*)args);
+	   if (writeLen >= 0 && (_len + writeLen) < sizeof(_fixedBuffer))
+		   return _len += writeLen;
 
       // Start off the dynamic buffer at twice fixed buffer size
       _len = startLen;
@@ -1460,14 +1461,14 @@ S32 String::StrFormat::formatAppend( const char *format, void *args )
    // Format into the dynamic buffer, if the buffer is not large enough, then
    // keep doubling it's size until it is.  The buffer is not reallocated
    // using reallocate() to avoid unnecessary buffer copying.
-   _len += vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, *(va_list*)args);
-   while (_len < 0 || _len >= _dynamicSize)
+   writeLen = vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, *(va_list*)args);
+   while (writeLen < 0 || (_len + writeLen) >= _dynamicSize)
    {
       _len = startLen;
       _dynamicBuffer = (char*)dRealloc(_dynamicBuffer, _dynamicSize *= 2);
-      _len += vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, *(va_list*)args);
+	  writeLen = vsnprintf(_dynamicBuffer + _len, _dynamicSize - _len, format, *(va_list*)args);
    }
-
+   _len += writeLen;
    return _len;
 }
 
@@ -1489,7 +1490,7 @@ S32 String::StrFormat::append(const char * str, S32 len)
    }
 
    S32 newSize = _dynamicSize;
-   while (newSize < _len+len)
+   while (newSize < _len+len+1)
       newSize *= 2;
    if (newSize != _dynamicSize)
       _dynamicBuffer = (char*) dRealloc(_dynamicBuffer, newSize);
