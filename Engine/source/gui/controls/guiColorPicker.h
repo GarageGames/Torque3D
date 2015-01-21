@@ -98,7 +98,11 @@ class GuiColorPickerCtrl : public GuiControl
    bool mMouseDown;		///< Mouse button down?
    bool mActionOnMove;		///< Perform onAction() when position has changed?
 
-	
+   bool mSelectColor;
+   ColorF mSetColor;
+   GBitmap* mBitmap;
+
+   Point2I findColor(const ColorF & color, const Point2I& offset, const Point2I& resolution, GBitmap& bmp);
    
    S32   mSelectorGap;		///< The half-way "gap" between the selector pos and where the selector is allowed to draw. 
 
@@ -113,6 +117,7 @@ class GuiColorPickerCtrl : public GuiControl
    DECLARE_CATEGORY( "Gui Editor" );
    
    GuiColorPickerCtrl();
+   ~GuiColorPickerCtrl();
 
    static void initPersistFields();
    void onRender(Point2I offset, const RectI &updateRect);
@@ -131,6 +136,7 @@ class GuiColorPickerCtrl : public GuiControl
    /// @name Selector Functions
    /// @{
    void setSelectorPos(const Point2I &pos); ///< Set new pos (in local coords)
+   void setSelectorPos(const ColorF & color);
    Point2I getSelectorPos() {return mSelectorPos;}
    /// @}
    

@@ -71,6 +71,18 @@ GuiColorPickerCtrl::GuiColorPickerCtrl()
    mSelectorGap = 1;
    mActionOnMove = false;
 	mShowReticle = true;
+	mSelectColor = false;
+	mSetColor = mSetColor.BLACK;
+	mBitmap = NULL;
+}
+
+GuiColorPickerCtrl::~GuiColorPickerCtrl()
+{
+	if (mBitmap)
+	{
+		delete mBitmap;
+		mBitmap = NULL;
+	}
 }
 
 //--------------------------------------------------------------------------
@@ -331,60 +343,180 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
 
 void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
 {
-   if (mStateBlock.isNull())
-   {
-      GFXStateBlockDesc desc;
-      desc.setBlend(true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
-      desc.setZReadWrite(false);
-      desc.zWriteEnable = false;
-      desc.setCullMode(GFXCullNone);
-      mStateBlock = GFX->createStateBlock( desc );
-   }
+	if (mStateBlock.isNull())
+	{
+		GFXStateBlockDesc desc;
+		desc.setBlend(true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
+		desc.setZReadWrite(false);
+		desc.zWriteEnable = false;
+		desc.setCullMode(GFXCullNone);
+		mStateBlock = GFX->createStateBlock(desc);
+	}
 
-   RectI boundsRect(offset, getExtent()); 
-   renderColorBox(boundsRect);
+	RectI boundsRect(offset, getExtent());
+	renderColorBox(boundsRect);
 
-   if (mPositionChanged) 
-   {
-      mPositionChanged = false;
-      Point2I extent = getRoot()->getExtent();
-      // If we are anything but a pallete, change the pick color
-      if (mDisplayMode != pPallet)
-      {
-         Point2I resolution = getRoot()->getExtent();
+	if (mPositionChanged || mBitmap == NULL)
+	{
+		bool nullBitmap = false;
 
-         U32 buf_x = offset.x + mSelectorPos.x + 1;
-         U32 buf_y = resolution.y - ( extent.y - ( offset.y + mSelectorPos.y + 1 ) );
+		if (mPositionChanged == false && mBitmap == NULL)
+			nullBitmap = true;
 
-         GFXTexHandle bb( resolution.x, 
-                          resolution.y, 
-                          GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__) );
-         
-         Point2I tmpPt( buf_x, buf_y );
+		mPositionChanged = false;
+		Point2I extent = getRoot()->getExtent();
+		// If we are anything but a pallete, change the pick color
+		if (mDisplayMode != pPallet)
+		{
+			Point2I resolution = getRoot()->getExtent();
 
-         GFXTarget *targ = GFX->getActiveRenderTarget();
-         targ->resolveTo( bb );
-         
-         GBitmap bmp( bb.getWidth(), bb.getHeight() );
+			U32 buf_x = offset.x + mSelectorPos.x + 1;
+			U32 buf_y = resolution.y - (extent.y - (offset.y + mSelectorPos.y + 1));
 
-         bb.copyToBmp( &bmp );
-         
-         //bmp.writePNGDebug( "foo.png" );
+			GFXTexHandle bb(resolution.x,
+				resolution.y,
+				GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__));
 
-         ColorI tmp;
-         bmp.getColor( buf_x, buf_y, tmp );
+			Point2I tmpPt(buf_x, buf_y);
 
-         mPickColor = (ColorF)tmp;
+			GFXTarget *targ = GFX->getActiveRenderTarget();
+			targ->resolveTo(bb);
 
-         // Now do onAction() if we are allowed
-         if (mActionOnMove) 
-            onAction();
-      }
-      
-   }
-   
-   //render the children
-   renderChildControls( offset, updateRect);
+			if (mBitmap)
+			{
+				delete mBitmap;
+				mBitmap = NULL;
+			}
+
+			mBitmap = new GBitmap(bb.getWidth(), bb.getHeight());
+
+			bb.copyToBmp(mBitmap);
+
+			//bmp.writePNGDebug( "foo.png" );
+
+			if (!nullBitmap)
+			{
+				if (mSelectColor)
+				{
+					Point2I pos = findColor(mSetColor, offset, resolution, *mBitmap);
+					mSetColor = mSetColor.BLACK;
+					mSelectColor = false;
+
+					setSelectorPos(pos);
+				}
+				else
+				{
+					ColorI tmp;
+					mBitmap->getColor(buf_x, buf_y, tmp);
+
+					mPickColor = (ColorF)tmp;
+
+					// Now do onAction() if we are allowed
+					if (mActionOnMove)
+						onAction();
+				}
+			}
+		}
+
+	}
+
+	//render the children
+	renderChildControls(offset, updateRect);
+}
+
+void GuiColorPickerCtrl::setSelectorPos(const ColorF & color)
+{
+	if (mBitmap && !mPositionChanged)
+	{
+		Point2I resolution = getRoot() ? getRoot()->getExtent() : Point2I(1024, 768);
+		RectI rect(getGlobalBounds());
+		Point2I pos = findColor(color, rect.point, resolution, *mBitmap);
+		mSetColor = mSetColor.BLACK;
+		mSelectColor = false;
+
+		setSelectorPos(pos);
+	}
+	else
+	{
+		mSetColor = color;
+		mSelectColor = true;
+		mPositionChanged = true;
+	}
+}
+
+Point2I GuiColorPickerCtrl::findColor(const ColorF & color, const Point2I& offset, const Point2I& resolution, GBitmap& bmp)
+{
+	RectI rect;
+	Point2I ext = getExtent();
+	if (mDisplayMode != pDropperBackground)
+	{
+		ext.x -= 3;
+		ext.y -= 2;
+		rect = RectI(Point2I(1, 1), ext);
+	}
+	else
+	{
+		rect = RectI(Point2I(0, 0), ext);
+	}
+
+	Point2I closestPos(-1, -1);
+
+	/* Debugging
+	char filename[256];
+	dSprintf( filename, 256, "%s.%s", "colorPickerTest", "png" );
+
+	// Open up the file on disk.
+	FileStream fs;
+	if ( !fs.open( filename, Torque::FS::File::Write ) )
+	Con::errorf( "GuiObjectView::saveAsImage() - Failed to open output file '%s'!", filename );
+	else
+	{
+	// Write it and close.
+	bmp.writeBitmap( "png", fs );
+
+	fs.close();
+	}
+	*/
+
+	ColorI tmp;
+	U32 buf_x;
+	U32 buf_y;
+	ColorF curColor;
+	F32 val(10000.0f);
+	F32 closestVal(10000.0f);
+	bool closestSet = false;
+
+	for (S32 x = rect.point.x; x <= rect.extent.x; x++)
+	{
+		for (S32 y = rect.point.y; y <= rect.extent.y; y++)
+		{
+			buf_x = offset.x + x + 1;
+			buf_y = (resolution.y - (offset.y + y + 1));
+			if (GFX->getAdapterType() != OpenGL)
+				buf_y = resolution.y - buf_y;
+
+			//Get the color at that position
+			bmp.getColor(buf_x, buf_y, tmp);
+			curColor = (ColorF)tmp;
+
+			//Evaluate how close the color is to our desired color
+			val = mFabs(color.red - curColor.red) + mFabs(color.green - curColor.green) + mFabs(color.blue - curColor.blue);
+
+			if (!closestSet)
+			{
+				closestVal = val;
+				closestPos.set(x, y);
+				closestSet = true;
+			}
+			else if (val < closestVal)
+			{
+				closestVal = val;
+				closestPos.set(x, y);
+			}
+		}
+	}
+
+	return closestPos;
 }
 
 //--------------------------------------------------------------------------
@@ -538,4 +670,11 @@ DefineConsoleMethod(GuiColorPickerCtrl, setSelectorPos, void, (Point2I newPos), 
 DefineConsoleMethod(GuiColorPickerCtrl, updateColor, void, (), , "Forces update of pick color")
 {
 	object->updateColor();
+}
+
+DefineEngineMethod(GuiColorPickerCtrl, setSelectorColor, void, (ColorF color), ,
+	"Sets the current position of the selector based on a color.n"
+	"@param color Color to look for.n")
+{
+	object->setSelectorPos(color);
 }
