@@ -160,6 +160,10 @@ void Win32CursorController::setCursorShape( const UTF8 *fileName, bool reload )
    
    if ( gCursorShape )
       SetCursor( gCursorShape );
+
+#ifdef UNICODE
+   delete[] lFileName;
+#endif
 }
 
 // Console function to set the current cursor shape given the cursor shape
