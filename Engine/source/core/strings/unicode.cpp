@@ -242,7 +242,7 @@ U32 convertUTF16toUTF8DoubleNULL( const UTF16 *unistring, UTF8  *outbuffer, U32 
 //-----------------------------------------------------------------------------
 // Functions that convert buffers of unicode code points
 //-----------------------------------------------------------------------------
-UTF16* convertUTF8toUTF16( const UTF8* unistring)
+UTF16* createUTF16string( const UTF8* unistring)
 {
    PROFILE_SCOPE(convertUTF8toUTF16_create);
    
@@ -264,7 +264,7 @@ UTF16* convertUTF8toUTF16( const UTF8* unistring)
 }
 
 //-----------------------------------------------------------------------------
-UTF8*  convertUTF16toUTF8( const UTF16* unistring)
+UTF8*  createUTF8string( const UTF16* unistring)
 {
    PROFILE_SCOPE(convertUTF16toUTF8_create);
 

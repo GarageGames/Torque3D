@@ -186,7 +186,7 @@ void StringBuffer::append(const UTF8* in)
    
    // convert to UTF16, because that's our internal format.
    // if the conversion fails, exit.
-   UTF16* tmp = convertUTF8toUTF16(in);
+   UTF16* tmp = createUTF16string(in);
    AssertFatal(tmp, "StringBuffer::append(UTF8) - could not convert UTF8 string!");
    if(!tmp)
       return;
@@ -231,7 +231,7 @@ void StringBuffer::insert(const U32 charOffset, const UTF8* in)
    
    // convert to UTF16, because that's our internal format.
    // if the conversion fails, exit.
-   UTF16* tmp = convertUTF8toUTF16(in);
+   UTF16* tmp = createUTF16string(in);
    AssertFatal(tmp, "StringBuffer::insert(UTF8) - could not convert UTF8 string!");
    if(!tmp)
       return;
@@ -377,7 +377,7 @@ UTF8* StringBuffer::createCopy8() const
    incRequestCount8();
    // convert will create a buffer of the appropriate size for a null terminated
    // input string.
-   UTF8* out = convertUTF16toUTF8(mBuffer.address());
+   UTF8* out = createUTF8string(mBuffer.address());
    return out;
 }
 

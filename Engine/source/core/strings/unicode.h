@@ -62,9 +62,9 @@
 ///   calling delete[] on these buffers.
 /// - Because they allocate memory, do not use these functions in a tight loop.
 /// - These are useful when you need a new long term copy of a string.
-UTF16* convertUTF8toUTF16( const UTF8 *unistring);
+UTF16* createUTF16string( const UTF8 *unistring);
 
-UTF8*  convertUTF16toUTF8( const UTF16 *unistring);
+UTF8*  createUTF8string( const UTF16 *unistring);
 
 //-----------------------------------------------------------------------------
 /// Functions that convert buffers of unicode code points, into a provided buffer.

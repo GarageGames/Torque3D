@@ -279,7 +279,7 @@ void GuiTextEditCtrl::setText( const UTF16* txt)
 {
    if(txt && txt[0] != 0)
    {
-      UTF8* txt8 = convertUTF16toUTF8( txt );
+      UTF8* txt8 = createUTF8string( txt );
       Parent::setText( txt8 );
       delete[] txt8;
       mTextBuffer.set( txt );

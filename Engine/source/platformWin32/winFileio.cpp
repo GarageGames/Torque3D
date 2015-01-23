@@ -802,7 +802,7 @@ StringTableEntry Platform::getCurrentDirectory()
    forwardslash( buf );
 
 #ifdef UNICODE
-   char* utf8 = convertUTF16toUTF8( buf );
+   char* utf8 = createUTF8string( buf );
    StringTableEntry result = StringTable->insert( utf8 );
    SAFE_DELETE_ARRAY( utf8 );
    return result;
@@ -847,8 +847,8 @@ static void getExecutableInfo( StringTableEntry* path, StringTableEntry* exe )
          if( delimiter )
             *delimiter = '\0';
 
-         char* pathBuf = convertUTF16toUTF8( cen_buf );
-         char* exeBuf = convertUTF16toUTF8( delimiter + 1 );
+         char* pathBuf = createUTF8string( cen_buf );
+         char* exeBuf = createUTF8string( delimiter + 1 );
 
          pathEntry = StringTable->insert( pathBuf );
          exeEntry = StringTable->insert( exeBuf );
