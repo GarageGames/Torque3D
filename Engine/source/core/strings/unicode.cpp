@@ -244,7 +244,7 @@ U32 convertUTF16toUTF8DoubleNULL( const UTF16 *unistring, UTF8  *outbuffer, U32 
 //-----------------------------------------------------------------------------
 UTF16* createUTF16string( const UTF8* unistring)
 {
-   PROFILE_SCOPE(convertUTF8toUTF16_create);
+   PROFILE_SCOPE(createUTF16string);
    
    // allocate plenty of memory.
    U32 nCodepoints, len = dStrlen(unistring) + 1;
@@ -266,7 +266,7 @@ UTF16* createUTF16string( const UTF8* unistring)
 //-----------------------------------------------------------------------------
 UTF8*  createUTF8string( const UTF16* unistring)
 {
-   PROFILE_SCOPE(convertUTF16toUTF8_create);
+   PROFILE_SCOPE(createUTF8string);
 
    // allocate plenty of memory.
    U32 nCodeunits, len = dStrlen(unistring) * 3 + 1;
