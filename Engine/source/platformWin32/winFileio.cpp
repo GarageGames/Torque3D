@@ -1216,7 +1216,7 @@ void Platform::getVolumeInformationList( Vector<VolumeInformation>& out_rVolumeI
             convertUTF16toUTF8( lpszFileSystem, buf );
             info.FileSystem = StringTable->insert( buf );
 
-            convertUTF16toUTF8( lpszVolumeName );
+            convertUTF16toUTF8( lpszVolumeName, buf );
             info.Name = StringTable->insert( buf );
 #else
             info.FileSystem = StringTable->insert( lpszFileSystem );
