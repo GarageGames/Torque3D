@@ -394,7 +394,7 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
             case GFXTDT_Cube :
                {
                   mCurrentCubemap[i] = mNewCubemap[i];
-                  if (mCurrentCubemap[i])
+                  if (mCurrentCubemap[i].isValid())
                      mCurrentCubemap[i]->setToTexUnit(i);
                   else
                      setTextureInternal(i, NULL);
