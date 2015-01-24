@@ -382,7 +382,7 @@ void TSShapeLoader::generateSubshapes()
 bool cmpMeshNameAndSize(const String& key, const Vector<String>& names, void* arg1, void* arg2)
 {
    const Vector<AppMesh*>& meshes = *(Vector<AppMesh*>*)arg1;
-   S32                     meshSize = (S32)arg2;
+   S32                     meshSize = (intptr_t)arg2;
 
    for (S32 i = 0; i < names.size(); i++)
    {

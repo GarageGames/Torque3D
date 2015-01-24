@@ -405,12 +405,12 @@ bool ShapeBaseImageData::preload(bool server, String &errorStr)
    // Resolve objects transmitted from server
    if (!server) {
       if (projectile)
-         if (Sim::findObject(SimObjectId(projectile), projectile) == false)
+         if (Sim::findObject(SimObjectId((uintptr_t)projectile), projectile) == false)
             Con::errorf(ConsoleLogEntry::General, "Error, unable to load projectile for shapebaseimagedata");
 
       for (U32 i = 0; i < MaxStates; i++) {
          if (state[i].emitter)
-            if (!Sim::findObject(SimObjectId(state[i].emitter), state[i].emitter))
+            if (!Sim::findObject(SimObjectId((uintptr_t)state[i].emitter), state[i].emitter))
                Con::errorf(ConsoleLogEntry::General, "Error, unable to load emitter for image datablock");
                
          String str;
@@ -1008,7 +1008,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
    // Write the projectile datablock
    if (stream->writeFlag(projectile))
-      stream->writeRangedU32(packed? SimObjectId(projectile):
+      stream->writeRangedU32(packed? SimObjectId((uintptr_t)projectile):
                              projectile->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
 
    stream->writeFlag(cloakable);
@@ -1036,7 +1036,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
    if( stream->writeFlag( casing ) )
    {
-      stream->writeRangedU32(packed? SimObjectId(casing):
+      stream->writeRangedU32(packed? SimObjectId((uintptr_t)casing):
          casing->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
    }
 
@@ -1125,7 +1125,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
          if (stream->writeFlag(s.emitter))
          {
-            stream->writeRangedU32(packed? SimObjectId(s.emitter):
+            stream->writeRangedU32(packed? SimObjectId((uintptr_t)s.emitter):
                                    s.emitter->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
             stream->write(s.emitterTime);
 

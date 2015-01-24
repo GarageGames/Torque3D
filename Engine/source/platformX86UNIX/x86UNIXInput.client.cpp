@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
+#ifndef TORQUE_SDL
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platform/platformInput.h"
 #include "platform/platformVideo.h"
@@ -602,3 +602,4 @@ void XClipboard::handleSelectionRequest(XSelectionRequestEvent& request)
    // flush the output buffer to send the event now
    XFlush(display);
 }
+#endif

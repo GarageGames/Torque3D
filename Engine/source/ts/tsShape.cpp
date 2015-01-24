@@ -1171,7 +1171,7 @@ void TSShape::assembleShape()
       TSMesh * mesh = TSMesh::assembleMesh(meshType,skip);
       if (ptr32)
       {
-         ptr32[i] = skip ?  0 : (S32)mesh;
+         ptr32[i] = skip ?  0 : (intptr_t)mesh; // @todo 64bit
          meshes.push_back(skip ?  0 : mesh);
       }
 

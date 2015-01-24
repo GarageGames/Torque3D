@@ -23,10 +23,13 @@
 project(${TORQUE_APP_NAME})
 
 if(UNIX)
+    set(CXX_FLAG32 "")
+    #set(CXX_FLAG32 "-m32") #uncomment for build x32 on OSx64
+    
     # default compiler flags
     # force compile 32 bit
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAG32} -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CXX_FLAG32} -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
 
 	# for asm files
 	SET (CMAKE_ASM_NASM_OBJECT_FORMAT "elf")
@@ -163,6 +166,20 @@ if(WIN32)
     else()
         link_directories($ENV{DXSDK_DIR}/Lib/x86)
     endif()
+endif()
+
+# build types
+if(NOT MSVC) # handle single-configuration generator
+	set(CMAKE_BUILD_TYPE ${TORQUE_BUILD_TYPE})
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(TORQUE_DEBUG TRUE)
+    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(TORQUE_RELEASE TRUE)
+    elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        set(TORQUE_RELEASE TRUE)
+    else()
+		message(FATAL_ERROR "Please select Debug, Release or RelWithDebInfo for TORQUE_BUILD_TYPE")
+	endif()
 endif()
 
 ###############################################################################
@@ -353,12 +370,12 @@ if(TORQUE_SDL)
     endif()
     
     if(UNIX)
-       set(CMAKE_SIZEOF_VOID_P 4) #force 32 bit
-       set(ENV{CFLAGS} "-m32 -g -O3")
+       #set(CMAKE_SIZEOF_VOID_P 4) #force 32 bit
+       set(ENV{CFLAGS} "${CXX_FLAG32} -g -O3")
        if("${TORQUE_ADDITIONAL_LINKER_FLAGS}" STREQUAL "")
-         set(ENV{LDFLAGS} "-m32")
+         set(ENV{LDFLAGS} "${CXX_FLAG32}")
        else()
-         set(ENV{LDFLAGS} "-m32 ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
+         set(ENV{LDFLAGS} "${CXX_FLAG32} ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
        endif()
     endif()
     
@@ -455,6 +472,7 @@ if(PS3)
 endif()
 
 if(UNIX)
+    # linux_dedicated
     if(TORQUE_DEDICATED)
 		addPath("${srcDir}/windowManager/dedicated")
 		# ${srcDir}/platformX86UNIX/*.client.* files are not needed	
@@ -471,8 +489,9 @@ if(UNIX)
         endforeach()
     else()
         addPath("${srcDir}/platformX86UNIX")
+        addPath("${srcDir}/platformX86UNIX/nativeDialogs")
     endif()    
-    
+    # linux
     addPath("${srcDir}/platformX86UNIX/threads")
     addPath("${srcDir}/platformPOSIX")
 endif()
@@ -554,6 +573,15 @@ endif()
 
 if(UNIX)
     # copy pasted from T3D build system, some might not be needed
+	set(TORQUE_EXTERNAL_LIBS "dl Xxf86vm Xext X11 Xft stdc++ pthread GL" CACHE STRING "external libs to link against")
+	mark_as_advanced(TORQUE_EXTERNAL_LIBS)
+    
+    string(REPLACE " " ";" TORQUE_EXTERNAL_LIBS_LIST ${TORQUE_EXTERNAL_LIBS})
+    addLib( "${TORQUE_EXTERNAL_LIBS_LIST}" )
+endif()
+
+if(UNIX)
+    # copy pasted from T3D build system, some might not be needed
 	set(TORQUE_EXTERNAL_LIBS "rt dl Xxf86vm Xext X11 Xft stdc++ pthread GL" CACHE STRING "external libs to link against")
 	mark_as_advanced(TORQUE_EXTERNAL_LIBS)
     
@@ -601,6 +629,10 @@ if(TORQUE_SDL)
     addLib(SDL2)
 endif()
 
+if(TORQUE_STATIC_CODE_ANALYSIS)
+    addDef( "ON_FAIL_ASSERTFATAL=exit(1)" )
+endif()
+
 ###############################################################################
 # Include Paths
 ###############################################################################
@@ -619,6 +651,15 @@ addInclude("${libDir}/libogg/include")
 addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
+if(TORQUE_OPENGL)
+	addInclude("${libDir}/glew/include")
+endif()
+
+if(UNIX)
+	addInclude("/usr/include/freetype2/freetype")
+	addInclude("/usr/include/freetype2")
+endif()
+
 if(TORQUE_OPENGL)
 	addInclude("${libDir}/glew/include")
 endif()

@@ -1019,7 +1019,7 @@ void TSStaticPolysoupConvex::getPolyList(AbstractPolyList *list)
                list->addPoint(verts[2]);
                list->addPoint(verts[1]);
 
-   list->begin(0, (U32)idx ^ (U32)mesh);
+   list->begin(0, (U32)idx ^ (uintptr_t)mesh);
    list->vertex(base + 2);
    list->vertex(base + 1);
    list->vertex(base + 0);

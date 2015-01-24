@@ -527,7 +527,7 @@ void Ribbon::prepRenderImage(SceneRenderState *state)
    } else {
       ri->defaultKey = 1;
    }
-   ri->defaultKey2 = (U32)ri->vertBuff; // Not 64bit safe!
+   ri->defaultKey2 = (uintptr_t)ri->vertBuff; // Not 64bit safe!
 
    state->getRenderPass()->addInst(ri);
 }
