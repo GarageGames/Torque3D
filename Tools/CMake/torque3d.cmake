@@ -23,7 +23,9 @@
 project(${TORQUE_APP_NAME})
 
 if(UNIX)
-    set(CXX_FLAG32 "")
+    if(NOT CXX_FLAG32)
+        set(CXX_FLAG32 "")
+    endif()
     #set(CXX_FLAG32 "-m32") #uncomment for build x32 on OSx64
     
     # default compiler flags
