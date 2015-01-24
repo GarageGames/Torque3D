@@ -19,6 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#ifndef _SCENEPOLYHEDRALOBJECT_IMPL_H_
+#define _SCENEPOLYHEDRALOBJECT_IMPL_H_
 
 #include "platform/platform.h"
 #include "scene/mixin/scenePolyhedralObject.h"
@@ -393,3 +395,5 @@ bool ScenePolyhedralObject< Base, P >::_setEdge( void* object, const char* index
 
    return false;
 }
+
+#endif // _SCENEPOLYHEDRALOBJECT_IMPL_H_
