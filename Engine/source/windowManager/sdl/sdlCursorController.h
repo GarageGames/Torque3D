@@ -20,10 +20,32 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "windowManager/dedicated/dedicatedWindowStub.h"
+#ifndef  _SDL_CURSORCONTROLLER_H_
+#define  _SDL_CURSORCONTROLLER_H_
 
+#include "windowManager/platformCursorController.h"
 
-PlatformWindowManager *CreatePlatformWindowManager()
+class PlatformCursorControllerSDL : public PlatformCursorController
 {
-   return new DedicatedWindowMgr;
-}
+public:
+   PlatformCursorControllerSDL( PlatformWindow *owner ) :
+      PlatformCursorController( owner )
+   {
+      pushCursor( PlatformCursorController::curArrow );
+   };
+
+   virtual void setCursorPosition( S32 x, S32 y );
+   virtual void getCursorPosition( Point2I &point );
+   virtual void setCursorVisible( bool visible );
+   virtual bool isCursorVisible();
+
+   void setCursorShape( U32 cursorID );
+   void setCursorShape( const UTF8 *fileName, bool reload );
+
+   U32 getDoubleClickTime();
+   S32 getDoubleClickWidth();
+   S32 getDoubleClickHeight();
+};
+
+
+#endif

@@ -59,6 +59,12 @@ mark_as_advanced(TORQUE_HIFI)
 option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
 mark_as_advanced(TORQUE_EXTENDED_MOVE)
 if(WIN32)
+	option(TORQUE_SDL "Use SDL for window and input" OFF)
+	mark_as_advanced(TORQUE_SDL)
+else()
+	set(TORQUE_SDL ON) # we need sdl to work on Linux/Mac
+endif()
+if(WIN32)
 	option(TORQUE_OPENGL "Allow OpenGL render" OFF)
 	#mark_as_advanced(TORQUE_OPENGL)
 else()
@@ -338,6 +344,30 @@ else()
     addPath("${srcDir}/T3D/gameBase/std")
 endif()
 
+if(TORQUE_SDL)
+    addPathRec("${srcDir}/windowManager/sdl")
+    addPathRec("${srcDir}/platformSDL")
+    
+    if(TORQUE_OPENGL)
+      addPathRec("${srcDir}/gfx/gl/sdl")
+    endif()
+    
+    if(UNIX)
+       set(CMAKE_SIZEOF_VOID_P 4) #force 32 bit
+       set(ENV{CFLAGS} "-m32 -g -O3")
+       if("${TORQUE_ADDITIONAL_LINKER_FLAGS}" STREQUAL "")
+         set(ENV{LDFLAGS} "-m32")
+       else()
+         set(ENV{LDFLAGS} "-m32 ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
+       endif()
+    endif()
+    
+    #override and hide SDL2 cache variables
+    set(SDL_SHARED ON CACHE INTERNAL "" FORCE)
+    set(SDL_STATIC OFF CACHE INTERNAL "" FORCE)
+    add_subdirectory( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
+endif()
+
 if(TORQUE_TESTING)
    include( "modules/module_testing.cmake" )
 endif()
@@ -564,6 +594,13 @@ if(TORQUE_OPENGL)
       addDef(GLEW_STATIC)
     endif()
 endif()
+
+if(TORQUE_SDL)
+    addDef(TORQUE_SDL)
+    addInclude(${libDir}/sdl/include)
+    addLib(SDL2)
+endif()
+
 ###############################################################################
 # Include Paths
 ###############################################################################
