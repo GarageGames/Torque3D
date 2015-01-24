@@ -219,7 +219,8 @@ function GuiEditCanvas::onDestroyMenu(%this)
       return;
 
    // Destroy menus      
-   %this.menuBar.getObject( 0 ).delete();
+   for( %i = %this.menuBar.getCount(); i > 0; %i-- )
+      %this.menuBar.getObject( i ).delete();
    
    %this.menuBar.removeFromCanvas();
    %this.menuBar.delete();
