@@ -1810,7 +1810,7 @@ void ReflectCubeFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    else
    {
       if ( attn )
-         lerpVal = new GenOp( "saturate( @ ).xxxx", attn );
+         lerpVal = new GenOp( "vec4( saturate( @ ) ).xxxx", attn );
       else
          blendOp = Material::Mul;
    }
