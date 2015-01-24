@@ -332,10 +332,8 @@ void GFXPCD3D9Device::init( const GFXVideoMode &mode, PlatformWindow *window /* 
 
    initD3DXFnTable();
 
-   Win32Window *win = dynamic_cast<Win32Window*>( window );
-   AssertISV( win, "GFXD3D9Device::init - got a non Win32Window window passed in! Did DX go crossplatform?" );
-
-   HWND winHwnd = win->getHWND();
+   HWND winHwnd = (HWND)window->getSystemWindow( PlatformWindow::WindowSystem_Windows );
+   AssertISV(winHwnd, "GFXPCD3D9WindowTarget::initPresentationParams() - no HWND");
 
    // Create D3D Presentation params
    D3DPRESENT_PARAMETERS d3dpp = setupPresentParams( mode, winHwnd );
@@ -1021,10 +1019,6 @@ bool GFXPCD3D9Device::beginSceneInternal()
 GFXWindowTarget * GFXPCD3D9Device::allocWindowTarget( PlatformWindow *window )
 {
    AssertFatal(window,"GFXD3D9Device::allocWindowTarget - no window provided!");
-#ifndef TORQUE_OS_XENON
-   AssertFatal(dynamic_cast<Win32Window*>(window), 
-      "GFXD3D9Device::allocWindowTarget - only works with Win32Windows!");
-#endif
 
    // Set up a new window target...
    GFXPCD3D9WindowTarget *gdwt = new GFXPCD3D9WindowTarget();

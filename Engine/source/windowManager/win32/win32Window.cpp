@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#if !defined(TORQUE_SDL)
+
 #include <windows.h>
 #include <tchar.h>
 #include <winuser.h>
@@ -119,6 +121,14 @@ Win32Window::~Win32Window()
 	mOwningManager->unlinkWindow(this);
 
 	_unregisterWindowClass();
+}
+
+void* Win32Window::getSystemWindow(const WindowSystem system)
+{
+   if( system == WindowSystem_Windows)
+      return getHWND();
+
+     return NULL;
 }
 
 GFXDevice * Win32Window::getGFXDevice()
@@ -1209,3 +1219,5 @@ const UTF16 *Win32Window::getCurtainWindowClassName()
 {
 	return _CurtainWindowClassName;
 }
+
+#endif

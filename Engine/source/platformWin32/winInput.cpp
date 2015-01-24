@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#if !defined( TORQUE_SDL )
 #include "platformWin32/platformWin32.h"
 
 #include "platform/platformInput.h"
@@ -863,3 +864,4 @@ bool Platform::setClipboard(const char *text)
 	return true;
 }
 
+#endif

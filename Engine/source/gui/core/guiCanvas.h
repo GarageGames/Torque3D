@@ -190,6 +190,8 @@ protected:
    
    void checkLockMouseMove( const GuiEvent& event );
 
+   GuiControl *mMenuBarCtrl;
+
 public:
    DECLARE_CONOBJECT(GuiCanvas);
    DECLARE_CATEGORY( "Gui Core" );
@@ -199,6 +201,8 @@ public:
 
    virtual bool onAdd();
    virtual void onRemove();
+
+   void setMenuBar(SimObject *obj);
 
    static void initPersistFields();
 
