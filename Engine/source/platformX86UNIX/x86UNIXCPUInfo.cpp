@@ -44,4 +44,4 @@ namespace CPUInfo
 
        return CONFIG_SingleCoreHTDisabled;
     }
-}; // namespace CPUInfo
+}; // namespace CPUInfo 
