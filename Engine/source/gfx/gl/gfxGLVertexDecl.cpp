@@ -21,7 +21,7 @@ void GFXGLVertexDecl::prepareVertexFormat() const
       {
          const glVertexAttribData &glElement = glVerticesFormat[i];
       
-         glVertexAttribFormat( glElement.attrIndex, glElement.elementCount, glElement.type, glElement.normalized, (U32)glElement.pointerFirst );
+         glVertexAttribFormat( glElement.attrIndex, glElement.elementCount, glElement.type, glElement.normalized, (uintptr_t)glElement.pointerFirst );
          glVertexAttribBinding( glElement.attrIndex, glElement.stream );
       }
 

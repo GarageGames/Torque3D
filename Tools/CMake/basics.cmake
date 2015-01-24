@@ -69,7 +69,8 @@ macro(addPath dir)
              ${dir}/*.c
              ${dir}/*.cc
              ${dir}/*.h
-             ${dir}/*.asm)
+             #${dir}/*.asm
+             )
     LIST(APPEND ${PROJECT_NAME}_files "${tmp_files}")
     LIST(APPEND ${PROJECT_NAME}_paths "${dir}")
     #message(STATUS "addPath ${PROJECT_NAME} : ${tmp_files}")

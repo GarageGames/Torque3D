@@ -20,31 +20,64 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "platform/platform.h"
-#include "math/util/matrixSet.h"
+#include "platform/types.h"
+#include "platform/platformDlibrary.h"
 
+#include <dlfcn.h>
 
-MatrixSet::MatrixSet()
+class x86UNIXDLibrary: public DLibrary
 {
-   // [9/4/2009 Pat] Until we get better control over heap allocations in Torque
-   // this class will provide a place where aligned/specalized matrix math can take place.
-   // We should be able to plug in any kind of platform-specific optimization 
-   // behind the delgates.
-   AssertFatal( ((intptr_t)this & 0xF) == 0, "MatrixSet has been allocated off a 16-byte boundary!" );
+    void*   mLibHandle;
+public:
+    x86UNIXDLibrary();
+    virtual ~x86UNIXDLibrary();
 
-   // Must be initialized by name, not a for(), it's macro magic
-   MATRIX_SET_BIND_VALUE(ObjectToWorld);
-   MATRIX_SET_BIND_VALUE(WorldToCamera);
-   MATRIX_SET_BIND_VALUE(CameraToScreen);
-   MATRIX_SET_BIND_VALUE(ObjectToCamera);
-   MATRIX_SET_BIND_VALUE(WorldToObject);
-   MATRIX_SET_BIND_VALUE(CameraToWorld);
-   MATRIX_SET_BIND_VALUE(ObjectToScreen);
-   MATRIX_SET_BIND_VALUE(CameraToObject);
-   MATRIX_SET_BIND_VALUE(WorldToScreen);
-   MATRIX_SET_BIND_VALUE(SceneView);
-   MATRIX_SET_BIND_VALUE(SceneProjection);
+    bool open(const char* file);
+    void close();
+    virtual void *bind(const char *name);
+};
 
-   mViewSource = NULL;
-   mProjectionSource = NULL;
+x86UNIXDLibrary::x86UNIXDLibrary()
+{
+    mLibHandle = 0;
 }
+
+x86UNIXDLibrary::~x86UNIXDLibrary()
+{
+    close();
+}
+
+bool x86UNIXDLibrary::open(const char* file)
+{
+    mLibHandle = dlopen(file, RTLD_LAZY);
+    if( !mLibHandle )
+        return false;
+
+    return true;
+}
+
+void x86UNIXDLibrary::close()
+{
+    if( mLibHandle )
+    {
+        dlclose(mLibHandle);
+        mLibHandle = 0;
+    }
+}
+
+void* x86UNIXDLibrary::bind(const char *name)
+{
+    return mLibHandle ? dlsym(mLibHandle, name) : 0;
+}
+
+DLibraryRef OsLoadLibrary(const char* file)
+{
+    x86UNIXDLibrary* library = new x86UNIXDLibrary();
+    if (!library->open(file)) 
+    {
+        delete library;
+        library = 0;
+    }
+    return library;
+}
+
