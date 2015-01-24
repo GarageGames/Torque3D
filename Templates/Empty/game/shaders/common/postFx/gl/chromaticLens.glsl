@@ -23,7 +23,7 @@
 // Based on 'Cubic Lens Distortion HLSL Shader' by François Tarlier
 // www.francois-tarlier.com/blog/index.php/2009/11/cubic-lens-distortion-shader
 
-#include "./postFx.glsl"
+#include "./postFX.glsl"
 #include "../../gl/torque.glsl"
 #include "../../gl/hlslCompat.glsl"
 

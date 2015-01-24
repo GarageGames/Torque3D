@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <cstdarg>
 
 #ifndef _TORQUE_TYPES_H_
 #include "platform/types.h"
@@ -229,9 +230,9 @@ int dItoa(int n, char s[]);
 // standard I/O functions [defined in platformString.cpp]
 
 extern void   dPrintf(const char *format, ...);
-extern S32    dVprintf(const char *format, void *arglist);
+extern S32    dVprintf(const char *format, va_list arglist);
 extern S32    dSprintf(char *buffer, U32 bufferSize, const char *format, ...);
-extern S32    dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist);
+extern S32    dVsprintf(char *buffer, U32 bufferSize, const char *format, va_list arglist);
 extern S32    dSscanf(const char *buffer, const char *format, ...);
 
 #endif

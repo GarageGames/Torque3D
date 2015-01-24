@@ -22,7 +22,7 @@
 
 #include "../../../gl/hlslCompat.glsl"
 #include "shadergen:/autogenConditioners.h"
-#include "../../gl/postFx.glsl"
+#include "../../gl/postFX.glsl"
 
 uniform sampler2D backBuffer;   // The original backbuffer.
 uniform sampler2D prepassTex;   // The pre-pass depth and normals.

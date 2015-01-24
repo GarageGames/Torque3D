@@ -579,7 +579,7 @@ AbstractClassRep* ConsoleObject::getClassRep() const
    return NULL;
 }
 
-String ConsoleObject::_getLogMessage(const char* fmt, void* args) const
+String ConsoleObject::_getLogMessage(const char* fmt, va_list args) const
 {
    String objClass = "UnknownClass";
    if(getClassRep())

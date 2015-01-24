@@ -79,6 +79,14 @@ public:
             ::PlatformAssert::processAssert(::PlatformAssert::Warning, __FILE__, __LINE__,  y); }
 
    /*!
+      Helper macro called when AssertFatal failed.
+      Used for help static code analyzers.
+   */
+   #ifndef ON_FAIL_ASSERTFATAL
+      #define ON_FAIL_ASSERTFATAL
+   #endif
+
+   /*!
       Assert that the statement x is true, otherwise halt.
 
       If the statement x is true, continue processing.
