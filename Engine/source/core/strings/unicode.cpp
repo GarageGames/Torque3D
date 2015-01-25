@@ -601,10 +601,13 @@ bool chompUTF8BOM( const char *inString, char **outStringPtr )
 {
    *outStringPtr = const_cast<char *>( inString );
 
-   U8 bom[4];
-   dMemcpy( bom, inString, 4 );
-
-   bool valid = isValidUTF8BOM( bom );
+   bool valid = false;
+   if (inString[0] && inString[1] && inString[2])
+   {
+      U8 bom[4];
+      dMemcpy(bom, inString, 4);
+      valid = isValidUTF8BOM(bom);
+   }
 
    // This is hackey, but I am not sure the best way to do it at the present.
    // The only valid BOM is a UTF8 BOM, which is 3 bytes, even though we read

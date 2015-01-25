@@ -203,8 +203,8 @@ void MeshRoadNodeEvent::padListToSize()
       newlist->mDepths.merge(list->mDepths);
       newlist->mNormals.merge(list->mNormals);
 
-      mNodeList = newlist;
       delete list;
+      mNodeList = list = newlist;
    }
 
    // Pad our list end?

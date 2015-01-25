@@ -3339,6 +3339,6 @@ void ShapeBase::ejectShellCasing( U32 imageSlot )
 
    if (!casing->registerObject())
       delete casing;
-
-   casing->init( shellPos, shellVel );
+   else
+      casing->init( shellPos, shellVel );
 }

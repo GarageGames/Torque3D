@@ -98,17 +98,17 @@ protected:
    {
       mIsBackground = false; // This could be toggled to true to prefer performance.
       mMinimumSize.set(0,0);
-		mLockedSize.set(0,0);
-		mResizeLocked = false;
+      mLockedSize.set(0,0);
+      mResizeLocked = false;
       mEnableKeyboardTranslation = false;
       mEnableAccelerators = true;
       mCursorController = NULL;
-      // This controller maps window input (Mouse/Keyboard) to a generic input consumer
-      mWindowInputGenerator = new WindowInputGenerator( this );
       mSuppressReset = false;
-
       mOffscreenRender = false;
       mDisplayWindow = false;
+
+      // This controller maps window input (Mouse/Keyboard) to a generic input consumer
+      mWindowInputGenerator = new WindowInputGenerator( this );
    }
 
 public:

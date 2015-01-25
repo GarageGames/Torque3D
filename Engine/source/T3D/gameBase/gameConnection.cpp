@@ -208,6 +208,8 @@ GameConnection::GameConnection()
 
    mAIControlled = false;
 
+   mLastPacketTime = 0;
+
    mDisconnectReason[0] = 0;
 
    //blackout vars

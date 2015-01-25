@@ -352,19 +352,20 @@ S32 main(S32 argc, const char **argv)
 
 #include "app/mainLoop.h"
 
-S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
+S32 WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
 {
    Vector<char *> argv( __FILE__, __LINE__ );
 
-   char moduleName[256];
+   enum { moduleNameSize = 256 };
+   char moduleName[moduleNameSize];
 #ifdef TORQUE_UNICODE
    {
-      TCHAR buf[ 256 ];
-      GetModuleFileNameW( NULL, buf, sizeof( buf ) );
-      convertUTF16toUTF8( buf, moduleName, sizeof( moduleName ) );
+      TCHAR buf[ moduleNameSize ];
+      GetModuleFileNameW( NULL, buf, moduleNameSize );
+      convertUTF16toUTF8( buf, moduleName, moduleNameSize );
    }
 #else
-   GetModuleFileNameA(NULL, moduleName, sizeof(moduleName));
+   GetModuleFileNameA(NULL, moduleName, moduleNameSize);
 #endif
    argv.push_back(moduleName);
 
@@ -433,15 +434,16 @@ S32 torque_winmain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
 {
 	Vector<char *> argv( __FILE__, __LINE__ );
 
-	char moduleName[256];
+   enum { moduleNameSize = 256 };
+   char moduleName[moduleNameSize];
 #ifdef TORQUE_UNICODE
-	{
-		TCHAR buf[ 256 ];
-		GetModuleFileNameW( NULL, buf, sizeof( buf ) );
-		convertUTF16toUTF8( buf, moduleName, sizeof( moduleName ) );
-}
+   {
+      TCHAR buf[ moduleNameSize ];
+      GetModuleFileNameW( NULL, buf, moduleNameSize );
+      convertUTF16toUTF8( buf, moduleName, moduleNameSize );
+   }
 #else
-	GetModuleFileNameA(NULL, moduleName, sizeof(moduleName));
+   GetModuleFileNameA(NULL, moduleName, moduleNameSize);
 #endif
 	argv.push_back(moduleName);
 
