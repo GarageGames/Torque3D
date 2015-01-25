@@ -39,6 +39,8 @@
 #include "T3D/gameBase/processList.h"
 #include "console/engineAPI.h"
 
+#include "T3D/gameBase/gameConnection.h"
+
 ConsoleDocClass( ForestWindEmitter,
    "@brief Object responsible for simulating wind in a level.\n\n"
 
@@ -513,9 +515,27 @@ void ForestWindEmitter::_renderEmitterInfo( ObjectRenderInst *ri, SceneRenderSta
    drawer->drawArrow( desc, pos, pos + (windVec * mWindStrength), ColorI( 0, 0, 255, 255 ) );//Point3F( -235.214, 219.589, 34.0991 ), Point3F( -218.814, 244.731, 37.5587 ), ColorI( 255, 255, 0, 255 ) );//
    drawer->drawArrow( desc, pos, pos + (mWind->getTarget() * mWindStrength ), ColorI( 255, 0, 0, 85 ) );
 
+   
+   S32 useRadius = mWindRadius;
    // Draw a 2D circle for the wind radius.
    if ( isRadialEmitter() )
-      drawer->drawSphere( desc, mWindRadius, pos, ColorI( 255, 0, 0, 80 ) );
+   {
+	   
+	   //So the problem is that when your inside the sphere it won't render so it might make someone 
+	   //think that it's not working right.  So what I did was determine if the camera is inside the sphere.
+	   //If the camera is inside the sphere, then I find the distance from the center of the sphere to the camera
+	   //Round down and use that as the radius to draw the sphere.
+	   //That way if someone zooms in or out, their screen is still showing the sphere.
+      GameConnection * gc = GameConnection::getConnectionToServer();
+      GameBase* gb = gc->getCameraObject();
+       if (gb)
+	   {
+		  Point3F camPos = gb->getPosition();
+		  if ( getPosition().isInsideSphere( camPos, mWindRadius ) )
+			  useRadius =  getPosition().distanceTo(camPos);
+	   }
+      drawer->drawSphere( desc, useRadius, pos, ColorI( 255, 0, 0, 80 ) );
+   }
 }
 
 F32 ForestWindEmitter::getStrength() const
