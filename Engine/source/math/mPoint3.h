@@ -123,22 +123,6 @@ class Point3F
    void interpolate(const Point3F&, const Point3F&, F32);
    void zero();
 
-   F32 distanceTo(Point3F loc)
-   {
-	   F32 xSqr = (this->x - loc.x) * (this->x - loc.x);
-	   F32 ySqr = (this->y - loc.y) * (this->y - loc.y);
-	   F32 zSqr = (this->z - loc.z) * (this->z - loc.z);
-
-	   F32 mySqr = xSqr + ySqr + zSqr;
-
-	   return sqrt(mySqr);
-   }
-
-   bool isInsideSphere(Point3F pt, F32 Radius)
-   {
-	   return (  (( this->x - pt.x) * ( this->x - pt.x) ) + (( this->y - pt.y) * ( this->y - pt.y) ) + (( this->z - pt.z) * ( this->z - pt.z) ) <= (Radius * Radius));
-   }
-
    /// Returns the smallest absolute value.
    F32 least() const;
 
