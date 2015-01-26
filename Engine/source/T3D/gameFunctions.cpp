@@ -99,6 +99,8 @@ namespace CameraAndFOV{
    static F32 sLastCameraUpdateTime    = 0;        ///< last time camera was updated
    static S32 sZoomSpeed               = 500;      ///< ms per 90deg fov change
 
+   F32 mFarClippingDistance     = 0.0f; //Set the Far Clipping.
+
    /// A scale to apply to the normal visible distance
    /// typically used for tuning performance.
    static F32 sVisDistanceScale = 1.0f;
@@ -427,6 +429,12 @@ static void RegisterGameFunctions()
    Con::addVariable( "$cameraFov", TypeF32, &CameraAndFOV::sConsoleCameraFov, 
       "The camera's Field of View.\n\n"
 	   "@ingroup Game" );
+
+//<!-- Scene Culling --!>
+	Con::addVariable( "$pref::Camera::FarDistance", TypeF32, &CameraAndFOV::mFarClippingDistance, 
+      "The camera's Far Clipping Distance.\n\n"
+	   "@ingroup Game" );
+//<!-- Scene Culling --!>
 
    // Stuff game types into the console
    Con::setIntVariable("$TypeMasks::StaticObjectType",         StaticObjectType);

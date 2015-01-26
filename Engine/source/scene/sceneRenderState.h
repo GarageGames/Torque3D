@@ -39,6 +39,9 @@
 #include "core/util/delegate.h"
 #endif
 
+//<!-- Scene Culling --!>
+#include "gui/core/guiCanvas.h"
+//<!-- Scene Culling --!>
 
 class SceneObject;
 class RenderPassManager;
@@ -60,8 +63,6 @@ class SceneRenderState
       /// The delegate used for material overrides.
       /// @see getOverrideMaterial
       typedef Delegate< BaseMatInstance*( BaseMatInstance* ) > MatDelegate;
-
-   protected:
 
       /// SceneManager being rendered in this state.
       SceneManager* mSceneManager;
@@ -111,6 +112,27 @@ class SceneRenderState
 
       /// If true (default) non-lightmapped meshes should be rendered.
       bool mRenderNonLightmappedMeshes;
+
+//<!-- Scene Culling --!>
+   private:
+      //Four side planes to be created
+	  PlaneF plTop;		//Top of view Frustum
+	  PlaneF plBottom;	//Bottom of view Frustum
+	  PlaneF plRight;	//Right side of view Frustum
+	  PlaneF plLeft;	//Left side of view Frustum
+	  PlaneF plNear;	//Near clipping plane
+	  PlaneF plFar;		//Far clipping plane
+	  SimObjectPtr<GameBase> cameraObject;
+	  F32 fOV ;
+	  F32 yAdd;
+	  F32 div;
+	  F32 xAdd;
+	  Point3F pPos, pView;
+      MatrixF mTrans;
+	  F32 posf;
+	  SimObjectPtr<GameConnection> connection;
+	  SimObjectPtr<GuiCanvas> mCanvas;
+//<!-- Scene Culling --!>
 
    public:
 

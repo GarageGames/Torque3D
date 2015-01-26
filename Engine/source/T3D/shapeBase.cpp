@@ -2385,6 +2385,19 @@ TSShape const* ShapeBase::getShape()
 
 void ShapeBase::prepRenderImage( SceneRenderState *state )
 {
+//<!-- Scene Culling --!>
+   GameConnection* connection = GameConnection::getConnectionToServer();
+   if (connection && !connection->didFirstRender)
+	{
+      for (S32 i = mShapeInstance->getSmallestVisibleDL(); i >= 0; i-- )
+      {
+         mShapeInstance->setCurrentDetail( i );
+         mShapeInstance->animate();
+         prepBatchRender( state, -1 );
+         calcClassRenderData();
+      }
+	}
+//<!-- Scene Culling --!>
    _prepRenderImage( state, true, true );
 }
 

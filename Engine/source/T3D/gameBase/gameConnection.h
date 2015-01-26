@@ -103,6 +103,10 @@ private:
 
 public:
 
+//<!-- Scene Culling --!>
+	bool didFirstRender;
+//<!-- Scene Culling --!>
+
    /// @name Protocol Versions
    ///
    /// Protocol versions are used to indicated changes in network traffic.

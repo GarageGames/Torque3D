@@ -238,6 +238,8 @@ class TSShapeInstance
    /// @}
 	
 	TSMaterialList* mMaterialList;    ///< by default, points to hShape material list
+
+	int getSmallestVisibleDL(){return mShape->mSmallestVisibleDL;}
 //-------------------------------------------------------------------------------------
 // Misc.
 //-------------------------------------------------------------------------------------
@@ -268,7 +270,6 @@ protected:
    /// equal mShapeResource if it was created from a resource.
    TSShape *mShape;
 
-   
    bool            mOwnMaterialList; ///< Does this own the material list pointer?
 
    bool           mAlphaAlways;

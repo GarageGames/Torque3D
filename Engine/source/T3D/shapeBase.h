@@ -1112,7 +1112,7 @@ protected:
    void _prepRenderImage(  SceneRenderState* state, 
                            bool renderSelf, 
                            bool renderMountedImages );
-
+   
    /// Renders the shape bounds as well as the 
    /// bounds of all mounted shape images.
    void _renderBoundingBox( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance* );
