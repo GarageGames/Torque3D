@@ -217,35 +217,41 @@ GFXGLPreserveTexture TORQUE_CONCAT(preserve_, __LINE__) (binding, _GET_TEXTURE_B
 GFXGLPreserveInteger TORQUE_CONCAT(preserve_, __LINE__) (GL_READ_FRAMEBUFFER, GL_READ_FRAMEBUFFER_BINDING, (GFXGLPreserveInteger::BindFn)glBindFramebuffer);\
 GFXGLPreserveInteger TORQUE_CONCAT(preserve2_, __LINE__) (GL_DRAW_FRAMEBUFFER, GL_DRAW_FRAMEBUFFER_BINDING, (GFXGLPreserveInteger::BindFn)glBindFramebuffer)
 
-// Handy macro for checking the status of a framebuffer.  Framebuffers can fail in 
-// all sorts of interesting ways, these are just the most common.  Further, no existing GL profiling 
-// tool catches framebuffer errors when the framebuffer is created, so we actually need this.
-#define CHECK_FRAMEBUFFER_STATUS()\
-{\
-GLenum status;\
-status = glCheckFramebufferStatus(GL_FRAMEBUFFER);\
-switch(status) {\
-case GL_FRAMEBUFFER_COMPLETE:\
-break;\
-case GL_FRAMEBUFFER_UNSUPPORTED:\
-AssertFatal(false, "Unsupported FBO");\
-break;\
-case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:\
-AssertFatal(false, "Incomplete FBO Attachment");\
-break;\
-case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:\
-AssertFatal(false, "Incomplete FBO Missing Attachment");\
-break;\
-case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:\
-AssertFatal(false, "Incomplete FBO Draw buffer");\
-break;\
-case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:\
-AssertFatal(false, "Incomplete FBO Read buffer");\
-break;\
-default:\
-/* programming error; will fail on all hardware */\
-AssertFatal(false, "Something really bad happened with an FBO");\
-}\
-}
+
+#if TORQUE_DEBUG
+
+    // Handy macro for checking the status of a framebuffer.  Framebuffers can fail in 
+    // all sorts of interesting ways, these are just the most common.  Further, no existing GL profiling 
+    // tool catches framebuffer errors when the framebuffer is created, so we actually need this.
+    #define CHECK_FRAMEBUFFER_STATUS()\
+    {\
+    GLenum status;\
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);\
+    switch(status) {\
+    case GL_FRAMEBUFFER_COMPLETE:\
+    break;\
+    case GL_FRAMEBUFFER_UNSUPPORTED:\
+    AssertFatal(false, "Unsupported FBO");\
+    break;\
+    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:\
+    AssertFatal(false, "Incomplete FBO Attachment");\
+    break;\
+    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:\
+    AssertFatal(false, "Incomplete FBO Missing Attachment");\
+    break;\
+    case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:\
+    AssertFatal(false, "Incomplete FBO Draw buffer");\
+    break;\
+    case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:\
+    AssertFatal(false, "Incomplete FBO Read buffer");\
+    break;\
+    default:\
+    /* programming error; will fail on all hardware */\
+    AssertFatal(false, "Something really bad happened with an FBO");\
+    }\
+    }
+#else
+    #define CHECK_FRAMEBUFFER_STATUS()
+#endif //TORQUE_DEBUG
 
 #endif
