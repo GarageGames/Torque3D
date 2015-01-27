@@ -182,8 +182,6 @@ bool NavPath::setProtectedAlwaysRender(void *obj, const char *index, const char 
    return true;
 }
 
-static IRangeValidator NaturalNumber(1, S32_MAX);
-
 void NavPath::initPersistFields()
 {
    addGroup("NavPath");

@@ -59,6 +59,7 @@ mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
 
 set(curModule "")
 set(allModules "")
+set(moduleStack "")
 
 option(TORQUE_UNIFIED_BUILD "Build files in groups (faster compile time and improved optimization)" OFF)
 
@@ -74,6 +75,33 @@ macro(setModule module)
     list(FIND allModules ${module} moduleIndex)
     if(${moduleIndex} EQUAL -1)
         list(APPEND allModules ${module})
+    endif()
+endmacro()
+
+# push the current module and optionally set a new module
+macro(pushModule)
+    if(curModule)
+        list(APPEND moduleStack ${curModule})
+    else()
+        list(APPEND moduleStack "DUMMY_MODULE")
+    endif()
+    if(${ARGC} GREATER 0)
+        setModule(${ARGV0})
+    endif()
+endmacro()
+
+# pop the last module from the stack and set it as current
+macro(popModule)
+    list(LENGTH moduleStack stackSize)
+    if(${stackSize} EQUAL 0)
+        # assert if pushes and pops aren't balanced
+        message(FATAL_ERROR "Attempted to pop nonexistent module from stack!")
+    endif()
+    math(EXPR last "${stackSize} - 1")
+    list(GET moduleStack last poppedModule)
+    list(REMOVE_AT moduleStack ${last})
+    if(NOT ${poppedModule} STREQUAL "DUMMY_MODULE")
+        setModule(${poppedModule})
     endif()
 endmacro()
 

@@ -184,7 +184,7 @@ void GFXGLVertexBuffer::resurrect()
 
 namespace
 {   
-   bool onGFXDeviceSignal( GFXDevice::GFXDeviceEventType type )
+   bool onGFXDeviceSignalVertex( GFXDevice::GFXDeviceEventType type )
    {
       if( GFX->getAdapterType() == OpenGL && GFXDevice::deEndOfFrame == type )
          getCircularVolatileVertexBuffer()->protectUsedRange();
@@ -199,11 +199,11 @@ MODULE_BEGIN( GFX_GL_VertexBuffer )
 
    MODULE_INIT
    {
-      GFXDevice::getDeviceEventSignal().notify( &onGFXDeviceSignal );
+      GFXDevice::getDeviceEventSignal().notify( &onGFXDeviceSignalVertex );
    }
 
    MODULE_SHUTDOWN
    {
-      GFXDevice::getDeviceEventSignal( ).remove( &onGFXDeviceSignal );
+      GFXDevice::getDeviceEventSignal( ).remove( &onGFXDeviceSignalVertex );
    }
 MODULE_END

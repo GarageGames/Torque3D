@@ -408,6 +408,7 @@ else()
 endif()
 
 if(TORQUE_SDL)
+    pushModule(sdl)
     addPathRec("${srcDir}/windowManager/sdl")
     addPathRec("${srcDir}/platformSDL")
     
@@ -429,6 +430,7 @@ if(TORQUE_SDL)
     set(SDL_SHARED ON CACHE INTERNAL "" FORCE)
     set(SDL_STATIC OFF CACHE INTERNAL "" FORCE)
     add_subdirectory( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
+    popModule()
 endif()
 
 if(TORQUE_TESTING)
@@ -543,6 +545,7 @@ if(UNIX)
 endif()
 
 if( TORQUE_OPENGL )
+    pushModule(gl)
     addPath("${srcDir}/shaderGen/GLSL")
     if( TORQUE_OPENGL AND NOT TORQUE_DEDICATED )
         addPath("${srcDir}/gfx/gl")
@@ -558,6 +561,7 @@ if( TORQUE_OPENGL )
     if(WIN32 AND NOT TORQUE_SDL)
       addPath("${srcDir}/gfx/gl/win32")
     endif()
+    popModule()
 endif()
 
 ###############################################################################

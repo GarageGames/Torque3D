@@ -162,7 +162,7 @@ void GFXGLPrimitiveBuffer::resurrect()
 
 namespace
 {
-   bool onGFXDeviceSignal( GFXDevice::GFXDeviceEventType type )
+   bool onGFXDeviceSignalIndex( GFXDevice::GFXDeviceEventType type )
    {
       if( GFX->getAdapterType() == OpenGL && GFXDevice::deEndOfFrame == type )
          getCircularVolatileIndexBuffer()->protectUsedRange();
@@ -177,11 +177,11 @@ MODULE_BEGIN( GFX_GL_PrimitiveBuffer )
 
    MODULE_INIT
    {
-      GFXDevice::getDeviceEventSignal( ).notify( &onGFXDeviceSignal );
+      GFXDevice::getDeviceEventSignal( ).notify( &onGFXDeviceSignalIndex );
    }
 
    MODULE_SHUTDOWN
    {
-      GFXDevice::getDeviceEventSignal( ).remove( &onGFXDeviceSignal );
+      GFXDevice::getDeviceEventSignal( ).remove( &onGFXDeviceSignalIndex );
    }
 MODULE_END
