@@ -81,10 +81,8 @@ namespace Torque
             return !( *this == uuid );
          }
    };
-}
 
-namespace DictHash
-{
+   // Hash interface
    inline U32 hash( const Torque::UUID& uuid )
    {
       return uuid.getHash();

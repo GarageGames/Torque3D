@@ -25,8 +25,6 @@
 
 #include "platform/platform.h"
 
-// Sigh... guess what compiler needs this...
-namespace DictHash { U32 hash( String::StringData* ); }
 namespace KeyCmp
 {
    template< typename Key > bool equals( const Key&, const Key& );
@@ -423,17 +421,16 @@ class String::StringData : protected StringDataImpl
                         
          return ( StringData* ) &empty;
       }
+
+      // Hash interface
+      friend U32 hash( String::StringData* data )
+      {
+         return data->getOrCreateHashCase();
+      }
 };
 
 //-----------------------------------------------------------------------------
 
-namespace DictHash
-{
-   inline U32 hash( String::StringData* data )
-   {
-      return data->getOrCreateHashCase();
-   }
-}
 namespace KeyCmp
 {
    template<>

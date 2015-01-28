@@ -36,6 +36,7 @@
 #include "core/color.h"
 #endif
 
+#include "core/crc.h"
 
 struct GFXSamplerStateDesc
 {
@@ -93,6 +94,12 @@ struct GFXSamplerStateDesc
    bool operator==(const GFXSamplerStateDesc &b) const
    {
       return !dMemcmp(this, &b, sizeof(GFXSamplerStateDesc));
+   }
+
+   // Hash interface
+   friend U32 hash(const GFXSamplerStateDesc &data)
+   {
+      return CRC::calculateCRC(&data, sizeof(GFXSamplerStateDesc));
    }
 };
 

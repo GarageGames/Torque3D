@@ -25,11 +25,6 @@
 
 #include "gfx/gfxStateBlock.h"
 
-namespace DictHash
-{
-   U32 hash(const GFXSamplerStateDesc &data);
-}
-
 class GFXGLStateBlock : public GFXStateBlock
 {   
 public:

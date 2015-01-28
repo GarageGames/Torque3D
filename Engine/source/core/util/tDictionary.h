@@ -322,7 +322,13 @@ template<typename Key, typename Value> HashTable<Key,Value>::~HashTable()
 template<typename Key, typename Value>
 inline U32 HashTable<Key,Value>::_hash(const Key& key) const
 {
-   return DictHash::hash(key);
+   // Use the "using" trick here so that hash() can be found in the containing
+   // namespace of the key type via argument dependent lookup. Otherwise,
+   // standards-conforming compilers (i.e. not MSVC) will have trouble finding
+   // the function for some argument types because they are defined after the
+   // definition of this template (but before the actual instantiation).
+   using DictHash::hash;
+   return hash(key);
 }
 
 template<typename Key, typename Value>
