@@ -20,6 +20,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef _X86UNIXSTATE_H_
+#define _X86UNIXSTATE_H_
+
 #include "math/mPoint2.h"
 #include "platformX86UNIX/platformX86UNIX.h"
 //#include "platformX86UNIX/platformGL.h"
@@ -272,3 +275,5 @@ class DisplayPtrManager
          return display;
       }
 };
+
+#endif // _X86UNIXSTATE_H_

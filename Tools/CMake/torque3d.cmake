@@ -520,6 +520,7 @@ if(PS3)
 endif()
 
 if(UNIX)
+    pushModule(unix)
     # linux_dedicated
     if(TORQUE_DEDICATED)
 		addPath("${srcDir}/windowManager/dedicated")
@@ -542,6 +543,7 @@ if(UNIX)
     # linux
     addPath("${srcDir}/platformX86UNIX/threads")
     addPath("${srcDir}/platformPOSIX")
+    popModule()
 endif()
 
 if( TORQUE_OPENGL )
