@@ -54,6 +54,9 @@ struct PlayerData: public ShapeBaseData {
    };
    bool renderFirstPerson;    ///< Render the player shape in first person
 
+   // rextimmy physics integration
+   bool physicsCollision;
+
    /// Render shadows while in first person when 
    /// renderFirstPerson is disabled.
    bool firstPersonShadows; 
