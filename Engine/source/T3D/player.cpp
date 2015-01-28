@@ -3410,7 +3410,9 @@ bool Player::canProne()
       return false;
 
    // Do standard Torque physics test here!
-   if ( !mPhysicsRep )
+
+   // rextimmy physics integration
+   if ( !mPhysicsRep || !mDataBlock->physicsCollision)
       return true;
 
 	// We are already in this pose, so don't test it again...
