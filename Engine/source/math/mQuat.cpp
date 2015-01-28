@@ -147,7 +147,7 @@ QuatF & QuatF::normalize()
    return *this;
 }
 
-#define idx(r,c) (r*4 + c)
+#define IDX(r,c) (r*4 + c)
 
 QuatF & QuatF::set( const MatrixF & mat )
 {
@@ -155,31 +155,31 @@ QuatF & QuatF::set( const MatrixF & mat )
 
    F32 const *m = mat;
 
-   F32 trace = m[idx(0, 0)] + m[idx(1, 1)] + m[idx(2, 2)];
+   F32 trace = m[IDX(0, 0)] + m[IDX(1, 1)] + m[IDX(2, 2)];
    if (trace > 0.0f) 
    {
       F32 s = mSqrt(trace + F32(1));
       w = s * 0.5f;
       s = 0.5f / s;
-      x = (m[idx(1,2)] - m[idx(2,1)]) * s;
-      y = (m[idx(2,0)] - m[idx(0,2)]) * s;
-      z = (m[idx(0,1)] - m[idx(1,0)]) * s;
+      x = (m[IDX(1,2)] - m[IDX(2,1)]) * s;
+      y = (m[IDX(2,0)] - m[IDX(0,2)]) * s;
+      z = (m[IDX(0,1)] - m[IDX(1,0)]) * s;
    } 
    else 
    {
       F32* q = &x;
       U32 i = 0;
-      if (m[idx(1, 1)] > m[idx(0, 0)]) i = 1;
-      if (m[idx(2, 2)] > m[idx(i, i)]) i = 2;
+      if (m[IDX(1, 1)] > m[IDX(0, 0)]) i = 1;
+      if (m[IDX(2, 2)] > m[IDX(i, i)]) i = 2;
       U32 j = (i + 1) % 3;
       U32 k = (j + 1) % 3;
 
-      F32 s = mSqrt((m[idx(i, i)] - (m[idx(j, j)] + m[idx(k, k)])) + 1.0f);
+      F32 s = mSqrt((m[IDX(i, i)] - (m[IDX(j, j)] + m[IDX(k, k)])) + 1.0f);
       q[i] = s * 0.5f;
       s = 0.5f / s;
-      q[j] = (m[idx(i,j)] + m[idx(j,i)]) * s;
-      q[k] = (m[idx(i,k)] + m[idx(k, i)]) * s;
-      w = (m[idx(j,k)] - m[idx(k, j)]) * s;
+      q[j] = (m[IDX(i,j)] + m[IDX(j,i)]) * s;
+      q[k] = (m[IDX(i,k)] + m[IDX(k, i)]) * s;
+      w = (m[IDX(j,k)] - m[IDX(k, j)]) * s;
    }
 
    // Added to resolve issue #2230
@@ -187,6 +187,8 @@ QuatF & QuatF::set( const MatrixF & mat )
 
    return *this;
 }
+
+#undef IDX
 
 MatrixF * QuatF::setMatrix( MatrixF * mat ) const
 {
