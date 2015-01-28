@@ -347,6 +347,15 @@ void StaticShape::setTransform(const MatrixF& mat)
 {
    Parent::setTransform(mat);
    setMaskBits(PositionMask);
+
+   // rextimmy physics integration
+   if (mPhysicsRep)
+   {
+	   if (mDataBlock->kinematic)
+		   mPhysicsRep->moveKinematicTo(mat);
+	   else
+		   mPhysicsRep->setTransform(mat);
+   }
 }
 
 void StaticShape::onUnmount(ShapeBase*,S32)
