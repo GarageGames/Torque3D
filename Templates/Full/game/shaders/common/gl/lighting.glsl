@@ -36,6 +36,7 @@ uniform vec4 inLightColor[4];
 #endif
 
 uniform vec4 ambient;
+#define ambientCameraFactor 0.3
 uniform float specularPower;
 uniform vec4 specularColor;
 
