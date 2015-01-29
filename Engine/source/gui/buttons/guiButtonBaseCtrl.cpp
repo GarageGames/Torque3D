@@ -581,9 +581,15 @@ void GuiButtonBaseCtrl::onAction()
     }
     setUpdate();
 
-   // Update the console variable:
-   if ( mConsoleVariable[0] )
-      Con::setBoolVariable( mConsoleVariable, mStateOn );
+	// Update the console variable:
+	if ( mConsoleVariable[0] )
+	{
+		char buf[16];
+		dSprintf( buf, sizeof( buf ), "%d", getId() );
+		Con::setVariable( "$ThisControl", buf );
+
+		Con::setBoolVariable( mConsoleVariable, mStateOn );
+	}
 
     onClick_callback();
     Parent::onAction();
