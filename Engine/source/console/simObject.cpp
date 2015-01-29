@@ -718,6 +718,25 @@ bool SimObject::isMethod( const char* methodName )
    return false;
 }
 
+const char* SimObject::getMethodArgs( const char* methodName )
+{
+   if( !methodName || !methodName[0] )
+      return "";
+
+   StringTableEntry stname = StringTable->insert( methodName );
+
+   if( getNamespace())
+   {
+      Namespace::Entry * nameEntry = getNamespace()->lookup( stname );
+	  if(nameEntry != NULL)
+	  {
+		  return Con::getReturnBuffer(nameEntry->getArgumentsString());
+	  }
+   }
+
+   return "";
+}
+
 //-----------------------------------------------------------------------------
 
 bool SimObject::isField( const char* fieldName, bool includeStatic, bool includeDynamic )
@@ -1872,6 +1891,16 @@ DefineConsoleMethod( SimObject, isMethod, bool, ( const char* methodName ),,
 
 //-----------------------------------------------------------------------------
 
+DefineConsoleMethod( SimObject, getMethodArgs, const char*, ( const char* methodName ),,
+   "Return the arguments this method takes.\n"
+   "@param The name of the method.\n"
+   "@return Arguments this method takes in form int arg1 string arg2..." )
+{
+   return object->getMethodArgs( methodName );
+}
+
+//-----------------------------------------------------------------------------
+
 DefineEngineMethod( SimObject, isChildOfGroup, bool, ( SimGroup* group ),,
    "Test whether the object belongs directly or indirectly to the given group.\n"
    "@param group The SimGroup object.\n"
@@ -2399,6 +2428,24 @@ DefineConsoleMethod( SimObject, getClassName, const char*, (),,
 
 //-----------------------------------------------------------------------------
 
+DefineConsoleMethod( SimObject, isClass, bool, ( const char* className ), ,
+   "Test if object is a of specified class.\n"
+   "@param className Class to test for.\n"
+   "@return true if of specified class, false if not." )
+{
+	AbstractClassRep* acr = AbstractClassRep::getClassRepFromName(className);
+
+	if(acr != NULL)
+		return object->getClassRep()->isClass(acr);
+	else
+	{
+		Con::printf("ERROR: SimObject::isClass - unknown class %s", className);
+		return false;
+	}
+}
+
+//-----------------------------------------------------------------------------
+
 DefineConsoleMethod( SimObject, isField, bool, ( const char* fieldName ),,
    "Test whether the given field is defined on this object.\n"
    "@param fieldName The name of the field.\n"
@@ -2652,8 +2699,32 @@ DefineConsoleMethod( SimObject, getDynamicFieldCount, S32, (),,
    "Get the number of dynamic fields defined on the object.\n"
    "@return The number of dynamic fields defined on the object." )
 {
+   return object->getDynamicFieldCount();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleMethod( SimObject, getStaticFieldCount, S32, (),,
+   "Get the number of static fields defined on the object.\n"
+   "@return The number of static fields defined on the object." )
+{
+	return object->getStaticFieldCount();
+}
+
+S32 SimObject::getStaticFieldCount() const
+{
+   if(mFlags.test(ModStaticFields))
+   {
+		return getFieldList().size();
+   }
+
+	return -1;
+}
+
+S32 SimObject::getDynamicFieldCount() const
+{
    S32 count = 0;
-   SimFieldDictionary* fieldDictionary = object->getFieldDictionary();
+   SimFieldDictionary* fieldDictionary = getFieldDictionary();
    for (SimFieldDictionaryIterator itr(fieldDictionary); *itr; ++itr)
       count++;
 
@@ -2662,17 +2733,108 @@ DefineConsoleMethod( SimObject, getDynamicFieldCount, S32, (),,
 
 //-----------------------------------------------------------------------------
 
+DefineConsoleMethod( SimObject, getStaticField, const char*, ( S32 index ),,
+   "Get a value of a static field by index.\n"
+   "@param index The index of the static field.\n"
+   "@return The value of the static field at the given index or \"\"." )
+{
+	char fieldName[128];
+	char fieldValue[128];
+
+	const char* fn = object->getStaticField(index);
+
+	if(fn)
+		dStrcpy(fieldName, fn);
+	else
+		dStrcpy(fieldName, "");
+
+	const char* fv = object->getDataField(StringTable->insert(fieldName),0);
+	
+	if(fv)
+		dStrcpy(fieldValue, fv);
+	else
+		dStrcpy(fieldValue, "");
+
+   static const U32 bufSize = 256;
+   char* buffer = Con::getReturnBuffer(bufSize);
+	dSprintf(buffer, bufSize, "%s\t%s",fieldName, fieldValue);
+
+	return buffer;
+}
+
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleMethod( SimObject, getStaticFieldType, const char*, ( S32 index ),,
+   "Get a type of a static field by index.\n"
+   "@param index The index of the static field.\n"
+   "@return The type of the static field at the given index or \"\". Types can are: StartGroup, EndGroup, or Field" )
+{
+	const char* fieldType = object->getStaticFieldType(index);
+
+   static const U32 bufSize = 256;
+   char* buffer = Con::getReturnBuffer(bufSize);
+	dSprintf(buffer, bufSize, "%s",fieldType);
+
+	return buffer;
+}
+
+const char* SimObject::getStaticFieldType(S32 index) const
+{
+   if(mFlags.test(ModStaticFields))
+   {
+		const AbstractClassRep::FieldList *fldlst = &getFieldList();
+		if(fldlst)
+		{
+			if(index >= 0 || index < fldlst->size())
+			{
+				switch((*fldlst)[index].type)
+				{
+					case AbstractClassRep::StartGroupFieldType: return "StartGroup"; break;
+					case AbstractClassRep::EndGroupFieldType: return "EndGroup"; break;
+					case AbstractClassRep::DeprecatedFieldType: return "Depricated"; break;
+					default: return "Field"; break;
+				}
+			}
+		}
+   }
+
+	Con::warnf("Invalid static field index passed to SimObject::getStaticFieldType!");
+	return NULL;
+}
+
+const char* SimObject::getStaticField(S32 index) const
+{
+   if(mFlags.test(ModStaticFields))
+   {
+		const AbstractClassRep::FieldList *fldlst = &getFieldList();
+		if(fldlst)
+		{
+			if(index >= 0 || index < fldlst->size())
+				return (*fldlst)[index].pFieldname;
+		}
+   }
+
+	Con::warnf("Invalid static field index passed to SimObject::getStaticField!");
+	return NULL;
+}
+
 DefineConsoleMethod( SimObject, getDynamicField, const char*, ( S32 index ),,
    "Get a value of a dynamic field by index.\n"
    "@param index The index of the dynamic field.\n"
    "@return The value of the dynamic field at the given index or \"\"." )
 {
-   SimFieldDictionary* fieldDictionary = object->getFieldDictionary();
-   SimFieldDictionaryIterator itr(fieldDictionary);
-   for (S32 i = 0; i < index; i++)
-   {
-      if (!(*itr))
-      {
+	return object->getDynamicField( index );
+}
+
+const char* SimObject::getDynamicField(S32 index) const
+{
+	SimFieldDictionary* fieldDictionary = getFieldDictionary();
+	SimFieldDictionaryIterator itr(fieldDictionary);
+	for (S32 i = 0; i < index; i++)
+	{
+		if (!(*itr))
+		{
          Con::warnf("Invalid dynamic field index passed to SimObject::getDynamicField!");
          return NULL;
       }
@@ -2692,7 +2854,82 @@ DefineConsoleMethod( SimObject, getDynamicField, const char*, ( S32 index ),,
    return NULL;
 }
 
-//-----------------------------------------------------------------------------
+DefineConsoleMethod( SimObject, listDynamicFields, void, ( ),,
+   "Print all of the dynamic fields and their value.\n" )
+{
+   S32 count = 0;
+   SimFieldDictionary* fieldDictionary = object->getFieldDictionary();
+   for (SimFieldDictionaryIterator itr(fieldDictionary); *itr; ++itr)
+	{
+		SimFieldDictionary::Entry* entry = *itr;
+		Con::printf("%i: %s = %s",count, entry->slotName, entry->value);
+		count++;
+	}
+}
+
+DefineConsoleMethod( SimObject, clearDynamicFields, void, ( ),,
+   "removes all dynamic fields.\n" )
+{
+   SimFieldDictionary* fieldDictionary = object->getFieldDictionary();
+	fieldDictionary->clearFields();
+}
+
+bool SimObject::isDynamicField( const char* fieldName )
+{
+   if( !fieldName )
+      return false;
+
+   SimFieldDictionary* fieldDictionary = getFieldDictionary();
+	if(!fieldDictionary)
+		return false;
+
+	const char* value = fieldDictionary->getFieldValue(StringTable->insert(fieldName));
+
+	if(value)
+		return true;
+	else
+		return false;
+}
+
+DefineConsoleMethod( SimObject, isDynamicField, bool, ( const char* field ),,
+   "check if the dynamic field exists.\n" 
+   "@param field The field name of the dynamic field.\n"
+   "@return True if the field exists, false if not." )
+{
+	return object->isDynamicField(field);
+}
+
+bool SimObject::isStaticField( const char* fieldName )
+{
+   if( !fieldName )
+      return false;
+
+   if(mFlags.test(ModStaticFields))
+   {
+      S32 array1 = -1;
+      const AbstractClassRep::Field *fld = findField(StringTable->insert(fieldName));
+   
+      if(fld)
+      {
+         if(array1 == -1 && fld->elementCount == 1)
+            return true;
+         if(array1 >= 0 && array1 < fld->elementCount)
+            return true;
+         return false;
+      }
+   }
+
+	return false;
+}
+
+
+DefineConsoleMethod( SimObject, isStaticField, bool, ( const char* field ),,
+   "check if the static field exists.\n"
+   "@param field The field name of the static field.\n"
+   "@return True if the field exists, false if not." )
+{
+	return object->isDynamicField(field);
+}
 
 DefineConsoleMethod( SimObject, getFieldCount, S32, (),,
    "Get the number of static fields on the object.\n"

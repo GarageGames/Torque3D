@@ -292,17 +292,12 @@ class SimObject: public ConsoleObject
       SimObject*       nextManagerNameObject;
       SimObject*       nextIdObject;
 
-      /// SimGroup we're contained in, if any.
-      SimGroup*   mGroup;
       
       /// Flags internal to the object management system.
       BitSet32    mFlags;
 
       /// Object we are copying fields from.
       SimObject* mCopySource;
-
-      /// Table of dynamic fields assigned to this object.
-      SimFieldDictionary *mFieldDictionary;
 
       /// Buffer to store textual representation of this object's numeric ID in.
       char mIdString[ 11 ];
@@ -355,6 +350,12 @@ class SimObject: public ConsoleObject
       static bool setProtectedName(void *object, const char *index, const char *data);
 
    protected:
+   
+   	  /// SimGroup we're contained in, if any.
+      SimGroup*   mGroup;
+
+      /// Table of dynamic fields assigned to this object.
+      SimFieldDictionary *mFieldDictionary;
    
       /// Id number for this object.
       SimObjectId mId;
@@ -483,7 +484,7 @@ class SimObject: public ConsoleObject
       /// function does.
       ///
       /// This dictionary can be iterated over using a SimFieldDictionaryIterator.
-      SimFieldDictionary * getFieldDictionary() {return(mFieldDictionary);}
+      SimFieldDictionary * getFieldDictionary() const {return(mFieldDictionary);}
 
       // Component Information
       inline virtual StringTableEntry  getComponentName() { return StringTable->insert( getClassName() ); };
@@ -526,11 +527,31 @@ class SimObject: public ConsoleObject
 
       /// Check if a method exists in the objects current namespace.
       virtual bool isMethod( const char* methodName );
+
+	  /// Get the argument list for this method.
+      virtual const char* getMethodArgs( const char* methodName );
       
       /// Return true if the field is defined on the object
       virtual bool isField( const char* fieldName, bool includeStatic = true, bool includeDynamic = true );
       
       /// @}
+
+      /// Check if the dynamic field exists
+      bool isDynamicField( const char* fieldName );
+
+      /// Check if the static field exists
+      bool isStaticField( const char* fieldName );
+
+      /// Get the number of static fields
+      S32 getStaticFieldCount() const;
+
+      /// Gets number of dynamic fields
+      S32 getDynamicFieldCount() const;
+
+      const char* getStaticField(S32 index) const;
+      const char* getStaticFieldType(S32 index) const;
+
+      const char* getDynamicField(S32 index) const;
 
       /// @name Initialization
       /// @{
@@ -692,7 +713,7 @@ class SimObject: public ConsoleObject
       void unregisterObject();
 
       /// Unregister, mark as deleted, and free the object.
-      void deleteObject();
+      virtual void deleteObject();
 
       /// Performs a safe delayed delete of the object using a sim event.
       void safeDeleteObject();
