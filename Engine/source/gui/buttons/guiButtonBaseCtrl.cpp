@@ -324,6 +324,27 @@ void GuiButtonBaseCtrl::setStateOn( bool bStateOn )
    setUpdate();
 }
 
+S32 GuiButtonBaseCtrl::getTextWidth()
+{
+	if(mProfile)
+	{
+		GFont *font = mProfile->mFont;
+
+		//If the font is null then this profile must have not been used on a focused gui yet
+		//lets just try to load it here
+		if(!font)
+		{
+			if(mProfile->loadFont())
+				font = mProfile->mFont;
+		}
+
+		if(font)
+			return font->getStrNWidth( mButtonText, dStrlen(mButtonText) );
+	}
+	
+	return -1;
+}
+
 //-----------------------------------------------------------------------------
 
 void GuiButtonBaseCtrl::acceleratorKeyPress(U32)
@@ -635,6 +656,15 @@ DefineEngineMethod( GuiButtonBaseCtrl, getText, const char*, (),,
    "@return The button's label." )
 {
    return object->getText( );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiButtonBaseCtrl, getTextWidth, S32, (),,
+   "returns the width of the text of the button, -1 if null profile or font.\n\n"
+   "@return The width of the text of the button, -1 if null profile or font." )
+{
+   return object->getTextWidth( );
 }
 
 //-----------------------------------------------------------------------------

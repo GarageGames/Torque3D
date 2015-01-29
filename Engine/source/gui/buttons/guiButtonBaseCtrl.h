@@ -94,6 +94,8 @@ class GuiButtonBaseCtrl : public GuiControl
       void setStateOn( bool bStateOn );
       bool getStateOn() const { return mStateOn; }
 
+      S32 getTextWidth();
+      
       void setDepressed( bool depressed ) { mDepressed = depressed; }
       void resetState() {mDepressed = false; mMouseOver = false;}
 
