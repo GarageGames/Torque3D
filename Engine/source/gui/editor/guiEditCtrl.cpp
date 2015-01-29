@@ -2575,9 +2575,9 @@ DefineConsoleMethod( GuiEditCtrl, deleteSelection, void, (), , "() - Delete the 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, moveSelection, void, (Point2I pos), , "Move all controls in the selection by (dx,dy) pixels.")
+DefineConsoleMethod( GuiEditCtrl, moveSelection, void, (S32 dx, S32 dy), , "Move all controls in the selection by (dx,dy) pixels.")
 {
-   object->moveAndSnapSelection(Point2I(pos));
+   object->moveAndSnapSelection(Point2I(dx, dy));
 }
 
 //-----------------------------------------------------------------------------
