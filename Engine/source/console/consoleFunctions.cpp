@@ -371,6 +371,40 @@ DefineConsoleFunction( strlen, S32, ( const char* str ),,
 }
 
 //-----------------------------------------------------------------------------
+DefineConsoleFunction( strlenskip, S32, ( const char* str, const char* first, const char* last ),,
+   "Calculate the length of a string in characters, skipping everything between and including first and last.\n"
+   "@param str A string.\n"
+   "@param first First character to look for to skip block of text.\n"
+   "@param last Second character to look for to skip block of text.\n"
+   "@return The length of the given string skipping blocks of text between characters.\n"
+   "@ingroup Strings" )
+{
+	const UTF8* pos = str;
+	U32 size = 0;
+	U32 length = dStrlen(str);
+	bool count = true;
+
+	//loop through each character counting each character, skipping tags (anything with < followed by >)
+	for(U32 i = 0; i < length; i++, pos++)
+	{
+		if(count)
+		{
+			if(*pos == first[0])
+				count = false;
+			else
+				size++;
+		}
+		else
+		{
+			if(*pos == last[0])
+				count = true;
+		}
+	}
+
+	return S32(size);
+}
+
+//-----------------------------------------------------------------------------
 
 DefineConsoleFunction( strstr, S32, ( const char* string, const char* substring ),,
    "Find the start of @a substring in the given @a string searching from left to right.\n"
@@ -409,6 +443,33 @@ DefineConsoleFunction( strpos, S32, ( const char* haystack, const char* needle, 
    if(sublen + start > strlen)
       return -1;
    for(; start + sublen <= strlen; start++)
+      if(!dStrncmp(haystack + start, needle, sublen))
+         return start;
+   return -1;
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( strposr, S32, ( const char* haystack, const char* needle, S32 offset ), ( 0 ),
+   "Find the start of @a needle in @a haystack searching from right to left beginning at the given offset.\n"
+   "@param haystack The string to search.\n"
+   "@param needle The string to search for.\n"
+   "@return The index at which the first occurrence of @a needle was found in @a heystack or -1 if no match was found.\n\n"
+   "@tsexample\n"
+   "strposr( \"b ab\", \"b\", 1 ) // Returns 2.\n"
+   "@endtsexample\n"
+   "@ingroup Strings" )
+{
+   U32 sublen = dStrlen( needle );
+   U32 strlen = dStrlen( haystack );
+   S32 start = strlen - offset;
+   	
+   if(start < 0 || start > strlen)
+      return -1;
+   
+   if (start + sublen > strlen)
+	  start = strlen - sublen;
+   for(; start >= 0; start--)
       if(!dStrncmp(haystack + start, needle, sublen))
          return start;
    return -1;
@@ -762,6 +823,18 @@ DefineConsoleFunction( stripTrailingNumber, String, ( const char* str ),,
    return String::GetTrailingNumber( str, suffix );
 }
 
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( getFirstNumber, String, ( const char* str ),,
+   "Get the first occuring number from @a str.\n"
+   "@param str The string from which to read out the first number.\n"
+   "@return String representation of the number or "" if no number.\n\n")
+{
+	U32 start;
+	U32 end;
+	return String::GetFirstNumber(str, start, end);
+}
+
 //----------------------------------------------------------------
 
 DefineConsoleFunction( isspace, bool, ( const char* str, S32 index ),,
@@ -944,6 +1017,30 @@ DefineConsoleFunction( strrchrpos, S32, ( const char* str, const char* chr, S32 
       return -1;
       
    return index;
+}
+
+//----------------------------------------------------------------
+
+DefineConsoleFunction( strToggleCaseToWords, const char*, ( const char* str ),,
+   "Parse a Toggle Case word into separate words.\n"
+   "@param str The string to parse.\n"
+   "@return new string space separated.\n\n"
+   "@tsexample\n"
+   "strToggleCaseToWords( \"HelloWorld\" ) // Returns \"Hello World\".\n"
+   "@endtsexample\n"
+   "@ingroup Strings" )
+{
+	String newStr;
+	for(S32 i = 0; str[i]; i++)
+	{
+		//If capitol add a space
+		if(i != 0 && str[i] >= 65 && str[i] <= 90)
+			newStr += " "; 
+
+		newStr += str[i]; 
+	}
+
+	return Con::getReturnBuffer(newStr);
 }
 
 //----------------------------------------------------------------
