@@ -25,6 +25,11 @@
 #include "console/consoleInternal.h"
 #include "console/engineAPI.h"
 #include "console/ast.h"
+
+#ifndef _CONSOLFUNCTIONS_H_
+#include "console/consoleFunctions.h"
+#endif
+
 #include "core/strings/findMatch.h"
 #include "core/strings/stringUnit.h"
 #include "core/strings/unicode.h"
@@ -45,6 +50,132 @@ bool LinkConsoleFunctions = false;
 // Buffer for expanding script filenames.
 static char scriptFilenameBuffer[1024];
 
+bool isInt(const char* str)
+{
+	int len = dStrlen(str);
+	if(len <= 0)
+		return false;
+
+	// Ingore whitespace
+	int start = 0;
+	for(int i = start; i < len; i++)
+		if(str[i] != ' ')
+		{
+			start = i;
+			break;
+		}
+
+	for(int i = start; i < len; i++)
+		switch(str[i])
+		{
+		case '+': case '-':
+			if(i != 0)
+				return false;
+			break;
+		case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': 
+			break;
+		case ' ': // ignore whitespace
+			for(int j = i+1; j < len; j++)
+				if(str[j] != ' ')
+					return false;
+			return true;
+			break;
+		default:
+			return false;
+		}
+	return true;
+}
+
+bool isFloat(const char* str, bool sciOk = false)
+{
+	int len = dStrlen(str);
+	if(len <= 0)
+		return false;
+
+	// Ingore whitespace
+	int start = 0;
+	for(int i = start; i < len; i++)
+		if(str[i] != ' ')
+		{
+			start = i;
+			break;
+		}
+
+	bool seenDot = false;
+	int eLoc = -1;
+	for(int i = 0; i < len; i++)
+		switch(str[i])
+		{
+		case '+': case '-':
+			if(sciOk)
+			{
+				//Haven't found e or scientific notation symbol
+				if(eLoc == -1)
+				{
+					//only allowed in beginning
+					if(i != 0)
+						return false;
+				}
+				else
+				{
+					//if not right after the e
+					if(i != (eLoc + 1))
+						return false;
+				}
+			}
+			else
+			{
+				//only allowed in beginning
+				if(i != 0)
+					return false;
+			}
+			break;
+		case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': 
+			break;
+		case 'e': case 'E':
+			if(!sciOk)
+				return false;
+			else
+			{
+				//already saw it so can't have 2
+				if(eLoc != -1)
+					return false;
+
+				eLoc = i;
+			}
+			break;
+		case '.':
+			if(seenDot | (sciOk && eLoc != -1))
+				return false;
+			seenDot = true;
+			break;
+		case ' ': // ignore whitespace
+			for(int j = i+1; j < len; j++)
+				if(str[j] != ' ')
+					return false;
+			return true;
+			break;
+		default:
+			return false;
+		}
+	return true;
+}
+
+bool isValidIP(const char* ip)
+{
+    unsigned b1, b2, b3, b4;
+	unsigned char c;
+	int rc = dSscanf(ip, "%3u.%3u.%3u.%3u%c", &b1, &b2, &b3, &b4, &c);
+	if (rc != 4 && rc != 5) return false;
+	if ((b1 | b2 | b3 | b4) > 255) return false;
+	if (dStrspn(ip, "0123456789.") < dStrlen(ip)) return false;
+	return true;
+}
+
+bool isValidPort(U16 port)
+{
+	return (port >= 0 && port <=65535);
+}
 
 //=============================================================================
 //    String Functions.
@@ -813,6 +944,75 @@ DefineConsoleFunction( strrchrpos, S32, ( const char* str, const char* chr, S32 
       return -1;
       
    return index;
+}
+
+//----------------------------------------------------------------
+
+// Warning: isInt and isFloat are very 'strict' and might need to be adjusted to allow other values. //seanmc
+DefineConsoleFunction( isInt, bool, ( const char* str),,
+   "Returns true if the string is an integer.\n"
+   "@param str The string to test.\n"
+   "@return true if @a str is an integer and false if not\n\n"
+   "@tsexample\n"
+   "isInt( \"13\" ) // Returns true.\n"
+   "@endtsexample\n"
+   "@ingroup Strings" )
+{
+	return isInt(str);
+}
+
+//----------------------------------------------------------------
+
+DefineConsoleFunction( isFloat, bool, ( const char* str, bool sciOk), (false),
+   "Returns true if the string is a float.\n"
+   "@param str The string to test.\n"
+   "@param sciOk Test for correct scientific notation and accept it (ex. 1.2e+14)"
+   "@return true if @a str is a float and false if not\n\n"
+   "@tsexample\n"
+   "isFloat( \"13.5\" ) // Returns true.\n"
+   "@endtsexample\n"
+   "@ingroup Strings" )
+{
+	return isFloat(str, sciOk);
+}
+
+//----------------------------------------------------------------
+
+DefineConsoleFunction( isValidPort, bool, ( const char* str),,
+   "Returns true if the string is a valid port number.\n"
+   "@param str The string to test.\n"
+   "@return true if @a str is a port and false if not\n\n"
+   "@tsexample\n"
+   "isValidPort( \"8080\" ) // Returns true.\n"
+   "@endtsexample\n"
+   "@ingroup Strings" )
+{
+	if(isInt(str))
+	{
+		U16 port = dAtous(str);
+		return isValidPort(port);
+	}
+	else
+		return false;
+}
+
+//----------------------------------------------------------------
+
+DefineConsoleFunction( isValidIP, bool, ( const char* str),,
+   "Returns true if the string is a valid ip address, excepts localhost.\n"
+   "@param str The string to test.\n"
+   "@return true if @a str is a valid ip address and false if not\n\n"
+   "@tsexample\n"
+   "isValidIP( \"localhost\" ) // Returns true.\n"
+   "@endtsexample\n"
+   "@ingroup Strings" )
+{
+	if(dStrcmp(str, "localhost") == 0)
+	{
+		return true;
+	}
+	else
+		return isValidIP(str);
 }
 
 //=============================================================================
