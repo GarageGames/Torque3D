@@ -33,6 +33,9 @@
 #include "platform/platformInput.h"
 #include "core/util/journal/journal.h"
 #include "core/util/uuid.h"
+#include "core/color.h"
+#include "math/mPoint3.h"
+#include "math/mathTypes.h"
 
 #ifdef TORQUE_DEMO_PURCHASE
 #include "gui/core/guiCanvas.h"
@@ -813,6 +816,86 @@ DefineConsoleFunction( strrchrpos, S32, ( const char* str, const char* chr, S32 
       return -1;
       
    return index;
+}
+
+//----------------------------------------------------------------
+
+DefineConsoleFunction( ColorFloatToInt, ColorI, ( ColorF color),,
+	"Convert from a float color to an integer color (0.0 - 1.0 to 0 to 255).\n"
+	"@param color Float color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha.\n"
+	"@return Converted color value (0 - 255)\n\n"
+	"@tsexample\n"
+	"ColorFloatToInt( \"0 0 1 0.5\" ) // Returns \"0 0 255 128\".\n"
+	"@endtsexample\n"
+	"@ingroup Strings" )
+{
+	return (ColorI)color;
+}
+
+DefineConsoleFunction( ColorIntToFloat, ColorF, ( ColorI color),,
+	"Convert from a integer color to an float color (0 to 255 to 0.0 - 1.0).\n"
+	"@param color Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha.\n"
+	"@return Converted color value (0.0 - 1.0)\n\n"
+	"@tsexample\n"
+	"ColorIntToFloat( \"0 0 255 128\" ) // Returns \"0 0 1 0.5\".\n"
+	"@endtsexample\n"
+	"@ingroup Strings" )
+{
+	return (ColorF)color;
+}
+
+DefineConsoleFunction( ColorRGBToHEX, const char*, ( ColorI color),,
+	"Convert from a integer RGB (red, green, blue) color to hex color value (0 to 255 to 00 - FF).\n"
+	"@param color Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha. It excepts an alpha, but keep in mind this will not be converted.\n"
+	"@return Hex color value (#000000 - #FFFFFF), alpha isn't handled/converted so it is only the RGB value\n\n"
+	"@tsexample\n"
+	"ColorRBGToHEX( \"0 0 255 128\" ) // Returns \"#0000FF\".\n"
+	"@endtsexample\n"
+	"@ingroup Strings" )
+{
+	return Con::getReturnBuffer(color.getHex());
+}
+
+DefineConsoleFunction( ColorRGBToHSB, const char*, ( ColorI color),,
+	"Convert from a integer RGB (red, green, blue) color to HSB (hue, saturation, brightness). HSB is also know as HSL or HSV as well, with the last letter standing for lightness or value.\n"
+	"@param color Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha. It excepts an alpha, but keep in mind this will not be converted.\n"
+	"@return HSB color value, alpha isn't handled/converted so it is only the RGB value\n\n"
+	"@tsexample\n"
+	"ColorRBGToHSB( \"0 0 255 128\" ) // Returns \"240 100 100\".\n"
+	"@endtsexample\n"
+	"@ingroup Strings" )
+{
+	ColorI::Hsb hsb(color.getHSB());
+	String s(String::ToString(hsb.hue) + " " + String::ToString(hsb.sat) + " " + String::ToString(hsb.brightness));
+	return Con::getReturnBuffer(s);
+}
+
+DefineConsoleFunction( ColorHEXToRGB, ColorI, ( const char* hex),,
+	"Convert from a hex color value to an integer RGB (red, green, blue) color (00 - FF to 0 to 255).\n"
+	"@param hex Hex color value (#000000 - #FFFFFF) to be converted to an RGB (red, green, blue) value.\n"
+	"@return Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha. Alpha isn't handled/converted so only pay attention to the RGB value\n\n"
+	"@tsexample\n"
+	"ColorHEXToRGB( \"#0000FF\" ) // Returns \"0 0 255 0\".\n"
+	"@endtsexample\n"
+	"@ingroup Strings" )
+{
+	ColorI color;
+	color.set(hex);
+	return color;
+}
+
+DefineConsoleFunction( ColorHSBToRGB, ColorI, ( Point3I hsb),,
+	"Convert from a HSB (hue, saturation, brightness) to an integer RGB (red, green, blue) color. HSB is also know as HSL or HSV as well, with the last letter standing for lightness or value.\n"
+	"@param hsb HSB (hue, saturation, brightness) value to be converted.\n"
+	"@return Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha. Alpha isn't handled/converted so only pay attention to the RGB value\n\n"
+	"@tsexample\n"
+	"ColorHSBToRGB( \"240 100 100\" ) // Returns \"0 0 255 0\".\n"
+	"@endtsexample\n"
+	"@ingroup Strings" )
+{
+	ColorI color;
+	color.set(ColorI::Hsb(hsb.x, hsb.y, hsb.z));
+	return color;
 }
 
 //=============================================================================
