@@ -98,17 +98,17 @@ protected:
    {
       mIsBackground = false; // This could be toggled to true to prefer performance.
       mMinimumSize.set(0,0);
-		mLockedSize.set(0,0);
-		mResizeLocked = false;
+      mLockedSize.set(0,0);
+      mResizeLocked = false;
       mEnableKeyboardTranslation = false;
       mEnableAccelerators = true;
       mCursorController = NULL;
-      // This controller maps window input (Mouse/Keyboard) to a generic input consumer
-      mWindowInputGenerator = new WindowInputGenerator( this );
       mSuppressReset = false;
-
       mOffscreenRender = false;
       mDisplayWindow = false;
+
+      // This controller maps window input (Mouse/Keyboard) to a generic input consumer
+      mWindowInputGenerator = new WindowInputGenerator( this );
    }
 
 public:
@@ -124,9 +124,20 @@ public:
    /// Get the WindowController associated with this window
    virtual void setInputController( IProcessInput *controller ) { if( mWindowInputGenerator ) mWindowInputGenerator->setInputController( controller ); };
 
+   WindowInputGenerator* getInputGenerator() const { return mWindowInputGenerator; }
+
    /// Get the ID that uniquely identifies this window in the context of its
    /// window manager.
    virtual WindowId getWindowId() { return 0; };
+
+   enum WindowSystem
+   {
+      WindowSystem_Unknown = 0,
+      WindowSystem_Windows,
+      WindowSystem_X11,
+   };
+
+   virtual void* getSystemWindow(const WindowSystem system) { return NULL; }
 
    /// Set the flag that determines whether to suppress a GFXDevice reset
    inline void setSuppressReset(bool suppress) { mSuppressReset = suppress; };

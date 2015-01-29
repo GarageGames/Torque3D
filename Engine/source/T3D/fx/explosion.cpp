@@ -615,7 +615,7 @@ void ExplosionData::packData(BitStream* stream)
    }
    U32 count;
    for(count = 0; count < EC_NUM_TIME_KEYS; count++)
-      if(times[i] >= 1)
+      if(times[count] >= 1)
          break;
    count++;
    if(count > EC_NUM_TIME_KEYS)

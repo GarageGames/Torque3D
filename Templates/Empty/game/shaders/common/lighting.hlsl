@@ -36,6 +36,7 @@ uniform float4 inLightColor[4];
 #endif
 
 uniform float4 ambient;
+#define ambientCameraFactor 0.3
 uniform float specularPower;
 uniform float4 specularColor;
 

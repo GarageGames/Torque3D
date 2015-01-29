@@ -208,6 +208,8 @@ GameConnection::GameConnection()
 
    mAIControlled = false;
 
+   mLastPacketTime = 0;
+
    mDisconnectReason[0] = 0;
 
    //blackout vars
@@ -465,7 +467,7 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
       connectArgv[i + 3] = mConnectArgv[i];
    }
    connectArgv[0] = "onConnectRequest";
-   connectArgv[1] = NULL;
+   connectArgv[1] = 0;
    char buffer[256];
    Net::addressToString(getNetAddress(), buffer);
    connectArgv[2] = buffer;

@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#if defined( TORQUE_SDL )
+#if defined( TORQUE_SDL ) && !defined( TORQUE_DEDICATED )
 
 #include "gfx/gfxCubemap.h"
 #include "gfx/screenshot.h"

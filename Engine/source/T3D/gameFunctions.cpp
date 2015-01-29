@@ -228,7 +228,7 @@ void GameUpdateCameraFov()
       F32 delta = time - CameraAndFOV::sLastCameraUpdateTime;
 
       // snap zoom?
-      if((CameraAndFOV::sZoomSpeed == 0) || (delta <= 0.f))
+      if((CameraAndFOV::sZoomSpeed == 0) || (delta <= 0.0f))
          CameraAndFOV::sCameraFov = CameraAndFOV::sTargetFov;
       else
       {

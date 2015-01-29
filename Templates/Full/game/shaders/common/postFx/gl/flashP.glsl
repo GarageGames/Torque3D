@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "./postFx.glsl"
+#include "./postFX.glsl"
 #include "../../gl/torque.glsl"
 #include "../../gl/hlslCompat.glsl"
 

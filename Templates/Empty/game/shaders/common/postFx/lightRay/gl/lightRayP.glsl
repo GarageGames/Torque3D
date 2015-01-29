@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "../../../gl/hlslCompat.glsl"
-#include "../../gl/postFx.glsl"
+#include "../../gl/postFX.glsl"
 
 uniform sampler2D frameSampler;
 uniform sampler2D backBuffer;

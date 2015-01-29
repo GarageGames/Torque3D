@@ -40,6 +40,7 @@ public:
 private:
    static PlatformAssert *platformAssert;
    bool processing;
+   bool ignoreAll;
 
    virtual bool displayMessageBox(const char *title, const char *message, bool retry);
    virtual bool process(Type         assertType,
@@ -76,6 +77,14 @@ public:
    #define AssertWarn(x, y)      \
          { if ((x)==0) \
             ::PlatformAssert::processAssert(::PlatformAssert::Warning, __FILE__, __LINE__,  y); }
+
+   /*!
+      Helper macro called when AssertFatal failed.
+      Used for help static code analyzers.
+   */
+   #ifndef ON_FAIL_ASSERTFATAL
+      #define ON_FAIL_ASSERTFATAL
+   #endif
 
    /*!
       Assert that the statement x is true, otherwise halt.

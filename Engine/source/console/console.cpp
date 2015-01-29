@@ -47,6 +47,8 @@ extern ConsoleValueStack CSTK;
 ConsoleDocFragment* ConsoleDocFragment::smFirst;
 ExprEvalState gEvalState;
 StmtNode *gStatementList;
+StmtNode *gAnonFunctionList;
+U32 gAnonFunctionID = 0;
 ConsoleConstructor *ConsoleConstructor::first = NULL;
 bool gWarnUndefinedScriptVariables;
 
@@ -1645,7 +1647,7 @@ StringStackConsoleWrapper::~StringStackConsoleWrapper()
 {
    for (int i=0; i<argc; i++)
    {
-      argv[i] = NULL;
+      argv[i] = 0;
    }
    delete[] argv;
 }

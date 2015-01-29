@@ -427,7 +427,7 @@ extern "C" {
 			PlatformWindowManager::get()->getFirstWindow()->setSize(Point2I(width,height));
 	}
 
-#ifdef TORQUE_OS_WIN
+#if defined(TORQUE_OS_WIN) && !defined(TORQUE_SDL)
    // retrieve the hwnd of our render window
    void* torque_gethwnd()
    {

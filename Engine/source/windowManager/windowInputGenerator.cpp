@@ -85,6 +85,19 @@ void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
    if( !mInputController || !mFocused )
       return;
 
+    if (inputEvent.action == SI_MAKE && inputEvent.deviceType == KeyboardDeviceType)
+    {
+        for( int i = 0; i < mAcceleratorMap.size(); ++i )
+        {
+            const AccKeyMap &acc = mAcceleratorMap[i];
+            if( acc.modifier & inputEvent.modifier && acc.keyCode == inputEvent.objInst )
+            {
+                Con::evaluatef(acc.cmd);
+                return;
+            }
+        }
+    }
+
    // Give the ActionMap first shot.
    if (ActionMap::handleEventGlobal(&inputEvent))
       return;

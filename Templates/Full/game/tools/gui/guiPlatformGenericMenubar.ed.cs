@@ -1,0 +1,1 @@
+exec("./guiPlatformGenericMenubar.ed.gui");

@@ -30,6 +30,7 @@
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiTypes.h"
 #include "gui/core/guiControl.h"
+#include "gui/editor/guiMenuBar.h"
 #include "console/consoleTypes.h"
 #include "gfx/screenshot.h"
 #include "gfx/video/videoCapture.h"
@@ -94,9 +95,11 @@ extern InputModifiers convertModifierBits(const U32 in);
 //-----------------------------------------------------------------------------
 
 GuiCanvas::GuiCanvas(): GuiControl(),
+                        mCurUpdateRect(0, 0, 0, 0),
                         mCursorEnabled(true),
                         mForceMouseToGUI(false),
                         mAlwaysHandleMouseButtons(false),
+                        mCursorChanged(0),
                         mClampTorqueCursor(true),
                         mShowCursor(true),
                         mLastCursorEnabled(false),
@@ -120,6 +123,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mLeftMouseLast(false),
                         mMiddleMouseLast(false),
                         mRightMouseLast(false),
+                        mMouseDownPoint(0.0f,0.0f),
                         mPlatformWindow(NULL),
                         mLastRenderMs(0),
                         mDisplayWindow(true)
@@ -283,6 +287,8 @@ bool GuiCanvas::onAdd()
    mLastPurchaseHideTime = 0;
 #endif
 
+   Sim::findObject("PlatformGenericMenubar", mMenuBarCtrl);
+
    return parentRet;
 }
 
@@ -300,6 +306,34 @@ void GuiCanvas::onRemove()
    Con::executef(this, "onDestroyMenu");
 
    Parent::onRemove();
+}
+
+void GuiCanvas::setMenuBar(SimObject *obj)
+{
+    GuiControl *oldMenuBar = mMenuBarCtrl;
+    mMenuBarCtrl = dynamic_cast<GuiControl*>(obj);
+
+    //remove old menubar
+    if( oldMenuBar )
+        Parent::removeObject( oldMenuBar );
+
+    // set new menubar    
+    if( mMenuBarCtrl )
+        Parent::addObject(mMenuBarCtrl);
+
+    // update window accelerator keys
+    if( oldMenuBar != mMenuBarCtrl )
+    {
+        StringTableEntry ste = StringTable->insert("menubar");
+        GuiMenuBar* menu = NULL;
+        menu = !oldMenuBar ? NULL : dynamic_cast<GuiMenuBar*>(oldMenuBar->findObjectByInternalName( ste, true));
+        if( menu )
+            menu->removeWindowAcceleratorMap( *getPlatformWindow()->getInputGenerator() );
+
+        menu = !mMenuBarCtrl ? NULL : dynamic_cast<GuiMenuBar*>(mMenuBarCtrl->findObjectByInternalName( ste, true));
+        if( menu )
+                menu->buildWindowAcceleratorMap( *getPlatformWindow()->getInputGenerator() );
+    }
 }
 
 void GuiCanvas::setWindowTitle(const char *newTitle)
@@ -1023,7 +1057,7 @@ void GuiCanvas::rootMouseDown(const GuiEvent &event)
       {
          i--;
          GuiControl *ctrl = static_cast<GuiControl *>(*i);
-         GuiControl *controlHit = ctrl->findHitControl(event.mousePoint);
+         GuiControl *controlHit = ctrl->findHitControl( event.mousePoint - ctrl->getPosition() );
 
          //see if the controlHit is a modeless dialog...
          if( !controlHit->getControlProfile()->mModal )
@@ -1293,6 +1327,9 @@ void GuiCanvas::setContentControl(GuiControl *gui)
       Sim::getGuiGroup()->addObject( ctrl );
    }
 
+   // set current menu bar
+   setMenuBar( mMenuBarCtrl );
+
    // lose the first responder from the old GUI
    GuiControl* responder = gui->findFirstTabable();
    if(responder)
@@ -1556,10 +1593,27 @@ void GuiCanvas::maintainSizing()
       GuiControl *ctrl = static_cast<GuiControl*>(*i);
       Point2I ext = ctrl->getExtent();
       Point2I pos = ctrl->getPosition();
+      Point2I newExt = screenRect.extent;
+      Point2I newPos = screenRect.point;
 
-      if(pos != screenRect.point || ext != screenRect.extent)
+      // if menubar is active displace content gui control
+      if( mMenuBarCtrl && (ctrl == getContentControl()) )
+      {          
+          const SimObject *menu = mMenuBarCtrl->findObjectByInternalName( StringTable->insert("menubar"), true);
+
+          if( !menu )
+              continue;
+
+          AssertFatal( dynamic_cast<const GuiControl*>(menu), "");
+
+          const U32 yOffset = static_cast<const GuiControl*>(menu)->getExtent().y;
+          newPos.y += yOffset;
+          newExt.y -= yOffset;
+      }
+
+      if(pos != newPos || ext != newExt)
       {
-         ctrl->resize(screenRect.point, screenRect.extent);
+         ctrl->resize(newPos, newExt);
          resetUpdateRegions();
       }
    }
@@ -2273,7 +2327,7 @@ DefineEngineFunction(excludeOtherInstance, bool, (const char* appIdentifer),,
 					 "@ingroup GuiCore")
 {
 	   // mac/360 can only run one instance in general.
-#if !defined(TORQUE_OS_MAC) && !defined(TORQUE_OS_XENON) && !defined(TORQUE_DEBUG)
+#if !defined(TORQUE_OS_MAC) && !defined(TORQUE_OS_XENON) && !defined(TORQUE_DEBUG) && !defined(TORQUE_OS_LINUX)
    return Platform::excludeOtherInstances(appIdentifer);
 #else
    // We can just return true if we get here.
@@ -2578,6 +2632,14 @@ DefineConsoleMethod( GuiCanvas, setFocus, void, (), , "() - Claim OS input focus
    PlatformWindow* window = object->getPlatformWindow();
    if( window )
       window->setFocus();
+}
+
+DefineEngineMethod( GuiCanvas, setMenuBar, void, ( GuiControl* menu ),,
+   "Translate a coordinate from canvas window-space to screen-space.\n"
+   "@param coordinate The coordinate in window-space.\n"
+   "@return The given coordinate translated to screen-space." )
+{
+   return object->setMenuBar( menu );
 }
 
 DefineConsoleMethod( GuiCanvas, setVideoMode, void, 

@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#ifndef TORQUE_SDL
+
 #include "platform/menus/popupMenu.h"
 #include "platformWin32/platformWin32.h"
 #include "console/consoleTypes.h"
@@ -158,7 +160,7 @@ void PopupMenu::createPlatformMenu()
    mData->mMenu = mIsPopup ? CreatePopupMenu() : CreateMenu();
    AssertFatal(mData->mMenu, "Unable to create menu");
 
-   MENUINFO mi;
+   MENUINFO mi = { 0 };
    mi.cbSize = sizeof(mi);
    mi.fMask = MIM_MENUDATA;
    mi.dwMenuData = (ULONG_PTR)this;
@@ -169,14 +171,14 @@ void PopupMenu::createPlatformMenu()
 // Public Methods
 //////////////////////////////////////////////////////////////////////////
 
-S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accelerator)
+S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accelerator, const char *)
 {
    Win32Window *pWindow = mCanvas ? dynamic_cast<Win32Window*>(mCanvas->getPlatformWindow()) : NULL;
    bool isAttached = isAttachedToMenuBar();
    if(isAttached && pWindow == NULL)
       return -1;
 
-   MENUITEMINFOA mi;
+   MENUITEMINFOA mi = { 0 };
    mi.cbSize = sizeof(mi);
    mi.fMask = MIIM_ID|MIIM_TYPE;
    mi.wID = (mData->mMenuID * PlatformPopupMenuData::PopupMenuIDRange) + mData->mLastID + 1;
@@ -266,7 +268,7 @@ S32 PopupMenu::insertSubMenu(S32 pos, const char *title, PopupMenu *submenu)
    return -1;
 }
 
-bool PopupMenu::setItem(S32 pos, const char *title, const char* accelerator)
+bool PopupMenu::setItem(S32 pos, const char *title, const char* accelerator, const char *)
 {
    Win32Window *pWindow = mCanvas ? dynamic_cast<Win32Window*>(mCanvas->getPlatformWindow()) : NULL;
    bool isAttached = isAttachedToMenuBar();
@@ -740,3 +742,4 @@ S32 PopupMenu::getPosOnMenuBar()
    return pos;
 }
 
+#endif

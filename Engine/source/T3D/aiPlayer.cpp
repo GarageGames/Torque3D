@@ -1245,7 +1245,7 @@ bool AIPlayer::checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled)
    // projection and box test.
    shapeDir.normalize();
    F32 dot = mDot(shapeDir, camDir);
-   return (dot > camFov);
+   return (dot > mCos(camFov));
 }
 
 DefineEngineMethod(AIPlayer, checkInFoV, bool, (ShapeBase* obj, F32 fov, bool checkEnabled), (NULL, 45.0f, false),

@@ -495,7 +495,7 @@ DefineConsoleFunction( dumpStringMemStats, void, (), , "()"
 void* String::StringData::operator new( size_t size, U32 len )
 {
    AssertFatal( len != 0, "String::StringData::operator new() - string must not be empty" );
-   StringData *str = reinterpret_cast<StringData*>( dMalloc( size + len * sizeof(StringChar) ) );
+   StringData *str = static_cast<StringData*>( dMalloc( size + len * sizeof(StringChar) ) );
 
    str->mLength      = len;
 
@@ -523,7 +523,7 @@ void String::StringData::operator delete(void *ptr)
 void* String::StringData::operator new( size_t size, U32 len, DataChunker& chunker )
 {
    AssertFatal( len != 0, "String::StringData::operator new() - string must not be empty" );
-   StringData *str = reinterpret_cast<StringData*>( chunker.alloc( size + len * sizeof(StringChar) ) );
+   StringData *str = static_cast<StringData*>( chunker.alloc( size + len * sizeof(StringChar) ) );
 
    str->mLength      = len;
 
@@ -1434,19 +1434,19 @@ String::StrFormat::~StrFormat()
       dFree( _dynamicBuffer );
 }
 
-S32 String::StrFormat::format( const char *format, void *args )
+S32 String::StrFormat::format( const char *format, va_list args )
 {
    _len=0;
    return formatAppend(format,args);
 }
 
-S32 String::StrFormat::formatAppend( const char *format, void *args )
+S32 String::StrFormat::formatAppend( const char *format, va_list args )
 {
    // Format into the fixed buffer first.
    S32 startLen = _len;
    if (_dynamicBuffer == NULL)
    {
-      _len += vsnprintf(_fixedBuffer + _len, sizeof(_fixedBuffer) - _len, format, *(va_list*)args);
+      _len += vsnprintf(_fixedBuffer + _len, sizeof(_fixedBuffer) - _len, format, args);
       if (_len >= 0 && _len < sizeof(_fixedBuffer))
          return _len;
 
@@ -1535,9 +1535,9 @@ String String::ToString(const char *str, ...)
    return ret;
 }
 
-String String::VToString(const char* str, void* args)
+String String::VToString(const char* str, va_list args)
 {
-   StrFormat format(str,&args);
+   StrFormat format(str,args);
 
    // Copy it into a string
    U32         len = format.length();

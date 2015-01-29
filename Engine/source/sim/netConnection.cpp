@@ -351,6 +351,7 @@ void NetConnection::setNetClassGroup(U32 grp)
 }
 
 NetConnection::NetConnection()
+ : mNetAddress()
 {
    mTranslateStrings = false;
    mConnectSequence = 0;
