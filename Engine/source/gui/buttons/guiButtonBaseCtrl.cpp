@@ -51,15 +51,56 @@ ConsoleDocClass( GuiButtonBaseCtrl,
    "@ingroup GuiButtons"
 );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseDown, void, (), (),
-   "If #useMouseEvents is true, this is called when the left mouse button is pressed on an (active) "
-   "button." );
+IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseDown, void, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ),
+														  ( modifier, mousePoint, mouseClickCount ),
+   "@brief Callback that occurs if #useMouseEvents is true, this is called when the left mouse button is pressed on an (active) button.\n\n"
+   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "$EventModifier::RSHIFT\n\n"
+   "$EventModifier::SHIFT\n\n"
+   "$EventModifier::LCTRL\n\n"
+   "$EventModifier::RCTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::RALT\n\n"
+   "$EventModifier::ALT\n\n"
+   "@param mousePoint X/Y location of the mouse point\n"
+   "@param mouseClickCount How many mouse clicks have occured for this event\n\n"
+   "@tsexample\n"
+   "// Mouse was pressed down in this control, causing the callback\n"
+   "GuiButtonBaseCtrl::onMouseDown(%this,%modifier,%mousePoint,%mouseClickCount)\n"
+   "{\n"
+   "	// Code to call when a mouse event occurs.\n"
+   "}\n"
+   "@endtsexample\n\n"
+   "@see GuiControl\n\n"
+);
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseUp, void, (), (),
-   "If #useMouseEvents is true, this is called when the left mouse button is release over an (active) "
-   "button.\n\n"
+IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseUp, void, ( bool depressed, S32 modifier, Point2I mousePoint, S32 mouseClickCount ),
+													    ( depressed, modifier, mousePoint, mouseClickCount ),
+   "@brief Callback that occurs if #useMouseEvents is true, this is called when the left mouse button is release over an (active) button.\n\n"
    "@note To trigger actions, better use onClick() since onMouseUp() will also be called when the mouse was "
-      "not originally pressed on the button." );
+      "not originally pressed on the button."
+   "@param depressed True if button was pressed first.\n\n"
+   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "$EventModifier::RSHIFT\n\n"
+   "$EventModifier::SHIFT\n\n"
+   "$EventModifier::LCTRL\n\n"
+   "$EventModifier::RCTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::RALT\n\n"
+   "$EventModifier::ALT\n\n"
+   "@param mousePoint X/Y location of the mouse point\n"
+   "@param mouseClickCount How many mouse clicks have occured for this event\n\n"
+   "@tsexample\n"
+   "// Mouse was released in this control, causing the callback\n"
+   "GuiButtonBaseCtrl::onMouseUp(%this,%depressed,%modifier,%mousePoint,%mouseClickCount)\n"
+   "{\n"
+   "	// Code to call when a mouse event occurs.\n"
+   "}\n"
+   "@endtsexample\n\n"
+   "@see GuiControl\n\n"
+);
 
 IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onClick, void, (), (),
    "Called when the primary action of the button is triggered (e.g. by a left mouse click)." );
@@ -70,18 +111,82 @@ IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onDoubleClick, void, (), (),
 IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onRightClick, void, (), (),
    "Called when the right mouse button is clicked on the button." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseEnter, void, (), (),
-   "If #useMouseEvents is true, this is called when the mouse cursor moves over the button (only if the button "
-   "is the front-most visible control, though)." );
+IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseEnter, void, (  S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
+												   ( modifier, mousePoint, mouseClickCount ),
+   "@brief Callback that occurs if #useMouseEvents is true, this is called when the mouse cursor moves over the button (only if the button "
+   "is the front-most visible control, though).\n\n"
+   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "$EventModifier::RSHIFT\n\n"
+   "$EventModifier::SHIFT\n\n"
+   "$EventModifier::LCTRL\n\n"
+   "$EventModifier::RCTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::RALT\n\n"
+   "$EventModifier::ALT\n\n"
+   "@param mousePoint X/Y location of the mouse point\n"
+   "@param mouseClickCount How many mouse clicks have occured for this event\n\n"
+   "@tsexample\n"
+   "// Mouse entered this control, causing the callback\n"
+   "GuiButtonBaseCtrl::onMouseEnter(%this,%modifier,%mousePoint,%mouseClickCount)\n"
+   "{\n"
+   "	// Code to call when a mouse event occurs.\n"
+   "}\n"
+   "@endtsexample\n\n"
+   "@see GuiControl\n\n"
+);
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseLeave, void, (), (),
-   "If #useMouseEvents is true, this is called when the mouse cursor moves off the button (only if the button "
-   "had previously received an onMouseEvent() event)." );
 
-IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseDragged, void, (), (),
-   "If #useMouseEvents is true, this is called when a left mouse button drag is detected, i.e. when the user "
+IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseLeave, void, (  S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
+												   ( modifier, mousePoint, mouseClickCount ),
+   "@brief Callback that occurs if #useMouseEvents is true, this is called when the mouse cursor moves off the button (only if the button "
+   "had previously received an onMouseEvent() event).\n\n"
+   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "$EventModifier::RSHIFT\n\n"
+   "$EventModifier::SHIFT\n\n"
+   "$EventModifier::LCTRL\n\n"
+   "$EventModifier::RCTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::RALT\n\n"
+   "$EventModifier::ALT\n\n"
+   "@param mousePoint X/Y location of the mouse point\n"
+   "@param mouseClickCount How many mouse clicks have occured for this event\n\n"
+   "@tsexample\n"
+   "// Mouse left this control, causing the callback\n"
+   "GuiButtonBaseCtrl::onMouseLeave(%this,%modifier,%mousePoint,%mouseClickCount)\n"
+   "{\n"
+   "	// Code to call when a mouse event occurs.\n"
+   "}\n"
+   "@endtsexample\n\n"
+   "@see GuiControl\n\n"
+);
+
+IMPLEMENT_CALLBACK( GuiButtonBaseCtrl, onMouseDragged, void, (  S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
+												   ( modifier, mousePoint, mouseClickCount ),
+   "@brief Callback that occurs if #useMouseEvents is true, this is called when a left mouse button drag is detected, i.e. when the user "
    "pressed the left mouse button on the control and then moves the mouse over a certain distance threshold with "
-   "the mouse button still pressed." );
+   "the mouse button still pressed.\n\n"
+   "@param modifier Key that was pressed during this callback. Values are:\n\n" 
+   "$EventModifier::RSHIFT\n\n"
+   "$EventModifier::SHIFT\n\n"
+   "$EventModifier::LCTRL\n\n"
+   "$EventModifier::RCTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::CTRL\n\n"
+   "$EventModifier::RALT\n\n"
+   "$EventModifier::ALT\n\n"
+   "@param mousePoint X/Y location of the mouse point\n"
+   "@param mouseClickCount How many mouse clicks have occured for this event\n\n"
+   "@tsexample\n"
+   "// Mouse was dragged in this control, causing the callback\n"
+   "GuiButtonBaseCtrl::onMouseDragged(%this,%modifier,%mousePoint,%mouseClickCount)\n"
+   "{\n"
+   "	// Code to call when a mouse event occurs.\n"
+   "}\n"
+   "@endtsexample\n\n"
+   "@see GuiControl\n\n"
+);
 
 
 ImplementEnumType( GuiButtonType,
@@ -136,6 +241,16 @@ void GuiButtonBaseCtrl::initPersistFields()
    endGroup( "Button" );
    
    Parent::initPersistFields();
+
+   Con::setIntVariable("$EventModifier::LSHIFT",      SI_LSHIFT);
+   Con::setIntVariable("$EventModifier::RSHIFT",      SI_RSHIFT);
+   Con::setIntVariable("$EventModifier::SHIFT",       SI_SHIFT);
+   Con::setIntVariable("$EventModifier::LCTRL",       SI_LCTRL);
+   Con::setIntVariable("$EventModifier::RCTRL",       SI_RCTRL);
+   Con::setIntVariable("$EventModifier::CTRL",        SI_CTRL);
+   Con::setIntVariable("$EventModifier::LALT",        SI_LALT);
+   Con::setIntVariable("$EventModifier::RALT",        SI_RALT);
+   Con::setIntVariable("$EventModifier::ALT",         SI_ALT);
 }
 
 //-----------------------------------------------------------------------------
@@ -259,7 +374,7 @@ void GuiButtonBaseCtrl::onMouseDown(const GuiEvent &event)
    mMouseDragged = false;
 
    if( mUseMouseEvents )
-	  onMouseDown_callback();
+	  onMouseDown_callback(event.modifier, event.mousePoint, event.mouseClickCount);
 
    //lock the mouse
    mouseLock();
@@ -283,7 +398,7 @@ void GuiButtonBaseCtrl::onMouseEnter(const GuiEvent &event)
    setUpdate();
 
    if( mUseMouseEvents )
-      onMouseEnter_callback();
+      onMouseEnter_callback(event.modifier, event.mousePoint, event.mouseClickCount);
 
    if(isMouseLocked())
    {
@@ -301,12 +416,12 @@ void GuiButtonBaseCtrl::onMouseEnter(const GuiEvent &event)
 
 //-----------------------------------------------------------------------------
 
-void GuiButtonBaseCtrl::onMouseLeave(const GuiEvent &)
+void GuiButtonBaseCtrl::onMouseLeave(const GuiEvent &event)
 {
    setUpdate();
 
    if( mUseMouseEvents )
-      onMouseLeave_callback();
+      onMouseLeave_callback(event.modifier, event.mousePoint, event.mouseClickCount);
    if( isMouseLocked() )
       mDepressed = false;
    mMouseOver = false;
@@ -324,7 +439,7 @@ void GuiButtonBaseCtrl::onMouseUp(const GuiEvent &event)
    setUpdate();
 
    if( mUseMouseEvents )
-      onMouseUp_callback();
+	   onMouseUp_callback(mDepressed, event.modifier, event.mousePoint, event.mouseClickCount);
 
    //if we released the mouse within this control, perform the action
    if( mDepressed )
@@ -359,7 +474,7 @@ void GuiButtonBaseCtrl::onMouseDragged( const GuiEvent& event )
       }
       
       if( mMouseDragged )
-         onMouseDragged_callback();
+         onMouseDragged_callback(event.modifier, event.mousePoint, event.mouseClickCount);
    }
       
    Parent::onMouseDragged( event );
