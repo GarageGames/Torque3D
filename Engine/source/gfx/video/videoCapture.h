@@ -173,11 +173,20 @@ public:
    /// Sets the output filename
    void setFilename( const char* filename ) { mFileName = filename; }
 
+   /// Gets the filename we are using
+   const char* getFilename() { return mFileName; }
+
    /// Sets the encoder we'll use
    void setEncoderName( const char* encoder ) { mEncoderName = encoder; }
 
+   /// Gets the encoder we are using
+   const char* getEncoderName() { return mEncoderName; }
+
    /// Sets the framerate
    void setFramerate( F32 fps ) { mFrameRate = fps; }
+
+   /// Gets the framerate we are using
+   F32 getFramerate() { return mFrameRate; }
 
    /// Sets the video output resolution
    void setResolution(const Point2I& res) { mResolution = res; }
