@@ -355,7 +355,7 @@ bool ParticleData::protectedSetSizes( void *object, const char *index, const cha
    U32 i;
 
    if (!index)
-      i = 0;
+      return (val >= 0.f && val <= MaxParticleSize);
    else
       i = dAtoui(index);
 
@@ -371,7 +371,7 @@ bool ParticleData::protectedSetTimes( void *object, const char *index, const cha
    U32 i;
 
    if (!index)
-      i = 0;
+      return (val >= 0.f && val <= 1.f);
    else
       i = dAtoui(index);
 

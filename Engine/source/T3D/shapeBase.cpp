@@ -940,8 +940,6 @@ ShapeBase::ShapeBase()
 
    for (i = 0; i < MaxTriggerKeys; i++)
       mTrigger[i] = false;
-
-   mWeaponCamShake = NULL;
 }
 
 
@@ -1063,15 +1061,7 @@ void ShapeBase::onRemove()
 
    if ( isClientObject() )   
    {
-      mCubeReflector.unregisterReflector();      
-
-      if ( mWeaponCamShake )
-      {
-         if ( mWeaponCamShake->isAdded )
-            gCamFXMgr.removeFX( mWeaponCamShake );
-
-         SAFE_DELETE( mWeaponCamShake );
-      }
+      mCubeReflector.unregisterReflector();
    }
 }
 
@@ -3161,40 +3151,9 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
                {
                   if ( imageData->lightType == ShapeBaseImageData::WeaponFireLight )                     
                      image.lightStart = Sim::getCurrentTime();                     
-                  
-                  // HACK: Only works properly if you are in control
-                  // of the one and only shapeBase object in the scene
-                  // which fires an image that uses camera shake.
-                  if ( imageData->shakeCamera )
-                  {
-                     if ( !mWeaponCamShake )
-                     {
-                        mWeaponCamShake = new CameraShake();
-                        mWeaponCamShake->remoteControlled = true;
-                     }
-
-                     mWeaponCamShake->init();
-                     mWeaponCamShake->setFrequency( imageData->camShakeFreq );
-                     mWeaponCamShake->setAmplitude( imageData->camShakeAmp );  
-                     
-                     if ( !mWeaponCamShake->isAdded )
-                     {
-                        gCamFXMgr.addFX( mWeaponCamShake );
-                        mWeaponCamShake->isAdded = true;
-                     }
-                  }
                }
                
                updateImageState(i,0);
-
-               if ( !image.triggerDown && !image.altTriggerDown )
-               {
-                  if ( mWeaponCamShake && mWeaponCamShake->isAdded )
-                  {
-                     gCamFXMgr.removeFX( mWeaponCamShake );
-                     mWeaponCamShake->isAdded = false;
-                  }
-               }
             }
             else
             {               

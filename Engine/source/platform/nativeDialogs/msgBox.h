@@ -32,7 +32,7 @@
 
 enum MBButtons
 {
-   MBOk,
+   MBOk = 0,
    MBOkCancel,
    MBRetryCancel,
    MBSaveDontSave,
@@ -42,7 +42,7 @@ enum MBButtons
 
 enum MBIcons
 {
-   MIWarning,
+   MIWarning = 0,
    MIInformation,
    MIQuestion,
    MIStop,

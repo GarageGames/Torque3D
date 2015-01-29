@@ -666,6 +666,11 @@ void ScatterSky::prepRenderImage( SceneRenderState *state )
       mFlareState.lightMat.identity();
       mFlareState.lightMat.setPosition( lightPos );
 
+      F32 dist = ( lightPos - state->getCameraPosition( ) ).len( );
+      F32 coronaScale = 0.5f;
+      F32 screenRadius = GFX->getViewport( ).extent.y * coronaScale * 0.5f;
+      mFlareState.worldRadius = screenRadius * dist / state->getWorldToScreenScale( ).y;
+
       mFlareData->prepRender( state, &mFlareState );
    }
 

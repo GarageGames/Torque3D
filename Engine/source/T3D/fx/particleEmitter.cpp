@@ -1833,22 +1833,22 @@ void ParticleEmitter::setupOriented( Particle *part,
    lVerts->point = start + crossDir;
    lVerts->color = partCol;
    // Here and below, we copy UVs from particle datablock's texCoords (oriented)
-   lVerts->texCoord = part->dataBlock->texCoords[0];
+   lVerts->texCoord = part->dataBlock->texCoords[1];
    ++lVerts;
 
    lVerts->point = start - crossDir;
    lVerts->color = partCol;
-   lVerts->texCoord = part->dataBlock->texCoords[1];
+   lVerts->texCoord = part->dataBlock->texCoords[2];
    ++lVerts;
 
    lVerts->point = end - crossDir;
    lVerts->color = partCol;
-   lVerts->texCoord = part->dataBlock->texCoords[2];
+   lVerts->texCoord = part->dataBlock->texCoords[3];
    ++lVerts;
 
    lVerts->point = end + crossDir;
    lVerts->color = partCol;
-   lVerts->texCoord = part->dataBlock->texCoords[3];
+   lVerts->texCoord = part->dataBlock->texCoords[0];
    ++lVerts;
 }
 

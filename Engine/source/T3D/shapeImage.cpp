@@ -44,6 +44,7 @@
 #include "sfx/sfxTypes.h"
 #include "scene/sceneManager.h"
 #include "core/stream/fileStream.h"
+#include "T3D/fx/cameraFXMgr.h"
 
 //----------------------------------------------------------------------------
 
@@ -297,6 +298,9 @@ ShapeBaseImageData::ShapeBaseImageData()
    shakeCamera = false;
    camShakeFreq = Point3F::Zero;
    camShakeAmp = Point3F::Zero;
+   camShakeDuration = 1.5f;
+   camShakeRadius = 3.0f;
+   camShakeFalloff = 10.0f;
 }
 
 ShapeBaseImageData::~ShapeBaseImageData()
@@ -739,10 +743,7 @@ void ShapeBaseImageData::initPersistFields()
       "@see lightType");
 
    addField( "shakeCamera", TypeBool, Offset(shakeCamera, ShapeBaseImageData),
-      "@brief Flag indicating whether the camera should shake when this Image fires.\n\n"
-      "@note Camera shake only works properly if the player is in control of "
-      "the one and only shapeBase object in the scene which fires an Image that "
-      "uses camera shake." );
+      "@brief Flag indicating whether the camera should shake when this Image fires.\n\n" );
 
    addField( "camShakeFreq", TypePoint3F, Offset(camShakeFreq, ShapeBaseImageData),
       "@brief Frequency of the camera shaking effect.\n\n"
@@ -751,6 +752,16 @@ void ShapeBaseImageData::initPersistFields()
    addField( "camShakeAmp", TypePoint3F, Offset(camShakeAmp, ShapeBaseImageData),
       "@brief Amplitude of the camera shaking effect.\n\n"
       "@see shakeCamera" );
+
+   addField( "camShakeDuration", TypeF32, Offset(camShakeDuration, ShapeBaseImageData),
+      "Duration (in seconds) to shake the camera." );
+
+   addField( "camShakeRadius", TypeF32, Offset(camShakeRadius, ShapeBaseImageData),
+      "Radial distance that a camera's position must be within relative to the "
+      "center of the explosion to be shaken." );
+
+   addField( "camShakeFalloff", TypeF32, Offset(camShakeFalloff, ShapeBaseImageData),
+      "Falloff value for the camera shake." );
 
    addField( "casing", TYPEID< DebrisData >(), Offset(casing, ShapeBaseImageData),
       "@brief DebrisData datablock to use for ejected casings.\n\n"
@@ -1028,6 +1039,9 @@ void ShapeBaseImageData::packData(BitStream* stream)
    {      
       mathWrite( *stream, camShakeFreq );
       mathWrite( *stream, camShakeAmp );
+      stream->write( camShakeDuration );
+      stream->write( camShakeRadius );
+      stream->write( camShakeFalloff );
    }
 
    mathWrite( *stream, shellExitDir );
@@ -1208,7 +1222,10 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
    if ( shakeCamera )
    {
       mathRead( *stream, &camShakeFreq );
-      mathRead( *stream, &camShakeAmp );      
+      mathRead( *stream, &camShakeAmp );
+      stream->read( &camShakeDuration );
+      stream->read( &camShakeRadius );
+      stream->read( &camShakeFalloff );
    }
 
    mathRead( *stream, &shellExitDir );
@@ -2596,6 +2613,10 @@ void ShapeBase::setImageState(U32 imageSlot, U32 newState,bool force)
       ejectShellCasing( imageSlot );
    }
 
+   // Shake camera on client.
+   if (isGhost() && nextStateData.fire && image.dataBlock->shakeCamera) {
+      shakeCamera( imageSlot );
+   }
 
    // Server must animate the shape if it is a firestate...
    if (isServerObject() && (image.dataBlock->state[newState].fire || image.dataBlock->state[newState].altFire))
@@ -3341,4 +3362,58 @@ void ShapeBase::ejectShellCasing( U32 imageSlot )
       delete casing;
    else
       casing->init( shellPos, shellVel );
+}
+
+void ShapeBase::shakeCamera( U32 imageSlot )
+{
+   MountedImage& image = mMountedImageList[imageSlot];
+   ShapeBaseImageData* imageData = image.dataBlock;
+
+   if (!imageData->shakeCamera)
+      return;
+
+   // Warning: this logic was duplicated from Explosion.
+
+   // first check if explosion is near camera
+   GameConnection* connection = GameConnection::getConnectionToServer();
+   ShapeBase *obj = dynamic_cast<ShapeBase*>(connection->getControlObject());
+
+   bool applyShake = true;
+
+   if (obj)
+   {
+      ShapeBase* cObj = obj;
+      while ((cObj = cObj->getControlObject()) != 0)
+      {
+         if (cObj->useObjsEyePoint())
+         {
+            applyShake = false;
+            break;
+         }
+      }
+   }
+
+   if (applyShake && obj)
+   {
+      VectorF diff;
+      getMuzzlePoint(imageSlot, &diff);
+      diff = obj->getPosition() - diff;
+      F32 dist = diff.len();
+      if (dist < imageData->camShakeRadius)
+      {
+         CameraShake *camShake = new CameraShake;
+         camShake->setDuration(imageData->camShakeDuration);
+         camShake->setFrequency(imageData->camShakeFreq);
+
+         F32 falloff =  dist / imageData->camShakeRadius;
+         falloff = 1.0f + falloff * 10.0f;
+         falloff = 1.0f / (falloff * falloff);
+
+         VectorF shakeAmp = imageData->camShakeAmp * falloff;
+         camShake->setAmplitude(shakeAmp);
+         camShake->setFalloff(imageData->camShakeFalloff);
+         camShake->init();
+         gCamFXMgr.addFX(camShake);
+      }
+   }
 }
