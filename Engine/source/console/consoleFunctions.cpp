@@ -1141,6 +1141,7 @@ DefineConsoleFunction( getWord, const char*, ( const char* text, S32 index ),,
    "@endtsexample\n\n"
    "@see getWords\n"
    "@see getWordCount\n"
+   "@see getToken\n"
    "@see getField\n"
    "@see getRecord\n"
    "@ingroup FieldManip" )
@@ -1164,6 +1165,7 @@ DefineConsoleFunction( getWords, const char*, ( const char* text, S32 startIndex
    "@endtsexample\n\n"
    "@see getWord\n"
    "@see getWordCount\n"
+   "@see getTokens\n"
    "@see getFields\n"
    "@see getRecords\n"
    "@ingroup FieldManip" )
@@ -1188,6 +1190,7 @@ DefineConsoleFunction( setWord, const char*, ( const char* text, S32 index, cons
       "setWord( \"a b c d\", 2, \"f\" ) // Returns \"a b f d\"\n"
    "@endtsexample\n\n"
    "@see getWord\n"
+   "@see setToken\n"
    "@see setField\n"
    "@see setRecord\n"
    "@ingroup FieldManip" )
@@ -1207,6 +1210,7 @@ DefineConsoleFunction( removeWord, const char*, ( const char* text, S32 index ),
    "@tsexample\n"
       "removeWord( \"a b c d\", 2 ) // Returns \"a b d\"\n"
    "@endtsexample\n\n"
+   "@see removeToken\n"
    "@see removeField\n"
    "@see removeRecord\n"
    "@ingroup FieldManip" )
@@ -1224,6 +1228,7 @@ DefineConsoleFunction( getWordCount, S32, ( const char* text ),,
    "@tsexample\n"
       "getWordCount( \"a b c d e\" ) // Returns 5\n"
    "@endtsexample\n\n"
+   "@see getTokenCount\n"
    "@see getFieldCount\n"
    "@see getRecordCount\n"
    "@ingroup FieldManip" )
@@ -1595,6 +1600,114 @@ DefineConsoleFunction( nextToken, const char*, ( const char* str1, const char* t
    char *ret = Con::getReturnBuffer(returnLen);
    dStrncpy(ret, str, returnLen);
    return ret;
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( getToken, const char*, ( const char* text, const char* delimiters, S32 index ),,
+   "Extract the substring at the given @a index in the @a delimiters separated list in @a text.\n"
+   "@param text A @a delimiters list of substrings.\n"
+   "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
+   "@param index The zero-based index of the substring to extract.\n"
+   "@return The substring at the given index or \"\" if the index is out of range.\n\n"
+   "@tsexample\n"
+      "getToken( \"a b c d\", \" \", 2 ) // Returns \"c\"\n"
+   "@endtsexample\n\n"
+   "@see getTokens\n"
+   "@see getTokenCount\n"
+   "@see getWord\n"
+   "@see getField\n"
+   "@see getRecord\n"
+   "@ingroup FieldManip" )
+{
+   return Con::getReturnBuffer( StringUnit::getUnit(text, index, delimiters));
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( getTokens, const char*, ( const char* text, const char* delimiters, S32 startIndex, S32 endIndex ), ( -1 ),
+   "Extract a range of substrings separated by @a delimiters at the given @a startIndex onwards thru @a endIndex.\n"
+   "@param text A @a delimiters list of substrings.\n"
+   "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
+   "@param startIndex The zero-based index of the first substring to extract from @a text.\n"
+   "@param endIndex The zero-based index of the last substring to extract from @a text.  If this is -1, all words beginning "
+      "with @a startIndex are extracted from @a text.\n"
+   "@return A string containing the specified range of substrings from @a text or \"\" if @a startIndex "
+      "is out of range or greater than @a endIndex.\n\n"
+   "@tsexample\n"
+      "getTokens( \"a b c d\", \" \", 1, 2, ) // Returns \"b c\"\n"
+   "@endtsexample\n\n"
+   "@see getToken\n"
+   "@see getTokenCount\n"
+   "@see getWords\n"
+   "@see getFields\n"
+   "@see getRecords\n"
+   "@ingroup FieldManip" )
+{
+   if( endIndex < 0 )
+      endIndex = 1000000;
+
+   return Con::getReturnBuffer( StringUnit::getUnits( text, startIndex, endIndex, delimiters ) );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( setToken, const char*, ( const char* text, const char* delimiters, S32 index, const char* replacement ),,
+   "Replace the substring in @a text separated by @a delimiters at the given @a index with @a replacement.\n"
+   "@param text A @a delimiters list of substrings.\n"
+   "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
+   "@param index The zero-based index of the substring to replace.\n"
+   "@param replacement The string with which to replace the substring.\n"
+   "@return A new string with the substring at the given @a index replaced by @a replacement or the original "
+      "string if @a index is out of range.\n\n"
+   "@tsexample\n"
+      "setToken( \"a b c d\", \" \", 2, \"f\" ) // Returns \"a b f d\"\n"
+   "@endtsexample\n\n"
+   "@see getToken\n"
+   "@see setWord\n"
+   "@see setField\n"
+   "@see setRecord\n"
+   "@ingroup FieldManip" )
+{
+   return Con::getReturnBuffer( StringUnit::setUnit( text, index, replacement, delimiters) );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( removeToken, const char*, ( const char* text, const char* delimiters, S32 index ),,
+   "Remove the substring in @a text separated by @a delimiters at the given @a index.\n"
+   "@param text A @a delimiters list of substrings.\n"
+   "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
+   "@param index The zero-based index of the word in @a text.\n"
+   "@return A new string with the substring at the given index removed or the original string if @a index is "
+      "out of range.\n\n"
+   "@tsexample\n"
+      "removeToken( \"a b c d\", \" \", 2 ) // Returns \"a b d\"\n"
+   "@endtsexample\n\n"
+   "@see removeWord\n"
+   "@see removeField\n"
+   "@see removeRecord\n"
+   "@ingroup FieldManip" )
+{
+   return Con::getReturnBuffer( StringUnit::removeUnit( text, index, delimiters ) );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( getTokenCount, S32, ( const char* text, const char* delimiters),,
+   "Return the number of @a delimiters substrings in @a text.\n"
+   "@param text A @a delimiters list of substrings.\n"
+   "@param delimiters Character or characters that separate the list of substrings in @a text.\n"
+   "@return The number of @a delimiters substrings in @a text.\n\n"
+   "@tsexample\n"
+      "getTokenCount( \"a b c d e\", \" \" ) // Returns 5\n"
+   "@endtsexample\n\n"
+   "@see getWordCount\n"
+   "@see getFieldCount\n"
+   "@see getRecordCount\n"
+   "@ingroup FieldManip" )
+{
+   return StringUnit::getUnitCount( text, delimiters );
 }
 
 //=============================================================================
