@@ -137,7 +137,7 @@ function NavEditorConsoleListener::onNavMeshUpdate(%this, %data)
       %minutes = mFloor(%seconds / 60);
       %seconds -= %minutes * 60;
       %message = "Built NavMesh" SPC getWord(%data, 0) SPC "in" SPC %minutes @ "m" SPC mRound(%seconds) @ "s";
-      if($Nav::Editor::playSoundWhenDone)
+      if(NavEditorGui.playSoundWhenDone)
       {
          sfxPlayOnce(Audio2D, "tools/navEditor/done.wav");
       }

@@ -37,8 +37,6 @@ function initializeNavEditor()
    exec("./NavEditor.cs");
    exec("./NavEditorGui.gui");
    exec("./NavEditorToolbar.gui");
-   exec("./NavEditorGui.cs");
-   exec("./NavEditorAboutDlg.gui");
    exec("./NavEditorConsoleDlg.gui");
    exec("./CreateNewNavMeshDlg.gui");
 
