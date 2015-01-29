@@ -1112,6 +1112,17 @@ DefineConsoleFunction( isValidIP, bool, ( const char* str),,
 		return isValidIP(str);
 }
 
+//----------------------------------------------------------------
+
+// Torque won't normally add another string if it already exists with another casing,
+// so this forces the addition. It should be called once near the start, such as in main.cs.
+ConsoleFunction(addCaseSensitiveStrings,void,2,0,"[string1, string2, ...]"
+                "Adds case sensitive strings to the StringTable.")
+{
+	for(int i = 1; i < argc; i++)
+		StringTable->insert(argv[i], true);
+}
+
 //=============================================================================
 //    Field Manipulators.
 //=============================================================================
