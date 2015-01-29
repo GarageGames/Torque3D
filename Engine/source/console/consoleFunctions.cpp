@@ -37,6 +37,7 @@
 #include "console/compiler.h"
 #include "platform/platformInput.h"
 #include "core/util/journal/journal.h"
+#include "gfx/gfxEnums.h"
 #include "core/util/uuid.h"
 
 #ifdef TORQUE_DEMO_PURCHASE
@@ -3064,4 +3065,11 @@ DefineEngineFunction( isToolBuild, bool, (),,
 #else
    return false;
 #endif
+}
+
+DefineEngineFunction( getMaxDynamicVerts, S32, (),,
+	"Get max number of allowable dynamic vertices in a single vertex buffer.\n\n"
+	"@return the max number of allowable dynamic vertices in a single vertex buffer" )
+{
+	return MAX_DYNAMIC_VERTS / 2;
 }
