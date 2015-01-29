@@ -612,12 +612,20 @@ void GuiButtonBaseCtrl::onMessage( GuiControl *sender, S32 msg )
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( GuiButtonBaseCtrl, performClick, void, (),,
+DefineEngineMethod( GuiButtonBaseCtrl, performClick, void, (bool force), (false),
    "Simulate a click on the button.\n"
    "This method will trigger the button's action just as if the button had been pressed by the "
-   "user.\n\n" )
+   "user.\n\n"
+   "@param force Force the action even if gui is inactive.")
 {
-   object->onAction();
+	bool isActive = object->isActive();
+	if(force)
+		object->setActive(true);
+
+	object->onAction();
+
+	if(force)
+		object->setActive(isActive);
 }
 
 //-----------------------------------------------------------------------------
