@@ -88,6 +88,9 @@ public:
    void printFields(SimObject *obj);
    void assignFrom(SimFieldDictionary *dict);
    U32   getNumFields() const { return mNumFields; }
+   
+   ///Clear all dictionary fields
+   void clearFields();
 
    Entry  *operator[](U32 index);
 };
