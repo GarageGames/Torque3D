@@ -101,7 +101,7 @@ DefineConsoleFunction(getNavMeshEventManager, S32, (),,
    return NavMesh::getEventManager()->getId();
 }
 
-DefineConsoleFunction(WalkaboutUpdateAll, void, (S32 objid, bool remove), (0, false),
+DefineConsoleFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, false),
    "@brief Update all NavMesh tiles that intersect the given object's world box.")
 {
    SceneObject *obj;
@@ -119,19 +119,19 @@ DefineConsoleFunction(WalkaboutUpdateAll, void, (S32 objid, bool remove), (0, fa
       obj->enableCollision();
 }
 
-DefineConsoleFunction(WalkaboutUpdateMesh, void, (S32 meshid, S32 objid, bool remove), (0, 0, false),
+DefineConsoleFunction(NavMeshUpdateOne, void, (S32 meshid, S32 objid, bool remove), (0, 0, false),
    "@brief Update all tiles in a given NavMesh that intersect the given object's world box.")
 {
    NavMesh *mesh;
    SceneObject *obj;
    if(!Sim::findObject(meshid, mesh))
    {
-      Con::errorf("WalkaboutUpdateMesh: cannot find NavMesh %d", meshid);
+      Con::errorf("NavMeshUpdateOne: cannot find NavMesh %d", meshid);
       return;
    }
    if(!Sim::findObject(objid, obj))
    {
-      Con::errorf("WalkaboutUpdateMesh: cannot find SceneObject %d", objid);
+      Con::errorf("NavMeshUpdateOne: cannot find SceneObject %d", objid);
       return;
    }
    if(remove)
