@@ -652,6 +652,52 @@ bool WaterBlock::castRay( const Point3F &start, const Point3F &end, RayInfo *inf
    return mObjBox.isContained(info->point);
 }
 
+bool WaterBlock::buildPolyList( PolyListContext context, AbstractPolyList* polyList, const Box3F& box, const SphereF& )
+{
+   if(context == PLC_Navigation && box.isOverlapped(mWorldBox))
+   {
+      polyList->setObject( this );
+      MatrixF mat(true);
+      Point3F pos = getPosition();
+      pos.x = pos.y = 0;
+      mat.setPosition(pos);
+      polyList->setTransform( &mat, Point3F(1, 1, 1) );
+
+      Box3F ov = box.getOverlap(mWorldBox);
+      Point3F
+         p0(ov.minExtents.x, ov.maxExtents.y, 0),
+         p1(ov.maxExtents.x, ov.maxExtents.y, 0),
+         p2(ov.maxExtents.x, ov.minExtents.y, 0),
+         p3(ov.minExtents.x, ov.minExtents.y, 0);
+
+      // Add vertices to poly list.
+      U32 v0 = polyList->addPoint(p0);
+      polyList->addPoint(p1);
+      polyList->addPoint(p2);
+      polyList->addPoint(p3);
+
+      // Add plane between first three vertices.
+      polyList->begin(0, 0);
+      polyList->vertex(v0);
+      polyList->vertex(v0+1);
+      polyList->vertex(v0+2);
+      polyList->plane(v0, v0+1, v0+2);
+      polyList->end();
+
+      // Add plane between last three vertices.
+      polyList->begin(0, 1);
+      polyList->vertex(v0+2);
+      polyList->vertex(v0+3);
+      polyList->vertex(v0);
+      polyList->plane(v0+2, v0+3, v0);
+      polyList->end();
+
+      return true;
+   }
+
+   return false;
+}
+
 F32 WaterBlock::getWaterCoverage( const Box3F &testBox ) const
 {
    Box3F wbox = getWorldBox();

@@ -120,6 +120,7 @@ public:
    virtual void inspectPostApply();
    virtual void setTransform( const MatrixF & mat );
    virtual F32 distanceTo( const Point3F& point ) const;
+   virtual bool buildPolyList( PolyListContext context, AbstractPolyList* polyList, const Box3F& box, const SphereF& sphere );
 
    // WaterObject
    virtual F32 getWaterCoverage( const Box3F &worldBox ) const;

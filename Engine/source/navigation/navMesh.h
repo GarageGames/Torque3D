@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2014 Daniel Buckmaster
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -25,16 +25,20 @@
 
 #include <queue>
 
-#include "torqueRecast.h"
 #include "scene/sceneObject.h"
+#include "collision/concretePolyList.h"
 #include "recastPolyList.h"
+#include "util/messaging/eventManager.h"
 
+#include "torqueRecast.h"
 #include "duDebugDrawTorque.h"
+#include "coverPoint.h"
 
 #include <Recast.h>
 #include <DetourNavMesh.h>
 #include <DetourNavMeshBuilder.h>
 #include <DebugDraw.h>
+#include <DetourNavMeshQuery.h>
 
 /// @class NavMesh
 /// Represents a set of bounds within which a Recast navigation mesh is generated.
@@ -53,6 +57,10 @@ public:
    bool build(bool background = true, bool saveIntermediates = false);
    /// Stop a build in progress.
    void cancelBuild();
+   /// Generate cover points from a nav mesh.
+   bool createCoverPoints();
+   /// Remove all cover points
+   void deleteCoverPoints();
 
    /// Save the navmesh to a file.
    bool save();
@@ -65,8 +73,14 @@ public:
    /// Instantly rebuild a specific tile.
    void buildTile(const U32 &tile);
 
+   /// Rebuild parts of the navmesh where links have changed.
+   void buildLinks();
+
    /// Data file to store this nav mesh in. (From engine executable dir.)
    StringTableEntry mFileName;
+
+   /// Name of the SimSet to store cover points in. (Usually a SimGroup.)
+   StringTableEntry mCoverSet;
 
    /// Cell width and height.
    F32 mCellSize, mCellHeight;
@@ -90,6 +104,17 @@ public:
    U32 mMaxPolysPerTile;
    /// @}
 
+   /// @name Water
+   /// @{
+   enum WaterMethod {
+      Ignore,
+      Solid,
+      Impassable
+   };
+
+   WaterMethod mWaterMethod;
+   /// @}
+
    /// @}
 
    /// Return the index of the tile included by this point.
@@ -97,6 +122,68 @@ public:
 
    /// Return the box of a given tile.
    Box3F getTileBox(U32 id);
+
+   /// @name Links
+   /// @{
+
+   /// Add an off-mesh link.
+   S32 addLink(const Point3F &from, const Point3F &to, U32 flags = 0);
+
+   /// Get the ID of the off-mesh link near the point.
+   S32 getLink(const Point3F &pos);
+
+   /// Get the number of links this mesh has.
+   S32 getLinkCount();
+
+   /// Get the starting point of a link.
+   Point3F getLinkStart(U32 idx);
+
+   /// Get the ending point of a link.
+   Point3F getLinkEnd(U32 idx);
+
+   /// Get the flags used by a link.
+   LinkData getLinkFlags(U32 idx);
+
+   /// Set flags used by a link.
+   void setLinkFlags(U32 idx, const LinkData &d);
+
+   /// Set the selected state of a link.
+   void selectLink(U32 idx, bool select, bool hover = true);
+
+   /// Delete the selected link.
+   void deleteLink(U32 idx);
+
+   /// @}
+
+   /// Should small characters use this mesh?
+   bool mSmallCharacters;
+   /// Should regular-sized characters use this mesh?
+   bool mRegularCharacters;
+   /// Should large characters use this mesh?
+   bool mLargeCharacters;
+   /// Should vehicles use this mesh?
+   bool mVehicles;
+
+   /// @name Annotations
+   /// @{
+
+   /// Should we automatically generate jump-down links?
+   bool mJumpDownLinks;
+   /// Height of a 'small' jump link.
+   F32 mJumpLinkSmall;
+   /// Height of a 'large' jump link.
+   F32 mJumpLinkLarge;
+
+   /// Distance to search for cover.
+   F32 mCoverDist;
+
+   /// Distance to search horizontally when peeking around cover.
+   F32 mPeekDist;
+
+   /// Add cover to walls that don't have corners?
+   bool mInnerCover;
+
+   /// @}
 
    /// @name SimObject
    /// @{
@@ -142,6 +229,8 @@ public:
 
    void prepRenderImage(SceneRenderState *state);
    void render(ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat);
+   void renderLinks(duDebugDraw &dd);
+   void renderTileData(duDebugDrawTorque &dd, U32 tile);
 
    bool mAlwaysRender;
 
@@ -150,6 +239,12 @@ public:
    NavMesh();
    ~NavMesh();
    DECLARE_CONOBJECT(NavMesh);
+
+   /// Return the server-side NavMesh SimSet.
+   static SimSet *getServerSet();
+
+   /// Return the EventManager for all NavMeshes.
+   static EventManager *getEventManager();
 
    void inspectPostApply();
 
@@ -164,6 +259,9 @@ private:
 
    /// Builds the next tile in the dirty list.
    void buildNextTile();
+
+   /// Save imtermediate navmesh creation data?
+   bool mSaveIntermediates;
 
    /// @name Tiles
    /// @{
@@ -223,6 +321,9 @@ private:
    /// List of tiles.
    Vector<Tile> mTiles;
 
+   /// List of tile intermediate data.
+   Vector<TileData> mTileData;
+
    /// List of indices to the tile array which are dirty.
    std::queue<U32> mDirtyTiles;
 
@@ -231,6 +332,33 @@ private:
 
    /// Generates navmesh data for a single tile.
    unsigned char *buildTileData(const Tile &tile, TileData &data, U32 &dataSize);
+
+   /// @}
+
+   /// @name Off-mesh links
+   /// @{
+
+   enum SelectState {
+      Unselected,
+      Hovered,
+      Selected
+   };
+
+   Vector<F32> mLinkVerts;            ///< Coordinates of each link vertex
+   Vector<bool> mLinksUnsynced;       ///< Are the editor links unsynced from the mesh?
+   Vector<F32> mLinkRads;             ///< Radius of each link
+   Vector<U8> mLinkDirs;              ///< Direction (one-way or bidirectional)
+   Vector<U8> mLinkAreas;             ///< Area ID
+   Vector<U16> mLinkFlags; ///< Flags
+   Vector<U32> mLinkIDs;              ///< ID number of each link
+   Vector<U8> mLinkSelectStates;      ///< Selection state of links
+   Vector<bool> mDeleteLinks;         ///< Link will be deleted next build.
+
+   U32 mCurLinkID;
+
+   void eraseLink(U32 idx);
+   void eraseLinks();
+   void setLinkCount(U32 c);
 
    /// @}
 
@@ -244,6 +372,21 @@ private:
    void updateConfig();
 
    dtNavMesh *nm;
+   rcContext *ctx;
+
+   /// @}
+
+   /// @name Cover
+   /// @{
+
+   struct CoverPointData {
+      MatrixF trans;
+      CoverPoint::Size size;
+      bool peek[3];
+   };
+
+   /// Attempt to place cover points along a given edge.
+   bool testEdgeCover(const Point3F &pos, const VectorF &dir, CoverPointData &data);
 
    /// @}
 
@@ -269,6 +412,15 @@ private:
    void renderToDrawer();
 
    /// @}
+
+   /// Server-side set for all NavMesh objects.
+   static SimObjectPtr<SimSet> smServerSet;
+
+   /// Use this object to manage update events.
+   static SimObjectPtr<EventManager> smEventManager;
 };
+
+typedef NavMesh::WaterMethod NavMeshWaterMethod;
+DefineEnumType(NavMeshWaterMethod);
 
 #endif
