@@ -152,6 +152,17 @@ ConsoleDocClass( GuiDragAndDropControl,
    "@ingroup GuiUtil"
 );
 
+IMPLEMENT_CALLBACK( GuiDragAndDropControl, onNotDropped, void, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
+   "Called when a drag&drop operation through GuiDragAndDropControl failed to find a control to drop to."
+   "This is only called when there is not a topmost visible controls for the GuiDragAndDropControl to drop its payload on.\n\n"
+   "@param control The control that was being dropped.\n"
+   "@param dropPoint The point at which the control is being dropped.  Relative to the canvas." );
+
+IMPLEMENT_CALLBACK( GuiDragAndDropControl, onDropped, void, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
+   "Called when a drag&drop operation through GuiDragAndDropControl found a control to drop to and after it has called it's drop call."
+   "@param control The control that was dropped.\n"
+   "@param dropPoint The point at which the control was dropped.  Relative to the canvas." );
+
 
 //-----------------------------------------------------------------------------
 
@@ -227,7 +238,12 @@ void GuiDragAndDropControl::onMouseUp(const GuiEvent& event)
 
    GuiControl* target = findDragTarget( event.mousePoint, "onControlDropped" );
    if( target )
+   {
       target->onControlDropped_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+	  onDropped_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+   }
+   else
+	   onNotDropped_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
 
    if( mDeleteOnMouseUp )
       deleteObject();
