@@ -36,6 +36,7 @@ BtBody::BtBody() :
    mWorld( NULL ),
    mMass( 0.0f ),
    mCompound( NULL ),
+
    // rextimmy physics integration
    mBodyFlags( 0 ),
    mCenterOfMass( NULL ),
