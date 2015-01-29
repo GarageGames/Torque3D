@@ -164,6 +164,9 @@ protected:
    bool              mPlayAmbient;
    TSThread*         mAmbientThread;
 
+   // rextimmy physics integration
+   bool mEnablePhysicsRep;
+
    /// The type of mesh data to return for collision queries.
    MeshType mCollisionType;
 
