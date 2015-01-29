@@ -31,9 +31,6 @@
 #include "platform/platformVolume.h"
 #include "core/util/zip/zipVolume.h"
 
-using namespace Torque;
-using namespace Torque::FS;
-
 namespace Platform
 {
 namespace FS

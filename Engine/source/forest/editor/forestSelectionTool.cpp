@@ -38,7 +38,7 @@
 #include "math/mMatrix.h"
 
 template <>
-MatrixF Selection<ForestItem>::getOrientation()
+MatrixF TSelection<ForestItem>::getOrientation()
 {
    if ( size() == 1 )
       return first().getTransform();
@@ -47,14 +47,14 @@ MatrixF Selection<ForestItem>::getOrientation()
 }
 
 template <>
-Point3F Selection<ForestItem>::getOrigin()
+Point3F TSelection<ForestItem>::getOrigin()
 {
    Point3F centroid( Point3F::Zero );
 
    if ( empty() )
       return centroid;
 
-   Selection<ForestItem>::iterator itr = begin();
+   TSelection<ForestItem>::iterator itr = begin();
 
    for ( ; itr != end(); itr++ )
    {
@@ -71,7 +71,7 @@ Point3F Selection<ForestItem>::getOrigin()
 }
 
 template <>
-Point3F Selection<ForestItem>::getScale()
+Point3F TSelection<ForestItem>::getScale()
 {
    if ( size() == 1 )
       return Point3F( first().getScale() );
@@ -414,8 +414,6 @@ void ForestSelectionTool::onRender3D()
    }
 }
 
-static Frustum gDragFrustum;
-
 void ForestSelectionTool::onRender2D()
 {
    // Draw drag selection rect.
@@ -454,6 +452,7 @@ void ForestSelectionTool::onRender2D()
       F32 right = (mDragRect.point.x - mEditor->getPosition().x + mDragRect.extent.x) * hscale - wwidth;
       F32 top = wheight - vscale * (mDragRect.point.y - mEditor->getPosition().y);
       F32 bottom = wheight - vscale * (mDragRect.point.y - mEditor->getPosition().y + mDragRect.extent.y);
+      static Frustum gDragFrustum;
       gDragFrustum.set(lastCameraQuery.ortho, left, right, top, bottom, lastCameraQuery.nearPlane, lastCameraQuery.farPlane, lastCameraQuery.cameraMatrix );
 
       mForest->getData()->getItems( gDragFrustum, &mDragSelection );      

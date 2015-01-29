@@ -88,6 +88,13 @@ class Point2I
    // Unary operators
    Point2I operator-() const;
 
+   /// Generates a 32bit hash from a Point2I.
+   /// @see DictHash
+   friend U32 hash( const Point2I &key )
+   {
+      return (key.x * 2230148873u) ^ key.y;
+   }
+
 	//-------------------------------------- Public static constants
   public:
 	const static Point2I One;
@@ -906,17 +913,6 @@ inline F32 mDotPerp(const Point2F &p1, const Point2F &p2)
 inline bool mIsNaN( const Point2F &p )
 {
    return mIsNaN_F( p.x ) || mIsNaN_F( p.y );
-}
-
-
-namespace DictHash
-{
-   /// Generates a 32bit hash from a Point2I.
-   /// @see DictHash
-   inline U32 hash( const Point2I &key )
-   {
-      return (key.x * 2230148873u) ^ key.y;
-   }
 }
 
 #endif // _MPOINT2_H_

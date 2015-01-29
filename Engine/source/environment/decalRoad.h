@@ -36,7 +36,6 @@
 #include "collision/clippedPolyList.h"
 #endif
 
-class Path;
 class TerrainBlock;
 struct ObjectRenderInst;
 class Material;

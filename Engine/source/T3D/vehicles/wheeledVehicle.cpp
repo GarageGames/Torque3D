@@ -49,7 +49,7 @@
 
 // Collision masks are used to determine what type of objects the
 // wheeled vehicle will collide with.
-static U32 sClientCollisionMask =
+static U32 sWVClientCollisionMask =
       TerrainObjectType     | PlayerObjectType  | 
       StaticShapeObjectType | VehicleObjectType | 
       VehicleBlockerObjectType;
@@ -1156,7 +1156,7 @@ void WheeledVehicle::extendWheels(bool clientHack)
          ts = ts / (1+ts);
 
          RayInfo rInfo;
-         if (mContainer->castRay(sp, ep, sClientCollisionMask & ~PlayerObjectType, &rInfo)) 
+         if (mContainer->castRay(sp, ep, sWVClientCollisionMask & ~PlayerObjectType, &rInfo))
          {
             wheel->surface.contact  = true;
             wheel->extension = (rInfo.t < ts)? 0: (rInfo.t - ts) / (1 - ts);
@@ -1326,7 +1326,7 @@ void WheeledVehicle::updateJetSound()
 
 U32 WheeledVehicle::getCollisionMask()
 {
-   return sClientCollisionMask;
+   return sWVClientCollisionMask;
 }
 
 

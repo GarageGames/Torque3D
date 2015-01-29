@@ -156,7 +156,7 @@ ShapeBaseImageData::StateData::StateData()
    }
 }
 
-static ShapeBaseImageData::StateData gDefaultStateData;
+static ShapeBaseImageData::StateData gSBIDDefaultStateData;
 
 //----------------------------------------------------------------------------
 
@@ -1096,7 +1096,7 @@ void ShapeBaseImageData::packData(BitStream* stream)
             }
          }
 
-         if(stream->writeFlag(s.timeoutValue != gDefaultStateData.timeoutValue))
+         if(stream->writeFlag(s.timeoutValue != gSBIDDefaultStateData.timeoutValue))
             stream->write(s.timeoutValue);
 
          stream->writeFlag(s.waitForTimeout);
@@ -1111,13 +1111,13 @@ void ShapeBaseImageData::packData(BitStream* stream)
          stream->writeFlag(s.sequenceTransitionIn);
          stream->writeFlag(s.sequenceTransitionOut);
          stream->writeFlag(s.sequenceNeverTransition);
-         if(stream->writeFlag(s.sequenceTransitionTime != gDefaultStateData.sequenceTransitionTime))
+         if(stream->writeFlag(s.sequenceTransitionTime != gSBIDDefaultStateData.sequenceTransitionTime))
             stream->write(s.sequenceTransitionTime);
 
          stream->writeString(s.shapeSequence);
          stream->writeFlag(s.shapeSequenceScale);
 
-         if(stream->writeFlag(s.energyDrain != gDefaultStateData.energyDrain))
+         if(stream->writeFlag(s.energyDrain != gSBIDDefaultStateData.energyDrain))
             stream->write(s.energyDrain);
 
          stream->writeInt(s.loaded,StateData::NumLoadedBits);
@@ -1126,10 +1126,10 @@ void ShapeBaseImageData::packData(BitStream* stream)
 
          for( U32 j=0; j<MaxShapes; ++j )
          {
-            if(stream->writeFlag(s.sequence[j] != gDefaultStateData.sequence[j]))
+            if(stream->writeFlag(s.sequence[j] != gSBIDDefaultStateData.sequence[j]))
                stream->writeSignedInt(s.sequence[j], 16);
 
-            if(stream->writeFlag(s.sequenceVis[j] != gDefaultStateData.sequenceVis[j]))
+            if(stream->writeFlag(s.sequenceVis[j] != gSBIDDefaultStateData.sequenceVis[j]))
                stream->writeSignedInt(s.sequenceVis[j],16);
 
             stream->writeFlag(s.flashSequence[j]);
@@ -1290,7 +1290,7 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
          if(stream->readFlag())
             stream->read(&s.timeoutValue);
          else
-            s.timeoutValue = gDefaultStateData.timeoutValue;
+            s.timeoutValue = gSBIDDefaultStateData.timeoutValue;
 
          s.waitForTimeout = stream->readFlag();
          s.fire = stream->readFlag();
@@ -1307,7 +1307,7 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
          if (stream->readFlag())
             stream->read(&s.sequenceTransitionTime);
          else
-            s.sequenceTransitionTime = gDefaultStateData.sequenceTransitionTime;
+            s.sequenceTransitionTime = gSBIDDefaultStateData.sequenceTransitionTime;
 
          s.shapeSequence = stream->readSTString();
          s.shapeSequenceScale = stream->readFlag();
@@ -1315,7 +1315,7 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
          if(stream->readFlag())
             stream->read(&s.energyDrain);
          else
-            s.energyDrain = gDefaultStateData.energyDrain;
+            s.energyDrain = gSBIDDefaultStateData.energyDrain;
 
          s.loaded = (StateData::LoadedState)stream->readInt(StateData::NumLoadedBits);
          s.spin = (StateData::SpinState)stream->readInt(StateData::NumSpinBits);
@@ -1326,12 +1326,12 @@ void ShapeBaseImageData::unpackData(BitStream* stream)
             if(stream->readFlag())
                s.sequence[j] = stream->readSignedInt(16);
             else
-               s.sequence[j] = gDefaultStateData.sequence[j];
+               s.sequence[j] = gSBIDDefaultStateData.sequence[j];
 
             if(stream->readFlag())
                s.sequenceVis[j] = stream->readSignedInt(16);
             else
-               s.sequenceVis[j] = gDefaultStateData.sequenceVis[j];
+               s.sequenceVis[j] = gSBIDDefaultStateData.sequenceVis[j];
 
             s.flashSequence[j] = stream->readFlag();
          }

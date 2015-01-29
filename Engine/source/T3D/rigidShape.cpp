@@ -187,35 +187,27 @@ IMPLEMENT_CALLBACK( RigidShape, onLeaveLiquid, void, ( const char* objId, const 
 
 namespace {
 
-   const U32 sMoveRetryCount = 3;
-
    // Client prediction
-   const S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
-   const S32 sMaxPredictionTicks = 30;    // Number of ticks to predict
+   const S32 sRSMaxWarpTicks = 3;           // Max warp duration in ticks
+   const S32 sRSMaxPredictionTicks = 30;    // Number of ticks to predict
    const F32 sRigidShapeGravity = -20;
 
    // Physics and collision constants
    static F32 sRestTol = 0.5;             // % of gravity energy to be at rest
    static S32 sRestCount = 10;            // Consecutive ticks before comming to rest
 
-   const U32 sCollisionMoveMask = ( TerrainObjectType     | PlayerObjectType  | 
+   const U32 sRSCollisionMoveMask = ( TerrainObjectType     | PlayerObjectType  |
                                     StaticShapeObjectType | VehicleObjectType |
                                     VehicleBlockerObjectType );
 
-   const U32 sServerCollisionMask = sCollisionMoveMask; // ItemObjectType
-   const U32 sClientCollisionMask = sCollisionMoveMask;
-
-   void nonFilter(SceneObject* object,void *key)
-   {
-      SceneContainer::CallbackInfo* info = reinterpret_cast<SceneContainer::CallbackInfo*>(key);
-      object->buildPolyList(info->context,info->polyList,info->boundingBox,info->boundingSphere);
-   }
+   const U32 sRSServerCollisionMask = sRSCollisionMoveMask; // ItemObjectType
+   const U32 sRSClientCollisionMask = sRSCollisionMoveMask;
 
 } // namespace {}
 
 
 // Trigger objects that are not normally collided with.
-static U32 sTriggerMask = ItemObjectType     |
+static U32 sRSTriggerMask = ItemObjectType     |
 TriggerObjectType  |
 CorpseObjectType;
 
@@ -603,9 +595,9 @@ RigidShape::~RigidShape()
 U32 RigidShape::getCollisionMask()
 {
    if (isServerObject())
-      return sServerCollisionMask;
+      return sRSServerCollisionMask;
    else
-      return sClientCollisionMask;
+      return sRSClientCollisionMask;
 }
 
 Point3F RigidShape::getVelocity() const
@@ -1382,7 +1374,7 @@ only be called on the server.
 void RigidShape::checkTriggers()
 {
    Box3F bbox = mConvex.getBoundingBox(getTransform(), getScale());
-   gServerContainer.findObjects(bbox,sTriggerMask,findCallback,this);
+   gServerContainer.findObjects(bbox,sRSTriggerMask,findCallback,this);
 }
 
 /** The callback used in by the checkTriggers() method.
@@ -1493,7 +1485,7 @@ void RigidShape::unpackUpdate(NetConnection *con, BitStream *stream)
       // rather than interpolate to it.
       bool forceUpdate = stream->readFlag();
 
-      mPredictionCount = sMaxPredictionTicks;
+      mPredictionCount = sRSMaxPredictionTicks;
       F32 speed = mRigid.linVelocity.len();
       mDelta.warpRot[0] = mRigid.angPosition;
 
@@ -1519,8 +1511,8 @@ void RigidShape::unpackUpdate(NetConnection *con, BitStream *stream)
          // Cal how many ticks it will take to cover the warp offset.
          // If it's less than what's left in the current tick, we'll just
          // warp in the remaining time.
-         if (!as || (dt = mDelta.warpOffset.len() / as) > sMaxWarpTicks)
-            dt = mDelta.dt + sMaxWarpTicks;
+         if (!as || (dt = mDelta.warpOffset.len() / as) > sRSMaxWarpTicks)
+            dt = mDelta.dt + sRSMaxWarpTicks;
          else
             dt = (dt <= mDelta.dt)? mDelta.dt : mCeil(dt - mDelta.dt) + mDelta.dt;
 

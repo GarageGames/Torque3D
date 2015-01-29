@@ -372,7 +372,7 @@ class ThreadPool
       }
 
       /// Return the global thread pool singleton.
-      static ThreadPool& GLOBAL();
+      static ThreadPool& Global();
 };
 
 typedef ThreadPool::Context ThreadContext;
@@ -390,7 +390,7 @@ struct ThreadPool::GlobalThreadPool : public ThreadPool, public ManagedSingleton
    static const char* getSingletonName() { return "GlobalThreadPool"; }
 };
 
-inline ThreadPool& ThreadPool::GLOBAL()
+inline ThreadPool& ThreadPool::Global()
 {
    return *( GlobalThreadPool::instance() );
 }

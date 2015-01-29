@@ -39,7 +39,7 @@ class Gizmo;
 class GizmoProfile;
 class ForestUpdateAction;
 
-class ForestItemSelection : public Selection<ForestItem>
+class ForestItemSelection : public TSelection<ForestItem>
 {
 public:
 

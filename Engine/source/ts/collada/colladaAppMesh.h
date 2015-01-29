@@ -72,6 +72,12 @@ struct VertTuple
                dataUV == p.dataUV &&  
                dataUV2 == p.dataUV2;
    }
+
+   // Hash interface
+   friend U32 hash(const VertTuple& data)
+   {
+      return (U32)data.vertex;
+   }
 };
 
 class ColladaAppMesh : public AppMesh

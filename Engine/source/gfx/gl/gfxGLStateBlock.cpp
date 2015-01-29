@@ -25,15 +25,6 @@
 #include "gfx/gl/gfxGLEnumTranslate.h"
 #include "gfx/gl/gfxGLUtils.h"
 #include "gfx/gl/gfxGLTextureObject.h"
-#include "core/crc.h"
-
-namespace DictHash
-{
-   inline U32 hash(const GFXSamplerStateDesc &data)
-   {
-      return CRC::calculateCRC(&data, sizeof(GFXSamplerStateDesc));;
-   }
-}
 
 GFXGLStateBlock::GFXGLStateBlock(const GFXStateBlockDesc& desc) :
    mDesc(desc),

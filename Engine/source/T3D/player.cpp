@@ -5859,7 +5859,7 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 
 //----------------------------------------------------------------------------
 
-static MatrixF IMat(1);
+static MatrixF PMat(1);
 
 bool Player::buildPolyList(PolyListContext, AbstractPolyList* polyList, const Box3F&, const SphereF&)
 {
@@ -5867,8 +5867,8 @@ bool Player::buildPolyList(PolyListContext, AbstractPolyList* polyList, const Bo
    // space bounding box axis aligned in world space.
    Point3F pos;
    getTransform().getColumn(3,&pos);
-   IMat.setColumn(3,pos);
-   polyList->setTransform(&IMat, Point3F(1.0f,1.0f,1.0f));
+   PMat.setColumn(3,pos);
+   polyList->setTransform(&PMat, Point3F(1.0f,1.0f,1.0f));
    polyList->setObject(this);
    polyList->addBox(mObjBox);
    return true;

@@ -566,7 +566,7 @@ static void m_matF_affineInverse_C(F32 *m)
    m[11] = -(temp[2]*temp[3] + temp[6]*temp[7] + temp[10]*temp[11]);
 }
 
-inline void swap(F32 &a, F32 &b)
+static inline void swap(F32 &a, F32 &b)
 {
    F32 temp = a;
    a = b;

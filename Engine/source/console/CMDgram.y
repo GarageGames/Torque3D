@@ -2,15 +2,14 @@
 
 // bison --defines=cmdgram.h --verbose -o cmdgram.cpp -p CMD CMDgram.y
 
-// Make sure we don't get gram.h twice.
-#define _CMDGRAM_H_
-
 #include <stdlib.h>
 #include <stdio.h>
 #include "console/console.h"
 #include "console/compiler.h"
 #include "console/consoleInternal.h"
 #include "core/strings/stringFunctions.h"
+
+#include "console/cmdgram_inc.h"
 
 #ifndef YYDEBUG
 #define YYDEBUG 0
@@ -32,13 +31,6 @@ void CMDerror(char *, ...);
 #undef alloca
 #endif
 #define alloca dMalloc
-
-template< typename T >
-struct Token
-{
-   T value;
-   U32 lineNumber;
-};
 
 %}
 %{
@@ -79,6 +71,10 @@ struct Token
 %token <i> opEQ opNE opGE opLE opAND opOR opSTREQ
 %token <i> opCOLONCOLON
 
+%{
+#ifndef _CMDGRAM_H_ // Avoid conflict if cmdgram.h was included
+%}
+
 %union {
    Token< char >           c;
    Token< int >            i;
@@ -96,6 +92,10 @@ struct Token
    AssignDecl              asn;
    IfStmtNode*             ifnode;
 }
+
+%{
+#endif // _CMDGRAM_H_
+%}
 
 %type <s>      parent_block
 %type <ifnode> case_block

@@ -68,8 +68,8 @@ public:
 
 MODULE_BEGIN( XAudio )
 
-   MODULE_INIT_BEFORE( SFX )
-   MODULE_SHUTDOWN_AFTER( SFX )
+   MODULE_INIT_BEFORE( SFXModule )
+   MODULE_SHUTDOWN_AFTER( SFXModule )
    
    SFXXAudioProvider* mProvider;
    

@@ -233,7 +233,7 @@ static const struct
 {
    const char *strMode;
    Zip::ZipArchive::AccessMode mode;
-} gModeMap[]=
+} gZipModeMap[]=
 {
    { "read", Zip::ZipArchive::Read },
    { "write", Zip::ZipArchive::Write },
@@ -262,11 +262,11 @@ DefineEngineMethod(ZipObject, openArchive, bool, ( const char* filename, const c
 {
    Zip::ZipArchive::AccessMode mode = Zip::ZipArchive::Read;
 
-   for(S32 i = 0;gModeMap[i].strMode;++i)
+   for(S32 i = 0;gZipModeMap[i].strMode;++i)
    {
-      if(dStricmp(gModeMap[i].strMode, accessMode) == 0)
+      if(dStricmp(gZipModeMap[i].strMode, accessMode) == 0)
       {
-         mode = gModeMap[i].mode;
+         mode = gZipModeMap[i].mode;
          break;
       }
    }

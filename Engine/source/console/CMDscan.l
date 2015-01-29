@@ -13,12 +13,7 @@
 #include "console/dynamicTypes.h"
 #include "core/strings/stringFunctions.h"
 
-template< typename T >
-struct Token
-{
-   T value;
-   S32 lineNumber;
-};
+#include "console/cmdgram_inc.h"
 
 // Can't have ctors in structs used in unions, so we have this.
 template< typename T >
@@ -29,8 +24,6 @@ inline Token< T > MakeToken( T value, U32 lineNumber )
    result.lineNumber = lineNumber;
    return result;
 }
-
-#include "console/cmdgram.h"
 
 using namespace Compiler;
 

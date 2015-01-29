@@ -229,7 +229,7 @@ void SimFieldDictionary::assignFrom(SimFieldDictionary *dict)
    }
 }
 
-static S32 QSORT_CALLBACK compareEntries(const void* a,const void* b)
+static S32 QSORT_CALLBACK compareDictEntries(const void* a,const void* b)
 {
    SimFieldDictionary::Entry *fa = *((SimFieldDictionary::Entry **)a);
    SimFieldDictionary::Entry *fb = *((SimFieldDictionary::Entry **)b);
@@ -263,7 +263,7 @@ void SimFieldDictionary::writeFields(SimObject *obj, Stream &stream, U32 tabStop
    }
 
    // Sort Entries to prevent version control conflicts
-   dQsort(flist.address(),flist.size(),sizeof(Entry *),compareEntries);
+   dQsort(flist.address(),flist.size(),sizeof(Entry *),compareDictEntries);
 
    // Save them out
    for(Vector<Entry *>::iterator itr = flist.begin(); itr != flist.end(); itr++)
@@ -305,7 +305,7 @@ void SimFieldDictionary::printFields(SimObject *obj)
          flist.push_back(walk);
       }
    }
-   dQsort(flist.address(),flist.size(),sizeof(Entry *),compareEntries);
+   dQsort(flist.address(),flist.size(),sizeof(Entry *),compareDictEntries);
 
    for(Vector<Entry *>::iterator itr = flist.begin(); itr != flist.end(); itr++)
    {

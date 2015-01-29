@@ -33,7 +33,7 @@
 
 
 template <class T>
-class Selection : public Vector<T>
+class TSelection : public Vector<T>
 {
 public:
 
@@ -62,24 +62,24 @@ protected:
 };
 
 
-template<class T> inline void Selection<T>::offset( const Point3F &delta )
+template<class T> inline void TSelection<T>::offset( const Point3F &delta )
 {
-   typename Selection<T>::iterator itr = this->begin();
+   typename TSelection<T>::iterator itr = this->begin();
 
    for ( ; itr != this->end(); itr++ )   
       offsetObject( *itr, delta );      
 }
 
-template<class T> inline void Selection<T>::rotate( const EulerF &delta )
+template<class T> inline void TSelection<T>::rotate( const EulerF &delta )
 {
-   typename Selection<T>::iterator itr = this->begin();
+   typename TSelection<T>::iterator itr = this->begin();
    Point3F origin = getOrigin();
 
    for ( ; itr != this->end(); itr++ )   
       rotateObject( *itr, delta, origin );
 }
 
-template<class T> inline void Selection<T>::scale( const Point3F &delta )
+template<class T> inline void TSelection<T>::scale( const Point3F &delta )
 {
    // Can only scale a single selection.
    if ( this->size() != 1 )

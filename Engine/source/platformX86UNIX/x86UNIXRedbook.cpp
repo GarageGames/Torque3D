@@ -136,16 +136,6 @@ bool UnixRedBookDevice::getTrackCount(U32 * numTracks)
    return false; // TODO LINUX
 }
 
-template <class Type>
-static inline Type max(Type v1, Type v2)
-{
-#if !defined(__FreeBSD__)
-   if (v1 <= v2)
-      return v2;
-   else
-      return v1;
-#endif	// !defined(__FreeBSD__)
-}
 //------------------------------------------------------------------------------
 bool UnixRedBookDevice::getVolume(F32 * volume)
 {

@@ -47,17 +47,17 @@ const F32 sAtRestVelocity = 0.15f;      // Min speed after collision
 const S32 sCollisionTimeout = 15;       // Timout value in ticks
 
 // Client prediction
-static F32 sMinWarpTicks = 0.5 ;        // Fraction of tick at which instant warp occures
-static S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
+static F32 sItemMinWarpTicks = 0.5 ;        // Fraction of tick at which instant warp occures
+static S32 sItemMaxWarpTicks = 3;           // Max warp duration in ticks
 
 F32 Item::mGravity = -20.0f;
 
-const U32 sClientCollisionMask = (TerrainObjectType     |
-                                  StaticShapeObjectType |
-                                  VehicleObjectType     |  
-                                  PlayerObjectType);
+const U32 sItemClientCollisionMask = (TerrainObjectType     |
+                                      StaticShapeObjectType |
+                                      VehicleObjectType     |
+                                      PlayerObjectType);
 
-const U32 sServerCollisionMask = (sClientCollisionMask);
+const U32 sItemServerCollisionMask = (sItemClientCollisionMask);
 
 const S32 Item::csmAtRestTimer = 64;
 
@@ -592,8 +592,8 @@ void Item::processTick(const Move* move)
       if (!mStatic && !mAtRest && isHidden() == false)
       {
          updateVelocity(TickSec);
-         updateWorkingCollisionSet(isGhost() ? sClientCollisionMask : sServerCollisionMask, TickSec);
-         updatePos(isGhost() ? sClientCollisionMask : sServerCollisionMask, TickSec);
+         updateWorkingCollisionSet(isGhost() ? sItemClientCollisionMask : sItemServerCollisionMask, TickSec);
+         updatePos(isGhost() ? sItemClientCollisionMask : sItemServerCollisionMask, TickSec);
       }
       else
       {
@@ -741,7 +741,7 @@ void Item::updatePos(const U32 /*mask*/, const F32 dt)
    static EarlyOutPolyList sEarlyOutPolyList;
    MatrixF collisionMatrix(true);
    Point3F end = pos + mVelocity * time;
-   U32 mask = isServerObject() ? sServerCollisionMask : sClientCollisionMask;
+   U32 mask = isServerObject() ? sItemServerCollisionMask : sItemClientCollisionMask;
 
    // Part of our speed problem here is that we don't track contact surfaces, like we do
    //  with the player.  In order to handle the most common and performance impacting
@@ -1128,15 +1128,15 @@ void Item::unpackUpdate(NetConnection *connection, BitStream *stream)
          // of the client and server velocities.
          delta.warpOffset = pos - delta.pos;
          F32 as = (speed + mVelocity.len()) * 0.5f * TickSec;
-         F32 dt = (as > 0.00001f) ? delta.warpOffset.len() / as: sMaxWarpTicks;
-         delta.warpTicks = (S32)((dt > sMinWarpTicks)? getMax(mFloor(dt + 0.5f), 1.0f): 0.0f);
+         F32 dt = (as > 0.00001f) ? delta.warpOffset.len() / as: sItemMaxWarpTicks;
+         delta.warpTicks = (S32)((dt > sItemMinWarpTicks)? getMax(mFloor(dt + 0.5f), 1.0f): 0.0f);
 
          if (delta.warpTicks)
          {
             // Setup the warp to start on the next tick, only the
             // object's position is warped.
-            if (delta.warpTicks > sMaxWarpTicks)
-               delta.warpTicks = sMaxWarpTicks;
+            if (delta.warpTicks > sItemMaxWarpTicks)
+               delta.warpTicks = sItemMaxWarpTicks;
             delta.warpOffset /= (F32)delta.warpTicks;
          }
          else {
@@ -1306,10 +1306,10 @@ void Item::initPersistFields()
 
 void Item::consoleInit()
 {
-   Con::addVariable("Item::minWarpTicks",TypeF32,&sMinWarpTicks,
+   Con::addVariable("Item::minWarpTicks",TypeF32,&sItemMinWarpTicks,
       "@brief Fraction of tick at which instant warp occures on the client.\n\n"
 	   "@ingroup GameObjects");
-   Con::addVariable("Item::maxWarpTicks",TypeS32,&sMaxWarpTicks, 
+   Con::addVariable("Item::maxWarpTicks",TypeS32,&sItemMaxWarpTicks,
       "@brief When a warp needs to occur due to the client being too far off from the server, this is the "
       "maximum number of ticks we'll allow the client to warp to catch up.\n\n"
 	   "@ingroup GameObjects");

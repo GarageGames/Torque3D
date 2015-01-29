@@ -33,8 +33,6 @@
 static ColorI colorLightGray(192, 192, 192);
 static ColorI colorGray(128, 128, 128);
 static ColorI colorDarkGray(64, 64, 64);
-static ColorI colorWhite(255,255,255);
-static ColorI colorBlack(0,0,0);
 
 void renderRaisedBox( const RectI &bounds, GuiControlProfile *profile )
 {
@@ -42,11 +40,11 @@ void renderRaisedBox( const RectI &bounds, GuiControlProfile *profile )
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y - 1;
 
    GFX->getDrawUtil()->drawRectFill( bounds, profile->mFillColor);
-   GFX->getDrawUtil()->drawLine(l, t, l, b - 1, colorWhite);
-   GFX->getDrawUtil()->drawLine(l, t, r - 1, t, colorWhite);
+   GFX->getDrawUtil()->drawLine(l, t, l, b - 1, ColorI::WHITE);
+   GFX->getDrawUtil()->drawLine(l, t, r - 1, t, ColorI::WHITE);
 
-   GFX->getDrawUtil()->drawLine(l, b, r, b, colorBlack);
-   GFX->getDrawUtil()->drawLine(r, b - 1, r, t, colorBlack);
+   GFX->getDrawUtil()->drawLine(l, b, r, b, ColorI::BLACK);
+   GFX->getDrawUtil()->drawLine(r, b - 1, r, t, ColorI::BLACK);
 
    GFX->getDrawUtil()->drawLine(l + 1, b - 1, r - 1, b - 1, profile->mBorderColor);
    GFX->getDrawUtil()->drawLine(r - 1, b - 2, r - 1, t + 1, profile->mBorderColor);
@@ -72,11 +70,11 @@ void renderLoweredBox( const RectI &bounds, GuiControlProfile *profile )
 
    GFX->getDrawUtil()->drawRectFill( bounds, profile->mFillColor);
 
-   GFX->getDrawUtil()->drawLine(l, b, r, b, colorWhite);
-   GFX->getDrawUtil()->drawLine(r, b - 1, r, t, colorWhite);
+   GFX->getDrawUtil()->drawLine(l, b, r, b, ColorI::WHITE);
+   GFX->getDrawUtil()->drawLine(r, b - 1, r, t, ColorI::WHITE);
 
-   GFX->getDrawUtil()->drawLine(l, t, r - 1, t, colorBlack);
-   GFX->getDrawUtil()->drawLine(l, t + 1, l, b - 1, colorBlack);
+   GFX->getDrawUtil()->drawLine(l, t, r - 1, t, ColorI::BLACK);
+   GFX->getDrawUtil()->drawLine(l, t + 1, l, b - 1, ColorI::BLACK);
 
    GFX->getDrawUtil()->drawLine(l + 1, t + 1, r - 2, t + 1, profile->mBorderColor);
    GFX->getDrawUtil()->drawLine(l + 1, t + 2, l + 1, b - 2, profile->mBorderColor);

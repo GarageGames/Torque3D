@@ -29,10 +29,9 @@
 #include "gfx/gfxDrawUtil.h"
 #include "console/engineAPI.h"
 
-static ColorI colorWhite(255,255,255); //  Added
 
 // Function to return the number of columns in 'string' given delimeters in 'set'
-static U32 getColumnCount(const char *string, const char *set)
+U32 getColumnCount(const char *string, const char *set)
 {
    U32 count = 0;
    U8 last = 0;
@@ -56,7 +55,7 @@ static U32 getColumnCount(const char *string, const char *set)
 }   
 
 // Function to return the 'index' column from 'string' given delimeters in 'set'
-static const char *getColumn(const char *string, char* returnbuff, U32 index, const char *set)
+const char *getColumn(const char *string, char* returnbuff, U32 index, const char *set)
 {
    U32 sz;
    while(index--)
@@ -75,7 +74,7 @@ static const char *getColumn(const char *string, char* returnbuff, U32 index, co
    dStrncpy(ret, string, sz);
    ret[sz] = '\0';
    return ret;
-}   
+}
 
 GuiPopUpBackgroundCtrl::GuiPopUpBackgroundCtrl(GuiPopUpMenuCtrl *ctrl, GuiPopupTextListCtrl *textList)
 {
@@ -538,23 +537,6 @@ DefineConsoleMethod( GuiPopUpMenuCtrl, clearEntry, void, (S32 entry), , "(S32 en
 }
 
 //------------------------------------------------------------------------------
-static S32 QSORT_CALLBACK textCompare(const void *a,const void *b)
-{
-   GuiPopUpMenuCtrl::Entry *ea = (GuiPopUpMenuCtrl::Entry *) (a);
-   GuiPopUpMenuCtrl::Entry *eb = (GuiPopUpMenuCtrl::Entry *) (b);
-   return (dStrnatcasecmp(ea->buf, eb->buf));
-} 
-
-//  Added to sort by entry ID
-//------------------------------------------------------------------------------
-static S32 QSORT_CALLBACK idCompare(const void *a,const void *b)
-{
-   GuiPopUpMenuCtrl::Entry *ea = (GuiPopUpMenuCtrl::Entry *) (a);
-   GuiPopUpMenuCtrl::Entry *eb = (GuiPopUpMenuCtrl::Entry *) (b);
-   return ( (ea->id < eb->id) ? -1 : ((ea->id > eb->id) ? 1 : 0) );
-} 
-
-//------------------------------------------------------------------------------
 //  Added
 void GuiPopUpMenuCtrl::setBitmap( const char *name )
 {
@@ -851,6 +833,8 @@ void GuiPopUpMenuCtrl::onRender( Point2I offset, const RectI &updateRect )
 
    if ( mScrollDir != GuiScrollCtrl::None )
       autoScroll();
+
+   const ColorI colorWhite(255,255,255); //  Added
 
    RectI r( offset, getExtent() );
    if ( mInAction )

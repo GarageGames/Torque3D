@@ -79,7 +79,7 @@ static const U32 sReverbSoundFlagInstance1               = 0x20;
 static const U32 sReverbSoundFlagInstance2               = 0x40;
 static const U32 sReverbSoundFlagInstance3               = 0x80;
 
-AFTER_MODULE_INIT( SFX )
+AFTER_MODULE_INIT( SFXModule )
 {
    Con::addConstant( "SFXDescription::REVERB_DIRECTHFAUTO", TypeS32, &sReverbSoundFlagDirectHFAuto,
       "Automatic setting of SFXDescription::reverbDirect due to distance to listener.\n"

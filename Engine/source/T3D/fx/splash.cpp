@@ -43,7 +43,7 @@
 namespace
 {
 
-MRandomLCG sgRandom(0xdeadbeef);
+MRandomLCG sgSplashRandom(0xdeadbeef);
 
 } // namespace {}
 
@@ -360,8 +360,8 @@ bool Splash::onAdd()
       return false;
    }
 
-   mDelayMS = mDataBlock->delayMS + sgRandom.randI( -mDataBlock->delayVariance, mDataBlock->delayVariance );
-   mEndingMS = mDataBlock->lifetimeMS + sgRandom.randI( -mDataBlock->lifetimeVariance, mDataBlock->lifetimeVariance );
+   mDelayMS = mDataBlock->delayMS + sgSplashRandom.randI( -mDataBlock->delayVariance, mDataBlock->delayVariance );
+   mEndingMS = mDataBlock->lifetimeMS + sgSplashRandom.randI( -mDataBlock->lifetimeVariance, mDataBlock->lifetimeVariance );
 
    mVelocity = mDataBlock->velocity;
    mHeight = mDataBlock->height;

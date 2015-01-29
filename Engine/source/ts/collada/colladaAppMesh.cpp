@@ -22,14 +22,6 @@
 
 #include "platform/platform.h"
 
-// Make GCC happy.  Needs to have seen this before processing the
-// hash table template.
-struct VertTuple;
-namespace DictHash
-{
-   inline U32 hash( const VertTuple& data );
-}
-
 #include "ts/collada/colladaExtensions.h"
 #include "ts/collada/colladaAppMesh.h"
 #include "ts/collada/colladaAppNode.h"
@@ -45,14 +37,6 @@ S32 ColladaAppMesh::fixedSize = 2;
 
 //-----------------------------------------------------------------------------
 // Define a VertTuple dictionary to allow fast tuple lookups
-namespace DictHash
-{
-   inline U32 hash(const VertTuple& data)
-   {
-      return (U32)data.vertex;
-   }
-}
-
 typedef Map<VertTuple, S32> VertTupleMap;
 
 //-----------------------------------------------------------------------------

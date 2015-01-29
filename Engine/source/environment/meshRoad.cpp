@@ -52,20 +52,31 @@
 #include "T3D/physics/physicsCollision.h"
 #include "environment/nodeListManager.h"
 
+#undef MIN_METERS_PER_SEGMENT
+#undef MIN_NODE_DEPTH
+#undef MAX_NODE_DEPTH
+#undef MIN_NODE_WIDTH
+#undef MAX_NODE_WIDTH
+
 #define MIN_METERS_PER_SEGMENT 1.0f
 #define MIN_NODE_DEPTH 0.25f
 #define MAX_NODE_DEPTH 50.0f
 #define MIN_NODE_WIDTH 0.25f
 #define MAX_NODE_WIDTH 50.0f
 
-
-static U32 gIdxArray[6][2][3] = {
+U32 gIdxArray[6][2][3] = {
    { { 0, 4, 5 }, { 0, 5, 1 }, },   // Top Face
    { { 2, 6, 4 }, { 2, 4, 0 }, },   // Left Face
    { { 1, 5, 7 }, { 1, 7, 3 }, },   // Right Face
    { { 2, 3, 7 }, { 2, 7, 6 }, },   // Bottom Face
    { { 0, 1, 3 }, { 0, 3, 2 }, },   // Front Face
    { { 4, 6, 7 }, { 4, 7, 5 }, },   // Back Face
+};
+
+struct MeshRoadHitSegment
+{
+   U32 idx;
+   F32 t;
 };
 
 static S32 QSORT_CALLBACK compareHitSegments(const void* a,const void* b)

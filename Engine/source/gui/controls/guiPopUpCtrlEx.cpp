@@ -52,53 +52,6 @@ ConsoleDocClass( GuiPopUpMenuCtrlEx,
 
 	"@ingroup GuiControls\n");
 
-static ColorI colorWhite(255,255,255); //  Added
-
-// Function to return the number of columns in 'string' given delimeters in 'set'
-static U32 getColumnCount(const char *string, const char *set)
-{
-   U32 count = 0;
-   U8 last = 0;
-   while(*string)
-   {
-      last = *string++;
-
-      for(U32 i =0; set[i]; i++)
-      {
-         if(last == set[i])
-         {
-            count++;
-            last = 0;
-            break;
-         }   
-      }
-   }
-   if(last)
-      count++;
-   return count;
-}   
-
-// Function to return the 'index' column from 'string' given delimeters in 'set'
-static const char *getColumn(const char *string, char* returnbuff, U32 index, const char *set)
-{
-   U32 sz;
-   while(index--)
-   {
-      if(!*string)
-         return "";
-      sz = dStrcspn(string, set);
-      if (string[sz] == 0)
-         return "";
-      string += (sz + 1);    
-   }
-   sz = dStrcspn(string, set);
-   if (sz == 0)
-      return "";
-   char *ret = returnbuff;
-   dStrncpy(ret, string, sz);
-   ret[sz] = '\0';
-   return ret;
-}   
 
 GuiPopUpBackgroundCtrlEx::GuiPopUpBackgroundCtrlEx(GuiPopUpMenuCtrlEx *ctrl, GuiPopupTextListCtrlEx *textList)
 {
@@ -743,23 +696,6 @@ DefineConsoleMethod( GuiPopUpMenuCtrlEx, clearEntry, void, (S32 entry), , "(S32 
 }
 
 //------------------------------------------------------------------------------
-static S32 QSORT_CALLBACK textCompare(const void *a,const void *b)
-{
-   GuiPopUpMenuCtrlEx::Entry *ea = (GuiPopUpMenuCtrlEx::Entry *) (a);
-   GuiPopUpMenuCtrlEx::Entry *eb = (GuiPopUpMenuCtrlEx::Entry *) (b);
-   return (dStrnatcasecmp(ea->buf, eb->buf));
-} 
-
-//  Added to sort by entry ID
-//------------------------------------------------------------------------------
-static S32 QSORT_CALLBACK idCompare(const void *a,const void *b)
-{
-   GuiPopUpMenuCtrlEx::Entry *ea = (GuiPopUpMenuCtrlEx::Entry *) (a);
-   GuiPopUpMenuCtrlEx::Entry *eb = (GuiPopUpMenuCtrlEx::Entry *) (b);
-   return ( (ea->id < eb->id) ? -1 : ((ea->id > eb->id) ? 1 : 0) );
-} 
-
-//------------------------------------------------------------------------------
 //  Added
 void GuiPopUpMenuCtrlEx::setBitmap(const char *name)
 {
@@ -1033,6 +969,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
 
    if ( mScrollDir != GuiScrollCtrl::None )
       autoScroll();
+
+   const ColorI colorWhite(255,255,255); //  Added
 
    RectI r( offset, getExtent() );
    if ( mInAction )

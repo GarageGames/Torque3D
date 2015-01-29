@@ -227,7 +227,7 @@ class AsyncPacketBufferedInputStream : public AsyncBufferedInputStream< Packet*,
                               U32 numSourceElementsToRead = 0,
                               U32 numReadAhead = Parent::DEFAULT_STREAM_LOOKAHEAD,
                               bool isLooping = false,
-                              ThreadPool* pool = &ThreadPool::GLOBAL(),
+                              ThreadPool* pool = &ThreadPool::Global(),
                               ThreadContext* context = ThreadContext::ROOT_CONTEXT() );
       
       /// @return the size of stream packets returned by this stream in number of elements.

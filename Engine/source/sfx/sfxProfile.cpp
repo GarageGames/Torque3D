@@ -31,7 +31,6 @@
 #include "core/resourceManager.h"
 #include "console/engineAPI.h"
 
-using namespace Torque;
 
 IMPLEMENT_CO_DATABLOCK_V1( SFXProfile );
 
@@ -243,7 +242,7 @@ void SFXProfile::_onDeviceEvent( SFXSystemEventType evt )
 
 void SFXProfile::_onResourceChanged( const Torque::Path& path )
 {
-   if( path != Path( mFilename ) )
+   if( path != Torque::Path( mFilename ) )
       return;
    
    // Let go of the old resource and buffer.

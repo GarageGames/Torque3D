@@ -48,8 +48,32 @@ dALIGN( static S32 sRGBCr[ 256 ][ 4 ] );
 static U8  sClampBuff[ 1024 ];
 static U8* sClamp = sClampBuff + 384;
 
-static void initLookupTables()
+static inline S32 sampleG( U8* pCb, U8* pCr )
 {
+   return sRGBCr[ *pCr ][ 1 ] + sRGBCr[ *pCb ][ 1 ];
+}
+
+//=============================================================================
+//    OggTheoraDecoder.
+//=============================================================================
+
+//-----------------------------------------------------------------------------
+
+OggTheoraDecoder::OggTheoraDecoder( const ThreadSafeRef< OggInputStream >& stream )
+   : Parent( stream ),
+#ifdef TORQUE_DEBUG
+     mLock( 0 ),
+#endif
+     mTheoraSetup( NULL ),
+     mTheoraDecoder( NULL ),
+     mTranscoder( TRANSCODER_Auto )
+{
+   // Initialize.
+
+   th_info_init( &mTheoraInfo );
+   th_comment_init( &mTheoraComment );
+
+   // Init lookup tables
    static bool sGenerated = false;
    if( !sGenerated )
    {
@@ -80,34 +104,6 @@ static void initLookupTables()
       
       sGenerated = true;
    }
-}
-
-static inline S32 sampleG( U8* pCb, U8* pCr )
-{
-   return sRGBCr[ *pCr ][ 1 ] + sRGBCr[ *pCb ][ 1 ];
-}
-
-//=============================================================================
-//    OggTheoraDecoder.
-//=============================================================================
-
-//-----------------------------------------------------------------------------
-
-OggTheoraDecoder::OggTheoraDecoder( const ThreadSafeRef< OggInputStream >& stream )
-   : Parent( stream ),
-#ifdef TORQUE_DEBUG
-     mLock( 0 ),
-#endif
-     mTheoraSetup( NULL ),
-     mTheoraDecoder( NULL ),
-     mTranscoder( TRANSCODER_Auto )
-{
-   // Initialize.
-      
-   th_info_init( &mTheoraInfo );
-   th_comment_init( &mTheoraComment );
-      
-   initLookupTables();
 }
 
 //-----------------------------------------------------------------------------

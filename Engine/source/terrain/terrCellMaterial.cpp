@@ -38,7 +38,7 @@
 #include "lighting/advanced/advancedLightBinManager.h"
 
 
-AFTER_MODULE_INIT( MaterialManager )
+AFTER_MODULE_INIT( MaterialManagerModule )
 {
    Con::NotifyDelegate callabck( &TerrainCellMaterial::_updateDefaultAnisotropy );
    Con::addVariableNotify( "$pref::Video::defaultAnisotropy", callabck );

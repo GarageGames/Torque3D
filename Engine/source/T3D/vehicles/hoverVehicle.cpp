@@ -73,18 +73,12 @@ namespace {
 const U32 sIntergrationsPerTick = 1;
 const F32 sHoverVehicleGravity  = -20;
 
-const U32 sCollisionMoveMask = (TerrainObjectType     | PlayerObjectType  | 
-                                StaticShapeObjectType | VehicleObjectType | 
-                                VehicleBlockerObjectType);
+const U32 sHVCollisionMoveMask = (TerrainObjectType     | PlayerObjectType  |
+                                  StaticShapeObjectType | VehicleObjectType |
+                                  VehicleBlockerObjectType);
 
-const U32 sServerCollisionMask = sCollisionMoveMask; // ItemObjectType
-const U32 sClientCollisionMask = sCollisionMoveMask;
-
-void nonFilter(SceneObject* object,void *key)
-{
-   SceneContainer::CallbackInfo* info = reinterpret_cast<SceneContainer::CallbackInfo*>(key);
-   object->buildPolyList(info->context,info->polyList,info->boundingBox,info->boundingSphere);
-}
+const U32 sHVServerCollisionMask = sHVCollisionMoveMask; // ItemObjectType
+const U32 sHVClientCollisionMask = sHVCollisionMoveMask;
 
 } // namespace {}
 
@@ -882,9 +876,9 @@ void HoverVehicle::updateForces(F32 /*dt*/)
 U32 HoverVehicle::getCollisionMask()
 {
    if (isServerObject())
-      return sServerCollisionMask;
+      return sHVServerCollisionMask;
    else
-      return sClientCollisionMask;
+      return sHVClientCollisionMask;
 }
 
 void HoverVehicle::updateDustTrail( F32 dt )

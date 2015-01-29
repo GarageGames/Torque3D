@@ -34,6 +34,28 @@
 #include "windowManager/win32/winDispatch.h"
 #endif
 
+Namespace::Entry* GetEntry(const char* nameSpace, const char* name)
+{
+   Namespace* ns = NULL;
+
+   if (!nameSpace || !dStrlen(nameSpace))
+      ns = Namespace::mGlobalNamespace;
+   else
+   {
+      nameSpace = StringTable->insert(nameSpace);
+      ns = Namespace::find(nameSpace); //can specify a package here, maybe need, maybe not
+   }
+
+   if (!ns)
+      return NULL;
+
+   name = StringTable->insert(name);
+
+   Namespace::Entry* entry = ns->lookupRecursive(name);
+
+   return entry;
+}
+
 extern "C" {
 
    struct MarshalNativeEntry
@@ -45,29 +67,6 @@ extern "C" {
       S32 maxArgs;
       S32 cbType;
    };
-
-
-   static Namespace::Entry* GetEntry(const char* nameSpace, const char* name)                                          
-   {
-      Namespace* ns = NULL;
-
-      if (!nameSpace || !dStrlen(nameSpace))
-         ns = Namespace::mGlobalNamespace;
-      else
-      {
-         nameSpace = StringTable->insert(nameSpace);
-         ns = Namespace::find(nameSpace); //can specify a package here, maybe need, maybe not
-      }
-
-      if (!ns)
-         return NULL;
-
-      name = StringTable->insert(name);
-
-      Namespace::Entry* entry = ns->lookupRecursive(name);
-
-      return entry;
-   }
 
    const char * script_getconsolexml()
    {

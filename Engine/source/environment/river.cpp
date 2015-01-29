@@ -69,6 +69,13 @@ ConsoleDocClass( River,
    "@ingroup Water"
 );
 
+#undef MIN_METERS_PER_SEGMENT
+#undef MIN_NODE_DEPTH
+#undef MAX_NODE_DEPTH
+#undef MIN_NODE_WIDTH
+#undef MAX_NODE_WIDTH
+#undef NODE_RADIUS
+
 #define MIN_METERS_PER_SEGMENT 1.0f
 #define MIN_NODE_DEPTH 0.25f
 #define MAX_NODE_DEPTH 500.0f
@@ -76,14 +83,7 @@ ConsoleDocClass( River,
 #define MAX_NODE_WIDTH 1000.0f
 #define NODE_RADIUS 15.0f
 
-static U32 gIdxArray[6][2][3] = {
-	{ { 0, 4, 5 }, { 0, 5, 1 }, },   // Top Face
-	{ { 2, 6, 4 }, { 2, 4, 0 }, },   // Left Face
-	{ { 1, 5, 7 }, { 1, 7, 3 }, },   // Right Face
-	{ { 2, 3, 7 }, { 2, 7, 6 }, },   // Bottom Face
-	{ { 0, 1, 3 }, { 0, 3, 2 }, },   // Front Face
-	{ { 4, 6, 7 }, { 4, 7, 5 }, },   // Back Face
-};
+extern U32 gIdxArray[6][2][3]; // defined in meshRoad.cpp
 
 struct RiverHitSegment
 {
@@ -91,7 +91,7 @@ struct RiverHitSegment
    F32 t;
 };
 
-static S32 QSORT_CALLBACK compareHitSegments(const void* a,const void* b)
+static S32 QSORT_CALLBACK compareRiverHitSegments(const void* a,const void* b)
 {
 	const RiverHitSegment *fa = (RiverHitSegment*)a;
 	const RiverHitSegment *fb = (RiverHitSegment*)b;
@@ -1223,7 +1223,7 @@ bool River::castRay(const Point3F &s, const Point3F &e, RayInfo* info)
 		}
 	}
 
-	dQsort( hitSegments.address(), hitSegments.size(), sizeof(RiverHitSegment), compareHitSegments );
+	dQsort( hitSegments.address(), hitSegments.size(), sizeof(RiverHitSegment), compareRiverHitSegments );
 
    U32 idx0, idx1, idx2;
    F32 t;
