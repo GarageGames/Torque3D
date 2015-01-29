@@ -1233,6 +1233,49 @@ DefineConsoleFunction( getWordCount, S32, ( const char* text ),,
 
 //-----------------------------------------------------------------------------
 
+DefineEngineFunction( monthNumToStr, String, ( S32 num, bool abbreviate ), (false),
+   "@brief returns month as a word given a number or \"\" if number is bad"
+   "@return month as a word given a number or \"\" if number is bad"
+   "@ingroup FileSystem")
+{
+	switch(num)
+	{
+		case 1: return abbreviate ? "Jan" : "January"; break;
+		case 2: return abbreviate ? "Feb" : "February"; break;
+		case 3: return abbreviate ? "Mar" : "March"; break;
+		case 4: return abbreviate ? "Apr" : "April"; break;
+		case 5: return "May"; break;
+		case 6: return abbreviate ? "Jun" : "June"; break;
+		case 7: return abbreviate ? "Jul" : "July"; break;
+		case 8: return abbreviate ? "Aug" : "August"; break;
+		case 9: return abbreviate ? "Sep" : "September"; break;
+		case 10: return abbreviate ? "Oct" : "October"; break;
+		case 11: return abbreviate ? "Nov" : "November"; break;
+		case 12: return abbreviate ? "Dec" : "December"; break;
+		default: return "";
+	}
+}
+
+DefineEngineFunction( weekdayNumToStr, String, ( S32 num, bool abbreviate ), (false),
+   "@brief returns weekday as a word given a number or \"\" if number is bad"
+   "@return weekday as a word given a number or \"\" if number is bad"
+   "@ingroup FileSystem")
+{
+	switch(num)
+	{
+		case 0: return abbreviate ? "Sun" : "Sunday"; break;
+		case 1: return abbreviate ? "Mon" : "Monday"; break;
+		case 2: return abbreviate ? "Tue" : "Tuesday"; break;
+		case 3: return abbreviate ? "Wed" : "Wednesday"; break;
+		case 4: return abbreviate ? "Thu" : "Thursday"; break;
+		case 5: return abbreviate ? "Fri" : "Friday"; break;
+		case 6: return abbreviate ? "Sat" : "Saturday"; break;
+		default: return "";
+	}
+}
+
+//-----------------------------------------------------------------------------
+
 DefineConsoleFunction( getField, const char*, ( const char* text, S32 index ),,
    "Extract the field at the given @a index in the newline and/or tab separated list in @a text.\n"
    "Fields in @a text must be separated by newlines and/or tabs.\n"
