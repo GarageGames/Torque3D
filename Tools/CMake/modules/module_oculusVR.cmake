@@ -21,17 +21,29 @@
 # -----------------------------------------------------------------------------
 
 # module OculusVR
- 
-# Source
-addPathRec( "${srcDir}/platform/input/oculusVR" )
 
-# Includes
-addInclude( "${TORQUE_OCULUSVR_SDK_PATH}/LibOVR/Include" )
-addInclude( "${TORQUE_OCULUSVR_SDK_PATH}/LibOVR/Src" )
+option(TORQUE_OCULUSVR "Enable OCULUSVR module" OFF)
+mark_as_advanced(TORQUE_OCULUSVR)
+if(TORQUE_OCULUSVR)
+	if(TORQUE_OCULUSVR_SDK_PATH STREQUAL "")
+		set(TORQUE_OCULUSVR_SDK_PATH "" CACHE PATH "OCULUSVR library path" FORCE)
+	endif()
+else() # hide variable
+    set(TORQUE_OCULUSVR_SDK_PATH "" CACHE INTERNAL "" FORCE) 
+endif() 
  
-# Libs
-if( WIN32 ) 
-    link_directories( "${TORQUE_OCULUSVR_SDK_PATH}/LibOVR/Lib/Win32" )
-    addLib( "libovr" )
-    addLib( "libovrd" )
+if(TORQUE_OCULUSVR)
+	# Source
+	addPathRec( "${srcDir}/platform/input/oculusVR" )
+
+	# Includes
+	addInclude( "${TORQUE_OCULUSVR_SDK_PATH}/LibOVR/Include" )
+	addInclude( "${TORQUE_OCULUSVR_SDK_PATH}/LibOVR/Src" )
+	 
+	# Libs
+	if( WIN32 ) 
+		link_directories( "${TORQUE_OCULUSVR_SDK_PATH}/LibOVR/Lib/Win32" )
+		addLib( "libovr" )
+		addLib( "libovrd" )
+	endif()
 endif()
