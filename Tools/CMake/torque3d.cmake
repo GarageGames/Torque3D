@@ -22,22 +22,6 @@
 
 project(${TORQUE_APP_NAME})
 
-if(UNIX)
-    if(NOT CXX_FLAG32)
-        set(CXX_FLAG32 "")
-    endif()
-    #set(CXX_FLAG32 "-m32") #uncomment for build x32 on OSx64
-    
-    # default compiler flags
-    # force compile 32 bit
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAG32} -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CXX_FLAG32} -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
-
-	# for asm files
-	SET (CMAKE_ASM_NASM_OBJECT_FORMAT "elf")
-	ENABLE_LANGUAGE (ASM_NASM)
-endif()
-
 # TODO: fmod support
 
 ###############################################################################
@@ -392,32 +376,6 @@ if(PS3)
     addPath("${srcDir}/forest/glsl")    
 endif()
 
-if(UNIX)
-    # linux_dedicated
-    if(TORQUE_DEDICATED)
-		addPath("${srcDir}/windowManager/dedicated")
-		# ${srcDir}/platformX86UNIX/*.client.* files are not needed	
-		# @todo: move to separate file
-		file( GLOB tmp_files
-             ${srcDir}/platformX86UNIX/*.cpp
-             ${srcDir}/platformX86UNIX/*.c
-             ${srcDir}/platformX86UNIX/*.cc
-             ${srcDir}/platformX86UNIX/*.h )
-        file( GLOB tmp_remove_files ${srcDir}/platformX86UNIX/*client.* )
-        LIST( REMOVE_ITEM tmp_files ${tmp_remove_files} )
-        foreach( f ${tmp_files} )
-            addFile( ${f} )
-        endforeach()
-    else()
-        addPath("${srcDir}/platformX86UNIX")
-        addPath("${srcDir}/platformX86UNIX/nativeDialogs")
-    endif()    
-    # linux
-    addPath("${srcDir}/platformX86UNIX/threads")
-    addPath("${srcDir}/platformPOSIX")
-endif()
-
-
 ###############################################################################
 ###############################################################################
 finishExecutable()
@@ -472,24 +430,6 @@ if(WIN32)
    
 endif()
 
-if(UNIX)
-    # copy pasted from T3D build system, some might not be needed
-	set(TORQUE_EXTERNAL_LIBS "dl Xxf86vm Xext X11 Xft stdc++ pthread GL" CACHE STRING "external libs to link against")
-	mark_as_advanced(TORQUE_EXTERNAL_LIBS)
-    
-    string(REPLACE " " ";" TORQUE_EXTERNAL_LIBS_LIST ${TORQUE_EXTERNAL_LIBS})
-    addLib( "${TORQUE_EXTERNAL_LIBS_LIST}" )
-endif()
-
-if(UNIX)
-    # copy pasted from T3D build system, some might not be needed
-	set(TORQUE_EXTERNAL_LIBS "rt dl Xxf86vm Xext X11 Xft stdc++ pthread GL" CACHE STRING "external libs to link against")
-	mark_as_advanced(TORQUE_EXTERNAL_LIBS)
-    
-    string(REPLACE " " ";" TORQUE_EXTERNAL_LIBS_LIST ${TORQUE_EXTERNAL_LIBS})
-    addLib( "${TORQUE_EXTERNAL_LIBS_LIST}" )
-endif()
-
 ###############################################################################
 # Always enabled Definitions
 ###############################################################################
@@ -512,10 +452,6 @@ addDef(DOM_INCLUDE_TINYXML)
 addDef(PCRE_STATIC)
 addDef(_CRT_SECURE_NO_WARNINGS)
 addDef(_CRT_SECURE_NO_DEPRECATE)
-
-if(UNIX)
-	addDef(LINUX)	
-endif()
 
 if(TORQUE_STATIC_CODE_ANALYSIS)
     addDef( "ON_FAIL_ASSERTFATAL=exit(1)" )
@@ -540,19 +476,9 @@ addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
 
-if(UNIX)
-	addInclude("/usr/include/freetype2/freetype")
-	addInclude("/usr/include/freetype2")
-endif()
-
 # external things
 if(WIN32)
     set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY INCLUDE_DIRECTORIES $ENV{DXSDK_DIR}/Include)
-endif()
-
-if(UNIX)
-	addInclude("/usr/include/freetype2/freetype")
-	addInclude("/usr/include/freetype2")
 endif()
 
 if(MSVC)
