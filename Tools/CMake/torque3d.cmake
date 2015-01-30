@@ -35,12 +35,6 @@ option(TORQUE_ADVANCED_LIGHTING "Advanced Lighting" ON)
 mark_as_advanced(TORQUE_ADVANCED_LIGHTING)
 option(TORQUE_BASIC_LIGHTING "Basic Lighting" ON)
 mark_as_advanced(TORQUE_BASIC_LIGHTING)
-if(WIN32)
-	option(TORQUE_SFX_DirectX "DirectX Sound" ON)
-	mark_as_advanced(TORQUE_SFX_DirectX)
-else()
-	set(TORQUE_SFX_DirectX OFF)
-endif()
 option(TORQUE_SFX_OPENAL "OpenAL Sound" ON)
 mark_as_advanced(TORQUE_SFX_OPENAL)
 option(TORQUE_HIFI "HIFI? support" OFF)
@@ -97,21 +91,6 @@ mark_as_advanced(TORQUE_DEBUG_GFX_MODE)
 
 #option(DEBUG_SPEW "more debug" OFF)
 set(TORQUE_NO_DSO_GENERATION ON)
-
-if(WIN32)
-    # warning C4800: 'XXX' : forcing value to bool 'true' or 'false' (performance warning)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4800")
-    # warning C4018: '<' : signed/unsigned mismatch
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4018")
-    # warning C4244: 'initializing' : conversion from 'XXX' to 'XXX', possible loss of data
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4244")
-
-    if( TORQUE_CPU_X64 )
-        link_directories($ENV{DXSDK_DIR}/Lib/x64)
-    else()
-        link_directories($ENV{DXSDK_DIR}/Lib/x86)
-    endif()
-endif()
 
 # build types
 if(NOT MSVC) # handle single-configuration generator
@@ -310,77 +289,23 @@ endif()
 #modules dir
 file(GLOB modules "modules/*.cmake")
 foreach(module ${modules})
-	include(${module})
+    string(FIND ${module} ".target.cmake" FIND_RESULT)
+    if( ${FIND_RESULT} STREQUAL "-1")
+        include(${module})
+    endif()
 endforeach()
-
-###############################################################################
-# platform specific things
-###############################################################################
-if(WIN32)
-    addPath("${srcDir}/platformWin32")
-    addPath("${srcDir}/platformWin32/nativeDialogs")
-    addPath("${srcDir}/platformWin32/menus")
-    addPath("${srcDir}/platformWin32/threads")
-    addPath("${srcDir}/platformWin32/videoInfo")
-    addPath("${srcDir}/platformWin32/minidump")
-    addPath("${srcDir}/windowManager/win32")
-    #addPath("${srcDir}/gfx/D3D8")
-    addPath("${srcDir}/gfx/D3D")
-    addPath("${srcDir}/gfx/D3D9")
-    addPath("${srcDir}/gfx/D3D9/pc")
-    addPath("${srcDir}/shaderGen/HLSL")    
-    addPath("${srcDir}/terrain/hlsl")
-    addPath("${srcDir}/forest/hlsl")
-    # add windows rc file for the icon
-    addFile("${projectSrcDir}/torque.rc")
-endif()
-
-if(APPLE)
-    addPath("${srcDir}/platformMac")
-    addPath("${srcDir}/platformMac/menus")
-    addPath("${srcDir}/platformPOSIX")
-    addPath("${srcDir}/windowManager/mac")
-    addPath("${srcDir}/gfx/gl")
-    addPath("${srcDir}/gfx/gl/ggl")
-    addPath("${srcDir}/gfx/gl/ggl/mac")
-    addPath("${srcDir}/gfx/gl/ggl/generated")
-    addPath("${srcDir}/shaderGen/GLSL")
-    addPath("${srcDir}/terrain/glsl")
-    addPath("${srcDir}/forest/glsl")    
-endif()
-
-if(XBOX360)
-    addPath("${srcDir}/platformXbox")
-    addPath("${srcDir}/platformXbox/threads")
-    addPath("${srcDir}/windowManager/360")
-    addPath("${srcDir}/gfx/D3D9")
-    addPath("${srcDir}/gfx/D3D9/360")
-    addPath("${srcDir}/shaderGen/HLSL")
-    addPath("${srcDir}/shaderGen/360")
-    addPath("${srcDir}/ts/arch/360")
-    addPath("${srcDir}/terrain/hlsl")
-    addPath("${srcDir}/forest/hlsl")
-endif()
-
-if(PS3)
-    addPath("${srcDir}/platformPS3")
-    addPath("${srcDir}/platformPS3/threads")
-    addPath("${srcDir}/windowManager/ps3")
-    addPath("${srcDir}/gfx/gl")
-    addPath("${srcDir}/gfx/gl/ggl")
-    addPath("${srcDir}/gfx/gl/ggl/ps3")
-    addPath("${srcDir}/gfx/gl/ggl/generated")
-    addPath("${srcDir}/shaderGen/GLSL")
-    addPath("${srcDir}/ts/arch/ps3")
-    addPath("${srcDir}/terrain/glsl")
-    addPath("${srcDir}/forest/glsl")    
-endif()
 
 ###############################################################################
 ###############################################################################
 finishExecutable()
 ###############################################################################
 ###############################################################################
+
+#modules dir
+file(GLOB modules "modules/*.target.cmake")
+foreach(module ${modules})
+    include(${module})
+endforeach()
 
 message(STATUS "writing ${projectSrcDir}/torqueConfig.h")
 CONFIGURE_FILE("${cmakeDir}/torqueConfig.h.in" "${projectSrcDir}/torqueConfig.h")
@@ -395,17 +320,7 @@ endif()
 if(EXISTS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" AND NOT EXISTS "${projectOutDir}/main.cs")
     CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" "${projectOutDir}/main.cs")
 endif()
-if(WIN32)
-    if(NOT EXISTS "${projectSrcDir}/torque.rc")
-        CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
-    endif()
-    if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}-debug.bat")
-        CONFIGURE_FILE("${cmakeDir}/app-debug-win.bat.in" "${projectOutDir}/${PROJECT_NAME}-debug.bat")
-    endif()
-    if(NOT EXISTS "${projectOutDir}/cleanup.bat")
-        CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectOutDir}/cleanup.bat")
-    endif()
-endif()
+
 
 ###############################################################################
 # Common Libraries
@@ -422,13 +337,6 @@ addLib(collada)
 addLib(pcre)
 addLib(convexDecomp)
 
-if(WIN32)
-    # copy pasted from T3D build system, some might not be needed
-    set(TORQUE_EXTERNAL_LIBS "COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib" CACHE STRING "external libs to link against")
-    mark_as_advanced(TORQUE_EXTERNAL_LIBS)
-    addLib("${TORQUE_EXTERNAL_LIBS}")
-   
-endif()
 
 ###############################################################################
 # Always enabled Definitions
@@ -476,21 +384,6 @@ addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
 
-# external things
-if(WIN32)
-    set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY INCLUDE_DIRECTORIES $ENV{DXSDK_DIR}/Include)
-endif()
-
-if(MSVC)
-    # Match projectGenerator naming for executables
-    set(OUTPUT_CONFIG DEBUG MINSIZEREL RELWITHDEBINFO)
-    set(OUTPUT_SUFFIX DEBUG MINSIZE    OPTIMIZEDDEBUG)
-    foreach(INDEX RANGE 2)
-        list(GET OUTPUT_CONFIG ${INDEX} CONF)
-        list(GET OUTPUT_SUFFIX ${INDEX} SUFFIX)
-        set_property(TARGET ${PROJECT_NAME} PROPERTY OUTPUT_NAME_${CONF} ${PROJECT_NAME}_${SUFFIX})
-    endforeach()
-endif()
 
 ###############################################################################
 # Installation
@@ -499,10 +392,4 @@ endif()
 if(TORQUE_TEMPLATE)
     message("Prepare Template(${TORQUE_TEMPLATE}) install...")
     INSTALL(DIRECTORY "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game"                 DESTINATION "${TORQUE_APP_DIR}")
-    if(WIN32)
-        INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/cleanShaders.bat"     DESTINATION "${TORQUE_APP_DIR}")
-        INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteCachedDTSs.bat" DESTINATION "${TORQUE_APP_DIR}")
-        INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteDSOs.bat"       DESTINATION "${TORQUE_APP_DIR}")
-        INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeletePrefs.bat"      DESTINATION "${TORQUE_APP_DIR}")
-    endif()
 endif()
