@@ -157,7 +157,7 @@ public:
    virtual bool onAdd();
    virtual void onRemove();
    virtual void inspectPostApply();
-   virtual bool processArguments(S32 argc, const char **argv);
+   virtual bool processArguments(S32 argc, ConsoleValueRef *argv);
 
    // NetObject
    virtual U32  packUpdate( NetConnection * conn, U32 mask, BitStream *stream );

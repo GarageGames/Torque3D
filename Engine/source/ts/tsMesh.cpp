@@ -165,6 +165,9 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
    MeshRenderInst *coreRI = renderPass->allocInst<MeshRenderInst>();
    coreRI->type = RenderPassManager::RIT_Mesh;
 
+   // Pass accumulation texture along.
+   coreRI->accuTex = rdata.getAccuTex();
+
    const MatrixF &objToWorld = GFX->getWorldMatrix();
 
    // Sort by the center point or the bounds.
@@ -203,7 +206,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
 
    coreRI->vertBuff = &vb;
    coreRI->primBuff = &pb;
-   coreRI->defaultKey2 = (U32) coreRI->vertBuff;
+   coreRI->defaultKey2 = (uintptr_t) coreRI->vertBuff;
 
    coreRI->materialHint = rdata.getMaterialHint();
 
@@ -784,7 +787,7 @@ bool TSMesh::castRayRendered( S32 frame, const Point3F & start, const Point3F & 
       // gonna depend on what kind of primitive it is...
       if ( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Triangles )
       {
-         for ( S32 j = 0; j < draw.numElements-2; j++)
+         for ( S32 j = 0; j < draw.numElements-2; j += 3 )
          {
             idx0 = indices[drawStart + j + 0];
             idx1 = indices[drawStart + j + 1];
@@ -2428,7 +2431,7 @@ void TSMesh::_createVBIB( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
             pInfo.startIndex = draw.start;
             // Use the first index to determine which 16-bit address space we are operating in
             pInfo.startVertex = indices[draw.start] & 0xFFFF0000;
-            pInfo.minIndex = pInfo.startVertex;
+            pInfo.minIndex = 0; // minIndex are zero based index relative to startVertex. See @GFXDevice
             pInfo.numVertices = getMin((U32)0x10000, mNumVerts - pInfo.startVertex);
             break;
 
@@ -2439,7 +2442,7 @@ void TSMesh::_createVBIB( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
             pInfo.startIndex = draw.start;
             // Use the first index to determine which 16-bit address space we are operating in
             pInfo.startVertex = indices[draw.start] & 0xFFFF0000;
-            pInfo.minIndex = pInfo.startVertex;
+            pInfo.minIndex = 0; // minIndex are zero based index relative to startVertex. See @GFXDevice
             pInfo.numVertices = getMin((U32)0x10000, mNumVerts - pInfo.startVertex);
             break;
 

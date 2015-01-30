@@ -356,6 +356,7 @@ PlayerData::PlayerData()
    decalID        = 0;
    decalOffset      = 0.0f;
 
+   actionCount = 0;
    lookAction = 0;
 
    // size of bounding box
@@ -3691,7 +3692,7 @@ bool Player::setActionThread(const char* sequence,bool hold,bool wait,bool fsp)
 
 void Player::setActionThread(U32 action,bool forward,bool hold,bool wait,bool fsp, bool forceSet)
 {
-   if (!mDataBlock || (mActionAnimation.action == action && mActionAnimation.forward == forward && !forceSet))
+   if (!mDataBlock || !mDataBlock->actionCount || (mActionAnimation.action == action && mActionAnimation.forward == forward && !forceSet))
       return;
 
    if (action >= PlayerData::NumActionAnims)
@@ -6151,13 +6152,16 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          stream->writeInt((S32)len, 13);
       }
       stream->writeFloat(mRot.z / M_2PI_F, 7);
-      stream->writeSignedFloat(mHead.x / mDataBlock->maxLookAngle, 6);
+      stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
       stream->writeSignedFloat(mHead.z / mDataBlock->maxFreelookAngle, 6);
       delta.move.pack(stream);
       stream->writeFlag(!(mask & NoWarpMask));
    }
    // Ghost need energy to predict reliably
-   stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy,EnergyLevelBits);
+   if (mDataBlock->maxEnergy > 0.f)
+      stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy, EnergyLevelBits);
+   else
+      stream->writeFloat(0.f, EnergyLevelBits);
    return retMask;
 }
 
@@ -6249,7 +6253,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       
       rot.y = rot.x = 0.0f;
       rot.z = stream->readFloat(7) * M_2PI_F;
-      mHead.x = stream->readSignedFloat(6) * mDataBlock->maxLookAngle;
+      mHead.x = stream->readSignedFloat(6) * (mDataBlock->maxLookAngle - mDataBlock->minLookAngle);
       mHead.z = stream->readSignedFloat(6) * mDataBlock->maxFreelookAngle;
       delta.move.unpack(stream);
 

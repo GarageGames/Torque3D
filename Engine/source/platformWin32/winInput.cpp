@@ -20,11 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#if !defined( TORQUE_SDL )
 #include "platformWin32/platformWin32.h"
 
 #include "platform/platformInput.h"
 #include "platformWin32/winDirectInput.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "core/util/journal/process.h"
 #include "windowManager/platformWindowMgr.h"
 
@@ -155,19 +157,17 @@ void Input::init()
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( isJoystickDetected, bool, 1, 1, "isJoystickDetected()" )
+DefineConsoleFunction( isJoystickDetected, bool, (), , "isJoystickDetected()")
 {
-   argc; argv;
    return( DInputDevice::joystickDetected() );
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( getJoystickAxes, const char*, 2, 2, "getJoystickAxes( instance )" )
+DefineConsoleFunction( getJoystickAxes, const char*, (U32 deviceID), , "getJoystickAxes( instance )")
 {
-   argc;
    DInputManager* mgr = dynamic_cast<DInputManager*>( Input::getManager() );
    if ( mgr )
-      return( mgr->getJoystickAxesString( dAtoi( argv[1] ) ) );
+      return( mgr->getJoystickAxesString( deviceID ) );
 
    return( "" );
 }
@@ -505,10 +505,9 @@ void Input::log( const char* format, ... )
    va_end( argptr );
 }
 
-ConsoleFunction( inputLog, void, 2, 2, "inputLog( string )" )
+DefineConsoleFunction( inputLog, void, (const char * log), , "inputLog( string )")
 {
-   argc;
-   Input::log( "%s\n", argv[1] );
+   Input::log( "%s\n", log );
 }
 #endif // LOG_INPUT
 
@@ -865,3 +864,4 @@ bool Platform::setClipboard(const char *text)
 	return true;
 }
 
+#endif

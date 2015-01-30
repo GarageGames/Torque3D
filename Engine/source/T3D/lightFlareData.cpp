@@ -26,16 +26,18 @@
 #include "core/stream/bitStream.h"
 #include "console/engineAPI.h"
 #include "lighting/lightInfo.h"
+#include "lighting/lightQuery.h"
 #include "math/mathUtils.h"
 #include "math/mathIO.h"
 #include "scene/sceneRenderState.h"
 #include "gfx/gfxOcclusionQuery.h"
 #include "gfx/gfxDrawUtil.h"
+#include "gfx/gfxTextureManager.h"
 #include "renderInstance/renderPassManager.h"
 #include "T3D/gameBase/gameConnection.h"
 #include "T3D/gameBase/processList.h"
 #include "collision/collision.h"
-
+#include "lighting/lightManager.h"
 
 const U32 LightFlareData::LosMask = STATIC_COLLISION_TYPEMASK |
                                     ShapeBaseObjectType |
@@ -45,8 +47,6 @@ const U32 LightFlareData::LosMask = STATIC_COLLISION_TYPEMASK |
 
 LightFlareState::~LightFlareState()
 {
-   delete occlusionQuery;
-   delete fullPixelQuery;
 }
 
 void LightFlareState::clear()
@@ -59,8 +59,6 @@ void LightFlareState::clear()
    lightInfo = NULL;
    worldRadius = -1.0f;
    occlusion = -1.0f;
-   occlusionQuery = NULL;
-   fullPixelQuery = NULL;
 }
 
 Point3F LightFlareData::sBasePoints[] =
@@ -296,47 +294,39 @@ bool LightFlareData::_testVisibility(const SceneRenderState *state, LightFlareSt
    // for one-shot initialization of LightFlareState
    if ( useOcclusionQuery )
    {
-      if ( flareState->occlusionQuery == NULL )
-         flareState->occlusionQuery = GFX->createOcclusionQuery();
-      if ( flareState->fullPixelQuery == NULL )
-         flareState->fullPixelQuery = GFX->createOcclusionQuery();
-
       // Always treat light as onscreen if using HOQ
       // it will be faded out if offscreen anyway.
       onScreen = true;
-
-      // NOTE: These queries frame lock us as we block to get the
-      // results.  This is ok as long as long as we're not too GPU
-      // bound... else we waste CPU time here waiting for it when
-      // we could have been doing other CPU work instead.
+	  needsRaycast = false;
 
       // Test the hardware queries for rendered pixels.
       U32 pixels = 0, fullPixels = 0;
-      GFXOcclusionQuery::OcclusionQueryStatus status = flareState->occlusionQuery->getStatus( true, &pixels );
-      flareState->fullPixelQuery->getStatus( true, &fullPixels );
-      if ( status != GFXOcclusionQuery::Occluded && fullPixels != 0 )
+      GFXOcclusionQuery::OcclusionQueryStatus status;
+      flareState->occlusionQuery.getLastStatus( false, &status, &pixels );      
+      flareState->fullPixelQuery.getLastStatus( false, NULL, &fullPixels );
+      
+      if ( status == GFXOcclusionQuery::NotOccluded && fullPixels != 0 )
          *outOcclusionFade = mClampF( (F32)pixels / (F32)fullPixels, 0.0f, 1.0f );
 
-      // If we got a result then we don't need to fallback to the raycast.
-      if ( status != GFXOcclusionQuery::Unset )
-         needsRaycast = false;
-
-      // Setup the new queries.
-      RenderPassManager *rpm = state->getRenderPass();
-      OccluderRenderInst *ri = rpm->allocInst<OccluderRenderInst>();   
-      ri->type = RenderPassManager::RIT_Occluder;
-      ri->query = flareState->occlusionQuery;   
-      ri->query2 = flareState->fullPixelQuery;
-      ri->isSphere = true;
-      ri->position = lightPos;
-      if ( isVectorLight && flareState->worldRadius > 0.0f )         
-         ri->scale.set( flareState->worldRadius );
-      else
-         ri->scale.set( mOcclusionRadius );
-      ri->orientation = rpm->allocUniqueXform( lightInfo->getTransform() );         
+        if( !flareState->occlusionQuery.isWaiting() )
+        {
+            // Setup the new queries.
+            RenderPassManager *rpm = state->getRenderPass();
+            OccluderRenderInst *ri = rpm->allocInst<OccluderRenderInst>();   
+            ri->type = RenderPassManager::RIT_Occluder;
+            ri->query = flareState->occlusionQuery.getQuery();
+            ri->query2 = flareState->fullPixelQuery.getQuery();
+            ri->isSphere = true;
+            ri->position = lightPos;
+            if ( isVectorLight && flareState->worldRadius > 0.0f )         
+                ri->scale.set( flareState->worldRadius );
+            else
+                ri->scale.set( mOcclusionRadius );
+            ri->orientation = rpm->allocUniqueXform( lightInfo->getTransform() );         
       
-      // Submit the queries.
-      state->getRenderPass()->addInst( ri );
+            // Submit the queries.
+            state->getRenderPass()->addInst( ri );
+        }
    }
 
    const Point3F &camPos = state->getCameraPosition();
@@ -608,7 +598,7 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    ri->blendStyle = ParticleRenderInst::BlendGreyscale;
    ri->diffuseTex = mFlareTexture;
    ri->softnessDistance = 1.0f; 
-   ri->defaultKey = ri->diffuseTex ? (U32)ri->diffuseTex : (U32)ri->vertBuff; // Sort by texture too.
+   ri->defaultKey = ri->diffuseTex ? (uintptr_t)ri->diffuseTex : (uintptr_t)ri->vertBuff; // Sort by texture too.
 
    // NOTE: Offscreen partical code is currently disabled.
    ri->systemState = PSS_AwaitingHighResDraw;

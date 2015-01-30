@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "gui/editor/guiFilterCtrl.h"
 
+#include "console/engineAPI.h"
 #include "console/console.h"
 #include "console/consoleTypes.h"
 #include "guiFilterCtrl.h"
@@ -59,10 +60,9 @@ void GuiFilterCtrl::initPersistFields()
    Parent::initPersistFields();
 }
 
-ConsoleMethod( GuiFilterCtrl, getValue, const char*, 2, 2, "Return a tuple containing all the values in the filter."
+DefineConsoleMethod( GuiFilterCtrl, getValue, const char*, (), , "Return a tuple containing all the values in the filter."
 			  "@internal")
 {
-   TORQUE_UNUSED(argv);
    static char buffer[512];
    const Filter *filter = object->get();
    *buffer = 0;
@@ -83,14 +83,13 @@ ConsoleMethod( GuiFilterCtrl, setValue, void, 3, 20, "(f1, f2, ...)"
 {
    Filter filter;
 
-   argc -= 2;
-   argv += 2;
+   StringStackWrapper args(argc - 2, argv + 2);
 
-   filter.set(argc, argv);
+   filter.set(args.count(), args);
 	object->set(filter);
 }
 
-ConsoleMethod( GuiFilterCtrl, identity, void, 2, 2, "Reset the filtering."
+DefineConsoleMethod( GuiFilterCtrl, identity, void, (), , "Reset the filtering."
 			  "@internal")
 {
    object->identity();

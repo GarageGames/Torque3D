@@ -61,6 +61,11 @@ new ShaderData( AL_VectorLightShader )
    OGLVertexShaderFile = "shaders/common/lighting/advanced/gl/farFrustumQuadV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/vectorLightP.glsl";
    
+   samplerNames[0] = "$prePassBuffer";
+   samplerNames[1] = "$ShadowMap";
+   samplerNames[2] = "$ssaoMask";
+   samplerNames[3] = "$gTapRotationTex";
+   
    pixVersion = 3.0;
 };
 
@@ -121,6 +126,11 @@ new ShaderData( AL_PointLightShader )
    OGLVertexShaderFile = "shaders/common/lighting/advanced/gl/convexGeometryV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/pointLightP.glsl";
 
+   samplerNames[0] = "$prePassBuffer";
+   samplerNames[1] = "$shadowMap";
+   samplerNames[2] = "$cookieMap";
+   samplerNames[3] = "$gTapRotationTex";
+   
    pixVersion = 3.0;
 };
 
@@ -131,7 +141,7 @@ new CustomMaterial( AL_PointLightMaterial )
    
    sampler["prePassBuffer"] = "#prepass";
    sampler["shadowMap"] = "$dynamiclight";
-   sampler["cookieTex"] = "$dynamiclightmask";
+   sampler["cookieMap"] = "$dynamiclightmask";
    
    target = "lightinfo";
    
@@ -147,6 +157,11 @@ new ShaderData( AL_SpotLightShader )
    OGLVertexShaderFile = "shaders/common/lighting/advanced/gl/convexGeometryV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/spotLightP.glsl";
    
+   samplerNames[0] = "$prePassBuffer";
+   samplerNames[1] = "$shadowMap";
+   samplerNames[2] = "$cookieMap";
+   samplerNames[3] = "$gTapRotationTex";   
+   
    pixVersion = 3.0;
 };
 
@@ -157,7 +172,7 @@ new CustomMaterial( AL_SpotLightMaterial )
    
    sampler["prePassBuffer"] = "#prepass";
    sampler["shadowMap"] = "$dynamiclight";
-   sampler["cookieTex"] = "$dynamiclightmask";
+   sampler["cookieMap"] = "$dynamiclightmask";
    
    target = "lightinfo";
    
@@ -210,6 +225,8 @@ new ShaderData( AL_ParticlePointLightShader )
 
    OGLVertexShaderFile = "shaders/common/lighting/advanced/gl/convexGeometryV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/pointLightP.glsl";
+   
+   samplerNames[0] = "$prePassBuffer";   
       
    pixVersion = 3.0;
 };

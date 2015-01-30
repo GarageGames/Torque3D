@@ -27,6 +27,7 @@
 #include "math/mathUtils.h"
 #include "console/consoleTypes.h"
 #include "console/consoleObject.h"
+#include "console/engineAPI.h"
 #include "sim/netConnection.h"
 #include "scene/sceneRenderState.h"
 #include "scene/sceneManager.h"
@@ -237,7 +238,7 @@ void PhysicsDebrisData::unpackData(BitStream* stream)
    shapeName   = stream->readSTString();
 }
 
-ConsoleMethod( PhysicsDebrisData, preload, void, 2, 2, 
+DefineConsoleMethod( PhysicsDebrisData, preload, void, (), , 
    "@brief Loads some information to have readily available at simulation time.\n\n"
    "Forces generation of shaders, materials, and other data used by the %PhysicsDebris object. "
    "This function should be used while a level is loading in order to shorten "

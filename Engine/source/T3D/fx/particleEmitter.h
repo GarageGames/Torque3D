@@ -114,6 +114,7 @@ class ParticleEmitterData : public GameBaseData
    GFXTexHandle          textureHandle;      ///< Emitter texture handle from txrName
    bool                  highResOnly;        ///< This particle system should not use the mixed-resolution particle rendering
    bool                  renderReflection;   ///< Enables this emitter to render into reflection passes.
+   bool glow;                                ///< Renders this emitter into the glow buffer.
 
    bool reload();
 };

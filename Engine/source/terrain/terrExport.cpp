@@ -25,6 +25,7 @@
 #include "gfx/bitmap/gBitmap.h"
 #include "terrain/terrMaterial.h"
 #include "core/stream/fileStream.h"
+#include "console/engineAPI.h"
 
 #ifdef TORQUE_TOOLS
 
@@ -136,26 +137,18 @@ bool TerrainBlock::exportLayerMaps( const UTF8 *filePrefix, const String &format
    return true;
 }
 
-ConsoleMethod( TerrainBlock, exportHeightMap, bool, 3, 4, "(string filename, [string format]) - export the terrain block's heightmap to a bitmap file (default: png)" )
+DefineConsoleMethod( TerrainBlock, exportHeightMap, bool, (const char * fileNameStr, const char * format), ( "png"), "(string filename, [string format]) - export the terrain block's heightmap to a bitmap file (default: png)" )
 {
    UTF8 fileName[1024];
-   String format = "png";
-   if( argc > 3 )
-      format = argv[ 3 ];
-
-   Con::expandScriptFilename( fileName, sizeof( fileName ), argv[2] );
+   Con::expandScriptFilename( fileName, sizeof( fileName ), fileNameStr );
 
    return object->exportHeightMap( fileName, format );
 }
 
-ConsoleMethod( TerrainBlock, exportLayerMaps, bool, 3, 4, "(string filePrefix, [string format]) - export the terrain block's layer maps to bitmap files (default: png)" )
+DefineConsoleMethod( TerrainBlock, exportLayerMaps, bool, (const char * filePrefixStr, const char * format), ( "png"), "(string filePrefix, [string format]) - export the terrain block's layer maps to bitmap files (default: png)" )
 {
    UTF8 filePrefix[1024];
-   String format = "png";
-   if( argc > 3 )
-      format = argv[3];
-
-   Con::expandScriptFilename( filePrefix, sizeof( filePrefix ), argv[2] );
+   Con::expandScriptFilename( filePrefix, sizeof( filePrefix ), filePrefixStr );
 
    return object->exportLayerMaps( filePrefix, format );
 }

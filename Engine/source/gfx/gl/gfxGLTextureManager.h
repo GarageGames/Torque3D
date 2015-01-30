@@ -26,7 +26,7 @@
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxTextureManager.h"
 #include "gfx/gl/gfxGLTextureObject.h"
-#include "gfx/gl/ggl/ggl.h"
+#include "gfx/gl/tGL/tGL.h"
 
 class GFXGLTextureManager : public GFXTextureManager
 {   

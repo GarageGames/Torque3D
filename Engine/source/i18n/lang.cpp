@@ -325,7 +325,7 @@ void LangTable::setCurrentLanguage(S32 langid)
 
 
 
-ConsoleMethod(LangTable, addLanguage, S32, 3, 4, 
+DefineConsoleMethod(LangTable, addLanguage, S32, (String filename, String languageName), ("", ""), 
 			  "(string filename, [string languageName])"
 			  "@brief Adds a language to the table\n\n"
 			  "@param filename Name and path to the language file\n"
@@ -335,11 +335,11 @@ ConsoleMethod(LangTable, addLanguage, S32, 3, 4,
 {
 	UTF8 scriptFilenameBuffer[1024];
 	
-	Con::expandScriptFilename((char*)scriptFilenameBuffer, sizeof(scriptFilenameBuffer), argv[2]);
-	return object->addLanguage(scriptFilenameBuffer, argc == 4 ? (const UTF8*)argv[3] : NULL);
+	Con::expandScriptFilename((char*)scriptFilenameBuffer, sizeof(scriptFilenameBuffer), filename);
+	return object->addLanguage(scriptFilenameBuffer, (const UTF8*)languageName);
 }
 
-ConsoleMethod(LangTable, getString, const char *, 3, 3, 
+DefineConsoleMethod(LangTable, getString, const char *, (U32 id), , 
 			  "(string filename)"
 			  "@brief Grabs a string from the specified table\n\n"
 			  "If an invalid is passed, the function will attempt to "
@@ -347,7 +347,7 @@ ConsoleMethod(LangTable, getString, const char *, 3, 3,
 			  "@param filename Name of the language table to access\n\n"
 			  "@return Text from the specified language table, \"\" if ID was invalid and default table is not set")
 {
-	const char * str =	(const char*)object->getString(dAtoi(argv[2]));
+	const char * str =	(const char*)object->getString(id);
 	if(str != NULL)
 	{
 		char * ret = Con::getReturnBuffer(dStrlen(str) + 1);
@@ -358,34 +358,34 @@ ConsoleMethod(LangTable, getString, const char *, 3, 3,
 	return "";
 }
 
-ConsoleMethod(LangTable, setDefaultLanguage, void, 3, 3, "(int language)"
+DefineConsoleMethod(LangTable, setDefaultLanguage, void, (S32 langId), , "(int language)"
 			  "@brief Sets the default language table\n\n"
 			  "@param language ID of the table\n")
 {
-	object->setDefaultLanguage(dAtoi(argv[2]));
+	object->setDefaultLanguage(langId);
 }
 
-ConsoleMethod(LangTable, setCurrentLanguage, void, 3, 3, 
+DefineConsoleMethod(LangTable, setCurrentLanguage, void, (S32 langId), , 
 			  "(int language)"
 			  "@brief Sets the current language table for grabbing text\n\n"
 			  "@param language ID of the table\n")
 {
-	object->setCurrentLanguage(dAtoi(argv[2]));
+	object->setCurrentLanguage(langId);
 }
 
-ConsoleMethod(LangTable, getCurrentLanguage, S32, 2, 2, "()"
+DefineConsoleMethod(LangTable, getCurrentLanguage, S32, (), , "()"
 			  "@brief Get the ID of the current language table\n\n"
 			  "@return Numerical ID of the current language table")
 {
 	return object->getCurrentLanguage();
 }
 
-ConsoleMethod(LangTable, getLangName, const char *, 3, 3, "(int language)"
+DefineConsoleMethod(LangTable, getLangName, const char *, (S32 langId), , "(int language)"
 			  "@brief Return the readable name of the language table\n\n"
 			  "@param language Numerical ID of the language table to access\n\n"
 			  "@return String containing the name of the table, NULL if ID was invalid or name was never specified")
 {
-	const char * str = (const char*)object->getLangName(dAtoi(argv[2]));
+	const char * str = (const char*)object->getLangName(langId);
 	if(str != NULL)
 	{
 		char * ret = Con::getReturnBuffer(dStrlen(str) + 1);
@@ -396,7 +396,7 @@ ConsoleMethod(LangTable, getLangName, const char *, 3, 3, "(int language)"
 	return "";
 }
 
-ConsoleMethod(LangTable, getNumLang, S32, 2, 2, "()"
+DefineConsoleMethod(LangTable, getNumLang, S32, (), , "()"
 			  "@brief Used to find out how many languages are in the table\n\n"
 			  "@return Size of the vector containing the languages, numerical")
 {

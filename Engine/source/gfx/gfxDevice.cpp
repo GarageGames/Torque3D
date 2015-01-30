@@ -267,6 +267,8 @@ GFXDevice::~GFXDevice()
       mNewCubemap[i] = NULL;
    }
 
+   mCurrentRT = NULL;
+
    // Release all the unreferenced textures in the cache.
    mTextureManager->cleanupCache();
 
@@ -277,6 +279,7 @@ GFXDevice::~GFXDevice()
 #endif
 
    SAFE_DELETE( mTextureManager );
+   SAFE_DELETE( mFrameTime );
 
    // Clear out our state block references
    mCurrentStateBlocks.clear();

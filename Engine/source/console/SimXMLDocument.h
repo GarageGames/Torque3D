@@ -57,7 +57,7 @@ class SimXMLDocument: public SimObject
       // tie in to the script language.  The .cc file has more in depth
       // comments on these.
       //-----------------------------------------------------------------------
-      bool processArguments(S32 argc, const char** argv);
+      bool processArguments(S32 argc, ConsoleValueRef *argv);
       bool onAdd();
       void onRemove();
       static void initPersistFields();

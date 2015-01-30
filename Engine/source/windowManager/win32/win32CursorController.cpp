@@ -106,7 +106,7 @@ void Win32CursorController::setCursorVisible( bool visible )
    if( visible )
       ShowCursor( true );
    else
-      while( ShowCursor(false) > 0 );
+      while( ShowCursor(false) >= 0 );
 }
 
 bool Win32CursorController::isCursorVisible()

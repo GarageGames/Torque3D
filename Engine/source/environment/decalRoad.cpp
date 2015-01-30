@@ -155,8 +155,8 @@ void DecalRoadNodeEvent::padListToSize()
       newlist->mPositions.merge(list->mPositions);
       newlist->mWidths.merge(list->mWidths);
 
-      mNodeList = newlist;
       delete list;
+      mNodeList = list = newlist;
    }
 
    // Pad our list end?

@@ -138,8 +138,17 @@ ConsoleDocClass( Explosion,
 
 MRandomLCG sgRandom(0xdeadbeef);
 
+//WLE - Vince - The defaults are bad, the whole point of calling this function\
+//is to determine the explosion coverage on a object.  Why would you want them
+//To call this with a null for the ID?  In fact, it just returns a 1f if
+//it can't find the object.  Seems useless to me.  Cause how can I apply
+//damage to a object that doesn't exist?
 
-DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMask),(Point3F(0.0f,0.0f,0.0f), NULL, NULL),
+//I could possible see a use with passing in a null covMask, but even that
+//sounds flaky because it will be 100 percent if your saying not to take
+//any thing in consideration for coverage.  So I'm removing these defaults they are just bad.
+
+DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMask),,
    "@brief Calculates how much an explosion effects a specific object.\n\n"
    "Use this to determine how much damage to apply to objects based on their "
    "distance from the explosion's center point, and whether the explosion is "
@@ -606,7 +615,7 @@ void ExplosionData::packData(BitStream* stream)
    }
    U32 count;
    for(count = 0; count < EC_NUM_TIME_KEYS; count++)
-      if(times[i] >= 1)
+      if(times[count] >= 1)
          break;
    count++;
    if(count > EC_NUM_TIME_KEYS)
@@ -964,10 +973,7 @@ void Explosion::onRemove()
       mMainEmitter = NULL;
    }
 
-   if (getSceneManager() != NULL)
-      getSceneManager()->removeObjectFromScene(this);
-   if (getContainer() != NULL)
-      getContainer()->removeObject(this);
+   removeFromScene();
 
    Parent::onRemove();
 }

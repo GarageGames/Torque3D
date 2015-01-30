@@ -26,10 +26,12 @@
 in vec2 uv0;
 uniform sampler2D lightInfoBuffer;
 
+out vec4 OUT_col;
+
 void main()
 {   
    vec3 lightcolor;   
    float nl_Att, specular;   
    lightinfoUncondition( texture( lightInfoBuffer, uv0 ), lightcolor, nl_Att, specular );   
-   OUT_FragColor0 = vec4( lightcolor, 1.0 ); 
+   OUT_col = vec4( lightcolor, 1.0 ); 
 }

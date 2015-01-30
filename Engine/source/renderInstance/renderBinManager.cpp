@@ -122,7 +122,6 @@ void RenderBinManager::internalAddElement(RenderInst* inst)
    mElementList.increment();
    MainSortElem &elem = mElementList.last();
    elem.inst = inst;
-   elem.key = elem.key2 = 0;
 
    elem.key = inst->defaultKey;
    elem.key2 = inst->defaultKey2;
@@ -165,6 +164,7 @@ void RenderBinManager::setupSGData( MeshRenderInst *ri, SceneData &data )
    data.cubemap      = ri->cubemap;
    data.miscTex      = ri->miscTex;
    data.reflectTex   = ri->reflectTex;
+   data.accuTex      = ri->accuTex;
    data.lightmap     = ri->lightmap;
    data.visibility   = ri->visibility;
    data.materialHint = ri->materialHint;

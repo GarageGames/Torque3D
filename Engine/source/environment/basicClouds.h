@@ -103,6 +103,7 @@ protected:
    GFXShaderConstHandle *mTexScaleSC;
    GFXShaderConstHandle *mTexDirectionSC;
    GFXShaderConstHandle *mTexOffsetSC;
+   GFXShaderConstHandle *mDiffuseMapSC;
 
    GFXVertexBufferHandle<GFXVertexPT> mVB[TEX_COUNT];
    GFXPrimitiveBufferHandle mPB;    

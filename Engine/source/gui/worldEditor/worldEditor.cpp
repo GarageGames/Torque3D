@@ -1471,7 +1471,7 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
    }
 
    GFX->setStateBlock(mSplineSB);
-
+   GFX->setupGenericShaders();
 
    if (path->isLooping())
    {
@@ -2760,7 +2760,7 @@ void WorldEditor::initPersistFields()
 //------------------------------------------------------------------------------
 // These methods are needed for the console interfaces.
 
-void WorldEditor::ignoreObjClass( U32 argc, const char **argv )
+void WorldEditor::ignoreObjClass( U32 argc, ConsoleValueRef *argv )
 {
    for(S32 i = 2; i < argc; i++)
    {
@@ -3187,17 +3187,17 @@ ConsoleMethod( WorldEditor, ignoreObjClass, void, 3, 0, "(string class_name, ...
 	object->ignoreObjClass(argc, argv);
 }
 
-ConsoleMethod( WorldEditor, clearIgnoreList, void, 2, 2, "")
+DefineConsoleMethod( WorldEditor, clearIgnoreList, void, (), , "")
 {
 	object->clearIgnoreList();
 }
 
-ConsoleMethod( WorldEditor, clearSelection, void, 2, 2, "")
+DefineConsoleMethod( WorldEditor, clearSelection, void, (), , "")
 {
 	object->clearSelection();
 }
 
-ConsoleMethod( WorldEditor, getActiveSelection, S32, 2, 2, "() - Return the currently active WorldEditorSelection object." )
+DefineConsoleMethod( WorldEditor, getActiveSelection, S32, (), , "() - Return the currently active WorldEditorSelection object." )
 {
    if( !object->getActiveSelectionSet() )
       return 0;
@@ -3205,43 +3205,36 @@ ConsoleMethod( WorldEditor, getActiveSelection, S32, 2, 2, "() - Return the curr
    return object->getActiveSelectionSet()->getId();
 }
 
-ConsoleMethod( WorldEditor, setActiveSelection, void, 3, 3, "( id set ) - Set the currently active WorldEditorSelection object." )
+DefineConsoleMethod( WorldEditor, setActiveSelection, void, ( WorldEditorSelection* selection), , "( id set ) - Set the currently active WorldEditorSelection object." )
 {
-   WorldEditorSelection* selection;
-   if( !Sim::findObject( argv[ 2 ], selection ) )
-   {
-      Con::errorf( "WorldEditor::setActiveSelectionSet - no selection set '%s'", argv[ 2 ] );
-      return;
-   }
-   
+	if (selection)
    object->makeActiveSelectionSet( selection );
 }
 
-ConsoleMethod( WorldEditor, selectObject, void, 3, 3, "(SimObject obj)")
+DefineConsoleMethod( WorldEditor, selectObject, void, (const char * objName), , "(SimObject obj)")
 {
-	object->selectObject(argv[2]);
+	object->selectObject(objName);
 }
 
-ConsoleMethod( WorldEditor, unselectObject, void, 3, 3, "(SimObject obj)")
+DefineConsoleMethod( WorldEditor, unselectObject, void, (const char * objName), , "(SimObject obj)")
 {
-	object->unselectObject(argv[2]);
+	object->unselectObject(objName);
 }
 
-ConsoleMethod( WorldEditor, invalidateSelectionCentroid, void, 2, 2, "")
+DefineConsoleMethod( WorldEditor, invalidateSelectionCentroid, void, (), , "")
 {
    WorldEditor::Selection* sel = object->getActiveSelectionSet();
    if(sel)
 	   sel->invalidateCentroid();
 }
 
-ConsoleMethod( WorldEditor, getSelectionSize, S32, 2, 2, "() - Return the number of objects currently selected in the editor.")
+DefineConsoleMethod( WorldEditor, getSelectionSize, S32, (), , "() - Return the number of objects currently selected in the editor.")
 {
 	return object->getSelectionSize();
 }
 
-ConsoleMethod( WorldEditor, getSelectedObject, S32, 3, 3, "(int index)")
+DefineConsoleMethod( WorldEditor, getSelectedObject, S32, (S32 index), , "(int index)")
 {
-   S32 index = dAtoi(argv[2]);
    if(index < 0 || index >= object->getSelectionSize())
    {
       Con::errorf(ConsoleLogEntry::General, "WorldEditor::getSelectedObject: invalid object index");
@@ -3251,30 +3244,23 @@ ConsoleMethod( WorldEditor, getSelectedObject, S32, 3, 3, "(int index)")
    return(object->getSelectObject(index));
 }
 
-ConsoleMethod( WorldEditor, getSelectionRadius, F32, 2, 2, "")
+DefineConsoleMethod( WorldEditor, getSelectionRadius, F32, (), , "")
 {
 	return object->getSelectionRadius();
 }
 
-ConsoleMethod( WorldEditor, getSelectionCentroid, const char *, 2, 2, "")
+DefineConsoleMethod( WorldEditor, getSelectionCentroid, const char *, (), , "")
 {
 	return object->getSelectionCentroidText();
 }
 
-ConsoleMethod( WorldEditor, getSelectionExtent, const char *, 2, 2, "")
+DefineConsoleMethod( WorldEditor, getSelectionExtent, Point3F, (), , "")
 {
-   Point3F bounds = object->getSelectionExtent();
-   static const U32 bufSize = 100;
-   char * ret = Con::getReturnBuffer(bufSize);
-   dSprintf(ret, bufSize, "%g %g %g", bounds.x, bounds.y, bounds.z);
-   return ret;	
+   return object->getSelectionExtent();
 }
 
-ConsoleMethod( WorldEditor, dropSelection, void, 2, 3, "( bool skipUndo = false )")
+DefineConsoleMethod( WorldEditor, dropSelection, void, ( bool skipUndo ), (false), "( bool skipUndo = false )")
 {
-   bool skipUndo = false;
-   if ( argc > 2 )
-      skipUndo = dAtob( argv[2] );
 
 	object->dropCurrentSelection( skipUndo );
 }
@@ -3289,17 +3275,17 @@ void WorldEditor::copyCurrentSelection()
 	copySelection(mSelected);	
 }
 
-ConsoleMethod( WorldEditor, cutSelection, void, 2, 2, "")
+DefineConsoleMethod( WorldEditor, cutSelection, void, (),, "")
 {
    object->cutCurrentSelection();
 }
 
-ConsoleMethod( WorldEditor, copySelection, void, 2, 2, "")
+DefineConsoleMethod( WorldEditor, copySelection, void, (),, "")
 {
    object->copyCurrentSelection();
 }
 
-ConsoleMethod( WorldEditor, pasteSelection, void, 2, 2, "")
+DefineConsoleMethod( WorldEditor, pasteSelection, void, (),, "")
 {
    object->pasteSelection();
 }
@@ -3309,88 +3295,86 @@ bool WorldEditor::canPasteSelection()
 	return mCopyBuffer.empty() != true;
 }
 
-ConsoleMethod( WorldEditor, canPasteSelection, bool, 2, 2, "")
+DefineConsoleMethod( WorldEditor, canPasteSelection, bool, (),, "")
 {
 	return object->canPasteSelection();
 }
 
-ConsoleMethod( WorldEditor, hideObject, void, 4, 4, "(Object obj, bool hide)")
+DefineConsoleMethod( WorldEditor, hideObject, void, (SceneObject *obj, bool hide), , "(Object obj, bool hide)")
 {
-   SceneObject *obj;
-   if ( !Sim::findObject( argv[2], obj ) )
-      return;
 
-   object->hideObject(obj, dAtob(argv[3]));
+	if (obj)
+   object->hideObject(obj, hide);
 }
 
-ConsoleMethod( WorldEditor, hideSelection, void, 3, 3, "(bool hide)")
+DefineConsoleMethod( WorldEditor, hideSelection, void, (bool hide), , "(bool hide)")
 {
-   object->hideSelection(dAtob(argv[2]));
+   object->hideSelection(hide);
 }
 
-ConsoleMethod( WorldEditor, lockSelection, void, 3, 3, "(bool lock)")
+DefineConsoleMethod( WorldEditor, lockSelection, void, (bool lock), , "(bool lock)")
 {
-   object->lockSelection(dAtob(argv[2]));
+   object->lockSelection(lock);
 }
 
-ConsoleMethod( WorldEditor, alignByBounds, void, 3, 3, "(int boundsAxis)"
+DefineConsoleMethod( WorldEditor, alignByBounds, void, (S32 boundsAxis), , "(int boundsAxis)"
               "Align all selected objects against the given bounds axis.")
 {
-	if(!object->alignByBounds(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", argv[2]));
+	if(!object->alignByBounds(boundsAxis))
+		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", boundsAxis));
 }
 
-ConsoleMethod( WorldEditor, alignByAxis, void, 3, 3, "(int axis)"
+DefineConsoleMethod( WorldEditor, alignByAxis, void, (S32 boundsAxis), , "(int axis)"
               "Align all selected objects along the given axis.")
 {
-	if(!object->alignByAxis(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", argv[2]));
+	if(!object->alignByAxis(boundsAxis))
+		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", boundsAxis));
 }
 
-ConsoleMethod( WorldEditor, resetSelectedRotation, void, 2, 2, "")
+DefineConsoleMethod( WorldEditor, resetSelectedRotation, void, (),, "")
 {
 	object->resetSelectedRotation();
 }
 
-ConsoleMethod( WorldEditor, resetSelectedScale, void, 2, 2, "")
+DefineConsoleMethod( WorldEditor, resetSelectedScale, void, (),, "")
 {
 	object->resetSelectedScale();
 }
 
-ConsoleMethod( WorldEditor, redirectConsole, void, 3, 3, "( int objID )")
+DefineConsoleMethod( WorldEditor, redirectConsole, void, (S32 objID), , "( int objID )")
 {
-   object->redirectConsole(dAtoi(argv[2]));
+   object->redirectConsole(objID);
 }
 
-ConsoleMethod( WorldEditor, addUndoState, void, 2, 2, "")
+DefineConsoleMethod( WorldEditor, addUndoState, void, (),, "")
 {
 	object->addUndoState();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditor, getSoftSnap, bool, 2, 2, "getSoftSnap()\n"
+DefineConsoleMethod( WorldEditor, getSoftSnap, bool, (),, "getSoftSnap()\n"
               "Is soft snapping always on?")
 {
 	return object->mSoftSnap;
 }
 
-ConsoleMethod( WorldEditor, setSoftSnap, void, 3, 3, "setSoftSnap(bool)\n"
+DefineConsoleMethod( WorldEditor, setSoftSnap, void, (bool enable), , "setSoftSnap(bool)\n"
               "Allow soft snapping all of the time.")
 {
-	object->mSoftSnap = dAtob(argv[2]);
+	object->mSoftSnap = enable;
 }
 
-ConsoleMethod( WorldEditor, getSoftSnapSize, F32, 2, 2, "getSoftSnapSize()\n"
+DefineConsoleMethod( WorldEditor, getSoftSnapSize, F32, (),, "getSoftSnapSize()\n"
               "Get the absolute size to trigger a soft snap.")
 {
 	return object->mSoftSnapSize;
 }
 
-ConsoleMethod( WorldEditor, setSoftSnapSize, void, 3, 3, "setSoftSnapSize(F32)\n"
+DefineConsoleMethod( WorldEditor, setSoftSnapSize, void, (F32 size), , "setSoftSnapSize(F32)\n"
               "Set the absolute size to trigger a soft snap.")
 {
-	object->mSoftSnapSize = dAtof(argv[2]);
+	object->mSoftSnapSize = size;
 }
 
 DefineEngineMethod( WorldEditor, getSoftSnapAlignment, WorldEditor::AlignmentType, (),,
@@ -3405,40 +3389,40 @@ DefineEngineMethod( WorldEditor, setSoftSnapAlignment, void, ( WorldEditor::Alig
    object->mSoftSnapAlignment = type;
 }
 
-ConsoleMethod( WorldEditor, softSnapSizeByBounds, void, 3, 3, "softSnapSizeByBounds(bool)\n"
+DefineConsoleMethod( WorldEditor, softSnapSizeByBounds, void, (bool enable), , "softSnapSizeByBounds(bool)\n"
               "Use selection bounds size as soft snap bounds.")
 {
-	object->mSoftSnapSizeByBounds = dAtob(argv[2]);
+	object->mSoftSnapSizeByBounds = enable;
 }
 
-ConsoleMethod( WorldEditor, getSoftSnapBackfaceTolerance, F32, 2, 2, "getSoftSnapBackfaceTolerance()\n"
+DefineConsoleMethod( WorldEditor, getSoftSnapBackfaceTolerance, F32, (), , "getSoftSnapBackfaceTolerance()\n"
               "The fraction of the soft snap radius that backfaces may be included.")
 {
 	return object->mSoftSnapBackfaceTolerance;
 }
 
-ConsoleMethod( WorldEditor, setSoftSnapBackfaceTolerance, void, 3, 3, "setSoftSnapBackfaceTolerance(F32 with range of 0..1)\n"
+DefineConsoleMethod( WorldEditor, setSoftSnapBackfaceTolerance, void, (F32 range), , "setSoftSnapBackfaceTolerance(F32 with range of 0..1)\n"
               "The fraction of the soft snap radius that backfaces may be included.")
 {
-	object->mSoftSnapBackfaceTolerance = dAtof(argv[2]);
+	object->mSoftSnapBackfaceTolerance = range;
 }
 
-ConsoleMethod( WorldEditor, softSnapRender, void, 3, 3, "softSnapRender(bool)\n"
+DefineConsoleMethod( WorldEditor, softSnapRender, void, (bool enable), , "softSnapRender(bool)\n"
               "Render the soft snapping bounds.")
 {
-	object->mSoftSnapRender = dAtob(argv[2]);
+	object->mSoftSnapRender = enable;
 }
 
-ConsoleMethod( WorldEditor, softSnapRenderTriangle, void, 3, 3, "softSnapRenderTriangle(bool)\n"
+DefineConsoleMethod( WorldEditor, softSnapRenderTriangle, void, (bool enable), , "softSnapRenderTriangle(bool)\n"
               "Render the soft snapped triangle.")
 {
-	object->mSoftSnapRenderTriangle = dAtob(argv[2]);
+	object->mSoftSnapRenderTriangle = enable;
 }
 
-ConsoleMethod( WorldEditor, softSnapDebugRender, void, 3, 3, "softSnapDebugRender(bool)\n"
+DefineConsoleMethod( WorldEditor, softSnapDebugRender, void, (bool enable), , "softSnapDebugRender(bool)\n"
               "Toggle soft snapping debug rendering.")
 {
-	object->mSoftSnapDebugRender = dAtob(argv[2]);
+	object->mSoftSnapDebugRender = enable;
 }
 
 DefineEngineMethod( WorldEditor, getTerrainSnapAlignment, WorldEditor::AlignmentType, (),,
@@ -3453,27 +3437,22 @@ DefineEngineMethod( WorldEditor, setTerrainSnapAlignment, void, ( WorldEditor::A
    object->mTerrainSnapAlignment = alignment;
 }
 
-ConsoleMethod( WorldEditor, transformSelection, void, 13, 13, "transformSelection(...)\n"
+DefineConsoleMethod( WorldEditor, transformSelection, void, 
+                   ( bool position,
+                     Point3F point,
+                     bool relativePos,
+                     bool rotate,
+                     Point3F rotation,
+                     bool relativeRot,
+                     bool rotLocal,
+                     S32 scaleType,
+                     Point3F scale,
+                     bool sRelative,
+                     bool sLocal ), ,
+              "transformSelection(...)\n"
               "Transform selection by given parameters.")
 {
-   bool position = dAtob(argv[2]);
-   Point3F p(0.0f, 0.0f, 0.0f);
-   dSscanf(argv[3], "%g %g %g", &p.x, &p.y, &p.z);
-   bool relativePos = dAtob(argv[4]);
-
-   bool rotate = dAtob(argv[5]);
-   EulerF r(0.0f, 0.0f, 0.0f);
-   dSscanf(argv[6], "%g %g %g", &r.x, &r.y, &r.z);
-   bool relativeRot = dAtob(argv[7]);
-   bool rotLocal = dAtob(argv[8]);
-
-   S32 scaleType = dAtoi(argv[9]);
-   Point3F s(1.0f, 1.0f, 1.0f);
-   dSscanf(argv[10], "%g %g %g", &s.x, &s.y, &s.z);
-   bool sRelative = dAtob(argv[11]);
-   bool sLocal = dAtob(argv[12]);
-
-   object->transformSelection(position, p, relativePos, rotate, r, relativeRot, rotLocal, scaleType, s, sRelative, sLocal);
+   object->transformSelection(position, point, relativePos, rotate, rotation, relativeRot, rotLocal, scaleType, scale, sRelative, sLocal);
 }
 
 #include "core/strings/stringUnit.h"
@@ -3546,10 +3525,10 @@ void WorldEditor::colladaExportSelection( const String &path )
 #endif
 }
 
-ConsoleMethod( WorldEditor, colladaExportSelection, void, 3, 3, 
+DefineConsoleMethod( WorldEditor, colladaExportSelection, void, (const char * path), , 
               "( String path ) - Export the combined geometry of all selected objects to the specified path in collada format." )
 {  
-   object->colladaExportSelection( argv[2] );
+   object->colladaExportSelection( path );
 }
 
 void WorldEditor::makeSelectionPrefab( const char *filename )
@@ -3700,25 +3679,20 @@ void WorldEditor::explodeSelectedPrefab()
    setDirty();
 }
 
-ConsoleMethod( WorldEditor, makeSelectionPrefab, void, 3, 3, "( string filename ) - Save selected objects to a .prefab file and replace them in the level with a Prefab object." )
+DefineConsoleMethod( WorldEditor, makeSelectionPrefab, void, ( const char * filename ), , "( string filename ) - Save selected objects to a .prefab file and replace them in the level with a Prefab object." )
 {
-   object->makeSelectionPrefab( argv[2] );
+   object->makeSelectionPrefab( filename );
 }
 
-ConsoleMethod( WorldEditor, explodeSelectedPrefab, void, 2, 2, "() - Replace selected Prefab objects with a SimGroup containing all children objects defined in the .prefab." )
+DefineConsoleMethod( WorldEditor, explodeSelectedPrefab, void, (),, "() - Replace selected Prefab objects with a SimGroup containing all children objects defined in the .prefab." )
 {
    object->explodeSelectedPrefab();
 }
 
-ConsoleMethod( WorldEditor, mountRelative, void, 4, 4, "( Object A, Object B )" )
+DefineConsoleMethod( WorldEditor, mountRelative, void, ( SceneObject *objA, SceneObject *objB ), , "( Object A, Object B )" )
 {
-   SceneObject *objA;
-   if ( !Sim::findObject( argv[2], objA ) )
-      return;
-
-   SceneObject *objB;
-   if ( !Sim::findObject( argv[3], objB ) )
-      return;
+	if (!objA || !objB)
+		return;
 
    MatrixF xfm = objB->getTransform();   
    MatrixF mat = objA->getWorldTransform();

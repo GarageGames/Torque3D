@@ -145,6 +145,7 @@ ParticleEmitterData::ParticleEmitterData()
    blendStyle = ParticleRenderInst::BlendUndefined;
    sortParticles = false;
    renderReflection = true;
+   glow = false;
    reverseOrder = false;
    textureName = 0;
    textureHandle = 0;
@@ -289,6 +290,9 @@ void ParticleEmitterData::initPersistFields()
       addField( "renderReflection", TYPEID< bool >(), Offset(renderReflection, ParticleEmitterData),
          "Controls whether particles are rendered onto reflective surfaces like water." );
 
+      addField("glow", TYPEID< bool >(), Offset(glow, ParticleEmitterData),
+         "If true, the particles are rendered to the glow buffer as well.");
+
       //@}
 
    endGroup( "ParticleEmitterData" );
@@ -356,6 +360,7 @@ void ParticleEmitterData::packData(BitStream* stream)
    }
    stream->writeFlag(highResOnly);
    stream->writeFlag(renderReflection);
+   stream->writeFlag(glow);
    stream->writeInt( blendStyle, 4 );
 }
 
@@ -418,6 +423,7 @@ void ParticleEmitterData::unpackData(BitStream* stream)
    }
    highResOnly = stream->readFlag();
    renderReflection = stream->readFlag();
+   glow = stream->readFlag();
    blendStyle = stream->readInt( 4 );
 }
 
@@ -909,6 +915,8 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
 
    ri->blendStyle = mDataBlock->blendStyle;
 
+   ri->glow = mDataBlock->glow;
+
    // use first particle's texture unless there is an emitter texture to override it
    if (mDataBlock->textureHandle)
      ri->diffuseTex = &*(mDataBlock->textureHandle);
@@ -918,7 +926,7 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
    ri->softnessDistance = mDataBlock->softnessDistance; 
 
    // Sort by texture too.
-   ri->defaultKey = ri->diffuseTex ? (U32)ri->diffuseTex : (U32)ri->vertBuff;
+   ri->defaultKey = ri->diffuseTex ? (uintptr_t)ri->diffuseTex : (uintptr_t)ri->vertBuff;
 
    renderManager->addInst( ri );
 
@@ -1825,22 +1833,22 @@ void ParticleEmitter::setupOriented( Particle *part,
    lVerts->point = start + crossDir;
    lVerts->color = partCol;
    // Here and below, we copy UVs from particle datablock's texCoords (oriented)
-   lVerts->texCoord = part->dataBlock->texCoords[0];
+   lVerts->texCoord = part->dataBlock->texCoords[1];
    ++lVerts;
 
    lVerts->point = start - crossDir;
    lVerts->color = partCol;
-   lVerts->texCoord = part->dataBlock->texCoords[1];
+   lVerts->texCoord = part->dataBlock->texCoords[2];
    ++lVerts;
 
    lVerts->point = end - crossDir;
    lVerts->color = partCol;
-   lVerts->texCoord = part->dataBlock->texCoords[2];
+   lVerts->texCoord = part->dataBlock->texCoords[3];
    ++lVerts;
 
    lVerts->point = end + crossDir;
    lVerts->color = partCol;
-   lVerts->texCoord = part->dataBlock->texCoords[3];
+   lVerts->texCoord = part->dataBlock->texCoords[0];
    ++lVerts;
 }
 

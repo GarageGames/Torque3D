@@ -150,7 +150,7 @@ public:
 
    static void initPersistFields();
 
-   virtual bool processArguments(S32 argc, const char **argv);
+   virtual bool processArguments(S32 argc, ConsoleValueRef *argv);
    
    bool isEnabled() const { return mEnabled; }
    

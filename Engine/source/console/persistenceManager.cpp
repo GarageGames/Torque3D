@@ -23,6 +23,7 @@
 #include "persistenceManager.h"
 #include "console/simSet.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "core/stream/fileStream.h"
 #include "gui/core/guiTypes.h"
 #include "materials/customMaterialDefinition.h"
@@ -2189,52 +2190,51 @@ void PersistenceManager::deleteObjectsFromFile(const char* fileName)
    clearAll();
 }
 
-ConsoleMethod( PersistenceManager, deleteObjectsFromFile, void, 3, 3, "( fileName )"
+DefineConsoleMethod( PersistenceManager, deleteObjectsFromFile, void, ( const char * fileName ), , "( fileName )"
               "Delete all of the objects that are created from the given file." )
 {
    // Delete Objects.
-   object->deleteObjectsFromFile( argv[2] );
+   object->deleteObjectsFromFile( fileName );
 }
 
-ConsoleMethod( PersistenceManager, setDirty, void, 3, 4, "(SimObject object, [filename])"
+DefineConsoleMethod( PersistenceManager, setDirty, void,  ( const char * objName, const char * fileName ), (""), "(SimObject object, [filename])"
               "Mark an existing SimObject as dirty (will be written out when saveDirty() is called).")
 {
    SimObject *dirtyObject = NULL;
-   if (argv[2][0])
+   if (dStrcmp(objName,"") != 0)
    {
-      if (!Sim::findObject(argv[2], dirtyObject))
+      if (!Sim::findObject(objName, dirtyObject))
       {
-         Con::printf("%s(): Invalid SimObject: %s", argv[0], argv[2]);
+         Con::printf("PersistenceManager::setDirty(): Invalid SimObject: %s", objName);
          return;
       }
    }
    
    // Prevent ourselves from shooting us in the foot.
-   
    if( dirtyObject == Sim::getRootGroup() )
    {
-      Con::errorf( "%s(): Cannot save RootGroup", argv[ 0 ] );
+      Con::errorf( "PersistenceManager::setDirty(): Cannot save RootGroup" );
       return;
    }
 
    if (dirtyObject)
    {
-      if (argc == 4 && argv[3][0])
-         object->setDirty(dirtyObject, argv[3]);
+      if (dStrcmp( fileName,"")!=0)
+         object->setDirty(dirtyObject, fileName);
       else
          object->setDirty(dirtyObject);
    }
 }
 
-ConsoleMethod( PersistenceManager, removeDirty, void, 3, 3, "(SimObject object)"
+DefineConsoleMethod( PersistenceManager, removeDirty, void, ( const char * objName ), , "(SimObject object)"
               "Remove a SimObject from the dirty list.")
 {
    SimObject *dirtyObject = NULL;
-   if (argv[2][0])
+	if (dStrcmp(  objName,"")!=0)
    {
-      if (!Sim::findObject(argv[2], dirtyObject))
+      if (!Sim::findObject(objName, dirtyObject))
       {
-         Con::printf("%s(): Invalid SimObject: %s", argv[0], argv[2]);
+         Con::printf("PersistenceManager::removeDirty(): Invalid SimObject: %s", objName);
          return;
       }
    }
@@ -2243,15 +2243,15 @@ ConsoleMethod( PersistenceManager, removeDirty, void, 3, 3, "(SimObject object)"
       object->removeDirty(dirtyObject);
 }
 
-ConsoleMethod( PersistenceManager, isDirty, bool, 3, 3, "(SimObject object)"
+DefineConsoleMethod( PersistenceManager, isDirty, bool, ( const char * objName ), , "(SimObject object)"
               "Returns true if the SimObject is on the dirty list.")
 {
    SimObject *dirtyObject = NULL;
-   if (argv[2][0])
+   if (dStrcmp ( objName,"")!=0)
    {
-      if (!Sim::findObject(argv[2], dirtyObject))
+      if (!Sim::findObject(objName, dirtyObject))
       {
-         Con::printf("%s(): Invalid SimObject: %s", argv[0], argv[2]);
+         Con::printf("PersistenceManager::isDirty(): Invalid SimObject: %s", objName);
          return false;
       }
    }
@@ -2262,25 +2262,24 @@ ConsoleMethod( PersistenceManager, isDirty, bool, 3, 3, "(SimObject object)"
    return false;
 }
 
-ConsoleMethod( PersistenceManager, hasDirty, bool, 2, 2, "()"
+DefineConsoleMethod( PersistenceManager, hasDirty, bool, (), , "()"
               "Returns true if the manager has dirty objects to save." )
 {
    return object->hasDirty();
 }
 
-ConsoleMethod( PersistenceManager, getDirtyObjectCount, S32, 2, 2, "()"
+DefineConsoleMethod( PersistenceManager, getDirtyObjectCount, S32, (), , "()"
               "Returns the number of dirty objects." )
 {
    return object->getDirtyList().size();
 }
 
-ConsoleMethod( PersistenceManager, getDirtyObject, S32, 3, 3, "( index )"
+DefineConsoleMethod( PersistenceManager, getDirtyObject, S32, (S32 index), , "( index )"
               "Returns the ith dirty object." )
 {
-   const S32 index = dAtoi( argv[2] );
    if ( index < 0 || index >= object->getDirtyList().size() )
    {
-      Con::warnf( "PersistenceManager::getDirtyObject() - Index (%s) out of range.", argv[2] );
+      Con::warnf( "PersistenceManager::getDirtyObject() - Index (%s) out of range.", index );
       return 0;
    }
 
@@ -2291,7 +2290,7 @@ ConsoleMethod( PersistenceManager, getDirtyObject, S32, 3, 3, "( index )"
    return ( dirtyObject.getObject() ) ? dirtyObject.getObject()->getId() : 0;
 }
 
-ConsoleMethod( PersistenceManager, listDirty, void, 2, 2, "()"
+DefineConsoleMethod( PersistenceManager, listDirty, void, (), , "()"
               "Prints the dirty list to the console.")
 {
    const PersistenceManager::DirtyList dirtyList = object->getDirtyList();
@@ -2319,21 +2318,21 @@ ConsoleMethod( PersistenceManager, listDirty, void, 2, 2, "()"
    }
 }
 
-ConsoleMethod( PersistenceManager, saveDirty, bool, 2, 2, "()"
+DefineConsoleMethod( PersistenceManager, saveDirty, bool, (), , "()"
               "Saves all of the SimObject's on the dirty list to their respective files.")
 {
    return object->saveDirty();
 }
 
-ConsoleMethod( PersistenceManager, saveDirtyObject, bool, 3, 3, "(SimObject object)"
+DefineConsoleMethod( PersistenceManager, saveDirtyObject, bool, (const char * objName), , "(SimObject object)"
               "Save a dirty SimObject to it's file.")
 {
    SimObject *dirtyObject = NULL;
-   if (argv[2][0])
+   if (dStrcmp (  objName, "")!=0)
    {
-      if (!Sim::findObject(argv[2], dirtyObject))
+      if (!Sim::findObject(objName, dirtyObject))
       {
-         Con::printf("%s(): Invalid SimObject: %s", argv[0], argv[2]);
+         Con::printf("%s(): Invalid SimObject: %s", object->getName(), objName);
          return false;
       }
    }
@@ -2343,51 +2342,51 @@ ConsoleMethod( PersistenceManager, saveDirtyObject, bool, 3, 3, "(SimObject obje
    return false;
 }
 
-ConsoleMethod( PersistenceManager, clearAll, void, 2, 2, "()"
+DefineConsoleMethod( PersistenceManager, clearAll, void, (), , "()"
               "Clears all the tracked objects without saving them." )
 {
    object->clearAll();
 }
 
-ConsoleMethod( PersistenceManager, removeObjectFromFile, void, 3, 4, "(SimObject object, [filename])"
+DefineConsoleMethod( PersistenceManager, removeObjectFromFile, void, (const char * objName, const char * filename),("") , "(SimObject object, [filename])"
               "Remove an existing SimObject from a file (can optionally specify a different file than \
                the one it was created in.")
 {
    SimObject *dirtyObject = NULL;
-   if (argv[2][0])
+   if (dStrcmp ( objName , "")!=0)
    {
-      if (!Sim::findObject(argv[2], dirtyObject))
+      if (!Sim::findObject(objName, dirtyObject))
       {
-         Con::printf("%s(): Invalid SimObject: %s", argv[0], argv[2]);
+         Con::printf("PersistenceManager::removeObjectFromFile(): Invalid SimObject: %s", objName);
          return;
       }
    }
 
    if (dirtyObject)
    {
-      if (argc == 4 && argv[3][0])
-         object->removeObjectFromFile(dirtyObject, argv[3]);
+      if (dStrcmp( filename,"")!=0)
+         object->removeObjectFromFile(dirtyObject, filename);
       else
          object->removeObjectFromFile(dirtyObject);
    }
 }
 
-ConsoleMethod( PersistenceManager, removeField, void, 4, 4, "(SimObject object, string fieldName)"
+DefineConsoleMethod( PersistenceManager, removeField, void, (const char * objName, const char * fieldName), , "(SimObject object, string fieldName)"
               "Remove a specific field from an object declaration.")
 {
    SimObject *dirtyObject = NULL;
-   if (argv[2][0])
+   if (dStrcmp(objName,"")!=0)
    {
-      if (!Sim::findObject(argv[2], dirtyObject))
+      if (!Sim::findObject(objName, dirtyObject))
       {
-         Con::printf("%s(): Invalid SimObject: %s", argv[0], argv[2]);
+         Con::printf("PersistenceManager::removeField(): Invalid SimObject: %s", objName);
          return;
       }
    }
 
    if (dirtyObject)
    {
-      if (argv[3][0])
-         object->addRemoveField(dirtyObject, argv[3]);
+      if (dStrcmp(fieldName,"") != 0)
+         object->addRemoveField(dirtyObject, fieldName);
    }
 }

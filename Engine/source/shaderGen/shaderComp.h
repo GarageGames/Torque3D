@@ -43,7 +43,8 @@ class ShaderComponent
 public:
    virtual ~ShaderComponent() {}
    
-   virtual void print( Stream &stream ){};
+   virtual void print( Stream &stream, bool isVerterShader ){};
+   virtual void printOnMain( Stream &stream, bool isVerterShader ){};
 };
 
 
@@ -86,7 +87,7 @@ public:
    virtual void reset() = 0;
    virtual void sortVars() = 0;
 
-   virtual void print( Stream &stream ) = 0;
+   virtual void print( Stream &stream, bool isVerterShader ) = 0;
 };
 
 /// This is to provide common functionalty needed by vertex and pixel main defs

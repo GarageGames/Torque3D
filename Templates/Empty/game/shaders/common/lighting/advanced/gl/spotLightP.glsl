@@ -63,6 +63,8 @@ uniform mat4 viewToLightProj;
 uniform vec4 lightParams;
 uniform float shadowSoftness;
 
+out vec4 OUT_col;
+
 void main()
 {   
    // Compute scene UV
@@ -162,5 +164,5 @@ void main()
       addToResult = ( 1.0 - shadowed ) * abs(lightMapParams);
    }
 
-   OUT_FragColor0 = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );
+   OUT_col = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );
 }

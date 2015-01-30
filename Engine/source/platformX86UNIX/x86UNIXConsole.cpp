@@ -113,6 +113,11 @@ void StdConsole::enable(bool enabled)
    }
 }
 
+void StdConsole::enableInput( bool enabled )
+{
+    stdConsoleInputEnabled = enabled;
+}
+
 bool StdConsole::isEnabled()
 {
    if ( stdConsole )
@@ -137,6 +142,7 @@ StdConsole::StdConsole()
 
    iCmdIndex = 0;
    stdConsoleEnabled = false;
+   stdConsoleInputEnabled = false;
    Con::addConsumer(stdConsoleConsumer);
    inpos = 0;
    lineOutput = false;
@@ -231,6 +237,10 @@ void StdConsole::process()
 
       numEvents = read(stdIn, typedData, 64);     
       if (numEvents == -1) 
+         return;
+
+      // TODO LINUX, when debug in qtCreator some times we get false console inputs.
+      if( !stdConsoleInputEnabled )
          return;
 
       typedData[numEvents] = '\0';

@@ -123,7 +123,7 @@ SimObject::~SimObject()
 
 //-----------------------------------------------------------------------------
 
-bool SimObject::processArguments(S32 argc, const char**argv)
+bool SimObject::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    return argc == 0;
 }
@@ -1599,8 +1599,7 @@ void SimObject::unlinkNamespaces()
 
    // Handle object name.
 
-   StringTableEntry objectName = getName();
-   if( objectName && objectName[ 0 ] )
+   if (mNameSpace && mNameSpace->mClassRep == NULL)
       mNameSpace->decRefCountToParent();
 
    mNameSpace = NULL;
@@ -1833,7 +1832,7 @@ void SimObject::inspectPostApply()
 
 //-----------------------------------------------------------------------------
 
-String SimObject::_getLogMessage(const char* fmt, void* args) const
+String SimObject::_getLogMessage(const char* fmt, va_list args) const
 {
    String objClass = "UnknownClass";
    if(getClassRep())

@@ -24,23 +24,40 @@
 #include "gfx/gl/gfxGLPrimitiveBuffer.h"
 #include "gfx/gl/gfxGLEnumTranslate.h"
 
-#include "gfx/gl/ggl/ggl.h"
+#include "gfx/gl/tGL/tGL.h"
 #include "gfx/gl/gfxGLUtils.h"
 
-GFXGLPrimitiveBuffer::GFXGLPrimitiveBuffer(GFXDevice *device, U32 indexCount, U32 primitiveCount, GFXBufferType bufferType) :
-GFXPrimitiveBuffer(device, indexCount, primitiveCount, bufferType), mZombieCache(NULL) 
+#include "gfx/gl/gfxGLCircularVolatileBuffer.h"
+
+GLCircularVolatileBuffer* getCircularVolatileIndexBuffer()
 {
+   static GLCircularVolatileBuffer sCircularVolatileIndexBuffer(GL_ELEMENT_ARRAY_BUFFER);
+   return &sCircularVolatileIndexBuffer;
+}
+
+GFXGLPrimitiveBuffer::GFXGLPrimitiveBuffer(GFXDevice *device, U32 indexCount, U32 primitiveCount, GFXBufferType bufferType) :
+   GFXPrimitiveBuffer(device, indexCount, primitiveCount, bufferType), mZombieCache(NULL),
+   mBufferOffset(0)
+{
+   if( mBufferType == GFXBufferTypeVolatile )
+   {
+      mBuffer = getCircularVolatileIndexBuffer()->getHandle();
+      return;
+   }
+
+   // Generate a buffer and allocate the needed memory
+   glGenBuffers(1, &mBuffer);
+   
    PRESERVE_INDEX_BUFFER();
-	// Generate a buffer and allocate the needed memory
-	glGenBuffers(1, &mBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(U16), NULL, GFXGLBufferType[bufferType]);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
+   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(U16), NULL, GFXGLBufferType[bufferType]);   
 }
 
 GFXGLPrimitiveBuffer::~GFXGLPrimitiveBuffer()
 {
 	// This is heavy handed, but it frees the buffer memory
-	glDeleteBuffersARB(1, &mBuffer);
+   if( mBufferType != GFXBufferTypeVolatile )
+	   glDeleteBuffers(1, &mBuffer);
    
    if( mZombieCache )
       delete [] mZombieCache;
@@ -48,44 +65,72 @@ GFXGLPrimitiveBuffer::~GFXGLPrimitiveBuffer()
 
 void GFXGLPrimitiveBuffer::lock(U32 indexStart, U32 indexEnd, void **indexPtr)
 {
-	// Preserve previous binding
-   PRESERVE_INDEX_BUFFER();
-   
-   // Bind ourselves and map
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
-   glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexCount * sizeof(U16), NULL, GFXGLBufferType[mBufferType]);
-   
-   // Offset the buffer to indexStart
-	*indexPtr = (void*)((U8*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY) + (indexStart * sizeof(U16)));
+   if( mBufferType == GFXBufferTypeVolatile )
+   {
+      AssertFatal(indexStart == 0, "");
+      getCircularVolatileIndexBuffer()->lock( mIndexCount * sizeof(U16), 0, mBufferOffset, *indexPtr );
+   }
+   else
+   {
+      mFrameAllocator.lock( mIndexCount * sizeof(U16) );
+
+      *indexPtr = (void*)(mFrameAllocator.getlockedPtr() + (indexStart * sizeof(U16)) );
+   }
+
+   lockedIndexStart = indexStart;
+   lockedIndexEnd = indexEnd;
 }
 
 void GFXGLPrimitiveBuffer::unlock()
 {
-	// Preserve previous binding
-   PRESERVE_INDEX_BUFFER();
+   PROFILE_SCOPE(GFXGLPrimitiveBuffer_unlock);
+
+   if( mBufferType == GFXBufferTypeVolatile )
+   {
+      getCircularVolatileIndexBuffer()->unlock();
+   }
+   else
+   {   
+      U32 offset = lockedIndexStart * sizeof(U16);
+      U32 length = (lockedIndexEnd - lockedIndexStart) * sizeof(U16);
    
-   // Bind ourselves and unmap
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
-	bool res = glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-   AssertFatal(res, "GFXGLPrimitiveBuffer::unlock - shouldn't fail!");
+      // Preserve previous binding
+      PRESERVE_INDEX_BUFFER();
+   
+      // Bind ourselves
+      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
+
+      if( !lockedIndexStart && lockedIndexEnd == mIndexCount)
+         glBufferData(GL_ELEMENT_ARRAY_BUFFER, mIndexCount * sizeof(U16), NULL, GFXGLBufferType[mBufferType]); // orphan the buffer
+
+      glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, offset, length, mFrameAllocator.getlockedPtr() + offset );
+   
+      mFrameAllocator.unlock();
+   }
+
+   lockedIndexStart = 0;
+   lockedIndexEnd = 0;
 }
 
 void GFXGLPrimitiveBuffer::prepare()
 {
 	// Bind
-	static_cast<GFXGLDevice*>(mDevice)->setPB(this);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
+   GFXGLDevice* glDevice = static_cast<GFXGLDevice*>(mDevice);
+   glDevice->setPB(this);
+   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
+   glDevice->getOpenglCache()->setCacheBinded(GL_ELEMENT_ARRAY_BUFFER, mBuffer);
 }
 
 void GFXGLPrimitiveBuffer::finish()
 {
    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+   static_cast<GFXGLDevice*>(mDevice)->getOpenglCache()->setCacheBinded(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 GLvoid* GFXGLPrimitiveBuffer::getBuffer()
 {
 	// NULL specifies no offset into the hardware buffer
-	return (GLvoid*)NULL;
+   return (GLvoid*)mBufferOffset;
 }
 
 void GFXGLPrimitiveBuffer::zombify()
@@ -114,3 +159,29 @@ void GFXGLPrimitiveBuffer::resurrect()
    delete[] mZombieCache;
    mZombieCache = NULL;
 }
+
+namespace
+{
+   bool onGFXDeviceSignal( GFXDevice::GFXDeviceEventType type )
+   {
+      if( GFX->getAdapterType() == OpenGL && GFXDevice::deEndOfFrame == type )
+         getCircularVolatileIndexBuffer()->protectUsedRange();
+
+      return true;
+   }
+}
+
+MODULE_BEGIN( GFX_GL_PrimitiveBuffer )
+   MODULE_INIT_AFTER( gfx )
+   MODULE_SHUTDOWN_BEFORE( gfx )
+
+   MODULE_INIT
+   {
+      GFXDevice::getDeviceEventSignal( ).notify( &onGFXDeviceSignal );
+   }
+
+   MODULE_SHUTDOWN
+   {
+      GFXDevice::getDeviceEventSignal( ).remove( &onGFXDeviceSignal );
+   }
+MODULE_END

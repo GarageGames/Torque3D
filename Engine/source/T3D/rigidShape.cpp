@@ -92,7 +92,7 @@ ConsoleDocClass( RigidShapeData,
    "@see RigidShape\n"
    "@see ShapeBase\n\n"
 
-   "@ingroup Platform\n"
+   "@ingroup Physics\n"
 );
 
 
@@ -149,7 +149,7 @@ ConsoleDocClass( RigidShape,
    "@see RigidShapeData\n"
    "@see ShapeBase\n\n"
    
-   "@ingroup Platform\n"
+   "@ingroup Physics\n"
 );
 
 

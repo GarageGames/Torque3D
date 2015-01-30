@@ -460,7 +460,7 @@ bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
 #endif
          success = str.open(defaultScriptName, Torque::FS::File::Read);
 
-#if defined( TORQUE_DEBUG ) && defined (TORQUE_TOOLS) && !defined( _XBOX )
+#if defined( TORQUE_DEBUG ) && defined (TORQUE_TOOLS) && !defined(TORQUE_DEDICATED) && !defined( _XBOX )
       if (!success)
       {
          OpenFileDialog ofd;
@@ -621,6 +621,11 @@ bool StandardMainLoop::doMainLoop()
    }
    
    return keepRunning;
+}
+
+S32 StandardMainLoop::getReturnStatus()
+{
+   return Process::getReturnStatus();
 }
 
 void StandardMainLoop::setRestart(bool restart )

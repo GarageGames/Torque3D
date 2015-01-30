@@ -80,7 +80,7 @@ public:
 
    enum
    {
-      NumTextures = 6,
+      NumTextures = 8,
    };
 
 protected:

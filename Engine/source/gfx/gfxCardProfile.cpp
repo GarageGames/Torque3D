@@ -53,7 +53,7 @@ void GFXCardProfiler::loadProfileScript(const char* aScriptName)
 
    Con::printf("      - Loaded card profile %s", scriptName.c_str());
 
-   Con::executef("eval", script);
+   Con::evaluate(script, false, NULL);
    delete[] script;
 }
 

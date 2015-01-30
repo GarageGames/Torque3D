@@ -55,6 +55,11 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
    mSpecularColorSC = shader->getShaderConstHandle(ShaderGenVars::specularColor);
    mSpecularPowerSC = shader->getShaderConstHandle(ShaderGenVars::specularPower);
    mSpecularStrengthSC = shader->getShaderConstHandle(ShaderGenVars::specularStrength);
+   mAccuScaleSC = shader->getShaderConstHandle("$accuScale");
+   mAccuDirectionSC = shader->getShaderConstHandle("$accuDirection");
+   mAccuStrengthSC = shader->getShaderConstHandle("$accuStrength");
+   mAccuCoverageSC = shader->getShaderConstHandle("$accuCoverage");
+   mAccuSpecularSC = shader->getShaderConstHandle("$accuSpecular");
    mParallaxInfoSC = shader->getShaderConstHandle("$parallaxInfo");
    mFogDataSC = shader->getShaderConstHandle(ShaderGenVars::fogData);
    mFogColorSC = shader->getShaderConstHandle(ShaderGenVars::fogColor);
@@ -221,6 +226,7 @@ bool ProcessedShaderMaterial::init( const FeatureSet &features,
          {
             rpd->mTexSlot[0].texTarget = texTarget;
             rpd->mTexType[0] = Material::TexTarget;
+            rpd->mSamplerNames[0] = "diffuseMap";
          }
       }
 
@@ -328,6 +334,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
    if (  features.hasFeature( MFT_UseInstancing ) &&
          mMaxStages == 1 &&
          !mMaterial->mGlow[0] &&
+         !mMaterial->mDynamicCubemap &&
          shaderVersion >= 3.0f )
       fd.features.addFeature( MFT_UseInstancing );
 
@@ -419,6 +426,34 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
       // the alpha channel.
       if( mStages[stageNum].getTex( MFT_SpecularMap )->mHasTransparency )
          fd.features.addFeature( MFT_GlossMap );
+   }
+
+   if ( mMaterial->mAccuEnabled[stageNum] )
+   {
+      fd.features.addFeature( MFT_AccuMap );
+      mHasAccumulation = true;
+   }
+
+   // we need both diffuse and normal maps + sm3 to have an accu map
+   if(   fd.features[ MFT_AccuMap ] && 
+       ( !fd.features[ MFT_DiffuseMap ] || 
+         !fd.features[ MFT_NormalMap ] ||
+         GFX->getPixelShaderVersion() < 3.0f ) ) {
+      AssertWarn(false, "SAHARA: Using an Accu Map requires SM 3.0 and a normal map.");
+      fd.features.removeFeature( MFT_AccuMap );
+      mHasAccumulation = false;
+   }
+
+   // if we still have the AccuMap feature, we add all accu constant features
+   if ( fd.features[ MFT_AccuMap ] ) {
+      // add the dependencies of the accu map
+      fd.features.addFeature( MFT_AccuScale );
+      fd.features.addFeature( MFT_AccuDirection );
+      fd.features.addFeature( MFT_AccuStrength );
+      fd.features.addFeature( MFT_AccuCoverage );
+      fd.features.addFeature( MFT_AccuSpecular );
+      // now remove some features that are not compatible with this
+      fd.features.removeFeature( MFT_UseInstancing );
    }
 
    // Without a base texture use the diffuse color
@@ -515,7 +550,22 @@ bool ProcessedShaderMaterial::_createPasses( MaterialFeatureData &stageFeatures,
 
       passData.mNumTexReg += numTexReg;
       passData.mFeatureData.features.addFeature( *info.type );
+
+#if defined(TORQUE_DEBUG) && defined( TORQUE_OPENGL)
+      U32 oldTexNumber = texIndex;
+#endif
+
       info.feature->setTexData( mStages[stageNum], stageFeatures, passData, texIndex );
+
+#if defined(TORQUE_DEBUG) && defined( TORQUE_OPENGL)
+      if(oldTexNumber != texIndex)
+      {
+         for(int i = oldTexNumber; i < texIndex; i++)
+         {
+            AssertFatal(passData.mSamplerNames[ oldTexNumber ].isNotEmpty(), avar( "ERROR: ShaderGen feature %s don't set used sampler name", info.feature->getName().c_str()) );
+         }
+      }
+#endif
 
       // Add pass if tex units are maxed out
       if( texIndex > GFX->getNumSamplers() )
@@ -525,6 +575,13 @@ bool ProcessedShaderMaterial::_createPasses( MaterialFeatureData &stageFeatures,
          _setPassBlendOp( info.feature, passData, texIndex, stageFeatures, stageNum, features );
       }
    }
+
+#if defined(TORQUE_DEBUG) && defined( TORQUE_OPENGL)
+   for(int i = 0; i < texIndex; i++)
+   {
+      AssertFatal(passData.mSamplerNames[ i ].isNotEmpty(),"");
+   }
+#endif
 
    const FeatureSet &passFeatures = passData.mFeatureData.codify();
    if ( passFeatures.isNotEmpty() )
@@ -586,9 +643,16 @@ bool ProcessedShaderMaterial::_addPass( ShaderRenderPassData &rpd,
    // Copy over features
    rpd.mFeatureData.materialFeatures = fd.features;
 
+   Vector<String> samplers;
+   samplers.setSize(Material::MAX_TEX_PER_PASS);
+   for(int i = 0; i < Material::MAX_TEX_PER_PASS; ++i)
+   {
+      samplers[i] = (rpd.mSamplerNames[i].isEmpty() || rpd.mSamplerNames[i][0] == '$') ? rpd.mSamplerNames[i] : "$" + rpd.mSamplerNames[i];
+   }
+
    // Generate shader
    GFXShader::setLogging( true, true );
-   rpd.shader = SHADERGEN->getShader( rpd.mFeatureData, mVertexFormat, &mUserMacros );
+   rpd.shader = SHADERGEN->getShader( rpd.mFeatureData, mVertexFormat, &mUserMacros, samplers );
    if( !rpd.shader )
       return false;
    rpd.shaderHandles.init( rpd.shader );   
@@ -599,6 +663,30 @@ bool ProcessedShaderMaterial::_addPass( ShaderRenderPassData &rpd,
  
    ShaderRenderPassData *newPass = new ShaderRenderPassData( rpd );
    mPasses.push_back( newPass );
+
+   //initSamplerHandles
+   ShaderConstHandles *handles = _getShaderConstHandles( mPasses.size()-1 );
+   AssertFatal(handles,"");
+   for(int i = 0; i < rpd.mNumTex; i++)
+   { 
+      if(rpd.mSamplerNames[i].isEmpty())
+      {
+         handles->mTexHandlesSC[i] = newPass->shader->getShaderConstHandle( String::EmptyString );
+         handles->mRTParamsSC[i] = newPass->shader->getShaderConstHandle( String::EmptyString );
+         continue;
+      }
+
+      String samplerName = rpd.mSamplerNames[i];
+      if( !samplerName.startsWith("$"))
+         samplerName.insert(0, "$");
+
+      GFXShaderConstHandle *handle = newPass->shader->getShaderConstHandle( samplerName ); 
+
+      handles->mTexHandlesSC[i] = handle;
+      handles->mRTParamsSC[i] = newPass->shader->getShaderConstHandle( String::ToString( "$rtParams%s", samplerName.c_str()+1 ) ); 
+      
+      AssertFatal( handle,"");
+   }
 
    // Give each active feature a chance to create specialized shader consts.
    for( U32 i=0; i < FEATUREMGR->getFeatureCount(); i++ )
@@ -688,7 +776,7 @@ bool ProcessedShaderMaterial::setupPass( SceneRenderState *state, const SceneDat
    }
    else
    {
-      GFX->disableShaders();
+      GFX->setupGenericShaders();
       GFX->setShaderConstBuffer(NULL);
    } 
 
@@ -704,6 +792,7 @@ void ProcessedShaderMaterial::setTextureStages( SceneRenderState *state, const S
    PROFILE_SCOPE( ProcessedShaderMaterial_SetTextureStages );
 
    ShaderConstHandles *handles = _getShaderConstHandles(pass);
+   AssertFatal(handles,"");
 
    // Set all of the textures we need to render the give pass.
 #ifdef TORQUE_DEBUG
@@ -752,6 +841,13 @@ void ProcessedShaderMaterial::setTextureStages( SceneRenderState *state, const S
 
          case Material::BackBuff:
             GFX->setTexture( i, sgData.backBuffTex );
+            break;
+
+         case Material::AccuMap:
+            if ( sgData.accuTex )
+               GFX->setTexture( i, sgData.accuTex );
+            else
+               GFX->setTexture( i, GFXTexHandle::ZERO );
             break;
             
          case Material::TexTarget:
@@ -1081,6 +1177,17 @@ void ProcessedShaderMaterial::_setShaderConstants(SceneRenderState * state, cons
          0.0f, 0.0f ); // TODO: Wrap mode flags?
       shaderConsts->setSafe(handles->mBumpAtlasTileSC, atlasTileParams);
    }
+   
+   if( handles->mAccuScaleSC->isValid() )
+      shaderConsts->set( handles->mAccuScaleSC, mMaterial->mAccuScale[stageNum] );
+   if( handles->mAccuDirectionSC->isValid() )
+      shaderConsts->set( handles->mAccuDirectionSC, mMaterial->mAccuDirection[stageNum] );
+   if( handles->mAccuStrengthSC->isValid() )
+      shaderConsts->set( handles->mAccuStrengthSC, mMaterial->mAccuStrength[stageNum] );
+   if( handles->mAccuCoverageSC->isValid() )
+      shaderConsts->set( handles->mAccuCoverageSC, mMaterial->mAccuCoverage[stageNum] );
+   if( handles->mAccuSpecularSC->isValid() )
+      shaderConsts->set( handles->mAccuSpecularSC, mMaterial->mAccuSpecular[stageNum] );
 }
 
 bool ProcessedShaderMaterial::_hasCubemap(U32 pass)

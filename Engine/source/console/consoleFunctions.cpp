@@ -1179,7 +1179,7 @@ static bool isInSet(char c, const char *set)
    return false;
 }
 
-ConsoleFunction( nextToken, const char *, 4, 4, "( string str, string token, string delimiters ) "
+DefineConsoleFunction( nextToken, const char*, ( const char* str1, const char* token, const char* delim), , "( string str, string token, string delimiters ) "
    "Tokenize a string using a set of delimiting characters.\n"
    "This function first skips all leading charaters in @a str that are contained in @a delimiters. "
    "From that position, it then scans for the next character in @a str that is contained in @a delimiters and stores all characters "
@@ -1207,11 +1207,11 @@ ConsoleFunction( nextToken, const char *, 4, 4, "( string str, string token, str
    "@endtsexample\n\n"
    "@ingroup Strings" )
 {
-   char *str = (char *) argv[1];
-   const char *token = argv[2];
-   const char *delim = argv[3];
+	char buffer[4096];
+   dStrncpy(buffer, str1, 4096);
+   char *str = buffer;
 
-   if( str )
+   if( str[0] )
    {
       // skip over any characters that are a member of delim
       // no need for special '\0' check since it can never be in delim
@@ -1240,7 +1240,10 @@ ConsoleFunction( nextToken, const char *, 4, 4, "( string str, string token, str
          str++;
    }
 
-   return str;
+   U32 returnLen = dStrlen(str)+1;
+   char *ret = Con::getReturnBuffer(returnLen);
+   dStrncpy(ret, str, returnLen);
+   return ret;
 }
 
 //=============================================================================
@@ -1285,7 +1288,7 @@ DefineEngineFunction( detag, const char*, ( const char* str ),,
       return str;
 }
 
-ConsoleFunction(getTag, const char *, 2, 2, "(string textTagString)"
+DefineConsoleFunction( getTag, const char*, ( const char* textTagString ), , "( string textTagString ) "
    "@brief Extracts the tag from a tagged string\n\n"
 
    "Should only be used within the context of a function that receives a tagged "
@@ -1299,25 +1302,24 @@ ConsoleFunction(getTag, const char *, 2, 2, "(string textTagString)"
    "@see detag()\n"
    "@ingroup Networking")
 {
-   TORQUE_UNUSED(argc);
-   if(argv[1][0] == StringTagPrefixByte)
+   if(textTagString[0] == StringTagPrefixByte)
    {
-      const char * space = dStrchr(argv[1], ' ');
+      const char * space = dStrchr(textTagString, ' ');
 
-      U32 len;
+      U64 len;
       if(space)
-         len = space - argv[1];
+         len = space - textTagString;
       else
-         len = dStrlen(argv[1]) + 1;
+         len = dStrlen(textTagString) + 1;
 
       char * ret = Con::getReturnBuffer(len);
-      dStrncpy(ret, argv[1] + 1, len - 1);
+      dStrncpy(ret, textTagString + 1, len - 1);
       ret[len - 1] = 0;
 
       return(ret);
    }
    else
-      return(argv[1]);
+      return(textTagString);
 }
 
 
@@ -1507,21 +1509,21 @@ DefineConsoleFunction( quit, void, ( ),,
 
 //-----------------------------------------------------------------------------
 
-#ifdef TORQUE_DEMO_PURCHASE
-ConsoleFunction( realQuit, void, 1, 1, "" )
+
+DefineConsoleFunction( realQuit, void, (), , "")
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    Platform::postQuitMessage(0);
 }
-#endif
+
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message ),,
+DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message, S32 status ), (0),
    "Display an error message box showing the given @a message and then shut down the engine and exit its process.\n"
    "This function cleanly uninitialized the engine and then exits back to the system with a process "
    "exit status indicating an error.\n\n"
-   "@param message The message to log to the console and show in an error message box.\n\n"
+   "@param message The message to log to the console and show in an error message box.\n"
+   "@param status  The status code to return to the OS.\n\n"
    "@see quit\n\n"
    "@ingroup Platform" )
 {
@@ -1532,7 +1534,20 @@ DefineConsoleFunction( quitWithErrorMessage, void, ( const char* message ),,
    //    as the script code should not be allowed to pretty much hard-crash the engine
    //    and prevent proper shutdown.  Changed this to use postQuitMessage.
    
-   Platform::postQuitMessage( -1 );
+   Platform::postQuitMessage( status );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( quitWithStatus, void, ( S32 status ), (0),
+   "Shut down the engine and exit its process.\n"
+   "This function cleanly uninitializes the engine and then exits back to the system with a given "
+   "return status code.\n\n"
+   "@param status The status code to return to the OS.\n\n"
+   "@see quitWithErrorMessage\n\n"
+   "@ingroup Platform" )
+{
+   Platform::postQuitMessage(status);
 }
 
 //-----------------------------------------------------------------------------
@@ -2166,87 +2181,86 @@ DefineEngineFunction( exec, bool, ( const char* fileName, bool noCalls, bool jou
    return ret;
 }
 
-ConsoleFunction(eval, const char *, 2, 2, "eval(consoleString)")
+DefineConsoleFunction( eval, const char*, ( const char* consoleString ), , "eval(consoleString)" )
 {
-   TORQUE_UNUSED(argc);
-   return Con::evaluate(argv[1], false, NULL);
+   return Con::evaluate(consoleString, false, NULL);
 }
 
-ConsoleFunction(getVariable, const char *, 2, 2, "(string varName)\n"
+DefineConsoleFunction( getVariable, const char*, ( const char* varName ), , "(string varName)\n" 
    "@brief Returns the value of the named variable or an empty string if not found.\n\n"
    "@varName Name of the variable to search for\n"
    "@return Value contained by varName, \"\" if the variable does not exist\n"
    "@ingroup Scripting")
 {
-   return Con::getVariable(argv[1]);
+   return Con::getVariable(varName);
 }
 
-ConsoleFunction(setVariable, void, 3, 3, "(string varName, string value)\n"
+DefineConsoleFunction( setVariable, void, ( const char* varName, const char* value ), , "(string varName, string value)\n" 
    "@brief Sets the value of the named variable.\n\n"
    "@param varName Name of the variable to locate\n"
    "@param value New value of the variable\n"
    "@return True if variable was successfully found and set\n"
    "@ingroup Scripting")
 {
-   return Con::setVariable(argv[1], argv[2]);
+   return Con::setVariable(varName, value);
 }
 
-ConsoleFunction(isFunction, bool, 2, 2, "(string funcName)"
+DefineConsoleFunction( isFunction, bool, ( const char* funcName ), , "(string funcName)" 
 	"@brief Determines if a function exists or not\n\n"
 	"@param funcName String containing name of the function\n"
 	"@return True if the function exists, false if not\n"
 	"@ingroup Scripting")
 {
-   return Con::isFunction(argv[1]);
+   return Con::isFunction(funcName);
 }
 
-ConsoleFunction(getFunctionPackage, const char*, 2, 2, "(string funcName)"
+DefineConsoleFunction( getFunctionPackage, const char*, ( const char* funcName ), , "(string funcName)" 
 	"@brief Provides the name of the package the function belongs to\n\n"
 	"@param funcName String containing name of the function\n"
 	"@return The name of the function's package\n"
 	"@ingroup Packages")
 {
-   Namespace::Entry* nse = Namespace::global()->lookup( StringTable->insert( argv[1] ) );
+   Namespace::Entry* nse = Namespace::global()->lookup( StringTable->insert( funcName ) );
    if( !nse )
       return "";
 
    return nse->mPackage;
 }
 
-ConsoleFunction(isMethod, bool, 3, 3, "(string namespace, string method)"
+DefineConsoleFunction( isMethod, bool, ( const char* nameSpace, const char* method ), , "(string namespace, string method)" 
 	"@brief Determines if a class/namespace method exists\n\n"
 	"@param namespace Class or namespace, such as Player\n"
 	"@param method Name of the function to search for\n"
 	"@return True if the method exists, false if not\n"
 	"@ingroup Scripting\n")
 {
-   Namespace* ns = Namespace::find( StringTable->insert( argv[1] ) );
-   Namespace::Entry* nse = ns->lookup( StringTable->insert( argv[2] ) );
+   Namespace* ns = Namespace::find( StringTable->insert( nameSpace ) );
+   Namespace::Entry* nse = ns->lookup( StringTable->insert( method ) );
    if( !nse )
       return false;
 
    return true;
 }
 
-ConsoleFunction(getMethodPackage, const char*, 3, 3, "(string namespace, string method)"
+DefineConsoleFunction( getMethodPackage, const char*, ( const char* nameSpace, const char* method ), , "(string namespace, string method)" 
 	"@brief Provides the name of the package the method belongs to\n\n"
 	"@param namespace Class or namespace, such as Player\n"
 	"@param method Name of the funciton to search for\n"
 	"@return The name of the method's package\n"
 	"@ingroup Packages")
 {
-   Namespace* ns = Namespace::find( StringTable->insert( argv[1] ) );
+   Namespace* ns = Namespace::find( StringTable->insert( nameSpace ) );
    if( !ns )
       return "";
 
-   Namespace::Entry* nse = ns->lookup( StringTable->insert( argv[2] ) );
+   Namespace::Entry* nse = ns->lookup( StringTable->insert( method ) );
    if( !nse )
       return "";
 
    return nse->mPackage;
 }
 
-ConsoleFunction(isDefined, bool, 2, 3, "(string varName)"
+DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varValue ), ("") , "(string varName)" 
 	"@brief Determines if a variable exists and contains a value\n"
 	"@param varName Name of the variable to search for\n"
 	"@return True if the variable was defined in script, false if not\n"
@@ -2255,13 +2269,13 @@ ConsoleFunction(isDefined, bool, 2, 3, "(string varName)"
    "@endtsexample\n\n"
 	"@ingroup Scripting")
 {
-   if(dStrlen(argv[1]) == 0)
+   if(dStrIsEmpty(varName))
    {
       Con::errorf("isDefined() - did you forget to put quotes around the variable name?");
       return false;
    }
 
-   StringTableEntry name = StringTable->insert(argv[1]);
+   StringTableEntry name = StringTable->insert(varName);
 
    // Deal with <var>.<value>
    if (dStrchr(name, '.'))
@@ -2312,7 +2326,7 @@ ConsoleFunction(isDefined, bool, 2, 3, "(string varName)"
 
          if (!value)
          {
-            obj->setDataField(valName, 0, argv[2]);
+            obj->setDataField(valName, 0, varValue);
 
             return false;
          }
@@ -2331,8 +2345,10 @@ ConsoleFunction(isDefined, bool, 2, 3, "(string varName)"
             {
                if (dStrlen(value) > 0)
                   return true;
-               else if (argc > 2)
-                  obj->setDataField(valName, 0, argv[2]);
+               else if (!dStrIsEmpty(varValue))
+               { 
+                  obj->setDataField(valName, 0, varValue); 
+               }
             }
          }
       }
@@ -2346,8 +2362,10 @@ ConsoleFunction(isDefined, bool, 2, 3, "(string varName)"
 
          if (ent)
             return true;
-         else if (argc > 2)
-            gEvalState.getCurrentFrame().setVariable(name, argv[2]);
+         else if (!dStrIsEmpty(varValue))
+         {
+            gEvalState.getCurrentFrame().setVariable(name, varValue);
+         }
       }
       else
          Con::errorf("%s() - no local variable frame.", __FUNCTION__);
@@ -2359,16 +2377,20 @@ ConsoleFunction(isDefined, bool, 2, 3, "(string varName)"
 
       if (ent)
          return true;
-      else if (argc > 2)
-         gEvalState.globalVars.setVariable(name, argv[2]);
+      else if (!dStrIsEmpty(varValue))
+      {
+         gEvalState.globalVars.setVariable(name, varValue);
+      }
    }
    else
    {
       // Is it an object?
-      if (dStrcmp(argv[1], "0") && dStrcmp(argv[1], "") && (Sim::findObject(argv[1]) != NULL))
+      if (dStrcmp(varName, "0") && dStrcmp(varName, "") && (Sim::findObject(varName) != NULL))
          return true;
-      else if (argc > 2)
-         Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, argv[1]);
+      else if (!dStrIsEmpty(varValue))
+      {
+         Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, varValue);
+      }
    }
 
    return false;
@@ -2376,39 +2398,39 @@ ConsoleFunction(isDefined, bool, 2, 3, "(string varName)"
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( isCurrentScriptToolScript, bool, 1, 1,
-   "() Returns true if the calling script is a tools script.\n"
+DefineConsoleFunction( isCurrentScriptToolScript, bool, (), , "()" 
+   "Returns true if the calling script is a tools script.\n"
    "@hide")
 {
    return Con::isCurrentScriptToolScript();
 }
 
-ConsoleFunction(getModNameFromPath, const char *, 2, 2, "(string path)"
+DefineConsoleFunction( getModNameFromPath, const char *, ( const char* path ), , "(string path)" 
 				"@brief Attempts to extract a mod directory from path. Returns empty string on failure.\n\n"
 				"@param File path of mod folder\n"
 				"@note This is no longer relevant in Torque 3D (which does not use mod folders), should be deprecated\n"
 				"@internal")
 {
-   StringTableEntry modPath = Con::getModNameFromPath(argv[1]);
+   StringTableEntry modPath = Con::getModNameFromPath(path);
    return modPath ? modPath : "";
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( pushInstantGroup, void, 1, 2, "([group])"
+DefineConsoleFunction( pushInstantGroup, void, ( String group ),("") , "([group])" 
 				"@brief Pushes the current $instantGroup on a stack "
 				"and sets it to the given value (or clears it).\n\n"
 				"@note Currently only used for editors\n"
 				"@ingroup Editors\n"
 				"@internal")
 {
-   if( argc > 1 )
-      Con::pushInstantGroup( argv[ 1 ] );
+   if( group.size() > 0 )
+      Con::pushInstantGroup( group );
    else
       Con::pushInstantGroup();
 }
 
-ConsoleFunction( popInstantGroup, void, 1, 1, "()"
+DefineConsoleFunction( popInstantGroup, void, (), , "()" 
 				"@brief Pop and restore the last setting of $instantGroup off the stack.\n\n"
 				"@note Currently only used for editors\n\n"
 				"@ingroup Editors\n"
@@ -2419,11 +2441,11 @@ ConsoleFunction( popInstantGroup, void, 1, 1, "()"
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction(getPrefsPath, const char *, 1, 2, "([relativeFileName])"
+DefineConsoleFunction( getPrefsPath, const char *, ( const char* relativeFileName ), (""), "([relativeFileName])" 
 				"@note Appears to be useless in Torque 3D, should be deprecated\n"
 				"@internal")
 {
-   const char *filename = Platform::getPrefsPath(argc > 1 ? argv[1] : NULL);
+   const char *filename = Platform::getPrefsPath(relativeFileName);
    if(filename == NULL || *filename == 0)
       return "";
      

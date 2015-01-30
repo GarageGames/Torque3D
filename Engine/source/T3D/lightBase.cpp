@@ -425,21 +425,22 @@ static ConsoleDocFragment _lbplayAnimation2(
    "LightBase",
    "void playAnimation(LightAnimData anim);"
 );
-ConsoleMethod( LightBase, playAnimation, void, 2, 3, "( [LightAnimData anim] )\t"
+
+DefineConsoleMethod( LightBase, playAnimation, void, (const char * anim), (""), "( [LightAnimData anim] )\t"
    "Plays a light animation on the light.  If no LightAnimData is passed the "
    "existing one is played."
    "@hide")
 {
-    if ( argc == 2 )
+	if ( dStrIsEmpty(anim) )
     {
         object->playAnimation();
         return;
     }
 
     LightAnimData *animData;
-    if ( !Sim::findObject( argv[2], animData ) )
+    if ( !Sim::findObject( anim, animData ) )
     {
-        Con::errorf( "LightBase::playAnimation() - Invalid LightAnimData '%s'.", argv[2] );
+        Con::errorf( "LightBase::playAnimation() - Invalid LightAnimData '%s'.", anim );
         return;
     }
 
@@ -469,7 +470,7 @@ void LightBase::playAnimation( LightAnimData *animData )
     }
 }
 
-ConsoleMethod( LightBase, pauseAnimation, void, 2, 2, "Stops the light animation." )
+DefineConsoleMethod( LightBase, pauseAnimation, void, (), , "Stops the light animation." )
 {
     object->pauseAnimation();
 }

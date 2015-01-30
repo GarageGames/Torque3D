@@ -384,6 +384,7 @@ function EditorGui::addToToolsToolbar( %this, %pluginName, %internalName, %bitma
          useMouseEvents = "0";
       };
       ToolsToolbarArray.add(%button);
+      EWToolsToolbar.setExtent((25 + 8) * (%count + 1) + 12 SPC "33");
    }
 }
 

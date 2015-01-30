@@ -93,6 +93,7 @@ ProcessedMaterial::ProcessedMaterial()
    mCurrentParams( NULL ),
    mHasSetStageData( false ),
    mHasGlow( false ),   
+   mHasAccumulation( false ),   
    mMaxStages( 0 ),
    mVertexFormat( NULL ),
    mUserObject( NULL )
@@ -289,9 +290,7 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
 
    // The prepass will take care of writing to the 
    // zbuffer, so we don't have to by default.
-   // The prepass can't write to the backbuffer's zbuffer in OpenGL.
    if (  MATMGR->getPrePassEnabled() && 
-         !GFX->getAdapterType() == OpenGL && 
          !mFeatures.hasFeature(MFT_ForwardShading))
       result.setZReadWrite( result.zEnable, false );
 

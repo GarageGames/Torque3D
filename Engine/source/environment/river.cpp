@@ -227,8 +227,8 @@ void RiverNodeEvent::padListToSize()
       newlist->mDepths.merge(list->mDepths);
       newlist->mNormals.merge(list->mNormals);
 
-      mNodeList = newlist;
       delete list;
+      mNodeList = list = newlist;
    }
 
    // Pad our list end?
@@ -1291,6 +1291,56 @@ bool River::castRay(const Point3F &s, const Point3F &e, RayInfo* info)
 bool River::collideBox(const Point3F &start, const Point3F &end, RayInfo* info)
 {
 	return false;
+}
+
+bool River::buildPolyList( PolyListContext context, AbstractPolyList* polyList, const Box3F& box, const SphereF& sphere )
+{
+   Vector<const RiverSegment*> hitSegments;
+   for ( U32 i = 0; i < mSegments.size(); i++ )
+   {
+      const RiverSegment &segment = mSegments[i];
+      if ( segment.worldbounds.isOverlapped( box ) )
+      {
+         hitSegments.push_back( &segment );
+      }
+   }
+
+   if ( !hitSegments.size() )
+      return false;
+   
+   polyList->setObject( this );
+   polyList->setTransform( &MatrixF::Identity, Point3F( 1.0f, 1.0f, 1.0f ) );
+
+   for ( U32 i = 0; i < hitSegments.size(); i++ )
+   {
+      const RiverSegment* segment = hitSegments[i];
+      for ( U32 k = 0; k < 2; k++ )
+      {
+         // gIdxArray[0] gives us the top plane (see table definition).
+         U32 idx0 = gIdxArray[0][k][0];
+         U32 idx1 = gIdxArray[0][k][1];
+         U32 idx2 = gIdxArray[0][k][2];
+
+         const Point3F &v0 = (*segment)[idx0];
+         const Point3F &v1 = (*segment)[idx1];
+         const Point3F &v2 = (*segment)[idx2];
+      
+         // Add vertices to poly list.
+         U32 i0 = polyList->addPoint(v0);
+         polyList->addPoint(v1);
+         polyList->addPoint(v2);
+
+         // Add plane between them.
+         polyList->begin(0, 0);
+         polyList->vertex(i0);
+         polyList->vertex(i0+1);
+         polyList->vertex(i0+2);
+         polyList->plane(i0, i0+1, i0+2);
+         polyList->end();
+      }
+   }
+
+   return true;
 }
 
 F32 River::getWaterCoverage( const Box3F &worldBox ) const

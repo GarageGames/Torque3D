@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "console/compiler.h"
 #include "console/consoleInternal.h"
+#include "console/engineAPI.h"
 #include "core/util/tDictionary.h"
 #include "core/strings/stringFunctions.h"
 #include "app/mainLoop.h"
@@ -130,6 +131,11 @@ extern "C" {
 
       
 
+	}
+
+	S32 torque_getreturnstatus()
+	{
+		return StandardMainLoop::getReturnStatus();
 	}
 
    // signal an engine shutdown (as with the quit(); console command)
@@ -262,7 +268,8 @@ extern "C" {
 		if (!entry)
 			return;
 
-		entry->cb.mVoidCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		entry->cb.mVoidCallbackFunc(NULL, args.count(), args);
 	}
 
 	F32 torque_callfloatfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -273,7 +280,8 @@ extern "C" {
 		if (!entry)
 			return 0.0f;
 
-		return entry->cb.mFloatCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mFloatCallbackFunc(NULL, args.count(), args);
 	}
 
 	S32 torque_callintfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -284,7 +292,8 @@ extern "C" {
 		if (!entry)
 			return 0;
 
-		return entry->cb.mIntCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mIntCallbackFunc(NULL, args.count(), args);
 	}
 
 
@@ -295,7 +304,8 @@ extern "C" {
 		if (!entry)
 			return "";
 
-		return entry->cb.mStringCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mStringCallbackFunc(NULL, args.count(), args);
 	}
 
 	bool torque_callboolfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -305,7 +315,8 @@ extern "C" {
 		if (!entry)
 			return false;
 
-		return entry->cb.mBoolCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mBoolCallbackFunc(NULL, args.count(), args);
 	}
 
 
@@ -319,7 +330,8 @@ extern "C" {
 		if(!entry->mFunctionOffset)
 			return "";
 
-		const char* ret = entry->mCode->exec(entry->mFunctionOffset, StringTable->insert(name), entry->mNamespace, argc, argv, false, entry->mPackage);
+		StringStackConsoleWrapper args(argc, argv);
+		const char* ret = entry->mCode->exec(entry->mFunctionOffset, StringTable->insert(name), entry->mNamespace, args.count(), args, false, entry->mPackage);
 
 		if (!ret || !dStrlen(ret))
 			return "";
@@ -415,7 +427,7 @@ extern "C" {
 			PlatformWindowManager::get()->getFirstWindow()->setSize(Point2I(width,height));
 	}
 
-#ifdef TORQUE_OS_WIN
+#if defined(TORQUE_OS_WIN) && !defined(TORQUE_SDL)
    // retrieve the hwnd of our render window
    void* torque_gethwnd()
    {
@@ -447,20 +459,16 @@ extern "C" {
 // By default, it is marked as secure by the web plugins and then can be called from
 // Javascript on the web page to ensure that function calls across the language
 // boundry are working with arguments and return values
-ConsoleFunction(testJavaScriptBridge, const char *, 4, 4, "testBridge(arg1, arg2, arg3)")
+DefineConsoleFunction( testJavaScriptBridge, const char *, (const char* arg1, const char* arg2, const char* arg3), , "testBridge(arg1, arg2, arg3)")
 {
 	S32 failed = 0;
-	if(argc != 4)
-		failed = 1;
-	else
-	{
-		if (dStrcmp(argv[1],"one"))
+		if (dStrcmp(arg1,"one"))
 			failed = 2;
-		if (dStrcmp(argv[2],"two"))
+		if (dStrcmp(arg2,"two"))
 			failed = 2;
-		if (dStrcmp(argv[3],"three"))
+		if (dStrcmp(arg3,"three"))
 			failed = 2;
-	}
+	
 
 	//attempt to call from TorqueScript -> JavaScript
 	const char* jret = Con::evaluate("JS::bridgeCallback(\"one\",\"two\",\"three\");");

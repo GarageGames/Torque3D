@@ -371,7 +371,6 @@ Marker::Marker()
    mTypeMask |= MarkerObjectType;
 
    mSeqNum   = 0;
-   mSmoothingType = SmoothingTypeLinear;
    mMSToNext = 1000;
    mSmoothingType = SmoothingTypeSpline;
    mKnotType = KnotTypeNormal;
