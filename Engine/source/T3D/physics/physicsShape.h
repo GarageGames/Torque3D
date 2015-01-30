@@ -112,6 +112,8 @@ public:
    // The density of this object used for water buoyancy effects.
    F32 buoyancyDensity;
 
+   // rextimmy physics integration
+   bool ccdEnabled;
 
    enum SimType
    {
@@ -149,6 +151,9 @@ class PhysicsShape : public GameBase
    typedef GameBase Parent;
 
 protected:
+   // rextimmy physics integration
+   /// Datablock for the physicsshapedata
+	PhysicsShapeData *mDatablock;
 
    /// The abstracted physics actor.
    PhysicsBody *mPhysicsRep;
