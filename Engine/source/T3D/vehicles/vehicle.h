@@ -127,6 +127,9 @@ struct VehicleData: public ShapeBaseData
    F32 splashFreqMod;
    F32 splashVelEpsilon;
 
+   // rextimmy physics integration
+   bool enablePhysicsRep;
+
    //
    VehicleData();
    bool preload(bool server, String &errorStr);
@@ -143,6 +146,8 @@ struct VehicleData: public ShapeBaseData
 
 //----------------------------------------------------------------------------
 
+// rextimmy physics integration
+class PhysicsBody;
 class Vehicle: public ShapeBase
 {
    typedef ShapeBase Parent;
@@ -176,6 +181,10 @@ class Vehicle: public ShapeBase
       Point3F cameraRot;
       Point3F cameraRotVec;
    };
+
+   // rextimmy physics integration
+   PhysicsBody *mPhysicsRep;
+   void _createPhysics();
 
    StateDelta mDelta;
    S32 mPredictionCount;            ///< Number of ticks to predict
