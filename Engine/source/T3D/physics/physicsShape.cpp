@@ -35,10 +35,6 @@
 #include "ts/tsShapeInstance.h"
 #include "scene/sceneRenderState.h"
 #include "gfx/gfxTransformSaver.h"
-
-// rextimmy physics integration
-#include "T3D/trigger.h"
-
 #include "T3D/physics/physicsDebris.h"
 #include "T3D/fx/explosion.h"
 #include "T3D/containerQuery.h"
@@ -790,7 +786,9 @@ bool PhysicsShape::_createShape()
    // rextimmy physics integration
    mPhysicsRep->init(   mDatablock->colShape, 
                         mDatablock->mass, 
-                        isDynamic ? 0 : PhysicsBody::BF_KINEMATIC,  
+
+						// rextimmy physics integration
+                        bodyFlags, /*isDynamic ? 0 : PhysicsBody::BF_KINEMATIC,  */
                         this, 
                         mWorld );
 
