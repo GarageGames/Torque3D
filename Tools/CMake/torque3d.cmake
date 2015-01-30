@@ -69,20 +69,6 @@ if(WIN32)
 else()
 	set(TORQUE_SDL ON) # we need sdl to work on Linux/Mac
 endif()
-if(WIN32)
-	option(TORQUE_OPENGL "Allow OpenGL render" OFF)
-	#mark_as_advanced(TORQUE_OPENGL)
-else()
-	set(TORQUE_OPENGL ON) # we need OpenGL to render on Linux/Mac
-endif()
-
-if(WIN32)
-	option(TORQUE_OPENGL "Allow OpenGL render" OFF)
-	#mark_as_advanced(TORQUE_OPENGL)
-else()
-	set(TORQUE_OPENGL ON) # we need OpenGL to render on Linux/Mac
-	option(TORQUE_DEDICATED "Torque dedicated" OFF)
-endif()
 
 ###############################################################################
 # options
@@ -268,9 +254,6 @@ if(TORQUE_ADVANCED_LIGHTING)
     addPathRec("${srcDir}/lighting/shadowMap")
     if(WIN32)
 		addPathRec("${srcDir}/lighting/advanced/hlsl")
-	endif()
-	if(TORQUE_OPENGL)
-		addPathRec("${srcDir}/lighting/advanced/glsl")
 	endif()
     addDef(TORQUE_ADVANCED_LIGHTING)
 endif()
@@ -464,23 +447,6 @@ if(UNIX)
     addPath("${srcDir}/platformPOSIX")
 endif()
 
-if( TORQUE_OPENGL )
-    addPath("${srcDir}/shaderGen/GLSL")
-    if( TORQUE_OPENGL AND NOT TORQUE_DEDICATED )
-        addPath("${srcDir}/gfx/gl")
-        addPath("${srcDir}/gfx/gl/tGL")        
-    addPath("${srcDir}/shaderGen/GLSL")
-        addPath("${srcDir}/terrain/glsl")
-        addPath("${srcDir}/forest/glsl")    
-
-    # glew
-    LIST(APPEND ${PROJECT_NAME}_files "${libDir}/glew/src/glew.c")
-    endif()
-    
-    if(WIN32 AND NOT TORQUE_SDL)
-      addPath("${srcDir}/gfx/gl/win32")
-    endif()
-endif()
 
 ###############################################################################
 ###############################################################################
@@ -534,9 +500,6 @@ if(WIN32)
     mark_as_advanced(TORQUE_EXTERNAL_LIBS)
     addLib("${TORQUE_EXTERNAL_LIBS}")
    
-   if(TORQUE_OPENGL)
-      addLib(OpenGL32.lib)
-   endif()
 endif()
 
 if(UNIX)
@@ -584,13 +547,6 @@ if(UNIX)
 	addDef(LINUX)	
 endif()
 
-if(TORQUE_OPENGL)
-	addDef(TORQUE_OPENGL)
-   if(WIN32)
-      addDef(GLEW_STATIC)
-    endif()
-endif()
-
 if(TORQUE_SDL)
     addDef(TORQUE_SDL)
     addInclude(${libDir}/sdl/include)
@@ -619,17 +575,10 @@ addInclude("${libDir}/libogg/include")
 addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
-if(TORQUE_OPENGL)
-	addInclude("${libDir}/glew/include")
-endif()
 
 if(UNIX)
 	addInclude("/usr/include/freetype2/freetype")
 	addInclude("/usr/include/freetype2")
-endif()
-
-if(TORQUE_OPENGL)
-	addInclude("${libDir}/glew/include")
 endif()
 
 # external things
