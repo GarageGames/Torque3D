@@ -209,6 +209,7 @@ class GuiWindowCtrl : public GuiContainer
       GuiWindowCtrl();
 
       bool isMinimized(S32 &index);
+      bool isMaximized();
 
       virtual void getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent &lastGuiEvent);
 
