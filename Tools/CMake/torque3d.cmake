@@ -27,8 +27,6 @@ project(${TORQUE_APP_NAME})
 ###############################################################################
 # modules
 ###############################################################################
-option(TORQUE_SFX_VORBIS "Vorbis Sound" ON)
-mark_as_advanced(TORQUE_SFX_VORBIS)
 option(TORQUE_THEORA "Theora Video Support" ON)
 mark_as_advanced(TORQUE_THEORA)
 option(TORQUE_ADVANCED_LIGHTING "Advanced Lighting" ON)
@@ -79,14 +77,6 @@ if(TORQUE_SFX_OPENAL AND NOT TORQUE_DEDICATED)
 		addPath("${srcDir}/sfx/openal/linux")
 	endif()
     
-endif()
-
-# Vorbis
-if(TORQUE_SFX_VORBIS)
-    addInclude(${libDir}/libvorbis/include)
-    addDef(TORQUE_OGGVORBIS)
-    addLib(libvorbis)
-    addLib(libogg)
 endif()
 
 # Theora
