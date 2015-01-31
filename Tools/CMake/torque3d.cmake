@@ -27,8 +27,6 @@ project(${TORQUE_APP_NAME})
 ###############################################################################
 # modules
 ###############################################################################
-option(TORQUE_SFX_OPENAL "OpenAL Sound" ON)
-mark_as_advanced(TORQUE_SFX_OPENAL)
 option(TORQUE_HIFI "HIFI? support" OFF)
 mark_as_advanced(TORQUE_HIFI)
 option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
@@ -43,20 +41,6 @@ if(TORQUE_SFX_DirectX)
     addLib(x3daudio.lib)
     addPathRec("${srcDir}/sfx/dsound")
     addPathRec("${srcDir}/sfx/xaudio")
-endif()
-
-# OpenAL
-if(TORQUE_SFX_OPENAL AND NOT TORQUE_DEDICATED)
-    addPath("${srcDir}/sfx/openal")
-    #addPath("${srcDir}/sfx/openal/mac")
-    if(WIN32)
-		addPath("${srcDir}/sfx/openal/win32")
-		addInclude("${libDir}/openal/win32")
-    endif()
-	if(UNIX)
-		addPath("${srcDir}/sfx/openal/linux")
-	endif()
-    
 endif()
 
 # Include tools for non-tool builds (or define player if a tool build)
