@@ -28,10 +28,7 @@ endif()
 
 addDef(LINUX)
 
-if(NOT CXX_FLAG32)
-    set(CXX_FLAG32 "")
-endif()
-#set(CXX_FLAG32 "-m32") #uncomment for build x32 on OSx64
+#set( CXX_FLAG32 "-m32" CACHE INTERNAL ""  FORCE ) #uncomment for build x32 on OSx64
 
 # default compiler flags
 # force compile 32 bit

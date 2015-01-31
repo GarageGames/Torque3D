@@ -22,11 +22,11 @@
 
 # OpenGL module
 
-if(WIN32)
-	option(TORQUE_OPENGL "Allow OpenGL render" OFF)
-	#mark_as_advanced(TORQUE_OPENGL)
-else()
-	set(TORQUE_OPENGL ON) # we need OpenGL to render on Linux/Mac
+option(TORQUE_OPENGL "Allow OpenGL render" OFF)
+#mark_as_advanced(TORQUE_OPENGL)
+
+if( NOT WIN32 )
+	set( TORQUE_OPENGL ON CACHE INTERNAL "" FORCE )
 endif()
 
 if( NOT TORQUE_OPENGL )

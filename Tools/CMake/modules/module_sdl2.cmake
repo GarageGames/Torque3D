@@ -21,17 +21,16 @@
 # -----------------------------------------------------------------------------
 
 # SDL2 module
-if(WIN32)
-	option(TORQUE_SDL "Use SDL for window and input" OFF)
-	mark_as_advanced(TORQUE_SDL)
-else()
-	set(TORQUE_SDL ON) # we need sdl to work on Linux/Mac
+option(TORQUE_SDL "Use SDL for window and input" OFF)
+mark_as_advanced(TORQUE_SDL)
+
+if( NOT WIN32 )
+	set(TORQUE_SDL ON CACHE INTERNAL "" FORCE) # we need sdl to work on Linux/Mac
 endif()
 
 if( NOT TORQUE_SDL )
     return()
 endif()
-
 
 addDef(TORQUE_SDL)
 addInclude(${libDir}/sdl/include)
@@ -40,7 +39,7 @@ addPathRec("${srcDir}/windowManager/sdl")
 addPathRec("${srcDir}/platformSDL")
 
 if(TORQUE_OPENGL)
-  addPathRec("${srcDir}/gfx/gl/sdl")
+  addPathRec("${srcDir}/gfx/gl/sdl") 
 endif()
 
 if(UNIX)
