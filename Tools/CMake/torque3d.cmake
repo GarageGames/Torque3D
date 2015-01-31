@@ -27,8 +27,6 @@ project(${TORQUE_APP_NAME})
 ###############################################################################
 # modules
 ###############################################################################
-option(TORQUE_ADVANCED_LIGHTING "Advanced Lighting" ON)
-mark_as_advanced(TORQUE_ADVANCED_LIGHTING)
 option(TORQUE_BASIC_LIGHTING "Basic Lighting" ON)
 mark_as_advanced(TORQUE_BASIC_LIGHTING)
 option(TORQUE_SFX_OPENAL "OpenAL Sound" ON)
@@ -41,15 +39,6 @@ mark_as_advanced(TORQUE_EXTENDED_MOVE)
 ###############################################################################
 # modular paths
 ###############################################################################
-# lighting
-if(TORQUE_ADVANCED_LIGHTING)
-    addPath("${srcDir}/lighting/advanced")
-    addPathRec("${srcDir}/lighting/shadowMap")
-    if(WIN32)
-		addPathRec("${srcDir}/lighting/advanced/hlsl")
-	endif()
-    addDef(TORQUE_ADVANCED_LIGHTING)
-endif()
 if(TORQUE_BASIC_LIGHTING)
     addPathRec("${srcDir}/lighting/basic")
     addPathRec("${srcDir}/lighting/shadowMap")
