@@ -151,7 +151,7 @@
 /// It was previously set to 3MB but I've increased it to 32MB due to the
 /// FrameAllocator being used as temporary storage for bitmaps in the D3D9
 /// texture manager.
-#define TORQUE_FRAME_SIZE     16 << 21
+#define TORQUE_FRAME_SIZE     32 << 20
 
 // Finally, we define some dependent #defines. This enables some subsidiary
 // functionality to get automatically turned on in certain configurations.
