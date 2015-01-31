@@ -138,7 +138,7 @@ void Win32WindowManager::buildMonitorsList()
    mMonitors.clear();
 
    // Enumerate all monitors
-   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (size_t)(void*)&mMonitors);
+   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (uintptr_t)&mMonitors);
 }
 
 S32 Win32WindowManager::findFirstMatchingMonitor(const char* name)
