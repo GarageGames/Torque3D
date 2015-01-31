@@ -25,31 +25,8 @@ project(${TORQUE_APP_NAME})
 # TODO: fmod support
 
 ###############################################################################
-# modular paths
+# process modules
 ###############################################################################
-
-# DirectX Sound
-if(TORQUE_SFX_DirectX)
-    addLib(x3daudio.lib)
-    addPathRec("${srcDir}/sfx/dsound")
-    addPathRec("${srcDir}/sfx/xaudio")
-endif()
-
-# Include tools for non-tool builds (or define player if a tool build)
-if(TORQUE_TOOLS)
-    addPath("${srcDir}/gui/worldEditor")
-    addPath("${srcDir}/environment/editors")
-    addPath("${srcDir}/forest/editor")
-    addPath("${srcDir}/gui/editor")
-    addPath("${srcDir}/gui/editor/inspector")
-endif()
-
-
-if(TORQUE_DEDICATED)
-    addDef(TORQUE_DEDICATED)
-endif()
-
-#modules dir
 file(GLOB modules "modules/*.cmake")
 foreach(module ${modules})
     string(FIND ${module} ".target.cmake" FIND_RESULT)
@@ -58,18 +35,26 @@ foreach(module ${modules})
     endif()
 endforeach()
 
+
 ###############################################################################
 ###############################################################################
 finishExecutable()
 ###############################################################################
 ###############################################################################
 
-#modules dir
+
+###############################################################################
+# process modules with target requeriment
+###############################################################################
 file(GLOB modules "modules/*.target.cmake")
 foreach(module ${modules})
     include(${module})
 endforeach()
 
+
+###############################################################################
+# configure files
+###############################################################################
 message(STATUS "writing ${projectSrcDir}/torqueConfig.h")
 CONFIGURE_FILE("${cmakeDir}/torqueConfig.h.in" "${projectSrcDir}/torqueConfig.h")
 

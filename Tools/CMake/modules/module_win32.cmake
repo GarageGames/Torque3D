@@ -62,6 +62,13 @@ addPath("${srcDir}/forest/hlsl")
 # add windows rc file for the icon
 addFile("${projectSrcDir}/torque.rc")
 
+# DirectX Sound
+if(TORQUE_SFX_DirectX)
+    addLib(x3daudio.lib)
+    addPathRec("${srcDir}/sfx/dsound")
+    addPathRec("${srcDir}/sfx/xaudio")
+endif()
+
 if(NOT EXISTS "${projectSrcDir}/torque.rc")
     CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
 endif()

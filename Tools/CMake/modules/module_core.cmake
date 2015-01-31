@@ -243,3 +243,17 @@ addInclude("${libDir}/libogg/include")
 addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
+
+# Include tools for non-tool builds (or define player if a tool build)
+if(TORQUE_TOOLS)
+    addPath("${srcDir}/gui/worldEditor")
+    addPath("${srcDir}/environment/editors")
+    addPath("${srcDir}/forest/editor")
+    addPath("${srcDir}/gui/editor")
+    addPath("${srcDir}/gui/editor/inspector")
+endif()
+
+
+if(TORQUE_DEDICATED)
+    addDef(TORQUE_DEDICATED)
+endif()
