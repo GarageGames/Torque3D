@@ -27,8 +27,6 @@ project(${TORQUE_APP_NAME})
 ###############################################################################
 # modules
 ###############################################################################
-option(TORQUE_THEORA "Theora Video Support" ON)
-mark_as_advanced(TORQUE_THEORA)
 option(TORQUE_ADVANCED_LIGHTING "Advanced Lighting" ON)
 mark_as_advanced(TORQUE_ADVANCED_LIGHTING)
 option(TORQUE_BASIC_LIGHTING "Basic Lighting" ON)
@@ -77,18 +75,6 @@ if(TORQUE_SFX_OPENAL AND NOT TORQUE_DEDICATED)
 		addPath("${srcDir}/sfx/openal/linux")
 	endif()
     
-endif()
-
-# Theora
-if(TORQUE_THEORA)
-    addPath("${srcDir}/core/ogg")
-    addPath("${srcDir}/gfx/video")
-    addPath("${srcDir}/gui/theora")
-    
-    addDef(TORQUE_OGGTHEORA)
-    addDef(TORQUE_OGGVORIBS)
-    addInclude(${libDir}/libtheora/include)
-    addLib(libtheora)
 endif()
 
 # Include tools for non-tool builds (or define player if a tool build)
