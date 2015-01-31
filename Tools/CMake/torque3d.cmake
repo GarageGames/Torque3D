@@ -25,12 +25,6 @@ project(${TORQUE_APP_NAME})
 # TODO: fmod support
 
 ###############################################################################
-# modules
-###############################################################################
-option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
-mark_as_advanced(TORQUE_EXTENDED_MOVE)
-
-###############################################################################
 # modular paths
 ###############################################################################
 
@@ -50,12 +44,6 @@ if(TORQUE_TOOLS)
     addPath("${srcDir}/gui/editor/inspector")
 endif()
 
-if(TORQUE_EXTENDED_MOVE)
-    addPath("${srcDir}/T3D/gameBase/extended")
-    addDef(TORQUE_EXTENDED_MOVE)
-else()
-    addPath("${srcDir}/T3D/gameBase/std")
-endif()
 
 if(TORQUE_DEDICATED)
     addDef(TORQUE_DEDICATED)
