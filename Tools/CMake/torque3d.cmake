@@ -27,8 +27,6 @@ project(${TORQUE_APP_NAME})
 ###############################################################################
 # modules
 ###############################################################################
-option(TORQUE_BASIC_LIGHTING "Basic Lighting" ON)
-mark_as_advanced(TORQUE_BASIC_LIGHTING)
 option(TORQUE_SFX_OPENAL "OpenAL Sound" ON)
 mark_as_advanced(TORQUE_SFX_OPENAL)
 option(TORQUE_HIFI "HIFI? support" OFF)
@@ -39,11 +37,6 @@ mark_as_advanced(TORQUE_EXTENDED_MOVE)
 ###############################################################################
 # modular paths
 ###############################################################################
-if(TORQUE_BASIC_LIGHTING)
-    addPathRec("${srcDir}/lighting/basic")
-    addPathRec("${srcDir}/lighting/shadowMap")
-    addDef(TORQUE_BASIC_LIGHTING)
-endif()
 
 # DirectX Sound
 if(TORQUE_SFX_DirectX)
