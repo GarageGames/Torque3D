@@ -27,8 +27,6 @@ project(${TORQUE_APP_NAME})
 ###############################################################################
 # modules
 ###############################################################################
-option(TORQUE_HIFI "HIFI? support" OFF)
-mark_as_advanced(TORQUE_HIFI)
 option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
 mark_as_advanced(TORQUE_EXTENDED_MOVE)
 
@@ -52,11 +50,6 @@ if(TORQUE_TOOLS)
     addPath("${srcDir}/gui/editor/inspector")
 endif()
 
-if(TORQUE_HIFI)
-    addPath("${srcDir}/T3D/gameBase/hifi")
-    addDef(TORQUE_HIFI_NET)
-endif()
-    
 if(TORQUE_EXTENDED_MOVE)
     addPath("${srcDir}/T3D/gameBase/extended")
     addDef(TORQUE_EXTENDED_MOVE)
