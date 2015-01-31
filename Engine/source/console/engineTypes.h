@@ -575,7 +575,7 @@ namespace _Private {
    
 ///
 #define FIELDOFFSET( fieldName ) \
-   uintptr_t( ( ( const char* ) &( ( ( ThisType* ) 16 )->fieldName ) ) - 16 ) // Artificial offset to avoid compiler warnings.
+   UPTR( ( ( const char* ) &( ( ( ThisType* ) 16 )->fieldName ) ) - 16 ) // Artificial offset to avoid compiler warnings.
    
 ///
 #define CLASSDOC( className, doc ) \

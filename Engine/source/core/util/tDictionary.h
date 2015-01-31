@@ -95,7 +95,7 @@ namespace DictHash
 
    inline U32 hash(const void *data)
    {
-      return (uintptr_t)data;
+      return (UPTR)data;
    }
 
    template<class A, class B>

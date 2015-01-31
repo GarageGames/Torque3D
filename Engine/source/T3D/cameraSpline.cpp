@@ -193,7 +193,7 @@ void CameraSpline::renderTimeMap()
    void *ptr = vb.lock();
    if(!ptr) return;
 
-   MRandomLCG random(1376312589 * (uintptr_t)this);
+   MRandomLCG random(1376312589 * (UPTR)this);
    S32 index = 0;
    for(Vector<TimeMap>::iterator itr=mTimeMap.begin(); itr != mTimeMap.end(); itr++)
    {

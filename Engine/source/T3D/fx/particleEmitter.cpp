@@ -926,7 +926,7 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
    ri->softnessDistance = mDataBlock->softnessDistance; 
 
    // Sort by texture too.
-   ri->defaultKey = ri->diffuseTex ? (uintptr_t)ri->diffuseTex : (uintptr_t)ri->vertBuff;
+   ri->defaultKey = ri->diffuseTex ? (UPTR)ri->diffuseTex : (UPTR)ri->vertBuff;
 
    renderManager->addInst( ri );
 

@@ -43,6 +43,9 @@ typedef double             F64;     ///< Compiler independent 64-bit float
 
 struct EmptyType {};                ///< "Null" type used by templates
 
+typedef intptr_t           SPTR;    ///< Compiler independent integer to store pointers
+typedef uintptr_t          UPTR;    ///< Compiler independent unsigned integer to store pointers
+
 #define TORQUE_UNUSED(var) (void)sizeof(var)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////

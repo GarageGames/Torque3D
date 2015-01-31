@@ -206,7 +206,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
 
    coreRI->vertBuff = &vb;
    coreRI->primBuff = &pb;
-   coreRI->defaultKey2 = (uintptr_t) coreRI->vertBuff;
+   coreRI->defaultKey2 = (UPTR) coreRI->vertBuff;
 
    coreRI->materialHint = rdata.getMaterialHint();
 

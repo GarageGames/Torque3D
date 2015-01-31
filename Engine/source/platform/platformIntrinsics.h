@@ -40,7 +40,7 @@
 template< typename T >
 inline bool dCompareAndSwap( T* volatile& refPtr, T* oldPtr, T* newPtr )
 {
-   return dCompareAndSwap( *reinterpret_cast< volatile uintptr_t* >( &refPtr ), ( uintptr_t ) oldPtr, ( uintptr_t ) newPtr );
+   return dCompareAndSwap( *reinterpret_cast< volatile UPTR* >( &refPtr ), ( UPTR ) oldPtr, ( UPTR ) newPtr );
 }
 
 // Test-And-Set
