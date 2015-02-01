@@ -5,22 +5,18 @@ apt-get update -y
 apt-get install -y --no-install-recommends ubuntu-desktop
 
 # Install software for development.
-apt-get install \
-	terminal \
-	git \
-	-y
-
-# Install Torque-specific binaries.
 sudo apt-get install \
+	git \
+	terminal \
 	build-essential \
 	nasm \
+	cmake \
+	cmake-qt-gui \
 	xorg-dev \
 	ninja-build \
 	gcc-multilib \
 	g++-multilib \
-	cmake \
-	cmake-qt-gui \
-	--ignore-missing -y
+	-y
 
 # Install libraries.
 sudo apt-get install \
@@ -35,4 +31,4 @@ sudo apt-get install \
 	libxi-dev \
 	libxrandr-dev \
 	libxss-dev \
-	--ignore-missing -y
+	-y

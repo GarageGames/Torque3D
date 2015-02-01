@@ -19,7 +19,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # config.vm.network 'forwarded_port', guest: 80, host: 8080
 
   # More info at http://fgrehm.viewdocs.io/vagrant-cachier/usage
-  if Vagrant.has_plugin?("vagrant-cachier")
+  if Vagrant.has_plugin?('vagrant-cachier')
     config.cache.scope = :box
   end
 end
