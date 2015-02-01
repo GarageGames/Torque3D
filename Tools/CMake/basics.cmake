@@ -366,8 +366,31 @@ macro(finishExecutable)
             if (moduleSrcs)
                 set(unifiedFile "${module}.cpp")
                 message(STATUS "Generating " ${unifiedFile})
+
+                # Put the list in a deterministic order, since globbing is
+                # unsequenced.  Add a (hopefully) unique character sequence to
+                # the start of each directory name before sorting so that files
+                # will come before directories at the same tree depth. This is
+                # similar but not identical to the order we would have gotten
+                # just by globbing on NTFS.
+                set(mangledSrcs "")
+                foreach(file ${moduleSrcs})
+                    string(REGEX REPLACE "([^/]+)/" "~|\\1/" result "${file}")
+                    list(APPEND mangledSrcs ${result})
+                endforeach()
+
+                # sort the list
+                list(SORT mangledSrcs)
+                list(REMOVE_DUPLICATES mangledSrcs)
+
+                # restore the original names
+                set(moduleSrcs "")
+                foreach(file ${mangledSrcs})
+                    string(REPLACE "~|" "" demangled "${file}")
+                    list(APPEND moduleSrcs ${demangled})
+                endforeach()
+
                 # prevent individual files from being built
-                list(REMOVE_DUPLICATES moduleSrcs)
                 set_source_files_properties(${moduleSrcs} PROPERTIES HEADER_FILE_ONLY true)
 
                 # generate the module cpp file
