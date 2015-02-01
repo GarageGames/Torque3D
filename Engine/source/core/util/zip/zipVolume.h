@@ -29,10 +29,8 @@
 
 namespace Torque
 {
-   using namespace FS;
-   using namespace Zip;
 
-class ZipFileSystem: public FileSystem
+class ZipFileSystem: public FS::FileSystem
 {
 public:
    ZipFileSystem(String& zipFilename, bool zipNameIsDir = false);
@@ -40,10 +38,10 @@ public:
 
    String   getTypeStr() const { return "Zip"; }
 
-   FileNodeRef resolve(const Path& path);
+   FS::FileNodeRef resolve(const Path& path);
 
    // these are unsupported, ZipFileSystem is currently read only access
-   FileNodeRef create(const Path& path,FileNode::Mode) { return 0; }
+   FS::FileNodeRef create(const Path& path,FS::FileNode::Mode) { return 0; }
    bool remove(const Path& path) { return 0; }
    bool rename(const Path& a,const Path& b) { return 0; }
 
@@ -53,7 +51,7 @@ public:
 
 public:
    /// Private interface for use by unit test only. 
-   StrongRefPtr<ZipArchive> getArchive() { return mZipArchive; }
+   StrongRefPtr<Zip::ZipArchive> getArchive() { return mZipArchive; }
 
 private:
    void _init();
@@ -63,7 +61,7 @@ private:
    String mZipFilename;
    String mFakeRoot;
    FileStream* mZipArchiveStream;
-   StrongRefPtr<ZipArchive> mZipArchive;
+   StrongRefPtr<Zip::ZipArchive> mZipArchive;
 };
 
 }

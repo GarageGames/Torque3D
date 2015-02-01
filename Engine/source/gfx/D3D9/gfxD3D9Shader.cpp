@@ -36,8 +36,6 @@
 #include "core/util/safeDelete.h"
 #include "console/console.h"
 
-using namespace Torque;
-
 extern bool gDisassembleAllShaders;
 
 /// D3DXInclude plugin
@@ -833,7 +831,7 @@ bool GFXD3D9Shader::_compileShader( const Torque::Path &filePath,
       // Convert the path which might have virtualized
       // mount paths to a real file system path.
       Torque::Path realPath;
-      if ( !FS::GetFSPath( filePath, realPath ) )
+      if ( !Torque::FS::GetFSPath( filePath, realPath ) )
          realPath = filePath;
 
       // Add a #line pragma so that error and warning messages
