@@ -63,6 +63,9 @@ GuiMLTextEditCtrl::GuiMLTextEditCtrl()
    mActive = true;
 
    mVertMoveAnchorValid = false;
+
+   mCursorOn = false;
+   mNumFramesElapsed = 0;
 }
 
 
@@ -151,7 +154,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
          case KEY_X:
 			{
 				//make sure we actually have something selected
-				if (mSelectionActive)
+				if (isSelectionActive())
 				{
 		         copyToClipboard(mSelectionStart, mSelectionEnd);
 
@@ -451,12 +454,29 @@ void GuiMLTextEditCtrl::handleMoveKeys(const GuiEvent& event)
 }
 
 //--------------------------------------------------------------------------
+void GuiMLTextEditCtrl::onPreRender()
+{
+	Parent::onPreRender();
+	if ( isFirstResponder() )
+	{
+		U32 timeElapsed = Platform::getVirtualMilliseconds() - mTimeLastCursorFlipped;
+		mNumFramesElapsed++;
+		if ( ( timeElapsed > 500 ) && ( mNumFramesElapsed > 3 ) )
+		{
+			mCursorOn = !mCursorOn;
+			mTimeLastCursorFlipped = Platform::getVirtualMilliseconds();
+			mNumFramesElapsed = 0;
+			setUpdate();
+		}
+	}
+}
+
 void GuiMLTextEditCtrl::onRender(Point2I offset, const RectI& updateRect)
 {
    Parent::onRender(offset, updateRect);
 
    // We are the first responder, draw our cursor in the appropriate position...
-   if (isFirstResponder()) 
+   if (isFirstResponder() && mCursorOn) 
    {
       Point2I top, bottom;
       ColorI color;
