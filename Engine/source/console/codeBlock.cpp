@@ -61,7 +61,7 @@ CodeBlock::CodeBlock()
 CodeBlock::~CodeBlock()
 {
    // Make sure we aren't lingering in the current code block...
-   AssertFatal(smCurrentCodeBlock != this, "CodeBlock::~CodeBlock - Caught lingering in smCurrentCodeBlock!")
+   AssertFatal(smCurrentCodeBlock != this, "CodeBlock::~CodeBlock - Caught lingering in smCurrentCodeBlock!");
 
    if(name)
       removeFromCodeList();

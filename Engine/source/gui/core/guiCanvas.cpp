@@ -712,7 +712,8 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
    // Need to query platform for specific things
    AssertISV(mPlatformWindow, "GuiCanvas::processMouseEvent - no window present!");
    PlatformCursorController *pController = mPlatformWindow->getCursorController();
-   AssertFatal(pController != NULL, "GuiCanvas::processInputEvent - No Platform Controller Found")
+   AssertFatal(pController != NULL, "GuiCanvas::processInputEvent - No Platform Controller Found");
+
 
       //copy the modifier into the new event
       mLastEvent.modifier = inputEvent.modifier;
