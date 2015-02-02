@@ -64,6 +64,9 @@ class GuiBitmapCtrl : public GuiControl
       void onSleep();
       void inspectPostApply();
 
+      U32 getImageWidth();
+      U32 getImageHeight();
+      	
       void updateSizing();
 
       void onRender(Point2I offset, const RectI &updateRect);
