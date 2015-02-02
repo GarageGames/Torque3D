@@ -325,11 +325,21 @@ S32 GuiTextListCtrl::findEntryById(U32 id)
    return -1;
 }
 
-S32 GuiTextListCtrl::findEntryByText(const char *text)
+S32 GuiTextListCtrl::findEntryByText(const char *text, bool substring)
 {
    for(U32 i = 0; i < mList.size(); i++)
-      if(!dStricmp(mList[i].text, text))
-         return i;
+   {
+      if(substring)
+      {
+         if(dStrstr( mList[i].text, text ))
+            return i;
+      }
+      else
+      {
+         if(!dStricmp(mList[i].text, text))
+            return i;
+      }
+   }
    return -1;
 }
 
@@ -798,7 +808,7 @@ DefineEngineMethod( GuiTextListCtrl, scrollVisible, void, (S32 rowNum),,
    object->scrollCellVisible(Point2I(0, rowNum));
 }
 
-DefineEngineMethod( GuiTextListCtrl, findTextIndex, S32, (const char* needle),,
+DefineEngineMethod( GuiTextListCtrl, findTextIndex, S32, (const char* needle, bool substring), (false),
    "@brief Find needle in the list, and return the row number it was found in.\n\n"
    "@param needle Text to find in the list.\n"
    "@tsexample\n"
@@ -810,7 +820,7 @@ DefineEngineMethod( GuiTextListCtrl, findTextIndex, S32, (const char* needle),,
    "@return Row number that the defined text was found in,\n\n"
    "@see GuiControl")
 {
-   return( object->findEntryByText(needle) );
+   return( object->findEntryByText(needle, substring) );
 }
 
 DefineEngineMethod( GuiTextListCtrl, setRowActive, void, (S32 rowNum, bool active),,

@@ -86,7 +86,7 @@ class GuiTextListCtrl : public GuiArrayCtrl
    void setEntry(U32 id, const char *text);
    void setEntryActive(U32 id, bool active);
    S32 findEntryById(U32 id);
-   S32 findEntryByText(const char *text);
+   S32 findEntryByText(const char *text, bool substring = false);
    bool isEntryActive(U32 id);
 
    U32 getEntryId(U32 index);
