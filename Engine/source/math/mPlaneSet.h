@@ -458,7 +458,7 @@ U32 PlaneSet< T >::clipPolygon( const Point3F* inVertices, U32 inNumVertices, Po
       // to indicate we haven't clipped anything.
 
       if( !numClippedPolygonVertices )
-         return false;
+         return 0;
 
       // On first iteration, replace the inVertices with the
       // outVertices buffer.

@@ -383,9 +383,10 @@ inline PlaneF::Side PlaneF::whichSide( const OrientedBox3F& obb ) const
    // Project the box onto the line defined by the plane center and normal.
    // See "3D Game Engine Design" chapter 4.3.2.
 
-   const F32 r = obb.getHalfExtents().x * mFabs( mDot( obb.getAxis( 0 ), *this ) ) +
-                 obb.getHalfExtents().y * mFabs( mDot( obb.getAxis( 1 ), *this ) ) +
-                 obb.getHalfExtents().z * mFabs( mDot( obb.getAxis( 2 ), *this ) );
+   Point3F mObbHalf = obb.getHalfExtents();
+   const F32 r = mObbHalf.x * mFabs( mDot( obb.getAxis( 0 ), *this ) ) +
+                 mObbHalf.y * mFabs( mDot( obb.getAxis( 1 ), *this ) ) +
+                 mObbHalf.z * mFabs( mDot( obb.getAxis( 2 ), *this ) );
 
    const F32 dist = distToPlane( obb.getCenter() );
    if( dist > r )

@@ -290,6 +290,12 @@ bool MatInstance::init( const FeatureSet &features,
 //----------------------------------------------------------------------------
 bool MatInstance::reInit()
 {
+   if (!mVertexFormat)
+   {
+      mIsValid = false;
+      return mIsValid;
+   }
+
    SAFE_DELETE(mProcessedMaterial);
    deleteAllHooks();
    mIsValid = processMaterial();
