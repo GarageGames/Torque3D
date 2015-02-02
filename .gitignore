@@ -185,3 +185,4 @@ projects.xml
 Qt*.dll
 Templates/Full/game/resources/
 Templates/Full/game/shaders/procedural/
+Templates/Full/buildFiles/
