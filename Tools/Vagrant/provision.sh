@@ -2,7 +2,7 @@
 apt-get update -y
 
 # Install Unity desktop for GUI purposes.
-apt-get install -y --no-install-recommends ubuntu-desktop
+#apt-get install -y --no-install-recommends ubuntu-desktop
 
 # Install software for development.
 sudo apt-get install \
