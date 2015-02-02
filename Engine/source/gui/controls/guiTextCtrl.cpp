@@ -87,6 +87,13 @@ DefineEngineMethod( GuiTextCtrl, setTextID, void, (const char* textID),,
 	object->setTextID( textID );
 }
 
+DefineEngineMethod( GuiTextCtrl, getText, const char*, (),,
+   "@brief returns the text.\n\n"
+   "@return text displayed in this control\n")
+{
+   return object->getText();
+}
+
 void GuiTextCtrl::initPersistFields()
 {
    addProtectedField("text", TypeCaseString, Offset(mInitialText, GuiTextCtrl), setText, getTextProperty,
@@ -228,7 +235,7 @@ void GuiTextCtrl::onRender(Point2I offset, const RectI &updateRect)
 {
    renderBorder( RectI( offset, getExtent() ), mProfile );
 
-   GFX->getDrawUtil()->setBitmapModulation( mProfile->mFontColor );
+   GFX->getDrawUtil()->setBitmapModulation( isActive() ? mProfile->mFontColor : mProfile->mFontColorNA );
    renderJustifiedText(offset, getExtent(), (char*)mText);
 
    //render the child controls
