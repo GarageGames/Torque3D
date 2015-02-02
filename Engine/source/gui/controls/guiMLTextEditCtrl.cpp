@@ -175,18 +175,10 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
          case KEY_V:
 			{
 				const char *clipBuf = Platform::getClipboard();
-				if (dStrlen(clipBuf) > 0)
-				{
-			      // Normal ascii keypress.  Go ahead and add the chars...
-			      if (mSelectionActive == true)
-			      {
-			         mSelectionActive = false;
-			         deleteChars(mSelectionStart, mSelectionEnd);
-			         mCursorPosition = mSelectionStart;
-			      }
 
-			      insertChars(clipBuf, dStrlen(clipBuf), mCursorPosition);
-				}
+				// Normal ascii keypress.  Go ahead and add the chars...
+				insertText(clipBuf);
+
 				return true;
 			}
          
@@ -198,6 +190,64 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
    {
       switch ( event.keyCode )
       {
+		  case KEY_LEFT:
+			  if (mCursorPosition > 0)
+			  {
+				  if(mSelectionActive)
+				  {
+					  if(mCursorPosition < mSelectionEnd)
+					  {
+						  mCursorPosition--;
+						  mSelectionStart = mCursorPosition;
+					  }
+					  else if(mCursorPosition > mSelectionStart)
+					  {
+						  mCursorPosition--;
+						  mSelectionEnd = mCursorPosition;
+					  }
+				  }
+				  else
+				  {
+					  mSelectionEnd = mCursorPosition;
+					  mCursorPosition--;
+					  mSelectionStart = mCursorPosition;
+				  }
+
+				  if(mSelectionStart != mSelectionEnd)
+					  mSelectionActive = true;
+				  else
+					  mSelectionActive = false;
+			  }
+			  return true;
+		  case KEY_RIGHT:
+			  if (mCursorPosition < mTextBuffer.length())
+			  {
+				  if(mSelectionActive)
+				  {
+					  if(mCursorPosition > mSelectionStart)
+					  {
+						  mCursorPosition++;
+						  mSelectionEnd = mCursorPosition;
+					  }
+					  else if(mCursorPosition < mSelectionEnd)
+					  {
+						  mCursorPosition++;
+						  mSelectionStart = mCursorPosition;
+					  }
+				  }
+				  else
+				  {
+					  mSelectionStart = mCursorPosition;
+					  mCursorPosition++;
+					  mSelectionEnd = mCursorPosition;
+				  }
+
+				  if(mSelectionStart != mSelectionEnd)
+					  mSelectionActive = true;
+				  else
+					  mSelectionActive = false;
+			  }
+			  return true;
          case KEY_TAB:
             return( Parent::onKeyDown( event ) );
          default:
@@ -303,13 +353,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
 //--------------------------------------
 void GuiMLTextEditCtrl::handleDeleteKeys(const GuiEvent& event)
 {
-   if ( isSelectionActive() )
-   {
-      mSelectionActive = false;
-      deleteChars(mSelectionStart, mSelectionEnd+1);
-      mCursorPosition = mSelectionStart;
-   }
-   else
+   if(!deleteSelection())
    {
       switch ( event.keyCode )
       {
