@@ -270,11 +270,6 @@ GuiMouseEventCtrl::GuiMouseEventCtrl()
 //------------------------------------------------------------------------------
 void GuiMouseEventCtrl::sendMouseEvent(const char * name, const GuiEvent & event)
 {
-   char buf[3][32];
-   dSprintf(buf[0], 32, "%d", event.modifier);
-   dSprintf(buf[1], 32, "%d %d", event.mousePoint.x, event.mousePoint.y);
-   dSprintf(buf[2], 32, "%d", event.mouseClickCount);
-
    if(dStricmp(name,"onMouseDown") == 0)
 	   onMouseDown_callback(event.modifier, event.mousePoint, event.mouseClickCount);
    else if(dStricmp(name,"onMouseUp") == 0)
