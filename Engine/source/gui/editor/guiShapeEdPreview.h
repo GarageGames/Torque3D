@@ -154,7 +154,7 @@ protected:
    void handleMouseDragged(const GuiEvent& event, GizmoMode mode);
 
    // Node picking
-   S32 collideNode(const Gui3DMouseEvent& event) const;
+   virtual S32 collideNode(const Gui3DMouseEvent& event) const;
    void updateProjectedNodePoints();
 
    void updateSun();
@@ -163,7 +163,7 @@ protected:
 
    // Rendering
    void renderGrid();
-   void renderNodes() const;
+   virtual void renderNodes() const;
    void renderNodeAxes(S32 index, const ColorF& nodeColor) const;
    void renderNodeName(S32 index, const ColorF& textColor) const;
    void renderSunDirection() const;
@@ -247,7 +247,7 @@ public:
    void setAllMeshesHidden(bool hidden);
 
    void renderWorld(const RectI& updateRect);
-   void renderGui(Point2I offset, const RectI& updateRect);
+   virtual void renderGui(Point2I offset, const RectI& updateRect);
    ///@}
 
    DECLARE_CONOBJECT(GuiShapeEdPreview);
