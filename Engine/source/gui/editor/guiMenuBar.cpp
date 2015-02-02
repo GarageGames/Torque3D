@@ -1018,7 +1018,7 @@ void GuiMenuBar::addSubmenuItem(Menu *menu, MenuItem *submenu, const char *text,
    newMenuItem->checkGroup = checkGroup;
    newMenuItem->nextMenuItem = NULL;
    newMenuItem->acceleratorIndex = 0;
-   newMenuItem->enabled = text[0] != '-';
+   newMenuItem->enabled = (dStrlen(text) > 1 || text[0] != '-');
    newMenuItem->visible = true;
    newMenuItem->bitmapIndex = -1;
 
