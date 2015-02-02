@@ -115,6 +115,9 @@ void GuiConsoleTextCtrl::onPreRender()
    {
       mResult = Con::evaluatef( "$guiConsoleTextCtrlTemp = %s;", mConsoleExpression.c_str() );
       
+      //Fixes a bug with the above not always grabbing the console text.
+      mResult = Con::getVariable("$guiConsoleTextCtrlTemp");
+      
       // Of the resulting string we will be printing,
       // Find the number of lines and length of each.      
       mProfile->mFont->wrapString( mResult, U32_MAX, mStartLineOffset, mLineLen );
