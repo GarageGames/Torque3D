@@ -44,7 +44,7 @@ protected:
          : mData( str ), mLength( str ? dStrlen( str ) : 0 ), mUTF16( NULL )
       {
          if( str )
-            mUTF16 = convertUTF8toUTF16( mData );
+            mUTF16 = createUTF16string( mData );
       }
       ~StrTest()
       {

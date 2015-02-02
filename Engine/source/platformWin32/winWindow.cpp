@@ -104,7 +104,7 @@ bool Platform::excludeOtherInstances(const char *mutexName)
 {
 #ifdef UNICODE
    UTF16 b[512];
-   convertUTF8toUTF16((UTF8 *)mutexName, b, sizeof(b));
+   convertUTF8toUTF16((UTF8 *)mutexName, b);
    gMutexHandle = CreateMutex(NULL, true, b);
 #else
    gMutexHandle = CreateMutex(NULL, true, mutexName);
@@ -164,7 +164,7 @@ bool Platform::checkOtherInstances(const char *mutexName)
    
 #ifdef UNICODE
    UTF16 b[512];
-   convertUTF8toUTF16((UTF8 *)mutexName, b, sizeof(b));
+   convertUTF8toUTF16((UTF8 *)mutexName, b);
    pMutex  = CreateMutex(NULL, true, b);
 #else
    pMutex = CreateMutex(NULL, true, mutexName);
@@ -197,8 +197,8 @@ void Platform::AlertOK(const char *windowTitle, const char *message)
    ShowCursor(true);
 #ifdef UNICODE
    UTF16 m[1024], t[512];
-   convertUTF8toUTF16((UTF8 *)windowTitle, t, sizeof(t));
-   convertUTF8toUTF16((UTF8 *)message, m, sizeof(m));
+   convertUTF8toUTF16((UTF8 *)windowTitle, t);
+   convertUTF8toUTF16((UTF8 *)message, m);
    MessageBox(NULL, m, t, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_OK);
 #else
    MessageBox(NULL, message, windowTitle, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_OK);
@@ -211,8 +211,8 @@ bool Platform::AlertOKCancel(const char *windowTitle, const char *message)
    ShowCursor(true);
 #ifdef UNICODE
    UTF16 m[1024], t[512];
-   convertUTF8toUTF16((UTF8 *)windowTitle, t, sizeof(t));
-   convertUTF8toUTF16((UTF8 *)message, m, sizeof(m));
+   convertUTF8toUTF16((UTF8 *)windowTitle, t);
+   convertUTF8toUTF16((UTF8 *)message, m);
    return MessageBox(NULL, m, t, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_OKCANCEL) == IDOK;
 #else
    return MessageBox(NULL, message, windowTitle, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_OKCANCEL) == IDOK;
@@ -225,8 +225,8 @@ bool Platform::AlertRetry(const char *windowTitle, const char *message)
    ShowCursor(true);
 #ifdef UNICODE
    UTF16 m[1024], t[512];
-   convertUTF8toUTF16((UTF8 *)windowTitle, t, sizeof(t));
-   convertUTF8toUTF16((UTF8 *)message, m, sizeof(m));
+   convertUTF8toUTF16((UTF8 *)windowTitle, t);
+   convertUTF8toUTF16((UTF8 *)message, m);
    return (MessageBox(NULL, m, t, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_RETRYCANCEL) == IDRETRY);
 #else
    return (MessageBox(NULL, message, windowTitle, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_RETRYCANCEL) == IDRETRY);
@@ -241,8 +241,8 @@ Platform::ALERT_ASSERT_RESULT Platform::AlertAssert(const char *windowTitle, con
 
 #ifdef UNICODE
    UTF16 messageUTF[1024], title[512];
-   convertUTF8toUTF16((UTF8 *)windowTitle, title, sizeof(title));
-   convertUTF8toUTF16((UTF8 *)message, messageUTF, sizeof(messageUTF));
+   convertUTF8toUTF16((UTF8 *)windowTitle, title);
+   convertUTF8toUTF16((UTF8 *)message, messageUTF);
 #else
    const char* messageUTF = message;
    const char* title = windowTitle;
@@ -362,7 +362,7 @@ S32 WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
    {
       TCHAR buf[ moduleNameSize ];
       GetModuleFileNameW( NULL, buf, moduleNameSize );
-      convertUTF16toUTF8( buf, moduleName, moduleNameSize );
+      convertUTF16toUTF8( buf, moduleName );
    }
 #else
    GetModuleFileNameA(NULL, moduleName, moduleNameSize);
@@ -440,7 +440,7 @@ S32 torque_winmain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
    {
       TCHAR buf[ moduleNameSize ];
       GetModuleFileNameW( NULL, buf, moduleNameSize );
-      convertUTF16toUTF8( buf, moduleName, moduleNameSize );
+      convertUTF16toUTF8( buf, moduleName );
    }
 #else
    GetModuleFileNameA(NULL, moduleName, moduleNameSize);
@@ -541,7 +541,7 @@ bool Platform::openWebBrowser( const char* webAddress )
       RegCloseKey( regKey );
       sHaveKey = true;
 
-      convertUTF16toUTF8(sWebKey,utf8WebKey,512);
+      convertUTF16toUTF8(sWebKey,utf8WebKey);
 
 #ifdef UNICODE
       char *p = dStrstr((const char *)utf8WebKey, "%1"); 
@@ -560,7 +560,7 @@ bool Platform::openWebBrowser( const char* webAddress )
 #ifdef UNICODE
    dSprintf( buf, sizeof( buf ), "%s %s", utf8WebKey, webAddress );   
    UTF16 b[1024];
-   convertUTF8toUTF16((UTF8 *)buf, b, sizeof(b));
+   convertUTF8toUTF16((UTF8 *)buf, b);
 #else
    dSprintf( buf, sizeof( buf ), "%s %s", sWebKey, webAddress );   
 #endif

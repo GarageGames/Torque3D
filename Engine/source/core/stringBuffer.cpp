@@ -141,7 +141,7 @@ void StringBuffer::set(const UTF8 *in)
    incRequestCount8();
    // Convert and store. Note that a UTF16 version of the string cannot be longer.
    FrameTemp<UTF16> tmpBuff(dStrlen(in)+1);
-   if(!in || in[0] == 0 || !convertUTF8toUTF16(in, tmpBuff, dStrlen(in)+1))
+   if(!in || in[0] == 0 || !convertUTF8toUTF16N(in, tmpBuff, dStrlen(in)+1))
    {
       // Easy out, it's a blank string, or a bad string.
       mBuffer.clear();
@@ -186,7 +186,7 @@ void StringBuffer::append(const UTF8* in)
    
    // convert to UTF16, because that's our internal format.
    // if the conversion fails, exit.
-   UTF16* tmp = convertUTF8toUTF16(in);
+   UTF16* tmp = createUTF16string(in);
    AssertFatal(tmp, "StringBuffer::append(UTF8) - could not convert UTF8 string!");
    if(!tmp)
       return;
@@ -231,7 +231,7 @@ void StringBuffer::insert(const U32 charOffset, const UTF8* in)
    
    // convert to UTF16, because that's our internal format.
    // if the conversion fails, exit.
-   UTF16* tmp = convertUTF8toUTF16(in);
+   UTF16* tmp = createUTF16string(in);
    AssertFatal(tmp, "StringBuffer::insert(UTF8) - could not convert UTF8 string!");
    if(!tmp)
       return;
@@ -359,7 +359,7 @@ void StringBuffer::getCopy8(UTF8 *buff, const U32 buffSize) const
 {
    incRequestCount8();
    AssertFatal(mBuffer.last() == 0, "StringBuffer::get UTF8 - not a null terminated string!");
-   convertUTF16toUTF8(mBuffer.address(), buff, buffSize);
+   convertUTF16toUTF8N(mBuffer.address(), buff, buffSize);
 }
 
 void StringBuffer::getCopy(UTF16 *buff, const U32 buffSize) const
@@ -377,7 +377,7 @@ UTF8* StringBuffer::createCopy8() const
    incRequestCount8();
    // convert will create a buffer of the appropriate size for a null terminated
    // input string.
-   UTF8* out = convertUTF16toUTF8(mBuffer.address());
+   UTF8* out = createUTF8string(mBuffer.address());
    return out;
 }
 
@@ -408,7 +408,7 @@ void StringBuffer::updateBuffer8()
 {
    U32 slackLen = getUTF8BufferSizeEstimate();
    mBuffer8.setSize(slackLen);
-   U32 len = convertUTF16toUTF8(mBuffer.address(), mBuffer8.address(), slackLen);
+   U32 len = convertUTF16toUTF8N(mBuffer.address(), mBuffer8.address(), slackLen);
    mBuffer8.setSize(len+1);
    mBuffer8.compact();
    mDirty8 = false;

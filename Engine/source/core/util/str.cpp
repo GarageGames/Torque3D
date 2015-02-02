@@ -346,7 +346,7 @@ class String::StringData : protected StringDataImpl
          {
             // Do this atomically to protect interned strings.
             
-            UTF16* utf16 = convertUTF8toUTF16( mData );
+            UTF16* utf16 = createUTF16string( mData );
             if( !dCompareAndSwap( mUTF16,( UTF16* ) NULL, utf16 ) )
                delete [] utf16;
          }
@@ -580,7 +580,7 @@ String::String(const UTF16 *str)
 
    if( str && str[ 0 ] )
    {
-      UTF8* utf8 = convertUTF16toUTF8( str );
+      UTF8* utf8 = createUTF8string( str );
       U32 len = dStrlen( utf8 );
       _string = new ( len ) StringData( utf8 );
       delete [] utf8;

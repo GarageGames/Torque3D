@@ -146,7 +146,7 @@ inline bool isAboveBMP(U32 codepoint)
 }
 
 //-----------------------------------------------------------------------------
-U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
+U32 convertUTF8toUTF16N(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
 {
    AssertFatal(len >= 1, "Buffer for unicode conversion must be large enough to hold at least the null terminator.");
    PROFILE_SCOPE(convertUTF8toUTF16);
@@ -159,7 +159,6 @@ U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
    {
       const UTF16Cache &cache = (*cacheItr).value;
       cache.copyToBuffer(outbuffer, len);
-      outbuffer[len-1] = '\0';
       return getMin(cache.mLength,len - 1);
    }
 #endif
@@ -191,7 +190,7 @@ U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
 }
 
 //-----------------------------------------------------------------------------
-U32 convertUTF16toUTF8( const UTF16 *unistring, UTF8  *outbuffer, U32 len)
+U32 convertUTF16toUTF8N( const UTF16 *unistring, UTF8  *outbuffer, U32 len)
 {
    AssertFatal(len >= 1, "Buffer for unicode conversion must be large enough to hold at least the null terminator.");
    PROFILE_START(convertUTF16toUTF8);
@@ -243,16 +242,16 @@ U32 convertUTF16toUTF8DoubleNULL( const UTF16 *unistring, UTF8  *outbuffer, U32 
 //-----------------------------------------------------------------------------
 // Functions that convert buffers of unicode code points
 //-----------------------------------------------------------------------------
-UTF16* convertUTF8toUTF16( const UTF8* unistring)
+UTF16* createUTF16string( const UTF8* unistring)
 {
-   PROFILE_SCOPE(convertUTF8toUTF16_create);
+   PROFILE_SCOPE(createUTF16string);
    
    // allocate plenty of memory.
    U32 nCodepoints, len = dStrlen(unistring) + 1;
    FrameTemp<UTF16> buf(len);
    
    // perform conversion
-   nCodepoints = convertUTF8toUTF16( unistring, buf, len);
+   nCodepoints = convertUTF8toUTF16N( unistring, buf, len);
    
    // add 1 for the NULL terminator the converter promises it included.
    nCodepoints++;
@@ -265,16 +264,16 @@ UTF16* convertUTF8toUTF16( const UTF8* unistring)
 }
 
 //-----------------------------------------------------------------------------
-UTF8*  convertUTF16toUTF8( const UTF16* unistring)
+UTF8*  createUTF8string( const UTF16* unistring)
 {
-   PROFILE_SCOPE(convertUTF16toUTF8_create);
+   PROFILE_SCOPE(createUTF8string);
 
    // allocate plenty of memory.
    U32 nCodeunits, len = dStrlen(unistring) * 3 + 1;
    FrameTemp<UTF8> buf(len);
       
    // perform conversion
-   nCodeunits = convertUTF16toUTF8( unistring, buf, len);
+   nCodeunits = convertUTF16toUTF8N( unistring, buf, len);
    
    // add 1 for the NULL terminator the converter promises it included.
    nCodeunits++;
@@ -507,21 +506,6 @@ U32 dStrlen(const UTF32 *unistring)
       i++;
       
    return i;
-}
-
-//-----------------------------------------------------------------------------
-U32 dStrncmp(const UTF16* unistring1, const UTF16* unistring2, U32 len)
-{
-   UTF16 c1, c2;
-   for(U32 i = 0; i<len; i++)
-   {
-      c1 = *unistring1++;
-      c2 = *unistring2++;
-      if(c1 < c2) return -1;
-      if(c1 > c2) return 1;
-      if(!c1) return 0;
-   }
-   return 0;
 }
 
 //-----------------------------------------------------------------------------

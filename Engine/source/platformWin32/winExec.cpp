@@ -88,15 +88,15 @@ ExecuteThread::ExecuteThread(const char *executable, const char *args /* = NULL 
 
 #ifdef UNICODE
    WCHAR exe[ 1024 ];
-   convertUTF8toUTF16( exeBuf, exe, sizeof( exe ) / sizeof( exe[ 0 ] ) );
+   convertUTF8toUTF16( exeBuf, exe );
 
    TempAlloc< WCHAR > argsBuf( ( args ? dStrlen( args ) : 0 ) + 1 );
    argsBuf[ argsBuf.size - 1 ] = 0;
 
    if( args )
-      convertUTF8toUTF16( args, argsBuf, argsBuf.size );
+      convertUTF8toUTF16N( args, argsBuf, argsBuf.size );
    if( directory )
-      convertUTF8toUTF16( directory, dirBuf, dirBuf.size );
+      convertUTF8toUTF16N( directory, dirBuf, dirBuf.size );
 #else
    char* exe = exeBuf;
    char* argsBuf = args;
@@ -162,7 +162,7 @@ void Platform::openFolder(const char* path )
 
 #ifdef UNICODE
    WCHAR p[ 1024 ];
-   convertUTF8toUTF16( filePath, p, sizeof( p ) / sizeof( p[ 0 ] ) );
+   convertUTF8toUTF16( filePath, p );
 #else
    char* p = filePath;
 #endif
@@ -179,7 +179,7 @@ void Platform::openFile(const char* path )
 
 #ifdef UNICODE
    WCHAR p[ 1024 ];
-   convertUTF8toUTF16( filePath, p, sizeof( p ) / sizeof( p[ 0 ] ) );
+   convertUTF8toUTF16( filePath, p );
 #else
    char* p = filePath;
 #endif
