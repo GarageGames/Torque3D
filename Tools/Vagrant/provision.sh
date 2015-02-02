@@ -7,7 +7,6 @@ apt-get update -y
 # Install software for development.
 sudo apt-get install \
 	git \
-	terminal \
 	build-essential \
 	nasm \
 	cmake \
