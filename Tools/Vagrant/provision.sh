@@ -30,4 +30,5 @@ sudo apt-get install \
 	libxi-dev \
 	libxrandr-dev \
 	libxss-dev \
+	libglu1-mesa-dev \
 	-y
