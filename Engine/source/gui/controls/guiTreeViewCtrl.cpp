@@ -1441,13 +1441,16 @@ bool GuiTreeViewCtrl::removeItem( S32 itemId, bool deleteObjects )
 
 //-----------------------------------------------------------------------------
 
-void GuiTreeViewCtrl::removeAllChildren(S32 itemId)
+bool GuiTreeViewCtrl::removeAllChildren(S32 itemId)
 {
    Item * item = getItem(itemId);
    if(item)
    {
       _destroyChildren(item->mChild, item);
+      return true;
    }
+
+   return false;
 }
 //------------------------------------------------------------------------------
 
@@ -3618,7 +3621,7 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
 
    mPossibleRenameItem = NULL;
    mRenamingItem = NULL;
-	mTempItem = NULL;
+   mTempItem = NULL;
       
    //
    if( event.modifier & SI_MULTISELECT )

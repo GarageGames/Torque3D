@@ -509,7 +509,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       void unlinkItem(Item * item);
       S32 insertItem(S32 parentId, const char * text, const char * value = "", const char * iconString = "", S16 normalImage = 0, S16 expandedImage = 1);
       bool removeItem(S32 itemId, bool deleteObjects=true);
-      void removeAllChildren(S32 itemId); // Remove all children of the given item
+      bool removeAllChildren(S32 itemId); // Remove all children of the given item
 
       bool buildIconTable(const char * icons);
 
