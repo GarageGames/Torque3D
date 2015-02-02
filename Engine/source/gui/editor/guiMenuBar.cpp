@@ -637,7 +637,7 @@ DefineEngineMethod(GuiMenuBar, setMenuItemSubmenuState, void, (const char* menuT
 }
 
 DefineEngineMethod(GuiMenuBar, addSubmenuItem, void, (const char* menuTarget, const char* menuItem, const char* submenuItemText, 
-													  int submenuItemId, const char* accelerator, int checkGroup),,
+													  int submenuItemId, const char* accelerator, int checkGroup), (NULL, -1),
    "@brief Adds a menu item to the specified menu.  The menu argument can be either the text of a menu or its id.\n\n"
    "@param menuTarget Menu to affect a submenu in\n"
    "@param menuItem Menu item to affect\n"
