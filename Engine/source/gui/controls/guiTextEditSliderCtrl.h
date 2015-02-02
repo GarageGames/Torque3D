@@ -84,6 +84,8 @@ protected:
    StringTableEntry mFormat;
    U32 mMouseDownTime;
    bool mFocusOnMouseWheel;
+	
+   S32 mHitWidth;
 
    CtrlArea mTextAreaHit;
 };
