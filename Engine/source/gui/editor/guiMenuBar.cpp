@@ -159,7 +159,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onSubmenuSelect, void, ( const char* submenuId, 
 // console methods
 //------------------------------------------------------------------------------
 
-DefineEngineMethod( GuiMenuBar, clearMenus, void, ( S32 param1, S32 param2),,
+DefineEngineMethod( GuiMenuBar, clearMenus, void, (),,
    "@brief Clears all the menus from the menu bar.\n\n"
    "@tsexample\n"
    "// Inform the GuiMenuBar control to clear all menus from itself.\n"
