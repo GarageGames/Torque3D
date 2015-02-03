@@ -1432,12 +1432,32 @@ DefineEngineMethod( SceneObject, getWorldBoxCenter, Point3F, (),,
 
 //-----------------------------------------------------------------------------
 
+DefineEngineMethod( SceneObject, getWorldBoxSize, Point3F, (),,
+   "Returns the size of the bounding box relative to the object's origin.\n"
+   "@return the size of the bounding box relative to the object's origin." )
+{
+   const Box3F& box = object->getWorldBox();
+   return Point3F(box.len_x(), box.len_y(), box.len_z());
+}
+
+//-----------------------------------------------------------------------------
+
 DefineEngineMethod( SceneObject, getObjectBox, Box3F, (),,
    "Get the object's bounding box (relative to the object's origin).\n"
    "@return six fields, two Point3Fs, containing the min and max points of the "
    "objectbox." )
 {
    return object->getObjBox();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( SceneObject, getObjectBoxSize, Point3F, (),,
+   "Returns the size of the bounding box relative to the object's origin.\n"
+   "@return the size of the bounding box relative to the object's origin." )
+{
+   const Box3F& box = object->getObjBox();
+   return Point3F(box.len_x(), box.len_y(), box.len_z());
 }
 
 //-----------------------------------------------------------------------------
