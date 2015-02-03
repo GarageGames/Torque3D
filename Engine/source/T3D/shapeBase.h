@@ -1317,6 +1317,11 @@ public:
    /// @param   reset   Reset the sequence
    bool setThreadSequence(U32 slot, S32 seq, bool reset = true);
 
+   /// Gets the animation thread for a mounted object
+   /// @param   slot   Mount slot ID
+   /// @return    seq   Sequence id
+   S32 getThreadSequence(U32 slot);
+
    /// Update the animation thread
    /// @param   st   Thread to update
    void updateThread(Thread& st);
@@ -1351,6 +1356,11 @@ public:
    /// @param   slot   Mount slot ID
    /// @param   timescale   Timescale
    bool setThreadTimeScale( U32 slot, F32 timeScale );
+   
+   /// Get the thread time scale
+   /// @param   slot   Mount slot ID
+   /// @return time scale for given slot
+   F32 getThreadTimeScale(U32 slot);
 
    /// Advance all animation threads attached to this shapebase
    /// @param   dt   Change in time from last call to this function
@@ -1796,7 +1806,16 @@ public:
    /// @param   fadeTime Time fade should take
    /// @param   fadeDelay Delay before starting fade
    /// @param   fadeOut   True if object is fading out, false if fading in.
-   void startFade( F32 fadeTime, F32 fadeDelay = 0.0, bool fadeOut = true );
+   /// @param	elapsedTime	How much time into the fade has happened
+   void startFade( F32 fadeTime, F32 fadeDelay = 0.0, bool fadeOut = true, F32 elapsedTime = 0.0f );
+
+   /// Pause the fading of an object in/out
+   /// @param	pause	True if to pause, false if not (resume)
+   void pauseFade( bool pause = true );
+
+   /// Returns if we are fading or not
+   /// @return True if fading, false if not
+   bool isFading();
 
    /// Traverses mounted objects and registers light sources with the light manager
    /// @param   lightManager   Light manager to register with
