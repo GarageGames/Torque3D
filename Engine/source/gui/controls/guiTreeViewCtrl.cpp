@@ -5001,7 +5001,7 @@ DefineEngineMethod( GuiTreeViewCtrl, removeAllChildren, bool, (S32 itemId), ,
    "Remove all children of an item from the tree with the given id.\n\n"
    "@param itemId TreeItemID of item that has children we should remove.\n")
 {
-   object->removeAllChildren(itemId);
+   return object->removeAllChildren(itemId);
 }
 
 DefineEngineMethod( GuiTreeViewCtrl, clear, bool, (), ,
