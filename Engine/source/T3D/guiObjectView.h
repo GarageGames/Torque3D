@@ -43,6 +43,8 @@ class GuiObjectView : public GuiTSCtrl
 
 	  DECLARE_CALLBACK( void, onMouseEnter, ());
 	  DECLARE_CALLBACK( void, onMouseLeave, ());
+	  
+	  DECLARE_CALLBACK( void, onOrbitDistanceChanged, ());
 
    protected:
    
@@ -77,6 +79,8 @@ class GuiObjectView : public GuiTSCtrl
       String mSkinName;
       
       /// @}
+      
+	  bool mShowAxis;
       
       /// @name Camera State
       /// @{
@@ -155,8 +159,9 @@ class GuiObjectView : public GuiTSCtrl
       
       /// @}
 
-      ///
-      void _initAnimation();
+      /// Initialize the animations
+	  /// @param time speed of the animation, 1 = normal, -1 = reverse, 0 = stop.
+      void _initAnimation(F32 time = 1);
       
       ///
       void _initMount();
@@ -194,11 +199,24 @@ class GuiObjectView : public GuiTSCtrl
       
       /// Set the animation sequence to play on the model.
       /// @param seqIndex Index of sequence to play.
-      void setObjectAnimation( S32 seqIndex );
+	  /// @param time speed of the animation, 1 = normal, -1 = reverse, 0 = stop.
+      void setObjectAnimation( S32 seqIndex, F32 time = 1 );
             
       /// Set the animation sequence to play on the model.
       /// @param seqIndex Name of sequence to play.
-      void setObjectAnimation( const String& sequenceName );
+	  /// @param time speed of the animation, 1 = normal, -1 = reverse, 0 = stop.
+      void setObjectAnimation( const String& sequenceName, F32 time = 1 );
+	  
+	  /// Set the animation sequence speed on the model.
+      /// @param time speed of the animation, 1 = normal, -1 = reverse, 0 = stop.
+      void setObjectAnimationSpeed(F32 time);
+      
+	  /// Get the animation name for the given index of the sequence
+	  /// @param index Index of sequence to play.
+      const char* getObjectAnimationName(S32 index);
+	  
+	  /// Get number of animations for the current dts
+      S32 getObjectAnimationCount();
       
       /// @}
       
@@ -276,7 +294,9 @@ class GuiObjectView : public GuiTSCtrl
       void onRightMouseDown( const GuiEvent& event );
       void onRightMouseUp( const GuiEvent& event );
       void onRightMouseDragged( const GuiEvent& event );
-
+      bool onMouseWheelUp(const GuiEvent &event);
+      bool onMouseWheelDown(const GuiEvent &event);
+      
       bool processCameraQuery( CameraQuery* query );
       void renderWorld( const RectI& updateRect );
       
