@@ -167,6 +167,11 @@ inline F32 mClampToZero(F32& input)
    return input;
 }
 
+inline F32 mScaleRange(const F32 v, const F32 vMin, const F32 vMax, const F32 min, const F32 max)
+{
+	return (v / ((vMax - vMin) / (max - min))) + min;
+}
+
 
 inline F32 mMax(const F32 x, const F32 y)
 {
@@ -479,5 +484,13 @@ inline F64 mSquared( F64 n )
    return n * n;
 }
 
+///Return the given angular value converted to be less than aMax,
+///and within a single revolution
+inline F64 mAngleWrap(F64 a, F64 aMax)
+{
+	while(a < (aMax - M_2PI)) a += M_2PI;
+	while(a > aMax) a -= M_2PI;
+	return a;
+}
 
 #endif //_MMATHFN_H_

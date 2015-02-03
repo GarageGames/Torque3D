@@ -360,6 +360,20 @@ void getVectorFromAngles( VectorF &vec, F32 yawAng, F32 pitchAng )
    vec = pnt;
 }
 
+F32 getAngleFromPoints(const Point3F& A, const Point3F& B, const Point3F& C)
+{
+	//To calculate angle at point A get two vectors that start at A 
+	VectorF V1 = B - A;
+	VectorF V2 = C - A;
+
+	//Normalize the vectors to take the dot product
+	V1.normalize();
+	V2.normalize();
+
+	//Get the dot product
+	return mAcos(mDot(V1, V2));
+}
+
 //-----------------------------------------------------------------------------
 
 void transformBoundingBox(const Box3F &sbox, const MatrixF &mat, const Point3F scale, Box3F &dbox)

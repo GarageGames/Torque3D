@@ -151,6 +151,29 @@ namespace MathUtils
    /// <b>ASSUMES Z AXIS IS UP</b>
    void getVectorFromAngles( VectorF &vec, F32 yawAng, F32 pitchAng );
 
+   /// Gets angle between 3 points where the 3 points are like this:
+   /// C
+   /// |
+   /// |
+   /// A------B
+   /// This was taken from this article: http://docs.autodesk.com/3DSMAX/15/ENU/MAXScript-Help/index.html?url=files/GUID-8FB870E5-823A-42FE-9A8C-70D25FF3B92C.htm,topicNumber=d30e89302
+   /// @param A   Point to calculate angle at
+   /// @param B   Point to the right of A (vector of A to B)
+   /// @param C   Point above A (vector of A to C)
+   /// @return Radian angle between B, A, C where A is the point the calculated angle is at
+   F32 getAngleFromPoints(const Point3F& A, const Point3F& B, const Point3F& C);
+
+   /// Test what side of a line A to B the point testPoint is on (done in 2D space - z is ignored)
+   /// This was taken from http://stackoverflow.com/questions/1560492/how-to-tell-whether-a-point-is-to-the-right-or-left-of-a-line
+   /// @param A start point of line
+   /// @param B end point of line
+   /// @param testPoint point to test what side of the line it it's on
+   /// @return 0 if it's on the line, +1 if it's on one side, -1 if it's on the other side
+   inline F32 getSideOfLinePointsOn(const Point3F& A, const Point3F& B, const Point3F& testPoint)
+   {
+	   return mSign( (B.x - A.x)*(testPoint.y - A.y) - (B.y - A.y)*(testPoint.x - A.x));
+   }
+
    /// Simple reflection equation - pass in a vector and a normal to reflect off of
    inline Point3F reflect( Point3F &inVec, Point3F &norm )
    {
