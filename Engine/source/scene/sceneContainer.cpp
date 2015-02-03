@@ -1128,7 +1128,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
 //-----------------------------------------------------------------------------
 
 // collide with the objects projected object box
-bool SceneContainer::collideBox(const Point3F &start, const Point3F &end, U32 mask, RayInfo * info)
+bool SceneContainer::collideBox(const Point3F &start, const Point3F &end, U32 mask, RayInfo * info, U32 maskExclude)
 {
    AssertFatal( info->userData == NULL, "SceneContainer::collideBox - RayInfo->userData cannot be used here!" );
 
@@ -1136,7 +1136,7 @@ bool SceneContainer::collideBox(const Point3F &start, const Point3F &end, U32 ma
    for (Link* itr = mStart.next; itr != &mEnd; itr = itr->next)
    {
       SceneObject* ptr = static_cast<SceneObject*>(itr);
-      if (ptr->getTypeMask() & mask && !ptr->mCollisionCount)
+      if (ptr->getTypeMask() & mask && ptr->getTypeMask() ^ maskExclude && !ptr->mCollisionCount)
       {
          Point3F xformedStart, xformedEnd;
          ptr->mWorldToObj.mulP(start, &xformedStart);
