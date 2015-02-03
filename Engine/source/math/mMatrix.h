@@ -72,6 +72,8 @@ public:
    /// Initialize matrix to rotate about p by e.
    MatrixF& set( const EulerF &e, const Point3F& p);
 
+   bool equals(const MatrixF& mat);
+
    /// Initialize matrix with a cross product of p.
    MatrixF& setCrossProduct( const Point3F &p);
 
@@ -212,7 +214,23 @@ public:
    /// Convenience function to allow people to treat this like an array.
    F32& operator ()(S32 row, S32 col) { return m[idx(col,row)]; }
    F32 operator ()(S32 row, S32 col) const { return m[idx(col,row)]; }
+   
+   bool operator==(const MatrixF& a) const
+   {
+      return (a[0] == m[0] && a[1] == m[1] && a[2] == m[2] && a[3] == m[3]
+         && a[4] == m[4] && a[5] == m[5] && a[6] == m[6] && a[7] == m[7]
+         && a[8] == m[8] && a[9] == m[9] && a[10] == m[10] && a[11] == m[11]
+         && a[12] == m[12] && a[13] == m[13] && a[14] == m[14] && a[15] == m[15]);
+   }
 
+   bool operator!=(const MatrixF& a) const
+   {
+      return (a[0] != m[0] || a[1] != m[1] || a[2] != m[2] || a[3] != m[3]
+         || a[4] != m[4] || a[5] != m[5] || a[6] != m[6] || a[7] != m[7]
+         || a[8] != m[8] || a[9] != m[9] || a[10] != m[10] || a[11] != m[11]
+         || a[12] != m[12] || a[13] != m[13] || a[14] != m[14] || a[15] != m[15]);
+   }
+   
    void dumpMatrix(const char *caption=NULL) const;
 
    // Math operator overloads
@@ -255,6 +273,14 @@ inline MatrixF& MatrixF::set( const EulerF &e, const Point3F& p)
 {
    m_matF_set_euler_point( e, p, *this );
    return (*this);
+}
+
+inline bool MatrixF::equals(const MatrixF& mat)
+{
+   return (m[0] == mat[0] && m[1] == mat[1] && m[2] == mat[2] && m[3] == mat[3] &&
+      m[4] == mat[4] && m[5] == mat[5] && m[6] == mat[6] && m[7] == mat[7] &&
+      m[8] == mat[8] && m[9] == mat[9] && m[10] == mat[10] && m[11] == mat[11] &&
+      m[12] == mat[12] && m[13] == mat[13] && m[14] == mat[14] && m[15] == mat[15]);
 }
 
 inline MatrixF& MatrixF::setCrossProduct( const Point3F &p)
