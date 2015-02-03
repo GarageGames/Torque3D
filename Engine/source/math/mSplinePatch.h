@@ -50,6 +50,9 @@ public:
    SplCtrlPts();
    virtual ~SplCtrlPts();
 
+   ///Clear the points
+   void               clear();
+
    /// Gets the number of points in the spline
    U32               getNumPoints(){ return mPoints.size(); }
    /// Gets the point at the given index
