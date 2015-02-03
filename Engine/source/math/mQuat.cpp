@@ -289,7 +289,7 @@ QuatF & QuatF::interpolate( const QuatF & q1, const QuatF & q2, F32 t )
    return *this;
 }
 
-Point3F & QuatF::mulP(const Point3F& p, Point3F* r)
+Point3F & QuatF::mulP(const Point3F& p, Point3F* r) const
 {
    QuatF qq;
    QuatF qi = *this;
