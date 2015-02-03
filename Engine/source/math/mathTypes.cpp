@@ -74,6 +74,16 @@ IMPLEMENT_STRUCT( Point3F,
       FIELD( z, z, 1, "Z coordinate." )
 
 END_IMPLEMENT_STRUCT;
+IMPLEMENT_STRUCT( Point4I,
+   Point4I, MathTypes,
+   "" )
+   
+      FIELD( x, x, 1, "X coordinate." )
+      FIELD( y, y, 1, "Y coordinate." )
+      FIELD( z, z, 1, "Z coordinate." )
+      FIELD( w, w, 1, "W coordinate." )
+      
+END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( Point4F,
    Point4F, MathTypes,
    "" )
@@ -168,7 +178,7 @@ ConsoleSetType( TypePoint2F )
 // TypePoint3I
 //-----------------------------------------------------------------------------
 ConsoleType( Point3I, TypePoint3I, Point3I )
-ImplementConsoleTypeCasters(TypePoint3I, Point3I)
+ImplementConsoleTypeCasters( TypePoint3I, Point3I )
 
 ConsoleGetType( TypePoint3I )
 {
@@ -212,6 +222,31 @@ ConsoleSetType( TypePoint3F )
       *((Point3F *) dptr) = Point3F(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]));
    else
       Con::printf("Point3F must be set as { x, y, z } or \"x y z\"");
+}
+
+//-----------------------------------------------------------------------------
+// TypePoint4I
+//-----------------------------------------------------------------------------
+ConsoleType( Point4I, TypePoint4I, Point4I )
+ImplementConsoleTypeCasters( TypePoint4I, Point4I )
+
+ConsoleGetType( TypePoint4I )
+{
+   Point4I *pt = (Point4I *) dptr;
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d %d %d", pt->x, pt->y, pt->z, pt->w);
+   return returnBuffer;
+}
+
+ConsoleSetType( TypePoint4I )
+{
+   if(argc == 1)
+      dSscanf(argv[0], "%d %d %d %d", &((Point4I *) dptr)->x, &((Point4I *) dptr)->y, &((Point4I *) dptr)->z, &((Point4I *) dptr)->w);
+   else if(argc == 4)
+      *((Point4I *) dptr) = Point4I(dAtoi(argv[0]), dAtoi(argv[1]), dAtoi(argv[2]), dAtoi(argv[3]));
+   else
+      Con::printf("Point4I must be set as { x, y, z, w } or \"x y z w\"");
 }
 
 //-----------------------------------------------------------------------------
@@ -846,8 +881,9 @@ DefineConsoleFunction( VectorRot, const char*, (Point3F v, F32 angle), , "(Vecto
 	x = v.x * cos(angle) - v.y * sin(angle);            
 	y = v.x * sin(angle) + v.y * cos(angle); 
 
-	char* returnBuffer = Con::getReturnBuffer(256);
-	dSprintf(returnBuffer,256,"%g %g %g", x, y, v.z);
+	static const U32 bufSize = 256;
+	char* returnBuffer = Con::getReturnBuffer(bufSize);
+	dSprintf(returnBuffer,bufSize,"%g %g %g", x, y, v.z);
 	return returnBuffer;
 }
 
@@ -903,7 +939,7 @@ DefineConsoleFunction( MatrixCreate, TransformF, ( VectorF position, AngAxisF or
 //-----------------------------------------------------------------------------
 
 DefineConsoleFunction( MatrixCreateFromEuler, TransformF, ( Point3F angles ),,
-   "@Create a matrix from the given rotations.\n\n"
+   "Create a matrix from the given rotations.\n\n"
    "@param Vector3F X, Y, and Z rotation in *radians*.\n"
    "@return A transform based on the given orientation.\n"
    "@ingroup Matrices" )
