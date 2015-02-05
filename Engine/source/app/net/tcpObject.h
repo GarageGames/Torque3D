@@ -36,6 +36,7 @@ public:
 
 	DECLARE_CALLBACK(void, onConnectionRequest, (const char* address, const char* ID));
 	DECLARE_CALLBACK(void, onLine, (const char* line));
+	DECLARE_CALLBACK(void, onEndReceive, ());
 	DECLARE_CALLBACK(void, onDNSResolved,());
 	DECLARE_CALLBACK(void, onDNSFailed, ());
 	DECLARE_CALLBACK(void, onConnected, ());

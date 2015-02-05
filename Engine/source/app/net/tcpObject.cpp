@@ -138,6 +138,10 @@ IMPLEMENT_CALLBACK(TCPObject, onLine, void, (const char* line), (line),
    "@param line Data sent from the server.\n"
    );
 
+IMPLEMENT_CALLBACK(TCPObject, onEndReceive, void, (), (),
+   "@brief Called when we are done reading all lines.\n\n"
+   );
+
 IMPLEMENT_CALLBACK(TCPObject, onDNSResolved, void, (),(),
    "Called whenever the DNS has been resolved.\n"
    );
@@ -499,6 +503,8 @@ void processConnectedReceiveEvent(NetSocket sock, RawData incomingData)
       size -= ret;
       buffer += ret;
    }
+
+   tcpo->onEndReceive_callback();
 }
 
 void processConnectedAcceptEvent(NetSocket listeningPort, NetSocket newConnection, NetAddress originatingAddress)
