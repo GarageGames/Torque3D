@@ -27,6 +27,7 @@
 #include "console/consoleInternal.h"
 #include "core/strings/stringUnit.h"
 #include "console/engineAPI.h"
+#include "core/stream/fileStream.h"
 
 TCPObject *TCPObject::table[TCPObject::TableSize] = {0, };
 
@@ -404,6 +405,29 @@ void TCPObject::send(const U8 *buffer, U32 len)
    Net::sendtoSocket(mTag, buffer, S32(len));
 }
 
+bool TCPObject::sendFile(const char* fileName)
+{
+	//Open the file for reading
+	FileStream readFile;
+	if(!readFile.open(fileName, Torque::FS::File::Read))
+	{
+		return false;
+	}
+
+	//Read each byte into our buffer
+	Vector<U8> buffer(readFile.getStreamSize());
+	U8 byte;
+	while(readFile.read(&byte))
+	{
+		buffer.push_back(byte);
+	}
+
+	//Send the buffer
+	send(buffer.address(), buffer.size());
+
+	return true;
+}
+
 DefineEngineMethod(TCPObject, send, void, (const char *data),, 
    "@brief Transmits the data string to the connected computer.\n\n"
 
@@ -424,6 +448,15 @@ DefineEngineMethod(TCPObject, send, void, (const char *data),,
 {
    object->send( (const U8*)data, dStrlen(data) );
 }
+
+DefineEngineMethod(TCPObject, sendFile, bool, (const char *fileName),, 
+   "@brief Transmits the file in binary to the connected computer.\n\n"
+
+   "@param fileName The filename of the file to transfer.\n")
+{
+	return object->sendFile(fileName);
+}
+
 
 DefineEngineMethod(TCPObject, listen, void, (U32 port),, 
    "@brief Start listening on the specified port for connections.\n\n"

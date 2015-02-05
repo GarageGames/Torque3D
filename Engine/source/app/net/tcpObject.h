@@ -82,6 +82,12 @@ public:
 
    bool processArguments(S32 argc, ConsoleValueRef *argv);
    void send(const U8 *buffer, U32 bufferLen);
+
+   ///Send an entire file over tcp
+   ///@arg fileName Full path to file you want to send
+   ///@return true if file was sent, false if not (file doesn't exist)
+   bool sendFile(const char* fileName);
+
    void addToTable(NetSocket newTag);
    void removeFromTable();
 
