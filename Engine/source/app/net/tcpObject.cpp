@@ -457,6 +457,11 @@ DefineEngineMethod(TCPObject, sendFile, bool, (const char *fileName),,
 	return object->sendFile(fileName);
 }
 
+DefineEngineMethod(TCPObject, finishLastLine, void, (),, 
+   "@brief Eat the rest of the lines.\n")
+{
+	object->finishLastLine();
+}
 
 DefineEngineMethod(TCPObject, listen, void, (U32 port),, 
    "@brief Start listening on the specified port for connections.\n\n"
