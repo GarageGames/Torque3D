@@ -259,6 +259,11 @@ S32 TSShape::findSequence(S32 nameIndex) const
    return -1;
 }
 
+S32 TSShape::getSequenceCount() const
+{
+   return sequences.size();
+}
+
 bool TSShape::findMeshIndex(const String& meshName, S32& objIndex, S32& meshIndex)
 {
    // Determine the object name and detail size from the mesh name
