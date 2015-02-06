@@ -577,3 +577,35 @@ FileStream* FileStream::clone() const
    delete copy;
    return NULL;
 }
+
+bool FileStream::writeBitStream(BitStream* stream)
+{
+	//Some logic here.
+	/*
+	It is important to remember that a bitstream is exactly that, a array of bits.
+	File Reading/Writing is use to an array of characters.
+	So if you send in an array of Bits that don't equal full characters, things go bad.
+	This function ensures that the bitstream can be translated to a char array without missing bits at the end.
+	So if you write to the stream 11 bits, this code will append 5 more bits (All 0's) to the end of the stream
+	to make a valid character.
+	*/
+	//Get the passed current position, we will need to restore to that point when we are done.
+	U32 passedPosition = stream->getCurPos();
+
+	//Find out how many bits we are missing if the last the stream isn't divisible by 8 (a character)
+	U32 missingBits = ( stream->getPosition() << 3) - stream->getCurPos();
+
+	//If we are between 1 and 8
+	if (missingBits > 0 && missingBits <= 8)
+	
+		//write the missing bits as 0's
+		stream->writeInt(0, missingBits);
+
+	//Write the corrected stream to the filestream
+	bool result = write(stream->getPosition(),stream->getBuffer() );
+
+	//move the current position back to where it was before we appended the missing bits.
+	stream->setCurPos(passedPosition);
+
+	return result;
+}

@@ -47,8 +47,9 @@ class QuatF;
 
 class BitStream : public Stream
 {
-protected:
+public:
    U8 *dataPtr;
+protected:
    S32  bitNum;
    S32  bufSize;
    bool error;
@@ -72,6 +73,8 @@ public:
    S32  getCurPos() const;
    void setCurPos(const U32);
 
+   bool isEOS();
+
    // HACK: We reverted BitStream to this previous version
    // because it was crashing the build.
    //
@@ -89,6 +92,9 @@ public:
    void setStringBuffer(char buffer[256]);
    void writeInt(S32 value, S32 bitCount);
    S32  readInt(S32 bitCount);
+
+   void writeuInt(U32 value, S32 bitCount);
+   S32  readuInt(S32 bitCount);
 
    /// Use this method to write out values in a concise but ass backwards way...
    /// Good for values you expect to be frequently zero, often small. Worst case
@@ -320,6 +326,13 @@ inline void BitStream::setCurPos(const U32 in_position)
 {
    AssertFatal(in_position < (U32)(bufSize << 3), "Out of range bitposition");
    bitNum = S32(in_position);
+}
+
+inline bool BitStream::isEOS()
+{
+	 if(bitNum > maxReadBitNum)
+		 return true;
+	 return false;
 }
 
 inline bool BitStream::readFlag()

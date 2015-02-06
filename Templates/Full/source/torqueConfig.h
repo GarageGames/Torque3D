@@ -31,6 +31,10 @@
 //general, the information here is global for your entire codebase, applying
 //not only to your game proper, but also to all of your tools.
 
+//Comment this to turn off datablock caching.
+#ifndef ENABLE_DATABLOCK_CACHE
+#define ENABLE_DATABLOCK_CACHE
+#endif
 /// What's the name of your application? Used in a variety of places.
 #define TORQUE_APP_NAME            "Full"
 

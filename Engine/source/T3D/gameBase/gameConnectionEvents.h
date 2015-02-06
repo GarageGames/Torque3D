@@ -39,6 +39,9 @@
 #include "core/stream/bitStream.h"
 #endif
 
+#include "torqueConfig.h"
+
+
 
 class QuitEvent : public SimEvent
 {
@@ -91,6 +94,7 @@ class SimDataBlockEvent : public NetEvent
       void pack(NetConnection *, BitStream *bstream);
       void write(NetConnection *, BitStream *bstream);
       void unpack(NetConnection *cptr, BitStream *bstream);
+	  void unpack(NetConnection *cptr, BitStream *bstream, bool NoCache);
       void process(NetConnection*);
       void notifyDelivered(NetConnection *, bool);
       

@@ -49,8 +49,8 @@ function GameConnection::loadMission(%this)
    else
    {
       commandToClient(%this, 'MissionStartPhase1', $missionSequence,
-         $Server::MissionFile, MissionGroup.musicTrack);
-      echo("*** Sending mission load to client: " @ $Server::MissionFile);
+         $Server::MissionFile, MissionGroup.musicTrack, $ServerDatablockCacheCRC);
+      echo("*** Sending mission load to client: " @ $Server::MissionFile @ ", CRC=" @ $ServerDatablockCacheCRC @ "");
    }
 }
 
@@ -83,6 +83,10 @@ function GameConnection::onDataBlocksDone( %this, %missionSequence )
 
    // On to the next phase
    commandToClient(%this, 'MissionStartPhase2', $missionSequence, $Server::MissionFile);
+}
+function serverCmdMissionStartPhase2CacheAck(%client)
+{
+   %client.currentPhase = 1.5;
 }
 
 function serverCmdMissionStartPhase2Ack(%client, %seq, %playerDB)

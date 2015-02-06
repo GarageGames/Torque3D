@@ -32,6 +32,7 @@
 #include "app/game.h"
 #include "T3D/gameBase/gameConnection.h"
 #include "T3D/gameBase/gameConnectionEvents.h"
+#include "torqueConfig.h"
 
 #define DebugChecksum 0xF00DBAAD
 
@@ -158,8 +159,17 @@ void SimDataBlockEvent::pack(NetConnection *conn, BitStream *bstream)
    }
 }
 
-void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream)
+void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream, bool NoCache)
 {
+#ifdef ENABLE_DATABLOCK_CACHE
+    //We want to mark the current stream position so we know what part
+    //of this stream we want to record for this Datablock.
+    //If we grab the starting point in the stream here, and the ending point at the end
+    //of this function then we know what part of the data in this stream is related to this
+    //datablock and thus we can save it for disk loading later.
+    S32 BeginBufferPoint = bstream->getCurPos();
+#endif
+
    if(bstream->readFlag())
    {
       mProcess = true;
@@ -213,7 +223,43 @@ void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream)
             mObj->getClassName()) );
 #endif
 
-   }
+#ifdef ENABLE_DATABLOCK_CACHE
+
+        //If this is from a load of a cache then we don't want to cache it
+        //and this function will be called with nocache = true;
+        if (NoCache)
+            return;
+        //Ok, the current position of this stream is the end of the datablock information.
+        //So we just need to snip the data and save it.
+
+        //First set up a scratch buffer.
+        U8 scratchBuffer[Net::MaxPacketDataSize];
+
+        //Get the current position in the buffer, this is the end of the data.
+        S32 EndBufferPoint = bstream->getCurPos();
+
+        //Now we need to rewind the buffer back to the position it was at when it entered this function.
+        bstream->setCurPos(BeginBufferPoint);
+
+        //Now we read in all the bits till the end point into the scratchBuffer
+        bstream->readBits(EndBufferPoint - BeginBufferPoint,scratchBuffer);
+
+        if ( ((GameConnection *)cptr)->clientBitStream->getCurPos() == 0 )
+        {
+            U32 crc = dAtoui(Con::getVariable("$ServerDatablockCacheCRC"));
+			Con::errorf("--------------->Writing CRC value: %u",crc);
+            ((GameConnection *)cptr)->clientBitStream->writeuInt(crc,32);
+        }
+
+        ((GameConnection *)cptr)->clientBitStream->writeBits(EndBufferPoint - BeginBufferPoint,scratchBuffer);
+
+#endif
+    }
+}
+
+void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream)
+{
+    unpack(cptr, bstream, false);
 }
 
 void SimDataBlockEvent::write(NetConnection *cptr, BitStream *bstream)
