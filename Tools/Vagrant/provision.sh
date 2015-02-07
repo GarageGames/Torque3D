@@ -1,12 +1,6 @@
 # Make sure package listings are up to date.
 apt-get update -y
 
-# Install Unity desktop for GUI purposes.
-#apt-get install --no-install-recommends \
-#	ubuntu-desktop \
-#	gnome-terminal \
-#	-y
-
 # Install software for development.
 sudo apt-get install \
 	git \
