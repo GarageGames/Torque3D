@@ -96,7 +96,7 @@ root: .
             <table class="borderless table">
                 <tr>
                     <td>Current version</td>
-                    <td><a href="http://wiki.torque3d.org/release:three-six-two">3.6.2</a></td>
+                    <td id="current-version">...</td>
                 </tr>
                 <tr>
                     <td>Continuous integration</td>
@@ -218,6 +218,18 @@ $(document).ready(function() {
         $('#activity-loading').replaceWith(list);
       }
     }
+  });
+
+  $.get('http://api.github.com/repos/GarageGames/Torque3D/releases')
+  .done(function(releases) {
+    var latest = releases[0];
+    $('#current-version').html($('<a/>')
+      .attr('href', latest.html_url)
+      .html(latest.name)
+    );
+  })
+  .fail(function() {
+    $('#curent-version').html('error');
   });
 });
 </script>
