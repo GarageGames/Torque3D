@@ -93,7 +93,7 @@ private:
 public:
    DECLARE_CONOBJECT(PathCamera);
    
-   DECLARE_CALLBACK( void, onNode, (const char* node));
+   DECLARE_CALLBACK( void, onNode, (S32 node));
 
    PathCamera();
    ~PathCamera();

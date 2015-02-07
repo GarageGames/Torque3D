@@ -1338,14 +1338,20 @@ void Namespace::markGroup(const char* name, const char* usage)
 
 extern S32 executeBlock(StmtNode *block, ExprEvalState *state);
 
-const char *Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprEvalState *state)
+ConsoleValueRef Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprEvalState *state)
 {
+   STR.clearFunctionOffset();
+
    if(mType == ConsoleFunctionType)
    {
       if(mFunctionOffset)
+      {
          return mCode->exec(mFunctionOffset, argv[0], mNamespace, argc, argv, false, mPackage);
+      }
       else
-         return "";
+      {
+         return ConsoleValueRef();
+      }
    }
 
 #ifndef TORQUE_DEBUG
@@ -1354,7 +1360,7 @@ const char *Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprEvalS
    if(mToolOnly && ! Con::isCurrentScriptToolScript())
    {
       Con::errorf(ConsoleLogEntry::Script, "%s::%s - attempting to call tools only function from outside of tools", mNamespace->mName, mFunctionName);
-      return "";
+      return ConsoleValueRef();
    }
 #endif
 
@@ -1362,32 +1368,26 @@ const char *Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprEvalS
    {
       Con::warnf(ConsoleLogEntry::Script, "%s::%s - wrong number of arguments.", mNamespace->mName, mFunctionName);
       Con::warnf(ConsoleLogEntry::Script, "usage: %s", mUsage);
-      return "";
+      return ConsoleValueRef();
    }
 
    static char returnBuffer[32];
    switch(mType)
    {
       case StringCallbackType:
-         return cb.mStringCallbackFunc(state->thisObject, argc, argv);
+         return ConsoleValueRef::fromValue(CSTK.pushStackString(cb.mStringCallbackFunc(state->thisObject, argc, argv)));
       case IntCallbackType:
-         dSprintf(returnBuffer, sizeof(returnBuffer), "%d",
-            cb.mIntCallbackFunc(state->thisObject, argc, argv));
-         return returnBuffer;
+		 return ConsoleValueRef::fromValue(CSTK.pushUINT((U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv)));
       case FloatCallbackType:
-         dSprintf(returnBuffer, sizeof(returnBuffer), "%g",
-            cb.mFloatCallbackFunc(state->thisObject, argc, argv));
-         return returnBuffer;
+		 return ConsoleValueRef::fromValue(CSTK.pushFLT((U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv)));
       case VoidCallbackType:
          cb.mVoidCallbackFunc(state->thisObject, argc, argv);
-         return "";
+         return ConsoleValueRef();
       case BoolCallbackType:
-         dSprintf(returnBuffer, sizeof(returnBuffer), "%d",
-            (U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv));
-         return returnBuffer;
+		 return ConsoleValueRef::fromValue(CSTK.pushUINT((U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv)));
    }
-
-   return "";
+   
+   return ConsoleValueRef();
 }
 
 //-----------------------------------------------------------------------------

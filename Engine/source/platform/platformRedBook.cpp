@@ -22,6 +22,7 @@
 
 #include "core/strings/stringFunctions.h"
 #include "console/console.h"
+#include "console/simBase.h"
 #include "console/engineAPI.h"
 #include "platform/platformRedBook.h"
 

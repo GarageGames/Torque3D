@@ -296,7 +296,7 @@ public:
    void unpackUpdate(NetConnection *conn,           BitStream *stream);
 
    DECLARE_CONOBJECT(RigidShape);
-   DECLARE_CALLBACK( void, onEnterLiquid, ( const char* objId, const char* waterCoverage, const char* liquidType ));
+   DECLARE_CALLBACK( void, onEnterLiquid, ( const char* objId, F32 waterCoverage, const char* liquidType ));
    DECLARE_CALLBACK( void, onLeaveLiquid, ( const char* objId, const char* liquidType ));
 };
 

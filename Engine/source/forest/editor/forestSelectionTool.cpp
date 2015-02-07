@@ -517,7 +517,7 @@ bool ForestSelectionTool::updateGuiInfo()
 
    Con::executef( statusbar, "setInfo", text.c_str() );
 
-   Con::executef( statusbar, "setSelectionObjectsByCount", Con::getIntArg( mSelection.size() ) );
+   Con::executef( statusbar, "setSelectionObjectsByCount", mSelection.size() );
 
    return true;
 }

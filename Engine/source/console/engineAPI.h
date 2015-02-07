@@ -148,15 +148,15 @@ inline const char* EngineMarshallData( U32 value )
 template< typename T >
 inline void EngineMarshallData( const T& arg, S32& argc, ConsoleValueRef *argv )
 {
-   argv[ argc ] = Con::getStringArg( castConsoleTypeToString( arg ) );
+   argv[ argc ] = castConsoleTypeToString( arg );
    argc ++;
 }
 inline void EngineMarshallData( bool arg, S32& argc, ConsoleValueRef *argv )
 {
    if( arg )
-      argv[ argc ] = "1";
+      argv[ argc ] = 1;
    else
-      argv[ argc ] = "0";
+      argv[ argc ] = 0;
    argc ++;
 }
 inline void EngineMarshallData( S32 arg, S32& argc, ConsoleValueRef *argv )
@@ -178,16 +178,22 @@ inline void EngineMarshallData( const char* arg, S32& argc, ConsoleValueRef *arg
    argv[ argc ] = arg;
    argc ++;
 }
+inline void EngineMarshallData( char* arg, S32& argc, ConsoleValueRef *argv )
+{
+   argv[ argc ] = arg;
+   argc ++;
+}
+
 template< typename T >
 inline void EngineMarshallData( T* object, S32& argc, ConsoleValueRef *argv )
 {
-   argv[ argc ] = ( object ? object->getIdString() : "0" );
+   argv[ argc ] = object ? object->getId() : 0;
    argc ++;
 }
 template< typename T >
 inline void EngineMarshallData( const T* object, S32& argc, ConsoleValueRef *argv )
 {
-   argv[ argc ] = ( object ? object->getIdString() : "0" );
+   argv[ argc ] = object ? object->getId() : 0;
    argc ++;
 }
 
@@ -260,6 +266,11 @@ struct EngineUnmarshallData< U8 >
 template<>
 struct EngineUnmarshallData< const char* >
 {
+   const char* operator()( ConsoleValueRef &ref ) const
+   {
+      return ref.getStringValue();
+   }
+
    const char* operator()( const char* str ) const
    {
       return str;
@@ -268,6 +279,11 @@ struct EngineUnmarshallData< const char* >
 template< typename T >
 struct EngineUnmarshallData< T* >
 {
+   T* operator()( ConsoleValueRef &ref ) const
+   {
+      return dynamic_cast< T* >( Sim::findObject( ref.getStringValue() ) );
+   }
+
    T* operator()( const char* str ) const
    {
       return dynamic_cast< T* >( Sim::findObject( str ) );
@@ -276,7 +292,18 @@ struct EngineUnmarshallData< T* >
 template<>
 struct EngineUnmarshallData< void >
 {
+   void operator()( ConsoleValueRef& ) const {}
    void operator()( const char* ) const {}
+};
+
+
+template<>
+struct EngineUnmarshallData< ConsoleValueRef >
+{
+   ConsoleValueRef operator()( ConsoleValueRef ref ) const
+   {
+      return ref;
+   }
 };
 
 /// @}
@@ -2542,6 +2569,8 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
       return returnType();                                                                                                                   \
    }
 
+#include "console/stringStack.h"
+
 
 // Internal helper class for doing call-outs in the new interop.
 struct _EngineCallbackHelper
@@ -2637,103 +2666,260 @@ struct _EngineCallbackHelper
       }
 };
 
-// Internal helper for callback support in legacy console system.
-struct _EngineConsoleCallbackHelper
+class SimConsoleThreadExecEvent;
+
+struct _BaseEngineConsoleCallbackHelper
 {
+public:
 
-   protected:
-   
-      /// Matches up to storeArgs.
-      static const U32 MAX_ARGUMENTS = 11;
+   /// Matches up to storeArgs.
+   static const U32 MAX_ARGUMENTS = 11;
 
-      SimObject* mThis;
-      S32 mArgc;
-      ConsoleValueRef mArgv[ MAX_ARGUMENTS + 2 ];
-      
-      const char* _exec()
-      {
-         if( mThis )
-         {
-            // Cannot invoke callback until object has been registered
-            if (mThis->isProperlyAdded()) {
-               return Con::execute( mThis, mArgc, mArgv );
-            } else {
-               Con::resetStackFrame(); // We might have pushed some vars here
-               return "";
-            }
-         }
-         else
-            return Con::execute( mArgc, mArgv );
-      }
-      
-   public:
+   SimObject* mThis;
+   S32 mInitialArgc;
+   S32 mArgc;
+   StringTableEntry mCallbackName;
+   ConsoleValueRef mArgv[ MAX_ARGUMENTS + 2 ];
 
-      _EngineConsoleCallbackHelper( StringTableEntry callbackName, SimObject* pThis )
-         : mThis( pThis ),
-           mArgc( pThis ? 2 : 1 )
+   ConsoleValueRef _exec();
+   ConsoleValueRef _execLater(SimConsoleThreadExecEvent *evt);
+
+   _BaseEngineConsoleCallbackHelper() {;}
+};
+
+// Internal helper for callback support in legacy console system.
+
+// Base helper for console callbacks
+struct _EngineConsoleCallbackHelper : public _BaseEngineConsoleCallbackHelper
+{
+public:
+
+   _EngineConsoleCallbackHelper( StringTableEntry callbackName, SimObject* pThis )
+   {
+      mThis = pThis;
+      mArgc = mInitialArgc = pThis ? 2 : 1 ;
+      mCallbackName = callbackName;
+   }
+
+   template< typename R >
+   R call()
+   {
+      if (Con::isMainThread())
       {
-         mArgv[ 0 ] = callbackName;
-      }
-      
-      template< typename R >
-      R call()
-      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A >
-      R call( A a )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A >
+   R call( A a )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+1, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B >
-      R call( A a, B b )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+1, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( a, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B >
+   R call( A a, B b )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+2, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C >
-      R call( A a, B b, C c )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+2, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C >
+   R call( A a, B b, C c )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+3, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C, typename D >
-      R call( A a, B b, C c, D d )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+3, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D >
+   R call( A a, B b, C c, D d )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+4, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
          EngineMarshallData( d, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C, typename D, typename E >
-      R call( A a, B b, C c, D d, E e )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+4, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E >
+   R call( A a, B b, C c, D d, E e )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+5, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
          EngineMarshallData( d, mArgc, mArgv );
          EngineMarshallData( e, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
-      R call( A a, B b, C c, D d, E e, F f )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+5, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
+   R call( A a, B b, C c, D d, E e, F f )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+6, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
          EngineMarshallData( d, mArgc, mArgv );
          EngineMarshallData( e, mArgc, mArgv );
          EngineMarshallData( f, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-      R call( A a, B b, C c, D d, E e, F f, G g )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+6, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
+   R call( A a, B b, C c, D d, E e, F f, G g )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+7, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
@@ -2741,11 +2927,38 @@ struct _EngineConsoleCallbackHelper
          EngineMarshallData( e, mArgc, mArgv );
          EngineMarshallData( f, mArgc, mArgv );
          EngineMarshallData( g, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+7, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+8, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
@@ -2754,11 +2967,39 @@ struct _EngineConsoleCallbackHelper
          EngineMarshallData( f, mArgc, mArgv );
          EngineMarshallData( g, mArgc, mArgv );
          EngineMarshallData( h, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+8, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i )
+   { 
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+9, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
@@ -2768,11 +3009,40 @@ struct _EngineConsoleCallbackHelper
          EngineMarshallData( g, mArgc, mArgv );
          EngineMarshallData( h, mArgc, mArgv );
          EngineMarshallData( i, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+9, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+10, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
@@ -2783,11 +3053,41 @@ struct _EngineConsoleCallbackHelper
          EngineMarshallData( h, mArgc, mArgv );
          EngineMarshallData( i, mArgc, mArgv );
          EngineMarshallData( j, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+10, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+11, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
@@ -2799,11 +3099,41 @@ struct _EngineConsoleCallbackHelper
          EngineMarshallData( i, mArgc, mArgv );
          EngineMarshallData( j, mArgc, mArgv );
          EngineMarshallData( k, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l )
+      else
       {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+11, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+12, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
@@ -2816,8 +3146,964 @@ struct _EngineConsoleCallbackHelper
          EngineMarshallData( j, mArgc, mArgv );
          EngineMarshallData( k, mArgc, mArgv );
          EngineMarshallData( l, mArgc, mArgv );
+
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+12, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+         EngineMarshallData( l, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+};
+
+// Override for when first parameter is const char*
+template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEngineConsoleCallbackHelper
+{
+   _EngineConsoleExecCallbackHelper( const char *callbackName )
+   {
+      mThis = NULL;
+      mArgc = mInitialArgc = 1;
+      mCallbackName = StringTable->insert(callbackName);
+   }
+
+   template< typename R >
+   R call()
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+
+   template< typename R, typename A >
+   R call( A a )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+1, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+1, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( a, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B >
+   R call( A a, B b )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+2, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+2, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C >
+   R call( A a, B b, C c )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+3, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+3, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D >
+   R call( A a, B b, C c, D d )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+4, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+4, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E >
+   R call( A a, B b, C c, D d, E e )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+5, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+5, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
+   R call( A a, B b, C c, D d, E e, F f )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+6, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+6, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
+   R call( A a, B b, C c, D d, E e, F f, G g )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+7, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+7, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+8, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+8, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i )
+   { 
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+9, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+9, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+10, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+10, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+11, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+11, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+12, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(mCallbackName);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+         EngineMarshallData( l, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+12, NULL, false, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( a, mArgc, mArgv );
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+         EngineMarshallData( l, mArgc, mArgv );
+
+         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+};
+
+
+// Override for when first parameter is presumably a SimObject*, in which case A will be absorbed as the callback
+template<typename P1> struct _EngineConsoleExecCallbackHelper : public _BaseEngineConsoleCallbackHelper
+{
+public:
+
+   _EngineConsoleExecCallbackHelper( SimObject* pThis )
+   {
+      mThis = pThis;
+      mArgc = mInitialArgc = 2;
+      mCallbackName = NULL;
+   }
+
+   template< typename R, typename A >
+   R call( A a )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B >
+   R call( A a, B b )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+1, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+1, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C >
+   R call( A a, B b, C c )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+2, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+2, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D >
+   R call( A a, B b, C c, D d )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+3, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+3, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E >
+   R call( A a, B b, C c, D d, E e )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+4, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+4, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
+   R call( A a, B b, C c, D d, E e, F f )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+5, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+5, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
+   R call( A a, B b, C c, D d, E e, F f, G g )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+6, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+6, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+7, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+7, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i )
+   { 
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+8, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+8, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+9, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+9, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+10, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+10, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
+   template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
+   R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l )
+   {
+      if (Con::isMainThread())
+      {
+         ConsoleStackFrameSaver sav; sav.save();
+         CSTK.reserveValues(mArgc+11, mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+         EngineMarshallData( l, mArgc, mArgv );
+
+         return R( EngineUnmarshallData< R >()( _exec() ) );
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+11, NULL, true, &cb);
+         evt->populateArgs(mArgv);
+         mArgv[ 0 ].value->setStackStringValue(a);
+
+         EngineMarshallData( b, mArgc, mArgv );
+         EngineMarshallData( c, mArgc, mArgv );
+         EngineMarshallData( d, mArgc, mArgv );
+         EngineMarshallData( e, mArgc, mArgv );
+         EngineMarshallData( f, mArgc, mArgv );
+         EngineMarshallData( g, mArgc, mArgv );
+         EngineMarshallData( h, mArgc, mArgv );
+         EngineMarshallData( i, mArgc, mArgv );
+         EngineMarshallData( j, mArgc, mArgv );
+         EngineMarshallData( k, mArgc, mArgv );
+         EngineMarshallData( l, mArgc, mArgv );
+
+         Sim::postEvent(mThis, evt, Sim::getCurrentTime());
+
+         return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
+      }
+   }
 };
 
 

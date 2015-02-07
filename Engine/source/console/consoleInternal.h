@@ -151,7 +151,7 @@ class Namespace
          void clear();
 
          ///
-         const char *execute( S32 argc, ConsoleValueRef* argv, ExprEvalState* state );
+         ConsoleValueRef execute( S32 argc, ConsoleValueRef* argv, ExprEvalState* state );
          
          /// Return a one-line documentation text string for the function.
          String getBriefDescription( String* outRemainingDocText = NULL ) const;

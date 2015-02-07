@@ -195,18 +195,20 @@ namespace Con
       return STR.getArgBuffer(bufferSize);
    }
 
-   ConsoleValueRef getFloatArg(F64 arg)
+   char *getFloatArg(F64 arg)
    {
-      ConsoleValueRef ref = arg;
-      return ref;
+      char *ret = STR.getArgBuffer(32);
+      dSprintf(ret, 32, "%g", arg);
+      return ret;
    }
 
-   ConsoleValueRef getIntArg(S32 arg)
+   char *getIntArg(S32 arg)
    {
-      ConsoleValueRef ref = arg;
-      return ref;
+      char *ret = STR.getArgBuffer(32);
+      dSprintf(ret, 32, "%d", arg);
+      return ret;
    }
-   
+
    char *getStringArg( const char *arg )
    {
       U32 len = dStrlen( arg ) + 1;
@@ -432,6 +434,8 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
    U32 consoleStackStart = CSTK.mStackPos;
 #endif
 
+   //Con::printf("CodeBlock::exec(%s,%u)", functionName ? functionName : "??", ip);
+
    static char traceBuffer[1024];
    S32 i;
    
@@ -441,7 +445,7 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
    F64 *curFloatTable;
    char *curStringTable;
    S32 curStringTableLen = 0; //clint to ensure we dont overwrite it
-   STR.clearFunctionOffset();
+   STR.clearFunctionOffset(); // ensures arg buffer offset is back to 0
    StringTableEntry thisFunctionName = NULL;
    bool popFrame = false;
    if(argv)
@@ -531,17 +535,6 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
          gEvalState.pushFrameRef( stackIndex );
          popFrame = true;
       }
-   }
-
-   bool doResetValueStack = !gEvalState.mResetLocked;
-   gEvalState.mResetLocked = true;
-   
-   if (gEvalState.mShouldReset)
-   {
-      // Ensure all stacks are clean in case anything became unbalanced during the previous execution
-      STR.clearFrames();
-      CSTK.clearFrames();
-      gEvalState.mShouldReset = false;
    }
 
    // Grab the state of the telenet debugger here once
@@ -1847,7 +1840,7 @@ breakContinue:
 
                // This will clear everything including returnValue
                CSTK.popFrame();
-               STR.clearFunctionOffset();
+               //STR.clearFunctionOffset();
             }
             else
             {
@@ -2234,18 +2227,11 @@ execFinished:
       Con::gCurrentRoot = saveCodeBlock->modPath;
    }
 
-   // Mark the reset flag for the next run if we've finished execution
-   if (doResetValueStack)
-   {
-      gEvalState.mShouldReset = true;
-      gEvalState.mResetLocked = false;
-   }
-
    decRefCount();
 
 #ifdef TORQUE_DEBUG
-   AssertFatal(!(STR.mStartStackSize > stackStart), "String stack not popped enough in script exec");
-   AssertFatal(!(STR.mStartStackSize < stackStart), "String stack popped too much in script exec");
+   //AssertFatal(!(STR.mStartStackSize > stackStart), "String stack not popped enough in script exec");
+   //AssertFatal(!(STR.mStartStackSize < stackStart), "String stack popped too much in script exec");
 #endif
 
    return returnValue;

@@ -570,7 +570,7 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
 
 }
 
-const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, S32 setFrame)
+ConsoleValueRef CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, S32 setFrame)
 {
 	AssertFatal(Con::isMainThread(), "Compiling code on a secondary thread");
 	
@@ -635,7 +635,7 @@ const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inStri
    if(!gStatementList)
    {
       delete this;
-      return "";
+      return ConsoleValueRef();
    }
 
    resetTables();

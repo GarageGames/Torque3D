@@ -220,10 +220,10 @@ public:
    static void initPersistFields();
 
    DECLARE_CONOBJECT(GuiMenuBar);
-   DECLARE_CALLBACK( void, onMouseInMenu, (bool hasLeftMenu));
-   DECLARE_CALLBACK( void, onMenuSelect, (const char* menuId, const char* menuText));
-   DECLARE_CALLBACK( void, onMenuItemSelect, ( const char* menuId, const char* menuText, const char* menuItemId, const char* menuItemText  ));
-   DECLARE_CALLBACK( void, onSubmenuSelect, ( const char* submenuId, const char* submenuText));
+   DECLARE_CALLBACK( void, onMouseInMenu, ( bool hasLeftMenu ));
+   DECLARE_CALLBACK( void, onMenuSelect, ( S32 menuId, const char* menuText ));
+   DECLARE_CALLBACK( void, onMenuItemSelect, ( S32 menuId, const char* menuText, S32 menuItemId, const char* menuItemText  ));
+   DECLARE_CALLBACK( void, onSubmenuSelect, ( S32 submenuId, const char* submenuText ));
 };
 
 #endif
