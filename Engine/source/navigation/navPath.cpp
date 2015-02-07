@@ -37,6 +37,7 @@
 #include "math/mathIO.h"
 
 #include <DetourDebugDraw.h>
+#include <climits>
 
 extern bool gEditingMission;
 
