@@ -39,6 +39,10 @@ body {
   text-align: justify;
 }
 
+.commit p {
+  text-align: left;
+}
+
 .site .media:first-child {
   margin-top: 15px;
 }
