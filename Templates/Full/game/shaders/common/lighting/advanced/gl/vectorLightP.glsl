@@ -202,7 +202,7 @@ void main()
    
    float Sat_NL_Att = saturate( dotNL * shadowed ) * lightBrightness;
    vec3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
-   vec4 addToResult = lightAmbient;
+   vec4 addToResult = (lightAmbient * (1 - ambientCameraFactor)) + ( lightAmbient * ambientCameraFactor * saturate(dot(normalize(-vsEyeRay), normal)) );
 
    // TODO: This needs to be removed when lightmapping is disabled
    // as its extra work per-pixel on dynamic lit scenes.
