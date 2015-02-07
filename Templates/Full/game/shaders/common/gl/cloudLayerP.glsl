@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "hlslCompat.glsl"
-
+#include "torque.glsl"
 //-----------------------------------------------------------------------------
 // Structures                                                                  
 //-----------------------------------------------------------------------------
@@ -143,5 +143,5 @@ void main()
 
    cResultColor.a = mix( cResultColor.a, 0.0, 1.0 - pow(IN_worldDist,2.0) );
 
-   OUT_col = cResultColor;
+   OUT_col = hdrEncode(cResultColor);
 }   
