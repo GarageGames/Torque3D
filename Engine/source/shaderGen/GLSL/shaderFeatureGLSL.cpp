@@ -1422,6 +1422,13 @@ void VertLitGLSL::processVert(   Vector<ShaderComponent*> &componentList,
    Var* outColor = dynamic_cast< Var* >( LangElement::find( "vertColor" ) );
    if( !outColor )
    {
+      // Grab the connector color
+      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
+      Var *outColor = connectComp->getElement( RT_COLOR );
+      outColor->setName( "vertColor" );
+      outColor->setStructName( "OUT" );
+      outColor->setType( "vec4" );
+   	
       // Search for vert color
       Var *inColor = (Var*) LangElement::find( "diffuse" );   
 
@@ -1431,13 +1438,6 @@ void VertLitGLSL::processVert(   Vector<ShaderComponent*> &componentList,
          output = NULL;
          return;
       }
-
-      // Grab the connector color
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      Var *outColor = connectComp->getElement( RT_COLOR );
-      outColor->setName( "vertColor" );
-      outColor->setStructName( "OUT" );
-      outColor->setType( "vec4" );
 
       output = new GenOp( "   @ = @;\r\n", outColor, inColor );
    }
