@@ -405,6 +405,7 @@ void VertPixelConnectorGLSL::printStructDefines( Stream &stream, bool in )
       {
          dSprintf((char*)output, sizeof(output), "#define %s_%s _%s_\r\n", connectionDir, var->name, var->connectName);
          stream.write( dStrlen((char*)output), output );
+         continue;
       }
 
       if( deprecatedDefines.contains((char*)var->name))
