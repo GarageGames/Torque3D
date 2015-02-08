@@ -55,7 +55,7 @@ root: .
             <h2>Always evolving</h2>
             <p>
             Torque is being constantly developed by an enthusiastic community.
-            Its future is in <em>your</em> hands, not those of a company with a
+            Its future is in <em>our</em> hands, not those of a company with a
             bottom line to meet.
             </p>
             <center>
@@ -66,20 +66,6 @@ root: .
             </center>
         </div>
     </div>
-
-    {% if site.posts != empty %}
-    <div class="row">
-        <div class="col-sm-12">
-            <h2>Recent news</h2>
-
-            {% for post in site.posts limit:3 %}
-                {% include newsitem.html post=post %}
-            {% endfor %}
-
-            <a class="pull-right" href="{{page.root}}/news">See all <i class="fa fa-angle-right"></i></a>
-        </div>
-    </div>
-    {% endif %}
 </div>
 
 <div class="break"></div>
@@ -87,31 +73,23 @@ root: .
 <div class="container">
     <div class="row">
         <div class="col-sm-4">
+            <h2 class="status">Recent news</h2>
+            <div id="recent-news">Loading news...</div>
+            <a class="pull-right" href="http://forums.torque3d.org/viewforum.php?f=15">See all <i class="fa fa-angle-right"></i></a>
+        </div>
+
+        <div class="col-sm-4">
             <h2 class="status">Activity</h2>
             <p id="activity-loading">Loading activity...</p>
         </div>
 
         <div class="col-sm-4">
-            <h2 class="status">Status</h2>
-            <table class="borderless table">
-                <tr>
-                    <td>Current version</td>
-                    <td id="current-version">...</td>
-                </tr>
-                <tr>
-                    <td>Continuous integration</td>
-                    <td><a href="http://t3dci.org">t3dci.org</a></td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="col-sm-4">
-            <h2>Issues</h2>
-            <ul>
+            <h2>Quick links</h2>
+            <ul id="quick-links">
                 <li><a href="https://github.com/GarageGames/Torque3D/issues/new">Report an issue</a></li>
-                <li><a href="https://github.com/GarageGames/Torque3D/issues?q=is%3Aopen+milestone%3A3.7+sort%3Aupdated-desc">Issues for next milestone</a></li>
                 <li><a href="https://github.com/GarageGames/Torque3D/issues?labels=Final+review">Changes for final review</a></li>
                 <li><a href="http://garagegames.uservoice.com/forums/178972-torque-3d-mit/filters/top">Feature requests</a></li>
+                <li><a href="http://t3dci.org">Builds and CI</a></li>
             </ul>
         </div>
     </div>
@@ -181,56 +159,89 @@ $(document).ready(function() {
 
   createBreaks();
 
-  var numResults = 2;
-  var feed = 'https://github.com/GarageGames/Torque3D/commits/development.atom';
-  var now = new Date();
-  var googleAPI = document.location.protocol +
-    '//ajax.googleapis.com/ajax/services/feed/load?' +
-    'v=1.0' +
-    '&dailycache=' + [now.getUTCDate(), now.getUTCMonth(), now.getUTCFullYear()].join('-') +
-    '&num=' + numResults +
-    '&callback=?&q=';
-  var url = googleAPI + encodeURIComponent(feed);
-  $.ajax({
-    url: url,
-    dataType: 'json',
-    success: function (data) {
-      if(data.responseData.feed && data.responseData.feed.entries) {
-        var list = $('<ul/>').addClass('list-unstyled');
-        $.each(data.responseData.feed.entries, function (i, e) {
-          var li = $('<li/>').addClass('commit').appendTo(list);
-          var hash = e.link.split('/').pop().substr(0, 6);
+  getFeed('https://github.com/GarageGames/Torque3D/commits/development.atom', 2)
+  .done(function (data) {
+    if(data.responseData.feed && data.responseData.feed.entries) {
+      var list = $('<ul/>').addClass('list-unstyled');
+      $.each(data.responseData.feed.entries, function (i, e) {
+        var li = $('<li/>').addClass('commit').appendTo(list);
+        var hash = e.link.split('/').pop().substr(0, 6);
 
-          var content = e.contentSnippet.split('\n').pop();
-          li.append($('<p/>').text(content));
+        var content = e.contentSnippet.split('\n').pop();
+        var contentel = $('<p/>').text(content).appendTo(li);
 
-          var hashel = $('<pre/>').addClass('inline').appendTo(li);
-          hashel.append($('<a/>')
-            .text(hash)
+        var hashel = $('<pre/>').addClass('inline').prependTo(contentel);
+        hashel.append($('<a/>')
+          .text(hash)
+          .attr('href', e.link)
+          .attr('target', '_blank'));
+
+        var d = new Date(e.publishedDate);
+        var stamp = $('<span/>').addClass('timeago').text('by ' + e.author + ' ').appendTo(li);
+        stamp.append($('<span/>')
+          .attr('title', d.toISOString())
+          .timeago());
+      });
+      $('#activity-loading').replaceWith(list);
+    }
+  })
+
+  getFeed('http://forums.torque3d.org/feed.php?mode=news', 3)
+  .done(function(data) {
+    if(data.responseData.feed && data.responseData.feed.entries) {
+      var news = $('#recent-news');
+      $.each(data.responseData.feed.entries, function (i, e) {
+        news.html('');
+
+        news.append($('<h5/>')
+          .append($('<a/>')
             .attr('href', e.link)
-            .attr('target', '_blank'));
+            .html(e.title)
+          )
+        );
 
-          var d = new Date(e.publishedDate);
-          var stamp = $('<span/>').addClass('timeago').text('by ' + e.author + ' ').appendTo(li);
-          stamp.append($('<span/>')
-            .attr('title', d.toISOString())
-            .timeago());
-        });
-        $('#activity-loading').replaceWith(list);
-      }
+        var d = new Date(e.publishedDate);
+        var stamp = $('<span/>').addClass('timeago').text('by ' + e.author + ' ').appendTo(news);
+        stamp.append($('<span/>')
+          .attr('title', d.toISOString())
+          .timeago());
+
+        news.append($('<p/>').html(e.contentSnippet + ' ')
+          .append($('<a/>')
+            .attr('href', e.link)
+            .html('Read more')
+          )
+        );
+      });
     }
   });
 
   $.get('http://api.github.com/repos/GarageGames/Torque3D/releases')
   .done(function(releases) {
     var latest = releases[0];
-    $('#current-version').html($('<a/>')
+    $('<li/>').append($('<a/>')
       .attr('href', latest.html_url)
-      .html(latest.name)
-    );
+      .html('Version ' + latest.name)
+    ).prependTo('#quick-links');
   })
   .fail(function() {
-    $('#curent-version').html('error');
+    $('#current-version').html('error');
   });
+
+  // Get a feed through the Google feeds API with hourly caching.
+  function getFeed(feed, numResults) {
+    var now = new Date();
+    var googleAPI = document.location.protocol +
+      '//ajax.googleapis.com/ajax/services/feed/load?' +
+      'v=1.0' +
+      '&dailycache=' + [now.getUTCDate(), now.getUTCMonth(), now.getUTCFullYear()].join('-') +
+      '&num=' + numResults +
+      '&callback=?&q=';
+    var url = googleAPI + encodeURIComponent(feed);
+    return $.ajax({
+      url: url,
+      dataType: 'json'
+    });
+  }
 });
 </script>
