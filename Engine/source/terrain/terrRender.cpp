@@ -356,12 +356,6 @@ void TerrainBlock::_renderBlock( SceneRenderState *state )
    if ( !mCastShadows && state->isShadowPass() ) 
       return;
 	  
-   MatrixF worldViewXfm = state->getWorldViewMatrix();
-   worldViewXfm.mul( getRenderTransform() );
-
-   MatrixF worldViewProjXfm = state->getProjectionMatrix();
-   worldViewProjXfm.mul( worldViewXfm );
-
    const MatrixF &objectXfm = getRenderWorldTransform();
 
    Point3F objCamPos = state->getDiffuseCameraPosition();
