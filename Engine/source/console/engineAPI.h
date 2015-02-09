@@ -53,6 +53,11 @@
    #include "console/engineStructs.h"
 #endif
 
+// Needed for the executef macros. Blame GCC.
+#ifndef _SIMEVENTS_H_
+#include "console/simEvents.h"
+#endif
+
 
 /// @file
 /// Definitions for exposing engine functionality to the control layer.
@@ -3146,7 +3151,7 @@ struct _EngineCallbackHelper
       
 };
 
-class SimConsoleThreadExecEvent;
+
 #include "console/stringStack.h"
 
 // Internal helper for callback support in legacy console system.
@@ -3199,7 +3204,7 @@ public:
          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc, NULL, false, &cb);
          evt->populateArgs(mArgv);
          mArgv[ 0 ].value->setStackStringValue(mCallbackName);
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3229,7 +3234,7 @@ public:
 
          EngineMarshallData( a, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3259,7 +3264,7 @@ public:
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3291,7 +3296,7 @@ public:
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3325,7 +3330,7 @@ public:
          EngineMarshallData( c, mArgc, mArgv );
          EngineMarshallData( d, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3361,7 +3366,7 @@ public:
          EngineMarshallData( d, mArgc, mArgv );
          EngineMarshallData( e, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3399,7 +3404,7 @@ public:
          EngineMarshallData( e, mArgc, mArgv );
          EngineMarshallData( f, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3439,7 +3444,7 @@ public:
          EngineMarshallData( f, mArgc, mArgv );
          EngineMarshallData( g, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3481,7 +3486,7 @@ public:
          EngineMarshallData( g, mArgc, mArgv );
          EngineMarshallData( h, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3525,7 +3530,7 @@ public:
          EngineMarshallData( h, mArgc, mArgv );
          EngineMarshallData( i, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3571,7 +3576,7 @@ public:
          EngineMarshallData( i, mArgc, mArgv );
          EngineMarshallData( j, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3619,7 +3624,7 @@ public:
          EngineMarshallData( j, mArgc, mArgv );
          EngineMarshallData( k, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -3669,7 +3674,7 @@ public:
          EngineMarshallData( k, mArgc, mArgv );
          EngineMarshallData( l, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4166,7 +4171,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          evt->populateArgs(mArgv);
          mArgv[ 0 ].value->setStackStringValue(mCallbackName);
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
    }
@@ -4195,7 +4200,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
 
          EngineMarshallData( a, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4225,7 +4230,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( a, mArgc, mArgv );
          EngineMarshallData( b, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4257,7 +4262,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( b, mArgc, mArgv );
          EngineMarshallData( c, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4291,7 +4296,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( c, mArgc, mArgv );
          EngineMarshallData( d, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4327,7 +4332,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( d, mArgc, mArgv );
          EngineMarshallData( e, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4365,7 +4370,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( e, mArgc, mArgv );
          EngineMarshallData( f, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4405,7 +4410,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( f, mArgc, mArgv );
          EngineMarshallData( g, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4447,7 +4452,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( g, mArgc, mArgv );
          EngineMarshallData( h, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4491,7 +4496,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( h, mArgc, mArgv );
          EngineMarshallData( i, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4537,7 +4542,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( i, mArgc, mArgv );
          EngineMarshallData( j, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4585,7 +4590,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( j, mArgc, mArgv );
          EngineMarshallData( k, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }
@@ -4635,7 +4640,7 @@ template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEn
          EngineMarshallData( k, mArgc, mArgv );
          EngineMarshallData( l, mArgc, mArgv );
 
-         Sim::postEvent(Sim::getRootGroup(), evt, Sim::getCurrentTime());
+         Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
       }

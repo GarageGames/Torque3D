@@ -119,6 +119,8 @@ public:
    void populateArgs(ConsoleValueRef *argv);
 };
 
+
+// NOTE: SimConsoleThreadExecCallback & SimConsoleThreadExecEvent moved to engineAPI.h
 /// Used by Con::threadSafeExecute()
 struct SimConsoleThreadExecCallback
 {
