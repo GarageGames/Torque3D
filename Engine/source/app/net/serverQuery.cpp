@@ -541,8 +541,7 @@ void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
 }
 
 DefineConsoleFunction( queryMasterServer
-                     , void, ( U32 lanPort
-                             , U32 flags
+                     , void, (  U32 flags
                              , const char * gameType
                              , const char * missionType
                              , U32 minPlayers
