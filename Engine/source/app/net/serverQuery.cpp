@@ -240,6 +240,7 @@ struct ServerFilter
 
    ServerFilter()
    {
+      type = Normal;
       queryFlags = 0;
       gameType = NULL;
       missionType = NULL;

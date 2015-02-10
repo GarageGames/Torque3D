@@ -87,6 +87,7 @@ ConsoleDocClass( GuiClockHud,
 GuiClockHud::GuiClockHud()
 {
    mShowFrame = mShowFill = true;
+   mTimeReversed = false;
    mFillColor.set(0, 0, 0, 0.5);
    mFrameColor.set(0, 1, 0, 1);
    mTextColor.set( 0, 1, 0, 1 );

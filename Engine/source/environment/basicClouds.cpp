@@ -63,6 +63,12 @@ BasicClouds::BasicClouds()
    mTypeMask |= EnvironmentObjectType | StaticObjectType;
    mNetFlags.set(Ghostable | ScopeAlways);
 
+   mTimeSC =
+   mModelViewProjSC =
+   mTexScaleSC =
+   mTexDirectionSC =
+   mTexOffsetSC = 0;
+
    mLayerEnabled[0] = true;
    mLayerEnabled[1] = true;
    mLayerEnabled[2] = true;

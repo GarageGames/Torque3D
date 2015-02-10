@@ -905,7 +905,7 @@ ConsoleDocClass( DICreateUndoAction,
 				"@internal");
 
 DICreateUndoAction::DICreateUndoAction( const UTF8* actionName )
-   :  UndoAction( actionName )
+   :  UndoAction( actionName ), mEditor(0), mDatablockId(0)
 {
 }
 
@@ -993,7 +993,7 @@ ConsoleDocClass( DIDeleteUndoAction,
 				"@internal");
 
 DIDeleteUndoAction::DIDeleteUndoAction( const UTF8 *actionName )
-   :  UndoAction( actionName )
+   :  UndoAction( actionName ), mEditor(0), mDatablockId(0)
 {
 }
 
@@ -1081,7 +1081,7 @@ ConsoleDocClass( DBDeleteUndoAction,
 				"@internal");
 
 DBDeleteUndoAction::DBDeleteUndoAction( const UTF8 *actionName )
-   :  UndoAction( actionName )
+   :  UndoAction( actionName ), mEditor(0), mDatablockId(0)
 {
 }
 
@@ -1190,7 +1190,7 @@ ConsoleDocClass( DBRetargetUndoAction,
 				"@internal");
 
 DBRetargetUndoAction::DBRetargetUndoAction( const UTF8 *actionName )
-   :  UndoAction( actionName )
+   :  UndoAction( actionName ), mEditor(0), mDBFromId(0), mDBToId(0)
 {
 }
 

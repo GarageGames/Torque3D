@@ -86,7 +86,7 @@ class PathManagerEvent : public NetEvent
 
   public:
    typedef NetEvent Parent;
-   PathManagerEvent() { }
+   PathManagerEvent() : modifiedPath(0), clearPaths(false) { }
 
    void pack(NetConnection*, BitStream*);
    void write(NetConnection*, BitStream*);

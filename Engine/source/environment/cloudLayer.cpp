@@ -73,14 +73,26 @@ U32 CloudLayer::smVertCount = smVertStride * smVertStride;
 U32 CloudLayer::smTriangleCount = smStrideMinusOne * smStrideMinusOne * 2;
 
 CloudLayer::CloudLayer()
-: mBaseColor( 0.9f, 0.9f, 0.9f, 1.0f ),
-  mCoverage( 0.5f ),
+: mLastTime( 0 ),
+  mBaseColor( 0.9f, 0.9f, 0.9f, 1.0f ),
   mExposure( 1.0f ),
-  mWindSpeed( 1.0f ),
-  mLastTime( 0 )
+  mCoverage( 0.5f ),
+  mWindSpeed( 1.0f )
 {
    mTypeMask |= EnvironmentObjectType | StaticObjectType;
    mNetFlags.set(Ghostable | ScopeAlways);
+
+   mModelViewProjSC =
+   mAmbientColorSC =
+   mSunColorSC =
+   mSunVecSC =
+   mTexScaleSC =
+   mBaseColorSC =
+   mCoverageSC =
+   mExposureSC =
+   mEyePosWorldSC = 0;
+
+   mTexOffsetSC[0] = mTexOffsetSC[1] = mTexOffsetSC[2] = 0;
 
    mTexScale[0] = 1.0;
    mTexScale[1] = 1.0;
