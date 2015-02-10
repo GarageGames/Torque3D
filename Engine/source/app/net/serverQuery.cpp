@@ -433,8 +433,6 @@ DefineConsoleFunction( queryAllServers
 
    queryLanServers(lanPort, flags, gameType, missionType, minPlayers, maxPlayers, maxBots,
       regionMask, maxPing, minCPU, filterFlags);
-   dFree(gameType);
-   dFree(missionType);
 
 }
 
@@ -558,9 +556,6 @@ DefineConsoleFunction( queryMasterServer
    clearServerList();
    queryMasterServer(flags,gameType,missionType,minPlayers,maxPlayers,
       maxBots,regionMask,maxPing,minCPU,filterFlags,0,&buddyList);
-
-   dFree(gameType);
-   dFree(missionType);
 }
 
 //-----------------------------------------------------------------------------
