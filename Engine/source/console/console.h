@@ -885,6 +885,7 @@ namespace Con
 	template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I> ConsoleValueRef executef(A a, B b, C c, D d, E e, F f, G g, H h, I i) { _EngineConsoleExecCallbackHelper<A> callback( a ); return callback.template call<ConsoleValueRef>(b, c, d, e, f, g, h, i); }
 	template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J> ConsoleValueRef executef(A a, B b, C c, D d, E e, F f, G g, H h, I i, J j) { _EngineConsoleExecCallbackHelper<A> callback( a ); return callback.template call<ConsoleValueRef>(b, c, d, e, f, g, h, i, j); }
 	template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K> ConsoleValueRef executef(A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k) { _EngineConsoleExecCallbackHelper<A> callback( a ); return callback.template call<ConsoleValueRef>(b, c, d, e, f, g, h, i, j, k); }
+	template<typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L> ConsoleValueRef executef(A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l) { _EngineConsoleExecCallbackHelper<A> callback( a ); return callback.template call<ConsoleValueRef>(b, c, d, e, f, g, h, i, j, k, l); }
 	/// }
 };
 
