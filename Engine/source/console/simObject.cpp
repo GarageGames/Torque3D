@@ -1407,10 +1407,11 @@ void SimObject::linkNamespaces()
    // while still having the class namespace fields matching the current
    // setup.
 
-   AssertWarn( mNameSpace == NULL, "SimObject::linkNamespaces -- Namespace linkage already in place" );
-   if( mNameSpace )
+   if (mNameSpace)
+   {
+      Con::warnf("SimObject::linkNamespaces -- Namespace linkage already in place %s", mNameSpace->getName());
       return;
-
+   }
    // Get the namespace for the C++ class.
 
    Namespace* cppNamespace = getClassRep()->getNameSpace();
