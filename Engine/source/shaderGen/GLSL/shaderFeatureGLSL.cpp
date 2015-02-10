@@ -986,8 +986,11 @@ void DiffuseMapFeatGLSL::setTexData(   Material::StageData &stageDat,
                                        U32 &texIndex )
 {
    GFXTextureObject *tex = stageDat.getTex( MFT_DiffuseMap );
-   passData.mSamplerNames[ texIndex ] = "diffuseMap";
-   passData.mTexSlot[ texIndex++ ].texObject = tex;
+   if (tex)
+   {
+      passData.mSamplerNames[texIndex] = "diffuseMap";
+      passData.mTexSlot[texIndex++].texObject = tex;
+   }
 }
 
 
