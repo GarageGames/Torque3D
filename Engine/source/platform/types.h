@@ -23,7 +23,15 @@
 #ifndef _TORQUE_TYPES_H_
 #define _TORQUE_TYPES_H_
 
+#if (defined _MSC_VER) && (_MSC_VER <= 1500)
+#ifdef _WIN64 // [
+typedef unsigned __int64  uintptr_t;
+#else // _WIN64 ][
+typedef _W64 unsigned int uintptr_t;
+#endif // _WIN64 ]
+#else
 #include <stdint.h>
+#endif
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //-----------------------------------------Basic Types--------------------------------------------------//
