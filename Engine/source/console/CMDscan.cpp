@@ -2190,6 +2190,7 @@ void CMDerror(char *format, ...)
 #else
    vsnprintf( tempBuf, BUFMAX, format, args );
 #endif
+    va_end(args);
 
    if(fileName)
    {

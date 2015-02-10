@@ -174,6 +174,7 @@ void StdConsole::printf(const char *s, ...)
    va_list args;
    va_start(args, s);
    vsnprintf(buffer, BufSize, s, args);
+   va_end(args);
    // Replace tabs with carats, like the "real" console does.
    char *pos = buffer;
    while (*pos) {
