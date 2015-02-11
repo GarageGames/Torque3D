@@ -53,129 +53,129 @@ static char scriptFilenameBuffer[1024];
 
 bool isInt(const char* str)
 {
-	int len = dStrlen(str);
-	if(len <= 0)
-		return false;
+   int len = dStrlen(str);
+   if(len <= 0)
+      return false;
 
-	// Ingore whitespace
-	int start = 0;
-	for(int i = start; i < len; i++)
-		if(str[i] != ' ')
-		{
-			start = i;
-			break;
-		}
+   // Ignore whitespace
+   int start = 0;
+   for(int i = start; i < len; i++)
+      if(str[i] != ' ')
+      {
+         start = i;
+         break;
+      }
 
-	for(int i = start; i < len; i++)
-		switch(str[i])
-		{
-		case '+': case '-':
-			if(i != 0)
-				return false;
-			break;
-		case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': 
-			break;
-		case ' ': // ignore whitespace
-			for(int j = i+1; j < len; j++)
-				if(str[j] != ' ')
-					return false;
-			return true;
-			break;
-		default:
-			return false;
-		}
-	return true;
+      for(int i = start; i < len; i++)
+         switch(str[i])
+      {
+         case '+': case '-':
+            if(i != 0)
+               return false;
+            break;
+         case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': 
+            break;
+         case ' ': // ignore whitespace
+            for(int j = i+1; j < len; j++)
+               if(str[j] != ' ')
+                  return false;
+            return true;
+            break;
+         default:
+            return false;
+      }
+      return true;
 }
 
 bool isFloat(const char* str, bool sciOk = false)
 {
-	int len = dStrlen(str);
-	if(len <= 0)
-		return false;
+   int len = dStrlen(str);
+   if(len <= 0)
+      return false;
 
-	// Ingore whitespace
-	int start = 0;
-	for(int i = start; i < len; i++)
-		if(str[i] != ' ')
-		{
-			start = i;
-			break;
-		}
+   // Ingore whitespace
+   int start = 0;
+   for(int i = start; i < len; i++)
+      if(str[i] != ' ')
+      {
+         start = i;
+         break;
+      }
 
-	bool seenDot = false;
-	int eLoc = -1;
-	for(int i = 0; i < len; i++)
-		switch(str[i])
-		{
-		case '+': case '-':
-			if(sciOk)
-			{
-				//Haven't found e or scientific notation symbol
-				if(eLoc == -1)
-				{
-					//only allowed in beginning
-					if(i != 0)
-						return false;
-				}
-				else
-				{
-					//if not right after the e
-					if(i != (eLoc + 1))
-						return false;
-				}
-			}
-			else
-			{
-				//only allowed in beginning
-				if(i != 0)
-					return false;
-			}
-			break;
-		case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': 
-			break;
-		case 'e': case 'E':
-			if(!sciOk)
-				return false;
-			else
-			{
-				//already saw it so can't have 2
-				if(eLoc != -1)
-					return false;
+      bool seenDot = false;
+      int eLoc = -1;
+      for(int i = 0; i < len; i++)
+         switch(str[i])
+      {
+         case '+': case '-':
+            if(sciOk)
+            {
+               //Haven't found e or scientific notation symbol
+               if(eLoc == -1)
+               {
+                  //only allowed in beginning
+                  if(i != 0)
+                     return false;
+               }
+               else
+               {
+                  //if not right after the e
+                  if(i != (eLoc + 1))
+                     return false;
+               }
+            }
+            else
+            {
+               //only allowed in beginning
+               if(i != 0)
+                  return false;
+            }
+            break;
+         case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': case '0': 
+            break;
+         case 'e': case 'E':
+            if(!sciOk)
+               return false;
+            else
+            {
+               //already saw it so can't have 2
+               if(eLoc != -1)
+                  return false;
 
-				eLoc = i;
-			}
-			break;
-		case '.':
-			if(seenDot | (sciOk && eLoc != -1))
-				return false;
-			seenDot = true;
-			break;
-		case ' ': // ignore whitespace
-			for(int j = i+1; j < len; j++)
-				if(str[j] != ' ')
-					return false;
-			return true;
-			break;
-		default:
-			return false;
-		}
-	return true;
+               eLoc = i;
+            }
+            break;
+         case '.':
+            if(seenDot | (sciOk && eLoc != -1))
+               return false;
+            seenDot = true;
+            break;
+         case ' ': // ignore whitespace
+            for(int j = i+1; j < len; j++)
+               if(str[j] != ' ')
+                  return false;
+            return true;
+            break;
+         default:
+            return false;
+      }
+      return true;
 }
 
 bool isValidIP(const char* ip)
 {
-    unsigned b1, b2, b3, b4;
-	unsigned char c;
-	int rc = dSscanf(ip, "%3u.%3u.%3u.%3u%c", &b1, &b2, &b3, &b4, &c);
-	if (rc != 4 && rc != 5) return false;
-	if ((b1 | b2 | b3 | b4) > 255) return false;
-	if (dStrspn(ip, "0123456789.") < dStrlen(ip)) return false;
-	return true;
+   unsigned b1, b2, b3, b4;
+   unsigned char c;
+   int rc = dSscanf(ip, "%3u.%3u.%3u.%3u%c", &b1, &b2, &b3, &b4, &c);
+   if (rc != 4 && rc != 5) return false;
+   if ((b1 | b2 | b3 | b4) > 255) return false;
+   if (dStrspn(ip, "0123456789.") < dStrlen(ip)) return false;
+   return true;
 }
 
 bool isValidPort(U16 port)
 {
-	return (port >= 0 && port <=65535);
+   return (port >= 0 && port <=65535);
 }
 
 //=============================================================================
@@ -380,29 +380,29 @@ DefineConsoleFunction( strlenskip, S32, ( const char* str, const char* first, co
    "@return The length of the given string skipping blocks of text between characters.\n"
    "@ingroup Strings" )
 {
-	const UTF8* pos = str;
-	U32 size = 0;
-	U32 length = dStrlen(str);
-	bool count = true;
+   const UTF8* pos = str;
+   U32 size = 0;
+   U32 length = dStrlen(str);
+   bool count = true;
 
-	//loop through each character counting each character, skipping tags (anything with < followed by >)
-	for(U32 i = 0; i < length; i++, pos++)
-	{
-		if(count)
-		{
-			if(*pos == first[0])
-				count = false;
-			else
-				size++;
-		}
-		else
-		{
-			if(*pos == last[0])
-				count = true;
-		}
-	}
+   //loop through each character counting each character, skipping tags (anything with < followed by >)
+   for(U32 i = 0; i < length; i++, pos++)
+   {
+      if(count)
+      {
+         if(*pos == first[0])
+            count = false;
+         else
+            size++;
+      }
+      else
+      {
+         if(*pos == last[0])
+            count = true;
+      }
+   }
 
-	return S32(size);
+   return S32(size);
 }
 
 //-----------------------------------------------------------------------------
@@ -831,9 +831,9 @@ DefineConsoleFunction( getFirstNumber, String, ( const char* str ),,
    "@param str The string from which to read out the first number.\n"
    "@return String representation of the number or "" if no number.\n\n")
 {
-	U32 start;
-	U32 end;
-	return String::GetFirstNumber(str, start, end);
+   U32 start;
+   U32 end;
+   return String::GetFirstNumber(str, start, end);
 }
 
 //----------------------------------------------------------------
@@ -1031,17 +1031,17 @@ DefineConsoleFunction( strToggleCaseToWords, const char*, ( const char* str ),,
    "@endtsexample\n"
    "@ingroup Strings" )
 {
-	String newStr;
-	for(S32 i = 0; str[i]; i++)
-	{
-		//If capitol add a space
-		if(i != 0 && str[i] >= 65 && str[i] <= 90)
-			newStr += " "; 
+   String newStr;
+   for(S32 i = 0; str[i]; i++)
+   {
+      //If capitol add a space
+      if(i != 0 && str[i] >= 65 && str[i] <= 90)
+         newStr += " "; 
 
-		newStr += str[i]; 
-	}
+      newStr += str[i]; 
+   }
 
-	return Con::getReturnBuffer(newStr);
+   return Con::getReturnBuffer(newStr);
 }
 
 //----------------------------------------------------------------
@@ -1056,7 +1056,7 @@ DefineConsoleFunction( isInt, bool, ( const char* str),,
    "@endtsexample\n"
    "@ingroup Strings" )
 {
-	return isInt(str);
+   return isInt(str);
 }
 
 //----------------------------------------------------------------
@@ -1071,7 +1071,7 @@ DefineConsoleFunction( isFloat, bool, ( const char* str, bool sciOk), (false),
    "@endtsexample\n"
    "@ingroup Strings" )
 {
-	return isFloat(str, sciOk);
+   return isFloat(str, sciOk);
 }
 
 //----------------------------------------------------------------
@@ -1085,13 +1085,13 @@ DefineConsoleFunction( isValidPort, bool, ( const char* str),,
    "@endtsexample\n"
    "@ingroup Strings" )
 {
-	if(isInt(str))
-	{
-		U16 port = dAtous(str);
-		return isValidPort(port);
-	}
-	else
-		return false;
+   if(isInt(str))
+   {
+      U16 port = dAtous(str);
+      return isValidPort(port);
+   }
+   else
+      return false;
 }
 
 //----------------------------------------------------------------
@@ -1105,12 +1105,12 @@ DefineConsoleFunction( isValidIP, bool, ( const char* str),,
    "@endtsexample\n"
    "@ingroup Strings" )
 {
-	if(dStrcmp(str, "localhost") == 0)
-	{
-		return true;
-	}
-	else
-		return isValidIP(str);
+   if(dStrcmp(str, "localhost") == 0)
+   {
+      return true;
+   }
+   else
+      return isValidIP(str);
 }
 
 //----------------------------------------------------------------
@@ -1244,22 +1244,22 @@ DefineEngineFunction( monthNumToStr, String, ( S32 num, bool abbreviate ), (fals
    "@return month as a word given a number or \"\" if number is bad"
    "@ingroup FileSystem")
 {
-	switch(num)
-	{
-		case 1: return abbreviate ? "Jan" : "January"; break;
-		case 2: return abbreviate ? "Feb" : "February"; break;
-		case 3: return abbreviate ? "Mar" : "March"; break;
-		case 4: return abbreviate ? "Apr" : "April"; break;
-		case 5: return "May"; break;
-		case 6: return abbreviate ? "Jun" : "June"; break;
-		case 7: return abbreviate ? "Jul" : "July"; break;
-		case 8: return abbreviate ? "Aug" : "August"; break;
-		case 9: return abbreviate ? "Sep" : "September"; break;
-		case 10: return abbreviate ? "Oct" : "October"; break;
-		case 11: return abbreviate ? "Nov" : "November"; break;
-		case 12: return abbreviate ? "Dec" : "December"; break;
-		default: return "";
-	}
+   switch(num)
+   {
+      case 1: return abbreviate ? "Jan" : "January"; break;
+      case 2: return abbreviate ? "Feb" : "February"; break;
+      case 3: return abbreviate ? "Mar" : "March"; break;
+      case 4: return abbreviate ? "Apr" : "April"; break;
+      case 5: return "May"; break;
+      case 6: return abbreviate ? "Jun" : "June"; break;
+      case 7: return abbreviate ? "Jul" : "July"; break;
+      case 8: return abbreviate ? "Aug" : "August"; break;
+      case 9: return abbreviate ? "Sep" : "September"; break;
+      case 10: return abbreviate ? "Oct" : "October"; break;
+      case 11: return abbreviate ? "Nov" : "November"; break;
+      case 12: return abbreviate ? "Dec" : "December"; break;
+      default: return "";
+   }
 }
 
 DefineEngineFunction( weekdayNumToStr, String, ( S32 num, bool abbreviate ), (false),
@@ -1267,17 +1267,17 @@ DefineEngineFunction( weekdayNumToStr, String, ( S32 num, bool abbreviate ), (fa
    "@return weekday as a word given a number or \"\" if number is bad"
    "@ingroup FileSystem")
 {
-	switch(num)
-	{
-		case 0: return abbreviate ? "Sun" : "Sunday"; break;
-		case 1: return abbreviate ? "Mon" : "Monday"; break;
-		case 2: return abbreviate ? "Tue" : "Tuesday"; break;
-		case 3: return abbreviate ? "Wed" : "Wednesday"; break;
-		case 4: return abbreviate ? "Thu" : "Thursday"; break;
-		case 5: return abbreviate ? "Fri" : "Friday"; break;
-		case 6: return abbreviate ? "Sat" : "Saturday"; break;
-		default: return "";
-	}
+   switch(num)
+   {
+      case 0: return abbreviate ? "Sun" : "Sunday"; break;
+      case 1: return abbreviate ? "Mon" : "Monday"; break;
+      case 2: return abbreviate ? "Tue" : "Tuesday"; break;
+      case 3: return abbreviate ? "Wed" : "Wednesday"; break;
+      case 4: return abbreviate ? "Thu" : "Thursday"; break;
+      case 5: return abbreviate ? "Fri" : "Friday"; break;
+      case 6: return abbreviate ? "Sat" : "Saturday"; break;
+      default: return "";
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -3071,5 +3071,5 @@ DefineEngineFunction( getMaxDynamicVerts, S32, (),,
 	"Get max number of allowable dynamic vertices in a single vertex buffer.\n\n"
 	"@return the max number of allowable dynamic vertices in a single vertex buffer" )
 {
-	return MAX_DYNAMIC_VERTS / 2;
+   return MAX_DYNAMIC_VERTS / 2;
 }

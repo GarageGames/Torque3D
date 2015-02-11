@@ -96,16 +96,16 @@ DefineConsoleFunction( mFloor, S32, ( F32 v ),,
 
 
 DefineConsoleFunction( mRound, F32, ( F32 v, S32 n ), (0),
-				"Round v to the nth decimal place or the nearest whole number by default."
-				"@param v Value to round\n"
-				"@param n Number of decimal places to round to, 0 by default\n"
-				"@return The rounded value as a S32."
-				"@ingroup Math" )
+    "Round v to the nth decimal place or the nearest whole number by default."
+    "@param v Value to round\n"
+    "@param n Number of decimal places to round to, 0 by default\n"
+    "@return The rounded value as a S32."
+    "@ingroup Math" )
 {
-	if(n <= 0)
-		return mRound(v);
-	else
-		return mRound(v, n);
+   if(n <= 0)
+      return mRound(v);
+   else
+      return mRound(v, n);
 }
 
 DefineConsoleFunction( mCeil, S32, ( F32 v ),,
