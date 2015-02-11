@@ -75,84 +75,84 @@ void JSONObject::initPersistFields()
 
 const JSONObject::DataType JSONObject::getValueType( const String& val ) const
 {
-	JSONObject* jsonObj = NULL;
-	if(val.isEmpty())
-	{
-		return DataType::UNDEFINED;
-	}
-	else if (!val.equal("0", String::NoCase) && Sim::findObject(val, jsonObj))
-	{
-		return jsonObj->mIsArray ? DataType::ARRAY : DataType::OBJECT;
-	}
-	else if(val.equal("null", String::NoCase))
-	{
-		return DataType::NULL_TYPE;
-	}
-	else if(val.equal("true", String::NoCase) || val.equal("false", String::NoCase))
-	{
-		return DataType::BOOLEAN;
-	}
-	/* This code relies on some other math functions defined in mMathFn
-	in many cases a string will work just as good, so I removed this, but someone may want it.
-	else if(isInt(val.c_str()) || isFloat(val.c_str()))
-	{
-		return DataType::NUMBER;
-	}
-	*/
-	
-	return DataType::STRING;
+   JSONObject* jsonObj = NULL;
+   if(val.isEmpty())
+   {
+      return DataType::UNDEFINED;
+   }
+   else if (!val.equal("0", String::NoCase) && Sim::findObject(val, jsonObj))
+   {
+      return jsonObj->mIsArray ? DataType::ARRAY : DataType::OBJECT;
+   }
+   else if(val.equal("null", String::NoCase))
+   {
+      return DataType::NULL_TYPE;
+   }
+   else if(val.equal("true", String::NoCase) || val.equal("false", String::NoCase))
+   {
+      return DataType::BOOLEAN;
+   }
+   /* This code relies on some other math functions defined in mMathFn
+   in many cases a string will work just as good, so I removed this, but someone may want it.
+   else if(isInt(val.c_str()) || isFloat(val.c_str()))
+   {
+   return DataType::NUMBER;
+   }
+   */
+
+   return DataType::STRING;
 }
 
 char* JSONObject::toJSON() const
 {
-	//Put the start of the object/array tag
-	String temp = (mIsArray) ? "[" : "{";
+   //Put the start of the object/array tag
+   String temp = (mIsArray) ? "[" : "{";
 
-	for ( U32 i = 0; i < mArray.size(); i++ )
-	{
-		//Get the key value pair
-		const String& key = mArray[i].key;
-		const String& val = mArray[i].value;
+   for ( U32 i = 0; i < mArray.size(); i++ )
+   {
+      //Get the key value pair
+      const String& key = mArray[i].key;
+      const String& val = mArray[i].value;
 
-		//If not the first then add a comma to separate items
-		if(i > 0)
-			temp += ", ";
+      //If not the first then add a comma to separate items
+      if(i > 0)
+         temp += ", ";
 
-		//If we are not an array add the key to the string
-		if(!mIsArray)
-			temp += "\"" + key + "\": ";
+      //If we are not an array add the key to the string
+      if(!mIsArray)
+         temp += "\"" + key + "\": ";
 
-		//Check the type and output the correct string
-		const DataType type = getValueType(val);
-		switch(type)
-		{
-		case DataType::NULL_TYPE:
-		case DataType::BOOLEAN:
-			temp += String::ToLower(val);
-			break;
-		case DataType::NUMBER:
-			temp += val;
-			break;
-		case DataType::ARRAY:
-		case DataType::OBJECT:
-			{
-				JSONObject* jsonObj = NULL;
-				if(Sim::findObject(val, jsonObj))
-				{
-					temp += jsonObj->toJSON();
-				}
-			}
-			break;
-		default:
-			temp += "\"" + val + "\"";
-		}
-	}
+      //Check the type and output the correct string
+      const DataType type = getValueType(val);
+      switch(type)
+      {
+         case DataType::NULL_TYPE:
+         case DataType::BOOLEAN:
+            temp += String::ToLower(val);
+            break;
+         case DataType::NUMBER:
+            temp += val;
+            break;
+         case DataType::ARRAY:
+         case DataType::OBJECT:
+            {
+               JSONObject* jsonObj = NULL;
+               if(Sim::findObject(val, jsonObj))
+               {
+                  temp += jsonObj->toJSON();
+               }
+            }
+            break;
+         default:
+            temp += "\"" + val + "\"";
+      }
+   }
 
-	//End the object/array
-	temp += (mIsArray) ? "]" : "}";
+   //End the object/array
+   temp += (mIsArray) ? "]" : "}";
 
-	//Return our new string
-	return Con::getReturnBuffer(temp);
+   //Return our new string
+   return Con::getReturnBuffer(temp);
 }
 
 //=============================================================================
@@ -161,27 +161,27 @@ char* JSONObject::toJSON() const
 
 DefineEngineMethod(JSONObject, getValueType, const char*, (S32 index),, "Get JSON type as a string")
 {
-	const String val = object->getValueFromIndex(index);
-	switch(object->getValueType(val))
-	{
-	case JSONObject::DataType::ARRAY:
-		return "Array";
-	case JSONObject::DataType::BOOLEAN:
-		return "Boolean";
-	case JSONObject::DataType::NULL_TYPE:
-		return "Null";
-	case JSONObject::DataType::NUMBER:
-		return "Number";
-	case JSONObject::DataType::OBJECT:
-		return "Object";
-	case JSONObject::DataType::STRING:
-		return "String";
-	default:
-		return "Undefined";
-	}
+   const String val = object->getValueFromIndex(index);
+   switch(object->getValueType(val))
+   {
+   case JSONObject::DataType::ARRAY:
+      return "Array";
+   case JSONObject::DataType::BOOLEAN:
+      return "Boolean";
+   case JSONObject::DataType::NULL_TYPE:
+      return "Null";
+   case JSONObject::DataType::NUMBER:
+      return "Number";
+   case JSONObject::DataType::OBJECT:
+      return "Object";
+   case JSONObject::DataType::STRING:
+      return "String";
+   default:
+      return "Undefined";
+   }
 }
 
 DefineEngineMethod(JSONObject, toJSON, const char*, (),, "Get JSON string for this object")
 {
-	return object->toJSON();
+   return object->toJSON();
 }

@@ -40,18 +40,18 @@ protected:
    bool mIsArray;
 
 public:
-  
+
    JSONObject();
 
    ///Enumeration of data type for the array
    enum DataType {
-	   NUMBER,
-	   STRING,
-	   BOOLEAN,
-	   ARRAY,
-	   OBJECT,
-	   NULL_TYPE,
-	   UNDEFINED
+      NUMBER,
+      STRING,
+      BOOLEAN,
+      ARRAY,
+      OBJECT,
+      NULL_TYPE,
+      UNDEFINED
    };
 
    ///Get the type of the value
@@ -67,7 +67,7 @@ public:
    DECLARE_CONOBJECT( JSONObject );
    DECLARE_CATEGORY( "Core" );
    DECLARE_DESCRIPTION( "An object storing an indexed sequence of key/value pairs with type and JSON writing." );
-   
+
    static void initPersistFields();
 };
 
