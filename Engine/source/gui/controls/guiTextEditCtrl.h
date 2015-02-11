@@ -91,6 +91,8 @@ protected:
    void updateHistory(StringBuffer *txt, bool moveIndex);
 
    void playDeniedSound();
+   bool mTextValid;
+
    void execConsoleCallback();
 
    virtual void handleCharInput( U16 ascii );
@@ -118,6 +120,9 @@ public:
    virtual void setText(const UTF16* txt);
    S32   getCursorPos()   { return( mCursorPos ); }
    void  setCursorPos( const S32 newPos );
+   void invalidText(bool playSound = true);
+   void validText();
+   bool isValidText();
    
    bool isAllTextSelected();
    void selectAllText();

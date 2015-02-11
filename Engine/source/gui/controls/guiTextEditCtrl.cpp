@@ -128,6 +128,8 @@ GuiTextEditCtrl::GuiTextEditCtrl()
 
    mActive = true;
 
+   mTextValid = true;
+
    mTextOffsetReset = true;
 
    mHistoryDirty = false;
@@ -1257,7 +1259,9 @@ void GuiTextEditCtrl::onRender(Point2I offset, const RectI &updateRect)
    //if opaque, fill the update rect with the fill color
    if ( mProfile->mOpaque )
    {
-      if(isFirstResponder())
+      if(!mTextValid)
+         GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorNA );
+      else if(isFirstResponder())
          GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorHL );
       else
          GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColor );
@@ -1265,7 +1269,11 @@ void GuiTextEditCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    //if there's a border, draw the border
    if ( mProfile->mBorder )
+   {
       renderBorder( ctrlRect, mProfile );
+      if( !mTextValid )
+         GFX->getDrawUtil()->drawRectFill(ctrlRect, mProfile->mFillColorNA);
+   }
 
    drawText( ctrlRect, isFirstResponder() );
 }
@@ -1491,6 +1499,24 @@ bool GuiTextEditCtrl::hasText()
    return (mTextBuffer.length());
 }
 
+void GuiTextEditCtrl::invalidText(bool playSound)
+{
+   mTextValid = false;
+
+   if(playSound)
+      playDeniedSound();
+}
+
+void GuiTextEditCtrl::validText()
+{
+   mTextValid = true;
+}
+
+bool GuiTextEditCtrl::isValidText()
+{
+   return mTextValid;
+}
+
 void GuiTextEditCtrl::playDeniedSound()
 {
    if ( mDeniedSound )
@@ -1523,21 +1549,25 @@ void GuiTextEditCtrl::handleCharInput( U16 ascii )
          //a minus sign only exists at the beginning, and only a single minus sign
          if ( mCursorPos != 0 && !isAllTextSelected() )
          {
-            playDeniedSound();
+            invalidText();
             return;
          }
 
          if ( mInsertOn && ( mTextBuffer.getChar(0) == '-' ) ) 
          {
-            playDeniedSound();
+            invalidText();
             return;
          }
       }
       // BJTODO: This is probably not unicode safe.
       else if (  ascii != '.' && (ascii < '0' || ascii > '9')  )
       {
-         playDeniedSound();
+         invalidText();
          return;
+      }
+      else
+      {
+         validText();
       }
    }
 
@@ -1745,4 +1775,25 @@ DefineEngineMethod( GuiTextEditCtrl, forceValidateText, void, (),,
    "@see GuiControl")
 {
    object->forceValidateText();
+}
+
+DefineEngineMethod( GuiTextEditCtrl, invalidText, void, ( bool playSound ), (true),
+   "@brief Trigger the invalid sound and make the box red.\n\n"
+   "@param playSound Play the invalid text sound or not.\n")
+{
+   object->invalidText( playSound );
+}
+
+
+DefineEngineMethod( GuiTextEditCtrl, validText, void, (),,
+   "@brief Restores the box to normal color.\n\n")
+{
+   object->validText();
+}
+
+DefineEngineMethod( GuiTextEditCtrl, isValidText, bool, (),,
+   "@brief Returns if the text is set to valid or not.\n"
+   "@Return true if text is set to valid, false if not.\n\n")
+{
+   return object->isValidText();
 }
