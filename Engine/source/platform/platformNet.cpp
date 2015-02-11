@@ -314,7 +314,7 @@ Net::Error getLastError()
       return Net::UnknownError;
    }
 #else
-   if (errno == EAGAIN)
+   if (errno == EAGAIN || errno == EINPROGRESS)
       return Net::WouldBlock;
    if (errno == 0)
       return Net::NoError;
