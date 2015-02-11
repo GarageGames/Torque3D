@@ -141,6 +141,7 @@ DefineConsoleFunction( shellExecute, bool, (const char * executable, const char 
 				"@param executable Name of the executable or batch file\n"
 				"@param args Optional list of arguments, in string format, to pass to the executable\n"
 				"@param directory Optional string containing path to output or shell\n"
+				"@return true if executed, false if not\n"
 				"@ingroup Platform")
 {
    ExecuteThread *et = new ExecuteThread( executable, args, directory );
