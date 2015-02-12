@@ -859,8 +859,8 @@ inline F64 Point3D::lenSquared() const
 
 inline F64 Point3D::len() const
 {
-	F64 temp = x*x + y*y + z*z;
-	return (temp > 0.0) ? mSqrtD(x*x + y*y + z*z) : 0.0;
+   F64 temp = x*x + y*y + z*z;
+   return (temp > 0.0) ? mSqrtD(temp) : 0.0;
 }
 
 inline void Point3D::normalize()
