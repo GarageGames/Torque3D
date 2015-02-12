@@ -669,7 +669,7 @@ void GuiMLTextCtrl::getCursorPositionAndColor(Point2I &cursorTop, Point2I &curso
 {
    S32 x = 0;
    S32 y = 0;
-   S32 height = mProfile && mProfile->mFont ? mProfile->mFont->getHeight() : 0;
+   S32 height = (mProfile && mProfile->mFont) ? mProfile->mFont->getHeight() : 0;
    color = mProfile->mCursorColor;
    for(Line *walk = mLineList; walk; walk = walk->next)
    {
