@@ -32,6 +32,9 @@
 #include "gfx/gfxTransformSaver.h"
 #include "console/engineAPI.h"
 
+#include "gfx/gfxDrawUtil.h"
+#include "gui/core/guiCanvas.h"
+
 IMPLEMENT_CONOBJECT( GuiObjectView );
 
 ConsoleDocClass( GuiObjectView,
@@ -86,6 +89,10 @@ IMPLEMENT_CALLBACK( GuiObjectView, onMouseLeave, void, (),(),
    "@see GuiControl\n\n"
 );
 
+IMPLEMENT_CALLBACK( GuiObjectView, onOrbitDistanceChanged, void, (), (),
+	"Called when the orbit distance changes (using mouse).\n"
+   );
+
 //------------------------------------------------------------------------------
 
 GuiObjectView::GuiObjectView()
@@ -94,6 +101,7 @@ GuiObjectView::GuiObjectView()
       mOrbitDist( 5.0f ),
       mMouseState( None ),
       mModel( NULL ),
+	  mShowAxis(false),
       mMountedModel( NULL ),
       mLastMousePoint( 0, 0 ),
       mLastRenderTime( 0 ),
@@ -141,6 +149,8 @@ void GuiObjectView::initPersistFields()
          "The object model shape file to show in the view." );
       addField( "skin", TypeRealString, Offset( mSkinName, GuiObjectView ),
          "The skin to use on the object model." );
+	  addField("showAxis", TypeBool, Offset( mShowAxis, GuiObjectView ),
+         "Display the axis for the orientation of the model." ); 
    
    endGroup( "Model" );
    
@@ -315,28 +325,92 @@ void GuiObjectView::onRightMouseDragged( const GuiEvent &event )
    mLastMousePoint = event.mousePoint;
 
    mOrbitDist += ( delta * mCameraSpeed );
+
+   //Let script know mOrbitDist changed
+   onOrbitDistanceChanged_callback();
 }
 
 //------------------------------------------------------------------------------
 
-void GuiObjectView::setObjectAnimation( S32 index )
+bool GuiObjectView::onMouseWheelUp(const GuiEvent &event)
+{
+	if (mMouseState == Zooming)
+	{
+		return false;
+	}
+
+	S32 delta = 5;
+
+	mOrbitDist += (delta * mCameraSpeed);
+
+	return true;
+}
+
+bool GuiObjectView::onMouseWheelDown(const GuiEvent &event)
+{
+	if (mMouseState == Zooming)
+	{
+		return false;
+	}
+
+	S32 delta = -5;
+
+	mOrbitDist += (delta * mCameraSpeed);
+
+	//Let script know mOrbitDist changed
+	onOrbitDistanceChanged_callback();
+
+	return true;
+}
+
+void GuiObjectView::setObjectAnimationSpeed(F32 time)
+{
+	if(mModel && mRunThread)
+	{
+		// If you found the sequence add the thread then scale the thread (speed it up or down)
+		mModel->setTimeScale( mRunThread, time );
+	}
+	else
+		Con::printf("Error: The model hasn't been loaded yet."); 
+}
+
+void GuiObjectView::setObjectAnimation(S32 index, F32 time)
 {
    mAnimationSeq = index;
    mAnimationSeqName = String();
    
    if( mModel )
-      _initAnimation();
+      _initAnimation(time);
 }
 
 //------------------------------------------------------------------------------
 
-void GuiObjectView::setObjectAnimation( const String& sequenceName )
+void GuiObjectView::setObjectAnimation(const String & sequenceName, F32 time)
 {
    mAnimationSeq = -1;
    mAnimationSeqName = sequenceName;
    
    if( mModel )
-      _initAnimation();
+      _initAnimation(time);
+}
+
+S32 GuiObjectView::getObjectAnimationCount()
+{
+	if(mModel)
+		return mModel->getShape()->getSequenceCount();
+	else
+		return -1;
+}
+
+const char* GuiObjectView::getObjectAnimationName(S32 index)
+{
+	if(mModel && index < mModel->getShape()->sequences.size())
+	{
+		const String & s = mModel->getShape()->getSequenceName(index);
+		return s.c_str();
+	}
+	else
+		return NULL;
 }
 
 //------------------------------------------------------------------------------
@@ -525,6 +599,10 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
       true
    );
 
+   // Set up pass transforms.
+   renderPass->assignSharedXform( RenderPassManager::View, MatrixF::Identity );  
+   renderPass->assignSharedXform( RenderPassManager::Projection, GFX->getProjectionMatrix() );
+
    // Set up our TS render state here.   
    TSRenderState rdata;
    rdata.setSceneState( &state );
@@ -546,6 +624,14 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
       }
       
       mModel->render( rdata );
+
+	  if(mShowAxis)
+	  {
+		  GFXStateBlockDesc desc;
+		  desc.setBlend( false );
+		  desc.setZReadWrite( false, false );
+		  GFX->getDrawUtil()->drawTransform(desc, MatrixF::Identity);
+	  }
    }
    
    // Render mounted model.
@@ -573,6 +659,9 @@ void GuiObjectView::setOrbitDistance( F32 distance )
 {
    // Make sure the orbit distance is within the acceptable range
    mOrbitDist = mClampF( distance, mMinOrbitDist, mMaxOrbitDist );
+
+   //Let script know mOrbitDist changed
+   onOrbitDistanceChanged_callback();
 }
 
 //------------------------------------------------------------------------------
@@ -617,7 +706,7 @@ void GuiObjectView::setLightDirection( const Point3F& direction )
 
 //------------------------------------------------------------------------------
 
-void GuiObjectView::_initAnimation()
+void GuiObjectView::_initAnimation(F32 time)
 {
    AssertFatal( mModel, "GuiObjectView::_initAnimation - No model loaded!" );
    
@@ -659,6 +748,9 @@ void GuiObjectView::_initAnimation()
       if( !mRunThread )
          mRunThread = mModel->addThread();
          
+	  mLastRenderTime = Platform::getVirtualMilliseconds();
+	  mModel->setPos( mRunThread, 0 );
+	  mModel->setTimeScale( mRunThread, time );
       mModel->setSequence( mRunThread, mAnimationSeq, 0.f );
    }
    
@@ -843,9 +935,10 @@ DefineEngineMethod( GuiObjectView, setMountSkin, void, (const char* skinName),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( GuiObjectView, setSeq, void, (const char* indexOrName),,
+DefineEngineMethod( GuiObjectView, setSeq, void, (const char* indexOrName, F32 time), ( 1 ),
    "@brief Sets the animation to play for the viewed object.\n\n"
    "@param indexOrName The index or name of the animation to play.\n"
+   "@param time The time scale to play, 1 normal, -1 reverse, 0 stopped.\n"
    "@tsexample\n"
    "// Set the animation index value, or animation sequence name.\n"
    "%indexVal = \"3\";\n"
@@ -857,9 +950,9 @@ DefineEngineMethod( GuiObjectView, setSeq, void, (const char* indexOrName),,
    "@see GuiControl")
 {
    if( dIsdigit( indexOrName[0] ) )
-      object->setObjectAnimation( dAtoi( indexOrName ) );
+      object->setObjectAnimation( dAtoi( indexOrName ), time );
    else
-      object->setObjectAnimation( indexOrName );
+      object->setObjectAnimation( indexOrName, time );
 }
 
 //-----------------------------------------------------------------------------
@@ -996,4 +1089,43 @@ DefineEngineMethod( GuiObjectView, setLightDirection, void, (Point3F direction),
    "@see GuiControl")
 {
    object->setLightDirection( direction );
+}
+
+DefineEngineMethod( GuiObjectView, getSeqName, const char *, (S32 index),,
+   "@brief get the name of the sequence/animation with the given index for the current dts.\n\n"
+   "@param index sequence/animation index for current dts\n"
+   "@tsexample\n"
+   "// Set the animation index value to get the name off\n"
+   "%indexVal = \"3\";\n"
+   "// This will return idle.\n"
+   "%thisGuiObjectVew.getSeqName(%indexVal);\n"
+   "@endtsexample\n\n"
+   "@see GuiControl")
+{
+
+   return Con::getReturnBuffer( object->getObjectAnimationName(index) );
+}
+
+DefineEngineMethod( GuiObjectView, getSeqCount, S32, (),,
+   "@brief get the number of sequences/animations for current dts.\n\n"
+   "@tsexample\n"
+   "%thisGuiObjectVew.getSeqCount();\n"
+   "@endtsexample\n\n"
+   "@see GuiControl")
+{
+	return object->getObjectAnimationCount();
+}
+
+DefineEngineMethod( GuiObjectView, setSeqSpeed, void, (F32 time),,
+   "@brief Sets the animation speed for the viewed object.\n\n"
+   "@param time The time scale to play, 1 normal, -1 reverse, 0 stopped.\n"
+   "@tsexample\n"
+   "// Set the animation index value to get the name off\n"
+   "%time = \"-1\";\n"
+   "// Reverse the animation.\n"
+   "%thisGuiObjectVew.setSeqSpeed(%time);\n"
+   "@endtsexample\n\n"
+   "@see GuiControl")
+{
+	object->setObjectAnimationSpeed(time);
 }

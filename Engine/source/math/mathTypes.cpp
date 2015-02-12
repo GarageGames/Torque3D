@@ -74,6 +74,16 @@ IMPLEMENT_STRUCT( Point3F,
       FIELD( z, z, 1, "Z coordinate." )
 
 END_IMPLEMENT_STRUCT;
+IMPLEMENT_STRUCT( Point4I,
+   Point4I, MathTypes,
+   "" )
+   
+      FIELD( x, x, 1, "X coordinate." )
+      FIELD( y, y, 1, "Y coordinate." )
+      FIELD( z, z, 1, "Z coordinate." )
+      FIELD( w, w, 1, "W coordinate." )
+      
+END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( Point4F,
    Point4F, MathTypes,
    "" )
@@ -168,7 +178,7 @@ ConsoleSetType( TypePoint2F )
 // TypePoint3I
 //-----------------------------------------------------------------------------
 ConsoleType( Point3I, TypePoint3I, Point3I )
-ImplementConsoleTypeCasters(TypePoint3I, Point3I)
+ImplementConsoleTypeCasters( TypePoint3I, Point3I )
 
 ConsoleGetType( TypePoint3I )
 {
@@ -212,6 +222,31 @@ ConsoleSetType( TypePoint3F )
       *((Point3F *) dptr) = Point3F(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]));
    else
       Con::printf("Point3F must be set as { x, y, z } or \"x y z\"");
+}
+
+//-----------------------------------------------------------------------------
+// TypePoint4I
+//-----------------------------------------------------------------------------
+ConsoleType( Point4I, TypePoint4I, Point4I )
+ImplementConsoleTypeCasters( TypePoint4I, Point4I )
+
+ConsoleGetType( TypePoint4I )
+{
+   Point4I *pt = (Point4I *) dptr;
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d %d %d", pt->x, pt->y, pt->z, pt->w);
+   return returnBuffer;
+}
+
+ConsoleSetType( TypePoint4I )
+{
+   if(argc == 1)
+      dSscanf(argv[0], "%d %d %d %d", &((Point4I *) dptr)->x, &((Point4I *) dptr)->y, &((Point4I *) dptr)->z, &((Point4I *) dptr)->w);
+   else if(argc == 4)
+      *((Point4I *) dptr) = Point4I(dAtoi(argv[0]), dAtoi(argv[1]), dAtoi(argv[2]), dAtoi(argv[3]));
+   else
+      Con::printf("Point4I must be set as { x, y, z, w } or \"x y z w\"");
 }
 
 //-----------------------------------------------------------------------------
@@ -846,8 +881,9 @@ DefineConsoleFunction( VectorRot, const char*, (Point3F v, F32 angle), , "(Vecto
 	x = v.x * cos(angle) - v.y * sin(angle);            
 	y = v.x * sin(angle) + v.y * cos(angle); 
 
-	char* returnBuffer = Con::getReturnBuffer(256);
-	dSprintf(returnBuffer,256,"%g %g %g", x, y, v.z);
+	static const U32 bufSize = 256;
+	char* returnBuffer = Con::getReturnBuffer(bufSize);
+	dSprintf(returnBuffer,bufSize,"%g %g %g", x, y, v.z);
 	return returnBuffer;
 }
 
@@ -903,7 +939,7 @@ DefineConsoleFunction( MatrixCreate, TransformF, ( VectorF position, AngAxisF or
 //-----------------------------------------------------------------------------
 
 DefineConsoleFunction( MatrixCreateFromEuler, TransformF, ( Point3F angles ),,
-   "@Create a matrix from the given rotations.\n\n"
+   "Create a matrix from the given rotations.\n\n"
    "@param Vector3F X, Y, and Z rotation in *radians*.\n"
    "@return A transform based on the given orientation.\n"
    "@ingroup Matrices" )
@@ -913,6 +949,190 @@ DefineConsoleFunction( MatrixCreateFromEuler, TransformF, ( Point3F angles ),,
    aa.set(rotQ);
 
    return TransformF( Point3F::Zero, aa );
+}
+
+DefineConsoleFunction( EulerToAngleAxis, AngAxisF, ( EulerF angle ),,
+   "Converts a Euler rotation to angle axis rotation (in degrees).\n\n"
+   "@param angle Angle in degrees to convert.\n"
+   "@return Euler rotation/angle converted to angle axis form.\n")
+{
+	EulerF rot(angle);
+
+	//convert to radians
+	rot.x = mDegToRad(rot.x);
+	rot.y = mDegToRad(rot.y);
+	rot.z = mDegToRad(rot.z);
+
+	QuatF rotQ(rot);
+	AngAxisF aa(rotQ);
+
+	//I negated the sign of the axis, because the sign was incorrect
+	aa.axis.x = (aa.axis.x == 0 ? 0.0 : -aa.axis.x);
+	aa.axis.y = (aa.axis.y == 0 ? 0.0 : -aa.axis.y);
+	aa.axis.z = (aa.axis.z == 0 ? 0 : -aa.axis.z);
+
+	return aa;
+}
+
+DefineConsoleFunction( AngleAxisToEuler, EulerF, ( AngAxisF angle ),,
+   "Converts an angle axis rotation to Euler rotation (in degrees).\n\n"
+   "@param angle Angle in degrees to convert.\n"
+   "@return Angle Axis rotation/angle converted to Euler form.\n")
+{
+	MatrixF mat;
+	angle.setMatrix(&mat);
+	EulerF rot;
+	rot = mat.toEuler();
+
+	//Convert back to degrees and round a bit.
+	rot.x = mRadToDeg(rot.x);
+	rot.y = mRadToDeg(rot.y);
+	rot.z = mRadToDeg(rot.z);
+	rot.x = (rot.x == 0 ? 0.0 : rot.x);
+	rot.y = (rot.y == 0 ? 0.0 : rot.y);
+	rot.z = (rot.z == 0 ? 0.0 : rot.z);
+	
+	return rot;
+}
+
+DefineConsoleFunction( TransformToRollPitchYaw, Point3F, ( TransformF trans),,
+   "@brief Converts the transform's rotation to Roll, Pitch, Yaw.\n\n"
+   "@param trans Transform to be converted.\n"
+   "@return Roll, Pitch, and Yaw as a Point3F.\n"
+   "@ingroup Math" )
+{
+	// Get current object transform matrix
+	MatrixF objTx = trans.getMatrix();
+
+	// Get rotations from transform matrix
+	Point3F vec;
+	objTx.getColumn(1,&vec);
+
+	// Get X-vector for roll calculation
+	Point3F xv;
+	objTx.getColumn(0,&xv);
+
+	// Calculate PRH (x = pitch, y = roll, z = heading)
+	Point3F rot(-mAtan2(vec.z, mSqrt(vec.x*vec.x + vec.y*vec.y)), mDot(xv,Point3F(0,0,1)), -mAtan2(-vec.x,vec.y) );
+
+	// Set up vars
+	F32 pitch = mRadToDeg(rot.x);     // Pitch
+	F32 yaw = mRadToDeg(rot.z);       // Heading
+	F32 roll = mRadToDeg(rot.y);      // Roll
+
+	return Point3F(roll, pitch, yaw);
+}
+
+DefineConsoleFunction( AngleAxisToPitchYawRoll, Point3F, ( AngAxisF angle ),,
+   "Converts an angle axis rotation to Roll, Pitch, Yaw rotation (in degrees).\n\n"
+   "@param angle Angle in degrees to convert.\n"
+   "@return Angle Axis rotation/angle converted to Pitch, Yaw, Roll form.\n")
+{
+	MatrixF mat;
+	angle.setMatrix(&mat);
+
+	VectorF axisVector[3] = {
+		VectorF(1,0,0),
+		VectorF(0,1,0),
+		VectorF(0,0,1)
+	};
+
+	VectorF localAxis[3];
+	for(U32 i = 0; i < 3; i++)
+	{
+		VectorF tmp;
+		mat.mulV(axisVector[i], &tmp);
+		localAxis[i] = tmp;
+		localAxis[i].normalizeSafe();
+	}
+
+	F32 d2 = mAcos(mDot(localAxis[2], axisVector[2])), d0 = mAcos(mDot(localAxis[0], axisVector[0])), d1 = mAcos(mDot(localAxis[1], axisVector[1])); 
+	F32 retY = (localAxis[0].y <= 0.0f ? 1.0 : -1.0) * mRadToDeg(d0);
+	retY = retY >= 0 ? retY : retY + 360.0f;
+
+	Point3F rollPitchYaw((localAxis[2].y <= 0.0f ? 1.0 : -1.0) * mRadToDeg(d2), retY, (localAxis[1].y < 0 ? 1.0 : -1.0) * mRadToDeg(d1));
+
+	return rollPitchYaw;
+}
+
+DefineConsoleFunction( PitchYawToAngleAxis, AngAxisF, ( Point2F pitchYaw ),,
+   "Converts a Pitch/Yaw angle to axis angle.\n\n"
+   "@param pitchYaw Pitch and Yaw angles to convert.\n"
+   "@return Pitch Yaw angles converted to AngleAxis.\n")
+{
+   F32 pitch(pitchYaw.x), yaw(pitchYaw.y);
+
+   MatrixF xRot(true), zRot(true), finalRot;
+   float cosPitch = mCos(mDegToRad(pitch)), sinPitch = mSin(mDegToRad(pitch)),
+      cosYaw = mCos(mDegToRad(yaw)), sinYaw = mSin(mDegToRad(yaw));
+   xRot(1, 1) = cosPitch; xRot(1, 2) = -sinPitch;
+   xRot(2, 1) = sinPitch; xRot(2, 2) = cosPitch;
+   zRot(0, 0) = cosYaw; zRot(0, 1) = -sinYaw;
+   zRot(1, 0) = sinYaw; zRot(1, 1) = cosYaw;
+   finalRot = xRot.mul(zRot);
+   AngAxisF aa(finalRot);
+
+   return aa;
+}
+
+DefineConsoleFunction( EulerToQuat, Point4F, ( EulerF angle ),,
+   "Converts an Euler rotation to quaternion rotation.\n\n"
+   "@param angle Euler angle to convert.\n"
+   "@return Euler rotation converted to quaternion's.\n")
+{
+	EulerF rot(angle);
+
+	//convert to radians
+	rot.x = mDegToRad(rot.x);
+	rot.y = mDegToRad(rot.y);
+	rot.z = mDegToRad(rot.z);
+
+	QuatF rotQ(rot);
+
+	Point4F temp(rotQ.x, rotQ.y, rotQ.z, rotQ.w);
+
+	return temp;
+}
+
+DefineConsoleFunction( AngleAxisToQuat, Point4F, ( AngAxisF angle ),,
+   "Converts an angle axis rotation to a quaternion rotation.\n\n"
+   "@param angle Angle Axis angle to convert.\n"
+   "@return Angle Axis rotation converted to quaternion's.\n")
+{
+	QuatF rotQ(angle);
+
+	Point4F temp(rotQ.x, rotQ.y, rotQ.z, rotQ.w);
+
+	return temp;
+}
+
+DefineConsoleFunction( QuatToAngleAxis, AngAxisF, ( Point4F angle ),,
+   "Converts a quaternion rotation to angle axis rotation.\n\n"
+   "@param angle Quaternion angle to convert.\n"
+   "@return Quaternion rotation converted to Angle Axis.\n")
+{
+	QuatF quat(angle.x, angle.y, angle.z, angle.w);
+	AngAxisF aa(quat);
+
+	return aa;
+}
+
+DefineConsoleFunction( QuatToEuler, EulerF, ( Point4F angle ),,
+   "Converts a quaternion rotation to Euler rotation.\n\n"
+   "@param angle Quaternion angle to convert.\n"
+   "@return Quaternion rotation converted to Euler.\n")
+{
+	QuatF quat(angle.x, angle.y, angle.z, angle.w);
+
+	MatrixF mat;
+	quat.setMatrix(&mat);
+	EulerF rot;
+	rot = mat.toEuler();
+	rot.x = mRadToDeg(rot.x);
+	rot.y = mRadToDeg(rot.y);
+	rot.z = mRadToDeg(rot.z);
+
+	return rot;
 }
 
 //-----------------------------------------------------------------------------

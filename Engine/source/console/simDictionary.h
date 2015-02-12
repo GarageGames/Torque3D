@@ -147,6 +147,12 @@ public:
    void remove(SimObject* obj);
    SimObject* find(S32 id);
 
+	///Loop through each object in the dictionary calling the callback function
+	///@param callback	Function to call passing it the object we are on and data passed in
+	///@param data		Data to pass off to each object callback
+	///@TODO make this support the new sim dictionary
+	void foreach(void (*callback)(SimObject *obj, void *data), void* data);
+
    SimIdDictionary();
    ~SimIdDictionary();
 };

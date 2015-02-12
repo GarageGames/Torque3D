@@ -1441,13 +1441,16 @@ bool GuiTreeViewCtrl::removeItem( S32 itemId, bool deleteObjects )
 
 //-----------------------------------------------------------------------------
 
-void GuiTreeViewCtrl::removeAllChildren(S32 itemId)
+bool GuiTreeViewCtrl::removeAllChildren(S32 itemId)
 {
    Item * item = getItem(itemId);
    if(item)
    {
       _destroyChildren(item->mChild, item);
+      return true;
    }
+
+   return false;
 }
 //------------------------------------------------------------------------------
 
@@ -3618,7 +3621,7 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
 
    mPossibleRenameItem = NULL;
    mRenamingItem = NULL;
-	mTempItem = NULL;
+   mTempItem = NULL;
       
    //
    if( event.modifier & SI_MULTISELECT )
@@ -4899,10 +4902,12 @@ DefineConsoleMethod(GuiTreeViewCtrl, markItem, bool, (S32 id, bool mark), (true)
    return object->markItem(id, mark);
 }
 
-// Make the given item visible.
-DefineConsoleMethod(GuiTreeViewCtrl, scrollVisible, void, (S32 itemId), , "(TreeItemId item)")
+DefineEngineMethod( GuiTreeViewCtrl, scrollVisible, bool, ( S32 itemID), ,
+   "Make the given item visible.\n\n"
+   "@param itemID TreeItemId of item to scroll to/make visible.\n"
+   "@return True if it was successful, false if not.")
 {
-   object->scrollVisible(itemId);
+   return object->scrollVisible(itemID);
 }
 
 DefineConsoleMethod(GuiTreeViewCtrl, buildIconTable, bool, (const char * icons), , "(builds an icon table)")
@@ -4925,17 +4930,22 @@ DefineConsoleMethod( GuiTreeViewCtrl, open, void, (const char * objName, bool ok
    object->inspectObject(treeRoot,okToEdit);
 }
 
-DefineConsoleMethod( GuiTreeViewCtrl, setItemTooltip, void, ( S32 id, const char * text ), , "( int id, string text ) - Set the tooltip to show for the given item." )
+DefineEngineMethod( GuiTreeViewCtrl, setItemTooltip, bool, ( S32 itemId, const char* tooltip), ,
+   "Set the tooltip to show for the given item.\n\n"
+   "@param itemId  TreeItemID of item to set the tooltip for.\n"
+   "@param tooltip	String tooltip to set for the item."
+   "@return True if successfully found the item, false if not")
 {
-   
-   GuiTreeViewCtrl::Item* item = object->getItem( id );
+   GuiTreeViewCtrl::Item* item = object->getItem( itemId );
    if( !item )
    {
-      Con::errorf( "GuiTreeViewCtrl::setTooltip() - invalid item id '%i'", id );
-      return;
+      Con::errorf( "GuiTreeViewCtrl::setTooltip() - invalid item id '%i'", itemId );
+      return false;
    }
-   
-   item->mTooltip = text;
+
+   item->mTooltip = tooltip;
+
+   return true;
 }
 
 DefineConsoleMethod( GuiTreeViewCtrl, setItemImages, void, ( S32 id, S8 normalImage, S8 expandedImage ), , "( int id, int normalImage, int expandedImage ) - Sets the normal and expanded images to show for the given item." )
@@ -4987,14 +4997,18 @@ DefineConsoleMethod(GuiTreeViewCtrl, removeItem, bool, (S32 itemId), , "(TreeIte
    return(object->removeItem(itemId));
 }
 
-DefineConsoleMethod(GuiTreeViewCtrl, removeAllChildren, void, (S32 itemId), , "removeAllChildren(TreeItemId parent)")
+DefineEngineMethod( GuiTreeViewCtrl, removeAllChildren, bool, (S32 itemId), ,
+   "Remove all children of an item from the tree with the given id.\n\n"
+   "@param itemId TreeItemID of item that has children we should remove.\n")
 {
-   object->removeAllChildren(itemId);
+   return object->removeAllChildren(itemId);
 }
 
-DefineConsoleMethod(GuiTreeViewCtrl, clear, void, (), , "() - empty tree")
+DefineEngineMethod( GuiTreeViewCtrl, clear, bool, (), ,
+   "Empty the tree.\n"
+   "@return True if successful, false if not.")
 {
-   object->removeItem(0);
+	return object->removeItem(0);
 }
 
 DefineConsoleMethod(GuiTreeViewCtrl, getFirstRootItem, S32, (), , "Get id for root item.")
@@ -5051,6 +5065,15 @@ DefineConsoleMethod(GuiTreeViewCtrl, getSelectedObject, S32, ( S32 index ), (0),
    }
 
    return -1;
+}
+
+DefineEngineMethod( GuiTreeViewCtrl, isSelected, bool, (S32 objectID), (0),
+   "Get if the specified object is selected or not.\n\n"
+   "@param objectID Id of object to check."
+   "@return True if the object is selected, false if not or object wasn't found.")
+{
+	S32 itemID = object->findItemByObjectId(objectID);
+	return itemID != -1 ? ( object->isSelected(itemID) ) : false;
 }
 
 const char* GuiTreeViewCtrl::getSelectedObjectList()
@@ -5124,34 +5147,27 @@ DefineConsoleMethod(GuiTreeViewCtrl, getTextToRoot, const char*, (S32 itemId, co
    return object->getTextToRoot( itemId, delimiter );
 }
 
-DefineConsoleMethod(GuiTreeViewCtrl, getSelectedItemList,const char*, (), ,"returns a space seperated list of mulitple item ids")
+DefineEngineMethod( GuiTreeViewCtrl, getSelectedItemList, const char*, (), ,
+   "Returns a space separated list if ids of all selected items.\n\n"
+   "@return space separated list of selected item ids.")
 {
-   const U32 bufSize = 1024;
-	char* buff = Con::getReturnBuffer(bufSize);
-	dSprintf(buff, bufSize, "");
+   String temp("");
 
+   int previousID = -1; // used to prevent returning duplicate values (a value twice one after another)
    const Vector< S32 >& selected = object->getSelected();
-	for(int i = 0; i < selected.size(); i++)
-	{
-		S32 id  = selected[i];
-		//get the current length of the buffer
-		U32	len = dStrlen(buff);
-		//the start of the buffer where we want to write
-		char* buffPart = buff+len;
-		//the size of the remaining buffer (-1 cause dStrlen doesn't count the \0)
-		S32 size	=	bufSize-len-1;
-		//write it:
-		if(size < 1)
-		{
-			Con::errorf("GuiTreeViewCtrl::getSelectedItemList - Not enough room to return our object list");
-			return buff;
-		}
+   for(int i = 0; i < selected.size(); i++)
+   {
+      S32 id  = selected[i];
 
-		dSprintf(buffPart,size,"%d ", id);
-	}
-//mSelected
+      if(id == previousID)
+         continue;
+      previousID = id;
 
-	return buff;
+      temp += String::ToString(id) + " ";
+   }
+
+   char* buff = Con::getReturnBuffer(temp);
+   return buff;
 }
 
 S32 GuiTreeViewCtrl::findItemByObjectId(S32 iObjId)
@@ -5387,4 +5403,22 @@ DefineEngineMethod( GuiTreeViewCtrl, clearFilterText, void, (),,
    "@see getFilterText" )
 {
    object->clearFilterText();
+}
+
+DefineEngineMethod( GuiTreeViewCtrl, setItemFiltered, bool, (S32 id, bool filtered), (true),
+   "Filter the item with the given id.\n\n"
+   "@param id ID of the item to set as filtered or not filtered.\n"
+   "@param filtered True to filter the item, false if not.\n"
+   "@return True if we found the item and filtered it, false if not.\n"
+   "@see setFilterText\n"
+   "@see getFilterText" )
+{
+	GuiTreeViewCtrl::Item* item = object->getItem(id);
+	if(item)
+	{
+		item->setFiltered(filtered);
+		return true;
+	}
+
+	return false;
 }

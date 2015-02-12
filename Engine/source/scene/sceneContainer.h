@@ -245,7 +245,7 @@ class SceneContainer
       /// Test against rendered geometry -- slow.
       bool castRayRendered( const Point3F &start, const Point3F &end, U32 mask, RayInfo* info, CastRayCallback callback = NULL );
 
-      bool collideBox(const Point3F &start, const Point3F &end, U32 mask, RayInfo* info);
+      bool collideBox(const Point3F &start, const Point3F &end, U32 mask, RayInfo* info, U32 maskExclude = 0);
 
       /// @}
 

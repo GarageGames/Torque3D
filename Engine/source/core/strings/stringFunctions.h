@@ -150,6 +150,11 @@ inline U32 dAtoui(const char *str, U32 base = 10)
    return strtoul(str, NULL, base);
 }
 
+inline U16 dAtous(const char *str, U32 base = 10)
+{
+   return strtoul(str, NULL, base);
+}
+
 inline F32 dAtof(const char *str)
 {
    return strtof(str, NULL);

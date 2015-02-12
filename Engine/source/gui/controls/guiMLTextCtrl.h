@@ -141,7 +141,7 @@ class GuiMLTextCtrl : public GuiControl
 
    // Text substitution functions
    void setText(const char* textBuffer, const U32 numChars);
-   void addText(const char* textBuffer, const U32 numChars, bool reformat);
+   void addText(const char* textBuffer, const U32 numChars, bool reformat, const S32 pos = -1);
 
    void setAlpha(F32 alpha) { mAlpha = alpha;}
 
@@ -297,7 +297,14 @@ class GuiMLTextCtrl : public GuiControl
    void setSelectionStart( U32 start ) { clearSelection(); mSelectionStart = start; };
    void setSelectionEnd( U32 end ) { mSelectionEnd = end;};
    void setSelectionActive(bool active) { mSelectionActive = active; };
+   Point2I getSelectionPosition();
    S32 getCursorPosition()  { return( mCursorPosition ); }
+   Point2I getCursorPositionInControl();
+   bool setSelection(const S32 start, const S32 end);
+   bool deleteSelection();
+   bool replaceSelectedText(const char* text);
+   void insertText(const char* text);
+   S32 getStrWidth(const char* string);
 
    virtual bool resize(const Point2I &newPosition, const Point2I &newExtent);
 };

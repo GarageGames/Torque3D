@@ -338,6 +338,38 @@ DefineEngineFunction( stopVideoCapture, void, (),,
    VIDCAP->end();
 }
 
+DefineEngineFunction( isVideoCapture, bool, (),,
+   "Returns if we have a video capture session.\n"
+   "@see startVideoCapture\n"   
+   "@ingroup Rendering\n" )
+{
+	return VIDCAP->isRecording();
+}
+
+DefineEngineFunction( getVideoCatureFPS, F32, (),,
+   "Returns video capture session framerate.\n"
+   "@see startVideoCapture\n"   
+   "@ingroup Rendering\n" )
+{
+	return VIDCAP->getFramerate();
+}
+
+DefineEngineFunction( getVideoCaptureFormat, const char *, (),,
+	"Returns video capture session format (encoding).\n"
+   "@see startVideoCapture\n"   
+   "@ingroup Rendering\n" )
+{
+	return VIDCAP->getEncoderName();
+}
+
+DefineEngineFunction( getVideoCaptureFilename, const char *, (),,
+	"Returns video capture session filename.\n"
+   "@see startVideoCapture\n"   
+   "@ingroup Rendering\n" )
+{
+	return VIDCAP->getFilename();
+}
+
 DefineEngineFunction( playJournalToVideo, void, 
    ( const char *journalFile, const char *videoFile, const char *encoder, F32 framerate, Point2I resolution ),
 	( NULL, "THEORA", 30.0f, Point2I::Zero ),

@@ -63,6 +63,9 @@ GuiMLTextEditCtrl::GuiMLTextEditCtrl()
    mActive = true;
 
    mVertMoveAnchorValid = false;
+
+   mCursorOn = false;
+   mNumFramesElapsed = 0;
 }
 
 
@@ -151,7 +154,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
          case KEY_X:
 			{
 				//make sure we actually have something selected
-				if (mSelectionActive)
+				if (isSelectionActive())
 				{
 		         copyToClipboard(mSelectionStart, mSelectionEnd);
 
@@ -172,18 +175,10 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
          case KEY_V:
 			{
 				const char *clipBuf = Platform::getClipboard();
-				if (dStrlen(clipBuf) > 0)
-				{
-			      // Normal ascii keypress.  Go ahead and add the chars...
-			      if (mSelectionActive == true)
-			      {
-			         mSelectionActive = false;
-			         deleteChars(mSelectionStart, mSelectionEnd);
-			         mCursorPosition = mSelectionStart;
-			      }
 
-			      insertChars(clipBuf, dStrlen(clipBuf), mCursorPosition);
-				}
+				// Normal ascii keypress.  Go ahead and add the chars...
+				insertText(clipBuf);
+
 				return true;
 			}
          
@@ -195,6 +190,64 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
    {
       switch ( event.keyCode )
       {
+		  case KEY_LEFT:
+			  if (mCursorPosition > 0)
+			  {
+				  if(mSelectionActive)
+				  {
+					  if(mCursorPosition < mSelectionEnd)
+					  {
+						  mCursorPosition--;
+						  mSelectionStart = mCursorPosition;
+					  }
+					  else if(mCursorPosition > mSelectionStart)
+					  {
+						  mCursorPosition--;
+						  mSelectionEnd = mCursorPosition;
+					  }
+				  }
+				  else
+				  {
+					  mSelectionEnd = mCursorPosition;
+					  mCursorPosition--;
+					  mSelectionStart = mCursorPosition;
+				  }
+
+				  if(mSelectionStart != mSelectionEnd)
+					  mSelectionActive = true;
+				  else
+					  mSelectionActive = false;
+			  }
+			  return true;
+		  case KEY_RIGHT:
+			  if (mCursorPosition < mTextBuffer.length())
+			  {
+				  if(mSelectionActive)
+				  {
+					  if(mCursorPosition > mSelectionStart)
+					  {
+						  mCursorPosition++;
+						  mSelectionEnd = mCursorPosition;
+					  }
+					  else if(mCursorPosition < mSelectionEnd)
+					  {
+						  mCursorPosition++;
+						  mSelectionStart = mCursorPosition;
+					  }
+				  }
+				  else
+				  {
+					  mSelectionStart = mCursorPosition;
+					  mCursorPosition++;
+					  mSelectionEnd = mCursorPosition;
+				  }
+
+				  if(mSelectionStart != mSelectionEnd)
+					  mSelectionActive = true;
+				  else
+					  mSelectionActive = false;
+			  }
+			  return true;
          case KEY_TAB:
             return( Parent::onKeyDown( event ) );
          default:
@@ -300,13 +353,7 @@ bool GuiMLTextEditCtrl::onKeyDown(const GuiEvent& event)
 //--------------------------------------
 void GuiMLTextEditCtrl::handleDeleteKeys(const GuiEvent& event)
 {
-   if ( isSelectionActive() )
-   {
-      mSelectionActive = false;
-      deleteChars(mSelectionStart, mSelectionEnd+1);
-      mCursorPosition = mSelectionStart;
-   }
-   else
+   if(!deleteSelection())
    {
       switch ( event.keyCode )
       {
@@ -451,12 +498,29 @@ void GuiMLTextEditCtrl::handleMoveKeys(const GuiEvent& event)
 }
 
 //--------------------------------------------------------------------------
+void GuiMLTextEditCtrl::onPreRender()
+{
+	Parent::onPreRender();
+	if ( isFirstResponder() )
+	{
+		U32 timeElapsed = Platform::getVirtualMilliseconds() - mTimeLastCursorFlipped;
+		mNumFramesElapsed++;
+		if ( ( timeElapsed > 500 ) && ( mNumFramesElapsed > 3 ) )
+		{
+			mCursorOn = !mCursorOn;
+			mTimeLastCursorFlipped = Platform::getVirtualMilliseconds();
+			mNumFramesElapsed = 0;
+			setUpdate();
+		}
+	}
+}
+
 void GuiMLTextEditCtrl::onRender(Point2I offset, const RectI& updateRect)
 {
    Parent::onRender(offset, updateRect);
 
    // We are the first responder, draw our cursor in the appropriate position...
-   if (isFirstResponder()) 
+   if (isFirstResponder() && mCursorOn) 
    {
       Point2I top, bottom;
       ColorI color;

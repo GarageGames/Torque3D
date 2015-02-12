@@ -1467,6 +1467,13 @@ bool GuiWindowCtrl::isMinimized(S32 &index)
 
 //-----------------------------------------------------------------------------
 
+bool GuiWindowCtrl::isMaximized()
+{
+	return mMaximized && mVisible;
+}
+
+//-----------------------------------------------------------------------------
+
 void GuiWindowCtrl::positionButtons(void)
 {
    if( !mBitmapBounds || !mAwake )
@@ -1929,4 +1936,21 @@ DefineEngineStaticMethod( GuiWindowCtrl, attach, void, ( GuiWindowCtrl* bottomWi
    }
 
    bottomWindow->moveToCollapseGroup( topWindow, 1 );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiWindowCtrl, isMaximized, bool, (),,
+   "returns true if the window is maximized." )
+{
+	return object->isMaximized();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiWindowCtrl, isMinimized, bool, (),,
+   "returns true if the window is minimized." )
+{
+	S32 index;
+	return object->isMinimized(index);
 }

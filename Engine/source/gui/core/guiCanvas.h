@@ -325,6 +325,9 @@ public:
    /// Returns the point, in screenspace, at which the cursor is located.
    virtual Point2I getCursorPos();
 
+   /// Returns the point, in local space (within Main Window), at which the cursor is located
+   virtual Point2I getLocalCursorPos();
+
    /// Enable/disable rendering of the cursor.
    /// @param   state    True if we should render cursor
    virtual void showCursor(bool state);

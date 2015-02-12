@@ -508,6 +508,7 @@ class TSShape
    S32 findSequence(S32 nameIndex) const;
    S32 findSequence(const String &name) const { return findSequence(findName(name)); }
 
+   S32 getSequenceCount() const;
    S32 getSubShapeForNode(S32 nodeIndex);
    S32 getSubShapeForObject(S32 objIndex);
    void getSubShapeDetails(S32 subShapeIndex, Vector<S32>& validDetails);

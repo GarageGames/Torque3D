@@ -121,10 +121,11 @@ DefineEngineMethod( GuiMLTextCtrl, getText, const char*, (),,
    return( object->getTextContent() );
 }
 
-DefineEngineMethod( GuiMLTextCtrl, addText, void, ( const char* text, bool reformat), (true),
+DefineEngineMethod( GuiMLTextCtrl, addText, void, ( const char* text, bool reformat, S32 pos), (true, -1),
    "@brief Appends the text in the control with additional text. Also .\n\n"
    "@param text New text to append to the existing text.\n"
    "@param reformat If true, the control will also be visually reset (defaults to true).\n"
+   "@param pos Position to insert text or add the text at (defaults to end).\n"
    "@tsexample\n"
    "// Define new text to add\n"
    "%text = \"New Text to Add\";\n\n"
@@ -135,7 +136,7 @@ DefineEngineMethod( GuiMLTextCtrl, addText, void, ( const char* text, bool refor
    "@endtsexample\n\n"
    "@see GuiControl")
 {
-   object->addText(text, dStrlen(text), reformat);
+   object->addText(text, dStrlen(text), reformat, pos);
 }
 
 DefineEngineMethod( GuiMLTextCtrl, setCursorPosition, bool, (S32 newPos),,
@@ -151,6 +152,62 @@ DefineEngineMethod( GuiMLTextCtrl, setCursorPosition, bool, (S32 newPos),,
    "@see GuiControl")
 {
    return object->setCursorPosition(newPos);
+}
+
+DefineEngineMethod( GuiMLTextCtrl, getCursorPosition, S32, (),,
+   "@brief Offset in characters the cursor is positioned at.\n\n"
+   "@return position the cursor is positioned at\n\n")
+{
+   return object->getCursorPosition();
+}
+
+DefineEngineMethod( GuiMLTextCtrl, getSelectionPosition, Point2I, (),,
+   "@brief Offset in characters the selection is at.\n\n"
+   "@return position the selection is positioned at. Returns \"-1 -1\" if no selection.\n\n")
+{
+   return object->getSelectionPosition();
+}
+
+DefineEngineMethod( GuiMLTextCtrl, getCursorPositionInControl, const char*, (),,
+   "@brief returns the position of the cursor inside the ctrl as a Point2I.\n\n"
+   "@return the position of the cursor inside the ctrl as a Point2I\n\n")
+{
+	char *retBuffer = Con::getReturnBuffer(64);
+	const Point2I pos = object->getCursorPositionInControl();
+	dSprintf(retBuffer, 64, "%d %d", pos.x, pos.y);
+	return retBuffer;
+}
+
+DefineEngineMethod( GuiMLTextCtrl, setSelection, bool, ( U32 start, U32 end ),,
+   "@brief sets the position of the selection.\n\n"
+   "@param start Start of the selection to make.\n"
+   "@param end End of the selection to make.\n"
+   "@return true if selection was made and false if not. The main reason this will happen is because of bad arguments.\n\n")
+{
+	return object->setSelection(start, end);
+}
+
+DefineEngineMethod( GuiMLTextCtrl, replaceSelectedText, bool, ( const char* text ),,
+   "@brief replaces the text at the selection.\n\n"
+   "@param text Text to replace the selection with.\n"
+   "@return true if selection was replaced and false if not.\n\n")
+{
+   return object->replaceSelectedText(text);
+}
+
+DefineEngineMethod( GuiMLTextCtrl, insertText, void, ( const char* text ),,
+   "@brief replaces the text at the selection if there is a selection else just inserts the text at the cursor position.\n\n"
+   "@param text Text to replace the selection with or to insert at the cursor.\n")
+{
+   object->insertText(text);
+}
+
+DefineEngineMethod( GuiMLTextCtrl, getStrWidth, S32, ( const char* str ),,
+   "@brief returns the width of the given string as a S32, for this controls font.\n\n"
+   "@param str String to get the width with the current controls font.\n"
+   "@return width of the string given with the current font.\n\n")
+{
+	return object->getStrWidth(str);
 }
 
 DefineEngineMethod( GuiMLTextCtrl, scrollToTag, void, (S32 tagID),,
@@ -602,7 +659,7 @@ void GuiMLTextCtrl::setText(const char* textBuffer, const U32 numChars)
 }
 
 //--------------------------------------------------------------------------
-void GuiMLTextCtrl::addText(const char* textBuffer, const U32 numChars, bool reformat)
+void GuiMLTextCtrl::addText(const char* textBuffer, const U32 numChars, bool reformat, const S32 pos)
 {
    if(numChars >= mMaxBufferSize)
       return;
@@ -611,7 +668,10 @@ void GuiMLTextCtrl::addText(const char* textBuffer, const U32 numChars, bool ref
    dStrncpy(tmp, textBuffer, numChars);
    tmp[numChars] = 0;
 
-   mTextBuffer.append(tmp);
+   if(pos < 0)
+      mTextBuffer.append(tmp);
+   else
+      mTextBuffer.insert(U32(pos), tmp);
 
    //after setting text, always set the cursor to the beginning
    if (reformat)
@@ -643,6 +703,78 @@ bool GuiMLTextCtrl::setCursorPosition(const S32 newPosition)
    }
 }
 
+Point2I GuiMLTextCtrl::getCursorPositionInControl()
+{
+	Point2I top, bottom;
+	ColorI color;
+	getCursorPositionAndColor(top, bottom, color);
+	return bottom;
+}
+
+Point2I GuiMLTextCtrl::getSelectionPosition()
+{
+	if ( isSelectionActive() )
+	{
+		return Point2I(mSelectionStart, mSelectionEnd);
+	}
+
+	return Point2I(-1, -1);
+}
+
+bool GuiMLTextCtrl::setSelection(const S32 start, const S32 end)
+{
+	if(start < 0 || end < 0 || start >= end || end > mTextBuffer.length())
+		return false;
+
+	setSelectionStart(U32(start));
+	setSelectionEnd(U32(end));
+	mSelectionActive = true;
+
+	return true;
+}
+
+
+S32 GuiMLTextCtrl::getStrWidth(const char* string)
+{
+	return mProfile->mFont->getStrNWidth(string, dStrlen(string));
+}
+
+bool GuiMLTextCtrl::deleteSelection()
+{
+	if ( isSelectionActive() )
+	{
+		mSelectionActive = false;
+		deleteChars(mSelectionStart, mSelectionEnd);
+		mCursorPosition = mSelectionStart;
+		return true;
+	}
+	
+	return false;
+}
+
+bool GuiMLTextCtrl::replaceSelectedText(const char* text)
+{
+	if (dStrlen(text) > 0)
+	{
+		if (deleteSelection())
+		{
+			insertChars(text, dStrlen(text), mCursorPosition);
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+void GuiMLTextCtrl::insertText(const char* text)
+{
+	if (dStrlen(text) > 0)
+	{
+		deleteSelection();
+
+		insertChars(text, dStrlen(text), mCursorPosition);
+	}
+}
 //--------------------------------------------------------------------------
 void GuiMLTextCtrl::ensureCursorOnScreen()
 {

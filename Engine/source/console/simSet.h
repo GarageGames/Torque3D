@@ -124,6 +124,8 @@ class SimSet: public SimObject
       
       DECLARE_CALLBACK( void, onObjectAdded, ( SimObject* object ) );
       DECLARE_CALLBACK( void, onObjectRemoved, ( SimObject* object ) );
+      DECLARE_CALLBACK( void, onReOrder, ( SimObject* object, SimObject* target ) );
+      DECLARE_CALLBACK( void, onClear, ( ) );
       
       /// @}
 
@@ -167,6 +169,12 @@ class SimSet: public SimObject
       
       /// @}
 
+
+	  ///Check if an object is a member of this SimSet or not
+	  ///@param testObject	Object to check for in this SimSet
+	  ///@return True if object was found, false if not
+      bool isMember(SimObject* testObject);
+      
       /// @name Set Management
       /// @{
 
@@ -224,6 +232,9 @@ class SimSet: public SimObject
 
       SimObject* findObjectByInternalName(StringTableEntry internalName, bool searchChildren = false);
       SimObject* findObjectByLineNumber(const char* fileName, S32 declarationLine, bool searchChildren = false);   
+
+	  SimObject* findFirstObjectByClass(const char* className, bool searchChildren = false);
+	  void getObjectListByClass(SimSet& list, const char* className, bool searchChildren = false);
 
       /// Find the given object in this set.  Returns NULL if the object
       /// is not part of this set.

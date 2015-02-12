@@ -119,7 +119,7 @@ struct Net
    static NetSocket openListenPort(U16 port);
    static NetSocket openConnectTo(const char *stringAddress); // does the DNS resolve etc.
    static void closeConnectTo(NetSocket socket);
-   static Error sendtoSocket(NetSocket socket, const U8 *buffer, S32 bufferSize);
+   static Error sendtoSocket(NetSocket socket, const U8 *buffer, S32 bufferSize, S32 *outBytesWritten = NULL);
 
    static bool compareAddresses(const NetAddress *a1, const NetAddress *a2);
    static bool stringToAddress(const char *addressString, NetAddress *address);
@@ -129,7 +129,7 @@ struct Net
    static NetSocket openSocket();
    static Error closeSocket(NetSocket socket);
 
-   static Error send(NetSocket socket, const U8 *buffer, S32 bufferSize);
+   static Error send(NetSocket socket, const U8 *buffer, S32 bufferSize, S32 *outBytesWritten = NULL);
    static Error recv(NetSocket socket, U8 *buffer, S32 bufferSize, S32 *bytesRead);
 
    static Error connect(NetSocket socket, const NetAddress *address);

@@ -54,6 +54,12 @@ class Point2I
    void neg();                              ///< Invert sign of point's co-ordinates.
    void convolve(const Point2I&);           ///< Convolve this point by parameter.
 
+   /// Rotate the point around a pivot
+   ///
+   /// @param   pivot   Pivot to rotate around
+   /// @param   radians	Angle to rotate by
+   void rotate(Point2I& pivot, F32 radians);
+
    //-------------------------------------- Queries
    bool isZero() const;                     ///< Is this point at the origin? (No epsilon used)
    F32  len() const;                        ///< Get the length of the point
@@ -125,6 +131,19 @@ class Point2F
    void interpolate(const Point2F& a, const Point2F& b, const F32 c);
 
    void zero();                         ///< Zero all values
+
+   /// Rotate the point around a pivot
+   ///
+   /// @param   pivot   Pivot to rotate around
+   /// @param   radians	Angle to rotate by
+   void rotate(Point2F& pivot, F32 radians);
+
+   /// Get the point on a circle with the given information using the parametric equation for a circle
+   ///
+   /// @param	center		Center point for the circle
+   /// @param	radius		Radius of the circle
+   /// @param	angleRad	Angle in radians to get the point of
+   void getPointOnCircle(Point2F& center, F32 radius, F32 angleRad);
 
    operator F32*() { return &x; }
    operator const F32*() const { return &x; }
@@ -217,6 +236,19 @@ class Point2D
    void interpolate(const Point2D &a, const Point2D &b, const F64 c);
 
    void zero();                         ///< Zero all values
+
+   /// Rotate the point around a pivot
+   ///
+   /// @param   pivot   Pivot to rotate around
+   /// @param   radians	Angle to rotate by
+   void rotate(Point2D& pivot, F64 radians);
+
+   /// Get the point on a circle with the given information using the parametric equation for a circle
+   ///
+   /// @param	center		Center point for the circle
+   /// @param	radius		Radius of the circle
+   /// @param	angleRad	Angle in radians to get the point of
+   void getPointOnCircle(Point2D& center, F64 radius, F64 angleRad);
 
    operator F64*() { return &x; }
    operator const F64*() const { return &x; }
@@ -322,6 +354,21 @@ inline void Point2I::convolve(const Point2I& c)
 {
    x *= c.x;
    y *= c.y;
+}
+
+inline void Point2I::rotate(Point2I& pivot, F32 radians)
+{
+	//Center the point around the origin
+	x -= pivot.x;
+	y -= pivot.y;
+
+	//Rotate the point
+	S32 newX = (F32(x) * mCos(radians)) - (F32(y) * mSin(radians));
+	S32 newY = (F32(x) * mSin(radians)) + (F32(y) * mCos(radians));
+
+	//Move the point back to its original offset
+	x = newX + pivot.x;
+	y = newY + pivot.y;
 }
 
 inline bool Point2I::isZero() const
@@ -499,6 +546,26 @@ inline void Point2F::zero()
    x = y = 0.0f;
 }
 
+inline void Point2F::rotate(Point2F& pivot, F32 radians)
+{
+	//Center the point around the origin
+	x -= pivot.x;
+	y -= pivot.y;
+
+	//Rotate the point
+	F32 newX = (x * mCos(radians)) - (y * mSin(radians));
+	F32 newY = (x * mSin(radians)) + (y * mCos(radians));
+
+	//Move the point back to its original offset
+	x = newX + pivot.x;
+	y = newY + pivot.y;
+}
+
+inline void Point2F::getPointOnCircle(Point2F& center, F32 radius, F32 angleRad)
+{
+	x = center.x + (radius) * mCos(angleRad);
+	y = center.y + (radius) * mSin(angleRad);
+}
 
 inline bool Point2F::isZero() const
 {
@@ -742,6 +809,26 @@ inline void Point2D::zero()
    x = y = 0.0;
 }
 
+inline void Point2D::rotate(Point2D& pivot, F64 radians)
+{
+	//Center the point around the origin
+	x -= pivot.x;
+	y -= pivot.y;
+
+	//Rotate the point
+	F64 newX = (x * mCos(radians)) - (y * mSin(radians));
+	F64 newY = (x * mSin(radians)) + (y * mCos(radians));
+
+	//Move the point back to its origional offset
+	x = newX + pivot.x;
+	y = newY + pivot.y;
+}
+
+inline void Point2D::getPointOnCircle(Point2D& center, F64 radius, F64 angleRad)
+{
+	x = center.x + (radius) * mCos(angleRad);
+	y = center.y + (radius) * mSin(angleRad);
+}
 
 inline bool Point2D::isZero() const
 {

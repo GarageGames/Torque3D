@@ -52,16 +52,17 @@ ConsoleDocClass( GuiTextEditSliderCtrl,
    "@ingroup GuiCore\n"
 );
 
-GuiTextEditSliderCtrl::GuiTextEditSliderCtrl()
+GuiTextEditSliderCtrl::GuiTextEditSliderCtrl():
+   mHitWidth(14),
+   mRange(0.0f, 1.0f),
+   mIncAmount(1.0f),
+   mValue(0.0f),
+   mMulInc(0.0f),
+   mIncCounter(0.0f),
+   mTextAreaHit(None),
+   mFocusOnMouseWheel(false)
 {
-   mRange.set(0.0f, 1.0f);
-   mIncAmount = 1.0f;
-   mValue = 0.0f;
-   mMulInc = 0;
-   mIncCounter = 0.0f;
    mFormat = StringTable->insert("%3.2f");
-   mTextAreaHit = None;
-   mFocusOnMouseWheel = false;
 }
 
 GuiTextEditSliderCtrl::~GuiTextEditSliderCtrl()
@@ -135,7 +136,7 @@ void GuiTextEditSliderCtrl::onMouseDown(const GuiEvent &event)
    Point2I camPos  = event.mousePoint;
    Point2I point = parent->localToGlobalCoord(getPosition());
 
-   if(camPos.x > point.x + getExtent().x - 14)
+   if(camPos.x > point.x + getExtent().x - mHitWidth)
    {
       if(camPos.y > point.y + (getExtent().y/2))
       {
@@ -343,16 +344,16 @@ void GuiTextEditSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
          }
       }
    }
-	Parent::onRender(offset, updateRect);
+   Parent::onRender(offset, updateRect);
 
-   Point2I start(offset.x + getWidth() - 14, offset.y);
+   Point2I start(offset.x + getWidth() - mHitWidth, offset.y);
    Point2I midPoint(start.x + 7, start.y + (getExtent().y/2));
 
    GFX->getDrawUtil()->drawRectFill(Point2I(start.x+1,start.y+1), Point2I(start.x+13,start.y+getExtent().y-1) , mProfile->mFillColor);
 
    GFX->getDrawUtil()->drawLine(start, Point2I(start.x, start.y+getExtent().y),mProfile->mFontColor);
    GFX->getDrawUtil()->drawLine(Point2I(start.x,midPoint.y),
-               Point2I(start.x+14,midPoint.y),
+               Point2I(start.x+mHitWidth,midPoint.y),
                mProfile->mFontColor);
 
    GFXVertexBufferHandle<GFXVertexPC> verts(GFX, 6, GFXBufferTypeVolatile);

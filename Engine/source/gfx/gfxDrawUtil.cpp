@@ -307,6 +307,11 @@ void GFXDrawUtil::drawBitmap( GFXTextureObject* texture, const Point2I &in_rAt, 
    drawBitmap(texture,Point2F((F32)in_rAt.x,(F32)in_rAt.y),in_flip,filter,in_wrap);
 }
 
+void GFXDrawUtil::drawBitmapStretchRotation( GFXTextureObject* texture, const RectI &dstRect, F32 rotation, const GFXBitmapFlip in_flip, const GFXTextureFilterType filter , bool in_wrap /*= true*/ )
+{
+   drawBitmapStretchRotation(texture,RectF((F32)dstRect.point.x,(F32)dstRect.point.y,(F32)dstRect.extent.x,(F32)dstRect.extent.y),rotation,in_flip,filter,in_wrap);
+}
+
 void GFXDrawUtil::drawBitmapStretch( GFXTextureObject* texture, const RectI &dstRect, const GFXBitmapFlip in_flip, const GFXTextureFilterType filter , bool in_wrap /*= true*/ )
 {
    drawBitmapStretch(texture,RectF((F32)dstRect.point.x,(F32)dstRect.point.y,(F32)dstRect.extent.x,(F32)dstRect.extent.y),in_flip,filter,in_wrap);
@@ -315,6 +320,14 @@ void GFXDrawUtil::drawBitmapStretch( GFXTextureObject* texture, const RectI &dst
 void GFXDrawUtil::drawBitmapSR( GFXTextureObject* texture, const Point2I &in_rAt, const RectI &srcRect, const GFXBitmapFlip in_flip, const GFXTextureFilterType filter , bool in_wrap /*= true*/ )
 {
    drawBitmapSR(texture,Point2F((F32)in_rAt.x,(F32)in_rAt.y),RectF((F32)srcRect.point.x,(F32)srcRect.point.y,(F32)srcRect.extent.x,(F32)srcRect.extent.y),in_flip,filter,in_wrap);
+}
+
+
+void GFXDrawUtil::drawBitmapStretchRotationSR( GFXTextureObject *texture, const RectI &dstRect, const RectI &srcRect, F32 rotation, const GFXBitmapFlip in_flip, const GFXTextureFilterType filter , bool in_wrap /*= true*/ ) 
+{
+   RectF dstRectF = RectF((F32)dstRect.point.x,(F32)dstRect.point.y,(F32)dstRect.extent.x,(F32)dstRect.extent.y);
+   RectF srcRectF = RectF((F32)srcRect.point.x,(F32)srcRect.point.y,(F32)srcRect.extent.x,(F32)srcRect.extent.y);
+   drawBitmapStretchRotationSR(texture,dstRectF,srcRectF,rotation,in_flip,filter,in_wrap);
 }
 
 void GFXDrawUtil::drawBitmapStretchSR( GFXTextureObject *texture, const RectI &dstRect, const RectI &srcRect, const GFXBitmapFlip in_flip, const GFXTextureFilterType filter , bool in_wrap /*= true*/ ) 
@@ -333,6 +346,14 @@ void GFXDrawUtil::drawBitmap( GFXTextureObject*texture, const Point2F &in_rAt, c
    drawBitmapStretchSR( texture, stretch, subRegion, in_flip, filter, in_wrap );
 }
 
+void GFXDrawUtil::drawBitmapStretchRotation( GFXTextureObject*texture, const RectF &dstRect, F32 rotation, const GFXBitmapFlip in_flip /*= GFXBitmapFlip_None*/, const GFXTextureFilterType filter /*= GFXTextureFilterPoint */ , bool in_wrap /*= true*/ )
+{
+   AssertFatal( texture != 0, "No texture specified for drawBitmapStretch()" );
+
+   RectF subRegion( 0.f, 0.f, (F32)texture->mBitmapSize.x, (F32)texture->mBitmapSize.y );
+   drawBitmapStretchRotationSR( texture, dstRect, subRegion,rotation, in_flip, filter, in_wrap );
+}
+
 void GFXDrawUtil::drawBitmapStretch( GFXTextureObject*texture, const RectF &dstRect, const GFXBitmapFlip in_flip /*= GFXBitmapFlip_None*/, const GFXTextureFilterType filter /*= GFXTextureFilterPoint */ , bool in_wrap /*= true*/ )
 {
    AssertFatal( texture != 0, "No texture specified for drawBitmapStretch()" );
@@ -347,6 +368,106 @@ void GFXDrawUtil::drawBitmapSR( GFXTextureObject*texture, const Point2F &in_rAt,
 
    RectF stretch( in_rAt.x, in_rAt.y, srcRect.len_x(), srcRect.len_y() );
    drawBitmapStretchSR( texture, stretch, srcRect, in_flip, filter, in_wrap );
+}
+
+void GFXDrawUtil::drawBitmapStretchRotationSR( GFXTextureObject* texture, const RectF &dstRect, const RectF &srcRect, F32 rotation, const GFXBitmapFlip in_flip /*= GFXBitmapFlip_None*/, const GFXTextureFilterType filter /*= GFXTextureFilterPoint */ , bool in_wrap /*= true*/ )
+{
+	// Sanity if no texture is specified.
+	if(!texture)
+		return;   
+
+	GFXVertexBufferHandle<GFXVertexPCT> verts(mDevice, 4, GFXBufferTypeVolatile );
+	verts.lock();
+
+	F32 texLeft   = (srcRect.point.x)                    / (texture->mTextureSize.x);
+	F32 texRight  = (srcRect.point.x + srcRect.extent.x) / (texture->mTextureSize.x);
+	F32 texTop    = (srcRect.point.y)                    / (texture->mTextureSize.y);
+	F32 texBottom = (srcRect.point.y + srcRect.extent.y) / (texture->mTextureSize.y);
+
+	F32 screenLeft   = dstRect.point.x;
+	F32 screenRight  = (dstRect.point.x + dstRect.extent.x);
+	F32 screenTop    = dstRect.point.y;
+	F32 screenBottom = (dstRect.point.y + dstRect.extent.y);
+
+	if( in_flip & GFXBitmapFlip_X ) 
+	{
+		F32 temp = texLeft;
+		texLeft = texRight;
+		texRight = temp;
+	}
+	if( in_flip & GFXBitmapFlip_Y ) 
+	{
+		F32 temp = texTop;
+		texTop = texBottom;
+		texBottom = temp;
+	}
+
+	const F32 fillConv = mDevice->getFillConventionOffset();
+
+	//Handle Rotation
+
+	Point2F topLeft;
+	Point2F	topRight;
+	Point2F	bottomLeft;
+	Point2F	bottomRight;
+
+	Point2F pivot;
+
+	topLeft.x = screenLeft  - fillConv;
+	topLeft.y = screenTop    - fillConv;
+
+	topRight.x = screenRight - fillConv;
+	topRight.y = screenTop    - fillConv;
+
+	bottomLeft.x = screenLeft  - fillConv;
+	bottomLeft.y = screenBottom - fillConv;
+
+	bottomRight.x = screenRight - fillConv;
+	bottomRight.y = screenBottom - fillConv;
+
+	pivot.x = ((topRight.x - topLeft.x) / 2) + topLeft.x;
+	pivot.y = ((bottomLeft.y - topLeft.y) / 2) + topLeft.y;
+
+
+	topLeft.rotate(pivot, rotation);
+	topRight.rotate(pivot, rotation);
+	bottomLeft.rotate(pivot, rotation);
+	bottomRight.rotate(pivot, rotation);
+
+
+	verts[0].point.set( topLeft.x, topLeft.y, 0.f );
+	verts[1].point.set( topRight.x, topRight.y, 0.f );
+	verts[2].point.set( bottomLeft.x, bottomLeft.y, 0.f );
+	verts[3].point.set( bottomRight.x, bottomRight.y, 0.f );
+
+	verts[0].color = verts[1].color = verts[2].color = verts[3].color = mBitmapModulation;
+
+	verts[0].texCoord.set( texLeft,  texTop );
+	verts[1].texCoord.set( texRight, texTop );
+	verts[2].texCoord.set( texLeft,  texBottom );
+	verts[3].texCoord.set( texRight, texBottom );
+
+	verts.unlock();
+
+	mDevice->setVertexBuffer( verts );
+
+	switch (filter)
+	{
+	case GFXTextureFilterPoint :
+		mDevice->setStateBlock(in_wrap ? mBitmapStretchWrapSB : mBitmapStretchSB);
+		break;
+	case GFXTextureFilterLinear :
+		mDevice->setStateBlock(in_wrap ? mBitmapStretchWrapLinearSB : mBitmapStretchLinearSB);
+		break;
+	default:
+		AssertFatal(false, "No GFXDrawUtil state block defined for this filter type!");
+		mDevice->setStateBlock(mBitmapStretchSB);
+		break;
+	}   
+	mDevice->setTexture( 0, texture );
+	mDevice->setupGenericShaders( GFXDevice::GSModColorTexture );
+
+	mDevice->drawPrimitive( GFXTriangleStrip, 0, 2 );
 }
 
 void GFXDrawUtil::drawBitmapStretchSR( GFXTextureObject* texture, const RectF &dstRect, const RectF &srcRect, const GFXBitmapFlip in_flip /*= GFXBitmapFlip_None*/, const GFXTextureFilterType filter /*= GFXTextureFilterPoint */ , bool in_wrap /*= true*/ )
@@ -583,6 +704,91 @@ void GFXDrawUtil::draw2DSquare( const Point2F &screenPoint, F32 width, F32 spinA
    mDevice->drawPrimitive( GFXTriangleStrip, 0, 2 );
 }
 
+void GFXDrawUtil::drawCircle( const Point2F &center, F32 radius, S32 numSegments, const ColorI &color )
+{
+	F32 theta = ((F32)M_2PI)/((F32) numSegments);
+
+	//Calculate the tangential factor
+	F32 tangetialFactor = mTan(theta);
+
+	//Calculate the radial factor
+	F32 radialFactor = mCos(theta);
+
+	//Starting at angle 0
+	Point2F pos(radius, 0);
+
+	//Set up the vertex buffer
+	GFXVertexBufferHandle<GFXVertexPC> verts(GFX, numSegments, GFXBufferTypeVolatile);
+
+	verts.lock();
+	for(S32 i = 0; i < numSegments; i++)
+	{
+		//Set the vertex
+		verts[i].point.set( pos.x + center.x, pos.y + center.y, 0.0f );
+		verts[i].color = color;
+
+		//Calculate the tangential vector 
+		//remember, the radial vector is (x, y) 
+		//to get the tangential vector we flip those coordinates and negate one of them
+		Point2F tPos(-pos.y, pos.x);
+
+		//Add the tangential vector
+		pos += tPos * tangetialFactor;
+
+		//Correct using the radial factor
+		pos *= radialFactor;
+	}
+
+	verts.unlock();
+
+	//Draw the actual arc
+	GFX->setVertexBuffer( verts );
+	GFX->drawPrimitive( GFXLineStrip, 0, numSegments - 1 );
+}
+
+void GFXDrawUtil::drawArc( const Point2F &center, F32 radius, F32 startAngle, F32 arcAngle, S32 numSegments, const ColorI &color )
+{
+	//Theta is calculated from the arc angle, the - 1 bit comes from the fact that the arc is open
+	F32 theta = arcAngle / F32(numSegments - 1);
+
+	//Calculate the tangential factor
+	F32 tangetialFactor = mTan(theta);
+
+	//Calculate the radial factor
+	F32 radialFactor = mCos(theta);
+
+	//Starting at the start angle
+	Point2F pos(radius * mCos(startAngle), radius * mSin(startAngle));
+
+	//Set up the vertex buffer
+	GFXVertexBufferHandle<GFXVertexPC> verts(GFX, numSegments, GFXBufferTypeVolatile);
+
+	verts.lock();
+	for(S32 i = 0; i < numSegments; i++)
+	{
+		//Set the vertex
+		verts[i].point.set( pos.x + center.x, pos.y + center.y, 0.0f );
+		verts[i].color = color;
+
+		//Calculate the tangential vector 
+		//remember, the radial vector is (x, y) 
+		//to get the tangential vector we flip those coordinates and negate one of them
+		Point2F tPos(-pos.y, pos.x);
+
+		//Add the tangential vector
+		pos += tPos * tangetialFactor;
+
+		//Correct using the radial factor
+		pos *= radialFactor;
+	}
+
+	verts.unlock();
+
+	//Draw the actual arc
+	GFX->setVertexBuffer( verts );
+	GFX->drawPrimitive( GFXLineStrip, 0, numSegments - 1 );
+}
+
 //-----------------------------------------------------------------------------
 // Draw Line
 //-----------------------------------------------------------------------------
@@ -701,6 +907,14 @@ static const U32 cubeFaces[6][4] =
    { 0, 4, 6, 2 }, { 0, 2, 3, 1 }, { 0, 1, 5, 4 },
    { 3, 2, 6, 7 }, { 7, 6, 4, 5 }, { 3, 7, 5, 1 }
 };
+
+void GFXDrawUtil::drawTriangle( const GFXStateBlockDesc &desc, const Point2I &p0, const Point2I &p1, const Point2I &p2, const ColorI &color, const MatrixF *xfm )
+{
+   if ( desc.fillMode == GFXFillWireframe )
+      _drawWireTriangle( desc, Point3F(p0.x, p0.y, 0.0f), Point3F(p1.x, p1.y, 0.0f), Point3F(p2.x, p2.y, 0.0f), color, xfm );
+   else
+      _drawSolidTriangle( desc, Point3F(p0.x, p0.y, 0.0f), Point3F(p1.x, p1.y, 0.0f), Point3F(p2.x, p2.y, 0.0f), color, xfm );
+}
 
 void GFXDrawUtil::drawTriangle( const GFXStateBlockDesc &desc, const Point3F &p0, const Point3F &p1, const Point3F &p2, const ColorI &color, const MatrixF *xfm )
 {

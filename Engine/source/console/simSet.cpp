@@ -107,6 +107,12 @@ IMPLEMENT_CALLBACK( SimSet, onObjectAdded, void, ( SimObject* object ), ( object
 IMPLEMENT_CALLBACK( SimSet, onObjectRemoved, void, ( SimObject* object ), ( object ),
    "Called when an object is removed from the set.\n"
    "@param object The object that was removed." );
+IMPLEMENT_CALLBACK( SimSet, onReOrder, void, ( SimObject* object, SimObject* target ), ( object, target ),
+   "Called when an object is reordered in a set.\n"
+   "@param object The object that reordered.\n"
+   "@param target The object that it was reorderd to." );
+IMPLEMENT_CALLBACK( SimSet, onClear, void, (), (),
+   "Called after set has been cleared.");
    
 
 //=============================================================================
@@ -276,6 +282,8 @@ U32 SimSet::sizeRecursive()
 
 bool SimSet::reOrder( SimObject *obj, SimObject *target )
 {
+	onReOrder_callback( obj, target );
+	
    MutexHandle handle;
    handle.lock(mMutex);
 
@@ -404,6 +412,7 @@ void SimSet::clear()
    unlock();
 
    getSetModificationSignal().trigger( SetCleared, this, NULL );
+   onClear_callback();
 }
 
 //-----------------------------------------------------------------------------
@@ -492,6 +501,48 @@ SimObject* SimSet::findObjectByInternalName(StringTableEntry internalName, bool 
    }
 
    return NULL;
+}
+
+SimObject* SimSet::findFirstObjectByClass(const char* className, bool searchChildren)
+{
+   iterator i;
+   for (i = begin(); i != end(); i++)
+   {
+      SimObject *childObj = static_cast<SimObject*>(*i);
+	  if(childObj->getClassRep()->isSubclassOf(className))
+         return childObj;
+      else if (searchChildren)
+      {
+         SimSet* childSet = dynamic_cast<SimSet*>(*i);
+         if (childSet)
+         {
+            SimObject* found = childSet->findFirstObjectByClass(className, searchChildren);
+            if (found) return found;
+         }
+      }
+   }
+
+   return NULL;
+}
+
+void SimSet::getObjectListByClass(SimSet& list, const char* className, bool searchChildren)
+{
+   iterator i;
+   for (i = begin(); i != end(); i++)
+   {
+      SimObject *childObj = static_cast<SimObject*>(*i);
+	  if(childObj->getClassRep()->isSubclassOf(className))
+		  list.pushObject(childObj);
+      
+	  if (searchChildren)
+      {
+         SimSet* childSet = dynamic_cast<SimSet*>(*i);
+         if (childSet)
+         {
+            childSet->getObjectListByClass(list, className, searchChildren);
+         }
+      }
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -890,6 +941,55 @@ DefineEngineMethod( SimSet, listObjects, void, (),,
    object->unlock();
 }
 
+DefineEngineMethod( SimSet, getObjectList, const char*, (),,
+	"Return a space sperated list of all object ids.\n"
+	"@return Space sperated list of all object ids.")
+{
+	char* buff = Con::getReturnBuffer(1024);
+	dSprintf(buff, 1024, "");
+
+	String str;
+	object->lock();
+	SimSet::iterator itr;
+	for(itr = object->begin(); itr != object->end(); itr++)
+	{
+		SimObject *obj = *itr;
+
+		S32 id  = obj->getId();
+		//get the current length of the buffer
+		U32	len = dStrlen(buff);
+		//the start of the buffer where we want to write
+		char* buffPart = buff+len;
+		//the size of the remaining buffer (-1 cause dStrlen doesn't count the \0)
+		S32 size	=	1024-len-1;
+		//write it:
+		if(size < 1)
+		{
+			Con::errorf("SimSet::getObjectList - Not enough room to return our object list");
+			return buff;
+		}
+
+		dSprintf(buffPart, size, "%d ", id);
+	}
+	object->unlock();
+
+	return buff;
+}
+
+DefineEngineMethod( SimSet, getObjectListByClass, void, (SimSet* list, const char* className, bool searchChildren), ( false ),
+	"Fills a SimSet with all the objects found in current SetSet of a class name/type.\n"
+	"@param list SimSet to store the found objects in.\n"
+	"@param className The Class of the Objects to look for.\n"
+	"@param searchChildren If true, SimSets contained in the set will be recursively searched for the object.\n")
+{
+	if(list)
+	{
+		object->lock();
+		object->getObjectListByClass(*list, className, searchChildren);
+		object->unlock();
+	}
+}
+
 //-----------------------------------------------------------------------------
 
 DEFINE_CALLIN( fnSimSet_add, add, SimSet, void, ( SimSet* set, SimObject* object ),,,
@@ -1029,6 +1129,50 @@ DefineConsoleMethod( SimSet, getFullCount, S32, (), , "() Get the number of dire
    return object->sizeRecursive();
 }
 
+static S32 getHiddenCountRecursive(SimSet* parent)
+{
+   S32 sum = 0;
+   for(SimSet::iterator itr = parent->begin(); itr != parent->end(); itr++)
+   {
+      if((*itr)->isHidden())
+         sum++;
+      SimSet* child = dynamic_cast<SimSet*>(*itr);
+      if(child && child->size() > 0)
+         sum += getHiddenCountRecursive(child);
+   }
+   return sum;
+}
+
+DefineEngineMethod( SimSet, getHiddenCountRecursive, S32, (),,
+   "Get the number of hidden objects contained in the set and all child sets.\n"
+   "@return The number of hidden objects contained in the set and all child sets." )
+{
+   return getHiddenCountRecursive(object);
+}
+
+static S32 getSelectableCountRecursive(SimSet* parent)
+{
+   S32 sum = 0;
+   for(SimSet::iterator itr = parent->begin(); itr != parent->end(); itr++)
+   {
+      SimSet* child = dynamic_cast<SimSet*>(*itr);
+      if(!child)
+         continue;
+      if(!child->isLocked() && !child->isHidden() && !child->isSelected())
+         sum++;
+      if(child->size() > 0)
+         sum += getSelectableCountRecursive(child);
+   }
+   return sum;
+}
+
+DefineEngineMethod( SimSet, getSelectableCountRecursive, S32, (),,
+   "Get the number of selectable objects contained in the set and all child sets.\n"
+   "@return The number of selectable objects contained in the set and all child sets." )
+{
+   return getSelectableCountRecursive(object);
+}
+
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( SimSet, getObject, SimObject*, ( U32 index ),,
@@ -1072,6 +1216,14 @@ DefineEngineMethod( SimSet, getObjectIndex, S32, ( SimObject* obj ),,
    return -1;
 }
 
+bool SimSet::isMember(SimObject* obj)
+{
+   if(!obj)
+	   return false;
+
+   return ( find( begin(), end(), obj ) != end() );
+}
+
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( SimSet, isMember, bool, ( SimObject* obj ),,
@@ -1082,7 +1234,7 @@ DefineEngineMethod( SimSet, isMember, bool, ( SimObject* obj ),,
    if( !obj )
       return false;
 
-   return ( object->find( object->begin(), object->end(), obj ) != object->end() );
+   return object->isMember(obj); 
 }
 
 //-----------------------------------------------------------------------------
@@ -1095,6 +1247,16 @@ DefineEngineMethod( SimSet, findObjectByInternalName, SimObject*, ( const char* 
 {
    StringTableEntry pcName = StringTable->insert( internalName );
    return object->findObjectByInternalName( pcName, searchChildren );
+}
+
+DefineEngineMethod( SimSet, findFirstObjectByClass, SimObject*, ( const char* className, bool searchChildren ), ( false ),
+   "Find an object in the set by its class name.\n"
+   "@param className The class name of the object to look for.\n"
+   "@param searchChildren If true, SimSets contained in the set will be recursively searched for the object.\n"
+   "@return The object with the given internal name or 0 if no match was found.\n" )
+{
+   StringTableEntry pcName = StringTable->insert( className );
+   return object->findFirstObjectByClass( pcName, searchChildren );
 }
 
 //-----------------------------------------------------------------------------
@@ -1123,6 +1285,17 @@ DefineConsoleMethod( SimSet, sort, void, ( const char * callbackFunction ), , "(
    "@param callbackFunction Name of a function that takes two object arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal." )
 {
    object->scriptSort( callbackFunction );
+}
+
+DefineEngineMethod( SimSet, reorder, void, ( SimObject* obj1, SimObject* obj2 ),,
+   "Switch @a obj1 with @a obj2 in the simset.\n"
+   "@param obj1 The object to swap with @a obj2.\n"
+   "@param obj2 The object to swap with @a obj1." )
+{
+   if(obj1 == NULL || obj2 == NULL)
+      return;
+   
+   object->reOrder(obj1, obj2);
 }
 
 //-----------------------------------------------------------------------------

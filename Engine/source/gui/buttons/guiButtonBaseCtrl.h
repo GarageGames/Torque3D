@@ -65,14 +65,14 @@ class GuiButtonBaseCtrl : public GuiControl
 	   /// @name Callbacks
 	   /// @{
 
-      DECLARE_CALLBACK( void, onMouseDown, () );   
-	   DECLARE_CALLBACK( void, onMouseUp, () );
+	   DECLARE_CALLBACK( void, onMouseDown, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+	   DECLARE_CALLBACK( void, onMouseUp, ( bool depressed, S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
 	   DECLARE_CALLBACK( void, onClick, () );
 	   DECLARE_CALLBACK( void, onRightClick, () );
 	   DECLARE_CALLBACK( void, onDoubleClick, () );    
-	   DECLARE_CALLBACK( void, onMouseEnter, () );   
-	   DECLARE_CALLBACK( void, onMouseLeave, () );      
-	   DECLARE_CALLBACK( void, onMouseDragged, () );   
+	   DECLARE_CALLBACK( void, onMouseEnter, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+	   DECLARE_CALLBACK( void, onMouseLeave, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));   
+	   DECLARE_CALLBACK( void, onMouseDragged, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));  
 
       /// @}
 
@@ -94,6 +94,8 @@ class GuiButtonBaseCtrl : public GuiControl
       void setStateOn( bool bStateOn );
       bool getStateOn() const { return mStateOn; }
 
+      S32 getTextWidth();
+      
       void setDepressed( bool depressed ) { mDepressed = depressed; }
       void resetState() {mDepressed = false; mMouseOver = false;}
 

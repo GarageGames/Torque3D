@@ -330,7 +330,10 @@ public:
 
    /// Return the head of the global class list.
    static AbstractClassRep* getClassList() { return classLinkList; }
-
+   
+   /// Support function for isClass() Console Method in SimObject
+   static AbstractClassRep*	  getClassRepFromName(const char* className);
+   
    /// Helper class to see if we are a given class, or a subclass thereof by
    /// comparing AbstractClassRep pointers.
    bool isSubclassOf( const AbstractClassRep* klass ) const
@@ -542,6 +545,19 @@ public:
 
 extern AbstractClassRep::FieldList sg_tempFieldList;
 
+inline AbstractClassRep* AbstractClassRep::getClassRepFromName(const char* className)
+{
+	AbstractClassRep* current = classLinkList;
+	while(current != NULL)
+	{
+		if(dStricmp(current->getClassName(),className) == 0)
+			return current;
+
+		current = current->nextClass;
+	}
+
+	return NULL;
+}
 
 //=============================================================================
 //    ConcreteClassRep.

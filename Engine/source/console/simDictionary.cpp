@@ -374,6 +374,28 @@ void SimIdDictionary::remove(SimObject* obj)
    Mutex::unlockMutex(mutex);
 }
 
+void SimIdDictionary::foreach(void (*callback)(SimObject*, void*), void* data)
+{
+	Mutex::lockMutex(mutex);
+
+#ifndef USE_NEW_SIMDICTIONARY
+	for(S32 i = 0; i < DefaultTableSize; i++)
+	{
+		SimObject *walk = table[i];
+		if(walk)
+		{
+			SimObject* firstObject = walk;
+			do {
+				callback(walk, data);
+				walk = walk->nextIdObject;
+			} while(walk && walk != firstObject);
+		}
+	}
+#else
+#endif
+	Mutex::unlockMutex(mutex);
+}
+
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 

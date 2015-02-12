@@ -338,15 +338,19 @@ void GuiTabBookCtrl::onMouseDown(const GuiEvent &event)
    if( mTabRect.pointInRect( localMouse ) )
    {
       GuiTabPageCtrl *tab = findHitTab( localMouse );
-      if( tab != NULL )
-      {
-         selectPage( tab );
-         mDraggingTab = mAllowReorder;
-      }
-      else
-      {
-         mDraggingTabRect = true;
-      }
+	  
+	  if(tab != NULL)
+	  {
+		  if( tab->isActive() )
+		  {
+			  selectPage( tab );
+			  mDraggingTab = mAllowReorder;
+		  }
+	  }
+	  else
+	  {
+		 mDraggingTabRect = true;
+	  }
    }
 }
 
@@ -550,6 +554,9 @@ void GuiTabBookCtrl::renderTabs( const Point2I &offset, const RectI &tabRect )
 
 void GuiTabBookCtrl::renderTab( RectI tabRect, GuiTabPageCtrl *tab )
 {
+	if(!tab->isActive())
+		return;
+
    StringTableEntry text = tab->getText();
    ColorI oldColor;
 
@@ -819,8 +826,11 @@ void GuiTabBookCtrl::selectPage( S32 index )
    if( mPages.size() <= index )
       index = mPages.size() - 1;
 
-   // Select the page
-   selectPage( mPages[ index ].Page );
+   // Select the page if it is active
+   if(mPages[ index ].Page->isActive())
+   {
+	   selectPage( mPages[ index ].Page );
+   }
 }
 
 //-----------------------------------------------------------------------------

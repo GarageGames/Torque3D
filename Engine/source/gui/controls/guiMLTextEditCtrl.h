@@ -35,6 +35,11 @@ class GuiMLTextEditCtrl : public GuiMLTextCtrl
   protected:
    StringTableEntry mEscapeCommand;
 
+   // for animating the cursor
+   S32      mNumFramesElapsed;
+   U32      mTimeLastCursorFlipped;
+   bool     mCursorOn;
+
    // Events
    bool onKeyDown(const GuiEvent&event);
 
@@ -43,6 +48,7 @@ class GuiMLTextEditCtrl : public GuiMLTextCtrl
    void handleDeleteKeys(const GuiEvent&);
 
    // rendering
+   void onPreRender();
    void onRender(Point2I offset, const RectI &updateRect);
 
   public:

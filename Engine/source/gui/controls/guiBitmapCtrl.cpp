@@ -264,3 +264,21 @@ DefineConsoleMethod( GuiBitmapCtrl, setBitmap, void, ( const char * fileRoot, bo
    Con::expandScriptFilename(filename, sizeof(filename), fileRoot);
    object->setBitmap(filename, resize );
 }
+
+U32 GuiBitmapCtrl::getImageWidth()
+{
+	return mTextureObject.getWidth();
+}
+
+U32 GuiBitmapCtrl::getImageHeight()
+{
+	return mTextureObject.getHeight();
+}
+
+DefineEngineMethod( GuiBitmapCtrl, getImageSize, Point2I, (),,
+   "Get the width and height of the image the control is using.\n"
+   "@return width and height of image for the control or zeros if no image.\n")
+{
+	Point2I extent(object->getImageWidth(), object->getImageHeight());
+	return extent;
+}

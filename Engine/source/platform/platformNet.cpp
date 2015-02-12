@@ -22,6 +22,7 @@
 
 #include "platform/platformNet.h"
 #include "core/strings/stringFunctions.h"
+#include "console/console.h"
 
 #if defined (TORQUE_OS_WIN)
 #define TORQUE_USE_WINSOCK
@@ -127,7 +128,35 @@ static const char* strerror_wsa( S32 code )
       E( WSAEACCES );
 #undef E
       default:
-         return "Unknown";
+		  LPWSTR errString = NULL;  // will be allocated and filled by FormatMessage
+
+		  S32 size = FormatMessageW(  FORMAT_MESSAGE_ALLOCATE_BUFFER |
+									  FORMAT_MESSAGE_FROM_SYSTEM,	// use windows internal message table
+									  0,							// 0 since source is internal message table
+									  code,							// this is the error code returned by WSAGetLastError()
+																	// Could just as well have been an error code from generic
+																	// Windows errors from GetLastError()
+									  0,							// auto-determine language to use
+									  (LPWSTR)&errString,			// this is WHERE we want FormatMessage
+																	// to plunk the error string.  Note the
+																	// peculiar pass format:  Even though
+																	// errString is already a pointer, we
+																	// pass &errString (which is really type LPSTR* now)
+																	// and then CAST IT to (LPSTR).  This is a really weird
+																	// trip up.. but its how they do it on msdn:
+																	// http://msdn.microsoft.com/en-us/library/ms679351(VS.85).aspx
+									  0,							// min size for buffer
+									  0 );							// 0, since getting message from system tables
+
+		  //Store our output so we can return it
+		  const char* str = Con::getReturnBuffer(errString);
+
+		  LocalFree( errString );	// if you don't do this, you will get an
+									// ever so slight memory leak, since we asked
+									// FormatMessage to FORMAT_MESSAGE_ALLOCATE_BUFFER,
+									// and it does so using LocalAlloc
+									// Gotcha!  I guess.
+		  return str;
    }
 }
 #endif
@@ -285,7 +314,7 @@ Net::Error getLastError()
       return Net::UnknownError;
    }
 #else
-   if (errno == EAGAIN)
+   if (errno == EAGAIN || errno == EINPROGRESS)
       return Net::WouldBlock;
    if (errno == 0)
       return Net::NoError;
@@ -458,7 +487,7 @@ void Net::closeConnectTo(NetSocket sock)
    closeSocket(sock);
 }
 
-Net::Error Net::sendtoSocket(NetSocket socket, const U8 *buffer, S32  bufferSize)
+Net::Error Net::sendtoSocket(NetSocket socket, const U8 *buffer, S32  bufferSize, S32 *outBytesWritten)
 {
    if(Journal::IsPlaying())
    {
@@ -468,7 +497,7 @@ Net::Error Net::sendtoSocket(NetSocket socket, const U8 *buffer, S32  bufferSize
       return (Net::Error) e;
    }
 
-   Net::Error e = send(socket, buffer, bufferSize);
+   Net::Error e = send(socket, buffer, bufferSize, outBytesWritten);
 
    if(Journal::IsRecording())
       Journal::Write(U32(e));
@@ -914,11 +943,13 @@ Net::Error Net::setBlocking(NetSocket socket, bool blockingIO)
    return getLastError();
 }
 
-Net::Error Net::send(NetSocket socket, const U8 *buffer, S32 bufferSize)
+Net::Error Net::send(NetSocket socket, const U8 *buffer, S32 bufferSize, S32 *outBytesWritten)
 {
    errno = 0;
    S32 bytesWritten = ::send(socket, (const char*)buffer, bufferSize, 0);
-   if(bytesWritten == -1)
+   if (outBytesWritten)
+      *outBytesWritten = bytesWritten;
+   else if(bytesWritten == -1)
 #if defined(TORQUE_USE_WINSOCK)
       Con::errorf("Could not write to socket. Error: %s",strerror_wsa( WSAGetLastError() ));
 #else

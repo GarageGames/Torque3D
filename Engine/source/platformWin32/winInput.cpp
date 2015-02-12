@@ -192,7 +192,19 @@ static void fillAsciiTable()
    for ( keyCode = KEY_FIRST; keyCode < NUM_KEYS; keyCode++ )
    {
       ascii[0] = ascii[1] = 0;
-      dikCode  = Key_to_DIK( keyCode );
+	  if(keyCode >= KEY_NUMPAD0 && keyCode <= KEY_NUMPAD9) // handle num keys
+         dikCode  = Key_to_DIK( keyCode - KEY_NUMPAD0 + KEY_0 );
+      else
+      {
+         switch(keyCode)
+         {
+         case KEY_DECIMAL: dikCode  = Key_to_DIK( KEY_PERIOD ); break;
+         case KEY_DIVIDE: dikCode  = Key_to_DIK( KEY_SLASH ); break;
+         case KEY_NUMPADENTER: dikCode  = Key_to_DIK( KEY_RETURN ); break;
+         default: dikCode  = Key_to_DIK( keyCode );
+         }
+      }
+      
 
       // This is a special case for numpad keys.
       //

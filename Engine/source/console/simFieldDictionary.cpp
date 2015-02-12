@@ -168,6 +168,25 @@ SimFieldDictionary::Entry *SimFieldDictionary::findDynamicField( StringTableEntr
    return NULL;
 }
 
+void SimFieldDictionary::clearFields()
+{
+	for(U32 i = 0; i < HashTableSize; i++)
+   {
+		Entry **walk = &mHashTable[i];
+		Entry *field = NULL;
+		while(*walk)
+		{
+			field = *walk;
+			mVersion++;
+
+			if( field->value )
+				dFree(field->value);
+
+			*walk = field->next;
+			freeEntry(field);
+		}
+	}
+}
 
 void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *value)
 {

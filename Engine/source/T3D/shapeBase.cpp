@@ -2159,6 +2159,20 @@ bool ShapeBase::setThreadSequence(U32 slot, S32 seq, bool reset)
    return false;
 }
 
+S32 ShapeBase::getThreadSequence(U32 slot)
+{
+	Thread& st = mScriptThread[slot];
+	if(st.thread)
+	{
+		if(mShapeInstance)
+			return mShapeInstance->getSequence(st.thread);
+		else
+			return st.sequence;
+	}
+
+	return -1;
+}
+
 void ShapeBase::updateThread(Thread& st)
 {
 	switch (st.state)
@@ -2181,7 +2195,7 @@ void ShapeBase::updateThread(Thread& st)
 					mShapeInstance->setTimeScale(st.thread,1);
 					mShapeInstance->setPos( st.thread, ( st.timescale > 0.f ) ? 1.0f : 0.0f );
 					mShapeInstance->setTimeScale(st.thread,0);
-               st.state = Thread::Stop;
+					st.state = Thread::Stop;
 				}
 				else
 				{
@@ -2302,6 +2316,15 @@ bool ShapeBase::setThreadTimeScale( U32 slot, F32 timeScale )
 		return true;
 	}
 	return false;
+}
+
+F32 ShapeBase::getThreadTimeScale(U32 slot)
+{
+	Thread& st = mScriptThread[slot];
+   if (st.sequence != -1) {
+	  return mShapeInstance->getTimeScale(st.thread);
+   }
+   return 0.0f;
 }
 
 void ShapeBase::advanceThreads(F32 dt)
@@ -3419,10 +3442,10 @@ bool ShapeBase::isInvincible()
    return false;
 }
 
-void ShapeBase::startFade( F32 fadeTime, F32 fadeDelay, bool fadeOut )
+void ShapeBase::startFade( F32 fadeTime, F32 fadeDelay, bool fadeOut, F32 elapsedTime )
 {
    setMaskBits(CloakMask);
-   mFadeElapsedTime = 0;
+   mFadeElapsedTime = elapsedTime;
    mFading = true;
    if(fadeDelay < 0)
       fadeDelay = 0;
@@ -3432,6 +3455,20 @@ void ShapeBase::startFade( F32 fadeTime, F32 fadeDelay, bool fadeOut )
    mFadeDelay = fadeDelay;
    mFadeOut = fadeOut;
    mFadeVal = F32(mFadeOut);
+}
+
+void ShapeBase::pauseFade( bool pause )
+{
+	setMaskBits(CloakMask);
+	mFading = !pause;
+}
+
+bool ShapeBase::isFading()
+{
+	if(mFadeElapsedTime > mFadeTime + mFadeDelay)
+		return false;
+	else
+		return true;
 }
 
 //--------------------------------------------------------------------------
@@ -3600,6 +3637,38 @@ DefineEngineMethod( ShapeBase, playThread, bool, ( S32 slot, const char* name ),
    return false;
 }
 
+DefineEngineMethod( ShapeBase, getThreadAnim, const char*, ( S32 slot),,
+   "@brief Get the animation on this thread\n\n"
+
+   "@param slot thread slot to get the animation for. Valid range is 0 - (getMaxThreadCount()-1)\n"  // 3 = ShapeBase::MaxScriptThreads-1
+   "@return Animation name if there is an animation on this thread else empty string.\n\n"
+   
+   "@see pauseThread()\n"
+   "@see stopThread()\n"
+   "@see setThreadDir()\n"
+   "@see setThreadTimeScale()\n"
+   "@see destroyThread()\n")
+{
+   if (slot >= 0 && slot < ShapeBase::MaxScriptThreads) {
+	   return object->getThreadSequenceName(slot);
+   }
+   return "";
+}
+
+DefineEngineFunction( getMaxThreadCount, S32, (),,
+   "@brief Get the max number of threads for ShapeBase objects to animate on\n\n"
+
+   "@return The max number of threads (0 to ShapeBase::MaxScriptThreads-1).\n\n"
+   
+   "@see pauseThread()\n"
+   "@see stopThread()\n"
+   "@see setThreadDir()\n"
+   "@see setThreadTimeScale()\n"
+   "@see destroyThread()\n")
+{
+   return ShapeBase::MaxScriptThreads;
+}
+
 DefineEngineMethod( ShapeBase, setThreadDir, bool, ( S32 slot, bool fwd ),,
    "@brief Set the playback direction of an animation thread.\n\n"
 
@@ -3630,6 +3699,19 @@ DefineEngineMethod( ShapeBase, setThreadTimeScale, bool, ( S32 slot, F32 scale )
          return true;
    }
    return false;
+}
+
+DefineEngineMethod( ShapeBase, getThreadTimeScale, F32, ( S32 slot ),,
+   "@brief Get the speed/time scale of the thread/animation.\n\n"
+   "@param slot Thread slot to get the speed/time scale of\n"
+   "@return Speed/time scale of the given thread.\n\n"
+   
+   "@see playThread\n" )
+{
+   if (slot >= 0 && slot < ShapeBase::MaxScriptThreads) {
+	   return object->getThreadTimeScale(slot);
+   }
+   return 0.0f;
 }
 
 DefineEngineMethod( ShapeBase, setThreadPosition, bool, ( S32 slot, F32 pos ),,
@@ -4564,7 +4646,7 @@ DefineEngineMethod( ShapeBase, setCameraFov, void, ( F32 fov ),,
       object->setCameraFov( fov );
 }
 
-DefineEngineMethod( ShapeBase, startFade, void, ( S32 time, S32 delay, bool fadeOut ),,
+DefineEngineMethod( ShapeBase, startFade, void, ( S32 time, S32 delay, bool fadeOut, S32 elapsedTime ), (0, true, 0),
    "@brief Fade the object in or out without removing it from the scene.\n\n"
 
    "A faded out object is still in the scene and can still be collided with, "
@@ -4580,7 +4662,23 @@ DefineEngineMethod( ShapeBase, startFade, void, ( S32 time, S32 delay, bool fade
    "@param delay delay in ms before the fade effect begins\n"
    "@param fadeOut true to fade-out to invisible, false to fade-in to full visibility\n" )
 {
-   object->startFade( (F32)time / (F32)1000.0, delay / 1000.0, fadeOut );
+   object->startFade( (F32)time / 1000.0f, (F32)delay / 1000.0f, fadeOut, (F32)elapsedTime / 1000.0f );
+}
+
+DefineEngineMethod( ShapeBase, pauseFade, void, ( bool pause ), (true),
+   "@brief Pause fading of the object in or out without removing it from the scene.\n\n"
+
+   "@param pause True if we should pause, false if not (resume)\n")
+{
+   object->pauseFade(pause);
+}
+
+DefineEngineMethod( ShapeBase, isFading, bool, (),,
+   "@brief Get if we are fading or not.\n\n"
+
+   "@return True if we are fading, false if not\n")
+{
+   return object->isFading();
 }
 
 DefineEngineMethod( ShapeBase, setDamageVector, void, ( Point3F vec ),,
