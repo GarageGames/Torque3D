@@ -416,11 +416,7 @@ bool TCPObject::sendFile(const char* fileName)
 
 	//Read each byte into our buffer
 	Vector<U8> buffer(readFile.getStreamSize());
-	U8 byte;
-	while(readFile.read(&byte))
-	{
-		buffer.push_back(byte);
-	}
+	readFile.read(buffer.size(), &buffer);
 
 	//Send the buffer
 	send(buffer.address(), buffer.size());
