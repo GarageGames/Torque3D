@@ -36,6 +36,7 @@ public:
 
 	DECLARE_CALLBACK(void, onConnectionRequest, (const char* address, const char* ID));
 	DECLARE_CALLBACK(void, onLine, (const char* line));
+	DECLARE_CALLBACK(bool, onPacket, (const char* data));
 	DECLARE_CALLBACK(void, onEndReceive, ());
 	DECLARE_CALLBACK(void, onDNSResolved,());
 	DECLARE_CALLBACK(void, onDNSFailed, ());
@@ -61,7 +62,9 @@ public:
    virtual ~TCPObject();
 
    void parseLine(U8 *buffer, U32 *start, U32 bufferLen);
-   void finishLastLine();
+   bool finishLastLine();
+   bool isBufferEmpty();
+   void emptyBuffer();
 
    static TCPObject *find(NetSocket tag);
 

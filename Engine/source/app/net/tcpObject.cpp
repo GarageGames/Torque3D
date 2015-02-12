@@ -139,6 +139,11 @@ IMPLEMENT_CALLBACK(TCPObject, onLine, void, (const char* line), (line),
    "@param line Data sent from the server.\n"
    );
 
+IMPLEMENT_CALLBACK(TCPObject, onPacket, bool, (const char* data), (data),
+   "@brief Called when we get a packet with no newlines or nulls (probably websocket).\n\n"
+   "@param data Data sent from the server.\n"
+   "@return true if script handled the packet.\n"
+   );
 IMPLEMENT_CALLBACK(TCPObject, onEndReceive, void, (), (),
    "@brief Called when we are done reading all lines.\n\n"
    );
@@ -360,12 +365,31 @@ void TCPObject::onConnectFailed()
    onConnectFailed_callback();
 }
 
-void TCPObject::finishLastLine()
+bool TCPObject::finishLastLine()
 {
    if(mBufferSize)
    {
       mBuffer[mBufferSize] = 0;
       processLine((UTF8*)mBuffer);
+      dFree(mBuffer);
+      mBuffer = 0;
+      mBufferSize = 0;
+
+      return true;
+   }
+
+   return false;
+}
+
+bool TCPObject::isBufferEmpty()
+{
+   return (mBufferSize <= 0);
+}
+
+void TCPObject::emptyBuffer()
+{
+   if(mBufferSize)
+   {
       dFree(mBuffer);
       mBuffer = 0;
       mBufferSize = 0;
@@ -536,6 +560,27 @@ void processConnectedReceiveEvent(NetSocket sock, RawData incomingData)
       AssertFatal(ret <= size, "Invalid return size");
       size -= ret;
       buffer += ret;
+   }
+
+   //If our buffer now has something in it then it's probably a web socket packet and lets handle it
+   if(!tcpo->isBufferEmpty())
+   {
+      //Copy all the data into a string (may be a quicker way of doing this)
+      U8 *data = (U8*)incomingData.data;
+      String temp;
+      for(S32 i = 0; i < incomingData.size; i++)
+      {
+         temp += data[i];
+      }
+
+      //Send the packet to script
+      bool handled = tcpo->onPacket_callback(temp);
+
+      //If the script did something with it, clear the buffer
+      if(handled)
+      {
+         tcpo->emptyBuffer();
+      }
    }
 
    tcpo->onEndReceive_callback();
