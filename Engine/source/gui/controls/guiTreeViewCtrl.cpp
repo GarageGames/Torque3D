@@ -4872,7 +4872,7 @@ DefineEngineMethod( GuiTreeViewCtrl, removeSelection, void, ( S32 itemId), ,
    "Deselect an item or remove it from the selection.\n\n"
    "@param itemId Item Id to deselect.\n")
 {
-	object->removeSelection(itemId);
+   object->removeSelection(itemId);
 }
 
 DefineEngineMethod( GuiTreeViewCtrl, removeChildSelectionByValue, void, ( S32 parentId, const char* value), ,
@@ -5012,7 +5012,7 @@ DefineEngineMethod( GuiTreeViewCtrl, getItemText, const char *, ( S32 itemId ), 
    "@param itemId TreeItemID to get text of.\n"
    "@return Text for a given item.")
 {
-	return(object->getItemText(itemId));
+   return(object->getItemText(itemId));
 }
 
 DefineEngineMethod( GuiTreeViewCtrl, getItemValue, const char *, ( S32 itemId ), ,
@@ -5049,7 +5049,7 @@ DefineEngineMethod( GuiTreeViewCtrl, removeAllChildren, void, (S32 itemId), ,
 DefineEngineMethod( GuiTreeViewCtrl, clear, void, (), ,
    "Empty the tree.\n")
 {
-	object->removeItem(0);
+   object->removeItem(0);
 }
 
 DefineEngineMethod( GuiTreeViewCtrl, getFirstRootItem, S32, (), ,
