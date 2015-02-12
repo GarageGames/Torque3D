@@ -153,6 +153,9 @@ void GFXGLDevice::initGLState()
    }
 
 #if TORQUE_DEBUG
+#ifdef TORQUE_NSIGHT_WORKAROUND
+   __GLEW_ARB_buffer_storage = false;
+#endif
    if( gglHasExtension(ARB_debug_output) )
    {
       glEnable(GL_DEBUG_OUTPUT);
