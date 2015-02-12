@@ -1260,7 +1260,7 @@ void GuiTextEditCtrl::onRender(Point2I offset, const RectI &updateRect)
    if ( mProfile->mOpaque )
    {
       if(!mTextValid)
-         GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorNA );
+         GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorERR );
       else if(isFirstResponder())
          GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorHL );
       else
@@ -1272,7 +1272,7 @@ void GuiTextEditCtrl::onRender(Point2I offset, const RectI &updateRect)
    {
       renderBorder( ctrlRect, mProfile );
       if( !mTextValid )
-         GFX->getDrawUtil()->drawRectFill(ctrlRect, mProfile->mFillColorNA);
+         GFX->getDrawUtil()->drawRectFill(ctrlRect, mProfile->mFillColorERR);
    }
 
    drawText( ctrlRect, isFirstResponder() );

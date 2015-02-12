@@ -385,6 +385,7 @@ public:
    ColorI mFillColor;                              ///< Fill color, this is used to fill the bounds of the control if it is opaque
    ColorI mFillColorHL;                            ///< This is used instead of mFillColor if the object is highlighted
    ColorI mFillColorNA;                            ///< This is used instead of mFillColor if the object is not active or disabled
+   ColorI mFillColorERR;                           ///< This is used instead of mFillColor if the object has an error or is invalid
    ColorI mFillColorSEL;                           ///< This is used instead of mFillColor if the object is selected
 
    S32 mBorder;                                    ///< For most controls, if mBorder is > 0 a border will be drawn, some controls use this to draw different types of borders however @see guiDefaultControlRender.cc
