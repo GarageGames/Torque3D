@@ -407,21 +407,21 @@ void TCPObject::send(const U8 *buffer, U32 len)
 
 bool TCPObject::sendFile(const char* fileName)
 {
-	//Open the file for reading
-	FileStream readFile;
-	if(!readFile.open(fileName, Torque::FS::File::Read))
-	{
-		return false;
-	}
+   //Open the file for reading
+   FileStream readFile;
+   if(!readFile.open(fileName, Torque::FS::File::Read))
+   {
+      return false;
+   }
 
-	//Read each byte into our buffer
-	Vector<U8> buffer(readFile.getStreamSize());
-	readFile.read(buffer.size(), &buffer);
+   //Read each byte into our buffer
+   Vector<U8> buffer(readFile.getStreamSize());
+   readFile.read(buffer.size(), &buffer);
 
-	//Send the buffer
-	send(buffer.address(), buffer.size());
+   //Send the buffer
+   send(buffer.address(), buffer.size());
 
-	return true;
+   	return true;
 }
 
 DefineEngineMethod(TCPObject, send, void, (const char *data),, 
@@ -450,13 +450,13 @@ DefineEngineMethod(TCPObject, sendFile, bool, (const char *fileName),,
 
    "@param fileName The filename of the file to transfer.\n")
 {
-	return object->sendFile(fileName);
+   return object->sendFile(fileName);
 }
 
 DefineEngineMethod(TCPObject, finishLastLine, void, (),, 
    "@brief Eat the rest of the lines.\n")
 {
-	object->finishLastLine();
+   object->finishLastLine();
 }
 
 DefineEngineMethod(TCPObject, listen, void, (U32 port),, 
