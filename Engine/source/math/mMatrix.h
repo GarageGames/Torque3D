@@ -277,10 +277,7 @@ inline MatrixF& MatrixF::set( const EulerF &e, const Point3F& p)
 
 inline bool MatrixF::equals(const MatrixF& mat)
 {
-   return (m[0] == mat[0] && m[1] == mat[1] && m[2] == mat[2] && m[3] == mat[3] &&
-      m[4] == mat[4] && m[5] == mat[5] && m[6] == mat[6] && m[7] == mat[7] &&
-      m[8] == mat[8] && m[9] == mat[9] && m[10] == mat[10] && m[11] == mat[11] &&
-      m[12] == mat[12] && m[13] == mat[13] && m[14] == mat[14] && m[15] == mat[15]);
+   return (m == mat);
 }
 
 inline MatrixF& MatrixF::setCrossProduct( const Point3F &p)
