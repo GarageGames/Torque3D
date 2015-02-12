@@ -1012,7 +1012,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
       F32 currStartX = normalStart.x;
 
       AssertFatal(currStartX != normalEnd.x, "This is going to cause problems in SceneContainer::castRay");
-      if(_isnan(currStartX))
+      if(mIsNaN_F(currStartX))
       {
          PROFILE_END();
          return false;
