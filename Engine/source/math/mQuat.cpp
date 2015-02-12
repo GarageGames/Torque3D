@@ -60,12 +60,12 @@ QuatF& QuatF::set( const EulerF & e )
 	z = cysz*cx - sycz*sx;
 	*/
 	// Assuming the angles are in radians.
-	F32 c1 = mCos(e.y/2.0f);
-	F32 s1 = mSin(e.y/2.0f);
-	F32 c2 = mCos(e.z/2.0f);
-	F32 s2 = mSin(e.z/2.0f);
-	F32 c3 = mCos(e.x/2.0f);
-	F32 s3 = mSin(e.x/2.0f);
+	F32 c1 = mCos(e.y * 0.5f);
+	F32 s1 = mSin(e.y * 0.5f);
+	F32 c2 = mCos(e.z * 0.5f);
+	F32 s2 = mSin(e.z * 0.5f);
+	F32 c3 = mCos(e.x * 0.5f);
+	F32 s3 = mSin(e.x * 0.5f);
 	F32 c1c2 = c1*c2;
 	F32 s1s2 = s1*s2;
 	w =c1c2*c3 - s1s2*s3;
