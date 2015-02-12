@@ -35,7 +35,7 @@
 #endif
 
 #ifndef _ENGINEAPI_H_
-   #include "console/engineAPI.h"
+#include "console/engineAPI.h"
 #endif
 
 class ColorI;
@@ -130,15 +130,15 @@ class ColorI
    U8 alpha;
 
   public:
-	  struct Hsb
-	  {
-		  Hsb():hue(0), sat(0), brightness(0){};
-		  Hsb(U32 h, U32 s, U32 b):hue(h), sat(s), brightness(b){};
+     struct Hsb
+     {
+        Hsb():hue(0), sat(0), brightness(0){};
+        Hsb(U32 h, U32 s, U32 b):hue(h), sat(s), brightness(b){};
 
-		  U32 hue;			///Hue
-		  U32 sat;			///Saturation
-		  U32 brightness;	//Brightness/Value/Lightness
-	  };
+        U32 hue;			///Hue
+        U32 sat;			///Saturation
+        U32 brightness;	//Brightness/Value/Lightness
+     };
 
    ColorI() { }
    ColorI(const ColorI& in_rCopy);
@@ -491,71 +491,71 @@ inline void ColorI::set(const ColorI& in_rCopy,
 
 inline void ColorI::set(const Hsb& color)
 {
-	U32 r = 0;
-	U32 g = 0;
-	U32 b = 0;
+   U32 r = 0;
+   U32 g = 0;
+   U32 b = 0;
 
-	F64 L = ((F64)color.brightness)/100.0;
-	F64 S = ((F64)color.sat)/100.0;
-	F64 H = ((F64)color.hue)/360.0;
+   F64 L = ((F64)color.brightness)/100.0;
+   F64 S = ((F64)color.sat)/100.0;
+   F64 H = ((F64)color.hue)/360.0;
 
-	if(color.sat == 0)
-	{
-		r = color.brightness;
-		g = color.brightness;
-		b = color.brightness;
-	}
-	else
-	{
-		F64 temp1 = 0;
-		if(L < 0.50)
-		{
-			temp1 = L*(1 + S);
-		}
-		else
-		{
-			temp1 = L + S - (L*S);
-		}
+   if(color.sat == 0)
+   {
+      r = color.brightness;
+      g = color.brightness;
+      b = color.brightness;
+   }
+   else
+   {
+      F64 temp1 = 0;
+      if(L < 0.50)
+      {
+         temp1 = L*(1 + S);
+      }
+      else
+      {
+         temp1 = L + S - (L*S);
+      }
 
-		F64 temp2 = 2.0*L - temp1;
+      F64 temp2 = 2.0*L - temp1;
 
-		F64 temp3 = 0;
-		for(S32 i = 0 ; i < 3 ; i++)
-		{
-			switch(i)
-			{
-			case 0: // red
-				{
-					temp3 = H + 0.33333;
-					if(temp3 > 1.0)
-						temp3 -= 1.0;
-					HSLtoRGB_Subfunction(r,temp1,temp2,temp3);
-					break;
-				}
-			case 1: // green
-				{
-					temp3 = H;
-					HSLtoRGB_Subfunction(g,temp1,temp2,temp3);
-					break;
-				}
-			case 2: // blue
-				{
-					temp3 = H - 0.33333;
-					if(temp3 < 0)
-						temp3 += 1;
-					HSLtoRGB_Subfunction(b,temp1,temp2,temp3);
-					break;
-				}
-			default:
-				{
+      F64 temp3 = 0;
+      for(S32 i = 0 ; i < 3 ; i++)
+      {
+         switch(i)
+         {
+         case 0: // red
+            {
+               temp3 = H + 0.33333;
+               if(temp3 > 1.0)
+                  temp3 -= 1.0;
+               HSLtoRGB_Subfunction(r,temp1,temp2,temp3);
+               break;
+            }
+         case 1: // green
+            {
+               temp3 = H;
+               HSLtoRGB_Subfunction(g,temp1,temp2,temp3);
+               break;
+            }
+         case 2: // blue
+            {
+               temp3 = H - 0.33333;
+               if(temp3 < 0)
+                  temp3 += 1;
+               HSLtoRGB_Subfunction(b,temp1,temp2,temp3);
+               break;
+            }
+         default:
+            {
 
-				}
-			}
-		}
-	}
-	red = (U32)((((F64)r)/100)*255);
-	green = (U32)((((F64)g)/100)*255);
-	blue = (U32)((((F64)b)/100)*255);
+            }
+         }
+      }
+   }
+   red = (U32)((((F64)r)/100)*255);
+   green = (U32)((((F64)g)/100)*255);
+   blue = (U32)((((F64)b)/100)*255);
 }
 
 // This is a subfunction of HSLtoRGB

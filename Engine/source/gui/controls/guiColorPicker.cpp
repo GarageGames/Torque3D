@@ -70,7 +70,7 @@ GuiColorPickerCtrl::GuiColorPickerCtrl()
    mPositionChanged = false;
    mSelectorGap = 1;
    mActionOnMove = false;
-	mShowReticle = true;
+   mShowReticle = true;
 }
 
 //--------------------------------------------------------------------------
