@@ -344,7 +344,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrl, forceClose, void, (), , "")
    object->closePopUp();
 }
 
-DefineConsoleMethod( GuiPopUpMenuCtrl, getSelected, S32, (), , "")
+DefineConsoleMethod( GuiPopUpMenuCtrl, getSelected, S32, (), , "Gets the selected index")
 {
    return object->getSelected();
 }
@@ -430,7 +430,7 @@ DefineConsoleMethod( GuiPopUpMenuCtrl, setEnumContent, void, (const char * class
 
 //------------------------------------------------------------------------------
 DefineConsoleMethod( GuiPopUpMenuCtrl, findText, S32, (const char * text), , "(string text)"
-              "Returns the position of the first entry containing the specified text.")
+              "Returns the position of the first entry containing the specified text or -1 if not found.")
 {
    return( object->findText( text ) );   
 }
