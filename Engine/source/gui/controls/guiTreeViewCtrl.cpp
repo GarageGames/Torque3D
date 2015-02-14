@@ -4924,7 +4924,7 @@ DefineEngineMethod( GuiTreeViewCtrl, scrollVisible, bool, ( S32 itemID), ,
    "@param itemID TreeItemId of item to scroll to/make visible.\n"
    "@return True if it was successful, false if not.")
 {
-   object->scrollVisible(itemID);
+   return object->scrollVisible(itemID);
 }
 
 DefineEngineMethod( GuiTreeViewCtrl, buildIconTable, bool, ( const char* icons), ,
