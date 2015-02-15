@@ -206,7 +206,7 @@
 				Optimization="3"
 				InlineFunctionExpansion="2"
 				AdditionalIncludeDirectories="{foreach item=def from=$projIncludes}{$def};{/foreach}"
-				PreprocessorDefinitions="{foreach item=def from=$projDefines}{$def};{/foreach}UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="{foreach item=def from=$projDefines}{$def};{/foreach}UNICODE;_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;TORQUE_RELEASE"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
 				StringPooling="true"
