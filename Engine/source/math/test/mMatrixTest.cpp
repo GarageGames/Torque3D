@@ -31,8 +31,8 @@ extern void mInstallLibrary_ASM();
 
 // If we're x86 and not Mac, then include these. There's probably a better way to do this.
 #if defined(WIN32) && defined(TORQUE_CPU_X86)
-extern "C" void Athlon_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result);
-extern "C" void SSE_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result);
+void Athlon_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result);
+void SSE_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result);
 #endif
 
 #if defined( __VEC__ )
