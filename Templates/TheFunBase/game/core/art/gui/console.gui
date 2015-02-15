@@ -1,0 +1,175 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(ConsoleDlg) {
+   profile = "GuiDefaultProfile";
+   horizSizing = "right";
+   vertSizing = "bottom";
+   position = "0 0";
+   extent = "640 480";
+   minExtent = "8 8";
+   visible = "1";
+   helpTag = "0";
+
+   new GuiConsoleEditCtrl(ConsoleEntry) {
+      profile = "ConsoleTextEditProfile";
+      horizSizing = "width";
+      vertSizing = "top";
+      position = "0 462";
+      extent = "640 18";
+      minExtent = "8 8";
+      visible = "1";
+      altCommand = "ConsoleEntry::eval();";
+      helpTag = "0";
+      maxLength = "255";
+      historySize = "40";
+      password = "0";
+      tabComplete = "0";
+      sinkAllKeyEvents = "1";
+      useSiblingScroller = "1";
+   };
+   new GuiScrollCtrl() {
+      internalName = "Scroll";
+      profile = "ConsoleScrollProfile";
+      horizSizing = "width";
+      vertSizing = "height";
+      position = "0 0";
+      extent = "640 462";
+      minExtent = "8 8";
+      visible = "1";
+      helpTag = "0";
+      willFirstRespond = "1";
+      hScrollBar = "alwaysOn";
+      vScrollBar = "alwaysOn";
+      lockHorizScroll = "false";
+      lockVertScroll = "false";
+      constantThumbHeight = "0";
+      childMargin = "0 0";
+
+         new GuiConsole( ConsoleMessageLogView ) {
+            profile = "GuiConsoleProfile";
+            position = "0 0";
+         };
+      };
+};
+//--- OBJECT WRITE END ---
+
+
+function ConsoleEntry::eval()
+{
+   %text = trim( ConsoleEntry.getValue() );
+   if( %text $= "" )
+      return;
+   
+   // If it's missing a trailing () and it's not a variable,
+   // append the parentheses.
+
+   if( strpos(%text, "(") == -1 && !isDefined( %text ) )
+   {
+      if(strpos(%text, "=") == -1 && strpos(%text, " ") == -1)
+      {
+         if(strpos(%text, "{") == -1 && strpos(%text, "}") == -1)
+         {
+            %text = %text @ "()";
+         }
+      }
+   }
+   
+   // Append a semicolon if need be.
+
+   %pos = strlen(%text) - 1;
+   if(strpos(%text, ";", %pos) == -1 && strpos(%text, "}") == -1)
+   {
+      %text = %text @ ";";
+   }
+   
+   // Turn off warnings for assigning from void
+   // and evaluate the snippet.
+   
+   if( !isDefined( "$Con::warnVoidAssignment" ) )
+      %oldWarnVoidAssignment = true;
+   else
+      %oldWarnVoidAssignment = $Con::warnVoidAssignment;
+   $Con::warnVoidAssignment = false;
+   
+   echo("==>" @ %text);
+   if(    !startsWith( %text, "function " )
+       && !startsWith( %text, "datablock " )
+       && !startsWith( %text, "foreach(" )
+       && !startsWith( %text, "foreach$(" )
+       && !startsWith( %text, "if(" )
+       && !startsWith( %text, "while(" )
+       && !startsWith( %text, "for(" )
+       && !startsWith( %text, "switch(" )
+       && !startsWith( %text, "switch$(" ) )
+      eval( "%result = " @ %text );
+   else
+      eval( %text );
+   $Con::warnVoidAssignment = %oldWarnVoidAssignment;
+   
+   ConsoleEntry.setValue("");
+   
+   // Echo result.
+   
+   if( %result !$= "" )
+      echo( %result );
+}
+
+function ToggleConsole(%make)
+{
+   if (%make)
+   {
+      if (ConsoleDlg.isAwake())
+      {
+         // Deactivate the console.
+         Canvas.popDialog(ConsoleDlg);
+      }
+      else
+      {
+         Canvas.pushDialog(ConsoleDlg, 99);         
+      }
+   }
+}
+
+function ConsoleDlg::hideWindow( %this )
+{
+   %this-->Scroll.setVisible( false );
+}
+
+function ConsoleDlg::showWindow( %this )
+{
+   %this-->Scroll.setVisible( true );
+}
+
+function ConsoleDlg::setAlpha(  %this, %alpha )
+{
+   if ( %alpha $= "" )
+      ConsoleScrollProfile.fillColor = $ConsoleDefaultFillColor;
+   else
+      ConsoleScrollProfile.fillColor = getWords( $ConsoleDefaultFillColor, 0, 2 ) SPC %alpha * 255.0;
+}
+
+// If a message is selected that has a source location preceding it, allow jumping to the
+// source location in Torsion by clicking on the message in the log view.
+function ConsoleMessageLogView::onMessageSelected( %this, %level, %message )
+{
+   if( !isFunction( "EditorOpenFileInTorsion" ) )
+      return;
+      
+   %fileText = getWord( %message, 0 );
+   %lineText = getWord( %message, 1 );
+   
+   if( %fileText $= "" || %lineText $= "" )
+      return;
+   
+   %fileName = makeFullPath( %fileText );
+   if( !isFile( %fileName ) )
+      return;
+      
+   %lineTextLen = strlen( %lineText );
+   if( !startsWith( %lineText, "(" ) ||
+       !endsWith( %lineText, "):" ) )
+      return;
+      
+   %lineNumber = getSubStr( %lineText, 1, %lineTextLen - 2 );
+   
+   EditorOpenFileInTorsion( %fileName, %lineNumber );
+}
