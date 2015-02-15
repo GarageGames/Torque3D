@@ -150,6 +150,8 @@ bool CustomMaterial::onAdd()
                getName(), samplerName.c_str(), mShaderDataName.c_str() ));
             Con::errorf(error);
 
+            pos = i;
+
 #if TORQUE_OPENGL
             GFXAssertFatal(0, error);
             continue;
