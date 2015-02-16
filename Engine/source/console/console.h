@@ -44,6 +44,8 @@ struct ConsoleFunctionHeader;
 class EngineEnumTable;
 typedef EngineEnumTable EnumTable;
 
+typedef U32 StringStackPtr;
+
 template< typename T > S32 TYPEID();
 
 
@@ -121,8 +123,9 @@ public:
    
    enum
    {
-      TypeInternalInt = -4,
-      TypeInternalFloat = -3,
+      TypeInternalInt = -5,
+      TypeInternalFloat = -4,
+      TypeInternalStringStackPtr = -3,
       TypeInternalStackString = -2,
       TypeInternalString = -1,
    };
@@ -166,6 +169,7 @@ public:
    S32 getSignedIntValue();
    F32 getFloatValue();
    const char *getStringValue();
+   StringStackPtr getStringStackPtr();
    bool getBoolValue();
    
    void setIntValue(U32 val);
@@ -173,6 +177,7 @@ public:
    void setFloatValue(F32 val);
    void setStringValue(const char *value);
    void setStackStringValue(const char *value);
+   void setStringStackPtrValue(StringStackPtr ptr);
    void setBoolValue(bool val);
    
    void init()
@@ -187,7 +192,7 @@ public:
    void cleanup()
    {
       if (type <= TypeInternalString &&
-          sval != typeValueEmpty && type != TypeInternalStackString )
+          sval != typeValueEmpty && type != TypeInternalStackString && type != TypeInternalStringStackPtr)
          dFree(sval);
       sval = typeValueEmpty;
       type = ConsoleValue::TypeInternalString;
@@ -219,6 +224,7 @@ public:
    static ConsoleValueRef fromValue(ConsoleValue *value) { ConsoleValueRef ref; ref.value = value; return ref; }
 
    const char *getStringValue() { return value ? value->getStringValue() : ""; }
+   StringStackPtr getStringStackPtrValue() { return value ? value->getStringStackPtr() : 0; }
 
    inline U32 getIntValue() { return value ? value->getIntValue() : 0; }
    inline S32 getSignedIntValue() { return value ? value->getSignedIntValue() : 0; }
@@ -231,10 +237,12 @@ public:
    inline operator S32() { return getSignedIntValue(); }
    inline operator F32() { return getFloatValue(); }
    inline operator bool() { return getBoolValue(); }
-
-   inline bool isString() { return value ? value->type >= ConsoleValue::TypeInternalStackString : true; }
+   
+   inline bool isStringStackPtr() { return value ? value->type == ConsoleValue::TypeInternalStringStackPtr : false; }
+   inline bool isString() { return value ? value->type >= ConsoleValue::TypeInternalStringStackPtr : true; }
    inline bool isInt() { return value ? value->type == ConsoleValue::TypeInternalInt : false; }
    inline bool isFloat() { return value ? value->type == ConsoleValue::TypeInternalFloat : false; }
+   inline S32 getType() { return value ? value->type : -1; }
 
    // Note: operators replace value
    ConsoleValueRef& operator=(const ConsoleValueRef &other);

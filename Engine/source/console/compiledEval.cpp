@@ -87,7 +87,7 @@ struct IterStackRecord
    struct StringPos
    {
       /// The raw string data on the string stack.
-      const char* mString;
+      StringStackPtr mString;
       
       /// Current parsing position.
       U32 mIndex;
@@ -286,6 +286,12 @@ inline void ExprEvalState::setStringVariable(const char *val)
 {
    AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
    currentVariable->setStringValue(val);
+}
+
+inline void ExprEvalState::setStringStackPtrVariable(StringStackPtr str)
+{
+   AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+   currentVariable->setStringStackPtrValue(str);
 }
 
 inline void ExprEvalState::setCopyVariable()
@@ -493,15 +499,25 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
 
          ConsoleValueRef ref = argv[i+1];
 
-         if (argv[i+1].isString())
-            gEvalState.setStringVariable(argv[i+1]);
-         else if (argv[i+1].isInt())
+         switch(argv[i+1].getType())
+         {
+         case ConsoleValue::TypeInternalInt:
             gEvalState.setIntVariable(argv[i+1]);
-         else if (argv[i+1].isFloat())
+            break;
+         case ConsoleValue::TypeInternalFloat:
             gEvalState.setFloatVariable(argv[i+1]);
-         else
+            break;
+         case ConsoleValue::TypeInternalStringStackPtr:
+            gEvalState.setStringStackPtrVariable(argv[i+1].getStringStackPtrValue());
+            break;
+         case ConsoleValue::TypeInternalStackString:
+         case ConsoleValue::TypeInternalString:
+         default:
             gEvalState.setStringVariable(argv[i+1]);
+            break;
+         }
       }
+
       ip = ip + (fnArgc * 2) + (2 + 6 + 1);
       curFloatTable = functionFloats;
       curStringTable = functionStrings;
@@ -583,7 +599,7 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
       Con::gCurrentRoot = this->modPath;
    }
    const char * val;
-   const char *retValue;
+   StringStackPtr retValue;
 
    // note: anything returned is pushed to CSTK and will be invalidated on the next exec()
    ConsoleValueRef returnValue;
@@ -1137,7 +1153,7 @@ breakContinue:
       		// We're falling thru here on purpose.
             
          case OP_RETURN:
-            retValue = STR.getStringValue();
+            retValue = STR.getStringValuePtr();
 
             if( iterDepth > 0 )
             {
@@ -1149,13 +1165,13 @@ breakContinue:
                }
 
                STR.rewind();
-               STR.setStringValue( retValue ); // Not nice but works.
-               retValue = STR.getStringValue();
+               STR.setStringValue( StringStackPtrRef(retValue).getPtr(&STR) ); // Not nice but works.
+               retValue = STR.getStringValuePtr();
             }
 
             // Previously the return value was on the stack and would be returned using STR.getStringValue().
             // Now though we need to wrap it in a ConsoleValueRef 
-            returnValue.value = CSTK.pushStackString(retValue);
+            returnValue.value = CSTK.pushStringStackPtr(retValue);
                
             goto execFinished;
 
@@ -1992,7 +2008,7 @@ breakContinue:
             break;
          case OP_PUSH:
             STR.push();
-            CSTK.pushString(STR.getPreviousStringValue());
+            CSTK.pushStringStackPtr(STR.getPreviousStringValuePtr());
             break;
          case OP_PUSH_UINT:
             CSTK.pushUINT(intStack[_UINT]);
@@ -2073,7 +2089,7 @@ breakContinue:
             
             if( iter.mIsStringIter )
             {
-               iter.mData.mStr.mString = STR.getStringValue();
+               iter.mData.mStr.mString = STR.getStringValuePtr();
                iter.mData.mStr.mIndex = 0;
             }
             else
@@ -2111,7 +2127,7 @@ breakContinue:
             
             if( iter.mIsStringIter )
             {
-               const char* str = iter.mData.mStr.mString;
+               const char* str = StringStackPtrRef(iter.mData.mStr.mString).getPtr(&STR);
                               
                U32 startIndex = iter.mData.mStr.mIndex;
                U32 endIndex = startIndex;

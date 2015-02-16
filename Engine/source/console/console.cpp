@@ -1756,6 +1756,8 @@ const char *ConsoleValue::getStringValue()
 {
    if(type == TypeInternalString || type == TypeInternalStackString)
       return sval;
+   else if (type == TypeInternalStringStackPtr)
+      return STR.mBuffer + (U32)sval;
    if(type == TypeInternalFloat)
       return Con::getData(TypeF32, &fval, 0);
    else if(type == TypeInternalInt)
@@ -1764,10 +1766,18 @@ const char *ConsoleValue::getStringValue()
       return Con::getData(type, dataPtr, 0, enumTable);
 }
 
+StringStackPtr ConsoleValue::getStringStackPtr()
+{
+   if (type == TypeInternalStringStackPtr)
+      return (U32)sval;
+   else
+      return (U32)-1;
+}
+
 bool ConsoleValue::getBoolValue()
 {
-   if(type == TypeInternalString || type == TypeInternalStackString)
-      return dAtob(sval);
+   if(type == TypeInternalString || type == TypeInternalStackString || type == TypeInternalStringStackPtr)
+      return dAtob(getStringValue());
    if(type == TypeInternalFloat)
       return fval > 0;
    else if(type == TypeInternalInt)
@@ -1791,7 +1801,7 @@ void ConsoleValue::setIntValue(U32 val)
       ival = val;
       if(sval != typeValueEmpty)
       {
-         if (type != TypeInternalStackString) dFree(sval);
+         if (type != TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
          sval = typeValueEmpty;
       }
       type = TypeInternalInt;
@@ -1816,7 +1826,7 @@ void ConsoleValue::setFloatValue(F32 val)
       ival = static_cast<U32>(val);
       if(sval != typeValueEmpty)
       {
-         if (type != TypeInternalStackString) dFree(sval);
+         if (type != TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
          sval = typeValueEmpty;
       }
       type = TypeInternalFloat;

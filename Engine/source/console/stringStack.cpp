@@ -90,6 +90,8 @@ void ConsoleValueStack::pushValue(ConsoleValue &variable)
       mStack[mStackPos++].setIntValue((S32)variable.getIntValue());
    case ConsoleValue::TypeInternalFloat:
       mStack[mStackPos++].setFloatValue((F32)variable.getFloatValue());
+   case ConsoleValue::TypeInternalStringStackPtr:
+      mStack[mStackPos++].setStringStackPtrValue(variable.getStringStackPtr());
    default:
       mStack[mStackPos++].setStringValue(variable.getStringValue());
    }
@@ -148,6 +150,19 @@ ConsoleValue *ConsoleValueStack::pushStackString(const char *value)
    //Con::printf("[%i]CSTK pushString %s", mStackPos, value);
 
    mStack[mStackPos++].setStackStringValue(value);
+   return &mStack[mStackPos-1];
+}
+
+ConsoleValue *ConsoleValueStack::pushStringStackPtr(StringStackPtr value)
+{
+   if (mStackPos == ConsoleValueStack::MaxStackDepth) {
+      AssertFatal(false, "Console Value Stack is empty");
+      return NULL;
+   }
+
+   //Con::printf("[%i]CSTK pushStringStackPtr %s", mStackPos, StringStackPtrRef(value).getPtr(&STR));
+
+   mStack[mStackPos++].setStringStackPtrValue(value);
    return &mStack[mStackPos-1];
 }
 

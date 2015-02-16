@@ -35,8 +35,21 @@
 #include "console/console.h"
 #endif
 
+typedef U32 StringStackPtr;
+struct StringStack;
 
+/// Helper class which stores a relative pointer in the StringStack buffer
+class StringStackPtrRef
+{
+public:
+   StringStackPtrRef() : mOffset(0) {;}
+   StringStackPtrRef(StringStackPtr offset) : mOffset(offset) {;}
 
+   StringStackPtr mOffset;
+
+   /// Get pointer to string in stack stk
+   inline char *getPtr(StringStack *stk);
+};
 
 /// Core stack for interpreter operations.
 ///
@@ -199,6 +212,16 @@ struct StringStack
       return mBuffer + mStartOffsets[mStartStackSize-1];
    }
 
+   inline StringStackPtr getStringValuePtr()
+   {
+      return (getStringValue() - mBuffer);
+   }
+
+   inline StringStackPtr getPreviousStringValuePtr()
+   {
+      return (getPreviousStringValue() - mBuffer);
+   }
+
    /// Advance the start stack, placing a zero length string on the top.
    ///
    /// @note You should use StringStack::push, not this, if you want to
@@ -322,6 +345,7 @@ public:
 
    ConsoleValue *pushString(const char *value);
    ConsoleValue *pushStackString(const char *value);
+   ConsoleValue *pushStringStackPtr(StringStackPtr ptr);
    ConsoleValue *pushUINT(U32 value);
    ConsoleValue *pushFLT(float value);
 
@@ -344,5 +368,7 @@ public:
 
 extern StringStack STR;
 extern ConsoleValueStack CSTK;
+
+inline char* StringStackPtrRef::getPtr(StringStack *stk) { return stk->mBuffer + mOffset; }
 
 #endif
