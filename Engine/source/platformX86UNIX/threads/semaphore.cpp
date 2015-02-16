@@ -25,8 +25,8 @@
 // Instead of that mess that was here before, lets use the SDL lib to deal
 // with the semaphores.
 
-#include <SDL.h>
-#include <SDL_thread.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_thread.h>
 
 struct PlatformSemaphore
 {
