@@ -474,7 +474,8 @@ void GFXPCD3D9WindowTarget::resetMode()
       // have changed.      
       if ( backbufferSize == getSize() && 
            ppFullscreen == mode.fullScreen &&
-           ppAntiAliaseLevel == mode.antialiasLevel )
+           ppAntiAliaseLevel == mode.antialiasLevel &&
+           ((pp.PresentationInterval == D3DPRESENT_INTERVAL_IMMEDIATE) == mDevice->smDisableVSync) )
          return;   
    }
 
