@@ -45,6 +45,8 @@
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
 
+#include "windowManager/platformWindowMgr.h"
+
 GFXDevice * GFXDevice::smGFXDevice = NULL;
 bool GFXDevice::smWireframe = false;
 bool GFXDevice::smDisableVSync = true;
@@ -197,6 +199,29 @@ GFXDevice::GFXDevice()
    #elif defined TORQUE_OS_PS3
       GFXShader::addGlobalMacro( "TORQUE_OS_PS3" );            
    #endif
+
+   Con::NotifyDelegate callback( this, &GFXDevice::vsyncChanged );
+   Con::addVariableNotify( "$pref::Video::disableVerticalSync", callback );
+}
+
+void GFXDevice::vsyncChanged()
+{
+   static bool sHaveWarned;
+   if (smDisableVSync && !sHaveWarned)
+   {
+      const String resString = Con::getVariable("$pref::Video::mode");
+      GFXVideoMode vm;
+      vm.parseFromString(resString);
+
+      if (!vm.fullScreen && WindowManager->isDesktopCompositionEnabled())
+      {
+         Platform::AlertOK("Warning",
+                           "It looks like desktop composition is enabled on your system.\n\n"
+                           "In this case, disabling vertical sync for windowed video modes will not have the desired effect, "
+                           "and may needlessly increase CPU utilization. You probably don't want this.");
+         sHaveWarned = true;
+      }
+   }
 }
 
 GFXDrawUtil* GFXDevice::getDrawUtil()

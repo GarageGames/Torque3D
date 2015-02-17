@@ -937,6 +937,11 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 			}
 		}
 		break;
+
+   case WM_DWMCOMPOSITIONCHANGED:
+      WindowManager->updateDesktopCompositionState();
+      break;
+
 		// Some events need to be consumed as well as queued up
 		// for later dispatch.
 	case WM_CLOSE:

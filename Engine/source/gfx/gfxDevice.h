@@ -563,6 +563,7 @@ protected:
    //-----------------------------------------------------------------------------
 protected:
 
+   void vsyncChanged();
 
    /// @name Buffer Allocation 
    /// These methods are implemented per-device and are called by the GFX layer

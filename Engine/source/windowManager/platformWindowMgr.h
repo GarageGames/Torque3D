@@ -136,6 +136,10 @@ public:
    /// This method indicates to created windows to show as normal.
    virtual void setDisplayWindow(bool set){}
 
+   /// Checks if DWM is running (Windows only)
+   virtual bool isDesktopCompositionEnabled() { return false; }
+   virtual void updateDesktopCompositionState() {}
+
 private:
    /// Process command line arguments from StandardMainLoop. This is done to
    /// allow web plugin functionality, where we are passed platform-specific

@@ -123,6 +123,9 @@ public:
    virtual void raiseCurtain();
 
    virtual void setDisplayWindow(bool set) { mDisplayWindow = set; }
+
+   virtual bool isDesktopCompositionEnabled();
+   virtual void updateDesktopCompositionState();
 };
 
 #endif
