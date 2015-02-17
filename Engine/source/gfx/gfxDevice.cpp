@@ -49,8 +49,12 @@
 
 GFXDevice * GFXDevice::smGFXDevice = NULL;
 bool GFXDevice::smWireframe = false;
+
 bool GFXDevice::smDisableVSync = true;
 bool GFXDevice::smPrevDisableVSync = GFXDevice::smDisableVSync;
+S32  GFXDevice::smFullscreenVSyncMode = VS_Auto;
+S32  GFXDevice::smWindowedVSyncMode = VS_Auto;
+
 F32 GFXDevice::smForcedPixVersion = -1.0f;
 bool GFXDevice::smDisableOcclusionQuery = false;
 bool gDisassembleAllShaders = false;
@@ -74,15 +78,23 @@ void GFXDevice::initConsole()
       "them to return only the visibile state.\n"
       "@ingroup GFX\n" );
 
-   Con::addVariable( "$pref::Video::disableVerticalSync", TypeBool, &smDisableVSync,
+   Con::addVariable( "$video::disableVerticalSync", TypeBool, &smDisableVSync,
       "Disables vertical sync on the active device.\n"
-      "@note The video mode must be reset for the change to take affect.\n"
+      "@note The video mode must be reset for the change to take effect.\n"
+      "@ingroup GFX\n" );
+   Con::addVariable( "$pref::Video::vsyncFullscreen", TypeS32, &smFullscreenVSyncMode,
+      "Sets fullscreen vertical sync mode on the active device. 0=off, 1=on, 2=auto\n"
+      "@note The video mode must be reset for the change to take effect.\n"
+      "@ingroup GFX\n" );
+   Con::addVariable( "$pref::Video::vsyncWindowed", TypeS32, &smWindowedVSyncMode,
+      "Sets windowed vertical sync mode on the active device. 0=off, 1=on, 2=auto\n"
+      "@note The video mode must be reset for the change to take effect.\n"
       "@ingroup GFX\n" );
 
    Con::addVariable( "$pref::Video::forcedPixVersion", TypeF32, &smForcedPixVersion,
       "Will force the shader model if the value is positive and less than the "
       "shader model supported by the active device.  Use 0 for fixed function.\n"
-      "@note The graphics device must be reset for the change to take affect.\n"
+      "@note The graphics device must be reset for the change to take effect.\n"
       "@ingroup GFX\n" );
 }
 
@@ -201,8 +213,33 @@ GFXDevice::GFXDevice()
       GFXShader::addGlobalMacro( "TORQUE_OS_PS3" );            
    #endif
 
-   Con::NotifyDelegate callback( this, &GFXDevice::vsyncChanged );
-   Con::addVariableNotify( "$pref::Video::disableVerticalSync", callback );
+   Con::NotifyDelegate vsCallback( this, &GFXDevice::vsyncChanged );
+   Con::addVariableNotify( "$video::disableVerticalSync", vsCallback );
+
+   Con::NotifyDelegate vmCallback( this, &GFXDevice::videoModeChanged );
+   Con::addVariableNotify( "$pref::Video::mode", vmCallback );
+}
+
+void GFXDevice::videoModeChanged()
+{
+   const String resString = Con::getVariable("$pref::Video::mode");
+   GFXVideoMode vm;
+   vm.parseFromString(resString);
+
+   // Use the mode-specific vsync value
+   VSyncMode vsm = (VSyncMode)(vm.fullScreen ? smFullscreenVSyncMode : smWindowedVSyncMode);
+   if (vsm == VS_Auto)
+   {
+      if (vm.fullScreen)
+         smDisableVSync = true; // Prefer to disable vsync
+      else
+         smDisableVSync = !WindowManager->isDesktopCompositionEnabled();
+   }
+   else
+   {
+      smDisableVSync = vsm == VS_Disabled;
+   }
+   smPrevDisableVSync = smDisableVSync;
 }
 
 void GFXDevice::vsyncChanged()
@@ -210,21 +247,25 @@ void GFXDevice::vsyncChanged()
    if (smDisableVSync == smPrevDisableVSync)
       return;
 
-   static bool sHaveWarned;
-   if (smDisableVSync && !sHaveWarned)
-   {
-      const String resString = Con::getVariable("$pref::Video::mode");
-      GFXVideoMode vm;
-      vm.parseFromString(resString);
+   const String resString = Con::getVariable("$pref::Video::mode");
+   GFXVideoMode vm;
+   vm.parseFromString(resString);
 
-      if (!vm.fullScreen && WindowManager->isDesktopCompositionEnabled())
-      {
-         Platform::AlertOK("Warning",
-                           "It looks like desktop composition is enabled on your system.\n\n"
-                           "In this case, disabling vertical sync for windowed video modes will not have the desired effect, "
-                           "and may needlessly increase CPU utilization. You probably don't want this.");
-         sHaveWarned = true;
-      }
+   // Clobber any "auto" mode settings if the user sets vsync by hand
+   if (vm.fullScreen)
+      smFullscreenVSyncMode = smDisableVSync ? VS_Disabled : VS_Enabled;
+   else
+      smWindowedVSyncMode = smDisableVSync ? VS_Disabled : VS_Enabled;
+
+   static bool sHaveWarned;
+   if (smDisableVSync && !sHaveWarned &&
+       !vm.fullScreen && WindowManager->isDesktopCompositionEnabled())
+   {
+      Platform::AlertOK("Warning",
+                        "It looks like desktop composition is enabled on your system.\n\n"
+                        "In this case, disabling vertical sync for windowed video modes will not have the desired effect, "
+                        "and may needlessly increase CPU utilization. You probably don't want this.");
+      sHaveWarned = true;
    }
    smPrevDisableVSync = smDisableVSync;
 }

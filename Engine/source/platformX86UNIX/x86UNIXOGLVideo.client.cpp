@@ -197,7 +197,7 @@ bool OpenGLDevice::activate( U32 width, U32 height, U32 bpp, bool fullScreen )
    // Do this here because we now know about the extensions:
    if ( gGLState.suppSwapInterval )
       setVerticalSync(
-         !Con::getBoolVariable( "$pref::Video::disableVerticalSync" ) );
+         !Con::getBoolVariable( "$video::disableVerticalSync" ) );
    Con::setBoolVariable("$pref::OpenGL::allowTexGen", true);
 
    return true;
@@ -362,7 +362,7 @@ bool OpenGLDevice::setScreenMode( U32 width, U32 height, U32 bpp,
    }
 
    if ( gGLState.suppSwapInterval )
-      setVerticalSync( !Con::getBoolVariable( "$pref::Video::disableVerticalSync" ) );
+      setVerticalSync( !Con::getBoolVariable( "$video::disableVerticalSync" ) );
 
    // reset the window in platform state
    SDL_SysWMinfo sysinfo;

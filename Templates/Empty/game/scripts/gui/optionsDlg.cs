@@ -140,7 +140,7 @@ function OptionsDlg::onWake(%this)
    {
       %this-->OptGraphicsFullscreenToggle.setStateOn( Canvas.isFullScreen() );
    }
-   %this-->OptGraphicsVSyncToggle.setStateOn( !$pref::Video::disableVerticalSync );
+   %this-->OptGraphicsVSyncToggle.setStateOn( !$video::disableVerticalSync );
    
    OptionsDlg.initResMenu();
    %resSelId = OptionsDlg-->OptGraphicsResolutionMenu.findText( _makePrettyResString( $pref::Video::mode ) );
@@ -355,7 +355,7 @@ function OptionsDlg::applyGraphics( %this, %testNeedApply )
 	%newBpp        = 32; // ... its not 1997 anymore.
 	%newFullScreen = %this-->OptGraphicsFullscreenToggle.getValue() ? "true" : "false";
 	%newRefresh    = %this-->OptRefreshSelectMenu.getSelected();
-	%newVsync = !%this-->OptGraphicsVSyncToggle.getValue();	
+	%newVsync = !%this-->OptGraphicsVSyncToggle.getValue();
 	%newFSAA = %this-->OptAAQualityPopup.getSelected();
 
    // Under web deployment we can't be full screen.
@@ -383,13 +383,13 @@ function OptionsDlg::applyGraphics( %this, %testNeedApply )
 	
    // Change the video mode.   
    if (  %newMode !$= $pref::Video::mode || 
-         %newVsync != $pref::Video::disableVerticalSync )
+         %newVsync != $video::disableVerticalSync )
    {
       if ( %testNeedApply )
          return true;
 
       $pref::Video::mode = %newMode;
-      $pref::Video::disableVerticalSync = %newVsync;      
+      $video::disableVerticalSync = %newVsync;
       configureCanvas();
    }
    
@@ -426,6 +426,22 @@ function OptionsDlg::_updateApplyState( %this )
    assert( isObject( %graphicsPane ) );
 
    %applyCtrl.active = %graphicsPane.isVisible() && %this.applyGraphics( true );   
+}
+
+function OptionsDlg::_fullscreenChanged( %this )
+{
+    // Switching between fullscreen and windowed can trigger the vsync mode to change,
+    // so temporarily set the new mode string to see what vsync we will get and
+    // update the UI appropriately.
+    // TODO: This is hacky, write a dedicated function for this instead.
+    %newFullScreen = %this-->OptGraphicsFullscreenToggle.getValue() ? "true" : "false";
+
+    %oldMode = $pref::Video::mode;
+    $pref::Video::mode = setWord(%oldMode, $WORD::FULLSCREEN, %newFullScreen);
+    %this-->OptGraphicsVSyncToggle.setStateOn( !$video::disableVerticalSync );
+    $pref::Video::mode = %oldMode;
+
+    %this._updateApplyState();
 }
 
 function OptionsDlg::_autoDetectQuality( %this )

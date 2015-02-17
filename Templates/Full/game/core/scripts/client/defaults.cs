@@ -47,7 +47,8 @@ $sceneLighting::purgeMethod = "lastCreated";
 $sceneLighting::cacheLighting = 1;
 
 $pref::Video::displayDevice = "D3D9";
-$pref::Video::disableVerticalSync = 1;
+$pref::Video::vsyncFullscreen = 2;
+$pref::Video::vsyncWindowed = 2;
 $pref::Video::mode = "1024 768 false 32 60 4";
 $pref::Video::defaultFenceCount = 0;
 $pref::Video::screenShotSession = 0;
