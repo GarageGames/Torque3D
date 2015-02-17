@@ -50,6 +50,7 @@
 GFXDevice * GFXDevice::smGFXDevice = NULL;
 bool GFXDevice::smWireframe = false;
 bool GFXDevice::smDisableVSync = true;
+bool GFXDevice::smPrevDisableVSync = GFXDevice::smDisableVSync;
 F32 GFXDevice::smForcedPixVersion = -1.0f;
 bool GFXDevice::smDisableOcclusionQuery = false;
 bool gDisassembleAllShaders = false;
@@ -206,6 +207,9 @@ GFXDevice::GFXDevice()
 
 void GFXDevice::vsyncChanged()
 {
+   if (smDisableVSync == smPrevDisableVSync)
+      return;
+
    static bool sHaveWarned;
    if (smDisableVSync && !sHaveWarned)
    {
@@ -222,6 +226,7 @@ void GFXDevice::vsyncChanged()
          sHaveWarned = true;
       }
    }
+   smPrevDisableVSync = smDisableVSync;
 }
 
 GFXDrawUtil* GFXDevice::getDrawUtil()
