@@ -5,7 +5,6 @@ Changelog :
 -------
 
 ###### .01a : 95% of physx3 should be working thanks to rextimmy/andr3wmac. ######
-###### .for .01b : new avatar, new weapons, new vehicles.
 ###### .02b : the Greed folder was updated to current physx3 from rextimmy, more to come
 ###### on physx3.
 ###### .03b : re-added default readme, started proper changelog.
@@ -15,6 +14,8 @@ http://www.garagegames.com/community/resources/view/22590
 ###### .05b  : alpha : first official commit, refactor was removed : half the fps were lost
 ###### .06a  : alpha : all physx support dropped, Bullet support 100%, rextimmy core physics changes in
 and GMK tested and in process of reintegration. physx3 basic support is provided by T3D
+----------------
+###### .07 goals: new car, new avatar, island textured + base scene setup. 
 ----------------
 This is a fork of the MIT Licensed Torque 3D (see http://www.garagegames.com/products/torque-3d).
 
