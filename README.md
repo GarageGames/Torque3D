@@ -13,7 +13,7 @@ http://www.garagegames.com/community/resources/view/22590
 ###### .05a  : alpha : started testing fps performances on d3d9-refactor. (avg fps on default : 103.45)
 ###### .05b  : alpha : first official commit, refactor was removed : half the fps were lost
 ###### .06a  : alpha : all physx support dropped, Bullet support 100%, rextimmy core physics changes in
-and GMK tested and in process of reintegration. physx3 basic support is provided by T3D
+###### GMK is tested and fixed and in process of reintegration. physx3 basic support is provided by T3D.
 ----------------
 ###### .07 goals: new car, new avatar, island textured + base scene setup. 
 ----------------
