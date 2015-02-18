@@ -511,7 +511,7 @@ DefineEngineFunction(fileSize, S32, ( const char* fileName ),,
 	"@brief Determines the size of a file on disk\n\n"
 
 	"@param fileName Name and path of the file to check\n"
-	"@return Returns filesize in KB, or -1 if no file\n"
+	"@return Returns filesize in bytes, or -1 if no file\n"
 
 	"@ingroup FileSystem")
 {

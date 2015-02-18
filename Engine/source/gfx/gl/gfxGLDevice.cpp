@@ -152,6 +152,9 @@ void GFXGLDevice::initGLState()
       glBindFramebuffer = &_t3d_glBindFramebuffer;
    }
 
+#ifdef TORQUE_NSIGHT_WORKAROUND
+   __GLEW_ARB_buffer_storage = false;
+#endif
 #if TORQUE_DEBUG
    if( gglHasExtension(ARB_debug_output) )
    {
@@ -176,7 +179,7 @@ void GFXGLDevice::initGLState()
    }
 #endif
 
-   PlatformGL::setVSync(0);
+   PlatformGL::setVSync(smDisableVSync ? 0 : 1);
 
    //OpenGL 3 need a binded VAO for render
    GLuint vao;

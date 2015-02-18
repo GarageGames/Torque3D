@@ -2613,21 +2613,24 @@ DefineEngineMethod( GuiControl, setValue, void, ( const char* value ),,
    object->setScriptValue( value );
 }
 
-//ConsoleMethod( GuiControl, getValue, const char*, 2, 2, "")
-DefineConsoleMethod( GuiControl, getValue, const char*, (), , "")
+DefineEngineMethod( GuiControl, getValue, const char*, (),,
+   "Get the value associated with the control.\n"
+   "@return value for the control.\n" )
 {
    return object->getScriptValue();
 }
 
-//ConsoleMethod( GuiControl, makeFirstResponder, void, 3, 3, "(bool isFirst)")
-DefineConsoleMethod( GuiControl, makeFirstResponder, void, (bool isFirst), , "(bool isFirst)")
+DefineEngineMethod( GuiControl, makeFirstResponder, void, ( bool isFirst ),,
+   "Make this control the first responder.\n"
+   "@param isFirst True to make first responder, false to not.\n" )
 {
    //object->makeFirstResponder(dAtob(argv[2]));
    object->makeFirstResponder(isFirst);
 }
 
-//ConsoleMethod( GuiControl, isActive, bool, 2, 2, "")
-DefineConsoleMethod( GuiControl, isActive, bool, (), , "")
+DefineEngineMethod( GuiControl, isActive, bool, (),,
+   "Check if this control is active or not.\n"
+   "@return True if it's active, false if not.\n" )
 {
    return object->isActive();
 }
@@ -2635,7 +2638,8 @@ DefineConsoleMethod( GuiControl, isActive, bool, (), , "")
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( GuiControl, setActive, void, ( bool state ), ( true ),
-   "" )
+   "Set the control as active or inactive."
+   "@param state True to set the control as active, false to set it as inactive.")
 {
    object->setActive( state );
 }

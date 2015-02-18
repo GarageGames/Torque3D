@@ -25,57 +25,59 @@
 #include "platform/platformNet.h"
 #include "core/util/journal/process.h"
 
+struct TcpHandle
+{
+   NetSocket mSocket;
+   S32 mDataReceived;
+
+   void notify(NetSocket sock, U32 state) 
+   {
+      // Only consider our own socket.
+      if(mSocket != sock)
+         return;
+
+      // Ok - what's the state? We do some dumb responses to given states
+      // in order to fulfill the request.
+      if(state == Net::Connected)
+      {
+         U8 reqBuffer[] = {
+            "GET / HTTP/1.0\nUser-Agent: Torque/1.0\n\n"
+         };
+
+         Net::Error e = Net::sendtoSocket(mSocket, reqBuffer, sizeof(reqBuffer));
+
+         ASSERT_EQ(Net::NoError, e)
+            << "Got an error sending our HTTP request!";
+      }
+      else
+      {
+         Process::requestShutdown();
+         mSocket = NULL;
+         ASSERT_EQ(Net::Disconnected, state)
+            << "Ended with a network error!";
+      }
+   }
+
+   void receive(NetSocket sock, RawData incomingData)
+   {
+      // Only consider our own socket.
+      if(mSocket != sock)
+         return;
+
+      mDataReceived += incomingData.size;
+   }
+};
+
 TEST(Net, TCPRequest)
 {
-   struct handle
-   {
-      NetSocket mSocket;
-      S32 mDataReceived;
-
-      void notify(NetSocket sock, U32 state) 
-      {
-         // Only consider our own socket.
-         if(mSocket != sock)
-            return;
-
-         // Ok - what's the state? We do some dumb responses to given states
-         // in order to fulfill the request.
-         if(state == Net::Connected)
-         {
-            U8 reqBuffer[] = {
-               "GET / HTTP/1.0\nUser-Agent: Torque/1.0\n\n"
-            };
-
-            Net::Error e = Net::sendtoSocket(mSocket, reqBuffer, sizeof(reqBuffer));
-
-            ASSERT_EQ(Net::NoError, e)
-               << "Got an error sending our HTTP request!";
-         }
-         else
-         {
-            Process::requestShutdown();
-            mSocket = NULL;
-            ASSERT_EQ(Net::Disconnected, state)
-               << "Ended with a network error!";
-         }
-      }
-
-      void receive(NetSocket sock, RawData incomingData)
-      {
-         // Only consider our own socket.
-         if(mSocket != sock)
-            return;
-
-         mDataReceived += incomingData.size;
-      }
-   } handler;
+   TcpHandle handler;
 
    handler.mSocket = InvalidSocket;
    handler.mDataReceived = 0;
 
    // Hook into the signals.
-   Net::smConnectionNotify. notify(&handler, &handle::notify);
-   Net::smConnectionReceive.notify(&handler, &handle::receive);
+   Net::smConnectionNotify .notify(&handler, &TcpHandle::notify);
+   Net::smConnectionReceive.notify(&handler, &TcpHandle::receive);
 
    // Open a TCP connection to garagegames.com
    handler.mSocket = Net::openConnectTo("72.246.107.193:80");
@@ -83,79 +85,81 @@ TEST(Net, TCPRequest)
    while(Process::processEvents() && (Platform::getRealMilliseconds() < limit) ) {}
 
    // Unhook from the signals.
-   Net::smConnectionNotify. remove(&handler, &handle::notify);
-   Net::smConnectionReceive.remove(&handler, &handle::receive);
+   Net::smConnectionNotify .remove(&handler, &TcpHandle::notify);
+   Net::smConnectionReceive.remove(&handler, &TcpHandle::receive);
 
    EXPECT_GT(handler.mDataReceived, 0)
       << "Didn't get any data back!";
 }
 
+struct JournalHandle
+{
+   NetSocket mSocket;
+   S32 mDataReceived;
+
+   void notify(NetSocket sock, U32 state)
+   {
+      // Only consider our own socket.
+      if(mSocket != sock)
+         return;
+
+      // Ok - what's the state? We do some dumb responses to given states
+      // in order to fulfill the request.
+      if(state == Net::Connected)
+      {
+         U8 reqBuffer[] = {
+            "GET / HTTP/1.0\nUser-Agent: Torque/1.0\n\n"
+         };
+
+         Net::Error e = Net::sendtoSocket(mSocket, reqBuffer, sizeof(reqBuffer));
+
+         ASSERT_EQ(Net::NoError, e)
+            << "Got an error sending our HTTP request!";
+      }
+      else
+      {
+         Process::requestShutdown();
+         mSocket = NULL;
+         ASSERT_EQ(Net::Disconnected, state)
+            << "Ended with a network error!";
+      }
+   }
+
+   void receive(NetSocket sock, RawData incomingData)
+   {
+      // Only consider our own socket.
+      if(mSocket != sock)
+         return;
+      mDataReceived += incomingData.size;
+   }
+
+   void makeRequest()
+   {
+      mSocket = InvalidSocket;
+      mDataReceived = 0;
+
+      // Hook into the signals.
+      Net::smConnectionNotify .notify(this, &JournalHandle::notify);
+      Net::smConnectionReceive.notify(this, &JournalHandle::receive);
+
+      // Open a TCP connection to garagegames.com
+      mSocket = Net::openConnectTo("72.246.107.193:80");
+
+      // Let the callbacks enable things to process.
+      while(Process::processEvents()) {}
+
+      // Unhook from the signals.
+      Net::smConnectionNotify .remove(this, &JournalHandle::notify);
+      Net::smConnectionReceive.remove(this, &JournalHandle::receive);
+
+      EXPECT_GT(mDataReceived, 0)
+         << "Didn't get any data back!";
+   }
+};
+
 TEST(Net, JournalTCPRequest)
 {
-   struct handle
-   {
-      NetSocket mSocket;
-      S32 mDataReceived;
-
-      void notify(NetSocket sock, U32 state)
-      {
-         // Only consider our own socket.
-         if(mSocket != sock)
-            return;
-
-         // Ok - what's the state? We do some dumb responses to given states
-         // in order to fulfill the request.
-         if(state == Net::Connected)
-         {
-            U8 reqBuffer[] = {
-               "GET / HTTP/1.0\nUser-Agent: Torque/1.0\n\n"
-            };
-
-            Net::Error e = Net::sendtoSocket(mSocket, reqBuffer, sizeof(reqBuffer));
-
-            ASSERT_EQ(Net::NoError, e)
-               << "Got an error sending our HTTP request!";
-         }
-         else
-         {
-            Process::requestShutdown();
-            mSocket = NULL;
-            ASSERT_EQ(Net::Disconnected, state)
-               << "Ended with a network error!";
-         }
-      }
-
-      void receive(NetSocket sock, RawData incomingData)
-      {
-         // Only consider our own socket.
-         if(mSocket != sock)
-            return;
-         mDataReceived += incomingData.size;
-      }
-
-      void makeRequest()
-      {
-         mSocket = InvalidSocket;
-         mDataReceived = 0;
-
-         // Hook into the signals.
-         Net::smConnectionNotify. notify(this, &handle::notify);
-         Net::smConnectionReceive.notify(this, &handle::receive);
-
-         // Open a TCP connection to garagegames.com
-         mSocket = Net::openConnectTo("72.246.107.193:80");
-
-         // Let the callbacks enable things to process.
-         while(Process::processEvents()) {}
-
-         // Unhook from the signals.
-         Net::smConnectionNotify. remove(this, &handle::notify);
-         Net::smConnectionReceive.remove(this, &handle::receive);
-
-         EXPECT_GT(mDataReceived, 0)
-            << "Didn't get any data back!";
-      }
-   } handler;
+   JournalHandle handler;
 
    Journal::Record("journalTCP.jrn");
    ASSERT_TRUE(Journal::IsRecording());

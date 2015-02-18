@@ -2920,9 +2920,15 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
    mUndoSel = 0;  
   
    scheduleMaterialUpdate();     
-}  
-  
-DefineConsoleMethod( TerrainEditor, autoMaterialLayer, void, (F32 minHeight, F32 maxHeight, F32 minSlope, F32 maxSlope, F32 coverage), , "(F32 minHeight, F32 maxHeight, F32 minSlope, F32 maxSlope , F32 coverage)")  
-{  
+}
+
+DefineEngineMethod( TerrainEditor, autoMaterialLayer, void, (F32 minHeight, F32 maxHeight, F32 minSlope, F32 maxSlope, F32 coverage),,
+   "Rule based terrain painting.\n"
+   "@param minHeight Minimum terrain height."
+   "@param maxHeight Maximum terrain height."
+   "@param minSlope Minimum terrain slope."
+   "@param maxSlope Maximum terrain slope."
+   "@param coverage Terrain coverage amount.")
+{
    object->autoMaterialLayer( minHeight,maxHeight, minSlope, maxSlope, coverage );  
 }

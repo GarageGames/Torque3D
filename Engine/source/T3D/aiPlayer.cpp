@@ -28,6 +28,8 @@
 #include "T3D/gameBase/moveManager.h"
 #include "console/engineAPI.h"
 
+#include <cfloat>
+
 static U32 sAIPlayerLoSMask = TerrainObjectType | StaticShapeObjectType | StaticObjectType;
 
 IMPLEMENT_CO_NETOBJECT_V1(AIPlayer);

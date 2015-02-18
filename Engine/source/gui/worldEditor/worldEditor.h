@@ -92,7 +92,6 @@ class WorldEditor : public EditTSCtrl
       S32 getSelectionSize();
       S32 getSelectObject(S32 index);	
       const Point3F& getSelectionCentroid();
-      const char* getSelectionCentroidText();
       const Box3F& getSelectionBounds();
       Point3F getSelectionExtent();
       F32 getSelectionRadius();
