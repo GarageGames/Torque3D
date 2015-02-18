@@ -117,6 +117,9 @@ TSStatic::TSStatic()
    mAlphaFadeEnd     = 150.0f;
    mInvertAlphaFade  = false;
    mAlphaFade = 1.0f;
+
+   // rextimmy physics integration
+   mEnablePhysicsRep = true;
    mPhysicsRep = NULL;
 
    mCollisionType = CollisionMesh;
@@ -197,6 +200,12 @@ void TSStatic::initPersistFields()
          "When set to false, the slightest bump will stop the player from walking on top of the object.\n");
    
    endGroup("Collision");
+
+   // rextimmy physics integration
+   addGroup("Physics");
+   addField("enablePhysicsRep", TypeBool, Offset(mEnablePhysicsRep, TSStatic),
+	   "@brief Creates a representation of the object in the physics plugin.\n");
+   endGroup("Physics");
 
    addGroup( "AlphaFade" );  
       addField( "alphaFadeEnable",   TypeBool,   Offset(mUseAlphaFade,    TSStatic), "Turn on/off Alpha Fade" );  
@@ -383,6 +392,10 @@ void TSStatic::prepCollision()
 void TSStatic::_updatePhysics()
 {
    SAFE_DELETE( mPhysicsRep );
+
+   // rextimmy physics integration
+   if ( !mEnablePhysicsRep )
+	   return;
 
    if ( !PHYSICSMGR || mCollisionType == None )
       return;
@@ -715,6 +728,9 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if ( mLightPlugin )
       retMask |= mLightPlugin->packUpdate(this, AdvancedStaticOptionsMask, con, mask, stream);
 
+   // rextimmy physics integration
+   stream->writeFlag( mEnablePhysicsRep );
+
    return retMask;
 }
 
@@ -780,6 +796,15 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
    if ( mLightPlugin )
    {
       mLightPlugin->unpackUpdate(this, con, stream);
+   }
+
+   // rextimmy physics integration
+   bool physicsRepFlag = stream->readFlag();
+   // GreedFixme : ok so the flag is auto-added whatever happens ?
+   if (physicsRepFlag != mEnablePhysicsRep)
+   {
+	   mEnablePhysicsRep = physicsRepFlag;
+	   _updatePhysics();
    }
 
    if ( isProperlyAdded() )

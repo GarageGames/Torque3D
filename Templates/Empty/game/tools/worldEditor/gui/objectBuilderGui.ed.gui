@@ -1120,6 +1120,23 @@ function PhysicsShapeData::create( %datablock )
    return %obj;
 }
 
+function RigidPhysicsShapeData::create( %datablock )
+{
+   %obj = new RigidPhysicsShape()
+   {
+		dataBlock = %datablock;
+		parentGroup = EWCreatorWindow.objectGroup;
+		
+      invulnerable = false;
+      damageRadius = 0;
+      areaImpulse = 0;
+      radiusDamage = 0;
+      minDamageAmount = 0;         
+   };
+
+   return %obj;
+}
+
 function ProximityMineData::create( %datablock )
 {
    %obj = new ProximityMine()

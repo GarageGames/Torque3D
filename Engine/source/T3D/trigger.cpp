@@ -603,13 +603,20 @@ void Trigger::setTriggerPolyhedron(const Polyhedron& rPolyhedron)
    {
       PhysicsCollision *colShape = PHYSICSMGR->createCollision();
 
-      MatrixF colMat( true );      
+      MatrixF colMat( true );
+	  
+	  // rextimmy physics integration
+	  colMat.scale(mObjScale);
+	  colShape->addConvex(mTriggerPolyhedron.pointList.address(), mTriggerPolyhedron.pointList.size(), colMat);
+
+	  /*
       colMat.displace( Point3F( 0, 0, mObjBox.getExtents().z * 0.5f * mObjScale.z ) );
       
       colShape->addBox( mObjBox.getExtents() * 0.5f * mObjScale, colMat );
       //MatrixF colMat( true );
       //colMat.scale( mObjScale );
       //colShape->addConvex( mTriggerPolyhedron.pointList.address(), mTriggerPolyhedron.pointList.size(), colMat );
+	  */
 
       PhysicsWorld *world = PHYSICSMGR->getWorld( isServerObject() ? "server" : "client" );
       mPhysicsRep = PHYSICSMGR->createBody();

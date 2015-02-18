@@ -52,8 +52,13 @@ public:
       BF_KINEMATIC = BIT( 1 ),
 
       /// The body responds to contacts but does not push forces into others.
-      BF_DEBRIS = BIT( 2 )
+      BF_DEBRIS = BIT( 2 )/* added cautionnously ..*/
+	  ,
+	  BF_CCD = BIT( 3 )
    };
+
+   // rextimmy physics integration
+   virtual void moveKinematicTo(const MatrixF &xfm) = 0;
 
    /// Initialize the body with a collision shape 
    /// and basic physics properties.

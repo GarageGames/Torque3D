@@ -20,11 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _PHYSICSSHAPE_H_
-#define _PHYSICSSHAPE_H_
+#ifndef _RIGIDPHYSICSSHAPE_H_
+#define _RIGIDPHYSICSSHAPE_H_
 
-#ifndef _GAMEBASE_H_
-   #include "T3D/gameBase/gameBase.h"
+#ifndef _SHAPEBASE_H_
+   #include "T3D/shapeBase.h"
 #endif
 #ifndef __RESOURCE_H__
    #include "core/resource.h"
@@ -49,18 +49,18 @@ class PhysicsDebrisData;
 class ExplosionData;
 
 
-class PhysicsShapeData : public GameBaseData
+class RigidPhysicsShapeData : public ShapeBaseData
 {
-   typedef GameBaseData Parent;
+   typedef ShapeBaseData Parent;
 
    void _onResourceChanged( const Torque::Path &path );
 
 public:
 
-   PhysicsShapeData();
-   virtual ~PhysicsShapeData();
+   RigidPhysicsShapeData();
+   virtual ~RigidPhysicsShapeData();
 
-   DECLARE_CONOBJECT(PhysicsShapeData);
+   DECLARE_CONOBJECT(RigidPhysicsShapeData);
    static void initPersistFields();   
    bool onAdd();
    void onRemove();
@@ -112,8 +112,9 @@ public:
    // The density of this object used for water buoyancy effects.
    F32 buoyancyDensity;
 
-   // rextimmy physics integration
+   // Continuous Collision Detection support,ignored if not supported by underlying plugin
    bool ccdEnabled;
+
 
    enum SimType
    {
@@ -136,25 +137,23 @@ public:
    
    SimObjectRef< PhysicsDebrisData > debris;   
    SimObjectRef< ExplosionData > explosion;   
-   SimObjectRef< PhysicsShapeData > destroyedShape;
+   SimObjectRef< RigidPhysicsShapeData > destroyedShape;
 };
 
-typedef PhysicsShapeData::SimType PhysicsSimType;
-DefineEnumType( PhysicsSimType );
+typedef RigidPhysicsShapeData::SimType RigidPhysicsSimType;
+DefineEnumType( RigidPhysicsSimType );
 
 class TSThread;
 
 
 /// A simple single body dynamic physics object.
-class PhysicsShape : public GameBase
+class RigidPhysicsShape : public ShapeBase
 {
-   typedef GameBase Parent;
+   typedef ShapeBase Parent;
 
 protected:
-   // rextimmy physics integration
-   /// Datablock for the physicsshapedata
-	PhysicsShapeData *mDatablock;
-
+   /// Datablock
+   RigidPhysicsShapeData *mDataBlock;
    /// The abstracted physics actor.
    PhysicsBody *mPhysicsRep;
 
@@ -178,19 +177,19 @@ protected:
    /// The previous and current render states.
    PhysicsState mRenderState[2];
 
-   /// True if the PhysicsShape has been destroyed ( gameplay ).
+   /// True if the RigidPhysicsShape has been destroyed ( gameplay ).
    bool mDestroyed;
 
    /// Enables automatic playing of the animation named "ambient" (if it exists) 
-   /// when the PhysicsShape is loaded.
+   /// when the RigidPhysicsShape is loaded.
    bool mPlayAmbient;
    S32 mAmbientSeq;
    TSThread* mAmbientThread;
 
-   /// If a specified to create one in the PhysicsShape data, this is the 
-   /// subshape created when this PhysicsShape is destroyed.
-   /// Is only assigned (non null) on the serverside PhysicsShape.
-   SimObjectPtr< PhysicsShape > mDestroyedShape;
+   /// If a specified to create one in the RigidPhysicsShape data, this is the 
+   /// subshape created when this RigidPhysicsShape is destroyed.
+   /// Is only assigned (non null) on the serverside RigidPhysicsShape.
+   SimObjectPtr< RigidPhysicsShape > mDestroyedShape;
 
    ///
    enum MaskBits 
@@ -229,13 +228,10 @@ protected:
 
 public:
 
-   PhysicsShape();
-   virtual ~PhysicsShape();
+   RigidPhysicsShape();
+   virtual ~RigidPhysicsShape();
 
-   DECLARE_CONOBJECT( PhysicsShape );
-
-   /// Returns the PhysicsShapeData datablock.
-   PhysicsShapeData* getDataBlock() { return static_cast<PhysicsShapeData*>( Parent::getDataBlock() ); }
+   DECLARE_CONOBJECT( RigidPhysicsShape );
 
    // SimObject
    static void consoleInit();
@@ -265,10 +261,18 @@ public:
    void destroy();
    void restore();
 
+   //Check collisions and triggers
+   void checkCollisions();
+   static void findCallback(SceneObject* obj,void * key);
+   virtual bool buildPolyList(   PolyListContext context, 
+                                    AbstractPolyList* polyList, 
+                                    const Box3F& box, 
+                                    const SphereF& sphere );
+
    /// Save the current transform as where we return to when a physics reset
    /// event occurs. This is automatically set in onAdd but some manipulators
    /// such as Prefab need to make use of this.
    void storeRestorePos();
 };
 
-#endif // _PHYSICSSHAPE_H_
+#endif

@@ -29,16 +29,32 @@
 
 //----------------------------------------------------------------------------
 
+// rextimmy physics integration
+class PhysicsBody;
+
 struct StaticShapeData: public ShapeBaseData {
    typedef ShapeBaseData Parent;
 
-  public:
+   /// The different types of mesh data types
+   enum MeshType
+   {
+	   None = 0,            ///< No mesh
+	   Bounds = 1,          ///< Bounding box of the shape
+	   CollisionMesh = 2,   ///< Specifically designated collision meshes
+	   VisibleMesh = 3      ///< Rendered mesh polygons
+   };
+
    StaticShapeData();
 
    bool  noIndividualDamage;
    S32   dynamicTypeField;
    bool  isShielded;
    F32   energyPerDamagePoint;
+
+   // rextimmy physics integration
+   bool enablePhysicsRep;
+   bool kinematic;
+   MeshType collisionType;
 
    //
    DECLARE_CONOBJECT(StaticShapeData);
@@ -47,6 +63,9 @@ struct StaticShapeData: public ShapeBaseData {
    virtual void unpackData(BitStream* stream);
 };
 
+// rextimmy physics integration
+typedef StaticShapeData::MeshType SSDMeshType;
+DefineEnumType(SSDMeshType);
 
 //----------------------------------------------------------------------------
 
@@ -57,7 +76,14 @@ class StaticShape: public ShapeBase
    StaticShapeData*  mDataBlock;
    bool              mPowered;
 
+   // rextimmy physics integration
+   PhysicsBody *mPhysicsRep;
+
+
    void onUnmount(ShapeBase* obj,S32 node);
+
+   // rextimmy physics integration
+   void _createPhysics();
 
 protected:
    enum MaskBits {

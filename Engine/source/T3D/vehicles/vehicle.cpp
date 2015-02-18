@@ -47,6 +47,10 @@
 #include "gfx/gfxDrawUtil.h"
 #include "materials/materialDefinition.h"
 
+// rextimmy physics integration
+#include "T3D/physics/physicsPlugin.h"
+#include "T3D/physics/physicsBody.h"
+#include "T3D/physics/physicsCollision.h"
 
 namespace {
 
@@ -204,6 +208,9 @@ VehicleData::VehicleData()
 
    collDamageThresholdVel = 20;
    collDamageMultiplier   = 0.05f;
+
+   // rextimmy physics integration
+   enablePhysicsRep = true;
 }
 
 
@@ -316,6 +323,9 @@ void VehicleData::packData(BitStream* stream)
    stream->write(medSplashSoundVel);
    stream->write(hardSplashSoundVel);
 
+   // rextimmy physics integration
+   stream->write(enablePhysicsRep);
+
    // write the water sound profiles
    for(i = 0; i < MaxSounds; i++)
       if(stream->writeFlag(waterSound[i]))
@@ -412,6 +422,9 @@ void VehicleData::unpackData(BitStream* stream)
    stream->read(&medSplashSoundVel);
    stream->read(&hardSplashSoundVel);
 
+   // rextimmy physics integration
+   stream->read(&enablePhysicsRep);
+
    // write the water sound profiles
    for(i = 0; i < MaxSounds; i++)
       if(stream->readFlag())
@@ -465,6 +478,12 @@ void VehicleData::unpackData(BitStream* stream)
 
 void VehicleData::initPersistFields()
 {
+   // rextimmy physics integration
+   addGroup("Physics");
+      addField( "enablePhysicsRep", TypeBool, Offset( enablePhysicsRep, VehicleData ),
+      "@brief Creates a representation of the object in the physics plugin.\n");
+   endGroup("Physics");
+
    addField( "jetForce", TypeF32, Offset(jetForce, VehicleData),
       "@brief Additional force applied to the vehicle when it is jetting.\n\n"
       "For WheeledVehicles, the force is applied in the forward direction. For "
@@ -682,12 +701,36 @@ Vehicle::Vehicle()
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBox.maxExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBoxCountDown = sWorkingQueryBoxStaleThreshold;
+
+   // rextimmy physics integration
+   mPhysicsRep = NULL ;
 }
 
 U32 Vehicle::getCollisionMask()
 {
    AssertFatal(false, "Vehicle::getCollisionMask is pure virtual!");
    return 0;
+}
+
+// rextimmy physics integration
+void Vehicle::_createPhysics()
+{
+	SAFE_DELETE(mPhysicsRep);
+
+	if (!PHYSICSMGR && !mDataBlock->enablePhysicsRep)
+		return;
+
+	TSShape *shape = mShapeInstance->getShape();
+	PhysicsCollision *colShape = NULL;
+	colShape = shape->buildColShape(false, getScale());
+
+	if (colShape)
+	{
+		PhysicsWorld *world = PHYSICSMGR->getWorld(isServerObject() ? "server" : "client");
+		mPhysicsRep = PHYSICSMGR->createBody();
+		mPhysicsRep->init(colShape, 0, PhysicsBody::BF_KINEMATIC, this, world);
+		mPhysicsRep->setTransform(getTransform());
+	}
 }
 
 Point3F Vehicle::getVelocity() const
@@ -776,11 +819,17 @@ bool Vehicle::onAdd()
    mConvex.box.maxExtents.convolve(mObjScale);
    mConvex.findNodeTransform();
 
+   // rextimmy physics integration
+   _createPhysics();
+
    return true;
 }
 
 void Vehicle::onRemove()
 {
+   // rextimmy physics integration
+   SAFE_DELETE (mPhysicsRep )
+
    U32 i=0;
    for( i=0; i<VehicleData::VC_NUM_DUST_EMITTERS; i++ )
    {
@@ -880,6 +929,13 @@ void Vehicle::processTick(const Move* move)
       setPosition(mRigid.linPosition, mRigid.angPosition);
       setMaskBits(PositionMask);
       updateContainer();
+
+	  // rextimmy physics integration
+	  
+	  // TODO: Only update when position has actually changed
+	  // no need to check if mDataBlock->enablePhysicsRep is false as mPhysicsRep will be NULL if it is
+	  if (mPhysicsRep)
+		  mPhysicsRep->moveKinematicTo(getTransform());
    }
 }
 

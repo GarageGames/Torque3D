@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "T3D/physics/physicsShape.h"
+#include "T3D/physics/rigidPhysicsShape.h"
 
 #include "console/consoleTypes.h"
 #include "core/stream/bitStream.h"
@@ -33,8 +33,10 @@
 #include "T3D/physics/physicsCollision.h"
 #include "collision/concretePolyList.h"
 #include "ts/tsShapeInstance.h"
+#include "T3D/tsStatic.h"
 #include "scene/sceneRenderState.h"
 #include "gfx/gfxTransformSaver.h"
+#include "T3D/trigger.h"
 #include "T3D/physics/physicsDebris.h"
 #include "T3D/fx/explosion.h"
 #include "T3D/containerQuery.h"
@@ -43,28 +45,30 @@
 
 using namespace Torque;
 
-bool PhysicsShape::smNoCorrections = false;
-bool PhysicsShape::smNoSmoothing = false;
+bool RigidPhysicsShape::smNoCorrections = false;
+bool RigidPhysicsShape::smNoSmoothing = false;
+//collision filter/mask
+static U32 sCollisionFilter = TriggerObjectType|GameBaseObjectType|StaticShapeObjectType;
 
-ImplementEnumType( PhysicsSimType,
+ImplementEnumType( RigidPhysicsSimType,
    "How to handle the physics simulation with the client's and server.\n"
    "@ingroup Physics\n\n")
-   { PhysicsShapeData::SimType_ClientOnly,    "ClientOnly", "Only handle physics on the client.\n"  },
-   { PhysicsShapeData::SimType_ServerOnly,   "ServerOnly", "Only handle physics on the server.\n" },
-   { PhysicsShapeData::SimType_ClientServer,  "ClientServer", "Handle physics on both the client and server.\n"   }
+   { RigidPhysicsShapeData::SimType_ClientOnly,    "ClientOnly", "Only handle physics on the client.\n"  },
+   { RigidPhysicsShapeData::SimType_ServerOnly,   "ServerOnly", "Only handle physics on the server.\n" },
+   { RigidPhysicsShapeData::SimType_ClientServer,  "ClientServer", "Handle physics on both the client and server.\n"   }
 EndImplementEnumType;
 
 
-IMPLEMENT_CO_DATABLOCK_V1( PhysicsShapeData );
+IMPLEMENT_CO_DATABLOCK_V1( RigidPhysicsShapeData );
 
-ConsoleDocClass( PhysicsShapeData,
+ConsoleDocClass( RigidPhysicsShapeData,
    
-   "@brief Defines the properties of a PhysicsShape.\n\n"
-   "@see PhysicsShape.\n"   
+   "@brief Defines the properties of a RigidPhysicsShape.\n\n"
+   "@see RigidPhysicsShape.\n"   
    "@ingroup Physics"
 );
 
-PhysicsShapeData::PhysicsShapeData()
+RigidPhysicsShapeData::RigidPhysicsShapeData()
    :  shapeName( NULL ),
       mass( 1.0f ),
       dynamicFriction( 0.0f ),
@@ -76,69 +80,69 @@ PhysicsShapeData::PhysicsShapeData()
       angularSleepThreshold( 1.0f ),
       waterDampingScale( 1.0f ),
       buoyancyDensity( 0.0f ),
-	  
-	  // rextimmy physics integration
-	  ccdEnabled( false ),
+      ccdEnabled( false ),
       simType( SimType_ClientServer )      
 {
 }
 
-PhysicsShapeData::~PhysicsShapeData()
+RigidPhysicsShapeData::~RigidPhysicsShapeData()
 {
 }
 
-void PhysicsShapeData::initPersistFields()
+void RigidPhysicsShapeData::initPersistFields()
 {
    Parent::initPersistFields();
 
    addGroup("Media");
 
-      addField( "shapeName", TypeShapeFilename, Offset( shapeName, PhysicsShapeData ),
+      addField( "shapeName", TypeShapeFilename, Offset( shapeName, RigidPhysicsShapeData ),
          "@brief Path to the .DAE or .DTS file to use for this shape.\n\n"
          "Compatable with Live-Asset Reloading. ");
 
-      addField( "debris", TYPEID< SimObjectRef<PhysicsDebrisData> >(), Offset( debris, PhysicsShapeData ),
+      addField( "debris", TYPEID< SimObjectRef<PhysicsDebrisData> >(), Offset( debris, RigidPhysicsShapeData ),
          "@brief Name of a PhysicsDebrisData to spawn when this shape is destroyed (optional)." );
 
-      addField( "explosion", TYPEID< SimObjectRef<ExplosionData> >(), Offset( explosion, PhysicsShapeData ),
+      addField( "explosion", TYPEID< SimObjectRef<ExplosionData> >(), Offset( explosion, RigidPhysicsShapeData ),
          "@brief Name of an ExplosionData to spawn when this shape is destroyed (optional)." );
 
-      addField( "destroyedShape", TYPEID< SimObjectRef<PhysicsShapeData> >(), Offset( destroyedShape, PhysicsShapeData ),
-         "@brief Name of a PhysicsShapeData to spawn when this shape is destroyed (optional)." );
+      addField( "destroyedShape", TYPEID< SimObjectRef<RigidPhysicsShapeData> >(), Offset( destroyedShape, RigidPhysicsShapeData ),
+         "@brief Name of a RigidPhysicsShapeData to spawn when this shape is destroyed (optional)." );
 
    endGroup("Media");
 
    addGroup( "Physics" );
 
-   // rextimmy physics integration
-   addField("ccd", TypeBool, Offset(ccdEnabled, PhysicsShapeData),
-		 "@brief Enable CCD support for this body.\n\n"
-		 "Continuous Collision Detection support for fast moving objects.\n"
-		 "Continuous Collision Detection support for fast moving objects.\n");
+      addField( "ccd", TypeBool, Offset( ccdEnabled, RigidPhysicsShapeData ),
+         "@brief Enable CCD support for this body.\n\n"
+         "Continuous Collision Detection support for fast moving objects.\n"
+         "@note Currently only supported in the PhysX 3 physics plugin.");
 
-      addField( "mass", TypeF32, Offset( mass, PhysicsShapeData ),
+      //remove the ShapeBaseData mass field and add our own
+      removeField("mass");
+
+      addField( "mass", TypeF32, Offset( mass, RigidPhysicsShapeData ),
          "@brief Value representing the mass of the shape.\n\n"
          "A shape's mass influences the magnitude of any force exerted on it. "
-         "For example, a PhysicsShape with a large mass requires a much larger force to move than "
+         "For example, a RigidPhysicsShape with a large mass requires a much larger force to move than "
          "the same shape with a smaller mass.\n"
          "@note A mass of zero will create a kinematic shape while anything greater will create a dynamic shape.");
 
-      addField( "friction", TypeF32, Offset( dynamicFriction, PhysicsShapeData ),
+      addField( "friction", TypeF32, Offset( dynamicFriction, RigidPhysicsShapeData ),
          "@brief Coefficient of kinetic %friction to be applied to the shape.\n\n" 
          "Kinetic %friction reduces the velocity of a moving object while it is in contact with a surface. "
          "A higher coefficient will result in a larger velocity reduction. "
          "A shape's friction should be lower than it's staticFriction, but larger than 0.\n\n"
-         "@note This value is only applied while an object is in motion. For an object starting at rest, see PhysicsShape::staticFriction");
+         "@note This value is only applied while an object is in motion. For an object starting at rest, see RigidPhysicsShape::staticFriction");
 
-      addField( "staticFriction", TypeF32, Offset( staticFriction, PhysicsShapeData ),
+      addField( "staticFriction", TypeF32, Offset( staticFriction, RigidPhysicsShapeData ),
          "@brief Coefficient of static %friction to be applied to the shape.\n\n" 
          "Static %friction determines the force needed to start moving an at-rest object in contact with a surface. "
          "If the force applied onto shape cannot overcome the force of static %friction, the shape will remain at rest. "
          "A larger coefficient will require a larger force to start motion. "
-         "This value should be larger than zero and the physicsShape's friction.\n\n"
-         "@note This value is only applied while an object is at rest. For an object in motion, see PhysicsShape::friction");
+         "This value should be larger than zero and the RigidPhysicsShape's friction.\n\n"
+         "@note This value is only applied while an object is at rest. For an object in motion, see RigidPhysicsShape::friction");
 
-      addField( "restitution", TypeF32, Offset( restitution, PhysicsShapeData ),
+      addField( "restitution", TypeF32, Offset( restitution, RigidPhysicsShapeData ),
          "@brief Coeffecient of a bounce applied to the shape in response to a collision.\n\n"
          "Restitution is a ratio of a shape's velocity before and after a collision. "
          "A value of 0 will zero out a shape's post-collision velocity, making it stop on contact. "
@@ -147,45 +151,45 @@ void PhysicsShapeData::initPersistFields()
          "@note Values near or equaling 1.0 are likely to cause undesirable results in the physics simulation."
          " Because of this it is reccomended to avoid values close to 1.0");
 
-      addField( "linearDamping", TypeF32, Offset( linearDamping, PhysicsShapeData ),
+      addField( "linearDamping", TypeF32, Offset( linearDamping, RigidPhysicsShapeData ),
          "@brief Value that reduces an object's linear velocity over time.\n\n"
          "Larger values will cause velocity to decay quicker.\n\n" );
 
-      addField( "angularDamping", TypeF32, Offset( angularDamping, PhysicsShapeData ),
+      addField( "angularDamping", TypeF32, Offset( angularDamping, RigidPhysicsShapeData ),
          "@brief Value that reduces an object's rotational velocity over time.\n\n"
          "Larger values will cause velocity to decay quicker.\n\n" );
 
-      addField( "linearSleepThreshold", TypeF32, Offset( linearSleepThreshold, PhysicsShapeData ),
+      addField( "linearSleepThreshold", TypeF32, Offset( linearSleepThreshold, RigidPhysicsShapeData ),
          "@brief Minimum linear velocity before the shape can be put to sleep.\n\n"
          "This should be a positive value. Shapes put to sleep will not be simulated in order to save system resources.\n\n"
          "@note The shape must be dynamic.");
 
-      addField( "angularSleepThreshold", TypeF32, Offset( angularSleepThreshold, PhysicsShapeData ),
+      addField( "angularSleepThreshold", TypeF32, Offset( angularSleepThreshold, RigidPhysicsShapeData ),
          "@brief Minimum rotational velocity before the shape can be put to sleep.\n\n"
          "This should be a positive value. Shapes put to sleep will not be simulated in order to save system resources.\n\n"
          "@note The shape must be dynamic.");
 
-      addField( "waterDampingScale", TypeF32, Offset( waterDampingScale, PhysicsShapeData ),
+      addField( "waterDampingScale", TypeF32, Offset( waterDampingScale, RigidPhysicsShapeData ),
          "@brief Scale to apply to linear and angular dampening while underwater.\n\n "
          "Used with the waterViscosity of the  "
          "@see angularDamping linearDamping" );
 
-      addField( "buoyancyDensity", TypeF32, Offset( buoyancyDensity, PhysicsShapeData ),
+      addField( "buoyancyDensity", TypeF32, Offset( buoyancyDensity, RigidPhysicsShapeData ),
          "@brief The density of the shape for calculating buoyant forces.\n\n"
-         "The result of the calculated buoyancy is relative to the density of the WaterObject the PhysicsShape is within.\n\n"
+         "The result of the calculated buoyancy is relative to the density of the WaterObject the RigidPhysicsShape is within.\n\n"
          "@see WaterObject::density");
 
    endGroup( "Physics" );   
 
    addGroup( "Networking" );
 
-      addField( "simType", TYPEID< PhysicsShapeData::SimType >(), Offset( simType, PhysicsShapeData ),
+      addField( "simType", TYPEID< RigidPhysicsShapeData::SimType >(), Offset( simType, RigidPhysicsShapeData ),
          "@brief Controls whether this shape is simulated on the server, client, or both physics simulations.\n\n" );
 
    endGroup( "Networking" );   
 }
 
-void PhysicsShapeData::packData( BitStream *stream )
+void RigidPhysicsShapeData::packData( BitStream *stream )
 { 
    Parent::packData( stream );
 
@@ -201,8 +205,6 @@ void PhysicsShapeData::packData( BitStream *stream )
    stream->write( angularSleepThreshold );
    stream->write( waterDampingScale );
    stream->write( buoyancyDensity );
-
-   // rextimmy physics integration
    stream->write( ccdEnabled );
 
    stream->writeInt( simType, SimType_Bits );
@@ -212,7 +214,7 @@ void PhysicsShapeData::packData( BitStream *stream )
    stream->writeRangedU32( destroyedShape ? destroyedShape->getId() : 0, 0, DataBlockObjectIdLast );
 }
 
-void PhysicsShapeData::unpackData( BitStream *stream )
+void RigidPhysicsShapeData::unpackData( BitStream *stream )
 {
    Parent::unpackData(stream);
 
@@ -228,8 +230,6 @@ void PhysicsShapeData::unpackData( BitStream *stream )
    stream->read( &angularSleepThreshold );
    stream->read( &waterDampingScale );
    stream->read( &buoyancyDensity );
-
-   // rextimmy physics integration
    stream->read( &ccdEnabled );
 
    simType = (SimType)stream->readInt( SimType_Bits );
@@ -239,22 +239,22 @@ void PhysicsShapeData::unpackData( BitStream *stream )
    destroyedShape = stream->readRangedU32( 0, DataBlockObjectIdLast );
 }
 
-bool PhysicsShapeData::onAdd()
+bool RigidPhysicsShapeData::onAdd()
 {
    if ( !Parent::onAdd() )
       return false;
 
-   ResourceManager::get().getChangedSignal().notify( this, &PhysicsShapeData::_onResourceChanged );
+   ResourceManager::get().getChangedSignal().notify( this, &RigidPhysicsShapeData::_onResourceChanged );
    return true;
 }
 
-void PhysicsShapeData::onRemove()
+void RigidPhysicsShapeData::onRemove()
 {
-   ResourceManager::get().getChangedSignal().remove( this, &PhysicsShapeData::_onResourceChanged );
+   ResourceManager::get().getChangedSignal().remove( this, &RigidPhysicsShapeData::_onResourceChanged );
    Parent::onRemove();
 }
 
-void PhysicsShapeData::_onResourceChanged( const Torque::Path &path )
+void RigidPhysicsShapeData::_onResourceChanged( const Torque::Path &path )
 {
 	if ( path != Path( shapeName ) )
       return;
@@ -266,7 +266,7 @@ void PhysicsShapeData::_onResourceChanged( const Torque::Path &path )
    reloadShape = ResourceManager::get().load( shapeName );
    if ( !bool(reloadShape) )
    {
-      Con::warnf( ConsoleLogEntry::General, "PhysicsShapeData::_onResourceChanged: Could not reload %s.", path.getFileName().c_str() );
+      Con::warnf( ConsoleLogEntry::General, "RigidPhysicsShapeData::_onResourceChanged: Could not reload %s.", path.getFileName().c_str() );
       return;
    }
 
@@ -282,7 +282,7 @@ void PhysicsShapeData::_onResourceChanged( const Torque::Path &path )
    mReloadSignal.trigger();
 }
 
-bool PhysicsShapeData::preload( bool server, String &errorBuffer )
+bool RigidPhysicsShapeData::preload( bool server, String &errorBuffer )
 {
    if ( !Parent::preload( server, errorBuffer ) )
       return false;
@@ -291,13 +291,13 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
    // we have to fail completely.
    if ( !PHYSICSMGR )
    {
-      errorBuffer = "PhysicsShapeData::preload - No physics plugin is active!";
+      errorBuffer = "RigidPhysicsShapeData::preload - No physics plugin is active!";
       return false;
    }
 
    if ( !shapeName || !shapeName[0] ) 
    {
-      errorBuffer = "PhysicsShapeData::preload - No shape name defined.";
+      errorBuffer = "RigidPhysicsShapeData::preload - No shape name defined.";
       return false;
    }
 
@@ -305,7 +305,7 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
    shape = ResourceManager::get().load( shapeName );
    if ( bool(shape) == false )
    {
-      errorBuffer = String::ToString( "PhysicsShapeData::preload - Unable to load shape '%s'.", shapeName );
+      errorBuffer = String::ToString( "RigidPhysicsShapeData::preload - Unable to load shape '%s'.", shapeName );
       return false;
    }
 
@@ -318,97 +318,27 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
       // we need to fail... can't have a shape without collision.
       if ( !colShape )
       {
-         errorBuffer = String::ToString( "PhysicsShapeData::preload - No collision found for shape '%s'.", shapeName );
+         errorBuffer = String::ToString( "RigidPhysicsShapeData::preload - No collision found for shape '%s'.", shapeName );
          return false;
       }
    }   
-
-   // My convex demcomposion test
-   /*
-   // Get the verts and triangles for the first visible detail.
-   ConcretePolyList polyList;
-   polyList.setTransform( &MatrixF::Identity, Point3F::One );
-   TSShapeInstance shapeInst( shape, false );
-   shapeInst.animate(0);
-   if ( !shapeInst.buildPolyList( &polyList, 0 ) )
-      return false;
-
-   // Gah... Ratcliff's lib works on doubles... why, oh why?
-   Vector<F64> doubleVerts;
-   doubleVerts.setSize( polyList.mVertexList.size() * 3 );
-   for ( U32 i=0; i < polyList.mVertexList.size(); i++ )
-   {
-      doubleVerts[ ( i * 3 ) + 0 ] = (F64)polyList.mVertexList[i].x;
-      doubleVerts[ ( i * 3 ) + 1 ] = (F64)polyList.mVertexList[i].y;
-      doubleVerts[ ( i * 3 ) + 2 ] = (F64)polyList.mVertexList[i].z;
-   }
-
-   using namespace ConvexDecomposition;
-
-   class ConvexBuilder : public ConvexDecompInterface
-   {
-   public:
-
-      ConvexBuilder() { }
-
-      ~ConvexBuilder() 
-      {
-         for ( U32 i=0; i < mHulls.size(); i++ )
-            delete mHulls[i];
-      }
-
-      virtual void ConvexDecompResult( ConvexResult &result )
-      {
-         FConvexResult *hull = new FConvexResult( result );
-         mHulls.push_back( hull );
-      }
-
-      Vector<FConvexResult*> mHulls;
-   };
-
- 	DecompDesc d;
-   d.mVcount       =	polyList.mVertexList.size();
-   d.mVertices     = doubleVerts.address();
-   d.mTcount       = polyList.mIndexList.size() / 3;
-   d.mIndices      = polyList.mIndexList.address();
-   d.mDepth        = 3;
-   d.mCpercent     = 20.0f;
-   d.mPpercent     = 30.0f;
-   d.mMaxVertices  = 32;
-   d.mSkinWidth    = 0.05f; // Need to expose this!
-
-   ConvexBuilder builder;
-   d.mCallback = &builder;
- 
-   if ( performConvexDecomposition( d ) < 1 || builder.mHulls.empty() )
-      return false;
-
-   // Add all the convex hull results into the collision shape.
-   colShape = PHYSICSMGR->createCollision();
-   for ( U32 i=0; i < builder.mHulls.size(); i++ )
-      colShape->addConvex( (const Point3F*)builder.mHulls[i]->mHullVertices, 
-                           builder.mHulls[i]->mHullVcount,
-                           MatrixF::Identity );
-   */
 
    return true;
 }
 
 
-IMPLEMENT_CO_NETOBJECT_V1(PhysicsShape);
+IMPLEMENT_CO_NETOBJECT_V1(RigidPhysicsShape);
 
-ConsoleDocClass( PhysicsShape,
+ConsoleDocClass( RigidPhysicsShape,
    
    "@brief Represents a destructible physical object simulated through the plugin system.\n\n"
-   "@see PhysicsShapeData.\n"   
+   "@see RigidPhysicsShapeData.\n"   
    "@ingroup Physics"
 );
 
-PhysicsShape::PhysicsShape()
+RigidPhysicsShape::RigidPhysicsShape()
    :  mPhysicsRep( NULL ),
-
-      // rextimmy physics integration
-	  mDatablock( NULL ),
+      mDataBlock( NULL ),
       mWorld( NULL ),
       mShapeInst( NULL ),
       mResetPos( MatrixF::Identity ),
@@ -421,20 +351,20 @@ PhysicsShape::PhysicsShape()
    mTypeMask |= DynamicShapeObjectType;
 }
 
-PhysicsShape::~PhysicsShape()
+RigidPhysicsShape::~RigidPhysicsShape()
 {
 }
 
-void PhysicsShape::consoleInit()
+void RigidPhysicsShape::consoleInit()
 {
-   Con::addVariable( "$PhysicsShape::noCorrections", TypeBool, &PhysicsShape::smNoCorrections,
+   Con::addVariable( "$RigidPhysicsShape::noCorrections", TypeBool, &RigidPhysicsShape::smNoCorrections,
      "@brief Determines if the shape will recieve corrections from the server or "
      "will instead be allowed to diverge.\n\n"
      "In the event that the client and server object positions/orientations "
      "differ and if this variable is true, the server will attempt to \'correct\' "
      "the client object to keep it in sync. Otherwise, client and server objects may fall out of sync.\n\n");
 
-   Con::addVariable( "$PhysicsShape::noSmoothing", TypeBool, &PhysicsShape::smNoSmoothing,
+   Con::addVariable( "$RigidPhysicsShape::noSmoothing", TypeBool, &RigidPhysicsShape::smNoSmoothing,
      "@brief Determines if client-side shapes will attempt to smoothly transition to "
      "their new position after reciving a correction.\n\n"
      "If true, shapes will immediately render at the position they are corrected to.\n\n");
@@ -442,29 +372,29 @@ void PhysicsShape::consoleInit()
    Parent::consoleInit();   
 }
 
-void PhysicsShape::initPersistFields()
+void RigidPhysicsShape::initPersistFields()
 {   
-   addGroup( "PhysicsShape" );
+   addGroup( "RigidPhysicsShape" );
 
-      addField( "playAmbient", TypeBool, Offset( mPlayAmbient, PhysicsShape ),
+      addField( "playAmbient", TypeBool, Offset( mPlayAmbient, RigidPhysicsShape ),
             "@brief Enables or disables playing of an ambient animation upon loading the shape.\n\n"
             "@note The ambient animation must be named \"ambient\"." );
    
-   endGroup( "PhysicsShape" );
+   endGroup( "RigidPhysicsShape" );
 
    Parent::initPersistFields();   
 
    removeField( "scale" );
 }
 
-void PhysicsShape::inspectPostApply()
+void RigidPhysicsShape::inspectPostApply()
 {
    Parent::inspectPostApply();
 
    setMaskBits( InitialUpdateMask );
 }
 
-U32 PhysicsShape::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
+U32 RigidPhysicsShape::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
 {
    U32 retMask = Parent::packUpdate( con, mask, stream );
 
@@ -507,13 +437,13 @@ U32 PhysicsShape::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
          // <5 bytes in normal cases, and <8 bytes if the velocity is
          // greater than 1000.
          AssertWarn( mState.linVelocity.len() < 1000.0f, 
-            "PhysicsShape::packUpdate - The linVelocity is out of range!" );
+            "RigidPhysicsShape::packUpdate - The linVelocity is out of range!" );
          stream->writeVector( mState.linVelocity, 1000.0f, 16, 9 );
 
          // For angular velocity we get < 0.01f resolution in magnitude
          // with the most common case being under 4 bytes.
          AssertWarn( mState.angVelocity.len() < 10.0f, 
-            "PhysicsShape::packUpdate - The angVelocity is out of range!" );
+            "RigidPhysicsShape::packUpdate - The angVelocity is out of range!" );
          stream->writeVector( mState.angVelocity, 10.0f, 10, 9 );
       }
    }
@@ -524,7 +454,7 @@ U32 PhysicsShape::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
    return retMask;
 }   
 
-void PhysicsShape::unpackUpdate( NetConnection *con, BitStream *stream )
+void RigidPhysicsShape::unpackUpdate( NetConnection *con, BitStream *stream )
 {
    Parent::unpackUpdate( con, stream );
 
@@ -605,7 +535,7 @@ void PhysicsShape::unpackUpdate( NetConnection *con, BitStream *stream )
    }
 }
 
-bool PhysicsShape::onAdd()
+bool RigidPhysicsShape::onAdd()
 {
    if ( !Parent::onAdd() )
       return false;
@@ -614,14 +544,14 @@ bool PhysicsShape::onAdd()
    // we have to fail completely.
    if ( !PHYSICSMGR )
    {
-      Con::errorf( "PhysicsShape::onAdd - No physics plugin is active!" );
+      Con::errorf( "RigidPhysicsShape::onAdd - No physics plugin is active!" );
       return false;
    }
 
    // 
    if ( !mPhysicsRep && !_createShape() )
    {
-      Con::errorf( "PhysicsShape::onAdd() - Shape creation failed!" );
+      Con::errorf( "RigidPhysicsShape::onAdd() - Shape creation failed!" );
       return false;
    }
 
@@ -630,11 +560,11 @@ bool PhysicsShape::onAdd()
    if ( isServerObject() )
    {
       storeRestorePos();
-      PhysicsPlugin::getPhysicsResetSignal().notify( this, &PhysicsShape::_onPhysicsReset );
+      PhysicsPlugin::getPhysicsResetSignal().notify( this, &RigidPhysicsShape::_onPhysicsReset );
    }
 
    // Register for the resource change signal.
-   //ResourceManager::get().getChangedSignal().notify( this, &PhysicsShape::_onResourceChanged );
+   //ResourceManager::get().getChangedSignal().notify( this, &RigidPhysicsShape::_onResourceChanged );
 
    // Only add server objects and non-destroyed client objects to the scene.
    if ( isServerObject() || !mDestroyed)
@@ -653,7 +583,7 @@ bool PhysicsShape::onAdd()
    return true;
 }
 
-void PhysicsShape::onRemove()
+void RigidPhysicsShape::onRemove()
 {
    removeFromScene();
 
@@ -665,23 +595,22 @@ void PhysicsShape::onRemove()
 
    if ( isServerObject() )
    {
-      PhysicsPlugin::getPhysicsResetSignal().remove( this, &PhysicsShape::_onPhysicsReset );
+      PhysicsPlugin::getPhysicsResetSignal().remove( this, &RigidPhysicsShape::_onPhysicsReset );
 
       if ( mDestroyedShape )
 		  mDestroyedShape->deleteObject();
    }
 
    // Remove the resource change signal.
-   //ResourceManager::get().getChangedSignal().remove( this, &PhysicsShape::_onResourceChanged );
+   //ResourceManager::get().getChangedSignal().remove( this, &RigidPhysicsShape::_onResourceChanged );
 
    Parent::onRemove();
 }
 
-bool PhysicsShape::onNewDataBlock( GameBaseData *dptr, bool reload )
+bool RigidPhysicsShape::onNewDataBlock( GameBaseData *dptr, bool reload )
 {
-	// rextimmy physics integration
-	// datablock check
-	if ( !mDatablock || !Parent::onNewDataBlock( dptr, reload ) )
+   mDataBlock = static_cast<RigidPhysicsShapeData*>(dptr);
+   if (!mDataBlock || !Parent::onNewDataBlock( dptr, reload ) )
       return false;
 
    if ( !isProperlyAdded() )
@@ -691,21 +620,21 @@ bool PhysicsShape::onNewDataBlock( GameBaseData *dptr, bool reload )
    // we have to fail completely.
    if ( !PHYSICSMGR )
    {
-      Con::errorf( "PhysicsShape::onNewDataBlock - No physics plugin is active!" );
+      Con::errorf( "RigidPhysicsShape::onNewDataBlock - No physics plugin is active!" );
       return false;
    }
 
    // 
    if ( !_createShape() )
    {
-      Con::errorf( "PhysicsShape::onNewDataBlock() - Shape creation failed!" );
+      Con::errorf( "RigidPhysicsShape::onNewDataBlock() - Shape creation failed!" );
       return false;
    }
 
    return true;
 }
 
-bool PhysicsShape::_createShape()
+bool RigidPhysicsShape::_createShape()
 {
    SAFE_DELETE( mPhysicsRep );
    SAFE_DELETE( mShapeInst );
@@ -713,43 +642,29 @@ bool PhysicsShape::_createShape()
    mWorld = NULL;
    mAmbientSeq = -1;
 
-   // rextimmy physics integration
-   if( !mDatablock )
-   /*
-   PhysicsShapeData *db = getDataBlock();
-   if ( !db )
-   */
+   if ( !mDataBlock )
       return false;
 
    // Set the world box.
-
-   // rextimmy physics integration
-   //mObjBox = db->shape->bounds;
-   mObjBox = mDatablock->shape->bounds;
-
+   mObjBox = mDataBlock->shape->bounds;
    resetWorldBox();
 
    // If this is the server and its a client only simulation
    // object then disable our tick... the server doesn't do 
    // any work for this shape.
    if (  isServerObject() && 
-	     
-	     // rextimmy physics integration
-         mDatablock->simType == PhysicsShapeData::SimType_ClientOnly )
+         mDataBlock->simType == RigidPhysicsShapeData::SimType_ClientOnly )
    {
       setProcessTick( false );
       return true;
    }
 
    // Create the shape instance.
-
-   // rextimmy physics integration
-   mShapeInst = new TSShapeInstance( mDatablock->shape, isClientObject() );
+   mShapeInst = new TSShapeInstance( mDataBlock->shape, isClientObject() );
 
    if ( isClientObject() )
    {
-	  // rextimmy physics integration
-      mAmbientSeq = mDatablock->shape->findSequence( "ambient" );
+      mAmbientSeq = mDataBlock->shape->findSequence( "ambient" );
       _initAmbient();   
    }
 
@@ -759,10 +674,8 @@ bool PhysicsShape::_createShape()
    // While a kinematic is less optimal than a static body
    // it allows for us to enable/disable collision and having
    // all dynamic actors react correctly... waking up.
-   //
-
-   // rextimmy physics integration
-   const bool isDynamic = mDatablock->mass > 0.0f;
+   // 
+   const bool isDynamic = mDataBlock->mass > 0.0f;
 
    // If we aren't dynamic we don't need to tick.   
    setProcessTick( isDynamic || mPlayAmbient );
@@ -770,36 +683,27 @@ bool PhysicsShape::_createShape()
    // If this is the client and we're a server only object then
    // we don't need any physics representation... we're done.
    if (  isClientObject() && 
-	     // rextimmy physics integration
-         mDatablock->simType == PhysicsShapeData::SimType_ServerOnly )
+         mDataBlock->simType == RigidPhysicsShapeData::SimType_ServerOnly )
       return true;
 
    mWorld = PHYSICSMGR->getWorld( isServerObject() ? "server" : "client" );
-   
-   // rextimmy physics integration
-   U32 bodyFlags = isDynamic ? 0 : PhysicsBody::BF_KINEMATIC;
-   if ( mDatablock->ccdEnabled )
-	   bodyFlags |= PhysicsBody::BF_CCD;
-      
+   U32 bodyFlags = isDynamic ? 0 : PhysicsBody::BF_KINEMATIC; 
+   if(mDataBlock->ccdEnabled)
+      bodyFlags |= PhysicsBody::BF_CCD;
+
    mPhysicsRep = PHYSICSMGR->createBody();
-
-   // rextimmy physics integration
-   mPhysicsRep->init(   mDatablock->colShape, 
-                        mDatablock->mass, 
-
-						// rextimmy physics integration
-                        bodyFlags, /*isDynamic ? 0 : PhysicsBody::BF_KINEMATIC,  */
+   mPhysicsRep->init(   mDataBlock->colShape, 
+                        mDataBlock->mass, 
+                        bodyFlags,  
                         this, 
                         mWorld );
 
-   // rextimmy physics integration
-   mPhysicsRep->setMaterial( mDatablock->restitution, mDatablock->dynamicFriction, mDatablock->staticFriction );
+   mPhysicsRep->setMaterial( mDataBlock->restitution, mDataBlock->dynamicFriction, mDataBlock->staticFriction );
    
    if ( isDynamic )
    {
-	  // rextimmy physics integration
-      mPhysicsRep->setDamping( mDatablock->linearDamping, mDatablock->angularDamping );
-      mPhysicsRep->setSleepThreshold( mDatablock->linearSleepThreshold, mDatablock->angularSleepThreshold );
+      mPhysicsRep->setDamping( mDataBlock->linearDamping, mDataBlock->angularDamping );
+      mPhysicsRep->setSleepThreshold( mDataBlock->linearSleepThreshold, mDataBlock->angularSleepThreshold );
    }
 
    mPhysicsRep->setTransform( getTransform() );
@@ -807,7 +711,7 @@ bool PhysicsShape::_createShape()
    return true;
 }
 
-void PhysicsShape::_initAmbient()
+void RigidPhysicsShape::_initAmbient()
 {
    if ( isServerObject() )
       return;
@@ -835,7 +739,7 @@ void PhysicsShape::_initAmbient()
    }
 }
 
-void PhysicsShape::_onPhysicsReset( PhysicsResetEvent reset )
+void RigidPhysicsShape::_onPhysicsReset( PhysicsResetEvent reset )
 {
    if ( reset == PhysicsResetEvent_Store )
       mResetPos = getTransform();
@@ -850,14 +754,14 @@ void PhysicsShape::_onPhysicsReset( PhysicsResetEvent reset )
       // Cheat and reset the client from here.
       if ( getClientObject() )
       {
-         PhysicsShape *clientObj = (PhysicsShape*)getClientObject();
+         RigidPhysicsShape *clientObj = (RigidPhysicsShape*)getClientObject();
          clientObj->setTransform( mResetPos );
          clientObj->restore();
       }
    }
 }
 
-void PhysicsShape::setTransform( const MatrixF &newMat )
+void RigidPhysicsShape::setTransform( const MatrixF &newMat )
 {
    Parent::setTransform( newMat );
    
@@ -872,31 +776,29 @@ void PhysicsShape::setTransform( const MatrixF &newMat )
       mPhysicsRep->setTransform( newMat );
 }
 
-void PhysicsShape::setScale( const VectorF &scale )
+void RigidPhysicsShape::setScale( const VectorF &scale )
 {
-   // Cannot scale PhysicsShape.
+   // Cannot scale RigidPhysicsShape.
    return;
 }
 
-void PhysicsShape::storeRestorePos()
+void RigidPhysicsShape::storeRestorePos()
 {
    mResetPos = getTransform();
 }
 
-F32 PhysicsShape::getMass() const 
+F32 RigidPhysicsShape::getMass() const 
 { 
-   // rextimmy physics integration
-   // const PhysicsShapeData *db = const_cast<PhysicsShape*>( this )->getDataBlock();
-   return mDatablock->mass;
+   return mDataBlock->mass; 
 }
 
-void PhysicsShape::applyImpulse( const Point3F &pos, const VectorF &vec )
+void RigidPhysicsShape::applyImpulse( const Point3F &pos, const VectorF &vec )
 {
    if ( mPhysicsRep && mPhysicsRep->isDynamic() )
       mPhysicsRep->applyImpulse( pos, vec );
 }
 
-void PhysicsShape::applyRadialImpulse( const Point3F &origin, F32 radius, F32 magnitude )
+void RigidPhysicsShape::applyRadialImpulse( const Point3F &origin, F32 radius, F32 magnitude )
 {
    if ( !mPhysicsRep || !mPhysicsRep->isDynamic() )
       return;
@@ -929,12 +831,12 @@ void PhysicsShape::applyRadialImpulse( const Point3F &origin, F32 radius, F32 ma
 
    // Cheat for single player.
    //if ( getClientObject() )
-      //((PhysicsShape*)getClientObject())->mPhysicsRep->applyImpulse( origin, force );
+      //((RigidPhysicsShape*)getClientObject())->mPhysicsRep->applyImpulse( origin, force );
 }
 
-void PhysicsShape::interpolateTick( F32 delta )
+void RigidPhysicsShape::interpolateTick( F32 delta )
 {
-   AssertFatal( !mDestroyed, "PhysicsShape::interpolateTick - Shouldn't be processing a destroyed shape!" );
+   AssertFatal( !mDestroyed, "RigidPhysicsShape::interpolateTick - Shouldn't be processing a destroyed shape!" );
 
    if ( !mPhysicsRep->isDynamic() )
       return;
@@ -947,11 +849,57 @@ void PhysicsShape::interpolateTick( F32 delta )
    setRenderTransform( state.getTransform() );
 }
 
-void PhysicsShape::processTick( const Move *move )
-{
-   AssertFatal( mPhysicsRep && !mDestroyed, "PhysicsShape::processTick - Shouldn't be processing a destroyed shape!" );
+//from player.cpp
+static MatrixF IMat(1);
 
-   // Note that unlike TSStatic, the serverside PhysicsShape does not
+bool RigidPhysicsShape::buildPolyList(PolyListContext, AbstractPolyList* polyList, const Box3F&, const SphereF&)
+{
+   Point3F pos;
+   getTransform().getColumn(3,&pos);
+   IMat.setColumn(3,pos);
+   polyList->setTransform(&IMat, Point3F(1.0f,1.0f,1.0f));
+   polyList->setObject(this);
+   polyList->addBox(mObjBox);
+   return true;
+}
+
+//TODO: this could be accelerated further by actually running through the physics plugin
+void RigidPhysicsShape::checkCollisions()
+{
+   Box3F bbox = getWorldBox();//mPhysicsRep->getWorldBounds();
+   gServerContainer.findObjects(bbox,sCollisionFilter,findCallback,this);
+}
+
+void RigidPhysicsShape::findCallback(SceneObject* obj,void *key)
+{
+   RigidPhysicsShape* shape = reinterpret_cast<RigidPhysicsShape*>(key);
+   U32 objectMask = obj->getTypeMask();
+
+   if (objectMask & TriggerObjectType) {
+      Trigger* pTrigger = static_cast<Trigger*>(obj);
+      pTrigger->potentialEnterObject(shape);
+   }
+   else if (objectMask & GameBaseObjectType) {
+      GameBase* col = static_cast<GameBase*>(obj);
+      //don't want collision with ourselves
+      if(col != shape)
+         shape->queueCollision(col,shape->getVelocity() - col->getVelocity());
+   }
+   else if(objectMask & StaticShapeObjectType)
+   {
+      SceneObject *col = static_cast<SceneObject*>(obj);
+      if(col != shape)
+         shape->queueCollision(col,shape->getVelocity());
+   }
+   
+
+}
+
+void RigidPhysicsShape::processTick( const Move *move )
+{
+   AssertFatal( mPhysicsRep && !mDestroyed, "RigidPhysicsShape::processTick - Shouldn't be processing a destroyed shape!" );
+
+   // Note that unlike TSStatic, the serverside RigidPhysicsShape does not
    // need to play the ambient animation because even if the animation were
    // to move collision shapes it would not affect the physx representation.
 
@@ -961,7 +909,7 @@ void PhysicsShape::processTick( const Move *move )
    // SINGLE PLAYER HACK!!!!
    if ( PHYSICSMGR->isSinglePlayer() && isClientObject() && getServerObject() )
    {          
-      PhysicsShape *servObj = (PhysicsShape*)getServerObject();
+      RigidPhysicsShape *servObj = (RigidPhysicsShape*)getServerObject();
       setTransform( servObj->mState.getTransform() );      
       mRenderState[0] = servObj->mRenderState[0];
       mRenderState[1] = servObj->mRenderState[1];
@@ -984,6 +932,12 @@ void PhysicsShape::processTick( const Move *move )
    {
       mPhysicsRep->getState( &mState );
       _updateContainerForces();
+      //check triggers
+      if(isServerObject())
+      {
+         checkCollisions();
+         notifyCollision();
+      }
    }
    else
    {
@@ -1018,15 +972,15 @@ void PhysicsShape::processTick( const Move *move )
    }
 }
 
-void PhysicsShape::advanceTime( F32 timeDelta )
+void RigidPhysicsShape::advanceTime( F32 timeDelta )
 {
    if ( isClientObject() && mPlayAmbient && mAmbientThread != NULL )
       mShapeInst->advanceTime( timeDelta, mAmbientThread );
 }
 
-void PhysicsShape::_updateContainerForces()
+void RigidPhysicsShape::_updateContainerForces()
 {
-   PROFILE_SCOPE( PhysicsShape_updateContainerForces );
+   PROFILE_SCOPE( RigidPhysicsShape_updateContainerForces );
 
    // If we're not simulating don't update forces.
    if ( !mWorld->isEnabled() )
@@ -1034,31 +988,23 @@ void PhysicsShape::_updateContainerForces()
 
    ContainerQueryInfo info;
    info.box = getWorldBox();
-
-   // rextimmy physics integration
-   info.mass = mDatablock->mass;
+   info.mass = mDataBlock->mass;
 
    // Find and retreive physics info from intersecting WaterObject(s)
    getContainer()->findObjects( getWorldBox(), WaterObjectType|PhysicalZoneObjectType, findRouter, &info );
 
    // Calculate buoyancy and drag
-
-   // rextimmy physics integration
-   F32 angDrag = mDatablock->angularDamping;
-   F32 linDrag = mDatablock->linearDamping;
-
+   F32 angDrag = mDataBlock->angularDamping;
+   F32 linDrag = mDataBlock->linearDamping;
    F32 buoyancy = 0.0f;
    Point3F cmass = mPhysicsRep->getCMassPosition();
 
-   // rextimmy physics integration
-   F32 density = mDatablock->buoyancyDensity;
-
+   F32 density = mDataBlock->buoyancyDensity;
    if ( density > 0.0f )
    {
       if ( info.waterCoverage > 0.0f )
       {
-         // rextimmy physics integration
-         F32 waterDragScale = info.waterViscosity * mDatablock->waterDampingScale;
+         F32 waterDragScale = info.waterViscosity * mDataBlock->waterDampingScale;
          F32 powCoverage = mPow( info.waterCoverage, 0.25f );
 
          angDrag = mLerp( angDrag, angDrag * waterDragScale, powCoverage );
@@ -1071,9 +1017,7 @@ void PhysicsShape::_updateContainerForces()
       // Based on this blog post:
       // (http://reinot.blogspot.com/2005/11/oh-yes-they-float-georgie-they-all.html)
       // JCF: disabled!
-
-	  // rextimmy physics integration
-	  Point3F buoyancyForce = buoyancy * -mWorld->getGravity() * TickSec * mDatablock->mass;
+      Point3F buoyancyForce = buoyancy * -mWorld->getGravity() * TickSec * mDataBlock->mass;
       mPhysicsRep->applyImpulse( cmass, buoyancyForce );      
    }
 
@@ -1085,11 +1029,11 @@ void PhysicsShape::_updateContainerForces()
       mPhysicsRep->applyImpulse( cmass, info.appliedForce );
 }
 
-void PhysicsShape::prepRenderImage( SceneRenderState *state )
+void RigidPhysicsShape::prepRenderImage( SceneRenderState *state )
 {
-   AssertFatal( !mDestroyed, "PhysicsShape::prepRenderImage - Shouldn't be processing a destroyed shape!" );
+   AssertFatal( !mDestroyed, "RigidPhysicsShape::prepRenderImage - Shouldn't be processing a destroyed shape!" );
 
-   PROFILE_SCOPE( PhysicsShape_prepRenderImage );
+   PROFILE_SCOPE( RigidPhysicsShape_prepRenderImage );
 
    if( !mShapeInst )
          return;
@@ -1126,7 +1070,7 @@ void PhysicsShape::prepRenderImage( SceneRenderState *state )
    mShapeInst->render( rdata );
 }
 
-void PhysicsShape::destroy()
+void RigidPhysicsShape::destroy()
 {
    if ( mDestroyed )
       return;
@@ -1147,11 +1091,8 @@ void PhysicsShape::destroy()
    // Stop doing tick processing for this SceneObject.
    setProcessTick( false );
 
-   // rextimmy physics integration
-   if (!mDatablock)
-	   return;
-
-   // rextimmy physics integration
+   if ( !mDataBlock )
+      return;
 
    const MatrixF &mat = getTransform();
    if ( isServerObject() )
@@ -1159,13 +1100,10 @@ void PhysicsShape::destroy()
       // We only create the destroyed object on the server
       // and let ghosting deal with updating the client.
 
-	  // rextimmy physics integration
-      if ( mDatablock->destroyedShape )
+      if ( mDataBlock->destroyedShape )
       {
-         mDestroyedShape = new PhysicsShape();
-		 
-		 // rextimmy physics integration
-         mDestroyedShape->setDataBlock( mDatablock->destroyedShape );
+         mDestroyedShape = new RigidPhysicsShape();
+         mDestroyedShape->setDataBlock( mDataBlock->destroyedShape );
          mDestroyedShape->setTransform( mat );
          if ( !mDestroyedShape->registerObject() )
             delete mDestroyedShape.getObject();
@@ -1175,15 +1113,12 @@ void PhysicsShape::destroy()
    }
    
    // Let the physics debris create itself.
-   
-   // rextimmy physics integration
-   PhysicsDebris::create( mDatablock->debris, mat, lastLinVel );
-   if ( mDatablock->explosion )
+   PhysicsDebris::create( mDataBlock->debris, mat, lastLinVel );
+
+   if ( mDataBlock->explosion )
    {
       Explosion *splod = new Explosion();
-
-	  // rextimmy physics integration
-      splod->setDataBlock( mDatablock->explosion );
+      splod->setDataBlock( mDataBlock->explosion );
       splod->setTransform( mat );
       splod->setInitialState( getPosition(), mat.getUpVector(), 1.0f );
       if ( !splod->registerObject() )
@@ -1191,13 +1126,12 @@ void PhysicsShape::destroy()
    }   
 }
 
-void PhysicsShape::restore()
+void RigidPhysicsShape::restore()
 {
    if ( !mDestroyed )
       return;
 
-   // rextimmy physics integration
-   const bool isDynamic = mDatablock && mDatablock->mass > 0.0f;
+   const bool isDynamic = mDataBlock && mDataBlock->mass > 0.0f;
 
    if ( mDestroyedShape )   
       mDestroyedShape->deleteObject();
@@ -1213,23 +1147,23 @@ void PhysicsShape::restore()
    setMaskBits( DamageMask );
 }
 
-DefineEngineMethod( PhysicsShape, isDestroyed, bool, (),, 
-   "@brief Returns if a PhysicsShape has been destroyed or not.\n\n" )
+DefineEngineMethod( RigidPhysicsShape, isDestroyed, bool, (),, 
+   "@brief Returns if a RigidPhysicsShape has been destroyed or not.\n\n" )
 {
    return object->isDestroyed();
 }
 
-DefineEngineMethod( PhysicsShape, destroy, void, (),,
+DefineEngineMethod( RigidPhysicsShape, destroy, void, (),,
    "@brief Disables rendering and physical simulation.\n\n"
    "Calling destroy() will also spawn any explosions, debris, and/or destroyedShape "
    "defined for it, as well as remove it from the scene graph.\n\n"
    "Destroyed objects are only created on the server. Ghosting will later update the client.\n\n"
-   "@note This does not actually delete the PhysicsShape." )
+   "@note This does not actually delete the RigidPhysicsShape." )
 {
    object->destroy();
 }
 
-DefineEngineMethod( PhysicsShape, restore, void, (),,
+DefineEngineMethod( RigidPhysicsShape, restore, void, (),,
    "@brief Restores the shape to its state before being destroyed.\n\n"
    "Re-enables rendering and physical simulation on the object and "
    "adds it to the client's scene graph. "
