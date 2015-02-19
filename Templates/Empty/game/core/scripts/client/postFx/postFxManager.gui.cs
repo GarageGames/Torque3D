@@ -33,7 +33,7 @@ function PostFXManager::onDialogPush( %this )
 {
    //Apply the settings to the controls
    postVerbose("% - PostFX Manager - Loading GUI.");
-   
+
    %this.settingsRefreshAll();
 }
 
@@ -45,14 +45,14 @@ function ppOptionsEnable::onAction(%this)
    if(ppOptionsEnable.getValue())
    {
       %toEnable = true;
-   }   
+   }
    else
    {
       %toEnable = false;
    }
-   
+
    PostFXManager.settingsSetEnabled(%toEnable);
-   
+
 }
 
 function PostFXManager::getEnableResultFromControl(%this, %control)
@@ -67,7 +67,7 @@ function PostFXManager::getEnableResultFromControl(%this, %control)
    {
       %toEnable = false;
    }
-   
+
    return %toEnable;
 }
 
@@ -76,14 +76,6 @@ function ppOptionsEnableSSAO::onAction(%this)
    %toEnable = PostFXManager.getEnableResultFromControl(%this);
    PostFXManager.settingsEffectSetEnabled("SSAO", %toEnable);
 }
-
-// RDM SSAO Start
-function ppOptionsEnableSSAO2::onAction(%this)
-{
-   %toEnable = PostFXManager.getEnableResultFromControl(%this);
-   PostFXManager.settingsEffectSetEnabled("SSAO2", %toEnable);
-}
-// RDM SSAO End
 
 function ppOptionsEnableHDR::onAction(%this)
 {
@@ -98,14 +90,14 @@ function ppOptionsEnableLightRays::onAction(%this)
 }
 
 function ppOptionsEnableDOF::onAction(%this)
-{ 
+{
    %toEnable = PostFXManager.getEnableResultFromControl(%this);
    PostFXManager.settingsEffectSetEnabled("DOF", %toEnable);
 }
- 
+
 function ppOptionsSavePreset::onClick(%this)
 {
-   //Stores the current settings into a preset file for loading and use later on 
+   //Stores the current settings into a preset file for loading and use later on
 }
 
 function ppOptionsLoadPreset::onClick(%this)
@@ -124,120 +116,29 @@ function ppOptionsSSAOQuality::onSelect( %this, %id, %text )
 }
 
 //SSAO Slider controls
-//General Tab
-function ppOptionsSSAOOverallStrength::onMouseDragged(%this)
+function ppOptionsSSAOIntensity::onMouseDragged(%this)
 {
-   $SSAOPostFx::overallStrength = %this.value;
+   $SSAOPostFx::intensity = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
 
-function ppOptionsSSAOBlurDepth::onMouseDragged(%this)
+function ppOptionsSSAORadius::onMouseDragged(%this)
 {
-   $SSAOPostFx::blurDepthTol = %this.value;
+   $SSAOPostFx::radius = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
 
-function ppOptionsSSAOBlurNormal::onMouseDragged(%this)
+function ppOptionsSSAOScale::onMouseDragged(%this)
 {
-   $SSAOPostFx::blurNormalTol = %this.value;
+   $SSAOPostFx::scale = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
 
-//Near Tab
-function ppOptionsSSAONearRadius::onMouseDragged(%this)
+function ppOptionsSSAOBias::onMouseDragged(%this)
 {
-   $SSAOPostFx::sRadius = %this.value;
+   $SSAOPostFx::bias = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
-
-function ppOptionsSSAONearStrength::onMouseDragged(%this)
-{
-   $SSAOPostFx::sStrength = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-
-function ppOptionsSSAONearDepthMin::onMouseDragged(%this)
-{
-   $SSAOPostFx::sDepthMin = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-
-function ppOptionsSSAONearDepthMax::onMouseDragged(%this)
-{
-   $SSAOPostFx::sDepthMax = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;   
-}
-
-function ppOptionsSSAONearToleranceNormal::onMouseDragged(%this)
-{
-   $SSAOPostFx::sNormalTol = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-
-function ppOptionsSSAONearTolerancePower::onMouseDragged(%this)
-{
-   $SSAOPostFx::sNormalPow = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-
-//Far Tab
-function ppOptionsSSAOFarRadius::onMouseDragged(%this)
-{
-   $SSAOPostFx::lRadius = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-function ppOptionsSSAOFarStrength::onMouseDragged(%this)
-{
-   $SSAOPostFx::lStrength = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-function ppOptionsSSAOFarDepthMin::onMouseDragged(%this)
-{
-   $SSAOPostFx::lDepthMin = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-function ppOptionsSSAOFarDepthMax::onMouseDragged(%this)
-{
-   $SSAOPostFx::lDepthMax = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-function ppOptionsSSAOFarToleranceNormal::onMouseDragged(%this)
-{
-   $SSAOPostFx::lNormalTol = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-function ppOptionsSSAOFarTolerancePower::onMouseDragged(%this)
-{
-   $SSAOPostFx::lNormalPow = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-
-// RDM SSAO Start
-//SSAO2 Slider controls
-function ppOptionsSSAO2Intensity::onMouseDragged(%this)
-{
-   $SSAO2PostFx::intensity = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-
-function ppOptionsSSAO2Radius::onMouseDragged(%this)
-{
-   $SSAO2PostFx::radius = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-
-function ppOptionsSSAO2Scale::onMouseDragged(%this)
-{
-   $SSAO2PostFx::scale = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-
-function ppOptionsSSAO2Bias::onMouseDragged(%this)
-{
-   $SSAO2PostFx::bias = %this.value;
-   %this.ToolTip = "Value : " @ %this.value;
-}
-// RDM SSAO End
 
 //HDR Slider Controls
 //Brighness tab
@@ -340,10 +241,10 @@ function ppOptionsLightRaysBrightScalar::onMouseDragged(%this)
 function ppOptionsUpdateDOFSettings()
 {
    DOFPostEffect.setFocusParams( $DOFPostFx::BlurMin, $DOFPostFx::BlurMax, $DOFPostFx::FocusRangeMin, $DOFPostFx::FocusRangeMax, -($DOFPostFx::BlurCurveNear), $DOFPostFx::BlurCurveFar );
-   
+
    DOFPostEffect.setAutoFocus( $DOFPostFx::EnableAutoFocus );
    DOFPostEffect.setFocalDist(0);
-   
+
    if($PostFXManager::PostFX::EnableDOF)
    {
       DOFPostEffect.enable();
@@ -385,13 +286,13 @@ function ppOptionsDOFFarBlurMaxSlider::onMouseDragged(%this)
 function ppOptionsDOFFocusRangeMinSlider::onMouseDragged(%this)
 {
    $DOFPostFx::FocusRangeMin = %this.value;
-   ppOptionsUpdateDOFSettings();   
+   ppOptionsUpdateDOFSettings();
 }
 
 function ppOptionsDOFFocusRangeMaxSlider::onMouseDragged(%this)
 {
    $DOFPostFx::FocusRangeMax = %this.value;
-   ppOptionsUpdateDOFSettings();   
+   ppOptionsUpdateDOFSettings();
 }
 
 function ppOptionsDOFBlurCurveNearSlider::onMouseDragged(%this)
@@ -403,7 +304,7 @@ function ppOptionsDOFBlurCurveNearSlider::onMouseDragged(%this)
 function ppOptionsDOFBlurCurveFarSlider::onMouseDragged(%this)
 {
    $DOFPostFx::BlurCurveFar = %this.value;
-   ppOptionsUpdateDOFSettings();   
+   ppOptionsUpdateDOFSettings();
 }
 
 function ppOptionsEnableHDRDebug::onAction(%this)
@@ -411,12 +312,12 @@ function ppOptionsEnableHDRDebug::onAction(%this)
    if ( %this.getValue() )
       LuminanceVisPostFX.enable();
    else
-      LuminanceVisPostFX.disable();   
+      LuminanceVisPostFX.disable();
 }
 
 function ppColorCorrection_selectFile()
 {
-   %filter = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng. *.tga)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga|All Files (*.*)|*.*|";   
+   %filter = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng. *.tga)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga|All Files (*.*)|*.*|";
    getLoadFilename( %filter, "ppColorCorrection_selectFileHandler");
 }
 
@@ -426,7 +327,7 @@ function ppColorCorrection_selectFileHandler( %filename )
       %filename = "core/scripts/client/postFx/null_color_ramp.png";
    else
       %filename = makeRelativePath( %filename, getMainDotCsDir() );
-            
+
    $HDRPostFX::colorCorrectionRamp = %filename;
-   PostFXManager-->ColorCorrectionFileName.Text = %filename; 
+   PostFXManager-->ColorCorrectionFileName.Text = %filename;
 }
