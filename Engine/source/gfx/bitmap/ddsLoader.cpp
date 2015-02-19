@@ -607,7 +607,7 @@ bool DDSFile::read(Stream &s, U32 dropMipCount)
       else if ( mFlags.test( PitchSizeFlag ) )
          mPitchOrLinearSize = getSurfacePitch( dropMipCount );
       else
-         mPitchOrLinearSize = mPitchOrLinearSize; // Do nothing?
+         ; // Do nothing?
 
       // Now fix up the rest of the 
       mMipMapCount = getMax( (U32)1, mMipMapCount - dropMipCount );
