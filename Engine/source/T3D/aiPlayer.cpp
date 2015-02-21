@@ -232,6 +232,15 @@ void AIPlayer::setMoveTolerance( const F32 tolerance )
  */
 void AIPlayer::setMoveDestination( const Point3F &location, bool slowdown )
 {
+   // BlissGMK >> 
+   // hack to avoid stopping right after the beginning of the move
+   MatrixF eye;
+   getEyeTransform(&eye);
+   Point3F pos = eye.getPosition();
+   mLastLocation = pos;
+   mLastLocation.z += mMoveTolerance * 2;
+   // BlissGMK <<
+
    mMoveDestination = location;
    mMoveState = ModeMove;
    mMoveSlowdown = slowdown;
