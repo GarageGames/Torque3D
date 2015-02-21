@@ -37,6 +37,11 @@
 #include "T3D/gameBase/std/stdMoveList.h"
 #include "T3D/fx/cameraFXMgr.h"
 
+// BlissGMK >>
+#include "core/threadStatic.h"
+extern bool ATTS(gFreezeSim);
+// BlissGMK <<
+
 MODULE_BEGIN( ProcessList )
 
    MODULE_INIT
@@ -226,8 +231,15 @@ void StdClientProcessList::onTickObject( ProcessObject *obj )
          con->mMoveList->clearMoves( 1 );
       }
    }
-   else if ( obj->isTicking() )
-      obj->processTick( 0 );
+
+   // BlissGMK >>
+   else if (obj->isTicking()) {	   
+	   // Freezing simulation for all objects, that aren't controlled
+	   // by client. This will allow us to edit object and fly the camera simultaneously.
+	   if (!ATTS(gFreezeSim))
+		   obj->processTick(0);
+   }
+   // BlissGMK <<
 }
 
 void StdClientProcessList::advanceObjects()
@@ -369,8 +381,14 @@ void StdServerProcessList::onTickObject( ProcessObject *pobj )
 
       con->mMoveList->clearMoves( m );
    }
-   else if ( pobj->isTicking() )
-      pobj->processTick( 0 );
+   // BlissGMK >>
+   else if ( pobj->isTicking() ) {	   
+	   // Freezing simulation for all objects, that aren't controlled
+	   // by client. This will allow us to edit object and fly the camera simultaneously.
+	   if (!ATTS(gFreezeSim))
+		   pobj->processTick(0);
+	}
+   // BlissGMK <<
 }
 
 void StdServerProcessList::advanceObjects()
