@@ -412,6 +412,15 @@ class SimObject: public ConsoleObject
    
       /// We can provide more detail, like object name and id.
       virtual String _getLogMessage(const char* fmt, va_list args) const;
+
+	  // BlissGMK >>
+	  bool mEnabled;   ///< Flag used to indicate whether object is enabled or not.
+	  // set enable flag value
+	  static bool setEnabledValue(void* obj, const char *index, const char* data)          {
+		  static_cast<SimObject*>(obj)->setEnabled(dAtob(data));
+		  return false;
+	  };
+	  // BlissGMK <<
    
       DEFINE_CREATE_METHOD
       {
@@ -922,6 +931,13 @@ class SimObject: public ConsoleObject
 
       // EngineObject.
       virtual void destroySelf();
+
+	  // BlissGMK >>
+	  //this function call chunks stored in dynamic fields
+	  void signal(const char* fieldName, const char* args = NULL);
+	  virtual void setEnabled(const bool enabled) { mEnabled = enabled; }
+	  bool isEnabled() const { return mEnabled; }
+	  // BlissGMK <<
 };
 
 

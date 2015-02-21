@@ -35,6 +35,9 @@
 #include "core/stream/fileStream.h"
 #include "core/fileObject.h"
 
+// BlissGMK >>
+#include "core/strings/stringUnit.h"
+// BlissGMK <<
 
 IMPLEMENT_CONOBJECT( SimObject );
 
@@ -186,6 +189,13 @@ void SimObject::initPersistFields()
    endGroup( "Persistence" );
 
    Parent::initPersistFields();
+
+   // BlissGMK >>
+   // Component Enabled
+   addGroup("Component");
+   addProtectedField("Enabled", TypeBool, Offset(mEnabled, SimObject), &setEnabledValue, &defaultProtectedGetFn, "ENABLED FLAG");
+   endGroup("Component");
+   // BlissGMK <<
 }
 
 //-----------------------------------------------------------------------------
@@ -1046,6 +1056,36 @@ SimObject* SimObject::deepClone()
 {
    return clone();
 }
+
+// BlissGMK >>
+void SimObject::signal(const char* fieldName, const char* args)
+{
+	const char* data = getDataField(fieldName, NULL);
+	if (data == NULL || strlen(data) == 0)
+	{
+		//Con::warnf("Invalid dynamic field index %s for object %s", fieldName, getName());	
+		return;
+	}
+
+	char chunk[512];
+	char argsParsed[512] = "";
+	if (args != NULL)
+	{
+		int count = StringUnit::getUnitCount(args, " \t\n");
+		for (int i = 0; i < count; i++)
+		{
+			char str[10];
+			dSprintf(str, 512, ", %%arg%d", i);
+			strcat(argsParsed, str);
+		}
+	}
+
+	dSprintf(chunk, 512, " function SimObjectFunctionChunk(%%this %s) { %s } SimObjectFunctionChunk(%d, %s); ", argsParsed, data, getId(), args);
+
+	Con::evaluate(chunk);
+
+}
+// BlissGMK <<
 
 //=============================================================================
 //    Grouping.
@@ -2745,6 +2785,24 @@ DefineConsoleMethod( SimObject, getField, const char*, ( S32 index ),,
    // if we found nada, return nada.
    return "";
 }
+
+// BlissGMK >>
+ConsoleMethod(SimObject, signal, void, 3, 4, "evaluates strings stored in dynamic fields take a string as parameter")
+{
+	const char *fieldName = StringTable->insert( argv[2] );
+	object->signal(fieldName, argc > 3 ? argv[3] : NULL);
+}
+
+ConsoleMethod(SimObject, setEnabled, void, 3, 3, "(enabled)")
+{
+	object->setEnabled(dAtob(argv[2]));
+}
+
+ConsoleMethod(SimObject, isEnabled, bool, 2, 2, "()")
+{
+	return object->isEnabled();
+}
+// BlissGMK <<
 
 //-----------------------------------------------------------------------------
 
