@@ -531,6 +531,12 @@ void Item::setVelocity(const VectorF& vel)
 
 void Item::applyImpulse(const Point3F&,const VectorF& vec)
 {
+   // BlissGMK >>
+   // DEVFIX : need removal flag if the item is under certain conditions
+   // (when mass set ingame by a script)
+   if (mDataBlock->mass <= 0) return; 
+   // BlissGMK <<
+
    // Items ignore angular velocity
    VectorF vel;
    vel.x = vec.x / mDataBlock->mass;

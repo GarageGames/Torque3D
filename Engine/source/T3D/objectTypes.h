@@ -147,6 +147,11 @@ enum SceneObjectTypes
    /// @see PhysicalZone
    PhysicalZoneObjectType = BIT( 22 ),
 
+   // BlissGMK >> 
+   // Can't find a logic why its was removed?
+   AIObjectType = BIT(24),
+   // BlissGMK << 
+
    /// @}
 };
 
