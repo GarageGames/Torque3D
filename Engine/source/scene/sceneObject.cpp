@@ -345,6 +345,12 @@ void SceneObject::removeFromScene()
 
 void SceneObject::onDeleteNotify( SimObject *obj )
 {      
+   // BlissGMK >>
+   // cast to SceneObject first for correct casting to ProcessObject
+   if ( (ProcessObject*)((SceneObject*)obj) == mAfterObject)
+      clearProcessAfter();
+   // BlissGMK <<
+
    // We are comparing memory addresses so even if obj really is not a 
    // ProcessObject this cast shouldn't break anything.
    if ( obj == mAfterObject )

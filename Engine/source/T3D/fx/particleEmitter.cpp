@@ -773,6 +773,15 @@ bool ParticleEmitter::onAdd()
       cleanup->addObject( this );
    }
 
+   // BlissGMK >>
+   else
+   {
+	   // logicking made it warning instead of error, because otherwise we can't
+	   // save/load player characters.
+	   AssertWarn(false, "Error, could not find ClientMissionCleanup group");
+   }
+   // BlissGMK <<
+
    removeFromProcessList();
 
    F32 radius = 5.0;
