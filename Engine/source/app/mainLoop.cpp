@@ -73,6 +73,10 @@ DITTS( F32, gTimeScale, 1.0 );
 DITTS( U32, gTimeAdvance, 0 );
 DITTS( U32, gFrameSkip, 0 );
 
+// BlissGMK >>
+bool gFreezeSim = false;
+// BlissGMK <<
+
 extern S32 sgBackgroundProcessSleepTime;
 extern S32 sgTimeManagerProcessInterval;
 
@@ -280,6 +284,10 @@ void StandardMainLoop::init()
 	   "@ingroup platform");
    Con::addVariable("frameSkip", TypeS32, &ATTS(gFrameSkip), "Sets the number of frames to skip while rendering the scene.\n"
 	   "@ingroup platform");
+
+   // BlissGMK >>
+   Con::addVariable("freezeSim", TypeS32, &ATTS(gFreezeSim));
+   // BlissGMK <<
 
    Con::setVariable( "defaultGame", StringTable->insert("scripts") );
 
