@@ -39,6 +39,12 @@
 #include "console/engineAPI.h"
 #include "math/mTransform.h"
 
+// console string stack fix 
+#include "console/stringStack.h"
+extern StringStack STR;
+extern ConsoleValueStack CSTK;
+// end of fix
+
 #ifdef TORQUE_HIFI_NET
    #include "T3D/gameBase/hifi/hifiMoveList.h"
 #elif defined TORQUE_EXTENDED_MOVE
@@ -1676,8 +1682,18 @@ DefineEngineMethod( GameConnection, transmitDataBlocks, void, (S32 sequence),,
             mStream.clearCompressionPoint();
             pDataBlock->unpackData(&mStream);
 
+			// console string stack fix >>
+			STR.pushFrame();
+			CSTK.pushFrame();
+			// console string stack fix <<
+
             // Call the console function to set the number of blocks to be sent.
             onDataBlockObjectReceived_callback(i, iCount);
+
+			// console string stack fix >>
+			STR.popFrame();
+			CSTK.popFrame();
+			// console string stack fix <<
 
             // Preload the datablock on the dummy client.
             pDataBlock->preload(false, NetConnection::getErrorBuffer());
