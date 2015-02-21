@@ -35,6 +35,10 @@
 
 class Convex;
 
+// BlissGMK <<
+class PhysicsBody;
+// BlissGMK >>
+
 
 class PhysicalZone : public SceneObject
 {
@@ -57,6 +61,11 @@ class PhysicalZone : public SceneObject
    EarlyOutPolyList     mClippedList;
 
    bool mActive;
+
+   // BlissGMK >>
+   bool mInvisibleWall;
+   PhysicsBody *mPhysicsRep;
+   // BlissGMK <<
 
    Convex* mConvexList;
    void buildConvex(const Box3F& box, Convex* convex);
@@ -95,6 +104,11 @@ class PhysicalZone : public SceneObject
    void activate();
    void deactivate();
    inline bool isActive() const { return mActive; }
+
+   // BlissGMK >>
+   bool isInvisibleWall(SceneObject* who);
+   PhysicsBody* getPhysicsRep();
+   // BlissGMK <<
 
 };
 

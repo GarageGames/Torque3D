@@ -1347,6 +1347,10 @@ void Projectile::unpackUpdate(NetConnection* con, BitStream* stream)
          NetObject* pObject = con->resolveGhost( mSourceObjectId );
          if ( pObject != NULL )
             mSourceObject = dynamic_cast<ShapeBase*>( pObject );
+
+		 // BlissGMK >>
+		 deleteNotify(pObject);// BlissGMK - add notification for client
+		 // BlissGMK <<
       }
       else
       {

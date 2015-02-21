@@ -4763,10 +4763,18 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
             Box3F convexBox = pConvex->getBoundingBox();
             if (plistBox.isOverlapped(convexBox))
             {
-               if (pConvex->getObject()->getTypeMask() & PhysicalZoneObjectType)
-                  pConvex->getPolyList(&sPhysZonePolyList);
-               else
-                  pConvex->getPolyList(&sExtrudedPolyList);
+				if (pConvex->getObject()->getTypeMask() & PhysicalZoneObjectType)
+				{
+					// BlissGMK >> 
+					// behavior of Physical Zone as invisible wall                
+					PhysicalZone* pZone = (PhysicalZone*)pConvex->getObject();
+					if (pZone->isActive() && pZone->isInvisibleWall(this))
+					{
+						pConvex->getPolyList(&sExtrudedPolyList);
+					} else {
+						pConvex->getPolyList(&sPhysZonePolyList);
+					}
+				}
             }
          }
          pList = pList->wLink.mNext;

@@ -671,6 +671,11 @@ protected:
    void disableHeadZCalc() { mUseHeadZCalc = false; }
    void enableHeadZCalc() { mUseHeadZCalc = true; }
 
+   // BlissGMK >>
+   // for AI to handle obstacle avoidance
+   virtual void wallAvoidance(const VectorF& wallNormal) {}
+   // BlissGMK <<
+
 public:
    DECLARE_CONOBJECT(Player);
 
