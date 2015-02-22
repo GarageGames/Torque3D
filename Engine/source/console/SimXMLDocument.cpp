@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "tinyxml/tinyxml.h"
+#include "taml/fsTinyXml.h"
 
 //-----------------------------------------------------------------------------
 // Console implementation of STL map.
@@ -175,7 +175,7 @@ bool SimXMLDocument::onAdd()
 
    if(!m_qDocument)
    {
-      m_qDocument = new TiXmlDocument();
+      m_qDocument = new fsTiXmlDocument();
    }
    return true;
 }
@@ -345,16 +345,16 @@ bool SimXMLDocument::pushFirstChildElement(const char* rName)
    m_CurrentAttribute = 0;
 
    // Push the first element found under the current element of the given name
-   TiXmlElement* pElement;
+   fsTiXmlElement* pElement;
    if(!m_paNode.empty())
    {
-      const S32 iLastElement = m_paNode.size() - 1;
-      TiXmlElement* pNode = m_paNode[iLastElement];
+      const int iLastElement = m_paNode.size() - 1;
+      fsTiXmlElement* pNode = m_paNode[iLastElement];
       if(!pNode)
       {
          return false;
       }
-      pElement = pNode->FirstChildElement(rName);
+      pElement = static_cast<fsTiXmlElement*>(pNode->FirstChildElement(rName));
    }
    else
    {
@@ -362,7 +362,7 @@ bool SimXMLDocument::pushFirstChildElement(const char* rName)
       {
          return false;
       }
-      pElement = m_qDocument->FirstChildElement(rName);
+      pElement = static_cast<fsTiXmlElement*>(m_qDocument->FirstChildElement(rName));
    }
 
    if(!pElement)
@@ -409,22 +409,22 @@ bool SimXMLDocument::pushChildElement(S32 index)
    m_CurrentAttribute = 0;
 
    // Push the first element found under the current element of the given name
-   TiXmlElement* pElement;
+   fsTiXmlElement* pElement;
    if(!m_paNode.empty())
    {
-      const S32 iLastElement = m_paNode.size() - 1;
-      TiXmlElement* pNode = m_paNode[iLastElement];
+      const int iLastElement = m_paNode.size() - 1;
+      fsTiXmlElement* pNode = m_paNode[iLastElement];
       if(!pNode)
       {
          return false;
       }
-      pElement = pNode->FirstChildElement();
+      pElement = static_cast<fsTiXmlElement*>(pNode->FirstChildElement());
       for( S32 i = 0; i < index; i++ )
       {
          if( !pElement )
             return false;
 
-         pElement = pElement->NextSiblingElement();
+         pElement = static_cast<fsTiXmlElement*>(pElement->NextSiblingElement());
       }
    }
    else
@@ -433,13 +433,13 @@ bool SimXMLDocument::pushChildElement(S32 index)
       {
          return false;
       }
-      pElement = m_qDocument->FirstChildElement();
+      pElement = static_cast<fsTiXmlElement*>(m_qDocument->FirstChildElement());
       for( S32 i = 0; i < index; i++ )
       {
          if( !pElement )
             return false;
 
-         pElement = pElement->NextSiblingElement();
+         pElement = static_cast<fsTiXmlElement*>(pElement->NextSiblingElement());
       }
    }
 
@@ -472,14 +472,14 @@ bool SimXMLDocument::nextSiblingElement(const char* rName)
    {
       return false;
    }
-   const S32 iLastElement = m_paNode.size() - 1;
-   TiXmlElement*& pElement = m_paNode[iLastElement];
+   const int iLastElement = m_paNode.size() - 1;
+   fsTiXmlElement*& pElement = m_paNode[iLastElement];
    if(!pElement)
    {
       return false;
    }
 
-   pElement = pElement->NextSiblingElement(rName);
+   pElement = static_cast<fsTiXmlElement*>(pElement->NextSiblingElement(rName));
    if(!pElement)
    {
       return false;
@@ -506,8 +506,8 @@ const char* SimXMLDocument::elementValue()
    {
       return StringTable->insert("");
    }
-   const S32 iLastElement = m_paNode.size() - 1;
-   TiXmlElement* pNode = m_paNode[iLastElement];
+   const int iLastElement = m_paNode.size() - 1;
+   fsTiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
       return StringTable->insert("");
@@ -547,8 +547,8 @@ const char* SimXMLDocument::attribute(const char* rAttribute)
    {
       return StringTable->insert("");
    }
-   const S32 iLastElement = m_paNode.size() - 1;
-   TiXmlElement* pNode = m_paNode[iLastElement];
+   const int iLastElement = m_paNode.size() - 1;
+   fsTiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
       return StringTable->insert("");
@@ -598,8 +598,8 @@ bool SimXMLDocument::attributeExists(const char* rAttribute)
    {
       return false;
    }
-   const S32 iLastElement = m_paNode.size() - 1;
-   TiXmlElement* pNode = m_paNode[iLastElement];
+   const int iLastElement = m_paNode.size() - 1;
+   fsTiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
       return false;
@@ -631,15 +631,15 @@ const char* SimXMLDocument::firstAttribute()
    {
       return StringTable->insert("");
    }
-   const S32 iLastElement = m_paNode.size() - 1;
-   TiXmlElement* pNode = m_paNode[iLastElement];
+   const int iLastElement = m_paNode.size() - 1;
+   fsTiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
       return StringTable->insert("");
    }
 
    // Gets its first attribute, if any
-   m_CurrentAttribute = pNode->FirstAttribute();
+   m_CurrentAttribute = static_cast<fsTiXmlAttribute*>(pNode->FirstAttribute());
    if(!m_CurrentAttribute)
    {
       return StringTable->insert("");
@@ -668,15 +668,15 @@ const char* SimXMLDocument::lastAttribute()
    {
       return StringTable->insert("");
    }
-   const S32 iLastElement = m_paNode.size() - 1;
-   TiXmlElement* pNode = m_paNode[iLastElement];
+   const int iLastElement = m_paNode.size() - 1;
+   fsTiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
       return StringTable->insert("");
    }
 
    // Gets its last attribute, if any
-   m_CurrentAttribute = pNode->LastAttribute();
+   m_CurrentAttribute = static_cast<fsTiXmlAttribute*>(pNode->LastAttribute());
    if(!m_CurrentAttribute)
    {
       return StringTable->insert("");
@@ -707,7 +707,7 @@ const char* SimXMLDocument::nextAttribute()
    }
 
    // Gets its next attribute, if any
-   m_CurrentAttribute = m_CurrentAttribute->Next();
+   m_CurrentAttribute = static_cast<fsTiXmlAttribute*>(m_CurrentAttribute->Next());
    if(!m_CurrentAttribute)
    {
       return StringTable->insert("");
@@ -738,7 +738,7 @@ const char* SimXMLDocument::prevAttribute()
    }
 
    // Gets its next attribute, if any
-   m_CurrentAttribute = m_CurrentAttribute->Previous();
+   m_CurrentAttribute = static_cast<fsTiXmlAttribute*>(m_CurrentAttribute->Previous());
    if(!m_CurrentAttribute)
    {
       return StringTable->insert("");
@@ -767,8 +767,8 @@ void SimXMLDocument::setAttribute(const char* rAttribute, const char* rVal)
       return;
    }
 
-   const S32 iLastElement = m_paNode.size() - 1;
-   TiXmlElement* pElement = m_paNode[iLastElement];
+   const int iLastElement = m_paNode.size() - 1;
+   fsTiXmlElement* pElement = m_paNode[iLastElement];
    if(!pElement)
    {
       return;
@@ -799,14 +799,14 @@ void SimXMLDocument::setObjectAttributes(const char* objectID)
    if( pObject == NULL )
       return;
 
-   const S32 iLastElement = m_paNode.size() - 1;
-   TiXmlElement* pElement = m_paNode[iLastElement];
+   const int iLastElement = m_paNode.size() - 1;
+   fsTiXmlElement* pElement = m_paNode[iLastElement];
    if(!pElement)
       return;
 
    char textbuf[1024];
-   TiXmlElement field( "Field" );
-   TiXmlElement group( "FieldGroup" );
+   fsTiXmlElement field( "Field" );
+   fsTiXmlElement group( "FieldGroup" );
    pElement->SetAttribute( "Name", pObject->getName() );
 
 
@@ -917,22 +917,22 @@ DefineEngineMethod( SimXMLDocument, setObjectAttributes, void, ( const char* obj
 // -----------------------------------------------------------------------------
 void SimXMLDocument::pushNewElement(const char* rName)
 {    
-   TiXmlElement cElement( rName );
-   TiXmlElement* pStackTop = 0;
+   fsTiXmlElement cElement( rName );
+   fsTiXmlElement* pStackTop = 0;
    if(m_paNode.empty())
    {
-      pStackTop = dynamic_cast<TiXmlElement*>
+      pStackTop = dynamic_cast<fsTiXmlElement*>
          (m_qDocument->InsertEndChild( cElement ) );
    }
    else
    {
-      const S32 iFinalElement = m_paNode.size() - 1;
-      TiXmlElement* pNode = m_paNode[iFinalElement];
+      const int iFinalElement = m_paNode.size() - 1;
+      fsTiXmlElement* pNode = m_paNode[iFinalElement];
       if(!pNode)
       {
          return;
       }
-      pStackTop = dynamic_cast<TiXmlElement*>
+      pStackTop = dynamic_cast<fsTiXmlElement*>
          (pNode->InsertEndChild( cElement ));
    }
    if(!pStackTop)
@@ -962,11 +962,11 @@ DefineEngineMethod( SimXMLDocument, pushNewElement, void, ( const char* name ),,
 // -----------------------------------------------------------------------------
 void SimXMLDocument::addNewElement(const char* rName)
 {    
-   TiXmlElement cElement( rName );
-   TiXmlElement* pStackTop = 0;
+   fsTiXmlElement cElement( rName );
+   fsTiXmlElement* pStackTop = 0;
    if(m_paNode.empty())
    {
-      pStackTop = dynamic_cast<TiXmlElement*>
+      pStackTop = dynamic_cast<fsTiXmlElement*>
          (m_qDocument->InsertEndChild( cElement ));
       if(!pStackTop)
       {
@@ -979,7 +979,7 @@ void SimXMLDocument::addNewElement(const char* rName)
    const S32 iParentElement = m_paNode.size() - 2;
    if(iParentElement < 0)
    {
-      pStackTop = dynamic_cast<TiXmlElement*>
+      pStackTop = dynamic_cast<fsTiXmlElement*>
          (m_qDocument->InsertEndChild( cElement ));
       if(!pStackTop)
       {
@@ -990,12 +990,12 @@ void SimXMLDocument::addNewElement(const char* rName)
    }
    else
    {
-      TiXmlElement* pNode = m_paNode[iParentElement];
+      fsTiXmlElement* pNode = m_paNode[iParentElement];
       if(!pNode)
       {
          return;
       }   
-      pStackTop = dynamic_cast<TiXmlElement*>
+      pStackTop = dynamic_cast<fsTiXmlElement*>
          (pNode->InsertEndChild( cElement ));
       if(!pStackTop)
       {
@@ -1029,7 +1029,7 @@ DefineEngineMethod( SimXMLDocument, addNewElement, void, ( const char* name ),,
 // -----------------------------------------------------------------------------
 void SimXMLDocument::addHeader(void)
 {
-   TiXmlDeclaration cDeclaration("1.0", "utf-8", "yes");
+   fsTiXmlDeclaration cDeclaration("1.0", "utf-8", "yes");
    m_qDocument->InsertEndChild(cDeclaration);
 }
 
@@ -1057,7 +1057,7 @@ DefineEngineMethod( SimXMLDocument, addHeader, void, (),,
 
 void SimXMLDocument::addComment(const char* comment)
 {
-   TiXmlComment cComment;
+   fsTiXmlComment cComment;
    cComment.SetValue(comment);
    m_qDocument->InsertEndChild(cComment);
 }
@@ -1160,12 +1160,12 @@ void SimXMLDocument::addText(const char* text)
    if(m_paNode.empty())
       return;
 
-   const S32 iFinalElement = m_paNode.size() - 1;
-   TiXmlElement* pNode = m_paNode[iFinalElement];
+   const int iFinalElement = m_paNode.size() - 1;
+   fsTiXmlElement* pNode = m_paNode[iFinalElement];
    if(!pNode)
       return;
 
-   TiXmlText cText(text);
+   fsTiXmlText cText(text);
    pNode->InsertEndChild( cText );
 }
 
@@ -1265,8 +1265,8 @@ void SimXMLDocument::removeText()
    if(m_paNode.empty())
       return;
 
-   const S32 iFinalElement = m_paNode.size() - 1;
-   TiXmlElement* pNode = m_paNode[iFinalElement];
+   const int iFinalElement = m_paNode.size() - 1;
+   fsTiXmlElement* pNode = m_paNode[iFinalElement];
    if(!pNode)
       return;
 
@@ -1301,12 +1301,12 @@ void SimXMLDocument::addData(const char* text)
    if(m_paNode.empty())
       return;
 
-   const S32 iFinalElement = m_paNode.size() - 1;
-   TiXmlElement* pNode = m_paNode[iFinalElement];
+   const int iFinalElement = m_paNode.size() - 1;
+   fsTiXmlElement* pNode = m_paNode[iFinalElement];
    if(!pNode)
       return;
 
-   TiXmlText cText(text);
+   fsTiXmlText cText(text);
    pNode->InsertEndChild( cText );
 }
 

@@ -38,6 +38,7 @@
 #ifndef _TSIGNAL_H_
 #include "core/util/tSignal.h"
 #endif
+#include <taml/tamlChildren.h>
 
 
 //---------------------------------------------------------------------------
@@ -89,7 +90,7 @@
 ///         }
 /// @endcode
 ///
-class SimSet: public SimObject
+class SimSet: public SimObject, public TamlChildren
 {
    public:
 
@@ -277,6 +278,32 @@ class SimSet: public SimObject
       virtual bool readObject(Stream *stream);
 
       virtual SimSet* clone();
+
+      // TamlChildren
+      virtual U32 getTamlChildCount( void ) const
+      {
+         return (U32)size();
+      }
+
+      virtual SimObject* getTamlChild( const U32 childIndex ) const
+      {
+         // Sanity!
+         AssertFatal( childIndex < (U32)size(), "SimSet::getTamlChild() - Child index is out of range." );
+
+         // For when the assert is not used.
+         if ( childIndex >= (U32)size() )
+            return NULL;
+
+         return at( childIndex );
+      }
+
+      virtual void addTamlChild( SimObject* pSimObject )
+      {
+         // Sanity!
+         AssertFatal( pSimObject != NULL, "SimSet::addTamlChild() - Cannot add a NULL child object." );
+
+         addObject( pSimObject );
+      }
 };
 
 #ifdef TORQUE_DEBUG_GUARD
