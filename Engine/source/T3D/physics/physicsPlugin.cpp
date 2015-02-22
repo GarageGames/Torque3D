@@ -35,6 +35,9 @@
 #include "T3D/physics/physicsWorld.h"
 #include "core/util/tNamedFactory.h"
 
+// BlissGMK >>
+#include "T3D/BlissGMK/physics/physics.h"
+// BlissGMK <<
 
 PhysicsPlugin* PhysicsPlugin::smSingleton = NULL;
 PhysicsResetSignal PhysicsPlugin::smPhysicsResetSignal;
@@ -133,7 +136,11 @@ DefineConsoleFunction( physicsPluginPresent, bool, (), , "physicsPluginPresent()
 
 DefineConsoleFunction( physicsInit, bool, (const char * library), ("default"), "physicsInit( [string library] )")
 {
-   return PhysicsPlugin::activate( library );
+   // BlissGMK >>
+   // note : at this point, you need to add the BlissGMK folder.
+   Physics::init(library); // fixme : check that the init is proper!
+   // BlissGMK <<
+   return PhysicsPlugin::activate(library);
 }
 
 DefineConsoleFunction( physicsDestroy, void, (), , "physicsDestroy()")
@@ -145,6 +152,12 @@ DefineConsoleFunction( physicsDestroy, void, (), , "physicsDestroy()")
 DefineConsoleFunction( physicsInitWorld, bool, (const char * worldName), , "physicsInitWorld( String worldName )")
 {
     bool res = PHYSICSMGR && PHYSICSMGR->createWorld( String( worldName ) );
+
+	// BlissGMK >>
+	if (res) // fixme : check if this works..
+		Physics::createPhysics(!dStrcmp(worldName, "server"), PHYSICSMGR->getWorld(String(worldName)));
+	// BlissGMK <<
+
    return res;
 }
 
@@ -152,6 +165,10 @@ DefineConsoleFunction( physicsDestroyWorld, void, (const char * worldName), , "p
 {
    if ( PHYSICSMGR )
       PHYSICSMGR->destroyWorld( worldName );
+
+   // BlissGMK >>
+   Physics::destroyPhysics(!dStrcmp(worldName, "server"));
+   // BlissGMK <<
 }
 
 
