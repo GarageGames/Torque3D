@@ -63,6 +63,9 @@ private:
 
    Point3F mAimOffset;
 
+   // move triggers
+   bool mMoveTriggers[MaxTriggerKeys];
+
    // Utility Methods
    void throwCallback( const char *name );
 
@@ -174,6 +177,11 @@ public:
    void setMoveDestination( const Point3F &location, bool slowdown );
    Point3F getMoveDestination() const { return mMoveDestination; }
    void stopMove();
+
+   // Trigger sets/gets
+   void setMoveTrigger( U32 slot, const bool isSet = true );
+   bool getMoveTrigger( U32 slot ) const;
+   void clearMoveTriggers();
 
 #ifdef TORQUE_NAVIGATION_ENABLED
    /// @name Pathfinding
