@@ -4624,6 +4624,8 @@ S32 GuiTreeViewCtrl::findItemByName(const char *name)
 {
    for (S32 i = 0; i < mItems.size(); i++) 
    {
+      if ( !mItems[i] )
+         continue;
 	   if( mItems[i]->mState.test( Item::InspectorData ) )
 		   continue;
       if (mItems[i] && dStrcmp(mItems[i]->getText(),name) == 0) 
