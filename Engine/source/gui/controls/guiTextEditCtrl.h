@@ -123,6 +123,10 @@ public:
    void selectAllText();
    void clearSelectedText();
 
+   // BlissGMK >>
+   void selectText(S32 blockStart, S32 blockEnd);
+   // BlissGMK <<
+
    void forceValidateText();
    const char *getScriptValue();
    void setScriptValue(const char *value);
@@ -138,6 +142,10 @@ public:
    void onCopy(bool andCut);
    void onPaste();
    void onUndo();
+
+   // BlissGMK >>
+   void onChangeCursorPos();
+   // BlissGMK <<
 
    virtual void setFirstResponder();
    virtual void onLoseFirstResponder();

@@ -48,7 +48,14 @@
 #include "T3D/prefab.h"
 #include "math/mEase.h"
 
+// BlissGMK >>
+#include "core/strings/stringUnit.h"
 
+F32 gMinIconDist = 3.f;
+F32 gMaxIconDist = 30.f;
+F32 gIconResizeStep = 0.02f;
+F32 gIconMaxResizeCoef = 0.8f;
+// BlissGMK <<
 
 IMPLEMENT_CONOBJECT( WorldEditor );
 
@@ -1558,6 +1565,53 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
       GFX->drawPrimitive(GFXTriangleList,0,vIdx/3);
 }
 
+// BlissGMK >>
+void WorldEditor::renderLinks(SceneObject * obj)
+{
+	int drawLinksMode = Con::getIntVariable("$pref::GameMechaniksKit::drawLinksMode");
+	if (drawLinksMode == 0) return;
+
+	char varName[64];
+	dSprintf(varName, 64, "$linksList%d", obj->getId());
+	const char* objectsList = Con::getVariable(varName);
+	if (!objectsList || !(*objectsList))
+		return;
+
+	if (drawLinksMode == 1 && !mSelected->objInSet(obj))
+		return;
+
+	Point3F objectPos = getBoundingBoxCenter(obj);
+
+	int count = StringUnit::getUnitCount(objectsList, " \t\n");
+	PrimBuild::begin(GFXLineList, count * 2);
+	for (int i = 0; i < count; i++)
+	{
+		const char* linkedObjectId = StringUnit::getUnit(objectsList, i, " \t\n");
+		if (!linkedObjectId || !(*linkedObjectId)) continue;
+
+		SceneObject* linkedObject = NULL;
+		Sim::findObject(linkedObjectId, linkedObject);
+
+		if (!linkedObject) continue;
+
+
+		Point3F linkedWorldPos = getBoundingBoxCenter(linkedObject);
+
+		ColorF lineColor(0.5, 0.5, 0.5);
+		if (mSelected->objInSet(obj))
+			lineColor.set(1, 1, 1);
+
+		//GFX->getDrawUtil()->drawLine(objectPos, linkedWorldPos, ColorF(1, 1, 1));		
+
+		PrimBuild::color(lineColor);
+
+		PrimBuild::vertex3fv(objectPos);
+		PrimBuild::vertex3fv(linkedWorldPos);
+	}
+	PrimBuild::end();
+}
+// BlissGMK <<
+
 void WorldEditor::renderScreenObj( SceneObject *obj, const Point3F& projPos, const Point3F& wPos )
 {
    // Do not render control objects, hidden objects,
@@ -1567,6 +1621,56 @@ void WorldEditor::renderScreenObj( SceneObject *obj, const Point3F& projPos, con
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
    
+   // BlissGMK >>
+   //Draw the game objects icons
+   if (mGameMechanicsMode && mShowIcons)
+   {
+	   char chunk[256];
+	   dSprintf(chunk, 256, "getEditorIcon(%d);", obj->getId());
+	   const char* iconPath = Con::executef("eval", chunk);
+	   if (iconPath != NULL && strlen(iconPath) > 0)
+	   {
+		   StringTableEntry iconPathString = StringTable->insert(iconPath);
+		   GFXTexHandle editorIcon;
+		   HashTable<StringTableEntry, GFXTexHandle>::Iterator it = mIconsCache.find(iconPathString);
+		   if (it != mIconsCache.end())
+			   editorIcon = it->value;
+		   else
+		   {
+			   editorIcon = GFXTexHandle(iconPathString, &GFXDefaultStaticDiffuseProfile, avar("%s; %s() - editorIcon = GFXTexHandle (line %d)", iconPathString, __FUNCTION__, __LINE__));
+			   mIconsCache.insertUnique(iconPathString, editorIcon);
+		   }
+		   AssertWarn(editorIcon.getPointer() != NULL, avar("Wrong editorIcon file - \" %s \" ", iconPath));
+		   if (editorIcon)
+		   {
+			   Point2I size(editorIcon->getWidth(), editorIcon->getHeight());
+			   GameConnection* connection = GameConnection::getConnectionToServer();
+			   Point2I iPos(0, 0);
+			   iPos.x = projPos.x;
+			   iPos.y = projPos.y;
+			   if (connection)
+			   {
+				   // Grab the camera's transform
+				   MatrixF mat;
+				   connection->getControlCameraTransform(0, &mat);
+
+				   float dist = Point3F(mat.getPosition() - obj->getPosition()).len();
+				   dist = mClampF(dist, gMinIconDist, gMaxIconDist);
+				   float coef = gIconMaxResizeCoef - ((dist - gMinIconDist) * gIconResizeStep);
+				   size.x *= coef;
+				   size.y *= coef;
+				   iPos.y -= 20 * coef;
+			   }
+			   iPos.x -= (size.x / 2);
+			   iPos.y -= (size.y / 2);
+			   RectI rect(iPos.x, iPos.y, size.x, size.y);
+			   drawer->clearBitmapModulation();
+			   drawer->drawBitmapStretch(editorIcon, rect);
+		   }
+	   }
+   }
+   // BlissGMK <<
+
    // Lookup the ClassIcon - TextureHandle
    GFXTexHandle classIcon = gEditorIcons.findIcon( obj );
 
@@ -1687,6 +1791,24 @@ WorldEditor::ClassInfo::~ClassInfo()
 
 bool WorldEditor::objClassIgnored(const SimObject * obj)
 {
+   // BlissGMK >>
+   //In Game Mechanics mode only select objects, that have
+   //dynamic field "templateName".
+   if (mGameMechanicsMode)
+   {
+	   SceneObject* objNotConst = const_cast<SceneObject*>((SceneObject*)obj);
+	   const char* templateName = objNotConst->getDataField(StringTable->insert("templateName"), NULL);
+	   //When 'gmkEditorVisible' field is true it allows selection even of non GMK template
+	   //objects. When gmkEditorVisible = false it can prevent selection of GMK object as well.
+	   //When it unspecified it just ignored.
+	   const char* gmkEditorVisibleStr = objNotConst->getDataField(StringTable->insert("gmkEditorVisible"), NULL);
+	   bool gmkEditorVisible = dStrlen(gmkEditorVisibleStr) > 0 ? dAtob(gmkEditorVisibleStr) : false;
+	   if (!(gmkEditorVisible || (dStrlen(gmkEditorVisibleStr) == 0 && 
+		   dStrlen(templateName) > 0)))
+		   return true;
+   }
+   // BlissGMK <<
+
    ClassInfo::Entry * entry = getClassEntry(obj);
    if(mToggleIgnoreList)
       return(!(entry ? entry->mIgnoreCollision : false));
@@ -1790,6 +1912,12 @@ WorldEditor::WorldEditor()
    Sim::getRootGroup()->addObject( mDragSelected );
    mDragSelected->setAutoSelect(false);
 
+   // BlissGMK >>
+   mShowIcons = false;
+   mGameMechanicsMode = false;
+   mHighLightedObject = NULL;
+   // BlissGMK <<
+
    //
    mSoftSnap = false;
    mSoftSnapActivated = false;
@@ -1826,6 +1954,13 @@ bool WorldEditor::onAdd()
    mDefaultClassEntry.mDefaultHandle   = GFXTexHandle(mDefaultHandle,   &GFXDefaultStaticDiffuseProfile, avar("%s() - mDefaultClassEntry.mDefaultHandle (line %d)", __FUNCTION__, __LINE__));
    mDefaultClassEntry.mSelectHandle    = GFXTexHandle(mSelectHandle,    &GFXDefaultStaticDiffuseProfile, avar("%s() - mDefaultClassEntry.mSelectHandle (line %d)", __FUNCTION__, __LINE__));
    mDefaultClassEntry.mLockedHandle    = GFXTexHandle(mLockedHandle,    &GFXDefaultStaticDiffuseProfile, avar("%s() - mDefaultClassEntry.mLockedHandle (line %d)", __FUNCTION__, __LINE__));
+
+   // BlissGMK >>
+   Con::addVariable("minIconDist", TypeF32, &gMinIconDist);
+   Con::addVariable("maxIconDist", TypeF32, &gMaxIconDist);
+   Con::addVariable("iconResizeStep", TypeF32, &gIconResizeStep);
+   Con::addVariable("iconMaxResizeCoef", TypeF32, &gIconMaxResizeCoef);
+   // BlissGMK <<
 
    if(!(mDefaultClassEntry.mDefaultHandle && mDefaultClassEntry.mSelectHandle && mDefaultClassEntry.mLockedHandle))
       return false;
@@ -2025,6 +2160,11 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
       if( !addToSelection )
          clearSelection();
 
+	  // BlissGMK >>
+	  if (mDragSelected->size() > 0)
+		  Con::executef(this, "onStartSelection");
+	  // BlissGMK <<
+
       if ( mDragSelected->size() > 1 )
       {
          for ( U32 i = 0; i < mDragSelected->size(); i++ )                     
@@ -2038,6 +2178,12 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
             obj = Sim::findObject( mRedirectID );
          Con::executef( obj ? obj : this, "onClick", ( *mSelected )[ 0 ]->getIdString() );
       }
+
+	  // BlissGMK >>
+	  if (mDragSelected->size() > 0)
+		  Con::executef(this, "onEndSelection");
+	  // BlissGMK <<
+
       else if ( mDragSelected->size() == 1 )
       {         
          mSelected->addObject( ( *mDragSelected )[0] );    
@@ -2398,6 +2544,23 @@ void WorldEditor::renderScene( const RectI &updateRect )
       frustum.set( isOrtho, left, right, top, bottom, nearPlane, farPlane, cameraMat );
    }
 
+   // BlissGMK >>
+   if (mHighLightedObject != NULL)
+   {
+	   renderObjectBox(mHighLightedObject, ColorI(255, 255, 0));
+   }
+
+   Vector<SceneObject *> objectsVector;
+   gServerContainer.findObjects(0xFFFFFFFF, findObjectsCallback, &objectsVector);
+   for (int i = 0; i < objectsVector.size(); i++)
+   {
+	   SceneObject * obj = objectsVector[i];
+	   if (objClassIgnored(obj))
+		   continue;
+	   renderLinks(obj);
+   }
+   // BlissGMK <<
+
    // Render the paths
    renderPaths(Sim::findObject("MissionGroup"));
 
@@ -2733,6 +2896,11 @@ void WorldEditor::initPersistFields()
       addField( "selectHandle",           TypeFilename, Offset(mSelectHandle, WorldEditor) );
       addField( "defaultHandle",          TypeFilename, Offset(mDefaultHandle, WorldEditor) );
       addField( "lockedHandle",           TypeFilename, Offset(mLockedHandle, WorldEditor) );
+
+	  // BlissGMK >>
+	  addField("gameMechanicsMode", TypeBool, Offset(mGameMechanicsMode, WorldEditor));
+	  addField("showIcons", TypeBool, Offset(mShowIcons, WorldEditor));
+	  // BlissGMK <<
    
    endGroup( "Rendering" );
    
@@ -3170,6 +3338,50 @@ void WorldEditor::resetSelectedScale()
          object->setScale(Point3F(1,1,1));
    }
 }
+
+// BlissGMK >>
+void	WorldEditor::invalidateCentroid()
+{
+	mSelected->invalidateCentroid();
+};
+
+void WorldEditor::highlightObject(const char* obj)
+{
+	Sim::findObject(obj, mHighLightedObject);
+}
+
+ConsoleMethod(WorldEditor, highlightObject, void, 3, 3, "(SceneObject obj)")
+{
+	object->highlightObject(argv[2]);
+}
+
+void WorldEditor::clearHighlighting()
+{
+	mHighLightedObject = NULL;
+}
+
+ConsoleMethod(WorldEditor, clearHighlighting, void, 2, 2, "")
+{
+	object->clearHighlighting();
+}
+
+ConsoleMethod(WorldEditor, updateClientTransforms, void, 3, 3, "")
+{
+	SceneObject* obj;
+	Sim::findObject(argv[2], obj);
+	if (!obj)
+		return;
+
+	SceneObject * clientObj = object->getClientObj(obj);
+	if (!clientObj)
+		return;
+
+	//
+	clientObj->setTransform(obj->getTransform());
+	clientObj->setScale(obj->getScale());
+	object->invalidateCentroid();
+}
+// BlissGMK <<
 
 //------------------------------------------------------------------------------
 
