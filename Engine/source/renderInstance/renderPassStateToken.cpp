@@ -86,7 +86,7 @@ static const char *_get_enable(void* obj, const char* data)
 
 void RenderPassStateToken::initPersistFields()
 {
-   addProtectedField("enabled", TypeBool, NULL, &_set_enable, &_get_enable, "Enables or disables this token.");
+   addProtectedField("enabled", TypeBool, NULL, &_set_enable, &_get_enable, new AbstractClassRep::WriteDataNotify(), "Enables or disables this token.");
    Parent::initPersistFields();
 }
 

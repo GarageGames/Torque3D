@@ -246,59 +246,75 @@ void GuiControl::initPersistFields()
          "The position relative to the parent control." );
       addField("extent",            TypePoint2I,      Offset(mBounds.extent, GuiControl),
          "The width and height of the control." );
-      addField("minExtent",         TypePoint2I,      Offset(mMinExtent, GuiControl),
+      addField("minExtent",         TypePoint2I,      Offset(mMinExtent, GuiControl), 
+         new DefaultValueWriteFn("8 2"),
          "The minimum width and height of the control. The control will not be resized smaller than this." );
-      addField("horizSizing",       TYPEID< horizSizingOptions >(),         Offset(mHorizSizing, GuiControl),
+      addField("horizSizing",       TYPEID< horizSizingOptions >(),         Offset(mHorizSizing, GuiControl), 
+         new DefaultValueWriteFn("right"),
          "The horizontal resizing behavior." );
-      addField("vertSizing",        TYPEID< vertSizingOptions >(),         Offset(mVertSizing, GuiControl),
+      addField("vertSizing",        TYPEID< vertSizingOptions >(),         Offset(mVertSizing, GuiControl), 
+         new DefaultValueWriteFn("bottom"),
          "The vertical resizing behavior." );
 
    endGroup( "Layout" );
 
    addGroup( "Control");
 
-      addProtectedField("profile",  TYPEID< GuiControlProfile >(),   Offset(mProfile, GuiControl), &setProfileProt, &defaultProtectedGetFn,
+      addProtectedField("profile",  TYPEID< GuiControlProfile >(),   Offset(mProfile, GuiControl), &setProfileProt, &defaultProtectedGetFn, 
+         new DefaultValueWriteFn(""),
          "The control profile that determines fill styles, font settings, etc." );
 
-      addProtectedField( "visible", TypeBool,         Offset(mVisible, GuiControl), &_setVisible, &defaultProtectedGetFn,
+      addProtectedField( "visible", TypeBool,         Offset(mVisible, GuiControl), &_setVisible, &defaultProtectedGetFn, 
+         new DefaultBoolWriteFn(true),
          "Whether the control is visible or hidden." );
-      addProtectedField( "active",  TypeBool,         Offset( mActive, GuiControl ), &_setActive, &defaultProtectedGetFn,
+      addProtectedField( "active",  TypeBool,         Offset( mActive, GuiControl ), &_setActive, &defaultProtectedGetFn, 
+         new DefaultBoolWriteFn(true),
          "Whether the control is enabled for user interaction." );
 
       addDeprecatedField("modal");
       addDeprecatedField("setFirstResponder");
 
-      addField("variable",          TypeString,       Offset(mConsoleVariable, GuiControl),
+      addField("variable",          TypeString,       Offset(mConsoleVariable, GuiControl), 
+         new DefaultValueWriteFn(""),
          "Name of the variable to which the value of this control will be synchronized." );
-      addField("command",           TypeRealString,   Offset(mConsoleCommand, GuiControl),
+      addField("command",           TypeRealString,   Offset(mConsoleCommand, GuiControl), 
+         new DefaultValueWriteFn(""),
          "Command to execute on the primary action of the control.\n\n"
          "@note Within this script snippet, the control on which the #command is being executed is bound to "
             "the global variable $ThisControl." );
-      addField("altCommand",        TypeRealString,   Offset(mAltConsoleCommand, GuiControl),
+      addField("altCommand",        TypeRealString,   Offset(mAltConsoleCommand, GuiControl), 
+         new DefaultValueWriteFn(""),
          "Command to execute on the secondary action of the control.\n\n"
          "@note Within this script snippet, the control on which the #altCommand is being executed is bound to "
             "the global variable $ThisControl." );
-      addField("accelerator",       TypeString,       Offset(mAcceleratorKey, GuiControl),
+      addField("accelerator",       TypeString,       Offset(mAcceleratorKey, GuiControl), 
+         new DefaultValueWriteFn(""),
          "Key combination that triggers the control's primary action when the control is on the canvas." );
 
    endGroup( "Control" );	
    
    addGroup( "ToolTip" );
-      addProtectedField("tooltipProfile", TYPEID< GuiControlProfile >(), Offset(mTooltipProfile, GuiControl), &setTooltipProfileProt, &defaultProtectedGetFn,
+      addProtectedField("tooltipProfile", TYPEID< GuiControlProfile >(), Offset(mTooltipProfile, GuiControl), 
+         &setTooltipProfileProt, &defaultProtectedGetFn, 
+         new PublicMemberWriteFn<GuiControl, GuiControlProfile*>(NULL, &GuiControl::mTooltipProfile),
          "Control profile to use when rendering tooltips for this control." );
-      addField("tooltip",           TypeRealString,   Offset(mTooltip, GuiControl),
+      addField("tooltip",           TypeRealString,   Offset(mTooltip, GuiControl), 
+         new DefaultValueWriteFn(""),
          "String to show in tooltip for this control." );
-      addField("hovertime",         TypeS32,          Offset(mTipHoverTime, GuiControl),
+      addField("hovertime",         TypeS32,          Offset(mTipHoverTime, GuiControl), 
+         new DefaultIntWriteFn(1000),
          "Time for mouse to hover over control until tooltip is shown (in milliseconds)." );
    endGroup( "ToolTip" );
 
    addGroup( "Editing" );
-      addField("isContainer",       TypeBool,      Offset(mIsContainer, GuiControl),
+      addField("isContainer",       TypeBool,      Offset(mIsContainer, GuiControl), 
+         new DefaultBoolWriteFn(true),
          "If true, the control may contain child controls." );
    endGroup( "Editing" );
 
    addGroup( "Localization" );
-      addField("langTableMod",      TypeString,       Offset(mLangTableName, GuiControl),
+      addField("langTableMod",      TypeString,       Offset(mLangTableName, GuiControl), 
+         new DefaultValueWriteFn(""),
          "Name of string table to use for lookup of internationalized text." );
    endGroup( "Localization" );
 

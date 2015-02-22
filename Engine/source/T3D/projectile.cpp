@@ -246,17 +246,17 @@ void ProjectileData::initPersistFields()
    
    addField("impactForce", TypeF32, Offset(impactForce, ProjectileData));
 
-   addProtectedField("lifetime", TypeS32, Offset(lifetime, ProjectileData), &setLifetime, &getScaledValue, 
+   addProtectedField("lifetime", TypeS32, Offset(lifetime, ProjectileData), &setLifetime, &getScaledValue, new AbstractClassRep::WriteDataNotify(),
       "@brief Amount of time, in milliseconds, before the projectile is removed from the simulation.\n\n"
       "Used with fadeDelay to determine the transparency of the projectile at a given time. "
       "A projectile may exist up to a maximum of 131040ms (or 4095 ticks) as defined by Projectile::MaxLivingTicks in the source code."
       "@see fadeDelay");
 
-   addProtectedField("armingDelay", TypeS32, Offset(armingDelay, ProjectileData), &setArmingDelay, &getScaledValue, 
+   addProtectedField("armingDelay", TypeS32, Offset(armingDelay, ProjectileData), &setArmingDelay, &getScaledValue, new AbstractClassRep::WriteDataNotify(),
       "@brief Amount of time, in milliseconds, before the projectile will cause damage or explode on impact.\n\n"
       "This value must be equal to or less than the projectile's lifetime.\n\n"
       "@see lifetime");
-   addProtectedField("fadeDelay", TypeS32, Offset(fadeDelay, ProjectileData), &setFadeDelay, &getScaledValue,
+   addProtectedField("fadeDelay", TypeS32, Offset(fadeDelay, ProjectileData), &setFadeDelay, &getScaledValue, new AbstractClassRep::WriteDataNotify(),
       "@brief Amount of time, in milliseconds, before the projectile begins to fade out.\n\n"
       "This value must be smaller than the projectile's lifetime to have an affect.");
 
@@ -589,11 +589,11 @@ void Projectile::initPersistFields()
 {
    addGroup("Physics");
 
-   addProtectedField("initialPosition",  TypePoint3F, Offset(mInitialPosition, Projectile), &_setInitialPosition, &defaultProtectedGetFn,
+   addProtectedField("initialPosition",  TypePoint3F, Offset(mInitialPosition, Projectile), &_setInitialPosition, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "@brief Starting position for the projectile.\n\n");
    //addField("initialPosition",  TypePoint3F, Offset(mCurrPosition, Projectile),
    //   "@brief Starting position for the projectile.\n\n");
-   addProtectedField("initialVelocity", TypePoint3F, Offset(mInitialVelocity, Projectile), &_setInitialVelocity, &defaultProtectedGetFn,
+   addProtectedField("initialVelocity", TypePoint3F, Offset(mInitialVelocity, Projectile), &_setInitialVelocity, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "@brief Starting velocity for the projectile.\n\n");
    //addField("initialVelocity", TypePoint3F, Offset(mCurrVelocity, Projectile),
    //   "@brief Starting velocity for the projectile.\n\n");

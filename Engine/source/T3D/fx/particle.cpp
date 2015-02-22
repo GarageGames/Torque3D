@@ -205,12 +205,12 @@ void ParticleData::initPersistFields()
       "The particle color will linearly interpolate between the color/time keys "
       "over the lifetime of the particle." );
    addProtectedField( "sizes", TYPEID< F32 >(), Offset(sizes, ParticleData), &protectedSetSizes, 
-      &defaultProtectedGetFn, PDC_NUM_KEYS,
+      &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), PDC_NUM_KEYS,
       "@brief Particle size keyframe values.\n\n"
       "The particle size will linearly interpolate between the size/time keys "
       "over the lifetime of the particle." );
    addProtectedField( "times", TYPEID< F32 >(), Offset(times, ParticleData), &protectedSetTimes, 
-      &defaultProtectedGetFn, PDC_NUM_KEYS,
+      &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), PDC_NUM_KEYS,
       "@brief Time keys used with the colors and sizes keyframes.\n\n"
       "Values are from 0.0 (particle creation) to 1.0 (end of lifespace)." );
 

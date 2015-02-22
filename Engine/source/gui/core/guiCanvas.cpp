@@ -180,7 +180,7 @@ void GuiCanvas::initPersistFields()
    endGroup("Mouse Handling");
 
    addGroup("Canvas Rendering");
-   addProtectedField( "numFences", TypeS32, Offset( mNumFences, GuiCanvas ), &setProtectedNumFences, &defaultProtectedGetFn, "The number of GFX fences to use." );
+   addProtectedField( "numFences", TypeS32, Offset( mNumFences, GuiCanvas ), &setProtectedNumFences, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "The number of GFX fences to use." );
 
    addField("displayWindow", TypeBool, Offset(mDisplayWindow, GuiCanvas), "Controls if the canvas window is rendered or not." );
    endGroup("Canvas Rendering");

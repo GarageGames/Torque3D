@@ -80,7 +80,7 @@ void Prefab::initPersistFields()
    addGroup( "Prefab" );
 
       addProtectedField( "filename", TypePrefabFilename, Offset( mFilename, Prefab ),         
-                         &protectedSetFile, &defaultProtectedGetFn,
+                         &protectedSetFile, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
                          "(.prefab) File describing objects within this prefab." );
 
    endGroup( "Prefab" );

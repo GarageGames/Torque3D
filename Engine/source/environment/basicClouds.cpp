@@ -158,31 +158,85 @@ void BasicClouds::onRemove()
    Parent::onRemove();
 }
 
+struct BasicCloudsHeightWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      BasicClouds* cloud = static_cast<BasicClouds*>(obj);
+      F32 defVal;
+      U32 i = dAtoi(idx);
+      switch (i)
+      {
+      case 0:
+         defVal = 4.0f;
+         break;
+      case 1:
+         defVal = 3.0f;
+         break;
+      case 2:
+         defVal = 2.0f;
+         break;
+      default:
+         defVal = 0.0f;
+      }
+      if(dAtof(cloud->getDataField(pFieldName,idx)) == defVal)
+         return false;
+      return true;
+   }
+};
+
+struct BasicCloudsTexSpeedWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      BasicClouds* cloud = static_cast<BasicClouds*>(obj);
+      F32 defVal;
+      U32 i = dAtoi(idx);
+      switch (i)
+      {
+      case 0:
+         defVal = 0.0005f;
+         break;
+      case 1:
+         defVal = 0.001f;
+         break;
+      case 2:
+         defVal = 0.0003f;
+         break;
+      default:
+         defVal = 0.0f;
+      }
+      if(dAtof(cloud->getDataField(pFieldName,idx)) == defVal)
+         return false;
+      return true;
+   }
+};
+
 void BasicClouds::initPersistFields()
 {
    addGroup( "BasicClouds" );
 
-      addArray( "Layers", TEX_COUNT );
+      addArray( "Layers", "Layer", TEX_COUNT );
 
-         addField( "layerEnabled", TypeBool, Offset( mLayerEnabled, BasicClouds ), TEX_COUNT,
+         addField( "layerEnabled", TypeBool, Offset( mLayerEnabled, BasicClouds ), new DefaultBoolWriteFn(true), TEX_COUNT,
             "Enable or disable rendering of this layer." );
 
          addField( "texture", TypeImageFilename, Offset( mTexName, BasicClouds ), TEX_COUNT,
             "Texture for this layer." );
 
-         addField( "texScale", TypeF32, Offset( mTexScale, BasicClouds ), TEX_COUNT,
+         addField( "texScale", TypeF32, Offset( mTexScale, BasicClouds ), new DefaultFloatWriteFn(1.0f), TEX_COUNT,
             "Texture repeat for this layer." );
 
-         addField( "texDirection", TypePoint2F, Offset( mTexDirection, BasicClouds ), TEX_COUNT,
+         addField( "texDirection", TypePoint2F, Offset( mTexDirection, BasicClouds ), new DefaultValueWriteFn("1 0"), TEX_COUNT,
             "Texture scroll direction for this layer, relative to the world axis." );
 
-         addField( "texSpeed", TypeF32, Offset( mTexSpeed, BasicClouds ), TEX_COUNT,
+         addField( "texSpeed", TypeF32, Offset( mTexSpeed, BasicClouds ), new BasicCloudsTexSpeedWriteFn(), TEX_COUNT,
             "Texture scroll speed for this layer." );   
 
-         addField( "texOffset", TypePoint2F, Offset( mTexOffset, BasicClouds ), TEX_COUNT,
+         addField( "texOffset", TypePoint2F, Offset( mTexOffset, BasicClouds ), new DefaultValueWriteFn("0.5 0.5"), TEX_COUNT,
             "UV offset for this layer." );
 
-         addField( "height", TypeF32, Offset( mHeight, BasicClouds ), TEX_COUNT,
+         addField( "height", TypeF32, Offset( mHeight, BasicClouds ), new BasicCloudsHeightWriteFn(), TEX_COUNT,
             "Abstract number which controls the curvature and height of the dome mesh" );
 
       endArray( "Layers" );      

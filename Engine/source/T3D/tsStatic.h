@@ -195,6 +195,8 @@ public:
    static void initPersistFields();
    static bool _setFieldSkin( void *object, const char* index, const char* data );
    static const char *_getFieldSkin( void *object, const char *data );
+   static bool writeShapeName(void *obj, StringTableEntry fieldName) { TSStatic* object = static_cast<TSStatic*>(obj); return object->getShapeFileName() != NULL && object->getShapeFileName() != StringTable->EmptyString(); };
+   static bool writeSkinName(void *obj, StringTableEntry fieldName) { TSStatic* object = static_cast<TSStatic*>(obj); return object->mSkinNameHandle.getString() != NULL && object->mSkinNameHandle.getString() != StringTable->EmptyString(); };
 
    // Skinning
    void setSkinName( const char *name );

@@ -192,7 +192,7 @@ void SimComponent::initPersistFields()
     addGroup("Component");
 
         addProtectedField( "Template", TypeBool, Offset(mTemplate, SimComponent), 
-           &setIsTemplate, &defaultProtectedGetFn, 
+           &setIsTemplate, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
            "Places the object in a component set for later use in new levels." );
 
     endGroup("Component");

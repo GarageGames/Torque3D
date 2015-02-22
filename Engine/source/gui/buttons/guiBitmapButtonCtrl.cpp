@@ -133,26 +133,30 @@ void GuiBitmapButtonCtrl::initPersistFields()
    addGroup( "Bitmap" );
    
       addProtectedField( "bitmap", TypeStringFilename, Offset( mBitmapName, GuiBitmapButtonCtrl ),
-         &_setBitmap, &defaultProtectedGetFn,
+         &_setBitmap, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Texture file to display on this button.\n"
          "If useStates is false, this will be the file that renders on the control.  Otherwise, this will "
          "specify the default texture name to which the various state and modifier suffixes are appended "
          "to find the per-state and per-modifier (if enabled) textures." );
-      addField( "bitmapMode", TYPEID< BitmapMode >(), Offset( mBitmapMode, GuiBitmapButtonCtrl ),
+      addField( "bitmapMode", TYPEID< BitmapMode >(), Offset( mBitmapMode, GuiBitmapButtonCtrl ), 
+         new DefaultValueWriteFn("Stretched"),
          "Behavior for fitting the bitmap to the control extents.\n"
          "If set to 'Stretched', the bitmap will be stretched both verticall and horizontally to fit inside "
          "the control's extents.\n\n"
          "If set to 'Centered', the bitmap will stay at its original resolution centered in the control's "
          "rectangle (getting clipped if the control is smaller than the texture)." );
       addProtectedField( "autoFitExtents", TypeBool, Offset( mAutoFitExtents, GuiBitmapButtonCtrl ),
-         &_setAutoFitExtents, &defaultProtectedGetFn,
+         &_setAutoFitExtents, &defaultProtectedGetFn, 
+         new DefaultBoolWriteFn(false),
          "If true, the control's extents will be set to match the bitmap's extents when setting the bitmap.\n"
          "The bitmap extents will always be taken from the default/normal bitmap (in case the extents of the various "
          "bitmaps do not match up.)" );
-      addField( "useModifiers", TypeBool, Offset( mUseModifiers, GuiBitmapButtonCtrl ),
+      addField( "useModifiers", TypeBool, Offset( mUseModifiers, GuiBitmapButtonCtrl ), 
+         new DefaultBoolWriteFn(false),
          "If true, per-modifier button functionality is enabled.\n"
          "@ref guibitmapbutton_modifiers" );
-      addField( "useStates", TypeBool, Offset( mUseStates, GuiBitmapButtonCtrl ),
+      addField( "useStates", TypeBool, Offset( mUseStates, GuiBitmapButtonCtrl ), 
+         new DefaultBoolWriteFn(true),
          "If true, per-mouse state button functionality is enabled.\n"
          "Defaults to true.\n\n"
          "If you do not use per-state images on this button set this to false to speed up the loading process "

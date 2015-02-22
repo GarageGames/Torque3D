@@ -279,7 +279,7 @@ void ParticleEmitterData::initPersistFields()
       addField( "alignParticles", TYPEID< bool >(), Offset(alignParticles, ParticleEmitterData),
          "If true, particles always face along the axis defined by alignDirection." );
 
-      addProtectedField( "alignDirection", TYPEID< Point3F>(), Offset(alignDirection, ParticleEmitterData), &ParticleEmitterData::_setAlignDirection, &defaultProtectedGetFn,
+      addProtectedField( "alignDirection", TYPEID< Point3F>(), Offset(alignDirection, ParticleEmitterData), &ParticleEmitterData::_setAlignDirection, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "The direction aligned particles should face, only valid if alignParticles is true." );
 
       addField( "highResOnly", TYPEID< bool >(), Offset(highResOnly, ParticleEmitterData),

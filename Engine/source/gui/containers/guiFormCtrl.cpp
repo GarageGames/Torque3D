@@ -84,7 +84,7 @@ void GuiFormCtrl::initPersistFields()
    addField("movable",        TypeBool,       Offset(mCanMove,        GuiFormCtrl));
    
    addProtectedField( "hasMenu", TypeBool,  Offset(mHasMenu, GuiFormCtrl),
-      &_setHasMenu, &defaultProtectedGetFn,
+      &_setHasMenu, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "" );
 
    Parent::initPersistFields();

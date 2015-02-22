@@ -491,6 +491,12 @@ protected:
    virtual void innerRender( SceneRenderState *state );
    virtual void _getWaterPlane( const Point3F &camPos, PlaneF &outPlane, Point3F &outPos );
 
+   /// Called during the writing of the object to allow custom properties to be written.
+   virtual void onTamlCustomWrite( TamlCustomNodes& customNodes );
+
+   /// Called during the reading of the object to allow custom properties to be read.
+   virtual void onTamlCustomRead( const TamlCustomNodes& customNodes );
+
 protected:
 
    RiverSliceVector mSlices;

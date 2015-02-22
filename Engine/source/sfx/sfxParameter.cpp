@@ -121,20 +121,20 @@ void SFXParameter::initPersistFields()
    addGroup( "Sound" );
    
       addProtectedField( "value",         TypeF32,       Offset( mValue, SFXParameter ),
-         &SFXParameter::_setValue, &defaultProtectedGetFn,
+         &SFXParameter::_setValue, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Current value of the audio parameter.\n"
          "All attached sources are notified when this value changes." );
       addProtectedField( "range",         TypePoint2F,   Offset( mRange, SFXParameter ),
-         &SFXParameter::_setRange, &defaultProtectedGetFn,
+         &SFXParameter::_setRange, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Permitted range for #value.\n"
          "Minimum and maximum allowed value for the parameter.  Both inclusive.\n\n"
          "For all but the User0-3 channels, this property is automatically set up by SFXParameter." );
       addProtectedField( "channel",       TYPEID< SFXChannel >(), Offset( mChannel, SFXParameter ),
-         &SFXParameter::_setChannel, &defaultProtectedGetFn,
+         &SFXParameter::_setChannel, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Channel that the parameter controls.\n"
          "This controls which property of the sources it is attached to the parameter controls." );
       addProtectedField( "defaultValue",  TypeF32,       Offset( mDefaultValue, SFXParameter ),
-         &SFXParameter::_setDefaultValue, &defaultProtectedGetFn,
+         &SFXParameter::_setDefaultValue, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Value to which the parameter is initially set.\n"
          "When the parameter is first added to the system, #value will be set to #defaultValue." );
       addField( "description",            TypeRealString,Offset( mDescription, SFXParameter ),

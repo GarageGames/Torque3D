@@ -142,24 +142,24 @@ void GuiShapeEdPreview::initPersistFields()
    endGroup( "Rendering" );
 
    addGroup( "Sun" );
-   addProtectedField( "sunDiffuse", TypeColorI, Offset( mSunDiffuseColor, GuiShapeEdPreview ), &setFieldSunDiffuse, &defaultProtectedGetFn,
+   addProtectedField( "sunDiffuse", TypeColorI, Offset( mSunDiffuseColor, GuiShapeEdPreview ), &setFieldSunDiffuse, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "Ambient color for the sun" );
-   addProtectedField( "sunAmbient", TypeColorI, Offset( mSunAmbientColor, GuiShapeEdPreview ), &setFieldSunAmbient, &defaultProtectedGetFn,
+   addProtectedField( "sunAmbient", TypeColorI, Offset( mSunAmbientColor, GuiShapeEdPreview ), &setFieldSunAmbient, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "Diffuse color for the sun" );
-   addProtectedField( "sunAngleX",  TypeF32,    Offset( mSunRot.x, GuiShapeEdPreview ), &setFieldSunAngleX, &defaultProtectedGetFn,
+   addProtectedField( "sunAngleX",  TypeF32,    Offset( mSunRot.x, GuiShapeEdPreview ), &setFieldSunAngleX, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "X-axis rotation angle for the sun" );
-   addProtectedField( "sunAngleZ",  TypeF32,    Offset( mSunRot.z, GuiShapeEdPreview ), &setFieldSunAngleZ, &defaultProtectedGetFn,
+   addProtectedField( "sunAngleZ",  TypeF32,    Offset( mSunRot.z, GuiShapeEdPreview ), &setFieldSunAngleZ, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "Z-axis rotation angle for the sun" );
    endGroup( "Sun" );
 
    addGroup( "Animation" );
    addField( "activeThread",              TypeS32,    Offset( mActiveThread, GuiShapeEdPreview ),
       "Index of the active thread, or -1 if none" );
-   addProtectedField( "threadPos",        TypeF32,    NULL, &setFieldThreadPos, &getFieldThreadPos,
+   addProtectedField( "threadPos",        TypeF32,    NULL, &setFieldThreadPos, &getFieldThreadPos, new AbstractClassRep::WriteDataNotify(),
       "Current position of the active thread (0-1)" );
-   addProtectedField( "threadDirection",  TypeS32,    NULL, &setFieldThreadDir, &getFieldThreadDir,
+   addProtectedField( "threadDirection",  TypeS32,    NULL, &setFieldThreadDir, &getFieldThreadDir, new AbstractClassRep::WriteDataNotify(),
       "Playback direction of the active thread" );
-   addProtectedField( "threadPingPong",   TypeBool,   NULL, &setFieldThreadPingPong, &getFieldThreadPingPong,
+   addProtectedField( "threadPingPong",   TypeBool,   NULL, &setFieldThreadPingPong, &getFieldThreadPingPong, new AbstractClassRep::WriteDataNotify(),
       "'PingPong' mode of the active thread" );
    endGroup( "Animation" );
 
@@ -168,25 +168,25 @@ void GuiShapeEdPreview::initPersistFields()
       "If false, the current detail is selected based on camera distance" );
    addField( "orbitDist",              TypeF32, Offset( mOrbitDist, GuiShapeEdPreview ),
       "The current distance from the camera to the model" );
-   addProtectedField( "currentDL",     TypeS32, Offset( mCurrentDL, GuiShapeEdPreview ),     &setFieldCurrentDL,     &defaultProtectedGetFn,
+   addProtectedField( "currentDL",     TypeS32, Offset( mCurrentDL, GuiShapeEdPreview ),     &setFieldCurrentDL,     &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The current detail level" );
-   addProtectedField( "detailSize",    TypeS32, Offset( mDetailSize, GuiShapeEdPreview ),    &defaultProtectedSetFn, &defaultProtectedGetFn,
+   addProtectedField( "detailSize",    TypeS32, Offset( mDetailSize, GuiShapeEdPreview ),    &defaultProtectedSetFn, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The size of the current detail" );
-   addProtectedField( "detailPolys",   TypeS32, Offset( mDetailPolys, GuiShapeEdPreview ),   &defaultProtectedSetFn, &defaultProtectedGetFn,
+   addProtectedField( "detailPolys",   TypeS32, Offset( mDetailPolys, GuiShapeEdPreview ),   &defaultProtectedSetFn, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "Number of polygons in the current detail" );
-   addProtectedField( "pixelSize",     TypeF32, Offset( mPixelSize, GuiShapeEdPreview ),     &defaultProtectedSetFn, &defaultProtectedGetFn,
+   addProtectedField( "pixelSize",     TypeF32, Offset( mPixelSize, GuiShapeEdPreview ),     &defaultProtectedSetFn, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The current pixel size of the model" );
-   addProtectedField( "numMaterials",  TypeS32, Offset( mNumMaterials, GuiShapeEdPreview ),  &defaultProtectedSetFn, &defaultProtectedGetFn,
+   addProtectedField( "numMaterials",  TypeS32, Offset( mNumMaterials, GuiShapeEdPreview ),  &defaultProtectedSetFn, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The number of materials in the current detail level" );
-   addProtectedField( "numDrawCalls",  TypeS32, Offset( mNumDrawCalls, GuiShapeEdPreview ),  &defaultProtectedSetFn, &defaultProtectedGetFn,
+   addProtectedField( "numDrawCalls",  TypeS32, Offset( mNumDrawCalls, GuiShapeEdPreview ),  &defaultProtectedSetFn, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The number of draw calls in the current detail level" );
-   addProtectedField( "numBones",      TypeS32, Offset( mNumBones, GuiShapeEdPreview ),      &defaultProtectedSetFn, &defaultProtectedGetFn,
+   addProtectedField( "numBones",      TypeS32, Offset( mNumBones, GuiShapeEdPreview ),      &defaultProtectedSetFn, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The number of bones in the current detail level (skins only)" );
-   addProtectedField( "numWeights",    TypeS32, Offset( mNumWeights, GuiShapeEdPreview ),    &defaultProtectedSetFn, &defaultProtectedGetFn,
+   addProtectedField( "numWeights",    TypeS32, Offset( mNumWeights, GuiShapeEdPreview ),    &defaultProtectedSetFn, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The number of vertex weights in the current detail level (skins only)" );
-   addProtectedField( "colMeshes",     TypeS32, Offset( mColMeshes, GuiShapeEdPreview ),     &defaultProtectedSetFn, &defaultProtectedGetFn,
+   addProtectedField( "colMeshes",     TypeS32, Offset( mColMeshes, GuiShapeEdPreview ),     &defaultProtectedSetFn, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The number of collision meshes in the shape" );
-   addProtectedField( "colPolys",      TypeS32, Offset( mColPolys, GuiShapeEdPreview ),      &defaultProtectedSetFn, &defaultProtectedGetFn,
+   addProtectedField( "colPolys",      TypeS32, Offset( mColPolys, GuiShapeEdPreview ),      &defaultProtectedSetFn, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The total number of collision polygons (all meshes) in the shape" );
    endGroup( "Detail Stats" );
 

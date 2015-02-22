@@ -106,6 +106,13 @@ IMPLEMENT_CALLBACK( GuiTextEditCtrl, onValidate, void, (),(),
    "@see GuiControl\n\n"
 );
 
+#if defined(__MACOSX__)
+   UTF8	bullet[4] = { 0xE2, 0x80, 0xA2, 0 };
+
+   const char* DefaultPasswordMask = StringTable->insert( bullet );
+#else
+   const char* DefaultPasswordMask = StringTable->insert( "*" );
+#endif
 GuiTextEditCtrl::GuiTextEditCtrl()
 {
    mInsertOn = true;
@@ -136,13 +143,8 @@ GuiTextEditCtrl::GuiTextEditCtrl()
    mHistoryIndex = 0;
    mHistoryBuf = NULL;
 
-#if defined(__MACOSX__)
-   UTF8	bullet[4] = { 0xE2, 0x80, 0xA2, 0 };
-   
-   mPasswordMask = StringTable->insert( bullet );
-#else
-   mPasswordMask = StringTable->insert( "*" );
-#endif
+   mPasswordMask = StringTable->insert( DefaultPasswordMask );
+
    Sim::findObject( "InputDeniedSound", mDeniedSound );
 }
 
@@ -162,14 +164,27 @@ void GuiTextEditCtrl::initPersistFields()
 {
    addGroup( "Text Input" );
    
-      addField("validate",          TypeRealString,Offset(mValidateCommand,   GuiTextEditCtrl), "Script command to be called when the first validater is lost.\n");
-      addField("escapeCommand",     TypeRealString,Offset(mEscapeCommand,     GuiTextEditCtrl), "Script command to be called when the Escape key is pressed.\n");
-      addField("historySize",       TypeS32,       Offset(mHistorySize,       GuiTextEditCtrl), "How large of a history buffer to maintain.\n");
-      addField("tabComplete",       TypeBool,      Offset(mTabComplete,       GuiTextEditCtrl), "If true, when the 'tab' key is pressed, it will act as if the Enter key was pressed on the control.\n");
-      addField("deniedSound",       TypeSFXTrackName, Offset(mDeniedSound, GuiTextEditCtrl), "If the attempted text cannot be entered, this sound effect will be played.\n");
-      addField("sinkAllKeyEvents",  TypeBool,      Offset(mSinkAllKeyEvents,  GuiTextEditCtrl), "If true, every key event will act as if the Enter key was pressed.\n");
-      addField("password",          TypeBool,      Offset(mPasswordText,      GuiTextEditCtrl), "If true, all characters entered will be stored in the control, however will display as the character stored in passwordMask.\n");
-      addField("passwordMask",      TypeString,    Offset(mPasswordMask,      GuiTextEditCtrl), "If 'password' is true, this is the character that will be used to mask the characters in the control.\n");
+      addField("validate",          TypeRealString,Offset(mValidateCommand,   GuiTextEditCtrl), 
+         "Script command to be called when the first validater is lost.\n");
+      addField("escapeCommand",     TypeRealString,Offset(mEscapeCommand,     GuiTextEditCtrl), 
+         "Script command to be called when the Escape key is pressed.\n");
+      addField("historySize",       TypeS32,       Offset(mHistorySize,       GuiTextEditCtrl), 
+         new DefaultIntWriteFn(0),
+         "How large of a history buffer to maintain.\n");
+      addField("tabComplete",       TypeBool,      Offset(mTabComplete,       GuiTextEditCtrl), 
+         new DefaultBoolWriteFn(false),
+         "If true, when the 'tab' key is pressed, it will act as if the Enter key was pressed on the control.\n");
+      addField("deniedSound",       TypeSFXTrackName, Offset(mDeniedSound, GuiTextEditCtrl), 
+         "If the attempted text cannot be entered, this sound effect will be played.\n");
+      addField("sinkAllKeyEvents",  TypeBool,      Offset(mSinkAllKeyEvents,  GuiTextEditCtrl), 
+         new DefaultBoolWriteFn(false),
+         "If true, every key event will act as if the Enter key was pressed.\n");
+      addField("password",          TypeBool,      Offset(mPasswordText,      GuiTextEditCtrl), 
+         new DefaultBoolWriteFn(false),
+         "If true, all characters entered will be stored in the control, however will display as the character stored in passwordMask.\n");
+      addField("passwordMask",      TypeString,    Offset(mPasswordMask,      GuiTextEditCtrl), 
+         new DefaultValueWriteFn(DefaultPasswordMask),
+         "If 'password' is true, this is the character that will be used to mask the characters in the control.\n");
       
    endGroup( "Text Input" );
 

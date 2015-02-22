@@ -115,7 +115,7 @@ void GuiSliderCtrl::initPersistFields()
       addField( "snap",  TypeBool, Offset( mSnap,  GuiSliderCtrl ),
          "Whether to snap the slider to tick marks." );
       addProtectedField( "value", TypeF32, Offset( mValue, GuiSliderCtrl ),
-         _setValue, defaultProtectedGetFn,
+         _setValue, defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "The value corresponding to the current slider position." );
       
    endGroup( "Slider" );

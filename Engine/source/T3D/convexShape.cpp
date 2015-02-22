@@ -42,6 +42,7 @@
 #include "T3D/physics/physicsBody.h"
 #include "T3D/physics/physicsCollision.h"
 #include "console/engineAPI.h"
+#include "taml/tamlCustom.h"
 
 IMPLEMENT_CO_NETOBJECT_V1( ConvexShape );
 
@@ -261,7 +262,7 @@ void ConvexShape::initPersistFields()
 
    addGroup( "Internal" );
 
-      addProtectedField( "surface", TypeRealString, NULL, &protectedSetSurface, &defaultProtectedGetFn, 
+      addProtectedField( "surface", TypeRealString, NULL, &protectedSetSurface, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Do not modify, for internal use.", AbstractClassRep::FIELD_HideInInspectors );
 
    endGroup( "Internal" );
@@ -1747,5 +1748,121 @@ void ConvexShape::Geometry::generate( const Vector< PlaneF > &planes, const Vect
       // Done with this Face.
       
       faces.push_back( newFace );
+   }
+}
+
+static StringTableEntry surfacesCustomNodeName = StringTable->insert("Surfaces");
+static StringTableEntry surfaceNodeName = StringTable->insert("Surface");
+static StringTableEntry surfaceQuatName = StringTable->insert("Rotation");
+static StringTableEntry surfacePositionName = StringTable->insert("Position");
+
+void ConvexShape::onTamlCustomWrite( TamlCustomNodes& customNodes )
+{
+   // Debug Profiling.
+   PROFILE_SCOPE(ConvexShape_OnTamlCustomWrite);
+
+   // Call parent.
+   Parent::onTamlCustomWrite( customNodes );
+
+   if (mSurfaces.size() > 0)
+   {
+      // Add cell custom node.
+      TamlCustomNode* pCustomCellNodes = customNodes.addNode( surfacesCustomNodeName );
+
+      // Iterate explicit frames.
+      for( Vector<MatrixF>::iterator surfaceItr = mSurfaces.begin(); surfaceItr != mSurfaces.end(); ++surfaceItr )
+      {
+         QuatF quat(*surfaceItr);
+         Point3F pos = surfaceItr->getPosition();
+         // Add cell alias.
+         TamlCustomNode* pNode = pCustomCellNodes->addNode( surfaceNodeName );
+         
+         AngAxisF axis(quat);
+
+         // Add cell properties.
+         pNode->addField( surfaceQuatName, axis );
+         pNode->addField( surfacePositionName, pos );
+      }
+   }
+}
+
+void ConvexShape::onTamlCustomRead( const TamlCustomNodes& customNodes )
+{
+   // Debug Profiling.
+   PROFILE_SCOPE(ConvexShape_OnTamlCustomRead);
+
+   // Call parent.
+   Parent::onTamlCustomRead( customNodes );
+
+   // Find cell custom node.
+   const TamlCustomNode* pCustomCellNodes = customNodes.findNode( surfacesCustomNodeName );
+
+   // Continue if we have explicit cells.
+   if ( pCustomCellNodes != NULL )
+   {
+      mSurfaces.clear();
+
+      // Fetch children cell nodes.
+      const TamlCustomNodeVector& cellNodes = pCustomCellNodes->getChildren();
+
+      // Iterate cells.
+      for( TamlCustomNodeVector::const_iterator cellNodeItr = cellNodes.begin(); cellNodeItr != cellNodes.end(); ++cellNodeItr )
+      {
+         // Fetch cell node.
+         TamlCustomNode* pCellNode = *cellNodeItr;
+
+         // Fetch node name.
+         StringTableEntry nodeName = pCellNode->getNodeName();
+
+         // Is this a valid alias?
+         if ( nodeName != surfaceNodeName )
+         {
+            // No, so warn.
+            Con::warnf( "ConvexShape::onTamlCustomRead() - Encountered an unknown custom name of '%s'.  Only '%s' is valid.", nodeName, surfaceNodeName );
+            continue;
+         }
+
+         QuatF quat;
+         Point3F pos;
+
+         // Fetch fields.
+         const TamlCustomFieldVector& fields = pCellNode->getFields();
+
+         // Iterate property fields.
+         for ( TamlCustomFieldVector::const_iterator fieldItr = fields.begin(); fieldItr != fields.end(); ++fieldItr )
+         {
+            // Fetch field.
+            const TamlCustomField* pField = *fieldItr;
+
+            // Fetch field name.
+            StringTableEntry fieldName = pField->getFieldName();
+
+            // Check common fields.
+            if ( fieldName == surfaceQuatName )
+            {
+               AngAxisF axis;
+               pField->getFieldValue( axis );
+               quat = QuatF(axis);
+            }
+            else if ( fieldName == surfacePositionName )
+            {
+               pField->getFieldValue( pos );
+            }
+            else
+            {
+               // Unknown name so warn.
+               Con::warnf( "MeshRoad::onTamlCustomRead() - Encountered an unknown custom field name of '%s'.", fieldName );
+               continue;
+            }
+         }
+
+	      MatrixF surface;
+	      quat.setMatrix( &surface );
+	      surface.setPosition( pos );
+
+         mSurfaces.push_back( surface );   
+      }
+      _updateGeometry(true);
+      setMaskBits( UpdateMask );
    }
 }

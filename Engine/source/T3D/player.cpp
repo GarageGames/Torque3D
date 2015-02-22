@@ -57,6 +57,8 @@
 #include "T3D/decal/decalData.h"
 #include "materials/baseMatInstance.h"
 
+#include "taml/tamlCustom.h"
+
 #ifdef TORQUE_EXTENDED_MOVE
    #include "T3D/gameBase/extended/extendedMove.h"
 #endif
@@ -1143,7 +1145,7 @@ void PlayerData::initPersistFields()
          "of a first person image based on the type of player.\n");
 
       // Mounted images arrays
-      addArray( "Mounted Images", ShapeBase::MaxMountedImages );
+      addArray( "MountedImages", "Image", ShapeBase::MaxMountedImages );
 
          addField( "shapeNameFP", TypeShapeFilename, Offset(shapeNameFP, PlayerData), ShapeBase::MaxMountedImages,
             "@brief File name of this player's shape that will be used in conjunction with the corresponding mounted image.\n\n"
@@ -1151,7 +1153,7 @@ void PlayerData::initPersistFields()
             "in addition to the mounted image shape.  Typically these are a player's arms (or arm) that is "
             "animated along with the mounted image's state animation sequences.\n");
 
-      endArray( "Mounted Images" );
+      endArray( "MountedImages" );
 
    endGroup( "First Person Arms" );
 
@@ -1537,7 +1539,6 @@ void PlayerData::unpackData(BitStream* stream)
       }
    }
 }
-
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------

@@ -76,7 +76,7 @@ void GuiFileTreeCtrl::initPersistFields()
    addGroup( "File Tree" );
    addField( "rootPath",   TypeRealString,   Offset( mRootPath, GuiFileTreeCtrl ),     "Path in game directory that should be displayed in the control." );
    addProtectedField( "fileFilter", TypeRealString,   Offset( mFileFilter, GuiFileTreeCtrl ),
-                      &_setFileFilterValue, &defaultProtectedGetFn, "Vector of file patterns.  If not empty, only files matching the pattern will be shown in the control." );
+                      &_setFileFilterValue, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "Vector of file patterns.  If not empty, only files matching the pattern will be shown in the control." );
    endGroup( "File Tree" );
    
    Parent::initPersistFields();

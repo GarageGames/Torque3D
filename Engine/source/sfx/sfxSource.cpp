@@ -300,7 +300,7 @@ void SFXSource::initPersistFields()
    addGroup( "Sound" );
    
       addProtectedField( "description", TypeSFXDescriptionName, Offset( mDescription, SFXSource ),
-         &_setDescription, &_getDescription,
+         &_setDescription, &_getDescription, new AbstractClassRep::WriteDataNotify(),
          "The playback configuration that determines the initial sound properties and setup.\n"
          "Any SFXSource must have an associated SFXDescription." );
          

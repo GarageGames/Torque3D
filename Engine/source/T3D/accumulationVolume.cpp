@@ -97,7 +97,7 @@ AccumulationVolume::~AccumulationVolume()
 void AccumulationVolume::initPersistFields()
 {
    addProtectedField( "texture", TypeStringFilename, Offset( mTextureName, AccumulationVolume ),
-         &_setTexture, &defaultProtectedGetFn, "Accumulation texture." );
+	   &_setTexture, &defaultProtectedGetFn, &DefaultNonEmptyStringWriteFn(), "Accumulation texture." );
 
    Parent::initPersistFields();
 }

@@ -261,16 +261,16 @@ FileDialog::~FileDialog()
 
 void FileDialog::initPersistFields()
 {
-   addProtectedField( "defaultPath", TypeString, Offset(mData.mDefaultPath, FileDialog), &setDefaultPath, &defaultProtectedGetFn, 
+   addProtectedField( "defaultPath", TypeString, Offset(mData.mDefaultPath, FileDialog), &setDefaultPath, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "The default directory path when the dialog is shown." );
       
-   addProtectedField( "defaultFile", TypeString, Offset(mData.mDefaultFile, FileDialog), &setDefaultFile, &defaultProtectedGetFn, 
+   addProtectedField( "defaultFile", TypeString, Offset(mData.mDefaultFile, FileDialog), &setDefaultFile, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), 
       "The default file path when the dialog is shown." );
             
-   addProtectedField( "fileName", TypeString, Offset(mData.mFile, FileDialog), &setFile, &defaultProtectedGetFn, 
+   addProtectedField( "fileName", TypeString, Offset(mData.mFile, FileDialog), &setFile, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), 
       "The default file name when the dialog is shown." );
       
-   addProtectedField( "filters", TypeString, Offset(mData.mFilters, FileDialog), &setFilters, &defaultProtectedGetFn, 
+   addProtectedField( "filters", TypeString, Offset(mData.mFilters, FileDialog), &setFilters, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), 
       "The filter string for limiting the types of files visible in the dialog.  It makes use of the pipe symbol '|' "
       "as a delimiter.  For example:\n\n"
       "'All Files|*.*'\n\n"
@@ -279,7 +279,7 @@ void FileDialog::initPersistFields()
    addField( "title", TypeString, Offset(mData.mTitle, FileDialog), 
       "The title for the dialog." );
    
-   addProtectedField( "changePath", TypeBool, Offset(mChangePath, FileDialog), &setChangePath, &getChangePath,
+   addProtectedField( "changePath", TypeBool, Offset(mChangePath, FileDialog), &setChangePath, &getChangePath, new AbstractClassRep::WriteDataNotify(),
       "True/False whether to set the working directory to the directory returned by the dialog." );
    
    Parent::initPersistFields();
@@ -760,8 +760,8 @@ IMPLEMENT_CONOBJECT(OpenFileDialog);
 //-----------------------------------------------------------------------------
 void OpenFileDialog::initPersistFields()
 {
-   addProtectedField("MustExist", TypeBool, Offset(mMustExist, OpenFileDialog), &setMustExist, &getMustExist, "True/False whether the file returned must exist or not" );
-   addProtectedField("MultipleFiles", TypeBool, Offset(mMultipleFiles, OpenFileDialog), &setMultipleFiles, &getMultipleFiles, "True/False whether multiple files may be selected and returned or not" );
+   addProtectedField("MustExist", TypeBool, Offset(mMustExist, OpenFileDialog), &setMustExist, &getMustExist, new AbstractClassRep::WriteDataNotify(), "True/False whether the file returned must exist or not" );
+   addProtectedField("MultipleFiles", TypeBool, Offset(mMultipleFiles, OpenFileDialog), &setMultipleFiles, &getMultipleFiles, new AbstractClassRep::WriteDataNotify(), "True/False whether multiple files may be selected and returned or not" );
    
    Parent::initPersistFields();
 }
@@ -882,7 +882,7 @@ IMPLEMENT_CONOBJECT(SaveFileDialog);
 //-----------------------------------------------------------------------------
 void SaveFileDialog::initPersistFields()
 {
-   addProtectedField("OverwritePrompt", TypeBool, Offset(mOverwritePrompt, SaveFileDialog), &setOverwritePrompt, &getOverwritePrompt, "True/False whether the dialog should prompt before accepting an existing file name" );
+   addProtectedField("OverwritePrompt", TypeBool, Offset(mOverwritePrompt, SaveFileDialog), &setOverwritePrompt, &getOverwritePrompt, new AbstractClassRep::WriteDataNotify(), "True/False whether the dialog should prompt before accepting an existing file name" );
    
    Parent::initPersistFields();
 }

@@ -167,6 +167,12 @@ public:
    void writeFields(Stream &stream, U32 tabStop);
    bool writeField( StringTableEntry fieldname, const char *value );
    
+   /// Called during the writing of the object to allow custom properties to be written.
+   virtual void onTamlCustomWrite( TamlCustomNodes& customNodes );
+
+   /// Called during the reading of the object to allow custom properties to be read.
+   virtual void onTamlCustomRead( const TamlCustomNodes& customNodes );
+   
 	// NetObject
 	U32 packUpdate(NetConnection *, U32, BitStream *);
 	void unpackUpdate(NetConnection *, BitStream *);	

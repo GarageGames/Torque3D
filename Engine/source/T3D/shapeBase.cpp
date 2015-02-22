@@ -501,7 +501,7 @@ void ShapeBaseData::initPersistFields()
 
    addGroup( "Physics" );
    
-      addProtectedField("mass", TypeF32, Offset(mass, ShapeBaseData), &_setMass, &defaultProtectedGetFn, "Shape mass.\nUsed in simulation of moving objects.\n"  );
+      addProtectedField("mass", TypeF32, Offset(mass, ShapeBaseData), &_setMass, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "Shape mass.\nUsed in simulation of moving objects.\n"  );
       addField( "drag", TypeF32, Offset(drag, ShapeBaseData),
          "Drag factor.\nReduces velocity of moving objects." );
       addField( "density", TypeF32, Offset(density, ShapeBaseData),
@@ -965,7 +965,7 @@ ShapeBase::~ShapeBase()
 
 void ShapeBase::initPersistFields()
 {
-   addProtectedField( "skin", TypeRealString, Offset(mAppliedSkinName, ShapeBase), &_setFieldSkin, &_getFieldSkin,
+   addProtectedField( "skin", TypeRealString, Offset(mAppliedSkinName, ShapeBase), &_setFieldSkin, &_getFieldSkin, new AbstractClassRep::WriteDataNotify(),
       "@brief The skin applied to the shape.\n\n"
 
       "'Skinning' the shape effectively renames the material targets, allowing "
