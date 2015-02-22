@@ -52,8 +52,8 @@ public:
       BF_KINEMATIC = BIT( 1 ),
 
       /// The body responds to contacts but does not push forces into others.
-      BF_DEBRIS = BIT( 2 )/* added cautionnously ..*/
-	  ,
+      BF_DEBRIS = BIT( 2 ),/* added cautionnously ..*/
+	  /// Marks the body to have continuous collision detection enabled
 	  BF_CCD = BIT( 3 )
    };
 
