@@ -57,6 +57,14 @@ addEngineSrcDir('T3D/decal');
 addEngineSrcDir('T3D/sfx');
 addEngineSrcDir('T3D/gameBase');
 addEngineSrcDir('T3D/turret');
+// BlissGMK >>
+addEngineSrcDir('T3D/BlissGMK');
+// GuideBot added (out for now)
+//addEngineSrcDir('T3D/BlissGMK/guideBot');
+addEngineSrcDir('T3D/BlissGMK/physics');
+addEngineSrcDir('T3D/BlissGMK/physics/bullet');
+//addEngineSrcDir('T3D/BlissGMK/physics/physx');
+// BlissGMK <<
 
 global $TORQUE_HIFI_NET;
 global $TORQUE_EXTENDED_MOVE;
