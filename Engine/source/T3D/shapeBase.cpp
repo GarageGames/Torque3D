@@ -3697,6 +3697,16 @@ DefineEngineMethod( ShapeBase, pauseThread, bool, ( S32 slot ),,
    return false;
 }
 
+// BlissGMK >>
+// commented out because another function by that name exists.
+/*
+ConsoleMethod(ShapeBase, setThreadPosition, bool, 4, 4, "( int pSlot, float pos )")
+{
+return object->setThreadPosition(dAtoi(argv[2]), dAtof(argv[3]));
+}
+*/
+// BlissGMK <<
+
 //----------------------------------------------------------------------------
 DefineEngineMethod( ShapeBase, mountImage, bool,
    ( ShapeBaseImageData* image, S32 slot, bool loaded, const char* skinTag ), ( true, "" ),

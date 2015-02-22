@@ -84,11 +84,20 @@ class StaticShape: public ShapeBase
 
    // rextimmy physics integration
    void _createPhysics();
-
+// BlissGMK >>
+// this already exist at line 80 even in t3d 1.2 : why the duplication ?
+// PhysicsBody *mPhysicsRep;
+// BlissGMK <<
 protected:
    enum MaskBits {
-      PositionMask = Parent::NextFreeMask,	  
-      NextFreeMask = Parent::NextFreeMask << 1
+      PositionMask = Parent::NextFreeMask,
+	  // BlissGMK >>
+	  // change the mask bit order & add a physic one
+	  PhysicsMask = Parent::NextFreeMask << 1,
+
+	  NextFreeMask = Parent::NextFreeMask << 2
+	  // BlissGMK <<
+	  // correction by dragutux
    };
 
 public:
@@ -111,6 +120,10 @@ public:
    // power
    void setPowered(bool power)      {mPowered = power;}
    bool isPowered()                 {return(mPowered);}
+
+   // BlissGMK >>
+   void updatePhysics();
+   // BlissGMK <<
 
    static void initPersistFields();   
 };

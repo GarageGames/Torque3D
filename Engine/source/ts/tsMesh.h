@@ -112,6 +112,10 @@ class TSMesh
    F32 mVisibility;
    bool mDynamic;
 
+   // BlissGMK >>
+   bool mManualDynamic;
+   // BlissGMK <<
+
    const GFXVertexFormat *mVertexFormat;
 
    U32 mVertSize;
@@ -146,6 +150,12 @@ class TSMesh
    U32 getFlags( U32 flag = 0xFFFFFFFF ) const { return meshType & flag; }
 
    const Point3F* getNormals( S32 firstVert );
+
+   // BlissGMK >>
+   void setManualDynamic(bool flg){ mManualDynamic = flg; };
+   void createVBIB(TSVertexBufferHandle &vb);
+   int getVertexStride();
+   // BlissGMK <<
 
    S32 parentMesh; ///< index into shapes mesh list
    S32 numFrames;
