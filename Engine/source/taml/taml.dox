@@ -1,0 +1,468 @@
+/*! @defgroup tamlGroup TAML Reference
+
+## Introduction
+
+TAML is an acronym of Torque Application Mark-up Language.  It decribes a method of persisting type instances in various output formats.  TAML is designed to be extremely easy to use and provides a nice consistent method of persisting information.
+
+## Prerequisite Knowledge
+
+This document assumes knowledge of the [TorqueScript Syntax](TorqueScript-Syntax) only.
+
+## TorqueScript Bindings
+
+- [Taml](https://github.com/GarageGames/Torque2D/blob/master/engine/source/persistence/taml/taml_ScriptBinding.h)
+
+## Starting Out
+
+TAML was designed to be easy to use and in that sense, the following code should be easy to understand:
+
+@code{.cpp}
+// Create a sprite.
+%obj = new Sprite();
+
+
+// Write it out.
+TamlWrite( %obj, "stuff.taml" );
+@endcode
+
+This will write the following XML file:
+
+@code{.xml}
+<Sprite/>
+@endcode
+
+That's pretty simple and shows a basic principle when the output format is XML in that an XML element denotes a type to be created, in this case it's the "Sprite" type.  It should also be clear that nothing else related to the "Sprite" has been written.  This is another feature that TAML provides in that it allows type designers to specify whether additional state like fields are written or not, typically based upon whether they are at their default values or not.
+
+To read this back in we would use:
+
+@code{.cpp}
+%obj = TamlRead( "stuff.taml" );
+@endcode
+
+Again, pretty simple.  Given the two global functions shown you have nearly everything you need to know to actually use the TAML system because you can both write and read objects.
+
+This document however breaks down TAML into more detail beyond what you may need on a day-to-day basis but also includes information on the structure of its XML format which is an easily editable format to work with.
+
+## TAML instance
+
+The global functions shown above are simplified ways of writing and reading objects.  They are simplified because they hide the fact that TAML is actually a type you can create.
+
+For instance, the previous write and read examples could've been done using the following:
+
+@code{.cpp}
+// Create a sprite.
+%obj = new Sprite();
+
+// Create an instance of TAML.
+%taml = new Taml();
+
+// Write it out.
+%taml.write( %obj, "stuff.taml" );
+
+// Read it in using the same TAML instance.
+%readObj = %taml.read( "stuff.taml" );
+
+// Delete the instance of Taml.
+%taml.delete();
+@endcode
+
+The "TamlWrite()" and "TamlRead()" essentially remove the need to generate a TAML instance and delete if afterwards.  Whilst this is convenient in many cases, these functions don't expose all the other features that TAML provides therefore it becomes necesssary to use a TAML instance when you wish to use them.
+
+There is an exception to this, both the "TamlWrite()" and "TamlRead()" support additional arguments to specify the formats to use however that will be covered below.
+
+## Multiple formats
+
+TAML currently supports two named formats of:
+
+- XML
+- Binary
+
+The XML format offers an easily edited format which is useful during game construction to edit outside of any editor.  XML however is more verbose and typically produces larger file sizes however this disadvantage is greatly outweighed by the fact that it is easily editable.
+
+The Binary format is not easily edited but produces smaller file sizes, especially when compression is used.
+
+TAML can easily be extended to support more format types as long as the the format can encapsulate the state that TAML compiles when it analyses an object.  Also, all formats must obviously be lossless and produce identical results in that if you were to read from one format and save to another then read that back and save back to the original format, the output should be identical.  Currently both the XML and Binary formats strictly adhere to this principle.
+
+There are two ways to select which format to use for writing and reading, one explicit and the other implicit.
+
+Here's a couple of explicit method examples:
+
+@code{.cpp}
+// Create a sprite.
+%obj = new Sprite();
+
+// Create an instance of TAML.
+%taml = new Taml();
+
+// Set the XML format.
+%taml.Format = Xml;
+
+// Write it out.
+%taml.write( %obj, "stuff.taml" );
+
+// Read it in.
+%readObj = %taml.read( "stuff.taml" );
+
+// Delete the instance of Taml.
+%taml.delete();
+@endcode
+
+@code{.cpp}
+// Create a sprite.
+%obj = new Sprite();
+
+// Create an instance of TAML.
+%taml = new Taml();
+
+// Set the Binary format.
+%taml.Format = Binary;
+
+// Write it out.
+%taml.write( %obj, "stuff.baml" );
+
+// Read it in.
+%readObj = %taml.read( "stuff.baml" );
+
+// Delete the instance of Taml.
+%taml.delete();
+@endcode
+
+As you can see, the format was set using the field "Format" but an alternate is using the method "setFormat()".  You can currently specify either "xml" or "binary" for the format.  The TAML instance will then use that format for all subsequent write and read operations.
+
+In the examples the extensions ".taml" and ".baml" were used to denote an XML file and a Binary file respectively however these extensions and filenames can be whatever you choose.
+
+Explicit formatting provides very fine control over write and read operations however it's common to not actually know the format but instead establish an extension to denote a format type just like you would expect for other file types.
+
+Implicit formatting also known as "auto format" works without you having to select the format mode.  Auto format does this by looking at the specified filename in the write or read operation and uses its extension to determine which format to use.
+
+Taml comes with defaults for the filename extensions for both XML and Binary, these being "taml" and "baml" respectively but you are free to change those easily.
+
+Here's an example auto-format:
+
+@code{.cpp}
+// Create a sprite.
+%obj = new Sprite();
+
+// Create an instance of TAML.
+%taml = new Taml();
+
+// Write it out in XML.
+%taml.write( %obj, "stuff.taml" );
+
+// Write it out in Binary.
+%taml.write( %obj, "stuff.baml" );
+
+// Read it in.
+%readObj1 = %taml.read( "stuff.taml" );
+%readObj2 = %taml.read( "stuff.baml" );
+
+// Delete the instance of Taml.
+%taml.delete();
+@endcode
+
+As you can see, there's no format specification anywhere.  Again, this is because TAML determined that the "taml" extension is associated with XML and the "baml" extension with Binary.
+
+You can change these meanings and reuse a TAML instance if you so desire like so:
+
+@code{.cpp}
+// Create a sprite.
+%obj = new Sprite();
+
+// Create an instance of TAML.
+%taml = new Taml()
+
+%taml.AutoFormatXmlExtension = "xml";
+%taml.AutoFormatBinaryExtension = "bin";
+
+// Write it out in XML.
+%taml.write( %obj, "stuff.xml" );
+
+// Write it out in Binary.
+%taml.write( %obj, "stuff.bin" );
+
+// Read it in.
+%readObj1 = %taml.read( "stuff.xml" );
+%readObj2 = %taml.read( "stuff.bin" );
+
+// Delete the instance of Taml.
+%taml.delete();
+@endcode
+
+Currently, TAML only supports a single file extension specification but it's a trivial matter to change this to support multiple extensions should it be required.
+
+When using the Binary format you can also specify whether binary compression is used or not.  This is used by default and you should not turn it off unless you have a good reason to do so.
+
+It is controlled with the following:
+
+- setBinaryCompression(true/false)
+- getBinaryCompression()
+- "BinaryCompression" field.
+
+## TamlRead and TamlWrite
+
+Given the various methods for explicit and implicit format control, it's worth knowing that the simplified "TamlWrite()" and "TamlRead()" expose the ability to specify an explicit format like so:
+
+@code{.cpp}
+// Create a sprite.
+%obj = new Sprite();
+
+// Write it out in XML.
+TamlWrite( %obj, "stuff.txt", xml );
+
+// Write it out in Binary.
+TamlWrite( %obj, "stuff.dat1", binary );
+
+// Write it out in Binary (with compression off).
+TamlWrite( %obj, "stuff.dat2", binary, false );
+@endcode
+
+## Writing Defaults
+
+When TAML determines that it needs to write out an object it checks each field to see if it should be written or not.  It does this internally using a mechanism that allows a type to say whether it currently wants to write the field or not.  In nearly all cases this decision is simply based upon whether the field is at its default or not.
+
+You can control whether TAML asks this question or not or put another way, whether it simply writes out all fields or only the ones that are not at their defaults.
+
+Writing out fields that are at their defaults results in larger files which are slower to read.  Also, setting fields that are already at their default when reading is a waste of time.  Some may prefer to have all the available fields for an object written out, sometimes used as a crude way of knowing what is available but this is not only an expensive way of doing things, it's also confusing to interpret because it's not easy to see how one object is configured differently than another as all fields are written.
+
+If you do wish to write all fields that are at defaults, you can control it using the following:
+
+- setWriteDefaults(true/false)
+- getWriteDefaults()
+- "WriteDefaults" field.
+
+By default, writing defaults is off.
+
+## Progenitor Update
+
+When you generate an instance of any type in TorqueScript, the instance is flagged with the filename of the script that created it.  
+
+For instance, let's say the following method is called and is compiled in the file "\T2D\foo.cs":
+
+@code{.cpp}
+function bar()
+{
+	# Create a sprite (this could be any SimObject).
+	%sprite = new Sprite();
+	
+	# Echo the progenitor file.
+	echo( %sprite.getProgenitorFile() );
+}
+@endcode
+
+The above example would output "\T2D\foo.cs" as that is the script it was created in.
+
+This is extremely useful for debugging however, what does this have to do with TAML?  Because TAML can generate object instances as well and those instances are not defined inside a script but inside a TAML formatted file it makes sense for TAML to update the progenitor file to refer to the TAML formatted file itself.
+
+By default TAML will do this however you can control whether it does so or not using the following:
+
+- setProgenitorUpdate(true/false)
+- getProgenitorUpdate()
+- "ProgenitorUpdate" field.
+
+If you turn-off progenitor updates then the progenitor file will be the last executing script that caused the TAML file to be read.
+
+## Advanced TAML
+
+The remainder of the document is more advanced and covers how TAML writes and reads state for objects.  This is useful when designing types as you must always take persistence into account as part of the design.  It's no good designing a type or a full system only to have to then figure out how to write and read its states afterwards.
+
+## TAML compilation
+
+When you specify an object to write, this doesn't necessarily mean that it's the only object that will get written.  This is due to the fact that various objects "own" or "contain" other objects, otherwise known as "children" objects.
+
+When TAML writes an object it performs several stages of compilation:
+
+1. Find all static and dynamic fields to write
+2. Find any child objects to write
+3. Find any custom state to write
+
+### Static and Dynamic Field Compilation
+
+This stage is actually in two parts.  The first part is iterating all the static fields and querying whether the field should be written or not.  Note that this query is only done if the TAML option of "WriteDefaults" is not active as described previously.
+
+This is done by simply using the Torque field system which allows a developer to specify for each field a setter, getter and write-field functions like so:
+
+@code{.cpp}
+addProtectedField("Angle", TypeF32, NULL, &setAngle, &getAngle, &writeAngle, "");
+@endcode
+
+In this example, the protected field is specifying a setter, getter and write functions although combinations of these are allowed.
+
+The "writeAngle" method is called by anything that needs to know if the field should be written or not.  In this case it's TAML calling it.  The "writeAngle" method in this example is defined as a method that determines if the angle is at its default or not.
+
+TAML quickly iterates all the static fields querying this and produces a list of static fields that need writing.
+
+Following this, TAML quickly iterates any dynamic fields that exist and adds them all because dynamic fields are just that, dynamic, and do not have any code related to them that can determine their meaning or if they should be written or not.
+
+### Children Object Compilation
+
+TAML will query the type to see if it implements the type [TamlChildren](https://github.com/GarageGames/Torque2D/blob/master/engine/source/persistence/taml/tamlChildren.h).  If it does then it queries how many children the object contains.  It then iterates each of those children perform a full compilation on each i.e. it will check for fields, for child objects and custom state as is being described here.
+
+This is the key to how writing a single object produces multiple objects being written.  This only occurs for types that have been specifically written to do this by implementing the "TamlChildren" type.  Notable types that do this are [SimSet](https://github.com/GarageGames/Torque2D/blob/master/engine/source/sim/simSet.h) which can contain as many other [SimObject](https://github.com/GarageGames/Torque2D/blob/master/engine/source/sim/simObject.h) as required and [Scene](https://github.com/GarageGames/Torque2D/blob/master/engine/source/2d/scene/Scene.h) which contains [SceneObject](https://github.com/GarageGames/Torque2D/blob/master/engine/source/2d/sceneobject/SceneObject.h).
+
+The [SimSet](https://github.com/GarageGames/Torque2D/blob/master/engine/source/sim/simSet.h) type is particularly useful as it allows you to persist a generic list of objects like so:
+
+@code{.cpp}
+%list = new SimSet();
+
+// Add some objects.
+%list.add( new ScriptObject() );
+%list.add( new ScriptObject() );
+%list.add( new ScriptObject() );
+
+// Write out the list.
+TamlWrite( %list, "list.taml" );
+
+@endcode
+
+... which produces the following XML output:
+
+@code{.xml}
+<SimSet>
+   <ScriptObject/>
+   <ScriptObject/>
+   <ScriptObject/>
+</SimSet>
+@endcode
+
+### Custom State
+
+When designing types you can simply expose state using Torques field system as long as the order at which fields are set is not critical.  If that serves your purposes then you do not need to perform any special work.
+
+_WIP_
+
+## XML Format
+
+Whilst the Binary format is difficult to describe and is not intended for editing anyway, the XML format is easy to describe and is intended for editing.
+
+As an example, here's a basic structure set up in the scripts:
+
+@code{.cpp}
+%bookList = new SimSet()
+{
+    Title="My Book List";
+};
+
+// Blatantly obvious advert: http://www.packtpub.com/torque-3d-game-development-cookbook/book
+%book1 = new ScriptObject()
+{
+    Title="Torque 3D Game Development Cookbook";
+    Author="Dave Wyand";
+};
+
+%book2 = new ScriptObject()
+{
+    Title="Graphics Programming Black Book (Special Edition)";
+    Author="Michael Abrash";
+};
+
+%book3 = new ScriptObject()
+{
+    Title="Programming with Graphics";
+    Author="Garry Marshall";
+};
+
+%bookList.add( %book1 );
+%bookList.add( %book2 );
+%bookList.add( %book3 );
+
+TamlWrite( %bookList, "booklist.taml" );
+@endcode
+
+This produces the following in XML format:
+
+@code{.xml}
+<SimSet
+	Title="My Book List">
+	<ScriptObject
+		Title="Torque 3D Game Development Cookbook"
+		Author="Dave Wyand"/>
+	<ScriptObject
+		Title="Graphics Programming Black Book (Special Edition)"
+		Author="Michael Abrash"/>				
+	<ScriptObject
+		Title="Programming with Graphics"
+		Author="Garry Marshall"/>				
+</SimSet>
+@endcode
+
+The XML schema used here is pretty simple.  Each [XML element](http://www.w3schools.com/xml/xml_elements.asp) represents an engine type to be created.  Each [XML attribute](http://www.w3schools.com/xml/xml_attributes.asp) represents a field to be set.  The field might be a static or dynamic Torque field, both are represented by the fields' name only.
+
+The relative position of each XML element is also important as the XML file represents an [XML Tree](http://www.w3schools.com/xml/xml_tree.asp).  The root element is the object which was originally written and is the object that will be returned when the file is subsequently read again.
+
+XML Elements that appear as children of other XML elements are indeed children objects and are added to the parent object.  As seen in previous examples, the parent object might be a [Scene](https://github.com/GarageGames/Torque2D/blob/master/engine/source/2d/scene/Scene.h) or in this example a [SimSet](https://github.com/GarageGames/Torque2D/blob/master/engine/source/sim/simSet.h).
+
+TAML also supports object referencing allow the same object to be referenced more than once inside a TAML file.
+
+For instance, let's say we did this:
+
+@code{.cpp}
+%list = new SimSet();
+
+%obj = new ScriptObject();
+%list.add( %obj );
+%list.add( %obj );
+%list.add( %obj );
+
+TamlWrite( %list, "list.taml" );
+@endcode
+
+In this example, we add the same object several times to the parent object.  This produces the following XML format:
+
+@code{.xml}
+<SimSet>
+	<ScriptObject TamlId="1"/>
+	<ScriptObject TamlRefId="1"/>
+	<ScriptObject TamlRefId="1"/>
+</SimSet>
+@endcode
+
+What this example shows are two new fields of "TamlId" and "TamlRefId".  These fields represent an automatically assigned object Id and a reference to an automatically assigned object Id respectively.
+
+The output format associates the first occurance of the object with its automatically assigned Id using TamlId="1".  This establishes the identity of this object.  If any subsequent XML elements refer to this object then they use TamlRefId="1".  This informs TAML to NOT create a new instance of the type but to simply use the reference to the previously created one.
+
+In the above example, this causes the first "ScriptObject" type to be created and added to the "SimSet" then the following two occurences of "ScriptObject" are treated as simply references to the first "ScriptObject" created and these are added to the "SimSet" resulting in a "SimSet" listing three of the same object.
+
+The actual Id used here is not available on the "ScriptObject" (or any other object involved) as it is completely dealt with by TAML itself.  The actual values used for Ids are not important (apart from being >0), simply that any Ids and references to Ids match up appropriately.
+
+### Named Objects
+
+TAML will quite happily persist named Torque objects however you must take extreme care when doing so because it is very easy to read such TAML files more than once causing previously named objects to be left orphaned.
+
+Writing a named object simply causes the "Name" field to be written like so:
+
+@code{.cpp}
+TamlWrite( new ScriptObject(Fred), "test.taml" );
+@endcode
+
+@code{.xml}
+<ScriptObject Name="Fred"/>
+@endcode
+
+When this is first read it produces a "ScriptObject" with the name "Fred" however, if it was read again then the original object known solely by the name "Fred" would be lost, replaced by the newly named object.
+
+Whilst this global namespace for Torque objects is very useful, especially for GUI files, careful consideration to persisting such objects should be taken.
+
+
+## TAML Callbacks
+
+TAML provides a [TamlCallbacks](https://github.com/GarageGames/Torque2D/blob/master/engine/source/persistence/taml/tamlCallbacks.h) type which defines all the callbacks that TAML will perform on any object being written or read.  This type is implemented by [SimObject](https://github.com/GarageGames/Torque2D/blob/master/engine/source/sim/simObject.h) so is available to every object that TAML can process.
+
+Each callback is virtual therefore allowing any derived type to hook into the callback but you must always ensure that you additionally call the parent type.
+
+The callbacks and their meaning as as follows:
+
+- onTamlPreWrite() - Called prior to TAML writing the object.
+- onTamlPostWrite() - Called after TAML has finished writing the object.
+- onTamlPreRead() - Called prior to TAML reading the objects state.
+- onTamlPostRead() - Called after TAML has read the objects state.
+- onTamlAddParent() - Called after 'onTamlPostRead()' and has added the object to a parent object i.e. it is a child.
+- onTamlCustomWrite() - Called during the writing of the object to allow custom properties to be written.
+- onTamlCustomRead() - Called during the reading of the object to allow custom properties to be read.
+
+Whilst these callbacks can be used for almost any purpose, they do have some typical uses.
+
+The "onTamlPreWrite()" and "onTamlPostWrite()" can be used for preparation of an object prior to writing and post-write clean-up.  This kind of work should be avoided so as to not cause side-effects during writing but it can be useful in certain circumstances.
+
+The "onTamlPostRead()" and "onTamlAddParent()" can useful when some specific initialization is required after reading or adding to a parent.  Again, this should be avoided as the need for some specific initialization actions after the state has been set isn't a good design configuration but can be useful in certain circumstances.
+
+*/
