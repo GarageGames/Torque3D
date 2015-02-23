@@ -472,7 +472,7 @@ S32 dSscanf(const char *buffer, const char *format, ...)
 #else
    va_list args;
    va_start(args, format);
-   int res = vsscanf(buffer, format, args);
+   S32 res = vsscanf(buffer, format, args);
    va_end(args);
    return res;
 #endif
