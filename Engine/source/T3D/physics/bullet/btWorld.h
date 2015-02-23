@@ -54,7 +54,11 @@ protected:
    btCollisionDispatcher *mDispatcher;
    btConstraintSolver *mSolver;
    btDefaultCollisionConfiguration *mCollisionConfiguration;
-  	btThreadSupportInterface *mThreadSupportCollision;
+   btThreadSupportInterface *mThreadSupportCollision;
+
+   // BlissGMK >>
+   btSoftBodyWorldInfo mSoftBodyWorldInfo;
+   // BlissGMK <<
 
    bool mErrorReport;
 
@@ -84,6 +88,10 @@ public:
    virtual bool isEnabled() const { return mIsEnabled; }
 
    btDynamicsWorld* getDynamicsWorld() const { return mDynamicsWorld; }
+
+   // BlissGMK >>
+   btSoftBodyWorldInfo& getSoftBodyWorldInfo() { return mSoftBodyWorldInfo; };
+   // BlissGMK <<
 
    void tickPhysics( U32 elapsedMs );
    void getPhysicsResults();

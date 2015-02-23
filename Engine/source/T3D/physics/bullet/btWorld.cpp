@@ -58,7 +58,12 @@ BtWorld::~BtWorld()
 bool BtWorld::initWorld( bool isServer, ProcessList *processList )
 {
    // Collision configuration contains default setup for memory, collision setup.
-   mCollisionConfiguration = new btDefaultCollisionConfiguration();
+   // BlissGMK >>
+   // - soft body support.
+   // TODO : implement a switcher between different btworlds
+   // mCollisionConfiguration = new btDefaultCollisionConfiguration();
+   mCollisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
+   // BlissGMK <<
 
    // TODO: There is something wrong with multithreading
    // and compound convex shapes... so disable it for now.
@@ -96,7 +101,17 @@ bool BtWorld::initWorld( bool isServer, ProcessList *processList )
    // The default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded).
    mSolver = new btSequentialImpulseConstraintSolver;
 
-   mDynamicsWorld = new btDiscreteDynamicsWorld( mDispatcher, mBroadphase, mSolver, mCollisionConfiguration );
+   // BlissGMK >>
+   mDynamicsWorld = new btSoftRigidDynamicsWorld(mDispatcher, mBroadphase, mSolver, mCollisionConfiguration);
+   mSoftBodyWorldInfo.m_broadphase = mBroadphase;
+   mSoftBodyWorldInfo.m_dispatcher = mDispatcher;
+   mSoftBodyWorldInfo.m_gravity = btCast<btVector3>(mGravity);
+   mSoftBodyWorldInfo.m_sparsesdf.Initialize();
+
+
+   //mDynamicsWorld = new btDiscreteDynamicsWorld( mDispatcher, mBroadphase, mSolver, mCollisionConfiguration );
+   // BlissGMK <<
+
    if ( !mDynamicsWorld )
    {
       Con::errorf( "BtWorld - %s failed to create dynamics world!", isServer ? "Server" : "Client" );
@@ -161,6 +176,12 @@ void BtWorld::tickPhysics( U32 elapsedMs )
 
    mIsSimulating = true;
 
+   // BlissGMK >>
+   // fixme! 
+   // todo : has other worlds type a garbage ??
+   mSoftBodyWorldInfo.m_sparsesdf.GarbageCollect();
+   // BlissGMK <<
+
    //Con::printf( "%s BtWorld::tickPhysics!", this == smClientWorld ? "Client" : "Server" );
 }
 
@@ -190,10 +211,54 @@ void BtWorld::destroyWorld()
    _destroy();
 }
 
+// BlissGMK >>
+class btWorldClosestRayResultCallback : public btCollisionWorld::ClosestRayResultCallback
+{
+public:
+	btWorldClosestRayResultCallback(const btVector3&	convexFromWorld, const btVector3&	convexToWorld) :
+		ClosestRayResultCallback(convexFromWorld, convexToWorld) {};
+	virtual bool needsCollision(btBroadphaseProxy* proxy0) const
+	{
+		btCollisionObject* otherObj = (btCollisionObject*)proxy0->m_clientObject;
+		if (!otherObj->hasContactResponse())
+			return false;
+
+		return ClosestRayResultCallback::needsCollision(proxy0);
+	}
+
+
+};
+// BlissGMK <<
+
 bool BtWorld::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *ri, const Point3F &impulse )
 {
-   btCollisionWorld::ClosestRayResultCallback result( btCast<btVector3>( startPnt ), btCast<btVector3>( endPnt ) );
+   // BlissGMK >>
+   //btCollisionWorld::ClosestRayResultCallback result( btCast<btVector3>( startPnt ), btCast<btVector3>( endPnt ) );
+   btWorldClosestRayResultCallback result(btCast<btVector3>(startPnt), btCast<btVector3>(endPnt));
+   // BlissGMK <<
    mDynamicsWorld->rayTest( btCast<btVector3>( startPnt ), btCast<btVector3>( endPnt ), result );
+
+   // BlissGMK >>
+   //soft body ray casting
+   btSoftRigidDynamicsWorld* softRigidWorld = static_cast<btSoftRigidDynamicsWorld*>(mDynamicsWorld);
+   btSoftBody::sRayCast rayCastRes;
+   btSoftBodyArray softBodies = softRigidWorld->getSoftBodyArray();
+   for (size_t i = 0; i<softBodies.size(); i++)
+   {
+
+	   btSoftBody* body = softBodies[i];
+	   if (body->rayTest(btCast<btVector3>(startPnt), btCast<btVector3>(endPnt), rayCastRes))
+	   {
+		   if (rayCastRes.fraction<result.m_closestHitFraction)
+		   {
+			   result.m_closestHitFraction = rayCastRes.fraction;
+			   result.m_collisionObject = body;
+			   result.m_hitNormalWorld = btVector3(1.f, 0.f, 0.f); // find normal from feature and index
+			   result.m_hitPointWorld = btCast<btVector3>(startPnt + (endPnt - startPnt)*result.m_closestHitFraction);
+		   }
+	   }
+   }
+   // BlissGMK <<
 
    if ( !result.hasHit() || !result.m_collisionObject )
       return false;

@@ -44,5 +44,10 @@
 #include <BulletMultiThreaded/Win32ThreadSupport.h>
 #include <BulletMultiThreaded/SpuNarrowPhaseCollisionTask/SpuGatheringCollisionTask.h>
 
+// BlissGMK >>
+#include "BulletSoftBody/btSoftRigidDynamicsWorld.h"
+#include "BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h"
+#include "BulletSoftBody/btSoftBodyHelpers.h"
+// BlissGMK <<
 
 #endif // _BULLET_H_

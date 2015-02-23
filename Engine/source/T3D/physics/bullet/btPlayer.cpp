@@ -28,6 +28,10 @@
 #include "T3D/physics/bullet/btCasts.h"
 #include "collision/collision.h"
 
+// BlissGMK <<
+#include "T3D/physicalZone.h"
+// BlissGMK >>
+
 BtPlayer::BtPlayer()
    :  PhysicsPlayer(),
       mWorld( NULL ),
@@ -249,6 +253,21 @@ public:
 		if ( proxy0->m_clientObject == mMe )
 			return false;
 
+		// BlissGMK >> behavior of Physical Zone as invisible wall
+		btCollisionObject* colObj = (btCollisionObject*)(proxy0->m_clientObject);
+		SceneObject* sceneObj = PhysicsUserData::getObject(colObj->getUserPointer());
+		if (sceneObj && (sceneObj->getTypeMask() & PhysicalZoneObjectType))
+		{
+			SceneObject* playerObject = PhysicsUserData::getObject(mMe->getUserPointer());
+			PhysicalZone* pZone = static_cast<PhysicalZone*>(sceneObj);
+			if (pZone->isActive() && pZone->isInvisibleWall(playerObject))
+				return true;
+		}
+
+		if (!colObj->hasContactResponse())
+			return false;
+		// BlissGMK <<
+
       return Parent::needsCollision( proxy0 );
    }
 
@@ -434,8 +453,13 @@ void BtPlayer::findContact(   SceneObject **contactObject,
       if ( other == mGhostObject )
          other = (btCollisionObject*)pair.m_pProxy1->m_clientObject;
 
-      AssertFatal( !outOverlapObjects->contains( PhysicsUserData::getObject( other->getUserPointer() ) ),
-         "Got multiple pairs of the same object!" );
+	  // BlissGMK >>
+	  if (outOverlapObjects->contains(PhysicsUserData::getObject(other->getUserPointer())))
+		  continue;
+	  //AssertFatal( !outOverlapObjects->contains( PhysicsUserData::getObject( other->getUserPointer() ) ),
+	  //   "Got multiple pairs of the same object!" );
+	  // BlissGMK <<
+
       outOverlapObjects->push_back( PhysicsUserData::getObject( other->getUserPointer() ) );
 
       if ( other->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE )
@@ -496,6 +520,11 @@ void BtPlayer::setTransform( const MatrixF &transform )
    xfm.getOrigin()[2] += mOriginOffset;
 
    mGhostObject->setWorldTransform( xfm );
+
+   // BlissGMK >> 
+   // update aabb immediately as object updates may be performed before physics tick
+   mWorld->getDynamicsWorld()->updateSingleAabb(mGhostObject);
+   // BlissGMK <<
 }
 
 MatrixF& BtPlayer::getTransform( MatrixF *outMatrix )
