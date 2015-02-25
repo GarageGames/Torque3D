@@ -152,7 +152,7 @@ bool CustomMaterial::onAdd()
 
             pos = i;
 
-#if TORQUE_OPENGL
+#ifdef TORQUE_OPENGL
             GFXAssertFatal(0, error);
             continue;
 #endif
