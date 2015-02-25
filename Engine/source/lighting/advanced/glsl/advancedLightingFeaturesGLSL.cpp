@@ -231,7 +231,7 @@ void DeferredBumpFeatGLSL::processVert(   Vector<ShaderComponent*> &componentLis
       {
 
          getOutTexCoord("texCoord",
-            "float2",
+            "vec2",
             true,
             useTexAnim,
             meta,
