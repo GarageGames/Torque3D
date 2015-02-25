@@ -27,12 +27,6 @@ singleton ShaderData( VignetteShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/vignette/VignetteP.hlsl";
-   
-   OGLVertexShaderFile  = "shaders/common/postFx/gl//postFxV.glsl";
-   OGLPixelShaderFile   = "shaders/common/postFx/vignette/gl/VignetteP.glsl";
-   
-   samplerNames[0] = "$backBuffer";
-   
    pixVersion = 2.0;
 };
 
