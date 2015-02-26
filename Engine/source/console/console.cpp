@@ -1307,11 +1307,11 @@ const char *executef(A a, A b)                               { ConsoleValueRef p
 const char *executef(A a, A b, A c)                          { ConsoleValueRef params[] = {a,b,c}; return _executef(3, 3, params); }
 const char *executef(A a, A b, A c, A d)                     { ConsoleValueRef params[] = {a,b,c,d}; return _executef(4, 4, params); }
 const char *executef(A a, A b, A c, A d, A e)                { ConsoleValueRef params[] = {a,b,c,d,e}; return _executef(5, 5, params); }
-const char *executef(A a, A b, A c, A d, A e, A f)           { ConsoleValueRef params[] = {a,b,c,d,e,f}; return _executef(1, 1, params); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g)      { ConsoleValueRef params[] = {a,b,c,d,e,f,g}; return _executef(1, 1, params); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g, A h) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h}; return _executef(1, 1, params); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h,i}; return _executef(1, 1, params); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i, A j) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h,i,j}; return _executef(1, 1, params); }
+const char *executef(A a, A b, A c, A d, A e, A f)           { ConsoleValueRef params[] = {a,b,c,d,e,f}; return _executef(6, 6, params); }
+const char *executef(A a, A b, A c, A d, A e, A f, A g)      { ConsoleValueRef params[] = {a,b,c,d,e,f,g}; return _executef(7, 7, params); }
+const char *executef(A a, A b, A c, A d, A e, A f, A g, A h) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h}; return _executef(8, 8, params); }
+const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h,i}; return _executef(9, 9, params); }
+const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i, A j) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h,i,j}; return _executef(10, 10, params); }
 #undef A
 
 
