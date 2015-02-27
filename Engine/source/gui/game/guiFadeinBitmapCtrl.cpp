@@ -121,6 +121,8 @@ void GuiFadeinBitmapCtrl::onPreRender()
 
 void GuiFadeinBitmapCtrl::onMouseDown(const GuiEvent &)
 {
+	if (clickEvent.valid())
+		clickEvent(this);
    click_callback();
 }
 
@@ -128,6 +130,8 @@ void GuiFadeinBitmapCtrl::onMouseDown(const GuiEvent &)
 
 bool GuiFadeinBitmapCtrl::onKeyDown(const GuiEvent &)
 {
+	if (clickEvent.valid())
+		clickEvent(this);
    click_callback();
    return true;
 }
@@ -189,7 +193,11 @@ void GuiFadeinBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
       // Trigger onDone callback except when in Gui Editor.
 
       if( !smDesignTime )
+	  {
+		  if (doneEvent.valid())
+			  doneEvent(this);
 		  onDone_callback();
+	  }
    }
    
    // Render overlay on top of bitmap.

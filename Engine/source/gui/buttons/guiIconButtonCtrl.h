@@ -61,7 +61,7 @@ protected:
    StringTableEntry mErrorBitmapName;
    GFXTexHandle mErrorTextureHandle;
 
-   void renderButton( Point2I &offset, const RectI& updateRect);
+   virtual void renderButton( Point2I &offset, const RectI& updateRect);
 
    enum 
    {
@@ -101,19 +101,35 @@ public:
 
    static void initPersistFields();
 
-   //Parent methods
-   bool onWake();
-   void onSleep();
-   void inspectPostApply();
-   void onStaticModified(const char* slotName, const char* newValue = NULL);
-   bool resize(const Point2I &newPosition, const Point2I &newExtent);
+   //- Accessors --------------------------------------------------------------
+   const StringTableEntry getBitmapName() const { return mBitmapName; }
+   void setBitmapName(StringTableEntry value) { mBitmapName = value; }
 
-   void setBitmap(const char *name);
+   const bool getMakeIconSquare() const { return mMakeIconSquare; }
+   void setMakeIconSquare(bool value) { mMakeIconSquare = value; }
+
+   const bool getAutoSize() const { return mAutoSize; }
+   void setAutoSize(bool value) { mAutoSize = value; }
+
+   const bool getFitBitmapToButton() const { return mFitBitmapToButton; }
+   void setFitBitmapToButton(bool value) { mFitBitmapToButton = value; }
+
+   const Point2I& GetMargin() const { return mButtonMargin; }
+   void SetMargin(const Point2I& value) { mButtonMargin = value; }
+
+   //Parent methods
+   virtual bool onWake();
+   virtual void onSleep();
+   virtual void inspectPostApply();
+   virtual void onStaticModified(const char* slotName, const char* newValue = NULL);
+   virtual bool resize(const Point2I &newPosition, const Point2I &newExtent);
+
+   virtual void setBitmap(const char *name);
 
    //  Used to set the optional error bitmap
    void setErrorBitmap(const char *name);
 
-   void onRender(Point2I offset, const RectI &updateRect);
+   virtual void onRender(Point2I offset, const RectI &updateRect);
 };
 
 typedef GuiIconButtonCtrl::TextLocation GuiIconButtonTextLocation;

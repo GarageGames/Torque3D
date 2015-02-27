@@ -332,6 +332,7 @@ GuiPopUpMenuCtrlEx::GuiPopUpMenuCtrlEx(void)
    mBitmapBounds.set(16, 16); //  Added
    mHotTrackItems = false;
 	mIdMax = -1;
+	mAutoSize = true;
 }
 
 //------------------------------------------------------------------------------
@@ -349,6 +350,7 @@ void GuiPopUpMenuCtrlEx::initPersistFields(void)
    addField("bitmapBounds",             TypePoint2I,      Offset(mBitmapBounds, GuiPopUpMenuCtrlEx), "Boundaries of bitmap displayed");
    addField("hotTrackCallback",         TypeBool,         Offset(mHotTrackItems, GuiPopUpMenuCtrlEx),
       "Whether to provide a 'onHotTrackItem' callback when a list item is hovered over");
+   addField("autoSize",                 TypeBool,         Offset(mAutoSize, GuiPopUpMenuCtrlEx), "Length of menu when it extends");
 
    Parent::initPersistFields();
 }
@@ -1023,6 +1025,31 @@ void GuiPopUpMenuCtrlEx::setNoneSelected()
 const char *GuiPopUpMenuCtrlEx::getScriptValue()
 {
    return getText();
+}
+
+//------------------------------------------------------------------------------
+bool GuiPopUpMenuCtrlEx::resize(const Point2I& newPosition, const Point2I& newExtent)
+{
+	Point2I autoSize = newExtent;
+
+	// Auto-size height of control based on bitmap array height
+	if (mAutoSize)
+	{
+		if (!mAwake)
+		{
+			mProfile->incLoadCount();
+			if( !mProfile->mBitmapArrayRects.size() )
+				mProfile->constructBitmapArray();
+		}
+
+		if (mProfile->mBitmapArrayRects.size() > 0)
+			autoSize.y = mProfile->mBitmapArrayRects[0].extent.y;
+
+		if (!mAwake)
+			mProfile->decLoadCount();
+	}
+
+	return Parent::resize(newPosition, autoSize);
 }
 
 //------------------------------------------------------------------------------

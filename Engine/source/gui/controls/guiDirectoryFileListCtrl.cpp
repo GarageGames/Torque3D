@@ -74,7 +74,11 @@ void GuiDirectoryFileListCtrl::onMouseDown(const GuiEvent &event)
    Parent::onMouseDown( event );
 
    if( event.mouseClickCount == 2 )
-      onDoubleClick_callback();
+   {
+	   if (doubleClickEvent.valid())
+	      doubleClickEvent(this);
+	   onDoubleClick_callback();
+   }
 }
 
 

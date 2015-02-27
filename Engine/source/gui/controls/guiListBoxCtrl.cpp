@@ -260,6 +260,8 @@ void GuiListBoxCtrl::clearSelection()
 
    mSelectedItems.clear();
 
+   if (clearSelectionEvent.valid())
+      clearSelectionEvent(this);
    onClearSelection_callback();
 }
 
@@ -309,6 +311,9 @@ void GuiListBoxCtrl::removeSelection( LBItem *item, S32 index )
       {
          mSelectedItems.erase( &mSelectedItems[i] );
          item->isSelected = false;
+
+		 if (unselectEvent.valid())
+		    unselectEvent(this, index, item->itemText);
          onUnSelect_callback(Con::getIntArg(index), item->itemText);
          return;
       }
@@ -355,6 +360,8 @@ void GuiListBoxCtrl::addSelection( LBItem *item, S32 index )
    item->isSelected = true;
    mSelectedItems.push_front( item );
 
+   if (selectEvent.valid())
+      selectEvent(this, index, item->itemText);
    onSelect_callback(Con::getIntArg( index ), item->itemText);
 }
 
@@ -1145,6 +1152,8 @@ void GuiListBoxCtrl::onMouseDragged(const GuiEvent &event)
 {
    Parent::onMouseDragged(event);
 
+   if (mouseDraggedEvent.valid())
+	  mouseDraggedEvent(this, event);
    onMouseDragged_callback();
 }
 
@@ -1169,7 +1178,11 @@ void GuiListBoxCtrl::onMouseDown( const GuiEvent &event )
       setCurSel( itemHit );
 
       if( itemHit == selItem && event.mouseClickCount == 2 )
-         onDoubleClick_callback();
+	  {
+		  if (doubleClickEvent.valid())
+		     doubleClickEvent(this);
+		  onDoubleClick_callback();
+	  }
 
       // Store the clicked item
       mLastClickItem = hitItem;
@@ -1215,7 +1228,11 @@ void GuiListBoxCtrl::onMouseDown( const GuiEvent &event )
    }
 
    if( hitItem == mLastClickItem && event.mouseClickCount == 2 )
-      onDoubleClick_callback();
+   {
+	   if (doubleClickEvent.valid())
+	      doubleClickEvent(this);
+	   onDoubleClick_callback();
+   }
 
    mLastClickItem = hitItem;
 }
@@ -1224,8 +1241,11 @@ void GuiListBoxCtrl::onMouseUp( const GuiEvent& event )
 {
    S32 itemHit = -1;
    if( hitTest( event.mousePoint, itemHit ) )
-      onMouseUp_callback(Con::getIntArg( itemHit ), Con::getIntArg( event.mouseClickCount ) );
-
+   {
+	   if (mouseUpEvent.valid())
+		   mouseUpEvent(this, itemHit, event.mouseClickCount);
+	   onMouseUp_callback(Con::getIntArg( itemHit ), Con::getIntArg( event.mouseClickCount ) );
+   }
    // Execute console command
    execConsoleCallback();
    
@@ -1466,7 +1486,9 @@ void GuiListBoxCtrl::_mirror()
       bool addObj = true;
         
       if ( isObjMirroredDefined )
-         addObj = isObjectMirrored_callback(mirrorSet->at(i)->getIdString()); 
+	  {
+		  addObj = isObjectMirrored_callback(mirrorSet->at(i)->getIdString()); 
+	  }
         
       if ( addObj )
          workingSet.push_back( mirrorSet->at(i)->getId() );

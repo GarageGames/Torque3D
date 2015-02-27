@@ -921,8 +921,8 @@ public:
 		return !m_Closure.IsEqualToStaticFuncPtr(funcptr);    }
 	inline bool operator ! () const	{	// Is it bound to anything?
 			return !m_Closure; }
-	inline bool empty() const	{
-			return !m_Closure; }
+	inline bool valid() const { return !m_Closure.empty(); }
+	inline bool empty() const { return !m_Closure; }
 	void clear() { m_Closure.clear();}
 	// Conversion to and from the DelegateMemento storage class
 	const DelegateMemento & GetMemento() { return m_Closure; }
@@ -1006,8 +1006,8 @@ public:
 		return !m_Closure.IsEqualToStaticFuncPtr(funcptr);    }
 	inline bool operator ! () const	{	// Is it bound to anything?
 			return !m_Closure; }
-	inline bool empty() const	{
-			return !m_Closure; }
+	inline bool valid() const { return !m_Closure.empty(); }
+	inline bool empty() const { return !m_Closure; }
 	void clear() { m_Closure.clear();}
 	// Conversion to and from the DelegateMemento storage class
 	const DelegateMemento & GetMemento() { return m_Closure; }
@@ -1091,8 +1091,8 @@ public:
 		return !m_Closure.IsEqualToStaticFuncPtr(funcptr);    }
 	inline bool operator ! () const	{	// Is it bound to anything?
 			return !m_Closure; }
-	inline bool empty() const	{
-			return !m_Closure; }
+	inline bool valid() const { return !m_Closure.empty(); }
+	inline bool empty() const { return !m_Closure; }
 	void clear() { m_Closure.clear();}
 	// Conversion to and from the DelegateMemento storage class
 	const DelegateMemento & GetMemento() { return m_Closure; }
@@ -1176,8 +1176,8 @@ public:
 		return !m_Closure.IsEqualToStaticFuncPtr(funcptr);    }
 	inline bool operator ! () const	{	// Is it bound to anything?
 			return !m_Closure; }
-	inline bool empty() const	{
-			return !m_Closure; }
+	inline bool valid() const { return !m_Closure.empty(); }
+	inline bool empty() const { return !m_Closure; }
 	void clear() { m_Closure.clear();}
 	// Conversion to and from the DelegateMemento storage class
 	const DelegateMemento & GetMemento() { return m_Closure; }
@@ -1261,8 +1261,8 @@ public:
 		return !m_Closure.IsEqualToStaticFuncPtr(funcptr);    }
 	inline bool operator ! () const	{	// Is it bound to anything?
 			return !m_Closure; }
-	inline bool empty() const	{
-			return !m_Closure; }
+	inline bool valid() const { return !m_Closure.empty(); }
+	inline bool empty() const { return !m_Closure; }
 	void clear() { m_Closure.clear();}
 	// Conversion to and from the DelegateMemento storage class
 	const DelegateMemento & GetMemento() { return m_Closure; }
@@ -1346,8 +1346,8 @@ public:
 		return !m_Closure.IsEqualToStaticFuncPtr(funcptr);    }
 	inline bool operator ! () const	{	// Is it bound to anything?
 			return !m_Closure; }
-	inline bool empty() const	{
-			return !m_Closure; }
+	inline bool valid() const { return !m_Closure.empty(); }
+	inline bool empty() const { return !m_Closure; }
 	void clear() { m_Closure.clear();}
 	// Conversion to and from the DelegateMemento storage class
 	const DelegateMemento & GetMemento() { return m_Closure; }
@@ -1431,8 +1431,8 @@ public:
 		return !m_Closure.IsEqualToStaticFuncPtr(funcptr);    }
 	inline bool operator ! () const	{	// Is it bound to anything?
 			return !m_Closure; }
-	inline bool empty() const	{
-			return !m_Closure; }
+	inline bool valid() const { return !m_Closure.empty(); }
+	inline bool empty() const { return !m_Closure; }
 	void clear() { m_Closure.clear();}
 	// Conversion to and from the DelegateMemento storage class
 	const DelegateMemento & GetMemento() { return m_Closure; }
@@ -1516,8 +1516,8 @@ public:
 		return !m_Closure.IsEqualToStaticFuncPtr(funcptr);    }
 	inline bool operator ! () const	{	// Is it bound to anything?
 			return !m_Closure; }
-	inline bool empty() const	{
-			return !m_Closure; }
+	inline bool valid() const { return !m_Closure.empty(); }
+	inline bool empty() const { return !m_Closure; }
 	void clear() { m_Closure.clear();}
 	// Conversion to and from the DelegateMemento storage class
 	const DelegateMemento & GetMemento() { return m_Closure; }
@@ -1601,8 +1601,8 @@ public:
 		return !m_Closure.IsEqualToStaticFuncPtr(funcptr);    }
 	inline bool operator ! () const	{	// Is it bound to anything?
 			return !m_Closure; }
-	inline bool empty() const	{
-			return !m_Closure; }
+	inline bool valid() const { return !m_Closure.empty(); }
+	inline bool empty() const { return !m_Closure; }
 	void clear() { m_Closure.clear();}
 	// Conversion to and from the DelegateMemento storage class
 	const DelegateMemento & GetMemento() { return m_Closure; }

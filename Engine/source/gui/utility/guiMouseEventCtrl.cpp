@@ -276,23 +276,59 @@ void GuiMouseEventCtrl::sendMouseEvent(const char * name, const GuiEvent & event
    dSprintf(buf[2], 32, "%d", event.mouseClickCount);
 
    if(dStricmp(name,"onMouseDown") == 0)
+   {
+	   if (mouseDownEvent.valid())
+		   mouseDownEvent(this, event);
 	   onMouseDown_callback(event.modifier, event.mousePoint, event.mouseClickCount);
+   }
    else if(dStricmp(name,"onMouseUp") == 0)
+   {
+	   if (mouseUpEvent.valid())
+		   mouseUpEvent(this, event);
 	   onMouseUp_callback(event.modifier, event.mousePoint, event.mouseClickCount);
+   }
 	else if(dStricmp(name,"onMouseMove") == 0)
+	{
+		if (mouseMoveEvent.valid())
+			mouseMoveEvent(this, event);
 		onMouseMove_callback(event.modifier, event.mousePoint, event.mouseClickCount);
+    }
 	else if(dStricmp(name,"onMouseDragged") == 0)
+	{
+		if (mouseDraggedEvent.valid())
+			mouseDraggedEvent(this, event);
 		onMouseDragged_callback(event.modifier, event.mousePoint, event.mouseClickCount);
+	}
 	else if(dStricmp(name,"onMouseEnter") == 0)
+	{
+		if (mouseEnterEvent.valid())
+			mouseEnterEvent(this, event);
 		onMouseEnter_callback(event.modifier, event.mousePoint, event.mouseClickCount);
+	}
 	else if(dStricmp(name,"onMouseLeave") == 0)
+	{
+		if (mouseLeaveEvent.valid())
+			mouseLeaveEvent(this, event);
 		onMouseLeave_callback(event.modifier, event.mousePoint, event.mouseClickCount);
+	}
 	else if(dStricmp(name,"onRightMouseDown") == 0)
+	{
+		if (rightMouseDownEvent.valid())
+			rightMouseDownEvent(this, event);
 		onRightMouseDown_callback(event.modifier, event.mousePoint, event.mouseClickCount);
+	}
 	else if(dStricmp(name,"onRightMouseUp") == 0)
+	{
+		if (rightMouseUpEvent.valid())
+			rightMouseUpEvent(this, event);
 		onRightMouseUp_callback(event.modifier, event.mousePoint, event.mouseClickCount);
+	}
 	else if(dStricmp(name,"onRightMouseDragged") == 0)
+	{
+		if (rightMouseDraggedEvent.valid())
+			rightMouseDraggedEvent(this, event);
 		onRightMouseDragged_callback(event.modifier, event.mousePoint, event.mouseClickCount);
+	}
 }
 
 //------------------------------------------------------------------------------

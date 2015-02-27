@@ -900,7 +900,7 @@ void GuiShapeEdPreview::handleMouseDown(const GuiEvent& event, GizmoMode mode)
    if ( mRenderNodes && ( mode == NoneMode ) )
    {
       mGizmoDragID++;
-      make3DMouseEvent( mLastEvent, event );
+      make3DMouseEvent( mLastEvent, event, smCamOrtho );
 
       // Check gizmo first
       mUsingAxisGizmo = false;
@@ -934,7 +934,7 @@ void GuiShapeEdPreview::handleMouseUp(const GuiEvent& event, GizmoMode mode)
 
    if ( mRenderNodes && ( mode == NoneMode ) )
    {
-      make3DMouseEvent( mLastEvent, event );
+      make3DMouseEvent( mLastEvent, event, smCamOrtho );
       mGizmo->on3DMouseUp( mLastEvent );
    }
 
@@ -946,7 +946,7 @@ void GuiShapeEdPreview::handleMouseMove(const GuiEvent& event, GizmoMode mode)
 {
    if ( mRenderNodes && ( mode == NoneMode ) )
    {
-      make3DMouseEvent( mLastEvent, event );
+      make3DMouseEvent( mLastEvent, event, smCamOrtho );
       if ( mSelectedNode != -1 )
       {
          // Check if the mouse is hovering over an axis
@@ -992,7 +992,7 @@ void GuiShapeEdPreview::handleMouseDragged(const GuiEvent& event, GizmoMode mode
       }
       else if ( mRenderNodes )
       {
-         make3DMouseEvent( mLastEvent, event );
+         make3DMouseEvent( mLastEvent, event, smCamOrtho );
 
          if ( mUsingAxisGizmo )
          {
@@ -1302,6 +1302,10 @@ void GuiShapeEdPreview::updateThreads(F32 delta)
       {
          F32 threadPos = mModel->getPos( thread.key );
          bool inTransition = mModel->isInTransition( thread.key );
+
+		 if (animationThreadChangedEvent.valid())
+			 animationThreadChangedEvent(this, threadPos, inTransition);
+
          onThreadPosChanged_callback( threadPos, inTransition );
       }
    }

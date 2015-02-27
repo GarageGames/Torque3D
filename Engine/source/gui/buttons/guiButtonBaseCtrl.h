@@ -37,6 +37,16 @@ class GuiButtonBaseCtrl : public GuiControl
    
       typedef GuiControl Parent;
 
+	  // Event delegates
+	  Delegate<bool(GuiButtonBaseCtrl* sender, const GuiEvent& event)> mouseDownEvent;
+	  Delegate<bool(GuiButtonBaseCtrl* sender, const GuiEvent& event)> mouseUpEvent;
+	  Delegate<bool(GuiButtonBaseCtrl* sender, const GuiEvent& event)> mouseEnterEvent;
+	  Delegate<bool(GuiButtonBaseCtrl* sender, const GuiEvent& event)> mouseLeaveEvent;
+	  Delegate<bool(GuiButtonBaseCtrl* sender, const GuiEvent& event)> mouseDraggedEvent;
+	  Delegate<bool(GuiButtonBaseCtrl* sender)> clickEvent;
+	  Delegate<bool(GuiButtonBaseCtrl* sender)> rightClickEvent;
+	  Delegate<bool(GuiButtonBaseCtrl* sender)> doubleClickEvent;
+
       enum ButtonType
       {
          ButtonTypePush,
@@ -54,7 +64,8 @@ class GuiButtonBaseCtrl : public GuiControl
       S32 mButtonType;
       S32 mRadioGroup;
       bool mUseMouseEvents;
-      
+	  bool mCanDrag;
+
       /// Point where left mouse button was pressed down.  Used to find when to start
       /// a mouse drag.
       Point2I mMouseDownPoint;
@@ -65,14 +76,14 @@ class GuiButtonBaseCtrl : public GuiControl
 	   /// @name Callbacks
 	   /// @{
 
-      DECLARE_CALLBACK( void, onMouseDown, () );   
+       DECLARE_CALLBACK( void, onMouseDown, () );   
 	   DECLARE_CALLBACK( void, onMouseUp, () );
-	   DECLARE_CALLBACK( void, onClick, () );
-	   DECLARE_CALLBACK( void, onRightClick, () );
-	   DECLARE_CALLBACK( void, onDoubleClick, () );    
 	   DECLARE_CALLBACK( void, onMouseEnter, () );   
 	   DECLARE_CALLBACK( void, onMouseLeave, () );      
 	   DECLARE_CALLBACK( void, onMouseDragged, () );   
+	   DECLARE_CALLBACK( void, onClick, () );
+	   DECLARE_CALLBACK( void, onRightClick, () );
+	   DECLARE_CALLBACK( void, onDoubleClick, () );    
 
       /// @}
 
@@ -119,6 +130,9 @@ class GuiButtonBaseCtrl : public GuiControl
       
       bool usesMouseEvents() const { return mUseMouseEvents; }
       void setUseMouseEvents( bool val ) { mUseMouseEvents = val; }
+
+	  bool getCanDrag() const { return mCanDrag; }
+	  void setCanDrag(bool value) { mCanDrag = value; }
 };
 
 typedef GuiButtonBaseCtrl::ButtonType GuiButtonType;

@@ -262,6 +262,8 @@ void GuiAutoScrollCtrl::childResized( GuiControl* child )
 
 void GuiAutoScrollCtrl::processTick()
 {
+   if (tickEvent.valid())
+      tickEvent(this);
    onTick_callback();
 }
 
@@ -284,6 +286,8 @@ void GuiAutoScrollCtrl::advanceTime( F32 timeDelta )
    
    if( mCurrentPhase == PhaseInitial )
    {
+      if (startEvent.valid())
+	     startEvent(this);
       onStart_callback();
       mCurrentPhase = PhaseScrolling;
    }
@@ -313,6 +317,8 @@ void GuiAutoScrollCtrl::advanceTime( F32 timeDelta )
       {
          if( mCurrentPhase != PhaseWait )
          {
+		    if (completeEvent.valid())
+				completeEvent(this);
             onComplete_callback();
             mCurrentPhase = PhaseComplete;
          }
@@ -329,6 +335,8 @@ void GuiAutoScrollCtrl::advanceTime( F32 timeDelta )
          mCurrentPhase = PhaseWait;
          if( mCurrentTime > ( mCompleteTime + mResetDelay ) )
          {
+		    if (resetEvent.valid())
+				resetEvent(this);
             onReset_callback();
             _reset( control );
          }

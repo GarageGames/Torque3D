@@ -141,6 +141,8 @@ bool GuiInputCtrl::onInputEvent( const InputEventInfo &event )
          const char* actionString = ActionMap::buildActionString( &event );
 
 		 //Con::executef( this, "onInputEvent", deviceString, actionString, "1" );
+		 if (inputEvent.valid())
+			 inputEvent(this, deviceString, actionString, 1);
 		 onInputEvent_callback(deviceString, actionString, 1);
 
          return( true );
@@ -155,6 +157,8 @@ bool GuiInputCtrl::onInputEvent( const InputEventInfo &event )
             return( false );
 
          //Con::executef( this, "onInputEvent", "keyboard", keyString, "0" );
+		 if (inputEvent.valid())
+			 inputEvent(this, "keyboard", keyString, 0);
 		 onInputEvent_callback("keyboard", keyString, 0);
 
          return( true );

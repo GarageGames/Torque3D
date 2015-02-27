@@ -38,6 +38,13 @@ class GuiWindowCtrl : public GuiContainer
    
 		typedef GuiContainer Parent;
       
+		// Event delegates
+		Delegate<bool(GuiWindowCtrl* sender)> closeEvent;
+		Delegate<bool(GuiWindowCtrl* sender)> minimizeEvent;
+		Delegate<bool(GuiWindowCtrl* sender)> maximizeEvent;
+		Delegate<bool(GuiWindowCtrl* sender)> collapseEvent;
+		Delegate<bool(GuiWindowCtrl* sender)> restoreEvent;
+
    protected:
    
       enum
@@ -277,10 +284,10 @@ class GuiWindowCtrl : public GuiContainer
       virtual bool onKeyDown(const GuiEvent &event);
       virtual void onRender(Point2I offset, const RectI &updateRect);
 
+	  static void initPersistFields();
+
       DECLARE_CONOBJECT( GuiWindowCtrl );
       DECLARE_DESCRIPTION( "A control that shows an independent window inside the canvas." );
-
-      static void initPersistFields();
 };
 /// @}
 

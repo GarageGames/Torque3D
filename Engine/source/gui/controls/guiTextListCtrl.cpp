@@ -172,6 +172,8 @@ bool GuiTextListCtrl::cellSelected(Point2I cell)
 
 void GuiTextListCtrl::onCellSelected(Point2I cell)
 {
+   if (selectEvent.valid())
+      selectEvent(this, mList[cell.y].id, mList[cell.y].text);
    onSelect_callback(Con::getIntArg(mList[cell.y].id), mList[cell.y].text);
    execConsoleCallback();
 }
@@ -497,6 +499,8 @@ bool GuiTextListCtrl::onKeyDown( const GuiEvent &event )
       break;
    case KEY_DELETE:
       if ( mSelectedCell.y >= 0 && mSelectedCell.y < mList.size() )
+	  if (deleteEvent.valid())
+	     deleteEvent(this, mList[mSelectedCell.y].id);
       onDeleteKey_callback(Con::getIntArg( mList[mSelectedCell.y].id ) );
       break;
    default:

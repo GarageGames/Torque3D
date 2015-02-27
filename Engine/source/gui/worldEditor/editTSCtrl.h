@@ -44,9 +44,6 @@ class EditTSCtrl : public GuiTSCtrl
       typedef GuiTSCtrl Parent;
 
    protected:
-
-      void make3DMouseEvent(Gui3DMouseEvent & gui3Devent, const GuiEvent &event);
-
       // GuiControl
       virtual void getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent &lastGuiEvent);
       virtual void onMouseUp(const GuiEvent & event);

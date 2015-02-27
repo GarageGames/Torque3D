@@ -547,6 +547,8 @@ void GuiScrollCtrl::scrollTo(S32 x, S32 y)
    }
    calcThumbs();
 
+   if (scrollEvent.valid())
+      scrollEvent(this);
    onScroll_callback();
 }
 

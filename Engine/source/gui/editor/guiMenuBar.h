@@ -89,8 +89,15 @@ class GuiMenuBar : public GuiTickCtrl //  Was: GuiControl
 {
    typedef GuiTickCtrl Parent; //  Was: GuiControl Parent;
 public:
-
 	struct Menu;
+	struct MenuItem;
+
+	// Event delegates
+	Delegate<bool(GuiMenuBar* sender, bool hasLeftMenu)> mouseInMenuEvent;
+	Delegate<bool(GuiMenuBar* sender, Menu* menu)> menuSelectEvent;
+	Delegate<bool(GuiMenuBar* sender, Menu* menu, MenuItem* item)> menuItemSelectEvent;
+	Delegate<bool(GuiMenuBar* sender, MenuItem* submenu)> submenuSelectEvent;
+
 
 	struct MenuItem   // an individual item in a pull-down menu
 	{
@@ -220,6 +227,7 @@ public:
    static void initPersistFields();
 
    DECLARE_CONOBJECT(GuiMenuBar);
+
    DECLARE_CALLBACK( void, onMouseInMenu, (bool hasLeftMenu));
    DECLARE_CALLBACK( void, onMenuSelect, (const char* menuId, const char* menuText));
    DECLARE_CALLBACK( void, onMenuItemSelect, ( const char* menuId, const char* menuText, const char* menuItemId, const char* menuItemText  ));

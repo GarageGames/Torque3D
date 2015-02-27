@@ -169,7 +169,7 @@ void GuiIconButtonCtrl::onStaticModified(const char* slotName, const char* newVa
 
 bool GuiIconButtonCtrl::resize(const Point2I &newPosition, const Point2I &newExtent)
 {   
-   if ( !mAutoSize || !mProfile->mFont )   
+   if ( !mAutoSize || mProfile == NULL || !mProfile->mFont)   
       return Parent::resize( newPosition, newExtent );
    
    Point2I autoExtent( mMinExtent );

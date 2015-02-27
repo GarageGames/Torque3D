@@ -283,38 +283,6 @@ void EditTSCtrl::consoleInit()
 
 //------------------------------------------------------------------------------
 
-void EditTSCtrl::make3DMouseEvent(Gui3DMouseEvent & gui3DMouseEvent, const GuiEvent & event)
-{
-   (GuiEvent&)(gui3DMouseEvent) = event;
-   gui3DMouseEvent.mousePoint = event.mousePoint;
-
-   if(!smCamOrtho)
-   {
-      // get the eye pos and the mouse vec from that...
-      Point3F screenPoint((F32)gui3DMouseEvent.mousePoint.x, (F32)gui3DMouseEvent.mousePoint.y, 1.0f);
-
-      Point3F wp;
-      unproject(screenPoint, &wp);
-
-      gui3DMouseEvent.pos = smCamPos;
-      gui3DMouseEvent.vec = wp - smCamPos;
-      gui3DMouseEvent.vec.normalizeSafe();
-   }
-   else
-   {
-      // get the eye pos and the mouse vec from that...
-      Point3F screenPoint((F32)gui3DMouseEvent.mousePoint.x, (F32)gui3DMouseEvent.mousePoint.y, 0.0f);
-
-      Point3F np, fp;
-      unproject(screenPoint, &np);
-
-      gui3DMouseEvent.pos = np;
-      smCamMatrix.getColumn( 1, &(gui3DMouseEvent.vec) );
-   }
-}
-
-//------------------------------------------------------------------------------
-
 TerrainBlock* EditTSCtrl::getActiveTerrain()
 {
    // Find a terrain block
@@ -363,7 +331,7 @@ void EditTSCtrl::setDisplayType( S32 type )
 
 void EditTSCtrl::getCursor(GuiCursor *&cursor, bool &visible, const GuiEvent &event)
 {
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    get3DCursor(cursor, visible, mLastEvent);
 }
 
@@ -377,7 +345,7 @@ void EditTSCtrl::get3DCursor(GuiCursor *&cursor, bool &visible, const Gui3DMouse
 void EditTSCtrl::onMouseUp(const GuiEvent & event)
 {
    mLeftMouseDown = false;
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DMouseUp(mLastEvent);
 }
 
@@ -385,7 +353,7 @@ void EditTSCtrl::onMouseDown(const GuiEvent & event)
 {
    mLeftMouseDown = true;
    mLastBorderMoveTime = 0;
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DMouseDown(mLastEvent);
    
    setFirstResponder();
@@ -393,7 +361,7 @@ void EditTSCtrl::onMouseDown(const GuiEvent & event)
 
 void EditTSCtrl::onMouseMove(const GuiEvent & event)
 {
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DMouseMove(mLastEvent);
 
    mLastMousePos = event.mousePoint;
@@ -401,14 +369,14 @@ void EditTSCtrl::onMouseMove(const GuiEvent & event)
 
 void EditTSCtrl::onMouseDragged(const GuiEvent & event)
 {
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DMouseDragged(mLastEvent);
 }
 
 void EditTSCtrl::onMouseEnter(const GuiEvent & event)
 {
    mMouseLeft = false;
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DMouseEnter(mLastEvent);
 }
 
@@ -416,7 +384,7 @@ void EditTSCtrl::onMouseLeave(const GuiEvent & event)
 {
    mMouseLeft = true;
    mLastBorderMoveTime = 0;
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DMouseLeave(mLastEvent);
 }
 
@@ -427,7 +395,7 @@ void EditTSCtrl::onRightMouseDown(const GuiEvent & event)
    mRightMouseDown = true;
    mLastBorderMoveTime = 0;
 
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DRightMouseDown(mLastEvent);
 
    if(!mLeftMouseDown && mRightMousePassThru && mProfile->mCanKeyFocus)
@@ -512,13 +480,13 @@ void EditTSCtrl::onRightMouseDown(const GuiEvent & event)
 void EditTSCtrl::onRightMouseUp(const GuiEvent & event)
 {
    mRightMouseDown = false;
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DRightMouseUp(mLastEvent);
 }
 
 void EditTSCtrl::onRightMouseDragged(const GuiEvent & event)
 {
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DRightMouseDragged(mLastEvent);
 
    // Handle zoom of orthographic views.
@@ -595,7 +563,7 @@ bool EditTSCtrl::onMouseWheelUp( const GuiEvent &event )
       return true;
    }
 
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DMouseWheelUp(mLastEvent);
 
    return false;
@@ -610,7 +578,7 @@ bool EditTSCtrl::onMouseWheelDown( const GuiEvent &event )
       return true;
    }
 
-   make3DMouseEvent(mLastEvent, event);
+   make3DMouseEvent(mLastEvent, event, smCamOrtho);
    on3DMouseWheelDown(mLastEvent);
 
    return false;

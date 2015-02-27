@@ -62,6 +62,8 @@ protected:
    /// most likely rendering.
    static Vector<GuiTSCtrl*> smAwakeTSCtrls;
 
+	RectI mViewport;
+
    /// A scalar which controls how much of the reflection
    /// update timeslice for this viewport to get.
    F32 mReflectPriority;
@@ -75,7 +77,7 @@ protected:
    MatrixF     mSaveModelview;
    MatrixF     mSaveProjection;
    RectI       mSaveViewport;
-	Frustum		mSaveFrustum;
+   Frustum	   mSaveFrustum;
    
    /// The saved world to screen space scale.
    /// @see getWorldToScreenScale
@@ -158,6 +160,9 @@ public:
    DECLARE_CONOBJECT(GuiTSCtrl);
    DECLARE_CATEGORY( "Gui 3D" );
    DECLARE_DESCRIPTION( "Abstract base class for controls that render a 3D viewport." );
+
+protected:
+   virtual void make3DMouseEvent(Gui3DMouseEvent& gui3DMouseEvent, const GuiEvent& event, bool orthographic);
 };
 
 typedef GuiTSCtrl::RenderStyles GuiTSRenderStyles;

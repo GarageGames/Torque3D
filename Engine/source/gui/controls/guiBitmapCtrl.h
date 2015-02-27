@@ -49,7 +49,6 @@ class GuiBitmapCtrl : public GuiControl
       bool mWrap;
 
       static bool setBitmapName( void *object, const char *index, const char *data );
-      static const char *getBitmapName( void *obj, const char *data );
 
    public:
       
@@ -58,6 +57,7 @@ class GuiBitmapCtrl : public GuiControl
 
       void setBitmap(const char *name,bool resize = false);
       void setBitmapHandle(GFXTexHandle handle, bool resize = false);
+	  const String& getBitmapName() const { return mBitmapName; }
 
       // GuiControl.
       bool onWake();

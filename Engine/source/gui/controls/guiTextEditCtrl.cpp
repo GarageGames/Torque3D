@@ -706,6 +706,8 @@ bool GuiTextEditCtrl::onKeyDown(const GuiEvent &event)
             case KEY_TAB:
                if ( mTabComplete )
                {
+				  if (tabCompleteEvent.valid())
+				 	 tabCompleteEvent(this, 1);
 				  onTabComplete_callback("1");
                   return true;
                }
@@ -1151,6 +1153,8 @@ dealWithBackspace:
       case KEY_TAB:
          if ( mTabComplete )
          {
+			if (tabCompleteEvent.valid())
+				tabCompleteEvent(this, 0);
 			onTabComplete_callback("0");
             return( true );
          }
@@ -1193,6 +1197,8 @@ bool GuiTextEditCtrl::dealWithEnter( bool clearResponder )
    execAltConsoleCallback();
 
    // Notify of Return
+   if (returnEvent.valid())
+      returnEvent(this);
    onReturn_callback();
 
    if (mProfile->mReturnTab)
@@ -1241,6 +1247,8 @@ void GuiTextEditCtrl::onLoseFirstResponder()
    if( mValidateCommand.isNotEmpty() )
       evaluate( mValidateCommand );
 
+   if (validateEvent.valid())
+      validateEvent(this);
    onValidate_callback();
 
    // Redraw the control:

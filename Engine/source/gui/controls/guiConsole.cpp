@@ -167,6 +167,9 @@ void GuiConsole::onCellSelected( Point2I cell )
    Con::getLockLog(log, size);
 
    ConsoleLogEntry& entry = log[ cell.y ];
+
+   if (messageSelectedEvent.valid())
+      messageSelectedEvent(this, entry.mLevel, entry.mString);
    onMessageSelected_callback( entry.mLevel, entry.mString );
 
    Con::unlockLog();

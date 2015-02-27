@@ -35,6 +35,11 @@ class GuiArrayCtrl : public GuiControl
 {
    typedef GuiControl Parent;
 
+public:
+   // Event delegates
+   Delegate<bool(GuiArrayCtrl* sender, Point2I& cell)> cellHighlightedEvent;
+   Delegate<bool(GuiArrayCtrl* sender, Point2I& cell)> cellSelectedEvent;
+
 protected:
 
    Point2I mHeaderDim;

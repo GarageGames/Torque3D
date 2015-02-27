@@ -30,6 +30,11 @@ class LightInfo;
 
 class GuiShapeEdPreview : public EditTSCtrl
 {
+public:
+	// Event delegates
+	Delegate<bool(GuiShapeEdPreview* sender, F32 position, bool transitioning)> animationThreadChangedEvent;
+
+protected:
    struct Thread
    {
       TSThread*   key;              //!< TSThread key

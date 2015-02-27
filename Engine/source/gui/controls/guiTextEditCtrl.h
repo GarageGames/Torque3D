@@ -40,8 +40,12 @@ class GuiTextEditCtrl : public GuiTextCtrl
 private:
    typedef GuiTextCtrl Parent;
 
-protected:
+   // Event delegates
+   Delegate<bool(GuiTextEditCtrl* sender, S32 value)> tabCompleteEvent;
+   Delegate<bool(GuiTextEditCtrl* sender)> returnEvent;
+   Delegate<bool(GuiTextEditCtrl* sender)> validateEvent;
 
+protected:
    DECLARE_CALLBACK( void, onTabComplete, (const char* val));
    DECLARE_CALLBACK( void, onReturn, ());
    DECLARE_CALLBACK( void, onValidate, ());

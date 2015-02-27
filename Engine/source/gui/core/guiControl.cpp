@@ -152,7 +152,7 @@ IMPLEMENT_CALLBACK( GuiControl, onControlDragged, void, ( GuiControl* control, c
    "topmost visible controls as the GuiDragAndDropControl moves across them.\n\n"
    "@param control The payload of the drag operation.\n"
    "@param dropPoint The point at which the payload would be dropped if it were released now.  Relative to the canvas." );
-IMPLEMENT_CALLBACK( GuiControl, onControlDropped, void, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
+IMPLEMENT_CALLBACK( GuiControl, onControlDropped, bool, ( GuiControl* control, const Point2I& dropPoint ), ( control, dropPoint ),
    "Called when a drag&drop operation through GuiDragAndDropControl has completed and is dropping its payload onto the control.  "
    "This is only called for topmost visible controls as the GuiDragAndDropControl drops its payload on them.\n\n"
    "@param control The control that is being dropped onto this control.\n"
@@ -206,8 +206,9 @@ GuiControl::GuiControl() : mAddGroup( NULL ),
                            mTooltipProfile(NULL),
                            mTipHoverTime(1000),
                            mIsContainer(false),
-									mCanResize(true),
-                           mCanHit( true )
+						   mCanResize(true),
+                           mCanHit( true ),
+						   mAcceptDrops(false)
 {
    mConsoleVariable     = StringTable->EmptyString();
    mAcceleratorKey      = StringTable->EmptyString();
@@ -280,6 +281,7 @@ void GuiControl::initPersistFields()
             "the global variable $ThisControl." );
       addField("accelerator",       TypeString,       Offset(mAcceleratorKey, GuiControl),
          "Key combination that triggers the control's primary action when the control is on the canvas." );
+	  addField("data",       TypeRealString,       Offset(mDataString, GuiControl), "Arbitrary string data that can be associated with a control." );
 
    endGroup( "Control" );	
    
@@ -295,6 +297,8 @@ void GuiControl::initPersistFields()
    addGroup( "Editing" );
       addField("isContainer",       TypeBool,      Offset(mIsContainer, GuiControl),
          "If true, the control may contain child controls." );
+	  addField("acceptDrops",       TypeBool,      Offset(mAcceptDrops, GuiControl),
+         "If true, other controls may be dragged and dropped on to this control" );
    endGroup( "Editing" );
 
    addGroup( "Localization" );
@@ -728,6 +732,8 @@ bool GuiControl::onAdd()
    }
 
    // Notify Script.
+   if (addEvent.valid())
+	  addEvent(this);
    onAdd_callback();
 
    GFXStateBlockDesc d;
@@ -754,6 +760,8 @@ void GuiControl::onRemove()
       sleep();
       
    // Only invoke script callbacks if they can be received
+   if (removeEvent.valid())
+	  removeEvent(this);
    onRemove_callback();
 
    if ( mProfile )
@@ -831,6 +839,8 @@ bool GuiControl::onWake()
 
    // Only invoke script callbacks if we have a namespace in which to do so
    // This will suppress warnings
+   if (wakeEvent.valid())
+	 wakeEvent(this);
    onWake_callback();
    
    return true;
@@ -849,6 +859,8 @@ void GuiControl::onSleep()
 
    // Only invoke script callbacks if we have a namespace in which to do so
    // This will suppress warnings
+   if (sleepEvent.valid())
+      sleepEvent(this);
    onSleep_callback();
 
    //decrement the profile reference
@@ -1021,38 +1033,68 @@ bool GuiControl::onMouseWheelDown( const GuiEvent &event )
 
 //-----------------------------------------------------------------------------
 
-void GuiControl::onRightMouseDown(const GuiEvent &)
+void GuiControl::onRightMouseDown(const GuiEvent& event)
 {
+	SimObject* obj = getGroup();
+	if (GuiControl* parent = dynamic_cast<GuiControl*>(obj))
+	{
+		parent->onRightMouseDown(event);
+	}
 }
 
 //-----------------------------------------------------------------------------
 
-void GuiControl::onRightMouseUp(const GuiEvent &)
+void GuiControl::onRightMouseUp(const GuiEvent& event)
 {
+	SimObject* obj = getGroup();
+	if (GuiControl* parent = dynamic_cast<GuiControl*>(obj))
+	{
+		parent->onRightMouseUp(event);
+	}
 }
 
 //-----------------------------------------------------------------------------
 
-void GuiControl::onRightMouseDragged(const GuiEvent &)
+void GuiControl::onRightMouseDragged(const GuiEvent& event)
 {
+	SimObject* obj = getGroup();
+	if (GuiControl* parent = dynamic_cast<GuiControl*>(obj))
+	{
+		parent->onRightMouseDragged(event);
+	}
 }
 
 //-----------------------------------------------------------------------------
 
-void GuiControl::onMiddleMouseDown(const GuiEvent &)
+void GuiControl::onMiddleMouseDown(const GuiEvent& event)
 {
+	SimObject* obj = getGroup();
+	if (GuiControl* parent = dynamic_cast<GuiControl*>(obj))
+	{
+		parent->onMiddleMouseDown(event);
+	}
 }
 
 //-----------------------------------------------------------------------------
 
-void GuiControl::onMiddleMouseUp(const GuiEvent &)
+void GuiControl::onMiddleMouseUp(const GuiEvent& event)
 {
+	SimObject* obj = getGroup();
+	if (GuiControl* parent = dynamic_cast<GuiControl*>(obj))
+	{
+		parent->onMiddleMouseUp(event);
+	}
 }
 
 //-----------------------------------------------------------------------------
 
-void GuiControl::onMiddleMouseDragged(const GuiEvent &)
+void GuiControl::onMiddleMouseDragged(const GuiEvent &event)
 {
+	SimObject* obj = getGroup();
+	if (GuiControl* parent = dynamic_cast<GuiControl*>(obj))
+	{
+		parent->onMiddleMouseDragged(event);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1151,12 +1193,31 @@ bool GuiControl::onGamepadTrigger(const GuiEvent &event)
 
 //-----------------------------------------------------------------------------
 
+bool GuiControl::onControlDropped(GuiControl* payload, Point2I position)
+{
+	if (controlDroppedEvent.valid())
+	{
+		if (!controlDroppedEvent(this, payload, position))
+		{
+			payload->unregisterObject();
+			delete payload;
+			return false;
+		}
+	}
+	onControlDropped_callback(payload, position);
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
 void GuiControl::onAction()
 {
    if (! mActive)
       return;
 
    //execute the console command
+   if (actionEvent.valid())
+      actionEvent(this);
    if( mConsoleCommand.isNotEmpty() )
    {
       execConsoleCallback();
@@ -1175,7 +1236,9 @@ void GuiControl::onMessage( GuiControl* , S32 )
 
 void GuiControl::onDialogPush()
 {
-   // Notify Script.
+   // Trigger event and callback
+   if (dialogPushEvent.valid())
+      dialogPushEvent(this);
    onDialogPush_callback();
 }
 
@@ -1183,7 +1246,9 @@ void GuiControl::onDialogPush()
 
 void GuiControl::onDialogPop()
 {
-   // Notify Script.
+   // Trigger event and callback
+   if (dialogPopEvent.valid())
+	  dialogPopEvent(this);
    onDialogPop_callback();
 }
 
@@ -1292,6 +1357,29 @@ bool GuiControl::resize(const Point2I &newPosition, const Point2I &newExtent)
 bool GuiControl::setPosition( const Point2I &newPosition )
 {
    return resize( newPosition, mBounds.extent );
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiControl::setPositionClamped(const Point2I& desiredPosition, RectI& validRegion)
+{
+	// Clamp position against max point of valid region
+	Point2I desiredMaxPosition = desiredPosition + mBounds.extent;
+	desiredMaxPosition.setMin(validRegion.point + validRegion.extent);
+
+	// Clamp position against min point of valid region
+	Point2I desiredMinPosition = desiredMaxPosition - mBounds.extent;
+	desiredMinPosition.setMax(validRegion.point);
+
+	// Set position of control to clamped value
+	GuiControl::setPosition(desiredMinPosition);
+}
+
+//-----------------------------------------------------------------------------
+
+bool GuiControl::setCenter( const Point2I &newCenter )
+{
+	return resize( newCenter - mBounds.extent / 2, mBounds.extent );
 }
 
 //-----------------------------------------------------------------------------
@@ -1695,7 +1783,11 @@ void GuiControl::setVisible(bool value)
    }
    
    if( getNamespace() ) // May be called during construction.
-      onVisible_callback( value );
+   {
+	   if (visibleEvent.valid())
+		  visibleEvent(this, value);
+	   onVisible_callback( value );
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1714,7 +1806,11 @@ void GuiControl::setActive( bool value )
       setUpdate();
       
    if( getNamespace() ) // May be called during construction.
-      onActive_callback( value );
+   {
+	   if (activeEvent.valid())
+	      activeEvent(this, value);
+	   onActive_callback( value );
+   }
       
    // Pass activation on to children.
       
@@ -1725,6 +1821,14 @@ void GuiControl::setActive( bool value )
          child->setActive( value );
    }
 }
+
+//-----------------------------------------------------------------------------
+
+bool GuiControl::acceptDrops()
+{
+	return mAcceptDrops || isMethod("onControlDropped");
+}
+
 
 //=============================================================================
 //    Persistence.
@@ -2163,6 +2267,8 @@ void GuiControl::onLoseFirstResponder()
 	// Since many controls have visual cues when they are the firstResponder...
 	setUpdate();
 
+   if (loseFirstResponderEvent.valid())
+      loseFirstResponderEvent(this);
    onLoseFirstResponder_callback();
 }
 
@@ -2173,6 +2279,8 @@ void GuiControl::onGainFirstResponder()
    // Since many controls have visual cues when they are the firstResponder...
    this->setUpdate();
 
+   if (gainFirstResponderEvent.valid())
+      gainFirstResponderEvent(this);
    onGainFirstResponder_callback();
 }
 
@@ -2689,6 +2797,24 @@ DefineEngineMethod( GuiControl, setProfile, void, ( GuiControlProfile* profile )
       return;
       
    object->setControlProfile( profile );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, globalToLocal, Point2I, (Point2I global),,
+	"Transform global space position to local space position\n"
+	"@return The transformed position in local space" )
+{
+	return object->globalToLocalCoord(global);
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod( GuiControl, localToGlobal, Point2I, (Point2I local),,
+	"Transform local space position to global space position\n"
+	"@return The transformed position in global space" )
+{
+	return object->localToGlobalCoord(local);
 }
 
 //-----------------------------------------------------------------------------

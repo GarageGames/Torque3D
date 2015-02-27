@@ -45,9 +45,16 @@
 
 class GuiListBoxCtrl : public GuiControl
 {
-private:
-   typedef GuiControl Parent;
 public:
+   typedef GuiControl Parent;
+
+   // Event delegates
+   Delegate<bool(GuiListBoxCtrl* sender, const GuiEvent& event)> mouseDraggedEvent;
+   Delegate<bool(GuiListBoxCtrl* sender)> clearSelectionEvent;
+   Delegate<bool(GuiListBoxCtrl* sender, S32 index, const char* text)> unselectEvent;
+   Delegate<bool(GuiListBoxCtrl* sender, S32 index, const char* text)> selectEvent;
+   Delegate<bool(GuiListBoxCtrl* sender)> doubleClickEvent;
+   Delegate<bool(GuiListBoxCtrl* sender, S32 index, S32 clickCount)> mouseUpEvent;
 
    GuiListBoxCtrl();
    ~GuiListBoxCtrl();

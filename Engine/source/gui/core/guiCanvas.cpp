@@ -476,6 +476,11 @@ Point2I GuiCanvas::getCursorPos()
    return p;
 }
 
+Point2I GuiCanvas::getCursorCanvasPos()
+{
+	return Point2I(S32(mCursorPt.x), S32(mCursorPt.y));
+}
+
 void GuiCanvas::setCursorPos(const Point2I &pt)
 {
    AssertISV(mPlatformWindow, "GuiCanvas::setCursorPos - no window present!");
@@ -2270,6 +2275,12 @@ DefineEngineMethod( GuiCanvas, getCursorPos, Point2I, (),,
 				   "@return Screen coordinates of mouse cursor, in format \"X Y\"")
 {
 	return object->getCursorPos();
+}
+
+DefineEngineMethod( GuiCanvas, getCursorCanvasPos, Point2I, (),,
+				   "@brief Get the current position of the cursor in local space.\n\n")
+{
+	return object->getCursorCanvasPos();
 }
 
 ConsoleDocFragment _setCursorPos1(

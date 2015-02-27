@@ -79,4 +79,43 @@ DefineConsoleType( TypeBox3F, Box3F )
 DefineConsoleType( TypeEaseF, EaseF )
 
 
+struct Align
+{
+public:
+	enum Enum
+	{
+		Invalid = -1,
+		UpperLeft,
+		UpperMiddle,
+		UpperRight,
+
+		CenterLeft,
+		CenterMiddle,
+		CenterRight,
+
+		LowerLeft,
+		LowerMiddle,
+		LowerRight,
+
+		PrincipalAlignments,
+
+		UpperEdge = PrincipalAlignments,
+		CenterVertically,
+		LowerEdge,
+		LeftEdge,
+		MiddleHorizontally,
+		RightEdge,
+
+		TotalAlignments,
+		Default = Invalid
+	};
+
+private:
+	Align();
+};
+
+typedef Align::Enum AlignEnum;
+DefineEnumType(AlignEnum);
+
+
 #endif

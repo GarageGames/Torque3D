@@ -62,6 +62,10 @@ class GuiTabBookCtrl : public GuiContainer
    
       typedef GuiContainer Parent;
       
+	  // Event delegates
+	  Delegate<bool(GuiTabBookCtrl* sender, const String& text, U32 index)> tabSelectedEvent;
+	  Delegate<bool(GuiTabBookCtrl* sender, const String& text, U32 index)> tabRightClickEvent;
+
       enum TabPosition
       {
          AlignTop,   ///< Align the tabs on the top of the tab book control
@@ -114,7 +118,7 @@ class GuiTabBookCtrl : public GuiContainer
       
       /// @name Callbacks
       /// @{
-      
+
       DECLARE_CALLBACK( void, onTabSelected, ( const String& text, U32 index ) );
       DECLARE_CALLBACK( void, onTabRightClick, ( const String& text, U32 index ) );
       

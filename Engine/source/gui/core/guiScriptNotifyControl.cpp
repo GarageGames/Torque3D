@@ -116,6 +116,9 @@ void GuiScriptNotifyCtrl::onChildAdded( GuiControl *child )
 {
    Parent::onChildAdded( child );
 
+	if (childAddedEvent.valid())
+		childAddedEvent(this, child);
+
    // Call Script.
    if( mOnChildAdded )
       onChildAdded_callback(getId(), child->getId());
@@ -125,6 +128,9 @@ void GuiScriptNotifyCtrl::onChildRemoved( GuiControl *child )
 {
    Parent::onChildRemoved( child );
 
+	if (childRemovedEvent.valid())
+		childRemovedEvent(this, child);
+	
    // Call Script.
    if( mOnChildRemoved )
       onChildRemoved_callback(getId(), child->getId());
@@ -135,6 +141,9 @@ bool GuiScriptNotifyCtrl::resize(const Point2I &newPosition, const Point2I &newE
 {
    if( !Parent::resize( newPosition, newExtent ) )
       return false;
+
+	if (resizeEvent.valid())
+		resizeEvent(this);
 
    // Call Script.
    if( mOnResize )
@@ -147,6 +156,9 @@ void GuiScriptNotifyCtrl::childResized(GuiScriptNotifyCtrl *child)
 {
    Parent::childResized( child );
 
+	if (childResizedEvent.valid())
+		childResizedEvent(this, child);
+
    // Call Script.
    if( mOnChildResized )
       onChildResized_callback(getId(), child->getId());
@@ -155,6 +167,9 @@ void GuiScriptNotifyCtrl::childResized(GuiScriptNotifyCtrl *child)
 void GuiScriptNotifyCtrl::parentResized(const RectI &oldParentRect, const RectI &newParentRect)
 {
    Parent::parentResized( oldParentRect, newParentRect );
+
+	if (parentResizedEvent.valid())
+		parentResizedEvent(this);
 
    // Call Script.
    if( mOnParentResized )

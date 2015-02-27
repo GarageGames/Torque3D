@@ -36,10 +36,25 @@ class GuiTextEditCtrl;
 
 class GuiTreeViewCtrl : public GuiArrayCtrl
 {
-   private:
       typedef GuiArrayCtrl Parent;
+	  
+public:
+	  // Event delegates
+	  Delegate<bool(GuiTreeViewCtrl* sender)> defineIconsEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender, SimGroup* group)> addGroupSelectedEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender, S32 id, bool lastSelection)> addSelectionEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender, S32 id)> selectedEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender, S32 id)> inspectEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender, S32 id)> removeSelectionEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender, S32 id)> unselectEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender)> deleteSelectionEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender, S32 id, S32 oldParentId, S32 newParentId)> reparentEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender)> dragDroppedEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender)> addMultipleSelectionBeginEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender)> addMultipleSelectionEndEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender)> clearSelectionEvent;
+	  Delegate<bool(GuiTreeViewCtrl* sender, const char* newName, SimObject* object)> renameEvent;
 
-   public:
       /// @section GuiControl_Intro Introduction
       /// @nosubgrouping
 

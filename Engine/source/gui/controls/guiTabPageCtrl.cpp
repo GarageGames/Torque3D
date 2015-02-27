@@ -49,10 +49,11 @@ ConsoleDocClass( GuiTabPageCtrl,
 GuiTabPageCtrl::GuiTabPageCtrl(void)
 {
    setExtent(Point2I(100, 200));
-   mFitBook = false;
+   mFitBook = true;
    dStrcpy(mText,(UTF8*)"TabPage");
    mActive = true;
    mIsContainer = true;
+   mRenderPanel = true;
 }
 
 void GuiTabPageCtrl::initPersistFields()
@@ -61,6 +62,8 @@ void GuiTabPageCtrl::initPersistFields()
       "Determines whether to resize this page when it is added to the tab book. "
       "If true, the page will be resized according to the tab book extents and "
       "<i>tabPosition</i> property." );
+   addField( "renderPanel", TypeBool, Offset( mRenderPanel, GuiTabPageCtrl ),
+	   "Determines whether render a panel for this tab. If true, it will use the control's profile; if false, the tab page itself will be transparent." );
 
    Parent::initPersistFields();
 }
@@ -70,11 +73,22 @@ bool GuiTabPageCtrl::onWake()
    if (! Parent::onWake())
       return false;
 
+   // Get texture for frame
+   mBitmapBounds = NULL;
+   mTextureObject = mProfile->mTextureObject;
+   if( mProfile->constructBitmapArray() >= NumBitmaps )
+	   mBitmapBounds = mProfile->mBitmapArrayRects.address();
+   else
+	   Con::errorf( "GuiTabPageCtrl: Could not construct bitmap array for profile '%s'", mProfile->getName() );
+
    return true;
 }
 
 void GuiTabPageCtrl::onSleep()
 {
+	mTextureObject = NULL;
+	mBitmapBounds = NULL;
+
    Parent::onSleep();
 }
 
@@ -207,6 +221,77 @@ void GuiTabPageCtrl::selectWindow(void)
 
 void GuiTabPageCtrl::onRender(Point2I offset,const RectI &updateRect)
 {
+	if (mRenderPanel && mBitmapBounds )
+	{
+		GFX->setClipRect(updateRect);
+		GFX->getDrawUtil()->setBitmapModulation(ColorI::BLACK);
+
+		//draw the outline
+		RectI winRect;
+		winRect.point = offset;
+		winRect.extent = getExtent();
+
+		winRect.point.x += mBitmapBounds[BorderLeft].extent.x;
+		winRect.point.y += mBitmapBounds[BorderTop].extent.y;
+
+		winRect.extent.x -= mBitmapBounds[BorderLeft].extent.x + mBitmapBounds[BorderRight].extent.x;
+		winRect.extent.y -= mBitmapBounds[BorderTop].extent.y + mBitmapBounds[BorderBottom].extent.y;
+
+		if(mProfile->mOpaque)
+		{
+			GFX->getDrawUtil()->drawRectFill(winRect, ColorI::WHITE);
+			GFX->getDrawUtil()->clearBitmapModulation();
+		}
+		else if (mBitmapBounds[MiddleFill].area() > 0)
+		{
+			GFX->getDrawUtil()->clearBitmapModulation();
+			GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, winRect, mBitmapBounds[MiddleFill]);
+		}
+
+		GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset, mBitmapBounds[BorderTopLeft]);
+		GFX->getDrawUtil()->drawBitmapSR(mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[BorderTopRight].extent.x, offset.y),
+			mBitmapBounds[BorderTopRight]);
+
+		RectI destRect;
+		destRect.point.x = offset.x + mBitmapBounds[BorderTopLeft].extent.x;
+		destRect.point.y = offset.y;
+		destRect.extent.x = getWidth() - mBitmapBounds[BorderTopLeft].extent.x - mBitmapBounds[BorderTopRight].extent.x;
+		destRect.extent.y = mBitmapBounds[BorderTop].extent.y;
+		RectI stretchRect = mBitmapBounds[BorderTop];
+		stretchRect.inset(1,0);
+		GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+
+
+		destRect.point.x = offset.x;
+		destRect.point.y = offset.y + mBitmapBounds[BorderTopLeft].extent.y;
+		destRect.extent.x = mBitmapBounds[BorderLeft].extent.x;
+		destRect.extent.y = getHeight() - mBitmapBounds[BorderTopLeft].extent.y - mBitmapBounds[BorderBottomLeft].extent.y;
+		stretchRect = mBitmapBounds[BorderLeft];
+		stretchRect.inset(0,1);
+		GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+
+		destRect.point.x = offset.x + getWidth() - mBitmapBounds[BorderRight].extent.x;
+		destRect.extent.x = mBitmapBounds[BorderRight].extent.x;
+		destRect.point.y = offset.y + mBitmapBounds[BorderTopRight].extent.y;
+		destRect.extent.y = getHeight() - mBitmapBounds[BorderTopRight].extent.y - mBitmapBounds[BorderBottomRight].extent.y;
+
+		stretchRect = mBitmapBounds[BorderRight];
+		stretchRect.inset(0,1);
+		GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+		GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset + Point2I(0, getHeight() - mBitmapBounds[BorderBottomLeft].extent.y), mBitmapBounds[BorderBottomLeft]);
+		GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset + getExtent() - mBitmapBounds[BorderBottomRight].extent, mBitmapBounds[BorderBottomRight]);
+
+		destRect.point.x = offset.x + mBitmapBounds[BorderBottomLeft].extent.x;
+		destRect.extent.x = getWidth() - mBitmapBounds[BorderBottomLeft].extent.x - mBitmapBounds[BorderBottomRight].extent.x;
+
+		destRect.point.y = offset.y + getHeight() - mBitmapBounds[BorderBottom].extent.y;
+		destRect.extent.y = mBitmapBounds[BorderBottom].extent.y;
+		stretchRect = mBitmapBounds[BorderBottom];
+		stretchRect.inset(1,0);
+
+		GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+	}
+	
    // Call directly into GuiControl to skip the GuiTextCtrl parent render
    GuiControl::onRender( offset, updateRect );
 }

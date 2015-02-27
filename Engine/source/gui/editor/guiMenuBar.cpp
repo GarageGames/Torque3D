@@ -1233,6 +1233,8 @@ void GuiMenuBar::onMouseLeave(const GuiEvent &event)
    // within it.
    if(mCountMouseOver && mMouseOverCounter >= mMouseHoverAmount)
    {
+	   if (mouseInMenuEvent.valid())
+		   mouseInMenuEvent(this, false);
 	  onMouseInMenu_callback(false); // Last parameter indicates if we've entered or left the menu
    }
    mCountMouseOver = false;
@@ -1393,6 +1395,8 @@ void GuiMenuBar::acceleratorKeyPress(U32 index)
          if(item->acceleratorIndex == index)
          {
             // first, call the script callback for menu selection:
+			 if (menuSelectEvent.valid())
+				 menuSelectEvent(this, menu);
             onMenuSelect_callback(Con::getIntArg(menu->id), menu->text);
 			
             if(item->visible)
@@ -1575,7 +1579,11 @@ bool GuiSubmenuBackgroundCtrl::pointInControl(const Point2I& parentCoordPoint)
 void GuiMenuBar::menuItemSelected(GuiMenuBar::Menu *menu, GuiMenuBar::MenuItem *item)
 {
    if(item->enabled)
-      onMenuItemSelect_callback(Con::getIntArg(menu->id), menu->text, Con::getIntArg(item->id), item->text);
+   {
+	   if (menuItemSelectEvent.valid())
+		   menuItemSelectEvent(this, menu, item);
+	   onMenuItemSelect_callback(Con::getIntArg(menu->id), menu->text, Con::getIntArg(item->id), item->text);
+   }
 }
 
 void GuiMenuBar::onSleep()
@@ -1668,6 +1676,8 @@ void GuiMenuBar::onAction()
       return;
 
    // first, call the script callback for menu selection:
+   if (menuSelectEvent.valid())
+	   menuSelectEvent(this, mouseDownMenu);
    onMenuSelect_callback(Con::getIntArg(mouseDownMenu->id), mouseDownMenu->text);
 
    MenuItem *visWalk = mouseDownMenu->firstMenuItem;
@@ -1783,6 +1793,8 @@ void GuiMenuBar::onSubmenuAction(S32 selectionIndex, RectI bounds, Point2I cellS
       return;
 
    // first, call the script callback for menu selection:
+   if (submenuSelectEvent.valid())
+	   submenuSelectEvent(this, mouseOverSubmenu);
    onSubmenuSelect_callback(Con::getIntArg(mouseOverSubmenu->id), mouseOverSubmenu->text);
 
    MenuItem *visWalk = mouseOverSubmenu->submenu->firstMenuItem;
@@ -1970,6 +1982,8 @@ void GuiMenuBar::processTick()
 	  } else if(mMouseOverCounter == mMouseHoverAmount)
 	  {
          ++mMouseOverCounter;
+		 if (mouseInMenuEvent.valid())
+			 mouseInMenuEvent(this, true);
 		 onMouseInMenu_callback(true); // Last parameter indicates if we've entered or left the menu
 	  }
    }

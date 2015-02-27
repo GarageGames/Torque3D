@@ -971,8 +971,9 @@ void GuiTreeViewCtrl::_destroyItem( Item* item, bool deleteObject )
       {
          bool skipDelete = !deleteObject;
 
-         if( !skipDelete && isMethod( "onDeleteObject" ) )
-            skipDelete = onDeleteObject_callback( pObject );
+
+		 if( !skipDelete && isMethod( "onDeleteObject" ) )
+			 skipDelete = onDeleteObject_callback( pObject );
 
          if ( !skipDelete )
             pObject->deleteObject();
@@ -2018,6 +2019,8 @@ bool GuiTreeViewCtrl::setAddGroup(SimObject * obj)
 
    if(grp)
    {
+	  if (addGroupSelectedEvent.valid())
+         addGroupSelectedEvent(this, grp);
       onAddGroupSelected_callback( grp );
       return true;
    }
@@ -2151,6 +2154,8 @@ void GuiTreeViewCtrl::removeSelection( S32 itemOrObjectId )
    }
 
    // Callback.
+   if (removeSelectionEvent.valid())
+      removeSelectionEvent(this, item->getID());
    onRemoveSelection( item );
 }
 
@@ -2207,10 +2212,14 @@ void GuiTreeViewCtrl::addSelection( S32 itemOrObjectId, bool update, bool isLast
    { 
       SimObject *obj = item->getObject();
 		
+      if (addSelectionEvent.valid())
+		  addSelectionEvent(this, obj->getId(), isLastSelection);
       onAddSelection_callback( obj->getId(), isLastSelection );
    }
    else
    {
+	   if (addSelectionEvent.valid())
+		   addSelectionEvent(this, item->mId, isLastSelection);
       onAddSelection_callback( item->mId, isLastSelection );
    }
 	// Callback end
@@ -2233,16 +2242,30 @@ void GuiTreeViewCtrl::onItemSelected( Item *item )
    if (item->isInspectorData())
    {
       SimObject* object = item->getObject();
-	   if( object )
-         onSelect_callback( object->getId() );
+	  if( object )
+	  {
+		  if (selectedEvent.valid())
+			  selectedEvent(this, object->getId());
+		  onSelect_callback( object->getId() );
+	  }
       if( !item->isParent() && object )
-         onInspect_callback( object->getId() );
+	  {
+		  if (inspectEvent.valid())
+			  inspectEvent(this, object->getId());
+		  onInspect_callback( object->getId() );
+	  }
    }
    else
    {
+	   if (selectedEvent.valid())
+		   selectedEvent(this, item->mId);
       onSelect_callback( item->mId );
       if( !item->isParent() )
-         onInspect_callback( item->mId );
+	  {
+		  if (inspectEvent.valid())
+			  inspectEvent(this, item->mId);
+		  onInspect_callback( item->mId );
+	  }
    }
 }
 
@@ -2261,9 +2284,17 @@ void GuiTreeViewCtrl::onRemoveSelection( Item *item )
    }
 
    if( isMethod( "onRemoveSelection" ) )
-      onRemoveSelection_callback( id );
+   {
+	   if (removeSelectionEvent.valid())
+		   removeSelectionEvent(this, id);
+	   onRemoveSelection_callback( id );
+   }
    else
-      onUnselect_callback( id );
+   {
+	   if (unselectEvent.valid())
+		   unselectEvent(this, id);
+	   onUnselect_callback( id );
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -2364,9 +2395,17 @@ bool GuiTreeViewCtrl::setItemSelected(S32 itemId, bool select)
       item->mState.set(Item::Selected, false);
 
       if (item->isInspectorData() && item->getObject())
-         onUnselect_callback( item->getObject()->getId() );
+	  {
+		  if (unselectEvent.valid())
+			  unselectEvent(this, item->getObject()->getId());
+		  onUnselect_callback( item->getObject()->getId() );
+	  }
       else
-         onUnselect_callback( item->mId );
+	  {
+		  if (unselectEvent.valid())
+			  unselectEvent(this, item->mId);
+		  onUnselect_callback( item->mId );
+	  }
 
       // remove it from the selected items list
       for (S32 i = 0; i < mSelectedItems.size(); i++)
@@ -2541,6 +2580,8 @@ bool GuiTreeViewCtrl::isItemSelected( S32 itemId )
 
 void GuiTreeViewCtrl::deleteSelection()
 {
+   if (deleteSelectionEvent.valid())
+	   deleteSelectionEvent(this);
    onDeleteSelection_callback();
 
    if (mSelectedItems.empty())
@@ -3105,8 +3146,7 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
       }
       
       // Notify script for undo.
-
-      onBeginReparenting_callback();
+	  onBeginReparenting_callback();
       
       // Reparent the items.
 
@@ -3420,17 +3460,15 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
          // Notify script.
 
          if( item->isInspectorData() )
-            onReparent_callback(
-               item->getObject()->getId(),
-               oldParent->getObject()->getId(),
-               item->mParent->getObject()->getId()
-            );
+		 {
+			if (reparentEvent.valid())
+				reparentEvent(this, item->getObject()->getId(), oldParent->getObject()->getId(), item->mParent->getObject()->getId());
+			 onReparent_callback(item->getObject()->getId(), oldParent->getObject()->getId(), item->mParent->getObject()->getId());
+		 }
          else
-            onReparent_callback(
-               item->mId,
-               oldParent->mId,
-               item->mParent->mId
-            );
+			 if (reparentEvent.valid())
+				 reparentEvent(this, item->mId, oldParent->mId, item->mParent->mId);
+            onReparent_callback(item->mId, oldParent->mId, item->mParent->mId);
       }
       
       onEndReparenting_callback();
@@ -3438,6 +3476,8 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
       // And update everything.
       scrollVisible(newItem);
 
+	  if (dragDroppedEvent.valid())
+		  dragDroppedEvent(this);
       onDragDropped_callback();
 
       buildVisibleTree(false);
@@ -3663,6 +3703,9 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
          }
          else
          {
+			if (addMultipleSelectionBeginEvent.valid())
+				addMultipleSelectionBeginEvent(this);
+
             // select the cells
             onAddMultipleSelectionBegin_callback();
             if ((mCurrentDragCell) < firstSelectedIndex)
@@ -3691,6 +3734,8 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
             // Scroll to view the last selected cell.
             scrollVisible( mVisibleItems[mCurrentDragCell] );
 
+			if (addMultipleSelectionEndEvent)
+				addMultipleSelectionEndEvent(this);
             onAddMultipleSelectionEnd_callback();
          }
       }
@@ -4263,7 +4308,10 @@ void GuiTreeViewCtrl::clearSelection()
    mSelectedItems.clear();
    mSelected.clear();
 
-   onClearSelection();   
+   onClearSelection(); 
+
+   if (clearSelectionEvent.valid())
+	   clearSelectionEvent(this);
    onClearSelection_callback();
 }
 
@@ -4600,6 +4648,8 @@ void GuiTreeViewCtrl::inspectObject( SimObject* obj, bool okToEdit )
    mFlags.set( IsEditable, okToEdit );
    mFlags.set( IsInspector );
 
+   if (defineIconsEvent.valid())
+      defineIconsEvent(this);
    onDefineIcons_callback();
 
    addInspectorDataItem( NULL, obj );
@@ -5368,6 +5418,9 @@ void GuiTreeViewCtrl::onRenameValidate()
    if ( !obj )
       return;
    
+   if (renameEvent.valid())
+      renameEvent(this, data, obj);
+
    if( isMethod( "handleRenameObject" ) && handleRenameObject_callback( data, obj ) )
       return;
 

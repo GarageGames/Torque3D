@@ -32,10 +32,12 @@
 /// to script.  This is useful for implementing custom keyboard handling code.
 class GuiInputCtrl : public GuiMouseEventCtrl
 {
-   public:
-
       typedef GuiMouseEventCtrl Parent;
-   
+	  
+   public:
+	  // Event delegates
+	  Delegate<bool(GuiInputCtrl* sender, const char* device, const char* action, bool state)> inputEvent;
+
       // GuiControl.
       virtual bool onWake();
       virtual void onSleep();

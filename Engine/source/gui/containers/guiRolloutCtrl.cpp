@@ -232,7 +232,11 @@ void GuiRolloutCtrl::onRightMouseUp( const GuiEvent& event )
    
    Point2I localMouse = globalToLocalCoord( event.mousePoint );
    if( mHeader.pointInRect( localMouse ) )
-      onHeaderRightClick_callback();
+   {
+	   if (headerRightClickEvent.valid())
+	      headerRightClickEvent(this);
+	   onHeaderRightClick_callback(); 
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -336,6 +340,8 @@ void GuiRolloutCtrl::instantExpand()
    mIsAnimating = false;
    resize( getPosition() + mExpanded.point, mExpanded.extent );
 
+   if (expandedEvent.valid())
+      expandedEvent(this);
    onExpanded_callback();
 }
 
@@ -349,6 +355,8 @@ void GuiRolloutCtrl::instantCollapse()
    mIsAnimating = false;
    resize( getPosition() + mHeader.point, mHeader.extent );
 
+   if (collapsedEvent.valid())
+      collapsedEvent(this);
    onCollapsed_callback();
 }
 
@@ -489,9 +497,17 @@ void GuiRolloutCtrl::processTick()
    if ( !mIsAnimating )
    {
       if( mCollapsing )
-         onCollapsed_callback();
+	  {
+		  if (collapsedEvent.valid())
+		     collapsedEvent(this);
+		  onCollapsed_callback();
+	  }
       else if( !mCollapsing )
-         onExpanded_callback();
+	  {
+		  if (expandedEvent.valid())
+		     expandedEvent(this);
+		  onExpanded_callback();
+	  }
 
       calculateHeights();
    }

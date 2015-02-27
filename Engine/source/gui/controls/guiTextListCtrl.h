@@ -67,6 +67,9 @@ class GuiTextListCtrl : public GuiArrayCtrl
    DECLARE_CATEGORY( "Gui Lists" );
    DECLARE_DESCRIPTION( "A control that displays text in tabular form." );
    
+   Delegate<bool(GuiTextListCtrl* sender, S32 index, const char* text)> selectEvent;
+   Delegate<bool(GuiTextListCtrl* sender, S32 index)> deleteEvent;
+
    DECLARE_CALLBACK( void, onSelect, (const char* cellid, const char* text));
    DECLARE_CALLBACK( void, onDeleteKey, ( const char* id ));
 

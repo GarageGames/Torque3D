@@ -107,6 +107,7 @@ GuiButtonBaseCtrl::GuiButtonBaseCtrl()
    mRadioGroup = -1;
    mButtonType = ButtonTypePush;
    mUseMouseEvents = false;
+   mCanDrag = false;
    mMouseDragged = false;
 }
 
@@ -130,6 +131,8 @@ void GuiButtonBaseCtrl::initPersistFields()
          "The default group is -1." );
       addField( "buttonType", TYPEID< ButtonType >(), Offset(mButtonType, GuiButtonBaseCtrl),
          "Button behavior type.\n" );
+	  addField( "canDrag", TypeBool, Offset(mCanDrag, GuiButtonBaseCtrl),
+		  "If true, the object can be dragged and dropped\n" );
       addField( "useMouseEvents", TypeBool, Offset(mUseMouseEvents, GuiButtonBaseCtrl),
          "If true, mouse events will be passed on to script.  Default is false.\n" );
       
@@ -258,6 +261,8 @@ void GuiButtonBaseCtrl::onMouseDown(const GuiEvent &event)
    mMouseDownPoint = event.mousePoint;
    mMouseDragged = false;
 
+   if (mouseDownEvent.valid())
+	   mouseDownEvent(this, event);
    if( mUseMouseEvents )
 	  onMouseDown_callback();
 
@@ -268,6 +273,8 @@ void GuiButtonBaseCtrl::onMouseDown(const GuiEvent &event)
    // If we have a double click then execute the alt command.
    if ( event.mouseClickCount == 2 )
    {
+      if (doubleClickEvent.valid())
+		doubleClickEvent(this);
       onDoubleClick_callback();
       execAltConsoleCallback();
    }
@@ -282,6 +289,8 @@ void GuiButtonBaseCtrl::onMouseEnter(const GuiEvent &event)
 {
    setUpdate();
 
+   if (mouseEnterEvent.valid())
+	  mouseEnterEvent(this, event);
    if( mUseMouseEvents )
       onMouseEnter_callback();
 
@@ -301,10 +310,12 @@ void GuiButtonBaseCtrl::onMouseEnter(const GuiEvent &event)
 
 //-----------------------------------------------------------------------------
 
-void GuiButtonBaseCtrl::onMouseLeave(const GuiEvent &)
+void GuiButtonBaseCtrl::onMouseLeave(const GuiEvent& event)
 {
    setUpdate();
 
+   if (mouseLeaveEvent.valid())
+	  mouseLeaveEvent(this, event);
    if( mUseMouseEvents )
       onMouseLeave_callback();
    if( isMouseLocked() )
@@ -323,6 +334,8 @@ void GuiButtonBaseCtrl::onMouseUp(const GuiEvent &event)
    
    setUpdate();
 
+   if (mouseUpEvent.valid())
+      mouseUpEvent(this, event);
    if( mUseMouseEvents )
       onMouseUp_callback();
 
@@ -338,6 +351,8 @@ void GuiButtonBaseCtrl::onMouseUp(const GuiEvent &event)
 
 void GuiButtonBaseCtrl::onRightMouseUp(const GuiEvent &event)
 {
+   if (rightClickEvent.valid())
+	   rightClickEvent(this);
    onRightClick_callback();
    Parent::onRightMouseUp( event );
 }
@@ -346,7 +361,7 @@ void GuiButtonBaseCtrl::onRightMouseUp(const GuiEvent &event)
 
 void GuiButtonBaseCtrl::onMouseDragged( const GuiEvent& event )
 {
-   if( mUseMouseEvents )
+   if( mCanDrag )
    {
       // If we haven't started a drag yet, find whether we have moved past
       // the tolerance value.
@@ -357,8 +372,10 @@ void GuiButtonBaseCtrl::onMouseDragged( const GuiEvent& event )
          if( mAbs( delta.x ) > 2 || mAbs( delta.y ) > 2 )
             mMouseDragged = true;
       }
-      
-      if( mMouseDragged )
+     
+	  if (mouseDraggedEvent.valid())
+	     mouseDraggedEvent(this, event);
+      if(mUseMouseEvents && mMouseDragged )
          onMouseDragged_callback();
    }
       
@@ -449,6 +466,8 @@ void GuiButtonBaseCtrl::onAction()
    if ( mConsoleVariable[0] )
       Con::setBoolVariable( mConsoleVariable, mStateOn );
 
+    if (clickEvent.valid())
+       clickEvent(this);
     onClick_callback();
     Parent::onAction();
 }

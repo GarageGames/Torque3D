@@ -54,6 +54,9 @@ class GuiFormCtrl : public GuiPanel
 private:
    typedef GuiPanel Parent;
 
+   // Event delegates
+   Delegate<bool(GuiFormCtrl* sender)> resizeEvent;
+
    Resource<GFont>  mFont;
    String           mCaption;
    bool             mCanMove;
@@ -96,6 +99,7 @@ public:
    void setHasMenu( bool value );
 
    bool resize(const Point2I &newPosition, const Point2I &newExtent);
+
    void onRender(Point2I offset, const RectI &updateRect);
 
    bool onWake();
@@ -114,6 +118,7 @@ public:
    U32  getMenuBarID();
 
    static void initPersistFields();
+
    DECLARE_CONOBJECT(GuiFormCtrl);
 };
 /// @}

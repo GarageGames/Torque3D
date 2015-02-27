@@ -155,6 +155,7 @@ GuiTSCtrl::GuiTSCtrl()
    mLastCameraQuery.projectionOffset = Point2F::Zero;
    mLastCameraQuery.eyeOffset = Point3F::Zero;
 
+   mViewport = RectI(0, 0, 0, 0);
    mLastCameraQuery.ortho = false;
 }
 
@@ -168,7 +169,10 @@ void GuiTSCtrl::initPersistFields()
          "Z rotation angle of camera." );
       addField("forceFOV",   TypeF32, Offset(mForceFOV,   GuiTSCtrl),
          "The vertical field of view in degrees or zero to use the normal camera FOV." );
-         
+
+	  addField( "viewport", TypeRectI, Offset( mViewport, GuiTSCtrl ),
+		  "The position and size of the 3D viewport" );
+
    endGroup( "Camera" );
    
    addGroup( "Rendering" );
@@ -354,11 +358,21 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       mLastCameraQuery.cameraMatrix.mul(rotMat);
    }
 
+   RectI viewportRect = updateRect;
+   if (mViewport.point.x != 0 || mViewport.point.y != 0)
+   {
+	   viewportRect.point += mViewport.point;
+   }
+   if (mViewport.extent.x != 0 || mViewport.extent.y != 0)
+   {
+	   viewportRect.extent = mViewport.extent;
+   }
+   
    // set up the camera and viewport stuff:
    F32 wwidth;
    F32 wheight;
-   F32 renderWidth = (mRenderStyle == RenderStyleStereoSideBySide) ? F32(getWidth())*0.5f : F32(getWidth());
-   F32 renderHeight = F32(getHeight());
+   F32 renderWidth = (mRenderStyle == RenderStyleStereoSideBySide) ? F32(viewportRect.extent.x)*0.5f : F32(viewportRect.extent.x);
+   F32 renderHeight = F32(viewportRect.extent.y);
    F32 aspectRatio = renderWidth / renderHeight;
    
    // Use the FOV to calculate the viewport height scale
@@ -389,10 +403,10 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    }
    else
    {
-      F32 left = (updateRect.point.x - offset.x) * hscale - wwidth;
-      F32 right = (updateRect.point.x + updateRect.extent.x - offset.x) * hscale - wwidth;
-      F32 top = wheight - vscale * (updateRect.point.y - offset.y);
-      F32 bottom = wheight - vscale * (updateRect.point.y + updateRect.extent.y - offset.y);
+      F32 left = (viewportRect.point.x - offset.x) * hscale - wwidth;
+      F32 right = (viewportRect.point.x + viewportRect.extent.x - offset.x) * hscale - wwidth;
+      F32 top = wheight - vscale * (viewportRect.point.y - offset.y);
+      F32 bottom = wheight - vscale * (viewportRect.point.y + viewportRect.extent.y - offset.y);
 
       frustum.set( mLastCameraQuery.ortho, left, right, top, bottom, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane );
    }
@@ -404,15 +418,13 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       gScreenShot->tileFrustum( frustum );      
       GFX->setViewMatrix(MatrixF::Identity);
    }
-      
-   RectI tempRect = updateRect;
    
 #ifdef TORQUE_OS_MAC
    Point2I screensize = getRoot()->getWindowSize();
-   tempRect.point.y = screensize.y - (tempRect.point.y + tempRect.extent.y);
+   viewportRect.point.y = screensize.y - (viewportRect.point.y + viewportRect.extent.y);
 #endif
 
-   GFX->setViewport( tempRect );
+   GFX->setViewport( viewportRect );
 
    // Clear the zBuffer so GUI doesn't hose object rendering accidentally
    GFX->clear( GFXClearZBuffer , ColorI(20,20,20), 1.0f, 0 );
@@ -440,7 +452,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    mSaveProjection = GFX->getProjectionMatrix();
    mSaveModelview = GFX->getWorldMatrix();
-   mSaveViewport = updateRect;
+   mSaveViewport = viewportRect;
    mSaveWorldToScreenScale = GFX->getWorldToScreenScale();
    mSaveFrustum = GFX->getFrustum();
    mSaveFrustum.setTransform( mLastCameraQuery.cameraMatrix );
@@ -452,7 +464,8 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    // Give the post effect manager the worldToCamera, and cameraToScreen matrices
    PFXMGR->setFrameMatrices( mSaveModelview, mSaveProjection );
 
-   renderWorld(updateRect);
+   renderWorld(viewportRect);
+
    DebugDrawer::get()->render();
 
 	// Restore the previous matrix state before
@@ -465,7 +478,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    GFX->setStereoEyeOffset(prevEyeOffset);
 
    // Allow subclasses to render 2D elements.
-   GFX->setClipRect(updateRect);
+   GFX->setClipRect(viewportRect);
    renderGui( offset, updateRect );
 
    renderChildControls(offset, updateRect);
@@ -497,6 +510,39 @@ void GuiTSCtrl::drawLineList( const Vector<Point3F> &points, const ColorI color,
 {
    for ( S32 i = 0; i < points.size() - 1; i++ )
       drawLine( points[i], points[i+1], color, width );
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiTSCtrl::make3DMouseEvent(Gui3DMouseEvent& gui3DMouseEvent, const GuiEvent& event, bool orthographic)
+{
+	(GuiEvent&)(gui3DMouseEvent) = event;
+	gui3DMouseEvent.mousePoint = event.mousePoint;
+
+	if (!orthographic)
+	{
+		// get the eye pos and the mouse vec from that...
+		Point3F screenPoint((F32)gui3DMouseEvent.mousePoint.x, (F32)gui3DMouseEvent.mousePoint.y, 1.0f);
+
+		Point3F wp;
+		unproject(screenPoint, &wp);
+
+		mLastCameraQuery.cameraMatrix.getColumn(3, &gui3DMouseEvent.pos);
+
+		gui3DMouseEvent.vec = wp - gui3DMouseEvent.pos;
+		gui3DMouseEvent.vec.normalizeSafe();
+	}
+	else
+	{
+		// get the eye pos and the mouse vec from that...
+		Point3F screenPoint((F32)gui3DMouseEvent.mousePoint.x, (F32)gui3DMouseEvent.mousePoint.y, 0.0f);
+
+		Point3F np, fp;
+		unproject(screenPoint, &np);
+
+		gui3DMouseEvent.pos = np;
+		mLastCameraQuery.cameraMatrix.getColumn( 1, &(gui3DMouseEvent.vec) );
+	}
 }
 
 //=============================================================================
