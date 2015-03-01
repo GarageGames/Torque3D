@@ -237,6 +237,12 @@ function NavEditorPlugin::readSettings(%this)
    NavEditorGui.saveIntermediates = EditorSettings.value("SaveIntermediates");
    NavEditorGui.playSoundWhenDone = EditorSettings.value("PlaySoundWhenDone");
 
+   // Build in the background by default, unless a preference has been saved.
+   if (NavEditorGui.backgroundBuild $= "")
+   {
+      NavEditorGui.backgroundBuild = true;
+   }
+
    EditorSettings.endGroup();  
 }
 
