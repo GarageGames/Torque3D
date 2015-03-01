@@ -36,6 +36,7 @@ RecastPolyList::RecastPolyList()
    ntris = 0;
    tris = NULL;
    tricap = 0;
+   vidx = 0;
 }
 
 RecastPolyList::~RecastPolyList()

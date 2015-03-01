@@ -103,13 +103,17 @@ struct UTF16Cache
       dMemcpy(mString, other.mString, mLength * sizeof(UTF16));
    }
 
-   void operator =(const UTF16Cache &other)
+   UTF16Cache & operator =(const UTF16Cache &other)
    {
-      delete [] mString;
+      if (&other != this)
+      {
+         delete [] mString;
 
-      mLength = other.mLength;
-      mString = new UTF16[mLength];
-      dMemcpy(mString, other.mString, mLength * sizeof(UTF16));
+         mLength = other.mLength;
+         mString = new UTF16[mLength];
+         dMemcpy(mString, other.mString, mLength * sizeof(UTF16));
+      }
+      return *this;
    }
 
    ~UTF16Cache()

@@ -156,6 +156,7 @@ LightningStrikeEvent::LightningStrikeEvent()
 {
    mLightning = NULL;
    mTarget = NULL;
+   mClientId = 0;
 }
 
 LightningStrikeEvent::~LightningStrikeEvent()
