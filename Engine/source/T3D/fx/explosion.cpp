@@ -254,10 +254,6 @@ ExplosionData::ExplosionData()
    lifetimeVariance = 0;
    offset = 0.0f;
 
-   shockwave = NULL;
-   shockwaveID = 0;
-   shockwaveOnTerrain = false;
-
    shakeCamera = false;
    camShakeFreq.set( 10.0f, 10.0f, 10.0f );
    camShakeAmp.set( 1.0f, 1.0f, 1.0f );
@@ -320,9 +316,6 @@ void ExplosionData::initPersistFields()
       "@brief List of additional ParticleEmitterData objects to spawn with this "
       "explosion.\n\n"
       "@see particleEmitter" );
-
-//   addField( "shockwave", TypeShockwaveDataPtr, Offset(shockwave, ExplosionData) );
-//   addField( "shockwaveOnTerrain", TypeBool, Offset(shockwaveOnTerrain, ExplosionData) );
 
    addField( "debris", TYPEID< DebrisData >(), Offset(debrisList, ExplosionData), EC_NUM_DEBRIS_TYPES,
       "List of DebrisData objects to spawn with this explosion." );
