@@ -1758,7 +1758,7 @@ const char *ConsoleValue::getStringValue()
    if(type == TypeInternalString || type == TypeInternalStackString)
       return sval;
    else if (type == TypeInternalStringStackPtr)
-      return STR.mBuffer + (U32)sval;
+      return STR.mBuffer + (uintptr_t)sval;
    if(type == TypeInternalFloat)
       return Con::getData(TypeF32, &fval, 0);
    else if(type == TypeInternalInt)
@@ -1770,9 +1770,9 @@ const char *ConsoleValue::getStringValue()
 StringStackPtr ConsoleValue::getStringStackPtr()
 {
    if (type == TypeInternalStringStackPtr)
-      return (U32)sval;
+      return (uintptr_t)sval;
    else
-      return (U32)-1;
+      return (uintptr_t)-1;
 }
 
 bool ConsoleValue::getBoolValue()
