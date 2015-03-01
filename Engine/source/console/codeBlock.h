@@ -61,28 +61,28 @@ public:
    CodeBlock();
    ~CodeBlock();
 
-   StringTableEntry name;
-   StringTableEntry fullPath;
-   StringTableEntry modPath;
+   StringTableEntry mName;
+   StringTableEntry mFullPath;
+   StringTableEntry mModPath;
 
-   char *globalStrings;
-   char *functionStrings;
+   char *mGlobalStrings;
+   char *mFunctionStrings;
 
-   U32 functionStringsMaxLen;
-   U32 globalStringsMaxLen;
+   U32 mFunctionStringsMaxLen;
+   U32 mGlobalStringsMaxLen;
 
-   F64 *globalFloats;
-   F64 *functionFloats;
+   F64 *mGlobalFloats;
+   F64 *mFunctionFloats;
 
-   U32 codeSize;
-   U32 *code;
+   U32 mCodeSize;
+   U32 *mCode;
 
-   U32 refCount;
-   U32 lineBreakPairCount;
-   U32 *lineBreakPairs;
-   U32 breakListSize;
-   U32 *breakList;
-   CodeBlock *nextFile;
+   U32 mRefCount;
+   U32 mLineBreakPairCount;
+   U32 *mLineBreakPairs;
+   U32 mBreakListSize;
+   U32 *mBreakList;
+   CodeBlock *mNextFile;
 
    void addToCodeList();
    void removeFromCodeList();

@@ -97,9 +97,9 @@ void TSPartInstance::updateBounds()
 
 void TSPartInstance::breakShape(TSShapeInstance * shape, S32 subShape, Vector<TSPartInstance*> & partList, F32 * probShatter, F32 * probBreak, S32 probDepth)
 {
-   AssertFatal(subShape>=0 && subShape<shape->mShape->subShapeFirstNode.size(),"TSPartInstance::breakShape: subShape out of range.");
+   AssertFatal(subShape>=0 && subShape<shape->mShape->mSubShapeFirstNode.size(),"TSPartInstance::breakShape: subShape out of range.");
 
-   S32 start = shape->mShape->subShapeFirstNode[subShape];
+   S32 start = shape->mShape->mSubShapeFirstNode[subShape];
 
    TSPartInstance::breakShape(shape, NULL, start, partList, probShatter, probBreak, probDepth);
 
@@ -120,7 +120,7 @@ void TSPartInstance::breakShape(TSShapeInstance * shape, TSPartInstance * curren
 {
    AssertFatal( !probDepth || (probShatter && probBreak),"TSPartInstance::breakShape: probabilities improperly specified.");
 
-   const TSShape::Node * node = &shape->mShape->nodes[currentNode];
+   const TSShape::Node * node = &shape->mShape->mNodes[currentNode];
    S32 object = node->firstObject;
    S32 child  = node->firstChild;
 
@@ -155,14 +155,14 @@ void TSPartInstance::breakShape(TSShapeInstance * shape, TSPartInstance * curren
       {
          partList.increment();
          partList.last() = new TSPartInstance(shape,object);
-         object = shape->mShape->objects[object].nextSibling;
+         object = shape->mShape->mObjects[object].nextSibling;
       }
 
       // iterate through the child nodes, call ourselves on each one with currentPart = NULL
       while (child>=0)
       {
          TSPartInstance::breakShape(shape,NULL,child,partList,probShatter,probBreak,probDepth);
-         child = shape->mShape->nodes[child].nextSibling;
+         child = shape->mShape->mNodes[child].nextSibling;
       }
 
       return;
@@ -184,14 +184,14 @@ void TSPartInstance::breakShape(TSShapeInstance * shape, TSPartInstance * curren
    while (object>=0)
    {
       currentPart->addObject(object);
-      object = shape->mShape->objects[object].nextSibling;
+      object = shape->mShape->mObjects[object].nextSibling;
    }
 
    // iterate through child nodes, call ourselves on each one with currentPart as is
    while (child>=0)
    {
       TSPartInstance::breakShape(shape,currentPart,child,partList,probShatter,probBreak,probDepth);
-      child = shape->mShape->nodes[child].nextSibling;
+      child = shape->mShape->mNodes[child].nextSibling;
    }
 }
 
@@ -334,7 +334,7 @@ F32 TSPartInstance::getDetailSize(S32 dl) const
    else if (mSizeCutoffs && dl<mNumDetails)
       return mSizeCutoffs[dl];
    else if (!mSizeCutoffs && dl<=mSourceShape->getShape()->mSmallestVisibleDL)
-      return mSourceShape->getShape()->details[dl].size;
+      return mSourceShape->getShape()->mDetails[dl].size;
    else return 0;
 }
 

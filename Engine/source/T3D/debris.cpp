@@ -573,7 +573,7 @@ bool Debris::onAdd()
    // Setup our bounding box
    if( mDataBlock->shape )
    {
-      mObjBox = mDataBlock->shape->bounds;
+      mObjBox = mDataBlock->shape->mBounds;
    }
    else
    {

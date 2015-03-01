@@ -43,14 +43,14 @@ void TSShapeInstance::sortThreads()
 void TSShapeInstance::setDirty(U32 dirty)
 {
    AssertFatal((dirty & AllDirtyMask) == dirty,"TSShapeInstance::setDirty: illegal dirty flags");
-   for (S32 i=0; i<mShape->subShapeFirstNode.size(); i++)
+   for (S32 i=0; i<mShape->mSubShapeFirstNode.size(); i++)
       mDirtyFlags[i] |= dirty;
 }
 
 void TSShapeInstance::clearDirty(U32 dirty)
 {
    AssertFatal((dirty & AllDirtyMask) == dirty,"TSShapeInstance::clearDirty: illegal dirty flags");
-   for (S32 i=0; i<mShape->subShapeFirstNode.size(); i++)
+   for (S32 i=0; i<mShape->mSubShapeFirstNode.size(); i++)
       mDirtyFlags[i] &= ~dirty;
 }
 
@@ -62,25 +62,25 @@ void TSShapeInstance::animateNodes(S32 ss)
 {
    PROFILE_SCOPE( TSShapeInstance_animateNodes );
 
-   if (!mShape->nodes.size())
+   if (!mShape->mNodes.size())
       return;
 
    // @todo: When a node is added, we need to make sure to resize the nodeTransforms array as well
-   mNodeTransforms.setSize(mShape->nodes.size());
+   mNodeTransforms.setSize(mShape->mNodes.size());
 
    // temporary storage for node transforms
-   smNodeCurrentRotations.setSize(mShape->nodes.size());
-   smNodeCurrentTranslations.setSize(mShape->nodes.size());
-   smNodeLocalTransforms.setSize(mShape->nodes.size());
-   smRotationThreads.setSize(mShape->nodes.size());
-   smTranslationThreads.setSize(mShape->nodes.size());
+   smNodeCurrentRotations.setSize(mShape->mNodes.size());
+   smNodeCurrentTranslations.setSize(mShape->mNodes.size());
+   smNodeLocalTransforms.setSize(mShape->mNodes.size());
+   smRotationThreads.setSize(mShape->mNodes.size());
+   smTranslationThreads.setSize(mShape->mNodes.size());
 
    TSIntegerSet rotBeenSet;
    TSIntegerSet tranBeenSet;
    TSIntegerSet scaleBeenSet;
-   rotBeenSet.setAll(mShape->nodes.size());
-   tranBeenSet.setAll(mShape->nodes.size());
-   scaleBeenSet.setAll(mShape->nodes.size());
+   rotBeenSet.setAll(mShape->mNodes.size());
+   tranBeenSet.setAll(mShape->mNodes.size());
+   scaleBeenSet.setAll(mShape->mNodes.size());
    smNodeLocalTransformDirty.clearAll();
 
    S32 i,j,nodeIndex,a,b,start,end,firstBlend = mThreadList.size();
@@ -114,18 +114,18 @@ void TSShapeInstance::animateNodes(S32 ss)
    // we'll set default regardless of mask status
 
    // all the nodes marked above need to have the default transform
-   a = mShape->subShapeFirstNode[ss];
-   b = a + mShape->subShapeNumNodes[ss];
+   a = mShape->mSubShapeFirstNode[ss];
+   b = a + mShape->mSubShapeNumNodes[ss];
    for (i=a; i<b; i++)
    {
       if (rotBeenSet.test(i))
       {
-         mShape->defaultRotations[i].getQuatF(&smNodeCurrentRotations[i]);
+         mShape->mDefaultRotations[i].getQuatF(&smNodeCurrentRotations[i]);
          smRotationThreads[i] = NULL;
       }
       if (tranBeenSet.test(i))
       {
-         smNodeCurrentTranslations[i] = mShape->defaultTranslations[i];
+         smNodeCurrentTranslations[i] = mShape->mDefaultTranslations[i];
          smTranslationThreads[i] = NULL;
       }
    }
@@ -157,9 +157,9 @@ void TSShapeInstance::animateNodes(S32 ss)
          if (!rotBeenSet.test(nodeIndex))
          {
             QuatF q1,q2;
-            mShape->getRotation(*th->getSequence(),th->keyNum1,j,&q1);
-            mShape->getRotation(*th->getSequence(),th->keyNum2,j,&q2);
-            TSTransform::interpolate(q1,q2,th->keyPos,&smNodeCurrentRotations[nodeIndex]);
+            mShape->getRotation(*th->getSequence(),th->mKeyNum1,j,&q1);
+            mShape->getRotation(*th->getSequence(),th->mKeyNum2,j,&q2);
+            TSTransform::interpolate(q1,q2,th->mKeyPos,&smNodeCurrentRotations[nodeIndex]);
             rotBeenSet.set(nodeIndex);
             smRotationThreads[nodeIndex] = th;
          }
@@ -178,9 +178,9 @@ void TSShapeInstance::animateNodes(S32 ss)
                handleMaskedPositionNode(th,nodeIndex,j);
             else
             {
-               const Point3F & p1 = mShape->getTranslation(*th->getSequence(),th->keyNum1,j);
-               const Point3F & p2 = mShape->getTranslation(*th->getSequence(),th->keyNum2,j);
-               TSTransform::interpolate(p1,p2,th->keyPos,&smNodeCurrentTranslations[nodeIndex]);
+               const Point3F & p1 = mShape->getTranslation(*th->getSequence(),th->mKeyNum1,j);
+               const Point3F & p2 = mShape->getTranslation(*th->getSequence(),th->mKeyNum2,j);
+               TSTransform::interpolate(p1,p2,th->mKeyPos,&smNodeCurrentTranslations[nodeIndex]);
                smTranslationThreads[nodeIndex] = th;
             }
             tranBeenSet.set(nodeIndex);
@@ -222,7 +222,7 @@ void TSShapeInstance::animateNodes(S32 ss)
    for (i=firstBlend; i<mThreadList.size(); i++)
    {
       TSThread * th = mThreadList[i];
-      if (th->blendDisabled)
+      if (th->mBlendDisabled)
          continue;
 
       handleBlendSequence(th,a,b);
@@ -235,7 +235,7 @@ void TSShapeInstance::animateNodes(S32 ss)
    // multiply transforms...
    for (i=a; i<b; i++)
    {
-      S32 parentIdx = mShape->nodes[i].parentIndex;
+      S32 parentIdx = mShape->mNodes[i].parentIndex;
       if (parentIdx < 0)
          mNodeTransforms[i] = smNodeLocalTransforms[i];
       else
@@ -248,12 +248,12 @@ void TSShapeInstance::handleDefaultScale(S32 a, S32 b, TSIntegerSet & scaleBeenS
    // set default scale values (i.e., identity) and do any initialization
    // relating to animated scale (since scale normally not animated)
 
-   smScaleThreads.setSize(mShape->nodes.size());
+   smScaleThreads.setSize(mShape->mNodes.size());
    scaleBeenSet.takeAway(mCallbackNodes);
    scaleBeenSet.takeAway(mHandsOffNodes);
    if (animatesUniformScale())
    {
-      smNodeCurrentUniformScales.setSize(mShape->nodes.size());
+      smNodeCurrentUniformScales.setSize(mShape->mNodes.size());
       for (S32 i=a; i<b; i++)
          if (scaleBeenSet.test(i))
          {
@@ -263,7 +263,7 @@ void TSShapeInstance::handleDefaultScale(S32 a, S32 b, TSIntegerSet & scaleBeenS
    }
    else if (animatesAlignedScale())
    {
-      smNodeCurrentAlignedScales.setSize(mShape->nodes.size());
+      smNodeCurrentAlignedScales.setSize(mShape->mNodes.size());
       for (S32 i=a; i<b; i++)
          if (scaleBeenSet.test(i))
          {
@@ -273,7 +273,7 @@ void TSShapeInstance::handleDefaultScale(S32 a, S32 b, TSIntegerSet & scaleBeenS
    }
    else
    {
-      smNodeCurrentArbitraryScales.setSize(mShape->nodes.size());
+      smNodeCurrentArbitraryScales.setSize(mShape->mNodes.size());
       for (S32 i=a; i<b; i++)
          if (scaleBeenSet.test(i))
          {
@@ -330,7 +330,7 @@ void TSShapeInstance::handleTransitionNodes(S32 a, S32 b)
       if (nodeIndex<a)
          continue;
       TSThread * thread = smRotationThreads[nodeIndex];
-      thread = thread && thread->transitionData.inTransition ? thread : NULL;
+      thread = thread && thread->mTransitionData.inTransition ? thread : NULL;
       if (!thread)
       {
          // if not controlled by a sequence in transition then there must be
@@ -338,7 +338,7 @@ void TSShapeInstance::handleTransitionNodes(S32 a, S32 b)
          // transition now...use that thread to control interpolation
          for (S32 i=0; i<mTransitionThreads.size(); i++)
          {
-            if (mTransitionThreads[i]->transitionData.oldRotationNodes.test(nodeIndex) || mTransitionThreads[i]->getSequence()->rotationMatters.test(nodeIndex))
+            if (mTransitionThreads[i]->mTransitionData.oldRotationNodes.test(nodeIndex) || mTransitionThreads[i]->getSequence()->rotationMatters.test(nodeIndex))
             {
                thread = mTransitionThreads[i];
                break;
@@ -347,7 +347,7 @@ void TSShapeInstance::handleTransitionNodes(S32 a, S32 b)
          AssertFatal(thread!=NULL,"TSShapeInstance::handleRotTransitionNodes (rotation)");
       }
       QuatF tmpQ;
-      TSTransform::interpolate(mNodeReferenceRotations[nodeIndex].getQuatF(&tmpQ),smNodeCurrentRotations[nodeIndex],thread->transitionData.pos,&smNodeCurrentRotations[nodeIndex]);
+      TSTransform::interpolate(mNodeReferenceRotations[nodeIndex].getQuatF(&tmpQ),smNodeCurrentRotations[nodeIndex],thread->mTransitionData.pos,&smNodeCurrentRotations[nodeIndex]);
    }
 
    // then translation
@@ -356,7 +356,7 @@ void TSShapeInstance::handleTransitionNodes(S32 a, S32 b)
    for (nodeIndex=start; nodeIndex<end; mTransitionTranslationNodes.next(nodeIndex))
    {
       TSThread * thread = smTranslationThreads[nodeIndex];
-      thread = thread && thread->transitionData.inTransition ? thread : NULL;
+      thread = thread && thread->mTransitionData.inTransition ? thread : NULL;
       if (!thread)
       {
          // if not controlled by a sequence in transition then there must be
@@ -364,7 +364,7 @@ void TSShapeInstance::handleTransitionNodes(S32 a, S32 b)
          // transition now...use that thread to control interpolation
          for (S32 i=0; i<mTransitionThreads.size(); i++)
          {
-            if (mTransitionThreads[i]->transitionData.oldTranslationNodes.test(nodeIndex) || mTransitionThreads[i]->getSequence()->translationMatters.test(nodeIndex))
+            if (mTransitionThreads[i]->mTransitionData.oldTranslationNodes.test(nodeIndex) || mTransitionThreads[i]->getSequence()->translationMatters.test(nodeIndex))
             {
                thread = mTransitionThreads[i];
                break;
@@ -375,7 +375,7 @@ void TSShapeInstance::handleTransitionNodes(S32 a, S32 b)
       Point3F & p = smNodeCurrentTranslations[nodeIndex];
       Point3F & p1 = mNodeReferenceTranslations[nodeIndex];
       Point3F & p2 = p;
-      F32 k = thread->transitionData.pos;
+      F32 k = thread->mTransitionData.pos;
       p.x = p1.x + k * (p2.x-p1.x);
       p.y = p1.y + k * (p2.y-p1.y);
       p.z = p1.z + k * (p2.z-p1.z);
@@ -389,7 +389,7 @@ void TSShapeInstance::handleTransitionNodes(S32 a, S32 b)
       for (nodeIndex=start; nodeIndex<end; mTransitionScaleNodes.next(nodeIndex))
       {
          TSThread * thread = smScaleThreads[nodeIndex];
-         thread = thread && thread->transitionData.inTransition ? thread : NULL;
+         thread = thread && thread->mTransitionData.inTransition ? thread : NULL;
          if (!thread)
          {
             // if not controlled by a sequence in transition then there must be
@@ -397,7 +397,7 @@ void TSShapeInstance::handleTransitionNodes(S32 a, S32 b)
             // transition now...use that thread to control interpolation
             for (S32 i=0; i<mTransitionThreads.size(); i++)
             {
-               if (mTransitionThreads[i]->transitionData.oldScaleNodes.test(nodeIndex) || mTransitionThreads[i]->getSequence()->scaleMatters.test(nodeIndex))
+               if (mTransitionThreads[i]->mTransitionData.oldScaleNodes.test(nodeIndex) || mTransitionThreads[i]->getSequence()->scaleMatters.test(nodeIndex))
                {
                   thread = mTransitionThreads[i];
                   break;
@@ -406,14 +406,14 @@ void TSShapeInstance::handleTransitionNodes(S32 a, S32 b)
             AssertFatal(thread!=NULL,"TSShapeInstance::handleTransitionNodes (scale).");
          }
          if (animatesUniformScale())
-            smNodeCurrentUniformScales[nodeIndex] += thread->transitionData.pos * (mNodeReferenceUniformScales[nodeIndex]-smNodeCurrentUniformScales[nodeIndex]);
+            smNodeCurrentUniformScales[nodeIndex] += thread->mTransitionData.pos * (mNodeReferenceUniformScales[nodeIndex]-smNodeCurrentUniformScales[nodeIndex]);
          else if (animatesAlignedScale())
-            TSTransform::interpolate(mNodeReferenceScaleFactors[nodeIndex],smNodeCurrentAlignedScales[nodeIndex],thread->transitionData.pos,&smNodeCurrentAlignedScales[nodeIndex]);
+            TSTransform::interpolate(mNodeReferenceScaleFactors[nodeIndex],smNodeCurrentAlignedScales[nodeIndex],thread->mTransitionData.pos,&smNodeCurrentAlignedScales[nodeIndex]);
          else
          {
             QuatF q;
-            TSTransform::interpolate(mNodeReferenceScaleFactors[nodeIndex],smNodeCurrentArbitraryScales[nodeIndex].mScale,thread->transitionData.pos,&smNodeCurrentArbitraryScales[nodeIndex].mScale);
-            TSTransform::interpolate(mNodeReferenceArbitraryScaleRots[nodeIndex].getQuatF(&q),smNodeCurrentArbitraryScales[nodeIndex].mRotate,thread->transitionData.pos,&smNodeCurrentArbitraryScales[nodeIndex].mRotate);
+            TSTransform::interpolate(mNodeReferenceScaleFactors[nodeIndex],smNodeCurrentArbitraryScales[nodeIndex].mScale,thread->mTransitionData.pos,&smNodeCurrentArbitraryScales[nodeIndex].mScale);
+            TSTransform::interpolate(mNodeReferenceArbitraryScaleRots[nodeIndex].getQuatF(&q),smNodeCurrentArbitraryScales[nodeIndex].mRotate,thread->mTransitionData.pos,&smNodeCurrentArbitraryScales[nodeIndex].mRotate);
          }
       }
    }
@@ -498,26 +498,26 @@ void TSShapeInstance::handleAnimatedScale(TSThread * thread, S32 a, S32 b, TSInt
             case 4:  // uniform -> aligned
             case 8:  // uniform -> arbitrary
             {
-               F32 s1 = mShape->getUniformScale(*thread->getSequence(),thread->keyNum1,j);
-               F32 s2 = mShape->getUniformScale(*thread->getSequence(),thread->keyNum2,j);
-               uniformScale = TSTransform::interpolate(s1,s2,thread->keyPos);
+               F32 s1 = mShape->getUniformScale(*thread->getSequence(),thread->mKeyNum1,j);
+               F32 s2 = mShape->getUniformScale(*thread->getSequence(),thread->mKeyNum2,j);
+               uniformScale = TSTransform::interpolate(s1,s2,thread->mKeyPos);
                alignedScale.set(uniformScale,uniformScale,uniformScale);
                break;
             }
             case 5:  // aligned -> aligned
             case 9:  // aligned -> arbitrary
             {
-               const Point3F & s1 = mShape->getAlignedScale(*thread->getSequence(),thread->keyNum1,j);
-               const Point3F & s2 = mShape->getAlignedScale(*thread->getSequence(),thread->keyNum2,j);
-               TSTransform::interpolate(s1,s2,thread->keyPos,&alignedScale);
+               const Point3F & s1 = mShape->getAlignedScale(*thread->getSequence(),thread->mKeyNum1,j);
+               const Point3F & s2 = mShape->getAlignedScale(*thread->getSequence(),thread->mKeyNum2,j);
+               TSTransform::interpolate(s1,s2,thread->mKeyPos,&alignedScale);
                break;
             }
             case 10: // arbitrary -> arbitary
             {
                TSScale s1,s2;
-               mShape->getArbitraryScale(*thread->getSequence(),thread->keyNum1,j,&s1);
-               mShape->getArbitraryScale(*thread->getSequence(),thread->keyNum2,j,&s2);
-               TSTransform::interpolate(s1,s2,thread->keyPos,&arbitraryScale);
+               mShape->getArbitraryScale(*thread->getSequence(),thread->mKeyNum1,j,&s1);
+               mShape->getArbitraryScale(*thread->getSequence(),thread->mKeyNum2,j,&s2);
+               TSTransform::interpolate(s1,s2,thread->mKeyPos,&arbitraryScale);
                break;
             }
             default: AssertFatal(0,"TSShapeInstance::handleAnimatedScale"); break;
@@ -556,10 +556,10 @@ void TSShapeInstance::handleAnimatedScale(TSThread * thread, S32 a, S32 b, TSInt
 
 void TSShapeInstance::handleMaskedPositionNode(TSThread * th, S32 nodeIndex, S32 offset)
 {
-   const Point3F & p1 = mShape->getTranslation(*th->getSequence(),th->keyNum1,offset);
-   const Point3F & p2 = mShape->getTranslation(*th->getSequence(),th->keyNum2,offset);
+   const Point3F & p1 = mShape->getTranslation(*th->getSequence(),th->mKeyNum1,offset);
+   const Point3F & p2 = mShape->getTranslation(*th->getSequence(),th->mKeyNum2,offset);
    Point3F p;
-   TSTransform::interpolate(p1,p2,th->keyPos,&p);
+   TSTransform::interpolate(p1,p2,th->mKeyPos,&p);
 
    if (!mMaskPosXNodes.test(nodeIndex))
       smNodeCurrentTranslations[nodeIndex].x = p.x;
@@ -600,20 +600,20 @@ void TSShapeInstance::handleBlendSequence(TSThread * thread, S32 a, S32 b)
       if (thread->getSequence()->rotationMatters.test(nodeIndex))
       {
          QuatF q1,q2;
-         mShape->getRotation(*thread->getSequence(),thread->keyNum1,jrot,&q1);
-         mShape->getRotation(*thread->getSequence(),thread->keyNum2,jrot,&q2);
+         mShape->getRotation(*thread->getSequence(),thread->mKeyNum1,jrot,&q1);
+         mShape->getRotation(*thread->getSequence(),thread->mKeyNum2,jrot,&q2);
          QuatF quat;
-         TSTransform::interpolate(q1,q2,thread->keyPos,&quat);
+         TSTransform::interpolate(q1,q2,thread->mKeyPos,&quat);
          TSTransform::setMatrix(quat,&mat);
          jrot++;
       }
 
       if (thread->getSequence()->translationMatters.test(nodeIndex))
       {
-         const Point3F & p1 = mShape->getTranslation(*thread->getSequence(),thread->keyNum1,jtrans);
-         const Point3F & p2 = mShape->getTranslation(*thread->getSequence(),thread->keyNum2,jtrans);
+         const Point3F & p1 = mShape->getTranslation(*thread->getSequence(),thread->mKeyNum1,jtrans);
+         const Point3F & p2 = mShape->getTranslation(*thread->getSequence(),thread->mKeyNum2,jtrans);
          Point3F p;
-         TSTransform::interpolate(p1,p2,thread->keyPos,&p);
+         TSTransform::interpolate(p1,p2,thread->mKeyPos,&p);
          mat.setColumn(3,p);
          jtrans++;
       }
@@ -622,26 +622,26 @@ void TSShapeInstance::handleBlendSequence(TSThread * thread, S32 a, S32 b)
       {
          if (thread->getSequence()->animatesUniformScale())
          {
-            F32 s1 = mShape->getUniformScale(*thread->getSequence(),thread->keyNum1,jscale);
-            F32 s2 = mShape->getUniformScale(*thread->getSequence(),thread->keyNum2,jscale);
-            F32 scale = TSTransform::interpolate(s1,s2,thread->keyPos);
+            F32 s1 = mShape->getUniformScale(*thread->getSequence(),thread->mKeyNum1,jscale);
+            F32 s2 = mShape->getUniformScale(*thread->getSequence(),thread->mKeyNum2,jscale);
+            F32 scale = TSTransform::interpolate(s1,s2,thread->mKeyPos);
             TSTransform::applyScale(scale,&mat);
          }
          else if (animatesAlignedScale())
          {
-            Point3F s1 = mShape->getAlignedScale(*thread->getSequence(),thread->keyNum1,jscale);
-            Point3F s2 = mShape->getAlignedScale(*thread->getSequence(),thread->keyNum2,jscale);
+            Point3F s1 = mShape->getAlignedScale(*thread->getSequence(),thread->mKeyNum1,jscale);
+            Point3F s2 = mShape->getAlignedScale(*thread->getSequence(),thread->mKeyNum2,jscale);
             Point3F scale;
-            TSTransform::interpolate(s1,s2,thread->keyPos,&scale);
+            TSTransform::interpolate(s1,s2,thread->mKeyPos,&scale);
             TSTransform::applyScale(scale,&mat);
          }
          else
          {
             TSScale s1,s2;
-            mShape->getArbitraryScale(*thread->getSequence(),thread->keyNum1,jscale,&s1);
-            mShape->getArbitraryScale(*thread->getSequence(),thread->keyNum2,jscale,&s2);
+            mShape->getArbitraryScale(*thread->getSequence(),thread->mKeyNum1,jscale,&s1);
+            mShape->getArbitraryScale(*thread->getSequence(),thread->mKeyNum2,jscale,&s2);
             TSScale scale;
-            TSTransform::interpolate(s1,s2,thread->keyPos,&scale);
+            TSTransform::interpolate(s1,s2,thread->mKeyPos,&scale);
             TSTransform::applyScale(scale,&mat);
          }
          jscale++;
@@ -672,12 +672,12 @@ void TSShapeInstance::animateVisibility(S32 ss)
       beenSet.takeAway(mThreadList[i]->getSequence()->visMatters);
 
    // set defaults
-   S32 a = mShape->subShapeFirstObject[ss];
-   S32 b = a + mShape->subShapeNumObjects[ss];
+   S32 a = mShape->mSubShapeFirstObject[ss];
+   S32 b = a + mShape->mSubShapeNumObjects[ss];
    for (i=a; i<b; i++)
    {
       if (beenSet.test(i))
-         mMeshObjects[i].visible = mShape->objectStates[i].vis;
+         mMeshObjects[i].visible = mShape->mObjectStates[i].vis;
    }
 
    // go through each thread and set visibility on those objects that
@@ -704,14 +704,14 @@ void TSShapeInstance::animateVisibility(S32 ss)
       {
          if (!beenSet.test(objectIndex) && th->getSequence()->visMatters.test(objectIndex))
          {
-            F32 state1 = mShape->getObjectState(*th->getSequence(),th->keyNum1,j).vis;
-            F32 state2 = mShape->getObjectState(*th->getSequence(),th->keyNum2,j).vis;
+            F32 state1 = mShape->getObjectState(*th->getSequence(),th->mKeyNum1,j).vis;
+            F32 state2 = mShape->getObjectState(*th->getSequence(),th->mKeyNum2,j).vis;
             if ((state1-state2) * (state1-state2) > 0.99f)
                // goes from 0 to 1 -- discreet jump
-               mMeshObjects[objectIndex].visible = th->keyPos<0.5f ? state1 : state2;
+               mMeshObjects[objectIndex].visible = th->mKeyPos<0.5f ? state1 : state2;
             else
                // interpolate between keyframes when visibility change is gradual
-               mMeshObjects[objectIndex].visible = (1.0f-th->keyPos) * state1 + th->keyPos * state2;
+               mMeshObjects[objectIndex].visible = (1.0f-th->mKeyPos) * state1 + th->mKeyPos * state2;
 
             // record change so that later threads don't over-write us...
             beenSet.set(objectIndex);
@@ -735,11 +735,11 @@ void TSShapeInstance::animateFrame(S32 ss)
       beenSet.takeAway(mThreadList[i]->getSequence()->frameMatters);
 
    // set defaults
-   S32 a = mShape->subShapeFirstObject[ss];
-   S32 b = a + mShape->subShapeNumObjects[ss];
+   S32 a = mShape->mSubShapeFirstObject[ss];
+   S32 b = a + mShape->mSubShapeNumObjects[ss];
    for (i=a; i<b; i++)
       if (beenSet.test(i))
-         mMeshObjects[i].frame = mShape->objectStates[i].frameIndex;
+         mMeshObjects[i].frame = mShape->mObjectStates[i].frameIndex;
 
    // go through each thread and set frame on those objects that
    // are not set yet and are controlled by that thread
@@ -765,7 +765,7 @@ void TSShapeInstance::animateFrame(S32 ss)
       {
          if (!beenSet.test(objectIndex) && th->getSequence()->frameMatters.test(objectIndex))
          {
-            S32 key = (th->keyPos<0.5f) ? th->keyNum1 : th->keyNum2;
+            S32 key = (th->mKeyPos<0.5f) ? th->mKeyNum1 : th->mKeyNum2;
             mMeshObjects[objectIndex].frame = mShape->getObjectState(*th->getSequence(),key,j).frameIndex;
 
             // record change so that later threads don't over-write us...
@@ -790,11 +790,11 @@ void TSShapeInstance::animateMatFrame(S32 ss)
       beenSet.takeAway(mThreadList[i]->getSequence()->matFrameMatters);
 
    // set defaults
-   S32 a = mShape->subShapeFirstObject[ss];
-   S32 b = a + mShape->subShapeNumObjects[ss];
+   S32 a = mShape->mSubShapeFirstObject[ss];
+   S32 b = a + mShape->mSubShapeNumObjects[ss];
    for (i=a; i<b; i++)
       if (beenSet.test(i))
-         mMeshObjects[i].matFrame = mShape->objectStates[i].matFrameIndex;
+         mMeshObjects[i].matFrame = mShape->mObjectStates[i].matFrameIndex;
 
    // go through each thread and set matFrame on those objects that
    // are not set yet and are controlled by that thread
@@ -820,7 +820,7 @@ void TSShapeInstance::animateMatFrame(S32 ss)
       {
          if (!beenSet.test(objectIndex) && th->getSequence()->matFrameMatters.test(objectIndex))
          {
-            S32 key = (th->keyPos<0.5f) ? th->keyNum1 : th->keyNum2;
+            S32 key = (th->mKeyPos<0.5f) ? th->mKeyNum1 : th->mKeyNum2;
             mMeshObjects[objectIndex].matFrame = mShape->getObjectState(*th->getSequence(),key,j).matFrameIndex;
 
             // record change so that later threads don't over-write us...
@@ -842,7 +842,7 @@ void TSShapeInstance::animate(S32 dl)
       // nothing to do
       return;
 
-   S32 ss = mShape->details[dl].subShapeNum;
+   S32 ss = mShape->mDetails[dl].subShapeNum;
 
    // this is a billboard detail...
    if (ss<0)
@@ -878,7 +878,7 @@ void TSShapeInstance::animateNodeSubtrees(bool forceFull)
       // force transforms to animate
       setDirty(TransformDirty);
 
-   for (S32 i=0; i<mShape->subShapeNumNodes.size(); i++)
+   for (S32 i=0; i<mShape->mSubShapeNumNodes.size(); i++)
    {
       if (mDirtyFlags[i] & TransformDirty)
       {
@@ -896,7 +896,7 @@ void TSShapeInstance::animateSubtrees(bool forceFull)
       // force full animate
       setDirty(AllDirtyMask);
 
-   for (S32 i=0; i<mShape->subShapeNumNodes.size(); i++)
+   for (S32 i=0; i<mShape->mSubShapeNumNodes.size(); i++)
    {
       if (mDirtyFlags[i] & TransformDirty)
       {
@@ -909,7 +909,7 @@ void TSShapeInstance::animateSubtrees(bool forceFull)
 void TSShapeInstance::addPath(TSThread *gt, F32 start, F32 end, MatrixF *mat)
 {
    // never get here while in transition...
-   AssertFatal(!gt->transitionData.inTransition,"TSShapeInstance::addPath");
+   AssertFatal(!gt->mTransitionData.inTransition,"TSShapeInstance::addPath");
 
    if (!mat)
       mat = &mGroundTransform;
@@ -932,7 +932,7 @@ bool TSShapeInstance::initGround()
    for (S32 i=0; i<mThreadList.size(); i++)
    {
       TSThread * th = mThreadList[i];
-      if (!th->transitionData.inTransition && th->getSequence()->numGroundFrames>0)
+      if (!th->mTransitionData.inTransition && th->getSequence()->numGroundFrames>0)
       {
          mGroundThread = th;
          return true;
@@ -950,9 +950,9 @@ void TSShapeInstance::animateGround()
    if (!mGroundThread && !initGround())
       return;
 
-   S32 & loop    = mGroundThread->path.loop;
-   F32 & start = mGroundThread->path.start;
-   F32 & end   = mGroundThread->path.end;
+   S32 & loop    = mGroundThread->mPath.loop;
+   F32 & start = mGroundThread->mPath.start;
+   F32 & end   = mGroundThread->mPath.end;
 
    // accumulate path transform
    if (loop>0)
@@ -980,7 +980,7 @@ void TSShapeInstance::deltaGround(TSThread * thread, F32 start, F32 end, MatrixF
       mat = &mGroundTransform;
 
    mat->identity();
-   if (thread->transitionData.inTransition)
+   if (thread->mTransitionData.inTransition)
       return;
 
    F32 invDuration = 1.0f / thread->getDuration();
@@ -994,7 +994,7 @@ void TSShapeInstance::deltaGround(TSThread * thread, F32 start, F32 end, MatrixF
 void TSShapeInstance::deltaGround1(TSThread * thread, F32 start, F32 end, MatrixF& mat)
 {
    mat.identity();
-   if (thread->transitionData.inTransition)
+   if (thread->mTransitionData.inTransition)
       return;
    addPath(thread, start, end, &mat);
 }

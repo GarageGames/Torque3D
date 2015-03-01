@@ -331,7 +331,7 @@ void GuiShapeEdPreview::setCurrentDetail(S32 dl)
    if ( mModel )
    {
       S32 smallest = mModel->getShape()->mSmallestVisibleDL;
-      mModel->getShape()->mSmallestVisibleDL = mModel->getShape()->details.size()-1;
+      mModel->getShape()->mSmallestVisibleDL = mModel->getShape()->mDetails.size()-1;
       mModel->setCurrentDetail( dl );
       mModel->getShape()->mSmallestVisibleDL = smallest;
 
@@ -360,18 +360,18 @@ bool GuiShapeEdPreview::setObjectModel(const char* modelName)
       AssertFatal( mModel, avar("GuiShapeEdPreview: Failed to load model %s. Please check your model name and load a valid model.", modelName ));
 
       // Initialize camera values:
-      mOrbitPos = mModel->getShape()->center;
+      mOrbitPos = mModel->getShape()->mCenter;
 
       // Set camera move and zoom speed according to model size
-      mMoveSpeed = mModel->getShape()->radius / sMoveScaler;
-      mZoomSpeed = mModel->getShape()->radius / sZoomScaler;
+      mMoveSpeed = mModel->getShape()->mRadius / sMoveScaler;
+      mZoomSpeed = mModel->getShape()->mRadius / sZoomScaler;
 
       // Reset node selection
       mHoverNode = -1;
       mSelectedNode = -1;
       mSelectedObject = -1;
       mSelectedObjDetail = 0;
-      mProjectedNodes.setSize( mModel->getShape()->nodes.size() );
+      mProjectedNodes.setSize( mModel->getShape()->mNodes.size() );
 
       // Reset detail stats
       mCurrentDL = 0;
@@ -683,9 +683,9 @@ void GuiShapeEdPreview::refreshShape()
       mModel->initNodeTransforms();
       mModel->initMeshObjects();
 
-      mProjectedNodes.setSize( mModel->getShape()->nodes.size() );
+      mProjectedNodes.setSize( mModel->getShape()->mNodes.size() );
 
-      if ( mSelectedObject >= mModel->getShape()->objects.size() )
+      if ( mSelectedObject >= mModel->getShape()->mObjects.size() )
       {
          mSelectedObject = -1;
          mSelectedObjDetail = 0;
@@ -694,9 +694,9 @@ void GuiShapeEdPreview::refreshShape()
       // Re-compute the collision mesh stats
       mColMeshes = 0;
       mColPolys = 0;
-      for ( S32 i = 0; i < mModel->getShape()->details.size(); i++ )
+      for ( S32 i = 0; i < mModel->getShape()->mDetails.size(); i++ )
       {
-         const TSShape::Detail& det = mModel->getShape()->details[i];
+         const TSShape::Detail& det = mModel->getShape()->mDetails[i];
          const String& detName = mModel->getShape()->getName( det.nameIndex );
          if ( ( det.subShapeNum < 0 ) || !detName.startsWith( "collision-" ) )
             continue;
@@ -704,12 +704,12 @@ void GuiShapeEdPreview::refreshShape()
          mColPolys += det.polyCount;
 
          S32 od = det.objectDetailNum;
-         S32 start = mModel->getShape()->subShapeFirstObject[det.subShapeNum];
-         S32 end   = start + mModel->getShape()->subShapeNumObjects[det.subShapeNum];
+         S32 start = mModel->getShape()->mSubShapeFirstObject[det.subShapeNum];
+         S32 end   = start + mModel->getShape()->mSubShapeNumObjects[det.subShapeNum];
          for ( S32 j = start; j < end; j++ )
          {
-            const TSShape::Object &obj = mModel->getShape()->objects[j];
-            const TSMesh* mesh = ( od < obj.numMeshes ) ? mModel->getShape()->meshes[obj.startMeshIndex + od] : NULL;
+            const TSShape::Object &obj = mModel->getShape()->mObjects[j];
+            const TSMesh* mesh = ( od < obj.numMeshes ) ? mModel->getShape()->mMeshes[obj.startMeshIndex + od] : NULL;
             if ( mesh )
                mColMeshes++;
          }
@@ -850,7 +850,7 @@ void GuiShapeEdPreview::exportToCollada( const String& path )
    if ( mModel )
    {
       MatrixF orientation( true );
-      orientation.setPosition( mModel->getShape()->bounds.getCenter() );
+      orientation.setPosition( mModel->getShape()->mBounds.getCenter() );
       orientation.inverse();
 
       OptimizedPolyList polyList;
@@ -1135,8 +1135,8 @@ bool GuiShapeEdPreview::getCameraTransform(MatrixF* cameraMatrix)
       cameraMatrix->identity();
       if ( mModel )
       {
-         Point3F camPos = mModel->getShape()->bounds.getCenter();
-         F32 offset = mModel->getShape()->bounds.len();
+         Point3F camPos = mModel->getShape()->mBounds.getCenter();
+         F32 offset = mModel->getShape()->mBounds.len();
 
          switch (mDisplayType)
          {
@@ -1166,11 +1166,11 @@ void GuiShapeEdPreview::computeSceneBounds(Box3F& bounds)
 void GuiShapeEdPreview::updateDetailLevel(const SceneRenderState* state)
 {
    // Make sure current detail is valid
-   if ( !mModel->getShape()->details.size() )
+   if ( !mModel->getShape()->mDetails.size() )
       return;
 
-   if ( mModel->getCurrentDetail() >= mModel->getShape()->details.size() )
-      setCurrentDetail( mModel->getShape()->details.size() - 1 );
+   if ( mModel->getCurrentDetail() >= mModel->getShape()->mDetails.size() )
+      setCurrentDetail( mModel->getShape()->mDetails.size() - 1 );
 
    // Convert between FOV and distance so zoom is consistent between Perspective
    // and Orthographic views (conversion factor found by trial and error)
@@ -1193,7 +1193,7 @@ void GuiShapeEdPreview::updateDetailLevel(const SceneRenderState* state)
       setCurrentDetail( 0 );
 
    currentDetail = mModel->getCurrentDetail();
-   const TSShape::Detail& det = mModel->getShape()->details[ currentDetail ];
+   const TSShape::Detail& det = mModel->getShape()->mDetails[ currentDetail ];
 
    mDetailPolys = det.polyCount;
    mDetailSize = det.size;
@@ -1213,31 +1213,31 @@ void GuiShapeEdPreview::updateDetailLevel(const SceneRenderState* state)
    {
       Vector<U32> usedMaterials;
 
-      S32 start = mModel->getShape()->subShapeFirstObject[det.subShapeNum];
-      S32 end = start + mModel->getShape()->subShapeNumObjects[det.subShapeNum];
+      S32 start = mModel->getShape()->mSubShapeFirstObject[det.subShapeNum];
+      S32 end = start + mModel->getShape()->mSubShapeNumObjects[det.subShapeNum];
 
       for ( S32 iObj = start; iObj < end; iObj++ )
       {
-         const TSShape::Object& obj = mModel->getShape()->objects[iObj];
+         const TSShape::Object& obj = mModel->getShape()->mObjects[iObj];
 
          if ( obj.numMeshes <= currentDetail )
             continue;
 
-         const TSMesh* mesh = mModel->getShape()->meshes[ obj.startMeshIndex + currentDetail ];
+         const TSMesh* mesh = mModel->getShape()->mMeshes[ obj.startMeshIndex + currentDetail ];
          if ( !mesh )
             continue;
 
          // Count the number of draw calls and materials
-         mNumDrawCalls += mesh->primitives.size();
-         for ( S32 iPrim = 0; iPrim < mesh->primitives.size(); iPrim++ )
-            usedMaterials.push_back_unique( mesh->primitives[iPrim].matIndex & TSDrawPrimitive::MaterialMask );
+         mNumDrawCalls += mesh->mPrimitives.size();
+         for ( S32 iPrim = 0; iPrim < mesh->mPrimitives.size(); iPrim++ )
+            usedMaterials.push_back_unique( mesh->mPrimitives[iPrim].matIndex & TSDrawPrimitive::MaterialMask );
 
          // For skinned meshes, count the number of bones and weights
          if ( mesh->getMeshType() == TSMesh::SkinMeshType )
          {
             const TSSkinMesh* skin = dynamic_cast<const TSSkinMesh*>(mesh);
-            mNumBones += skin->batchData.initialTransforms.size();
-            mNumWeights += skin->weight.size();
+            mNumBones += skin->mBatchData.initialTransforms.size();
+            mNumWeights += skin->mWeight.size();
          }
       }
 
@@ -1262,7 +1262,7 @@ void GuiShapeEdPreview::updateThreads(F32 delta)
          continue;
 
       // Make sure thread priority matches sequence priority (which may have changed)
-      mModel->setPriority( thread.key, mModel->getShape()->sequences[mModel->getSequence( thread.key )].priority );
+      mModel->setPriority( thread.key, mModel->getShape()->mSequences[mModel->getSequence( thread.key )].priority );
 
       // Handle ping-pong
       if ( thread.pingpong && !mModel->isInTransition( thread.key ) )
@@ -1426,18 +1426,18 @@ void GuiShapeEdPreview::renderWorld(const RectI &updateRect)
       // Render the shape bounding box
       if ( mRenderBounds )
       {
-         Point3F boxSize = mModel->getShape()->bounds.maxExtents - mModel->getShape()->bounds.minExtents;
+         Point3F boxSize = mModel->getShape()->mBounds.maxExtents - mModel->getShape()->mBounds.minExtents;
 
          GFXStateBlockDesc desc;
          desc.fillMode = GFXFillWireframe;
-         GFX->getDrawUtil()->drawCube( desc, boxSize, mModel->getShape()->center, ColorF::WHITE );
+         GFX->getDrawUtil()->drawCube( desc, boxSize, mModel->getShape()->mCenter, ColorF::WHITE );
       }
 
       // Render the selected object bounding box
       if ( mRenderObjBox && ( mSelectedObject != -1 ) )
       {
-         const TSShape::Object& obj = mModel->getShape()->objects[mSelectedObject];
-         const TSMesh* mesh = ( mCurrentDL < obj.numMeshes ) ? mModel->getShape()->meshes[obj.startMeshIndex + mSelectedObjDetail] : NULL;
+         const TSShape::Object& obj = mModel->getShape()->mObjects[mSelectedObject];
+         const TSMesh* mesh = ( mCurrentDL < obj.numMeshes ) ? mModel->getShape()->mMeshes[obj.startMeshIndex + mSelectedObjDetail] : NULL;
          if ( mesh )
          {
             GFX->pushWorldMatrix();
@@ -1528,7 +1528,7 @@ void GuiShapeEdPreview::renderSunDirection() const
    {
       // Render four arrows aiming in the direction of the sun's light
       ColorI color( mFakeSun->getColor() );
-      F32 length = mModel->getShape()->bounds.len() * 0.8f;
+      F32 length = mModel->getShape()->mBounds.len() * 0.8f;
 
       // Get the sun's vectors
       Point3F fwd = mFakeSun->getTransform().getForwardVector();
@@ -1536,8 +1536,8 @@ void GuiShapeEdPreview::renderSunDirection() const
       Point3F right = mFakeSun->getTransform().getRightVector() * length / 8;
 
       // Calculate the start and end points of the first arrow (bottom left)
-      Point3F start = mModel->getShape()->center - fwd * length - up/2 - right/2;
-      Point3F end = mModel->getShape()->center - fwd * length / 3 - up/2 - right/2;
+      Point3F start = mModel->getShape()->mCenter - fwd * length - up/2 - right/2;
+      Point3F end = mModel->getShape()->mCenter - fwd * length / 3 - up/2 - right/2;
 
       GFXStateBlockDesc desc;
       desc.setZReadWrite( true, true );
@@ -1560,10 +1560,10 @@ void GuiShapeEdPreview::renderNodes() const
       GFX->setStateBlockByDesc( desc );
 
       PrimBuild::color( ColorI::WHITE );
-      PrimBuild::begin( GFXLineList, mModel->getShape()->nodes.size() * 2 );
-      for ( S32 i = 0; i < mModel->getShape()->nodes.size(); i++)
+      PrimBuild::begin( GFXLineList, mModel->getShape()->mNodes.size() * 2 );
+      for ( S32 i = 0; i < mModel->getShape()->mNodes.size(); i++)
       {
-         const TSShape::Node& node = mModel->getShape()->nodes[i];
+         const TSShape::Node& node = mModel->getShape()->mNodes[i];
          if (node.parentIndex >= 0)
          {
             Point3F start(mModel->mNodeTransforms[i].getPosition());
@@ -1576,7 +1576,7 @@ void GuiShapeEdPreview::renderNodes() const
       PrimBuild::end();
 
       // Render the node axes
-      for ( S32 i = 0; i < mModel->getShape()->nodes.size(); i++)
+      for ( S32 i = 0; i < mModel->getShape()->mNodes.size(); i++)
       {
          // Render the selected and hover nodes last (so they are on top)
          if ( ( i == mSelectedNode ) || ( i == mHoverNode ) )
@@ -1626,7 +1626,7 @@ void GuiShapeEdPreview::renderNodeAxes(S32 index, const ColorF& nodeColor) const
 
 void GuiShapeEdPreview::renderNodeName(S32 index, const ColorF& textColor) const
 {
-   const TSShape::Node& node = mModel->getShape()->nodes[index];
+   const TSShape::Node& node = mModel->getShape()->mNodes[index];
    const String& nodeName = mModel->getShape()->getName( node.nameIndex );
 
    Point2I pos( mProjectedNodes[index].x, mProjectedNodes[index].y + sNodeRectSize + 6 );
@@ -1641,9 +1641,9 @@ void GuiShapeEdPreview::renderCollisionMeshes() const
    {
       ConcretePolyList polylist;
       polylist.setTransform( &MatrixF::Identity, Point3F::One );
-      for ( S32 iDet = 0; iDet < mModel->getShape()->details.size(); iDet++ )
+      for ( S32 iDet = 0; iDet < mModel->getShape()->mDetails.size(); iDet++ )
       {
-         const TSShape::Detail& det = mModel->getShape()->details[iDet];
+         const TSShape::Detail& det = mModel->getShape()->mDetails[iDet];
          const String& detName = mModel->getShape()->getName( det.nameIndex );
 
          // Ignore non-collision details

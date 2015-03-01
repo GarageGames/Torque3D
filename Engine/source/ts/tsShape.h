@@ -274,25 +274,25 @@ class TSShape
    /// @name Shape Vector Data
    /// @{
 
-   Vector<Node> nodes;
-   Vector<Object> objects;
-   Vector<ObjectState> objectStates;
-   Vector<S32> subShapeFirstNode;
-   Vector<S32> subShapeFirstObject;
-   Vector<S32> detailFirstSkin;
-   Vector<S32> subShapeNumNodes;
-   Vector<S32> subShapeNumObjects;
-   Vector<Detail> details;
-   Vector<Quat16> defaultRotations;
-   Vector<Point3F> defaultTranslations;
+   Vector<Node> mNodes;
+   Vector<Object> mObjects;
+   Vector<ObjectState> mObjectStates;
+   Vector<S32> mSubShapeFirstNode;
+   Vector<S32> mSubShapeFirstObject;
+   Vector<S32> mDetailFirstSkin;
+   Vector<S32> mSubShapeNumNodes;
+   Vector<S32> mSubShapeNumObjects;
+   Vector<Detail> mDetails;
+   Vector<Quat16> mDefaultRotations;
+   Vector<Point3F> mDefaultTranslations;
 
    /// @}
 
    /// These are set up at load time, but memory is allocated along with loaded data
    /// @{
 
-   Vector<S32> subShapeFirstTranslucentObject;
-   Vector<TSMesh*> meshes;
+   Vector<S32> mSubShapeFirstTranslucentObject;
+   Vector<TSMesh*> mMeshes;
 
    /// @}
 
@@ -306,39 +306,39 @@ class TSShape
    ///   - intraDL is at 0 when if shape were any farther away we'd be at dl+1
    /// @{
 
-   Vector<F32> alphaIn;
-   Vector<F32> alphaOut
+   Vector<F32> mAlphaIn;
+   Vector<F32> mAlphaOut
       ;
    /// @}
 
    /// @name Resizeable vectors
    /// @{
 
-   Vector<Sequence>                 sequences;
-   Vector<Quat16>                   nodeRotations;
-   Vector<Point3F>                  nodeTranslations;
-   Vector<F32>                      nodeUniformScales;
-   Vector<Point3F>                  nodeAlignedScales;
-   Vector<Quat16>                   nodeArbitraryScaleRots;
-   Vector<Point3F>                  nodeArbitraryScaleFactors;
-   Vector<Quat16>                   groundRotations;
-   Vector<Point3F>                  groundTranslations;
-   Vector<Trigger>                  triggers;
-   Vector<TSLastDetail*>            billboardDetails;
-   Vector<ConvexHullAccelerator*>   detailCollisionAccelerators;
-   Vector<String>                   names;
+   Vector<Sequence>                 mSequences;
+   Vector<Quat16>                   mNodeRotations;
+   Vector<Point3F>                  mNodeTranslations;
+   Vector<F32>                      mNodeUniformScales;
+   Vector<Point3F>                  mNodeAlignedScales;
+   Vector<Quat16>                   mNodeArbitraryScaleRots;
+   Vector<Point3F>                  mNodeArbitraryScaleFactors;
+   Vector<Quat16>                   mGroundRotations;
+   Vector<Point3F>                  mGroundTranslations;
+   Vector<Trigger>                  mTriggers;
+   Vector<TSLastDetail*>            mBillboardDetails;
+   Vector<ConvexHullAccelerator*>   mDetailCollisionAccelerators;
+   Vector<String>                   mNames;
 
    /// @}
 
-   TSMaterialList * materialList;
+   TSMaterialList * mMaterialList;
 
    /// @name Bounding
    /// @{
 
-   F32 radius;
-   F32 tubeRadius;
-   Point3F center;
-   Box3F bounds;
+   F32 mRadius;
+   F32 mTubeRadius;
+   Point3F mCenter;
+   Box3F mBounds;
 
    /// @}
 
@@ -348,7 +348,7 @@ class TSShape
    S32 mSmallestVisibleDL;    ///< @see mSmallestVisibleSize
    S32 mReadVersion;          ///< File version that this shape was read from.
    U32 mFlags;                ///< hasTranslucancy
-   U32 data;                  ///< User-defined data storage.
+   U32 mData;                  ///< User-defined data storage.
 
    /// If enabled detail selection will use the
    /// legacy screen error method for lod.
@@ -659,34 +659,34 @@ class TSShape
 
 inline QuatF & TSShape::getRotation(const Sequence & seq, S32 keyframeNum, S32 rotNum, QuatF * quat) const
 {
-   return nodeRotations[seq.baseRotation + rotNum*seq.numKeyframes + keyframeNum].getQuatF(quat);
+   return mNodeRotations[seq.baseRotation + rotNum*seq.numKeyframes + keyframeNum].getQuatF(quat);
 }
 
 inline const Point3F & TSShape::getTranslation(const Sequence & seq, S32 keyframeNum, S32 tranNum) const
 {
-   return nodeTranslations[seq.baseTranslation + tranNum*seq.numKeyframes + keyframeNum];
+   return mNodeTranslations[seq.baseTranslation + tranNum*seq.numKeyframes + keyframeNum];
 }
 
 inline F32 TSShape::getUniformScale(const Sequence & seq, S32 keyframeNum, S32 scaleNum) const
 {
-   return nodeUniformScales[seq.baseScale + scaleNum*seq.numKeyframes + keyframeNum];
+   return mNodeUniformScales[seq.baseScale + scaleNum*seq.numKeyframes + keyframeNum];
 }
 
 inline const Point3F & TSShape::getAlignedScale(const Sequence & seq, S32 keyframeNum, S32 scaleNum) const
 {
-   return nodeAlignedScales[seq.baseScale + scaleNum*seq.numKeyframes + keyframeNum];
+   return mNodeAlignedScales[seq.baseScale + scaleNum*seq.numKeyframes + keyframeNum];
 }
 
 inline TSScale & TSShape::getArbitraryScale(const Sequence & seq, S32 keyframeNum, S32 scaleNum, TSScale * scale) const
 {
-   nodeArbitraryScaleRots[seq.baseScale + scaleNum*seq.numKeyframes + keyframeNum].getQuatF(&scale->mRotate);
-   scale->mScale = nodeArbitraryScaleFactors[seq.baseScale + scaleNum*seq.numKeyframes + keyframeNum];
+   mNodeArbitraryScaleRots[seq.baseScale + scaleNum*seq.numKeyframes + keyframeNum].getQuatF(&scale->mRotate);
+   scale->mScale = mNodeArbitraryScaleFactors[seq.baseScale + scaleNum*seq.numKeyframes + keyframeNum];
    return *scale;
 }
 
 inline const TSShape::ObjectState & TSShape::getObjectState(const Sequence & seq, S32 keyframeNum, S32 objectNum) const
 {
-   return objectStates[seq.baseObjectState + objectNum*seq.numKeyframes + keyframeNum];
+   return mObjectStates[seq.baseObjectState + objectNum*seq.numKeyframes + keyframeNum];
 }
 
 #endif

@@ -50,7 +50,7 @@ void TSShapeInstance::dumpNode(Stream & stream ,S32 level, S32 nodeIndex, Vector
    space[level*3] = '\0';
 
    const char *nodeName = "";
-   const TSShape::Node & node = mShape->nodes[nodeIndex];
+   const TSShape::Node & node = mShape->mNodes[nodeIndex];
    if (node.nameIndex != -1)
      nodeName = mShape->getName(node.nameIndex);
    dumpLine(avar("%s%s", space, nodeName));
@@ -93,7 +93,7 @@ void TSShapeInstance::dumpNode(Stream & stream ,S32 level, S32 nodeIndex, Vector
       for (S32 k=0; k<obj->object->numMeshes; k++)
       {
          S32 f = obj->object->startMeshIndex;
-         if (mShape->meshes[f+k])
+         if (mShape->mMeshes[f+k])
             dumpLine(avar(" %i",detailSizes[k]));
       }
 
@@ -108,9 +108,9 @@ void TSShapeInstance::dumpNode(Stream & stream ,S32 level, S32 nodeIndex, Vector
    }
 
    // search for children
-   for (S32 k=nodeIndex+1; k<mShape->nodes.size(); k++)
+   for (S32 k=nodeIndex+1; k<mShape->mNodes.size(); k++)
    {
-      if (mShape->nodes[k].parentIndex == nodeIndex)
+      if (mShape->mNodes[k].parentIndex == nodeIndex)
          // this is our child
          dumpNode(stream, level+1, k, detailSizes);
    }
@@ -126,9 +126,9 @@ void TSShapeInstance::dump(Stream & stream)
 
    dumpLine("\r\n   Details:\r\n");
 
-   for (i=0; i<mShape->details.size(); i++)
+   for (i=0; i<mShape->mDetails.size(); i++)
    {
-      const TSDetail & detail = mShape->details[i];
+      const TSDetail & detail = mShape->mDetails[i];
       name = mShape->getName(detail.nameIndex);
       ss = detail.subShapeNum;
       od = detail.objectDetailNum;
@@ -145,23 +145,23 @@ void TSShapeInstance::dump(Stream & stream)
 
    dumpLine("\r\n   Subtrees:\r\n");
 
-   for (i=0; i<mShape->subShapeFirstNode.size(); i++)
+   for (i=0; i<mShape->mSubShapeFirstNode.size(); i++)
    {
-      S32 a = mShape->subShapeFirstNode[i];
-      S32 b = a + mShape->subShapeNumNodes[i];
+      S32 a = mShape->mSubShapeFirstNode[i];
+      S32 b = a + mShape->mSubShapeNumNodes[i];
       dumpLine(avar("      Subtree %i\r\n",i));
 
       // compute detail sizes for each subshape
       Vector<S32> detailSizes;
-      for (S32 l=0;l<mShape->details.size(); l++)
+      for (S32 l=0;l<mShape->mDetails.size(); l++)
       {
-          if ((mShape->details[l].subShapeNum==i) || (mShape->details[l].subShapeNum==-1))
-              detailSizes.push_back((S32)mShape->details[l].size);
+          if ((mShape->mDetails[l].subShapeNum==i) || (mShape->mDetails[l].subShapeNum==-1))
+              detailSizes.push_back((S32)mShape->mDetails[l].size);
       }
 
       for (j=a; j<b; j++)
       {
-          const TSNode & node = mShape->nodes[j];
+          const TSNode & node = mShape->mNodes[j];
           // if the node has a parent, it'll get dumped via the parent
           if (node.parentIndex<0)
               dumpNode(stream,3,j,detailSizes);
@@ -169,22 +169,22 @@ void TSShapeInstance::dump(Stream & stream)
    }
 
    bool foundSkin = false;
-   for (i=0; i<mShape->objects.size(); i++)
+   for (i=0; i<mShape->mObjects.size(); i++)
    {
-      if (mShape->objects[i].nodeIndex<0) // must be a skin
+      if (mShape->mObjects[i].nodeIndex<0) // must be a skin
       {
          if (!foundSkin)
             dumpLine("\r\n   Skins:\r\n");
          foundSkin=true;
          const char * skinName = "";
-         S32 nameIndex = mShape->objects[i].nameIndex;
+         S32 nameIndex = mShape->mObjects[i].nameIndex;
          if (nameIndex>=0)
             skinName = mShape->getName(nameIndex);
          dumpLine(avar("      Skin %s with following details: ",skinName));
-         for (S32 num=0; num<mShape->objects[i].numMeshes; num++)
+         for (S32 num=0; num<mShape->mObjects[i].numMeshes; num++)
          {
-            if (mShape->meshes[mShape->objects[i].startMeshIndex + num])
-               dumpLine(avar(" %i",(S32)mShape->details[num].size));
+            if (mShape->mMeshes[mShape->mObjects[i].startMeshIndex + num])
+               dumpLine(avar(" %i",(S32)mShape->mDetails[num].size));
          }
          dumpLine("\r\n");
       }
@@ -193,19 +193,19 @@ void TSShapeInstance::dump(Stream & stream)
       dumpLine("\r\n");
 
    dumpLine("\r\n   Sequences:\r\n");
-   for (i = 0; i < mShape->sequences.size(); i++)
+   for (i = 0; i < mShape->mSequences.size(); i++)
    {
       const char *name = "(none)";
-      if (mShape->sequences[i].nameIndex != -1)
-         name = mShape->getName(mShape->sequences[i].nameIndex);
+      if (mShape->mSequences[i].nameIndex != -1)
+         name = mShape->getName(mShape->mSequences[i].nameIndex);
       dumpLine(avar("      %3d: %s%s%s\r\n", i, name,
-         mShape->sequences[i].isCyclic() ? " (cyclic)" : "",
-         mShape->sequences[i].isBlend() ? " (blend)" : ""));
+         mShape->mSequences[i].isCyclic() ? " (cyclic)" : "",
+         mShape->mSequences[i].isBlend() ? " (blend)" : ""));
    }
 
-   if (mShape->materialList)
+   if (mShape->mMaterialList)
    {
-      TSMaterialList * ml = mShape->materialList;
+      TSMaterialList * ml = mShape->mMaterialList;
       dumpLine("\r\n   Material list:\r\n");
       for (i=0; i<(S32)ml->size(); i++)
       {

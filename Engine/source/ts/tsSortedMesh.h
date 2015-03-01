@@ -48,14 +48,14 @@ public:
                         ///< if frontCluster==backCluster, no plane to test against...
    };
 
-   Vector<Cluster> clusters; ///< All of the clusters of primitives to be drawn
-   Vector<S32> startCluster; ///< indexed by frame number
-   Vector<S32> firstVerts;   ///< indexed by frame number
-   Vector<S32> numVerts;     ///< indexed by frame number
-   Vector<S32> firstTVerts;  ///< indexed by frame number or matFrame number, depending on which one animates (never both)
+   Vector<Cluster> mClusters; ///< All of the clusters of primitives to be drawn
+   Vector<S32> mStartCluster; ///< indexed by frame number
+   Vector<S32> mFirstVerts;   ///< indexed by frame number
+   Vector<S32> mNumVerts;     ///< indexed by frame number
+   Vector<S32> mFirstTVerts;  ///< indexed by frame number or matFrame number, depending on which one animates (never both)
 
    /// sometimes, we want to write the depth value to the frame buffer even when object is translucent
-   bool alwaysWriteDepth;
+   bool mAlwaysWriteDepth;
 
    // render methods..
    void render(S32 frame, S32 matFrame, TSMaterialList *);
@@ -71,7 +71,7 @@ public:
    void disassemble();
 
    TSSortedMesh() {
-      meshType = SortedMeshType;
+      mMeshType = SortedMeshType;
    }
 };
 

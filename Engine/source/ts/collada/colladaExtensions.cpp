@@ -29,10 +29,10 @@
 /// the interval
 bool ColladaExtension_effect::animatesTextureTransform(F32 start, F32 end)
 {
-   return repeatU.isAnimated(start, end)           || repeatV.isAnimated(start, end)         ||
-          offsetU.isAnimated(start, end)           || offsetV.isAnimated(start, end)         ||
-          rotateUV.isAnimated(start, end)          || noiseU.isAnimated(start, end)          ||
-          noiseV.isAnimated(start, end);
+   return mRepeatU.isAnimated(start, end)           || mRepeatV.isAnimated(start, end)         ||
+          mOffsetU.isAnimated(start, end)           || mOffsetV.isAnimated(start, end)         ||
+          mRotateUV.isAnimated(start, end)          || mNoiseU.isAnimated(start, end)          ||
+          mNoiseV.isAnimated(start, end);
 }
 
 /// Apply the MAYA texture transform to the given UV coordinates
@@ -41,21 +41,21 @@ void ColladaExtension_effect::applyTextureTransform(Point2F& uv, F32 time)
    // This function will be called for every tvert, every frame. So cache the
    // texture transform parameters to avoid interpolating them every call (since
    // they are constant for all tverts for a given 't')
-   if (time != lastAnimTime) {
+   if (time != mLastAnimTime) {
       // Update texture transform
-      textureTransform.set(EulerF(0, 0, rotateUV.getValue(time)));
-      textureTransform.setPosition(Point3F(
-         offsetU.getValue(time) + noiseU.getValue(time)*gRandGen.randF(),
-         offsetV.getValue(time) + noiseV.getValue(time)*gRandGen.randF(),
+      mTextureTransform.set(EulerF(0, 0, mRotateUV.getValue(time)));
+      mTextureTransform.setPosition(Point3F(
+         mOffsetU.getValue(time) + mNoiseU.getValue(time)*gRandGen.randF(),
+         mOffsetV.getValue(time) + mNoiseV.getValue(time)*gRandGen.randF(),
          0));
-      textureTransform.scale(Point3F(repeatU.getValue(time), repeatV.getValue(time), 1.0f));
+      mTextureTransform.scale(Point3F(mRepeatU.getValue(time), mRepeatV.getValue(time), 1.0f));
 
-      lastAnimTime = time;
+      mLastAnimTime = time;
    }
 
    // Apply texture transform
    Point3F result;
-   textureTransform.mulP(Point3F(uv.x, uv.y, 0), &result);
+   mTextureTransform.mulP(Point3F(uv.x, uv.y, 0), &result);
 
    uv.x = result.x;
    uv.y = result.y;
