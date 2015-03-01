@@ -31,12 +31,11 @@ void ConsoleValueStack::getArgcArgv(StringTableEntry name, U32 *argc, ConsoleVal
    U32 argCount   = getMin(mStackPos - startStack, (U32)MaxArgs - 1);
 
    *in_argv = mArgv;
-   mArgv[0] = name;
+   mArgv[0].value = CSTK.pushStackString(name);
    
    for(U32 i = 0; i < argCount; i++) {
       ConsoleValueRef *ref = &mArgv[i+1];
       ref->value = &mStack[startStack + i];
-      ref->stringStackValue = NULL;
    }
    argCount++;
    
@@ -91,9 +90,41 @@ void ConsoleValueStack::pushValue(ConsoleValue &variable)
       mStack[mStackPos++].setIntValue((S32)variable.getIntValue());
    case ConsoleValue::TypeInternalFloat:
       mStack[mStackPos++].setFloatValue((F32)variable.getFloatValue());
+   case ConsoleValue::TypeInternalStringStackPtr:
+      mStack[mStackPos++].setStringStackPtrValue(variable.getStringStackPtr());
    default:
       mStack[mStackPos++].setStringValue(variable.getStringValue());
    }
+}
+
+ConsoleValue* ConsoleValueStack::reserveValues(U32 count)
+{
+   U32 startPos = mStackPos;
+   if (startPos+count >= ConsoleValueStack::MaxStackDepth) {
+      AssertFatal(false, "Console Value Stack is empty");
+      return NULL;
+   }
+
+   //Con::printf("[%i]CSTK reserveValues %i", mStackPos, count);
+   mStackPos += count;
+   return &mStack[startPos];
+}
+
+bool ConsoleValueStack::reserveValues(U32 count, ConsoleValueRef *outValues)
+{
+   U32 startPos = mStackPos;
+   if (startPos+count >= ConsoleValueStack::MaxStackDepth) {
+      AssertFatal(false, "Console Value Stack is empty");
+      return false;
+   }
+
+   //Con::printf("[%i]CSTK reserveValues %i", mStackPos, count);
+   for (U32 i=0; i<count; i++)
+   {
+	   outValues[i].value = &mStack[mStackPos+i];
+   }
+   mStackPos += count;
+   return true;
 }
 
 ConsoleValue *ConsoleValueStack::pushString(const char *value)
@@ -119,6 +150,19 @@ ConsoleValue *ConsoleValueStack::pushStackString(const char *value)
    //Con::printf("[%i]CSTK pushString %s", mStackPos, value);
 
    mStack[mStackPos++].setStackStringValue(value);
+   return &mStack[mStackPos-1];
+}
+
+ConsoleValue *ConsoleValueStack::pushStringStackPtr(StringStackPtr value)
+{
+   if (mStackPos == ConsoleValueStack::MaxStackDepth) {
+      AssertFatal(false, "Console Value Stack is empty");
+      return NULL;
+   }
+
+   //Con::printf("[%i]CSTK pushStringStackPtr %s", mStackPos, StringStackPtrRef(value).getPtr(&STR));
+
+   mStack[mStackPos++].setStringStackPtrValue(value);
    return &mStack[mStackPos-1];
 }
 

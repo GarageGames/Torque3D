@@ -21,9 +21,11 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
+
+#include "console/simBase.h"
+#include "console/engineAPI.h"
 #include "console/telnetConsole.h"
 
-#include "console/engineAPI.h"
 #include "core/strings/stringFunctions.h"
 #include "core/util/journal/process.h"
 #include "core/module.h"

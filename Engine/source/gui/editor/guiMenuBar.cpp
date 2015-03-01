@@ -111,7 +111,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMouseInMenu, void, (bool isInMenu),( isInMenu 
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onMenuSelect, void, ( const char* menuId, const char* menuText ),( menuId , menuText ),
+IMPLEMENT_CALLBACK( GuiMenuBar, onMenuSelect, void, ( S32 menuId, const char* menuText ),( menuId , menuText ),
    "@brief Called whenever a menu is selected.\n\n"
    "@param menuId Index id of the clicked menu\n"
    "@param menuText Text of the clicked menu\n\n"
@@ -125,7 +125,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMenuSelect, void, ( const char* menuId, const 
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onMenuItemSelect, void, ( const char* menuId, const char* menuText, const char* menuItemId, const char* menuItemText ),
+IMPLEMENT_CALLBACK( GuiMenuBar, onMenuItemSelect, void, ( S32 menuId, const char* menuText, S32 menuItemId, const char* menuItemText ),
 												   ( menuId, menuText, menuItemId, menuItemText ),
    "@brief Called whenever an item in a menu is selected.\n\n"
    "@param menuId Index id of the menu which contains the selected menu item\n"
@@ -142,7 +142,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMenuItemSelect, void, ( const char* menuId, co
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onSubmenuSelect, void, ( const char* submenuId, const char* submenuText ),( submenuId, submenuText ),
+IMPLEMENT_CALLBACK( GuiMenuBar, onSubmenuSelect, void, ( S32 submenuId, const char* submenuText ),( submenuId, submenuText ),
    "@brief Called whenever a submenu is selected.\n\n"
    "@param submenuId Id of the selected submenu\n"
    "@param submenuText Text of the selected submenu\n\n"
@@ -1393,7 +1393,7 @@ void GuiMenuBar::acceleratorKeyPress(U32 index)
          if(item->acceleratorIndex == index)
          {
             // first, call the script callback for menu selection:
-            onMenuSelect_callback(Con::getIntArg(menu->id), menu->text);
+            onMenuSelect_callback(menu->id, menu->text);
 			
             if(item->visible)
                menuItemSelected(menu, item);
@@ -1575,7 +1575,7 @@ bool GuiSubmenuBackgroundCtrl::pointInControl(const Point2I& parentCoordPoint)
 void GuiMenuBar::menuItemSelected(GuiMenuBar::Menu *menu, GuiMenuBar::MenuItem *item)
 {
    if(item->enabled)
-      onMenuItemSelect_callback(Con::getIntArg(menu->id), menu->text, Con::getIntArg(item->id), item->text);
+      onMenuItemSelect_callback(menu->id, menu->text, item->id, item->text);
 }
 
 void GuiMenuBar::onSleep()
@@ -1668,7 +1668,7 @@ void GuiMenuBar::onAction()
       return;
 
    // first, call the script callback for menu selection:
-   onMenuSelect_callback(Con::getIntArg(mouseDownMenu->id), mouseDownMenu->text);
+   onMenuSelect_callback(mouseDownMenu->id, mouseDownMenu->text);
 
    MenuItem *visWalk = mouseDownMenu->firstMenuItem;
    while(visWalk)
@@ -1783,7 +1783,7 @@ void GuiMenuBar::onSubmenuAction(S32 selectionIndex, RectI bounds, Point2I cellS
       return;
 
    // first, call the script callback for menu selection:
-   onSubmenuSelect_callback(Con::getIntArg(mouseOverSubmenu->id), mouseOverSubmenu->text);
+   onSubmenuSelect_callback(mouseOverSubmenu->id, mouseOverSubmenu->text);
 
    MenuItem *visWalk = mouseOverSubmenu->submenu->firstMenuItem;
    while(visWalk)

@@ -104,7 +104,7 @@ ConsoleDocClass( PathCamera,
    "@ingroup PathCameras\n"
 );
 
-IMPLEMENT_CALLBACK( PathCamera, onNode, void, (const char* node), (node),
+IMPLEMENT_CALLBACK( PathCamera, onNode, void, (S32 node), (node),
 					"A script callback that indicates the path camera has arrived at a specific node in its path.  Server side only.\n"
 					"@param Node Unique ID assigned to this node.\n");
 
@@ -408,7 +408,7 @@ void PathCamera::popFront()
 void PathCamera::onNode(S32 node)
 {
    if (!isGhost())
-		onNode_callback(Con::getIntArg(node));
+		onNode_callback(node);
    
 }
 

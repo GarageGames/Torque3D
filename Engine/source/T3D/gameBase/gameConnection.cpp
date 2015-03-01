@@ -459,6 +459,14 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
       return false;
    }
    ConsoleValueRef connectArgv[MaxConnectArgs + 3];
+   ConsoleValue connectArgvValue[MaxConnectArgs + 3];
+
+   for(U32 i = 0; i < mConnectArgc+3; i++)
+   {
+	   connectArgv[i].value = &connectArgvValue[i];
+	   connectArgvValue[i].init();
+   }
+
    for(U32 i = 0; i < mConnectArgc; i++)
    {
       char argString[256];
@@ -466,11 +474,11 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
       mConnectArgv[i] = dStrdup(argString);
       connectArgv[i + 3] = mConnectArgv[i];
    }
-   connectArgv[0] = "onConnectRequest";
-   connectArgv[1] = 0;
+   connectArgvValue[0].setStackStringValue("onConnectRequest");
+   connectArgvValue[1].setIntValue(0);
    char buffer[256];
    Net::addressToString(getNetAddress(), buffer);
-   connectArgv[2] = buffer;
+   connectArgvValue[2].setStackStringValue(buffer);
 
    // NOTE: Cannot convert over to IMPLEMENT_CALLBACK as it has variable args.
    const char *ret = Con::execute(this, mConnectArgc + 3, connectArgv);

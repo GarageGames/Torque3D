@@ -512,7 +512,7 @@ void ConsoleValue::setStringValue(const char * value)
 */
 	   if (value == typeValueEmpty)
       {
-            if (sval && sval != typeValueEmpty && type != TypeInternalStackString) dFree(sval);
+            if (sval && sval != typeValueEmpty && type != TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
             sval = typeValueEmpty;
             bufferLen = 0;
             fval = 0.f;
@@ -541,7 +541,7 @@ void ConsoleValue::setStringValue(const char * value)
       // may as well pad to the next cache line
       U32 newLen = ((stringLen + 1) + 15) & ~15;
 	  
-      if(sval == typeValueEmpty || type == TypeInternalStackString)
+      if(sval == typeValueEmpty || type == TypeInternalStackString || type == TypeInternalStringStackPtr)
          sval = (char *) dMalloc(newLen);
       else if(newLen > bufferLen)
          sval = (char *) dRealloc(sval, newLen);
@@ -556,7 +556,7 @@ void ConsoleValue::setStringValue(const char * value)
 }
 
 
-void ConsoleValue::setStackStringValue(const char * value)
+void ConsoleValue::setStackStringValue(const char *value)
 {
    if (value == NULL) value = typeValueEmpty;
 
@@ -564,7 +564,7 @@ void ConsoleValue::setStackStringValue(const char * value)
    {
 	   if (value == typeValueEmpty)
       {
-         if (sval && sval != typeValueEmpty && type != ConsoleValue::TypeInternalStackString) dFree(sval);
+         if (sval && sval != typeValueEmpty && type != ConsoleValue::TypeInternalStackString && type != ConsoleValue::TypeInternalStringStackPtr) dFree(sval);
          sval = typeValueEmpty;
          bufferLen = 0;
          fval = 0.f;
@@ -586,13 +586,42 @@ void ConsoleValue::setStackStringValue(const char * value)
       }
 
       type = TypeInternalStackString;
-	  sval = (char*)value;
+      sval = (char*)value;
       bufferLen = stringLen;
    }
    else
       Con::setData(type, dataPtr, 0, 1, &value, enumTable);      
 }
 
+void ConsoleValue::setStringStackPtrValue(StringStackPtr ptrValue)
+{
+   if(type <= ConsoleValue::TypeInternalString)
+   {
+      const char *value = StringStackPtrRef(ptrValue).getPtr(&STR);
+	   if (sval && sval != typeValueEmpty && type != ConsoleValue::TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
+
+      U32 stringLen = dStrlen(value);
+      if(stringLen < 256)
+      {
+         fval = dAtof(value);
+         ival = dAtoi(value);
+      }
+      else
+      {
+         fval = 0.f;
+         ival = 0;
+      }
+
+      type = TypeInternalStringStackPtr;
+      sval = (char*)(value - STR.mBuffer);
+      bufferLen = stringLen;
+   }
+   else
+   {
+      const char *value = StringStackPtrRef(ptrValue).getPtr(&STR);
+      Con::setData(type, dataPtr, 0, 1, &value, enumTable);      
+   }
+}
 
 S32 Dictionary::getIntVariable(StringTableEntry name, bool *entValid)
 {
@@ -651,7 +680,8 @@ Dictionary::Entry* Dictionary::addVariable(  const char *name,
    Entry *ent = add(StringTable->insert(name));
    
    if (  ent->value.type <= ConsoleValue::TypeInternalString &&
-         ent->value.sval != typeValueEmpty && ent->value.type != ConsoleValue::TypeInternalStackString )
+         ent->value.sval != typeValueEmpty && 
+         ent->value.type != ConsoleValue::TypeInternalStackString && ent->value.type != ConsoleValue::TypeInternalStringStackPtr )
       dFree(ent->value.sval);
 
    ent->value.type = type;
@@ -1338,14 +1368,20 @@ void Namespace::markGroup(const char* name, const char* usage)
 
 extern S32 executeBlock(StmtNode *block, ExprEvalState *state);
 
-const char *Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprEvalState *state)
+ConsoleValueRef Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprEvalState *state)
 {
+   STR.clearFunctionOffset();
+
    if(mType == ConsoleFunctionType)
    {
       if(mFunctionOffset)
+      {
          return mCode->exec(mFunctionOffset, argv[0], mNamespace, argc, argv, false, mPackage);
+      }
       else
-         return "";
+      {
+         return ConsoleValueRef();
+      }
    }
 
 #ifndef TORQUE_DEBUG
@@ -1354,7 +1390,7 @@ const char *Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprEvalS
    if(mToolOnly && ! Con::isCurrentScriptToolScript())
    {
       Con::errorf(ConsoleLogEntry::Script, "%s::%s - attempting to call tools only function from outside of tools", mNamespace->mName, mFunctionName);
-      return "";
+      return ConsoleValueRef();
    }
 #endif
 
@@ -1362,32 +1398,26 @@ const char *Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprEvalS
    {
       Con::warnf(ConsoleLogEntry::Script, "%s::%s - wrong number of arguments.", mNamespace->mName, mFunctionName);
       Con::warnf(ConsoleLogEntry::Script, "usage: %s", mUsage);
-      return "";
+      return ConsoleValueRef();
    }
 
    static char returnBuffer[32];
    switch(mType)
    {
       case StringCallbackType:
-         return cb.mStringCallbackFunc(state->thisObject, argc, argv);
+         return ConsoleValueRef::fromValue(CSTK.pushStackString(cb.mStringCallbackFunc(state->thisObject, argc, argv)));
       case IntCallbackType:
-         dSprintf(returnBuffer, sizeof(returnBuffer), "%d",
-            cb.mIntCallbackFunc(state->thisObject, argc, argv));
-         return returnBuffer;
+		 return ConsoleValueRef::fromValue(CSTK.pushUINT((U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv)));
       case FloatCallbackType:
-         dSprintf(returnBuffer, sizeof(returnBuffer), "%g",
-            cb.mFloatCallbackFunc(state->thisObject, argc, argv));
-         return returnBuffer;
+		 return ConsoleValueRef::fromValue(CSTK.pushFLT((U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv)));
       case VoidCallbackType:
          cb.mVoidCallbackFunc(state->thisObject, argc, argv);
-         return "";
+         return ConsoleValueRef();
       case BoolCallbackType:
-         dSprintf(returnBuffer, sizeof(returnBuffer), "%d",
-            (U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv));
-         return returnBuffer;
+		 return ConsoleValueRef::fromValue(CSTK.pushUINT((U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv)));
    }
-
-   return "";
+   
+   return ConsoleValueRef();
 }
 
 //-----------------------------------------------------------------------------

@@ -87,7 +87,7 @@ struct IterStackRecord
    struct StringPos
    {
       /// The raw string data on the string stack.
-      const char* mString;
+      StringStackPtr mString;
       
       /// Current parsing position.
       U32 mIndex;
@@ -195,18 +195,20 @@ namespace Con
       return STR.getArgBuffer(bufferSize);
    }
 
-   ConsoleValueRef getFloatArg(F64 arg)
+   char *getFloatArg(F64 arg)
    {
-      ConsoleValueRef ref = arg;
-      return ref;
+      char *ret = STR.getArgBuffer(32);
+      dSprintf(ret, 32, "%g", arg);
+      return ret;
    }
 
-   ConsoleValueRef getIntArg(S32 arg)
+   char *getIntArg(S32 arg)
    {
-      ConsoleValueRef ref = arg;
-      return ref;
+      char *ret = STR.getArgBuffer(32);
+      dSprintf(ret, 32, "%d", arg);
+      return ret;
    }
-   
+
    char *getStringArg( const char *arg )
    {
       U32 len = dStrlen( arg ) + 1;
@@ -284,6 +286,12 @@ inline void ExprEvalState::setStringVariable(const char *val)
 {
    AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
    currentVariable->setStringValue(val);
+}
+
+inline void ExprEvalState::setStringStackPtrVariable(StringStackPtr str)
+{
+   AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+   currentVariable->setStringStackPtrValue(str);
 }
 
 inline void ExprEvalState::setCopyVariable()
@@ -432,6 +440,8 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
    U32 consoleStackStart = CSTK.mStackPos;
 #endif
 
+   //Con::printf("CodeBlock::exec(%s,%u)", functionName ? functionName : "??", ip);
+
    static char traceBuffer[1024];
    S32 i;
    
@@ -441,7 +451,7 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
    F64 *curFloatTable;
    char *curStringTable;
    S32 curStringTableLen = 0; //clint to ensure we dont overwrite it
-   STR.clearFunctionOffset();
+   STR.clearFunctionOffset(); // ensures arg buffer offset is back to 0
    StringTableEntry thisFunctionName = NULL;
    bool popFrame = false;
    if(argv)
@@ -489,15 +499,25 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
 
          ConsoleValueRef ref = argv[i+1];
 
-         if (argv[i+1].isString())
-            gEvalState.setStringVariable(argv[i+1]);
-         else if (argv[i+1].isInt())
+         switch(argv[i+1].getType())
+         {
+         case ConsoleValue::TypeInternalInt:
             gEvalState.setIntVariable(argv[i+1]);
-         else if (argv[i+1].isFloat())
+            break;
+         case ConsoleValue::TypeInternalFloat:
             gEvalState.setFloatVariable(argv[i+1]);
-         else
+            break;
+         case ConsoleValue::TypeInternalStringStackPtr:
+            gEvalState.setStringStackPtrVariable(argv[i+1].getStringStackPtrValue());
+            break;
+         case ConsoleValue::TypeInternalStackString:
+         case ConsoleValue::TypeInternalString:
+         default:
             gEvalState.setStringVariable(argv[i+1]);
+            break;
+         }
       }
+
       ip = ip + (fnArgc * 2) + (2 + 6 + 1);
       curFloatTable = functionFloats;
       curStringTable = functionStrings;
@@ -531,17 +551,6 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
          gEvalState.pushFrameRef( stackIndex );
          popFrame = true;
       }
-   }
-
-   bool doResetValueStack = !gEvalState.mResetLocked;
-   gEvalState.mResetLocked = true;
-   
-   if (gEvalState.mShouldReset)
-   {
-      // Ensure all stacks are clean in case anything became unbalanced during the previous execution
-      STR.clearFrames();
-      CSTK.clearFrames();
-      gEvalState.mShouldReset = false;
    }
 
    // Grab the state of the telenet debugger here once
@@ -590,7 +599,7 @@ ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thi
       Con::gCurrentRoot = this->modPath;
    }
    const char * val;
-   const char *retValue;
+   StringStackPtr retValue;
 
    // note: anything returned is pushed to CSTK and will be invalidated on the next exec()
    ConsoleValueRef returnValue;
@@ -1144,7 +1153,7 @@ breakContinue:
       		// We're falling thru here on purpose.
             
          case OP_RETURN:
-            retValue = STR.getStringValue();
+            retValue = STR.getStringValuePtr();
 
             if( iterDepth > 0 )
             {
@@ -1156,13 +1165,13 @@ breakContinue:
                }
 
                STR.rewind();
-               STR.setStringValue( retValue ); // Not nice but works.
-               retValue = STR.getStringValue();
+               STR.setStringValue( StringStackPtrRef(retValue).getPtr(&STR) ); // Not nice but works.
+               retValue = STR.getStringValuePtr();
             }
 
             // Previously the return value was on the stack and would be returned using STR.getStringValue().
             // Now though we need to wrap it in a ConsoleValueRef 
-            returnValue.value = CSTK.pushStackString(retValue);
+            returnValue.value = CSTK.pushStringStackPtr(retValue);
                
             goto execFinished;
 
@@ -1847,7 +1856,7 @@ breakContinue:
 
                // This will clear everything including returnValue
                CSTK.popFrame();
-               STR.clearFunctionOffset();
+               //STR.clearFunctionOffset();
             }
             else
             {
@@ -1999,7 +2008,7 @@ breakContinue:
             break;
          case OP_PUSH:
             STR.push();
-            CSTK.pushString(STR.getPreviousStringValue());
+            CSTK.pushStringStackPtr(STR.getPreviousStringValuePtr());
             break;
          case OP_PUSH_UINT:
             CSTK.pushUINT(intStack[_UINT]);
@@ -2080,7 +2089,7 @@ breakContinue:
             
             if( iter.mIsStringIter )
             {
-               iter.mData.mStr.mString = STR.getStringValue();
+               iter.mData.mStr.mString = STR.getStringValuePtr();
                iter.mData.mStr.mIndex = 0;
             }
             else
@@ -2118,7 +2127,7 @@ breakContinue:
             
             if( iter.mIsStringIter )
             {
-               const char* str = iter.mData.mStr.mString;
+               const char* str = StringStackPtrRef(iter.mData.mStr.mString).getPtr(&STR);
                               
                U32 startIndex = iter.mData.mStr.mIndex;
                U32 endIndex = startIndex;
@@ -2234,18 +2243,11 @@ execFinished:
       Con::gCurrentRoot = saveCodeBlock->modPath;
    }
 
-   // Mark the reset flag for the next run if we've finished execution
-   if (doResetValueStack)
-   {
-      gEvalState.mShouldReset = true;
-      gEvalState.mResetLocked = false;
-   }
-
    decRefCount();
 
 #ifdef TORQUE_DEBUG
-   AssertFatal(!(STR.mStartStackSize > stackStart), "String stack not popped enough in script exec");
-   AssertFatal(!(STR.mStartStackSize < stackStart), "String stack popped too much in script exec");
+   //AssertFatal(!(STR.mStartStackSize > stackStart), "String stack not popped enough in script exec");
+   //AssertFatal(!(STR.mStartStackSize < stackStart), "String stack popped too much in script exec");
 #endif
 
    return returnValue;
