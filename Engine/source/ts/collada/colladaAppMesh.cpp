@@ -922,7 +922,8 @@ void ColladaAppMesh::lockMesh(F32 t, const MatrixF& objOffset)
 
    // Now get the vertex data at the specified time
    if (geometry->getElementType() == COLLADA_TYPE::GEOMETRY) {
-      getPrimitives(daeSafeCast<domGeometry>(geometry));(daeSafeCast<domGeometry>(geometry), t, objOffset, mPoints, mNormals, mColors, mUVs, mUV2s, true);
+      getPrimitives(daeSafeCast<domGeometry>(geometry));
+      getVertexData(daeSafeCast<domGeometry>(geometry), t, objOffset, mPoints, mNormals, mColors, mUVs, mUV2s, true);
    }
    else if (geometry->getElementType() == COLLADA_TYPE::MORPH) {
       getMorphVertexData(daeSafeCast<domMorph>(geometry), t, objOffset, mPoints, mNormals, mColors, mUVs, mUV2s);
