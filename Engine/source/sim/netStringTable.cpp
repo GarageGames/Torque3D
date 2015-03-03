@@ -31,79 +31,79 @@ NetStringTable *gNetStringTable = NULL;
 
 NetStringTable::NetStringTable()
 {
-   firstFree = 1;
-   firstValid = 1;
+   mFirstFree = 1;
+   mFirstValid = 1;
 
-   table = (Entry *) dMalloc(sizeof(Entry) * InitialSize);
-   size = InitialSize;
+   mTable = (Entry *) dMalloc(sizeof(Entry) * InitialSize);
+   mSize = InitialSize;
    for(U32 i = 0; i < InitialSize; i++)
    {
-      table[i].next = i + 1;
-      table[i].refCount = 0;
-      table[i].scriptRefCount = 0;
+      mTable[i].next = i + 1;
+      mTable[i].refCount = 0;
+      mTable[i].scriptRefCount = 0;
    }
-   table[InitialSize-1].next = InvalidEntry;
+   mTable[InitialSize-1].next = InvalidEntry;
    for(U32 j = 0; j < HashTableSize; j++)
-      hashTable[j] = 0;
-   allocator = new DataChunker(DataChunkerSize);
+      mHashTable[j] = 0;
+   mAllocator = new DataChunker(DataChunkerSize);
 }
 
 NetStringTable::~NetStringTable()
 {
-   delete allocator;
-   dFree( table );
+   delete mAllocator;
+   dFree( mTable );
 }
 
 void NetStringTable::incStringRef(U32 id)
 {
-   AssertFatal(table[id].refCount != 0 || table[id].scriptRefCount != 0 , "Cannot inc ref count from zero.");
-   table[id].refCount++;
+   AssertFatal(mTable[id].refCount != 0 || mTable[id].scriptRefCount != 0 , "Cannot inc ref count from zero.");
+   mTable[id].refCount++;
 }
 
 void NetStringTable::incStringRefScript(U32 id)
 {
-   AssertFatal(table[id].refCount != 0 || table[id].scriptRefCount != 0 , "Cannot inc ref count from zero.");
-   table[id].scriptRefCount++;
+   AssertFatal(mTable[id].refCount != 0 || mTable[id].scriptRefCount != 0 , "Cannot inc ref count from zero.");
+   mTable[id].scriptRefCount++;
 }
 
 U32 NetStringTable::addString(const char *string)
 {
    U32 hash = _StringTable::hashString(string);
    U32 bucket = hash % HashTableSize;
-   for(U32 walk = hashTable[bucket];walk; walk = table[walk].next)
+   for(U32 walk = mHashTable[bucket];walk; walk = mTable[walk].next)
    {
-      if(!dStrcmp(table[walk].string, string))
+      if(!dStrcmp(mTable[walk].string, string))
       {
-         table[walk].refCount++;
+         mTable[walk].refCount++;
          return walk;
       }
    }
-   U32 e = firstFree;
-   firstFree = table[e].next;
-   if(firstFree == InvalidEntry)
+   U32 e = mFirstFree;
+   mFirstFree = mTable[e].next;
+   if(mFirstFree == InvalidEntry)
    {
       // in this case, we should expand the table for next time...
-      U32 newSize = size * 2;
-      table = (Entry *) dRealloc(table, newSize * sizeof(Entry));
-      for(U32 i = size; i < newSize; i++)
+      U32 newSize = mSize * 2;
+      mTable = (Entry *) dRealloc(mTable, newSize * sizeof(Entry));
+      for(U32 i = mSize; i < newSize; i++)
       {
-         table[i].next = i + 1;
-         table[i].refCount = 0;
-         table[i].scriptRefCount = 0;
+         mTable[i].next = i + 1;
+         mTable[i].refCount = 0;
+         mTable[i].scriptRefCount = 0;
       }
-      firstFree = size;
-      table[newSize - 1].next = InvalidEntry;
-      size = newSize;
+      mFirstFree = mSize;
+      mTable[newSize - 1].next = InvalidEntry;
+      mSize = newSize;
    }
-   table[e].refCount++;
-   table[e].string = (char *) allocator->alloc(dStrlen(string) + 1);
-   dStrcpy(table[e].string, string);
-   table[e].next = hashTable[bucket];
-   hashTable[bucket] = e;
-   table[e].link = firstValid;
-   table[firstValid].prevLink = e;
-   firstValid = e;
-   table[e].prevLink = 0;
+   mTable[e].refCount++;
+   mTable[e].string = (char *) mAllocator->alloc(dStrlen(string) + 1);
+   dStrcpy(mTable[e].string, string);
+   mTable[e].next = mHashTable[bucket];
+   mHashTable[bucket] = e;
+   mTable[e].link = mFirstValid;
+   mTable[mFirstValid].prevLink = e;
+   mFirstValid = e;
+   mTable[e].prevLink = 0;
    return e;
 }
 
@@ -114,75 +114,75 @@ U32 GameAddTaggedString(const char *string)
 
 const char *NetStringTable::lookupString(U32 id)
 {
-   if(table[id].refCount == 0 && table[id].scriptRefCount == 0)
+   if(mTable[id].refCount == 0 && mTable[id].scriptRefCount == 0)
       return NULL;
-   return table[id].string;
+   return mTable[id].string;
 }
 
 void NetStringTable::removeString(U32 id, bool script)
 {
    if(!script)
    {
-      AssertFatal(table[id].refCount != 0, "Error, ref count is already 0!!");
-      if(--table[id].refCount)
+      AssertFatal(mTable[id].refCount != 0, "Error, ref count is already 0!!");
+      if(--mTable[id].refCount)
          return;
-      if(table[id].scriptRefCount)
+      if(mTable[id].scriptRefCount)
          return;
    }
    else
    {
       // If both ref counts are already 0, this id is not valid. Ignore
       // the remove
-      if (table[id].scriptRefCount == 0 && table[id].refCount == 0)
+      if (mTable[id].scriptRefCount == 0 && mTable[id].refCount == 0)
          return;
 
-      if(table[id].scriptRefCount == 0 && table[id].refCount)
+      if(mTable[id].scriptRefCount == 0 && mTable[id].refCount)
       {
-         Con::errorf("removeTaggedString failed!  Ref count is already 0 for string: %s", table[id].string);
+         Con::errorf("removeTaggedString failed!  Ref count is already 0 for string: %s", mTable[id].string);
          return;
       }
-      if(--table[id].scriptRefCount)
+      if(--mTable[id].scriptRefCount)
          return;
-      if(table[id].refCount)
+      if(mTable[id].refCount)
          return;
    }
    // unlink first:
-   U32 prev = table[id].prevLink;
-   U32 next = table[id].link;
+   U32 prev = mTable[id].prevLink;
+   U32 next = mTable[id].link;
    if(next)
-      table[next].prevLink = prev;
+      mTable[next].prevLink = prev;
    if(prev)
-      table[prev].link = next;
+      mTable[prev].link = next;
    else
-      firstValid = next;
+      mFirstValid = next;
    // remove it from the hash table
-   U32 hash = _StringTable::hashString(table[id].string);
+   U32 hash = _StringTable::hashString(mTable[id].string);
    U32 bucket = hash % HashTableSize;
-   for(U32 *walk = &hashTable[bucket];*walk; walk = &table[*walk].next)
+   for(U32 *walk = &mHashTable[bucket];*walk; walk = &mTable[*walk].next)
    {
       if(*walk == id)
       {
-         *walk = table[id].next;
+         *walk = mTable[id].next;
          break;
       }
    }
-   table[id].next = firstFree;
-   firstFree = id;
+   mTable[id].next = mFirstFree;
+   mFirstFree = id;
 }
 
 void NetStringTable::repack()
 {
    DataChunker *newAllocator = new DataChunker(DataChunkerSize);
-   for(U32 walk = firstValid; walk; walk = table[walk].link)
+   for(U32 walk = mFirstValid; walk; walk = mTable[walk].link)
    {
-      const char *prevStr = table[walk].string;
+      const char *prevStr = mTable[walk].string;
 
 
-      table[walk].string = (char *) newAllocator->alloc(dStrlen(prevStr) + 1);
-      dStrcpy(table[walk].string, prevStr);
+      mTable[walk].string = (char *) newAllocator->alloc(dStrlen(prevStr) + 1);
+      dStrcpy(mTable[walk].string, prevStr);
    }
-   delete allocator;
-   allocator = newAllocator;
+   delete mAllocator;
+   mAllocator = newAllocator;
 }
 
 void NetStringTable::create()
@@ -249,21 +249,21 @@ void NetStringTable::dumpToConsole()
 {
    U32 count = 0;
    S32 maxIndex = -1;
-   for ( U32 i = 0; i < size; i++ )
+   for ( U32 i = 0; i < mSize; i++ )
    {
-      if ( table[i].refCount > 0 || table[i].scriptRefCount > 0)
+      if ( mTable[i].refCount > 0 || mTable[i].scriptRefCount > 0)
       {
-         Con::printf( "%d: \"%c%s%c\" REF: %d", i, 0x10, table[i].string, 0x11, table[i].refCount );
-         if ( maxIndex == -1 || table[i].refCount > table[maxIndex].refCount )
+         Con::printf( "%d: \"%c%s%c\" REF: %d", i, 0x10, mTable[i].string, 0x11, mTable[i].refCount );
+         if ( maxIndex == -1 || mTable[i].refCount > mTable[maxIndex].refCount )
             maxIndex = i;
          count++;
       }
    }
    Con::printf( ">> STRINGS: %d MAX REF COUNT: %d \"%c%s%c\" <<",
          count,
-         ( maxIndex == -1 ) ? 0 : table[maxIndex].refCount,
+         ( maxIndex == -1 ) ? 0 : mTable[maxIndex].refCount,
          0x10,
-         ( maxIndex == -1 ) ? "" : table[maxIndex].string,
+         ( maxIndex == -1 ) ? "" : mTable[maxIndex].string,
          0x11 );
 }
 

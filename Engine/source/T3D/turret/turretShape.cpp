@@ -823,8 +823,8 @@ void TurretShape::_updateNodes(const Point3F& rot)
    if (node != -1)
    {
       MatrixF* mat = &mShapeInstance->mNodeTransforms[node];
-      Point3F defaultPos = mShapeInstance->getShape()->defaultTranslations[node];
-      Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];
+      Point3F defaultPos = mShapeInstance->getShape()->mDefaultTranslations[node];
+      Quat16 defaultRot = mShapeInstance->getShape()->mDefaultRotations[node];
 
       QuatF qrot(zRot);
       qrot *= defaultRot.getQuatF();
@@ -837,8 +837,8 @@ void TurretShape::_updateNodes(const Point3F& rot)
    if (node != -1)
    {
       MatrixF* mat = &mShapeInstance->mNodeTransforms[node];
-      Point3F defaultPos = mShapeInstance->getShape()->defaultTranslations[node];
-      Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];
+      Point3F defaultPos = mShapeInstance->getShape()->mDefaultTranslations[node];
+      Quat16 defaultRot = mShapeInstance->getShape()->mDefaultRotations[node];
 
       QuatF qrot(xRot);
       qrot *= defaultRot.getQuatF();
@@ -853,8 +853,8 @@ void TurretShape::_updateNodes(const Point3F& rot)
       if (node != -1)
       {
          MatrixF* mat = &mShapeInstance->mNodeTransforms[node];
-         Point3F defaultPos = mShapeInstance->getShape()->defaultTranslations[node];
-         Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];         
+         Point3F defaultPos = mShapeInstance->getShape()->mDefaultTranslations[node];
+         Quat16 defaultRot = mShapeInstance->getShape()->mDefaultRotations[node];         
 
          QuatF qrot(xRot);
          qrot *= defaultRot.getQuatF();
@@ -866,8 +866,8 @@ void TurretShape::_updateNodes(const Point3F& rot)
       if (node != -1)
       {
          MatrixF* mat = &mShapeInstance->mNodeTransforms[node];
-         Point3F defaultPos = mShapeInstance->getShape()->defaultTranslations[node];
-         Quat16 defaultRot = mShapeInstance->getShape()->defaultRotations[node];
+         Point3F defaultPos = mShapeInstance->getShape()->mDefaultTranslations[node];
+         Quat16 defaultRot = mShapeInstance->getShape()->mDefaultRotations[node];
 
          QuatF qrot(zRot);
          qrot *= defaultRot.getQuatF();

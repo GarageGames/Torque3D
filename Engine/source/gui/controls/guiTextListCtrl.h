@@ -67,8 +67,8 @@ class GuiTextListCtrl : public GuiArrayCtrl
    DECLARE_CATEGORY( "Gui Lists" );
    DECLARE_DESCRIPTION( "A control that displays text in tabular form." );
    
-   DECLARE_CALLBACK( void, onSelect, (const char* cellid, const char* text));
-   DECLARE_CALLBACK( void, onDeleteKey, ( const char* id ));
+   DECLARE_CALLBACK( void, onSelect, (S32 cellid, const char* text));
+   DECLARE_CALLBACK( void, onDeleteKey, ( S32 id ));
 
    static void initPersistFields();
 

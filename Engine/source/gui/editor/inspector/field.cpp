@@ -269,7 +269,7 @@ void GuiInspectorField::setData( const char* data, bool callbacks )
          {
             char buffer[ 2048 ];
             expandEscape( buffer, newValue );
-            newValue = Con::evaluatef( "%%f = \"%s\"; return ( %s );", oldValue.c_str(), buffer );
+            newValue = (const char*)Con::evaluatef( "%%f = \"%s\"; return ( %s );", oldValue.c_str(), buffer );
          }
          else if(    type == TypeS32Vector
                   || type == TypeF32Vector

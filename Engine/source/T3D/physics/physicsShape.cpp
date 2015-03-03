@@ -698,7 +698,7 @@ bool PhysicsShape::_createShape()
       return false;
 
    // Set the world box.
-   mObjBox = db->shape->bounds;
+   mObjBox = db->shape->mBounds;
    resetWorldBox();
 
    // If this is the server and its a client only simulation

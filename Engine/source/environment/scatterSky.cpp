@@ -329,7 +329,7 @@ void ScatterSky::initPersistFields()
          "Affects the size of the sun's disk." );
 
       addField( "colorizeAmount",      TypeF32,    Offset( mColorizeAmt, ScatterSky ),
-         "Controls how much the the alpha component of colorize brigthens the sky. Setting to 0 returns default behavior." );
+         "Controls how much the alpha component of colorize brigthens the sky. Setting to 0 returns default behavior." );
 
       addField( "colorize",            TypeColorF, Offset( mColorize, ScatterSky ),
          "Tints the sky the color specified, the alpha controls the brigthness. The brightness is multipled by the value of colorizeAmt." );

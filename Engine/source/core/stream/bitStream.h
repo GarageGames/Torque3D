@@ -48,13 +48,13 @@ class QuatF;
 class BitStream : public Stream
 {
 protected:
-   U8 *dataPtr;
-   S32  bitNum;
-   S32  bufSize;
-   bool error;
-   S32  maxReadBitNum;
-   S32  maxWriteBitNum;
-   char *stringBuffer;
+   U8 *mDataPtr;
+   S32  mBitNum;
+   S32  mBufSize;
+   bool mError;
+   S32  mMaxReadBitNum;
+   S32  mMaxWriteBitNum;
+   char *mStringBuffer;
    Point3F mCompressPoint;
 
    friend class HuffmanProcessor;
@@ -63,7 +63,7 @@ public:
    static void sendPacketStream(const NetAddress *addr);
 
    void setBuffer(void *bufPtr, S32 bufSize, S32 maxSize = 0);
-   U8*  getBuffer() { return dataPtr; }
+   U8*  getBuffer() { return mDataPtr; }
    U8*  getBytePtr();
 
    U32 getReadByteSize();
@@ -83,7 +83,7 @@ public:
    S32 getBitPosition() const { return getCurPos(); }
    void clearStringBuffer();
 
-   BitStream(void *bufPtr, S32 bufSize, S32 maxWriteSize = -1) { setBuffer(bufPtr, bufSize,maxWriteSize); stringBuffer = NULL; }
+   BitStream(void *bufPtr, S32 bufSize, S32 maxWriteSize = -1) { setBuffer(bufPtr, bufSize,maxWriteSize); mStringBuffer = NULL; }
    void clear();
 
    void setStringBuffer(char buffer[256]);
@@ -241,8 +241,8 @@ public:
    void setBit(S32 bitCount, bool set);
    bool testBit(S32 bitCount);
 
-   bool isFull() { return bitNum > (bufSize << 3); }
-   bool isValid() { return !error; }
+   bool isFull() { return mBitNum > (mBufSize << 3); }
+   bool isValid() { return !mError; }
 
    bool _read (const U32 size,void* d);
    bool _write(const U32 size,const void* d);
@@ -313,26 +313,26 @@ public:
 //
 inline S32 BitStream::getCurPos() const
 {
-   return bitNum;
+   return mBitNum;
 }
 
 inline void BitStream::setCurPos(const U32 in_position)
 {
-   AssertFatal(in_position < (U32)(bufSize << 3), "Out of range bitposition");
-   bitNum = S32(in_position);
+   AssertFatal(in_position < (U32)(mBufSize << 3), "Out of range bitposition");
+   mBitNum = S32(in_position);
 }
 
 inline bool BitStream::readFlag()
 {
-   if(bitNum > maxReadBitNum)
+   if(mBitNum > mMaxReadBitNum)
    {
-      error = true;
+      mError = true;
       AssertFatal(false, "Out of range read");
       return false;
    }
-   S32 mask = 1 << (bitNum & 0x7);
-   bool ret = (*(dataPtr + (bitNum >> 3)) & mask) != 0;
-   bitNum++;
+   S32 mask = 1 << (mBitNum & 0x7);
+   bool ret = (*(mDataPtr + (mBitNum >> 3)) & mask) != 0;
+   mBitNum++;
    return ret;
 }
 

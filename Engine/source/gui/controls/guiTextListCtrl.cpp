@@ -52,7 +52,7 @@ ConsoleDocClass( GuiTextListCtrl,
 );
 
 
-IMPLEMENT_CALLBACK( GuiTextListCtrl, onSelect, void, (const char* cellid, const char* text),( cellid , text ),
+IMPLEMENT_CALLBACK( GuiTextListCtrl, onSelect, void, (S32 cellid, const char* text),( cellid , text ),
    "@brief Called whenever an item in the list is selected.\n\n"
    "@param cellid The ID of the cell that was selected\n"
    "@param text The text in the selected cel\n\n"
@@ -66,7 +66,7 @@ IMPLEMENT_CALLBACK( GuiTextListCtrl, onSelect, void, (const char* cellid, const 
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiTextListCtrl, onDeleteKey, void, ( const char* id ),( id ),
+IMPLEMENT_CALLBACK( GuiTextListCtrl, onDeleteKey, void, ( S32 id ),( id ),
    "@brief Called when the delete key has been pressed.\n\n"
    "@param id Id of the selected item in the list\n"
    "@tsexample\n"
@@ -172,7 +172,7 @@ bool GuiTextListCtrl::cellSelected(Point2I cell)
 
 void GuiTextListCtrl::onCellSelected(Point2I cell)
 {
-   onSelect_callback(Con::getIntArg(mList[cell.y].id), mList[cell.y].text);
+   onSelect_callback(mList[cell.y].id, mList[cell.y].text);
    execConsoleCallback();
 }
 
@@ -497,7 +497,7 @@ bool GuiTextListCtrl::onKeyDown( const GuiEvent &event )
       break;
    case KEY_DELETE:
       if ( mSelectedCell.y >= 0 && mSelectedCell.y < mList.size() )
-      onDeleteKey_callback(Con::getIntArg( mList[mSelectedCell.y].id ) );
+      onDeleteKey_callback( mList[mSelectedCell.y].id );
       break;
    default:
    return( Parent::onKeyDown( event ) );

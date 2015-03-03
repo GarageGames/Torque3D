@@ -622,7 +622,7 @@ bool NavMesh::build(bool background, bool saveIntermediates)
 
    if(!background)
    {
-      while(mDirtyTiles.size())
+      while(!mDirtyTiles.empty())
          buildNextTile();
    }
 
@@ -637,7 +637,7 @@ DefineEngineMethod(NavMesh, build, bool, (bool background, bool save), (true, fa
 
 void NavMesh::cancelBuild()
 {
-   while(mDirtyTiles.size()) mDirtyTiles.pop();
+   while(!mDirtyTiles.empty()) mDirtyTiles.pop();
    ctx->stopTimer(RC_TIMER_TOTAL);
    mBuilding = false;
 }
@@ -707,7 +707,7 @@ void NavMesh::updateTiles(bool dirty)
 
    mTiles.clear();
    mTileData.clear();
-   while(mDirtyTiles.size()) mDirtyTiles.pop();
+   while(!mDirtyTiles.empty()) mDirtyTiles.pop();
 
    const Box3F &box = DTStoRC(getWorldBox());
    if(box.isEmpty())
@@ -756,7 +756,7 @@ void NavMesh::processTick(const Move *move)
 
 void NavMesh::buildNextTile()
 {
-   if(mDirtyTiles.size())
+   if(!mDirtyTiles.empty())
    {
       // Pop a single dirty tile and process it.
       U32 i = mDirtyTiles.front();
@@ -794,7 +794,7 @@ void NavMesh::buildNextTile()
          }
       }
       // Did we just build the last tile?
-      if(!mDirtyTiles.size())
+      if(mDirtyTiles.empty())
       {
          ctx->stopTimer(RC_TIMER_TOTAL);
          if(getEventManager())

@@ -60,14 +60,14 @@ class NetStringTable
       U32 prevLink;
       U32 seq;
    };
-   U32 size;
-   U32 firstFree;
-   U32 firstValid;
-   U32 sequenceCount;
+   U32 mSize;
+   U32 mFirstFree;
+   U32 mFirstValid;
+   U32 mSequenceCount;
 
-   Entry *table;
-   U32 hashTable[HashTableSize];
-   DataChunker *allocator;
+   Entry *mTable;
+   U32 mHashTable[HashTableSize];
+   DataChunker *mAllocator;
 
     NetStringTable();
    ~NetStringTable();

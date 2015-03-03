@@ -95,11 +95,11 @@ ColladaShapeLoader::ColladaShapeLoader(domCOLLADA* _root)
    }
 
    // Set import options (if they are not set to override)
-   if (ColladaUtils::getOptions().unit <= 0.0f)
-      ColladaUtils::getOptions().unit = unit;
+   if (ColladaUtils::getOptions().mUnit <= 0.0f)
+      ColladaUtils::getOptions().mUnit = unit;
 
-   if (ColladaUtils::getOptions().upAxis == UPAXISTYPE_COUNT)
-      ColladaUtils::getOptions().upAxis = upAxis;
+   if (ColladaUtils::getOptions().mUpAxis == UPAXISTYPE_COUNT)
+      ColladaUtils::getOptions().mUpAxis = upAxis;
 }
 
 ColladaShapeLoader::~ColladaShapeLoader()
@@ -169,14 +169,14 @@ void ColladaShapeLoader::processAnimation(const domAnimation* anim, F32& maxEndT
          // @todo:don't care about the input param names for now. Could
          // validate against the target type....
          if (dStrEqual(input->getSemantic(), "INPUT")) {
-            data.input.initFromSource(source);
+            data.mInput.initFromSource(source);
             // Adjust the maximum sequence end time
-            maxEndTime = getMax(maxEndTime, data.input.getFloatValue((S32)data.input.size()-1));
+            maxEndTime = getMax(maxEndTime, data.mInput.getFloatValue((S32)data.mInput.size()-1));
 
             // Detect the frame rate (minimum time between keyframes)
-            for (S32 iFrame = 1; iFrame < data.input.size(); iFrame++)
+            for (S32 iFrame = 1; iFrame < data.mInput.size(); iFrame++)
             {
-               F32 delta = data.input.getFloatValue( iFrame ) - data.input.getFloatValue( iFrame-1 );
+               F32 delta = data.mInput.getFloatValue( iFrame ) - data.mInput.getFloatValue( iFrame-1 );
                if ( delta < 0 )
                {
                   daeErrorHandler::get()->handleError(avar("<animation> INPUT '%s' "
@@ -187,13 +187,13 @@ void ColladaShapeLoader::processAnimation(const domAnimation* anim, F32& maxEndT
             }
          }
          else if (dStrEqual(input->getSemantic(), "OUTPUT"))
-            data.output.initFromSource(source);
+            data.mOutput.initFromSource(source);
          else if (dStrEqual(input->getSemantic(), "IN_TANGENT"))
-            data.inTangent.initFromSource(source);
+            data.mInTangent.initFromSource(source);
          else if (dStrEqual(input->getSemantic(), "OUT_TANGENT"))
-            data.outTangent.initFromSource(source);
+            data.mOutTangent.initFromSource(source);
          else if (dStrEqual(input->getSemantic(), "INTERPOLATION"))
-            data.interpolation.initFromSource(source);
+            data.mInterpolation.initFromSource(source);
       }
 
       // Set initial value for visibility targets that were added automatically (in colladaUtils.cpp
@@ -201,11 +201,11 @@ void ColladaShapeLoader::processAnimation(const domAnimation* anim, F32& maxEndT
       {
          domAny* visTarget = daeSafeCast<domAny>(target);
          if (visTarget && dStrEqual(visTarget->getValue(), ""))
-            visTarget->setValue(avar("%g", data.output.getFloatValue(0)));
+            visTarget->setValue(avar("%g", data.mOutput.getFloatValue(0)));
       }
 
       // Ignore empty animations
-      if (data.input.size() == 0) {
+      if (data.mInput.size() == 0) {
          channel->setUserData(0);
          delete targetChannels->last();
          targetChannels->pop_back();
@@ -239,14 +239,14 @@ void ColladaShapeLoader::enumerateScene()
    for (S32 iClipLib = 0; iClipLib < root->getLibrary_animation_clips_array().getCount(); iClipLib++) {
       const domLibrary_animation_clips* libraryClips = root->getLibrary_animation_clips_array()[iClipLib];
       for (S32 iClip = 0; iClip < libraryClips->getAnimation_clip_array().getCount(); iClip++)
-         appSequences.push_back(new ColladaAppSequence(libraryClips->getAnimation_clip_array()[iClip]));
+         mAppSequences.push_back(new ColladaAppSequence(libraryClips->getAnimation_clip_array()[iClip]));
    }
 
    // Process all animations => this attaches animation channels to the targeted
    // Collada elements, and determines the length of the sequence if it is not
    // already specified in the Collada <animation_clip> element
-   for (S32 iSeq = 0; iSeq < appSequences.size(); iSeq++) {
-      ColladaAppSequence* appSeq = dynamic_cast<ColladaAppSequence*>(appSequences[iSeq]);
+   for (S32 iSeq = 0; iSeq < mAppSequences.size(); iSeq++) {
+      ColladaAppSequence* appSeq = dynamic_cast<ColladaAppSequence*>(mAppSequences[iSeq]);
       F32 maxEndTime = 0;
       F32 minFrameTime = 1000.0f;
       for (S32 iAnim = 0; iAnim < appSeq->getClip()->getInstance_animation_array().getCount(); iAnim++) {
@@ -260,7 +260,7 @@ void ColladaShapeLoader::enumerateScene()
       // Collada animations can be stored as sampled frames or true keyframes. For
       // sampled frames, use the same frame rate as the DAE file. For true keyframes,
       // resample at a fixed frame rate.
-      appSeq->fps = mClamp(1.0f / minFrameTime + 0.5f, TSShapeLoader::MinFrameRate, TSShapeLoader::MaxFrameRate);
+      appSeq->fps = mClamp(1.0f / minFrameTime + 0.5f, TSShapeLoader::smMinFrameRate, TSShapeLoader::smMaxFrameRate);
    }
 
    // First grab all of the top-level nodes
@@ -276,7 +276,7 @@ void ColladaShapeLoader::enumerateScene()
 
    // Set LOD option
    bool singleDetail = true;
-   switch (ColladaUtils::getOptions().lodType)
+   switch (ColladaUtils::getOptions().mLodType)
    {
       case ColladaUtils::ImportOptions::DetectDTS:
          // Check for a baseXX->startXX hierarchy at the top-level, if we find
@@ -307,7 +307,7 @@ void ColladaShapeLoader::enumerateScene()
          break;
    }
 
-   ColladaAppMesh::fixDetailSize( singleDetail, ColladaUtils::getOptions().singleDetailSize );
+   ColladaAppMesh::fixDetailSize( singleDetail, ColladaUtils::getOptions().mSingleDetailSize );
 
    // Process the top level nodes
    for (S32 iNode = 0; iNode < sceneNodes.size(); iNode++) {
@@ -317,7 +317,7 @@ void ColladaShapeLoader::enumerateScene()
    }
 
    // Make sure that the scene has a bounds node (for getting the root scene transform)
-   if (!boundsNode)
+   if (!mBoundsNode)
    {
       domVisual_scene* visualScene = root->getLibrary_visual_scenes_array()[0]->getVisual_scene_array()[0];
       domNode* dombounds = daeSafeCast<domNode>( visualScene->createAndPlace( "node" ) );
@@ -330,18 +330,18 @@ void ColladaShapeLoader::enumerateScene()
 
 bool ColladaShapeLoader::ignoreNode(const String& name)
 {
-   if (FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().alwaysImport, name, false))
+   if (FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().mAlwaysImport, name, false))
       return false;
    else
-      return FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().neverImport, name, false);
+      return FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().mNeverImport, name, false);
 }
 
 bool ColladaShapeLoader::ignoreMesh(const String& name)
 {
-   if (FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().alwaysImportMesh, name, false))
+   if (FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().mAlwaysImportMesh, name, false))
       return false;
    else
-      return FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().neverImportMesh, name, false);
+      return FindMatch::isMatchMultipleExprs(ColladaUtils::getOptions().mNeverImportMesh, name, false);
 }
 
 void ColladaShapeLoader::computeBounds(Box3F& bounds)
@@ -350,17 +350,17 @@ void ColladaShapeLoader::computeBounds(Box3F& bounds)
 
    // Check if the model origin needs adjusting
    if ( bounds.isValidBox() &&
-       (ColladaUtils::getOptions().adjustCenter ||
-        ColladaUtils::getOptions().adjustFloor) )
+       (ColladaUtils::getOptions().mAdjustCenter ||
+        ColladaUtils::getOptions().mAdjustFloor) )
    {
       // Compute shape offset
       Point3F shapeOffset = Point3F::Zero;
-      if ( ColladaUtils::getOptions().adjustCenter )
+      if ( ColladaUtils::getOptions().mAdjustCenter )
       {
          bounds.getCenter( &shapeOffset );
          shapeOffset = -shapeOffset;
       }
-      if ( ColladaUtils::getOptions().adjustFloor )
+      if ( ColladaUtils::getOptions().mAdjustFloor )
          shapeOffset.z = -bounds.minExtents.z;
 
       // Adjust bounds
@@ -368,24 +368,24 @@ void ColladaShapeLoader::computeBounds(Box3F& bounds)
       bounds.maxExtents += shapeOffset;
 
       // Now adjust all positions for root level nodes (nodes with no parent)
-      for (S32 iNode = 0; iNode < shape->nodes.size(); iNode++)
+      for (S32 iNode = 0; iNode < mShape->mNodes.size(); iNode++)
       {
-         if ( !appNodes[iNode]->isParentRoot() )
+         if ( !mAppNodes[iNode]->isParentRoot() )
             continue;
 
          // Adjust default translation
-         shape->defaultTranslations[iNode] += shapeOffset;
+         mShape->mDefaultTranslations[iNode] += shapeOffset;
 
          // Adjust animated translations
-         for (S32 iSeq = 0; iSeq < shape->sequences.size(); iSeq++)
+         for (S32 iSeq = 0; iSeq < mShape->mSequences.size(); iSeq++)
          {
-            const TSShape::Sequence& seq = shape->sequences[iSeq];
+            const TSShape::Sequence& seq = mShape->mSequences[iSeq];
             if ( seq.translationMatters.test(iNode) )
             {
                for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
                {
                   S32 index = seq.baseTranslation + seq.translationMatters.count(iNode)*seq.numKeyframes + iFrame;
-                  shape->nodeTranslations[index] += shapeOffset;
+                  mShape->mNodeTranslations[index] += shapeOffset;
                }
             }
          }
@@ -457,7 +457,7 @@ void copySketchupTexture(const Torque::Path &path, String &textureFilename)
 void updateMaterialsScript(const Torque::Path &path, bool copyTextures = false)
 {
 #ifdef DAE2DTS_TOOL
-   if (!ColladaUtils::getOptions().forceUpdateMaterials)
+   if (!ColladaUtils::getOptions().mForceUpdateMaterials)
       return;
 #endif
 
@@ -467,16 +467,16 @@ void updateMaterialsScript(const Torque::Path &path, bool copyTextures = false)
 
    // First see what materials we need to update
    PersistenceManager persistMgr;
-   for ( U32 iMat = 0; iMat < AppMesh::appMaterials.size(); iMat++ )
+   for ( U32 iMat = 0; iMat < AppMesh::mAppMaterials.size(); iMat++ )
    {
-      ColladaAppMaterial *mat = dynamic_cast<ColladaAppMaterial*>( AppMesh::appMaterials[iMat] );
+      ColladaAppMaterial *mat = dynamic_cast<ColladaAppMaterial*>( AppMesh::mAppMaterials[iMat] );
       if ( mat )
       {
          Material *mappedMat;
          if ( Sim::findObject( MATMGR->getMapEntry( mat->getName() ), mappedMat ) )
          {
             // Only update existing materials if forced to
-            if ( ColladaUtils::getOptions().forceUpdateMaterials )
+            if ( ColladaUtils::getOptions().mForceUpdateMaterials )
                persistMgr.setDirty( mappedMat );
          }
          else
@@ -686,8 +686,8 @@ TSShape* loadColladaShape(const Torque::Path &path)
 
 #ifdef DAE2DTS_TOOL
       // Command line overrides certain options
-      ColladaUtils::getOptions().forceUpdateMaterials = cmdLineOptions.forceUpdateMaterials;
-      ColladaUtils::getOptions().useDiffuseNames = cmdLineOptions.useDiffuseNames;
+      ColladaUtils::getOptions().mForceUpdateMaterials = cmdLineOptions.mForceUpdateMaterials;
+      ColladaUtils::getOptions().mUseDiffuseNames = cmdLineOptions.mUseDiffuseNames;
 #endif
    }
 

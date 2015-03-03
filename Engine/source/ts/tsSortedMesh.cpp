@@ -80,16 +80,16 @@ bool TSSortedMesh::buildConvexHull()
 S32 TSSortedMesh::getNumPolys()
 {
    S32 count = 0;
-   S32 cIdx = !clusters.size() ? -1 : 0;
+   S32 cIdx = !mClusters.size() ? -1 : 0;
    while (cIdx>=0)
    {
-      Cluster & cluster = clusters[cIdx];
+      Cluster & cluster = mClusters[cIdx];
       for (S32 i=cluster.startPrimitive; i<cluster.endPrimitive; i++)
       {
-         if (primitives[i].matIndex & TSDrawPrimitive::Triangles)
-            count += primitives[i].numElements / 3;
+         if (mPrimitives[i].matIndex & TSDrawPrimitive::Triangles)
+            count += mPrimitives[i].numElements / 3;
          else
-            count += primitives[i].numElements - 2;
+            count += mPrimitives[i].numElements - 2;
       }
       cIdx = cluster.frontCluster; // always use frontCluster...we assume about the same no matter what
    }
@@ -117,25 +117,25 @@ void TSSortedMesh::assemble(bool skip)
 
    S32 numClusters = tsalloc.get32();
    S32 * ptr32 = tsalloc.copyToShape32(numClusters*8);
-   clusters.set(ptr32,numClusters);
+   mClusters.set(ptr32,numClusters);
 
    S32 sz = tsalloc.get32();
    ptr32 = tsalloc.copyToShape32(sz);
-   startCluster.set(ptr32,sz);
+   mStartCluster.set(ptr32,sz);
 
    sz = tsalloc.get32();
    ptr32 = tsalloc.copyToShape32(sz);
-   firstVerts.set(ptr32,sz);
+   mFirstVerts.set(ptr32,sz);
 
    sz = tsalloc.get32();
    ptr32 = tsalloc.copyToShape32(sz);
-   numVerts.set(ptr32,sz);
+   mNumVerts.set(ptr32,sz);
 
    sz = tsalloc.get32();
    ptr32 = tsalloc.copyToShape32(sz);
-   firstTVerts.set(ptr32,sz);
+   mFirstTVerts.set(ptr32,sz);
 
-   alwaysWriteDepth = tsalloc.get32()!=0;
+   mAlwaysWriteDepth = tsalloc.get32()!=0;
 
    tsalloc.checkGuard();
 }
@@ -144,22 +144,22 @@ void TSSortedMesh::disassemble()
 {
    TSMesh::disassemble();
 
-   tsalloc.set32(clusters.size());
-   tsalloc.copyToBuffer32((S32*)clusters.address(),clusters.size()*8);
+   tsalloc.set32(mClusters.size());
+   tsalloc.copyToBuffer32((S32*)mClusters.address(),mClusters.size()*8);
 
-   tsalloc.set32(startCluster.size());
-   tsalloc.copyToBuffer32((S32*)startCluster.address(),startCluster.size());
+   tsalloc.set32(mStartCluster.size());
+   tsalloc.copyToBuffer32((S32*)mStartCluster.address(),mStartCluster.size());
 
-   tsalloc.set32(firstVerts.size());
-   tsalloc.copyToBuffer32((S32*)firstVerts.address(),firstVerts.size());
+   tsalloc.set32(mFirstVerts.size());
+   tsalloc.copyToBuffer32((S32*)mFirstVerts.address(),mFirstVerts.size());
 
-   tsalloc.set32(numVerts.size());
-   tsalloc.copyToBuffer32((S32*)numVerts.address(),numVerts.size());
+   tsalloc.set32(mNumVerts.size());
+   tsalloc.copyToBuffer32((S32*)mNumVerts.address(),mNumVerts.size());
 
-   tsalloc.set32(firstTVerts.size());
-   tsalloc.copyToBuffer32((S32*)firstTVerts.address(),firstTVerts.size());
+   tsalloc.set32(mFirstTVerts.size());
+   tsalloc.copyToBuffer32((S32*)mFirstTVerts.address(),mFirstTVerts.size());
 
-   tsalloc.set32(alwaysWriteDepth ? 1 : 0);
+   tsalloc.set32(mAlwaysWriteDepth ? 1 : 0);
 
    tsalloc.setGuard();
 }

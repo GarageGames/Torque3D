@@ -151,7 +151,7 @@ class Namespace
          void clear();
 
          ///
-         const char *execute( S32 argc, ConsoleValueRef* argv, ExprEvalState* state );
+         ConsoleValueRef execute( S32 argc, ConsoleValueRef* argv, ExprEvalState* state );
          
          /// Return a one-line documentation text string for the function.
          String getBriefDescription( String* outRemainingDocText = NULL ) const;
@@ -367,6 +367,22 @@ public:
             notify->trigger();
       }
 
+      void setStringStackPtrValue(StringStackPtr newValue)
+      {
+         if( mIsConstant )
+         {
+            Con::errorf( "Cannot assign value to constant '%s'.", name );
+            return;
+         }
+         
+         value.setStringStackPtrValue(newValue);
+         
+         
+         // Fire off the notification if we have one.
+         if ( notify )
+            notify->trigger();
+      }
+
       void setStringValue(const char *newValue)
       {
          if( mIsConstant )
@@ -495,6 +511,7 @@ public:
    void setIntVariable(S32 val);
    void setFloatVariable(F64 val);
    void setStringVariable(const char *str);
+   void setStringStackPtrVariable(StringStackPtr str);
    void setCopyVariable();
 
    void pushFrame(StringTableEntry frameName, Namespace *ns);

@@ -421,6 +421,7 @@ StringTableEntry Platform::makeRelativePathName(const char *path, const char *to
 
    else
    {
+      // FIXME: This condition is clearly wrong
       if((*pathPtr == 0 && *toPtr == '/') || (*toPtr == '/' && *pathPtr == 0))
          branch = pathPtr;
 

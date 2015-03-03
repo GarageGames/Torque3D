@@ -24,6 +24,7 @@
 #include "lighting/common/sceneLighting.h"
 
 #include "T3D/gameBase/gameConnection.h"
+#include "console/engineAPI.h"
 #include "console/consoleTypes.h"
 #include "scene/sceneManager.h"
 #include "lighting/common/shadowVolumeBSP.h"
@@ -605,7 +606,7 @@ void SceneLighting::completed(bool success)
    }
 
    if(gCompleteCallback && gCompleteCallback[0])
-      Con::executef(gCompleteCallback);
+      Con::executef((const char*)gCompleteCallback);
 
    dFree(gCompleteCallback);
    gCompleteCallback = NULL;

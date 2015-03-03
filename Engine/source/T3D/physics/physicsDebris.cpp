@@ -358,7 +358,7 @@ bool PhysicsDebris::onAdd()
    }
 
    // Setup our bounding box
-   mObjBox = mDataBlock->shape->bounds;   
+   mObjBox = mDataBlock->shape->mBounds;   
    resetWorldBox();
 
    // Add it to the client scene.
@@ -696,20 +696,20 @@ void PhysicsDebris::_findNodes( U32 colNode, Vector<U32> &nodeIds )
    // 2. Collision node is a child of its visible mesh node
 
    TSShape *shape = mDataBlock->shape;
-   S32 itr = shape->nodes[colNode].parentIndex;
-   itr = shape->nodes[itr].firstChild;
+   S32 itr = shape->mNodes[colNode].parentIndex;
+   itr = shape->mNodes[itr].firstChild;
 
    while ( itr != -1 )
    {
       if ( itr != colNode )
          nodeIds.push_back(itr);
-      itr = shape->nodes[itr].nextSibling;
+      itr = shape->mNodes[itr].nextSibling;
    }
 
    // If we didn't find any siblings of the collision node we assume
    // it is case #2 and the collision nodes direct parent is the visible mesh.
-   if ( nodeIds.size() == 0 && shape->nodes[colNode].parentIndex != -1 )
-      nodeIds.push_back( shape->nodes[colNode].parentIndex );
+   if ( nodeIds.size() == 0 && shape->mNodes[colNode].parentIndex != -1 )
+      nodeIds.push_back( shape->mNodes[colNode].parentIndex );
 }
 
 extern bool gEditingMission;

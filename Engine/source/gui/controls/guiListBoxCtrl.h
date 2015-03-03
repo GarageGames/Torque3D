@@ -57,10 +57,10 @@ public:
 
    DECLARE_CALLBACK( void, onMouseDragged, ());
    DECLARE_CALLBACK( void, onClearSelection, ());
-   DECLARE_CALLBACK( void, onUnSelect, ( const char* index, const char* itemText));
-   DECLARE_CALLBACK( void, onSelect, ( const char* index , const char* itemText ));
+   DECLARE_CALLBACK( void, onUnSelect, ( S32 index, const char* itemText));
+   DECLARE_CALLBACK( void, onSelect, ( S32 index , const char* itemText ));
    DECLARE_CALLBACK( void, onDoubleClick, ());
-   DECLARE_CALLBACK( void, onMouseUp, (const char* itemHit, const char* mouseClickCount));
+   DECLARE_CALLBACK( void, onMouseUp, ( S32 itemHit, S32 mouseClickCount ));
    DECLARE_CALLBACK( void, onDeleteKey, ());
    DECLARE_CALLBACK( bool, isObjectMirrored, ( const char* indexIdString ));
 

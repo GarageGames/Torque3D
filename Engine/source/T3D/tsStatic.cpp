@@ -334,7 +334,7 @@ bool TSStatic::_createShape()
          NetConnection::filesWereDownloaded() )
       return false;
 
-   mObjBox = mShape->bounds;
+   mObjBox = mShape->mBounds;
    resetWorldBox();
 
    mShapeInstance = new TSShapeInstance( mShape, isClientObject() );
@@ -391,7 +391,7 @@ void TSStatic::_updatePhysics()
    if ( mCollisionType == Bounds )
    {
       MatrixF offset( true );
-      offset.setPosition( mShape->center );
+      offset.setPosition( mShape->mCenter );
       colShape = PHYSICSMGR->createCollision();
       colShape->addBox( getObjBox().getExtents() * 0.5f * mObjScale, offset );         
    }
@@ -960,31 +960,31 @@ void TSStatic::buildConvex(const Box3F& box, Convex* convex)
 SceneObject* TSStaticPolysoupConvex::smCurObject = NULL;
 
 TSStaticPolysoupConvex::TSStaticPolysoupConvex()
-:  box( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f ),
-   normal( 0.0f, 0.0f, 0.0f, 0.0f ),
-   idx( 0 ),
-   mesh( NULL )
+:  mBox( 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f ),
+   mNormal( 0.0f, 0.0f, 0.0f, 0.0f ),
+   mIdx( 0 ),
+   mMesh( NULL )
 {
    mType = TSPolysoupConvexType;
 
    for ( U32 i = 0; i < 4; ++i )
    {
-      verts[i].set( 0.0f, 0.0f, 0.0f );
+      mVerts[i].set( 0.0f, 0.0f, 0.0f );
    }
 }
 
 Point3F TSStaticPolysoupConvex::support(const VectorF& vec) const
 {
-   F32 bestDot = mDot( verts[0], vec );
+   F32 bestDot = mDot( mVerts[0], vec );
 
-   const Point3F *bestP = &verts[0];
+   const Point3F *bestP = &mVerts[0];
    for(S32 i=1; i<4; i++)
    {
-      F32 newD = mDot(verts[i], vec);
+      F32 newD = mDot(mVerts[i], vec);
       if(newD > bestDot)
       {
          bestDot = newD;
-         bestP = &verts[i];
+         bestP = &mVerts[i];
       }
    }
 
@@ -993,7 +993,7 @@ Point3F TSStaticPolysoupConvex::support(const VectorF& vec) const
 
 Box3F TSStaticPolysoupConvex::getBoundingBox() const
 {
-   Box3F wbox = box;
+   Box3F wbox = mBox;
    wbox.minExtents.convolve( mObject->getScale() );
    wbox.maxExtents.convolve( mObject->getScale() );
    mObject->getTransform().mul(wbox);
@@ -1003,7 +1003,7 @@ Box3F TSStaticPolysoupConvex::getBoundingBox() const
 Box3F TSStaticPolysoupConvex::getBoundingBox(const MatrixF& mat, const Point3F& scale) const
 {
    AssertISV(false, "TSStaticPolysoupConvex::getBoundingBox(m,p) - Not implemented. -- XEA");
-   return box;
+   return mBox;
 }
 
 void TSStaticPolysoupConvex::getPolyList(AbstractPolyList *list)
@@ -1015,11 +1015,11 @@ void TSStaticPolysoupConvex::getPolyList(AbstractPolyList *list)
    list->setObject(mObject);
 
    // Add only the original collision triangle
-   S32 base =  list->addPoint(verts[0]);
-               list->addPoint(verts[2]);
-               list->addPoint(verts[1]);
+   S32 base =  list->addPoint(mVerts[0]);
+               list->addPoint(mVerts[2]);
+               list->addPoint(mVerts[1]);
 
-   list->begin(0, (U32)idx ^ (uintptr_t)mesh);
+   list->begin(0, (U32)mIdx ^ (uintptr_t)mMesh);
    list->vertex(base + 2);
    list->vertex(base + 1);
    list->vertex(base + 0);
@@ -1035,10 +1035,10 @@ void TSStaticPolysoupConvex::getFeatures(const MatrixF& mat,const VectorF& n, Co
    // For a tetrahedron this is pretty easy... first
    // convert everything into world space.
    Point3F tverts[4];
-   mat.mulP(verts[0], &tverts[0]);
-   mat.mulP(verts[1], &tverts[1]);
-   mat.mulP(verts[2], &tverts[2]);
-   mat.mulP(verts[3], &tverts[3]);
+   mat.mulP(mVerts[0], &tverts[0]);
+   mat.mulP(mVerts[1], &tverts[1]);
+   mat.mulP(mVerts[2], &tverts[2]);
+   mat.mulP(mVerts[3], &tverts[3]);
 
    // points...
    S32 firstVert = cf->mVertexList.size();
@@ -1172,7 +1172,7 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
    }
 
    // Check the mapTo name exists for this shape
-   S32 matIndex = object->getShape()->materialList->getMaterialNameList().find_next(String(mapTo));
+   S32 matIndex = object->getShape()->mMaterialList->getMaterialNameList().find_next(String(mapTo));
    if (matIndex < 0)
    {
       Con::errorf("TSShape::changeMaterial failed: Invalid mapTo name '%s'", mapTo);
@@ -1190,13 +1190,13 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
 
    // Replace instances with the new material being traded in. Lets make sure that we only
    // target the specific targets per inst, this is actually doing more than we thought
-   delete object->getShape()->materialList->mMatInstList[matIndex];
-   object->getShape()->materialList->mMatInstList[matIndex] = newMat->createMatInstance();
+   delete object->getShape()->mMaterialList->mMatInstList[matIndex];
+   object->getShape()->mMaterialList->mMatInstList[matIndex] = newMat->createMatInstance();
 
    // Finish up preparing the material instances for rendering
    const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPNTTB>();
    FeatureSet features = MATMGR->getDefaultFeatures();
-   object->getShape()->materialList->getMaterialInst(matIndex)->init( features, flags );
+   object->getShape()->mMaterialList->getMaterialInst(matIndex)->init( features, flags );
 }
 
 DefineEngineMethod( TSStatic, getModelFile, const char *, (),,
