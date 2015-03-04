@@ -63,6 +63,8 @@
    #include "console/dynamicTypes.h"
 #endif
 
+// Need full definition visible for SimObjectPtr<ParticleEmitter>
+#include "T3D/fx/particleEmitter.h"
 
 class GFXCubemap;
 class TSShapeInstance;
@@ -70,8 +72,6 @@ class SceneRenderState;
 class TSThread;
 class GameConnection;
 struct CameraScopeQuery;
-class ParticleEmitter;
-class ParticleEmitterData;
 class ProjectileData;
 class ExplosionData;
 struct DebrisData;
