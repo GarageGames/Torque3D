@@ -1409,9 +1409,9 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
          if( ( subPath  && ( dStrncmp( subPath, "", 1 ) != 0 ) ))
          {
             if( subTrail == '/' )
-               dSprintf(search, search.size, "%s%s", subPath, fileName);
+               dSprintf(search, search.size, "%s%s", subPath, fileName.ptr);
             else
-               dSprintf(search, search.size, "%s/%s", subPath, fileName);
+               dSprintf(search, search.size, "%s/%s", subPath, fileName.ptr);
             char* child = search;
 
             if( currentDepth < recurseDepth || recurseDepth == -1 )
@@ -1425,7 +1425,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
                child = fileName;
             else
             {
-               dSprintf(search, search.size, "/%s", fileName);
+               dSprintf(search, search.size, "/%s", fileName.ptr);
                child = search;
             }
 
