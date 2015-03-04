@@ -501,8 +501,8 @@ void Win32WindowManager::lowerCurtain()
 
    // Get the monitor's extents.
    MONITORINFO monInfo;
-   dMemset(&monInfo, 0, sizeof MONITORINFO);
-   monInfo.cbSize = sizeof MONITORINFO;
+   dMemset(&monInfo, 0, sizeof(MONITORINFO));
+   monInfo.cbSize = sizeof(MONITORINFO);
 
    GetMonitorInfo(hMon, &monInfo);
  
