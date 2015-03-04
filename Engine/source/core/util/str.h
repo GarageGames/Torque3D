@@ -292,10 +292,9 @@ private:
    // causes an ambiguous cast compile error.  Making it private is simply
    // more insurance that it isn't used on different compilers.
    // NOTE: disable on GCC since it causes hyper casting to U32 on gcc.
-#ifndef TORQUE_COMPILER_GCC
+#if !defined(TORQUE_COMPILER_GCC) && !defined(__clang__)
    operator const bool() const { return false; }
 #endif
-
 
    static void copy(StringChar *dst, const StringChar *src, U32 size);
 
