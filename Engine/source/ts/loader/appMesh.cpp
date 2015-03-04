@@ -23,10 +23,10 @@
 #include "ts/loader/appMesh.h"
 #include "ts/loader/tsShapeLoader.h"
 
-Vector<AppMaterial*> AppMesh::mAppMaterials;
+Vector<AppMaterial*> AppMesh::appMaterials;
 
 AppMesh::AppMesh()
-   : mFlags(0), mNumFrames(0), mNumMatFrames(0), mVertsPerFrame(0)
+   : flags(0), numFrames(0), numMatFrames(0), vertsPerFrame(0)
 {
 }
 
@@ -44,43 +44,43 @@ void AppMesh::computeBounds(Box3F& bounds)
 
       // Setup bone transforms
       Vector<MatrixF> boneTransforms;
-      boneTransforms.setSize( mNodeIndex.size() );
+      boneTransforms.setSize( nodeIndex.size() );
       for (S32 iBone = 0; iBone < boneTransforms.size(); iBone++)
       {
-         MatrixF nodeMat = mBones[iBone]->getNodeTransform( TSShapeLoader::smDefaultTime );
+         MatrixF nodeMat = bones[iBone]->getNodeTransform( TSShapeLoader::DefaultTime );
          TSShapeLoader::zapScale(nodeMat);
-         boneTransforms[iBone].mul( nodeMat, mInitialTransforms[iBone] );
+         boneTransforms[iBone].mul( nodeMat, initialTransforms[iBone] );
       }
 
       // Multiply verts by weighted bone transforms
-      for (S32 iVert = 0; iVert < mInitialVerts.size(); iVert++)
-         mPoints[iVert].set( Point3F::Zero );
+      for (S32 iVert = 0; iVert < initialVerts.size(); iVert++)
+         points[iVert].set( Point3F::Zero );
 
-      for (S32 iWeight = 0; iWeight < mVertexIndex.size(); iWeight++)
+      for (S32 iWeight = 0; iWeight < vertexIndex.size(); iWeight++)
       {
-         const S32& vertIndex = mVertexIndex[iWeight];
-         const MatrixF& deltaTransform = boneTransforms[ mBoneIndex[iWeight] ];
+         const S32& vertIndex = vertexIndex[iWeight];
+         const MatrixF& deltaTransform = boneTransforms[ boneIndex[iWeight] ];
 
          Point3F v;
-         deltaTransform.mulP( mInitialVerts[vertIndex], &v );
-         v *= mWeight[iWeight];
+         deltaTransform.mulP( initialVerts[vertIndex], &v );
+         v *= weight[iWeight];
 
-         mPoints[vertIndex] += v;
+         points[vertIndex] += v;
       }
 
       // compute bounds for the skinned mesh
-      for (S32 iVert = 0; iVert < mInitialVerts.size(); iVert++)
-         bounds.extend( mPoints[iVert] );
+      for (S32 iVert = 0; iVert < initialVerts.size(); iVert++)
+         bounds.extend( points[iVert] );
    }
    else
    {
-      MatrixF transform = getMeshTransform(TSShapeLoader::smDefaultTime);
+      MatrixF transform = getMeshTransform(TSShapeLoader::DefaultTime);
       TSShapeLoader::zapScale(transform);
 
-      for (S32 iVert = 0; iVert < mPoints.size(); iVert++)
+      for (S32 iVert = 0; iVert < points.size(); iVert++)
       {
          Point3F p;
-         transform.mulP(mPoints[iVert], &p);
+         transform.mulP(points[iVert], &p);
          bounds.extend(p);
       }
    }
@@ -89,39 +89,39 @@ void AppMesh::computeBounds(Box3F& bounds)
 void AppMesh::computeNormals()
 {
    // Clear normals
-   mNormals.setSize( mPoints.size() );
-   for (S32 iNorm = 0; iNorm < mNormals.size(); iNorm++)
-      mNormals[iNorm] = Point3F::Zero;
+   normals.setSize( points.size() );
+   for (S32 iNorm = 0; iNorm < normals.size(); iNorm++)
+      normals[iNorm] = Point3F::Zero;
 
    // Sum triangle normals for each vertex
-   for (S32 iPrim = 0; iPrim < mPrimitives.size(); iPrim++)
+   for (S32 iPrim = 0; iPrim < primitives.size(); iPrim++)
    {
-      const TSDrawPrimitive& prim = mPrimitives[iPrim];
+      const TSDrawPrimitive& prim = primitives[iPrim];
 
       for (S32 iInd = 0; iInd < prim.numElements; iInd += 3)
       {
          // Compute the normal for this triangle
-         S32 idx0 = mIndices[prim.start + iInd + 0];
-         S32 idx1 = mIndices[prim.start + iInd + 1];
-         S32 idx2 = mIndices[prim.start + iInd + 2];
+         S32 idx0 = indices[prim.start + iInd + 0];
+         S32 idx1 = indices[prim.start + iInd + 1];
+         S32 idx2 = indices[prim.start + iInd + 2];
 
-         const Point3F& v0 = mPoints[idx0];
-         const Point3F& v1 = mPoints[idx1];
-         const Point3F& v2 = mPoints[idx2];
+         const Point3F& v0 = points[idx0];
+         const Point3F& v1 = points[idx1];
+         const Point3F& v2 = points[idx2];
 
          Point3F n;
          mCross(v2 - v0, v1 - v0, &n);
          n.normalize();    // remove this to use 'weighted' normals (large triangles will have more effect)
 
-         mNormals[idx0] += n;
-         mNormals[idx1] += n;
-         mNormals[idx2] += n;
+         normals[idx0] += n;
+         normals[idx1] += n;
+         normals[idx2] += n;
       }
    }
 
    // Normalize the vertex normals (this takes care of averaging the triangle normals)
-   for (S32 iNorm = 0; iNorm < mNormals.size(); iNorm++)
-      mNormals[iNorm].normalize();
+   for (S32 iNorm = 0; iNorm < normals.size(); iNorm++)
+      normals[iNorm].normalize();
 }
 
 TSMesh* AppMesh::constructTSMesh()
@@ -133,13 +133,13 @@ TSMesh* AppMesh::constructTSMesh()
       tsmesh = tsskin;
 
       // Copy skin elements
-      tsskin->mWeight = mWeight;
-      tsskin->mBoneIndex = mBoneIndex;
-      tsskin->mVertexIndex = mVertexIndex;
-      tsskin->mBatchData.nodeIndex = mNodeIndex;
-      tsskin->mBatchData.initialTransforms = mInitialTransforms;
-      tsskin->mBatchData.initialVerts = mInitialVerts;
-      tsskin->mBatchData.initialNorms = mInitialNorms;
+      tsskin->weight = weight;
+      tsskin->boneIndex = boneIndex;
+      tsskin->vertexIndex = vertexIndex;
+      tsskin->batchData.nodeIndex = nodeIndex;
+      tsskin->batchData.initialTransforms = initialTransforms;
+      tsskin->batchData.initialVerts = initialVerts;
+      tsskin->batchData.initialNorms = initialNorms;
    }
    else
    {
@@ -147,22 +147,22 @@ TSMesh* AppMesh::constructTSMesh()
    }
 
    // Copy mesh elements
-   tsmesh->mVerts = mPoints;
-   tsmesh->mNorms = mNormals;
-   tsmesh->mTVerts = mUVs;
-   tsmesh->mPrimitives = mPrimitives;
-   tsmesh->mIndices = mIndices;
-   tsmesh->mColors = mColors;
-   tsmesh->mTVerts2 = mUV2s;
+   tsmesh->verts = points;
+   tsmesh->norms = normals;
+   tsmesh->tverts = uvs;
+   tsmesh->primitives = primitives;
+   tsmesh->indices = indices;
+   tsmesh->colors = colors;
+   tsmesh->tverts2 = uv2s;
 
    // Finish initializing the shape
-   tsmesh->setFlags(mFlags);
+   tsmesh->setFlags(flags);
    tsmesh->computeBounds();
-   tsmesh->mNumFrames = mNumFrames;
-   tsmesh->mNumMatFrames = mNumMatFrames;
-   tsmesh->mVertsPerFrame = mVertsPerFrame;
-   tsmesh->createTangents(tsmesh->mVerts, tsmesh->mNorms);
-   tsmesh->mEncodedNorms.set(NULL,0);
+   tsmesh->numFrames = numFrames;
+   tsmesh->numMatFrames = numMatFrames;
+   tsmesh->vertsPerFrame = vertsPerFrame;
+   tsmesh->createTangents(tsmesh->verts, tsmesh->norms);
+   tsmesh->encodedNorms.set(NULL,0);
 
    return tsmesh;
 }

@@ -76,20 +76,20 @@ namespace ColladaUtils
          NumLodTypes
       };
 
-      domUpAxisType  mUpAxis;             // Override for the collada <up_axis> element
-      F32            mUnit;               // Override for the collada <unit> element
-      eLodType       mLodType;            // LOD type option
-      S32            mSingleDetailSize;   // Detail size for all meshes in the model
-      String         mMatNamePrefix;      // Prefix to apply to collada material names
-      String         mAlwaysImport;       // List of node names (with wildcards) to import, even if in the neverImport list
-      String         mNeverImport;        // List of node names (with wildcards) to ignore on loading
-      String         mAlwaysImportMesh;   // List of mesh names (with wildcards) to import, even if in the neverImportMesh list
-      String         mNeverImportMesh;    // List of mesh names (with wildcards) to ignore on loading
-      bool           mIgnoreNodeScale;    // Ignore <scale> elements in <node>s
-      bool           mAdjustCenter;       // Translate model so origin is at the center
-      bool           mAdjustFloor;        // Translate model so origin is at the bottom
-      bool           mForceUpdateMaterials;  // Force update of materials.cs
-      bool           mUseDiffuseNames;    // Use diffuse texture as the material name
+      domUpAxisType  upAxis;           // Override for the collada <up_axis> element
+      F32            unit;             // Override for the collada <unit> element
+      eLodType       lodType;          // LOD type option
+      S32            singleDetailSize; // Detail size for all meshes in the model
+      String         matNamePrefix;    // Prefix to apply to collada material names
+      String         alwaysImport;     // List of node names (with wildcards) to import, even if in the neverImport list
+      String         neverImport;      // List of node names (with wildcards) to ignore on loading
+      String         alwaysImportMesh; // List of mesh names (with wildcards) to import, even if in the neverImportMesh list
+      String         neverImportMesh;  // List of mesh names (with wildcards) to ignore on loading
+      bool           ignoreNodeScale;  // Ignore <scale> elements in <node>s
+      bool           adjustCenter;     // Translate model so origin is at the center
+      bool           adjustFloor;      // Translate model so origin is at the bottom
+      bool           forceUpdateMaterials;   // Force update of materials.cs
+      bool           useDiffuseNames;  // Use diffuse texture as the material name
 
       ImportOptions()
       {
@@ -98,20 +98,20 @@ namespace ColladaUtils
 
       void reset()
       {
-         mUpAxis = UPAXISTYPE_COUNT;
-         mUnit = -1.0f;
-         mLodType = DetectDTS;
-         mSingleDetailSize = 2;
-         mMatNamePrefix = "";
-         mAlwaysImport = "";
-         mNeverImport = "";
-         mAlwaysImportMesh = "";
-         mNeverImportMesh = "";
-         mIgnoreNodeScale = false;
-         mAdjustCenter = false;
-         mAdjustFloor = false;
-         mForceUpdateMaterials = false;
-         mUseDiffuseNames = false;
+         upAxis = UPAXISTYPE_COUNT;
+         unit = -1.0f;
+         lodType = DetectDTS;
+         singleDetailSize = 2;
+         matNamePrefix = "";
+         alwaysImport = "";
+         neverImport = "";
+         alwaysImportMesh = "";
+         neverImportMesh = "";
+         ignoreNodeScale = false;
+         adjustCenter = false;
+         adjustFloor = false;
+         forceUpdateMaterials = false;
+         useDiffuseNames = false;
       }
    };
 
@@ -291,27 +291,27 @@ template<> inline const char* _GetNameOrId(const domInstance_controller* element
 // is done until we actually try to extract values from the source.
 class _SourceReader
 {
-   const domSource* mSource;     // the wrapped Collada source
-   const domAccessor* mAccessor; // shortcut to the source accessor
-   Vector<U32> mOffsets;         // offset of each of the desired values to pull from the source array
+   const domSource* source;      // the wrapped Collada source
+   const domAccessor* accessor;  // shortcut to the source accessor
+   Vector<U32> offsets;          // offset of each of the desired values to pull from the source array
 
 public:
-   _SourceReader() : mSource(0), mAccessor(0) {}
+   _SourceReader() : source(0), accessor(0) {}
 
    void reset()
    {
-      mSource = 0;
-      mAccessor = 0;
-      mOffsets.clear();
+      source = 0;
+      accessor = 0;
+      offsets.clear();
    }
 
    //------------------------------------------------------
    // Initialize the _SourceReader object
    bool initFromSource(const domSource* src, const char* paramNames[] = 0)
    {
-      mSource = src;
-      mAccessor = mSource->getTechnique_common()->getAccessor();
-      mOffsets.clear();
+      source = src;
+      accessor = source->getTechnique_common()->getAccessor();
+      offsets.clear();
 
       // The source array has groups of values in a 1D stream => need to map the
       // input param names to source params to determine the offset within the
@@ -319,11 +319,11 @@ public:
       U32 paramCount = 0;
       while (paramNames && paramNames[paramCount][0]) {
          // lookup the index of the source param that matches the input param
-         mOffsets.push_back(paramCount);
-         for (U32 iParam = 0; iParam < mAccessor->getParam_array().getCount(); iParam++) {
-            if (mAccessor->getParam_array()[iParam]->getName() &&
-               dStrEqual(mAccessor->getParam_array()[iParam]->getName(), paramNames[paramCount])) {
-               mOffsets.last() = iParam;
+         offsets.push_back(paramCount);
+         for (U32 iParam = 0; iParam < accessor->getParam_array().getCount(); iParam++) {
+            if (accessor->getParam_array()[iParam]->getName() &&
+               dStrEqual(accessor->getParam_array()[iParam]->getName(), paramNames[paramCount])) {
+               offsets.last() = iParam;
                break;
             }
          }
@@ -331,9 +331,9 @@ public:
       }
 
       // If no input params were specified, just map the source params directly
-      if (!mOffsets.size()) {
-         for (S32 iParam = 0; iParam < mAccessor->getParam_array().getCount(); iParam++)
-            mOffsets.push_back(iParam);
+      if (!offsets.size()) {
+         for (S32 iParam = 0; iParam < accessor->getParam_array().getCount(); iParam++)
+            offsets.push_back(iParam);
       }
 
       return true;
@@ -341,10 +341,10 @@ public:
 
    //------------------------------------------------------
    // Shortcut to the size of the array (should be the number of destination objects)
-   S32 size() const { return mAccessor ? mAccessor->getCount() : 0; }
+   S32 size() const { return accessor ? accessor->getCount() : 0; }
 
    // Get the number of elements per group in the source
-   S32 stride() const { return mAccessor ? mAccessor->getStride() : 0; }
+   S32 stride() const { return accessor ? accessor->getStride() : 0; }
 
    //------------------------------------------------------
    // Get a pointer to the start of a group of values (index advances by stride)
@@ -353,8 +353,8 @@ public:
    const double* getStringArrayData(S32 index) const
    {
       if ((index >= 0) && (index < size())) {
-         if (mSource->getFloat_array())
-            return &mSource->getFloat_array()->getValue()[index*stride()];
+         if (source->getFloat_array())
+            return &source->getFloat_array()->getValue()[index*stride()];
       }
       return 0;
    }
@@ -367,10 +367,10 @@ public:
    {
       if ((index >= 0) && (index < size())) {
          // could be plain strings or IDREFs
-         if (mSource->getName_array())
-            return mSource->getName_array()->getValue()[index*stride()];
-         else if (mSource->getIDREF_array())
-            return mSource->getIDREF_array()->getValue()[index*stride()].getID();
+         if (source->getName_array())
+            return source->getName_array()->getValue()[index*stride()];
+         else if (source->getIDREF_array())
+            return source->getIDREF_array()->getValue()[index*stride()].getID();
       }
       return "";
    }
@@ -379,7 +379,7 @@ public:
    {
       F32 value(0);
       if (const double* data = getStringArrayData(index))
-         return data[mOffsets[0]];
+         return data[offsets[0]];
       return value;
    }
 
@@ -387,7 +387,7 @@ public:
    {
       Point2F value(0, 0);
       if (const double* data = getStringArrayData(index))
-         value.set(data[mOffsets[0]], data[mOffsets[1]]);
+         value.set(data[offsets[0]], data[offsets[1]]);
       return value;
    }
 
@@ -395,7 +395,7 @@ public:
    {
       Point3F value(1, 0, 0);
       if (const double* data = getStringArrayData(index))
-         value.set(data[mOffsets[0]], data[mOffsets[1]], data[mOffsets[2]]);
+         value.set(data[offsets[0]], data[offsets[1]], data[offsets[2]]);
       return value;
    }
 
@@ -404,11 +404,11 @@ public:
       ColorI value(255, 255, 255, 255);
       if (const double* data = getStringArrayData(index))
       {
-         value.red = data[mOffsets[0]] * 255.0;
-         value.green = data[mOffsets[1]] * 255.0;
-         value.blue = data[mOffsets[2]] * 255.0;
+         value.red = data[offsets[0]] * 255.0;
+         value.green = data[offsets[1]] * 255.0;
+         value.blue = data[offsets[2]] * 255.0;
          if ( stride() == 4 )
-            value.alpha = data[mOffsets[3]] * 255.0;
+            value.alpha = data[offsets[3]] * 255.0;
       }
       return value;
    }
@@ -477,14 +477,14 @@ public:
 /// Template child class for supported Collada primitive elements
 template<class T> class ColladaPrimitive : public BasePrimitive
 {
-   T* mPrimitive;
-   domListOfUInts *mTriangleData;
+   T* primitive;
+   domListOfUInts *pTriangleData;
    S32 stride;
 public:
-   ColladaPrimitive(const daeElement* e) : mTriangleData(0)
+   ColladaPrimitive(const daeElement* e) : pTriangleData(0)
    {
       // Cast to geometric primitive element
-      mPrimitive = daeSafeCast<T>(const_cast<daeElement*>(e));
+      primitive = daeSafeCast<T>(const_cast<daeElement*>(e));
 
       // Determine stride
       stride = 0;
@@ -495,13 +495,13 @@ public:
    }
    ~ColladaPrimitive()
    {
-      delete mTriangleData;
+      delete pTriangleData;
    }
 
    /// Most primitives can use these common implementations
-   const char* getElementName() { return mPrimitive->getElementName(); }
-   const char* getMaterial() { return mPrimitive->getMaterial(); }
-   const domInputLocalOffset_Array& getInputs() { return mPrimitive->getInput_array(); }
+   const char* getElementName() { return primitive->getElementName(); }
+   const char* getMaterial() { return primitive->getMaterial(); }
+   const domInputLocalOffset_Array& getInputs() { return primitive->getInput_array(); }
    S32 getStride() const { return stride; }
 
    /// Each supported primitive needs to implement this method (and convert
@@ -514,21 +514,21 @@ public:
 template<> inline const domListOfUInts *ColladaPrimitive<domTriangles>::getTriangleData()
 {
    // Return the <p> integer list directly
-   return (mPrimitive->getP() ? &(mPrimitive->getP()->getValue()) : NULL);
+   return (primitive->getP() ? &(primitive->getP()->getValue()) : NULL);
 }
 
 //-----------------------------------------------------------------------------
 // <tristrips>
 template<> inline const domListOfUInts *ColladaPrimitive<domTristrips>::getTriangleData()
 {
-   if (!mTriangleData)
+   if (!pTriangleData)
    {
       // Convert strips to triangles
-      mTriangleData = new domListOfUInts();
+      pTriangleData = new domListOfUInts();
 
-      for (S32 iStrip = 0; iStrip < mPrimitive->getCount(); iStrip++) {
+      for (S32 iStrip = 0; iStrip < primitive->getCount(); iStrip++) {
 
-         domP* P = mPrimitive->getP_array()[iStrip];
+         domP* P = primitive->getP_array()[iStrip];
 
          // Ignore invalid P arrays
          if (!P || !P->getValue().getCount())
@@ -543,33 +543,33 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTristrips>::getTrian
             if (iTri & 0x1)
             {
                // CW triangle
-               mTriangleData->appendArray(stride, v0);
-               mTriangleData->appendArray(stride, v0 + 2*stride);
-               mTriangleData->appendArray(stride, v0 + stride);
+               pTriangleData->appendArray(stride, v0);
+               pTriangleData->appendArray(stride, v0 + 2*stride);
+               pTriangleData->appendArray(stride, v0 + stride);
             }
             else
             {
                // CCW triangle
-               mTriangleData->appendArray(stride*3, v0);
+               pTriangleData->appendArray(stride*3, v0);
             }
          }
       }
    }
-   return mTriangleData;
+   return pTriangleData;
 }
 
 //-----------------------------------------------------------------------------
 // <trifans>
 template<> inline const domListOfUInts *ColladaPrimitive<domTrifans>::getTriangleData()
 {
-   if (!mTriangleData)
+   if (!pTriangleData)
    {
       // Convert strips to triangles
-      mTriangleData = new domListOfUInts();
+      pTriangleData = new domListOfUInts();
 
-      for (S32 iStrip = 0; iStrip < mPrimitive->getCount(); iStrip++) {
+      for (S32 iStrip = 0; iStrip < primitive->getCount(); iStrip++) {
 
-         domP* P = mPrimitive->getP_array()[iStrip];
+         domP* P = primitive->getP_array()[iStrip];
 
          // Ignore invalid P arrays
          if (!P || !P->getValue().getCount())
@@ -581,27 +581,27 @@ template<> inline const domListOfUInts *ColladaPrimitive<domTrifans>::getTriangl
          // Convert the fan back to a triangle list
          domUint* v0 = pSrcData + stride;
          for (S32 iTri = 0; iTri < numTriangles; iTri++, v0 += stride) {
-            mTriangleData->appendArray(stride, pSrcData);   // shared vertex
-            mTriangleData->appendArray(stride, v0);         // previous vertex
-            mTriangleData->appendArray(stride, v0+stride);  // current vertex
+            pTriangleData->appendArray(stride, pSrcData);   // shared vertex
+            pTriangleData->appendArray(stride, v0);         // previous vertex
+            pTriangleData->appendArray(stride, v0+stride);  // current vertex
          }
       }
    }
-   return mTriangleData;
+   return pTriangleData;
 }
 
 //-----------------------------------------------------------------------------
 // <polygons>
 template<> inline const domListOfUInts *ColladaPrimitive<domPolygons>::getTriangleData()
 {
-   if (!mTriangleData)
+   if (!pTriangleData)
    {
       // Convert polygons to triangles
-      mTriangleData = new domListOfUInts();
+      pTriangleData = new domListOfUInts();
 
-      for (S32 iPoly = 0; iPoly < mPrimitive->getCount(); iPoly++) {
+      for (S32 iPoly = 0; iPoly < primitive->getCount(); iPoly++) {
 
-         domP* P = mPrimitive->getP_array()[iPoly];
+         domP* P = primitive->getP_array()[iPoly];
 
          // Ignore invalid P arrays
          if (!P || !P->getValue().getCount())
@@ -615,41 +615,41 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolygons>::getTriang
          domUint* v0 = pSrcData;
          pSrcData += stride;
          for (S32 iTri = 0; iTri < numPoints-2; iTri++) {
-            mTriangleData->appendArray(stride, v0);
-            mTriangleData->appendArray(stride*2, pSrcData);
+            pTriangleData->appendArray(stride, v0);
+            pTriangleData->appendArray(stride*2, pSrcData);
             pSrcData += stride;
          }
       }
    }
-   return mTriangleData;
+   return pTriangleData;
 }
 
 //-----------------------------------------------------------------------------
 // <polylist>
 template<> inline const domListOfUInts *ColladaPrimitive<domPolylist>::getTriangleData()
 {
-   if (!mTriangleData)
+   if (!pTriangleData)
    {
       // Convert polygons to triangles
-      mTriangleData = new domListOfUInts();
+      pTriangleData = new domListOfUInts();
 
       // Check that the P element has the right number of values (this
       // has been seen with certain models exported using COLLADAMax)
-      const domListOfUInts& vcount = mPrimitive->getVcount()->getValue();
+      const domListOfUInts& vcount = primitive->getVcount()->getValue();
 
       U32 expectedCount = 0;
       for (S32 iPoly = 0; iPoly < vcount.getCount(); iPoly++)
          expectedCount += vcount[iPoly];
       expectedCount *= stride;
 
-      if (!mPrimitive->getP() || !mPrimitive->getP()->getValue().getCount() ||
-         (mPrimitive->getP()->getValue().getCount() != expectedCount) )
+      if (!primitive->getP() || !primitive->getP()->getValue().getCount() ||
+         (primitive->getP()->getValue().getCount() != expectedCount) )
       {
          Con::warnf("<polylist> element found with invalid <p> array. This primitive will be ignored.");
-         return mTriangleData;
+         return pTriangleData;
       }
 
-      domUint* pSrcData = &(mPrimitive->getP()->getValue()[0]);
+      domUint* pSrcData = &(primitive->getP()->getValue()[0]);
       for (S32 iPoly = 0; iPoly < vcount.getCount(); iPoly++) {
 
          // Use a simple tri-fan (centered at the first point) method of
@@ -657,14 +657,14 @@ template<> inline const domListOfUInts *ColladaPrimitive<domPolylist>::getTriang
          domUint* v0 = pSrcData;
          pSrcData += stride;
          for (S32 iTri = 0; iTri < vcount[iPoly]-2; iTri++) {
-            mTriangleData->appendArray(stride, v0);
-            mTriangleData->appendArray(stride*2, pSrcData);
+            pTriangleData->appendArray(stride, v0);
+            pTriangleData->appendArray(stride*2, pSrcData);
             pSrcData += stride;
          }
          pSrcData += stride;
       }
    }
-   return mTriangleData;
+   return pTriangleData;
 }
 
 //-----------------------------------------------------------------------------
@@ -680,32 +680,32 @@ template<> inline F32 convert(const char* value) { return convert<double>(value)
 /// Collada animation data
 struct AnimChannels : public Vector<struct AnimData*>
 {
-   daeElement  *mElement;
-   AnimChannels(daeElement* el) : mElement(el)
+   daeElement  *element;
+   AnimChannels(daeElement* el) : element(el)
    {
-      mElement->setUserData(this);
+      element->setUserData(this);
    }
    ~AnimChannels()
    {
-      if (mElement)
-         mElement->setUserData(0);
+      if (element)
+         element->setUserData(0);
    }
 };
 
 struct AnimData
 {
-   bool           mEnabled;      ///!< Used to select animation channels for the current clip
+   bool           enabled;       ///!< Used to select animation channels for the current clip
 
-   _SourceReader  mInput;
-   _SourceReader  mOutput;
+   _SourceReader  input;
+   _SourceReader  output;
 
-   _SourceReader  mInTangent;
-   _SourceReader  mOutTangent;
+   _SourceReader  inTangent;
+   _SourceReader  outTangent;
 
-   _SourceReader  mInterpolation;
+   _SourceReader  interpolation;
 
-   U32 mTargetValueOffset;       ///< Offset into the target element (for arrays of values)
-   U32 mTargetValueCount;        ///< Number of values animated (from OUTPUT source array)
+   U32 targetValueOffset;        ///< Offset into the target element (for arrays of values)
+   U32 targetValueCount;         ///< Number of values animated (from OUTPUT source array)
 
    /// Get the animation channels for the Collada element (if any)
    static AnimChannels* getAnimChannels(const daeElement* element)
@@ -713,7 +713,7 @@ struct AnimData
       return element ? (AnimChannels*)const_cast<daeElement*>(element)->getUserData() : 0;
    }
 
-   AnimData() : mEnabled(false) { }
+   AnimData() : enabled(false) { }
 
    void parseTargetString(const char* target, S32 fullCount, const char* elements[]);
 
@@ -737,13 +737,13 @@ struct AnimData
 template<class T>
 struct AnimatedElement
 {
-   const daeElement* mElement;   ///< The Collada element (can be NULL)
-   T mDefaultVal;                ///< Default value (used when element is NULL)
+   const daeElement* element;    ///< The Collada element (can be NULL)
+   T defaultVal;                 ///< Default value (used when element is NULL)
 
-   AnimatedElement(const daeElement* e=0) : mElement(e) { }
+   AnimatedElement(const daeElement* e=0) : element(e) { }
 
    /// Check if the element has any animations channels
-   bool isAnimated() { return (AnimData::getAnimChannels(mElement) != 0); }
+   bool isAnimated() { return (AnimData::getAnimChannels(element) != 0); }
    bool isAnimated(F32 start, F32 end) { return isAnimated(); }
 
    /// Get the value of the element at the specified time
@@ -751,17 +751,17 @@ struct AnimatedElement
    {
       // If the element is NULL, just use the default (handy for <extra> profiles which
       // may or may not be present in the document)
-      T value(mDefaultVal);
-      if (const domAny* param = daeSafeCast<domAny>(const_cast<daeElement*>(mElement))) {
+      T value(defaultVal);
+      if (const domAny* param = daeSafeCast<domAny>(const_cast<daeElement*>(element))) {
          // If the element is not animated, just use its current value
          value = convert<T>(param->getValue());
 
          // Animate the value
-         const AnimChannels* channels = AnimData::getAnimChannels(mElement);
+         const AnimChannels* channels = AnimData::getAnimChannels(element);
          if (channels && (time >= 0)) {
             for (S32 iChannel = 0; iChannel < channels->size(); iChannel++) {
                const AnimData* animData = (*channels)[iChannel];
-               if (animData->mEnabled)
+               if (animData->enabled)
                   animData->interpValue(time, 0, &value);
             }
          }
@@ -781,19 +781,19 @@ template<class T> struct AnimatedElementList : public AnimatedElement<T>
    // Get the value of the element list at the specified time
    T getValue(F32 time)
    {
-      T vec(this->mDefaultVal);
-      if (this->mElement) {
+      T vec(this->defaultVal);
+      if (this->element) {
          // Get a copy of the vector
-         vec = *(T*)const_cast<daeElement*>(this->mElement)->getValuePointer();
+         vec = *(T*)const_cast<daeElement*>(this->element)->getValuePointer();
 
          // Animate the vector
-         const AnimChannels* channels = AnimData::getAnimChannels(this->mElement);
+         const AnimChannels* channels = AnimData::getAnimChannels(this->element);
          if (channels && (time >= 0)) {
             for (S32 iChannel = 0; iChannel < channels->size(); iChannel++) {
                const AnimData* animData = (*channels)[iChannel];
-               if (animData->mEnabled) {
-                  for (S32 iValue = 0; iValue < animData->mTargetValueCount; iValue++)
-                     animData->interpValue(time, iValue, &vec[animData->mTargetValueOffset + iValue]);
+               if (animData->enabled) {
+                  for (S32 iValue = 0; iValue < animData->targetValueCount; iValue++)
+                     animData->interpValue(time, iValue, &vec[animData->targetValueOffset + iValue]);
                }
             }
          }

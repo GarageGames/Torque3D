@@ -57,20 +57,20 @@
 // AND all of the target geometries because they MUST have the same topology.
 struct VertTuple
 {
-   S32 mPrim, mVertex, mNormal, mColor, mUV, mUV2;
+   S32 prim, vertex, normal, color, uv, uv2;
 
-   Point3F mDataVertex, mDataNormal;
-   ColorI  mDataColor;
-   Point2F mDataUV, mDataUV2;
+   Point3F dataVertex, dataNormal;
+   ColorI  dataColor;
+   Point2F dataUV, dataUV2;
 
-   VertTuple(): mPrim(-1), mVertex(-1), mNormal(-1), mColor(-1), mUV(-1), mUV2(-1) {}
+   VertTuple(): prim(-1), vertex(-1), normal(-1), color(-1), uv(-1), uv2(-1) {}
    bool operator==(const VertTuple& p) const 
    {
-      return   mDataVertex == p.mDataVertex &&
-               mDataColor == p.mDataColor &&  
-               mDataNormal == p.mDataNormal &&   
-               mDataUV == p.mDataUV &&  
-               mDataUV2 == p.mDataUV2;
+      return   dataVertex == p.dataVertex &&
+               dataColor == p.dataColor &&  
+               dataNormal == p.dataNormal &&   
+               dataUV == p.dataUV &&  
+               dataUV2 == p.dataUV2;
    }
 };
 
@@ -79,24 +79,24 @@ class ColladaAppMesh : public AppMesh
    typedef AppMesh Parent;
 
 protected:
-   class ColladaAppNode* mAppNode;                    ///< Pointer to the node that owns this mesh
-   const domInstance_geometry* mInstanceGeom;
-   const domInstance_controller* mInstanceCtrl;
-   ColladaExtension_geometry* mGeomExt;               ///< geometry extension
+   class ColladaAppNode* appNode;                     ///< Pointer to the node that owns this mesh
+   const domInstance_geometry* instanceGeom;
+   const domInstance_controller* instanceCtrl;
+   ColladaExtension_geometry* geomExt;                ///< geometry extension
 
-   Vector<VertTuple> mVertTuples;                     ///<
-   Map<StringTableEntry,U32> mBoundMaterials;         ///< Local map of symbols to materials
+   Vector<VertTuple> vertTuples;                      ///<
+   Map<StringTableEntry,U32> boundMaterials;          ///< Local map of symbols to materials
 
-   static bool mFixedSizeEnabled;                     ///< Set to true to fix the detail size to a particular value for all geometry
-   static S32 mFixedSize;                             ///< The fixed detail size value for all geometry
+   static bool fixedSizeEnabled;                      ///< Set to true to fix the detail size to a particular value for all geometry
+   static S32 fixedSize;                              ///< The fixed detail size value for all geometry
 
    //-----------------------------------------------------------------------
 
    /// Get the morph controller for this mesh (if any)
    const domMorph* getMorph()
    {
-      if (mInstanceCtrl) {
-         const domController* ctrl = daeSafeCast<domController>(mInstanceCtrl->getUrl().getElement());
+      if (instanceCtrl) {
+         const domController* ctrl = daeSafeCast<domController>(instanceCtrl->getUrl().getElement());
          if (ctrl && ctrl->getSkin())
             ctrl = daeSafeCast<domController>(ctrl->getSkin()->getSource().getElement());
          return ctrl ? ctrl->getMorph() : NULL;
@@ -123,13 +123,13 @@ public:
    ColladaAppMesh(const domInstance_controller* instance, ColladaAppNode* node);
    ~ColladaAppMesh()
    {
-      delete mGeomExt;
+      delete geomExt;
    }
 
    static void fixDetailSize(bool fixed, S32 size=2)
    {
-      mFixedSizeEnabled = fixed;
-      mFixedSize = size;
+      fixedSizeEnabled = fixed;
+      fixedSize = size;
    }
 
    /// Get the name of this mesh
@@ -147,7 +147,7 @@ public:
    /// @return True if a value was set, false if not
    bool getFloat(const char *propName, F32 &defaultVal)
    {
-      return mAppNode->getFloat(propName,defaultVal);
+      return appNode->getFloat(propName,defaultVal);
    }
 
    /// Get an integer property value
@@ -158,7 +158,7 @@ public:
    /// @return True if a value was set, false if not
    bool getInt(const char *propName, S32 &defaultVal)
    {
-      return mAppNode->getInt(propName,defaultVal);
+      return appNode->getInt(propName,defaultVal);
    }
 
    /// Get a boolean property value
@@ -169,14 +169,14 @@ public:
    /// @return True if a value was set, false if not
    bool getBool(const char *propName, bool &defaultVal)
    {
-      return mAppNode->getBool(propName,defaultVal);
+      return appNode->getBool(propName,defaultVal);
    }
 
    /// Return true if this mesh is a skin
    bool isSkin()
    {
-      if (mInstanceCtrl) {
-         const domController* ctrl = daeSafeCast<domController>(mInstanceCtrl->getUrl().getElement());
+      if (instanceCtrl) {
+         const domController* ctrl = daeSafeCast<domController>(instanceCtrl->getUrl().getElement());
          if (ctrl && ctrl->getSkin() &&
             (ctrl->getSkin()->getVertex_weights()->getV()->getValue().getCount() > 0))
             return true;

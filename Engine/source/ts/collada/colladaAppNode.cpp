@@ -58,7 +58,7 @@ static char* TrimFirstWord(char* str)
 
 ColladaAppNode::ColladaAppNode(const domNode* node, ColladaAppNode* parent)
       : p_domNode(node), appParent(parent), nodeExt(new ColladaExtension_node(node)),
-      lastTransformTime(TSShapeLoader::smDefaultTime-1), defaultTransformValid(false),
+      lastTransformTime(TSShapeLoader::DefaultTime-1), defaultTransformValid(false),
       invertMeshes(false)
 {
    mName = dStrdup(_GetNameOrId(node));
@@ -66,7 +66,7 @@ ColladaAppNode::ColladaAppNode(const domNode* node, ColladaAppNode* parent)
 
    // Extract user properties from the <node> extension as whitespace separated
    // "name=value" pairs
-   char* properties = dStrdup(nodeExt->mUserProperties);
+   char* properties = dStrdup(nodeExt->user_properties);
    char* pos = properties;
    char* end = properties + dStrlen( properties );
    while ( pos < end )
@@ -99,7 +99,7 @@ ColladaAppNode::ColladaAppNode(const domNode* node, ColladaAppNode* parent)
          case COLLADA_TYPE::MATRIX:
          case COLLADA_TYPE::LOOKAT:
             nodeTransforms.increment();
-            nodeTransforms.last().mElement = node->getContents()[iChild];
+            nodeTransforms.last().element = node->getContents()[iChild];
             break;
       }
    }
@@ -178,7 +178,7 @@ bool ColladaAppNode::animatesTransform(const AppSequence* appSeq)
 MatrixF ColladaAppNode::getNodeTransform(F32 time)
 {
    // Avoid re-computing the default transform if possible
-   if (defaultTransformValid && time == TSShapeLoader::smDefaultTime)
+   if (defaultTransformValid && time == TSShapeLoader::DefaultTime)
    {
       return defaultNodeTransform;
    }
@@ -198,7 +198,7 @@ MatrixF ColladaAppNode::getNodeTransform(F32 time)
       }
 
       // Cache the default transform
-      if (time == TSShapeLoader::smDefaultTime)
+      if (time == TSShapeLoader::DefaultTime)
       {
          defaultTransformValid = true;
          defaultNodeTransform = nodeTransform;
@@ -221,7 +221,7 @@ MatrixF ColladaAppNode::getTransform(F32 time)
    else {
       // no parent (ie. root level) => scale by global shape <unit>
       lastTransform.identity();
-      lastTransform.scale(ColladaUtils::getOptions().mUnit);
+      lastTransform.scale(ColladaUtils::getOptions().unit);
       if (!isBounds())
          ColladaUtils::convertTransform(lastTransform);     // don't convert bounds node transform (or upAxis won't work!)
    }
@@ -232,7 +232,7 @@ MatrixF ColladaAppNode::getTransform(F32 time)
       MatrixF mat(true);
 
       // Convert the transform element to a MatrixF
-      switch (nodeTransforms[iTxfm].mElement->getElementType()) {
+      switch (nodeTransforms[iTxfm].element->getElementType()) {
          case COLLADA_TYPE::TRANSLATE: mat = vecToMatrixF<domTranslate>(nodeTransforms[iTxfm].getValue(time));  break;
          case COLLADA_TYPE::SCALE:     mat = vecToMatrixF<domScale>(nodeTransforms[iTxfm].getValue(time));      break;
          case COLLADA_TYPE::ROTATE:    mat = vecToMatrixF<domRotate>(nodeTransforms[iTxfm].getValue(time));     break;
@@ -242,7 +242,7 @@ MatrixF ColladaAppNode::getTransform(F32 time)
       }
 
       // Remove node scaling (but keep reflections) if desired
-      if (ColladaUtils::getOptions().mIgnoreNodeScale)
+      if (ColladaUtils::getOptions().ignoreNodeScale)
       {
          Point3F invScale = mat.getScale();
          invScale.x = invScale.x ? (1.0f / invScale.x) : 0;

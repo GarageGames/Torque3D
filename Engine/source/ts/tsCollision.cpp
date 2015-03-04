@@ -52,10 +52,10 @@ bool TSShapeInstance::buildPolyList(AbstractPolyList * polyList, S32 dl)
    if (dl==-1)
       return false;
 
-   AssertFatal(dl>=0 && dl<mShape->mDetails.size(),"TSShapeInstance::buildPolyList");
+   AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::buildPolyList");
 
    // get subshape and object detail
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
@@ -67,8 +67,8 @@ bool TSShapeInstance::buildPolyList(AbstractPolyList * polyList, S32 dl)
    bool emitted = false;
    U32 surfaceKey = 0;
 
-   S32 start = mShape->mSubShapeFirstObject[ss];
-   S32 end   = mShape->mSubShapeNumObjects[ss] + start;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end   = mShape->subShapeNumObjects[ss] + start;
    if (start<end)
    {
       MatrixF initialMat;
@@ -124,10 +124,10 @@ bool TSShapeInstance::getFeatures(const MatrixF& mat, const Point3F& n, ConvexFe
    if (dl==-1)
       return false;
 
-   AssertFatal(dl>=0 && dl<mShape->mDetails.size(),"TSShapeInstance::buildPolyList");
+   AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::buildPolyList");
 
    // get subshape and object detail
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
@@ -135,8 +135,8 @@ bool TSShapeInstance::getFeatures(const MatrixF& mat, const Point3F& n, ConvexFe
    bool emitted = false;
    U32 surfaceKey = 0;
 
-   S32 start = mShape->mSubShapeFirstObject[ss];
-   S32 end   = mShape->mSubShapeNumObjects[ss] + start;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end   = mShape->subShapeNumObjects[ss] + start;
    if (start<end)
    {
       MatrixF final;
@@ -168,10 +168,10 @@ bool TSShapeInstance::castRay(const Point3F & a, const Point3F & b, RayInfo * ra
    if (dl==-1)
       return false;
 
-   AssertFatal(dl>=0 && dl<mShape->mDetails.size(),"TSShapeInstance::castRay");
+   AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::castRay");
 
    // get subshape and object detail
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
@@ -179,8 +179,8 @@ bool TSShapeInstance::castRay(const Point3F & a, const Point3F & b, RayInfo * ra
    if ( ss < 0 )
       return false;
 
-   S32 start = mShape->mSubShapeFirstObject[ss];
-   S32 end   = mShape->mSubShapeNumObjects[ss] + start;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end   = mShape->subShapeNumObjects[ss] + start;
    RayInfo saveRay;
    saveRay.t = 1.0f;
    const MatrixF * saveMat = NULL;
@@ -255,18 +255,18 @@ bool TSShapeInstance::castRayRendered(const Point3F & a, const Point3F & b, RayI
    if (dl==-1)
       return false;
 
-   AssertFatal(dl>=0 && dl<mShape->mDetails.size(),"TSShapeInstance::castRayRendered");
+   AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::castRayRendered");
 
    // get subshape and object detail
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
    if ( ss == -1 )
       return false;
 
-   S32 start = mShape->mSubShapeFirstObject[ss];
-   S32 end   = mShape->mSubShapeNumObjects[ss] + start;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end   = mShape->subShapeNumObjects[ss] + start;
    RayInfo saveRay;
    saveRay.t = 1.0f;
    const MatrixF * saveMat = NULL;
@@ -339,15 +339,15 @@ Point3F TSShapeInstance::support(const Point3F & v, S32 dl)
 {
    // if dl==-1, nothing to do
    AssertFatal(dl != -1, "Error, should never try to collide with a non-existant detail level!");
-   AssertFatal(dl>=0 && dl<mShape->mDetails.size(),"TSShapeInstance::support");
+   AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::support");
 
    // get subshape and object detail
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
-   S32 start = mShape->mSubShapeFirstObject[ss];
-   S32 end   = mShape->mSubShapeNumObjects[ss] + start;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end   = mShape->subShapeNumObjects[ss] + start;
 
    F32     currMaxDP   = -1e9f;
    Point3F currSupport = Point3F(0, 0, 0);
@@ -404,22 +404,22 @@ void TSShapeInstance::computeBounds(S32 dl, Box3F & bounds)
    if (dl==-1)
       return;
 
-   AssertFatal(dl>=0 && dl<mShape->mDetails.size(),"TSShapeInstance::computeBounds");
+   AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::computeBounds");
 
    // get subshape and object detail
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
    // use shape bounds for imposter details
    if (ss < 0)
    {
-      bounds = mShape->mBounds;
+      bounds = mShape->bounds;
       return;
    }
 
-   S32 start = mShape->mSubShapeFirstObject[ss];
-   S32 end   = mShape->mSubShapeNumObjects[ss] + start;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end   = mShape->subShapeNumObjects[ss] + start;
 
    // run through objects and updating bounds as we go
    bounds.minExtents.set( 10E30f, 10E30f, 10E30f);
@@ -587,10 +587,10 @@ bool TSShapeInstance::buildPolyListOpcode( S32 dl, AbstractPolyList *polyList, c
    if (dl==-1)
       return false;
 
-   AssertFatal(dl>=0 && dl<mShape->mDetails.size(),"TSShapeInstance::buildPolyListOpcode");
+   AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::buildPolyListOpcode");
 
    // get subshape and object detail
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    if ( ss < 0 )
       return false;
@@ -600,8 +600,8 @@ bool TSShapeInstance::buildPolyListOpcode( S32 dl, AbstractPolyList *polyList, c
    // nothing emitted yet...
    bool emitted = false;
 
-   S32 start = mShape->mSubShapeFirstObject[ss];
-   S32 end   = mShape->mSubShapeNumObjects[ss] + start;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end   = mShape->subShapeNumObjects[ss] + start;
    if (start<end)
    {
       MatrixF initialMat;
@@ -670,12 +670,12 @@ bool TSShapeInstance::castRayOpcode( S32 dl, const Point3F & startPos, const Poi
    if (dl==-1)
       return false;
 
-   AssertFatal(dl>=0 && dl<mShape->mDetails.size(),"TSShapeInstance::castRayOpcode");
+   AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::castRayOpcode");
 
    info->t = 100.f;
 
    // get subshape and object detail
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    if ( ss < 0 )
       return false;
@@ -686,8 +686,8 @@ bool TSShapeInstance::castRayOpcode( S32 dl, const Point3F & startPos, const Poi
    bool emitted = false;
 
    const MatrixF* saveMat = NULL;
-   S32 start = mShape->mSubShapeFirstObject[ss];
-   S32 end   = mShape->mSubShapeNumObjects[ss] + start;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end   = mShape->subShapeNumObjects[ss] + start;
    if (start<end)
    {
       MatrixF mat;
@@ -742,18 +742,18 @@ bool TSShapeInstance::castRayOpcode( S32 dl, const Point3F & startPos, const Poi
 
 bool TSShapeInstance::buildConvexOpcode( const MatrixF &objMat, const Point3F &objScale, S32 dl, const Box3F &bounds, Convex *c, Convex *list )
 {
-   AssertFatal(dl>=0 && dl<mShape->mDetails.size(),"TSShapeInstance::buildConvexOpcode");
+   AssertFatal(dl>=0 && dl<mShape->details.size(),"TSShapeInstance::buildConvexOpcode");
 
    // get subshape and object detail
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
    // nothing emitted yet...
    bool emitted = false;
 
-   S32 start = mShape->mSubShapeFirstObject[ss];
-   S32 end   = mShape->mSubShapeNumObjects[ss] + start;
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end   = mShape->subShapeNumObjects[ss] + start;
    if (start<end)
    {
       MatrixF initialMat = objMat;
@@ -823,10 +823,10 @@ void TSShape::findColDetails( bool useVisibleMesh, Vector<S32> *outDetails, Vect
       U32 highestDetail = -1;
       F32 highestSize = -F32_MAX;
 
-      for ( U32 i = 0; i < mDetails.size(); i++ )
+      for ( U32 i = 0; i < details.size(); i++ )
       {
          // Make sure we skip any details that shouldn't be rendered
-         if ( mDetails[i].size < 0 )
+         if ( details[i].size < 0 )
             continue;
 
          /*
@@ -838,10 +838,10 @@ void TSShape::findColDetails( bool useVisibleMesh, Vector<S32> *outDetails, Vect
          */
 
          // Otherwise test against the current highest size
-         if ( mDetails[i].size > highestSize )
+         if ( details[i].size > highestSize )
          {
             highestDetail = i;
-            highestSize = mDetails[i].size;
+            highestSize = details[i].size;
          }
       }
 
@@ -861,9 +861,9 @@ void TSShape::findColDetails( bool useVisibleMesh, Vector<S32> *outDetails, Vect
    //
    // The LOS (light of sight) details are used for raycasts.
 
-   for ( U32 i = 0; i < mDetails.size(); i++ )
+   for ( U32 i = 0; i < details.size(); i++ )
    {
-      const String &name = mNames[ mDetails[i].nameIndex ];
+      const String &name = names[ details[i].nameIndex ];
       if ( !dStrStartsWith( name, "Collision" ) )
          continue;
 
@@ -906,9 +906,9 @@ void TSShape::findColDetails( bool useVisibleMesh, Vector<S32> *outDetails, Vect
 
    // Snag any "unmatched" LOS details and put 
    // them at the end of the list.
-   for ( U32 i = 0; i < mDetails.size(); i++ )
+   for ( U32 i = 0; i < details.size(); i++ )
    {
-      const String &name = mNames[ mDetails[i].nameIndex ];
+      const String &name = names[ details[i].nameIndex ];
       if ( !dStrStartsWith( name, "LOS" ) )
          continue;
 
@@ -954,7 +954,7 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
       // visible detail levels.
 
       // A negative subshape on the detail means we don't have geometry.
-      const TSShape::Detail &detail = mDetails[0];     
+      const TSShape::Detail &detail = details[0];     
       if ( detail.subShapeNum < 0 )
          return NULL;
 
@@ -964,16 +964,16 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
       polyList.setTransform( &MatrixF::Identity, scale );
 
       // Create the collision meshes.
-      S32 start = mSubShapeFirstObject[ detail.subShapeNum ];
-      S32 end = start + mSubShapeNumObjects[ detail.subShapeNum ];
+      S32 start = subShapeFirstObject[ detail.subShapeNum ];
+      S32 end = start + subShapeNumObjects[ detail.subShapeNum ];
       for ( S32 o=start; o < end; o++ )
       {
-         const TSShape::Object &object = mObjects[o];
+         const TSShape::Object &object = objects[o];
          if ( detail.objectDetailNum >= object.numMeshes )
             continue;
 
          // No mesh or no verts.... nothing to do.
-         TSMesh *mesh = mMeshes[ object.startMeshIndex + detail.objectDetailNum ];
+         TSMesh *mesh = meshes[ object.startMeshIndex + detail.objectDetailNum ];
          if ( !mesh || mesh->mNumVerts == 0 )
             continue;
 
@@ -1013,31 +1013,31 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
    //
    // TODO: We need to support LOS collision for physics.
    //
-   for ( U32 i = 0; i < mDetails.size(); i++ )
+   for ( U32 i = 0; i < details.size(); i++ )
    {
-      const TSShape::Detail &detail = mDetails[i];
-      const String &name = mNames[detail.nameIndex];
+      const TSShape::Detail &detail = details[i];
+      const String &name = names[detail.nameIndex];
 
       // Is this a valid collision detail.
       if ( !dStrStartsWith( name, "Collision" ) || detail.subShapeNum < 0 )
          continue;
 
       // Now go thru the meshes for this detail.
-      S32 start = mSubShapeFirstObject[ detail.subShapeNum ];
-      S32 end = start + mSubShapeNumObjects[ detail.subShapeNum ];
+      S32 start = subShapeFirstObject[ detail.subShapeNum ];
+      S32 end = start + subShapeNumObjects[ detail.subShapeNum ];
       if ( start >= end )
          continue;         
 
       for ( S32 o=start; o < end; o++ )
       {
-         const TSShape::Object &object = mObjects[o];
-         const String &meshName = mNames[ object.nameIndex ];
+         const TSShape::Object &object = objects[o];
+         const String &meshName = names[ object.nameIndex ];
 
          if ( object.numMeshes <= detail.objectDetailNum )
             continue;
 
          // No mesh, a flat bounds, or no verts.... nothing to do.
-         TSMesh *mesh = mMeshes[ object.startMeshIndex + detail.objectDetailNum ];
+         TSMesh *mesh = meshes[ object.startMeshIndex + detail.objectDetailNum ];
          if ( !mesh || mesh->getBounds().isEmpty() || mesh->mNumVerts == 0 )
             continue;
 
@@ -1280,10 +1280,10 @@ bool TSMesh::buildConvexOpcode( const MatrixF &meshToObjectMat, const Box3F &nod
          if( chunkc->getObject() != TSStaticPolysoupConvex::smCurObject )
             continue;
                
-         if( chunkc->mMesh != this )
+         if( chunkc->mesh != this )
             continue;
 
-         if( chunkc->mIdx != curIdx )
+         if( chunkc->idx != curIdx )
             continue;
 
          // A match! Don't need to add it.
@@ -1315,18 +1315,18 @@ bool TSMesh::buildConvexOpcode( const MatrixF &meshToObjectMat, const Box3F &nod
       list->registerObject( cp );
       convex->addToWorkingList( cp );
 
-      cp->mMesh    = this;
-      cp->mIdx     = curIdx;
+      cp->mesh    = this;
+      cp->idx     = curIdx;
       cp->mObject = TSStaticPolysoupConvex::smCurObject;
 
-      cp->mNormal = p;
-      cp->mVerts[0] = a;
-      cp->mVerts[1] = b;
-      cp->mVerts[2] = c;
-      cp->mVerts[3] = peak;
+      cp->normal = p;
+      cp->verts[0] = a;
+      cp->verts[1] = b;
+      cp->verts[2] = c;
+      cp->verts[3] = peak;
 
       // Update the bounding box.
-      Box3F &bounds = cp->mBox;
+      Box3F &bounds = cp->box;
       bounds.minExtents.set( F32_MAX,  F32_MAX,  F32_MAX );
       bounds.maxExtents.set( -F32_MAX, -F32_MAX, -F32_MAX );
 
@@ -1364,9 +1364,9 @@ void TSMesh::prepOpcodeCollision()
    // Figure out how many triangles we have...
    U32 triCount = 0;
    const U32 base = 0;
-   for ( U32 i = 0; i < mPrimitives.size(); i++ )
+   for ( U32 i = 0; i < primitives.size(); i++ )
    {
-      TSDrawPrimitive & draw = mPrimitives[i];
+      TSDrawPrimitive & draw = primitives[i];
       const U32 start = draw.start;
 
       AssertFatal( draw.matIndex & TSDrawPrimitive::Indexed,"TSMesh::buildPolyList (1)" );
@@ -1377,16 +1377,16 @@ void TSMesh::prepOpcodeCollision()
       else
       {
          // Have to walk the tristrip to get a count... may have degenerates
-         U32 idx0 = base + mIndices[start + 0];
+         U32 idx0 = base + indices[start + 0];
          U32 idx1;
-         U32 idx2 = base + mIndices[start + 1];
+         U32 idx2 = base + indices[start + 1];
          U32 * nextIdx = &idx1;
          for ( S32 j = 2; j < draw.numElements; j++ )
          {
             *nextIdx = idx2;
             //            nextIdx = (j%2)==0 ? &idx0 : &idx1;
             nextIdx = (U32*) ( (dsize_t)nextIdx ^ (dsize_t)&idx0 ^ (dsize_t)&idx1);
-            idx2 = base + mIndices[start + j];
+            idx2 = base + indices[start + j];
             if ( idx0 == idx1 || idx0 == idx2 || idx1 == idx2 )
                continue;
 
@@ -1396,7 +1396,7 @@ void TSMesh::prepOpcodeCollision()
    }
 
    // Just do the first trilist for now.
-   mi->SetNbVertices( mVertexData.isReady() ? mNumVerts : mVerts.size() );
+   mi->SetNbVertices( mVertexData.isReady() ? mNumVerts : verts.size() );
    mi->SetNbTriangles( triCount );
 
    // Stuff everything into appropriate arrays.
@@ -1407,9 +1407,9 @@ void TSMesh::prepOpcodeCollision()
    mOpPoints = pts;
 
    // add the polys...
-   for ( U32 i = 0; i < mPrimitives.size(); i++ )
+   for ( U32 i = 0; i < primitives.size(); i++ )
    {
-      TSDrawPrimitive & draw = mPrimitives[i];
+      TSDrawPrimitive & draw = primitives[i];
       const U32 start = draw.start;
 
       AssertFatal( draw.matIndex & TSDrawPrimitive::Indexed,"TSMesh::buildPolyList (1)" );
@@ -1421,9 +1421,9 @@ void TSMesh::prepOpcodeCollision()
       {
          for ( S32 j = 0; j < draw.numElements; )
          {
-            curIts->mVRef[2] = base + mIndices[start + j + 0];
-            curIts->mVRef[1] = base + mIndices[start + j + 1];
-            curIts->mVRef[0] = base + mIndices[start + j + 2];
+            curIts->mVRef[2] = base + indices[start + j + 0];
+            curIts->mVRef[1] = base + indices[start + j + 1];
+            curIts->mVRef[0] = base + indices[start + j + 2];
             curIts->mMatIdx = matIndex;
             curIts++;
 
@@ -1434,16 +1434,16 @@ void TSMesh::prepOpcodeCollision()
       {
          AssertFatal( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Strip,"TSMesh::buildPolyList (2)" );
 
-         U32 idx0 = base + mIndices[start + 0];
+         U32 idx0 = base + indices[start + 0];
          U32 idx1;
-         U32 idx2 = base + mIndices[start + 1];
+         U32 idx2 = base + indices[start + 1];
          U32 * nextIdx = &idx1;
          for ( S32 j = 2; j < draw.numElements; j++ )
          {
             *nextIdx = idx2;
             //            nextIdx = (j%2)==0 ? &idx0 : &idx1;
             nextIdx = (U32*) ( (dsize_t)nextIdx ^ (dsize_t)&idx0 ^ (dsize_t)&idx1);
-            idx2 = base + mIndices[start + j];
+            idx2 = base + indices[start + j];
             if ( idx0 == idx1 || idx0 == idx2 || idx1 == idx2 )
                continue;
 
@@ -1462,7 +1462,7 @@ void TSMesh::prepOpcodeCollision()
       if( mVertexData.isReady() )
          pts[i].Set( mVertexData[i].vert().x, mVertexData[i].vert().y, mVertexData[i].vert().z );
       else
-         pts[i].Set( mVerts[i].x, mVerts[i].y, mVerts[i].z );
+         pts[i].Set( verts[i].x, verts[i].y, verts[i].z );
 
    mi->SetPointers( its, pts );
 

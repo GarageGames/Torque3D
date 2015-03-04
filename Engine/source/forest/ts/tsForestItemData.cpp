@@ -154,7 +154,7 @@ TSShapeInstance* TSForestItemData::_getShapeInstance() const
 void TSForestItemData::_checkLastDetail()
 {
    const S32 dl = mShape->mSmallestVisibleDL;
-   const TSDetail *detail = &mShape->mDetails[dl];
+   const TSDetail *detail = &mShape->details[dl];
 
    // TODO: Expose some real parameters to the datablock maybe?
    if ( detail->subShapeNum != -1 )
@@ -162,8 +162,8 @@ void TSForestItemData::_checkLastDetail()
       mShape->addImposter( mShapeFile, 10, 4, 0, 0, 256, 0, 0 );
 
       // HACK: If i don't do this it crashes!
-      while ( mShape->mDetailCollisionAccelerators.size() < mShape->mDetails.size() )
-         mShape->mDetailCollisionAccelerators.push_back( NULL );
+      while ( mShape->detailCollisionAccelerators.size() < mShape->details.size() )
+         mShape->detailCollisionAccelerators.push_back( NULL );
    }
 }
 
@@ -174,12 +174,12 @@ TSLastDetail* TSForestItemData::getLastDetail() const
       return NULL;
 
    const S32 dl = mShape->mSmallestVisibleDL;
-   const TSDetail* detail = &mShape->mDetails[dl];
+   const TSDetail* detail = &mShape->details[dl];
    if (  detail->subShapeNum >= 0 ||
-         mShape->mBillboardDetails.size() <= dl )
+         mShape->billboardDetails.size() <= dl )
       return NULL;
 
-   return mShape->mBillboardDetails[dl];
+   return mShape->billboardDetails[dl];
 }
 
 ForestCellBatch* TSForestItemData::allocateBatch() const
@@ -207,8 +207,8 @@ bool TSForestItemData::canBillboard( const SceneRenderState *state, const Forest
    if ( dl < 0 )
       return true;
 
-   const TSDetail *detail = &mShape->mDetails[dl];
-   if ( detail->subShapeNum < 0 && dl < mShape->mBillboardDetails.size() )
+   const TSDetail *detail = &mShape->details[dl];
+   if ( detail->subShapeNum < 0 && dl < mShape->billboardDetails.size() )
       return true;
 
    return false;
