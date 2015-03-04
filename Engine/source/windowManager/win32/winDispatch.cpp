@@ -137,14 +137,14 @@ static void _keyboardEvent(Win32Window* window,UINT message, WPARAM wParam, WPAR
        && window->getKeyboardTranslation()
 	    && !window->shouldNotTranslate( torqueMods, newVirtKey ) )
 	{
-      U16 chars[ 64 ];
+      wchar_t chars[ 64 ];
       dMemset( chars, 0, sizeof( chars ) );
 
       S32 res = ToUnicode( keyCode, scanCode, keyboardState, chars, sizeof( chars ) / sizeof( chars[ 0 ] ), 0 );
 
    	// This should only happen on Window 9x/ME systems
    	if( res == 0 )
-   		res = ToAscii( keyCode, scanCode, keyboardState, chars, 0 );
+         res = ToAscii( keyCode, scanCode, keyboardState, (LPWORD)chars, 0 );
 
       if( res >= 1 )
       {
