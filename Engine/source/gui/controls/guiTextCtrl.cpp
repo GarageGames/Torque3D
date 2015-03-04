@@ -188,7 +188,7 @@ void GuiTextCtrl::setText(const char *txt)
    if( !mProfile )
       return;
    
-   if (txt)
+   if (txt && txt != mText)
       dStrncpy(mText, (UTF8*)txt, MAX_STRING_LENGTH);
    mText[MAX_STRING_LENGTH] = '\0';
    
