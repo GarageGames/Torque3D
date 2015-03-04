@@ -159,7 +159,7 @@ void TSShapeConstructor::initPersistFields()
    endGroup( "Media" );
 
    addGroup( "Collada" );
-   addField( "upAxis", TYPEID< domUpAxisType >(), Offset(mOptions.mUpAxis, TSShapeConstructor),
+   addField( "upAxis", TYPEID< domUpAxisType >(), Offset(mOptions.upAxis, TSShapeConstructor),
       "Override the <up_axis> element in the COLLADA (.dae) file. No effect for DTS files.\n"
       "Set to one of the following values:\n"
       "<dl><dt>X_AXIS</dt><dd>Positive X points up. Model will be rotated into Torque's coordinate system (Z up).</dd>"
@@ -167,7 +167,7 @@ void TSShapeConstructor::initPersistFields()
       "<dt>Z_AXIS</dt><dd>Positive Z points up. No rotation will be applied to the model.</dd>"
       "<dt>DEFAULT</dt><dd>The default value. Use the value in the .dae file (defaults to Z_AXIS if the <up_axis> element is not present).</dd></dl>" );
 
-   addField( "unit", TypeF32, Offset(mOptions.mUnit, TSShapeConstructor),
+   addField( "unit", TypeF32, Offset(mOptions.unit, TSShapeConstructor),
       "Override the <unit> element in the COLLADA (.dae) file. No effect for DTS files.\n"
       "COLLADA (.dae) files usually contain a <unit> element that indicates the "
       "'real world' units that the model is described in. It means you can work "
@@ -182,7 +182,7 @@ void TSShapeConstructor::initPersistFields()
       "Omit the field or set to -1 to use the value in the .dae file (1.0 if the "
       "<unit> element is not present)" );
 
-   addField( "lodType", TYPEID< ColladaUtils::ImportOptions::eLodType >(), Offset(mOptions.mLodType, TSShapeConstructor),
+   addField( "lodType", TYPEID< ColladaUtils::ImportOptions::eLodType >(), Offset(mOptions.lodType, TSShapeConstructor),
       "Control how the COLLADA (.dae) importer interprets LOD in the model. No effect for DTS files.\n"
       "Set to one of the following values:\n"
       "<dl><dt>DetectDTS</dt><dd>The default value. Instructs the importer to search for a 'baseXXX->startXXX' node hierarchy at the root level. If found, the importer acts as if ''TrailingNumber'' was set. Otherwise, all geometry is imported at a single detail size.</dd>"
@@ -190,16 +190,16 @@ void TSShapeConstructor::initPersistFields()
       "<dt>TrailingNumber</dt><dd>Numbers at the end of geometry node's name are interpreted as the detail size (similar to DTS exporting). Geometry instances with the same base name but different trailing number are grouped into the same object.</dd>"
       "<dt>DEFAULT</dt><dd>The default value. Use the value in the .dae file (defaults to Z_AXIS if the <up_axis> element is not present).</dd></dl>" );
 
-   addField( "singleDetailSize", TypeS32, Offset(mOptions.mSingleDetailSize, TSShapeConstructor),
+   addField( "singleDetailSize", TypeS32, Offset(mOptions.singleDetailSize, TSShapeConstructor),
       "Sets the detail size when lodType is set to SingleSize. No effect otherwise, and no effect for DTS files.\n"
       "@see lodType" );
 
-   addField( "matNamePrefix", TypeRealString, Offset(mOptions.mMatNamePrefix, TSShapeConstructor),
+   addField( "matNamePrefix", TypeRealString, Offset(mOptions.matNamePrefix, TSShapeConstructor),
       "Prefix to apply to all material map names in the COLLADA (.dae) file. No effect for DTS files.\n"
       "This field is useful to avoid material name clashes for exporters that generate generic material "
       "names like \"texture0\" or \"material1\"." );
 
-   addField( "alwaysImport", TypeRealString, Offset(mOptions.mAlwaysImport, TSShapeConstructor),
+   addField( "alwaysImport", TypeRealString, Offset(mOptions.alwaysImport, TSShapeConstructor),
       "TAB separated patterns of nodes to import even if in neverImport list. No effect for DTS files.\n"
       "Torque allows unwanted nodes in COLLADA (.dae) files to to be ignored "
       "during import. This field contains a TAB separated list of patterns to "
@@ -215,7 +215,7 @@ void TSShapeConstructor::initPersistFields()
       "}\n"
       "@endtsexample" );
 
-   addField( "neverImport", TypeRealString, Offset(mOptions.mNeverImport, TSShapeConstructor),
+   addField( "neverImport", TypeRealString, Offset(mOptions.neverImport, TSShapeConstructor),
       "TAB separated patterns of nodes to ignore on loading. No effect for DTS files.\n"
       "Torque allows unwanted nodes in COLLADA (.dae) files to to be ignored "
       "during import. This field contains a TAB separated list of patterns to "
@@ -223,7 +223,7 @@ void TSShapeConstructor::initPersistFields()
       "not be imported (unless it matches the alwaysImport list.\n"
       "@see alwaysImport" );
 
-   addField( "alwaysImportMesh", TypeRealString, Offset(mOptions.mAlwaysImportMesh, TSShapeConstructor),
+   addField( "alwaysImportMesh", TypeRealString, Offset(mOptions.alwaysImportMesh, TSShapeConstructor),
       "TAB separated patterns of meshes to import even if in neverImportMesh list. No effect for DTS files.\n"
       "Torque allows unwanted meshes in COLLADA (.dae) files to to be ignored "
       "during import. This field contains a TAB separated list of patterns to "
@@ -239,7 +239,7 @@ void TSShapeConstructor::initPersistFields()
       "}\n"
       "@endtsexample" );
 
-   addField( "neverImportMesh", TypeRealString, Offset(mOptions.mNeverImportMesh, TSShapeConstructor),
+   addField( "neverImportMesh", TypeRealString, Offset(mOptions.neverImportMesh, TSShapeConstructor),
       "TAB separated patterns of meshes to ignore on loading. No effect for DTS files.\n"
       "Torque allows unwanted meshes in COLLADA (.dae) files to to be ignored "
       "during import. This field contains a TAB separated list of patterns to "
@@ -247,21 +247,21 @@ void TSShapeConstructor::initPersistFields()
       "not be imported (unless it matches the alwaysImportMesh list.\n"
       "@see alwaysImportMesh" );
 
-   addField( "ignoreNodeScale", TypeBool, Offset(mOptions.mIgnoreNodeScale, TSShapeConstructor),
+   addField( "ignoreNodeScale", TypeBool, Offset(mOptions.ignoreNodeScale, TSShapeConstructor),
       "Ignore <scale> elements inside COLLADA <node>s. No effect for DTS files.\n"
       "This field is a workaround for certain exporters that generate bad node "
       "scaling, and is not usually required." );
 
-   addField( "adjustCenter", TypeBool, Offset(mOptions.mAdjustCenter, TSShapeConstructor),
+   addField( "adjustCenter", TypeBool, Offset(mOptions.adjustCenter, TSShapeConstructor),
       "Translate COLLADA model on import so the origin is at the center. No effect for DTS files." );
 
-   addField( "adjustFloor", TypeBool, Offset(mOptions.mAdjustFloor, TSShapeConstructor),
+   addField( "adjustFloor", TypeBool, Offset(mOptions.adjustFloor, TSShapeConstructor),
       "Translate COLLADA model on import so origin is at the (Z axis) bottom of the model. No effect for DTS files.\n"
       "This can be used along with adjustCenter to have the origin at the "
       "center of the bottom of the model.\n"
       "@see adjustCenter" );
 
-   addField( "forceUpdateMaterials", TypeBool, Offset(mOptions.mForceUpdateMaterials, TSShapeConstructor),
+   addField( "forceUpdateMaterials", TypeBool, Offset(mOptions.forceUpdateMaterials, TSShapeConstructor),
       "Forces update of the materials.cs file in the same folder as the COLLADA "
       "(.dae) file, even if Materials already exist. No effect for DTS files.\n"
       "Normally only Materials that are not already defined are written to materials.cs." );
@@ -482,7 +482,7 @@ bool TSShapeConstructor::writeField(StringTableEntry fieldname, const char *valu
          return ret;                                                 \
       }                                                              \
    }                                                                 \
-   TSShape::Node* var = var##Index < 0 ? NULL : &(mShape->mNodes[var##Index]); \
+   TSShape::Node* var = var##Index < 0 ? NULL : &(mShape->nodes[var##Index]); \
    TORQUE_UNUSED(var##Index);                                        \
    TORQUE_UNUSED(var)
 
@@ -495,7 +495,7 @@ bool TSShapeConstructor::writeField(StringTableEntry fieldname, const char *valu
          "node '%s'", name);                                         \
       return ret;                                                    \
    }                                                                 \
-   TSShape::Node* var = &(mShape->mNodes[var##Index]);                \
+   TSShape::Node* var = &(mShape->nodes[var##Index]);                \
    TORQUE_UNUSED(var##Index);                                        \
    TORQUE_UNUSED(var)
 
@@ -508,7 +508,7 @@ bool TSShapeConstructor::writeField(StringTableEntry fieldname, const char *valu
          "object '%s'", name);                                       \
       return ret;                                                    \
    }                                                                 \
-   TSShape::Object* var = &(mShape->mObjects[var##Index]);            \
+   TSShape::Object* var = &(mShape->objects[var##Index]);            \
    TORQUE_UNUSED(var##Index);                                        \
    TORQUE_UNUSED(var)
 
@@ -531,7 +531,7 @@ bool TSShapeConstructor::writeField(StringTableEntry fieldname, const char *valu
          "sequence named '%s'", name);                               \
       return ret;                                                    \
    }                                                                 \
-   TSShape::Sequence* var = &(mShape->mSequences[var##Index]);        \
+   TSShape::Sequence* var = &(mShape->sequences[var##Index]);        \
    TORQUE_UNUSED(var##Index);                                        \
    TORQUE_UNUSED(var);
 
@@ -695,7 +695,7 @@ DefineTSShapeConstructorMethod( getNodeCount, S32, (),,
    "%count = %this.getNodeCount();\n"
    "@endtsexample\n" )
 {
-   return mShape->mNodes.size();
+   return mShape->nodes.size();
 }}
 
 DefineTSShapeConstructorMethod( getNodeIndex, S32, ( const char* name ),,
@@ -723,8 +723,8 @@ DefineTSShapeConstructorMethod( getNodeName, const char*, ( S32 index ),,
    "   echo(%i SPC %this.getNodeName(%i));\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getNodeName, index, mShape->mNodes.size(), "" );
-   return mShape->getName( mShape->mNodes[index].nameIndex );
+   CHECK_INDEX_IN_RANGE( getNodeName, index, mShape->nodes.size(), "" );
+   return mShape->getName( mShape->nodes[index].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getNodeParentName, const char*, ( const char* name ),,
@@ -742,7 +742,7 @@ DefineTSShapeConstructorMethod( getNodeParentName, const char*, ( const char* na
    if ( node->parentIndex < 0 )
       return "";
    else
-      return mShape->getName( mShape->mNodes[node->parentIndex].nameIndex );
+      return mShape->getName( mShape->nodes[node->parentIndex].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( setNodeParent, bool, ( const char* name, const char* parentName ),,
@@ -814,7 +814,7 @@ DefineTSShapeConstructorMethod( getNodeChildName, const char*, ( const char* nam
    mShape->getNodeChildren( nodeIndex, nodeChildren );
    CHECK_INDEX_IN_RANGE( getNodeChildName, index, nodeChildren.size(), "" );
 
-   return mShape->getName( mShape->mNodes[nodeChildren[index]].nameIndex );
+   return mShape->getName( mShape->nodes[nodeChildren[index]].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getNodeObjectCount, S32, ( const char* name ),,
@@ -852,7 +852,7 @@ DefineTSShapeConstructorMethod( getNodeObjectName, const char*, ( const char* na
    mShape->getNodeObjects( nodeIndex, nodeObjects );
    CHECK_INDEX_IN_RANGE( getNodeObjectName, index, nodeObjects.size(), "" );
 
-   return mShape->getName( mShape->mObjects[nodeObjects[index]].nameIndex );
+   return mShape->getName( mShape->objects[nodeObjects[index]].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getNodeTransform, TransformF, ( const char* name, bool isWorld ), ( false ),
@@ -884,8 +884,8 @@ DefineTSShapeConstructorMethod( getNodeTransform, TransformF, ( const char* name
    else
    {
       // Local transform
-      pos = mShape->mDefaultTranslations[nodeIndex];
-      const Quat16& q16 = mShape->mDefaultRotations[nodeIndex];
+      pos = mShape->defaultTranslations[nodeIndex];
+      const Quat16& q16 = mShape->defaultRotations[nodeIndex];
       aa.set( q16.getQuatF() );
    }
 
@@ -1067,7 +1067,7 @@ DefineTSShapeConstructorMethod( getObjectCount, S32, (),, (), 0,
    "%count = %this.getObjectCount();\n"
    "@endtsexample\n" )
 {
-   return mShape->mObjects.size();
+   return mShape->objects.size();
 }}
 
 DefineTSShapeConstructorMethod( getObjectName, const char*, ( S32 index ),,
@@ -1082,9 +1082,9 @@ DefineTSShapeConstructorMethod( getObjectName, const char*, ( S32 index ),,
    "   echo( %i SPC %this.getObjectName( %i ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getObjectName, index, mShape->mObjects.size(), "" );
+   CHECK_INDEX_IN_RANGE( getObjectName, index, mShape->objects.size(), "" );
 
-   return mShape->getName( mShape->mObjects[index].nameIndex );
+   return mShape->getName( mShape->objects[index].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getObjectIndex, S32, ( const char* name ),,
@@ -1113,7 +1113,7 @@ DefineTSShapeConstructorMethod( getObjectNode, const char*, ( const char* name )
    if ( obj->nodeIndex < 0 )
       return "";
    else
-      return mShape->getName( mShape->mNodes[obj->nodeIndex].nameIndex );
+      return mShape->getName( mShape->nodes[obj->nodeIndex].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( setObjectNode, bool, ( const char* objName, const char* nodeName ),,
@@ -1218,7 +1218,7 @@ DefineTSShapeConstructorMethod( getMeshName, const char*, ( const char* name, S3
 
    static const U32 bufSize = 256;
    char* returnBuffer = Con::getReturnBuffer(bufSize);
-   dSprintf(returnBuffer, bufSize, "%s %d", name, (S32)mShape->mDetails[objectDetails[index]].size);
+   dSprintf(returnBuffer, bufSize, "%s %d", name, (S32)mShape->details[objectDetails[index]].size);
    return returnBuffer;
 }}
 
@@ -1243,7 +1243,7 @@ DefineTSShapeConstructorMethod( getMeshSize, S32, ( const char* name, S32 index 
 
    CHECK_INDEX_IN_RANGE( getMeshName, index, objectDetails.size(), -1 );
 
-   return (S32)mShape->mDetails[objectDetails[index]].size;
+   return (S32)mShape->details[objectDetails[index]].size;
 }}
 
 DefineTSShapeConstructorMethod( setMeshSize, bool, ( const char* name, S32 size ),,
@@ -1327,9 +1327,9 @@ DefineTSShapeConstructorMethod( getMeshMaterial, const char*, ( const char* name
    GET_MESH( getMeshMaterial, mesh, name, "" );
 
    // Return the name of the first material attached to this mesh
-   S32 matIndex = mesh->mPrimitives[0].matIndex & TSDrawPrimitive::MaterialMask;
-   if ((matIndex >= 0) && (matIndex < mShape->mMaterialList->size()))
-      return mShape->mMaterialList->getMaterialName( matIndex );
+   S32 matIndex = mesh->primitives[0].matIndex & TSDrawPrimitive::MaterialMask;
+   if ((matIndex >= 0) && (matIndex < mShape->materialList->size()))
+      return mShape->materialList->getMaterialName( matIndex );
    else
       return "";
 }}
@@ -1351,23 +1351,23 @@ DefineTSShapeConstructorMethod( setMeshMaterial, bool, ( const char* meshName, c
 
    // Check if this material is already in the shape
    S32 matIndex;
-   for ( matIndex = 0; matIndex < mShape->mMaterialList->size(); matIndex++ )
+   for ( matIndex = 0; matIndex < mShape->materialList->size(); matIndex++ )
    {
-      if ( dStrEqual( matName, mShape->mMaterialList->getMaterialName( matIndex ) ) )
+      if ( dStrEqual( matName, mShape->materialList->getMaterialName( matIndex ) ) )
          break;
    }
-   if ( matIndex == mShape->mMaterialList->size() )
+   if ( matIndex == mShape->materialList->size() )
    {
       // Add a new material to the shape
       U32 flags = TSMaterialList::S_Wrap | TSMaterialList::T_Wrap;
-      mShape->mMaterialList->push_back( matName, flags );
+      mShape->materialList->push_back( matName, flags );
    }
 
    // Set this material for all primitives in the mesh
-   for ( S32 i = 0; i < mesh->mPrimitives.size(); i++ )
+   for ( S32 i = 0; i < mesh->primitives.size(); i++ )
    {
-      U32 matType = mesh->mPrimitives[i].matIndex & ( TSDrawPrimitive::TypeMask | TSDrawPrimitive::Indexed );
-      mesh->mPrimitives[i].matIndex = ( matType | matIndex );
+      U32 matType = mesh->primitives[i].matIndex & ( TSDrawPrimitive::TypeMask | TSDrawPrimitive::Indexed );
+      mesh->primitives[i].matIndex = ( matType | matIndex );
    }
 
    ADD_TO_CHANGE_SET();
@@ -1432,7 +1432,7 @@ DefineTSShapeConstructorMethod( getBounds, Box3F, (),,
    "Get the bounding box for the shape.\n"
    "@return Bounding box \"minX minY minZ maxX maxY maxZ\"" )
 {
-   return mShape->mBounds;
+   return mShape->bounds;
 }}
 
 DefineTSShapeConstructorMethod( setBounds, bool, ( Box3F bbox ),,
@@ -1444,10 +1444,10 @@ DefineTSShapeConstructorMethod( setBounds, bool, ( Box3F bbox ),,
    // Set shape bounds
    TSShape* shape = mShape;
 
-   shape->mBounds = bbox;
-   shape->mBounds.getCenter( &shape->mCenter );
-   shape->mRadius = ( shape->mBounds.maxExtents - shape->mCenter ).len();
-   shape->mTubeRadius = shape->mRadius;
+   shape->bounds = bbox;
+   shape->bounds.getCenter( &shape->center );
+   shape->radius = ( shape->bounds.maxExtents - shape->center ).len();
+   shape->tubeRadius = shape->radius;
 
    ADD_TO_CHANGE_SET();
    return true;
@@ -1459,7 +1459,7 @@ DefineTSShapeConstructorMethod( getDetailLevelCount, S32, (),, (), 0,
    "Get the total number of detail levels in the shape.\n"
    "@return the number of detail levels in the shape\n" )
 {
-   return mShape->mDetails.size();
+   return mShape->details.size();
 }}
 
 DefineTSShapeConstructorMethod( getDetailLevelName, const char*, ( S32 index ),,
@@ -1474,9 +1474,9 @@ DefineTSShapeConstructorMethod( getDetailLevelName, const char*, ( S32 index ),,
    "   echo( %i SPC %this.getDetailLevelName( %i ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getDetailLevelName, index, mShape->mDetails.size(), "" );
+   CHECK_INDEX_IN_RANGE( getDetailLevelName, index, mShape->details.size(), "" );
 
-   return mShape->getName(mShape->mDetails[index].nameIndex);
+   return mShape->getName(mShape->details[index].nameIndex);
 }}
 
 DefineTSShapeConstructorMethod( getDetailLevelSize, S32, ( S32 index),,
@@ -1491,9 +1491,9 @@ DefineTSShapeConstructorMethod( getDetailLevelSize, S32, ( S32 index),,
    "   echo( \"Detail\" @ %i @ \" has size \" @ %this.getDetailLevelSize( %i ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getDetailLevelSize, index, mShape->mDetails.size(), 0 );
+   CHECK_INDEX_IN_RANGE( getDetailLevelSize, index, mShape->details.size(), 0 );
 
-   return (S32)mShape->mDetails[index].size;
+   return (S32)mShape->details[index].size;
 }}
 
 DefineTSShapeConstructorMethod( getDetailLevelIndex, S32, ( S32 size ),,
@@ -1568,9 +1568,9 @@ DefineTSShapeConstructorMethod( getImposterDetailLevel, S32, (),, (), -1,
    "@return imposter detail level index, or -1 if the shape does not use "
    "imposters.\n\n" )
 {
-   for ( S32 i = 0; i < mShape->mDetails.size(); i++ )
+   for ( S32 i = 0; i < mShape->details.size(); i++ )
    {
-      if ( mShape->mDetails[i].subShapeNum < 0 )
+      if ( mShape->details[i].subShapeNum < 0 )
          return i;
    }
    return -1;
@@ -1598,10 +1598,10 @@ DefineTSShapeConstructorMethod( getImposterSettings, const char*, ( S32 index ),
    "   echo( \"Imposter settings: \" @ %this.getImposterSettings( %index ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getImposterSettings, index, mShape->mDetails.size(), "" );
+   CHECK_INDEX_IN_RANGE( getImposterSettings, index, mShape->details.size(), "" );
 
    // Return information about the detail level
-   const TSShape::Detail& det = mShape->mDetails[index];
+   const TSShape::Detail& det = mShape->details[index];
 
    static const U32 bufSize = 512;
    char* returnBuffer = Con::getReturnBuffer(bufSize);
@@ -1672,7 +1672,7 @@ DefineTSShapeConstructorMethod( getSequenceCount, S32, (),, (), 0,
    "Get the total number of sequences in the shape.\n"
    "@return the number of sequences in the shape\n\n" )
 {
-   return mShape->mSequences.size();
+   return mShape->sequences.size();
 }}
 
 DefineTSShapeConstructorMethod( getSequenceIndex, S32, ( const char* name),,
@@ -1701,9 +1701,9 @@ DefineTSShapeConstructorMethod( getSequenceName, const char*, ( S32 index ),,
    "   echo( %i SPC %this.getSequenceName( %i ) );\n"
    "@endtsexample\n" )
 {
-   CHECK_INDEX_IN_RANGE( getSequenceName, index, mShape->mSequences.size(), "" );
+   CHECK_INDEX_IN_RANGE( getSequenceName, index, mShape->sequences.size(), "" );
 
-   return mShape->getName( mShape->mSequences[index].nameIndex );
+   return mShape->getName( mShape->sequences[index].nameIndex );
 }}
 
 DefineTSShapeConstructorMethod( getSequenceSource, const char*, ( const char* name ),,
@@ -1792,12 +1792,12 @@ DefineTSShapeConstructorMethod( getSequenceGroundSpeed, const char*, ( const cha
    Point3F trans(0,0,0), rot(0,0,0);
    if ( seq->numGroundFrames > 0 )
    {
-      const Point3F& p1 = mShape->mGroundTranslations[seq->firstGroundFrame];
-      const Point3F& p2 = mShape->mGroundTranslations[seq->firstGroundFrame + 1];
+      const Point3F& p1 = mShape->groundTranslations[seq->firstGroundFrame];
+      const Point3F& p2 = mShape->groundTranslations[seq->firstGroundFrame + 1];
       trans = p2 - p1;
 
-      QuatF r1 = mShape->mGroundRotations[seq->firstGroundFrame].getQuatF();
-      QuatF r2 = mShape->mGroundRotations[seq->firstGroundFrame + 1].getQuatF();
+      QuatF r1 = mShape->groundRotations[seq->firstGroundFrame].getQuatF();
+      QuatF r2 = mShape->groundRotations[seq->firstGroundFrame + 1].getQuatF();
       r2 -= r1;
 
       MatrixF mat;
@@ -2037,7 +2037,7 @@ DefineTSShapeConstructorMethod( getTrigger, const char*, ( const char* name, S32
 
    CHECK_INDEX_IN_RANGE( getTrigger, index, seq->numTriggers, "" );
 
-   const TSShape::Trigger& trig = mShape->mTriggers[seq->firstTrigger + index];
+   const TSShape::Trigger& trig = mShape->triggers[seq->firstTrigger + index];
    S32 frame = trig.pos * seq->numKeyframes;
    S32 state = getBinLog2(trig.state & TSShape::Trigger::StateMask) + 1;
    if (!(trig.state & TSShape::Trigger::StateOn))
@@ -2144,9 +2144,9 @@ void TSShapeConstructor::ChangeSet::write(TSShape* shape, Stream& stream, const 
    // Remove all __backup__ sequences (used during Shape Editing)
    if (shape)
    {
-      for (S32 i = 0; i < shape->mSequences.size(); i++)
+      for (S32 i = 0; i < shape->sequences.size(); i++)
       {
-         const char* seqName = shape->getName( shape->mSequences[i].nameIndex );
+         const char* seqName = shape->getName( shape->sequences[i].nameIndex );
          if ( dStrStartsWith( seqName, "__backup__" ) )
          {
             Command cmd( "removeSequence" );

@@ -213,7 +213,7 @@ void RenderShapeExample::createShape()
    }
 
    // Update the bounding box
-   mObjBox = mShape->mBounds;
+   mObjBox = mShape->bounds;
    resetWorldBox();
    setRenderTransform(mObjToWorld);
 

@@ -323,9 +323,9 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
       // Resolve details and camera node indexes.
       static const String sCollisionStr( "collision-" );
 
-      for (i = 0; i < mShape->mDetails.size(); i++)
+      for (i = 0; i < mShape->details.size(); i++)
       {
-         const String &name = mShape->mNames[mShape->mDetails[i].nameIndex];
+         const String &name = mShape->names[mShape->details[i].nameIndex];
 
          if (name.compare( sCollisionStr, sCollisionStr.length(), String::NoCase ) == 0)
          {
@@ -335,15 +335,15 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
             mShape->computeBounds(collisionDetails.last(), collisionBounds.last());
             mShape->getAccelerator(collisionDetails.last());
 
-            if (!mShape->mBounds.isContained(collisionBounds.last()))
+            if (!mShape->bounds.isContained(collisionBounds.last()))
             {
                Con::warnf("Warning: shape %s collision detail %d (Collision-%d) bounds exceed that of shape.", shapeName, collisionDetails.size() - 1, collisionDetails.last());
-               collisionBounds.last() = mShape->mBounds;
+               collisionBounds.last() = mShape->bounds;
             }
             else if (collisionBounds.last().isValidBox() == false)
             {
                Con::errorf("Error: shape %s-collision detail %d (Collision-%d) bounds box invalid!", shapeName, collisionDetails.size() - 1, collisionDetails.last());
-               collisionBounds.last() = mShape->mBounds;
+               collisionBounds.last() = mShape->bounds;
             }
 
             // The way LOS works is that it will check to see if there is a LOS detail that matches
@@ -364,9 +364,9 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
       // Snag any "unmatched" LOS details
       static const String sLOSStr( "LOS-" );
 
-      for (i = 0; i < mShape->mDetails.size(); i++)
+      for (i = 0; i < mShape->details.size(); i++)
       {
-         const String &name = mShape->mNames[mShape->mDetails[i].nameIndex];
+         const String &name = mShape->names[mShape->details[i].nameIndex];
 
          if (name.compare( sLOSStr, sLOSStr.length(), String::NoCase ) == 0)
          {
@@ -410,7 +410,7 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
       damageSequence = mShape->findSequence("Damage");
 
       //
-      F32 w = mShape->mBounds.len_y() / 2;
+      F32 w = mShape->bounds.len_y() / 2;
       if (cameraMaxDist < w)
          cameraMaxDist = w;
    }
@@ -606,7 +606,7 @@ DefineEngineMethod( ShapeBaseData, checkDeployPos, bool, ( TransformF txfm ),,
 
    MatrixF mat = txfm.getMatrix();
 
-   Box3F objBox = object->mShape->mBounds;
+   Box3F objBox = object->mShape->bounds;
    Point3F boxCenter = (objBox.minExtents + objBox.maxExtents) * 0.5f;
    objBox.minExtents = boxCenter + (objBox.minExtents - boxCenter) * 0.9f;
    objBox.maxExtents = boxCenter + (objBox.maxExtents - boxCenter) * 0.9f;
@@ -1097,11 +1097,11 @@ bool ShapeBase::onNewDataBlock( GameBaseData *dptr, bool reload )
       if (isClientObject())
          mShapeInstance->cloneMaterialList();
 
-      mObjBox = mDataBlock->mShape->mBounds;
+      mObjBox = mDataBlock->mShape->bounds;
       resetWorldBox();
 
       // Set the initial mesh hidden state.
-      mMeshHidden.setSize( mDataBlock->mShape->mObjects.size() );
+      mMeshHidden.setSize( mDataBlock->mShape->objects.size() );
       mMeshHidden.clear();
 
       // Initialize the threads
@@ -1126,8 +1126,8 @@ bool ShapeBase::onNewDataBlock( GameBaseData *dptr, bool reload )
             AssertFatal( prevDB != NULL, "ShapeBase::onNewDataBlock - how did you have a sequence playing without a prior datablock?" );
    
             const TSShape *prevShape = prevDB->mShape;
-            const TSShape::Sequence &prevSeq = prevShape->mSequences[st.sequence];
-            const String &prevSeqName = prevShape->mNames[prevSeq.nameIndex];
+            const TSShape::Sequence &prevSeq = prevShape->sequences[st.sequence];
+            const String &prevSeqName = prevShape->names[prevSeq.nameIndex];
 
             st.sequence = mDataBlock->mShape->findSequence( prevSeqName );
 
@@ -2123,7 +2123,7 @@ const char *ShapeBase::getThreadSequenceName( U32 slot )
 	}
 
 	// Name Index
-	const U32 nameIndex = getShape()->mSequences[st.sequence].nameIndex;
+	const U32 nameIndex = getShape()->sequences[st.sequence].nameIndex;
 
 	// Return Name.
 	return getShape()->getName( nameIndex );
@@ -2309,7 +2309,7 @@ void ShapeBase::advanceThreads(F32 dt)
    for (U32 i = 0; i < MaxScriptThreads; i++) {
       Thread& st = mScriptThread[i];
       if (st.thread) {
-         if (!mShapeInstance->getShape()->mSequences[st.sequence].isCyclic() && !st.atEnd &&
+         if (!mShapeInstance->getShape()->sequences[st.sequence].isCyclic() && !st.atEnd &&
 			 ( ( st.timescale > 0.f )? mShapeInstance->getPos(st.thread) >= 1.0:
               mShapeInstance->getPos(st.thread) <= 0)) {
             st.atEnd = true;
@@ -2589,7 +2589,7 @@ void ShapeBase::_renderBoundingBox( ObjectRenderInst *ri, SceneRenderState *stat
          MatrixF mat;
          getRenderImageTransform( ri->objectIndex, &mat );         
 
-         const Box3F &objBox = image.shapeInstance[getImageShapeIndex(image)]->getShape()->mBounds;
+         const Box3F &objBox = image.shapeInstance[getImageShapeIndex(image)]->getShape()->bounds;
 
          drawer->drawCube( desc, objBox, ColorI( 255, 255, 255 ), &mat );
       }
@@ -3277,17 +3277,17 @@ void ShapeBaseConvex::findNodeTransform()
    TSShapeInstance* si = pShapeBase->getShapeInstance();
    TSShape* shape = si->getShape();
 
-   const TSShape::Detail* detail = &shape->mDetails[dl];
+   const TSShape::Detail* detail = &shape->details[dl];
    const S32 subs = detail->subShapeNum;
-   const S32 start = shape->mSubShapeFirstObject[subs];
-   const S32 end = start + shape->mSubShapeNumObjects[subs];
+   const S32 start = shape->subShapeFirstObject[subs];
+   const S32 end = start + shape->subShapeNumObjects[subs];
 
    // Find the first object that contains a mesh for this
    // detail level. There should only be one mesh per
    // collision detail level.
    for (S32 i = start; i < end; i++) 
    {
-      const TSShape::Object* obj = &shape->mObjects[i];
+      const TSShape::Object* obj = &shape->objects[i];
       if (obj->numMeshes && detail->objectDetailNum < obj->numMeshes) 
       {
          nodeTransform = &si->mNodeTransforms[obj->nodeIndex];
@@ -4857,7 +4857,7 @@ DefineEngineMethod( ShapeBase, changeMaterial, void, ( const char* mapTo, Materi
    ShapeBase *clientObj = dynamic_cast< ShapeBase* > ( object->getClientObject() );
 
    // Check the mapTo name exists for this shape
-   S32 matIndex = serverObj->getShape()->mMaterialList->getMaterialNameList().find_next(String(mapTo));
+   S32 matIndex = serverObj->getShape()->materialList->getMaterialNameList().find_next(String(mapTo));
    if (matIndex < 0)
    {
       Con::errorf("ShapeBase::changeMaterial failed: Invalid mapTo name '%s'", mapTo);
@@ -4876,19 +4876,19 @@ DefineEngineMethod( ShapeBase, changeMaterial, void, ( const char* mapTo, Materi
    // Replace instances with the new material being traded in. For ShapeBase
    // class we have to update the server/client objects separately so both
    // represent our changes
-   delete serverObj->getShape()->mMaterialList->mMatInstList[matIndex];
-   serverObj->getShape()->mMaterialList->mMatInstList[matIndex] = newMat->createMatInstance();
+   delete serverObj->getShape()->materialList->mMatInstList[matIndex];
+   serverObj->getShape()->materialList->mMatInstList[matIndex] = newMat->createMatInstance();
    if (clientObj)
    {
-      delete clientObj->getShape()->mMaterialList->mMatInstList[matIndex];
-      clientObj->getShape()->mMaterialList->mMatInstList[matIndex] = newMat->createMatInstance();
+      delete clientObj->getShape()->materialList->mMatInstList[matIndex];
+      clientObj->getShape()->materialList->mMatInstList[matIndex] = newMat->createMatInstance();
    }
 
    // Finish up preparing the material instances for rendering
    const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPNTTB>();
    FeatureSet features = MATMGR->getDefaultFeatures();
 
-   serverObj->getShape()->mMaterialList->getMaterialInst(matIndex)->init( features, flags );
+   serverObj->getShape()->materialList->getMaterialInst(matIndex)->init( features, flags );
    if (clientObj)
       clientObj->getShapeInstance()->mMaterialList->getMaterialInst(matIndex)->init( features, flags );
 }

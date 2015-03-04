@@ -45,31 +45,31 @@ const char* ColladaAppSequence::getName() const
 
 S32 ColladaAppSequence::getNumTriggers()
 {
-   return clipExt->mTriggers.size();
+   return clipExt->triggers.size();
 }
 
 void ColladaAppSequence::getTrigger(S32 index, TSShape::Trigger& trigger)
 {
-   trigger.pos = clipExt->mTriggers[index].time;
-   trigger.state = clipExt->mTriggers[index].state;
+   trigger.pos = clipExt->triggers[index].time;
+   trigger.state = clipExt->triggers[index].state;
 }
 
 U32 ColladaAppSequence::getFlags() const
 {
    U32 flags = 0;
-   if (clipExt->mCyclic) flags |= TSShape::Cyclic;
-   if (clipExt->mBlend)  flags |= TSShape::Blend;
+   if (clipExt->cyclic) flags |= TSShape::Cyclic;
+   if (clipExt->blend)  flags |= TSShape::Blend;
    return flags;
 }
 
 F32 ColladaAppSequence::getPriority()
 {
-   return clipExt->mPriority;
+   return clipExt->priority;
 }
 
 F32 ColladaAppSequence::getBlendRefTime()
 {
-   return clipExt->mBlendReferenceTime;
+   return clipExt->blendReferenceTime;
 }
 
 void ColladaAppSequence::setActive(bool active)
@@ -88,7 +88,7 @@ void ColladaAppSequence::setAnimationActive(const domAnimation* anim, bool activ
       domChannel* channel = anim->getChannel_array()[iChannel];
       AnimData* animData = reinterpret_cast<AnimData*>(channel->getUserData());
       if (animData)
-         animData->mEnabled = active;
+         animData->enabled = active;
    }
 
    // Recurse into child animations

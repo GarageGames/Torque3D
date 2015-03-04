@@ -41,21 +41,21 @@ ConsoleParser *CodeBlock::smCurrentParser = NULL;
 
 CodeBlock::CodeBlock()
 {
-   mGlobalStrings = NULL;
-   mFunctionStrings = NULL;
-   mFunctionStringsMaxLen = 0;
-   mGlobalStringsMaxLen = 0;
-   mGlobalFloats = NULL;
-   mFunctionFloats = NULL;
-   mLineBreakPairs = NULL;
-   mBreakList = NULL;
-   mBreakListSize = 0;
+   globalStrings = NULL;
+   functionStrings = NULL;
+   functionStringsMaxLen = 0;
+   globalStringsMaxLen = 0;
+   globalFloats = NULL;
+   functionFloats = NULL;
+   lineBreakPairs = NULL;
+   breakList = NULL;
+   breakListSize = 0;
 
-   mRefCount = 0;
-   mCode = NULL;
-   mName = NULL;
-   mFullPath = NULL;
-   mModPath = NULL;
+   refCount = 0;
+   code = NULL;
+   name = NULL;
+   fullPath = NULL;
+   modPath = NULL;
 }
 
 CodeBlock::~CodeBlock()
@@ -63,18 +63,18 @@ CodeBlock::~CodeBlock()
    // Make sure we aren't lingering in the current code block...
    AssertFatal(smCurrentCodeBlock != this, "CodeBlock::~CodeBlock - Caught lingering in smCurrentCodeBlock!")
 
-   if(mName)
+   if(name)
       removeFromCodeList();
-   delete[] const_cast<char*>(mGlobalStrings);
-   delete[] const_cast<char*>(mFunctionStrings);
+   delete[] const_cast<char*>(globalStrings);
+   delete[] const_cast<char*>(functionStrings);
    
-   mFunctionStringsMaxLen = 0;
-   mGlobalStringsMaxLen = 0;
+   functionStringsMaxLen = 0;
+   globalStringsMaxLen = 0;
 
-   delete[] mGlobalFloats;
-   delete[] mFunctionFloats;
-   delete[] mCode;
-   delete[] mBreakList;
+   delete[] globalFloats;
+   delete[] functionFloats;
+   delete[] code;
+   delete[] breakList;
 }
 
 //-------------------------------------------------------------------------
@@ -82,7 +82,7 @@ CodeBlock::~CodeBlock()
 StringTableEntry CodeBlock::getCurrentCodeBlockName()
 {
    if (CodeBlock::getCurrentBlock())
-      return CodeBlock::getCurrentBlock()->mName;
+      return CodeBlock::getCurrentBlock()->name;
    else
       return NULL;
 }   
@@ -90,7 +90,7 @@ StringTableEntry CodeBlock::getCurrentCodeBlockName()
 StringTableEntry CodeBlock::getCurrentCodeBlockFullPath()
 {
    if (CodeBlock::getCurrentBlock())
-      return CodeBlock::getCurrentBlock()->mFullPath;
+      return CodeBlock::getCurrentBlock()->fullPath;
    else
       return NULL;
 }
@@ -98,15 +98,15 @@ StringTableEntry CodeBlock::getCurrentCodeBlockFullPath()
 StringTableEntry CodeBlock::getCurrentCodeBlockModName()
 {
    if (CodeBlock::getCurrentBlock())
-      return CodeBlock::getCurrentBlock()->mModPath;
+      return CodeBlock::getCurrentBlock()->modPath;
    else
       return NULL;
 }
 
 CodeBlock *CodeBlock::find(StringTableEntry name)
 {
-   for(CodeBlock *walk = CodeBlock::getCodeBlockList(); walk; walk = walk->mNextFile)
-      if(walk->mName == name)
+   for(CodeBlock *walk = CodeBlock::getCodeBlockList(); walk; walk = walk->nextFile)
+      if(walk->name == name)
          return walk;
    return NULL;
 }
@@ -116,39 +116,39 @@ CodeBlock *CodeBlock::find(StringTableEntry name)
 void CodeBlock::addToCodeList()
 {
    // remove any code blocks with my name
-   for(CodeBlock **walk = &smCodeBlockList; *walk;walk = &((*walk)->mNextFile))
+   for(CodeBlock **walk = &smCodeBlockList; *walk;walk = &((*walk)->nextFile))
    {
-      if((*walk)->mName == mName)
+      if((*walk)->name == name)
       {
-         *walk = (*walk)->mNextFile;
+         *walk = (*walk)->nextFile;
          break;
       }
    }
-   mNextFile = smCodeBlockList;
+   nextFile = smCodeBlockList;
    smCodeBlockList = this;
 }
 
 void CodeBlock::clearAllBreaks()
 {
-   if(!mLineBreakPairs)
+   if(!lineBreakPairs)
       return;
-   for(U32 i = 0; i < mLineBreakPairCount; i++)
+   for(U32 i = 0; i < lineBreakPairCount; i++)
    {
-      U32 *p = mLineBreakPairs + i * 2;
-      mCode[p[1]] = p[0] & 0xFF;
+      U32 *p = lineBreakPairs + i * 2;
+      code[p[1]] = p[0] & 0xFF;
    }
 }
 
 void CodeBlock::clearBreakpoint(U32 lineNumber)
 {
-   if(!mLineBreakPairs)
+   if(!lineBreakPairs)
       return;
-   for(U32 i = 0; i < mLineBreakPairCount; i++)
+   for(U32 i = 0; i < lineBreakPairCount; i++)
    {
-      U32 *p = mLineBreakPairs + i * 2;
+      U32 *p = lineBreakPairs + i * 2;
       if((p[0] >> 8) == lineNumber)
       {
-         mCode[p[1]] = p[0] & 0xFF;
+         code[p[1]] = p[0] & 0xFF;
          return;
       }
    }
@@ -156,26 +156,26 @@ void CodeBlock::clearBreakpoint(U32 lineNumber)
 
 void CodeBlock::setAllBreaks()
 {
-   if(!mLineBreakPairs)
+   if(!lineBreakPairs)
       return;
-   for(U32 i = 0; i < mLineBreakPairCount; i++)
+   for(U32 i = 0; i < lineBreakPairCount; i++)
    {
-      U32 *p = mLineBreakPairs + i * 2;
-      mCode[p[1]] = OP_BREAK;
+      U32 *p = lineBreakPairs + i * 2;
+      code[p[1]] = OP_BREAK;
    }
 }
 
 bool CodeBlock::setBreakpoint(U32 lineNumber)
 {
-   if(!mLineBreakPairs)
+   if(!lineBreakPairs)
       return false;
 
-   for(U32 i = 0; i < mLineBreakPairCount; i++)
+   for(U32 i = 0; i < lineBreakPairCount; i++)
    {
-      U32 *p = mLineBreakPairs + i * 2;
+      U32 *p = lineBreakPairs + i * 2;
       if((p[0] >> 8) == lineNumber)
       {
-         mCode[p[1]] = OP_BREAK;
+         code[p[1]] = OP_BREAK;
          return true;
       }
    }
@@ -185,12 +185,12 @@ bool CodeBlock::setBreakpoint(U32 lineNumber)
 
 U32 CodeBlock::findFirstBreakLine(U32 lineNumber)
 {
-   if(!mLineBreakPairs)
+   if(!lineBreakPairs)
       return 0;
 
-   for(U32 i = 0; i < mLineBreakPairCount; i++)
+   for(U32 i = 0; i < lineBreakPairCount; i++)
    {
-      U32 *p = mLineBreakPairs + i * 2;
+      U32 *p = lineBreakPairs + i * 2;
       U32 line = (p[0] >> 8);
 
       if( lineNumber <= line )
@@ -209,11 +209,11 @@ struct LinePair
 void CodeBlock::findBreakLine(U32 ip, U32 &line, U32 &instruction)
 {
    U32 min = 0;
-   U32 max = mLineBreakPairCount - 1;
-   LinePair *p = (LinePair *) mLineBreakPairs;
+   U32 max = lineBreakPairCount - 1;
+   LinePair *p = (LinePair *) lineBreakPairs;
 
    U32 found;
-   if(!mLineBreakPairCount || p[min].ip > ip || p[max].ip < ip)
+   if(!lineBreakPairCount || p[min].ip > ip || p[max].ip < ip)
    {
       line = 0;
       instruction = OP_INVALID;
@@ -254,17 +254,17 @@ const char *CodeBlock::getFileLine(U32 ip)
    U32 line, inst;
    findBreakLine(ip, line, inst);
 
-   dSprintf(nameBuffer, sizeof(nameBuffer), "%s (%d)", mName ? mName : "<input>", line);
+   dSprintf(nameBuffer, sizeof(nameBuffer), "%s (%d)", name ? name : "<input>", line);
    return nameBuffer;
 }
 
 void CodeBlock::removeFromCodeList()
 {
-   for(CodeBlock **walk = &smCodeBlockList; *walk; walk = &((*walk)->mNextFile))
+   for(CodeBlock **walk = &smCodeBlockList; *walk; walk = &((*walk)->nextFile))
    {
       if(*walk == this)
       {
-         *walk = mNextFile;
+         *walk = nextFile;
 
          // clear out all breakpoints
          clearAllBreaks();
@@ -285,9 +285,9 @@ void CodeBlock::calcBreakList()
    S32 line = -1;
    U32 seqCount = 0;
    U32 i;
-   for(i = 0; i < mLineBreakPairCount; i++)
+   for(i = 0; i < lineBreakPairCount; i++)
    {
-      U32 lineNumber = mLineBreakPairs[i * 2];
+      U32 lineNumber = lineBreakPairs[i * 2];
       if(lineNumber == U32(line + 1))
          seqCount++;
       else
@@ -302,23 +302,23 @@ void CodeBlock::calcBreakList()
    if(seqCount)
       size++;
 
-   mBreakList = new U32[size];
-   mBreakListSize = size;
+   breakList = new U32[size];
+   breakListSize = size;
    line = -1;
    seqCount = 0;
    size = 0;
 
-   for(i = 0; i < mLineBreakPairCount; i++)
+   for(i = 0; i < lineBreakPairCount; i++)
    {
-      U32 lineNumber = mLineBreakPairs[i * 2];
+      U32 lineNumber = lineBreakPairs[i * 2];
 
       if(lineNumber == U32(line + 1))
          seqCount++;
       else
       {
          if(seqCount)
-            mBreakList[size++] = seqCount;
-         mBreakList[size++] = lineNumber - getMax(0, line) - 1;
+            breakList[size++] = seqCount;
+         breakList[size++] = lineNumber - getMax(0, line) - 1;
          seqCount = 1;
       }
 
@@ -326,12 +326,12 @@ void CodeBlock::calcBreakList()
    }
 
    if(seqCount)
-      mBreakList[size++] = seqCount;
+      breakList[size++] = seqCount;
 
-   for(i = 0; i < mLineBreakPairCount; i++)
+   for(i = 0; i < lineBreakPairCount; i++)
    {
-      U32 *p = mLineBreakPairs + i * 2;
-      p[0] = (p[0] << 8) | mCode[p[1]];
+      U32 *p = lineBreakPairs + i * 2;
+      p[0] = (p[0] << 8) | code[p[1]];
    }
 
    // Let the telnet debugger know that this code
@@ -346,27 +346,27 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
    const StringTableEntry exePath = Platform::getMainDotCsDir();
    const StringTableEntry cwd = Platform::getCurrentDirectory();
 
-   mName = fileName;
+   name = fileName;
 
    if(fileName)
    {
-      mFullPath = NULL;
+      fullPath = NULL;
 
       if(Platform::isFullPath(fileName))
-         mFullPath = fileName;
+         fullPath = fileName;
 
       if(dStrnicmp(exePath, fileName, dStrlen(exePath)) == 0)
-         mName = StringTable->insert(fileName + dStrlen(exePath) + 1, true);
+         name = StringTable->insert(fileName + dStrlen(exePath) + 1, true);
       else if(dStrnicmp(cwd, fileName, dStrlen(cwd)) == 0)
-         mName = StringTable->insert(fileName + dStrlen(cwd) + 1, true);
+         name = StringTable->insert(fileName + dStrlen(cwd) + 1, true);
 
-      if(mFullPath == NULL)
+      if(fullPath == NULL)
       {
          char buf[1024];
-         mFullPath = StringTable->insert(Platform::makeFullPathName(fileName, buf, sizeof(buf)), true);
+         fullPath = StringTable->insert(Platform::makeFullPathName(fileName, buf, sizeof(buf)), true);
       }
 
-      mModPath = Con::getModNameFromPath(fileName);
+      modPath = Con::getModNameFromPath(fileName);
    }
    
    //
@@ -376,53 +376,53 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
    st.read(&size);
    if(size)
    {
-      mGlobalStrings = new char[size];
-      mGlobalStringsMaxLen = size;
-      st.read(size, mGlobalStrings);
+      globalStrings = new char[size];
+      globalStringsMaxLen = size;
+      st.read(size, globalStrings);
    }
    globalSize = size;
    st.read(&size);
    if(size)
    {
-      mFunctionStrings = new char[size];
-      mFunctionStringsMaxLen = size;
-      st.read(size, mFunctionStrings);
+      functionStrings = new char[size];
+      functionStringsMaxLen = size;
+      st.read(size, functionStrings);
    }
    st.read(&size);
    if(size)
    {
-      mGlobalFloats = new F64[size];
+      globalFloats = new F64[size];
       for(U32 i = 0; i < size; i++)
-         st.read(&mGlobalFloats[i]);
+         st.read(&globalFloats[i]);
    }
    st.read(&size);
    if(size)
    {
-      mFunctionFloats = new F64[size];
+      functionFloats = new F64[size];
       for(U32 i = 0; i < size; i++)
-         st.read(&mFunctionFloats[i]);
+         st.read(&functionFloats[i]);
    }
    U32 codeLength;
    st.read(&codeLength);
-   st.read(&mLineBreakPairCount);
+   st.read(&lineBreakPairCount);
 
-   U32 totSize = codeLength + mLineBreakPairCount * 2;
-   mCode = new U32[totSize];
+   U32 totSize = codeLength + lineBreakPairCount * 2;
+   code = new U32[totSize];
 
    for(i = 0; i < codeLength; i++)
    {
       U8 b;
       st.read(&b);
       if(b == 0xFF)
-         st.read(&mCode[i]);
+         st.read(&code[i]);
       else
-         mCode[i] = b;
+         code[i] = b;
    }
 
    for(i = codeLength; i < totSize; i++)
-      st.read(&mCode[i]);
+      st.read(&code[i]);
 
-   mLineBreakPairs = mCode + codeLength;
+   lineBreakPairs = code + codeLength;
 
    // StringTable-ize our identifiers.
    U32 identCount;
@@ -433,7 +433,7 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
       st.read(&offset);
       StringTableEntry ste;
       if(offset < globalSize)
-         ste = StringTable->insert(mGlobalStrings + offset);
+         ste = StringTable->insert(globalStrings + offset);
       else
          ste = StringTable->insert("");
       U32 count;
@@ -442,11 +442,11 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
       {
          U32 ip;
          st.read(&ip);
-         mCode[ip] = *((U32 *) &ste);
+         code[ip] = *((U32 *) &ste);
       }
    }
 
-   if(mLineBreakPairCount)
+   if(lineBreakPairCount)
       calcBreakList();
 
    return true;
@@ -519,14 +519,14 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
    }
    else
    {
-      mCodeSize = 1;
+      codeSize = 1;
       lastIp = 0;
    }
    
    codeStream.emit(OP_RETURN);
-   codeStream.emitCodeStream(&mCodeSize, &mCode, &mLineBreakPairs);
+   codeStream.emitCodeStream(&codeSize, &code, &lineBreakPairs);
    
-   mLineBreakPairCount = codeStream.getNumLineBreaks();
+   lineBreakPairCount = codeStream.getNumLineBreaks();
 
    // Write string table data...
    getGlobalStringTable().write(st);
@@ -536,29 +536,29 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
    getGlobalFloatTable().write(st);
    getFunctionFloatTable().write(st);
 
-   if(lastIp != mCodeSize)
+   if(lastIp != codeSize)
       Con::errorf(ConsoleLogEntry::General, "CodeBlock::compile - precompile size mismatch, a precompile/compile function pair is probably mismatched.");
    
-   U32 totSize = mCodeSize + codeStream.getNumLineBreaks() * 2;
-   st.write(mCodeSize);
-   st.write(mLineBreakPairCount);
+   U32 totSize = codeSize + codeStream.getNumLineBreaks() * 2;
+   st.write(codeSize);
+   st.write(lineBreakPairCount);
 
    // Write out our bytecode, doing a bit of compression for low numbers.
    U32 i;   
-   for(i = 0; i < mCodeSize; i++)
+   for(i = 0; i < codeSize; i++)
    {
-      if(mCode[i] < 0xFF)
-         st.write(U8(mCode[i]));
+      if(code[i] < 0xFF)
+         st.write(U8(code[i]));
       else
       {
          st.write(U8(0xFF));
-         st.write(mCode[i]);
+         st.write(code[i]);
       }
    }
 
    // Write the break info...
-   for(i = mCodeSize; i < totSize; i++)
-      st.write(mCode[i]);
+   for(i = codeSize; i < totSize; i++)
+      st.write(code[i]);
 
    getIdentTable().write(st);
 
@@ -581,33 +581,33 @@ ConsoleValueRef CodeBlock::compileExec(StringTableEntry fileName, const char *in
    STEtoCode = evalSTEtoCode;
    consoleAllocReset();
 
-   mName = fileName;
+   name = fileName;
 
    if(fileName)
    {
       const StringTableEntry exePath = Platform::getMainDotCsDir();
       const StringTableEntry cwd = Platform::getCurrentDirectory();
 
-      mFullPath = NULL;
+      fullPath = NULL;
       
       if(Platform::isFullPath(fileName))
-         mFullPath = fileName;
+         fullPath = fileName;
 
       if(dStrnicmp(exePath, fileName, dStrlen(exePath)) == 0)
-         mName = StringTable->insert(fileName + dStrlen(exePath) + 1, true);
+         name = StringTable->insert(fileName + dStrlen(exePath) + 1, true);
       else if(dStrnicmp(cwd, fileName, dStrlen(cwd)) == 0)
-         mName = StringTable->insert(fileName + dStrlen(cwd) + 1, true);
+         name = StringTable->insert(fileName + dStrlen(cwd) + 1, true);
 
-      if(mFullPath == NULL)
+      if(fullPath == NULL)
       {
          char buf[1024];
-         mFullPath = StringTable->insert(Platform::makeFullPathName(fileName, buf, sizeof(buf)), true);
+         fullPath = StringTable->insert(Platform::makeFullPathName(fileName, buf, sizeof(buf)), true);
       }
 
-      mModPath = Con::getModNameFromPath(fileName);
+      modPath = Con::getModNameFromPath(fileName);
    }
 
-   if(mName)
+   if(name)
       addToCodeList();
    
    gStatementList = NULL;
@@ -645,29 +645,29 @@ ConsoleValueRef CodeBlock::compileExec(StringTableEntry fileName, const char *in
    CodeStream codeStream;
    U32 lastIp = compileBlock(gStatementList, codeStream, 0);
 
-   mLineBreakPairCount = codeStream.getNumLineBreaks();
+   lineBreakPairCount = codeStream.getNumLineBreaks();
 
-   mGlobalStrings   = getGlobalStringTable().build();
-   mGlobalStringsMaxLen = getGlobalStringTable().totalLen;
+   globalStrings   = getGlobalStringTable().build();
+   globalStringsMaxLen = getGlobalStringTable().totalLen;
 
-   mFunctionStrings = getFunctionStringTable().build();
-   mFunctionStringsMaxLen = getFunctionStringTable().totalLen;
+   functionStrings = getFunctionStringTable().build();
+   functionStringsMaxLen = getFunctionStringTable().totalLen;
 
-   mGlobalFloats    = getGlobalFloatTable().build();
-   mFunctionFloats  = getFunctionFloatTable().build();
+   globalFloats    = getGlobalFloatTable().build();
+   functionFloats  = getFunctionFloatTable().build();
    
    codeStream.emit(OP_RETURN);
-   codeStream.emitCodeStream(&mCodeSize, &mCode, &mLineBreakPairs);
+   codeStream.emitCodeStream(&codeSize, &code, &lineBreakPairs);
    
    //dumpInstructions(0, false);
    
    consoleAllocReset();
 
-   if(mLineBreakPairCount && fileName)
+   if(lineBreakPairCount && fileName)
       calcBreakList();
 
-   if(lastIp+1 != mCodeSize)
-      Con::warnf(ConsoleLogEntry::General, "precompile size mismatch, precompile: %d compile: %d", mCodeSize, lastIp);
+   if(lastIp+1 != codeSize)
+      Con::warnf(ConsoleLogEntry::General, "precompile size mismatch, precompile: %d compile: %d", codeSize, lastIp);
 
    return exec(0, fileName, NULL, 0, 0, noCalls, NULL, setFrame);
 }
@@ -676,13 +676,13 @@ ConsoleValueRef CodeBlock::compileExec(StringTableEntry fileName, const char *in
 
 void CodeBlock::incRefCount()
 {
-   mRefCount++;
+   refCount++;
 }
 
 void CodeBlock::decRefCount()
 {
-   mRefCount--;
-   if(!mRefCount)
+   refCount--;
+   if(!refCount)
       delete this;
 }
 
@@ -692,10 +692,10 @@ String CodeBlock::getFunctionArgs( U32 ip )
 {
    StringBuilder str;
    
-   U32 fnArgc = mCode[ ip + 5 ];
+   U32 fnArgc = code[ ip + 5 ];
    for( U32 i = 0; i < fnArgc; ++ i )
    {
-      StringTableEntry var = CodeToSTE(mCode, ip + (i*2) + 6);
+      StringTableEntry var = CodeToSTE(code, ip + (i*2) + 6);
       
       if( i != 0 )
          str.append( ", " );
@@ -720,24 +720,24 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
    smInFunction = false;
    U32 endFuncIp = 0;
    
-   while( ip < mCodeSize )
+   while( ip < codeSize )
    {
       if (ip > endFuncIp)
       {
          smInFunction = false;
       }
       
-      switch( mCode[ ip ++ ] )
+      switch( code[ ip ++ ] )
       {
             
          case OP_FUNC_DECL:
          {
-            StringTableEntry fnName       = CodeToSTE(mCode, ip);
-            StringTableEntry fnNamespace  = CodeToSTE(mCode, ip+2);
-            StringTableEntry fnPackage    = CodeToSTE(mCode, ip+4);
-            bool hasBody = bool(mCode[ip+6]);
-            U32 newIp = mCode[ ip + 7 ];
-            U32 argc = mCode[ ip + 8 ];
+            StringTableEntry fnName       = CodeToSTE(code, ip);
+            StringTableEntry fnNamespace  = CodeToSTE(code, ip+2);
+            StringTableEntry fnPackage    = CodeToSTE(code, ip+4);
+            bool hasBody = bool(code[ip+6]);
+            U32 newIp = code[ ip + 7 ];
+            U32 argc = code[ ip + 8 ];
             endFuncIp = newIp;
             
             Con::printf( "%i: OP_FUNC_DECL name=%s nspace=%s package=%s hasbody=%i newip=%i argc=%i",
@@ -752,12 +752,12 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
             
          case OP_CREATE_OBJECT:
          {
-            StringTableEntry objParent = CodeToSTE(mCode, ip);
-            bool isDataBlock =          mCode[ip + 2];
-            bool isInternal  =          mCode[ip + 3];
-            bool isSingleton =          mCode[ip + 4];
-            U32  lineNumber  =          mCode[ip + 5];
-            U32 failJump     =          mCode[ip + 6];
+            StringTableEntry objParent = CodeToSTE(code, ip);
+            bool isDataBlock =          code[ip + 2];
+            bool isInternal  =          code[ip + 3];
+            bool isSingleton =          code[ip + 4];
+            U32  lineNumber  =          code[ip + 5];
+            U32 failJump     =          code[ip + 6];
             
             Con::printf( "%i: OP_CREATE_OBJECT objParent=%s isDataBlock=%i isInternal=%i isSingleton=%i lineNumber=%i failJump=%i",
                ip - 1, objParent, isDataBlock, isInternal, isSingleton, lineNumber, failJump );
@@ -768,14 +768,14 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_ADD_OBJECT:
          {
-            bool placeAtRoot = mCode[ip++];
+            bool placeAtRoot = code[ip++];
             Con::printf( "%i: OP_ADD_OBJECT placeAtRoot=%i", ip - 1, placeAtRoot );
             break;
          }
          
          case OP_END_OBJECT:
          {
-            bool placeAtRoot = mCode[ip++];
+            bool placeAtRoot = code[ip++];
             Con::printf( "%i: OP_END_OBJECT placeAtRoot=%i", ip - 1, placeAtRoot );
             break;
          }
@@ -788,49 +788,49 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_JMPIFFNOT:
          {
-            Con::printf( "%i: OP_JMPIFFNOT ip=%i", ip - 1, mCode[ ip ] );
+            Con::printf( "%i: OP_JMPIFFNOT ip=%i", ip - 1, code[ ip ] );
             ++ ip;
             break;
          }
          
          case OP_JMPIFNOT:
          {
-            Con::printf( "%i: OP_JMPIFNOT ip=%i", ip - 1, mCode[ ip ] );
+            Con::printf( "%i: OP_JMPIFNOT ip=%i", ip - 1, code[ ip ] );
             ++ ip;
             break;
          }
          
          case OP_JMPIFF:
          {
-            Con::printf( "%i: OP_JMPIFF ip=%i", ip - 1, mCode[ ip ] );
+            Con::printf( "%i: OP_JMPIFF ip=%i", ip - 1, code[ ip ] );
             ++ ip;
             break;
          }
 
          case OP_JMPIF:
          {
-            Con::printf( "%i: OP_JMPIF ip=%i", ip - 1, mCode[ ip ] );
+            Con::printf( "%i: OP_JMPIF ip=%i", ip - 1, code[ ip ] );
             ++ ip;
             break;
          }
 
          case OP_JMPIFNOT_NP:
          {
-            Con::printf( "%i: OP_JMPIFNOT_NP ip=%i", ip - 1, mCode[ ip ] );
+            Con::printf( "%i: OP_JMPIFNOT_NP ip=%i", ip - 1, code[ ip ] );
             ++ ip;
             break;
          }
 
          case OP_JMPIF_NP:
          {
-            Con::printf( "%i: OP_JMPIF_NP ip=%i", ip - 1, mCode[ ip ] );
+            Con::printf( "%i: OP_JMPIF_NP ip=%i", ip - 1, code[ ip ] );
             ++ ip;
             break;
          }
 
          case OP_JMP:
          {
-            Con::printf( "%i: OP_JMP ip=%i", ip - 1, mCode[ ip ] );
+            Con::printf( "%i: OP_JMP ip=%i", ip - 1, code[ ip ] );
             ++ ip;
             break;
          }
@@ -1009,7 +1009,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_SETCURVAR:
          {
-            StringTableEntry var = CodeToSTE(mCode, ip);
+            StringTableEntry var = CodeToSTE(code, ip);
             
             Con::printf( "%i: OP_SETCURVAR var=%s", ip - 1, var );
             ip += 2;
@@ -1018,7 +1018,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_SETCURVAR_CREATE:
          {
-            StringTableEntry var = CodeToSTE(mCode, ip);
+            StringTableEntry var = CodeToSTE(code, ip);
             
             Con::printf( "%i: OP_SETCURVAR_CREATE var=%s", ip - 1, var );
             ip += 2;
@@ -1106,7 +1106,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_SETCURFIELD:
          {
-            StringTableEntry curField = CodeToSTE(mCode, ip);
+            StringTableEntry curField = CodeToSTE(code, ip);
             Con::printf( "%i: OP_SETCURFIELD field=%s", ip - 1, curField );
             ip += 2;
             break;
@@ -1120,7 +1120,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_SETCURFIELD_TYPE:
          {
-            U32 type = mCode[ ip ];
+            U32 type = code[ ip ];
             Con::printf( "%i: OP_SETCURFIELD_TYPE type=%i", ip - 1, type );
             ++ ip;
             break;
@@ -1224,7 +1224,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_LOADIMMED_UINT:
          {
-            U32 val = mCode[ ip ];
+            U32 val = code[ ip ];
             Con::printf( "%i: OP_LOADIMMED_UINT val=%i", ip - 1, val );
             ++ ip;
             break;
@@ -1232,7 +1232,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_LOADIMMED_FLT:
          {
-            F64 val = (smInFunction ? mFunctionFloats : mGlobalFloats)[ mCode[ ip ] ];
+            F64 val = (smInFunction ? functionFloats : globalFloats)[ code[ ip ] ];
             Con::printf( "%i: OP_LOADIMMED_FLT val=%f", ip - 1, val );
             ++ ip;
             break;
@@ -1240,7 +1240,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_TAG_TO_STR:
          {
-            const char* str = (smInFunction ? mFunctionStrings : mGlobalStrings) + mCode[ ip ];
+            const char* str = (smInFunction ? functionStrings : globalStrings) + code[ ip ];
             Con::printf( "%i: OP_TAG_TO_STR str=%s", ip - 1, str );
             ++ ip;
             break;
@@ -1248,7 +1248,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_LOADIMMED_STR:
          {
-            const char* str = (smInFunction ? mFunctionStrings : mGlobalStrings) + mCode[ ip ];
+            const char* str = (smInFunction ? functionStrings : globalStrings) + code[ ip ];
             Con::printf( "%i: OP_LOADIMMED_STR str=%s", ip - 1, str );
             ++ ip;
             break;
@@ -1256,7 +1256,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_DOCBLOCK_STR:
          {
-            const char* str = (smInFunction ? mFunctionStrings : mGlobalStrings) + mCode[ ip ];
+            const char* str = (smInFunction ? functionStrings : globalStrings) + code[ ip ];
             Con::printf( "%i: OP_DOCBLOCK_STR str=%s", ip - 1, str );
             ++ ip;
             break;
@@ -1264,7 +1264,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_LOADIMMED_IDENT:
          {
-            StringTableEntry str = CodeToSTE(mCode, ip);
+            StringTableEntry str = CodeToSTE(code, ip);
             Con::printf( "%i: OP_LOADIMMED_IDENT str=%s", ip - 1, str );
             ip += 2;
             break;
@@ -1272,9 +1272,9 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_CALLFUNC_RESOLVE:
          {
-            StringTableEntry fnNamespace = CodeToSTE(mCode, ip+2);
-            StringTableEntry fnName      = CodeToSTE(mCode, ip);
-            U32 callType = mCode[ip+2];
+            StringTableEntry fnNamespace = CodeToSTE(code, ip+2);
+            StringTableEntry fnName      = CodeToSTE(code, ip);
+            U32 callType = code[ip+2];
 
             Con::printf( "%i: OP_CALLFUNC_RESOLVE name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace,
                callType == FuncCallExprNode::FunctionCall ? "FunctionCall"
@@ -1286,9 +1286,9 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_CALLFUNC:
          {
-            StringTableEntry fnNamespace = CodeToSTE(mCode, ip+2);
-            StringTableEntry fnName      = CodeToSTE(mCode, ip);
-            U32 callType = mCode[ip+4];
+            StringTableEntry fnNamespace = CodeToSTE(code, ip+2);
+            StringTableEntry fnName      = CodeToSTE(code, ip);
+            U32 callType = code[ip+4];
 
             Con::printf( "%i: OP_CALLFUNC name=%s nspace=%s callType=%s", ip - 1, fnName, fnNamespace,
                callType == FuncCallExprNode::FunctionCall ? "FunctionCall"
@@ -1306,7 +1306,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_ADVANCE_STR_APPENDCHAR:
          {
-            char ch = mCode[ ip ];
+            char ch = code[ ip ];
             Con::printf( "%i: OP_ADVANCE_STR_APPENDCHAR char=%c", ip - 1, ch );
             ++ ip;
             break;
@@ -1374,7 +1374,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_ASSERT:
          {
-            const char* message = (smInFunction ? mFunctionStrings : mGlobalStrings) + mCode[ ip ];
+            const char* message = (smInFunction ? functionStrings : globalStrings) + code[ ip ];
             Con::printf( "%i: OP_ASSERT message=%s", ip - 1, message );
             ++ ip;
             break;
@@ -1388,8 +1388,8 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_ITER_BEGIN:
          {
-            StringTableEntry varName = CodeToSTE(mCode, ip);
-            U32 failIp = mCode[ ip + 2 ];
+            StringTableEntry varName = CodeToSTE(code, ip);
+            U32 failIp = code[ ip + 2 ];
             
             Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", ip - 1, varName, failIp );
 
@@ -1399,8 +1399,8 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
 
          case OP_ITER_BEGIN_STR:
          {
-            StringTableEntry varName = CodeToSTE(mCode, ip);
-            U32 failIp = mCode[ ip + 2 ];
+            StringTableEntry varName = CodeToSTE(code, ip);
+            U32 failIp = code[ ip + 2 ];
             
             Con::printf( "%i: OP_ITER_BEGIN varName=%s failIp=%i", ip - 1, varName, failIp );
 
@@ -1410,7 +1410,7 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          
          case OP_ITER:
          {
-            U32 breakIp = mCode[ ip ];
+            U32 breakIp = code[ ip ];
             
             Con::printf( "%i: OP_ITER breakIp=%i", ip - 1, breakIp );
 
