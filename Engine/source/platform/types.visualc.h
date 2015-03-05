@@ -42,7 +42,7 @@ typedef unsigned _int64 U64;
 #if _MSC_VER < 1200
    // No support for old compilers
 #  error "VC: Minimum VisualC++ 6.0 or newer required"
-#else _MSC_VER >= 1200
+#else // _MSC_VER >= 1200
 #  define TORQUE_COMPILER_STRING "VisualC++"
 #endif
 
