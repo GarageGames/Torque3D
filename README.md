@@ -5,7 +5,7 @@ MIT Licensed Open Source version of [Torque 3D](http://torque3d.org) from [Garag
 ## More Information
 
 * [Torque 3D wiki](http://wiki.torque3d.org)
-* [Community forum](http://forum.torque3d.org)
+* [Community forum](http://forums.torque3d.org)
 * [GarageGames forum](http://www.garagegames.com/community/forums)
 * [GarageGames professional services](http://services.garagegames.com/)
 
@@ -13,7 +13,6 @@ MIT Licensed Open Source version of [Torque 3D](http://torque3d.org) from [Garag
 
 In addition to GitHub we also have a couple of pre-packaged files for you to download if you would prefer to not compile the code yourself.
 They are available from the [downloads](http://wiki.torque3d.org/main:downloads) page on the wiki.
-At any time you can download the contents of the entire repository from GitHub, or check out former [releases](https://github.com/GarageGames/Torque3D/releases).
 
 ## Related repositories
 
