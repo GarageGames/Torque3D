@@ -20,17 +20,22 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "../postFx.hlsl"
+#include "../../../gl/hlslCompat.glsl"
 #include "shadergen:/autogenConditioners.h"
 
-uniform sampler2D backBuffer : register(S0);
+uniform sampler2D backBuffer;
 uniform float Vmax;
 uniform float Vmin;
 
-float4 main(PFXVertToPix IN) : COLOR0
+in vec2 uv0;
+#define IN_uv0 uv0
+
+out vec4 OUT_col;
+
+void main()
 {
-   float4 base = tex2D(backBuffer, IN.uv0);  
-   float dist = distance(IN.uv0, float2(0.5,0.5));
+   vec4 base = texture(backBuffer, IN_uv0);
+   float dist = distance(IN_uv0, vec2(0.5,0.5));
    base.rgb *= smoothstep(Vmax, Vmin, dist);
-   return base;
+   OUT_col = base;
 }
