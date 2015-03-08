@@ -216,39 +216,40 @@ void DeferredRTLightingFeatGLSL::setTexData( Material::StageData &stageDat,
 void DeferredBumpFeatGLSL::processVert(   Vector<ShaderComponent*> &componentList, 
                                           const MaterialFeatureData &fd )
 {
-   if (fd.features[MFT_PrePassConditioner])
+   if( fd.features[MFT_PrePassConditioner] )
    {
       // There is an output conditioner active, so we need to supply a transform
       // to the pixel shader. 
       MultiLine *meta = new MultiLine;
 
       // We need the view to tangent space transform in the pixel shader.
-      getOutViewToTangent(componentList, meta, fd);
+      getOutViewToTangent( componentList, meta, fd );
 
       const bool useTexAnim = fd.features[MFT_TexAnim];
       // Make sure there are texcoords
-      if (!fd.features[MFT_Parallax] && !fd.features[MFT_DiffuseMap])
+      if( !fd.features[MFT_Parallax] && !fd.features[MFT_DiffuseMap] )
       {
 
-         getOutTexCoord("texCoord",
-            "vec2",
-            true,
-            useTexAnim,
-            meta,
-            componentList);
+         getOutTexCoord(   "texCoord", 
+                           "vec2", 
+                           true, 
+                           useTexAnim, 
+                           meta, 
+                           componentList );
       }
-      if (fd.features.hasFeature(MFT_DetailNormalMap))
-         addOutDetailTexCoord(componentList,
-         meta,
-         useTexAnim);
+
+      if ( fd.features.hasFeature( MFT_DetailNormalMap ) )
+            addOutDetailTexCoord( componentList, 
+                                  meta,
+                                  useTexAnim );
 
       output = meta;
    }
-   else if (fd.materialFeatures[MFT_NormalsOut] ||
-      fd.features[MFT_ForwardShading] ||
-      !fd.features[MFT_RTLighting])
+   else if (   fd.materialFeatures[MFT_NormalsOut] || 
+               fd.features[MFT_ForwardShading] || 
+               !fd.features[MFT_RTLighting] )
    {
-      Parent::processVert(componentList, fd);
+      Parent::processVert( componentList, fd );
       return;
    }
    else

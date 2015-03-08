@@ -224,7 +224,7 @@ void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentLis
 
       // We need the view to tangent space transform in the pixel shader.
       getOutViewToTangent( componentList, meta, fd );
-      
+
       const bool useTexAnim = fd.features[MFT_TexAnim];
       // Make sure there are texcoords
       if( !fd.features[MFT_Parallax] && !fd.features[MFT_DiffuseMap] )
@@ -237,10 +237,11 @@ void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentLis
                            meta, 
                            componentList );
       }
+
       if ( fd.features.hasFeature( MFT_DetailNormalMap ) )
-         addOutDetailTexCoord( componentList, 
-                               meta,
-                               useTexAnim );
+            addOutDetailTexCoord( componentList, 
+                                  meta,
+                                  useTexAnim );
 
       output = meta;
    }
