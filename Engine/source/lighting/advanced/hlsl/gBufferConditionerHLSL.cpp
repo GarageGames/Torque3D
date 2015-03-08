@@ -96,6 +96,7 @@ void GBufferConditionerHLSL::processVert( Vector<ShaderComponent*> &componentLis
    {
       inNormal = new Var("normal", "float3");
       meta->addStatement(new GenOp("   @ = float3( 0.0, 0.0, 1.0 );\r\n", new DecOp(inNormal)));
+      Con::errorf("ShagerGen: Something went bad with ShaderGen. The normal should be already defined.");
    }
    AssertFatal( inNormal, "Something went bad with ShaderGen. The normal should be already defined." );
 
