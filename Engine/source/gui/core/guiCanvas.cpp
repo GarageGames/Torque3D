@@ -2723,7 +2723,7 @@ DefineConsoleMethod( GuiCanvas, setVideoMode, void,
    // aren't specified, just leave them at whatever they were set to.
    if (bitDepth > 0)
    {
-      vm.bitDepth = refreshRate;
+      vm.bitDepth = bitDepth;
    }
 
    if (refreshRate > 0)
