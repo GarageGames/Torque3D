@@ -363,7 +363,10 @@ void Forest::saveDataFile( const char *path )
 
 DefineConsoleMethod( Forest, saveDataFile, void, (const char * path), (""), "saveDataFile( [path] )" )
 {   
-   object->saveDataFile( path );
+   if (strlen(path)>0)
+      object->saveDataFile( path );
+   else
+      object->saveDataFile();
 }
 
 DefineConsoleMethod(Forest, isDirty, bool, (), , "()")
