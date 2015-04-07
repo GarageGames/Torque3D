@@ -21,6 +21,7 @@
 
 #include "T3D/physics/physicsWorld.h"
 
+#include "console/engineAPI.h"
 #include "console/console.h"
 #include "scene/sceneObject.h"
 

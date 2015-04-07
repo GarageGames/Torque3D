@@ -2,6 +2,8 @@
 // Copyright 2008 (C) LogicKing.com, Inc.
 //-----------------------------------------------------------------------------
 
+#include "console/engineAPI.h"
+#include "console/console.h"
 #include "console/consoleTypes.h"
 #include "T3D/BlissGMK/visualEffect.h"
 #include "core/stream/bitStream.h"

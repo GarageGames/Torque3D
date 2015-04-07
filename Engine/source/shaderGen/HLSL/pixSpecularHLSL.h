@@ -33,24 +33,24 @@ class PixelSpecularHLSL : public ShaderFeatureHLSL
 {
 protected:
 
-   ShaderIncludeDependency mDep;
+	ShaderIncludeDependency mDep;
 
 public:
 
-   PixelSpecularHLSL();
+	PixelSpecularHLSL();
 
-   virtual void processVert( Vector<ShaderComponent*> &componentList,
-                             const MaterialFeatureData &fd );
+	virtual void processVert(Vector<ShaderComponent*> &componentList,
+		const MaterialFeatureData &fd);
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
-                            const MaterialFeatureData &fd );
+	virtual void processPix(Vector<ShaderComponent*> &componentList,
+		const MaterialFeatureData &fd);
 
-   virtual Resources getResources( const MaterialFeatureData &fd );
-   
-   virtual String getName()
-   {
-      return "Pixel Specular";
-   }
+	virtual Resources getResources(const MaterialFeatureData &fd);
+
+	virtual String getName()
+	{
+		return "Pixel Specular";
+	}
 };
 
 /// A texture source for the PixSpecular feature
@@ -58,23 +58,23 @@ class SpecularMapHLSL : public ShaderFeatureHLSL
 {
 
 public:
-   virtual void processVert( Vector<ShaderComponent*> &componentList,
-                             const MaterialFeatureData &fd );
+	virtual void processVert(Vector<ShaderComponent*> &componentList,
+		const MaterialFeatureData &fd);
 
-   virtual void processPix( Vector<ShaderComponent*> &componentList, 
-      const MaterialFeatureData &fd );
+	virtual void processPix(Vector<ShaderComponent*> &componentList,
+		const MaterialFeatureData &fd);
 
-   virtual Resources getResources( const MaterialFeatureData &fd );
+	virtual Resources getResources(const MaterialFeatureData &fd);
 
-   virtual void setTexData( Material::StageData &stageDat,
-      const MaterialFeatureData &fd,
-      RenderPassData &passData,
-      U32 &texIndex );
+	virtual void setTexData(Material::StageData &stageDat,
+		const MaterialFeatureData &fd,
+		RenderPassData &passData,
+		U32 &texIndex);
 
-   virtual String getName()
-   {
-      return "Specular Map";
-   }
+	virtual String getName()
+	{
+		return "Specular Map";
+	}
 };
 
 #endif // _PIXSPECULAR_HLSL_H_

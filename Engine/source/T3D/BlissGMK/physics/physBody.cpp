@@ -6,6 +6,8 @@
 #include "T3D/BlissGMK/physics/physBody.h"
 #include "core/stream/bitStream.h"
 #include "math/mathIO.h"
+#include "console/engineAPI.h"
+#include "console/console.h"
 #include "console/consoleTypes.h"
 
 IMPLEMENT_CO_DATABLOCK_V1(PhysicsBodyData);

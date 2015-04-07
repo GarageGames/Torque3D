@@ -448,7 +448,7 @@ void PathCamera::popFront()
 void PathCamera::onNode(S32 node)
 {
    if (!isGhost())
-		onNode_callback(Con::getIntArg(node));
+		onNode_callback(node);
 
    // BlissGMK >> 
    // we need to call onNode on datablock PathCameraData class, not on PathCamera
