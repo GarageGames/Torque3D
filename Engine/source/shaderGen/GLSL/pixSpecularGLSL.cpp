@@ -113,17 +113,17 @@ ShaderFeature::Resources PixelSpecularGLSL::getResources( const MaterialFeatureD
 
 void SpecularMapGLSL::processVert(Vector<ShaderComponent*> &componentList, const MaterialFeatureData &fd)
 {
- MultiLine *meta = new MultiLine;
+   MultiLine *meta = new MultiLine;
 
- // Add the texture coords.
- getOutTexCoord("texCoord",
- "vec2",
- true,
- fd.features[MFT_TexAnim],
- meta,
- componentList);
+   // Add the texture coords.
+   getOutTexCoord("texCoord",
+     "vec2",
+      true,
+      fd.features[MFT_TexAnim],
+      meta,
+      componentList);
 
- output = meta;
+   output = meta;
 }
 
 void SpecularMapGLSL::processPix( Vector<ShaderComponent*> &componentList, const MaterialFeatureData &fd )

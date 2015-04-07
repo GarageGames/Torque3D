@@ -22,6 +22,7 @@
 
 #include "sfx/sfxParameter.h"
 #include "console/consoleTypes.h"
+#include "console/simBase.h"
 #include "console/engineAPI.h"
 #include "console/simSet.h"
 #include "math/mMathFn.h"

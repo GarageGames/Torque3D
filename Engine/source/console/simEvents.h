@@ -114,19 +114,24 @@ public:
 
    ~SimConsoleEvent();
    virtual void process(SimObject *object);
+
+   /// Creates a reference to our internal args list in argv
+   void populateArgs(ConsoleValueRef *argv);
 };
 
+
+// NOTE: SimConsoleThreadExecCallback & SimConsoleThreadExecEvent moved to engineAPI.h
 /// Used by Con::threadSafeExecute()
 struct SimConsoleThreadExecCallback
 {
    Semaphore   *sem;
-   const char  *retVal;
+   ConsoleValueRef retVal;
 
    SimConsoleThreadExecCallback();
    ~SimConsoleThreadExecCallback();
 
-   void handleCallback(const char *ret);
-   const char *waitForResult();
+   void handleCallback(ConsoleValueRef ret);
+   ConsoleValueRef waitForResult();
 };
 
 class SimConsoleThreadExecEvent : public SimConsoleEvent
@@ -136,6 +141,7 @@ class SimConsoleThreadExecEvent : public SimConsoleEvent
 public:
    SimConsoleThreadExecEvent(S32 argc, ConsoleValueRef *argv, bool onObject, SimConsoleThreadExecCallback *callback);
 
+   SimConsoleThreadExecCallback& getCB() { return *cb; }
    virtual void process(SimObject *object);
 };
 

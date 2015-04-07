@@ -1640,7 +1640,8 @@ void SimObject::unlinkNamespaces()
 
    // Handle object name.
 
-   if (mNameSpace && mNameSpace->mClassRep == NULL)
+   StringTableEntry objectName = getName();
+   if( objectName && objectName[ 0 ] )
       mNameSpace->decRefCountToParent();
 
    mNameSpace = NULL;

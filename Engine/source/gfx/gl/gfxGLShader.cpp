@@ -64,7 +64,7 @@ public:
 };
 
 GFXGLShaderConstHandle::GFXGLShaderConstHandle( GFXGLShader *shader )
- : mShader( shader ), mSamplerNum(-1), mInstancingConstant(false)
+ : mShader( shader ), mLocation(0), mOffset(0), mSize(0), mSamplerNum(-1), mInstancingConstant(false)
 {
    mValid = false;
 }
@@ -929,7 +929,7 @@ char* GFXGLShader::_handleIncludes( const Torque::Path& path, FileStream *s )
          dFree(includedText);
          manip.insert(q-buffer, sItx);
          char* manipBuf = dStrdup(manip.c_str());
-         p = manipBuf + (p - buffer);
+         p = manipBuf + (q - buffer);
          dFree(buffer);
          buffer = manipBuf;
       }

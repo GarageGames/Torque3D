@@ -52,7 +52,13 @@ public:
          objectId = obj->getId();
          ghostIndex = index;
       }
+      else
+      {
+         objectId = 0;
+         ghostIndex = 0;
+      }
       object = NULL;
+      validObject = false;
    }
    ~GhostAlwaysObjectEvent()
       { delete object; }

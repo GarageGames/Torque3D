@@ -105,7 +105,7 @@ HEXDIGIT [a-fA-F0-9]
 %%
          ;
 {SPACE}+ { }
-("///"[^/][^\n\r]*[\n\r]*)+ { return(Sc_ScanDocBlock()); }
+("///"([^/\n\r][^\n\r]*)?[\n\r]+)+ { return(Sc_ScanDocBlock()); }
 "//"[^\n\r]*   ;
 [\r]        ;
 [\n]        {lineIndex++;}
@@ -250,6 +250,7 @@ void CMDerror(char *format, ...)
 #else
    vsnprintf( tempBuf, BUFMAX, format, args );
 #endif
+    va_end(args);
 
    if(fileName)
    {

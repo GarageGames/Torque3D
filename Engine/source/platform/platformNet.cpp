@@ -141,7 +141,7 @@ static const char* strerror_wsa( S32 code )
 static Net::Error getLastError();
 static S32 defaultPort = 28000;
 static S32 netPort = 0;
-static S32 udpSocket = InvalidSocket;
+static NetSocket udpSocket = InvalidSocket;
 
 ConnectionNotifyEvent   Net::smConnectionNotify;
 ConnectionAcceptedEvent Net::smConnectionAccept;
@@ -790,7 +790,7 @@ void Net::process()
 
 NetSocket Net::openSocket()
 {
-   S32 retSocket;
+   NetSocket retSocket;
    retSocket = socket(AF_INET, SOCK_STREAM, 0);
 
    if(retSocket == InvalidSocket)
@@ -835,7 +835,7 @@ NetSocket Net::accept(NetSocket acceptSocket, NetAddress *remoteAddress)
    sockaddr_in socketAddress;
    socklen_t addrLen = sizeof(socketAddress);
 
-   S32 retVal = ::accept(acceptSocket, (sockaddr *) &socketAddress,  &addrLen);
+   NetSocket retVal = ::accept(acceptSocket, (sockaddr *) &socketAddress,  &addrLen);
    if(retVal != InvalidSocket)
    {
       IPSocketToNetAddress(&socketAddress, remoteAddress);

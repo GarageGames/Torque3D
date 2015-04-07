@@ -109,6 +109,9 @@ AIPlayer::AIPlayer()
 #endif
 
    mIsAiControlled = true;
+
+   for( S32 i = 0; i < MaxTriggerKeys; i ++ )
+      mMoveTriggers[ i ] = false;
 }
 
 /**
@@ -294,6 +297,53 @@ void AIPlayer::clearAim()
    mAimObject = 0;
    mAimLocationSet = false;
    mAimOffset = Point3F(0.0f, 0.0f, 0.0f);
+}
+
+/**
+ * Set the state of a movement trigger.
+ *
+ * @param slot The trigger slot to set
+ * @param isSet set/unset the trigger
+ */
+void AIPlayer::setMoveTrigger( U32 slot, const bool isSet )
+{
+   if(slot >= MaxTriggerKeys)
+   {
+      Con::errorf("Attempting to set an invalid trigger slot (%i)", slot);
+   }
+   else
+   {
+      mMoveTriggers[ slot ] = isSet;   // set the trigger
+      setMaskBits(NoWarpMask);         // force the client to updateMove
+   }
+}
+
+/**
+ * Get the state of a movement trigger.
+ *
+ * @param slot The trigger slot to query
+ * @return True if the trigger is set, false if it is not set
+ */
+bool AIPlayer::getMoveTrigger( U32 slot ) const
+{
+   if(slot >= MaxTriggerKeys)
+   {
+      Con::errorf("Attempting to get an invalid trigger slot (%i)", slot);
+      return false;
+   }
+   else
+   {
+      return mMoveTriggers[ slot ];
+   }
+}
+
+/**
+ * Clear the trigger state for all movement triggers.
+ */
+void AIPlayer::clearMoveTriggers()
+{
+   for( U32 i = 0; i < MaxTriggerKeys; i ++ )
+      setMoveTrigger( i, false );
 }
 
 /**
@@ -524,8 +574,8 @@ bool AIPlayer::getAIMove(Move *movePtr)
 
    // Replicate the trigger state into the move so that
    // triggers can be controlled from scripts.
-   for( int i = 0; i < MaxTriggerKeys; i++ )
-      movePtr->trigger[i] = getImageTriggerState(i);
+   for( U32 i = 0; i < MaxTriggerKeys; i++ )
+      movePtr->trigger[ i ] = mMoveTriggers[ i ];
 
 #ifdef TORQUE_NAVIGATION_ENABLED
    if(mJump == Now)
@@ -1266,4 +1316,44 @@ DefineEngineMethod(AIPlayer, checkInFoV, bool, (ShapeBase* obj, F32 fov, bool ch
    "@checkEnabled check whether the object can take damage and if so is still alive.(Defaults to false)\n")
 {
    return object->checkInFoV(obj, fov, checkEnabled);
+}
+
+DefineEngineMethod( AIPlayer, setMoveTrigger, void, ( U32 slot ),,
+   "@brief Sets a movement trigger on an AI object.\n\n"
+   "@param slot The trigger slot to set.\n"
+   "@see getMoveTrigger()\n"
+   "@see clearMoveTrigger()\n"
+   "@see clearMoveTriggers()\n")
+{
+   object->setMoveTrigger( slot, true );
+}
+
+DefineEngineMethod( AIPlayer, clearMoveTrigger, void, ( U32 slot ),,
+   "@brief Clears a movement trigger on an AI object.\n\n"
+   "@param slot The trigger slot to set.\n"
+   "@see setMoveTrigger()\n"
+   "@see getMoveTrigger()\n"
+   "@see clearMoveTriggers()\n")
+{
+   object->setMoveTrigger( slot, false );
+}
+
+DefineEngineMethod( AIPlayer, getMoveTrigger, bool, ( U32 slot ),,
+   "@brief Tests if a movement trigger on an AI object is set.\n\n"
+   "@param slot The trigger slot to check.\n"
+   "@return a boolean indicating if the trigger is set/unset.\n"
+   "@see setMoveTrigger()\n"
+   "@see clearMoveTrigger()\n"
+   "@see clearMoveTriggers()\n")
+{
+   return object->getMoveTrigger( slot );
+}
+
+DefineEngineMethod( AIPlayer, clearMoveTriggers, void, ( ),,
+   "@brief Clear ALL movement triggers on an AI object.\n"
+   "@see setMoveTrigger()\n"
+   "@see getMoveTrigger()\n"
+   "@see clearMoveTrigger()\n")
+{
+   object->clearMoveTriggers();
 }

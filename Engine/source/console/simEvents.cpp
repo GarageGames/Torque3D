@@ -39,7 +39,10 @@ SimConsoleEvent::SimConsoleEvent(S32 argc, ConsoleValueRef *argv, bool onObject)
       mArgv[i].value = new ConsoleValue();
       mArgv[i].value->type = ConsoleValue::TypeInternalString;
       mArgv[i].value->init();
-      mArgv[i].value->setStringValue((const char*)argv[i]);
+	  if (argv)
+	  {
+		mArgv[i].value->setStringValue((const char*)argv[i]);
+	  }
    }
 }
 
@@ -92,10 +95,19 @@ void SimConsoleEvent::process(SimObject* object)
    }
 }
 
+void SimConsoleEvent::populateArgs(ConsoleValueRef *argv)
+{
+   for (U32 i=0; i<mArgc; i++)
+   {
+      argv[i].value = mArgv[i].value;
+   }
+}
+
 //-----------------------------------------------------------------------------
 
-SimConsoleThreadExecCallback::SimConsoleThreadExecCallback() : retVal(NULL)
+SimConsoleThreadExecCallback::SimConsoleThreadExecCallback()
 {
+   retVal.value = NULL;
    sem = new Semaphore(0);
 }
 
@@ -104,20 +116,20 @@ SimConsoleThreadExecCallback::~SimConsoleThreadExecCallback()
    delete sem;
 }
 
-void SimConsoleThreadExecCallback::handleCallback(const char *ret)
+void SimConsoleThreadExecCallback::handleCallback(ConsoleValueRef ret)
 {
    retVal = ret;
    sem->release();
 }
 
-const char *SimConsoleThreadExecCallback::waitForResult()
+ConsoleValueRef SimConsoleThreadExecCallback::waitForResult()
 {
    if(sem->acquire(true))
    {
       return retVal;
    }
 
-   return NULL;
+   return (const char*)NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -129,7 +141,7 @@ SimConsoleThreadExecEvent::SimConsoleThreadExecEvent(S32 argc, ConsoleValueRef *
 
 void SimConsoleThreadExecEvent::process(SimObject* object)
 {
-   const char *retVal;
+   ConsoleValueRef retVal;
    if(mOnObject)
       retVal = Con::execute(object, mArgc, mArgv);
    else

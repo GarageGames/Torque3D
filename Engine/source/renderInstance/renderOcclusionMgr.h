@@ -38,7 +38,6 @@ class RenderOcclusionMgr : public RenderBinManager
    typedef RenderBinManager Parent;
 public:
    RenderOcclusionMgr();
-   RenderOcclusionMgr(RenderInstType riType, F32 renderOrder, F32 processAddOrder);
 
    // RenderOcclusionMgr
    virtual void init();

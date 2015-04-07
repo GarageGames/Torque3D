@@ -20,13 +20,19 @@
 // IN THE SOFTWARE.  
 //-----------------------------------------------------------------------------  
 
-$VignettePostEffect::RadiusX = 0.6;
-$VignettePostEffect::RadiusY = 0.2;
+$VignettePostEffect::VMax = 0.6;
+$VignettePostEffect::VMin = 0.2;
 
 singleton ShaderData( VignetteShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/vignette/VignetteP.hlsl";
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/gl//postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/vignette/gl/VignetteP.glsl";
+   
+   samplerNames[0] = "$backBuffer";
+   
    pixVersion = 2.0;
 };
 
@@ -44,6 +50,6 @@ singleton PostEffect( VignettePostEffect )
 
 function VignettePostEffect::setShaderConsts(%this)
 {
-   %this.setShaderConst("$radiusX", $VignettePostEffect::RadiusX);
-   %this.setShaderConst("$radiusY", $VignettePostEffect::RadiusY);
+   %this.setShaderConst("$Vmax", $VignettePostEffect::VMax);
+   %this.setShaderConst("$Vmin", $VignettePostEffect::VMin);
 }
