@@ -1086,6 +1086,9 @@ void WheeledVehicle::updateForces(F32 dt)
    if (mJetting)
       mRigid.force += by * mDataBlock->jetForce;
 
+   // Add in force from physical zones...
+   mRigid.force += mAppliedForce;
+
    // Container drag & buoyancy
    mRigid.force  += Point3F(0, 0, -mBuoyancy * sWheeledVehicleGravity * mRigid.mass);
    mRigid.force  -= mRigid.linVelocity * mDrag;
