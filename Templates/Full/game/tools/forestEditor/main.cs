@@ -233,8 +233,12 @@ function ForestEditorPlugin::onSaveMission( %this, %missionFile )
 {
    ForestDataManager.saveDirty();
    
-   if ( isObject( theForest ) )                     
-      theForest.saveDataFile();
+   if ( isObject( theForest ) )
+   {
+      %path = filePath(%missionFile);
+      %missionName = fileBase(%missionFile);
+      theForest.saveDataFile(%path @ "\\" @ %missionName @ ".forest");
+   }
       
    ForestBrushGroup.save( "art/forest/brushes.cs" );
 }
