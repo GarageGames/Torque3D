@@ -141,6 +141,13 @@ function ForestEditorPlugin::onActivated( %this )
    ForestEditorPropertiesWindow.setVisible( true );
    ForestEditorGui.makeFirstResponder( true );
    //ForestEditToolbar.setVisible( true );
+
+   //Get our existing forest object in our current mission if we have one
+   %forestObject = parseMissionGroupForIds("Forest", "");
+   if(isObject(%forestObject))
+   {
+      ForestEditorGui.setActiveForest(%forestObject.getName());
+   }
    
    %this.map.push();
    Parent::onActivated(%this);   
@@ -232,12 +239,26 @@ function ForestEditorPlugin::clearDirty( %this )
 function ForestEditorPlugin::onSaveMission( %this, %missionFile )
 {
    ForestDataManager.saveDirty();
-   
-   if ( isObject( theForest ) )
+
+   //First, find out if we have an existing forest object
+   %forestObject = parseMissionGroupForIds("Forest", "");
+ 
+   if ( isObject( %forestObject ) )
    {
-      %path = filePath(%missionFile);
-      %missionName = fileBase(%missionFile);
-      theForest.saveDataFile(%path @ "\\" @ %missionName @ ".forest");
+      //We do. Next, see if we have a file already by polling the datafield.
+      if(%forestObject.dataFile !$= "")
+      {
+         //If we do, just save to the provided file.
+         %forestObject.saveDataFile(%forestObject.dataFile);
+      }
+      else
+      {
+         //We don't, so we'll save in the same place as the mission file and give it the missionpath\missionName.forest 
+         //naming convention.
+         %path = filePath(%missionFile);
+         %missionName = fileBase(%missionFile);
+         %forestObject.saveDataFile(%path @ "\\" @ %missionName @ ".forest");
+      }
    }
       
    ForestBrushGroup.save( "art/forest/brushes.cs" );
