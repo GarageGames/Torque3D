@@ -257,7 +257,7 @@ function ForestEditorPlugin::onSaveMission( %this, %missionFile )
          //naming convention.
          %path = filePath(%missionFile);
          %missionName = fileBase(%missionFile);
-         %forestObject.saveDataFile(%path @ "\\" @ %missionName @ ".forest");
+         %forestObject.saveDataFile(%path @ "/" @ %missionName @ ".forest");
       }
    }
       
