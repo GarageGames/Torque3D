@@ -99,6 +99,27 @@ function MissionAreaEditorPlugin::onDeactivated( %this )
    Parent::onDeactivated(%this);
 }
 
+function MissionAreaEditorPlugin::setEditorFunction( %this )
+{
+   %missionAreaExists = isObject(getMissionAreaServerObject());
+
+   if( %missionAreaExists == false )
+      MessageBoxYesNoCancel("No Mission Area","Would you like to create a New Mission Area?", "MissionAreaEditorPlugin.createNewMissionArea();");
+
+   return %missionAreaExists;
+}
+
+function MissionAreaEditorPlugin::createNewMissionArea(%this)
+{
+   %newMissionArea = new MissionArea();
+   %newMissionArea.area = "-256 -256 512 512";
+
+   MissionGroup.add(%newMissionArea);
+
+   EditorGui.setEditor(MissionAreaEditorPlugin);
+
+   EWorldEditor.isDirty = true;
+}
 //-----------------------------------------------------------------------------
 // Settings
 //-----------------------------------------------------------------------------
