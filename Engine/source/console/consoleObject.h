@@ -460,6 +460,7 @@ public:
    enum FieldFlags
    {
       FIELD_HideInInspectors     = BIT( 0 ),    ///< Do not show the field in inspectors.
+      FIELD_ButtonInInspectors   = BIT( 1 ),    ///< Display as a button in inspectors.
    };
 
    struct Field 
