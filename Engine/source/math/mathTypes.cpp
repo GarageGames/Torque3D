@@ -1019,7 +1019,7 @@ F32 mRandF()
    return gRandGen.randF();
 }
 
-DefineConsoleFunction( getRandom, F32, (S32 a, S32 b), (1, 0),
+DefineConsoleFunction(getRandom, F32, (S32 a, S32 b), (S32_MAX, S32_MAX),
    "( int a, int b ) "
    "@brief Returns a random number based on parameters passed in..\n\n"
    "If no parameters are passed in, getRandom() will return a float between 0.0 and 1.0. If one "
@@ -1033,21 +1033,21 @@ DefineConsoleFunction( getRandom, F32, (S32 a, S32 b), (1, 0),
    "@see setRandomSeed\n"
    "@ingroup Random" )
 {
-   if (b == 0)
-      return F32(gRandGen.randI(0,getMax( a, 0 )));
-   else
+   if (a != S32_MAX)
    {
-      if (b != 0) 
+      if (b == S32_MAX)
+         return F32(gRandGen.randI(0, getMax(a, 0)));
+      else
       {
          S32 min = a;
          S32 max = b;
-         if (min > max) 
+         if (min > max)
          {
             S32 t = min;
             min = max;
             max = t;
          }
-         return F32(gRandGen.randI(min,max));
+         return F32(gRandGen.randI(min, max));
       }
    }
    return gRandGen.randF();
