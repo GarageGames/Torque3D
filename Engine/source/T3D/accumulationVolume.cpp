@@ -42,6 +42,7 @@
 #include "scene/sceneContainer.h"
 
 #include "math/mPolyhedron.impl.h"
+#include "scene/mixin/scenePolyhedralObject.impl.h"
 
 Vector< SimObjectPtr<SceneObject> > AccumulationVolume::smAccuObjects;
 Vector< SimObjectPtr<AccumulationVolume> > AccumulationVolume::smAccuVolumes;
