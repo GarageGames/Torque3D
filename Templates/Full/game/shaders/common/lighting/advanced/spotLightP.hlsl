@@ -120,13 +120,14 @@ float4 main(   ConvexConnectP IN,
 
    #endif // !NO_SHADOW
    
+   float3 lightcol = lightColor.rgb;
    #ifdef USE_COOKIE_TEX
 
       // Lookup the cookie sample.
       float4 cookie = tex2D( cookieMap, shadowCoord );
 
       // Multiply the light with the cookie tex.
-      lightColor.rgb *= cookie.rgb;
+      lightcol *= cookie.rgb;
 
       // Use a maximum channel luminance to attenuate 
       // the lighting else we get specular in the dark
@@ -144,7 +145,7 @@ float4 main(   ConvexConnectP IN,
                                        normalize( -eyeRay ) ) * lightBrightness * atten * shadowed;
 
    float Sat_NL_Att = saturate( nDotL * atten * shadowed ) * lightBrightness;
-   float3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
+   float3 lightColorOut = lightMapParams.rgb * lightcol;
    float4 addToResult = 0.0;
 
    // TODO: This needs to be removed when lightmapping is disabled
