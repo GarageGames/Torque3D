@@ -354,7 +354,7 @@ void Forest::createNewFile()
 
 void Forest::saveDataFile( const char *path )
 {
-   if ( path )
+   if ( path && strcmp(path, "") != 0)
       mDataFileName = StringTable->insert( path );
 
    if ( mData )
