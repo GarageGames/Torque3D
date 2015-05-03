@@ -77,6 +77,8 @@ const char* getEngineProductString()
          return "Torque 3D";
       case 0007:
 	     return "Torque 3D MIT";
+	  case 0010:
+	     return "Ueberengine";
 		 
       default:
          return "Torque Engine";
