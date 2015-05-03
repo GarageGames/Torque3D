@@ -419,10 +419,9 @@ void ThreadPool::queueWorkItem( WorkItem* item )
       // the semaphore more often than necessary, but it avoids
       // a race condition.
       
-      //Isn't there still a race condition? Why not rely entirely on the semaphore?
-      //Also, mNumThreadsReady counts threads which are busy when, in actuality, what we
-      //want is to wake a thread if any are sleeping. This conditional only wakes a thread
-      //if all are sleeping. 
+      //Wasn't there still a race condition? Why not rely entirely on the semaphore?
+      //For example, mNumThreadsReady initializes equalto mNumThreads, which could cause
+      //initial work items to hang.
       //if( !dCompareAndSwap( mNumThreadsReady, mNumThreads, mNumThreads ) )
          mSemaphore.release();
    }
