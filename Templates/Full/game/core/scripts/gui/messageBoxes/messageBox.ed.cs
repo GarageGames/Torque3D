@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+$GameCanvas = 0;
 
 // Cleanup Dialog created by 'core'
 if( isObject( MessagePopupDlg ) )
@@ -76,7 +77,7 @@ new SFXProfile(messageBoxBeep)
 //---------------------------------------------------------------------------------------------
 function messageCallback(%dlg, %callback)
 {
-   Canvas.popDialog(%dlg);
+   $GameCanvas.popDialog(%dlg);
    eval(%callback);
 }
 
@@ -89,7 +90,7 @@ function IOCallback(%dlg, %callback)
    %callback = strreplace(%callback, "#", %text); 
    eval(%callback);
    
-   Canvas.popDialog(%dlg);
+   $GameCanvas.popDialog(%dlg);
 }
 
 //---------------------------------------------------------------------------------------------
@@ -134,7 +135,7 @@ function MBSetText(%text, %frame, %msg)
 function MessageBoxOK(%title, %message, %callback)
 {
    MBOKFrame.text = %title;
-   Canvas.pushDialog(MessageBoxOKDlg);
+   $GameCanvas.pushDialog(MessageBoxOKDlg);
    MBSetText(MBOKText, MBOKFrame, %message);
    MessageBoxOKDlg.callback = %callback;
 }
@@ -147,7 +148,7 @@ function MessageBoxOKDlg::onSleep( %this )
 function MessageBoxOKCancel(%title, %message, %callback, %cancelCallback)
 {
    MBOKCancelFrame.text = %title;
-   Canvas.pushDialog(MessageBoxOKCancelDlg);
+   $GameCanvas.pushDialog(MessageBoxOKCancelDlg);
    MBSetText(MBOKCancelText, MBOKCancelFrame, %message);
    MessageBoxOKCancelDlg.callback = %callback;
    MessageBoxOKCancelDlg.cancelCallback = %cancelCallback;
@@ -169,7 +170,7 @@ function MessageBoxOKCancelDetails(%title, %message, %details, %callback, %cance
    
    MBOKCancelDetailsFrame.setText( %title );
    
-   Canvas.pushDialog(MessageBoxOKCancelDetailsDlg);
+   $GameCanvas.pushDialog(MessageBoxOKCancelDetailsDlg);
    MBSetText(MBOKCancelDetailsText, MBOKCancelDetailsFrame, %message);
    MBOKCancelDetailsInfoText.setText(%details);
    
@@ -233,7 +234,7 @@ function MessageBoxYesNo(%title, %message, %yesCallback, %noCallback)
 {
    MBYesNoFrame.text = %title;
    MessageBoxYesNoDlg.profile = "GuiOverlayProfile";
-   Canvas.pushDialog(MessageBoxYesNoDlg);
+   $GameCanvas.pushDialog(MessageBoxYesNoDlg);
    MBSetText(MBYesNoText, MBYesNoFrame, %message);
    MessageBoxYesNoDlg.yesCallBack = %yesCallback;
    MessageBoxYesNoDlg.noCallback = %noCallBack;
@@ -243,7 +244,7 @@ function MessageBoxYesNoCancel(%title, %message, %yesCallback, %noCallback, %can
 {
    MBYesNoCancelFrame.text = %title;
    MessageBoxYesNoDlg.profile = "GuiOverlayProfile";
-   Canvas.pushDialog(MessageBoxYesNoCancelDlg);
+   $GameCanvas.pushDialog(MessageBoxYesNoCancelDlg);
    MBSetText(MBYesNoCancelText, MBYesNoCancelFrame, %message);
    MessageBoxYesNoCancelDlg.yesCallBack = %yesCallback;
    MessageBoxYesNoCancelDlg.noCallback = %noCallBack;
@@ -264,7 +265,7 @@ function MessagePopup(%title, %message, %delay)
 {
    // Currently two lines max.
    MessagePopFrame.setText(%title);
-   Canvas.pushDialog(MessagePopupDlg);
+   $GameCanvas.pushDialog(MessagePopupDlg);
    MBSetText(MessagePopText, MessagePopFrame, %message);
    if (%delay !$= "")
       schedule(%delay, 0, CloseMessagePopup);
@@ -279,7 +280,7 @@ function MessagePopup(%title, %message, %delay)
 function IODropdown(%title, %message, %simgroup, %callback, %cancelCallback)
 {
    IODropdownFrame.text = %title;
-   Canvas.pushDialog(IODropdownDlg);
+   $GameCanvas.pushDialog(IODropdownDlg);
    MBSetText(IODropdownText, IODropdownFrame, %message);
    
    if(isObject(%simgroup))
@@ -305,7 +306,7 @@ function IODropdownDlg::onSleep( %this )
 
 function CloseMessagePopup()
 {
-   Canvas.popDialog(MessagePopupDlg);
+   $GameCanvas.popDialog(MessagePopupDlg);
 }
 
 //---------------------------------------------------------------------------------------------

@@ -32,7 +32,8 @@
 #include "core/util/tSingleton.h"
 #include "math/mQuat.h"
 #include "math/mPoint4.h"
-#include "OVR.h"
+#include "gfx/gfxDevice.h"
+#include "OVR_CAPI_0_5_0.h"
 
 #define DEFAULT_RIFT_UNIT 0
 
@@ -44,13 +45,10 @@ public:
    // If no HMD is present simulate it being available
    static bool smSimulateHMD;
 
-   // Use the chromatic aberration correction version of the barrel
-   // distortion shader.
-   static bool smUseChromaticAberrationCorrection;
-
    // Type of rotation events to broadcast
    static bool smGenerateAngleAxisRotationEvents;
    static bool smGenerateEulerRotationEvents;
+   static bool smGeneratePositionEvents;
 
    // Broadcast sensor rotation as axis
    static bool smGenerateRotationAsAxisEvents;
@@ -66,37 +64,24 @@ public:
    // should be buffered.
    static bool smGenerateWholeFrameEvents;
 
+   /// Determines desired pixel density for render target
+   static F32 smDesiredPixelDensity;
+
+   /// Determined if the window is moved to the oculus display
+   static bool smWindowDebug;
+
+   static F32 smPositionTrackingScale;
+
 protected:
-   class DeviceListener : public OVR::MessageHandler
-   {
-   protected:
-      OculusVRDevice* mOwner;
-
-   public:
-      DeviceListener(OculusVRDevice* owner) { mOwner = owner; }
-      virtual ~DeviceListener() { mOwner = NULL; }
-
-      virtual void OnMessage(const OVR::Message&);
-   };
-
-   // Our OVR SDK device listener class
-   DeviceListener* mListener;
-
-   // The OVR SDK device manager
-   OVR::DeviceManager* mDeviceManager;
 
    // Discovered HMD devices
    Vector<OculusVRHMDDevice*> mHMDDevices;
 
-   // Discovered sensor devices
-   Vector<OculusVRSensorDevice*> mSensorDevices;
-
    /// Is the device active
    bool mActive;
 
-   // Should the input texture into the HMD (the render target that the scene has been
-   // rendered to) be scaled according to the HMD's distortion calculation?
-   bool mScaleInputTexture;
+   /// Which HMD is the active one
+   U32 mActiveDeviceId;
 
 protected:
    void cleanUp();
@@ -105,13 +90,9 @@ protected:
    /// Input Event Manager
    void buildCodeTable();
 
-   void addHMDDevice(OVR::HMDDevice* hmd);
+   void addHMDDevice(ovrHmd hmd);
 
    void createSimulatedHMD();
-
-   void addSensorDevice(OVR::SensorDevice* sensor);
-
-   void createSimulatedSensor();
 
 public:
    OculusVRDevice();
@@ -128,35 +109,49 @@ public:
    bool process();
 
    // IDisplayDevice
-   virtual bool providesYFOV() const;
-   virtual F32 getYFOV() const;
-   virtual bool providesEyeOffset() const;
-   virtual const Point3F& getEyeOffset() const;
+   virtual bool providesFrameEyePose() const;
+   virtual void getFrameEyePose(DisplayPose *outPose, U32 eyeId) const;
+   virtual bool providesEyeOffsets() const;
+   virtual void getEyeOffsets(Point3F *dest) const;
+   virtual bool providesFovPorts() const;
+   virtual void getFovPorts(FovPort *out) const;
    virtual bool providesProjectionOffset() const;
    virtual const Point2F& getProjectionOffset() const;
+   virtual void getStereoViewports(RectI *out) const;
+   virtual void getStereoTargets(GFXTextureTarget **out) const;
+   virtual void onStartFrame();
 
    // HMDs
    U32 getHMDCount() const { return mHMDDevices.size(); }
-   const OculusVRHMDDevice* getHMDDevice(U32 index) const;
+   OculusVRHMDDevice* getHMDDevice(U32 index) const;
    F32 getHMDCurrentIPD(U32 index);
    void setHMDCurrentIPD(U32 index, F32 ipd);
 
    // Sensors
-   U32 getSensorCount() const { return mSensorDevices.size(); }
+   U32 getSensorCount() const { return mHMDDevices.size(); }
    const OculusVRSensorDevice* getSensorDevice(U32 index) const;
    EulerF getSensorEulerRotation(U32 index);
    VectorF getSensorAcceleration(U32 index);
    EulerF getSensorAngularVelocity(U32 index);
-   VectorF getSensorMagnetometer(U32 index);
-   F32 getSensorPredictionTime(U32 index);
-   void setSensorPredictionTime(U32 index, F32 dt);
-   void setAllSensorPredictionTime(F32 dt);
-   bool getSensorGravityCorrection(U32 index);
-   void setSensorGravityCorrection(U32 index, bool state);
    bool getSensorYawCorrection(U32 index);
    void setSensorYawCorrection(U32 index, bool state);
    bool getSensorMagnetometerCalibrated(U32 index);
+
+   void setOptimalDisplaySize(U32 idx, GuiCanvas *canvas);
    void resetAllSensors();
+
+   bool isDiplayingWarning();
+   void dismissWarning();
+
+   String dumpMetrics(U32 idx);
+
+
+   void setDrawCanvas(GuiCanvas *canvas);
+   
+   virtual void setCurrentConnection(GameConnection *connection);
+   virtual GameConnection* getCurrentConnection();
+
+   bool _handleDeviceEvent( GFXDevice::GFXDeviceEventType evt );
 
 public:
    // For ManagedSingleton.

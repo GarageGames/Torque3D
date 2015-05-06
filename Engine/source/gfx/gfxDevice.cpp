@@ -161,7 +161,6 @@ GFXDevice::GFXDevice()
    mAllowRender = true;
    mCurrentRenderStyle = RS_Standard;
    mCurrentProjectionOffset = Point2F::Zero;
-   mStereoEyeOffset = Point3F::Zero;
    mCanCurrentlyRender = false;
    mInitialized = false;
    
@@ -197,6 +196,9 @@ GFXDevice::GFXDevice()
    #elif defined TORQUE_OS_PS3
       GFXShader::addGlobalMacro( "TORQUE_OS_PS3" );            
    #endif
+
+   mStereoTargets[0] = NULL;
+   mStereoTargets[1] = NULL;
 }
 
 GFXDrawUtil* GFXDevice::getDrawUtil()

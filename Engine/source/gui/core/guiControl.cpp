@@ -2380,7 +2380,8 @@ void GuiControl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent 
       // so set it back before we change it again.
 
       PlatformWindow *pWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
-      AssertFatal(pWindow != NULL,"GuiControl without owning platform window!  This should not be possible.");
+      if (!pWindow)
+         return;
       PlatformCursorController *pController = pWindow->getCursorController();
       AssertFatal(pController != NULL,"PlatformWindow without an owned CursorController!");
 

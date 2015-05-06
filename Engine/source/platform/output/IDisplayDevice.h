@@ -25,20 +25,44 @@
 
 #include "console/consoleTypes.h"
 
+class GameConnection;
+class GuiCanvas;
+
 // Defines a custom display device that requires particular rendering settings
 // in order for a scene to display correctly.
+
+/// Defines the basic display pose common to most display devices
+typedef struct DisplayPose
+{
+   EulerF orientation;  /// Direction device is facing
+   Point3F position;    /// Relative position of device in view space
+} IDevicePose;
 
 class IDisplayDevice
 {
 public:
-   virtual bool providesYFOV() const = 0;
-   virtual F32 getYFOV() const = 0;
+   virtual bool providesFrameEyePose() const = 0;
+   virtual void getFrameEyePose(IDevicePose *pose, U32 eye) const = 0;
 
-   virtual bool providesEyeOffset() const = 0;
-   virtual const Point3F& getEyeOffset() const = 0;
+   virtual bool providesEyeOffsets() const = 0;
+   /// Returns eye offset not taking into account any position tracking info
+   virtual void getEyeOffsets(Point3F *dest) const = 0;
+
+   virtual bool providesFovPorts() const = 0;
+   virtual void getFovPorts(FovPort *out) const = 0;
 
    virtual bool providesProjectionOffset() const = 0;
    virtual const Point2F& getProjectionOffset() const = 0;
+
+   virtual void getStereoViewports(RectI *out) const = 0;
+   virtual void getStereoTargets(GFXTextureTarget **out) const = 0;
+
+   virtual void setDrawCanvas(GuiCanvas *canvas) = 0;
+
+   virtual void setCurrentConnection(GameConnection *connection) = 0;
+   virtual GameConnection* getCurrentConnection() = 0;
+
+   virtual void onStartFrame() = 0;
 };
 
 #endif   // _IDISPLAYDEVICE_H_

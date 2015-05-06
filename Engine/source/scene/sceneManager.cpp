@@ -36,6 +36,7 @@
 #include "console/engineAPI.h"
 #include "sim/netConnection.h"
 #include "T3D/gameBase/gameConnection.h"
+#include "math/mathUtils.h"
 
 // For player object bounds workaround.
 #include "T3D/player.h"
@@ -236,26 +237,21 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       // Store previous values
       RectI originalVP = GFX->getViewport();
       MatrixF originalWorld = GFX->getWorldMatrix();
+      Frustum originalFrustum = GFX->getFrustum();
 
       Point2F projOffset = GFX->getCurrentProjectionOffset();
-      Point3F eyeOffset = GFX->getStereoEyeOffset();
-
-      // Indicate that we're about to start a field
-      GFX->beginField();
+      const FovPort *currentFovPort = GFX->getSteroFovPort();
+      const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
+      const MatrixF *worldEyeTransforms = GFX->getInverseStereoEyeTransforms();
 
       // Render left half of display
-      RectI leftVP = originalVP;
-      leftVP.extent.x *= 0.5;
-      GFX->setViewport(leftVP);
+      GFX->activateStereoTarget(0);
+      GFX->beginField();
 
-      MatrixF leftWorldTrans(true);
-      leftWorldTrans.setPosition(Point3F(eyeOffset.x, eyeOffset.y, eyeOffset.z));
-      MatrixF leftWorld(originalWorld);
-      leftWorld.mulL(leftWorldTrans);
-      GFX->setWorldMatrix(leftWorld);
+      GFX->setWorldMatrix(worldEyeTransforms[0]);
 
-      Frustum gfxFrustum = GFX->getFrustum();
-      gfxFrustum.setProjectionOffset(Point2F(projOffset.x, projOffset.y));
+      Frustum gfxFrustum = originalFrustum;
+      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[0], eyeTransforms[0]);
       GFX->setFrustum(gfxFrustum);
 
       SceneCameraState cameraStateLeft = SceneCameraState::fromGFX();
@@ -266,25 +262,16 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       renderSceneNoLights( &renderStateLeft, objectMask, baseObject, baseZone );
 
       // Indicate that we've just finished a field
+      //GFX->clear(GFXClearTarget | GFXClearZBuffer | GFXClearStencil, ColorI(255,0,0), 1.0f, 0);
       GFX->endField();
-
-      // Indicate that we're about to start a field
-      GFX->beginField();
-
+      
       // Render right half of display
-      RectI rightVP = originalVP;
-      rightVP.extent.x *= 0.5;
-      rightVP.point.x += rightVP.extent.x;
-      GFX->setViewport(rightVP);
+      GFX->activateStereoTarget(1);
+      GFX->beginField();
+      GFX->setWorldMatrix(worldEyeTransforms[1]);
 
-      MatrixF rightWorldTrans(true);
-      rightWorldTrans.setPosition(Point3F(-eyeOffset.x, eyeOffset.y, eyeOffset.z));
-      MatrixF rightWorld(originalWorld);
-      rightWorld.mulL(rightWorldTrans);
-      GFX->setWorldMatrix(rightWorld);
-
-      gfxFrustum = GFX->getFrustum();
-      gfxFrustum.setProjectionOffset(Point2F(-projOffset.x, projOffset.y));
+      gfxFrustum = originalFrustum;
+      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[1], eyeTransforms[1]);
       GFX->setFrustum(gfxFrustum);
 
       SceneCameraState cameraStateRight = SceneCameraState::fromGFX();
@@ -295,12 +282,12 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       renderSceneNoLights( &renderStateRight, objectMask, baseObject, baseZone );
 
       // Indicate that we've just finished a field
+      //GFX->clear(GFXClearTarget | GFXClearZBuffer | GFXClearStencil, ColorI(0,255,0), 1.0f, 0);
       GFX->endField();
 
       // Restore previous values
       GFX->setWorldMatrix(originalWorld);
-      gfxFrustum.clearProjectionOffset();
-      GFX->setFrustum(gfxFrustum);
+      GFX->setFrustum(originalFrustum);
       GFX->setViewport(originalVP);
    }
    else
