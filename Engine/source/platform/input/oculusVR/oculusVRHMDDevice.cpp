@@ -238,28 +238,6 @@ bool OculusVRHMDDevice::setupTargets()
 
       gLastStereoTexture = mEyeTexture[0];
    }
-   else if (mDesiredRenderingMode == GFXDevice::RS_StereoRenderTargets)
-   {
-      // Setup two targets
-      Point2I rtSize;
-
-      GFXFormat targetFormat = GFX->getActiveRenderTarget()->getFormat();
-      mRTFormat = targetFormat;
-
-      // Left
-      rtSize = generateRenderTarget(mEyeRT[0], mEyeTexture[0], mStereoDepthTexture, Point2I(mRecomendedEyeTargetSize[0].w, mRecomendedEyeTargetSize[0].h));
-      mEyeViewport[0] = RectI(Point2I(0,0), Point2I((rtSize.x+1)/2, rtSize.y));
-
-      // Right
-      rtSize = generateRenderTarget(mEyeRT[1], mEyeTexture[1], mStereoDepthTexture, Point2I(mRecomendedEyeTargetSize[1].w, mRecomendedEyeTargetSize[1].h));
-      mEyeViewport[1] = RectI(Point2I(0,0), Point2I((rtSize.x+1)/2, rtSize.y));
-
-      mStereoRT = NULL;
-      mStereoTexture = NULL;
-
-      gLastStereoTexture = mEyeTexture[0];
-
-   }
    else
    {
       // No rendering, abort!
