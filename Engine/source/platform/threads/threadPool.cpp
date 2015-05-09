@@ -418,8 +418,11 @@ void ThreadPool::queueWorkItem( WorkItem* item )
       // thread's run function.  This may lead us to release
       // the semaphore more often than necessary, but it avoids
       // a race condition.
-
-      if( !dCompareAndSwap( mNumThreadsReady, mNumThreads, mNumThreads ) )
+      
+      //Wasn't there still a race condition? Why not rely entirely on the semaphore?
+      //For example, mNumThreadsReady initializes equalto mNumThreads, which could cause
+      //initial work items to hang.
+      //if( !dCompareAndSwap( mNumThreadsReady, mNumThreads, mNumThreads ) )
          mSemaphore.release();
    }
 }
