@@ -402,7 +402,7 @@ void TimeOfDay::_getSunColor( ColorF *outColor ) const
    //simple check
    if ( mColorTargets[0].elevation != 0.0f )
    {
-      AssertFatal(0, "TimeOfDay::GetColor() - First elevation must be 0.0 radians")
+      AssertFatal(0, "TimeOfDay::GetColor() - First elevation must be 0.0 radians");
       outColor->set(1.0f, 1.0f, 1.0f);
       //mBandMod = 1.0f;
       //mCurrentBandColor = color;
@@ -411,7 +411,7 @@ void TimeOfDay::_getSunColor( ColorF *outColor ) const
 
    if ( mColorTargets[mColorTargets.size()-1].elevation != M_PI_F )
    {
-      AssertFatal(0, "Celestails::GetColor() - Last elevation must be PI")
+      AssertFatal(0, "Celestails::GetColor() - Last elevation must be PI");
       outColor->set(1.0f, 1.0f, 1.0f);
       //mBandMod = 1.0f;
       //mCurrentBandColor = color;

@@ -48,7 +48,7 @@ CatmullRomBase::CatmullRomBase()
 void CatmullRomBase::_initialize( U32 count, const F32 *times )
 {
    //AssertFatal( times, "CatmullRomBase::_initialize() - Got null position!" )
-   AssertFatal( count > 1, "CatmullRomBase::_initialize() - Must have more than 2 points!" )
+   AssertFatal( count > 1, "CatmullRomBase::_initialize() - Must have more than 2 points!" );
 
    // set up arrays
    mTimes = new F32[count];
