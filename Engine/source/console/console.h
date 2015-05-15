@@ -186,19 +186,20 @@ public:
       fval = 0;
       sval = typeValueEmpty;
       bufferLen = 0;
-	  type = TypeInternalString;
+      type = TypeInternalString;
    }
    
    void cleanup()
    {
-      if (type <= TypeInternalString &&
-          sval != typeValueEmpty && type != TypeInternalStackString && type != TypeInternalStringStackPtr)
+      if (bufferLen > 0)
+      {
          dFree(sval);
+         bufferLen = 0;
+      }
       sval = typeValueEmpty;
       type = ConsoleValue::TypeInternalString;
       ival = 0;
       fval = 0;
-      bufferLen = 0;
    }
 };
 
