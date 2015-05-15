@@ -1759,12 +1759,32 @@ const char *ConsoleValue::getStringValue()
       return sval;
    else if (type == TypeInternalStringStackPtr)
       return STR.mBuffer + (uintptr_t)sval;
-   if(type == TypeInternalFloat)
-      return Con::getData(TypeF32, &fval, 0);
-   else if(type == TypeInternalInt)
-      return Con::getData(TypeS32, &ival, 0);
    else
-      return Con::getData(type, dataPtr, 0, enumTable);
+   {
+      // We need a string representation, so lets create one
+      const char *internalValue = NULL;
+
+      if(type == TypeInternalFloat)
+         internalValue = Con::getData(TypeF32, &fval, 0);
+      else if(type == TypeInternalInt)
+         internalValue = Con::getData(TypeS32, &ival, 0);
+      else
+         internalValue = Con::getData(type, dataPtr, 0, enumTable);
+
+      if (!internalValue)
+         return "";
+
+      U32 stringLen = dStrlen(internalValue);
+      U32 newLen = ((stringLen + 1) + 15) & ~15; // pad upto next cache line
+	   
+      if(sval == typeValueEmpty || type == TypeInternalStackString || type == TypeInternalStringStackPtr)
+         sval = (char *) dMalloc(newLen);
+      else if(newLen > bufferLen)
+         sval = (char *) dRealloc(sval, newLen);
+
+      dStrcpy(sval, internalValue);
+      return sval;
+   }
 }
 
 StringStackPtr ConsoleValue::getStringStackPtr()
