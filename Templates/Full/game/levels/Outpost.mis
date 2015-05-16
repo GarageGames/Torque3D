@@ -1277,7 +1277,7 @@ new SimGroup(MissionGroup) {
       };
    };
    new TSStatic() {
-      shapeName = "art/shapes/trees/defaulttree/defaulttree.dae";
+      shapeName = "art/shapes/trees/defaulttree/defaulttree.DAE";
       playAmbient = "1";
       meshCulling = "0";
       originSort = "0";
