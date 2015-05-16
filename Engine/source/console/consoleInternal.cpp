@@ -693,8 +693,7 @@ Dictionary::Entry* Dictionary::addVariable(  const char *name,
    Entry *ent = add(StringTable->insert(name));
    
    if (  ent->value.type <= ConsoleValue::TypeInternalString &&
-         ent->value.sval != typeValueEmpty && 
-         ent->value.type != ConsoleValue::TypeInternalStackString && ent->value.type != ConsoleValue::TypeInternalStringStackPtr )
+         ent->value.bufferLen > 0 )
       dFree(ent->value.sval);
 
    ent->value.type = type;
