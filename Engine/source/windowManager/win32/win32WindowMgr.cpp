@@ -29,6 +29,9 @@
 
 #if !defined( TORQUE_SDL )
 
+enum DWMState { DWM_NotChecked = 0, DWM_Disabled, DWM_Enabled };
+static DWMState sgDWMState;
+
 // ------------------------------------------------------------------------
 
 void CloseSplashWindow(HINSTANCE hinst);
@@ -524,6 +527,47 @@ void Win32WindowManager::raiseCurtain()
 
    DestroyWindow(mCurtainWindow);
    mCurtainWindow = NULL;
+}
+
+bool Win32WindowManager::isDesktopCompositionEnabled()
+{
+   // Only perform the check once
+   if (sgDWMState != DWM_NotChecked)
+      return sgDWMState == DWM_Enabled;
+
+   // Use the system api for determining if composition is enabled. According to
+   // the documentation, this may sometimes return false on Windows 8, even
+   // though DWM is "permanently enabled" on that OS. Maybe a version check and
+   // doing a search for running DWM.exe processes would be more accurate - that
+   // would also allow us to catch the case where the user went out of their way
+   // to disable DWM on Windows 8+, which apparently is possible if you're
+   // determined enough.
+   HMODULE dwmModule = LoadLibraryA("dwmapi.dll");
+   if (dwmModule)
+   {
+      typedef HRESULT (WINAPI* DwmIsCompositionEnabledFunc)(BOOL *);
+      DwmIsCompositionEnabledFunc function =
+         (DwmIsCompositionEnabledFunc) GetProcAddress(dwmModule, "DwmIsCompositionEnabled");
+      if (function)
+      {
+         BOOL enabled;
+         if (function(&enabled) == S_OK)
+         {
+            sgDWMState = enabled ? DWM_Enabled : DWM_Disabled;
+            return enabled;
+         }
+      }
+   }
+
+   // Failed - assume disabled
+   sgDWMState = DWM_Disabled;
+   return false;
+}
+
+void Win32WindowManager::updateDesktopCompositionState()
+{
+   // Re-check the state next time it's needed
+   sgDWMState = DWM_NotChecked;
 }
 
 #endif

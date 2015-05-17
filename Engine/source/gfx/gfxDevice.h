@@ -401,6 +401,15 @@ public:
 
    /// @}
 
+   enum VSyncMode
+   {
+      VS_Disabled = 0,
+      VS_Enabled  = 1,
+      VS_Auto     = 2 // Try to choose a good vsync based on video mode and whether desktop
+                      // composition is running, preferring to disable vsync when appropriate.
+                      // TODO: support adaptive vsync
+   };
+
    //-----------------------------------------------------------------------------
 protected:
 
@@ -441,6 +450,10 @@ protected:
 
    /// The global vsync state.
    static bool smDisableVSync;
+   static bool smPrevDisableVSync;
+
+   static S32 smFullscreenVSyncMode;
+   static S32 smWindowedVSyncMode;
 
    /// The forced shader model version if non-zero.
    static F32 smForcedPixVersion;
@@ -563,6 +576,8 @@ protected:
    //-----------------------------------------------------------------------------
 protected:
 
+   void videoModeChanged();
+   void vsyncChanged();
 
    /// @name Buffer Allocation 
    /// These methods are implemented per-device and are called by the GFX layer
