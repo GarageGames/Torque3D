@@ -202,6 +202,10 @@ void RenderGlowMgr::render( SceneRenderState *state )
          }
 
          ParticleRenderInst *ri = static_cast<ParticleRenderInst*>(_ri);
+
+         GFX->setStateBlock(mParticleRenderMgr->_getHighResStateBlock(ri));
+         mParticleRenderMgr->_getShaderConsts().mShaderConsts->setSafe(mParticleRenderMgr->_getShaderConsts().mModelViewProjSC, *ri->modelViewProj);
+
          mParticleRenderMgr->renderParticle(ri, state);
          j++;
          continue;
