@@ -20,11 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+$PostFXManager::Settings::EnableVignette = "0";
 $PostFXManager::Settings::EnableDOF = "0";
 $PostFXManager::Settings::EnabledSSAO = "0";
 $PostFXManager::Settings::EnableHDR = "0";
 $PostFXManager::Settings::EnableLightRays = "0";
 $PostFXManager::Settings::EnablePostFX = "0";
+$PostFXManager::Settings::Vignette::VMax = "0.6";
 $PostFXManager::Settings::DOF::BlurCurveFar = "";
 $PostFXManager::Settings::DOF::BlurCurveNear = "";
 $PostFXManager::Settings::DOF::BlurMax = "";
