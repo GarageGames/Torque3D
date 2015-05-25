@@ -1759,12 +1759,34 @@ const char *ConsoleValue::getStringValue()
       return sval;
    else if (type == TypeInternalStringStackPtr)
       return STR.mBuffer + (uintptr_t)sval;
-   if(type == TypeInternalFloat)
-      return Con::getData(TypeF32, &fval, 0);
-   else if(type == TypeInternalInt)
-      return Con::getData(TypeS32, &ival, 0);
    else
-      return Con::getData(type, dataPtr, 0, enumTable);
+   {
+      // We need a string representation, so lets create one
+      const char *internalValue = NULL;
+
+      if(type == TypeInternalFloat)
+         internalValue = Con::getData(TypeF32, &fval, 0);
+      else if(type == TypeInternalInt)
+         internalValue = Con::getData(TypeS32, &ival, 0);
+      else
+         return Con::getData(type, dataPtr, 0, enumTable); // We can't save sval here since it is the same as dataPtr
+
+      if (!internalValue)
+         return "";
+
+      U32 stringLen = dStrlen(internalValue);
+      U32 newLen = ((stringLen + 1) + 15) & ~15; // pad upto next cache line
+	   
+      if (bufferLen == 0)
+         sval = (char *) dMalloc(newLen);
+      else if(newLen > bufferLen)
+         sval = (char *) dRealloc(sval, newLen);
+
+      dStrcpy(sval, internalValue);
+      bufferLen = newLen;
+
+      return sval;
+   }
 }
 
 StringStackPtr ConsoleValue::getStringStackPtr()
@@ -1800,11 +1822,13 @@ void ConsoleValue::setIntValue(U32 val)
    {
       fval = (F32)val;
       ival = val;
-      if(sval != typeValueEmpty)
+      if(bufferLen > 0)
       {
-         if (type != TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
-         sval = typeValueEmpty;
+         dFree(sval);
+         bufferLen = 0;
       }
+
+      sval = typeValueEmpty;
       type = TypeInternalInt;
    }
    else
@@ -1825,11 +1849,12 @@ void ConsoleValue::setFloatValue(F32 val)
    {
       fval = val;
       ival = static_cast<U32>(val);
-      if(sval != typeValueEmpty)
+      if(bufferLen > 0)
       {
-         if (type != TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
-         sval = typeValueEmpty;
+         dFree(sval);
+         bufferLen = 0;
       }
+      sval = typeValueEmpty;
       type = TypeInternalFloat;
    }
    else
