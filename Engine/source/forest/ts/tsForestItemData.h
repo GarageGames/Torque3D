@@ -88,7 +88,7 @@ public:
    const Vector<S32>& getLOSDetails() const { return mLOSDetails; }
 
    // ForestItemData
-   const Box3F& getObjBox() const { return mShape ? mShape->bounds : Box3F::Invalid; }
+   const Box3F& getObjBox() const { return mShape ? mShape->bounds : Box3F::Zero; }
    bool render( TSRenderState *rdata, const ForestItem& item ) const;
    ForestCellBatch* allocateBatch() const;
    bool canBillboard( const SceneRenderState *state, const ForestItem &item, F32 distToCamera ) const;

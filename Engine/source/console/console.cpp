@@ -1534,9 +1534,16 @@ StringTableEntry getModNameFromPath(const char *path)
 void postConsoleInput( RawData data )
 {
    // Schedule this to happen at the next time event.
+   ConsoleValue values[2];
    ConsoleValueRef argv[2];
-   argv[0] = "eval";
-   argv[1] = ( const char* ) data.data;
+
+   values[0].init();
+   values[0].setStringValue("eval");
+   values[1].init();
+   values[1].setStringValue((const char*)data.data);
+   argv[0].value = &values[0];
+   argv[1].value = &values[1];
+
    Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(2, argv, false));
 }
 
@@ -1608,36 +1615,6 @@ extern ConsoleValueStack CSTK;
 ConsoleValueRef::ConsoleValueRef(const ConsoleValueRef &ref)
 {
    value = ref.value;
-}
-
-ConsoleValueRef::ConsoleValueRef(const char *newValue) : value(NULL)
-{
-   *this = newValue;
-}
-
-ConsoleValueRef::ConsoleValueRef(const String &newValue) : value(NULL)
-{
-   *this = (const char*)(newValue.utf8());
-}
-
-ConsoleValueRef::ConsoleValueRef(U32 newValue) : value(NULL)
-{
-   *this = newValue;
-}
-
-ConsoleValueRef::ConsoleValueRef(S32 newValue) : value(NULL)
-{
-   *this = newValue;
-}
-
-ConsoleValueRef::ConsoleValueRef(F32 newValue) : value(NULL)
-{
-   *this = newValue;
-}
-
-ConsoleValueRef::ConsoleValueRef(F64 newValue) : value(NULL)
-{
-   *this = newValue;
 }
 
 ConsoleValueRef& ConsoleValueRef::operator=(const ConsoleValueRef &newValue)

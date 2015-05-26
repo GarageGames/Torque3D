@@ -187,13 +187,14 @@ void main()
 
    #endif // !NO_SHADOW
    
+   vec3 lightcol = lightColor.rgb;
    #ifdef USE_COOKIE_TEX
 
       // Lookup the cookie sample.
       vec4 cookie = texture( cookieMap, tMul( viewToLightProj, -lightVec ) );
 
       // Multiply the light with the cookie tex.
-      lightColor.rgb *= cookie.rgb;
+      lightcol *= cookie.rgb;
 
       // Use a maximum channel luminance to attenuate 
       // the lighting else we get specular in the dark
@@ -211,7 +212,7 @@ void main()
                                        normalize( -eyeRay ) ) * lightBrightness * atten * shadowed;
 
    float Sat_NL_Att = saturate( nDotL * atten * shadowed ) * lightBrightness;
-   vec3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
+   vec3 lightColorOut = lightMapParams.rgb * lightcol;
    vec4 addToResult = vec4(0.0);
     
    // TODO: This needs to be removed when lightmapping is disabled

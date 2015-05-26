@@ -76,9 +76,10 @@ extern "C" {
       if (!entry)
          return "";
 
-      ConsoleValueRef argv[] = {"consoleExportXML"};
+      static const char* exportArgv[1] = { "consoleExportXML" };
+      static StringStackConsoleWrapper exportCmd(1, exportArgv);
 
-      return entry->cb.mStringCallbackFunc(NULL, 1, argv);      
+      return entry->cb.mStringCallbackFunc(NULL, exportCmd.argc, exportCmd.argv);      
    }
 
    MarshalNativeEntry* script_get_namespace_entry(const char* nameSpace, const char* name)
