@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "platform/input/oculusVR/oculusVRDevice.h"
 #include "platform/input/oculusVR/oculusVRSensorData.h"
 #include "platform/input/oculusVR/oculusVRUtil.h"
 #include "console/console.h"
@@ -32,66 +33,44 @@ OculusVRSensorData::OculusVRSensorData()
 void OculusVRSensorData::reset()
 {
    mDataSet = false;
+   mStatusFlags = 0;
 }
 
-void OculusVRSensorData::setData(OVR::SensorFusion& data, const F32& maxAxisRadius)
+void OculusVRSensorData::setData(ovrTrackingState& data, const F32& maxAxisRadius)
 {
-   // Sensor rotation
-   OVR::Quatf orientation;
-   if(data.GetPredictionDelta() > 0)
-   {
-      orientation = data.GetPredictedOrientation();
-   }
-   else
-   {
-      orientation = data.GetOrientation();
-   }
+   // Sensor rotation & position
+   OVR::Posef pose = data.HeadPose.ThePose;
+   OVR::Quatf orientation = pose.Rotation;
+   OVR::Vector3f position = data.HeadPose.ThePose.Position;
+
+   mPosition = Point3F(-position.z, position.x, position.y);
+   mPosition *= OculusVRDevice::smPositionTrackingScale;
+
    OVR::Matrix4f orientMat(orientation);
    OculusVRUtil::convertRotation(orientMat.M, mRot);
    mRotQuat.set(mRot);
 
    // Sensor rotation in Euler format
-   OculusVRUtil::convertRotation(orientation, mRotEuler);
+   OculusVRUtil::convertRotation(orientation, mRotEuler); // mRotEuler == pitch, roll, yaw FROM yaw, pitch, roll
+
+   //mRotEuler = EulerF(0,0,0);
+   float hmdYaw, hmdPitch, hmdRoll;
+        orientation.GetEulerAngles<OVR::Axis_Y, OVR::Axis_X, OVR::Axis_Z>(&hmdYaw, &hmdPitch, &hmdRoll);
 
    // Sensor rotation as axis
    OculusVRUtil::calculateAxisRotation(mRot, maxAxisRadius, mRotAxis);
 
    // Sensor raw values
-   OVR::Vector3f accel = data.GetAcceleration();
+   OVR::Vector3f accel = data.HeadPose.LinearAcceleration;
    OculusVRUtil::convertAcceleration(accel, mAcceleration);
 
-   OVR::Vector3f angVel = data.GetAngularVelocity();
+   OVR::Vector3f angVel = data.HeadPose.AngularVelocity;
    OculusVRUtil::convertAngularVelocity(angVel, mAngVelocity);
 
-   OVR::Vector3f mag;
-   if(data.HasMagCalibration() && data.IsYawCorrectionEnabled())
-   {
-      mag = data.GetCalibratedMagnetometer();
-   }
-   else
-   {
-      mag = data.GetMagnetometer();
-   }
+   OVR::Vector3f mag = data.RawSensorData.Magnetometer;
    OculusVRUtil::convertMagnetometer(mag, mMagnetometer);
 
-   mDataSet = true;
-}
-
-void OculusVRSensorData::simulateData(const F32& maxAxisRadius)
-{
-   // Sensor rotation
-   mRot.identity();
-   mRotQuat.identity();
-   mRotEuler.zero();
-
-   // Sensor rotation as axis
-   OculusVRUtil::calculateAxisRotation(mRot, maxAxisRadius, mRotAxis);
-
-   // Sensor raw values
-   mAcceleration.zero();
-   mAngVelocity.zero();
-   mMagnetometer.zero();
-
+   mStatusFlags = data.StatusFlags;
    mDataSet = true;
 }
 
@@ -130,6 +109,11 @@ U32 OculusVRSensorData::compare(OculusVRSensorData* other, bool doRawCompare)
       {
          result |= DIFF_MAG;
       }
+   }
+
+   if (other->mStatusFlags != mStatusFlags)
+   {
+      result |= DIFF_STATUS;
    }
 
    return result;

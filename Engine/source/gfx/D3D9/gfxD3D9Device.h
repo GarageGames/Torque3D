@@ -238,7 +238,7 @@ protected:
    // }
 
    virtual GFXShader* createShader();
-   void disableShaders();
+   void disableShaders(bool force = false);
 
    /// Device helper function
    virtual D3DPRESENT_PARAMETERS setupPresentParams( const GFXVideoMode &mode, const HWND &hwnd ) const = 0;
@@ -272,7 +272,7 @@ public:
 
    virtual F32  getPixelShaderVersion() const { return mPixVersion; }
    virtual void setPixelShaderVersion( F32 version ){ mPixVersion = version; }
-   virtual void setShader( GFXShader *shader );
+   virtual void setShader( GFXShader *shader, bool force = false );
    virtual U32  getNumSamplers() const { return mNumSamplers; }
    virtual U32  getNumRenderTargets() const { return mNumRenderTargets; }
    // }

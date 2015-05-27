@@ -22,6 +22,7 @@
 
 #include "platform/platform.h"
 #include "gui/3d/guiTSControl.h"
+#include "gui/core/guiOffscreenCanvas.h"
 
 #include "console/engineAPI.h"
 #include "scene/sceneManager.h"
@@ -34,7 +35,12 @@
 #include "scene/reflectionManager.h"
 #include "postFx/postEffectManager.h"
 #include "gfx/gfxTransformSaver.h"
+#include "gfx/gfxDrawUtil.h"
+#include "gfx/gfxDebugEvent.h"
 
+GFXTextureObject *gLastStereoTexture = NULL;
+
+#define TS_OVERLAY_SCREEN_WIDTH 0.75
 
 IMPLEMENT_CONOBJECT( GuiTSCtrl );
 
@@ -51,6 +57,7 @@ ConsoleDocClass( GuiTSCtrl,
 );
 
 U32 GuiTSCtrl::smFrameCount = 0;
+bool GuiTSCtrl::smUseLatestDisplayTransform = true;
 Vector<GuiTSCtrl*> GuiTSCtrl::smAwakeTSCtrls;
 
 ImplementEnumType( GuiTSRenderStyles,
@@ -59,7 +66,6 @@ ImplementEnumType( GuiTSRenderStyles,
 	{ GuiTSCtrl::RenderStyleStandard,         "standard"              },
 	{ GuiTSCtrl::RenderStyleStereoSideBySide, "stereo side by side"   },
 EndImplementEnumType;
-
 
 //-----------------------------------------------------------------------------
 
@@ -153,7 +159,6 @@ GuiTSCtrl::GuiTSCtrl()
    mLastCameraQuery.nearPlane = 0.01f;
 
    mLastCameraQuery.projectionOffset = Point2F::Zero;
-   mLastCameraQuery.eyeOffset = Point3F::Zero;
 
    mLastCameraQuery.ortho = false;
 }
@@ -192,6 +197,8 @@ void GuiTSCtrl::consoleInit()
 {
    Con::addVariable("$TSControl::frameCount", TypeS32, &smFrameCount, "The number of frames that have been rendered since this control was created.\n"
 	   "@ingroup Rendering\n");
+   Con::addVariable("$TSControl::useLatestDisplayTransform", TypeBool, &smUseLatestDisplayTransform, "Use the latest view transform when rendering stereo instead of the one calculated by the last move.\n"
+	   "@ingroup Rendering\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -205,6 +212,9 @@ bool GuiTSCtrl::onWake()
    AssertFatal( !smAwakeTSCtrls.contains( this ), 
       "GuiTSCtrl::onWake - This control is already in the awake list!" );
    smAwakeTSCtrls.push_back( this );
+
+   // For VR
+   mLastCameraQuery.drawCanvas = getRoot();
 
    return true;
 }
@@ -307,6 +317,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 	// Save the current transforms so we can restore
    // it for child control rendering below.
    GFXTransformSaver saver;
+   bool renderingToTarget = false;
 
    if(!processCameraQuery(&mLastCameraQuery))
    {
@@ -317,15 +328,52 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       return;
    }
 
+   GFXTargetRef origTarget = GFX->getActiveRenderTarget();
+
    // Set up the appropriate render style
    U32 prevRenderStyle = GFX->getCurrentRenderStyle();
    Point2F prevProjectionOffset = GFX->getCurrentProjectionOffset();
-   Point3F prevEyeOffset = GFX->getStereoEyeOffset();
+   Point2I renderSize = getExtent();
+
    if(mRenderStyle == RenderStyleStereoSideBySide)
    {
       GFX->setCurrentRenderStyle(GFXDevice::RS_StereoSideBySide);
       GFX->setCurrentProjectionOffset(mLastCameraQuery.projectionOffset);
-      GFX->setStereoEyeOffset(mLastCameraQuery.eyeOffset);
+      GFX->setStereoEyeOffsets(mLastCameraQuery.eyeOffset);
+      GFX->setFovPort(mLastCameraQuery.fovPort); // NOTE: this specifies fov for BOTH eyes
+      GFX->setSteroViewports(mLastCameraQuery.stereoViewports);
+      GFX->setStereoTargets(mLastCameraQuery.stereoTargets);
+
+      MatrixF myTransforms[2];
+
+      if (smUseLatestDisplayTransform)
+      {
+         // Use the view matrix determined from the display device
+         myTransforms[0] = mLastCameraQuery.eyeTransforms[0];
+         myTransforms[1] = mLastCameraQuery.eyeTransforms[1];
+      }
+      else
+      {
+         // Use the view matrix determined from the control object
+         myTransforms[0] = mLastCameraQuery.cameraMatrix;
+         myTransforms[1] = mLastCameraQuery.cameraMatrix;
+
+         QuatF qrot = mLastCameraQuery.cameraMatrix;
+         Point3F pos = mLastCameraQuery.cameraMatrix.getPosition();
+         Point3F rotEyePos;
+
+         myTransforms[0].setPosition(pos + qrot.mulP(mLastCameraQuery.eyeOffset[0], &rotEyePos));
+         myTransforms[1].setPosition(pos + qrot.mulP(mLastCameraQuery.eyeOffset[1], &rotEyePos));
+      }
+
+      GFX->setStereoEyeTransforms(myTransforms);
+
+      // Allow render size to originate from the render target
+      if (mLastCameraQuery.stereoTargets[0])
+      {
+         renderSize = mLastCameraQuery.stereoViewports[0].extent;
+         renderingToTarget = true;
+      }
    }
    else
    {
@@ -357,8 +405,8 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    // set up the camera and viewport stuff:
    F32 wwidth;
    F32 wheight;
-   F32 renderWidth = (mRenderStyle == RenderStyleStereoSideBySide) ? F32(getWidth())*0.5f : F32(getWidth());
-   F32 renderHeight = F32(getHeight());
+   F32 renderWidth = F32(renderSize.x);
+   F32 renderHeight = F32(renderSize.y);
    F32 aspectRatio = renderWidth / renderHeight;
    
    // Use the FOV to calculate the viewport height scale
@@ -380,12 +428,8 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    Frustum frustum;
    if(mRenderStyle == RenderStyleStereoSideBySide)
    {
-      F32 left = 0.0f * hscale - wwidth;
-      F32 right = renderWidth * hscale - wwidth;
-      F32 top = wheight - vscale * 0.0f;
-      F32 bottom = wheight - vscale * renderHeight;
-
-      frustum.set( mLastCameraQuery.ortho, left, right, top, bottom, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane );
+      // NOTE: these calculations are essentially overridden later by the fov port settings when rendering each eye.
+      MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho,  mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[0]);
    }
    else
    {
@@ -407,15 +451,24 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       
    RectI tempRect = updateRect;
    
-#ifdef TORQUE_OS_MAC
-   Point2I screensize = getRoot()->getWindowSize();
-   tempRect.point.y = screensize.y - (tempRect.point.y + tempRect.extent.y);
-#endif
+   if (!renderingToTarget)
+   {
+   #ifdef TORQUE_OS_MAC
+      Point2I screensize = getRoot()->getWindowSize();
+      tempRect.point.y = screensize.y - (tempRect.point.y + tempRect.extent.y);
+   #endif
 
-   GFX->setViewport( tempRect );
+      GFX->setViewport( tempRect );
+   }
+   else
+   {
+      // Activate stereo RT
+      GFX->activateStereoTarget(-1);
+   }
 
    // Clear the zBuffer so GUI doesn't hose object rendering accidentally
    GFX->clear( GFXClearZBuffer , ColorI(20,20,20), 1.0f, 0 );
+   //GFX->clear( GFXClearTarget, ColorI(255,0,0), 1.0f, 0);
 
    GFX->setFrustum( frustum );
    if(mLastCameraQuery.ortho)
@@ -427,7 +480,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    // We're going to be displaying this render at size of this control in
    // pixels - let the scene know so that it can calculate e.g. reflections
    // correctly for that final display result.
-   gClientSceneGraph->setDisplayTargetResolution(getExtent());
+   gClientSceneGraph->setDisplayTargetResolution(renderSize);
 
    // Set the GFX world matrix to the world-to-camera transform, but don't 
    // change the cameraMatrix in mLastCameraQuery. This is because 
@@ -455,20 +508,121 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    renderWorld(updateRect);
    DebugDrawer::get()->render();
 
+   // Render the canvas overlay if its available
+   if (mRenderStyle == RenderStyleStereoSideBySide && mStereoGuiTarget.getPointer())
+   {
+      GFXDEBUGEVENT_SCOPE( StereoGui_Render, ColorI( 255, 0, 0 ) );
+      MatrixF proj(1);
+      
+      Frustum originalFrustum = GFX->getFrustum();
+      GFXTextureObject *texObject = mStereoGuiTarget->getTexture(0);
+      const FovPort *currentFovPort = GFX->getSteroFovPort();
+      const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
+      const MatrixF *worldEyeTransforms = GFX->getInverseStereoEyeTransforms();
+      const Point3F *eyeOffset = GFX->getStereoEyeOffsets();
+
+      for (U32 i=0; i<2; i++)
+      {
+         GFX->activateStereoTarget(i);
+         Frustum gfxFrustum = originalFrustum;
+         const F32 frustumDepth = gfxFrustum.getNearDist();
+         MathUtils::makeFovPortFrustum(&gfxFrustum, true, gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[i], eyeTransforms[i]);
+         GFX->setFrustum(gfxFrustum);
+
+         MatrixF eyeWorldTrans(1);
+         eyeWorldTrans.setPosition(Point3F(eyeOffset[i].x,eyeOffset[i].y,eyeOffset[i].z));
+         MatrixF eyeWorld(1);
+         eyeWorld.mul(eyeWorldTrans);
+         eyeWorld.inverse();
+         
+         GFX->setWorldMatrix(eyeWorld);
+         GFX->setViewMatrix(MatrixF::Identity);
+
+         if (!mStereoOverlayVB.getPointer())
+         {
+            mStereoOverlayVB.set(GFX, 4, GFXBufferTypeStatic);
+            GFXVertexPCT *verts = mStereoOverlayVB.lock(0, 4);
+
+            F32 texLeft   = 0.0f;
+            F32 texRight  = 1.0f;
+            F32 texTop    = 1.0f;
+            F32 texBottom = 0.0f;
+
+            F32 rectRatio = gfxFrustum.getWidth() / gfxFrustum.getHeight();
+            F32 rectWidth = gfxFrustum.getWidth() * TS_OVERLAY_SCREEN_WIDTH;
+            F32 rectHeight = rectWidth * rectRatio;
+
+            F32 screenLeft   = -rectWidth * 0.5;
+            F32 screenRight  = rectWidth * 0.5;
+            F32 screenTop    = -rectHeight * 0.5;
+            F32 screenBottom = rectHeight * 0.5;
+
+            const F32 fillConv = 0.0f;
+            const F32 frustumDepth = gfxFrustum.getNearDist() + 0.012;
+            verts[0].point.set( screenLeft  - fillConv, frustumDepth, screenTop    - fillConv );
+            verts[1].point.set( screenRight - fillConv, frustumDepth, screenTop    - fillConv );
+            verts[2].point.set( screenLeft  - fillConv, frustumDepth, screenBottom - fillConv );
+            verts[3].point.set( screenRight - fillConv, frustumDepth, screenBottom - fillConv );
+
+            verts[0].color = verts[1].color = verts[2].color = verts[3].color = ColorI(255,255,255,255);
+
+            verts[0].texCoord.set( texLeft,  texTop );
+            verts[1].texCoord.set( texRight, texTop );
+            verts[2].texCoord.set( texLeft,  texBottom );
+            verts[3].texCoord.set( texRight, texBottom );
+
+            mStereoOverlayVB.unlock();
+         }
+
+         if (!mStereoGuiSB.getPointer())
+         {
+            // DrawBitmapStretchSR
+            GFXStateBlockDesc bitmapStretchSR;
+            bitmapStretchSR.setCullMode(GFXCullNone);
+            bitmapStretchSR.setZReadWrite(false, false);
+            bitmapStretchSR.setBlend(true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
+            bitmapStretchSR.samplersDefined = true;
+
+            bitmapStretchSR.samplers[0] = GFXSamplerStateDesc::getClampLinear();
+            bitmapStretchSR.samplers[0].minFilter = GFXTextureFilterPoint;
+            bitmapStretchSR.samplers[0].mipFilter = GFXTextureFilterPoint;
+            bitmapStretchSR.samplers[0].magFilter = GFXTextureFilterPoint;
+
+            mStereoGuiSB = GFX->createStateBlock(bitmapStretchSR);
+         }
+
+         GFX->setVertexBuffer(mStereoOverlayVB);
+         GFX->setStateBlock(mStereoGuiSB);
+         GFX->setTexture( 0, texObject );
+         GFX->setupGenericShaders( GFXDevice::GSModColorTexture );
+         GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
+      }
+   }
+
 	// Restore the previous matrix state before
    // we begin rendering the child controls.
    saver.restore();
 
    // Restore the render style and any stereo parameters
+   GFX->setActiveRenderTarget(origTarget);
    GFX->setCurrentRenderStyle(prevRenderStyle);
    GFX->setCurrentProjectionOffset(prevProjectionOffset);
-   GFX->setStereoEyeOffset(prevEyeOffset);
+
+   
+   if(mRenderStyle == RenderStyleStereoSideBySide && gLastStereoTexture)
+   {
+      GFX->setClipRect(updateRect);
+      GFX->getDrawUtil()->drawBitmapStretch(gLastStereoTexture, updateRect);
+   }
 
    // Allow subclasses to render 2D elements.
    GFX->setClipRect(updateRect);
    renderGui( offset, updateRect );
 
-   renderChildControls(offset, updateRect);
+   if (shouldRenderChildControls())
+   {
+      renderChildControls(offset, updateRect);
+   }
    smFrameCount++;
 }
 
@@ -497,6 +651,12 @@ void GuiTSCtrl::drawLineList( const Vector<Point3F> &points, const ColorI color,
 {
    for ( S32 i = 0; i < points.size() - 1; i++ )
       drawLine( points[i], points[i+1], color, width );
+}
+
+
+void GuiTSCtrl::setStereoGui(GuiOffscreenCanvas *canvas)
+{
+   mStereoGuiTarget = canvas ? canvas->getTarget() : NULL;
 }
 
 //=============================================================================
@@ -546,4 +706,11 @@ DefineEngineMethod( GuiTSCtrl, calculateViewDistance, F32, ( F32 radius ),,
    "@return The distance from the viewpoint at which the given radius would be fully visible." )
 {
    return object->calculateViewDistance( radius );
+}
+
+DefineEngineMethod( GuiTSCtrl, setStereoGui, void, ( GuiOffscreenCanvas* canvas ),,
+   "Sets the current stereo texture to an offscreen canvas\n"
+   "@param canvas The desired canvas." )
+{
+   object->setStereoGui(canvas);
 }

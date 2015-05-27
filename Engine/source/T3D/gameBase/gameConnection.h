@@ -269,6 +269,10 @@ public:
    bool getControlCameraTransform(F32 dt,MatrixF* mat);
    bool getControlCameraVelocity(Point3F *vel);
 
+   /// Returns the eye transforms for the control object, using supplemental information 
+   /// from the provided IDisplayDevice.
+   bool getControlCameraEyeTransforms(IDisplayDevice *display, MatrixF *transforms);
+   
    bool getControlCameraDefaultFov(F32 *fov);
    bool getControlCameraFov(F32 *fov);
    bool setControlCameraFov(F32 fov);
@@ -280,8 +284,8 @@ public:
    void setFirstPerson(bool firstPerson);
    
    bool hasDisplayDevice() const { return mDisplayDevice != NULL; }
-   const IDisplayDevice* getDisplayDevice() const { return mDisplayDevice; }
-   void setDisplayDevice(IDisplayDevice* display) { mDisplayDevice = display; }
+   IDisplayDevice* getDisplayDevice() const { return mDisplayDevice; }
+   void setDisplayDevice(IDisplayDevice* display) { if (mDisplayDevice) mDisplayDevice->setDrawCanvas(NULL); mDisplayDevice = display; }
    void clearDisplayDevice() { mDisplayDevice = NULL; }
 
    void setControlSchemeParameters(bool absoluteRotation, bool addYawToAbsRot, bool addPitchToAbsRot);

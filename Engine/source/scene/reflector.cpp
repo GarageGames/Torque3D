@@ -606,63 +606,58 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       RectI originalVP = GFX->getViewport();
 
       Point2F projOffset = GFX->getCurrentProjectionOffset();
-      Point3F eyeOffset = GFX->getStereoEyeOffset();
+      const FovPort *currentFovPort = GFX->getSteroFovPort();
+      MatrixF inverseEyeTransforms[2];
+
+      // Calculate world transforms for eyes
+      inverseEyeTransforms[0] = params.query->eyeTransforms[0];
+      inverseEyeTransforms[1] = params.query->eyeTransforms[1];
+      inverseEyeTransforms[0].inverse();
+      inverseEyeTransforms[1].inverse();
+
+      Frustum originalFrustum = GFX->getFrustum();
 
       // Render left half of display
-      RectI leftVP = originalVP;
-      leftVP.extent.x *= 0.5;
-      GFX->setViewport(leftVP);
+      GFX->activateStereoTarget(0);
+      GFX->setWorldMatrix(params.query->eyeTransforms[0]);
 
-      MatrixF leftWorldTrans(true);
-      leftWorldTrans.setPosition(Point3F(eyeOffset.x, eyeOffset.y, eyeOffset.z));
-      MatrixF leftWorld(params.query->cameraMatrix);
-      leftWorld.mulL(leftWorldTrans);
-
-      Frustum gfxFrustum = GFX->getFrustum();
-      gfxFrustum.setProjectionOffset(Point2F(projOffset.x, projOffset.y));
+      Frustum gfxFrustum = originalFrustum;
+      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[0], inverseEyeTransforms[0]);
       GFX->setFrustum(gfxFrustum);
 
-      setGFXMatrices( leftWorld );
+      setGFXMatrices( params.query->eyeTransforms[0] );
 
       SceneCameraState cameraStateLeft = SceneCameraState::fromGFX();
       SceneRenderState renderStateLeft( gClientSceneGraph, SPT_Reflect, cameraStateLeft );
       renderStateLeft.setSceneRenderStyle(SRS_SideBySide);
       renderStateLeft.setSceneRenderField(0);
       renderStateLeft.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-      renderStateLeft.setDiffuseCameraTransform( params.query->cameraMatrix );
+      renderStateLeft.setDiffuseCameraTransform( params.query->eyeTransforms[0] );
       renderStateLeft.disableAdvancedLightingBins(true);
 
       gClientSceneGraph->renderSceneNoLights( &renderStateLeft, objTypeFlag );
 
       // Render right half of display
-      RectI rightVP = originalVP;
-      rightVP.extent.x *= 0.5;
-      rightVP.point.x += rightVP.extent.x;
-      GFX->setViewport(rightVP);
+      GFX->activateStereoTarget(1);
+      GFX->setWorldMatrix(params.query->eyeTransforms[1]);
 
-      MatrixF rightWorldTrans(true);
-      rightWorldTrans.setPosition(Point3F(-eyeOffset.x, eyeOffset.y, eyeOffset.z));
-      MatrixF rightWorld(params.query->cameraMatrix);
-      rightWorld.mulL(rightWorldTrans);
-
-      gfxFrustum = GFX->getFrustum();
-      gfxFrustum.setProjectionOffset(Point2F(-projOffset.x, projOffset.y));
+      gfxFrustum = originalFrustum;
+      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[1], inverseEyeTransforms[1]);
       GFX->setFrustum(gfxFrustum);
 
-      setGFXMatrices( rightWorld );
+      setGFXMatrices( params.query->eyeTransforms[1] );
 
       SceneCameraState cameraStateRight = SceneCameraState::fromGFX();
       SceneRenderState renderStateRight( gClientSceneGraph, SPT_Reflect, cameraStateRight );
       renderStateRight.setSceneRenderStyle(SRS_SideBySide);
       renderStateRight.setSceneRenderField(1);
       renderStateRight.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-      renderStateRight.setDiffuseCameraTransform( params.query->cameraMatrix );
+      renderStateRight.setDiffuseCameraTransform( params.query->eyeTransforms[1] );
       renderStateRight.disableAdvancedLightingBins(true);
 
       gClientSceneGraph->renderSceneNoLights( &renderStateRight, objTypeFlag );
 
       // Restore previous values
-      gfxFrustum.clearProjectionOffset();
       GFX->setFrustum(gfxFrustum);
       GFX->setViewport(originalVP);
    }

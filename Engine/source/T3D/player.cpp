@@ -1650,6 +1650,7 @@ Player::Player()
 
    mLastAbsoluteYaw = 0.0f;
    mLastAbsolutePitch = 0.0f;
+   mLastAbsoluteRoll = 0.0f;
 }
 
 Player::~Player()
@@ -2608,6 +2609,7 @@ void Player::updateMove(const Move* move)
             }
             mLastAbsoluteYaw = emove->rotZ[emoveIndex];
             mLastAbsolutePitch = emove->rotX[emoveIndex];
+            mLastAbsoluteRoll = emove->rotY[emoveIndex];
 
             // Head bank
             mHead.y = emove->rotY[emoveIndex];
@@ -5584,6 +5586,57 @@ void Player::getMuzzleTransform(U32 imageSlot,MatrixF* mat)
    *mat = nmat;
 }
 
+DisplayPose Player::calcCameraDeltaPose(GameConnection *con, DisplayPose inPose)
+{
+   // NOTE: this is intended to be similar to updateMove
+   DisplayPose outPose;
+   outPose.orientation = getRenderTransform().toEuler();
+   outPose.position = inPose.position;
+
+   if (con && con->getControlSchemeAbsoluteRotation())
+   {
+      // Pitch
+      outPose.orientation.x = (inPose.orientation.x - mLastAbsolutePitch);
+
+      // Constrain the range of mRot.x
+      while (outPose.orientation.x  < -M_PI_F) 
+         outPose.orientation.x += M_2PI_F;
+      while (outPose.orientation.x  > M_PI_F) 
+         outPose.orientation.x -= M_2PI_F;
+
+      // Yaw
+
+      // Rotate (heading) head or body?
+      if ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson()))
+      {
+         // Rotate head
+         outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
+      }
+      else
+      {
+         // Rotate body
+         outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
+      }
+
+      // Constrain the range of mRot.z
+      while (outPose.orientation.z < 0.0f)
+         outPose.orientation.z += M_2PI_F;
+      while (outPose.orientation.z > M_2PI_F)
+         outPose.orientation.z -= M_2PI_F;
+
+      // Bank
+      if (mDataBlock->cameraCanBank)
+      {
+         outPose.orientation.y = (inPose.orientation.y - mLastAbsoluteRoll);
+      }
+
+      // Constrain the range of mRot.y
+      while (outPose.orientation.y > M_PI_F) 
+         outPose.orientation.y -= M_2PI_F;
+   }
+
+   return outPose;
+}
 
 void Player::getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat)
 {

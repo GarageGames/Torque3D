@@ -30,16 +30,29 @@
 #include "math/mMath.h"
 #endif
 
+
+#ifndef _MATTEXTURETARGET_H_
+#include "materials/matTextureTarget.h"
+#endif
+
+class IDisplayDevice;
+class GuiOffscreenCanvas;
+
 struct CameraQuery
 {
    SimObject*  object;
    F32         nearPlane;
    F32         farPlane;
    F32         fov;
+   FovPort     fovPort[2]; // fov for each eye
    Point2F     projectionOffset;
-   Point3F     eyeOffset;
+   Point3F     eyeOffset[2];
+   MatrixF     eyeTransforms[2];
    bool        ortho;
    MatrixF     cameraMatrix;
+   RectI       stereoViewports[2]; // destination viewports
+   GFXTextureTarget* stereoTargets[2];
+   GuiCanvas* drawCanvas; // Canvas we are drawing to. Needed for VR
 };
 
 /// Abstract base class for 3D viewport GUIs.
@@ -50,11 +63,12 @@ class GuiTSCtrl : public GuiContainer
 public:
    enum RenderStyles {
       RenderStyleStandard           = 0,
-      RenderStyleStereoSideBySide   = (1<<0),
+      RenderStyleStereoSideBySide   = (1<<0)
    };
 
 protected:
    static U32     smFrameCount;
+   static bool    smUseLatestDisplayTransform;
    F32            mCameraZRot;
    F32            mForceFOV;
 
@@ -83,7 +97,11 @@ protected:
 
    /// The last camera query set in onRender.
    /// @see getLastCameraQuery
-   CameraQuery mLastCameraQuery;	
+   CameraQuery mLastCameraQuery;
+
+   NamedTexTargetRef mStereoGuiTarget;
+   GFXVertexBufferHandle<GFXVertexPCT> mStereoOverlayVB;
+   GFXStateBlockRef mStereoGuiSB;
    
 public:
    
@@ -154,6 +172,10 @@ public:
    void drawLineList( const Vector<Point3F> &points, const ColorI color, F32 width );
 
    static const U32& getFrameCount() { return smFrameCount; }
+
+   bool shouldRenderChildControls() { return mRenderStyle == RenderStyleStandard; }
+
+   void setStereoGui(GuiOffscreenCanvas *canvas);
 
    DECLARE_CONOBJECT(GuiTSCtrl);
    DECLARE_CATEGORY( "Gui 3D" );

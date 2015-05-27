@@ -279,6 +279,7 @@ Camera::Camera()
 
    mLastAbsoluteYaw = 0.0f;
    mLastAbsolutePitch = 0.0f;
+   mLastAbsoluteRoll = 0.0f;
 
    // For NewtonFlyMode
    mNewtonRotation = false;
@@ -377,6 +378,57 @@ void Camera::getCameraTransform(F32* pos, MatrixF* mat)
 
    // Apply Camera FX.
    mat->mul( gCamFXMgr.getTrans() );
+}
+
+void Camera::getEyeCameraTransform(IDisplayDevice *displayDevice, U32 eyeId, MatrixF *outMat)
+{
+   // The camera doesn't support a third person mode,
+   // so we want to override the default ShapeBase behavior.
+   ShapeBase * obj = dynamic_cast<ShapeBase*>(static_cast<SimObject*>(mOrbitObject));
+   if(obj && static_cast<ShapeBaseData*>(obj->getDataBlock())->observeThroughObject)
+      obj->getEyeCameraTransform(displayDevice, eyeId, outMat);
+   else
+   {
+      Parent::getEyeCameraTransform(displayDevice, eyeId, outMat);
+   }
+}
+
+DisplayPose Camera::calcCameraDeltaPose(GameConnection *con, DisplayPose inPose)
+{
+   // NOTE: this is intended to be similar to updateMove
+   DisplayPose outPose;
+   outPose.orientation = EulerF(0,0,0);
+   outPose.position = inPose.position;
+
+   // Pitch
+   outPose.orientation.x = (inPose.orientation.x - mLastAbsolutePitch);
+
+   // Constrain the range of mRot.x
+   while (outPose.orientation.x  < -M_PI_F) 
+      outPose.orientation.x += M_2PI_F;
+   while (outPose.orientation.x  > M_PI_F) 
+      outPose.orientation.x -= M_2PI_F;
+
+   // Yaw
+   outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
+
+   // Constrain the range of mRot.z
+   while (outPose.orientation.z < -M_PI_F) 
+      outPose.orientation.z += M_2PI_F;
+   while (outPose.orientation.z > M_PI_F) 
+      outPose.orientation.z -= M_2PI_F;
+
+   // Bank
+   if (mDataBlock->cameraCanBank)
+   {
+      outPose.orientation.y = (inPose.orientation.y - mLastAbsoluteRoll);
+   }
+
+   // Constrain the range of mRot.y
+   while (outPose.orientation.y > M_PI_F) 
+      outPose.orientation.y -= M_2PI_F;
+
+   return outPose;
 }
 
 //----------------------------------------------------------------------------
@@ -547,6 +599,7 @@ void Camera::processTick(const Move* move)
 
                mLastAbsoluteYaw = emove->rotZ[emoveIndex];
                mLastAbsolutePitch = emove->rotX[emoveIndex];
+               mLastAbsoluteRoll = emove->rotY[emoveIndex];
 
                // Bank
                mRot.y = emove->rotY[emoveIndex];
