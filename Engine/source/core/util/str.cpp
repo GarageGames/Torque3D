@@ -659,7 +659,7 @@ bool String::isEmpty() const
 
 bool String::isEmpty(const char* str)
 {
-	return src == 0 || src[0] == '\0';
+	return str == 0 || str[0] == '\0';
 }
 
 bool String::isShared() const
