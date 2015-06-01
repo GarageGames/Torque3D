@@ -657,6 +657,11 @@ bool String::isEmpty() const
    return ( _string == StringData::Empty() );
 }
 
+bool String::isEmpty(const char* str)
+{
+	return str == 0 || str[0] == '\0';
+}
+
 bool String::isShared() const
 {
    return _string->isShared();
