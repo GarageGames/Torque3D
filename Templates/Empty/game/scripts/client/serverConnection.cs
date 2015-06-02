@@ -55,7 +55,6 @@ function GameConnection::initialControlSet(%this)
    {
       if (Canvas.getContent() != PlayGui.getId())
          Canvas.setContent(PlayGui);
-         $GameCanvas = Canvas;
    }
 }
 
