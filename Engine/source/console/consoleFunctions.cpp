@@ -2269,7 +2269,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
    "@endtsexample\n\n"
 	"@ingroup Scripting")
 {
-   if(dStrIsEmpty(varName))
+   if(String::isEmpty(varName))
    {
       Con::errorf("isDefined() - did you forget to put quotes around the variable name?");
       return false;
@@ -2345,7 +2345,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
             {
                if (dStrlen(value) > 0)
                   return true;
-               else if (!dStrIsEmpty(varValue))
+               else if (!String::isEmpty(varValue))
                { 
                   obj->setDataField(valName, 0, varValue); 
                }
@@ -2362,7 +2362,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
 
          if (ent)
             return true;
-         else if (!dStrIsEmpty(varValue))
+         else if (!String::isEmpty(varValue))
          {
             gEvalState.getCurrentFrame().setVariable(name, varValue);
          }
@@ -2377,7 +2377,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
 
       if (ent)
          return true;
-      else if (!dStrIsEmpty(varValue))
+      else if (!String::isEmpty(varValue))
       {
          gEvalState.globalVars.setVariable(name, varValue);
       }
@@ -2387,7 +2387,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
       // Is it an object?
       if (dStrcmp(varName, "0") && dStrcmp(varName, "") && (Sim::findObject(varName) != NULL))
          return true;
-      else if (!dStrIsEmpty(varValue))
+      else if (!String::isEmpty(varValue))
       {
          Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, varValue);
       }

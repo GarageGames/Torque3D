@@ -431,7 +431,7 @@ DefineConsoleMethod( LightBase, playAnimation, void, (const char * anim), (""), 
    "existing one is played."
    "@hide")
 {
-	if ( dStrIsEmpty(anim) )
+	if ( String::isEmpty(anim) )
     {
         object->playAnimation();
         return;

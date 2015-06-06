@@ -1248,7 +1248,7 @@ DefineConsoleMethod( GuiMeshRoadEditorCtrl, setNodeNormal, void, (Point3F normal
 
 DefineConsoleMethod( GuiMeshRoadEditorCtrl, setSelectedRoad, void, (const char * objName), (""), "" )
 {
-   if ( dStrIsEmpty(objName) )
+   if ( String::isEmpty(objName) )
       object->setSelectedRoad(NULL);
    else
    {
