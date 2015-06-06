@@ -507,10 +507,14 @@ bool TerrainBlock::getHeight( const Point2F &pos, F32 *height ) const
    if ( sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 zBottomLeft = fixedToFloat( mFile->getHeight( x, y ) );
-   F32 zBottomRight = fixedToFloat( mFile->getHeight( x + 1, y ) );
-   F32 zTopLeft = fixedToFloat( mFile->getHeight( x, y + 1 ) );
-   F32 zTopRight = fixedToFloat( mFile->getHeight( x + 1, y + 1 ) );
+   F32  zBottomLeft, zBottomRight, zTopLeft, zTopRight;
+   mFile->getHeight4(
+      &zBottomLeft, &zBottomRight, &zTopLeft, &zTopRight,
+      Point2I( x, y ),
+      Point2I( x + 1, y ),
+      Point2I( x, y + 1 ),
+      Point2I( x + 1, y + 1 )
+   );
 
    if ( sq->flags & TerrainSquare::Split45 )
    {
@@ -558,10 +562,15 @@ bool TerrainBlock::getNormal( const Point2F &pos, Point3F *normal, bool normaliz
    if ( skipEmpty && sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 zBottomLeft = fixedToFloat( mFile->getHeight( x, y ) );
-   F32 zBottomRight = fixedToFloat( mFile->getHeight( x + 1, y ) );
-   F32 zTopLeft = fixedToFloat( mFile->getHeight( x, y + 1 ) );
-   F32 zTopRight = fixedToFloat( mFile->getHeight( x + 1, y + 1 ) );
+
+   F32  zBottomLeft, zBottomRight, zTopLeft, zTopRight;
+   mFile->getHeight4(
+      &zBottomLeft, &zBottomRight, &zTopLeft, &zTopRight,
+      Point2I( x, y ),
+      Point2I( x + 1, y ),
+      Point2I( x, y + 1 ),
+      Point2I( x + 1, y + 1 )
+   );
 
    if ( sq->flags & TerrainSquare::Split45 )
    {
@@ -613,10 +622,14 @@ bool TerrainBlock::getSmoothNormal( const Point2F &pos,
    if ( skipEmpty && sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 h1 = fixedToFloat( mFile->getHeight( x + 1, y ) );
-   F32 h2 = fixedToFloat( mFile->getHeight( x, y + 1 ) );
-   F32 h3 = fixedToFloat( mFile->getHeight( x - 1, y ) );
-   F32 h4 = fixedToFloat( mFile->getHeight( x, y - 1 ) );
+   F32  h1, h2, h3, h4;
+   mFile->getHeight4(
+      &h1, &h2, &h3, &h4,
+      Point2I( x + 1, y     ),
+      Point2I( x,     y + 1 ),
+      Point2I( x - 1, y     ),
+      Point2I( x,     y - 1 )
+   );
 
    normal->set( h3 - h1, h4 - h2, mSquareSize * 2.0f );
 
@@ -650,10 +663,14 @@ bool TerrainBlock::getNormalAndHeight( const Point2F &pos, Point3F *normal, F32 
    if ( sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 zBottomLeft  = fixedToFloat( mFile->getHeight(x, y) );
-   F32 zBottomRight = fixedToFloat( mFile->getHeight(x + 1, y) );
-   F32 zTopLeft     = fixedToFloat( mFile->getHeight(x, y + 1) );
-   F32 zTopRight    = fixedToFloat( mFile->getHeight(x + 1, y + 1) );
+   F32  zBottomLeft, zBottomRight, zTopLeft, zTopRight;
+   mFile->getHeight4(
+      &zBottomLeft, &zBottomRight, &zTopLeft, &zTopRight,
+      Point2I( x, y ),
+      Point2I( x + 1, y ),
+      Point2I( x, y + 1 ),
+      Point2I( x + 1, y + 1 )
+   );
 
    if ( sq->flags & TerrainSquare::Split45 )
    {
@@ -722,10 +739,14 @@ bool TerrainBlock::getNormalHeightMaterial(  const Point2F &pos,
    if ( sq->flags & TerrainSquare::Empty )
       return false;
 
-   F32 zBottomLeft  = fixedToFloat( mFile->getHeight(x, y) );
-   F32 zBottomRight = fixedToFloat( mFile->getHeight(x + 1, y) );
-   F32 zTopLeft     = fixedToFloat( mFile->getHeight(x, y + 1) );
-   F32 zTopRight    = fixedToFloat( mFile->getHeight(x + 1, y + 1) );
+   F32  zBottomLeft, zBottomRight, zTopLeft, zTopRight;
+   mFile->getHeight4(
+      &zBottomLeft, &zBottomRight, &zTopLeft, &zTopRight,
+      Point2I( x, y ),
+      Point2I( x + 1, y ),
+      Point2I( x, y + 1 ),
+      Point2I( x + 1, y + 1 )
+   );
 
    matName = mFile->getMaterialName( xm, ym );
 

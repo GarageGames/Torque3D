@@ -1026,6 +1026,7 @@ function TerrainEditorPlugin::onWorldEditorStartup( %this )
       barTitle = "Terrain";
                
       item[0] = "Smooth Heightmap" TAB "" TAB "ETerrainEditor.onSmoothHeightmap();";
+      item[1] = "Solder Edges" TAB "" TAB "ETerrainEditor.onSolderEdges();";
    };   
 }
 

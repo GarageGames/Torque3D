@@ -647,7 +647,7 @@ bool TerrainBlock::castRayI(const Point3F &start, const Point3F &end, RayInfo *i
 
    info->object = this;
 
-   if(start.x == end.x && start.y == end.y)
+   if(start.x == end.x || start.y == end.y)
    {
       if (end.z == start.z)
          return false;
@@ -657,14 +657,14 @@ bool TerrainBlock::castRayI(const Point3F &start, const Point3F &end, RayInfo *i
          return false;
 
       F32 t = (height - start.z) / (end.z - start.z);
-      if(t < 0 || t > 1)
+      if(t < 0.0f || t > 1.0f)
          return false;
       info->t = t;
 
       return true;
    }
 
-   F32 invBlockWorldSize = 1 / getWorldBlockSize();
+   F32 invBlockWorldSize = 1.0f / getWorldBlockSize();
 
    Point3F pStart(start.x * invBlockWorldSize, start.y * invBlockWorldSize, start.z);
    Point3F pEnd(end.x * invBlockWorldSize, end.y * invBlockWorldSize, end.z);
@@ -683,7 +683,7 @@ bool TerrainBlock::castRayI(const Point3F &start, const Point3F &end, RayInfo *i
    }
    else
    {
-      invDeltaX = 1 / (pEnd.x - pStart.x);
+      invDeltaX = 1.0f / (pEnd.x - pStart.x);
       calcInterceptX = calcInterceptV;
       if(pEnd.x < pStart.x)
          dx = -1;
@@ -700,7 +700,7 @@ bool TerrainBlock::castRayI(const Point3F &start, const Point3F &end, RayInfo *i
    }
    else
    {
-      invDeltaY = 1 / (pEnd.y - pStart.y);
+      invDeltaY = 1.0f / (pEnd.y - pStart.y);
       calcInterceptY = calcInterceptV;
       if(pEnd.y < pStart.y)
          dy = -1;
@@ -717,7 +717,8 @@ bool TerrainBlock::castRayI(const Point3F &start, const Point3F &end, RayInfo *i
       F32 nextXInt = calcInterceptX(pStart.x, invDeltaX, (F32)(blockX + (dx == 1)));
       F32 nextYInt = calcInterceptY(pStart.y, invDeltaY, (F32)(blockY + (dy == 1)));
 
-      F32 intersectT = 1;
+
+      F32 intersectT = 1.0f;
 
       if(nextXInt < intersectT)
          intersectT = nextXInt;
@@ -742,7 +743,7 @@ bool TerrainBlock::castRayI(const Point3F &start, const Point3F &end, RayInfo *i
       }
 
       startT = intersectT;
-      if(intersectT >= 1)
+      if(intersectT >= 1.0f)
          break;
       if(nextXInt < nextYInt)
          blockX += dx;
