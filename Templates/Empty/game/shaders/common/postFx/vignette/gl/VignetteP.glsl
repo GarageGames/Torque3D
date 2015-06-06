@@ -20,50 +20,22 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef _BARRELDISTORTIONPOSTEFFECT_H_
-#define _BARRELDISTORTIONPOSTEFFECT_H_
+#include "../../../gl/hlslCompat.glsl"
+#include "shadergen:/autogenConditioners.h"
 
-#include "postFx/postEffect.h"
+uniform sampler2D backBuffer;
+uniform float Vmax;
+uniform float Vmin;
 
-class BarrelDistortionPostEffect : public PostEffect
+in vec2 uv0;
+#define IN_uv0 uv0
+
+out vec4 OUT_col;
+
+void main()
 {
-   typedef PostEffect Parent;
-
-protected:
-   GFXShaderConstHandle *mHmdWarpParamSC;
-   GFXShaderConstHandle *mHmdChromaAbSC;
-   GFXShaderConstHandle *mScaleSC;
-   GFXShaderConstHandle *mScaleInSC;
-   GFXShaderConstHandle *mLensCenterSC;
-   GFXShaderConstHandle *mScreenCenterSC;
-
-   // Oculus VR HMD index to reference
-   S32 mHMDIndex;
-
-   // Oculus VR sensor index to reference
-   S32 mSensorIndex;
-
-   // Used to increase the size of the window into the world at the
-   // expense of apparent resolution.
-   F32 mScaleOutput;
-
-protected:
-   virtual void _setupConstants( const SceneRenderState *state );
-
-public:
-   BarrelDistortionPostEffect();
-   virtual ~BarrelDistortionPostEffect();
-
-   DECLARE_CONOBJECT(BarrelDistortionPostEffect);
-
-   // SimObject
-   virtual bool onAdd();
-   virtual void onRemove();
-   static void initPersistFields();
-
-   virtual void process(   const SceneRenderState *state, 
-                           GFXTexHandle &inOutTex,
-                           const RectI *inTexViewport = NULL );
-};
-
-#endif   // _BARRELDISTORTIONPOSTEFFECT_H_
+   vec4 base = texture(backBuffer, IN_uv0);
+   float dist = distance(IN_uv0, vec2(0.5,0.5));
+   base.rgb *= smoothstep(Vmax, Vmin, dist);
+   OUT_col = base;
+}

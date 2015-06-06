@@ -439,6 +439,7 @@ protected:
 
    F32 mLastAbsoluteYaw;            ///< Stores that last absolute yaw value as passed in by ExtendedMove
    F32 mLastAbsolutePitch;          ///< Stores that last absolute pitch value as passed in by ExtendedMove
+   F32 mLastAbsoluteRoll;           ///< Stores that last absolute roll value as passed in by ExtendedMove
 
    S32 mMountPending;               ///< mMountPending suppresses tickDelay countdown so players will sit until
                                     ///< their mount, or another animation, comes through (or 13 seconds elapses).
@@ -683,6 +684,7 @@ public:
    void getEyeBaseTransform(MatrixF* mat, bool includeBank);
    void getRenderEyeTransform(MatrixF* mat);
    void getRenderEyeBaseTransform(MatrixF* mat, bool includeBank);
+   virtual DisplayPose calcCameraDeltaPose(GameConnection *con, DisplayPose inPose);
    void getCameraParameters(F32 *min, F32 *max, Point3F *offset, MatrixF *rot);
    void getMuzzleTransform(U32 imageSlot,MatrixF* mat);
    void getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat);   

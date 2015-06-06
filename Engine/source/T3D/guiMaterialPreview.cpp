@@ -268,8 +268,8 @@ void GuiMaterialPreview::setObjectModel(const char* modelName)
    AssertFatal(mModel, avar("GuiMaterialPreview: Failed to load model %s. Please check your model name and load a valid model.", modelName));
 
    // Initialize camera values:
-   mOrbitPos = mModel->getShape()->mCenter;
-   mMinOrbitDist = mModel->getShape()->mRadius;
+   mOrbitPos = mModel->getShape()->center;
+   mMinOrbitDist = mModel->getShape()->radius;
 
    lastRenderTime = Platform::getVirtualMilliseconds();
 }
@@ -434,7 +434,7 @@ void GuiMaterialPreview::resetViewport()
    mCameraRot.set( mDegToRad(30.0f), 0, mDegToRad(-30.0f) );
    mCameraPos.set(0.0f, 1.75f, 1.25f);
    mOrbitDist = 5.0f;
-   mOrbitPos = mModel->getShape()->mCenter;
+   mOrbitPos = mModel->getShape()->center;
 
    // Reset the viewport's lighting.
    GuiMaterialPreview::mFakeSun->setColor( ColorF( 1.0f, 1.0f, 1.0f ) );

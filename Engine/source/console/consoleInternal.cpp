@@ -512,13 +512,17 @@ void ConsoleValue::setStringValue(const char * value)
 */
 	   if (value == typeValueEmpty)
       {
-            if (sval && sval != typeValueEmpty && type != TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
-            sval = typeValueEmpty;
+         if (bufferLen > 0)
+         {
+            dFree(sval);
             bufferLen = 0;
-            fval = 0.f;
-            ival = 0;
-            type = TypeInternalString;
-            return;
+         }
+
+         sval = typeValueEmpty;
+         fval = 0.f;
+         ival = 0;
+         type = TypeInternalString;
+         return;
       }
 
       U32 stringLen = dStrlen(value);
@@ -541,7 +545,7 @@ void ConsoleValue::setStringValue(const char * value)
       // may as well pad to the next cache line
       U32 newLen = ((stringLen + 1) + 15) & ~15;
 	  
-      if(sval == typeValueEmpty || type == TypeInternalStackString || type == TypeInternalStringStackPtr)
+      if(bufferLen == 0)
          sval = (char *) dMalloc(newLen);
       else if(newLen > bufferLen)
          sval = (char *) dRealloc(sval, newLen);
@@ -562,11 +566,16 @@ void ConsoleValue::setStackStringValue(const char *value)
 
    if(type <= ConsoleValue::TypeInternalString)
    {
+      // sval might still be temporarily present so we need to check and free it
+      if (bufferLen > 0)
+      {
+         dFree(sval);
+         bufferLen = 0;
+      }
+
 	   if (value == typeValueEmpty)
       {
-         if (sval && sval != typeValueEmpty && type != ConsoleValue::TypeInternalStackString && type != ConsoleValue::TypeInternalStringStackPtr) dFree(sval);
          sval = typeValueEmpty;
-         bufferLen = 0;
          fval = 0.f;
          ival = 0;
          type = TypeInternalString;
@@ -587,7 +596,7 @@ void ConsoleValue::setStackStringValue(const char *value)
 
       type = TypeInternalStackString;
       sval = (char*)value;
-      bufferLen = stringLen;
+      bufferLen = 0;
    }
    else
       Con::setData(type, dataPtr, 0, 1, &value, enumTable);      
@@ -598,7 +607,11 @@ void ConsoleValue::setStringStackPtrValue(StringStackPtr ptrValue)
    if(type <= ConsoleValue::TypeInternalString)
    {
       const char *value = StringStackPtrRef(ptrValue).getPtr(&STR);
-	   if (sval && sval != typeValueEmpty && type != ConsoleValue::TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
+	   if (bufferLen > 0)
+      {
+         dFree(sval);
+         bufferLen = 0;
+      }
 
       U32 stringLen = dStrlen(value);
       if(stringLen < 256)
@@ -614,7 +627,7 @@ void ConsoleValue::setStringStackPtrValue(StringStackPtr ptrValue)
 
       type = TypeInternalStringStackPtr;
       sval = (char*)(value - STR.mBuffer);
-      bufferLen = stringLen;
+      bufferLen = 0;
    }
    else
    {
@@ -680,8 +693,7 @@ Dictionary::Entry* Dictionary::addVariable(  const char *name,
    Entry *ent = add(StringTable->insert(name));
    
    if (  ent->value.type <= ConsoleValue::TypeInternalString &&
-         ent->value.sval != typeValueEmpty && 
-         ent->value.type != ConsoleValue::TypeInternalStackString && ent->value.type != ConsoleValue::TypeInternalStringStackPtr )
+         ent->value.bufferLen > 0 )
       dFree(ent->value.sval);
 
    ent->value.type = type;

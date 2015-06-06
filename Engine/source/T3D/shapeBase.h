@@ -63,7 +63,6 @@
    #include "console/dynamicTypes.h"
 #endif
 
-
 class GFXCubemap;
 class TSShapeInstance;
 class SceneRenderState;
@@ -1582,6 +1581,13 @@ public:
    /// @param   pos   TODO: Find out what this does
    /// @param   mat   Camera transform (out)
    virtual void getCameraTransform(F32* pos,MatrixF* mat);
+
+   /// Gets the view transform for a particular eye, taking into account the current absolute 
+   /// orient and position values of the display device.
+   virtual void getEyeCameraTransform( IDisplayDevice *display, U32 eyeId, MatrixF *outMat );
+
+   /// Calculates a delta camera angle and view position based on inPose
+   virtual DisplayPose calcCameraDeltaPose(GameConnection *con, DisplayPose inPose);
 
    /// Gets the index of a node inside a mounted image given the name
    /// @param   imageSlot   Image slot

@@ -56,11 +56,11 @@ public:
    ~TSStaticPolysoupConvex() {};
 
 public:
-   Box3F                mBox;
-   Point3F              mVerts[4];
-   PlaneF               mNormal;
-   S32                  mIdx;
-   TSMesh               *mMesh;
+   Box3F                box;
+   Point3F              verts[4];
+   PlaneF               normal;
+   S32                  idx;
+   TSMesh               *mesh;
 
    static SceneObject* smCurObject;
 

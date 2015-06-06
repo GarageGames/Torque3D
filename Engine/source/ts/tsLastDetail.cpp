@@ -82,8 +82,8 @@ TSLastDetail::TSLastDetail(   TSShape *shape,
    mDl = dl;
    mDim = getMax( dim, (S32)32 );
 
-   mRadius = mShape->mRadius;
-   mCenter = mShape->mCenter;
+   mRadius = mShape->radius;
+   mCenter = mShape->center;
 
    mCachePath = cachePath;
 

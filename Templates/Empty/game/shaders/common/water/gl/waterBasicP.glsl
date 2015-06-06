@@ -210,7 +210,7 @@ void main()
 
    #endif
    
-   OUT_col = OUT;
+   OUT_col = hdrEncode( OUT );
    
 #endif   
 }

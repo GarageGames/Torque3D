@@ -349,7 +349,6 @@ bool GameProcessCameraQuery(CameraQuery *query)
 
       // Provide some default values
       query->projectionOffset = Point2F::Zero;
-      query->eyeOffset = Point3F::Zero;
 
       F32 cameraFov = 0.0f;
       bool fovSet = false;
@@ -358,14 +357,14 @@ bool GameProcessCameraQuery(CameraQuery *query)
       // is not open
       if(!gEditingMission && connection->hasDisplayDevice())
       {
-         const IDisplayDevice* display = connection->getDisplayDevice();
+         IDisplayDevice* display = connection->getDisplayDevice();
+         // Note: all eye values are invalid until this is called
+         display->setDrawCanvas(query->drawCanvas);
 
-         // The connection's display device may want to set the FOV
-         if(display->providesYFOV())
-         {
-            cameraFov = mRadToDeg(display->getYFOV());
-            fovSet = true;
-         }
+         display->setCurrentConnection(connection);
+
+         // Display may activate AFTER so we need to call this again just in case
+         display->onStartFrame();
 
          // The connection's display device may want to set the projection offset
          if(display->providesProjectionOffset())
@@ -374,14 +373,27 @@ bool GameProcessCameraQuery(CameraQuery *query)
          }
 
          // The connection's display device may want to set the eye offset
-         if(display->providesEyeOffset())
+         if(display->providesEyeOffsets())
          {
-            query->eyeOffset = display->getEyeOffset();
+            display->getEyeOffsets(query->eyeOffset);
          }
+
+         // Grab field of view for both eyes
+         if (display->providesFovPorts())
+         {
+            display->getFovPorts(query->fovPort);
+            fovSet = true;
+         }
+         
+         // Grab the latest overriding render view transforms
+         connection->getControlCameraEyeTransforms(display, query->eyeTransforms);
+
+         display->getStereoViewports(query->stereoViewports);
+         display->getStereoTargets(query->stereoTargets);
       }
 
       // Use the connection's FOV settings if requried
-      if(!fovSet && !connection->getControlCameraFov(&cameraFov))
+      if(!connection->getControlCameraFov(&cameraFov))
       {
          return false;
       }

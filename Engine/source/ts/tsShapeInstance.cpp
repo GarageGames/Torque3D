@@ -175,7 +175,7 @@ void TSShapeInstance::buildInstanceData(TSShape * _shape, bool loadMaterials)
    mScaleCurrentlyAnimated = false;
 
    if(loadMaterials)
-      setMaterialList(mShape->mMaterialList);
+      setMaterialList(mShape->materialList);
 
    // set up node data
    initNodeTransforms();
@@ -184,7 +184,7 @@ void TSShapeInstance::buildInstanceData(TSShape * _shape, bool loadMaterials)
    initMeshObjects();
 
    // set up subtree data
-   S32 ss = mShape->mSubShapeFirstNode.size(); // we have this many subtrees
+   S32 ss = mShape->subShapeFirstNode.size(); // we have this many subtrees
    mDirtyFlags = new U32[ss];
 
    mGroundThread = NULL;
@@ -200,18 +200,18 @@ void TSShapeInstance::buildInstanceData(TSShape * _shape, bool loadMaterials)
 void TSShapeInstance::initNodeTransforms()
 {
    // set up node data
-   S32 numNodes = mShape->mNodes.size();
+   S32 numNodes = mShape->nodes.size();
    mNodeTransforms.setSize(numNodes);
 }
 
 void TSShapeInstance::initMeshObjects()
 {
    // add objects to trees
-   S32 numObjects = mShape->mObjects.size();
+   S32 numObjects = mShape->objects.size();
    mMeshObjects.setSize(numObjects);
    for (S32 i=0; i<numObjects; i++)
    {
-      const TSObject * obj = &mShape->mObjects[i];
+      const TSObject * obj = &mShape->objects[i];
       MeshObjectInstance * objInst = &mMeshObjects[i];
 
       // hook up the object to it's node and transforms.
@@ -220,7 +220,7 @@ void TSShapeInstance::initMeshObjects()
 
       // set up list of meshes
       if (obj->numMeshes)
-         objInst->meshList = &mShape->mMeshes[obj->startMeshIndex];
+         objInst->meshList = &mShape->meshes[obj->startMeshIndex];
       else
          objInst->meshList = NULL;
 
@@ -327,7 +327,7 @@ void TSShapeInstance::renderDebugNormals( F32 normalScalar, S32 dl )
    if ( dl < 0 )
       return;
 
-   AssertFatal( dl >= 0 && dl < mShape->mDetails.size(),
+   AssertFatal( dl >= 0 && dl < mShape->details.size(),
       "TSShapeInstance::renderDebugNormals() - Bad detail level!" );
 
    static GFXStateBlockRef sb;
@@ -343,13 +343,13 @@ void TSShapeInstance::renderDebugNormals( F32 normalScalar, S32 dl )
    }
    GFX->setStateBlock( sb );
 
-   const TSDetail *detail = &mShape->mDetails[dl];
+   const TSDetail *detail = &mShape->details[dl];
    const S32 ss = detail->subShapeNum;
    if ( ss < 0 )
       return;
 
-   const S32 start = mShape->mSubShapeFirstObject[ss];
-   const S32 end   = start + mShape->mSubShapeNumObjects[ss];
+   const S32 start = mShape->subShapeFirstObject[ss];
+   const S32 end   = start + mShape->subShapeNumObjects[ss];
 
    for ( S32 i = start; i < end; i++ )
    {
@@ -445,8 +445,8 @@ void TSShapeInstance::render( const TSRenderState &rdata )
    // NOTE:
    //   intraDL is at 1 when if shape were any closer to us we'd be at dl-1,
    //   intraDL is at 0 when if shape were any farther away we'd be at dl+1
-   F32 alphaOut = mShape->mAlphaOut[mCurrentDetailLevel];
-   F32 alphaIn  = mShape->mAlphaIn[mCurrentDetailLevel];
+   F32 alphaOut = mShape->alphaOut[mCurrentDetailLevel];
+   F32 alphaIn  = mShape->alphaIn[mCurrentDetailLevel];
    F32 saveAA = mAlphaAlways ? mAlphaAlwaysValue : 1.0f;
 
    /// This first case is the single detail level render.
@@ -458,7 +458,7 @@ void TSShapeInstance::render( const TSRenderState &rdata )
       // alpha=1-(intraDl-alphaOut)/alphaIn
 
       // first draw next detail level
-      if ( mCurrentDetailLevel + 1 < mShape->mDetails.size() && mShape->mDetails[ mCurrentDetailLevel + 1 ].size > 0.0f )
+      if ( mCurrentDetailLevel + 1 < mShape->details.size() && mShape->details[ mCurrentDetailLevel + 1 ].size > 0.0f )
       {
          setAlphaAlways( saveAA * ( alphaIn + alphaOut - mCurrentIntraDetailLevel ) / alphaIn );
          render( rdata, mCurrentDetailLevel + 1, 0.0f );
@@ -473,7 +473,7 @@ void TSShapeInstance::render( const TSRenderState &rdata )
       // alpha = 1-intraDL/alphaOut
 
       // first draw next detail level
-      if ( mCurrentDetailLevel + 1 < mShape->mDetails.size() && mShape->mDetails[ mCurrentDetailLevel + 1 ].size > 0.0f )
+      if ( mCurrentDetailLevel + 1 < mShape->details.size() && mShape->details[ mCurrentDetailLevel + 1 ].size > 0.0f )
          render( rdata, mCurrentDetailLevel+1, 0.0f );
 
       setAlphaAlways( saveAA * mCurrentIntraDetailLevel / alphaOut );
@@ -488,7 +488,7 @@ void TSShapeInstance::setMeshForceHidden( const char *meshName, bool hidden )
    for ( ; iter != mMeshObjects.end(); iter++ )
    {
       S32 nameIndex = iter->object->nameIndex;
-      const char *name = mShape->mNames[ nameIndex ];
+      const char *name = mShape->names[ nameIndex ];
 
       if ( dStrcmp( meshName, name ) == 0 )
       {
@@ -508,11 +508,11 @@ void TSShapeInstance::setMeshForceHidden( S32 meshIndex, bool hidden )
 
 void TSShapeInstance::render( const TSRenderState &rdata, S32 dl, F32 intraDL )
 {
-   AssertFatal( dl >= 0 && dl < mShape->mDetails.size(),"TSShapeInstance::render" );
+   AssertFatal( dl >= 0 && dl < mShape->details.size(),"TSShapeInstance::render" );
 
    S32 i;
 
-   const TSDetail * detail = &mShape->mDetails[dl];
+   const TSDetail * detail = &mShape->details[dl];
    S32 ss = detail->subShapeNum;
    S32 od = detail->objectDetailNum;
 
@@ -522,14 +522,14 @@ void TSShapeInstance::render( const TSRenderState &rdata, S32 dl, F32 intraDL )
       PROFILE_SCOPE( TSShapeInstance_RenderBillboards );
       
       if ( !rdata.isNoRenderTranslucent() && ( TSLastDetail::smCanShadow || !rdata.getSceneState()->isShadowPass() ) )
-         mShape->mBillboardDetails[ dl ]->render( rdata, mAlphaAlways ? mAlphaAlwaysValue : 1.0f );
+         mShape->billboardDetails[ dl ]->render( rdata, mAlphaAlways ? mAlphaAlwaysValue : 1.0f );
 
       return;
    }
 
    // run through the meshes   
-   S32 start = rdata.isNoRenderNonTranslucent() ? mShape->mSubShapeFirstTranslucentObject[ss] : mShape->mSubShapeFirstObject[ss];
-   S32 end   = rdata.isNoRenderTranslucent() ? mShape->mSubShapeFirstTranslucentObject[ss] : mShape->mSubShapeFirstObject[ss] + mShape->mSubShapeNumObjects[ss];
+   S32 start = rdata.isNoRenderNonTranslucent() ? mShape->subShapeFirstTranslucentObject[ss] : mShape->subShapeFirstObject[ss];
+   S32 end   = rdata.isNoRenderTranslucent() ? mShape->subShapeFirstTranslucentObject[ss] : mShape->subShapeFirstObject[ss] + mShape->subShapeNumObjects[ss];
    for (i=start; i<end; i++)
    {
       // following line is handy for debugging, to see what part of the shape that it is rendering
@@ -612,7 +612,7 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
 
    // We're inlining SceneRenderState::projectRadius here to 
    // skip the unnessasary divide by zero protection.
-   F32 pixelRadius = ( mShape->mRadius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
+   F32 pixelRadius = ( mShape->radius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
    F32 pixelSize = pixelRadius * smDetailAdjust;
 
    if ( pixelSize < smSmallestVisiblePixelSize ) {
@@ -670,7 +670,7 @@ S32 TSShapeInstance::setDetailFromScreenError( F32 errorTolerance )
    if ( mShape->mSmallestVisibleDL < 0 )
       prevErr = 0.0f;
    else
-      prevErr = 10.0f * mShape->mDetails[mShape->mSmallestVisibleDL].averageError * 20.0f;
+      prevErr = 10.0f * mShape->details[mShape->mSmallestVisibleDL].averageError * 20.0f;
    if ( mShape->mSmallestVisibleDL < 0 || prevErr < errorTolerance )
    {
       // draw last detail
@@ -687,7 +687,7 @@ S32 TSShapeInstance::setDetailFromScreenError( F32 errorTolerance )
    // we use the next highest detail (higher error)
    for (S32 i = mShape->mSmallestVisibleDL; i >= 0; i-- )
    {
-      F32 err0 = 10.0f * mShape->mDetails[i].averageError;
+      F32 err0 = 10.0f * mShape->details[i].averageError;
       if ( err0 < errorTolerance )
       {
          // ok, stop here
@@ -775,10 +775,10 @@ void TSShapeInstance::prepCollision()
    PROFILE_SCOPE( TSShapeInstance_PrepCollision );
 
    // Iterate over all our meshes and call prepCollision on them...
-   for(S32 i=0; i<mShape->mMeshes.size(); i++)
+   for(S32 i=0; i<mShape->meshes.size(); i++)
    {
-      if(mShape->mMeshes[i])
-         mShape->mMeshes[i]->prepOpcodeCollision();
+      if(mShape->meshes[i])
+         mShape->meshes[i]->prepOpcodeCollision();
    }
 }
 

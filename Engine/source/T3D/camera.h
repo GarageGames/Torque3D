@@ -113,6 +113,7 @@ class Camera: public ShapeBase
 
       F32 mLastAbsoluteYaw;            ///< Stores that last absolute yaw value as passed in by ExtendedMove
       F32 mLastAbsolutePitch;          ///< Stores that last absolute pitch value as passed in by ExtendedMove
+      F32 mLastAbsoluteRoll;           ///< Stores that last absolute roll value as passed in by ExtendedMove
 
       /// @name NewtonFlyMode
       /// @{
@@ -235,6 +236,8 @@ class Camera: public ShapeBase
       virtual void processTick( const Move* move );
       virtual void interpolateTick( F32 delta);
       virtual void getCameraTransform( F32* pos,MatrixF* mat );
+      virtual void getEyeCameraTransform( IDisplayDevice *display, U32 eyeId, MatrixF *outMat );
+      virtual DisplayPose calcCameraDeltaPose(GameConnection *con, DisplayPose inPose);
 
       virtual void writePacketData( GameConnection* conn, BitStream* stream );
       virtual void readPacketData( GameConnection* conn, BitStream* stream );

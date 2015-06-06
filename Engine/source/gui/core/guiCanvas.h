@@ -331,6 +331,10 @@ public:
 
    /// Returns true if the cursor is being rendered.
    virtual bool isCursorShown();
+
+   void cursorClick(S32 buttonId, bool isDown);
+
+   void cursorNudge(F32 x, F32 y);
    /// @}
 
    ///used by the tooltip resource

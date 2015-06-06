@@ -366,8 +366,8 @@ void GuiObjectView::setObjectModel( const String& modelName )
 
    // Initialize camera values.
    
-   mOrbitPos = mModel->getShape()->mCenter;
-   mMinOrbitDist = mModel->getShape()->mRadius;
+   mOrbitPos = mModel->getShape()->center;
+   mMinOrbitDist = mModel->getShape()->radius;
 
    // Initialize animation.
    
@@ -645,7 +645,7 @@ void GuiObjectView::_initAnimation()
       
    if( mAnimationSeq != -1 )
    {
-      if( mAnimationSeq >= mModel->getShape()->mSequences.size() )
+      if( mAnimationSeq >= mModel->getShape()->sequences.size() )
       {
          Con::errorf( "GuiObjectView::_initAnimation - Sequence '%i' out of range for model '%s'",
             mAnimationSeq,
@@ -694,7 +694,7 @@ void GuiObjectView::_initMount()
    
    // Make sure mount node is valid.
    
-   if( mMountNode != -1 && mMountNode >= mModel->getShape()->mNodes.size() )
+   if( mMountNode != -1 && mMountNode >= mModel->getShape()->nodes.size() )
    {
       Con::errorf( "GuiObjectView::_initMount - Mount node index '%i' out of range for '%s'",
          mMountNode,

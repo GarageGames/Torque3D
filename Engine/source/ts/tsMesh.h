@@ -105,7 +105,7 @@ class TSMesh
    struct TSMeshVertexArray;
   protected:
 
-   U32 mMeshType;
+   U32 meshType;
    Box3F mBounds;
    Point3F mCenter;
    F32 mRadius;
@@ -140,17 +140,17 @@ class TSMesh
       FlagMask = Billboard|BillboardZAxis|HasDetailTexture|UseEncodedNormals
    };
 
-   U32 getMeshType() const { return mMeshType & TypeMask; }
-   void setFlags(U32 flag) { mMeshType |= flag; }
-   void clearFlags(U32 flag) { mMeshType &= ~flag; }
-   U32 getFlags( U32 flag = 0xFFFFFFFF ) const { return mMeshType & flag; }
+   U32 getMeshType() const { return meshType & TypeMask; }
+   void setFlags(U32 flag) { meshType |= flag; }
+   void clearFlags(U32 flag) { meshType &= ~flag; }
+   U32 getFlags( U32 flag = 0xFFFFFFFF ) const { return meshType & flag; }
 
    const Point3F* getNormals( S32 firstVert );
 
-   S32 mParentMesh; ///< index into shapes mesh list
-   S32 mNumFrames;
-   S32 mNumMatFrames;
-   S32 mVertsPerFrame;
+   S32 parentMesh; ///< index into shapes mesh list
+   S32 numFrames;
+   S32 numMatFrames;
+   S32 vertsPerFrame;
 
    /// @name Aligned Vertex Data 
    /// @{
@@ -244,34 +244,34 @@ class TSMesh
       FreeableVector<T>& operator=(const FreeableVector<T>& p) { Vector<T>::operator=(p); return *this; }
    };
 
-   FreeableVector<Point3F> mVerts;
-   FreeableVector<Point3F> mNorms;
-   FreeableVector<Point2F> mTVerts;
-   FreeableVector<Point4F> mTangents;
+   FreeableVector<Point3F> verts;
+   FreeableVector<Point3F> norms;
+   FreeableVector<Point2F> tverts;
+   FreeableVector<Point4F> tangents;
    
    // Optional second texture uvs.
-   FreeableVector<Point2F> mTVerts2;
+   FreeableVector<Point2F> tverts2;
 
    // Optional vertex colors data.
-   FreeableVector<ColorI> mColors;
+   FreeableVector<ColorI> colors;
    /// @}
 
-   Vector<TSDrawPrimitive> mPrimitives;
-   Vector<U8> mEncodedNorms;
-   Vector<U32> mIndices;
+   Vector<TSDrawPrimitive> primitives;
+   Vector<U8> encodedNorms;
+   Vector<U32> indices;
 
    /// billboard data
-   Point3F mBillboardAxis;
+   Point3F billboardAxis;
 
    /// @name Convex Hull Data
    /// Convex hulls are convex (no angles >= 180º) meshes used for collision
    /// @{
 
-   Vector<Point3F> mPlaneNormals;
-   Vector<F32>     mPlaneConstants;
-   Vector<U32>     mPlaneMaterials;
-   S32 mPlanesPerFrame;
-   U32 mMergeBufferStart;
+   Vector<Point3F> planeNormals;
+   Vector<F32>     planeConstants;
+   Vector<U32>     planeMaterials;
+   S32 planesPerFrame;
+   U32 mergeBufferStart;
    /// @}
 
    /// @name Render Methods
@@ -501,13 +501,13 @@ public:
    typedef TSMesh Parent;
 
    /// Structure containing data needed to batch skinning
-   BatchData mBatchData;
-   bool mBatchDataInitialized;
+   BatchData batchData;
+   bool batchDataInitialized;
    
    /// vectors that define the vertex, weight, bone tuples
-   Vector<F32> mWeight;
-   Vector<S32> mBoneIndex;
-   Vector<S32> mVertexIndex;
+   Vector<F32> weight;
+   Vector<S32> boneIndex;
+   Vector<S32> vertexIndex;
 
    /// set verts and normals...
    void updateSkin( const Vector<MatrixF> &transforms, TSVertexBufferHandle &instanceVB, GFXPrimitiveBufferHandle &instancePB );

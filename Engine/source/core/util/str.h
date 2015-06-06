@@ -74,6 +74,7 @@ public:
    SizeType size() const;     ///< Returns the length of the string in bytes including the NULL terminator.
    SizeType numChars() const; ///< Returns the length of the string in characters.
    bool     isEmpty() const;  ///< Is this an empty string [""]?
+   static bool isEmpty(const char*); // is the input empty?
    bool     isNotEmpty() const { return !isEmpty(); }  ///< Is this not an empty string [""]?
 
    /// Erases all characters in a string.

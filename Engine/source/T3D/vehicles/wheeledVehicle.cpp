@@ -111,7 +111,7 @@ bool WheeledVehicleTire::preload(bool server, String &errorStr)
       // Determinw wheel radius from the shape's bounding box.
       // The tire should be built with it's hub axis along the
       // object's Y axis.
-      radius = shape->mBounds.len_z() / 2;
+      radius = shape->bounds.len_z() / 2;
    }
 
    return true;
@@ -399,8 +399,8 @@ bool WheeledVehicleData::preload(bool server, String &errorStr)
    if (collisionDetails[0] != -1) {
       MatrixF imat(1);
       SphereF sphere;
-      sphere.center = mShape->mCenter;
-      sphere.radius = mShape->mRadius;
+      sphere.center = mShape->center;
+      sphere.radius = mShape->radius;
       PlaneExtractorPolyList polyList;
       polyList.mPlaneList = &rigidBody.mPlaneList;
       polyList.setTransform(&imat, Point3F(1,1,1));
@@ -1085,6 +1085,9 @@ void WheeledVehicle::updateForces(F32 dt)
    // Jet Force
    if (mJetting)
       mRigid.force += by * mDataBlock->jetForce;
+
+   // Add in force from physical zones...
+   mRigid.force += mAppliedForce;
 
    // Container drag & buoyancy
    mRigid.force  += Point3F(0, 0, -mBuoyancy * sWheeledVehicleGravity * mRigid.mass);
