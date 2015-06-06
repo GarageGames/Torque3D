@@ -288,6 +288,8 @@ bool TerrainBlock::_setBaseTexFormat(void *obj, const char *index, const char *d
          terrain->mBaseTexFormat = (BaseTexFormat)eTable[i].mInt;
          terrain->_updateMaterials();
          terrain->_updateLayerTexture();
+
+         if (terrain->isServerObject()) return false;
          // If the cached base texture is older that the terrain file or
          // it doesn't exist then generate and cache it.
          String baseCachePath = terrain->_getBaseTexCacheFileName();
