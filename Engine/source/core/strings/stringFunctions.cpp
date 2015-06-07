@@ -328,7 +328,7 @@ char* dStrcpyl(char *dst, dsize_t dstSize, ...)
 }
 
 
-S32 dStrcmp( const UTF16 *str1, const UTF16 *str2)
+S32 dStrcmp(const UTF16 *str1, const UTF16 *str2)
 {
 #if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
    return wcscmp( reinterpret_cast<const wchar_t *>( str1 ), reinterpret_cast<const wchar_t *>( str2 ) );
@@ -484,7 +484,7 @@ bool dStrEqual(const char* str1, const char* str2)
    if (!str1 || !str2)
       return false;
    else
-      return (dStrcmp(str1, str2) == 0);
+      return (String::compare(str1, str2) == 0);
 }
 
 /// Check if one string starts with another

@@ -463,7 +463,7 @@ DefineEngineFunction(getDirectoryList, String, ( const char* path, S32 depth ), 
 {
    // Grab the full path.
    char fullpath[1024];
-   Platform::makeFullPathName(dStrcmp(path, "/") == 0 ? "" : path, fullpath, sizeof(fullpath));
+   Platform::makeFullPathName(String::compare(path, "/") == 0 ? "" : path, fullpath, sizeof(fullpath));
 
    //dSprintf(fullpath, 511, "%s/%s", Platform::getWorkingDirectory(), path);
 

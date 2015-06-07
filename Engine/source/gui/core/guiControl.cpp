@@ -676,7 +676,7 @@ bool GuiControl::onAdd()
    const char *cName = getClassName();
 
    // if we're a pure GuiControl, then we're a container by default.
-   if ( dStrcmp( "GuiControl", cName ) == 0 )
+   if ( String::compare( "GuiControl", cName ) == 0 )
       mIsContainer = true;
 
    // Add to root group.

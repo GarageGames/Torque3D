@@ -59,7 +59,7 @@
 /// pointer mapped to it. As a pointer is an integer value (usually an unsigned int),
 /// so we can do several neat things:
 ///      - StringTableEntrys can be compared directly for equality, instead of using
-///        the time-consuming dStrcmp() or dStricmp() function.
+///        the time-consuming String::compare() or dStricmp() function.
 ///      - For things like object names, we can avoid storing multiple copies of the
 ///        string containing the name. The StringTable ensures that we only ever store
 ///        one copy.

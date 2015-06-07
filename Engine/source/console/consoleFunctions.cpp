@@ -135,7 +135,7 @@ DefineConsoleFunction( strcmp, S32, ( const char* str1, const char* str2 ),,
    "@see strnatcmp\n"
    "@ingroup Strings" )
 {
-   return dStrcmp( str1, str2 );
+   return String::compare( str1, str2 );
 }
 
 //-----------------------------------------------------------------------------
@@ -741,7 +741,7 @@ DefineConsoleFunction( endsWith, bool, ( const char* str, const char* suffix, bo
       return false;
       
    if( caseSensitive )
-      return ( dStrcmp( &str[ srcLen - targetLen ], suffix ) == 0 );
+      return ( String::compare( &str[ srcLen - targetLen ], suffix ) == 0 );
 
    // both src and target are non empty, create temp buffers for lowercase operation
    char* srcBuf = new char[ srcLen + 1 ];
@@ -759,7 +759,7 @@ DefineConsoleFunction( endsWith, bool, ( const char* str, const char* suffix, bo
    str += srcLen - targetLen;
 
    // do the comparison
-   bool endsWith = dStrcmp( str, suffix ) == 0;
+   bool endsWith = String::compare( str, suffix ) == 0;
 
    // delete temp buffers
    delete [] srcBuf;
@@ -2385,7 +2385,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
    else
    {
       // Is it an object?
-      if (dStrcmp(varName, "0") && dStrcmp(varName, "") && (Sim::findObject(varName) != NULL))
+      if (String::compare(varName, "0") && String::compare(varName, "") && (Sim::findObject(varName) != NULL))
          return true;
       else if (!dStrIsEmpty(varValue))
       {

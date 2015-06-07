@@ -1576,14 +1576,14 @@ DefineConsoleMethod( SFXSource, setTransform, void, ( const char * position, con
 {
    MatrixF mat = object->getTransform();
 
-   if(dStrcmp( position , "")!=0 )
+   if(String::compare( position , "")!=0 )
    {
       Point3F pos;
       dSscanf( position, "%g %g %g", &pos.x, &pos.y, &pos.z );
       mat.setPosition( pos );
    }
    
-   if(dStrcmp( direction ,"")!=0 )
+   if(String::compare( direction ,"")!=0 )
    {
       Point3F dir;
       dSscanf( direction, "%g %g %g", &dir.x, &dir.y, &dir.z );

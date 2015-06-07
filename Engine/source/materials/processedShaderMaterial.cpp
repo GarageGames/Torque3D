@@ -315,7 +315,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
 
    // TODO: This sort of sucks... BL should somehow force this
    // feature on from the outside and not this way.
-   if ( dStrcmp( LIGHTMGR->getId(), "BLM" ) == 0 )
+   if ( String::compare( LIGHTMGR->getId(), "BLM" ) == 0 )
       fd.features.addFeature( MFT_ForwardShading );
 
    // Disabling the InterlacedPrePass feature for now. It is not ready for prime-time

@@ -493,7 +493,7 @@ DefineConsoleMethod( FileObject, writeObject, void,  (const char * simName, cons
       Con::printf("FileObject::writeObject - Invalid Object!");
       return;
    }
-	if (!dStrcmp(objName,""))
+	if (!String::compare(objName,""))
        objName = NULL;
 
    object->writeObject( obj, (const U8*)objName );

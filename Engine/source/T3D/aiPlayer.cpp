@@ -1028,11 +1028,11 @@ DefineEngineMethod(AIPlayer, getNavMesh, S32, (),,
 DefineEngineMethod(AIPlayer, setNavSize, void, (const char *size),,
    "@brief Set the size of NavMesh this character uses. One of \"Small\", \"Regular\" or \"Large\".")
 {
-   if(!dStrcmp(size, "Small"))
+   if(!String::compare(size, "Small"))
       object->setNavSize(AIPlayer::Small);
-   else if(!dStrcmp(size, "Regular"))
+   else if(!String::compare(size, "Regular"))
       object->setNavSize(AIPlayer::Regular);
-   else if(!dStrcmp(size, "Large"))
+   else if(!String::compare(size, "Large"))
       object->setNavSize(AIPlayer::Large);
    else
       Con::errorf("AIPlayer::setNavSize: no such size '%s'.", size);

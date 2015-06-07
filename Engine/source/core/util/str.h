@@ -102,6 +102,8 @@ public:
    */
    S32 compare(const StringChar *str, SizeType len = 0, U32 mode = Case|Left) const;
    S32 compare(const String &str, SizeType len = 0, U32 mode = Case|Left) const; ///< @see compare(const StringChar *, SizeType, U32) const
+   static S32 compare(const char *str1, const char *str2);
+   static S32 compare(const UTF16 *str1, const UTF16 *str2);
 
    /**
       Compare two strings for equality.

@@ -425,7 +425,7 @@ bool TSShape::addNode(const String& name, const String& parentName, const Point3
 
    // Find the parent node (OK for name to be empty => node is at root level)
    S32 parentIndex = -1;
-   if (dStrcmp(parentName, ""))
+   if (String::compare(parentName, ""))
    {
       parentIndex = findNode(parentName);
       if (parentIndex < 0)

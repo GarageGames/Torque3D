@@ -419,7 +419,7 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
    U32 currentProtocol, minProtocol;
    char gameString[256];
    stream->readString(gameString);
-   if(dStrcmp(gameString, GameString))
+   if(String::compare(gameString, GameString))
    {
       *errorString = "CHR_GAME";
       return false;
@@ -446,7 +446,7 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
    const char *serverPassword = Con::getVariable("pref::Server::Password");
    if(serverPassword[0])
    {
-      if(dStrcmp(joinPassword, serverPassword))
+      if(String::compare(joinPassword, serverPassword))
       {
          *errorString = "CHR_PASSWORD";
          return false;

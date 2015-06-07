@@ -229,7 +229,7 @@ void GuiTextEditCtrl::updateHistory( StringBuffer *inTxt, bool moveIndex )
       return;
 
    // see if it's already in
-   if(mHistoryLast == -1 || dStrcmp(txt, mHistoryBuf[mHistoryLast]))
+   if(mHistoryLast == -1 || String::compare(txt, mHistoryBuf[mHistoryLast]))
    {
       if(mHistoryLast == mHistorySize-1) // we're at the history limit... shuffle the pointers around:
       {

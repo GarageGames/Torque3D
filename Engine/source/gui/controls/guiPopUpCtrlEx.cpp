@@ -827,7 +827,7 @@ void GuiPopUpMenuCtrlEx::addEntry(const char *buf, S32 id, U32 scheme)
 	// Ensure that there are no other entries with exactly the same name
 	for ( U32 i = 0; i < mEntries.size(); i++ )
    {
-      if ( dStrcmp( mEntries[i].buf, buf ) == 0 )
+      if ( String::compare( mEntries[i].buf, buf ) == 0 )
          return;
    }
 
@@ -925,7 +925,7 @@ S32 GuiPopUpMenuCtrlEx::findText( const char* text )
 {
    for ( U32 i = 0; i < mEntries.size(); i++ )
    {
-      if ( dStrcmp( text, mEntries[i].buf ) == 0 )
+      if ( String::compare( text, mEntries[i].buf ) == 0 )
          return( mEntries[i].id );        
    }
    return( -1 );

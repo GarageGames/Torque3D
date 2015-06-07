@@ -1077,7 +1077,7 @@ DefineConsoleMethod( GuiRoadEditorCtrl, setNodePosition, void, ( Point3F pos ), 
 
 DefineConsoleMethod( GuiRoadEditorCtrl, setSelectedRoad, void, ( const char * pathRoad ), (""), "" )
 {
-   if (dStrcmp( pathRoad,"")==0 )
+   if (String::compare( pathRoad,"")==0 )
       object->setSelectedRoad(NULL);
    else
    {

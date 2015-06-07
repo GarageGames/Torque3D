@@ -97,7 +97,7 @@ void GuiMissionAreaEditorCtrl::setSelectedMissionArea( MissionArea *missionArea 
 
 DefineConsoleMethod( GuiMissionAreaEditorCtrl, setSelectedMissionArea, void, (const char * missionAreaName), (""), "" )
 {
-   if ( dStrcmp( missionAreaName, "" )==0 )
+   if ( String::compare( missionAreaName, "" )==0 )
       object->setSelectedMissionArea(NULL);
    else
    {

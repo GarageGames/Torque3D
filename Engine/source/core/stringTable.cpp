@@ -134,7 +134,7 @@ StringTableEntry _StringTable::insert(const char* _val, const bool caseSens)
    U32 key = hashString(val);
    walk = &buckets[key % numBuckets];
    while((temp = *walk) != NULL)   {
-      if(caseSens && !dStrcmp(temp->val, val))
+      if(caseSens && !String::compare(temp->val, val))
          return temp->val;
       else if(!caseSens && !dStricmp(temp->val, val))
          return temp->val;
@@ -174,7 +174,7 @@ StringTableEntry _StringTable::lookup(const char* val, const bool  caseSens)
    U32 key = hashString(val);
    walk = &buckets[key % numBuckets];
    while((temp = *walk) != NULL)   {
-      if(caseSens && !dStrcmp(temp->val, val))
+      if(caseSens && !String::compare(temp->val, val))
             return temp->val;
       else if(!caseSens && !dStricmp(temp->val, val))
          return temp->val;

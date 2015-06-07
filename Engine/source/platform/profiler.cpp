@@ -241,7 +241,7 @@ static Profiler aProfiler; // allocate the global profiler
 ProfilerRootData::ProfilerRootData(const char *name)
 {
    for(ProfilerRootData *walk = sRootList; walk; walk = walk->mNextRoot)
-      if(!dStrcmp(walk->mName, name))
+      if(!String::compare(walk->mName, name))
          AssertFatal( false, avar( "Duplicate profile name: %s", name ) );
 
    mName = name;
@@ -683,7 +683,7 @@ void Profiler::enableMarker(const char *marker, bool enable)
       }
       else
       {
-         if(!dStrcmp(marker, data->mName))
+         if(!String::compare(marker, data->mName))
             data->mEnabled = enable;
       }
    }

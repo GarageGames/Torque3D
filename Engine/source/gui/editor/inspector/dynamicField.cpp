@@ -70,7 +70,7 @@ void GuiInspectorDynamicField::setData( const char* data, bool callbacks )
       const char *oldData = target->getDataField( mDynField->slotName, NULL );
       if ( !oldData )
          oldData = "";
-      if ( dStrcmp( oldData, data ) != 0 )
+      if ( String::compare( oldData, data ) != 0 )
       {
          target->inspectPreApply();
          

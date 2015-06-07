@@ -462,18 +462,18 @@ extern "C" {
 DefineConsoleFunction( testJavaScriptBridge, const char *, (const char* arg1, const char* arg2, const char* arg3), , "testBridge(arg1, arg2, arg3)")
 {
 	S32 failed = 0;
-		if (dStrcmp(arg1,"one"))
+		if (String::compare(arg1,"one"))
 			failed = 2;
-		if (dStrcmp(arg2,"two"))
+		if (String::compare(arg2,"two"))
 			failed = 2;
-		if (dStrcmp(arg3,"three"))
+		if (String::compare(arg3,"three"))
 			failed = 2;
 	
 
 	//attempt to call from TorqueScript -> JavaScript
 	const char* jret = Con::evaluate("JS::bridgeCallback(\"one\",\"two\",\"three\");");
 
-	if (dStrcmp(jret,"42"))
+	if (String::compare(jret,"42"))
 		failed = 3;
 
 	static const U32 bufSize = 256;

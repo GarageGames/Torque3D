@@ -90,7 +90,7 @@ protected:
          // search the technique contents for the desired parameter
          for (S32 iParam = 0; iParam < pTechnique->getContents().getCount(); iParam++) {
             const domAny* param = daeSafeCast<domAny>(pTechnique->getContents()[iParam]);
-            if (param && !dStrcmp(param->getElementName(), name))
+            if (param && !String::compare(param->getElementName(), name))
                return param;
          }
       }

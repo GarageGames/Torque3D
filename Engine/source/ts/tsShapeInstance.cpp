@@ -490,7 +490,7 @@ void TSShapeInstance::setMeshForceHidden( const char *meshName, bool hidden )
       S32 nameIndex = iter->object->nameIndex;
       const char *name = mShape->names[ nameIndex ];
 
-      if ( dStrcmp( meshName, name ) == 0 )
+      if ( String::compare( meshName, name ) == 0 )
       {
          iter->forceHidden = hidden;
          return;

@@ -4628,7 +4628,7 @@ S32 GuiTreeViewCtrl::findItemByName(const char *name)
          continue;
 	   if( mItems[i]->mState.test( Item::InspectorData ) )
 		   continue;
-      if (mItems[i] && dStrcmp(mItems[i]->getText(),name) == 0) 
+      if (mItems[i] && String::compare(mItems[i]->getText(),name) == 0) 
          return mItems[i]->mId;
    }
 
@@ -4643,7 +4643,7 @@ S32 GuiTreeViewCtrl::findItemByValue(const char *name)
    {
 	   if( mItems[i]->mState.test( Item::InspectorData ) )
 		   continue;
-	   if (mItems[i] && dStrcmp(mItems[i]->getValue(),name) == 0) 
+	   if (mItems[i] && String::compare(mItems[i]->getValue(),name) == 0) 
 		   return mItems[i]->mId;
    }
 
@@ -5203,7 +5203,7 @@ DefineEngineMethod( GuiTreeViewCtrl, getTextToRoot, const char*, (S32 itemId, co
    "@param delimiter (Optional) delimiter to use between each branch concatenation."
    "@return text from the current node to the root.")
 {
-	if (!dStrcmp(delimiter, "" ))
+	if (!String::compare(delimiter, "" ))
    {
       Con::warnf("GuiTreeViewCtrl::getTextToRoot - Invalid number of arguments!");
       return ("");

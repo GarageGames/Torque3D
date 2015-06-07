@@ -315,7 +315,7 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
    {
       bool allowed = (_isDirInMainDotCsPath(value) || matchesFilters(value));
       Item *exists = parent->findChildByValue( szValue );
-      if( allowed && !exists && dStrcmp( curPos, "" ) != 0 )
+      if( allowed && !exists && String::compare( curPos, "" ) != 0 )
       {
          // Since we're adding a child this parent can't be a virtual parent, so clear that flag
          parent->setVirtualParent( false );
@@ -357,7 +357,7 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
    }
    if( delim )
    {
-      if( ( dStrcmp( delim, "" ) == 0 ) && item )
+      if( ( String::compare( delim, "" ) == 0 ) && item )
       {
          item->setExpanded( false );
          if( parent && _hasChildren( item->getValue() ) )

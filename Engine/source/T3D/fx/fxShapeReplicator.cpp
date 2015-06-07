@@ -209,7 +209,7 @@ void fxShapeReplicator::CreateShapes(void)
    if (mFieldData.mHideReplications) return;
 
    // Cannot continue without shapes!
-   if (dStrcmp(mFieldData.mShapeFile, "") == 0) return;
+   if (String::compare(mFieldData.mShapeFile, "") == 0) return;
 
    // Check that we can position somewhere!
    if (!(	mFieldData.mAllowOnTerrain ||

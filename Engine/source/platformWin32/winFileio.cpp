@@ -614,7 +614,7 @@ static bool recurseDumpPath(const char *path, const char *pattern, Vector<Platfo
             continue;
 
          // skip . and .. directories
-         if (dStrcmp( findData.cFileName, TEXT( "." ) ) == 0 || dStrcmp( findData.cFileName, TEXT( ".." ) ) == 0)
+         if (String::compare( findData.cFileName, TEXT( "." ) ) == 0 || String::compare( findData.cFileName, TEXT( ".." ) ) == 0)
             continue;
 
          // Skip excluded directores
@@ -1085,7 +1085,7 @@ bool Platform::isSubDirectory(const char *pParent, const char *pDir)
          //FIXME: this has to be dStrcasecmp but there's no implementation for Unicode
 
          // and the names match
-         if (dStrcmp(dir, findData.cFileName ) == 0)
+         if (String::compare(dir, findData.cFileName ) == 0)
          {
             // then we have a real sub directory
             FindClose(handle);
@@ -1271,7 +1271,7 @@ bool Platform::hasSubDirectory(const char *pPath)
       if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       {
          // skip . and .. directories
-         if (dStrcmp(findData.cFileName, TEXT( "." ) ) == 0 || dStrcmp(findData.cFileName, TEXT( ".." ) ) == 0)
+         if (String::compare(findData.cFileName, TEXT( "." ) ) == 0 || String::compare(findData.cFileName, TEXT( ".." ) ) == 0)
             continue;
 
 #ifdef UNICODE
@@ -1395,7 +1395,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
       if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       {
          // skip . and .. directories
-         if (dStrcmp(findData.cFileName, TEXT( "." )) == 0 || dStrcmp(findData.cFileName, TEXT( ".." )) == 0)
+         if (String::compare(findData.cFileName, TEXT( "." )) == 0 || String::compare(findData.cFileName, TEXT( ".." )) == 0)
             continue;
 
 #ifdef UNICODE

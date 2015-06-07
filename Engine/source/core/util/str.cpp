@@ -439,7 +439,7 @@ namespace KeyCmp
    template<>
    inline bool equals<>( String::StringData* const& d1, String::StringData* const& d2 )
    {
-      return ( dStrcmp( d1->utf8(), d2->utf8() ) == 0 );
+      return ( String::compare( d1->utf8(), d2->utf8() ) == 0 );
    }
 }
 
@@ -1027,6 +1027,28 @@ S32 String::compare(const String &str, SizeType len, U32 mode) const
       return 0;
 
    return compare( str.c_str(), len, mode );
+}
+
+S32 String::compare(const char *str1, const char *str2)
+{
+   return strcmp(str1, str2);
+}
+
+S32 String::compare(const UTF16 *str1, const UTF16 *str2)
+{
+#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+   return wcscmp(reinterpret_cast<const wchar_t *>(str1), reinterpret_cast<const wchar_t *>(str2));
+#else
+   S32 ret;
+   const UTF16 *a, *b;
+   a = str1;
+   b = str2;
+
+   while (((ret = *a - *b) == 0) && *a && *b)
+      a++, b++;
+
+   return ret;
+#endif
 }
 
 bool String::equal(const String &str, U32 mode) const

@@ -142,7 +142,7 @@ namespace KeyCmp
    template<>
    inline bool equals<>( const char * const &keya, const char * const &keyb )
    {
-      return ( dStrcmp( keya, keyb ) == 0 );
+      return ( String::compare( keya, keyb ) == 0 );
    }
 };
 

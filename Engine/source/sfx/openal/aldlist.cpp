@@ -61,7 +61,7 @@ ALDeviceList::ALDeviceList( const OPENALFNTABLE &oalft )
       index = 0;
       // go through device list (each device terminated with a single NULL, list terminated with double NULL)
       while (*devices != 0) {
-         if (dStrcmp(defaultDeviceName, devices) == 0) {
+         if (String::compare(defaultDeviceName, devices) == 0) {
             defaultDeviceIndex = index;
          }
          ALCdevice *device = ALFunction.alcOpenDevice(devices);
@@ -73,7 +73,7 @@ ALDeviceList::ALDeviceList( const OPENALFNTABLE &oalft )
                actualDeviceName = ALFunction.alcGetString(device, ALC_DEVICE_SPECIFIER);
                bool bNewName = true;
                for (int i = 0; i < GetNumDevices(); i++) {
-                  if (dStrcmp(GetDeviceName(i), actualDeviceName) == 0) {
+                  if (String::compare(GetDeviceName(i), actualDeviceName) == 0) {
                      bNewName = false;
                   }
                }

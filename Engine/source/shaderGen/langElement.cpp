@@ -48,7 +48,7 @@ LangElement * LangElement::find( const char *name )
 {
    for( U32 i=0; i<elementList.size(); i++ )
    {
-      if( !dStrcmp( (char*)elementList[i]->name, name ) )
+      if( !String::compare( (char*)elementList[i]->name, name ) )
       {
          return elementList[i];
       }

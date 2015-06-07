@@ -513,7 +513,7 @@ S32 GuiListBoxCtrl::findItemText( StringTableEntry text, bool caseSensitive )
    for( S32 i = 0; i < mItems.size(); i++ )
    {
       // Case Sensitive Compare?
-      if( caseSensitive && ( dStrcmp( mItems[i]->itemText, text ) == 0 ) )
+      if( caseSensitive && ( String::compare( mItems[i]->itemText, text ) == 0 ) )
          return i;
       else if (!caseSensitive && ( dStricmp( mItems[i]->itemText, text ) == 0 ))
          return i;
@@ -1594,7 +1594,7 @@ void GuiListBoxCtrl::addFilteredItem( String item )
 	for ( S32 i = 0; i < mSelectedItems.size(); i++ ) 
 	{
 		String itemText = mSelectedItems[i]->itemText;
-		if ( dStrcmp( itemText.c_str(), item.c_str() ) == 0 ) 
+		if ( String::compare( itemText.c_str(), item.c_str() ) == 0 ) 
 		{
 			mSelectedItems.erase_fast( i );
 			break;
@@ -1604,7 +1604,7 @@ void GuiListBoxCtrl::addFilteredItem( String item )
 	for ( S32 i = 0; i < mItems.size(); i++ ) 
 	{
 		String itemText = mItems[i]->itemText;
-		if( dStrcmp( itemText.c_str(), item.c_str() ) == 0 )
+		if( String::compare( itemText.c_str(), item.c_str() ) == 0 )
 		{	
 			mItems[i]->isSelected = false;		
 			mFilteredItems.push_front( mItems[i] );
@@ -1637,7 +1637,7 @@ void GuiListBoxCtrl::removeFilteredItem( String item )
 	for ( S32 i = 0; i < mFilteredItems.size(); i++ ) 
 	{
 		String itemText = mFilteredItems[i]->itemText;
-		if( dStrcmp( itemText.c_str(), item.c_str() ) == 0 )
+		if( String::compare( itemText.c_str(), item.c_str() ) == 0 )
 		{			
 			mItems.push_front( mFilteredItems[i] );
 			mFilteredItems.erase( &mFilteredItems[i] );

@@ -181,14 +181,14 @@ Var * ShaderFeatureHLSL::getVertTexCoord( const String &name )
 
    for( U32 i=0; i<LangElement::elementList.size(); i++ )
    {
-      if( !dStrcmp( (char*)LangElement::elementList[i]->name, name.c_str() ) )
+      if( !String::compare( (char*)LangElement::elementList[i]->name, name.c_str() ) )
       {
          inTex = dynamic_cast<Var*>( LangElement::elementList[i] );
          if ( inTex )
          {
             // NOTE: This used to do this check...
             //
-            // dStrcmp( (char*)inTex->structName, "IN" )
+            // String::compare( (char*)inTex->structName, "IN" )
             //
             // ... to ensure that the var was from the input
             // vertex structure, but this kept some features
@@ -377,7 +377,7 @@ Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
       }
    }
 
-   AssertFatal( dStrcmp( type, (const char*)texCoord->type ) == 0, 
+   AssertFatal( String::compare( type, (const char*)texCoord->type ) == 0, 
       "ShaderFeatureHLSL::getOutTexCoord - Type mismatch!" );
 
    return texCoord;
@@ -399,7 +399,7 @@ Var* ShaderFeatureHLSL::getInTexCoord( const char *name,
       texCoord->mapsToSampler = mapsToSampler;
    }
 
-   AssertFatal( dStrcmp( type, (const char*)texCoord->type ) == 0, 
+   AssertFatal( String::compare( type, (const char*)texCoord->type ) == 0, 
       "ShaderFeatureHLSL::getInTexCoord - Type mismatch!" );
 
    return texCoord;
@@ -419,7 +419,7 @@ Var* ShaderFeatureHLSL::getInColor( const char *name,
       inColor->setType( type );
    }
 
-   AssertFatal( dStrcmp( type, (const char*)inColor->type ) == 0, 
+   AssertFatal( String::compare( type, (const char*)inColor->type ) == 0, 
       "ShaderFeatureHLSL::getInColor - Type mismatch!" );
 
    return inColor;
