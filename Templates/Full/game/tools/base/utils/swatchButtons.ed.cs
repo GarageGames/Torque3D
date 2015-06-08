@@ -37,7 +37,7 @@ function GuiSwatchButtonCtrl::onMouseDragged( %this )
    
    %xOffset = getWord( %payload.extent, 0 ) / 2;
    %yOffset = getWord( %payload.extent, 1 ) / 2;  
-   %cursorpos = Canvas.getCursorPos();
+   %cursorpos = $GameCanvas.getCursorPos();
    %xPos = getWord( %cursorpos, 0 ) - %xOffset;
    %yPos = getWord( %cursorpos, 1 ) - %yOffset;
 
@@ -63,7 +63,7 @@ function GuiSwatchButtonCtrl::onMouseDragged( %this )
    
    // Start drag.
    
-   Canvas.getContent().add( %ctrl );
+   $GameCanvas.getContent().add( %ctrl );
    %ctrl.startDragging( %xOffset, %yOffset );
 }
 

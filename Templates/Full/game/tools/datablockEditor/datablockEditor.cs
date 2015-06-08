@@ -383,7 +383,7 @@ function DatablockEditorPlugin::showSaveNewFileDialog(%this)
 function DatablockEditorPlugin::saveNewFileFinish( %this, %newFileName )
 {
    // Clear the first responder to capture any inspector changes
-   %ctrl = canvas.getFirstResponder();
+   %ctrl = $GameCanvas.getFirstResponder();
    if( isObject(%ctrl) )
       %ctrl.clearFirstResponder();
 
@@ -421,7 +421,7 @@ function DatablockEditorPlugin::saveNewFileFinish( %this, %newFileName )
 function DatablockEditorPlugin::save( %this )
 {
    // Clear the first responder to capture any inspector changes
-   %ctrl = canvas.getFirstResponder();
+   %ctrl = $GameCanvas.getFirstResponder();
    if( isObject(%ctrl) )
       %ctrl.clearFirstResponder();
 
@@ -669,7 +669,7 @@ function DatablockEditorPlugin::createDatablock(%this)
       
       // Show the dialog.
       
-      canvas.pushDialog( DatablockEditorCreatePrompt, 0, true );
+      $GameCanvas.pushDialog( DatablockEditorCreatePrompt, 0, true );
    }
 }
 
@@ -688,7 +688,7 @@ function DatablockEditorPlugin::createPromptNameCheck(%this)
    
    // Remove the dialog and create the datablock.
    
-   canvas.popDialog( DatablockEditorCreatePrompt );
+   $GameCanvas.popDialog( DatablockEditorCreatePrompt );
    %this.createDatablockFinish( %name, %copySource );
 }
 

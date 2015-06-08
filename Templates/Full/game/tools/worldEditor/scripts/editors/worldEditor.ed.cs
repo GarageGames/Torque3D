@@ -157,7 +157,7 @@ function WorldEditor::init(%this)
          extent = "0 0";
          minExtent = "0 0";
          maxPopupHeight = "200";
-         command = "canvas.popDialog(WEContextPopupDlg);";
+         command = "$GameCanvas.popDialog(WEContextPopupDlg);";
       };
    };
    WEContextPopup.setVisible(false);

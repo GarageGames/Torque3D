@@ -509,7 +509,7 @@ function ObjectBuilderGui::process(%this)
    %this.adjustSizes();
 
    //
-   Canvas.pushDialog(%this);
+   $GameCanvas.pushDialog(%this);
 }
 
 function ObjectBuilderGui::processNewObject(%this, %obj)
@@ -581,13 +581,13 @@ function ObjectBuilderGui::onOK(%this)
       %this.processNewObject(%this.newObject);
 
    %this.reset();
-   Canvas.popDialog(%this);
+   $GameCanvas.popDialog(%this);
 }
 
 function ObjectBuilderGui::onCancel(%this)
 {
    %this.reset();
-   Canvas.popDialog(%this);
+   $GameCanvas.popDialog(%this);
 }
 
 function ObjectBuilderGui::addField(%this, %name, %type, %text, %value, %ext)
@@ -914,7 +914,7 @@ function ObjectBuilderGui::buildLevelInfo(%this)
    {
       GenericPromptDialog-->GenericPromptWindow.text = "Warning";
       GenericPromptDialog-->GenericPromptText.text   = "There is already an existing LevelInfo in the scene.";
-      Canvas.pushDialog( GenericPromptDialog );
+      $GameCanvas.pushDialog( GenericPromptDialog );
       return;
    } 
 
@@ -929,7 +929,7 @@ function ObjectBuilderGui::buildTimeOfDay(%this)
    {
       GenericPromptDialog-->GenericPromptWindow.text = "Warning";
       GenericPromptDialog-->GenericPromptText.text   = "There is already an existing TimeOfDay in the scene.";
-      Canvas.pushDialog( GenericPromptDialog );
+      $GameCanvas.pushDialog( GenericPromptDialog );
       return;
    }
    

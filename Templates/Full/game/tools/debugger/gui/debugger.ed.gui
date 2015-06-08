@@ -21,7 +21,7 @@
       visible = "True";
       setFirstResponder = "False";
       modal = "True";
-      command = "Canvas.pushDialog(DebuggerConnectDlg, 80);";
+      command = "$GameCanvas.pushDialog(DebuggerConnectDlg, 80);";
       helpTag = "0";
       text = "Connect";
    };
@@ -35,7 +35,7 @@
       visible = "True";
       setFirstResponder = "False";
       modal = "True";
-      command = "Canvas.pushDialog(OpenFileDialog, 80);";
+      command = "$GameCanvas.pushDialog(OpenFileDialog, 80);";
       helpTag = "0";
       text = "File";
    };
@@ -109,7 +109,7 @@
       visible = "True";
       setFirstResponder = "False";
       modal = "True";
-      command = "Canvas.pushDialog(DebuggerFindDlg, 80);";
+      command = "$GameCanvas.pushDialog(DebuggerFindDlg, 80);";
       helpTag = "0";
       text = "Find";
    };
@@ -267,7 +267,7 @@
                visible = "True";
                setFirstResponder = "False";
                modal = "True";
-               command = "Canvas.pushDialog(DebuggerWatchDlg, 80);";
+               command = "$GameCanvas.pushDialog(DebuggerWatchDlg, 80);";
                helpTag = "0";
                text = "Add";
             };
@@ -281,7 +281,7 @@
                visible = "True";
                setFirstResponder = "False";
                modal = "True";
-               command = "Canvas.pushDialog(DebuggerEditWatchDlg, 80);";
+               command = "$GameCanvas.pushDialog(DebuggerEditWatchDlg, 80);";
                helpTag = "0";
                text = "Edit";
             };
@@ -436,7 +436,7 @@
                visible = "True";
                setFirstResponder = "False";
                modal = "True";
-               command = "Canvas.pushDialog(DebuggerBreakConditionDlg, 80);";
+               command = "$GameCanvas.pushDialog(DebuggerBreakConditionDlg, 80);";
                helpTag = "0";
                text = "Condition";
             };

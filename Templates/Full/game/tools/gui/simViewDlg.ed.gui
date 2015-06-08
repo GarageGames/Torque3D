@@ -31,7 +31,7 @@
       canMinimize = "1";
       canMaximize = "1";
       minSize = "50 50";
-      closeCommand = "Canvas.popDialog(simViewDlg);";
+      closeCommand = "$GameCanvas.popDialog(simViewDlg);";
 
       new GuiScrollCtrl() {
          canSaveDynamicFields = "0";
@@ -322,8 +322,8 @@ function InspectTreeView::onSelect(%this, %obj)
 
 function Tree(%obj)
 {
-   Canvas.popDialog("simViewDlg");
-   Canvas.pushDialog("simViewDlg", 20);
+   $GameCanvas.popDialog("simViewDlg");
+   $GameCanvas.pushDialog("simViewDlg", 20);
    InspectTreeView.open(%obj);
 }
 

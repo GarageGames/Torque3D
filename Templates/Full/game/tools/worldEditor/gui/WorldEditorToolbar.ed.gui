@@ -242,7 +242,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(softSnapSizeSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(softSnapSizeSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes size of the soft snap region";
             hovertime = "750";

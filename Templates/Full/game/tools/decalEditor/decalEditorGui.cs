@@ -129,7 +129,7 @@ function DecalDataList::onSelect( %this, %id, %text )
    // Update the materialEditorList
    $Tools::materialEditorList = %data.getId();
    
-   //Canvas.pushDialog( DecalEditDlg );
+   //$GameCanvas.pushDialog( DecalEditDlg );
    DecalInspector.inspect( %data );
    DecalEditorGui.updateDecalPreview( %data.material );
 }
@@ -172,7 +172,7 @@ function NewDecalButton::onClick( %this )
    %id = DecalDataList.findItemText( %name );
    DecalDataList.setSelected( %id, true );
       
-   Canvas.pushDialog( DecalEditDlg );
+   $GameCanvas.pushDialog( DecalEditDlg );
    DecalInspector.inspect( %name );
 }
 

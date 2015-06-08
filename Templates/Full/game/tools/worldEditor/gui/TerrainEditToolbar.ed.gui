@@ -196,7 +196,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(TerrainBrushSizeSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(TerrainBrushSizeSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes size of the brush (CTRL + Mouse Wheel)";
             hovertime = "750";
@@ -283,7 +283,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(TerrainBrushPressureSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(TerrainBrushPressureSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the pressure (CTRL + SHIFT + Mouse Wheel)";
             hovertime = "750";
@@ -370,7 +370,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(TerrainBrushSoftnessSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(TerrainBrushSoftnessSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the softness (SHIFT + Mouse Wheel)";
             hovertime = "750";
@@ -393,7 +393,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         Command = "Canvas.pushDialog( TerrainBrushSoftnessCurveDlg );";
+         Command = "$GameCanvas.pushDialog( TerrainBrushSoftnessCurveDlg );";
          tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Changes the softness curve";
          hovertime = "750";
@@ -480,7 +480,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(TerrainSetHeightSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(TerrainSetHeightSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the height for the SetHeight tool (ALT + Left Mouse)";
             hovertime = "750";

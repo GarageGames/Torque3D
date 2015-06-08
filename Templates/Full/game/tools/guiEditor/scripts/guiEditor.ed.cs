@@ -30,7 +30,7 @@ $MLAAFxGuiEditorTemp = false;
 
 function GuiEdit( %val )
 {
-   if (Canvas.isFullscreen())
+   if ($GameCanvas.isFullscreen())
    {
       MessageBoxOK("Windowed Mode Required", "Please switch to windowed mode to access the GUI Editor.");
       return;
@@ -41,7 +41,7 @@ function GuiEdit( %val )
 
    if (!$InGuiEditor)
    {
-      GuiEditContent(Canvas.getContent());
+      GuiEditContent($GameCanvas.getContent());
       
       //Temp fix to disable MLAA when in GUI editor
       if( isObject(MLAAFx) && MLAAFx.isEnabled==true )
@@ -100,7 +100,7 @@ package GuiEditor_BlockDialogs
 
 function GuiEditor::openForEditing( %this, %content )
 {   
-   Canvas.setContent( GuiEditorGui );
+   $GameCanvas.setContent( GuiEditorGui );
    while( GuiEditorContent.getCount() )
       GuiGroup.add( GuiEditorContent.getObject( 0 ) ); // get rid of anything being edited
       
@@ -212,7 +212,7 @@ function GuiEditor::enableMenuItems(%this, %val)
 
 function GuiEditor::showPrefsDialog(%this)
 {
-   Canvas.pushDialog(GuiEditorPrefsDlg);
+   $GameCanvas.pushDialog(GuiEditorPrefsDlg);
 }
 
 //---------------------------------------------------------------------------------------------

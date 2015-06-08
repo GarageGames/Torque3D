@@ -43,7 +43,7 @@
       canCollapse = "0";  
       CollapseGroup = "-1";  
       CollapseGroupNum = "-1";  
-      closeCommand = "Canvas.popDialog(ProceduralTerrainPainterGui);";  
+      closeCommand = "$GameCanvas.popDialog(ProceduralTerrainPainterGui);";  
       text = "Generate layer mask";  
   
       new GuiButtonCtrl() {  
@@ -394,12 +394,12 @@ $TPPCoverage = 100;
   
 function autoLayers() 
 {  
-   Canvas.pushDialog(ProceduralTerrainPainterGui);  
+   $GameCanvas.pushDialog(ProceduralTerrainPainterGui);  
 }  
   
 function generateProceduralTerrainMask() 
 {  
-   Canvas.popDialog(ProceduralTerrainPainterGui);  
+   $GameCanvas.popDialog(ProceduralTerrainPainterGui);  
    ETerrainEditor.autoMaterialLayer($TPPHeightMin, $TPPHeightMax, $TPPSlopeMin, $TPPSlopeMax, $TPPCoverage);  
 }  
 

@@ -136,7 +136,7 @@
          visible = "True";
          setFirstResponder = "False";
          modal = "True";
-         command = "Canvas.popDialog(DebuggerBreakConditionDlg);";
+         command = "$GameCanvas.popDialog(DebuggerBreakConditionDlg);";
          helpTag = "0";
          text = "Cancel";
       };

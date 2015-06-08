@@ -52,7 +52,7 @@ function EditorChooseLevelGui::onWake()
    }
    
    //If no valid name, then push the level chooser
-   Canvas.pushDialog(EditorChooseLevelContainer);
+   $GameCanvas.pushDialog(EditorChooseLevelContainer);
 }  
  
 function EditorChooseLevelContainer::onWake(%this)

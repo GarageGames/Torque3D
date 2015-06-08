@@ -78,7 +78,7 @@ function MessageBoxOKBuy(%title, %message, %OKCallback, %BuyCallback)
 {
    MBOKBuyFrame.text = %title;
    MessageBoxOKBuyDlg.profile = "ToolsGuiOverlayProfile";
-   Canvas.pushDialog(MessageBoxOKBuyDlg);
+   $GameCanvas.pushDialog(MessageBoxOKBuyDlg);
    MBSetText(MBOKBuyText, MBOKBuyFrame, %message);
    MessageBoxOKBuyDlg.OKCallback = %OKCallback;
    MessageBoxOKBuyDlg.BuyCallback = %BuyCallback;

@@ -166,7 +166,7 @@ function RoadEditorPlugin::setEditorFunction( %this )
    %terrainExists = parseMissionGroup( "TerrainBlock" );
 
    if( %terrainExists == false )
-      MessageBoxYesNoCancel("No Terrain","Would you like to create a New Terrain?", "Canvas.pushDialog(CreateNewTerrainGui);");
+      MessageBoxYesNoCancel("No Terrain","Would you like to create a New Terrain?", "$GameCanvas.pushDialog(CreateNewTerrainGui);");
    
    return %terrainExists;
 }

@@ -563,7 +563,7 @@ function EditorGui::onWake( %this )
       %this.onNewLevelLoaded( %levelName );
       
    if (isObject(DemoEditorAlert) && DemoEditorAlert.helpTag<2)
-      Canvas.pushDialog(DemoEditorAlert);
+      $GameCanvas.pushDialog(DemoEditorAlert);
 }
 
 function EditorGui::onSleep( %this )
@@ -1900,21 +1900,21 @@ function EditorTreeTabBook::onTabSelected( %this )
 function Editor::open(%this)
 {
    // prevent the mission editor from opening while the GuiEditor is open.
-   if(Canvas.getContent() == GuiEditorGui.getId())
+   if($GameCanvas.getContent() == GuiEditorGui.getId())
       return;
       
    if( !EditorGui.isInitialized )
       EditorGui.init();
 
    %this.editorEnabled();
-   Canvas.setContent(EditorGui);   
+   $GameCanvas.setContent(EditorGui);   
    EditorGui.syncCameraGui();
 }
 
 function Editor::close(%this, %gui)
 {
    %this.editorDisabled();
-   Canvas.setContent(%gui);
+   $GameCanvas.setContent(%gui);
    if(isObject(MessageHud))
       MessageHud.close();   
    EditorGui.writeCameraSettings();
@@ -1951,7 +1951,7 @@ function Editor::lightScene(%this, %callback, %forceAlways)
    $RelightCallback = %callback;
    RelightStatus.visible = true;
    RelightProgress.setValue(0);
-   Canvas.repaint();  
+   $GameCanvas.repaint();  
    lightScene("EditorLightingComplete", %forceAlways);
    updateEditorLightingProgress();
 } 
@@ -2623,10 +2623,10 @@ function CameraSpeedDropdownCtrlContainer::onWake(%this)
 
 function EditorDropdownSliderContainer::onMouseDown(%this)
 {
-   Canvas.popDialog(%this);
+   $GameCanvas.popDialog(%this);
 }
 
 function EditorDropdownSliderContainer::onRightMouseDown(%this)
 {
-   Canvas.popDialog(%this);
+   $GameCanvas.popDialog(%this);
 }

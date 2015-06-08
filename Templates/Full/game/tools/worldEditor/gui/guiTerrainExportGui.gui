@@ -266,14 +266,14 @@ function TerrainExportGui::onWake( %this )
 
 function TerrainExportGui::close( %this )
 {
-   Canvas.popDialog( %this );
+   $GameCanvas.popDialog( %this );
 }
 
 function TerrainExportGui::showExportDialog( %this )
 {
    %this.findAllTerrains();
 
-   Canvas.pushDialog( %this );
+   $GameCanvas.pushDialog( %this );
 }
 
 function TerrainExportGui::openFolderCallback( %this, %path )

@@ -550,14 +550,14 @@ function UVEditor::showDialog( %this, %applyCallback, %obj, %uv)
    UVEditor-->uvHandles.useCustomColor = true;
    UVEditor-->uvHandles.handleColor = %popup.getColorById(%popup.getSelected());
    
-   Canvas.pushDialog(UVEditorOverlay);
+   $GameCanvas.pushDialog(UVEditorOverlay);
    UVEditor.setVisible(1);
 }
 
 function UVEditor::hideDialog( %this )
 {
    UVEditor.setVisible(0);
-   Canvas.popDialog(UVEditorOverlay);
+   $GameCanvas.popDialog(UVEditorOverlay);
 }
 
 function UVEditor::apply( %this )

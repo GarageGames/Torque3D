@@ -196,7 +196,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(PaintBrushSizeSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(PaintBrushSizeSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the size of the brush (CTRL + Mouse Wheel)";
             hovertime = "750";
@@ -302,7 +302,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             bitmap = "tools/gui/images/dropslider";
-            Command = "Canvas.pushDialog(PaintBrushSlopeMinContainer);";
+            Command = "$GameCanvas.pushDialog(PaintBrushSlopeMinContainer);";
          };
          new GuiTextCtrl() {
             Profile = "ToolsGuiTextProfile";
@@ -363,7 +363,7 @@
             buttonType = "PushButton";
             useMouseEvents = "0";
             bitmap = "tools/gui/images/dropslider";
-            Command = "Canvas.pushDialog(PaintBrushSlopeMaxContainer);";
+            Command = "$GameCanvas.pushDialog(PaintBrushSlopeMaxContainer);";
          };
       };
 
@@ -444,7 +444,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(PaintBrushPressureSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(PaintBrushPressureSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the pressure (CTRL + SHIFT + Mouse Wheel)";
             hovertime = "750";

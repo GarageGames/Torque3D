@@ -179,7 +179,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         Command = "Canvas.popDialog( TerrainBrushSoftnessCurveDlg );";
+         Command = "$GameCanvas.popDialog( TerrainBrushSoftnessCurveDlg );";
          hovertime = "1000";
          text = "Cancel";
          groupNum = "-1";
@@ -222,7 +222,7 @@ function TerrainBrushSoftnessCurveDlg::onOk( %this )
    ETerrainEditor.softSelectFilter = %curve.getValue(); 
    ETerrainEditor.resetSelWeights(true); 
       
-   Canvas.popDialog( %this );
+   $GameCanvas.popDialog( %this );
 }
 
 function TerrainBrushSoftnessCurveDlg::resetCurve( %this )

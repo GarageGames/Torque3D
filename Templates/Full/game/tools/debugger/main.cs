@@ -64,5 +64,5 @@ function startDebugger()
    
    // Set up the GUI.
    DebuggerConsoleView.setActive(false);
-   Canvas.pushDialog(DebuggerGui);
+   $GameCanvas.pushDialog(DebuggerGui);
 }

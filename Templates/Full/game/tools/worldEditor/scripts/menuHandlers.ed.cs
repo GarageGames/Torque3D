@@ -259,7 +259,7 @@ function EditorSaveMission()
    // just save the mission without renaming it
    if(isFunction("getObjectLimit") && MissionGroup.getFullCount() >= getObjectLimit())
    {
-      MessageBoxOKBuy( "Object Limit Reached", "You have exceeded the object limit of " @ getObjectLimit() @ " for this demo. You can remove objects if you would like to add more.", "", "Canvas.showPurchaseScreen(\"objectlimit\");" );
+      MessageBoxOKBuy( "Object Limit Reached", "You have exceeded the object limit of " @ getObjectLimit() @ " for this demo. You can remove objects if you would like to add more.", "", "$GameCanvas.showPurchaseScreen(\"objectlimit\");" );
       return;
    }
    
@@ -320,14 +320,14 @@ function EditorSaveMissionMenuDisableSave()
 {
    GenericPromptDialog-->GenericPromptWindow.text = "Warning";
    GenericPromptDialog-->GenericPromptText.setText("Saving disabled in demo mode."); 
-   Canvas.pushDialog( GenericPromptDialog ); 
+   $GameCanvas.pushDialog( GenericPromptDialog ); 
 }
 
 function EditorSaveMissionAs( %missionName )
 {
    if(isFunction("getObjectLimit") && MissionGroup.getFullCount() >= getObjectLimit())
    {
-      MessageBoxOKBuy( "Object Limit Reached", "You have exceeded the object limit of " @ getObjectLimit() @ " for this demo. You can remove objects if you would like to add more.", "", "Canvas.showPurchaseScreen(\"objectlimit\");" );
+      MessageBoxOKBuy( "Object Limit Reached", "You have exceeded the object limit of " @ getObjectLimit() @ " for this demo. You can remove objects if you would like to add more.", "", "$GameCanvas.showPurchaseScreen(\"objectlimit\");" );
       return;
    }
    

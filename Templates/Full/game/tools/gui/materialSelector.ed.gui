@@ -742,7 +742,7 @@ function MaterialSelector::showDialogBase( %this, %selectCallback, %returnType, 
    MaterialSelector-->materialPreviewCountPopup.add( "100", 5 );
    MaterialSelector-->materialPreviewCountPopup.setSelected( $Pref::MaterialSelector::ThumbnailCountIndex );
    
-   Canvas.pushDialog(MaterialSelectorOverlay);
+   $GameCanvas.pushDialog(MaterialSelectorOverlay);
    MaterialSelector.setVisible(1);
    MaterialSelector.buildStaticFilters();   
    
@@ -754,7 +754,7 @@ function MaterialSelector::hideDialog( %this )
 {
    MaterialSelector.breakdown();
    MaterialSelector.setVisible(0);
-   Canvas.popDialog(MaterialSelectorOverlay);
+   $GameCanvas.popDialog(MaterialSelectorOverlay);
 }
 
 function MaterialSelector::breakdown( %this )
