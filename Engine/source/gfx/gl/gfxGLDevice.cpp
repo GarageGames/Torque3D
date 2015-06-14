@@ -811,9 +811,9 @@ GFXShader* GFXGLDevice::createShader()
    return shader;
 }
 
-void GFXGLDevice::setShader( GFXShader *shader )
+void GFXGLDevice::setShader(GFXShader *shader, bool force)
 {
-   if(mCurrentShader == shader)
+   if(mCurrentShader == shader && !force)
       return;
 
    if ( shader )
