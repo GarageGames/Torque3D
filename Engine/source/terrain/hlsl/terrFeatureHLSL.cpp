@@ -378,6 +378,8 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
 {
    const U32 detailIndex = getProcessIndex();
    Var *inTex = getVertTexCoord( "texCoord" );
+
+   bool hasNormal = fd.features.hasFeature(MFT_TerrainNormalMap, detailIndex);
    
    MultiLine *meta = new MultiLine;
 
@@ -447,6 +449,90 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
    meta->addStatement( new GenOp( "   @ = calcBlend( @.x, @.xy, @, @ );\r\n", 
                                     new DecOp( detailBlend ), detailInfo, inTex, layerSize, layerSample ) );
 
+   Var *lerpBlend = (Var*)LangElement::find("lerpBlend");
+   if (!lerpBlend)
+   {
+      lerpBlend = new Var;
+      lerpBlend->setType("float");
+      lerpBlend->setName("lerpBlend");
+      lerpBlend->uniform = true;
+      lerpBlend->constSortPos = cspPrimitive;
+   }
+
+   
+   Var *blendDepth = (Var*)LangElement::find(String::ToString("blendDepth%d", detailIndex));
+   if (!blendDepth)
+   {
+      blendDepth = new Var;
+      blendDepth->setType("float");
+      blendDepth->setName(String::ToString("blendDepth%d", detailIndex));
+      blendDepth->uniform = true;
+      blendDepth->constSortPos = cspPrimitive;
+   }
+
+   Var *baseColor = (Var*)LangElement::find("baseColor");
+   Var *outColor = (Var*)LangElement::find(getOutputTargetVarName(OutputTarget::DefaultTarget));
+
+   if (!outColor)
+   {
+      // create color var
+      outColor = new Var;
+      outColor->setType("fragout");
+      outColor->setName(getOutputTargetVarName(OutputTarget::DefaultTarget));
+      outColor->setStructName("OUT");
+   }
+
+   Var *detailColor = (Var*)LangElement::find("detailColor");
+   if (!detailColor)
+   {
+      detailColor = new Var;
+      detailColor->setType("float4");
+      detailColor->setName("detailColor");
+      meta->addStatement(new GenOp("   @;\r\n", new DecOp(detailColor)));
+   }
+
+   // Get the detail texture.
+   Var *detailMap = new Var;
+   detailMap->setType("sampler2D");
+   detailMap->setName(String::ToString("detailMap%d", detailIndex));
+   detailMap->uniform = true;
+   detailMap->sampler = true;
+   detailMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
+
+   // Get the normal map texture.
+   Var *normalMap = _getNormalMapTex();
+
+   // Issue happens somewhere here -----
+
+   // Sample the normal map.
+   //
+   // We take two normal samples and lerp between them for
+   // side projection layers... else a single sample.
+   LangElement *texOp;
+
+   // Note that we're doing the standard greyscale detail 
+   // map technique here which can darken and lighten the 
+   // diffuse texture.
+   //
+   // We take two color samples and lerp between them for
+   // side projection layers... else a single sample.
+   //
+   if (fd.features.hasFeature(MFT_TerrainSideProject, detailIndex))
+   {
+      meta->addStatement(new GenOp("   @ = ( lerp( tex2D( @, @.yz ), tex2D( @, @.xz ), @.z ) * 2.0 ) - 1.0;\r\n",
+         detailColor, detailMap, inDet, detailMap, inDet, inTex));
+
+      texOp = new GenOp("lerp( tex2D( @, @.yz ), tex2D( @, @.xz ), @.z )",
+         normalMap, inDet, normalMap, inDet, inTex);
+   }
+   else
+   {
+      meta->addStatement(new GenOp("   @ = ( tex2D( @, @.xy ) * 2.0 ) - 1.0;\r\n",
+         detailColor, detailMap, inDet));
+
+      texOp = new GenOp("tex2D(@, @.xy)", normalMap, inDet);
+   }
+
    // Get a var and accumulate the blend amount.
    Var *blendTotal = (Var*)LangElement::find( "blendTotal" );
    if ( !blendTotal )
@@ -459,6 +545,92 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
 
    // Add to the blend total.
    meta->addStatement( new GenOp( "   @ += @;\r\n", blendTotal, detailBlend ) );
+
+   Var *bumpNorm = (Var*)LangElement::find("bumpNormal");
+   Var *invBlend = (Var*)LangElement::find("invBlend");
+   Var *currentAlpha = (Var*)LangElement::find("currentAlpha");
+   Var *ma = (Var*)LangElement::find("ma");
+   Var *b1 = (Var*)LangElement::find("b1");
+   Var *b2 = (Var*)LangElement::find("b2");
+   
+   // Get a var and accumulate the blend amount.
+   if (!currentAlpha)
+   {
+      currentAlpha = new Var;
+      currentAlpha->setName("currentAlpha");
+      currentAlpha->setType("float");
+      meta->addStatement(new GenOp("   @ = 0;\r\n", new DecOp(currentAlpha)));
+   }
+
+   if(hasNormal)
+   {
+      // create bump normal
+      bool bumpNormWasDefined = bumpNorm ? true : false;
+      LangElement *bumpNormDecl = bumpNorm;
+ 
+      if (!bumpNormWasDefined)
+      {
+         bumpNorm = new Var;
+         bumpNorm->setName("bumpNormal");
+         bumpNorm->setType("float4");
+         bumpNormDecl = new DecOp(bumpNorm);
+      }
+      meta->addStatement( new GenOp( "   @ = @;\r\n", bumpNormDecl, texOp ) );
+      meta->addStatement(new GenOp("   @.a = max(@.a, 0.000001);\r\n", bumpNorm, bumpNorm));
+   
+      // -----
+
+      // Get a var and accumulate the blend amount.
+      if (!invBlend)
+      {
+         invBlend = new Var;
+         invBlend->setName("invBlend");
+         invBlend->setType("float");
+         meta->addStatement(new GenOp("   @;\r\n", new DecOp(invBlend)));
+      }
+
+      // Get a var and accumulate the blend amount.
+      if (!ma)
+      {
+         ma = new Var;
+         ma->setName("ma");
+         ma->setType("float");
+         meta->addStatement(new GenOp("   @;\r\n", new DecOp(ma)));
+      }
+
+      // Get a var and accumulate the blend amount.
+      if (!b1)
+      {
+         b1 = new Var;
+         b1->setName("b1");
+         b1->setType("float");
+         meta->addStatement(new GenOp("   @;\r\n", new DecOp(b1)));
+      }
+      // Get a var and accumulate the blend amount.
+      if (!b2)
+      {
+         b2 = new Var;
+         b2->setName("b2");
+         b2->setType("float");
+         meta->addStatement(new GenOp("   @;\r\n", new DecOp(b2)));
+      }
+
+      meta->addStatement(new GenOp("   if( @ <= 0 ) \r\n   { \r\n", lerpBlend));
+
+      meta->addStatement(new GenOp("      @ = 1-@;\r\n", invBlend, detailBlend));
+
+      meta->addStatement(new GenOp("      @ = max(@.a + @, @ + @) - @;\r\n", ma, bumpNorm, detailBlend, currentAlpha, invBlend, blendDepth));
+
+      meta->addStatement(new GenOp("      @ = max(@.a + @ - @, 0);\r\n", b1, bumpNorm, detailBlend, ma));
+
+      meta->addStatement(new GenOp("      @ = max(@ + @ - @, 0);\r\n", b2, currentAlpha, invBlend, ma));
+
+      meta->addStatement(new GenOp("   }\r\n"));
+   }
+   else
+   {
+      meta->addStatement(new GenOp("   @ = max(@,@);\r\n", currentAlpha, currentAlpha, detailBlend));
+   }
 
    // If we had a parallax feature... then factor in the parallax
    // amount so that it fades out with the layer blending.
@@ -494,24 +666,8 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
       output = meta;
       return;
    }
-
-   Var *detailColor = (Var*)LangElement::find( "detailColor" ); 
-   if ( !detailColor )
-   {
-      detailColor = new Var;
-      detailColor->setType( "float4" );
-      detailColor->setName( "detailColor" );
-      meta->addStatement( new GenOp( "   @;\r\n", new DecOp( detailColor ) ) );
-   }
-
-   // Get the detail texture.
-   Var *detailMap = new Var;
-   detailMap->setType( "sampler2D" );
-   detailMap->setName( String::ToString( "detailMap%d", detailIndex ) );
-   detailMap->uniform = true;
-   detailMap->sampler = true;
-   detailMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
-
+   
+   // used as texture unit num here
    // If we're using SM 3.0 then take advantage of 
    // dynamic branching to skip layers per-pixel.
 
@@ -521,32 +677,23 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
 
    meta->addStatement( new GenOp( "   {\r\n" ) );
 
-   // Note that we're doing the standard greyscale detail 
-   // map technique here which can darken and lighten the 
-   // diffuse texture.
-   //
-   // We take two color samples and lerp between them for
-   // side projection layers... else a single sample.
-   //
-   if ( fd.features.hasFeature( MFT_TerrainSideProject, detailIndex ) )
-   {
-      meta->addStatement( new GenOp( "      @ = ( lerp( tex2D( @, @.yz ), tex2D( @, @.xz ), @.z ) * 2.0 ) - 1.0;\r\n", 
-                                                detailColor, detailMap, inDet, detailMap, inDet, inTex ) );
-   }
-   else
-   {
-      meta->addStatement( new GenOp( "      @ = ( tex2D( @, @.xy ) * 2.0 ) - 1.0;\r\n", 
-                                       detailColor, detailMap, inDet ) );
-   }
-
    meta->addStatement( new GenOp( "      @ *= @.y * @.w;\r\n",
                                     detailColor, detailInfo, inDet ) );
 
-   Var *baseColor = (Var*)LangElement::find( "baseColor" );
-   Var *outColor = (Var*)LangElement::find( "col" );
-
-   meta->addStatement( new GenOp( "      @ = lerp( @, @ + @, @ );\r\n",
+   if(hasNormal)
+   {
+      meta->addStatement(new GenOp("      if( @ <= 0 ) \r\n", lerpBlend));
+      meta->addStatement(new GenOp("         @.rgb = ((@ + @).rgb * @ + @.rgb * @) / (@ + @);\r\n", outColor, baseColor, detailColor, b1, outColor, b2, b1, b2));
+      meta->addStatement(new GenOp("      else\r\n"));
+   }
+   meta->addStatement( new GenOp( "          @ = lerp( @, @ + @, @ );\r\n",
                                     outColor, outColor, baseColor, detailColor, detailBlend ) );
+
+   if(hasNormal)
+   {
+      meta->addStatement(new GenOp("      if( @ <= 0 ) \r\n", lerpBlend));
+      meta->addStatement(new GenOp("         @ = (@.a * @ + @ * @) / (@ + @);\r\n", currentAlpha, bumpNorm, b1, currentAlpha, b2, b1, b2));
+   }
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 
@@ -920,15 +1067,33 @@ void TerrainNormalMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
       texOp = new GenOp( "tex2D(@, @.xy)", normalMap, inDet );
 
    // create bump normal
-   Var *bumpNorm = new Var;
-   bumpNorm->setName( "bumpNormal" );
-   bumpNorm->setType( "float4" );
+   Var *bumpNorm = (Var*)LangElement::find("bumpNormal");
+   bool bumpNormWasDefined = bumpNorm ? true : false;
+   LangElement *bumpNormDecl = bumpNorm;
 
-   LangElement *bumpNormDecl = new DecOp( bumpNorm );
+   if (!bumpNormWasDefined)
+   {
+      bumpNorm = new Var;
+      bumpNorm->setName( "bumpNormal" );
+      bumpNorm->setType( "float4" );
+      bumpNormDecl = new DecOp(bumpNorm);
+   }
+
    meta->addStatement( expandNormalMap( texOp, bumpNormDecl, bumpNorm, fd ) );
+
+   Var *lerpBlend = (Var*)LangElement::find("lerpBlend");
+   AssertFatal(lerpBlend, "The lerpBlend is missing!");
+   Var *b1 = (Var*)LangElement::find("b1");
+   AssertFatal(b1, "The b1 is missing!");
+   Var *b2 = (Var*)LangElement::find("b2");
+   AssertFatal(b2, "The b2 is missing!");
 
    // Normalize is done later... 
    // Note: The reverse mul order is intentional. Affine matrix.
+   
+   meta->addStatement(new GenOp("      if( @ <= 0 ) \r\n", lerpBlend));
+   meta->addStatement(new GenOp("         @ = (mul( @.xyz, @ ).rgb * @ + @.rgb * @) / (@ + @);\r\n", gbNormal, bumpNorm, viewToTangent, b1, gbNormal, b2, b1, b2));
+   meta->addStatement(new GenOp("      else\r\n"));
    meta->addStatement( new GenOp( "      @ = lerp( @, mul( @.xyz, @ ), min( @, @.w ) );\r\n", 
       gbNormal, gbNormal, bumpNorm, viewToTangent, detailBlend, inDet ) );
 

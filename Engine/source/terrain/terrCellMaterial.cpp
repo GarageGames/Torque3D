@@ -574,6 +574,10 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
       matInfo->detailInfoVConst = pass->shader->getShaderConstHandle( avar( "$detailScaleAndFade%d", i ) );
       matInfo->detailInfoPConst = pass->shader->getShaderConstHandle( avar( "$detailIdStrengthParallax%d", i ) );
 
+      // New blending
+      matInfo->lerpBlend = pass->shader->getShaderConstHandle("$lerpBlend");
+      matInfo->blendDepth = pass->shader->getShaderConstHandle(avar("$blendDepth%d", i));
+
       matInfo->detailTexConst = pass->shader->getShaderConstHandle( avar( "$detailMap%d", i ) );
       if ( matInfo->detailTexConst->isValid() )
       {
@@ -710,6 +714,12 @@ void TerrainCellMaterial::_updateMaterialConsts( Pass *pass )
 
       pass->consts->setSafe( matInfo->detailInfoVConst, detailScaleAndFade );
       pass->consts->setSafe( matInfo->detailInfoPConst, detailIdStrengthParallax );
+
+      // New blending
+      bool lerpBlend = Con::getBoolVariable("$Pref::Terrain::LerpBlend", true);
+      pass->consts->setSafe( matInfo->lerpBlend, lerpBlend ? 1.0f : 0.0f );
+
+      pass->consts->setSafe(matInfo->blendDepth, matInfo->mat->getBlendDepth());
 
 	// macro texture info
 
