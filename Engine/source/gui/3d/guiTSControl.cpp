@@ -159,6 +159,8 @@ GuiTSCtrl::GuiTSCtrl()
    mLastCameraQuery.nearPlane = 0.01f;
 
    mLastCameraQuery.projectionOffset = Point2F::Zero;
+   mLastCameraQuery.hasFovPort = false;
+   mLastCameraQuery.hasStereoTargets = false;
 
    mLastCameraQuery.ortho = false;
 }
@@ -312,6 +314,46 @@ F32 GuiTSCtrl::calculateViewDistance(F32 radius)
 
 //-----------------------------------------------------------------------------
 
+static FovPort CalculateFovPortForCanvas(const RectI viewport, const CameraQuery &cameraQuery)
+{
+   F32 wwidth;
+   F32 wheight;
+   F32 renderWidth = viewport.extent.x;
+   F32 renderHeight = viewport.extent.y;
+   F32 aspectRatio = renderWidth / renderHeight;
+
+   // Use the FOV to calculate the viewport height scale
+   // then generate the width scale from the aspect ratio.
+   if(!cameraQuery.ortho)
+   {
+      wheight = /*cameraQuery.nearPlane * */ mTan(cameraQuery.fov / 2.0f);
+      wwidth = aspectRatio * wheight;
+   }
+   else
+   {
+      wheight = cameraQuery.fov;
+      wwidth = aspectRatio * wheight;
+   }
+
+   F32 hscale = wwidth * 2.0f / renderWidth;
+   F32 vscale = wheight * 2.0f / renderHeight;
+
+   F32 left = 0.0f * hscale - wwidth;
+   F32 right = renderWidth * hscale - wwidth;
+   F32 top = wheight - vscale * 0.0f;
+   F32 bottom = wheight - vscale * renderHeight;
+
+   FovPort fovPort;
+   fovPort.upTan = top;
+   fovPort.downTan = -bottom;
+   fovPort.leftTan = -left;
+   fovPort.rightTan = right;
+
+   return fovPort;
+}
+
+//-----------------------------------------------------------------------------
+
 void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 {
 	// Save the current transforms so we can restore
@@ -340,7 +382,25 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       GFX->setCurrentRenderStyle(GFXDevice::RS_StereoSideBySide);
       GFX->setCurrentProjectionOffset(mLastCameraQuery.projectionOffset);
       GFX->setStereoEyeOffsets(mLastCameraQuery.eyeOffset);
-      GFX->setFovPort(mLastCameraQuery.fovPort); // NOTE: this specifies fov for BOTH eyes
+
+      if (!mLastCameraQuery.hasStereoTargets)
+      {
+         // Need to calculate our current viewport here
+         mLastCameraQuery.stereoViewports[0] = updateRect;
+         mLastCameraQuery.stereoViewports[0].extent.x /= 2;
+         mLastCameraQuery.stereoViewports[1] = mLastCameraQuery.stereoViewports[0];
+         mLastCameraQuery.stereoViewports[1].point.x += mLastCameraQuery.stereoViewports[1].extent.x;
+      }
+
+      if (!mLastCameraQuery.hasFovPort)
+      {
+         // Need to make our own fovPort
+         mLastCameraQuery.fovPort[0] = CalculateFovPortForCanvas(mLastCameraQuery.stereoViewports[0], mLastCameraQuery);
+         mLastCameraQuery.fovPort[1] = CalculateFovPortForCanvas(mLastCameraQuery.stereoViewports[1], mLastCameraQuery);
+      }
+         
+      GFX->setStereoFovPort(mLastCameraQuery.fovPort); // NOTE: this specifies fov for BOTH eyes
+
       GFX->setSteroViewports(mLastCameraQuery.stereoViewports);
       GFX->setStereoTargets(mLastCameraQuery.stereoTargets);
 
@@ -402,29 +462,6 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       mLastCameraQuery.cameraMatrix.mul(rotMat);
    }
 
-   // set up the camera and viewport stuff:
-   F32 wwidth;
-   F32 wheight;
-   F32 renderWidth = F32(renderSize.x);
-   F32 renderHeight = F32(renderSize.y);
-   F32 aspectRatio = renderWidth / renderHeight;
-   
-   // Use the FOV to calculate the viewport height scale
-   // then generate the width scale from the aspect ratio.
-   if(!mLastCameraQuery.ortho)
-   {
-      wheight = mLastCameraQuery.nearPlane * mTan(mLastCameraQuery.fov / 2.0f);
-      wwidth = aspectRatio * wheight;
-   }
-   else
-   {
-      wheight = mLastCameraQuery.fov;
-      wwidth = aspectRatio * wheight;
-   }
-
-   F32 hscale = wwidth * 2.0f / renderWidth;
-   F32 vscale = wheight * 2.0f / renderHeight;
-
    Frustum frustum;
    if(mRenderStyle == RenderStyleStereoSideBySide)
    {
@@ -433,6 +470,29 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    }
    else
    {
+      // set up the camera and viewport stuff:
+      F32 wwidth;
+      F32 wheight;
+      F32 renderWidth = F32(renderSize.x);
+      F32 renderHeight = F32(renderSize.y);
+      F32 aspectRatio = renderWidth / renderHeight;
+   
+      // Use the FOV to calculate the viewport height scale
+      // then generate the width scale from the aspect ratio.
+      if(!mLastCameraQuery.ortho)
+      {
+         wheight = mLastCameraQuery.nearPlane * mTan(mLastCameraQuery.fov / 2.0f);
+         wwidth = aspectRatio * wheight;
+      }
+      else
+      {
+         wheight = mLastCameraQuery.fov;
+         wwidth = aspectRatio * wheight;
+      }
+
+      F32 hscale = wwidth * 2.0f / renderWidth;
+      F32 vscale = wheight * 2.0f / renderHeight;
+
       F32 left = (updateRect.point.x - offset.x) * hscale - wwidth;
       F32 right = (updateRect.point.x + updateRect.extent.x - offset.x) * hscale - wwidth;
       F32 top = wheight - vscale * (updateRect.point.y - offset.y);
@@ -516,7 +576,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       
       Frustum originalFrustum = GFX->getFrustum();
       GFXTextureObject *texObject = mStereoGuiTarget->getTexture(0);
-      const FovPort *currentFovPort = GFX->getSteroFovPort();
+      const FovPort *currentFovPort = GFX->getStereoFovPort();
       const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
       const MatrixF *worldEyeTransforms = GFX->getInverseStereoEyeTransforms();
       const Point3F *eyeOffset = GFX->getStereoEyeOffsets();

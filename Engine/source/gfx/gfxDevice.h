@@ -354,10 +354,10 @@ public:
    void setStereoEyeTransforms(MatrixF *transforms) { dMemcpy(mStereoEyeTransforms, transforms, sizeof(mStereoEyeTransforms)); dMemcpy(mInverseStereoEyeTransforms, transforms, sizeof(mInverseStereoEyeTransforms)); mInverseStereoEyeTransforms[0].inverse(); mInverseStereoEyeTransforms[1].inverse();  }
 
    /// Set the current eye offset used during stereo rendering. Assumes NumStereoPorts are available.
-   void setFovPort(const FovPort *ports) { dMemcpy(mFovPorts, ports, sizeof(mFovPorts)); }
+   void setStereoFovPort(const FovPort *ports) { dMemcpy(mFovPorts, ports, sizeof(mFovPorts)); }
 
    /// Get the current eye offset used during stereo rendering
-   const FovPort* getSteroFovPort() { return mFovPorts; }
+   const FovPort* getStereoFovPort() { return mFovPorts; }
 
    /// Sets stereo viewports
    void setSteroViewports(const RectI *ports) { dMemcpy(mStereoViewports, ports, sizeof(RectI) * NumStereoPorts); }
