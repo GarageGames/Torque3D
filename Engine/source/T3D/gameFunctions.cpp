@@ -397,6 +397,7 @@ bool GameProcessCameraQuery(CameraQuery *query)
 
          display->getStereoViewports(query->stereoViewports);
          display->getStereoTargets(query->stereoTargets);
+         query->hasStereoTargets = true;
       }
       else
       {
