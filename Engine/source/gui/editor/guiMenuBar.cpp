@@ -1000,12 +1000,15 @@ GuiMenuBar::MenuItem* GuiMenuBar::findSubmenuItem(MenuItem *menuItem, const char
 //  Add a menuitem to the given submenu
 void GuiMenuBar::addSubmenuItem(Menu *menu, MenuItem *submenu, const char *text, U32 id, const char *accelerator, S32 checkGroup)
 {
-   // Check that the given menu item supports a submenu
-   if(submenu && !submenu->isSubmenu)
-   {
-      Con::errorf("GuiMenuBar::addSubmenuItem: Attempting to add menuitem '%s' to an invalid submenu",text);
-	  return;
-   }
+	// Check that the given menu item supports a submenu
+	//TorqueLab isSubmenu check removed and simply validate the submenu object
+	//if(submenu && !submenu->isSubmenu)
+	if (!submenu)
+	{
+		Con::errorf("GuiMenuBar::addSubmenuItem: Attempting to add menuitem '%s' to an invalid submenu", text);
+		return;
+	}
+	submenu->isSubmenu = true;//TorqueLab => Force isSubmenu to true (hack)
 
    // allocate the new menu item
    MenuItem *newMenuItem = new MenuItem;
@@ -1028,6 +1031,13 @@ void GuiMenuBar::addSubmenuItem(Menu *menu, MenuItem *submenu, const char *text,
 
    //  Point back to the submenu's menu
    newMenuItem->submenuParentMenu = menu;
+
+   //TorqueLab : Added to make sure there's a menu to add the item
+   if (!submenu->submenu){
+	   Menu *newMenu = sCreateMenu(submenu->text, submenu->id);
+	   submenu->submenu = newMenu;
+   }
+   //TorqueLab end
 
    // link it into the menu's menu item list
    MenuItem **walk = &submenu->submenu->firstMenuItem;
