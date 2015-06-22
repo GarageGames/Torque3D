@@ -6,7 +6,7 @@
 	>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
+			Name="Debug|x64"
 			>
 			<DebugSettings
 				Command="{$commandDebug}"
@@ -34,7 +34,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Optimized Debug|Win32"
+			Name="Optimized Debug|x64"
 			>
 			<DebugSettings
 				Command="{$commandOptimized}"
@@ -62,7 +62,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
+			Name="Release|x64"
 			>
 			<DebugSettings
 				Command="{$commandRelease}"

@@ -36,7 +36,7 @@
 {* we don't compile some files. *}
 {if dontCompile($dirWalk->path, $projOutput)}
 	<FileConfiguration
-		Name="Debug|Win32"
+		Name="Debug|x64"
 		ExcludedFromBuild="true"
 		>
 		<Tool
@@ -44,7 +44,7 @@
 		/>
 	</FileConfiguration>
 	<FileConfiguration
-		Name="Optimized Debug|Win32"
+		Name="Optimized Debug|x64"
 		ExcludedFromBuild="true"
 		>
 		<Tool
@@ -52,7 +52,7 @@
 		/>
 	</FileConfiguration>
 	<FileConfiguration
-		Name="Release|Win32"
+		Name="Release|x64"
 		ExcludedFromBuild="true"
 		>
 		<Tool
@@ -62,24 +62,24 @@
 {else}
 {if substr($dirWalk->path, -4, 4) == ".asm"}
 	<FileConfiguration
-		Name="Debug|Win32">
+		Name="Debug|x64">
 		<Tool
 			Name="VCCustomBuildTool"
-			CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe&quot; -f win32 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
+			CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe&quot; -f x64 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
 			Outputs="$(IntDir)/$(InputName).obj"/>
 	</FileConfiguration>
 	<FileConfiguration
-		Name="Optimized Debug|Win32">
+		Name="Optimized Debug|x64">
 		<Tool
 			Name="VCCustomBuildTool"
-			CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe&quot; -f win32 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
+			CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe&quot; -f x64 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
 			Outputs="$(IntDir)/$(InputName).obj"/>
 	</FileConfiguration>
 	<FileConfiguration
-		Name="Release|Win32">
+		Name="Release|x64">
 		<Tool
 			Name="VCCustomBuildTool"
-         CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe&quot; -f win32 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
+         CommandLine="&quot;{$binDir|replace:'//':'/'|replace:'/':'\\'}nasm\nasm.exe&quot; -f x64 &quot;$(InputPath)&quot; -o &quot;$(IntDir)/$(InputName).obj&quot;"
 			Outputs="$(IntDir)/$(InputName).obj"/>
 	</FileConfiguration>
 {/if}{* if path == "*.asm" *}

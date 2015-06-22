@@ -8,14 +8,14 @@
 	ProjectGUID="{$GUID}">
 	<Platforms>
 		<Platform
-			Name="Win32"
+			Name="x64"
 		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
+			Name="Debug|x64"
 			OutputDirectory="{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName)"
 			IntermediateDirectory="$(OutDir)/$(ProjectName)"
 			ConfigurationType="1"
@@ -117,7 +117,7 @@
 			/>
 		</Configuration>
       <Configuration
-			Name="Optimized Debug|Win32"
+			Name="Optimized Debug|x64"
 			OutputDirectory="{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName)"
 			IntermediateDirectory="$(OutDir)/$(ProjectName)"
 			ConfigurationType="1"
@@ -220,7 +220,7 @@
 			/>
       </Configuration>
 		<Configuration
-			Name="Release|Win32"
+			Name="Release|x64"
 			OutputDirectory="{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName)"
 			IntermediateDirectory="$(OutDir)/$(ProjectName)"
 			ConfigurationType="1"
