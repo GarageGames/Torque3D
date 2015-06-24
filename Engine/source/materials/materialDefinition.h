@@ -88,6 +88,7 @@ public:
       DynamicLightMask,
       NormalizeCube,
       TexTarget,
+      AccuMap,
    };
 
    enum BlendOp
@@ -198,6 +199,12 @@ public:
    // Data
    //-----------------------------------------------------------------------
    FileName mDiffuseMapFilename[MAX_STAGES];
+   bool     mAccuEnabled[MAX_STAGES];
+   F32      mAccuScale[MAX_STAGES];
+   F32      mAccuDirection[MAX_STAGES];
+   F32      mAccuStrength[MAX_STAGES];
+   F32      mAccuCoverage[MAX_STAGES];
+   F32      mAccuSpecular[MAX_STAGES];
    FileName mOverlayMapFilename[MAX_STAGES];
    FileName mLightMapFilename[MAX_STAGES];
    FileName mToneMapFilename[MAX_STAGES];
@@ -370,6 +377,9 @@ public:
    // ConsoleObject interface
    //
    static void initPersistFields();
+
+   // Accumulation
+   static bool _setAccuEnabled( void *object, const char *index, const char *data );
 
    DECLARE_CONOBJECT(Material);
 protected:

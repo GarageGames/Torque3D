@@ -27,6 +27,7 @@
 #include "core/strings/stringUnit.h"
 #include "console/consoleTypes.h"
 #include "console/simEvents.h"
+#include "console/engineAPI.h"
 #include "sim/netConnection.h"
 #include "math/mathUtils.h"
 #include "gfx/primBuilder.h"
@@ -2401,7 +2402,7 @@ void TerrainEditor::reorderMaterial( S32 index, S32 orderPos )
 
 //------------------------------------------------------------------------------
 
-ConsoleMethod( TerrainEditor, attachTerrain, void, 2, 3, "(TerrainBlock terrain)")
+DefineConsoleMethod( TerrainEditor, attachTerrain, void, (const char * terrain), (""), "(TerrainBlock terrain)")
 {
    SimSet * missionGroup = dynamic_cast<SimSet*>(Sim::findObject("MissionGroup"));
    if (!missionGroup)
@@ -2413,7 +2414,7 @@ ConsoleMethod( TerrainEditor, attachTerrain, void, 2, 3, "(TerrainBlock terrain)
    VectorPtr<TerrainBlock*> terrains;
 
    // attach to first found terrainBlock
-   if (argc == 2)
+   if (dStrcmp (terrain,"")==0)
    {
       for(SimSetIterator itr(missionGroup); *itr; ++itr)
       {
@@ -2428,13 +2429,13 @@ ConsoleMethod( TerrainEditor, attachTerrain, void, 2, 3, "(TerrainBlock terrain)
    }
    else  // attach to named object
    {
-      TerrainBlock* terrBlock = dynamic_cast<TerrainBlock*>(Sim::findObject(argv[2]));
+      TerrainBlock* terrBlock = dynamic_cast<TerrainBlock*>(Sim::findObject(terrain));
 
       if (terrBlock)
          terrains.push_back(terrBlock);
 
       if(terrains.size() == 0)
-         Con::errorf(ConsoleLogEntry::Script, "TerrainEditor::attach: failed to attach to object '%s'", argv[2]);
+         Con::errorf(ConsoleLogEntry::Script, "TerrainEditor::attach: failed to attach to object '%s'", terrain);
    }
 
    if (terrains.size() > 0)
@@ -2457,21 +2458,21 @@ ConsoleMethod( TerrainEditor, attachTerrain, void, 2, 3, "(TerrainBlock terrain)
    }
 }
 
-ConsoleMethod( TerrainEditor, getTerrainBlockCount, S32, 2, 2, "()")
+DefineConsoleMethod( TerrainEditor, getTerrainBlockCount, S32, (), , "()")
 {
    return object->getTerrainBlockCount();
 }
 
-ConsoleMethod( TerrainEditor, getTerrainBlock, S32, 3, 3, "(S32 index)")
+DefineConsoleMethod( TerrainEditor, getTerrainBlock, S32, (S32 index), , "(S32 index)")
 {
-   TerrainBlock* tb = object->getTerrainBlock(dAtoi(argv[2]));
+   TerrainBlock* tb = object->getTerrainBlock(index);
    if(!tb)
       return 0;
    else
       return tb->getId();
 }
 
-ConsoleMethod(TerrainEditor, getTerrainBlocksMaterialList, const char *, 2, 2, "() gets the list of current terrain materials for all terrain blocks.")
+DefineConsoleMethod(TerrainEditor, getTerrainBlocksMaterialList, const char *, (), , "() gets the list of current terrain materials for all terrain blocks.")
 {
    Vector<StringTableEntry> list;
    object->getTerrainBlocksMaterialList(list);
@@ -2500,25 +2501,23 @@ ConsoleMethod(TerrainEditor, getTerrainBlocksMaterialList, const char *, 2, 2, "
    return ret;
 }
 
-ConsoleMethod( TerrainEditor, setBrushType, void, 3, 3, "(string type)"
+DefineConsoleMethod( TerrainEditor, setBrushType, void, (String type), , "(string type)"
               "One of box, ellipse, selection.")
 {
-	object->setBrushType(argv[2]);
+	object->setBrushType(type);
 }
 
-ConsoleMethod( TerrainEditor, getBrushType, const char*, 2, 2, "()")
+DefineConsoleMethod( TerrainEditor, getBrushType, const char*, (), , "()")
 {
    return object->getBrushType();
 }
 
-ConsoleMethod( TerrainEditor, setBrushSize, void, 3, 4, "(int w [, int h])")
+DefineConsoleMethod( TerrainEditor, setBrushSize, void, ( S32 w, S32 h), (0), "(int w [, int h])")
 {
-   S32 w = dAtoi(argv[2]);
-   S32 h = argc > 3 ? dAtoi(argv[3]) : w;
-	object->setBrushSize( w, h );
+	object->setBrushSize( w, h==0?w:h );
 }
 
-ConsoleMethod( TerrainEditor, getBrushSize, const char*, 2, 2, "()")
+DefineConsoleMethod( TerrainEditor, getBrushSize, const char*, (), , "()")
 {
    Point2I size = object->getBrushSize();
 
@@ -2528,84 +2527,74 @@ ConsoleMethod( TerrainEditor, getBrushSize, const char*, 2, 2, "()")
    return ret;
 }
 
-ConsoleMethod( TerrainEditor, setBrushPressure, void, 3, 3, "(float pressure)")
+DefineConsoleMethod( TerrainEditor, setBrushPressure, void, (F32 pressure), , "(float pressure)")
 {
-   object->setBrushPressure( dAtof( argv[2] ) );
+   object->setBrushPressure( pressure );
 }
 
-ConsoleMethod( TerrainEditor, getBrushPressure, F32, 2, 2, "()")
+DefineConsoleMethod( TerrainEditor, getBrushPressure, F32, (), , "()")
 {
    return object->getBrushPressure();
 }
 
-ConsoleMethod( TerrainEditor, setBrushSoftness, void, 3, 3, "(float softness)")
+DefineConsoleMethod( TerrainEditor, setBrushSoftness, void, (F32 softness), , "(float softness)")
 {
-   object->setBrushSoftness( dAtof( argv[2] ) );
+   object->setBrushSoftness( softness );
 }
 
-ConsoleMethod( TerrainEditor, getBrushSoftness, F32, 2, 2, "()")
+DefineConsoleMethod( TerrainEditor, getBrushSoftness, F32, (), , "()")
 {
+	
    return object->getBrushSoftness();
 }
 
-ConsoleMethod( TerrainEditor, getBrushPos, const char*, 2, 2, "Returns a Point2I.")
+DefineConsoleMethod( TerrainEditor, getBrushPos, const char*, (), , "Returns a Point2I.")
 {
 	return object->getBrushPos();
 }
 
-ConsoleMethod( TerrainEditor, setBrushPos, void, 3, 4, "(int x, int y)")
+DefineConsoleMethod( TerrainEditor, setBrushPos, void, (Point2I pos), , "Location")
 {
-   //
-   Point2I pos;
-   if(argc == 3)
-      dSscanf(argv[2], "%d %d", &pos.x, &pos.y);
-   else
-   {
-      pos.x = dAtoi(argv[2]);
-      pos.y = dAtoi(argv[3]);
-   }
 
    object->setBrushPos(pos);
 }
 
-ConsoleMethod( TerrainEditor, setAction, void, 3, 3, "(string action_name)")
+DefineConsoleMethod( TerrainEditor, setAction, void, (const char * action_name), , "(string action_name)")
 {
-	object->setAction(argv[2]);
+	object->setAction(action_name);
 }
 
-ConsoleMethod( TerrainEditor, getActionName, const char*, 3, 3, "(int num)")
+DefineConsoleMethod( TerrainEditor, getActionName, const char*, (U32 index), , "(int num)")
 {
-	return (object->getActionName(dAtoi(argv[2])));
+	return (object->getActionName(index));
 }
 
-ConsoleMethod( TerrainEditor, getNumActions, S32, 2, 2, "")
+DefineConsoleMethod( TerrainEditor, getNumActions, S32, (), , "")
 {
 	return(object->getNumActions());
 }
 
-ConsoleMethod( TerrainEditor, getCurrentAction, const char*, 2, 2, "")
+DefineConsoleMethod( TerrainEditor, getCurrentAction, const char*, (), , "")
 {
 	return object->getCurrentAction();
 }
 
-ConsoleMethod( TerrainEditor, resetSelWeights, void, 3, 3, "(bool clear)")
+DefineConsoleMethod( TerrainEditor, resetSelWeights, void, (bool clear), , "(bool clear)")
 {
-	object->resetSelWeights(dAtob(argv[2]));
+	object->resetSelWeights(clear);
 }
 
-ConsoleMethod( TerrainEditor, clearSelection, void, 2, 2, "")
+DefineConsoleMethod( TerrainEditor, clearSelection, void, (), , "")
 {
    object->clearSelection();
 }
 
-ConsoleMethod( TerrainEditor, processAction, void, 2, 3, "(string action=NULL)")
+DefineConsoleMethod( TerrainEditor, processAction, void, (String action), (""), "(string action=NULL)")
 {
-	if(argc == 3)
-		object->processAction(argv[2]);
-	else object->processAction("");
+	object->processAction(action);
 }
 
-ConsoleMethod( TerrainEditor, getActiveTerrain, S32, 2, 2, "")
+DefineConsoleMethod( TerrainEditor, getActiveTerrain, S32, (), , "")
 {
    S32 ret = 0;
 
@@ -2617,27 +2606,27 @@ ConsoleMethod( TerrainEditor, getActiveTerrain, S32, 2, 2, "")
 	return ret;
 }
 
-ConsoleMethod( TerrainEditor, getNumTextures, S32, 2, 2, "")
+DefineConsoleMethod( TerrainEditor, getNumTextures, S32, (), , "")
 {
 	return object->getNumTextures();
 }
 
-ConsoleMethod( TerrainEditor, markEmptySquares, void, 2, 2, "")
+DefineConsoleMethod( TerrainEditor, markEmptySquares, void, (), , "")
 {
 	object->markEmptySquares();
 }
 
-ConsoleMethod( TerrainEditor, mirrorTerrain, void, 3, 3, "")
+DefineConsoleMethod( TerrainEditor, mirrorTerrain, void, (S32 mirrorIndex), , "")
 {
-	object->mirrorTerrain(dAtoi(argv[2]));
+	object->mirrorTerrain(mirrorIndex);
 }
 
-ConsoleMethod(TerrainEditor, setTerraformOverlay, void, 3, 3, "(bool overlayEnable) - sets the terraformer current heightmap to draw as an overlay over the current terrain.")
+DefineConsoleMethod(TerrainEditor, setTerraformOverlay, void, (bool overlayEnable), , "(bool overlayEnable) - sets the terraformer current heightmap to draw as an overlay over the current terrain.")
 {
    // XA: This one needs to be implemented :)
 }
 
-ConsoleMethod(TerrainEditor, updateMaterial, bool, 4, 4, 
+DefineConsoleMethod(TerrainEditor, updateMaterial, bool, ( U32 index, String matName ), , 
    "( int index, string matName )\n"
    "Changes the material name at the index." )
 {
@@ -2645,18 +2634,17 @@ ConsoleMethod(TerrainEditor, updateMaterial, bool, 4, 4,
    if ( !terr )
       return false;
    
-   U32 index = dAtoi( argv[2] );
    if ( index >= terr->getMaterialCount() )
       return false;
 
-   terr->updateMaterial( index, argv[3] );
+   terr->updateMaterial( index, matName );
 
    object->setDirty();
 
    return true;
 }
 
-ConsoleMethod(TerrainEditor, addMaterial, S32, 3, 3, 
+DefineConsoleMethod(TerrainEditor, addMaterial, S32, ( String matName ), , 
    "( string matName )\n"
    "Adds a new material." )
 {
@@ -2664,20 +2652,19 @@ ConsoleMethod(TerrainEditor, addMaterial, S32, 3, 3,
    if ( !terr )
       return false;
    
-   terr->addMaterial( argv[2] );
+   terr->addMaterial( matName );
 
    object->setDirty();
 
    return true;
 }
 
-ConsoleMethod( TerrainEditor, removeMaterial, void, 3, 3, "( int index ) - Remove the material at the given index." )
+DefineConsoleMethod( TerrainEditor, removeMaterial, void, ( S32 index ), , "( int index ) - Remove the material at the given index." )
 {
    TerrainBlock *terr = object->getClientTerrain();
    if ( !terr )
       return;
       
-   S32 index = dAtoi( argv[ 2 ] );
    if ( index < 0 || index >= terr->getMaterialCount() )
    {
       Con::errorf( "TerrainEditor::removeMaterial - index out of range!" );
@@ -2701,7 +2688,7 @@ ConsoleMethod( TerrainEditor, removeMaterial, void, 3, 3, "( int index ) - Remov
    object->setGridUpdateMinMax();
 }
 
-ConsoleMethod(TerrainEditor, getMaterialCount, S32, 2, 2, 
+DefineConsoleMethod(TerrainEditor, getMaterialCount, S32, (), , 
    "Returns the current material count." )
 {
    TerrainBlock *terr = object->getClientTerrain();
@@ -2711,7 +2698,7 @@ ConsoleMethod(TerrainEditor, getMaterialCount, S32, 2, 2,
    return 0;
 }
 
-ConsoleMethod(TerrainEditor, getMaterials, const char *, 2, 2, "() gets the list of current terrain materials.")
+DefineConsoleMethod(TerrainEditor, getMaterials, const char *, (), , "() gets the list of current terrain materials.")
 {
    TerrainBlock *terr = object->getClientTerrain();
    if ( !terr )
@@ -2728,13 +2715,12 @@ ConsoleMethod(TerrainEditor, getMaterials, const char *, 2, 2, "() gets the list
    return ret;
 }
 
-ConsoleMethod( TerrainEditor, getMaterialName, const char*, 3, 3, "( int index ) - Returns the name of the material at the given index." )
+DefineConsoleMethod( TerrainEditor, getMaterialName, const char*, (S32 index), , "( int index ) - Returns the name of the material at the given index." )
 {
    TerrainBlock *terr = object->getClientTerrain();
    if ( !terr )
       return "";
       
-   S32 index = dAtoi( argv[ 2 ] );
    if( index < 0 || index >= terr->getMaterialCount() )
    {
       Con::errorf( "TerrainEditor::getMaterialName - index out of range!" );
@@ -2745,13 +2731,12 @@ ConsoleMethod( TerrainEditor, getMaterialName, const char*, 3, 3, "( int index )
    return Con::getReturnBuffer( name );
 }
 
-ConsoleMethod( TerrainEditor, getMaterialIndex, S32, 3, 3, "( string name ) - Returns the index of the material with the given name or -1." )
+DefineConsoleMethod( TerrainEditor, getMaterialIndex, S32, ( String name ), , "( string name ) - Returns the index of the material with the given name or -1." )
 {
    TerrainBlock *terr = object->getClientTerrain();
    if ( !terr )
       return -1;
       
-   const char* name = argv[ 2 ];
    const U32 count = terr->getMaterialCount();
    
    for( U32 i = 0; i < count; ++ i )
@@ -2761,13 +2746,14 @@ ConsoleMethod( TerrainEditor, getMaterialIndex, S32, 3, 3, "( string name ) - Re
    return -1;
 }
 
-ConsoleMethod( TerrainEditor, reorderMaterial, void, 4, 4, "( int index, int order ) "
+DefineConsoleMethod( TerrainEditor, reorderMaterial, void, ( S32 index, S32 orderPos ), , "( int index, int order ) "
   "- Reorder material at the given index to the new position, changing the order in which it is rendered / blended." )
 {
-   object->reorderMaterial( dAtoi( argv[2] ), dAtoi( argv[3] ) );
+   object->reorderMaterial( index, orderPos );
 }
 
-ConsoleMethod(TerrainEditor, getTerrainUnderWorldPoint, S32, 3, 5, "(x/y/z) Gets the terrain block that is located under the given world point.\n"
+DefineConsoleMethod(TerrainEditor, getTerrainUnderWorldPoint, S32, (const char * ptOrX, const char * Y, const char * Z), ("", "", ""), 
+                                                                           "(x/y/z) Gets the terrain block that is located under the given world point.\n"
                                                                            "@param x/y/z The world coordinates (floating point values) you wish to query at. " 
                                                                            "These can be formatted as either a string (\"x y z\") or separately as (x, y, z)\n"
                                                                            "@return Returns the ID of the requested terrain block (0 if not found).\n\n")
@@ -2776,13 +2762,13 @@ ConsoleMethod(TerrainEditor, getTerrainUnderWorldPoint, S32, 3, 5, "(x/y/z) Gets
    if(tEditor == NULL)
       return 0;
    Point3F pos;
-   if(argc == 3)
-      dSscanf(argv[2], "%f %f %f", &pos.x, &pos.y, &pos.z);
-   else if(argc == 5)
+   if(!dStrIsEmpty(ptOrX) && dStrIsEmpty(Y) && dStrIsEmpty(Z))
+      dSscanf(ptOrX, "%f %f %f", &pos.x, &pos.y, &pos.z);
+   else if(!dStrIsEmpty(ptOrX) && !dStrIsEmpty(Y) && !dStrIsEmpty(Z))
    {
-      pos.x = dAtof(argv[2]);
-      pos.y = dAtof(argv[3]);
-      pos.z = dAtof(argv[4]);
+      pos.x = dAtof(ptOrX);
+      pos.y = dAtof(Y);
+      pos.z = dAtof(Z);
    }
 
    else
@@ -2835,14 +2821,13 @@ void TerrainEditor::initPersistFields()
    Parent::initPersistFields();
 }
 
-ConsoleMethod( TerrainEditor, getSlopeLimitMinAngle, F32, 2, 2, 0)
+DefineConsoleMethod( TerrainEditor, getSlopeLimitMinAngle, F32, (), , "")
 {
    return object->mSlopeMinAngle;
 }
 
-ConsoleMethod( TerrainEditor, setSlopeLimitMinAngle, F32, 3, 3, 0)
+DefineConsoleMethod( TerrainEditor, setSlopeLimitMinAngle, F32, (F32 angle), , "")
 {
-	F32 angle = dAtof( argv[2] );	
 	if ( angle < 0.0f )
 		angle = 0.0f;
    if ( angle > object->mSlopeMaxAngle )
@@ -2852,14 +2837,13 @@ ConsoleMethod( TerrainEditor, setSlopeLimitMinAngle, F32, 3, 3, 0)
 	return angle;
 }
 
-ConsoleMethod( TerrainEditor, getSlopeLimitMaxAngle, F32, 2, 2, 0)
+DefineConsoleMethod( TerrainEditor, getSlopeLimitMaxAngle, F32, (), , "")
 {
    return object->mSlopeMaxAngle;
 }
 
-ConsoleMethod( TerrainEditor, setSlopeLimitMaxAngle, F32, 3, 3, 0)
+DefineConsoleMethod( TerrainEditor, setSlopeLimitMaxAngle, F32, (F32 angle), , "")
 {
-	F32 angle = dAtof( argv[2] );	
 	if ( angle > 90.0f )
 		angle = 90.0f;
    if ( angle < object->mSlopeMinAngle )
@@ -2936,9 +2920,15 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
    mUndoSel = 0;  
   
    scheduleMaterialUpdate();     
-}  
-  
-ConsoleMethod( TerrainEditor, autoMaterialLayer, void, 7, 7, "(float minHeight, float maxHeight, float minSlope, float maxSlope, float coverage)")   
-{  
-   object->autoMaterialLayer( dAtof(argv[2]), dAtof(argv[3]), dAtof(argv[4]), dAtof(argv[5]), dAtof(argv[6]));  
-}  
+}
+
+DefineEngineMethod( TerrainEditor, autoMaterialLayer, void, (F32 minHeight, F32 maxHeight, F32 minSlope, F32 maxSlope, F32 coverage),,
+   "Rule based terrain painting.\n"
+   "@param minHeight Minimum terrain height."
+   "@param maxHeight Maximum terrain height."
+   "@param minSlope Minimum terrain slope."
+   "@param maxSlope Maximum terrain slope."
+   "@param coverage Terrain coverage amount.")
+{
+   object->autoMaterialLayer( minHeight,maxHeight, minSlope, maxSlope, coverage );  
+}

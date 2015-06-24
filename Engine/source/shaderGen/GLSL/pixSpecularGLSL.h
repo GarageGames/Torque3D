@@ -58,6 +58,9 @@ class SpecularMapGLSL : public ShaderFeatureGLSL
 {
 
 public:
+   virtual void processVert( Vector<ShaderComponent*> &componentList,
+                             const MaterialFeatureData &fd );
+
    virtual void processPix( Vector<ShaderComponent*> &componentList, 
       const MaterialFeatureData &fd );
 

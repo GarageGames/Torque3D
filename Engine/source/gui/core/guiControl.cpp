@@ -307,7 +307,7 @@ void GuiControl::initPersistFields()
 
 //-----------------------------------------------------------------------------
 
-bool GuiControl::processArguments(S32 argc, const char **argv)
+bool GuiControl::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    // argv[0] - The GuiGroup to add this control to when it's created.  
    //           this is an optional parameter that may be specified at
@@ -2613,17 +2613,24 @@ DefineEngineMethod( GuiControl, setValue, void, ( const char* value ),,
    object->setScriptValue( value );
 }
 
-ConsoleMethod( GuiControl, getValue, const char*, 2, 2, "")
+DefineEngineMethod( GuiControl, getValue, const char*, (),,
+   "Get the value associated with the control.\n"
+   "@return value for the control.\n" )
 {
    return object->getScriptValue();
 }
 
-ConsoleMethod( GuiControl, makeFirstResponder, void, 3, 3, "(bool isFirst)")
+DefineEngineMethod( GuiControl, makeFirstResponder, void, ( bool isFirst ),,
+   "Make this control the first responder.\n"
+   "@param isFirst True to make first responder, false to not.\n" )
 {
-   object->makeFirstResponder(dAtob(argv[2]));
+   //object->makeFirstResponder(dAtob(argv[2]));
+   object->makeFirstResponder(isFirst);
 }
 
-ConsoleMethod( GuiControl, isActive, bool, 2, 2, "")
+DefineEngineMethod( GuiControl, isActive, bool, (),,
+   "Check if this control is active or not.\n"
+   "@return True if it's active, false if not.\n" )
 {
    return object->isActive();
 }
@@ -2631,7 +2638,8 @@ ConsoleMethod( GuiControl, isActive, bool, 2, 2, "")
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( GuiControl, setActive, void, ( bool state ), ( true ),
-   "" )
+   "Set the control as active or inactive."
+   "@param state True to set the control as active, false to set it as inactive.")
 {
    object->setActive( state );
 }
@@ -2806,22 +2814,19 @@ static ConsoleDocFragment _sGuiControlSetExtent2(
    "GuiControl", // The class to place the method in; use NULL for functions.
    "void setExtent( Point2I p );" ); // The definition string.
 
-ConsoleMethod( GuiControl, setExtent, void, 3, 4,
+DefineConsoleMethod( GuiControl, setExtent, void, ( const char* extOrX, const char* y ), (""),
    "( Point2I p | int x, int y ) Set the width and height of the control.\n\n"
    "@hide" )
 {
-   if ( argc == 3 )
+   Point2I extent;
+   if(!dStrIsEmpty(extOrX) && dStrIsEmpty(y))
+      dSscanf(extOrX, "%d %d", &extent.x, &extent.y);
+   else if(!dStrIsEmpty(extOrX) && !dStrIsEmpty(y))
    {
-      // We scan for floats because its possible that math 
-      // done on the extent can result in fractional values.
-      Point2F ext;
-      if ( dSscanf( argv[2], "%g %g", &ext.x, &ext.y ) == 2 )
-         object->setExtent( (S32)ext.x, (S32)ext.y );
-      else
-         Con::errorf( "GuiControl::setExtent, not enough parameters!" );
+      extent.x = dAtoi(extOrX);
+      extent.y = dAtoi(y);
    }
-   else if ( argc == 4 )
-      object->setExtent( dAtoi(argv[2]), dAtoi(argv[3]) );
+   object->setExtent( extent );
 }
 
 //-----------------------------------------------------------------------------

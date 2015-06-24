@@ -468,6 +468,7 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
    STEtoCode = compileSTEtoCode;
 
    gStatementList = NULL;
+   gAnonFunctionList = NULL;
 
    // Set up the parser.
    smCurrentParser = getParserForFile(fileName);
@@ -477,6 +478,17 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
    smCurrentParser->setScanBuffer(script, fileName);
    smCurrentParser->restart(NULL);
    smCurrentParser->parse();
+   if (gStatementList)
+   {
+      if (gAnonFunctionList)
+      {
+         // Prepend anonymous functions to statement list, so they're defined already when
+         // the statements run.
+         gAnonFunctionList->append(gStatementList);
+         gStatementList = gAnonFunctionList;
+      }
+   }
+
 
    if(gSyntaxError)
    {
@@ -558,7 +570,7 @@ bool CodeBlock::compile(const char *codeFileName, StringTableEntry fileName, con
 
 }
 
-const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, S32 setFrame)
+ConsoleValueRef CodeBlock::compileExec(StringTableEntry fileName, const char *inString, bool noCalls, S32 setFrame)
 {
 	AssertFatal(Con::isMainThread(), "Compiling code on a secondary thread");
 	
@@ -599,6 +611,7 @@ const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inStri
       addToCodeList();
    
    gStatementList = NULL;
+   gAnonFunctionList = NULL;
 
    // Set up the parser.
    smCurrentParser = getParserForFile(fileName);
@@ -608,11 +621,21 @@ const char *CodeBlock::compileExec(StringTableEntry fileName, const char *inStri
    smCurrentParser->setScanBuffer(string, fileName);
    smCurrentParser->restart(NULL);
    smCurrentParser->parse();
+   if (gStatementList)
+   {
+      if (gAnonFunctionList)
+      {
+         // Prepend anonymous functions to statement list, so they're defined already when
+         // the statements run.
+         gAnonFunctionList->append(gStatementList);
+         gStatementList = gAnonFunctionList;
+      }
+   }
 
    if(!gStatementList)
    {
       delete this;
-      return "";
+      return ConsoleValueRef();
    }
 
    resetTables();
@@ -832,6 +855,26 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
             break;
          }
 
+         case OP_RETURN_UINT:
+         {
+            Con::printf( "%i: OP_RETURNUINT", ip - 1 );
+
+            if( upToReturn )
+               return;
+
+            break;
+         }
+
+         case OP_RETURN_FLT:
+         {
+            Con::printf( "%i: OP_RETURNFLT", ip - 1 );
+
+            if( upToReturn )
+               return;
+
+            break;
+         }
+
          case OP_CMPEQ:
          {
             Con::printf( "%i: OP_CMPEQ", ip - 1 );
@@ -1012,6 +1055,12 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
             break;
          }
 
+         case OP_LOADVAR_VAR:
+         {
+            Con::printf( "%i: OP_LOADVAR_VAR", ip - 1 );
+            break;
+         }
+
          case OP_SAVEVAR_UINT:
          {
             Con::printf( "%i: OP_SAVEVAR_UINT", ip - 1 );
@@ -1027,6 +1076,12 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          case OP_SAVEVAR_STR:
          {
             Con::printf( "%i: OP_SAVEVAR_STR", ip - 1 );
+            break;
+         }
+
+         case OP_SAVEVAR_VAR:
+         {
+            Con::printf( "%i: OP_SAVEVAR_VAR", ip - 1 );
             break;
          }
 
@@ -1161,6 +1216,12 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
             break;
          }
 
+         case OP_COPYVAR_TO_NONE:
+         {
+            Con::printf( "%i: OP_COPYVAR_TO_NONE", ip - 1 );
+            break;
+         }
+
          case OP_LOADIMMED_UINT:
          {
             U32 val = code[ ip ];
@@ -1284,6 +1345,24 @@ void CodeBlock::dumpInstructions( U32 startIp, bool upToReturn )
          case OP_PUSH:
          {
             Con::printf( "%i: OP_PUSH", ip - 1 );
+            break;
+         }
+
+         case OP_PUSH_UINT:
+         {
+            Con::printf( "%i: OP_PUSH_UINT", ip - 1 );
+            break;
+         }
+
+         case OP_PUSH_FLT:
+         {
+            Con::printf( "%i: OP_PUSH_FLT", ip - 1 );
+            break;
+         }
+
+         case OP_PUSH_VAR:
+         {
+            Con::printf( "%i: OP_PUSH_VAR", ip - 1 );
             break;
          }
 

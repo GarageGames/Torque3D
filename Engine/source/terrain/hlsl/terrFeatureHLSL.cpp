@@ -30,15 +30,16 @@
 #include "shaderGen/langElement.h"
 #include "shaderGen/shaderOp.h"
 #include "shaderGen/featureMgr.h"
+#include "shaderGen/shaderGen.h"
 #include "core/module.h"
 
-
-MODULE_BEGIN( TerrainFeatHLSL )
-
-   MODULE_INIT_AFTER( ShaderGenFeatureMgr )
-
-   MODULE_INIT
+namespace 
+{
+   void register_hlsl_shader_features_for_terrain(GFXAdapterType type)
    {
+      if(type != Direct3D9 && type != Direct3D9_360)
+         return;
+
       FEATUREMGR->registerFeature( MFT_TerrainBaseMap, new TerrainBaseMapFeatHLSL );
       FEATUREMGR->registerFeature( MFT_TerrainParallaxMap, new NamedFeatureHLSL( "Terrain Parallax Texture" ) );   
       FEATUREMGR->registerFeature( MFT_TerrainDetailMap, new TerrainDetailMapFeatHLSL );
@@ -47,6 +48,17 @@ MODULE_BEGIN( TerrainFeatHLSL )
       FEATUREMGR->registerFeature( MFT_TerrainLightMap, new TerrainLightMapFeatHLSL );
       FEATUREMGR->registerFeature( MFT_TerrainSideProject, new NamedFeatureHLSL( "Terrain Side Projection" ) );
       FEATUREMGR->registerFeature( MFT_TerrainAdditive, new TerrainAdditiveFeatHLSL );
+   }
+
+};
+
+MODULE_BEGIN( TerrainFeatHLSL )
+
+   MODULE_INIT_AFTER( ShaderGen )
+
+   MODULE_INIT
+   {      
+      SHADERGEN->getFeatureInitSignal().notify(&register_hlsl_shader_features_for_terrain);
    }
 
 MODULE_END;
@@ -446,7 +458,7 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
    }
 
    // Add to the blend total.
-   meta->addStatement( new GenOp( "   @ = max( @, @ );\r\n", blendTotal, blendTotal, detailBlend ) );
+   meta->addStatement( new GenOp( "   @ += @;\r\n", blendTotal, detailBlend ) );
 
    // If we had a parallax feature... then factor in the parallax
    // amount so that it fades out with the layer blending.
@@ -533,8 +545,8 @@ void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
    Var *baseColor = (Var*)LangElement::find( "baseColor" );
    Var *outColor = (Var*)LangElement::find( "col" );
 
-   meta->addStatement( new GenOp( "      @ = lerp( @, @ + @, @ );\r\n",
-                                    outColor, outColor, baseColor, detailColor, detailBlend ) );
+   meta->addStatement( new GenOp( "      @ += @ * @;\r\n",
+                                    outColor, detailColor, detailBlend));
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 
@@ -730,7 +742,7 @@ void TerrainMacroMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentL
    }
 
    // Add to the blend total.
-   meta->addStatement( new GenOp( "   @ = max( @, @ );\r\n", blendTotal, blendTotal, detailBlend ) );
+   meta->addStatement( new GenOp( "   @ += @;\r\n", blendTotal, detailBlend ) );
 
    // If this is a prepass then we skip color.
    if ( fd.features.hasFeature( MFT_PrePassConditioner ) )
@@ -803,9 +815,8 @@ void TerrainMacroMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentL
    //Var *baseColor = (Var*)LangElement::find( "baseColor" );
    Var *outColor = (Var*)LangElement::find( "col" );
 
-   meta->addStatement( new GenOp( "      @ = lerp( @, @ + @, @ );\r\n",
-                                    outColor, outColor, outColor, detailColor, detailBlend ) );
-   //outColor, outColor, baseColor, detailColor, detailBlend ) );
+   meta->addStatement(new GenOp("      @ += @ * @;\r\n",
+                                    outColor, detailColor, detailBlend));
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 

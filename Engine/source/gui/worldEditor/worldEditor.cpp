@@ -1471,7 +1471,7 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
    }
 
    GFX->setStateBlock(mSplineSB);
-
+   GFX->setupGenericShaders();
 
    if (path->isLooping())
    {
@@ -2760,7 +2760,7 @@ void WorldEditor::initPersistFields()
 //------------------------------------------------------------------------------
 // These methods are needed for the console interfaces.
 
-void WorldEditor::ignoreObjClass( U32 argc, const char **argv )
+void WorldEditor::ignoreObjClass( U32 argc, ConsoleValueRef *argv )
 {
    for(S32 i = 2; i < argc; i++)
    {
@@ -2877,15 +2877,6 @@ const Point3F& WorldEditor::getSelectionCentroid()
    }
 
    return mObjectsUseBoxCenter ? mSelected->getBoxCentroid() : mSelected->getCentroid();
-}
-
-const char* WorldEditor::getSelectionCentroidText()
-{
-   const Point3F & centroid = getSelectionCentroid();
-   static const U32 bufSize = 100;
-   char * ret = Con::getReturnBuffer(bufSize);
-   dSprintf(ret, bufSize, "%g %g %g", centroid.x, centroid.y, centroid.z);
-   return ret;	
 }
 
 const Box3F& WorldEditor::getSelectionBounds()
@@ -3187,17 +3178,21 @@ ConsoleMethod( WorldEditor, ignoreObjClass, void, 3, 0, "(string class_name, ...
 	object->ignoreObjClass(argc, argv);
 }
 
-ConsoleMethod( WorldEditor, clearIgnoreList, void, 2, 2, "")
+DefineEngineMethod( WorldEditor, clearIgnoreList, void, (),,
+   "Clear the ignore class list.\n")
 {
 	object->clearIgnoreList();
 }
 
-ConsoleMethod( WorldEditor, clearSelection, void, 2, 2, "")
+DefineEngineMethod( WorldEditor, clearSelection, void, (),,
+   "Clear the selection.\n")
 {
 	object->clearSelection();
 }
 
-ConsoleMethod( WorldEditor, getActiveSelection, S32, 2, 2, "() - Return the currently active WorldEditorSelection object." )
+DefineEngineMethod( WorldEditor, getActiveSelection, S32, (),,
+   "Return the currently active WorldEditorSelection object.\n"
+   "@return currently active WorldEditorSelection object or 0 if no selection set is available.")
 {
    if( !object->getActiveSelectionSet() )
       return 0;
@@ -3205,43 +3200,48 @@ ConsoleMethod( WorldEditor, getActiveSelection, S32, 2, 2, "() - Return the curr
    return object->getActiveSelectionSet()->getId();
 }
 
-ConsoleMethod( WorldEditor, setActiveSelection, void, 3, 3, "( id set ) - Set the currently active WorldEditorSelection object." )
+DefineConsoleMethod( WorldEditor, setActiveSelection, void, ( WorldEditorSelection* selection), ,
+   "Set the currently active WorldEditorSelection object.\n"
+   "@param	selection A WorldEditorSelectionSet object to use for the selection container.")
 {
-   WorldEditorSelection* selection;
-   if( !Sim::findObject( argv[ 2 ], selection ) )
-   {
-      Con::errorf( "WorldEditor::setActiveSelectionSet - no selection set '%s'", argv[ 2 ] );
-      return;
-   }
-   
+	if (selection)
    object->makeActiveSelectionSet( selection );
 }
 
-ConsoleMethod( WorldEditor, selectObject, void, 3, 3, "(SimObject obj)")
+DefineEngineMethod( WorldEditor, selectObject, void, (SimObject* obj),,
+   "Selects a single object."
+   "@param obj	Object to select.")
 {
-	object->selectObject(argv[2]);
+	object->selectObject(obj);
 }
 
-ConsoleMethod( WorldEditor, unselectObject, void, 3, 3, "(SimObject obj)")
+DefineEngineMethod( WorldEditor, unselectObject, void, (SimObject* obj),,
+   "Unselects a single object."
+   "@param obj	Object to unselect.")
 {
-	object->unselectObject(argv[2]);
+	object->unselectObject(obj);
 }
 
-ConsoleMethod( WorldEditor, invalidateSelectionCentroid, void, 2, 2, "")
+DefineEngineMethod( WorldEditor, invalidateSelectionCentroid, void, (),,
+   "Invalidate the selection sets centroid.")
 {
    WorldEditor::Selection* sel = object->getActiveSelectionSet();
    if(sel)
 	   sel->invalidateCentroid();
 }
 
-ConsoleMethod( WorldEditor, getSelectionSize, S32, 2, 2, "() - Return the number of objects currently selected in the editor.")
+DefineEngineMethod( WorldEditor, getSelectionSize, S32, (),,
+	"Return the number of objects currently selected in the editor."
+	"@return number of objects currently selected in the editor.")
 {
 	return object->getSelectionSize();
 }
 
-ConsoleMethod( WorldEditor, getSelectedObject, S32, 3, 3, "(int index)")
+DefineEngineMethod( WorldEditor, getSelectedObject, S32, (S32 index),,
+	"Return the selected object and the given index."
+	"@param index Index of selected object to get."
+	"@return selected object at given index or -1 if index is incorrect.")
 {
-   S32 index = dAtoi(argv[2]);
    if(index < 0 || index >= object->getSelectionSize())
    {
       Con::errorf(ConsoleLogEntry::General, "WorldEditor::getSelectedObject: invalid object index");
@@ -3251,30 +3251,31 @@ ConsoleMethod( WorldEditor, getSelectedObject, S32, 3, 3, "(int index)")
    return(object->getSelectObject(index));
 }
 
-ConsoleMethod( WorldEditor, getSelectionRadius, F32, 2, 2, "")
+DefineEngineMethod( WorldEditor, getSelectionRadius, F32, (),,
+	"Get the radius of the current selection."
+	"@return radius of the current selection.")
 {
 	return object->getSelectionRadius();
 }
 
-ConsoleMethod( WorldEditor, getSelectionCentroid, const char *, 2, 2, "")
+DefineEngineMethod( WorldEditor, getSelectionCentroid, Point3F, (),,
+	"Get centroid of the selection."
+	"@return centroid of the selection.")
 {
-	return object->getSelectionCentroidText();
+	return object->getSelectionCentroid();
 }
 
-ConsoleMethod( WorldEditor, getSelectionExtent, const char *, 2, 2, "")
+DefineEngineMethod( WorldEditor, getSelectionExtent, Point3F, (),,
+	"Get extent of the selection."
+	"@return extent of the selection.")
 {
-   Point3F bounds = object->getSelectionExtent();
-   static const U32 bufSize = 100;
-   char * ret = Con::getReturnBuffer(bufSize);
-   dSprintf(ret, bufSize, "%g %g %g", bounds.x, bounds.y, bounds.z);
-   return ret;	
+   return object->getSelectionExtent();
 }
 
-ConsoleMethod( WorldEditor, dropSelection, void, 2, 3, "( bool skipUndo = false )")
+DefineEngineMethod( WorldEditor, dropSelection, void, (bool skipUndo), (false),
+	"Drop the current selection."
+	"@param skipUndo True to skip creating undo's for this action, false to create an undo.")
 {
-   bool skipUndo = false;
-   if ( argc > 2 )
-      skipUndo = dAtob( argv[2] );
 
 	object->dropCurrentSelection( skipUndo );
 }
@@ -3289,17 +3290,20 @@ void WorldEditor::copyCurrentSelection()
 	copySelection(mSelected);	
 }
 
-ConsoleMethod( WorldEditor, cutSelection, void, 2, 2, "")
+DefineEngineMethod( WorldEditor, cutSelection, void, (), ,
+	"Cut the current selection to be pasted later.")
 {
    object->cutCurrentSelection();
 }
 
-ConsoleMethod( WorldEditor, copySelection, void, 2, 2, "")
+DefineEngineMethod( WorldEditor, copySelection, void, (), ,
+	"Copy the current selection to be pasted later.")
 {
    object->copyCurrentSelection();
 }
 
-ConsoleMethod( WorldEditor, pasteSelection, void, 2, 2, "")
+DefineEngineMethod( WorldEditor, pasteSelection, void, (), ,
+	"Paste the current selection.")
 {
    object->pasteSelection();
 }
@@ -3309,171 +3313,207 @@ bool WorldEditor::canPasteSelection()
 	return mCopyBuffer.empty() != true;
 }
 
-ConsoleMethod( WorldEditor, canPasteSelection, bool, 2, 2, "")
+DefineEngineMethod( WorldEditor, canPasteSelection, bool, (), ,
+	"Check if we can paste the current selection."
+	"@return True if we can paste the current selection, false if not.")
 {
 	return object->canPasteSelection();
 }
 
-ConsoleMethod( WorldEditor, hideObject, void, 4, 4, "(Object obj, bool hide)")
+DefineEngineMethod( WorldEditor, hideObject, void, (SceneObject* obj, bool hide), ,
+	"Hide/show the given object."
+	"@param obj	Object to hide/show."
+	"@param hide True to hide the object, false to show it.")
 {
-   SceneObject *obj;
-   if ( !Sim::findObject( argv[2], obj ) )
-      return;
 
-   object->hideObject(obj, dAtob(argv[3]));
+	if (obj)
+   object->hideObject(obj, hide);
 }
 
-ConsoleMethod( WorldEditor, hideSelection, void, 3, 3, "(bool hide)")
+DefineEngineMethod( WorldEditor, hideSelection, void, (bool hide), ,
+	"Hide/show the selection."
+	"@param hide True to hide the selection, false to show it.")
 {
-   object->hideSelection(dAtob(argv[2]));
+   object->hideSelection(hide);
 }
 
-ConsoleMethod( WorldEditor, lockSelection, void, 3, 3, "(bool lock)")
+DefineEngineMethod( WorldEditor, lockSelection, void, (bool lock), ,
+	"Lock/unlock the selection."
+	"@param lock True to lock the selection, false to unlock it.")
 {
-   object->lockSelection(dAtob(argv[2]));
+   object->lockSelection(lock);
 }
 
-ConsoleMethod( WorldEditor, alignByBounds, void, 3, 3, "(int boundsAxis)"
-              "Align all selected objects against the given bounds axis.")
+//TODO: Put in the param possible options and what they mean
+DefineEngineMethod( WorldEditor, alignByBounds, void, (S32 boundsAxis), ,
+	"Align all selected objects against the given bounds axis."
+	"@param boundsAxis Bounds axis to align all selected objects against.")
 {
-	if(!object->alignByBounds(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", argv[2]));
+	if(!object->alignByBounds(boundsAxis))
+		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByBounds: invalid bounds axis '%s'", boundsAxis));
 }
 
-ConsoleMethod( WorldEditor, alignByAxis, void, 3, 3, "(int axis)"
-              "Align all selected objects along the given axis.")
+//TODO: Put in the param possible options and what they mean (assuming x,y,z)
+DefineEngineMethod( WorldEditor, alignByAxis, void, (S32 axis), ,
+	"Align all selected objects along the given axis."
+	"@param axis Axis to align all selected objects along.")
 {
-	if(!object->alignByAxis(dAtoi(argv[2])))
-		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", argv[2]));
+	if(!object->alignByAxis(axis))
+		Con::warnf(ConsoleLogEntry::General, avar("worldEditor.alignByAxis: invalid axis '%s'", axis));
 }
 
-ConsoleMethod( WorldEditor, resetSelectedRotation, void, 2, 2, "")
+DefineEngineMethod( WorldEditor, resetSelectedRotation, void, (), ,
+	"Reset the rotation of the selection.")
 {
 	object->resetSelectedRotation();
 }
 
-ConsoleMethod( WorldEditor, resetSelectedScale, void, 2, 2, "")
+DefineEngineMethod( WorldEditor, resetSelectedScale, void, (), ,
+	"Reset the scale of the selection.")
 {
 	object->resetSelectedScale();
 }
 
-ConsoleMethod( WorldEditor, redirectConsole, void, 3, 3, "( int objID )")
+//TODO: Better documentation on exactly what this does.
+DefineEngineMethod( WorldEditor, redirectConsole, void, (S32 objID), ,
+	"Redirect console."
+	"@param objID Object id.")
 {
-   object->redirectConsole(dAtoi(argv[2]));
+   object->redirectConsole(objID);
 }
 
-ConsoleMethod( WorldEditor, addUndoState, void, 2, 2, "")
+DefineEngineMethod( WorldEditor, addUndoState, void, (), ,
+	"Adds/Submits an undo state to the undo manager.")
 {
 	object->addUndoState();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditor, getSoftSnap, bool, 2, 2, "getSoftSnap()\n"
-              "Is soft snapping always on?")
+DefineEngineMethod( WorldEditor, getSoftSnap, bool, (), ,
+	"Is soft snapping always on?"
+	"@return True if soft snap is on, false if not.")
 {
 	return object->mSoftSnap;
 }
 
-ConsoleMethod( WorldEditor, setSoftSnap, void, 3, 3, "setSoftSnap(bool)\n"
-              "Allow soft snapping all of the time.")
+DefineEngineMethod( WorldEditor, setSoftSnap, void, (bool softSnap), ,
+	"Allow soft snapping all of the time."
+	"@param softSnap True to turn soft snap on, false to turn it off.")
 {
-	object->mSoftSnap = dAtob(argv[2]);
+	object->mSoftSnap = softSnap;
 }
 
-ConsoleMethod( WorldEditor, getSoftSnapSize, F32, 2, 2, "getSoftSnapSize()\n"
-              "Get the absolute size to trigger a soft snap.")
+DefineEngineMethod( WorldEditor, getSoftSnapSize, F32, (), ,
+	"Get the absolute size to trigger a soft snap."
+	"@return absolute size to trigger a soft snap.")
 {
 	return object->mSoftSnapSize;
 }
 
-ConsoleMethod( WorldEditor, setSoftSnapSize, void, 3, 3, "setSoftSnapSize(F32)\n"
-              "Set the absolute size to trigger a soft snap.")
+DefineEngineMethod( WorldEditor, setSoftSnapSize, void, (F32 size), ,
+	"Set the absolute size to trigger a soft snap."
+	"@param size Absolute size to trigger a soft snap.")
 {
-	object->mSoftSnapSize = dAtof(argv[2]);
+	object->mSoftSnapSize = size;
 }
 
 DefineEngineMethod( WorldEditor, getSoftSnapAlignment, WorldEditor::AlignmentType, (),,
-   "Get the soft snap alignment." )
+	"Get the soft snap alignment."
+	"@return soft snap alignment.")
 {
    return object->mSoftSnapAlignment;
 }
 
 DefineEngineMethod( WorldEditor, setSoftSnapAlignment, void, ( WorldEditor::AlignmentType type ),,
-   "Set the soft snap alignment." )
+	"Set the soft snap alignment."
+	"@param type Soft snap alignment type.")
 {
    object->mSoftSnapAlignment = type;
 }
 
-ConsoleMethod( WorldEditor, softSnapSizeByBounds, void, 3, 3, "softSnapSizeByBounds(bool)\n"
-              "Use selection bounds size as soft snap bounds.")
+DefineEngineMethod( WorldEditor, softSnapSizeByBounds, void, (bool useBounds), ,
+	"Use selection bounds size as soft snap bounds."
+	"@param useBounds True to use selection bounds size as soft snap bounds, false to not.")
 {
-	object->mSoftSnapSizeByBounds = dAtob(argv[2]);
+	object->mSoftSnapSizeByBounds = useBounds;
 }
 
-ConsoleMethod( WorldEditor, getSoftSnapBackfaceTolerance, F32, 2, 2, "getSoftSnapBackfaceTolerance()\n"
-              "The fraction of the soft snap radius that backfaces may be included.")
+DefineEngineMethod( WorldEditor, getSoftSnapBackfaceTolerance, F32, (),,
+	"Get the fraction of the soft snap radius that backfaces may be included."
+	"@return fraction of the soft snap radius that backfaces may be included.")
 {
 	return object->mSoftSnapBackfaceTolerance;
 }
 
-ConsoleMethod( WorldEditor, setSoftSnapBackfaceTolerance, void, 3, 3, "setSoftSnapBackfaceTolerance(F32 with range of 0..1)\n"
-              "The fraction of the soft snap radius that backfaces may be included.")
+DefineEngineMethod( WorldEditor, setSoftSnapBackfaceTolerance, void, (F32 tolerance),,
+	"Set the fraction of the soft snap radius that backfaces may be included."
+	"@param tolerance Fraction of the soft snap radius that backfaces may be included (range of 0..1).")
 {
-	object->mSoftSnapBackfaceTolerance = dAtof(argv[2]);
+	object->mSoftSnapBackfaceTolerance = tolerance;
 }
 
-ConsoleMethod( WorldEditor, softSnapRender, void, 3, 3, "softSnapRender(bool)\n"
-              "Render the soft snapping bounds.")
+DefineEngineMethod( WorldEditor, softSnapRender, void, (F32 render),,
+	"Render the soft snapping bounds."
+	"@param render True to render the soft snapping bounds, false to not.")
 {
-	object->mSoftSnapRender = dAtob(argv[2]);
+	object->mSoftSnapRender = render;
 }
 
-ConsoleMethod( WorldEditor, softSnapRenderTriangle, void, 3, 3, "softSnapRenderTriangle(bool)\n"
-              "Render the soft snapped triangle.")
+DefineEngineMethod( WorldEditor, softSnapRenderTriangle, void, (F32 renderTriangle),,
+	"Render the soft snapped triangle."
+	"@param renderTriangle True to render the soft snapped triangle, false to not.")
 {
-	object->mSoftSnapRenderTriangle = dAtob(argv[2]);
+	object->mSoftSnapRenderTriangle = renderTriangle;
 }
 
-ConsoleMethod( WorldEditor, softSnapDebugRender, void, 3, 3, "softSnapDebugRender(bool)\n"
-              "Toggle soft snapping debug rendering.")
+DefineEngineMethod( WorldEditor, softSnapDebugRender, void, (F32 debugRender),,
+	"Toggle soft snapping debug rendering."
+	"@param debugRender True to turn on soft snapping debug rendering, false to turn it off.")
 {
-	object->mSoftSnapDebugRender = dAtob(argv[2]);
+	object->mSoftSnapDebugRender = debugRender;
 }
 
 DefineEngineMethod( WorldEditor, getTerrainSnapAlignment, WorldEditor::AlignmentType, (),,
-   "Get the terrain snap alignment. " )
+   "Get the terrain snap alignment."
+   "@return terrain snap alignment type.")
 {
    return object->mTerrainSnapAlignment;
 }
 
 DefineEngineMethod( WorldEditor, setTerrainSnapAlignment, void, ( WorldEditor::AlignmentType alignment ),,
-   "Set the terrain snap alignment." )
+   "Set the terrain snap alignment."
+   "@param alignment New terrain snap alignment type.")
 {
    object->mTerrainSnapAlignment = alignment;
 }
 
-ConsoleMethod( WorldEditor, transformSelection, void, 13, 13, "transformSelection(...)\n"
-              "Transform selection by given parameters.")
+DefineEngineMethod( WorldEditor, transformSelection, void, 
+                   ( bool position,
+                     Point3F point,
+                     bool relativePos,
+                     bool rotate,
+                     Point3F rotation,
+                     bool relativeRot,
+                     bool rotLocal,
+                     S32 scaleType,
+                     Point3F scale,
+                     bool sRelative,
+                     bool sLocal ), ,
+   "Transform selection by given parameters."
+   "@param position True to transform the selection's position."
+   "@param point Position to transform by."
+   "@param relativePos True to use relative position."
+   "@param rotate True to transform the selection's rotation."
+   "@param rotation Rotation to transform by."
+   "@param relativeRot True to use the relative rotation."
+   "@param rotLocal True to use the local rotation."
+   "@param scaleType Scale type to use."
+   "@param scale Scale to transform by."
+   "@param sRelative True to use a relative scale."
+   "@param sLocal True to use a local scale.")
 {
-   bool position = dAtob(argv[2]);
-   Point3F p(0.0f, 0.0f, 0.0f);
-   dSscanf(argv[3], "%g %g %g", &p.x, &p.y, &p.z);
-   bool relativePos = dAtob(argv[4]);
-
-   bool rotate = dAtob(argv[5]);
-   EulerF r(0.0f, 0.0f, 0.0f);
-   dSscanf(argv[6], "%g %g %g", &r.x, &r.y, &r.z);
-   bool relativeRot = dAtob(argv[7]);
-   bool rotLocal = dAtob(argv[8]);
-
-   S32 scaleType = dAtoi(argv[9]);
-   Point3F s(1.0f, 1.0f, 1.0f);
-   dSscanf(argv[10], "%g %g %g", &s.x, &s.y, &s.z);
-   bool sRelative = dAtob(argv[11]);
-   bool sLocal = dAtob(argv[12]);
-
-   object->transformSelection(position, p, relativePos, rotate, r, relativeRot, rotLocal, scaleType, s, sRelative, sLocal);
+   object->transformSelection(position, point, relativePos, rotate, rotation, relativeRot, rotLocal, scaleType, scale, sRelative, sLocal);
 }
 
 #include "core/strings/stringUnit.h"
@@ -3546,10 +3586,11 @@ void WorldEditor::colladaExportSelection( const String &path )
 #endif
 }
 
-ConsoleMethod( WorldEditor, colladaExportSelection, void, 3, 3, 
-              "( String path ) - Export the combined geometry of all selected objects to the specified path in collada format." )
-{  
-   object->colladaExportSelection( argv[2] );
+DefineEngineMethod( WorldEditor, colladaExportSelection, void, ( const char* path ),,
+	"Export the combined geometry of all selected objects to the specified path in collada format."
+	"@param path Path to export collada format to.")
+{
+   object->colladaExportSelection( path );
 }
 
 void WorldEditor::makeSelectionPrefab( const char *filename )
@@ -3700,25 +3741,26 @@ void WorldEditor::explodeSelectedPrefab()
    setDirty();
 }
 
-ConsoleMethod( WorldEditor, makeSelectionPrefab, void, 3, 3, "( string filename ) - Save selected objects to a .prefab file and replace them in the level with a Prefab object." )
+DefineEngineMethod( WorldEditor, makeSelectionPrefab, void, ( const char* filename ),,
+	"Save selected objects to a .prefab file and replace them in the level with a Prefab object."
+	"@param filename Prefab file to save the selected objects to.")
 {
-   object->makeSelectionPrefab( argv[2] );
+   object->makeSelectionPrefab( filename );
 }
 
-ConsoleMethod( WorldEditor, explodeSelectedPrefab, void, 2, 2, "() - Replace selected Prefab objects with a SimGroup containing all children objects defined in the .prefab." )
+DefineEngineMethod( WorldEditor, explodeSelectedPrefab, void, (),,
+	"Replace selected Prefab objects with a SimGroup containing all children objects defined in the .prefab.")
 {
    object->explodeSelectedPrefab();
 }
 
-ConsoleMethod( WorldEditor, mountRelative, void, 4, 4, "( Object A, Object B )" )
+DefineEngineMethod( WorldEditor, mountRelative, void, ( SceneObject *objA, SceneObject *objB ),,
+	"Mount object B relatively to object A."
+	"@param objA Object to mount to."
+	"@param objB Object to mount.")
 {
-   SceneObject *objA;
-   if ( !Sim::findObject( argv[2], objA ) )
-      return;
-
-   SceneObject *objB;
-   if ( !Sim::findObject( argv[3], objB ) )
-      return;
+	if (!objA || !objB)
+		return;
 
    MatrixF xfm = objB->getTransform();   
    MatrixF mat = objA->getWorldTransform();

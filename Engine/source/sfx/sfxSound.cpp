@@ -627,7 +627,7 @@ S32 QSORT_CALLBACK SFXSound::qsortCompare( const void* item1, const void* item2 
    
    if( !source1IsPlaying && !source2IsPlaying )
       return 0;
-	else if( !source1IsPlaying && source1IsPlaying )
+	else if( !source1IsPlaying && source2IsPlaying )
 		return 1;
 	else if( source1IsPlaying && !source2IsPlaying )
 		return -1;

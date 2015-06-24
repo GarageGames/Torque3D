@@ -78,9 +78,9 @@ LangElement *ConditionerFeature::assignOutput( Var *unconditionedOutput, ShaderF
       {
          color->setName( getOutputTargetVarName(outputTarget) );
          color->setType( "vec4" );
-         DecOp* colDecl = new DecOp(color);
+         color->setStructName( "OUT" );
 
-         assign = new GenOp( "@ = vec4(@)", colDecl, conditionedOutput );
+         assign = new GenOp( "@ = vec4(@)", color, conditionedOutput );
       }
       else
       {

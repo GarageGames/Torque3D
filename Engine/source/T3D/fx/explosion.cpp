@@ -138,8 +138,17 @@ ConsoleDocClass( Explosion,
 
 MRandomLCG sgRandom(0xdeadbeef);
 
+//WLE - Vince - The defaults are bad, the whole point of calling this function\
+//is to determine the explosion coverage on a object.  Why would you want them
+//To call this with a null for the ID?  In fact, it just returns a 1f if
+//it can't find the object.  Seems useless to me.  Cause how can I apply
+//damage to a object that doesn't exist?
 
-DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMask),(Point3F(0.0f,0.0f,0.0f), NULL, NULL),
+//I could possible see a use with passing in a null covMask, but even that
+//sounds flaky because it will be 100 percent if your saying not to take
+//any thing in consideration for coverage.  So I'm removing these defaults they are just bad.
+
+DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMask),,
    "@brief Calculates how much an explosion effects a specific object.\n\n"
    "Use this to determine how much damage to apply to objects based on their "
    "distance from the explosion's center point, and whether the explosion is "
@@ -245,10 +254,6 @@ ExplosionData::ExplosionData()
    lifetimeVariance = 0;
    offset = 0.0f;
 
-   shockwave = NULL;
-   shockwaveID = 0;
-   shockwaveOnTerrain = false;
-
    shakeCamera = false;
    camShakeFreq.set( 10.0f, 10.0f, 10.0f );
    camShakeAmp.set( 1.0f, 1.0f, 1.0f );
@@ -311,9 +316,6 @@ void ExplosionData::initPersistFields()
       "@brief List of additional ParticleEmitterData objects to spawn with this "
       "explosion.\n\n"
       "@see particleEmitter" );
-
-//   addField( "shockwave", TypeShockwaveDataPtr, Offset(shockwave, ExplosionData) );
-//   addField( "shockwaveOnTerrain", TypeBool, Offset(shockwaveOnTerrain, ExplosionData) );
 
    addField( "debris", TYPEID< DebrisData >(), Offset(debrisList, ExplosionData), EC_NUM_DEBRIS_TYPES,
       "List of DebrisData objects to spawn with this explosion." );

@@ -863,7 +863,7 @@ public:
    /// @param fmt A printf style format string.
    /// @param args A va_list containing the args passed ot a log function.
    /// @note It is suggested that you use String::VToString.
-   virtual String _getLogMessage(const char* fmt, void* args) const;
+   virtual String _getLogMessage(const char* fmt, va_list args) const;
    
    /// @}
 

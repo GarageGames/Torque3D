@@ -720,13 +720,13 @@ String   Platform::FS::getAssetDir()
    {
       TCHAR buf[ 2048 ];
       ::GetModuleFileNameW( NULL, buf, sizeof( buf ) );
-      convertUTF16toUTF8( buf, cen_buf, sizeof( cen_buf ) );
+      convertUTF16toUTF8( buf, cen_buf );
    }
    else
    {
       TCHAR buf[ 2048 ];
       GetCurrentDirectoryW( sizeof( buf ) / sizeof( buf[ 0 ] ), buf );
-      convertUTF16toUTF8( buf, cen_buf, sizeof( cen_buf ) );
+      convertUTF16toUTF8( buf, cen_buf );
       return Path::CleanSeparators(cen_buf);
    }
 #else

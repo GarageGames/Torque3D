@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "console/engineAPI.h"
 #include "gui/editor/guiInspector.h"
 #include "gui/editor/inspector/field.h"
 #include "gui/editor/inspector/group.h"
@@ -770,14 +771,15 @@ void GuiInspector::sendInspectPostApply()
 // MARK: ---- Console Methods ----
 
 //-----------------------------------------------------------------------------
-
-ConsoleMethod( GuiInspector, inspect, void, 3, 3, "Inspect(Object)")
+DefineEngineMethod( GuiInspector, inspect, void, (const char* simObject), (""),
+   "Inspect the given object.\n"
+   "@param simObject Object to inspect.")
 {
-   SimObject * target = Sim::findObject(argv[2]);
+   SimObject * target = Sim::findObject(simObject);
    if(!target)
    {
-      if(dAtoi(argv[2]) > 0)
-         Con::warnf("%s::inspect(): invalid object: %s", argv[0], argv[2]);
+      if(dAtoi(simObject) > 0)
+         Con::warnf("%s::inspect(): invalid object: %s", object->getClassName(), simObject);
 
       object->clearInspectObjects();
       return;
@@ -788,38 +790,41 @@ ConsoleMethod( GuiInspector, inspect, void, 3, 3, "Inspect(Object)")
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspector, addInspect, void, 3, 4, "( id object, (bool autoSync = true) ) - Add the object to the list of objects being inspected." )
+DefineEngineMethod( GuiInspector, addInspect, void, (const char* simObject, bool autoSync), (true),
+   "Add the object to the list of objects being inspected.\n"
+   "@param simObject Object to add to the inspection."
+   "@param autoSync Auto sync the values when they change.")
 {
    SimObject* obj;
-   if( !Sim::findObject( argv[ 2 ], obj ) )
+   if( !Sim::findObject( simObject, obj ) )
    {
-      Con::errorf( "%s::addInspect(): invalid object: %s", argv[ 0 ], argv[ 2 ] );
+      Con::errorf( "%s::addInspect(): invalid object: %s", object->getClassName(), simObject );
       return;
    }
 
-   if( argc > 3 )
-		object->addInspectObject( obj, false );
-	else
-		object->addInspectObject( obj );
+	object->addInspectObject( obj, autoSync );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspector, removeInspect, void, 3, 3, "( id object ) - Remove the object from the list of objects being inspected." )
+DefineEngineMethod( GuiInspector, removeInspect, void, (const char* simObject), ,
+   "Remove the object from the list of objects being inspected.\n"
+   "@param simObject Object to remove from the inspection.")
 {
    SimObject* obj;
-   if( !Sim::findObject( argv[ 2 ], obj ) )
+   if( !Sim::findObject( simObject, obj ) )
    {
-      Con::errorf( "%s::removeInspect(): invalid object: %s", argv[ 0 ], argv[ 2 ] );
+      Con::errorf( "%s::removeInspect(): invalid object: %s", object->getClassName(), simObject );
       return;
    }
-   
+
    object->removeInspectObject( obj );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspector, refresh, void, 2, 2, "Reinspect the currently selected object." )
+DefineEngineMethod( GuiInspector, refresh, void, (), ,
+   "Re-inspect the currently selected object.\n")
 {
    if ( object->getNumInspectObjects() == 0 )
       return;
@@ -831,13 +836,13 @@ ConsoleMethod( GuiInspector, refresh, void, 2, 2, "Reinspect the currently selec
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspector, getInspectObject, const char*, 2, 3, "getInspectObject( int index=0 ) - Returns currently inspected object" )
+DefineEngineMethod( GuiInspector, getInspectObject, const char*, (S32 index), (0),
+   "Returns currently inspected object.\n"
+   "@param index Index of object in inspection list you want to get."
+   "@return object being inspected.")
 {
-   U32 index = 0;
-   if( argc > 2 )
-      index = dAtoi( argv[ 2 ] );
       
-   if( index >= object->getNumInspectObjects() )
+   if( index < 0 || index >= object->getNumInspectObjects() )
    {
       Con::errorf( "GuiInspector::getInspectObject() - index out of range: %i", index );
       return "";
@@ -848,46 +853,54 @@ ConsoleMethod( GuiInspector, getInspectObject, const char*, 2, 3, "getInspectObj
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspector, getNumInspectObjects, S32, 2, 2, "() - Return the number of objects currently being inspected." )
+DefineEngineMethod( GuiInspector, getNumInspectObjects, S32, (), ,
+   "Return the number of objects currently being inspected.\n"
+   "@return number of objects currently being inspected.")
 {
    return object->getNumInspectObjects();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspector, setName, void, 3, 3, "setName(NewObjectName)")
+DefineEngineMethod( GuiInspector, setName, void, (const char* newObjectName), ,
+	"Rename the object being inspected (first object in inspect list).\n"
+	"@param newObjectName new name for object being inspected.")
 {
-   object->setName(argv[2]);
+   object->setName(newObjectName);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspector, apply, void, 2, 2, "apply() - Force application of inspected object's attributes" )
+DefineEngineMethod( GuiInspector, apply, void, (), ,
+	"Force application of inspected object's attributes.\n")
 {
    object->sendInspectPostApply();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspector, setObjectField, void, 4, 4, 
-   "setObjectField( fieldname, data ) - Set a named fields value on the inspected object if it exists. This triggers all the usual callbacks that would occur if the field had been changed through the gui." )
+DefineEngineMethod( GuiInspector, setObjectField, void, (const char* fieldname, const char* data ), ,
+	"Set a named fields value on the inspected object if it exists. This triggers all the usual callbacks that would occur if the field had been changed through the gui..\n"
+	"@param fieldname Field name on object we are inspecting we want to change."
+	"@param data New Value for the given field.")
 {
-   object->setObjectField( argv[2], argv[3] );
+   object->setObjectField( fieldname, data );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleStaticMethod( GuiInspector, findByObject, S32, 2, 2, 
-   "findByObject( SimObject ) - returns the id of an awake inspector that is inspecting the passed object if one exists." )
+DefineEngineMethod( GuiInspector, findByObject, S32, (SimObject* object), ,
+	"Returns the id of an awake inspector that is inspecting the passed object if one exists\n"
+	"@param object Object to find away inspector for."
+	"@return id of an awake inspector that is inspecting the passed object if one exists, else NULL or 0.")
 {
-   SimObject *obj;
-   if ( !Sim::findObject( argv[1], obj ) )   
-      return NULL;
-   
-   obj = GuiInspector::findByObject( obj );
-
-   if ( !obj )
+   if ( !object )
       return NULL;
 
-   return obj->getId();      
+   SimObject *inspector = GuiInspector::findByObject( object );
+
+   if ( !inspector )
+      return NULL;
+
+   return inspector->getId();
 }

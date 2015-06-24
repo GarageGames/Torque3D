@@ -389,11 +389,12 @@ void dPrintf(const char *format, ...)
    va_list args;
    va_start(args, format);
    vprintf(format, args);
+   va_end(args);
 }
 
-S32 dVprintf(const char *format, void *arglist)
+S32 dVprintf(const char *format, va_list arglist)
 {
-   return vprintf(format, (char*)arglist);
+   return (S32)vprintf(format, arglist);
 }
 
 S32 dSprintf(char *buffer, U32 bufferSize, const char *format, ...)
@@ -402,6 +403,7 @@ S32 dSprintf(char *buffer, U32 bufferSize, const char *format, ...)
    va_start(args, format);
 
    S32 len = vsnprintf(buffer, bufferSize, format, args);
+   va_end(args);
 
    AssertWarn( len < bufferSize, "Buffer too small in call to dSprintf!" );
 
@@ -409,9 +411,9 @@ S32 dSprintf(char *buffer, U32 bufferSize, const char *format, ...)
 }
 
 
-S32 dVsprintf(char *buffer, U32 bufferSize, const char *format, void *arglist)
+S32 dVsprintf(char *buffer, U32 bufferSize, const char *format, va_list arglist)
 {
-   S32 len = vsnprintf(buffer, bufferSize, format, (char*)arglist);
+   S32 len = vsnprintf(buffer, bufferSize, format, arglist);
    
    AssertWarn( len < bufferSize, "Buffer too small in call to dVsprintf!" );
 
@@ -470,7 +472,9 @@ S32 dSscanf(const char *buffer, const char *format, ...)
 #else
    va_list args;
    va_start(args, format);
-   return vsscanf(buffer, format, args);
+   S32 res = vsscanf(buffer, format, args);
+   va_end(args);
+   return res;
 #endif
 }
 

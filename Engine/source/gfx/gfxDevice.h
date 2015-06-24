@@ -723,7 +723,7 @@ public:
    virtual U32 getNumRenderTargets() const = 0;
 
    virtual void setShader( GFXShader *shader ) {}
-   virtual void disableShaders() {}
+   virtual void disableShaders() {} // TODO Remove when T3D 4.0
 
    /// Set the buffer! (Actual set happens on the next draw call, just like textures, state blocks, etc)
    void setShaderConstBuffer(GFXShaderConstBuffer* buffer);
@@ -867,6 +867,8 @@ public:
 
    /// Sets the current stateblock (actually activated in ::updateStates)
    virtual void setStateBlock( GFXStateBlock *block );
+
+   GFXStateBlock* getStateBlock() { return mNewStateBlock; }
 
    /// This sets a stateblock directly from the description
    /// structure.  Its acceptable to use this for debug rendering
@@ -1116,5 +1118,11 @@ inline void GFXDevice::setVertexFormat( const GFXVertexFormat *vertexFormat )
    mStateDirty = true;
 }
 
+
+#if defined(TORQUE_DEBUG) && defined(TORQUE_DEBUG_GFX)
+#define GFXAssertFatal(x, error) AssertFatal(x, error)
+#else
+#define GFXAssertFatal(x, error)
+#endif
 
 #endif // _GFXDEVICE_H_

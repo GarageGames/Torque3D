@@ -52,6 +52,11 @@
 #define TORQUE_DISABLE_MEMORY_MANAGER
 #endif
 
+/// The improved SimDictionary uses C++11 and is designed for games where
+/// there are over 10000 simobjects active normally. To enable the new
+/// SimDictionary just uncomment the line below.
+//#define USE_NEW_SIMDICTIONARY
+
 /// Define me if you want to disable the virtual mount system.
 //#define TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM
 
@@ -143,10 +148,10 @@
 
 /// This #define is used by the FrameAllocator to set the size of the frame.
 ///
-/// It was previously set to 3MB but I've increased it to 16MB due to the
+/// It was previously set to 3MB but I've increased it to 32MB due to the
 /// FrameAllocator being used as temporary storage for bitmaps in the D3D9
 /// texture manager.
-#define TORQUE_FRAME_SIZE     16 << 20
+#define TORQUE_FRAME_SIZE     32 << 20
 
 // Finally, we define some dependent #defines. This enables some subsidiary
 // functionality to get automatically turned on in certain configurations.

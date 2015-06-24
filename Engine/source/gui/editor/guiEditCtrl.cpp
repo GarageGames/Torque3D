@@ -2468,7 +2468,7 @@ void GuiEditCtrl::startMouseGuideDrag( guideAxis axis, U32 guideIndex, bool lock
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, getContentControl, S32, 2, 2, "() - Return the toplevel control edited inside the GUI editor." )
+DefineConsoleMethod( GuiEditCtrl, getContentControl, S32, (), , "() - Return the toplevel control edited inside the GUI editor." )
 {
    GuiControl* ctrl = object->getContentControl();
    if( ctrl )
@@ -2479,76 +2479,60 @@ ConsoleMethod( GuiEditCtrl, getContentControl, S32, 2, 2, "() - Return the tople
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, setContentControl, void, 3, 3, "( GuiControl ctrl ) - Set the toplevel control to edit in the GUI editor." )
+DefineConsoleMethod( GuiEditCtrl, setContentControl, void, (GuiControl *ctrl ), , "( GuiControl ctrl ) - Set the toplevel control to edit in the GUI editor." )
 {
-   GuiControl *ctrl;
-   if(!Sim::findObject(argv[2], ctrl))
-      return;
-   object->setContentControl(ctrl);
+	if (ctrl)
+		object->setContentControl(ctrl);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, addNewCtrl, void, 3, 3, "(GuiControl ctrl)")
+DefineConsoleMethod( GuiEditCtrl, addNewCtrl, void, (GuiControl *ctrl), , "(GuiControl ctrl)")
 {
-   GuiControl *ctrl;
-   if(!Sim::findObject(argv[2], ctrl))
-      return;
-   object->addNewControl(ctrl);
+	if (ctrl)
+		object->addNewControl(ctrl);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, addSelection, void, 3, 3, "selects a control.")
+DefineConsoleMethod( GuiEditCtrl, addSelection, void, (S32 id), , "selects a control.")
 {
-   S32 id = dAtoi(argv[2]);
    object->addSelection(id);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, removeSelection, void, 3, 3, "deselects a control.")
+DefineConsoleMethod( GuiEditCtrl, removeSelection, void, (S32 id), , "deselects a control.")
 {
-   S32 id = dAtoi(argv[2]);
    object->removeSelection(id);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, clearSelection, void, 2, 2, "Clear selected controls list.")
+DefineConsoleMethod( GuiEditCtrl, clearSelection, void, (), , "Clear selected controls list.")
 {
    object->clearSelection();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, select, void, 3, 3, "(GuiControl ctrl)")
+DefineConsoleMethod( GuiEditCtrl, select, void, (GuiControl *ctrl), , "(GuiControl ctrl)")
 {
-   GuiControl *ctrl;
-
-   if(!Sim::findObject(argv[2], ctrl))
-      return;
-
+	if (ctrl)
    object->setSelection(ctrl, false);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, setCurrentAddSet, void, 3, 3, "(GuiControl ctrl)")
+DefineConsoleMethod( GuiEditCtrl, setCurrentAddSet, void, (GuiControl *addSet), , "(GuiControl ctrl)")
 {
-   GuiControl *addSet;
-
-   if (!Sim::findObject(argv[2], addSet))
-   {
-      Con::printf("%s(): Invalid control: %s", argv[0], argv[2]);
-      return;
-   }
+	if (addSet)
    object->setCurrentAddSet(addSet);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, getCurrentAddSet, S32, 2, 2, "Returns the set to which new controls will be added")
+DefineConsoleMethod( GuiEditCtrl, getCurrentAddSet, S32, (), , "Returns the set to which new controls will be added")
 {
    const GuiControl* add = object->getCurrentAddSet();
    return add ? add->getId() : 0;
@@ -2556,71 +2540,65 @@ ConsoleMethod( GuiEditCtrl, getCurrentAddSet, S32, 2, 2, "Returns the set to whi
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, toggle, void, 2, 2, "Toggle activation.")
+DefineConsoleMethod( GuiEditCtrl, toggle, void, (), , "Toggle activation.")
 {
    object->setEditMode( !object->isActive() );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, justify, void, 3, 3, "(int mode)" )
+DefineConsoleMethod( GuiEditCtrl, justify, void, (U32 mode), , "(int mode)" )
 {
-   object->justifySelection((GuiEditCtrl::Justification)dAtoi(argv[2]));
+   object->justifySelection( (GuiEditCtrl::Justification)mode );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, bringToFront, void, 2, 2, "")
+DefineConsoleMethod( GuiEditCtrl, bringToFront, void, (), , "")
 {
    object->bringToFront();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, pushToBack, void, 2, 2, "")
+DefineConsoleMethod( GuiEditCtrl, pushToBack, void, (), , "")
 {
    object->pushToBack();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, deleteSelection, void, 2, 2, "() - Delete the selected controls.")
+DefineConsoleMethod( GuiEditCtrl, deleteSelection, void, (), , "() - Delete the selected controls.")
 {
    object->deleteSelection();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, moveSelection, void, 4, 4, "(int dx, int dy) - Move all controls in the selection by (dx,dy) pixels.")
+DefineConsoleMethod( GuiEditCtrl, moveSelection, void, (S32 dx, S32 dy), , "Move all controls in the selection by (dx,dy) pixels.")
 {
-   object->moveAndSnapSelection(Point2I(dAtoi(argv[2]), dAtoi(argv[3])));
+   object->moveAndSnapSelection(Point2I(dx, dy));
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, saveSelection, void, 2, 3, "( string fileName=null ) - Save selection to file or clipboard.")
+DefineConsoleMethod( GuiEditCtrl, saveSelection, void, (const char * filename), (NULL), "( string fileName=null ) - Save selection to file or clipboard.")
 {
-   const char* filename = NULL;
-   if( argc > 2 )
-      filename = argv[ 2 ];
       
    object->saveSelection( filename );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, loadSelection, void, 2, 3, "( string fileName=null ) - Load selection from file or clipboard.")
+DefineConsoleMethod( GuiEditCtrl, loadSelection, void, (const char * filename), (NULL), "( string fileName=null ) - Load selection from file or clipboard.")
 {
-   const char* filename = NULL;
-   if( argc > 2 )
-      filename = argv[ 2 ];
 
    object->loadSelection( filename );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, selectAll, void, 2, 2, "()")
+DefineConsoleMethod( GuiEditCtrl, selectAll, void, (), , "()")
 {
    object->selectAll();
 }
@@ -2635,14 +2613,14 @@ DefineEngineMethod( GuiEditCtrl, getSelection, SimSet*, (),,
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, getNumSelected, S32, 2, 2, "() - Return the number of controls currently selected." )
+DefineConsoleMethod( GuiEditCtrl, getNumSelected, S32, (), , "() - Return the number of controls currently selected." )
 {
    return object->getNumSelected();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, getSelectionGlobalBounds, const char*, 2, 2, "() - Returns global bounds of current selection as vector 'x y width height'." )
+DefineConsoleMethod( GuiEditCtrl, getSelectionGlobalBounds, const char*, (), , "() - Returns global bounds of current selection as vector 'x y width height'." )
 {
    RectI bounds = object->getSelectionGlobalBounds();
    String str = String::ToString( "%i %i %i %i", bounds.point.x, bounds.point.y, bounds.extent.x, bounds.extent.y );
@@ -2655,22 +2633,16 @@ ConsoleMethod( GuiEditCtrl, getSelectionGlobalBounds, const char*, 2, 2, "() - R
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, selectParents, void, 2, 3, "( bool addToSelection=false ) - Select parents of currently selected controls." )
+DefineConsoleMethod( GuiEditCtrl, selectParents, void, ( bool addToSelection ), (false), "( bool addToSelection=false ) - Select parents of currently selected controls." )
 {
-   bool addToSelection = false;
-   if( argc > 2 )
-      addToSelection = dAtob( argv[ 2 ] );
       
    object->selectParents( addToSelection );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, selectChildren, void, 2, 3, "( bool addToSelection=false ) - Select children of currently selected controls." )
+DefineConsoleMethod( GuiEditCtrl, selectChildren, void, ( bool addToSelection ), (false), "( bool addToSelection=false ) - Select children of currently selected controls." )
 {
-   bool addToSelection = false;
-   if( argc > 2 )
-      addToSelection = dAtob( argv[ 2 ] );
       
    object->selectChildren( addToSelection );
 }
@@ -2685,33 +2657,29 @@ DefineEngineMethod( GuiEditCtrl, getTrash, SimGroup*, (),,
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(GuiEditCtrl, setSnapToGrid, void, 3, 3, "GuiEditCtrl.setSnapToGrid(gridsize)")
+DefineConsoleMethod(GuiEditCtrl, setSnapToGrid, void, (U32 gridsize), , "GuiEditCtrl.setSnapToGrid(gridsize)")
 {
-   U32 gridsize = dAtoi(argv[2]);
    object->setSnapToGrid(gridsize);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, readGuides, void, 3, 4, "( GuiControl ctrl [, int axis ] ) - Read the guides from the given control." )
+DefineConsoleMethod( GuiEditCtrl, readGuides, void, ( GuiControl* ctrl, S32 axis ), (-1), "( GuiControl ctrl [, int axis ] ) - Read the guides from the given control." )
 {
    // Find the control.
    
-   GuiControl* ctrl;
-   if( !Sim::findObject( argv[ 2 ], ctrl ) )
+   if( !ctrl  )
    {
-      Con::errorf( "GuiEditCtrl::readGuides - no control '%s'", argv[ 2 ] );
       return;
    }
    
    // Read the guides.
    
-   if( argc > 3 )
+   if( axis != -1 )
    {
-      S32 axis = dAtoi( argv[ 3 ] );
       if( axis < 0 || axis > 1 )
       {
-         Con::errorf( "GuiEditCtrl::readGuides - invalid axis '%s'", argv[ 3 ] );
+         Con::errorf( "GuiEditCtrl::readGuides - invalid axis '%s'", axis );
          return;
       }
       
@@ -2726,25 +2694,22 @@ ConsoleMethod( GuiEditCtrl, readGuides, void, 3, 4, "( GuiControl ctrl [, int ax
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, writeGuides, void, 3, 4, "( GuiControl ctrl [, int axis ] ) - Write the guides to the given control." )
+DefineConsoleMethod( GuiEditCtrl, writeGuides, void, ( GuiControl* ctrl, S32 axis ), ( -1), "( GuiControl ctrl [, int axis ] ) - Write the guides to the given control." )
 {
    // Find the control.
    
-   GuiControl* ctrl;
-   if( !Sim::findObject( argv[ 2 ], ctrl ) )
+   if( ! ctrl ) 
    {
-      Con::errorf( "GuiEditCtrl::writeGuides - no control '%i'", argv[ 2 ] );
       return;
    }
    
    // Write the guides.
    
-   if( argc > 3 )
+   if( axis != -1 )
    {
-      S32 axis = dAtoi( argv[ 3 ] );
       if( axis < 0 || axis > 1 )
       {
-         Con::errorf( "GuiEditCtrl::writeGuides - invalid axis '%s'", argv[ 3 ] );
+         Con::errorf( "GuiEditCtrl::writeGuides - invalid axis '%s'", axis );
          return;
       }
       
@@ -2759,11 +2724,10 @@ ConsoleMethod( GuiEditCtrl, writeGuides, void, 3, 4, "( GuiControl ctrl [, int a
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, clearGuides, void, 2, 3, "( [ int axis ] ) - Clear all currently set guide lines." )
+DefineConsoleMethod( GuiEditCtrl, clearGuides, void, ( S32 axis ), (-1), "( [ int axis ] ) - Clear all currently set guide lines." )
 {
-   if( argc > 2 )
+   if( axis != -1 )
    {
-      S32 axis = dAtoi( argv[ 2 ] );
       if( axis < 0 || axis > 1 )
       {
          Con::errorf( "GuiEditCtrl::clearGuides - invalid axis '%i'", axis );
@@ -2781,22 +2745,15 @@ ConsoleMethod( GuiEditCtrl, clearGuides, void, 2, 3, "( [ int axis ] ) - Clear a
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, fitIntoParents, void, 2, 4, "( bool width=true, bool height=true ) - Fit selected controls into their parents." )
+DefineConsoleMethod( GuiEditCtrl, fitIntoParents, void, (bool width, bool height), (true, true), "( bool width=true, bool height=true ) - Fit selected controls into their parents." )
 {
-   bool width = true;
-   bool height = true;
-   
-   if( argc > 2 )
-      width = dAtob( argv[ 2 ] );
-   if( argc > 3 )
-      height = dAtob( argv[ 3 ] );
       
    object->fitIntoParents( width, height );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiEditCtrl, getMouseMode, const char*, 2, 2, "() - Return the current mouse mode." )
+DefineConsoleMethod( GuiEditCtrl, getMouseMode, const char*, (), , "() - Return the current mouse mode." )
 {
    switch( object->getMouseMode() )
    {

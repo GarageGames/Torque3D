@@ -77,7 +77,9 @@ protected:
    // Not only a helper method, but a method for the RenderTranslucentMgr to
    // request a particle system draw
    void renderInstance(ParticleRenderInst *ri, SceneRenderState *state);
-
+public:
+   void renderParticle(ParticleRenderInst *ri, SceneRenderState *state);
+protected:
    bool mOffscreenRenderEnabled;
 
    /// The prepass render target used for the
@@ -110,6 +112,9 @@ protected:
       GFXShaderConstHandle *mPrePassTargetParamsSC;
       GFXShaderConstHandle *mAlphaFactorSC;
       GFXShaderConstHandle *mAlphaScaleSC;
+      GFXShaderConstHandle *mSamplerDiffuse;
+      GFXShaderConstHandle *mSamplerPrePassTex;
+      GFXShaderConstHandle *mSamplerParaboloidLightMap;
 
    } mParticleShaderConsts;
 
@@ -118,6 +123,8 @@ protected:
       GFXShaderConstBufferRef mShaderConsts;
       GFXShaderConstHandle *mSystemDepth;
       GFXShaderConstHandle *mScreenRect;
+      GFXShaderConstHandle *mSamplerColorSource;
+      GFXShaderConstHandle *mSamplerEdgeSource;
       GFXShaderConstHandle *mEdgeTargetParamsSC;
       GFXShaderConstHandle *mOffscreenTargetParamsSC;
    } mParticleCompositeShaderConsts;
@@ -130,11 +137,13 @@ protected:
    GFXStateBlockRef mOffscreenBlocks[ParticleRenderInst::BlendStyle_COUNT];
    GFXStateBlockRef mBackbufferBlocks[ParticleRenderInst::BlendStyle_COUNT];
    GFXStateBlockRef mMixedResBlocks[ParticleRenderInst::BlendStyle_COUNT];
-   
+
+public:
    GFXStateBlockRef _getHighResStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getMixedResStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getOffscreenStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getCompositeStateBlock(ParticleRenderInst *ri);
+   ShaderConsts &_getShaderConsts() { return mParticleShaderConsts; };
 };
 
 

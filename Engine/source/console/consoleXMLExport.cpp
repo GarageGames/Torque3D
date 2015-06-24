@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleInternal.h"
+#include "console/engineAPI.h"
 #include "console/consoleObject.h"
 #include "console/SimXMLDocument.h"
 
@@ -313,7 +314,7 @@ namespace Con {
 }; // namespace Con
 
 
-ConsoleFunction(consoleExportXML, const char*, 1, 1, "Exports console definition XML representation")
+DefineConsoleFunction( consoleExportXML, const char*, (), ,"Exports console definition XML representation" )
 {
    Con::XMLExport xmlExport;
    String xml;

@@ -25,6 +25,11 @@
 
 #include "gfx/gfxStateBlock.h"
 
+namespace DictHash
+{
+   U32 hash(const GFXSamplerStateDesc &data);
+}
+
 class GFXGLStateBlock : public GFXStateBlock
 {   
 public:
@@ -58,6 +63,7 @@ public:
 private:
    GFXStateBlockDesc mDesc;
    U32 mCachedHashValue;
+   U32 mSamplerObjects[TEXTURE_STAGE_COUNT];
 };
 
 typedef StrongRefPtr<GFXGLStateBlock> GFXGLStateBlockRef;

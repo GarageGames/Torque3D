@@ -22,12 +22,12 @@
 
 #include "platform/platform.h"
 #include "gfx/gl/gfxGLOcclusionQuery.h"
-#include "gfx/gl/ggl/ggl.h"
+#include "gfx/gl/tGL/tGL.h"
 
 GFXGLOcclusionQuery::GFXGLOcclusionQuery(GFXDevice* device) : 
-   GFXOcclusionQuery(device), mQuery(0)
+   GFXOcclusionQuery(device), mQuery(-1)
 {
-   glGenQueries(1, &mQuery);
+   
 }
 
 GFXGLOcclusionQuery::~GFXGLOcclusionQuery()
@@ -37,6 +37,9 @@ GFXGLOcclusionQuery::~GFXGLOcclusionQuery()
 
 bool GFXGLOcclusionQuery::begin()
 {
+   if(mQuery == -1)
+      glGenQueries(1, &mQuery);
+
    glBeginQuery(GL_SAMPLES_PASSED, mQuery);
    return true;
 }
@@ -51,6 +54,9 @@ GFXOcclusionQuery::OcclusionQueryStatus GFXGLOcclusionQuery::getStatus(bool bloc
    // If this ever shows up near the top of a profile 
    // then your system is GPU bound.
    PROFILE_SCOPE(GFXGLOcclusionQuery_getStatus);
+
+   if(mQuery == -1)
+      return NotOccluded;
    
    GLint numPixels = 0;
    GLint queryDone = false;

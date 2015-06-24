@@ -707,7 +707,7 @@ void ShapeBaseData::packData(BitStream* stream)
 
    if( stream->writeFlag( debris != NULL ) )
    {
-      stream->writeRangedU32(packed? SimObjectId(debris):
+      stream->writeRangedU32(packed? SimObjectId((uintptr_t)debris):
                              debris->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
    }
 
@@ -2080,7 +2080,7 @@ void ShapeBase::updateAudioState(Sound& st)
    {
       if ( isGhost() ) 
       {
-         if ( Sim::findObject( SimObjectId( st.profile ), st.profile ) )
+         if ( Sim::findObject( SimObjectId((uintptr_t)st.profile), st.profile ) )
          {
             st.sound = SFX->createSource( st.profile, &getTransform() );
             if ( st.sound )

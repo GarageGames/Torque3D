@@ -40,7 +40,7 @@ void main()
    gl_Position = modelview * vec4(vPosition.xyz, 1.0);
    
    color = vColor;
-   texCoord = vTexCoord1.st;
+   texCoord = vTexCoord0.st;
    
    float fromCasterDist = length(vPosition.xyz - shadowCasterPosition) - shadowLength;
    fade = 1.0 - clamp( fromCasterDist / shadowLength , 0.0, 1.0 );

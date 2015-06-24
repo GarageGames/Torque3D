@@ -305,10 +305,11 @@ void VideoFrameGrabber::_onTextureEvent(GFXTexCallbackCode code)
 ///----------------------------------------------------------------------
 
 ///----------------------------------------------------------------------
-
+//WLE - Vince
+//Changing the resolution to Point2I::Zero instead of the Point2I(0,0) better to use constants.
 DefineEngineFunction( startVideoCapture, void, 
    ( GuiCanvas *canvas, const char *filename, const char *encoder, F32 framerate, Point2I resolution ),
-   ( "THEORA", 30.0f, Point2I( 0, 0 ) ),
+   ( "THEORA", 30.0f, Point2I::Zero ),
    "Begins a video capture session.\n"
    "@see stopVideoCapture\n"
    "@ingroup Rendering\n" )
@@ -339,7 +340,7 @@ DefineEngineFunction( stopVideoCapture, void, (),,
 
 DefineEngineFunction( playJournalToVideo, void, 
    ( const char *journalFile, const char *videoFile, const char *encoder, F32 framerate, Point2I resolution ),
-   ( NULL, "THEORA", 30.0f, Point2I( 0, 0 ) ),
+	( NULL, "THEORA", 30.0f, Point2I::Zero ),
    "Load a journal file and capture it video.\n"
    "@ingroup Rendering\n" )
 {

@@ -43,15 +43,21 @@ static Process* _theOneProcess = NULL; ///< the one instance of the Process clas
 
 //-----------------------------------------------------------------------------
 
-void Process::requestShutdown()
+void Process::requestShutdown(S32 status)
 {
    Process::get()._RequestShutdown = true;
+   Process::get()._ReturnStatus = status;
+}
+
+S32 Process::getReturnStatus()
+{
+   return Process::get()._ReturnStatus;
 }
 
 //-----------------------------------------------------------------------------
 
 Process::Process()
-:  _RequestShutdown( false )
+:  _RequestShutdown( false ), _ReturnStatus( 0 )
 {
 }
 

@@ -63,15 +63,15 @@ F32 PSSMLightShadowMap::smSmallestVisiblePixelSize = 25.0f;
 
 PSSMLightShadowMap::PSSMLightShadowMap( LightInfo *light )
    :  LightShadowMap( light ),
-      mNumSplits( 0 )
+      mNumSplits( 1 )
 {  
    mIsViewDependent = true;
 }
 
 void PSSMLightShadowMap::_setNumSplits( U32 numSplits, U32 texSize )
 {
-   AssertFatal( numSplits > 0 && numSplits <= MAX_SPLITS, 
-      "PSSMLightShadowMap::_setNumSplits() - Splits must be between 1 and 4!" );
+   AssertFatal(numSplits > 0 && numSplits <= MAX_SPLITS,
+      avar("PSSMLightShadowMap::_setNumSplits() - Splits must be between 1 and %d!", MAX_SPLITS));
 
    releaseTextures();
   
@@ -204,7 +204,10 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
    if (  mShadowMapTex.isNull() || 
          mNumSplits != params->numSplits || 
          mTexSize != texSize )
+   {
       _setNumSplits( params->numSplits, texSize );
+      mShadowMapDepth = _getDepthTarget( mShadowMapTex->getWidth(), mShadowMapTex->getHeight() );   
+   }
    mLogWeight = params->logWeight;
 
    Frustum fullFrustum( diffuseState->getCameraFrustum() );
@@ -216,8 +219,7 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
    // Set our render target
    GFX->pushActiveRenderTarget();
    mTarget->attachTexture( GFXTextureTarget::Color0, mShadowMapTex );
-   mTarget->attachTexture( GFXTextureTarget::DepthStencil, 
-      _getDepthTarget( mShadowMapTex->getWidth(), mShadowMapTex->getHeight() ) );
+   mTarget->attachTexture( GFXTextureTarget::DepthStencil, mShadowMapDepth );
    GFX->setActiveRenderTarget( mTarget );
    GFX->clear( GFXClearStencil | GFXClearZBuffer | GFXClearTarget, ColorI(255,255,255), 1.0f, 0 );
 
@@ -384,6 +386,9 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
 void PSSMLightShadowMap::setShaderParameters(GFXShaderConstBuffer* params, LightingShaderConstants* lsc)
 {
    PROFILE_SCOPE( PSSMLightShadowMap_setShaderParameters );
+
+   AssertFatal(mNumSplits > 0 && mNumSplits <= MAX_SPLITS,
+      avar("PSSMLightShadowMap::_setNumSplits() - Splits must be between 1 and %d!", MAX_SPLITS));
 
    if ( lsc->mTapRotationTexSC->isValid() )
       GFX->setTexture( lsc->mTapRotationTexSC->getSamplerRegister(), 

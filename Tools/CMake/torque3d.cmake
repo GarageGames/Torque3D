@@ -23,10 +23,14 @@
 project(${TORQUE_APP_NAME})
 
 if(UNIX)
+    if(NOT CXX_FLAG32)
+        set(CXX_FLAG32 "")
+    endif()
+    #set(CXX_FLAG32 "-m32") #uncomment for build x32 on OSx64
+    
     # default compiler flags
-    # force compile 32 bit
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32 -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32 -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_FLAG32} -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS} -Wl,-rpath,'$$ORIGIN'")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CXX_FLAG32} -Wall -Wundef -msse -pipe -Wfatal-errors ${TORQUE_ADDITIONAL_LINKER_FLAGS} -Wl,-rpath,'$$ORIGIN'")
 
 	# for asm files
 	SET (CMAKE_ASM_NASM_OBJECT_FORMAT "elf")
@@ -58,34 +62,25 @@ option(TORQUE_HIFI "HIFI? support" OFF)
 mark_as_advanced(TORQUE_HIFI)
 option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
 mark_as_advanced(TORQUE_EXTENDED_MOVE)
-option(TORQUE_NAVIGATION "Enable Navigation module" OFF)
-#mark_as_advanced(TORQUE_NAVIGATION)
-option(TORQUE_TESTING "Enable unit test module" OFF)
-mark_as_advanced(TORQUE_TESTING)
+if(WIN32)
+	option(TORQUE_SDL "Use SDL for window and input" OFF)
+	mark_as_advanced(TORQUE_SDL)
+else()
+	set(TORQUE_SDL ON) # we need sdl to work on Linux/Mac
+endif()
+if(WIN32)
+	option(TORQUE_OPENGL "Allow OpenGL render" OFF)
+	#mark_as_advanced(TORQUE_OPENGL)
+else()
+	set(TORQUE_OPENGL ON) # we need OpenGL to render on Linux/Mac
+endif()
+
 if(WIN32)
 	option(TORQUE_OPENGL "Allow OpenGL render" OFF)
 	#mark_as_advanced(TORQUE_OPENGL)
 else()
 	set(TORQUE_OPENGL ON) # we need OpenGL to render on Linux/Mac
 	option(TORQUE_DEDICATED "Torque dedicated" OFF)
-endif()
-
-#Oculus VR
-option(TORQUE_OCULUSVR "Enable OCULUSVR module" OFF)
-mark_as_advanced(TORQUE_OCULUSVR)
-if(TORQUE_OCULUSVR)
-    set(TORQUE_OCULUSVR_SDK_PATH "" CACHE PATH "OCULUSVR library path" FORCE)
-else() # hide variable
-    set(TORQUE_OCULUSVR_SDK_PATH "" CACHE INTERNAL "" FORCE) 
-endif()
-
-#Hydra
-option(TORQUE_HYDRA "Enable HYDRA module" OFF)
-mark_as_advanced(TORQUE_HYDRA)
-if(TORQUE_HYDRA)
-    set(TORQUE_HYDRA_SDK_PATH "" CACHE PATH "HYDRA library path" FORCE)
-else() # hide variable
-    set(TORQUE_HYDRA_SDK_PATH "" CACHE INTERNAL "" FORCE) 
 endif()
 
 ###############################################################################
@@ -151,6 +146,20 @@ if(WIN32)
     else()
         link_directories($ENV{DXSDK_DIR}/Lib/x86)
     endif()
+endif()
+
+# build types
+if(NOT MSVC) # handle single-configuration generator
+	set(CMAKE_BUILD_TYPE ${TORQUE_BUILD_TYPE})
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(TORQUE_DEBUG TRUE)
+    elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set(TORQUE_RELEASE TRUE)
+    elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+        set(TORQUE_RELEASE TRUE)
+    else()
+		message(FATAL_ERROR "Please select Debug, Release or RelWithDebInfo for TORQUE_BUILD_TYPE")
+	endif()
 endif()
 
 ###############################################################################
@@ -332,28 +341,39 @@ else()
     addPath("${srcDir}/T3D/gameBase/std")
 endif()
 
-if(TORQUE_TESTING)
-   include( "modules/module_testing.cmake" )
-endif()
-
-if(TORQUE_NAVIGATION)
-   include( "modules/module_navigation.cmake" )
-endif()
-
-if(TORQUE_OCULUSVR)
-    include( "modules/module_oculusVR.cmake" )
-endif()
-
-if(TORQUE_HYDRA)
-    include( "modules/module_hydra.cmake" )
+if(TORQUE_SDL)
+    addPathRec("${srcDir}/windowManager/sdl")
+    addPathRec("${srcDir}/platformSDL")
+    
+    if(TORQUE_OPENGL)
+      addPathRec("${srcDir}/gfx/gl/sdl")
+    endif()
+    
+    if(UNIX)
+       #set(CMAKE_SIZEOF_VOID_P 4) #force 32 bit
+       set(ENV{CFLAGS} "${CXX_FLAG32} -g -O3")
+       if("${TORQUE_ADDITIONAL_LINKER_FLAGS}" STREQUAL "")
+         set(ENV{LDFLAGS} "${CXX_FLAG32}")
+       else()
+         set(ENV{LDFLAGS} "${CXX_FLAG32} ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
+       endif()
+    endif()
+    
+    #override and hide SDL2 cache variables
+    set(SDL_SHARED ON CACHE INTERNAL "" FORCE)
+    set(SDL_STATIC OFF CACHE INTERNAL "" FORCE)
+    add_subdirectory( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
 endif()
 
 if(TORQUE_DEDICATED)
     addDef(TORQUE_DEDICATED)
 endif()
 
-include( "modules/module_testing.cmake" )
-
+#modules dir
+file(GLOB modules "modules/*.cmake")
+foreach(module ${modules})
+	include(${module})
+endforeach()
 
 ###############################################################################
 # platform specific things
@@ -419,6 +439,7 @@ if(PS3)
 endif()
 
 if(UNIX)
+    # linux_dedicated
     if(TORQUE_DEDICATED)
 		addPath("${srcDir}/windowManager/dedicated")
 		# ${srcDir}/platformX86UNIX/*.client.* files are not needed	
@@ -435,8 +456,9 @@ if(UNIX)
         endforeach()
     else()
         addPath("${srcDir}/platformX86UNIX")
+        addPath("${srcDir}/platformX86UNIX/nativeDialogs")
     endif()    
-    
+    # linux
     addPath("${srcDir}/platformX86UNIX/threads")
     addPath("${srcDir}/platformPOSIX")
 endif()
@@ -446,8 +468,12 @@ if( TORQUE_OPENGL )
     if( TORQUE_OPENGL AND NOT TORQUE_DEDICATED )
         addPath("${srcDir}/gfx/gl")
         addPath("${srcDir}/gfx/gl/tGL")        
+    addPath("${srcDir}/shaderGen/GLSL")
         addPath("${srcDir}/terrain/glsl")
         addPath("${srcDir}/forest/glsl")    
+
+    # glew
+    LIST(APPEND ${PROJECT_NAME}_files "${libDir}/glew/src/glew.c")
     endif()
     
     if(WIN32 AND NOT TORQUE_SDL)
@@ -506,6 +532,19 @@ if(WIN32)
     set(TORQUE_EXTERNAL_LIBS "COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WSOCK32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib" CACHE STRING "external libs to link against")
     mark_as_advanced(TORQUE_EXTERNAL_LIBS)
     addLib("${TORQUE_EXTERNAL_LIBS}")
+   
+   if(TORQUE_OPENGL)
+      addLib(OpenGL32.lib)
+   endif()
+endif()
+
+if(UNIX)
+    # copy pasted from T3D build system, some might not be needed
+	set(TORQUE_EXTERNAL_LIBS "dl Xxf86vm Xext X11 Xft stdc++ pthread GL" CACHE STRING "external libs to link against")
+	mark_as_advanced(TORQUE_EXTERNAL_LIBS)
+    
+    string(REPLACE " " ";" TORQUE_EXTERNAL_LIBS_LIST ${TORQUE_EXTERNAL_LIBS})
+    addLib( "${TORQUE_EXTERNAL_LIBS_LIST}" )
 endif()
 
 if(UNIX)
@@ -520,8 +559,8 @@ endif()
 ###############################################################################
 # Always enabled Definitions
 ###############################################################################
-addDef(TORQUE_DEBUG DEBUG)
-addDef(TORQUE_ENABLE_ASSERTS "DEBUG;RelWithDebInfo")
+addDef(TORQUE_DEBUG Debug)
+addDef(TORQUE_ENABLE_ASSERTS "Debug;RelWithDebInfo")
 addDef(TORQUE_DEBUG_GFX_MODE "RelWithDebInfo")
 addDef(TORQUE_SHADERGEN)
 addDef(INITGUID)
@@ -544,6 +583,23 @@ if(UNIX)
 	addDef(LINUX)	
 endif()
 
+if(TORQUE_OPENGL)
+	addDef(TORQUE_OPENGL)
+   if(WIN32)
+      addDef(GLEW_STATIC)
+    endif()
+endif()
+
+if(TORQUE_SDL)
+    addDef(TORQUE_SDL)
+    addInclude(${libDir}/sdl/include)
+    addLib(SDL2)
+endif()
+
+if(TORQUE_STATIC_CODE_ANALYSIS)
+    addDef( "ON_FAIL_ASSERTFATAL=exit(1)" )
+endif()
+
 ###############################################################################
 # Include Paths
 ###############################################################################
@@ -562,6 +618,18 @@ addInclude("${libDir}/libogg/include")
 addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
+if(TORQUE_OPENGL)
+	addInclude("${libDir}/glew/include")
+endif()
+
+if(UNIX)
+	addInclude("/usr/include/freetype2/freetype")
+	addInclude("/usr/include/freetype2")
+endif()
+
+if(TORQUE_OPENGL)
+	addInclude("${libDir}/glew/include")
+endif()
 
 # external things
 if(WIN32)
@@ -571,6 +639,17 @@ endif()
 if(UNIX)
 	addInclude("/usr/include/freetype2/freetype")
 	addInclude("/usr/include/freetype2")
+endif()
+
+if(MSVC)
+    # Match projectGenerator naming for executables
+    set(OUTPUT_CONFIG DEBUG MINSIZEREL RELWITHDEBINFO)
+    set(OUTPUT_SUFFIX DEBUG MINSIZE    OPTIMIZEDDEBUG)
+    foreach(INDEX RANGE 2)
+        list(GET OUTPUT_CONFIG ${INDEX} CONF)
+        list(GET OUTPUT_SUFFIX ${INDEX} SUFFIX)
+        set_property(TARGET ${PROJECT_NAME} PROPERTY OUTPUT_NAME_${CONF} ${PROJECT_NAME}_${SUFFIX})
+    endforeach()
 endif()
 
 ###############################################################################

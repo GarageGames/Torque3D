@@ -26,6 +26,7 @@
 #include "platform/platform.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "scene/sceneManager.h"
 #include "collision/collision.h"
 #include "math/util/frustum.h"
@@ -785,41 +786,41 @@ void GuiDecalEditorCtrl::setMode( String mode, bool sourceShortcut = false )
 		Con::executef( this, "paletteSync", mMode );
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, deleteSelectedDecal, void, 2, 2, "deleteSelectedDecal()" )
+DefineConsoleMethod( GuiDecalEditorCtrl, deleteSelectedDecal, void, (), , "deleteSelectedDecal()" )
 {
    object->deleteSelectedDecal();
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, 3, 3, "deleteSelectedDecalDatablock( String datablock )" )
+DefineConsoleMethod( GuiDecalEditorCtrl, deleteDecalDatablock, void, ( const char * datablock ), , "deleteSelectedDecalDatablock( String datablock )" )
 {
-	String lookupName( argv[2] );
+	String lookupName( datablock );
 	if( lookupName == String::EmptyString )
 		return;
 	
 	object->deleteDecalDatablock( lookupName );
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, setMode, void, 3, 3, "setMode( String mode )()" )
+DefineConsoleMethod( GuiDecalEditorCtrl, setMode, void, ( String newMode ), , "setMode( String mode )()" )
 {
-	String newMode = ( argv[2] );
 	object->setMode( newMode );
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, getMode, const char*, 2, 2, "getMode()" )
+DefineConsoleMethod( GuiDecalEditorCtrl, getMode, const char*, (), , "getMode()" )
 {
 	return object->mMode;
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, getDecalCount, S32, 2, 2, "getDecalCount()" )
+DefineConsoleMethod( GuiDecalEditorCtrl, getDecalCount, S32, (), , "getDecalCount()" )
 {
 	return gDecalManager->mDecalInstanceVec.size();
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, 3, 3, "getDecalTransform()" )
+DefineConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, ( U32 id ), , "getDecalTransform()" )
 {
-	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[dAtoi(argv[2])];
-	if( decalInstance == NULL )
-		return "";
+   DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[id];
+
+   if( decalInstance == NULL )
+      return "";
 
    static const U32 bufSize = 256;
    char* returnBuffer = Con::getReturnBuffer(bufSize);
@@ -836,42 +837,30 @@ ConsoleMethod( GuiDecalEditorCtrl, getDecalTransform, const char*, 3, 3, "getDec
 	return returnBuffer;
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, getDecalLookupName, const char*, 3, 3, "getDecalLookupName( S32 )()" )
+DefineConsoleMethod( GuiDecalEditorCtrl, getDecalLookupName, const char*, ( U32 id ), , "getDecalLookupName( S32 )()" )
 {
-	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[dAtoi(argv[2])];
+	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[id];
 	if( decalInstance == NULL )
 		return "invalid";
 
 	return decalInstance->mDataBlock->lookupName;
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, selectDecal, void, 3, 3, "selectDecal( S32 )()" )
+DefineConsoleMethod( GuiDecalEditorCtrl, selectDecal, void, ( U32 id ), , "selectDecal( S32 )()" )
 {
-	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[dAtoi(argv[2])];
+	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[id];
 	if( decalInstance == NULL )
 		return;
 
 	object->selectDecal( decalInstance );
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, editDecalDetails, void, 4, 4, "editDecalDetails( S32 )()" )
+DefineConsoleMethod( GuiDecalEditorCtrl, editDecalDetails, void, ( U32 id, Point3F pos, Point3F tan,F32 size ), , "editDecalDetails( S32 )()" )
 {
-	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[ dAtoi(argv[2]) ];
+	DecalInstance *decalInstance = gDecalManager->mDecalInstanceVec[id];
 	if( decalInstance == NULL )
 		return;
 
-	Point3F pos;
-	Point3F tan;
-	F32 size;
-
-	S32 count = dSscanf( argv[3], "%f %f %f %f %f %f %f", 
-		&pos.x, &pos.y, &pos.z, &tan.x, &tan.y, &tan.z, &size);
-	
-	if ( (count != 7) )
-   {
-		Con::printf("Failed to parse decal information \"px py pz tx ty tz s\" from '%s'", argv[3]);
-      return;
-   }
 
    decalInstance->mPosition = pos;
 	decalInstance->mTangent = tan;
@@ -885,17 +874,17 @@ ConsoleMethod( GuiDecalEditorCtrl, editDecalDetails, void, 4, 4, "editDecalDetai
 	gDecalManager->notifyDecalModified( decalInstance );
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, getSelectionCount, S32, 2, 2, "" )
+DefineConsoleMethod( GuiDecalEditorCtrl, getSelectionCount, S32, (), , "" )
 {
    if ( object->mSELDecal != NULL )
       return 1;
    return 0;
 }
 
-ConsoleMethod( GuiDecalEditorCtrl, retargetDecalDatablock, void, 4, 4, "" )
+DefineConsoleMethod( GuiDecalEditorCtrl, retargetDecalDatablock, void, ( const char * dbFrom, const char * dbTo ), , "" )
 {
-   if( dStrcmp( argv[2], "" ) != 0 && dStrcmp( argv[3], "" ) != 0 )
-		object->retargetDecalDatablock( argv[2], argv[3] );
+   if( dStrcmp( dbFrom, "" ) != 0 && dStrcmp( dbTo, "" ) != 0 )
+		object->retargetDecalDatablock( dbFrom, dbTo );
 }
 
 void GuiDecalEditorCtrl::setGizmoFocus( DecalInstance * decalInstance )
@@ -916,7 +905,7 @@ ConsoleDocClass( DICreateUndoAction,
 				"@internal");
 
 DICreateUndoAction::DICreateUndoAction( const UTF8* actionName )
-   :  UndoAction( actionName )
+   :  UndoAction( actionName ), mEditor(0), mDatablockId(0)
 {
 }
 
@@ -1004,7 +993,7 @@ ConsoleDocClass( DIDeleteUndoAction,
 				"@internal");
 
 DIDeleteUndoAction::DIDeleteUndoAction( const UTF8 *actionName )
-   :  UndoAction( actionName )
+   :  UndoAction( actionName ), mEditor(0), mDatablockId(0)
 {
 }
 
@@ -1092,7 +1081,7 @@ ConsoleDocClass( DBDeleteUndoAction,
 				"@internal");
 
 DBDeleteUndoAction::DBDeleteUndoAction( const UTF8 *actionName )
-   :  UndoAction( actionName )
+   :  UndoAction( actionName ), mEditor(0), mDatablockId(0)
 {
 }
 
@@ -1201,7 +1190,7 @@ ConsoleDocClass( DBRetargetUndoAction,
 				"@internal");
 
 DBRetargetUndoAction::DBRetargetUndoAction( const UTF8 *actionName )
-   :  UndoAction( actionName )
+   :  UndoAction( actionName ), mEditor(0), mDBFromId(0), mDBToId(0)
 {
 }
 

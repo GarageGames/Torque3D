@@ -30,6 +30,7 @@
 
 #include "gui/worldEditor/editTSCtrl.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "core/util/tVector.h"
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiCanvas.h"
@@ -681,7 +682,7 @@ bool ForestBrushTool::getGroundAt( const Point3F &worldPt, F32 *zValueOut, Vecto
    return true;
 }
 
-ConsoleMethod( ForestBrushTool, collectElements, void, 2, 2, "" )
+DefineConsoleMethod( ForestBrushTool, collectElements, void, (), , "" )
 {
    object->collectElements();
 }

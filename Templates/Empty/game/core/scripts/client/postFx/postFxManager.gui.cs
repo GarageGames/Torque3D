@@ -94,7 +94,13 @@ function ppOptionsEnableDOF::onAction(%this)
    %toEnable = PostFXManager.getEnableResultFromControl(%this);
    PostFXManager.settingsEffectSetEnabled("DOF", %toEnable);
 }
- 
+
+function ppOptionsEnableVignette::onAction(%this)
+{ 
+   %toEnable = PostFXManager.getEnableResultFromControl(%this);
+   PostFXManager.settingsEffectSetEnabled("Vignette", %toEnable);
+}
+
 function ppOptionsSavePreset::onClick(%this)
 {
    //Stores the current settings into a preset file for loading and use later on 
@@ -295,12 +301,37 @@ function ppOptionsHDREffectsBlueShiftColorBaseColor::onAction(%this)
 }
 
 
-//Light rays Slider Controls
+//Light rays Brightness Slider Controls
 function ppOptionsLightRaysBrightScalar::onMouseDragged(%this)
 {
    $LightRayPostFX::brightScalar = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
+//Light rays Number of Samples Slider Control
+function ppOptionsLightRaysSampleScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::numSamples = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+//Light rays Density Slider Control
+function ppOptionsLightRaysDensityScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::density = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+//Light rays Weight Slider Control
+function ppOptionsLightRaysWeightScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::weight = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+//Light rays Decay Slider Control
+function ppOptionsLightRaysDecayScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::decay = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+
 
 function ppOptionsUpdateDOFSettings()
 {
@@ -377,6 +408,24 @@ function ppOptionsEnableHDRDebug::onAction(%this)
       LuminanceVisPostFX.enable();
    else
       LuminanceVisPostFX.disable();   
+}
+
+function ppOptionsUpdateVignetteSettings()
+{  
+   if($PostFXManager::PostFX::EnableVignette)
+   {
+      VignettePostEffect.enable();
+   }
+   else
+   {
+      VignettePostEffect.disable();
+   }
+}
+
+function ppOptionsVignetteEnableVignette::onAction(%this)
+{
+   $PostFXManager::PostFX::EnableVignette = %this.getValue();
+   ppOptionsUpdateVignetteSettings();
 }
 
 function ppColorCorrection_selectFile()

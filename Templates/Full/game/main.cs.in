@@ -40,7 +40,7 @@ function createCanvas(%windowTitle)
    // Create the Canvas
    %foo = new GuiCanvas(Canvas)
    {
-      displayWindow = false;
+      displayWindow = $platform !$= "windows";
    };
    
    // Set the window title

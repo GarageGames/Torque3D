@@ -73,14 +73,26 @@ U32 CloudLayer::smVertCount = smVertStride * smVertStride;
 U32 CloudLayer::smTriangleCount = smStrideMinusOne * smStrideMinusOne * 2;
 
 CloudLayer::CloudLayer()
-: mBaseColor( 0.9f, 0.9f, 0.9f, 1.0f ),
-  mCoverage( 0.5f ),
+: mLastTime( 0 ),
+  mBaseColor( 0.9f, 0.9f, 0.9f, 1.0f ),
   mExposure( 1.0f ),
-  mWindSpeed( 1.0f ),
-  mLastTime( 0 )
+  mCoverage( 0.5f ),
+  mWindSpeed( 1.0f )
 {
    mTypeMask |= EnvironmentObjectType | StaticObjectType;
    mNetFlags.set(Ghostable | ScopeAlways);
+
+   mModelViewProjSC =
+   mAmbientColorSC =
+   mSunColorSC =
+   mSunVecSC =
+   mTexScaleSC =
+   mBaseColorSC =
+   mCoverageSC =
+   mExposureSC =
+   mEyePosWorldSC = 0;
+
+   mTexOffsetSC[0] = mTexOffsetSC[1] = mTexOffsetSC[2] = 0;
 
    mTexScale[0] = 1.0;
    mTexScale[1] = 1.0;
@@ -143,6 +155,7 @@ bool CloudLayer::onAdd()
       mCoverageSC = mShader->getShaderConstHandle( "$cloudCoverage" );
       mExposureSC = mShader->getShaderConstHandle( "$cloudExposure" );
       mBaseColorSC = mShader->getShaderConstHandle( "$cloudBaseColor" );
+      mNormalHeightMapSC = mShader->getShaderConstHandle( "$normalHeightMap" );
 
       // Create StateBlocks
       GFXStateBlockDesc desc;
@@ -365,7 +378,7 @@ void CloudLayer::renderObject( ObjectRenderInst *ri, SceneRenderState *state, Ba
 
    mShaderConsts->setSafe( mExposureSC, mExposure );
 
-   GFX->setTexture( 0, mTexture );                            
+   GFX->setTexture( mNormalHeightMapSC->getSamplerRegister(), mTexture );                            
    GFX->setVertexBuffer( mVB );            
    GFX->setPrimitiveBuffer( mPB );
 

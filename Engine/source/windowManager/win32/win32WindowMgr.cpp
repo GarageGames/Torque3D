@@ -27,6 +27,8 @@
 #include "core/util/journal/process.h"
 #include "core/strings/unicode.h"
 
+#if !defined( TORQUE_SDL )
+
 // ------------------------------------------------------------------------
 
 void CloseSplashWindow(HINSTANCE hinst);
@@ -136,7 +138,7 @@ void Win32WindowManager::buildMonitorsList()
    mMonitors.clear();
 
    // Enumerate all monitors
-   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (size_t)(void*)&mMonitors);
+   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (uintptr_t)&mMonitors);
 }
 
 S32 Win32WindowManager::findFirstMatchingMonitor(const char* name)
@@ -523,3 +525,5 @@ void Win32WindowManager::raiseCurtain()
    DestroyWindow(mCurtainWindow);
    mCurtainWindow = NULL;
 }
+
+#endif

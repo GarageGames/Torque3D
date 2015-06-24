@@ -21,17 +21,19 @@
 # -----------------------------------------------------------------------------
 
 # Navigation module
+option(TORQUE_NAVIGATION "Enable Navigation module" ON)
 
-addDef( "TORQUE_NAVIGATION_ENABLED" )
-addLib( "recast" )
+if(TORQUE_NAVIGATION)
+	addDef( "TORQUE_NAVIGATION_ENABLED" )
+	addLib( "recast" )
 
-# files
-addPathRec( "${srcDir}/navigation" )
+	# files
+	addPathRec( "${srcDir}/navigation" )
 
-# include paths
-addInclude( "${libDir}/recast/DebugUtils/Include" )
-addInclude( "${libDir}/recast/Recast/Include" )
-addInclude( "${libDir}/recast/Detour/Include" )
-addInclude( "${libDir}/recast/DetourTileCache/Include" )
-addInclude( "${libDir}/recast/DetourCrowd/Include" )
-
+	# include paths
+	addInclude( "${libDir}/recast/DebugUtils/Include" )
+	addInclude( "${libDir}/recast/Recast/Include" )
+	addInclude( "${libDir}/recast/Detour/Include" )
+	addInclude( "${libDir}/recast/DetourTileCache/Include" )
+	addInclude( "${libDir}/recast/DetourCrowd/Include" )
+endif(TORQUE_NAVIGATION)

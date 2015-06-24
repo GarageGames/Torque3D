@@ -179,6 +179,8 @@ ReflectorBase::ReflectorBase()
    mObject = NULL;
    mOcclusionQuery = GFX->createOcclusionQuery();
    mQueryPending = false;
+   score = 0.0f;
+   lastUpdateMs = 0;
 }
 
 ReflectorBase::~ReflectorBase()
@@ -539,9 +541,10 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    if (  texResize || 
          reflectTex.isNull() ||
          reflectTex->getFormat() != REFLECTMGR->getReflectFormat() )
+   {
       reflectTex = REFLECTMGR->allocRenderTarget( texSize );
-
-   GFXTexHandle depthBuff = LightShadowMap::_getDepthTarget( texSize.x, texSize.y );
+      depthBuff = LightShadowMap::_getDepthTarget( texSize.x, texSize.y );
+   }
 
    // store current matrices
    GFXTransformSaver saver;

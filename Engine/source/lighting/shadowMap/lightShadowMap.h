@@ -259,6 +259,7 @@ protected:
    GFXTextureTargetRef mTarget;
    U32 mTexSize;
    GFXTexHandle mShadowMapTex;
+   GFXTexHandle mShadowMapDepth;
 
    // The light we are rendering.
    LightInfo *mLight;   

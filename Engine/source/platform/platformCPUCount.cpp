@@ -21,6 +21,12 @@
 //					must ensure BIOS settings is not configured to restrict CPUID functionalities.
 //-------------------------------------------------------------------------------------------------
 
+#if defined(TORQUE_OS_LINUX) || defined(LINUX)
+
+// TODO GCC code don't compile on Release with optimizations, mover code to platform layer
+
+#else
+
 #include "platform/platform.h"
 #include "platform/platformCPUCount.h"
 
@@ -663,6 +669,8 @@ next:
       }
 
 } // namespace CPUInfo
+#endif
+
 #endif
 
 #endif

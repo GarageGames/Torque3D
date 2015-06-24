@@ -384,6 +384,7 @@ void ParallaxFeatGLSL::setTexData(  Material::StageData &stageDat,
    GFXTextureObject *tex = stageDat.getTex( MFT_NormalMap );
    if ( tex )
    {
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
       passData.mTexType[ texIndex ] = Material::Bump;
       passData.mTexSlot[ texIndex++ ].texObject = tex;
    }

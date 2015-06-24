@@ -484,19 +484,17 @@ static ConsoleDocFragment _FileObjectwriteObject2(
    "FileObject",
    "void writeObject( SimObject* object, string prepend);");
 
-ConsoleMethod( FileObject, writeObject, void, 3, 4, "FileObject.writeObject(SimObject, object prepend)" 
+DefineConsoleMethod( FileObject, writeObject, void,  (const char * simName, const char * objName), (""), "FileObject.writeObject(SimObject, object prepend)" 
 			  "@hide")
 {
-   SimObject* obj = Sim::findObject( argv[2] );
+   SimObject* obj = Sim::findObject( simName );
    if( !obj )
    {
       Con::printf("FileObject::writeObject - Invalid Object!");
       return;
    }
-
-   char *objName = NULL;
-   if( argc == 4 )
-      objName = (char*)argv[3];
+	if (!dStrcmp(objName,""))
+       objName = NULL;
 
    object->writeObject( obj, (const U8*)objName );
 }

@@ -28,6 +28,8 @@
 #include "T3D/gameBase/moveManager.h"
 #include "console/engineAPI.h"
 
+#include <cfloat>
+
 static U32 sAIPlayerLoSMask = TerrainObjectType | StaticShapeObjectType | StaticObjectType;
 
 IMPLEMENT_CO_NETOBJECT_V1(AIPlayer);
@@ -100,7 +102,16 @@ AIPlayer::AIPlayer()
    mTargetInLOS = false;
    mAimOffset = Point3F(0.0f, 0.0f, 0.0f);
 
+#ifdef TORQUE_NAVIGATION_ENABLED
+   mJump = None;
+   mNavSize = Regular;
+   mLinkTypes = LinkData(AllFlags);
+#endif
+
    mIsAiControlled = true;
+
+   for( S32 i = 0; i < MaxTriggerKeys; i ++ )
+      mMoveTriggers[ i ] = false;
 }
 
 /**
@@ -136,6 +147,27 @@ void AIPlayer::initPersistFields()
 
    endGroup( "AI" );
 
+#ifdef TORQUE_NAVIGATION_ENABLED
+   addGroup("Pathfinding");
+
+      addField("allowWalk", TypeBool, Offset(mLinkTypes.walk, AIPlayer),
+         "Allow the character to walk on dry land.");
+      addField("allowJump", TypeBool, Offset(mLinkTypes.jump, AIPlayer),
+         "Allow the character to use jump links.");
+      addField("allowDrop", TypeBool, Offset(mLinkTypes.drop, AIPlayer),
+         "Allow the character to use drop links.");
+      addField("allowSwim", TypeBool, Offset(mLinkTypes.swim, AIPlayer),
+         "Allow the character tomove in water.");
+      addField("allowLedge", TypeBool, Offset(mLinkTypes.ledge, AIPlayer),
+         "Allow the character to jump ledges.");
+      addField("allowClimb", TypeBool, Offset(mLinkTypes.climb, AIPlayer),
+         "Allow the character to use climb links.");
+      addField("allowTeleport", TypeBool, Offset(mLinkTypes.teleport, AIPlayer),
+         "Allow the character to use teleporters.");
+
+   endGroup("Pathfinding");
+#endif // TORQUE_NAVIGATION_ENABLED
+
    Parent::initPersistFields();
 }
 
@@ -150,6 +182,16 @@ bool AIPlayer::onAdd()
    mLastLocation = eye.getPosition();
 
    return true;
+}
+
+void AIPlayer::onRemove()
+{
+#ifdef TORQUE_NAVIGATION_ENABLED
+   clearPath();
+   clearCover();
+   clearFollow();
+#endif
+   Parent::onRemove();
 }
 
 /**
@@ -168,6 +210,11 @@ void AIPlayer::setMoveSpeed( F32 speed )
 void AIPlayer::stopMove()
 {
    mMoveState = ModeStop;
+#ifdef TORQUE_NAVIGATION_ENABLED
+   clearPath();
+   clearCover();
+   clearFollow();
+#endif
 }
 
 /**
@@ -244,6 +291,53 @@ void AIPlayer::clearAim()
 }
 
 /**
+ * Set the state of a movement trigger.
+ *
+ * @param slot The trigger slot to set
+ * @param isSet set/unset the trigger
+ */
+void AIPlayer::setMoveTrigger( U32 slot, const bool isSet )
+{
+   if(slot >= MaxTriggerKeys)
+   {
+      Con::errorf("Attempting to set an invalid trigger slot (%i)", slot);
+   }
+   else
+   {
+      mMoveTriggers[ slot ] = isSet;   // set the trigger
+      setMaskBits(NoWarpMask);         // force the client to updateMove
+   }
+}
+
+/**
+ * Get the state of a movement trigger.
+ *
+ * @param slot The trigger slot to query
+ * @return True if the trigger is set, false if it is not set
+ */
+bool AIPlayer::getMoveTrigger( U32 slot ) const
+{
+   if(slot >= MaxTriggerKeys)
+   {
+      Con::errorf("Attempting to get an invalid trigger slot (%i)", slot);
+      return false;
+   }
+   else
+   {
+      return mMoveTriggers[ slot ];
+   }
+}
+
+/**
+ * Clear the trigger state for all movement triggers.
+ */
+void AIPlayer::clearMoveTriggers()
+{
+   for( U32 i = 0; i < MaxTriggerKeys; i ++ )
+      setMoveTrigger( i, false );
+}
+
+/**
  * This method calculates the moves for the AI player
  *
  * @param movePtr Pointer to move the move list into
@@ -257,6 +351,32 @@ bool AIPlayer::getAIMove(Move *movePtr)
    getEyeTransform(&eye);
    Point3F location = eye.getPosition();
    Point3F rotation = getRotation();
+
+#ifdef TORQUE_NAVIGATION_ENABLED
+   if(mDamageState == Enabled)
+   {
+      if(mMoveState != ModeStop)
+         updateNavMesh();
+      if(!mFollowData.object.isNull())
+      {
+         if(mPathData.path.isNull())
+         {
+            if((getPosition() - mFollowData.object->getPosition()).len() > mFollowData.radius)
+               followObject(mFollowData.object, mFollowData.radius);
+         }
+         else
+         {
+            if((mPathData.path->mTo - mFollowData.object->getPosition()).len() > mFollowData.radius)
+               repath();
+            else if((getPosition() - mFollowData.object->getPosition()).len() < mFollowData.radius)
+            {
+               clearPath();
+               mMoveState = ModeStop;
+            }
+         }
+      }
+   }
+#endif // TORQUE_NAVIGATION_ENABLED
 
    // Orient towards the aim point, aim object, or towards
    // our destination.
@@ -340,7 +460,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
       if (mFabs(xDiff) < mMoveTolerance && mFabs(yDiff) < mMoveTolerance) 
       {
          mMoveState = ModeStop;
-         throwCallback("onReachDestination");
+         onReachDestination();
       }
       else 
       {
@@ -409,7 +529,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
                if ( mMoveState != ModeSlowing || locationDelta == 0 )
                {
                   mMoveState = ModeStuck;
-                  throwCallback("onMoveStuck");
+                  onStuck();
                }
             }
          }
@@ -419,27 +539,52 @@ bool AIPlayer::getAIMove(Move *movePtr)
    // Test for target location in sight if it's an object. The LOS is
    // run from the eye position to the center of the object's bounding,
    // which is not very accurate.
-   if (mAimObject)
-   {
-      if (checkInLos(mAimObject.getPointer()))
-      {
-         if (!mTargetInLOS)
-         {
-            throwCallback("onTargetEnterLOS");
-            mTargetInLOS = true;
+   if (mAimObject) {
+      MatrixF eyeMat;
+      getEyeTransform(&eyeMat);
+      eyeMat.getColumn(3,&location);
+      Point3F targetLoc = mAimObject->getBoxCenter();
+
+      // This ray ignores non-static shapes. Cast Ray returns true
+      // if it hit something.
+      RayInfo dummy;
+      if (getContainer()->castRay( location, targetLoc,
+            StaticShapeObjectType | StaticObjectType |
+            TerrainObjectType, &dummy)) {
+         if (mTargetInLOS) {
+            throwCallback( "onTargetExitLOS" );
+            mTargetInLOS = false;
          }
       }
-      else if (mTargetInLOS)
-      {
-         throwCallback("onTargetExitLOS");
-         mTargetInLOS = false;
-      }
+      else
+         if (!mTargetInLOS) {
+            throwCallback( "onTargetEnterLOS" );
+            mTargetInLOS = true;
+         }
    }
 
    // Replicate the trigger state into the move so that
    // triggers can be controlled from scripts.
-   for( U32 i = 0; i < MaxMountedImages; i++ )
-      movePtr->trigger[i] = getImageTriggerState(i);
+   for( U32 i = 0; i < MaxTriggerKeys; i++ )
+      movePtr->trigger[ i ] = mMoveTriggers[ i ];
+
+#ifdef TORQUE_NAVIGATION_ENABLED
+   if(mJump == Now)
+   {
+      movePtr->trigger[2] = true;
+      mJump = None;
+   }
+   else if(mJump == Ledge)
+   {
+      // If we're not touching the ground, jump!
+      RayInfo info;
+      if(!getContainer()->castRay(getPosition(), getPosition() - Point3F(0, 0, 0.4f), StaticShapeObjectType, &info))
+      {
+         movePtr->trigger[2] = true;
+         mJump = None;
+      }
+   }
+#endif // TORQUE_NAVIGATION_ENABLED
 
    mLastLocation = location;
 
@@ -457,6 +602,457 @@ void AIPlayer::throwCallback( const char *name )
    Con::executef(getDataBlock(), name, getIdString());
 }
 
+/**
+ * Called when we get within mMoveTolerance of our destination set using
+ * setMoveDestination(). Only fires the script callback if we are at the end
+ * of a pathfinding path, or have no pathfinding path.
+ */
+void AIPlayer::onReachDestination()
+{
+#ifdef TORQUE_NAVIGATION_ENABLED
+   if(!mPathData.path.isNull())
+   {
+      if(mPathData.index == mPathData.path->size() - 1)
+      {
+         // Handle looping paths.
+         if(mPathData.path->mIsLooping)
+            moveToNode(0);
+         // Otherwise end path.
+         else
+         {
+            clearPath();
+            throwCallback("onReachDestination");
+         }
+      }
+      else
+      {
+         moveToNode(mPathData.index + 1);
+         // Throw callback every time if we're on a looping path.
+         //if(mPathData.path->mIsLooping)
+            //throwCallback("onReachDestination");
+      }
+   }
+   else
+#endif
+      throwCallback("onReachDestination");
+}
+
+/**
+ * Called when we move less than mMoveStuckTolerance in a tick, signalling
+ * that some obstacle is preventing us from getting where we need to go.
+ */
+void AIPlayer::onStuck()
+{
+#ifdef TORQUE_NAVIGATION_ENABLED
+   if(!mPathData.path.isNull())
+      repath();
+   else
+#endif
+      throwCallback("onMoveStuck");
+}
+
+#ifdef TORQUE_NAVIGATION_ENABLED
+// --------------------------------------------------------------------------------------------
+// Pathfinding
+// --------------------------------------------------------------------------------------------
+
+void AIPlayer::clearPath()
+{
+   // Only delete if we own the path.
+   if(!mPathData.path.isNull() && mPathData.owned)
+      mPathData.path->deleteObject();
+   // Reset path data.
+   mPathData = PathData();
+}
+
+void AIPlayer::clearCover()
+{
+   // Notify cover that we are no longer on our way.
+   if(!mCoverData.cover.isNull())
+      mCoverData.cover->setOccupied(false);
+   mCoverData = CoverData();
+}
+
+void AIPlayer::clearFollow()
+{
+   mFollowData = FollowData();
+}
+
+void AIPlayer::moveToNode(S32 node)
+{
+   if(mPathData.path.isNull())
+      return;
+
+   // -1 is shorthand for 'last path node'.
+   if(node == -1)
+      node = mPathData.path->size() - 1;
+
+   // Consider slowing down on the last path node.
+   setMoveDestination(mPathData.path->getNode(node), false);
+
+   // Check flags for this segment.
+   if(mPathData.index)
+   {
+      U16 flags = mPathData.path->getFlags(node - 1);
+      // Jump if we must.
+      if(flags & LedgeFlag)
+         mJump = Ledge;
+      else if(flags & JumpFlag)
+         mJump = Now;
+      else
+         // Catch pathing errors.
+         mJump = None;
+   }
+
+   // Store current index.
+   mPathData.index = node;
+}
+
+bool AIPlayer::setPathDestination(const Point3F &pos)
+{
+   // Pathfinding only happens on the server.
+   if(!isServerObject())
+      return false;
+
+   if(!getNavMesh())
+      updateNavMesh();
+   // If we can't find a mesh, just move regularly.
+   if(!getNavMesh())
+   {
+      //setMoveDestination(pos);
+      return false;
+   }
+
+   // Create a new path.
+   NavPath *path = new NavPath();
+   if(path)
+   {
+      path->mMesh = getNavMesh();
+      path->mFrom = getPosition();
+      path->mTo = pos;
+      path->mFromSet = path->mToSet = true;
+      path->mAlwaysRender = true;
+      path->mLinkTypes = mLinkTypes;
+      path->mXray = true;
+      // Paths plan automatically upon being registered.
+      if(!path->registerObject())
+      {
+         delete path;
+         return false;
+      }
+   }
+   else
+      return false;
+
+   if(path->success())
+   {
+      // Clear any current path we might have.
+      clearPath();
+      clearCover();
+      clearFollow();
+      // Store new path.
+      mPathData.path = path;
+      mPathData.owned = true;
+      // Skip node 0, which we are currently standing on.
+      moveToNode(1);
+      return true;
+   }
+   else
+   {
+      // Just move normally if we can't path.
+      //setMoveDestination(pos, true);
+      //return;
+      //throwCallback("onPathFailed");
+      path->deleteObject();
+      return false;
+   }
+}
+
+DefineEngineMethod(AIPlayer, setPathDestination, bool, (Point3F goal),,
+   "@brief Tells the AI to find a path to the location provided\n\n"
+
+   "@param goal Coordinates in world space representing location to move to.\n"
+   "@return True if a path was found.\n\n"
+
+   "@see getPathDestination()\n"
+   "@see setMoveDestination()\n")
+{
+   return object->setPathDestination(goal);
+}
+
+Point3F AIPlayer::getPathDestination() const
+{
+   if(!mPathData.path.isNull())
+      return mPathData.path->mTo;
+   return Point3F(0, 0, 0);
+}
+
+DefineEngineMethod(AIPlayer, getPathDestination, Point3F, (),,
+   "@brief Get the AIPlayer's current pathfinding destination.\n\n"
+
+   "@return Returns a point containing the \"x y z\" position "
+   "of the AIPlayer's current path destination. If no path destination "
+   "has yet been set, this returns \"0 0 0\"."
+
+   "@see setPathDestination()\n")
+{
+	return object->getPathDestination();
+}
+
+void AIPlayer::followNavPath(NavPath *path)
+{
+   if(!isServerObject())
+      return;
+
+   // Get rid of our current path.
+   clearPath();
+   clearCover();
+   clearFollow();
+
+   // Follow new path.
+   mPathData.path = path;
+   mPathData.owned = false;
+   // Start from 0 since we might not already be there.
+   moveToNode(0);
+}
+
+DefineEngineMethod(AIPlayer, followNavPath, void, (SimObjectId obj),,
+   "@brief Tell the AIPlayer to follow a path.\n\n"
+
+   "@param obj ID of a NavPath object for the character to follow.")
+{
+   NavPath *path;
+   if(Sim::findObject(obj, path))
+      object->followNavPath(path);
+}
+
+void AIPlayer::followObject(SceneObject *obj, F32 radius)
+{
+   if(!isServerObject())
+      return;
+
+   if(setPathDestination(obj->getPosition()))
+   {
+      clearCover();
+      mFollowData.object = obj;
+      mFollowData.radius = radius;
+   }
+}
+
+DefineEngineMethod(AIPlayer, followObject, void, (SimObjectId obj, F32 radius),,
+   "@brief Tell the AIPlayer to follow another object.\n\n"
+
+   "@param obj ID of the object to follow.\n"
+   "@param radius Maximum distance we let the target escape to.")
+{
+   SceneObject *follow;
+   if(Sim::findObject(obj, follow))
+      object->followObject(follow, radius);
+}
+
+void AIPlayer::repath()
+{
+   // Ineffectual if we don't have a path, or are using someone else's.
+   if(mPathData.path.isNull() || !mPathData.owned)
+      return;
+
+   // If we're following, get their position.
+   if(!mFollowData.object.isNull())
+      mPathData.path->mTo = mFollowData.object->getPosition();
+   // Update from position and replan.
+   mPathData.path->mFrom = getPosition();
+   mPathData.path->plan();
+   // Move to first node (skip start pos).
+   moveToNode(1);
+}
+
+DefineEngineMethod(AIPlayer, repath, void, (),,
+   "@brief Tells the AI to re-plan its path. Does nothing if the character "
+   "has no path, or if it is following a mission path.\n\n")
+{
+   object->repath();
+}
+
+struct CoverSearch
+{
+   Point3F loc;
+   Point3F from;
+   F32 dist;
+   F32 best;
+   CoverPoint *point;
+   CoverSearch() : loc(0, 0, 0), from(0, 0, 0)
+   {
+      best = -FLT_MAX;
+      point = NULL;
+      dist = FLT_MAX;
+   }
+};
+
+static void findCoverCallback(SceneObject *obj, void *key)
+{
+   CoverPoint *p = dynamic_cast<CoverPoint*>(obj);
+   if(!p || p->isOccupied())
+      return;
+   CoverSearch *s = static_cast<CoverSearch*>(key);
+   Point3F dir = s->from - p->getPosition();
+   dir.normalizeSafe();
+   // Score first based on angle of cover point to enemy.
+   F32 score = mDot(p->getNormal(), dir);
+   // Score also based on distance from seeker.
+   score -= (p->getPosition() - s->loc).len() / s->dist;
+   // Finally, consider cover size.
+   score += (p->getSize() + 1) / CoverPoint::NumSizes;
+   score *= p->getQuality();
+   if(score > s->best)
+   {
+      s->best = score;
+      s->point = p;
+   }
+}
+
+bool AIPlayer::findCover(const Point3F &from, F32 radius)
+{
+   if(radius <= 0)
+      return false;
+
+   // Create a search state.
+   CoverSearch s;
+   s.loc = getPosition();
+   s.dist = radius;
+   // Direction we seek cover FROM.
+   s.from = from;
+
+   // Find cover points.
+   Box3F box(radius * 2.0f);
+   box.setCenter(getPosition());
+   getContainer()->findObjects(box, MarkerObjectType, findCoverCallback, &s);
+
+   // Go to cover!
+   if(s.point)
+   {
+      // Calling setPathDestination clears cover...
+      bool foundPath = setPathDestination(s.point->getPosition());
+      // Now store the cover info.
+      mCoverData.cover = s.point;
+      s.point->setOccupied(true);
+      return foundPath;
+   }
+   return false;
+}
+
+DefineEngineMethod(AIPlayer, findCover, S32, (Point3F from, F32 radius),,
+   "@brief Tells the AI to find cover nearby.\n\n"
+
+   "@param from   Location to find cover from (i.e., enemy position).\n"
+   "@param radius Distance to search for cover.\n"
+   "@return Cover point ID if cover was found, -1 otherwise.\n\n")
+{
+   if(object->findCover(from, radius))
+   {
+      CoverPoint* cover = object->getCover();
+      return cover ? cover->getId() : -1;
+   }
+   else
+   {
+      return -1;
+   }
+}
+
+NavMesh *AIPlayer::findNavMesh() const
+{
+   // Search for NavMeshes that contain us entirely with the smallest possible
+   // volume.
+   NavMesh *mesh = NULL;
+   SimSet *set = NavMesh::getServerSet();
+   for(U32 i = 0; i < set->size(); i++)
+   {
+      NavMesh *m = static_cast<NavMesh*>(set->at(i));
+      if(m->getWorldBox().isContained(getWorldBox()))
+      {
+         // Check that mesh size is appropriate.
+         if(mMount.object) // Should use isMounted() but it's not const. Grr.
+         {
+            if(!m->mVehicles)
+               continue;
+         }
+         else
+         {
+            if(getNavSize() == Small && !m->mSmallCharacters ||
+               getNavSize() == Regular && !m->mRegularCharacters ||
+               getNavSize() == Large && !m->mLargeCharacters)
+               continue;
+         }
+         if(!mesh || m->getWorldBox().getVolume() < mesh->getWorldBox().getVolume())
+            mesh = m;
+      }
+   }
+   return mesh;
+}
+
+DefineEngineMethod(AIPlayer, findNavMesh, S32, (),,
+   "@brief Get the NavMesh object this AIPlayer is currently using.\n\n"
+
+   "@return The ID of the NavPath object this character is using for "
+   "pathfinding. This is determined by the character's location, "
+   "navigation type and other factors. Returns -1 if no NavMesh is "
+   "found.")
+{
+   NavMesh *mesh = object->getNavMesh();
+   return mesh ? mesh->getId() : -1;
+}
+
+void AIPlayer::updateNavMesh()
+{
+   NavMesh *old = mNavMesh;
+   if(mNavMesh.isNull())
+      mNavMesh = findNavMesh();
+   else
+   {
+      if(!mNavMesh->getWorldBox().isContained(getWorldBox()))
+         mNavMesh = findNavMesh();
+   }
+   // See if we need to update our path.
+   if(mNavMesh != old && !mPathData.path.isNull())
+   {
+      setPathDestination(mPathData.path->mTo);
+   }
+}
+
+DefineEngineMethod(AIPlayer, getNavMesh, S32, (),,
+   "@brief Return the NavMesh this AIPlayer is using to navigate.\n\n")
+{
+   NavMesh *m = object->getNavMesh();
+   return m ? m->getId() : 0;
+}
+
+DefineEngineMethod(AIPlayer, setNavSize, void, (const char *size),,
+   "@brief Set the size of NavMesh this character uses. One of \"Small\", \"Regular\" or \"Large\".")
+{
+   if(!dStrcmp(size, "Small"))
+      object->setNavSize(AIPlayer::Small);
+   else if(!dStrcmp(size, "Regular"))
+      object->setNavSize(AIPlayer::Regular);
+   else if(!dStrcmp(size, "Large"))
+      object->setNavSize(AIPlayer::Large);
+   else
+      Con::errorf("AIPlayer::setNavSize: no such size '%s'.", size);
+}
+
+DefineEngineMethod(AIPlayer, getNavSize, const char*, (),,
+   "@brief Return the size of NavMesh this character uses for pathfinding.")
+{
+   switch(object->getNavSize())
+   {
+   case AIPlayer::Small:
+      return "Small";
+   case AIPlayer::Regular:
+      return "Regular";
+   case AIPlayer::Large:
+      return "Large";
+   }
+   return "";
+}
+#endif // TORQUE_NAVIGATION_ENABLED
 
 // --------------------------------------------------------------------------------------------
 // Console Functions
@@ -575,23 +1171,21 @@ ConsoleDocFragment _setAimObject(
    "AIPlayer",
    "void setAimObject(GameBase targetObject, Point3F offset);"
 );
-ConsoleMethod( AIPlayer, setAimObject, void, 3, 4, "( GameBase obj, [Point3F offset] )"
+
+DefineConsoleMethod( AIPlayer, setAimObject, void, ( const char * objName, Point3F offset ), (Point3F::Zero), "( GameBase obj, [Point3F offset] )"
               "Sets the bot's target object. Optionally set an offset from target location."
 			  "@hide")
 {
-   Point3F off( 0.0f, 0.0f, 0.0f );
 
    // Find the target
    GameBase *targetObject;
-   if( Sim::findObject( argv[2], targetObject ) )
+   if( Sim::findObject( objName, targetObject ) )
    {
-      if (argc == 4)
-         dSscanf( argv[3], "%g %g %g", &off.x, &off.y, &off.z );
 
-      object->setAimObject( targetObject, off );
+      object->setAimObject( targetObject, offset );
    }
    else
-      object->setAimObject( 0, off );
+      object->setAimObject( 0, offset );
 }
 
 DefineEngineMethod( AIPlayer, getAimObject, S32, (),,
@@ -713,4 +1307,44 @@ DefineEngineMethod(AIPlayer, checkInFoV, bool, (ShapeBase* obj, F32 fov, bool ch
    "@checkEnabled check whether the object can take damage and if so is still alive.(Defaults to false)\n")
 {
    return object->checkInFoV(obj, fov, checkEnabled);
+}
+
+DefineEngineMethod( AIPlayer, setMoveTrigger, void, ( U32 slot ),,
+   "@brief Sets a movement trigger on an AI object.\n\n"
+   "@param slot The trigger slot to set.\n"
+   "@see getMoveTrigger()\n"
+   "@see clearMoveTrigger()\n"
+   "@see clearMoveTriggers()\n")
+{
+   object->setMoveTrigger( slot, true );
+}
+
+DefineEngineMethod( AIPlayer, clearMoveTrigger, void, ( U32 slot ),,
+   "@brief Clears a movement trigger on an AI object.\n\n"
+   "@param slot The trigger slot to set.\n"
+   "@see setMoveTrigger()\n"
+   "@see getMoveTrigger()\n"
+   "@see clearMoveTriggers()\n")
+{
+   object->setMoveTrigger( slot, false );
+}
+
+DefineEngineMethod( AIPlayer, getMoveTrigger, bool, ( U32 slot ),,
+   "@brief Tests if a movement trigger on an AI object is set.\n\n"
+   "@param slot The trigger slot to check.\n"
+   "@return a boolean indicating if the trigger is set/unset.\n"
+   "@see setMoveTrigger()\n"
+   "@see clearMoveTrigger()\n"
+   "@see clearMoveTriggers()\n")
+{
+   return object->getMoveTrigger( slot );
+}
+
+DefineEngineMethod( AIPlayer, clearMoveTriggers, void, ( ),,
+   "@brief Clear ALL movement triggers on an AI object.\n"
+   "@see setMoveTrigger()\n"
+   "@see getMoveTrigger()\n"
+   "@see clearMoveTrigger()\n")
+{
+   object->clearMoveTriggers();
 }

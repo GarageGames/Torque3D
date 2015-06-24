@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "console/engineAPI.h"
 #include "platform/platform.h"
 #include "gui/editor/inspector/field.h"
 #include "gui/buttons/guiIconButtonCtrl.h"
@@ -268,7 +269,7 @@ void GuiInspectorField::setData( const char* data, bool callbacks )
          {
             char buffer[ 2048 ];
             expandEscape( buffer, newValue );
-            newValue = Con::evaluatef( "%%f = \"%s\"; return ( %s );", oldValue.c_str(), buffer );
+            newValue = (const char*)Con::evaluatef( "%%f = \"%s\"; return ( %s );", oldValue.c_str(), buffer );
          }
          else if(    type == TypeS32Vector
                   || type == TypeF32Vector
@@ -615,53 +616,49 @@ void GuiInspectorField::_setFieldDocs( StringTableEntry docs )
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspectorField, getInspector, S32, 2, 2, "() - Return the GuiInspector to which this field belongs." )
+DefineConsoleMethod( GuiInspectorField, getInspector, S32, (), , "() - Return the GuiInspector to which this field belongs." )
 {
    return object->getInspector()->getId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspectorField, getInspectedFieldName, const char*, 2, 2, "() - Return the name of the field edited by this inspector field." )
+DefineConsoleMethod( GuiInspectorField, getInspectedFieldName, const char*, (), , "() - Return the name of the field edited by this inspector field." )
 {
    return object->getFieldName();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspectorField, getInspectedFieldType, const char*, 2, 2, "() - Return the type of the field edited by this inspector field." )
+DefineConsoleMethod( GuiInspectorField, getInspectedFieldType, const char*, (), , "() - Return the type of the field edited by this inspector field." )
 {
    return object->getFieldType();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspectorField, apply, void, 3, 4, "( string newValue, bool callbacks=true ) - Set the field's value. Suppress callbacks for undo if callbacks=false." )
+DefineConsoleMethod( GuiInspectorField, apply, void, ( const char * newValue, bool callbacks ), (true), "( string newValue, bool callbacks=true ) - Set the field's value. Suppress callbacks for undo if callbacks=false." )
 {
-   bool callbacks = true;
-   if( argc > 3 )
-      callbacks = dAtob( argv[ 3 ] );
-      
-   object->setData( argv[ 2 ], callbacks );
+   object->setData( newValue, callbacks );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspectorField, applyWithoutUndo, void, 3, 3, "() - Set field value without recording undo (same as 'apply( value, false )')." )
+DefineConsoleMethod( GuiInspectorField, applyWithoutUndo, void, (const char * data), , "() - Set field value without recording undo (same as 'apply( value, false )')." )
 {
-   object->setData( argv[ 2 ], false );
+   object->setData( data, false );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspectorField, getData, const char*, 2, 2, "() - Return the value currently displayed on the field." )
+DefineConsoleMethod( GuiInspectorField, getData, const char*, (), , "() - Return the value currently displayed on the field." )
 {
    return object->getData();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( GuiInspectorField, reset, void, 2, 2, "() - Reset to default value." )
+DefineConsoleMethod( GuiInspectorField, reset, void, (), , "() - Reset to default value." )
 {
    object->resetData();
 }

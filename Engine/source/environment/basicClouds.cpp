@@ -63,6 +63,12 @@ BasicClouds::BasicClouds()
    mTypeMask |= EnvironmentObjectType | StaticObjectType;
    mNetFlags.set(Ghostable | ScopeAlways);
 
+   mTimeSC = 0;
+   mModelViewProjSC = 0;
+   mTexScaleSC = 0;
+   mTexDirectionSC = 0;
+   mTexOffsetSC = 0;
+
    mLayerEnabled[0] = true;
    mLayerEnabled[1] = true;
    mLayerEnabled[2] = true;
@@ -129,6 +135,7 @@ bool BasicClouds::onAdd()
       mTexScaleSC = mShader->getShaderConstHandle( "$texScale" );
       mTexDirectionSC = mShader->getShaderConstHandle( "$texDirection" );
       mTexOffsetSC = mShader->getShaderConstHandle( "$texOffset" );
+      mDiffuseMapSC = mShader->getShaderConstHandle( "$diffuseMap" );
 
       // Create StateBlocks
       GFXStateBlockDesc desc;
@@ -312,7 +319,7 @@ void BasicClouds::renderObject( ObjectRenderInst *ri, SceneRenderState *state, B
       mShaderConsts->setSafe( mTexDirectionSC, mTexDirection[i] * mTexSpeed[i] );
       mShaderConsts->setSafe( mTexOffsetSC, mTexOffset[i] );         
 
-      GFX->setTexture( 0, mTexture[i] );                            
+      GFX->setTexture( mDiffuseMapSC->getSamplerRegister(), mTexture[i] );                            
       GFX->setVertexBuffer( mVB[i] );            
 
       GFX->drawIndexedPrimitive( GFXTriangleList, 0, 0, smVertCount, 0, smTriangleCount );

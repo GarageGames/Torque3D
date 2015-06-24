@@ -53,6 +53,7 @@ public:
       mRunArg     = 0;
       mThread     = 0;
       mThreadHnd  = 0;
+      mThreadID   = 0;
       mDead       = false;
    };
 };

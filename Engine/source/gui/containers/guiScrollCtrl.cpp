@@ -72,8 +72,9 @@ GuiScrollCtrl::GuiScrollCtrl()
    mAnimating( false ),
    mScrollAnimSpeed( -1 ),
    mScrollTargetPos( -1, -1 ),
-	mChildExt(0, 0),
-	mChildPos(0, 0)
+   mChildExt(0, 0),
+   mChildPos(0, 0),
+   mBaseThumbSize(0)
 {
    mIsContainer = true;
    setExtent(200,200);

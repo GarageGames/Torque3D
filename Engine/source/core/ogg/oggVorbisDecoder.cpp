@@ -174,7 +174,7 @@ U32 OggVorbisDecoder::read( RawData** buffer, U32 num )
             S32 val = S32( pcmData[ c ][ n ] * 32767.f );
             if( val > 32767 )
                val = 32767;
-            else if( val < -34768 )
+            else if( val < -32768 )
                val = -32768;
                
             *samplePtr = val;

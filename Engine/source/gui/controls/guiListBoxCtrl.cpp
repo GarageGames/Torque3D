@@ -71,7 +71,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onClearSelection, void, (),(),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onUnSelect, void, ( const char* index, const char* itemText),( index, itemText ),
+IMPLEMENT_CALLBACK( GuiListBoxCtrl, onUnSelect, void, ( S32 index, const char* itemText),( index, itemText ),
    "@brief Called whenever a selected item in the list has been unselected.\n\n"
    "@param index Index id of the item that was unselected\n"
    "@param itemText Text for the list entry at the index id that was unselected\n\n"
@@ -85,7 +85,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onUnSelect, void, ( const char* index, const
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onSelect, void, ( const char* index , const char* itemText ),( index, itemText ),
+IMPLEMENT_CALLBACK( GuiListBoxCtrl, onSelect, void, ( S32 index , const char* itemText ),( index, itemText ),
    "@brief Called whenever an item in the list is selected.\n\n"
    "@param index Index id for the item in the list that was selected.\n"
    "@param itemText Text for the list item at the index that was selected.\n\n"
@@ -111,7 +111,7 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onDoubleClick, void, (),(),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseUp, void, (const char* itemHit, const char* mouseClickCount),( itemHit,mouseClickCount),
+IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseUp, void, ( S32 itemHit, S32 mouseClickCount ),( itemHit,mouseClickCount ),
    "@brief Called whenever the mouse has previously been clicked down (onMouseDown) and has now been raised on the control.\n"
    "If an item in the list was hit during the click cycle, then the index id of the clicked object along with how many clicks occured are passed\n"
    "into the callback.\n\n"
@@ -309,7 +309,7 @@ void GuiListBoxCtrl::removeSelection( LBItem *item, S32 index )
       {
          mSelectedItems.erase( &mSelectedItems[i] );
          item->isSelected = false;
-         onUnSelect_callback(Con::getIntArg(index), item->itemText);
+         onUnSelect_callback(index, item->itemText);
          return;
       }
    }
@@ -355,7 +355,7 @@ void GuiListBoxCtrl::addSelection( LBItem *item, S32 index )
    item->isSelected = true;
    mSelectedItems.push_front( item );
 
-   onSelect_callback(Con::getIntArg( index ), item->itemText);
+   onSelect_callback(index, item->itemText);
 }
 
 S32 GuiListBoxCtrl::getItemIndex( LBItem *item )
@@ -924,7 +924,7 @@ SimObject* GuiListBoxCtrl::getItemObject( S32 index )
    }
 
    SimObject *outObj;
-   Sim::findObject( (SimObjectId)(mItems[ index ]->itemData), outObj );
+   Sim::findObject( (SimObjectId)(uintptr_t)(mItems[ index ]->itemData), outObj );
 
    return outObj;   
 }
@@ -1224,7 +1224,7 @@ void GuiListBoxCtrl::onMouseUp( const GuiEvent& event )
 {
    S32 itemHit = -1;
    if( hitTest( event.mousePoint, itemHit ) )
-      onMouseUp_callback(Con::getIntArg( itemHit ), Con::getIntArg( event.mouseClickCount ) );
+      onMouseUp_callback( itemHit, event.mouseClickCount );
 
    // Execute console command
    execConsoleCallback();
@@ -1481,7 +1481,7 @@ void GuiListBoxCtrl::_mirror()
 
    for ( U32 i = 0; i < mItems.size(); i++ )
    {
-      curId = (SimObjectId)mItems[i]->itemData;
+      curId = (SimObjectId)(uintptr_t)mItems[i]->itemData;
 
       Sim::findObject( curId, curObj );
 
@@ -1515,7 +1515,7 @@ void GuiListBoxCtrl::_mirror()
 
       for ( U32 j = 0; j < mItems.size(); j++ )
       {
-         if ( (SimObjectId)(mItems[j]->itemData) == curId )
+         if ( (SimObjectId)(uintptr_t)(mItems[j]->itemData) == curId )
          {
             found = true;
             break;
@@ -1524,7 +1524,7 @@ void GuiListBoxCtrl::_mirror()
 		
 		for ( U32 j = 0; j < mFilteredItems.size(); j++ )
       {
-         if ( (SimObjectId)(mFilteredItems[j]->itemData) == curId )
+         if ( (SimObjectId)(uintptr_t)(mFilteredItems[j]->itemData) == curId )
          {
             found = true;
             break;

@@ -87,7 +87,7 @@ struct IterStackRecord
    struct StringPos
    {
       /// The raw string data on the string stack.
-      const char* mString;
+      StringStackPtr mString;
       
       /// Current parsing position.
       U32 mIndex;
@@ -105,7 +105,11 @@ IterStackRecord iterStack[ MaxStackSize ];
 F64 floatStack[MaxStackSize];
 S64 intStack[MaxStackSize];
 
+
+
+
 StringStack STR;
+ConsoleValueStack CSTK;
 
 U32 _FLT = 0;     ///< Stack pointer for floatStack.
 U32 _UINT = 0;    ///< Stack pointer for intStack.
@@ -204,7 +208,7 @@ namespace Con
       dSprintf(ret, 32, "%d", arg);
       return ret;
    }
-   
+
    char *getStringArg( const char *arg )
    {
       U32 len = dStrlen( arg ) + 1;
@@ -282,6 +286,31 @@ inline void ExprEvalState::setStringVariable(const char *val)
 {
    AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
    currentVariable->setStringValue(val);
+}
+
+inline void ExprEvalState::setStringStackPtrVariable(StringStackPtr str)
+{
+   AssertFatal(currentVariable != NULL, "Invalid evaluator state - trying to set null variable!");
+   currentVariable->setStringStackPtrValue(str);
+}
+
+inline void ExprEvalState::setCopyVariable()
+{
+   if (copyVariable)
+   {
+      switch (copyVariable->value.type)
+      {
+         case ConsoleValue::TypeInternalInt:
+            currentVariable->setIntValue(copyVariable->getIntValue());
+         break;
+         case ConsoleValue::TypeInternalFloat:
+            currentVariable->setFloatValue(copyVariable->getFloatValue());
+         break;
+         default:
+            currentVariable->setStringValue(copyVariable->getStringValue());
+         break;
+	   }
+   }
 }
 
 //------------------------------------------------------------
@@ -404,14 +433,17 @@ static void setFieldComponent( SimObject* object, StringTableEntry field, const 
    }
 }
 
-const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNamespace, U32 argc, const char **argv, bool noCalls, StringTableEntry packageName, S32 setFrame)
+ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNamespace, U32 argc, ConsoleValueRef *argv, bool noCalls, StringTableEntry packageName, S32 setFrame)
 {
 #ifdef TORQUE_DEBUG
    U32 stackStart = STR.mStartStackSize;
+   U32 consoleStackStart = CSTK.mStackPos;
 #endif
 
+   //Con::printf("CodeBlock::exec(%s,%u)", functionName ? functionName : "??", ip);
+
    static char traceBuffer[1024];
-   U32 i;
+   S32 i;
    
    U32 iterDepth = 0;
 
@@ -419,7 +451,7 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
    F64 *curFloatTable;
    char *curStringTable;
    S32 curStringTableLen = 0; //clint to ensure we dont overwrite it
-   STR.clearFunctionOffset();
+   STR.clearFunctionOffset(); // ensures arg buffer offset is back to 0
    StringTableEntry thisFunctionName = NULL;
    bool popFrame = false;
    if(argv)
@@ -427,7 +459,7 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
       // assume this points into a function decl:
       U32 fnArgc = code[ip + 2 + 6];
       thisFunctionName = CodeToSTE(code, ip);
-      argc = getMin(argc-1, fnArgc); // argv[0] is func name
+      S32 wantedArgc = getMin(argc-1, fnArgc); // argv[0] is func name
       if(gEvalState.traceOn)
       {
          traceBuffer[0] = 0;
@@ -448,10 +480,10 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
             dSprintf(traceBuffer + dStrlen(traceBuffer), sizeof(traceBuffer) - dStrlen(traceBuffer),
                "%s(", thisFunctionName);
          }
-         for(i = 0; i < argc; i++)
+         for(i = 0; i < wantedArgc; i++)
          {
             dStrcat(traceBuffer, argv[i+1]);
-            if(i != argc - 1)
+            if(i != wantedArgc - 1)
                dStrcat(traceBuffer, ", ");
          }
          dStrcat(traceBuffer, ")");
@@ -459,12 +491,33 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
       }
       gEvalState.pushFrame(thisFunctionName, thisNamespace);
       popFrame = true;
-      for(i = 0; i < argc; i++)
+
+      for(i = 0; i < wantedArgc; i++)
       {
          StringTableEntry var = CodeToSTE(code, ip + (2 + 6 + 1) + (i * 2));
          gEvalState.setCurVarNameCreate(var);
-         gEvalState.setStringVariable(argv[i+1]);
+
+         ConsoleValueRef ref = argv[i+1];
+
+         switch(argv[i+1].getType())
+         {
+         case ConsoleValue::TypeInternalInt:
+            gEvalState.setIntVariable(argv[i+1]);
+            break;
+         case ConsoleValue::TypeInternalFloat:
+            gEvalState.setFloatVariable(argv[i+1]);
+            break;
+         case ConsoleValue::TypeInternalStringStackPtr:
+            gEvalState.setStringStackPtrVariable(argv[i+1].getStringStackPtrValue());
+            break;
+         case ConsoleValue::TypeInternalStackString:
+         case ConsoleValue::TypeInternalString:
+         default:
+            gEvalState.setStringVariable(argv[i+1]);
+            break;
+         }
       }
+
       ip = ip + (fnArgc * 2) + (2 + 6 + 1);
       curFloatTable = functionFloats;
       curStringTable = functionStrings;
@@ -533,7 +586,7 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
    char nsDocBlockClass[nsDocLength];
 
    U32 callArgc;
-   const char **callArgv;
+   ConsoleValueRef *callArgv;
 
    static char curFieldArray[256];
    static char prevFieldArray[256];
@@ -546,6 +599,10 @@ const char *CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNam
       Con::gCurrentRoot = this->modPath;
    }
    const char * val;
+   StringStackPtr retValue;
+
+   // note: anything returned is pushed to CSTK and will be invalidated on the next exec()
+   ConsoleValueRef returnValue;
 
    // The frame temp is used by the variable accessor ops (OP_SAVEFIELD_* and
    // OP_LOADFIELD_*) to store temporary values for the fields.
@@ -618,8 +675,8 @@ breakContinue:
             objectCreationStack[ objectCreationStackIndex++ ].failJump = failJump;
 
             // Get the constructor information off the stack.
-            STR.getArgcArgv(NULL, &callArgc, &callArgv);
-            const char* objectName = callArgv[ 2 ];
+            CSTK.getArgcArgv(NULL, &callArgc, &callArgv);
+            const char *objectName = callArgv[ 2 ];
 
             // Con::printf("Creating object...");
 
@@ -641,6 +698,7 @@ breakContinue:
                   Con::errorf(ConsoleLogEntry::General, "%s: Cannot re-declare data block %s with a different class.", getFileLine(ip), objectName);
                   ip = failJump;
                   STR.popFrame();
+                  CSTK.popFrame();
                   break;
                }
 
@@ -662,18 +720,19 @@ breakContinue:
                   break;
                }
 
-               SimObject *obj = Sim::findObject( objectName );
+               SimObject *obj = Sim::findObject( (const char*)objectName );
                if (obj /*&& !obj->isLocalName()*/)
                {
                   if ( isSingleton )
                   {
                      // Make sure we're not trying to change types
-                     if ( dStricmp( obj->getClassName(), callArgv[1] ) != 0 )
+                     if ( dStricmp( obj->getClassName(), (const char*)callArgv[1] ) != 0 )
                      {
                         Con::errorf(ConsoleLogEntry::General, "%s: Cannot re-declare object [%s] with a different class [%s] - was [%s].",
-                           getFileLine(ip), objectName, callArgv[1], obj->getClassName());
+                           getFileLine(ip), objectName, (const char*)callArgv[1], obj->getClassName());
                         ip = failJump;
                         STR.popFrame();
+                        CSTK.popFrame();
                         break;
                      }
 
@@ -691,13 +750,29 @@ breakContinue:
                         // string stack and may get stomped if deleteObject triggers
                         // script execution.
                         
-                        const char* savedArgv[ StringStack::MaxArgs ];
-                        dMemcpy( savedArgv, callArgv, sizeof( savedArgv[ 0 ] ) * callArgc );
+                        ConsoleValueRef savedArgv[ StringStack::MaxArgs ];
+                        for (int i=0; i<callArgc; i++) {
+                           savedArgv[i] = callArgv[i];
+                        }
+                        //dMemcpy( savedArgv, callArgv, sizeof( savedArgv[ 0 ] ) * callArgc );
                         
+                        // Prevent stack value corruption
+                        CSTK.pushFrame();
+                        STR.pushFrame();
+                        // --
+
                         obj->deleteObject();
                         obj = NULL;
 
-                        dMemcpy( callArgv, savedArgv, sizeof( callArgv[ 0 ] ) * callArgc );
+                        // Prevent stack value corruption
+                        CSTK.popFrame();
+                        STR.popFrame();
+                        // --
+
+                        //dMemcpy( callArgv, savedArgv, sizeof( callArgv[ 0 ] ) * callArgc );
+                        for (int i=0; i<callArgc; i++) {
+                           callArgv[i] = savedArgv[i];
+                        }
                      }
                      else if( dStricmp( redefineBehavior, "renameNew" ) == 0 )
                      {
@@ -726,6 +801,7 @@ breakContinue:
                               getFileLine(ip), newName.c_str() );
                            ip = failJump;
                            STR.popFrame();
+                           CSTK.popFrame();
                            break;
                         }
                         else
@@ -737,6 +813,7 @@ breakContinue:
                            getFileLine(ip), objectName);
                         ip = failJump;
                         STR.popFrame();
+                        CSTK.popFrame();
                         break;
                      }
                   }
@@ -744,16 +821,17 @@ breakContinue:
             }
 
             STR.popFrame();
+            CSTK.popFrame();
             
             if(!currentNewObject)
             {
                // Well, looks like we have to create a new object.
-               ConsoleObject *object = ConsoleObject::create(callArgv[1]);
+               ConsoleObject *object = ConsoleObject::create((const char*)callArgv[1]);
 
                // Deal with failure!
                if(!object)
                {
-                  Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-conobject class %s.", getFileLine(ip), callArgv[1]);
+                  Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-conobject class %s.", getFileLine(ip), (const char*)callArgv[1]);
                   ip = failJump;
                   break;
                }
@@ -769,7 +847,7 @@ breakContinue:
                   else
                   {
                      // They tried to make a non-datablock with a datablock keyword!
-                     Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-datablock class %s.", getFileLine(ip), callArgv[1]);
+                     Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-datablock class %s.", getFileLine(ip), (const char*)callArgv[1]);
                      // Clean up...
                      delete object;
                      ip = failJump;
@@ -783,7 +861,7 @@ breakContinue:
                // Deal with the case of a non-SimObject.
                if(!currentNewObject)
                {
-                  Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-SimObject class %s.", getFileLine(ip), callArgv[1]);
+                  Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-SimObject class %s.", getFileLine(ip), (const char*)callArgv[1]);
                   delete object;
                   ip = failJump;
                   break;
@@ -810,7 +888,7 @@ breakContinue:
                   else
                   {
                      if ( Con::gObjectCopyFailures == -1 )
-                        Con::errorf(ConsoleLogEntry::General, "%s: Unable to find parent object %s for %s.", getFileLine(ip), objParent, callArgv[1]);
+                        Con::errorf(ConsoleLogEntry::General, "%s: Unable to find parent object %s for %s.", getFileLine(ip), objParent, (const char*)callArgv[1]);
                      else
                         ++Con::gObjectCopyFailures;
 
@@ -833,14 +911,29 @@ breakContinue:
                   currentNewObject->setOriginalName( objectName );
                }
 
+               // Prevent stack value corruption
+               CSTK.pushFrame();
+               STR.pushFrame();
+               // --
+
                // Do the constructor parameters.
                if(!currentNewObject->processArguments(callArgc-3, callArgv+3))
                {
                   delete currentNewObject;
                   currentNewObject = NULL;
                   ip = failJump;
+
+                  // Prevent stack value corruption
+                  CSTK.popFrame();
+                  STR.popFrame();
+                  // --
                   break;
                }
+
+               // Prevent stack value corruption
+               CSTK.popFrame();
+               STR.popFrame();
+               // --
 
                // If it's not a datablock, allow people to modify bits of it.
                if(!isDataBlock)
@@ -866,6 +959,11 @@ breakContinue:
 
             // Con::printf("Adding object %s", currentNewObject->getName());
 
+            // Prevent stack value corruption
+            CSTK.pushFrame();
+            STR.pushFrame();
+            // --
+
             // Make sure it wasn't already added, then add it.
             if(currentNewObject->isProperlyAdded() == false)
             {
@@ -889,6 +987,10 @@ breakContinue:
                   Con::warnf(ConsoleLogEntry::General, "%s: Register object failed for object %s of class %s.", getFileLine(ip), currentNewObject->getName(), currentNewObject->getClassName());
                   delete currentNewObject;
                   ip = failJump;
+                  // Prevent stack value corruption
+                  CSTK.popFrame();
+                  STR.popFrame();
+                  // --
                   break;
                }
             }
@@ -897,6 +999,8 @@ breakContinue:
             SimDataBlock *dataBlock = dynamic_cast<SimDataBlock *>(currentNewObject);
             static String errorStr;
 
+
+
             // If so, preload it.
             if(dataBlock && !dataBlock->preload(true, errorStr))
             {
@@ -904,6 +1008,11 @@ breakContinue:
                            currentNewObject->getName(), errorStr.c_str());
                dataBlock->deleteObject();
                ip = failJump;
+			   
+               // Prevent stack value corruption
+               CSTK.popFrame();
+               STR.popFrame();
+               // --
                break;
             }
 
@@ -958,6 +1067,10 @@ breakContinue:
             else
                intStack[++_UINT] = currentNewObject->getId();
 
+            // Prevent stack value corruption
+            CSTK.popFrame();
+            STR.popFrame();
+            // --
             break;
          }
 
@@ -1040,6 +1153,29 @@ breakContinue:
       		// We're falling thru here on purpose.
             
          case OP_RETURN:
+            retValue = STR.getStringValuePtr();
+
+            if( iterDepth > 0 )
+            {
+               // Clear iterator state.
+               while( iterDepth > 0 )
+               {
+                  iterStack[ -- _ITER ].mIsStringIter = false;
+                  -- iterDepth;
+               }
+
+               STR.rewind();
+               STR.setStringValue( StringStackPtrRef(retValue).getPtr(&STR) ); // Not nice but works.
+               retValue = STR.getStringValuePtr();
+            }
+
+            // Previously the return value was on the stack and would be returned using STR.getStringValue().
+            // Now though we need to wrap it in a ConsoleValueRef 
+            returnValue.value = CSTK.pushStringStackPtr(retValue);
+               
+            goto execFinished;
+
+         case OP_RETURN_FLT:
          
             if( iterDepth > 0 )
             {
@@ -1050,10 +1186,27 @@ breakContinue:
                   -- iterDepth;
                }
                
-               const char* returnValue = STR.getStringValue();
-               STR.rewind();
-               STR.setStringValue( returnValue ); // Not nice but works.
             }
+
+            returnValue.value = CSTK.pushFLT(floatStack[_FLT]);
+            _FLT--;
+               
+            goto execFinished;
+
+         case OP_RETURN_UINT:
+         
+            if( iterDepth > 0 )
+            {
+               // Clear iterator state.
+               while( iterDepth > 0 )
+               {
+                  iterStack[ -- _ITER ].mIsStringIter = false;
+                  -- iterDepth;
+               }
+            }
+
+            returnValue.value = CSTK.pushUINT(intStack[_UINT]);
+            _UINT--;
                
             goto execFinished;
             
@@ -1196,7 +1349,7 @@ breakContinue:
             var = CodeToSTE(code, ip);
             ip += 2;
 
-			// See OP_SETCURVAR
+            // See OP_SETCURVAR
             prevField = NULL;
             prevObject = NULL;
             curObject = NULL;
@@ -1253,6 +1406,11 @@ breakContinue:
             STR.setStringValue(val);
             break;
 
+         case OP_LOADVAR_VAR:
+            // Sets current source of OP_SAVEVAR_VAR
+            gEvalState.copyVariable = gEvalState.currentVariable;
+            break;
+
          case OP_SAVEVAR_UINT:
             gEvalState.setIntVariable(intStack[_UINT]);
             break;
@@ -1263,6 +1421,11 @@ breakContinue:
 
          case OP_SAVEVAR_STR:
             gEvalState.setStringVariable(STR.getStringValue());
+            break;
+		    
+         case OP_SAVEVAR_VAR:
+            // this basically handles %var1 = %var2
+            gEvalState.setCopyVariable();
             break;
 
          case OP_SETCUROBJECT:
@@ -1451,6 +1614,10 @@ breakContinue:
             _UINT--;
             break;
 
+         case OP_COPYVAR_TO_NONE:
+            gEvalState.copyVariable = NULL;
+            break;
+
          case OP_LOADIMMED_UINT:
             intStack[_UINT+1] = code[ip++];
             _UINT++;
@@ -1527,6 +1694,7 @@ breakContinue:
                   getFileLine(ip-7), fnNamespace ? fnNamespace : "",
                   fnNamespace ? "::" : "", fnName);
                STR.popFrame();
+               CSTK.popFrame();
                break;
             }
             
@@ -1562,7 +1730,7 @@ breakContinue:
             U32 callType = code[ip+4];
 
             ip += 5;
-            STR.getArgcArgv(fnName, &callArgc, &callArgv);
+            CSTK.getArgcArgv(fnName, &callArgc, &callArgv);
 
             const char *componentReturnValue = "";
 
@@ -1586,14 +1754,16 @@ breakContinue:
             else if(callType == FuncCallExprNode::MethodCall)
             {
                saveObject = gEvalState.thisObject;
-               gEvalState.thisObject = Sim::findObject(callArgv[1]);
+               gEvalState.thisObject = Sim::findObject((const char*)callArgv[1]);
                if(!gEvalState.thisObject)
                {
                   // Go back to the previous saved object.
                   gEvalState.thisObject = saveObject;
 
-                  Con::warnf(ConsoleLogEntry::General,"%s: Unable to find object: '%s' attempting to call function '%s'", getFileLine(ip-4), callArgv[1], fnName);
+                  Con::warnf(ConsoleLogEntry::General,"%s: Unable to find object: '%s' attempting to call function '%s'", getFileLine(ip-4), (const char*)callArgv[1], fnName);
                   STR.popFrame();
+                  CSTK.popFrame();
+                  STR.setStringValue("");
                   break;
                }
                
@@ -1649,6 +1819,7 @@ breakContinue:
                   }
                }
                STR.popFrame();
+               CSTK.popFrame();
 
                if( routingId == MethodOnComponent )
                   STR.setStringValue( componentReturnValue );
@@ -1659,12 +1830,33 @@ breakContinue:
             }
             if(nsEntry->mType == Namespace::Entry::ConsoleFunctionType)
             {
-               const char *ret = "";
+               ConsoleValueRef ret;
                if(nsEntry->mFunctionOffset)
                   ret = nsEntry->mCode->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage);
-               
+
                STR.popFrame();
-               STR.setStringValue(ret);
+               // Functions are assumed to return strings, so look ahead to see if we can skip the conversion
+               if(code[ip] == OP_STR_TO_UINT)
+               {
+                  ip++;
+                  intStack[++_UINT] = (U32)((S32)ret);
+               }
+               else if(code[ip] == OP_STR_TO_FLT)
+               {
+                  ip++;
+                  floatStack[++_FLT] = (F32)ret;
+               }
+               else if(code[ip] == OP_STR_TO_NONE)
+               {
+                  STR.setStringValue(ret.getStringValue());
+                  ip++;
+               }
+               else
+                  STR.setStringValue((const char*)ret);
+
+               // This will clear everything including returnValue
+               CSTK.popFrame();
+               //STR.clearFunctionOffset();
             }
             else
             {
@@ -1685,6 +1877,7 @@ breakContinue:
                      callArgc, nsEntry->mMinArgs, nsEntry->mMaxArgs);
                   Con::warnf(ConsoleLogEntry::Script, "%s: usage: %s", getFileLine(ip-6), nsEntry->mUsage);
                   STR.popFrame();
+                  CSTK.popFrame();
                }
                else
                {
@@ -1694,16 +1887,18 @@ breakContinue:
                      {
                         const char *ret = nsEntry->cb.mStringCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
                         STR.popFrame();
+                        CSTK.popFrame();
                         if(ret != STR.getStringValue())
                            STR.setStringValue(ret);
-                        else
-                           STR.setLen(dStrlen(ret));
+                        //else
+                        //   STR.setLen(dStrlen(ret));
                         break;
                      }
                      case Namespace::Entry::IntCallbackType:
                      {
                         S32 result = nsEntry->cb.mIntCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
                         STR.popFrame();
+                        CSTK.popFrame();
                         if(code[ip] == OP_STR_TO_UINT)
                         {
                            ip++;
@@ -1726,6 +1921,7 @@ breakContinue:
                      {
                         F64 result = nsEntry->cb.mFloatCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
                         STR.popFrame();
+                        CSTK.popFrame();
                         if(code[ip] == OP_STR_TO_UINT)
                         {
                            ip++;
@@ -1750,12 +1946,14 @@ breakContinue:
                            Con::warnf(ConsoleLogEntry::General, "%s: Call to %s in %s uses result of void function call.", getFileLine(ip-6), fnName, functionName);
                         
                         STR.popFrame();
+                        CSTK.popFrame();
                         STR.setStringValue("");
                         break;
                      case Namespace::Entry::BoolCallbackType:
                      {
                         bool result = nsEntry->cb.mBoolCallbackFunc(gEvalState.thisObject, callArgc, callArgv);
                         STR.popFrame();
+                        CSTK.popFrame();
                         if(code[ip] == OP_STR_TO_UINT)
                         {
                            ip++;
@@ -1810,10 +2008,26 @@ breakContinue:
             break;
          case OP_PUSH:
             STR.push();
+            CSTK.pushStringStackPtr(STR.getPreviousStringValuePtr());
+            break;
+         case OP_PUSH_UINT:
+            CSTK.pushUINT(intStack[_UINT]);
+            _UINT--;
+            break;
+         case OP_PUSH_FLT:
+            CSTK.pushFLT(floatStack[_FLT]);
+            _FLT--;
+            break;
+         case OP_PUSH_VAR:
+            if (gEvalState.currentVariable)
+               CSTK.pushValue(gEvalState.currentVariable->value);
+            else
+               CSTK.pushString("");
             break;
 
          case OP_PUSH_FRAME:
             STR.pushFrame();
+            CSTK.pushFrame();
             break;
 
          case OP_ASSERT:
@@ -1875,7 +2089,7 @@ breakContinue:
             
             if( iter.mIsStringIter )
             {
-               iter.mData.mStr.mString = STR.getStringValue();
+               iter.mData.mStr.mString = STR.getStringValuePtr();
                iter.mData.mStr.mIndex = 0;
             }
             else
@@ -1913,7 +2127,7 @@ breakContinue:
             
             if( iter.mIsStringIter )
             {
-               const char* str = iter.mData.mStr.mString;
+               const char* str = StringStackPtrRef(iter.mData.mStr.mString).getPtr(&STR);
                               
                U32 startIndex = iter.mData.mStr.mIndex;
                U32 endIndex = startIndex;
@@ -2021,15 +2235,7 @@ execFinished:
          Con::printf("%s", traceBuffer);
       }
    }
-   else
-   {
-      delete[] globalStrings;
-      globalStringsMaxLen = 0;
 
-      delete[] globalFloats;
-      globalStrings = NULL;
-      globalFloats = NULL;
-   }
    smCurrentCodeBlock = saveCodeBlock;
    if(saveCodeBlock && saveCodeBlock->name)
    {
@@ -2040,10 +2246,11 @@ execFinished:
    decRefCount();
 
 #ifdef TORQUE_DEBUG
-   AssertFatal(!(STR.mStartStackSize > stackStart), "String stack not popped enough in script exec");
-   AssertFatal(!(STR.mStartStackSize < stackStart), "String stack popped too much in script exec");
+   //AssertFatal(!(STR.mStartStackSize > stackStart), "String stack not popped enough in script exec");
+   //AssertFatal(!(STR.mStartStackSize < stackStart), "String stack popped too much in script exec");
 #endif
-   return STR.getStringValue();
+
+   return returnValue;
 }
 
 //------------------------------------------------------------

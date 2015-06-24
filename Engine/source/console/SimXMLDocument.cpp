@@ -158,7 +158,7 @@ SimXMLDocument::~SimXMLDocument()
 // -----------------------------------------------------------------------------
 // Included for completeness.
 // -----------------------------------------------------------------------------
-bool SimXMLDocument::processArguments(S32 argc, const char** argv)
+bool SimXMLDocument::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    return argc == 0;
 }
@@ -571,21 +571,22 @@ DefineEngineMethod( SimXMLDocument, attribute, const char*, ( const char* attrib
 }
 
 // These two methods don't make a lot of sense the way TS works.  Leaving them in for backwards-compatibility.
-ConsoleMethod( SimXMLDocument, attributeF32, F32, 3, 3, "(string attributeName)"
+DefineConsoleMethod( SimXMLDocument, attributeF32, F32, (const char * attributeName), , "(string attributeName)"
    "@brief Get float attribute from the current Element on the stack.\n\n"
    "@param attributeName Name of attribute to retrieve.\n"
    "@return The value of the given attribute in the form of a float.\n"
    "@deprecated Use attribute().")
 {
-   return dAtof( object->attribute( argv[2] ) );
+   return dAtof( object->attribute( attributeName ) );
 }
-ConsoleMethod(SimXMLDocument, attributeS32, S32, 3, 3, "(string attributeName)"
+
+DefineConsoleMethod(SimXMLDocument, attributeS32, S32, (const char * attributeName), , "(string attributeName)"
    "@brief Get int attribute from the current Element on the stack.\n\n"
    "@param attributeName Name of attribute to retrieve.\n"
    "@return The value of the given attribute in the form of an integer.\n"
    "@deprecated Use attribute().")
 {
-   return dAtoi( object->attribute( argv[2] ) );
+   return dAtoi( object->attribute( attributeName ) );
 }
 
 // -----------------------------------------------------------------------------

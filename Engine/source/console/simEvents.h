@@ -34,6 +34,7 @@
 // Forward Refs
 class SimObject;
 class Semaphore;
+class ConsoleValue;
 
 /// Represents a queued event in the sim.
 ///
@@ -82,6 +83,8 @@ public:
    virtual void process(SimObject *object)=0;
 };
 
+class ConsoleValueRef;
+
 /// Implementation of schedule() function.
 ///
 /// This allows you to set a console function to be
@@ -90,7 +93,7 @@ class SimConsoleEvent : public SimEvent
 {
 protected:
    S32 mArgc;
-   char **mArgv;
+   ConsoleValueRef *mArgv;
    bool mOnObject;
 public:
 
@@ -107,23 +110,28 @@ public:
    ///
    /// @see Con::execute(S32 argc, const char *argv[])
    /// @see Con::execute(SimObject *object, S32 argc, const char *argv[])
-   SimConsoleEvent(S32 argc, const char **argv, bool onObject);
+   SimConsoleEvent(S32 argc, ConsoleValueRef *argv, bool onObject);
 
    ~SimConsoleEvent();
    virtual void process(SimObject *object);
+
+   /// Creates a reference to our internal args list in argv
+   void populateArgs(ConsoleValueRef *argv);
 };
 
+
+// NOTE: SimConsoleThreadExecCallback & SimConsoleThreadExecEvent moved to engineAPI.h
 /// Used by Con::threadSafeExecute()
 struct SimConsoleThreadExecCallback
 {
    Semaphore   *sem;
-   const char  *retVal;
+   ConsoleValueRef retVal;
 
    SimConsoleThreadExecCallback();
    ~SimConsoleThreadExecCallback();
 
-   void handleCallback(const char *ret);
-   const char *waitForResult();
+   void handleCallback(ConsoleValueRef ret);
+   ConsoleValueRef waitForResult();
 };
 
 class SimConsoleThreadExecEvent : public SimConsoleEvent
@@ -131,8 +139,9 @@ class SimConsoleThreadExecEvent : public SimConsoleEvent
    SimConsoleThreadExecCallback *cb;
 
 public:
-   SimConsoleThreadExecEvent(S32 argc, const char **argv, bool onObject, SimConsoleThreadExecCallback *callback);
+   SimConsoleThreadExecEvent(S32 argc, ConsoleValueRef *argv, bool onObject, SimConsoleThreadExecCallback *callback);
 
+   SimConsoleThreadExecCallback& getCB() { return *cb; }
    virtual void process(SimObject *object);
 };
 

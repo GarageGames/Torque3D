@@ -30,6 +30,7 @@
 #include "gui/worldEditor/editTSCtrl.h"
 #include "gui/worldEditor/gizmo.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "core/util/tVector.h"
 #include "core/util/safeDelete.h"
 #include "gfx/gfxDrawUtil.h"
@@ -516,7 +517,7 @@ bool ForestSelectionTool::updateGuiInfo()
 
    Con::executef( statusbar, "setInfo", text.c_str() );
 
-   Con::executef( statusbar, "setSelectionObjectsByCount", Con::getIntArg( mSelection.size() ) );
+   Con::executef( statusbar, "setSelectionObjectsByCount", mSelection.size() );
 
    return true;
 }
@@ -558,32 +559,32 @@ void ForestSelectionTool::onUndoAction()
       mBounds.intersect( mSelection[i].getWorldBox() );
 }
 
-ConsoleMethod( ForestSelectionTool, getSelectionCount, S32, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, getSelectionCount, S32, (), , "" )
 {
    return object->getSelectionCount();
 }
 
-ConsoleMethod( ForestSelectionTool, deleteSelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, deleteSelection, void, (), , "" )
 {
    object->deleteSelection();
 }
 
-ConsoleMethod( ForestSelectionTool, clearSelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, clearSelection, void, (), , "" )
 {
    object->clearSelection();
 }
 
-ConsoleMethod( ForestSelectionTool, cutSelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, cutSelection, void, (), , "" )
 {
    object->cutSelection();
 }
 
-ConsoleMethod( ForestSelectionTool, copySelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, copySelection, void, (), , "" )
 {
    object->copySelection();
 }
 
-ConsoleMethod( ForestSelectionTool, pasteSelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, pasteSelection, void, (), , "" )
 {
    object->pasteSelection();
 }

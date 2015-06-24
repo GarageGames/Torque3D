@@ -20,9 +20,10 @@
 # IN THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-option(TORQUE_TESTS_ENABLED "TORQUE_TESTS_ENABLED" OFF)
+option(TORQUE_TESTING "Enable unit test module" ON)
+mark_as_advanced(TORQUE_TESTING)
 
-if(TORQUE_TESTS_ENABLED)
+if(TORQUE_TESTING)
 
     # Project defines
     addDef( "TORQUE_TESTS_ENABLED" )

@@ -579,7 +579,7 @@ AbstractClassRep* ConsoleObject::getClassRep() const
    return NULL;
 }
 
-String ConsoleObject::_getLogMessage(const char* fmt, void* args) const
+String ConsoleObject::_getLogMessage(const char* fmt, va_list args) const
 {
    String objClass = "UnknownClass";
    if(getClassRep())
@@ -834,3 +834,44 @@ DefineEngineFunction( sizeof, S32, ( const char *objectOrClass ),,
    Con::warnf("could not find a class rep for that object or class name.");
    return 0;
 }
+
+
+DefineEngineFunction(linkNamespaces, bool, ( String childNSName, String parentNSName  ),,
+                     "@brief Links childNS to parentNS.\n\n"
+                     "Links childNS to parentNS, or nothing if parentNS is NULL.\n"
+                     "Will unlink the namespace from previous namespace if a parent already exists.\n"
+                     "@internal\n")
+{
+   StringTableEntry childNSSTE = StringTable->insert(childNSName.c_str());
+   StringTableEntry parentNSSTE = StringTable->insert(parentNSName.c_str());
+   
+   Namespace *childNS = Namespace::find(childNSSTE);
+   Namespace *parentNS = Namespace::find(parentNSSTE);
+   Namespace *currentParent = childNS->getParent();
+   
+   if (!childNS)
+   {
+      return false;
+   }
+   
+   // Link to new NS if applicable
+   
+   if (currentParent != parentNS)
+   {
+      if (currentParent != NULL)
+      {
+         if (!childNS->unlinkClass(currentParent))
+         {
+            return false;
+         }
+      }
+      
+      if (parentNS != NULL)
+      {
+         return childNS->classLinkTo(parentNS);
+      }
+   }
+   
+   return true;
+}
+

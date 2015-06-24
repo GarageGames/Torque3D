@@ -69,4 +69,36 @@ enum PolyFlags {
    AllFlags = 0xffff
 };
 
+/// Stores information about a link.
+struct LinkData {
+   bool walk;
+   bool jump;
+   bool drop;
+   bool swim;
+   bool ledge;
+   bool climb;
+   bool teleport;
+   LinkData(U16 flags = 0)
+   {
+      walk = flags & WalkFlag;
+      jump = flags & JumpFlag;
+      drop = flags & DropFlag;
+      swim = flags & SwimFlag;
+      ledge = flags & LedgeFlag;
+      climb = flags & ClimbFlag;
+      teleport = flags & TeleportFlag;
+   }
+   U16 getFlags() const
+   {
+      return
+         (walk ? WalkFlag : 0) |
+         (jump ? JumpFlag : 0) |
+         (drop ? DropFlag : 0) |
+         (swim ? SwimFlag : 0) |
+         (ledge ? LedgeFlag : 0) |
+         (climb ? ClimbFlag : 0) |
+         (teleport ? TeleportFlag : 0);
+   }
+};
+
 #endif

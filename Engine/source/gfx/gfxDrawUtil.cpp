@@ -148,8 +148,8 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF8 *in_s
 
    // Convert to UTF16 temporarily.
    n++; // space for null terminator
-   FrameTemp<UTF16> ubuf( n * sizeof(UTF16) );
-   convertUTF8toUTF16(in_string, ubuf, n);
+   FrameTemp<UTF16> ubuf( n );
+   convertUTF8toUTF16N(in_string, ubuf, n);
 
    return drawTextN( font, ptDraw, ubuf, n, colorTable, maxColorIndex, rot );
 }
@@ -621,6 +621,7 @@ void GFXDrawUtil::drawLine( F32 x1, F32 y1, F32 z1, F32 x2, F32 y2, F32 z2, cons
 
    mDevice->setVertexBuffer( verts );
    mDevice->setStateBlock( mRectFillSB );
+   mDevice->setupGenericShaders();
    mDevice->drawPrimitive( GFXLineList, 0, 1 );
 }
 

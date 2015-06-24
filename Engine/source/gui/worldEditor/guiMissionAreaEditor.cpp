@@ -22,6 +22,7 @@
 
 #include "gui/worldEditor/guiMissionAreaEditor.h"
 #include "gui/core/guiCanvas.h"
+#include "console/engineAPI.h"
 
 IMPLEMENT_CONOBJECT(GuiMissionAreaEditorCtrl);
 
@@ -94,19 +95,19 @@ void GuiMissionAreaEditorCtrl::setSelectedMissionArea( MissionArea *missionArea 
       Con::executef( this, "onMissionAreaSelected" );
 }
 
-ConsoleMethod( GuiMissionAreaEditorCtrl, setSelectedMissionArea, void, 2, 3, "" )
+DefineConsoleMethod( GuiMissionAreaEditorCtrl, setSelectedMissionArea, void, (const char * missionAreaName), (""), "" )
 {
-   if ( argc == 2 )
+   if ( dStrcmp( missionAreaName, "" )==0 )
       object->setSelectedMissionArea(NULL);
    else
    {
       MissionArea *missionArea = NULL;
-      if ( Sim::findObject( argv[2], missionArea ) )
+      if ( Sim::findObject( missionAreaName, missionArea ) )
          object->setSelectedMissionArea(missionArea);
    }
 }
 
-ConsoleMethod( GuiMissionAreaEditorCtrl, getSelectedMissionArea, const char*, 2, 2, "" )
+DefineConsoleMethod( GuiMissionAreaEditorCtrl, getSelectedMissionArea, const char*, (), , "" )
 {
    MissionArea *missionArea = object->getSelectedMissionArea();
    if ( !missionArea )

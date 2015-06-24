@@ -24,8 +24,12 @@
 #define _BULLET_H_
 
 // NOTE: We set these defines which bullet needs here.
-#ifdef TORQUE_OS_WIN
+#if defined TORQUE_OS_WIN && !defined(WIN32)
 #define WIN32
+#endif
+
+#ifdef TORQUE_CPU_X86
+#define __BT_SKIP_UINT64_H
 #endif
 
 // NOTE: All the Bullet includes we use should be here and

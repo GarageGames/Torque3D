@@ -38,8 +38,10 @@
 #include "environment/sun.h"
 #include "scene/sceneManager.h"
 #include "math/mathUtils.h"
+#include "math/mTransform.h"
 #include "T3D/physics/physicsBody.h"
 #include "forest/editor/forestBrushElement.h"
+#include "console/engineAPI.h"
 
 /// For frame signal
 #include "gui/core/guiCanvas.h"
@@ -359,23 +361,22 @@ void Forest::saveDataFile( const char *path )
       mData->write( mDataFileName );
 }
 
-ConsoleMethod( Forest, saveDataFile, bool, 2, 3, "saveDataFile( [path] )" )
+DefineConsoleMethod( Forest, saveDataFile, void, (const char * path), (""), "saveDataFile( [path] )" )
 {   
-   object->saveDataFile( argc == 3 ? argv[2] : NULL );
-   return true;
+   object->saveDataFile( path );
 }
 
-ConsoleMethod(Forest, isDirty, bool, 2, 2, "()")
+DefineConsoleMethod(Forest, isDirty, bool, (), , "()")
 {
    return object->getData() && object->getData()->isDirty();
 }
 
-ConsoleMethod(Forest, regenCells, void, 2, 2, "()")
+DefineConsoleMethod(Forest, regenCells, void, (), , "()")
 {
    object->getData()->regenCells();
 }
 
-ConsoleMethod(Forest, clear, void, 2, 2, "()" )
+DefineConsoleMethod(Forest, clear, void, (), , "()" )
 {
    object->clear();
 }

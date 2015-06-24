@@ -62,6 +62,8 @@ uniform vec4 farPlaneScalePSSM;
 uniform vec4 overDarkPSSM;
 uniform float shadowSoftness;
 
+out vec4 OUT_col;
+
 void main()             
 {
    // Sample/unpack the normal/z data
@@ -200,7 +202,7 @@ void main()
    
    float Sat_NL_Att = saturate( dotNL * shadowed ) * lightBrightness;
    vec3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
-   vec4 addToResult = lightAmbient;
+   vec4 addToResult = (lightAmbient * (1 - ambientCameraFactor)) + ( lightAmbient * ambientCameraFactor * saturate(dot(normalize(-vsEyeRay), normal)) );
 
    // TODO: This needs to be removed when lightmapping is disabled
    // as its extra work per-pixel on dynamic lit scenes.
@@ -227,6 +229,6 @@ void main()
       lightColorOut = debugColor;
    #endif
    
-   OUT_FragColor0 = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );  
+   OUT_col = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );  
    
 }

@@ -123,7 +123,7 @@ SimObject::~SimObject()
 
 //-----------------------------------------------------------------------------
 
-bool SimObject::processArguments(S32 argc, const char**argv)
+bool SimObject::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    return argc == 0;
 }
@@ -1407,10 +1407,11 @@ void SimObject::linkNamespaces()
    // while still having the class namespace fields matching the current
    // setup.
 
-   AssertWarn( mNameSpace == NULL, "SimObject::linkNamespaces -- Namespace linkage already in place" );
-   if( mNameSpace )
+   if (mNameSpace)
+   {
+      Con::warnf("SimObject::linkNamespaces -- Namespace linkage already in place %s", mNameSpace->getName());
       return;
-
+   }
    // Get the namespace for the C++ class.
 
    Namespace* cppNamespace = getClassRep()->getNameSpace();
@@ -1599,7 +1600,8 @@ void SimObject::unlinkNamespaces()
 
    // Handle object name.
 
-   if (mNameSpace && mNameSpace->mClassRep == NULL)
+   StringTableEntry objectName = getName();
+   if( objectName && objectName[ 0 ] )
       mNameSpace->decRefCountToParent();
 
    mNameSpace = NULL;
@@ -1832,7 +1834,7 @@ void SimObject::inspectPostApply()
 
 //-----------------------------------------------------------------------------
 
-String SimObject::_getLogMessage(const char* fmt, void* args) const
+String SimObject::_getLogMessage(const char* fmt, va_list args) const
 {
    String objClass = "UnknownClass";
    if(getClassRep())

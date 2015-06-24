@@ -831,6 +831,26 @@ DefineConsoleFunction( VectorOrthoBasis, MatrixF, ( AngAxisF aa ),,
 
 //-----------------------------------------------------------------------------
 
+//ConsoleFunction(VectorRot, const char*, 3, 3, "(Vector3F, float) rotate a vector in 2d")
+DefineConsoleFunction( VectorRot, const char*, (Point3F v, F32 angle), , "(Vector3F, float) rotate a vector in 2d")
+{
+	//VectorF v(0,0,0);
+	//dSscanf(argv[1],"%g %g %g",&v.x,&v.y,&v.z);
+	//dSscanf(axeStr,"%g %g %g",&v.x,&v.y,&v.z);
+
+	//float angle = dAtof(argv[2]);
+	//float angle = dAtof(angleStr);
+
+	float x = 0, y = 0;
+
+	x = v.x * cos(angle) - v.y * sin(angle);            
+	y = v.x * sin(angle) + v.y * cos(angle); 
+
+	char* returnBuffer = Con::getReturnBuffer(256);
+	dSprintf(returnBuffer,256,"%g %g %g", x, y, v.z);
+	return returnBuffer;
+}
+
 DefineConsoleFunction( VectorLerp, VectorF, ( VectorF a, VectorF b, F32 t ),,
    "Linearly interpolate between two vectors by @a t.\n"
    "@param a Vector to start interpolation from.\n"
@@ -999,7 +1019,7 @@ F32 mRandF()
    return gRandGen.randF();
 }
 
-ConsoleFunction( getRandom, F32, 1, 3,
+DefineConsoleFunction(getRandom, F32, (S32 a, S32 b), (S32_MAX, S32_MAX),
    "( int a, int b ) "
    "@brief Returns a random number based on parameters passed in..\n\n"
    "If no parameters are passed in, getRandom() will return a float between 0.0 and 1.0. If one "
@@ -1013,21 +1033,21 @@ ConsoleFunction( getRandom, F32, 1, 3,
    "@see setRandomSeed\n"
    "@ingroup Random" )
 {
-   if (argc == 2)
-      return F32(gRandGen.randI(0,getMax( dAtoi(argv[1]), 0 )));
-   else
+   if (a != S32_MAX)
    {
-      if (argc == 3) 
+      if (b == S32_MAX)
+         return F32(gRandGen.randI(0, getMax(a, 0)));
+      else
       {
-         S32 min = dAtoi(argv[1]);
-         S32 max = dAtoi(argv[2]);
-         if (min > max) 
+         S32 min = a;
+         S32 max = b;
+         if (min > max)
          {
             S32 t = min;
             min = max;
             max = t;
          }
-         return F32(gRandGen.randI(min,max));
+         return F32(gRandGen.randI(min, max));
       }
    }
    return gRandGen.randF();

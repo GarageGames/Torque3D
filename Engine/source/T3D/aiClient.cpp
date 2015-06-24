@@ -28,6 +28,7 @@
 #include "T3D/player.h"
 #include "T3D/gameBase/moveManager.h"
 #include "console/consoleInternal.h"
+#include "console/engineAPI.h"
 
 
 IMPLEMENT_CONOBJECT( AIClient );
@@ -51,6 +52,8 @@ ConsoleDocClass( AIClient,
    "@ingroup AI\n"
    "@ingroup Networking\n"
 );
+
+IMPLEMENT_CALLBACK(AIClient, onConnect, void, (const char* idString), (idString),"");
 
 /**
  * Constructor
@@ -415,15 +418,17 @@ void AIClient::onAdd( const char *nameSpace ) {
 /**
  * Sets the move speed for an AI object
  */
-ConsoleMethod( AIClient, setMoveSpeed, void, 3, 3, "ai.setMoveSpeed( float );" ) {
+DefineConsoleMethod( AIClient, setMoveSpeed, void, (F32 speed), , "ai.setMoveSpeed( float );" ) 
+{
    AIClient *ai = static_cast<AIClient *>( object );
-   ai->setMoveSpeed( dAtof( argv[2] ) );
+   ai->setMoveSpeed( speed );
 }
 
 /**
  * Stops all AI movement, halt!
  */
-ConsoleMethod( AIClient, stop, void, 2, 2, "ai.stop();" ) {
+DefineConsoleMethod( AIClient, stop, void, (),, "ai.stop();" ) 
+{
    AIClient *ai = static_cast<AIClient *>( object );
    ai->setMoveMode( AIClient::ModeStop );
 }
@@ -431,10 +436,9 @@ ConsoleMethod( AIClient, stop, void, 2, 2, "ai.stop();" ) {
 /**
  * Tells the AI to aim at the location provided
  */
-ConsoleMethod( AIClient, setAimLocation, void, 3, 3, "ai.setAimLocation( x y z );" ) {
+DefineConsoleMethod( AIClient, setAimLocation, void, (Point3F v), , "ai.setAimLocation( x y z );" ) 
+{
    AIClient *ai = static_cast<AIClient *>( object );
-   Point3F v( 0.0f,0.0f,0.0f );
-   dSscanf( argv[2], "%f %f %f", &v.x, &v.y, &v.z );
 
    ai->setAimLocation( v );
 }
@@ -442,10 +446,9 @@ ConsoleMethod( AIClient, setAimLocation, void, 3, 3, "ai.setAimLocation( x y z )
 /**
  * Tells the AI to move to the location provided
  */
-ConsoleMethod( AIClient, setMoveDestination, void, 3, 3, "ai.setMoveDestination( x y z );" ) {
+DefineConsoleMethod( AIClient, setMoveDestination, void, (Point3F v), , "ai.setMoveDestination( x y z );" )
+{
    AIClient *ai = static_cast<AIClient *>( object );
-   Point3F v( 0.0f, 0.0f, 0.0f );
-   dSscanf( argv[2], "%f %f", &v.x, &v.y );
 
    ai->setMoveDestination( v );
 }
@@ -453,40 +456,31 @@ ConsoleMethod( AIClient, setMoveDestination, void, 3, 3, "ai.setMoveDestination(
 /**
  * Returns the point the AI is aiming at
  */
-ConsoleMethod( AIClient, getAimLocation, const char *, 2, 2, "ai.getAimLocation();" ) {
+DefineConsoleMethod( AIClient, getAimLocation, Point3F, (),, "ai.getAimLocation();" ) 
+{
    AIClient *ai = static_cast<AIClient *>( object );
-   Point3F aimPoint = ai->getAimLocation();
-
-   static const U32 bufSize = 256;
-   char *returnBuffer = Con::getReturnBuffer( bufSize );
-   dSprintf( returnBuffer, bufSize, "%f %f %f", aimPoint.x, aimPoint.y, aimPoint.z );
-
-   return returnBuffer;
+   return ai->getAimLocation();
 }
 
 /**
  * Returns the point the AI is set to move to
  */
-ConsoleMethod( AIClient, getMoveDestination, const char *, 2, 2, "ai.getMoveDestination();" ) {
+DefineConsoleMethod( AIClient, getMoveDestination, Point3F, (),, "ai.getMoveDestination();" ) 
+{
    AIClient *ai = static_cast<AIClient *>( object );
-   Point3F movePoint = ai->getMoveDestination();
-
-   static const U32 bufSize = 256;
-   char *returnBuffer = Con::getReturnBuffer( bufSize );
-   dSprintf( returnBuffer, bufSize, "%f %f %f", movePoint.x, movePoint.y, movePoint.z );
-
-   return returnBuffer;
+   return ai->getMoveDestination();
 }
 
 /**
  * Sets the bots target object
  */
-ConsoleMethod( AIClient, setTargetObject, void, 3, 3, "ai.setTargetObject( obj );" ) {
+DefineConsoleMethod( AIClient, setTargetObject, void, (const char * objName), , "ai.setTargetObject( obj );" ) 
+{
    AIClient *ai = static_cast<AIClient *>( object );
    
    // Find the target
    ShapeBase *targetObject;
-   if( Sim::findObject( argv[2], targetObject ) )
+   if( Sim::findObject( objName, targetObject ) )
       ai->setTargetObject( targetObject );
    else
       ai->setTargetObject( NULL );
@@ -495,7 +489,8 @@ ConsoleMethod( AIClient, setTargetObject, void, 3, 3, "ai.setTargetObject( obj )
 /**
  * Gets the object the AI is targeting
  */
-ConsoleMethod( AIClient, getTargetObject, S32, 2, 2, "ai.getTargetObject();" ) {
+DefineConsoleMethod( AIClient, getTargetObject, S32, (),, "ai.getTargetObject();" ) 
+{
    AIClient *ai = static_cast<AIClient *>( object );
 
    return ai->getTargetObject();
@@ -504,7 +499,8 @@ ConsoleMethod( AIClient, getTargetObject, S32, 2, 2, "ai.getTargetObject();" ) {
 /**
  * Tells the bot the mission is cycling
  */
-ConsoleMethod( AIClient, missionCycleCleanup, void, 2, 2, "ai.missionCycleCleanup();" ) {
+DefineConsoleMethod( AIClient, missionCycleCleanup, void, (),, "ai.missionCycleCleanup();" ) 
+{
    AIClient *ai = static_cast<AIClient*>( object );
    ai->missionCycleCleanup();
 }
@@ -512,7 +508,8 @@ ConsoleMethod( AIClient, missionCycleCleanup, void, 2, 2, "ai.missionCycleCleanu
 /**
  * Sets the AI to run mode
  */
-ConsoleMethod( AIClient, move, void, 2, 2, "ai.move();" ) {
+DefineConsoleMethod( AIClient, move, void, (),, "ai.move();" ) 
+{
    AIClient *ai = static_cast<AIClient *>( object );
    ai->setMoveMode( AIClient::ModeMove );
 }
@@ -520,21 +517,17 @@ ConsoleMethod( AIClient, move, void, 2, 2, "ai.move();" ) {
 /**
  * Gets the AI's location in the world
  */
-ConsoleMethod( AIClient, getLocation, const char *, 2, 2, "ai.getLocation();" ) {
+DefineConsoleMethod( AIClient, getLocation, Point3F, (),, "ai.getLocation();" ) 
+{
    AIClient *ai = static_cast<AIClient *>( object );
-   Point3F locPoint = ai->getLocation();
-
-   static const U32 bufSize = 256;
-   char *returnBuffer = Con::getReturnBuffer( bufSize );
-   dSprintf( returnBuffer, bufSize, "%f %f %f", locPoint.x, locPoint.y, locPoint.z );
-
-   return returnBuffer;
+   return ai->getLocation();
 }
 
 /**
  * Adds an AI Player to the game
  */
-ConsoleFunction( aiAddPlayer, S32 , 2, 3, "aiAddPlayer( 'playerName'[, 'AIClassType'] );" ) {
+DefineConsoleFunction( aiAddPlayer, S32, (const char * name, const char * ns), (""), "'playerName'[, 'AIClassType'] );")
+{
    // Create the player
    AIClient *aiPlayer = new AIClient();
    aiPlayer->registerObject();
@@ -548,18 +541,13 @@ ConsoleFunction( aiAddPlayer, S32 , 2, 3, "aiAddPlayer( 'playerName'[, 'AIClassT
    SimGroup *g = Sim::getClientGroup();
    g->addObject( aiPlayer );
 
-   char *name = new char[ dStrlen( argv[1] ) + 1];
-   char *ns = new char[ dStrlen( argv[2] ) + 1];
-
-   dStrcpy( name, argv[1] );
-   dStrcpy( ns, argv[2] );
 
    // Execute the connect console function, this is the same 
    // onConnect function invoked for normal client connections
-   Con::executef( aiPlayer, "onConnect", name );
+   aiPlayer->onConnect_callback( name );
 
    // Now execute the onAdd command and feed it the namespace
-   if( argc > 2 )
+   if(dStrcmp( ns,"" ) != 0 )
       aiPlayer->onAdd( ns );
    else
       aiPlayer->onAdd( "AIClient" );
@@ -571,7 +559,8 @@ ConsoleFunction( aiAddPlayer, S32 , 2, 3, "aiAddPlayer( 'playerName'[, 'AIClassT
 /**
  * Tells the AI to move forward 100 units...TEST FXN
  */
-ConsoleMethod( AIClient, moveForward, void, 2, 2, "ai.moveForward();" ) {
+DefineConsoleMethod( AIClient, moveForward, void, (),, "ai.moveForward();" ) 
+{
    
    AIClient *ai = static_cast<AIClient *>( object );
    ShapeBase *player = dynamic_cast<ShapeBase*>(ai->getControlObject());

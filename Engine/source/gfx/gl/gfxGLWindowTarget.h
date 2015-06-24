@@ -51,12 +51,17 @@ public:
    
 private:
    friend class GFXGLDevice;
+
+   GLuint mCopyFBO, mBackBufferFBO;
+   GFXTexHandle mBackBufferColorTex, mBackBufferDepthTex;
    Point2I size;   
    GFXDevice* mDevice;
    void* mContext;
    void* mFullscreenContext;
    void _teardownCurrentMode();
    void _setupNewMode();
+   void _setupAttachments();
+   void _WindowPresent();
 };
 
 #endif

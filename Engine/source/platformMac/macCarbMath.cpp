@@ -34,17 +34,21 @@ static MRandomLCG sgPlatRandom;
 
 U32 Platform::getMathControlState()
 {
-   return 0;
-}
-
-void Platform::setMathControlStateKnown()
-{
-   
+   U16 cw;
+   asm("fstcw %0" : "=m" (cw) :);
+   return cw;
 }
 
 void Platform::setMathControlState(U32 state)
 {
-   
+   U16 cw = state;
+   asm("fldcw %0" : : "m" (cw));
+}
+
+void Platform::setMathControlStateKnown()
+{
+   U16 cw = 0x27F;
+   asm("fldcw %0" : : "m" (cw));
 }
 
 //--------------------------------------

@@ -73,7 +73,7 @@ IMPLEMENT_CALLBACK( GuiMLTextCtrl, onURL, void, ( const char* url ),( url ),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMLTextCtrl, onResize, void, ( const char* width, const char* maxY ),( width, maxY ),
+IMPLEMENT_CALLBACK( GuiMLTextCtrl, onResize, void, ( S32 width, S32 maxY ),( width, maxY ),
    "@brief Called whenever the control size changes.\n\n"
    "@param width The new width value for the control\n"
    "@param maxY The current maximum allowed Y value for the control\n\n"
@@ -2133,7 +2133,7 @@ textemit:
    processEmitAtoms();
    emitNewLine(mScanPos);
    setHeight( mMaxY );
-   onResize_callback(Con::getIntArg( getWidth() ), Con::getIntArg( mMaxY ) );
+   onResize_callback( getWidth(), mMaxY );
 	
    //make sure the cursor is still visible - this handles if we're a child of a scroll ctrl...
    ensureCursorOnScreen();

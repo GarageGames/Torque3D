@@ -26,6 +26,7 @@
 #include "platformWin32/winDirectInput.h"
 #include "windowManager/win32/win32Window.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "math/mRandom.h"
 #include "core/stream/fileStream.h"
 #include "T3D/resource.h"
@@ -103,7 +104,7 @@ bool Platform::excludeOtherInstances(const char *mutexName)
 {
 #ifdef UNICODE
    UTF16 b[512];
-   convertUTF8toUTF16((UTF8 *)mutexName, b, sizeof(b));
+   convertUTF8toUTF16((UTF8 *)mutexName, b);
    gMutexHandle = CreateMutex(NULL, true, b);
 #else
    gMutexHandle = CreateMutex(NULL, true, mutexName);
@@ -163,7 +164,7 @@ bool Platform::checkOtherInstances(const char *mutexName)
    
 #ifdef UNICODE
    UTF16 b[512];
-   convertUTF8toUTF16((UTF8 *)mutexName, b, sizeof(b));
+   convertUTF8toUTF16((UTF8 *)mutexName, b);
    pMutex  = CreateMutex(NULL, true, b);
 #else
    pMutex = CreateMutex(NULL, true, mutexName);
@@ -189,14 +190,15 @@ bool Platform::checkOtherInstances(const char *mutexName)
    return false;
 }
 
+#ifndef TORQUE_SDL
 //--------------------------------------
 void Platform::AlertOK(const char *windowTitle, const char *message)
 {
    ShowCursor(true);
 #ifdef UNICODE
    UTF16 m[1024], t[512];
-   convertUTF8toUTF16((UTF8 *)windowTitle, t, sizeof(t));
-   convertUTF8toUTF16((UTF8 *)message, m, sizeof(m));
+   convertUTF8toUTF16((UTF8 *)windowTitle, t);
+   convertUTF8toUTF16((UTF8 *)message, m);
    MessageBox(NULL, m, t, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_OK);
 #else
    MessageBox(NULL, message, windowTitle, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_OK);
@@ -209,8 +211,8 @@ bool Platform::AlertOKCancel(const char *windowTitle, const char *message)
    ShowCursor(true);
 #ifdef UNICODE
    UTF16 m[1024], t[512];
-   convertUTF8toUTF16((UTF8 *)windowTitle, t, sizeof(t));
-   convertUTF8toUTF16((UTF8 *)message, m, sizeof(m));
+   convertUTF8toUTF16((UTF8 *)windowTitle, t);
+   convertUTF8toUTF16((UTF8 *)message, m);
    return MessageBox(NULL, m, t, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_OKCANCEL) == IDOK;
 #else
    return MessageBox(NULL, message, windowTitle, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_OKCANCEL) == IDOK;
@@ -223,13 +225,50 @@ bool Platform::AlertRetry(const char *windowTitle, const char *message)
    ShowCursor(true);
 #ifdef UNICODE
    UTF16 m[1024], t[512];
-   convertUTF8toUTF16((UTF8 *)windowTitle, t, sizeof(t));
-   convertUTF8toUTF16((UTF8 *)message, m, sizeof(m));
+   convertUTF8toUTF16((UTF8 *)windowTitle, t);
+   convertUTF8toUTF16((UTF8 *)message, m);
    return (MessageBox(NULL, m, t, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_RETRYCANCEL) == IDRETRY);
 #else
    return (MessageBox(NULL, message, windowTitle, MB_ICONINFORMATION | MB_SETFOREGROUND | MB_TASKMODAL | MB_RETRYCANCEL) == IDRETRY);
 #endif
 }
+
+Platform::ALERT_ASSERT_RESULT Platform::AlertAssert(const char *windowTitle, const char *message)
+{
+#ifndef TORQUE_TOOLS
+   ShowCursor(true);
+#endif // TORQUE_TOOLS
+
+#ifdef UNICODE
+   UTF16 messageUTF[1024], title[512];
+   convertUTF8toUTF16((UTF8 *)windowTitle, title);
+   convertUTF8toUTF16((UTF8 *)message, messageUTF);
+#else
+   const char* messageUTF = message;
+   const char* title = windowTitle;
+#endif
+
+   // TODO: Change this to a custom dialog that has Exit, Ignore, Ignore All, and Debug buttons
+   ALERT_ASSERT_RESULT alertResult = ALERT_ASSERT_DEBUG;
+   int result = MessageBox(winState.appWindow, messageUTF, title, MB_ABORTRETRYIGNORE | MB_ICONSTOP | MB_DEFBUTTON2 | MB_TASKMODAL | MB_SETFOREGROUND);
+   switch( result )
+   {
+		case IDABORT:
+			alertResult = ALERT_ASSERT_EXIT;
+			break;
+		case IDIGNORE:
+			alertResult = ALERT_ASSERT_IGNORE;
+			break;
+		default:
+		case IDRETRY:
+			alertResult = ALERT_ASSERT_DEBUG;
+			break;
+   }
+
+   return alertResult;
+}
+
+#endif
 
 //--------------------------------------
 HIMC gIMEContext;
@@ -313,19 +352,20 @@ S32 main(S32 argc, const char **argv)
 
 #include "app/mainLoop.h"
 
-S32 PASCAL WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
+S32 WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
 {
    Vector<char *> argv( __FILE__, __LINE__ );
 
-   char moduleName[256];
+   enum { moduleNameSize = 256 };
+   char moduleName[moduleNameSize];
 #ifdef TORQUE_UNICODE
    {
-      TCHAR buf[ 256 ];
-      GetModuleFileNameW( NULL, buf, sizeof( buf ) );
-      convertUTF16toUTF8( buf, moduleName, sizeof( moduleName ) );
+      TCHAR buf[ moduleNameSize ];
+      GetModuleFileNameW( NULL, buf, moduleNameSize );
+      convertUTF16toUTF8( buf, moduleName );
    }
 #else
-   GetModuleFileNameA(NULL, moduleName, sizeof(moduleName));
+   GetModuleFileNameA(NULL, moduleName, moduleNameSize);
 #endif
    argv.push_back(moduleName);
 
@@ -366,6 +406,7 @@ extern "C"
 {
 	bool torque_engineinit(S32 argc, const char **argv);
 	S32  torque_enginetick();
+	S32  torque_getreturnstatus();
 	bool torque_engineshutdown();
 };
 
@@ -381,7 +422,7 @@ S32 TorqueMain(int argc, const char **argv)
 
 	torque_engineshutdown();
 
-	return 0;
+	return torque_getreturnstatus();
 
 }
 
@@ -393,15 +434,16 @@ S32 torque_winmain( HINSTANCE hInstance, HINSTANCE, LPSTR lpszCmdLine, S32)
 {
 	Vector<char *> argv( __FILE__, __LINE__ );
 
-	char moduleName[256];
+   enum { moduleNameSize = 256 };
+   char moduleName[moduleNameSize];
 #ifdef TORQUE_UNICODE
-	{
-		TCHAR buf[ 256 ];
-		GetModuleFileNameW( NULL, buf, sizeof( buf ) );
-		convertUTF16toUTF8( buf, moduleName, sizeof( moduleName ) );
-}
+   {
+      TCHAR buf[ moduleNameSize ];
+      GetModuleFileNameW( NULL, buf, moduleNameSize );
+      convertUTF16toUTF8( buf, moduleName );
+   }
 #else
-	GetModuleFileNameA(NULL, moduleName, sizeof(moduleName));
+   GetModuleFileNameA(NULL, moduleName, moduleNameSize);
 #endif
 	argv.push_back(moduleName);
 
@@ -499,7 +541,7 @@ bool Platform::openWebBrowser( const char* webAddress )
       RegCloseKey( regKey );
       sHaveKey = true;
 
-      convertUTF16toUTF8(sWebKey,utf8WebKey,512);
+      convertUTF16toUTF8(sWebKey,utf8WebKey);
 
 #ifdef UNICODE
       char *p = dStrstr((const char *)utf8WebKey, "%1"); 
@@ -518,7 +560,7 @@ bool Platform::openWebBrowser( const char* webAddress )
 #ifdef UNICODE
    dSprintf( buf, sizeof( buf ), "%s %s", utf8WebKey, webAddress );   
    UTF16 b[1024];
-   convertUTF8toUTF16((UTF8 *)buf, b, sizeof(b));
+   convertUTF8toUTF16((UTF8 *)buf, b);
 #else
    dSprintf( buf, sizeof( buf ), "%s %s", sWebKey, webAddress );   
 #endif
@@ -602,9 +644,8 @@ bool Platform::setLoginPassword( const char* password )
 //       as commentary on Koreans as a nationality. Thank you for your
 //       attention.
 //--------------------------------------
-ConsoleFunction( isKoreanBuild, bool, 1, 1, "isKoreanBuild()" )
+DefineConsoleFunction( isKoreanBuild, bool, ( ), , "isKoreanBuild()")
 {
-   argc; argv;
    HKEY regKey;
    bool result = false;
    if ( RegOpenKeyEx( HKEY_LOCAL_MACHINE, TorqueRegKey, 0, KEY_QUERY_VALUE, &regKey ) == ERROR_SUCCESS )

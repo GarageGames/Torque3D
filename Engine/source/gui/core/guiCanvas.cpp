@@ -30,6 +30,7 @@
 #include "gfx/gfxDrawUtil.h"
 #include "gui/core/guiTypes.h"
 #include "gui/core/guiControl.h"
+#include "gui/editor/guiMenuBar.h"
 #include "console/consoleTypes.h"
 #include "gfx/screenshot.h"
 #include "gfx/video/videoCapture.h"
@@ -94,9 +95,11 @@ extern InputModifiers convertModifierBits(const U32 in);
 //-----------------------------------------------------------------------------
 
 GuiCanvas::GuiCanvas(): GuiControl(),
+                        mCurUpdateRect(0, 0, 0, 0),
                         mCursorEnabled(true),
                         mForceMouseToGUI(false),
                         mAlwaysHandleMouseButtons(false),
+                        mCursorChanged(0),
                         mClampTorqueCursor(true),
                         mShowCursor(true),
                         mLastCursorEnabled(false),
@@ -120,6 +123,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mLeftMouseLast(false),
                         mMiddleMouseLast(false),
                         mRightMouseLast(false),
+                        mMouseDownPoint(0.0f,0.0f),
                         mPlatformWindow(NULL),
                         mLastRenderMs(0),
                         mDisplayWindow(true)
@@ -283,6 +287,8 @@ bool GuiCanvas::onAdd()
    mLastPurchaseHideTime = 0;
 #endif
 
+   Sim::findObject("PlatformGenericMenubar", mMenuBarCtrl);
+
    return parentRet;
 }
 
@@ -300,6 +306,34 @@ void GuiCanvas::onRemove()
    Con::executef(this, "onDestroyMenu");
 
    Parent::onRemove();
+}
+
+void GuiCanvas::setMenuBar(SimObject *obj)
+{
+    GuiControl *oldMenuBar = mMenuBarCtrl;
+    mMenuBarCtrl = dynamic_cast<GuiControl*>(obj);
+
+    //remove old menubar
+    if( oldMenuBar )
+        Parent::removeObject( oldMenuBar );
+
+    // set new menubar    
+    if( mMenuBarCtrl )
+        Parent::addObject(mMenuBarCtrl);
+
+    // update window accelerator keys
+    if( oldMenuBar != mMenuBarCtrl )
+    {
+        StringTableEntry ste = StringTable->insert("menubar");
+        GuiMenuBar* menu = NULL;
+        menu = !oldMenuBar ? NULL : dynamic_cast<GuiMenuBar*>(oldMenuBar->findObjectByInternalName( ste, true));
+        if( menu )
+            menu->removeWindowAcceleratorMap( *getPlatformWindow()->getInputGenerator() );
+
+        menu = !mMenuBarCtrl ? NULL : dynamic_cast<GuiMenuBar*>(mMenuBarCtrl->findObjectByInternalName( ste, true));
+        if( menu )
+                menu->buildWindowAcceleratorMap( *getPlatformWindow()->getInputGenerator() );
+    }
 }
 
 void GuiCanvas::setWindowTitle(const char *newTitle)
@@ -1023,7 +1057,7 @@ void GuiCanvas::rootMouseDown(const GuiEvent &event)
       {
          i--;
          GuiControl *ctrl = static_cast<GuiControl *>(*i);
-         GuiControl *controlHit = ctrl->findHitControl(event.mousePoint);
+         GuiControl *controlHit = ctrl->findHitControl( event.mousePoint - ctrl->getPosition() );
 
          //see if the controlHit is a modeless dialog...
          if( !controlHit->getControlProfile()->mModal )
@@ -1293,6 +1327,9 @@ void GuiCanvas::setContentControl(GuiControl *gui)
       Sim::getGuiGroup()->addObject( ctrl );
    }
 
+   // set current menu bar
+   setMenuBar( mMenuBarCtrl );
+
    // lose the first responder from the old GUI
    GuiControl* responder = gui->findFirstTabable();
    if(responder)
@@ -1556,10 +1593,27 @@ void GuiCanvas::maintainSizing()
       GuiControl *ctrl = static_cast<GuiControl*>(*i);
       Point2I ext = ctrl->getExtent();
       Point2I pos = ctrl->getPosition();
+      Point2I newExt = screenRect.extent;
+      Point2I newPos = screenRect.point;
 
-      if(pos != screenRect.point || ext != screenRect.extent)
+      // if menubar is active displace content gui control
+      if( mMenuBarCtrl && (ctrl == getContentControl()) )
+      {          
+          const SimObject *menu = mMenuBarCtrl->findObjectByInternalName( StringTable->insert("menubar"), true);
+
+          if( !menu )
+              continue;
+
+          AssertFatal( dynamic_cast<const GuiControl*>(menu), "");
+
+          const U32 yOffset = static_cast<const GuiControl*>(menu)->getExtent().y;
+          newPos.y += yOffset;
+          newExt.y -= yOffset;
+      }
+
+      if(pos != newPos || ext != newExt)
       {
-         ctrl->resize(screenRect.point, screenRect.extent);
+         ctrl->resize(newPos, newExt);
          resetUpdateRegions();
       }
    }
@@ -2015,25 +2069,18 @@ ConsoleDocFragment _pushDialog(
    "void pushDialog( GuiControl ctrl, int layer=0, bool center=false);"
 );
 
-ConsoleMethod( GuiCanvas, pushDialog, void, 3, 5, "(GuiControl ctrl, int layer=0, bool center=false)"
+DefineConsoleMethod( GuiCanvas, pushDialog, void, (const char * ctrlName, S32 layer, bool center), ( 0, false), "(GuiControl ctrl, int layer=0, bool center=false)"
 			  "@hide")
 {
    GuiControl *gui;
 
-   if (!	Sim::findObject(argv[2], gui))
+   if (!	Sim::findObject(ctrlName, gui))
    {
-      Con::printf("%s(): Invalid control: %s", argv[0], argv[2]);
+      Con::printf("pushDialog(): Invalid control: %s", ctrlName);
       return;
    }
 
    //find the layer
-   S32 layer = 0;
-   if( argc > 3 )
-      layer = dAtoi( argv[ 3 ] );
-      
-   bool center = false;
-   if( argc > 4 )
-      center = dAtob( argv[ 4 ] );
 
    //set the new content control
    object->pushDialogControl(gui, layer, center);
@@ -2059,19 +2106,9 @@ ConsoleDocFragment _popDialog2(
    "void popDialog();"
 );
 
-ConsoleMethod( GuiCanvas, popDialog, void, 2, 3, "(GuiControl ctrl=NULL)"
+DefineConsoleMethod( GuiCanvas, popDialog, void, (GuiControl * gui), (NULL), "(GuiControl ctrl=NULL)"
 			  "@hide")
 {
-   GuiControl *gui = NULL;
-   if (argc == 3)
-   {
-      if (!Sim::findObject(argv[2], gui))
-      {
-         Con::printf("%s(): Invalid control: %s", argv[0], argv[2]);
-         return;
-      }
-   }
-
    if (gui)
       object->popDialogControl(gui);
    else
@@ -2097,12 +2134,9 @@ ConsoleDocFragment _popLayer2(
 	"void popLayer(S32 layer);"
 );
 
-ConsoleMethod( GuiCanvas, popLayer, void, 2, 3, "(int layer)" 
+DefineConsoleMethod( GuiCanvas, popLayer, void, (S32 layer), (0), "(int layer)" 
 			  "@hide")
 {
-   S32 layer = 0;
-   if (argc == 3)
-      layer = dAtoi(argv[2]);
 
    object->popDialogControl(layer);
 }
@@ -2258,15 +2292,9 @@ ConsoleDocFragment _setCursorPos2(
    "bool setCursorPos( F32 posX, F32 posY);"
 );
 
-ConsoleMethod( GuiCanvas, setCursorPos, void, 3, 4, "(Point2I pos)"
+DefineConsoleMethod( GuiCanvas, setCursorPos, void, (Point2I pos), , "(Point2I pos)"
 			  "@hide")
 {
-   Point2I pos(0,0);
-
-   if(argc == 4)
-      pos.set(dAtoi(argv[2]), dAtoi(argv[3]));
-   else
-      dSscanf(argv[2], "%d %d", &pos.x, &pos.y);
 
    object->setCursorPos(pos);
 }
@@ -2299,7 +2327,7 @@ DefineEngineFunction(excludeOtherInstance, bool, (const char* appIdentifer),,
 					 "@ingroup GuiCore")
 {
 	   // mac/360 can only run one instance in general.
-#if !defined(TORQUE_OS_MAC) && !defined(TORQUE_OS_XENON) && !defined(TORQUE_DEBUG)
+#if !defined(TORQUE_OS_MAC) && !defined(TORQUE_OS_XENON) && !defined(TORQUE_DEBUG) && !defined(TORQUE_OS_LINUX)
    return Platform::excludeOtherInstances(appIdentifer);
 #else
    // We can just return true if we get here.
@@ -2549,7 +2577,7 @@ DefineEngineMethod( GuiCanvas, setWindowPosition, void, ( Point2I position ),,
    object->getPlatformWindow()->setPosition( position );
 }
 
-ConsoleMethod( GuiCanvas, isFullscreen, bool, 2, 2, "() - Is this canvas currently fullscreen?" )
+DefineConsoleMethod( GuiCanvas, isFullscreen, bool, (), , "() - Is this canvas currently fullscreen?" )
 {
    if (Platform::getWebDeployment())
       return false;
@@ -2560,14 +2588,14 @@ ConsoleMethod( GuiCanvas, isFullscreen, bool, 2, 2, "() - Is this canvas current
    return object->getPlatformWindow()->getVideoMode().fullScreen;
 }
 
-ConsoleMethod( GuiCanvas, minimizeWindow, void, 2, 2, "() - minimize this canvas' window." )
+DefineConsoleMethod( GuiCanvas, minimizeWindow, void, (), , "() - minimize this canvas' window." )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
       window->minimize();
 }
 
-ConsoleMethod( GuiCanvas, isMinimized, bool, 2, 2, "()" )
+DefineConsoleMethod( GuiCanvas, isMinimized, bool, (), , "()" )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
@@ -2576,7 +2604,7 @@ ConsoleMethod( GuiCanvas, isMinimized, bool, 2, 2, "()" )
    return false;
 }
 
-ConsoleMethod( GuiCanvas, isMaximized, bool, 2, 2, "()" )
+DefineConsoleMethod( GuiCanvas, isMaximized, bool, (), , "()" )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
@@ -2585,28 +2613,38 @@ ConsoleMethod( GuiCanvas, isMaximized, bool, 2, 2, "()" )
    return false;
 }
 
-ConsoleMethod( GuiCanvas, maximizeWindow, void, 2, 2, "() - maximize this canvas' window." )
+DefineConsoleMethod( GuiCanvas, maximizeWindow, void, (), , "() - maximize this canvas' window." )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
       window->maximize();
 }
 
-ConsoleMethod( GuiCanvas, restoreWindow, void, 2, 2, "() - restore this canvas' window." )
+DefineConsoleMethod( GuiCanvas, restoreWindow, void, (), , "() - restore this canvas' window." )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if( window )
       window->restore();
 }
 
-ConsoleMethod( GuiCanvas, setFocus, void, 2,2, "() - Claim OS input focus for this canvas' window.")
+DefineConsoleMethod( GuiCanvas, setFocus, void, (), , "() - Claim OS input focus for this canvas' window.")
 {
    PlatformWindow* window = object->getPlatformWindow();
    if( window )
       window->setFocus();
 }
 
-ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
+DefineEngineMethod( GuiCanvas, setMenuBar, void, ( GuiControl* menu ),,
+   "Translate a coordinate from canvas window-space to screen-space.\n"
+   "@param coordinate The coordinate in window-space.\n"
+   "@return The given coordinate translated to screen-space." )
+{
+   return object->setMenuBar( menu );
+}
+
+DefineConsoleMethod( GuiCanvas, setVideoMode, void, 
+               (U32 width, U32 height, bool fullscreen, U32 bitDepth, U32 refreshRate, U32 antialiasLevel), 
+               ( false, 0, 0, 0),
                "(int width, int height, bool fullscreen, [int bitDepth], [int refreshRate], [int antialiasLevel] )\n"
                "Change the video mode of this canvas. This method has the side effect of setting the $pref::Video::mode to the new values.\n\n"
                "\\param width The screen width to set.\n"
@@ -2625,8 +2663,6 @@ ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
    // Update the video mode and tell the window to reset.
    GFXVideoMode vm = object->getPlatformWindow()->getVideoMode();
 
-   U32 width = dAtoi(argv[2]);
-   U32 height = dAtoi(argv[3]);
 
    bool changed = false;
    if (width == 0 && height > 0)
@@ -2673,28 +2709,31 @@ ConsoleMethod( GuiCanvas, setVideoMode, void, 5, 8,
    }
 
    if (changed)
-      Con::errorf("GuiCanvas::setVideoMode(): Error - Invalid resolution of (%d, %d) - attempting (%d, %d)", dAtoi(argv[2]), dAtoi(argv[3]), width, height);
+   {
+      Con::errorf("GuiCanvas::setVideoMode(): Error - Invalid resolution of (%d, %d) - attempting (%d, %d)", width, height, width, height);
+   }
 
    vm.resolution  = Point2I(width, height);
-   vm.fullScreen  = dAtob(argv[4]);
+   vm.fullScreen  = fullscreen;
 
    if (Platform::getWebDeployment())
       vm.fullScreen  = false;
 
    // These optional params are set to default at construction of vm. If they
    // aren't specified, just leave them at whatever they were set to.
-   if ((argc > 5) && (dStrlen(argv[5]) > 0))
+   if (bitDepth > 0)
    {
-      vm.bitDepth = dAtoi(argv[5]);
-   }
-   if ((argc > 6) && (dStrlen(argv[6]) > 0))
-   {
-      vm.refreshRate = dAtoi(argv[6]);
+      vm.bitDepth = bitDepth;
    }
 
-   if ((argc > 7) && (dStrlen(argv[7]) > 0))
+   if (refreshRate > 0)
    {
-      vm.antialiasLevel = dAtoi(argv[7]);
+      vm.refreshRate = refreshRate;
+   }
+
+   if (antialiasLevel > 0)
+   {
+      vm.antialiasLevel = antialiasLevel;
    }
 
    object->getPlatformWindow()->setVideoMode(vm);

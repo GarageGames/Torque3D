@@ -98,10 +98,10 @@ GuiWindowCtrl::GuiWindowCtrl()
    mMouseMovingWin = false;
    mMouseResizeWidth = false;
    mMouseResizeHeight = false;
-   setExtent(100, 200);
    mMinimizeIndex = -1;
    mTabIndex = -1;
    mBitmapBounds = NULL;
+   setExtent(100, 200);
 
    RectI closeRect(80, 2, 16, 16);
    mCloseButton = closeRect;

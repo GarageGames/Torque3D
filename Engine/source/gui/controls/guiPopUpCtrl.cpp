@@ -23,6 +23,7 @@
 #include "gui/core/guiCanvas.h"
 #include "gui/controls/guiPopUpCtrl.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiDefaultControlRender.h"
 #include "gfx/primBuilder.h"
 #include "gfx/gfxDrawUtil.h"
@@ -299,121 +300,82 @@ void GuiPopUpMenuCtrl::initPersistFields(void)
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrl, add, void, 3, 5, "(string name, int idNum, int scheme=0)")
+DefineConsoleMethod( GuiPopUpMenuCtrl, add, void, (const char * name, S32 idNum, U32 scheme), ("", -1, 0), "(string name, int idNum, int scheme=0)")
 {
-	if ( argc == 4 )
-		object->addEntry(argv[2],dAtoi(argv[3]));
-   if ( argc == 5 )
-      object->addEntry(argv[2],dAtoi(argv[3]),dAtoi(argv[4]));
-   else
-      object->addEntry(argv[2]);
+  	object->addEntry(name, idNum, scheme);
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, addScheme, void, 6, 6, "(int id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL)")
+DefineConsoleMethod( GuiPopUpMenuCtrl, addScheme, void, (U32 id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL), , 
+	"(int id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL)")
 {
-   ColorI fontColor, fontColorHL, fontColorSEL;
-   U32 r, g, b;
-   char buf[64];
 
-   dStrcpy( buf, argv[3] );
-   char* temp = dStrtok( buf, " \0" );
-   r = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   g = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   b = temp ? dAtoi( temp ) : 0;
-   fontColor.set( r, g, b );
-
-   dStrcpy( buf, argv[4] );
-   temp = dStrtok( buf, " \0" );
-   r = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   g = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   b = temp ? dAtoi( temp ) : 0;
-   fontColorHL.set( r, g, b );
-
-   dStrcpy( buf, argv[5] );
-   temp = dStrtok( buf, " \0" );
-   r = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   g = temp ? dAtoi( temp ) : 0;
-   temp = dStrtok( NULL, " \0" );
-   b = temp ? dAtoi( temp ) : 0;
-   fontColorSEL.set( r, g, b );
-
-   object->addScheme( dAtoi( argv[2] ), fontColor, fontColorHL, fontColorSEL );
+   object->addScheme( id, fontColor, fontColorHL, fontColorSEL );
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, getText, const char*, 2, 2, "")
+DefineConsoleMethod( GuiPopUpMenuCtrl, getText, const char*, (), , "")
 {
    return object->getText();
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, clear, void, 2, 2, "Clear the popup list.")
+DefineConsoleMethod( GuiPopUpMenuCtrl, clear, void, (), , "Clear the popup list.")
 {
    object->clear();
 }
 
 //FIXME: clashes with SimSet.sort
-ConsoleMethod(GuiPopUpMenuCtrl, sort, void, 2, 2, "Sort the list alphabetically.")
+DefineConsoleMethod(GuiPopUpMenuCtrl, sort, void, (), , "Sort the list alphabetically.")
 {
    object->sort();
 }
 
 //  Added to sort the entries by ID
-ConsoleMethod(GuiPopUpMenuCtrl, sortID, void, 2, 2, "Sort the list by ID.")
+DefineConsoleMethod(GuiPopUpMenuCtrl, sortID, void, (), , "Sort the list by ID.")
 {
    object->sortID();
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, forceOnAction, void, 2, 2, "")
+DefineConsoleMethod( GuiPopUpMenuCtrl, forceOnAction, void, (), , "")
 {
    object->onAction();
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, forceClose, void, 2, 2, "")
+DefineConsoleMethod( GuiPopUpMenuCtrl, forceClose, void, (), , "")
 {
    object->closePopUp();
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, getSelected, S32, 2, 2, "")
+DefineConsoleMethod( GuiPopUpMenuCtrl, getSelected, S32, (), , "Gets the selected index")
 {
    return object->getSelected();
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, setSelected, void, 3, 4, "(int id, [scriptCallback=true])")
+DefineConsoleMethod( GuiPopUpMenuCtrl, setSelected, void, (S32 id,  bool scriptCallback), (true), "(int id, [scriptCallback=true])")
 {
-   if( argc > 3 )
-      object->setSelected( dAtoi( argv[2] ), dAtob( argv[3] ) );
-   else
-      object->setSelected( dAtoi( argv[2] ) );
+   object->setSelected( id, scriptCallback );
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, setFirstSelected, void, 2, 3, "([scriptCallback=true])")
+DefineConsoleMethod( GuiPopUpMenuCtrl, setFirstSelected, void, (bool scriptCallback), (true), "([scriptCallback=true])")
 {
-	if( argc > 2 )
-      object->setFirstSelected( dAtob( argv[2] ) );
-   else
-      object->setFirstSelected();
+   object->setFirstSelected( scriptCallback );
+
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, setNoneSelected, void, 2, 2, "")
+DefineConsoleMethod( GuiPopUpMenuCtrl, setNoneSelected, void, (), , "")
 {
    object->setNoneSelected();
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, getTextById, const char*, 3, 3,  "(int id)")
+DefineConsoleMethod( GuiPopUpMenuCtrl, getTextById, const char*, (S32 id), ,  "(int id)")
 {
-   return(object->getTextById(dAtoi(argv[2])));
+   return(object->getTextById(id));
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, changeTextById, void, 4, 4, "( int id, string text )" )
+DefineConsoleMethod( GuiPopUpMenuCtrl, changeTextById, void, ( S32 id, const char * text ), , "( int id, string text )" )
 {
-   object->setEntryText( dAtoi( argv[ 2 ] ), argv[ 3 ] );
+   object->setEntryText( id, text );
 }
 
-ConsoleMethod( GuiPopUpMenuCtrl, setEnumContent, void, 4, 4, "(string class, string enum)"
+DefineConsoleMethod( GuiPopUpMenuCtrl, setEnumContent, void, (const char * className, const char * enumName), , "(string class, string enum)"
               "This fills the popup with a classrep's field enumeration type info.\n\n"
               "More of a helper function than anything.   If console access to the field list is added, "
               "at least for the enumerated types, then this should go away..")
@@ -423,7 +385,7 @@ ConsoleMethod( GuiPopUpMenuCtrl, setEnumContent, void, 4, 4, "(string class, str
    // walk the class list to get our class
    while(classRep)
    {
-      if(!dStricmp(classRep->getClassName(), argv[2]))
+      if(!dStricmp(classRep->getClassName(), className))
          break;
       classRep = classRep->getNextClass();
    }
@@ -431,20 +393,20 @@ ConsoleMethod( GuiPopUpMenuCtrl, setEnumContent, void, 4, 4, "(string class, str
    // get it?
    if(!classRep)
    {
-      Con::warnf(ConsoleLogEntry::General, "failed to locate class rep for '%s'", argv[2]);
+      Con::warnf(ConsoleLogEntry::General, "failed to locate class rep for '%s'", className);
       return;
    }
 
    // walk the fields to check for this one (findField checks StringTableEntry ptrs...)
    U32 i;
    for(i = 0; i < classRep->mFieldList.size(); i++)
-      if(!dStricmp(classRep->mFieldList[i].pFieldname, argv[3]))
+      if(!dStricmp(classRep->mFieldList[i].pFieldname, enumName))
          break;
 
    // found it?   
    if(i == classRep->mFieldList.size())
    {   
-      Con::warnf(ConsoleLogEntry::General, "failed to locate field '%s' for class '%s'", argv[3], argv[2]);
+      Con::warnf(ConsoleLogEntry::General, "failed to locate field '%s' for class '%s'", enumName, className);
       return;
    }
 
@@ -454,7 +416,7 @@ ConsoleMethod( GuiPopUpMenuCtrl, setEnumContent, void, 4, 4, "(string class, str
    // check the type
    if( !conType->getEnumTable() )
    {
-      Con::warnf(ConsoleLogEntry::General, "field '%s' is not an enumeration for class '%s'", argv[3], argv[2]);
+      Con::warnf(ConsoleLogEntry::General, "field '%s' is not an enumeration for class '%s'", enumName, className);
       return;
    }
 
@@ -467,22 +429,22 @@ ConsoleMethod( GuiPopUpMenuCtrl, setEnumContent, void, 4, 4, "(string class, str
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrl, findText, S32, 3, 3, "(string text)"
-              "Returns the position of the first entry containing the specified text.")
+DefineConsoleMethod( GuiPopUpMenuCtrl, findText, S32, (const char * text), , "(string text)"
+              "Returns the position of the first entry containing the specified text or -1 if not found.")
 {
-   return( object->findText( argv[2] ) );   
+   return( object->findText( text ) );   
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrl, size, S32, 2, 2, "Get the size of the menu - the number of entries in it.")
+DefineConsoleMethod( GuiPopUpMenuCtrl, size, S32, (), , "Get the size of the menu - the number of entries in it.")
 {
    return( object->getNumEntries() ); 
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrl, replaceText, void, 3, 3, "(bool doReplaceText)")
+DefineConsoleMethod( GuiPopUpMenuCtrl, replaceText, void, (bool doReplaceText), , "(bool doReplaceText)")
 {
-   object->replaceText(dAtoi(argv[2]));  
+   object->replaceText(S32(doReplaceText));  
 }
 
 //------------------------------------------------------------------------------
@@ -570,9 +532,9 @@ void GuiPopUpMenuCtrl::clearEntry( S32 entry )
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrl, clearEntry, void, 3, 3, "(S32 entry)")
+DefineConsoleMethod( GuiPopUpMenuCtrl, clearEntry, void, (S32 entry), , "(S32 entry)")
 {
-   object->clearEntry(dAtoi(argv[2]));  
+   object->clearEntry(entry);
 }
 
 //------------------------------------------------------------------------------

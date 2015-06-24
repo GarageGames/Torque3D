@@ -85,11 +85,11 @@ public:
    /// returns the menu item's ID, or -1 on failure.
    /// implementd on a per-platform basis.
    /// TODO: factor out common code
-   S32 insertItem(S32 pos, const char *title, const char* accelerator);
+   S32 insertItem(S32 pos, const char *title, const char* accelerator, const char* cmd);
 
    /// Sets the name title and accelerator for 
    /// an existing item.
-   bool setItem(S32 pos, const char *title, const char* accelerator);
+   bool setItem(S32 pos, const char *title, const char* accelerator, const char* cmd);
 
    /// pass NULL for @p title to insert a separator
    /// returns the menu item's ID, or -1 on failure.

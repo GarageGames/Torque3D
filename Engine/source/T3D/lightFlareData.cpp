@@ -598,7 +598,7 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    ri->blendStyle = ParticleRenderInst::BlendGreyscale;
    ri->diffuseTex = mFlareTexture;
    ri->softnessDistance = 1.0f; 
-   ri->defaultKey = ri->diffuseTex ? (U32)ri->diffuseTex : (U32)ri->vertBuff; // Sort by texture too.
+   ri->defaultKey = ri->diffuseTex ? (uintptr_t)ri->diffuseTex : (uintptr_t)ri->vertBuff; // Sort by texture too.
 
    // NOTE: Offscreen partical code is currently disabled.
    ri->systemState = PSS_AwaitingHighResDraw;

@@ -113,7 +113,7 @@ void GuiConsoleTextCtrl::onPreRender()
 {   
    if ( mConsoleExpression.isNotEmpty() )
    {
-      mResult = Con::evaluatef( "$guiConsoleTextCtrlTemp = %s;", mConsoleExpression.c_str() );
+      mResult = (const char*)Con::evaluatef( "$guiConsoleTextCtrlTemp = %s;", mConsoleExpression.c_str() );
       
       // Of the resulting string we will be printing,
       // Find the number of lines and length of each.      
