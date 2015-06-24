@@ -4,6 +4,7 @@ MIT Licensed Open Source version of [Torque 3D](http://torque3d.org) from [Garag
 
 ## More Information
 
+* [Homepage](http://torque3d.org)
 * [Torque 3D wiki](http://wiki.torque3d.org)
 * [Community forum](http://forums.torque3d.org)
 * [GarageGames forum](http://www.garagegames.com/community/forums)
