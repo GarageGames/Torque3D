@@ -121,9 +121,9 @@ class GuiControl : public SimGroup
          horizResizeLeft,        ///< fixed on the right and width
          horizResizeCenter,
          horizResizeRelative,     ///< resize relative
-         horizResizeRelativeToYL,     ///< resize relative to hieght delta (offset Left)
-         horizResizeRelativeToYR,     ///< resize relative to hieght delta (offset Right)
-         horizResizeRelativeToYC,     ///< resize relative to hieght delta (offset Right)
+         horizResizeAspectLeft,    ///< resize relative to hieght delta (offset Left)
+         horizResizeAspectRight,   ///< resize relative to hieght delta (offset Right)
+         horizResizeAspectCenter,  ///< resize relative to hieght delta (Centered)
          horizResizeWindowRelative ///< resize window relative
       };
       enum vertSizingOptions
@@ -133,6 +133,9 @@ class GuiControl : public SimGroup
          vertResizeTop,          ///< fixed in height and on the bottom
          vertResizeCenter,
          vertResizeRelative,      ///< resize relative
+         vertResizeAspectTop,     ///< resize relative to width delta (offset Left)
+         vertResizeAspectBottom,  ///< resize relative to width delta (offset Right)
+         vertResizeAspectCenter,  ///< resize relative to width delta Centered)
          vertResizeWindowRelative ///< resize window relative
       };
       
