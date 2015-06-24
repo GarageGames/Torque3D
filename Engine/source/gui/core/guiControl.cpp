@@ -175,6 +175,9 @@ ImplementEnumType( GuiHorizontalSizing,
 	{ GuiControl::horizResizeLeft,            "left"      },
    { GuiControl::horizResizeCenter,          "center"    },
    { GuiControl::horizResizeRelative,        "relative"  },
+   { GuiControl::horizResizeRelativeToYL,     "relativeToYL" },
+   { GuiControl::horizResizeRelativeToYR,     "relativeToYR" },
+   { GuiControl::horizResizeRelativeToYC,     "relativeToYC" },
 	{ GuiControl::horizResizeWindowRelative,  "windowRelative"  }
 EndImplementEnumType;
 
@@ -1363,6 +1366,36 @@ void GuiControl::parentResized(const RectI &oldParentRect, const RectI &newParen
       S32 newLeft = mRoundToNearest( ( F32( newPosition.x ) / F32( oldParentRect.extent.x ) ) * F32( newParentRect.extent.x ) );
       S32 newWidth = mRoundToNearest( ( F32( newExtent.x ) / F32( oldParentRect.extent.x ) ) * F32( newParentRect.extent.x ) );
 
+      newPosition.x = newLeft;
+      newExtent.x = newWidth;
+   }
+   else if (mHorizSizing == horizResizeRelativeToYL && oldParentRect.extent.x != 0)
+   {
+      S32 newLeft = mRoundToNearest((F32(newPosition.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x));
+      S32 newWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y));
+
+      newPosition.x = newLeft;
+      newExtent.x = newWidth;
+   }
+   else if (mHorizSizing == horizResizeRelativeToYR && oldParentRect.extent.x != 0)
+   {
+      S32 newLeft = mRoundToNearest((F32(newPosition.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x));
+      S32 newWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y)); //origional aspect ratio corrected width
+      S32 rWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x)); //parent aspect ratio relative width
+
+      S32 offset = rWidth - newWidth; // account for change in relative width
+      newLeft += offset;
+      newPosition.x = newLeft;
+      newExtent.x = newWidth;
+   }
+   else if (mHorizSizing == horizResizeRelativeToYC && oldParentRect.extent.x != 0)
+   {
+      S32 newLeft = mRoundToNearest((F32(newPosition.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x));
+      S32 newWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y)); //origional aspect ratio corrected width
+      S32 rWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x)); //parent aspect ratio relative width
+
+      S32 offset = rWidth - newWidth; // account for change in relative width
+      newLeft += offset/2;
       newPosition.x = newLeft;
       newExtent.x = newWidth;
    }

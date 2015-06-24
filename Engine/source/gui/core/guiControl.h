@@ -121,6 +121,9 @@ class GuiControl : public SimGroup
          horizResizeLeft,        ///< fixed on the right and width
          horizResizeCenter,
          horizResizeRelative,     ///< resize relative
+         horizResizeRelativeToYL,     ///< resize relative to hieght delta (offset Left)
+         horizResizeRelativeToYR,     ///< resize relative to hieght delta (offset Right)
+         horizResizeRelativeToYC,     ///< resize relative to hieght delta (offset Right)
          horizResizeWindowRelative ///< resize window relative
       };
       enum vertSizingOptions
