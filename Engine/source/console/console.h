@@ -215,12 +215,6 @@ public:
    ~ConsoleValueRef() { ; }
 
    ConsoleValueRef(const ConsoleValueRef &ref);
-   ConsoleValueRef(const char *value);
-   ConsoleValueRef(const String &ref);
-   ConsoleValueRef(U32 value);
-   ConsoleValueRef(S32 value);
-   ConsoleValueRef(F32 value);
-   ConsoleValueRef(F64 value);
 
    static ConsoleValueRef fromValue(ConsoleValue *value) { ConsoleValueRef ref; ref.value = value; return ref; }
 

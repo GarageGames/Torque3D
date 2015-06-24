@@ -1374,7 +1374,7 @@ F32 SceneContainer::containerSearchCurrRadiusDist()
 
 void SceneContainer::getBinRange( const F32 min, const F32 max, U32& minBin, U32& maxBin )
 {
-   AssertFatal(max >= min, "Error, bad range! in getBinRange");
+   AssertFatal(max >= min, avar("Error, bad range in getBinRange. min: %f, max: %f", min, max));
 
    if ((max - min) >= (SceneContainer::csmTotalBinSize - SceneContainer::csmBinSize))
    {

@@ -22,7 +22,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
   end
 
-  config.vm.synced_folder '../../', '/torque'
+  config.vm.synced_folder '../../../', '/torque'
 
   config.vm.provision :shell, path: 'provision.sh'
   if gui?

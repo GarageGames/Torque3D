@@ -1024,8 +1024,10 @@ bool GameConnection::readDemoStartBlock(BitStream *stream)
 
 void GameConnection::demoPlaybackComplete()
 {
-   static ConsoleValueRef demoPlaybackArgv[1] = { "demoPlaybackComplete" };
-   Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(1, demoPlaybackArgv, false));
+   static const char* demoPlaybackArgv[1] = { "demoPlaybackComplete" };
+   static StringStackConsoleWrapper demoPlaybackCmd(1, demoPlaybackArgv);
+
+   Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(demoPlaybackCmd.argc, demoPlaybackCmd.argv, false));
    Parent::demoPlaybackComplete();
 }
 
