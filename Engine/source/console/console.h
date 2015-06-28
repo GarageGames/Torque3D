@@ -191,7 +191,7 @@ public:
    
    void cleanup()
    {
-      if (bufferLen > 0)
+      if ((type <= TypeInternalString) && (bufferLen > 0))
       {
          dFree(sval);
          bufferLen = 0;
@@ -201,6 +201,8 @@ public:
       ival = 0;
       fval = 0;
    }
+   ConsoleValue(){ init(); };
+   ~ConsoleValue(){ cleanup(); };
 };
 
 // Proxy class for console variables
