@@ -2,12 +2,11 @@
 new SimGroup(MissionGroup) {
    canSave = "1";
    canSaveDynamicFields = "1";
-   Enabled = "1";
+      enabled = "1";
 
    new LevelInfo(theLevelInfo) {
       nearClip = "0.1";
       visibleDistance = "2000";
-      visibleGhostDistance = "0";
       decalBias = "0.0015";
       fogColor = "0.462745 0.698039 0.729412 1";
       fogDensity = "0.005";
@@ -21,7 +20,6 @@ new SimGroup(MissionGroup) {
       soundDistanceModel = "Linear";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
          desc = "A \'one of everything\' test level that demonstrates lots of stock classes.";
          levelName = "Outpost";
    };
@@ -35,7 +33,6 @@ new SimGroup(MissionGroup) {
       ambientScale = "1 1 1 1";
       fogScale = "1 1 1 1";
       exposure = "1";
-      zOffset = "0";
       azimuth = "0";
       elevation = "35";
       moonAzimuth = "0";
@@ -70,15 +67,14 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
          mieScattering = "0.0045";
    };
    new TimeOfDay() {
       axisTilt = "23.44";
       dayLength = "120";
       startTime = "0.1";
-      time = "0.0722667";
-      play = "0";
+      time = "0.756599";
+      play = "1";
       azimuthOverride = "1";
       dayScale = "1";
       nightScale = "3";
@@ -87,7 +83,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new CloudLayer() {
       texture = "art/skies/clouds/clouds_normal_displacement";
@@ -110,28 +105,25 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new TerrainBlock(theTerrain) {
       terrainFile = "art/terrains/Outpost_0.ter";
       castShadows = "1";
       squareSize = "2";
       baseTexSize = "1024";
-      baseTexFormat = "JPG";
       lightMapSize = "256";
       screenError = "16";
       position = "-1024 -1024 179.978";
       rotation = "1 0 0 0";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
          scale = "1 1 1";
          tile = "0";
    };
    new SimGroup(PlayerDropPoints) {
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
+         enabled = "1";
 
       new SpawnSphere() {
          autoSpawn = "0";
@@ -147,7 +139,7 @@ new SimGroup(MissionGroup) {
          scale = "1 1 1";
          canSave = "1";
          canSaveDynamicFields = "1";
-         Enabled = "1";
+            enabled = "1";
             homingCount = "0";
             lockCount = "0";
       };
@@ -223,7 +215,6 @@ new SimGroup(MissionGroup) {
       position = "0 0 238.69";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new GroundCover(g1) {
       Material = "grass1";
@@ -365,7 +356,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new GroundCover(g2) {
       Material = "grass2";
@@ -507,7 +497,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new GroundCover(g3) {
       Material = "grass3";
@@ -649,7 +638,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new GroundCover(g4) {
       Material = "plant1";
@@ -791,7 +779,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new GroundCover(g5) {
       Material = "plant2";
@@ -933,7 +920,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new DecalRoad() {
       Material = "DefaultDecalRoadMaterial";
@@ -945,7 +931,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
 
       Node = "9.808894 2.398789 240.942383 10.000000";
       Node = "19.435331 -12.021607 242.012695 10.000000";
@@ -990,7 +975,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
 
       Node = "-37.0747 -131.611 241.008 10 5 0 0 1";
       Node = "-46.5522 -126.509 241.261 10 1 0 0 1";
@@ -1011,7 +995,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
 
       Node = "-130.650162 -23.988914 240.977051 10.000000";
       Node = "-135.118286 -18.524910 241.336426 10.000000";
@@ -1040,7 +1023,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
 
       Node = "-41.7054 46.9005 253.598 10 5 -0.0955467 -0.111315 0.989181";
       Node = "-36.1458 42.8452 254.174 10 1 -0.047903 -0.055809 0.997292";
@@ -1058,7 +1040,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
       dataFile = "levels/Outpost.forest";
       lodReflectScalar = "2";
    };
@@ -1066,16 +1047,15 @@ new SimGroup(MissionGroup) {
       disableMove = "0";
       isAIControlled = "0";
       dataBlock = "CheetahCar";
-      position = "29.887 -39.7301 244.411";
-      rotation = "0.282041 -0.955878 -0.0821632 1.74131";
+      position = "29.878 -39.733 244.411";
+      rotation = "0.279703 -0.957384 -0.0719901 1.72959";
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
       persistentId = "fab05691-3175-11e4-978f-ce5dedd0cf27";
-      Enabled = "1";
-         leftBrakeLight = "4574";
+         leftBrakeLight = "4285";
          mountable = "1";
-         rightBrakeLight = "4573";
+         rightBrakeLight = "4284";
    };
    new TSStatic() {
       shapeName = "art/shapes/rocks/rock1.dts";
@@ -1085,11 +1065,6 @@ new SimGroup(MissionGroup) {
       collisionType = "Collision Mesh";
       decalType = "Collision Mesh";
       allowPlayerStep = "1";
-      enablePhysicsRep = "1";
-      alphaFadeEnable = "0";
-      alphaFadeStart = "100";
-      alphaFadeEnd = "150";
-      alphaFadeInverse = "0";
       renderNormals = "0";
       forceDetail = "-1";
       position = "16.9991 -25.9715 240.76";
@@ -1097,21 +1072,15 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new TSStatic() {
       shapeName = "art/shapes/rocks/rock2.dts";
       playAmbient = "1";
       meshCulling = "0";
       originSort = "0";
-      collisionType = "Visible Mesh";
-      decalType = "Visible Mesh";
+      collisionType = "Collision Mesh";
+      decalType = "Collision Mesh";
       allowPlayerStep = "1";
-      enablePhysicsRep = "1";
-      alphaFadeEnable = "0";
-      alphaFadeStart = "100";
-      alphaFadeEnd = "150";
-      alphaFadeInverse = "0";
       renderNormals = "0";
       forceDetail = "-1";
       position = "39.7956 -43.2913 238.099";
@@ -1119,29 +1088,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
-   };
-   new TSStatic() {
-      shapeName = "art/shapes/rocks/rock3.dts";
-      playAmbient = "1";
-      meshCulling = "0";
-      originSort = "0";
-      collisionType = "Visible Mesh";
-      decalType = "Visible Mesh";
-      allowPlayerStep = "1";
-      enablePhysicsRep = "1";
-      alphaFadeEnable = "0";
-      alphaFadeStart = "100";
-      alphaFadeEnd = "150";
-      alphaFadeInverse = "0";
-      renderNormals = "0";
-      forceDetail = "-1";
-      position = "-2.17366 -10.0803 233.761";
-      rotation = "1 0 0 0";
-      scale = "1 1 1";
-      canSave = "1";
-      canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new TSStatic() {
       shapeName = "art/shapes/rocks/rock3.dts";
@@ -1151,11 +1097,22 @@ new SimGroup(MissionGroup) {
       collisionType = "Collision Mesh";
       decalType = "Collision Mesh";
       allowPlayerStep = "1";
-      enablePhysicsRep = "1";
-      alphaFadeEnable = "0";
-      alphaFadeStart = "100";
-      alphaFadeEnd = "150";
-      alphaFadeInverse = "0";
+      renderNormals = "0";
+      forceDetail = "-1";
+      position = "-2.17366 -10.0803 233.761";
+      rotation = "1 0 0 0";
+      scale = "1 1 1";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+   };
+   new TSStatic() {
+      shapeName = "art/shapes/rocks/rock3.dts";
+      playAmbient = "1";
+      meshCulling = "0";
+      originSort = "0";
+      collisionType = "Collision Mesh";
+      decalType = "Collision Mesh";
+      allowPlayerStep = "1";
       renderNormals = "0";
       forceDetail = "-1";
       position = "-56.0141 31.2388 261.771";
@@ -1163,7 +1120,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new Precipitation() {
       numDrops = "1024";
@@ -1199,7 +1155,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new PointLight() {
       radius = "25";
@@ -1230,7 +1185,6 @@ new SimGroup(MissionGroup) {
       rotation = "1 0 0 0";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new ParticleEmitterNode() {
       active = "1";
@@ -1242,7 +1196,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new ParticleEmitterNode() {
       active = "1";
@@ -1254,7 +1207,6 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new TSStatic() {
       shapeName = "art/shapes/station/station01.dts";
@@ -1263,12 +1215,7 @@ new SimGroup(MissionGroup) {
       originSort = "0";
       collisionType = "Visible Mesh";
       decalType = "Visible Mesh";
-      allowPlayerStep = "0";
-      enablePhysicsRep = "1";
-      alphaFadeEnable = "0";
-      alphaFadeStart = "100";
-      alphaFadeEnd = "150";
-      alphaFadeInverse = "0";
+      allowPlayerStep = "1";
       renderNormals = "0";
       forceDetail = "-1";
       position = "-118.394 34.2259 246.05";
@@ -1276,103 +1223,17 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
    };
    new PhysicalZone() {
       velocityMod = "1";
       gravityMod = "-1";
       appliedForce = "0 0 0";
       polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
-      invisibleWall = "0";
       position = "-75.81 34.2165 245.552";
       rotation = "1 0 0 0";
       scale = "4.70489 4.32539 16.1481";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
-   };
-   new SimGroup(CameraBookmarks) {
-      canSave = "1";
-      canSaveDynamicFields = "1";
-      Enabled = "1";
-
-      new CameraBookmark() {
-         isAIControlled = "0";
-         dataBlock = "CameraBookmarkMarker";
-         position = "-54.2205 -122.766 257.705";
-         rotation = "-0.0597204 -0.269509 0.961144 204.046";
-         scale = "1 1 1";
-         internalName = "NewCamera_0";
-         canSave = "1";
-         canSaveDynamicFields = "1";
-         Enabled = "1";
-      };
-      new CameraBookmark() {
-         isAIControlled = "0";
-         dataBlock = "CameraBookmarkMarker";
-         position = "-48.0151 -90.5681 272.547";
-         rotation = "-0.0406335 -0.246727 0.968233 198.12";
-         scale = "1 1 1";
-         internalName = "NewCamera_1";
-         canSave = "1";
-         canSaveDynamicFields = "1";
-         Enabled = "1";
-      };
-   };
-   new TSStatic() {
-      shapeName = "art/shapes/trees/defaulttree/defaulttree.DAE";
-      playAmbient = "1";
-      meshCulling = "0";
-      originSort = "0";
-      collisionType = "Collision Mesh";
-      decalType = "Collision Mesh";
-      allowPlayerStep = "1";
-      enablePhysicsRep = "1";
-      alphaFadeEnable = "0";
-      alphaFadeStart = "100";
-      alphaFadeEnd = "150";
-      alphaFadeInverse = "0";
-      renderNormals = "0";
-      forceDetail = "-1";
-      position = "-57.5817 -139.689 238.213";
-      rotation = "1 0 0 0";
-      scale = "3 3 3";
-      canSave = "1";
-      canSaveDynamicFields = "1";
-      Enabled = "1";
-   };
-   new PhysicalZone() {
-      velocityMod = "1";
-      gravityMod = "0.5";
-      appliedForce = "-2500 0 0";
-      polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
-      invisibleWall = "0";
-      position = "-79.5161 34.0702 259.951";
-      rotation = "1 0 0 0";
-      scale = "11.8676 3.54503 7.79052";
-      canSave = "1";
-      canSaveDynamicFields = "1";
-      Enabled = "1";
-   };
-   new AITurretShape() {
-      respawn = "0";
-      static = "0";
-      rotate = "0";
-      isAIControlled = "1";
-      dataBlock = "DeployableTurret";
-      position = "-149.332 33.4366 246.085";
-      rotation = "0 0 -1 116.57";
-      scale = "1 1 1";
-      canSave = "1";
-      canSaveDynamicFields = "1";
-      Enabled = "1";
-         client = "4595";
-         count = "1";
-         entranceThread = "-1";
-         invAITurretAmmo = "10000";
-         invAITurretHead = "1";
-         mountable = "0";
-         sourceObject = "5793";
    };
    new AITurretShape() {
       respawn = "1";
@@ -1385,33 +1246,62 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
          entranceThread = "-1";
          invAITurretAmmo = "10000";
          invAITurretHead = "1";
          mountable = "0";
    };
+   new SimGroup(CameraBookmarks) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      new CameraBookmark() {
+         isAIControlled = "0";
+         dataBlock = "CameraBookmarkMarker";
+         position = "-54.2205 -122.766 257.705";
+         rotation = "-0.0597204 -0.269509 0.961144 204.046";
+         scale = "1 1 1";
+         internalName = "NewCamera_0";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+      new CameraBookmark() {
+         isAIControlled = "0";
+         dataBlock = "CameraBookmarkMarker";
+         position = "-48.0151 -90.5681 272.547";
+         rotation = "-0.0406335 -0.246727 0.968233 198.12";
+         scale = "1 1 1";
+         internalName = "NewCamera_1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+      };
+   };
    new TSStatic() {
-      shapeName = "art/shapes/stairs/stairs.DAE";
+      shapeName = "art/shapes/trees/defaulttree/defaulttree.DAE";
       playAmbient = "1";
       meshCulling = "0";
       originSort = "0";
-      collisionType = "Visible Mesh";
-      decalType = "Visible Mesh";
+      collisionType = "Collision Mesh";
+      decalType = "Collision Mesh";
       allowPlayerStep = "1";
-      enablePhysicsRep = "1";
-      alphaFadeEnable = "0";
-      alphaFadeStart = "100";
-      alphaFadeEnd = "150";
-      alphaFadeInverse = "0";
       renderNormals = "0";
       forceDetail = "-1";
-      position = "50.4833 -40.4544 244.735";
+      position = "-57.5817 -139.689 238.213";
       rotation = "1 0 0 0";
-      scale = "1 1 1";
+      scale = "3 3 3";
       canSave = "1";
       canSaveDynamicFields = "1";
-      Enabled = "1";
+   };
+   new PhysicalZone() {
+      velocityMod = "1";
+      gravityMod = "0.5";
+      appliedForce = "-2500 0 0";
+      polyhedron = "-0.5000000 0.5000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
+      position = "-79.5161 34.0702 259.951";
+      rotation = "1 0 0 0";
+      scale = "11.8676 3.54503 7.79052";
+      canSave = "1";
+      canSaveDynamicFields = "1";
    };
 };
 //--- OBJECT WRITE END ---
