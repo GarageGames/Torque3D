@@ -933,8 +933,11 @@ class SimObject: public ConsoleObject
       virtual void destroySelf();
 
 	  // BlissGMK >>
+	  // removed untill we replace it by a native trigger..
+	  /*
 	  //this function call chunks stored in dynamic fields
 	  void signal(const char* fieldName, const char* args = NULL);
+	  */
 	  virtual void setEnabled(const bool enabled) { mEnabled = enabled; }
 	  bool isEnabled() const { return mEnabled; }
 	  // BlissGMK <<

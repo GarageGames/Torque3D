@@ -1057,6 +1057,8 @@ SimObject* SimObject::deepClone()
    return clone();
 }
 
+// removed untill we replace it by a native trigger..
+/*
 // BlissGMK >>
 void SimObject::signal(const char* fieldName, const char* args)
 {
@@ -1086,6 +1088,7 @@ void SimObject::signal(const char* fieldName, const char* args)
 
 }
 // BlissGMK <<
+*/
 
 //=============================================================================
 //    Grouping.
@@ -2786,7 +2789,8 @@ DefineConsoleMethod( SimObject, getField, const char*, ( S32 index ),,
    // if we found nada, return nada.
    return "";
 }
-
+// removed untill we replace it by a native trigger..
+/*
 // BlissGMK >>
 ConsoleMethod(SimObject, signal, void, 3, 4, "evaluates strings stored in dynamic fields take a string as parameter")
 {
@@ -2804,7 +2808,7 @@ ConsoleMethod(SimObject, isEnabled, bool, 2, 2, "()")
 	return object->isEnabled();
 }
 // BlissGMK <<
-
+*/
 //-----------------------------------------------------------------------------
 
 #ifdef TORQUE_DEBUG
