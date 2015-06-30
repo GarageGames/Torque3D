@@ -32,6 +32,12 @@ addDef( "TORQUE_PHYSICS_BULLET" )
 addDef( "TORQUE_PHYSICS_ENABLED" )
 
 addPath( "${srcDir}/T3D/physics/bullet" )
+#// BlissGMK >>
+addPath( "${srcDir}/T3D/BlissGMK" )
+addPath( "${srcDir}/T3D/BlissGMK/physics" )
+addPath( "${srcDir}/T3D/BlissGMK/physics/bullet" )
+#// BlissGMK <<
+
 addInclude( "${libDir}/bullet/src" )
 
 addLib( "libbullet" )

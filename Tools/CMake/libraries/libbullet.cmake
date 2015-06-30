@@ -35,6 +35,9 @@ addPath( "${libDir}/bullet/src/BulletDynamics/ConstraintSolver" )
 addPath( "${libDir}/bullet/src/BulletDynamics/Dynamics" )
 addPath( "${libDir}/bullet/src/BulletDynamics/Vehicle" )
 addPath( "${libDir}/bullet/src/LinearMath" )
+#// BlissGMK >>
+addPath( "${libDir}/bullet/src/BulletSoftBody" )
+#// BlissGMK <<
 
 if( WIN32 )
   addDef( "WIN32" )

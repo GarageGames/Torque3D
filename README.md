@@ -1,4 +1,4 @@
-Greed v00.00.05b
+Greed v00.00.08a
 -------
 
 Changelog :
@@ -17,6 +17,10 @@ http://www.garagegames.com/community/resources/view/22590
 ----------------
 ###### .07 goals: new car, new avatar, island textured + base scene setup. 
 ----------------
+----------------
+###### .08a base code is frozen appart for fixes, integration of .07a goals are partly done (base island is there)
+----------------
+
 This is a fork of the MIT Licensed Torque 3D (see http://www.garagegames.com/products/torque-3d).
 
 More Information
