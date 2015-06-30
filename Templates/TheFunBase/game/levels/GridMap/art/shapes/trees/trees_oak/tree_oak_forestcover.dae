@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.63.0 r46461:46487M</authoring_tool>
+    </contributor>
+    <created>2012-09-26T22:59:53</created>
+    <modified>2012-09-26T22:59:53</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_cameras/>
+  <library_lights/>
+  <library_images>
+    <image id="vegetation_oak_01_diff_png" name="vegetation_oak_01_diff_png">
+      <init_from>../+%20Documents/artwork/3dmodels/vegetation/vegetation_oak_01_diff.png</init_from>
+    </image>
+    <image id="vegetation_oak_01_ddn_png" name="vegetation_oak_01_ddn_png">
+      <init_from>../+%20Documents/artwork/3dmodels/vegetation/vegetation_oak_01_ddn.png</init_from>
+    </image>
+    <image id="vegetation_oak_01_spec_png" name="vegetation_oak_01_spec_png">
+      <init_from>../+%20Documents/artwork/3dmodels/vegetation/vegetation_oak_01_spec.png</init_from>
+    </image>
+  </library_images>
+  <library_effects>
+    <effect id="oak_leaves-effect">
+      <profile_COMMON>
+        <newparam sid="vegetation_oak_01_diff_png-surface">
+          <surface type="2D">
+            <init_from>vegetation_oak_01_diff_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="vegetation_oak_01_diff_png-sampler">
+          <sampler2D>
+            <source>vegetation_oak_01_diff_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <newparam sid="vegetation_oak_01_spec_png-surface">
+          <surface type="2D">
+            <init_from>vegetation_oak_01_spec_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="vegetation_oak_01_spec_png-sampler">
+          <sampler2D>
+            <source>vegetation_oak_01_spec_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <newparam sid="vegetation_oak_01_ddn_png-surface">
+          <surface type="2D">
+            <init_from>vegetation_oak_01_ddn_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="vegetation_oak_01_ddn_png-sampler">
+          <sampler2D>
+            <source>vegetation_oak_01_ddn_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="vegetation_oak_01_diff_png-sampler"/>
+            </diffuse>
+            <specular>
+              <texture texture="vegetation_oak_01_spec_png-sampler"/>
+            </specular>
+            <transparent>
+              <texture texture="vegetation_oak_01_diff_png-sampler"/>
+            </transparent>
+            <transparency>
+              <float sid="transparency">0</float>
+            </transparency>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </lambert>
+          <extra>
+            <technique profile="FCOLLADA">
+              <bump>
+                <texture texture="vegetation_oak_01_ddn_png-sampler"/>
+              </bump>
+            </technique>
+          </extra>
+        </technique>
+        <extra>
+          <technique profile="GOOGLEEARTH">
+            <double_sided>1</double_sided>
+          </technique>
+        </extra>
+      </profile_COMMON>
+      <extra><technique profile="MAX3D"><double_sided>1</double_sided></technique></extra>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="oak_leaves-material" name="oak_leaves">
+      <instance_effect url="#oak_leaves-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="Plane_148-mesh" name="Plane.148">
+      <mesh>
+        <source id="Plane_148-mesh-positions">
+          <float_array id="Plane_148-mesh-positions-array" count="48">-1.043773 0.2089972 0.6381111 0.5138598 0.2089972 -0.7660332 0.4879332 -0.07040166 0.678318 -0.9407053 -0.07040166 -0.6404228 -0.1134138 0.9156032 -0.2571755 1.35974 -0.1730232 0.03555297 -1.124709 -0.3095493 0.3480377 -1.360042 0.4801674 -0.1702079 -1.302185 0.7528992 -0.2253799 -0.9137917 0.6436591 0.7225571 1.368827 -0.1304359 0.03030395 -0.3363028 -0.08843183 -0.6989098 -0.1135568 0.4021907 0.1001815 -1.788575 0.06735372 0.4682045 -1.151973 0.02111005 -0.5785027 -0.6550179 0.004310131 0.9632874</float_array>
+          <technique_common>
+            <accessor source="#Plane_148-mesh-positions-array" count="16" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Plane_148-mesh-normals">
+          <float_array id="Plane_148-mesh-normals-array" count="48">-0.01669359 0.9996643 -0.0185247 0.1713309 0.9666738 0.1900693 0.005127072 0.9999695 0.005706906 -0.01718187 0.454207 0.8907132 0.09518718 0.3765984 0.9214454 0.03460794 0.4195075 0.9070711 0.4205145 0.864742 -0.274514 0.1882076 0.9021577 -0.3881649 0.3183386 0.8891873 -0.3285928 -0.2024598 0.9531541 -0.2246162 -0.1221961 0.5188147 0.8460952 0.6036561 0.7815485 -0.1572619 -0.1753898 0.9800409 0.09329503 -0.2311777 0.955565 -0.1828058 -0.1826227 0.9812311 0.06149476 -0.1059908 0.9266335 0.3606677</float_array>
+          <technique_common>
+            <accessor source="#Plane_148-mesh-normals-array" count="16" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Plane_148-mesh-map-0">
+          <float_array id="Plane_148-mesh-map-0-array" count="48">0 0.5157393 0.5106589 0.502254 0.519214 0.9837844 0.6321768 0.2403751 1.028071 0.3576206 0.7539899 0.4923769 0.6321768 0.2403751 1.028071 0.3576206 0.7539899 0.4923769 0.03408133 0.9420579 0 0.5157393 0.519214 0.9837844 0.5682252 0.383506 0.6321768 0.2403751 0.7539899 0.4923769 0.5682252 0.383506 0.6321768 0.2403751 0.7539899 0.4923769 0 0.5157393 0.5106589 0.502254 0.519214 0.9837844 0.03408133 0.9420579 0 0.5157393 0.519214 0.9837844</float_array>
+          <technique_common>
+            <accessor source="#Plane_148-mesh-map-0-array" count="24" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Plane_148-mesh-colors">
+          <float_array id="Plane_148-mesh-colors-array" count="72">1 0.6705883 0.0862745 1 0.9686275 0.9843137 1 1 0.7176471 0.06666666 0.2117647 1 0 0 0 0.08235293 0.3803921 0.7137255 0.003921568 0.3607843 0.8196079 0 0 0 0 0.09411764 0.3058823 1 0.6117647 0.372549 1 0.6705883 0.0862745 1 1 0.7176471 0.1803922 0.3803921 0.9568628 0.06666666 0.2117647 1 0.08235293 0.3803921 0.7137255 0.172549 0.3921568 1 0.003921568 0.3607843 0.8196079 0 0.09411764 0.3058823 1 0.6705883 0.0862745 1 0.9686275 0.9843137 1 1 0.7176471 1 0.6117647 0.372549 1 0.6705883 0.0862745 1 1 0.7176471</float_array>
+          <technique_common>
+            <accessor source="#Plane_148-mesh-colors-array" count="24" stride="3">
+              <param name="R" type="float"/>
+              <param name="G" type="float"/>
+              <param name="B" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Plane_148-mesh-vertices">
+          <input semantic="POSITION" source="#Plane_148-mesh-positions"/>
+        </vertices>
+        <polylist material="oak_leaves" count="8">
+          <input semantic="VERTEX" source="#Plane_148-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Plane_148-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Plane_148-mesh-map-0" offset="2" set="0"/>
+          <input semantic="COLOR" source="#Plane_148-mesh-colors" offset="3"/>
+          <vcount>3 3 3 3 3 3 3 3 </vcount>
+          <p>0 0 0 0 2 1 1 1 1 2 2 2 6 3 3 3 5 4 4 4 4 5 5 5 9 6 6 6 10 7 7 7 11 8 8 8 3 9 9 9 0 0 10 10 1 2 11 11 7 10 12 12 6 3 13 13 4 5 14 14 8 11 15 15 9 6 16 16 11 8 17 17 12 12 18 18 14 13 19 19 13 14 20 20 15 15 21 21 12 12 22 22 13 14 23 23</p>
+        </polylist>
+      </mesh>
+      <extra><technique profile="MAYA"><double_sided>1</double_sided></technique></extra>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="Plane_030" type="NODE">
+        <translate sid="location">0 0 0</translate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 90</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <instance_geometry url="#Plane_148-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="oak_leaves" target="#oak_leaves-material">
+                <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>

@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.63.0 r46461:46487M</authoring_tool>
+    </contributor>
+    <created>2012-10-21T19:20:24</created>
+    <modified>2012-10-21T19:20:24</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_images>
+    <image id="grass_field_dds_001" name="grass_field_dds_001">
+      <init_from>grass_field.dds</init_from>
+    </image>
+  </library_images>
+  <library_effects>
+    <effect id="grass_field-effect">
+      <profile_COMMON>
+        <newparam sid="grass_field_dds_001-surface">
+          <surface type="2D">
+            <init_from>grass_field_dds_001</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="grass_field_dds_001-sampler">
+          <sampler2D>
+            <source>grass_field_dds_001-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="grass_field_dds_001-sampler"/>
+            </diffuse>
+            <transparent>
+              <texture texture="grass_field_dds_001-sampler"/>
+            </transparent>
+            <transparency>
+              <float sid="transparency">0</float>
+            </transparency>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+        <extra>
+          <technique profile="GOOGLEEARTH">
+            <double_sided>1</double_sided>
+          </technique>
+        </extra>
+      </profile_COMMON>
+      <extra><technique profile="MAX3D"><double_sided>1</double_sided></technique></extra>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="grass_field-material" name="grass_field">
+      <instance_effect url="#grass_field-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="Untitled-mesh" name="Untitled">
+      <mesh>
+        <source id="Untitled-mesh-positions">
+          <float_array id="Untitled-mesh-positions-array" count="24">-7.760349 -7.760349 -7.020276 -7.760349 7.760349 -7.020276 7.760349 7.760349 -7.020276 7.760349 -7.760349 -7.020276 -7.760349 -7.760349 7.020276 -7.760349 7.760349 7.020276 7.760349 7.760349 7.020276 7.760349 -7.760349 7.020276</float_array>
+          <technique_common>
+            <accessor source="#Untitled-mesh-positions-array" count="8" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Untitled-mesh-normals">
+          <float_array id="Untitled-mesh-normals-array" count="18">-1 0 0 0 1 0 1 0 0 0 -1 0 0 0 -1 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Untitled-mesh-normals-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Untitled-mesh-vertices">
+          <input semantic="POSITION" source="#Untitled-mesh-positions"/>
+        </vertices>
+        <polylist count="6">
+          <input semantic="VERTEX" source="#Untitled-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Untitled-mesh-normals" offset="1"/>
+          <vcount>4 4 4 4 4 4 </vcount>
+          <p>1 0 0 0 4 0 5 0 5 1 6 1 2 1 1 1 6 2 7 2 3 2 2 2 0 3 3 3 7 3 4 3 0 4 1 4 2 4 3 4 7 5 6 5 5 5 4 5</p>
+        </polylist>
+      </mesh>
+      <extra><technique profile="MAYA"><double_sided>1</double_sided></technique></extra>
+    </geometry>
+    <geometry id="grass_field_large200-mesh" name="grass_field_large200">
+      <mesh>
+        <source id="grass_field_large200-mesh-positions">
+          <float_array id="grass_field_large200-mesh-positions-array" count="138">0.6293347 1.32392 0.2691292 0.557009 -0.9714954 0.5287531 -0.7440889 -0.942251 0.2691292 -0.1068055 1.343722 -0.02223497 0.02077984 -0.9716289 -0.02223497 -0.4329727 1.167659 0.5654966 1.126692 -0.4122756 0.2691292 -1.168208 -0.4994619 0.5287531 -1.22935 0.8005278 0.2691292 1.095346 0.3234642 -0.02223497 -1.205563 0.03546452 -0.02223497 1.06555 0.8877142 0.5287531 1.064598 0.5919951 0.8960174 0.7772833 1.645342 0.4381012 0.5764549 0.01802897 -0.04686212 -0.2758024 0.8229184 -0.054223 1.371676 0.9566288 0.1277675 0.4947441 1.609378 0.2670822 0.5447431 -0.882824 0.8328808 1.431526 -0.1861805 0.4403656 -0.2788136 -0.6026633 -0.04686218 0.1658756 0.4819748 -0.05422306 0.8829191 -1.00729 0.1277675 1.176769 0.04567885 0.2670821 -0.9049895 1.549752 0.01458662 -1.144185 0.1518557 -0.08254301 0.48189 1.263335 -0.0344491 0.1733729 -0.08573126 0.3122784 1.453992 1.008117 0.01458662 0.06394839 1.289381 -0.08254301 1.12586 -0.3694885 -0.0344491 -0.1816918 0.04397511 0.4332775 0.8086622 -1.531286 0.01458662 1.17183 -0.1603596 -0.08254301 -0.5470703 -1.122071 -0.0344491 -0.1192233 0.1940257 0.3122784 -0.06649947 0.6813438 0.477923 -1.595375 0.1266458 -0.1414908 0.6140564 -0.8338478 -0.02261632 -1.007615 -1.477513 -0.1039431 -0.5537876 0.9694079 0.8328808 -1.631932 0.6388015 0.4403656 0.1136488 0.4114973 -0.04686218 -0.6917632 -0.4402655 -0.05422306 -0.824463 1.207294 0.1277675 -1.47775 0.3307626 0.2670821</float_array>
+          <technique_common>
+            <accessor source="#grass_field_large200-mesh-positions-array" count="46" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="grass_field_large200-mesh-normals">
+          <float_array id="grass_field_large200-mesh-normals-array" count="138">-0.3628346 0.1160008 0.9245887 0.2407605 0.09253209 0.966155 -0.6523942 -0.006683528 0.7578051 -0.1844539 -0.110538 0.9765923 0.79635 0.002746641 0.6047853 0.3440962 -0.1801508 0.9214759 0.09051787 0.3700064 0.9245887 0.0871303 -0.1779534 0.980163 -0.05197298 0.6503494 0.7578051 -0.08908349 0.1973937 0.9762566 0.04858541 -0.6303598 0.7747429 -0.09158605 -0.3568834 0.9296243 -0.6232185 -0.1517075 0.7671743 -0.3506577 -0.188757 0.9172644 -0.8791467 -0.0331431 0.4753258 -0.219245 -0.2234565 0.9497055 -0.08871728 -0.1971495 0.9763177 0.0122379 -0.1929075 0.981109 -0.3467513 0.4845729 0.8030641 -0.2881252 0.2276986 0.9301126 -0.3432416 0.7531358 0.5611743 -0.2783288 0.1205786 0.9528794 -0.2158574 0.01190221 0.9763177 -0.1756035 -0.08078247 0.981109 -0.1070894 0.1092562 0.9882199 0.08188116 0.2304757 0.9696035 -0.1040071 0.111301 0.9883114 -0.2898038 -0.01684617 0.9569079 0.1648915 0.1439863 0.9757378 0.3049104 -0.106296 0.9464095 0.1707205 0.1342509 0.976104 0.01235997 0.3805353 0.9246803 0.09689623 -0.1183813 0.9882199 -0.1021454 -0.2222357 0.9696035 0.0936613 -0.1201514 0.9883114 0.2901394 -0.009063959 0.9569079 -0.1417585 -0.1994995 0.969573 0.06567579 -0.2862636 0.9558702 -0.1384014 -0.2010254 0.9697256 -0.3411054 -0.1030915 0.9343242 0.1490219 -0.5769524 0.8030641 0.1868038 -0.3161718 0.9301126 0.04904323 -0.8262276 0.5611743 0.2162541 -0.212714 0.9528794 0.1970885 -0.08883935 0.9763177 0.192938 0.01211583 0.981109</float_array>
+          <technique_common>
+            <accessor source="#grass_field_large200-mesh-normals-array" count="46" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="grass_field_large200-mesh-map-0">
+          <float_array id="grass_field_large200-mesh-map-0-array" count="168">0.5000741 1 0.250037 0.9999999 0.4988483 0.2534404 0.250037 0.9999999 0.2494241 0.2509689 0.4988483 0.2534404 0.250037 0.9999999 0.2494241 0.2509689 0.4988483 0.2534404 0.5000741 1 0.250037 0.9999999 0.4988483 0.2534404 0.5000741 1 0.250037 0.9999999 0.4988483 0.2534404 0.250037 0.9999999 0.2494241 0.2509689 0.4988483 0.2534404 0.250037 0.9999999 0.2494241 0.2509689 0.4988483 0.2534404 0.5000741 1 0.250037 0.9999999 0.4988483 0.2534404 0.9999999 0.4999738 0.4993782 0 0.5014777 0.5022407 0.9999999 0 0.4993782 0 0.9999999 0.4999738 0.9999999 0.4999738 0.4993782 0 0.5014777 0.5022407 0.9999999 0 0.4993782 0 0.9999999 0.4999738 0.9999999 0.4999738 0.4993782 0 0.5014777 0.5022407 0.9999999 0 0.4993782 0 0.9999999 0.4999738 0.9999999 0.4999738 0.4993782 0 0.5014777 0.5022407 0.9999999 0 0.4993782 0 0.9999999 0.4999738 0.9999999 1 0.5048137 1 0.5066213 0.5081842 0.9999999 0.5158023 0.9999999 1 0.5066213 0.5081842 0.9999999 1 0.5048137 1 0.5066213 0.5081842 0.9999999 0.5158023 0.9999999 1 0.5066213 0.5081842 0.9999999 1 0.5048137 1 0.5066213 0.5081842 0.9999999 0.5158023 0.9999999 1 0.5066213 0.5081842 0.9999999 1 0.5048137 1 0.5066213 0.5081842 0.9999999 0.5158023 0.9999999 1 0.5066213 0.5081842 0.9999999 0.4999738 0.4993782 0 0.5014777 0.5022407 0.9999999 0 0.4993782 0 0.9999999 0.4999738 0.9999999 0.4999738 0.4993782 0 0.5014777 0.5022407 0.9999999 0 0.4993782 0 0.9999999 0.4999738</float_array>
+          <technique_common>
+            <accessor source="#grass_field_large200-mesh-map-0-array" count="84" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="grass_field_large200-mesh-colors">
+          <float_array id="grass_field_large200-mesh-colors-array" count="252">0.3372549 0.4509804 0.8039216 0 0 0 0.3686274 0.1803922 0.5529412 0 0 0 0 0 0 0.3686274 0.1803922 0.5529412 0 0 0 0 0 0 0.3686274 0.1803922 0.5529412 0.3372549 0.4509804 0.8039216 0 0 0 0.3686274 0.1803922 0.5529412 0.3372549 0.4509804 0.8039216 0 0 0 0.3686274 0.1803922 0.5529412 0 0 0 0 0 0 0.3686274 0.1803922 0.5529412 0 0 0 0 0 0 0.3686274 0.1803922 0.5529412 0.3372549 0.4509804 0.8039216 0 0 0 0.3686274 0.1803922 0.5529412 0.5725491 0.4666666 0.4901961 0 0 0 0.9137255 0.2470588 0.1215686 0 0 0 0 0 0 0.5725491 0.4666666 0.4901961 0.5725491 0.4666666 0.4901961 0 0 0 0.9137255 0.2470588 0.1215686 0 0 0 0 0 0 0.5725491 0.4666666 0.4901961 0.5725491 0.4666666 0.4901961 0 0 0 0.9137255 0.2470588 0.1215686 0 0 0 0 0 0 0.5725491 0.4666666 0.4901961 0.5725491 0.4666666 0.4901961 0 0 0 0.9137255 0.2470588 0.1215686 0 0 0 0 0 0 0.5725491 0.4666666 0.4901961 0.2470588 0.08235293 0.2666667 0.427451 0 0 0.4313725 0.9019608 0.6509804 0.3568627 0.3882353 0.1411765 0.2470588 0.08235293 0.2666667 0.4313725 0.9019608 0.6509804 0.2470588 0.08235293 0.2666667 0.427451 0 0 0.4313725 0.9019608 0.6509804 0.3568627 0.3882353 0.1411765 0.2470588 0.08235293 0.2666667 0.4313725 0.9019608 0.6509804 0.2470588 0.08235293 0.2666667 0.427451 0 0 0.4313725 0.9019608 0.6509804 0.3568627 0.3882353 0.1411765 0.2470588 0.08235293 0.2666667 0.4313725 0.9019608 0.6509804 0.2470588 0.08235293 0.2666667 0.427451 0 0 0.4313725 0.9019608 0.6509804 0.3568627 0.3882353 0.1411765 0.2470588 0.08235293 0.2666667 0.4313725 0.9019608 0.6509804 0.5725491 0.4666666 0.4901961 0 0 0 0.9137255 0.2470588 0.1215686 0 0 0 0 0 0 0.5725491 0.4666666 0.4901961 0.5725491 0.4666666 0.4901961 0 0 0 0.9137255 0.2470588 0.1215686 0 0 0 0 0 0 0.5725491 0.4666666 0.4901961</float_array>
+          <technique_common>
+            <accessor source="#grass_field_large200-mesh-colors-array" count="84" stride="3">
+              <param name="R" type="float"/>
+              <param name="G" type="float"/>
+              <param name="B" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="grass_field_large200-mesh-vertices">
+          <input semantic="POSITION" source="#grass_field_large200-mesh-positions"/>
+        </vertices>
+        <polylist material="grass_field" count="28">
+          <input semantic="VERTEX" source="#grass_field_large200-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#grass_field_large200-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#grass_field_large200-mesh-map-0" offset="2" set="0"/>
+          <input semantic="COLOR" source="#grass_field_large200-mesh-colors" offset="3"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>0 0 0 0 3 1 1 1 1 2 2 2 3 1 3 3 4 3 4 4 1 2 5 5 4 3 6 6 3 1 7 7 5 4 8 8 2 5 9 9 4 3 10 10 5 4 11 11 6 6 12 12 9 7 13 13 7 8 14 14 9 7 15 15 10 9 16 16 7 8 17 17 10 9 18 18 9 7 19 19 11 10 20 20 8 11 21 21 10 9 22 22 11 10 23 23 13 12 24 24 14 13 25 25 12 14 26 26 15 15 27 27 14 13 28 28 13 12 29 29 17 16 30 30 14 13 31 31 16 17 32 32 15 15 33 33 14 13 34 34 17 16 35 35 19 18 36 36 20 19 37 37 18 20 38 38 21 21 39 39 20 19 40 40 19 18 41 41 23 22 42 42 20 19 43 43 22 23 44 44 21 21 45 45 20 19 46 46 23 22 47 47 27 24 48 48 26 25 49 49 24 26 50 50 25 27 51 51 27 24 52 52 24 26 53 53 31 28 54 54 30 29 55 55 28 30 56 56 29 31 57 57 31 28 58 58 28 30 59 59 35 32 60 60 34 33 61 61 32 34 62 62 33 35 63 63 35 32 64 64 32 34 65 65 39 36 66 66 38 37 67 67 36 38 68 68 37 39 69 69 39 36 70 70 36 38 71 71 41 40 72 72 42 41 73 73 40 42 74 74 43 43 75 75 42 41 76 76 41 40 77 77 45 44 78 78 42 41 79 79 44 45 80 80 43 43 81 81 42 41 82 82 45 44 83 83</p>
+        </polylist>
+      </mesh>
+      <extra><technique profile="MAYA"><double_sided>1</double_sided></technique></extra>
+    </geometry>
+    <geometry id="grass_field_large120-mesh" name="grass_field_large120">
+      <mesh>
+        <source id="grass_field_large120-mesh-positions">
+          <float_array id="grass_field_large120-mesh-positions-array" count="60">1.266599 1.442262 0.2531964 -1.454105 1.430608 -0.148232 1.248064 -1.256636 -0.2272893 -1.471282 -1.240956 0.2450938 -0.5537876 0.9694079 0.8328807 -1.631932 0.6388015 0.4403656 0.1136488 0.4114973 -0.04686212 -0.6917632 -0.4402655 -0.05422306 0.6293347 1.32392 0.2691293 0.557009 -0.9714954 0.5287531 -0.7440889 -0.942251 0.2691293 -0.1068055 1.343722 -0.02223503 0.02077984 -0.9716289 -0.02223503 -0.4329727 1.167659 0.5654967 0.5447431 -0.882824 0.8328807 1.431526 -0.1861805 0.4403656 -0.2788136 -0.6026633 -0.04686212 0.1658756 0.4819748 -0.05422306 0.8829191 -1.00729 0.1277675 1.176769 0.04567885 0.2670822</float_array>
+          <technique_common>
+            <accessor source="#grass_field_large120-mesh-positions-array" count="20" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="grass_field_large120-mesh-normals">
+          <float_array id="grass_field_large120-mesh-normals-array" count="60">0.1675466 -0.1738944 0.9703971 0.01376384 -0.0170598 0.9997559 0.01116973 -0.01443523 0.9998169 -0.145024 0.145024 0.9787286 0.1490219 -0.5769524 0.8030641 0.1674245 -0.5154271 0.8403882 0.04904323 -0.8262276 0.5611743 0.2338633 -0.2292855 0.9448226 -0.3628346 0.1160008 0.9245887 0.2407605 0.09253209 0.966155 -0.6523942 -0.006683528 0.7578051 -0.1844539 -0.110538 0.9765923 0.79635 0.002746641 0.6047853 0.3440962 -0.1801508 0.9214759 -0.3467513 0.4845729 0.8030641 -0.2881252 0.2276986 0.9301126 -0.3432416 0.7531358 0.5611743 -0.2783288 0.1205786 0.9528794 -0.2158574 0.01190221 0.9763177 -0.1756035 -0.08078247 0.981109</float_array>
+          <technique_common>
+            <accessor source="#grass_field_large120-mesh-normals-array" count="20" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="grass_field_large120-mesh-map-0">
+          <float_array id="grass_field_large120-mesh-map-0-array" count="72">0.5048137 1 0.5066213 0.5081842 0.9999999 1 0.9999999 1 0.5066213 0.5081842 0.9999999 0.5158023 0.9999999 0.4999738 0.4993782 0 0.5014777 0.5022407 0.9999999 0 0.4993782 0 0.9999999 0.4999738 0.5000741 1 0.250037 0.9999999 0.4988483 0.2534404 0.250037 0.9999999 0.2494241 0.2509689 0.4988483 0.2534404 0.250037 0.9999999 0.2494241 0.2509689 0.4988483 0.2534404 0.5000741 1 0.250037 0.9999999 0.4988483 0.2534404 0.9999999 0.4999738 0.4993782 0 0.5014777 0.5022407 0.9999999 0 0.4993782 0 0.9999999 0.4999738 0.9999999 0.4999738 0.4993782 0 0.5014777 0.5022407 0.9999999 0 0.4993782 0 0.9999999 0.4999738</float_array>
+          <technique_common>
+            <accessor source="#grass_field_large120-mesh-map-0-array" count="36" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="grass_field_large120-mesh-colors">
+          <float_array id="grass_field_large120-mesh-colors-array" count="108">0.427451 0 0 0.4313725 0.9019608 0.6509804 0.2470588 0.08235293 0.2666667 0.2470588 0.08235293 0.2666667 0.4313725 0.9019608 0.6509804 0.3568627 0.3882353 0.1411765 0.5725491 0.4666666 0.4901961 0 0 0 0.9137255 0.2470588 0.1215686 0 0 0 0 0 0 0.5725491 0.4666666 0.4901961 0.3372549 0.4509804 0.8039216 0 0 0 0.3686274 0.1803922 0.5529412 0 0 0 0 0 0 0.3686274 0.1803922 0.5529412 0 0 0 0 0 0 0.3686274 0.1803922 0.5529412 0.3372549 0.4509804 0.8039216 0 0 0 0.3686274 0.1803922 0.5529412 0.5725491 0.4666666 0.4901961 0 0 0 0.9137255 0.2470588 0.1215686 0 0 0 0 0 0 0.5725491 0.4666666 0.4901961 0.5725491 0.4666666 0.4901961 0 0 0 0.9137255 0.2470588 0.1215686 0 0 0 0 0 0 0.5725491 0.4666666 0.4901961</float_array>
+          <technique_common>
+            <accessor source="#grass_field_large120-mesh-colors-array" count="36" stride="3">
+              <param name="R" type="float"/>
+              <param name="G" type="float"/>
+              <param name="B" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="grass_field_large120-mesh-vertices">
+          <input semantic="POSITION" source="#grass_field_large120-mesh-positions"/>
+        </vertices>
+        <polylist material="grass_field" count="12">
+          <input semantic="VERTEX" source="#grass_field_large120-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#grass_field_large120-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#grass_field_large120-mesh-map-0" offset="2" set="0"/>
+          <input semantic="COLOR" source="#grass_field_large120-mesh-colors" offset="3"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>2 0 0 0 0 1 1 1 3 2 2 2 3 2 3 3 0 1 4 4 1 3 5 5 5 4 6 6 6 5 7 7 4 6 8 8 7 7 9 9 6 5 10 10 5 4 11 11 8 8 12 12 11 9 13 13 9 10 14 14 11 9 15 15 12 11 16 16 9 10 17 17 12 11 18 18 11 9 19 19 13 12 20 20 10 13 21 21 12 11 22 22 13 12 23 23 15 14 24 24 16 15 25 25 14 16 26 26 17 17 27 27 16 15 28 28 15 14 29 29 19 18 30 30 16 15 31 31 18 19 32 32 17 17 33 33 16 15 34 34 19 18 35 35</p>
+        </polylist>
+      </mesh>
+      <extra><technique profile="MAYA"><double_sided>1</double_sided></technique></extra>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="bounds" type="NODE">
+        <translate sid="location">0 0 0</translate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <node id="Untitled" type="NODE">
+          <translate sid="location">-0.02734702 0.1298983 0.3965317</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">0.2315188 0.2315188 0.0824323</scale>
+          <instance_geometry url="#Untitled-mesh"/>
+        </node>
+      </node>
+      <node id="base00" type="NODE">
+        <translate sid="location">0 0 0</translate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <node id="start00" type="NODE">
+          <translate sid="location">0 0 0</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">1 1 1</scale>
+          <node id="grass_field_large200" type="NODE">
+            <translate sid="location">0 0 0</translate>
+            <rotate sid="rotationZ">0 0 1 0</rotate>
+            <rotate sid="rotationY">0 1 0 0</rotate>
+            <rotate sid="rotationX">1 0 0 0</rotate>
+            <scale sid="scale">1 1 1</scale>
+            <instance_geometry url="#grass_field_large200-mesh">
+              <bind_material>
+                <technique_common>
+                  <instance_material symbol="grass_field" target="#grass_field-material">
+                    <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+                  </instance_material>
+                </technique_common>
+              </bind_material>
+            </instance_geometry>
+          </node>
+          <node id="grass_field_large120" type="NODE">
+            <translate sid="location">0 0 0</translate>
+            <rotate sid="rotationZ">0 0 1 0</rotate>
+            <rotate sid="rotationY">0 1 0 0</rotate>
+            <rotate sid="rotationX">1 0 0 0</rotate>
+            <scale sid="scale">1 1 1</scale>
+            <instance_geometry url="#grass_field_large120-mesh">
+              <bind_material>
+                <technique_common>
+                  <instance_material symbol="grass_field" target="#grass_field-material">
+                    <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+                  </instance_material>
+                </technique_common>
+              </bind_material>
+            </instance_geometry>
+          </node>
+        </node>
+        <node id="detail200" type="NODE">
+          <translate sid="location">0 0 0</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">1 1 1</scale>
+        </node>
+        <node id="detail120" type="NODE">
+          <translate sid="location">0 0 0</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">1 1 1</scale>
+        </node>
+        <node id="bb__autobillboard25" type="NODE">
+          <translate sid="location">0 0 0</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">1 1 1</scale>
+        </node>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>

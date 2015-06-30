@@ -87,7 +87,7 @@ new SimGroup(MissionGroup) {
          outdoorWeight = "100";
          isAIControlled = "0";
          dataBlock = "SpawnSphereMarker";
-         position = "4360.93 1397.5 266.434";
+         position = "3934.83 1247.87 156.364";
          rotation = "1 0 0 0";
          scale = "1 1 1";
          canSave = "1";
@@ -104,7 +104,7 @@ new SimGroup(MissionGroup) {
          outdoorWeight = "100";
          isAIControlled = "0";
          dataBlock = "SpawnSphereMarker";
-         position = "782.061 676.051 686.73";
+         position = "2668.46 1225.03 214.347";
          rotation = "1 0 0 0";
          scale = "1 1 1";
          canSave = "1";
@@ -119,7 +119,7 @@ new SimGroup(MissionGroup) {
          outdoorWeight = "1";
          isAIControlled = "0";
          dataBlock = "SpawnSphereMarker";
-         position = "-114 -89 636.764";
+         position = "174.784 237.769 947.06";
          rotation = "1 0 0 0";
          scale = "1 1 1";
          canSave = "1";
@@ -154,7 +154,7 @@ new SimGroup(MissionGroup) {
       fresnelBias = "0.4";
       fresnelPower = "6";
       specularPower = "48";
-      specularColor = "1 1 1 1";
+      specularColor = "White";
       emissive = "0";
       waveDir[0] = "0 1";
       waveDir[1] = "0.707 0.707";
@@ -214,7 +214,7 @@ new SimGroup(MissionGroup) {
       clarity = "0.5";
       underwaterColor = "9 6 5 240";
       soundAmbience = "AudioAmbienceUnderwater";
-      position = "0 0 205";
+      position = "0 0 150";
       canSave = "1";
       canSaveDynamicFields = "1";
    };
@@ -226,39 +226,44 @@ new SimGroup(MissionGroup) {
       baseTexFormat = "JPG";
       lightMapSize = "256";
       screenError = "16";
-      position = "644.849 434.591 168.448";
+      position = "0 0 434";
       rotation = "1 0 0 0";
       canSave = "1";
       canSaveDynamicFields = "1";
    };
-   new TerrainBlock(turtleIsland) {
-      terrainFile = "levels/theTerrain2.ter";
+   new TerrainBlock(newMapTest) {
+      terrainFile = "levels/newMapTest.ter";
       castShadows = "1";
       squareSize = "4";
       baseTexSize = "1024";
       baseTexFormat = "JPG";
       lightMapSize = "256";
       screenError = "16";
-      position = "-3927.92 -4151.54 -85.5156";
+      position = "-4096 -4096 0";
       rotation = "1 0 0 0";
       canSave = "1";
       canSaveDynamicFields = "1";
    };
-   new AITurretShape() {
-      respawn = "1";
-      static = "1";
-      rotate = "0";
-      isAIControlled = "0";
-      dataBlock = "AITurret";
-      position = "821.766 881.184 583.218";
+   new TSStatic() {
+      shapeName = "art/shapes/station/station01.dts";
+      playAmbient = "1";
+      meshCulling = "0";
+      originSort = "0";
+      collisionType = "Collision Mesh";
+      decalType = "Collision Mesh";
+      allowPlayerStep = "1";
+      enablePhysicsRep = "1";
+      alphaFadeEnable = "0";
+      alphaFadeStart = "100";
+      alphaFadeEnd = "150";
+      alphaFadeInverse = "0";
+      renderNormals = "0";
+      forceDetail = "-1";
+      position = "-112.6 31.8205 356.837";
       rotation = "1 0 0 0";
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-         entranceThread = "-1";
-         invAITurretAmmo = "10000";
-         invAITurretHead = "1";
-         mountable = "0";
    };
 };
 //--- OBJECT WRITE END ---
