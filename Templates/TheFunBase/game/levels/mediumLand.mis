@@ -219,7 +219,7 @@ new SimGroup(MissionGroup) {
       canSaveDynamicFields = "1";
    };
    new TerrainBlock(platform) {
-      terrainFile = "art/terrains/mediumLand.ter";
+      terrainFile = "levels/mediumLand.ter";
       castShadows = "1";
       squareSize = "1";
       baseTexSize = "1024";
@@ -232,7 +232,7 @@ new SimGroup(MissionGroup) {
       canSaveDynamicFields = "1";
    };
    new TerrainBlock(newMapTest) {
-      terrainFile = "levels/newMapTest.ter";
+      terrainFile = "levels/theTerrain2.ter";
       castShadows = "1";
       squareSize = "4";
       baseTexSize = "1024";
