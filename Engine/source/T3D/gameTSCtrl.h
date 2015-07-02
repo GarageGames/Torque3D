@@ -30,12 +30,6 @@
 #include "gui/3d/guiTSControl.h"
 #endif
 
-#ifdef TORQUE_DEMO_WATERMARK
-#ifndef _WATERMARK_H_
-#include "demo/watermark/watermark.h"
-#endif
-#endif
-
 class ProjectileData;
 class GameBase;
 
@@ -44,10 +38,6 @@ class GameTSCtrl : public GuiTSCtrl
 {
 private:
    typedef GuiTSCtrl Parent;
-
-#ifdef TORQUE_DEMO_WATERMARK
-   Watermark mWatermark;
-#endif
 
    void makeScriptCall(const char *func, const GuiEvent &evt) const;
 

@@ -34,10 +34,6 @@
 #include "core/util/journal/journal.h"
 #include "core/util/uuid.h"
 
-#ifdef TORQUE_DEMO_PURCHASE
-#include "gui/core/guiCanvas.h"
-#endif
-
 // This is a temporary hack to get tools using the library to
 // link in this module which contains no other references.
 bool LinkConsoleFunctions = false;
