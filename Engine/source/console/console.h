@@ -1100,9 +1100,9 @@ struct ConsoleDocFragment
    static ConsoleDocFragment* smFirst;
    
    ConsoleDocFragment( const char* text, const char* inClass = NULL, const char* definition = NULL )
-      : mText( text ),
-        mClass( inClass ),
+      : mClass( inClass ),
         mDefinition( definition ),
+        mText( text ),
         mNext( smFirst )
    {
       smFirst = this;
