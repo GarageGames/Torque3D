@@ -349,7 +349,13 @@ bool GameProcessCameraQuery(CameraQuery *query)
 
       // Provide some default values
       query->projectionOffset = Point2F::Zero;
-
+      query->stereoTargets[0] = 0;
+      query->stereoTargets[1] = 0;
+      query->eyeOffset[0] = Point3F::Zero;
+      query->eyeOffset[1] = Point3F::Zero;
+      query->hasFovPort = false;
+      query->hasStereoTargets = false;
+      
       F32 cameraFov = 0.0f;
       bool fovSet = false;
 
@@ -383,6 +389,7 @@ bool GameProcessCameraQuery(CameraQuery *query)
          {
             display->getFovPorts(query->fovPort);
             fovSet = true;
+            query->hasFovPort = true;
          }
          
          // Grab the latest overriding render view transforms
@@ -390,6 +397,12 @@ bool GameProcessCameraQuery(CameraQuery *query)
 
          display->getStereoViewports(query->stereoViewports);
          display->getStereoTargets(query->stereoTargets);
+         query->hasStereoTargets = true;
+      }
+      else
+      {
+         query->eyeTransforms[0] = query->cameraMatrix;
+         query->eyeTransforms[1] = query->cameraMatrix;
       }
 
       // Use the connection's FOV settings if requried
