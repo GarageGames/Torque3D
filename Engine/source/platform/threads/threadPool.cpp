@@ -446,8 +446,6 @@ void ThreadPool::flushWorkItems( S32 timeOut )
 
 void ThreadPool::waitForAllItems( S32 timeOut )
 {
-   AssertFatal( mNumPendingItems, "ThreadPool::waitForAllItems() - no items pending" );
-
    U32 endTime = 0;
    if( timeOut != -1 )
       endTime = Platform::getRealMilliseconds() + timeOut;
