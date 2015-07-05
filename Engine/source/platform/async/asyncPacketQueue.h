@@ -156,12 +156,13 @@ class AsyncPacketQueue
                            Consumer consumer,
                            TickType totalTicks = 0,
                            bool dropPackets = false )
-         : mTotalTicks( totalTicks ),
+         : mDropPackets( dropPackets ),
+           mTotalTicks( totalTicks ),
            mTotalQueuedTicks( 0 ),
            mPacketQueue( maxQueuedPackets ),
            mTimeSource( timeSource ),
-           mConsumer( consumer ),
-           mDropPackets( dropPackets )
+           mConsumer( consumer )
+
       {
          #ifdef TORQUE_DEBUG
          mTotalQueuedPackets = 0;

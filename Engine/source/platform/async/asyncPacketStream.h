@@ -56,10 +56,10 @@ class AsyncPacket : public RawDataT< T >
       typedef RawDataT< T > Parent;
 
       AsyncPacket()
-         : mIndex( 0 ), mIsLast( false ), mSizeActual( 0 ) {}
+         : mIndex( 0 ), mSizeActual( 0 ), mIsLast( false ) {}
       AsyncPacket( T* data, U32 size, bool ownMemory = false )
          : Parent( data, size, ownMemory ),
-           mIndex( 0 ), mIsLast( false ), mSizeActual( 0 ) {}
+           mIndex( 0 ), mSizeActual( 0 ), mIsLast( false ) {}
 
       /// Running number in stream.
       U32 mIndex;
