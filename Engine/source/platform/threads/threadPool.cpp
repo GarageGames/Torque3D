@@ -120,6 +120,7 @@ void ThreadPool::Context::updateAccumulatedPriorityBiases()
 void ThreadPool::WorkItem::process()
 {
    execute();
+   mExecuted = true;
 }
 
 //--------------------------------------------------------------------------

@@ -194,6 +194,9 @@ class ThreadPool
             /// This is the primary function to implement by subclasses.
             virtual void execute() = 0;
 
+            /// This flag is set after the execute() method has completed.
+            bool mExecuted;
+
          public:
          
             /// Construct a new work item.
@@ -201,7 +204,8 @@ class ThreadPool
             /// @param context The work context in which the item should be placed.
             ///    If NULL, the root context will be used.
             WorkItem( Context* context = 0 )
-               : mContext( context ? context : Context::ROOT_CONTEXT() )
+               : mContext( context ? context : Context::ROOT_CONTEXT() ),
+                 mExecuted( false )
             {
             }
             
@@ -229,6 +233,12 @@ class ThreadPool
             /// Return the item's base priority value.
             /// @return item priority; defaults to 1.0.
             virtual F32 getPriority();
+
+            /// Has this work item been executed already?
+            bool hasExecuted() const
+            {
+               return mExecuted;
+            }
       };
 
       typedef ThreadSafeRef< WorkItem > WorkItemPtr;
