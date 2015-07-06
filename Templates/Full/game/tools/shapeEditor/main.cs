@@ -207,7 +207,7 @@ function ShapeEditorPlugin::open(%this, %filename)
       ShapeEditor.selectShape(%filename, ShapeEditor.isDirty());
 
       // 'fitToShape' only works after the GUI has been rendered, so force a repaint first
-      Canvas.repaint();
+      $GameCanvas.repaint();
       ShapeEdShapeView.fitToShape();
    }
 }
@@ -233,7 +233,7 @@ function ShapeEditorPlugin::onActivated(%this)
                ShapeEdShapeTreeView.onSelect(%obj);
 
             // 'fitToShape' only works after the GUI has been rendered, so force a repaint first
-            Canvas.repaint();
+            $GameCanvas.repaint();
             ShapeEdShapeView.fitToShape();
          }
          break;

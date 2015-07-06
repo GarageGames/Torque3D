@@ -44,7 +44,7 @@
       canMinimize = "0";
       canMaximize = "0";
       minSize = "4 4";
-      closeCommand = "Canvas.popDialog( TerrainImportGui );";
+      closeCommand = "$GameCanvas.popDialog( TerrainImportGui );";
       EdgeSnap = "0";
       text = "Import Terrain Height Map";
 
@@ -502,7 +502,7 @@
          canSave = "1";
          isDecoy = "0";
          Visible = "1";
-         Command = "Canvas.popDialog( TerrainImportGui );";
+         Command = "$GameCanvas.popDialog( TerrainImportGui );";
          tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Cancel";
@@ -593,7 +593,7 @@ function TerrainImportGui::import( %this )
                                   %materialNames,
                                   %flipYAxis );
 
-   Canvas.popDialog( %this );
+   $GameCanvas.popDialog( %this );
 
    if ( isObject( %obj ) )
    {

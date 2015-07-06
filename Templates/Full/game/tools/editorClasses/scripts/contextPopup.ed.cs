@@ -139,7 +139,7 @@ function ContextDialogContainer::Show( %this, %positionX, %positionY, %delay )
    if( %positionX !$= "" && %positionY !$= "" )
       %this.Dialog.setPositionGlobal( %positionX, %positionY );
    
-   Canvas.pushDialog( %this.base, 99 );
+   $GameCanvas.pushDialog( %this.base, 99 );
    
    // Setup Delay Schedule   
    if( isEventPending( %this.popSchedule ) )
@@ -164,7 +164,7 @@ function ContextDialogContainer::Show( %this, %positionX, %positionY, %delay )
 function ContextDialogContainer::Hide( %this )
 {
    if( %this.isPushed == true )
-      Canvas.popDialog( %this.base );
+      $GameCanvas.popDialog( %this.base );
       
    // Restore Old Parent;
    if( isObject( %this.Dialog ) && isObject( %this.oldParent ) )

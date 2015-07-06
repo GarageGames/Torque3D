@@ -131,7 +131,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(ForestBrushSizeSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(ForestBrushSizeSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes size of the brush";
             hovertime = "750";
@@ -233,7 +233,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(ForestBrushPressureSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(ForestBrushPressureSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the pressure";
             hovertime = "750";
@@ -335,7 +335,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(ForestBrushHardnessSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(ForestBrushHardnessSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the hardness curve.";
             hovertime = "750";

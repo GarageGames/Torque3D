@@ -193,7 +193,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         Command = "GuiEditorNewGuiDialog.init( \"NewGui\", \"GuiControl\" );" @ "Canvas.pushdialog(GuiEditorNewGuiDialog);";
+         Command = "GuiEditorNewGuiDialog.init( \"NewGui\", \"GuiControl\" );" @ "$GameCanvas.pushdialog(GuiEditorNewGuiDialog);";
          tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "New GUI";

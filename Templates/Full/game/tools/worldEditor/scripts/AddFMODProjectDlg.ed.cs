@@ -74,7 +74,7 @@ function AddFMODProjectDlg::show( %this )
    
    // Show it.
       
-   Canvas.pushDialog( %this, 0, true );
+   $GameCanvas.pushDialog( %this, 0, true );
 }
 
 //-----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ function AddFMODProjectDlg::onSleep( %this )
 
 function AddFMODProjectDlg::onCancel( %this )
 {
-   Canvas.popDialog( %this );
+   $GameCanvas.popDialog( %this );
 }
 
 //-----------------------------------------------------------------------------
@@ -169,7 +169,7 @@ function AddFMODProjectDlg::onOK( %this )
       %this.persistenceMgr.saveDirty();
    }
       
-   Canvas.popDialog( %this );
+   $GameCanvas.popDialog( %this );
    
    // Trigger a reinit on the datablock editor, just in case.
    

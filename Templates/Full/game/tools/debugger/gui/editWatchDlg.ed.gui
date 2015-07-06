@@ -84,7 +84,7 @@
          visible = "True";
          setFirstResponder = "False";
          modal = "True";
-         command = "Canvas.popDialog(DebuggerEditWatchDlg);";
+         command = "$GameCanvas.popDialog(DebuggerEditWatchDlg);";
          helpTag = "0";
          text = "Cancel";
       };

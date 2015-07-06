@@ -1818,13 +1818,13 @@ new GuiControl(ShapeEdWaitGui,EditorGuiGroup) {
 function ShapeEdWaitGui::show(%this, %text)
 {
    %this-->message.setText( %text );
-   Canvas.pushDialog( %this );
-   Canvas.repaint();
+   $GameCanvas.pushDialog( %this );
+   $GameCanvas.repaint();
 }
 
 function ShapeEdWaitGui::hide(%this)
 {
-   Canvas.popDialog( %this );
+   $GameCanvas.popDialog( %this );
 }
 
 function ShapeEdWaitGui::onWake(%this)

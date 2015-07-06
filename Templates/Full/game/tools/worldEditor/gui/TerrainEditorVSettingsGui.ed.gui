@@ -27,7 +27,7 @@ new GuiControl(TerrainEditorValuesSettingsGui, EditorGuiGroup) {
       canMinimize = "0";
       canMaximize = "0";
       minSize = "50 50";
-      closeCommand = "Canvas.popDIalog(TerrainEditorValuesSettingsGui);";
+      closeCommand = "$GameCanvas.popDIalog(TerrainEditorValuesSettingsGui);";
 
       new GuiControl() {
          profile = "ToolsGuiWindowProfile";
@@ -158,7 +158,7 @@ new GuiControl(TerrainEditorValuesSettingsGui, EditorGuiGroup) {
          extent = "80 20";
          minExtent = "8 8";
          visible = "1";
-         command = "Canvas.popDIalog(TerrainEditorValuesSettingsGui);";
+         command = "$GameCanvas.popDIalog(TerrainEditorValuesSettingsGui);";
          helpTag = "0";
          text = "OK";
          groupNum = "-1";

@@ -139,7 +139,7 @@
          visible = "True";
          setFirstResponder = "False";
          modal = "True";
-         command = "Canvas.popDialog(DebuggerConnectDlg);";
+         command = "$GameCanvas.popDialog(DebuggerConnectDlg);";
          helpTag = "0";
          text = "Cancel";
       };

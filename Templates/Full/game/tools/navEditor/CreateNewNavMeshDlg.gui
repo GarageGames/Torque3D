@@ -23,7 +23,7 @@
       canMinimize = "0";
       canMaximize = "0";
       canCollapse = "0";
-      closeCommand = "Canvas.popDialog(CreateNewNavMeshDlg);";
+      closeCommand = "$GameCanvas.popDialog(CreateNewNavMeshDlg);";
       edgeSnap = "1";
       margin = "0 0 0 0";
       padding = "0 0 0 0";
@@ -274,7 +274,7 @@
          profile = "GuiButtonProfile";
          visible = "1";
          active = "1";
-         command = "Canvas.popDialog(CreateNewNavMeshDlg);";
+         command = "$GameCanvas.popDialog(CreateNewNavMeshDlg);";
          tooltipProfile = "GuiToolTipProfile";
          hovertime = "1000";
          isContainer = "0";
@@ -383,7 +383,7 @@ function CreateNewNavMeshDlg::create(%this)
    MissionGroup.add(%mesh);
    NavEditorGui.selectObject(%mesh);
 
-   Canvas.popDialog(CreateNewNavMeshDlg);
+   $GameCanvas.popDialog(CreateNewNavMeshDlg);
 }
 
 function MeshMissionBounds::onClick(%this)

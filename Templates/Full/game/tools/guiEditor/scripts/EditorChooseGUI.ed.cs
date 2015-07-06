@@ -54,7 +54,7 @@ function GE_OpenGUIFile()
       MessageBox( getEngineName(),
          "You have loaded a Gui file that was created before this version.  It has been loaded but you must open it manually from the content list dropdown",
          "Ok", "Information" );   
-      GuiEditContent( Canvas.getContent() );
+      GuiEditContent( $GameCanvas.getContent() );
       return 0;
    }
 

@@ -24,7 +24,7 @@
       canMinimize = "0";
       canMaximize = "0";
       canCollapse = "0";
-      closeCommand = "canvas.popDialog(DatablockEditorCreatePrompt);";
+      closeCommand = "$GameCanvas.popDialog(DatablockEditorCreatePrompt);";
       edgeSnap = "0";
       margin = "0 0 0 0";
       padding = "0 0 0 0";
@@ -137,7 +137,7 @@
          profile = "ToolsGuiButtonProfile";
          visible = "1";
          active = "1";
-         command = "canvas.popDialog(DatablockEditorCreatePrompt);";
+         command = "$GameCanvas.popDialog(DatablockEditorCreatePrompt);";
          accelerator = "escape";
          tooltipProfile = "ToolsGuiToolTipProfile";
          hovertime = "1000";

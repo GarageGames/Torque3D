@@ -389,7 +389,7 @@ function TerrainEditorPlugin::setEditorFunction(%this)
    %terrainExists = parseMissionGroup( "TerrainBlock" );
 
    if( %terrainExists == false )
-      MessageBoxYesNoCancel("No Terrain","Would you like to create a New Terrain?", "Canvas.pushDialog(CreateNewTerrainGui);");
+      MessageBoxYesNoCancel("No Terrain","Would you like to create a New Terrain?", "$GameCanvas.pushDialog(CreateNewTerrainGui);");
 
    return %terrainExists;
 }
@@ -399,7 +399,7 @@ function TerrainPainterPlugin::setEditorFunction(%this, %overrideGroup)
    %terrainExists = parseMissionGroup( "TerrainBlock" );
 
    if( %terrainExists == false )
-      MessageBoxYesNoCancel("No Terrain","Would you like to create a New Terrain?", "Canvas.pushDialog(CreateNewTerrainGui);");
+      MessageBoxYesNoCancel("No Terrain","Would you like to create a New Terrain?", "$GameCanvas.pushDialog(CreateNewTerrainGui);");
 
    return %terrainExists;
 }
@@ -416,7 +416,7 @@ function EPainterIconBtn::onMouseDragged( %this )
 
    %xOffset = getWord( %payload.extent, 0 ) / 2;
    %yOffset = getWord( %payload.extent, 1 ) / 2;
-   %cursorpos = Canvas.getCursorPos();
+   %cursorpos = $GameCanvas.getCursorPos();
    %xPos = getWord( %cursorpos, 0 ) - %xOffset;
    %yPos = getWord( %cursorpos, 1 ) - %yOffset;
 
@@ -439,7 +439,7 @@ function EPainterIconBtn::onMouseDragged( %this )
 
    %ctrl.add( %payload );
 
-   Canvas.getContent().add( %ctrl );
+   $GameCanvas.getContent().add( %ctrl );
    %ctrl.startDragging( %xOffset, %yOffset );
 }
 

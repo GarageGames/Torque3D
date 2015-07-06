@@ -301,7 +301,7 @@ function DbgWatchDialogAdd()
       TCPDebugger.send("EVAL " @ $DbgWatchSeq @ " 0 " @ %expr @ "\r\n");
       $DbgWatchSeq++;
    }
-   Canvas.popDialog(DebuggerWatchDlg);
+   $GameCanvas.popDialog(DebuggerWatchDlg);
 }
 
 // Edit a watch expression.
@@ -320,7 +320,7 @@ function DbgWatchDialogEdit()
       }
       TCPDebugger.send("EVAL " @ %id  @ " 0 " @ %assignment @ "\r\n");
    }
-   Canvas.popDialog(DebuggerEditWatchDlg);
+   $GameCanvas.popDialog(DebuggerEditWatchDlg);
 }
 
 // Set/change the singular "cursor watch" expression.
@@ -348,7 +348,7 @@ function DbgConnect()
       TCPDebugger.password = %password;
    }
 
-   Canvas.popDialog(DebuggerConnectDlg);
+   $GameCanvas.popDialog(DebuggerConnectDlg);
 }
 
 // Put a condition on a breakpoint.
@@ -375,7 +375,7 @@ function DbgBreakConditionSet()
       DbgSetBreakPoint(getField(%bkp, 1), getField(%bkp, 0), %clear, %passct, %condition);
    }
 
-   Canvas.popDialog(DebuggerBreakConditionDlg);
+   $GameCanvas.popDialog(DebuggerBreakConditionDlg);
 }
 
 // Open a file, go to the indicated line, and optionally select the line.
@@ -401,7 +401,7 @@ function DbgFileViewFind()
    %searchString = DebuggerFindStringText.getValue();
    DebuggerFileView.findString(%searchString);
 
-   Canvas.popDialog(DebuggerFindDlg);
+   $GameCanvas.popDialog(DebuggerFindDlg);
 }
 
 // Set a breakpoint, optionally with condition.

@@ -205,7 +205,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(CameraSpeedDropdownCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(CameraSpeedDropdownCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes the Camera Speed";
             hovertime = "750";

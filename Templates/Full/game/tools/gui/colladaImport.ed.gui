@@ -21,7 +21,7 @@
       canMinimize = "0";
       canMaximize = "0";
       minSize = "50 50";
-      closeCommand = "Canvas.popDialog(ColladaImportDlg);";
+      closeCommand = "$GameCanvas.popDialog(ColladaImportDlg);";
       EdgeSnap = "1";
       text = "";
       Margin = "0 0 0 0";
@@ -1299,7 +1299,7 @@ function ColladaImportDlg::showDialog(%this, %shapePath, %cmd)
       %this-->loadLights.setStateOn(0);
    }
 
-   Canvas.pushDialog(%this);
+   $GameCanvas.pushDialog(%this);
 
    ColladaImportTreeView.refresh("all");
 }
@@ -1507,13 +1507,13 @@ function ColladaImportTreeView::refreshNode(%this, %id)
 
 function ColladaImportDlg::onCancel(%this)
 {
-   Canvas.popDialog(%this);
+   $GameCanvas.popDialog(%this);
    ColladaImportTreeView.clear();
 }
 
 function ColladaImportDlg::onOK(%this)
 {
-   Canvas.popDialog(%this);
+   $GameCanvas.popDialog(%this);
    ColladaImportTreeView.clear();
 
    // Need to create a TSShapeConstructor object if any settings are not
@@ -1642,11 +1642,11 @@ function updateTSShapeLoadProgress(%progress, %msg)
       {
          ColladaImportProgress-->window.text = "Importing" SPC %msg;
          %msg = "Reading file into memory...";
-         Canvas.pushDialog(ColladaImportProgress);
+         $GameCanvas.pushDialog(ColladaImportProgress);
       }
       else if ( %progress == 1.0 )
       {
-         Canvas.popDialog(ColladaImportProgress);
+         $GameCanvas.popDialog(ColladaImportProgress);
       }
 
       %progressCtrl = ColladaImportProgress-->progressBar;
@@ -1665,7 +1665,7 @@ function updateTSShapeLoadProgress(%progress, %msg)
       %textCtrl.setText(%msg);
    }
 
-   Canvas.repaint(33);
+   $GameCanvas.repaint(33);
 }
 
 

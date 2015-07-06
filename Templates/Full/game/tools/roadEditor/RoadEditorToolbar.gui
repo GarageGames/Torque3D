@@ -173,7 +173,7 @@
             MinExtent = "8 2";
             canSave = "1";
             Visible = "1";
-            Command = "Canvas.pushDialog(RoadDefaultWidthSliderCtrlContainer);";
+            Command = "$GameCanvas.pushDialog(RoadDefaultWidthSliderCtrlContainer);";
             tooltipprofile = "ToolsGuiToolTipProfile";
             ToolTip = "Changes Default Road Width";
             hovertime = "750";

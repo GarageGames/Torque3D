@@ -40,6 +40,7 @@
 
 function Editor::create()
 {
+	$GameCanvas = Canvas;
    // Not much to do here, build it and they will come...
    // Only one thing... the editor is a gui control which
    // expect the Canvas to exist, so it must be constructed
@@ -89,7 +90,7 @@ function Editor::checkActiveLoadDone()
 {
    if(isObject(EditorGui) && EditorGui.loadingMission)
    {
-      Canvas.setContent(EditorGui);
+      $GameCanvas.setContent(EditorGui);
       EditorGui.loadingMission = false;
       return true;
    }
@@ -99,7 +100,7 @@ function Editor::checkActiveLoadDone()
 //------------------------------------------------------------------------------
 function toggleEditor(%make)
 {
-   if (Canvas.isFullscreen())
+   if ($GameCanvas.isFullscreen())
    {
       MessageBoxOK("Windowed Mode Required", "Please switch to windowed mode to access the Mission Editor.");
       return;
@@ -116,7 +117,7 @@ function toggleEditor(%make)
       {
          // Flag saying, when level is chosen, launch it with the editor open.
          ChooseLevelDlg.launchInEditor = true;
-         Canvas.pushDialog( ChooseLevelDlg );         
+         $GameCanvas.pushDialog( ChooseLevelDlg );         
       }
       else
       {
@@ -145,8 +146,8 @@ function toggleEditor(%make)
          {
             if ( !$GuiEditorBtnPressed )
             {
-               canvas.pushDialog( EditorLoadingGui );
-               canvas.repaint();
+               $GameCanvas.pushDialog( EditorLoadingGui );
+               $GameCanvas.repaint();
             }
             else
             {
@@ -164,7 +165,7 @@ function toggleEditor(%make)
                commandToServer('dropCameraAtPlayer', true);
                
             
-            canvas.popDialog(EditorLoadingGui);
+            $GameCanvas.popDialog(EditorLoadingGui);
          }
          
          popInstantGroup();

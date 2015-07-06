@@ -44,7 +44,7 @@
       minSize = "50 50";
       EdgeSnap = "1";
       text = "Error";
-      closeCommand = "Canvas.popDialog(GenericPromptDialog);";
+      closeCommand = "$GameCanvas.popDialog(GenericPromptDialog);";
 
       new GuiTextCtrl() {
          canSaveDynamicFields = "0";
@@ -82,7 +82,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "1";
-         Command = "Canvas.popDialog(GenericPromptDialog);";
+         Command = "$GameCanvas.popDialog(GenericPromptDialog);";
          tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "OK";
@@ -102,7 +102,7 @@
          MinExtent = "8 2";
          canSave = "1";
          Visible = "0";
-         Command = "Canvas.popDialog(GenericPromptDialog);";
+         Command = "$GameCanvas.popDialog(GenericPromptDialog);";
          tooltipprofile = "ToolsGuiToolTipProfile";
          hovertime = "1000";
          text = "Cancel";

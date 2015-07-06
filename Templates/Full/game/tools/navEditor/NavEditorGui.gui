@@ -76,7 +76,7 @@
          position = "115 2";
          extent = "90 18";
          text = "New NavMesh";
-         command = "Canvas.pushDialog(CreateNewNavMeshDlg);";
+         command = "$GameCanvas.pushDialog(CreateNewNavMeshDlg);";
       };
 
       new GuiContainer(){

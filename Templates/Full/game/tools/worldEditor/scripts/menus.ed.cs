@@ -128,12 +128,12 @@ function EditorGui::buildMenus(%this)
       }
    }
    
-   %fileMenu.appendItem("Create Blank Terrain" TAB "" TAB "Canvas.pushDialog( CreateNewTerrainGui );");        
-   %fileMenu.appendItem("Import Terrain Heightmap" TAB "" TAB "Canvas.pushDialog( TerrainImportGui );");
+   %fileMenu.appendItem("Create Blank Terrain" TAB "" TAB "$GameCanvas.pushDialog( CreateNewTerrainGui );");        
+   %fileMenu.appendItem("Import Terrain Heightmap" TAB "" TAB "$GameCanvas.pushDialog( TerrainImportGui );");
    
    if(!isWebDemo())
    {
-      %fileMenu.appendItem("Export Terrain Heightmap" TAB "" TAB "Canvas.pushDialog( TerrainExportGui );");
+      %fileMenu.appendItem("Export Terrain Heightmap" TAB "" TAB "$GameCanvas.pushDialog( TerrainExportGui );");
       %fileMenu.appendItem("-");
       %fileMenu.appendItem("Export To COLLADA..." TAB "" TAB "EditorExportToCollada();");
          //item[5] = "Import Terraform Data..." TAB "" TAB "Heightfield::import();";
@@ -179,8 +179,8 @@ function EditorGui::buildMenus(%this)
       item[12] = "Editor Settings..." TAB "" TAB "ESettingsWindow.ToggleVisibility();";
       item[13] = "Snap Options..." TAB "" TAB "ESnapOptions.ToggleVisibility();";
       item[14] = "-";
-      item[15] = "Game Options..." TAB "" TAB "Canvas.pushDialog(optionsDlg);";
-      item[16] = "PostEffect Manager" TAB "" TAB "Canvas.pushDialog(PostFXManager);";
+      item[15] = "Game Options..." TAB "" TAB "$GameCanvas.pushDialog(optionsDlg);";
+      item[16] = "PostEffect Manager" TAB "" TAB "$GameCanvas.pushDialog(PostFXManager);";
    };
    %this.menuBar.insert(%editMenu, %this.menuBar.getCount());
       

@@ -33,12 +33,12 @@ function GuiEditorPrefsDlgOkBtn::onAction(%this)
    if( GuiEditor.snap2grid )
       GuiEditor.setSnapToGrid( GuiEditor.snap2gridsize );
       
-   Canvas.popDialog( GuiEditorPrefsDlg );
+   $GameCanvas.popDialog( GuiEditorPrefsDlg );
 }
 
 function GuiEditorPrefsDlgCancelBtn::onAction(%this)
 {
-   Canvas.popDialog( GuiEditorPrefsDlg );
+   $GameCanvas.popDialog( GuiEditorPrefsDlg );
 }
 
 function GuiEditorPrefsDlgDefaultsBtn::onAction(%this)
