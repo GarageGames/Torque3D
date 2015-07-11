@@ -497,7 +497,6 @@ private:
 
    U32 mProtocolVersion;
    U32 mSendDelayCredit;
-   U32 mConnectSequence;
    U32 mAddressDigest[4];
 
    bool mEstablished;
