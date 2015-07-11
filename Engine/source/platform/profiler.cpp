@@ -155,11 +155,13 @@ U32 endHighResolutionTimer(U32 time[2])  {
 
 void startHighResolutionTimer(U32 time[2])
 {
+   time[0] = Platform::getRealMilliseconds();
 }
 
 U32 endHighResolutionTimer(U32 time[2])
 {
-   return 1;
+   U32 ticks = Platform::getRealMilliseconds() - time[0];
+   return ticks;
 }
 
 #endif
