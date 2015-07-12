@@ -62,7 +62,7 @@ public:
    String();
    String(const String &str);
    String(const StringChar *str);
-   String(const StringChar *str, SizeType size);
+   String(const StringChar *str, SizeType size); ///< Copy from raw data
    String(const UTF16 *str);
    ~String();
 
