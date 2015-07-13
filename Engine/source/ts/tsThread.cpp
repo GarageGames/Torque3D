@@ -286,13 +286,15 @@ void TSThread::activateTriggers(F32 a, F32 b)
    S32 bIndex  = numTriggers+firstTrigger; // initialized to handle case where pos past all triggers
    for (i=firstTrigger; i<numTriggers+firstTrigger; i++)
    {
+      TSShape::Trigger currentTrigger = shape->triggers[i];
+
       // is a between this trigger and previous one...
-      if (a>lastPos && a<=shape->triggers[i].pos)
+      if (a>lastPos && a <= currentTrigger.pos)
          aIndex = i;
       // is b between this trigger and previous one...
-      if (b>lastPos && b<=shape->triggers[i].pos)
+      if (b>lastPos && b <= currentTrigger.pos)
          bIndex = i;
-      lastPos = shape->triggers[i].pos;
+      lastPos = currentTrigger.pos;
    }
 
    // activate triggers between aIndex and bIndex (depends on direction)
@@ -578,19 +580,21 @@ void TSShapeInstance::transitionToSequence(TSThread * thread, S32 seq, F32 pos, 
    setDirty(AllDirtyMask);
    mGroundThread = NULL;
 
-   if (mScaleCurrentlyAnimated && !thread->getSequence()->animatesScale())
+   const TSShape::Sequence* threadSequence = thread->getSequence();
+
+   if (mScaleCurrentlyAnimated && !threadSequence->animatesScale())
       checkScaleCurrentlyAnimated();
-   else if (!mScaleCurrentlyAnimated && thread->getSequence()->animatesScale())
+   else if (!mScaleCurrentlyAnimated && threadSequence->animatesScale())
       mScaleCurrentlyAnimated=true;
 
    mTransitionRotationNodes.overlap(thread->transitionData.oldRotationNodes);
-   mTransitionRotationNodes.overlap(thread->getSequence()->rotationMatters);
+   mTransitionRotationNodes.overlap(threadSequence->rotationMatters);
 
    mTransitionTranslationNodes.overlap(thread->transitionData.oldTranslationNodes);
-   mTransitionTranslationNodes.overlap(thread->getSequence()->translationMatters);
+   mTransitionTranslationNodes.overlap(threadSequence->translationMatters);
 
    mTransitionScaleNodes.overlap(thread->transitionData.oldScaleNodes);
-   mTransitionScaleNodes.overlap(thread->getSequence()->scaleMatters);
+   mTransitionScaleNodes.overlap(threadSequence->scaleMatters);
 
    // if we aren't already in the list of transition threads, add us now
    S32 i;
