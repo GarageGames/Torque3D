@@ -1353,15 +1353,16 @@ F32 SceneContainer::containerSearchCurrRadiusDist()
       return 0.0;
 
    Point3F pos;
-   (*mSearchList[mCurrSearchPos])->getWorldBox().getCenter(&pos);
+   Box3F worldBox = (*mSearchList[mCurrSearchPos])->getWorldBox();
+   worldBox.getCenter(&pos);
 
    F32 dist = (pos - mSearchReferencePoint).len();
 
-   F32 min = (*mSearchList[mCurrSearchPos])->getWorldBox().len_x();
-   if ((*mSearchList[mCurrSearchPos])->getWorldBox().len_y() < min)
-      min = (*mSearchList[mCurrSearchPos])->getWorldBox().len_y();
-   if ((*mSearchList[mCurrSearchPos])->getWorldBox().len_z() < min)
-      min = (*mSearchList[mCurrSearchPos])->getWorldBox().len_z();
+   F32 min = worldBox.len_x();
+   if (worldBox.len_y() < min)
+      min = worldBox.len_y();
+   if (worldBox.len_z() < min)
+      min = worldBox.len_z();
 
    dist -= min;
    if (dist < 0)

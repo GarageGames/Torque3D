@@ -186,7 +186,7 @@ template<class Type> typename List<Type>::Link* List<Type>::_node(U32 index) con
 {
    Iterator itr(_head.next);
    while (index--)
-      itr++;
+      ++itr;
    return itr._link;
 }
 

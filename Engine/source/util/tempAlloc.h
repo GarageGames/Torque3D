@@ -35,11 +35,11 @@ struct TempAlloc
    U32 size;
 
    TempAlloc()
-      : size( 0 ), ptr( 0 ) {}
+      : ptr(0), size(0) {}
    TempAlloc( U32 size )
       : size( size )
    {
-      ptr = ( T* ) dMalloc( size * sizeof( T ) );
+      ptr = static_cast<T*>(dMalloc( size * sizeof( T ) ));
    }
    ~TempAlloc()
    {
@@ -51,9 +51,18 @@ struct TempAlloc
       return ptr;
    }
 
-private:
-   // Not safe.
-   TempAlloc( const TempAlloc& ) {}
+   TempAlloc( const TempAlloc& copyAlloc )
+   {
+      ptr = copyAlloc.ptr;
+      size = copyAlloc.size; 
+   }
+
+   inline TempAlloc& operator=(const TempAlloc &copyAlloc)
+   {
+      ptr = copyAlloc.ptr;
+      size = copyAlloc.size;
+      return *this;
+   }
 };
 
 #endif // _TEMPALLOC_H_

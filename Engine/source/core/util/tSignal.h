@@ -162,7 +162,12 @@ protected:
 
 private:
    SignalSlot( const SignalSlot&) {}
-   SignalSlot& operator=( const SignalSlot&) {}
+   SignalSlot& operator=( const SignalSlot& copySignalSlot) 
+   {
+      mSignal = copySignalSlot.mSignal;
+      mDlg = copySignalSlot.mDlg;
+      return *this;
+   }
 };
 
 template<typename Signature> class SignalBaseT : public SignalBase

@@ -79,8 +79,8 @@ public:
    Time operator+(const Time &time) const;
    Time operator-(const Time &time) const;
    S64 operator/(const Time &time) const;
-   const Time& operator+=(const Time time);
-   const Time& operator-=(const Time time);
+   const Time& operator+=(const Time& time);
+   const Time& operator-=(const Time& time);
    
    template<typename T> Time operator*(T scaler) const { return Time(_time * scaler); }
    template<typename T> Time operator/(T scaler) const { return Time(_time / scaler); }
@@ -173,13 +173,13 @@ inline S64 Time::operator/(const Time &time) const
    return S64(_time / time._time);
 }
 
-inline const Time& Time::operator+=(const Time time)
+inline const Time& Time::operator+=(const Time& time)
 {
    _time += time._time;
    return *this;
 }
 
-inline const Time& Time::operator-=(const Time time)
+inline const Time& Time::operator-=(const Time& time)
 {
    _time -= time._time;
    return *this;
@@ -262,13 +262,13 @@ template<class S> inline bool write(S &stream, const Time &theTime)
 inline Time UnixTimeToTime(U32 t)
 {
    // Converts "unix" time, seconds since 00:00:00 UTC, January 1, 1970
-   return Time(((S64)(t)) * 100000 + TORQUE_CONSTANT_S64(6213568320000000));
+   return Time((static_cast<S64>(t)) * 100000 + TORQUE_CONSTANT_S64(6213568320000000));
 }
 
 inline Time Win32FileTimeToTime(U32 low,U32 high)
 {
    // Converts Win32 "file" time, 100 nanosecond intervals since 00:00:00 UTC, January 1, 1601
-   S64 t = (((S64)high) << 32) + low;
+   S64 t = ((static_cast<S64>(high)) << 32) + low;
    return Time(t / 100 + TORQUE_CONSTANT_S64(5049120960000000));
 }
 

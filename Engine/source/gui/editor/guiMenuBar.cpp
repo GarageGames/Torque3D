@@ -1278,12 +1278,13 @@ void GuiMenuBar::onMouseUp(const GuiEvent &event)
 
 void GuiMenuBar::onRender(Point2I offset, const RectI &updateRect)
 {
-
    RectI ctrlRect(offset, getExtent());
+
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
 
    //if opaque, fill the update rect with the fill color
    if (mProfile->mOpaque)
-      GFX->getDrawUtil()->drawRectFill(RectI(offset, getExtent()), mProfile->mFillColor);
+      drawUtil->drawRectFill(RectI(offset, getExtent()), mProfile->mFillColor);
 
    //if there's a border, draw the border
    if (mProfile->mBorder)
@@ -1327,20 +1328,20 @@ void GuiMenuBar::onRender(Point2I offset, const RectI &updateRect)
 		 Point2I bitmapstart(start);
 		 bitmapstart.y = walk->bounds.point.y + ( walk->bounds.extent.y - rect.extent.y ) / 2;
 
-         GFX->getDrawUtil()->clearBitmapModulation();
-         GFX->getDrawUtil()->drawBitmapSR( mProfile->mTextureObject, offset + bitmapstart, rect);
+         drawUtil->clearBitmapModulation();
+         drawUtil->drawBitmapSR( mProfile->mTextureObject, offset + bitmapstart, rect);
 
 		 // Should we also draw the text?
 		 if(!walk->drawBitmapOnly)
 		 {
             start.x += mBitmapMargin;
-      GFX->getDrawUtil()->setBitmapModulation( fontColor );
-      GFX->getDrawUtil()->drawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
+      drawUtil->setBitmapModulation( fontColor );
+      drawUtil->drawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
 		 }
 	  } else
 	  {
-      GFX->getDrawUtil()->setBitmapModulation( fontColor );
-      GFX->getDrawUtil()->drawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
+      drawUtil->setBitmapModulation( fontColor );
+      drawUtil->drawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
 	  }
    }
 

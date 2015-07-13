@@ -1041,7 +1041,8 @@ void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
    }
 
    // inOutFormat is not modified by this method
-   bool chekFmt = GFX->getCardProfiler()->checkFormat( testingFormat, profile, autoGenSupp ); 
+   GFXCardProfiler* cardProfiler = GFX->getCardProfiler();
+   bool chekFmt = cardProfiler->checkFormat(testingFormat, profile, autoGenSupp);
    
    if( !chekFmt )
    {
@@ -1057,16 +1058,16 @@ void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
       {
          case GFXFormatR8G8B8:
             testingFormat = GFXFormatR8G8B8X8;
-            chekFmt = GFX->getCardProfiler()->checkFormat( testingFormat, profile, autoGenSupp );
+            chekFmt = cardProfiler->checkFormat(testingFormat, profile, autoGenSupp);
             break;
 
          case GFXFormatA8:
             testingFormat = GFXFormatR8G8B8A8;
-            chekFmt = GFX->getCardProfiler()->checkFormat( testingFormat, profile, autoGenSupp );
+            chekFmt = cardProfiler->checkFormat(testingFormat, profile, autoGenSupp);
             break;
          
          default:
-            chekFmt = GFX->getCardProfiler()->checkFormat( testingFormat, profile, autoGenSupp );
+            chekFmt = cardProfiler->checkFormat(testingFormat, profile, autoGenSupp);
             break;
       }
    }
