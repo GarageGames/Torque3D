@@ -41,15 +41,17 @@ void renderRaisedBox( const RectI &bounds, GuiControlProfile *profile )
    S32 l = bounds.point.x, r = bounds.point.x + bounds.extent.x - 1;
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y - 1;
 
-   GFX->getDrawUtil()->drawRectFill( bounds, profile->mFillColor);
-   GFX->getDrawUtil()->drawLine(l, t, l, b - 1, colorWhite);
-   GFX->getDrawUtil()->drawLine(l, t, r - 1, t, colorWhite);
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
 
-   GFX->getDrawUtil()->drawLine(l, b, r, b, colorBlack);
-   GFX->getDrawUtil()->drawLine(r, b - 1, r, t, colorBlack);
+   drawUtil->drawRectFill( bounds, profile->mFillColor);
+   drawUtil->drawLine(l, t, l, b - 1, colorWhite);
+   drawUtil->drawLine(l, t, r - 1, t, colorWhite);
 
-   GFX->getDrawUtil()->drawLine(l + 1, b - 1, r - 1, b - 1, profile->mBorderColor);
-   GFX->getDrawUtil()->drawLine(r - 1, b - 2, r - 1, t + 1, profile->mBorderColor);
+   drawUtil->drawLine(l, b, r, b, colorBlack);
+   drawUtil->drawLine(r, b - 1, r, t, colorBlack);
+
+   drawUtil->drawLine(l + 1, b - 1, r - 1, b - 1, profile->mBorderColor);
+   drawUtil->drawLine(r - 1, b - 2, r - 1, t + 1, profile->mBorderColor);
 }
 
 void renderSlightlyRaisedBox( const RectI &bounds, GuiControlProfile *profile )
@@ -70,16 +72,18 @@ void renderLoweredBox( const RectI &bounds, GuiControlProfile *profile )
    S32 l = bounds.point.x, r = bounds.point.x + bounds.extent.x - 1;
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y - 1;
 
-   GFX->getDrawUtil()->drawRectFill( bounds, profile->mFillColor);
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
 
-   GFX->getDrawUtil()->drawLine(l, b, r, b, colorWhite);
-   GFX->getDrawUtil()->drawLine(r, b - 1, r, t, colorWhite);
+   drawUtil->drawRectFill( bounds, profile->mFillColor);
 
-   GFX->getDrawUtil()->drawLine(l, t, r - 1, t, colorBlack);
-   GFX->getDrawUtil()->drawLine(l, t + 1, l, b - 1, colorBlack);
+   drawUtil->drawLine(l, b, r, b, colorWhite);
+   drawUtil->drawLine(r, b - 1, r, t, colorWhite);
 
-   GFX->getDrawUtil()->drawLine(l + 1, t + 1, r - 2, t + 1, profile->mBorderColor);
-   GFX->getDrawUtil()->drawLine(l + 1, t + 2, l + 1, b - 2, profile->mBorderColor);
+   drawUtil->drawLine(l, t, r - 1, t, colorBlack);
+   drawUtil->drawLine(l, t + 1, l, b - 1, colorBlack);
+
+   drawUtil->drawLine(l + 1, t + 1, r - 2, t + 1, profile->mBorderColor);
+   drawUtil->drawLine(l + 1, t + 2, l + 1, b - 2, profile->mBorderColor);
 }
 
 void renderSlightlyLoweredBox( const RectI &bounds, GuiControlProfile *profile )
@@ -87,11 +91,13 @@ void renderSlightlyLoweredBox( const RectI &bounds, GuiControlProfile *profile )
    S32 l = bounds.point.x + 1, r = bounds.point.x + bounds.extent.x - 1;
    S32 t = bounds.point.y + 1, b = bounds.point.y + bounds.extent.y - 1;
 
-   GFX->getDrawUtil()->drawRectFill( bounds, profile->mFillColor);
-   GFX->getDrawUtil()->drawLine(l, b, r, b, profile->mBorderColor);
-   GFX->getDrawUtil()->drawLine(r, t, r, b - 1, profile->mBorderColor);
-   GFX->getDrawUtil()->drawLine(l, t, l, b - 1, profile->mBorderColor);
-   GFX->getDrawUtil()->drawLine(l + 1, t, r - 1, t, profile->mBorderColor);
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
+   drawUtil->drawRectFill( bounds, profile->mFillColor);
+   drawUtil->drawLine(l, b, r, b, profile->mBorderColor);
+   drawUtil->drawLine(r, t, r, b - 1, profile->mBorderColor);
+   drawUtil->drawLine(l, t, l, b - 1, profile->mBorderColor);
+   drawUtil->drawLine(l + 1, t, r - 1, t, profile->mBorderColor);
 }
 
 void renderBorder( const RectI &bounds, GuiControlProfile *profile )
