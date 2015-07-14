@@ -56,7 +56,7 @@ Point3F Selection<ForestItem>::getOrigin()
 
    Selection<ForestItem>::iterator itr = begin();
 
-   for ( ; itr != end(); itr++ )
+   for (; itr != end(); ++itr)
    {
       const MatrixF &mat = itr->getTransform();
       Point3F wPos;

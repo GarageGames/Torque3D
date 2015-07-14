@@ -173,7 +173,7 @@ public:
       inline bool hasValidTex() const
       {
          TextureTable::ConstIterator iter = mTextures.begin();
-         for ( ; iter != mTextures.end(); iter++ )
+         for (; iter != mTextures.end(); ++iter)
          {
             if ( iter->value.isValid() )
                return true;
