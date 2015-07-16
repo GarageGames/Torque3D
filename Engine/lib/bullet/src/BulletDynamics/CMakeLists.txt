@@ -14,6 +14,7 @@ SET(BulletDynamics_SRCS
 	ConstraintSolver/btHingeConstraint.cpp
 	ConstraintSolver/btPoint2PointConstraint.cpp
 	ConstraintSolver/btSequentialImpulseConstraintSolver.cpp
+	ConstraintSolver/btNNCGConstraintSolver.cpp
 	ConstraintSolver/btSliderConstraint.cpp
 	ConstraintSolver/btSolve2LinearConstraint.cpp
 	ConstraintSolver/btTypedConstraint.cpp
@@ -21,7 +22,7 @@ SET(BulletDynamics_SRCS
 	Dynamics/btDiscreteDynamicsWorld.cpp
 	Dynamics/btRigidBody.cpp
 	Dynamics/btSimpleDynamicsWorld.cpp
-	Dynamics/Bullet-C-API.cpp
+#	Dynamics/Bullet-C-API.cpp
 	Vehicle/btRaycastVehicle.cpp
 	Vehicle/btWheelInfo.cpp
 	Featherstone/btMultiBody.cpp
@@ -33,6 +34,7 @@ SET(BulletDynamics_SRCS
 	Featherstone/btMultiBodyJointMotor.cpp
 	MLCPSolvers/btDantzigLCP.cpp
 	MLCPSolvers/btMLCPSolver.cpp
+	MLCPSolvers/btLemkeAlgorithm.cpp
 )
 
 SET(Root_HDRS
@@ -53,6 +55,7 @@ SET(ConstraintSolver_HDRS
 	ConstraintSolver/btJacobianEntry.h
 	ConstraintSolver/btPoint2PointConstraint.h
 	ConstraintSolver/btSequentialImpulseConstraintSolver.h
+	ConstraintSolver/btNNCGConstraintSolver.h
 	ConstraintSolver/btSliderConstraint.h
 	ConstraintSolver/btSolve2LinearConstraint.h
 	ConstraintSolver/btSolverBody.h
@@ -94,6 +97,8 @@ SET(MLCPSolvers_HDRS
 	MLCPSolvers/btMLCPSolverInterface.h
 	MLCPSolvers/btPATHSolver.h
 	MLCPSolvers/btSolveProjectedGaussSeidel.h	
+	MLCPSolvers/btLemkeSolver.h
+	MLCPSolvers/btLemkeAlgorithm.h
 )
 
 SET(Character_HDRS

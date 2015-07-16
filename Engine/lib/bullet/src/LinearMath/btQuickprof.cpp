@@ -237,6 +237,14 @@ unsigned long int btClock::getTimeMicroseconds()
 
 
 
+/// Returns the time in s since the last call to reset or since 
+/// the Clock was created.
+btScalar btClock::getTimeSeconds()
+{
+	static const btScalar microseconds_to_seconds = btScalar(0.000001);
+	return btScalar(getTimeMicroseconds()) * microseconds_to_seconds;
+}
+
 
 
 inline void Profile_Get_Ticks(unsigned long int * ticks)
@@ -293,8 +301,7 @@ void	CProfileNode::CleanupMemory()
 
 CProfileNode::~CProfileNode( void )
 {
-	delete ( Child);
-	delete ( Sibling);
+	CleanupMemory();
 }
 
 
@@ -535,7 +542,7 @@ void	CProfileManager::dumpRecursive(CProfileIterator* profileIterator, int spaci
 
 	if (parent_time < accumulated_time)
 	{
-		printf("what's wrong\n");
+		//printf("what's wrong\n");
 	}
 	for (i=0;i<spacing;i++)	printf(".");
 	printf("%s (%.3f %%) :: %.3f ms\n", "Unaccounted:",parent_time > SIMD_EPSILON ? ((parent_time - accumulated_time) / parent_time) * 100 : 0.f, parent_time - accumulated_time);
