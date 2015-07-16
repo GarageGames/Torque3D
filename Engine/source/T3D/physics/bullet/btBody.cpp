@@ -141,7 +141,8 @@ bool BtBody::init(   PhysicsCollision *shape,
    if ( bodyFlags & BF_KINEMATIC )
    {
       btFlags &= ~btCollisionObject::CF_STATIC_OBJECT;
-      btFlags |= btCollisionObject::CF_KINEMATIC_OBJECT;
+      btFlags |= btCollisionObject::CF_KINEMATIC_OBJECT
+        | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK;
    }
 
    mActor->setCollisionFlags( btFlags );
@@ -163,15 +164,8 @@ void BtBody::setMaterial(  F32 restitution,
    AssertFatal( mActor, "BtBody::setMaterial - The actor is null!" );
 
    mActor->setRestitution( restitution );
-
-   // TODO: Weird.. Bullet doesn't have seperate dynamic 
-   // and static friction.
-   //
-   // Either add it and submit it as an official patch
-   // or hack it via contact reporting or something
-   // like that.
-
    mActor->setFriction( friction );
+   mActor->setHitFraction( staticFriction );
 
    // Wake it up... it may need to move.
    mActor->activate();
@@ -347,10 +341,16 @@ void BtBody::applyImpulse( const Point3F &origin, const Point3F &force )
       mCenterOfMass->mulP( relOrigin );
       Point3F relForce( force );
       mCenterOfMass->mulV( relForce );
-      mActor->applyImpulse( btCast<btVector3>( relForce ), btCast<btVector3>( relOrigin ) );
+      btVector3 rhRelForce = btCast<btVector3>(Point3F(relForce.x, relForce.z, relForce.y));
+      btVector3 rhRelOrigin = btCast<btVector3>(Point3F(relOrigin.x, relOrigin.z, relOrigin.y));
+      mActor->applyImpulse(rhRelForce, rhRelOrigin);
    }
    else
-      mActor->applyImpulse( btCast<btVector3>( force ), btCast<btVector3>( localOrigin ) );
+   {
+      btVector3 rhForce = btCast<btVector3>(Point3F(force.x, force.z, force.y));
+      btVector3 rhOrigin = btCast<btVector3>(Point3F(origin.x, origin.z, origin.y));
+      mActor->applyImpulse(rhForce, rhOrigin);
+   }
 
    if ( !mActor->isActive() )
       mActor->activate();

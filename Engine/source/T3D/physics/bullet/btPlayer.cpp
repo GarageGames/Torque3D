@@ -43,6 +43,10 @@ BtPlayer::~BtPlayer()
    _releaseController();
 }
 
+void BtPlayer::setSimulationEnabled( bool enabled )
+{
+}
+
 void BtPlayer::_releaseController()
 {
    if ( !mGhostObject )
@@ -496,6 +500,9 @@ void BtPlayer::setTransform( const MatrixF &transform )
    xfm.getOrigin()[2] += mOriginOffset;
 
    mGhostObject->setWorldTransform( xfm );
+
+   //update aabb immediately as object updates may be performed before physics tick
+   mWorld->getDynamicsWorld()->updateSingleAabb(mGhostObject);
 }
 
 MatrixF& BtPlayer::getTransform( MatrixF *outMatrix )
