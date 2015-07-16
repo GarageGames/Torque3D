@@ -192,13 +192,13 @@ void GFXTextureManager::cleanupPool()
          // This texture is unreferenced, so take the time
          // now to completely remove it from the pool.
          TexturePoolMap::Iterator unref = iter;
-         iter++;
+         ++iter;
          unref->value = NULL;
          mTexturePool.erase( unref );
          continue;
       }
 
-      iter++;
+      ++iter;
    }
 }
 
