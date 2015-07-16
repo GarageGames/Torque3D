@@ -49,12 +49,15 @@ protected:
 
    F32 mEditorTimeScale;
 
+   //keep the collision shapes, for deletion/cleanup
+   btAlignedObjectArray<btCollisionShape*> mCollisionShapes;
+
    btDynamicsWorld *mDynamicsWorld;
    btBroadphaseInterface *mBroadphase;
    btCollisionDispatcher *mDispatcher;
    btConstraintSolver *mSolver;
    btDefaultCollisionConfiguration *mCollisionConfiguration;
-  	btThreadSupportInterface *mThreadSupportCollision;
+   btSoftBodyWorldInfo mSoftBodyWorldInfo;
 
    bool mErrorReport;
 
@@ -84,6 +87,8 @@ public:
    virtual bool isEnabled() const { return mIsEnabled; }
 
    btDynamicsWorld* getDynamicsWorld() const { return mDynamicsWorld; }
+
+   btSoftBodyWorldInfo& getSoftBodyWorldInfo() { return mSoftBodyWorldInfo; };
 
    void tickPhysics( U32 elapsedMs );
    void getPhysicsResults();

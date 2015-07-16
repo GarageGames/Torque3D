@@ -40,11 +40,14 @@ protected:
    /// The frustum to use for culling or NULL.
    const Frustum *mCuller;
 
+   S32 mDebugMode;
+
 public:
 
    BtDebugDraw()
       :  mVertexCount( 0 ),
-         mCuller( NULL )
+         mCuller( NULL ),
+         mDebugMode( DBG_DrawWireframe )
    {
    }
 
@@ -62,7 +65,7 @@ public:
    virtual void drawContactPoint( const btVector3 &PointOnB, const btVector3 &normalOnB, btScalar distance, int lifeTime, const btVector3 &color );
    virtual void reportErrorWarning( const char *warningString ) {}
    virtual void draw3dText( const btVector3 &location, const char *textString ) {}
-   virtual void setDebugMode( int debugMode ) {}
+   virtual void setDebugMode( int debugMode ) { mDebugMode = DBG_DrawWireframe | debugMode; }
    virtual int getDebugMode() const { return DBG_DrawWireframe; }
 };
 

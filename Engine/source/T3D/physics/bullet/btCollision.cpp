@@ -27,7 +27,7 @@
 #include "math/mMatrix.h"
 #include "T3D/physics/bullet/bt.h"
 #include "T3D/physics/bullet/btCasts.h"
-
+#include "T3D/physics/bullet/btWorld.h"
 
 BtCollision::BtCollision() 
    :  mCompound( NULL ),
@@ -151,6 +151,8 @@ bool BtCollision::addTriangleMesh(  const Point3F *vert,
    mMeshInterfaces.push_back( meshInterface );
 
    btBvhTriangleMeshShape *shape = new btBvhTriangleMeshShape( meshInterface, true, true );
+   btTriangleInfoMap* triangleInfoMap = new btTriangleInfoMap();
+   btGenerateInternalEdgeInfo(shape, triangleInfoMap);
    shape->setMargin( 0.01f );
    _addShape( shape, localXfm );
    

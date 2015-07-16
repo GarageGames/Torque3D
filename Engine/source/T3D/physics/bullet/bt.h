@@ -24,7 +24,7 @@
 #define _BULLET_H_
 
 // NOTE: We set these defines which bullet needs here.
-#if defined TORQUE_OS_WIN && !defined(WIN32)
+#if defined TORQUE_OS_WIN && !defined(_WIN32)
 #define WIN32
 #endif
 
@@ -38,11 +38,10 @@
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision/CollisionDispatch/btGhostObject.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+#include <BulletCollision/CollisionDispatch/btInternalEdgeUtility.h>
 
-#include <BulletMultiThreaded/PlatformDefinitions.h>
-#include <BulletMultiThreaded/SpuGatheringCollisionDispatcher.h>
-#include <BulletMultiThreaded/Win32ThreadSupport.h>
-#include <BulletMultiThreaded/SpuNarrowPhaseCollisionTask/SpuGatheringCollisionTask.h>
-
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
+#include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
+#include <BulletSoftBody/btSoftBodyHelpers.h>
 
 #endif // _BULLET_H_

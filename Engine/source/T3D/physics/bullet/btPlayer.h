@@ -82,7 +82,7 @@ public:
    virtual MatrixF& getTransform( MatrixF *outMatrix );
    virtual void setScale( const Point3F &scale );   
    virtual Box3F getWorldBounds() { return Box3F::Invalid; }
-   virtual void setSimulationEnabled( bool enabled ) {}
+   virtual void setSimulationEnabled( bool enabled );
    virtual bool isSimulationEnabled() { return true; }
 
    // PhysicsPlayer

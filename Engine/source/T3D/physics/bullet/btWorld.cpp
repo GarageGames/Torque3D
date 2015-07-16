@@ -33,11 +33,8 @@
 #include "console/consoleTypes.h"
 #include "scene/sceneRenderState.h"
 #include "T3D/gameBase/gameProcess.h"
-#ifdef _WIN32
-#include "BulletMultiThreaded/Win32ThreadSupport.h"
-#elif defined (USE_PTHREADS)
-#include "BulletMultiThreaded/PosixThreadSupport.h"
-#endif
+#include "console/engineAPI.h"
+#include "gfx/sim/debugDraw.h"
 
 BtWorld::BtWorld() :
    mProcessList( NULL ),
@@ -47,7 +44,7 @@ BtWorld::BtWorld() :
    mIsEnabled( false ),
    mEditorTimeScale( 1.0f ),
    mDynamicsWorld( NULL ),
-   mThreadSupportCollision( NULL )
+   mBroadphase( NULL )
 {
 } 
 
@@ -58,35 +55,9 @@ BtWorld::~BtWorld()
 bool BtWorld::initWorld( bool isServer, ProcessList *processList )
 {
    // Collision configuration contains default setup for memory, collision setup.
-   mCollisionConfiguration = new btDefaultCollisionConfiguration();
+   mCollisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
+   mDispatcher = new btCollisionDispatcher(mCollisionConfiguration);
 
-   // TODO: There is something wrong with multithreading
-   // and compound convex shapes... so disable it for now.
-   static const U32 smMaxThreads = 1;
-
-   // Different initialization with threading enabled.
-   if ( smMaxThreads > 1 )
-   {
-	   
-	   // TODO: ifdef assumes smMaxThread is always one at this point. MACOSX support to be decided
-#ifdef WIN32
-      mThreadSupportCollision = new Win32ThreadSupport( 
-         Win32ThreadSupport::Win32ThreadConstructionInfo(   isServer ? "bt_servercol" : "bt_clientcol",
-								                                    processCollisionTask,
-								                                    createCollisionLocalStoreMemory,
-								                                    smMaxThreads ) );
-      
-      mDispatcher = new	SpuGatheringCollisionDispatcher( mThreadSupportCollision,
-                                                         smMaxThreads,
-                                                         mCollisionConfiguration );
-#endif // WIN32
-   }
-   else
-   {
-      mThreadSupportCollision = NULL;
-      mDispatcher = new	btCollisionDispatcher( mCollisionConfiguration );
-   }
-  
    btVector3 worldMin( -2000, -2000, -1000 );
    btVector3 worldMax( 2000, 2000, 1000 );
    btAxisSweep3 *sweepBP = new btAxisSweep3( worldMin, worldMax );
@@ -96,7 +67,12 @@ bool BtWorld::initWorld( bool isServer, ProcessList *processList )
    // The default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded).
    mSolver = new btSequentialImpulseConstraintSolver;
 
-   mDynamicsWorld = new btDiscreteDynamicsWorld( mDispatcher, mBroadphase, mSolver, mCollisionConfiguration );
+   mDynamicsWorld = new btSoftRigidDynamicsWorld(mDispatcher, mBroadphase, mSolver, mCollisionConfiguration);
+   mSoftBodyWorldInfo.m_broadphase = mBroadphase;
+   mSoftBodyWorldInfo.m_dispatcher = mDispatcher;
+   mSoftBodyWorldInfo.m_gravity = btCast<btVector3>(mGravity);
+   mSoftBodyWorldInfo.m_sparsesdf.Initialize();
+
    if ( !mDynamicsWorld )
    {
       Con::errorf( "BtWorld - %s failed to create dynamics world!", isServer ? "Server" : "Client" );
@@ -127,14 +103,23 @@ void BtWorld::_destroy()
       mProcessList = NULL;
    }
 
-   // TODO: Release any remaining
-   // orphaned rigid bodies here.
+   for (S32 i = mDynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+   {
+      btCollisionObject* colObj = mDynamicsWorld->getCollisionObjectArray()[i];
+      btRigidBody* body = btRigidBody::upcast(colObj);
+      if (body && body->getMotionState())
+      {
+         delete body->getMotionState();
+      }
+      
+      mDynamicsWorld->removeCollisionObject(colObj);
+      delete colObj;
+   }
 
    SAFE_DELETE( mDynamicsWorld );
    SAFE_DELETE( mSolver );
    SAFE_DELETE( mBroadphase );
    SAFE_DELETE( mDispatcher );
-   SAFE_DELETE( mThreadSupportCollision );
    SAFE_DELETE( mCollisionConfiguration );
 }
 
@@ -144,12 +129,12 @@ void BtWorld::tickPhysics( U32 elapsedMs )
       return;
 
    // Did we forget to call getPhysicsResults somewhere?
-   AssertFatal( !mIsSimulating, "PhysXWorld::tickPhysics() - Already simulating!" );
+   AssertFatal( !mIsSimulating, "BtWorld::tickPhysics() - Already simulating!" );
 
    // The elapsed time should be non-zero and 
    // a multiple of TickMs!
    AssertFatal(   elapsedMs != 0 &&
-                  ( elapsedMs % TickMs ) == 0 , "PhysXWorld::tickPhysics() - Got bad elapsed time!" );
+                  ( elapsedMs % TickMs ) == 0 , "BtWorld::tickPhysics() - Got bad elapsed time!" );
 
    PROFILE_SCOPE(BtWorld_TickPhysics);
 
@@ -160,6 +145,8 @@ void BtWorld::tickPhysics( U32 elapsedMs )
    mDynamicsWorld->stepSimulation( elapsedSec * mEditorTimeScale );
 
    mIsSimulating = true;
+
+   mSoftBodyWorldInfo.m_sparsesdf.GarbageCollect();
 
    //Con::printf( "%s BtWorld::tickPhysics!", this == smClientWorld ? "Client" : "Server" );
 }
@@ -172,7 +159,7 @@ void BtWorld::getPhysicsResults()
    PROFILE_SCOPE(BtWorld_GetPhysicsResults);
 
    // Get results from scene.
-  // mScene->fetchResults( NX_RIGID_BODY_FINISHED, true );
+   // mScene->fetchResults( NX_RIGID_BODY_FINISHED, true );
    mIsSimulating = false;
    mTickCount++;
 }
@@ -190,10 +177,44 @@ void BtWorld::destroyWorld()
    _destroy();
 }
 
+class btWorldClosestRayResultCallback : public btCollisionWorld::ClosestRayResultCallback
+{
+public:
+   btWorldClosestRayResultCallback(const btVector3&	convexFromWorld, const btVector3&	convexToWorld) :
+      ClosestRayResultCallback(convexFromWorld, convexToWorld) {};
+   virtual bool needsCollision(btBroadphaseProxy* proxy0) const
+   {
+      btCollisionObject* otherObj = (btCollisionObject*)proxy0->m_clientObject;
+      if (!otherObj->hasContactResponse())
+         return false;
+      
+      return ClosestRayResultCallback::needsCollision(proxy0);
+   }
+};
+
 bool BtWorld::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *ri, const Point3F &impulse )
 {
-   btCollisionWorld::ClosestRayResultCallback result( btCast<btVector3>( startPnt ), btCast<btVector3>( endPnt ) );
-   mDynamicsWorld->rayTest( btCast<btVector3>( startPnt ), btCast<btVector3>( endPnt ), result );
+   btWorldClosestRayResultCallback result(btCast<btVector3>(startPnt), btCast<btVector3>(endPnt));
+   mDynamicsWorld->rayTest(btCast<btVector3>(startPnt), btCast<btVector3>(endPnt), result);
+
+   //soft body ray casting
+   btSoftRigidDynamicsWorld* softRigidWorld = static_cast<btSoftRigidDynamicsWorld*>(mDynamicsWorld);
+   btSoftBody::sRayCast rayCastRes;
+   btSoftBodyArray softBodies = softRigidWorld->getSoftBodyArray();
+   for (size_t i = 0; i<softBodies.size(); i++)
+   {
+      btSoftBody* body = softBodies[i];
+      if (body->rayTest(btCast<btVector3>(startPnt), btCast<btVector3>(endPnt), rayCastRes))
+      {
+         if (rayCastRes.fraction<result.m_closestHitFraction)
+         {
+            result.m_closestHitFraction = rayCastRes.fraction;
+            result.m_collisionObject = body;
+            result.m_hitNormalWorld = btVector3(1.f, 0.f, 0.f); //find normal from feature and index
+            result.m_hitPointWorld = btCast<btVector3>(startPnt + (endPnt - startPnt)*result.m_closestHitFraction);
+         }
+      }
+   }
 
    if ( !result.hasHit() || !result.m_collisionObject )
       return false;
@@ -288,6 +309,8 @@ void BtWorld::onDebugDraw( const SceneRenderState *state )
 {
    mDebugDraw.setCuller( &state->getCullingFrustum() );
 
+   mDebugDraw.setDebugMode(btIDebugDraw::DBG_DrawConstraints | btIDebugDraw::DBG_DrawConstraintLimits);
+
    mDynamicsWorld->setDebugDrawer( &mDebugDraw );
    mDynamicsWorld->debugDrawWorld();
    mDynamicsWorld->setDebugDrawer( NULL );
@@ -300,51 +323,45 @@ void BtWorld::reset()
    if ( !mDynamicsWorld )
       return;
 
-    ///create a copy of the array, not a reference!
-    btCollisionObjectArray copyArray = mDynamicsWorld->getCollisionObjectArray();
+   // create a copy of the array, not a reference!
+   btCollisionObjectArray copyArray = mDynamicsWorld->getCollisionObjectArray();
 
-    S32 numObjects = mDynamicsWorld->getNumCollisionObjects();
-    for ( S32 i=0; i < numObjects; i++ )
-    {
-            btCollisionObject* colObj = copyArray[i];
-            btRigidBody* body = btRigidBody::upcast(colObj);
+   S32 numObjects = mDynamicsWorld->getNumCollisionObjects();
+   for ( S32 i=0; i < numObjects; i++ )
+   {
+      btCollisionObject* colObj = copyArray[i];
+      btRigidBody* body = btRigidBody::upcast(colObj);
 
-            if (body)
-            {
-                    if (body->getMotionState())
-                    {
-                            //btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
-                            //myMotionState->m_graphicsWorldTrans = myMotionState->m_startWorldTrans;
-                            //body->setCenterOfMassTransform( myMotionState->m_graphicsWorldTrans );
-                            //colObj->setInterpolationWorldTransform( myMotionState->m_startWorldTrans );
-                            colObj->forceActivationState(ACTIVE_TAG);
-                            colObj->activate();
-                            colObj->setDeactivationTime(0);
-                            //colObj->setActivationState(WANTS_DEACTIVATION);
-                    }
+      if (body && body->getMotionState())
+      {
+         //btDefaultMotionState* myMotionState = (btDefaultMotionState*)body->getMotionState();
+         //myMotionState->m_graphicsWorldTrans = myMotionState->m_startWorldTrans;
+         //body->setCenterOfMassTransform( myMotionState->m_graphicsWorldTrans );
+         //colObj->setInterpolationWorldTransform( myMotionState->m_startWorldTrans );
+         colObj->forceActivationState(ACTIVE_TAG);
+         colObj->activate();
+         colObj->setDeactivationTime(0);
+         //colObj->setActivationState(WANTS_DEACTIVATION);
+      }
 
-                    //removed cached contact points (this is not necessary if all objects have been removed from the dynamics world)
-                    //m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(colObj->getBroadphaseHandle(),getDynamicsWorld()->getDispatcher());
+      //removed cached contact points (this is not necessary if all objects have been removed from the dynamics world)
+      //m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->cleanProxyFromPairs(colObj->getBroadphaseHandle(),getDynamicsWorld()->getDispatcher());
 
-                    btRigidBody* body = btRigidBody::upcast(colObj);
-                    if (body && !body->isStaticObject())
-                    {
-                         btRigidBody::upcast(colObj)->setLinearVelocity(btVector3(0,0,0));
-                         btRigidBody::upcast(colObj)->setAngularVelocity(btVector3(0,0,0));
-                    }
-            }
+      if (body && !body->isStaticObject())
+      {
+         btRigidBody::upcast(colObj)->setLinearVelocity(btVector3(0, 0, 0));
+         btRigidBody::upcast(colObj)->setAngularVelocity(btVector3(0, 0, 0));
+      }
+   }
 
-    }
-
-    // reset some internal cached data in the broadphase
-    mDynamicsWorld->getBroadphase()->resetPool( mDynamicsWorld->getDispatcher() );
-    mDynamicsWorld->getConstraintSolver()->reset();
+   // reset some internal cached data in the broadphase
+   mDynamicsWorld->getBroadphase()->resetPool(mDynamicsWorld->getDispatcher());
+   mDynamicsWorld->getConstraintSolver()->reset();
 }
 
-/*
-ConsoleFunction( castForceRay, const char*, 4, 4, "( Point3F startPnt, Point3F endPnt, VectorF impulseVec )" )
+DefineConsoleFunction(castForceRay, const char*, (const char * startPntChar, const char * endPntChar, const char * impulseVecChar), , "( Point3F startPnt, Point3F endPnt, VectorF impulseVec )")
 {
-   PhysicsWorld *world = PHYSICSPLUGIN->getWorld( "server" );
+   PhysicsWorld *world = PHYSICSMGR->getWorld( "server" );
    if ( !world )
       return NULL;
    
@@ -352,9 +369,9 @@ ConsoleFunction( castForceRay, const char*, 4, 4, "( Point3F startPnt, Point3F e
 
    Point3F impulse;
    Point3F startPnt, endPnt;
-   dSscanf( argv[1], "%f %f %f", &startPnt.x, &startPnt.y, &startPnt.z );
-   dSscanf( argv[2], "%f %f %f", &endPnt.x, &endPnt.y, &endPnt.z );
-   dSscanf( argv[3], "%f %f %f", &impulse.x, &impulse.y, &impulse.z );
+   dSscanf( startPntChar, "%f %f %f", &startPnt.x, &startPnt.y, &startPnt.z );
+   dSscanf( endPntChar, "%f %f %f", &endPnt.x, &endPnt.y, &endPnt.z );
+   dSscanf( impulseVecChar, "%f %f %f", &impulse.x, &impulse.y, &impulse.z );
 
    Point3F hitPoint;
 
@@ -372,10 +389,9 @@ ConsoleFunction( castForceRay, const char*, 4, 4, "( Point3F startPnt, Point3F e
    if ( hit )
    {
       dSprintf(returnBuffer, 256, "%g %g %g",
-            rinfo.point.x, rinfo.point.y, rinfo.point.z );
+         rinfo.point.x, rinfo.point.y, rinfo.point.z );
       return returnBuffer;
    }
    else 
-      return NULL;
+      return StringTable->insert("");
 }
-*/
