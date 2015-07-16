@@ -1091,8 +1091,9 @@ void GuiScrollCtrl::drawVScrollBar(const Point2I &offset)
     }
 
     // Render Up Arrow.
-    GFX->getDrawUtil()->clearBitmapModulation();
-    GFX->getDrawUtil()->drawBitmapSR( mTextureObject, pos, mBitmapBounds[upArrowBitmap] );
+    GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+    drawUtil->clearBitmapModulation();
+    drawUtil->drawBitmapSR(mTextureObject, pos, mBitmapBounds[upArrowBitmap]);
 
     // Update Pos.
     pos.y += mBitmapBounds[upArrowBitmap].extent.y;
@@ -1118,8 +1119,8 @@ void GuiScrollCtrl::drawVScrollBar(const Point2I &offset)
     if ( trackRect.extent.y > 0 )
     {
         // Render Track.
-        GFX->getDrawUtil()->clearBitmapModulation();
-        GFX->getDrawUtil()->drawBitmapStretchSR( mTextureObject, trackRect, mBitmapBounds[trackBitmap] );
+       drawUtil->clearBitmapModulation();
+       drawUtil->drawBitmapStretchSR(mTextureObject, trackRect, mBitmapBounds[trackBitmap]);
     }
 
     // Update Pos.
@@ -1137,8 +1138,8 @@ void GuiScrollCtrl::drawVScrollBar(const Point2I &offset)
     }
 
     // Render Down Arrow.
-    GFX->getDrawUtil()->clearBitmapModulation();
-    GFX->getDrawUtil()->drawBitmapSR( mTextureObject, pos, mBitmapBounds[downArrowBitmap] );
+    drawUtil->clearBitmapModulation();
+    drawUtil->drawBitmapSR(mTextureObject, pos, mBitmapBounds[downArrowBitmap]);
 
     // Render the Thumb?
     if ( !mVBarEnabled )
@@ -1163,8 +1164,8 @@ void GuiScrollCtrl::drawVScrollBar(const Point2I &offset)
     }
 
     // Render Thumb Top.
-    GFX->getDrawUtil()->clearBitmapModulation();
-    GFX->getDrawUtil()->drawBitmapSR( mTextureObject, pos, mBitmapBounds[thumbBitmapTop] );
+    drawUtil->clearBitmapModulation();
+    drawUtil->drawBitmapSR(mTextureObject, pos, mBitmapBounds[thumbBitmapTop]);
 
     // Update Pos.
     pos.y += mBitmapBounds[thumbBitmapTop].extent.y;
@@ -1179,16 +1180,16 @@ void GuiScrollCtrl::drawVScrollBar(const Point2I &offset)
     if ( thumbRect.extent.y > 0 )
     {
         // Render Track.
-        GFX->getDrawUtil()->clearBitmapModulation();
-        GFX->getDrawUtil()->drawBitmapStretchSR( mTextureObject, thumbRect, mBitmapBounds[thumbBitmapMiddle] );
+       drawUtil->clearBitmapModulation();
+       drawUtil->drawBitmapStretchSR(mTextureObject, thumbRect, mBitmapBounds[thumbBitmapMiddle]);
     }
 
     // Update Pos.
     pos.y += thumbRect.extent.y;
 
     // Render the Thumb Bottom.
-    GFX->getDrawUtil()->clearBitmapModulation();
-    GFX->getDrawUtil()->drawBitmapSR( mTextureObject, pos, mBitmapBounds[thumbBitmapBottom] );
+    drawUtil->clearBitmapModulation();
+    drawUtil->drawBitmapSR(mTextureObject, pos, mBitmapBounds[thumbBitmapBottom]);
 }
 
 //-----------------------------------------------------------------------------
@@ -1215,8 +1216,9 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
     }
 
     // Render Up Arrow.
-    GFX->getDrawUtil()->clearBitmapModulation();
-    GFX->getDrawUtil()->drawBitmapSR( mTextureObject, pos, mBitmapBounds[leftArrowBitmap] );
+    GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+    drawUtil->clearBitmapModulation();
+    drawUtil->drawBitmapSR(mTextureObject, pos, mBitmapBounds[leftArrowBitmap]);
 
     // Update Pos.
     pos.x += mBitmapBounds[leftArrowBitmap].extent.x;
@@ -1242,8 +1244,8 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
     if ( trackRect.extent.x > 0 )
     {
         // Render Track.
-        GFX->getDrawUtil()->clearBitmapModulation();
-        GFX->getDrawUtil()->drawBitmapStretchSR( mTextureObject, trackRect, mBitmapBounds[trackBitmap] );
+       drawUtil->clearBitmapModulation();
+       drawUtil->drawBitmapStretchSR(mTextureObject, trackRect, mBitmapBounds[trackBitmap]);
     }
 
     // Update Pos.
@@ -1261,8 +1263,8 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
     }
 
     // Render Right Arrow.
-    GFX->getDrawUtil()->clearBitmapModulation();
-    GFX->getDrawUtil()->drawBitmapSR( mTextureObject, pos, mBitmapBounds[rightArrowBitmap] );
+    drawUtil->clearBitmapModulation();
+    drawUtil->drawBitmapSR(mTextureObject, pos, mBitmapBounds[rightArrowBitmap]);
 
     // Render the Thumb?
     if ( !mHBarEnabled )
@@ -1287,8 +1289,8 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
     }
 
     // Render Thumb Left.
-    GFX->getDrawUtil()->clearBitmapModulation();
-    GFX->getDrawUtil()->drawBitmapSR( mTextureObject, pos, mBitmapBounds[thumbBitmapLeft] );
+    drawUtil->clearBitmapModulation();
+    drawUtil->drawBitmapSR(mTextureObject, pos, mBitmapBounds[thumbBitmapLeft]);
 
     // Update Pos.
     pos.x += mBitmapBounds[thumbBitmapLeft].extent.x;
@@ -1303,16 +1305,16 @@ void GuiScrollCtrl::drawHScrollBar(const Point2I &offset)
     if ( thumbRect.extent.x > 0 )
     {
         // Render Track.
-        GFX->getDrawUtil()->clearBitmapModulation();
-        GFX->getDrawUtil()->drawBitmapStretchSR( mTextureObject, thumbRect, mBitmapBounds[thumbBitmapMiddle] );
+       drawUtil->clearBitmapModulation();
+       drawUtil->drawBitmapStretchSR(mTextureObject, thumbRect, mBitmapBounds[thumbBitmapMiddle]);
     }
 
     // Update Pos.
     pos.x += thumbRect.extent.x;
 
     // Render the Thumb Bottom.
-    GFX->getDrawUtil()->clearBitmapModulation();
-    GFX->getDrawUtil()->drawBitmapSR( mTextureObject, pos, mBitmapBounds[thumbBitmapRight] );
+    drawUtil->clearBitmapModulation();
+    drawUtil->drawBitmapSR(mTextureObject, pos, mBitmapBounds[thumbBitmapRight]);
 }
 
 //-----------------------------------------------------------------------------

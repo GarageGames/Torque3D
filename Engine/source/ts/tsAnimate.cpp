@@ -88,16 +88,18 @@ void TSShapeInstance::animateNodes(S32 ss)
    {
       TSThread * th = mThreadList[i];
 
-      if (th->getSequence()->isBlend())
+      const TSShape::Sequence* threadSequence = th->getSequence();
+
+      if (threadSequence->isBlend())
       {
          // blend sequences need default (if not set by other sequence)
          // break rather than continue because the rest will be blends too
          firstBlend = i;
          break;
       }
-      rotBeenSet.takeAway(th->getSequence()->rotationMatters);
-      tranBeenSet.takeAway(th->getSequence()->translationMatters);
-      scaleBeenSet.takeAway(th->getSequence()->scaleMatters);
+      rotBeenSet.takeAway(threadSequence->rotationMatters);
+      tranBeenSet.takeAway(threadSequence->translationMatters);
+      scaleBeenSet.takeAway(threadSequence->scaleMatters);
    }
    rotBeenSet.takeAway(mCallbackNodes);
    rotBeenSet.takeAway(mHandsOffNodes);
@@ -576,9 +578,12 @@ void TSShapeInstance::handleBlendSequence(TSThread * thread, S32 a, S32 b)
    S32 jrot=0;
    S32 jtrans=0;
    S32 jscale=0;
-   TSIntegerSet nodeMatters = thread->getSequence()->translationMatters;
-   nodeMatters.overlap(thread->getSequence()->rotationMatters);
-   nodeMatters.overlap(thread->getSequence()->scaleMatters);
+
+   const TSShape::Sequence* threadSequence = thread->getSequence();
+
+   TSIntegerSet nodeMatters = threadSequence->translationMatters;
+   nodeMatters.overlap(threadSequence->rotationMatters);
+   nodeMatters.overlap(threadSequence->scaleMatters);
    nodeMatters.takeAway(mHandsOffNodes);
    S32 start = nodeMatters.start();
    S32 end   = b;
@@ -587,50 +592,50 @@ void TSShapeInstance::handleBlendSequence(TSThread * thread, S32 a, S32 b)
       // skip nodes outside of this detail
       if (start<a || mDisableBlendNodes.test(nodeIndex))
       {
-         if (thread->getSequence()->rotationMatters.test(nodeIndex))
+         if (threadSequence->rotationMatters.test(nodeIndex))
             jrot++;
-         if (thread->getSequence()->translationMatters.test(nodeIndex))
+         if (threadSequence->translationMatters.test(nodeIndex))
             jtrans++;
-         if (thread->getSequence()->scaleMatters.test(nodeIndex))
+         if (threadSequence->scaleMatters.test(nodeIndex))
             jscale++;
          continue;
       }
 
       MatrixF mat(true);
-      if (thread->getSequence()->rotationMatters.test(nodeIndex))
+      if (threadSequence->rotationMatters.test(nodeIndex))
       {
          QuatF q1,q2;
-         mShape->getRotation(*thread->getSequence(),thread->keyNum1,jrot,&q1);
-         mShape->getRotation(*thread->getSequence(),thread->keyNum2,jrot,&q2);
+         mShape->getRotation(*threadSequence,thread->keyNum1,jrot,&q1);
+         mShape->getRotation(*threadSequence,thread->keyNum2,jrot,&q2);
          QuatF quat;
          TSTransform::interpolate(q1,q2,thread->keyPos,&quat);
          TSTransform::setMatrix(quat,&mat);
          jrot++;
       }
 
-      if (thread->getSequence()->translationMatters.test(nodeIndex))
+      if (threadSequence->translationMatters.test(nodeIndex))
       {
-         const Point3F & p1 = mShape->getTranslation(*thread->getSequence(),thread->keyNum1,jtrans);
-         const Point3F & p2 = mShape->getTranslation(*thread->getSequence(),thread->keyNum2,jtrans);
+         const Point3F & p1 = mShape->getTranslation(*threadSequence,thread->keyNum1,jtrans);
+         const Point3F & p2 = mShape->getTranslation(*threadSequence,thread->keyNum2,jtrans);
          Point3F p;
          TSTransform::interpolate(p1,p2,thread->keyPos,&p);
          mat.setColumn(3,p);
          jtrans++;
       }
 
-      if (thread->getSequence()->scaleMatters.test(nodeIndex))
+      if (threadSequence->scaleMatters.test(nodeIndex))
       {
-         if (thread->getSequence()->animatesUniformScale())
+         if (threadSequence->animatesUniformScale())
          {
-            F32 s1 = mShape->getUniformScale(*thread->getSequence(),thread->keyNum1,jscale);
-            F32 s2 = mShape->getUniformScale(*thread->getSequence(),thread->keyNum2,jscale);
+            F32 s1 = mShape->getUniformScale(*threadSequence,thread->keyNum1,jscale);
+            F32 s2 = mShape->getUniformScale(*threadSequence,thread->keyNum2,jscale);
             F32 scale = TSTransform::interpolate(s1,s2,thread->keyPos);
             TSTransform::applyScale(scale,&mat);
          }
          else if (animatesAlignedScale())
          {
-            Point3F s1 = mShape->getAlignedScale(*thread->getSequence(),thread->keyNum1,jscale);
-            Point3F s2 = mShape->getAlignedScale(*thread->getSequence(),thread->keyNum2,jscale);
+            Point3F s1 = mShape->getAlignedScale(*threadSequence,thread->keyNum1,jscale);
+            Point3F s2 = mShape->getAlignedScale(*threadSequence,thread->keyNum2,jscale);
             Point3F scale;
             TSTransform::interpolate(s1,s2,thread->keyPos,&scale);
             TSTransform::applyScale(scale,&mat);
@@ -638,8 +643,8 @@ void TSShapeInstance::handleBlendSequence(TSThread * thread, S32 a, S32 b)
          else
          {
             TSScale s1,s2;
-            mShape->getArbitraryScale(*thread->getSequence(),thread->keyNum1,jscale,&s1);
-            mShape->getArbitraryScale(*thread->getSequence(),thread->keyNum2,jscale,&s2);
+            mShape->getArbitraryScale(*threadSequence,thread->keyNum1,jscale,&s1);
+            mShape->getArbitraryScale(*threadSequence,thread->keyNum2,jscale,&s2);
             TSScale scale;
             TSTransform::interpolate(s1,s2,thread->keyPos,&scale);
             TSTransform::applyScale(scale,&mat);
@@ -686,15 +691,17 @@ void TSShapeInstance::animateVisibility(S32 ss)
    {
       TSThread * th = mThreadList[i];
 
+      const TSShape::Sequence* threadSequence = th->getSequence();
+
       // For better or worse, object states are stored together (frame,
       // matFrame, visibility all in one structure).  Thus, indexing into
       // object state array for animation for any of these attributes needs to
       // take into account whether or not the other attributes are also animated.
       // The object states should eventually be separated (like the node states were)
       // in order to save memory and save the following step.
-      TSIntegerSet objectMatters = th->getSequence()->frameMatters;
-      objectMatters.overlap(th->getSequence()->matFrameMatters);
-      objectMatters.overlap(th->getSequence()->visMatters);
+      TSIntegerSet objectMatters = threadSequence->frameMatters;
+      objectMatters.overlap(threadSequence->matFrameMatters);
+      objectMatters.overlap(threadSequence->visMatters);
 
       // skip to beginning of this sub-shape
       S32 j=0;
@@ -702,10 +709,10 @@ void TSShapeInstance::animateVisibility(S32 ss)
       S32 end = b;
       for (S32 objectIndex = start; objectIndex<end; objectMatters.next(objectIndex), j++)
       {
-         if (!beenSet.test(objectIndex) && th->getSequence()->visMatters.test(objectIndex))
+         if (!beenSet.test(objectIndex) && threadSequence->visMatters.test(objectIndex))
          {
-            F32 state1 = mShape->getObjectState(*th->getSequence(),th->keyNum1,j).vis;
-            F32 state2 = mShape->getObjectState(*th->getSequence(),th->keyNum2,j).vis;
+            F32 state1 = mShape->getObjectState(*threadSequence,th->keyNum1,j).vis;
+            F32 state2 = mShape->getObjectState(*threadSequence,th->keyNum2,j).vis;
             if ((state1-state2) * (state1-state2) > 0.99f)
                // goes from 0 to 1 -- discreet jump
                mMeshObjects[objectIndex].visible = th->keyPos<0.5f ? state1 : state2;
@@ -747,15 +754,17 @@ void TSShapeInstance::animateFrame(S32 ss)
    {
       TSThread * th = mThreadList[i];
 
+      const TSShape::Sequence* threadSequence = th->getSequence();
+
       // For better or worse, object states are stored together (frame,
       // matFrame, visibility all in one structure).  Thus, indexing into
       // object state array for animation for any of these attributes needs to
       // take into account whether or not the other attributes are also animated.
       // The object states should eventually be separated (like the node states were)
       // in order to save memory and save the following step.
-      TSIntegerSet objectMatters = th->getSequence()->frameMatters;
-      objectMatters.overlap(th->getSequence()->matFrameMatters);
-      objectMatters.overlap(th->getSequence()->visMatters);
+      TSIntegerSet objectMatters = threadSequence->frameMatters;
+      objectMatters.overlap(threadSequence->matFrameMatters);
+      objectMatters.overlap(threadSequence->visMatters);
 
       // skip to beginning of this sub-shape
       S32 j=0;
@@ -763,10 +772,10 @@ void TSShapeInstance::animateFrame(S32 ss)
       S32 end = b;
       for (S32 objectIndex = start; objectIndex<end; objectMatters.next(objectIndex), j++)
       {
-         if (!beenSet.test(objectIndex) && th->getSequence()->frameMatters.test(objectIndex))
+         if (!beenSet.test(objectIndex) && threadSequence->frameMatters.test(objectIndex))
          {
             S32 key = (th->keyPos<0.5f) ? th->keyNum1 : th->keyNum2;
-            mMeshObjects[objectIndex].frame = mShape->getObjectState(*th->getSequence(),key,j).frameIndex;
+            mMeshObjects[objectIndex].frame = mShape->getObjectState(*threadSequence,key,j).frameIndex;
 
             // record change so that later threads don't over-write us...
             beenSet.set(objectIndex);
@@ -802,15 +811,17 @@ void TSShapeInstance::animateMatFrame(S32 ss)
    {
       TSThread * th = mThreadList[i];
 
+      const TSShape::Sequence* threadSequence = th->getSequence();
+
       // For better or worse, object states are stored together (frame,
       // matFrame, visibility all in one structure).  Thus, indexing into
       // object state array for animation for any of these attributes needs to
       // take into account whether or not the other attributes are also animated.
       // The object states should eventually be separated (like the node states were)
       // in order to save memory and save the following step.
-      TSIntegerSet objectMatters = th->getSequence()->frameMatters;
-      objectMatters.overlap(th->getSequence()->matFrameMatters);
-      objectMatters.overlap(th->getSequence()->visMatters);
+      TSIntegerSet objectMatters = threadSequence->frameMatters;
+      objectMatters.overlap(threadSequence->matFrameMatters);
+      objectMatters.overlap(threadSequence->visMatters);
 
       // skip to beginining of this sub-shape
       S32 j=0;
@@ -818,10 +829,10 @@ void TSShapeInstance::animateMatFrame(S32 ss)
       S32 end = b;
       for (S32 objectIndex = start; objectIndex<end; objectMatters.next(objectIndex), j++)
       {
-         if (!beenSet.test(objectIndex) && th->getSequence()->matFrameMatters.test(objectIndex))
+         if (!beenSet.test(objectIndex) && threadSequence->matFrameMatters.test(objectIndex))
          {
             S32 key = (th->keyPos<0.5f) ? th->keyNum1 : th->keyNum2;
-            mMeshObjects[objectIndex].matFrame = mShape->getObjectState(*th->getSequence(),key,j).matFrameIndex;
+            mMeshObjects[objectIndex].matFrame = mShape->getObjectState(*threadSequence,key,j).matFrameIndex;
 
             // record change so that later threads don't over-write us...
             beenSet.set(objectIndex);

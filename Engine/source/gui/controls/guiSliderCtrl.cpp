@@ -363,6 +363,8 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
    Point2I ext(getWidth() - mShiftExtent, getHeight());
    RectI thumb = mThumb;
 
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
    if( mHasTexture )
    {
       if(mTicks > 0)
@@ -402,12 +404,12 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
       S32 index = SliderButtonNormal;
       if(mMouseOver)
          index = SliderButtonHighlight;
-      GFX->getDrawUtil()->clearBitmapModulation();
+      drawUtil->clearBitmapModulation();
 
       //left border
-      GFX->getDrawUtil()->drawBitmapSR(mProfile->mTextureObject, Point2I(offset.x,offset.y), mBitmapBounds[SliderLineLeft]);
+      drawUtil->drawBitmapSR(mProfile->mTextureObject, Point2I(offset.x,offset.y), mBitmapBounds[SliderLineLeft]);
       //right border
-      GFX->getDrawUtil()->drawBitmapSR(mProfile->mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[SliderLineRight].extent.x, offset.y), mBitmapBounds[SliderLineRight]);
+      drawUtil->drawBitmapSR(mProfile->mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[SliderLineRight].extent.x, offset.y), mBitmapBounds[SliderLineRight]);
 
 
       //draw our center piece to our slider control's border and stretch it
@@ -421,11 +423,11 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
       stretchRect = mBitmapBounds[SliderLineCenter];
       stretchRect.inset(1,0);
 
-      GFX->getDrawUtil()->drawBitmapStretchSR(mProfile->mTextureObject, destRect, stretchRect);
+      drawUtil->drawBitmapStretchSR(mProfile->mTextureObject, destRect, stretchRect);
 
       //draw our control slider button	
       thumb.point += pos;
-      GFX->getDrawUtil()->drawBitmapSR(mProfile->mTextureObject,Point2I(thumb.point.x,offset.y ),mBitmapBounds[index]);
+      drawUtil->drawBitmapSR(mProfile->mTextureObject,Point2I(thumb.point.x,offset.y ),mBitmapBounds[index]);
 
    }
    else if (getWidth() >= getHeight())
@@ -490,8 +492,8 @@ void GuiSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
    	else if(textStart.x + txt_w > offset.x+getWidth())
    		textStart.x -=((textStart.x + txt_w) - (offset.x+getWidth()));
 
-    	GFX->getDrawUtil()->setBitmapModulation(mProfile->mFontColor);
-    	GFX->getDrawUtil()->drawText(mProfile->mFont, textStart, buf, mProfile->mFontColors);
+    	drawUtil->setBitmapModulation(mProfile->mFontColor);
+    	drawUtil->drawText(mProfile->mFont, textStart, buf, mProfile->mFontColors);
    }
    renderChildControls(offset, updateRect);
 }
