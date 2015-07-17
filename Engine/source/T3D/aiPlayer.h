@@ -127,6 +127,7 @@ private:
       FollowData() : object(NULL)
       {
          radius = 5.0f;
+         lastPos = Point3F::Zero;
       }
    };
 
