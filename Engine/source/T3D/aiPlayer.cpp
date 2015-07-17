@@ -831,11 +831,15 @@ void AIPlayer::followObject(SceneObject *obj, F32 radius)
    if(!isServerObject())
       return;
 
+   if ((mFollowData.lastPos - obj->getPosition()).len()<mMoveTolerance)
+      return;
+
    if(setPathDestination(obj->getPosition()))
    {
       clearCover();
       mFollowData.object = obj;
       mFollowData.radius = radius;
+      mFollowData.lastPos = obj->getPosition();
    }
 }
 

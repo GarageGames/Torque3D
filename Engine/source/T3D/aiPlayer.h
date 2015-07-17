@@ -122,6 +122,7 @@ private:
       SimObjectPtr<SceneObject> object;
       /// Distance at whcih to follow.
       F32 radius;
+      Point3F lastPos;
       /// Default constructor.
       FollowData() : object(NULL)
       {
