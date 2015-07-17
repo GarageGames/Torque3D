@@ -113,7 +113,7 @@ void GuiConsoleTextCtrl::onPreRender()
 {   
    if ( mConsoleExpression.isNotEmpty() )
    {
-      mResult = Con::evaluatef( "$guiConsoleTextCtrlTemp = %s;", mConsoleExpression.c_str() );
+      Con::evaluatef( "$guiConsoleTextCtrlTemp = %s;", mConsoleExpression.c_str() );
       
       //Fixes a bug with the above not always grabbing the console text.
       mResult = Con::getVariable("$guiConsoleTextCtrlTemp");
