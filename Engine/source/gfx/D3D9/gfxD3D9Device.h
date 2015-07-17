@@ -76,7 +76,7 @@ inline void D3D9Assert( HRESULT hr, const char *info )
 
 // Typedefs
 #define D3DX_FUNCTION(fn_name, fn_return, fn_args) \
-   typedef fn_return (WINAPI *D3DXFNPTR##fn_name##)##fn_args##;
+   typedef fn_return (WINAPI *D3DXFNPTR##fn_name)fn_args;
 #include "gfx/D3D9/d3dx9Functions.h"
 #undef D3DX_FUNCTION
 

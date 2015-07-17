@@ -30,7 +30,9 @@
 #include "console/simObjectMemento.h"
 #endif
 
-class GuiInspectorField;
+// Need full definition visible for SimObjectPtr<GuiInspectorField>
+#include "gui/editor/inspector/field.h"
+
 class GuiInspector;
 
 class MECreateUndoAction : public UndoAction

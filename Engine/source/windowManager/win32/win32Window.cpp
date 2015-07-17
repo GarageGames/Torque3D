@@ -439,8 +439,8 @@ void Win32Window::centerWindow()
 
 	// Get the monitor's extents.
 	MONITORINFO monInfo;
-	dMemset(&monInfo, 0, sizeof MONITORINFO);
-	monInfo.cbSize = sizeof MONITORINFO;
+	dMemset(&monInfo, 0, sizeof(MONITORINFO));
+	monInfo.cbSize = sizeof(MONITORINFO);
 	GetMonitorInfo(hMon, &monInfo);
 
    // Calculate the offset to center the window in the working area
@@ -502,8 +502,8 @@ bool Win32Window::setSize( const Point2I &newSize )
 
 		// Get the monitor's extents.
 		MONITORINFO monInfo;
-		dMemset(&monInfo, 0, sizeof MONITORINFO);
-		monInfo.cbSize = sizeof MONITORINFO;
+		dMemset(&monInfo, 0, sizeof(MONITORINFO));
+		monInfo.cbSize = sizeof(MONITORINFO);
 		GetMonitorInfo(hMon, &monInfo);
 
       // Calculate the offset to center the window in the working area
