@@ -5586,7 +5586,7 @@ void Player::getMuzzleTransform(U32 imageSlot,MatrixF* mat)
    *mat = nmat;
 }
 
-DisplayPose Player::calcCameraDeltaPose(GameConnection *con, DisplayPose inPose)
+DisplayPose Player::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
 {
    // NOTE: this is intended to be similar to updateMove
    DisplayPose outPose;

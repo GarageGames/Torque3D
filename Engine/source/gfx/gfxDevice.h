@@ -901,8 +901,8 @@ public:
    /// because of the state caching stuff.
    /// @{
    void setLight(U32 stage, GFXLightInfo* light);
-   void setLightMaterial(GFXLightMaterial mat);
-   void setGlobalAmbientColor(ColorF color);
+   void setLightMaterial(const GFXLightMaterial& mat);
+   void setGlobalAmbientColor(const ColorF& color);
 
    /// @}
    

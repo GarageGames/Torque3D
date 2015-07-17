@@ -259,7 +259,7 @@ void AIPlayer::setAimObject( GameBase *targetObject )
  * @param targetObject The object to target
  * @param offset       The offest from the target location to aim at
  */
-void AIPlayer::setAimObject( GameBase *targetObject, Point3F offset )
+void AIPlayer::setAimObject(GameBase *targetObject, const Point3F& offset)
 {
    mAimObject = targetObject;
    mTargetInLOS = false;

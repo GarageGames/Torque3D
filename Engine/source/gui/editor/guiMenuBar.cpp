@@ -1623,7 +1623,7 @@ void GuiMenuBar::closeMenu()
 }
 
 //  Called when a menu item is highlighted by the mouse
-void GuiMenuBar::highlightedMenuItem(S32 selectionIndex, RectI bounds, Point2I cellSize)
+void GuiMenuBar::highlightedMenuItem(S32 selectionIndex, const RectI& bounds, Point2I cellSize)
 {
    S32 selstore = selectionIndex;
 
@@ -1777,7 +1777,7 @@ void GuiMenuBar::onAction()
 
 //------------------------------------------------------------------------------
 //  Performs an action when a menu item that is a submenu is selected/highlighted
-void GuiMenuBar::onSubmenuAction(S32 selectionIndex, RectI bounds, Point2I cellSize)
+void GuiMenuBar::onSubmenuAction(S32 selectionIndex, const RectI& bounds, Point2I cellSize)
 {
    if(!mouseOverSubmenu)
       return;

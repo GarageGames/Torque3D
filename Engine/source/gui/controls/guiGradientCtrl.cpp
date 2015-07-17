@@ -521,7 +521,7 @@ void GuiGradientCtrl::reInitSwatches( GuiGradientCtrl::PickMode )
 	}
 }
 
-void GuiGradientCtrl::addColorRange( Point2I pos, ColorF color )
+void GuiGradientCtrl::addColorRange(Point2I pos, const ColorF& color)
 {
 	if( pos.x + mSwatchFactor < mBlendRangeBox.point.x &&
 		pos.x + mSwatchFactor > mBlendRangeBox.extent.x )

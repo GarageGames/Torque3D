@@ -735,14 +735,14 @@ void GFXDevice::setLight(U32 stage, GFXLightInfo* light)
 //-----------------------------------------------------------------------------
 // Set Light Material
 //-----------------------------------------------------------------------------
-void GFXDevice::setLightMaterial(GFXLightMaterial mat)
+void GFXDevice::setLightMaterial(const GFXLightMaterial& mat)
 {
    mCurrentLightMaterial = mat;
    mLightMaterialDirty = true;
    mStateDirty = true;
 }
 
-void GFXDevice::setGlobalAmbientColor(ColorF color)
+void GFXDevice::setGlobalAmbientColor(const ColorF& color)
 {
    if(mGlobalAmbientColor != color)
    {
