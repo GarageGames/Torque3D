@@ -434,9 +434,8 @@ void BtPlayer::findContact(   SceneObject **contactObject,
       if ( other == mGhostObject )
          other = (btCollisionObject*)pair.m_pProxy1->m_clientObject;
 
-      AssertFatal( !outOverlapObjects->contains( PhysicsUserData::getObject( other->getUserPointer() ) ),
-         "Got multiple pairs of the same object!" );
-      outOverlapObjects->push_back( PhysicsUserData::getObject( other->getUserPointer() ) );
+      if (!outOverlapObjects->contains(PhysicsUserData::getObject(other->getUserPointer())))
+         outOverlapObjects->push_back( PhysicsUserData::getObject( other->getUserPointer() ) );
 
       if ( other->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE )
          continue;
