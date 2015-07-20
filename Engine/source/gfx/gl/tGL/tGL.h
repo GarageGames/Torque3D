@@ -25,7 +25,7 @@
 #include "GL/glew.h"
 
 // Slower but reliably detects extensions
-#define gglHasExtension(EXTENSION) glewGetExtension("GL_##EXTENSION")
+#define gglHasExtension(EXTENSION) glewGetExtension("GL_" # EXTENSION)
 
 #endif
 
