@@ -393,7 +393,7 @@ void Camera::getEyeCameraTransform(IDisplayDevice *displayDevice, U32 eyeId, Mat
    }
 }
 
-DisplayPose Camera::calcCameraDeltaPose(GameConnection *con, DisplayPose inPose)
+DisplayPose Camera::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
 {
    // NOTE: this is intended to be similar to updateMove
    DisplayPose outPose;

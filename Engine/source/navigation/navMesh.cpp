@@ -681,7 +681,7 @@ void NavMesh::updateConfig()
    cfg.tileSize = mTileSize / cfg.cs;
 }
 
-S32 NavMesh::getTile(Point3F pos)
+S32 NavMesh::getTile(const Point3F& pos)
 {
    if(mBuilding)
       return -1;

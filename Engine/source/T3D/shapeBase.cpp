@@ -1191,13 +1191,13 @@ void ShapeBase::onDeleteNotify( SimObject *obj )
    Parent::onDeleteNotify( obj );      
 }
 
-void ShapeBase::onImpact(SceneObject* obj, VectorF vec)
+void ShapeBase::onImpact(SceneObject* obj, const VectorF& vec)
 {
    if (!isGhost())
       mDataBlock->onImpact_callback( this, obj, vec, vec.len() );
 }
 
-void ShapeBase::onImpact(VectorF vec)
+void ShapeBase::onImpact(const VectorF& vec)
 {
    if (!isGhost())
       mDataBlock->onImpact_callback( this, NULL, vec, vec.len() );
@@ -1994,7 +1994,7 @@ void ShapeBase::getEyeCameraTransform(IDisplayDevice *displayDevice, U32 eyeId, 
    *outMat = temp;
 }
 
-DisplayPose ShapeBase::calcCameraDeltaPose(GameConnection *con, DisplayPose inPose)
+DisplayPose ShapeBase::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
 {
    // NOTE: this is intended to be similar to updateMove
    // WARNING: does not take into account any move values

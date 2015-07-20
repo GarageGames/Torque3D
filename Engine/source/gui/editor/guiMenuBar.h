@@ -182,12 +182,12 @@ public:
    static void addSubmenuItem(Menu *menu, MenuItem *submenu, MenuItem *newMenuItem );
    static void removeSubmenuItem(MenuItem *menuItem, MenuItem *submenuItem);
    static void clearSubmenuItems(MenuItem *menuitem);
-   void onSubmenuAction(S32 selectionIndex, RectI bounds, Point2I cellSize);
+   void onSubmenuAction(S32 selectionIndex, const RectI& bounds, Point2I cellSize);
    void closeSubmenu();
    void checkSubmenuMouseMove(const GuiEvent &event);
    MenuItem *findHitMenuItem(Point2I mousePoint);
 
-   void highlightedMenuItem(S32 selectionIndex, RectI bounds, Point2I cellSize); //  Called whenever a menu item is highlighted by the mouse
+   void highlightedMenuItem(S32 selectionIndex, const RectI& bounds, Point2I cellSize); //  Called whenever a menu item is highlighted by the mouse
 
 	// display/mouse functions
 

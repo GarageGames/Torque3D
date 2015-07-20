@@ -86,7 +86,7 @@ public:
    fxFoliageCulledList(Box3F SearchBox, fxFoliageCulledList* InVec);
    ~fxFoliageCulledList() {};
 
-   void FindCandidates(Box3F SearchBox, fxFoliageCulledList* InVec);
+   void FindCandidates(const Box3F& SearchBox, fxFoliageCulledList* InVec);
 
    U32 GetListCount(void) { return mCulledObjectSet.size(); };
    fxFoliageItem* GetElement(U32 index) { return mCulledObjectSet[index]; };
@@ -157,7 +157,7 @@ protected:
 
    void SyncFoliageReplicators(void);
 
-   Box3F FetchQuadrant(Box3F Box, U32 Quadrant);
+   Box3F FetchQuadrant(const Box3F& Box, U32 Quadrant);
    void ProcessQuadrant(fxFoliageQuadrantNode* pParentNode, fxFoliageCulledList* pCullList, U32 Quadrant);
    void ProcessNodeChildren(fxFoliageQuadrantNode* pParentNode, fxFoliageCulledList* pCullList);
 

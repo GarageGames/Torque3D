@@ -677,7 +677,7 @@ DefineEngineMethod( GuiListBoxCtrl, setItemColor, void, (S32 index, ColorF color
    object->setItemColor( index, color );
 }
 
-void GuiListBoxCtrl::setItemColor( S32 index, ColorF color )
+void GuiListBoxCtrl::setItemColor(S32 index, const ColorF& color)
 {
    if ((index >= mItems.size()) || index < 0)
    {
@@ -1090,7 +1090,7 @@ void GuiListBoxCtrl::onRender( Point2I offset, const RectI &updateRect )
    GFX->setClipRect( oldClipRect );
 }
 
-void GuiListBoxCtrl::onRenderItem( RectI itemRect, LBItem *item )
+void GuiListBoxCtrl::onRenderItem(const RectI& itemRect, LBItem *item)
 {
    if( item->isSelected )
       GFX->getDrawUtil()->drawRectFill( itemRect, mProfile->mFillColorSEL );
