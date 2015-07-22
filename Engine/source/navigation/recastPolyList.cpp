@@ -72,8 +72,7 @@ U32 RecastPolyList::addPoint(const Point3F &p)
       else vertcap *= 2;
       // Allocate new vertex storage.
       F32 *newverts = new F32[vertcap*3];
-      if(!newverts)
-         return 0;
+
       dMemcpy(newverts, verts, nverts*3 * sizeof(F32));
       dFree(verts);
       verts = newverts;
@@ -106,8 +105,7 @@ void RecastPolyList::begin(BaseMatInstance *material, U32 surfaceKey)
       else tricap *= 2;
       // Allocate new vertex storage.
       S32 *newtris = new S32[tricap*3];
-      if(!newtris)
-         return;
+
       dMemcpy(newtris, tris, ntris*3 * sizeof(S32));
       dFree(tris);
       tris = newtris;
