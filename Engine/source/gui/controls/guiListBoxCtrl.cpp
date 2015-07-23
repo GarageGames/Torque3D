@@ -748,11 +748,6 @@ S32 GuiListBoxCtrl::insertItem( S32 index, StringTableEntry text, void *itemData
    }
 
    LBItem *newItem = new LBItem;
-   if( !newItem )
-   {
-      Con::warnf("GuiListBoxCtrl::insertItem - error allocating item memory!" );
-      return -1;
-   }
 
    // Assign item data
    newItem->itemText    = StringTable->insert(text, true);
@@ -792,11 +787,6 @@ S32 GuiListBoxCtrl::insertItemWithColor( S32 index, StringTableEntry text, Color
    }
 
    LBItem *newItem = new LBItem;
-   if( !newItem )
-   {
-      Con::warnf("GuiListBoxCtrl::insertItem - error allocating item memory!" );
-      return -1;
-   }
 
    // Assign item data
    newItem->itemText    = StringTable->insert(text, true);

@@ -514,8 +514,6 @@ bool GuiShapeEdPreview::mountShape(const char* modelName, const char* nodeName, 
       return false;
 
    TSShapeInstance* tsi = new TSShapeInstance( model, true );
-   if ( !tsi )
-      return false;
 
    if ( slot == -1 )
    {
