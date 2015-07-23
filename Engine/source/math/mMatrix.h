@@ -572,10 +572,10 @@ inline MatrixF operator * ( const MatrixF &m1, const MatrixF &m2 )
    return temp;
 }
 
-inline MatrixF& MatrixF::operator *= ( const MatrixF &m )
+inline MatrixF& MatrixF::operator *= ( const MatrixF &m1 )
 {
    MatrixF tempThis(*this);
-   m_matF_x_matF(tempThis, m, *this);
+   m_matF_x_matF(tempThis, m1, *this);
    return (*this);
 }
 
