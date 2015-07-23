@@ -3035,7 +3035,7 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
    {
       Parent::onMouseMove( event );
          
-      BitSet32 hitFlags = 0;
+      hitFlags = 0;
       if( !_hitTest( event.mousePoint, newItem2, hitFlags ) )
       {
          if( !mShowRoot )
@@ -3113,7 +3113,7 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
       for (S32 i = 0; i <mSelectedItems.size();i++) 
       {
          newItem = newItem2;
-         Item * item = mSelectedItems[i];
+         item = mSelectedItems[i];
 
          if (mDebug) Con::printf("----------------------------");
       
@@ -4222,9 +4222,9 @@ bool GuiTreeViewCtrl::renderTooltip( const Point2I &hoverPos, const Point2I& cur
 
             FrameAllocatorMarker txtAlloc;
             U32 bufLen = item->getDisplayTextLength() + 1;
-            char *buf = (char*)txtAlloc.alloc(bufLen);
-            item->getDisplayText(bufLen, buf);
-            textExt.x = mProfile->mFont->getStrWidth(buf);
+            char *buff = (char*)txtAlloc.alloc(bufLen);
+            item->getDisplayText(bufLen, buff);
+            textExt.x = mProfile->mFont->getStrWidth(buff);
             textExt.y = mProfile->mFont->getHeight();
 
             if( pScrollParent->isRectCompletelyVisible(RectI(textStart, textExt)) )

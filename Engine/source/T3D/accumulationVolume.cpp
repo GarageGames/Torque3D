@@ -169,7 +169,7 @@ void AccumulationVolume::buildSilhouette( const SceneCameraState& cameraState, V
    // depending on whether we project orthogonally or in perspective.
 
    TempAlloc< U32 > indices( mPolyhedron.getNumPoints() );
-   U32 numPoints;
+   U32 numSilhouettePoints;
 
    if( cameraState.getFrustum().isOrtho() )
    {
@@ -181,7 +181,7 @@ void AccumulationVolume::buildSilhouette( const SceneCameraState& cameraState, V
       // And extract the silhouette.
 
       SilhouetteExtractorOrtho< PolyhedronType > extractor( mPolyhedron );
-      numPoints = extractor.extractSilhouette( osViewDir, indices, indices.size );
+      numSilhouettePoints = extractor.extractSilhouette( osViewDir, indices, indices.size );
    }
    else
    {
@@ -194,7 +194,7 @@ void AccumulationVolume::buildSilhouette( const SceneCameraState& cameraState, V
 
       // Do a perspective-correct silhouette extraction.
 
-      numPoints = mSilhouetteExtractor.extractSilhouette(
+      numSilhouettePoints = mSilhouetteExtractor.extractSilhouette(
          camView,
          indices, indices.size );
    }
@@ -220,8 +220,8 @@ void AccumulationVolume::buildSilhouette( const SceneCameraState& cameraState, V
 
    // Now store the points.
 
-   outPoints.setSize( numPoints );
-   for( U32 i = 0; i < numPoints; ++ i )
+   outPoints.setSize( numSilhouettePoints );
+   for( U32 i = 0; i < numSilhouettePoints; ++ i )
       outPoints[ i ] = mWSPoints[ indices[ i ] ];
 }
 

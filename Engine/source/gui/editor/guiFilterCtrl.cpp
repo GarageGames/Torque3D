@@ -218,13 +218,13 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
    // draw the knots
    for (U32 k=0; k < mFilter.size(); k++)
    {
-      RectI r;
-      r.point.x = (S32)(((F32)ext.x/(F32)(mFilter.size()-1)*(F32)k));
-      r.point.y = (S32)(ext.y - ((F32)ext.y * mFilter[k]));
-      r.point += pos + Point2I(-2,-2);
-      r.extent = Point2I(5,5);
+      RectI rect;
+      rect.point.x = (S32)(((F32)ext.x/(F32)(mFilter.size()-1)*(F32)k));
+      rect.point.y = (S32)(ext.y - ((F32)ext.y * mFilter[k]));
+      rect.point += pos + Point2I(-2,-2);
+      rect.extent = Point2I(5,5);
 
-      GFX->getDrawUtil()->drawRectFill(r, ColorI(255,0,0));
+      GFX->getDrawUtil()->drawRectFill(rect, ColorI(255,0,0));
    }
 
    renderChildControls(offset, updateRect);

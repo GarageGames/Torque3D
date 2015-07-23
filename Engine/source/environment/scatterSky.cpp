@@ -686,13 +686,13 @@ void ScatterSky::prepRenderImage( SceneRenderState *state )
       mMatrixSet->setSceneProjection(GFX->getProjectionMatrix());
       mMatrixSet->setWorld(GFX->getWorldMatrix());
 
-      ObjectRenderInst *ri = renderPass->allocInst<ObjectRenderInst>();
-      ri->renderDelegate.bind( this, &ScatterSky::_renderMoon );
-      ri->type = RenderPassManager::RIT_Sky;
+      ObjectRenderInst *mri = renderPass->allocInst<ObjectRenderInst>();
+      mri->renderDelegate.bind( this, &ScatterSky::_renderMoon );
+      mri->type = RenderPassManager::RIT_Sky;
       // Render after sky objects and before CloudLayer!
-      ri->defaultKey = 5;
-      ri->defaultKey2 = 0;
-      renderPass->addInst(ri);
+      mri->defaultKey = 5;
+      mri->defaultKey2 = 0;
+      renderPass->addInst(mri);
    }
 }
 
@@ -1333,7 +1333,6 @@ void ScatterSky::_getColor( const Point3F &pos, ColorF *outColor )
    for ( U32 i = 0; i < 2; i++ )
    {
       F32 fHeight = v3SamplePoint.len();
-      F32 fDepth = mExp( scaleOverScaleDepth * (mSphereInnerRadius - smViewerHeight) );
       F32 fLightAngle = mDot( mLightDir, v3SamplePoint ) / fHeight;
       F32 fCameraAngle = mDot( v3Ray, v3SamplePoint ) / fHeight;
 

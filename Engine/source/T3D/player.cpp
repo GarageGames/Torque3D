@@ -2674,8 +2674,7 @@ void Player::updateMove(const Move* move)
             delta.headVec[i] += M_2PI_F;
       }
    }
-   MatrixF zRot;
-   zRot.set(EulerF(0.0f, 0.0f, mRot.z));
+   const MatrixF zRot(EulerF(0.0f, 0.0f, mRot.z));
 
    // Desired move direction & speed
    VectorF moveVec;
@@ -2897,9 +2896,8 @@ void Player::updateMove(const Move* move)
 
       // get the head pitch and add it to the moveVec
       // This more accurate swim vector calc comes from Matt Fairfax
-      MatrixF xRot, zRot;
+      MatrixF xRot;
       xRot.set(EulerF(mHead.x, 0, 0));
-      zRot.set(EulerF(0, 0, mRot.z));
       MatrixF rot;
       rot.mul(zRot, xRot);
       rot.getColumn(0,&moveVec);

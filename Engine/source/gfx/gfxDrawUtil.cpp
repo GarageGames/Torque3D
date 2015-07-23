@@ -1049,9 +1049,9 @@ void GFXDrawUtil::_drawSolidPolyhedron( const GFXStateBlockDesc &desc, const Any
             continue;
       }
 
-      U32 numPoints = poly.extractFace( i, &indices[ idx ], numIndices - idx );
-      numIndicesForPoly[ numPolys ] = numPoints;
-      idx += numPoints;
+      U32 numExtracted = poly.extractFace( i, &indices[ idx ], numIndices - idx );
+      numIndicesForPoly[ numPolys ] = numExtracted;
+      idx += numExtracted;
 
       numPolys ++;
    }

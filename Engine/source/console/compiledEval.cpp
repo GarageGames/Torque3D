@@ -751,8 +751,8 @@ breakContinue:
                         // script execution.
                         
                         ConsoleValueRef savedArgv[ StringStack::MaxArgs ];
-                        for (int i=0; i<callArgc; i++) {
-                           savedArgv[i] = callArgv[i];
+                        for (int j=0; j<callArgc; j++) {
+                           savedArgv[j] = callArgv[j];
                         }
                         //dMemcpy( savedArgv, callArgv, sizeof( savedArgv[ 0 ] ) * callArgc );
                         
@@ -770,15 +770,15 @@ breakContinue:
                         // --
 
                         //dMemcpy( callArgv, savedArgv, sizeof( callArgv[ 0 ] ) * callArgc );
-                        for (int i=0; i<callArgc; i++) {
-                           callArgv[i] = savedArgv[i];
+                        for (int j=0; j<callArgc; j++) {
+                           callArgv[j] = savedArgv[j];
                         }
                      }
                      else if( dStricmp( redefineBehavior, "renameNew" ) == 0 )
                      {
-                        for( U32 i = 1;; ++ i )
+                        for( U32 j = 1;; ++ j )
                         {
-                           String newName = String::ToString( "%s%i", objectName, i );
+                           String newName = String::ToString( "%s%i", objectName, j );
                            if( !Sim::findObject( newName ) )
                            {
                               objectName = StringTable->insert( newName );

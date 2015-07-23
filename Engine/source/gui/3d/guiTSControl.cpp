@@ -618,11 +618,11 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
             F32 screenBottom = rectHeight * 0.5;
 
             const F32 fillConv = 0.0f;
-            const F32 frustumDepth = gfxFrustum.getNearDist() + 0.012;
-            verts[0].point.set( screenLeft  - fillConv, frustumDepth, screenTop    - fillConv );
-            verts[1].point.set( screenRight - fillConv, frustumDepth, screenTop    - fillConv );
-            verts[2].point.set( screenLeft  - fillConv, frustumDepth, screenBottom - fillConv );
-            verts[3].point.set( screenRight - fillConv, frustumDepth, screenBottom - fillConv );
+            const F32 frustumDepthEx = gfxFrustum.getNearDist() + 0.012;
+            verts[0].point.set( screenLeft  - fillConv, frustumDepthEx, screenTop    - fillConv );
+            verts[1].point.set( screenRight - fillConv, frustumDepthEx, screenTop    - fillConv );
+            verts[2].point.set( screenLeft  - fillConv, frustumDepthEx, screenBottom - fillConv );
+            verts[3].point.set( screenRight - fillConv, frustumDepthEx, screenBottom - fillConv );
 
             verts[0].color = verts[1].color = verts[2].color = verts[3].color = ColorI(255,255,255,255);
 

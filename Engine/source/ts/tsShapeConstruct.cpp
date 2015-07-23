@@ -2187,7 +2187,7 @@ void TSShapeConstructor::ChangeSet::write(TSShape* shape, Stream& stream, const 
          for (U32 j = 1; j < cmd.argc; j++)
          {
             // Use relative paths when possible
-            String str( cmd.argv[j] );
+            str = cmd.argv[j];
             if ( str.startsWith( savePath ) )
                str = str.substr( savePath.length() + 1 );
 

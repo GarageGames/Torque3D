@@ -1684,32 +1684,32 @@ void MeshRoad::_generateSlices()
    //      
    for ( U32 i = 0; i < mSlices.size(); i++ )
    {
-      MeshRoadSlice *slice = &mSlices[i];
-      slice->p0 = slice->p1 - slice->rvec * slice->width * 0.5f;
-      slice->p2 = slice->p1 + slice->rvec * slice->width * 0.5f;
-      slice->pb0 = slice->p0 - slice->uvec * slice->depth;
-      slice->pb2 = slice->p2 - slice->uvec * slice->depth;
+      MeshRoadSlice *pSlice = &mSlices[i];
+      pSlice->p0 = pSlice->p1 - pSlice->rvec * pSlice->width * 0.5f;
+      pSlice->p2 = pSlice->p1 + pSlice->rvec * pSlice->width * 0.5f;
+      pSlice->pb0 = pSlice->p0 - pSlice->uvec * pSlice->depth;
+      pSlice->pb2 = pSlice->p2 - pSlice->uvec * pSlice->depth;
    }
 
    // Generate the object/world bounds
    Box3F box;
    for ( U32 i = 0; i < mSlices.size(); i++ )
    {
-      const MeshRoadSlice &slice = mSlices[i];
+      const MeshRoadSlice &theSlice = mSlices[i];
 
       if ( i == 0 )
       {
-         box.minExtents = slice.p0;
-         box.maxExtents = slice.p2;
-         box.extend( slice.pb0 );
-         box.extend( slice.pb2 );
+         box.minExtents = theSlice.p0;
+         box.maxExtents = theSlice.p2;
+         box.extend( theSlice.pb0 );
+         box.extend( theSlice.pb2 );
       }
       else
       {
-         box.extend( slice.p0 ); 
-         box.extend( slice.p2 );
-         box.extend( slice.pb0 );
-         box.extend( slice.pb2 );
+         box.extend( theSlice.p0 ); 
+         box.extend( theSlice.p2 );
+         box.extend( theSlice.pb0 );
+         box.extend( theSlice.pb2 );
       }
    }
 

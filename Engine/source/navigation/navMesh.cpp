@@ -1182,10 +1182,10 @@ bool NavMesh::createCoverPoints()
          float segs[MAX_SEGS*6];
          int nsegs = 0;
          query->getPolyWallSegments(ref, &f, segs, NULL, &nsegs, MAX_SEGS);
-         for(int j = 0; j < nsegs; ++j)
+         for(int k = 0; k < nsegs; ++k)
          {
-            const float* sa = &segs[j*6];
-            const float* sb = &segs[j*6+3];
+            const float* sa = &segs[k*6];
+            const float* sb = &segs[k*6+3];
             Point3F a = RCtoDTS(sa), b = RCtoDTS(sb);
             F32 len = (b - a).len();
             if(len < mWalkableRadius * 2)
@@ -1194,7 +1194,7 @@ bool NavMesh::createCoverPoints()
             edge.normalize();
             // Number of points to try placing - for now, one at each end.
             U32 pointCount = (len > mWalkableRadius * 4) ? 2 : 1;
-            for(U32 i = 0; i < pointCount; i++)
+            for(U32 l = 0; l < pointCount; l++)
             {
                MatrixF mat;
                Point3F pos;
@@ -1204,10 +1204,10 @@ bool NavMesh::createCoverPoints()
                // Otherwise, stand off from edge ends.
                else
                {
-                  if(i % 2)
-                     pos = a + edge * (i/2+1) * mWalkableRadius;
+                  if(l % 2)
+                     pos = a + edge * (l/2+1) * mWalkableRadius;
                   else
-                     pos = b - edge * (i/2+1) * mWalkableRadius;
+                     pos = b - edge * (l/2+1) * mWalkableRadius;
                }
                CoverPointData data;
                if(testEdgeCover(pos, edge, data))

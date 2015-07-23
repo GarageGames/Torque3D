@@ -958,7 +958,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
          U32 checkX = x % csmNumBins;
          U32 checkY = y % csmNumBins;
 
-         SceneObjectRef* chain = mBinArray[(checkY * csmNumBins) + checkX].nextInBin;
+         chain = mBinArray[(checkY * csmNumBins) + checkX].nextInBin;
          while (chain)
          {
             SceneObject* ptr = chain->object;
@@ -1050,7 +1050,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
             {
                U32 checkY = i % csmNumBins;
 
-               SceneObjectRef* chain = mBinArray[(checkY * csmNumBins) + checkX].nextInBin;
+               chain = mBinArray[(checkY * csmNumBins) + checkX].nextInBin;
                while (chain)
                {
                   SceneObject* ptr = chain->object;

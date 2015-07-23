@@ -200,7 +200,7 @@ void WinConsole::process()
                               if (rgCmds[iCmdIndex][0] != '\0')
                               {
                                  // Obliterate current displayed text
-                                 for (S32 i = outpos = 0; i < inpos; i ++)
+                                 for (S32 j = outpos = 0; j < inpos; j ++)
                                  {
                                     outbuf[outpos ++] = '\b';
                                     outbuf[outpos ++] = ' ';
@@ -230,7 +230,7 @@ void WinConsole::process()
                                   iCmdIndex = 0;
 
                               // Obliterate current displayed text
-                              for (S32 i = outpos = 0; i < inpos; i ++)
+                              for (S32 j = outpos = 0; j < inpos; j ++)
                               {
                                  outbuf[outpos ++] = '\b';
                                  outbuf[outpos ++] = ' ';
@@ -274,8 +274,7 @@ void WinConsole::process()
                         // also 512 chars long so that constraint will also be fine for the input buffer.
                         {
                            // Erase the current line.
-                           U32 i;
-                           for (i = 0; i < inpos; i++) {
+                           for (U32 j = 0; j < inpos; j++) {
                               outbuf[outpos++] = '\b';
                               outbuf[outpos++] = ' ';
                               outbuf[outpos++] = '\b';
@@ -289,8 +288,8 @@ void WinConsole::process()
                               inpos = Con::tabComplete(inbuf, inpos, maxlen, true);
                            }
                            // Copy the input buffer to the output.
-                           for (i = 0; i < inpos; i++) {
-                              outbuf[outpos++] = inbuf[i];
+                           for (U32 j = 0; j < inpos; j++) {
+                              outbuf[outpos++] = inbuf[j];
                            }
                         }
                         break;

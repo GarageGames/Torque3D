@@ -214,11 +214,11 @@ void Polytope::intersect(SimObject* object,const BSPNode* root)
                   face.vertex = mVertexList.size() - 1;
                else {
                   mEdgeList.increment(2);
-                  Edge& e0 = mEdgeList.last();
+                  e0 = mEdgeList.last();
                   e0.next = frontVolume.edgeList;
                   frontVolume.edgeList = mEdgeList.size() - 1;
 
-                  Edge& e1 = *(&e0 - 1);
+                  e1 = *(&e0 - 1);
                   e1.next = backVolume.edgeList;
                   backVolume.edgeList = frontVolume.edgeList - 1;
 

@@ -675,9 +675,9 @@ void SFXSystem::_onRemoveSource( SFXSource* source )
 {
    // Check if it was a play once source.
    
-   Vector< SFXSource* >::iterator iter = find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
-   if ( iter != mPlayOnceSources.end() )
-      mPlayOnceSources.erase_fast( iter );
+   Vector< SFXSource* >::iterator iSource = find( mPlayOnceSources.begin(), mPlayOnceSources.end(), source );
+   if ( iSource != mPlayOnceSources.end() )
+      mPlayOnceSources.erase_fast( iSource );
 
    // Update the stats.
    
@@ -685,9 +685,9 @@ void SFXSystem::_onRemoveSource( SFXSource* source )
    
    if( dynamic_cast< SFXSound* >( source ) )
    {
-      SFXSoundVector::iterator iter = find( mSounds.begin(), mSounds.end(), static_cast< SFXSound* >( source ) );
-      if( iter != mSounds.end() )
-         mSounds.erase_fast( iter );
+      SFXSoundVector::iterator sound = find( mSounds.begin(), mSounds.end(), static_cast< SFXSound* >( source ) );
+      if( sound != mSounds.end() )
+         mSounds.erase_fast( sound );
          
       mStatNumSounds = mSounds.size();
    }

@@ -808,7 +808,6 @@ bool MountSystem::isDirectory(const Path& path, FileSystemRef fsRef)
       if (fnRef.isNull())
          return false;
 
-      FileNode::Attributes attr;
       if (fnRef->getAttributes(&attr))
          return attr.flags & FileNode::Directory;
       return false;

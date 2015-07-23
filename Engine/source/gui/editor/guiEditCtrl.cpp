@@ -490,10 +490,10 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
       return;
    }
 
-   Point2I mousePoint = globalToLocalCoord( event.mousePoint );
+   Point2I localMousePoint = globalToLocalCoord( event.mousePoint );
 
    //find the control we clicked
-   GuiControl *ctrl = mContentControl->findHitControl( mousePoint, getCurrentAddSet()->mLayer );
+   GuiControl *ctrl = mContentControl->findHitControl( localMousePoint, getCurrentAddSet()->mLayer );
 
    bool handledEvent = ctrl->onMouseDraggedEditor( event, localToGlobalCoord( Point2I(0,0) ) );
    if( handledEvent == true )
@@ -511,7 +511,7 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
       // If we haven't yet crossed the mouse delta to actually start the
       // clone, check if we have now.
       
-      S32 delta = mAbs( ( mousePoint - mDragBeginPoint ).len() );
+      S32 delta = mAbs( ( localMousePoint - mDragBeginPoint ).len() );
       if( delta >= 4 )
       {
          cloneSelection();
@@ -588,7 +588,7 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
    }
    else if (mMouseDownMode == MovingSelection && mSelectedControls.size())
    {
-      Point2I delta = mousePoint - mLastMousePos;
+      Point2I delta = localMousePoint - mLastMousePos;
       RectI selectionBounds = getSelectionBounds();
       
       // Apply snaps.
@@ -632,7 +632,7 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
       // find the current control under the mouse
 
       canHitSelectedControls( false );
-      GuiControl *inCtrl = mContentControl->findHitControl(mousePoint, getCurrentAddSet()->mLayer);
+      GuiControl *inCtrl = mContentControl->findHitControl(localMousePoint, getCurrentAddSet()->mLayer);
       canHitSelectedControls( true );
 
       // find the nearest control up the heirarchy from the control the mouse is in
@@ -651,7 +651,7 @@ void GuiEditCtrl::onMouseDragged( const GuiEvent &event )
       mLastMousePos += delta;
    }
    else
-      mLastMousePos = mousePoint;
+      mLastMousePos = localMousePoint;
 }
 
 //-----------------------------------------------------------------------------
@@ -702,7 +702,7 @@ void GuiEditCtrl::onPreRender()
 void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
 {   
    Point2I ctOffset;
-   Point2I cext;
+   Point2I ctExt;
    bool keyFocused = isFirstResponder();
 
    GFXDrawUtil *drawer = GFX->getDrawUtil();
@@ -712,9 +712,9 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
       if( getCurrentAddSet() != getContentControl() )
       {
          // draw a white frame inset around the current add set.
-         cext = getCurrentAddSet()->getExtent();
+         ctExt = getCurrentAddSet()->getExtent();
          ctOffset = getCurrentAddSet()->localToGlobalCoord(Point2I(0,0));
-         RectI box(ctOffset.x, ctOffset.y, cext.x, cext.y);
+         RectI box(ctOffset.x, ctOffset.y, ctExt.x, ctExt.y);
 
 			box.inset( -5, -5 );
          drawer->drawRect( box, ColorI( 50, 101, 152, 128 ) );
@@ -732,9 +732,9 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
       for(i = mSelectedControls.begin(); i != mSelectedControls.end(); i++)
       {
          GuiControl *ctrl = (*i);
-         cext = ctrl->getExtent();
+         ctExt = ctrl->getExtent();
          ctOffset = ctrl->localToGlobalCoord(Point2I(0,0));
-         RectI box(ctOffset.x,ctOffset.y, cext.x, cext.y);
+         RectI box(ctOffset.x,ctOffset.y, ctExt.x, ctExt.y);
          ColorI nutColor = multisel ? ColorI( 255, 255, 255, 100 ) : ColorI( 0, 0, 0, 100 );
          ColorI outlineColor = multisel ? ColorI( 0, 0, 0, 100 ) : ColorI( 255, 255, 255, 100 );
          if(!keyFocused)
@@ -847,8 +847,8 @@ void GuiEditCtrl::onRender(Point2I offset, const RectI &updateRect)
             
             if( mSnapTargets[ axis ] )
             {
-               RectI bounds = mSnapTargets[ axis ]->getGlobalBounds();
-               drawer->drawRect( bounds, ColorF( .5, .5, .5, .5 ) );
+               RectI targetBounds = mSnapTargets[ axis ]->getGlobalBounds();
+               drawer->drawRect( targetBounds, ColorF( .5, .5, .5, .5 ) );
             }
          }
       }

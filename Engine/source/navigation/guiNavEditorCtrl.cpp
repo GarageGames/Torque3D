@@ -523,12 +523,12 @@ void GuiNavEditorCtrl::renderScene(const RectI & updateRect)
       return;
 
    // Grab the camera's transform
-   MatrixF mat;
-   connection->getControlCameraTransform(0, &mat);
+   MatrixF camMat;
+   connection->getControlCameraTransform(0, &camMat);
 
    // Get the camera position
    Point3F camPos;
-   mat.getColumn(3,&camPos);
+   camMat.getColumn(3,&camPos);
 
    if(mMode == mLinkMode)
    {

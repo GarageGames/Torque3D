@@ -1275,7 +1275,7 @@ static void processPingsAndQueries( U32 session, bool schedule )
    if ( !gPingList.size() && !waitingForMaster )
    {
       // Start the query phase:
-      for ( U32 i = 0; i < gQueryList.size() && i < gMaxConcurrentQueries; )
+      for ( U32 j = 0; j < gQueryList.size() && j < gMaxConcurrentQueries; )
       {
          Ping &p = gQueryList[i];
          if ( p.time + gPingTimeout < time )
@@ -1284,7 +1284,7 @@ static void processPingsAndQueries( U32 session, bool schedule )
             if ( !si )
             {
                // Server info not found, so remove the query:
-               gQueryList.erase( i );
+               gQueryList.erase( j );
                gServerBrowserDirty = true;
                continue;
             }
@@ -1294,7 +1294,7 @@ static void processPingsAndQueries( U32 session, bool schedule )
             {
                Con::printf( "Query to server %s timed out.", addressString );
                si->status = ServerInfo::Status_TimedOut;
-               gQueryList.erase( i );
+               gQueryList.erase( j );
                gServerBrowserDirty = true;
             }
             else
@@ -1310,11 +1310,11 @@ static void processPingsAndQueries( U32 session, bool schedule )
                   si->status |= ServerInfo::Status_Querying;
                   gServerBrowserDirty = true;
                }
-               i++;
+               j++;
             }
          }
          else
-            i++;
+            j++;
       }
    }
 

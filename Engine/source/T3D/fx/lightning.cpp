@@ -214,10 +214,10 @@ void LightningStrikeEvent::unpack(NetConnection* con, BitStream* stream)
       // target id
       S32 mTargetID    = stream->readRangedU32(0, NetConnection::MaxGhostCount);
 
-      NetObject* pObject = con->resolveGhost(mTargetID);
-      if( pObject != NULL )
+      NetObject* pTarget = con->resolveGhost(mTargetID);
+      if( pTarget != NULL )
       {
-         mTarget = dynamic_cast<SceneObject*>(pObject);
+         mTarget = dynamic_cast<SceneObject*>(pTarget);
       }
       if( bool(mTarget) == false )
       {

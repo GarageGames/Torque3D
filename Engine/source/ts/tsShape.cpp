@@ -533,7 +533,7 @@ void TSShape::init()
          if (accel != NULL) {
             delete [] accel->vertexList;
             delete [] accel->normalList;
-            for (S32 j = 0; j < accel->numVerts; j++)
+            for (j = 0; j < accel->numVerts; j++)
                delete [] accel->emitStrings[j];
             delete [] accel->emitStrings;
             delete accel;
@@ -992,7 +992,7 @@ void TSShape::assembleShape()
          S32 oldSz = groundTranslations.size();
          groundTranslations.setSize(oldSz+seq.numGroundFrames);
          groundRotations.setSize(oldSz+seq.numGroundFrames);
-         for (S32 j=0;j<seq.numGroundFrames;j++)
+         for (j=0;j<seq.numGroundFrames;j++)
          {
             groundTranslations[j+oldSz] = nodeTranslations[seq.firstGroundFrame+j-numNodes];
             groundRotations[j+oldSz] = nodeRotations[seq.firstGroundFrame+j-numNodes];
@@ -1067,9 +1067,9 @@ void TSShape::assembleShape()
       ptr32 = tsalloc.copyToShape32( numDetails * 7, true );
 
       details.setSize( numDetails );
-      for ( U32 i = 0; i < details.size(); i++, ptr32 += 7 )
+      for ( U32 d = 0; d < details.size(); d++, ptr32 += 7 )
       {
-         Detail *det = &(details[i]);
+         Detail *det = &(details[d]);
 
          // Clear the struct... we don't want to leave 
          // garbage in the parts that are unfilled.
@@ -1097,12 +1097,12 @@ void TSShape::assembleShape()
    // Some DTS exporters (MAX - I'm looking at you!) write garbage into the
    // averageError and maxError values which stops LOD from working correctly.
    // Try to detect and fix it
-   for ( U32 i = 0; i < details.size(); i++ )
+   for ( U32 d = 0; d < details.size(); d++ )
    {
-      if ( ( details[i].averageError == 0 ) || ( details[i].averageError > 10000 ) ||
-           ( details[i].maxError == 0 ) || ( details[i].maxError > 10000 ) )
+      if ( ( details[d].averageError == 0 ) || ( details[d].averageError > 10000 ) ||
+           ( details[d].maxError == 0 ) || ( details[d].maxError > 10000 ) )
       {
-         details[i].averageError = details[i].maxError = -1.0f;
+         details[d].averageError = details[d].maxError = -1.0f;
       }
    }
 
@@ -1396,7 +1396,7 @@ void TSShape::disassembleShape()
    {
       // Legacy details => no explicit autobillboard parameters
       U32 legacyDetailSize32 = 7;   // only store the first 7 4-byte values of each detail
-      for ( S32 i = 0; i < details.size(); i++ )
+      for ( i = 0; i < details.size(); i++ )
          tsalloc.copyToBuffer32( (S32*)&details[i], legacyDetailSize32 );
    }
    tsalloc.setGuard();
