@@ -1293,7 +1293,7 @@ void Precipitation::interpolateTick(F32 delta)
 void Precipitation::processTick(const Move *)
 {
    //nothing to do on the server
-   if (isServerObject() || mDataBlock == NULL)
+   if (isServerObject() || mDataBlock == NULL || isHidden())
       return;
 
    const U32 currTime = Platform::getVirtualMilliseconds();
