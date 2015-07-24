@@ -191,7 +191,7 @@ public:
    
    void cleanup()
    {
-      if (bufferLen > 0)
+      if ((type <= TypeInternalString) && (bufferLen > 0))
       {
          dFree(sval);
          bufferLen = 0;
@@ -201,6 +201,8 @@ public:
       ival = 0;
       fval = 0;
    }
+   ConsoleValue(){ init(); };
+   ~ConsoleValue(){ cleanup(); };
 };
 
 // Proxy class for console variables
@@ -1098,9 +1100,9 @@ struct ConsoleDocFragment
    static ConsoleDocFragment* smFirst;
    
    ConsoleDocFragment( const char* text, const char* inClass = NULL, const char* definition = NULL )
-      : mText( text ),
-        mClass( inClass ),
+      : mClass( inClass ),
         mDefinition( definition ),
+        mText( text ),
         mNext( smFirst )
    {
       smFirst = this;

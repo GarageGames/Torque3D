@@ -918,17 +918,18 @@ void GFont::importStrip(const char *fileName, U32 padding, U32 kerning)
 
       // Allocate a new bitmap for this glyph, taking into account kerning and padding.
       glyphList.increment();
-      glyphList.last().bitmap = new GBitmap(mCharInfoList[i].width + kerning + 2*padding, mCharInfoList[i].height + 2*padding, false, strip->getFormat());
-      glyphList.last().charId = i;
+      GlyphMap& lastGlyphMap = glyphList.last();
+      lastGlyphMap.bitmap = new GBitmap(mCharInfoList[i].width + kerning + 2 * padding, mCharInfoList[i].height + 2 * padding, false, strip->getFormat());
+      lastGlyphMap.charId = i;
 
       // Copy the rect.
-      RectI ri(curWidth, getBaseline() - mCharInfoList[i].yOrigin, glyphList.last().bitmap->getWidth(), glyphList.last().bitmap->getHeight());
+      RectI ri(curWidth, getBaseline() - mCharInfoList[i].yOrigin, lastGlyphMap.bitmap->getWidth(), lastGlyphMap.bitmap->getHeight());
       Point2I outRi(0,0);
-      glyphList.last().bitmap->copyRect(strip, ri, outRi); 
+      lastGlyphMap.bitmap->copyRect(strip, ri, outRi);
 
       // Update glyph attributes.
-      mCharInfoList[i].width = glyphList.last().bitmap->getWidth();
-      mCharInfoList[i].height = glyphList.last().bitmap->getHeight();
+      mCharInfoList[i].width = lastGlyphMap.bitmap->getWidth();
+      mCharInfoList[i].height = lastGlyphMap.bitmap->getHeight();
       mCharInfoList[i].xOffset -= kerning + padding;
       mCharInfoList[i].xIncrement += kerning;
       mCharInfoList[i].yOffset -= padding;

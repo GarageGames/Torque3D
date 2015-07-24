@@ -339,7 +339,7 @@ bool TerrainBlock::setFile( const FileName &terrFileName )
    return true;
 }
 
-void TerrainBlock::setFile( Resource<TerrainFile> terr )
+void TerrainBlock::setFile(const Resource<TerrainFile>& terr)
 {
    mFile = terr;
    mTerrFileName = terr.getPath();

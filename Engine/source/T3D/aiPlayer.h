@@ -164,7 +164,7 @@ public:
 
    // Targeting and aiming sets/gets
    void setAimObject( GameBase *targetObject );
-   void setAimObject( GameBase *targetObject, Point3F offset );
+   void setAimObject(GameBase *targetObject, const Point3F& offset);
    GameBase* getAimObject() const  { return mAimObject; }
    void setAimLocation( const Point3F &location );
    Point3F getAimLocation() const { return mAimLocation; }

@@ -1306,8 +1306,10 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
    // Compose our search string - Format : ([path]/[subpath]/*)
    //-----------------------------------------------------------------------------
 
-   char trail = basePath[ dStrlen(basePath) - 1 ];
-   char subTrail = subPath ? subPath[ dStrlen(subPath) - 1 ] : '\0';
+   dsize_t trLen = basePath ? dStrlen(basePath) : 0;
+   dsize_t subtrLen = subPath ? dStrlen(subPath) : 0;
+   char trail = trLen > 0 ? basePath[ trLen - 1 ] : '\0';
+   char subTrail = subtrLen > 0 ? subPath[ subtrLen - 1 ] : '\0';
 
    if( trail == '/' )
    {
@@ -1409,9 +1411,9 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
          if( ( subPath  && ( dStrncmp( subPath, "", 1 ) != 0 ) ))
          {
             if( subTrail == '/' )
-               dSprintf(search, search.size, "%s%s", subPath, fileName);
+               dSprintf(search, search.size, "%s%s", subPath, fileName.ptr);
             else
-               dSprintf(search, search.size, "%s/%s", subPath, fileName);
+               dSprintf(search, search.size, "%s/%s", subPath, fileName.ptr);
             char* child = search;
 
             if( currentDepth < recurseDepth || recurseDepth == -1 )
@@ -1425,7 +1427,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
                child = fileName;
             else
             {
-               dSprintf(search, search.size, "/%s", fileName);
+               dSprintf(search, search.size, "/%s", fileName.ptr);
                child = search;
             }
 

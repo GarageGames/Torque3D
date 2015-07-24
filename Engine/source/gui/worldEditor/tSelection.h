@@ -66,7 +66,7 @@ template<class T> inline void Selection<T>::offset( const Point3F &delta )
 {
    typename Selection<T>::iterator itr = this->begin();
 
-   for ( ; itr != this->end(); itr++ )   
+   for (; itr != this->end(); ++itr)
       offsetObject( *itr, delta );      
 }
 
@@ -75,7 +75,7 @@ template<class T> inline void Selection<T>::rotate( const EulerF &delta )
    typename Selection<T>::iterator itr = this->begin();
    Point3F origin = getOrigin();
 
-   for ( ; itr != this->end(); itr++ )   
+   for (; itr != this->end(); ++itr)
       rotateObject( *itr, delta, origin );
 }
 

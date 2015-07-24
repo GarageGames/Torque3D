@@ -118,7 +118,7 @@ public:
    /// @}
 
    /// Return the index of the tile included by this point.
-   S32 getTile(Point3F pos);
+   S32 getTile(const Point3F& pos);
 
    /// Return the box of a given tile.
    Box3F getTileBox(U32 id);

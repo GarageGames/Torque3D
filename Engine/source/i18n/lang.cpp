@@ -250,18 +250,16 @@ S32 LangTable::addLanguage(LangFile *lang, const UTF8 *name /* = NULL */)
 S32 LangTable::addLanguage(const UTF8 *filename, const UTF8 *name /* = NULL */)
 {
 	LangFile * lang = new LangFile(name);
-	if(lang != NULL)
+
+   if(Torque::FS::IsFile(filename))
 	{
-      if(Torque::FS::IsFile(filename))
-		{
-			lang->setLangFile(filename);
+		lang->setLangFile(filename);
 			
-      	S32 ret = addLanguage(lang);
-			if(ret >= 0)
-				return ret;
-		}
-		delete lang;
+      S32 ret = addLanguage(lang);
+		if(ret >= 0)
+			return ret;
 	}
+	delete lang;
 
 	return -1;
 }

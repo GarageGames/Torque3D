@@ -241,6 +241,7 @@ GameConnection::GameConnection()
 
 GameConnection::~GameConnection()
 {
+   setDisplayDevice(NULL);
    delete mAuthInfo;
    for(U32 i = 0; i < mConnectArgc; i++)
       dFree(mConnectArgv[i]);
@@ -678,6 +679,30 @@ bool GameConnection::getControlCameraTransform(F32 dt, MatrixF* mat)
    }
    return true;
 }
+
+bool GameConnection::getControlCameraEyeTransforms(IDisplayDevice *display, MatrixF *transforms)
+{
+   GameBase* obj = getCameraObject();
+   if(!obj)
+      return false;
+
+   GameBase* cObj = obj;
+   while((cObj = cObj->getControlObject()) != 0)
+   {
+      if(cObj->useObjsEyePoint())
+         obj = cObj;
+   }
+
+   // Perform operation on left & right eyes. For each we need to calculate the world space 
+   // of the rotated eye offset and add that onto the camera world space.
+   for (U32 i=0; i<2; i++)
+   {
+      obj->getEyeCameraTransform(display, i, &transforms[i]);
+   }
+
+   return true;
+}
+
 
 bool GameConnection::getControlCameraDefaultFov(F32 * fov)
 {

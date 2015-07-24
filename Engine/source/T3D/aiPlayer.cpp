@@ -268,7 +268,7 @@ void AIPlayer::setAimObject( GameBase *targetObject )
  * @param targetObject The object to target
  * @param offset       The offest from the target location to aim at
  */
-void AIPlayer::setAimObject( GameBase *targetObject, Point3F offset )
+void AIPlayer::setAimObject(GameBase *targetObject, const Point3F& offset)
 {
    mAimObject = targetObject;
    mTargetInLOS = false;
@@ -734,24 +734,20 @@ bool AIPlayer::setPathDestination(const Point3F &pos)
 
    // Create a new path.
    NavPath *path = new NavPath();
-   if(path)
+
+   path->mMesh = getNavMesh();
+   path->mFrom = getPosition();
+   path->mTo = pos;
+   path->mFromSet = path->mToSet = true;
+   path->mAlwaysRender = true;
+   path->mLinkTypes = mLinkTypes;
+   path->mXray = true;
+   // Paths plan automatically upon being registered.
+   if(!path->registerObject())
    {
-      path->mMesh = getNavMesh();
-      path->mFrom = getPosition();
-      path->mTo = pos;
-      path->mFromSet = path->mToSet = true;
-      path->mAlwaysRender = true;
-      path->mLinkTypes = mLinkTypes;
-      path->mXray = true;
-      // Paths plan automatically upon being registered.
-      if(!path->registerObject())
-      {
-         delete path;
-         return false;
-      }
-   }
-   else
+      delete path;
       return false;
+   }
 
    if(path->success())
    {

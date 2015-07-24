@@ -77,7 +77,7 @@ void ForestData::clear()
    // clean up its sub-cells in its destructor.   
 
    BucketTable::Iterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ ) delete iter->value;
+   for (; iter != mBuckets.end(); ++iter) delete iter->value;
    mBuckets.clear();
 
    mIsDirty = true;
@@ -408,7 +408,7 @@ const ForestItem& ForestData::findItem( ForestItemKey key ) const
 
    Vector<const ForestCell*> stack;
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
       stack.push_back( iter->value );
 
    // Now loop till we run out of cells.
@@ -444,7 +444,7 @@ U32 ForestData::getItems( Vector<ForestItem> *outItems ) const
    U32 count = 0;
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
       stack.push_back( iter->value );
 
    // Now loop till we run out of cells.
@@ -520,7 +520,7 @@ U32 ForestData::getItems( const Box3F &box, Vector<ForestItem> *outItems ) const
    U32 count = 0;
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
       stack.push_back( iter->value );
 
    // Now loop till we run out of cells.
@@ -571,7 +571,7 @@ U32 ForestData::getItems( const Point3F &point, F32 radius, Vector<ForestItem> *
    U32 count = 0;
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
          stack.push_back( iter->value );
 
    const F32 radiusSq = radius * radius;
@@ -629,7 +629,7 @@ U32 ForestData::getItems( const Point2F &point, F32 radius, Vector<ForestItem> *
    U32 count = 0;
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
          stack.push_back( iter->value );
 
    const F32 radiusSq = radius * radius;
@@ -686,7 +686,7 @@ U32 ForestData::getItems( const ForestItemData *data, Vector<ForestItem> *outIte
    U32 count = 0;
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
       stack.push_back( iter->value );
 
    // Now loop till we run out of cells.
@@ -724,7 +724,7 @@ void ForestData::getCells( const Frustum &frustum, Vector<ForestCell*> *outCells
    PROFILE_SCOPE( ForestData_getCells_frustum );
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
    {
       if ( !frustum.isCulled( iter->value->getBounds() ) )
          outCells->push_back( iter->value );
@@ -736,7 +736,7 @@ void ForestData::getCells( Vector<ForestCell*> *outCells ) const
    PROFILE_SCOPE( ForestData_getCells_nofrustum );
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )         
+   for (; iter != mBuckets.end(); ++iter)
       outCells->push_back( iter->value );
 }
 
@@ -746,7 +746,7 @@ U32 ForestData::getDatablocks( Vector<ForestItemData*> *outVector ) const
    U32 count = 0;
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
       stack.push_back( iter->value );
 
    // Now loop till we run out of cells.
@@ -786,7 +786,7 @@ void ForestData::clearPhysicsRep( Forest *forest )
    Vector<ForestCell*> stack;
 
    BucketTable::Iterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
       stack.push_back( iter->value );
 
    // Now loop till we run out of cells.
@@ -812,7 +812,7 @@ void ForestData::buildPhysicsRep( Forest *forest )
    Vector<ForestCell*> stack;
 
    BucketTable::Iterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
       stack.push_back( iter->value );
 
    // Now loop till we run out of cells.

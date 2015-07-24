@@ -76,7 +76,7 @@ Point3F BoxConvex::getVertex(S32 v)
    return p;
 }
 
-inline bool isOnPlane(Point3F p,PlaneF& plane)
+inline bool isOnPlane(const Point3F& p,PlaneF& plane)
 {
    F32 dist = mDot(plane,p) + plane.d;
    return dist < 0.1 && dist > -0.1;

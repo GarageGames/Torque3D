@@ -100,7 +100,7 @@ class GuiMeshRoadEditorCtrl : public EditTSCtrl
       void setNodeDepth( F32 depth );
 		
 		Point3F getNodePosition();
-		void setNodePosition( Point3F pos );
+      void setNodePosition(const Point3F& pos);
 
       VectorF getNodeNormal();
       void setNodeNormal( const VectorF &normal );
