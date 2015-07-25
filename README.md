@@ -50,9 +50,7 @@ Once we have created our own project based on a template, we may then compile an
 executable and begin work on our game.  
 The following templates are included in this version of Torque 3D:
 
-* Empty
-* Full
-* TheFunBase : contains any Greed specific changes, bullet activated for physics.
+* GreedBaseGame : contains any Greed specific changes, bullet activated for physics.
 
 ### Using Greed ###
 As of 0.6, bullet is mapped and can be used like stock physics, there is also
