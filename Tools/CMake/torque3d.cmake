@@ -491,8 +491,8 @@ message(STATUS "writing ${projectSrcDir}/torqueConfig.h")
 CONFIGURE_FILE("${cmakeDir}/torqueConfig.h.in" "${projectSrcDir}/torqueConfig.h")
 
 # configure the relevant files only once
-if(NOT EXISTS "${projectSrcDir}/torque.ico")
-    CONFIGURE_FILE("${cmakeDir}/torque.ico" "${projectSrcDir}/torque.ico" COPYONLY)
+if(NOT EXISTS "${projectSrcDir}/greed.ico")
+    CONFIGURE_FILE("${cmakeDir}/greed.ico" "${projectSrcDir}/greed.ico" COPYONLY)
 endif()
 if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}.torsion")
     CONFIGURE_FILE("${cmakeDir}/template.torsion.in" "${projectOutDir}/${PROJECT_NAME}.torsion")
