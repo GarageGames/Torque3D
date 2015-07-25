@@ -148,13 +148,7 @@ const GFXVideoMode & Win32Window::getVideoMode()
 
 void Win32Window::setVideoMode(const GFXVideoMode &mode)
 {
-<<<<<<< HEAD
 	bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
-	// 1037 patch
-	// static bool first_load = true;
-=======
-   bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
->>>>>>> 8245f0a828b3ebffe7ee254ef5d77bdebb667ff0
 
 	if (needCurtain)
 	{
