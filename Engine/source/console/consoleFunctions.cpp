@@ -1591,7 +1591,12 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( displaySplashWindow, bool, (const char* path), ("art/gui/splash.bmp"),
+// GreedWork >> 
+// data folder implemented.
+// this change splash file name and do the first pass at implementing data/ folder.
+// NOTE : this could fucking use fucking SDL methods ?!
+DefineEngineFunction(displaySplashWindow, bool, (const char* path), ("data/textures/loading.bmp"),
+// GreedWork <<
    "Display a startup splash window suitable for showing while the engine still starts up.\n\n"
    "@note This is currently only implemented on Windows.\n\n"
    "@return True if the splash window could be successfully initialized.\n\n"
