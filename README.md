@@ -20,7 +20,20 @@ http://www.garagegames.com/community/resources/view/22590
 ----------------
 ###### .08a base code is frozen appart for fixes, integration of .07a goals are partly done (base island is there)
 ----------------
-
+----------------
+###### .09a 
+ - will go in separate stages (a to e)
+ - a is being done, integration of last dev-head changes to grab fixes.
+ - b is removing old templates and finishing to fix GreedBase and GreedBaseGame
+ - c is re-adding base gmk scripts, test its core functionalities
+ - d is the 'tech' part : reintroduce sunbokeh, shaders etc
+ - e is the release candidate for 1.0
+----------------
+----------------
+###### 1.00
+- is the first stable release of greed with base work a base template and a system
+ready game.
+----------------
 This is a fork of the MIT Licensed Torque 3D (see http://www.garagegames.com/products/torque-3d).
 
 More Information
