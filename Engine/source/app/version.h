@@ -34,7 +34,7 @@
 /// TGE WII   0005
 /// Torque 3D 0006
 /// Torque 3D MIT 0007
-#define TORQUE_ENGINE_PRODUCT      0007
+#define TORQUE_ENGINE_PRODUCT      0010
 
 /// This is our global version number for the engine source code that
 /// we are using. See <game>/source/torqueConfig.h for the game's source

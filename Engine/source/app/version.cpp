@@ -77,7 +77,11 @@ const char* getEngineProductString()
          return "Torque 3D";
       case 0007:
 	     return "Torque 3D MIT";
-		 
+	  case 0010:
+		 return "Greed Tech MIT";
+	  case 0011:
+		 return "[Pre-Alpha]";
+
       default:
          return "Torque Engine";
    };
@@ -140,3 +144,21 @@ DefineConsoleFunction( getBuildString, const char*, (), , "Get the type of build
 }
 
 ConsoleFunctionGroupEnd( CompileInformation );
+
+DefineConsoleFunction( isDemo, bool, (), , "")
+{
+#ifdef TORQUE_DEMO
+   return true;
+#else
+   return false;
+#endif
+}
+
+DefineConsoleFunction( isWebDemo, bool, (), , "")
+{
+#ifdef TORQUE_DEMO
+   return Platform::getWebDeployment();
+#else
+   return false;
+#endif
+}
