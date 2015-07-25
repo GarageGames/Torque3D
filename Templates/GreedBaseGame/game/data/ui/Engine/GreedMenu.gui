@@ -4,7 +4,7 @@
    useVariable = "0";
    tile = "0";
    position = "0 0";
-   extent = "1280 720";
+   extent = "1024 768";
    minExtent = "8 8";
    horizSizing = "width";
    vertSizing = "height";
@@ -22,7 +22,7 @@
    new GuiBitmapCtrl(MainMenuAppLogo) {
       bitmap = "data/textures/Engine/ui/tfzlogo";
       wrap = "0";
-      position = "365 30";
+      position = "237 0";
       extent = "550 162";
       minExtent = "8 2";
       horizSizing = "center";
@@ -36,11 +36,10 @@
       canSave = "1";
       canSaveDynamicFields = "1";
       Enabled = "1";
-         isDecoy = "0";
    };
    new GuiControl() {
-      position = "487 210";
-      extent = "306 427";
+      position = "359 214";
+      extent = "306 471";
       minExtent = "8 2";
       horizSizing = "center";
       vertSizing = "top";

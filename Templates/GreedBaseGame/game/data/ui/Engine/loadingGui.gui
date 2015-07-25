@@ -4,7 +4,7 @@
    useVariable = "0";
    tile = "0";
    position = "0 0";
-   extent = "1280 720";
+   extent = "1024 768";
    minExtent = "8 8";
    horizSizing = "width";
    vertSizing = "height";
@@ -16,11 +16,11 @@
    isContainer = "1";
    canSave = "1";
    canSaveDynamicFields = "1";
-      enabled = "1";
+   Enabled = "1";
       qLineCount = "0";
 
    new GuiControl() {
-      position = "391 277";
+      position = "263 301";
       extent = "497 166";
       minExtent = "8 8";
       horizSizing = "center";
@@ -33,15 +33,16 @@
       isContainer = "1";
       canSave = "1";
       canSaveDynamicFields = "0";
+      Enabled = "1";
 
       new GuiBitmapCtrl(LoadingLogo) {
-         bitmap = "data/textures/Game/ui/Torque-3D-logo_alt.png";
+         bitmap = "data/textures/Engine/ui/tfzlogo";
          wrap = "0";
-         position = "27 6";
-         extent = "443 139";
+         position = "-30 -20";
+         extent = "550 162";
          minExtent = "8 2";
-         horizSizing = "center";
-         vertSizing = "bottom";
+         horizSizing = "left";
+         vertSizing = "top";
          profile = "GuiDefaultProfile";
          visible = "1";
          active = "1";
@@ -50,6 +51,7 @@
          isContainer = "0";
          canSave = "1";
          canSaveDynamicFields = "0";
+         Enabled = "1";
       };
       new GuiProgressBitmapCtrl(LoadingProgress) {
          maxLength = "1024";
@@ -72,6 +74,7 @@
          isContainer = "0";
          canSave = "1";
          canSaveDynamicFields = "0";
+         Enabled = "1";
       };
       new GuiTextCtrl(LoadingProgressTxt) {
          text = "WAITING FOR SERVER";
@@ -95,6 +98,7 @@
          isContainer = "0";
          canSave = "1";
          canSaveDynamicFields = "0";
+         Enabled = "1";
       };
    };
 };
