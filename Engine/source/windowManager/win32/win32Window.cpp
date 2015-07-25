@@ -218,20 +218,14 @@ void Win32Window::setVideoMode(const GFXVideoMode &mode)
 	}
 	else
 	{
-<<<<<<< HEAD
-		// #1037
-		// if (!first_load)
 		DISPLAY_DEVICE dd = GetPrimaryDevice();
-
 		DEVMODE dv;
 		ZeroMemory(&dv, sizeof(dv));
 		dv.dmSize = sizeof(DEVMODE);
 		EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv);
-		
+
 		if ((mode.resolution.x != dv.dmPelsWidth) || (mode.resolution.y != dv.dmPelsHeight))
 			ChangeDisplaySettings(NULL, 0);
-		// #1037
-		// first_load = false;
 
 		// Reset device *first*, so that when we call setSize() and let it
 		// access the monitor settings, it won't end up with our fullscreen
@@ -285,69 +279,6 @@ void Win32Window::setVideoMode(const GFXVideoMode &mode)
 		}
 
 		mFullscreen = false;
-=======
-	   DISPLAY_DEVICE dd = GetPrimaryDevice();
-	   DEVMODE dv;
-	   ZeroMemory(&dv, sizeof(dv));
-	   dv.dmSize = sizeof(DEVMODE);
-           EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv);
-
-	   if ((mode.resolution.x != dv.dmPelsWidth) || (mode.resolution.y != dv.dmPelsHeight))
-	       ChangeDisplaySettings(NULL, 0);
-
-           // Reset device *first*, so that when we call setSize() and let it
-	   // access the monitor settings, it won't end up with our fullscreen
-	   // geometry that is just about to change.
-
-	   if(mTarget.isValid())
-		   mTarget->resetMode();
-
-      if (!mOffscreenRender)
-      {
-		   SetWindowLong( getHWND(), GWL_STYLE, mWindowedWindowStyle);
-		   SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-         // Put back the menu bar, if any
-         if(mMenuHandle)
-         {
-            SetMenu(getHWND(), mMenuHandle);
-         }
-      }
-
-      // Make sure we're the correct resolution for web deployment
-      if (!Platform::getWebDeployment() || !mOwningManager->getParentWindow() || mOffscreenRender)
-      {
-         setSize(mode.resolution);
-      }
-      else
-      {
-         HWND parentWin = (HWND)mOwningManager->getParentWindow();
-         RECT windowRect;
-         GetClientRect(parentWin, &windowRect);
-         Point2I res(windowRect.right-windowRect.left, windowRect.bottom-windowRect.top);
-         if (res.x == 0 || res.y == 0)
-         {
-            // Must be too early in the window set up to obtain the parent's size.
-            setSize(mode.resolution);
-         }
-         else
-         {
-            setSize(res);
-         }
-      }
-
-      if (!mOffscreenRender)
-      {
-		   // We have to force Win32 to update the window frame and make the window
-		   // visible and no longer topmost - this code might be possible to simplify.
-		   SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-
-         if(mDisplayWindow)
-            ShowWindow( getHWND(), SW_SHOWNORMAL);
-      }
-
-      mFullscreen = false;
->>>>>>> 8245f0a828b3ebffe7ee254ef5d77bdebb667ff0
 	}
 
 	mSuppressReset = false;
