@@ -87,7 +87,7 @@ function onStart()
    // The core does initialization which requires some of
    // the preferences to loaded... so do that first.  
    exec( "data/scripts/client/defaults.cs" );
-   exec( "data/scripts./server/defaults.cs" );
+   exec( "data/scripts/server/defaults.cs" );
              
    Parent::onStart();
    echo("\n--------- Initializing Directory: scripts ---------");
