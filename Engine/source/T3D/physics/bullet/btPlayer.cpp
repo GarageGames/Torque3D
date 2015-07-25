@@ -359,7 +359,19 @@ void BtPlayer::_stepForward( btVector3 *inOutCurrPos, const btVector3 &displacem
 		callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
 		callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
 
-		mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
+		/* 
+		deactivated in favor of a finer sweep test (we have to get back on that 
+		later tho : see the else case, filtering needed ? stepping ? have to check)
+		of course, colision mesh work less than great, use visible colision mesh
+		for stairs/interiors
+		 mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
+		*/
+		if (disp.length() > 0.0001) {
+			mGhostObject->convexSweepTest(mColShape, start, end, callback, 0.0f);
+		}
+		else {
+			// for now nothing, but can be used to implement climbing stairs (filter bad values also?)
+		}
 
       // Subtract from the travel fraction.
       fraction -= callback.m_closestHitFraction;
