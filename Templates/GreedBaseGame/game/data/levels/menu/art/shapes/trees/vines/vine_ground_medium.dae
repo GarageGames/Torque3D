@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.65.0 r52859</authoring_tool>
+    </contributor>
+    <created>2013-01-19T17:44:56</created>
+    <modified>2013-01-19T17:44:56</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_images/>
+  <library_effects>
+    <effect id="ColorEffectR225G87B143-material-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.7036979 0.2735316 0.4466724 1</color>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.5 0.5 0.5 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">50</float>
+            </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+        <extra>
+          <technique profile="GOOGLEEARTH">
+            <double_sided>1</double_sided>
+          </technique>
+        </extra>
+      </profile_COMMON>
+      <extra><technique profile="MAX3D"><double_sided>1</double_sided></technique></extra>
+    </effect>
+    <effect id="vine_leaves-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.64 0.64 0.64 1</color>
+            </diffuse>
+            <transparency>
+              <float sid="transparency">0</float>
+            </transparency>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+        <extra>
+          <technique profile="GOOGLEEARTH">
+            <double_sided>1</double_sided>
+          </technique>
+        </extra>
+      </profile_COMMON>
+      <extra><technique profile="MAX3D"><double_sided>1</double_sided></technique></extra>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="ColorEffectR225G87B143-material-material" name="ColorEffectR225G87B143-material">
+      <instance_effect url="#ColorEffectR225G87B143-material-effect"/>
+    </material>
+    <material id="vine_leaves-material" name="vine_leaves">
+      <instance_effect url="#vine_leaves-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="Untitled-mesh" name="Untitled">
+      <mesh>
+        <source id="Untitled-mesh-positions">
+          <float_array id="Untitled-mesh-positions-array" count="24">-3.092402 -3.779648 -8.011638 -3.092402 3.779648 -8.011638 3.092402 3.779648 -8.011638 3.092402 -3.779648 -8.011638 -3.092402 -3.779648 8.011638 -3.092402 3.779648 8.011638 3.092402 3.779648 8.011638 3.092402 -3.779648 8.011638</float_array>
+          <technique_common>
+            <accessor source="#Untitled-mesh-positions-array" count="8" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Untitled-mesh-normals">
+          <float_array id="Untitled-mesh-normals-array" count="18">-1 0 0 0 1 0 1 0 0 0 -1 0 0 0 -1 0 0 1</float_array>
+          <technique_common>
+            <accessor source="#Untitled-mesh-normals-array" count="6" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Untitled-mesh-vertices">
+          <input semantic="POSITION" source="#Untitled-mesh-positions"/>
+        </vertices>
+        <polylist material="ColorEffectR225G87B143-material-material" count="6">
+          <input semantic="VERTEX" source="#Untitled-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Untitled-mesh-normals" offset="1"/>
+          <vcount>4 4 4 4 4 4 </vcount>
+          <p>1 0 0 0 4 0 5 0 5 1 6 1 2 1 1 1 6 2 7 2 3 2 2 2 0 3 3 3 7 3 4 3 0 4 1 4 2 4 3 4 7 5 6 5 5 5 4 5</p>
+        </polylist>
+      </mesh>
+      <extra><technique profile="MAYA"><double_sided>1</double_sided></technique></extra>
+    </geometry>
+    <geometry id="tree_oak_bush_a200_001-mesh" name="tree_oak_bush_a200.001">
+      <mesh>
+        <source id="tree_oak_bush_a200_001-mesh-positions">
+          <float_array id="tree_oak_bush_a200_001-mesh-positions-array" count="36">0.1372733 -3.565385 -0.007500708 -0.1322584 -3.565385 0.1087313 -5.77316e-4 -4.016585 0.08782219 -0.1868423 -2.824214 0.05120837 0.02372199 -2.791321 0.1256221 0.2099871 -3.983692 0.01340842 -0.05990433 -2.361969 0.05061531 -0.3294361 -2.361969 0.05061531 0.1372733 0.04452395 0.1087313 0.3795202 -1.158722 0.05061531 -0.1322581 0.04452395 -0.007500708 0.1099884 -1.158722 0.05061531</float_array>
+          <technique_common>
+            <accessor source="#tree_oak_bush_a200_001-mesh-positions-array" count="12" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="tree_oak_bush_a200_001-mesh-normals">
+          <float_array id="tree_oak_bush_a200_001-mesh-normals-array" count="36">0.2668538 -0.03494364 0.9630726 0.3379315 -0.03567612 0.9404584 -0.2577899 -0.02465891 0.9658803 -0.3299661 -0.02255314 0.9436933 0.02621537 0.02130192 0.9994202 0 0.02584916 0.9996643 0.3479415 0.0242927 0.9371929 0.3958861 0.0205084 0.9180578 -0.3489486 -0.03729361 0.9363689 -0.3957335 -0.03534042 0.9176611 -0.02581864 -0.02252262 0.9993897 0 -0.02551347 0.9996643</float_array>
+          <technique_common>
+            <accessor source="#tree_oak_bush_a200_001-mesh-normals-array" count="12" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="tree_oak_bush_a200_001-mesh-map-0">
+          <float_array id="tree_oak_bush_a200_001-mesh-map-0-array" count="48">0.6237659 0.9999999 0.4471729 1 0.4471729 0 0.6237658 0 0.6237659 0.9999999 0.4471729 0 0.847104 1 0.6237659 0.9999999 0.6237658 0 0.8471041 0 0.847104 1 0.6237658 0 0.847104 1 0.6237659 0.9999999 0.6237658 0 0.8471041 0 0.847104 1 0.6237658 0 0.847104 1 0.6237659 0.9999999 0.6237658 0 0.8471041 0 0.847104 1 0.6237658 0</float_array>
+          <technique_common>
+            <accessor source="#tree_oak_bush_a200_001-mesh-map-0-array" count="24" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="tree_oak_bush_a200_001-mesh-colors">
+          <float_array id="tree_oak_bush_a200_001-mesh-colors-array" count="72">0.1098039 0.1921569 1 0.1137255 0.3568627 1 0 1 0.7647059 0 0.7647059 0.8 0.1098039 0.1921569 1 0 1 0.7647059 0 0.2313725 0.8627451 0 0.5647059 0.9843137 0 0.4470588 1 0 0.5058824 1 0 0.2313725 0.8627451 0 0.4470588 1 0 0 0.6078432 0 0 0.2392157 0 0.4431372 1 0 0.5647059 1 0 0 0.6078432 0 0.4431372 1 0 0.5647059 1 0 0.4431372 1 0 0.5647059 0.9921569 0 0.2313725 0.8666667 0 0.5647059 1 0 0.5647059 0.9921569</float_array>
+          <technique_common>
+            <accessor source="#tree_oak_bush_a200_001-mesh-colors-array" count="24" stride="3">
+              <param name="R" type="float"/>
+              <param name="G" type="float"/>
+              <param name="B" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="tree_oak_bush_a200_001-mesh-vertices">
+          <input semantic="POSITION" source="#tree_oak_bush_a200_001-mesh-positions"/>
+        </vertices>
+        <polylist material="vine_leaves-material" count="8">
+          <input semantic="VERTEX" source="#tree_oak_bush_a200_001-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#tree_oak_bush_a200_001-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#tree_oak_bush_a200_001-mesh-map-0" offset="2" set="0"/>
+          <input semantic="COLOR" source="#tree_oak_bush_a200_001-mesh-colors" offset="3"/>
+          <vcount>3 3 3 3 3 3 3 3 </vcount>
+          <p>2 0 0 0 5 1 1 1 4 2 2 2 3 3 3 3 2 0 4 4 4 2 5 5 6 4 6 6 7 5 7 7 1 6 8 8 0 7 9 9 6 4 10 10 1 6 11 11 8 8 12 12 10 9 13 13 11 10 14 14 9 11 15 15 8 8 16 16 11 10 17 17 9 11 18 18 11 10 19 19 7 5 20 20 6 4 21 21 9 11 22 22 7 5 23 23</p>
+        </polylist>
+      </mesh>
+      <extra><technique profile="MAYA"><double_sided>1</double_sided></technique></extra>
+    </geometry>
+    <geometry id="tree_oak_bush_a200-mesh" name="tree_oak_bush_a200">
+      <mesh>
+        <source id="tree_oak_bush_a200-mesh-positions">
+          <float_array id="tree_oak_bush_a200-mesh-positions-array" count="96">-0.1477502 -1.935192 0.1166249 0.206952 -1.935192 0.03553783 -0.1477502 -2.190497 0.03553783 0.2066216 -2.189597 0.1166249 0.03820079 -2.645723 0.1239513 -0.2521594 -2.947524 0.02821147 -0.1790267 -2.43673 0.02821147 -0.4683503 -2.738986 0.1239513 0.1372733 -3.565385 -0.007500648 -0.1322584 -3.565385 0.1087313 -5.77316e-4 -4.016585 0.08782219 -0.1868423 -2.824214 0.05120831 0.02372199 -2.791321 0.1256221 0.2099871 -3.983692 0.01340842 -0.05990433 -2.361969 0.05061531 -0.3294361 -2.361969 0.05061531 0.1372733 0.04452395 0.1087313 0.3795202 -1.158722 0.05061531 -0.1322581 0.04452395 -0.007500648 0.1099884 -1.158722 0.05061531 0.3166997 -1.440175 0.1345529 -0.1293961 -1.189813 0.01760983 0.4969033 -1.119088 0.01760983 0.05058842 -0.8700907 0.1345529 -0.1511507 -0.7479832 0.1417345 -0.1365535 -0.1737904 0.0104283 0.2621371 -0.7584898 0.0104283 0.275264 -0.1847954 0.1417345 -0.04669481 -1.97521 0.1185913 -0.192213 -1.519096 -0.009339392 0.2816032 -1.87047 -0.009339392 0.1350637 -1.41515 0.1185913</float_array>
+          <technique_common>
+            <accessor source="#tree_oak_bush_a200-mesh-positions-array" count="32" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="tree_oak_bush_a200-mesh-normals">
+          <float_array id="tree_oak_bush_a200-mesh-normals-array" count="96">0.212836 0.2964568 0.9309977 -0.04483169 -0.06244087 0.9970092 0.04510635 0.06280708 0.9969787 -0.2123478 -0.2957854 0.9313334 0.06607258 -0.3588977 0.9309977 -0.01391643 0.0755943 0.9970092 0.01397746 -0.07605212 0.9969787 -0.06591993 0.3581042 0.9313334 0.2668538 -0.03494364 0.9630726 0.3379315 -0.03567612 0.9404584 -0.2577899 -0.02465891 0.9658803 -0.3299661 -0.02255314 0.9436933 0.02621537 0.02130192 0.9994202 0 0.02584916 0.9996643 0.3479415 0.0242927 0.9371929 0.3958861 0.0205084 0.9180578 -0.3489486 -0.03729361 0.9363689 -0.3957335 -0.03534042 0.9176611 -0.02581864 -0.02252262 0.9993897 0 -0.02551347 0.9996643 -0.3306986 -0.1543626 0.9309977 0.06964319 0.03250217 0.9970092 -0.0700705 -0.03271579 0.9969787 0.3299356 0.1539964 0.9313334 -0.2909635 0.2202826 0.9309977 0.06128114 -0.04638808 0.9970092 -0.06164735 0.04666274 0.9969787 0.290292 -0.2197943 0.9313334 -0.3961913 0.1285744 0.9090853 0.08407849 -0.02728354 0.9960631 -0.08456677 0.02743613 0.9960326 0.3953368 -0.1282998 0.9095126</float_array>
+          <technique_common>
+            <accessor source="#tree_oak_bush_a200-mesh-normals-array" count="32" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="tree_oak_bush_a200-mesh-map-0">
+          <float_array id="tree_oak_bush_a200-mesh-map-0-array" count="108">0.2939118 0.9999999 0 0.9999999 0.2936381 0.789196 0 0.9999999 0 0.7884501 0.2936381 0.789196 0.2939118 0.9999999 0 0.9999999 0.2936381 0.789196 0 0.9999999 0 0.7884501 0.2936381 0.789196 0.6237659 0.9999999 0.4471729 1 0.4471729 0 0.6237658 0 0.6237659 0.9999999 0.4471729 0 0.847104 1 0.6237659 0.9999999 0.6237658 0 0.8471041 0 0.847104 1 0.6237658 0 0.847104 1 0.6237659 0.9999999 0.6237658 0 0.8471041 0 0.847104 1 0.6237658 0 0.847104 1 0.6237659 0.9999999 0.6237658 0 0.8471041 0 0.847104 1 0.6237658 0 0.2939118 0.9999999 0 0.9999999 0.2936381 0.789196 0 0.9999999 0 0.7884501 0.2936381 0.789196 0.2939118 0.9999999 0 0.9999999 0.2936381 0.789196 0 0.9999999 0 0.7884501 0.2936381 0.789196 0.2939118 0.9999999 0 0.9999999 0.2936381 0.789196 0 0.9999999 0 0.7884501 0.2936381 0.789196</float_array>
+          <technique_common>
+            <accessor source="#tree_oak_bush_a200-mesh-map-0-array" count="54" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="tree_oak_bush_a200-mesh-colors">
+          <float_array id="tree_oak_bush_a200-mesh-colors-array" count="162">0.08235293 0.2666667 1 0.07843136 0.7254902 1 0.1137255 0.3333333 1 0.07843136 0.7254902 1 0.05098038 0.5058824 1 0.1137255 0.3333333 1 0.08235293 0.8117647 1 0.07843136 0.9764706 1 0.1137255 0.9215686 1 0.07843136 0.9764706 1 0.05098038 0.6392157 1 0.1137255 0.9215686 1 0.1098039 0.1921569 1 0.1137255 0.3568627 1 0 1 0.7647059 0 0.7647059 0.8 0.1098039 0.1921569 1 0 1 0.7647059 0 0.2313725 0.8627451 0 0.5647059 0.9843137 0 0.4470588 1 0 0.5058824 1 0 0.2313725 0.8627451 0 0.4470588 1 0 0 0.6078432 0 0 0.2392157 0 0.4431372 1 0 0.5647059 1 0 0 0.6078432 0 0.4431372 1 0 0.5647059 1 0 0.4431372 1 0 0.5647059 0.9921569 0 0.2313725 0.8666667 0 0.5647059 1 0 0.5647059 0.9921569 0.08235293 0.5450981 1 0.07843136 0.7686275 1 0.1137255 0.5764706 1 0.07843136 0.7686275 1 0.05098038 0.7647059 1 0.1137255 0.5176471 1 0.08235293 0.3058823 1 0.07843136 0.8352941 1 0.1137255 0.3921568 1 0.07843136 0.8352941 1 0.05098038 0.4078431 1 0.1137255 0.3921568 1 0.08235293 0.6196079 1 0.07843136 0.6392157 1 0.1137255 0.7921569 1 0.07843136 0.6392157 1 0.05098038 0.2431373 1 0.1137255 0.7921569 1</float_array>
+          <technique_common>
+            <accessor source="#tree_oak_bush_a200-mesh-colors-array" count="54" stride="3">
+              <param name="R" type="float"/>
+              <param name="G" type="float"/>
+              <param name="B" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="tree_oak_bush_a200-mesh-vertices">
+          <input semantic="POSITION" source="#tree_oak_bush_a200-mesh-positions"/>
+        </vertices>
+        <polylist material="vine_leaves-material" count="18">
+          <input semantic="VERTEX" source="#tree_oak_bush_a200-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#tree_oak_bush_a200-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#tree_oak_bush_a200-mesh-map-0" offset="2" set="0"/>
+          <input semantic="COLOR" source="#tree_oak_bush_a200-mesh-colors" offset="3"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>1 0 0 0 0 1 1 1 3 2 2 2 0 1 3 3 2 3 4 4 3 2 5 5 5 4 6 6 4 5 7 7 7 6 8 8 4 5 9 9 6 7 10 10 7 6 11 11 10 8 12 12 13 9 13 13 12 10 14 14 11 11 15 15 10 8 16 16 12 10 17 17 14 12 18 18 15 13 19 19 9 14 20 20 8 15 21 21 14 12 22 22 9 14 23 23 16 16 24 24 18 17 25 25 19 18 26 26 17 19 27 27 16 16 28 28 19 18 29 29 17 19 30 30 19 18 31 31 15 13 32 32 14 12 33 33 17 19 34 34 15 13 35 35 21 20 36 36 20 21 37 37 23 22 38 38 20 21 39 39 22 23 40 40 23 22 41 41 25 24 42 42 24 25 43 43 27 26 44 44 24 25 45 45 26 27 46 46 27 26 47 47 29 28 48 48 28 29 49 49 31 30 50 50 28 29 51 51 30 31 52 52 31 30 53 53</p>
+        </polylist>
+      </mesh>
+      <extra><technique profile="MAYA"><double_sided>1</double_sided></technique></extra>
+    </geometry>
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="bounds" name="bounds" type="NODE">
+        <translate sid="location">0 0 0</translate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <node id="Untitled" name="Untitled" type="NODE">
+          <translate sid="location">0.03186018 -1.934146 0.06915808</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">0.1525729 0.5085949 0.0103843</scale>
+          <instance_geometry url="#Untitled-mesh">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="ColorEffectR225G87B143-material-material" target="#ColorEffectR225G87B143-material-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+        </node>
+      </node>
+      <node id="base00" name="base00" type="NODE">
+        <translate sid="location">0 0 0</translate>
+        <rotate sid="rotationZ">0 0 1 0</rotate>
+        <rotate sid="rotationY">0 1 0 0</rotate>
+        <rotate sid="rotationX">1 0 0 0</rotate>
+        <scale sid="scale">1 1 1</scale>
+        <node id="bb__autobillboard25" name="bb__autobillboard25" type="NODE">
+          <translate sid="location">0 0 0</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">1 1 1</scale>
+        </node>
+        <node id="detail150" name="detail150" type="NODE">
+          <translate sid="location">0 0 0</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">1 1 1</scale>
+        </node>
+        <node id="detail450" name="detail450" type="NODE">
+          <translate sid="location">0 0 0</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">1 1 1</scale>
+        </node>
+        <node id="start01" name="start01" type="NODE">
+          <translate sid="location">0 0 0</translate>
+          <rotate sid="rotationZ">0 0 1 0</rotate>
+          <rotate sid="rotationY">0 1 0 0</rotate>
+          <rotate sid="rotationX">1 0 0 0</rotate>
+          <scale sid="scale">1 1 1</scale>
+          <node id="tree_oak_bush_a90" name="tree_oak_bush_a90" type="NODE">
+            <translate sid="location">0 0 0</translate>
+            <rotate sid="rotationZ">0 0 1 0</rotate>
+            <rotate sid="rotationY">0 1 0 0</rotate>
+            <rotate sid="rotationX">1 0 0 0</rotate>
+            <scale sid="scale">1 1 1</scale>
+            <instance_geometry url="#tree_oak_bush_a200_001-mesh">
+              <bind_material>
+                <technique_common>
+                  <instance_material symbol="vine_leaves-material" target="#vine_leaves-material">
+                    <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+                  </instance_material>
+                </technique_common>
+              </bind_material>
+            </instance_geometry>
+          </node>
+          <node id="tree_oak_bush_a250" name="tree_oak_bush_a250" type="NODE">
+            <translate sid="location">0 0 0</translate>
+            <rotate sid="rotationZ">0 0 1 0</rotate>
+            <rotate sid="rotationY">0 1 0 0</rotate>
+            <rotate sid="rotationX">1 0 0 0</rotate>
+            <scale sid="scale">1 1 1</scale>
+            <instance_geometry url="#tree_oak_bush_a200-mesh">
+              <bind_material>
+                <technique_common>
+                  <instance_material symbol="vine_leaves-material" target="#vine_leaves-material">
+                    <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+                  </instance_material>
+                </technique_common>
+              </bind_material>
+            </instance_geometry>
+          </node>
+        </node>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>

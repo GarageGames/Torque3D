@@ -1,0 +1,601 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>dragutux</author>
+      <authoring_tool>OpenCOLLADA for 3ds Max;  ;  </authoring_tool>
+    </contributor>
+    <created>2015-06-30T17:45:49</created>
+    <modified>2015-06-30T17:45:49</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_effects>
+    <effect id="Stairs_Bas">
+      <profile_COMMON>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color>0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color>0.09803922 0.09803922 0.09803922 1</color>
+            </ambient>
+            <diffuse>
+              <color>0.2156863 0.2156863 0.2156863 1</color>
+            </diffuse>
+            <specular>
+              <color>0.04313726 0.04313726 0.04313726 1</color>
+            </specular>
+            <shininess>
+              <float>0.3</float>
+            </shininess>
+            <reflective>
+              <color>0 0 0 1</color>
+            </reflective>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
+            <transparency>
+              <float>1</float>
+            </transparency>
+          </phong>
+        </technique>
+      </profile_COMMON>
+      <extra>
+        <technique profile="OpenCOLLADA3dsMax">
+          <extended_shader>
+            <apply_reflection_dimming>0</apply_reflection_dimming>
+            <dim_level>0</dim_level>
+            <falloff_type>1</falloff_type>
+            <index_of_refraction>1.5</index_of_refraction>
+            <opacity_type>0</opacity_type>
+            <reflection_level>3</reflection_level>
+            <wire_size>1</wire_size>
+            <wire_units>0</wire_units>
+          </extended_shader>
+          <shader>
+            <ambient_diffuse_lock>1</ambient_diffuse_lock>
+            <ambient_diffuse_texture_lock>1</ambient_diffuse_texture_lock>
+            <diffuse_specular_lock>0</diffuse_specular_lock>
+            <soften>0.1</soften>
+            <use_self_illum_color>0</use_self_illum_color>
+          </shader>
+        </technique>
+      </extra>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="Stairs_Bas-material" name="Stairs_Bas">
+      <instance_effect url="#Stairs_Bas"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="geom-Cube5" name="Cube5">
+      <mesh>
+        <source id="geom-Cube5-positions">
+          <float_array id="geom-Cube5-positions-array" count="72">-3.279453 -1.527119 0.6818143 -3.279453 0.4020716 0.6818143 1.668158 0.4020716 0.6818143 1.668158 -1.527119 0.6818143 1.668158 -1.527119 0.6818143 1.668158 0.4020716 0.6818143 1.668158 0.4020716 1.01908 1.668158 -1.527119 1.01908 1.668158 -1.527119 1.01908 1.668158 0.4020716 1.01908 -3.279453 0.4020716 1.01908 -3.279453 -1.527119 1.01908 -3.279453 -1.527119 1.01908 -3.279453 0.4020716 1.01908 -3.279453 0.4020716 0.6818143 -3.279453 -1.527119 0.6818143 1.668158 0.4020716 0.6818143 -3.279453 0.4020716 0.6818143 -3.279453 0.4020716 1.01908 1.668158 0.4020716 1.01908 -3.279453 -1.527119 0.6818143 1.668158 -1.527119 0.6818143 1.668158 -1.527119 1.01908 -3.279453 -1.527119 1.01908</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube5-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube5-normals">
+          <float_array id="geom-Cube5-normals-array" count="72">0 0 -1 0 0 -1 0 0 -1 0 0 -1 1 0 0 1 0 0 1 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube5-normals-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube5-map1">
+          <float_array id="geom-Cube5-map1-array" count="72">0.3333333 0 0 0.6666667 0 0 0.6666667 0.25 0 0.3333333 0.25 0 0.3333333 0.25 0 0.6666667 0.25 0 0.6666667 0.5 0 0.3333333 0.5 0 0.3333333 0.5 0 0.6666667 0.5 0 0.6666667 0.75 0 0.3333333 0.75 0 0.3333333 0.75 0 0.6666667 0.75 0 0.6666667 1 0 0.3333333 1 0 0.6666667 0.25 0 1 0.25 0 1 0.5 0 0.6666667 0.5 0 0 0.25 0 0.3333333 0.25 0 0.3333333 0.5 0 0 0.5 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube5-map1-array" count="24" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Cube5-vertices">
+          <input semantic="POSITION" source="#geom-Cube5-positions"/>
+        </vertices>
+        <triangles material="Stairs_Bas_1" count="12">
+          <input semantic="VERTEX" source="#geom-Cube5-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Cube5-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Cube5-map1" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 2 2 2 2 3 3 3 0 0 0 4 4 4 5 5 5 6 6 6 6 6 6 7 7 7 4 4 4 8 8 8 9 9 9 10 10 10 10 10 10 11 11 11 8 8 8 12 12 12 13 13 13 14 14 14 14 14 14 15 15 15 12 12 12 16 16 16 17 17 17 18 18 18 18 18 18 19 19 19 16 16 16 20 20 20 21 21 21 22 22 22 22 22 22 23 23 23 20 20 20</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="geom-Cube4" name="Cube4">
+      <mesh>
+        <source id="geom-Cube4-positions">
+          <float_array id="geom-Cube4-positions-array" count="72">-3.275457 -1.527119 1.019133 -3.275457 0.4020716 1.019133 1.175347 0.4020716 1.019133 1.175347 -1.527119 1.019133 1.175347 -1.527119 1.019133 1.175347 0.4020716 1.019133 1.175347 0.4020716 1.356399 1.175347 -1.527119 1.356399 1.175347 -1.527119 1.356399 1.175347 0.4020716 1.356399 -3.275457 0.4020716 1.356399 -3.275457 -1.527119 1.356399 -3.275457 -1.527119 1.356399 -3.275457 0.4020716 1.356399 -3.275457 0.4020716 1.019133 -3.275457 -1.527119 1.019133 1.175347 0.4020716 1.019133 -3.275457 0.4020716 1.019133 -3.275457 0.4020716 1.356399 1.175347 0.4020716 1.356399 -3.275457 -1.527119 1.019133 1.175347 -1.527119 1.019133 1.175347 -1.527119 1.356399 -3.275457 -1.527119 1.356399</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube4-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube4-normals">
+          <float_array id="geom-Cube4-normals-array" count="72">0 0 -1 0 0 -1 0 0 -1 0 0 -1 1 0 0 1 0 0 1 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube4-normals-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube4-map1">
+          <float_array id="geom-Cube4-map1-array" count="72">0.3333333 0 0 0.6666667 0 0 0.6666667 0.25 0 0.3333333 0.25 0 0.3333333 0.25 0 0.6666667 0.25 0 0.6666667 0.5 0 0.3333333 0.5 0 0.3333333 0.5 0 0.6666667 0.5 0 0.6666667 0.75 0 0.3333333 0.75 0 0.3333333 0.75 0 0.6666667 0.75 0 0.6666667 1 0 0.3333333 1 0 0.6666667 0.25 0 1 0.25 0 1 0.5 0 0.6666667 0.5 0 0 0.25 0 0.3333333 0.25 0 0.3333333 0.5 0 0 0.5 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube4-map1-array" count="24" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Cube4-vertices">
+          <input semantic="POSITION" source="#geom-Cube4-positions"/>
+        </vertices>
+        <triangles material="Stairs_Bas" count="12">
+          <input semantic="VERTEX" source="#geom-Cube4-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Cube4-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Cube4-map1" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 2 2 2 2 3 3 3 0 0 0 4 4 4 5 5 5 6 6 6 6 6 6 7 7 7 4 4 4 8 8 8 9 9 9 10 10 10 10 10 10 11 11 11 8 8 8 12 12 12 13 13 13 14 14 14 14 14 14 15 15 15 12 12 12 16 16 16 17 17 17 18 18 18 18 18 18 19 19 19 16 16 16 20 20 20 21 21 21 22 22 22 22 22 22 23 23 23 20 20 20</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="geom-Stairs_Bas" name="Stairs_Bas">
+      <mesh>
+        <source id="geom-Stairs_Bas-positions">
+          <float_array id="geom-Stairs_Bas-positions-array" count="72">-3.269963 -1.530201 0.007135859 -3.269963 0.4051533 0.007135859 2.658221 0.4051533 0.007135859 2.658221 -1.530201 0.007135859 2.658221 -1.530201 0.007135859 2.658221 0.4051533 0.007135859 2.658221 0.4051533 0.3444018 2.658221 -1.530201 0.3444018 2.658221 -1.530201 0.3444018 2.658221 0.4051533 0.3444018 -3.269963 0.4051533 0.3444018 -3.269963 -1.530201 0.3444018 -3.269963 -1.530201 0.3444018 -3.269963 0.4051533 0.3444018 -3.269963 0.4051533 0.007135859 -3.269963 -1.530201 0.007135859 2.658221 0.4051533 0.007135859 -3.269963 0.4051533 0.007135859 -3.269963 0.4051533 0.3444018 2.658221 0.4051533 0.3444018 -3.269963 -1.530201 0.007135859 2.658221 -1.530201 0.007135859 2.658221 -1.530201 0.3444018 -3.269963 -1.530201 0.3444018</float_array>
+          <technique_common>
+            <accessor source="#geom-Stairs_Bas-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Stairs_Bas-normals">
+          <float_array id="geom-Stairs_Bas-normals-array" count="72">0 0 -1 0 0 -1 0 0 -1 0 0 -1 0.9999999 0 0 1 0 0 0.9999999 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 -0.9999999 0 0 -1 0 0 -0.9999999 0 0 -1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Stairs_Bas-normals-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Stairs_Bas-map1">
+          <float_array id="geom-Stairs_Bas-map1-array" count="72">0.3333333 0 0 0.6666667 0 0 0.6666667 0.25 0 0.3333333 0.25 0 0.3333333 0.25 0 0.6666667 0.25 0 0.6666667 0.5 0 0.3333333 0.5 0 0.3333333 0.5 0 0.6666667 0.5 0 0.6666667 0.75 0 0.3333333 0.75 0 0.3333333 0.75 0 0.6666667 0.75 0 0.6666667 1 0 0.3333333 1 0 0.6666667 0.25 0 1 0.25 0 1 0.5 0 0.6666667 0.5 0 0 0.25 0 0.3333333 0.25 0 0.3333333 0.5 0 0 0.5 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Stairs_Bas-map1-array" count="24" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Stairs_Bas-vertices">
+          <input semantic="POSITION" source="#geom-Stairs_Bas-positions"/>
+        </vertices>
+        <triangles material="Stairs_Bas" count="12">
+          <input semantic="VERTEX" source="#geom-Stairs_Bas-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Stairs_Bas-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Stairs_Bas-map1" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 2 2 2 2 3 3 3 0 0 0 4 4 4 5 5 5 6 6 6 6 6 6 7 7 7 4 4 4 8 8 8 9 9 9 10 10 10 10 10 10 11 11 11 8 8 8 12 12 12 13 13 13 14 14 14 14 14 14 15 15 15 12 12 12 16 16 16 17 17 17 18 18 18 18 18 18 19 19 19 16 16 16 20 20 20 21 21 21 22 22 22 22 22 22 23 23 23 20 20 20</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="geom-Cube6" name="Cube6">
+      <mesh>
+        <source id="geom-Cube6-positions">
+          <float_array id="geom-Cube6-positions-array" count="72">-3.278372 -1.527119 0.3444546 -3.278372 0.4020716 0.3444546 2.153005 0.4020716 0.3444546 2.153005 -1.527119 0.3444546 2.153005 -1.527119 0.3444546 2.153005 0.4020716 0.3444546 2.153005 0.4020716 0.6817205 2.153005 -1.527119 0.6817205 2.153005 -1.527119 0.6817205 2.153005 0.4020716 0.6817205 -3.278372 0.4020716 0.6817205 -3.278372 -1.527119 0.6817205 -3.278372 -1.527119 0.6817205 -3.278372 0.4020716 0.6817205 -3.278372 0.4020716 0.3444546 -3.278372 -1.527119 0.3444546 2.153005 0.4020716 0.3444546 -3.278372 0.4020716 0.3444546 -3.278372 0.4020716 0.6817205 2.153005 0.4020716 0.6817205 -3.278372 -1.527119 0.3444546 2.153005 -1.527119 0.3444546 2.153005 -1.527119 0.6817205 -3.278372 -1.527119 0.6817205</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube6-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube6-normals">
+          <float_array id="geom-Cube6-normals-array" count="72">0 0 -1 0 0 -1 0 0 -1 0 0 -1 1 0 0 1 0 0 1 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube6-normals-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube6-map1">
+          <float_array id="geom-Cube6-map1-array" count="72">0.3333333 0 0 0.6666667 0 0 0.6666667 0.25 0 0.3333333 0.25 0 0.3333333 0.25 0 0.6666667 0.25 0 0.6666667 0.5 0 0.3333333 0.5 0 0.3333333 0.5 0 0.6666667 0.5 0 0.6666667 0.75 0 0.3333333 0.75 0 0.3333333 0.75 0 0.6666667 0.75 0 0.6666667 1 0 0.3333333 1 0 0.6666667 0.25 0 1 0.25 0 1 0.5 0 0.6666667 0.5 0 0 0.25 0 0.3333333 0.25 0 0.3333333 0.5 0 0 0.5 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube6-map1-array" count="24" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Cube6-vertices">
+          <input semantic="POSITION" source="#geom-Cube6-positions"/>
+        </vertices>
+        <triangles material="Stairs_Bas" count="12">
+          <input semantic="VERTEX" source="#geom-Cube6-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Cube6-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Cube6-map1" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 2 2 2 2 3 3 3 0 0 0 4 4 4 5 5 5 6 6 6 6 6 6 7 7 7 4 4 4 8 8 8 9 9 9 10 10 10 10 10 10 11 11 11 8 8 8 12 12 12 13 13 13 14 14 14 14 14 14 15 15 15 12 12 12 16 16 16 17 17 17 18 18 18 18 18 18 19 19 19 16 16 16 20 20 20 21 21 21 22 22 22 22 22 22 23 23 23 20 20 20</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="geom-Cube" name="Cube">
+      <mesh>
+        <source id="geom-Cube-positions">
+          <float_array id="geom-Cube-positions-array" count="72">-3.277607 -1.527119 1.356459 -3.277607 0.4020716 1.356459 0.67478 0.4020716 1.356459 0.67478 -1.527119 1.356459 0.67478 -1.527119 1.356459 0.67478 0.4020716 1.356459 0.67478 0.4020716 1.693725 0.67478 -1.527119 1.693725 0.67478 -1.527119 1.693725 0.67478 0.4020716 1.693725 -3.277607 0.4020716 1.693725 -3.277607 -1.527119 1.693725 -3.277607 -1.527119 1.693725 -3.277607 0.4020716 1.693725 -3.277607 0.4020716 1.356459 -3.277607 -1.527119 1.356459 0.67478 0.4020716 1.356459 -3.277607 0.4020716 1.356459 -3.277607 0.4020716 1.693725 0.67478 0.4020716 1.693725 -3.277607 -1.527119 1.356459 0.67478 -1.527119 1.356459 0.67478 -1.527119 1.693725 -3.277607 -1.527119 1.693725</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube-normals">
+          <float_array id="geom-Cube-normals-array" count="72">0 0 -1 0 0 -1 0 0 -1 0 0 -1 1 0 0 1 0 0 1 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 0.9999999 0 0 1 0 0 0.9999999 0 0 1 0 0 -0.9999999 0 0 -1 0 0 -0.9999999 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube-normals-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube-map1">
+          <float_array id="geom-Cube-map1-array" count="72">0.3333333 0 0 0.6666667 0 0 0.6666667 0.25 0 0.3333333 0.25 0 0.3333333 0.25 0 0.6666667 0.25 0 0.6666667 0.5 0 0.3333333 0.5 0 0.3333333 0.5 0 0.6666667 0.5 0 0.6666667 0.75 0 0.3333333 0.75 0 0.3333333 0.75 0 0.6666667 0.75 0 0.6666667 1 0 0.3333333 1 0 0.6666667 0.25 0 1 0.25 0 1 0.5 0 0.6666667 0.5 0 0 0.25 0 0.3333333 0.25 0 0.3333333 0.5 0 0 0.5 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube-map1-array" count="24" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Cube-vertices">
+          <input semantic="POSITION" source="#geom-Cube-positions"/>
+        </vertices>
+        <triangles material="Stairs_Bas" count="12">
+          <input semantic="VERTEX" source="#geom-Cube-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Cube-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Cube-map1" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 2 2 2 2 3 3 3 0 0 0 4 4 4 5 5 5 6 6 6 6 6 6 7 7 7 4 4 4 8 8 8 9 9 9 10 10 10 10 10 10 11 11 11 8 8 8 12 12 12 13 13 13 14 14 14 14 14 14 15 15 15 12 12 12 16 16 16 17 17 17 18 18 18 18 18 18 19 19 19 16 16 16 20 20 20 21 21 21 22 22 22 22 22 22 23 23 23 20 20 20</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="geom-Cube3" name="Cube3">
+      <mesh>
+        <source id="geom-Cube3-positions">
+          <float_array id="geom-Cube3-positions-array" count="72">-3.274883 -1.527119 2.031138 -3.274883 0.4020716 2.031138 -0.3030697 0.4020716 2.031138 -0.3030697 -1.527119 2.031138 -0.3030697 -1.527119 2.031138 -0.3030697 0.4020716 2.031138 -0.3030697 0.4020716 2.368404 -0.3030697 -1.527119 2.368404 -0.3030697 -1.527119 2.368404 -0.3030697 0.4020716 2.368404 -3.274883 0.4020716 2.368404 -3.274883 -1.527119 2.368404 -3.274883 -1.527119 2.368404 -3.274883 0.4020716 2.368404 -3.274883 0.4020716 2.031138 -3.274883 -1.527119 2.031138 -0.3030697 0.4020716 2.031138 -3.274883 0.4020716 2.031138 -3.274883 0.4020716 2.368404 -0.3030697 0.4020716 2.368404 -3.274883 -1.527119 2.031138 -0.3030697 -1.527119 2.031138 -0.3030697 -1.527119 2.368404 -3.274883 -1.527119 2.368404</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube3-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube3-normals">
+          <float_array id="geom-Cube3-normals-array" count="72">0 0 -0.9999999 0 0 -1 0 0 -0.9999999 0 0 -1 1 0 0 1 0 0 1 0 0 1 0 0 0 0 0.9999999 0 0 1 0 0 0.9999999 0 0 1 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube3-normals-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube3-map1">
+          <float_array id="geom-Cube3-map1-array" count="72">0.3333333 0 0 0.6666667 0 0 0.6666667 0.25 0 0.3333333 0.25 0 0.3333333 0.25 0 0.6666667 0.25 0 0.6666667 0.5 0 0.3333333 0.5 0 0.3333333 0.5 0 0.6666667 0.5 0 0.6666667 0.75 0 0.3333333 0.75 0 0.3333333 0.75 0 0.6666667 0.75 0 0.6666667 1 0 0.3333333 1 0 0.6666667 0.25 0 1 0.25 0 1 0.5 0 0.6666667 0.5 0 0 0.25 0 0.3333333 0.25 0 0.3333333 0.5 0 0 0.5 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube3-map1-array" count="24" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Cube3-vertices">
+          <input semantic="POSITION" source="#geom-Cube3-positions"/>
+        </vertices>
+        <triangles material="Stairs_Bas" count="12">
+          <input semantic="VERTEX" source="#geom-Cube3-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Cube3-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Cube3-map1" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 2 2 2 2 3 3 3 0 0 0 4 4 4 5 5 5 6 6 6 6 6 6 7 7 7 4 4 4 8 8 8 9 9 9 10 10 10 10 10 10 11 11 11 8 8 8 12 12 12 13 13 13 14 14 14 14 14 14 15 15 15 12 12 12 16 16 16 17 17 17 18 18 18 18 18 18 19 19 19 16 16 16 20 20 20 21 21 21 22 22 22 22 22 22 23 23 23 20 20 20</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="geom-Cube2" name="Cube2">
+      <mesh>
+        <source id="geom-Cube2-positions">
+          <float_array id="geom-Cube2-positions-array" count="72">-3.279389 -1.527119 2.368456 -3.279389 0.4020716 2.368456 -0.8043832 0.4020716 2.368456 -0.8043832 -1.527119 2.368456 -0.8043832 -1.527119 2.368456 -0.8043832 0.4020716 2.368456 -0.8043832 0.4020716 2.705722 -0.8043832 -1.527119 2.705722 -0.8043832 -1.527119 2.705722 -0.8043832 0.4020716 2.705722 -3.279389 0.4020716 2.705722 -3.279389 -1.527119 2.705722 -3.279389 -1.527119 2.705722 -3.279389 0.4020716 2.705722 -3.279389 0.4020716 2.368456 -3.279389 -1.527119 2.368456 -0.8043832 0.4020716 2.368456 -3.279389 0.4020716 2.368456 -3.279389 0.4020716 2.705722 -0.8043832 0.4020716 2.705722 -3.279389 -1.527119 2.368456 -0.8043832 -1.527119 2.368456 -0.8043832 -1.527119 2.705722 -3.279389 -1.527119 2.705722</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube2-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube2-normals">
+          <float_array id="geom-Cube2-normals-array" count="72">0 0 -0.9999999 0 0 -1 0 0 -0.9999999 0 0 -1 1 0 0 1 0 0 1 0 0 1 0 0 0 0 0.9999999 0 0 1 0 0 0.9999999 0 0 1 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube2-normals-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube2-map1">
+          <float_array id="geom-Cube2-map1-array" count="72">0.3333333 0 0 0.6666667 0 0 0.6666667 0.25 0 0.3333333 0.25 0 0.3333333 0.25 0 0.6666667 0.25 0 0.6666667 0.5 0 0.3333333 0.5 0 0.3333333 0.5 0 0.6666667 0.5 0 0.6666667 0.75 0 0.3333333 0.75 0 0.3333333 0.75 0 0.6666667 0.75 0 0.6666667 1 0 0.3333333 1 0 0.6666667 0.25 0 1 0.25 0 1 0.5 0 0.6666667 0.5 0 0 0.25 0 0.3333333 0.25 0 0.3333333 0.5 0 0 0.5 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube2-map1-array" count="24" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Cube2-vertices">
+          <input semantic="POSITION" source="#geom-Cube2-positions"/>
+        </vertices>
+        <triangles material="Stairs_Bas" count="12">
+          <input semantic="VERTEX" source="#geom-Cube2-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Cube2-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Cube2-map1" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 2 2 2 2 3 3 3 0 0 0 4 4 4 5 5 5 6 6 6 6 6 6 7 7 7 4 4 4 8 8 8 9 9 9 10 10 10 10 10 10 11 11 11 8 8 8 12 12 12 13 13 13 14 14 14 14 14 14 15 15 15 12 12 12 16 16 16 17 17 17 18 18 18 18 18 18 19 19 19 16 16 16 20 20 20 21 21 21 22 22 22 22 22 22 23 23 23 20 20 20</p>
+        </triangles>
+      </mesh>
+    </geometry>
+    <geometry id="geom-Cube1" name="Cube1">
+      <mesh>
+        <source id="geom-Cube1-positions">
+          <float_array id="geom-Cube1-positions-array" count="72">-3.278245 -1.527119 1.693778 -3.278245 0.4020716 1.693778 0.1773341 0.4020716 1.693778 0.1773341 -1.527119 1.693778 0.1773341 -1.527119 1.693778 0.1773341 0.4020716 1.693778 0.1773341 0.4020716 2.031044 0.1773341 -1.527119 2.031044 0.1773341 -1.527119 2.031044 0.1773341 0.4020716 2.031044 -3.278245 0.4020716 2.031044 -3.278245 -1.527119 2.031044 -3.278245 -1.527119 2.031044 -3.278245 0.4020716 2.031044 -3.278245 0.4020716 1.693778 -3.278245 -1.527119 1.693778 0.1773341 0.4020716 1.693778 -3.278245 0.4020716 1.693778 -3.278245 0.4020716 2.031044 0.1773341 0.4020716 2.031044 -3.278245 -1.527119 1.693778 0.1773341 -1.527119 1.693778 0.1773341 -1.527119 2.031044 -3.278245 -1.527119 2.031044</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube1-positions-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube1-normals">
+          <float_array id="geom-Cube1-normals-array" count="72">0 0 -1 0 0 -1 0 0 -1 0 0 -1 1 0 0 1 0 0 1 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 0 1 -1 0 0 -1 0 0 -1 0 0 -1 0 0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube1-normals-array" count="24" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="geom-Cube1-map1">
+          <float_array id="geom-Cube1-map1-array" count="72">0.3333333 0 0 0.6666667 0 0 0.6666667 0.25 0 0.3333333 0.25 0 0.3333333 0.25 0 0.6666667 0.25 0 0.6666667 0.5 0 0.3333333 0.5 0 0.3333333 0.5 0 0.6666667 0.5 0 0.6666667 0.75 0 0.3333333 0.75 0 0.3333333 0.75 0 0.6666667 0.75 0 0.6666667 1 0 0.3333333 1 0 0.6666667 0.25 0 1 0.25 0 1 0.5 0 0.6666667 0.5 0 0 0.25 0 0.3333333 0.25 0 0.3333333 0.5 0 0 0.5 0</float_array>
+          <technique_common>
+            <accessor source="#geom-Cube1-map1-array" count="24" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="geom-Cube1-vertices">
+          <input semantic="POSITION" source="#geom-Cube1-positions"/>
+        </vertices>
+        <triangles material="Stairs_Bas" count="12">
+          <input semantic="VERTEX" source="#geom-Cube1-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#geom-Cube1-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#geom-Cube1-map1" offset="2" set="0"/>
+          <p>0 0 0 1 1 1 2 2 2 2 2 2 3 3 3 0 0 0 4 4 4 5 5 5 6 6 6 6 6 6 7 7 7 4 4 4 8 8 8 9 9 9 10 10 10 10 10 10 11 11 11 8 8 8 12 12 12 13 13 13 14 14 14 14 14 14 15 15 15 12 12 12 16 16 16 17 17 17 18 18 18 18 18 18 19 19 19 16 16 16 20 20 20 21 21 21 22 22 22 22 22 22 23 23 23 20 20 20</p>
+        </triangles>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_lights>
+    <light id="EnvironmentAmbientLight" name="EnvironmentAmbientLight">
+      <technique_common>
+        <ambient>
+          <color>0.2 0.2 0.2</color>
+        </ambient>
+      </technique_common>
+    </light>
+  </library_lights>
+  <library_visual_scenes>
+    <visual_scene id="MaxScene">
+      <node name="EnvironmentAmbientLight">
+        <instance_light url="#EnvironmentAmbientLight"/>
+      </node>
+      <node id="node-stairsTest" name="stairsTest">
+        <translate>-0.03797215 0.7339287 1.356429</translate>
+        <node id="node-Cube5" name="Cube5">
+          <translate>-0.5625239 0.3106159 -1.356429</translate>
+          <rotate>0 0 -1 -90</rotate>
+          <instance_geometry url="#geom-Cube5">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="Stairs_Bas_1" target="#Stairs_Bas-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows>1</cast_shadows>
+              <primary_visibility>1</primary_visibility>
+              <receive_shadows>1</receive_shadows>
+              <secondary_visibility>1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <node id="node-Cube4" name="Cube4">
+          <translate>-0.5625239 0.3106159 -1.356429</translate>
+          <rotate>0 0 -1 -90</rotate>
+          <instance_geometry url="#geom-Cube4">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="Stairs_Bas" target="#Stairs_Bas-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows>1</cast_shadows>
+              <primary_visibility>1</primary_visibility>
+              <receive_shadows>1</receive_shadows>
+              <secondary_visibility>1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <node id="node-Stairs_Bas" name="Stairs_Bas">
+          <translate>-0.5625239 0.3106159 -1.356429</translate>
+          <rotate>0 0 -1 -90</rotate>
+          <instance_geometry url="#geom-Stairs_Bas">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="Stairs_Bas" target="#Stairs_Bas-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows>1</cast_shadows>
+              <primary_visibility>1</primary_visibility>
+              <receive_shadows>1</receive_shadows>
+              <secondary_visibility>1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <node id="node-Cube6" name="Cube6">
+          <translate>-0.5625239 0.3106159 -1.356429</translate>
+          <rotate>0 0 -1 -90</rotate>
+          <instance_geometry url="#geom-Cube6">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="Stairs_Bas" target="#Stairs_Bas-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows>1</cast_shadows>
+              <primary_visibility>1</primary_visibility>
+              <receive_shadows>1</receive_shadows>
+              <secondary_visibility>1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <node id="node-Cube" name="Cube">
+          <translate>-0.5625239 0.3106159 -1.356429</translate>
+          <rotate>0 0 -1 -90</rotate>
+          <instance_geometry url="#geom-Cube">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="Stairs_Bas" target="#Stairs_Bas-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows>1</cast_shadows>
+              <primary_visibility>1</primary_visibility>
+              <receive_shadows>1</receive_shadows>
+              <secondary_visibility>1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <node id="node-Cube3" name="Cube3">
+          <translate>-0.5625239 0.3106159 -1.356429</translate>
+          <rotate>0 0 -1 -90</rotate>
+          <instance_geometry url="#geom-Cube3">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="Stairs_Bas" target="#Stairs_Bas-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows>1</cast_shadows>
+              <primary_visibility>1</primary_visibility>
+              <receive_shadows>1</receive_shadows>
+              <secondary_visibility>1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <node id="node-Cube2" name="Cube2">
+          <translate>-0.5625239 0.3106159 -1.356429</translate>
+          <rotate>0 0 -1 -90</rotate>
+          <instance_geometry url="#geom-Cube2">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="Stairs_Bas" target="#Stairs_Bas-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows>1</cast_shadows>
+              <primary_visibility>1</primary_visibility>
+              <receive_shadows>1</receive_shadows>
+              <secondary_visibility>1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <node id="node-Cube1" name="Cube1">
+          <translate>-0.5625239 0.3106159 -1.356429</translate>
+          <rotate>0 0 -1 -90</rotate>
+          <instance_geometry url="#geom-Cube1">
+            <bind_material>
+              <technique_common>
+                <instance_material symbol="Stairs_Bas" target="#Stairs_Bas-material"/>
+              </technique_common>
+            </bind_material>
+          </instance_geometry>
+          <extra>
+            <technique profile="OpenCOLLADA">
+              <cast_shadows>1</cast_shadows>
+              <primary_visibility>1</primary_visibility>
+              <receive_shadows>1</receive_shadows>
+              <secondary_visibility>1</secondary_visibility>
+            </technique>
+          </extra>
+        </node>
+        <extra>
+          <technique profile="OpenCOLLADA">
+            <cast_shadows>1</cast_shadows>
+            <primary_visibility>1</primary_visibility>
+            <receive_shadows>1</receive_shadows>
+            <secondary_visibility>1</secondary_visibility>
+          </technique>
+        </extra>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#MaxScene"/>
+  </scene>
+</COLLADA>

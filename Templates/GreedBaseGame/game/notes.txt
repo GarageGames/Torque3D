@@ -1,0 +1,21 @@
+mainLoop at 449 : this has to disable client loading a mission and whatever
+
+T3D compressed FS has precedence when existing inside the zip (overrides
+init & everything)	
+
+core : done ? (check loading/chathud!) -too many fuck-ups-
+gui : 75% ? majority lays in Engine. (that tho is 95-98%)
+script : kept as t3d, pathing done, check along the way (will end in data/)
+
+init.cs : lots of shit to be removed after the merge with core.
+NB : as the template is supposed to represent a ready game template
+MIT headers are kept only in Greed Base (rename of TheFunBase after
+full & template delete -that's a todo...-)
+
+splash : 
+A : no other capitals than on "The" and LOADING (else it looks ugly)
+(side sub note : of course Zombie Apocalypse can take capitalisation)
+
+B : exclamation mark need to be moved & replaced by a double dot (:)
+C : exclamation mark move at the end 
+D : main thefunz logo need to be re-scaled as in the banner (see msplash5)
