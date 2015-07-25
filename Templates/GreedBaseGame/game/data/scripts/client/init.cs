@@ -88,9 +88,9 @@ function initClient()
    exec("data/ui/Engine/remapDlg.gui");
    
    // Gui scripts
-   exec("./playerList.cs");
-   exec("./chatHud.cs");
-   exec("./messageHud.cs");
+   exec("data/scripts/client/playerList.cs");
+   exec("data/scripts/client/chatHud.cs");
+   exec("data/scripts/client/messageHud.cs");
    exec("data/scripts/gui/playGui.cs");
    exec("data/scripts/gui/startupGui.cs");
    exec("data/scripts/gui/chooseLevelDlg.cs");
@@ -98,19 +98,19 @@ function initClient()
    exec("data/scripts/gui/optionsDlg.cs");
 
    // Client scripts
-   exec("./client.cs");
-   exec("./game.cs");
-   exec("./missionDownload.cs");
-   exec("./serverConnection.cs");
+   exec("data/scripts/client/client.cs");
+   exec("data/scripts/client/game.cs");
+   exec("data/scripts/client/missionDownload.cs");
+   exec("data/scripts/client/serverConnection.cs");
 
    // Load useful Materials
-   exec("./shaders.cs");
+   exec("data/scripts/client/shaders.cs");
 
    // Default player key bindings
-   exec("./default.bind.cs");
+   exec("data/scripts/client/default.bind.cs");
 
-   if (isFile("./config.cs"))
-      exec("./config.cs");
+   if (isFile("data/scripts/client/config.cs"))
+      exec("data/scripts/client/config.cs");
 
    loadMaterials();
 
@@ -123,8 +123,8 @@ function initClient()
    setDefaultFov( $pref::Player::defaultFov );
    setZoomSpeed( $pref::Player::zoomSpeed );
 
-   if( isScriptFile( expandFilename("./audioData.cs") ) )
-      exec( "./audioData.cs" );
+   if( isScriptFile( expandFilename("data/scripts/client/audioData.cs") ) )
+      exec( "data/scripts/client/audioData.cs" );
 
    // Start up the main menu... this is separated out into a
    // method for easier mod override.

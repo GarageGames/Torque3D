@@ -129,8 +129,8 @@ function demoPlaybackComplete()
    // handling functionality.
    clientEndMission();
 
-   if (isObject( MainMenuGui ))
-      Canvas.setContent( MainMenuGui );
+   if (isObject( GreedMenu ))
+      Canvas.setContent( GreedMenu );
 
    Canvas.pushDialog(RecordingsDlg);
 }

@@ -86,15 +86,15 @@ function onStart()
 {
    // The core does initialization which requires some of
    // the preferences to loaded... so do that first.  
-   exec( "./client/defaults.cs" );
-   exec( "./server/defaults.cs" );
+   exec( "data/scripts/client/defaults.cs" );
+   exec( "data/scripts./server/defaults.cs" );
              
    Parent::onStart();
    echo("\n--------- Initializing Directory: scripts ---------");
 
    // Load the scripts that start it all...
-   exec("./client/init.cs");
-   exec("./server/init.cs");
+   exec("data/scripts/client/init.cs");
+   exec("data/scripts/server/init.cs");
    
    // Init the physics plugin.
    physicsInit(Bullet);
@@ -127,11 +127,11 @@ function onExit()
    physicsDestroy();
       
    echo("Exporting client prefs");
-   export("$pref::*", "./client/prefs.cs", False);
+   export("$pref::*", "data/scripts/client/prefs.cs", False);
 
    echo("Exporting server prefs");
-   export("$Pref::Server::*", "./server/prefs.cs", False);
-   BanList::Export("./server/banlist.cs");
+   export("$Pref::Server::*", "data/scripts/server/prefs.cs", False);
+   BanList::Export("data/scripts/server/banlist.cs");
 
    Parent::onExit();
 }

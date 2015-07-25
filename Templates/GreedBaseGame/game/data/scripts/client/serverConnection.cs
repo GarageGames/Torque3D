@@ -217,8 +217,8 @@ function disconnectedCleanup()
    clientCmdClearCenterPrint();
 
    // Back to the launch screen
-   if (isObject( MainMenuGui ))
-      Canvas.setContent( MainMenuGui );
+   if (isObject( GreedMenu ))
+      Canvas.setContent( GreedMenu );
 
    // Before we destroy the client physics world
    // make sure all ServerConnection objects are deleted.
