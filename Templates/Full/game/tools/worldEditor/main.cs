@@ -120,6 +120,7 @@ function initializeWorldEditor()
    EVisibility.addOption( "AL: Normals Viz", "$AL_NormalsVisualizeVar", "toggleNormalsViz" );
    EVisibility.addOption( "AL: Depth Viz", "$AL_DepthVisualizeVar", "toggleDepthViz" );
    EVisibility.addOption( "AL: Glow Buffer", "$AL_GlowVisualizeVar", "toggleGlowViz" );
+   EVisibility.addOption( "AL: PSSM Cascade Viz", "$AL::PSSMDebugRender", "" );
    EVisibility.addOption( "Frustum Lock", "$Scene::lockCull", "" );
    EVisibility.addOption( "Disable Zone Culling", "$Scene::disableZoneCulling", "" );
    EVisibility.addOption( "Disable Terrain Occlusion", "$Scene::disableTerrainOcclusion", "" );
