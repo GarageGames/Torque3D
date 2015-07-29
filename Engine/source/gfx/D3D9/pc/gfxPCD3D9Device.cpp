@@ -66,7 +66,7 @@ void GFXPCD3D9Device::createDirect3D9(LPDIRECT3D9 &d3d9, LPDIRECT3D9EX &d3d9ex)
       
       if (pfnCreate9Ex)
       {
-         if (!FAILED(pfnCreate9Ex(D3D_SDK_VERSION, &d3d9ex)) && d3d9ex)
+		  if (d3d9ex && !FAILED(pfnCreate9Ex(D3D_SDK_VERSION, &d3d9ex)))
             d3d9ex->QueryInterface(__uuidof(IDirect3D9), reinterpret_cast<void **>(&d3d9));
       }
 

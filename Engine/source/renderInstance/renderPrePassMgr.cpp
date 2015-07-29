@@ -203,12 +203,11 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
       matInst = static_cast<MeshRenderInst*>(inst)->matInst;
 
    // Skip decals if they don't have normal maps.
-   if ( isDecalMeshInst && !matInst->hasNormalMap() )
+   if (!matInst || isDecalMeshInst && !matInst->hasNormalMap())
       return;
 
    // If its a custom material and it refracts... skip it.
-   if (  matInst && 
-         matInst->isCustomMaterial() &&
+   if (  matInst->isCustomMaterial() &&
          static_cast<CustomMaterial*>( matInst->getMaterial() )->mRefract )
       return;
 
