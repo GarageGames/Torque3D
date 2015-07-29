@@ -161,6 +161,7 @@ private:
    {
       /// Color used for this primitive.
       ColorF color;
+      ColorF color2;
 
       /// Points used to store positional data. Exact semantics determined by type.
       Point3F a, b, c;
@@ -168,7 +169,10 @@ private:
          Tri,
          Box,
          Line,
-         Text
+         Text,
+         DirectionLine,
+         OutlinedText,
+         Capsule,
       } type;	   ///< Type of the primitive. The meanings of a,b,c are determined by this.
 
       SimTime dieTime;   ///< Time at which we should remove this from the list.
@@ -188,6 +192,7 @@ private:
 
    GFXStateBlockRef mRenderZOffSB;
    GFXStateBlockRef mRenderZOnSB;
+   GFXStateBlockRef mRenderAlpha;
 
    Resource<GFont> mFont;
 
