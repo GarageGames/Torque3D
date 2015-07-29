@@ -578,14 +578,12 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       GFXTextureObject *texObject = mStereoGuiTarget->getTexture(0);
       const FovPort *currentFovPort = GFX->getStereoFovPort();
       const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
-      const MatrixF *worldEyeTransforms = GFX->getInverseStereoEyeTransforms();
       const Point3F *eyeOffset = GFX->getStereoEyeOffsets();
 
       for (U32 i=0; i<2; i++)
       {
          GFX->activateStereoTarget(i);
          Frustum gfxFrustum = originalFrustum;
-         const F32 frustumDepth = gfxFrustum.getNearDist();
          MathUtils::makeFovPortFrustum(&gfxFrustum, true, gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[i], eyeTransforms[i]);
          GFX->setFrustum(gfxFrustum);
 
