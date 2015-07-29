@@ -73,10 +73,12 @@ EndImplementEnumType;
 
 
 //-----------------------------------------------------------------------------
-
-String TSShapeConstructor::smCapsuleShapePath("core/art/shapes/unit_capsule.dts");
-String TSShapeConstructor::smCubeShapePath("core/art/shapes/unit_cube.dts");
-String TSShapeConstructor::smSphereShapePath("core/art/shapes/unit_sphere.dts");
+// GreedWork >> 
+// data/ implementation 2nd pass : prefs.cs changes
+String TSShapeConstructor::smCapsuleShapePath("data/core/art/shapes/unit_capsule.dts");
+String TSShapeConstructor::smCubeShapePath("data/core/art/shapes/unit_cube.dts");
+String TSShapeConstructor::smSphereShapePath("data/core/art/shapes/unit_sphere.dts");
+// GreedWork << 
 
 ResourceRegisterPostLoadSignal< TSShape > TSShapeConstructor::_smAutoLoad( &TSShapeConstructor::_onTSShapeLoaded );
 ResourceRegisterUnloadSignal< TSShape > TSShapeConstructor::_smAutoUnload( &TSShapeConstructor::_onTSShapeUnloaded );

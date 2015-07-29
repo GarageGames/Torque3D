@@ -60,7 +60,7 @@ ConsoleDocClass( GuiTextEditSliderBitmapCtrl,
    "@tsexample\n"
    "singleton GuiControlProfile (SliderBitmapGUIProfile)\n"
    "{\n"
-   "   bitmap = \"core/art/gui/images/sliderArray\";\n"
+   "   bitmap = \"data/core/art/gui/images/sliderArray\";\n"
    "   hasBitmapArray = true;\n"
    "   opaque = false;\n"
    "};\n\n"

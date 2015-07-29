@@ -38,7 +38,7 @@ ConsoleDocClass( MissionMarkerData,
    "datablock MissionMarkerData(SpawnSphereMarker)\n"
    "{\n"
    "   category = \"Misc\";\n"
-   "   shapeFile = \"core/art/shapes/octahedron.dts\";\n"
+   "   shapeFile = \"data/core/art/shapes/octahedron.dts\";\n"
    "};\n"
    "@endtsexample\n\n"
 

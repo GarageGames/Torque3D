@@ -84,7 +84,7 @@ ConsoleDocClass( GuiBitmapBorderCtrl,
    "@tsexample\n"
    "singleton GuiControlProfile (BorderGUIProfile)\n"
    "{\n"
-   "   bitmap = \"core/art/gui/images/borderArray\";\n"
+   "   bitmap = \"data/core/art/gui/images/borderArray\";\n"
    "   hasBitmapArray = true;\n"
    "   opaque = false;\n"
    "};\n\n"

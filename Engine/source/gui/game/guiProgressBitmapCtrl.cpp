@@ -48,7 +48,7 @@ ConsoleDocClass( GuiProgressBitmapCtrl,
       "\n"
       "new GuiProgressBitmapCtrl( Progress )\n"
       "{\n"
-      "   bitmap = \"core/art/gui/images/loading\";\n"
+      "   bitmap = \"data/core/art/gui/images/loading\";\n"
       "   extent = \"300 50\";\n"
       "   position = \"100 100\";\n"
       "};\n"
