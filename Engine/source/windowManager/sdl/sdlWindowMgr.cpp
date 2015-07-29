@@ -222,6 +222,14 @@ void PlatformWindowManagerSDL::_process()
             break;
          }
 
+         case SDL_MOUSEWHEEL:
+         {
+            PlatformWindowSDL *window = mWindowMap[evt.wheel.windowID];
+            if (window)
+               window->_processSDLEvent(evt);
+            break;
+         }
+
          case SDL_MOUSEBUTTONDOWN:
          case SDL_MOUSEBUTTONUP:
          {

@@ -432,6 +432,11 @@ void PlatformWindowSDL::_triggerMouseLocationNotify(const SDL_Event& evt)
       mouseEvent.trigger(getWindowId(), 0, evt.motion.xrel, evt.motion.yrel, true);
 }
 
+void PlatformWindowSDL::_triggerMouseWheelNotify(const SDL_Event& evt)
+{
+   mouseEvent.trigger(getWindowId(), 0, evt.wheel.y, evt.wheel.y, false);
+}
+
 void PlatformWindowSDL::_triggerMouseButtonNotify(const SDL_Event& event)
 {
    S32 action = (event.type == SDL_MOUSEBUTTONDOWN) ? SI_MAKE : SI_BREAK;
@@ -536,6 +541,11 @@ void PlatformWindowSDL::_processSDLEvent(SDL_Event &evt)
          break;
       }
 
+      case SDL_MOUSEWHEEL:
+      {
+         _triggerMouseWheelNotify(evt);
+         break;
+      }
       case SDL_MOUSEBUTTONDOWN:
       case SDL_MOUSEBUTTONUP:
       {
