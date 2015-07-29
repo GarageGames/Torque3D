@@ -223,8 +223,8 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
       // We need to have a material.
       if ( draw.matIndex & TSDrawPrimitive::NoMaterial )
          continue;
-/*
-#ifdef TORQUE_DEBUG
+
+#ifdef TORQUE_DEBUG_BREAK_INSPECT
       // for inspection if you happen to be running in a debugger and can't do bit 
       // operations in your head.
       S32 triangles = draw.matIndex & TSDrawPrimitive::Triangles;
@@ -237,8 +237,9 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
       TORQUE_UNUSED(fan);
       TORQUE_UNUSED(indexed);
       TORQUE_UNUSED(type);
+      //define TORQUE_DEBUG_BREAK_INSPECT, and insert debug break here to inspect the above elements at runtime
 #endif
-*/
+
       const U32 matIndex = draw.matIndex & TSDrawPrimitive::MaterialMask;
       BaseMatInstance *matInst = materials->getMaterialInst( matIndex );
 
