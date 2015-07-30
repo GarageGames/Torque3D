@@ -125,7 +125,7 @@ void* PlatformWindowSDL::getSystemWindow(const WindowSystem system)
      SDL_VERSION(&info.version);
      SDL_GetWindowWMInfo(mWindowHandle,&info);     
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
      if( system == WindowSystem_Windows && info.subsystem == SDL_SYSWM_WINDOWS)
         return info.info.win.window;
 #endif
