@@ -434,7 +434,7 @@ void PlatformWindowSDL::_triggerMouseLocationNotify(const SDL_Event& evt)
 
 void PlatformWindowSDL::_triggerMouseWheelNotify(const SDL_Event& evt)
 {
-   mouseEvent.trigger(getWindowId(), 0, evt.wheel.y, evt.wheel.y, false);
+   wheelEvent.trigger(getWindowId(), 0, evt.wheel.x, evt.wheel.y);
 }
 
 void PlatformWindowSDL::_triggerMouseButtonNotify(const SDL_Event& event)
@@ -535,15 +535,15 @@ void PlatformWindowSDL::_processSDLEvent(SDL_Event &evt)
          break;
       }
 
-      case SDL_MOUSEMOTION:
-      {
-         _triggerMouseLocationNotify(evt);
-         break;
-      }
-
       case SDL_MOUSEWHEEL:
       {
          _triggerMouseWheelNotify(evt);
+         break;
+      }
+
+      case SDL_MOUSEMOTION:
+      {
+         _triggerMouseLocationNotify(evt);
          break;
       }
       case SDL_MOUSEBUTTONDOWN:

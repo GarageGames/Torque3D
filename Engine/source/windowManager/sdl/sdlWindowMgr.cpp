@@ -214,18 +214,18 @@ void PlatformWindowManagerSDL::_process()
             break;
          }
 
-         case SDL_MOUSEMOTION:
-         {
-            PlatformWindowSDL *window = mWindowMap[evt.motion.windowID];
-            if(window)
-               window->_processSDLEvent(evt);
-            break;
-         }
-
          case SDL_MOUSEWHEEL:
          {
             PlatformWindowSDL *window = mWindowMap[evt.wheel.windowID];
             if (window)
+               window->_processSDLEvent(evt);
+            break;
+         }
+
+         case SDL_MOUSEMOTION:
+         {
+            PlatformWindowSDL *window = mWindowMap[evt.motion.windowID];
+            if(window)
                window->_processSDLEvent(evt);
             break;
          }
