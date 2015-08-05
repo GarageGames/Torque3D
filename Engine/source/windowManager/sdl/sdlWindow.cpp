@@ -434,7 +434,7 @@ void PlatformWindowSDL::_triggerMouseLocationNotify(const SDL_Event& evt)
 
 void PlatformWindowSDL::_triggerMouseWheelNotify(const SDL_Event& evt)
 {
-   wheelEvent.trigger(getWindowId(), 0, evt.wheel.x, evt.wheel.y * WHEEL_DELTA);
+   wheelEvent.trigger(getWindowId(), 0, evt.wheel.x, evt.wheel.y * Con::getIntVariable("$pref::Input::MouseWheelSpeed"));
 }
 
 void PlatformWindowSDL::_triggerMouseButtonNotify(const SDL_Event& event)
