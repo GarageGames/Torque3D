@@ -1067,8 +1067,10 @@ singleton GuiControlProfile( GuiCreatorIconButtonProfile )
 singleton GuiControlProfile( GuiMenuBarProfile )
 {
    fillcolor = "255 255 255";
-   borderColor = "0 0 0";
-   border = 1;
+   fillcolorHL = "213 231 248";
+   borderColor = "98 163 229";
+   borderColorHL = "122 177 232";
+   border = 0;
    borderThickness = 1;
    opaque = true;
    mouseOverSelected = true;
