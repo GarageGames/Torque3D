@@ -112,15 +112,37 @@ void MenuBar::updateMenuBar(PopupMenu *popupMenu /* = NULL */)
    GuiPlatformGenericMenuBar* menuBarGui = _FindMenuBarCtrl();
    popupMenu->mData->mMenuBar = this;
 
-   AssertFatal( dStrcmp( popupMenu->mData->mMenuGui->text, popupMenu->getBarTitle() ) == 0, "");
-   GuiMenuBar::Menu* menuGui = menuBarGui->findMenu( popupMenu->getBarTitle() );
-   if(!menuGui)
-   {
-      menuBarGui->addMenu( popupMenu->mData->mMenuGui );
-      menuGui = menuBarGui->findMenu( popupMenu->getBarTitle() );
-   }
+   String menuTitle = popupMenu->getBarTitle();
 
-   PlatformPopupMenuData::mMenuMap[ menuGui ] = popupMenu;
+   //Next, find out if we're still in the list of entries
+   SimSet::iterator itr = find(begin(), end(), popupMenu);
+
+   GuiMenuBar::Menu* menuGui = menuBarGui->findMenu(menuTitle);
+   if (!menuGui)
+   {
+      //This is our first time setting this particular menu up, so we'll OK it.
+      if (itr == end())
+         menuBarGui->attachToMenuBar(popupMenu->mData->mMenuGui);
+      else
+         menuBarGui->attachToMenuBar(popupMenu->mData->mMenuGui, itr - begin());
+   }
+   else
+   {
+      //Not our first time through, so we're really updating it.
+
+      //So, first, remove it from the menubar
+      menuBarGui->removeFromMenuBar(menuGui);
+
+      //Next, find out if we're still in the list of entries
+      SimSet::iterator itr = find(begin(), end(), popupMenu);
+
+      //if we're no longer in the list, we're pretty much done here
+      if (itr == end())
+         return;
+
+      //We're still here, so this is a valid menu for our current bar configuration, so add us back in.
+      menuBarGui->attachToMenuBar(menuGui, itr - begin());
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -154,17 +176,47 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
 
       mCanvas->setMenuBar( base );
    }
+
+   for (S32 i = 0; i < size(); ++i)
+   {
+      PopupMenu *mnu = dynamic_cast<PopupMenu *>(at(i));
+      if (mnu == NULL)
+      {
+         Con::warnf("MenuBar::attachToMenuBar - Non-PopupMenu object in set");
+         continue;
+      }
+
+      if (mnu->isAttachedToMenuBar())
+         mnu->removeFromMenuBar();
+
+      mnu->attachToMenuBar(owner, pos + i);
+   }
    
 }
 
 void MenuBar::removeFromCanvas()
 {
-   _FindMenuBarCtrl()->clearMenus();
+   if (mCanvas == NULL || !isAttachedToCanvas())
+      return;
+
+   //_FindMenuBarCtrl()->clearMenus();
+
+   // Add the items
+   for (S32 i = 0; i < size(); ++i)
+   {
+      PopupMenu *mnu = dynamic_cast<PopupMenu *>(at(i));
+      if (mnu == NULL)
+      {
+         Con::warnf("MenuBar::removeFromMenuBar - Non-PopupMenu object in set");
+         continue;
+      }
+
+      mnu->removeFromMenuBar();
+   }
 
    mCanvas->setMenuBar(NULL);
 
-   if(mCanvas == NULL || !isAttachedToCanvas())
-      return;
+   mCanvas = NULL;
 }
 
 #endif
