@@ -2231,6 +2231,9 @@ void WorldEditor::on3DMouseDragged(const Gui3DMouseEvent & event)
             
             copySelection( mSelected );
             pasteSelection( false );
+
+			//TorqueLab -> Needed to know a dragCopy happen
+			Con::executef(this, "onDragCopy", mSelected->getIdString());
          }
          
          // Check for grid snap toggle with ALT.

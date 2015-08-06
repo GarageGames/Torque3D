@@ -66,14 +66,16 @@ GuiSwatchButtonCtrl::GuiSwatchButtonCtrl()
    static StringTableEntry sProfile = StringTable->insert( "profile" );
    setDataField( sProfile, NULL, "GuiInspectorSwatchButtonProfile" );
 
-   mGridBitmap = "tools/gui/images/transp_grid";
+   mGridBitmap = StringTable->insert("tools/gui/images/transp_grid"); //TorqueLab bad bitmap crash fix
+   //mGridBitmap = "tools/gui/images/transp_grid";
 }
 
 void GuiSwatchButtonCtrl::initPersistFields()
 {
    addField( "color", TypeColorF, Offset( mSwatchColor, GuiSwatchButtonCtrl ), "The foreground color of GuiSwatchButtonCtrl" );
 
-   addField( "gridBitmap", TypeString, Offset( mGridBitmap, GuiSwatchButtonCtrl ), "The bitmap used for the transparent grid" );
+   addField("gridBitmap", TypeFilename, Offset(mGridBitmap, GuiSwatchButtonCtrl), "The bitmap used for the transparent grid");//TorqueLab bad bitmap crash fix
+   //addField( "gridBitmap", TypeString, Offset( mGridBitmap, GuiSwatchButtonCtrl ), "The bitmap used for the transparent grid" );
    
    Parent::initPersistFields();
 }

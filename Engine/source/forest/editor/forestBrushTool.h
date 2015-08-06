@@ -61,10 +61,12 @@ public:
 
    // SimObject
    DECLARE_CONOBJECT( ForestBrushTool );
+   static void consoleInit(); //TorqueLab - New console variables
    static void initPersistFields();
    virtual bool onAdd();
    virtual void onRemove();
 
+   static F32 smGlobalScale; //TorqueLab - Forest global scale
    // ForestTool
    virtual void on3DMouseDown( const Gui3DMouseEvent &evt );
    virtual void on3DMouseUp( const Gui3DMouseEvent &evt );
