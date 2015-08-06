@@ -92,6 +92,7 @@ private:
    void _processSDLEvent(SDL_Event &evt);
    void _triggerMouseLocationNotify(const SDL_Event& evt);
    void _triggerMouseButtonNotify(const SDL_Event& event);
+   void _triggerMouseWheelNotify(const SDL_Event& event);
    void _triggerKeyNotify(const SDL_Event& event);
    void _triggerTextNotify(const SDL_Event& event);
 

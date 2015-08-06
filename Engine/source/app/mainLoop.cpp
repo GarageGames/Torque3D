@@ -61,10 +61,6 @@
 // For the TickMs define... fix this for T2D...
 #include "T3D/gameBase/processList.h"
 
-#ifdef TORQUE_DEMO_PURCHASE
-#include "demo/pestTimer/pestTimer.h"
-#endif
-
 #ifdef TORQUE_ENABLE_VFS
 #include "platform/platformVFS.h"
 #endif
@@ -308,10 +304,6 @@ void StandardMainLoop::init()
 
    // Hook in for UDP notification
    Net::smPacketReceive.notify(GNet, &NetInterface::processPacketReceiveEvent);
-
-   #ifdef TORQUE_DEMO_PURCHASE
-   PestTimerinit();
-   #endif
 
    #ifdef TORQUE_DEBUG_GUARD
       Memory::flagCurrentAllocs( Memory::FLAG_Static );
@@ -613,11 +605,6 @@ bool StandardMainLoop::doMainLoop()
       ThreadPool::processMainThreadWorkItems();
       Sampler::endFrame();
       PROFILE_END_NAMED(MainLoop);
-
-	  #ifdef TORQUE_DEMO_PURCHASE
-	  CheckTimer();
-	  CheckBlocker();
-	  #endif
    }
    
    return keepRunning;

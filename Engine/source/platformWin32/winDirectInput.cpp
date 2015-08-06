@@ -450,7 +450,7 @@ int DInputManager::getXInputState(S32 controllerID, S32 property, bool current)
    switch(property)
    {
 #define CHECK_PROP_ANALOG(prop, stateTest) \
-   case prop:        (current) ? retVal = mXInputStateNew[controllerID].state.Gamepad.##stateTest : retVal = mXInputStateOld[controllerID].state.Gamepad.##stateTest; return retVal;
+   case prop:        (current) ? retVal = mXInputStateNew[controllerID].state.Gamepad.stateTest : retVal = mXInputStateOld[controllerID].state.Gamepad.stateTest; return retVal;
 
       CHECK_PROP_ANALOG(XI_THUMBLX, sThumbLX)
       CHECK_PROP_ANALOG(XI_THUMBLY, sThumbLY)

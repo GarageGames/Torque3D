@@ -97,7 +97,7 @@ class GuiRoadEditorCtrl : public EditTSCtrl
       void setNodeWidth( F32 width );
 
 		Point3F getNodePosition();
-		void setNodePosition( Point3F pos );
+      void setNodePosition(const Point3F& pos);
 
       void setTextureFile( StringTableEntry file );
 	

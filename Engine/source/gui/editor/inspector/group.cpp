@@ -167,12 +167,10 @@ GuiInspectorField* GuiInspectorGroup::constructField( S32 fieldType )
 
 
       GuiInspectorDatablockField *dbFieldClass = new GuiInspectorDatablockField( typeClassName );
-      if( dbFieldClass != NULL )
-      {
-         // return our new datablock field with correct datablock type enumeration info
-         return dbFieldClass;
-      }
-   }
+
+      // return our new datablock field with correct datablock type enumeration info
+      return dbFieldClass;
+}
 
    // Nope, not a datablock. So maybe it has a valid inspector field override we can use?
    if(!cbt->getInspectorFieldType())

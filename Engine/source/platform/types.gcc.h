@@ -30,7 +30,7 @@
 
 //--------------------------------------
 // Types
-#if TORQUE_X86
+#if defined(TORQUE_X86)
 typedef signed long long    S64;
 typedef unsigned long long  U64;
 #else

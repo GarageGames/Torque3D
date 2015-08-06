@@ -1534,9 +1534,16 @@ StringTableEntry getModNameFromPath(const char *path)
 void postConsoleInput( RawData data )
 {
    // Schedule this to happen at the next time event.
+   ConsoleValue values[2];
    ConsoleValueRef argv[2];
-   argv[0] = "eval";
-   argv[1] = ( const char* ) data.data;
+
+   values[0].init();
+   values[0].setStringValue("eval");
+   values[1].init();
+   values[1].setStringValue((const char*)data.data);
+   argv[0].value = &values[0];
+   argv[1].value = &values[1];
+
    Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(2, argv, false));
 }
 
@@ -1608,36 +1615,6 @@ extern ConsoleValueStack CSTK;
 ConsoleValueRef::ConsoleValueRef(const ConsoleValueRef &ref)
 {
    value = ref.value;
-}
-
-ConsoleValueRef::ConsoleValueRef(const char *newValue) : value(NULL)
-{
-   *this = newValue;
-}
-
-ConsoleValueRef::ConsoleValueRef(const String &newValue) : value(NULL)
-{
-   *this = (const char*)(newValue.utf8());
-}
-
-ConsoleValueRef::ConsoleValueRef(U32 newValue) : value(NULL)
-{
-   *this = newValue;
-}
-
-ConsoleValueRef::ConsoleValueRef(S32 newValue) : value(NULL)
-{
-   *this = newValue;
-}
-
-ConsoleValueRef::ConsoleValueRef(F32 newValue) : value(NULL)
-{
-   *this = newValue;
-}
-
-ConsoleValueRef::ConsoleValueRef(F64 newValue) : value(NULL)
-{
-   *this = newValue;
 }
 
 ConsoleValueRef& ConsoleValueRef::operator=(const ConsoleValueRef &newValue)
@@ -1759,12 +1736,34 @@ const char *ConsoleValue::getStringValue()
       return sval;
    else if (type == TypeInternalStringStackPtr)
       return STR.mBuffer + (uintptr_t)sval;
-   if(type == TypeInternalFloat)
-      return Con::getData(TypeF32, &fval, 0);
-   else if(type == TypeInternalInt)
-      return Con::getData(TypeS32, &ival, 0);
    else
-      return Con::getData(type, dataPtr, 0, enumTable);
+   {
+      // We need a string representation, so lets create one
+      const char *internalValue = NULL;
+
+      if(type == TypeInternalFloat)
+         internalValue = Con::getData(TypeF32, &fval, 0);
+      else if(type == TypeInternalInt)
+         internalValue = Con::getData(TypeS32, &ival, 0);
+      else
+         return Con::getData(type, dataPtr, 0, enumTable); // We can't save sval here since it is the same as dataPtr
+
+      if (!internalValue)
+         return "";
+
+      U32 stringLen = dStrlen(internalValue);
+      U32 newLen = ((stringLen + 1) + 15) & ~15; // pad upto next cache line
+	   
+      if (bufferLen == 0)
+         sval = (char *) dMalloc(newLen);
+      else if(newLen > bufferLen)
+         sval = (char *) dRealloc(sval, newLen);
+
+      dStrcpy(sval, internalValue);
+      bufferLen = newLen;
+
+      return sval;
+   }
 }
 
 StringStackPtr ConsoleValue::getStringStackPtr()
@@ -1800,11 +1799,13 @@ void ConsoleValue::setIntValue(U32 val)
    {
       fval = (F32)val;
       ival = val;
-      if(sval != typeValueEmpty)
+      if(bufferLen > 0)
       {
-         if (type != TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
-         sval = typeValueEmpty;
+         dFree(sval);
+         bufferLen = 0;
       }
+
+      sval = typeValueEmpty;
       type = TypeInternalInt;
    }
    else
@@ -1825,11 +1826,12 @@ void ConsoleValue::setFloatValue(F32 val)
    {
       fval = val;
       ival = static_cast<U32>(val);
-      if(sval != typeValueEmpty)
+      if(bufferLen > 0)
       {
-         if (type != TypeInternalStackString && type != TypeInternalStringStackPtr) dFree(sval);
-         sval = typeValueEmpty;
+         dFree(sval);
+         bufferLen = 0;
       }
+      sval = typeValueEmpty;
       type = TypeInternalFloat;
    }
    else

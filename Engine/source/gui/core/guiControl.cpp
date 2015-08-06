@@ -465,6 +465,8 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
 
    GFont *font = mTooltipProfile->mFont;
 
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
    // Support for multi-line tooltip text...
 
    Vector<U32> startLineOffsets, lineLengths;
@@ -521,12 +523,12 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
    GFX->setClipRect( rect );
 
    // Draw Filler bit, then border on top of that
-   GFX->getDrawUtil()->drawRectFill( rect, mTooltipProfile->mFillColor );
-   GFX->getDrawUtil()->drawRect( rect, mTooltipProfile->mBorderColor );
+   drawUtil->drawRectFill( rect, mTooltipProfile->mFillColor );
+   drawUtil->drawRect( rect, mTooltipProfile->mBorderColor );
 
    // Draw the text centered in the tool tip box...
 
-   GFX->getDrawUtil()->setBitmapModulation( mTooltipProfile->mFontColor );
+   drawUtil->setBitmapModulation( mTooltipProfile->mFontColor );
 
    for ( U32 i = 0; i < lineLengths.size(); i++ )
    {      
@@ -534,7 +536,7 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
       const UTF8 *line = renderTip.c_str() + startLineOffsets[i];
       U32 lineLen = lineLengths[i];
 
-      GFX->getDrawUtil()->drawTextN( font, start + offset, line, lineLen, mProfile->mFontColors );
+      drawUtil->drawTextN( font, start + offset, line, lineLen, mProfile->mFontColors );
    }
 
    GFX->setClipRect( oldClip );
@@ -2380,7 +2382,8 @@ void GuiControl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent 
       // so set it back before we change it again.
 
       PlatformWindow *pWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
-      AssertFatal(pWindow != NULL,"GuiControl without owning platform window!  This should not be possible.");
+      if (!pWindow)
+         return;
       PlatformCursorController *pController = pWindow->getCursorController();
       AssertFatal(pController != NULL,"PlatformWindow without an owned CursorController!");
 

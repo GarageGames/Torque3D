@@ -447,11 +447,13 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
                           cf->mVertexList[base + indices[start + j + 2]]);
 
             cf->mFaceList.increment();
-            cf->mFaceList.last().normal = plane;
 
-            cf->mFaceList.last().vertex[0] = base + indices[start + j + 0];
-            cf->mFaceList.last().vertex[1] = base + indices[start + j + 1];
-            cf->mFaceList.last().vertex[2] = base + indices[start + j + 2];
+            ConvexFeature::Face& lastFace = cf->mFaceList.last();
+            lastFace.normal = plane;
+
+            lastFace.vertex[0] = base + indices[start + j + 0];
+            lastFace.vertex[1] = base + indices[start + j + 1];
+            lastFace.vertex[2] = base + indices[start + j + 2];
 
             for ( U32 l = 0; l < 3; l++ ) 
             {
@@ -514,8 +516,9 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
             S32 k;
             for ( k = 0; k < cf->mEdgeList.size(); k++ ) 
             {
-               if ( cf->mEdgeList[k].vertex[0] == newEdge0 &&
-                    cf->mEdgeList[k].vertex[1] == newEdge1) 
+               ConvexFeature::Edge currentEdge = cf->mEdgeList[k];
+               if (currentEdge.vertex[0] == newEdge0 &&
+                  currentEdge.vertex[1] == newEdge1)
                {
                   found = true;
                   break;
@@ -1437,10 +1440,12 @@ void TSSkinMesh::createBatchData()
          }
 
          bt->_tmpVec->increment();
-         bt->_tmpVec->last().vert = batchData.initialVerts[curTransform.vertexIndex];
-         bt->_tmpVec->last().normal = batchData.initialNorms[curTransform.vertexIndex];
-         bt->_tmpVec->last().weight = transformOp.weight;
-         bt->_tmpVec->last().vidx = curTransform.vertexIndex;
+
+         BatchData::BatchedVertWeight& tempLast = bt->_tmpVec->last();
+         tempLast.vert = batchData.initialVerts[curTransform.vertexIndex];
+         tempLast.normal = batchData.initialNorms[curTransform.vertexIndex];
+         tempLast.weight = transformOp.weight;
+         tempLast.vidx = curTransform.vertexIndex;
       }
    }
 

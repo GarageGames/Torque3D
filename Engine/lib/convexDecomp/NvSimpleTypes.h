@@ -87,7 +87,7 @@ NvSimpleTypes.h : Defines basic data types for integers and floats.
 	typedef float				NxF32;
 	typedef double				NxF64;
 		
-#elif LINUX
+#elif defined(LINUX)
 	typedef long long			NxI64;
 	typedef signed int			NxI32;
 	typedef signed short		NxI16;
@@ -101,7 +101,7 @@ NvSimpleTypes.h : Defines basic data types for integers and floats.
 	typedef float				NxF32;
 	typedef double				NxF64;
 
-#elif __APPLE__
+#elif defined(__APPLE__)
 	typedef long long			NxI64;
 	typedef signed int			NxI32;
 	typedef signed short		NxI16;
@@ -115,7 +115,7 @@ NvSimpleTypes.h : Defines basic data types for integers and floats.
 	typedef float				NxF32;
 	typedef double				NxF64;
 
-#elif __CELLOS_LV2__
+#elif defined(__CELLOS_LV2__)
 	typedef long long			NxI64;
 	typedef signed int			NxI32;
 	typedef signed short		NxI16;
@@ -129,7 +129,7 @@ NvSimpleTypes.h : Defines basic data types for integers and floats.
 	typedef float				NxF32;
 	typedef double				NxF64;
 
-#elif _XBOX
+#elif defined(_XBOX)
 	typedef __int64				NxI64;
 	typedef signed int			NxI32;
 	typedef signed short		NxI16;

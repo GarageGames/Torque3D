@@ -125,7 +125,7 @@ void* PlatformWindowSDL::getSystemWindow(const WindowSystem system)
      SDL_VERSION(&info.version);
      SDL_GetWindowWMInfo(mWindowHandle,&info);     
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
      if( system == WindowSystem_Windows && info.subsystem == SDL_SYSWM_WINDOWS)
         return info.info.win.window;
 #endif
@@ -432,6 +432,11 @@ void PlatformWindowSDL::_triggerMouseLocationNotify(const SDL_Event& evt)
       mouseEvent.trigger(getWindowId(), 0, evt.motion.xrel, evt.motion.yrel, true);
 }
 
+void PlatformWindowSDL::_triggerMouseWheelNotify(const SDL_Event& evt)
+{
+   wheelEvent.trigger(getWindowId(), 0, evt.wheel.x, evt.wheel.y);
+}
+
 void PlatformWindowSDL::_triggerMouseButtonNotify(const SDL_Event& event)
 {
    S32 action = (event.type == SDL_MOUSEBUTTONDOWN) ? SI_MAKE : SI_BREAK;
@@ -530,12 +535,17 @@ void PlatformWindowSDL::_processSDLEvent(SDL_Event &evt)
          break;
       }
 
+      case SDL_MOUSEWHEEL:
+      {
+         _triggerMouseWheelNotify(evt);
+         break;
+      }
+
       case SDL_MOUSEMOTION:
       {
          _triggerMouseLocationNotify(evt);
          break;
       }
-
       case SDL_MOUSEBUTTONDOWN:
       case SDL_MOUSEBUTTONUP:
       {

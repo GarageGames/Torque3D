@@ -129,7 +129,7 @@ ConsoleValueRef SimConsoleThreadExecCallback::waitForResult()
       return retVal;
    }
 
-   return (const char*)NULL;
+   return ConsoleValueRef();
 }
 
 //-----------------------------------------------------------------------------

@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
+#include "math/util/frustum.h"
 #include "math/mathUtils.h"
 
 #include "math/mMath.h"
@@ -1405,6 +1406,29 @@ void makeProjection( MatrixF *outMatrix,
    F32 left, right, top, bottom;
    makeFrustum( &left, &right, &top, &bottom, fovYInRadians, aspectRatio, nearPlane );
    makeProjection( outMatrix, left, right, top, bottom, nearPlane, farPlane, gfxRotate );
+}
+
+//-----------------------------------------------------------------------------
+
+void makeFovPortFrustum(
+   Frustum *outFrustum,
+   bool isOrtho,
+   F32 nearDist,
+   F32 farDist,
+   const FovPort &inPort,
+   const MatrixF &transform)
+{
+   F32 leftSize = nearDist * inPort.leftTan;
+   F32 rightSize = nearDist * inPort.rightTan;
+   F32 upSize = nearDist * inPort.upTan;
+   F32 downSize = nearDist * inPort.downTan;
+
+   F32 left = -leftSize;
+   F32 right = rightSize;
+   F32 top = upSize;
+   F32 bottom = -downSize;
+
+   outFrustum->set(isOrtho, left, right, top, bottom, nearDist, farDist, transform);
 }
 
 //-----------------------------------------------------------------------------

@@ -287,8 +287,14 @@ bool TerrainBlock::_setBaseTexFormat(void *obj, const char *index, const char *d
       {
          terrain->mBaseTexFormat = (BaseTexFormat)eTable[i].mInt;
          terrain->_updateMaterials();
+
+         if (terrain->isServerObject()) return false;
          terrain->_updateLayerTexture();
-         terrain->_updateBaseTexture(true);
+         // If the cached base texture is older that the terrain file or
+         // it doesn't exist then generate and cache it.
+         String baseCachePath = terrain->_getBaseTexCacheFileName();
+         if (Platform::compareModifiedTimes(baseCachePath, terrain->mTerrFileName) < 0)
+            terrain->_updateBaseTexture(true);
          break;
       }
    }
@@ -333,7 +339,7 @@ bool TerrainBlock::setFile( const FileName &terrFileName )
    return true;
 }
 
-void TerrainBlock::setFile( Resource<TerrainFile> terr )
+void TerrainBlock::setFile(const Resource<TerrainFile>& terr)
 {
    mFile = terr;
    mTerrFileName = terr.getPath();

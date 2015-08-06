@@ -144,6 +144,20 @@ GFX_ImplementTextureProfile( PostFxTextureProfile,
                             GFXTextureProfile::Static | GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap,
                             GFXTextureProfile::NONE );
 
+GFX_ImplementTextureProfile( VRTextureProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::PreserveSize |
+                            GFXTextureProfile::RenderTarget |
+                            GFXTextureProfile::NoMipmap,
+                            GFXTextureProfile::NONE );
+
+GFX_ImplementTextureProfile( VRDepthProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::PreserveSize |
+                            GFXTextureProfile::RenderTarget |
+                            GFXTextureProfile::NoMipmap |
+                            GFXTextureProfile::ZTarget,
+                            GFXTextureProfile::NONE );
 
 void PostEffect::EffectConst::set( const String &newVal )
 {
@@ -797,14 +811,16 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
                            lightDir.y * (6378.0f * 1000.0f),
                            lightDir.z * (6378.0f * 1000.0f) );
 
+         RectI viewPort = GFX->getViewport();
+
          // Get the screen space sun position.
-         MathUtils::mProjectWorldToScreen( lightPos, &sunPos, GFX->getViewport(), tmp, proj );
+         MathUtils::mProjectWorldToScreen(lightPos, &sunPos, viewPort, tmp, proj);
 
          // And normalize it to the 0 to 1 range.
-         sunPos.x -= (F32)GFX->getViewport().point.x;
-         sunPos.y -= (F32)GFX->getViewport().point.y;
-         sunPos.x /= (F32)GFX->getViewport().extent.x;
-         sunPos.y /= (F32)GFX->getViewport().extent.y;
+         sunPos.x -= (F32)viewPort.point.x;
+         sunPos.y -= (F32)viewPort.point.y;
+         sunPos.x /= (F32)viewPort.extent.x;
+         sunPos.y /= (F32)viewPort.extent.y;
 
          mShaderConsts->set( mScreenSunPosSC, Point2F( sunPos.x, sunPos.y ) );
       }

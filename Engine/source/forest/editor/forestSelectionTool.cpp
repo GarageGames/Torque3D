@@ -56,7 +56,7 @@ Point3F Selection<ForestItem>::getOrigin()
 
    Selection<ForestItem>::iterator itr = begin();
 
-   for ( ; itr != end(); itr++ )
+   for (; itr != end(); ++itr)
    {
       const MatrixF &mat = itr->getTransform();
       Point3F wPos;
@@ -450,10 +450,11 @@ void ForestSelectionTool::onRender2D()
       F32 hscale = wwidth * 2 / F32(mEditor->getWidth());
       F32 vscale = wheight * 2 / F32(mEditor->getHeight());
 
-      F32 left = (mDragRect.point.x - mEditor->getPosition().x) * hscale - wwidth;
-      F32 right = (mDragRect.point.x - mEditor->getPosition().x + mDragRect.extent.x) * hscale - wwidth;
-      F32 top = wheight - vscale * (mDragRect.point.y - mEditor->getPosition().y);
-      F32 bottom = wheight - vscale * (mDragRect.point.y - mEditor->getPosition().y + mDragRect.extent.y);
+      Point2I editorPosition = mEditor->getPosition();
+      F32 left = (mDragRect.point.x - editorPosition.x) * hscale - wwidth;
+      F32 right = (mDragRect.point.x - editorPosition.x + mDragRect.extent.x) * hscale - wwidth;
+      F32 top = wheight - vscale * (mDragRect.point.y - editorPosition.y);
+      F32 bottom = wheight - vscale * (mDragRect.point.y - editorPosition.y + mDragRect.extent.y);
       gDragFrustum.set(lastCameraQuery.ortho, left, right, top, bottom, lastCameraQuery.nearPlane, lastCameraQuery.farPlane, lastCameraQuery.cameraMatrix );
 
       mForest->getData()->getItems( gDragFrustum, &mDragSelection );      

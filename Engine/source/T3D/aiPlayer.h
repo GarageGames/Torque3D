@@ -122,10 +122,12 @@ private:
       SimObjectPtr<SceneObject> object;
       /// Distance at whcih to follow.
       F32 radius;
+      Point3F lastPos;
       /// Default constructor.
       FollowData() : object(NULL)
       {
          radius = 5.0f;
+         lastPos = Point3F::Zero;
       }
    };
 
@@ -161,7 +163,7 @@ public:
 
    // Targeting and aiming sets/gets
    void setAimObject( GameBase *targetObject );
-   void setAimObject( GameBase *targetObject, Point3F offset );
+   void setAimObject(GameBase *targetObject, const Point3F& offset);
    GameBase* getAimObject() const  { return mAimObject; }
    void setAimLocation( const Point3F &location );
    Point3F getAimLocation() const { return mAimLocation; }

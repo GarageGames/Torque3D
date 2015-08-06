@@ -1235,7 +1235,7 @@ F32 GuiRiverEditorCtrl::getNodeDepth()
    return 0.0f;
 }
 
-void GuiRiverEditorCtrl::setNodePosition( Point3F pos )
+void GuiRiverEditorCtrl::setNodePosition(const Point3F& pos)
 {
    if ( mSelRiver && mSelNode != -1 )
    {

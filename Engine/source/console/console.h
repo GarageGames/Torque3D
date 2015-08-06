@@ -186,20 +186,23 @@ public:
       fval = 0;
       sval = typeValueEmpty;
       bufferLen = 0;
-	  type = TypeInternalString;
+      type = TypeInternalString;
    }
    
    void cleanup()
    {
-      if (type <= TypeInternalString &&
-          sval != typeValueEmpty && type != TypeInternalStackString && type != TypeInternalStringStackPtr)
+      if ((type <= TypeInternalString) && (bufferLen > 0))
+      {
          dFree(sval);
+         bufferLen = 0;
+      }
       sval = typeValueEmpty;
       type = ConsoleValue::TypeInternalString;
       ival = 0;
       fval = 0;
-      bufferLen = 0;
    }
+   ConsoleValue(){ init(); };
+   ~ConsoleValue(){ cleanup(); };
 };
 
 // Proxy class for console variables
@@ -214,12 +217,6 @@ public:
    ~ConsoleValueRef() { ; }
 
    ConsoleValueRef(const ConsoleValueRef &ref);
-   ConsoleValueRef(const char *value);
-   ConsoleValueRef(const String &ref);
-   ConsoleValueRef(U32 value);
-   ConsoleValueRef(S32 value);
-   ConsoleValueRef(F32 value);
-   ConsoleValueRef(F64 value);
 
    static ConsoleValueRef fromValue(ConsoleValue *value) { ConsoleValueRef ref; ref.value = value; return ref; }
 
@@ -1103,9 +1100,9 @@ struct ConsoleDocFragment
    static ConsoleDocFragment* smFirst;
    
    ConsoleDocFragment( const char* text, const char* inClass = NULL, const char* definition = NULL )
-      : mText( text ),
-        mClass( inClass ),
+      : mClass( inClass ),
         mDefinition( definition ),
+        mText( text ),
         mNext( smFirst )
    {
       smFirst = this;

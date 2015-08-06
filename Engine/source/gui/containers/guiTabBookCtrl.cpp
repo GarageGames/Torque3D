@@ -548,7 +548,7 @@ void GuiTabBookCtrl::renderTabs( const Point2I &offset, const RectI &tabRect )
 
 //-----------------------------------------------------------------------------
 
-void GuiTabBookCtrl::renderTab( RectI tabRect, GuiTabPageCtrl *tab )
+void GuiTabBookCtrl::renderTab(const RectI& tabRect, GuiTabPageCtrl *tab)
 {
    StringTableEntry text = tab->getText();
    ColorI oldColor;

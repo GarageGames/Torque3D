@@ -272,20 +272,3 @@ function ESettingsWindowPopup::onSelect(%this)
    EditorSettings.setValue(%this.editorSettingsValue, %this.getText());
    eval(%this.editorSettingsRead);
 }
-
-//-----------------------------------------------------------------------------
-// Demo
-//-----------------------------------------------------------------------------
-
-function OnWalkaboutDemoLimit()
-{
-   MessageBoxOK("Walkabout demo",
-      "This demo only allows two NavMeshes to be created. Sorry!");
-}
-
-function OnWalkaboutDemoSave()
-{
-   MessageBoxOK("Walkabout demo",
-      "This demo doesn't allow you to save NavMeshes. Sorry!" SPC
-      "The rest of your mission will still be saved.");
-}

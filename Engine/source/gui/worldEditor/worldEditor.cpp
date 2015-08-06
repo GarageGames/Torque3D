@@ -1631,10 +1631,11 @@ void WorldEditor::renderScreenObj( SceneObject *obj, const Point3F& projPos, con
       // Save an IconObject for performing icon-click testing later.
 
       mIcons.increment();
-      mIcons.last().object = obj;
-      mIcons.last().rect   = renderRect;
-      mIcons.last().dist   = projPos.z;
-      mIcons.last().alpha  = iconAlpha;
+      IconObject& lastIcon = mIcons.last();
+      lastIcon.object = obj;
+      lastIcon.rect = renderRect;
+      lastIcon.dist = projPos.z;
+      lastIcon.alpha = iconAlpha;
    }
 
    //

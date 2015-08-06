@@ -65,7 +65,7 @@ ForestWindMgr::ForestWindMgr()
 ForestWindMgr::~ForestWindMgr()
 {
    IdToWindMap::Iterator sourceIter = mSources->begin();
-   for( ; sourceIter != mSources->end(); sourceIter++ )      
+   for (; sourceIter != mSources->end(); ++sourceIter)
       delete (*sourceIter).value;
 
    delete mSources;
@@ -185,7 +185,7 @@ void ForestWindMgr::processTick()
       PROFILE_SCOPE( ForestWindMgr_AdvanceTime_Cleanup );
 
       IdToWindMap::Iterator sourceIter = mPrevSources->begin();
-      for( ; sourceIter != mPrevSources->end(); sourceIter++ )
+      for (; sourceIter != mPrevSources->end(); ++sourceIter)
       {
          ForestWindAccumulator *accum = (*sourceIter).value;
 

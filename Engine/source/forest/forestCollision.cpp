@@ -355,7 +355,7 @@ bool ForestData::castRay( const Point3F &start, const Point3F &end, RayInfo *out
    shortest.t = F32_MAX;
 
    BucketTable::ConstIterator iter = mBuckets.begin();
-   for ( ; iter != mBuckets.end(); iter++ )
+   for (; iter != mBuckets.end(); ++iter)
    {
       if ( iter->value->castRay( start, end, outInfo, rendered ) )
       {

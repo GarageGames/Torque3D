@@ -63,6 +63,8 @@
    #include "console/dynamicTypes.h"
 #endif
 
+// Need full definition visible for SimObjectPtr<ParticleEmitter>
+#include "T3D/fx/particleEmitter.h"
 
 class GFXCubemap;
 class TSShapeInstance;
@@ -70,8 +72,6 @@ class SceneRenderState;
 class TSThread;
 class GameConnection;
 struct CameraScopeQuery;
-class ParticleEmitter;
-class ParticleEmitterData;
 class ProjectileData;
 class ExplosionData;
 struct DebrisData;
@@ -1104,8 +1104,8 @@ protected:
    virtual void shakeCamera( U32 imageSlot );
    virtual void updateDamageLevel();
    virtual void updateDamageState();
-   virtual void onImpact(SceneObject* obj, VectorF vec);
-   virtual void onImpact(VectorF vec);
+   virtual void onImpact(SceneObject* obj, const VectorF& vec);
+   virtual void onImpact(const VectorF& vec);
    /// @}
 
    /// The inner prep render function that does the 
@@ -1582,6 +1582,13 @@ public:
    /// @param   pos   TODO: Find out what this does
    /// @param   mat   Camera transform (out)
    virtual void getCameraTransform(F32* pos,MatrixF* mat);
+
+   /// Gets the view transform for a particular eye, taking into account the current absolute 
+   /// orient and position values of the display device.
+   virtual void getEyeCameraTransform( IDisplayDevice *display, U32 eyeId, MatrixF *outMat );
+
+   /// Calculates a delta camera angle and view position based on inPose
+   virtual DisplayPose calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose);
 
    /// Gets the index of a node inside a mounted image given the name
    /// @param   imageSlot   Image slot

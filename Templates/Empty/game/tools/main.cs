@@ -131,12 +131,6 @@ package Tools
       Tools::LoadResources( $Tools::resourcePath );
       
       //$Scripts::ignoreDSOs = %toggle;
-      
-      if(isWebDemo())
-      {
-         // if this is the web tool demo lets init some value storage
-         //$clicks
-      }
    }
    
    function startToolTime(%tool)
