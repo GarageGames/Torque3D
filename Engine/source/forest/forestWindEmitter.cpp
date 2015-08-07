@@ -522,8 +522,9 @@ void ForestWindEmitter::_renderEmitterInfo( ObjectRenderInst *ri, SceneRenderSta
       // If the camera is close to the sphere, shrink the sphere so it remains visible.
       GameConnection* gc = GameConnection::getConnectionToServer();
       GameBase* gb;
-      if ( gc && (gb = gc->getCameraObject()) )
+      if (gc && (gc->getCameraObject()))
       {
+         gb = gc->getCameraObject();
          F32 camDist = (gb->getPosition() - getPosition()).len();
          if ( camDist < mWindRadius )
             useRadius = camDist;
