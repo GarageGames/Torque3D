@@ -114,6 +114,7 @@ function initializeWorldEditor()
    EVisibility.addOption( "Debug Render: Decals", "$Decals::debugRender", "" );
    EVisibility.addOption( "Debug Render: Light Frustums", "$Light::renderLightFrustums", "" );
    EVisibility.addOption( "Debug Render: Bounding Boxes", "$Scene::renderBoundingBoxes", "" );
+   EVisibility.addOption( "Debug Render: Physics World", "$PhysicsWorld::render", "togglePhysicsDebugViz" );
    EVisibility.addOption( "AL: Disable Shadows", "$Shadows::disable", "" );   
    EVisibility.addOption( "AL: Light Color Viz", "$AL_LightColorVisualizeVar", "toggleLightColorViz" );
    EVisibility.addOption( "AL: Light Specular Viz", "$AL_LightSpecularVisualizeVar", "toggleLightSpecularViz" );
