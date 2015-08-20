@@ -188,7 +188,7 @@ $(document).ready(function() {
     }
   })
 
-  getFeed('http://forums.torque3d.org/feed.php?mode=news', 3)
+  getFeed('http://forums.torque3d.org/feed.php?mode=news', 1)
   .done(function(data) {
     if(data.responseData.feed && data.responseData.feed.entries) {
       var news = $('#recent-news');
