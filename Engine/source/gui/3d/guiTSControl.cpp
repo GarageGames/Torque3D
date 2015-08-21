@@ -579,11 +579,11 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       const FovPort *currentFovPort = GFX->getStereoFovPort();
       const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
       const Point3F *eyeOffset = GFX->getStereoEyeOffsets();
+      Frustum gfxFrustum = originalFrustum;
 
       for (U32 i=0; i<2; i++)
       {
          GFX->activateStereoTarget(i);
-         Frustum gfxFrustum = originalFrustum;
          MathUtils::makeFovPortFrustum(&gfxFrustum, true, gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[i], eyeTransforms[i]);
          GFX->setFrustum(gfxFrustum);
 
