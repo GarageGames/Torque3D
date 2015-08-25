@@ -1755,41 +1755,48 @@ void GuiControl::write(Stream &stream, U32 tabStop, U32 flags)
 {
    //note: this will return false if either we, or any of our parents, are non-save controls
    bool bCanSave	= ( flags & IgnoreCanSave ) || ( flags & NoCheckParentCanSave && getCanSave() ) || getCanSaveParent();
-   StringTableEntry steName = mAddGroup->getInternalName();
-   if(bCanSave && mAddGroup && (steName != NULL) && (steName != StringTable->insert("null")) && getName() )
+   
+   if (bCanSave && mAddGroup)
    {
-      MutexHandle handle;
-      handle.lock(mMutex);
+      StringTableEntry steName = mAddGroup->getInternalName();
 
-      // export selected only?
-      if((flags & SelectedOnly) && !isSelected())
+      if ((steName != NULL) && (steName != StringTable->insert("null")) && getName())
       {
-         for(U32 i = 0; i < size(); i++)
-            (*this)[i]->write(stream, tabStop, flags);
+         MutexHandle handle;
+         handle.lock(mMutex);
+
+         // export selected only?
+         if ((flags & SelectedOnly) && !isSelected())
+         {
+            for (U32 i = 0; i < size(); i++)
+               (*this)[i]->write(stream, tabStop, flags);
+
+            return;
+
+         }
+
+         stream.writeTabs(tabStop);
+         char buffer[1024];
+         dSprintf(buffer, sizeof(buffer), "new %s(%s,%s) {\r\n", getClassName(), getName() ? getName() : "", mAddGroup->getInternalName());
+         stream.write(dStrlen(buffer), buffer);
+         writeFields(stream, tabStop + 1);
+
+         if (size())
+         {
+            stream.write(2, "\r\n");
+            for (U32 i = 0; i < size(); i++)
+               (*this)[i]->write(stream, tabStop + 1, flags);
+         }
+
+         stream.writeTabs(tabStop);
+         stream.write(4, "};\r\n");
 
          return;
-
       }
-
-      stream.writeTabs(tabStop);
-      char buffer[1024];
-      dSprintf(buffer, sizeof(buffer), "new %s(%s,%s) {\r\n", getClassName(), getName() ? getName() : "", mAddGroup->getInternalName());
-      stream.write(dStrlen(buffer), buffer);
-      writeFields(stream, tabStop + 1);
-
-      if(size())
-      {
-         stream.write(2, "\r\n");
-         for(U32 i = 0; i < size(); i++)
-            (*this)[i]->write(stream, tabStop + 1, flags);
-      }
-
-      stream.writeTabs(tabStop);
-      stream.write(4, "};\r\n");
    }
-   else if (bCanSave)
+   
+   if (bCanSave)
       Parent::write( stream, tabStop, flags );
-
 }
 
 //=============================================================================
