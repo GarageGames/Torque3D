@@ -150,6 +150,21 @@ vec2 parallaxOffset( sampler2D texMap, vec2 texCoord, vec3 negViewTS, float dept
    return offset;
 }
 
+/// Same as parallaxOffset but for dxtnm where depth is stored in the red channel instead of the alpha
+vec2 parallaxOffsetDxtnm(sampler2D texMap, vec2 texCoord, vec3 negViewTS, float depthScale)
+{
+   float depth = texture(texMap, texCoord).r;
+   vec2 offset = negViewTS.xy * (depth * depthScale);
+
+   for (int i = 0; i < PARALLAX_REFINE_STEPS; i++)
+   {
+      depth = (depth + texture(texMap, texCoord + offset).r) * 0.5;
+      offset = negViewTS.xy * (depth * depthScale);
+   }
+
+   return offset;
+}
+
 
 /// The maximum value for 16bit per component integer HDR encoding.
 const float HDR_RGB16_MAX = 100.0;
