@@ -713,30 +713,32 @@ void FlyingVehicle::updateEmitter(bool active,F32 dt,ParticleEmitterData *emitte
 {
    if (!emitter)
       return;
-   for (S32 j = idx; j < idx + count; j++)
+   for (S32 i = idx; i < idx + count; i++) {
       if (active) {
-         if (mDataBlock->jetNode[j] != -1) {
-            if (!bool(mJetEmitter[j])) {
-               mJetEmitter[j] = new ParticleEmitter;
-               mJetEmitter[j]->onNewDataBlock(emitter,false);
-               mJetEmitter[j]->registerObject();
+         if (mDataBlock->jetNode[i] != -1) {
+            if (!bool(mJetEmitter[i])) {
+               mJetEmitter[i] = new ParticleEmitter;
+               mJetEmitter[i]->onNewDataBlock(emitter,false);
+               mJetEmitter[i]->registerObject();
             }
             MatrixF mat;
             Point3F pos,axis;
             mat.mul(getRenderTransform(),
-                    mShapeInstance->mNodeTransforms[mDataBlock->jetNode[j]]);
+                    mShapeInstance->mNodeTransforms[mDataBlock->jetNode[i]]);
             mat.getColumn(1,&axis);
             mat.getColumn(3,&pos);
-            mJetEmitter[j]->emitParticles(pos,true,axis,getVelocity(),(U32)(dt * 1000));
+            mJetEmitter[i]->emitParticles(pos,true,axis,getVelocity(),(U32)(dt * 1000));
          }
       }
       else {
-         for (S32 j = idx; j < idx + count; j++)
+         for (S32 j = idx; j < idx + count; j++) {
             if (bool(mJetEmitter[j])) {
                mJetEmitter[j]->deleteWhenEmpty();
                mJetEmitter[j] = 0;
             }
+         }
       }
+   }
 }
 
 

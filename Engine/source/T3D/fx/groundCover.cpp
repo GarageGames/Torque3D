@@ -228,8 +228,6 @@ void GroundCoverCell::_rebuildVB()
 
       // Fill this puppy!
       GCVertex* vertPtr = vb.lock( 0, verts );
-      
-      GFXVertexColor color;
 
       Vector<Placement>::const_iterator last = iter + bb;
       for ( ; iter != last; iter++ )
@@ -1184,9 +1182,9 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
             terrainBlock = dynamic_cast< TerrainBlock* >( terrainBlocks.first() );
          else
          {
-            for ( U32 i = 0; i < terrainBlocks.size(); i++ )
+            for ( U32 j = 0; j < terrainBlocks.size(); j++ )
             {
-               TerrainBlock *terrain = dynamic_cast< TerrainBlock* >( terrainBlocks[ i ] );
+               TerrainBlock *terrain = dynamic_cast< TerrainBlock* >( terrainBlocks[ j ] );
                if( !terrain )
                   continue;
 

@@ -113,8 +113,8 @@ inline void SparseArray<T>::insert(T* pObject, U32 key)
 template <class T>
 inline T* SparseArray<T>::remove(U32 key)
 {
-   U32 remove  = key % mModulus;
-   Node* probe = &mSentryTables[remove];
+   U32 removeK = key % mModulus;
+   Node* probe = &mSentryTables[removeK];
    while (probe->next != NULL) {
       if (probe->next->key == key) {
          Node* remove = probe->next;

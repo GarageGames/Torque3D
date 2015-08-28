@@ -1123,7 +1123,7 @@ void DiffuseVertColorFeatureHLSL::processVert(  Vector< ShaderComponent* >& comp
 
       ShaderConnector* connectComp = dynamic_cast< ShaderConnector* >( componentList[ C_CONNECTOR ] );
       AssertFatal( connectComp, "DiffuseVertColorFeatureGLSL::processVert - C_CONNECTOR is not a ShaderConnector" );
-      Var* outColor = connectComp->getElement( RT_COLOR );
+      outColor = connectComp->getElement( RT_COLOR );
       outColor->setName( "vertColor" );
       outColor->setStructName( "OUT" );
       outColor->setType( "float4" );
@@ -1435,7 +1435,7 @@ void VertLitHLSL::processVert(   Vector<ShaderComponent*> &componentList,
 
       // Grab the connector color
       ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      Var *outColor = connectComp->getElement( RT_COLOR );
+      outColor = connectComp->getElement( RT_COLOR );
       outColor->setName( "vertColor" );
       outColor->setStructName( "OUT" );
       outColor->setType( "float4" );

@@ -350,18 +350,18 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
 
          if ( fd.features.hasFeature( MFT_DetailNormalMap ) )
          {
-            Var *bumpMap = (Var*)LangElement::find( "detailBumpMap" );
-            if ( !bumpMap ) {
-               bumpMap = new Var;
-               bumpMap->setType( "sampler2D" );
-               bumpMap->setName( "detailBumpMap" );
-               bumpMap->uniform = true;
-               bumpMap->sampler = true;
-               bumpMap->constNum = Var::getTexUnitNum();
+            Var *detailBumpMap = (Var*)LangElement::find( "detailBumpMap" );
+            if ( !detailBumpMap ) {
+               detailBumpMap = new Var;
+               detailBumpMap->setType( "sampler2D" );
+               detailBumpMap->setName( "detailBumpMap" );
+               detailBumpMap->uniform = true;
+               detailBumpMap->sampler = true;
+               detailBumpMap->constNum = Var::getTexUnitNum();
             }
 
             texCoord = getInTexCoord( "detCoord", "float2", true, componentList );
-            LangElement *texOp = new GenOp( "tex2D(@, @)", bumpMap, texCoord );
+            LangElement *texOp = new GenOp( "tex2D(@, @)", detailBumpMap, texCoord );
 
             Var *detailBump = new Var;
             detailBump->setName( "detailBump" );

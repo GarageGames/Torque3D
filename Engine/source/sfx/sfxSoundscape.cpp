@@ -174,18 +174,18 @@ void SFXSoundscapeManager::update()
          // Activate SFXStates on the ambience.  For state slots that
          // have changed, deactivate states that we have already activated.
          
-         for( U32 i = 0; i < SFXAmbience::MaxStates; ++ i )
+         for( U32 j = 0; j < SFXAmbience::MaxStates; ++ j )
          {
-            SFXState* state = ambience->getState( i );
-            if( soundscape->mStates[ i ] != state )
+            SFXState* state = ambience->getState( j );
+            if( soundscape->mStates[ j ] != state )
             {
-               if( soundscape->mStates[ i ] )
-                  soundscape->mStates[ i ]->deactivate();
+               if( soundscape->mStates[ j ] )
+                  soundscape->mStates[ j ]->deactivate();
 
                if( state )
                   state->activate();
                   
-               soundscape->mStates[ i ] = state;
+               soundscape->mStates[ j ] = state;
             }
          }
          

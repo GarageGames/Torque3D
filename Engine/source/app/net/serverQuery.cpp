@@ -1275,7 +1275,7 @@ static void processPingsAndQueries( U32 session, bool schedule )
    if ( !gPingList.size() && !waitingForMaster )
    {
       // Start the query phase:
-      for ( U32 i = 0; i < gQueryList.size() && i < gMaxConcurrentQueries; )
+      for ( i = 0; i < gQueryList.size() && i < gMaxConcurrentQueries; )
       {
          Ping &p = gQueryList[i];
          if ( p.time + gPingTimeout < time )

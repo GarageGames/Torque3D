@@ -443,7 +443,7 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
    PlaneF clipPlane( mOrigin, toGizmoVec );
 
    mSelectionIdx = -1;
-   Point3F end = camPos + event.vec * smProjectDistance;
+   const Point3F end = camPos + event.vec * smProjectDistance;
 
    if ( mProfile->mode == RotateMode )
    {
@@ -612,7 +612,6 @@ bool Gizmo::collideAxisGizmo( const Gui3DMouseEvent & event )
             Point3F(mOrigin + (p1 + p2) * scale)
          };
 
-         Point3F end = camPos + event.vec * smProjectDistance;
          F32 t = plane.intersect(camPos, end);
          if ( t >= 0 && t <= 1 )
          {

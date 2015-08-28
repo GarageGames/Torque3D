@@ -472,7 +472,7 @@ DefineConsoleFunction( strreplace, const char*, ( const char* source, const char
    U32 dstp = 0;
    for(;;)
    {
-      const char *scan = dStrstr(source + scanp, from);
+      scan = dStrstr(source + scanp, from);
       if(!scan)
       {
          dStrcpy(ret + dstp, source + scanp);

@@ -1497,7 +1497,7 @@ void GuiCanvas::popDialogControl(GuiControl *gui)
 
    if (size() > 0)
    {
-      GuiControl *ctrl = static_cast<GuiControl *>(last());
+      ctrl = static_cast<GuiControl *>(last());
       if( ctrl->getFirstResponder() )
          ctrl->getFirstResponder()->setFirstResponder();
    }
@@ -1514,7 +1514,7 @@ void GuiCanvas::popDialogControl(GuiControl *gui)
 
    if (size() > 0)
    {
-      GuiControl *ctrl = static_cast<GuiControl*>(last());
+      ctrl = static_cast<GuiControl*>(last());
       ctrl->buildAcceleratorMap();
    }
    refreshMouseControl();

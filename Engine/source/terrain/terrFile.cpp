@@ -110,11 +110,11 @@ void TerrainFile::_buildGridMap()
    mGridMap.compact();
 
    // Assign memory from the pool to each grid level.
-   TerrainSquare *sq = mGridMapPool.address();
+   TerrainSquare *poolsq = mGridMapPool.address();
    for ( S32 i = mGridLevels; i >= 0; i-- )
    {
-      mGridMap[i] = sq;
-      sq += 1 << ( 2 * ( mGridLevels - i ) );
+      mGridMap[i] = poolsq;
+      poolsq += 1 << ( 2 * ( mGridLevels - i ) );
    }
 
    for( S32 i = mGridLevels; i >= 0; i-- )

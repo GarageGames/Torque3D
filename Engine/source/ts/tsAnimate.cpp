@@ -212,11 +212,11 @@ void TSShapeInstance::animateNodes(S32 ss)
    for (i=0; i<mNodeCallbacks.size(); i++)
    {
       AssertFatal(mNodeCallbacks[i].callback, "No callback method defined");
-      S32 nodeIndex = mNodeCallbacks[i].nodeIndex;
-      if (nodeIndex>=start && nodeIndex<end)
+      S32 callbackIndex = mNodeCallbacks[i].nodeIndex;
+      if (callbackIndex>=start && callbackIndex<end)
       {
-         mNodeCallbacks[i].callback->setNodeTransform(this, nodeIndex, smNodeLocalTransforms[nodeIndex]);
-         smNodeLocalTransformDirty.set(nodeIndex);
+         mNodeCallbacks[i].callback->setNodeTransform(this, callbackIndex, smNodeLocalTransforms[callbackIndex]);
+         smNodeLocalTransformDirty.set(callbackIndex);
       }
    }
 

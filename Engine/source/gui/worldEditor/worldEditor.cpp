@@ -1543,7 +1543,7 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
 
          // Reset for next pass...
          vIdx = 0;
-         void *lockPtr = vb.lock();
+         lockPtr = vb.lock();
          if(!lockPtr) return;
       }
    }
@@ -3010,7 +3010,7 @@ bool WorldEditor::alignByAxis( S32 axis )
 
    for(S32 i=0; i<mSelected->size(); ++i)
    {
-      SceneObject* object = dynamic_cast< SceneObject* >( ( *mSelected )[ i ] );
+      object = dynamic_cast< SceneObject* >( ( *mSelected )[ i ] );
       if( !object )
          continue;
          

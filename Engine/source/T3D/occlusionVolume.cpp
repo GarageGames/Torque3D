@@ -132,7 +132,7 @@ void OcclusionVolume::buildSilhouette( const SceneCameraState& cameraState, Vect
    // depending on whether we project orthogonally or in perspective.
 
    TempAlloc< U32 > indices( mPolyhedron.getNumPoints() );
-   U32 numPoints;
+   U32 numSilhouettePoints;
 
    if( cameraState.getFrustum().isOrtho() )
    {
@@ -144,7 +144,7 @@ void OcclusionVolume::buildSilhouette( const SceneCameraState& cameraState, Vect
       // And extract the silhouette.
 
       SilhouetteExtractorOrtho< PolyhedronType > extractor( mPolyhedron );
-      numPoints = extractor.extractSilhouette( osViewDir, indices, indices.size );
+      numSilhouettePoints = extractor.extractSilhouette( osViewDir, indices, indices.size );
    }
    else
    {
@@ -157,7 +157,7 @@ void OcclusionVolume::buildSilhouette( const SceneCameraState& cameraState, Vect
 
       // Do a perspective-correct silhouette extraction.
 
-      numPoints = mSilhouetteExtractor.extractSilhouette(
+      numSilhouettePoints = mSilhouetteExtractor.extractSilhouette(
          camView,
          indices, indices.size );
    }
@@ -183,7 +183,7 @@ void OcclusionVolume::buildSilhouette( const SceneCameraState& cameraState, Vect
 
    // Now store the points.
 
-   outPoints.setSize( numPoints );
-   for( U32 i = 0; i < numPoints; ++ i )
+   outPoints.setSize( numSilhouettePoints );
+   for( U32 i = 0; i < numSilhouettePoints; ++ i )
       outPoints[ i ] = mWSPoints[ indices[ i ] ];
 }

@@ -3170,7 +3170,6 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
             bool datablockChange = image.dataBlock != imageData;
             if (datablockChange || (image.skinNameHandle != skinDesiredNameHandle))
             {
-               MountedImage& image = mMountedImageList[i];
                image.scriptAnimPrefix = scriptDesiredAnimPrefix;
 
                setImage(   i, imageData, 
@@ -3184,7 +3183,6 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
             {
                // We don't have a new image, but we do have a new script anim prefix to work with.
                // Notify the image of this change.
-               MountedImage& image = mMountedImageList[i];
                image.scriptAnimPrefix = scriptDesiredAnimPrefix;
                updateAnimThread(i, getImageShapeIndex(image));
             }
@@ -3441,8 +3439,8 @@ void ShapeBaseConvex::getFeatures(const MatrixF& mat, const VectorF& n, ConvexFe
    U32 numVerts = emitString[currPos++];
    for (i = 0; i < numVerts; i++) {
       cf->mVertexList.increment();
-      U32 index = emitString[currPos++];
-      mat.mulP(pAccel->vertexList[index], &cf->mVertexList.last());
+      U32 vid = emitString[currPos++];
+      mat.mulP(pAccel->vertexList[vid], &cf->mVertexList.last());
    }
 
    U32 numEdges = emitString[currPos++];

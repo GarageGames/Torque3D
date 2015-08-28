@@ -150,10 +150,10 @@ void ForestWind::processTick()
       mCurrentInterp = 0;
       mCurrentTarget.set( 0, 0 );
    
-      Point2F windDir( mDirection.x, mDirection.y );
-      windDir.normalizeSafe();
+      Point2F myWindDir( mDirection.x, mDirection.y );
+      myWindDir.normalizeSafe();
 
-      mCurrentTarget = finalVec + windDir;
+      mCurrentTarget = finalVec + myWindDir;
    }
    else
    {

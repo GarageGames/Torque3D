@@ -246,12 +246,12 @@ void SimFieldDictionary::writeFields(SimObject *obj, Stream &stream, U32 tabStop
       for(Entry *walk = mHashTable[i];walk; walk = walk->next)
       {
          // make sure we haven't written this out yet:
-         U32 i;
-         for(i = 0; i < list.size(); i++)
-            if(list[i].pFieldname == walk->slotName)
+         U32 j;
+         for(j = 0; j < list.size(); j++)
+            if(list[j].pFieldname == walk->slotName)
                break;
 
-         if(i != list.size())
+         if(j != list.size())
             continue;
 
 
@@ -294,12 +294,12 @@ void SimFieldDictionary::printFields(SimObject *obj)
       for(Entry *walk = mHashTable[i];walk; walk = walk->next)
       {
          // make sure we haven't written this out yet:
-         U32 i;
-         for(i = 0; i < list.size(); i++)
-            if(list[i].pFieldname == walk->slotName)
+         U32 j;
+         for(j = 0; j < list.size(); j++)
+            if(list[j].pFieldname == walk->slotName)
                break;
 
-         if(i != list.size())
+         if(j != list.size())
             continue;
 
          flist.push_back(walk);

@@ -647,7 +647,7 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
          nodeUniformScales.increment(newScaleMembership.count() * seq.numKeyframes);
 
       // remap node transforms from temporary arrays
-      for (S32 j = 0; j < nodeMap.size(); j++)
+      for (j = 0; j < nodeMap.size(); j++)
       {
          if (nodeMap[j] < 0)
             continue;
@@ -713,7 +713,7 @@ bool TSShape::importSequences(Stream * s, const String& sequencePath)
    S32 oldSz = triggers.size();
    s->read(&sz);
    triggers.setSize(oldSz+sz);
-   for (S32 i=0; i<sz;i++)
+   for (i=0; i<sz;i++)
    {
       s->read(&triggers[i+oldSz].state);
       s->read(&triggers[i+oldSz].pos);

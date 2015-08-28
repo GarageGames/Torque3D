@@ -415,9 +415,9 @@ F32 GameBase::getUpdatePriority(CameraScopeQuery *camInfo, U32 updateMask, S32 u
       // Projectiles are more interesting if they
       // are heading for us.
       wInterest = 0.30f;
-      F32 dot = -mDot(pos,getVelocity());
-      if (dot > 0.0f)
-         wInterest += 0.20 * dot;
+      F32 vdot = -mDot(pos,getVelocity());
+      if (vdot > 0.0f)
+         wInterest += 0.20 * vdot;
    }
    else
    {

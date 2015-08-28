@@ -615,7 +615,7 @@ bool GFXD3D9TextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dd
             U32 srcHeight = dds->getHeight();
             U8* srcBytes = dds->mSurfaces[0]->mMips[i];
             U8* dstBytes = (U8*)lockedRect.pBits;
-            for (U32 i = 0; i<srcHeight; i++)          
+            for (U32 j = 0; j<srcHeight; j++)          
             {
                dMemcpy( dstBytes, srcBytes, srcPitch );
                dstBytes += lockedRect.Pitch;

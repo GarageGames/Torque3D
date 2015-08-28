@@ -420,12 +420,12 @@ void TSLastDetail::_update()
 
       imposterCap->end();
 
-      Point2I texSize( destBmp.getWidth(mip), destBmp.getHeight(mip) );
+      Point2I mipSize( destBmp.getWidth(mip), destBmp.getHeight(mip) );
 
       // Ok... pack in bitmaps till we run out.
-      for ( S32 y=0; y+currDim <= texSize.y; )
+      for ( S32 y=0; y+currDim <= mipSize.y; )
       {
-         for ( S32 x=0; x+currDim <= texSize.x; )
+         for ( S32 x=0; x+currDim <= mipSize.x; )
          {
             // Copy the next bitmap to the dest texture.
             GBitmap* bmp = bitmaps.first();
@@ -434,7 +434,7 @@ void TSLastDetail::_update()
             delete bmp;
 
             // Copy the next normal to the dest texture.
-            GBitmap* normalmap = normalmaps.first();
+            normalmap = normalmaps.first();
             normalmaps.pop_front();
             destNormal.copyRect( normalmap, RectI( 0, 0, currDim, currDim ), Point2I( x, y ), 0, mip );
             delete normalmap;

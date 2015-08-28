@@ -1297,21 +1297,21 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
       for ( U32 j = currentBatch.startDecal; j < lastDecal; j++ )
       {
-         DecalInstance *dinst = mDecalQueue[j];
+         DecalInstance *inst = mDecalQueue[j];
 
-         for ( U32 k = 0; k < dinst->mIndxCount; k++ )
+         for ( U32 k = 0; k < inst->mIndxCount; k++ )
          {
-            *( pbPtr + ioffset + k ) = dinst->mIndices[k] + voffset;            
+            *( pbPtr + ioffset + k ) = inst->mIndices[k] + voffset;            
          }
 
-         ioffset += dinst->mIndxCount;
+         ioffset += inst->mIndxCount;
 
-         dMemcpy( vpPtr + voffset, dinst->mVerts, sizeof( DecalVertex ) * dinst->mVertCount );
-         voffset += dinst->mVertCount;
+         dMemcpy( vpPtr + voffset, inst->mVerts, sizeof( DecalVertex ) * inst->mVertCount );
+         voffset += inst->mVertCount;
 
          // Ugly hack for ProjectedShadow!
-         if ( (dinst->mFlags & CustomDecal) && dinst->mCustomTex != NULL )
-            customTex = *dinst->mCustomTex;
+         if ( (inst->mFlags & CustomDecal) && inst->mCustomTex != NULL )
+            customTex = *inst->mCustomTex;
       }
 
       AssertFatal( ioffset == currentBatch.iCount, "bad" );
