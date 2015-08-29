@@ -139,12 +139,12 @@ mat3x3 quatToMat( vec4 quat )
 vec2 parallaxOffset( sampler2D texMap, vec2 texCoord, vec3 negViewTS, float depthScale )
 {
    float depth = texture( texMap, texCoord ).a;
-   vec2 offset = negViewTS.xy * ( depth * depthScale );
+   vec2 offset = negViewTS.xy * vec2( depth * depthScale );
 
    for ( int i=0; i < PARALLAX_REFINE_STEPS; i++ )
    {
       depth = ( depth + texture( texMap, texCoord + offset ).a ) * 0.5;
-      offset = negViewTS.xy * ( depth * depthScale );
+      offset = negViewTS.xy * vec2( depth * depthScale );
    }
 
    return offset;
@@ -154,12 +154,12 @@ vec2 parallaxOffset( sampler2D texMap, vec2 texCoord, vec3 negViewTS, float dept
 vec2 parallaxOffsetDxtnm(sampler2D texMap, vec2 texCoord, vec3 negViewTS, float depthScale)
 {
    float depth = texture(texMap, texCoord).r;
-   vec2 offset = negViewTS.xy * (depth * depthScale);
+   vec2 offset = negViewTS.xy * vec2(depth * depthScale);
 
    for (int i = 0; i < PARALLAX_REFINE_STEPS; i++)
    {
       depth = (depth + texture(texMap, texCoord + offset).r) * 0.5;
-      offset = negViewTS.xy * (depth * depthScale);
+      offset = negViewTS.xy * vec2(depth * depthScale);
    }
 
    return offset;
