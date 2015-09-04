@@ -604,6 +604,8 @@ void GuiControl::setUpdate()
 void GuiControl::renderJustifiedText(Point2I offset, Point2I extent, const char *text)
 {
    GFont *font = mProfile->mFont;
+   if(!font)
+      return;
    S32 textWidth = font->getStrWidthPrecise((const UTF8*)text);
    U32 textHeight = font->getHeight();
 
