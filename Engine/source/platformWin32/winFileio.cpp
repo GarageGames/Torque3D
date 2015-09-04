@@ -998,7 +998,7 @@ S32 Platform::getFileSize(const char *pFilePath)
       return -1;
 
    // must be a real file then
-   return findData.nFileSizeLow;
+   return ((findData.nFileSizeHigh * (MAXDWORD+1)) + findData.nFileSizeLow);
 }
 
 

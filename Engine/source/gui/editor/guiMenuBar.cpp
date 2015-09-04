@@ -159,7 +159,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onSubmenuSelect, void, ( S32 submenuId, const ch
 // console methods
 //------------------------------------------------------------------------------
 
-DefineEngineMethod( GuiMenuBar, clearMenus, void, ( S32 param1, S32 param2),,
+DefineEngineMethod( GuiMenuBar, clearMenus, void, (),,
    "@brief Clears all the menus from the menu bar.\n\n"
    "@tsexample\n"
    "// Inform the GuiMenuBar control to clear all menus from itself.\n"
@@ -1035,7 +1035,7 @@ void GuiMenuBar::addSubmenuItem(Menu *menu, MenuItem *submenu, const char *text,
    newMenuItem->checkGroup = checkGroup;
    newMenuItem->nextMenuItem = NULL;
    newMenuItem->acceleratorIndex = 0;
-   newMenuItem->enabled = text[0] != '-';
+   newMenuItem->enabled = (dStrlen(text) > 1 || text[0] != '-');
    newMenuItem->visible = true;
    newMenuItem->bitmapIndex = -1;
 

@@ -168,7 +168,7 @@ DefineEngineMethod( GuiMLTextCtrl, scrollToTag, void, (S32 tagID),,
    object->scrollToTag( tagID );
 }
 
-DefineEngineMethod( GuiMLTextCtrl, scrollToTop, void, ( S32 param1, S32 param2),,
+DefineEngineMethod( GuiMLTextCtrl, scrollToTop, void, (),,
    "@brief Scroll to the top of the text.\n\n"
    "@tsexample\n"
    "// Inform GuiMLTextCtrl object to scroll to its top\n"
@@ -631,7 +631,7 @@ bool GuiMLTextCtrl::setCursorPosition(const S32 newPosition)
       mCursorPosition = 0;
       return true;
    }
-   else if (newPosition >= mTextBuffer.length()) 
+   else if (newPosition >= mTextBuffer.length() - 1)
    {
       mCursorPosition = mTextBuffer.length();
       return true;
@@ -669,11 +669,11 @@ void GuiMLTextCtrl::getCursorPositionAndColor(Point2I &cursorTop, Point2I &curso
 {
    S32 x = 0;
    S32 y = 0;
-   S32 height = mProfile->mFont->getHeight();
+   S32 height = (mProfile && mProfile->mFont) ? mProfile->mFont->getHeight() : 0;
    color = mProfile->mCursorColor;
    for(Line *walk = mLineList; walk; walk = walk->next)
    {
-      if ((mCursorPosition <= walk->textStart + walk->len) || (walk->next == NULL))
+      if ((mCursorPosition < walk->textStart + walk->len) || (walk->next == NULL))
       {
          // it's in the atoms on this line...
          y = walk->y;
@@ -768,7 +768,7 @@ void GuiMLTextCtrl::onMouseDown(const GuiEvent& event)
    mSelectionAnchorDropped = event.mousePoint;
    if (mSelectionAnchor < 0)
       mSelectionAnchor = 0;
-   else if (mSelectionAnchor >= mTextBuffer.length())
+   else if (mSelectionAnchor >= mTextBuffer.length() - 1)
       mSelectionAnchor = mTextBuffer.length();
 
    mVertMoveAnchorValid = false;
