@@ -1105,8 +1105,3 @@ DefineConsoleMethod( GuiRoadEditorCtrl, deleteRoad, void, (), , "" )
 {
    object->deleteSelectedRoad();
 }
-//TorqueLab Added to change node from script
-DefineConsoleMethod(GuiRoadEditorCtrl, setSelectedNode, void, (S32 node), , "")
-{
-	object->setSelectedNode(node);
-}

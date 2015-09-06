@@ -42,8 +42,7 @@ class GuiSwatchButtonCtrl : public GuiButtonBaseCtrl
       ColorF mSwatchColor;
       
       /// Bitmap used for mGrid
-	  StringTableEntry mGridBitmap; //TorqueLab bad bitmap crash fix
-      //String mGridBitmap;
+      String mGridBitmap;
 
       /// Background texture that will show through with transparent colors.
       GFXTexHandle mGrid;

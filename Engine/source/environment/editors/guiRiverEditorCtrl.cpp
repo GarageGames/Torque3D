@@ -1479,9 +1479,3 @@ DefineConsoleMethod( GuiRiverEditorCtrl, regenerate, void, (), , "" )
    if ( river )
       river->regenerate();
 }
-
-//TorqueLab Added to change node from script
-DefineConsoleMethod(GuiRiverEditorCtrl, setSelectedNode, void, (S32 node), , "")
-{
-	object->setSelectedNode(node);
-}

@@ -40,7 +40,7 @@
 #include "math/mRandomDeck.h"
 #include "math/mRandomSet.h"
 
-F32 ForestBrushTool::smGlobalScale = 1.0f; //TorqueLab - Forest global scale Init
+
 bool ForestBrushTool::protectedSetSize( void *object, const char *index, const char *data )
 {
    ForestBrushTool *tool = static_cast<ForestBrushTool*>( object );
@@ -122,14 +122,7 @@ void ForestBrushTool::initPersistFields()
 
    Parent::initPersistFields();
 }
-//TorqueLab - Forest brush tool new console variables
-void ForestBrushTool::consoleInit()
-{
-	//TorqueLab - Forest global scale - Apply global scaling to painted elements
-	Con::addVariable("$Forest::GlobalScale", TypeF32, &ForestBrushTool::smGlobalScale, "For editor use.\n"
-		"@ingroup Editors\n");
-	Parent::consoleInit();
-}
+
 bool ForestBrushTool::onAdd()
 {
    if ( !Parent::onAdd() )
@@ -387,10 +380,6 @@ void ForestBrushTool::_paint( const Point3F &point )
       randElementSet.add( pElement, pElement->mProbability );
    }
    
-   //TorqueLab - Check forest global scale
-   if (smGlobalScale <= 0.01)
-	   smGlobalScale = 0.01f;
-
    // Pull elements from the random set until we would theoretically fill
    // the desired area.
 
@@ -413,8 +402,6 @@ void ForestBrushTool::_paint( const Point3F &point )
       area = mCircleArea( radius );
 
       areaLeft -= area * 5.0f; // fudge value
-
-	  scaleFactor *= smGlobalScale; //TorqueLab - Add forest global scale
 
       // No room left we are done.
       //if ( areaLeft < 0.0f )
