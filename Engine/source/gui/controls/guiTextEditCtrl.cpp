@@ -212,7 +212,8 @@ void GuiTextEditCtrl::execConsoleCallback()
    Parent::execConsoleCallback();
 
    // Update the console variable:
-   setVariable(mTextBuffer.getPtr8());
+   if ( mConsoleVariable[0] )
+      Con::setVariable(mConsoleVariable, mTextBuffer.getPtr8());
 }
 
 void GuiTextEditCtrl::updateHistory( StringBuffer *inTxt, bool moveIndex )
