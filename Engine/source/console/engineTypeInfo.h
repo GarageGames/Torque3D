@@ -44,7 +44,7 @@ enum EngineTypeKind
    EngineTypeKindClass           ///< Pointer to opaque EngineObject.
 };
 
-DECLARE_ENUM( EngineTypeKind );
+DECLARE_ENUM_R( EngineTypeKind );
 
 /// Flags for an EngineTypeInfo.
 enum EngineTypeFlags

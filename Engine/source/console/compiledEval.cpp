@@ -435,7 +435,8 @@ static void setFieldComponent( SimObject* object, StringTableEntry field, const 
 
 ConsoleValueRef CodeBlock::exec(U32 ip, const char *functionName, Namespace *thisNamespace, U32 argc, ConsoleValueRef *argv, bool noCalls, StringTableEntry packageName, S32 setFrame)
 {
-#ifdef TORQUE_DEBUG
+
+#ifdef TORQUE_VALIDATE_STACK
    U32 stackStart = STR.mStartStackSize;
    U32 consoleStackStart = CSTK.mStackPos;
 #endif
@@ -2245,9 +2246,9 @@ execFinished:
 
    decRefCount();
 
-#ifdef TORQUE_DEBUG
-   //AssertFatal(!(STR.mStartStackSize > stackStart), "String stack not popped enough in script exec");
-   //AssertFatal(!(STR.mStartStackSize < stackStart), "String stack popped too much in script exec");
+#ifdef TORQUE_VALIDATE_STACK
+   AssertFatal(!(STR.mStartStackSize > stackStart), "String stack not popped enough in script exec");
+   AssertFatal(!(STR.mStartStackSize < stackStart), "String stack popped too much in script exec");
 #endif
 
    return returnValue;

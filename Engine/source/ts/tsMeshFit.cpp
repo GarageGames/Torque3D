@@ -28,9 +28,9 @@
 #include "console/engineAPI.h"
 
 // define macros required for ConvexDecomp headers
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( WIN32 )
 #define WIN32
-#elif defined( __MACOSX__ )
+#elif defined( __MACOSX__ ) && !defined( APPLE )
 #define APPLE
 #endif
 

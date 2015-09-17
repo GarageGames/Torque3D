@@ -493,6 +493,8 @@ void GuiScrollCtrl::calcThumbs()
 void GuiScrollCtrl::scrollDelta(S32 deltaX, S32 deltaY)
 {
    scrollTo(mChildRelPos.x + deltaX, mChildRelPos.y + deltaY);
+
+   onScroll_callback();
 }
 
 //-----------------------------------------------------------------------------

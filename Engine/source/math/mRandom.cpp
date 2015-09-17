@@ -88,13 +88,13 @@ void MRandomLCG::setSeed(S32 s)
 U32 MRandomLCG::randI()
 {
    if ( mSeed <= msQuotient )
-      mSeed = (mSeed * 16807L) % S32_MAX;
+      mSeed = (mSeed * 16807) % S32_MAX;
    else
    {
       S32 high_part = mSeed / msQuotient;
       S32 low_part  = mSeed % msQuotient;
 
-      S32 test = (16807L * low_part) - (msRemainder * high_part);
+      S32 test = (16807 * low_part) - (msRemainder * high_part);
 
       if ( test > 0 )
          mSeed = test;

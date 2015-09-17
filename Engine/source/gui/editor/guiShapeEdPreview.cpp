@@ -1608,6 +1608,8 @@ void GuiShapeEdPreview::renderNodes() const
 
 void GuiShapeEdPreview::renderNodeAxes(S32 index, const ColorF& nodeColor) const
 {
+   if(mModel->mNodeTransforms.size() <= index || index < 0)
+      return;
    const Point3F xAxis( 1.0f,  0.15f, 0.15f );
    const Point3F yAxis( 0.15f, 1.0f,  0.15f );
    const Point3F zAxis( 0.15f, 0.15f, 1.0f  );
@@ -1631,6 +1633,8 @@ void GuiShapeEdPreview::renderNodeAxes(S32 index, const ColorF& nodeColor) const
 
 void GuiShapeEdPreview::renderNodeName(S32 index, const ColorF& textColor) const
 {
+   if(index < 0 || index >= mModel->getShape()->nodes.size() || index >= mProjectedNodes.size())
+      return;
    const TSShape::Node& node = mModel->getShape()->nodes[index];
    const String& nodeName = mModel->getShape()->getName( node.nameIndex );
 

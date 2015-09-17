@@ -684,13 +684,13 @@ template<class T> inline void Vector<T>::pop_back()
 
 template<class T> inline T& Vector<T>::operator[](U32 index)
 {
-   AssertFatal(index < mElementCount, "Vector<T>::operator[] - out of bounds array access!");
+   AssertFatal(index < mElementCount, avar("Vector<T>::operator[%i/%i] - out of bounds array access!", index, mElementCount));
    return mArray[index];
 }
 
 template<class T> inline const T& Vector<T>::operator[](U32 index) const
 {
-   AssertFatal(index < mElementCount, "Vector<T>::operator[] - out of bounds array access!");
+   AssertFatal(index < mElementCount, avar("Vector<T>::operator[%i/%i] - out of bounds array access!", index, mElementCount));
    return mArray[index];
 }
 

@@ -32,33 +32,48 @@ const QuatF QuatF::Identity(0.0f,0.0f,0.0f,1.0f);
 
 QuatF& QuatF::set( const EulerF & e )
 {
-   F32 cx, sx;
-   F32 cy, sy;
-   F32 cz, sz;
-   mSinCos( e.x * 0.5f, sx, cx );
-   mSinCos( e.y * 0.5f, sy, cy );
-   mSinCos( e.z * 0.5f, sz, cz );
+	/*
+	F32 cx, sx;
+	F32 cy, sy;
+	F32 cz, sz;
+	mSinCos( -e.x * 0.5f, sx, cx );
+	mSinCos( -e.y * 0.5f, sy, cy );
+	mSinCos( -e.z * 0.5f, sz, cz );
 
-   // Qyaw(z) = [ (0, 0, sin z/2), cos z/2 ]
-   // Qpitch(x) = [ (sin x/2, 0, 0), cos x/2 ]
-   // Qroll(y) = [ (0, sin y/2, 0), cos y/2 ]
-   // this = Qresult = Qyaw*Qpitch*Qroll ZXY
-   //
-   // The code that folows is a simplification of:
-   // roll*=pitch;
-   // roll*=yaw;
-   // *this = roll;
-   F32 cycz, sysz, sycz, cysz;
-   cycz = cy*cz;
-   sysz = sy*sz;
-   sycz = sy*cz;
-   cysz = cy*sz;
-   w = cycz*cx - sysz*sx;
-   x = cycz*sx + sysz*cx;
-   y = sycz*cx + cysz*sx;
-   z = cysz*cx - sycz*sx;
+	// Qyaw(z)   = [ (0, 0, sin z/2), cos z/2 ]
+	// Qpitch(x) = [ (sin x/2, 0, 0), cos x/2 ]
+	// Qroll(y)  = [ (0, sin y/2, 0), cos y/2 ]
+	// this = Qresult = Qyaw*Qpitch*Qroll  ZXY
+	//
+	// The code that folows is a simplification of:
+	//    roll*=pitch;
+	//    roll*=yaw;
+	//    *this = roll;
+	F32 cycz, sysz, sycz, cysz;
+	cycz = cy*cz;
+	sysz = sy*sz;
+	sycz = sy*cz;
+	cysz = cy*sz;
+	w = cycz*cx + sysz*sx;
+	x = cycz*sx + sysz*cx;
+	y = sycz*cx - cysz*sx;
+	z = cysz*cx - sycz*sx;
+	*/
+	// Assuming the angles are in radians.
+	F32 c1 = mCos(e.y * 0.5f);
+	F32 s1 = mSin(e.y * 0.5f);
+	F32 c2 = mCos(e.z * 0.5f);
+	F32 s2 = mSin(e.z * 0.5f);
+	F32 c3 = mCos(e.x * 0.5f);
+	F32 s3 = mSin(e.x * 0.5f);
+	F32 c1c2 = c1*c2;
+	F32 s1s2 = s1*s2;
+	w =c1c2*c3 - s1s2*s3;
+	x =c1c2*s3 + s1s2*c3;
+	y =s1*c2*c3 + c1*s2*s3;
+	z =c1*s2*c3 - s1*c2*s3;
 
-   return *this;
+	return *this;
 }
 
 QuatF& QuatF::operator *=( const QuatF & b )
@@ -289,7 +304,7 @@ QuatF & QuatF::interpolate( const QuatF & q1, const QuatF & q2, F32 t )
    return *this;
 }
 
-Point3F & QuatF::mulP(const Point3F& p, Point3F* r)
+Point3F & QuatF::mulP(const Point3F& p, Point3F* r) const
 {
    QuatF qq;
    QuatF qi = *this;

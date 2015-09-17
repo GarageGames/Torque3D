@@ -163,7 +163,7 @@ EulerF MatrixF::toEuler() const
    const F32 * mat = m;
 
    EulerF r;
-   r.x = mAsin(mat[MatrixF::idx(2,1)]);
+   r.x = mAsin(mClampF(mat[MatrixF::idx(2,1)], -1.0, 1.0));
 
    if(mCos(r.x) != 0.f)
    {

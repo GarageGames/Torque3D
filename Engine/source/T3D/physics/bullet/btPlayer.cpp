@@ -309,8 +309,9 @@ bool BtPlayer::_sweep( btVector3 *inOutCurrPos, const btVector3 &disp, Collision
    BtPlayerSweepCallback callback( mGhostObject, disp.normalized() );
 	callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
 	callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
-	
-	mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
+
+   if (disp.length()>0.0001)
+      mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
 
 	inOutCurrPos->setInterpolate3( start.getOrigin(), end.getOrigin(), callback.m_closestHitFraction );
    if ( callback.hasHit() )
@@ -465,6 +466,7 @@ void BtPlayer::findContact(   SceneObject **contactObject,
       if ( other == mGhostObject )
          other = (btCollisionObject*)pair.m_pProxy1->m_clientObject;
 
+<<<<<<< HEAD
 	  // BlissGMK >>
 	  if (outOverlapObjects->contains(PhysicsUserData::getObject(other->getUserPointer())))
 		  continue;
@@ -473,6 +475,10 @@ void BtPlayer::findContact(   SceneObject **contactObject,
 	  // BlissGMK <<
 
       outOverlapObjects->push_back( PhysicsUserData::getObject( other->getUserPointer() ) );
+=======
+      if (!outOverlapObjects->contains(PhysicsUserData::getObject(other->getUserPointer())))
+         outOverlapObjects->push_back( PhysicsUserData::getObject( other->getUserPointer() ) );
+>>>>>>> 70c7a67456f5acb530b4456516db5d5d111c75d3
 
       if ( other->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE )
          continue;
