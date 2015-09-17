@@ -195,6 +195,7 @@ bool LightAnimData::AnimValue<COUNT>::animate( F32 time, F32 *output )
    F32 scaledTime, lerpFactor, valueRange, keyFrameLerp;
    U32 posFrom, posTo;
    S32 keyFrameFrom, keyFrameTo;
+   F32 initialValue = *output;
    
    bool wasAnimated = false;
 
@@ -215,13 +216,13 @@ bool LightAnimData::AnimValue<COUNT>::animate( F32 time, F32 *output )
 	   valueRange = ( value2[i] - value1[i] ) / 25.0f;
 
       if ( !smooth[i] )
-   	   output[i] = value1[i] + ( keyFrameFrom * valueRange );
+         output[i] = (value1[i] + (keyFrameFrom * valueRange)) * initialValue;
       else
       {
          lerpFactor = scaledTime - posFrom;
    	   keyFrameLerp = ( keyFrameTo - keyFrameFrom ) * lerpFactor;
 
-         output[i] = value1[i] + ( ( keyFrameFrom + keyFrameLerp ) * valueRange );
+         output[i] = (value1[i] + ((keyFrameFrom + keyFrameLerp) * valueRange)) * initialValue;
       }
    }
 
