@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+def gui?
+  !ENV.fetch('GUI', '').empty?
+end
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = '2'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = 'ubuntu/trusty64'
+
+  config.vm.provider 'virtualbox' do |vb|
+    vb.memory = 1024
+    if gui?
+      vb.memory = 2048
+      vb.customize ['modifyvm', :id, '--vram', '256']
+      vb.customize ['modifyvm', :id, '--accelerate3d', 'on']
+      vb.customize ['modifyvm', :id, '--hwvirtex', 'on']
+      vb.gui = true
+    end
+  end
+
+  config.vm.synced_folder '../../../', '/torque'
+
+  config.vm.provision :shell, path: 'provision.sh'
+  if gui?
+    config.vm.provision :shell, path: 'provision-gui.sh'
+  end
+
+  # config.vm.network 'forwarded_port', guest: 80, host: 8080
+
+  # More info at http://fgrehm.viewdocs.io/vagrant-cachier/usage
+  if Vagrant.has_plugin?('vagrant-cachier')
+    config.cache.scope = :box
+  end
+end

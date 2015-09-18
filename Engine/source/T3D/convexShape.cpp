@@ -502,7 +502,7 @@ void ConvexShape::prepRenderImage( SceneRenderState *state )
    }
    */
 
-   if ( mVertexBuffer.isNull() )
+   if ( mVertexBuffer.isNull() || !state)
       return;
 
    // If we don't have a material instance after the override then 
@@ -573,7 +573,7 @@ void ConvexShape::prepRenderImage( SceneRenderState *state )
 
    // We sort by the material then vertex buffer.
    ri->defaultKey = matInst->getStateHint();
-   ri->defaultKey2 = (U32)ri->vertBuff; // Not 64bit safe!
+   ri->defaultKey2 = (uintptr_t)ri->vertBuff; // Not 64bit safe!
 
    // Submit our RenderInst to the RenderPassManager
    state->getRenderPass()->addInst( ri );

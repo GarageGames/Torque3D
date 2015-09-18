@@ -27,6 +27,8 @@
 #include "core/util/journal/process.h"
 #include "core/strings/unicode.h"
 
+#if !defined( TORQUE_SDL )
+
 // ------------------------------------------------------------------------
 
 void CloseSplashWindow(HINSTANCE hinst);
@@ -136,7 +138,7 @@ void Win32WindowManager::buildMonitorsList()
    mMonitors.clear();
 
    // Enumerate all monitors
-   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (size_t)(void*)&mMonitors);
+   EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, (uintptr_t)&mMonitors);
 }
 
 S32 Win32WindowManager::findFirstMatchingMonitor(const char* name)
@@ -180,10 +182,11 @@ BOOL Win32WindowManager::MonitorRegionEnumProc(HMONITOR hMonitor, HDC hdcMonitor
    Vector<RectI> * regions = (Vector<RectI>*)dwData;
 
    regions->increment();
-   regions->last().point.x = lprcMonitor->left;
-   regions->last().point.y = lprcMonitor->top;
-   regions->last().extent.x = lprcMonitor->right - lprcMonitor->left;
-   regions->last().extent.y = lprcMonitor->bottom - lprcMonitor->top;
+   RectI& lastRegion = regions->last();
+   lastRegion.point.x = lprcMonitor->left;
+   lastRegion.point.y = lprcMonitor->top;
+   lastRegion.extent.x = lprcMonitor->right - lprcMonitor->left;
+   lastRegion.extent.y = lprcMonitor->bottom - lprcMonitor->top;
 
    return true;
 }
@@ -499,8 +502,8 @@ void Win32WindowManager::lowerCurtain()
 
    // Get the monitor's extents.
    MONITORINFO monInfo;
-   dMemset(&monInfo, 0, sizeof MONITORINFO);
-   monInfo.cbSize = sizeof MONITORINFO;
+   dMemset(&monInfo, 0, sizeof(MONITORINFO));
+   monInfo.cbSize = sizeof(MONITORINFO);
 
    GetMonitorInfo(hMon, &monInfo);
  
@@ -523,3 +526,5 @@ void Win32WindowManager::raiseCurtain()
    DestroyWindow(mCurtainWindow);
    mCurtainWindow = NULL;
 }
+
+#endif

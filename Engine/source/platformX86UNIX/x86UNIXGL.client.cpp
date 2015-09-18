@@ -19,7 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
+#if 0
 #include "platformX86UNIX/platformGL.h"
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "console/console.h"
@@ -389,3 +389,4 @@ bool GL_EXT_Init( )
    return true;
 }
 
+#endif // 0

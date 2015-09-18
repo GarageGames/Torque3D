@@ -706,7 +706,7 @@ static bool dumpEngineDocs( const char *outputFile )
    // Dump pre-declarations for any groups we encountered
    // so that we don't have to explicitly define them.
    HashTable<String,U32>::Iterator iter = smDocGroups.begin();
-   for ( ; iter != smDocGroups.end(); iter++ )
+   for (; iter != smDocGroups.end(); ++iter)
       stream.writeText( String::ToString( "/*! @addtogroup %s */\r\n\r\n", iter->key.c_str() ) );
 
    return true;

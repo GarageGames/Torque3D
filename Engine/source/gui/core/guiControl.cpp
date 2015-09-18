@@ -465,6 +465,8 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
 
    GFont *font = mTooltipProfile->mFont;
 
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
    // Support for multi-line tooltip text...
 
    Vector<U32> startLineOffsets, lineLengths;
@@ -521,12 +523,12 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
    GFX->setClipRect( rect );
 
    // Draw Filler bit, then border on top of that
-   GFX->getDrawUtil()->drawRectFill( rect, mTooltipProfile->mFillColor );
-   GFX->getDrawUtil()->drawRect( rect, mTooltipProfile->mBorderColor );
+   drawUtil->drawRectFill( rect, mTooltipProfile->mFillColor );
+   drawUtil->drawRect( rect, mTooltipProfile->mBorderColor );
 
    // Draw the text centered in the tool tip box...
 
-   GFX->getDrawUtil()->setBitmapModulation( mTooltipProfile->mFontColor );
+   drawUtil->setBitmapModulation( mTooltipProfile->mFontColor );
 
    for ( U32 i = 0; i < lineLengths.size(); i++ )
    {      
@@ -534,7 +536,7 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
       const UTF8 *line = renderTip.c_str() + startLineOffsets[i];
       U32 lineLen = lineLengths[i];
 
-      GFX->getDrawUtil()->drawTextN( font, start + offset, line, lineLen, mProfile->mFontColors );
+      drawUtil->drawTextN( font, start + offset, line, lineLen, mProfile->mFontColors );
    }
 
    GFX->setClipRect( oldClip );
@@ -602,6 +604,8 @@ void GuiControl::setUpdate()
 void GuiControl::renderJustifiedText(Point2I offset, Point2I extent, const char *text)
 {
    GFont *font = mProfile->mFont;
+   if(!font)
+      return;
    S32 textWidth = font->getStrWidthPrecise((const UTF8*)text);
    U32 textHeight = font->getHeight();
 
@@ -1753,41 +1757,48 @@ void GuiControl::write(Stream &stream, U32 tabStop, U32 flags)
 {
    //note: this will return false if either we, or any of our parents, are non-save controls
    bool bCanSave	= ( flags & IgnoreCanSave ) || ( flags & NoCheckParentCanSave && getCanSave() ) || getCanSaveParent();
-   StringTableEntry steName = mAddGroup->getInternalName();
-   if(bCanSave && mAddGroup && (steName != NULL) && (steName != StringTable->insert("null")) && getName() )
+   
+   if (bCanSave && mAddGroup)
    {
-      MutexHandle handle;
-      handle.lock(mMutex);
+      StringTableEntry steName = mAddGroup->getInternalName();
 
-      // export selected only?
-      if((flags & SelectedOnly) && !isSelected())
+      if ((steName != NULL) && (steName != StringTable->insert("null")) && getName())
       {
-         for(U32 i = 0; i < size(); i++)
-            (*this)[i]->write(stream, tabStop, flags);
+         MutexHandle handle;
+         handle.lock(mMutex);
+
+         // export selected only?
+         if ((flags & SelectedOnly) && !isSelected())
+         {
+            for (U32 i = 0; i < size(); i++)
+               (*this)[i]->write(stream, tabStop, flags);
+
+            return;
+
+         }
+
+         stream.writeTabs(tabStop);
+         char buffer[1024];
+         dSprintf(buffer, sizeof(buffer), "new %s(%s,%s) {\r\n", getClassName(), getName() ? getName() : "", mAddGroup->getInternalName());
+         stream.write(dStrlen(buffer), buffer);
+         writeFields(stream, tabStop + 1);
+
+         if (size())
+         {
+            stream.write(2, "\r\n");
+            for (U32 i = 0; i < size(); i++)
+               (*this)[i]->write(stream, tabStop + 1, flags);
+         }
+
+         stream.writeTabs(tabStop);
+         stream.write(4, "};\r\n");
 
          return;
-
       }
-
-      stream.writeTabs(tabStop);
-      char buffer[1024];
-      dSprintf(buffer, sizeof(buffer), "new %s(%s,%s) {\r\n", getClassName(), getName() ? getName() : "", mAddGroup->getInternalName());
-      stream.write(dStrlen(buffer), buffer);
-      writeFields(stream, tabStop + 1);
-
-      if(size())
-      {
-         stream.write(2, "\r\n");
-         for(U32 i = 0; i < size(); i++)
-            (*this)[i]->write(stream, tabStop + 1, flags);
-      }
-
-      stream.writeTabs(tabStop);
-      stream.write(4, "};\r\n");
    }
-   else if (bCanSave)
+   
+   if (bCanSave)
       Parent::write( stream, tabStop, flags );
-
 }
 
 //=============================================================================
@@ -2380,7 +2391,8 @@ void GuiControl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent 
       // so set it back before we change it again.
 
       PlatformWindow *pWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
-      AssertFatal(pWindow != NULL,"GuiControl without owning platform window!  This should not be possible.");
+      if (!pWindow)
+         return;
       PlatformCursorController *pController = pWindow->getCursorController();
       AssertFatal(pController != NULL,"PlatformWindow without an owned CursorController!");
 
@@ -2613,17 +2625,24 @@ DefineEngineMethod( GuiControl, setValue, void, ( const char* value ),,
    object->setScriptValue( value );
 }
 
-ConsoleMethod( GuiControl, getValue, const char*, 2, 2, "")
+DefineEngineMethod( GuiControl, getValue, const char*, (),,
+   "Get the value associated with the control.\n"
+   "@return value for the control.\n" )
 {
    return object->getScriptValue();
 }
 
-ConsoleMethod( GuiControl, makeFirstResponder, void, 3, 3, "(bool isFirst)")
+DefineEngineMethod( GuiControl, makeFirstResponder, void, ( bool isFirst ),,
+   "Make this control the first responder.\n"
+   "@param isFirst True to make first responder, false to not.\n" )
 {
-   object->makeFirstResponder(dAtob(argv[2]));
+   //object->makeFirstResponder(dAtob(argv[2]));
+   object->makeFirstResponder(isFirst);
 }
 
-ConsoleMethod( GuiControl, isActive, bool, 2, 2, "")
+DefineEngineMethod( GuiControl, isActive, bool, (),,
+   "Check if this control is active or not.\n"
+   "@return True if it's active, false if not.\n" )
 {
    return object->isActive();
 }
@@ -2631,7 +2650,8 @@ ConsoleMethod( GuiControl, isActive, bool, 2, 2, "")
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( GuiControl, setActive, void, ( bool state ), ( true ),
-   "" )
+   "Set the control as active or inactive."
+   "@param state True to set the control as active, false to set it as inactive.")
 {
    object->setActive( state );
 }
@@ -2806,22 +2826,19 @@ static ConsoleDocFragment _sGuiControlSetExtent2(
    "GuiControl", // The class to place the method in; use NULL for functions.
    "void setExtent( Point2I p );" ); // The definition string.
 
-ConsoleMethod( GuiControl, setExtent, void, 3, 4,
+DefineConsoleMethod( GuiControl, setExtent, void, ( const char* extOrX, const char* y ), (""),
    "( Point2I p | int x, int y ) Set the width and height of the control.\n\n"
    "@hide" )
 {
-   if ( argc == 3 )
+   Point2I extent;
+   if(!dStrIsEmpty(extOrX) && dStrIsEmpty(y))
+      dSscanf(extOrX, "%d %d", &extent.x, &extent.y);
+   else if(!dStrIsEmpty(extOrX) && !dStrIsEmpty(y))
    {
-      // We scan for floats because its possible that math 
-      // done on the extent can result in fractional values.
-      Point2F ext;
-      if ( dSscanf( argv[2], "%g %g", &ext.x, &ext.y ) == 2 )
-         object->setExtent( (S32)ext.x, (S32)ext.y );
-      else
-         Con::errorf( "GuiControl::setExtent, not enough parameters!" );
+      extent.x = dAtoi(extOrX);
+      extent.y = dAtoi(y);
    }
-   else if ( argc == 4 )
-      object->setExtent( dAtoi(argv[2]), dAtoi(argv[3]) );
+   object->setExtent( extent );
 }
 
 //-----------------------------------------------------------------------------

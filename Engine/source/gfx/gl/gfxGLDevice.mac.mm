@@ -294,21 +294,7 @@ GFXFence* GFXGLDevice::_createPlatformSpecificFence()
    return new GFXGLAppleFence(this);
 }
 
-void GFXGLWindowTarget::makeActive()
-{
-   // If we're supposed to be running fullscreen, but haven't yet set up for it,
-   // do it now.
-   
-   if( !mFullscreenContext && mWindow->getVideoMode().fullScreen )
-   {
-      static_cast< GFXGLDevice* >( mDevice )->zombify();
-      _setupNewMode();
-   }
-      
-   mFullscreenContext ? [(NSOpenGLContext*)mFullscreenContext makeCurrentContext] : [(NSOpenGLContext*)mContext makeCurrentContext];
-}
-
-bool GFXGLWindowTarget::present() 
+void GFXGLWindowTarget::_WindowPresent()
 {
    GFX->updateStates();
    mFullscreenContext ? [(NSOpenGLContext*)mFullscreenContext flushBuffer] : [(NSOpenGLContext*)mContext flushBuffer];

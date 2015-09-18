@@ -458,7 +458,7 @@ void TerrainDetailMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
    }
 
    // Add to the blend total.
-   meta->addStatement( new GenOp( "   @ = max( @, @ );\r\n", blendTotal, blendTotal, detailBlend ) );
+   meta->addStatement( new GenOp( "   @ += @;\r\n", blendTotal, detailBlend ) );
 
    // If we had a parallax feature... then factor in the parallax
    // amount so that it fades out with the layer blending.
@@ -468,8 +468,16 @@ void TerrainDetailMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
       Var *normalMap = _getNormalMapTex();
 
       // Call the library function to do the rest.
-      meta->addStatement( new GenOp( "   @.xy += parallaxOffset( @, @.xy, @, @.z * @ );\r\n", 
-         inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend ) );
+      if (fd.features.hasFeature(MFT_IsDXTnm, detailIndex))
+      {
+         meta->addStatement(new GenOp("   @.xy += parallaxOffsetDxtnm( @, @.xy, @, @.z * @ );\r\n",
+         inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend));
+      }
+      else
+      {
+         meta->addStatement(new GenOp("   @.xy += parallaxOffset( @, @.xy, @, @.z * @ );\r\n",
+         inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend));
+      }
    }
 
    // If this is a prepass then we skip color.
@@ -812,12 +820,10 @@ void TerrainMacroMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentL
    meta->addStatement( new GenOp( "      @ *= @.y * @.w;\r\n",
                                     detailColor, detailInfo, inDet ) );
 
-   Var *baseColor = (Var*)LangElement::find( "baseColor" );
    Var *outColor = (Var*)LangElement::find( "col" );
 
    meta->addStatement( new GenOp( "      @ = lerp( @, @ + @, @ );\r\n",
                                     outColor, outColor, outColor, detailColor, detailBlend ) );
-   //outColor, outColor, baseColor, detailColor, detailBlend ) );
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 

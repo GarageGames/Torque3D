@@ -37,12 +37,6 @@
 #include "windowManager/platformWindowMgr.h"
 #include "gfx/gfxFence.h"
 
-#ifdef TORQUE_DEMO_PURCHASE
-#ifndef _PURCHASESCREEN_H_
-#include "demo/purchase/purchaseScreen.h"
-#endif
-#endif
-
 /// A canvas on which rendering occurs.
 ///
 ///
@@ -190,6 +184,8 @@ protected:
    
    void checkLockMouseMove( const GuiEvent& event );
 
+   GuiControl *mMenuBarCtrl;
+
 public:
    DECLARE_CONOBJECT(GuiCanvas);
    DECLARE_CATEGORY( "Gui Core" );
@@ -199,6 +195,8 @@ public:
 
    virtual bool onAdd();
    virtual void onRemove();
+
+   void setMenuBar(SimObject *obj);
 
    static void initPersistFields();
 
@@ -327,6 +325,10 @@ public:
 
    /// Returns true if the cursor is being rendered.
    virtual bool isCursorShown();
+
+   void cursorClick(S32 buttonId, bool isDown);
+
+   void cursorNudge(F32 x, F32 y);
    /// @}
 
    ///used by the tooltip resource
@@ -434,21 +436,6 @@ public:
 
 private:
    static const U32 MAX_GAMEPADS = 4; ///< The maximum number of supported gamepads
-
-#ifdef TORQUE_DEMO_PURCHASE
-private:
-   PurchaseScreen* mPurchaseScreen;
-   U32             mLastPurchaseHideTime;
-
-public:
-   void showPurchaseScreen(bool show, bool startBlocker, const char* location, bool doExit);
-   void updatePurchaseScreen(const char* value);
-#endif
-
-#ifdef TORQUE_DEMO_TIMEOUT
-private:
-   void checkTimeOut();
-#endif
 };
 
 #endif

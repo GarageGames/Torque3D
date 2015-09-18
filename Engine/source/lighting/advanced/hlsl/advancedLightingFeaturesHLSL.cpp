@@ -98,7 +98,7 @@ void DeferredRTLightingFeatHLSL::processPix( Vector<ShaderComponent*> &component
    uvScene->setName( "uvScene" );
    LangElement *uvSceneDecl = new DecOp( uvScene );
 
-   String rtParamName = String::ToString( "rtParams%d", mLastTexIndex );
+   String rtParamName = String::ToString( "rtParams%s", "lightInfoBuffer" );
    Var *rtParams = (Var*) LangElement::find( rtParamName );
    if( !rtParams )
    {
@@ -207,6 +207,7 @@ void DeferredRTLightingFeatHLSL::setTexData( Material::StageData &stageDat,
       mLastTexIndex = texIndex;
 
       passData.mTexType[ texIndex ] = Material::TexTarget;
+      passData.mSamplerNames[ texIndex ]= "lightInfoBuffer";
       passData.mTexSlot[ texIndex++ ].texTarget = texTarget;
    }
 }
@@ -224,10 +225,10 @@ void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentLis
       // We need the view to tangent space transform in the pixel shader.
       getOutViewToTangent( componentList, meta, fd );
 
+      const bool useTexAnim = fd.features[MFT_TexAnim];
       // Make sure there are texcoords
       if( !fd.features[MFT_Parallax] && !fd.features[MFT_DiffuseMap] )
       {
-         const bool useTexAnim = fd.features[MFT_TexAnim];
 
          getOutTexCoord(   "texCoord", 
                            "float2", 
@@ -235,12 +236,12 @@ void DeferredBumpFeatHLSL::processVert(   Vector<ShaderComponent*> &componentLis
                            useTexAnim, 
                            meta, 
                            componentList );
+      }
 
-         if ( fd.features.hasFeature( MFT_DetailNormalMap ) )
+      if ( fd.features.hasFeature( MFT_DetailNormalMap ) )
             addOutDetailTexCoord( componentList, 
                                   meta,
                                   useTexAnim );
-      }
 
       output = meta;
    }
@@ -329,6 +330,57 @@ void DeferredBumpFeatHLSL::processPix( Vector<ShaderComponent*> &componentList,
       output = meta;
       return;
    }
+   else if (fd.features[MFT_AccuMap]) 
+   {
+      Var *bumpSample = (Var *)LangElement::find( "bumpSample" );
+      if( bumpSample == NULL )
+      {
+         MultiLine *meta = new MultiLine;
+
+         Var *texCoord = getInTexCoord( "texCoord", "float2", true, componentList );
+
+         Var *bumpMap = getNormalMapTex();
+
+         bumpSample = new Var;
+         bumpSample->setType( "float4" );
+         bumpSample->setName( "bumpSample" );
+         LangElement *bumpSampleDecl = new DecOp( bumpSample );
+
+         meta->addStatement( new GenOp( "   @ = tex2D(@, @);\r\n", bumpSampleDecl, bumpMap, texCoord ) );
+
+         if ( fd.features.hasFeature( MFT_DetailNormalMap ) )
+         {
+            Var *bumpMap = (Var*)LangElement::find( "detailBumpMap" );
+            if ( !bumpMap ) {
+               bumpMap = new Var;
+               bumpMap->setType( "sampler2D" );
+               bumpMap->setName( "detailBumpMap" );
+               bumpMap->uniform = true;
+               bumpMap->sampler = true;
+               bumpMap->constNum = Var::getTexUnitNum();
+            }
+
+            texCoord = getInTexCoord( "detCoord", "float2", true, componentList );
+            LangElement *texOp = new GenOp( "tex2D(@, @)", bumpMap, texCoord );
+
+            Var *detailBump = new Var;
+            detailBump->setName( "detailBump" );
+            detailBump->setType( "float4" );
+            meta->addStatement( expandNormalMap( texOp, new DecOp( detailBump ), detailBump, fd ) );
+
+            Var *detailBumpScale = new Var;
+            detailBumpScale->setType( "float" );
+            detailBumpScale->setName( "detailBumpStrength" );
+            detailBumpScale->uniform = true;
+            detailBumpScale->constSortPos = cspPass;
+            meta->addStatement( new GenOp( "   @.xy += @.xy * @;\r\n", bumpSample, detailBump, detailBumpScale ) );
+         }
+
+         output = meta;
+
+         return;
+      }
+   } 
    else if (   fd.materialFeatures[MFT_NormalsOut] || 
                fd.features[MFT_ForwardShading] || 
                !fd.features[MFT_RTLighting] )
@@ -397,17 +449,32 @@ void DeferredBumpFeatHLSL::setTexData( Material::StageData &stageDat,
       return;
    }
 
-   if (  !fd.features[MFT_Parallax] && !fd.features[MFT_SpecularMap] &&
+   if (  !fd.features[MFT_PrePassConditioner] && fd.features[MFT_AccuMap] )
+   {
+      passData.mTexType[ texIndex ] = Material::Bump;
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
+      passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_NormalMap );
+
+      if (  fd.features.hasFeature( MFT_DetailNormalMap ) )
+      {
+         passData.mTexType[ texIndex ] = Material::DetailBump;
+         passData.mSamplerNames[texIndex] = "detailBumpMap";
+         passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_DetailNormalMap );
+      }
+   }
+   else if (  !fd.features[MFT_Parallax] && !fd.features[MFT_SpecularMap] &&
          ( fd.features[MFT_PrePassConditioner] ||
            fd.features[MFT_PixSpecular] ) )
    {
       passData.mTexType[ texIndex ] = Material::Bump;
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
       passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_NormalMap );
 
       if (  fd.features[MFT_PrePassConditioner] &&
             fd.features.hasFeature( MFT_DetailNormalMap ) )
       {
          passData.mTexType[ texIndex ] = Material::DetailBump;
+         passData.mSamplerNames[ texIndex ] = "detailBumpMap";
          passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_DetailNormalMap );
       }
    }
@@ -478,6 +545,15 @@ void DeferredPixelSpecularHLSL::processPix(  Vector<ShaderComponent*> &component
    AssertFatal( lightInfoSamp && d_specular && d_NL_Att,
       "DeferredPixelSpecularHLSL::processPix - Something hosed the deferred features!" );
 
+   if (fd.features[ MFT_AccuMap ]) {
+      // change specularity where the accu texture is applied
+      Var *accuPlc = (Var*) LangElement::find( "plc" );
+      Var *accuSpecular = (Var*)LangElement::find( "accuSpecular" );
+      if(accuPlc != NULL && accuSpecular != NULL)
+         //d_specular = clamp(lerp( d_specular, accuSpecular * d_specular, plc.a), 0, 1)
+         meta->addStatement( new GenOp( "   @ = clamp( lerp( @, @ * @, @.a), 0, 1);\r\n", d_specular, d_specular, accuSpecular, d_specular, accuPlc ) );
+   }
+	  
    // (a^m)^n = a^(m*n)
    meta->addStatement( new GenOp( "   @ = pow( abs(@), max((@ / AL_ConstantSpecularPower),1.0f)) * @;\r\n", 
       specDecl, d_specular, specPow, specStrength ) );
@@ -529,7 +605,8 @@ void DeferredMinnaertHLSL::setTexData( Material::StageData &stageDat,
       NamedTexTarget *texTarget = NamedTexTarget::find(RenderPrePassMgr::BufferName);
       if ( texTarget )
       {
-         passData.mTexType[ texIndex ] = Material::TexTarget;
+         passData.mTexType[texIndex] = Material::TexTarget;
+         passData.mSamplerNames[texIndex] = "prepassBuffer";
          passData.mTexSlot[ texIndex++ ].texTarget = texTarget;
       }
    }

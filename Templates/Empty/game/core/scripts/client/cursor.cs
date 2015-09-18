@@ -62,11 +62,12 @@ function GuiCanvas::checkCursor(%this)
       if ((%control.noCursor $= "") || !%control.noCursor)
       {
          showCursor();
-         return;
+         return true;
       }
    }
    // If we get here, every control requested a hidden cursor, so we oblige.
    hideCursor();
+   return false;
 }
 
 //---------------------------------------------------------------------------------------------

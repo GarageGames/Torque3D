@@ -22,7 +22,7 @@
 
 #include "core/strings/stringFunctions.h"
 #include "core/util/str.h"
-
+#include "gfx/gfxDevice.h"
 #include "langElement.h"
 
 //**************************************************************************
@@ -89,19 +89,22 @@ Var::Var()
 {
    dStrcpy( (char*)type, "float4" );
    structName[0] = '\0';
+   connectName[0] = '\0';
+   constSortPos = cspUninit;
+   constNum = 0;
+   texCoordNum = 0;
    uniform = false;
    vertData = false;
    connector = false;
    sampler = false;
    mapsToSampler = false;
-   texCoordNum = 0;
-   constSortPos = cspUninit;
    arraySize = 1;
 }
 
 Var::Var( const char *inName, const char *inType )
 {
    structName[0] = '\0';
+   connectName[0] = '\0';
    uniform = false;
    vertData = false;
    connector = false;
@@ -158,6 +161,9 @@ void Var::print( Stream &stream )
    if( structName[0] != '\0' )
    {
       stream.write( dStrlen((char*)structName), structName );
+      if(GFX->getAdapterType() == OpenGL)
+         stream.write( 1, "_" );
+      else
       stream.write( 1, "." );
    }
 

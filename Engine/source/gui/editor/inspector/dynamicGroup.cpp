@@ -24,6 +24,7 @@
 #include "gui/editor/guiInspector.h"
 #include "gui/editor/inspector/dynamicGroup.h"
 #include "gui/editor/inspector/dynamicField.h"
+#include "console/engineAPI.h"
 
 IMPLEMENT_CONOBJECT(GuiInspectorDynamicGroup);
 
@@ -176,7 +177,7 @@ void GuiInspectorDynamicGroup::updateAllFields()
    inspectGroup();
 }
 
-ConsoleMethod(GuiInspectorDynamicGroup, inspectGroup, bool, 2, 2, "Refreshes the dynamic fields in the inspector.")
+DefineConsoleMethod(GuiInspectorDynamicGroup, inspectGroup, bool, (), , "Refreshes the dynamic fields in the inspector.")
 {
    return object->inspectGroup();
 }
@@ -251,11 +252,11 @@ void GuiInspectorDynamicGroup::addDynamicField()
    instantExpand();
 }
 
-ConsoleMethod( GuiInspectorDynamicGroup, addDynamicField, void, 2, 2, "obj.addDynamicField();" )
+DefineConsoleMethod( GuiInspectorDynamicGroup, addDynamicField, void, (), , "obj.addDynamicField();" )
 {
    object->addDynamicField();
 }
 
-ConsoleMethod( GuiInspectorDynamicGroup, removeDynamicField, void, 3, 3, "" )
+DefineConsoleMethod( GuiInspectorDynamicGroup, removeDynamicField, void, (), , "" )
 {
 }

@@ -579,7 +579,7 @@ AbstractClassRep* ConsoleObject::getClassRep() const
    return NULL;
 }
 
-String ConsoleObject::_getLogMessage(const char* fmt, void* args) const
+String ConsoleObject::_getLogMessage(const char* fmt, va_list args) const
 {
    String objClass = "UnknownClass";
    if(getClassRep())
@@ -847,12 +847,13 @@ DefineEngineFunction(linkNamespaces, bool, ( String childNSName, String parentNS
    
    Namespace *childNS = Namespace::find(childNSSTE);
    Namespace *parentNS = Namespace::find(parentNSSTE);
-   Namespace *currentParent = childNS->getParent();
    
    if (!childNS)
    {
       return false;
    }
+
+   Namespace *currentParent = childNS->getParent();
    
    // Link to new NS if applicable
    

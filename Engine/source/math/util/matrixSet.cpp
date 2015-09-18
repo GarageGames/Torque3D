@@ -30,7 +30,7 @@ MatrixSet::MatrixSet()
    // this class will provide a place where aligned/specalized matrix math can take place.
    // We should be able to plug in any kind of platform-specific optimization 
    // behind the delgates.
-   AssertFatal( ((int)this & 0xF) == 0, "MatrixSet has been allocated off a 16-byte boundary!" );
+   AssertFatal( ((intptr_t)this & 0xF) == 0, "MatrixSet has been allocated off a 16-byte boundary!" );
 
    // Must be initialized by name, not a for(), it's macro magic
    MATRIX_SET_BIND_VALUE(ObjectToWorld);

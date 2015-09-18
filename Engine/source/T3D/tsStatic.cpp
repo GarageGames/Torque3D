@@ -48,6 +48,7 @@
 #include "materials/materialFeatureData.h"
 #include "materials/materialFeatureTypes.h"
 #include "console/engineAPI.h"
+#include "T3D/accumulationVolume.h"
 
 using namespace Torque;
 
@@ -101,7 +102,7 @@ TSStatic::TSStatic()
    mPlayAmbient      = true;
    mAmbientThread    = NULL;
 
-   mAllowPlayerStep = true;
+   mAllowPlayerStep = false;
 
    mConvexList = new Convex;
 
@@ -111,6 +112,11 @@ TSStatic::TSStatic()
    mMeshCulling = false;
    mUseOriginSort = false;
 
+   mUseAlphaFade     = false;
+   mAlphaFadeStart   = 100.0f;
+   mAlphaFadeEnd     = 150.0f;
+   mInvertAlphaFade  = false;
+   mAlphaFade = 1.0f;
    mPhysicsRep = NULL;
 
    mCollisionType = CollisionMesh;
@@ -191,6 +197,13 @@ void TSStatic::initPersistFields()
          "When set to false, the slightest bump will stop the player from walking on top of the object.\n");
    
    endGroup("Collision");
+
+   addGroup( "AlphaFade" );  
+      addField( "alphaFadeEnable",   TypeBool,   Offset(mUseAlphaFade,    TSStatic), "Turn on/off Alpha Fade" );  
+      addField( "alphaFadeStart",    TypeF32,    Offset(mAlphaFadeStart,  TSStatic), "Distance of start Alpha Fade" );  
+      addField( "alphaFadeEnd",      TypeF32,    Offset(mAlphaFadeEnd,    TSStatic), "Distance of end Alpha Fade" );  
+      addField( "alphaFadeInverse", TypeBool,    Offset(mInvertAlphaFade, TSStatic), "Invert Alpha Fade's Start & End Distance" );  
+   endGroup( "AlphaFade" );
 
    addGroup("Debug");
 
@@ -280,6 +293,13 @@ bool TSStatic::onAdd()
    addToScene();
 
    _updateShouldTick();
+
+   // Accumulation
+   if ( isClientObject() && mShapeInstance )
+   {
+      if ( mShapeInstance->hasAccumulation() ) 
+         AccumulationVolume::addObject(this);
+   }
 
    return true;
 }
@@ -390,6 +410,13 @@ void TSStatic::_updatePhysics()
 void TSStatic::onRemove()
 {
    SAFE_DELETE( mPhysicsRep );
+
+   // Accumulation
+   if ( isClientObject() && mShapeInstance )
+   {
+      if ( mShapeInstance->hasAccumulation() ) 
+         AccumulationVolume::removeObject(this);
+   }
 
    mConvexList->nukeList();
 
@@ -502,6 +529,36 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    if (dist < 0.01f)
       dist = 0.01f;
 
+   if (mUseAlphaFade)
+   {
+      mAlphaFade = 1.0f;
+      if ((mAlphaFadeStart < mAlphaFadeEnd) && mAlphaFadeStart > 0.1f)
+      {
+         if (mInvertAlphaFade)
+         {
+            if (dist <= mAlphaFadeStart)
+            {
+               return;
+            }
+            if (dist < mAlphaFadeEnd)
+            {
+               mAlphaFade = ((dist - mAlphaFadeStart) / (mAlphaFadeEnd - mAlphaFadeStart));
+            }
+         }
+         else
+         {
+            if (dist >= mAlphaFadeEnd)
+            {
+               return;
+            }
+            if (dist > mAlphaFadeStart)
+            {
+               mAlphaFade -= ((dist - mAlphaFadeStart) / (mAlphaFadeEnd - mAlphaFadeStart));
+            }
+         }
+      }
+   }
+
    F32 invScale = (1.0f/getMax(getMax(mObjScale.x,mObjScale.y),mObjScale.z));   
 
    if ( mForceDetail == -1 )
@@ -519,6 +576,9 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    rdata.setSceneState( state );
    rdata.setFadeOverride( 1.0f );
    rdata.setOriginSort( mUseOriginSort );
+
+   // Acculumation
+   rdata.setAccuTex(mAccuTex);
 
    // If we have submesh culling enabled then prepare
    // the object space frustum to pass to the shape.
@@ -545,6 +605,19 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    GFX->setWorldMatrix( mat );
 
    mShapeInstance->animate();
+   if(mShapeInstance)
+   {
+      if (mUseAlphaFade)
+      {
+         mShapeInstance->setAlphaAlways(mAlphaFade);
+         S32 s = mShapeInstance->mMeshObjects.size();
+         
+         for(S32 x = 0; x < s; x++)
+         {
+            mShapeInstance->mMeshObjects[x].visible = mAlphaFade;
+         }
+      }
+   }
    mShapeInstance->render( rdata );
 
    if ( mRenderNormalScalar > 0 )
@@ -594,6 +667,13 @@ void TSStatic::setTransform(const MatrixF & mat)
    if ( mPhysicsRep )
       mPhysicsRep->setTransform( mat );
 
+   // Accumulation
+   if ( isClientObject() && mShapeInstance )
+   {
+      if ( mShapeInstance->hasAccumulation() ) 
+         AccumulationVolume::updateObject(this);
+   }
+
    // Since this is a static it's render transform changes 1
    // to 1 with it's collision transform... no interpolation.
    setRenderTransform(mat);
@@ -624,6 +704,13 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    stream->write( mForceDetail );
 
    stream->writeFlag( mPlayAmbient );
+
+   if ( stream->writeFlag(mUseAlphaFade) )  
+   {  
+      stream->write(mAlphaFadeStart);  
+      stream->write(mAlphaFadeEnd);  
+      stream->write(mInvertAlphaFade);  
+   } 
 
    if ( mLightPlugin )
       retMask |= mLightPlugin->packUpdate(this, AdvancedStaticOptionsMask, con, mask, stream);
@@ -681,6 +768,14 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
    stream->read( &mForceDetail );
 
    mPlayAmbient = stream->readFlag();
+
+   mUseAlphaFade = stream->readFlag();  
+   if (mUseAlphaFade)
+   {
+      stream->read(&mAlphaFadeStart);  
+      stream->read(&mAlphaFadeEnd);  
+      stream->read(&mInvertAlphaFade);  
+   }
 
    if ( mLightPlugin )
    {
@@ -924,7 +1019,7 @@ void TSStaticPolysoupConvex::getPolyList(AbstractPolyList *list)
                list->addPoint(verts[2]);
                list->addPoint(verts[1]);
 
-   list->begin(0, (U32)idx ^ (U32)mesh);
+   list->begin(0, (U32)idx ^ (uintptr_t)mesh);
    list->vertex(base + 2);
    list->vertex(base + 1);
    list->vertex(base + 0);
@@ -1076,8 +1171,10 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
       return;
    }
 
+   TSMaterialList* shapeMaterialList = object->getShape()->materialList;
+
    // Check the mapTo name exists for this shape
-   S32 matIndex = object->getShape()->materialList->getMaterialNameList().find_next(String(mapTo));
+   S32 matIndex = shapeMaterialList->getMaterialNameList().find_next(String(mapTo));
    if (matIndex < 0)
    {
       Con::errorf("TSShape::changeMaterial failed: Invalid mapTo name '%s'", mapTo);
@@ -1095,13 +1192,13 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
 
    // Replace instances with the new material being traded in. Lets make sure that we only
    // target the specific targets per inst, this is actually doing more than we thought
-   delete object->getShape()->materialList->mMatInstList[matIndex];
-   object->getShape()->materialList->mMatInstList[matIndex] = newMat->createMatInstance();
+   delete shapeMaterialList->mMatInstList[matIndex];
+   shapeMaterialList->mMatInstList[matIndex] = newMat->createMatInstance();
 
    // Finish up preparing the material instances for rendering
    const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPNTTB>();
    FeatureSet features = MATMGR->getDefaultFeatures();
-   object->getShape()->materialList->getMaterialInst(matIndex)->init( features, flags );
+   shapeMaterialList->getMaterialInst(matIndex)->init(features, flags);
 }
 
 DefineEngineMethod( TSStatic, getModelFile, const char *, (),,

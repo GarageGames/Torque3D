@@ -1063,3 +1063,17 @@ singleton GuiControlProfile( GuiCreatorIconButtonProfile )
    //bevelColorLL = "0 0 0";
    category = "Editor";
 };
+
+singleton GuiControlProfile( GuiMenuBarProfile )
+{
+   fillcolor = "255 255 255";
+   fillcolorHL = "213 231 248";
+   borderColor = "98 163 229";
+   borderColorHL = "122 177 232";
+   border = 0;
+   borderThickness = 1;
+   opaque = true;
+   mouseOverSelected = true;
+   category = "Editor";
+   bitmap = "tools/gui/images/checkbox-menubar";
+};

@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2014 Daniel Buckmaster
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -22,10 +22,12 @@
 
 #include "torqueRecast.h"
 #include "navPath.h"
+#include "duDebugDrawTorque.h"
 
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
 #include "console/typeValidators.h"
+#include "math/mathTypes.h"
 
 #include "scene/sceneRenderState.h"
 #include "gfx/gfxDrawUtil.h"
@@ -35,6 +37,7 @@
 #include "math/mathIO.h"
 
 #include <DetourDebugDraw.h>
+#include <climits>
 
 extern bool gEditingMission;
 
@@ -44,8 +47,7 @@ NavPath::NavPath() :
    mFrom(0.0f, 0.0f, 0.0f),
    mTo(0.0f, 0.0f, 0.0f)
 {
-   mTypeMask |= StaticShapeObjectType | MarkerObjectType;
-   mNetFlags.clear(Ghostable);
+   mTypeMask |= MarkerObjectType;
 
    mMesh = NULL;
    mWaypoints = NULL;
@@ -56,43 +58,51 @@ NavPath::NavPath() :
    mToSet = false;
    mLength = 0.0f;
 
+   mCurIndex = -1;
    mIsLooping = false;
+   mAutoUpdate = false;
+   mIsSliced = false;
+
+   mMaxIterations = 1;
 
    mAlwaysRender = false;
    mXray = false;
+   mRenderSearch = false;
 
-   mQuery = dtAllocNavMeshQuery();
+   mQuery = NULL;
 }
 
 NavPath::~NavPath()
 {
-   // Required for Detour.
    dtFreeNavMeshQuery(mQuery);
    mQuery = NULL;
 }
 
-bool NavPath::setProtectedMesh(void *obj, const char *index, const char *data)
+void NavPath::checkAutoUpdate()
 {
-   NavMesh *mesh = NULL;
-   NavPath *object = static_cast<NavPath*>(obj);
-
-   if(Sim::findObject(data, mesh))
-      object->mMesh = mesh;
-
-   return false;
+   EventManager *em = NavMesh::getEventManager();
+   em->removeAll(this);
+   if(mMesh)
+   {
+      if(mAutoUpdate)
+      {
+         em->subscribe(this, "NavMeshRemoved");
+         em->subscribe(this, "NavMeshUpdate");
+         em->subscribe(this, "NavMeshUpdateBox");
+         em->subscribe(this, "NavMeshObstacleAdded");
+         em->subscribe(this, "NavMeshObstacleRemoved");
+      }
+   }
 }
 
-const char *NavPath::getProtectedMesh(void *obj, const char *data)
+bool NavPath::setProtectedMesh(void *obj, const char *index, const char *data)
 {
    NavPath *object = static_cast<NavPath*>(obj);
 
-   if(object->mMesh.isNull())
-      return "";
+   if(Sim::findObject(data, object->mMesh))
+      object->checkAutoUpdate();
 
-   if(object->mMesh->getName())
-      return object->mMesh->getName();
-   else
-      return object->mMesh->getIdString();
+   return true;
 }
 
 bool NavPath::setProtectedWaypoints(void *obj, const char *index, const char *data)
@@ -107,6 +117,16 @@ bool NavPath::setProtectedWaypoints(void *obj, const char *index, const char *da
    }
    else
       object->mWaypoints = NULL;
+
+   return false;
+}
+
+bool NavPath::setProtectedAutoUpdate(void *obj, const char *index, const char *data)
+{
+   NavPath *object = static_cast<NavPath*>(obj);
+
+   object->mAutoUpdate = dAtob(data);
+   object->checkAutoUpdate();
 
    return false;
 }
@@ -150,7 +170,7 @@ const char *NavPath::getProtectedFrom(void *obj, const char *data)
    if(object->mFromSet)
       return data;
    else
-      return "";
+      return StringTable->insert("");
 }
 
 const char *NavPath::getProtectedTo(void *obj, const char *data)
@@ -160,29 +180,10 @@ const char *NavPath::getProtectedTo(void *obj, const char *data)
    if(object->mToSet)
       return data;
    else
-      return "";
+      return StringTable->insert("");
 }
 
-bool NavPath::setProtectedAlwaysRender(void *obj, const char *index, const char *data)
-{
-   NavPath *path = static_cast<NavPath*>(obj);
-   bool always = dAtob(data);
-   if(always)
-   {
-      if(!gEditingMission)
-         path->mNetFlags.set(Ghostable);
-   }
-   else
-   {
-      if(!gEditingMission)
-         path->mNetFlags.clear(Ghostable);
-   }
-   path->mAlwaysRender = always;
-   path->setMaskBits(PathMask);
-   return true;
-}
-
-static IRangeValidator NaturalNumber(1, S32_MAX);
+IRangeValidator ValidIterations(1, S32_MAX);
 
 void NavPath::initPersistFields()
 {
@@ -195,25 +196,52 @@ void NavPath::initPersistFields()
       &setProtectedTo, &getProtectedTo,
       "World location this path should end at.");
 
-   addProtectedField("mesh", TYPEID<NavMesh>(), Offset(mMesh, NavPath),
-      &setProtectedMesh, &getProtectedMesh,
-      "NavMesh object this path travels within.");
+   addProtectedField("mesh", TypeRealString, Offset(mMeshName, NavPath),
+      &setProtectedMesh, &defaultProtectedGetFn,
+      "Name of the NavMesh object this path travels within.");
    addProtectedField("waypoints", TYPEID<SimPath::Path>(), Offset(mWaypoints, NavPath),
       &setProtectedWaypoints, &defaultProtectedGetFn,
       "Path containing waypoints for this NavPath to visit.");
 
    addField("isLooping", TypeBool, Offset(mIsLooping, NavPath),
       "Does this path loop?");
+   addField("isSliced", TypeBool, Offset(mIsSliced, NavPath),
+      "Plan this path over multiple updates instead of all at once.");
+   addFieldV("maxIterations", TypeS32, Offset(mMaxIterations, NavPath), &ValidIterations,
+      "Maximum iterations of path planning this path does per tick.");
+   addProtectedField("autoUpdate", TypeBool, Offset(mAutoUpdate, NavPath),
+      &setProtectedAutoUpdate, &defaultProtectedGetFn,
+      "If set, this path will automatically replan when its navigation mesh changes.");
 
    endGroup("NavPath");
 
+   addGroup("Flags");
+
+   addField("allowWalk", TypeBool, Offset(mLinkTypes.walk, NavPath),
+      "Allow the path to use dry land.");
+   addField("allowJump", TypeBool, Offset(mLinkTypes.jump, NavPath),
+      "Allow the path to use jump links.");
+   addField("allowDrop", TypeBool, Offset(mLinkTypes.drop, NavPath),
+      "Allow the path to use drop links.");
+   addField("allowSwim", TypeBool, Offset(mLinkTypes.swim, NavPath),
+      "Allow the path tomove in water.");
+   addField("allowLedge", TypeBool, Offset(mLinkTypes.ledge, NavPath),
+      "Allow the path to jump ledges.");
+   addField("allowClimb", TypeBool, Offset(mLinkTypes.climb, NavPath),
+      "Allow the path to use climb links.");
+   addField("allowTeleport", TypeBool, Offset(mLinkTypes.teleport, NavPath),
+      "Allow the path to use teleporters.");
+
+   endGroup("Flags");
+
    addGroup("NavPath Render");
-   
-   addProtectedField("alwaysRender", TypeBool, Offset(mAlwaysRender, NavMesh),
-      &setProtectedAlwaysRender, &defaultProtectedGetFn,
-      "Display this NavPath even outside the editor.");
+
+   addField("alwaysRender", TypeBool, Offset(mAlwaysRender, NavPath),
+      "Render this NavPath even when not selected.");
    addField("xray", TypeBool, Offset(mXray, NavPath),
       "Render this NavPath through other objects.");
+   addField("renderSearch", TypeBool, Offset(mRenderSearch, NavPath),
+      "Render the closed list of this NavPath's search.");
 
    endGroup("NavPath Render");
 
@@ -225,59 +253,62 @@ bool NavPath::onAdd()
    if(!Parent::onAdd())
       return false;
 
-   addToScene();
-
-   // Ghost immediately if the editor's already open.
-   if(gEditingMission || mAlwaysRender)
+   if(gEditingMission)
       mNetFlags.set(Ghostable);
 
-   // Automatically find a path if we can.
-   if(isServerObject())
-      plan();
-
-   // Set initial world bounds and stuff.
    resize();
+
+   addToScene();
+
+   if(isServerObject())
+   {
+      mQuery = dtAllocNavMeshQuery();
+      if(!mQuery)
+         return false;
+      checkAutoUpdate();
+      if(!plan())
+         setProcessTick(true);
+   }
 
    return true;
 }
 
 void NavPath::onRemove()
 {
-   // Remove from simulation.
-   removeFromScene();
-
    Parent::onRemove();
+
+   removeFromScene();
 }
 
 bool NavPath::init()
 {
-   // Check that enough data is provided.
-   if(mMesh.isNull() || !mMesh->getNavMesh())
+   mStatus = DT_FAILURE;
+
+   // Check that all the right data is provided.
+   if(!mMesh || !mMesh->getNavMesh())
       return false;
-   if(!(mFromSet && mToSet) && !(!mWaypoints.isNull() && mWaypoints->size()))
+   if(!(mFromSet && mToSet) && !(mWaypoints && mWaypoints->size()))
       return false;
 
-   // Initialise query in Detour.
+   // Initialise our query.
    if(dtStatusFailed(mQuery->init(mMesh->getNavMesh(), MaxPathLen)))
       return false;
 
    mPoints.clear();
+   mFlags.clear();
    mVisitPoints.clear();
    mLength = 0.0f;
 
-   // Send path data to clients who are ghosting this object.
    if(isServerObject())
       setMaskBits(PathMask);
 
    // Add points we need to visit in reverse order.
    if(mWaypoints && mWaypoints->size())
    {
-      // Add destination. For looping paths, that includes 'from'.
       if(mIsLooping && mFromSet)
          mVisitPoints.push_back(mFrom);
       if(mToSet)
          mVisitPoints.push_front(mTo);
-      // Add waypoints.
       for(S32 i = mWaypoints->size() - 1; i >= 0; i--)
       {
          SceneObject *s = dynamic_cast<SceneObject*>(mWaypoints->at(i));
@@ -289,13 +320,11 @@ bool NavPath::init()
                mVisitPoints.push_front(s->getPosition());
          }
       }
-      // Add source (only ever specified by 'from').
       if(mFromSet)
          mVisitPoints.push_back(mFrom);
    }
    else
    {
-      // Add (from,) to and from
       if(mIsLooping)
          mVisitPoints.push_back(mFrom);
       mVisitPoints.push_back(mTo);
@@ -316,7 +345,6 @@ void NavPath::resize()
       return;
    }
 
-   // Grow a box to just fit over all our points.
    Point3F max(mPoints[0]), min(mPoints[0]), pos(0.0f);
    for(U32 i = 1; i < mPoints.size(); i++)
    {
@@ -341,20 +369,38 @@ void NavPath::resize()
 
 bool NavPath::plan()
 {
+   // Initialise filter.
+   mFilter.setIncludeFlags(mLinkTypes.getFlags());
+
+   // Initialise query and visit locations.
    if(!init())
       return false;
 
-   if(!visitNext())
-      return false;
+   if(mIsSliced)
+      return planSliced();
+   else
+      return planInstant();
+}
 
+bool NavPath::planSliced()
+{
+   bool visited = visitNext();
+
+   if(visited)
+      setProcessTick(true);
+
+   return visited;
+}
+
+bool NavPath::planInstant()
+{
+   setProcessTick(false);
+   visitNext();
+   S32 store = mMaxIterations;
+   mMaxIterations = INT_MAX;
    while(update());
-
-   if(!finalise())
-      return false;
-
-   resize();
-
-   return true;
+   mMaxIterations = store;
+   return finalise();
 }
 
 bool NavPath::visitNext()
@@ -364,23 +410,32 @@ bool NavPath::visitNext()
       return false;
 
    // Current leg of journey.
-   Point3F start = mVisitPoints[s-1];
-   Point3F end = mVisitPoints[s-2];
+   Point3F &start = mVisitPoints[s-1];
+   Point3F &end = mVisitPoints[s-2];
+
+   // Drop to height of statics.
+   RayInfo info;
+   if(getContainer()->castRay(start, start - Point3F(0, 0, mMesh->mWalkableHeight * 2.0f), StaticObjectType, &info))
+      start = info.point;
+   if(getContainer()->castRay(end + Point3F(0, 0, 0.1f), end - Point3F(0, 0, mMesh->mWalkableHeight * 2.0f), StaticObjectType, &info))
+      end = info.point;
 
    // Convert to Detour-friendly coordinates and data structures.
    F32 from[] = {start.x, start.z, -start.y};
    F32 to[] =   {end.x,   end.z,   -end.y};
-   F32 extents[] = {1.0f, 1.0f, 1.0f};
+   F32 extx = mMesh->mWalkableRadius * 4.0f;
+   F32 extz = mMesh->mWalkableHeight;
+   F32 extents[] = {extx, extz, extx};
    dtPolyRef startRef, endRef;
 
-   if(dtStatusFailed(mQuery->findNearestPoly(from, extents, &mFilter, &startRef, from)) || !startRef)
+   if(dtStatusFailed(mQuery->findNearestPoly(from, extents, &mFilter, &startRef, NULL)) || !startRef)
    {
       Con::errorf("No NavMesh polygon near visit point (%g, %g, %g) of NavPath %s",
          start.x, start.y, start.z, getIdString());
       return false;
    }
 
-   if(dtStatusFailed(mQuery->findNearestPoly(to, extents, &mFilter, &endRef, to)) || !startRef)
+   if(dtStatusFailed(mQuery->findNearestPoly(to, extents, &mFilter, &endRef, NULL)) || !endRef)
    {
       Con::errorf("No NavMesh polygon near visit point (%g, %g, %g) of NavPath %s",
          end.x, end.y, end.z, getIdString());
@@ -397,20 +452,16 @@ bool NavPath::visitNext()
 
 bool NavPath::update()
 {
-   // StatusInProgress means a query is underway.
    if(dtStatusInProgress(mStatus))
-      mStatus = mQuery->updateSlicedFindPath(INT_MAX, NULL);
-   // StatusSucceeded means the query found its destination.
+      mStatus = mQuery->updateSlicedFindPath(mMaxIterations, NULL);
    if(dtStatusSucceed(mStatus))
    {
-      // Finalize the path. Need to use the static path length cap again.
+      // Add points from this leg.
       dtPolyRef path[MaxPathLen];
       S32 pathLen;
       mStatus = mQuery->finalizeSlicedFindPath(path, &pathLen, MaxPathLen);
-      // Apparently stuff can go wrong during finalizing, so check the status again.
       if(dtStatusSucceed(mStatus) && pathLen)
       {
-         // These next few blocks are straight from Detour example code.
          F32 straightPath[MaxPathLen * 3];
          S32 straightPathLen;
          dtPolyRef straightPathPolys[MaxPathLen];
@@ -422,19 +473,19 @@ bool NavPath::update()
          F32 from[] = {start.x, start.z, -start.y};
          F32 to[] =   {end.x,   end.z,   -end.y};
 
-         // Straightens out the path.
          mQuery->findStraightPath(from, to, path, pathLen,
             straightPath, straightPathFlags,
             straightPathPolys, &straightPathLen, MaxPathLen);
 
-         // Convert Detour point path to list of Torque points.
          s = mPoints.size();
          mPoints.increment(straightPathLen);
+         mFlags.increment(straightPathLen);
          for(U32 i = 0; i < straightPathLen; i++)
          {
             F32 *f = straightPath + i * 3;
             mPoints[s + i] = RCtoDTS(f);
-            // Accumulate length if we're not the first vertex.
+            mMesh->getNavMesh()->getPolyFlags(straightPathPolys[i], &mFlags[s + i]);
+            // Add to length
             if(s > 0 || i > 0)
                mLength += (mPoints[s+i] - mPoints[s+i-1]).len();
          }
@@ -467,30 +518,37 @@ bool NavPath::update()
 
 bool NavPath::finalise()
 {
-   // Stop ticking.
    setProcessTick(false);
 
-   // Reset world bounds and stuff.
    resize();
 
-   return dtStatusSucceed(mStatus);
+   return success();
 }
 
 void NavPath::processTick(const Move *move)
 {
+   if(!mMesh)
+      if(Sim::findObject(mMeshName.c_str(), mMesh))
+         plan();
    if(dtStatusInProgress(mStatus))
       update();
 }
 
-Point3F NavPath::getNode(S32 idx)
+Point3F NavPath::getNode(S32 idx) const
 {
-   if(idx < getCount() && idx >= 0)
+   if(idx < size() && idx >= 0)
       return mPoints[idx];
-   Con::errorf("Trying to access out-of-bounds path index %d (path length: %d)!", idx, getCount());
    return Point3F(0,0,0);
 }
 
-S32 NavPath::getCount()
+U16 NavPath::getFlags(S32 idx) const
+{
+   if(idx < size() && idx >= 0)
+      return mFlags[idx];
+   return 0;
+}
+
+S32 NavPath::size() const
 {
    return mPoints.size();
 }
@@ -498,18 +556,11 @@ S32 NavPath::getCount()
 void NavPath::onEditorEnable()
 {
    mNetFlags.set(Ghostable);
-   if(isClientObject() && !mAlwaysRender)
-      addToScene();
 }
 
 void NavPath::onEditorDisable()
 {
-   if(!mAlwaysRender)
-   {
-      mNetFlags.clear(Ghostable);
-      if(isClientObject())
-         removeFromScene();
-   }
+   mNetFlags.clear(Ghostable);
 }
 
 void NavPath::inspectPostApply()
@@ -530,7 +581,7 @@ void NavPath::prepRenderImage(SceneRenderState *state)
 {
    ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
    ri->renderDelegate.bind(this, &NavPath::renderSimple);
-   ri->type = RenderPassManager::RIT_Object;
+   ri->type = RenderPassManager::RIT_Editor;      
    ri->translucentSort = true;
    ri->defaultKey = 1;
    state->getRenderPass()->addInst(ri);
@@ -577,6 +628,18 @@ void NavPath::renderSimple(ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    for (U32 i = 0; i < mPoints.size(); i++)
       PrimBuild::vertex3fv(mPoints[i]);
    PrimBuild::end();
+
+   if(mRenderSearch && getServerObject())
+   {
+      NavPath *np = static_cast<NavPath*>(getServerObject());
+      if(np->mQuery && !dtStatusSucceed(np->mStatus))
+      {
+         duDebugDrawTorque dd;
+         dd.overrideColor(duRGBA(250, 20, 20, 255));
+         duDebugDrawNavMeshNodes(&dd, *np->mQuery);
+         dd.render();
+      }
+   }
 }
 
 U32 NavPath::packUpdate(NetConnection *conn, U32 mask, BitStream *stream)
@@ -586,6 +649,7 @@ U32 NavPath::packUpdate(NetConnection *conn, U32 mask, BitStream *stream)
    stream->writeFlag(mIsLooping);
    stream->writeFlag(mAlwaysRender);
    stream->writeFlag(mXray);
+   stream->writeFlag(mRenderSearch);
 
    if(stream->writeFlag(mFromSet))
       mathWrite(*stream, mFrom);
@@ -596,7 +660,10 @@ U32 NavPath::packUpdate(NetConnection *conn, U32 mask, BitStream *stream)
    {
       stream->writeInt(mPoints.size(), 32);
       for(U32 i = 0; i < mPoints.size(); i++)
+      {
          mathWrite(*stream, mPoints[i]);
+         stream->writeInt(mFlags[i], 16);
+      }
    }
 
    return retMask;
@@ -609,6 +676,7 @@ void NavPath::unpackUpdate(NetConnection *conn, BitStream *stream)
    mIsLooping = stream->readFlag();
    mAlwaysRender = stream->readFlag();
    mXray = stream->readFlag();
+   mRenderSearch = stream->readFlag();
 
    if((mFromSet = stream->readFlag()) == true)
       mathRead(*stream, &mFrom);
@@ -618,27 +686,55 @@ void NavPath::unpackUpdate(NetConnection *conn, BitStream *stream)
    if(stream->readFlag())
    {
       mPoints.clear();
+      mFlags.clear();
       mPoints.setSize(stream->readInt(32));
+      mFlags.setSize(mPoints.size());
       for(U32 i = 0; i < mPoints.size(); i++)
       {
          Point3F p;
          mathRead(*stream, &p);
          mPoints[i] = p;
+         mFlags[i] = stream->readInt(16);
       }
       resize();
    }
 }
 
-DefineEngineMethod(NavPath, replan, bool, (),,
+DefineEngineMethod(NavPath, plan, bool, (),,
    "@brief Find a path using the already-specified path properties.")
 {
    return object->plan();
 }
 
-DefineEngineMethod(NavPath, getCount, S32, (),,
+DefineEngineMethod(NavPath, onNavMeshUpdate, void, (const char *data),,
+   "@brief Callback when this path's NavMesh is loaded or rebuilt.")
+{
+   if(object->mMesh && !dStrcmp(data, object->mMesh->getIdString()))
+      object->plan();
+}
+
+DefineEngineMethod(NavPath, onNavMeshUpdateBox, void, (const char *data),,
+   "@brief Callback when a particular area in this path's NavMesh is rebuilt.")
+{
+   String s(data);
+   U32 space = s.find(' ');
+   if(space != String::NPos)
+   {
+      String id = s.substr(0, space);
+      if(!object->mMesh || id.compare(object->mMesh->getIdString()))
+         return;
+      String boxstr = s.substr(space + 1);
+      Box3F box;
+      castConsoleTypeFromString(box, boxstr.c_str());
+      if(object->getWorldBox().isOverlapped(box))
+         object->plan();
+   }
+}
+
+DefineEngineMethod(NavPath, size, S32, (),,
    "@brief Return the number of nodes in this path.")
 {
-   return object->getCount();
+   return object->size();
 }
 
 DefineEngineMethod(NavPath, getNode, Point3F, (S32 idx),,
@@ -647,8 +743,14 @@ DefineEngineMethod(NavPath, getNode, Point3F, (S32 idx),,
    return object->getNode(idx);
 }
 
+DefineEngineMethod(NavPath, getFlags, S32, (S32 idx),,
+   "@brief Get a specified node along the path.")
+{
+   return (S32)object->getFlags(idx);
+}
+
 DefineEngineMethod(NavPath, getLength, F32, (),,
-   "@brief Get the length of this path in Torque units (i.e. the total distance it covers).")
+   "@brief Get the length of this path.")
 {
    return object->getLength();
 }

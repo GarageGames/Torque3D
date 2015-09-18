@@ -654,7 +654,6 @@
                            bitmap = "tools/gui/images/delete";
                         };
                      };
-                  
                   };
                };
                new GuiRolloutCtrl(advancedTextureMapsRollout) {
@@ -1481,6 +1480,482 @@
                            bitmap = "tools/gui/images/delete";
                         };
                      };
+                  };
+               };
+               new GuiRolloutCtrl() {
+                  class = "BehaviorQuickEditRollout";
+                  superclass = LBQuickEditRollout;
+                  Profile = "GuiRolloutProfile";
+                  HorizSizing = "width";
+                  VertSizing = "bottom";
+                  Position = "0 0";
+                  Extent = "195 0";
+                  Caption = "Accumulation Properties";
+                  Margin = "-1 0 0 0";
+                  DragSizable = false;
+                  container = true;
+                  parentRollout = %this.rollout;
+                  object = %behavior;
+                  
+                  new GuiStackControl() {
+                     StackingType = "Vertical";
+                     HorizStacking = "Left to Right";
+                     VertStacking = "Top to Bottom";
+                     Padding = "0";
+                     canSaveDynamicFields = "0";
+                     Enabled = "1";
+                     isContainer = "1";
+                     Profile = "GuiDefaultProfile";
+                     HorizSizing = "width";
+                     VertSizing = "bottom";
+                     Position = "1 3";
+                     Extent = "195 16";
+                     MinExtent = "16 16";
+                     canSave = "1";
+                     isDecoy = "0";
+                     Visible = "1";
+                     tooltipprofile = "GuiToolTipProfile";
+                     hovertime = "1000";
+                     
+                     new GuiContainer(){ // enable/disable
+                        profile="GuiTransparentProfile";
+                        isContainer = "1";
+                        position = "0 0";
+                        Extent = "195 24";
+                        HorizSizing = "width";
+                        
+                        new GuiCheckBoxCtrl() {
+                           canSaveDynamicFields = "0";
+                           internalName = "accuCheckbox";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "ToolsGuiCheckBoxProfile";
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "8 7";
+                           Extent = "57 16";
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           Command = "MaterialEditorGui.updateAccuCheckbox($ThisControl.getValue());";
+                           tooltipprofile = "ToolsGuiDefaultProfile";
+                           ToolTip = "Enables the use of Pixel Specular for this layer.";
+                           hovertime = "1000";
+                           text = "Enable";
+                           groupNum = "-1";
+                           buttonType = "ToggleButton";
+                           useMouseEvents = "0";
+                           useInactiveState = "0";
+                        };  
+                     };
+                  
+                     new GuiContainer(){ // scale
+                        profile="GuiTransparentProfile";
+                        isContainer = "1";
+                        position = "0 0";
+                        Extent = "195 24";
+                        HorizSizing = "width";
+                        
+                        new GuiTextCtrl() {
+                           canSaveDynamicFields = "0";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "GuiTextRightProfile";
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "8 3";
+                           Extent = "54 16";
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           hovertime = "1000";
+                           Margin = "0 0 0 0";
+                           Padding = "0 0 0 0";
+                           AnchorTop = "1";
+                           AnchorBottom = "0";
+                           AnchorLeft = "1";
+                           AnchorRight = "0";
+                           text = "Scale";
+                           maxLength = "1024";
+                        };
+
+								new GuiControl() {
+                           class = "AggregateControl";
+                           position = "70 3";
+                           Extent = "96 20";
+                           
+                           new GuiSliderCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuScaleSlider";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiSliderProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "0 2";
+                              Extent = "61 14";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "MaterialEditorGui.updateActiveMaterial(\"accuScale[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, true);";
+                              AltCommand = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuScale[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, false);";
+                              tooltipprofile = "GuiDefaultProfile";
+                              ToolTip = "Sets the scale of the accu map.";
+                              hovertime = "1000";
+                              range = "0.03125 32";
+                              ticks = "0";
+                              value = "1";
+                           };
+                           new GuiTextEditCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuScaleTextEdit";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiTextEditProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "64 0";
+                              Extent = "29 18";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuScale[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue());";
+                              hovertime = "1000";
+                              AnchorTop = "1";
+                              AnchorBottom = "0";
+                              AnchorLeft = "1";
+                              AnchorRight = "0";
+                              text = "1";
+                              maxLength = "3";
+                           };
+                        };
+                     };
+
+                     new GuiContainer(){ // direction
+                        profile="GuiTransparentProfile";
+                        isContainer = "1";
+                        position = "0 0";
+                        Extent = "195 24";
+                        HorizSizing = "width";
+                        
+                        new GuiTextCtrl() {
+                           canSaveDynamicFields = "0";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "GuiTextRightProfile";
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "8 3";
+                           Extent = "54 16";
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           hovertime = "1000";
+                           Margin = "0 0 0 0";
+                           Padding = "0 0 0 0";
+                           AnchorTop = "1";
+                           AnchorBottom = "0";
+                           AnchorLeft = "1";
+                           AnchorRight = "0";
+                           text = "Direction";
+                           maxLength = "1024";
+                        };
+
+								new GuiControl() {
+                           class = "AggregateControl";
+                           position = "70 3";
+                           Extent = "96 20";
+                           
+                           new GuiSliderCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuDirectionSlider";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiSliderProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "0 2";
+                              Extent = "61 14";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "MaterialEditorGui.updateActiveMaterial(\"accuDirection[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, true);";
+                              AltCommand = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuDirection[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, false);";
+                              tooltipprofile = "GuiDefaultProfile";
+                              ToolTip = "Sets the direction of the accu map.";
+                              hovertime = "1000";
+                              range = "-1 1";
+                              ticks = "0";
+                              value = "-1";
+                           };
+                           new GuiTextEditCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuDirectionTextEdit";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiTextEditProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "64 0";
+                              Extent = "29 18";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuDirection[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue());";
+                              hovertime = "1000";
+                              AnchorTop = "1";
+                              AnchorBottom = "0";
+                              AnchorLeft = "1";
+                              AnchorRight = "0";
+                              text = "-1";
+                              maxLength = "3";
+                           };
+                        };
+                     };
+                     new GuiContainer(){ // strength
+                        profile="GuiTransparentProfile";
+                        isContainer = "1";
+                        position = "0 0";
+                        Extent = "195 24";
+                        HorizSizing = "width";
+                        
+                        new GuiTextCtrl() {
+                           canSaveDynamicFields = "0";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "GuiTextRightProfile";
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "8 3";
+                           Extent = "54 16";
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           hovertime = "1000";
+                           Margin = "0 0 0 0";
+                           Padding = "0 0 0 0";
+                           AnchorTop = "1";
+                           AnchorBottom = "0";
+                           AnchorLeft = "1";
+                           AnchorRight = "0";
+                           text = "Strength";
+                           maxLength = "1024";
+                        };
+
+								new GuiControl() {
+                           class = "AggregateControl";
+                           position = "70 3";
+                           Extent = "96 20";
+                           
+                           new GuiSliderCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuStrengthSlider";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiSliderProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "0 2";
+                              Extent = "61 14";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "MaterialEditorGui.updateActiveMaterial(\"accuStrength[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, true);";
+                              AltCommand = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuStrength[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, false);";
+                              tooltipprofile = "GuiDefaultProfile";
+                              ToolTip = "Sets the strength of the accu map.";
+                              hovertime = "1000";
+                              range = "0 1";
+                              ticks = "0";
+                              value = "0.6";
+                           };
+                           new GuiTextEditCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuStrengthTextEdit";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiTextEditProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "64 0";
+                              Extent = "29 18";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuStrength[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue());";
+                              hovertime = "1000";
+                              AnchorTop = "1";
+                              AnchorBottom = "0";
+                              AnchorLeft = "1";
+                              AnchorRight = "0";
+                              text = "0.6";
+                              maxLength = "3";
+                           };
+                        };
+                     };
+                     new GuiContainer(){ // coverage
+                        profile="GuiTransparentProfile";
+                        isContainer = "1";
+                        position = "0 0";
+                        Extent = "195 24";
+                        HorizSizing = "width";
+                        
+                        new GuiTextCtrl() {
+                           canSaveDynamicFields = "0";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "GuiTextRightProfile";
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "8 3";
+                           Extent = "54 16";
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           hovertime = "1000";
+                           Margin = "0 0 0 0";
+                           Padding = "0 0 0 0";
+                           AnchorTop = "1";
+                           AnchorBottom = "0";
+                           AnchorLeft = "1";
+                           AnchorRight = "0";
+                           text = "Coverage";
+                           maxLength = "1024";
+                        };
+
+								new GuiControl() {
+                           class = "AggregateControl";
+                           position = "70 3";
+                           Extent = "96 20";
+                           
+                           new GuiSliderCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuCoverageSlider";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiSliderProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "0 2";
+                              Extent = "61 14";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "MaterialEditorGui.updateActiveMaterial(\"accuCoverage[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, true);";
+                              AltCommand = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuCoverage[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, false);";
+                              tooltipprofile = "GuiDefaultProfile";
+                              ToolTip = "Sets the coverage of the accu map.";
+                              hovertime = "1000";
+                              range = "0 2";
+                              ticks = "0";
+                              value = "1";
+                           };
+                           new GuiTextEditCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuCoverageTextEdit";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiTextEditProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "64 0";
+                              Extent = "29 18";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuCoverage[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue());";
+                              hovertime = "1000";
+                              AnchorTop = "1";
+                              AnchorBottom = "0";
+                              AnchorLeft = "1";
+                              AnchorRight = "0";
+                              text = "1";
+                              maxLength = "3";
+                           };
+                        };
+                     };
+                     new GuiContainer(){ // specular
+                        profile="GuiTransparentProfile";
+                        isContainer = "1";
+                        position = "0 0";
+                        Extent = "195 24";
+                        HorizSizing = "width";
+                        
+                        new GuiTextCtrl() {
+                           canSaveDynamicFields = "0";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "GuiTextRightProfile";
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "8 3";
+                           Extent = "54 16";
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           hovertime = "1000";
+                           Margin = "0 0 0 0";
+                           Padding = "0 0 0 0";
+                           AnchorTop = "1";
+                           AnchorBottom = "0";
+                           AnchorLeft = "1";
+                           AnchorRight = "0";
+                           text = "Specular scale";
+                           maxLength = "1024";
+                        };
+
+								new GuiControl() {
+                           class = "AggregateControl";
+                           position = "70 3";
+                           Extent = "96 20";
+                           
+                           new GuiSliderCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuSpecularSlider";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiSliderProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "0 2";
+                              Extent = "61 14";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "MaterialEditorGui.updateActiveMaterial(\"accuSpecular[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, true);";
+                              AltCommand = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuSpecular[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue(), true, false);";
+                              tooltipprofile = "GuiDefaultProfile";
+                              ToolTip = "Sets the specular scale over the accu map.";
+                              hovertime = "1000";
+                              range = "0 2";
+                              ticks = "0";
+                              value = "1";
+                           };
+                           new GuiTextEditCtrl() {
+                              canSaveDynamicFields = "0";
+                              internalName = "accuSpecularTextEdit";
+                              Enabled = "1";
+                              isContainer = "0";
+                              Profile = "GuiTextEditProfile";
+                              HorizSizing = "right";
+                              VertSizing = "bottom";
+                              position = "64 0";
+                              Extent = "29 18";
+                              MinExtent = "8 2";
+                              canSave = "1";
+                              Visible = "1";
+                              Command = "$ThisControl.getParent().updateFromChild($ThisControl); MaterialEditorGui.updateActiveMaterial(\"accuSpecular[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue());";
+                              hovertime = "1000";
+                              AnchorTop = "1";
+                              AnchorBottom = "0";
+                              AnchorLeft = "1";
+                              AnchorRight = "0";
+                              text = "1";
+                              maxLength = "3";
+                           };
+                        };
+                     };
+
                   };
                };
                new GuiRolloutCtrl() {

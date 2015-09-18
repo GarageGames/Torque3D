@@ -33,10 +33,10 @@ TEST(Profiler, ProfileStartEnd)
    // Do work.
    if(true)
    {
-      PROFILE_END(ProfileStartEndTest);
+      PROFILE_END();
       return;
    }
-   PROFILE_END(ProfileStartEndTest);
+   PROFILE_END();
 }
 
 TEST(Profiler, ProfileScope)

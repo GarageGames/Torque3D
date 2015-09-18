@@ -1131,3 +1131,14 @@ function ProximityMineData::create( %datablock )
 
    return %obj;
 }
+
+function RibbonData::create( %datablock )
+{
+   %obj = new RibbonNode()
+   {
+      dataBlock = DefaultRibbonNodeData;
+      ribbon = %datablock;
+   };
+
+   return %obj;
+}

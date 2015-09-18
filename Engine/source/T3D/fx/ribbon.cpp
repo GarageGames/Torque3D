@@ -527,7 +527,7 @@ void Ribbon::prepRenderImage(SceneRenderState *state)
    } else {
       ri->defaultKey = 1;
    }
-   ri->defaultKey2 = (U32)ri->vertBuff; // Not 64bit safe!
+   ri->defaultKey2 = (uintptr_t)ri->vertBuff; // Not 64bit safe!
 
    state->getRenderPass()->addInst(ri);
 }
@@ -672,9 +672,9 @@ void Ribbon::createBuffers(SceneRenderState *state, GFXVertexBufferHandle<GFXVer
    Point3F pointA = verts[count-1].point;
    Point3F pointB = verts[0].point;
 
-   verts.unlock();
    pb.unlock();
-
+   verts.unlock();
+ 
    Point3F diffSize = pointA - pointB;
 
    Box3F objBox;

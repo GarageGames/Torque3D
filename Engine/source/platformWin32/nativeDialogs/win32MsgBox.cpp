@@ -80,7 +80,7 @@ static U32 getMaskFromID(_FlagMap *map, S32 id)
 }
 
 //-----------------------------------------------------------------------------
-
+#ifndef TORQUE_SDL
 S32 Platform::messageBox(const UTF8 *title, const UTF8 *message, MBButtons buttons, MBIcons icon)
 {
    PlatformWindow *pWindow = WindowManager->getFirstWindow();
@@ -101,8 +101,8 @@ S32 Platform::messageBox(const UTF8 *title, const UTF8 *message, MBButtons butto
       pWindow->setCursorVisible(true);
 
 #ifdef UNICODE
-   const UTF16 *msg = convertUTF8toUTF16(message);
-   const UTF16 *t = convertUTF8toUTF16(title);
+   const UTF16 *msg = createUTF16string(message);
+   const UTF16 *t = createUTF16string(title);
 #else
    const UTF8 *msg = message;
    const UTF8 *t = title;
@@ -127,3 +127,4 @@ S32 Platform::messageBox(const UTF8 *title, const UTF8 *message, MBButtons butto
 
    return getMaskFromID(sgMsgBoxRetMap, ret);
 }
+#endif

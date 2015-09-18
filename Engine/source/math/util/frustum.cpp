@@ -28,6 +28,8 @@
 #include "math/mSphere.h"
 #include "platform/profiler.h"
 
+static const MatrixF sGFXProjRotMatrix( EulerF( (M_PI_F / 2.0f), 0.0f, 0.0f ) );
+
 
 //TODO: For OBB/frustum intersections and ortho frustums, we can resort to a much quicker AABB/OBB test
 
@@ -174,7 +176,7 @@ void Frustum::set( const MatrixF &projMat, bool normalize )
          mPlanes[ i ].normalize();
    }
 
-   /* // Create the corner points via plane intersections.
+   /*// Create the corner points via plane intersections.
    mPlanes[ PlaneNear ].intersect( mPlanes[ PlaneTop ], mPlanes[ PlaneLeft ], &mPoints[ NearTopLeft ] );
    mPlanes[ PlaneNear ].intersect( mPlanes[ PlaneTop ], mPlanes[ PlaneRight ], &mPoints[ NearTopRight ] );
    mPlanes[ PlaneNear ].intersect( mPlanes[ PlaneBottom ], mPlanes[ PlaneLeft ], &mPoints[ NearBottomLeft ] );

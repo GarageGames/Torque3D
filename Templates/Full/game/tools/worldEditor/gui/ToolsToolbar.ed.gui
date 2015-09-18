@@ -8,7 +8,7 @@
    HorizSizing = "right";
    VertSizing = "bottom";
    Position = "0 31";
-   Extent = (29 + 4) * 14 + 12 SPC "33";
+   Extent = "0 33";
    MinExtent = "8 2";
    canSave = "1";
    Visible = "1";

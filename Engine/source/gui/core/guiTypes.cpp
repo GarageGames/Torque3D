@@ -24,6 +24,7 @@
 #include "platform/types.h"
 #include "console/consoleTypes.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiTypes.h"
 #include "gui/core/guiControl.h"
 #include "gfx/gFont.h"
@@ -694,9 +695,12 @@ bool GuiControlProfile::loadFont()
    return true;
 }
 
-ConsoleMethod( GuiControlProfile, getStringWidth, S32, 3, 3, "( pString )" )
+DefineEngineMethod( GuiControlProfile, getStringWidth, S32, (const char* string),,
+   "Get the width of the string in pixels.\n"
+   "@param string String to get the width of."
+   "@return width of the string in pixels." )
 {
-    return object->mFont->getStrNWidth( argv[2], dStrlen( argv[2] ) );
+   return object->mFont->getStrNWidth( string, dStrlen( string ) );
 }
 
 //-----------------------------------------------------------------------------

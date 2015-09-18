@@ -22,6 +22,7 @@
 
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 
@@ -286,33 +287,35 @@ void GuiRectHandles::onRender(Point2I offset, const RectI &updateRect)
    Point2I size(extent.x*mHandleRect.extent.x, extent.y*mHandleRect.extent.y);
    RectI box(offset+pos, size);
 
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
    // Draw border
-   GFX->getDrawUtil()->drawRect(box, handleColor);
+   drawUtil->drawRect(box, handleColor);
 
    // Draw each handle
    Point2I handleSize(mHandleSize, mHandleSize);
    RectI handleRect(box.point, handleSize);
-   GFX->getDrawUtil()->drawRectFill(handleRect, handleColor);      // Upper left
+   drawUtil->drawRectFill(handleRect, handleColor);      // Upper left
    handleRect.point = Point2I(box.point.x+size.x-handleSize.x, box.point.y);
-   GFX->getDrawUtil()->drawRectFill(handleRect, handleColor);      // Upper right
+   drawUtil->drawRectFill(handleRect, handleColor);      // Upper right
    handleRect.point = Point2I(box.point.x, box.point.y+size.y-handleSize.y);
-   GFX->getDrawUtil()->drawRectFill(handleRect, handleColor);      // Lower left
+   drawUtil->drawRectFill(handleRect, handleColor);      // Lower left
    handleRect.point = Point2I(box.point.x+size.x-handleSize.x, box.point.y+size.y-handleSize.y);
-   GFX->getDrawUtil()->drawRectFill(handleRect, handleColor);      // Lower right
+   drawUtil->drawRectFill(handleRect, handleColor);      // Lower right
 
    Point2I halfSize = size / 2;
    Point2I halfHandleSize = handleSize / 2;
    handleRect.point = Point2I(box.point.x+halfSize.x-halfHandleSize.x, box.point.y);
-   GFX->getDrawUtil()->drawRectFill(handleRect, handleColor);      // Upper middle
+   drawUtil->drawRectFill(handleRect, handleColor);      // Upper middle
    handleRect.point = Point2I(box.point.x+halfSize.x-halfHandleSize.x, box.point.y+size.y-handleSize.y);
-   GFX->getDrawUtil()->drawRectFill(handleRect, handleColor);      // Lower middle
+   drawUtil->drawRectFill(handleRect, handleColor);      // Lower middle
    handleRect.point = Point2I(box.point.x, box.point.y+halfSize.y-halfHandleSize.y);
-   GFX->getDrawUtil()->drawRectFill(handleRect, handleColor);      // Left middle
+   drawUtil->drawRectFill(handleRect, handleColor);      // Left middle
    handleRect.point = Point2I(box.point.x+size.x-handleSize.x, box.point.y+halfSize.y-halfHandleSize.y);
-   GFX->getDrawUtil()->drawRectFill(handleRect, handleColor);      // Right middle
+   drawUtil->drawRectFill(handleRect, handleColor);      // Right middle
 
    handleRect.point = Point2I(box.point.x+halfSize.x-halfHandleSize.x, box.point.y+halfSize.y-halfHandleSize.y);
-   GFX->getDrawUtil()->drawRectFill(handleRect, handleColor);      // Middle
+   drawUtil->drawRectFill(handleRect, handleColor);      // Middle
 
    renderChildControls(offset, updateRect);
 }

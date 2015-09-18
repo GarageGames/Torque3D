@@ -193,7 +193,7 @@ void CameraSpline::renderTimeMap()
    void *ptr = vb.lock();
    if(!ptr) return;
 
-   MRandomLCG random(1376312589 * (U32)this);
+   MRandomLCG random(1376312589 * (uintptr_t)this);
    S32 index = 0;
    for(Vector<TimeMap>::iterator itr=mTimeMap.begin(); itr != mTimeMap.end(); itr++)
    {
@@ -214,7 +214,7 @@ void CameraSpline::renderTimeMap()
 
    // Render the buffer
    GFX->pushWorldMatrix();
-   GFX->disableShaders();
+   GFX->setupGenericShaders();
    GFX->setVertexBuffer(vb);
    GFX->drawPrimitive(GFXLineStrip,0,index);
    GFX->popWorldMatrix();

@@ -26,6 +26,7 @@
 #include "core/stream/bitStream.h"
 #include "math/mRandom.h"
 #include "core/util/journal/journal.h"
+#include "console/engineAPI.h"
 
 #ifdef GGC_PLUGIN
 #include "GGCNatTunnel.h" 
@@ -640,15 +641,14 @@ void NetInterface::computeNetMD5(const NetAddress *address, U32 connectSequence,
 
 ConsoleFunctionGroupBegin(NetInterface, "Global control functions for the netInterfaces.");
 
-ConsoleFunction(allowConnections,void,2,2,"allowConnections(bool allow);"
+DefineConsoleFunction( allowConnections, void, ( bool allow ), , "allowConnections(bool allow)"
    "@brief Sets whether or not the global NetInterface allows connections from remote hosts.\n\n"
 
    "@param allow Set to true to allow remote connections.\n"
 
    "@ingroup Networking\n")
 {
-   TORQUE_UNUSED(argc);
-   GNet->setAllowsConnections(dAtob(argv[1]));
+   GNet->setAllowsConnections(allow);
 }
 
 ConsoleFunctionGroupEnd(NetInterface);

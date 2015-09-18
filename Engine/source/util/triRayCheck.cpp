@@ -125,8 +125,8 @@ bool intersect_triangle(Point3F orig, Point3F dir,
 }
 
 //*** Taken from TSE, and based on the above
-bool castRayTriangle(Point3F orig, Point3F dir,
-   Point3F vert0, Point3F vert1, Point3F vert2,
+bool castRayTriangle(const Point3F& orig, const Point3F& dir,
+   const Point3F& vert0, const Point3F& vert1, const Point3F& vert2,
    F32 &t, Point2F &bary)
 {
    Point3F tvec, qvec;

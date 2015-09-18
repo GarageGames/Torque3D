@@ -32,6 +32,8 @@ singleton ShaderData( CloudLayerShader )
    OGLVertexShaderFile = "shaders/common/gl/cloudLayerV.glsl";
    OGLPixelShaderFile = "shaders/common/gl/cloudLayerP.glsl";
       
+   samplerNames[0] = "$normalHeightMap";
+      
    pixVersion = 2.0;   
 };
 
@@ -44,8 +46,10 @@ singleton ShaderData( BasicCloudsShader )
    DXVertexShaderFile   = "shaders/common/basicCloudsV.hlsl";
    DXPixelShaderFile    = "shaders/common/basicCloudsP.hlsl";
    
-   //OGLVertexShaderFile = "shaders/common/gl/basicCloudsV.glsl";
-   //OGLPixelShaderFile = "shaders/common/gl/basicCloudsP.glsl";
+   OGLVertexShaderFile = "shaders/common/gl/basicCloudsV.glsl";
+   OGLPixelShaderFile = "shaders/common/gl/basicCloudsP.glsl";
+   
+   samplerNames[0] = "$diffuseMap";
       
    pixVersion = 2.0;   
 };

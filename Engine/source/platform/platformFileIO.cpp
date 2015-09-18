@@ -23,6 +23,7 @@
 #include "core/strings/stringFunctions.h"
 #include "util/tempAlloc.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "core/stringTable.h"
 
 //-----------------------------------------------------------------------------
@@ -37,7 +38,7 @@ StringTableEntry Platform::getTemporaryDirectory()
    return path;
 }
 
-ConsoleFunction(getTemporaryDirectory, const char *, 1, 1, "()"
+DefineConsoleFunction( getTemporaryDirectory, const char *, (), ,
 				"@brief Returns the OS temporary directory, \"C:/Users/Mich/AppData/Local/Temp\" for example\n\n"
 				"@note This can be useful to adhering to OS standards and practices, "
 				"but not really used in Torque 3D right now.\n"
@@ -65,7 +66,7 @@ StringTableEntry Platform::getTemporaryFileName()
    return StringTable->insert(buf);
 }
 
-ConsoleFunction(getTemporaryFileName, const char *, 1, 1, "()"
+DefineConsoleFunction( getTemporaryFileName, const char *, (), ,
 				"@brief Creates a name and extension for a potential temporary file\n\n"
 				"This does not create the actual file. It simply creates a random name "
 				"for a file that does not exist.\n\n"
@@ -420,6 +421,7 @@ StringTableEntry Platform::makeRelativePathName(const char *path, const char *to
 
    else
    {
+      // FIXME: This condition is clearly wrong
       if((*pathPtr == 0 && *toPtr == '/') || (*toPtr == '/' && *pathPtr == 0))
          branch = pathPtr;
 
@@ -520,12 +522,12 @@ StringTableEntry Platform::getPrefsPath(const char *file /* = NULL */)
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction(getUserDataDirectory, const char*, 1, 1, "getUserDataDirectory()")
+DefineConsoleFunction( getUserDataDirectory, const char *, (), , "getUserDataDirectory()")
 {
    return Platform::getUserDataDirectory();
 }
 
-ConsoleFunction(getUserHomeDirectory, const char*, 1, 1, "getUserHomeDirectory()")
+DefineConsoleFunction( getUserHomeDirectory, const char *, (), , "getUserHomeDirectory()")
 {
    return Platform::getUserHomeDirectory();
 }

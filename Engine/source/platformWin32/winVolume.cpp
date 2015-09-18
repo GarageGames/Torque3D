@@ -236,6 +236,14 @@ Win32FileSystem::~Win32FileSystem()
 {
 }
 
+void Win32FileSystem::verifyCompatibility(const Path& _path, WIN32_FIND_DATAW _info)
+{
+   if (_path.getFullFileName().isNotEmpty() && _path.getFullFileName().compare(String(_info.cFileName)) != 0)
+   {
+      Con::warnf("Linux Compatibility Warning: %s != %s", String(_info.cFileName).c_str(), _path.getFullFileName().c_str());
+   }
+}
+
 FileNodeRef Win32FileSystem::resolve(const Path& path)
 {
    String file = _BuildFileName(mVolume,path);
@@ -245,6 +253,9 @@ FileNodeRef Win32FileSystem::resolve(const Path& path)
    ::FindClose(handle);
    if (handle != INVALID_HANDLE_VALUE)
    {
+#ifdef TORQUE_DEBUG
+      verifyCompatibility(path, info);
+#endif
       if (S_ISREG(info.dwFileAttributes))
          return new Win32File(path,file);
       if (S_ISDIR(info.dwFileAttributes))
@@ -720,13 +731,13 @@ String   Platform::FS::getAssetDir()
    {
       TCHAR buf[ 2048 ];
       ::GetModuleFileNameW( NULL, buf, sizeof( buf ) );
-      convertUTF16toUTF8( buf, cen_buf, sizeof( cen_buf ) );
+      convertUTF16toUTF8( buf, cen_buf );
    }
    else
    {
       TCHAR buf[ 2048 ];
       GetCurrentDirectoryW( sizeof( buf ) / sizeof( buf[ 0 ] ), buf );
-      convertUTF16toUTF8( buf, cen_buf, sizeof( cen_buf ) );
+      convertUTF16toUTF8( buf, cen_buf );
       return Path::CleanSeparators(cen_buf);
    }
 #else

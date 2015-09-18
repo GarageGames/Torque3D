@@ -23,7 +23,7 @@
 #ifndef _X86UNIXINPUTMANAGER_H_
 #define _X86UNIXINPUTMANAGER_H_
 
-#include "core/tVector.h"
+#include "core/util/tVector.h"
 #include "platform/platformInput.h"
 #include "platformX86UNIX/platformX86UNIX.h"
 
@@ -45,7 +45,7 @@ struct AsciiData
    KeyData goofy;
 };
 
-typedef struct _SDL_Joystick;
+struct _SDL_Joystick;
 
 struct JoystickAxisInfo
 {
@@ -184,7 +184,7 @@ class UInputManager : public InputManager
       void mouseButtonEvent(const SDL_Event& event);
       void mouseMotionEvent(const SDL_Event& event);
       void keyEvent(const SDL_Event& event);
-      bool processKeyEvent(InputEvent &event);
+      bool processKeyEvent(InputEventInfo &event);
 };
 
 #endif  // _H_X86UNIXINPUTMANAGER_

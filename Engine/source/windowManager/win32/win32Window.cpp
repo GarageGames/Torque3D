@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#if !defined(TORQUE_SDL)
+
 #include <windows.h>
 #include <tchar.h>
 #include <winuser.h>
@@ -62,6 +64,19 @@ static bool isScreenSaverRunning()
 	BOOL sreensaver = false;
 	SystemParametersInfo(SPI_GETSCREENSAVERRUNNING,0,&sreensaver,0);
 	return sreensaver;
+}
+
+DISPLAY_DEVICE GetPrimaryDevice()
+{
+	int index = 0;
+	DISPLAY_DEVICE dd;
+	dd.cb = sizeof(DISPLAY_DEVICE);
+
+	while (EnumDisplayDevices(NULL, index++, &dd, 0))
+	{
+		if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) return dd;
+	}
+	return dd;
 }
 
 Win32Window::Win32Window(): mMouseLockPosition(0,0),
@@ -108,6 +123,14 @@ Win32Window::~Win32Window()
 	_unregisterWindowClass();
 }
 
+void* Win32Window::getSystemWindow(const WindowSystem system)
+{
+   if( system == WindowSystem_Windows)
+      return getHWND();
+
+     return NULL;
+}
+
 GFXDevice * Win32Window::getGFXDevice()
 {
 	return mDevice;
@@ -125,9 +148,9 @@ const GFXVideoMode & Win32Window::getVideoMode()
 
 void Win32Window::setVideoMode( const GFXVideoMode &mode )
 {
-	bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
+   bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
 
-	if(needCurtain)
+   if(needCurtain)
    {
 		Con::errorf("Win32Window::setVideoMode - invoking curtain");
       mOwningManager->lowerCurtain();
@@ -150,10 +173,33 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 
 	// Set our window to have the right style based on the mode
    if(mode.fullScreen && !Platform::getWebDeployment() && !mOffscreenRender)
-	{
-		SetWindowLong( getHWND(), GWL_STYLE, WS_POPUP);
-		SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-		
+   {
+	  WINDOWPLACEMENT wplacement = { sizeof(wplacement) };
+	  DWORD dwStyle = GetWindowLong(getHWND(), GWL_STYLE);
+	  MONITORINFO mi = { sizeof(mi) };
+
+	  if (GetWindowPlacement(getHWND(), &wplacement) && GetMonitorInfo(MonitorFromWindow(getHWND(), MONITOR_DEFAULTTOPRIMARY), &mi))
+	  {
+		   DISPLAY_DEVICE dd = GetPrimaryDevice();
+		   DEVMODE dv;
+		   ZeroMemory(&dv, sizeof(dv));
+		   dv.dmSize = sizeof(DEVMODE);
+		   EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv);
+		   dv.dmPelsWidth = mode.resolution.x;
+		   dv.dmPelsHeight = mode.resolution.y;
+		   dv.dmBitsPerPel = mode.bitDepth;
+		   dv.dmDisplayFrequency = mode.refreshRate;
+		   dv.dmFields = (DM_PELSWIDTH | DM_PELSHEIGHT);
+		   ChangeDisplaySettings(&dv, CDS_FULLSCREEN);
+		   SetWindowLong(getHWND(), GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW);
+		   SetWindowPos(getHWND(), HWND_TOP,	
+		   					mi.rcMonitor.left,
+		   					mi.rcMonitor.top,
+							mi.rcMonitor.right - mi.rcMonitor.left,
+							mi.rcMonitor.bottom - mi.rcMonitor.top,
+							SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+	  }
+
       if(mDisplayWindow)
          ShowWindow(getHWND(), SW_SHOWNORMAL);
 
@@ -172,7 +218,16 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 	}
 	else
 	{
-      // Reset device *first*, so that when we call setSize() and let it
+	   DISPLAY_DEVICE dd = GetPrimaryDevice();
+	   DEVMODE dv;
+	   ZeroMemory(&dv, sizeof(dv));
+	   dv.dmSize = sizeof(DEVMODE);
+           EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv);
+
+	   if ((mode.resolution.x != dv.dmPelsWidth) || (mode.resolution.y != dv.dmPelsHeight))
+	       ChangeDisplaySettings(NULL, 0);
+
+           // Reset device *first*, so that when we call setSize() and let it
 	   // access the monitor settings, it won't end up with our fullscreen
 	   // geometry that is just about to change.
 
@@ -387,8 +442,8 @@ void Win32Window::centerWindow()
 
 	// Get the monitor's extents.
 	MONITORINFO monInfo;
-	dMemset(&monInfo, 0, sizeof MONITORINFO);
-	monInfo.cbSize = sizeof MONITORINFO;
+	dMemset(&monInfo, 0, sizeof(MONITORINFO));
+	monInfo.cbSize = sizeof(MONITORINFO);
 	GetMonitorInfo(hMon, &monInfo);
 
    // Calculate the offset to center the window in the working area
@@ -450,8 +505,8 @@ bool Win32Window::setSize( const Point2I &newSize )
 
 		// Get the monitor's extents.
 		MONITORINFO monInfo;
-		dMemset(&monInfo, 0, sizeof MONITORINFO);
-		monInfo.cbSize = sizeof MONITORINFO;
+		dMemset(&monInfo, 0, sizeof(MONITORINFO));
+		monInfo.cbSize = sizeof(MONITORINFO);
 		GetMonitorInfo(hMon, &monInfo);
 
       // Calculate the offset to center the window in the working area
@@ -1167,3 +1222,5 @@ const UTF16 *Win32Window::getCurtainWindowClassName()
 {
 	return _CurtainWindowClassName;
 }
+
+#endif

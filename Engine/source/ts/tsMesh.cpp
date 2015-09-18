@@ -165,6 +165,9 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
    MeshRenderInst *coreRI = renderPass->allocInst<MeshRenderInst>();
    coreRI->type = RenderPassManager::RIT_Mesh;
 
+   // Pass accumulation texture along.
+   coreRI->accuTex = rdata.getAccuTex();
+
    const MatrixF &objToWorld = GFX->getWorldMatrix();
 
    // Sort by the center point or the bounds.
@@ -203,7 +206,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
 
    coreRI->vertBuff = &vb;
    coreRI->primBuff = &pb;
-   coreRI->defaultKey2 = (U32) coreRI->vertBuff;
+   coreRI->defaultKey2 = (uintptr_t) coreRI->vertBuff;
 
    coreRI->materialHint = rdata.getMaterialHint();
 
@@ -221,7 +224,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
       if ( draw.matIndex & TSDrawPrimitive::NoMaterial )
          continue;
 
-#ifdef TORQUE_DEBUG
+#ifdef TORQUE_DEBUG_BREAK_INSPECT
       // for inspection if you happen to be running in a debugger and can't do bit 
       // operations in your head.
       S32 triangles = draw.matIndex & TSDrawPrimitive::Triangles;
@@ -234,6 +237,7 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
       TORQUE_UNUSED(fan);
       TORQUE_UNUSED(indexed);
       TORQUE_UNUSED(type);
+      //define TORQUE_DEBUG_BREAK_INSPECT, and insert debug break here to inspect the above elements at runtime
 #endif
 
       const U32 matIndex = draw.matIndex & TSDrawPrimitive::MaterialMask;
@@ -444,11 +448,13 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
                           cf->mVertexList[base + indices[start + j + 2]]);
 
             cf->mFaceList.increment();
-            cf->mFaceList.last().normal = plane;
 
-            cf->mFaceList.last().vertex[0] = base + indices[start + j + 0];
-            cf->mFaceList.last().vertex[1] = base + indices[start + j + 1];
-            cf->mFaceList.last().vertex[2] = base + indices[start + j + 2];
+            ConvexFeature::Face& lastFace = cf->mFaceList.last();
+            lastFace.normal = plane;
+
+            lastFace.vertex[0] = base + indices[start + j + 0];
+            lastFace.vertex[1] = base + indices[start + j + 1];
+            lastFace.vertex[2] = base + indices[start + j + 2];
 
             for ( U32 l = 0; l < 3; l++ ) 
             {
@@ -511,8 +517,9 @@ bool TSMesh::getFeatures( S32 frame, const MatrixF& mat, const VectorF&, ConvexF
             S32 k;
             for ( k = 0; k < cf->mEdgeList.size(); k++ ) 
             {
-               if ( cf->mEdgeList[k].vertex[0] == newEdge0 &&
-                    cf->mEdgeList[k].vertex[1] == newEdge1) 
+               ConvexFeature::Edge currentEdge = cf->mEdgeList[k];
+               if (currentEdge.vertex[0] == newEdge0 &&
+                  currentEdge.vertex[1] == newEdge1)
                {
                   found = true;
                   break;
@@ -1434,10 +1441,12 @@ void TSSkinMesh::createBatchData()
          }
 
          bt->_tmpVec->increment();
-         bt->_tmpVec->last().vert = batchData.initialVerts[curTransform.vertexIndex];
-         bt->_tmpVec->last().normal = batchData.initialNorms[curTransform.vertexIndex];
-         bt->_tmpVec->last().weight = transformOp.weight;
-         bt->_tmpVec->last().vidx = curTransform.vertexIndex;
+
+         BatchData::BatchedVertWeight& tempLast = bt->_tmpVec->last();
+         tempLast.vert = batchData.initialVerts[curTransform.vertexIndex];
+         tempLast.normal = batchData.initialNorms[curTransform.vertexIndex];
+         tempLast.weight = transformOp.weight;
+         tempLast.vidx = curTransform.vertexIndex;
       }
    }
 
@@ -2428,7 +2437,7 @@ void TSMesh::_createVBIB( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
             pInfo.startIndex = draw.start;
             // Use the first index to determine which 16-bit address space we are operating in
             pInfo.startVertex = indices[draw.start] & 0xFFFF0000;
-            pInfo.minIndex = pInfo.startVertex;
+            pInfo.minIndex = 0; // minIndex are zero based index relative to startVertex. See @GFXDevice
             pInfo.numVertices = getMin((U32)0x10000, mNumVerts - pInfo.startVertex);
             break;
 
@@ -2439,7 +2448,7 @@ void TSMesh::_createVBIB( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
             pInfo.startIndex = draw.start;
             // Use the first index to determine which 16-bit address space we are operating in
             pInfo.startVertex = indices[draw.start] & 0xFFFF0000;
-            pInfo.minIndex = pInfo.startVertex;
+            pInfo.minIndex = 0; // minIndex are zero based index relative to startVertex. See @GFXDevice
             pInfo.numVertices = getMin((U32)0x10000, mNumVerts - pInfo.startVertex);
             break;
 

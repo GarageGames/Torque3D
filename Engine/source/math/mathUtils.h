@@ -39,6 +39,10 @@
 #include "core/util/tVector.h"
 #endif
 
+#ifndef _MATHUTIL_FRUSTUM_H_
+#include "math/util/frustum.h"
+#endif
+
 
 class Box3F;
 class RectI;
@@ -325,6 +329,13 @@ namespace MathUtils
                      F32 fovYInRadians, 
                      F32 aspectRatio, 
                      F32 nearPlane );
+
+   void makeFovPortFrustum( Frustum *outFrustum,
+                             bool isOrtho,
+                             F32 nearDist,
+                             F32 farDist,
+                             const FovPort &inPort,
+                             const MatrixF &transform = MatrixF(1) );
 
    /// Build a GFX projection matrix from the frustum parameters
    /// including the optional rotation required by GFX.

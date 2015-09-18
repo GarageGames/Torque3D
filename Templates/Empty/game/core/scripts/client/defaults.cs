@@ -41,6 +41,7 @@ $pref::Input::KeyboardEnabled = 1;
 $pref::Input::MouseEnabled = 1;
 $pref::Input::JoystickEnabled = 0;
 $pref::Input::KeyboardTurnSpeed = 0.1;
+$pref::Input::MouseWheelSpeed = 120;
 
 $sceneLighting::cacheSize = 20000;
 $sceneLighting::purgeMethod = "lastCreated";

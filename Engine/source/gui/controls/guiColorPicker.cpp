@@ -22,6 +22,7 @@
 #include "console/console.h"
 #include "gfx/gfxDevice.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiCanvas.h"
 #include "gui/buttons/guiButtonCtrl.h"
 #include "gui/core/guiDefaultControlRender.h"
@@ -353,9 +354,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
          Point2I resolution = getRoot()->getExtent();
 
          U32 buf_x = offset.x + mSelectorPos.x + 1;
-         U32 buf_y = ( extent.y - ( offset.y + mSelectorPos.y + 1 ) );
-         if(GFX->getAdapterType() != OpenGL)
-            buf_y = resolution.y - buf_y;
+         U32 buf_y = resolution.y - ( extent.y - ( offset.y + mSelectorPos.y + 1 ) );
 
          GFXTexHandle bb( resolution.x, 
                           resolution.y, 
@@ -526,24 +525,17 @@ void GuiColorPickerCtrl::setScriptValue(const char *value)
    setValue(newValue);
 }
 
-ConsoleMethod(GuiColorPickerCtrl, getSelectorPos, const char*, 2, 2, "Gets the current position of the selector")
+DefineConsoleMethod(GuiColorPickerCtrl, getSelectorPos, Point2I, (), , "Gets the current position of the selector")
 {
-   static const U32 bufSize = 256;
-   char *temp = Con::getReturnBuffer(bufSize);
-   Point2I pos;
-   pos = object->getSelectorPos();
-   dSprintf(temp,bufSize,"%d %d",pos.x, pos.y); 
-   return temp;
+   return object->getSelectorPos();
 }
 
-ConsoleMethod(GuiColorPickerCtrl, setSelectorPos, void, 3, 3, "Sets the current position of the selector")
+DefineConsoleMethod(GuiColorPickerCtrl, setSelectorPos, void, (Point2I newPos), , "Sets the current position of the selector")
 {
-   Point2I newPos;
-   dSscanf(argv[2], "%d %d", &newPos.x, &newPos.y);
    object->setSelectorPos(newPos);
 }
 
-ConsoleMethod(GuiColorPickerCtrl, updateColor, void, 2, 2, "Forces update of pick color")
+DefineConsoleMethod(GuiColorPickerCtrl, updateColor, void, (), , "Forces update of pick color")
 {
 	object->updateColor();
 }

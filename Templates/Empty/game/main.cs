@@ -40,8 +40,10 @@ function createCanvas(%windowTitle)
    // Create the Canvas
    %foo = new GuiCanvas(Canvas)
    {
-      displayWindow = false;
+      displayWindow = $platform !$= "windows";
    };
+   
+   $GameCanvas = %foo;
    
    // Set the window title
    if (isObject(Canvas))

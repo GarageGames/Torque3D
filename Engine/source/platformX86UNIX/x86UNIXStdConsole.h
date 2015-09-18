@@ -36,6 +36,7 @@
 class StdConsole
 {
    bool stdConsoleEnabled;
+   bool stdConsoleInputEnabled;
    // true if we're running in the background
    bool inBackground;
 
@@ -61,6 +62,7 @@ public:
    virtual ~StdConsole();
    void process();
    void enable(bool);
+   void enableInput(bool enabled);
    void processConsoleLine(const char *consoleLine);
    static void create();
    static void destroy();

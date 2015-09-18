@@ -279,6 +279,7 @@ Camera::Camera()
 
    mLastAbsoluteYaw = 0.0f;
    mLastAbsolutePitch = 0.0f;
+   mLastAbsoluteRoll = 0.0f;
 
    // For NewtonFlyMode
    mNewtonRotation = false;
@@ -377,6 +378,57 @@ void Camera::getCameraTransform(F32* pos, MatrixF* mat)
 
    // Apply Camera FX.
    mat->mul( gCamFXMgr.getTrans() );
+}
+
+void Camera::getEyeCameraTransform(IDisplayDevice *displayDevice, U32 eyeId, MatrixF *outMat)
+{
+   // The camera doesn't support a third person mode,
+   // so we want to override the default ShapeBase behavior.
+   ShapeBase * obj = dynamic_cast<ShapeBase*>(static_cast<SimObject*>(mOrbitObject));
+   if(obj && static_cast<ShapeBaseData*>(obj->getDataBlock())->observeThroughObject)
+      obj->getEyeCameraTransform(displayDevice, eyeId, outMat);
+   else
+   {
+      Parent::getEyeCameraTransform(displayDevice, eyeId, outMat);
+   }
+}
+
+DisplayPose Camera::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
+{
+   // NOTE: this is intended to be similar to updateMove
+   DisplayPose outPose;
+   outPose.orientation = EulerF(0,0,0);
+   outPose.position = inPose.position;
+
+   // Pitch
+   outPose.orientation.x = (inPose.orientation.x - mLastAbsolutePitch);
+
+   // Constrain the range of mRot.x
+   while (outPose.orientation.x  < -M_PI_F) 
+      outPose.orientation.x += M_2PI_F;
+   while (outPose.orientation.x  > M_PI_F) 
+      outPose.orientation.x -= M_2PI_F;
+
+   // Yaw
+   outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
+
+   // Constrain the range of mRot.z
+   while (outPose.orientation.z < -M_PI_F) 
+      outPose.orientation.z += M_2PI_F;
+   while (outPose.orientation.z > M_PI_F) 
+      outPose.orientation.z -= M_2PI_F;
+
+   // Bank
+   if (mDataBlock->cameraCanBank)
+   {
+      outPose.orientation.y = (inPose.orientation.y - mLastAbsoluteRoll);
+   }
+
+   // Constrain the range of mRot.y
+   while (outPose.orientation.y > M_PI_F) 
+      outPose.orientation.y -= M_2PI_F;
+
+   return outPose;
 }
 
 //----------------------------------------------------------------------------
@@ -547,6 +599,7 @@ void Camera::processTick(const Move* move)
 
                mLastAbsoluteYaw = emove->rotZ[emoveIndex];
                mLastAbsolutePitch = emove->rotX[emoveIndex];
+               mLastAbsoluteRoll = emove->rotY[emoveIndex];
 
                // Bank
                mRot.y = emove->rotY[emoveIndex];
@@ -1860,7 +1913,7 @@ DefineEngineMethod( Camera, setOffset, void, (Point3F offset), ,
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( Camera, setOrbitMode, void, (GameBase* orbitObject, TransformF orbitPoint, F32 minDistance, F32 maxDistance, 
-                    F32 initDistance, bool ownClientObj, Point3F offset, bool locked), (false, Point3F(0.0f, 0.0f, 0.0f), false),
+                    F32 initDistance, bool ownClientObj, Point3F offset, bool locked), (false, Point3F::Zero, false),
                     "Set the camera to orbit around the given object, or if none is given, around the given point.\n\n"
                     "@param orbitObject The object to orbit around.  If no object is given (0 or blank string is passed in) use the orbitPoint instead\n"
                     "@param orbitPoint The point to orbit around when no object is given.  In the form of \"x y z ax ay az aa\" such as returned by SceneObject::getTransform().\n"
@@ -1883,7 +1936,7 @@ DefineEngineMethod( Camera, setOrbitMode, void, (GameBase* orbitObject, Transfor
 
 DefineEngineMethod( Camera, setOrbitObject, bool, (GameBase* orbitObject, VectorF rotation, F32 minDistance, 
                     F32 maxDistance, F32 initDistance, bool ownClientObject, Point3F offset, bool locked),
-                    (false, Point3F(0.0f, 0.0f, 0.0f), false),
+                    (false, Point3F::Zero, false),
                     "Set the camera to orbit around a given object.\n\n"
                     "@param orbitObject The object to orbit around.\n"
                     "@param rotation The initial camera rotation about the object in radians in the form of \"x y z\".\n"
@@ -1911,7 +1964,7 @@ DefineEngineMethod( Camera, setOrbitObject, bool, (GameBase* orbitObject, Vector
 
 DefineEngineMethod( Camera, setOrbitPoint, void, (TransformF orbitPoint, F32 minDistance, F32 maxDistance, F32 initDistance, 
                     Point3F offset, bool locked),
-                    (Point3F(0.0f, 0.0f, 0.0f), false),
+                    (Point3F::Zero, false),
                     "Set the camera to orbit around a given point.\n\n"
                     "@param orbitPoint The point to orbit around.  In the form of \"x y z ax ay az aa\" such as returned by SceneObject::getTransform().\n"
                     "@param minDistance The minimum distance allowed to the orbit object or point.\n"
@@ -1929,7 +1982,7 @@ DefineEngineMethod( Camera, setOrbitPoint, void, (TransformF orbitPoint, F32 min
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( Camera, setTrackObject, bool, (GameBase* trackObject, Point3F offset), (Point3F(0.0f, 0.0f, 0.0f)),
+DefineEngineMethod( Camera, setTrackObject, bool, (GameBase* trackObject, Point3F offset), (Point3F::Zero),
                     "Set the camera to track a given object.\n\n"
                     "@param trackObject The object to track.\n"
                     "@param offset [optional] An offset added to the camera's position.  Default is no offset.\n"

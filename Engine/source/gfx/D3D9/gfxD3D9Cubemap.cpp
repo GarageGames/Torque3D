@@ -101,11 +101,20 @@ void GFXD3D9Cubemap::initStatic( GFXTexHandle *faces )
       mTexSize = faces[0].getWidth();
       mFaceFormat = faces[0].getFormat();
 
-      D3D9Assert( D3D9Device->CreateCubeTexture( mTexSize, 1, 0, GFXD3D9TextureFormat[mFaceFormat],
+      U32 levels = faces->getPointer()->getMipLevels();
+      if (levels >1)
+      { 
+         D3D9Assert(D3D9Device->CreateCubeTexture(mTexSize, levels, 0, GFXD3D9TextureFormat[mFaceFormat],
+            pool, &mCubeTex, NULL), NULL);
+         fillCubeTextures(faces, D3D9Device);
+      }
+      else
+      {
+         D3D9Assert( D3D9Device->CreateCubeTexture( mTexSize, 0, D3DUSAGE_AUTOGENMIPMAP, GFXD3D9TextureFormat[mFaceFormat],
                  pool, &mCubeTex, NULL ), NULL );
-
-      fillCubeTextures( faces, D3D9Device );
-//      mCubeTex->GenerateMipSubLevels();
+         fillCubeTextures( faces, D3D9Device );
+         mCubeTex->GenerateMipSubLevels();
+      }
    }
 }
 
@@ -195,24 +204,29 @@ void GFXD3D9Cubemap::initDynamic( U32 texSize, GFXFormat faceFormat )
 //-----------------------------------------------------------------------------
 // Fills in face textures of cube map from existing textures
 //-----------------------------------------------------------------------------
-void GFXD3D9Cubemap::fillCubeTextures( GFXTexHandle *faces, LPDIRECT3DDEVICE9 D3DDevice )
+void GFXD3D9Cubemap::fillCubeTextures( GFXTexHandle *faces, LPDIRECT3DDEVICE9 D3DDevice)
 {
-   for( U32 i=0; i<6; i++ )
-   {
-      // get cube face surface
-      IDirect3DSurface9 *cubeSurf = NULL;
-      D3D9Assert( mCubeTex->GetCubeMapSurface( faceList[i], 0, &cubeSurf ), NULL );
 
-      // get incoming texture surface
-      GFXD3D9TextureObject *texObj = dynamic_cast<GFXD3D9TextureObject*>( (GFXTextureObject*)faces[i] );
-      IDirect3DSurface9 *inSurf;
-      D3D9Assert( texObj->get2DTex()->GetSurfaceLevel( 0, &inSurf ), NULL );
-      
-      // copy incoming texture into cube face
-      D3D9Assert( GFXD3DX.D3DXLoadSurfaceFromSurface( cubeSurf, NULL, NULL, inSurf, NULL, 
-                                  NULL, D3DX_FILTER_NONE, 0 ), NULL );
-      cubeSurf->Release();
-      inSurf->Release();
+   U32 levels = faces->getPointer()->getMipLevels();
+   for (U32 mip = 0; mip < levels; mip++)
+   {
+      for (U32 i = 0; i < 6; i++)
+      {
+         // get cube face surface
+         IDirect3DSurface9 *cubeSurf = NULL;
+         D3D9Assert(mCubeTex->GetCubeMapSurface(faceList[i], mip, &cubeSurf), NULL);
+
+         // get incoming texture surface
+         GFXD3D9TextureObject *texObj = dynamic_cast<GFXD3D9TextureObject*>((GFXTextureObject*)faces[i]);
+         IDirect3DSurface9 *inSurf;
+         D3D9Assert(texObj->get2DTex()->GetSurfaceLevel(mip, &inSurf), NULL);
+
+         // copy incoming texture into cube face
+         D3D9Assert(GFXD3DX.D3DXLoadSurfaceFromSurface(cubeSurf, NULL, NULL, inSurf, NULL,
+            NULL, D3DX_FILTER_NONE, 0), NULL);
+         cubeSurf->Release();
+         inSurf->Release();
+      }
    }
 }
 

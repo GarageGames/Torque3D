@@ -105,6 +105,18 @@ int XMessageBox::alertRetryCancel(const char *windowTitle, const char *message)
    return show();
 }
 
+int XMessageBox::alertAssert(const char *windowTitle, const char *message)
+{
+    mMessage = message;
+    mTitle = windowTitle;
+    mButtons.clear();
+    mButtons.push_back(XMessageBoxButton("Exit", OK));
+    mButtons.push_back(XMessageBoxButton("Ignore", Cancel));
+    mButtons.push_back(XMessageBoxButton("Ignore All", IgnoreAll));
+    mButtons.push_back(XMessageBoxButton("Debug", Retry));
+    return show();
+}
+
 void XMessageBox::repaint()
 {
    int white = WhitePixel(mDisplay, DefaultScreen(mDisplay));
@@ -421,7 +433,7 @@ int XMessageBox::show()
    XSetWMName(mDisplay, mWin, &wtitle);
 
    // show window
-   XMapWindow(mDisplay, mWin);
+   XMapRaised(mDisplay, mWin);
    // move it in case some bozo window manager repositioned it
    XMoveWindow(mDisplay, mWin, 
       (mScreenWidth - mMBWidth) / 2,  (mScreenHeight - mMBHeight) / 2);

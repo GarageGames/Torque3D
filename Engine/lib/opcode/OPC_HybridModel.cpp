@@ -83,6 +83,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "Opcode.h"
 
+#if (defined _MSC_VER) && (_MSC_VER <= 1500)
+#ifdef _WIN64 // [
+typedef unsigned __int64  uintptr_t;
+#else // _WIN64 ][
+typedef _W64 unsigned int uintptr_t;
+#endif // _WIN64 ]
+#else
+#include <stdint.h>
+#endif
+
 using namespace Opcode;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +218,7 @@ bool HybridModel::Build(const OPCODECREATE& create)
 				Data->mLeaves[Data->mNbLeaves] = *current->GetAABB();
 
 				// Setup leaf data
-				udword Index = (udword(current->GetPrimitives()) - udword(Data->mBase))/sizeof(udword);
+				udword Index = (uintptr_t(current->GetPrimitives()) - uintptr_t(Data->mBase))/sizeof(uintptr_t);
 				Data->mTriangles[Data->mNbLeaves].SetData(current->GetNbPrimitives(), Index);
 
 				Data->mNbLeaves++;

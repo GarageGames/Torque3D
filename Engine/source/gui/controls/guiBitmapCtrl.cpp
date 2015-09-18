@@ -256,11 +256,11 @@ static ConsoleDocFragment _sGuiBitmapCtrlSetBitmap2(
 
 
 //"Set the bitmap displayed in the control. Note that it is limited in size, to 256x256."
-ConsoleMethod( GuiBitmapCtrl, setBitmap, void, 3, 4,
+DefineConsoleMethod( GuiBitmapCtrl, setBitmap, void, ( const char * fileRoot, bool resize), ( false),
    "( String filename | String filename, bool resize ) Assign an image to the control.\n\n"
    "@hide" )
 {
    char filename[1024];
-   Con::expandScriptFilename(filename, sizeof(filename), argv[2]);
-   object->setBitmap(filename, argc > 3 ? dAtob( argv[3] ) : false );
+   Con::expandScriptFilename(filename, sizeof(filename), fileRoot);
+   object->setBitmap(filename, resize );
 }

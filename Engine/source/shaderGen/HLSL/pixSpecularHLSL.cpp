@@ -111,6 +111,20 @@ ShaderFeature::Resources PixelSpecularHLSL::getResources( const MaterialFeatureD
    return res;
 }
 
+void SpecularMapHLSL::processVert(Vector<ShaderComponent*> &componentList, const MaterialFeatureData &fd)
+{
+   MultiLine *meta = new MultiLine;
+
+   // Add the texture coords.
+   getOutTexCoord("texCoord",
+     "float2",
+      true,
+      fd.features[MFT_TexAnim],
+      meta,
+      componentList);
+
+   output = meta;
+}
 
 void SpecularMapHLSL::processPix( Vector<ShaderComponent*> &componentList, const MaterialFeatureData &fd )
 {
@@ -147,6 +161,7 @@ void SpecularMapHLSL::setTexData( Material::StageData &stageDat,
    if ( tex )
    {
       passData.mTexType[ texIndex ] = Material::Standard;
+      passData.mSamplerNames[ texIndex ] = "specularMap";
       passData.mTexSlot[ texIndex++ ].texObject = tex;
    }
 }

@@ -41,15 +41,15 @@ class GuiMouseEventCtrl : public GuiControl
 
       GuiMouseEventCtrl();
 
-	  DECLARE_CALLBACK( void, onMouseDown, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseUp, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseMove, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseDragged, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseEnter, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-  	  DECLARE_CALLBACK( void, onMouseLeave, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-	  DECLARE_CALLBACK( void, onRightMouseDown, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-	  DECLARE_CALLBACK( void, onRightMouseUp, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
-	  DECLARE_CALLBACK( void, onRightMouseDragged, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ));
+      DECLARE_CALLBACK( void, onMouseDown, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+      DECLARE_CALLBACK( void, onMouseUp, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+      DECLARE_CALLBACK( void, onMouseMove, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+      DECLARE_CALLBACK( void, onMouseDragged, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+      DECLARE_CALLBACK( void, onMouseEnter, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+      DECLARE_CALLBACK( void, onMouseLeave, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+      DECLARE_CALLBACK( void, onRightMouseDown, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+      DECLARE_CALLBACK( void, onRightMouseUp, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
+      DECLARE_CALLBACK( void, onRightMouseDragged, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ));
 
       // GuiControl
       void onMouseDown(const GuiEvent & event);

@@ -7,6 +7,7 @@ $PostFXManager::Settings::DOF::EnableAutoFocus = "";
 $PostFXManager::Settings::DOF::EnableDOF = "";
 $PostFXManager::Settings::DOF::FocusRangeMax = "";
 $PostFXManager::Settings::DOF::FocusRangeMin = "";
+$PostFXManager::Settings::EnableVignette = "0";
 $PostFXManager::Settings::EnableDOF = "1";
 $PostFXManager::Settings::EnabledSSAO = "1";
 $PostFXManager::Settings::EnableHDR = "1";

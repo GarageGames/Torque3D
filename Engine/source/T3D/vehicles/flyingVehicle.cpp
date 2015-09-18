@@ -134,11 +134,11 @@ bool FlyingVehicleData::preload(bool server, String &errorStr)
    if (!server) {
       for (S32 i = 0; i < MaxSounds; i++)
          if (sound[i])
-            Sim::findObject(SimObjectId(sound[i]),sound[i]);
+            Sim::findObject(SimObjectId((uintptr_t)sound[i]),sound[i]);
 
       for (S32 j = 0; j < MaxJetEmitters; j++)
          if (jetEmitter[j])
-            Sim::findObject(SimObjectId(jetEmitter[j]),jetEmitter[j]);
+            Sim::findObject(SimObjectId((uintptr_t)jetEmitter[j]),jetEmitter[j]);
    }
 
    // Extract collision planes from shape collision detail level
@@ -244,7 +244,7 @@ void FlyingVehicleData::packData(BitStream* stream)
    {
       if (stream->writeFlag(sound[i]))
       {
-         SimObjectId writtenId = packed ? SimObjectId(sound[i]) : sound[i]->getId();
+         SimObjectId writtenId = packed ? SimObjectId((uintptr_t)sound[i]) : sound[i]->getId();
          stream->writeRangedU32(writtenId, DataBlockObjectIdFirst, DataBlockObjectIdLast);
       }
    }
@@ -253,7 +253,7 @@ void FlyingVehicleData::packData(BitStream* stream)
    {
       if (stream->writeFlag(jetEmitter[j]))
       {
-         SimObjectId writtenId = packed ? SimObjectId(jetEmitter[j]) : jetEmitter[j]->getId();
+         SimObjectId writtenId = packed ? SimObjectId((uintptr_t)jetEmitter[j]) : jetEmitter[j]->getId();
          stream->writeRangedU32(writtenId, DataBlockObjectIdFirst,DataBlockObjectIdLast);
       }
    }

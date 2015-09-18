@@ -187,8 +187,10 @@ void GuiTextCtrl::setText(const char *txt)
    //make sure we don't call this before onAdd();
    if( !mProfile )
       return;
-   
-   if (txt)
+
+   // The txt pointer is sometimes the same as the mText pointer, so make sure
+   // we don't call strncpy with overlapping src and dest.
+   if (txt && txt != mText)
       dStrncpy(mText, (UTF8*)txt, MAX_STRING_LENGTH);
    mText[MAX_STRING_LENGTH] = '\0';
    

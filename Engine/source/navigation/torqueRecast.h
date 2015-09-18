@@ -28,11 +28,11 @@
 #include "math/mBox.h"
 
 inline Point3F DTStoRC(F32 x, F32 y, F32 z) { return Point3F(x, z, -y); }
-inline Point3F DTStoRC(Point3F point)       { return Point3F(point.x, point.z, -point.y); }
+inline Point3F DTStoRC(const Point3F& point){ return Point3F(point.x, point.z, -point.y); }
 inline Point3F RCtoDTS(const F32* xyz)      { return Point3F(xyz[0], -xyz[2], xyz[1]); }
 inline Point3F RCtoDTS(F32 x, F32 y, F32 z) { return Point3F(x, -z, y); }
-inline Point3F RCtoDTS(Point3F point)       { return Point3F(point.x, -point.z, point.y); }
-inline Box3F DTStoRC(Box3F box)
+inline Point3F RCtoDTS(const Point3F& point){ return Point3F(point.x, -point.z, point.y); }
+inline Box3F DTStoRC(const Box3F& box)
 {
    return Box3F(box.minExtents.x, box.minExtents.z, -box.maxExtents.y,
                   box.maxExtents.x, box.maxExtents.z, -box.minExtents.y);
@@ -67,6 +67,38 @@ enum PolyFlags {
    ClimbFlag = 1 << 5,
    TeleportFlag = 1 << 6,
    AllFlags = 0xffff
+};
+
+/// Stores information about a link.
+struct LinkData {
+   bool walk;
+   bool jump;
+   bool drop;
+   bool swim;
+   bool ledge;
+   bool climb;
+   bool teleport;
+   LinkData(U16 flags = 0)
+   {
+      walk = flags & WalkFlag;
+      jump = flags & JumpFlag;
+      drop = flags & DropFlag;
+      swim = flags & SwimFlag;
+      ledge = flags & LedgeFlag;
+      climb = flags & ClimbFlag;
+      teleport = flags & TeleportFlag;
+   }
+   U16 getFlags() const
+   {
+      return
+         (walk ? WalkFlag : 0) |
+         (jump ? JumpFlag : 0) |
+         (drop ? DropFlag : 0) |
+         (swim ? SwimFlag : 0) |
+         (ledge ? LedgeFlag : 0) |
+         (climb ? ClimbFlag : 0) |
+         (teleport ? TeleportFlag : 0);
+   }
 };
 
 #endif

@@ -404,6 +404,7 @@ public:
 	virtual bool castRay(const Point3F &start, const Point3F &end, RayInfo* info);
 	virtual bool collideBox(const Point3F &start, const Point3F &end, RayInfo* info);
    virtual bool containsPoint( const Point3F& point ) const { return containsPoint( point, NULL ); }
+   virtual bool buildPolyList( PolyListContext context, AbstractPolyList* polyList, const Box3F& box, const SphereF& sphere );
 
    // WaterObject
    virtual F32 getWaterCoverage( const Box3F &worldBox ) const;   

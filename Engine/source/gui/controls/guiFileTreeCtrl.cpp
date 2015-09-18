@@ -25,6 +25,7 @@
 #include "core/frameAllocator.h"
 #include "core/strings/stringUnit.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 
 
 IMPLEMENT_CONOBJECT(GuiFileTreeCtrl);
@@ -378,18 +379,18 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
 
 }
 
-ConsoleMethod( GuiFileTreeCtrl, getSelectedPath, const char*, 2, 2, "getSelectedPath() - returns the currently selected path in the tree")
+DefineConsoleMethod( GuiFileTreeCtrl, getSelectedPath, const char*, (), , "getSelectedPath() - returns the currently selected path in the tree")
 {
    const String& path = object->getSelectedPath();
    return Con::getStringArg( path );
 }
 
-ConsoleMethod( GuiFileTreeCtrl, setSelectedPath, bool, 3, 3, "setSelectedPath(path) - expands the tree to the specified path")
+DefineConsoleMethod( GuiFileTreeCtrl, setSelectedPath, bool, (const char * path), , "setSelectedPath(path) - expands the tree to the specified path")
 {
-   return object->setSelectedPath( argv[ 2 ] );
+   return object->setSelectedPath( path );
 }
 
-ConsoleMethod( GuiFileTreeCtrl, reload, void, 2, 2, "() - Reread the directory tree hierarchy." )
+DefineConsoleMethod( GuiFileTreeCtrl, reload, void, (), , "() - Reread the directory tree hierarchy." )
 {
    object->updateTree();
 }

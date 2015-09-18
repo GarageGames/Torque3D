@@ -780,7 +780,7 @@ void WaterObject::drawUnderwaterFilter( SceneRenderState *state )
    GFX->setWorldMatrix( newMat );   
 
    // set up render states
-   GFX->disableShaders();
+   GFX->setupGenericShaders();
    GFX->setStateBlock( mUnderwaterSB );
 
    /*
@@ -891,6 +891,10 @@ void WaterObject::onRemove()
    {
       mPlaneReflector.unregisterReflector();
       cleanupMaterials();
+
+      PostEffect *underWaterEffect = getUnderwaterEffect( );
+      if( underWaterEffect )
+         underWaterEffect->disable( );
    }
 
    Parent::onRemove();

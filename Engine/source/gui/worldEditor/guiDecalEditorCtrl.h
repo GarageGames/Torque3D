@@ -129,7 +129,7 @@ public:
    DICreateUndoAction( const UTF8* actionName = "Create Decal " );
    virtual ~DICreateUndoAction();
 
-   void addDecal( DecalInstance decal );
+   void addDecal(const DecalInstance& decal);
 
    // UndoAction
    virtual void undo();
@@ -159,7 +159,7 @@ public:
    virtual ~DIDeleteUndoAction();
 
    ///
-   void deleteDecal( DecalInstance decal );
+   void deleteDecal(const DecalInstance& decal);
 
    // UndoAction
    virtual void undo();
@@ -188,7 +188,7 @@ public:
    DBDeleteUndoAction( const UTF8* actionName = "Delete Decal Datablock" );
    virtual ~DBDeleteUndoAction();
 
-   void deleteDecal( DecalInstance decal );
+   void deleteDecal(const DecalInstance& decal);
 
    // UndoAction
    virtual void undo();

@@ -148,7 +148,7 @@ protected:
 
 public:
 
-   GroundCoverCell() {}
+   GroundCoverCell() : mDirty(false) {}
 
    ~GroundCoverCell() 
    {
