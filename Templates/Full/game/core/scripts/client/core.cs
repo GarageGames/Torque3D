@@ -71,6 +71,7 @@ function initializeCore()
       
    // Core Guis.
    exec("~/art/gui/console.gui");
+   exec("~/art/gui/ProfilerGui.gui");
    exec("~/art/gui/consoleVarDlg.gui");
    exec("~/art/gui/netGraphGui.gui");
    

@@ -615,12 +615,87 @@ GlobalActionMap.bind(keyboard, "ctrl o", bringUpOptions);
 //------------------------------------------------------------------------------
 // Debugging Functions
 //------------------------------------------------------------------------------
-function showMetrics(%val)
+$MetricsParamArray[0] = "fps ";
+$MetricsParamArray[1] = "shadow "; 
+$MetricsParamArray[2] = "gfx "; 
+$MetricsParamArray[3] = "sfx ";
+$MetricsParamArray[4] = "terrain ";
+$MetricsParamArray[5] = "groundcover ";
+$MetricsParamArray[6] = "forest ";
+$MetricsParamArray[7] = "net ";
+$EnableProfiler = false;
+$string = ""; //string used to collet the parameters for metrics function
+
+function showMetrics(%var)
 {
-   if(%val)
-      metrics("fps gfx shadow sfx terrain groundcover forest net");
+	$string = "";
+	if(ppShowFps.getValue())
+	{
+		$string = $string @ $MetricsParamArray[0];
+	}
+	if(ppShowShadow.getValue())
+	{
+		$string = $string @ $MetricsParamArray[1];
+	}
+	if(ppShowGfx.getValue())
+	{
+		$string = $string @ $MetricsParamArray[2];
+	}
+	if(ppShowSfx.getValue())
+	{
+		$string = $string @ $MetricsParamArray[3];
+	}
+	if(ppShowTerrain.getValue())
+	{
+		$string = $string @ $MetricsParamArray[4];
+	}
+	if(ppShowForest.getValue())
+	{
+		$string = $string @ $MetricsParamArray[5];
+	}
+	if(ppShowGroundcover.getValue())
+	{
+		$string = $string @ $MetricsParamArray[6];
+	}
+	if(ppShowNet.getValue())
+	{
+		$string = $string @ $MetricsParamArray[7];
+	}
+
+	if(%var)
+	{
+		$EnableProfiler = !($EnableProfiler);
+
+	   if($EnableProfiler)
+	   {
+			metrics($string);	
+	   }
+	   else if((false == $EnableProfiler))
+	   {
+		   metrics();
+	   }
+	}
+	else if($EnableProfiler)  //will enter only when the enable/disable button was pressed
+	{
+		metrics($string);
+	}
+
+   
 }
-GlobalActionMap.bind(keyboard, "ctrl F2", showMetrics);
+function showMetricsKey(%var)
+{
+   if(%var)
+   {
+		metrics($string);
+   }
+   else if((true == $EnableProfiler))
+   {
+	   $EnableProfiler = false;
+	   metrics();
+   }
+
+}
+GlobalActionMap.bind(keyboard, "ctrl F2", showMetricsKey);
 
 //------------------------------------------------------------------------------
 //
@@ -647,6 +722,40 @@ function doProfile(%val)
 }
 
 GlobalActionMap.bind(keyboard, "ctrl F3", doProfile);
+
+$IsdoProfileFromGuiOn = false;
+function doProfileFromGui()
+{
+	$IsdoProfileFromGuiOn = !($IsdoProfileFromGuiOn);
+	if ($IsdoProfileFromGuiOn)
+   {
+	   %duration = getTrailingNumber(Duration.getText()); //Convert string to int
+	   
+	   if(1 > %duration )
+	   {
+		   %duration = 1;
+		   echo("Warning:Duration is smaller then 1ms. Clip to 1ms!");
+	   }
+	   if(4000 < %duration )
+	   {
+		   %duration = 4000;
+		   echo("Warning:Durtion is greater then 4s. Clip to 4s!");
+	   }
+      // -- start profile
+      echo("Starting profile session...");
+	  schedule(%duration, 0 ,"doProfileFromGui");
+      profilerReset();
+      profilerEnable(true);
+   }
+   else
+   {
+      // -- finish off profile
+      echo("Ending profile session...");
+
+      profilerDumpToFile("profilerDumpToFile" @ getSimTime() @ ".txt");
+      profilerEnable(false);
+   }
+}
 
 //------------------------------------------------------------------------------
 // Misc.

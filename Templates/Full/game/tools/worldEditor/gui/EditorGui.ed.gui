@@ -32,8 +32,8 @@
       canSave = "1";
       Visible = "1";
       hovertime = "1000";
-      
-        
+     
+       
       new GuiBitmapButtonCtrl(EHWorldEditor) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -106,7 +106,7 @@
       MinExtent = "1 1";
       bitmap = "tools/gui/images/separator-h.png";
       };
-      
+     
       new GuiBitmapButtonCtrl(EWorldEditorToggleCamera) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -149,7 +149,7 @@
          canSave = "1";
          Visible = "1";
          hovertime = "1000";
-
+ 
          new GuiTextCtrl() {
             canSaveDynamicFields = "0";
             Enabled = "1";
@@ -271,7 +271,7 @@
             bitmap = "tools/gui/images/dropdown-button-arrow";
          };
       };
-      
+     
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -280,7 +280,7 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-            
+           
       new GuiPopUpMenuCtrl(EWorldEditorAlignPopup) {
          canSaveDynamicFields = "0";
          internalName = "";
@@ -307,6 +307,48 @@
          reverseTextList = "0";
          bitmapBounds = "16 16";
       };
+      new GuiControl(PrefabBar1) {
+         position = "853 5";
+         extent = "31 27";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiDefaultProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+
+         new GuiBitmapButtonCtrl() {
+            bitmap = "tools/gui/images/menubar/Profiler_icon";
+            bitmapMode = "Stretched";
+            autoFitExtents = "0";
+            useModifiers = "0";
+            useStates = "1";
+            groupNum = "-1";
+            buttonType = "PushButton";
+            useMouseEvents = "0";
+            position = "2 -1";
+            extent = "29 27";
+            minExtent = "8 8";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "ToolsGuiButtonProfile";
+            visible = "1";
+            active = "1";
+            command = "Canvas.pushDialog(ProfilerGui);";
+            tooltipProfile = "ToolsGuiToolTipProfile";
+            tooltip = "Metrics Options.";
+            hovertime = "1000";
+            isContainer = "0";
+            internalName = "explodePrefabBtn";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+         };
+      };
    };
    
    new GuiContainer(EditorGuiStatusBar) {
@@ -323,7 +365,7 @@
       Visible = "1";
       hovertime = "1000";
       Docking = "Bottom";
-      
+     
       new GuiTextCtrl(EWorldEditorStatusBarInfo) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -346,7 +388,7 @@
          text = "Current Tool";
          maxLength = "255";
       };
-      
+     
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -357,7 +399,7 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-      
+     
       new GuiTextCtrl(EWorldEditorStatusBarSelection) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -380,7 +422,7 @@
          text = "";
          maxLength = "255";
       };
-      
+     
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -391,7 +433,7 @@
          MinExtent = "1 1";
          bitmap = "tools/gui/images/separator-h.png";
       };
-      
+     
       new GuiPopUpMenuCtrl(EWorldEditorStatusBarCamera) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -412,7 +454,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
       };
-      
+     
       new GuiBitmapCtrl() {
          Enabled = "1";
          Profile = "ToolsGuiDefaultProfile";
@@ -542,7 +584,7 @@
       softSelectDefaultFilter = "1.000000 0.833333 0.666667 0.500000 0.333333 0.166667 0.000000";
       adjustHeightMouseScale = "0.1";
       paintIndex = "-1";
-
+ 
       new GuiTextCtrl(TESelectionInfo) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -632,7 +674,7 @@
          maxLength = "255";
       };
    };
-    
+   
    new GuiControl(RelightStatus) {
       canSaveDynamicFields = "0";
       Enabled = "1";
@@ -647,7 +689,7 @@
       Visible = "0";
       hovertime = "1000";
        
-
+ 
       new GuiProgressBitmapCtrl(RelightProgress) {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -668,7 +710,7 @@
          AnchorLeft = "1";
          AnchorRight = "0";
          maxLength = "1024";
-
+ 
       };
       new GuiTextCtrl(RelightProgressTxt) {
          canSaveDynamicFields = "0";
@@ -707,7 +749,7 @@
       canSave = "1";
       Visible = "0";
       hovertime = "1000";
-
+ 
       new GuiTextCtrl() {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -782,7 +824,7 @@
       canSave = "1";
       Visible = "0";
       hovertime = "1000";
-
+ 
       new GuiTextCtrl() {
          canSaveDynamicFields = "0";
          Enabled = "1";
@@ -849,7 +891,7 @@
       Position = getWord(EWorldEditorToggleCamera.position, 0)-5 SPC getWord(EditorGuiToolbar.extent, 1)-1;
       Extent = "137" SPC ((6*28)+6);//97";
       isContainer = "1";
-      visible = "0"; 
+      visible = "0";
          
       new GuiDynamicCtrlArrayControl(cameraDropdownArray) {
         canSaveDynamicFields = "0";
@@ -1032,7 +1074,7 @@
             useMouseEvents = "0";
          };
       };
-      
+     
       new GuiDecoyCtrl(CameraTypesDropdownDecoy) {
          profile = "ToolsGuiDefaultProfile";
          horizSizing = "right";
@@ -1045,15 +1087,15 @@
          useMouseEvents = "1";
          isDecoy = "1";
       };
-      
+     
    };
    new GuiContainer(VisibilityDropdown){
       Profile = "IconDropdownProfile";
       Position = getWord(visibilityToggleBtn.position, 0)-5 SPC getWord(EditorGuiToolbar.extent, 1)-1;
       Extent = "159 261"; //SPC ((6*28)+6);//97";
       isContainer = "1";
-      visible = "0"; 
-      
+      visible = "0";
+     
       new GuiTabBookCtrl() {
          canSaveDynamicFields = "0";
          Profile = "ToolsGuiTabBookProfile";
@@ -1071,7 +1113,7 @@
          TabHeight = "22";
          TabMargin = "7";
          MinTabWidth = "64";
-
+ 
          new GuiTabPageCtrl() {
             canSaveDynamicFields = "0";
             Profile = "ToolsGuiTabPageProfile";
@@ -1087,7 +1129,7 @@
             hovertime = "1000";
             text = "Viz Toggles";
             maxLength = "255";
-            
+           
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -1117,7 +1159,7 @@
                lockVertScroll = "false";
                constantThumbHeight = "0";
                childMargin = "2 0";
-
+ 
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -1156,7 +1198,7 @@
             hovertime = "1000";
             text = "Class Toggles";
             maxLength = "255";
-            
+           
             new GuiScrollCtrl() {
                canSaveDynamicFields = "0";
                Enabled = "1";
@@ -1186,7 +1228,7 @@
                lockVertScroll = "false";
                constantThumbHeight = "0";
                childMargin = "2 0";
-
+ 
                new GuiStackControl() {
                   StackingType = "Vertical";
                   HorizStacking = "Left to Right";
@@ -1213,10 +1255,10 @@
       };
    };
 };
-
+ 
    
-
-
+ 
+ 
 new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
    internalName = "AggregateControl";
    horizSizing = "right";
@@ -1229,21 +1271,21 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
    class = "EditorDropdownSliderContainer";
    
    new GuiContainer(){
-      position = firstWord(CameraSpeedDropdownContainer.position) + firstWord(EditorGuiToolbar.position) + -6 SPC 
+      position = firstWord(CameraSpeedDropdownContainer.position) + firstWord(EditorGuiToolbar.position) + -6 SPC
             (getWord(CameraSpeedDropdownContainer, 1)) + 31;
       extent = "146 39";  
       isContainer = "1";
       Profile = "IconDropdownProfile";
       HorizSizing = "right";
-      VertSizing = "bottom"; 
-      
+      VertSizing = "bottom";
+     
       new GuiBitmapCtrl(){ // Fast
          position = "105 15";
          extent = "2 8";
          bitmap = "tools/gui/images/separator-h.png";  
          Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
-         VertSizing = "bottom"; 
+         VertSizing = "bottom";
       };
       new GuiBitmapCtrl(){ // normal
          position = "73 15";
@@ -1251,7 +1293,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
          bitmap = "tools/gui/images/separator-h.png";  
          Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
-         VertSizing = "bottom"; 
+         VertSizing = "bottom";
       };
       new GuiBitmapCtrl(){ // slow
          position = "41 15";
@@ -1259,7 +1301,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
          bitmap = "tools/gui/images/separator-h.png";  
          Profile = "ToolsGuiDefaultProfile";
          HorizSizing = "right";
-         VertSizing = "bottom"; 
+         VertSizing = "bottom";
       };
          
          new GuiSliderCtrl(){ //camera speed slider
@@ -1268,7 +1310,7 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
             extent = "129 15";
             bitmap = "tools/gui/images/separator-h.png";  
             HorizSizing = "width";
-            VertSizing = "bottom"; 
+            VertSizing = "bottom";
             range = "1 200";
             ticks = "0";
             value = "100";
@@ -1301,4 +1343,5 @@ new GuiMouseEventCtrl(CameraSpeedDropdownCtrlContainer, EditorGuiGroup) {
       };
    };
 };
-//--- OBJECT WRITE END ---
+
+    //--- OBJECT WRITE END ---
