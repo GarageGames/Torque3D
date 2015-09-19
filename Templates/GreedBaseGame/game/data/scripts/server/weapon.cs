@@ -329,7 +329,8 @@ function WeaponImage::onWetFire(%this, %obj, %slot)
    %numProjectiles = %this.projectileNum;
    if (%numProjectiles == 0)
       %numProjectiles = 1;
-      
+  
+   // ok so the under code explains a lot why the weapons are doing shit.. REMOVE THAT AND REPLACE BY PROPER RECOIL FFS
    for (%i = 0; %i < %numProjectiles; %i++)
    {
       if (%this.wetProjectileSpread)

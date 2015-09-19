@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 // Timeouts for corpse deletion.
-$CorpseTimeoutValue = 45 * 1000;
+$CorpseTimeoutValue = 45 * 1000; // add the zombie modding here
 
 
 //----------------------------------------------------------------------------
@@ -73,6 +73,9 @@ function PlayerData::onMount(%this, %obj, %vehicle, %node)
       else
          %obj.setActionThread("root", true);
    }
+   %vehicle.getDatablock().setFieldValue("isPuppet", false);
+   %vehicle.getDatablock().setFieldValue("ownPuppet", true);
+   %vehicle.getDatablock().setFieldValue("isControlled", true);  
 }
 
 function PlayerData::onUnmount(%this, %obj, %vehicle, %node)

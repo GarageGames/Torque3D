@@ -7,13 +7,13 @@
    HorizSizing = "right";
    VertSizing = "bottom";
    position = "0 0";
-   Extent = "800 600";
+   Extent = "2048 2048";
    MinExtent = "8 8";
    canSave = "1";
    Visible = "1";
    tooltipprofile = "GuiToolTipProfile";
    hovertime = "1000";
-   bitmap = "data/textures/Engine/ui/background.png";
+   bitmap = "data/textures/Game/ui/burnt_soil5.png";
    wrap = "0";
    fadeinTime = "500";
    waitTime = "8000";
@@ -35,7 +35,7 @@
       Visible = "1";
       tooltipprofile = "GuiToolTipProfile";
       hovertime = "1000";
-      bitmap = "data/textures/Engine/ui/Torque-3D-logo_alt.png";
+      bitmap = "data/textures/Game/ui/tfzlogostart.png";
       wrap = "0";
       command = "StartupGui.click();";
    };

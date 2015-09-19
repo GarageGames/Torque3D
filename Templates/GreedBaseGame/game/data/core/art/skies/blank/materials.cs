@@ -46,11 +46,6 @@ singleton CubemapData( BlueSkyCubemap )
    cubeFace[5] = "./solidsky_blue";
 };
 
-singleton Material( BlueSkyMat )
-{
-   cubemap = BlueSkyCubemap;
-   materialTag0 = "Skies";
-};
 
 singleton CubemapData( GreySkyCubemap )
 {
@@ -65,5 +60,12 @@ singleton CubemapData( GreySkyCubemap )
 singleton Material( GreySkyMat )
 {
    cubemap = GreySkyCubemap;
+   materialTag0 = "Skies";
+};
+
+singleton Material(BlueSkyMat)
+{
+   mapTo = "unmapped_mat";
+   cubemap = "BlueSkyCubemap";
    materialTag0 = "Skies";
 };

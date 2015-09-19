@@ -22,7 +22,7 @@
 
 singleton Material( WarningMaterial )
 {
-   diffuseMap[0] = "~/art/warnMat";
+   diffuseMap[0] = "~/core/art/warnMat";
    emissive[0] = false;
    translucent = false;
 };
@@ -30,10 +30,10 @@ singleton Material( WarningMaterial )
 
 singleton CubemapData( WarnMatCubeMap )
 {
-   cubeFace[0] = "~/art/warnMat";
-   cubeFace[1] = "~/art/warnMat";
-   cubeFace[2] = "~/art/warnMat";
-   cubeFace[3] = "~/art/warnMat";
-   cubeFace[4] = "~/art/warnMat";
-   cubeFace[5] = "~/art/warnMat";
+   cubeFace[0] = "~/core/art/warnMat";
+   cubeFace[1] = "~/core/art/warnMat";
+   cubeFace[2] = "~/core/art/warnMat";
+   cubeFace[3] = "~/core/art/warnMat";
+   cubeFace[4] = "~/core/art/warnMat";
+   cubeFace[5] = "~/core/art/warnMat";
 };

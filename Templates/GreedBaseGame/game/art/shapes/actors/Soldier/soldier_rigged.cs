@@ -29,7 +29,7 @@ singleton TSShapeConstructor(SoldierDAE)
    lodType = "TrailingNumber";
    ignoreNodeScale = "0";
    adjustCenter = "0";
-   adjustFloor = "1";
+   adjustFloor = "0";
    forceUpdateMaterials = "0";
 };
 

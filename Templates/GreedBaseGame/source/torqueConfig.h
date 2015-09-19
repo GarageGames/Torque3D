@@ -31,7 +31,7 @@
 //not only to your game proper, but also to all of your tools.
 
 /// What's the name of your application? Used in a variety of places.
-#define TORQUE_APP_NAME            "TFZALPHA-X64"
+#define TORQUE_APP_NAME            "TheFunZ-RC"
 
 /// What version of the application specific source code is this?
 ///
@@ -48,7 +48,6 @@
 #define TORQUE_DISABLE_MEMORY_MANAGER
 
 /// Define me if you want to disable the virtual mount system.
-// when set with a #define this disable zip fs
 /* #undef TORQUE_DISABLE_VIRTUAL_MOUNT_SYSTEM */
 
 /// Define me if you want to disable looking for the root of a given path

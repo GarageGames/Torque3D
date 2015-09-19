@@ -60,5 +60,8 @@ exec("./player.cs");
 // Load our other player datablocks
 exec("./aiPlayer.cs");
 
-// Load the vehicle datablocks
+// Load the vehicle datablocks & functions ........
+exec("./vehicles/VehicleRigidBodies.cs");
 exec("./vehicles/cheetahCar.cs");
+exec("./vehicles/jeep.cs");
+exec("./vwstatic.cs");

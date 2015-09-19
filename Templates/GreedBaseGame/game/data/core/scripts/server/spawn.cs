@@ -217,7 +217,7 @@ function GameConnection::spawnCamera(%this, %spawnPoint)
 //-----------------------------------------------------------------------------
 function GameConnection::spawnPlayer(%this, %spawnPoint, %noControl)
 {
-   if (isObject(%this.player))
+   if (!isObject(%this.player))
    {
       // The client should not already have a player. Assigning
       // a new one could result in an uncontrolled player object.

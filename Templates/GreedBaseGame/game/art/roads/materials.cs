@@ -40,3 +40,10 @@ singleton Material(DefaultRoadMaterialOther)
    diffuseMap[0] = "art/roads/defaultRoadTextureOther.png";
    materialTag0 = "RoadAndPath";
 };
+
+singleton Material(DefaultRoadMaterialGrungy)
+{
+   mapTo = "unmapped_mat";
+   diffuseMap[0] = "art/roads/gRoad.png";
+   materialTag0 = "RoadAndPath";
+};

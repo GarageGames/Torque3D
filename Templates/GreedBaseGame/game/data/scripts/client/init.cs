@@ -62,8 +62,8 @@ function initClient()
 
    // These should be game specific GuiProfiles.  Custom profiles are saved out
    // from the Gui Editor.  Either of these may override any that already exist.
-   exec("art/gui/defaultGameProfiles.cs");
-   exec("art/gui/customProfiles.cs"); 
+   exec("data/scripts/gui/defaultGameProfiles.cs");
+   exec("data/scripts/gui/customProfiles.cs"); 
    
    // The common module provides basic client functionality
    initBaseClient();
@@ -72,10 +72,10 @@ function initClient()
    configureCanvas();
 
    // Load up the Game GUIs
-   exec("art/gui/playGui.gui");
-   exec("art/gui/chatHud.gui");
-   exec("art/gui/playerList.gui");
-   exec("art/gui/hudlessGui.gui");
+   exec("data/ui/Game/playGui.gui");
+   exec("data/ui/Game/chatHud.gui");
+   exec("data/ui/Game/playerList.gui");
+   exec("data/ui/Game/hudlessGui.gui");
 
    // Load up the shell GUIs
    exec("data/ui/Engine/GreedMenu.gui");
@@ -89,7 +89,7 @@ function initClient()
    
    // Gui scripts
    exec("data/scripts/client/playerList.cs");
-   exec("data/scripts/client/chatHud.cs");
+   exec("data/scripts/gui/chatHud.cs");
    exec("data/scripts/client/messageHud.cs");
    exec("data/scripts/gui/playGui.cs");
    exec("data/scripts/gui/startupGui.cs");

@@ -1071,6 +1071,7 @@ function WheeledVehicleData::create(%block)
       dataBlock = %block;
       parentGroup = EWCreatorWindow.objectGroup;
    };
+   //echo("-->spawning a car : " @ %block @ "datablock");
    return %obj;
 }
 
@@ -1127,17 +1128,6 @@ function ProximityMineData::create( %datablock )
       dataBlock = %dataBlock;
       parentGroup = EWCreatorWindow.objectGroup;
       static = true;    // mines created by the editor are static, and armed immediately
-   };
-
-   return %obj;
-}
-
-function RibbonData::create( %datablock )
-{
-   %obj = new RibbonNode()
-   {
-      dataBlock = DefaultRibbonNodeData;
-      ribbon = %datablock;
    };
 
    return %obj;

@@ -34,17 +34,17 @@ function loadStartup()
    // be in consecutive numerical order
    // Greed Warning : improper pathing lead to a GuiBitmapButtonCtrl::setBimap 
    // infinite loop.
-   StartupGui.bitmap0     = "data/textures/Game/ui/background";
-   StartupGui.logo0       = "data/textures/Engine/ui/Torque-3D-logo_alt";
+   StartupGui.bitmap0     = "data/textures/Game/ui/burnt_soil5";
+   StartupGui.logo0       = "data/textures/Game/ui/tfzlogostart";
    StartupGui.logoPos0    = "178 251";
-   StartupGui.logoExtent0 = "443 139";
+   StartupGui.logoExtent0 = "960 282";
 
    // Call the next() function to set our firt
    // splash screen
    StartupGui.next();
 
    // Play our startup sound
-   //SFXPlayOnce(AudioGui, "art/sound/gui/startup");
+   //SFXPlayOnce(AudioGui, "data/sound/gui/startup");
    //SFXPlay(startsnd);
 }
 

@@ -27,7 +27,7 @@ datablock SFXProfile(RocketLauncherExplosionSound)
 
 datablock ParticleData(RocketDebrisTrailParticle)
 {
-   textureName = "art/particles/impact";
+   textureName = "data/materials/particles/impact";
    dragCoeffiecient = 0;
    inheritedVelFactor = 0.0;
    constantAcceleration = 0.0;
@@ -46,7 +46,7 @@ datablock ParticleData(RocketDebrisTrailParticle)
    times[0] = 0.0;
    times[1] = 0.498039;
    times[2] = 1.0;
-   animTexName = "art/particles/impact";
+   animTexName = "data/materials/particles/impact";
    times[3] = "1";
 };
 
@@ -107,7 +107,7 @@ datablock ParticleData(RocketSplashMist)
    spinRandomMin = -90.0;
    spinRandomMax = 500.0;
    spinSpeed = 1;
-   textureName = "art/particles/smoke";
+   textureName = "data/materials/particles/smoke";
    colors[0] = "0.7 0.8 1.0 1.0";
    colors[1] = "0.7 0.8 1.0 0.5";
    colors[2] = "0.7 0.8 1.0 0.0";
@@ -144,7 +144,7 @@ datablock ParticleData(RocketSplashParticle)
    constantAcceleration = -1.4;
    lifetimeMS = 600;
    lifetimeVarianceMS = 200;
-   textureName = "art/particles/droplet";
+   textureName = "data/materials/particles/droplet";
    colors[0] = "0.7 0.8 1.0 1.0";
    colors[1] = "0.7 0.8 1.0 0.5";
    colors[2] = "0.7 0.8 1.0 0.0";
@@ -176,7 +176,7 @@ datablock ParticleEmitterData(RocketSplashEmitter)
 
 datablock ParticleData(RocketSplashRingParticle)
 {
-   textureName = "art/particles/wake";
+   textureName = "data/materials/particles/wake";
    dragCoefficient = 0.0;
    gravityCoefficient = 0.0;
    inheritedVelFactor = 0.0;
@@ -259,8 +259,8 @@ datablock ParticleData(RocketExpFire)
    spinSpeed = "1";
    spinRandomMin = "-200";
    spinRandomMax = "0";
-   textureName = "art/particles/smoke";
-   animTexName = "art/particles/smoke";
+   textureName = "data/materials/particles/smoke";
+   animTexName = "data/materials/particles/smoke";
    colors[0] = "1 0.897638 0.795276 1";
    colors[1] = "0.795276 0.393701 0 0.6";
    colors[2] = "0 0 0 0";
@@ -284,13 +284,13 @@ datablock ParticleEmitterData(RocketExpFireEmitter)
 
 datablock ParticleData(RocketExpFireball)
 {
-   textureName = "art/particles/fireball.png";
+   textureName = "data/materials/particles/fireball.png";
    lifetimeMS = "300";
    lifetimeVarianceMS = "299";
    spinSpeed = "1";
    spinRandomMin = "-400";
    spinRandomMax = "0";
-   animTexName = "art/particles/fireball.png";
+   animTexName = "data/materials/particles/fireball.png";
    colors[0] = "1 0.897638 0.795276 0.2";
    colors[1] = "1 0.496063 0 0.6";
    colors[2] = "0.0944882 0.0944882 0.0944882 0";
@@ -319,8 +319,8 @@ datablock ParticleData(RocketExpSmoke)
 {
    lifetimeMS = 1200;//"1250";
    lifetimeVarianceMS = 299;//200;//"250";
-   textureName = "art/particles/smoke";
-   animTexName = "art/particles/smoke";
+   textureName = "data/materials/particles/smoke";
+   animTexName = "data/materials/particles/smoke";
    useInvAlpha = "1";
    gravityCoefficient = "-0.100122";
    spinSpeed = "1";
@@ -349,10 +349,10 @@ datablock ParticleEmitterData(RocketExpSmokeEmitter)
 
 datablock ParticleData(RocketExpSparks)
 {
-   textureName = "art/particles/droplet.png";
+   textureName = "data/materials/particles/droplet.png";
    lifetimeMS = "100";
    lifetimeVarianceMS = "50";
-   animTexName = "art/particles/droplet.png";
+   animTexName = "data/materials/particles/droplet.png";
    inheritedVelFactor = "0.391389";
    sizes[0] = "1.99902";
    sizes[1] = "2.49954";
@@ -384,14 +384,14 @@ datablock ParticleEmitterData(RocketExpSparksEmitter)
 
 datablock ParticleData(RocketExpSubFireParticles)
 {
-   textureName = "art/particles/fireball.png";
+   textureName = "data/materials/particles/fireball.png";
    gravityCoefficient = "-0.202686";
    lifetimeMS = "400";
    lifetimeVarianceMS = "299";
    spinSpeed = "1";
    spinRandomMin = "-200";
    spinRandomMax = "0";
-   animTexName = "art/particles/fireball.png";
+   animTexName = "data/materials/particles/fireball.png";
    colors[0] = "1 0.897638 0.795276 0.2";
    colors[1] = "1 0.496063 0 1";
    colors[2] = "0.0944882 0.0944882 0.0944882 0";
@@ -416,14 +416,14 @@ datablock ParticleEmitterData(RocketExpSubFireEmitter)
 
 datablock ParticleData(RocketExpSubSmoke)
 {
-   textureName = "art/particles/smoke";
+   textureName = "data/materials/particles/smoke";
    gravityCoefficient = "-0.40293";
    lifetimeMS = "800";
    lifetimeVarianceMS = "299";
    spinSpeed = "1";
    spinRandomMin = "-200";
    spinRandomMax = "0";
-   animTexName = "art/particles/smoke";
+   animTexName = "data/materials/particles/smoke";
    colors[0] = "0.4 0.35 0.3 0.393701";
    colors[1] = "0.45 0.45 0.45 0.795276";
    colors[2] = "0.4 0.4 0.4 0";

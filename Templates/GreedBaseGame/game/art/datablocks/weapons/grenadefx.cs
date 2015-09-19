@@ -54,7 +54,7 @@ datablock LightDescription(GrenadeLauncherLightDesc)
 
 datablock ParticleData(GrenadeDebrisFireParticle)
 {
-   textureName = "art/particles/impact";
+   textureName = "data/materials/particles/impact";
    dragCoeffiecient = 0;
    gravityCoefficient = -1.00366;
    inheritedVelFactor = 0.0;
@@ -74,7 +74,7 @@ datablock ParticleData(GrenadeDebrisFireParticle)
    times[0] = 0.0;
    times[1] = 0.494118;
    times[2] = 1.0;
-   animTexName = "art/particles/impact";
+   animTexName = "data/materials/particles/impact";
    colors[3] = "1 1 1 0.407";
    sizes[3] = "0.5";
 };
@@ -139,7 +139,7 @@ datablock ParticleData(GrenadeSplashMist)
    spinRandomMax = 500.0;
    spinSpeed = 1;
 
-   textureName = "art/particles/smoke";
+   textureName = "data/materials/particles/smoke";
 
    colors[0] = "0.7 0.8 1.0 1.0";
    colors[1] = "0.7 0.8 1.0 0.5";
@@ -179,7 +179,7 @@ datablock ParticleData(GrenadeSplashParticle)
    constantAcceleration = -1.4;
    lifetimeMS = 600;
    lifetimeVarianceMS = 200;
-   textureName = "art/particles/droplet";
+   textureName = "data/materials/particles/droplet";
 
    colors[0] = "0.7 0.8 1.0 1.0";
    colors[1] = "0.7 0.8 1.0 0.5";
@@ -214,7 +214,7 @@ datablock ParticleEmitterData(GrenadeSplashEmitter)
 
 datablock ParticleData(GrenadeSplashRingParticle)
 {
-   textureName = "art/particles/wake";
+   textureName = "data/materials/particles/wake";
    dragCoefficient = 0.0;
    gravityCoefficient = 0.0;
    inheritedVelFactor = 0.0;
@@ -297,7 +297,7 @@ datablock SplashData(GrenadeSplash)
 
 datablock ParticleData(GrenadeExpFire)
 {
-   textureName = "art/particles/fireball.png";
+   textureName = "data/materials/particles/fireball.png";
    dragCoeffiecient = 0;
    windCoeffiecient = 0.5;
    gravityCoefficient = -1;
@@ -318,7 +318,7 @@ datablock ParticleData(GrenadeExpFire)
    times[0] = 0.0;
    times[1] = 0.25;
    times[2] = 0.5;
-   animTexName = "art/particles/fireball.png";
+   animTexName = "data/materials/particles/fireball.png";
    times[3] = "1";
    dragCoefficient = "1.99902";
    sizes[3] = "10";
@@ -340,7 +340,7 @@ datablock ParticleEmitterData(GrenadeExpFireEmitter)
 
 datablock ParticleData(GrenadeExpDust)
 {
-   textureName = "art/particles/smoke.png";
+   textureName = "data/materials/particles/smoke.png";
    dragCoefficient = 0.498534;
    gravityCoefficient = 0;
    inheritedVelFactor = 1;
@@ -360,7 +360,7 @@ datablock ParticleData(GrenadeExpDust)
    times[0] = 0.0;
    times[1] = 0.494118;
    times[2] = 1.0;
-   animTexName = "art/particles/smoke.png";
+   animTexName = "data/materials/particles/smoke.png";
    colors[3] = "0.996078 0.996078 0.996078 0";
    sizes[3] = "15";
 };
@@ -384,7 +384,7 @@ datablock ParticleEmitterData(GrenadeExpDustEmitter)
 
 datablock ParticleData(GrenadeExpSpark)
 {
-   textureName = "art/particles/Sparkparticle";
+   textureName = "data/materials/particles/Sparkparticle";
    dragCoefficient = 1;
    gravityCoefficient = 0.0;
    inheritedVelFactor = 0.2;
@@ -421,7 +421,7 @@ datablock ParticleEmitterData(GrenadeExpSparkEmitter)
 
 datablock ParticleData(GrenadeExpSparks)
 {
-   textureName = "art/particles/droplet";
+   textureName = "data/materials/particles/droplet";
    dragCoefficient = 1;
    gravityCoefficient = 0.0;
    inheritedVelFactor = 0.2;
@@ -461,7 +461,7 @@ datablock ParticleEmitterData(GrenadeExpSparksEmitter)
 
 datablock ParticleData(GrenadeExpSmoke)
 {
-   textureName = "art/particles/smoke";
+   textureName = "data/materials/particles/smoke";
    dragCoeffiecient = 0;
    gravityCoefficient = -0.40293;
    inheritedVelFactor = 0.0;
@@ -481,7 +481,7 @@ datablock ParticleData(GrenadeExpSmoke)
    times[0] = 0;
    times[1] = 0.498039;
    times[2] = 1;
-   animTexName = "art/particles/smoke";
+   animTexName = "data/materials/particles/smoke";
    times[3] = "1";
 };
 
@@ -549,7 +549,7 @@ datablock ExplosionData(GrenadeExplosion)
 
 datablock ParticleData(GLWaterExpDust)
 {
-   textureName = "art/particles/steam";
+   textureName = "data/materials/particles/steam";
    dragCoefficient = 1.0;
    gravityCoefficient = -0.01;
    inheritedVelFactor = 0.0;
@@ -589,7 +589,7 @@ datablock ParticleEmitterData(GLWaterExpDustEmitter)
 
 datablock ParticleData(GLWaterExpSparks)
 {
-   textureName = "art/particles/spark_wet";
+   textureName = "data/materials/particles/spark_wet";
    dragCoefficient = 1;
    gravityCoefficient = 0.0;
    inheritedVelFactor = 0.2;
@@ -629,7 +629,7 @@ datablock ParticleEmitterData(GLWaterExpSparkEmitter)
 
 datablock ParticleData(GLWaterExpSmoke)
 {
-   textureName = "art/particles/smoke";
+   textureName = "data/materials/particles/smoke";
    dragCoeffiecient = 0.4;
    gravityCoefficient = -0.25;
    inheritedVelFactor = 0.025;
@@ -668,7 +668,7 @@ datablock ParticleEmitterData(GLWaterExpSmokeEmitter)
 
 datablock ParticleData(GLWaterExpBubbles)
 {
-   textureName = "art/particles/millsplash01";
+   textureName = "data/materials/particles/millsplash01";
    dragCoefficient = 0.0;
    gravityCoefficient = -0.05;
    inheritedVelFactor = 0.0;
@@ -798,7 +798,7 @@ datablock ExplosionData(GrenadeLauncherExplosion)
 
 datablock ParticleData(GrenadeTrailWaterParticle)
 {
-   textureName = "art/particles/bubble";
+   textureName = "data/materials/particles/bubble";
    dragCoefficient = 0.0;
    gravityCoefficient = 0.1;
    inheritedVelFactor = 0.0;
@@ -844,7 +844,7 @@ datablock ParticleEmitterData(GrenadeTrailWaterEmitter)
 
 datablock ParticleData(GrenadeProjSmokeTrail)
 {
-   textureName = "art/particles/smoke";
+   textureName = "data/materials/particles/smoke";
    dragCoeffiecient = 0.0;
    gravityCoefficient = -0.2;
    inheritedVelFactor = 0.0;

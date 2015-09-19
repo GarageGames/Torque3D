@@ -34,12 +34,18 @@ function onServerCreated()
    
    // Load up any objects or datablocks saved to the editor managed scripts
    %datablockFiles = new ArrayObject();
-   %datablockFiles.add( "art/ribbons/ribbonExec.cs" );   
-   %datablockFiles.add( "art/particles/managedParticleData.cs" );
-   %datablockFiles.add( "art/particles/managedParticleEmitterData.cs" );
-   %datablockFiles.add( "art/decals/managedDecalData.cs" );
+   %datablockFiles.add( "data/materials/ribbons/ribbonExec.cs" );   
+   %datablockFiles.add( "data/materials/particles/managedParticleData.cs" );
+   %datablockFiles.add( "data/materials/particles/managedParticleEmitterData.cs" );
+   /*
+   so it should be noted that this is data/materials integration pass
+   and that such scripts belong to scripts/game/system for example (or core????
+   it sounds like core is a more good candidate)
+   */
+   %datablockFiles.add( "data/materials/forest/managedItemData.cs" );
+   
+   %datablockFiles.add( "data/materials/decals/managedDecalData.cs" );
    %datablockFiles.add( "art/datablocks/managedDatablocks.cs" );
-   %datablockFiles.add( "art/forest/managedItemData.cs" );
    %datablockFiles.add( "art/datablocks/datablockExec.cs" );   
    loadDatablockFiles( %datablockFiles, true );
 

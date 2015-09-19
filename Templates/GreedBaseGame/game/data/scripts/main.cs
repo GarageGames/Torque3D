@@ -97,7 +97,7 @@ function onStart()
    exec("data/scripts/server/init.cs");
    
    // Init the physics plugin.
-   physicsInit(Bullet);
+   physicsInit("Bullet");
       
    // Start up the audio system.
    sfxStartup();

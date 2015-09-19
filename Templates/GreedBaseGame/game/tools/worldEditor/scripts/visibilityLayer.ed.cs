@@ -191,11 +191,3 @@ function EVisibility::addClassOptions( %this )
       %selList.addGuiControl( %selCheckBox );
    }
 }
-
-function togglePhysicsDebugViz( %enable )
-{
-   if(physicsPluginPresent())
-   {
-      physicsDebugDraw(%enable);
-   }
-}

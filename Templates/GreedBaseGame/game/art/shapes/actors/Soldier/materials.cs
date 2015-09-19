@@ -128,22 +128,3 @@ singleton Material(Mat_Yellow_Soldier_Main : Mat_Soldier_Main)
    mapTo = "Yellow_Soldier_Main";
    diffuseMap[0] = "Soldier_Yellow_Dif.dds";
 };
-
-singleton Material(clone07__Eye_trans)
-{
-   mapTo = "_Eye_trans";
-   diffuseColor[0] = "0.09092 0.09092 0.09092 0.8595";
-   specular[0] = "0.95868 0.95868 0.95868 1";
-   specularPower[0] = "43.2193";
-   translucent = "1";
-};
-
-singleton Material(clone07__Body)
-{
-   mapTo = "_Body";
-   diffuseMap[0] = "art/shapes/actors/Soldier/images/clone07aclothmil1_color";
-   specularPower[0] = "43.2193";
-   specularMap[0] = "art/shapes/actors/Soldier/images/clone07aclothmil1_spec";
-   translucentBlendOp = "None";
-   Enabled = "1";
-};

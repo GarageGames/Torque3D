@@ -78,8 +78,8 @@ function isScriptFile(%path)
 exec("data/core/parseArgs.cs");
 
 $isDedicated = false;
-$dirCount = 3;
-$userDirs = $defaultGame @ ";art;data/ui;data/levels";
+$dirCount = 4;
+$userDirs = $defaultGame @ ";data/mesh;art;data/levels";
 
 // load tools scripts if we're a tool build
 if (isToolBuild())

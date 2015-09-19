@@ -22,8 +22,9 @@
 
 new Material(Structure_wall)
 {
-   mapTo = "building01walls";
+   mapTo = "unmapped_mat";
    diffuseMap[0] = "art/shapes/station/building01walls";
+   Enabled = "0";
    //emissive[0] = true;
 };
 
@@ -43,3 +44,14 @@ new Material(Structure_plate)
    //emissive[0] = true;
 };
 
+
+singleton Material(parkinglot_01_b_terrain_rockydirt)
+{
+   mapTo = "building01walls";
+   diffuseColor[0] = "0.64 0.64 0.64 1";
+   doubleSided = "1";
+   translucentBlendOp = "None";
+   Enabled = "0";
+   materialTag1 = "Industrial";
+   materialTag0 = "beamng";
+};

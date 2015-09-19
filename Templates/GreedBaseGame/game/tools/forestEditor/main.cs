@@ -93,7 +93,7 @@ function ForestEditorPlugin::onWorldEditorStartup( %this )
 {       
    new PersistenceManager( ForestDataManager );
    
-   %brushPath = "art/forest/brushes.cs";
+   %brushPath = "data/materials/forest/brushes.cs";
    if ( !isFile( %brushPath ) )   
       createPath( %brushPath );      
       
@@ -261,7 +261,7 @@ function ForestEditorPlugin::onSaveMission( %this, %missionFile )
       }
    }
       
-   ForestBrushGroup.save( "art/forest/brushes.cs" );
+   ForestBrushGroup.save( "data/materials/forest/brushes.cs" );
 }
 
 function ForestEditorPlugin::onEditorSleep( %this )

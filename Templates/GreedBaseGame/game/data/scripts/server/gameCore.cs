@@ -53,7 +53,7 @@ function GameCore::createGame()
       $Server::MissionType = "";
    }
 
-   if ($Server::MissionType $= "")
+   if ($Server::MissionType $= "") // fuck that pretty soon.
       $Server::MissionType = "Deathmatch"; //Default gametype, just in case
 
    // Note: The Game object will be cleaned up by MissionCleanup.  Therefore its lifetime is
@@ -547,7 +547,7 @@ function GameCore::onClientEnterGame(%game, %client)
       }
    }
 
-   // Inform the client we've joined up
+   // Inform the client we've joined ups
    messageClient(%client,
       'MsgClientJoin', '\c2Welcome to the Torque demo app %1.',
       %client.playerName,
