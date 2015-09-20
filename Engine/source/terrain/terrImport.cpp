@@ -54,10 +54,12 @@ ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5,
    String terrainDirectory( Con::getVariable( "$pref::Directories::Terrain" ) );
    if ( terrainDirectory.isEmpty() )
    {
-      terrainDirectory = "art/terrains/";
+	   // data/ implemenation.. 3rd pass ?
+      terrainDirectory = "data/art/terrains/";
    }
    terrFileName.replace("tools/levels/", terrainDirectory);
-   terrFileName.replace("levels/", terrainDirectory);
+   // data/ implemenation.. 3rd pass ?
+   terrFileName.replace("data/levels/", terrainDirectory);
 
    TerrainFile::create( &terrFileName, resolution, materials );
 

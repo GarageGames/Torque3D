@@ -900,10 +900,12 @@ bool TerrainBlock::onAdd()
       String terrainDirectory( Con::getVariable( "$pref::Directories::Terrain" ) );
       if ( terrainDirectory.isEmpty() )
       {
-         terrainDirectory = "art/terrains/";
+		  // data/ implemenation.. 3rd pass ?
+		  terrainDirectory = "data/art/terrains/";
       }
       mTerrFileName.replace("tools/levels/", terrainDirectory);
-      mTerrFileName.replace("levels/", terrainDirectory);
+	  // data/ implemenation.. 3rd pass ?
+      mTerrFileName.replace("data/levels/", terrainDirectory);
 
       Vector<String> materials;
       materials.push_back( "warning_material" );
