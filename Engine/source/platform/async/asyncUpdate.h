@@ -148,7 +148,8 @@ class AsyncPeriodicUpdateThread : public AsyncUpdateThread
       enum
       {
          /// Default interval between periodic updates in milliseconds.
-         DEFAULT_UPDATE_INTERVAL = 4000
+		  // GREEDTHREADING
+		  DEFAULT_UPDATE_INTERVAL = 4000
       };
 
       ///

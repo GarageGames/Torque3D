@@ -75,7 +75,8 @@ class AsyncBufferedInputStream : public IInputStreamFilter< T, Stream >,
       enum
       {
          /// The number of elements to buffer in advance by default.
-         DEFAULT_STREAM_LOOKAHEAD = 3
+		  // GREEDTHREADING
+		  DEFAULT_STREAM_LOOKAHEAD = 3
       };
       
       friend class AsyncBufferedReadItem< T, Stream >; // _onArrival

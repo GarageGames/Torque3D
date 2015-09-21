@@ -582,6 +582,7 @@ struct ThreadSafePriorityQueueWithUpdate : public ThreadSafePriorityQueue< T, K,
    typedef T ValueType;
    typedef K KeyType;
 
+   // GREEDTHREADING
    enum { DEFAULT_UPDATE_INTERVAL = 256 };
 
    ThreadSafePriorityQueueWithUpdate( U32 updateInterval = DEFAULT_UPDATE_INTERVAL );
