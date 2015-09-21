@@ -105,6 +105,11 @@ void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
    if( mInputController->processInputEvent( inputEvent ) )
       return;
 
+   if (mWindow->getKeyboardTranslation())
+   {
+      return;
+   }
+
    // If we get here we failed to process it with anything prior... so let
    // the ActionMap handle it.
    ActionMap::handleEvent(&inputEvent);
