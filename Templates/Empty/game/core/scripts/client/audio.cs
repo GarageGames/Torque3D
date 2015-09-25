@@ -230,6 +230,8 @@ function sfxShutdown()
 /// Determines which of the two SFX providers is preferable.
 function sfxCompareProvider( %providerA, %providerB )
 {
+   %providerA = getField(%providerA, 0);
+   
    if( %providerA $= %providerB )
       return 0;
       
