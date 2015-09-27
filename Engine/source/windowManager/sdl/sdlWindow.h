@@ -160,6 +160,9 @@ public:
    virtual bool isMouseLocked() const { return mMouseLocked; };
    virtual bool shouldLockMouse() const { return mShouldLockMouse; };
 
+   /// Set if relevant keypress events should be translated into character input events.
+   virtual void setKeyboardTranslation(const bool enabled);
+
    virtual WindowId getWindowId();
 
    SDL_Window* getSDLWindow() const { return mWindowHandle; }

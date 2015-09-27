@@ -484,12 +484,6 @@ void PlatformWindowSDL::_triggerKeyNotify(const SDL_Event& evt)
       keyEvent.trigger(getWindowId(), torqueModifiers, inputAction, torqueKey);
       //Con::printf("Key %d : %d", tKey.sym, inputAction);
    }
-
-   // stop SDL_TEXTINPUT event when unwanted
-   if( inputAction == IA_MAKE && getKeyboardTranslation() && shouldNotTranslate( torqueModifiers, torqueKey ) )	
-      SDL_StopTextInput();
-   else   
-      SDL_StartTextInput();
 }
 
 void PlatformWindowSDL::_triggerTextNotify(const SDL_Event& evt)
@@ -605,4 +599,13 @@ const UTF16 *PlatformWindowSDL::getCurtainWindowClassName()
    // TODO SDL
    static String str("CurtainWindowClassName");
    return str.utf16();
+}
+
+void PlatformWindowSDL::setKeyboardTranslation(const bool enabled)
+{
+   mEnableKeyboardTranslation = enabled;
+   if (mEnableKeyboardTranslation)
+      SDL_StartTextInput();
+   else
+      SDL_StopTextInput();
 }
