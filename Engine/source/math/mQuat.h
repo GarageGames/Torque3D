@@ -229,11 +229,10 @@ inline F32 QuatF::angleBetween( const QuatF & q )
 {
    // angle between two quaternions
    QuatF base(x,y,z,w);
-   base=base.normalize();
+   base.normalize();
    QuatF q_norm=q;
-   q_norm=q_norm.normalize();
+   q_norm.normalize();
    return 2.0f*mAcos(base.dot(q_norm));
 }
-
 
 #endif // _MQUAT_H_
