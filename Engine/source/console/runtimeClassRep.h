@@ -60,6 +60,27 @@ public:
       parentClass     = parent;
    };
 
+   virtual AbstractClassRep* getContainerChildClass( const bool recurse )
+   {
+      // Fetch container children type.
+      AbstractClassRep* pChildren = T::getContainerChildStaticClassRep();
+      if ( !recurse || pChildren != NULL )
+         return pChildren;
+
+      // Fetch parent type.
+      AbstractClassRep* pParent = T::getParentStaticClassRep();
+      if ( pParent == NULL )
+         return NULL;
+
+      // Get parent container children.
+      return pParent->getContainerChildClass( recurse );
+   }
+
+   virtual WriteCustomTamlSchema getCustomTamlSchema( void )
+   {
+      return T::getStaticWriteCustomTamlSchema();
+   }
+
    /// Perform class specific initialization tasks.
    ///
    /// Link namespaces, call initPersistFields() and consoleInit().
@@ -160,6 +181,8 @@ template<class T> bool RuntimeClassRep<T>::smConRegistered = false;
    static RuntimeClassRep<className> dynRTClassRep;      \
    static AbstractClassRep* getParentStaticClassRep();  \
    static AbstractClassRep* getStaticClassRep();        \
+   static AbstractClassRep::WriteCustomTamlSchema getStaticWriteCustomTamlSchema();         \
+   static AbstractClassRep* getContainerChildStaticClassRep();         \
    virtual AbstractClassRep* getClassRep() const
 
 #define IMPLEMENT_RUNTIME_CONOBJECT(className)                                                     \
@@ -169,6 +192,8 @@ template<class T> bool RuntimeClassRep<T>::smConRegistered = false;
    AbstractClassRep* className::getClassRep() const { return &className::dynRTClassRep; }           \
    AbstractClassRep* className::getStaticClassRep() { return &dynRTClassRep; }                      \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); } \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
    RuntimeClassRep<className> className::dynRTClassRep(#className, "Type" #className, &_sTypeId, 0, -1, 0, className::getParentStaticClassRep())
 
 #endif

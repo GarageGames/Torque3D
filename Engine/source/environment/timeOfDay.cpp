@@ -129,15 +129,15 @@ void TimeOfDay::initPersistFields()
       addField( "axisTilt", TypeF32, Offset( mAxisTilt, TimeOfDay ),
             "The angle in degrees between global equator and tropic." );
 
-      addProtectedField( "dayLength", TypeF32, Offset( mDayLen, TimeOfDay ), &setDayLength, &defaultProtectedGetFn,
+      addProtectedField( "dayLength", TypeF32, Offset( mDayLen, TimeOfDay ), &setDayLength, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
             "The length of a virtual day in real world seconds." );
 
       addField( "startTime", TypeF32, Offset( mStartTimeOfDay, TimeOfDay ),
          "" );
 
-      addProtectedField( "time", TypeF32, Offset( mTimeOfDay, TimeOfDay ), &setTimeOfDay, &defaultProtectedGetFn, "Current time of day." );
+      addProtectedField( "time", TypeF32, Offset( mTimeOfDay, TimeOfDay ), &setTimeOfDay, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "Current time of day." );
 
-      addProtectedField( "play", TypeBool, Offset( mPlay, TimeOfDay ), &setPlay, &defaultProtectedGetFn, "True when the TimeOfDay object is operating." );
+      addProtectedField( "play", TypeBool, Offset( mPlay, TimeOfDay ), &setPlay, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "True when the TimeOfDay object is operating." );
 
       addField( "azimuthOverride", TypeF32, Offset( mAzimuthOverride, TimeOfDay ), "" );
 

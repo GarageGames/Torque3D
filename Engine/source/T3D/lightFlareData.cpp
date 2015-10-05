@@ -38,6 +38,7 @@
 #include "T3D/gameBase/processList.h"
 #include "collision/collision.h"
 #include "lighting/lightManager.h"
+#include "taml/tamlCustom.h"
 
 const U32 LightFlareData::LosMask = STATIC_COLLISION_TYPEMASK |
                                     ShapeBaseObjectType |
@@ -160,7 +161,7 @@ void LightFlareData::initPersistFields()
       addField( "flareTexture", TypeImageFilename, Offset( mFlareTextureName, LightFlareData ),
          "The texture / sprite sheet for this flare." );
 
-      addArray( "Elements", MAX_ELEMENTS );
+      addArray( "Elements", "Element", MAX_ELEMENTS );
 
          addField( "elementRect", TypeRectF, Offset( mElementRect, LightFlareData ), MAX_ELEMENTS,
             "A rectangle specified in pixels of the flareTexture image." );

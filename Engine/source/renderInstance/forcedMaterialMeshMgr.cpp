@@ -64,7 +64,7 @@ ForcedMaterialMeshMgr::~ForcedMaterialMeshMgr()
 void ForcedMaterialMeshMgr::initPersistFields()
 {
    addProtectedField("material", TYPEID< Material >(), Offset(mOverrideMaterial, ForcedMaterialMeshMgr),
-      &_setOverrideMat, &_getOverrideMat, "Material used to draw all meshes in the render bin.");
+      &_setOverrideMat, &_getOverrideMat, new AbstractClassRep::WriteDataNotify(), "Material used to draw all meshes in the render bin.");
 
    Parent::initPersistFields();
 }

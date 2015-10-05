@@ -541,18 +541,28 @@ void SceneObject::setHidden( bool hidden )
 
 //-----------------------------------------------------------------------------
 
+struct MountedWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   bool fn(void* obj, StringTableEntry pFieldName) const
+   {
+      return static_cast<SceneObject*>(obj)->isMounted() != false;
+   }
+};
+
 void SceneObject::initPersistFields()
 {
    addGroup( "Transform" );
-
+   
       addProtectedField( "position", TypeMatrixPosition, Offset( mObjToWorld, SceneObject ),
-         &_setFieldPosition, &defaultProtectedGetFn,
+         &_setFieldPosition, &defaultProtectedGetFn, 
+         new PublicConstMethodWriteFn<SceneObject, Point3F>(Point3F::Zero, &SceneObject::getPosition),
          "Object world position." );
       addProtectedField( "rotation", TypeMatrixRotation, Offset( mObjToWorld, SceneObject ),
-         &_setFieldRotation, &defaultProtectedGetFn,
+         &_setFieldRotation, &defaultProtectedGetFn, new DefaultValueWriteFn("1 0 0 0"),
          "Object world orientation." );
       addProtectedField( "scale", TypePoint3F, Offset( mObjScale, SceneObject ),
-         &_setFieldScale, &defaultProtectedGetFn,
+         &_setFieldRotation, &defaultProtectedGetFn, 
+         new PublicMemberWriteFn<SceneObject, VectorF>(VectorF::One, &SceneObject::mObjScale),
          "Object world scale." );
 
    endGroup( "Transform" );
@@ -560,12 +570,12 @@ void SceneObject::initPersistFields()
    addGroup( "Editing" );
 
       addProtectedField( "isRenderEnabled", TypeBool, Offset( mObjectFlags, SceneObject ),
-         &_setRenderEnabled, &_getRenderEnabled,
+         &_setRenderEnabled, &_getRenderEnabled, new DefaultBoolWriteFn(true),
          "Controls client-side rendering of the object.\n"
          "@see isRenderable()\n" );
 
       addProtectedField( "isSelectionEnabled", TypeBool, Offset( mObjectFlags, SceneObject ),
-         &_setSelectionEnabled, &_getSelectionEnabled,
+         &_setSelectionEnabled, &_getSelectionEnabled, new DefaultBoolWriteFn(true),
          "Determines if the object may be selected from wihin the Tools.\n"
          "@see isSelectable()\n" );
 
@@ -573,13 +583,13 @@ void SceneObject::initPersistFields()
 
    addGroup( "Mounting" );
 
-      addProtectedField( "mountPID", TypePID, Offset( mMountPID, SceneObject ), &_setMountPID, &defaultProtectedGetFn,
+      addProtectedField( "mountPID", TypePID, Offset( mMountPID, SceneObject ), &_setMountPID, &defaultProtectedGetFn, new MountedWriteFn(),
          "@brief PersistentID of object we are mounted to.\n\n"
          "Unlike the SimObjectID that is determined at run time, the PersistentID of an object is saved with the level/mission and "
          "may be used to form a link between objects." );
-      addField( "mountNode", TypeS32, Offset( mMount.node, SceneObject ), "Node we are mounted to." );
-      addField( "mountPos", TypeMatrixPosition, Offset( mMount.xfm, SceneObject ), "Position we are mounted at ( object space of our mount object )." );
-      addField( "mountRot", TypeMatrixRotation, Offset( mMount.xfm, SceneObject ), "Rotation we are mounted at ( object space of our mount object )." );
+      addField( "mountNode", TypeS32, Offset( mMount.node, SceneObject ), new MountedWriteFn(), "Node we are mounted to." );
+      addField( "mountPos", TypeMatrixPosition, Offset( mMount.xfm, SceneObject ), new MountedWriteFn(), "Position we are mounted at ( object space of our mount object )." );
+      addField( "mountRot", TypeMatrixRotation, Offset( mMount.xfm, SceneObject ), new MountedWriteFn(), "Rotation we are mounted at ( object space of our mount object )." );
 
    endGroup( "Mounting" );
 
@@ -593,9 +603,12 @@ bool SceneObject::_setFieldPosition( void *object, const char *index, const char
    SceneObject* so = static_cast<SceneObject*>( object );
    if ( so )
    {
+      const char* prevPosition = so->getDataField("position", NULL);
       MatrixF txfm( so->getTransform() );
       Con::setData( TypeMatrixPosition, &txfm, 0, 1, &data );
       so->setTransform( txfm );
+      if(strcmp(prevPosition, data) != 0)
+         return true;
    }
    return false;
 }
@@ -607,9 +620,12 @@ bool SceneObject::_setFieldRotation( void *object, const char *index, const char
    SceneObject* so = static_cast<SceneObject*>( object );
    if ( so )
    {
+      const char* prevRotation = so->getDataField("rotation", NULL);
       MatrixF txfm( so->getTransform() );
       Con::setData( TypeMatrixRotation, &txfm, 0, 1, &data );
       so->setTransform( txfm );
+      if(strcmp(prevRotation, data) != 0)
+         return true;
    }
    return false;
 }
@@ -621,9 +637,12 @@ bool SceneObject::_setFieldScale( void *object, const char *index, const char *d
    SceneObject* so = static_cast<SceneObject*>( object );
    if ( so )
    {
+      const char* prevScale = so->getDataField("scale", NULL);
       Point3F scale;
       Con::setData( TypePoint3F, &scale, 0, 1, &data );
       so->setScale( scale );
+      if(strcmp(prevScale, data) != 0)
+         return true;
    }
    return false;
 }

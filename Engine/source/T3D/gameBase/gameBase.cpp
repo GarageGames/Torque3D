@@ -662,7 +662,7 @@ void GameBase::initPersistFields()
    addGroup( "Game" );
 
       addProtectedField( "dataBlock", TYPEID< GameBaseData >(), Offset(mDataBlock, GameBase),
-         &setDataBlockProperty, &defaultProtectedGetFn, 
+         &setDataBlockProperty, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Script datablock used for game objects." );
 
    endGroup( "Game" );

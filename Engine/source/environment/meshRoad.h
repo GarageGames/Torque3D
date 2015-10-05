@@ -511,6 +511,12 @@ public:
    static bool smShowRoad;
    static SimObjectPtr<SimSet> smServerMeshRoadSet;   
 
+   /// Called during the writing of the object to allow custom properties to be written.
+   virtual void onTamlCustomWrite( TamlCustomNodes& customNodes );
+
+   /// Called during the reading of the object to allow custom properties to be read.
+   virtual void onTamlCustomRead( const TamlCustomNodes& customNodes );
+
 protected:
 
    void _initMaterial();

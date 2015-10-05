@@ -33,6 +33,9 @@
    #include "core/bitSet.h"
 #endif
 
+#ifndef _TAML_CALLBACKS_H_
+#include "taml/tamlCallbacks.h"
+#endif
 
 class Stream;
 class LightManager;
@@ -226,7 +229,7 @@ class SimPersistID;
 /// set automatically by the console constructor code.
 ///
 /// @nosubgrouping
-class SimObject: public ConsoleObject
+class SimObject: public ConsoleObject, public TamlCallbacks
 {
    public:
    
@@ -298,6 +301,8 @@ class SimObject: public ConsoleObject
       /// Flags internal to the object management system.
       BitSet32    mFlags;
 
+      StringTableEntry    mProgenitorFile;
+
       /// Object we are copying fields from.
       SimObject* mCopySource;
 
@@ -352,7 +357,21 @@ class SimObject: public ConsoleObject
       static bool setProtectedParent(void *object, const char *index, const char *data);
 
       // Object name protected set method
-      static bool setProtectedName(void *object, const char *index, const char *data);
+      static bool setProtectedName(void *obj, const char *index, const char *data);
+
+   public:
+      inline void setProgenitorFile( const char* pFile ) { mProgenitorFile = StringTable->insert( pFile ); }
+      inline StringTableEntry getProgenitorFile( void ) const { return mProgenitorFile; }
+
+   protected:
+      /// Taml callbacks.
+      virtual void onTamlPreWrite( void ) {}
+      virtual void onTamlPostWrite( void ) {}
+      virtual void onTamlPreRead( void ) {}
+      virtual void onTamlPostRead( const TamlCustomNodes& customNodes ) {}
+      virtual void onTamlAddParent( SimObject* pParentObject ) {}
+      virtual void onTamlCustomWrite( TamlCustomNodes& customNodes ) {}
+      virtual void onTamlCustomRead( const TamlCustomNodes& customNodes );
 
    protected:
    
@@ -1001,6 +1020,120 @@ class SimObjectPtr : public WeakRefPtr< T >
       {
          set(obj ? obj->getWeakReference() : (WeakRefBase::WeakReference *)NULL);
       }
+};
+
+struct DefaultNonEmptyStringWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      const char* value = static_cast<SimObject*>(obj)->getDataField(pFieldName, idx);
+      return value != NULL && dStricmp(value, "") != 0;
+   }
+};
+
+struct DefaultValueWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   const char* defaultValue;
+   DefaultValueWriteFn(const char* _val) : defaultValue(_val) {}
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      const char* value = static_cast<SimObject*>(obj)->getDataField(pFieldName, idx);
+      return dStricmp(value, defaultValue) != 0;
+   }
+};
+
+struct DefaultFloatWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   F32 defaultValue;
+   DefaultFloatWriteFn(F32 _val) : defaultValue(_val) {}
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      const char* value = static_cast<SimObject*>(obj)->getDataField(pFieldName, idx);
+      return dAtof(value) != defaultValue;
+   }
+};
+
+struct DefaultIntWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   S32 defaultValue;
+   DefaultIntWriteFn(S32 _val) : defaultValue(_val) {}
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      const char* value = static_cast<SimObject*>(obj)->getDataField(pFieldName, idx);
+      return dAtoi(value) != defaultValue;
+   }
+};
+
+struct DefaultUintWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   U32 defaultValue;
+   DefaultUintWriteFn(U32 _val) : defaultValue(_val) {}
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      const char* value = static_cast<SimObject*>(obj)->getDataField(pFieldName, idx);
+      return dAtoui(value) != defaultValue;
+   }
+};
+
+struct DefaultBoolWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   bool defaultValue;
+   DefaultBoolWriteFn(bool _val) : defaultValue(_val) {}
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      const char* value = static_cast<SimObject*>(obj)->getDataField(pFieldName, idx);
+      return dAtob(value) != defaultValue;
+   }
+};
+
+template<typename C, typename T >
+struct PublicMemberWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   T C::*pField;
+   T defaultValue;
+   PublicMemberWriteFn(T _val, T C::*_field ) : defaultValue(_val), pField(_field) {}
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      C* instance = static_cast<C*>(obj);
+      return instance->*pField != defaultValue;
+   }
+};
+
+template<typename C, typename T >
+struct PublicMethodWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   T (C::*method)(void);
+   T defaultValue;
+   PublicMethodWriteFn(T _val, T (C::*_method)(void) ) : defaultValue(_val), method(_method) {}
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      C* instance = static_cast<C*>(obj);
+      return (instance->*method)() != defaultValue;
+   }
+};
+
+template<typename C, typename T >
+struct PublicConstMethodWriteFn : public AbstractClassRep::WriteDataNotify
+{
+   T (C::*method)(void) const;
+   T defaultValue;
+   PublicConstMethodWriteFn(T _val, T (C::*_method)(void) const ) : defaultValue(_val), method(_method) {}
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      C* instance = static_cast<C*>(obj);
+      return (instance->*method)() != defaultValue;
+   }
+};
+
+template<typename C>
+struct PublicStringMemberWriteFn : public PublicMemberWriteFn<C, const char*>
+{
+   PublicStringMemberWriteFn(const char* _val, const char* C::*_field ) : PublicMemberWriteFn<C, const char*>(_val, _field) {}
+   bool fn(void* obj, StringTableEntry pFieldName, const char* idx = NULL) const
+   {
+      C* instance = static_cast<C*>(obj);
+      return instance->*pField != NULL && dStricmp(instance->*pField, defaultValue) != 0;
+   }
 };
 
 #endif // _SIMOBJECT_H_

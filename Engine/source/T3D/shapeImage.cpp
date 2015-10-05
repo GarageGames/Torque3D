@@ -780,7 +780,7 @@ void ShapeBaseImageData::initPersistFields()
       "@see casing");
 
    // State arrays
-   addArray( "States", MaxStates );
+   addArray( "States", "State", MaxStates );
 
       addField( "stateName", TypeCaseString, Offset(stateName, ShapeBaseImageData), MaxStates,
          "Name of this state." );

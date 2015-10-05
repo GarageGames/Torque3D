@@ -2719,7 +2719,7 @@ void WorldEditor::initPersistFields()
       addField( "boundingBoxCollision",   TypeBool,   Offset(mBoundingBoxCollision, WorldEditor) );
       addField( "objectMeshCollision",    TypeBool,   Offset(mObjectMeshCollision, WorldEditor) );
       addField( "selectionLocked",        TypeBool,   Offset(mSelectionLocked, WorldEditor) );   
-      addProtectedField( "objectsUseBoxCenter", TypeBool, Offset(mObjectsUseBoxCenter, WorldEditor), &setObjectsUseBoxCenter, &defaultProtectedGetFn, "" );
+      addProtectedField( "objectsUseBoxCenter", TypeBool, Offset(mObjectsUseBoxCenter, WorldEditor), &setObjectsUseBoxCenter, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "" );
 
    endGroup( "Selections" );
    

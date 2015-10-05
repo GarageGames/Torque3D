@@ -1119,7 +1119,7 @@ void TerrainBlock::initPersistFields()
    addGroup( "Media" );
       
       addProtectedField( "terrainFile", TypeStringFilename, Offset( mTerrFileName, TerrainBlock ), 
-         &TerrainBlock::_setTerrainFile, &defaultProtectedGetFn,
+         &TerrainBlock::_setTerrainFile, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "The source terrain data file." );
 
    endGroup( "Media" );
@@ -1130,19 +1130,19 @@ void TerrainBlock::initPersistFields()
          "Allows the terrain to cast shadows onto itself and other objects."); 
    
       addProtectedField( "squareSize", TypeF32, Offset( mSquareSize, TerrainBlock ),
-         &TerrainBlock::_setSquareSize, &defaultProtectedGetFn,
+         &TerrainBlock::_setSquareSize, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Indicates the spacing between points on the XY plane on the terrain." );
 
       addProtectedField( "baseTexSize", TypeS32, Offset( mBaseTexSize, TerrainBlock ),
-         &TerrainBlock::_setBaseTexSize, &defaultProtectedGetFn,
+         &TerrainBlock::_setBaseTexSize, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Size of base texture size per meter." );
 
       addProtectedField("baseTexFormat", TYPEID<baseTexFormat>(), Offset(mBaseTexFormat, TerrainBlock),
-         &TerrainBlock::_setBaseTexFormat, &defaultProtectedGetFn,
+		  &TerrainBlock::_setBaseTexFormat, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "");
 
       addProtectedField( "lightMapSize", TypeS32, Offset( mLightMapSize, TerrainBlock ),
-         &TerrainBlock::_setLightMapSize, &defaultProtectedGetFn,
+         &TerrainBlock::_setLightMapSize, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Light map dimensions in pixels." );
 
       addField( "screenError", TypeS32, Offset( mScreenError, TerrainBlock ), "Not yet implemented." );

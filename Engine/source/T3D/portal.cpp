@@ -150,10 +150,10 @@ void Portal::initPersistFields()
    addGroup( "Zoning" );
 
       addProtectedField( "frontSidePassable", TypeBool, Offset( mPassableSides[ FrontSide ], Portal ),
-         &_setFrontSidePassable, &defaultProtectedGetFn,
+         &_setFrontSidePassable, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Whether one can view through the front-side of the portal." );
       addProtectedField( "backSidePassable", TypeBool, Offset( mPassableSides[ BackSide ], Portal ),
-         &_setBackSidePassable, &defaultProtectedGetFn,
+         &_setBackSidePassable, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Whether one can view through the back-side of the portal." );
 
    endGroup( "Zoning" );

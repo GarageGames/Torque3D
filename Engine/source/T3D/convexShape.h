@@ -199,6 +199,12 @@ public:
       void renderFaceEdges( S32 faceid, const ColorI &color = ColorI::WHITE, F32 lineWidth = 1.0f );
 
    /// @}
+      
+   /// Called during the writing of the object to allow custom properties to be written.
+   virtual void onTamlCustomWrite( TamlCustomNodes& customNodes );
+
+   /// Called during the reading of the object to allow custom properties to be read.
+   virtual void onTamlCustomRead( const TamlCustomNodes& customNodes );
 
 protected:
 

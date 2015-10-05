@@ -36,9 +36,9 @@
 #endif // _TVECTOR_H_
 
 
-class TiXmlDocument;
-class TiXmlElement;
-class TiXmlAttribute;
+class fsTiXmlDocument;
+class fsTiXmlElement;
+class fsTiXmlAttribute;
 
 
 class SimXMLDocument: public SimObject
@@ -136,11 +136,11 @@ class SimXMLDocument: public SimObject
       
    private:
       // Document.
-      TiXmlDocument* m_qDocument;
+      fsTiXmlDocument* m_qDocument;
       // Stack of nodes.
-      Vector<TiXmlElement*> m_paNode;
+      Vector<fsTiXmlElement*> m_paNode;
 	  // The current attribute
-	  TiXmlAttribute* m_CurrentAttribute;
+	  fsTiXmlAttribute* m_CurrentAttribute;
 
    public:
       DECLARE_CONOBJECT(SimXMLDocument);

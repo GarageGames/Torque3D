@@ -89,13 +89,15 @@ DefineEngineMethod( GuiTextCtrl, setTextID, void, (const char* textID),,
 
 void GuiTextCtrl::initPersistFields()
 {
-   addProtectedField("text", TypeCaseString, Offset(mInitialText, GuiTextCtrl), setText, getTextProperty,
+   addProtectedField("text", TypeCaseString, Offset(mInitialText, GuiTextCtrl), setText, getTextProperty, new AbstractClassRep::WriteDataNotify(),
       "The text to show on the control.");
 
-   addField( "textID",     TypeString,      Offset( mInitialTextID, GuiTextCtrl ),
+   addField( "textID",     TypeString,      Offset( mInitialTextID, GuiTextCtrl ), 
+      new PublicStringMemberWriteFn<GuiTextCtrl>("", &GuiTextCtrl::mInitialTextID),
       "Maps the text of this control to a variable used in localization, rather than raw text.");   
 
-   addField( "maxLength",  TypeS32,         Offset( mMaxStrLen, GuiTextCtrl ),
+   addField( "maxLength",  TypeS32,         Offset( mMaxStrLen, GuiTextCtrl ), 
+      new DefaultUintWriteFn(1024),
       "Defines the maximum length of the text.  The default is 1024." );
 
    Parent::initPersistFields();    

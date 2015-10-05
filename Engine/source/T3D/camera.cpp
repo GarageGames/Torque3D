@@ -1362,7 +1362,7 @@ void Camera::initPersistFields()
 {
    addGroup( "Camera" );
       addProtectedField( "controlMode", TYPEID< CameraMotionMode >(), Offset( mMode, Camera ),
-         &_setModeField, &defaultProtectedGetFn,
+         &_setModeField, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "The current camera control mode." );
    endGroup( "Camera" );
 
@@ -1371,19 +1371,19 @@ void Camera::initPersistFields()
          "Apply smoothing (acceleration and damping) to camera movements." );
       addField( "newtonRotation",           TypeBool,   Offset(mNewtonRotation, Camera),
          "Apply smoothing (acceleration and damping) to camera rotations." );
-      addProtectedField( "mass",            TypeF32,    Offset(mMass, Camera),            &_setNewtonField, &defaultProtectedGetFn,
+      addProtectedField( "mass",            TypeF32,    Offset(mMass, Camera),            &_setNewtonField, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "The camera's mass (Newton mode only).  Default value is 10." );
-      addProtectedField( "drag",            TypeF32,    Offset(mDrag, Camera),            &_setNewtonField, &defaultProtectedGetFn,
+      addProtectedField( "drag",            TypeF32,    Offset(mDrag, Camera),            &_setNewtonField, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Drag on camera when moving (Newton mode only).  Default value is 2." );
-      addProtectedField( "force",           TypeF32,    Offset(mFlyForce, Camera),        &_setNewtonField, &defaultProtectedGetFn,
+      addProtectedField( "force",           TypeF32,    Offset(mFlyForce, Camera),        &_setNewtonField, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Force applied on camera when asked to move (Newton mode only).  Default value is 500." );
-      addProtectedField( "angularDrag",     TypeF32,    Offset(mAngularDrag, Camera),     &_setNewtonField, &defaultProtectedGetFn,
+      addProtectedField( "angularDrag",     TypeF32,    Offset(mAngularDrag, Camera),     &_setNewtonField, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Drag on camera when rotating (Newton mode only).  Default value is 2." );
-      addProtectedField( "angularForce",    TypeF32,    Offset(mAngularForce, Camera),    &_setNewtonField, &defaultProtectedGetFn,
+      addProtectedField( "angularForce",    TypeF32,    Offset(mAngularForce, Camera),    &_setNewtonField, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Force applied on camera when asked to rotate (Newton mode only).  Default value is 100." );
-      addProtectedField( "speedMultiplier", TypeF32,    Offset(mSpeedMultiplier, Camera), &_setNewtonField, &defaultProtectedGetFn,
+      addProtectedField( "speedMultiplier", TypeF32,    Offset(mSpeedMultiplier, Camera), &_setNewtonField, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Speed multiplier when triggering the accelerator (Newton mode only).  Default value is 2." );
-      addProtectedField( "brakeMultiplier", TypeF32,    Offset(mBrakeMultiplier, Camera), &_setNewtonField, &defaultProtectedGetFn,
+      addProtectedField( "brakeMultiplier", TypeF32,    Offset(mBrakeMultiplier, Camera), &_setNewtonField, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Speed multiplier when triggering the brake (Newton mode only).  Default value is 2." );
    endGroup( "Camera: Newton Mode" );
 

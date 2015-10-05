@@ -210,7 +210,7 @@ void Material::initPersistFields()
    addField("mapTo", TypeRealString, Offset(mMapTo, Material),
       "Used to map this material to the material name used by TSShape." );
 
-   addArray( "Stages", MAX_STAGES );
+   addArray( "Stages", "Stage", MAX_STAGES );
 
       addField("diffuseColor", TypeColorF, Offset(mDiffuse, Material), MAX_STAGES,
          "This color is multiplied against the diffuse texture color.  If no diffuse texture "
@@ -260,7 +260,7 @@ void Material::initPersistFields()
          "work with your normal map, unless you are also using a specular map." );
 
       addProtectedField( "accuEnabled", TYPEID< bool >(), Offset( mAccuEnabled, Material ),
-            &_setAccuEnabled, &defaultProtectedGetFn, MAX_STAGES, "Accumulation texture." );
+            &_setAccuEnabled, &defaultProtectedGetFn, &DefaultBoolWriteFn(false), MAX_STAGES, "Accumulation texture." );
 
       addField("accuScale",      TypeF32, Offset(mAccuScale, Material), MAX_STAGES,
          "The scale that is applied to the accu map texture. You can use this to fit the texture to smaller or larger objects.");
@@ -367,22 +367,22 @@ void Material::initPersistFields()
       // an empty string and writes only apply if the value is not empty.
       //
       addProtectedField("baseTex",        TypeImageFilename,   Offset(mDiffuseMapFilename, Material), 
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, new AbstractClassRep::WriteDataNotify(), MAX_STAGES, 
          "For backwards compatibility.\n@see diffuseMap\n" ); 
       addProtectedField("detailTex",      TypeImageFilename,   Offset(mDetailMapFilename, Material), 
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, new AbstractClassRep::WriteDataNotify(), MAX_STAGES, 
          "For backwards compatibility.\n@see detailMap\n"); 
       addProtectedField("overlayTex",     TypeImageFilename,   Offset(mOverlayMapFilename, Material),
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, new AbstractClassRep::WriteDataNotify(), MAX_STAGES, 
          "For backwards compatibility.\n@see overlayMap\n"); 
       addProtectedField("bumpTex",        TypeImageFilename,   Offset(mNormalMapFilename, Material),
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, new AbstractClassRep::WriteDataNotify(), MAX_STAGES, 
          "For backwards compatibility.\n@see normalMap\n"); 
       addProtectedField("envTex",         TypeImageFilename,   Offset(mEnvMapFilename, Material),
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, new AbstractClassRep::WriteDataNotify(), MAX_STAGES,
          "For backwards compatibility.\n@see envMap\n"); 
       addProtectedField("colorMultiply",  TypeColorF,          Offset(mDiffuse, Material),
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
+         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, new AbstractClassRep::WriteDataNotify(), MAX_STAGES,
          "For backwards compatibility.\n@see diffuseColor\n"); 
 
    endArray( "Stages" );

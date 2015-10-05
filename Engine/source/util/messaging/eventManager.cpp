@@ -125,7 +125,7 @@ EventManager::~EventManager()
 //-----------------------------------------------------------------------------
 void EventManager::initPersistFields()
 {
-   addProtectedField( "queue", TypeString, Offset( mQueue, EventManager ), &_setMessageQueue, &defaultProtectedGetFn, "List of events currently waiting" );
+   addProtectedField( "queue", TypeString, Offset( mQueue, EventManager ), &_setMessageQueue, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "List of events currently waiting" );
 }
 
 //-----------------------------------------------------------------------------

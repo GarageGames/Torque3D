@@ -72,7 +72,7 @@ void SceneZoneSpace::initPersistFields()
    addGroup( "Zoning" );
 
       addProtectedField( "zoneGroup", TypeS32, Offset( mZoneGroup, SceneZoneSpace ),
-         &_setZoneGroup, &defaultProtectedGetFn,
+         &_setZoneGroup, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "ID of group the zone is part of." );
 
    endGroup( "Zoning" );

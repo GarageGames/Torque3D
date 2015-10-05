@@ -52,8 +52,8 @@ FieldBrushObject::FieldBrushObject()
 void FieldBrushObject::initPersistFields()
 {
     // Add Fields.
-    addProtectedField("description", TypeCaseString, Offset(mDescription, FieldBrushObject), setDescription, defaultProtectedGetFn, "");
-    addProtectedField("sortName", TypeString, Offset(mSortName, FieldBrushObject), setSortName, defaultProtectedGetFn, "");
+    addProtectedField("description", TypeCaseString, Offset(mDescription, FieldBrushObject), setDescription, defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "");
+    addProtectedField("sortName", TypeString, Offset(mSortName, FieldBrushObject), setSortName, defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "");
 
     // Call Parent.
     Parent::initPersistFields();

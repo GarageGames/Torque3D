@@ -51,6 +51,7 @@
 #include "T3D/physics/physicsBody.h"
 #include "T3D/physics/physicsCollision.h"
 #include "environment/nodeListManager.h"
+#include "taml/tamlCustom.h"
 
 #define MIN_METERS_PER_SEGMENT 1.0f
 #define MIN_NODE_DEPTH 0.25f
@@ -654,7 +655,7 @@ void MeshRoad::initPersistFields()
 
    addGroup( "Internal" );
 
-      addProtectedField( "Node", TypeString, NULL, &addNodeFromField, &emptyStringProtectedGetFn, 
+      addProtectedField( "Node", TypeString, NULL, &addNodeFromField, &emptyStringProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Do not modify, for internal use." );
 
    endGroup( "Internal" );
@@ -2426,6 +2427,138 @@ void MeshRoad::regenerate()
 {
    _regenerate();
    setMaskBits( RegenMask );
+}
+
+static StringTableEntry nodesCustomNodeName = StringTable->insert("Nodes");
+static StringTableEntry nodeNodeName = StringTable->insert("Node");
+static StringTableEntry nodeDepthName = StringTable->insert("Depth");
+static StringTableEntry nodeNormalName = StringTable->insert("Normal");
+static StringTableEntry nodePointName = StringTable->insert("Point");
+static StringTableEntry nodeWidthName = StringTable->insert("Width");
+
+void MeshRoad::onTamlCustomWrite( TamlCustomNodes& customNodes )
+{
+   // Debug Profiling.
+   PROFILE_SCOPE(MeshRoad_OnTamlCustomWrite);
+
+   // Call parent.
+   Parent::onTamlCustomWrite( customNodes );
+
+   if (mNodes.size() > 0)
+   {
+      // Add cell custom node.
+      TamlCustomNode* pCustomCellNodes = customNodes.addNode( nodesCustomNodeName );
+
+      // Iterate explicit frames.
+      for( MeshRoadNodeVector::iterator nodeItr = mNodes.begin(); nodeItr != mNodes.end(); ++nodeItr )
+      {
+         // Add cell alias.
+         TamlCustomNode* pNode = pCustomCellNodes->addNode( nodeNodeName );
+         
+         // Add cell properties.
+         pNode->addField( nodeDepthName, nodeItr->depth );
+         pNode->addField( nodeNormalName, nodeItr->normal );
+         pNode->addField( nodePointName, nodeItr->point );
+         pNode->addField( nodeWidthName, nodeItr->width );
+      }
+   }
+}
+
+void MeshRoad::onTamlCustomRead( const TamlCustomNodes& customNodes )
+{
+   // Debug Profiling.
+   PROFILE_SCOPE(MeshRoad_OnTamlCustomRead);
+
+   // Call parent.
+   Parent::onTamlCustomRead( customNodes );
+
+   // Find cell custom node.
+   const TamlCustomNode* pCustomCellNodes = customNodes.findNode( nodesCustomNodeName );
+
+   // Continue if we have explicit cells.
+   if ( pCustomCellNodes != NULL )
+   {
+      // Fetch children cell nodes.
+      const TamlCustomNodeVector& cellNodes = pCustomCellNodes->getChildren();
+
+      // Iterate cells.
+      for( TamlCustomNodeVector::const_iterator cellNodeItr = cellNodes.begin(); cellNodeItr != cellNodes.end(); ++cellNodeItr )
+      {
+         // Fetch cell node.
+         TamlCustomNode* pCellNode = *cellNodeItr;
+
+         // Fetch node name.
+         StringTableEntry nodeName = pCellNode->getNodeName();
+
+         // Is this a valid alias?
+         if ( nodeName != nodeNodeName )
+         {
+            // No, so warn.
+            Con::warnf( "MeshRoad::onTamlCustomRead() - Encountered an unknown custom name of '%s'.  Only '%s' is valid.", nodeName, nodeNodeName );
+            continue;
+         }
+
+         F32 depth;
+         VectorF normal;
+         Point3F point;
+         F32 width;
+
+         // Fetch fields.
+         const TamlCustomFieldVector& fields = pCellNode->getFields();
+
+         // Iterate property fields.
+         for ( TamlCustomFieldVector::const_iterator fieldItr = fields.begin(); fieldItr != fields.end(); ++fieldItr )
+         {
+            // Fetch field.
+            const TamlCustomField* pField = *fieldItr;
+
+            // Fetch field name.
+            StringTableEntry fieldName = pField->getFieldName();
+
+            // Check common fields.
+            if ( fieldName == nodeDepthName )
+            {
+               pField->getFieldValue( depth );
+            }
+            else if ( fieldName == nodeNormalName )
+            {
+               pField->getFieldValue( normal );
+            }
+            else if ( fieldName == nodePointName )
+            {
+               pField->getFieldValue( point );
+            }
+            else if ( fieldName == nodeWidthName )
+            {
+               pField->getFieldValue( width );
+            }
+            else
+            {
+               // Unknown name so warn.
+               Con::warnf( "MeshRoad::onTamlCustomRead() - Encountered an unknown custom field name of '%s'.", fieldName );
+               continue;
+            }
+         }
+
+         // Is cell width valid?
+         if ( depth <= 0 )
+         {
+            // No, so warn.
+            Con::warnf( "MeshRoad::onTamlCustomRead() - Depth of '%d' is invalid or was not set.", depth );
+            continue;
+         }
+
+         // Is cell height valid?
+         if ( width <= 0 )
+         {
+            // No, so warn.
+            Con::warnf( "MeshRoad::onTamlCustomRead() - Width height of '%d' is invalid or was not set.", width );
+            continue;
+         }
+
+         _addNode( point, width, depth, normal );
+      }
+   }
 }
 
 //-------------------------------------------------------------------------

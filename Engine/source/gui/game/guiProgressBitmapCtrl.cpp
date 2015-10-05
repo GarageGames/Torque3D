@@ -130,7 +130,7 @@ GuiProgressBitmapCtrl::GuiProgressBitmapCtrl()
 void GuiProgressBitmapCtrl::initPersistFields()
 {
    addProtectedField( "bitmap", TypeFilename, Offset( mBitmapName, GuiProgressBitmapCtrl ),
-      _setBitmap, defaultProtectedGetFn,
+      _setBitmap, defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "~Path to the bitmap file to use for rendering the progress bar.\n\n"
       "If the profile assigned to the control already has a bitmap assigned, this property need not be "
       "set in which case the bitmap from the profile is used."

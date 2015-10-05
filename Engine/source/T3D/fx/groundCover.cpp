@@ -546,11 +546,11 @@ void GroundCover::initPersistFields()
       addField( "shapeCullRadius", TypeF32,        Offset( mShapeCullRadius, GroundCover ),     "This is the distance at which DTS elements are  completely culled out." );      
       addField( "shapesCastShadows", TypeBool,     Offset( mShapesCastShadows, GroundCover ),   "Whether DTS elements should cast shadows or not." );
 
-      addArray( "Types", MAX_COVERTYPES );
+      addArray( "Types", "Type", MAX_COVERTYPES );
 
          addField( "billboardUVs",  TypeRectUV,    Offset( mBillboardRects, GroundCover ), MAX_COVERTYPES,  "Subset material UV coordinates for this cover billboard." );
 
-         addField( "shapeFilename", TypeFilename,  Offset( mShapeFilenames, GroundCover ), MAX_COVERTYPES,  "The cover shape filename. [Optional]" );
+         addField( "shapeFilename", TypeFilename,  Offset( mShapeFilenames, GroundCover ), new DefaultNonEmptyStringWriteFn(), MAX_COVERTYPES,  "The cover shape filename. [Optional]" );
 
          addField( "layer",         TypeTerrainMaterialName, Offset( mLayer, GroundCover ), MAX_COVERTYPES, "Terrain material name to limit coverage to, or blank to not limit." );
 

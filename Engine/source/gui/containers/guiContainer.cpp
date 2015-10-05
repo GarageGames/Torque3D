@@ -84,13 +84,19 @@ void GuiContainer::initPersistFields()
    
    addGroup( "Layout" );
 
-      addProtectedField("docking",  TYPEID< Docking::DockingType >(),   Offset(mSizingOptions.mDocking, GuiContainer), &setDockingField, &defaultProtectedGetFn, "" );
-      addField("margin",         TypeRectSpacingI, Offset(mSizingOptions.mPadding, GuiContainer));
-      addField("padding",        TypeRectSpacingI, Offset(mSizingOptions.mInternalPadding, GuiContainer));
-      addField("anchorTop",      TypeBool,          Offset(mSizingOptions.mAnchorTop, GuiContainer));
-      addField("anchorBottom",   TypeBool,          Offset(mSizingOptions.mAnchorBottom, GuiContainer));
-      addField("anchorLeft",     TypeBool,          Offset(mSizingOptions.mAnchorLeft, GuiContainer));
-      addField("anchorRight",    TypeBool,          Offset(mSizingOptions.mAnchorRight, GuiContainer));
+      addProtectedField("docking",  TYPEID< Docking::DockingType >(),   Offset(mSizingOptions.mDocking, GuiContainer), &setDockingField, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "" );
+      addField("margin",         TypeRectSpacingI, Offset(mSizingOptions.mPadding, GuiContainer), 
+         new DefaultValueWriteFn("0 0 0 0"));
+      addField("padding",        TypeRectSpacingI, Offset(mSizingOptions.mInternalPadding, GuiContainer), 
+         new DefaultValueWriteFn("0 0 0 0"));
+      addField("anchorTop",      TypeBool,          Offset(mSizingOptions.mAnchorTop, GuiContainer), 
+         new DefaultBoolWriteFn(true));
+      addField("anchorBottom",   TypeBool,          Offset(mSizingOptions.mAnchorBottom, GuiContainer), 
+         new DefaultBoolWriteFn(false));
+      addField("anchorLeft",     TypeBool,          Offset(mSizingOptions.mAnchorLeft, GuiContainer), 
+         new DefaultBoolWriteFn(true));
+      addField("anchorRight",    TypeBool,          Offset(mSizingOptions.mAnchorRight, GuiContainer), 
+         new DefaultBoolWriteFn(false));
       
    endGroup( "Layout" );
 

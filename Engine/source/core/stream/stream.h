@@ -30,6 +30,7 @@
 #include "core/util/endian.h"
 #endif
 
+#include <core/strings/stringFunctions.h>
 
 /// @defgroup stream_overload Primitive Type Stream Operation Overloads
 /// These macros declare the read and write functions for all primitive types.
@@ -130,11 +131,20 @@ public:
    /// writeString is safer.
    void writeLongString(U32 maxStringLen, const char *string);
 
+   inline bool Put( char character ) { return write( character ); }
+
    /// Write raw text to the stream
    void writeText(const char *text);
 
    /// Writes a string to the stream.
    virtual void writeString(const char *stringBuf, S32 maxLen=255);
+
+   /// Writes a formatted buffer to the stream.
+   /// NOTE: A maximum string length of 4K is allowed.
+   bool writeFormattedBuffer(const char *format, ...);
+
+   /// Writes a NULL terminated string buffer.
+   bool writeStringBuffer(const char* buffer) { return write( dStrlen(buffer), buffer ); }
 
    // read/write real strings
    void write(const String & str) { _write(str); }
@@ -175,6 +185,7 @@ public:
 
    DECLARE_OVERLOADED_WRITE(S8)
    DECLARE_OVERLOADED_WRITE(U8)
+   DECLARE_OVERLOADED_WRITE(UTF8)
 
    DECLARE_OVERLOADED_WRITE(S16)
    DECLARE_OVERLOADED_WRITE(S32)

@@ -235,7 +235,7 @@ void AdvancedLightManager::_initLightFields()
 
    #define ADD_LIGHT_FIELD( field, type, var, desc )                       \
    ConsoleObject::addProtectedField( field, type, 0,                       \
-      &Dummy::_set##var##Field, &Dummy::_get##var##Field, desc )
+      &Dummy::_set##var##Field, &Dummy::_get##var##Field, new AbstractClassRep::WriteDataNotify(), desc )
 
    // Our dummy adaptor class which we hide in here
    // to keep from poluting the global namespace.

@@ -153,7 +153,7 @@ void AITurretShapeData::initPersistFields()
       "If value <= 0, don't lead target.\n");
 
    // State arrays
-   addArray( "States", MaxStates );
+   addArray( "States", "State", MaxStates );
 
       addField( "stateName", TypeCaseString, Offset(stateName, AITurretShapeData), MaxStates,
          "Name of this state." );

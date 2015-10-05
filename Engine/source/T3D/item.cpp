@@ -1297,8 +1297,8 @@ bool Item::_setRotate(void *object, const char *index, const char *data)
 void Item::initPersistFields()
 {
    addGroup("Misc");	
-   addProtectedField("static", TypeBool, Offset(mStatic, Item), &_setStatic, &defaultProtectedGetFn, "If true, the object is not moving in the world.\n");
-   addProtectedField("rotate", TypeBool, Offset(mRotate, Item), &_setRotate, &defaultProtectedGetFn, "If true, the object will automatically rotate around its Z axis.\n");
+   addProtectedField("static", TypeBool, Offset(mStatic, Item), &_setStatic, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "If true, the object is not moving in the world.\n");
+   addProtectedField("rotate", TypeBool, Offset(mRotate, Item), &_setRotate, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(), "If true, the object will automatically rotate around its Z axis.\n");
    endGroup("Misc");
 
    Parent::initPersistFields();

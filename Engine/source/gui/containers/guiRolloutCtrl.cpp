@@ -97,7 +97,7 @@ void GuiRolloutCtrl::initPersistFields()
          "Margin to put around child control." );
       addField( "defaultHeight", TypeS32, Offset( mDefaultHeight, GuiRolloutCtrl ),
          "Default height of the client area.  This is used when no child control has been added to the rollout." );
-      addProtectedField( "expanded", TypeBool, Offset( mIsExpanded, GuiRolloutCtrl), &setExpanded, &defaultProtectedGetFn,
+      addProtectedField( "expanded", TypeBool, Offset( mIsExpanded, GuiRolloutCtrl), &setExpanded, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "The current rollout expansion state." );
       addField( "clickCollapse", TypeBool, Offset( mCanCollapse, GuiRolloutCtrl ),
          "Whether the rollout can be collapsed by clicking its header." );

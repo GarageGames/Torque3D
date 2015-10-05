@@ -191,7 +191,7 @@ void CloudLayer::initPersistFields()
       addField( "texture", TypeImageFilename, Offset( mTextureName, CloudLayer ),
          "An RGBA texture which should contain normals and opacity (density)." );
 
-      addArray( "Textures", TEX_COUNT );
+      addArray( "Textures", "Texture", TEX_COUNT );
 
          addField( "texScale", TypeF32, Offset( mTexScale, CloudLayer ), TEX_COUNT,
             "Controls the texture repeat of this slot." );

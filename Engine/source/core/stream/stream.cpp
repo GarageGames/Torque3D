@@ -65,6 +65,7 @@
 
 IMPLEMENT_OVERLOADED_WRITE(S8)
 IMPLEMENT_OVERLOADED_WRITE(U8)
+IMPLEMENT_OVERLOADED_WRITE(UTF8)
 
 IMPLEMENT_ENDIAN_OVERLOADED_WRITE(S16)
 IMPLEMENT_ENDIAN_OVERLOADED_WRITE(S32)
@@ -121,6 +122,15 @@ void Stream::writeString(const char *string, S32 maxLen)
    write(U8(len));
    if(len)
       write(len, string);
+}
+
+bool Stream::writeFormattedBuffer(const char *format, ...)
+{
+   char buffer[4096];
+   va_list args;
+   va_start(args, format);
+   const S32 length = dVsprintf(buffer, sizeof(buffer), format, args);
+   return write( length, buffer );
 }
 
 void Stream::readString(char buf[256])

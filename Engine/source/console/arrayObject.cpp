@@ -135,7 +135,7 @@ void ArrayObject::initPersistFields()
       "Makes the keys and values case-sensitive.\n"
       "By default, comparison of key and value strings will be case-insensitive." );
 
-   addProtectedField( "key", TypeCaseString, NULL, &_addKeyFromField, &emptyStringProtectedGetFn, 
+   addProtectedField( "key", TypeCaseString, NULL, &_addKeyFromField, &emptyStringProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "Helper field which allows you to add new key['keyname'] = value pairs." );
 
    Parent::initPersistFields();

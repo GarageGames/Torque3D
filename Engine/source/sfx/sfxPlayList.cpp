@@ -245,7 +245,7 @@ void SFXPlayList::initPersistFields()
          "list for playback.  Only slots that have a valid #track assigned will be considered for "
          "this." );
    
-      addArray( "slots", NUM_SLOTS );
+      addArray( "Slots", "Slot", NUM_SLOTS );
       
          addField( "track",                  TypeSFXTrackName, Offset( mSlots.mTrack, SFXPlayList ), NUM_SLOTS,
             "Track to play in this slot.\n"

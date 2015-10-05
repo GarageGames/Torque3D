@@ -114,7 +114,7 @@ void GuiTabBookCtrl::initPersistFields()
          "Index of page to select on first onWake() call (-1 to disable)." );
 
       addProtectedField( "selectedPage", TypeS32, Offset( mSelectedPageNum, GuiTabBookCtrl ),
-         &_setSelectedPage, &defaultProtectedGetFn,
+         &_setSelectedPage, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Index of currently selected page." );
 
       addField( "frontTabPadding", TypeS32, Offset( mFrontTabPadding, GuiTabBookCtrl ),

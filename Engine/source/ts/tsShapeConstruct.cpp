@@ -268,7 +268,7 @@ void TSShapeConstructor::initPersistFields()
    endGroup( "Collada" );
 
    addGroup( "Sequences" );
-   addProtectedField( "sequence", TypeStringFilename, NULL, &addSequenceFromField, &emptyStringProtectedGetFn,
+   addProtectedField( "sequence", TypeStringFilename, NULL, &addSequenceFromField, &emptyStringProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "Legacy method of adding sequences to a DTS or DAE shape after loading.\n\n"
       "@tsexample\n"
       "singleton TSShapeConstructor(MyShapeDae)\n"

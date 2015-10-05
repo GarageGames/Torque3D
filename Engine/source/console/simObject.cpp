@@ -34,6 +34,7 @@
 #include "core/frameAllocator.h"
 #include "core/stream/fileStream.h"
 #include "core/fileObject.h"
+#include <taml/tamlCustom.h>
 
 
 IMPLEMENT_CONOBJECT( SimObject );
@@ -88,6 +89,8 @@ SimObject::SimObject()
 
    mCopySource = NULL;
    mPersistentId = NULL;
+   
+   mProgenitorFile      = CodeBlock::getCurrentCodeBlockFullPath();
 }
 
 //-----------------------------------------------------------------------------
@@ -135,6 +138,7 @@ void SimObject::initPersistFields()
    addGroup( "Ungrouped" );
 
       addProtectedField( "name", TypeName, Offset(objectName, SimObject), &setProtectedName, &defaultProtectedGetFn, 
+         new PublicStringMemberWriteFn<SimObject>(StringTable->EmptyString(), &SimObject::objectName),
          "Optional global name of this object." );
                   
    endGroup( "Ungrouped" );
@@ -142,19 +146,24 @@ void SimObject::initPersistFields()
    addGroup( "Object" );
 
       addField( "internalName", TypeString, Offset(mInternalName, SimObject), 
+         new PublicStringMemberWriteFn<SimObject>(StringTable->EmptyString(), &SimObject::mInternalName),
          "Optional name that may be used to lookup this object within a SimSet.");
 
       addProtectedField( "parentGroup", TYPEID< SimObject >(), Offset(mGroup, SimObject), &setProtectedParent, &defaultProtectedGetFn, 
+         new PublicMemberWriteFn<SimObject, SimGroup*>(NULL, &SimObject::mGroup),
          "Group hierarchy parent of the object." );
 
-      addProtectedField( "class", TypeString, Offset(mClassName, SimObject), &setClass, &defaultProtectedGetFn,
+      addProtectedField( "class", TypeString, Offset(mClassName, SimObject), &setClass, &defaultProtectedGetFn, 
+         new PublicStringMemberWriteFn<SimObject>(StringTable->EmptyString(), &SimObject::mClassName),
          "Script class of object." );
 
-      addProtectedField( "superClass", TypeString, Offset(mSuperClassName, SimObject), &setSuperClass, &defaultProtectedGetFn,
+      addProtectedField( "superClass", TypeString, Offset(mSuperClassName, SimObject), &setSuperClass, &defaultProtectedGetFn, 
+         new PublicStringMemberWriteFn<SimObject>(StringTable->EmptyString(), &SimObject::mSuperClassName),
          "Script super-class of object." );
 
       // For legacy support
       addProtectedField( "className", TypeString, Offset(mClassName, SimObject), &setClass, &defaultProtectedGetFn,
+         new PublicStringMemberWriteFn<SimObject>(StringTable->EmptyString(), &SimObject::mClassName),
          "Script class of object.", AbstractClassRep::FIELD_HideInInspectors );
 
    endGroup( "Object" );
@@ -162,25 +171,26 @@ void SimObject::initPersistFields()
    addGroup( "Editing" );
    
       addProtectedField( "hidden", TypeBool, NULL,
-         &_setHidden, &_getHidden,
+         &_setHidden, &_getHidden, new DefaultBoolWriteFn(false),
          "Whether the object is visible." );
       addProtectedField( "locked", TypeBool, NULL,
-         &_setLocked, &_getLocked,
+         &_setLocked, &_getLocked, new DefaultBoolWriteFn(false),
          "Whether the object can be edited." );
    
    endGroup( "Editing" );
    
    addGroup( "Persistence" );
-
+   
       addProtectedField( "canSave", TypeBool, Offset( mFlags, SimObject ),
-         &_setCanSave, &_getCanSave,
+         &_setCanSave, &_getCanSave, new PublicConstMethodWriteFn<SimObject, bool>(true, &SimObject::getCanSave),
          "Whether the object can be saved out. If false, the object is purely transient in nature." );
 
       addField( "canSaveDynamicFields", TypeBool, Offset(mCanSaveFieldDictionary, SimObject), 
+         new PublicMemberWriteFn<SimObject, bool>(true, &SimObject::mCanSaveFieldDictionary),
          "True if dynamic fields (added at runtime) should be saved. Defaults to true." );
    
       addProtectedField( "persistentId", TypePID, Offset( mPersistentId, SimObject ),
-         &_setPersistentID, &defaultProtectedGetFn,
+         &_setPersistentID, &defaultProtectedGetFn, new PublicMemberWriteFn<SimObject, SimPersistID*>(NULL, &SimObject::mPersistentId),
          "The universally unique identifier for the object." );
    
    endGroup( "Persistence" );
@@ -438,6 +448,95 @@ SimPersistID* SimObject::getOrCreatePersistentId()
 }
 
 //-----------------------------------------------------------------------------
+
+void SimObject::onTamlCustomRead(TamlCustomNodes const& customNodes)
+{
+   // Debug Profiling.
+   //PROFILE_SCOPE(SimObject_OnTamlCustomRead);
+
+   // Fetch field list.
+   const AbstractClassRep::FieldList& fieldList = getFieldList();
+   const U32 fieldCount = fieldList.size();
+   for( U32 index = 0; index < fieldCount; ++index )
+   {
+      // Fetch field.
+      const AbstractClassRep::Field* pField = &fieldList[index];
+
+      // Ignore if field not appropriate.
+      if( pField->type == AbstractClassRep::StartArrayFieldType || pField->elementCount > 1 )
+      {
+         // Find cell custom node.
+         const TamlCustomNode* pCustomCellNodes = NULL;
+         if( pField->pGroupname != NULL )
+            pCustomCellNodes = customNodes.findNode( pField->pGroupname );
+         if(!pCustomCellNodes)
+         {
+           char* niceFieldName = const_cast<char *>(pField->pFieldname);
+           niceFieldName[0] = dToupper(niceFieldName[0]);
+           String str_niceFieldName = String(niceFieldName);
+           pCustomCellNodes = customNodes.findNode(str_niceFieldName + "s");
+         }
+
+         // Continue if we have explicit cells.
+         if ( pCustomCellNodes != NULL )
+         {
+            // Fetch children cell nodes.
+            const TamlCustomNodeVector& cellNodes = pCustomCellNodes->getChildren();
+
+            U8 idx = 0;
+            // Iterate cells.
+            for( TamlCustomNodeVector::const_iterator cellNodeItr = cellNodes.begin(); cellNodeItr != cellNodes.end(); ++cellNodeItr )
+            {
+               char buf[5];
+               dSprintf(buf,5,"%d",idx);
+
+               // Fetch cell node.
+               TamlCustomNode* pCellNode = *cellNodeItr;
+
+               // Fetch node name.
+               StringTableEntry nodeName = pCellNode->getNodeName();
+
+               // Is this a valid alias?
+               if ( nodeName != pField->pFieldname )
+               {
+                  // No, so warn.
+                  Con::warnf( "SimObject::onTamlCustomRead() - Encountered an unknown custom name of '%s'.  Only '%s' is valid.", nodeName, pField->pFieldname );
+                  continue;
+               }
+
+               // Fetch fields.
+               const TamlCustomFieldVector& fields = pCellNode->getFields();
+
+               // Iterate property fields.
+               for ( TamlCustomFieldVector::const_iterator fieldItr = fields.begin(); fieldItr != fields.end(); ++fieldItr )
+               {
+                  // Fetch field.
+                  const TamlCustomField* pField = *fieldItr;
+
+                  // Fetch field name.
+                  StringTableEntry fieldName = pField->getFieldName();
+
+                  const AbstractClassRep::Field* field = findField(fieldName);
+
+                  // Check common fields.
+                  if ( field )
+                  {
+                     setDataField(fieldName, buf, pField->getFieldValue());
+                  }
+                  else
+                  {
+                     // Unknown name so warn.
+                     Con::warnf( "SimObject::onTamlCustomRead() - Encountered an unknown custom field name of '%s'.", fieldName );
+                     continue;
+                  }
+               }
+
+               idx++;
+            }
+         }
+      }
+   }
+}
 
 bool SimObject::_setPersistentID( void* object, const char* index, const char* data )
 {
@@ -1916,6 +2015,25 @@ DefineConsoleMethod( SimObject, setSuperClassNamespace, void, ( const char* name
    "@param name The name of the 'superClass' namespace for this object." )
 {
    object->setSuperClassNamespace( name );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleMethod(SimObject, setProgenitorFile, void, (const char* file),, 
+                     "(file) Sets the progenitor file responsible for this instances creation.\n"
+                     "@param file The progenitor file responsible for this instances creation.\n"
+                     "@return No return value." )
+{
+    object->setProgenitorFile( file );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleMethod(SimObject, getProgenitorFile, const char*, (),,  
+                     "() Gets the progenitor file responsible for this instances creation.\n"
+                     "@return The progenitor file responsible for this instances creation." )
+{
+    return object->getProgenitorFile();
 }
 
 //-----------------------------------------------------------------------------

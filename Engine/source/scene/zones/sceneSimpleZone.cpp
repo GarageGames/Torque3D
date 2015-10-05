@@ -58,10 +58,10 @@ void SceneSimpleZone::initPersistFields()
    addGroup( "Lighting" );
 
       addProtectedField( "useAmbientLightColor", TypeBool, Offset( mUseAmbientLightColor, SceneSimpleZone ),
-         &_setUseAmbientLightColor, &defaultProtectedGetFn,
+         &_setUseAmbientLightColor, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Whether to use #ambientLightColor for ambient lighting in this zone or the global ambient color." );
       addProtectedField( "ambientLightColor", TypeColorF, Offset( mAmbientLightColor, SceneSimpleZone ),
-         &_setAmbientLightColor, &defaultProtectedGetFn,
+         &_setAmbientLightColor, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
          "Color of ambient lighting in this zone.\n\n"
          "Only used if #useAmbientLightColor is true." );
 

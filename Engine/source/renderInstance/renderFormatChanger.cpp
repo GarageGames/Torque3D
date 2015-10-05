@@ -322,19 +322,19 @@ bool RenderFormatToken::isEnabled() const
 
 void RenderFormatToken::initPersistFields()
 {
-   addProtectedField("format", TypeGFXFormat, Offset(mColorFormat, RenderFormatToken), &_setFmt, &defaultProtectedGetFn, 
+   addProtectedField("format", TypeGFXFormat, Offset(mColorFormat, RenderFormatToken), &_setFmt, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "Sets the color buffer format for this token.");
 
-   addProtectedField("depthFormat", TypeGFXFormat, Offset(mDepthFormat, RenderFormatToken), &_setFmt, &defaultProtectedGetFn, 
+   addProtectedField("depthFormat", TypeGFXFormat, Offset(mDepthFormat, RenderFormatToken), &_setFmt, &defaultProtectedGetFn, new AbstractClassRep::WriteDataNotify(),
       "Sets the depth/stencil buffer format for this token.");
 
    addProtectedField("copyEffect", TYPEID<PostEffect>(), Offset(mCopyPostEffect, RenderFormatToken),
-      &_setCopyPostEffect, &_getCopyPostEffect,
+      &_setCopyPostEffect, &_getCopyPostEffect, new AbstractClassRep::WriteDataNotify(),
       "This PostEffect will be run when the render target is changed to the format specified "
       "by this token. It is used to copy/format data into the token rendertarget");
 
    addProtectedField("resolveEffect", TYPEID<PostEffect>(), Offset(mResolvePostEffect, RenderFormatToken),
-      &_setResolvePostEffect, &_getResolvePostEffect,
+      &_setResolvePostEffect, &_getResolvePostEffect, new AbstractClassRep::WriteDataNotify(),
       "This PostEffect will be run when the render target is changed back to the format "
       "active prior to this token. It is used to copy/format data from the token rendertarget to the backbuffer.");
 
