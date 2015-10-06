@@ -2655,7 +2655,7 @@ void WorldEditor::renderScene( const RectI &updateRect )
 
          // Probably should test the entire icon screen-rect instead of just the centerpoint
          // but would need to move some code from renderScreenObj to here.
-         if ( mDragSelect )
+         if (mDragSelect && selection)
             if ( mDragRect.pointInRect(sPosI) && !selection->objInSet(obj) )
                mDragSelected->addObject(obj);
 

@@ -318,6 +318,10 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
    DECLARE_ENUM( type ); \
    DefineConsoleType( Type ## type, type );
 
+#define DefineEnumType_R( type ) \
+   DECLARE_ENUM_R( type ); \
+   DefineConsoleType( Type ## type, type );
+
 #define _ConsoleEnumType( typeName, type, nativeType ) \
    S32 type; \
    ImplementConsoleTypeCasters( type, nativeType ) \
@@ -345,6 +349,10 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
 
 #define DefineBitfieldType( type ) \
    DECLARE_BITFIELD( type ); \
+   DefineConsoleType( Type ## type, type );
+
+#define DefineBitfieldType_R( type ) \
+   DECLARE_BITFIELD_R( type ); \
    DefineConsoleType( Type ## type, type );
 
 #define _ConsoleBitfieldType( typeName, type, nativeType ) \

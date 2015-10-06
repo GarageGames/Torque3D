@@ -308,7 +308,6 @@ void GuiNavEditorCtrl::on3DMouseDown(const Gui3DMouseEvent & event)
    U8 keys = Input::getModifierKeys();
    bool shift = keys & SI_LSHIFT;
    bool ctrl = keys & SI_LCTRL;
-   bool alt = keys & SI_LALT;
 
    if(mMode == mLinkMode && !mMesh.isNull())
    {

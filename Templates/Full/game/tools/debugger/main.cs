@@ -33,15 +33,15 @@ function initializeDebugger()
    echo(" % - Initializing Debugger");
    
    // Load the scripts.
-   exec("./Scripts/debugger.ed.cs");
+   exec("./scripts/debugger.ed.cs");
    
    // And the guis.
-   exec("./Gui/breakConditionDlg.ed.gui");
-   exec("./Gui/connectDlg.ed.gui");
-   exec("./Gui/editWatchDlg.ed.gui");
-   exec("./Gui/findDlg.ed.gui");
-   exec("./Gui/debugger.ed.gui");
-   exec("./Gui/watchDlg.ed.gui");
+   exec("./gui/breakConditionDlg.ed.gui");
+   exec("./gui/connectDlg.ed.gui");
+   exec("./gui/editWatchDlg.ed.gui");
+   exec("./gui/findDlg.ed.gui");
+   exec("./gui/debugger.ed.gui");
+   exec("./gui/watchDlg.ed.gui");
 }
 
 function destroyDebugger()
@@ -64,5 +64,5 @@ function startDebugger()
    
    // Set up the GUI.
    DebuggerConsoleView.setActive(false);
-   Canvas.pushDialog(DebuggerGui);
+   $GameCanvas.pushDialog(DebuggerGui);
 }

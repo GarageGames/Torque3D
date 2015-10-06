@@ -737,7 +737,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mShaderConsts->set( mMatPrevScreenToWorldSC, tempMat );
    }
 
-   if ( mAmbientColorSC->isValid() )
+   if (mAmbientColorSC->isValid() && state)
    {
       const ColorF &sunlight = state->getAmbientLightColor();
       Point3F ambientColor( sunlight.red, sunlight.green, sunlight.blue );

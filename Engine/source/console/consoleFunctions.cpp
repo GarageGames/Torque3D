@@ -476,7 +476,7 @@ DefineConsoleFunction( strreplace, const char*, ( const char* source, const char
       if(!scan)
       {
          dStrcpy(ret + dstp, source + scanp);
-         break;
+         return ret;
       }
       U32 len = scan - (source + scanp);
       dStrncpy(ret + dstp, source + scanp, len);
@@ -1594,6 +1594,7 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
 DefineEngineFunction( displaySplashWindow, bool, (const char* path), ("art/gui/splash.bmp"),
    "Display a startup splash window suitable for showing while the engine still starts up.\n\n"
    "@note This is currently only implemented on Windows.\n\n"
+   "@param path	relative path to splash screen image to display.\n"
    "@return True if the splash window could be successfully initialized.\n\n"
    "@ingroup Platform" )
 {

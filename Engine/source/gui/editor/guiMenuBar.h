@@ -133,7 +133,7 @@ public:
 	GuiSubmenuBackgroundCtrl *mSubmenuBackground; //  Background for a submenu
 	GuiMenuTextListCtrl *mSubmenuTextList;     //  Text list for a submenu
 
-	Menu *menuList;
+   Vector<Menu*> mMenuList;
    Menu *mouseDownMenu;
    Menu *mouseOverMenu;
 
@@ -164,7 +164,7 @@ public:
 	// internal menu handling functions
 	// these are used by the script manipulation functions to add/remove/change menu items
    static Menu* sCreateMenu(const char *menuText, U32 menuId);
-   void addMenu(Menu *menu);
+   void addMenu(Menu *menu, S32 pos = -1);
    void addMenu(const char *menuText, U32 menuId);
 	Menu *findMenu(const char *menu);  // takes either a menu text or a string id
 	static MenuItem *findMenuItem(Menu *menu, const char *menuItem); // takes either a menu text or a string id
@@ -174,6 +174,9 @@ public:
    static MenuItem* addMenuItem(Menu *menu, MenuItem *menuItem);
 	static void clearMenuItems(Menu *menu);
    void clearMenus();
+
+   void attachToMenuBar(Menu* menu, S32 pos = -1);
+   void removeFromMenuBar(Menu* menu);
 
    //  Methods to deal with submenus
    static MenuItem* findSubmenuItem(Menu *menu, const char *menuItem, const char *submenuItem);
