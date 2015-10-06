@@ -5,8 +5,8 @@
    new GuiPlatformGenericMenuBar()
    {
       internalName = "menubar";
-      extent = "1024 32";
-      minExtent = "320 32";
+      extent = "1024 20";
+      minExtent = "320 20";
       horizSizing = "width";
       profile = "GuiMenuBarProfile";
    };

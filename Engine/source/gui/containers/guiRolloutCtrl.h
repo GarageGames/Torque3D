@@ -118,6 +118,7 @@ class GuiRolloutCtrl : public GuiTickCtrl
 
       DECLARE_CALLBACK( void, onCollapsed, () );
       /// @}
+      virtual void processTick();
 
    public:
    
@@ -152,7 +153,6 @@ class GuiRolloutCtrl : public GuiTickCtrl
 
       // Sizing Animation Functions
       void animateTo( S32 height );
-      virtual void processTick();
 
       void collapse() { animateTo( mHeader.extent.y ); }
       void expand() { animateTo( mExpanded.extent.y ); }

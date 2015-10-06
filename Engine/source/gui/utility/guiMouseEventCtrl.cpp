@@ -46,7 +46,7 @@ ConsoleDocClass( GuiMouseEventCtrl,
 );
 
 
-IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDown, void, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ),
+IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDown, void, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ),
 														  ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is pressed down while in this control.\n\n"
    "@param modifier Key that was pressed during this callback. Values are:\n\n" 
@@ -70,7 +70,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDown, void, ( U8 modifier, Point2I
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseUp, void, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount ),
+IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseUp, void, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount ),
 													    ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is released while in this control.\n\n"
    "@param modifier Key that was pressed during this callback. Values are:\n\n" 
@@ -94,7 +94,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseUp, void, ( U8 modifier, Point2I m
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseMove, void, ( U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
+IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseMove, void, ( S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is moved (without dragging) while in this control.\n\n"
    "@param modifier Key that was pressed during this callback. Values are:\n\n" 
@@ -118,7 +118,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseMove, void, ( U8 modifier, Point2I
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDragged, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
+IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDragged, void, (  S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is dragged while in this control.\n\n"
    "@param modifier Key that was pressed during this callback. Values are:\n\n" 
@@ -142,7 +142,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseDragged, void, (  U8 modifier, Poi
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseEnter, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
+IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseEnter, void, (  S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse enters this control.\n\n"
    "@param modifier Key that was pressed during this callback. Values are:\n\n" 
@@ -166,7 +166,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseEnter, void, (  U8 modifier, Point
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseLeave, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
+IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseLeave, void, (  S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse leaves this control.\n\n"
    "@param modifier Key that was pressed during this callback. Values are:\n\n" 
@@ -190,7 +190,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onMouseLeave, void, (  U8 modifier, Point
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseDown, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
+IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseDown, void, (  S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the right mouse button is pressed while in this control.\n\n"
    "@param modifier Key that was pressed during this callback. Values are:\n\n" 
@@ -214,7 +214,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseDown, void, (  U8 modifier, P
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseUp, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
+IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseUp, void, (  S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the right mouse button is released while in this control.\n\n"
    "@param modifier Key that was pressed during this callback. Values are:\n\n" 
@@ -238,7 +238,7 @@ IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseUp, void, (  U8 modifier, Poi
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseDragged, void, (  U8 modifier, Point2I mousePoint,U8 mouseClickCount  ),
+IMPLEMENT_CALLBACK( GuiMouseEventCtrl, onRightMouseDragged, void, (  S32 modifier, Point2I mousePoint, S32 mouseClickCount  ),
 												   ( modifier, mousePoint, mouseClickCount ),
    "@brief Callback that occurs whenever the mouse is dragged in this control while the right mouse button is pressed.\n\n"
    "@param modifier Key that was pressed during this callback. Values are:\n\n" 
@@ -270,11 +270,6 @@ GuiMouseEventCtrl::GuiMouseEventCtrl()
 //------------------------------------------------------------------------------
 void GuiMouseEventCtrl::sendMouseEvent(const char * name, const GuiEvent & event)
 {
-   char buf[3][32];
-   dSprintf(buf[0], 32, "%d", event.modifier);
-   dSprintf(buf[1], 32, "%d %d", event.mousePoint.x, event.mousePoint.y);
-   dSprintf(buf[2], 32, "%d", event.mouseClickCount);
-
    if(dStricmp(name,"onMouseDown") == 0)
 	   onMouseDown_callback(event.modifier, event.mousePoint, event.mouseClickCount);
    else if(dStricmp(name,"onMouseUp") == 0)

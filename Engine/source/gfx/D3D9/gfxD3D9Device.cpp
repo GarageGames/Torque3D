@@ -695,9 +695,9 @@ GFXShader* GFXD3D9Device::createShader()
    return shader;
 }
 
-void GFXD3D9Device::disableShaders()
+void GFXD3D9Device::disableShaders(bool force)
 {
-   setShader( NULL );
+   setShader( NULL, force );
    setShaderConstBuffer( NULL );
 }
 
@@ -706,25 +706,24 @@ void GFXD3D9Device::disableShaders()
 //              and to make sure redundant shader states are not being
 //              sent to the card.
 //-----------------------------------------------------------------------------
-void GFXD3D9Device::setShader( GFXShader *shader )
+void GFXD3D9Device::setShader( GFXShader *shader, bool force )
 {
    GFXD3D9Shader *d3dShader = static_cast<GFXD3D9Shader*>( shader );
 
    IDirect3DPixelShader9 *pixShader = ( d3dShader != NULL ? d3dShader->mPixShader : NULL );
    IDirect3DVertexShader9 *vertShader = ( d3dShader ? d3dShader->mVertShader : NULL );
 
-   if( pixShader != mLastPixShader )
+   if( pixShader != mLastPixShader || force )
    {
       mD3DDevice->SetPixelShader( pixShader );
       mLastPixShader = pixShader;
    }
 
-   if( vertShader != mLastVertShader )
+   if( vertShader != mLastVertShader || force )
    {
       mD3DDevice->SetVertexShader( vertShader );
       mLastVertShader = vertShader;
    }
-
 }
 
 //-----------------------------------------------------------------------------

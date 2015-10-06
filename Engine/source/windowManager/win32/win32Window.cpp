@@ -149,7 +149,6 @@ const GFXVideoMode & Win32Window::getVideoMode()
 void Win32Window::setVideoMode( const GFXVideoMode &mode )
 {
    bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
-   static bool first_load = true;
 
    if(needCurtain)
    {
@@ -219,12 +218,16 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 	}
 	else
 	{
-	   if (!first_load)
-		  ChangeDisplaySettings(NULL, 0);
+	   DISPLAY_DEVICE dd = GetPrimaryDevice();
+	   DEVMODE dv;
+	   ZeroMemory(&dv, sizeof(dv));
+	   dv.dmSize = sizeof(DEVMODE);
+           EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv);
 
-	   first_load = false;
+	   if ((mode.resolution.x != dv.dmPelsWidth) || (mode.resolution.y != dv.dmPelsHeight))
+	       ChangeDisplaySettings(NULL, 0);
 
-       // Reset device *first*, so that when we call setSize() and let it
+           // Reset device *first*, so that when we call setSize() and let it
 	   // access the monitor settings, it won't end up with our fullscreen
 	   // geometry that is just about to change.
 
@@ -439,8 +442,8 @@ void Win32Window::centerWindow()
 
 	// Get the monitor's extents.
 	MONITORINFO monInfo;
-	dMemset(&monInfo, 0, sizeof MONITORINFO);
-	monInfo.cbSize = sizeof MONITORINFO;
+	dMemset(&monInfo, 0, sizeof(MONITORINFO));
+	monInfo.cbSize = sizeof(MONITORINFO);
 	GetMonitorInfo(hMon, &monInfo);
 
    // Calculate the offset to center the window in the working area
@@ -502,8 +505,8 @@ bool Win32Window::setSize( const Point2I &newSize )
 
 		// Get the monitor's extents.
 		MONITORINFO monInfo;
-		dMemset(&monInfo, 0, sizeof MONITORINFO);
-		monInfo.cbSize = sizeof MONITORINFO;
+		dMemset(&monInfo, 0, sizeof(MONITORINFO));
+		monInfo.cbSize = sizeof(MONITORINFO);
 		GetMonitorInfo(hMon, &monInfo);
 
       // Calculate the offset to center the window in the working area

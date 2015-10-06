@@ -30,7 +30,7 @@
 #ifndef _SCENEPOLYHEDRALOBJECT_H_
 #include "scene/mixin/scenePolyhedralObject.h"
 #endif
-
+#include "scene/mixin/scenePolyhedralObject.impl.h"
 
 ///
 class ScenePolyhedralSpace : public ScenePolyhedralObject< SceneSpace >

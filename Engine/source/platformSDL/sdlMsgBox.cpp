@@ -76,6 +76,10 @@ S32 Platform::messageBox(const UTF8 *title, const UTF8 *message, MBButtons butto
       initMsgBox_ButtonData();
 
    SDL_Window *window = WindowManager->getFirstWindow() ? SDL_GetWindowFromID( WindowManager->getFirstWindow()->getWindowId() ) : NULL;
+
+   if (window) //release the mouse from the window constaints
+      SDL_SetWindowGrab(window, SDL_FALSE);
+
    if(buttons == MBOk)
       return SDL_ShowSimpleMessageBox(0, title, message,  window );
 

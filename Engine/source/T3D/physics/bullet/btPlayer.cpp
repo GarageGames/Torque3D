@@ -290,8 +290,9 @@ bool BtPlayer::_sweep( btVector3 *inOutCurrPos, const btVector3 &disp, Collision
    BtPlayerSweepCallback callback( mGhostObject, disp.normalized() );
 	callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
 	callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
-	
-	mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
+
+   if (disp.length()>0.0001)
+      mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
 
 	inOutCurrPos->setInterpolate3( start.getOrigin(), end.getOrigin(), callback.m_closestHitFraction );
    if ( callback.hasHit() )
@@ -434,9 +435,8 @@ void BtPlayer::findContact(   SceneObject **contactObject,
       if ( other == mGhostObject )
          other = (btCollisionObject*)pair.m_pProxy1->m_clientObject;
 
-      AssertFatal( !outOverlapObjects->contains( PhysicsUserData::getObject( other->getUserPointer() ) ),
-         "Got multiple pairs of the same object!" );
-      outOverlapObjects->push_back( PhysicsUserData::getObject( other->getUserPointer() ) );
+      if (!outOverlapObjects->contains(PhysicsUserData::getObject(other->getUserPointer())))
+         outOverlapObjects->push_back( PhysicsUserData::getObject( other->getUserPointer() ) );
 
       if ( other->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE )
          continue;

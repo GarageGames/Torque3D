@@ -196,7 +196,7 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
 
    // Collision info. We're going to be running LOS tests and we
    // don't want to collide with the control object.
-   static U32 losMask = TerrainObjectType | ShapeBaseObjectType;
+   static U32 losMask = TerrainObjectType | ShapeBaseObjectType | StaticObjectType;
    control->disableCollision();
 
    // All ghosted objects are added to the server connection group,
@@ -301,18 +301,20 @@ void GuiShapeNameHud::drawName(Point2I offset, const char *name, F32 opacity)
    offset.x -= width / 2;
    offset.y -= height / 2;
 
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
    // Background fill first
    if (mShowLabelFill)
-      GFX->getDrawUtil()->drawRectFill(RectI(offset, extent), mLabelFillColor);
+      drawUtil->drawRectFill(RectI(offset, extent), mLabelFillColor);
 
    // Deal with opacity and draw.
    mTextColor.alpha = opacity;
-   GFX->getDrawUtil()->setBitmapModulation(mTextColor);
-   GFX->getDrawUtil()->drawText(mProfile->mFont, offset + mLabelPadding, name);
-   GFX->getDrawUtil()->clearBitmapModulation();
+   drawUtil->setBitmapModulation(mTextColor);
+   drawUtil->drawText(mProfile->mFont, offset + mLabelPadding, name);
+   drawUtil->clearBitmapModulation();
 
    // Border last
    if (mShowLabelFrame)
-      GFX->getDrawUtil()->drawRect(RectI(offset, extent), mLabelFrameColor);
+      drawUtil->drawRect(RectI(offset, extent), mLabelFrameColor);
 }
 

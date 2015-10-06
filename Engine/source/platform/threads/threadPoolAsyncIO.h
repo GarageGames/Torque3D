@@ -100,8 +100,8 @@ class AsyncIOItem : public ThreadPool::WorkItem
          : Parent( context ),
            mStream( stream ),
            mNumElements( numElements ),
-           mOffsetInStream( offsetInStream ),
-           mOffsetInBuffer( 0 ) {}
+           mOffsetInBuffer( 0 ),
+           mOffsetInStream( offsetInStream ) {}
 
       /// Construct a read item on "stream" that stores data into the given "buffer".
       ///
@@ -109,11 +109,11 @@ class AsyncIOItem : public ThreadPool::WorkItem
                    U32 numElements, OffsetType offsetInStream, bool takeOwnershipOfBuffer = true,
                    ThreadContext* context = 0 )
          : Parent( context ),
-           mStream( stream ),
            mBuffer( buffer ),
+           mStream( stream ),
            mNumElements( numElements ),
-           mOffsetInStream( offsetInStream ),
-           mOffsetInBuffer( offsetInBuffer )
+           mOffsetInBuffer( offsetInBuffer ),
+           mOffsetInStream( offsetInStream )
       {
          if( takeOwnershipOfBuffer )
             mBuffer.ownMemory = true;

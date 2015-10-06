@@ -567,7 +567,6 @@ String::String(const StringChar *str, SizeType len)
    PROFILE_SCOPE(String_char_len_constructor);
    if (str && *str && len!=0)
    {
-      AssertFatal(len<=dStrlen(str), "String::String: string too short");
       _string = new ( len ) StringData( str );
    }
    else
@@ -655,6 +654,11 @@ String::SizeType String::numChars() const
 bool String::isEmpty() const
 {
    return ( _string == StringData::Empty() );
+}
+
+bool String::isEmpty(const char* str)
+{
+	return str == 0 || str[0] == '\0';
 }
 
 bool String::isShared() const

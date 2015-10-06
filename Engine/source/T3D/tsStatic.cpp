@@ -102,7 +102,7 @@ TSStatic::TSStatic()
    mPlayAmbient      = true;
    mAmbientThread    = NULL;
 
-   mAllowPlayerStep = true;
+   mAllowPlayerStep = false;
 
    mConvexList = new Convex;
 
@@ -1171,8 +1171,10 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
       return;
    }
 
+   TSMaterialList* shapeMaterialList = object->getShape()->materialList;
+
    // Check the mapTo name exists for this shape
-   S32 matIndex = object->getShape()->materialList->getMaterialNameList().find_next(String(mapTo));
+   S32 matIndex = shapeMaterialList->getMaterialNameList().find_next(String(mapTo));
    if (matIndex < 0)
    {
       Con::errorf("TSShape::changeMaterial failed: Invalid mapTo name '%s'", mapTo);
@@ -1190,13 +1192,13 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
 
    // Replace instances with the new material being traded in. Lets make sure that we only
    // target the specific targets per inst, this is actually doing more than we thought
-   delete object->getShape()->materialList->mMatInstList[matIndex];
-   object->getShape()->materialList->mMatInstList[matIndex] = newMat->createMatInstance();
+   delete shapeMaterialList->mMatInstList[matIndex];
+   shapeMaterialList->mMatInstList[matIndex] = newMat->createMatInstance();
 
    // Finish up preparing the material instances for rendering
    const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPNTTB>();
    FeatureSet features = MATMGR->getDefaultFeatures();
-   object->getShape()->materialList->getMaterialInst(matIndex)->init( features, flags );
+   shapeMaterialList->getMaterialInst(matIndex)->init(features, flags);
 }
 
 DefineEngineMethod( TSStatic, getModelFile, const char *, (),,

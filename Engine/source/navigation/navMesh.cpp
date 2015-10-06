@@ -681,7 +681,7 @@ void NavMesh::updateConfig()
    cfg.tileSize = mTileSize / cfg.cs;
 }
 
-S32 NavMesh::getTile(Point3F pos)
+S32 NavMesh::getTile(const Point3F& pos)
 {
    if(mBuilding)
       return -1;
@@ -865,11 +865,7 @@ unsigned char *NavMesh::buildTileData(const Tile &tile, TileData &data, U32 &dat
    }
 
    unsigned char *areas = new unsigned char[data.geom.getTriCount()];
-   if(!areas)
-   {
-      Con::errorf("Out of memory (area flags) for NavMesh %s", getIdString());
-      return NULL;
-   }
+
    dMemset(areas, 0, data.geom.getTriCount() * sizeof(unsigned char));
 
    // Mark walkable triangles with the appropriate area flags, and rasterize.

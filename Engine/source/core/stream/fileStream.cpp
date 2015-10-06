@@ -39,15 +39,12 @@ FileStream *FileStream::createAndOpen(const String &inFileName, Torque::FS::File
 {
    FileStream  *newStream = new FileStream;
 
-   if ( newStream )
-   {
-      bool success = newStream->open( inFileName, inMode );
+   bool success = newStream->open( inFileName, inMode );
 
-      if ( !success )
-      {
-         delete newStream;
-         newStream = NULL;
-      }
+   if ( !success )
+   {
+      delete newStream;
+      newStream = NULL;
    }
 
    return newStream;

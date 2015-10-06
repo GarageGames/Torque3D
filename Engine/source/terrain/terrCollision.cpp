@@ -279,10 +279,11 @@ void TerrainConvex::getFeatures(const MatrixF& mat,const VectorF& n, ConvexFeatu
    cf->mFaceList.increment(numFaces);
    for (i = 0; i < numFaces; i++)
    {
-      cf->mFaceList[faceListStart + i].normal    = normal[fp[i * 4 + 0]];
-      cf->mFaceList[faceListStart + i].vertex[0] = vertexCount + fp[i * 4 + 1];
-      cf->mFaceList[faceListStart + i].vertex[1] = vertexCount + fp[i * 4 + 2];
-      cf->mFaceList[faceListStart + i].vertex[2] = vertexCount + fp[i * 4 + 3];
+      ConvexFeature::Face& face = cf->mFaceList[faceListStart + i];
+      face.normal = normal[fp[i * 4 + 0]];
+      face.vertex[0] = vertexCount + fp[i * 4 + 1];
+      face.vertex[1] = vertexCount + fp[i * 4 + 2];
+      face.vertex[2] = vertexCount + fp[i * 4 + 3];
    }
 }
 

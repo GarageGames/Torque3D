@@ -818,7 +818,7 @@ public:
    /// Some configuration values.
    enum GhostConstants
    {
-      GhostIdBitSize = 12,
+      GhostIdBitSize = 18, //262,144 ghosts
       MaxGhostCount = 1 << GhostIdBitSize, //4096,
       GhostLookupTableSize = 1 << GhostIdBitSize, //4096
       GhostIndexBitSize = 4 // number of bits GhostIdBitSize-3 fits into

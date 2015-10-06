@@ -44,6 +44,20 @@ public:
          mResults[mIndex] = mIndex;
       }
    };
+
+   // A worker that delays for some time. We'll use this to test the ThreadPool's
+   // synchronous and asynchronous operations.
+   struct DelayItem : public ThreadPool::WorkItem
+   {
+      U32 ms;
+      DelayItem(U32 _ms) : ms(_ms) {}
+
+   protected:
+      virtual void execute()
+      {
+         Platform::sleep(ms);
+      }
+   };
 };
 
 TEST_FIX(ThreadPool, BasicAPI)
@@ -63,13 +77,45 @@ TEST_FIX(ThreadPool, BasicAPI)
       pool->queueWorkItem(item);
    }
 
-   // Wait for all items to complete.
-   pool->flushWorkItems();
+   pool->waitForAllItems();
 
    // Verify.
    for (U32 i = 0; i < numItems; i++)
       EXPECT_EQ(results[i], i) << "result mismatch";
    results.clear();
+}
+
+TEST_FIX(ThreadPool, Asynchronous)
+{
+   const U32 delay = 500; //ms
+
+   // Launch a single delaying work item.
+   ThreadPool* pool = &ThreadPool::GLOBAL();
+   ThreadSafeRef<DelayItem> item(new DelayItem(delay));
+   pool->queueWorkItem(item);
+
+   // The thread should not yet be finished.
+   EXPECT_EQ(false, item->hasExecuted());
+
+   // Wait til the item should have completed.
+   Platform::sleep(delay * 2);
+
+   EXPECT_EQ(true, item->hasExecuted());
+}
+
+TEST_FIX(ThreadPool, Synchronous)
+{
+   const U32 delay = 500; //ms
+
+   // Launch a single delaying work item.
+   ThreadPool* pool = &ThreadPool::GLOBAL();
+   ThreadSafeRef<DelayItem> item(new DelayItem(delay));
+   pool->queueWorkItem(item);
+
+   // Wait for the item to complete.
+   pool->waitForAllItems();
+
+   EXPECT_EQ(true, item->hasExecuted());
 }
 
 #endif

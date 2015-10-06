@@ -465,6 +465,8 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
 
    GFont *font = mTooltipProfile->mFont;
 
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
    // Support for multi-line tooltip text...
 
    Vector<U32> startLineOffsets, lineLengths;
@@ -521,12 +523,12 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
    GFX->setClipRect( rect );
 
    // Draw Filler bit, then border on top of that
-   GFX->getDrawUtil()->drawRectFill( rect, mTooltipProfile->mFillColor );
-   GFX->getDrawUtil()->drawRect( rect, mTooltipProfile->mBorderColor );
+   drawUtil->drawRectFill( rect, mTooltipProfile->mFillColor );
+   drawUtil->drawRect( rect, mTooltipProfile->mBorderColor );
 
    // Draw the text centered in the tool tip box...
 
-   GFX->getDrawUtil()->setBitmapModulation( mTooltipProfile->mFontColor );
+   drawUtil->setBitmapModulation( mTooltipProfile->mFontColor );
 
    for ( U32 i = 0; i < lineLengths.size(); i++ )
    {      
@@ -534,7 +536,7 @@ bool GuiControl::defaultTooltipRender( const Point2I &hoverPos, const Point2I &c
       const UTF8 *line = renderTip.c_str() + startLineOffsets[i];
       U32 lineLen = lineLengths[i];
 
-      GFX->getDrawUtil()->drawTextN( font, start + offset, line, lineLen, mProfile->mFontColors );
+      drawUtil->drawTextN( font, start + offset, line, lineLen, mProfile->mFontColors );
    }
 
    GFX->setClipRect( oldClip );
@@ -602,6 +604,8 @@ void GuiControl::setUpdate()
 void GuiControl::renderJustifiedText(Point2I offset, Point2I extent, const char *text)
 {
    GFont *font = mProfile->mFont;
+   if(!font)
+      return;
    S32 textWidth = font->getStrWidthPrecise((const UTF8*)text);
    U32 textHeight = font->getHeight();
 
@@ -1753,41 +1757,48 @@ void GuiControl::write(Stream &stream, U32 tabStop, U32 flags)
 {
    //note: this will return false if either we, or any of our parents, are non-save controls
    bool bCanSave	= ( flags & IgnoreCanSave ) || ( flags & NoCheckParentCanSave && getCanSave() ) || getCanSaveParent();
-   StringTableEntry steName = mAddGroup->getInternalName();
-   if(bCanSave && mAddGroup && (steName != NULL) && (steName != StringTable->insert("null")) && getName() )
+   
+   if (bCanSave && mAddGroup)
    {
-      MutexHandle handle;
-      handle.lock(mMutex);
+      StringTableEntry steName = mAddGroup->getInternalName();
 
-      // export selected only?
-      if((flags & SelectedOnly) && !isSelected())
+      if ((steName != NULL) && (steName != StringTable->insert("null")) && getName())
       {
-         for(U32 i = 0; i < size(); i++)
-            (*this)[i]->write(stream, tabStop, flags);
+         MutexHandle handle;
+         handle.lock(mMutex);
+
+         // export selected only?
+         if ((flags & SelectedOnly) && !isSelected())
+         {
+            for (U32 i = 0; i < size(); i++)
+               (*this)[i]->write(stream, tabStop, flags);
+
+            return;
+
+         }
+
+         stream.writeTabs(tabStop);
+         char buffer[1024];
+         dSprintf(buffer, sizeof(buffer), "new %s(%s,%s) {\r\n", getClassName(), getName() ? getName() : "", mAddGroup->getInternalName());
+         stream.write(dStrlen(buffer), buffer);
+         writeFields(stream, tabStop + 1);
+
+         if (size())
+         {
+            stream.write(2, "\r\n");
+            for (U32 i = 0; i < size(); i++)
+               (*this)[i]->write(stream, tabStop + 1, flags);
+         }
+
+         stream.writeTabs(tabStop);
+         stream.write(4, "};\r\n");
 
          return;
-
       }
-
-      stream.writeTabs(tabStop);
-      char buffer[1024];
-      dSprintf(buffer, sizeof(buffer), "new %s(%s,%s) {\r\n", getClassName(), getName() ? getName() : "", mAddGroup->getInternalName());
-      stream.write(dStrlen(buffer), buffer);
-      writeFields(stream, tabStop + 1);
-
-      if(size())
-      {
-         stream.write(2, "\r\n");
-         for(U32 i = 0; i < size(); i++)
-            (*this)[i]->write(stream, tabStop + 1, flags);
-      }
-
-      stream.writeTabs(tabStop);
-      stream.write(4, "};\r\n");
    }
-   else if (bCanSave)
+   
+   if (bCanSave)
       Parent::write( stream, tabStop, flags );
-
 }
 
 //=============================================================================
@@ -2380,7 +2391,8 @@ void GuiControl::getCursor(GuiCursor *&cursor, bool &showCursor, const GuiEvent 
       // so set it back before we change it again.
 
       PlatformWindow *pWindow = static_cast<GuiCanvas*>(getRoot())->getPlatformWindow();
-      AssertFatal(pWindow != NULL,"GuiControl without owning platform window!  This should not be possible.");
+      if (!pWindow)
+         return;
       PlatformCursorController *pController = pWindow->getCursorController();
       AssertFatal(pController != NULL,"PlatformWindow without an owned CursorController!");
 

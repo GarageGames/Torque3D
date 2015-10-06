@@ -419,6 +419,16 @@ namespace _Private {
    template<> const EngineTypeInfo* TYPE< type >();                                          \
    template<> struct _SCOPE< type > {                                                        \
       EngineExportScope& operator()() const {                                                \
+         return *static_cast< EngineExportScope* >(                                          \
+            const_cast< EngineTypeInfo* >( ( TYPE< type >() ) )                              \
+         );                                                                                  \
+      }                                                                                      \
+   };
+
+#define _DECLARE_TYPE_R( type )                                                              \
+   template<> const EngineTypeInfo* TYPE< type >();                                          \
+   template<> struct _SCOPE< type > {                                                        \
+      EngineExportScope& operator()() const {                                                \
          return *reinterpret_cast< EngineExportScope* >(                                     \
             const_cast< EngineTypeInfo* >( ( TYPE< type >() ) )                              \
          );                                                                                  \
@@ -432,22 +442,42 @@ namespace _Private {
    _DECLARE_TYPE( type )                                                                     \
    template<>                                                                                \
    struct EngineTypeTraits< type > : public _EnginePrimitiveTypeTraits< type > {};
+
+#define _DECLARE_PRIMITIVE_R( type )                                                         \
+   _DECLARE_TYPE_R( type )                                                                   \
+   template<>                                                                                \
+   struct EngineTypeTraits< type > : public _EnginePrimitiveTypeTraits< type > {};
    
 #define _DECLARE_ENUM( type )                                                                \
    _DECLARE_TYPE( type )                                                                     \
    template<>                                                                                \
    struct _EngineTypeTraits< type > : public _EngineEnumTypeTraits< type > {};
-   
+
+#define _DECLARE_ENUM_R( type )                                                              \
+   _DECLARE_TYPE_R( type )                                                                   \
+   template<>                                                                                \
+   struct _EngineTypeTraits< type > : public _EngineEnumTypeTraits< type > {};
+
 #define _DECLARE_BITFIELD( type )                                                            \
    _DECLARE_TYPE( type )                                                                     \
    template<>                                                                                \
    struct _EngineTypeTraits< type > : public _EngineBitfieldTypeTraits< type > {};
+
+#define _DECLARE_BITFIELD_R( type )                                                            \
+   _DECLARE_TYPE_R( type )                                                                     \
+   template<>                                                                                \
+   struct _EngineTypeTraits< type > : public _EngineBitfieldTypeTraits< type > {};
+
 
 #define _DECLARE_STRUCT( type )                                                              \
    _DECLARE_TYPE( type )                                                                     \
    template<>                                                                                \
    struct _EngineTypeTraits< type > : public _EngineStructTypeTraits< type > {};
 
+#define _DECLARE_STRUCT_R( type )                                                            \
+   _DECLARE_TYPE_R( type )                                                                   \
+   template<>                                                                                \
+   struct _EngineTypeTraits< type > : public _EngineStructTypeTraits< type > {};
 
 #define _IMPLEMENT_TYPE( type, exportName )        \
    template<>                                      \
@@ -525,16 +555,28 @@ namespace _Private {
    _DECLARE_PRIMITIVE( type )
 
 ///
+#define DECLARE_PRIMITIVE_R( type ) \
+   _DECLARE_PRIMITIVE_R( type )
+
+///
 #define IMPLEMENT_PRIMITIVE( type, exportName, scope, doc ) \
    _IMPLEMENT_PRIMITIVE( type, exportName, scope, doc )
 
 ///
 #define DECLARE_ENUM( type ) \
    _DECLARE_ENUM( type )
+
+///
+#define DECLARE_ENUM_R( type ) \
+   _DECLARE_ENUM_R( type )
    
 ///
 #define DECLARE_BITFIELD( type ) \
    _DECLARE_BITFIELD( type )
+
+///
+#define DECLARE_BITFIELD_R( type ) \
+   _DECLARE_BITFIELD_R( type )
 
 ///
 #define IMPLEMENT_ENUM( type, exportName, scope, doc ) \
@@ -555,6 +597,10 @@ namespace _Private {
 ///
 #define DECLARE_STRUCT( type ) \
    _DECLARE_STRUCT( type )
+
+///
+#define DECLARE_STRUCT_R( type ) \
+   _DECLARE_STRUCT_R( type )
 
 ///
 #define IMPLEMENT_STRUCT( type, exportName, scope, doc ) \
