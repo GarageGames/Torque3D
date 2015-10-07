@@ -32,8 +32,10 @@ function configureCanvas()
    if ($pref::Video::mode $= "")
       $pref::Video::mode = "800 600 false 32 60 0";
 
-   if($cliFullscreen !$="")
+   if($cliFullscreen !$="") {
       $pref::Video::mode = setWord($pref::Video::mode, $WORD::FULLSCREEN, $cliFullScreen);
+      $cliFullscreen = "";
+   }
 
    %resX = getWord($pref::Video::mode, $WORD::RES_X);
    %resY = getWord($pref::Video::mode, $WORD::RES_Y);
