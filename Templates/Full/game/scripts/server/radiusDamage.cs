@@ -56,7 +56,8 @@ function radiusDamage(%sourceObject, %position, %radius, %damage, %damageType, %
       // Full damage is applied to anything less than half the radius away,
       // linear scale from there.
       %distScale = (%dist < %halfRadius)? 1.0 : 1.0 - ((%dist - %halfRadius) / %halfRadius);
-
+      %distScale = mClamp(%distScale,0.0,1.0);
+      
       // Apply the damage
       %targetObject.damage(%sourceObject, %position, %damage * %coverage * %distScale, %damageType);
 
