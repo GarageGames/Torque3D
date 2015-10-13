@@ -22,31 +22,37 @@
 
 #include "platform/platform.h"
 #include "gfx/gl/gfxGLOcclusionQuery.h"
-#include "gfx/gl/tGL/tGL.h"
 
-GFXGLOcclusionQuery::GFXGLOcclusionQuery(GFXDevice* device) : 
-   GFXOcclusionQuery(device), mQuery(-1)
+GFXGLOcclusionQuery::GFXGLOcclusionQuery(GFXDevice* device) :
+GFXOcclusionQuery(device), mQuery(NULL), mTesting(false)
 {
-   
 }
 
 GFXGLOcclusionQuery::~GFXGLOcclusionQuery()
 {
-   glDeleteQueries(1, &mQuery);
+   if (!glIsQuery(mQuery))
+      glDeleteQueries(1, &mQuery);
 }
 
 bool GFXGLOcclusionQuery::begin()
 {
-   if(mQuery == -1)
+   if (!glIsQuery(mQuery))
       glGenQueries(1, &mQuery);
 
-   glBeginQuery(GL_SAMPLES_PASSED, mQuery);
+   if (!mTesting)
+   {
+      glBeginQuery(GL_SAMPLES_PASSED, mQuery);
+      mTesting = true;
+   }
    return true;
 }
 
 void GFXGLOcclusionQuery::end()
 {
+   if (!glIsQuery(mQuery))
+      return;
    glEndQuery(GL_SAMPLES_PASSED);
+   mTesting = false;
 }
 
 GFXOcclusionQuery::OcclusionQueryStatus GFXGLOcclusionQuery::getStatus(bool block, U32* data)
@@ -55,37 +61,41 @@ GFXOcclusionQuery::OcclusionQueryStatus GFXGLOcclusionQuery::getStatus(bool bloc
    // then your system is GPU bound.
    PROFILE_SCOPE(GFXGLOcclusionQuery_getStatus);
 
-   if(mQuery == -1)
+   if (!glIsQuery(mQuery))
       return NotOccluded;
-   
+
    GLint numPixels = 0;
    GLint queryDone = false;
-   
+
    if (block)
       queryDone = true;
    else
       glGetQueryObjectiv(mQuery, GL_QUERY_RESULT_AVAILABLE, &queryDone);
-   
+
    if (queryDone)
       glGetQueryObjectiv(mQuery, GL_QUERY_RESULT, &numPixels);
    else
       return Waiting;
-   
+
    if (data)
       *data = numPixels;
-   
+
    return numPixels > 0 ? NotOccluded : Occluded;
 }
 
 void GFXGLOcclusionQuery::zombify()
 {
+   if (!glIsQuery(mQuery))
+      return;
+
    glDeleteQueries(1, &mQuery);
-   mQuery = 0;
+   mQuery = NULL;
 }
 
 void GFXGLOcclusionQuery::resurrect()
 {
-   glGenQueries(1, &mQuery);
+   if (!glIsQuery(mQuery))
+      glGenQueries(1, &mQuery);
 }
 
 const String GFXGLOcclusionQuery::describeSelf() const
