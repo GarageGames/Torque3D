@@ -486,6 +486,20 @@ namespace Con
    bool expandToolScriptFilename(char *filename, U32 size, const char *src);
    bool collapseScriptFilename(char *filename, U32 size, const char *src);
 
+   bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint = NULL, const bool ensureTrailingSlash = false);
+   void collapsePath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint = NULL);
+   bool isBasePath(const char* SrcPath, const char* pBasePath);
+   void ensureTrailingSlash(char* pDstPath, const char* pSrcPath);
+   bool stripRepeatSlashes(char* pDstPath, const char* pSrcPath, S32 dstSize);
+
+   void addPathExpando(const char* pExpandoName, const char* pPath);
+   void removePathExpando(const char* pExpandoName);
+   bool isPathExpando(const char* pExpandoName);
+   StringTableEntry getPathExpando(const char* pExpandoName);
+   U32 getPathExpandoCount(void);
+   StringTableEntry getPathExpandoKey(U32 expandoIndex);
+   StringTableEntry getPathExpandoValue(U32 expandoIndex);
+
    bool isCurrentScriptToolScript();
 
    StringTableEntry getModNameFromPath(const char *path);
@@ -739,6 +753,13 @@ namespace Con
    /// @see Con::errorf()
    void errorf(ConsoleLogEntry::Type type, const char *_format, ...);
 
+   //some additions from t2d
+   /// Prints a separator to the console.
+   inline void printSeparator(void) { printf("--------------------------------------------------------------------------------"); }
+
+   /// Prints a separator to the console.
+   inline void printBlankLine(void) { printf(""); }
+
    /// @}
 
    /// Returns true when called from the main thread, false otherwise
@@ -815,6 +836,7 @@ namespace Con
    char* getArgBuffer(U32 bufferSize);
    char* getFloatArg(F64 arg);
    char* getIntArg  (S32 arg);
+   char* getBoolArg(bool arg);
    char* getStringArg( const char* arg );
    char* getStringArg( const String& arg );
    /// @}

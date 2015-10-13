@@ -252,6 +252,11 @@ else {
    onStart();
    echo("Engine initialized...");
 
+   ModuleDatabase.scanModules( "" );
+
+   //You can also explicitly decalre some modules here to be loaded by default if they are part of your game
+   //Ex: ModuleDatabase.LoadExplicit( "AppCore" );
+
    if( !$isDedicated )
    {
       // As we know at this point that the initial load is complete,

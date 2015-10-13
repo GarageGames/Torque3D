@@ -60,6 +60,27 @@ public:
       parentClass     = parent;
    };
 
+   virtual AbstractClassRep* getContainerChildClass(const bool recurse)
+   {
+      // Fetch container children type.
+      AbstractClassRep* pChildren = T::getContainerChildStaticClassRep();
+      if (!recurse || pChildren != NULL)
+         return pChildren;
+
+      // Fetch parent type.
+      AbstractClassRep* pParent = T::getParentStaticClassRep();
+      if (pParent == NULL)
+         return NULL;
+
+      // Get parent container children.
+      return pParent->getContainerChildClass(recurse);
+   }
+
+   virtual WriteCustomTamlSchema getCustomTamlSchema(void)
+   {
+      return T::getStaticWriteCustomTamlSchema();
+   }
+
    /// Perform class specific initialization tasks.
    ///
    /// Link namespaces, call initPersistFields() and consoleInit().
