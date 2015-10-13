@@ -28,6 +28,7 @@
 #include "../../../gl/lighting.glsl"
 #include "../../shadowMap/shadowMapIO_GLSL.h"
 #include "softShadow.glsl"
+#include "../../../gl/torque.glsl"
 
 in vec4 wsEyeDir;
 in vec4 ssPos;
@@ -107,6 +108,7 @@ uniform sampler2D prePassBuffer;
 	uniform samplerCube shadowMap;
 #else
 	uniform sampler2D shadowMap;
+	uniform sampler2D dynamicShadowMap;
 #endif
 
 uniform vec4 rtParams0;
@@ -119,6 +121,7 @@ uniform vec2 lightAttenuation;
 uniform vec4 lightMapParams;
 uniform vec4 vsFarPlane;
 uniform mat3 viewToLightProj;
+uniform mat3 dynamicViewToLightProj;
 uniform vec4 lightParams;
 uniform float shadowSoftness;
 
@@ -175,7 +178,7 @@ void main()
 
          vec2 shadowCoord = decodeShadowCoord( tMul( viewToLightProj, -lightVec ) ).xy;
          
-         float shadowed = softShadow_filter( shadowMap,
+         float static_shadowed = softShadow_filter( shadowMap,
                                              ssPos.xy,
                                              shadowCoord,
                                              shadowSoftness,
@@ -183,6 +186,16 @@ void main()
                                              nDotL,
                                              lightParams.y );
 
+         vec2 dynamicShadowCoord = decodeShadowCoord( tMul( dynamicViewToLightProj, -lightVec ) ).xy;
+         float dynamic_shadowed = softShadow_filter( dynamicShadowMap,
+                                             ssPos.xy,
+                                             dynamicShadowCoord,
+                                             shadowSoftness,
+                                             distToLight,
+                                             nDotL,
+                                             lightParams.y );
+
+         float shadowed = min(static_shadowed, dynamic_shadowed);
       #endif
 
    #endif // !NO_SHADOW

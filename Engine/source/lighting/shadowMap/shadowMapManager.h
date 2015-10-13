@@ -60,12 +60,14 @@ public:
 
    /// Sets the current shadowmap (used in setLightInfo/setTextureStage calls)
    void setLightShadowMap( LightShadowMap *lm ) { mCurrentShadowMap = lm; }
+   void setLightDynamicShadowMap( LightShadowMap *lm ) { mCurrentDynamicShadowMap = lm; }
    
    /// Looks up the shadow map for the light then sets it.
    void setLightShadowMapForLight( LightInfo *light );
 
    /// Return the current shadow map
    LightShadowMap* getCurrentShadowMap() const { return mCurrentShadowMap; }
+   LightShadowMap* getCurrentDynamicShadowMap() const { return mCurrentDynamicShadowMap; }
 
    ShadowMapPass* getShadowMapPass() const { return mShadowMapPass; }
 
@@ -88,6 +90,7 @@ protected:
 
    ShadowMapPass *mShadowMapPass;
    LightShadowMap *mCurrentShadowMap;
+   LightShadowMap *mCurrentDynamicShadowMap;
 
    ///
    GFXTexHandle mTapRotationTex;

@@ -908,6 +908,14 @@ inline bool mIsNaN( const Point2F &p )
    return mIsNaN_F( p.x ) || mIsNaN_F( p.y );
 }
 
+/// Return 0 if points are colinear
+/// Return positive if p0p1p2 are counter-clockwise
+/// Return negative if p0p1p2 are clockwise 
+inline F64 mCross(const Point2F &p0, const Point2F &p1, const Point2F &pt2)
+{
+   return (p1.x - p0.x) * (pt2.y - p0.y) - (p1.y - p0.y) * (pt2.x - p0.x);
+}
+
 
 namespace DictHash
 {
