@@ -576,7 +576,7 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
       in_setDataFn,
       in_getDataFn,
       &defaultProtectedWriteFn,
-      1,
+      in_elementCount,
       in_pFieldDocs,
       flags);
 }
