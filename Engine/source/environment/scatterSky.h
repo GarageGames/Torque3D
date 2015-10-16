@@ -61,8 +61,6 @@ class MatrixSet;
 GFXDeclareVertexFormat( ScatterSkyVertex )
 {
    Point3F point;
-   VectorF normal;
-   GFXVertexColor color;
 };
 
 class ScatterSky : public SceneObject, public ISceneLight

@@ -85,8 +85,6 @@ const F32 ScatterSky::smViewerHeight = 1.0f;
 GFXImplementVertexFormat( ScatterSkyVertex )
 {
    addElement( "POSITION", GFXDeclType_Float3 );
-   addElement( "NORMAL", GFXDeclType_Float3 );
-   addElement( "COLOR", GFXDeclType_Color );
 }
 
 ScatterSky::ScatterSky()

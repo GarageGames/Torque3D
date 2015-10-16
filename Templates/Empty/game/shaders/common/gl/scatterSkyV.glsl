@@ -36,14 +36,9 @@ float vernierScale(float fCos)
 }
 
 in vec4 vPosition;
-in vec3 vNormal;
-in vec4 vColor;
-in vec2 vTexCoord0;
 
 // This is the shader input vertex structure.
 #define IN_position vPosition
-#define IN_normal vNormal
-#define IN_color vColor
 
 // This is the shader output data.
 out vec4  rayleighColor;
