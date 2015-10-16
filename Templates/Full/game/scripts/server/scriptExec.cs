@@ -24,6 +24,7 @@
 // a server is constructed.
 exec("./camera.cs");
 exec("./triggers.cs");
+exec("./VolumetricFog.cs");
 exec("./inventory.cs");
 exec("./shapeBase.cs");
 exec("./item.cs");
