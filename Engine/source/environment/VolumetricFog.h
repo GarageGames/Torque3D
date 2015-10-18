@@ -122,6 +122,8 @@ class VolumetricFog : public SceneObject
    
       GFXShaderConstBufferRef mPPShaderConsts;
       GFXShaderConstHandle *mPPModelViewProjSC;
+
+      GFXShaderConstHandle *mAmbientColorSC;
    
       GFXShaderConstBufferRef mReflShaderConsts;
       GFXShaderConstHandle *mReflModelViewProjSC;

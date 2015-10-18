@@ -22,6 +22,7 @@
 
 #include "../../gl/hlslCompat.glsl"
 #include "shadergen:/autogenConditioners.h"
+#include "../../gl/torque.glsl"
 
 uniform sampler2D prepassTex;
 uniform sampler2D depthBuffer;
@@ -37,6 +38,7 @@ uniform float modstrength;
 uniform vec4 modspeed;//xy speed layer 1, zw speed layer 2
 uniform vec2 viewpoint;
 uniform vec2 texscale;
+uniform vec3 ambientColor;
 uniform float numtiles;
 uniform float fadesize;
 uniform vec2 PixelSize;
@@ -77,5 +79,9 @@ void main()
 		col *= (2.0 - ((mod1.g + mod2.g) * fadesize))/2.0;
 	}
 
-	OUT_col = vec4(col, 1.0 - saturate(exp(-fogDensity  * depth * diff * fadesize)));
+   col *= ambientColor;
+
+   vec4 returnColor = vec4(col, 1.0 - saturate(exp(-fogDensity  * depth * diff * fadesize)));
+
+	OUT_col = hdrEncode(returnColor);
 }

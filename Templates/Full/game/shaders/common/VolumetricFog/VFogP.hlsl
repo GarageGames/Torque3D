@@ -20,19 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// This file contains script methods unique to the WheeledVehicle class.  All
-// other necessary methods are contained in "../server/scripts/vehicle.cs" in
-// which the "generic" Vehicle class methods that are shared by all vehicles,
-// (flying, hover, and wheeled) can be found.
-
-// Parenting is in place for WheeledVehicleData to VehicleData.  This should
-// make it easier for people to simply drop in new (generic) vehicles.  All that
-// the user needs to create is a set of datablocks for the new wheeled vehicle
-// to use.  This means that no (or little) scripting should be necessary.
-
 // Volumetric Fog final pixel shader V2.00
 
 #include "shadergen:/autogenConditioners.h"
+#include "../torque.hlsl"
 
 uniform sampler2D prepassTex : register(S0);
 uniform sampler2D depthBuffer : register(S1);
@@ -48,6 +39,7 @@ uniform float modstrength;
 uniform float4 modspeed;//xy speed layer 1, zw speed layer 2
 uniform float2 viewpoint;
 uniform float2 texscale;
+uniform float3 ambientColor;
 uniform float numtiles;
 uniform float fadesize;
 uniform float2 PixelSize;
@@ -87,5 +79,9 @@ float4 main( ConnectData IN ) : COLOR0
 		col *= (2.0 - ((mod1.g + mod2.g) * fadesize))/2.0;
 	}
 
-	return float4(col, 1.0 - saturate(exp(-fogDensity  * depth * diff * fadesize)));
+	col *= ambientColor;
+
+	float4 resultColor = float4(col, 1.0 - saturate(exp(-fogDensity  * depth * diff * fadesize)));
+
+	return hdrEncode(resultColor);
 }

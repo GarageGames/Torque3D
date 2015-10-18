@@ -35,6 +35,8 @@
 #include "console/engineAPI.h"
 #include "gui/core/guiCanvas.h"
 #include "VolumetricFogRTManager.h"
+#include "lighting/lightInfo.h"
+#include "lighting/lightManager.h"
 
 #define COLBOX_SCALE Point3F(1.02f, 1.02f, 1.02f)
 
@@ -851,6 +853,7 @@ bool VolumetricFog::setupRenderer()
    mModSpeedSC = mShader->getShaderConstHandle("$modspeed");
    mViewPointSC = mShader->getShaderConstHandle("$viewpoint");
    mTexScaleSC = mShader->getShaderConstHandle("$texscale");
+   mAmbientColorSC = mShader->getShaderConstHandle("$ambientColor");
 
    // Find and setup the reflection Shader
 
@@ -1071,6 +1074,12 @@ void VolumetricFog::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    xform *= GFX->getWorldMatrix();
 
    mPPShaderConsts->setSafe(mPPModelViewProjSC, xform);
+
+   LightInfo *lightinfo = LIGHTMGR->getSpecialLight(LightManager::slSunLightType);
+   const ColorF &sunlight = state->getAmbientLightColor();
+
+   Point3F ambientColor(sunlight.red, sunlight.green, sunlight.blue);
+   mShaderConsts->setSafe(mAmbientColorSC, ambientColor);
 
    GFXTextureObject *mDepthBuffer = mDepthBufferTarget ? mDepthBufferTarget->getTexture(0) : NULL;
    GFXTextureObject *mFrontBuffer = mFrontBufferTarget ? mFrontBufferTarget->getTexture(0) : NULL;
