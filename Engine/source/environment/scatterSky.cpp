@@ -82,11 +82,6 @@ const F32 ScatterSky::smEarthRadius = (6378.0f * 1000.0f);
 const F32 ScatterSky::smAtmosphereRadius = 200000.0f;
 const F32 ScatterSky::smViewerHeight = 1.0f;
 
-GFXImplementVertexFormat( ScatterSkyVertex )
-{
-   addElement( "POSITION", GFXDeclType_Float3 );
-}
-
 ScatterSky::ScatterSky()
 {
    mPrimCount = 0;
@@ -759,7 +754,7 @@ void ScatterSky::_initVBIB()
    F32 zOffset = -( mCos( mSqrt( 1.0f ) ) + 0.01f );
 
    mVB.set( GFX, mVertCount, GFXBufferTypeStatic );
-   ScatterSkyVertex *pVert = mVB.lock();
+   GFXVertexP *pVert = mVB.lock();
    if(!pVert) return;
 
    for ( U32 y = 0; y < vertStride; y++ )
