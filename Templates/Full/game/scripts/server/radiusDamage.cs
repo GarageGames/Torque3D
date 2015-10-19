@@ -29,7 +29,7 @@ function radiusDamage(%sourceObject, %position, %radius, %damage, %damageType, %
    // Use the container system to iterate through all the objects
    // within our explosion radius.  We'll apply damage to all ShapeBase
    // objects.
-   InitContainerRadiusSearch(%position, %radius, $TypeMasks::ShapeBaseObjectType);
+   InitContainerRadiusSearch(%position, %radius, $TypeMasks::ShapeBaseObjectType | $TypeMasks::DynamicShapeObjectType);
 
    %halfRadius = %radius / 2;
    while ((%targetObject = containerSearchNext()) != 0)
