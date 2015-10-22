@@ -50,7 +50,6 @@ GFXImplementVertexFormat( GFXWaterVertex )
 {
    addElement( "POSITION", GFXDeclType_Float3 );
    addElement( "NORMAL", GFXDeclType_Float3 );
-   addElement( "COLOR", GFXDeclType_Color );   
    addElement( "TEXCOORD", GFXDeclType_Float2, 0 );
    addElement( "TEXCOORD", GFXDeclType_Float4, 1 );   
 }
