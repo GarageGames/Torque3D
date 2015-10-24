@@ -205,8 +205,6 @@ void WaterBlock::setupVertexBlock( U32 width, U32 height, U32 rowOffset )
    U32 numVerts = width * height;
 
    GFXWaterVertex *verts = new GFXWaterVertex[ numVerts ];
-   ColorI waterColor(31, 56, 64, 127);
-   GFXVertexColor vertCol(waterColor);
 
    U32 index = 0;
    for( U32 i=0; i<height; i++ )
@@ -219,7 +217,6 @@ void WaterBlock::setupVertexBlock( U32 width, U32 height, U32 rowOffset )
          vert->point.x = vertX;
          vert->point.y = vertY;
          vert->point.z = 0.0;
-         vert->color = vertCol;
          vert->normal.set(0,0,1);
          vert->undulateData.set( vertX, vertY );
          vert->horizonFactor.set( 0, 0, 0, 0 );
