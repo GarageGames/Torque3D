@@ -362,7 +362,7 @@ class EngineTypeInfo : public EngineExportScope
       // them to retroactively install property tables.  Will be removed
       // when the console interop is removed and all classes are migrated
       // to the new system.
-      template< typename T > friend class ConcreteClassRep;
+      template< typename T > friend class ConcreteAbstractClassRep;
       
    protected:
       
