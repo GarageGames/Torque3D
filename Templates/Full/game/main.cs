@@ -57,7 +57,7 @@ $displayHelp = false;
 
 // Use these to record and play back crashes
 //saveJournal("editorOnFileQuitCrash.jrn");
-//playJournal("editorOnFileQuitCrash.jrn", false);
+//playJournal("editorOnFileQuitCrash.jrn");
 
 //------------------------------------------------------------------------------
 // Check if a script file exists, compiled or not.
