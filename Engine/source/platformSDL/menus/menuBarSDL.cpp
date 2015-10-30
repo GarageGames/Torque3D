@@ -177,6 +177,7 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
       mCanvas->setMenuBar( base );
    }
 
+#ifndef TORQUE_DEDICATED
    for (S32 i = 0; i < size(); ++i)
    {
       PopupMenu *mnu = dynamic_cast<PopupMenu *>(at(i));
@@ -192,6 +193,7 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
       mnu->attachToMenuBar(owner, pos + i);
    }
    
+#endif
 }
 
 void MenuBar::removeFromCanvas()
@@ -201,6 +203,7 @@ void MenuBar::removeFromCanvas()
 
    //_FindMenuBarCtrl()->clearMenus();
 
+#ifndef TORQUE_DEDICATED
    // Add the items
    for (S32 i = 0; i < size(); ++i)
    {
@@ -215,6 +218,7 @@ void MenuBar::removeFromCanvas()
    }
 
    mCanvas->setMenuBar(NULL);
+#endif
 
    mCanvas = NULL;
 }
