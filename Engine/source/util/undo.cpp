@@ -504,7 +504,7 @@ void UndoManager::popCompound( bool discard )
 DefineConsoleMethod(UndoAction, addToManager, void, (const char * undoManager), (""), "action.addToManager([undoManager])")
 {
    UndoManager *theMan = NULL;
-   if (!dStrIsEmpty(undoManager))
+   if (!String::isEmpty(undoManager))
    {
       SimObject *obj = Sim::findObject(undoManager);
       if(obj)
