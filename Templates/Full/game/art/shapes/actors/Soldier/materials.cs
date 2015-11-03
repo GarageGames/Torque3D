@@ -35,6 +35,7 @@ singleton Material(Mat_Soldier_Main)
    doubleSided = false;
    translucent = false;
    showFootprints = "0";
+   castDynamicShadows = true;
    materialTag0 = "Player";
 };
 
@@ -55,6 +56,7 @@ singleton Material(Mat_Soldier_Dazzle)
    emissive[0] = "1";
    castShadows = "0";
    showFootprints = "0";
+   castDynamicShadows = true;
    materialTag0 = "Player";
 };
 

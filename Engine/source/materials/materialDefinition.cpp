@@ -182,7 +182,7 @@ Material::Material()
    mAlphaRef = 1;
 
    mCastShadows = true;
-   mCastDynamicShadows = true;
+   mCastDynamicShadows = false;
 
    mPlanarReflection = false;
 
