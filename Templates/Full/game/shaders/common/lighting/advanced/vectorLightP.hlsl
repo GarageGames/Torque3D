@@ -35,7 +35,7 @@ uniform sampler2D dynamicShadowMap : register(S2);
 
 #ifdef USE_SSAO_MASK
 uniform sampler2D ssaoMask : register(S3);
-uniform float4 rtParams2;
+uniform float4 rtParams3;
 #endif
 
 float4 AL_VectorLightShadowCast( sampler2D sourceShadowMap,
@@ -295,7 +295,7 @@ float4 main( FarFrustumQuadConnectP IN,
 
    // Sample the AO texture.      
    #ifdef USE_SSAO_MASK
-      float ao = 1.0 - tex2D( ssaoMask, viewportCoordToRenderTarget( IN.uv0.xy, rtParams2 ) ).r;
+      float ao = 1.0 - tex2D( ssaoMask, viewportCoordToRenderTarget( IN.uv0.xy, rtParams3 ) ).r;
       addToResult *= ao;
    #endif
 
