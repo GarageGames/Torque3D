@@ -1552,7 +1552,7 @@ bool MeshRoad::castRay( const Point3F &s, const Point3F &e, RayInfo *info )
       info->point.interpolate(start, end, out);
       info->face = -1;
       info->object = this;
-
+      info->material = this->mMatInst[0];
       return true;
    }
 
