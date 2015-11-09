@@ -160,7 +160,7 @@ function defaultParseArgs()
             $argUsed[$i]++;
             if ($hasNextArg)
             {
-               playJournal($nextArg,false);
+               playJournal($nextArg);
                $argUsed[$i+1]++;
                $i++;
             }
@@ -239,18 +239,6 @@ function defaultParseArgs()
             }
             else
                error("Error: Missing Command Line argument. Usage: -vidCapHeight <ouput_video_height>");
-
-         //--------------------
-         case "-jDebug":
-            $argUsed[$i]++;
-            if ($hasNextArg)
-            {
-               playJournal($nextArg,true);
-               $argUsed[$i+1]++;
-               $i++;
-            }
-            else
-               error("Error: Missing Command Line argument. Usage: -jDebug <journal_name>");
 
          //--------------------
          case "-level":
