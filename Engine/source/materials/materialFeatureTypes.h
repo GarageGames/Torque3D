@@ -94,6 +94,7 @@ DeclareFeatureType( MFT_OverlayMap );
 DeclareFeatureType( MFT_DetailMap );
 DeclareFeatureType( MFT_DiffuseColor );
 DeclareFeatureType( MFT_DetailNormalMap );
+DeclareFeatureType( MFT_Imposter );
 
 DeclareFeatureType( MFT_AccuMap );
 DeclareFeatureType( MFT_AccuScale );

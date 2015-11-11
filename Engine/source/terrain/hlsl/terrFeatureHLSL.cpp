@@ -64,6 +64,12 @@ MODULE_BEGIN( TerrainFeatHLSL )
 MODULE_END;
 
 
+TerrainFeatHLSL::TerrainFeatHLSL()
+   : mTorqueDep( "shaders/common/torque.hlsl" )
+   {      
+   addDependency( &mTorqueDep );
+   }
+
 Var* TerrainFeatHLSL::_getUniformVar( const char *name, const char *type, ConstantSortPosition csp )
 {
    Var *theVar = (Var*)LangElement::find( name );
@@ -262,6 +268,7 @@ void TerrainBaseMapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentLis
    baseColor->setType( "float4" );
    baseColor->setName( "baseColor" );
    meta->addStatement( new GenOp( "   @ = tex2D( @, @.xy );\r\n", new DecOp( baseColor ), diffuseMap, texCoord ) );
+   meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", baseColor, baseColor));
    meta->addStatement( new GenOp( "   @;\r\n", assignColor( baseColor, Material::Mul ) ) );
 
    output = meta;

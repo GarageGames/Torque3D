@@ -64,6 +64,12 @@ MODULE_BEGIN( TerrainFeatGLSL )
 MODULE_END;
 
 
+TerrainFeatGLSL::TerrainFeatGLSL()
+   : mTorqueDep( "shaders/common/gl/torque.glsl" )
+   {      
+   addDependency( &mTorqueDep );
+   }
+
 Var* TerrainFeatGLSL::_getUniformVar( const char *name, const char *type, ConstantSortPosition csp )
 {
    Var *theVar = (Var*)LangElement::find( name );
@@ -262,6 +268,7 @@ void TerrainBaseMapFeatGLSL::processPix(  Vector<ShaderComponent*> &componentLis
    baseColor->setType( "vec4" );
    baseColor->setName( "baseColor" );
    meta->addStatement( new GenOp( "   @ = tex2D( @, @.xy );\r\n", new DecOp( baseColor ), diffuseMap, texCoord ) );
+   meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", baseColor, baseColor));
    meta->addStatement( new GenOp( "   @;\r\n", assignColor( baseColor, Material::Mul ) ) );
 
    output = meta;

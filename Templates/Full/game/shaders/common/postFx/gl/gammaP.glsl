@@ -28,6 +28,8 @@ uniform sampler2D backBuffer;
 uniform sampler1D colorCorrectionTex;
 
 uniform float OneOverGamma;
+uniform float Brightness;
+uniform float Contrast;
 
 in vec2 uv0;
 
@@ -45,5 +47,11 @@ void main()
    // Apply gamma correction
    color.rgb = pow( abs(color.rgb), vec3(OneOverGamma) );
 
+   // Apply contrast
+   color.rgb = ((color.rgb - 0.5f) * Contrast) + 0.5f;
+ 
+   // Apply brightness
+   color.rgb += Brightness;
+   
    OUT_col = color;
 }
