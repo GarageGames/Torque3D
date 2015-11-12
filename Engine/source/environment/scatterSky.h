@@ -199,6 +199,8 @@ protected:
    LightInfo *mLight;
 
    bool mCastShadows;
+   S32 mStaticRefreshFreq;
+   S32 mDynamicRefreshFreq;
    bool mDirty;
 
    LightFlareData *mFlareData;

@@ -86,6 +86,7 @@ Signal<void(void)> ShadowMapManager::smShadowDeactivateSignal;
 ShadowMapManager::ShadowMapManager() 
 :  mShadowMapPass(NULL), 
    mCurrentShadowMap(NULL),
+   mCurrentDynamicShadowMap(NULL),
    mIsActive(false)
 {
 }
@@ -98,9 +99,15 @@ void ShadowMapManager::setLightShadowMapForLight( LightInfo *light )
 {
    ShadowMapParams *params = light->getExtended<ShadowMapParams>();
    if ( params )
+   {
       mCurrentShadowMap = params->getShadowMap();
+      mCurrentDynamicShadowMap = params->getShadowMap(true);
+   }
    else 
+   {
       mCurrentShadowMap = NULL;
+      mCurrentDynamicShadowMap = NULL;
+   }
 }
 
 void ShadowMapManager::activate()

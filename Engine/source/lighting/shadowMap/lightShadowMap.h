@@ -47,6 +47,9 @@
 #ifndef _GFXSHADER_H_
 #include "gfx/gfxShader.h"
 #endif
+#ifndef _PLATFORM_PLATFORMTIMER_H_
+#include "platform/platformTimer.h"
+#endif
 
 class ShadowMapManager;
 class SceneManager;
@@ -88,20 +91,13 @@ struct LightingShaderConstants
    GFXShaderConstHandle *mLightSpotFalloffSC;
 
    GFXShaderConstHandle* mShadowMapSC;
+   GFXShaderConstHandle* mDynamicShadowMapSC;
    GFXShaderConstHandle* mShadowMapSizeSC;
 
    GFXShaderConstHandle* mCookieMapSC;
 
    GFXShaderConstHandle* mRandomDirsConst;
    GFXShaderConstHandle* mShadowSoftnessConst;
-
-   GFXShaderConstHandle* mWorldToLightProjSC;
-   GFXShaderConstHandle* mViewToLightProjSC;
-
-   GFXShaderConstHandle* mScaleXSC;
-   GFXShaderConstHandle* mScaleYSC;
-   GFXShaderConstHandle* mOffsetXSC;
-   GFXShaderConstHandle* mOffsetYSC;
    GFXShaderConstHandle* mAtlasXOffsetSC;
    GFXShaderConstHandle* mAtlasYOffsetSC;
    GFXShaderConstHandle* mAtlasScaleSC;
@@ -109,10 +105,27 @@ struct LightingShaderConstants
    // fadeStartLength.x = Distance in eye space to start fading shadows
    // fadeStartLength.y = 1 / Length of fade
    GFXShaderConstHandle* mFadeStartLength;
-   GFXShaderConstHandle* mFarPlaneScalePSSM;
    GFXShaderConstHandle* mOverDarkFactorPSSM;
 
    GFXShaderConstHandle* mTapRotationTexSC;
+
+   // Static Specific:   
+   GFXShaderConstHandle* mWorldToLightProjSC;
+   GFXShaderConstHandle* mViewToLightProjSC;
+   GFXShaderConstHandle* mScaleXSC;
+   GFXShaderConstHandle* mScaleYSC;
+   GFXShaderConstHandle* mOffsetXSC;
+   GFXShaderConstHandle* mOffsetYSC;
+   GFXShaderConstHandle* mFarPlaneScalePSSM;
+
+   // Dynamic Specific:   
+   GFXShaderConstHandle* mDynamicWorldToLightProjSC;
+   GFXShaderConstHandle* mDynamicViewToLightProjSC;
+   GFXShaderConstHandle* mDynamicScaleXSC;
+   GFXShaderConstHandle* mDynamicScaleYSC;
+   GFXShaderConstHandle* mDynamicOffsetXSC;
+   GFXShaderConstHandle* mDynamicOffsetYSC;
+   GFXShaderConstHandle* mDynamicFarPlaneScalePSSM;
 
    LightingShaderConstants();
    ~LightingShaderConstants();
@@ -147,7 +160,8 @@ public:
    virtual ~LightShadowMap();
 
    void render(   RenderPassManager* renderPass,
-                  const SceneRenderState *diffuseState );
+                  const SceneRenderState *diffuseState,
+                  bool _dynamic);
 
    U32 getLastUpdate() const { return mLastUpdate; }
 
@@ -237,6 +251,8 @@ protected:
 
    /// The time this shadow was last updated.
    U32 mLastUpdate;
+   PlatformTimer *mStaticRefreshTimer;
+   PlatformTimer *mDynamicRefreshTimer;
 
    /// The time this shadow was last culled and prioritized.
    U32 mLastCull;
@@ -274,6 +290,13 @@ protected:
    /// The callback used to get texture events.
    /// @see GFXTextureManager::addEventDelegate
    void _onTextureEvent( GFXTexCallbackCode code );  
+
+   bool mIsDynamic;
+public:
+
+   bool isDynamic() { return mIsDynamic; }
+   void setDynamic(bool value) { mIsDynamic = value; }
+
 };
 
 GFX_DeclareTextureProfile( ShadowMapProfile );
@@ -296,9 +319,9 @@ public:
    virtual void packUpdate( BitStream *stream ) const;
    virtual void unpackUpdate( BitStream *stream );
 
-   LightShadowMap* getShadowMap() const { return mShadowMap; }
+   LightShadowMap* getShadowMap(bool _isDynamic = false) const { return _isDynamic ? mDynamicShadowMap : mShadowMap; }
 
-   LightShadowMap* getOrCreateShadowMap();
+   LightShadowMap* getOrCreateShadowMap(bool _isDynamic = false);
 
    bool hasCookieTex() const { return cookie.isNotEmpty(); }
 
@@ -315,6 +338,7 @@ protected:
 
    ///
    LightShadowMap *mShadowMap;
+   LightShadowMap *mDynamicShadowMap;
 
    LightInfo *mLight;
 
@@ -376,6 +400,7 @@ public:
    bool lastSplitTerrainOnly;
 
    /// @}
+   bool isDynamic;
 };
 
 #endif // _LIGHTSHADOWMAP_H_
