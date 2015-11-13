@@ -209,6 +209,13 @@ namespace Con
       return ret;
    }
 
+   char* getBoolArg(bool arg)
+   {
+      char *ret = STR.getArgBuffer(32);
+      dSprintf(ret, 32, "%d", arg);
+      return ret;
+   }
+
    char *getStringArg( const char *arg )
    {
       U32 len = dStrlen( arg ) + 1;

@@ -35,6 +35,9 @@
 #include "console/engineTypeInfo.h"
 #endif
 
+#ifndef _STRINGTABLE_H_
+#include "core/stringTable.h"
+#endif
 
 /// @file
 /// Support for legacy TorqueScript console types.
@@ -151,6 +154,8 @@ class ConsoleBaseType
       virtual const bool isDatablock() { return false; };
       
       virtual const char* prepData( const char* data, char* buffer, U32 bufferLen ) { return data; };
+
+      virtual StringTableEntry getTypePrefix(void) const { return StringTable->EmptyString(); }
       
       /// @}
 };
@@ -259,7 +264,7 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
    DefineConsoleType( type, nativeType ) \
    template<> inline const EngineTypeInfo* _MAPTYPE< nativeType >() { return NULL; }
 
-#define ConsoleType( typeName, type, nativeType ) \
+#define ConsoleType( typeName, type, nativeType, typePrefix ) \
    S32 type; \
    class ConsoleType##type : public ConsoleBaseType \
    { \
@@ -275,6 +280,7 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
       virtual const char *getTypeClassName() { return #typeName ; } \
       virtual void       *getNativeVariable() { T* var = new T; return (void*)var; } \
       virtual void        deleteNativeVariable(void* var) { T* nativeVar = reinterpret_cast<T*>(var); delete nativeVar; } \
+      virtual StringTableEntry getTypePrefix( void ) const { return StringTable->insert( typePrefix ); } \
    }; \
    ConsoleType ## type gConsoleType ## type ## Instance;
 
@@ -303,6 +309,9 @@ const EngineTypeInfo* _MAPTYPE() { return TYPE< T >(); }
       virtual const char *prepData(const char *data, char *buffer, U32 bufferLen); \
    }; \
    ConsoleType ## type gConsoleType ## type ## Instance;
+
+#define ConsoleTypeFieldPrefix( type, typePrefix ) \
+   StringTableEntry ConsoleType##type::getTypePrefix( void ) const { return StringTable->insert( typePrefix ); }
 
 #define ConsoleSetType( type ) \
    void ConsoleType##type::setData(void *dptr, S32 argc, const char **argv, const EnumTable *tbl, BitSet32 flag)

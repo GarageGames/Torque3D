@@ -66,6 +66,17 @@ bool dFileDelete(const char * name)
       return RemoveDirectory( buf );
 }
 
+bool Platform::fileDelete(const char * name)
+{
+   if (!name || (dStrlen(name) >= MAX_PATH))
+      return(false);
+   //return(::DeleteFile(name));
+   if (Platform::isFile(name))
+      return(remove(name) == 0);
+   else
+      return ::RemoveDirectoryA(name) != 0;
+}
+
 bool dFileRename(const char *oldName, const char *newName)
 {
    AssertFatal( oldName != NULL && newName != NULL, "dFileRename - NULL file name" );

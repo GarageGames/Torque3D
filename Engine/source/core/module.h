@@ -42,7 +42,7 @@ class Module
    public:
    
       typedef void Parent;
-      friend struct ModuleManager;
+      friend struct EngineModuleManager;
       
    protected:
    
@@ -333,7 +333,7 @@ class Module
    void _AfterModuleInit::initialize()
 
 
-struct ModuleManager
+struct EngineModuleManager
 {
       /// Initialize all modules registered with the system.
       static void initializeSystem();

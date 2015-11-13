@@ -47,7 +47,9 @@
 #ifndef _SIMOBJECTREF_H_
    #include "console/simObjectRef.h"
 #endif
-
+#ifndef TINYXML_INCLUDED
+   #include "tinyXML/tinyxml.h"
+#endif
 
 /// @file
 /// Legacy console object system.
@@ -201,6 +203,9 @@ public:
 
    typedef ConsoleBaseType Parent;
 
+   /// Allows the writing of a custom TAML schema.
+   typedef void(*WriteCustomTamlSchema)(const AbstractClassRep* pClassRep, TiXmlElement* pParentElement);
+
    /// @name 'Tructors
    /// @{
 
@@ -321,6 +326,9 @@ public:
    
    /// Return the AbstractClassRep of the class that this class is derived from.
    AbstractClassRep* getParentClass() const { return parentClass; }
+
+   virtual AbstractClassRep*    getContainerChildClass(const bool recurse) = 0;
+   virtual WriteCustomTamlSchema getCustomTamlSchema(void) = 0;
    
    /// Return the size of instances of this class in bytes.
    S32 getSizeof() const { return mClassSizeof; }
@@ -376,6 +384,8 @@ public:
 
    virtual ConsoleObject*     create      () const = 0;
 
+   AbstractClassRep* findFieldRoot(StringTableEntry fieldName);
+
 protected:
 
    virtual void init();
@@ -420,6 +430,13 @@ public:
    /// This is a function pointer typedef to support get/set callbacks for fields
    typedef bool (*SetDataNotify)( void *obj, const char *array, const char *data );
    typedef const char *(*GetDataNotify)( void *obj, const char *data );
+
+   /// This is a function pointer typedef to support optional writing for fields.
+   typedef bool(*WriteDataNotify)(void* obj, StringTableEntry pFieldName);
+
+   /// Allows the writing of a custom TAML schema.
+   typedef void(*WriteCustomTamlSchema)(const AbstractClassRep* pClassRep, TiXmlElement* pParentElement);
+
 
    /// These are special field type values used to mark
    /// groups and arrays in the field list.
@@ -494,6 +511,7 @@ public:
       TypeValidator *validator;     ///< Validator, if any.
       SetDataNotify  setDataFn;     ///< Set data notify Fn
       GetDataNotify  getDataFn;     ///< Get data notify Fn
+      WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
    };
    typedef Vector<Field> FieldList;
 
@@ -595,6 +613,27 @@ class ConcreteClassRep : public AbstractClassRep
          registerClassRep(this);
       };
 
+      virtual AbstractClassRep* getContainerChildClass(const bool recurse)
+      {
+         // Fetch container children type.
+         AbstractClassRep* pChildren = T::getContainerChildStaticClassRep();
+         if (!recurse || pChildren != NULL)
+            return pChildren;
+
+         // Fetch parent type.
+         AbstractClassRep* pParent = T::getParentStaticClassRep();
+         if (pParent == NULL)
+            return NULL;
+
+         // Get parent container children.
+         return pParent->getContainerChildClass(recurse);
+      }
+
+      virtual WriteCustomTamlSchema getCustomTamlSchema(void)
+      {
+         return T::getStaticWriteCustomTamlSchema();
+      }
+
       /// Perform class specific initialization tasks.
       ///
       /// Link namespaces, call initPersistFields() and consoleInit().
@@ -652,7 +691,7 @@ template< typename T > EnginePropertyTable& ConcreteClassRep< T >::smPropertyTab
 //------------------------------------------------------------------------------
 // Forward declaration of this function so  it can be used in the class
 const char *defaultProtectedGetFn( void *obj, const char *data );
-
+bool defaultProtectedWriteFn(void* obj, StringTableEntry pFieldName);
 
 //=============================================================================
 //    ConsoleObject.
@@ -781,6 +820,14 @@ public:
       const char*   in_pFieldDocs   = NULL,
       U32 flags = 0 );
 
+   static void addField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      AbstractClassRep::WriteDataNotify in_writeDataFn,
+      const U32     in_elementCount = 1,
+      const char*   in_pFieldDocs = NULL,
+      U32 flags = 0);
+
    /// Register a simple field.
    ///
    /// @param  in_pFieldname  Name of the field.
@@ -792,6 +839,13 @@ public:
       const dsize_t in_fieldOffset,
       const char*   in_pFieldDocs,
       U32 flags = 0 );
+
+   static void addField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      AbstractClassRep::WriteDataNotify in_writeDataFn,
+      const char*   in_pFieldDocs,
+      U32 flags = 0);
 
    /// Register a validated field.
    ///
@@ -821,10 +875,20 @@ public:
       const U32     in_fieldType,
       const dsize_t in_fieldOffset,
       AbstractClassRep::SetDataNotify in_setDataFn,
-      AbstractClassRep::GetDataNotify in_getDataFn,
-      const U32     in_elementCount,
-      const char*   in_pFieldDocs   = NULL,
-      U32 flags = 0 );
+      AbstractClassRep::GetDataNotify in_getDataFn = &defaultProtectedGetFn,
+      AbstractClassRep::WriteDataNotify in_writeDataFn = &defaultProtectedWriteFn,
+      const U32     in_elementCount = 1,
+      const char*   in_pFieldDocs = NULL,
+      U32 flags = 0);
+
+   static void addProtectedField(const char*  in_pFieldname,
+      const U32 in_fieldType,
+      const dsize_t in_fieldOffset,
+      AbstractClassRep::SetDataNotify in_setDataFn,
+      AbstractClassRep::GetDataNotify in_getDataFn = &defaultProtectedGetFn,
+      const U32 in_elementCount = 1,
+      const char* in_pFieldDocs = NULL,
+      U32 flags = 0);
 
    /// Register a simple protected field.
    ///
@@ -839,8 +903,17 @@ public:
       const dsize_t in_fieldOffset,
       AbstractClassRep::SetDataNotify in_setDataFn,
       AbstractClassRep::GetDataNotify in_getDataFn = &defaultProtectedGetFn,
+      AbstractClassRep::WriteDataNotify in_writeDataFn = &defaultProtectedWriteFn,
       const char*   in_pFieldDocs = NULL,
-      U32 flags = 0 );
+      U32 flags = 0);
+
+   static void addProtectedField(const char*  in_pFieldname,
+      const U32 in_fieldType,
+      const dsize_t in_fieldOffset,
+      AbstractClassRep::SetDataNotify in_setDataFn,
+      AbstractClassRep::GetDataNotify in_getDataFn = &defaultProtectedGetFn,
+      const char* in_pFieldDocs = NULL,
+      U32 flags = 0);
 
    /// Add a deprecated field.
    ///
@@ -1045,6 +1118,8 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
    static AbstractClassRep* getParentStaticClassRep();   \
    static AbstractClassRep* getStaticClassRep();         \
    static SimObjectRefConsoleBaseType< className > ptrRefType;         \
+   static AbstractClassRep::WriteCustomTamlSchema getStaticWriteCustomTamlSchema();         \
+   static AbstractClassRep* getContainerChildStaticClassRep();         \
    virtual AbstractClassRep* getClassRep() const      
       
 #define DECLARE_CATEGORY( string )                      \
@@ -1061,6 +1136,44 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }            \
    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                       \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }  \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
+   ConcreteClassRep<className> className::dynClassRep( #className, "Type" #className, &_smTypeId, 0, -1, 0, className::getParentStaticClassRep(), &Parent::__description )
+
+#define IMPLEMENT_CONOBJECT_CHILDREN( className )                                                           \
+   IMPLEMENT_CLASS( className, NULL )                                                              \
+   END_IMPLEMENT_CLASS;                                                                            \
+   S32 className::_smTypeId;                                                                       \
+   SimObjectRefConsoleBaseType< className > className::ptrRefType( "Type" #className "Ref" );      \
+   AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }            \
+   AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                       \
+   AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }  \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return Children::getStaticClassRep(); }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
+   ConcreteClassRep<className> className::dynClassRep( #className, "Type" #className, &_smTypeId, 0, -1, 0, className::getParentStaticClassRep(), &Parent::__description )
+
+#define IMPLEMENT_CONOBJECT_SCHEMA( className, schema )                                                           \
+   IMPLEMENT_CLASS( className, NULL )                                                              \
+   END_IMPLEMENT_CLASS;                                                                            \
+   S32 className::_smTypeId;                                                                       \
+   SimObjectRefConsoleBaseType< className > className::ptrRefType( "Type" #className "Ref" );      \
+   AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }            \
+   AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                       \
+   AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }  \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return schema; }            \
+   ConcreteClassRep<className> className::dynClassRep( #className, "Type" #className, &_smTypeId, 0, -1, 0, className::getParentStaticClassRep(), &Parent::__description )
+
+#define IMPLEMENT_CONOBJECT_CHILDREN_SCHEMA( className, schema )                                                           \
+   IMPLEMENT_CLASS( className, NULL )                                                              \
+   END_IMPLEMENT_CLASS;                                                                            \
+   S32 className::_smTypeId;                                                                       \
+   SimObjectRefConsoleBaseType< className > className::ptrRefType( "Type" #className "Ref" );      \
+   AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }            \
+   AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                       \
+   AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }  \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return Children::getStaticClassRep(); }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return schema; }            \
    ConcreteClassRep<className> className::dynClassRep( #className, "Type" #className, &_smTypeId, 0, -1, 0, className::getParentStaticClassRep(), &Parent::__description )
 
 #define IMPLEMENT_CO_NETOBJECT_V1( className )                                                           \
@@ -1071,6 +1184,8 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                  \
    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                             \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }        \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }        \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
    ConcreteClassRep<className> className::dynClassRep( #className, "Type" #className, &_smTypeId, NetClassGroupGameMask, NetClassTypeObject, 0, className::getParentStaticClassRep(), &Parent::__description )
 
 #define IMPLEMENT_CO_DATABLOCK_V1( className )                                                           \
@@ -1081,6 +1196,8 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; }                  \
    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; }                             \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); }        \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
    ConcreteClassRep<className> className::dynClassRep(#className, "Type" #className, &_smTypeId, NetClassGroupGameMask, NetClassTypeDataBlock, 0, className::getParentStaticClassRep(), &Parent::__description )
    
 // Support for adding properties to classes CONOBJECT style.
@@ -1131,6 +1248,21 @@ inline const char *defaultProtectedGetFn( void *obj, const char *data )
 inline const char *emptyStringProtectedGetFn( void *obj, const char *data )
 {
    return "";
+}
+
+inline bool defaultProtectedWriteFn(void* obj, StringTableEntry pFieldName)
+{
+   return true;
+}
+
+inline bool defaultProtectedNotSetFn(void* obj, const char *array, const char* data)
+{
+   return false;
+}
+
+inline bool defaultProtectedNotWriteFn(void* obj, StringTableEntry pFieldName)
+{
+   return false;
 }
 
 /// @}
