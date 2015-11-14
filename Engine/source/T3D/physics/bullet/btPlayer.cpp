@@ -341,7 +341,8 @@ void BtPlayer::_stepForward( btVector3 *inOutCurrPos, const btVector3 &displacem
 		callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
 		callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
 
-		mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
+      if (disp.length()>0.0001)
+         mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
 
       // Subtract from the travel fraction.
       fraction -= callback.m_closestHitFraction;
