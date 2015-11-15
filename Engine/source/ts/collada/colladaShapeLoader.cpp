@@ -529,7 +529,7 @@ bool ColladaShapeLoader::canLoadCachedDTS(const Torque::Path& path)
    if(a1.mtime == a2.mtime) return true;
 
    //otherwise return false
-   return true;
+   return false;
 }
 
 bool ColladaShapeLoader::checkAndMountSketchup(const Torque::Path& path, String& mountPoint, Torque::Path& daePath)
