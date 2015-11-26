@@ -206,7 +206,7 @@ WaterObject::WaterObject()
    mEmissive( false ),
    mUnderwaterColor(9, 6, 5, 240)
 {
-   mTypeMask = WaterObjectType | StaticObjectType;
+   mTypeMask = WaterObjectType;
 
    for( U32 i=0; i < MAX_WAVES; i++ )
    {
