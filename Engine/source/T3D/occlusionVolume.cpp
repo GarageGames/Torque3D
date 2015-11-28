@@ -31,7 +31,7 @@
 #include "util/tempAlloc.h"
 
 #include "math/mPolyhedron.impl.h"
-
+#include "scene/mixin/scenePolyhedralObject.impl.h"
 
 //#define DEBUG_DRAW
 

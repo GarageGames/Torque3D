@@ -3397,8 +3397,9 @@ void ShapeBase::shakeCamera( U32 imageSlot )
    {
       VectorF diff;
       getMuzzlePoint(imageSlot, &diff);
-      diff = obj->getPosition() - diff;
+      diff = obj->getPosition() - getPosition();  //andrewmac's mystery camerashake fix
       F32 dist = diff.len();
+	  if ( dist == 0.0f ) dist = 1.0f;  //andrewmac's mystery camerashake fix
       if (dist < imageData->camShakeRadius)
       {
          CameraShake *camShake = new CameraShake;

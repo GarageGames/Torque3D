@@ -34,17 +34,18 @@
 /// TGE WII   0005
 /// Torque 3D 0006
 /// Torque 3D MIT 0007
-#define TORQUE_ENGINE_PRODUCT      0007
+/// Ueberengine 0010
+#define TORQUE_ENGINE_PRODUCT      0010
 
 /// This is our global version number for the engine source code that
 /// we are using. See <game>/source/torqueConfig.h for the game's source
 /// code version, the game name, and which type of game it is (TGB, TGE, TGEA, etc.).
 ///
 /// Version number is major * 1000 + minor * 100 + revision * 10.
-#define TORQUE_GAME_ENGINE          3630
+#define TORQUE_GAME_ENGINE          1030
 
 /// Human readable engine version string.
-#define TORQUE_GAME_ENGINE_VERSION_STRING  "3.6.3"
+#define TORQUE_GAME_ENGINE_VERSION_STRING  "1.0.3.0"
 
 /// Gets the engine version number.  The version number is specified as a global in version.cc
 U32 getVersionNumber();
