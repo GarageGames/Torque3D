@@ -30,7 +30,7 @@
 #include "T3D/shapeBase.h"
 #include "gfx/gfxDrawUtil.h"
 #include "console/engineAPI.h"
-
+#include "T3D/missionMarker.h" //> ZOD: Team coloring
 
 //----------------------------------------------------------------------------
 /// Displays name & damage above shape objects.
@@ -52,7 +52,10 @@ class GuiShapeNameHud : public GuiControl {
    ColorF   mTextColor;
    ColorF   mLabelFillColor;
    ColorF   mLabelFrameColor;
-
+   // ZOD: Team coloring
+   ColorF   mEnemyTextColor;
+   ColorF   mNeutralTextColor;
+   //> ZOD: End addition
    F32      mVerticalOffset;
    F32      mDistanceFade;
    bool     mShowFrame;
@@ -63,7 +66,10 @@ class GuiShapeNameHud : public GuiControl {
    Point2I  mLabelPadding;
 
 protected:
-   void drawName( Point2I offset, const char *buf, F32 opacity);
+	// ZOD: Team coloring
+   //void drawName( Point2I offset, const char *buf, F32 opacity);
+	void drawName( Point2I offset, const char *buf, F32 opacity, ColorF color);
+	//> ZOD: End edit
 
 public:
    GuiShapeNameHud();
@@ -120,6 +126,10 @@ GuiShapeNameHud::GuiShapeNameHud()
    mLabelFillColor.set( 0.25f, 0.25f, 0.25f, 0.25f );
    mLabelFrameColor.set( 0, 1, 0, 1 );
    mTextColor.set( 0, 1, 0, 1 );
+   //> ZOD: Team coloring
+   mEnemyTextColor.set( 1, 0, 0, 1 );
+   mNeutralTextColor.set( 1, 1, 1, 1 );
+   //> ZOD: End addition
    mShowFrame = mShowFill = true;
    mShowLabelFrame = mShowLabelFill = false;
    mVerticalOffset = 0.5f;
@@ -135,6 +145,10 @@ void GuiShapeNameHud::initPersistFields()
    addField( "textColor",  TypeColorF, Offset( mTextColor, GuiShapeNameHud ), "Color for the text on this control." );
    addField( "labelFillColor",  TypeColorF, Offset( mLabelFillColor, GuiShapeNameHud ), "Color for the background of each shape name label." );
    addField( "labelFrameColor", TypeColorF, Offset( mLabelFrameColor, GuiShapeNameHud ), "Color for the frames around each shape name label."  );
+   // ZOD: Team coloring
+   addField( "enemyTextColor",  TypeColorF, Offset( mEnemyTextColor, GuiShapeNameHud ), "Color for enemy shapes." );
+   //> ZOD: End addition
+   addField( "neutralTextColor",  TypeColorF, Offset( mNeutralTextColor, GuiShapeNameHud ), "Color for neutral shapes." );
    endGroup("Colors");     
 
    addGroup("Misc");       
@@ -174,7 +188,10 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
    // Must have a connection and control object
    GameConnection* conn = GameConnection::getConnectionToServer();
    if (!conn) return;
-   GameBase * control = dynamic_cast<GameBase*>(conn->getControlObject());
+//> ZOD: Team coloring
+   //GameBase * control = dynamic_cast<GameBase*>(conn->getControlObject());
+   ShapeBase * control = dynamic_cast<ShapeBase*>(conn->getControlObject());
+//< ZOD: End edit
    if (!control) return;
 
    // Get control camera info
@@ -199,6 +216,12 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
    static U32 losMask = TerrainObjectType | ShapeBaseObjectType | StaticObjectType;
    control->disableCollision();
 
+//> ZOD: Team coloring
+   ColorF renderColor;
+   const char *fof = NULL;
+   char buf[64];
+//< ZOD: End addition
+
    // All ghosted objects are added to the server connection group,
    // so we can find all the shape base objects by iterating through
    // our current connection.
@@ -207,6 +230,9 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
       if ( shape ) {
          if (shape != control && shape->getShapeName()) 
          {
+            //> ZOD: If cloaked, early out
+            if ( shape->getCloakedState() )
+               continue;
 
             // Target pos to test, if it's a player run the LOS to his eye
             // point, otherwise we'll grab the generic box center.
@@ -266,8 +292,32 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
             F32 opacity = (shapeDist < fadeDistance)? 1.0:
                1.0 - (shapeDist - fadeDistance) / (visDistance - fadeDistance);
 
+//> ZOD: Team coloring
+
+            S32 myId = control->getTeamId();
+            S32 targetId = shape->getTeamId();
+            if(targetId == 0)
+			{
+               fof = "N";
+               renderColor = mNeutralTextColor;
+			}
+            else if(myId != targetId)
+			{
+               fof = "E";
+               renderColor = mEnemyTextColor;
+			}
+            else
+			{
+               fof = "F";
+               renderColor = mTextColor;
+			}
+            // Append the distance from the shape to the name
+            dSprintf(buf,sizeof(buf), "%s : %gm", shape->getShapeName(), mFloor(shapeDist));
+			drawName(Point2I((S32)projPnt.x, (S32)projPnt.y), buf, opacity, renderColor);
+
+//< ZOD: End addition
             // Render the shape's name
-            drawName(Point2I((S32)projPnt.x, (S32)projPnt.y),shape->getShapeName(),opacity);
+            //drawName(Point2I((S32)projPnt.x, (S32)projPnt.y),shape->getShapeName(),opacity);
          }
       }
    }
@@ -275,6 +325,45 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
    // Restore control object collision
    control->enableCollision();
 
+// ZOD: Waypoints
+
+   SimSet *WayPointSet = Sim::getWayPointSet();
+   SimSet::iterator i;
+   for(i = WayPointSet->begin(); i != WayPointSet->end(); i++) 
+   {
+      WayPoint *way = (WayPoint *) (*i);
+      S32 myId = control->getTeamId();
+      S32 wayId = way->getTeamId();
+
+      Point3F wayPos;
+      MatrixF srtMat = way->getTransform();
+      srtMat.getColumn(3, &wayPos);
+
+      VectorF wayDir = wayPos - control->getPosition();//camPos;
+      F32 wayDist = wayDir.lenSquared();
+      if (wayDist == 0)
+         continue;
+
+      wayDist = mSqrt(wayDist);
+
+      Point3F projPnt;
+      wayPos.z += mVerticalOffset;
+      if (!parent->project(wayPos, &projPnt))
+         continue;
+
+      fof = way->mName;
+      if(wayId == 0)
+         renderColor = mNeutralTextColor;
+      else if(myId != wayId)
+         renderColor = mEnemyTextColor;
+      else
+         renderColor = mTextColor;
+
+      dSprintf(buf,sizeof(buf), "%s : %gm", fof, mFloor(wayDist));
+      drawName(Point2I((S32)projPnt.x, (S32)projPnt.y), buf, renderColor.alpha, renderColor);
+   }
+
+// ZOD: End addition
    // Border last
    if (mShowFrame)
       GFX->getDrawUtil()->drawRect(updateRect, mFrameColor);
@@ -291,7 +380,7 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
 ///                  specified y position.)
 /// @param   name    String name to display.
 /// @param   opacity Opacity of name (a fraction).
-void GuiShapeNameHud::drawName(Point2I offset, const char *name, F32 opacity)
+void GuiShapeNameHud::drawName(Point2I offset, const char *name, F32 opacity, ColorF mTextColor)
 {
    F32 width = mProfile->mFont->getStrWidth((const UTF8 *)name) + mLabelPadding.x * 2;
    F32 height = mProfile->mFont->getHeight() + mLabelPadding.y * 2;

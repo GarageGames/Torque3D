@@ -876,7 +876,7 @@ protected:
 
    F32 mEnergy;                     ///< Current enery level.
    F32 mRechargeRate;               ///< Energy recharge rate (in units/tick).
-
+   S32 mTeamId;                     ///< ZOD: Team identification for shape name
    F32 mMass;                       ///< Mass.
    F32 mOneOverMass;                ///< Inverse of mass.
                                     /// @note This is used to optimize certain physics calculations.
@@ -1139,8 +1139,11 @@ public:
       DamageMask      = Parent::NextFreeMask << 1,
       NoWarpMask      = Parent::NextFreeMask << 2,
       CloakMask       = Parent::NextFreeMask << 3,
-      SkinMask        = Parent::NextFreeMask << 4,
-      MeshHiddenMask  = Parent::NextFreeMask << 5,
+      //SkinMask        = Parent::NextFreeMask << 4,
+      SkinMask        = CloakMask,
+      //MeshHiddenMask  = Parent::NextFreeMask << 5,
+      MeshHiddenMask  = Parent::NextFreeMask << 4,
+      TeamMask        = Parent::NextFreeMask << 5,       //> ZOD: Add team Id
       SoundMaskN      = Parent::NextFreeMask << 6,       ///< Extends + MaxSoundThreads bits
       ThreadMaskN     = SoundMaskN  << MaxSoundThreads,  ///< Extends + MaxScriptThreads bits
       ImageMaskN      = ThreadMaskN << MaxScriptThreads, ///< Extends + MaxMountedImage bits
@@ -1170,7 +1173,10 @@ public:
    void onSceneRemove();
    static void consoleInit();
    bool onNewDataBlock( GameBaseData *dptr, bool reload );
-
+   //> ZOD: Add team Id
+   S32 getTeamId() { return mTeamId; }
+   void setTeamId(S32 team);
+   //< ZOD: End addition
    /// @}
 
    /// @name Name & Skin tags

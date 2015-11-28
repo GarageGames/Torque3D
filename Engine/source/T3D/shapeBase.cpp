@@ -907,6 +907,7 @@ ShapeBase::ShapeBase()
    damageDir( 0.0f, 0.0f, 1.0f ),
    mCloaked( false ),
    mCloakLevel( 0.0f ),
+   mTeamId( 0 ), //> ZOD: Add team Id
    mFadeOut( true ),
    mFading( false ),
    mFadeVal( 1.0f ),
@@ -2969,6 +2970,12 @@ U32 ShapeBase::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          ThreadMask | ImageMask | CloakMask | SkinMask)))
       return retMask;
 
+//> ZOD: Add team Id
+   if(stream->writeFlag(mask & TeamMask)) {
+      stream->write(mTeamId);
+   }
+//< ZOD: End addition
+
    if (stream->writeFlag(mask & DamageMask)) {
       stream->writeFloat(mClampF(mDamage / mDataBlock->maxDamage, 0.f, 1.f), DamageLevelBits);
       stream->writeInt(mDamageState,NumDamageStateBits);
@@ -3075,6 +3082,12 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
 
    if(!stream->readFlag())
       return;
+
+//> ZOD: Add team Id
+   if(stream->readFlag()) {
+      stream->read(&mTeamId);
+   }
+//< ZOD: End addition
 
    if (stream->readFlag()) {
       mDamage = mClampF(stream->readFloat(DamageLevelBits) * mDataBlock->maxDamage, 0.f, mDataBlock->maxDamage);
@@ -3579,6 +3592,35 @@ void ShapeBase::setCurrentWaterObject( WaterObject *obj )
 }
 
 //--------------------------------------------------------------------------
+//> ZOD: Add team Id
+void ShapeBase::setTeamId(S32 teamId)
+{
+   if(teamId < 0)
+      teamId = 0;
+
+   mTeamId = teamId;
+   setMaskBits(TeamMask);
+}
+
+DefineEngineMethod( ShapeBase, setTeamId, void, ( S32 teamId ),,
+   "@brief Set this object's current team.\n\n"
+
+   "@param teamId new team\n"
+   
+   "@see getTeamId()\n")
+{
+   object->setTeamId( teamId );
+}
+
+DefineEngineMethod( ShapeBase, getTeamId, S32, (),,
+   "@brief Get the object's current team.\n\n"
+
+   "@return team\n"
+   
+   "@see setTeamId()\n")
+{
+   return object->getTeamId();
+}
 //----------------------------------------------------------------------------
 DefineEngineMethod( ShapeBase, setHidden, void, ( bool show ),,
    "@brief Add or remove this object from the scene.\n\n"
