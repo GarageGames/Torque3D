@@ -113,8 +113,8 @@ DefineConsoleFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, fals
    for(U32 i = 0; i < set->size(); i++)
    {
       NavMesh *m = static_cast<NavMesh*>(set->at(i));
-	   if (m)
-	   {
+      if (m)
+      {
          m->cancelBuild();
          m->buildTiles(obj->getWorldBox());
       }
