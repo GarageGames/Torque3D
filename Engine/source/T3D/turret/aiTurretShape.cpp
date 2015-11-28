@@ -380,6 +380,12 @@ static void _scanCallback( SceneObject* object, void* data )
    ShapeBase* shape = dynamic_cast<ShapeBase*>(object);
    if (shape && shape->getDamageState() == ShapeBase::Enabled)
    {
+//> ZOD: Filter out these immediately
+      S32 myId = turret->getTeamId();
+      S32 targetId = shape->getTeamId();
+	  if (myId == targetId || shape->getCloakedState())
+	     return;
+//< ZOD: End addition
       Point3F targetPos = shape->getBoxCenter();
 
       // Put target position into the scan node's space
@@ -1352,3 +1358,13 @@ DefineEngineMethod( AITurretShape, recenterTurret, void, ( ),,
 {
    object->recenterTurret();
 }
+
+//< ZOD: You will shoot who I say to shoot!
+DefineEngineMethod( AITurretShape, addToTargetList, void, (ShapeBase* obj),,
+   "@brief Adds object to the turret's target list.\n\n"
+   "All objects in this list will be targeted by the turret.\n"
+   "@param obj The ShapeBase object to target.\n")
+{
+   object->addPotentialTarget(obj);
+}
+//< ZOD: End addition
