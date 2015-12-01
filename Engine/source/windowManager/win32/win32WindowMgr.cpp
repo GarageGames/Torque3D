@@ -252,7 +252,7 @@ PlatformWindow *Win32WindowManager::createWindow(GFXDevice *device, const GFXVid
    w32w->mWindowedWindowStyle = dwStyle;
 
    // Set the video mode on the window
-   w32w->setVideoMode(mode);
+   w32w->_setVideoMode(mode);
 
    // Associate our window struct with the HWND.
    SetWindowLongPtr(w32w->mWindowHandle, GWLP_USERDATA, (LONG_PTR)w32w);
