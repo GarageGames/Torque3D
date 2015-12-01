@@ -20,16 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// This file contains script methods unique to the WheeledVehicle class.  All
-// other necessary methods are contained in "../server/scripts/vehicle.cs" in
-// which the "generic" Vehicle class methods that are shared by all vehicles,
-// (flying, hover, and wheeled) can be found.
-
-// Parenting is in place for WheeledVehicleData to VehicleData.  This should
-// make it easier for people to simply drop in new (generic) vehicles.  All that
-// the user needs to create is a set of datablocks for the new wheeled vehicle
-// to use.  This means that no (or little) scripting should be necessary.
-
 function VolumetricFog::onEnterFog(%this,%obj)
 {
    // This method is called whenever the control object (Camera or Player)

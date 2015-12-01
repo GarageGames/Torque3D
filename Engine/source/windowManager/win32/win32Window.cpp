@@ -146,13 +146,13 @@ const GFXVideoMode & Win32Window::getVideoMode()
 	return mVideoMode;
 }
 
-void Win32Window::_setVideoMode( const GFXVideoMode &mode )
+void Win32Window::setVideoMode( const GFXVideoMode &mode )
 {
    bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
 
    if(needCurtain)
    {
-		Con::errorf("Win32Window::_setVideoMode - invoking curtain");
+		Con::errorf("Win32Window::setVideoMode - invoking curtain");
       mOwningManager->lowerCurtain();
    }
 
@@ -287,6 +287,8 @@ void Win32Window::_setVideoMode( const GFXVideoMode &mode )
 		mOwningManager->raiseCurtain();
 
 	SetForegroundWindow(getHWND());
+
+   getScreenResChangeSignal().trigger(this, true);
 }
 
 bool Win32Window::clearFullscreen()
