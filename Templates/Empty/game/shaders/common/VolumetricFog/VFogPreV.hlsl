@@ -20,40 +20,27 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// Load up all scripts.  This function is called when
-// a server is constructed.
-exec("./camera.cs");
-exec("./triggers.cs");
-exec("./VolumetricFog.cs");
-exec("./inventory.cs");
-exec("./shapeBase.cs");
-exec("./item.cs");
-exec("./health.cs");
-exec("./projectile.cs");
-exec("./radiusDamage.cs");
-exec("./teleporter.cs");
+// Volumetric Fog prepass vertex shader V1.00
 
-// Load our supporting weapon script, it contains methods used by all weapons.
-exec("./weapon.cs");
+#include "shaders/common/hlslstructs.h"
 
-// Load our weapon scripts
-// We only need weapon scripts for those weapons that work differently from the
-// class methods defined in weapon.cs
-exec("./proximityMine.cs");
+struct ConnectData
+{
+   float4 hpos : POSITION;
+   float4 pos : TEXCOORD0;
+};
 
-// Load our default player script
-exec("./player.cs");
+uniform float4x4 modelView;
 
-// Load our player scripts
-exec("./aiPlayer.cs");
+ConnectData main( VertexIn_P IN)    
+{
+	ConnectData OUT;
+	
+	float4 inPos = IN.pos;
+	inPos.w = 1.0;
+ 
+	OUT.hpos = mul( modelView, inPos );
+    OUT.pos = OUT.hpos;
 
-exec("./vehicle.cs");
-exec("./vehicleWheeled.cs");
-exec("./cheetah.cs");
-
-// Load turret support scripts
-exec("./turret.cs");
-
-// Load our gametypes
-exec("./gameCore.cs"); // This is the 'core' of the gametype functionality.
-exec("./gameDM.cs"); // Overrides GameCore with DeathMatch functionality.
+    return OUT;  
+}

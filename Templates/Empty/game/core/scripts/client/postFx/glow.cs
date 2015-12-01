@@ -106,3 +106,79 @@ singleton PostEffect( GlowPostFx )
       target = "$backBuffer";
    };
 };
+
+singleton ShaderData( PFX_VolFogGlowBlurVertShader )
+{
+	DXVertexShaderFile = "shaders/common/postFx/glowBlurV.hlsl";
+	DXPixelShaderFile = "shaders/common/postFx/VolFogGlowP.hlsl";
+	
+	OGLVertexShaderFile = "shaders/common/postFx/gl/glowBlurV.glsl";
+	OGLPixelShaderFile = "shaders/common/postFx/gl/VolFogGlowP.glsl";	
+	
+	defines = "BLUR_DIR=float2(0.0,1.0)";
+	samplerNames[0] = "$diffuseMap";
+	pixVersion = 2.0;
+};
+singleton ShaderData( PFX_VolFogGlowBlurHorzShader : PFX_VolFogGlowBlurVertShader )
+{
+	DXVertexShaderFile = "shaders/common/postFx/glowBlurV.hlsl";
+	DXPixelShaderFile = "shaders/common/postFx/VolFogGlowP.hlsl";
+	
+	OGLVertexShaderFile = "shaders/common/postFx/gl/glowBlurV.glsl";
+	OGLPixelShaderFile = "shaders/common/postFx/gl/VolFogGlowP.glsl";
+	
+	defines = "BLUR_DIR=float2(1.0,0.0)";
+};
+
+$VolFogGlowPostFx::glowStrength = 0.3;
+
+singleton PostEffect( VolFogGlowPostFx )
+{
+	// Do not allow the glow effect to work in reflection
+	// passes by default so we don't do the extra drawing.
+	allowReflectPass = false;
+	renderTime = "PFXAfterBin";
+	renderBin = "FogBin";
+	renderPriority = 1;
+	// First we down sample the glow buffer.
+	shader = PFX_PassthruShader;
+	stateBlock = PFX_DefaultStateBlock;
+	texture[0] = "$backbuffer";
+	target = "$outTex";
+	targetScale = "0.5 0.5";
+	isEnabled = true;
+	// Blur vertically
+	new PostEffect()
+	{
+		shader = PFX_VolFogGlowBlurVertShader;
+		stateBlock = PFX_DefaultStateBlock;
+		internalName = "vert";
+		texture[0] = "$inTex";
+		target = "$outTex";
+	};
+	// Blur horizontally
+	new PostEffect()
+	{
+		shader = PFX_VolFogGlowBlurHorzShader;
+		stateBlock = PFX_DefaultStateBlock;
+		internalName = "hor";
+		texture[0] = "$inTex";
+		target = "$outTex";
+	};
+	// Upsample and combine with the back buffer.
+	new PostEffect()
+	{
+		shader = PFX_PassthruShader;
+		stateBlock = PFX_GlowCombineStateBlock;
+		texture[0] = "$inTex";
+		target = "$backBuffer";
+	};
+};
+
+function VolFogGlowPostFx::setShaderConsts( %this )
+{
+	%vp=%this-->vert;
+	%vp.setShaderConst( "$strength", $VolFogGlowPostFx::glowStrength );
+	%vp=%this-->hor;
+	%vp.setShaderConst( "$strength", $VolFogGlowPostFx::glowStrength );
+}
