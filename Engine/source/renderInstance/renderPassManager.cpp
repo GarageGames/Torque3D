@@ -53,6 +53,7 @@ const RenderInstType RenderPassManager::RIT_ObjectTranslucent("ObjectTranslucent
 const RenderInstType RenderPassManager::RIT_Decal("Decal");
 const RenderInstType RenderPassManager::RIT_Water("Water");
 const RenderInstType RenderPassManager::RIT_Foliage("Foliage");
+const RenderInstType RenderPassManager::RIT_VolumetricFog("ObjectVolumetricFog");
 const RenderInstType RenderPassManager::RIT_Translucent("Translucent");
 const RenderInstType RenderPassManager::RIT_Begin("Begin");
 const RenderInstType RenderPassManager::RIT_Custom("Custom");
