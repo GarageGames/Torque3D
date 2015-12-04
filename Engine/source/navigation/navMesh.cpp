@@ -112,7 +112,7 @@ DefineConsoleFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, fals
    SimSet *set = NavMesh::getServerSet();
    for(U32 i = 0; i < set->size(); i++)
    {
-      NavMesh *m = static_cast<NavMesh*>(set->at(i));
+      NavMesh *m = dynamic_cast<NavMesh*>(set->at(i));
       if (m)
       {
          m->cancelBuild();
@@ -120,6 +120,28 @@ DefineConsoleFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, fals
       }
    }
    if(remove)
+      obj->enableCollision();
+}
+
+DefineConsoleFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove), (0, false),
+   "@brief Update all NavMesh tiles that intersect the given object's world box.")
+{
+   SceneObject *obj;
+   if (!Sim::findObject(objid, obj))
+      return;
+   if (remove)
+      obj->disableCollision();
+   SimSet *set = NavMesh::getServerSet();
+   for (U32 i = 0; i < set->size(); i++)
+   {
+      NavMesh *m = dynamic_cast<NavMesh*>(set->at(i));
+      if (m)
+      {
+         m->cancelBuild();
+         m->buildTiles(obj->getWorldBox());
+      }
+   }
+   if (remove)
       obj->enableCollision();
 }
 
