@@ -2491,6 +2491,9 @@ void Player::allowAllPoses()
 
 void Player::updateMove(const Move* move)
 {
+   if ( !getControllingClient() && isGhost() )
+      return;
+      
    delta.move = *move;
 
    // Is waterCoverage high enough to be 'swimming'?
