@@ -25,7 +25,7 @@
 
 
 #ifndef TINYXML_INCLUDED
-#include "tinyXML/tinyxml.h"
+#include "tinyxml/tinyxml.h"
 #endif
 
 #include "platform/platform.h"
