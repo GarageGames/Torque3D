@@ -582,3 +582,15 @@ new GuiControlProfile( GuiRadioProfile )
    hasBitmapArray = true;
    category = "Core";
 };
+
+singleton GuiControlProfile( GuiRolloutCoreProfile )
+{
+   border = 1;
+   borderColor = "200 200 200";
+   
+   hasBitmapArray = true;
+   bitmap = "tools/editorClasses/gui/images/rollout";
+   
+   textoffset = "17 0";
+   category = "Core";
+};

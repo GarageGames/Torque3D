@@ -29,7 +29,7 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
    //if to enable the postFX, apply the ones that are enabled
    if ( %bEnablePostFX )
    {
-      //SSAO, HDR, LightRays, DOF
+      //SSAO, HDR, LightRay, DOF
       
       if ( $PostFXManager::PostFX::EnableSSAO )      
          SSAOPostFx.enable();      
@@ -41,7 +41,7 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
       else
          HDRPostFX.disable();
 
-      if ( $PostFXManager::PostFX::EnableLightRays )
+      if ( $PostFXManager::PostFX::EnableLightRay )
          LightRayPostFX.enable();
       else
          LightRayPostFX.disable();
@@ -55,6 +55,16 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
          VignettePostEffect.enable();
       else
          VignettePostEffect.disable();
+         
+		if ( $PostFXManager::PostFX::EnableCA )
+         ChromaticLensPostFX.enable();
+      else
+         ChromaticLensPostFX.disable();
+         
+		if ( $PostFXManager::PostFX::EnableVolFogGlow )
+         VolFogGlowPostFx.enable();
+      else
+         VolFogGlowPostFx.disable();
      
       postVerbose("% - PostFX Manager - PostFX enabled");      
    }
@@ -66,47 +76,54 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
       HDRPostFX.disable();
       LightRayPostFX.disable();
       DOFPostEffect.disable();
-	  VignettePostEffect.disable();
-      
+	  	VignettePostEffect.disable();
+      ChromaticLensPostFX.disable();
+      VolFogGlowPostFx.disable();
       postVerbose("% - PostFX Manager - PostFX disabled");
    }
+   
 }
 
 function PostFXManager::settingsEffectSetEnabled(%this, %sName, %bEnable)
 {
    %postEffect = 0;
-   
+ 
    //Determine the postFX to enable, and apply the boolean
    if(%sName $= "SSAO")
    {
       %postEffect = SSAOPostFx;
-      $PostFXManager::PostFX::EnableSSAO = %bEnable;
-      //$pref::PostFX::SSAO::Enabled = %bEnable;
+      $PostFXManager::PostFX::EnableSSAO = %bEnable;     
    }
    else if(%sName $= "HDR")
    {
       %postEffect = HDRPostFX;
-      $PostFXManager::PostFX::EnableHDR = %bEnable;
-      //$pref::PostFX::HDR::Enabled = %bEnable;
+      $PostFXManager::PostFX::EnableHDR = %bEnable;     
    }
-   else if(%sName $= "LightRays")
+   else if(%sName $= "LightRay")
    {
       %postEffect = LightRayPostFX;
-      $PostFXManager::PostFX::EnableLightRays = %bEnable;
-      //$pref::PostFX::LightRays::Enabled = %bEnable;      
+      $PostFXManager::PostFX::EnableLightRay = %bEnable;     
    }
    else if(%sName $= "DOF")
    {
       %postEffect = DOFPostEffect;
-      $PostFXManager::PostFX::EnableDOF = %bEnable;
-      //$pref::PostFX::DOF::Enabled = %bEnable;
+      $PostFXManager::PostFX::EnableDOF = %bEnable;    
    }
    else if(%sName $= "Vignette")
    {
       %postEffect = VignettePostEffect;
-      $PostFXManager::PostFX::EnableVignette = %bEnable;
-      //$pref::PostFX::Vignette::Enabled = %bEnable;
+      $PostFXManager::PostFX::EnableVignette = %bEnable;    
    }
+   else if (%sName $= "CA")
+   {
+      %postEffect = ChromaticLensPostFX;
+      $PostFXManager::PostFX::EnableCA = %bEnable;     
+   }
+    else if (%sName $= "VolFogGlow")
+   {
+      %postEffect = VolFogGlowPostFx;
+      $PostFXManager::PostFX::EnableVolFogGlow = %bEnable;    
+   }   
    
    // Apply the change
    if ( %bEnable == true )
@@ -180,24 +197,23 @@ function PostFXManager::settingsRefreshHDR(%this)
    %this-->ColorCorrectionFileName.Text = $HDRPostFX::colorCorrectionRamp;    
 }
 
-function PostFXManager::settingsRefreshLightrays(%this)
+function PostFXManager::settingsRefreshLightRay(%this)
 {
   //Apply the enabled flag 
-   ppOptionsEnableLightRays.setValue($PostFXManager::PostFX::EnableLightRays);   
+   ppOptionsEnableLightRay.setValue($PostFXManager::PostFX::EnableLightRay);   
     
-   ppOptionsLightRaysBrightScalar.setValue($LightRayPostFX::brightScalar);
+   ppOptionsLightRayBrightScalar.setValue($LightRayPostFX::brightScalar);
    
-   ppOptionsLightRaysSampleScalar.setValue($LightRayPostFX::numSamples);
-   ppOptionsLightRaysDensityScalar.setValue($LightRayPostFX::density);
-   ppOptionsLightRaysWeightScalar.setValue($LightRayPostFX::weight);
-   ppOptionsLightRaysDecayScalar.setValue($LightRayPostFX::decay);
+   ppOptionsLightRaySampleScalar.setValue($LightRayPostFX::numSamples);
+   ppOptionsLightRayDensityScalar.setValue($LightRayPostFX::density);
+   ppOptionsLightRayWeightScalar.setValue($LightRayPostFX::weight);
+   ppOptionsLightRayDecayScalar.setValue($LightRayPostFX::decay);
 }
 
 function PostFXManager::settingsRefreshDOF(%this)
 {
   //Apply the enabled flag 
    ppOptionsEnableDOF.setValue($PostFXManager::PostFX::EnableDOF);   
-
 
    //ppOptionsDOFEnableDOF.setValue($PostFXManager::PostFX::EnableDOF);
    ppOptionsDOFEnableAutoFocus.setValue($DOFPostFx::EnableAutoFocus);
@@ -219,25 +235,38 @@ function PostFXManager::settingsRefreshVignette(%this)
    ppOptionsEnableVignette.setValue($PostFXManager::PostFX::EnableVignette);   
 
 }
+function PostFXManager::settingsRefreshCA(%this)
+{
+  //Apply the enabled flag 
+   ppOptionsEnableCA.setValue($PostFXManager::PostFX::EnableCA);   
 
+}
+function PostFXManager::settingsRefreshVolFogGlow(%this)
+{
+  //Apply the enabled flag 
+   ppOptionsEnableVolFogGlow.setValue($PostFXManager::PostFX::EnableVolFogGlow);   
+
+}
 function PostFXManager::settingsRefreshAll(%this)
 {    
    $PostFXManager::PostFX::Enabled           = $pref::enablePostEffects;
    $PostFXManager::PostFX::EnableSSAO        = SSAOPostFx.isEnabled();
    $PostFXManager::PostFX::EnableHDR         = HDRPostFX.isEnabled();
-   $PostFXManager::PostFX::EnableLightRays   = LightRayPostFX.isEnabled();
+   $PostFXManager::PostFX::EnableLightRay   = LightRayPostFX.isEnabled();
    $PostFXManager::PostFX::EnableDOF         = DOFPostEffect.isEnabled();
    $PostFXManager::PostFX::EnableVignette    = VignettePostEffect.isEnabled();
-   
+   $PostFXManager::PostFX::EnableCA 			= ChromaticLensPostFX.isEnabled();
+   $PostFXManager::PostFX::EnableVolFogGlow 	= VolFogGlowPostFx.isEnabled();
    //For all the postFX here, apply the active settings in the system
    //to the gui controls.
    
    %this.settingsRefreshSSAO();
    %this.settingsRefreshHDR();
-   %this.settingsRefreshLightrays();
+   %this.settingsRefreshLightRay();
    %this.settingsRefreshDOF();
    %this.settingsRefreshVignette();
-   
+   %this.settingsRefreshCA();
+   %this.settingsRefreshVolFogGlow();
    ppOptionsEnable.setValue($PostFXManager::PostFX::Enabled);
 
    postVerbose("% - PostFX Manager - GUI values updated.");
@@ -246,7 +275,14 @@ function PostFXManager::settingsRefreshAll(%this)
 function PostFXManager::settingsApplyFromPreset(%this)
 {
    postVerbose("% - PostFX Manager - Applying from preset");
-
+	//Fix LightRay = exposure resolutionScale
+	//Fix SSAO = targetScale
+	//Fix VolFogGlow = glowStrength  + Added to PostFXManager::Settings
+	//Fix $VignettePostEffect changed to $VignettePostFX for naming consistence
+	//Fix Vignette = VMin
+	//Fix $PostFXManager::Settings::EnabledSSAO changed to $PostFXManager::Settings::EnableSSAO for naming consistence
+	//Fix Added CA PostFX prefs (ChromaticLens) distCoeffecient colorDistortionFactor cubeDistortionFactor
+	
    //SSAO Settings
    $SSAOPostFx::blurDepthTol           = $PostFXManager::Settings::SSAO::blurDepthTol;
    $SSAOPostFx::blurNormalTol          = $PostFXManager::Settings::SSAO::blurNormalTol;
@@ -266,6 +302,7 @@ function PostFXManager::settingsApplyFromPreset(%this)
    $SSAOPostFx::sNormalTol             = $PostFXManager::Settings::SSAO::sNormalTol;
    $SSAOPostFx::sRadius                = $PostFXManager::Settings::SSAO::sRadius;
    $SSAOPostFx::sStrength              = $PostFXManager::Settings::SSAO::sStrength;
+   $SSAOPostFx::targetScale              = $PostFXManager::Settings::SSAO::targetScale;
    
    //HDR settings
    $HDRPostFX::adaptRate               = $PostFXManager::Settings::HDR::adaptRate;
@@ -283,12 +320,13 @@ function PostFXManager::settingsApplyFromPreset(%this)
    $HDRPostFX::colorCorrectionRamp     = $PostFXManager::Settings::ColorCorrectionRamp;
    
    //Light rays settings
-   $LightRayPostFX::brightScalar       = $PostFXManager::Settings::LightRays::brightScalar;
-   
-   $LightRayPostFX::numSamples         = $PostFXManager::Settings::LightRays::numSamples;
-   $LightRayPostFX::density            = $PostFXManager::Settings::LightRays::density;
-   $LightRayPostFX::weight             = $PostFXManager::Settings::LightRays::weight;
-   $LightRayPostFX::decay              = $PostFXManager::Settings::LightRays::decay;
+   $LightRayPostFX::brightScalar       = $PostFXManager::Settings::LightRay::brightScalar;
+   $LightRayPostFX::exposure         	= $PostFXManager::Settings::LightRay::exposure;
+   $LightRayPostFX::resolutionScale 	= $PostFXManager::Settings::LightRay::resolutionScale;
+   $LightRayPostFX::numSamples         = $PostFXManager::Settings::LightRay::numSamples;
+   $LightRayPostFX::density            = $PostFXManager::Settings::LightRay::density;
+   $LightRayPostFX::weight             = $PostFXManager::Settings::LightRay::weight;
+   $LightRayPostFX::decay              = $PostFXManager::Settings::LightRay::decay;
    
    //DOF settings   
    $DOFPostFx::EnableAutoFocus         = $PostFXManager::Settings::DOF::EnableAutoFocus;
@@ -300,17 +338,29 @@ function PostFXManager::settingsApplyFromPreset(%this)
    $DOFPostFx::BlurCurveFar            = $PostFXManager::Settings::DOF::BlurCurveFar;
 
    //Vignette settings   
-   $VignettePostEffect::VMax           = $PostFXManager::Settings::Vignette::VMax;
+   $VignettePostFX::VMin           		= $PostFXManager::Settings::Vignette::VMin;
+   $VignettePostFX::VMax           		= $PostFXManager::Settings::Vignette::VMax;
+   
+    //CA (ChromaticLens) settings   
+   $CAPostFX::colorDistortionFactor    = $PostFXManager::Settings::CA::colorDistortionFactor;
+   $CAPostFX::cubeDistortionFactor     = $PostFXManager::Settings::CA::cubeDistortionFactor;   
+   $CAPostFX::distCoeffecient     		= $PostFXManager::Settings::CA::distCoeffecient;
+   
+
+   //VolFogGlow settings   
+   $VolFogGlowPostFx::glowStrength 		= $PostFXManager::Settings::VolFogGlow::glowStrength;
+   
   
    if ( $PostFXManager::forceEnableFromPresets )
    {
       $PostFXManager::PostFX::Enabled           = $PostFXManager::Settings::EnablePostFX;
       $PostFXManager::PostFX::EnableDOF         = $PostFXManager::Settings::EnableDOF;
       $PostFXManager::PostFX::EnableVignette    = $PostFXManager::Settings::EnableVignette;
-      $PostFXManager::PostFX::EnableLightRays   = $PostFXManager::Settings::EnableLightRays;
+      $PostFXManager::PostFX::EnableLightRay   = $PostFXManager::Settings::EnableLightRay;
       $PostFXManager::PostFX::EnableHDR         = $PostFXManager::Settings::EnableHDR;
-      $PostFXManager::PostFX::EnableSSAO        = $PostFXManager::Settings::EnabledSSAO;
-
+      $PostFXManager::PostFX::EnableSSAO        = $PostFXManager::Settings::EnableSSAO;
+      $PostFXManager::PostFX::EnableCA        	= $PostFXManager::Settings::EnableCA;
+		$PostFXManager::PostFX::EnableVolFogGlow  = $PostFXManager::Settings::EnableVolFogGlow;
       %this.settingsSetEnabled( true );
    }
    
@@ -342,6 +392,7 @@ function PostFXManager::settingsApplySSAO(%this)
    $PostFXManager::Settings::SSAO::sNormalTol               = $SSAOPostFx::sNormalTol;
    $PostFXManager::Settings::SSAO::sRadius                  = $SSAOPostFx::sRadius;
    $PostFXManager::Settings::SSAO::sStrength                = $SSAOPostFx::sStrength;
+	$PostFXManager::Settings::SSAO::targetScale              = $SSAOPostFx::targetScale;
 
    postVerbose("% - PostFX Manager - Settings Saved - SSAO");    
    
@@ -366,14 +417,15 @@ function PostFXManager::settingsApplyHDR(%this)
    postVerbose("% - PostFX Manager - Settings Saved - HDR");      
 }
 
-function PostFXManager::settingsApplyLightRays(%this)
+function PostFXManager::settingsApplyLightRay(%this)
 {   
-   $PostFXManager::Settings::LightRays::brightScalar        = $LightRayPostFX::brightScalar;
-   
-   $PostFXManager::Settings::LightRays::numSamples          = $LightRayPostFX::numSamples;
-   $PostFXManager::Settings::LightRays::density             = $LightRayPostFX::density;
-   $PostFXManager::Settings::LightRays::weight              = $LightRayPostFX::weight;
-   $PostFXManager::Settings::LightRays::decay               = $LightRayPostFX::decay;
+   $PostFXManager::Settings::LightRay::brightScalar        = $LightRayPostFX::brightScalar;    
+   $PostFXManager::Settings::LightRay::exposure 				= $LightRayPostFX::exposure;
+   $PostFXManager::Settings::LightRay::resolutionScale 		= $LightRayPostFX::resolutionScale;
+   $PostFXManager::Settings::LightRay::numSamples          = $LightRayPostFX::numSamples;
+   $PostFXManager::Settings::LightRay::density             = $LightRayPostFX::density;
+   $PostFXManager::Settings::LightRay::weight              = $LightRayPostFX::weight;
+   $PostFXManager::Settings::LightRay::decay               = $LightRayPostFX::decay;
    
    postVerbose("% - PostFX Manager - Settings Saved - Light Rays");   
    
@@ -395,22 +447,39 @@ function PostFXManager::settingsApplyDOF(%this)
 
 function PostFXManager::settingsApplyVignette(%this)
 {
-   $PostFXManager::Settings::Vignette::VMax                 = $VignettePostEffect::VMax;
-
+   $PostFXManager::Settings::Vignette::VMin                 = $VignettePostFX::VMin;
+ 	$PostFXManager::Settings::Vignette::VMax                 = $VignettePostFX::VMax;
    postVerbose("% - PostFX Manager - Settings Saved - Vignette");   
    
 }
+function PostFXManager::settingsApplyCA(%this)
+{
+   $PostFXManager::Settings::CA::colorDistortionFactor      = $CAPostFX::colorDistortionFactor;
+	$PostFXManager::Settings::CA::cubeDistortionFactor       = $CAPostFX::cubeDistortionFactor;
+	$PostFXManager::Settings::CA::distCoeffecient       		= $CAPostFX::distCoeffecient;
+	
+   postVerbose("% - PostFX Manager - Settings Saved - ChromaticLens");   
+   
+}
 
+function PostFXManager::settingsApplyVolFogGlow(%this)
+{
+   $PostFXManager::Settings::VolFogGlow::glowStrength       = $VolFogGlowPostFX::glowStrength;
+
+   postVerbose("% - PostFX Manager - Settings Saved - VolFogGlow");   
+   
+}
 function PostFXManager::settingsApplyAll(%this, %sFrom)
 {
    // Apply settings which control if effects are on/off altogether.
-   $PostFXManager::Settings::EnablePostFX        = $PostFXManager::PostFX::Enabled;  
-   $PostFXManager::Settings::EnableDOF           = $PostFXManager::PostFX::EnableDOF;
-   $PostFXManager::Settings::EnableVignette      = $PostFXManager::PostFX::EnableVignette;
-   $PostFXManager::Settings::EnableLightRays     = $PostFXManager::PostFX::EnableLightRays;
-   $PostFXManager::Settings::EnableHDR           = $PostFXManager::PostFX::EnableHDR;
-   $PostFXManager::Settings::EnabledSSAO         = $PostFXManager::PostFX::EnableSSAO;
-      
+   $PostFXManager::Settings::EnablePostFX        	= $PostFXManager::PostFX::Enabled;  
+   $PostFXManager::Settings::EnableDOF           	= $PostFXManager::PostFX::EnableDOF;
+   $PostFXManager::Settings::EnableVignette      	= $PostFXManager::PostFX::EnableVignette;
+   $PostFXManager::Settings::EnableLightRay     	= $PostFXManager::PostFX::EnableLightRay;
+   $PostFXManager::Settings::EnableHDR           	= $PostFXManager::PostFX::EnableHDR;
+   $PostFXManager::Settings::EnableSSAO         	= $PostFXManager::PostFX::EnableSSAO;
+	$PostFXManager::Settings::EnableCA         		= $PostFXManager::PostFX::EnableCA;
+	$PostFXManager::Settings::EnableVolFogGlow      = $PostFXManager::PostFX::EnableVolFogGlow;  
    // Apply settings should save the values in the system to the 
    // the preset structure ($PostFXManager::Settings::*)
 
@@ -419,11 +488,15 @@ function PostFXManager::settingsApplyAll(%this, %sFrom)
    // HDR settings
    %this.settingsApplyHDR();
    // Light rays settings
-   %this.settingsApplyLightRays();
+   %this.settingsApplyLightRay();
    // DOF
    %this.settingsApplyDOF();
    // Vignette
    %this.settingsApplyVignette();
+   // CA
+   %this.settingsApplyCA();
+   // VolFogGlow
+   %this.settingsApplyVolFogGlow();
    
    postVerbose("% - PostFX Manager - All Settings applied to $PostFXManager::Settings");
 }
