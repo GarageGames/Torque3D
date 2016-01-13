@@ -190,6 +190,7 @@ struct PlayerData: public ShapeBaseData {
       FootHard,
       FootMetal,
       FootSnow,
+      MaxSoundOffsets,
       FootShallowSplash,
       FootWading,
       FootUnderWater,
