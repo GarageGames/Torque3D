@@ -42,9 +42,9 @@ using namespace Torque;
 
 S32 GFXTextureManager::smTextureReductionLevel = 0;
 
-String GFXTextureManager::smMissingTexturePath("core/art/missingTexture");
-String GFXTextureManager::smUnavailableTexturePath("core/art/unavailable");
-String GFXTextureManager::smWarningTexturePath("core/art/warnmat");
+String GFXTextureManager::smMissingTexturePath("art/core/missingTexture");
+String GFXTextureManager::smUnavailableTexturePath("art/core/unavailable");
+String GFXTextureManager::smWarningTexturePath("art/core/warnMat");
 
 GFXTextureManager::EventSignal GFXTextureManager::smEventSignal;
 
