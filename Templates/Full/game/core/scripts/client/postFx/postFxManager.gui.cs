@@ -34,6 +34,10 @@ function PostFXManager::onDialogPush( %this )
    //Apply the settings to the controls
    postVerbose("% - PostFX Manager - Loading GUI.");
    
+   ppOptionsQuality.clear();
+   ppOptionsQuality.add("Low",0);
+   ppOptionsQuality.add("Medium",1);
+   ppOptionsQuality.add("High",1);
    %this.settingsRefreshAll();
 }
 
@@ -83,10 +87,10 @@ function ppOptionsEnableHDR::onAction(%this)
    PostFXManager.settingsEffectSetEnabled("HDR", %toEnable);
 }
 
-function ppOptionsEnableLightRays::onAction(%this)
+function ppOptionsEnableLightRay::onAction(%this)
 {
    %toEnable = PostFXManager.getEnableResultFromControl(%this);
-   PostFXManager.settingsEffectSetEnabled("LightRays", %toEnable);
+   PostFXManager.settingsEffectSetEnabled("LightRay", %toEnable);
 }
 
 function ppOptionsEnableDOF::onAction(%this)
@@ -111,6 +115,9 @@ function ppOptionsLoadPreset::onClick(%this)
    //Loads and applies the settings from a postfxpreset file
 }
 
+//==============================================================================
+// SSAO  Settings
+//==============================================================================
 
 //Other controls, Quality dropdown
 function ppOptionsSSAOQuality::onSelect( %this, %id, %text )
@@ -209,10 +216,17 @@ function ppOptionsSSAOFarTolerancePower::onMouseDragged(%this)
    $SSAOPostFx::lNormalPow = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
+function ppOptionsSSAOTargetScale::onMouseDragged(%this)
+{
+   $SSAOPostFx::targetScale = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
 
-//HDR Slider Controls
+
+//==============================================================================
+// HDR  Settings
+//==============================================================================
 //Brighness tab
-
 function ppOptionsHDRToneMappingAmount::onMouseDragged(%this)
 {
 
@@ -299,39 +313,69 @@ function ppOptionsHDREffectsBlueShiftColorBaseColor::onAction(%this)
    	ppOptionsHDREffectsBlueShiftColorBlend.baseColor = %this.PickColor;
 	%this.ToolTip = "Color Values : " @ %this.PickColor;
 }
+function ppOptionsEnableHDRDebug::onAction(%this)
+{
+   if ( %this.getValue() )
+      LuminanceVisPostFX.enable();
+   else
+      LuminanceVisPostFX.disable();   
+}
 
-
+//==============================================================================
+// Light rays Settings
+//==============================================================================
+function ppOptionsLightRaySlider::onMouseDragged(%this)
+{
+	%field = %this.internalName;
+   eval("$LightRayPostFX::"@%field@" = %this.value;");
+   PostFXManager.settingsEffectSetEnabled("LightRay",$PostFXManager::PostFX::EnableLightRay);  
+}
 //Light rays Brightness Slider Controls
-function ppOptionsLightRaysBrightScalar::onMouseDragged(%this)
+function ppOptionsLightRayBrightScalar::onMouseDragged(%this)
 {
    $LightRayPostFX::brightScalar = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
 //Light rays Number of Samples Slider Control
-function ppOptionsLightRaysSampleScalar::onMouseDragged(%this)
+function ppOptionsLightRaySampleScalar::onMouseDragged(%this)
 {
    $LightRayPostFX::numSamples = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
 //Light rays Density Slider Control
-function ppOptionsLightRaysDensityScalar::onMouseDragged(%this)
+function ppOptionsLightRayDensityScalar::onMouseDragged(%this)
 {
    $LightRayPostFX::density = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
 //Light rays Weight Slider Control
-function ppOptionsLightRaysWeightScalar::onMouseDragged(%this)
+function ppOptionsLightRayWeightScalar::onMouseDragged(%this)
 {
    $LightRayPostFX::weight = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
 //Light rays Decay Slider Control
-function ppOptionsLightRaysDecayScalar::onMouseDragged(%this)
+function ppOptionsLightRayDecayScalar::onMouseDragged(%this)
 {
    $LightRayPostFX::decay = %this.value;
    %this.ToolTip = "Value : " @ %this.value;
 }
+//Light rays Exposure Slider Control
+function ppOptionsLightRayExposureScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::exposure = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
+//Light rays ResolutionScale Slider Control
+function ppOptionsLightRayResolutionScaleScalar::onMouseDragged(%this)
+{
+   $LightRayPostFX::resolutionScale = %this.value;
+   %this.ToolTip = "Value : " @ %this.value;
+}
 
+//==============================================================================
+// DOF Settings
+//=============================================================================
 
 function ppOptionsUpdateDOFSettings()
 {
@@ -402,14 +446,21 @@ function ppOptionsDOFBlurCurveFarSlider::onMouseDragged(%this)
    ppOptionsUpdateDOFSettings();   
 }
 
-function ppOptionsEnableHDRDebug::onAction(%this)
-{
-   if ( %this.getValue() )
-      LuminanceVisPostFX.enable();
-   else
-      LuminanceVisPostFX.disable();   
-}
 
+
+//==============================================================================
+// Vignette Settings
+//==============================================================================
+function ppOptionsVignetteVMinSlider::onMouseDragged(%this)
+{
+   $VignettePostFx::VMin = %this.value;
+   ppOptionsUpdateVignetteSettings();   
+}
+function ppOptionsVignetteVMaxSlider::onMouseDragged(%this)
+{
+   $VignettePostFx::VMax = %this.value;
+   ppOptionsUpdateVignetteSettings();   
+}
 function ppOptionsUpdateVignetteSettings()
 {  
    if($PostFXManager::PostFX::EnableVignette)
@@ -421,13 +472,52 @@ function ppOptionsUpdateVignetteSettings()
       VignettePostEffect.disable();
    }
 }
-
 function ppOptionsVignetteEnableVignette::onAction(%this)
 {
    $PostFXManager::PostFX::EnableVignette = %this.getValue();
    ppOptionsUpdateVignetteSettings();
 }
 
+//==============================================================================
+// CA (ChromaticLens) Settings
+//==============================================================================
+function ppOptionsCASlider::onMouseDragged(%this)
+{
+	%field = %this.internalName;
+   eval("$CAPostFX::"@%field@" = %this.value;");
+   PostFXManager.settingsEffectSetEnabled("CA",$PostFXManager::PostFX::EnableCA);  
+}
+
+function ppOptionsEnableCA::onAction(%this)
+{
+   $PostFXManager::PostFX::EnableCA = %this.getValue();
+	PostFXManager.settingsEffectSetEnabled("CA",$PostFXManager::PostFX::EnableCA);  
+}
+function ppOptionsCAEdit::onValidate(%this)
+{
+	%field = %this.internalName;
+   eval("$CAPostFX::"@%field@" = %this.getText();");
+   PostFXManager.settingsEffectSetEnabled("CA",$PostFXManager::PostFX::EnableCA);  
+}
+
+ 
+//==============================================================================
+// VolFogGlow Settings
+//==============================================================================
+function ppOptionsVolFogGlowSlider::onMouseDragged(%this)
+{
+	%field = %this.internalName;
+   eval("$VolFogGlowPostFX::"@%field@" = %this.value;");
+   PostFXManager.settingsEffectSetEnabled("VolFogGlow",$PostFXManager::PostFX::EnableVolFogGlow);  
+}
+function ppOptionsEnableVolFogGlow::onAction(%this)
+{
+   $PostFXManager::PostFX::EnableVolFogGlow = %this.getValue();
+  PostFXManager.settingsEffectSetEnabled("VolFogGlow",$PostFXManager::PostFX::EnableVolFogGlow);  
+}
+//==============================================================================
+// ColorCorrection Settings
+//==============================================================================
 function ppColorCorrection_selectFile()
 {
    %filter = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng. *.tga)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga|All Files (*.*)|*.*|";   
@@ -443,4 +533,5 @@ function ppColorCorrection_selectFileHandler( %filename )
             
    $HDRPostFX::colorCorrectionRamp = %filename;
    PostFXManager-->ColorCorrectionFileName.Text = %filename; 
+   PostFXManager-->ColorCorrectionPreview.setBitmap(%filename);
 }
