@@ -118,7 +118,8 @@ void GuiCrossHairHud::onRender(Point2I offset, const RectI &updateRect)
    if (!conn)
       return;
    ShapeBase* control = dynamic_cast<ShapeBase*>(conn->getControlObject());
-   if (!control || !(control->getTypeMask() & ObjectMask) || !conn->isFirstPerson())
+   //if (!control || !(control->getTypeMask() & ObjectMask) || !conn->isFirstPerson()) //original
+   if   (!control || !(control->getTypeMask() & ObjectMask)) //Duion: Modified to show crosshair in third person
       return;
 
    // Parent render.

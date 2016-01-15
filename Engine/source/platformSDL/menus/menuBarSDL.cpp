@@ -39,7 +39,7 @@
 
 // class PlatformMenuBarData
 // {
-// 
+//
 // };
 
 Map<GuiMenuBar::Menu*, PopupMenu*> PlatformPopupMenuData::mMenuMap;
@@ -91,8 +91,8 @@ GuiPlatformGenericMenuBar* _FindMenuBarCtrl()
    GuiControl* control;
    Sim::findObject("PlatformGenericMenubar", control);
    AssertFatal(control, "");
-   if( !control )      
-      return NULL;   
+   if( !control )
+      return NULL;
 
    GuiPlatformGenericMenuBar* menuBar;
    menuBar = dynamic_cast<GuiPlatformGenericMenuBar*>( control->findObjectByInternalName(  StringTable->insert("menubar"), true) );
@@ -104,7 +104,7 @@ GuiPlatformGenericMenuBar* _FindMenuBarCtrl()
 void MenuBar::updateMenuBar(PopupMenu *popupMenu /* = NULL */)
 {
    //if(! isAttachedToCanvas())
-   //   return;   
+   //   return;
 
    if(!popupMenu)
       return;
@@ -156,7 +156,7 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
    mCanvas = owner;
 
    PlatformWindowSDL *pWindow = dynamic_cast<PlatformWindowSDL*>(owner->getPlatformWindow());
-   if(pWindow == NULL) 
+   if(pWindow == NULL)
       return;
 
    // Setup the native menu bar
@@ -168,15 +168,15 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
    {
       pWindow->setMenuHandle( hWindowMenu );
       GuiControl *base = hWindowMenu->getParent();
-         
+
       while( base->getParent() )
       {
          base = base->getParent();
-      }         
+      }
 
       mCanvas->setMenuBar( base );
    }
-
+#ifndef TORQUE_DEDICATED
    for (S32 i = 0; i < size(); ++i)
    {
       PopupMenu *mnu = dynamic_cast<PopupMenu *>(at(i));
@@ -191,7 +191,7 @@ void MenuBar::attachToCanvas(GuiCanvas *owner, S32 pos)
 
       mnu->attachToMenuBar(owner, pos + i);
    }
-   
+#endif
 }
 
 void MenuBar::removeFromCanvas()
@@ -201,6 +201,7 @@ void MenuBar::removeFromCanvas()
 
    //_FindMenuBarCtrl()->clearMenus();
 
+#ifndef TORQUE_DEDICATED
    // Add the items
    for (S32 i = 0; i < size(); ++i)
    {
@@ -215,6 +216,7 @@ void MenuBar::removeFromCanvas()
    }
 
    mCanvas->setMenuBar(NULL);
+#endif
 
    mCanvas = NULL;
 }
