@@ -321,8 +321,11 @@ void GuiCanvas::setWindowTitle(const char *newTitle)
       mPlatformWindow->setCaption(newTitle);
 }
 
+CanvasSizeChangeSignal GuiCanvas::smCanvasSizeChangeSignal;
+
 void GuiCanvas::handleResize( WindowId did, S32 width, S32 height )
 {
+   getCanvasSizeChangeSignal().trigger(this);
 	if (Journal::IsPlaying() && mPlatformWindow)
 	{
 		mPlatformWindow->lockSize(false);
