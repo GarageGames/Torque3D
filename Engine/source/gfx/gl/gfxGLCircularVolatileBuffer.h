@@ -143,6 +143,11 @@ public:
       init();
    }
 
+   ~GLCircularVolatileBuffer()
+   {
+      glDeleteBuffers(1, &mBufferName);
+   }
+
    void init()
    {
       glGenBuffers(1, &mBufferName);
