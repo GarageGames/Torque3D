@@ -42,6 +42,14 @@ GFXGLWindowTarget::GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d)
    win->appEvent.notify(this, &GFXGLWindowTarget::_onAppSignal);
 }
 
+GFXGLWindowTarget::~GFXGLWindowTarget()
+{
+   if(glIsFramebuffer(mCopyFBO))
+   {
+      glDeleteFramebuffers(1, &mCopyFBO);
+   }
+}
+
 void GFXGLWindowTarget::resetMode()
 {
    if(mWindow->getVideoMode().fullScreen != mWindow->isFullscreen())
@@ -49,6 +57,7 @@ void GFXGLWindowTarget::resetMode()
       _teardownCurrentMode();
       _setupNewMode();
    }
+   GFX->beginReset();
 }
 
 void GFXGLWindowTarget::_onAppSignal(WindowId wnd, S32 event)
