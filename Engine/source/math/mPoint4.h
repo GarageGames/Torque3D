@@ -41,6 +41,7 @@ class Point4I
   public:
    Point4I() {}
    Point4I(S32 _x, S32 _y, S32 _z, S32 _w);
+   explicit Point4I(S32 xyzw);                ///< Initializes all elements to the same value.
 
    void zero();   ///< Zero all values
 
@@ -73,6 +74,7 @@ class Point4F
   public:
    Point4F();               ///< Create an uninitialized point.
    Point4F(const Point4F&); ///< Copy constructor.
+   explicit Point4F(F32 xyzw);                ///< Initializes all elements to the same value.
 
    /// Create point from coordinates.
    Point4F(F32 _x, F32 _y, F32 _z, F32 _w);
@@ -117,6 +119,15 @@ typedef Point4F Vector4F;   ///< Points can be vectors!
 
 //------------------------------------------------------------------------------
 //-------------------------------------- Point4I
+inline Point4I::Point4I(S32 _x, S32 _y, S32 _z, S32 _w)
+   : x(_x), y(_y), z(_z), w(_w)
+{
+}
+
+inline Point4I::Point4I(S32 xyzw)
+   : x(xyzw), y(xyzw), z(xyzw), w(xyzw)
+{
+}
 
 inline void Point4I::zero()
 {
@@ -137,6 +148,11 @@ inline Point4F::Point4F(const Point4F& _copy)
 
 inline Point4F::Point4F(F32 _x, F32 _y, F32 _z, F32 _w)
  : x(_x), y(_y), z(_z), w(_w)
+{
+}
+
+inline Point4F::Point4F(F32 xyzw)
+   : x(xyzw), y(xyzw), z(xyzw), w(xyzw)
 {
 }
 
@@ -219,13 +235,6 @@ inline Point4F Point4F::operator /(F32 t) const
 {
    F32 f = 1.0f / t;
    return Point4F( x * f, y * f, z * f, w * f );
-}
-
-//------------------------------------------------------------------------------
-//-------------------------------------- Point4F
-
-inline Point4I::Point4I(S32 _x, S32 _y, S32 _z, S32 _w) : x(_x), y(_y), z(_z), w(_w) 
-{
 }
 
 //-------------------------------------------------------------------
