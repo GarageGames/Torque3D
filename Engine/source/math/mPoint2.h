@@ -203,7 +203,7 @@ class Point2D
    Point2D();                           ///< Create uninitialized point.
    Point2D(const Point2D&);             ///< Copy constructor
    Point2D(F64 _x, F64 _y);             ///< Create point from coordinates.
-   Point2D(F64 xy);                     ///< Initializes all elements to the same value.
+   explicit Point2D(F64 xy);            ///< Initializes all elements to the same value.
 
    //-------------------------------------- Non-math mutators and misc functions
   public:
