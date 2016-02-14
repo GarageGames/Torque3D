@@ -189,8 +189,8 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
 		   dv.dmPelsHeight = mode.resolution.y;
 		   dv.dmBitsPerPel = mode.bitDepth;
 		   dv.dmDisplayFrequency = mode.refreshRate;
-			dv.dmDisplayFlags = (CDS_FULLSCREEN);
-			dv.dmFields = (DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFLAGS);
+		   dv.dmDisplayFlags = (CDS_FULLSCREEN);
+		   dv.dmFields = (DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFLAGS);
 		   ChangeDisplaySettings(&dv, CDS_FULLSCREEN);
 		   SetWindowLong(getHWND(), GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW);
 		   SetWindowPos(getHWND(), HWND_TOP,	
