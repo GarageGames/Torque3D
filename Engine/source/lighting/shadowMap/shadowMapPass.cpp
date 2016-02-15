@@ -174,12 +174,12 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
          continue;
       
       // --- Static Shadow Map ---
-	  LightShadowMap *lsm = params->getOrCreateShadowMap();
-     LightShadowMap *dlsm = params->getOrCreateShadowMap(true);
+      LightShadowMap *lsm = params->getOrCreateShadowMap();
+      LightShadowMap *dlsm = params->getOrCreateShadowMap(true);
 
       // First check the visiblity query... if it wasn't 
       // visible skip it.
-     if (lsm->wasOccluded() || dlsm->wasOccluded())
+      if(params->getOcclusionQuery()->getStatus(true) == GFXOcclusionQuery::Occluded)
          continue;
 
       // Any shadow that is visible is counted as being 
@@ -187,9 +187,9 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
       ++smActiveShadowMaps;
 
       // Do a priority update for this shadow.
-	  lsm->updatePriority(diffuseState, currTime);
+      lsm->updatePriority(diffuseState, currTime);
 
-	  shadowMaps.push_back(lsm);
+      shadowMaps.push_back(lsm);
 
       // --- Dynamic Shadow Map ---
 
@@ -198,7 +198,7 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
       ++smActiveShadowMaps;
 
       // Do a priority update for this shadow.
-	  dlsm->updatePriority(diffuseState, currTime);
+      dlsm->updatePriority(diffuseState, currTime);
 
       shadowMaps.push_back( dlsm );
    }
