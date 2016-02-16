@@ -34,6 +34,7 @@ struct ConvexConnectP
    float4 wsEyeDir : TEXCOORD0;
    float4 ssPos : TEXCOORD1;
    float4 vsEyeDir : TEXCOORD2;
+   float4 color : COLOR0;
 };
 
 
@@ -117,6 +118,10 @@ float4 main(   ConvexConnectP IN,
                   uniform sampler2D dynamicShadowMap : register(S2),
                #endif
 
+               uniform sampler2D lightBuffer : register(S5),
+               uniform sampler2D colorBuffer : register(S6),
+               uniform sampler2D matInfoBuffer : register(S7),
+
                uniform float4 rtParams0,
 
                uniform float3 lightPosition,
@@ -136,7 +141,15 @@ float4 main(   ConvexConnectP IN,
    // Compute scene UV
    float3 ssPos = IN.ssPos.xyz / IN.ssPos.w;
    float2 uvScene = getUVFromSSPos( ssPos, rtParams0 );
-      
+   
+   // Emissive.
+   float4 matInfo = tex2D( matInfoBuffer, uvScene );   
+   bool emissive = getFlag( matInfo.r, 0 );
+   if ( emissive )
+   {
+       return float4(0.0, 0.0, 0.0, 0.0);
+   }
+   
    // Sample/unpack the normal/z data
    float4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
    float3 normal = prepassSample.rgb;
@@ -250,5 +263,6 @@ float4 main(   ConvexConnectP IN,
       addToResult = ( 1.0 - shadowed ) * abs(lightMapParams);
    }
 
-   return lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );
+   float4 colorSample = tex2D( colorBuffer, uvScene );
+   return AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
 }
