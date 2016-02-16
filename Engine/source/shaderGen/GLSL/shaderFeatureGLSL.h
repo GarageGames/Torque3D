@@ -248,6 +248,8 @@ public:
    virtual void processPix( Vector<ShaderComponent*> &componentList, 
                             const MaterialFeatureData &fd );
 
+   virtual U32 getOutputTargets(const MaterialFeatureData &fd) const;
+
    virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }
 
    virtual Resources getResources( const MaterialFeatureData &fd );
@@ -300,6 +302,8 @@ public:
                               const MaterialFeatureData &fd );
 
    virtual Material::BlendOp getBlendOp(){ return Material::None; }
+
+   virtual U32 getOutputTargets(const MaterialFeatureData &fd) const;
 
    virtual String getName()
    {
@@ -656,4 +660,11 @@ public:
 };
 
 
+class DeferredSkyGLSL : public ShaderFeatureGLSL
+{
+public:
+   virtual String getName() { return "Deferred Shading: Sky"; }
+   virtual void processVert( Vector<ShaderComponent*> &componentList,
+                             const MaterialFeatureData &fd );
+};
 #endif // _SHADERGEN_GLSL_SHADERFEATUREGLSL_H_
