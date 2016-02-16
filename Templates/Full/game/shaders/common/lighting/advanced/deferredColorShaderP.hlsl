@@ -20,19 +20,25 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton CubemapData( DesertSkyCubemap )
+struct Fragout
 {
-   cubeFace[0] = "./cubemap/skybox_1";
-   cubeFace[1] = "./cubemap/skybox_2";
-   cubeFace[2] = "./cubemap/skybox_3";
-   cubeFace[3] = "./cubemap/skybox_4";
-   cubeFace[4] = "./cubemap/skybox_5";
-   cubeFace[5] = "./cubemap/skybox_6";
+   float4 col : COLOR0;
+   float4 col1 : COLOR1;
+   float4 col2 : COLOR2;
 };
 
-singleton Material( DesertSkyMat )
+//-----------------------------------------------------------------------------
+// Main                                                                        
+//-----------------------------------------------------------------------------
+Fragout main( )
 {
-   cubemap = DesertSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
+   Fragout OUT;
+   
+   OUT.col =  float4(0.0, 0.0, 0.0, 0.0);
+   OUT.col1 = float4(1.0, 1.0, 1.0, 1.0);
+
+   // Draw on color buffer.
+   OUT.col2 = float4(1.0, 0.0, 0.0, 1.0);
+
+   return OUT;
+}

@@ -107,6 +107,14 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
    if(STATE_CHANGE(blendOp))
       glBlendEquation(GFXGLBlendOp[mDesc.blendOp]);
 
+   if (mDesc.separateAlphaBlendEnable == true)
+   {
+       if (STATE_CHANGE(separateAlphaBlendSrc) || STATE_CHANGE(separateAlphaBlendDest))
+           glBlendFuncSeparate(GFXGLBlend[mDesc.blendSrc], GFXGLBlend[mDesc.blendDest], GFXGLBlend[mDesc.separateAlphaBlendSrc], GFXGLBlend[mDesc.separateAlphaBlendDest]);
+       if (STATE_CHANGE(separateAlphaBlendOp))
+           glBlendEquationSeparate(GFXGLBlendOp[mDesc.blendOp], GFXGLBlendOp[mDesc.separateAlphaBlendOp]);
+   }
+
    // Color write masks
    if(STATE_CHANGE(colorWriteRed) || STATE_CHANGE(colorWriteBlue) || STATE_CHANGE(colorWriteGreen) || STATE_CHANGE(colorWriteAlpha))
       glColorMask(mDesc.colorWriteRed, mDesc.colorWriteBlue, mDesc.colorWriteGreen, mDesc.colorWriteAlpha);

@@ -20,19 +20,18 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton CubemapData( DesertSkyCubemap )
-{
-   cubeFace[0] = "./cubemap/skybox_1";
-   cubeFace[1] = "./cubemap/skybox_2";
-   cubeFace[2] = "./cubemap/skybox_3";
-   cubeFace[3] = "./cubemap/skybox_4";
-   cubeFace[4] = "./cubemap/skybox_5";
-   cubeFace[5] = "./cubemap/skybox_6";
-};
+layout (location = 0) out vec4 col;
+layout (location = 1) out vec4 col1;
+layout (location = 2) out vec4 col2;
 
-singleton Material( DesertSkyMat )
-{
-   cubemap = DesertSkyCubemap;
-   materialTag0 = "Skies";
-   isSky = true;
-};
+//-----------------------------------------------------------------------------
+// Main                                                                        
+//-----------------------------------------------------------------------------
+void main()
+{    
+   col =  vec4(0.0, 0.0, 0.0, 0.0);
+   col1 = vec4(1.0, 1.0, 1.0, 1.0);
+
+   // Draw on color buffer.
+   col2 = vec4(1.0, 0.0, 0.0, 1.0);
+}

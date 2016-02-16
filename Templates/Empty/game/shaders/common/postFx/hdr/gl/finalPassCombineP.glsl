@@ -42,9 +42,10 @@ uniform vec3 g_fBlueShiftColor;
 uniform float g_fBloomScale;
 
 uniform float g_fOneOverGamma;
+uniform float Brightness;
+uniform float Contrast;
 
 out vec4 OUT_col;
-
 
 void main()
 {
@@ -94,5 +95,11 @@ void main()
    // Apply gamma correction
    _sample.rgb = pow( abs(_sample.rgb), vec3(g_fOneOverGamma) );
 
+   // Apply contrast
+   _sample.rgb = ((_sample.rgb - 0.5f) * Contrast) + 0.5f;
+ 
+   // Apply brightness
+   _sample.rgb += Brightness;
+   
    OUT_col = _sample;
 }

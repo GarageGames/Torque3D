@@ -56,7 +56,7 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    output = meta;
 
    // OUT.col
-   Var *color = (Var*) LangElement::find( "col" );
+   Var *color = (Var*) LangElement::find( "col1" );
    if (!color)
    {
       output = new GenOp("   //NULL COLOR!");
@@ -141,8 +141,6 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    // get the accu pixel color
    meta->addStatement( new GenOp( "   @ = tex2D(@, @ * @);\r\n", colorAccuDecl, accuMap, inTex, accuScale ) );
-   if (!fd.features[MFT_Imposter])
-      meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", accuColor, accuColor));
 
    // scale up normals
    meta->addStatement( new GenOp( "   @.xyz = @.xyz * 2.0 - 0.5;\r\n", bumpNorm, bumpNorm ) );

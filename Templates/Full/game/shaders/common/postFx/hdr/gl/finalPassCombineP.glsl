@@ -23,11 +23,13 @@
 #include "../../../gl/torque.glsl"
 #include "../../../gl/hlslCompat.glsl"
 #include "../../gl/postFX.glsl"
+#include "shadergen:/autogenConditioners.h"
 
 uniform sampler2D sceneTex;
 uniform sampler2D luminanceTex;
 uniform sampler2D bloomTex;
 uniform sampler1D colorCorrectionTex;
+uniform sampler2D prepassTex;
 
 uniform vec2 texSize0;
 uniform vec2 texSize2;
@@ -86,7 +88,9 @@ void main()
    }
 
    // Add the bloom effect.
-   _sample += g_fBloomScale * bloom;
+   float depth = prepassUncondition( prepassTex, IN_uv0 ).w;
+   if (depth>0.9999)
+      _sample += g_fBloomScale * bloom;
 
    // Apply the color correction.
    _sample.r = texture( colorCorrectionTex, _sample.r ).r;
