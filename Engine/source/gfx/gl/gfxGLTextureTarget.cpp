@@ -260,7 +260,10 @@ GFXGLTextureTarget::GFXGLTextureTarget() : mCopyFboSrc(0), mCopyFboDst(0)
 
 GFXGLTextureTarget::~GFXGLTextureTarget()
 {
-   GFXTextureManager::removeEventDelegate( this, &GFXGLTextureTarget::_onTextureEvent );
+   GFXTextureManager::removeEventDelegate(this, &GFXGLTextureTarget::_onTextureEvent);
+
+   glDeleteFramebuffers(1, &mCopyFboSrc);
+   glDeleteFramebuffers(1, &mCopyFboDst);
 }
 
 const Point2I GFXGLTextureTarget::getSize()
