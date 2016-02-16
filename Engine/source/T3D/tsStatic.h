@@ -39,6 +39,10 @@
 #include "ts/tsShape.h"
 #endif
 
+#ifndef _REFLECTOR_H_
+   #include "scene/reflector.h"
+#endif
+
 class TSShapeInstance;
 class TSThread;
 class TSStatic;
@@ -146,6 +150,11 @@ protected:
 
    /// Start or stop processing ticks depending on our state.
    void _updateShouldTick();
+
+   String cubeDescName;
+   U32 cubeDescId;
+   ReflectorDesc *reflectorDesc;
+   CubeReflector mCubeReflector;
 
 protected:
 
