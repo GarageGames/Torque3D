@@ -1847,7 +1847,7 @@ U32 extrudePolygonEdgesFromPoint( const Point3F* vertices, U32 numVertices, cons
 
 //-----------------------------------------------------------------------------
 
-void MathUtils::mBuildHull2D(const Vector<Point2F> _inPoints, Vector<Point2F> &hullPoints)
+void mBuildHull2D(const Vector<Point2F> _inPoints, Vector<Point2F> &hullPoints)
 {
    /// Andrew's monotone chain convex hull algorithm implementation
 
