@@ -2641,10 +2641,33 @@ void Player::updateMove(const Move* move)
          }
          else
          {
+
             mRot.z += y;
-            // Rotate the head back to the front, center horizontal
-            // as well if we're controlling another object.
-            mHead.z *= 0.5f;
+
+            if(move->noWeaponTPCam) {
+
+               while (mHead.z > M_PI_F)
+                  mHead.z -= M_2PI_F;
+               while (mHead.z < -M_PI_F)
+                  mHead.z += M_2PI_F;
+
+               if(move->y > 0.0f || (con && con->isFirstPerson())) {
+
+                  F32 change = mHead.z * 0.5f;
+                  mHead.z = change;
+                  mRot.z += change;
+                  
+               } else {
+
+                  if(con && !con->isFirstPerson()) {
+                     mHead.z += y;
+                  }
+               }
+
+            } else {
+               mHead.z *= 0.5f;
+            }
+
             if (mControlObject)
                mHead.x *= 0.5f;
          }
@@ -2656,6 +2679,7 @@ void Player::updateMove(const Move* move)
             mRot.z -= M_2PI_F;
       }
 
+      //if(move->y > 0.0f) 
       delta.rot = mRot;
       delta.rotVec.x = delta.rotVec.y = 0.0f;
       delta.rotVec.z = prevZRot - mRot.z;

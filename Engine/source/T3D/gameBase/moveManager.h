@@ -49,6 +49,7 @@ struct Move
 
    bool deviceIsKeyboardMouse;
    bool freeLook;
+   bool noWeaponTPCam;
    bool trigger[MaxTriggerKeys];
 
    Move();
@@ -77,6 +78,7 @@ public:
    static F32 mRightAction;
 
    static bool mFreeLook;
+   static bool mNoWeaponTPCam;
    static F32 mPitch;
    static F32 mYaw;
    static F32 mRoll;
