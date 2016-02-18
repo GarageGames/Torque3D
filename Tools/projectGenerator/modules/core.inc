@@ -135,7 +135,6 @@ addEngineSrcDir( 'shaderGen' );
 switch( T3D_Generator::$platform )
 {
    case "win32":
-      //addEngineSrcDir( 'gfx/D3D8' );
       addEngineSrcDir( 'gfx/D3D' );
       addEngineSrcDir( 'gfx/D3D9' );
       addEngineSrcDir( 'gfx/D3D9/pc' );
@@ -200,15 +199,5 @@ includeModule( 'tools' );
 addIncludePath( '../../source' );		   // product source (relative to solution output directories)
 addIncludePath( getAppEngineSrcDir() );	// main engine source dir relative to app project file 
 addIncludePath( getAppLibSrcDir() ); 	   // main lib source dir relative to app project file
-
-if ( T3D_Generator::$platform == "win32" )
-{
-   addIncludePath( getAppLibSrcDir() . 'directx8' );
-   addIncludePath( getAppLibSrcDir() . 'openal/win32' );
-   
-   addProjectLibDir( getAppLibSrcDir() . 'SDL/win32' );
-   addProjectLibDir( getAppLibSrcDir() . 'unicode' );
-   addProjectLibDir( getAppLibSrcDir() . 'directx8' );
-}
 
 ?>

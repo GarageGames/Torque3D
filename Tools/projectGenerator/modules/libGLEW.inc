@@ -1,6 +1,6 @@
 <?php
 //-----------------------------------------------------------------------------
-// Copyright (c) 2014 GarageGames, LLC
+// Copyright (c) 2016 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -21,34 +21,17 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-beginModule('openGL');
+beginModule( 'libGLEW' );
 
-	addProjectDefine('TORQUE_OPENGL');
+   includeLib( 'libGLEW' );
+   addLibIncludePath( "glew/include" );
 
-	addEngineSrcDir("shaderGen/GLSL");
-
-	if(!isDefined("TORQUE_DEDICATED"))
-	{
-		addEngineSrcDir("gfx/gl");
-		addEngineSrcDir("gfx/gl/tGL");
-		addEngineSrcDir("shaderGen/GLSL");
-		addEngineSrcDir("lighting/advanced/glsl");
-		addEngineSrcDir("terrain/glsl");
-		addEngineSrcDir("forest/glsl");
-	}
-
-	if(!isDefined("TORQUE_SDL"))
-	{
-		addEngineSrcDir("gfx/gl/win32");
-	}
-    
-	addIncludePath( getAppLibSrcDir() . 'glew/include/' );
-    
-    if ( T3D_Generator::$platform == "win32" )
-    {
-        addProjectLibInput('OpenGL32.lib');
-    }
-
+   if (inProjectConfig())
+   {
+      addProjectDependency( 'libGLEW' ); 
+      addSolutionProjectRef( 'libGLEW' );
+   }
+   
 endModule();
 
 ?>

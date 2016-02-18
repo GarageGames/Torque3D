@@ -43,6 +43,7 @@ class Torque3D
         includeLib( 'collada_dom' );
         includeLib( 'pcre' ); 
         includeLib( 'convexDecomp' ); 
+        includeLib( 'libGLEW' );
 
         // Use FMOD on consoles
         if ( T3D_Generator::$platform != "360" && T3D_Generator::$platform != "ps3" )
@@ -104,6 +105,7 @@ class Torque3D
         addLibIncludePath( "opcode" );
         addLibIncludePath( "squish" );
         addLibIncludePath( 'convexDecomp' ); 
+		addLibIncludePath( 'libGLEW' ); 
         
         if ( T3D_Generator::$platform != "360" && T3D_Generator::$platform != "ps3" )
         {
@@ -131,7 +133,6 @@ class Torque3D
         includeModule( 'openal' );
    
         // Dependencies
-        
         addProjectDependency( 'lmng' );
         addProjectDependency( 'lpng' );
         addProjectDependency( 'lungif' );
@@ -143,6 +144,7 @@ class Torque3D
         addProjectDependency( 'collada_dom' );
         addProjectDependency( 'pcre' );
         addProjectDependency( 'convexDecomp' ); 
+        addProjectDependency( 'libGLEW' ); 
         
         if ( T3D_Generator::$platform != "360" && T3D_Generator::$platform != "ps3" )
         {
@@ -245,6 +247,7 @@ class Torque3D
               addSolutionProjectRef( 'tinyxml' );
               addSolutionProjectRef( 'zlib' );
               addSolutionProjectRef( 'convexDecomp' ); 
+              addSolutionProjectRef( 'libGLEW' ); 
               
               if (T3D_Generator::$platform == "win32")
               {
