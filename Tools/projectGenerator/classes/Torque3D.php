@@ -127,9 +127,8 @@ class Torque3D
           includeModule( 'theora' );
         }
        
-        if(T3D_Generator::$platform == "mac" || T3D_Generator::$platform == "win32")
-           includeModule( 'openal' );
-
+        //Dushan - Include OpenAL module on all supported platforms (Mac, Windows and Linux)
+        includeModule( 'openal' );
    
         // Dependencies
         
