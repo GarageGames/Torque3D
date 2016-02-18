@@ -294,26 +294,6 @@ $ColorPickerCancelCallback = "";
 $ColorPickerUpdateCallback = "";
 $ColorCallbackType   = 1;  // ColorI
 
-function ColorFloatToInt( %color )
-{
-   %red     = getWord( %color, 0 );
-   %green   = getWord( %color, 1 );
-   %blue    = getWord( %color, 2 );
-   %alpha   = getWord( %color, 3 );
-   
-   return mCeil( %red * 255 ) SPC mCeil( %green * 255 ) SPC mCeil( %blue * 255 ) SPC mCeil( %alpha * 255 );
-}
-
-function ColorIntToFloat( %color )
-{
-   %red     = getWord( %color, 0 );
-   %green   = getWord( %color, 1 );
-   %blue    = getWord( %color, 2 );
-   %alpha   = getWord( %color, 3 );
-
-   return ( %red / 255 ) SPC ( %green / 255 ) SPC ( %blue / 255 ) SPC ( %alpha / 255 );
-}
-
 // This function pushes the color picker dialog and returns to a callback the selected value
 function GetColorI( %currentColor, %callback, %root, %updateCallback, %cancelCallback )
 {
