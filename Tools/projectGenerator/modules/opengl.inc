@@ -31,6 +31,7 @@ beginModule('openGL');
 	{
 		addEngineSrcDir("gfx/gl");
 		addEngineSrcDir("gfx/gl/tGL");
+		addEngineSrcDir("gfx/gl/util");
 		addEngineSrcDir("shaderGen/GLSL");
 		addEngineSrcDir("lighting/advanced/glsl");
 		addEngineSrcDir("terrain/glsl");
