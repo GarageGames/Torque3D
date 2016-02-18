@@ -26,8 +26,10 @@
 #include <tchar.h>
 #include <winuser.h>
 #include "math/mMath.h"
+#include "gfx/gfxDevice.h"
 #include "gfx/gfxStructs.h"
 
+#include "windowManager/platformWindowMgr.h"
 #include "windowManager/win32/win32Window.h"
 #include "windowManager/win32/win32WindowMgr.h"
 #include "windowManager/win32/win32CursorController.h"
@@ -38,11 +40,6 @@
 
 // for winState structure
 #include "platformWin32/platformWin32.h"
-
-#include <d3d9types.h>
-#include "gfx/gfxDevice.h"
-
-#include <zmouse.h>
 
 const UTF16* _MainWindowClassName = L"TorqueJuggernaughtWindow";
 const UTF16* _CurtainWindowClassName = L"TorqueJuggernaughtCurtainWindow";
@@ -148,96 +145,93 @@ const GFXVideoMode & Win32Window::getVideoMode()
 
 void Win32Window::setVideoMode( const GFXVideoMode &mode )
 {
-   bool needCurtain = (mVideoMode.fullScreen != mode.fullScreen);
+   bool needCurtain = ( mVideoMode.fullScreen != mode.fullScreen );
 
-   if(needCurtain)
+   if( needCurtain )
    {
-		Con::errorf("Win32Window::setVideoMode - invoking curtain");
+      Con::printf( "Win32Window::setVideoMode - invoking curtain" );
       mOwningManager->lowerCurtain();
    }
 
-	mVideoMode = mode;
-	mSuppressReset = true;
+   mVideoMode = mode;
+   mSuppressReset = true;
 
    // Can't switch to fullscreen while a child of another window
-   if(mode.fullScreen && !Platform::getWebDeployment() && mOwningManager->getParentWindow())
+   if( mode.fullScreen && !Platform::getWebDeployment() && mOwningManager->getParentWindow() )
    {
-      mOldParent = (HWND)mOwningManager->getParentWindow();
-      mOwningManager->setParentWindow(NULL);
+      mOldParent = reinterpret_cast<HWND>( mOwningManager->getParentWindow() );
+      mOwningManager->setParentWindow( NULL );
    }
-   else if(!mode.fullScreen && mOldParent)
+   else if( !mode.fullScreen && mOldParent )
    {
-      mOwningManager->setParentWindow(mOldParent);
+      mOwningManager->setParentWindow( mOldParent );
       mOldParent = NULL;
    }
 
-	// Set our window to have the right style based on the mode
-   if(mode.fullScreen && !Platform::getWebDeployment() && !mOffscreenRender)
+   // Set our window to have the right style based on the mode
+   if( mode.fullScreen && !Platform::getWebDeployment() && !mOffscreenRender )
    {
-	  WINDOWPLACEMENT wplacement = { sizeof(wplacement) };
-	  DWORD dwStyle = GetWindowLong(getHWND(), GWL_STYLE);
-	  MONITORINFO mi = { sizeof(mi) };
+      WINDOWPLACEMENT wplacement = { sizeof( wplacement ) };
+      DWORD dwStyle = GetWindowLong( getHWND(), GWL_STYLE );
+      MONITORINFO mi = { sizeof(mi) };
 
-	  if (GetWindowPlacement(getHWND(), &wplacement) && GetMonitorInfo(MonitorFromWindow(getHWND(), MONITOR_DEFAULTTOPRIMARY), &mi))
-	  {
-		   DISPLAY_DEVICE dd = GetPrimaryDevice();
-		   DEVMODE dv;
-		   ZeroMemory(&dv, sizeof(dv));
-		   dv.dmSize = sizeof(DEVMODE);
-		   EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv);
-		   dv.dmPelsWidth = mode.resolution.x;
-		   dv.dmPelsHeight = mode.resolution.y;
-		   dv.dmBitsPerPel = mode.bitDepth;
-		   dv.dmDisplayFrequency = mode.refreshRate;
-		   dv.dmFields = (DM_PELSWIDTH | DM_PELSHEIGHT);
-		   ChangeDisplaySettings(&dv, CDS_FULLSCREEN);
-		   SetWindowLong(getHWND(), GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW);
-		   SetWindowPos(getHWND(), HWND_TOP,	
-		   					mi.rcMonitor.left,
-		   					mi.rcMonitor.top,
-							mi.rcMonitor.right - mi.rcMonitor.left,
-							mi.rcMonitor.bottom - mi.rcMonitor.top,
-							SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
-	  }
-
-      if(mDisplayWindow)
-         ShowWindow(getHWND(), SW_SHOWNORMAL);
-
-      // Clear the menu bar from the window for full screen
-      HMENU menu = GetMenu(getHWND());
-      if(menu)
+      if ( GetWindowPlacement( getHWND(), &wplacement ) && GetMonitorInfo( MonitorFromWindow( getHWND(), MONITOR_DEFAULTTOPRIMARY ), &mi ) )
       {
-         SetMenu(getHWND(), NULL);
+         DISPLAY_DEVICE dd = GetPrimaryDevice();
+         DEVMODE dv;
+         ZeroMemory( &dv, sizeof( dv ) );
+         dv.dmSize = sizeof( DEVMODE );
+         EnumDisplaySettings( dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv );
+         dv.dmPelsWidth = mode.resolution.x;
+         dv.dmPelsHeight = mode.resolution.y;
+         dv.dmBitsPerPel = mode.bitDepth;
+         dv.dmDisplayFrequency = mode.refreshRate;
+         dv.dmFields = DM_PELSWIDTH | DM_PELSHEIGHT;
+         ChangeDisplaySettings( &dv, CDS_FULLSCREEN );
+         SetWindowLong( getHWND(), GWL_STYLE, dwStyle & ~WS_OVERLAPPEDWINDOW );
+         SetWindowPos( getHWND(), HWND_TOP,  mi.rcMonitor.left,
+                                             mi.rcMonitor.top,
+                                             mi.rcMonitor.right - mi.rcMonitor.left,
+                                             mi.rcMonitor.bottom - mi.rcMonitor.top,
+                                             SWP_NOOWNERZORDER | SWP_FRAMECHANGED );
       }
 
+      if( mDisplayWindow )
+         ShowWindow( getHWND(), SW_SHOWNORMAL );
+
+      // Clear the menu bar from the window for full screen
+      if( GetMenu( getHWND() ) )
+         SetMenu( getHWND(), NULL );
+
       // When switching to Fullscreen, reset device after setting style
-	   if(mTarget.isValid())
-		   mTarget->resetMode();
+      if( mTarget.isValid() )
+         mTarget->resetMode();
 
       mFullscreen = true;
-	}
-	else
-	{
-	   DISPLAY_DEVICE dd = GetPrimaryDevice();
-	   DEVMODE dv;
-	   ZeroMemory(&dv, sizeof(dv));
-	   dv.dmSize = sizeof(DEVMODE);
-           EnumDisplaySettings(dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv);
+   }
+   else
+   {
+      DISPLAY_DEVICE dd = GetPrimaryDevice();
+      DEVMODE dv;
+      ZeroMemory( &dv, sizeof( dv ) );
+      dv.dmSize = sizeof( DEVMODE );
+      EnumDisplaySettings( dd.DeviceName, ENUM_CURRENT_SETTINGS, &dv );
 
-	   if ((mode.resolution.x != dv.dmPelsWidth) || (mode.resolution.y != dv.dmPelsHeight))
-	       ChangeDisplaySettings(NULL, 0);
+      if (  ( WindowManager->getDesktopResolution() != mode.resolution || 
+            ( mode.resolution.x != dv.dmPelsWidth ) || ( mode.resolution.y != dv.dmPelsHeight ) ) )
+         ChangeDisplaySettings( NULL, 0 );
 
-           // Reset device *first*, so that when we call setSize() and let it
-	   // access the monitor settings, it won't end up with our fullscreen
-	   // geometry that is just about to change.
+      // Reset device *first*, so that when we call setSize() and let it
+      // access the monitor settings, it won't end up with our fullscreen
+      // geometry that is just about to change.
 
-	   if(mTarget.isValid())
-		   mTarget->resetMode();
+      if( mTarget.isValid() )
+         mTarget->resetMode();
 
-      if (!mOffscreenRender)
+      if ( !mOffscreenRender )
       {
-		   SetWindowLong( getHWND(), GWL_STYLE, mWindowedWindowStyle);
-		   SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+         SetWindowLong( getHWND(), GWL_STYLE, mWindowedWindowStyle);
+         SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 
          // Put back the menu bar, if any
          if(mMenuHandle)
@@ -253,42 +247,37 @@ void Win32Window::setVideoMode( const GFXVideoMode &mode )
       }
       else
       {
-         HWND parentWin = (HWND)mOwningManager->getParentWindow();
+         HWND parentWin = reinterpret_cast<HWND>( mOwningManager->getParentWindow() );
          RECT windowRect;
-         GetClientRect(parentWin, &windowRect);
-         Point2I res(windowRect.right-windowRect.left, windowRect.bottom-windowRect.top);
-         if (res.x == 0 || res.y == 0)
-         {
-            // Must be too early in the window set up to obtain the parent's size.
-            setSize(mode.resolution);
-         }
+         GetClientRect( parentWin, &windowRect );
+         Point2I res( windowRect.right - windowRect.left, windowRect.bottom - windowRect.top );
+
+         if ( res.x == 0 || res.y == 0 )
+            setSize( mode.resolution ); // Must be too early in the window set up to obtain the parent's size.
          else
-         {
-            setSize(res);
-         }
+            setSize( res );
       }
 
-      if (!mOffscreenRender)
+      if ( !mOffscreenRender )
       {
-		   // We have to force Win32 to update the window frame and make the window
-		   // visible and no longer topmost - this code might be possible to simplify.
-		   SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+         // We have to force Win32 to update the window frame and make the window
+         // visible and no longer topmost - this code might be possible to simplify.
+         SetWindowPos( getHWND(), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED );
 
          if(mDisplayWindow)
-            ShowWindow( getHWND(), SW_SHOWNORMAL);
+            ShowWindow( getHWND(), SW_SHOWNORMAL );
       }
 
       mFullscreen = false;
-	}
+   }
 
-	mSuppressReset = false;
+   mSuppressReset = false;
 
-	if(needCurtain)
-		mOwningManager->raiseCurtain();
+   if( needCurtain )
+      mOwningManager->raiseCurtain();
 
-	SetForegroundWindow(getHWND());
-
-   getScreenResChangeSignal().trigger(this, true);
+   SetForegroundWindow( getHWND() );
+   getScreenResChangeSignal().trigger( this, true );
 }
 
 bool Win32Window::clearFullscreen()
