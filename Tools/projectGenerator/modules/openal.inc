@@ -23,10 +23,18 @@
 
 // OpenAL
 addEngineSrcDir('sfx/openal');
-addEngineSrcDir('sfx/openal/mac');
-addEngineSrcDir('sfx/openal/win32');
 
-if ( T3D_Generator::$platform == "win32" )
-   addIncludePath( getAppLibSrcDir() . 'openal/win32' );
-
+switch ( T3D_Generator::$platform )
+{
+    case "win32":
+       addEngineSrcDir('sfx/openal/win32');
+       addIncludePath( getAppLibSrcDir() . 'openal/win32' );
+       break;
+    case "mac":
+       addEngineSrcDir('sfx/openal/mac');
+       break;
+    case "linux":
+       addEngineSrcDir('sfx/openal/linux');
+       break;
+}
 ?>
