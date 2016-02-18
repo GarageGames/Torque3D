@@ -124,7 +124,10 @@ public:
    void drawLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));	
    void drawTri(const Point3F &a, const Point3F &b, const Point3F &c, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
    void drawText(const Point3F& pos, const String& text, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
-
+   void drawCapsule(const Point3F &a, const F32 &radius, const F32 &height, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
+   void drawDirectionLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
+   void drawOutlinedText(const Point3F& pos, const String& text, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f), const ColorF &colorOutline = ColorF(0.0f, 0.0f, 0.0f));
+   
    /// Render a wireframe view of the given polyhedron.
    void drawPolyhedron( const AnyPolyhedron& polyhedron, const ColorF& color = ColorF( 1.f, 1.f, 1.f ) );
 
