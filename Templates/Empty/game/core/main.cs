@@ -65,8 +65,6 @@ function onStart()
    // a specific pixel shader version (0 is for fixed function)
    //$pref::Video::forcePixVersion = true;
    //$pref::Video::forcedPixVersion = 0;
-
-   $pref::Video::displayDevice = "OpenGL";
    
    // Initialise stuff.
    exec("./scripts/client/core.cs");
