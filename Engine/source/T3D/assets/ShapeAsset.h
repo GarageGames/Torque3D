@@ -39,7 +39,7 @@
 #endif
 
 #ifndef _TSSHAPE_H_
-#include "ts/TSShape.h"
+#include "ts/tsShape.h"
 #endif
 #ifndef __RESOURCE_H__
 #include "core/resource.h"
