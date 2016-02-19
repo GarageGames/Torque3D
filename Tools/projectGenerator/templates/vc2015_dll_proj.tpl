@@ -101,7 +101,7 @@
       <AdditionalDependencies>{foreach item=def from=$projLibsDebug}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName);$(DXSDK_DIR)/Lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2015.$(Configuration).$(PlatformName);$(DXSDK_DIR)/Lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;{foreach item=def from=$projLibsIgnore}{$def};{/foreach}%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ModuleDefinitionFile>{$projModuleDefinitionFile}</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -205,7 +205,7 @@
       <AdditionalDependencies>{foreach item=def from=$projLibs}{$def};{/foreach}%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2010.$(Configuration).$(PlatformName);$(DXSDK_DIR)/Lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>{foreach item=def from=$projLibDirs}{$def};{/foreach}{$projectOffset}../Link/VC2015.$(Configuration).$(PlatformName);$(DXSDK_DIR)/Lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBC;LIBCD;{foreach item=def from=$projLibsIgnore}{$def};{/foreach}%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ModuleDefinitionFile>{$projModuleDefinitionFile}</ModuleDefinitionFile>
       <GenerateDebugInformation>false</GenerateDebugInformation>
