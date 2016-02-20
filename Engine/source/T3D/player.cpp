@@ -2620,7 +2620,6 @@ void Player::updateMove(const Move* move)
          }
       }
 #endif
-
       if(doStandardMove)
       {
          F32 p = move->pitch * (mPose == SprintPose ? mDataBlock->sprintPitchScale : 1.0f);
@@ -2644,27 +2643,29 @@ void Player::updateMove(const Move* move)
 
             mRot.z += y;
 
-            if(move->noWeaponTPCam) {
+            if(move->noWeaponTPCam)
+            {
 
                while (mHead.z > M_PI_F)
                   mHead.z -= M_2PI_F;
                while (mHead.z < -M_PI_F)
                   mHead.z += M_2PI_F;
 
-               if(move->y > 0.0f || (con && con->isFirstPerson())) {
-
+               if(move->y > 0.0f || (con && con->isFirstPerson()))
+               {
                   F32 change = mHead.z * 0.5f;
                   mHead.z = change;
                   mRot.z += change;
                   
-               } else {
+               } else
+               {
 
-                  if(con && !con->isFirstPerson()) {
+                  if(con && !con->isFirstPerson())
                      mHead.z += y;
-                  }
                }
 
-            } else {
+            } else
+            {
                mHead.z *= 0.5f;
             }
 
@@ -2679,7 +2680,6 @@ void Player::updateMove(const Move* move)
             mRot.z -= M_2PI_F;
       }
 
-      //if(move->y > 0.0f) 
       delta.rot = mRot;
       delta.rotVec.x = delta.rotVec.y = 0.0f;
       delta.rotVec.z = prevZRot - mRot.z;
@@ -6230,7 +6230,15 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       }
       stream->writeFloat(mRot.z / M_2PI_F, 7);
       stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
-      stream->writeSignedFloat(mHead.z / mDataBlock->maxFreelookAngle, 6);
+      F32 denom = 1.0f;
+      if(delta.move.noWeaponTPCam)
+      {
+      	denom = M_2PI_F;
+      } else
+      {
+      	denom = mDataBlock->maxFreelookAngle;
+      }
+      stream->writeSignedFloat(mHead.z / denom, 6);
       delta.move.pack(stream);
       stream->writeFlag(!(mask & NoWarpMask));
    }
@@ -6331,7 +6339,15 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       rot.y = rot.x = 0.0f;
       rot.z = stream->readFloat(7) * M_2PI_F;
       mHead.x = stream->readSignedFloat(6) * (mDataBlock->maxLookAngle - mDataBlock->minLookAngle);
-      mHead.z = stream->readSignedFloat(6) * mDataBlock->maxFreelookAngle;
+      F32 multi = 1.0f;
+      if(delta.move.noWeaponTPCam)
+      {
+      	multi = M_2PI_F;
+      } else
+      {
+      	multi = mDataBlock->maxFreelookAngle;
+      }
+      mHead.z = stream->readSignedFloat(6) * multi;
       delta.move.unpack(stream);
 
       delta.head = mHead;
