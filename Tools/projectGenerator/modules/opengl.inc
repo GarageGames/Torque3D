@@ -48,6 +48,7 @@ beginModule('openGL');
     if ( T3D_Generator::$platform == "win32" )
     {
         addProjectLibInput('OpenGL32.lib');
+		addProjectDefine('GLEW_STATIC');
     }
 
 endModule();
