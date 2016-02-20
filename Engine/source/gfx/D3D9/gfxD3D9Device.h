@@ -298,10 +298,12 @@ public:
    virtual GFXVertexBuffer* allocVertexBuffer(  U32 numVerts, 
                                                 const GFXVertexFormat *vertexFormat,
                                                 U32 vertSize,
-                                                GFXBufferType bufferType );
+                                                GFXBufferType bufferType,
+                                                void* data = NULL );
    virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices, 
                                                       U32 numPrimitives, 
-                                                      GFXBufferType bufferType );
+                                                      GFXBufferType bufferType,
+                                                      void* data = NULL );
    virtual void deallocVertexBuffer( GFXD3D9VertexBuffer *vertBuff );
    virtual GFXVertexDecl* allocVertexDecl( const GFXVertexFormat *vertexFormat );
    virtual void setVertexDecl( const GFXVertexDecl *decl );
