@@ -2643,7 +2643,7 @@ void Player::updateMove(const Move* move)
 
             mRot.z += y;
 
-            if(move->noWeaponTPCam)
+            if(move->altFreeLook)
             {
 
                while (mHead.z > M_PI_F)
@@ -6208,6 +6208,8 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    if (stream->writeFlag(mask & MoveMask))
    {
+   	  F32 denom = 1.0f;
+
       stream->writeFlag(mFalling);
 
       stream->writeInt(mState,NumStateBits);
@@ -6230,16 +6232,15 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       }
       stream->writeFloat(mRot.z / M_2PI_F, 7);
       stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
-      F32 denom = 1.0f;
-      if(delta.move.noWeaponTPCam)
-      {
-      	denom = M_2PI_F;
-      } else
-      {
-      	denom = mDataBlock->maxFreelookAngle;
-      }
+
       stream->writeSignedFloat(mHead.z / denom, 6);
       delta.move.pack(stream);
+
+      if(delta.move.altFreeLook)
+      	denom = M_2PI_F;
+      else
+      	denom = mDataBlock->maxFreelookAngle;
+
       stream->writeFlag(!(mask & NoWarpMask));
    }
    // Ghost need energy to predict reliably
@@ -6339,16 +6340,16 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       rot.y = rot.x = 0.0f;
       rot.z = stream->readFloat(7) * M_2PI_F;
       mHead.x = stream->readSignedFloat(6) * (mDataBlock->maxLookAngle - mDataBlock->minLookAngle);
-      F32 multi = 1.0f;
-      if(delta.move.noWeaponTPCam)
-      {
-      	multi = M_2PI_F;
-      } else
-      {
-      	multi = mDataBlock->maxFreelookAngle;
-      }
-      mHead.z = stream->readSignedFloat(6) * multi;
+      
       delta.move.unpack(stream);
+
+      F32 multi = 1.0f;
+      if(delta.move.altFreeLook)
+      	multi = M_2PI_F;
+      else
+      	multi = mDataBlock->maxFreelookAngle;
+
+      mHead.z = stream->readSignedFloat(6) * multi;
 
       delta.head = mHead;
       delta.headVec.set(0.0f, 0.0f, 0.0f);
