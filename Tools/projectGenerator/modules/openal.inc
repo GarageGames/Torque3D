@@ -22,19 +22,24 @@
 //-----------------------------------------------------------------------------
 
 // OpenAL
-addEngineSrcDir('sfx/openal');
+beginModule( 'openal' );
+	addEngineSrcDir('sfx/openal');
+	addEngineSrcDir('sfx/openal/include');
+	
+	includeLib( 'openal' );
 
-switch ( T3D_Generator::$platform )
-{
-    case "win32":
-       addEngineSrcDir('sfx/openal/win32');
-       addIncludePath( getAppLibSrcDir() . 'openal/win32' );
-       break;
-    case "mac":
-       addEngineSrcDir('sfx/openal/mac');
-       break;
-    case "linux":
-       addEngineSrcDir('sfx/openal/linux');
-       break;
-}
+	switch ( T3D_Generator::$platform )
+	{
+		case "win32":
+			addEngineSrcDir( 'sfx/openal/win32' );
+			addLibIncludePath( 'openal/include' );
+			break;
+		case "mac":
+			addEngineSrcDir('sfx/openal/mac');
+			break;
+		case "linux":
+			addEngineSrcDir('sfx/openal/linux');
+			break;
+	}
+endModule();
 ?>
