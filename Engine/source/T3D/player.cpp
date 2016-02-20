@@ -2656,10 +2656,8 @@ void Player::updateMove(const Move* move)
                   F32 change = mHead.z * 0.5f;
                   mHead.z = change;
                   mRot.z += change;
-                  
                } else
                {
-
                   if(con && !con->isFirstPerson())
                      mHead.z += y;
                }
@@ -6208,7 +6206,6 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    if (stream->writeFlag(mask & MoveMask))
    {
-   	  F32 denom = 1.0f;
 
       stream->writeFlag(mFalling);
 
@@ -6233,13 +6230,14 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->writeFloat(mRot.z / M_2PI_F, 7);
       stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
 
-      stream->writeSignedFloat(mHead.z / denom, 6);
       delta.move.pack(stream);
 
+      F32 denom = 1.0f;
       if(delta.move.altFreeLook)
       	denom = M_2PI_F;
       else
       	denom = mDataBlock->maxFreelookAngle;
+      stream->writeSignedFloat(mHead.z / denom, 6);
 
       stream->writeFlag(!(mask & NoWarpMask));
    }
