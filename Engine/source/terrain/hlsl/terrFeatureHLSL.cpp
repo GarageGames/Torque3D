@@ -64,6 +64,12 @@ MODULE_BEGIN( TerrainFeatHLSL )
 MODULE_END;
 
 
+TerrainFeatHLSL::TerrainFeatHLSL()
+   : mTorqueDep( "shaders/common/torque.hlsl" )
+   {      
+   addDependency( &mTorqueDep );
+   }
+
 Var* TerrainFeatHLSL::_getUniformVar( const char *name, const char *type, ConstantSortPosition csp )
 {
    Var *theVar = (Var*)LangElement::find( name );
@@ -262,6 +268,7 @@ void TerrainBaseMapFeatHLSL::processPix(  Vector<ShaderComponent*> &componentLis
    baseColor->setType( "float4" );
    baseColor->setName( "baseColor" );
    meta->addStatement( new GenOp( "   @ = tex2D( @, @.xy );\r\n", new DecOp( baseColor ), diffuseMap, texCoord ) );
+   meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", baseColor, baseColor));
    meta->addStatement( new GenOp( "   @;\r\n", assignColor( baseColor, Material::Mul ) ) );
 
    output = meta;
@@ -291,7 +298,7 @@ TerrainDetailMapFeatHLSL::TerrainDetailMapFeatHLSL()
 void TerrainDetailMapFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList, 
                                              const MaterialFeatureData &fd )
 {
-   const U32 detailIndex = getProcessIndex();
+   const S32 detailIndex = getProcessIndex();
 
    // Grab incoming texture coords... the base map feature
    // made sure this was created.
@@ -376,7 +383,7 @@ void TerrainDetailMapFeatHLSL::processVert(  Vector<ShaderComponent*> &component
 void TerrainDetailMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList, 
                                              const MaterialFeatureData &fd )
 {
-   const U32 detailIndex = getProcessIndex();
+   const S32 detailIndex = getProcessIndex();
    Var *inTex = getVertTexCoord( "texCoord" );
    
    MultiLine *meta = new MultiLine;
@@ -608,7 +615,7 @@ TerrainMacroMapFeatHLSL::TerrainMacroMapFeatHLSL()
 void TerrainMacroMapFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList, 
                                              const MaterialFeatureData &fd )
 {
-   const U32 detailIndex = getProcessIndex();
+   const S32 detailIndex = getProcessIndex();
 
    // Grab incoming texture coords... the base map feature
    // made sure this was created.
@@ -666,7 +673,7 @@ void TerrainMacroMapFeatHLSL::processVert(  Vector<ShaderComponent*> &componentL
 void TerrainMacroMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList, 
                                              const MaterialFeatureData &fd )
 {
-   const U32 detailIndex = getProcessIndex();
+   const S32 detailIndex = getProcessIndex();
    Var *inTex = getVertTexCoord( "texCoord" );
    
    MultiLine *meta = new MultiLine;
@@ -893,7 +900,7 @@ void TerrainNormalMapFeatHLSL::processPix(   Vector<ShaderComponent*> &component
       meta->addStatement( new GenOp( "   @ = @[2];\r\n", new DecOp( gbNormal ), viewToTangent ) );
    }
 
-   const U32 normalIndex = getProcessIndex();
+   const S32 normalIndex = getProcessIndex();
 
    Var *detailBlend = (Var*)LangElement::find( String::ToString( "detailBlend%d", normalIndex ) );
    AssertFatal( detailBlend, "The detail blend is missing!" );

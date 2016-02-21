@@ -89,8 +89,6 @@ LightShadowMap::LightShadowMap( LightInfo *light )
       mLastUpdate( 0 ),
       mLastCull( 0 ),
       mIsViewDependent( false ),
-      mVizQuery( NULL ),
-      mWasOccluded( false ),
       mLastScreenSize( 0.0f ),
       mLastPriority( 0.0f ),
       mIsDynamic( false )
@@ -98,9 +96,7 @@ LightShadowMap::LightShadowMap( LightInfo *light )
    GFXTextureManager::addEventDelegate( this, &LightShadowMap::_onTextureEvent );
 
    mTarget = GFX->allocRenderToTextureTarget();
-   mVizQuery = GFX->createOcclusionQuery();
-
-   smShadowMaps.push_back(this);
+   smShadowMaps.push_back( this );
    mStaticRefreshTimer = PlatformTimer::create();
    mDynamicRefreshTimer = PlatformTimer::create();
 }
@@ -108,8 +104,9 @@ LightShadowMap::LightShadowMap( LightInfo *light )
 LightShadowMap::~LightShadowMap()
 {
    mTarget = NULL;
-   SAFE_DELETE( mVizQuery );   
-   
+   SAFE_DELETE(mStaticRefreshTimer);
+   SAFE_DELETE(mDynamicRefreshTimer);
+
    releaseTextures();
 
    smShadowMaps.remove( this );
@@ -332,23 +329,6 @@ void LightShadowMap::render(  RenderPassManager* renderPass,
    }
 
    mLastUpdate = Sim::getCurrentTime();
-}
-
-void LightShadowMap::preLightRender()
-{
-   PROFILE_SCOPE( LightShadowMap_prepLightRender );
-
-   if ( mVizQuery )
-   {
-      mWasOccluded = mVizQuery->getStatus( true ) == GFXOcclusionQuery::Occluded;
-      mVizQuery->begin();
-   }
-}
-
-void LightShadowMap::postLightRender()
-{
-   if ( mVizQuery )
-      mVizQuery->end();
 }
 
 BaseMatInstance* LightShadowMap::getShadowMaterial( BaseMatInstance *inMat ) const
@@ -610,11 +590,14 @@ ShadowMapParams::ShadowMapParams( LightInfo *light )
    shadowSoftness = 0.15f;
    fadeStartDist = 0.0f;
    lastSplitTerrainOnly = false;
+   mQuery = GFX->createOcclusionQuery();
+
    _validate();
 }
 
 ShadowMapParams::~ShadowMapParams()
 {
+   SAFE_DELETE( mQuery );
    SAFE_DELETE( mShadowMap );
    SAFE_DELETE( mDynamicShadowMap );
 }

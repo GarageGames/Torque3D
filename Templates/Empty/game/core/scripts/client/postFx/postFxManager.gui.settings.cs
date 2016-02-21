@@ -70,6 +70,7 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
       
       postVerbose("% - PostFX Manager - PostFX disabled");
    }
+   VolFogGlowPostFx.disable();
 }
 
 function PostFXManager::settingsEffectSetEnabled(%this, %sName, %bEnable)

@@ -277,5 +277,37 @@ void fizzle(float2 vpos, float visibility)
    clip( visibility - frac( determinant( m ) ) );
 }
 
+// Deferred Shading: Material Info Flag Check
+bool getFlag(float flags, int num)
+{
+   int process = round(flags * 255);
+   int squareNum = pow(2, num);
+   return (fmod(process, pow(2, squareNum)) >= squareNum); 
+}
+
+// #define TORQUE_STOCK_GAMMA
+#ifdef TORQUE_STOCK_GAMMA
+// Sample in linear space. Decodes gamma.
+float4 toLinear(float4 tex)
+{
+   return tex;
+}
+// Encodes gamma.
+float4 toLinear(float4 tex)
+{
+   return tex;
+}
+#else
+// Sample in linear space. Decodes gamma.
+float4 toLinear(float4 tex)
+{
+   return float4(pow(abs(tex.rgb), 2.2), tex.a);
+}
+// Encodes gamma.
+float4 toGamma(float4 tex)
+{
+   return float4(pow(abs(tex.rgb), 1.0/2.2), tex.a);
+}
+#endif //
 
 #endif // _TORQUE_HLSL_

@@ -236,7 +236,12 @@ public:
 /// Base texture
 class DiffuseMapFeatHLSL : public ShaderFeatureHLSL
 {
+protected:
+
+   ShaderIncludeDependency mTorqueDep;
+
 public:
+   DiffuseMapFeatHLSL();
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 

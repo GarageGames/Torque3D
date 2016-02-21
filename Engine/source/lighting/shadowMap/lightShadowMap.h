@@ -47,6 +47,9 @@
 #ifndef _GFXSHADER_H_
 #include "gfx/gfxShader.h"
 #endif
+#ifndef _GFXOCCLUSIONQUERY_H_
+#include "gfx/gfxOcclusionQuery.h"
+#endif
 #ifndef _PLATFORM_PLATFORMTIMER_H_
 #include "platform/platformTimer.h"
 #endif
@@ -61,7 +64,6 @@ struct SceneData;
 class GFXShaderConstBuffer;
 class GFXShaderConstHandle;
 class GFXShader;
-class GFXOcclusionQuery;
 class LightManager;
 class RenderPassManager;
 
@@ -169,12 +171,6 @@ public:
 
    bool isViewDependent() const { return mIsViewDependent; }
 
-   bool wasOccluded() const { return mWasOccluded; }
-
-   void preLightRender();
-
-   void postLightRender();
-
    void updatePriority( const SceneRenderState *state, U32 currTimeMs );
 
    F32 getLastScreenSize() const { return mLastScreenSize; }
@@ -257,15 +253,6 @@ protected:
    /// The time this shadow was last culled and prioritized.
    U32 mLastCull;
 
-   /// The shadow occlusion query used when the light is
-   /// rendered to determine if any pixel of it is visible.
-   GFXOcclusionQuery *mVizQuery;
-
-   /// If true the light was occluded by geometry the
-   /// last frame it was updated.
-   //the last frame.
-   bool mWasOccluded;
-
    F32 mLastScreenSize;
 
    F32 mLastPriority;
@@ -325,6 +312,8 @@ public:
 
    bool hasCookieTex() const { return cookie.isNotEmpty(); }
 
+   GFXOcclusionQuery* getOcclusionQuery() const { return mQuery; }
+
    GFXTextureObject* getCookieTex();
 
    GFXCubemap* getCookieCubeTex();
@@ -339,6 +328,7 @@ protected:
    ///
    LightShadowMap *mShadowMap;
    LightShadowMap *mDynamicShadowMap;
+   GFXOcclusionQuery* mQuery;
 
    LightInfo *mLight;
 
