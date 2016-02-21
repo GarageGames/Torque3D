@@ -127,12 +127,12 @@ class ColorI
 
    struct Hsb
    {
-	   Hsb() :hue(0), sat(0), brightness(0){};
-	   Hsb(U32 h, U32 s, U32 b) :hue(h), sat(s), brightness(b){};
+      Hsb() :hue(0), sat(0), brightness(0){};
+      Hsb(U32 h, U32 s, U32 b) :hue(h), sat(s), brightness(b){};
 
-	   U32 hue;			///Hue
-	   U32 sat;			///Saturation
-	   U32 brightness;	//Brightness/Value/Lightness
+      U32 hue;   ///Hue
+      U32 sat;   ///Saturation
+      U32 brightness;   //Brightness/Value/Lightness
    };
 
   public:
