@@ -2641,9 +2641,7 @@ void Player::updateMove(const Move* move)
          else
          {
 
-            mRot.z += y;
-
-            if(move->altFreeLook)
+            if(move->altFreeLook && (con && !con->isFirstPerson()))
             {
 
                while (mHead.z > M_PI_F)
@@ -2651,19 +2649,20 @@ void Player::updateMove(const Move* move)
                while (mHead.z < -M_PI_F)
                   mHead.z += M_2PI_F;
 
-               if(move->y > 0.0f || (con && con->isFirstPerson()))
+               if(move->y > 0.0f || move->y < 0.0f)
                {
+                  mRot.z += y;
                   F32 change = mHead.z * 0.5f;
                   mHead.z = change;
                   mRot.z += change;
                } else
                {
-                  if(con && !con->isFirstPerson())
-                     mHead.z += y;
+                  mHead.z += y;
                }
 
             } else
             {
+               mRot.z += y;
                mHead.z *= 0.5f;
             }
 
