@@ -1252,27 +1252,27 @@ void GuiTextEditCtrl::onLoseFirstResponder()
    Parent::onLoseFirstResponder();
 }
 
-void GuiTextEditCtrl::onRender(Point2I offset, const RectI &updateRect)
+void GuiTextEditCtrl::onRender( Point2I offset, const RectI &updateRect )
 {
    RectI ctrlRect( offset, getExtent() );
 
    //if opaque, fill the update rect with the fill color
    if ( mProfile->mOpaque )
    {
-	   if (!mTextValid)
-		   GFX->getDrawUtil()->drawRectFill(ctrlRect, mProfile->mFillColorERR);
-	   else if (isFirstResponder())
-		   GFX->getDrawUtil()->drawRectFill(ctrlRect, mProfile->mFillColorHL);
-	   else
-		   GFX->getDrawUtil()->drawRectFill(ctrlRect, mProfile->mFillColor);
+      if ( !mTextValid )
+         GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorERR );
+      else if ( isFirstResponder() )
+         GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorHL );
+      else
+         GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColor );
    }
 
    //if there's a border, draw the border
-   if (mProfile->mBorder)
+   if ( mProfile->mBorder )
    {
-	   renderBorder(ctrlRect, mProfile);
-	   if (!mTextValid)
-		   GFX->getDrawUtil()->drawRectFill(ctrlRect, mProfile->mFillColorERR);
+      renderBorder( ctrlRect, mProfile );
+      if ( !mTextValid )
+         GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorERR );
    }
 
    drawText( ctrlRect, isFirstResponder() );
@@ -1496,25 +1496,25 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, bool isFocused )
 
 bool GuiTextEditCtrl::hasText()
 {
-   return (mTextBuffer.length());
+   return ( mTextBuffer.length() );
 }
 
 void GuiTextEditCtrl::invalidText(bool playSound)
 {
-	mTextValid = false;
+   mTextValid = false;
 
-	if (playSound)
-		playDeniedSound();
+   if ( playSound )
+      playDeniedSound();
 }
 
 void GuiTextEditCtrl::validText()
 {
-	mTextValid = true;
+   mTextValid = true;
 }
 
 bool GuiTextEditCtrl::isValidText()
 {
-	return mTextValid;
+   return mTextValid;
 }
 
 void GuiTextEditCtrl::playDeniedSound()
