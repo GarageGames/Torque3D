@@ -144,23 +144,12 @@ GuiCanvas::GuiCanvas(): GuiControl(),
 #else
    mNumFences = 0;
 #endif
-
-#ifdef TORQUE_DEMO_PURCHASE
-   mPurchaseScreen = NULL;
-#endif
 }
 
 GuiCanvas::~GuiCanvas()
 {
    SAFE_DELETE(mPlatformWindow);
    SAFE_DELETE_ARRAY( mFences );
-
-#ifdef TORQUE_DEMO_PURCHASE
- //  if (mPurchaseScreen)
- //  {
- //     SAFE_DELETE(mPurchaseScreen);
- //  }
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -282,13 +271,6 @@ bool GuiCanvas::onAdd()
    // Define the menu bar for this canvas (if any)
    Con::executef(this, "onCreateMenu");
 
-#ifdef TORQUE_DEMO_PURCHASE
-   mPurchaseScreen = new PurchaseScreen;
-   mPurchaseScreen->init();
-
-   mLastPurchaseHideTime = 0;
-#endif
-
    Sim::findObject("PlatformGenericMenubar", mMenuBarCtrl);
 
    return parentRet;
@@ -296,11 +278,6 @@ bool GuiCanvas::onAdd()
 
 void GuiCanvas::onRemove()
 {
-#ifdef TORQUE_DEMO_PURCHASE
-   if (mPurchaseScreen && mPurchaseScreen->isAwake())
-      removeObject(mPurchaseScreen);
-#endif
-
    // And the process list
    Process::remove(this, &GuiCanvas::paint);
 
@@ -344,8 +321,11 @@ void GuiCanvas::setWindowTitle(const char *newTitle)
       mPlatformWindow->setCaption(newTitle);
 }
 
+CanvasSizeChangeSignal GuiCanvas::smCanvasSizeChangeSignal;
+
 void GuiCanvas::handleResize( WindowId did, S32 width, S32 height )
 {
+   getCanvasSizeChangeSignal().trigger(this);
 	if (Journal::IsPlaying() && mPlatformWindow)
 	{
 		mPlatformWindow->lockSize(false);
@@ -1362,11 +1342,6 @@ bool GuiCanvas::rootMouseWheelDown(const GuiEvent &event)
 
 void GuiCanvas::setContentControl(GuiControl *gui)
 {
-#ifdef TORQUE_DEMO_PURCHASE
-   if (mPurchaseScreen->isForceExit())
-      return;
-#endif
-
    // Skip out if we got passed NULL (why would that happen?)
    if(!gui)
       return;
@@ -1435,11 +1410,6 @@ GuiControl *GuiCanvas::getContentControl()
 
 void GuiCanvas::pushDialogControl(GuiControl *gui, S32 layer, bool center)
 {
-#ifdef TORQUE_DEMO_PURCHASE
-   if (mPurchaseScreen->isForceExit())
-      return;
-#endif
-
    if( center )
       gui->setPosition( getExtent().x / 2 - gui->getExtent().x / 2,
                         getExtent().y / 2 - gui->getExtent().y / 2 );
@@ -1955,10 +1925,6 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    // mPending is set when the console function "screenShot()" is called
    // this situation is necessary because it needs to take the screenshot
    // before the buffers swap
-
-#ifdef TORQUE_DEMO_TIMEOUT
-   checkTimeOut();
-#endif  
 
    PROFILE_END();
 

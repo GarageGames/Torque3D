@@ -28,7 +28,8 @@ uniform sampler2D backBuffer : register(S0);
 uniform sampler1D colorCorrectionTex : register( s1 );
 
 uniform float OneOverGamma;
-
+uniform float Brightness;
+uniform float Contrast;
 
 float4 main( PFXVertToPix IN ) : COLOR0  
 {
@@ -41,6 +42,12 @@ float4 main( PFXVertToPix IN ) : COLOR0
 
    // Apply gamma correction
     color.rgb = pow( abs(color.rgb), OneOverGamma );
+
+   // Apply contrast
+   color.rgb = ((color.rgb - 0.5f) * Contrast) + 0.5f;
+ 
+   // Apply brightness
+   color.rgb += Brightness;
 
     return color;    
 }

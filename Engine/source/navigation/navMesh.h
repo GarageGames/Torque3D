@@ -118,7 +118,7 @@ public:
    /// @}
 
    /// Return the index of the tile included by this point.
-   S32 getTile(Point3F pos);
+   S32 getTile(const Point3F& pos);
 
    /// Return the box of a given tile.
    Box3F getTileBox(U32 id);
@@ -325,7 +325,7 @@ private:
    Vector<TileData> mTileData;
 
    /// List of indices to the tile array which are dirty.
-   std::queue<U32> mDirtyTiles;
+   Vector<U32> mDirtyTiles;
 
    /// Update tile dimensions.
    void updateTiles(bool dirty = false);

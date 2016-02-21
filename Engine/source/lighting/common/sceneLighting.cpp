@@ -1012,13 +1012,14 @@ void SceneLighting::processCache()
 	// go through and remove the best candidate first (sorted reverse)
 	while(((curCacheSize >> 10) > quota) && files.size())
 	{
-		curCacheSize -= files.last().mFileObject->getSize();
+      CacheEntry& lastFile = files.last();
+      curCacheSize -= lastFile.mFileObject->getSize();
 
 		// no sneaky names
-		if(!dStrstr(files.last().mFileName, ".."))
+      if (!dStrstr(lastFile.mFileName, ".."))
 		{
-			Con::warnf("Removing lighting file '%s'.", files.last().mFileName);
-			dFileDelete(files.last().mFileName);
+         Con::warnf("Removing lighting file '%s'.", lastFile.mFileName);
+         dFileDelete(lastFile.mFileName);
 		}
 
 		files.pop_back();

@@ -49,6 +49,8 @@ struct CameraQuery
    Point3F     eyeOffset[2];
    MatrixF     eyeTransforms[2];
    bool        ortho;
+   bool        hasFovPort;
+   bool        hasStereoTargets;
    MatrixF     cameraMatrix;
    RectI       stereoViewports[2]; // destination viewports
    GFXTextureTarget* stereoTargets[2];

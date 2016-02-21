@@ -677,7 +677,7 @@ DefineEngineMethod( GuiListBoxCtrl, setItemColor, void, (S32 index, ColorF color
    object->setItemColor( index, color );
 }
 
-void GuiListBoxCtrl::setItemColor( S32 index, ColorF color )
+void GuiListBoxCtrl::setItemColor(S32 index, const ColorF& color)
 {
    if ((index >= mItems.size()) || index < 0)
    {
@@ -748,11 +748,6 @@ S32 GuiListBoxCtrl::insertItem( S32 index, StringTableEntry text, void *itemData
    }
 
    LBItem *newItem = new LBItem;
-   if( !newItem )
-   {
-      Con::warnf("GuiListBoxCtrl::insertItem - error allocating item memory!" );
-      return -1;
-   }
 
    // Assign item data
    newItem->itemText    = StringTable->insert(text, true);
@@ -792,11 +787,6 @@ S32 GuiListBoxCtrl::insertItemWithColor( S32 index, StringTableEntry text, Color
    }
 
    LBItem *newItem = new LBItem;
-   if( !newItem )
-   {
-      Con::warnf("GuiListBoxCtrl::insertItem - error allocating item memory!" );
-      return -1;
-   }
 
    // Assign item data
    newItem->itemText    = StringTable->insert(text, true);
@@ -1090,7 +1080,7 @@ void GuiListBoxCtrl::onRender( Point2I offset, const RectI &updateRect )
    GFX->setClipRect( oldClipRect );
 }
 
-void GuiListBoxCtrl::onRenderItem( RectI itemRect, LBItem *item )
+void GuiListBoxCtrl::onRenderItem(const RectI& itemRect, LBItem *item)
 {
    if( item->isSelected )
       GFX->getDrawUtil()->drawRectFill( itemRect, mProfile->mFillColorSEL );

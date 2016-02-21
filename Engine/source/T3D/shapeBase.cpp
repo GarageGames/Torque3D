@@ -40,7 +40,6 @@
 #include "scene/sceneRenderState.h"
 #include "scene/sceneObjectLightingPlugin.h"
 #include "T3D/fx/explosion.h"
-#include "T3D/fx/particleEmitter.h"
 #include "T3D/fx/cameraFXMgr.h"
 #include "environment/waterBlock.h"
 #include "T3D/debris.h"
@@ -154,28 +153,8 @@ ShapeBaseData::ShapeBaseData()
    shadowSphereAdjust( 1.0f ),
    shapeName( StringTable->insert("") ),
    cloakTexName( StringTable->insert("") ),
-   mass( 1.0f ),
-   drag( 0.0f ),
-   density( 1.0f ),
-   maxEnergy( 0.0f ),
-   maxDamage( 1.0f ),
-   disabledLevel( 1.0f ),
-   destroyedLevel( 1.0f ),
-   repairRate( 0.0033f ),
-   eyeNode( -1 ),
-   earNode( -1 ),
-   cameraNode( -1 ),
-   damageSequence( -1 ),
-   hulkSequence( -1 ),
-   cameraMaxDist( 0.0f ),
-   cameraMinDist( 0.2f ),
-   cameraDefaultFov( 75.0f ),
-   cameraMinFov( 5.0f ),
-   cameraMaxFov( 120.f ),
-   cameraCanBank( false ),
-   mountedImagesBank( false ),
-   isInvincible( false ),
-   renderWhenDestroyed( true ),
+   cubeDescId( 0 ),
+   reflectorDesc( NULL ),
    debris( NULL ),
    debrisID( 0 ),
    debrisShapeName( StringTable->insert("") ),
@@ -183,15 +162,35 @@ ShapeBaseData::ShapeBaseData()
    explosionID( 0 ),
    underwaterExplosion( NULL ),
    underwaterExplosionID( 0 ),
+   mass( 1.0f ),
+   drag( 0.0f ),
+   density( 1.0f ),
+   maxEnergy( 0.0f ),
+   maxDamage( 1.0f ),
+   destroyedLevel( 1.0f ),
+   disabledLevel( 1.0f ),
+   repairRate( 0.0033f ),
+   eyeNode( -1 ),
+   earNode( -1 ),
+   cameraNode( -1 ),
+   cameraMaxDist( 0.0f ),
+   cameraMinDist( 0.2f ),
+   cameraDefaultFov( 75.0f ),
+   cameraMinFov( 5.0f ),
+   cameraMaxFov( 120.f ),
+   cameraCanBank( false ),
+   mountedImagesBank( false ),
+   debrisDetail( -1 ),
+   damageSequence( -1 ),
+   hulkSequence( -1 ),
+   observeThroughObject( false ),
    firstPersonOnly( false ),
    useEyePoint( false ),
-   cubeDescId( 0 ),
-   reflectorDesc( NULL ),
-   observeThroughObject( false ),
+   isInvincible( false ),
+   renderWhenDestroyed( true ),
    computeCRC( false ),
    inheritEnergyFromMount( false ),
-   mCRC( 0 ),
-   debrisDetail( -1 )
+   mCRC( 0 )
 {      
    dMemset( mountPointNode, -1, sizeof( S32 ) * SceneObject::NumMountPoints );
 }
@@ -878,46 +877,46 @@ IMPLEMENT_CALLBACK( ShapeBase, validateCameraFov, F32, (F32 fov), (fov),
    "@see ShapeBaseData\n\n");
 
 ShapeBase::ShapeBase()
- : mDrag( 0.0f ),
-   mBuoyancy( 0.0f ),
-   mWaterCoverage( 0.0f ),
-   mLiquidHeight( 0.0f ),
+ : mDataBlock( NULL ),
+   mIsAiControlled( false ),
    mControllingObject( NULL ),
-   mGravityMod( 1.0f ),
-   mAppliedForce( Point3F::Zero ),
-   mTimeoutList( NULL ),
-   mDataBlock( NULL ),
+   mMoveMotion( false ),
+   mShapeBaseMount( NULL ),
    mShapeInstance( NULL ),
+   mConvexList( new Convex ),
    mEnergy( 0.0f ),
    mRechargeRate( 0.0f ),
+   mMass( 1.0f ),
+   mOneOverMass( 1.0f ),
+   mDrag( 0.0f ),
+   mBuoyancy( 0.0f ),
+   mLiquidHeight( 0.0f ),
+   mWaterCoverage( 0.0f ),
+   mAppliedForce( Point3F::Zero ),
+   mGravityMod( 1.0f ),
+   mDamageFlash( 0.0f ),
+   mWhiteOut( 0.0f ),
+   mFlipFadeVal( false ),
+   mTimeoutList( NULL ),
    mDamage( 0.0f ),
    mRepairRate( 0.0f ),
    mRepairReserve( 0.0f ),
    mDamageState( Enabled ),
    mDamageThread( NULL ),
    mHulkThread( NULL ),
-   mLastRenderFrame( 0 ),
-   mLastRenderDistance( 0.0f ),
+   damageDir( 0.0f, 0.0f, 1.0f ),
    mCloaked( false ),
    mCloakLevel( 0.0f ),
-   mDamageFlash( 0.0f ),
-   mWhiteOut( 0.0f ),
-   mIsControlled( false ),
-   mConvexList( new Convex ),
-   mCameraFov( 90.0f ),
    mFadeOut( true ),
    mFading( false ),
    mFadeVal( 1.0f ),
-   mFadeTime( 1.0f ),
    mFadeElapsedTime( 0.0f ),
+   mFadeTime( 1.0f ),
    mFadeDelay( 0.0f ),
-   mFlipFadeVal( false ),
-   damageDir( 0.0f, 0.0f, 1.0f ),
-   mShapeBaseMount( NULL ),
-   mMass( 1.0f ),
-   mOneOverMass( 1.0f ),
-   mMoveMotion( false ),
-   mIsAiControlled( false )
+   mCameraFov( 90.0f ),
+   mIsControlled( false ),
+   mLastRenderFrame( 0 ),
+   mLastRenderDistance( 0.0f )
 {
    mTypeMask |= ShapeBaseObjectType | LightObjectType;   
 
@@ -1192,13 +1191,13 @@ void ShapeBase::onDeleteNotify( SimObject *obj )
    Parent::onDeleteNotify( obj );      
 }
 
-void ShapeBase::onImpact(SceneObject* obj, VectorF vec)
+void ShapeBase::onImpact(SceneObject* obj, const VectorF& vec)
 {
    if (!isGhost())
       mDataBlock->onImpact_callback( this, obj, vec, vec.len() );
 }
 
-void ShapeBase::onImpact(VectorF vec)
+void ShapeBase::onImpact(const VectorF& vec)
 {
    if (!isGhost())
       mDataBlock->onImpact_callback( this, NULL, vec, vec.len() );
@@ -1995,7 +1994,7 @@ void ShapeBase::getEyeCameraTransform(IDisplayDevice *displayDevice, U32 eyeId, 
    *outMat = temp;
 }
 
-DisplayPose ShapeBase::calcCameraDeltaPose(GameConnection *con, DisplayPose inPose)
+DisplayPose ShapeBase::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
 {
    // NOTE: this is intended to be similar to updateMove
    // WARNING: does not take into account any move values

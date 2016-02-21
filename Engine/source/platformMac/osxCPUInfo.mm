@@ -31,6 +31,10 @@
 #include "console/console.h"
 #include "core/stringTable.h"
 
+// Gestalt has been deprecated
+// we now have to use NSProcessInfo
+#import <CoreFoundation/CoreFoundation.h>
+
 
 // Original code by Sean O'Brien (http://www.garagegames.com/community/forums/viewthread/81815).
 
@@ -88,16 +92,12 @@ void Processor::init()
 	unsigned long long llraw;
 	
 	Con::printf( "System & Processor Information:" );
-   
-   SInt32 MacVersion;
-   if( Gestalt( gestaltSystemVersion, &MacVersion ) == noErr )
-   {
-      U32 revision = MacVersion & 0xf;
-      U32 minorVersion = ( MacVersion & 0xf0 ) >> 4;
-      U32 majorVersion = ( MacVersion & 0xff00 ) >> 8;
-      
-      Con::printf( "   OSX Version: %x.%x.%x", majorVersion, minorVersion, revision );
-   }
+
+   // Gestalt has been deprecated since Mac OSX Mountain Lion and has stopped working on
+   // Mac OSX Yosemite. we have to use NSProcessInfo now.
+   // Availability: Mac OS 10.2 or greater.
+   NSString *osVersionStr = [[NSProcessInfo processInfo] operatingSystemVersionString];
+   Con::printf( "   OSX Version: %s", [osVersionStr UTF8String]);
 	
 	err = _getSysCTLstring("kern.ostype", buf, sizeof(buf));	
 	if (err)

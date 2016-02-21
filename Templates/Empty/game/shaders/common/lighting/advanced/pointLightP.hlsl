@@ -27,7 +27,7 @@
 #include "../../lighting.hlsl"
 #include "../shadowMap/shadowMapIO_HLSL.h"
 #include "softShadow.hlsl"
-
+#include "../../torque.hlsl"
 
 struct ConvexConnectP
 {
@@ -40,7 +40,7 @@ struct ConvexConnectP
 #ifdef USE_COOKIE_TEX
 
 /// The texture for cookie rendering.
-uniform samplerCUBE cookieMap : register(S2);
+uniform samplerCUBE cookieMap : register(S3);
 
 #endif
 
@@ -114,6 +114,7 @@ float4 main(   ConvexConnectP IN,
                   uniform samplerCUBE shadowMap : register(S1),
                #else
                   uniform sampler2D shadowMap : register(S1),
+                  uniform sampler2D dynamicShadowMap : register(S2),
                #endif
 
                uniform float4 rtParams0,
@@ -127,6 +128,7 @@ float4 main(   ConvexConnectP IN,
 
                uniform float4 vsFarPlane,
                uniform float3x3 viewToLightProj,
+               uniform float3x3 dynamicViewToLightProj,
 
                uniform float4 lightParams,
                uniform float shadowSoftness ) : COLOR0
@@ -134,7 +136,7 @@ float4 main(   ConvexConnectP IN,
    // Compute scene UV
    float3 ssPos = IN.ssPos.xyz / IN.ssPos.w;
    float2 uvScene = getUVFromSSPos( ssPos, rtParams0 );
-   
+      
    // Sample/unpack the normal/z data
    float4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
    float3 normal = prepassSample.rgb;
@@ -178,9 +180,9 @@ float4 main(   ConvexConnectP IN,
          
       #else
 
+         // Static
          float2 shadowCoord = decodeShadowCoord( mul( viewToLightProj, -lightVec ) ).xy;
-         
-         float shadowed = softShadow_filter( shadowMap,
+         float static_shadowed = softShadow_filter( shadowMap,
                                              ssPos.xy,
                                              shadowCoord,
                                              shadowSoftness,
@@ -188,17 +190,30 @@ float4 main(   ConvexConnectP IN,
                                              nDotL,
                                              lightParams.y );
 
+         // Dynamic
+         float2 dynamicShadowCoord = decodeShadowCoord( mul( dynamicViewToLightProj, -lightVec ) ).xy;
+         float dynamic_shadowed = softShadow_filter( dynamicShadowMap,
+                                             ssPos.xy,
+                                             dynamicShadowCoord,
+                                             shadowSoftness,
+                                             distToLight,
+                                             nDotL,
+                                             lightParams.y );
+
+         float shadowed = min(static_shadowed, dynamic_shadowed);
+
       #endif
 
    #endif // !NO_SHADOW
    
+   float3 lightcol = lightColor.rgb;
    #ifdef USE_COOKIE_TEX
 
       // Lookup the cookie sample.
       float4 cookie = texCUBE( cookieMap, mul( viewToLightProj, -lightVec ) );
 
       // Multiply the light with the cookie tex.
-      lightColor.rgb *= cookie.rgb;
+      lightcol *= cookie.rgb;
 
       // Use a maximum channel luminance to attenuate 
       // the lighting else we get specular in the dark
@@ -216,7 +231,7 @@ float4 main(   ConvexConnectP IN,
                                        normalize( -eyeRay ) ) * lightBrightness * atten * shadowed;
 
    float Sat_NL_Att = saturate( nDotL * atten * shadowed ) * lightBrightness;
-   float3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
+   float3 lightColorOut = lightMapParams.rgb * lightcol;
    float4 addToResult = 0.0;
     
    // TODO: This needs to be removed when lightmapping is disabled

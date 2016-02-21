@@ -3309,7 +3309,7 @@
                         HorizSizing = "width";
                         VertSizing = "bottom";
                         Position = "0 0";
-                        Extent = "210 71";
+                        Extent = "210 89";
                         
                         new GuiPopUpMenuCtrl() {
                            internalName = "blendingTypePopUp";
@@ -3480,9 +3480,32 @@
                            Visible = "1";
                            Command = "MaterialEditorGui.updateActiveMaterial(\"castShadows\", $ThisControl.getValue());";
                            tooltipprofile = "ToolsGuiDefaultProfile";
-                           ToolTip = "Alows object to cast shadows.";
+                           ToolTip = "Object casts shadows.";
                            hovertime = "1000";
                            text = "Cast Shadows";
+                           groupNum = "-1";
+                           buttonType = "ToggleButton";
+                           useMouseEvents = "0";
+                           useInactiveState = "0";
+                        };
+                        new GuiCheckBoxCtrl() {
+                           canSaveDynamicFields = "0";
+                           internalName = "castDynamicShadows";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "ToolsGuiCheckBoxProfile";
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "3 70";
+                           Extent = "112 16";
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           Command = "MaterialEditorGui.updateActiveMaterial(\"castDynamicShadows\", $ThisControl.getValue());";
+                           tooltipprofile = "ToolsGuiDefaultProfile";
+                           ToolTip = "Object casts dynamic shadows.";
+                           hovertime = "1000";
+                           text = "Dynamic Shadows";
                            groupNum = "-1";
                            buttonType = "ToggleButton";
                            useMouseEvents = "0";

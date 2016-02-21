@@ -302,6 +302,9 @@ namespace Platform
    void clearExcludedDirectories();
    bool isExcludedDirectory(const char *pDir);
 
+   bool deleteDirectory(const char* pPath);
+   bool fileDelete(const char *name);
+
    /// Given a directory path, create all necessary directories for that path to exist.
    bool createPath(const char *path); // create a directory path
 

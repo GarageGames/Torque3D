@@ -101,6 +101,8 @@ public:
    F32 brightness;
    F32 range;
    bool castShadows;
+   S32 mStaticRefreshFreq;
+   S32 mDynamicRefreshFreq;
 
    LightAnimData *animationData;   
    S32 animationDataId;

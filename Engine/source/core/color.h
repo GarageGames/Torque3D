@@ -702,6 +702,7 @@ inline ColorI& ColorI::operator*=(const S32 in_mul)
 
 inline ColorI& ColorI::operator/=(const S32 in_mul)
 {
+   AssertFatal(in_mul != 0.0f, "Error, div by zero...");
    red   = red    / in_mul;
    green = green  / in_mul;
    blue  = blue   / in_mul;

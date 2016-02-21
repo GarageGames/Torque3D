@@ -1449,14 +1449,15 @@ void TerrainEditor::renderSelection( const Selection & sel, const ColorF & inCol
       // walk the points in the selection
       for(U32 i = 0; i < sel.size(); i++)
       {
-         Point2I gPos = sel[i].mGridPoint.gridPos;
+         GridPoint selectedGridPoint = sel[i].mGridPoint;
+         Point2I gPos = selectedGridPoint.gridPos;
 
          GFXVertexPC *verts = &(vertexBuffer[i * 5]);
 
-         bool center = gridToWorld(sel[i].mGridPoint, verts[0].point);
-         gridToWorld(Point2I(gPos.x + 1, gPos.y), verts[1].point, sel[i].mGridPoint.terrainBlock);
-         gridToWorld(Point2I(gPos.x + 1, gPos.y + 1), verts[2].point, sel[i].mGridPoint.terrainBlock);
-         gridToWorld(Point2I(gPos.x, gPos.y + 1), verts[3].point, sel[i].mGridPoint.terrainBlock);
+         bool center = gridToWorld(selectedGridPoint, verts[0].point);
+         gridToWorld(Point2I(gPos.x + 1, gPos.y), verts[1].point, selectedGridPoint.terrainBlock);
+         gridToWorld(Point2I(gPos.x + 1, gPos.y + 1), verts[2].point, selectedGridPoint.terrainBlock);
+         gridToWorld(Point2I(gPos.x, gPos.y + 1), verts[3].point, selectedGridPoint.terrainBlock);
          verts[4].point = verts[0].point;
 
          F32 weight = sel[i].mWeight;
@@ -2762,9 +2763,9 @@ DefineConsoleMethod(TerrainEditor, getTerrainUnderWorldPoint, S32, (const char *
    if(tEditor == NULL)
       return 0;
    Point3F pos;
-   if(!dStrIsEmpty(ptOrX) && dStrIsEmpty(Y) && dStrIsEmpty(Z))
+   if(!String::isEmpty(ptOrX) && String::isEmpty(Y) && String::isEmpty(Z))
       dSscanf(ptOrX, "%f %f %f", &pos.x, &pos.y, &pos.z);
-   else if(!dStrIsEmpty(ptOrX) && !dStrIsEmpty(Y) && !dStrIsEmpty(Z))
+   else if(!String::isEmpty(ptOrX) && !String::isEmpty(Y) && !String::isEmpty(Z))
    {
       pos.x = dAtof(ptOrX);
       pos.y = dAtof(Y);

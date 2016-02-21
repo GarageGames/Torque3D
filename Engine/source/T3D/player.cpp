@@ -4659,9 +4659,9 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
       }
       Point3F distance = end - start;
 
-      if (mFabs(distance.x) < mObjBox.len_x() &&
-          mFabs(distance.y) < mObjBox.len_y() &&
-          mFabs(distance.z) < mObjBox.len_z())
+      if (mFabs(distance.x) < mScaledBox.len_x() &&
+          mFabs(distance.y) < mScaledBox.len_y() &&
+          mFabs(distance.z) < mScaledBox.len_z())
       {
          // We can potentially early out of this.  If there are no polys in the clipped polylist at our
          //  end position, then we can bail, and just set start = end;
@@ -5586,7 +5586,7 @@ void Player::getMuzzleTransform(U32 imageSlot,MatrixF* mat)
    *mat = nmat;
 }
 
-DisplayPose Player::calcCameraDeltaPose(GameConnection *con, DisplayPose inPose)
+DisplayPose Player::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
 {
    // NOTE: this is intended to be similar to updateMove
    DisplayPose outPose;

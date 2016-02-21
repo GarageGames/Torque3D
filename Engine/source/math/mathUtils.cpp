@@ -1845,4 +1845,55 @@ U32 extrudePolygonEdgesFromPoint( const Point3F* vertices, U32 numVertices, cons
    return numPlanes;
 }
 
+//-----------------------------------------------------------------------------
+
+void mBuildHull2D(const Vector<Point2F> _inPoints, Vector<Point2F> &hullPoints)
+{
+   /// Andrew's monotone chain convex hull algorithm implementation
+
+   struct Util
+   {
+      //compare by x and then by y   
+      static int CompareLexicographic( const Point2F *a, const Point2F *b)
+      {
+         return a->x < b->x || (a->x == b->x && a->y < b->y);
+      }
+   };
+
+   hullPoints.clear();
+   hullPoints.setSize( _inPoints.size()*2 );
+
+   // sort in points by x and then by y
+   Vector<Point2F> inSortedPoints = _inPoints;
+   inSortedPoints.sort( &Util::CompareLexicographic );
+
+   Point2F* lowerHullPtr = hullPoints.address();
+   U32 lowerHullIdx = 0;
+
+   //lower part of hull
+   for( int i = 0; i < inSortedPoints.size(); ++i )
+   {      
+      while( lowerHullIdx >= 2 && mCross( lowerHullPtr[ lowerHullIdx - 2], lowerHullPtr[lowerHullIdx - 1], inSortedPoints[i] ) <= 0 )
+         --lowerHullIdx;
+
+      lowerHullPtr[lowerHullIdx++] = inSortedPoints[i];
+   }
+
+   --lowerHullIdx; // last point are the same as first in upperHullPtr
+
+   Point2F* upperHullPtr = hullPoints.address() + lowerHullIdx;
+   U32 upperHullIdx = 0;
+
+   //upper part of hull
+   for( int i = inSortedPoints.size()-1; i >= 0; --i )
+   {
+      while( upperHullIdx >= 2 && mCross( upperHullPtr[ upperHullIdx - 2], upperHullPtr[upperHullIdx - 1], inSortedPoints[i] ) <= 0 )
+         --upperHullIdx;
+
+      upperHullPtr[upperHullIdx++] = inSortedPoints[i];
+   }
+
+   hullPoints.setSize( lowerHullIdx + upperHullIdx );
+}
+
 } // namespace MathUtils

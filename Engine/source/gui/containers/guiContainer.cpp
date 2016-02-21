@@ -128,9 +128,6 @@ bool GuiContainer::reOrder(SimObject* obj, SimObject* target)
 
 bool GuiContainer::resize( const Point2I &newPosition, const Point2I &newExtent )
 {
-   RectI oldBounds = getBounds();
-   Point2I minExtent = getMinExtent();
-
    if( !Parent::resize( newPosition, newExtent ) )
       return false;
    

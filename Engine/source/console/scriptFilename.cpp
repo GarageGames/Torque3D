@@ -230,6 +230,11 @@ bool expandOldScriptFilename(char *filename, U32 size, const char *src)
    else if (dStrncmp(src, "./", 2) == 0)
       // dot path means load from current codeblock/mod path
       slash = dStrrchr(cbName, '/');
+   else if (dStrncmp(src, "^", 1) == 0)
+   {
+      Platform::makeFullPathName(src + 1, filename, size);
+      return true;
+   }
    else
    {
       // otherwise path must be fully specified

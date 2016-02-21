@@ -237,7 +237,7 @@ class Camera: public ShapeBase
       virtual void interpolateTick( F32 delta);
       virtual void getCameraTransform( F32* pos,MatrixF* mat );
       virtual void getEyeCameraTransform( IDisplayDevice *display, U32 eyeId, MatrixF *outMat );
-      virtual DisplayPose calcCameraDeltaPose(GameConnection *con, DisplayPose inPose);
+      virtual DisplayPose calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose);
 
       virtual void writePacketData( GameConnection* conn, BitStream* stream );
       virtual void readPacketData( GameConnection* conn, BitStream* stream );

@@ -287,6 +287,8 @@ public:
    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; } \
    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; } \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); } \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }  \
    ConcreteClassRep<className> className::dynClassRep( #className, "Type" #className, &_smTypeId, NetClassGroupGameMask, NetClassTypeEvent, NetEventDirAny, className::getParentStaticClassRep(), &Parent::__description)
 
 #define IMPLEMENT_CO_CLIENTEVENT_V1(className)                    \
@@ -296,6 +298,8 @@ public:
    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; } \
    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; } \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); } \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
    ConcreteClassRep<className> className::dynClassRep(#className, "Type" #className, &_smTypeId,NetClassGroupGameMask, NetClassTypeEvent, NetEventDirServerToClient, className::getParentStaticClassRep(), &Parent::__description)
 
 #define IMPLEMENT_CO_SERVEREVENT_V1(className)                    \
@@ -305,6 +309,8 @@ public:
    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; } \
    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; } \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); } \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
    ConcreteClassRep<className> className::dynClassRep(#className, "Type" #className, &_smTypeId, NetClassGroupGameMask, NetClassTypeEvent, NetEventDirClientToServer, className::getParentStaticClassRep(), &Parent::__description)
 
 #define IMPLEMENT_CO_NETEVENT(className,groupMask)                    \
@@ -314,6 +320,8 @@ public:
    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; } \
    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; } \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); } \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
    ConcreteClassRep<className> className::dynClassRep(#className, "Type" #className, &_smTypeId, groupMask, NetClassTypeEvent, NetEventDirAny, className::getParentStaticClassRep(), &Parent::__description)
 
 #define IMPLEMENT_CO_CLIENTEVENT(className,groupMask)                    \
@@ -323,6 +331,8 @@ public:
    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; } \
    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; } \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); } \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
    ConcreteClassRep<className> className::dynClassRep(#className, "Type" #className, &_smTypeId, groupMask, NetClassTypeEvent, NetEventDirServerToClient, className::getParentStaticClassRep(), &Parent::__description)
 
 #define IMPLEMENT_CO_SERVEREVENT(className,groupMask)                    \
@@ -332,6 +342,8 @@ public:
    AbstractClassRep* className::getClassRep() const { return &className::dynClassRep; } \
    AbstractClassRep* className::getStaticClassRep() { return &dynClassRep; } \
    AbstractClassRep* className::getParentStaticClassRep() { return Parent::getStaticClassRep(); } \
+   AbstractClassRep* className::getContainerChildStaticClassRep() { return NULL; }                 \
+   AbstractClassRep::WriteCustomTamlSchema className::getStaticWriteCustomTamlSchema() { return NULL; }            \
    ConcreteClassRep<className> className::dynClassRep(#className, "Type" #className, &_smTypeId, groupMask, NetClassTypeEvent, NetEventDirClientToServer, className::getParentStaticClassRep(), &Parent::__description)
 
 
@@ -818,7 +830,7 @@ public:
    /// Some configuration values.
    enum GhostConstants
    {
-      GhostIdBitSize = 12,
+      GhostIdBitSize = 18, //262,144 ghosts
       MaxGhostCount = 1 << GhostIdBitSize, //4096,
       GhostLookupTableSize = 1 << GhostIdBitSize, //4096
       GhostIndexBitSize = 4 // number of bits GhostIdBitSize-3 fits into

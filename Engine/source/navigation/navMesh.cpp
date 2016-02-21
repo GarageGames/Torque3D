@@ -112,10 +112,36 @@ DefineConsoleFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, fals
    SimSet *set = NavMesh::getServerSet();
    for(U32 i = 0; i < set->size(); i++)
    {
-      NavMesh *m = static_cast<NavMesh*>(set->at(i));
-      m->buildTiles(obj->getWorldBox());
+      NavMesh *m = dynamic_cast<NavMesh*>(set->at(i));
+      if (m)
+      {
+         m->cancelBuild();
+         m->buildTiles(obj->getWorldBox());
+      }
    }
    if(remove)
+      obj->enableCollision();
+}
+
+DefineConsoleFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove), (0, false),
+   "@brief Update all NavMesh tiles that intersect the given object's world box.")
+{
+   SceneObject *obj;
+   if (!Sim::findObject(objid, obj))
+      return;
+   if (remove)
+      obj->disableCollision();
+   SimSet *set = NavMesh::getServerSet();
+   for (U32 i = 0; i < set->size(); i++)
+   {
+      NavMesh *m = dynamic_cast<NavMesh*>(set->at(i));
+      if (m)
+      {
+         m->cancelBuild();
+         m->buildTiles(obj->getWorldBox());
+      }
+   }
+   if (remove)
       obj->enableCollision();
 }
 
@@ -147,7 +173,7 @@ NavMesh::NavMesh()
    mFileName = StringTable->insert("");
    mNetFlags.clear(Ghostable);
 
-   mSaveIntermediates = true;
+   mSaveIntermediates = false;
    nm = NULL;
    ctx = NULL;
 
@@ -637,7 +663,7 @@ DefineEngineMethod(NavMesh, build, bool, (bool background, bool save), (true, fa
 
 void NavMesh::cancelBuild()
 {
-   while(!mDirtyTiles.empty()) mDirtyTiles.pop();
+   mDirtyTiles.clear();
    ctx->stopTimer(RC_TIMER_TOTAL);
    mBuilding = false;
 }
@@ -681,7 +707,7 @@ void NavMesh::updateConfig()
    cfg.tileSize = mTileSize / cfg.cs;
 }
 
-S32 NavMesh::getTile(Point3F pos)
+S32 NavMesh::getTile(const Point3F& pos)
 {
    if(mBuilding)
       return -1;
@@ -707,7 +733,7 @@ void NavMesh::updateTiles(bool dirty)
 
    mTiles.clear();
    mTileData.clear();
-   while(!mDirtyTiles.empty()) mDirtyTiles.pop();
+   mDirtyTiles.clear();
 
    const Box3F &box = DTStoRC(getWorldBox());
    if(box.isEmpty())
@@ -741,7 +767,7 @@ void NavMesh::updateTiles(bool dirty)
                   tileBmin, tileBmax));
 
          if(dirty)
-            mDirtyTiles.push(mTiles.size() - 1);
+            mDirtyTiles.push_back_unique(mTiles.size() - 1);
 
          if(mSaveIntermediates)
             mTileData.increment();
@@ -760,18 +786,20 @@ void NavMesh::buildNextTile()
    {
       // Pop a single dirty tile and process it.
       U32 i = mDirtyTiles.front();
-      mDirtyTiles.pop();
+      mDirtyTiles.pop_front();
       const Tile &tile = mTiles[i];
       // Intermediate data for tile build.
       TileData tempdata;
       TileData &tdata = mSaveIntermediates ? mTileData[i] : tempdata;
+      
+      // Remove any previous data.
+      nm->removeTile(nm->getTileRefAt(tile.x, tile.y, 0), 0, 0);
+
       // Generate navmesh for this tile.
       U32 dataSize = 0;
       unsigned char* data = buildTileData(tile, tdata, dataSize);
       if(data)
       {
-         // Remove any previous data.
-         nm->removeTile(nm->getTileRefAt(tile.x, tile.y, 0), 0, 0);
          // Add new data (navmesh owns and deletes the data).
          dtStatus status = nm->addTile(data, dataSize, DT_TILE_FREE_DATA, 0, 0);
          int success = 1;
@@ -830,6 +858,7 @@ unsigned char *NavMesh::buildTileData(const Tile &tile, TileData &data, U32 &dat
    SceneContainer::CallbackInfo info;
    info.context = PLC_Navigation;
    info.boundingBox = box;
+   data.geom.clear();
    info.polyList = &data.geom;
    info.key = this;
    getContainer()->findObjects(box, StaticShapeObjectType | TerrainObjectType, buildCallback, &info);
@@ -843,8 +872,11 @@ unsigned char *NavMesh::buildTileData(const Tile &tile, TileData &data, U32 &dat
    }
 
    // Check for no geometry.
-   if(!data.geom.getVertCount())
-      return false;
+   if (!data.geom.getVertCount())
+   {
+      data.geom.clear();
+      return NULL;
+   }
 
    // Figure out voxel dimensions of this tile.
    U32 width = 0, height = 0;
@@ -865,11 +897,7 @@ unsigned char *NavMesh::buildTileData(const Tile &tile, TileData &data, U32 &dat
    }
 
    unsigned char *areas = new unsigned char[data.geom.getTriCount()];
-   if(!areas)
-   {
-      Con::errorf("Out of memory (area flags) for NavMesh %s", getIdString());
-      return NULL;
-   }
+
    dMemset(areas, 0, data.geom.getTriCount() * sizeof(unsigned char));
 
    // Mark walkable triangles with the appropriate area flags, and rasterize.
@@ -1070,7 +1098,7 @@ void NavMesh::buildTiles(const Box3F &box)
       if(!tile.box.isOverlapped(box))
          continue;
       // Mark as dirty.
-      mDirtyTiles.push(i);
+      mDirtyTiles.push_back_unique(i);
    }
    if(mDirtyTiles.size())
       ctx->startTimer(RC_TIMER_TOTAL);
@@ -1086,7 +1114,7 @@ void NavMesh::buildTile(const U32 &tile)
 {
    if(tile < mTiles.size())
    {
-      mDirtyTiles.push(tile);
+      mDirtyTiles.push_back_unique(tile);
       ctx->startTimer(RC_TIMER_TOTAL);
    }
 }
@@ -1108,7 +1136,7 @@ void NavMesh::buildLinks()
             mLinksUnsynced[j])
          {
             // Mark tile for build.
-            mDirtyTiles.push(i);
+            mDirtyTiles.push_back_unique(i);
             // Delete link if necessary
             if(mDeleteLinks[j])
             {

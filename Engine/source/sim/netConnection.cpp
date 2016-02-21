@@ -215,7 +215,7 @@ U32 NetConnection::getSequence()
 static U32 gPacketRateToServer = 32;
 static U32 gPacketUpdateDelayToServer = 32;
 static U32 gPacketRateToClient = 10;
-static U32 gPacketSize = 200;
+static U32 gPacketSize = 508;
 
 void NetConnection::consoleInit()
 {

@@ -84,6 +84,26 @@ function AL_DepthVisualize::onEnabled( %this )
    return true;
 }
 
+new ShaderData( AL_GlowVisualizeShader )
+{
+   DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
+   DXPixelShaderFile  = "shaders/common/lighting/advanced/dbgGlowVisualizeP.hlsl";
+   
+   OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgGlowVisualizeP.glsl";
+
+   samplerNames[0] = "glowBuffer";
+   pixVersion = 2.0;
+};
+
+singleton PostEffect( AL_GlowVisualize )
+{   
+   shader = AL_GlowVisualizeShader;
+   stateBlock = AL_DefaultVisualizeState;
+   texture[0] = "#glowbuffer";
+   target = "$backBuffer";
+   renderPriority = 9999;
+};
 
 new ShaderData( AL_NormalsVisualizeShader )
 {
@@ -202,6 +222,20 @@ function toggleDepthViz( %enable )
       AL_DepthVisualize.enable();
    else if ( !%enable )
       AL_DepthVisualize.disable();
+}
+
+/// Toggles the visualization of the AL depth buffer.
+function toggleGlowViz( %enable )
+{
+   if ( %enable $= "" )
+   {
+      $AL_GlowVisualizeVar = AL_GlowVisualize.isEnabled() ? false : true;
+      AL_GlowVisualize.toggle();
+   }
+   else if ( %enable )
+      AL_GlowVisualize.enable();
+   else if ( !%enable )
+      AL_GlowVisualize.disable();
 }
 
 /// Toggles the visualization of the AL normals buffer.

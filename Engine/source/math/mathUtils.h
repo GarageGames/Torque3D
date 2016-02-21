@@ -417,6 +417,9 @@ namespace MathUtils
 
    //void findFarthestPoint( const Point3F* points, U32 numPoints, const Point3F& fromPoint, )
 
+   /// Build a convex hull from a cloud of 2D points, first and last hull point are the same.
+   void mBuildHull2D(const Vector<Point2F> inPoints, Vector<Point2F> &hullPoints);
+
 } // namespace MathUtils
 
 #endif // _MATHUTILS_H_

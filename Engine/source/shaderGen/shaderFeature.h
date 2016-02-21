@@ -153,7 +153,7 @@ public:
    void setProcessIndex( S32 index ) { mProcessIndex = index; }
 
    ///
-   U32 getProcessIndex() const { return mProcessIndex; }
+   S32 getProcessIndex() const { return mProcessIndex; }
 
    //-----------------------------------------------------------------------
    // Virtual Functions

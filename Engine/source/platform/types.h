@@ -54,7 +54,17 @@ struct EmptyType {};                ///< "Null" type used by templates
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef char           UTF8;        ///< Compiler independent 8  bit Unicode encoded character
+
+#if defined(_MSC_VER) && defined(__clang__)
+// Clang's MSVC compatibility mode doesn't currently support /Zc:wchar_t-,
+// which we rely on to avoid type conversion errors when calling system
+// APIs when UTF16 is defined as unsigned short.  So, just define UTF16
+// as wchar_t instead since it's always a 2 byte unsigned on windows anyway.
+typedef wchar_t        UTF16;
+#else
 typedef unsigned short UTF16;       ///< Compiler independent 16 bit Unicode encoded character
+#endif
+
 typedef unsigned int   UTF32;       ///< Compiler independent 32 bit Unicode encoded character
 
 typedef const char* StringTableEntry;

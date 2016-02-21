@@ -118,6 +118,9 @@ S32 ForestCell::renderBatches( SceneRenderState *state, Frustum *culler )
       if ( culler && culler->isCulled( mBatches[i]->getWorldBox() ) )
          continue;
 
+      if( state->getCullingState().isOccludedWithExtraPlanesCull( mBatches[i]->getWorldBox() ) )
+         continue;
+
       mBatches[i]->render( state );
       renderedItems += mBatches[i]->getItemCount();
    }

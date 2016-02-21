@@ -41,4 +41,6 @@ datablock RibbonData(BasicRibbon)
    fadeAwayStep = 0.1;
    UseFadeOut = true;
    RibbonMaterial = BasicRibbonMat;
+
+   category = "FX";
 };

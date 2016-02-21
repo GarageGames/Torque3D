@@ -215,7 +215,7 @@ void GuiTextEditCtrl::execConsoleCallback()
 
    // Update the console variable:
    if ( mConsoleVariable[0] )
-      Con::setVariable( mConsoleVariable, mTextBuffer.getPtr8() );
+      Con::setVariable(mConsoleVariable, mTextBuffer.getPtr8());
 }
 
 void GuiTextEditCtrl::updateHistory( StringBuffer *inTxt, bool moveIndex )
@@ -376,6 +376,8 @@ S32 GuiTextEditCtrl::calculateCursorPos( const Point2I &globalPos )
 
 void GuiTextEditCtrl::onMouseDown( const GuiEvent &event )
 {
+   if(!isActive())
+      return;
    mDragHit = false;
 
    // If we have a double click, select all text.  Otherwise

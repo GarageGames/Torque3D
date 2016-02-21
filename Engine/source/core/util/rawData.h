@@ -58,7 +58,7 @@ class RawDataT
       }
 
       RawDataT( T* data, U32 size, bool ownMemory = false )
-         : data( data ), size( size ), ownMemory( ownMemory ) {}
+         : ownMemory( ownMemory ), data( data ), size( size ) {}
 
       RawDataT(const ThisType& rd)
       {

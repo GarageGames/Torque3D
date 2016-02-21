@@ -46,14 +46,14 @@ bool Module::_constrainedToComeBefore( Module* module, Mode mode )
       Module* depModule = dependency->mModule;
       if( !depModule )
       {
-         depModule = ModuleManager::findModule( dependency->mModuleName );
+         depModule = EngineModuleManager::findModule( dependency->mModuleName );
          if( !depModule )
          {
             // Module does not exist.  Only emit a warning here so that modules
             // can be omitted from a link without requiring the module definitions
             // to be adapted.
             
-            Platform::outputDebugString( "[ModuleManager] Module %s of '%s' depends on module '%s' which does not exist",
+            Platform::outputDebugString( "[EngineModuleManager] Module %s of '%s' depends on module '%s' which does not exist",
                mode == Module::ModeInitialize ? "init" : "shutdown",
                module->getName(), dependency->mModuleName );
             continue;
@@ -86,14 +86,14 @@ bool Module::_constrainedToComeAfter( Module* module, Mode mode )
       Module* depModule = dependency->mModule;
       if( !depModule )
       {
-         depModule = ModuleManager::findModule( dependency->mModuleName );
+         depModule = EngineModuleManager::findModule( dependency->mModuleName );
          if( !depModule )
          {
             // Module does not exist.  Only emit a warning here so that modules
             // can be omitted from a link without requiring the module definitions
             // to be adapted.
             
-            Platform::outputDebugString( "[ModuleManager] Module %s of '%s' depends on module '%s' which does not exist",
+            Platform::outputDebugString( "[EngineModuleManager] Module %s of '%s' depends on module '%s' which does not exist",
                mode == Module::ModeInitialize ? "init" : "shutdown",
                module->getName(), dependency->mModuleName );
             continue;
@@ -115,7 +115,7 @@ bool Module::_constrainedToComeAfter( Module* module, Mode mode )
 
 //-----------------------------------------------------------------------------
 
-String ModuleManager::_moduleListToString( Vector< Module* >& moduleList )
+String EngineModuleManager::_moduleListToString( Vector< Module* >& moduleList )
 {
    StringBuilder str;
    
@@ -136,14 +136,14 @@ String ModuleManager::_moduleListToString( Vector< Module* >& moduleList )
 
 //-----------------------------------------------------------------------------
 
-void ModuleManager::_printModuleList( Vector< Module* >& moduleList )
+void EngineModuleManager::_printModuleList( Vector< Module* >& moduleList )
 {
    Platform::outputDebugString( _moduleListToString( moduleList ) );
 }
 
 //-----------------------------------------------------------------------------
 
-void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >& moduleList, Module* module )
+void EngineModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >& moduleList, Module* module )
 {
    // If this module is being overridden, switch over to
    // the module overriding it.
@@ -168,7 +168,7 @@ void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >&
    if( !module->_getDependencies( mode ) )
    {
       #if defined( DEBUG_SPEW ) && DEBUG_SPEW_LEVEL > 1
-      Platform::outputDebugString( "[ModuleManager] Appending '%s' to '%s'",
+      Platform::outputDebugString( "[EngineModuleManager] Appending '%s' to '%s'",
          module->getName(), _moduleListToString( moduleList ).c_str() );
       #endif
 
@@ -179,7 +179,7 @@ void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >&
    // First make sure that all 'after' dependencies are in the list.
       
    #if defined( DEBUG_SPEW ) && DEBUG_SPEW_LEVEL > 1
-   Platform::outputDebugString( "[ModuleManager] Resolving %s dependencies of '%s'",
+   Platform::outputDebugString( "[EngineModuleManager] Resolving %s dependencies of '%s'",
       mode == Module::ModeInitialize ? "init" : "shutdown",
       module->getName() );
    #endif
@@ -199,7 +199,7 @@ void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >&
    }
    
    AssertFatal( _getIndexOfModuleInList( moduleList, module ) == -1,
-      avar( "ModuleManager::_insertModuleIntoList - Cycle in 'after' %s dependency chain of '%s'",
+      avar( "EngineModuleManager::_insertModuleIntoList - Cycle in 'after' %s dependency chain of '%s'",
          mode == Module::ModeInitialize ? "init" : "shutdown",
          module->getName() ) );
       
@@ -212,7 +212,7 @@ void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >&
       const bool currentAfterThis   = moduleList[ i ]->_constrainedToComeAfter( module, mode );
       
       AssertFatal( !( thisBeforeCurrent && currentAfterThis ),
-         avar( "ModuleManager::_insertModuleIntoList - Ambiguous %s placement of module '%s' relative to '%s'",
+         avar( "EngineModuleManager::_insertModuleIntoList - Ambiguous %s placement of module '%s' relative to '%s'",
             mode == Module::ModeInitialize ? "init" : "shutdown",
             module->getName(), moduleList[ i ]->getName() ) );
       
@@ -232,7 +232,7 @@ void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >&
       if( thisBeforeCurrent && !moduleList[ i ]->_getDependencies( mode ) && i != numModules - 1 )
       {
          #if defined( DEBUG_SPEW ) && DEBUG_SPEW_LEVEL > 1
-         Platform::outputDebugString( "[ModuleManager] Pushing '%s' to back end of chain for resolving '%s'",
+         Platform::outputDebugString( "[EngineModuleManager] Pushing '%s' to back end of chain for resolving '%s'",
             moduleList[ i ]->getName(), module->getName() );
          #endif
          
@@ -251,7 +251,7 @@ void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >&
       for( U32 n = i + 1; n < numModules; ++ n )
          AssertFatal( !(    moduleList[ n ]->_constrainedToComeBefore( module, mode )
                          || module->_constrainedToComeAfter( moduleList[ n ], mode ) ),
-            avar( "ModuleManager::_insertModuleIntoList - Ambiguous %s constraint on module '%s' to come before '%s' yet after '%s'",
+            avar( "EngineModuleManager::_insertModuleIntoList - Ambiguous %s constraint on module '%s' to come before '%s' yet after '%s'",
                mode == Module::ModeInitialize ? "init" : "shutdown",
                module->getName(),
                moduleList[ i ]->getName(),
@@ -260,7 +260,7 @@ void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >&
       // Add the module at this position.
    
       #if defined( DEBUG_SPEW ) && DEBUG_SPEW_LEVEL > 1
-      Platform::outputDebugString( "[ModuleManager] Inserting '%s' at index %i into '%s'",
+      Platform::outputDebugString( "[EngineModuleManager] Inserting '%s' at index %i into '%s'",
          module->getName(), i, _moduleListToString( moduleList ).c_str() );
       #endif
 
@@ -271,7 +271,7 @@ void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >&
    // No constraint-based position.  Just append.
 
    #if defined( DEBUG_SPEW ) && DEBUG_SPEW_LEVEL > 1
-   Platform::outputDebugString( "[ModuleManager] Appending '%s' to '%s'",
+   Platform::outputDebugString( "[EngineModuleManager] Appending '%s' to '%s'",
       module->getName(), _moduleListToString( moduleList ).c_str() );
    #endif
 
@@ -280,7 +280,7 @@ void ModuleManager::_insertIntoModuleList( Module::Mode mode, Vector< Module* >&
 
 //-----------------------------------------------------------------------------
 
-Module* ModuleManager::_findOverrideFor( Module* module )
+Module* EngineModuleManager::_findOverrideFor( Module* module )
 {
    const char* name = module->getName();
    
@@ -294,7 +294,7 @@ Module* ModuleManager::_findOverrideFor( Module* module )
 
 //-----------------------------------------------------------------------------
 
-S32 ModuleManager::_getIndexOfModuleInList( Vector< Module* >& moduleList, Module* module )
+S32 EngineModuleManager::_getIndexOfModuleInList( Vector< Module* >& moduleList, Module* module )
 {
    const U32 numModules = moduleList.size();
    for( U32 i = 0; i < numModules; ++ i )
@@ -306,7 +306,7 @@ S32 ModuleManager::_getIndexOfModuleInList( Vector< Module* >& moduleList, Modul
 
 //-----------------------------------------------------------------------------
 
-S32 ModuleManager::_getIndexOfModuleInList( Vector< Module* >& moduleList, const char* moduleName )
+S32 EngineModuleManager::_getIndexOfModuleInList( Vector< Module* >& moduleList, const char* moduleName )
 {
    const U32 numModules = moduleList.size();
    for( U32 i = 0; i < numModules; ++ i )
@@ -318,7 +318,7 @@ S32 ModuleManager::_getIndexOfModuleInList( Vector< Module* >& moduleList, const
 
 //-----------------------------------------------------------------------------
 
-void ModuleManager::_createModuleList( Module::Mode mode, Vector< Module* >& moduleList )
+void EngineModuleManager::_createModuleList( Module::Mode mode, Vector< Module* >& moduleList )
 {
    for( Module* module = Module::smFirst; module != NULL; module = module->mNext )
       _insertIntoModuleList( mode, moduleList, module );
@@ -326,7 +326,7 @@ void ModuleManager::_createModuleList( Module::Mode mode, Vector< Module* >& mod
 
 //-----------------------------------------------------------------------------
 
-void ModuleManager::initializeSystem()
+void EngineModuleManager::initializeSystem()
 {
    Vector< Module* > modules;
    
@@ -339,7 +339,7 @@ void ModuleManager::initializeSystem()
       if( !module->mIsInitialized )
       {
          #ifdef DEBUG_SPEW
-         Platform::outputDebugString( "[ModuleManager] Initializing %s",
+         Platform::outputDebugString( "[EngineModuleManager] Initializing %s",
             module->getName() );
          #endif
          
@@ -351,7 +351,7 @@ void ModuleManager::initializeSystem()
 
 //-----------------------------------------------------------------------------
 
-void ModuleManager::shutdownSystem()
+void EngineModuleManager::shutdownSystem()
 {
    Vector< Module* > modules;
    
@@ -363,7 +363,7 @@ void ModuleManager::shutdownSystem()
       if( modules[ i ]->mIsInitialized )
       {
          #ifdef DEBUG_SPEW
-         Platform::outputDebugString( "[ModuleManager] Shutting down %s",
+         Platform::outputDebugString( "[EngineModuleManager] Shutting down %s",
             modules[ i ]->getName() );
          #endif
          
@@ -375,7 +375,7 @@ void ModuleManager::shutdownSystem()
 
 //-----------------------------------------------------------------------------
 
-Module* ModuleManager::findModule( const char* name )
+Module* EngineModuleManager::findModule( const char* name )
 {
    for( Module* module = Module::smFirst; module != NULL; module = module->mNext )
       if( dStricmp( module->getName(), name ) == 0 )

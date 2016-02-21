@@ -148,7 +148,7 @@ GFXDevice::GFXDevice()
    mGlobalAmbientColor = ColorF(0.0f, 0.0f, 0.0f, 1.0f);
 
    mLightMaterialDirty = false;
-   dMemset(&mCurrentLightMaterial, NULL, sizeof(GFXLightMaterial));
+   dMemset(&mCurrentLightMaterial, 0, sizeof(GFXLightMaterial));
 
    // State block 
    mStateBlockDirty = false;
@@ -735,14 +735,14 @@ void GFXDevice::setLight(U32 stage, GFXLightInfo* light)
 //-----------------------------------------------------------------------------
 // Set Light Material
 //-----------------------------------------------------------------------------
-void GFXDevice::setLightMaterial(GFXLightMaterial mat)
+void GFXDevice::setLightMaterial(const GFXLightMaterial& mat)
 {
    mCurrentLightMaterial = mat;
    mLightMaterialDirty = true;
    mStateDirty = true;
 }
 
-void GFXDevice::setGlobalAmbientColor(ColorF color)
+void GFXDevice::setGlobalAmbientColor(const ColorF& color)
 {
    if(mGlobalAmbientColor != color)
    {

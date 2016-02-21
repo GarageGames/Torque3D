@@ -357,9 +357,6 @@ GBitmap * GuiMissionAreaCtrl::createTerrainBitmap()
 
    GBitmap * bitmap = new GBitmap(mTerrainBlock->getBlockSize(), mTerrainBlock->getBlockSize(), false, GFXFormatR8G8B8 );
 
-   if(!bitmap)
-      return NULL;
-
    // get the min/max
    F32 min, max;
    mTerrainBlock->getMinMaxHeight(&min, &max);

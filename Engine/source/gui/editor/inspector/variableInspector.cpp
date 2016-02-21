@@ -52,13 +52,10 @@ void GuiVariableInspector::loadVars( String searchStr )
    group->setCaption( "Global Variables" );
    group->mSearchString = searchStr;
 
-   if( group != NULL )
-   {
-      group->registerObject();
-      mGroups.push_back( group );
-      addObject( group );
-   }   
-
+   group->registerObject();
+   mGroups.push_back( group );
+   addObject( group );
+ 
    //group->inspectGroup();
 }
 

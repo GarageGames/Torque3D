@@ -39,10 +39,6 @@ struct Vert
 {
    // .xyz  = point
    float4 position : POSITION;
-   
-   float3 normal   : NORMAL;
-   
-   float4 color : TEXCOORD0;  
 };
 
 // This is the shader output data.
