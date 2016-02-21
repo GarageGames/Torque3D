@@ -875,9 +875,11 @@ DefineConsoleFunction(ColorHEXToRGB, ColorI, (const char* hex), ,
 	"@endtsexample\n"
 	"@ingroup Strings")
 {
-	ColorI color;
-	color.set(hex);
-	return color;
+   S32 rgb = dAtoui(hex, 16);
+
+   ColorI color;
+   color.set(rgb & 0x000000FF, (rgb & 0x0000FF00) >> 8, (rgb & 0x00FF0000) >> 16);
+   return color;
 }
 
 DefineConsoleFunction(ColorHSBToRGB, ColorI, (Point3I hsb), ,
