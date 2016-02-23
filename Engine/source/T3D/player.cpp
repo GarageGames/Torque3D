@@ -2651,19 +2651,20 @@ void Player::updateMove(const Move* move)
 
                if(move->y > 0.0f || move->y < 0.0f)
                {
-                  mRot.z += y;
+               	  mRot.z += y;
                   F32 change = mHead.z * 0.5f;
                   mHead.z = change;
                   mRot.z += change;
                } else
                {
-                  mHead.z += y;
+               	mHead.z += y;
                }
-
             } else
             {
-               mRot.z += y;
-               mHead.z *= 0.5f;
+            	mRot.z += y;
+            	F32 change = mHead.z * 0.5f;
+            	mHead.z = change;
+            	mRot.z += change;
             }
 
             if (mControlObject)
