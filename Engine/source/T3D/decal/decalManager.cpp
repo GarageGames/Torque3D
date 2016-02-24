@@ -1773,7 +1773,11 @@ DefineEngineFunction( decalManagerEditDecal, bool, ( S32 decalID, Point3F pos, P
    mat.getColumn( 1, &tangent );
    
    //if everything is unchanged just do nothing and  return "everything is ok"
-   if ( pos.equal(decalInstance->mPosition) && normal.equal(decalInstance->mNormal) && tangent.equal(decalInstance->mTangent) && mFabs( decalInstance->mSize - (decalInstance->mDataBlock->size * decalScale) ) < POINT_EPSILON ) return true;
+   if ( pos.equal(decalInstance->mPosition) &&
+        normal.equal(decalInstance->mNormal) &&
+        tangent.equal(decalInstance->mTangent) &&
+        mFabs( decalInstance->mSize - (decalInstance->mDataBlock->size * decalScale) ) < POINT_EPSILON )
+           return true;
 
    decalInstance->mPosition = pos;
    decalInstance->mNormal = normal;
