@@ -503,7 +503,7 @@ bool Net::openPort(S32 port, bool doBind)
 	  }
 
       if(error == NoError)
-         error = setBufferSize(udpSocket, 32768);
+         error = setBufferSize(udpSocket, 32768*8);
 
       if(error == NoError && !useVDP)
          error = setBroadcast(udpSocket, true);
