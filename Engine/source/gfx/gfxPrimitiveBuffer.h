@@ -140,6 +140,8 @@ public:
    }
 
    void set(GFXDevice *theDevice, U32 indexCount, U32 primitiveCount, GFXBufferType bufferType, String desc = String::EmptyString );
+   
+   void immutable(GFXDevice *theDevice, U32 indexCount, U32 primitiveCount, void* data, String desc = String::EmptyString );
 
    void lock(U16 **indexBuffer, GFXPrimitive **primitiveBuffer = NULL, U32 indexStart = 0, U32 indexEnd = 0)
    {
