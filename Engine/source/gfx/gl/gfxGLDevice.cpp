@@ -377,7 +377,8 @@ GFXVertexBuffer *GFXGLDevice::allocVertexBuffer(   U32 numVerts,
 
 GFXPrimitiveBuffer *GFXGLDevice::allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType, void* data ) 
 {
-   GFXPrimitiveBuffer* buf
+   GFXPrimitiveBuffer* buf;
+   
    if(bufferType == GFXBufferTypeVolatile)
    {
       buf = findVolatilePBO(numIndices, numPrimitives);
