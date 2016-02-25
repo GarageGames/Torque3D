@@ -215,12 +215,20 @@ void Profiler::reset()
 {
    mEnabled = false; // in case we're in a profiler call.
    ProfilerData * head = mProfileList;
-   ProfilerData * curr = NULL;
-   while ((curr = head) != NULL)
+   ProfilerData * curr = head;
+
+   while ( curr )
    {
-      head = head->mNextProfilerData;
-      free(curr);
+      head = curr->mNextProfilerData;
+      free( curr );
+
+      if ( head )
+         curr = head;
+      else
+         curr = NULL;
    }
+
+   mProfileList = NULL;
 
    for(ProfilerRootData *walk = ProfilerRootData::sRootList; walk; walk = walk->mNextRoot)
    {
