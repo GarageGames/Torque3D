@@ -356,7 +356,7 @@ GFXVertexBuffer *GFXGLDevice::allocVertexBuffer(   U32 numVerts,
                                                    const GFXVertexFormat *vertexFormat, 
                                                    U32 vertSize, 
                                                    GFXBufferType bufferType,
-                                                   void* data = NULL )  
+                                                   void* data )  
 {
    if(bufferType == GFXBufferTypeVolatile)
       return findVolatileVBO(numVerts, vertexFormat, vertSize);
