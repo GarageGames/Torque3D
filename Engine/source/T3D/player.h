@@ -684,7 +684,7 @@ public:
    void getEyeBaseTransform(MatrixF* mat, bool includeBank);
    void getRenderEyeTransform(MatrixF* mat);
    void getRenderEyeBaseTransform(MatrixF* mat, bool includeBank);
-   virtual DisplayPose calcCameraDeltaPose(GameConnection *con, DisplayPose inPose);
+   virtual DisplayPose calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose);
    void getCameraParameters(F32 *min, F32 *max, Point3F *offset, MatrixF *rot);
    void getMuzzleTransform(U32 imageSlot,MatrixF* mat);
    void getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat);   

@@ -1235,8 +1235,30 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
          currentBatch = &batches.last();
          currentBatch->startDecal = i;
          currentBatch->decalCount = 1;
-         currentBatch->iCount = decal->mIndxCount;
-         currentBatch->vCount = decal->mVertCount;
+
+         // Shrink and warning: preventing a potential crash.
+         currentBatch->iCount =
+             (decal->mIndxCount > smMaxIndices) ? smMaxIndices : decal->mIndxCount;
+         currentBatch->vCount =
+             (decal->mVertCount > smMaxVerts) ? smMaxVerts : decal->mVertCount;
+#ifdef TORQUE_DEBUG
+         // we didn't mean send a spam to the console
+         static U32 countMsgIndx = 0;
+         if ( (decal->mIndxCount > smMaxIndices) && ((countMsgIndx++ % 1024) == 0) ) {
+            Con::warnf(
+               "DecalManager::prepRenderImage() - Shrinked indices of decal."
+               " Lost %u.",  (decal->mIndxCount - smMaxIndices)
+            );
+         }
+         static U32 countMsgVert = 0;
+         if ( (decal->mVertCount > smMaxVerts) && ((countMsgVert++ % 1024) == 0) ) {
+            Con::warnf(
+               "DecalManager::prepRenderImage() - Shrinked vertices of decal."
+               " Lost %u.",  (decal->mVertCount - smMaxVerts)
+            );
+         }
+#endif
+
          currentBatch->mat = mat;
          currentBatch->matInst = decal->mDataBlock->getMaterialInstance();
          currentBatch->priority = decal->getRenderPriority();         
@@ -1299,15 +1321,21 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
       {
          DecalInstance *dinst = mDecalQueue[j];
 
-         for ( U32 k = 0; k < dinst->mIndxCount; k++ )
+         const U32 indxCount =
+             (dinst->mIndxCount > currentBatch.iCount) ?
+             currentBatch.iCount : dinst->mIndxCount;
+         for ( U32 k = 0; k < indxCount; k++ )
          {
             *( pbPtr + ioffset + k ) = dinst->mIndices[k] + voffset;            
          }
 
-         ioffset += dinst->mIndxCount;
+         ioffset += indxCount;
 
-         dMemcpy( vpPtr + voffset, dinst->mVerts, sizeof( DecalVertex ) * dinst->mVertCount );
-         voffset += dinst->mVertCount;
+         const U32 vertCount =
+             (dinst->mVertCount > currentBatch.vCount) ?
+             currentBatch.vCount : dinst->mVertCount;
+         dMemcpy( vpPtr + voffset, dinst->mVerts, sizeof( DecalVertex ) * vertCount );
+         voffset += vertCount;
 
          // Ugly hack for ProjectedShadow!
          if ( (dinst->mFlags & CustomDecal) && dinst->mCustomTex != NULL )
@@ -1357,8 +1385,10 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
       pb->lock( &pbPtr );
 
       // Memcpy from system to video memory.
-      dMemcpy( vpPtr, vertData, sizeof( DecalVertex ) * currentBatch.vCount );
-      dMemcpy( pbPtr, indexData, sizeof( U16 ) * currentBatch.iCount );
+      const U32 vpCount = sizeof( DecalVertex ) * currentBatch.vCount;
+      dMemcpy( vpPtr, vertData, vpCount );
+      const U32 pbCount = sizeof( U16 ) * currentBatch.iCount;
+      dMemcpy( pbPtr, indexData, pbCount );
 
       pb->unlock();
       vb->unlock();

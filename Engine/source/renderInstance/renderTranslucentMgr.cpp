@@ -51,6 +51,7 @@ RenderTranslucentMgr::RenderTranslucentMgr()
 {
    notifyType( RenderPassManager::RIT_ObjectTranslucent );
    notifyType( RenderPassManager::RIT_Particle );
+   notifyType( RenderPassManager::RIT_VolumetricFog);
 }
 
 RenderTranslucentMgr::~RenderTranslucentMgr()
@@ -187,6 +188,15 @@ void RenderTranslucentMgr::render( SceneRenderState *state )
          j++;
          continue;
       }
+      else if (baseRI->type == RenderPassManager::RIT_VolumetricFog)
+	   {
+	      ObjectRenderInst* objRI = static_cast<ObjectRenderInst*>(baseRI);
+	      objRI->renderDelegate(objRI, state, NULL);
+	      lastVB = NULL;
+	      lastPB = NULL;
+	      j++;
+	      continue;
+	   }
       else if ( baseRI->type == RenderPassManager::RIT_Particle )
       {
          ParticleRenderInst *ri = static_cast<ParticleRenderInst*>(baseRI);

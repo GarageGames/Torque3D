@@ -720,9 +720,9 @@ const char* SceneObject::_getRenderEnabled( void* object, const char* data )
 {
    SceneObject* obj = reinterpret_cast< SceneObject* >( object );
    if( obj->mObjectFlags.test( RenderEnabledFlag ) )
-      return "true";
+      return "1";
    else
-      return "false";
+      return "0";
 }
 
 //-----------------------------------------------------------------------------

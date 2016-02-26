@@ -182,6 +182,7 @@ Material::Material()
    mAlphaRef = 1;
 
    mCastShadows = true;
+   mCastDynamicShadows = false;
 
    mPlanarReflection = false;
 
@@ -288,7 +289,7 @@ void Material::initPersistFields()
       
       addField( "useAnisotropic", TypeBool, Offset(mUseAnisotropic, Material), MAX_STAGES,
          "Use anisotropic filtering for the textures of this stage." );
-
+      
       addField("envMap", TypeImageFilename, Offset(mEnvMapFilename, Material), MAX_STAGES,
          "The name of an environment map cube map to apply to this material." );
 
@@ -389,6 +390,9 @@ void Material::initPersistFields()
 
    addField( "castShadows", TypeBool, Offset(mCastShadows, Material),
       "If set to false the lighting system will not cast shadows from this material." );
+
+   addField( "castDynamicShadows", TypeBool, Offset(mCastDynamicShadows, Material),
+      "If set to false the lighting system will not cast dynamic shadows from this material." );
 
    addField("planarReflection", TypeBool, Offset(mPlanarReflection, Material), "@internal" );
 

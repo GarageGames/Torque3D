@@ -606,7 +606,7 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       RectI originalVP = GFX->getViewport();
 
       Point2F projOffset = GFX->getCurrentProjectionOffset();
-      const FovPort *currentFovPort = GFX->getSteroFovPort();
+      const FovPort *currentFovPort = GFX->getStereoFovPort();
       MatrixF inverseEyeTransforms[2];
 
       // Calculate world transforms for eyes

@@ -1059,9 +1059,9 @@ void TurretShape::writePacketData(GameConnection *connection, BitStream *stream)
 {
    // Update client regardless of status flags.
    Parent::writePacketData(connection, stream);
-
-   stream->write(mRot.x);
-   stream->write(mRot.z);
+   
+   stream->writeSignedFloat(mRot.x / M_2PI_F, 7);
+   stream->writeSignedFloat(mRot.z / M_2PI_F, 7);
 }
 
 void TurretShape::readPacketData(GameConnection *connection, BitStream *stream)
@@ -1069,9 +1069,8 @@ void TurretShape::readPacketData(GameConnection *connection, BitStream *stream)
    Parent::readPacketData(connection, stream);
 
    Point3F rot(0.0f, 0.0f, 0.0f);
-   stream->read(&rot.x);
-   stream->read(&rot.z);
-
+   rot.x = stream->readSignedFloat(7) * M_2PI_F;
+   rot.z = stream->readSignedFloat(7) * M_2PI_F;
    _setRotation(rot);
 
    mTurretDelta.rot = rot;
@@ -1100,8 +1099,8 @@ U32 TurretShape::packUpdate(NetConnection *connection, U32 mask, BitStream *stre
 
    if (stream->writeFlag(mask & TurretUpdateMask))
    {
-      stream->write(mRot.x);
-      stream->write(mRot.z);
+      stream->writeSignedFloat(mRot.x / M_2PI_F, 7);
+      stream->writeSignedFloat(mRot.z / M_2PI_F, 7);
       stream->write(allowManualRotation);
       stream->write(allowManualFire);
    }
@@ -1137,8 +1136,8 @@ void TurretShape::unpackUpdate(NetConnection *connection, BitStream *stream)
    if (stream->readFlag())
    {
       Point3F rot(0.0f, 0.0f, 0.0f);
-      stream->read(&rot.x);
-      stream->read(&rot.z);
+      rot.x = stream->readSignedFloat(7) * M_2PI_F;
+      rot.z = stream->readSignedFloat(7) * M_2PI_F;
       _setRotation(rot);
 
       // New delta for client side interpolation

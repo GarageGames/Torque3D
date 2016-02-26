@@ -106,6 +106,9 @@ class SceneCullingState
       /// The root culling frustum, which may be different from the camera frustum
       Frustum mCullingFrustum;
 
+      /// Extra planes for culling.
+      PlaneSetF mExtraPlanesCull;
+
       /// Occluders that have been added to this render state.  Adding an occluder does not
       /// necessarily result in an occluder volume being added.  To not repeatedly try to
       /// process the same occluder object, all objects that are added are recorded here.
@@ -300,6 +303,21 @@ class SceneCullingState
       /// Queue debug visualizations of the culling volumes of all currently selected zones
       /// (or, if no zone is selected, all volumes in the outdoor zone) to the debug drawer.
       void debugRenderCullingVolumes() const;
+
+      /// Set planes for extra culling
+      void setExtraPlanesCull( const PlaneSetF &cull) { mExtraPlanesCull = cull; }
+
+      /// Clear planes for extra culling.
+      void clearExtraPlanesCull() { mExtraPlanesCull = PlaneSetF(NULL, 0); }
+
+      /// Check extra planes culling
+      bool isOccludedWithExtraPlanesCull(const Box3F &box) const
+      {
+         if(mExtraPlanesCull.getNumPlanes())
+            return mExtraPlanesCull.testPotentialIntersection( box ) == GeometryOutside;
+
+         return false;
+      }
 
    private:
 

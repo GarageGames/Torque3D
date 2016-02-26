@@ -171,19 +171,21 @@ void TSShapeInstance::dump(Stream & stream)
    bool foundSkin = false;
    for (i=0; i<mShape->objects.size(); i++)
    {
-      if (mShape->objects[i].nodeIndex<0) // must be a skin
+      TSShape::Object& currentObject = mShape->objects[i];
+
+      if (currentObject.nodeIndex<0) // must be a skin
       {
          if (!foundSkin)
             dumpLine("\r\n   Skins:\r\n");
          foundSkin=true;
          const char * skinName = "";
-         S32 nameIndex = mShape->objects[i].nameIndex;
+         S32 nameIndex = currentObject.nameIndex;
          if (nameIndex>=0)
             skinName = mShape->getName(nameIndex);
          dumpLine(avar("      Skin %s with following details: ",skinName));
-         for (S32 num=0; num<mShape->objects[i].numMeshes; num++)
+         for (S32 num=0; num<currentObject.numMeshes; num++)
          {
-            if (mShape->meshes[mShape->objects[i].startMeshIndex + num])
+            if (mShape->meshes[currentObject.startMeshIndex + num])
                dumpLine(avar(" %i",(S32)mShape->details[num].size));
          }
          dumpLine("\r\n");

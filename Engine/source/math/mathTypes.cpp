@@ -37,6 +37,7 @@
 #include "math/mEase.h"
 #include "math/mathUtils.h"
 
+#include "core/strings/stringUnit.h"
 
 IMPLEMENT_SCOPE( MathTypes, Math,, "" );
 
@@ -117,7 +118,7 @@ END_IMPLEMENT_STRUCT;
 //-----------------------------------------------------------------------------
 // TypePoint2I
 //-----------------------------------------------------------------------------
-ConsoleType( Point2I, TypePoint2I, Point2I )
+ConsoleType(Point2I, TypePoint2I, Point2I, "")
 ImplementConsoleTypeCasters( TypePoint2I, Point2I )
 
 ConsoleGetType( TypePoint2I )
@@ -142,7 +143,7 @@ ConsoleSetType( TypePoint2I )
 //-----------------------------------------------------------------------------
 // TypePoint2F
 //-----------------------------------------------------------------------------
-ConsoleType( Point2F, TypePoint2F, Point2F )
+ConsoleType(Point2F, TypePoint2F, Point2F, "")
 ImplementConsoleTypeCasters( TypePoint2F, Point2F )
 
 ConsoleGetType( TypePoint2F )
@@ -167,7 +168,7 @@ ConsoleSetType( TypePoint2F )
 //-----------------------------------------------------------------------------
 // TypePoint3I
 //-----------------------------------------------------------------------------
-ConsoleType( Point3I, TypePoint3I, Point3I )
+ConsoleType(Point3I, TypePoint3I, Point3I, "")
 ImplementConsoleTypeCasters(TypePoint3I, Point3I)
 
 ConsoleGetType( TypePoint3I )
@@ -192,7 +193,7 @@ ConsoleSetType( TypePoint3I )
 //-----------------------------------------------------------------------------
 // TypePoint3F
 //-----------------------------------------------------------------------------
-ConsoleType( Point3F, TypePoint3F, Point3F )
+ConsoleType(Point3F, TypePoint3F, Point3F, "")
 ImplementConsoleTypeCasters(TypePoint3F, Point3F)
 
 ConsoleGetType( TypePoint3F )
@@ -217,7 +218,7 @@ ConsoleSetType( TypePoint3F )
 //-----------------------------------------------------------------------------
 // TypePoint4F
 //-----------------------------------------------------------------------------
-ConsoleType( Point4F, TypePoint4F, Point4F )
+ConsoleType(Point4F, TypePoint4F, Point4F, "")
 ImplementConsoleTypeCasters( TypePoint4F, Point4F )
 
 ConsoleGetType( TypePoint4F )
@@ -242,7 +243,7 @@ ConsoleSetType( TypePoint4F )
 //-----------------------------------------------------------------------------
 // TypeRectI
 //-----------------------------------------------------------------------------
-ConsoleType( RectI, TypeRectI, RectI )
+ConsoleType(RectI, TypeRectI, RectI, "")
 ImplementConsoleTypeCasters( TypeRectI, RectI )
 
 ConsoleGetType( TypeRectI )
@@ -269,7 +270,7 @@ ConsoleSetType( TypeRectI )
 //-----------------------------------------------------------------------------
 // TypeRectF
 //-----------------------------------------------------------------------------
-ConsoleType( RectF, TypeRectF, RectF )
+ConsoleType(RectF, TypeRectF, RectF, "")
 ImplementConsoleTypeCasters( TypeRectF, RectF )
 
 ConsoleGetType( TypeRectF )
@@ -296,7 +297,7 @@ ConsoleSetType( TypeRectF )
 //-----------------------------------------------------------------------------
 // TypeMatrix
 //-----------------------------------------------------------------------------
-ConsoleType( MatrixF, TypeMatrixF, MatrixF )
+ConsoleType(MatrixF, TypeMatrixF, MatrixF, "")
 ImplementConsoleTypeCasters( TypeMatrixF, MatrixF )
 
 // Oh merry confusion.  Torque stores matrices in row-major order yet to TorqueScript
@@ -339,7 +340,7 @@ ConsoleSetType( TypeMatrixF )
 //-----------------------------------------------------------------------------
 // TypeMatrixPosition
 //-----------------------------------------------------------------------------
-ConsoleType( MatrixPosition, TypeMatrixPosition, MatrixF )
+ConsoleType(MatrixPosition, TypeMatrixPosition, MatrixF, "")
 
 ConsoleGetType( TypeMatrixPosition )
 {
@@ -374,7 +375,7 @@ ConsoleSetType( TypeMatrixPosition )
 //-----------------------------------------------------------------------------
 // TypeMatrixRotation
 //-----------------------------------------------------------------------------
-ConsoleType( MatrixRotation, TypeMatrixRotation, MatrixF )
+ConsoleType(MatrixRotation, TypeMatrixRotation, MatrixF, "")
 
 ConsoleGetType( TypeMatrixRotation )
 {
@@ -419,7 +420,7 @@ ConsoleSetType( TypeMatrixRotation )
 //-----------------------------------------------------------------------------
 // TypeAngAxisF
 //-----------------------------------------------------------------------------
-ConsoleType( AngAxisF, TypeAngAxisF, AngAxisF )
+ConsoleType(AngAxisF, TypeAngAxisF, AngAxisF, "")
 ImplementConsoleTypeCasters( TypeAngAxisF, AngAxisF )
 
 ConsoleGetType( TypeAngAxisF )
@@ -458,7 +459,7 @@ ConsoleSetType( TypeAngAxisF )
 
 const TransformF TransformF::Identity( Point3F::Zero, AngAxisF( Point3F( 0, 0, 1 ), 0) );
 
-ConsoleType( TransformF, TypeTransformF, TransformF )
+ConsoleType(TransformF, TypeTransformF, TransformF, "")
 ImplementConsoleTypeCasters( TypeTransformF, TransformF )
 
 ConsoleGetType( TypeTransformF )
@@ -502,7 +503,7 @@ ConsoleSetType( TypeTransformF )
 //-----------------------------------------------------------------------------
 // TypeBox3F
 //-----------------------------------------------------------------------------
-ConsoleType( Box3F, TypeBox3F, Box3F )
+ConsoleType(Box3F, TypeBox3F, Box3F, "")
 ImplementConsoleTypeCasters( TypeBox3F, Box3F )
 
 ConsoleGetType( TypeBox3F )
@@ -539,7 +540,7 @@ ConsoleSetType( TypeBox3F )
 //-----------------------------------------------------------------------------
 // TypeEaseF
 //-----------------------------------------------------------------------------
-ConsoleType( EaseF, TypeEaseF, EaseF )
+ConsoleType(EaseF, TypeEaseF, EaseF, "")
 ImplementConsoleTypeCasters( TypeEaseF, EaseF )
 
 ConsoleGetType( TypeEaseF )

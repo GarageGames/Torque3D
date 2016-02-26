@@ -45,6 +45,7 @@ public:
    String   getTypeStr() const { return "Win32"; }
 
    FileNodeRef resolve(const Path& path);
+   void verifyCompatibility(const Path& _path, WIN32_FIND_DATAW _info);
    FileNodeRef create(const Path& path,FileNode::Mode);
    bool remove(const Path& path);
    bool rename(const Path& from,const Path& to);

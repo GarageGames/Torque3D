@@ -105,7 +105,7 @@ protected:
 
    SimObjectPtr<Material> mMaterial;
    
-   GFXVertexBufferHandle<GFXVertexPNTT> mVB;
+   GFXVertexBufferHandle<GFXVertexPNT> mVB;
 
    GFXVertexBufferHandle<GFXVertexPC> mFogBandVB;
    Material *mFogBandMat;

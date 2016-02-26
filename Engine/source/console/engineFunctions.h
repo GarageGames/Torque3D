@@ -77,7 +77,11 @@ struct EngineFunctionDefaultArguments
 
 
 // Need byte-aligned packing for the default argument structures.
+#ifdef _WIN64
+#pragma pack( push, 4 )
+#else
 #pragma pack( push, 1 )
+#endif
    
 
 // Structure encapsulating default arguments to an engine API function.

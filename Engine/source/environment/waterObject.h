@@ -49,7 +49,6 @@ GFXDeclareVertexFormat( GFXWaterVertex )
 {
    Point3F point;
    Point3F normal;
-   GFXVertexColor color;
    Point2F undulateData;
    Point4F horizonFactor;
 };

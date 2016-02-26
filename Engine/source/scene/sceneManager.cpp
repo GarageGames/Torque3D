@@ -240,7 +240,7 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       Frustum originalFrustum = GFX->getFrustum();
 
       Point2F projOffset = GFX->getCurrentProjectionOffset();
-      const FovPort *currentFovPort = GFX->getSteroFovPort();
+      const FovPort *currentFovPort = GFX->getStereoFovPort();
       const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
       const MatrixF *worldEyeTransforms = GFX->getInverseStereoEyeTransforms();
 

@@ -82,13 +82,6 @@ const F32 ScatterSky::smEarthRadius = (6378.0f * 1000.0f);
 const F32 ScatterSky::smAtmosphereRadius = 200000.0f;
 const F32 ScatterSky::smViewerHeight = 1.0f;
 
-GFXImplementVertexFormat( ScatterSkyVertex )
-{
-   addElement( "POSITION", GFXDeclType_Float3 );
-   addElement( "NORMAL", GFXDeclType_Float3 );
-   addElement( "COLOR", GFXDeclType_Color );
-}
-
 ScatterSky::ScatterSky()
 {
    mPrimCount = 0;
@@ -151,6 +144,8 @@ ScatterSky::ScatterSky()
    mBrightness = 1.0f;
 
    mCastShadows = true;
+   mStaticRefreshFreq = 8;
+   mDynamicRefreshFreq = 8;
    mDirty = true;
 
    mLight = LightManager::createLightInfo();
@@ -271,6 +266,8 @@ void ScatterSky::_conformLights()
    mLight->setAmbient( mAmbientColor );
    mLight->setColor( mSunColor );
    mLight->setCastShadows( mCastShadows );
+   mLight->setStaticRefreshFreq(mStaticRefreshFreq);
+   mLight->setDynamicRefreshFreq(mDynamicRefreshFreq);
 
    FogData fog = getSceneManager()->getFogData();
    fog.color = mFogColor;
@@ -381,6 +378,9 @@ void ScatterSky::initPersistFields()
       addField( "castShadows", TypeBool, Offset( mCastShadows, ScatterSky ),
          "Enables/disables shadows cast by objects due to ScatterSky light." );
 
+      addField("staticRefreshFreq", TypeS32, Offset(mStaticRefreshFreq, ScatterSky), "static shadow refresh rate (milliseconds)");
+      addField("dynamicRefreshFreq", TypeS32, Offset(mDynamicRefreshFreq, ScatterSky), "dynamic shadow refresh rate (milliseconds)");
+
       addField( "brightness", TypeF32, Offset( mBrightness, ScatterSky ),
          "The brightness of the ScatterSky's light object." );
 
@@ -487,6 +487,8 @@ U32 ScatterSky::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->write( mBrightness );
 
       stream->writeFlag( mCastShadows );
+      stream->write(mStaticRefreshFreq);
+      stream->write(mDynamicRefreshFreq);
 
       stream->write( mFlareScale );
 
@@ -588,6 +590,8 @@ void ScatterSky::unpackUpdate(NetConnection *con, BitStream *stream)
       stream->read( &mBrightness );
 
       mCastShadows = stream->readFlag();
+      stream->read(&mStaticRefreshFreq);
+      stream->read(&mDynamicRefreshFreq);
 
       stream->read( &mFlareScale );
 
@@ -637,12 +641,13 @@ void ScatterSky::prepRenderImage( SceneRenderState *state )
       return;
 
    // Regular sky render instance.
-   ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
+   RenderPassManager* renderPass = state->getRenderPass();
+   ObjectRenderInst *ri = renderPass->allocInst<ObjectRenderInst>();
    ri->renderDelegate.bind( this, &ScatterSky::_render );
    ri->type = RenderPassManager::RIT_Sky;
    ri->defaultKey = 10;
    ri->defaultKey2 = 0;
-   state->getRenderPass()->addInst( ri );
+   renderPass->addInst(ri);
 
    // Debug render instance.
    /*
@@ -685,13 +690,13 @@ void ScatterSky::prepRenderImage( SceneRenderState *state )
       mMatrixSet->setSceneProjection(GFX->getProjectionMatrix());
       mMatrixSet->setWorld(GFX->getWorldMatrix());
 
-      ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
+      ObjectRenderInst *ri = renderPass->allocInst<ObjectRenderInst>();
       ri->renderDelegate.bind( this, &ScatterSky::_renderMoon );
       ri->type = RenderPassManager::RIT_Sky;
       // Render after sky objects and before CloudLayer!
       ri->defaultKey = 5;
       ri->defaultKey2 = 0;
-      state->getRenderPass()->addInst( ri );
+      renderPass->addInst(ri);
    }
 }
 
@@ -760,7 +765,7 @@ void ScatterSky::_initVBIB()
    F32 zOffset = -( mCos( mSqrt( 1.0f ) ) + 0.01f );
 
    mVB.set( GFX, mVertCount, GFXBufferTypeStatic );
-   ScatterSkyVertex *pVert = mVB.lock();
+   GFXVertexP *pVert = mVB.lock();
    if(!pVert) return;
 
    for ( U32 y = 0; y < vertStride; y++ )

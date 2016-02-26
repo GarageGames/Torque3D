@@ -44,9 +44,9 @@ public:
    static S32 _smTypeId;
 
    SimObjectRef()
-      : mId( 0 ),
-        mObject( NULL ),
-        mName( "" )
+      : mName( "" ),
+        mId( 0 ),
+        mObject( NULL )
    {
    }
    

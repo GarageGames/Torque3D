@@ -918,7 +918,7 @@ void DICreateUndoAction::initPersistFields()
    Parent::initPersistFields();
 }
 
-void DICreateUndoAction::addDecal( DecalInstance decal )
+void DICreateUndoAction::addDecal(const DecalInstance& decal)
 {
 	mDecalInstance = decal;
 	mDatablockId = decal.mDataBlock->getId();
@@ -1006,7 +1006,7 @@ void DIDeleteUndoAction::initPersistFields()
    Parent::initPersistFields();
 }
 
-void DIDeleteUndoAction::deleteDecal( DecalInstance decal )
+void DIDeleteUndoAction::deleteDecal(const DecalInstance& decal)
 {
 	mDecalInstance = decal;
 	mDatablockId = decal.mDataBlock->getId();
@@ -1094,7 +1094,7 @@ void DBDeleteUndoAction::initPersistFields()
    Parent::initPersistFields();
 }
 
-void DBDeleteUndoAction::deleteDecal( DecalInstance decal )
+void DBDeleteUndoAction::deleteDecal(const DecalInstance& decal)
 {
 	mDecalInstanceVec.increment();
    mDecalInstanceVec.last() = decal;

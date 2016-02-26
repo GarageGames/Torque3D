@@ -77,8 +77,11 @@ bool SphereF::intersectsRay( const Point3F &start, const Point3F &end ) const
    // value for getting the exact
    // intersection point, by interpolating
    // start to end by t.
+
+   /*
    F32 t = 0;
    TORQUE_UNUSED(t);
+   */
 
    // if t1 is less than zero, the object is in the ray's negative direction
    // and consequently the ray misses the sphere

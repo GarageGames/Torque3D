@@ -717,7 +717,7 @@ IMPLEMENT_STRUCT( RectSpacingI,
       
 END_IMPLEMENT_STRUCT;
 
-ConsoleType( RectSpacingI, TypeRectSpacingI, RectSpacingI )
+ConsoleType(RectSpacingI, TypeRectSpacingI, RectSpacingI, "")
 ImplementConsoleTypeCasters( TypeRectSpacingI, RectSpacingI )
 
 ConsoleGetType( TypeRectSpacingI )

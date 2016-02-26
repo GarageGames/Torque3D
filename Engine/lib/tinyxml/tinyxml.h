@@ -283,10 +283,9 @@ public:
 		TIXML_ERROR_STRING_COUNT
 	};
 
-protected:
-
 	static const char* SkipWhiteSpace( const char*, TiXmlEncoding encoding );
 
+protected:
 	inline static bool IsWhiteSpace( char c )		
 	{ 
 		return ( isspace( (unsigned char) c ) || c == '\n' || c == '\r' ); 
@@ -360,6 +359,7 @@ protected:
 		}
 	}
 
+public:
 	// Return true if the next characters in the stream are any of the endTag sequences.
 	// Ignore case only works for english, and should only be relied on when comparing
 	// to English words: StringEqual( p, "version", true ) is fine.
@@ -368,6 +368,7 @@ protected:
 								bool ignoreCase,
 								TiXmlEncoding encoding );
 
+protected:
 	static const char* errorString[ TIXML_ERROR_STRING_COUNT ];
 
 	TiXmlCursor location;
@@ -375,10 +376,13 @@ protected:
     /// Field containing a generic user pointer
 	void*			userData;
 	
+public:
 	// None of these methods are reliable for any language except English.
 	// Good for approximation, not great for accuracy.
 	static int IsAlpha( unsigned char anyByte, TiXmlEncoding encoding );
 	static int IsAlphaNum( unsigned char anyByte, TiXmlEncoding encoding );
+
+protected:
 	inline static int ToLower( int v, TiXmlEncoding encoding )
 	{
 		if ( encoding == TIXML_ENCODING_UTF8 )
@@ -750,9 +754,10 @@ protected:
 	#endif
 
 	// Figure out what is at *p, and parse it. Returns null if it is not an xml node.
-	TiXmlNode* Identify( const char* start, TiXmlEncoding encoding );
-
+	virtual TiXmlNode* Identify( const char* start, TiXmlEncoding encoding );
+public:
 	TiXmlNode*		parent;
+protected:
 	NodeType		type;
 
 	TiXmlNode*		firstChild;
@@ -1047,7 +1052,7 @@ public:
 	/** Sets an attribute of name to a given value. The attribute
 		will be created if it does not exist, or changed if it does.
 	*/
-	void SetAttribute( const char* name, const char * _value );
+	virtual void SetAttribute( const char* name, const char * _value );
 
     #ifdef TIXML_USE_STL
 	const std::string* Attribute( const std::string& name ) const;
@@ -1067,7 +1072,7 @@ public:
 	/** Sets an attribute of name to a given value. The attribute
 		will be created if it does not exist, or changed if it does.
 	*/
-	void SetAttribute( const char * name, int value );
+	virtual void SetAttribute( const char * name, int value );
 
 	/** Sets an attribute of name to a given value. The attribute
 		will be created if it does not exist, or changed if it does.
@@ -1152,7 +1157,6 @@ protected:
 	*/
 	const char* ReadValue( const char* in, TiXmlParsingData* prevData, TiXmlEncoding encoding );
 
-private:
 	TiXmlAttributeSet attributeSet;
 };
 
@@ -1264,7 +1268,6 @@ protected :
 	virtual void StreamIn( std::istream * in, TIXML_STRING * tag );
 	#endif
 
-private:
 	bool cdata;			// true if this should be input and output as a CDATA style text element
 };
 
@@ -1335,8 +1338,6 @@ protected:
 	#ifdef TIXML_USE_STL
 	virtual void StreamIn( std::istream * in, TIXML_STRING * tag );
 	#endif
-
-private:
 
 	TIXML_STRING version;
 	TIXML_STRING encoding;
@@ -1416,9 +1417,9 @@ public:
 	/// Save a file using the current document value. Returns true if successful.
 	bool SaveFile() const;
 	/// Load a file using the given filename. Returns true if successful.
-	bool LoadFile( const char * filename, TiXmlEncoding encoding = TIXML_DEFAULT_ENCODING );
+	virtual bool LoadFile( const char * filename, TiXmlEncoding encoding = TIXML_DEFAULT_ENCODING );
 	/// Save a file using the given filename. Returns true if successful.
-	bool SaveFile( const char * filename ) const;
+	virtual bool SaveFile( const char * filename ) const;
 	/** Load a file using the given FILE*. Returns true if successful. Note that this method
 		doesn't stream - the entire object pointed at by the FILE*
 		will be interpreted as an XML file. TinyXML doesn't stream in XML from the current
@@ -1543,14 +1544,15 @@ protected :
 	virtual void StreamIn( std::istream * in, TIXML_STRING * tag );
 	#endif
 
-private:
 	void CopyTo( TiXmlDocument* target ) const;
 
+private:
 	bool error;
 	int  errorId;
 	TIXML_STRING errorDesc;
 	int tabsize;
 	TiXmlCursor errorLocation;
+protected:
 	bool useMicrosoftBOM;		// the UTF-8 BOM were found when read. Note this, and try to write.
 };
 
@@ -1797,6 +1799,29 @@ private:
 	TIXML_STRING lineBreak;
 };
 
+class TiXmlParsingData
+{
+	friend class TiXmlDocument;
+  public:
+	void Stamp( const char* now, TiXmlEncoding encoding );
+
+	const TiXmlCursor& Cursor() const	{ return cursor; }
+
+  private:
+	// Only used by the document!
+	TiXmlParsingData( const char* start, int _tabsize, int row, int col )
+	{
+		assert( start );
+		stamp = start;
+		tabsize = _tabsize;
+		cursor.row = row;
+		cursor.col = col;
+	}
+
+	TiXmlCursor		cursor;
+	const char*		stamp;
+	int				tabsize;
+};
 
 #ifdef _MSC_VER
 #pragma warning( pop )

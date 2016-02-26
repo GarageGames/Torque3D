@@ -137,7 +137,7 @@ void RenderPassStateBin::sort()
 void RenderPassStateBin::initPersistFields()
 {
    addProtectedField( "stateToken", TYPEID< RenderPassStateToken >(), Offset( mStateToken, RenderPassStateBin ),
-      _setStateToken, _getStateToken );
+      _setStateToken, _getStateToken, "");
    
    Parent::initPersistFields();
 }

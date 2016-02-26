@@ -567,7 +567,6 @@ String::String(const StringChar *str, SizeType len)
    PROFILE_SCOPE(String_char_len_constructor);
    if (str && *str && len!=0)
    {
-      AssertFatal(len<=dStrlen(str), "String::String: string too short");
       _string = new ( len ) StringData( str );
    }
    else

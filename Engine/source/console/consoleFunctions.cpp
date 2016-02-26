@@ -37,10 +37,6 @@
 #include "math/mPoint3.h"
 #include "math/mathTypes.h"
 
-#ifdef TORQUE_DEMO_PURCHASE
-#include "gui/core/guiCanvas.h"
-#endif
-
 // This is a temporary hack to get tools using the library to
 // link in this module which contains no other references.
 bool LinkConsoleFunctions = false;
@@ -483,7 +479,7 @@ DefineConsoleFunction( strreplace, const char*, ( const char* source, const char
       if(!scan)
       {
          dStrcpy(ret + dstp, source + scanp);
-         break;
+         return ret;
       }
       U32 len = scan - (source + scanp);
       dStrncpy(ret + dstp, source + scanp, len);
@@ -1681,6 +1677,7 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
 DefineEngineFunction( displaySplashWindow, bool, (const char* path), ("art/gui/splash.bmp"),
    "Display a startup splash window suitable for showing while the engine still starts up.\n\n"
    "@note This is currently only implemented on Windows.\n\n"
+   "@param path	relative path to splash screen image to display.\n"
    "@return True if the splash window could be successfully initialized.\n\n"
    "@ingroup Platform" )
 {
@@ -2352,7 +2349,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
    "@endtsexample\n\n"
 	"@ingroup Scripting")
 {
-   if(dStrIsEmpty(varName))
+   if(String::isEmpty(varName))
    {
       Con::errorf("isDefined() - did you forget to put quotes around the variable name?");
       return false;
@@ -2428,7 +2425,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
             {
                if (dStrlen(value) > 0)
                   return true;
-               else if (!dStrIsEmpty(varValue))
+               else if (!String::isEmpty(varValue))
                { 
                   obj->setDataField(valName, 0, varValue); 
                }
@@ -2445,7 +2442,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
 
          if (ent)
             return true;
-         else if (!dStrIsEmpty(varValue))
+         else if (!String::isEmpty(varValue))
          {
             gEvalState.getCurrentFrame().setVariable(name, varValue);
          }
@@ -2460,7 +2457,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
 
       if (ent)
          return true;
-      else if (!dStrIsEmpty(varValue))
+      else if (!String::isEmpty(varValue))
       {
          gEvalState.globalVars.setVariable(name, varValue);
       }
@@ -2470,7 +2467,7 @@ DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varVa
       // Is it an object?
       if (dStrcmp(varName, "0") && dStrcmp(varName, "") && (Sim::findObject(varName) != NULL))
          return true;
-      else if (!dStrIsEmpty(varValue))
+      else if (!String::isEmpty(varValue))
       {
          Con::errorf("%s() - can't assign a value to a variable of the form \"%s\"", __FUNCTION__, varValue);
       }

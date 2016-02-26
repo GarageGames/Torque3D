@@ -1631,10 +1631,11 @@ void WorldEditor::renderScreenObj( SceneObject *obj, const Point3F& projPos, con
       // Save an IconObject for performing icon-click testing later.
 
       mIcons.increment();
-      mIcons.last().object = obj;
-      mIcons.last().rect   = renderRect;
-      mIcons.last().dist   = projPos.z;
-      mIcons.last().alpha  = iconAlpha;
+      IconObject& lastIcon = mIcons.last();
+      lastIcon.object = obj;
+      lastIcon.rect = renderRect;
+      lastIcon.dist = projPos.z;
+      lastIcon.alpha = iconAlpha;
    }
 
    //
@@ -2654,7 +2655,7 @@ void WorldEditor::renderScene( const RectI &updateRect )
 
          // Probably should test the entire icon screen-rect instead of just the centerpoint
          // but would need to move some code from renderScreenObj to here.
-         if ( mDragSelect )
+         if (mDragSelect && selection)
             if ( mDragRect.pointInRect(sPosI) && !selection->objInSet(obj) )
                mDragSelected->addObject(obj);
 
@@ -2809,7 +2810,7 @@ void WorldEditor::clearSelection()
 
 void WorldEditor::selectObject( SimObject *obj )
 {
-   if ( mSelectionLocked || !mSelected )
+   if ( mSelectionLocked || !mSelected || !obj )
       return;
 
    // Don't check isSelectionEnabled of SceneObjects here as we
@@ -2832,7 +2833,7 @@ void WorldEditor::selectObject( const char* obj )
 
 void WorldEditor::unselectObject( SimObject *obj )
 {
-   if ( mSelectionLocked || !mSelected )
+   if ( mSelectionLocked || !mSelected || !obj )
       return;
 
    if ( !objClassIgnored( obj ) && mSelected->objInSet( obj ) )

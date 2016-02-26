@@ -132,7 +132,7 @@ function MenuBuilder::addItem(%this, %pos, %item)
    }
    else
    {
-      %this.insertItem(%pos, %name !$= "-" ? %name : "", %accel);
+      %this.insertItem(%pos, %name !$= "-" ? %name : "", %accel, %cmd);
    }
 }
 
