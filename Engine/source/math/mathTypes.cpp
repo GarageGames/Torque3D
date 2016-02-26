@@ -660,6 +660,66 @@ DefineConsoleFunction( VectorScale, VectorF, ( VectorF a, F32 scalar ),,
 {
    return a * scalar;
 }
+DefineConsoleFunction( VectorMul, VectorF, ( VectorF a, VectorF b ),,
+   "Multiplies two vectors.\n"
+   "@param a The first vector.\n"
+   "@param b The second vector.\n"
+   "@return The vector @a a * @a b.\n\n"
+   "@tsexample\n"
+	"//-----------------------------------------------------------------------------\n"
+	"//\n"
+	"// VectorMul( %a, %b );\n"
+	"//\n"
+	"// The multiplication of vector a, (ax, ay, az), and vector b, (bx, by, bz) is:\n"
+	"//\n"
+	"//     a * b = ( ax * bx, ay * by, az * bz )\n"
+	"//\n"
+	"//-----------------------------------------------------------------------------\n\n"
+
+	"%a = \"1 0 0\";\n"
+	"%b = \"0 1 0\";\n\n"
+
+	"// %r = \"( 1 * 0, 0 * 1, 0 * 0 )\";\n"
+	"// %r = \"0 0 0\";\n"
+	"%r = VectorMul( %a, %b );\n"
+   "@endtsexample\n\n"
+   "@ingroup Vectors" )
+{
+   return a * b;
+}
+
+DefineConsoleFunction( VectorDiv, VectorF, ( VectorF a, VectorF b ),,
+   "Divide two vectors.\n"
+   "@param a The first vector.\n"
+   "@param b The second vector.\n"
+   "@return The vector @a a / @a b.\n\n"
+   "@tsexample\n"
+	"//-----------------------------------------------------------------------------\n"
+	"//\n"
+	"// VectorDiv( %a, %b );\n"
+	"//\n"
+	"// The division of vector a, (ax, ay, az), and vector b, (bx, by, bz) is:\n"
+	"//\n"
+	"//     a * b = ( ax / bx, ay / by, az / bz )\n"
+	"//\n"
+	"//-----------------------------------------------------------------------------\n\n"
+
+	"%a = \"1 1 1\";\n"
+	"%b = \"2 2 2\";\n\n"
+
+	"// %r = \"( 1 / 2, 1 / 2, 1 / 2 )\";\n"
+	"// %r = \"0.5 0.5 0.5\";\n"
+	"%r = VectorDiv( %a, %b );\n"
+   "@endtsexample\n\n"
+   "@ingroup Vectors" )
+{
+   //this is kind of bad, but so is dividing by 0
+   if(b.x == 0) b.x = 0.000001f;
+   if(b.y == 0) b.y = 0.000001f;
+   if(b.z == 0) b.z = 0.000001f;
+   
+   return a / b;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -786,6 +846,34 @@ DefineConsoleFunction( VectorDist, F32, ( VectorF a, VectorF b ),,
 {
    VectorF v = b - a;
    return v.len();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( VectorMidPoint, VectorF, ( VectorF a, VectorF b ),,
+   "Gets the midpoint between the two vectors.\n"
+   "@param a The first vector.\n"
+   "@param b The second vector.\n"
+   "@return The vector (@a a + @a b) / 2.\n\n"
+   "@tsexample\n"
+      "//-----------------------------------------------------------------------------\n"
+      "//\n"
+      "// VectorMidPoint( %a, %b );\n"
+      "//\n"
+      "// The midpoint of vector a, (ax, ay, az), and vector b, (bx, by, bz) is:\n"
+      "//\n"
+	  "//     (a + b)/2 = ( (ax + bx) /2, ay + by) /2, (az + bz) /2 )\n"
+      "//\n"
+      "//-----------------------------------------------------------------------------\n"
+//      "%a = \"1 0 0\";\n"
+//      "%b = \"0 1 0\";\n\n"
+//      "// %r = \"( 1 + 0, 0 + 1, 0 + 0 )\";\n"
+//      "// %r = \"1 1 0\";\n"
+//      "%r = VectorAdd( %a, %b );\n"
+   "@endtsexample\n\n"
+   "@ingroup Vectors")
+{
+   return (a + b)/2.0f;
 }
 
 //-----------------------------------------------------------------------------
