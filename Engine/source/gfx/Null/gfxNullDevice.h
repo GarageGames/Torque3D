@@ -115,10 +115,12 @@ protected:
    virtual GFXVertexBuffer *allocVertexBuffer(  U32 numVerts, 
                                                 const GFXVertexFormat *vertexFormat, 
                                                 U32 vertSize, 
-                                                GFXBufferType bufferType );
+                                                GFXBufferType bufferType,
+                                                void* data = NULL );
    virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices, 
                                                       U32 numPrimitives, 
-                                                      GFXBufferType bufferType );
+                                                      GFXBufferType bufferType,
+                                                      void* data = NULL );
 
    virtual GFXVertexDecl* allocVertexDecl( const GFXVertexFormat *vertexFormat ) { return NULL; }
    virtual void setVertexDecl( const GFXVertexDecl *decl ) {  }

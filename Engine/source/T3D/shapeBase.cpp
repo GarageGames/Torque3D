@@ -879,6 +879,7 @@ IMPLEMENT_CALLBACK( ShapeBase, validateCameraFov, F32, (F32 fov), (fov),
 ShapeBase::ShapeBase()
  : mDataBlock( NULL ),
    mIsAiControlled( false ),
+   mAiPose( 0 ),
    mControllingObject( NULL ),
    mMoveMotion( false ),
    mShapeBaseMount( NULL ),
