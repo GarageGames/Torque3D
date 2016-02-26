@@ -365,7 +365,7 @@ Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
          
          // Statement allows for casting of different types which
 		   // eliminates vector truncation problems.
-         String statement = String::ToString( "   @ = (%s)mul(@, @);\r\n", type );
+         String statement = String::ToString( "   @ = (%s)mul(@, @).xy;\r\n", type );
          meta->addStatement( new GenOp( statement, texCoord, texMat, inTex ) );
       }
       else
@@ -811,7 +811,7 @@ Var* ShaderFeatureHLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
          texMat->constSortPos = cspPass;   
       }
 
-      meta->addStatement( new GenOp( "   @ = mul(@, @) * @;\r\n", outTex, texMat, inTex, detScale ) );
+      meta->addStatement( new GenOp( "   @ = mul(@, @).xy * @;\r\n", outTex, texMat, inTex, detScale ) );
    }
    else
    {
