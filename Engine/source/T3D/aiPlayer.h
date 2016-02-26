@@ -179,7 +179,9 @@ public:
    void setMoveDestination( const Point3F &location, bool slowdown );
    Point3F getMoveDestination() const { return mMoveDestination; }
    void stopMove();
-
+   void setAiPose( S32 pose );
+   S32  getAiPose();
+	
    // Trigger sets/gets
    void setMoveTrigger( U32 slot, const bool isSet = true );
    bool getMoveTrigger( U32 slot ) const;
