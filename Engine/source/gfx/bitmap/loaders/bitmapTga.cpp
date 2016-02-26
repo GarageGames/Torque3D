@@ -483,7 +483,7 @@ static bool sReadTGA(Stream &stream, GBitmap *bitmap)
 
 static bool sWriteTGA(GBitmap *bitmap, Stream &stream, U32 compressionLevel)
 {
-   AssertISV(false, "GBitmap::writeTGA - doesn't support writing tga files!")
+   AssertISV(false, "GBitmap::writeTGA - doesn't support writing tga files!");
 
    return false;
 }
