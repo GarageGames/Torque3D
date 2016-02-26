@@ -24,7 +24,7 @@
 
 // Debug Profiling.
 #include "platform/profiler.h"
-#include "persistence/taml/fsTinyxml.h"
+#include "persistence/taml/fsTinyXml.h"
 
 //-----------------------------------------------------------------------------
 

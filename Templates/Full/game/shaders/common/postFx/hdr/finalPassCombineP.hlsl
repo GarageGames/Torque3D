@@ -41,6 +41,8 @@ uniform float3 g_fBlueShiftColor;
 uniform float g_fBloomScale;
 
 uniform float g_fOneOverGamma;
+uniform float Brightness;
+uniform float Contrast;
 
 
 float4 main( PFXVertToPix IN ) : COLOR0
@@ -90,6 +92,12 @@ float4 main( PFXVertToPix IN ) : COLOR0
 
    // Apply gamma correction
    sample.rgb = pow( abs(sample.rgb), g_fOneOverGamma );
+ 
+   // Apply contrast
+   sample.rgb = ((sample.rgb - 0.5f) * Contrast) + 0.5f;
+ 
+   // Apply brightness
+   sample.rgb += Brightness;
 
    return sample;
 }

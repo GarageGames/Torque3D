@@ -38,7 +38,7 @@ bool fsTiXmlDocument::LoadFile( const char * pFilename, TiXmlEncoding encoding )
 #endif
 
    // File open for read?
-   if ( !stream.open( filenameBuffer, Torque::FS::File::AccessMode::Read ) )
+   if ( !stream.open( filenameBuffer, Torque::FS::File::Read ) )
    {
       // No, so warn.
       Con::warnf("TamlXmlParser::parse() - Could not open filename '%s' for parse.", filenameBuffer );
@@ -67,7 +67,7 @@ bool fsTiXmlDocument::SaveFile( const char * pFilename ) const
    FileStream stream;
 
    // File opened?
-   if ( !stream.open( filenameBuffer, Torque::FS::File::AccessMode::Write ) )
+   if ( !stream.open( filenameBuffer, Torque::FS::File::Write ) )
    {
       // No, so warn.
       Con::warnf("Taml::writeFile() - Could not open filename '%s' for write.", filenameBuffer );
