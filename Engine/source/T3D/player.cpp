@@ -3173,18 +3173,21 @@ void Player::updateMove(const Move* move)
    // Update the PlayerPose
    Pose desiredPose = mPose;
 
-   if ( mSwimming )
-      desiredPose = SwimPose; 
-   else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
-      desiredPose = CrouchPose;
-   else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
-      desiredPose = PronePose;
-   else if ( move->trigger[sSprintTrigger] && canSprint() )
-      desiredPose = SprintPose;
-   else if ( canStand() )
-      desiredPose = StandPose;
+   if ( !mIsAiControlled )
+   {
+      if ( mSwimming )
+         desiredPose = SwimPose; 
+      else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
+         desiredPose = CrouchPose;
+      else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
+         desiredPose = PronePose;
+      else if ( move->trigger[sSprintTrigger] && canSprint() )
+         desiredPose = SprintPose;
+      else if ( canStand() )
+         desiredPose = StandPose;
 
-   setPose( desiredPose );
+      setPose( desiredPose );
+   }
 }
 
 
@@ -6186,6 +6189,10 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    {
       stream->writeFlag(mFalling);
 
+      stream->writeFlag(mSwimming);
+      stream->writeFlag(mJetting);  
+      stream->writeInt(mPose, NumPoseBits);
+	  
       stream->writeInt(mState,NumStateBits);
       if (stream->writeFlag(mState == RecoverState))
          stream->writeInt(mRecoverTicks,PlayerData::RecoverDelayBits);
@@ -6282,7 +6289,11 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
    if (stream->readFlag()) {
       mPredictionCount = sMaxPredictionTicks;
       mFalling = stream->readFlag();
-
+ 
+      mSwimming = stream->readFlag();
+      mJetting = stream->readFlag();  
+      mPose = (Pose)(stream->readInt(NumPoseBits)); 
+	  
       ActionState actionState = (ActionState)stream->readInt(NumStateBits);
       if (stream->readFlag()) {
          mRecoverTicks = stream->readInt(PlayerData::RecoverDelayBits);
