@@ -140,7 +140,6 @@ void TerrCell::createPrimBuffer( GFXPrimitiveBufferHandle *primBuffer )
       }
    }
 
-#if 1
    // Now add indices for the 'skirts'.
    // These could probably be reduced to a loop.
 
@@ -263,7 +262,6 @@ void TerrCell::createPrimBuffer( GFXPrimitiveBufferHandle *primBuffer )
       maxIndex = b1;
       counter += 6;
    }
-#endif
 
    primBuffer->unlock();
 }
@@ -488,7 +486,6 @@ void TerrCell::_updateVertexBuffer()
       }
    }
 
-#if 1
    // Add verts for 'skirts' around/beneath the edge verts of this cell.
    // This could probably be reduced to a loop...
    
@@ -592,8 +589,7 @@ void TerrCell::_updateVertexBuffer()
       vbcounter++;
       ++vert;      
    }
-#endif
-
+   
    mVertexBuffer.unlock();
 }
 
