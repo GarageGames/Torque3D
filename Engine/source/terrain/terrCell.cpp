@@ -677,7 +677,6 @@ void TerrCell::_updatePrimitiveBuffer()
       }
    }
 
-#if 1
    // Now add indices for the 'skirts'.
    // These could probably be reduced to a loop.
 
@@ -832,7 +831,6 @@ void TerrCell::_updatePrimitiveBuffer()
 
       mTriCount += 2;
    }
-#endif
 
    mPrimBuffer.unlock();
    prim->numPrimitives = mTriCount;

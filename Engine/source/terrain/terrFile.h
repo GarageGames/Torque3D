@@ -220,43 +220,13 @@ private:
    void clamp( U32* x,  U32* y ) const;
 };
 
-
-// @todo ! Need AssertFatal() and debug all clients.
-// @todo ! Verify all methods of TerrainFile.
 inline void TerrainFile::clamp( U32* x,  U32* y ) const
 {
-#if 0
-   // old clamp
-   *x %= mSize;
-   *y %= mSize;
-#else
-   // new clamp
-   const auto  error = [] ( char c, U32 v ) {
-      static const char* s = "TerrainFile Coord '%c == %d' out of range. Fix it in the algorithm.";
-#if 1
-      // only first error
-      static bool  first = true;
-      if ( first ) {
-         Con::errorf( s,  c, v );
-         first = false;
-      }
-#else
-      // all errors
-      Con::errorf( s,  c, v );
-#endif
-   };
-
-   if (*x >= mSize) {
-      error( 'x', *x );
+   if (*x >= mSize)
       *x = mSize - 1;
-   }
-   if (*y >= mSize) {
-      error( 'y', *y );
+   if (*y >= mSize)
       *y = mSize - 1;
-   }
-#endif
 }
-
 
 inline TerrainSquare* TerrainFile::findSquare( U32 level, U32 x, U32 y ) const
 {
