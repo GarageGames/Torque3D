@@ -161,6 +161,7 @@ const char* avar(const char *message, ...)
    va_list args;
    va_start(args, message);
    dVsprintf(buffer, sizeof(buffer), message, args);
+   va_end(args);
    return( buffer );
 }
 

@@ -202,21 +202,20 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
    if ( isMeshInst || isDecalMeshInst )
       matInst = static_cast<MeshRenderInst*>(inst)->matInst;
 
-   // Skip decals if they don't have normal maps.
-   if ( isDecalMeshInst && !matInst->hasNormalMap() )
-      return;
-
-   // If its a custom material and it refracts... skip it.
-   if (  matInst && 
-         matInst->isCustomMaterial() &&
-         static_cast<CustomMaterial*>( matInst->getMaterial() )->mRefract )
-      return;
-
-   // Make sure we got a prepass material.
-   if ( matInst )
+   if (matInst)
    {
-      matInst = getPrePassMaterial( matInst );
-      if ( !matInst || !matInst->isValid() )
+      // Skip decals if they don't have normal maps.
+      if (isDecalMeshInst && !matInst->hasNormalMap())
+         return;
+
+      // If its a custom material and it refracts... skip it.
+      if (matInst->isCustomMaterial() &&
+         static_cast<CustomMaterial*>(matInst->getMaterial())->mRefract)
+         return;
+
+      // Make sure we got a prepass material.
+      matInst = getPrePassMaterial(matInst);
+      if (!matInst || !matInst->isValid())
          return;
    }
 
@@ -241,7 +240,7 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
    elem.key = *((U32*)&invSortDistSq);
 
    // Next sort by pre-pass material if its a mesh... use the original sort key.
-   if ( isMeshInst )
+   if (isMeshInst && matInst)
       elem.key2 = matInst->getStateHint();
    else
       elem.key2 = originalKey;

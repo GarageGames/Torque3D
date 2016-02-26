@@ -23,9 +23,10 @@
 #include "core/strings/stringFunctions.h"
 
 #include "console/consoleTypes.h"
+#include "console/simBase.h"
+#include "console/engineAPI.h"
 #include "app/badWordFilter.h"
 #include "core/module.h"
-#include "console/engineAPI.h"
 
 MODULE_BEGIN( BadWordFilter )
 

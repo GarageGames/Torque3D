@@ -50,7 +50,9 @@ function ForestEditorGui::onActiveForestUpdated( %this, %forest, %createNew )
 /// Called from a message box when a forest is not found.
 function ForestEditorGui::createForest( %this )
 {
-   if ( isObject( theForest ) )
+   %forestObject = parseMissionGroupForIds("Forest", "");
+ 
+   if ( isObject( %forestObject ) )
    {
       error( "Cannot create a second 'theForest' Forest!" );
       return;
@@ -64,8 +66,42 @@ function ForestEditorGui::createForest( %this )
    };
    
    MECreateUndoAction::submit( theForest );
-   
-   ForestEditorInspector.inspect( theForest );
+
+   ForestEditorGui.setActiveForest( theForest );
+
+   //Re-initialize the editor settings so we can start using it immediately.
+   %tool = ForestEditorGui.getActiveTool();      
+   if ( isObject( %tool ) )
+      %tool.onActivated();
+	
+   if ( %tool == ForestTools->SelectionTool )
+   {
+      %mode = GlobalGizmoProfile.mode;
+      switch$ (%mode)
+      {
+         case "None":
+            ForestEditorSelectModeBtn.performClick();
+         case "Move":
+            ForestEditorMoveModeBtn.performClick();
+         case "Rotate":
+            ForestEditorRotateModeBtn.performClick();
+         case "Scale":
+            ForestEditorScaleModeBtn.performClick();
+      }
+   }
+   else if ( %tool == ForestTools->BrushTool )
+   {
+      %mode = ForestTools->BrushTool.mode;
+      switch$ (%mode)
+      {
+         case "Paint":
+            ForestEditorPaintModeBtn.performClick();
+         case "Erase":
+            ForestEditorEraseModeBtn.performClick();
+         case "EraseSelected":
+            ForestEditorEraseSelectedModeBtn.performClick();
+      }
+   }   
    
    EWorldEditor.isDirty = true;
 }

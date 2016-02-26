@@ -695,9 +695,12 @@ bool GuiControlProfile::loadFont()
    return true;
 }
 
-DefineConsoleMethod( GuiControlProfile, getStringWidth, S32, ( const char * pString ), , "( pString )" )
+DefineEngineMethod( GuiControlProfile, getStringWidth, S32, (const char* string),,
+   "Get the width of the string in pixels.\n"
+   "@param string String to get the width of."
+   "@return width of the string in pixels." )
 {
-    return object->mFont->getStrNWidth( pString, dStrlen( pString ) );
+   return object->mFont->getStrNWidth( string, dStrlen( string ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -714,7 +717,7 @@ IMPLEMENT_STRUCT( RectSpacingI,
       
 END_IMPLEMENT_STRUCT;
 
-ConsoleType( RectSpacingI, TypeRectSpacingI, RectSpacingI )
+ConsoleType(RectSpacingI, TypeRectSpacingI, RectSpacingI, "")
 ImplementConsoleTypeCasters( TypeRectSpacingI, RectSpacingI )
 
 ConsoleGetType( TypeRectSpacingI )

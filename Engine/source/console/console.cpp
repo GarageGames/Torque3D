@@ -1138,8 +1138,11 @@ void addCommand( const char *name,BoolCallback cb,const char *usage, S32 minArgs
    Namespace::global()->addCommand( StringTable->insert(name), cb, usage, minArgs, maxArgs, isToolOnly, header );
 }
 
-const char *evaluate(const char* string, bool echo, const char *fileName)
+ConsoleValueRef evaluate(const char* string, bool echo, const char *fileName)
 {
+   ConsoleStackFrameSaver stackSaver;
+   stackSaver.save();
+
    if (echo)
    {
       if (string[0] == '%')
@@ -1156,36 +1159,48 @@ const char *evaluate(const char* string, bool echo, const char *fileName)
 }
 
 //------------------------------------------------------------------------------
-const char *evaluatef(const char* string, ...)
+ConsoleValueRef evaluatef(const char* string, ...)
 {
+   ConsoleStackFrameSaver stackSaver;
+   stackSaver.save();
+
    char buffer[4096];
    va_list args;
    va_start(args, string);
    dVsprintf(buffer, sizeof(buffer), string, args);
+   va_end(args);
    CodeBlock *newCodeBlock = new CodeBlock();
    return newCodeBlock->compileExec(NULL, buffer, false, 0);
 }
 
-const char *execute(S32 argc, ConsoleValueRef argv[])
+//------------------------------------------------------------------------------
+
+// Internal execute for global function which does not save the stack
+ConsoleValueRef _internalExecute(S32 argc, ConsoleValueRef argv[])
+{
+   Namespace::Entry *ent;
+   StringTableEntry funcName = StringTable->insert(argv[0]);
+   ent = Namespace::global()->lookup(funcName);
+
+   if(!ent)
+   {
+      warnf(ConsoleLogEntry::Script, "%s: Unknown command.", (const char*)argv[0]);
+
+      STR.clearFunctionOffset();
+      return ConsoleValueRef();
+   }
+   return ent->execute(argc, argv, &gEvalState);
+}
+
+ConsoleValueRef execute(S32 argc, ConsoleValueRef argv[])
 {
 #ifdef TORQUE_MULTITHREAD
    if(isMainThread())
    {
 #endif
-      Namespace::Entry *ent;
-      StringTableEntry funcName = StringTable->insert(argv[0]);
-      ent = Namespace::global()->lookup(funcName);
-
-      if(!ent)
-      {
-         warnf(ConsoleLogEntry::Script, "%s: Unknown command.", (const char*)argv[0]);
-
-         // Clean up arg buffers, if any.
-         STR.clearFunctionOffset();
-         CSTK.resetFrame();
-         return "";
-      }
-      return ent->execute(argc, argv, &gEvalState);
+      ConsoleStackFrameSaver stackSaver;
+      stackSaver.save();
+	   return _internalExecute(argc, argv);
 #ifdef TORQUE_MULTITHREAD
    }
    else
@@ -1199,17 +1214,24 @@ const char *execute(S32 argc, ConsoleValueRef argv[])
 #endif
 }
 
-const char *execute(S32 argc, const char *argv[])
+ConsoleValueRef execute(S32 argc, const char *argv[])
 {
+   ConsoleStackFrameSaver stackSaver;
+   stackSaver.save();
    StringStackConsoleWrapper args(argc, argv);
    return execute(args.count(), args);
 }
 
 //------------------------------------------------------------------------------
-const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool thisCallOnly)
+
+// Internal execute for object method which does not save the stack
+ConsoleValueRef _internalExecute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool thisCallOnly)
 {
    if(argc < 2)
-      return "";
+   {
+      STR.clearFunctionOffset();
+      return ConsoleValueRef();
+   }
 
    // [neo, 10/05/2007 - #3010]
    // Make sure we don't get recursive calls, respect the flag!   
@@ -1229,10 +1251,8 @@ const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool th
 
    if(object->getNamespace())
    {
-	  ConsoleValueRef internalArgv[StringStack::MaxArgs];
-
-	  U32 ident = object->getId();
-	  ConsoleValueRef oldIdent = argv[1];
+      U32 ident = object->getId();
+      ConsoleValueRef oldIdent = argv[1];
 
       StringTableEntry funcName = StringTable->insert(argv[0]);
       Namespace::Entry *ent = object->getNamespace()->lookup(funcName);
@@ -1241,10 +1261,8 @@ const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool th
       {
          //warnf(ConsoleLogEntry::Script, "%s: undefined for object '%s' - id %d", funcName, object->getName(), object->getId());
 
-         // Clean up arg buffers, if any.
          STR.clearFunctionOffset();
-         CSTK.resetFrame();
-         return "";
+         return ConsoleValueRef();
       }
 
       // Twiddle %this argument
@@ -1252,7 +1270,7 @@ const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool th
 
       SimObject *save = gEvalState.thisObject;
       gEvalState.thisObject = object;
-      const char *ret = ent->execute(argc, argv, &gEvalState);
+      ConsoleValueRef ret = ent->execute(argc, argv, &gEvalState);
       gEvalState.thisObject = save;
 
       // Twiddle it back
@@ -1260,17 +1278,52 @@ const char *execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool th
 
       return ret;
    }
+
    warnf(ConsoleLogEntry::Script, "Con::execute - %d has no namespace: %s", object->getId(), (const char*)argv[0]);
-   return "";
+   STR.clearFunctionOffset();
+   return ConsoleValueRef();
 }
 
-const char *execute(SimObject *object, S32 argc, const char *argv[], bool thisCallOnly)
+
+ConsoleValueRef execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool thisCallOnly)
 {
+   if(argc < 2)
+   {
+      STR.clearFunctionOffset();
+      return ConsoleValueRef();
+   }
+
+   ConsoleStackFrameSaver stackSaver;
+   stackSaver.save();
+
+   if (object->getNamespace() || !thisCallOnly)
+   {
+      if (isMainThread())
+      {
+         return _internalExecute(object, argc, argv, thisCallOnly);
+      }
+      else
+      {
+         SimConsoleThreadExecCallback cb;
+         SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(argc, argv, true, &cb);
+         Sim::postEvent(object, evt, Sim::getCurrentTime());
+      }
+   }
+
+   warnf(ConsoleLogEntry::Script, "Con::execute - %d has no namespace: %s", object->getId(), (const char*)argv[0]);
+   STR.clearFunctionOffset();
+   return ConsoleValueRef();
+}
+
+ConsoleValueRef execute(SimObject *object, S32 argc, const char *argv[], bool thisCallOnly)
+{
+   ConsoleStackFrameSaver stackSaver;
+   stackSaver.save();
    StringStackConsoleWrapper args(argc, argv);
    return execute(object, args.count(), args, thisCallOnly);
 }
 
-inline const char*_executef(SimObject *obj, S32 checkArgc, S32 argc, ConsoleValueRef *argv)
+inline ConsoleValueRef _executef(SimObject *obj, S32 checkArgc, S32 argc, ConsoleValueRef *argv)
 {
    const U32 maxArg = 12;
    AssertWarn(checkArgc == argc, "Incorrect arg count passed to Con::executef(SimObject*)");
@@ -1278,42 +1331,14 @@ inline const char*_executef(SimObject *obj, S32 checkArgc, S32 argc, ConsoleValu
    return execute(obj, argc, argv);
 }
 
-#define A ConsoleValueRef
-#define OBJ SimObject* obj
-const char *executef(OBJ, A a)                                    { ConsoleValueRef params[] = {a,ConsoleValueRef()}; return _executef(obj, 2, 2, params); }
-const char *executef(OBJ, A a, A b)                               { ConsoleValueRef params[] = {a,ConsoleValueRef(),b}; return _executef(obj, 3, 3, params); }
-const char *executef(OBJ, A a, A b, A c)                          { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c}; return _executef(obj, 4, 4, params); }
-const char *executef(OBJ, A a, A b, A c, A d)                     { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d}; return _executef(obj, 5, 5, params); }
-const char *executef(OBJ, A a, A b, A c, A d, A e)                { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e}; return _executef(obj, 6, 6, params); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f)           { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f}; return _executef(obj, 7, 7, params); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g)      { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g}; return _executef(obj, 8, 8, params); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h) { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g,h}; return _executef(obj, 9, 9, params); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h, A i) { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g,h,i}; return _executef(obj, 10, 10, params); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h, A i, A j) { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g,h,i,j}; return _executef(obj, 11, 11, params); }
-const char *executef(OBJ, A a, A b, A c, A d, A e, A f, A g, A h, A i, A j, A k) { ConsoleValueRef params[] = {a,ConsoleValueRef(),b,c,d,e,f,g,h,i,j,k}; return _executef(obj, 12, 12, params); }
-
 //------------------------------------------------------------------------------
-inline const char*_executef(S32 checkArgc, S32 argc, ConsoleValueRef *argv)
+inline ConsoleValueRef _executef(S32 checkArgc, S32 argc, ConsoleValueRef *argv)
 {
    const U32 maxArg = 10;
    AssertFatal(checkArgc == argc, "Incorrect arg count passed to Con::executef()");
    AssertFatal(argc <= maxArg, "Too many args passed to Con::_executef(). Please update the function to handle more.");
    return execute(argc, argv);
 }
-   
-#define A ConsoleValueRef
-const char *executef(A a)                                    { ConsoleValueRef params[] = {a}; return _executef(1, 1, params); }
-const char *executef(A a, A b)                               { ConsoleValueRef params[] = {a,b}; return _executef(2, 2, params); }
-const char *executef(A a, A b, A c)                          { ConsoleValueRef params[] = {a,b,c}; return _executef(3, 3, params); }
-const char *executef(A a, A b, A c, A d)                     { ConsoleValueRef params[] = {a,b,c,d}; return _executef(4, 4, params); }
-const char *executef(A a, A b, A c, A d, A e)                { ConsoleValueRef params[] = {a,b,c,d,e}; return _executef(5, 5, params); }
-const char *executef(A a, A b, A c, A d, A e, A f)           { ConsoleValueRef params[] = {a,b,c,d,e,f}; return _executef(1, 1, params); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g)      { ConsoleValueRef params[] = {a,b,c,d,e,f,g}; return _executef(1, 1, params); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g, A h) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h}; return _executef(1, 1, params); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h,i}; return _executef(1, 1, params); }
-const char *executef(A a, A b, A c, A d, A e, A f, A g, A h, A i, A j) { ConsoleValueRef params[] = {a,b,c,d,e,f,g,h,i,j}; return _executef(1, 1, params); }
-#undef A
-
 
 //------------------------------------------------------------------------------
 bool isFunction(const char *fn)
@@ -1509,9 +1534,16 @@ StringTableEntry getModNameFromPath(const char *path)
 void postConsoleInput( RawData data )
 {
    // Schedule this to happen at the next time event.
+   ConsoleValue values[2];
    ConsoleValueRef argv[2];
-   argv[0] = "eval";
-   argv[1] = ( const char* ) data.data;
+
+   values[0].init();
+   values[0].setStringValue("eval");
+   values[1].init();
+   values[1].setStringValue((const char*)data.data);
+   argv[0].value = &values[0];
+   argv[1].value = &values[1];
+
    Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(2, argv, false));
 }
 
@@ -1532,6 +1564,494 @@ void popInstantGroup()
       gInstantGroup = sInstantGroupStack.last();
       sInstantGroupStack.pop_back();
    }
+}
+
+
+typedef HashMap<StringTableEntry, StringTableEntry> typePathExpandoMap;
+static typePathExpandoMap PathExpandos;
+
+//-----------------------------------------------------------------------------
+
+void addPathExpando(const char* pExpandoName, const char* pPath)
+{
+   // Sanity!
+   AssertFatal(pExpandoName != NULL, "Expando name cannot be NULL.");
+   AssertFatal(pPath != NULL, "Expando path cannot be NULL.");
+
+   // Fetch expando name.
+   StringTableEntry expandoName = StringTable->insert(pExpandoName);
+
+   // Fetch the length of the path.
+   S32 pathLength = dStrlen(pPath);
+
+   char pathBuffer[1024];
+
+   // Sanity!
+   if (pathLength == 0 || pathLength >= sizeof(pathBuffer))
+   {
+      Con::warnf("Cannot add path expando '%s' with path '%s' as the path is an invalid length.", pExpandoName, pPath);
+      return;
+   }
+
+   // Strip repeat slashes.
+   if (!Con::stripRepeatSlashes(pathBuffer, pPath, sizeof(pathBuffer)))
+   {
+      Con::warnf("Cannot add path expando '%s' with path '%s' as the path is an invalid length.", pExpandoName, pPath);
+      return;
+   }
+
+   // Fetch new path length.
+   pathLength = dStrlen(pathBuffer);
+
+   // Sanity!
+   if (pathLength == 0)
+   {
+      Con::warnf("Cannot add path expando '%s' with path '%s' as the path is an invalid length.", pExpandoName, pPath);
+      return;
+   }
+
+   // Remove any terminating slash.
+   if (pathBuffer[pathLength - 1] == '/')
+      pathBuffer[pathLength - 1] = 0;
+
+   // Fetch expanded path.
+   StringTableEntry expandedPath = StringTable->insert(pathBuffer);
+
+   // Info.
+#if defined(TORQUE_DEBUG)
+   Con::printf("Adding path expando of '%s' as '%s'.", expandoName, expandedPath);
+#endif
+
+   // Find any existing path expando.
+   typePathExpandoMap::iterator expandoItr = PathExpandos.find(pExpandoName);
+
+   // Does the expando exist?
+   if (expandoItr != PathExpandos.end())
+   {
+      // Yes, so modify the path.
+      expandoItr->value = expandedPath;
+      return;
+   }
+
+   // Insert expando.
+   PathExpandos.insert(expandoName, expandedPath);
+}
+
+//-----------------------------------------------------------------------------
+
+StringTableEntry getPathExpando(const char* pExpandoName)
+{
+   // Sanity!
+   AssertFatal(pExpandoName != NULL, "Expando name cannot be NULL.");
+
+   // Fetch expando name.
+   StringTableEntry expandoName = StringTable->insert(pExpandoName);
+
+   // Find any existing path expando.
+   typePathExpandoMap::iterator expandoItr = PathExpandos.find(expandoName);
+
+   // Does the expando exist?
+   if (expandoItr != PathExpandos.end())
+   {
+      // Yes, so return it.
+      return expandoItr->value;
+   }
+
+   // Not found.
+   return NULL;
+}
+
+//-----------------------------------------------------------------------------
+
+void removePathExpando(const char* pExpandoName)
+{
+   // Sanity!
+   AssertFatal(pExpandoName != NULL, "Expando name cannot be NULL.");
+
+   // Fetch expando name.
+   StringTableEntry expandoName = StringTable->insert(pExpandoName);
+
+   // Find any existing path expando.
+   typePathExpandoMap::iterator expandoItr = PathExpandos.find(expandoName);
+
+   // Does the expando exist?
+   if (expandoItr == PathExpandos.end())
+   {
+      // No, so warn.
+#if defined(TORQUE_DEBUG)
+      Con::warnf("Removing path expando of '%s' but it does not exist.", expandoName);
+#endif
+      return;
+   }
+
+   // Info.
+#if defined(TORQUE_DEBUG)
+   Con::printf("Removing path expando of '%s' as '%s'.", expandoName, expandoItr->value);
+#endif
+   // Remove expando.
+   PathExpandos.erase(expandoItr);
+}
+
+//-----------------------------------------------------------------------------
+
+bool isPathExpando(const char* pExpandoName)
+{
+   // Sanity!
+   AssertFatal(pExpandoName != NULL, "Expando name cannot be NULL.");
+
+   // Fetch expando name.
+   StringTableEntry expandoName = StringTable->insert(pExpandoName);
+
+   return PathExpandos.contains(expandoName);
+}
+
+//-----------------------------------------------------------------------------
+
+U32 getPathExpandoCount(void)
+{
+   return PathExpandos.size();
+}
+
+//-----------------------------------------------------------------------------
+
+StringTableEntry getPathExpandoKey(U32 expandoIndex)
+{
+   // Finish if index is out of range.
+   if (expandoIndex >= PathExpandos.size())
+      return NULL;
+
+   // Find indexed iterator.
+   typePathExpandoMap::iterator expandoItr = PathExpandos.begin();
+   while (expandoIndex > 0) { ++expandoItr; --expandoIndex; }
+
+   return expandoItr->key;
+}
+
+//-----------------------------------------------------------------------------
+
+StringTableEntry getPathExpandoValue(U32 expandoIndex)
+{
+   // Finish if index is out of range.
+   if (expandoIndex >= PathExpandos.size())
+      return NULL;
+
+   // Find indexed iterator.
+   typePathExpandoMap::iterator expandoItr = PathExpandos.begin();
+   while (expandoIndex > 0) { ++expandoItr; --expandoIndex; }
+
+   return expandoItr->value;
+}
+
+//-----------------------------------------------------------------------------
+
+bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint, const bool ensureTrailingSlash)
+{
+   char pathBuffer[2048];
+   const char* pSrc = pSrcPath;
+   char* pSlash;
+
+   // Fetch leading character.
+   const char leadingToken = *pSrc;
+
+   // Fetch following token.
+   const char followingToken = leadingToken != 0 ? pSrc[1] : 0;
+
+   // Expando.
+   if (leadingToken == '^')
+   {
+      // Initial prefix search.
+      const char* pPrefixSrc = pSrc + 1;
+      char* pPrefixDst = pathBuffer;
+
+      // Search for end of expando.
+      while (*pPrefixSrc != '/' && *pPrefixSrc != 0)
+      {
+         // Copy prefix character.
+         *pPrefixDst++ = *pPrefixSrc++;
+      }
+
+      // Yes, so terminate the expando string.
+      *pPrefixDst = 0;
+
+      // Fetch the expando path.
+      StringTableEntry expandoPath = getPathExpando(pathBuffer);
+
+      // Does the expando exist?
+      if (expandoPath == NULL)
+      {
+         // No, so error.
+         Con::errorf("expandPath() : Could not find path expando '%s' for path '%s'.", pathBuffer, pSrcPath);
+
+         // Are we ensuring the trailing slash?
+         if (ensureTrailingSlash)
+         {
+            // Yes, so ensure it.
+            Con::ensureTrailingSlash(pDstPath, pSrcPath);
+         }
+         else
+         {
+            // No, so just use the source path.
+            dStrcpy(pDstPath, pSrcPath);
+         }
+
+         return false;
+      }
+
+      // Skip the expando and the following slash.
+      pSrc += dStrlen(pathBuffer) + 1;
+
+      // Format the output path.
+      dSprintf(pathBuffer, sizeof(pathBuffer), "%s/%s", expandoPath, pSrc);
+
+      // Are we ensuring the trailing slash?
+      if (ensureTrailingSlash)
+      {
+         // Yes, so ensure it.
+         Con::ensureTrailingSlash(pathBuffer, pathBuffer);
+      }
+
+      // Strip repeat slashes.
+      Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+
+      return true;
+   }
+
+   // Script-Relative.
+   if (leadingToken == '.')
+   {
+      // Fetch the code-block file-path.
+      const StringTableEntry codeblockFullPath = CodeBlock::getCurrentCodeBlockFullPath();
+
+      // Do we have a code block full path?
+      if (codeblockFullPath == NULL)
+      {
+         // No, so error.
+         Con::errorf("expandPath() : Could not find relative path from code-block for path '%s'.", pSrcPath);
+
+         // Are we ensuring the trailing slash?
+         if (ensureTrailingSlash)
+         {
+            // Yes, so ensure it.
+            Con::ensureTrailingSlash(pDstPath, pSrcPath);
+         }
+         else
+         {
+            // No, so just use the source path.
+            dStrcpy(pDstPath, pSrcPath);
+         }
+
+         return false;
+      }
+
+      // Yes, so use it as the prefix.
+      dStrncpy(pathBuffer, codeblockFullPath, sizeof(pathBuffer) - 1);
+
+      // Find the final slash in the code-block.
+      pSlash = dStrrchr(pathBuffer, '/');
+
+      // Is this a parent directory token?
+      if (followingToken == '.')
+      {
+         // Yes, so terminate after the slash so we include it.
+         pSlash[1] = 0;
+      }
+      else
+      {
+         // No, it's a current directory token so terminate at the slash so we don't include it.
+         pSlash[0] = 0;
+
+         // Skip the current directory token.
+         pSrc++;
+      }
+
+      // Format the output path.
+      dStrncat(pathBuffer, "/", sizeof(pathBuffer) - 1 - strlen(pathBuffer));
+      dStrncat(pathBuffer, pSrc, sizeof(pathBuffer) - 1 - strlen(pathBuffer));
+
+      // Are we ensuring the trailing slash?
+      if (ensureTrailingSlash)
+      {
+         // Yes, so ensure it.
+         Con::ensureTrailingSlash(pathBuffer, pathBuffer);
+      }
+
+      // Strip repeat slashes.
+      Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+
+      return true;
+   }
+
+   // All else.
+
+   //Using a special case here because the code below barfs on trying to build a full path for apk reading
+#ifdef TORQUE_OS_ANDROID
+   if (leadingToken == '/' || strstr(pSrcPath, "/") == NULL)
+      Platform::makeFullPathName(pSrcPath, pathBuffer, sizeof(pathBuffer), pWorkingDirectoryHint);
+   else
+      dSprintf(pathBuffer, sizeof(pathBuffer), "/%s", pSrcPath);
+#else
+   Platform::makeFullPathName(pSrcPath, pathBuffer, sizeof(pathBuffer), pWorkingDirectoryHint);
+#endif
+
+   // Are we ensuring the trailing slash?
+   if (ensureTrailingSlash)
+   {
+      // Yes, so ensure it.
+      Con::ensureTrailingSlash(pathBuffer, pathBuffer);
+   }
+
+   // Strip repeat slashes.
+   Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+
+   return true;
+}
+
+//-----------------------------------------------------------------------------
+
+bool isBasePath(const char* SrcPath, const char* pBasePath)
+{
+   char expandBuffer[1024];
+   Con::expandPath(expandBuffer, sizeof(expandBuffer), SrcPath);
+   return dStrnicmp(pBasePath, expandBuffer, dStrlen(pBasePath)) == 0;
+}
+
+//-----------------------------------------------------------------------------
+
+void collapsePath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint)
+{
+   // Check path against expandos.  If there are multiple matches, choose the
+   // expando that produces the shortest relative path.
+
+   char pathBuffer[2048];
+
+   // Fetch expando count.
+   const U32 expandoCount = getPathExpandoCount();
+
+   // Iterate expandos.
+   U32 expandoRelativePathLength = U32_MAX;
+   for (U32 expandoIndex = 0; expandoIndex < expandoCount; ++expandoIndex)
+   {
+      // Fetch expando value (path).
+      StringTableEntry expandoValue = getPathExpandoValue(expandoIndex);
+
+      // Skip if not the base path.
+      if (!isBasePath(pSrcPath, expandoValue))
+         continue;
+
+      // Fetch path relative to expando path.
+      StringTableEntry relativePath = Platform::makeRelativePathName(pSrcPath, expandoValue);
+
+      // If the relative path is simply a period
+      if (relativePath[0] == '.')
+         relativePath++;
+
+      if (dStrlen(relativePath) > expandoRelativePathLength)
+      {
+         // This expando covers less of the path than any previous one found.
+         // We will keep the previous one.
+         continue;
+      }
+
+      // Keep track of the relative path length
+      expandoRelativePathLength = dStrlen(relativePath);
+
+      // Fetch expando key (name).
+      StringTableEntry expandoName = getPathExpandoKey(expandoIndex);
+
+      // Format against expando.
+      dSprintf(pathBuffer, sizeof(pathBuffer), "^%s/%s", expandoName, relativePath);
+   }
+
+   // Check if we've found a suitable expando
+   if (expandoRelativePathLength != U32_MAX)
+   {
+      // Strip repeat slashes.
+      Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+
+      return;
+   }
+
+   // Fetch the working directory.
+   StringTableEntry workingDirectory = pWorkingDirectoryHint != NULL ? pWorkingDirectoryHint : Platform::getCurrentDirectory();
+
+   // Fetch path relative to current directory.
+   StringTableEntry relativePath = Platform::makeRelativePathName(pSrcPath, workingDirectory);
+
+   // If the relative path is simply a period
+   if (relativePath[0] == '.'  && relativePath[1] != '.')
+      relativePath++;
+
+   // Format against expando.
+   dSprintf(pathBuffer, sizeof(pathBuffer), "%s/%s", workingDirectory, relativePath);
+
+   // Strip repeat slashes.
+   Con::stripRepeatSlashes(pDstPath, pathBuffer, size);
+}
+
+
+void ensureTrailingSlash(char* pDstPath, const char* pSrcPath)
+{
+   // Copy to target.
+   dStrcpy(pDstPath, pSrcPath);
+
+   // Find trailing character index.
+   S32 trailIndex = dStrlen(pDstPath);
+
+   // Ignore if empty string.
+   if (trailIndex == 0)
+      return;
+
+   // Finish if the trailing slash already exists.
+   if (pDstPath[trailIndex - 1] == '/')
+      return;
+
+   // Add trailing slash.
+   pDstPath[trailIndex++] = '/';
+   pDstPath[trailIndex] = 0;
+}
+
+//-----------------------------------------------------------------------------
+
+bool stripRepeatSlashes(char* pDstPath, const char* pSrcPath, S32 dstSize)
+{
+   // Note original destination.
+   char* pOriginalDst = pDstPath;
+
+   // Reset last source character.
+   char lastSrcChar = 0;
+
+   // Search source...
+   while (dstSize > 0)
+   {
+      // Fetch characters.
+      const char srcChar = *pSrcPath++;
+
+      // Do we have a repeat slash?
+      if (srcChar == '/' && lastSrcChar == '/')
+      {
+         // Yes, so skip it.
+         continue;
+      }
+
+      // No, so copy character.
+      *pDstPath++ = srcChar;
+
+      // Finish if end of source.
+      if (srcChar == 0)
+         return true;
+
+      // Reduce room left in destination.
+      dstSize--;
+
+      // Set last character.
+      lastSrcChar = srcChar;
+   }
+
+   // Terminate the destination string as we ran out of room.
+   *pOriginalDst = 0;
+
+   // Fail!
+   return false;
 }
 
 } // end of Console namespace
@@ -1576,41 +2096,57 @@ DefineEngineFunction( logWarning, void, ( const char* message ),,
    Con::warnf( "%s", message );
 }
 
+//------------------------------------------------------------------------------
+
+extern ConsoleValueStack CSTK;
+
 ConsoleValueRef::ConsoleValueRef(const ConsoleValueRef &ref)
 {
-	value = ref.value;
-	stringStackValue = ref.stringStackValue;
+   value = ref.value;
 }
 
-ConsoleValueRef::ConsoleValueRef(const char *newValue) : value(NULL)
+ConsoleValueRef& ConsoleValueRef::operator=(const ConsoleValueRef &newValue)
 {
-   *this = newValue;
+   value = newValue.value;
+   return *this;
 }
 
-ConsoleValueRef::ConsoleValueRef(const String &newValue) : value(NULL)
+ConsoleValueRef& ConsoleValueRef::operator=(const char *newValue)
 {
-   *this = (const char*)(newValue.utf8());
+   AssertFatal(value, "value should not be NULL");
+   value->setStringValue(newValue);
+   return *this;
 }
 
-ConsoleValueRef::ConsoleValueRef(U32 newValue) : value(NULL)
+ConsoleValueRef& ConsoleValueRef::operator=(S32 newValue)
 {
-   *this = newValue;
+   AssertFatal(value, "value should not be NULL");
+   value->setIntValue(newValue);
+   return *this;
 }
 
-ConsoleValueRef::ConsoleValueRef(S32 newValue) : value(NULL)
+ConsoleValueRef& ConsoleValueRef::operator=(U32 newValue)
 {
-   *this = newValue;
+   AssertFatal(value, "value should not be NULL");
+   value->setIntValue(newValue);
+   return *this;
 }
 
-ConsoleValueRef::ConsoleValueRef(F32 newValue) : value(NULL)
+ConsoleValueRef& ConsoleValueRef::operator=(F32 newValue)
 {
-   *this = newValue;
+   AssertFatal(value, "value should not be NULL");
+   value->setFloatValue(newValue);
+   return *this;
 }
 
-ConsoleValueRef::ConsoleValueRef(F64 newValue) : value(NULL)
+ConsoleValueRef& ConsoleValueRef::operator=(F64 newValue)
 {
-   *this = newValue;
+   AssertFatal(value, "value should not be NULL");
+   value->setFloatValue(newValue);
+   return *this;
 }
+
+//------------------------------------------------------------------------------
 
 StringStackWrapper::StringStackWrapper(int targc, ConsoleValueRef targv[])
 {
@@ -1636,10 +2172,13 @@ StringStackWrapper::~StringStackWrapper()
 StringStackConsoleWrapper::StringStackConsoleWrapper(int targc, const char** targ)
 {
    argv = new ConsoleValueRef[targc];
+   argvValue = new ConsoleValue[targc];
    argc = targc;
 
    for (int i=0; i<targc; i++) {
-      argv[i] = ConsoleValueRef(targ[i]);
+      argvValue[i].init();
+      argv[i].value = &argvValue[i];
+      argvValue[i].setStackStringValue(targ[i]);
    }
 }
 
@@ -1650,7 +2189,10 @@ StringStackConsoleWrapper::~StringStackConsoleWrapper()
       argv[i] = 0;
    }
    delete[] argv;
+   delete[] argvValue;
 }
+
+//------------------------------------------------------------------------------
 
 S32 ConsoleValue::getSignedIntValue()
 {
@@ -1680,18 +2222,50 @@ const char *ConsoleValue::getStringValue()
 {
    if(type == TypeInternalString || type == TypeInternalStackString)
       return sval;
-   if(type == TypeInternalFloat)
-      return Con::getData(TypeF32, &fval, 0);
-   else if(type == TypeInternalInt)
-      return Con::getData(TypeS32, &ival, 0);
+   else if (type == TypeInternalStringStackPtr)
+      return STR.mBuffer + (uintptr_t)sval;
    else
-      return Con::getData(type, dataPtr, 0, enumTable);
+   {
+      // We need a string representation, so lets create one
+      const char *internalValue = NULL;
+
+      if(type == TypeInternalFloat)
+         internalValue = Con::getData(TypeF32, &fval, 0);
+      else if(type == TypeInternalInt)
+         internalValue = Con::getData(TypeS32, &ival, 0);
+      else
+         return Con::getData(type, dataPtr, 0, enumTable); // We can't save sval here since it is the same as dataPtr
+
+      if (!internalValue)
+         return "";
+
+      U32 stringLen = dStrlen(internalValue);
+      U32 newLen = ((stringLen + 1) + 15) & ~15; // pad upto next cache line
+	   
+      if (bufferLen == 0)
+         sval = (char *) dMalloc(newLen);
+      else if(newLen > bufferLen)
+         sval = (char *) dRealloc(sval, newLen);
+
+      dStrcpy(sval, internalValue);
+      bufferLen = newLen;
+
+      return sval;
+   }
+}
+
+StringStackPtr ConsoleValue::getStringStackPtr()
+{
+   if (type == TypeInternalStringStackPtr)
+      return (uintptr_t)sval;
+   else
+      return (uintptr_t)-1;
 }
 
 bool ConsoleValue::getBoolValue()
 {
-   if(type == TypeInternalString || type == TypeInternalStackString)
-      return dAtob(sval);
+   if(type == TypeInternalString || type == TypeInternalStackString || type == TypeInternalStringStackPtr)
+      return dAtob(getStringValue());
    if(type == TypeInternalFloat)
       return fval > 0;
    else if(type == TypeInternalInt)
@@ -1713,11 +2287,13 @@ void ConsoleValue::setIntValue(U32 val)
    {
       fval = (F32)val;
       ival = val;
-      if(sval != typeValueEmpty)
+      if(bufferLen > 0)
       {
-         if (type != TypeInternalStackString) dFree(sval);
-         sval = typeValueEmpty;
+         dFree(sval);
+         bufferLen = 0;
       }
+
+      sval = typeValueEmpty;
       type = TypeInternalInt;
    }
    else
@@ -1738,11 +2314,12 @@ void ConsoleValue::setFloatValue(F32 val)
    {
       fval = val;
       ival = static_cast<U32>(val);
-      if(sval != typeValueEmpty)
+      if(bufferLen > 0)
       {
-         if (type != TypeInternalStackString) dFree(sval);
-         sval = typeValueEmpty;
+         dFree(sval);
+         bufferLen = 0;
       }
+      sval = typeValueEmpty;
       type = TypeInternalFloat;
    }
    else
@@ -1752,70 +2329,49 @@ void ConsoleValue::setFloatValue(F32 val)
    }
 }
 
+//------------------------------------------------------------------------------
 
-const char *ConsoleValueRef::getStringArgValue()
+ConsoleValueRef _BaseEngineConsoleCallbackHelper::_exec()
 {
-   if (value)
+   ConsoleValueRef returnValue;
+   if( mThis )
    {
-      if (stringStackValue == NULL)
-         stringStackValue = Con::getStringArg(value->getStringValue());
-      return stringStackValue;
+      // Cannot invoke callback until object has been registered
+      if (mThis->isProperlyAdded()) {
+         returnValue = Con::_internalExecute( mThis, mArgc, mArgv, false );
+      } else {
+         STR.clearFunctionOffset();
+         returnValue = ConsoleValueRef();
+      }
    }
    else
+      returnValue = Con::_internalExecute( mArgc, mArgv );
+
+   mArgc = mInitialArgc; // reset args
+   return returnValue;
+}
+
+ConsoleValueRef _BaseEngineConsoleCallbackHelper::_execLater(SimConsoleThreadExecEvent *evt)
+{
+   mArgc = mInitialArgc; // reset args
+   Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
+   return evt->getCB().waitForResult();
+}
+
+//------------------------------------------------------------------------------
+
+void ConsoleStackFrameSaver::save()
+{
+   CSTK.pushFrame();
+   STR.pushFrame();
+   mSaved = true;
+}
+
+void ConsoleStackFrameSaver::restore()
+{
+   if (mSaved)
    {
-      return "";
+      CSTK.popFrame();
+      STR.popFrame();
    }
-}
-
-
-extern ConsoleValueStack CSTK;
-   
-ConsoleValueRef& ConsoleValueRef::operator=(const ConsoleValueRef &newValue)
-{
-   value = newValue.value;
-   stringStackValue = newValue.stringStackValue;
-   return *this;
-}
-
-ConsoleValueRef& ConsoleValueRef::operator=(const char *newValue)
-{
-   value = CSTK.pushStackString(newValue);
-   stringStackValue = NULL;
-   return *this;
-}
-
-ConsoleValueRef& ConsoleValueRef::operator=(S32 newValue)
-{
-   value = CSTK.pushFLT(newValue);
-   stringStackValue = NULL;
-   return *this;
-}
-
-ConsoleValueRef& ConsoleValueRef::operator=(U32 newValue)
-{
-   value = CSTK.pushUINT(newValue);
-   stringStackValue = NULL;
-   return *this;
-}
-
-ConsoleValueRef& ConsoleValueRef::operator=(F32 newValue)
-{
-   value = CSTK.pushFLT(newValue);
-   stringStackValue = NULL;
-   return *this;
-}
-
-ConsoleValueRef& ConsoleValueRef::operator=(F64 newValue)
-{
-   value = CSTK.pushFLT(newValue);
-   stringStackValue = NULL;
-   return *this;
-}
-
-namespace Con
-{
-	void resetStackFrame()
-	{
-		CSTK.resetFrame();
-	}
 }

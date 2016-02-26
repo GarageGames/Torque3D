@@ -564,31 +564,25 @@ void GuiInspector::refresh()
       ungroup = new GuiInspectorGroup( "Ungrouped", this );
       ungroup->setHeaderHidden( true );
       ungroup->setCanCollapse( false );
-      if( ungroup != NULL )
-      {
-         ungroup->registerObject();
-         mGroups.push_back( ungroup );
-         addObject( ungroup );
-      }   
+
+      ungroup->registerObject();
+      mGroups.push_back( ungroup );
+      addObject( ungroup );
    }
 
    // Put the 'transform' group first
    GuiInspectorGroup *transform = new GuiInspectorGroup( "Transform", this );
-   if( transform != NULL )
-   {
-      transform->registerObject();
-      mGroups.push_back( transform );
-      addObject( transform );
-   }
+
+   transform->registerObject();
+   mGroups.push_back(transform);
+   addObject(transform);
 
    // Always create the 'general' group (for fields without a group)      
    GuiInspectorGroup *general = new GuiInspectorGroup( "General", this );
-   if( general != NULL )
-   {
-      general->registerObject();
-      mGroups.push_back( general );
-      addObject( general );
-   }
+
+   general->registerObject();
+   mGroups.push_back(general);
+   addObject(general);
 
    // Create the inspector groups for static fields.
 
@@ -606,25 +600,23 @@ void GuiInspector::refresh()
             if( !group && !isGroupFiltered( itr->pGroupname ) )
             {
                GuiInspectorGroup *group = new GuiInspectorGroup( itr->pGroupname, this );
-               if( group != NULL )
+
+               group->registerObject();
+               if( !group->getNumFields() )
                {
-                  group->registerObject();
-                  if( !group->getNumFields() )
-                  {
-                     #ifdef DEBUG_SPEW
-                     Platform::outputDebugString( "[GuiInspector] Removing empty group '%s'",
-                        group->getCaption().c_str() );
-                     #endif
+                  #ifdef DEBUG_SPEW
+                  Platform::outputDebugString( "[GuiInspector] Removing empty group '%s'",
+                     group->getCaption().c_str() );
+                  #endif
                      
-                     // The group ended up having no fields.  Remove it.
-                     group->deleteObject();
-                  }
-                  else
-                  {
-                     mGroups.push_back( group );
-                     addObject( group );
-                  }
-               }            
+                  // The group ended up having no fields.  Remove it.
+                  group->deleteObject();
+               }
+               else
+               {
+                  mGroups.push_back( group );
+                  addObject( group );
+               }
             }
          }
       }
@@ -634,12 +626,10 @@ void GuiInspector::refresh()
    if ( !isGroupFiltered( "Dynamic Fields" ) )
    {
       GuiInspectorGroup *dynGroup = new GuiInspectorDynamicGroup( "Dynamic Fields", this);
-      if( dynGroup != NULL )
-      {
-         dynGroup->registerObject();
-         mGroups.push_back( dynGroup );
-         addObject( dynGroup );
-      }
+
+      dynGroup->registerObject();
+      mGroups.push_back( dynGroup );
+      addObject( dynGroup );
    }
 
    if( mShowCustomFields && mTargets.size() == 1 )
@@ -771,14 +761,16 @@ void GuiInspector::sendInspectPostApply()
 // MARK: ---- Console Methods ----
 
 //-----------------------------------------------------------------------------
-
-DefineConsoleMethod( GuiInspector, inspect, void, (const char * className), , "Inspect(Object)")
+DefineEngineMethod( GuiInspector, inspect, void, (const char* simObject), (""),
+   "Inspect the given object.\n"
+   "@param simObject Object to inspect.")
 {
-   SimObject * target = Sim::findObject(className);
+   SimObject * target = Sim::findObject(simObject);
    if(!target)
    {
-      if(dAtoi(className) > 0)
-         Con::warnf("GuiInspector::inspect(): invalid object: %s", className);
+      if(dAtoi(simObject) > 0)
+         Con::warnf("%s::inspect(): invalid object: %s", object->getClassName(), simObject);
+
       object->clearInspectObjects();
       return;
    }
@@ -788,12 +780,15 @@ DefineConsoleMethod( GuiInspector, inspect, void, (const char * className), , "I
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspector, addInspect, void, (const char * className, bool autoSync), (true), "( id object, (bool autoSync = true) ) - Add the object to the list of objects being inspected." )
+DefineEngineMethod( GuiInspector, addInspect, void, (const char* simObject, bool autoSync), (true),
+   "Add the object to the list of objects being inspected.\n"
+   "@param simObject Object to add to the inspection."
+   "@param autoSync Auto sync the values when they change.")
 {
    SimObject* obj;
-   if( !Sim::findObject( className, obj ) )
+   if( !Sim::findObject( simObject, obj ) )
    {
-      Con::errorf( "GuiInspector::addInspect(): invalid object: %s", className );
+      Con::errorf( "%s::addInspect(): invalid object: %s", object->getClassName(), simObject );
       return;
    }
 
@@ -802,15 +797,24 @@ DefineConsoleMethod( GuiInspector, addInspect, void, (const char * className, bo
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspector, removeInspect, void, (SimObject* obj), , "( id object ) - Remove the object from the list of objects being inspected." )
+DefineEngineMethod( GuiInspector, removeInspect, void, (const char* simObject), ,
+   "Remove the object from the list of objects being inspected.\n"
+   "@param simObject Object to remove from the inspection.")
 {
-   if (obj)
-      object->removeInspectObject( obj );
+   SimObject* obj;
+   if( !Sim::findObject( simObject, obj ) )
+   {
+      Con::errorf( "%s::removeInspect(): invalid object: %s", object->getClassName(), simObject );
+      return;
+   }
+
+   object->removeInspectObject( obj );
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspector, refresh, void, (), , "Reinspect the currently selected object." )
+DefineEngineMethod( GuiInspector, refresh, void, (), ,
+   "Re-inspect the currently selected object.\n")
 {
    if ( object->getNumInspectObjects() == 0 )
       return;
@@ -822,10 +826,13 @@ DefineConsoleMethod( GuiInspector, refresh, void, (), , "Reinspect the currently
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspector, getInspectObject, const char*, (U32 index), (0), "getInspectObject( int index=0 ) - Returns currently inspected object" )
+DefineEngineMethod( GuiInspector, getInspectObject, const char*, (S32 index), (0),
+   "Returns currently inspected object.\n"
+   "@param index Index of object in inspection list you want to get."
+   "@return object being inspected.")
 {
       
-   if( index >= object->getNumInspectObjects() )
+   if( index < 0 || index >= object->getNumInspectObjects() )
    {
       Con::errorf( "GuiInspector::getInspectObject() - index out of range: %i", index );
       return "";
@@ -836,46 +843,54 @@ DefineConsoleMethod( GuiInspector, getInspectObject, const char*, (U32 index), (
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspector, getNumInspectObjects, S32, (), , "() - Return the number of objects currently being inspected." )
+DefineEngineMethod( GuiInspector, getNumInspectObjects, S32, (), ,
+   "Return the number of objects currently being inspected.\n"
+   "@return number of objects currently being inspected.")
 {
    return object->getNumInspectObjects();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspector, setName, void, (const char * newObjectName), , "setName(NewObjectName)")
+DefineEngineMethod( GuiInspector, setName, void, (const char* newObjectName), ,
+	"Rename the object being inspected (first object in inspect list).\n"
+	"@param newObjectName new name for object being inspected.")
 {
    object->setName(newObjectName);
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspector, apply, void, (), , "apply() - Force application of inspected object's attributes" )
+DefineEngineMethod( GuiInspector, apply, void, (), ,
+	"Force application of inspected object's attributes.\n")
 {
    object->sendInspectPostApply();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiInspector, setObjectField, void, (const char * fieldname, const char * data ), , 
-   "setObjectField( fieldname, data ) - Set a named fields value on the inspected object if it exists. This triggers all the usual callbacks that would occur if the field had been changed through the gui." )
+DefineEngineMethod( GuiInspector, setObjectField, void, (const char* fieldname, const char* data ), ,
+	"Set a named fields value on the inspected object if it exists. This triggers all the usual callbacks that would occur if the field had been changed through the gui..\n"
+	"@param fieldname Field name on object we are inspecting we want to change."
+	"@param data New Value for the given field.")
 {
    object->setObjectField( fieldname, data );
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleStaticMethod( GuiInspector, findByObject, S32, (const char * className ), , 
-   "findByObject( SimObject ) - returns the id of an awake inspector that is inspecting the passed object if one exists." )
+DefineEngineMethod( GuiInspector, findByObject, S32, (SimObject* object), ,
+	"Returns the id of an awake inspector that is inspecting the passed object if one exists\n"
+	"@param object Object to find away inspector for."
+	"@return id of an awake inspector that is inspecting the passed object if one exists, else NULL or 0.")
 {
-   SimObject *obj;
-   if ( !Sim::findObject( className, obj ) )   
-      return NULL;
-   
-   obj = GuiInspector::findByObject( obj );
-
-   if ( !obj )
+   if ( !object )
       return NULL;
 
-   return obj->getId();      
+   SimObject *inspector = GuiInspector::findByObject( object );
+
+   if ( !inspector )
+      return NULL;
+
+   return inspector->getId();
 }

@@ -55,7 +55,25 @@ bool                               AbstractClassRep::initialized = false;
 
 
 //-----------------------------------------------------------------------------
+AbstractClassRep* AbstractClassRep::findFieldRoot(StringTableEntry fieldName)
+{
+   // Find the field.
+   const Field* pField = findField(fieldName);
 
+   // Finish if not found.
+   if (pField == NULL)
+      return NULL;
+
+   // We're the root if we have no parent.
+   if (getParentClass() == NULL)
+      return this;
+
+   // Find the field root via the parent.
+   AbstractClassRep* pFieldRoot = getParentClass()->findFieldRoot(fieldName);
+
+   // We're the root if the parent does not have it else return the field root.
+   return pFieldRoot == NULL ? this : pFieldRoot;
+}
 
 void AbstractClassRep::init()
 {
@@ -349,6 +367,7 @@ void ConsoleObject::addGroup(const char* in_pGroupname, const char* in_pGroupDoc
    f.validator    = NULL;
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
+   f.writeDataFn = &defaultProtectedWriteFn;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -371,6 +390,7 @@ void ConsoleObject::endGroup(const char*  in_pGroupname)
    f.validator    = NULL;
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
+   f.writeDataFn = &defaultProtectedWriteFn;
    f.elementCount = 0;
 
    // Add to field list.
@@ -393,6 +413,7 @@ void ConsoleObject::addArray( const char *arrayName, S32 count )
    f.validator    = NULL;
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
+   f.writeDataFn = &defaultProtectedWriteFn;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -412,6 +433,7 @@ void ConsoleObject::endArray( const char *arrayName )
    f.validator    = NULL;
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
+   f.writeDataFn = &defaultProtectedWriteFn;
    f.elementCount = 0;
 
    // Add to field list.
@@ -433,13 +455,77 @@ void ConsoleObject::addField(const char*  in_pFieldname,
       flags );
 }
 
+void ConsoleObject::addField(const char*  in_pFieldname,
+   const U32 in_fieldType,
+   const dsize_t in_fieldOffset,
+   AbstractClassRep::WriteDataNotify in_writeDataFn,
+   const char* in_pFieldDocs,
+   U32 flags)
+{
+   addField(
+      in_pFieldname,
+      in_fieldType,
+      in_fieldOffset,
+      in_writeDataFn,
+      1,
+      in_pFieldDocs,
+      flags);
+}
+
+void ConsoleObject::addField(const char*  in_pFieldname,
+   const U32 in_fieldType,
+   const dsize_t in_fieldOffset,
+   const U32 in_elementCount,
+   const char* in_pFieldDocs,
+   U32 flags)
+{
+   addField(in_pFieldname,
+      in_fieldType,
+      in_fieldOffset,
+      &defaultProtectedWriteFn,
+      in_elementCount,
+      in_pFieldDocs,
+      flags);
+}
+
+void ConsoleObject::addField(const char*  in_pFieldname,
+   const U32 in_fieldType,
+   const dsize_t in_fieldOffset,
+   AbstractClassRep::WriteDataNotify in_writeDataFn,
+   const U32 in_elementCount,
+   const char* in_pFieldDocs,
+   U32 flags)
+{
+   AbstractClassRep::Field f;
+   f.pFieldname = StringTable->insert(in_pFieldname);
+
+   if (in_pFieldDocs)
+      f.pFieldDocs = in_pFieldDocs;
+
+   f.type = in_fieldType;
+   f.offset = in_fieldOffset;
+   f.elementCount = in_elementCount;
+   f.validator = NULL;
+   f.flag = flags;
+
+   f.setDataFn = &defaultProtectedSetFn;
+   f.getDataFn = &defaultProtectedGetFn;
+   f.writeDataFn = in_writeDataFn;
+
+   ConsoleBaseType* conType = ConsoleBaseType::getType(in_fieldType);
+   AssertFatal(conType, "ConsoleObject::addField - invalid console type");
+   f.table = conType->getEnumTable();
+
+   sg_tempFieldList.push_back(f);
+}
+
 void ConsoleObject::addProtectedField(const char*  in_pFieldname,
-                       const U32 in_fieldType,
-                       const dsize_t in_fieldOffset,
-                       AbstractClassRep::SetDataNotify in_setDataFn,
-                       AbstractClassRep::GetDataNotify in_getDataFn,
-                       const char* in_pFieldDocs,
-                       U32 flags )
+   const U32 in_fieldType,
+   const dsize_t in_fieldOffset,
+   AbstractClassRep::SetDataNotify in_setDataFn,
+   AbstractClassRep::GetDataNotify in_getDataFn,
+   const char* in_pFieldDocs,
+   U32 flags)
 {
    addProtectedField(
       in_pFieldname,
@@ -447,67 +533,81 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
       in_fieldOffset,
       in_setDataFn,
       in_getDataFn,
+      &defaultProtectedWriteFn,
       1,
       in_pFieldDocs,
-      flags );
-}
-
-
-void ConsoleObject::addField(const char*  in_pFieldname,
-                       const U32 in_fieldType,
-                       const dsize_t in_fieldOffset,
-                       const U32 in_elementCount,
-                       const char* in_pFieldDocs,
-                       U32 flags )
-{
-   AbstractClassRep::Field f;
-   f.pFieldname   = StringTable->insert(in_pFieldname);
-
-   if(in_pFieldDocs)
-      f.pFieldDocs   = in_pFieldDocs;
-
-   f.type         = in_fieldType;
-   f.offset       = in_fieldOffset;
-   f.elementCount = in_elementCount;
-   f.validator    = NULL;
-   f.flag         = flags;
-
-   f.setDataFn = &defaultProtectedSetFn;
-   f.getDataFn    = &defaultProtectedGetFn;
-
-   ConsoleBaseType* conType = ConsoleBaseType::getType( in_fieldType );
-   AssertFatal( conType, "ConsoleObject::addField - invalid console type" );
-   f.table = conType->getEnumTable();
-
-   sg_tempFieldList.push_back(f);
+      flags);
 }
 
 void ConsoleObject::addProtectedField(const char*  in_pFieldname,
-                       const U32 in_fieldType,
-                       const dsize_t in_fieldOffset,
-                       AbstractClassRep::SetDataNotify in_setDataFn,
-                       AbstractClassRep::GetDataNotify in_getDataFn,
-                       const U32 in_elementCount,
-                       const char* in_pFieldDocs,
-                       U32 flags )
+   const U32 in_fieldType,
+   const dsize_t in_fieldOffset,
+   AbstractClassRep::SetDataNotify in_setDataFn,
+   AbstractClassRep::GetDataNotify in_getDataFn,
+   AbstractClassRep::WriteDataNotify in_writeDataFn,
+   const char* in_pFieldDocs,
+   U32 flags)
+{
+   addProtectedField(
+      in_pFieldname,
+      in_fieldType,
+      in_fieldOffset,
+      in_setDataFn,
+      in_getDataFn,
+      in_writeDataFn,
+      1,
+      in_pFieldDocs,
+      flags);
+}
+
+void ConsoleObject::addProtectedField(const char*  in_pFieldname,
+   const U32 in_fieldType,
+   const dsize_t in_fieldOffset,
+   AbstractClassRep::SetDataNotify in_setDataFn,
+   AbstractClassRep::GetDataNotify in_getDataFn,
+   const U32 in_elementCount,
+   const char* in_pFieldDocs,
+   U32 flags)
+{
+   addProtectedField(
+      in_pFieldname,
+      in_fieldType,
+      in_fieldOffset,
+      in_setDataFn,
+      in_getDataFn,
+      &defaultProtectedWriteFn,
+      in_elementCount,
+      in_pFieldDocs,
+      flags);
+}
+void ConsoleObject::addProtectedField(const char*  in_pFieldname,
+   const U32 in_fieldType,
+   const dsize_t in_fieldOffset,
+   AbstractClassRep::SetDataNotify in_setDataFn,
+   AbstractClassRep::GetDataNotify in_getDataFn,
+   AbstractClassRep::WriteDataNotify in_writeDataFn,
+   const U32 in_elementCount,
+   const char* in_pFieldDocs,
+   U32 flags)
 {
    AbstractClassRep::Field f;
-   f.pFieldname   = StringTable->insert(in_pFieldname);
+   f.pFieldname = StringTable->insert(in_pFieldname);
 
-   if(in_pFieldDocs)
-      f.pFieldDocs   = in_pFieldDocs;
+   if (in_pFieldDocs)
+      f.pFieldDocs = in_pFieldDocs;
 
-   f.type         = in_fieldType;
-   f.offset       = in_fieldOffset;
+   f.type = in_fieldType;
+   f.offset = in_fieldOffset;
    f.elementCount = in_elementCount;
-   f.validator    = NULL;
-   f.flag         = flags;
+   f.validator = NULL;
+   f.flag = flags;
 
    f.setDataFn = in_setDataFn;
    f.getDataFn = in_getDataFn;
+   f.writeDataFn = in_writeDataFn;
 
-   ConsoleBaseType* conType = ConsoleBaseType::getType( in_fieldType );
-   AssertFatal( conType, "ConsoleObject::addProtectedField - invalid console type" );
+   ConsoleBaseType* conType = ConsoleBaseType::getType(in_fieldType);
+   AssertFatal(conType, "ConsoleObject::addProtectedField - invalid console type");
    f.table = conType->getEnumTable();
 
    sg_tempFieldList.push_back(f);
@@ -529,6 +629,7 @@ void ConsoleObject::addFieldV(const char*  in_pFieldname,
    f.table        = NULL;
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
+   f.writeDataFn = &defaultProtectedWriteFn;
    f.validator    = v;
    v->fieldIndex  = sg_tempFieldList.size();
 
@@ -546,6 +647,7 @@ void ConsoleObject::addDeprecatedField(const char *fieldName)
    f.validator    = NULL;
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
+   f.writeDataFn = &defaultProtectedWriteFn;
 
    sg_tempFieldList.push_back(f);
 }
@@ -847,12 +949,13 @@ DefineEngineFunction(linkNamespaces, bool, ( String childNSName, String parentNS
    
    Namespace *childNS = Namespace::find(childNSSTE);
    Namespace *parentNS = Namespace::find(parentNSSTE);
-   Namespace *currentParent = childNS->getParent();
    
    if (!childNS)
    {
       return false;
    }
+
+   Namespace *currentParent = childNS->getParent();
    
    // Link to new NS if applicable
    

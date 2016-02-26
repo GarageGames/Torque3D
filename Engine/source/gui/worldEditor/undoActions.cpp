@@ -58,10 +58,12 @@ void MECreateUndoAction::addObject( SimObject *object )
    mObjects.last().id = object->getId();
 }
 
-DefineConsoleMethod( MECreateUndoAction, addObject, void, (SimObject *obj), , "( SimObject obj )")
+DefineEngineMethod( MECreateUndoAction, addObject, void, ( SimObject* obj),,
+   "Add the object being created to an undo action.\n"
+   "@param obj Object being created you want to create the undo for.")
 {
 	if (obj)
-   	object->addObject( obj );
+      object->addObject( obj );
 }
 
 void MECreateUndoAction::undo()
@@ -163,10 +165,12 @@ void MEDeleteUndoAction::deleteObject( const Vector<SimObject*> &objectList )
       deleteObject( objectList[i] );
 }
 
-DefineConsoleMethod( MEDeleteUndoAction, deleteObject, void, (SimObject *obj ), , "( SimObject obj )")
+DefineEngineMethod( MEDeleteUndoAction, deleteObject, void, ( SimObject* obj),,
+   "Delete the object and add it to the undo action.\n"
+   "@param obj Object to delete and add to the undo action.")
 {
 	if (obj)
-   	object->deleteObject( obj );
+      object->deleteObject( obj );
 }
 
 void MEDeleteUndoAction::undo()

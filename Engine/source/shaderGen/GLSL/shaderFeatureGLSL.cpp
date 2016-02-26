@@ -49,7 +49,7 @@ LangElement * ShaderFeatureGLSL::setupTexSpaceMat( Vector<ShaderComponent*> &, /
    (*texSpaceMat)->setName( "objToTangentSpace" );
 
    MultiLine * meta = new MultiLine;
-   meta->addStatement( new GenOp( "   @;\r\n", new DecOp( *texSpaceMat ) ) );
+   meta->addStatement( new GenOp( "   @ = float3x3(1,0,0, 0,1,0, 0,0,1);\r\n", new DecOp( *texSpaceMat ) ) );
    
    // Protect against missing normal and tangent.
    if ( !N || !T )
@@ -828,6 +828,12 @@ Var* ShaderFeatureGLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
 // Base Texture
 //****************************************************************************
 
+DiffuseMapFeatGLSL::DiffuseMapFeatGLSL()
+: mTorqueDep("shaders/common/gl/torque.glsl")
+{
+	addDependency(&mTorqueDep);
+}
+
 void DiffuseMapFeatGLSL::processVert( Vector<ShaderComponent*> &componentList, 
                                        const MaterialFeatureData &fd )
 {
@@ -855,20 +861,23 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    diffuseMap->sampler = true;
    diffuseMap->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
+   // create sample color var
+   Var *diffColor = new Var;
+   diffColor->setType("vec4");
+   diffColor->setName("diffuseColor");
+   LangElement *colorDecl = new DecOp( diffColor );
+
+   MultiLine * meta = new MultiLine;
+   output = meta;
+
    if (  fd.features[MFT_CubeMap] )
    {
-      MultiLine * meta = new MultiLine;
-      
-      // create sample color
-      Var *diffColor = new Var;
-      diffColor->setType( "vec4" );
-      diffColor->setName( "diffuseColor" );
-      LangElement *colorDecl = new DecOp( diffColor );
-   
       meta->addStatement(  new GenOp( "   @ = tex2D(@, @);\r\n", 
                            colorDecl, 
                            diffuseMap, 
                            inTex ) );
+      if (!fd.features[MFT_Imposter])
+         meta->addStatement( new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor) );
       
       meta->addStatement( new GenOp( "   @;\r\n", assignColor( diffColor, Material::Mul ) ) );
       output = meta;
@@ -877,8 +886,6 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    {   
       // Handle atlased textures
       // http://www.infinity-universe.com/Infinity/index.php?option=com_content&task=view&id=65&Itemid=47
-      MultiLine * meta = new MultiLine;
-      output = meta;
 
       Var *atlasedTex = new Var;
       atlasedTex->setName("atlasedTexCoord");
@@ -934,11 +941,6 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
       // For the rest of the feature...
       inTex = atlasedTex;
 
-      // create sample color var
-      Var *diffColor = new Var;
-      diffColor->setType("vec4");
-      diffColor->setName("diffuseColor");
-
       // To dump out UV coords...
       //#define DEBUG_ATLASED_UV_COORDS
 #ifdef DEBUG_ATLASED_UV_COORDS
@@ -954,21 +956,26 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
       {
          meta->addStatement(new GenOp( "   @ = tex2Dlod(@, float4(@, 0.0, mipLod));\r\n", 
             new DecOp(diffColor), diffuseMap, inTex));
+         if (!fd.features[MFT_Imposter])
+            meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor));
       }
       else
       {
          meta->addStatement(new GenOp( "   @ = tex2D(@, @);\r\n", 
             new DecOp(diffColor), diffuseMap, inTex));
+          if (!fd.features[MFT_Imposter])
+             meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor));
       }
 
       meta->addStatement(new GenOp( "   @;\r\n", assignColor(diffColor, Material::Mul)));
    }
    else
    {
-      LangElement *statement = new GenOp( "tex2D(@, @)", diffuseMap, inTex );
-      output = new GenOp( "   @;\r\n", assignColor( statement, Material::Mul ) );
+      meta->addStatement(new GenOp("@ = tex2D(@, @);\r\n", colorDecl, diffuseMap, inTex));
+      if (!fd.features[MFT_Imposter])
+         meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor));
+      meta->addStatement(new GenOp("   @;\r\n", assignColor(diffColor, Material::Mul)));
    }
-   
 }
 
 ShaderFeature::Resources DiffuseMapFeatGLSL::getResources( const MaterialFeatureData &fd )
@@ -1422,6 +1429,13 @@ void VertLitGLSL::processVert(   Vector<ShaderComponent*> &componentList,
    Var* outColor = dynamic_cast< Var* >( LangElement::find( "vertColor" ) );
    if( !outColor )
    {
+      // Grab the connector color
+      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
+      Var *outColor = connectComp->getElement( RT_COLOR );
+      outColor->setName( "vertColor" );
+      outColor->setStructName( "OUT" );
+      outColor->setType( "vec4" );
+   	
       // Search for vert color
       Var *inColor = (Var*) LangElement::find( "diffuse" );   
 
@@ -1431,13 +1445,6 @@ void VertLitGLSL::processVert(   Vector<ShaderComponent*> &componentList,
          output = NULL;
          return;
       }
-
-      // Grab the connector color
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      Var *outColor = connectComp->getElement( RT_COLOR );
-      outColor->setName( "vertColor" );
-      outColor->setStructName( "OUT" );
-      outColor->setType( "vec4" );
 
       output = new GenOp( "   @ = @;\r\n", outColor, inColor );
    }

@@ -106,7 +106,7 @@ public:
    void removeFeature( const FeatureType &type );
 
    ///
-   U32 getNextFeatureIndex( const FeatureType &type, S32 index ) const;
+   S32 getNextFeatureIndex( const FeatureType &type, S32 index ) const;
 
    /// Removes features that are not in the input set.
    void filter( const FeatureSet &features );

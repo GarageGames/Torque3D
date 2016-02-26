@@ -258,7 +258,6 @@ void IfStmtNode::propagateSwitchExpr(ExprNode *left, bool string)
 
 U32 IfStmtNode::compileStmt(CodeStream &codeStream, U32 ip)
 {
-   U32 start = ip;
    U32 endifIp, elseIp;
    addBreakLine(codeStream);
    
@@ -340,7 +339,6 @@ U32 LoopStmtNode::compileStmt(CodeStream &codeStream, U32 ip)
    addBreakLine(codeStream);
    codeStream.pushFixScope(true);
    
-   U32 start = ip;
    if(initExpr)
       ip = initExpr->compile(codeStream, ip, TypeReqNone);
 
@@ -1565,8 +1563,6 @@ U32 FunctionDeclStmtNode::compileStmt(CodeStream &codeStream, U32 ip)
    
    CodeBlock::smInFunction = false;
    
-   
-   U32 start = ip;
    codeStream.emit(OP_FUNC_DECL);
    codeStream.emitSTE(fnName);
    codeStream.emitSTE(nameSpace);

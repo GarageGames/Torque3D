@@ -43,13 +43,17 @@ public:
    Win32Timer()
    {
       mPerfCountRemainderCurrent = 0.0f;
+      mPerfCountRemainderNext = 0.0f;
 
       // Attempt to use QPC for high res timing, otherwise fallback to GTC.
       mUsingPerfCounter = QueryPerformanceFrequency((LARGE_INTEGER *) &mFrequency);
       if(mUsingPerfCounter)
          mUsingPerfCounter = QueryPerformanceCounter((LARGE_INTEGER *) &mPerfCountCurrent);
       if(!mUsingPerfCounter)
+      {
          mTickCountCurrent = GetTickCount();
+         mTickCountNext = 0;
+      }
    }
 
    const S32 getElapsedMs()

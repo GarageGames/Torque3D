@@ -338,14 +338,10 @@ void RenderParticleMgr::render( SceneRenderState *state )
 void RenderParticleMgr::_initGFXResources()
 {
    // Screen quad
-   U16 *prims = NULL;
-   mScreenQuadPrimBuff.set(GFX, 4, 2, GFXBufferTypeStatic);
-   mScreenQuadPrimBuff.lock(&prims);
-   (*prims++) = 0;
-   (*prims++) = 1;
-   (*prims++) = 2;
-   (*prims++) = 3;
-   mScreenQuadPrimBuff.unlock();
+   U16 prims [] = {
+      0, 1, 2, 3,
+   };
+   mScreenQuadPrimBuff.immutable(GFX, 4, 2, prims);
 
    mScreenQuadVertBuff.set(GFX, 4, GFXBufferTypeStatic);
    CompositeQuadVert *verts = mScreenQuadVertBuff.lock();

@@ -120,6 +120,7 @@ void ThreadPool::Context::updateAccumulatedPriorityBiases()
 void ThreadPool::WorkItem::process()
 {
    execute();
+   mExecuted = true;
 }
 
 //--------------------------------------------------------------------------
@@ -281,6 +282,8 @@ void ThreadPool::WorkerThread::run( void* arg )
             Platform::outputDebugString( "[ThreadPool::WorkerThread] thread '%i' takes item '0x%x'", getId(), *workItem );
 #endif
             workItem->process();
+
+            dFetchAndAdd( mPool->mNumPendingItems, ( U32 ) -1 );
          }
          else
             waitForSignal = true;
@@ -318,6 +321,7 @@ ThreadPool::ThreadPool( const char* name, U32 numThreads )
    : mName( name ),
      mNumThreads( numThreads ),
      mNumThreadsAwake( 0 ),
+     mNumPendingItems( 0 ),
      mThreads( 0 ),
      mSemaphore( 0 )
 {
@@ -409,18 +413,10 @@ void ThreadPool::queueWorkItem( WorkItem* item )
    else
    {
       // Put the item in the queue.
-
+      dFetchAndAdd( mNumPendingItems, 1 );
       mWorkItemQueue.insert( item->getPriority(), item );
 
-      // Wake up some thread, if we need to.
-      // Use the ready count here as the wake count does
-      // not correctly protect the critical section in the
-      // thread's run function.  This may lead us to release
-      // the semaphore more often than necessary, but it avoids
-      // a race condition.
-
-      if( !dCompareAndSwap( mNumThreadsReady, mNumThreads, mNumThreads ) )
-         mSemaphore.release();
+      mSemaphore.release();
    }
 }
 
@@ -437,6 +433,26 @@ void ThreadPool::flushWorkItems( S32 timeOut )
    // Spinlock until the queue is empty.
 
    while( !mWorkItemQueue.isEmpty() )
+   {
+      Platform::sleep( 25 );
+
+      // Stop if we have exceeded our processing time budget.
+
+      if( timeOut != -1
+          && Platform::getRealMilliseconds() >= endTime )
+          break;
+   }
+}
+
+void ThreadPool::waitForAllItems( S32 timeOut )
+{
+   U32 endTime = 0;
+   if( timeOut != -1 )
+      endTime = Platform::getRealMilliseconds() + timeOut;
+
+   // Spinlock until there are no items that have not been processed.
+
+   while( dAtomicRead( mNumPendingItems ) )
    {
       Platform::sleep( 25 );
 

@@ -155,11 +155,13 @@ U32 endHighResolutionTimer(U32 time[2])  {
 
 void startHighResolutionTimer(U32 time[2])
 {
+   time[0] = Platform::getRealMilliseconds();
 }
 
 U32 endHighResolutionTimer(U32 time[2])
 {
-   return 1;
+   U32 ticks = Platform::getRealMilliseconds() - time[0];
+   return ticks;
 }
 
 #endif
@@ -212,11 +214,22 @@ Profiler::~Profiler()
 void Profiler::reset()
 {
    mEnabled = false; // in case we're in a profiler call.
-   while(mProfileList)
+   ProfilerData * head = mProfileList;
+   ProfilerData * curr = head;
+
+   while ( curr )
    {
-      free(mProfileList);
-      mProfileList = NULL;
+      head = curr->mNextProfilerData;
+      free( curr );
+
+      if ( head )
+         curr = head;
+      else
+         curr = NULL;
    }
+
+   mProfileList = NULL;
+
    for(ProfilerRootData *walk = ProfilerRootData::sRootList; walk; walk = walk->mNextRoot)
    {
       walk->mFirstProfilerData = 0;

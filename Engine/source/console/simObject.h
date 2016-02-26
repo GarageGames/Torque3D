@@ -33,6 +33,9 @@
    #include "core/bitSet.h"
 #endif
 
+#ifndef _TAML_CALLBACKS_H_
+#include "persistence/taml/tamlCallbacks.h"
+#endif
 
 class Stream;
 class LightManager;
@@ -226,7 +229,7 @@ class SimPersistID;
 /// set automatically by the console constructor code.
 ///
 /// @nosubgrouping
-class SimObject: public ConsoleObject
+class SimObject: public ConsoleObject, public TamlCallbacks
 {
    public:
    
@@ -298,6 +301,8 @@ class SimObject: public ConsoleObject
       /// Flags internal to the object management system.
       BitSet32    mFlags;
 
+      StringTableEntry    mProgenitorFile;
+
       /// Object we are copying fields from.
       SimObject* mCopySource;
 
@@ -348,13 +353,42 @@ class SimObject: public ConsoleObject
       static bool setSuperClass(void *object, const char *index, const char *data)     
          { static_cast<SimObject*>(object)->setSuperClassNamespace(data); return false; };
 
+            static bool writeObjectName(void* obj, StringTableEntry pFieldName)
+         { SimObject* simObject = static_cast<SimObject*>(obj); return simObject->objectName != NULL && simObject->objectName != StringTable->EmptyString(); }
+      static bool writeCanSaveDynamicFields(void* obj, StringTableEntry pFieldName)  
+         { return static_cast<SimObject*>(obj)->mCanSaveFieldDictionary == false; }
+      static bool writeInternalName(void* obj, StringTableEntry pFieldName)          
+         { SimObject* simObject = static_cast<SimObject*>(obj); return simObject->mInternalName != NULL && simObject->mInternalName != StringTable->EmptyString(); }
+      static bool setParentGroup(void* obj, const char* data);
+      static bool writeParentGroup(void* obj, StringTableEntry pFieldName)           
+         { return static_cast<SimObject*>(obj)->mGroup != NULL; }
+      static bool writeSuperclass(void* obj, StringTableEntry pFieldName)            
+         { SimObject* simObject = static_cast<SimObject*>(obj); return simObject->mSuperClassName != NULL && simObject->mSuperClassName != StringTable->EmptyString(); }
+      static bool writeClass(void* obj, StringTableEntry pFieldName)                 
+         { SimObject* simObject = static_cast<SimObject*>(obj); return simObject->mClassName != NULL && simObject->mClassName != StringTable->EmptyString(); }
+      static bool writeClassName(void* obj, StringTableEntry pFieldName)
+         { SimObject* simObject = static_cast<SimObject*>(obj); return simObject->mClassName != NULL && simObject->mClassName != StringTable->EmptyString(); }
+
+      
       // Group hierarchy protected set method 
       static bool setProtectedParent(void *object, const char *index, const char *data);
 
       // Object name protected set method
       static bool setProtectedName(void *object, const char *index, const char *data);
 
+   public:
+      inline void setProgenitorFile(const char* pFile) { mProgenitorFile = StringTable->insert(pFile); }
+      inline StringTableEntry getProgenitorFile(void) const { return mProgenitorFile; }
+
    protected:
+      /// Taml callbacks.
+      virtual void onTamlPreWrite(void) {}
+      virtual void onTamlPostWrite(void) {}
+      virtual void onTamlPreRead(void) {}
+      virtual void onTamlPostRead(const TamlCustomNodes& customNodes) {}
+      virtual void onTamlAddParent(SimObject* pParentObject) {}
+      virtual void onTamlCustomWrite(TamlCustomNodes& customNodes) {}
+      virtual void onTamlCustomRead(const TamlCustomNodes& customNodes);
    
       /// Id number for this object.
       SimObjectId mId;
@@ -460,6 +494,16 @@ class SimObject: public ConsoleObject
       /// @param   array       String containing index into array; if NULL, it is ignored.
       /// @param   value       Value to store.
       void setDataField(StringTableEntry slotName, const char *array, const char *value);
+
+      const char *getPrefixedDataField(StringTableEntry fieldName, const char *array);
+
+      void setPrefixedDataField(StringTableEntry fieldName, const char *array, const char *value);
+
+      const char *getPrefixedDynamicDataField(StringTableEntry fieldName, const char *array, const S32 fieldType = -1);
+
+      void setPrefixedDynamicDataField(StringTableEntry fieldName, const char *array, const char *value, const S32 fieldType = -1);
+
+      StringTableEntry getDataFieldPrefix(StringTableEntry fieldName);
 
       /// Get the type of a field on the object.
       ///

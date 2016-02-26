@@ -45,7 +45,7 @@ class UnmanagedVector
       UnmanagedVector()
          : mCount( 0 ), mArray( NULL ) {}
       UnmanagedVector( T* array, U32 count )
-         : mArray( array ), mCount( count ) {}
+         : mCount( count ), mArray( array ) {}
 
       U32 size() const { return mCount; }
       bool empty() const { return ( mCount == 0 ); }

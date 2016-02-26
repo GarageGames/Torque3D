@@ -64,11 +64,11 @@ public:
                      const GFXVertexFormat *vertexFormat, 
                      U32 vertexSize, 
                      GFXBufferType bufferType )
-      :  mDevice( device ),
-         mVolatileStart( 0 ),         
-         mNumVerts( numVerts ),
+      :  mNumVerts( numVerts ),
          mVertexSize( vertexSize ),
-         mBufferType( bufferType )      
+         mBufferType( bufferType ),
+         mDevice( device ),
+         mVolatileStart( 0 )
    {
       if ( vertexFormat )
       {

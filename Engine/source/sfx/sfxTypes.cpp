@@ -112,7 +112,7 @@ inline bool sResolve( T** ptr, String& errorString )
 //    TypeSFXSourceName.
 //=============================================================================
 
-ConsoleType( SFXSource, TypeSFXSourceName, SFXSource* )
+ConsoleType(SFXSource, TypeSFXSourceName, SFXSource*, "")
 
 ConsoleGetType( TypeSFXSourceName )
 {
@@ -138,7 +138,7 @@ ConsoleSetType( TypeSFXSourceName )
 //    TypeSFXParameterName.
 //=============================================================================
 
-ConsoleType( string, TypeSFXParameterName, StringTableEntry )
+ConsoleType(string, TypeSFXParameterName, StringTableEntry, "")
 
 ConsoleGetType( TypeSFXParameterName )
 {
@@ -157,7 +157,7 @@ ConsoleSetType( TypeSFXParameterName )
 //    TypeSFXDescriptionName.
 //=============================================================================
 
-ConsoleType( SFXDescription, TypeSFXDescriptionName, SFXDescription* )
+ConsoleType(SFXDescription, TypeSFXDescriptionName, SFXDescription*, "")
 
 ConsoleSetType( TypeSFXDescriptionName )
 {
@@ -184,7 +184,7 @@ ConsoleGetType( TypeSFXDescriptionName )
 //    TypeSFXTrackName.
 //=============================================================================
 
-ConsoleType( SFXTrack, TypeSFXTrackName, SFXTrack* )
+ConsoleType( SFXTrack, TypeSFXTrackName, SFXTrack*, "" )
 
 ConsoleSetType( TypeSFXTrackName )
 {
@@ -211,7 +211,7 @@ ConsoleGetType( TypeSFXTrackName )
 //    TypeSFXEnvironmentName.
 //=============================================================================
 
-ConsoleType( SFXEnvironment, TypeSFXEnvironmentName, SFXEnvironment* )
+ConsoleType(SFXEnvironment, TypeSFXEnvironmentName, SFXEnvironment*, "")
 
 ConsoleSetType( TypeSFXEnvironmentName )
 {
@@ -238,7 +238,7 @@ ConsoleGetType( TypeSFXEnvironmentName )
 //    TypeSFXStateName.
 //=============================================================================
 
-ConsoleType( SFXState, TypeSFXStateName, SFXState* )
+ConsoleType(SFXState, TypeSFXStateName, SFXState*, "")
 
 ConsoleSetType( TypeSFXStateName )
 {
@@ -265,7 +265,7 @@ ConsoleGetType( TypeSFXStateName )
 //    TypeSFXAmbienceName.
 //=============================================================================
 
-ConsoleType( SFXAmbience, TypeSFXAmbienceName, SFXAmbience* )
+ConsoleType(SFXAmbience, TypeSFXAmbienceName, SFXAmbience*, "")
 
 ConsoleSetType( TypeSFXAmbienceName )
 {

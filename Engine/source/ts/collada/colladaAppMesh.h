@@ -24,7 +24,7 @@
 #define _COLLADA_APPMESH_H_
 
 #ifndef _TDICTIONARY_H_
-#include "core/tDictionary.h"
+#include "core/util/tDictionary.h"
 #endif
 #ifndef _APPMESH_H_
 #include "ts/loader/appMesh.h"

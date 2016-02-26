@@ -35,6 +35,7 @@
 #include "gui/editor/guiMenuBar.h"
 
 #include "platformSDL/menus/PlatformSDLPopupMenuData.h"
+#include "console/engineAPI.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Platform Menu Data

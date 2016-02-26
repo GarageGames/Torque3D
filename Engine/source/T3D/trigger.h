@@ -87,6 +87,10 @@ class Trigger : public GameBase
    String            mLeaveCommand;
    String            mTickCommand;
 
+   static const U32 CMD_SIZE = 1024;
+
+  protected:
+   
    enum TriggerUpdateBits
    {
       TransformMask = Parent::NextFreeMask << 0,
@@ -96,10 +100,6 @@ class Trigger : public GameBase
       TickCmdMask   = Parent::NextFreeMask << 4,
       NextFreeMask  = Parent::NextFreeMask << 5,
    };
-
-   static const U32 CMD_SIZE = 1024;
-
-  protected:
 
    static bool smRenderTriggers;
    bool testObject(GameBase* enter);
@@ -142,7 +142,7 @@ class Trigger : public GameBase
    // Trigger
    void setTriggerPolyhedron(const Polyhedron&);
 
-   void      potentialEnterObject(GameBase*);
+   virtual void potentialEnterObject(GameBase*);
    U32       getNumTriggeringObjects() const;
    GameBase* getObject(const U32);   
    const Vector<GameBase*>& getObjects() const { return mObjects; }

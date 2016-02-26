@@ -23,7 +23,8 @@
 #include "platform/platform.h"
 #include "console/simObjectList.h"
 
-#include "console/console.h"
+#include "console/simBase.h"
+#include "console/engineAPI.h"
 #include "console/sim.h"
 #include "console/simObject.h"
 

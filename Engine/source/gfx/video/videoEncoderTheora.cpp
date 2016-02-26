@@ -193,7 +193,7 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
    
 public:
    VideoEncoderTheora() :
-      mLastFrame(NULL)      
+      mCurrentFrame(0), td(NULL), mLastFrame(NULL)
    {
       setStatus(false);      
    }

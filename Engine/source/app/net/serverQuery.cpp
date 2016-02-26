@@ -240,6 +240,7 @@ struct ServerFilter
 
    ServerFilter()
    {
+      type = Normal;
       queryFlags = 0;
       gameType = NULL;
       missionType = NULL;
@@ -433,8 +434,6 @@ DefineConsoleFunction( queryAllServers
 
    queryLanServers(lanPort, flags, gameType, missionType, minPlayers, maxPlayers, maxBots,
       regionMask, maxPing, minCPU, filterFlags);
-   dFree(gameType);
-   dFree(missionType);
 
 }
 
@@ -541,8 +540,7 @@ void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
 }
 
 DefineConsoleFunction( queryMasterServer
-                     , void, ( U32 lanPort
-                             , U32 flags
+                     , void, (  U32 flags
                              , const char * gameType
                              , const char * missionType
                              , U32 minPlayers
@@ -559,9 +557,6 @@ DefineConsoleFunction( queryMasterServer
    clearServerList();
    queryMasterServer(flags,gameType,missionType,minPlayers,maxPlayers,
       maxBots,regionMask,maxPing,minCPU,filterFlags,0,&buddyList);
-
-   dFree(gameType);
-   dFree(missionType);
 }
 
 //-----------------------------------------------------------------------------
@@ -1342,7 +1337,7 @@ static void processPingsAndQueries( U32 session, bool schedule )
       else
          dSprintf( msg, sizeof( msg ), "%d servers found.", foundCount );
 
-      Con::executef( "onServerQueryStatus", "done", msg, "1");
+      Con::executef( "onServerQueryStatus", "done", (const char*)msg, "1");
    }
 }
 

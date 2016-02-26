@@ -216,7 +216,7 @@ DefineConsoleMethod(FieldBrushObject, queryFields, const char*, (const char* sim
     const AbstractClassRep::FieldList& staticFields = pSimObject->getFieldList();
 
     // Did we specify a groups list?
-    if ( dStrIsEmpty(groupList) )
+    if ( String::isEmpty(groupList) )
     {
         // No, so return all fields...
 

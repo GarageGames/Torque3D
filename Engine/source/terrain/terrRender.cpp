@@ -170,7 +170,7 @@ bool TerrainBlock::_initBaseShader()
    desc.zDefined = true;
    desc.zWriteEnable = false;
    desc.zEnable = false;
-   desc.setBlend( true, GFXBlendSrcAlpha, GFXBlendOne );
+   desc.setBlend( true, GFXBlendSrcAlpha, GFXBlendOne  );
    desc.cullDefined = true;
    desc.cullMode = GFXCullNone;
    desc.colorWriteAlpha = false;

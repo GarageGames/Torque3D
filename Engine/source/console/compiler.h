@@ -310,7 +310,7 @@ protected:
       U8 *data;       ///< Allocated data (size is BlockSize)
       U32 size;       ///< Bytes used in data
       CodeData *next; ///< Next block
-   };
+   } CodeData;
    
    /// @name Emitted code
    /// {

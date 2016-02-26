@@ -502,7 +502,7 @@ void ConvexShape::prepRenderImage( SceneRenderState *state )
    }
    */
 
-   if ( mVertexBuffer.isNull() )
+   if ( mVertexBuffer.isNull() || !state)
       return;
 
    // If we don't have a material instance after the override then 

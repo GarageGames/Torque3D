@@ -648,7 +648,7 @@ DefineConsoleMethod(Settings, setValue, void, (const char * settingName, const c
 {
    StringTableEntry fieldName = StringTable->insert( settingName );
    
-   if (!dStrIsEmpty(value))
+   if (!String::isEmpty(value))
       object->setValue( fieldName, value );
    else
       object->setValue( fieldName );

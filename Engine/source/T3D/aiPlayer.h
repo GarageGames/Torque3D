@@ -63,6 +63,9 @@ private:
 
    Point3F mAimOffset;
 
+   // move triggers
+   bool mMoveTriggers[MaxTriggerKeys];
+
    // Utility Methods
    void throwCallback( const char *name );
 
@@ -119,10 +122,12 @@ private:
       SimObjectPtr<SceneObject> object;
       /// Distance at whcih to follow.
       F32 radius;
+      Point3F lastPos;
       /// Default constructor.
       FollowData() : object(NULL)
       {
          radius = 5.0f;
+         lastPos = Point3F::Zero;
       }
    };
 
@@ -158,7 +163,7 @@ public:
 
    // Targeting and aiming sets/gets
    void setAimObject( GameBase *targetObject );
-   void setAimObject( GameBase *targetObject, Point3F offset );
+   void setAimObject(GameBase *targetObject, const Point3F& offset);
    GameBase* getAimObject() const  { return mAimObject; }
    void setAimLocation( const Point3F &location );
    Point3F getAimLocation() const { return mAimLocation; }
@@ -174,6 +179,11 @@ public:
    void setMoveDestination( const Point3F &location, bool slowdown );
    Point3F getMoveDestination() const { return mMoveDestination; }
    void stopMove();
+
+   // Trigger sets/gets
+   void setMoveTrigger( U32 slot, const bool isSet = true );
+   bool getMoveTrigger( U32 slot ) const;
+   void clearMoveTriggers();
 
 #ifdef TORQUE_NAVIGATION_ENABLED
    /// @name Pathfinding

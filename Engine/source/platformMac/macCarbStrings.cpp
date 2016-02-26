@@ -45,7 +45,7 @@ int dSprintf(char *buffer, dsize_t /*bufferSize*/, const char *format, ...)
    va_list args;
    va_start(args, format);
    S32 len = vsprintf(buffer, format, args);
-
+   va_end(args);
    return (len);
 }   
 

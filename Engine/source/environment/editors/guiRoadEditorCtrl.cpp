@@ -979,7 +979,7 @@ F32 GuiRoadEditorCtrl::getNodeWidth()
    return 0.0f;   
 }
 
-void GuiRoadEditorCtrl::setNodePosition( Point3F pos )
+void GuiRoadEditorCtrl::setNodePosition(const Point3F& pos)
 {
    if ( mSelRoad && mSelNode != -1 )
    {

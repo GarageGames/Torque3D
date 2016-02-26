@@ -30,9 +30,9 @@ extern void default_matF_x_matF_C(const F32 *a, const F32 *b, F32 *mresult);
 extern void mInstallLibrary_ASM();
 
 // If we're x86 and not Mac, then include these. There's probably a better way to do this.
-#if defined(TORQUE_CPU_X86) && !defined(TORQUE_OS_MAC)
-extern "C" void Athlon_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result);
-extern "C" void SSE_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result);
+#if defined(WIN32) && defined(TORQUE_CPU_X86)
+void Athlon_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result);
+void SSE_MatrixF_x_MatrixF(const F32 *matA, const F32 *matB, F32 *result);
 #endif
 
 #if defined( __VEC__ )
@@ -55,7 +55,7 @@ TEST(MatrixF, MultiplyImplmentations)
    // C will be the baseline
    default_matF_x_matF_C(m1, m2, mrC);
 
-#if defined(TORQUE_CPU_X86) && !defined(TORQUE_OS_MAC)
+#if defined(WIN32) && defined(TORQUE_CPU_X86)
    // Check the CPU info
    U32 cpuProperties = Platform::SystemInfo.processor.properties;
    bool same;
