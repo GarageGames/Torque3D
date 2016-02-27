@@ -514,6 +514,10 @@ bool ColladaShapeLoader::canLoadCachedDTS(const Torque::Path& path)
    Torque::Path cachedPath(path);
    cachedPath.setExtension("cached.dts");
 
+   //if forcing dae loading then return false
+   if( Con::getBoolVariable("$collada::forceLoadDAE", false) )
+   	return false;
+
    Torque::FS::FileNode::Attributes a1, a2;
 
    //if there is no cached dts, return false
