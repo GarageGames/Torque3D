@@ -57,6 +57,7 @@ void GFXGLWindowTarget::resetMode()
       _teardownCurrentMode();
       _setupNewMode();
    }
+   GFX->beginReset();
 }
 
 void GFXGLWindowTarget::_onAppSignal(WindowId wnd, S32 event)

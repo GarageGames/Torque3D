@@ -221,8 +221,6 @@ public:
    /// The strength scalar for the detail normal map.
    F32 mDetailNormalMapStrength[MAX_STAGES];   
       
-   FileName mEnvMapFilename[MAX_STAGES];
-   
    /// This color is the diffuse color of the material
    /// or if it has a texture it is multiplied against 
    /// the diffuse texture color.
@@ -287,12 +285,18 @@ public:
    /// If the stage should use anisotropic filtering.
    bool mUseAnisotropic[MAX_STAGES];
 
+   // Deferred Shading: Metalness
+   bool mUseMetalness[MAX_STAGES];
+
    bool mDoubleSided;
 
    String mCubemapName;
    CubemapData* mCubemapData;
    bool mDynamicCubemap;
 
+   // Deferred Shading
+   bool mIsSky;
+   F32 mMatInfoFlags[MAX_STAGES];
    bool mTranslucent;   
    BlendOp mTranslucentBlendOp;
    bool mTranslucentZWrite;

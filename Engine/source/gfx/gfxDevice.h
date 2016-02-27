@@ -302,6 +302,7 @@ protected:
    /// This will allow querying to see if a device is initialized and ready to
    /// have operations performed on it.
    bool mInitialized;
+   bool mReset;
 
    /// This is called before this, or any other device, is deleted in the global destroy()
    /// method. It allows the device to clean up anything while everything is still valid.
@@ -325,6 +326,10 @@ public:
    /// @see beginScene
    /// @see endScene
    bool canCurrentlyRender() const { return mCanCurrentlyRender; }
+
+   bool recentlyReset(){ return mReset; }
+   void beginReset(){ mReset = true; }
+   void finalizeReset(){ mReset = false; }
 
    void setAllowRender( bool render ) { mAllowRender = render; }
 

@@ -172,6 +172,8 @@ singleton ShaderData( HDR_CombineShader )
    samplerNames[2] = "$bloomTex";
    samplerNames[3] = "$colorCorrectionTex";
    
+   samplerNames[4] = "prepassTex";
+
    pixVersion = 3.0;
 };
 
@@ -469,6 +471,7 @@ singleton PostEffect( HDRPostFX )
       texture[1] = "#adaptedLum";            
       texture[2] = "#bloomFinal";
       texture[3] = $HDRPostFX::colorCorrectionRamp;
+      texture[4] = "#prepass";
       target = "$backBuffer";
    };
 };

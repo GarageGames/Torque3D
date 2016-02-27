@@ -39,10 +39,13 @@ uniform sampler2D dynamicShadowMap;
 
 #ifdef USE_SSAO_MASK
 uniform sampler2D ssaoMask ;
-uniform vec4 rtParams2;
+uniform vec4 rtParams3;
 #endif
 
-uniform sampler2D prePassBuffer;            
+uniform sampler2D prePassBuffer;
+uniform sampler2D lightBuffer;
+uniform sampler2D colorBuffer;
+uniform sampler2D matInfoBuffer;             
 uniform vec3 lightDirection;
 uniform vec4 lightColor;
 uniform float  lightBrightness;
@@ -189,7 +192,16 @@ vec4 AL_VectorLightShadowCast( sampler2D _sourceshadowMap,
 
 out vec4 OUT_col;
 void main()             
-{   
+{
+   // Emissive.
+   float4 matInfo = texture( matInfoBuffer, uv0 );   
+   bool emissive = getFlag( matInfo.r, 0 );
+   if ( emissive )
+   {
+       OUT_col = vec4(1.0, 1.0, 1.0, 0.0);
+       return;
+   }
+   
    // Sample/unpack the normal/z data
    vec4 prepassSample = prepassUncondition( prePassBuffer, uv0 );
    vec3 normal = prepassSample.rgb;
@@ -228,8 +240,6 @@ void main()
                                                         shadowSoftness, 
                                                         dotNL,
                                                         overDarkPSSM);
-
-                                             
       vec4 dynamic_shadowed_colors = AL_VectorLightShadowCast( dynamicShadowMap,
                                                         uv0.xy,
                                                         dynamicWorldToLightProj,
@@ -242,14 +252,13 @@ void main()
                                                         shadowSoftness, 
                                                         dotNL,
                                                         overDarkPSSM);  
-      
       float static_shadowed = static_shadowed_colors.a;
       float dynamic_shadowed = dynamic_shadowed_colors.a;
 	  
       #ifdef PSSM_DEBUG_RENDER
 	     debugColor = static_shadowed_colors.rgb*0.5+dynamic_shadowed_colors.rgb*0.5;
       #endif
-	   
+      
       // Fade out the shadow at the end of the range.
       vec4 zDist = vec4(zNearFarInvNearFar.x + zNearFarInvNearFar.y * depth);
       float fadeOutAmt = ( zDist.x - fadeStartLength.x ) * fadeStartLength.y;
@@ -295,7 +304,7 @@ void main()
 
    // Sample the AO texture.      
    #ifdef USE_SSAO_MASK
-      float ao = 1.0 - texture( ssaoMask, viewportCoordToRenderTarget( uv0.xy, rtParams2 ) ).r;
+      float ao = 1.0 - texture( ssaoMask, viewportCoordToRenderTarget( uv0.xy, rtParams3 ) ).r;
       addToResult *= ao;
    #endif
 
@@ -303,6 +312,6 @@ void main()
       lightColorOut = debugColor;
    #endif
 
-   OUT_col = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );  
-   
+   vec4 colorSample = texture( colorBuffer, uv0 );
+   OUT_col = AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att); 
 }

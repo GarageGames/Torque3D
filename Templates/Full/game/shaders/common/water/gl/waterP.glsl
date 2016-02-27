@@ -295,7 +295,7 @@ void main()
    foamColor.rgb *= FOAM_OPACITY * foamAmt * foamColor.a;
    
    // Get reflection map color.
-   vec4 refMapColor = hdrDecode( texture( reflectMap, reflectCoord ) );  
+   vec4 refMapColor = texture( reflectMap, reflectCoord );  
    
    // If we do not have a reflection texture then we use the cubemap.
    refMapColor = mix( refMapColor, texture( skyMap, reflectionVec ), NO_REFLECT );

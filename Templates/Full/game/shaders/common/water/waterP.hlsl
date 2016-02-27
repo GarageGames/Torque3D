@@ -282,7 +282,7 @@ float4 main( ConnectData IN ) : COLOR
    foamColor.rgb *= FOAM_OPACITY * foamAmt * foamColor.a;
 
    // Get reflection map color.
-   float4 refMapColor = hdrDecode( tex2D( reflectMap, reflectCoord ) );  
+   float4 refMapColor = tex2D( reflectMap, reflectCoord );  
    
    // If we do not have a reflection texture then we use the cubemap.
    refMapColor = lerp( refMapColor, texCUBE( skyMap, reflectionVec ), NO_REFLECT );
