@@ -137,11 +137,13 @@ protected:
    GFXStateBlockRef mOffscreenBlocks[ParticleRenderInst::BlendStyle_COUNT];
    GFXStateBlockRef mBackbufferBlocks[ParticleRenderInst::BlendStyle_COUNT];
    GFXStateBlockRef mMixedResBlocks[ParticleRenderInst::BlendStyle_COUNT];
-   
+
+public:
    GFXStateBlockRef _getHighResStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getMixedResStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getOffscreenStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getCompositeStateBlock(ParticleRenderInst *ri);
+   ShaderConsts &_getShaderConsts() { return mParticleShaderConsts; };
 };
 
 

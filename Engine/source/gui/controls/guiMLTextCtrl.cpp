@@ -73,7 +73,7 @@ IMPLEMENT_CALLBACK( GuiMLTextCtrl, onURL, void, ( const char* url ),( url ),
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMLTextCtrl, onResize, void, ( const char* width, const char* maxY ),( width, maxY ),
+IMPLEMENT_CALLBACK( GuiMLTextCtrl, onResize, void, ( S32 width, S32 maxY ),( width, maxY ),
    "@brief Called whenever the control size changes.\n\n"
    "@param width The new width value for the control\n"
    "@param maxY The current maximum allowed Y value for the control\n\n"
@@ -168,7 +168,7 @@ DefineEngineMethod( GuiMLTextCtrl, scrollToTag, void, (S32 tagID),,
    object->scrollToTag( tagID );
 }
 
-DefineEngineMethod( GuiMLTextCtrl, scrollToTop, void, ( S32 param1, S32 param2),,
+DefineEngineMethod( GuiMLTextCtrl, scrollToTop, void, (),,
    "@brief Scroll to the top of the text.\n\n"
    "@tsexample\n"
    "// Inform GuiMLTextCtrl object to scroll to its top\n"
@@ -631,7 +631,7 @@ bool GuiMLTextCtrl::setCursorPosition(const S32 newPosition)
       mCursorPosition = 0;
       return true;
    }
-   else if (newPosition >= mTextBuffer.length()) 
+   else if (newPosition >= mTextBuffer.length() - 1)
    {
       mCursorPosition = mTextBuffer.length();
       return true;
@@ -669,11 +669,11 @@ void GuiMLTextCtrl::getCursorPositionAndColor(Point2I &cursorTop, Point2I &curso
 {
    S32 x = 0;
    S32 y = 0;
-   S32 height = mProfile->mFont->getHeight();
+   S32 height = (mProfile && mProfile->mFont) ? mProfile->mFont->getHeight() : 0;
    color = mProfile->mCursorColor;
    for(Line *walk = mLineList; walk; walk = walk->next)
    {
-      if ((mCursorPosition <= walk->textStart + walk->len) || (walk->next == NULL))
+      if ((mCursorPosition < walk->textStart + walk->len) || (walk->next == NULL))
       {
          // it's in the atoms on this line...
          y = walk->y;
@@ -768,7 +768,7 @@ void GuiMLTextCtrl::onMouseDown(const GuiEvent& event)
    mSelectionAnchorDropped = event.mousePoint;
    if (mSelectionAnchor < 0)
       mSelectionAnchor = 0;
-   else if (mSelectionAnchor >= mTextBuffer.length())
+   else if (mSelectionAnchor >= mTextBuffer.length() - 1)
       mSelectionAnchor = mTextBuffer.length();
 
    mVertMoveAnchorValid = false;
@@ -2133,7 +2133,7 @@ textemit:
    processEmitAtoms();
    emitNewLine(mScanPos);
    setHeight( mMaxY );
-   onResize_callback(Con::getIntArg( getWidth() ), Con::getIntArg( mMaxY ) );
+   onResize_callback( getWidth(), mMaxY );
 	
    //make sure the cursor is still visible - this handles if we're a child of a scroll ctrl...
    ensureCursorOnScreen();

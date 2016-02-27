@@ -1212,7 +1212,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
       // We're either moving out of a collapse group or moving to another one
       // Not valid for windows not previously in a group
       if( mCollapseGroup >= 0 && 
-         ( snapType == -1 || ( snapType >= 0 && mCollapseGroup != hitWindow->mCollapseGroup) ) )
+		  (snapType == -1 || (hitWindow && snapType >= 0 && mCollapseGroup != hitWindow->mCollapseGroup)))
          moveFromCollapseGroup();
       
       // No window to connect to
@@ -1294,11 +1294,13 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    
    winRect.extent.x += 1;
 
-   GFX->getDrawUtil()->drawRectFill(winRect, mProfile->mFillColor);
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
 
-   GFX->getDrawUtil()->clearBitmapModulation();
-   GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset, mBitmapBounds[topBase]);
-   GFX->getDrawUtil()->drawBitmapSR(mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[topBase+1].extent.x, offset.y),
+   drawUtil->drawRectFill(winRect, mProfile->mFillColor);
+
+   drawUtil->clearBitmapModulation();
+   drawUtil->drawBitmapSR(mTextureObject, offset, mBitmapBounds[topBase]);
+   drawUtil->drawBitmapSR(mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[topBase+1].extent.x, offset.y),
                    mBitmapBounds[topBase + 1]);
 
    RectI destRect;
@@ -1308,7 +1310,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    destRect.extent.y = mBitmapBounds[topBase + 2].extent.y;
    RectI stretchRect = mBitmapBounds[topBase + 2];
    stretchRect.inset(1,0);
-   GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+   drawUtil->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
 
    destRect.point.x = offset.x;
    destRect.point.y = offset.y + mBitmapBounds[topBase].extent.y;
@@ -1316,7 +1318,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    destRect.extent.y = getHeight() - mBitmapBounds[topBase].extent.y - mBitmapBounds[BorderBottomLeft].extent.y;
    stretchRect = mBitmapBounds[BorderLeft];
    stretchRect.inset(0,1);
-   GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+   drawUtil->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
 
    destRect.point.x = offset.x + getWidth() - mBitmapBounds[BorderRight].extent.x;
    destRect.extent.x = mBitmapBounds[BorderRight].extent.x;
@@ -1325,10 +1327,10 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    stretchRect = mBitmapBounds[BorderRight];
    stretchRect.inset(0,1);
-   GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+   drawUtil->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
 
-   GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset + Point2I(0, getHeight() - mBitmapBounds[BorderBottomLeft].extent.y), mBitmapBounds[BorderBottomLeft]);
-   GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset + getExtent() - mBitmapBounds[BorderBottomRight].extent, mBitmapBounds[BorderBottomRight]);
+   drawUtil->drawBitmapSR(mTextureObject, offset + Point2I(0, getHeight() - mBitmapBounds[BorderBottomLeft].extent.y), mBitmapBounds[BorderBottomLeft]);
+   drawUtil->drawBitmapSR(mTextureObject, offset + getExtent() - mBitmapBounds[BorderBottomRight].extent, mBitmapBounds[BorderBottomRight]);
 
    destRect.point.x = offset.x + mBitmapBounds[BorderBottomLeft].extent.x;
    destRect.extent.x = getWidth() - mBitmapBounds[BorderBottomLeft].extent.x - mBitmapBounds[BorderBottomRight].extent.x;
@@ -1338,13 +1340,13 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    stretchRect = mBitmapBounds[BorderBottom];
    stretchRect.inset(1,0);
 
-   GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+   drawUtil->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
 
    // Draw the title
    // dhc addition: copied/modded from renderJustifiedText, since we enforce a
    // different color usage here. NOTE: it currently CAN overdraw the controls
    // if mis-positioned or 'scrunched' in a small width.
-   GFX->getDrawUtil()->setBitmapModulation(mProfile->mFontColor);
+   drawUtil->setBitmapModulation(mProfile->mFontColor);
    S32 textWidth = mProfile->mFont->getStrWidth((const UTF8 *)mText);
    Point2I start(0,0);
 
@@ -1359,7 +1361,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    if( textWidth > winRect.extent.x ) start.set( 0, 0 );
    // center the vertical
 //   start.y = ( winRect.extent.y - ( font->getHeight() - 2 ) ) / 2;
-   GFX->getDrawUtil()->drawText( mProfile->mFont, start + offset + mProfile->mTextOffset, mText );
+   drawUtil->drawText( mProfile->mFont, start + offset + mProfile->mTextOffset, mText );
 
    // Deal with rendering the titlebar controls
    AssertFatal(root, "Unable to get the root GuiCanvas.");
@@ -1378,8 +1380,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
             bmp += BmpHilite;
       }
 
-      GFX->getDrawUtil()->clearBitmapModulation();
-      GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset + mCloseButton.point, mBitmapBounds[bmp]);
+      drawUtil->clearBitmapModulation();
+      drawUtil->drawBitmapSR(mTextureObject, offset + mCloseButton.point, mBitmapBounds[bmp]);
    }
 
    // Draw the maximize button
@@ -1397,8 +1399,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
             bmp += BmpHilite;
       }
 
-      GFX->getDrawUtil()->clearBitmapModulation();
-      GFX->getDrawUtil()->drawBitmapSR( mTextureObject, offset + mMaximizeButton.point, mBitmapBounds[bmp] );
+      drawUtil->clearBitmapModulation();
+      drawUtil->drawBitmapSR( mTextureObject, offset + mMaximizeButton.point, mBitmapBounds[bmp] );
    }
 
    // Draw the minimize button
@@ -1416,8 +1418,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
             bmp += BmpHilite;
       }
 
-      GFX->getDrawUtil()->clearBitmapModulation();
-      GFX->getDrawUtil()->drawBitmapSR( mTextureObject, offset + mMinimizeButton.point, mBitmapBounds[bmp] );
+      drawUtil->clearBitmapModulation();
+      drawUtil->drawBitmapSR( mTextureObject, offset + mMinimizeButton.point, mBitmapBounds[bmp] );
    }
 
    if( !mMinimized )

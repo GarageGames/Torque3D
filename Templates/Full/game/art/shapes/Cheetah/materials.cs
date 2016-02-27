@@ -29,6 +29,7 @@ singleton Material(Cheetah_Main)
    translucentBlendOp = "None";
    normalMap[0] = "art/shapes/Cheetah/Cheetah_N";
    specularMap[0] = "art/shapes/Cheetah/Cheetah_S";
+   castDynamicShadows = true;
 };
 
 singleton Material(Cheetah_TailLights)

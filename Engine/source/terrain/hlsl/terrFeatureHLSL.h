@@ -37,6 +37,10 @@ class TerrainFeatHLSL : public ShaderFeatureHLSL
 {
 protected:
 
+   ShaderIncludeDependency mTorqueDep;
+
+public:
+   TerrainFeatHLSL();
    Var* _getInDetailCoord(Vector<ShaderComponent*> &componentList );
 
    Var* _getInMacroCoord(Vector<ShaderComponent*> &componentList );

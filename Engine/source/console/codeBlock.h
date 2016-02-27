@@ -129,7 +129,7 @@ public:
    /// with, zero being the top of the stack. If the the index is
    /// -1 a new frame is created. If the index is out of range the
    /// top stack frame is used.
-   const char *compileExec(StringTableEntry fileName, const char *script, 
+   ConsoleValueRef compileExec(StringTableEntry fileName, const char *script, 
       bool noCalls, S32 setFrame = -1 );
 
    /// Executes the existing code in the CodeBlock. The return string is any 

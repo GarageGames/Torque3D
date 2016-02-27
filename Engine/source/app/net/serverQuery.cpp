@@ -240,6 +240,7 @@ struct ServerFilter
 
    ServerFilter()
    {
+      type = Normal;
       queryFlags = 0;
       gameType = NULL;
       missionType = NULL;
@@ -1336,7 +1337,7 @@ static void processPingsAndQueries( U32 session, bool schedule )
       else
          dSprintf( msg, sizeof( msg ), "%d servers found.", foundCount );
 
-      Con::executef( "onServerQueryStatus", "done", msg, "1");
+      Con::executef( "onServerQueryStatus", "done", (const char*)msg, "1");
    }
 }
 

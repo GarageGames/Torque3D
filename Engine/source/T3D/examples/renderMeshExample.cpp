@@ -269,7 +269,7 @@ void RenderMeshExample::prepRenderImage( SceneRenderState *state )
       createGeometry();
 
    // If we have no material then skip out.
-   if ( !mMaterialInst )
+   if ( !mMaterialInst || !state)
       return;
 
    // If we don't have a material instance after the override then 

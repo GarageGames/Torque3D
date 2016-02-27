@@ -1040,7 +1040,7 @@ new SimGroup(MissionGroup) {
       scale = "1 1 1";
       canSave = "1";
       canSaveDynamicFields = "1";
-      dataFile = "levels/outpost.forest";
+      dataFile = "levels/Outpost.forest";
       lodReflectScalar = "2";
    };
    new WheeledVehicle() {
@@ -1277,7 +1277,7 @@ new SimGroup(MissionGroup) {
       };
    };
    new TSStatic() {
-      shapeName = "art/shapes/trees/defaulttree/defaulttree.dae";
+      shapeName = "art/shapes/trees/defaulttree/defaulttree.DAE";
       playAmbient = "1";
       meshCulling = "0";
       originSort = "0";

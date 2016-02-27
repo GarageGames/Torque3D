@@ -153,7 +153,7 @@ ConsoleDocClass( RigidShape,
 );
 
 
-IMPLEMENT_CALLBACK( RigidShape, onEnterLiquid, void, ( const char* objId, const char* waterCoverage, const char* liquidType ),
+IMPLEMENT_CALLBACK( RigidShape, onEnterLiquid, void, ( const char* objId, F32 waterCoverage, const char* liquidType ),
 													 ( objId, waterCoverage, liquidType ),
    "@brief Called whenever this RigidShape object enters liquid.\n\n"
    "@param objId The ID of the rigidShape object.\n"
@@ -1088,7 +1088,7 @@ void RigidShape::updatePos(F32 dt)
       // Water script callbacks      
       if (!inLiquid && mWaterCoverage != 0.0f) 
       {
-         onEnterLiquid_callback(getIdString(), Con::getFloatArg(mWaterCoverage), mLiquidType.c_str() );
+         onEnterLiquid_callback(getIdString(), mWaterCoverage, mLiquidType.c_str() );
          inLiquid = true;
       }
       else if (inLiquid && mWaterCoverage == 0.0f) 

@@ -14,7 +14,9 @@ public:
 
    ~GLFenceRange()
    {
-      AssertFatal( mSync == 0, "");
+      //the order of creation/destruction of static variables is indetermined... depends on detail of the build
+      //looks like for some reason on windows + sdl + opengl the order make invalid / wrong the process TODO: Refactor -LAR
+      //AssertFatal( mSync == 0, "");
    }
 
    void init(U32 start, U32 end)
@@ -87,7 +89,9 @@ public:
 
    ~GLOrderedFenceRangeManager( )
    {
-      waitAllRanges( );
+      //the order of creation/destruction of static variables is indetermined... depends on detail of the build
+      //looks like for some reason on windows + sdl + opengl the order make invalid / wrong the process TODO: Refactor -LAR
+      //waitAllRanges( );
    }
 
    void protectOrderedRange( U32 start, U32 end )
@@ -137,6 +141,11 @@ public:
       : mBinding(binding), mBufferName(0), mBufferPtr(NULL), mBufferSize(0), mBufferFreePos(0), mCurrectUsedRangeStart(0)
    { 
       init();
+   }
+
+   ~GLCircularVolatileBuffer()
+   {
+      glDeleteBuffers(1, &mBufferName);
    }
 
    void init()

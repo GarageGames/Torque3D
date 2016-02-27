@@ -754,6 +754,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->transZWriteCheckBox.setValue((%material).translucentZWrite);
    MaterialEditorPropertiesWindow-->alphaTestCheckBox.setValue((%material).alphaTest);
    MaterialEditorPropertiesWindow-->castShadows.setValue((%material).castShadows);
+   MaterialEditorPropertiesWindow-->castDynamicShadows.setValue((%material).castDynamicShadows);
    MaterialEditorPropertiesWindow-->translucentCheckbox.setValue((%material).translucent);
    
    switch$((%material).translucentBlendOp)

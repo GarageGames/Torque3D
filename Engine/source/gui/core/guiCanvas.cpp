@@ -36,6 +36,7 @@
 #include "gfx/video/videoCapture.h"
 #include "lighting/lightManager.h"
 #include "core/strings/stringUnit.h"
+#include "gui/core/guiOffscreenCanvas.h"
 
 #ifndef TORQUE_TGB_ONLY
 #include "scene/sceneObject.h"
@@ -126,7 +127,8 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mMouseDownPoint(0.0f,0.0f),
                         mPlatformWindow(NULL),
                         mLastRenderMs(0),
-                        mDisplayWindow(true)
+                        mDisplayWindow(true),
+                        mMenuBarCtrl(NULL)
 {
    setBounds(0, 0, 640, 480);
    mAwake = true;
@@ -142,23 +144,12 @@ GuiCanvas::GuiCanvas(): GuiControl(),
 #else
    mNumFences = 0;
 #endif
-
-#ifdef TORQUE_DEMO_PURCHASE
-   mPurchaseScreen = NULL;
-#endif
 }
 
 GuiCanvas::~GuiCanvas()
 {
    SAFE_DELETE(mPlatformWindow);
    SAFE_DELETE_ARRAY( mFences );
-
-#ifdef TORQUE_DEMO_PURCHASE
- //  if (mPurchaseScreen)
- //  {
- //     SAFE_DELETE(mPurchaseScreen);
- //  }
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -280,13 +271,6 @@ bool GuiCanvas::onAdd()
    // Define the menu bar for this canvas (if any)
    Con::executef(this, "onCreateMenu");
 
-#ifdef TORQUE_DEMO_PURCHASE
-   mPurchaseScreen = new PurchaseScreen;
-   mPurchaseScreen->init();
-
-   mLastPurchaseHideTime = 0;
-#endif
-
    Sim::findObject("PlatformGenericMenubar", mMenuBarCtrl);
 
    return parentRet;
@@ -294,11 +278,6 @@ bool GuiCanvas::onAdd()
 
 void GuiCanvas::onRemove()
 {
-#ifdef TORQUE_DEMO_PURCHASE
-   if (mPurchaseScreen && mPurchaseScreen->isAwake())
-      removeObject(mPurchaseScreen);
-#endif
-
    // And the process list
    Process::remove(this, &GuiCanvas::paint);
 
@@ -342,8 +321,11 @@ void GuiCanvas::setWindowTitle(const char *newTitle)
       mPlatformWindow->setCaption(newTitle);
 }
 
+CanvasSizeChangeSignal GuiCanvas::smCanvasSizeChangeSignal;
+
 void GuiCanvas::handleResize( WindowId did, S32 width, S32 height )
 {
+   getCanvasSizeChangeSignal().trigger(this);
 	if (Journal::IsPlaying() && mPlatformWindow)
 	{
 		mPlatformWindow->lockSize(false);
@@ -506,6 +488,55 @@ bool GuiCanvas::isCursorShown()
    }
 
    return mPlatformWindow->isCursorVisible();
+}
+
+void GuiCanvas::cursorClick(S32 buttonId, bool isDown)
+{
+   InputEventInfo inputEvent;
+   inputEvent.deviceType = MouseDeviceType;
+   inputEvent.deviceInst = 0;
+   inputEvent.objType    = SI_BUTTON;
+   inputEvent.objInst    = (InputObjectInstances)(KEY_BUTTON0 + buttonId);
+   inputEvent.modifier   = (InputModifiers)0;
+   inputEvent.ascii      = 0;
+   inputEvent.action     = isDown ? SI_MAKE : SI_BREAK;
+   inputEvent.fValue     = isDown ? 1.0 : 0.0;
+
+   processMouseEvent(inputEvent);
+}
+
+void GuiCanvas::cursorNudge(F32 x, F32 y)
+{
+   // Generate a base Movement along and Axis event
+   InputEventInfo inputEvent;
+   inputEvent.deviceType = MouseDeviceType;
+   inputEvent.deviceInst = 0;
+   inputEvent.objType    = SI_AXIS;
+   inputEvent.modifier   = (InputModifiers)0;
+   inputEvent.ascii      = 0;
+
+   // Generate delta movement along each axis
+   Point2F cursDelta(x, y);
+
+   // If X axis changed, generate a relative event
+   if(mFabs(cursDelta.x) > 0.1)
+   {
+      inputEvent.objInst    = SI_XAXIS;
+      inputEvent.action     = SI_MOVE;
+      inputEvent.fValue     = cursDelta.x;
+      processMouseEvent(inputEvent);
+   }
+
+   // If Y axis changed, generate a relative event
+   if(mFabs(cursDelta.y) > 0.1)
+   {
+      inputEvent.objInst    = SI_YAXIS;
+      inputEvent.action     = SI_MOVE;
+      inputEvent.fValue     = cursDelta.y;
+      processMouseEvent(inputEvent);
+   }
+
+   processMouseEvent(inputEvent);
 }
 
 void GuiCanvas::addAcceleratorKey(GuiControl *ctrl, U32 index, U32 keyCode, U32 modifier)
@@ -708,14 +739,22 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
    //
    //    'mCursorPt' basically is an accumulation of errors and the number of bugs that have cropped up with
    //    the GUI clicking stuff where it is not supposed to are probably all to blame on this.
-   
-   // Need to query platform for specific things
-   AssertISV(mPlatformWindow, "GuiCanvas::processMouseEvent - no window present!");
-   PlatformCursorController *pController = mPlatformWindow->getCursorController();
-   AssertFatal(pController != NULL, "GuiCanvas::processInputEvent - No Platform Controller Found")
 
-      //copy the modifier into the new event
-      mLastEvent.modifier = inputEvent.modifier;
+   S32 mouseDoubleClickWidth = 12;
+   S32 mouseDoubleClickHeight = 12;
+   U32 mouseDoubleClickTime = 500;
+
+   // Query platform for mouse info if its available
+   PlatformCursorController *pController = mPlatformWindow ? mPlatformWindow->getCursorController() : NULL;
+   if (pController)
+   {
+      mouseDoubleClickWidth = pController->getDoubleClickWidth();
+      mouseDoubleClickHeight = pController->getDoubleClickHeight();
+      mouseDoubleClickTime = pController->getDoubleClickTime();
+   }
+
+   //copy the modifier into the new event
+   mLastEvent.modifier = inputEvent.modifier;
 
    if(inputEvent.objType == SI_AXIS && 
       (inputEvent.objInst == SI_XAXIS || inputEvent.objInst == SI_YAXIS))
@@ -747,7 +786,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
       // moving too much.
       Point2F movement = mMouseDownPoint - mCursorPt;
 
-      if ((mAbs((S32)movement.x) > pController->getDoubleClickWidth()) || (mAbs((S32)movement.y) > pController->getDoubleClickHeight() ) )
+      if ((mAbs((S32)movement.x) > mouseDoubleClickWidth) || (mAbs((S32)movement.y) > mouseDoubleClickHeight ) )
       {
          mLeftMouseLast   = false;
          mMiddleMouseLast = false;
@@ -799,7 +838,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
             if (mLeftMouseLast)
             {
                //if it was within the double click time count the clicks
-               if (curTime - mLastMouseDownTime <= pController->getDoubleClickTime())
+               if (curTime - mLastMouseDownTime <= mouseDoubleClickTime)
                   mLastMouseClickCount++;
                else
                   mLastMouseClickCount = 1;
@@ -833,7 +872,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
             if (mRightMouseLast)
             {
                //if it was within the double click time count the clicks
-               if (curTime - mLastMouseDownTime <= pController->getDoubleClickTime())
+               if (curTime - mLastMouseDownTime <= mouseDoubleClickTime)
                   mLastMouseClickCount++;
                else
                   mLastMouseClickCount = 1;
@@ -864,7 +903,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
             if (mMiddleMouseLast)
             {
                //if it was within the double click time count the clicks
-               if (curTime - mLastMouseDownTime <= pController->getDoubleClickTime())
+               if (curTime - mLastMouseDownTime <= mouseDoubleClickTime)
                   mLastMouseClickCount++;
                else
                   mLastMouseClickCount = 1;
@@ -1303,11 +1342,6 @@ bool GuiCanvas::rootMouseWheelDown(const GuiEvent &event)
 
 void GuiCanvas::setContentControl(GuiControl *gui)
 {
-#ifdef TORQUE_DEMO_PURCHASE
-   if (mPurchaseScreen->isForceExit())
-      return;
-#endif
-
    // Skip out if we got passed NULL (why would that happen?)
    if(!gui)
       return;
@@ -1376,11 +1410,6 @@ GuiControl *GuiCanvas::getContentControl()
 
 void GuiCanvas::pushDialogControl(GuiControl *gui, S32 layer, bool center)
 {
-#ifdef TORQUE_DEMO_PURCHASE
-   if (mPurchaseScreen->isForceExit())
-      return;
-#endif
-
    if( center )
       gui->setPosition( getExtent().x / 2 - gui->getExtent().x / 2,
                         getExtent().y / 2 - gui->getExtent().y / 2 );
@@ -1768,6 +1797,21 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
 
    PROFILE_END();
 
+   // Render all offscreen canvas objects here since we may need them in the render loop
+   if (GuiOffscreenCanvas::sList.size() != 0)
+   {
+      // Reset the entire state since oculus shit will have barfed it.
+      GFX->disableShaders(true);
+      GFX->updateStates(true);
+
+      for (Vector<GuiOffscreenCanvas*>::iterator itr = GuiOffscreenCanvas::sList.begin(); itr != GuiOffscreenCanvas::sList.end(); itr++)
+      {
+         (*itr)->renderFrame(false, false);
+      }
+
+      GFX->setActiveRenderTarget(renderTarget);
+   }
+
    // Can't render if waiting for device to reset.   
    if ( !beginSceneRes )
    {      
@@ -1882,10 +1926,6 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    // this situation is necessary because it needs to take the screenshot
    // before the buffers swap
 
-#ifdef TORQUE_DEMO_TIMEOUT
-   checkTimeOut();
-#endif  
-
    PROFILE_END();
 
    // Fence logic here, because this is where endScene is called.
@@ -1907,7 +1947,8 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    PROFILE_START(GFXEndScene);
    GFX->endScene();
    PROFILE_END();
-
+   
+   GFX->getDeviceEventSignal().trigger( GFXDevice::dePostFrame );
    swapBuffers();
 
    GuiCanvas::getGuiCanvasFrameSignal().trigger(false);
@@ -2723,7 +2764,7 @@ DefineConsoleMethod( GuiCanvas, setVideoMode, void,
    // aren't specified, just leave them at whatever they were set to.
    if (bitDepth > 0)
    {
-      vm.bitDepth = refreshRate;
+      vm.bitDepth = bitDepth;
    }
 
    if (refreshRate > 0)
@@ -2760,4 +2801,17 @@ ConsoleMethod( GuiCanvas, hideWindow, void, 2, 2, "" )
    object->getPlatformWindow()->hide();
    WindowManager->setDisplayWindow(false);
    object->getPlatformWindow()->setDisplayWindow(false);
+}
+
+ConsoleMethod( GuiCanvas, cursorClick, void, 4, 4, "button, isDown" )
+{
+   const S32 buttonId = dAtoi(argv[2]);
+   const bool isDown = dAtob(argv[3]);
+
+   object->cursorClick(buttonId, isDown);
+}
+
+ConsoleMethod( GuiCanvas, cursorNudge, void, 4, 4, "x, y" )
+{
+   object->cursorNudge(dAtof(argv[2]), dAtof(argv[3]));
 }

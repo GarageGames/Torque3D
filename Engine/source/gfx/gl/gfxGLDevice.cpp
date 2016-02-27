@@ -82,20 +82,25 @@ void loadGLExtensions(void *context)
 }
 
 void STDCALL glDebugCallback(GLenum source, GLenum type, GLuint id,
-   GLenum severity, GLsizei length, const GLchar* message, void* userParam)
+    GLenum severity, GLsizei length, const GLchar* message, void* userParam)
 {
-#if defined(TORQUE_DEBUG) && !defined(TORQUE_DEBUG_GFX)
-	if( type == GL_DEBUG_TYPE_OTHER_ARB ) 
-		return;
-#endif
-
-   Con::errorf("OPENGL: %s", message);
+    if (severity == GL_DEBUG_SEVERITY_HIGH)
+        Con::errorf("OPENGL: %s", message);
+    else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
+        Con::warnf("OPENGL: %s", message);
+    else if (severity == GL_DEBUG_SEVERITY_LOW)
+        Con::printf("OPENGL: %s", message);
 }
 
 void STDCALL glAmdDebugCallback(GLuint id, GLenum category, GLenum severity, GLsizei length,
-   const GLchar* message,GLvoid* userParam)
+    const GLchar* message, GLvoid* userParam)
 {
-   Con::errorf("OPENGL: %s",message);
+    if (severity == GL_DEBUG_SEVERITY_HIGH)
+        Con::errorf("AMDOPENGL: %s", message);
+    else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
+        Con::warnf("AMDOPENGL: %s", message);
+    else if (severity == GL_DEBUG_SEVERITY_LOW)
+        Con::printf("AMDOPENGL: %s", message);
 }
 
 
@@ -350,23 +355,47 @@ GFXPrimitiveBuffer* GFXGLDevice::findVolatilePBO(U32 numIndices, U32 numPrimitiv
 GFXVertexBuffer *GFXGLDevice::allocVertexBuffer(   U32 numVerts, 
                                                    const GFXVertexFormat *vertexFormat, 
                                                    U32 vertSize, 
-                                                   GFXBufferType bufferType ) 
+                                                   GFXBufferType bufferType,
+                                                   void* data )  
 {
    if(bufferType == GFXBufferTypeVolatile)
       return findVolatileVBO(numVerts, vertexFormat, vertSize);
          
    GFXGLVertexBuffer* buf = new GFXGLVertexBuffer( GFX, numVerts, vertexFormat, vertSize, bufferType );
-   buf->registerResourceWithDevice(this);
+   buf->registerResourceWithDevice(this);   
+
+   if(data)
+   {
+      void* dest;
+      buf->lock(0, numVerts, &dest);
+      dMemcpy(dest, data, vertSize * numVerts);
+      buf->unlock();
+   }
+
    return buf;
 }
 
-GFXPrimitiveBuffer *GFXGLDevice::allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType ) 
+GFXPrimitiveBuffer *GFXGLDevice::allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType, void* data ) 
 {
+   GFXPrimitiveBuffer* buf;
+   
    if(bufferType == GFXBufferTypeVolatile)
-      return findVolatilePBO(numIndices, numPrimitives);
-         
-   GFXGLPrimitiveBuffer* buf = new GFXGLPrimitiveBuffer(GFX, numIndices, numPrimitives, bufferType);
-   buf->registerResourceWithDevice(this);
+   {
+      buf = findVolatilePBO(numIndices, numPrimitives);
+   }
+   else
+   {
+      buf = new GFXGLPrimitiveBuffer(GFX, numIndices, numPrimitives, bufferType);
+      buf->registerResourceWithDevice(this);
+   }
+   
+   if(data)
+   {
+      void* dest;
+      buf->lock(0, numIndices, &dest);
+      dMemcpy(dest, data, sizeof(U16) * numIndices);
+      buf->unlock();
+   }
    return buf;
 }
 
@@ -806,9 +835,9 @@ GFXShader* GFXGLDevice::createShader()
    return shader;
 }
 
-void GFXGLDevice::setShader( GFXShader *shader )
+void GFXGLDevice::setShader(GFXShader *shader, bool force)
 {
-   if(mCurrentShader == shader)
+   if(mCurrentShader == shader && !force)
       return;
 
    if ( shader )

@@ -64,19 +64,17 @@ public:
 
 
 #ifdef TORQUE_ENABLE_ASSERTS
-   /*!
-      Assert that the statement x is true, and continue processing.
+/*!
+   Assert that the statement x is true, and continue processing.
 
-      If the statment x is true, continue processing.
+   If the statment x is true, continue processing.
 
-      If the statement x is false, log the file and line where the assert occured,
-      the message y and continue processing.
+   If the statement x is false, log the file and line where the assert occured,
+   the message y and continue processing.
 
-      These asserts are only present in DEBUG builds.
-    */
-   #define AssertWarn(x, y)      \
-         { if ((x)==0) \
-            ::PlatformAssert::processAssert(::PlatformAssert::Warning, __FILE__, __LINE__,  y); }
+   These asserts are only present in DEBUG builds.
+   */
+#define AssertWarn(x, y) (void)(!!(x) || ::PlatformAssert::processAssert(::PlatformAssert::Warning, __FILE__, __LINE__,  y))
 
    /*!
       Helper macro called when AssertFatal failed.
@@ -86,27 +84,27 @@ public:
       #define ON_FAIL_ASSERTFATAL
    #endif
 
-   /*!
-      Assert that the statement x is true, otherwise halt.
+/*!
+   Assert that the statement x is true, otherwise halt.
 
-      If the statement x is true, continue processing.
+   If the statement x is true, continue processing.
 
-      If the statement x is false, log the file and line where the assert occured,
-      the message y and displaying a dialog containing the message y. The user then
-      has the option to halt or continue causing the debugger to break.
+   If the statement x is false, log the file and line where the assert occured,
+   the message y and displaying a dialog containing the message y. The user then
+   has the option to halt or continue causing the debugger to break.
 
-      These asserts are only present in DEBUG builds.
+   These asserts are only present in DEBUG builds.
 
-      This assert is very useful for verifying data as well as function entry and
-      exit conditions.
-    */
-   #define AssertFatal(x, y)         \
-      { if (((bool)(x))==false) \
-         { if ( ::PlatformAssert::processAssert(::PlatformAssert::Fatal, __FILE__, __LINE__,  y) ) { ::Platform::debugBreak(); } } } 
+   This assert is very useful for verifying data as well as function entry and
+   exit conditions.
+   */
+#define AssertFatal(x, y) ((!(x) && ::PlatformAssert::processAssert(::PlatformAssert::Fatal, __FILE__, __LINE__,  y)) ? ::Platform::debugBreak() : (void)0)                                                                  \
 
 #else
-   #define AssertFatal(x, y)   { TORQUE_UNUSED(x); TORQUE_UNUSED(y); }
-   #define AssertWarn(x, y)    { TORQUE_UNUSED(x); TORQUE_UNUSED(y); }
+
+#define AssertFatal(x, y) TORQUE_UNUSED(x)
+#define AssertWarn(x, y)  TORQUE_UNUSED(x)
+
 #endif
 
 /*!
@@ -121,10 +119,7 @@ public:
    This assert should only be used for rare conditions where the application cannot continue
    execution without seg-faulting and you want to display a nice exit message.
  */
-#define AssertISV(x, y)  \
-   { if ((x)==0)         \
-{ if ( ::PlatformAssert::processAssert(::PlatformAssert::Fatal_ISV, __FILE__, __LINE__,  y) ) { ::Platform::debugBreak(); } } }
-
+#define AssertISV(x, y) ((!(x) && ::PlatformAssert::processAssert(::PlatformAssert::Fatal_ISV, __FILE__, __LINE__,  y)) ? ::Platform::debugBreak() : (void)0)                                                                  \
 
 /*!
    Sprintf style string formating into a fixed temporary buffer.

@@ -24,6 +24,7 @@
 
 #include "platform/menus/popupMenu.h"
 #include "platformWin32/platformWin32.h"
+#include "console/engineAPI.h"
 #include "console/consoleTypes.h"
 #include "gui/core/guiCanvas.h"
 #include "windowManager/platformWindowMgr.h"

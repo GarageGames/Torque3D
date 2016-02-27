@@ -28,6 +28,8 @@
 #include <windows.h>
 #include <dbghelp.h>
 
+#include "platform/types.h"
+
 class StackWalker
 {
 public:

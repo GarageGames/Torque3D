@@ -37,6 +37,7 @@
 #include "math/mEase.h"
 #include "math/mathUtils.h"
 
+#include "core/strings/stringUnit.h"
 
 IMPLEMENT_SCOPE( MathTypes, Math,, "" );
 
@@ -117,7 +118,7 @@ END_IMPLEMENT_STRUCT;
 //-----------------------------------------------------------------------------
 // TypePoint2I
 //-----------------------------------------------------------------------------
-ConsoleType( Point2I, TypePoint2I, Point2I )
+ConsoleType(Point2I, TypePoint2I, Point2I, "")
 ImplementConsoleTypeCasters( TypePoint2I, Point2I )
 
 ConsoleGetType( TypePoint2I )
@@ -142,7 +143,7 @@ ConsoleSetType( TypePoint2I )
 //-----------------------------------------------------------------------------
 // TypePoint2F
 //-----------------------------------------------------------------------------
-ConsoleType( Point2F, TypePoint2F, Point2F )
+ConsoleType(Point2F, TypePoint2F, Point2F, "")
 ImplementConsoleTypeCasters( TypePoint2F, Point2F )
 
 ConsoleGetType( TypePoint2F )
@@ -167,7 +168,7 @@ ConsoleSetType( TypePoint2F )
 //-----------------------------------------------------------------------------
 // TypePoint3I
 //-----------------------------------------------------------------------------
-ConsoleType( Point3I, TypePoint3I, Point3I )
+ConsoleType(Point3I, TypePoint3I, Point3I, "")
 ImplementConsoleTypeCasters(TypePoint3I, Point3I)
 
 ConsoleGetType( TypePoint3I )
@@ -192,7 +193,7 @@ ConsoleSetType( TypePoint3I )
 //-----------------------------------------------------------------------------
 // TypePoint3F
 //-----------------------------------------------------------------------------
-ConsoleType( Point3F, TypePoint3F, Point3F )
+ConsoleType(Point3F, TypePoint3F, Point3F, "")
 ImplementConsoleTypeCasters(TypePoint3F, Point3F)
 
 ConsoleGetType( TypePoint3F )
@@ -217,7 +218,7 @@ ConsoleSetType( TypePoint3F )
 //-----------------------------------------------------------------------------
 // TypePoint4F
 //-----------------------------------------------------------------------------
-ConsoleType( Point4F, TypePoint4F, Point4F )
+ConsoleType(Point4F, TypePoint4F, Point4F, "")
 ImplementConsoleTypeCasters( TypePoint4F, Point4F )
 
 ConsoleGetType( TypePoint4F )
@@ -242,7 +243,7 @@ ConsoleSetType( TypePoint4F )
 //-----------------------------------------------------------------------------
 // TypeRectI
 //-----------------------------------------------------------------------------
-ConsoleType( RectI, TypeRectI, RectI )
+ConsoleType(RectI, TypeRectI, RectI, "")
 ImplementConsoleTypeCasters( TypeRectI, RectI )
 
 ConsoleGetType( TypeRectI )
@@ -269,7 +270,7 @@ ConsoleSetType( TypeRectI )
 //-----------------------------------------------------------------------------
 // TypeRectF
 //-----------------------------------------------------------------------------
-ConsoleType( RectF, TypeRectF, RectF )
+ConsoleType(RectF, TypeRectF, RectF, "")
 ImplementConsoleTypeCasters( TypeRectF, RectF )
 
 ConsoleGetType( TypeRectF )
@@ -296,7 +297,7 @@ ConsoleSetType( TypeRectF )
 //-----------------------------------------------------------------------------
 // TypeMatrix
 //-----------------------------------------------------------------------------
-ConsoleType( MatrixF, TypeMatrixF, MatrixF )
+ConsoleType(MatrixF, TypeMatrixF, MatrixF, "")
 ImplementConsoleTypeCasters( TypeMatrixF, MatrixF )
 
 // Oh merry confusion.  Torque stores matrices in row-major order yet to TorqueScript
@@ -339,7 +340,7 @@ ConsoleSetType( TypeMatrixF )
 //-----------------------------------------------------------------------------
 // TypeMatrixPosition
 //-----------------------------------------------------------------------------
-ConsoleType( MatrixPosition, TypeMatrixPosition, MatrixF )
+ConsoleType(MatrixPosition, TypeMatrixPosition, MatrixF, "")
 
 ConsoleGetType( TypeMatrixPosition )
 {
@@ -374,7 +375,7 @@ ConsoleSetType( TypeMatrixPosition )
 //-----------------------------------------------------------------------------
 // TypeMatrixRotation
 //-----------------------------------------------------------------------------
-ConsoleType( MatrixRotation, TypeMatrixRotation, MatrixF )
+ConsoleType(MatrixRotation, TypeMatrixRotation, MatrixF, "")
 
 ConsoleGetType( TypeMatrixRotation )
 {
@@ -419,7 +420,7 @@ ConsoleSetType( TypeMatrixRotation )
 //-----------------------------------------------------------------------------
 // TypeAngAxisF
 //-----------------------------------------------------------------------------
-ConsoleType( AngAxisF, TypeAngAxisF, AngAxisF )
+ConsoleType(AngAxisF, TypeAngAxisF, AngAxisF, "")
 ImplementConsoleTypeCasters( TypeAngAxisF, AngAxisF )
 
 ConsoleGetType( TypeAngAxisF )
@@ -458,7 +459,7 @@ ConsoleSetType( TypeAngAxisF )
 
 const TransformF TransformF::Identity( Point3F::Zero, AngAxisF( Point3F( 0, 0, 1 ), 0) );
 
-ConsoleType( TransformF, TypeTransformF, TransformF )
+ConsoleType(TransformF, TypeTransformF, TransformF, "")
 ImplementConsoleTypeCasters( TypeTransformF, TransformF )
 
 ConsoleGetType( TypeTransformF )
@@ -502,7 +503,7 @@ ConsoleSetType( TypeTransformF )
 //-----------------------------------------------------------------------------
 // TypeBox3F
 //-----------------------------------------------------------------------------
-ConsoleType( Box3F, TypeBox3F, Box3F )
+ConsoleType(Box3F, TypeBox3F, Box3F, "")
 ImplementConsoleTypeCasters( TypeBox3F, Box3F )
 
 ConsoleGetType( TypeBox3F )
@@ -539,7 +540,7 @@ ConsoleSetType( TypeBox3F )
 //-----------------------------------------------------------------------------
 // TypeEaseF
 //-----------------------------------------------------------------------------
-ConsoleType( EaseF, TypeEaseF, EaseF )
+ConsoleType(EaseF, TypeEaseF, EaseF, "")
 ImplementConsoleTypeCasters( TypeEaseF, EaseF )
 
 ConsoleGetType( TypeEaseF )
@@ -658,6 +659,66 @@ DefineConsoleFunction( VectorScale, VectorF, ( VectorF a, F32 scalar ),,
    "@ingroup Vectors" )
 {
    return a * scalar;
+}
+DefineConsoleFunction( VectorMul, VectorF, ( VectorF a, VectorF b ),,
+   "Multiplies two vectors.\n"
+   "@param a The first vector.\n"
+   "@param b The second vector.\n"
+   "@return The vector @a a * @a b.\n\n"
+   "@tsexample\n"
+	"//-----------------------------------------------------------------------------\n"
+	"//\n"
+	"// VectorMul( %a, %b );\n"
+	"//\n"
+	"// The multiplication of vector a, (ax, ay, az), and vector b, (bx, by, bz) is:\n"
+	"//\n"
+	"//     a * b = ( ax * bx, ay * by, az * bz )\n"
+	"//\n"
+	"//-----------------------------------------------------------------------------\n\n"
+
+	"%a = \"1 0 0\";\n"
+	"%b = \"0 1 0\";\n\n"
+
+	"// %r = \"( 1 * 0, 0 * 1, 0 * 0 )\";\n"
+	"// %r = \"0 0 0\";\n"
+	"%r = VectorMul( %a, %b );\n"
+   "@endtsexample\n\n"
+   "@ingroup Vectors" )
+{
+   return a * b;
+}
+
+DefineConsoleFunction( VectorDiv, VectorF, ( VectorF a, VectorF b ),,
+   "Divide two vectors.\n"
+   "@param a The first vector.\n"
+   "@param b The second vector.\n"
+   "@return The vector @a a / @a b.\n\n"
+   "@tsexample\n"
+	"//-----------------------------------------------------------------------------\n"
+	"//\n"
+	"// VectorDiv( %a, %b );\n"
+	"//\n"
+	"// The division of vector a, (ax, ay, az), and vector b, (bx, by, bz) is:\n"
+	"//\n"
+	"//     a * b = ( ax / bx, ay / by, az / bz )\n"
+	"//\n"
+	"//-----------------------------------------------------------------------------\n\n"
+
+	"%a = \"1 1 1\";\n"
+	"%b = \"2 2 2\";\n\n"
+
+	"// %r = \"( 1 / 2, 1 / 2, 1 / 2 )\";\n"
+	"// %r = \"0.5 0.5 0.5\";\n"
+	"%r = VectorDiv( %a, %b );\n"
+   "@endtsexample\n\n"
+   "@ingroup Vectors" )
+{
+   //this is kind of bad, but so is dividing by 0
+   if(b.x == 0) b.x = 0.000001f;
+   if(b.y == 0) b.y = 0.000001f;
+   if(b.z == 0) b.z = 0.000001f;
+   
+   return a / b;
 }
 
 //-----------------------------------------------------------------------------
@@ -785,6 +846,34 @@ DefineConsoleFunction( VectorDist, F32, ( VectorF a, VectorF b ),,
 {
    VectorF v = b - a;
    return v.len();
+}
+
+//-----------------------------------------------------------------------------
+
+DefineConsoleFunction( VectorMidPoint, VectorF, ( VectorF a, VectorF b ),,
+   "Gets the midpoint between the two vectors.\n"
+   "@param a The first vector.\n"
+   "@param b The second vector.\n"
+   "@return The vector (@a a + @a b) / 2.\n\n"
+   "@tsexample\n"
+      "//-----------------------------------------------------------------------------\n"
+      "//\n"
+      "// VectorMidPoint( %a, %b );\n"
+      "//\n"
+      "// The midpoint of vector a, (ax, ay, az), and vector b, (bx, by, bz) is:\n"
+      "//\n"
+	  "//     (a + b)/2 = ( (ax + bx) /2, ay + by) /2, (az + bz) /2 )\n"
+      "//\n"
+      "//-----------------------------------------------------------------------------\n"
+//      "%a = \"1 0 0\";\n"
+//      "%b = \"0 1 0\";\n\n"
+//      "// %r = \"( 1 + 0, 0 + 1, 0 + 0 )\";\n"
+//      "// %r = \"1 1 0\";\n"
+//      "%r = VectorAdd( %a, %b );\n"
+   "@endtsexample\n\n"
+   "@ingroup Vectors")
+{
+   return (a + b)/2.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -1019,7 +1108,7 @@ F32 mRandF()
    return gRandGen.randF();
 }
 
-DefineConsoleFunction( getRandom, F32, (S32 a, S32 b), (1, 0),
+DefineConsoleFunction(getRandom, F32, (S32 a, S32 b), (S32_MAX, S32_MAX),
    "( int a, int b ) "
    "@brief Returns a random number based on parameters passed in..\n\n"
    "If no parameters are passed in, getRandom() will return a float between 0.0 and 1.0. If one "
@@ -1033,21 +1122,21 @@ DefineConsoleFunction( getRandom, F32, (S32 a, S32 b), (1, 0),
    "@see setRandomSeed\n"
    "@ingroup Random" )
 {
-   if (b == 0)
-      return F32(gRandGen.randI(0,getMax( a, 0 )));
-   else
+   if (a != S32_MAX)
    {
-      if (b != 0) 
+      if (b == S32_MAX)
+         return F32(gRandGen.randI(0, getMax(a, 0)));
+      else
       {
          S32 min = a;
          S32 max = b;
-         if (min > max) 
+         if (min > max)
          {
             S32 t = min;
             min = max;
             max = t;
          }
-         return F32(gRandGen.randI(min,max));
+         return F32(gRandGen.randI(min, max));
       }
    }
    return gRandGen.randF();

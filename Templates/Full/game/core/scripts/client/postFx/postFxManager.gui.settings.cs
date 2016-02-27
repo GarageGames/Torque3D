@@ -70,6 +70,7 @@ function PostFXManager::settingsSetEnabled(%this, %bEnablePostFX)
       
       postVerbose("% - PostFX Manager - PostFX disabled");
    }
+   VolFogGlowPostFx.disable();
 }
 
 function PostFXManager::settingsEffectSetEnabled(%this, %sName, %bEnable)
@@ -298,6 +299,9 @@ function PostFXManager::settingsApplyFromPreset(%this)
    $DOFPostFx::FocusRangeMax           = $PostFXManager::Settings::DOF::FocusRangeMax;
    $DOFPostFx::BlurCurveNear           = $PostFXManager::Settings::DOF::BlurCurveNear;
    $DOFPostFx::BlurCurveFar            = $PostFXManager::Settings::DOF::BlurCurveFar;
+
+   //Vignette settings   
+   $VignettePostEffect::VMax           = $PostFXManager::Settings::Vignette::VMax;
   
    if ( $PostFXManager::forceEnableFromPresets )
    {
@@ -392,6 +396,8 @@ function PostFXManager::settingsApplyDOF(%this)
 
 function PostFXManager::settingsApplyVignette(%this)
 {
+   $PostFXManager::Settings::Vignette::VMax                 = $VignettePostEffect::VMax;
+
    postVerbose("% - PostFX Manager - Settings Saved - Vignette");   
    
 }

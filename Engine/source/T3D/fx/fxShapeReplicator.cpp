@@ -224,7 +224,7 @@ void fxShapeReplicator::CreateShapes(void)
    }
 
    // Check Shapes.
-   AssertFatal(mCurrentShapeCount==0,"Shapes already present, this should not be possible!")
+   AssertFatal(mCurrentShapeCount==0,"Shapes already present, this should not be possible!");
 
       // Check that we have a shape...
       if (!mFieldData.mShapeFile) return;

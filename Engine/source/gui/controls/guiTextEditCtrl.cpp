@@ -128,6 +128,8 @@ GuiTextEditCtrl::GuiTextEditCtrl()
 
    mActive = true;
 
+   mTextValid = true;
+
    mTextOffsetReset = true;
 
    mHistoryDirty = false;
@@ -213,7 +215,7 @@ void GuiTextEditCtrl::execConsoleCallback()
 
    // Update the console variable:
    if ( mConsoleVariable[0] )
-      Con::setVariable( mConsoleVariable, mTextBuffer.getPtr8() );
+      Con::setVariable(mConsoleVariable, mTextBuffer.getPtr8());
 }
 
 void GuiTextEditCtrl::updateHistory( StringBuffer *inTxt, bool moveIndex )
@@ -374,6 +376,8 @@ S32 GuiTextEditCtrl::calculateCursorPos( const Point2I &globalPos )
 
 void GuiTextEditCtrl::onMouseDown( const GuiEvent &event )
 {
+   if(!isActive())
+      return;
    mDragHit = false;
 
    // If we have a double click, select all text.  Otherwise
@@ -1250,14 +1254,16 @@ void GuiTextEditCtrl::onLoseFirstResponder()
    Parent::onLoseFirstResponder();
 }
 
-void GuiTextEditCtrl::onRender(Point2I offset, const RectI &updateRect)
+void GuiTextEditCtrl::onRender( Point2I offset, const RectI &updateRect )
 {
    RectI ctrlRect( offset, getExtent() );
 
    //if opaque, fill the update rect with the fill color
    if ( mProfile->mOpaque )
    {
-      if(isFirstResponder())
+      if ( !mTextValid )
+         GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorERR );
+      else if ( isFirstResponder() )
          GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorHL );
       else
          GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColor );
@@ -1265,7 +1271,11 @@ void GuiTextEditCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    //if there's a border, draw the border
    if ( mProfile->mBorder )
+   {
       renderBorder( ctrlRect, mProfile );
+      if ( !mTextValid )
+         GFX->getDrawUtil()->drawRectFill( ctrlRect, mProfile->mFillColorERR );
+   }
 
    drawText( ctrlRect, isFirstResponder() );
 }
@@ -1488,7 +1498,25 @@ void GuiTextEditCtrl::drawText( const RectI &drawRect, bool isFocused )
 
 bool GuiTextEditCtrl::hasText()
 {
-   return (mTextBuffer.length());
+   return ( mTextBuffer.length() );
+}
+
+void GuiTextEditCtrl::invalidText(bool playSound)
+{
+   mTextValid = false;
+
+   if ( playSound )
+      playDeniedSound();
+}
+
+void GuiTextEditCtrl::validText()
+{
+   mTextValid = true;
+}
+
+bool GuiTextEditCtrl::isValidText()
+{
+   return mTextValid;
 }
 
 void GuiTextEditCtrl::playDeniedSound()
@@ -1518,27 +1546,29 @@ void GuiTextEditCtrl::handleCharInput( U16 ascii )
    //see if it's a number field
    if ( mProfile->mNumbersOnly )
    {
-      if ( ascii == '-')
-      {
-         //a minus sign only exists at the beginning, and only a single minus sign
-         if ( mCursorPos != 0 && !isAllTextSelected() )
-         {
-            playDeniedSound();
-            return;
-         }
+	   if (ascii == '-')
+	   {
+		   //a minus sign only exists at the beginning, and only a single minus sign
+		   if (mCursorPos != 0 && !isAllTextSelected())
+		   {
+			   invalidText();
+			   return;
+		   }
 
-         if ( mInsertOn && ( mTextBuffer.getChar(0) == '-' ) ) 
-         {
-            playDeniedSound();
-            return;
-         }
-      }
-      // BJTODO: This is probably not unicode safe.
-      else if (  ascii != '.' && (ascii < '0' || ascii > '9')  )
-      {
-         playDeniedSound();
-         return;
-      }
+		   if (mInsertOn && (mTextBuffer.getChar(0) == '-'))
+		   {
+			   invalidText();
+			   return;
+		   }
+	   }
+	   // BJTODO: This is probably not unicode safe.
+	   else if (ascii != '.' && (ascii < '0' || ascii > '9'))
+	   {
+		   invalidText();
+		   return;
+	   }
+	   else
+		   validText();
    }
 
    //save the current state
@@ -1745,4 +1775,25 @@ DefineEngineMethod( GuiTextEditCtrl, forceValidateText, void, (),,
    "@see GuiControl")
 {
    object->forceValidateText();
+}
+
+DefineEngineMethod(GuiTextEditCtrl, invalidText, void, (bool playSound), (true),
+	"@brief Trigger the invalid sound and make the box red.nn"
+	"@param playSound Play the invalid text sound or not.n")
+{
+	object->invalidText(playSound);
+}
+
+
+DefineEngineMethod(GuiTextEditCtrl, validText, void, (), ,
+	"@brief Restores the box to normal color.nn")
+{
+	object->validText();
+}
+
+DefineEngineMethod(GuiTextEditCtrl, isValidText, bool, (), ,
+	"@brief Returns if the text is set to valid or not.n"
+	"@Return true if text is set to valid, false if not.nn")
+{
+	return object->isValidText();
 }

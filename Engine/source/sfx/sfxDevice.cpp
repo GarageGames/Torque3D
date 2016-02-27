@@ -36,10 +36,10 @@ SFXDevice::SFXDevice( const String& name, SFXProvider* provider, bool useHardwar
       mProvider( provider ),
       mUseHardware( useHardware ),
       mMaxBuffers( maxBuffers ),
-      mStatNumBufferBytes( 0 ),
+      mCaps( 0 ),
       mStatNumBuffers( 0 ),
       mStatNumVoices( 0 ),
-      mCaps( 0 )
+      mStatNumBufferBytes( 0 )
 {
    AssertFatal( provider, "We must have a provider pointer on device creation!" );
 

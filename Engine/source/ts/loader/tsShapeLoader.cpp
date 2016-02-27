@@ -283,11 +283,12 @@ void TSShapeLoader::recurseSubshape(AppNode* appNode, S32 parentIndex, bool recu
 
       // Create the 3space node
       shape->nodes.increment();
-      shape->nodes.last().nameIndex = shape->addName(nodeName);
-      shape->nodes.last().parentIndex = parentIndex;
-      shape->nodes.last().firstObject = -1;
-      shape->nodes.last().firstChild = -1;
-      shape->nodes.last().nextSibling = -1;
+      TSShape::Node& lastNode = shape->nodes.last();
+      lastNode.nameIndex = shape->addName(nodeName);
+      lastNode.parentIndex = parentIndex;
+      lastNode.firstObject = -1;
+      lastNode.firstChild = -1;
+      lastNode.nextSibling = -1;
 
       // Add the AppNode to a matching list (so AppNodes can be accessed using 3space
       // node indices)
@@ -323,12 +324,14 @@ void TSShapeLoader::recurseSubshape(AppNode* appNode, S32 parentIndex, bool recu
             appNode->getBool("BB::INCLUDE_POLES", includePoles);
 
             S32 detIndex = shape->addDetail( "bbDetail", size, -1 );
-            shape->details[detIndex].bbEquatorSteps = numEquatorSteps;
-            shape->details[detIndex].bbPolarSteps = numPolarSteps;
-            shape->details[detIndex].bbDetailLevel = dl;
-            shape->details[detIndex].bbDimension = dim;
-            shape->details[detIndex].bbIncludePoles = includePoles;
-            shape->details[detIndex].bbPolarAngle = polarAngle;
+
+            TSShape::Detail& detIndexDetail = shape->details[detIndex];
+            detIndexDetail.bbEquatorSteps = numEquatorSteps;
+            detIndexDetail.bbPolarSteps = numPolarSteps;
+            detIndexDetail.bbDetailLevel = dl;
+            detIndexDetail.bbDimension = dim;
+            detIndexDetail.bbIncludePoles = includePoles;
+            detIndexDetail.bbPolarAngle = polarAngle;
          }
       }
    }
@@ -462,10 +465,11 @@ void TSShapeLoader::generateObjects()
          if (!lastName || (meshNames[iMesh] != *lastName))
          {
             shape->objects.increment();
-            shape->objects.last().nameIndex = shape->addName(meshNames[iMesh]);
-            shape->objects.last().nodeIndex = subshape->objNodes[iMesh];
-            shape->objects.last().startMeshIndex = appMeshes.size();
-            shape->objects.last().numMeshes = 0;
+            TSShape::Object& lastObject = shape->objects.last();
+            lastObject.nameIndex = shape->addName(meshNames[iMesh]);
+            lastObject.nodeIndex = subshape->objNodes[iMesh];
+            lastObject.startMeshIndex = appMeshes.size();
+            lastObject.numMeshes = 0;
             lastName = &meshNames[iMesh];
          }
 
@@ -1190,10 +1194,12 @@ void TSShapeLoader::install()
       shape->meshes.push_back(NULL);
 
       shape->objects.increment();
-      shape->objects.last().nameIndex = shape->addName("dummy");
-      shape->objects.last().nodeIndex = 0;
-      shape->objects.last().startMeshIndex = 0;
-      shape->objects.last().numMeshes = 1;
+
+      TSShape::Object& lastObject = shape->objects.last();
+      lastObject.nameIndex = shape->addName("dummy");
+      lastObject.nodeIndex = 0;
+      lastObject.startMeshIndex = 0;
+      lastObject.numMeshes = 1;
 
       shape->objectStates.increment();
       shape->objectStates.last().frameIndex = 0;

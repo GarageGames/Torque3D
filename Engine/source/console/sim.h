@@ -64,7 +64,7 @@ typedef U32 SimObjectId;
 enum SimObjectsConstants
 {
    DataBlockObjectIdFirst = 3,
-   DataBlockObjectIdBitSize = 10,
+   DataBlockObjectIdBitSize = 14,
    DataBlockObjectIdLast = DataBlockObjectIdFirst + (1 << DataBlockObjectIdBitSize) - 1,
 
    MessageObjectIdFirst = DataBlockObjectIdLast + 1,
@@ -157,13 +157,13 @@ namespace Sim
    SimTime getTargetTime();
 
    /// a target time of 0 on an event means current event
-   U32 postEvent(SimObject*, SimEvent*, U32 targetTime);
+   U32 postEvent(SimObject*, SimEvent*, SimTime targetTime);
 
-   inline U32 postEvent(SimObjectId iD,SimEvent*evt, U32 targetTime)
+   inline U32 postEvent(SimObjectId iD,SimEvent*evt, SimTime targetTime)
    {
       return postEvent(findObject(iD), evt, targetTime);
    }
-   inline U32 postEvent(const char *objectName,SimEvent*evt, U32 targetTime)
+   inline U32 postEvent(const char *objectName,SimEvent*evt, SimTime targetTime)
    {
       return postEvent(findObject(objectName), evt, targetTime);
    }

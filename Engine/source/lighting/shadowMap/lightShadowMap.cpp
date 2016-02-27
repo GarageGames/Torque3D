@@ -89,24 +89,24 @@ LightShadowMap::LightShadowMap( LightInfo *light )
       mLastUpdate( 0 ),
       mLastCull( 0 ),
       mIsViewDependent( false ),
-      mVizQuery( NULL ),
-      mWasOccluded( false ),
       mLastScreenSize( 0.0f ),
-      mLastPriority( 0.0f )
+      mLastPriority( 0.0f ),
+      mIsDynamic( false )
 {
    GFXTextureManager::addEventDelegate( this, &LightShadowMap::_onTextureEvent );
 
    mTarget = GFX->allocRenderToTextureTarget();
-   mVizQuery = GFX->createOcclusionQuery();
-
    smShadowMaps.push_back( this );
+   mStaticRefreshTimer = PlatformTimer::create();
+   mDynamicRefreshTimer = PlatformTimer::create();
 }
 
 LightShadowMap::~LightShadowMap()
 {
    mTarget = NULL;
-   SAFE_DELETE( mVizQuery );   
-   
+   SAFE_DELETE(mStaticRefreshTimer);
+   SAFE_DELETE(mDynamicRefreshTimer);
+
    releaseTextures();
 
    smShadowMaps.remove( this );
@@ -268,11 +268,20 @@ GFXTextureObject* LightShadowMap::_getDepthTarget( U32 width, U32 height )
 
 bool LightShadowMap::setTextureStage( U32 currTexFlag, LightingShaderConstants* lsc )
 {
-   if ( currTexFlag == Material::DynamicLight )
+   if ( currTexFlag == Material::DynamicLight && !isDynamic() )
    {
       S32 reg = lsc->mShadowMapSC->getSamplerRegister();
-   	if ( reg != -1 )
-      	GFX->setTexture( reg, mShadowMapTex);
+
+      if ( reg != -1 )
+         GFX->setTexture( reg, mShadowMapTex);
+
+      return true;
+   } else if ( currTexFlag == Material::DynamicShadowMap && isDynamic() )
+   {
+      S32 reg = lsc->mDynamicShadowMapSC->getSamplerRegister();
+
+      if ( reg != -1 )
+         GFX->setTexture( reg, mShadowMapTex);
 
       return true;
    }
@@ -296,8 +305,18 @@ bool LightShadowMap::setTextureStage( U32 currTexFlag, LightingShaderConstants* 
 }
 
 void LightShadowMap::render(  RenderPassManager* renderPass,
-                              const SceneRenderState *diffuseState )
+                              const SceneRenderState *diffuseState,
+                              bool _dynamic)
 {
+    //  control how often shadow maps are refreshed
+    if (!_dynamic && (mStaticRefreshTimer->getElapsedMs() < getLightInfo()->getStaticRefreshFreq()))
+        return;
+    mStaticRefreshTimer->reset();
+
+    if (_dynamic && (mDynamicRefreshTimer->getElapsedMs() < getLightInfo()->getDynamicRefreshFreq()))
+        return;
+    mDynamicRefreshTimer->reset();
+
    mDebugTarget.setTexture( NULL );
    _render( renderPass, diffuseState );
    mDebugTarget.setTexture( mShadowMapTex );
@@ -310,23 +329,6 @@ void LightShadowMap::render(  RenderPassManager* renderPass,
    }
 
    mLastUpdate = Sim::getCurrentTime();
-}
-
-void LightShadowMap::preLightRender()
-{
-   PROFILE_SCOPE( LightShadowMap_prepLightRender );
-
-   if ( mVizQuery )
-   {
-      mWasOccluded = mVizQuery->getStatus( true ) == GFXOcclusionQuery::Occluded;
-      mVizQuery->begin();
-   }
-}
-
-void LightShadowMap::postLightRender()
-{
-   if ( mVizQuery )
-      mVizQuery->end();
 }
 
 BaseMatInstance* LightShadowMap::getShadowMaterial( BaseMatInstance *inMat ) const
@@ -456,25 +458,35 @@ LightingShaderConstants::LightingShaderConstants()
       mLightInvRadiusSqSC(NULL),
       mLightSpotDirSC(NULL),
       mLightSpotAngleSC(NULL),
-	  mLightSpotFalloffSC(NULL),
+      mLightSpotFalloffSC(NULL),
       mShadowMapSC(NULL), 
+      mDynamicShadowMapSC(NULL), 
       mShadowMapSizeSC(NULL), 
       mCookieMapSC(NULL),
       mRandomDirsConst(NULL),
       mShadowSoftnessConst(NULL), 
+      mAtlasXOffsetSC(NULL), 
+      mAtlasYOffsetSC(NULL),
+      mAtlasScaleSC(NULL), 
+      mFadeStartLength(NULL), 
+      mOverDarkFactorPSSM(NULL), 
+      mTapRotationTexSC(NULL),
+
       mWorldToLightProjSC(NULL), 
       mViewToLightProjSC(NULL),
       mScaleXSC(NULL), 
       mScaleYSC(NULL),
       mOffsetXSC(NULL), 
       mOffsetYSC(NULL), 
-      mAtlasXOffsetSC(NULL), 
-      mAtlasYOffsetSC(NULL),
-      mAtlasScaleSC(NULL), 
-      mFadeStartLength(NULL), 
       mFarPlaneScalePSSM(NULL),
-      mOverDarkFactorPSSM(NULL), 
-      mTapRotationTexSC(NULL)
+
+      mDynamicWorldToLightProjSC(NULL),
+      mDynamicViewToLightProjSC(NULL),
+      mDynamicScaleXSC(NULL),
+      mDynamicScaleYSC(NULL),
+      mDynamicOffsetXSC(NULL),
+      mDynamicOffsetYSC(NULL),
+      mDynamicFarPlaneScalePSSM(NULL)
 {
 }
 
@@ -513,29 +525,35 @@ void LightingShaderConstants::init(GFXShader* shader)
    mLightSpotFalloffSC = shader->getShaderConstHandle( ShaderGenVars::lightSpotFalloff );
 
    mShadowMapSC = shader->getShaderConstHandle("$shadowMap");
+   mDynamicShadowMapSC = shader->getShaderConstHandle("$dynamicShadowMap");
    mShadowMapSizeSC = shader->getShaderConstHandle("$shadowMapSize");
 
    mCookieMapSC = shader->getShaderConstHandle("$cookieMap");
 
    mShadowSoftnessConst = shader->getShaderConstHandle("$shadowSoftness");
-
-   mWorldToLightProjSC = shader->getShaderConstHandle("$worldToLightProj");
-   mViewToLightProjSC = shader->getShaderConstHandle("$viewToLightProj");
-
-   mScaleXSC = shader->getShaderConstHandle("$scaleX");
-   mScaleYSC = shader->getShaderConstHandle("$scaleY");
-   mOffsetXSC = shader->getShaderConstHandle("$offsetX");
-   mOffsetYSC = shader->getShaderConstHandle("$offsetY");
    mAtlasXOffsetSC = shader->getShaderConstHandle("$atlasXOffset");
    mAtlasYOffsetSC = shader->getShaderConstHandle("$atlasYOffset");
    mAtlasScaleSC = shader->getShaderConstHandle("$atlasScale");
 
    mFadeStartLength = shader->getShaderConstHandle("$fadeStartLength");
+   mOverDarkFactorPSSM = shader->getShaderConstHandle("$overDarkPSSM");
+   mTapRotationTexSC = shader->getShaderConstHandle( "$gTapRotationTex" );
+
+   mWorldToLightProjSC = shader->getShaderConstHandle("$worldToLightProj");
+   mViewToLightProjSC = shader->getShaderConstHandle("$viewToLightProj");
+   mScaleXSC = shader->getShaderConstHandle("$scaleX");
+   mScaleYSC = shader->getShaderConstHandle("$scaleY");
+   mOffsetXSC = shader->getShaderConstHandle("$offsetX");
+   mOffsetYSC = shader->getShaderConstHandle("$offsetY");
    mFarPlaneScalePSSM = shader->getShaderConstHandle("$farPlaneScalePSSM");
 
-   mOverDarkFactorPSSM = shader->getShaderConstHandle("$overDarkPSSM");
-
-   mTapRotationTexSC = shader->getShaderConstHandle( "$gTapRotationTex" );
+   mDynamicWorldToLightProjSC = shader->getShaderConstHandle("$dynamicWorldToLightProj");
+   mDynamicViewToLightProjSC = shader->getShaderConstHandle("$dynamicViewToLightProj");
+   mDynamicScaleXSC = shader->getShaderConstHandle("$dynamicScaleX");
+   mDynamicScaleYSC = shader->getShaderConstHandle("$dynamicScaleY");
+   mDynamicOffsetXSC = shader->getShaderConstHandle("$dynamicOffsetX");
+   mDynamicOffsetYSC = shader->getShaderConstHandle("$dynamicOffsetY");
+   mDynamicFarPlaneScalePSSM = shader->getShaderConstHandle("$dynamicFarPlaneScalePSSM");
 
    mInit = true;
 }
@@ -558,7 +576,9 @@ LightInfoExType ShadowMapParams::Type( "" );
 
 ShadowMapParams::ShadowMapParams( LightInfo *light ) 
    :  mLight( light ),
-      mShadowMap( NULL )
+      mShadowMap( NULL ),
+      mDynamicShadowMap ( NULL ),
+      isDynamic ( true )
 {
    attenuationRatio.set( 0.0f, 1.0f, 1.0f );
    shadowType = ShadowType_Spot;
@@ -570,12 +590,16 @@ ShadowMapParams::ShadowMapParams( LightInfo *light )
    shadowSoftness = 0.15f;
    fadeStartDist = 0.0f;
    lastSplitTerrainOnly = false;
+   mQuery = GFX->createOcclusionQuery();
+
    _validate();
 }
 
 ShadowMapParams::~ShadowMapParams()
 {
+   SAFE_DELETE( mQuery );
    SAFE_DELETE( mShadowMap );
+   SAFE_DELETE( mDynamicShadowMap );
 }
 
 void ShadowMapParams::_validate()
@@ -632,39 +656,55 @@ void ShadowMapParams::_validate()
    texSize = mClamp( texSize, 32, maxTexSize );
 }
 
-LightShadowMap* ShadowMapParams::getOrCreateShadowMap()
+LightShadowMap* ShadowMapParams::getOrCreateShadowMap(bool _isDynamic)
 {
-   if ( mShadowMap )
+	if (_isDynamic && mDynamicShadowMap)
+		return mDynamicShadowMap;
+
+	if (!_isDynamic && mShadowMap)
       return mShadowMap;
 
    if ( !mLight->getCastShadows() )
       return NULL;
 
+   LightShadowMap* newShadowMap = NULL;
+
    switch ( mLight->getType() )
    {
       case LightInfo::Spot:
-         mShadowMap = new SingleLightShadowMap( mLight );
+         newShadowMap = new SingleLightShadowMap( mLight );
          break;
 
       case LightInfo::Vector:
-         mShadowMap = new PSSMLightShadowMap( mLight );
+         newShadowMap = new PSSMLightShadowMap( mLight );
          break;
 
       case LightInfo::Point:
 
          if ( shadowType == ShadowType_CubeMap )
-            mShadowMap = new CubeLightShadowMap( mLight );
+            newShadowMap = new CubeLightShadowMap( mLight );
          else if ( shadowType == ShadowType_Paraboloid )
-            mShadowMap = new ParaboloidLightShadowMap( mLight );
+            newShadowMap = new ParaboloidLightShadowMap( mLight );
          else
-            mShadowMap = new DualParaboloidLightShadowMap( mLight );
+            newShadowMap = new DualParaboloidLightShadowMap( mLight );
          break;
    
       default:
          break;
    }
 
-   return mShadowMap;
+   if ( _isDynamic )
+   {
+      newShadowMap->setDynamic( true );
+      mDynamicShadowMap = newShadowMap;
+      return mDynamicShadowMap;
+   }
+   else
+   {
+      newShadowMap->setDynamic(false);
+      mShadowMap = newShadowMap;
+      return mShadowMap;
+   }
 }
 
 GFXTextureObject* ShadowMapParams::getCookieTex()
@@ -739,6 +779,7 @@ void ShadowMapParams::unpackUpdate( BitStream *stream )
       // map so it can be reallocated on the next render.
       shadowType = newType;
       SAFE_DELETE( mShadowMap );
+      SAFE_DELETE( mDynamicShadowMap );
    }
 
    mathRead( *stream, &attenuationRatio );

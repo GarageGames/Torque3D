@@ -114,11 +114,14 @@ function initializeWorldEditor()
    EVisibility.addOption( "Debug Render: Decals", "$Decals::debugRender", "" );
    EVisibility.addOption( "Debug Render: Light Frustums", "$Light::renderLightFrustums", "" );
    EVisibility.addOption( "Debug Render: Bounding Boxes", "$Scene::renderBoundingBoxes", "" );
+   EVisibility.addOption( "Debug Render: Physics World", "$PhysicsWorld::render", "togglePhysicsDebugViz" );
    EVisibility.addOption( "AL: Disable Shadows", "$Shadows::disable", "" );   
    EVisibility.addOption( "AL: Light Color Viz", "$AL_LightColorVisualizeVar", "toggleLightColorViz" );
    EVisibility.addOption( "AL: Light Specular Viz", "$AL_LightSpecularVisualizeVar", "toggleLightSpecularViz" );
    EVisibility.addOption( "AL: Normals Viz", "$AL_NormalsVisualizeVar", "toggleNormalsViz" );
    EVisibility.addOption( "AL: Depth Viz", "$AL_DepthVisualizeVar", "toggleDepthViz" );
+   EVisibility.addOption( "AL: Glow Buffer", "$AL_GlowVisualizeVar", "toggleGlowViz" );
+   EVisibility.addOption( "AL: PSSM Cascade Viz", "$AL::PSSMDebugRender", "" );
    EVisibility.addOption( "Frustum Lock", "$Scene::lockCull", "" );
    EVisibility.addOption( "Disable Zone Culling", "$Scene::disableZoneCulling", "" );
    EVisibility.addOption( "Disable Terrain Occlusion", "$Scene::disableTerrainOcclusion", "" );

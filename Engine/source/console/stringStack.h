@@ -35,8 +35,21 @@
 #include "console/console.h"
 #endif
 
+typedef U32 StringStackPtr;
+struct StringStack;
 
+/// Helper class which stores a relative pointer in the StringStack buffer
+class StringStackPtrRef
+{
+public:
+   StringStackPtrRef() : mOffset(0) {;}
+   StringStackPtrRef(StringStackPtr offset) : mOffset(offset) {;}
 
+   StringStackPtr mOffset;
+
+   /// Get pointer to string in stack stk
+   inline char *getPtr(StringStack *stk);
+};
 
 /// Core stack for interpreter operations.
 ///
@@ -127,6 +140,7 @@ struct StringStack
    /// Return a temporary buffer we can use to return data.
    char* getReturnBuffer(U32 size)
    {
+      AssertFatal(Con::isMainThread(), "Manipulating return buffer from a secondary thread!");
       validateArgBufferSize(size);
       return mArgBuffer;
    }
@@ -136,6 +150,7 @@ struct StringStack
    /// This updates the function offset.
    char *getArgBuffer(U32 size)
    {
+      AssertFatal(Con::isMainThread(), "Manipulating console arg buffer from a secondary thread!");
       validateBufferSize(mStart + mFunctionOffset + size);
       char *ret = mBuffer + mStart + mFunctionOffset;
       mFunctionOffset += size;
@@ -195,6 +210,16 @@ struct StringStack
    inline const char *getPreviousStringValue()
    {
       return mBuffer + mStartOffsets[mStartStackSize-1];
+   }
+
+   inline StringStackPtr getStringValuePtr()
+   {
+      return (getStringValue() - mBuffer);
+   }
+
+   inline StringStackPtr getPreviousStringValuePtr()
+   {
+      return (getPreviousStringValue() - mBuffer);
    }
 
    /// Advance the start stack, placing a zero length string on the top.
@@ -314,10 +339,13 @@ public:
 
    void pushVar(ConsoleValue *variable);
    void pushValue(ConsoleValue &value);
+   ConsoleValue* reserveValues(U32 numValues);
+   bool reserveValues(U32 numValues, ConsoleValueRef *values);
    ConsoleValue* pop();
 
    ConsoleValue *pushString(const char *value);
    ConsoleValue *pushStackString(const char *value);
+   ConsoleValue *pushStringStackPtr(StringStackPtr ptr);
    ConsoleValue *pushUINT(U32 value);
    ConsoleValue *pushFLT(float value);
 
@@ -337,5 +365,10 @@ public:
 
    ConsoleValueRef mArgv[MaxArgs];
 };
+
+extern StringStack STR;
+extern ConsoleValueStack CSTK;
+
+inline char* StringStackPtrRef::getPtr(StringStack *stk) { return stk->mBuffer + mOffset; }
 
 #endif

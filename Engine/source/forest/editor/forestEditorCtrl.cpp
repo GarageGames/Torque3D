@@ -97,7 +97,6 @@ void ForestEditorCtrl::onSleep()
 
 bool ForestEditorCtrl::updateActiveForest( bool createNew )
 {
-   mForest = dynamic_cast<Forest*>( Sim::findObject( "theForest" ) );
    Con::executef( this, "onActiveForestUpdated", mForest ? mForest->getIdString() : "", createNew ? "1" : "0" );  
 
    if ( mTool )
@@ -400,4 +399,13 @@ DefineConsoleMethod( ForestEditorCtrl, deleteMeshSafe, void, ( const char * obj 
 DefineConsoleMethod( ForestEditorCtrl, isDirty, bool, (), , "" )
 {
    return object->isDirty();
+}
+
+DefineConsoleMethod(ForestEditorCtrl, setActiveForest, void, (const char * obj), , "( Forest obj )")
+{
+   Forest *forestObject;
+   if (!Sim::findObject(obj, forestObject))
+      return;
+
+   object->setActiveForest(forestObject);
 }

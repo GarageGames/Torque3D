@@ -31,6 +31,7 @@ singleton Material(Turret_Base)
    pixelSpecular[0] = "1";
    specularMap[0] = "art/shapes/weapons/Turret/Turret_D.dds";
    useAnisotropic[0] = "1";
+   castDynamicShadows = true;    
    materialTag0 = "Weapon";
 };
 
@@ -53,6 +54,7 @@ singleton Material(Turret_Lazer_Base)
    waveFreq[0] = "0";
    waveAmp[0] = "0";
    castShadows = "1";
+   castDynamicShadows = true;    
    translucentZWrite = "0";
    materialTag0 = "Weapon";
    materialTag1 = "FX";
@@ -68,6 +70,7 @@ singleton Material(Turret_Lazer_Base)
    glow[0] = "1";
    emissive[0] = "1";
    translucentBlendOp = "Add";
+   castDynamicShadows = true;    
 };
 
 singleton Material(CollisionMat)

@@ -364,6 +364,9 @@ bool Platform::setClipboard(const char *text)
 XClipboard::XClipboard()
 {
    mInitialized = false;
+   mXData = 0;
+   mTData = 0;
+   mTDataSize = 0;
 }
 
 //------------------------------------------------------------------------------

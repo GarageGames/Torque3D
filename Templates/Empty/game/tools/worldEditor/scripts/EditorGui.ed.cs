@@ -561,9 +561,6 @@ function EditorGui::onWake( %this )
    
    if( %levelName !$= %this.levelName )
       %this.onNewLevelLoaded( %levelName );
-      
-   if (isObject(DemoEditorAlert) && DemoEditorAlert.helpTag<2)
-      Canvas.pushDialog(DemoEditorAlert);
 }
 
 function EditorGui::onSleep( %this )

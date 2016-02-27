@@ -90,7 +90,7 @@ public:
    virtual F32 getPixelShaderVersion() const { return mPixelShaderVersion; }
    virtual void  setPixelShaderVersion( F32 version ) { mPixelShaderVersion = version; }
    
-   virtual void setShader(GFXShader* shd);
+   virtual void setShader(GFXShader *shader, bool force = false);
    
    /// @attention GL cannot check if the given format supports blending or filtering!
    virtual GFXFormat selectSupportedFormat(GFXTextureProfile *profile,
@@ -173,8 +173,9 @@ protected:
    virtual GFXVertexBuffer *allocVertexBuffer(  U32 numVerts, 
                                                 const GFXVertexFormat *vertexFormat,
                                                 U32 vertSize, 
-                                                GFXBufferType bufferType );
-   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType );
+                                                GFXBufferType bufferType,
+                                                void* data = NULL);
+   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType, void* data = NULL );
    
    // NOTE: The GL device doesn't need a vertex declaration at
    // this time, but we need to return something to keep the system

@@ -42,7 +42,7 @@ class Module
    public:
    
       typedef void Parent;
-      friend struct ModuleManager;
+      friend struct EngineModuleManager;
       
    protected:
    
@@ -79,9 +79,9 @@ class Module
          
          Dependency( Mode mode, DependencyType type, Module* parentModule, const char* moduleName )
             : mType( type ),
-              mNext( mode == ModeInitialize ? parentModule->mInitDependencies : parentModule->mShutdownDependencies ),
               mModuleName( moduleName ),
-              mModule( NULL )
+              mModule( NULL ),
+              mNext( mode == ModeInitialize ? parentModule->mInitDependencies : parentModule->mShutdownDependencies )
          {
             if( mode == ModeInitialize )
                parentModule->mInitDependencies = this;
@@ -141,11 +141,12 @@ class Module
       }
             
       Module()
-         : mNext( smFirst ),
+         : mIsInitialized( false ),
+           mNext( smFirst ),
            mInitDependencies( NULL ),
            mShutdownDependencies( NULL ),
-           mOverrides( NULL ),
-           mIsInitialized( false )
+           mOverrides( NULL )
+
       {
          smFirst = this;
       }
@@ -332,7 +333,7 @@ class Module
    void _AfterModuleInit::initialize()
 
 
-struct ModuleManager
+struct EngineModuleManager
 {
       /// Initialize all modules registered with the system.
       static void initializeSystem();

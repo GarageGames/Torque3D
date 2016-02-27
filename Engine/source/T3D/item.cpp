@@ -292,7 +292,7 @@ IMPLEMENT_CALLBACK( Item, onStickyCollision, void, ( const char* objID ),( objID
    "@see Item, ItemData\n"
 );
 
-IMPLEMENT_CALLBACK( Item, onEnterLiquid, void, ( const char* objID, const char* waterCoverage, const char* liquidType ),( objID, waterCoverage, liquidType ),
+IMPLEMENT_CALLBACK( Item, onEnterLiquid, void, ( const char* objID, F32 waterCoverage, const char* liquidType ),( objID, waterCoverage, liquidType ),
    "Informs an Item object that it has entered liquid, along with information about the liquid type.\n"
    "@param objID Object ID for this Item object.\n"
    "@param waterCoverage How much coverage of water this Item object has.\n"
@@ -1005,7 +1005,7 @@ void Item::updatePos(const U32 /*mask*/, const F32 dt)
       {
          if(!mInLiquid && mWaterCoverage != 0.0f)
          {
-			onEnterLiquid_callback( getIdString(), Con::getFloatArg(mWaterCoverage), mLiquidType.c_str() );
+			onEnterLiquid_callback( getIdString(), mWaterCoverage, mLiquidType.c_str() );
             mInLiquid = true;
          }
          else if(mInLiquid && mWaterCoverage == 0.0f)

@@ -28,6 +28,9 @@
 #include "core/util/safeDelete.h"
 #include "windowManager/platformCursorController.h"
 #include "windowManager/windowInputGenerator.h"
+#ifndef _SIGNAL_H_ //Volumetric Fog
+#include "core/util/tSignal.h"
+#endif
 
 //forward decl's
 class PlatformWindowManager;
@@ -35,7 +38,7 @@ class GFXDevice;
 struct GFXVideoMode;
 class GFXWindowTarget;
 class IProcessInput;
-
+typedef Signal<void(PlatformWindow *PlatformWindow, bool resize)> ScreenResChangeSignal;
 /// Abstract representation of a native OS window.
 ///
 /// Every windowing system has its own representations and conventions as
@@ -110,7 +113,7 @@ protected:
       // This controller maps window input (Mouse/Keyboard) to a generic input consumer
       mWindowInputGenerator = new WindowInputGenerator( this );
    }
-
+   static ScreenResChangeSignal smScreenResChangeSignal;
 public:
 
    /// To get rid of a window, just delete it. Make sure the GFXDevice is
@@ -158,7 +161,7 @@ public:
    virtual GFXWindowTarget *getGFXTarget()=0;
 
    /// Set the video mode for this window.
-   virtual void setVideoMode(const GFXVideoMode &mode)=0;
+   virtual void setVideoMode(const GFXVideoMode &mode);
 
    /// Get our current video mode - if the window has been resized, it will
    /// reflect this.
@@ -497,6 +500,7 @@ public:
    IdleEvent         idleEvent;
 
    /// @}
+   static ScreenResChangeSignal& getScreenResChangeSignal() { return smScreenResChangeSignal; }
    
    /// Get the platform specific object needed to create or attach an accelerated
    /// graohics drawing context on or to the window
@@ -507,6 +511,7 @@ public:
    virtual void* getPlatformDrawable() const = 0;
 protected:
    virtual void _setFullscreen(const bool fullScreen) {};
+   virtual void _setVideoMode(const GFXVideoMode &mode) {};
 };
 
 #endif

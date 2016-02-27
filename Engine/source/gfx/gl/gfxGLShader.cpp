@@ -64,7 +64,7 @@ public:
 };
 
 GFXGLShaderConstHandle::GFXGLShaderConstHandle( GFXGLShader *shader )
- : mShader( shader ), mSamplerNum(-1), mInstancingConstant(false)
+ : mShader( shader ), mLocation(0), mOffset(0), mSize(0), mSamplerNum(-1), mInstancingConstant(false)
 {
    mValid = false;
 }
@@ -929,7 +929,7 @@ char* GFXGLShader::_handleIncludes( const Torque::Path& path, FileStream *s )
          dFree(includedText);
          manip.insert(q-buffer, sItx);
          char* manipBuf = dStrdup(manip.c_str());
-         p = manipBuf + (p - buffer);
+         p = manipBuf + (q - buffer);
          dFree(buffer);
          buffer = manipBuf;
       }
@@ -951,13 +951,6 @@ bool GFXGLShader::_loadShaderFromStream(  GLuint shader,
    const char *versionDecl = "#version 150\r\n";
    buffers.push_back( dStrdup( versionDecl ) );
    lengths.push_back( dStrlen( versionDecl ) );
-
-   if(gglHasExtension(EXT_gpu_shader4))
-   {
-      const char *extension = "#extension GL_EXT_gpu_shader4 : enable\r\n";
-      buffers.push_back( dStrdup( extension ) );
-      lengths.push_back( dStrlen( extension ) );
-   }
 
    if(gglHasExtension(ARB_gpu_shader5))
    {

@@ -32,7 +32,7 @@ extern "C"
    int (*torque_winmain)( HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow) = NULL;
 };
 
-bool getDllName(std::wstring& dllName, const std::wstring suffix)
+bool getDllName(std::wstring& dllName, const std::wstring& suffix)
 {
    wchar_t filenameBuf[MAX_PATH];
    DWORD length = GetModuleFileNameW( NULL, filenameBuf, MAX_PATH );

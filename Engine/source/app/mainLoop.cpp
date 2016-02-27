@@ -61,12 +61,16 @@
 // For the TickMs define... fix this for T2D...
 #include "T3D/gameBase/processList.h"
 
-#ifdef TORQUE_DEMO_PURCHASE
-#include "demo/pestTimer/pestTimer.h"
-#endif
-
 #ifdef TORQUE_ENABLE_VFS
 #include "platform/platformVFS.h"
+#endif
+
+#ifndef _MODULE_MANAGER_H
+#include "module/moduleManager.h"
+#endif
+
+#ifndef _ASSET_MANAGER_H_
+#include "assets/assetManager.h"
 #endif
 
 DITTS( F32, gTimeScale, 1.0 );
@@ -261,7 +265,7 @@ void StandardMainLoop::init()
 
    // Initialize modules.
    
-   ModuleManager::initializeSystem();
+   EngineModuleManager::initializeSystem();
          
    // Initialise ITickable.
 #ifdef TORQUE_TGB_ONLY
@@ -292,6 +296,15 @@ void StandardMainLoop::init()
 	Con::addVariable("MiniDump::Params", TypeString, &gMiniDumpParams);
 	Con::addVariable("MiniDump::ExecDir", TypeString, &gMiniDumpExecDir);
 #endif
+
+   // Register the module manager.
+   ModuleDatabase.registerObject("ModuleDatabase");
+
+   // Register the asset database.
+   AssetDatabase.registerObject("AssetDatabase");
+
+   // Register the asset database as a module listener.
+   ModuleDatabase.addListener(&AssetDatabase);
    
    ActionMap* globalMap = new ActionMap;
    globalMap->registerObject("GlobalActionMap");
@@ -309,10 +322,6 @@ void StandardMainLoop::init()
    // Hook in for UDP notification
    Net::smPacketReceive.notify(GNet, &NetInterface::processPacketReceiveEvent);
 
-   #ifdef TORQUE_DEMO_PURCHASE
-   PestTimerinit();
-   #endif
-
    #ifdef TORQUE_DEBUG_GUARD
       Memory::flagCurrentAllocs( Memory::FLAG_Static );
    #endif
@@ -325,10 +334,16 @@ void StandardMainLoop::shutdown()
 
    delete tm;
    preShutdown();
+
+   // Unregister the module database.
+   ModuleDatabase.unregisterObject();
+
+   // Unregister the asset database.
+   AssetDatabase.unregisterObject();
    
    // Shut down modules.
    
-   ModuleManager::shutdownSystem();
+   EngineModuleManager::shutdownSystem();
    
    ThreadPool::GlobalThreadPool::deleteSingleton();
 
@@ -613,11 +628,6 @@ bool StandardMainLoop::doMainLoop()
       ThreadPool::processMainThreadWorkItems();
       Sampler::endFrame();
       PROFILE_END_NAMED(MainLoop);
-
-	  #ifdef TORQUE_DEMO_PURCHASE
-	  CheckTimer();
-	  CheckBlocker();
-	  #endif
    }
    
    return keepRunning;

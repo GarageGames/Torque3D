@@ -564,31 +564,25 @@ void GuiInspector::refresh()
       ungroup = new GuiInspectorGroup( "Ungrouped", this );
       ungroup->setHeaderHidden( true );
       ungroup->setCanCollapse( false );
-      if( ungroup != NULL )
-      {
-         ungroup->registerObject();
-         mGroups.push_back( ungroup );
-         addObject( ungroup );
-      }   
+
+      ungroup->registerObject();
+      mGroups.push_back( ungroup );
+      addObject( ungroup );
    }
 
    // Put the 'transform' group first
    GuiInspectorGroup *transform = new GuiInspectorGroup( "Transform", this );
-   if( transform != NULL )
-   {
-      transform->registerObject();
-      mGroups.push_back( transform );
-      addObject( transform );
-   }
+
+   transform->registerObject();
+   mGroups.push_back(transform);
+   addObject(transform);
 
    // Always create the 'general' group (for fields without a group)      
    GuiInspectorGroup *general = new GuiInspectorGroup( "General", this );
-   if( general != NULL )
-   {
-      general->registerObject();
-      mGroups.push_back( general );
-      addObject( general );
-   }
+
+   general->registerObject();
+   mGroups.push_back(general);
+   addObject(general);
 
    // Create the inspector groups for static fields.
 
@@ -606,25 +600,23 @@ void GuiInspector::refresh()
             if( !group && !isGroupFiltered( itr->pGroupname ) )
             {
                GuiInspectorGroup *group = new GuiInspectorGroup( itr->pGroupname, this );
-               if( group != NULL )
+
+               group->registerObject();
+               if( !group->getNumFields() )
                {
-                  group->registerObject();
-                  if( !group->getNumFields() )
-                  {
-                     #ifdef DEBUG_SPEW
-                     Platform::outputDebugString( "[GuiInspector] Removing empty group '%s'",
-                        group->getCaption().c_str() );
-                     #endif
+                  #ifdef DEBUG_SPEW
+                  Platform::outputDebugString( "[GuiInspector] Removing empty group '%s'",
+                     group->getCaption().c_str() );
+                  #endif
                      
-                     // The group ended up having no fields.  Remove it.
-                     group->deleteObject();
-                  }
-                  else
-                  {
-                     mGroups.push_back( group );
-                     addObject( group );
-                  }
-               }            
+                  // The group ended up having no fields.  Remove it.
+                  group->deleteObject();
+               }
+               else
+               {
+                  mGroups.push_back( group );
+                  addObject( group );
+               }
             }
          }
       }
@@ -634,12 +626,10 @@ void GuiInspector::refresh()
    if ( !isGroupFiltered( "Dynamic Fields" ) )
    {
       GuiInspectorGroup *dynGroup = new GuiInspectorDynamicGroup( "Dynamic Fields", this);
-      if( dynGroup != NULL )
-      {
-         dynGroup->registerObject();
-         mGroups.push_back( dynGroup );
-         addObject( dynGroup );
-      }
+
+      dynGroup->registerObject();
+      mGroups.push_back( dynGroup );
+      addObject( dynGroup );
    }
 
    if( mShowCustomFields && mTargets.size() == 1 )

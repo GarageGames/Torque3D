@@ -91,6 +91,9 @@ ConsoleDocClass( TSStatic,
 );
 
 TSStatic::TSStatic()
+:
+   cubeDescId( 0 ),
+   reflectorDesc( NULL )
 {
    mNetFlags.set(Ghostable | ScopeAlways);
 
@@ -102,7 +105,7 @@ TSStatic::TSStatic()
    mPlayAmbient      = true;
    mAmbientThread    = NULL;
 
-   mAllowPlayerStep = true;
+   mAllowPlayerStep = false;
 
    mConvexList = new Convex;
 
@@ -185,6 +188,11 @@ void TSStatic::initPersistFields()
          "Enables translucent sorting of the TSStatic by its origin instead of the bounds." );
 
    endGroup("Rendering");
+
+   addGroup( "Reflection" );
+      addField( "cubeReflectorDesc", TypeRealString, Offset( cubeDescName, TSStatic ), 
+         "References a ReflectorDesc datablock that defines performance and quality properties for dynamic reflections.\n");
+   endGroup( "Reflection" );
 
    addGroup("Collision");
 
@@ -292,6 +300,14 @@ bool TSStatic::onAdd()
 
    addToScene();
 
+   if ( isClientObject() )
+   {      
+      mCubeReflector.unregisterReflector();
+
+      if ( reflectorDesc )
+         mCubeReflector.registerReflector( this, reflectorDesc );      
+   }
+
    _updateShouldTick();
 
    // Accumulation
@@ -356,6 +372,16 @@ bool TSStatic::_createShape()
 
    if ( mAmbientThread )
       mShapeInstance->setSequence( mAmbientThread, ambientSeq, 0);
+
+   // Resolve CubeReflectorDesc.
+   if ( cubeDescName.isNotEmpty() )
+   {
+      Sim::findObject( cubeDescName, reflectorDesc );
+   }
+   else if( cubeDescId > 0 )
+   {
+      Sim::findObject( cubeDescId, reflectorDesc );
+   }
 
    return true;
 }
@@ -429,6 +455,8 @@ void TSStatic::onRemove()
    mShapeInstance = NULL;
 
    mAmbientThread = NULL;
+   if ( isClientObject() )
+       mCubeReflector.unregisterReflector();
 
    Parent::onRemove();
 }
@@ -561,6 +589,12 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
 
    F32 invScale = (1.0f/getMax(getMax(mObjScale.x,mObjScale.y),mObjScale.z));   
 
+   // If we're currently rendering our own reflection we
+   // don't want to render ourselves into it.
+   if ( mCubeReflector.isRendering() )
+      return;
+
+
    if ( mForceDetail == -1 )
       mShapeInstance->setDetailFromDistance( state, dist * invScale );
    else
@@ -576,6 +610,9 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    rdata.setSceneState( state );
    rdata.setFadeOverride( 1.0f );
    rdata.setOriginSort( mUseOriginSort );
+
+   if ( mCubeReflector.isEnabled() )
+      rdata.setCubemap( mCubeReflector.getCubemap() );
 
    // Acculumation
    rdata.setAccuTex(mAccuTex);
@@ -603,6 +640,20 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    MatrixF mat = getRenderTransform();
    mat.scale( mObjScale );
    GFX->setWorldMatrix( mat );
+
+   if ( state->isDiffusePass() && mCubeReflector.isEnabled() && mCubeReflector.getOcclusionQuery() )
+   {
+       RenderPassManager *pass = state->getRenderPass();
+       OccluderRenderInst *ri = pass->allocInst<OccluderRenderInst>();  
+       
+       ri->type = RenderPassManager::RIT_Occluder;
+       ri->query = mCubeReflector.getOcclusionQuery();
+       mObjToWorld.mulP( mObjBox.getCenter(), &ri->position );
+       ri->scale.set( mObjBox.getExtents() );
+       ri->orientation = pass->allocUniqueXform( mObjToWorld ); 
+       ri->isSphere = false;
+       state->getRenderPass()->addInst( ri );
+   }
 
    mShapeInstance->animate();
    if(mShapeInstance)
@@ -715,6 +766,10 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if ( mLightPlugin )
       retMask |= mLightPlugin->packUpdate(this, AdvancedStaticOptionsMask, con, mask, stream);
 
+   if( stream->writeFlag( reflectorDesc != NULL ) )
+   {
+      stream->writeRangedU32( reflectorDesc->getId(), DataBlockObjectIdFirst,  DataBlockObjectIdLast );
+   }
    return retMask;
 }
 
@@ -780,6 +835,11 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
    if ( mLightPlugin )
    {
       mLightPlugin->unpackUpdate(this, con, stream);
+   }
+
+   if( stream->readFlag() )
+   {
+      cubeDescId = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
    }
 
    if ( isProperlyAdded() )
@@ -1171,8 +1231,10 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
       return;
    }
 
+   TSMaterialList* shapeMaterialList = object->getShape()->materialList;
+
    // Check the mapTo name exists for this shape
-   S32 matIndex = object->getShape()->materialList->getMaterialNameList().find_next(String(mapTo));
+   S32 matIndex = shapeMaterialList->getMaterialNameList().find_next(String(mapTo));
    if (matIndex < 0)
    {
       Con::errorf("TSShape::changeMaterial failed: Invalid mapTo name '%s'", mapTo);
@@ -1190,13 +1252,13 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
 
    // Replace instances with the new material being traded in. Lets make sure that we only
    // target the specific targets per inst, this is actually doing more than we thought
-   delete object->getShape()->materialList->mMatInstList[matIndex];
-   object->getShape()->materialList->mMatInstList[matIndex] = newMat->createMatInstance();
+   delete shapeMaterialList->mMatInstList[matIndex];
+   shapeMaterialList->mMatInstList[matIndex] = newMat->createMatInstance();
 
    // Finish up preparing the material instances for rendering
    const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPNTTB>();
    FeatureSet features = MATMGR->getDefaultFeatures();
-   object->getShape()->materialList->getMaterialInst(matIndex)->init( features, flags );
+   shapeMaterialList->getMaterialInst(matIndex)->init(features, flags);
 }
 
 DefineEngineMethod( TSStatic, getModelFile, const char *, (),,
