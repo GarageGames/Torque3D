@@ -6884,31 +6884,13 @@ void Player::playFootstepSound( bool triggeredLeft, Material* contactMaterial, S
       // Play default sound.
 
       S32 sound = -1;
-      if( contactMaterial && contactMaterial->mFootstepSoundId != -1 )
+      if (contactMaterial && (contactMaterial->mImpactSoundId>-1 && contactMaterial->mImpactSoundId<PlayerData::MaxSoundOffsets))
          sound = contactMaterial->mFootstepSoundId;
       else if( contactObject && contactObject->getTypeMask() & VehicleObjectType )
          sound = 2;
 
-      switch ( sound )
-      {
-      case 0: // Soft
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootSoft], &footMat );
-         break;
-      case 1: // Hard
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootHard], &footMat );
-         break;
-      case 2: // Metal
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootMetal], &footMat );
-         break;
-      case 3: // Snow
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootSnow], &footMat );
-         break;
-      /*
-      default: //Hard
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootHard], &footMat );
-         break;
-      */
-      }
+      if (sound>=0)
+         SFX->playOnce(mDataBlock->sound[sound], &footMat);
    }
 }
 
@@ -6933,36 +6915,13 @@ void Player:: playImpactSound()
          else
          {
             S32 sound = -1;
-            if( material && material->mImpactSoundId )
+            if (material && (material->mImpactSoundId>-1 && material->mImpactSoundId<PlayerData::MaxSoundOffsets))
                sound = material->mImpactSoundId;
             else if( rInfo.object->getTypeMask() & VehicleObjectType )
                sound = 2; // Play metal;
 
-            switch( sound )
-            {
-            case 0:
-               //Soft
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactSoft ], &getTransform() );
-               break;
-            case 1:
-               //Hard
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactHard ], &getTransform() );
-               break;
-            case 2:
-               //Metal
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactMetal ], &getTransform() );
-               break;
-            case 3:
-               //Snow
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactSnow ], &getTransform() );
-               break;
-               /*
-            default:
-               //Hard
-               alxPlay(mDataBlock->sound[PlayerData::ImpactHard], &getTransform());
-               break;
-               */
-            }
+            if (sound >= 0)
+               SFX->playOnce(mDataBlock->sound[PlayerData::ImpactStart + sound], &getTransform());
          }
       }
    }
