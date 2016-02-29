@@ -285,11 +285,11 @@ void fizzle(vec2 vpos, float visibility)
 #define assert(condition, color) { if(!any(condition)) { OUT_col = color; return; } }
 
 // Deferred Shading: Material Info Flag Check
-bool getFlag(float flags, int num)
+bool getFlag(float flags, float num)
 {
    float process = round(flags * 255);
-   float squareNum = pow(2, num);
-   return (mod(process, pow(2, squareNum)) >= squareNum); 
+   float squareNum = pow(2.0, num);
+   return (mod(process, pow(2.0, squareNum)) >= squareNum); 
 }
 
 // #define TORQUE_STOCK_GAMMA
