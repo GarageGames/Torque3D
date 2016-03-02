@@ -163,8 +163,8 @@ void DeferredSpecVarsGLSL::processPix( Vector<ShaderComponent*> &componentList, 
    MultiLine *meta = new MultiLine;
    //matinfo.g slot reserved for AO later
    meta->addStatement(new GenOp("   @.g = 1.0;\r\n", material));
-   meta->addStatement(new GenOp("   @.b = @/128;\r\n", material, specStrength));
-   meta->addStatement(new GenOp("   @.a = @/5;\r\n", material, specPower));
+   meta->addStatement(new GenOp("   @.a = @/128;\r\n", material, specStrength));
+   meta->addStatement(new GenOp("   @.b = @/5;\r\n", material, specPower));
    output = meta;
 }
 
