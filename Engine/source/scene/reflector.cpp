@@ -419,7 +419,6 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
 
    reflectRenderState.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
    reflectRenderState.setDiffuseCameraTransform( params.query->cameraMatrix );
-   reflectRenderState.disableAdvancedLightingBins(true);
 
    // render scene
    LIGHTMGR->registerGlobalLights( &reflectRenderState.getCullingFrustum(), false );
@@ -633,7 +632,6 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       renderStateLeft.setSceneRenderField(0);
       renderStateLeft.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
       renderStateLeft.setDiffuseCameraTransform( params.query->eyeTransforms[0] );
-      renderStateLeft.disableAdvancedLightingBins(true);
 
       gClientSceneGraph->renderSceneNoLights( &renderStateLeft, objTypeFlag );
 
@@ -672,7 +670,6 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
 
       reflectRenderState.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
       reflectRenderState.setDiffuseCameraTransform( params.query->cameraMatrix );
-      reflectRenderState.disableAdvancedLightingBins(true);
 
       gClientSceneGraph->renderSceneNoLights( &reflectRenderState, objTypeFlag );
    }

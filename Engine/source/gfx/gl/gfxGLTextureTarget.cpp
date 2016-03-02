@@ -163,6 +163,10 @@ void _GFXGLTextureTargetFBOImpl::applyState()
    PRESERVE_FRAMEBUFFER();
    glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer);
 
+   bool drawbufs[16];
+   int bufsize = 0;
+   for (int i = 0; i < 16; i++)
+           drawbufs[i] = false;
    bool hasColor = false;
    for(int i = 0; i < GFXGL->getNumRenderTargets(); ++i)
    {   
@@ -200,6 +204,20 @@ void _GFXGLTextureTargetFBOImpl::applyState()
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
    }
 
+   GLenum *buf = new GLenum[bufsize];
+   int count = 0;
+   for (int i = 0; i < bufsize; i++)
+   {
+           if (drawbufs[i])
+           {
+                   buf[count] = GL_COLOR_ATTACHMENT0 + i;
+                   count++;
+           }
+   }
+ 
+   glDrawBuffers(bufsize, buf);
+ 
+   delete[] buf;
    CHECK_FRAMEBUFFER_STATUS();
 }
 
@@ -260,7 +278,10 @@ GFXGLTextureTarget::GFXGLTextureTarget() : mCopyFboSrc(0), mCopyFboDst(0)
 
 GFXGLTextureTarget::~GFXGLTextureTarget()
 {
-   GFXTextureManager::removeEventDelegate( this, &GFXGLTextureTarget::_onTextureEvent );
+   GFXTextureManager::removeEventDelegate(this, &GFXGLTextureTarget::_onTextureEvent);
+
+   glDeleteFramebuffers(1, &mCopyFboSrc);
+   glDeleteFramebuffers(1, &mCopyFboDst);
 }
 
 const Point2I GFXGLTextureTarget::getSize()

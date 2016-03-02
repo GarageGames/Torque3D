@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "shadergen:/autogenConditioners.h"
 #include "../../torque.hlsl"
 #include "../postFx.hlsl"
 
@@ -27,6 +28,7 @@ uniform sampler2D sceneTex : register( s0 );
 uniform sampler2D luminanceTex : register( s1 );
 uniform sampler2D bloomTex : register( s2 );
 uniform sampler1D colorCorrectionTex : register( s3 );
+uniform sampler2D prepassTex : register(S4);
 
 uniform float2 texSize0;
 uniform float2 texSize2;
@@ -41,6 +43,8 @@ uniform float3 g_fBlueShiftColor;
 uniform float g_fBloomScale;
 
 uniform float g_fOneOverGamma;
+uniform float Brightness;
+uniform float Contrast;
 
 
 float4 main( PFXVertToPix IN ) : COLOR0
@@ -81,15 +85,24 @@ float4 main( PFXVertToPix IN ) : COLOR0
    }
 
    // Add the bloom effect.
-   sample += g_fBloomScale * bloom;
+   float depth = prepassUncondition( prepassTex, IN.uv0 ).w;
+   if (depth>0.9999)
+      sample += g_fBloomScale * bloom;
 
    // Apply the color correction.
    sample.r = tex1D( colorCorrectionTex, sample.r ).r;
    sample.g = tex1D( colorCorrectionTex, sample.g ).g;
    sample.b = tex1D( colorCorrectionTex, sample.b ).b;
 
+	  
    // Apply gamma correction
    sample.rgb = pow( abs(sample.rgb), g_fOneOverGamma );
+ 
+   // Apply contrast
+   sample.rgb = ((sample.rgb - 0.5f) * Contrast) + 0.5f;
+ 
+   // Apply brightness
+   sample.rgb += Brightness;
 
    return sample;
 }

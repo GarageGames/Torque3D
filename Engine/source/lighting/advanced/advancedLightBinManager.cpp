@@ -318,6 +318,8 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       const U32 numPrims = curEntry.numPrims;
       const U32 numVerts = curEntry.vertBuffer->mNumVerts;
 
+      ShadowMapParams *lsp = curLightInfo->getExtended<ShadowMapParams>();
+
       // Skip lights which won't affect the scene.
       if ( !curLightMat || curLightInfo->getBrightness() <= 0.001f )
          continue;
@@ -329,14 +331,11 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       mShadowManager->setLightShadowMap( curEntry.shadowMap );
       mShadowManager->setLightDynamicShadowMap( curEntry.dynamicShadowMap );
 
-      // Let the shadow know we're about to render from it.
-      if ( curEntry.shadowMap )
-         curEntry.shadowMap->preLightRender();
-      if ( curEntry.dynamicShadowMap ) curEntry.dynamicShadowMap->preLightRender();
-
       // Set geometry
       GFX->setVertexBuffer( curEntry.vertBuffer );
       GFX->setPrimitiveBuffer( curEntry.primBuffer );
+
+      lsp->getOcclusionQuery()->begin();
 
       // Render the material passes
       while( curLightMat->matInstance->setupPass( state, sgData ) )
@@ -352,10 +351,7 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
             GFX->drawPrimitive(GFXTriangleList, 0, numPrims);
       }
 
-      // Tell it we're done rendering.
-      if ( curEntry.shadowMap )
-         curEntry.shadowMap->postLightRender();
-      if ( curEntry.dynamicShadowMap ) curEntry.dynamicShadowMap->postLightRender();
+      lsp->getOcclusionQuery()->end();
    }
 
    // Set NULL for active shadow map (so nothing gets confused)

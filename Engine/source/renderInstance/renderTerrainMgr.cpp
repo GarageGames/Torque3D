@@ -35,6 +35,7 @@
 #include "terrain/terrCell.h"
 #include "terrain/terrCellMaterial.h"
 #include "math/util/matrixSet.h"
+#include "materials/materialManager.h"
 
 bool RenderTerrainMgr::smRenderWireframe = false;
 
@@ -115,6 +116,10 @@ void RenderTerrainMgr::clear()
 void RenderTerrainMgr::render( SceneRenderState *state )
 {
    if ( mInstVector.empty() )
+      return;
+
+   // Check if bin is disabled in advanced lighting.
+   if ( MATMGR->getPrePassEnabled() && mBasicOnly )
       return;
 
    PROFILE_SCOPE( RenderTerrainMgr_Render );

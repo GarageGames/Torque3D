@@ -438,6 +438,7 @@ inline Point2I Point2I::operator/(const Point2I &_vec) const
 
 inline Point2I& Point2I::operator/=(const Point2I &_vec)
 {
+   AssertFatal(_vec.x != 0 && _vec.y != 0, "Error, div by zero attempted");
    x /= _vec.x;
    y /= _vec.y;
    return *this;
@@ -645,6 +646,7 @@ inline Point2F Point2F::operator/(const Point2F &_vec) const
 
 inline Point2F& Point2F::operator/=(const Point2F &_vec)
 {
+   AssertFatal(_vec.x != 0 && _vec.y != 0, "Error, div by zero attempted");
    x /= _vec.x;
    y /= _vec.y;
    return *this;

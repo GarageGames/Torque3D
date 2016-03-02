@@ -1,289 +1,722 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiColorPickerCtrl(ColorPickerDlg,EditorGuiGroup) {
-   canSaveDynamicFields = "0";
-   isContainer = "1";
-   Profile = "ToolsGuiDefaultProfile";
-   HorizSizing = "right";
-   VertSizing = "bottom";
+   displayMode = "Dropper"; // this makes the background visible
+   actionOnMove = "1";
    position = "0 0";
-   Extent = "800 600";
-   MinExtent = "8 2";
-   canSave = "1";
-   Visible = "1";
+   extent = "1024 768";
+   minExtent = "8 2";
+   horizSizing = "right";
+   vertSizing = "bottom";
+   profile = "ToolsGuiDefaultProfile";
+   visible = "1";
+   active = "1";
+   Clickable = "1";
+   AffectChildren = "1";
+   tooltipProfile = "GuiToolTipProfile";
    hovertime = "1000";
-   DisplayMode = "Dropper"; // this makes the background visible
-   ActionOnMove = "1";
+   isContainer = "1";
+   canSave = "1";
+   canSaveDynamicFields = "0";
 
    new GuiWindowCtrl(GuiPickerDlg) {
-      canSaveDynamicFields = "0";
-      isContainer = "1";
-      Profile = "ToolsGuiWindowProfile";
-      HorizSizing = "windowRelative";
-      VertSizing = "windowRelative";
-      position = "170 100";
-      Extent = "348 347";
-      MinExtent = "8 2";
-      canSave = "1";
-      Visible = "1";
-      hovertime = "1000";
       text = "Color Picker";
-      maxLength = "255";
       resizeWidth = "0";
       resizeHeight = "0";
       canMove = "1";
       canClose = "1";
       canMinimize = "0";
       canMaximize = "0";
-      minSize = "50 50";
+      canCollapse = "0";
       closeCommand = "DoColorPickerCancelCallback(); ColorPickerDlg.getRoot().popDialog(ColorPickerDlg);";
-      
+      position = "170 100";
+      extent = "439 317";
+      minExtent = "8 2";
+      horizSizing = "windowRelative";
+      vertSizing = "windowRelative";
+      profile = "ToolsGuiWindowProfile";
+      visible = "1";
+      active = "1";
+      Clickable = "1";
+      AffectChildren = "1";
+      tooltipProfile = "GuiToolTipProfile";
+      hovertime = "1000";
+      isContainer = "1";
+      canSave = "1";
+      canSaveDynamicFields = "0";
+
       new GuiBitmapBorderCtrl(){ // color blend
-         Profile = "ToolsGuiGroupBorderProfile";
          position = "3 24";
-         Extent = "255 258";
+         extent = "255 258";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiGroupBorderProfile";
+         visible = "1";
+         active = "1";
+         Clickable = "1";
+         AffectChildren = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+
+         new GuiColorPickerCtrl(ColorBlendSelect) {
+            baseColor = "1 0 0 1";
+            pickColor = "0 0 0 1";
+            selectorGap = "1";
+            displayMode = "BlendColor";
+            actionOnMove = "1";
+            position = "1 0";
+            extent = "255 258";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "GuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            command = "updateRGBValues(1);";
+            Clickable = "1";
+            AffectChildren = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "0";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+         };
       };
       new GuiBitmapBorderCtrl(){ // Hue
-         Profile = "ToolsGuiGroupBorderProfile";
          position = "263 23";
-         Extent = "25 261";
-      };
-      new GuiBitmapBorderCtrl(){ // new old color
-         Profile = "ToolsGuiGroupBorderProfile";
-         position = "292 37";
-         Extent = "52 99";
-      };
-      new GuiBitmapBorderCtrl(){ // rgb
-         Profile = "ToolsGuiGroupBorderProfile";
-         position = "292 209";
-         Extent = "52 75";
-      };
-      new GuiBitmapBorderCtrl(){ // alpha
-         Profile = "ToolsGuiGroupBorderProfile";
-         position = "3 287";
-         Extent = "341 24";
-      };
-      new GuiColorPickerCtrl(ColorBlendSelect) {
-         canSaveDynamicFields = "0";
-         isContainer = "0";
-         Profile = "ToolsGuiDefaultProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "3 24";
-         Extent = "255 258";
-         MinExtent = "8 2";
-         canSave = "1";
-         Visible = "1";
-         command = "updateRGBValues(1);";
+         extent = "25 261";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiGroupBorderProfile";
+         visible = "1";
+         active = "1";
+         Clickable = "1";
+         AffectChildren = "1";
+         tooltipProfile = "GuiToolTipProfile";
          hovertime = "1000";
-         baseColor = "1 0 0 1";
-         PickColor = "0 0 0 1";
-         SelectorGap = "1";
-         DisplayMode = "BlendColor";
-         ActionOnMove = "1";
-      };
-      new GuiColorPickerCtrl(ColorRangeSelect) {
-         canSaveDynamicFields = "0";
-         isContainer = "0";
-         Profile = "ToolsGuiDefaultProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "264 24";
-         Extent = "21 257";
-         MinExtent = "8 2";
+         isContainer = "1";
          canSave = "1";
-         Visible = "1";
-         Command = "updatePickerBaseColor(1);";
-         hovertime = "1000";
-         baseColor = "1 0 0 1";
-         PickColor = "1 0 0 1";
-         SelectorGap = "1";
-         DisplayMode = "VertColor";
-         ActionOnMove = "1";
-      };
-      new GuiTextCtrl() {
          canSaveDynamicFields = "0";
-         isContainer = "0";
-         Profile = "ToolsGuiTextProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "298 215";
-         Extent = "8 18";
-         MinExtent = "8 2";
-         canSave = "1";
-         Visible = "1";
-         hovertime = "1000";
-         text = "R";
-         maxLength = "255";
-      };
-      new GuiTextEditCtrl(Channel_R_Val) { // Red Channal
-         Profile = "ToolsGuiNumericTextEditProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "307 215";
-         Extent = "34 18";
-         text = "0";
-         maxLength = "4";
-         altCommand = "setColorInfo();";
-      };
-      new GuiTextCtrl() {
-         canSaveDynamicFields = "0";
-         isContainer = "0";
-         Profile = "ToolsGuiTextProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "297 238";
-         Extent = "8 18";
-         MinExtent = "8 2";
-         canSave = "1";
-         Visible = "1";
-         hovertime = "1000";
-         text = "G";
-         maxLength = "255";
-      };
-      new GuiTextEditCtrl(Channel_G_Val) { // Green Channal
-         Profile = "ToolsGuiNumericTextEditProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "307 238";
-         Extent = "34 18";
-         text = "0";
-         maxLength = "4";
-         altCommand = "setColorInfo();";
-      };
-      new GuiTextCtrl() {
-         canSaveDynamicFields = "0";
-         isContainer = "0";
-         Profile = "ToolsGuiTextProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "298 261";
-         Extent = "8 18";
-         MinExtent = "8 2";
-         canSave = "1";
-         Visible = "1";
-         hovertime = "1000";
-         text = "B";
-         maxLength = "255";
-      };
-      new GuiTextEditCtrl(Channel_B_Val) { // Blue Channal
-         Profile = "ToolsGuiNumericTextEditProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "307 261";
-         Extent = "34 18";
-         text = "0";
-         maxLength = "4";
-         altCommand = "setColorInfo();";
-      };
-      
-      
-      new GuiControl() {
-         class = "AggregateControl";
-         position = "2 290";
-         Extent = "341 18";
-         
-         new GuiTextCtrl() {
-            canSaveDynamicFields = "0";
-            isContainer = "0";
-            Profile = "ToolsGuiTextProfile";
-            HorizSizing = "right";
-            VertSizing = "bottom";
-            position = "267 0";
-            Extent = "29 18";
-            MinExtent = "8 2";
-            canSave = "1";
-            Visible = "1";
+
+         new GuiColorPickerCtrl(ColorRangeSelect) {
+            baseColor = "1 0 0 1";
+            pickColor = "1 0 0 1";
+            selectorGap = "1";
+            displayMode = "VertColor";
+            actionOnMove = "1";
+            position = "1 1";
+            extent = "21 257";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "GuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            command = "updatePickerBaseColor(1);";
+            Clickable = "1";
+            AffectChildren = "1";
+            tooltipProfile = "GuiToolTipProfile";
             hovertime = "1000";
-            text = "Alpha";
-            maxLength = "255";
-         };
-         new GuiSliderCtrl(ColorAlphaSelect) {
-            internalName = "slider";
-            canSaveDynamicFields = "0";
             isContainer = "0";
-            Profile = "ToolsGuiSliderProfile";
-            HorizSizing = "right";
-            VertSizing = "bottom";
-            position = "5 3";
-            Extent = "251 13";
-            MinExtent = "8 2";
             canSave = "1";
-            Visible = "1";
-            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); updateColorPickerAlpha( $ThisControl.getValue() );";
-            hovertime = "1000";
-            range = "0 1";
-            ticks = "0";
-            value = "1";
-         };
-         new GuiTextEditCtrl(Channel_A_Val) { // Alpha Channal
-            internalName = "textEdit";
-            Profile = "ToolsGuiNumericTextEditProfile";
-            HorizSizing = "right";
-            VertSizing = "bottom";
-            position = "305 0";
-            Extent = "34 18";
-            text = "0";
-            maxLength = "4";
-            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); updateColorPickerAlpha( $ThisControl.getValue() );";
+            canSaveDynamicFields = "0";
          };
       };
-      new GuiSwatchButtonCtrl(myColor){ // New Color // 
-         Profile = "ToolsGuiDefaultProfile";
-         position = "293 38";
-         Extent = "50 50";
-      };      
-      new GuiTextCtrl(){
-         Profile = "ToolsGuiDefaultProfile";
+      new GuiTextCtrl() {
          text = "New";
          position = "306 22";
-         Extent = "26 14";
+         extent = "26 14";
+         profile = "GuiDefaultProfile";
       };
-      new GuiSwatchButtonCtrl(oldColor){ // Old Color // 
-         Profile = "ToolsGuiDefaultProfile";
-         position = "293 85";
-         Extent = "50 50";
+      new GuiBitmapBorderCtrl(){ // new old color
+         position = "292 37";
+         extent = "52 99";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiGroupBorderProfile";
+         visible = "1";
+         active = "1";
+         Clickable = "1";
+         AffectChildren = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+
+         new GuiSwatchButtonCtrl(myColor){ // New Color //
+            position = "1 1";
+            extent = "50 50";
+            profile = "GuiDefaultProfile";
+         };
+         new GuiSwatchButtonCtrl(oldColor){ // Old Color // 
+            position = "1 48";
+            extent = "50 50";
+            profile = "GuiDefaultProfile";
+         };
       };
-      new GuiTextCtrl(){
-         Profile = "ToolsGuiDefaultProfile";
+      new GuiTextCtrl() {
          text = "Old";
          position = "310 138";
-         Extent = "26 14";
+         extent = "26 14";
+         profile = "GuiDefaultProfile";
+      };
+      new GuiBitmapBorderCtrl(){ // Color Text Fields
+         position = "291 165";
+         extent = "141 118";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiGroupBorderProfile";
+         visible = "1";
+         active = "1";
+         Clickable = "1";
+         AffectChildren = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+
+         new GuiControl() { // rgb
+            position = "4 0";
+            extent = "52 75";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "ToolsGuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            Clickable = "1";
+            AffectChildren = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+
+            new GuiTextCtrl() {
+               text = "R";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "5 6";
+               extent = "8 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Red Channel color value.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl(Channel_R_Val) { // Red Channal
+               text = "0";
+               maxLength = "4";
+               position = "14 6";
+               extent = "34 18";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextEditProfileNumbersOnly";
+               class = "ColorPickerRGBClass";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Red Channel color value.";
+            };
+            new GuiTextCtrl() {
+               text = "G";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "4 29";
+               extent = "8 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Green Channel color value.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl(Channel_G_Val) { // Green Channal
+               text = "0";
+               maxLength = "4";
+               position = "14 29";
+               extent = "34 18";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextEditProfileNumbersOnly";
+               class = "ColorPickerRGBClass";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Green Channel color value.";
+            };
+            new GuiTextCtrl() {
+               text = "B";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "5 52";
+               extent = "8 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Blue Channel color value.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl(Channel_B_Val) { // Blue Channal
+               text = "0";
+               maxLength = "4";
+               position = "14 52";
+               extent = "34 18";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextEditProfileNumbersOnly";
+               class = "ColorPickerRGBClass";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Blue Channel color value.";
+            };
+         };
+         new GuiControl() {
+            position = "71 0";
+            extent = "61 75";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "ToolsGuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            Clickable = "1";
+            AffectChildren = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+
+            new GuiTextCtrl() {
+               text = "H";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "5 6";
+               extent = "8 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Hue Channel color value.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl(Channel_H_Val) { // Hue Channal
+               text = "0";
+               maxLength = "4";
+               position = "14 6";
+               extent = "34 18";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextEditProfileNumbersOnly";
+               class = "ColorPickerHSBClass";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Hue Channel color value.";
+            };
+            new GuiTextCtrl() {
+               text = "o";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "51 2";
+               extent = "8 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "S";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "4 29";
+               extent = "8 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Saturation Channel color value.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl(Channel_S_Val) { // Saturation Channal
+               text = "0";
+               maxLength = "4";
+               position = "14 29";
+               extent = "34 18";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextEditProfileNumbersOnly";
+               class = "ColorPickerHSBClass";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Saturation Channel color value.";
+            };
+            new GuiTextCtrl() {
+               text = "%";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "51 29";
+               extent = "10 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "B";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "5 52";
+               extent = "8 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Brightness Channel color value. Aka value or lightness.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl(Channel_Br_Val) { // Brightness Channal
+               text = "0";
+               maxLength = "4";
+               position = "14 52";
+               extent = "34 18";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextEditProfileNumbersOnly";
+               class = "ColorPickerHSBClass";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Brightness Channel color value. Aka value or lightness.";
+            };
+            new GuiTextCtrl() {
+               text = "%";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "51 52";
+               extent = "10 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+         };
+         new GuiControl() {
+            position = "3 87";
+            extent = "138 24";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "ToolsGuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            Clickable = "1";
+            AffectChildren = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+
+            new GuiTextCtrl() {
+               text = "#";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "3 5";
+               extent = "8 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Hex representation of Red, Green, Blue Color value.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl(HexColor_Val) { // Hex Color Field
+               text = "0";
+               maxLength = "6";
+               position = "13 5";
+               extent = "116 18";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextEditProfile";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Hex representation of Red, Green, Blue Color value.";
+               command = "$thisControl.onKeyDown();";
+            };
+         };
+      };
+      new GuiBitmapBorderCtrl(){ // alpha
+         position = "3 287";
+         extent = "429 24";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiGroupBorderProfile";
+         visible = "1";
+         active = "1";
+         Clickable = "1";
+         AffectChildren = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+
+         new GuiControl() {
+            position = "-1 3";
+            extent = "428 18";
+            minExtent = "8 2";
+            horizSizing = "width";
+            vertSizing = "bottom";
+            profile = "ToolsGuiDefaultProfile";
+            visible = "1";
+            active = "1";
+            Clickable = "1";
+            AffectChildren = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            class = "AggregateControl";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+
+            new GuiSliderCtrl(ColorAlphaSelect) {
+               range = "0 1";
+               ticks = "0";
+               value = "1";
+               position = "5 3";
+               extent = "341 13";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiSliderProfile";
+               visible = "1";
+               active = "1";
+               altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); updateColorPickerAlpha( $ThisControl.getValue() );";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               internalName = "slider";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Alpha";
+               maxLength = "255";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "355 0";
+               extent = "28 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "ToolsGuiTextProfile";
+               visible = "1";
+               active = "1";
+               Clickable = "1";
+               AffectChildren = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl(Channel_A_Val) { // Alpha Channal
+               text = "0";
+               maxLength = "4";
+               position = "392 0";
+               extent = "34 18";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextEditProfileNumbersOnly";
+               altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); updateColorPickerAlpha( $ThisControl.getValue() );";
+               internalName = "TextEdit";
+            };
+         };
       };
       new GuiButtonCtrl() {
-         canSaveDynamicFields = "0";
-         isContainer = "0";
-         Profile = "ToolsGuiButtonProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "144 316";
-         Extent = "115 24";
-         MinExtent = "8 2";
-         canSave = "1";
-         Visible = "1";
-         Command = "DoColorPickerCallback();";
-         hovertime = "1000";
          text = "Select";
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
+         position = "349 37";
+         extent = "84 24";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiButtonProfile";
+         visible = "1";
+         active = "1";
+         command = "DoColorPickerCallback();";
+         Clickable = "1";
+         AffectChildren = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         canSave = "1";
+         canSaveDynamicFields = "0";
       };
       new GuiButtonCtrl() {
-         canSaveDynamicFields = "0";
-         isContainer = "0";
-         Profile = "ToolsGuiButtonProfile";
-         HorizSizing = "right";
-         VertSizing = "bottom";
-         position = "268 316";
-         Extent = "73 24";
-         MinExtent = "8 2";
-         canSave = "1";
-         Visible = "1";
-         Command = "DoColorPickerCancelCallback();";
-         hovertime = "1000";
          text = "Cancel";
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
+         position = "349 68";
+         extent = "84 24";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "ToolsGuiButtonProfile";
+         visible = "1";
+         active = "1";
+         command = "DoColorPickerCancelCallback();";
+         Clickable = "1";
+         AffectChildren = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         canSave = "1";
+         canSaveDynamicFields = "0";
       };
    };
 };
@@ -293,26 +726,6 @@ $ColorPickerCallback = ""; // Control that we need to update
 $ColorPickerCancelCallback = "";
 $ColorPickerUpdateCallback = "";
 $ColorCallbackType   = 1;  // ColorI
-
-function ColorFloatToInt( %color )
-{
-   %red     = getWord( %color, 0 );
-   %green   = getWord( %color, 1 );
-   %blue    = getWord( %color, 2 );
-   %alpha   = getWord( %color, 3 );
-   
-   return mCeil( %red * 255 ) SPC mCeil( %green * 255 ) SPC mCeil( %blue * 255 ) SPC mCeil( %alpha * 255 );
-}
-
-function ColorIntToFloat( %color )
-{
-   %red     = getWord( %color, 0 );
-   %green   = getWord( %color, 1 );
-   %blue    = getWord( %color, 2 );
-   %alpha   = getWord( %color, 3 );
-
-   return ( %red / 255 ) SPC ( %green / 255 ) SPC ( %blue / 255 ) SPC ( %alpha / 255 );
-}
 
 // This function pushes the color picker dialog and returns to a callback the selected value
 function GetColorI( %currentColor, %callback, %root, %updateCallback, %cancelCallback )
@@ -333,15 +746,18 @@ function GetColorI( %currentColor, %callback, %root, %updateCallback, %cancelCal
    ColorAlphaSelect.range = "0 255";
    
    // Set the RGBA displays accordingly
-   %red = getWord(%currentColor, 0) / 255;
-   %green = getWord(%currentColor, 1) / 255;
-   %blue = getWord(%currentColor, 2) / 255;
+   %red = getWord(%currentColor, 0);
+   %green = getWord(%currentColor, 1);
+   %blue = getWord(%currentColor, 2);
    %alpha = getWord(%currentColor, 3);
    
-   // set the initial range blend to correct color, no alpha needed
-   // this should also set the color blend select right now
-   ColorRangeSelect.baseColor = %red SPC %green SPC %blue SPC "1.0";
-   ColorRangeSelect.updateColor();
+   //Set the red green blue text fields
+   Channel_R_Val.setValue(%red); 
+   Channel_G_Val.setValue(%green);
+   Channel_B_Val.setValue(%blue);
+   
+   //Have the rgb text fields update the rest
+   Channel_R_Val.onValidate();
    
    if(!isObject(%root))
       %root = Canvas;
@@ -371,15 +787,18 @@ function GetColorF( %currentColor, %callback, %root, %updateCallback, %cancelCal
    ColorAlphaSelect.range = "0 1";
    
    // Set the RGBA displays accordingly
-   %red = getWord(%currentColor, 0);
-   %green = getWord(%currentColor, 1);
-   %blue = getWord(%currentColor, 2);
-   %alpha = getWord(%currentColor, 3);
+   %red = mRoundColour(getWord(%currentColor, 0), 3);
+   %green = mRoundColour(getWord(%currentColor, 1), 3);
+   %blue = mRoundColour(getWord(%currentColor, 2), 3);
+   %alpha = mRoundColour(getWord(%currentColor, 3), 3);
    
-   // set the initial range blend to correct color, no alpha needed
-   // this should also set the color blend select right now
-   ColorRangeSelect.baseColor = %red SPC %green SPC %blue SPC "1.0";
-   ColorRangeSelect.updateColor();
+   //Set the red green blue text fields
+   Channel_R_Val.setValue(%red); 
+   Channel_G_Val.setValue(%green);
+   Channel_B_Val.setValue(%blue);
+   
+   //Have the rgb text fields update the rest
+   Channel_R_Val.onValidate();
    
    if(!isObject(%root))
       %root = Canvas;
@@ -390,6 +809,133 @@ function GetColorF( %currentColor, %callback, %root, %updateCallback, %cancelCal
    Channel_A_Val.setText( %alpha );
 }
 
+function ColorPickerRGBClass::onValidate(%this)
+{
+   %red = Channel_R_Val.getValue();
+   %green = Channel_G_Val.getValue();
+   %blue = Channel_B_Val.getValue();
+   
+   //Rest of the fields just do everything with ints so convert
+   if( $ColorCallbackType != 1 )
+   {
+      %rgb = ColorFloatToInt(%red SPC %green SPC %blue SPC "1.0");
+      %red = getWord(%rgb, 0);
+      %green = getWord(%rgb, 1);
+      %blue = getWord(%rgb, 2);
+   }
+   
+   //Update all the other color fields
+   %hsb = ColorRGBToHSB(%red SPC %green SPC %blue);
+   Channel_H_Val.setValue(getWord(%hsb, 0));
+   Channel_S_Val.setValue(getWord(%hsb, 1));
+   Channel_Br_Val.setValue(getWord(%hsb, 2));
+   
+   %hex = ColorRGBToHEX(%red SPC %green SPC %blue);
+   HexColor_Val.setValue(%hex);
+   HexColor_Val.onKeyDown();
+   
+   //Update everything else with our new color
+   setColorInfo();
+}
+
+function ColorPickerHSBClass::onValidate(%this)
+{
+   %hue = Channel_H_Val.getValue();
+   %saturation = Channel_S_Val.getValue();
+   %brightness = Channel_Br_Val.getValue();
+   
+   //Update all the other color fields
+   %rgb = ColorHSBToRGB(%hue SPC %saturation SPC %brightness);
+   %hex = ColorRGBToHEX(%rgb);
+   HexColor_Val.setValue(%hex);
+   HexColor_Val.onKeyDown();
+   
+   //convert to float for rgb if we need to
+   if( $ColorCallbackType != 1 )
+   {
+      %rgb = ColorIntToFloat(%rgb);
+   }
+   %red = getWord(%rgb, 0);
+   %green = getWord(%rgb, 1);
+   %blue = getWord(%rgb, 2);
+   Channel_R_Val.setValue(%red);
+   Channel_G_Val.setValue(%green);
+   Channel_B_Val.setValue(%blue);   
+   
+   //Update everything else with our new color
+   setColorInfo();
+}
+
+function HexColor_Val::onKeyDown(%this)
+{
+   //Get the value
+   %value = %this.getValue();
+   
+   //It's hex so keep it all uppercase
+   %value = strupr(%value);
+   %pos = %this.getCursorPos();
+   %this.setValue(%value);
+   %this.setCursorPos(%pos);
+   
+   //Verify that it's a hex value
+   %value = stripChars(%value, "0123456789ABCDEF");
+   if(%value $= "")
+   {
+      %this.validText();
+   }
+   else
+   {
+      %this.invalidText(false);
+   }
+}
+
+function HexColor_Val::onValidate(%this)
+{   
+   //if the current text is invalid don't do anyting
+   if(!%this.isValidText())
+   {
+      %this.invalidText(true);
+      return;
+   }
+   
+   //Get the current value
+   %hex = %this.getValue();
+   
+   //Make sure we have 6 characters
+   while(strlen(%hex) < 6)
+   {
+      %hex = "0" @ %hex;
+   }
+   %hex = strupr(%hex);
+   
+   //Update the value in case there were missing characters
+   %this.setValue(%hex);
+   
+   //Update all the other color fields
+   %rgb = ColorHEXToRGB(%hex);
+   %hsb = ColorRGBToHSB(%rgb);
+   
+   //convert to float for rgb if we need to
+   if( $ColorCallbackType != 1 )
+   {
+      %rgb = ColorIntToFloat(%rgb);
+   }
+   
+   %red = getWord(%rgb, 0);
+   %green = getWord(%rgb, 1);
+   %blue = getWord(%rgb, 2);
+   Channel_R_Val.setValue(%red);
+   Channel_G_Val.setValue(%green);
+   Channel_B_Val.setValue(%blue);
+   
+   Channel_H_Val.setValue(getWord(%hsb, 0));
+   Channel_S_Val.setValue(getWord(%hsb, 1));
+   Channel_Br_Val.setValue(getWord(%hsb, 2));
+   
+   //Update everything else with our new color
+   setColorInfo();
+}
+
 // This function is used to update the text controls at the top
 function setColorInfo()
 {
@@ -398,16 +944,40 @@ function setColorInfo()
    %blue = Channel_B_Val.getValue();
    
    if( $ColorCallbackType == 1)
-   {
-      %red = (%red / 255);
-      %green = (%green / 255);
-      %blue = (%blue / 255);
-   }
+      %rgb = ColorIntToFloat(%red SPC %green SPC %blue SPC "255");
+   else
+      %rgb = %red SPC %green SPC %blue SPC "1.0";
       
-   $ColorPickerSignal = 1; 
+   $ColorPickerSignal = 0;
    
-   ColorBlendSelect.baseColor = %red SPC %green SPC %blue SPC "1.0";
+   //Convert color over to hue color
+   %hsb = ColorRGBToHSB(ColorFloatToInt(%rgb));
+   %tempColor = ColorHSBToRGB( getWord(%hsb, 0) SPC 100 SPC 50);
+   %tempColor = ColorIntToFloat(setWord(%tempColor, 3, 255));
+   
+   //Make sure all the text fields and everything don't update because of the cursors
+   ColorRangeSelect.update = false;
+   ColorBlendSelect.update = false;
+   
+   //Set values for the hue color picker
+   ColorRangeSelect.baseColor = %tempColor;
+   ColorRangeSelect.pickColor = %tempColor;
+   ColorRangeSelect.updateColor();
+   
+   //Set the cursor for the hue picker
+   ColorRangeSelect.setSelectorColor(%tempColor);
+   
+   //Set the values for the gradient color picker
+   ColorBlendSelect.baseColor = %tempColor;
+   ColorBlendSelect.pickColor = %rgb;
    ColorBlendSelect.updateColor();
+   
+   //Set the cursor for the gradiant color picker
+   ColorBlendSelect.setSelectorColor(%rgb);
+   
+   //Update our current color
+   %alpha = getWord(myColor.color, 3);
+   myColor.color = setWord(%rgb, 3, %alpha);
 }
 
 // return mycolor.color
@@ -433,11 +1003,17 @@ function DoColorPickerUpdateCallback()
 // this is called from ColorRangeSelect.updateColor
 function updatePickerBaseColor( %location )
 {
+   if(!ColorRangeSelect.update)
+   {
+      ColorRangeSelect.update = true;
+      return;
+   }
+   
    if( $ColorPickerSignal && %location )
       %pickColor = ColorRangeSelect.baseColor;
    else
       %pickColor = ColorRangeSelect.pickColor;
-   $ColorPickerSignal = 1;
+   $ColorPickerSignal = 0;
    
    %red = getWord(%pickColor, 0);
    %green = getWord(%pickColor, 1);
@@ -451,6 +1027,12 @@ function updatePickerBaseColor( %location )
 // this is called from ColorBlendSelect.updateColor
 function updateRGBValues( %location )
 {
+   if(!ColorBlendSelect.update)
+   {
+      ColorBlendSelect.update = true;
+      return;
+   }
+   
    //update the color based on where it came from
    if( $ColorPickerSignal && %location )
       %pickColor = ColorBlendSelect.baseColor;
@@ -465,7 +1047,7 @@ function updateRGBValues( %location )
    %alpha = getWord(myColor.color, 3);    
      
    // set the color!
-   myColor.color = %red SPC %green SPC %blue SPC %alpha ;
+   myColor.color = %red SPC %green SPC %blue SPC %alpha;
    
    DoColorPickerUpdateCallback();
    
@@ -487,6 +1069,25 @@ function updateRGBValues( %location )
    Channel_R_Val.setValue(%red); 
    Channel_G_Val.setValue(%green);
    Channel_B_Val.setValue(%blue);
+   
+   //Rest of the fields just do everything with ints so convert
+   if( $ColorCallbackType != 1 )
+   {
+      %rgb = ColorFloatToInt(%red SPC %green SPC %blue SPC "1.0");
+      %red = getWord(%rgb, 0);
+      %green = getWord(%rgb, 1);
+      %blue = getWord(%rgb, 2);
+   }
+   
+   //Update all the other color fields
+   %hsb = ColorRGBToHSB(%red SPC %green SPC %blue);
+   Channel_H_Val.setValue(getWord(%hsb, 0));
+   Channel_S_Val.setValue(getWord(%hsb, 1));
+   Channel_Br_Val.setValue(getWord(%hsb, 2));
+   
+   %hex = ColorRGBToHEX(%red SPC %green SPC %blue);
+   HexColor_Val.setValue(%hex);
+   HexColor_Val.onKeyDown();
    
    $ColorPickerSignal = 0;
 }

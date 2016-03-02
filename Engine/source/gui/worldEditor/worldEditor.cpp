@@ -2810,7 +2810,7 @@ void WorldEditor::clearSelection()
 
 void WorldEditor::selectObject( SimObject *obj )
 {
-   if ( mSelectionLocked || !mSelected )
+   if ( mSelectionLocked || !mSelected || !obj )
       return;
 
    // Don't check isSelectionEnabled of SceneObjects here as we
@@ -2833,7 +2833,7 @@ void WorldEditor::selectObject( const char* obj )
 
 void WorldEditor::unselectObject( SimObject *obj )
 {
-   if ( mSelectionLocked || !mSelected )
+   if ( mSelectionLocked || !mSelected || !obj )
       return;
 
    if ( !objClassIgnored( obj ) && mSelected->objInSet( obj ) )

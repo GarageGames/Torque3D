@@ -1099,7 +1099,7 @@ void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
                currHeight = 1;
 
             inOutNumMips++;
-         } while ( currWidth != 1 || currHeight != 1 );
+         } while ( currWidth != 1 && currHeight != 1 );
       }
    }
 }

@@ -599,7 +599,8 @@ void SkyBox::_initMaterial()
 
    // We want to disable culling and z write.
    GFXStateBlockDesc desc;
-   desc.setCullMode( GFXCullCW );
+   desc.setCullMode( GFXCullNone );
+   desc.setBlend( true );
    desc.setZReadWrite( true, false );
    mMatInstance->addStateBlockDesc( desc );
 

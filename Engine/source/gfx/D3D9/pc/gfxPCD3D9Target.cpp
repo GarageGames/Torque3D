@@ -31,6 +31,9 @@
 #include "gfx/gfxDebugEvent.h"
 #include "windowManager/win32/win32Window.h"
 
+#ifndef _GFXDEVICE_H_
+#include "gfx/gfxDevice.h"
+#endif
 
 GFXPCD3D9TextureTarget::GFXPCD3D9TextureTarget() 
    :  mTargetSize( Point2I::Zero ),
@@ -451,6 +454,7 @@ void GFXPCD3D9WindowTarget::createAdditionalSwapChain()
 
 void GFXPCD3D9WindowTarget::resetMode()
 {
+   GFX->beginReset();
    mWindow->setSuppressReset(true);
 
    if (mSwapChain)
@@ -509,6 +513,7 @@ void GFXPCD3D9WindowTarget::zombify()
 
 void GFXPCD3D9WindowTarget::resurrect()
 {
+   GFX->beginReset();
    if(mImplicit)
    {
       setImplicitSwapChain();

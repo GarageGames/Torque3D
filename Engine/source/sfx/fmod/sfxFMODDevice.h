@@ -105,8 +105,8 @@ struct FModFNTable
    }
    ~FModFNTable()
    {
-      eventDllRef = NULL;
       dllRef = NULL;
+      eventDllRef = NULL;      
       delete mutex;
    }
 

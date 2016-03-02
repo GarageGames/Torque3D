@@ -325,7 +325,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
     if (modType == TOUCH)
        return(utime(prefPathName, 0) != -1);
     else if (modType == DELETE)
-       return (remove(prefPathName) != -1);
+       return (remove(prefPathName) == 0);
     else
        AssertFatal(false, "Unknown File Mod type");
     return false;
@@ -1138,6 +1138,11 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
    closedir(dip);
    Platform::clearExcludedDirectories();
    return false;
+ }
+
+ bool Platform::fileDelete(const char * name)
+ {
+   return ModifyFile(name, DELETE);
  }
 
  static bool recurseDumpDirectories(const char *basePath, const char *subPath, Vector<StringTableEntry> &directoryVector, S32 currentDepth, S32 recurseDepth, bool noBasePath)

@@ -157,6 +157,10 @@ float4 main( FarFrustumQuadConnectP IN,
 
              uniform sampler2D prePassBuffer : register(S0),
              
+             uniform sampler2D lightBuffer : register(S5),
+             uniform sampler2D colorBuffer : register(S6),
+             uniform sampler2D matInfoBuffer : register(S7),
+             
              uniform float3 lightDirection,
              uniform float4 lightColor,
              uniform float  lightBrightness,
@@ -190,7 +194,15 @@ float4 main( FarFrustumQuadConnectP IN,
              uniform float4 dynamicFarPlaneScalePSSM
 
             ) : COLOR0
-{   
+{
+   // Emissive.
+   float4 matInfo = tex2D( matInfoBuffer, IN.uv0 );   
+   bool emissive = getFlag( matInfo.r, 0 );
+   if ( emissive )
+   {
+       return float4(1.0, 1.0, 1.0, 0.0);
+   }
+   
    // Sample/unpack the normal/z data
    float4 prepassSample = prepassUncondition( prePassBuffer, IN.uv0 );
    float3 normal = prepassSample.rgb;
@@ -229,7 +241,6 @@ float4 main( FarFrustumQuadConnectP IN,
                                                         shadowSoftness, 
                                                         dotNL,
                                                         overDarkPSSM);
-
       float4 dynamic_shadowed_colors = AL_VectorLightShadowCast( dynamicShadowMap,
                                                         IN.uv0.xy,
                                                         dynamicWorldToLightProj,
@@ -276,6 +287,7 @@ float4 main( FarFrustumQuadConnectP IN,
                                     
    float Sat_NL_Att = saturate( dotNL * shadowed ) * lightBrightness;
    float3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
+   
    float4 addToResult = (lightAmbient * (1 - ambientCameraFactor)) + ( lightAmbient * ambientCameraFactor * saturate(dot(normalize(-IN.vsEyeRay), normal)) );
 
    // TODO: This needs to be removed when lightmapping is disabled
@@ -303,5 +315,6 @@ float4 main( FarFrustumQuadConnectP IN,
       lightColorOut = debugColor;
    #endif
 
-   return lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );  
+   float4 colorSample = tex2D( colorBuffer, IN.uv0 );
+   return AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
 }

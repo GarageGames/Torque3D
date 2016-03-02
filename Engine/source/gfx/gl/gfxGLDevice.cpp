@@ -355,23 +355,47 @@ GFXPrimitiveBuffer* GFXGLDevice::findVolatilePBO(U32 numIndices, U32 numPrimitiv
 GFXVertexBuffer *GFXGLDevice::allocVertexBuffer(   U32 numVerts, 
                                                    const GFXVertexFormat *vertexFormat, 
                                                    U32 vertSize, 
-                                                   GFXBufferType bufferType ) 
+                                                   GFXBufferType bufferType,
+                                                   void* data )  
 {
    if(bufferType == GFXBufferTypeVolatile)
       return findVolatileVBO(numVerts, vertexFormat, vertSize);
          
    GFXGLVertexBuffer* buf = new GFXGLVertexBuffer( GFX, numVerts, vertexFormat, vertSize, bufferType );
-   buf->registerResourceWithDevice(this);
+   buf->registerResourceWithDevice(this);   
+
+   if(data)
+   {
+      void* dest;
+      buf->lock(0, numVerts, &dest);
+      dMemcpy(dest, data, vertSize * numVerts);
+      buf->unlock();
+   }
+
    return buf;
 }
 
-GFXPrimitiveBuffer *GFXGLDevice::allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType ) 
+GFXPrimitiveBuffer *GFXGLDevice::allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType, void* data ) 
 {
+   GFXPrimitiveBuffer* buf;
+   
    if(bufferType == GFXBufferTypeVolatile)
-      return findVolatilePBO(numIndices, numPrimitives);
-         
-   GFXGLPrimitiveBuffer* buf = new GFXGLPrimitiveBuffer(GFX, numIndices, numPrimitives, bufferType);
-   buf->registerResourceWithDevice(this);
+   {
+      buf = findVolatilePBO(numIndices, numPrimitives);
+   }
+   else
+   {
+      buf = new GFXGLPrimitiveBuffer(GFX, numIndices, numPrimitives, bufferType);
+      buf->registerResourceWithDevice(this);
+   }
+   
+   if(data)
+   {
+      void* dest;
+      buf->lock(0, numIndices, &dest);
+      dMemcpy(dest, data, sizeof(U16) * numIndices);
+      buf->unlock();
+   }
    return buf;
 }
 

@@ -81,3 +81,6 @@ const String ShaderGenVars::dLightMap("$dlightMap");
 const String ShaderGenVars::dLightMapSec("$dlightMapSec");
 const String ShaderGenVars::dLightMask("$dlightMask");
 const String ShaderGenVars::toneMap("$toneMap");
+
+// Deferred shading
+const String ShaderGenVars::matInfoFlags("$matInfoFlags");

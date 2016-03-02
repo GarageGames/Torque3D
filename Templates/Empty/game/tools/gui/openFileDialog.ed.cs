@@ -20,27 +20,38 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function getLoadFilename(%filespec, %callback, %currentFile)
-{   
+function getLoadFilename(%filespec, %callback, %currentFile, %getRelative, %defaultPath)
+{
+   //If no default path passed in then try to get one from the file
+   if(%defaultPath $= "")
+   {
+      if ( filePath( %currentFile ) !$= "" )
+         %defaultPath = filePath(%currentFile);
+   }
+   
    %dlg = new OpenFileDialog()
    {
       Filters = %filespec;
       DefaultFile = %currentFile;
+      DefaultPath = %defaultPath;
       ChangePath = false;
       MustExist = true;
       MultipleFiles = false;
    };
    
-   if ( filePath( %currentFile ) !$= "" )
-      %dlg.DefaultPath = filePath(%currentFile);  
-      
-   if ( %dlg.Execute() )
+   %ok = %dlg.Execute();
+   if ( %ok )
    {
-      eval(%callback @ "(\"" @ %dlg.FileName @ "\");");
+      %file = %dlg.FileName;
+      if(%getRelative)
+         %file = strreplace(%file,getWorkingDirectory() @ "/", "");
+      eval(%callback @ "(\"" @ %file @ "\");");
       $Tools::FileDialogs::LastFilePath = filePath( %dlg.FileName );
    }
    
    %dlg.delete();
+   
+   return %ok;
 }
 
 // Opens a choose file dialog with format filters already loaded

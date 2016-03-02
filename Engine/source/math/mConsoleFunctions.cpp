@@ -103,6 +103,19 @@ DefineConsoleFunction( mRound, S32, ( F32 v  ),,
    return mRound(v);
 }
 
+DefineConsoleFunction( mRoundColour, F32, ( F32 v, S32 n ), (0),
+   "Round v to the nth decimal place or the nearest whole number by default."
+   "@param v Value to roundn"
+   "@param n Number of decimal places to round to, 0 by defaultn"
+   "@return The rounded value as a S32."
+   "@ingroup Math")
+{
+   if (n <= 0)
+      return mRound(v);
+   else
+      return mRound(v, n);
+}
+
 DefineConsoleFunction( mCeil, S32, ( F32 v ),,
     "Round v up to the nearest integer.\n"
     "@param v Number to convert to integer."

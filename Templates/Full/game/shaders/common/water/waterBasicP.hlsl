@@ -117,6 +117,7 @@ float4 main( ConnectData IN ) : COLOR
 { 
    // Modulate baseColor by the ambientColor.
    float4 waterBaseColor = baseColor * float4( ambientColor.rgb, 1 );
+   waterBaseColor = toLinear(waterBaseColor);
    
    // Get the bumpNorm...
    float3 bumpNorm = ( tex2D( bumpMap, IN.rippleTexCoord01.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.x;
