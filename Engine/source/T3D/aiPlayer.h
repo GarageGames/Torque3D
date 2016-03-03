@@ -49,6 +49,7 @@ private:
    MoveState mMoveState;
    F32 mMoveSpeed;
    F32 mMoveTolerance;                 // Distance from destination before we stop
+   F32 mAttackRadius;                  // Distance to trigger weaponry calcs
    Point3F mMoveDestination;           // Destination for movement
    Point3F mLastLocation;              // For stuck check
    F32 mMoveStuckTolerance;            // Distance tolerance on stuck check
@@ -96,8 +97,6 @@ private:
    /// Path we are currently following.
    PathData mPathData;
 
-   /// Clear out the current path.
-   void clearPath();
 
    /// Get the current path we're following.
    NavPath *getPath() { return mPathData.path; }
@@ -113,8 +112,6 @@ private:
    /// Current cover we're trying to get to.
    CoverData mCoverData;
 
-   /// Stop searching for cover.
-   void clearCover();
 
    /// Information about a target we're following.
    struct FollowData {
@@ -134,8 +131,6 @@ private:
    /// Current object we're following.
    FollowData mFollowData;
 
-   /// Stop following me!
-   void clearFollow();
 
    /// NavMesh we pathfind on.
    SimObjectPtr<NavMesh> mNavMesh;
@@ -160,6 +155,13 @@ public:
    void onRemove();
 
    virtual bool getAIMove( Move *move );
+   virtual void updateMove(const Move *move);
+   /// Clear out the current path.
+   void clearPath();
+   /// Stop searching for cover.
+   void clearCover();
+   /// Stop following me!
+   void clearFollow();
 
    // Targeting and aiming sets/gets
    void setAimObject( GameBase *targetObject );
@@ -170,6 +172,7 @@ public:
    void clearAim();
    bool checkInLos(GameBase* target = NULL, bool _useMuzzle = false, bool _checkEnabled = false);
    bool checkInFoV(GameBase* target = NULL, F32 camFov = 45.0f, bool _checkEnabled = false);
+   F32 getTargetDistance(GameBase* target, bool _checkEnabled);
 
    // Movement sets/gets
    void setMoveSpeed( const F32 speed );

@@ -145,6 +145,9 @@ void AIPlayer::initPersistFields()
          "to accelerate to full speed without its initial slow start being considered as stuck.\n"
          "@note Set to zero to have the stuck test start immediately.\n");
 
+      addField( "AttackRadius", TypeF32, Offset( mAttackRadius, AIPlayer ), 
+         "@brief Distance considered in firing range for callback purposes.");
+      	  
    endGroup( "AI" );
 
 #ifdef TORQUE_NAVIGATION_ENABLED
@@ -372,6 +375,11 @@ bool AIPlayer::getAIMove(Move *movePtr)
             {
                clearPath();
                mMoveState = ModeStop;
+			   throwCallback("onTargetInRange");
+            }
+            else if((getPosition() - mFollowData.object->getPosition()).len() < mAttackRadius)
+            {
+			   throwCallback("onTargetInFiringRange");
             }
          }
       }
@@ -499,7 +507,7 @@ bool AIPlayer::getAIMove(Move *movePtr)
          {
             F32 speed = mMoveSpeed;
             F32 dist = mSqrt(xDiff*xDiff + yDiff*yDiff);
-            F32 maxDist = 5.0f;
+            F32 maxDist = mMoveTolerance*2;
             if (dist < maxDist)
                speed *= dist / maxDist;
             movePtr->x *= speed;
@@ -539,29 +547,22 @@ bool AIPlayer::getAIMove(Move *movePtr)
    // Test for target location in sight if it's an object. The LOS is
    // run from the eye position to the center of the object's bounding,
    // which is not very accurate.
-   if (mAimObject) {
-      MatrixF eyeMat;
-      getEyeTransform(&eyeMat);
-      eyeMat.getColumn(3,&location);
-      Point3F targetLoc = mAimObject->getBoxCenter();
-
-      // This ray ignores non-static shapes. Cast Ray returns true
-      // if it hit something.
-      RayInfo dummy;
-      if (getContainer()->castRay( location, targetLoc,
-            StaticShapeObjectType | StaticObjectType |
-            TerrainObjectType, &dummy)) {
-         if (mTargetInLOS) {
-            throwCallback( "onTargetExitLOS" );
-            mTargetInLOS = false;
-         }
-      }
-      else
-         if (!mTargetInLOS) {
+   if (mAimObject)
+   {
+      if (checkInLos(mAimObject.getPointer()))
+      {
+         if (!mTargetInLOS)
+         {
             throwCallback( "onTargetEnterLOS" );
             mTargetInLOS = true;
          }
    }
+      else if (mTargetInLOS)
+      {
+            throwCallback( "onTargetExitLOS" );
+            mTargetInLOS = false;
+         }
+      }
 
    Pose desiredPose = mPose;
 
@@ -606,14 +607,24 @@ bool AIPlayer::getAIMove(Move *movePtr)
    return true;
 }
 
+void AIPlayer::updateMove(const Move* move)
+{
+   if (!getControllingClient() && isGhost())
+      return;
+
+   Parent::updateMove(move);
+}
+
 void AIPlayer::setAiPose( S32 pose )  
 {  
+   if (!getControllingClient() && isGhost())  
+      return;  
    mAiPose = pose;  
 }  
   
 S32 AIPlayer::getAiPose()  
 {  
-   return mAiPose;   
+   return mAiPose;  
 }
 
 /**
@@ -745,6 +756,7 @@ bool AIPlayer::setPathDestination(const Point3F &pos)
    if(!getNavMesh())
    {
       //setMoveDestination(pos);
+      throwCallback("onPathFailed");
       return false;
    }
 
@@ -776,6 +788,7 @@ bool AIPlayer::setPathDestination(const Point3F &pos)
       mPathData.owned = true;
       // Skip node 0, which we are currently standing on.
       moveToNode(1);
+      throwCallback("onPathSuccess");
       return true;
    }
    else
@@ -783,7 +796,7 @@ bool AIPlayer::setPathDestination(const Point3F &pos)
       // Just move normally if we can't path.
       //setMoveDestination(pos, true);
       //return;
-      //throwCallback("onPathFailed");
+      throwCallback("onPathFailed");
       path->deleteObject();
       return false;
    }
@@ -871,6 +884,10 @@ DefineEngineMethod(AIPlayer, followObject, void, (SimObjectId obj, F32 radius),,
    "@param radius Maximum distance we let the target escape to.")
 {
    SceneObject *follow;
+   object->clearPath();
+   object->clearCover();
+   object->clearFollow();
+
    if(Sim::findObject(obj, follow))
       object->followObject(follow, radius);
 }
@@ -1372,6 +1389,40 @@ DefineEngineMethod( AIPlayer, clearMoveTriggers, void, ( ),,
    "@see clearMoveTrigger()\n")
 {
    object->clearMoveTriggers();
+}
+
+F32 AIPlayer::getTargetDistance(GameBase* target, bool _checkEnabled)
+{
+   if (!isServerObject()) return false;
+   if (!target)
+   {
+      target = mAimObject.getPointer();
+      if (!target)
+         return F32_MAX;
+   }
+
+   if (_checkEnabled)
+   {
+      if (target->getTypeMask() & ShapeBaseObjectType)
+      {
+         ShapeBase *shapeBaseCheck = static_cast<ShapeBase *>(target);
+         if (shapeBaseCheck)
+            if (shapeBaseCheck->getDamageState() != Enabled) return false;
+      }
+      else
+         return F32_MAX;
+   }
+
+   return (getPosition() - target->getPosition()).len();
+}
+
+DefineEngineMethod(AIPlayer, getTargetDistance, bool, (ShapeBase* obj, bool checkEnabled), (NULL, false),
+   "@brief Check whether an object is within a specified veiw cone.\n"
+   "@obj Object to check. (If blank, it will check the current target).\n"
+   "@fov view angle in degrees.(Defaults to 45)\n"
+   "@checkEnabled check whether the object can take damage and if so is still alive.(Defaults to false)\n")
+{
+   return object->getTargetDistance(obj, checkEnabled);
 }
 
 DefineEngineMethod( AIPlayer, setAiPose, void, ( S32 pose ),,  
