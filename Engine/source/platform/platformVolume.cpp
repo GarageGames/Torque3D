@@ -60,11 +60,15 @@ bool MountZips(const String &root)
 {
    Path basePath;
    basePath.setRoot(root);
-   Vector<String> outList;
+   Vector<String> outList, outListp;
 
    S32 num = FindByPattern(basePath, "*.zip", true, outList);
-   if(num == 0)
-      return true; // not an error
+   S32 nump = FindByPattern(basePath, "*.pak", true, outListp);
+   
+   if(num == 0 && nump == 0)
+      return true; //not an error
+
+   outList.merge(outListp);
 
    S32 mounted = 0;
    for(S32 i = 0;i < outList.size();++i)

@@ -514,21 +514,25 @@ bool ColladaShapeLoader::canLoadCachedDTS(const Torque::Path& path)
    Torque::Path cachedPath(path);
    cachedPath.setExtension("cached.dts");
 
-   // Check if a cached DTS newer than this file is available
-   FileTime cachedModifyTime;
-   if (Platform::getFileTimes(cachedPath.getFullPath(), NULL, &cachedModifyTime))
-   {
-      bool forceLoadDAE = Con::getBoolVariable("$collada::forceLoadDAE", false);
+   //if forcing dae loading then return false
+   if( Con::getBoolVariable("$collada::forceLoadDAE", false) )
+   	return false;
 
-      FileTime daeModifyTime;
-      if (!Platform::getFileTimes(path.getFullPath(), NULL, &daeModifyTime) ||
-         (!forceLoadDAE && (Platform::compareFileTimes(cachedModifyTime, daeModifyTime) >= 0) ))
-      {
-         // DAE not found, or cached DTS is newer
-         return true;
-      }
-   }
+   Torque::FS::FileNode::Attributes a1, a2;
 
+   //if there is no cached dts, return false
+   if (!Torque::FS::GetFileAttributes(cachedPath, &a1)) return false;
+
+   //if there is a cached dts but no dae, return true
+   if (!Torque::FS::GetFileAttributes(path, &a2)) return true;
+
+   //if the cached dts was most recently modified, return true
+   if(a1.mtime > a2.mtime) return true;
+
+   //if the cached dts and dae modified times equal, prefer cached dts
+   if(a1.mtime == a2.mtime) return true;
+
+   //otherwise return false
    return false;
 }
 

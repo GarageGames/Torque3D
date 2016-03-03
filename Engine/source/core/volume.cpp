@@ -48,6 +48,8 @@ bool FileSystemChangeNotifier::addNotification( const Path &path, ChangeDelegate
    if (dir.isEmpty())
       return false;
 
+   if(!Torque::FS::IsDirectory(dir)) return false;
+
    dir.setFileName( String() );
    dir.setExtension( String () );
    
