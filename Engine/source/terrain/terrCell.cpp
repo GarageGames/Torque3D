@@ -283,7 +283,7 @@ TerrCell* TerrCell::init( TerrainBlock *terrain )
 }
 
 
-void TerrCell::_init( TerrainBlock *terrain,               
+void TerrCell::_init( TerrainBlock *terrain,
                       const Point2I &point,
                       U32 size,
                       U32 level )
