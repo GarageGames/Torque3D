@@ -44,24 +44,26 @@ TEST(Platform, Sleep)
       << "We didn't sleep at least as long as we requested!";
 };
 
+struct handle
+{
+   S32 mElapsedTime;
+   S32 mNumberCalls;
+
+   handle() : mElapsedTime(0), mNumberCalls(0) {}
+
+   void timeEvent(S32 timeDelta)
+   {
+      mElapsedTime += timeDelta;
+      mNumberCalls++;
+      
+      if(mElapsedTime >= 1000)
+         Process::requestShutdown();
+   }
+};
+
 TEST(TimeManager, BasicAPI)
 {
-   struct handle
-   {
-      S32 mElapsedTime;
-      S32 mNumberCalls;
-
-      void timeEvent(S32 timeDelta)
-      {
-         mElapsedTime += timeDelta;
-         mNumberCalls++;
-      
-         if(mElapsedTime >= 1000)
-            Process::requestShutdown();
-      }
-   } handler;
-
-   handler.mElapsedTime = handler.mNumberCalls = 0;
+   handle handler;
 
    // Initialize the time manager...
    TimeManager time;

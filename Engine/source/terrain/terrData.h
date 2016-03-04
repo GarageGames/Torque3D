@@ -413,7 +413,7 @@ public:
 
    bool setFile( const FileName& terrFileName );
 
-   void setFile( Resource<TerrainFile> file );
+   void setFile(const Resource<TerrainFile>& file);
 
    bool save(const char* filename);
 

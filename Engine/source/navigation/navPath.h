@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2013 GarageGames, LLC
+// Copyright (c) 2014 Daniel Buckmaster
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -30,33 +30,33 @@
 
 class NavPath: public SceneObject {
    typedef SceneObject Parent;
-   /// Maximum size of Detour path.
-   static const U32 MaxPathLen = 1024;
-
+   static const U32 MaxPathLen = 2048;
 public:
    /// @name NavPath
    /// Functions for planning and accessing the path.
    /// @{
 
-   SimObjectPtr<NavMesh> mMesh;
-   SimObjectPtr<SimPath::Path> mWaypoints;
+   String mMeshName;
+   NavMesh *mMesh;
+   SimPath::Path *mWaypoints;
 
-   /// Location to start at.
    Point3F mFrom;
-   /// Has a starting location been set?
    bool mFromSet;
-   /// Location to end at.
    Point3F mTo;
-   /// Has an end been set?
    bool mToSet;
 
-   /// This path should include a segment from the end to the start.
    bool mIsLooping;
+   bool mAutoUpdate;
+   bool mIsSliced;
 
-   /// Render even when not selected in the editor.
+   S32 mMaxIterations;
+
    bool mAlwaysRender;
-   /// Render on top of other objects.
    bool mXray;
+   bool mRenderSearch;
+
+   /// What sort of link types are we allowed to move on?
+   LinkData mLinkTypes;
 
    /// Plan the path.
    bool plan();
@@ -69,20 +69,28 @@ public:
    /// @return True if the plan was successful overall.
    bool finalise();
 
+   /// Did the path plan successfully?
+   bool success() const { return dtStatusSucceed(mStatus); }
+
    /// @}
 
    /// @name Path interface
+   /// These functions are provided to make NavPath behave
+   /// similarly to the existing Path class, despite NavPath
+   /// not being a SimSet.
    /// @{
 
-   /// Return world-space position of a path node.
-   /// @param[in] idx Node index to retrieve.
-   Point3F getNode(S32 idx);
-
-   /// Return the number of nodes in this path.
-   S32 getCount();
-
    /// Return the length of this path.
-   F32 getLength() { return mLength; };
+   F32 getLength() const { return mLength; };
+
+   /// Get the number of nodes in a path.
+   S32 size() const;
+
+   /// Return world-space position of a path node.
+   Point3F getNode(S32 idx) const;
+
+   /// Get the flags for a given path node.
+   U16 getFlags(S32 idx) const;
 
    /// @}
 
@@ -128,39 +136,46 @@ private:
    /// Create appropriate data structures and stuff.
    bool init();
 
-   /// 'Visit' the most recent two points on our visit list.
+   /// Plan the path.
+   bool planInstant();
+
+   /// Start a sliced plan.
+   /// @return True if the plan initialised successfully.
+   bool planSliced();
+
+   /// Add points of the path between the two specified points.
+   //bool addPoints(Point3F from, Point3F to, Vector<Point3F> *points);
+
+   /// 'Visit' the last two points on our visit list.
    bool visitNext();
 
-   /// Detour path query.
    dtNavMeshQuery *mQuery;
-   /// Current status of our Detour query.
    dtStatus mStatus;
-   /// Filter that provides the movement costs for paths.
    dtQueryFilter mFilter;
-   
-   /// List of points the path should visit (waypoints, if you will).
-   Vector<Point3F> mVisitPoints;
-   /// List of points in the final path.
+   S32 mCurIndex;
    Vector<Point3F> mPoints;
-
-   /// Total length of path in world units.
+   Vector<U16> mFlags;
+   Vector<Point3F> mVisitPoints;
    F32 mLength;
 
    /// Resets our world transform and bounds to fit our point list.
    void resize();
 
-   /// @name Protected console getters/setters
-   /// @{
+   /// Function used to set mMesh object from console.
    static bool setProtectedMesh(void *obj, const char *index, const char *data);
-   static const char *getProtectedMesh(void *obj, const char *data);
+
+   /// Function used to set mWaypoints from console.
    static bool setProtectedWaypoints(void *obj, const char *index, const char *data);
 
-   static bool setProtectedAlwaysRender(void *obj, const char *index, const char *data);
+   void checkAutoUpdate();
+   /// Function used to protect auto-update flag.
+   static bool setProtectedAutoUpdate(void *obj, const char *index, const char *data);
 
+   /// @name Protected from and to vectors
+   /// @{
    static bool setProtectedFrom(void *obj, const char *index, const char *data);
-   static const char *getProtectedFrom(void *obj, const char *data);
-
    static bool setProtectedTo(void *obj, const char *index, const char *data);
+   static const char *getProtectedFrom(void *obj, const char *data);
    static const char *getProtectedTo(void *obj, const char *data);
    /// @}
 };

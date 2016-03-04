@@ -203,8 +203,8 @@ void MeshRoadNodeEvent::padListToSize()
       newlist->mDepths.merge(list->mDepths);
       newlist->mNormals.merge(list->mNormals);
 
-      mNodeList = newlist;
       delete list;
+      mNodeList = list = newlist;
    }
 
    // Pad our list end?
@@ -864,7 +864,7 @@ void MeshRoad::prepRenderImage( SceneRenderState* state )
 
          // We sort by the material then vertex buffer.
          ri->defaultKey = matInst->getStateHint();
-         ri->defaultKey2 = (U32)ri->vertBuff; // Not 64bit safe!
+         ri->defaultKey2 = (uintptr_t)ri->vertBuff; // Not 64bit safe!
 
          renderPass->addInst( ri );  
       }
@@ -1552,7 +1552,7 @@ bool MeshRoad::castRay( const Point3F &s, const Point3F &e, RayInfo *info )
       info->point.interpolate(start, end, out);
       info->face = -1;
       info->object = this;
-
+      info->material = this->mMatInst[0];
       return true;
    }
 

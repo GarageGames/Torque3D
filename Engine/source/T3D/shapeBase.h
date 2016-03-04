@@ -63,6 +63,8 @@
    #include "console/dynamicTypes.h"
 #endif
 
+// Need full definition visible for SimObjectPtr<ParticleEmitter>
+#include "T3D/fx/particleEmitter.h"
 
 class GFXCubemap;
 class TSShapeInstance;
@@ -70,8 +72,6 @@ class SceneRenderState;
 class TSThread;
 class GameConnection;
 struct CameraScopeQuery;
-class ParticleEmitter;
-class ParticleEmitterData;
 class ProjectileData;
 class ExplosionData;
 struct DebrisData;
@@ -324,7 +324,10 @@ struct ShapeBaseImageData: public GameBaseData {
    /// @{
    bool              shakeCamera;
    VectorF           camShakeFreq;
-   VectorF           camShakeAmp;         
+   VectorF           camShakeAmp;
+   F32               camShakeDuration;
+   F32               camShakeRadius;
+   F32               camShakeFalloff;
    /// @}
 
    /// Maximum number of sounds this image can play at a time.
@@ -871,6 +874,7 @@ protected:
    /// @name Physical Properties
    /// @{
 
+   S32 mAiPose;                     ///< Current pose.
    F32 mEnergy;                     ///< Current enery level.
    F32 mRechargeRate;               ///< Energy recharge rate (in units/tick).
 
@@ -902,9 +906,6 @@ protected:
    F32 mWhiteOut;
 
    bool mFlipFadeVal;
-
-   /// Camera shake caused by weapon fire.
-   CameraShake *mWeaponCamShake;
 
  public:
 
@@ -1101,10 +1102,11 @@ protected:
    virtual void onImageAnimThreadChange(U32 imageSlot, S32 imageShapeIndex, ShapeBaseImageData::StateData* lastState, const char* anim, F32 pos, F32 timeScale, bool reset=false);
    virtual void onImageAnimThreadUpdate(U32 imageSlot, S32 imageShapeIndex, F32 dt);
    virtual void ejectShellCasing( U32 imageSlot );
+   virtual void shakeCamera( U32 imageSlot );
    virtual void updateDamageLevel();
    virtual void updateDamageState();
-   virtual void onImpact(SceneObject* obj, VectorF vec);
-   virtual void onImpact(VectorF vec);
+   virtual void onImpact(SceneObject* obj, const VectorF& vec);
+   virtual void onImpact(const VectorF& vec);
    /// @}
 
    /// The inner prep render function that does the 
@@ -1581,6 +1583,13 @@ public:
    /// @param   pos   TODO: Find out what this does
    /// @param   mat   Camera transform (out)
    virtual void getCameraTransform(F32* pos,MatrixF* mat);
+
+   /// Gets the view transform for a particular eye, taking into account the current absolute 
+   /// orient and position values of the display device.
+   virtual void getEyeCameraTransform( IDisplayDevice *display, U32 eyeId, MatrixF *outMat );
+
+   /// Calculates a delta camera angle and view position based on inPose
+   virtual DisplayPose calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose);
 
    /// Gets the index of a node inside a mounted image given the name
    /// @param   imageSlot   Image slot

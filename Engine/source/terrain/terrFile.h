@@ -219,44 +219,15 @@ public:
 private:
    // Clamp X and Y to the size of terrain.
    void clamp( U32* x,  U32* y ) const;
-   inline static void error(char c, U32 v ) {
-	   static const char* s = "TerrainFile Coord '%c == %d' out of range. Fix it in the algorithm.";
-#if 1
-      // only first error
-      static bool  first = true;
-      if ( first ) {
-         Con::errorf( s,  c, v );
-         first = false;
-      }
-#else
-      // all errors
-      Con::errorf( s,  c, v );
-#endif
-   }
 };
 
-// @todo ! Need AssertFatal() and debug all clients.
-// @todo ! Verify all methods of TerrainFile.
 inline void TerrainFile::clamp( U32* x,  U32* y ) const
 {
-#if 0
-   // old clamp
-   *x %= mSize;
-   *y %= mSize;
-#else
-
-
-   if (*x >= mSize) {
-      error( 'x', *x );
+   if (*x >= mSize)
       *x = mSize - 1;
-   }
-   if (*y >= mSize) {
-      error( 'y', *y );
+   if (*y >= mSize)
       *y = mSize - 1;
-   }
-#endif
 }
-
 
 inline TerrainSquare* TerrainFile::findSquare( U32 level, U32 x, U32 y ) const
 {
@@ -269,7 +240,7 @@ inline TerrainSquare* TerrainFile::findSquare( U32 level, U32 x, U32 y ) const
 
 inline void TerrainFile::setHeight( U32 x, U32 y, U16 height )
 {
-	clamp( &x, &y );
+   clamp( &x, &y );
    setHeight( x + y * mSize,  height );
 }
 
@@ -280,13 +251,13 @@ inline void TerrainFile::setHeight( U32 i, U16 height )
 
 inline const U16* TerrainFile::getHeightAddress( U32 x, U32 y ) const
 {
-	clamp( &x, &y );
+   clamp( &x, &y );
    return &mHeightMap[ x + ( y * mSize ) ];
 }
 
 inline U16 TerrainFile::getHeight( U32 x, U32 y ) const
 {
-	clamp( &x, &y );
+   clamp( &x, &y );
    return mHeightMap[ x + ( y * mSize ) ];
 }
 
@@ -315,13 +286,13 @@ inline void TerrainFile::getHeight4(
 
 inline U8 TerrainFile::getLayerIndex( U32 x, U32 y ) const
 {
-	clamp( &x, &y );
+   clamp( &x, &y );
    return mLayerMap[ x + ( y * mSize ) ];
 }
 
 inline void TerrainFile::setLayerIndex( U32 x, U32 y, U8 index )
 {
-	clamp( &x, &y );
+   clamp( &x, &y );
    mLayerMap[ x + ( y * mSize ) ] = index;
 }
 
@@ -335,7 +306,7 @@ inline BaseMatInstance* TerrainFile::getMaterialMapping( U32 index ) const
 
 inline StringTableEntry TerrainFile::getMaterialName( U32 x, U32 y) const
 {
-	clamp( &x, &y );
+   clamp( &x, &y );
    const U8 &index = mLayerMap[ x + ( y * mSize ) ];
 
    if ( index < mMaterials.size() )

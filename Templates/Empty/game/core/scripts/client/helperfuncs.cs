@@ -252,7 +252,7 @@ function parseMissionGroupForIds( %className, %childGroup )
       if( (%currentGroup).getObject(%i).getClassName() $= "SimGroup" )
          %classIds = %classIds @ parseMissionGroupForIds( %className, (%currentGroup).getObject(%i).getId());
    } 
-   return %classIds;
+   return trim( %classIds );
 }
 
 //------------------------------------------------------------------------------

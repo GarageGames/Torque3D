@@ -384,6 +384,7 @@ function EditorGui::addToToolsToolbar( %this, %pluginName, %internalName, %bitma
          useMouseEvents = "0";
       };
       ToolsToolbarArray.add(%button);
+      EWToolsToolbar.setExtent((25 + 8) * (%count + 1) + 12 SPC "33");
    }
 }
 
@@ -560,9 +561,6 @@ function EditorGui::onWake( %this )
    
    if( %levelName !$= %this.levelName )
       %this.onNewLevelLoaded( %levelName );
-      
-   if (isObject(DemoEditorAlert) && DemoEditorAlert.helpTag<2)
-      Canvas.pushDialog(DemoEditorAlert);
 }
 
 function EditorGui::onSleep( %this )

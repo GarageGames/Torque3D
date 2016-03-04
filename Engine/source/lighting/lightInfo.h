@@ -131,6 +131,9 @@ protected:
 
    bool mCastShadows;
 
+   S32 mStaticRefreshFreq;
+   S32 mDynamicRefreshFreq;
+
    ::Vector<LightInfoEx*> mExtended;
 
    /// The priority of this light used for
@@ -190,6 +193,12 @@ public:
 
    bool getCastShadows() const { return mCastShadows; }
    void setCastShadows( bool castShadows ) { mCastShadows = castShadows; }
+   
+   S32 getStaticRefreshFreq() const { return mStaticRefreshFreq; }
+   void setStaticRefreshFreq(S32 _staticRefreshFreq) { mStaticRefreshFreq = _staticRefreshFreq; }
+
+   S32 getDynamicRefreshFreq() const { return mDynamicRefreshFreq; }
+   void setDynamicRefreshFreq(S32 _dynamicRefreshFreq) { mDynamicRefreshFreq = _dynamicRefreshFreq; }
 
    void setPriority( F32 priority ) { mPriority = priority; }
    F32 getPriority() const { return mPriority; }

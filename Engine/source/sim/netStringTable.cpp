@@ -267,6 +267,11 @@ void NetStringTable::dumpToConsole()
          0x11 );
 }
 
+
+
+#endif // DEBUG
+
+
 DefineEngineFunction( dumpNetStringTable, void, (),,
    "@brief Dump the current contents of the networked string table to the console.\n\n"
    "The results are returned in three columns.  The first column is the network string ID.  "
@@ -275,7 +280,8 @@ DefineEngineFunction( dumpNetStringTable, void, (),,
    "@note This function is available only in debug builds.\n\n"
    "@ingroup Networking" )
 {
+#ifdef TORQUE_DEBUG
    gNetStringTable->dumpToConsole();
+#endif
 }
 
-#endif // DEBUG

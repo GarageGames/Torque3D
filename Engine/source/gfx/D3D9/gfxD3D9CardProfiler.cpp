@@ -87,9 +87,11 @@ void GFXD3D9CardProfiler::setupCardCapabilities()
    bool canDoFourStageDetailBlend = ( caps.TextureOpCaps & D3DTEXOPCAPS_SUBTRACT ) &&
                                     ( caps.PrimitiveMiscCaps & D3DPMISCCAPS_TSSARGTEMP ) &&
                                     ( caps.MaxTextureBlendStages > 3 );
+   bool canDoIndependentMrtBitDepth = (caps.PrimitiveMiscCaps & D3DPMISCCAPS_MRTINDEPENDENTBITDEPTHS ? 1 : 0 );
 
    setCapability( "lerpDetailBlend", canDoLERPDetailBlend );
    setCapability( "fourStageDetailBlend", canDoFourStageDetailBlend );
+   setCapability( "independentMrtBitDepth", canDoIndependentMrtBitDepth);
 }
 
 bool GFXD3D9CardProfiler::_queryCardCap(const String &query, U32 &foundResult)

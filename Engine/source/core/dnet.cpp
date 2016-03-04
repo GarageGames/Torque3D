@@ -25,6 +25,7 @@
 #include "core/strings/stringFunctions.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 
 
 bool gLogToConsole = false;
@@ -49,14 +50,13 @@ static const char *packetTypeNames[] =
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------
 //-----------------------------------------------------------------
-ConsoleFunction(DNetSetLogging, void, 2, 2, "(bool enabled)"
+DefineConsoleFunction( DNetSetLogging, void, (bool enabled), , "(bool enabled)"
    "@brief Enables logging of the connection protocols\n\n"
    "When enabled a lot of network debugging information is sent to the console.\n"
    "@param enabled True to enable, false to disable\n"
    "@ingroup Networking")
 {
-   TORQUE_UNUSED(argc);
-   gLogToConsole = dAtob(argv[1]);
+   gLogToConsole = enabled;
 }
 
 ConnectionProtocol::ConnectionProtocol()
@@ -66,6 +66,7 @@ ConnectionProtocol::ConnectionProtocol()
    mLastSendSeq = 0; // start sending at 1
    mAckMask = 0;
    mLastRecvAckAck = 0;
+   mConnectionEstablished = false;
 }
 void ConnectionProtocol::buildSendPacketHeader(BitStream *stream, S32 packetType)
 {

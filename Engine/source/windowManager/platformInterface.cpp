@@ -136,7 +136,7 @@ HWND getWin32WindowHandle()
          return NULL;
    }
 
-   return ( ( Win32Window* ) window )->getHWND();
+   return (HWND)window->getSystemWindow( PlatformWindow::WindowSystem_Windows );
 }
 
 #endif

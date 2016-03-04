@@ -22,7 +22,7 @@
 
 #include "windowManager/platformWindow.h"
 
-
+ScreenResChangeSignal PlatformWindow::smScreenResChangeSignal;
 //-----------------------------------------------------------------------------
 
 void PlatformWindow::setFullscreen( const bool fullscreen )
@@ -47,4 +47,9 @@ bool PlatformWindow::shouldNotTranslate( U32 modifiers, U32 keyCode ) const
       return mWindowInputGenerator->wantAsKeyboardEvent( modifiers, keyCode );
    else
       return false;
+}
+void PlatformWindow::setVideoMode(const GFXVideoMode &mode)
+{
+   _setVideoMode(mode);
+	getScreenResChangeSignal().trigger(this, true);
 }

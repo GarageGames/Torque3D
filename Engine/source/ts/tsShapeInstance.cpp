@@ -39,7 +39,6 @@
 #include "gfx/gfxDrawUtil.h"
 #include "core/module.h"
 
-
 MODULE_BEGIN( TSShapeInstance )
 
    MODULE_INIT
@@ -594,7 +593,7 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
    // 4:3 aspect ratio, we've changed the reference value
    // to 300 to be more compatible with legacy shapes.
    //
-   const F32 pixelScale = state->getViewport().extent.y / 300.0f;
+   const F32 pixelScale = (state->getViewport().extent.x / state->getViewport().extent.y);
 
    // This is legacy DTS support for older "multires" based
    // meshes.  The original crossbow weapon uses this.
@@ -781,5 +780,18 @@ void TSShapeInstance::prepCollision()
       if(mShape->meshes[i])
          mShape->meshes[i]->prepOpcodeCollision();
    }
+}
+
+// Returns true is the shape contains any materials with accumulation enabled.
+bool TSShapeInstance::hasAccumulation()
+{
+   bool result = false;
+   for ( U32 i = 0; i < mMaterialList->size(); ++i )
+   {
+      BaseMatInstance* mat = mMaterialList->getMaterialInst(i);
+      if ( mat->hasAccumulation() )
+         result = true;
+   }
+   return result;
 }
 

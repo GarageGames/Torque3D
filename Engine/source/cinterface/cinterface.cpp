@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "console/compiler.h"
 #include "console/consoleInternal.h"
+#include "console/engineAPI.h"
 #include "core/util/tDictionary.h"
 #include "core/strings/stringFunctions.h"
 #include "app/mainLoop.h"
@@ -426,7 +427,7 @@ extern "C" {
 			PlatformWindowManager::get()->getFirstWindow()->setSize(Point2I(width,height));
 	}
 
-#ifdef TORQUE_OS_WIN
+#if defined(TORQUE_OS_WIN) && !defined(TORQUE_SDL)
    // retrieve the hwnd of our render window
    void* torque_gethwnd()
    {
@@ -458,20 +459,16 @@ extern "C" {
 // By default, it is marked as secure by the web plugins and then can be called from
 // Javascript on the web page to ensure that function calls across the language
 // boundry are working with arguments and return values
-ConsoleFunction(testJavaScriptBridge, const char *, 4, 4, "testBridge(arg1, arg2, arg3)")
+DefineConsoleFunction( testJavaScriptBridge, const char *, (const char* arg1, const char* arg2, const char* arg3), , "testBridge(arg1, arg2, arg3)")
 {
 	S32 failed = 0;
-	if(argc != 4)
-		failed = 1;
-	else
-	{
-		if (dStrcmp(argv[1],"one"))
+		if (dStrcmp(arg1,"one"))
 			failed = 2;
-		if (dStrcmp(argv[2],"two"))
+		if (dStrcmp(arg2,"two"))
 			failed = 2;
-		if (dStrcmp(argv[3],"three"))
+		if (dStrcmp(arg3,"three"))
 			failed = 2;
-	}
+	
 
 	//attempt to call from TorqueScript -> JavaScript
 	const char* jret = Con::evaluate("JS::bridgeCallback(\"one\",\"two\",\"three\");");

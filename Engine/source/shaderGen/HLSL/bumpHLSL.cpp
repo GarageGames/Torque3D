@@ -222,12 +222,14 @@ void BumpFeatHLSL::setTexData(   Material::StageData &stageDat,
    if ( fd.features[MFT_NormalMap] )
    {
       passData.mTexType[ texIndex ] = Material::Bump;
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
       passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_NormalMap );
    }
 
    if ( fd.features[ MFT_DetailNormalMap ] )
    {
       passData.mTexType[ texIndex ] = Material::DetailBump;
+      passData.mSamplerNames[ texIndex ] = "detailBumpMap";
       passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_DetailNormalMap );
    }
 }
@@ -345,8 +347,16 @@ void ParallaxFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    Var *normalMap = getNormalMapTex();
 
    // Call the library function to do the rest.
-   meta->addStatement( new GenOp( "   @.xy += parallaxOffset( @, @.xy, @, @ );\r\n", 
-      texCoord, normalMap, texCoord, negViewTS, parallaxInfo ) );
+   if(fd.features.hasFeature( MFT_IsDXTnm, getProcessIndex() ))
+   {
+      meta->addStatement( new GenOp( "   @.xy += parallaxOffsetDxtnm( @, @.xy, @, @ );\r\n", 
+         texCoord, normalMap, texCoord, negViewTS, parallaxInfo ) );
+   }
+   else
+   {
+      meta->addStatement( new GenOp( "   @.xy += parallaxOffset( @, @.xy, @, @ );\r\n", 
+         texCoord, normalMap, texCoord, negViewTS, parallaxInfo ) );
+   }
 
    // TODO: Fix second UV maybe?
 
@@ -382,6 +392,7 @@ void ParallaxFeatHLSL::setTexData(  Material::StageData &stageDat,
    GFXTextureObject *tex = stageDat.getTex( MFT_NormalMap );
    if ( tex )
    {
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
       passData.mTexType[ texIndex ] = Material::Bump;
       passData.mTexSlot[ texIndex++ ].texObject = tex;
    }

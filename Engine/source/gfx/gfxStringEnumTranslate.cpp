@@ -87,9 +87,9 @@ _STRING_VALUE_LOOKUP_FXN(GFXStringBlendOp);
 
 #define VALIDATE_LOOKUPTABLE( tablearray, enumprefix ) \
    for( S32 i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
-      if( (S32)tablearray[i] == GFX_UNINIT_VAL ) \
+      if( (intptr_t)tablearray[i] == GFX_UNINIT_VAL ) \
          Con::warnf( "GFXStringEnumTranslate: Unassigned value in " #tablearray ": %i", i ); \
-      else if( (S32)tablearray[i] == GFX_UNSUPPORTED_VAL ) \
+      else if( (intptr_t)tablearray[i] == GFX_UNSUPPORTED_VAL ) \
          Con::warnf( "GFXStringEnumTranslate: Unsupported value in " #tablearray ": %i", i );
 
 //------------------------------------------------------------------------------
@@ -135,6 +135,7 @@ void GFXStringEnumTranslate::init()
    GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR8G8B8 );
    GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR8G8B8A8 );
    GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR8G8B8X8 );
+   GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatB8G8R8A8 );
    GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR32F );
    GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR5G6B5 );
    GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR5G5B5A1 );

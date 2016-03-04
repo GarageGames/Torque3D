@@ -31,35 +31,8 @@
 #include "gfx/gfxDrawUtil.h"
 #include "console/engineAPI.h"
 
+#include "guiChunkedBitmapCtrl.h"
 
-class GuiChunkedBitmapCtrl : public GuiControl
-{
-private:
-   typedef GuiControl Parent;
-   void renderRegion(const Point2I &offset, const Point2I &extent);
-
-protected:
-   StringTableEntry mBitmapName;
-   GFXTexHandle mTexHandle;
-   bool  mUseVariable;
-   bool  mTile;
-
-public:
-   //creation methods
-   DECLARE_CONOBJECT(GuiChunkedBitmapCtrl);
-   DECLARE_CATEGORY( "Gui Images" );
-   
-   GuiChunkedBitmapCtrl();
-   static void initPersistFields();
-
-   //Parental methods
-   bool onWake();
-   void onSleep();
-
-   void setBitmap(const char *name);
-
-   void onRender(Point2I offset, const RectI &updateRect);
-};
 
 IMPLEMENT_CONOBJECT(GuiChunkedBitmapCtrl);
 

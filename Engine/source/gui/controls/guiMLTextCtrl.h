@@ -128,7 +128,7 @@ class GuiMLTextCtrl : public GuiControl
    ~GuiMLTextCtrl();
 
    DECLARE_CALLBACK( void, onURL, (const char* url));
-   DECLARE_CALLBACK( void, onResize, ( const char* width, const char* maxY ));
+   DECLARE_CALLBACK( void, onResize, ( S32 width, S32 maxY ));
 
    // Text retrieval functions
    U32 getNumChars() const;

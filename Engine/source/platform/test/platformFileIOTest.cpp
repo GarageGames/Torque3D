@@ -97,8 +97,8 @@ TEST(File, TouchAndTime)
       << "Somehow failed to delete our test file.";
 };
 
-// Mac has no implementations for these functions, so we 'def it out for now.
-#ifndef __MACOSX__
+// Mac/Linux have no implementations for these functions, so we 'def it out for now.
+#ifdef WIN32
 TEST(Platform, Volumes)
 {
    Vector<const char*> names;

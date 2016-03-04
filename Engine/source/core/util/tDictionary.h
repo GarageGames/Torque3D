@@ -95,7 +95,7 @@ namespace DictHash
 
    inline U32 hash(const void *data)
    {
-      return (U32)data;
+      return (uintptr_t)data;
    }
 
    template<class A, class B>
@@ -861,6 +861,168 @@ template<typename Key, typename Value, class Sequence>
 inline Value& Map<Key,Value,Sequence>::operator[](const Key& key)
 {
    return mMap.findOrInsert(key)->value;
+}
+
+
+//-----------------------------------------------------------------------------
+// iterator class
+
+/// A HashMap template class.
+/// The map class maps between a key and an associated value. Keys
+/// are unique.
+/// The hash table class is used as the default implementation so the
+/// the key must be hashable, see util/hash.h for details.
+/// @ingroup UtilContainers
+template<typename Key, typename Value, class Sequence = HashTable<Key, Value> >
+class HashMap : private Sequence
+{
+   typedef HashTable<Key, Value> Parent;
+
+private:
+   Sequence mHashMap;
+
+public:
+   // types
+   typedef typename Parent::Pair Pair;
+   typedef Pair        ValueType;
+   typedef Pair&       Reference;
+   typedef const Pair& ConstReference;
+
+   typedef typename Parent::Iterator  iterator;
+   typedef typename Parent::ConstIterator const_iterator;
+   typedef S32         DifferenceType;
+   typedef U32         SizeType;
+
+   // initialization
+   HashMap() {}
+   ~HashMap() {}
+   HashMap(const HashMap& p);
+
+   // management
+   U32  size() const;                  ///< Return the number of elements
+   void clear();                       ///< Empty the HashMap
+   bool isEmpty() const;               ///< Returns true if the map is empty
+
+   // insert & erase elements
+   iterator insert(const Key& key, const Value&); // Documented below...
+   void erase(iterator);               ///< Erase the given entry
+   void erase(const Key& key);         ///< Erase the key from the map
+
+   // HashMap lookup
+   iterator find(const Key&);          ///< Find entry for the given key
+   const_iterator find(const Key&) const;    ///< Find entry for the given key
+   bool contains(const Key&a)
+   {
+      return mHashMap.count(a) > 0;
+   }
+
+   // forward iterator access
+   iterator       begin();             ///< iterator to first element
+   const_iterator begin() const;       ///< iterator to first element
+   iterator       end();               ///< IIterator to last element + 1
+   const_iterator end() const;         ///< iterator to last element + 1
+
+   // operators
+   Value& operator[](const Key&);      ///< Index using the given key. If the key is not currently in the map it is added.
+};
+
+template<typename Key, typename Value, class Sequence> HashMap<Key, Value, Sequence>::HashMap(const HashMap& p)
+{
+   *this = p;
+}
+
+
+//-----------------------------------------------------------------------------
+// management
+
+template<typename Key, typename Value, class Sequence>
+inline U32 HashMap<Key, Value, Sequence>::size() const
+{
+   return mHashMap.size();
+}
+
+template<typename Key, typename Value, class Sequence>
+inline void HashMap<Key, Value, Sequence>::clear()
+{
+   mHashMap.clear();
+}
+
+template<typename Key, typename Value, class Sequence>
+inline bool HashMap<Key, Value, Sequence>::isEmpty() const
+{
+   return mHashMap.isEmpty();
+}
+
+
+//-----------------------------------------------------------------------------
+// add & remove elements
+
+/// Insert the key value pair but don't allow duplicates.
+/// The map class does not allow duplicates keys. If the key already exists in
+/// the map the function will fail and return end().
+template<typename Key, typename Value, class Sequence>
+typename HashMap<Key, Value, Sequence>::iterator HashMap<Key, Value, Sequence>::insert(const Key& key, const Value& x)
+{
+   return mHashMap.insertUnique(key, x);
+}
+
+template<typename Key, typename Value, class Sequence>
+void HashMap<Key, Value, Sequence>::erase(const Key& key)
+{
+   mHashMap.erase(key);
+}
+
+template<typename Key, typename Value, class Sequence>
+void HashMap<Key, Value, Sequence>::erase(iterator node)
+{
+   mHashMap.erase(node);
+}
+
+
+//-----------------------------------------------------------------------------
+// Searching
+
+template<typename Key, typename Value, class Sequence>
+typename HashMap<Key, Value, Sequence>::iterator HashMap<Key, Value, Sequence>::find(const Key& key)
+{
+   return mHashMap.find(key);
+}
+
+//-----------------------------------------------------------------------------
+// iterator access
+
+template<typename Key, typename Value, class Sequence>
+inline typename HashMap<Key, Value, Sequence>::iterator HashMap<Key, Value, Sequence>::begin()
+{
+   return mHashMap.begin();
+}
+
+template<typename Key, typename Value, class Sequence>
+inline typename HashMap<Key, Value, Sequence>::const_iterator HashMap<Key, Value, Sequence>::begin() const
+{
+   return mHashMap.begin();
+}
+
+template<typename Key, typename Value, class Sequence>
+inline typename HashMap<Key, Value, Sequence>::iterator HashMap<Key, Value, Sequence>::end()
+{
+   return mHashMap.end();
+}
+
+template<typename Key, typename Value, class Sequence>
+inline typename HashMap<Key, Value, Sequence>::const_iterator HashMap<Key, Value, Sequence>::end() const
+{
+   return mHashMap.end();
+}
+
+
+//-----------------------------------------------------------------------------
+// operators
+
+template<typename Key, typename Value, class Sequence>
+inline Value& HashMap<Key, Value, Sequence>::operator[](const Key& key)
+{
+   return mHashMap.findOrInsert(key)->value;
 }
 
 #endif

@@ -282,7 +282,7 @@ float4 main( ConnectData IN ) : COLOR
    foamColor.rgb *= FOAM_OPACITY * foamAmt * foamColor.a;
 
    // Get reflection map color.
-   float4 refMapColor = hdrDecode( tex2D( reflectMap, reflectCoord ) );  
+   float4 refMapColor = tex2D( reflectMap, reflectCoord );  
    
    // If we do not have a reflection texture then we use the cubemap.
    refMapColor = lerp( refMapColor, texCUBE( skyMap, reflectionVec ), NO_REFLECT );
@@ -311,6 +311,7 @@ float4 main( ConnectData IN ) : COLOR
    
    // Calculate the water "base" color based on depth.
    float4 waterBaseColor = baseColor * tex1D( depthGradMap, saturate( delta / depthGradMax ) );
+   waterBaseColor = toLinear(waterBaseColor);
       
    // Modulate baseColor by the ambientColor.
    waterBaseColor *= float4( ambientColor.rgb, 1 );     

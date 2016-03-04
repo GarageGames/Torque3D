@@ -67,6 +67,7 @@ void ProcessedFFMaterial::_construct()
 {   
    mHasSetStageData = false;
    mHasGlow = false;
+   mHasAccumulation = false;
    mIsLightingMaterial = false;
    mDefaultHandle = new FFMaterialParameterHandle();
    mDefaultParameters = new MaterialParameters();

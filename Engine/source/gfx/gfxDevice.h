@@ -213,6 +213,9 @@ public:
       /// The device is about to finish rendering a frame
       deEndOfFrame,
 
+      /// The device has rendered a frame and ended the scene
+      dePostFrame,
+
       /// The device has started rendering a frame's field (such as for side-by-side rendering)
       deStartOfField,
 
@@ -244,7 +247,12 @@ public:
    enum GFXDeviceRenderStyles
    {
       RS_Standard          = 0,
-      RS_StereoSideBySide  = (1<<0),
+      RS_StereoSideBySide  = (1<<0),     // Render into current Render Target side-by-side
+   };
+
+   enum GFXDeviceLimits
+   {
+      NumStereoPorts = 2
    };
 
 private:
@@ -277,11 +285,24 @@ protected:
    Point2F mCurrentProjectionOffset;
 
    /// Eye offset used when using a stereo rendering style
-   Point3F mStereoEyeOffset;
+   Point3F mStereoEyeOffset[NumStereoPorts];
+
+   MatrixF mStereoEyeTransforms[NumStereoPorts];
+   MatrixF mInverseStereoEyeTransforms[NumStereoPorts];
+
+   /// Fov port settings
+   FovPort mFovPorts[NumStereoPorts];
+
+   /// Destination viewports for stereo rendering
+   RectI mStereoViewports[NumStereoPorts];
+
+   /// Destination targets for stereo rendering
+   GFXTextureTarget* mStereoTargets[NumStereoPorts];
 
    /// This will allow querying to see if a device is initialized and ready to
    /// have operations performed on it.
    bool mInitialized;
+   bool mReset;
 
    /// This is called before this, or any other device, is deleted in the global destroy()
    /// method. It allows the device to clean up anything while everything is still valid.
@@ -306,6 +327,10 @@ public:
    /// @see endScene
    bool canCurrentlyRender() const { return mCanCurrentlyRender; }
 
+   bool recentlyReset(){ return mReset; }
+   void beginReset(){ mReset = true; }
+   void finalizeReset(){ mReset = false; }
+
    void setAllowRender( bool render ) { mAllowRender = render; }
 
    inline bool allowRender() const { return mAllowRender; }
@@ -323,10 +348,50 @@ public:
    void setCurrentProjectionOffset(const Point2F& offset) { mCurrentProjectionOffset = offset; }
 
    /// Get the current eye offset used during stereo rendering
-   const Point3F& getStereoEyeOffset() { return mStereoEyeOffset; }
+   const Point3F* getStereoEyeOffsets() { return mStereoEyeOffset; }
+
+   const MatrixF* getStereoEyeTransforms() { return mStereoEyeTransforms; }
+   const MatrixF* getInverseStereoEyeTransforms() { return mInverseStereoEyeTransforms; }
 
    /// Set the current eye offset used during stereo rendering
-   void setStereoEyeOffset(const Point3F& offset) { mStereoEyeOffset = offset; }
+   void setStereoEyeOffsets(Point3F *offsets) { dMemcpy(mStereoEyeOffset, offsets, sizeof(Point3F) * NumStereoPorts); }
+
+   void setStereoEyeTransforms(MatrixF *transforms) { dMemcpy(mStereoEyeTransforms, transforms, sizeof(mStereoEyeTransforms)); dMemcpy(mInverseStereoEyeTransforms, transforms, sizeof(mInverseStereoEyeTransforms)); mInverseStereoEyeTransforms[0].inverse(); mInverseStereoEyeTransforms[1].inverse();  }
+
+   /// Set the current eye offset used during stereo rendering. Assumes NumStereoPorts are available.
+   void setStereoFovPort(const FovPort *ports) { dMemcpy(mFovPorts, ports, sizeof(mFovPorts)); }
+
+   /// Get the current eye offset used during stereo rendering
+   const FovPort* getStereoFovPort() { return mFovPorts; }
+
+   /// Sets stereo viewports
+   void setSteroViewports(const RectI *ports) { dMemcpy(mStereoViewports, ports, sizeof(RectI) * NumStereoPorts); }
+
+   /// Sets stereo render targets
+   void setStereoTargets(GFXTextureTarget **targets) { mStereoTargets[0] = targets[0]; mStereoTargets[1] = targets[1]; }
+
+   RectI* getStereoViewports() { return mStereoViewports; }
+
+   /// Activates a stereo render target, setting the correct viewport to render eye contents.
+   /// If eyeId is -1, set a viewport encompassing the entire size of the render targets.
+   void activateStereoTarget(S32 eyeId)
+   {
+      if (eyeId == -1)
+      {
+         if (mStereoTargets[0])
+         {
+            setActiveRenderTarget(mStereoTargets[0], true);
+         }
+      }
+      else
+      {
+         if (mStereoTargets[eyeId])
+         {
+            setActiveRenderTarget(mStereoTargets[eyeId], false);
+         }
+         setViewport(mStereoViewports[eyeId]);
+      }
+   }
 
    GFXCardProfiler* getCardProfiler() const { return mCardProfiler; }
 
@@ -577,7 +642,8 @@ protected:
    virtual GFXVertexBuffer *allocVertexBuffer(  U32 numVerts, 
                                                 const GFXVertexFormat *vertexFormat, 
                                                 U32 vertSize, 
-                                                GFXBufferType bufferType ) = 0;
+                                                GFXBufferType bufferType,
+                                                void* data = NULL ) = 0;
 
    /// Called from GFXVertexFormat to allocate the hardware 
    /// specific vertex declaration for rendering.
@@ -614,7 +680,8 @@ protected:
    /// @note All index buffers use unsigned 16-bit indices.
    virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices, 
                                                       U32 numPrimitives, 
-                                                      GFXBufferType bufferType ) = 0;
+                                                      GFXBufferType bufferType,
+                                                      void* data = NULL ) = 0;
 
    /// @}
 
@@ -722,8 +789,8 @@ public:
    /// Returns the number of simultaneous render targets supported by the device.
    virtual U32 getNumRenderTargets() const = 0;
 
-   virtual void setShader( GFXShader *shader ) {}
-   virtual void disableShaders() {}
+   virtual void setShader( GFXShader *shader, bool force = false ) {}
+   virtual void disableShaders( bool force = false ) {} // TODO Remove when T3D 4.0
 
    /// Set the buffer! (Actual set happens on the next draw call, just like textures, state blocks, etc)
    void setShaderConstBuffer(GFXShaderConstBuffer* buffer);
@@ -841,8 +908,8 @@ public:
    /// because of the state caching stuff.
    /// @{
    void setLight(U32 stage, GFXLightInfo* light);
-   void setLightMaterial(GFXLightMaterial mat);
-   void setGlobalAmbientColor(ColorF color);
+   void setLightMaterial(const GFXLightMaterial& mat);
+   void setGlobalAmbientColor(const ColorF& color);
 
    /// @}
    
@@ -867,6 +934,8 @@ public:
 
    /// Sets the current stateblock (actually activated in ::updateStates)
    virtual void setStateBlock( GFXStateBlock *block );
+
+   GFXStateBlock* getStateBlock() { return mNewStateBlock; }
 
    /// This sets a stateblock directly from the description
    /// structure.  Its acceptable to use this for debug rendering
@@ -1116,5 +1185,11 @@ inline void GFXDevice::setVertexFormat( const GFXVertexFormat *vertexFormat )
    mStateDirty = true;
 }
 
+
+#if defined(TORQUE_DEBUG) && defined(TORQUE_DEBUG_GFX)
+#define GFXAssertFatal(x, error) AssertFatal(x, error)
+#else
+#define GFXAssertFatal(x, error)
+#endif
 
 #endif // _GFXDEVICE_H_

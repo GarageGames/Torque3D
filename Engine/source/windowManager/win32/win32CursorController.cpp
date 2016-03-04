@@ -106,7 +106,7 @@ void Win32CursorController::setCursorVisible( bool visible )
    if( visible )
       ShowCursor( true );
    else
-      while( ShowCursor(false) > 0 );
+      while( ShowCursor(false) >= 0 );
 }
 
 bool Win32CursorController::isCursorVisible()
@@ -150,7 +150,7 @@ static HCURSOR gCursorShape = NULL;
 void Win32CursorController::setCursorShape( const UTF8 *fileName, bool reload )
 {
 #ifdef UNICODE
-   const UTF16 *lFileName = convertUTF8toUTF16( fileName );
+   const UTF16 *lFileName = createUTF16string( fileName );
 #else
    const UTF8  *lFileName = fileName;
 #endif
@@ -160,6 +160,10 @@ void Win32CursorController::setCursorShape( const UTF8 *fileName, bool reload )
    
    if ( gCursorShape )
       SetCursor( gCursorShape );
+
+#ifdef UNICODE
+   delete[] lFileName;
+#endif
 }
 
 // Console function to set the current cursor shape given the cursor shape

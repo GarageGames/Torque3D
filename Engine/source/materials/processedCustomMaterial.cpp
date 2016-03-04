@@ -49,6 +49,7 @@ ProcessedCustomMaterial::ProcessedCustomMaterial(Material &mat)
    mCustomMaterial = static_cast<CustomMaterial*>(mMaterial);
    mHasSetStageData = false;
    mHasGlow = false;
+   mHasAccumulation = false;
    mMaxStages = 0;
    mMaxTex = 0;
 }
@@ -79,6 +80,15 @@ void ProcessedCustomMaterial::_setStageData()
       if(filename.equal(String("$dynamiclight"), String::NoCase))
       {
          rpd->mTexType[i] = Material::DynamicLight;
+         rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
+         mMaxTex = i+1;
+         continue;
+      }
+
+      if(filename.equal(String("$dynamicShadowMap"), String::NoCase))
+      {
+         rpd->mTexType[i] = Material::DynamicShadowMap;
+         rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
          mMaxTex = i+1;
          continue;
       }
@@ -86,6 +96,7 @@ void ProcessedCustomMaterial::_setStageData()
       if(filename.equal(String("$dynamiclightmask"), String::NoCase))
       {
          rpd->mTexType[i] = Material::DynamicLightMask;
+         rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
          mMaxTex = i+1;
          continue;
       }
@@ -93,6 +104,7 @@ void ProcessedCustomMaterial::_setStageData()
       if(filename.equal(String("$lightmap"), String::NoCase))
       {
          rpd->mTexType[i] = Material::Lightmap;
+         rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
          mMaxTex = i+1;
          continue;
       }
@@ -102,6 +114,7 @@ void ProcessedCustomMaterial::_setStageData()
          if( mCustomMaterial->mCubemapData )
          {
             rpd->mTexType[i] = Material::Cube;
+            rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
             mMaxTex = i+1;
          }
          else
@@ -114,6 +127,7 @@ void ProcessedCustomMaterial::_setStageData()
       if(filename.equal(String("$dynamicCubemap"), String::NoCase))
       {
          rpd->mTexType[i] = Material::SGCube;
+         rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
          mMaxTex = i+1;
          continue;
       }
@@ -121,6 +135,7 @@ void ProcessedCustomMaterial::_setStageData()
       if(filename.equal(String("$backbuff"), String::NoCase))
       {
          rpd->mTexType[i] = Material::BackBuff;
+         rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
          mMaxTex = i+1;
          continue;
       }
@@ -128,6 +143,7 @@ void ProcessedCustomMaterial::_setStageData()
       if(filename.equal(String("$reflectbuff"), String::NoCase))
       {
          rpd->mTexType[i] = Material::ReflectBuff;
+         rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
          mMaxTex = i+1;
          continue;
       }
@@ -135,6 +151,7 @@ void ProcessedCustomMaterial::_setStageData()
       if(filename.equal(String("$miscbuff"), String::NoCase))
       {
          rpd->mTexType[i] = Material::Misc;
+         rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
          mMaxTex = i+1;
          continue;
       }
@@ -151,6 +168,7 @@ void ProcessedCustomMaterial::_setStageData()
             texTarget->getShaderMacros( &mConditionerMacros );
 
          rpd->mTexType[i] = Material::TexTarget;
+         rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
          mMaxTex = i+1;
          continue;
       }
@@ -162,6 +180,7 @@ void ProcessedCustomMaterial::_setStageData()
          continue;
       }
       rpd->mTexType[i] = Material::Standard;
+      rpd->mSamplerNames[i] = mCustomMaterial->mSamplerNames[i];
       mMaxTex = i+1;
    }
 
@@ -232,6 +251,20 @@ bool ProcessedCustomMaterial::init( const FeatureSet &features,
    setMaterialParameters( mDefaultParameters, 0 );
    mStateHint.init( this );
    
+   for(int i = 0; i < mMaxTex; i++)
+   {
+      ShaderConstHandles *handles = _getShaderConstHandles( mPasses.size()-1 );
+      AssertFatal(handles,"");
+
+      if(rpd->mSamplerNames[i].isEmpty())      
+         continue;      
+
+      String samplerName = rpd->mSamplerNames[i].startsWith("$") ? rpd->mSamplerNames[i] : String("$") + rpd->mSamplerNames[i];
+      GFXShaderConstHandle *handle = rpd->shader->getShaderConstHandle( samplerName ); 
+      AssertFatal(handle,"");
+      handles->mTexHandlesSC[i] = handle;
+   }
+   
    return true;
 }
 
@@ -273,7 +306,7 @@ bool ProcessedCustomMaterial::setupPass( SceneRenderState *state, const SceneDat
    if ( rpd->shader )
       GFX->setShader( rpd->shader );
    else
-      GFX->disableShaders();
+      GFX->setupGenericShaders();
 
    // Set our textures   
    setTextureStages( state, sgData, pass );   

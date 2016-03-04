@@ -212,7 +212,10 @@ function AIPlayer::singleShot(%this)
    // The shooting delay is used to pulse the trigger
    %this.setImageTrigger(0, true);
    %this.setImageTrigger(0, false);
-   %this.trigger = %this.schedule(%this.shootingDelay, singleShot);
+   %delay = %this.getDataBlock().shootingDelay;
+   if (%delay $= "")
+      %delay = 1000;
+   %this.trigger = %this.schedule(%delay, singleShot);
 }
 
 //-----------------------------------------------------------------------------

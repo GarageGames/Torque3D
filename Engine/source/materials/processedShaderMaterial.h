@@ -48,6 +48,11 @@ public:
    GFXShaderConstHandle* mSpecularPowerSC;
    GFXShaderConstHandle* mSpecularStrengthSC;
    GFXShaderConstHandle* mParallaxInfoSC;
+   GFXShaderConstHandle* mAccuScaleSC;
+   GFXShaderConstHandle* mAccuDirectionSC;
+   GFXShaderConstHandle* mAccuStrengthSC;
+   GFXShaderConstHandle* mAccuCoverageSC;
+   GFXShaderConstHandle* mAccuSpecularSC;
    GFXShaderConstHandle* mFogDataSC;
    GFXShaderConstHandle* mFogColorSC;   
    GFXShaderConstHandle* mDetailScaleSC;
@@ -81,6 +86,9 @@ public:
 
    GFXShaderConstHandle *mImposterUVs;
    GFXShaderConstHandle *mImposterLimits;
+
+   // Deferred Shading : Material Info Flags
+   GFXShaderConstHandle* mMatInfoFlagsSC;
 
    GFXShaderConstHandle* mTexHandlesSC[Material::MAX_TEX_PER_PASS];
    GFXShaderConstHandle* mRTParamsSC[TEXTURE_STAGE_COUNT];

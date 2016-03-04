@@ -409,13 +409,13 @@ void ShaderGen::_printVertShader( Stream &stream )
    _printFeatureList(stream);
 
    // print out structures
-   mComponents[C_VERT_STRUCT]->print( stream );
-   mComponents[C_CONNECTOR]->print( stream );
+   mComponents[C_VERT_STRUCT]->print( stream, true );
+   mComponents[C_CONNECTOR]->print( stream, true );
 
    mPrinter->printMainComment(stream);
 
-   mComponents[C_VERT_MAIN]->print( stream );
-
+   mComponents[C_VERT_MAIN]->print( stream, true );
+   mComponents[C_VERT_STRUCT]->printOnMain( stream, true );
 
    // print out the function
    _printFeatures( stream );
@@ -430,12 +430,13 @@ void ShaderGen::_printPixShader( Stream &stream )
    _printDependencies(stream); // TODO: Split into vert and pix dependencies?
    _printFeatureList(stream);
 
-   mComponents[C_CONNECTOR]->print( stream );
+   mComponents[C_CONNECTOR]->print( stream, false );
 
    mPrinter->printPixelShaderOutputStruct(stream, mFeatureData);
    mPrinter->printMainComment(stream);
 
-   mComponents[C_PIX_MAIN]->print( stream );
+   mComponents[C_PIX_MAIN]->print( stream, false );
+   mComponents[C_CONNECTOR]->printOnMain( stream, false );
 
    // print out the function
    _printFeatures( stream );
@@ -443,7 +444,7 @@ void ShaderGen::_printPixShader( Stream &stream )
    mPrinter->printPixelShaderCloser(stream);
 }
 
-GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const GFXVertexFormat *vertexFormat, const Vector<GFXShaderMacro> *macros )
+GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const GFXVertexFormat *vertexFormat, const Vector<GFXShaderMacro> *macros, const Vector<String> &samplers )
 {
    PROFILE_SCOPE( ShaderGen_GetShader );
 
@@ -464,12 +465,12 @@ GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const G
    // Don't get paranoid!  This has 1 in 18446744073709551616
    // chance for collision... it won't happen in this lifetime.
    //
-   U64 hash = Torque::hash64( (const U8*)shaderDescription.c_str(), shaderDescription.length(), 0 );
+   U32 hash = Torque::hash( (const U8*)shaderDescription.c_str(), shaderDescription.length(), 0 );
    hash = convertHostToLEndian(hash);
-   U32 high = (U32)( hash >> 32 );
-   U32 low = (U32)( hash & 0x00000000FFFFFFFF );
-   String cacheKey = String::ToString( "%x%x", high, low );
-
+   //U32 high = (U32)( hash >> 32 );
+   //U32 low = (U32)( hash & 0x00000000FFFFFFFF );
+   //String cacheKey = String::ToString( "%x%x", high, low );
+   String cacheKey = String::ToString("%x", hash);
    // return shader if exists
    GFXShader *match = mProcShaders[cacheKey];
    if ( match )
@@ -488,7 +489,7 @@ GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const G
 
    GFXShader *shader = GFX->createShader();
    shader->mInstancingFormat.copy( mInstancingFormat ); // TODO: Move to init() below!
-   if ( !shader->init( vertFile, pixFile, pixVersion, shaderMacros ) )
+   if ( !shader->init( vertFile, pixFile, pixVersion, shaderMacros, samplers ) )
    {
       delete shader;
       return NULL;

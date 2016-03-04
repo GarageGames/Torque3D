@@ -194,6 +194,9 @@ class ThreadPool
             /// This is the primary function to implement by subclasses.
             virtual void execute() = 0;
 
+            /// This flag is set after the execute() method has completed.
+            bool mExecuted;
+
          public:
          
             /// Construct a new work item.
@@ -201,7 +204,8 @@ class ThreadPool
             /// @param context The work context in which the item should be placed.
             ///    If NULL, the root context will be used.
             WorkItem( Context* context = 0 )
-               : mContext( context ? context : Context::ROOT_CONTEXT() )
+               : mContext( context ? context : Context::ROOT_CONTEXT() ),
+                 mExecuted( false )
             {
             }
             
@@ -229,6 +233,12 @@ class ThreadPool
             /// Return the item's base priority value.
             /// @return item priority; defaults to 1.0.
             virtual F32 getPriority();
+
+            /// Has this work item been executed already?
+            bool hasExecuted() const
+            {
+               return mExecuted;
+            }
       };
 
       typedef ThreadSafeRef< WorkItem > WorkItemPtr;
@@ -254,6 +264,9 @@ class ThreadPool
       
       /// Number of worker threads guaranteed to be non-blocking.
       U32 mNumThreadsReady;
+
+      /// Number of work items that have not yet completed execution.
+      U32 mNumPendingItems;
       
       /// Semaphore used to wake up threads, if necessary.
       Semaphore mSemaphore;
@@ -305,6 +318,18 @@ class ThreadPool
       /// @param timeOut Soft limit on the number of milliseconds to wait for
       ///   the queue to flush out.  -1 = infinite.
       void flushWorkItems( S32 timeOut = -1 );
+
+      /// If you're using a non-global thread pool to parallelise some work, you
+      /// may want to block until all the parallel work is complete. As with
+      /// flushWorkItems, this method may block indefinitely if new items keep
+      /// getting added to the pool before old ones finish.
+      ///
+      /// <em>This method will not wait for items queued on the main thread using
+      /// queueWorkItemOnMainThread!</em>
+      ///
+      /// @param timeOut Soft limit on the number of milliseconds to wait for
+      ///   all items to complete.  -1 = infinite.
+      void waitForAllItems( S32 timeOut = -1 );
 
       /// Add a work item to the main thread's work queue.
       ///

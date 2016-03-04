@@ -30,6 +30,8 @@ class GFXGLWindowTarget : public GFXWindowTarget
 public:
 
    GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d);
+   ~GFXGLWindowTarget();
+
    const Point2I getSize() 
    { 
       return mWindow->getClientExtent();
@@ -51,12 +53,17 @@ public:
    
 private:
    friend class GFXGLDevice;
+
+   GLuint mCopyFBO, mBackBufferFBO;
+   GFXTexHandle mBackBufferColorTex, mBackBufferDepthTex;
    Point2I size;   
    GFXDevice* mDevice;
    void* mContext;
    void* mFullscreenContext;
    void _teardownCurrentMode();
    void _setupNewMode();
+   void _setupAttachments();
+   void _WindowPresent();
 };
 
 #endif

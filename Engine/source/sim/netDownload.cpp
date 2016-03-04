@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "core/dnet.h"
 #include "console/simBase.h"
+#include "console/engineAPI.h"
 #include "sim/netConnection.h"
 #include "core/stream/bitStream.h"
 #include "core/stream/fileStream.h"

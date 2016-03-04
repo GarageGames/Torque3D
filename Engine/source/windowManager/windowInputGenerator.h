@@ -61,6 +61,16 @@ class WindowInputGenerator
       void handleInputEvent (U32 deviceInst, F32 fValue, F32 fValue2, F32 fValue3, F32 fValue4, S32 iValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier);
 
       void generateInputEvent( InputEventInfo &inputEvent );
+
+      /// Accelerator key map
+       struct AccKeyMap
+       {
+          void *hnd;
+          String cmd;
+          U32 keyCode;
+          U32 modifier;
+       };
+       Vector <AccKeyMap> mAcceleratorMap;
       
    public:
    
@@ -72,6 +82,42 @@ class WindowInputGenerator
       /// Returns true if the given keypress event should be send as a raw keyboard
       /// event even if it maps to a character input event.
       bool wantAsKeyboardEvent( U32 modifiers, U32 key );
+
+    void addAcceleratorKey( void *hnd, const String &cmd, U32 keycode, U32 modifier)
+    {
+        AccKeyMap acc;
+        acc.hnd = hnd;
+        acc.cmd = cmd;
+        acc.keyCode = keycode;
+        acc.modifier = modifier;
+        mAcceleratorMap.push_back(acc);
+    }
+
+    void removeAcceleratorKeys( void *hnd )
+    {
+         for( int i = 0; i < mAcceleratorMap.size(); )
+         {
+            if( mAcceleratorMap[i].hnd == hnd )
+            {
+                mAcceleratorMap.erase( i, 1 );
+                continue;
+            }
+
+             ++i;
+         }
+    }
+
+    void removeAcceleratorKey( void *hnd, U32 keycode, U32 modifier )
+    {
+         for( int i = 0; i < mAcceleratorMap.size(); ++i )
+         {
+            if( mAcceleratorMap[i].hnd == hnd && mAcceleratorMap[i].keyCode == keycode && mAcceleratorMap[i].modifier == modifier )
+            {
+                mAcceleratorMap.erase( i, 1 );
+                return;
+            }
+         }
+    }
 };
 
 #endif // _WINDOW_INPUTGENERATOR_H_

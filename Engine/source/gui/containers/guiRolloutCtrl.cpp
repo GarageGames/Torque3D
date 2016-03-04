@@ -56,6 +56,10 @@ IMPLEMENT_CALLBACK( GuiRolloutCtrl, onCollapsed, void, (), (),
 //-----------------------------------------------------------------------------
 
 GuiRolloutCtrl::GuiRolloutCtrl()
+ : mHeader(0,0,0,0),
+   mExpanded(0,0,0,0),
+   mChildRect(0,0,0,0),
+   mMargin(0,0,0,0)
 {
    mExpanded.set(0,0,200,60);
    mCaption             = StringTable->EmptyString();
@@ -70,6 +74,7 @@ GuiRolloutCtrl::GuiRolloutCtrl()
    mIsContainer = true;
    mCanCollapse = true;
    mAutoCollapseSiblings = false;
+   mHasTexture = false;
    // Make sure we receive our ticks.
    setProcessTicks();
 }

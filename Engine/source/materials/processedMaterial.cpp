@@ -93,6 +93,7 @@ ProcessedMaterial::ProcessedMaterial()
    mCurrentParams( NULL ),
    mHasSetStageData( false ),
    mHasGlow( false ),   
+   mHasAccumulation( false ),   
    mMaxStages( 0 ),
    mVertexFormat( NULL ),
    mUserObject( NULL )
@@ -289,9 +290,7 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
 
    // The prepass will take care of writing to the 
    // zbuffer, so we don't have to by default.
-   // The prepass can't write to the backbuffer's zbuffer in OpenGL.
    if (  MATMGR->getPrePassEnabled() && 
-         !GFX->getAdapterType() == OpenGL && 
          !mFeatures.hasFeature(MFT_ForwardShading))
       result.setZReadWrite( result.zEnable, false );
 
@@ -455,14 +454,6 @@ void ProcessedMaterial::_setStageData()
          mStages[i].setTex( MFT_SpecularMap, _createTexture( mMaterial->mSpecularMapFilename[i], &GFXDefaultStaticDiffuseProfile ) );
          if(!mStages[i].getTex( MFT_SpecularMap ))
             mMaterial->logError("Failed to load specular map %s for stage %i", _getTexturePath(mMaterial->mSpecularMapFilename[i]).c_str(), i);
-      }
-
-      // EnironmentMap
-      if( mMaterial->mEnvMapFilename[i].isNotEmpty() )
-      {
-         mStages[i].setTex( MFT_EnvMap, _createTexture( mMaterial->mEnvMapFilename[i], &GFXDefaultStaticDiffuseProfile ) );
-         if(!mStages[i].getTex( MFT_EnvMap ))
-            mMaterial->logError("Failed to load environment map %s for stage %i", _getTexturePath(mMaterial->mEnvMapFilename[i]).c_str(), i);
       }
    }
 

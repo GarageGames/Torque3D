@@ -41,6 +41,7 @@ singleton Material(Lurker_Base)
    specularPower[0] = "10";
    translucentBlendOp = "None";
    useAnisotropic[0] = "1";
+   castDynamicShadows = true;    
 };
 
 singleton Material(Lurker_MuzzleFlash_Base)

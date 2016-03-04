@@ -145,6 +145,8 @@ uniform vec4	      sunColor;
 uniform float        sunBrightness;
 uniform float        reflectivity;
 
+out vec4 OUT_col;
+
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------
@@ -293,7 +295,7 @@ void main()
    foamColor.rgb *= FOAM_OPACITY * foamAmt * foamColor.a;
    
    // Get reflection map color.
-   vec4 refMapColor = hdrDecode( texture( reflectMap, reflectCoord ) );  
+   vec4 refMapColor = texture( reflectMap, reflectCoord );  
    
    // If we do not have a reflection texture then we use the cubemap.
    refMapColor = mix( refMapColor, texture( skyMap, reflectionVec ), NO_REFLECT );
@@ -322,6 +324,7 @@ void main()
    
    // Calculate the water "base" color based on depth.
    vec4 waterBaseColor = baseColor * texture( depthGradMap, saturate( delta / depthGradMax ) );
+   waterBaseColor = toLinear(waterBaseColor);
       
    // Modulate baseColor by the ambientColor.
    waterBaseColor *= vec4( ambientColor.rgb, 1 );     
@@ -390,5 +393,5 @@ void main()
 
    //return OUT;
    
-   OUT_FragColor0 = hdrEncode( OUT );
+   OUT_col = hdrEncode( OUT );
 }

@@ -290,6 +290,12 @@ bool MatInstance::init( const FeatureSet &features,
 //----------------------------------------------------------------------------
 bool MatInstance::reInit()
 {
+   if (!mVertexFormat)
+   {
+      mIsValid = false;
+      return mIsValid;
+   }
+
    SAFE_DELETE(mProcessedMaterial);
    deleteAllHooks();
    mIsValid = processMaterial();
@@ -493,6 +499,14 @@ bool MatInstance::hasGlow()
 { 
    if( mProcessedMaterial )
       return mProcessedMaterial->hasGlow(); 
+   else
+      return false;
+}
+
+bool MatInstance::hasAccumulation() 
+{ 
+   if( mProcessedMaterial )
+      return mProcessedMaterial->hasAccumulation(); 
    else
       return false;
 }

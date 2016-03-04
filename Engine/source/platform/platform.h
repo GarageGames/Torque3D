@@ -74,6 +74,9 @@ enum ProcessorType
    CPU_AMD_K6_2,
    CPU_AMD_K6_3,
    CPU_AMD_Athlon,
+   CPU_AMD_Phenom,
+   CPU_AMD_PhenomII,
+   CPU_AMD_Bulldozer,
    CPU_AMD_Unknown,
    CPU_Cyrix_6x86,
    CPU_Cyrix_MediaGX,
@@ -170,6 +173,15 @@ namespace Platform
       U16 yearday;    ///< Day of year (0-365)
       bool isdst;     ///< True if daylight savings time is active
    };
+
+	enum ALERT_ASSERT_RESULT
+	{
+		ALERT_ASSERT_DEBUG,
+		ALERT_ASSERT_IGNORE,
+		ALERT_ASSERT_IGNORE_ALL,
+		ALERT_ASSERT_EXIT
+	};
+
 
    void getLocalTime(LocalTime &);
    
@@ -290,6 +302,9 @@ namespace Platform
    void clearExcludedDirectories();
    bool isExcludedDirectory(const char *pDir);
 
+   bool deleteDirectory(const char* pPath);
+   bool fileDelete(const char *name);
+
    /// Given a directory path, create all necessary directories for that path to exist.
    bool createPath(const char *path); // create a directory path
 
@@ -297,6 +312,7 @@ namespace Platform
    void AlertOK(const char *windowTitle, const char *message);
    bool AlertOKCancel(const char *windowTitle, const char *message);
    bool AlertRetry(const char *windowTitle, const char *message);
+   ALERT_ASSERT_RESULT AlertAssert(const char *windowTitle, const char *message);
 
    // Volumes
    struct VolumeInformation

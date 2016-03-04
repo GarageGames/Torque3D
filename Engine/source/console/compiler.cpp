@@ -400,7 +400,7 @@ void CodeStream::reset()
    {
       CodeData *next = itr->next;
       dFree(itr->data);
-      dFree(itr);
+      delete(itr);
       itr = next;
    }
    

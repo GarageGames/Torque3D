@@ -31,6 +31,7 @@ void GFXD3D9PrimitiveBuffer::lock(U32 indexStart, U32 indexEnd, void **indexPtr)
    U32 flags=0;
    switch(mBufferType)
    {
+   case GFXBufferTypeImmutable:
    case GFXBufferTypeStatic:
       // flags |= D3DLOCK_DISCARD;
       break;

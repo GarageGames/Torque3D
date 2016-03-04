@@ -36,7 +36,8 @@ RenderBinManager::RenderBinManager( const RenderInstType& ritype, F32 renderOrde
    mRenderInstType( ritype ),
    mRenderOrder( renderOrder ),
    mProcessAddOrder( processAddOrder ),
-   mRenderPass( NULL )
+   mRenderPass( NULL ),
+   mBasicOnly ( false )
 {
    VECTOR_SET_ASSOCIATION( mElementList );
    mElementList.reserve( 2048 );
@@ -59,6 +60,9 @@ void RenderBinManager::initPersistFields()
 
    addField("processAddOrder", TypeF32, Offset(mProcessAddOrder, RenderBinManager),
       "Defines the order for adding instances in relation to other bins." );
+
+   addField( "basicOnly", TypeBool, Offset(mBasicOnly, RenderBinManager),
+      "Limites the render bin to basic lighting only." );
 
    Parent::initPersistFields();
 }
@@ -164,6 +168,7 @@ void RenderBinManager::setupSGData( MeshRenderInst *ri, SceneData &data )
    data.cubemap      = ri->cubemap;
    data.miscTex      = ri->miscTex;
    data.reflectTex   = ri->reflectTex;
+   data.accuTex      = ri->accuTex;
    data.lightmap     = ri->lightmap;
    data.visibility   = ri->visibility;
    data.materialHint = ri->materialHint;

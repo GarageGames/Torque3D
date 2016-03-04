@@ -144,7 +144,7 @@ bool Win32RedBookDevice::open()
    openParms.lpstrDeviceType = (LPCWSTR)MCI_DEVTYPE_CD_AUDIO;
 
    UTF16 buf[512];
-   convertUTF8toUTF16((UTF8 *)mDeviceName, buf, sizeof(buf));
+   convertUTF8toUTF16((UTF8 *)mDeviceName, buf);
    openParms.lpstrElementName = buf;
 #else
    openParms.lpstrDeviceType = (LPCSTR)MCI_DEVTYPE_CD_AUDIO;

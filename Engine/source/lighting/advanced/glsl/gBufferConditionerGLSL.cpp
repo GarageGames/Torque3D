@@ -92,6 +92,12 @@ void GBufferConditionerGLSL::processVert( Vector<ShaderComponent*> &componentLis
 
    // grab incoming vert normal
    Var *inNormal = (Var*) LangElement::find( "normal" );
+   if (!inNormal)
+   {
+      inNormal = new Var("normal", "vec3");
+      meta->addStatement(new GenOp("   @ = vec3( 0.0, 0.0, 1.0 );\r\n", new DecOp(inNormal)));
+      Con::errorf("ShagerGen: Something went bad with ShaderGen. The normal should be already defined.");
+   }
    AssertFatal( inNormal, "Something went bad with ShaderGen. The normal should be already defined." );
 
    // grab output for gbuffer normal
@@ -164,7 +170,7 @@ void GBufferConditionerGLSL::processPix(  Vector<ShaderComponent*> &componentLis
    if ( fd.features[ MFT_IsTranslucentZWrite ] )
    {
       alphaVal = new Var( "outAlpha", "float" );
-      meta->addStatement( new GenOp( "   @ = col.a; // MFT_IsTranslucentZWrite\r\n", new DecOp( alphaVal ) ) );
+      meta->addStatement( new GenOp( "   @ = OUT_col1.a; // MFT_IsTranslucentZWrite\r\n", new DecOp( alphaVal ) ) );
    }
 
    // If using interlaced normals, invert the normal
@@ -333,7 +339,7 @@ Var* GBufferConditionerGLSL::_conditionOutput( Var *unconditionedOutput, MultiLi
    // Encode depth into two channels
    if(mNormalStorageType != CartesianXYZ)
    {
-      const U64 maxValPerChannel = 1 << mBitsPerChannel;
+      const U64 maxValPerChannel = (U64)1 << mBitsPerChannel;
       meta->addStatement( new GenOp( "   \r\n   // Encode depth into hi/lo\r\n" ) );
       meta->addStatement( new GenOp( avar( "   float2 _tempDepth = frac(@.a * float2(1.0, %llu.0));\r\n", maxValPerChannel - 1 ), 
          unconditionedOutput ) );
@@ -391,7 +397,7 @@ Var* GBufferConditionerGLSL::_unconditionInput( Var *conditionedInput, MultiLine
    // Recover depth from encoding
    if(mNormalStorageType != CartesianXYZ)
    {
-      const U64 maxValPerChannel = 1 << mBitsPerChannel;
+      const U64 maxValPerChannel = (U64)1 << mBitsPerChannel;
       meta->addStatement( new GenOp( "   \r\n   // Decode depth\r\n" ) );
       meta->addStatement( new GenOp( avar( "   @.w = dot( @.zw, float2(1.0, 1.0/%llu.0));\r\n", maxValPerChannel - 1 ), 
          retVar, conditionedInput ) );

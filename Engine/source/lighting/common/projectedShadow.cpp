@@ -230,6 +230,9 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
       lightCount++;
    }
 
+   if (mShapeBase)
+      fade *= mShapeBase->getFadeVal();
+
    lightDir.normalize();
    
    // No light... no shadow.

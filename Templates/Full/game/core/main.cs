@@ -68,8 +68,8 @@ function onStart()
 
    if ($platform $= "macos")
       $pref::Video::displayDevice = "OpenGL";
-   else
-      $pref::Video::displayDevice = "D3D9";
+   //else
+      //$pref::Video::displayDevice = "D3D9";
    
    // Initialise stuff.
    exec("./scripts/client/core.cs");
@@ -141,11 +141,11 @@ function parseArgs()
       switch$ (%arg)
       {
          case "-fullscreen":
-            setFullScreen(true);
+            $cliFullscreen = true;
             $argUsed[%i]++;
 
          case "-windowed":
-            setFullScreen(false);
+            $cliFullscreen = false;
             $argUsed[%i]++;
 
          case "-openGL":

@@ -18,6 +18,16 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "Opcode.h"
 
+#if (defined _MSC_VER) && (_MSC_VER <= 1500)
+#ifdef _WIN64 // [
+typedef unsigned __int64  uintptr_t;
+#else // _WIN64 ][
+typedef _W64 unsigned int uintptr_t;
+#endif // _WIN64 ]
+#else
+#include <stdint.h>
+#endif
+
 using namespace Opcode;
 
 inline_ void Sort(udword& id0, udword& id1)
@@ -163,7 +173,7 @@ bool SAP_PairData::Init(udword nb_objects)
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline_ void Remap(SAP_Element*& element, udword delta)
 {
-	if(element)	element = (SAP_Element*)(udword(element) + delta);
+    if(element)	element = (SAP_Element*)(element + delta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,7 +209,7 @@ SAP_Element* SAP_PairData::GetFreeElem(udword id, SAP_Element* next, udword* rem
 
 			// Remap everything
 			{
-				udword Delta = udword(NewElems) - udword(mElementPool);
+				udword Delta = uintptr_t(NewElems) - uintptr_t(mElementPool);
 
 				for(udword i=0;i<mNbUsedElements;i++)	Remap(NewElems[i].mNext, Delta);
 				for(udword i=0;i<mNbObjects;i++)		Remap(mArray[i], Delta);

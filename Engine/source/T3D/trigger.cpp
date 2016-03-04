@@ -236,7 +236,7 @@ DECLARE_STRUCT( Polyhedron );
 IMPLEMENT_STRUCT( Polyhedron, Polyhedron,,
    "" )
 END_IMPLEMENT_STRUCT;
-ConsoleType( floatList, TypeTriggerPolyhedron, Polyhedron )
+ConsoleType(floatList, TypeTriggerPolyhedron, Polyhedron, "")
 
 
 ConsoleGetType( TypeTriggerPolyhedron )

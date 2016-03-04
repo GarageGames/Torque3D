@@ -28,9 +28,9 @@
 #include "console/engineAPI.h"
 
 // define macros required for ConvexDecomp headers
-#if defined( _WIN32 )
+#if defined( _WIN32 ) && !defined( WIN32 )
 #define WIN32
-#elif defined( __MACOSX__ )
+#elif defined( __MACOSX__ ) && !defined( APPLE )
 #define APPLE
 #endif
 
@@ -443,10 +443,11 @@ void MeshFit::addSphere( F32 radius, const Point3F& center )
    mesh->computeBounds();
 
    mMeshes.increment();
-   mMeshes.last().type = MeshFit::Sphere;
-   mMeshes.last().transform.identity();
-   mMeshes.last().transform.setPosition( center );
-   mMeshes.last().tsmesh = mesh;
+   MeshFit::Mesh& lastMesh = mMeshes.last();
+   lastMesh.type = MeshFit::Sphere;
+   lastMesh.transform.identity();
+   lastMesh.transform.setPosition(center);
+   lastMesh.tsmesh = mesh;
 }
 
 void MeshFit::fitSphere()
@@ -603,11 +604,12 @@ void MeshFit::fitK_DOP( const Vector<Point3F>& planes )
 
    // Create TSMesh from convex hull
    mMeshes.increment();
-   mMeshes.last().type = MeshFit::Hull;
-   mMeshes.last().transform.identity();
-   mMeshes.last().tsmesh = createTriMesh( result.mOutputVertices, result.mNumOutputVertices,
+   MeshFit::Mesh& lastMesh = mMeshes.last();
+   lastMesh.type = MeshFit::Hull;
+   lastMesh.transform.identity();
+   lastMesh.tsmesh = createTriMesh(result.mOutputVertices, result.mNumOutputVertices,
                               result.mIndices, result.mNumFaces );
-   mMeshes.last().tsmesh->computeBounds();
+   lastMesh.tsmesh->computeBounds();
 }
 
 //---------------------------
@@ -702,10 +704,11 @@ void MeshFit::fitConvexHulls( U32 depth, F32 mergeThreshold, F32 concavityThresh
       {
          // Create TSMesh from convex hull
          mMeshes.increment();
-         mMeshes.last().type = MeshFit::Hull;
-         mMeshes.last().transform.identity();
-         mMeshes.last().tsmesh = createTriMesh( result.mVertices, result.mVcount, result.mIndices, result.mTcount );
-         mMeshes.last().tsmesh->computeBounds();
+         MeshFit::Mesh& lastMesh = mMeshes.last();
+         lastMesh.type = MeshFit::Hull;
+         lastMesh.transform.identity();
+         lastMesh.tsmesh = createTriMesh(result.mVertices, result.mVcount, result.mIndices, result.mTcount);
+         lastMesh.tsmesh->computeBounds();
       }
    }
 

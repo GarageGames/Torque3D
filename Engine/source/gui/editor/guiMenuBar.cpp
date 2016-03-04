@@ -111,7 +111,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMouseInMenu, void, (bool isInMenu),( isInMenu 
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onMenuSelect, void, ( const char* menuId, const char* menuText ),( menuId , menuText ),
+IMPLEMENT_CALLBACK( GuiMenuBar, onMenuSelect, void, ( S32 menuId, const char* menuText ),( menuId , menuText ),
    "@brief Called whenever a menu is selected.\n\n"
    "@param menuId Index id of the clicked menu\n"
    "@param menuText Text of the clicked menu\n\n"
@@ -125,7 +125,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMenuSelect, void, ( const char* menuId, const 
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onMenuItemSelect, void, ( const char* menuId, const char* menuText, const char* menuItemId, const char* menuItemText ),
+IMPLEMENT_CALLBACK( GuiMenuBar, onMenuItemSelect, void, ( S32 menuId, const char* menuText, S32 menuItemId, const char* menuItemText ),
 												   ( menuId, menuText, menuItemId, menuItemText ),
    "@brief Called whenever an item in a menu is selected.\n\n"
    "@param menuId Index id of the menu which contains the selected menu item\n"
@@ -142,7 +142,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMenuItemSelect, void, ( const char* menuId, co
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onSubmenuSelect, void, ( const char* submenuId, const char* submenuText ),( submenuId, submenuText ),
+IMPLEMENT_CALLBACK( GuiMenuBar, onSubmenuSelect, void, ( S32 submenuId, const char* submenuText ),( submenuId, submenuText ),
    "@brief Called whenever a submenu is selected.\n\n"
    "@param submenuId Id of the selected submenu\n"
    "@param submenuText Text of the selected submenu\n\n"
@@ -159,7 +159,7 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onSubmenuSelect, void, ( const char* submenuId, 
 // console methods
 //------------------------------------------------------------------------------
 
-DefineEngineMethod( GuiMenuBar, clearMenus, void, ( S32 param1, S32 param2),,
+DefineEngineMethod( GuiMenuBar, clearMenus, void, (),,
    "@brief Clears all the menus from the menu bar.\n\n"
    "@tsexample\n"
    "// Inform the GuiMenuBar control to clear all menus from itself.\n"
@@ -215,8 +215,8 @@ DefineEngineMethod(GuiMenuBar, addMenu, void, (const char* menuText, S32 menuId)
    object->addMenu(menuText, menuId);
 }
 
-DefineEngineMethod(GuiMenuBar, addMenuItem, void, (const char* targetMenu, const char* menuItemText, S32 menuItemId, const char* accelerator, int checkGroup),
-												 ("","",0,NULL,-1),
+DefineEngineMethod(GuiMenuBar, addMenuItem, void, (const char* targetMenu, const char* menuItemText, S32 menuItemId, const char* accelerator, int checkGroup, const char *cmd),
+												 ("","",0,NULL,-1,""),
    "@brief Adds a menu item to the specified menu.  The menu argument can be either the text of a menu or its id.\n\n"
    "@param menu Menu name or menu Id to add the new item to.\n"
    "@param menuItemText Text for the new menu item.\n"
@@ -250,7 +250,7 @@ DefineEngineMethod(GuiMenuBar, addMenuItem, void, (const char* targetMenu, const
       Con::errorf("Cannot find menu %s for addMenuItem.", targetMenu);
       return;
    }
-   object->addMenuItem(menu, menuItemText, menuItemId, accelerator != NULL ? accelerator : "", checkGroup == -1 ? -1 : checkGroup);
+   object->addMenuItem(menu, menuItemText, menuItemId, accelerator != NULL ? accelerator : "", checkGroup == -1 ? -1 : checkGroup, cmd);
 }
 
 DefineEngineMethod(GuiMenuBar, setMenuItemEnable, void, (const char* menuTarget, const char* menuItemTarget, bool enabled),,
@@ -767,7 +767,7 @@ DefineEngineMethod(GuiMenuBar, setSubmenuItemChecked, void, (const char* menuTar
    if(checked && submenuItem->checkGroup != -1)
    {
       // first, uncheck everything in the group:
-      for(GuiMenuBar::MenuItem *itemWalk = menuItem->firstSubmenuItem; itemWalk; itemWalk = itemWalk->nextMenuItem)
+      for(GuiMenuBar::MenuItem *itemWalk = menuItem->submenu->firstMenuItem; itemWalk; itemWalk = itemWalk->nextMenuItem)
          if(itemWalk->checkGroup == submenuItem->checkGroup && itemWalk->bitmapIndex == object->mCheckmarkBitmapIndex)
             itemWalk->bitmapIndex = -1;
    }
@@ -777,8 +777,7 @@ DefineEngineMethod(GuiMenuBar, setSubmenuItemChecked, void, (const char* menuTar
 //------------------------------------------------------------------------------
 // menu management methods
 //------------------------------------------------------------------------------
-
-void GuiMenuBar::addMenu(const char *menuText, U32 menuId)
+GuiMenuBar::Menu* GuiMenuBar::sCreateMenu(const char *menuText, U32 menuId)
 {
    // allocate the menu
    Menu *newMenu = new Menu;
@@ -792,13 +791,25 @@ void GuiMenuBar::addMenu(const char *menuText, U32 menuId)
    newMenu->bitmapIndex = -1;
    newMenu->drawBitmapOnly = false;
    newMenu->drawBorder = true;
-   
+
+   return newMenu;
+}
+
+void GuiMenuBar::addMenu(GuiMenuBar::Menu *newMenu, S32 pos)
+{
    // add it to the menu list
    menuBarDirty = true;
-   Menu **walk;
-	for(walk = &menuList; *walk; walk = &(*walk)->nextMenu)
-      ;
-   *walk = newMenu;
+   if (pos == -1)
+      mMenuList.push_back(newMenu);
+   else
+      mMenuList.insert(pos, newMenu);
+}
+
+void GuiMenuBar::addMenu(const char *menuText, U32 menuId)
+{
+   Menu *newMenu = sCreateMenu(menuText, menuId);
+   
+   addMenu(newMenu);
 }
 
 GuiMenuBar::Menu *GuiMenuBar::findMenu(const char *menu)
@@ -806,16 +817,16 @@ GuiMenuBar::Menu *GuiMenuBar::findMenu(const char *menu)
 	if(dIsdigit(menu[0]))
 	{
 		U32 id = dAtoi(menu);
-		for(Menu *walk = menuList; walk; walk = walk->nextMenu)
-			if(id == walk->id)
-				return walk;
+      for (U32 i = 0; i < mMenuList.size(); ++i)
+         if (id == mMenuList[i]->id)
+            return mMenuList[i];
 		return NULL;
 	}
 	else
 	{
-		for(Menu *walk = menuList; walk; walk = walk->nextMenu)
-			if(!dStricmp(menu, walk->text))
-				return walk;
+      for (U32 i = 0; i < mMenuList.size(); ++i)
+         if (!dStricmp(menu, mMenuList[i]->text))
+            return mMenuList[i];
 		return NULL;
 	}
 }
@@ -843,16 +854,15 @@ void GuiMenuBar::removeMenu(Menu *menu)
 {
    menuBarDirty = true;
    clearMenuItems(menu);
-   for(Menu **walk = &menuList; *walk; walk = &(*walk)->nextMenu)
+
+   for (U32 i = 0; i < mMenuList.size(); ++i)
    {
-      if(*walk == menu)
+      if (mMenuList[i] == menu)
       {
-         *walk = menu->nextMenu;
+         mMenuList.erase(i);
          break;
       }
    }
-   dFree(menu->text);
-   delete menu;
 }
 
 void GuiMenuBar::removeMenuItem(Menu *menu, MenuItem *menuItem)
@@ -877,7 +887,7 @@ void GuiMenuBar::removeMenuItem(Menu *menu, MenuItem *menuItem)
    delete menuItem;
 }
 
-void GuiMenuBar::addMenuItem(Menu *menu, const char *text, U32 id, const char *accelerator, S32 checkGroup)
+GuiMenuBar::MenuItem* GuiMenuBar::addMenuItem(Menu *menu, const char *text, U32 id, const char *accelerator, S32 checkGroup, const char *cmd )
 {
    // allocate the new menu item
    MenuItem *newMenuItem = new MenuItem;
@@ -886,6 +896,7 @@ void GuiMenuBar::addMenuItem(Menu *menu, const char *text, U32 id, const char *a
       newMenuItem->accelerator = dStrdup(accelerator);
    else
       newMenuItem->accelerator = NULL;
+   newMenuItem->cmd = cmd;
    newMenuItem->id = id;
    newMenuItem->checkGroup = checkGroup;
    newMenuItem->nextMenuItem = NULL;
@@ -896,15 +907,33 @@ void GuiMenuBar::addMenuItem(Menu *menu, const char *text, U32 id, const char *a
 
    //  Default to not having a submenu
    newMenuItem->isSubmenu = false;
-   newMenuItem->firstSubmenuItem = NULL;
+   newMenuItem->submenu = NULL;
    newMenuItem->submenuParentMenu = NULL;
 
    // link it into the menu's menu item list
-   MenuItem **walk = &menu->firstMenuItem;
-   while(*walk)
-      walk = &(*walk)->nextMenuItem;
-   *walk = newMenuItem;
+   if(menu)
+   {
+      MenuItem **walk = &menu->firstMenuItem;
+      while(*walk)
+         walk = &(*walk)->nextMenuItem;
+      *walk = newMenuItem;
+   }
 
+   return newMenuItem;
+}
+
+GuiMenuBar::MenuItem* GuiMenuBar::addMenuItem(Menu *menu, MenuItem* newMenuItem)
+{
+   // link it into the menu's menu item list
+   if(menu)
+   {
+      MenuItem **walk = &menu->firstMenuItem;
+      while(*walk)
+         walk = &(*walk)->nextMenuItem;
+      *walk = newMenuItem;
+   }
+
+   return newMenuItem;
 }
 
 void GuiMenuBar::clearMenuItems(Menu *menu)
@@ -915,8 +944,26 @@ void GuiMenuBar::clearMenuItems(Menu *menu)
 
 void GuiMenuBar::clearMenus()
 {
-   while(menuList)
-      removeMenu(menuList);
+   mMenuList.clear();
+}
+
+void GuiMenuBar::attachToMenuBar(Menu* menu, S32 pos)
+{
+   addMenu(menu, pos);
+}
+
+void GuiMenuBar::removeFromMenuBar(Menu* menu)
+{
+   menuBarDirty = true;
+
+   for (U32 i = 0; i < mMenuList.size(); ++i)
+   {
+      if (mMenuList[i] == menu)
+      {
+         mMenuList.erase(i);
+         break;
+      }
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -935,16 +982,9 @@ GuiMenuBar::MenuItem *GuiMenuBar::findSubmenuItem(Menu *menu, const char *menuIt
       for(MenuItem *walk = menu->firstMenuItem; walk; walk = walk->nextMenuItem)
          if(id == walk->id)
 		 {
-		    if(walk->isSubmenu)
+		    if(walk->isSubmenu && walk->submenu)
 			{
-               U32 subid = dAtoi(submenuItem);
-	           for(MenuItem *subwalk = walk->firstSubmenuItem; subwalk; subwalk = subwalk->nextMenuItem)
-			   {
-				  if(subid == walk->id)
-				  {
-                     return subwalk;
-				  }
-			   }
+            return GuiMenuBar::findMenuItem(walk->submenu, submenuItem);
 			}
 			return NULL;
 		 }
@@ -956,18 +996,22 @@ GuiMenuBar::MenuItem *GuiMenuBar::findSubmenuItem(Menu *menu, const char *menuIt
       for(MenuItem *walk = menu->firstMenuItem; walk; walk = walk->nextMenuItem)
          if(!dStricmp(menuItem, walk->text))
 		 {
-		    if(walk->isSubmenu)
+		    if(walk->isSubmenu && walk->submenu)
 			{
-			   for(MenuItem *subwalk = walk->firstSubmenuItem; subwalk; subwalk = subwalk->nextMenuItem)
-			   {
-			      if(!dStricmp(submenuItem, subwalk->text))
-                      return subwalk;
-			   }
+            return GuiMenuBar::findMenuItem(walk->submenu, submenuItem);
 			}
 			return NULL;
 		 }
       return NULL;
    }
+}
+
+GuiMenuBar::MenuItem* GuiMenuBar::findSubmenuItem(MenuItem *menuItem, const char *submenuItem)
+{
+   if( !menuItem->isSubmenu )
+      return NULL;
+
+   return GuiMenuBar::findMenuItem( menuItem->submenu, submenuItem );
 }
 
 //  Add a menuitem to the given submenu
@@ -991,23 +1035,36 @@ void GuiMenuBar::addSubmenuItem(Menu *menu, MenuItem *submenu, const char *text,
    newMenuItem->checkGroup = checkGroup;
    newMenuItem->nextMenuItem = NULL;
    newMenuItem->acceleratorIndex = 0;
-   newMenuItem->enabled = text[0] != '-';
+   newMenuItem->enabled = (dStrlen(text) > 1 || text[0] != '-');
    newMenuItem->visible = true;
    newMenuItem->bitmapIndex = -1;
 
    //  Default to not having a submenu
    newMenuItem->isSubmenu = false;
-   newMenuItem->firstSubmenuItem = NULL;
+   newMenuItem->submenu = NULL;
 
    //  Point back to the submenu's menu
    newMenuItem->submenuParentMenu = menu;
 
    // link it into the menu's menu item list
-   MenuItem **walk = &submenu->firstSubmenuItem;
+   MenuItem **walk = &submenu->submenu->firstMenuItem;
    while(*walk)
       walk = &(*walk)->nextMenuItem;
    *walk = newMenuItem;
+}
 
+void GuiMenuBar::addSubmenuItem(Menu *menu, MenuItem *submenu, MenuItem *newMenuItem )
+{
+   AssertFatal( submenu && newMenuItem, "");
+
+   //  Point back to the submenu's menu
+   newMenuItem->submenuParentMenu = menu;
+
+   // link it into the menu's menu item list
+   MenuItem **walk = &submenu->submenu->firstMenuItem;
+   while(*walk)
+      walk = &(*walk)->nextMenuItem;
+   *walk = newMenuItem;
 }
 
 //  Remove a submenu item
@@ -1020,17 +1077,7 @@ void GuiMenuBar::removeSubmenuItem(MenuItem *menuItem, MenuItem *submenuItem)
 	  return;
    }
 
-   for(MenuItem **subwalk = &menuItem->firstSubmenuItem; *subwalk; subwalk = &(*subwalk)->nextMenuItem)
-   {
-      if(*subwalk == submenuItem)
-      {
-         *subwalk = submenuItem->nextMenuItem;
-         break;
-      }
-   }
-   dFree(submenuItem->text);
-   dFree(submenuItem->accelerator);
-   delete submenuItem;
+   GuiMenuBar::removeMenuItem(menuItem->submenu, submenuItem);
 }
 
 //  Clear all menuitems from a submenu
@@ -1043,8 +1090,8 @@ void GuiMenuBar::clearSubmenuItems(MenuItem *menuitem)
 	  return;
    }
 
-   while(menuitem->firstSubmenuItem)
-      removeSubmenuItem(menuitem, menuitem->firstSubmenuItem);
+   while(menuitem->submenu->firstMenuItem)
+      removeSubmenuItem(menuitem, menuitem->submenu->firstMenuItem);
 }
 
 //------------------------------------------------------------------------------
@@ -1053,7 +1100,7 @@ void GuiMenuBar::clearSubmenuItems(MenuItem *menuitem)
 
 GuiMenuBar::GuiMenuBar()
 {
-	menuList = NULL;
+   mMenuList.clear();
    menuBarDirty = true;
    mouseDownMenu = NULL;
    mouseOverMenu = NULL;
@@ -1110,9 +1157,9 @@ GuiMenuBar::Menu *GuiMenuBar::findHitMenu(Point2I mousePoint)
 {
    Point2I pos = globalToLocalCoord(mousePoint);
 
-   for(Menu *walk = menuList; walk; walk = walk->nextMenu)
-      if(walk->visible && walk->bounds.pointInRect(pos))
-         return walk;
+   for (U32 i = 0; i < mMenuList.size(); ++i)
+      if (mMenuList[i]->visible && mMenuList[i]->bounds.pointInRect(pos))
+         return mMenuList[i];
    return NULL;
 }
 
@@ -1123,35 +1170,35 @@ void GuiMenuBar::onPreRender()
    {
       menuBarDirty = false;
       U32 curX = mPadding;
-      for(Menu *walk = menuList; walk; walk = walk->nextMenu)
+      for (U32 i = 0; i < mMenuList.size(); ++i)
       {
-         if(!walk->visible)
+         if (!mMenuList[i]->visible)
             continue;
 
 		 // Bounds depends on if there is a bitmap to be drawn or not
-		 if(walk->bitmapIndex == -1)
+         if (mMenuList[i]->bitmapIndex == -1)
 		 {
             // Text only
-            walk->bounds.set(curX, 0, mProfile->mFont->getStrWidth(walk->text) + (mHorizontalMargin * 2), getHeight() - (mVerticalMargin * 2));
+            mMenuList[i]->bounds.set(curX, 0, mProfile->mFont->getStrWidth(mMenuList[i]->text) + (mHorizontalMargin * 2), getHeight() - (mVerticalMargin * 2));
 
          } else
 		 {
             // Will the bitmap and text be draw?
-            if(!walk->drawBitmapOnly)
+          if (!mMenuList[i]->drawBitmapOnly)
 			{
                // Draw the bitmap and the text
                RectI *bitmapBounds = mProfile->mBitmapArrayRects.address();
-			   walk->bounds.set(curX, 0, bitmapBounds[walk->bitmapIndex].extent.x + mProfile->mFont->getStrWidth(walk->text) + (mHorizontalMargin * 2), getHeight() + (mVerticalMargin * 2));
+               mMenuList[i]->bounds.set(curX, 0, bitmapBounds[mMenuList[i]->bitmapIndex].extent.x + mProfile->mFont->getStrWidth(mMenuList[i]->text) + (mHorizontalMargin * 2), getHeight() + (mVerticalMargin * 2));
 
 			} else
 			{
                // Only the bitmap will be drawn
                RectI *bitmapBounds = mProfile->mBitmapArrayRects.address();
-               walk->bounds.set(curX, 0, bitmapBounds[walk->bitmapIndex].extent.x + mBitmapMargin + (mHorizontalMargin * 2), getHeight() + (mVerticalMargin * 2));
+               mMenuList[i]->bounds.set(curX, 0, bitmapBounds[mMenuList[i]->bitmapIndex].extent.x + mBitmapMargin + (mHorizontalMargin * 2), getHeight() + (mVerticalMargin * 2));
 			}
 		 }
 
-         curX += walk->bounds.extent.x;
+         curX += mMenuList[i]->bounds.extent.x;
       }
 		mouseOverMenu = NULL;
 		mouseDownMenu = NULL;
@@ -1248,85 +1295,85 @@ void GuiMenuBar::onMouseUp(const GuiEvent &event)
 
 void GuiMenuBar::onRender(Point2I offset, const RectI &updateRect)
 {
-
    RectI ctrlRect(offset, getExtent());
+
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
 
    //if opaque, fill the update rect with the fill color
    if (mProfile->mOpaque)
-      GFX->getDrawUtil()->drawRectFill(RectI(offset, getExtent()), mProfile->mFillColor);
+      drawUtil->drawRectFill(RectI(offset, getExtent()), mProfile->mFillColor);
 
    //if there's a border, draw the border
    if (mProfile->mBorder)
       renderBorder(ctrlRect, mProfile);
 
-   for(Menu *walk = menuList; walk; walk = walk->nextMenu)
+   for (U32 i = 0; i < mMenuList.size(); ++i)
    {
-      if(!walk->visible)
+      if (!mMenuList[i]->visible)
          continue;
       ColorI fontColor = mProfile->mFontColor;
-      RectI bounds = walk->bounds;
+      RectI bounds = mMenuList[i]->bounds;
       bounds.point += offset;
       
       Point2I start;
 
-      start.x = walk->bounds.point.x + mHorizontalMargin;
-      start.y = walk->bounds.point.y + ( walk->bounds.extent.y - mProfile->mFont->getHeight() ) / 2;
+      start.x = mMenuList[i]->bounds.point.x + mHorizontalMargin;
+      start.y = mMenuList[i]->bounds.point.y + (mMenuList[i]->bounds.extent.y - mProfile->mFont->getHeight()) / 2;
 
 	  // Draw the border
-	  if(walk->drawBorder)
+      if (mMenuList[i]->drawBorder)
 	  {
         RectI highlightBounds = bounds;
         highlightBounds.inset(1,1);
-         if(walk == mouseDownMenu)
+        if (mMenuList[i] == mouseDownMenu)
             renderFilledBorder(highlightBounds, mProfile->mBorderColorHL, mProfile->mFillColorHL );
-         else if(walk == mouseOverMenu && mouseDownMenu == NULL)
-            renderFilledBorder(highlightBounds, mProfile->mBorderColor, mProfile->mFillColor );
+        else if (mMenuList[i] == mouseOverMenu && mouseDownMenu == NULL)
+           renderFilledBorder(highlightBounds, mProfile->mBorderColorHL, mProfile->mFillColorHL);
 	  }
 
 	  // Do we draw a bitmap?
-	  if(walk->bitmapIndex != -1)
+      if (mMenuList[i]->bitmapIndex != -1)
 	  {
-         S32 index = walk->bitmapIndex * 3;
-         if(walk == mouseDownMenu)
+        S32 index = mMenuList[i]->bitmapIndex * 3;
+        if (mMenuList[i] == mouseDownMenu)
             ++index;
-         else if(walk == mouseOverMenu && mouseDownMenu == NULL)
+        else if (mMenuList[i] == mouseOverMenu && mouseDownMenu == NULL)
             index += 2;
 
          RectI rect = mProfile->mBitmapArrayRects[index];
 
 		 Point2I bitmapstart(start);
-		 bitmapstart.y = walk->bounds.point.y + ( walk->bounds.extent.y - rect.extent.y ) / 2;
+       bitmapstart.y = mMenuList[i]->bounds.point.y + (mMenuList[i]->bounds.extent.y - rect.extent.y) / 2;
 
-         GFX->getDrawUtil()->clearBitmapModulation();
-         GFX->getDrawUtil()->drawBitmapSR( mProfile->mTextureObject, offset + bitmapstart, rect);
+         drawUtil->clearBitmapModulation();
+         drawUtil->drawBitmapSR( mProfile->mTextureObject, offset + bitmapstart, rect);
 
 		 // Should we also draw the text?
-		 if(!walk->drawBitmapOnly)
+         if (!mMenuList[i]->drawBitmapOnly)
 		 {
             start.x += mBitmapMargin;
-      GFX->getDrawUtil()->setBitmapModulation( fontColor );
-      GFX->getDrawUtil()->drawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
+      drawUtil->setBitmapModulation( fontColor );
+      drawUtil->drawText(mProfile->mFont, start + offset, mMenuList[i]->text, mProfile->mFontColors);
 		 }
 	  } else
 	  {
-      GFX->getDrawUtil()->setBitmapModulation( fontColor );
-      GFX->getDrawUtil()->drawText( mProfile->mFont, start + offset, walk->text, mProfile->mFontColors );
+      drawUtil->setBitmapModulation( fontColor );
+      drawUtil->drawText(mProfile->mFont, start + offset, mMenuList[i]->text, mProfile->mFontColors);
 	  }
    }
 
    renderChildControls( offset, updateRect );
 }
 
-void GuiMenuBar::buildAcceleratorMap()
+void GuiMenuBar::buildWindowAcceleratorMap( WindowInputGenerator &inputGenerator )
 {
-   Parent::buildAcceleratorMap();
    // ok, accelerator map is cleared...
    // add all our keys:
    mCurAcceleratorIndex = 1;
 
-   for(Menu *menu = menuList; menu; menu = menu->nextMenu)
+   for (U32 i = 0; i < mMenuList.size(); ++i)
    {
-      for(MenuItem *item = menu->firstMenuItem; item; item = item->nextMenuItem)
+      for (MenuItem *item = mMenuList[i]->firstMenuItem; item; item = item->nextMenuItem)
       {
          if(!item->accelerator)
          {
@@ -1334,36 +1381,40 @@ void GuiMenuBar::buildAcceleratorMap()
             continue;
          }
          EventDescriptor accelEvent;
-			ActionMap::createEventDescriptor(item->accelerator, &accelEvent);
+		 ActionMap::createEventDescriptor(item->accelerator, &accelEvent);
    
          //now we have a modifier, and a key, add them to the canvas
-         GuiCanvas *root = getRoot();
-         if (root)
-            root->addAcceleratorKey(this, mCurAcceleratorIndex, accelEvent.eventCode, accelEvent.flags);
+         inputGenerator.addAcceleratorKey( this, item->cmd, accelEvent.eventCode, accelEvent.flags);
+
          item->acceleratorIndex = mCurAcceleratorIndex;
          mCurAcceleratorIndex++;
       }
    }
 }
 
+void GuiMenuBar::removeWindowAcceleratorMap( WindowInputGenerator &inputGenerator )
+{
+    inputGenerator.removeAcceleratorKeys( this );
+}
+
 void GuiMenuBar::acceleratorKeyPress(U32 index)
 {
    // loop through all the menus
    // and find the item that corresponds to the accelerator index
-   for(Menu *menu = menuList; menu; menu = menu->nextMenu)
+   for (U32 i = 0; i < mMenuList.size(); ++i)
    {
-      if(!menu->visible)
+      if (!mMenuList[i]->visible)
          continue;
 
-      for(MenuItem *item = menu->firstMenuItem; item; item = item->nextMenuItem)
+      for (MenuItem *item = mMenuList[i]->firstMenuItem; item; item = item->nextMenuItem)
       {
          if(item->acceleratorIndex == index)
          {
             // first, call the script callback for menu selection:
-            onMenuSelect_callback(Con::getIntArg(menu->id), menu->text);
+            onMenuSelect_callback(mMenuList[i]->id, mMenuList[i]->text);
 			
             if(item->visible)
-               menuItemSelected(menu, item);
+               menuItemSelected(mMenuList[i], item);
             return;
          }
       }
@@ -1542,7 +1593,7 @@ bool GuiSubmenuBackgroundCtrl::pointInControl(const Point2I& parentCoordPoint)
 void GuiMenuBar::menuItemSelected(GuiMenuBar::Menu *menu, GuiMenuBar::MenuItem *item)
 {
    if(item->enabled)
-      onMenuItemSelect_callback(Con::getIntArg(menu->id), menu->text, Con::getIntArg(item->id), item->text);
+      onMenuItemSelect_callback(menu->id, menu->text, item->id, item->text);
 }
 
 void GuiMenuBar::onSleep()
@@ -1590,7 +1641,7 @@ void GuiMenuBar::closeMenu()
 }
 
 //  Called when a menu item is highlighted by the mouse
-void GuiMenuBar::highlightedMenuItem(S32 selectionIndex, RectI bounds, Point2I cellSize)
+void GuiMenuBar::highlightedMenuItem(S32 selectionIndex, const RectI& bounds, Point2I cellSize)
 {
    S32 selstore = selectionIndex;
 
@@ -1617,7 +1668,7 @@ void GuiMenuBar::highlightedMenuItem(S32 selectionIndex, RectI bounds, Point2I c
             if(list->isSubmenu)
 		    {
 			   // If there are submenu items, then open the submenu
-			   if(list->firstSubmenuItem)
+             if(list->submenu->firstMenuItem)
 			   {
 				   mouseOverSubmenu = list;
 				   onSubmenuAction(selstore, bounds, cellSize);
@@ -1635,7 +1686,7 @@ void GuiMenuBar::onAction()
       return;
 
    // first, call the script callback for menu selection:
-   onMenuSelect_callback(Con::getIntArg(mouseDownMenu->id), mouseDownMenu->text);
+   onMenuSelect_callback(mouseDownMenu->id, mouseDownMenu->text);
 
    MenuItem *visWalk = mouseDownMenu->firstMenuItem;
    while(visWalk)
@@ -1744,15 +1795,15 @@ void GuiMenuBar::onAction()
 
 //------------------------------------------------------------------------------
 //  Performs an action when a menu item that is a submenu is selected/highlighted
-void GuiMenuBar::onSubmenuAction(S32 selectionIndex, RectI bounds, Point2I cellSize)
+void GuiMenuBar::onSubmenuAction(S32 selectionIndex, const RectI& bounds, Point2I cellSize)
 {
    if(!mouseOverSubmenu)
       return;
 
    // first, call the script callback for menu selection:
-   onSubmenuSelect_callback(Con::getIntArg(mouseOverSubmenu->id), mouseOverSubmenu->text);
+   onSubmenuSelect_callback(mouseOverSubmenu->id, mouseOverSubmenu->text);
 
-   MenuItem *visWalk = mouseOverSubmenu->firstSubmenuItem;
+   MenuItem *visWalk = mouseOverSubmenu->submenu->firstMenuItem;
    while(visWalk)
    {
       if(visWalk->visible)
@@ -1780,7 +1831,7 @@ void GuiMenuBar::onSubmenuAction(S32 selectionIndex, RectI bounds, Point2I cellS
 
    GFont *font = mProfile->mFont;
 
-   for(MenuItem *walk = mouseOverSubmenu->firstSubmenuItem; walk; walk = walk->nextMenuItem)
+   for(MenuItem *walk = mouseOverSubmenu->submenu->firstMenuItem; walk; walk = walk->nextMenuItem)
    {
       if(!walk->visible)
          continue;
@@ -1803,7 +1854,7 @@ void GuiMenuBar::onSubmenuAction(S32 selectionIndex, RectI bounds, Point2I cellS
 
    U32 entryCount = 0;
 
-   for(MenuItem *walk = mouseOverSubmenu->firstSubmenuItem; walk; walk = walk->nextMenuItem)
+   for(MenuItem *walk = mouseOverSubmenu->submenu->firstMenuItem; walk; walk = walk->nextMenuItem)
    {
       if(!walk->visible)
          continue;
@@ -1885,7 +1936,7 @@ void GuiMenuBar::closeSubmenu()
       MenuItem *list = NULL;
 	  if(mouseOverSubmenu)
 	  {
-         list = mouseOverSubmenu->firstSubmenuItem;
+         list = mouseOverSubmenu->submenu->firstMenuItem;
 
          while(selectionIndex && list)
          {

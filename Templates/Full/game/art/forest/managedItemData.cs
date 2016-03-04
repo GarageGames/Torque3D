@@ -25,7 +25,7 @@
 
 datablock TSForestItemData(ExampleForestMesh)
 {
-   shapeFile = "art/shapes/trees/defaulttree/defaulttree.dae";
+   shapeFile = "art/shapes/trees/defaulttree/defaulttree.DAE";
    internalName = "ExampleForestMesh";
    windScale = "1";
    trunkBendScale = "0.02";

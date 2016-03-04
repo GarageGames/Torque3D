@@ -59,29 +59,28 @@ class GuiColorPickerCtrl : public GuiControl
   public:
    enum PickMode
    {
-     pPallet = 0,		///< We just have a solid color; We just act like a pallet 
-     pHorizColorRange,		///< We have a range of base colors going horizontally
-     pVertColorRange,		///< We have a range of base colors going vertically
+     pPallet = 0,                ///< We just have a solid color; We just act like a pallet 
+     pHorizColorRange,           ///< We have a range of base colors going horizontally
+     pVertColorRange,            ///< We have a range of base colors going vertically
      pHorizColorBrightnessRange, ///< HorizColorRange with brightness
-     pVertColorBrightnessRange, ///< VertColorRange with brightness
-     pBlendColorRange,		///< We have a box which shows a range in brightness of the color
-     pHorizAlphaRange,		///< We have a box which shows a range in alpha going horizontally
-     pVertAlphaRange,		///< We have a box which shows a range in alpha going vertically
-     pDropperBackground		///< The control does not draw anything; Only does something when you click, or move the mouse (when active)
+     pVertColorBrightnessRange,  ///< VertColorRange with brightness
+     pBlendColorRange,           ///< We have a box which shows a range in brightness of the color
+     pHorizAlphaRange,           ///< We have a box which shows a range in alpha going horizontally
+     pVertAlphaRange,            ///< We have a box which shows a range in alpha going vertically
+     pDropperBackground          ///< The control does not draw anything; Only does something when you click, or move the mouse (when active)
    };
    
    enum SelectorMode
    {
-     sHorizontal = 0,		///< Horizontal selector with small gap
-     sVertical,			///< Vertical selector with small gap
+     sHorizontal = 0,            ///< Horizontal selector with small gap
+     sVertical,                  ///< Vertical selector with small gap
    };
-  
+
   protected:
-   
    /// @name Core Rendering functions
    /// @{
-   void renderColorBox(RectI &bounds);			///< Function that draws the actual color box
-   void drawSelector(RectI &bounds, Point2I &selectorPos, SelectorMode mode);	///< Function that draws the selection indicator
+   void renderColorBox(RectI &bounds); ///< Function that draws the actual color box
+   void drawSelector(RectI &bounds, Point2I &selectorPos, SelectorMode mode); /// < Function that draws the selection indicator
    void drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &c4);
    void drawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors);
    /// @}
@@ -98,7 +97,11 @@ class GuiColorPickerCtrl : public GuiControl
    bool mMouseDown;		///< Mouse button down?
    bool mActionOnMove;		///< Perform onAction() when position has changed?
 
-	
+   bool mSelectColor;
+   ColorF mSetColor;
+   GBitmap* mBitmap;
+
+   Point2I findColor(const ColorF & color, const Point2I& offset, const Point2I& resolution, GBitmap& bmp);
    
    S32   mSelectorGap;		///< The half-way "gap" between the selector pos and where the selector is allowed to draw. 
 
@@ -107,12 +110,13 @@ class GuiColorPickerCtrl : public GuiControl
    static ColorI mColorRange[7]; ///< Color range for pHorizColorRange and pVertColorRange
    /// @}
 
-  public:   
-   
+  public:
+
    DECLARE_CONOBJECT(GuiColorPickerCtrl);
    DECLARE_CATEGORY( "Gui Editor" );
    
    GuiColorPickerCtrl();
+   ~GuiColorPickerCtrl();
 
    static void initPersistFields();
    void onRender(Point2I offset, const RectI &updateRect);
@@ -122,18 +126,19 @@ class GuiColorPickerCtrl : public GuiControl
    /// NOTE: setValue only sets baseColor, since setting pickColor wouldn't be useful
    void setValue(ColorF &value) {mBaseColor = value;}
    /// NOTE: getValue() returns baseColor if pallet (since pallet controls can't "pick" colours themselves)
-   ColorF getValue() {return mDisplayMode == pPallet ? mBaseColor : mPickColor;}
+   ColorF getValue() { return mDisplayMode == pPallet ? mBaseColor : mPickColor; }
    const char *getScriptValue();
    void setScriptValue(const char *value);
    void updateColor() {mPositionChanged = true;}
    /// @}
-   
+
    /// @name Selector Functions
    /// @{
    void setSelectorPos(const Point2I &pos); ///< Set new pos (in local coords)
+   void setSelectorPos(const ColorF & color);
    Point2I getSelectorPos() {return mSelectorPos;}
    /// @}
-   
+
    /// @name Input Events
    /// @{
    void onMouseDown(const GuiEvent &);

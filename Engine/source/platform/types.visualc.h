@@ -32,6 +32,16 @@
 typedef signed _int64   S64;
 typedef unsigned _int64 U64;
 
+// The types.h version of TORQUE_UNUSED no longer works for recent versions of MSVC.
+// Since it appears that MS has made this impossible to do in a zero-overhead way,
+// just turn the warning off in release builds.
+#undef TORQUE_UNUSED
+#ifdef TORQUE_DEBUG
+#define TORQUE_UNUSED(var) ((0,0) ? (void)(var) : (void)0)
+#else
+#pragma warning(disable: 4189) // local variable is initialized but not referenced
+#define TORQUE_UNUSED(var) ((void)0)
+#endif
 
 //--------------------------------------
 // Compiler Version
@@ -42,7 +52,7 @@ typedef unsigned _int64 U64;
 #if _MSC_VER < 1200
    // No support for old compilers
 #  error "VC: Minimum VisualC++ 6.0 or newer required"
-#else _MSC_VER >= 1200
+#else // _MSC_VER >= 1200
 #  define TORQUE_COMPILER_STRING "VisualC++"
 #endif
 
@@ -84,8 +94,10 @@ typedef unsigned _int64 U64;
 #  define TORQUE_CPU_STRING "x86"
 #  define TORQUE_CPU_X86
 #  define TORQUE_LITTLE_ENDIAN
+#ifndef __clang__ // asm not yet supported with clang
 #  define TORQUE_SUPPORTS_NASM
 #  define TORQUE_SUPPORTS_VC_INLINE_X86_ASM
+#endif
 #elif defined( TORQUE_OS_XENON )
 #  define TORQUE_CPU_STRING "ppc"
 #  define TORQUE_CPU_PPC

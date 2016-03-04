@@ -31,6 +31,9 @@
 #include "gfx/gfxDebugEvent.h"
 #include "windowManager/win32/win32Window.h"
 
+#ifndef _GFXDEVICE_H_
+#include "gfx/gfxDevice.h"
+#endif
 
 GFXPCD3D9TextureTarget::GFXPCD3D9TextureTarget() 
    :  mTargetSize( Point2I::Zero ),
@@ -372,10 +375,8 @@ void GFXPCD3D9WindowTarget::initPresentationParams()
          "GFXPCD3D9WindowTarget::initPresentationParams - Cannot go fullscreen with secondary window!");
    }
 
-   Win32Window *win = dynamic_cast<Win32Window*>(mWindow);
-   AssertISV(win, "GFXPCD3D9WindowTarget::initPresentationParams() - got a non Win32Window window passed in! Did DX go crossplatform?");
-
-   HWND hwnd = win->getHWND();
+   HWND hwnd = (HWND)mWindow->getSystemWindow( PlatformWindow::WindowSystem_Windows );
+   AssertISV(hwnd, "GFXPCD3D9WindowTarget::initPresentationParams() - no HWND");
 
    // At some point, this will become GFXPCD3D9WindowTarget like trunk has,
    // so this cast isn't as bad as it looks. ;) BTR
@@ -453,6 +454,7 @@ void GFXPCD3D9WindowTarget::createAdditionalSwapChain()
 
 void GFXPCD3D9WindowTarget::resetMode()
 {
+   GFX->beginReset();
    mWindow->setSuppressReset(true);
 
    if (mSwapChain)
@@ -511,6 +513,7 @@ void GFXPCD3D9WindowTarget::zombify()
 
 void GFXPCD3D9WindowTarget::resurrect()
 {
+   GFX->beginReset();
    if(mImplicit)
    {
       setImplicitSwapChain();

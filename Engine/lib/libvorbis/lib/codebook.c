@@ -450,7 +450,7 @@ long vorbis_book_decodev_set(codebook *book,float *a,oggpack_buffer *b,int n){
       }
     }
   }else{
-    int i,j;
+    int i;
 
     for(i=0;i<n;){
       a[i++]=0.f;

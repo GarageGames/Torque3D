@@ -30,12 +30,14 @@
 #include "sim/actionMap.h"
 
 class Win32WindowManager;
+class GFXGLDevice;
 
 /// Implementation of a window on Win32.
 class Win32Window : public PlatformWindow
 {
    friend class Win32WindowManager;
    friend class GFXPCD3D9Device;
+   friend class GFXGLDevice;
    friend class GFXPCD3D9WindowTarget;
    friend class GFXD3D8WindowTarget;
 
@@ -136,6 +138,8 @@ public:
    {
       return mWindowHandle;
    }
+
+   virtual void* getSystemWindow(const WindowSystem system);
 
    HMENU &getMenuHandle()
    {

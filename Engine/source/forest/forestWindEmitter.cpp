@@ -39,6 +39,8 @@
 #include "T3D/gameBase/processList.h"
 #include "console/engineAPI.h"
 
+#include "T3D/gameBase/gameConnection.h"
+
 ConsoleDocClass( ForestWindEmitter,
    "@brief Object responsible for simulating wind in a level.\n\n"
 
@@ -513,9 +515,21 @@ void ForestWindEmitter::_renderEmitterInfo( ObjectRenderInst *ri, SceneRenderSta
    drawer->drawArrow( desc, pos, pos + (windVec * mWindStrength), ColorI( 0, 0, 255, 255 ) );//Point3F( -235.214, 219.589, 34.0991 ), Point3F( -218.814, 244.731, 37.5587 ), ColorI( 255, 255, 0, 255 ) );//
    drawer->drawArrow( desc, pos, pos + (mWind->getTarget() * mWindStrength ), ColorI( 255, 0, 0, 85 ) );
 
+   S32 useRadius = mWindRadius;
    // Draw a 2D circle for the wind radius.
    if ( isRadialEmitter() )
-      drawer->drawSphere( desc, mWindRadius, pos, ColorI( 255, 0, 0, 80 ) );
+   {
+      // If the camera is close to the sphere, shrink the sphere so it remains visible.
+      GameConnection* gc = GameConnection::getConnectionToServer();
+      GameBase *gb = gc ? gc->getCameraObject() : NULL;
+      if (gb)
+      {
+         F32 camDist = (gb->getPosition() - getPosition()).len();
+         if ( camDist < mWindRadius )
+            useRadius = camDist;
+      }
+      drawer->drawSphere( desc, useRadius, pos, ColorI( 255, 0, 0, 80 ) );
+   }
 }
 
 F32 ForestWindEmitter::getStrength() const

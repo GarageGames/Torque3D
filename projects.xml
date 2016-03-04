@@ -28,16 +28,18 @@ Here are some examples:
   <entry type="templateDirectory" path="Templates" args="">Templates</entry>
 
   <entry type="modules">
+    <module name="openGL">OpenGL Rendering</module>
     <module name="fmod">FMod Sound Engine</module>
     <module name="leapMotion" path="$LEAPMOTION_SDK_PATH">Leap Motion Controller</module>
     <module name="razerHydra" path="$RAZERHYDRA_SDK_PATH">Razer Hydra Controller</module>
     <module name="oculusVR" path="$OCULUSVR_SDK_PATH">Oculus VR Devices</module>
     <module name="webDeploy">Web Deployment</module>
-    <module name="navigation">Recast Navigation</module>
-    <module name="testing">Unit testing</module>
+    <module name="navigation" default="1">Recast Navigation</module>
+    <module name="testing" default="1">Unit testing</module>
     <moduleGroup description="Physics Library">
       <module name="" donotwrite="1" default="1">Torque Physics</module>
-      <module name="physX">PhysX Physics Library</module>
+      <module name="physX">PhysX 2.8 Physics Library</module>
+      <module name="physX3">PhysX 3.2 Physics Library</module>
       <module name="bullet">Bullet Physics Library</module>
     </moduleGroup>
   </entry>

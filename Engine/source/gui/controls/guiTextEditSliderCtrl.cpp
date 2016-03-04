@@ -394,6 +394,7 @@ void GuiTextEditSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
    verts.unlock();
 
    GFX->setVertexBuffer( verts );
+   GFX->setupGenericShaders();
    GFX->drawPrimitive( GFXTriangleList, 0, 2 );
 }
 

@@ -50,7 +50,6 @@ GFXImplementVertexFormat( GFXWaterVertex )
 {
    addElement( "POSITION", GFXDeclType_Float3 );
    addElement( "NORMAL", GFXDeclType_Float3 );
-   addElement( "COLOR", GFXDeclType_Color );   
    addElement( "TEXCOORD", GFXDeclType_Float2, 0 );
    addElement( "TEXCOORD", GFXDeclType_Float4, 1 );   
 }
@@ -207,7 +206,7 @@ WaterObject::WaterObject()
    mEmissive( false ),
    mUnderwaterColor(9, 6, 5, 240)
 {
-   mTypeMask = WaterObjectType | StaticObjectType;
+   mTypeMask = WaterObjectType;
 
    for( U32 i=0; i < MAX_WAVES; i++ )
    {
@@ -780,7 +779,7 @@ void WaterObject::drawUnderwaterFilter( SceneRenderState *state )
    GFX->setWorldMatrix( newMat );   
 
    // set up render states
-   GFX->disableShaders();
+   GFX->setupGenericShaders();
    GFX->setStateBlock( mUnderwaterSB );
 
    /*
@@ -891,6 +890,10 @@ void WaterObject::onRemove()
    {
       mPlaneReflector.unregisterReflector();
       cleanupMaterials();
+
+      PostEffect *underWaterEffect = getUnderwaterEffect( );
+      if( underWaterEffect )
+         underWaterEffect->disable( );
    }
 
    Parent::onRemove();

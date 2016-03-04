@@ -94,6 +94,9 @@ struct ShaderGenVars
    const static String dLightMapSec;
    const static String dLightMask;
    const static String toneMap;
+
+   // Deferred Shading
+   const static String matInfoFlags;
 };
 
 #endif

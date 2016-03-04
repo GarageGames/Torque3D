@@ -1650,6 +1650,7 @@ Player::Player()
 
    mLastAbsoluteYaw = 0.0f;
    mLastAbsolutePitch = 0.0f;
+   mLastAbsoluteRoll = 0.0f;
 }
 
 Player::~Player()
@@ -2608,6 +2609,7 @@ void Player::updateMove(const Move* move)
             }
             mLastAbsoluteYaw = emove->rotZ[emoveIndex];
             mLastAbsolutePitch = emove->rotX[emoveIndex];
+            mLastAbsoluteRoll = emove->rotY[emoveIndex];
 
             // Head bank
             mHead.y = emove->rotY[emoveIndex];
@@ -3171,18 +3173,21 @@ void Player::updateMove(const Move* move)
    // Update the PlayerPose
    Pose desiredPose = mPose;
 
-   if ( mSwimming )
-      desiredPose = SwimPose; 
-   else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
-      desiredPose = CrouchPose;
-   else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
-      desiredPose = PronePose;
-   else if ( move->trigger[sSprintTrigger] && canSprint() )
-      desiredPose = SprintPose;
-   else if ( canStand() )
-      desiredPose = StandPose;
+   if ( !mIsAiControlled )
+   {
+      if ( mSwimming )
+         desiredPose = SwimPose; 
+      else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
+         desiredPose = CrouchPose;
+      else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
+         desiredPose = PronePose;
+      else if ( move->trigger[sSprintTrigger] && canSprint() )
+         desiredPose = SprintPose;
+      else if ( canStand() )
+         desiredPose = StandPose;
 
-   setPose( desiredPose );
+      setPose( desiredPose );
+   }
 }
 
 
@@ -4657,9 +4662,9 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
       }
       Point3F distance = end - start;
 
-      if (mFabs(distance.x) < mObjBox.len_x() &&
-          mFabs(distance.y) < mObjBox.len_y() &&
-          mFabs(distance.z) < mObjBox.len_z())
+      if (mFabs(distance.x) < mScaledBox.len_x() &&
+          mFabs(distance.y) < mScaledBox.len_y() &&
+          mFabs(distance.z) < mScaledBox.len_z())
       {
          // We can potentially early out of this.  If there are no polys in the clipped polylist at our
          //  end position, then we can bail, and just set start = end;
@@ -5584,6 +5589,57 @@ void Player::getMuzzleTransform(U32 imageSlot,MatrixF* mat)
    *mat = nmat;
 }
 
+DisplayPose Player::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
+{
+   // NOTE: this is intended to be similar to updateMove
+   DisplayPose outPose;
+   outPose.orientation = getRenderTransform().toEuler();
+   outPose.position = inPose.position;
+
+   if (con && con->getControlSchemeAbsoluteRotation())
+   {
+      // Pitch
+      outPose.orientation.x = (inPose.orientation.x - mLastAbsolutePitch);
+
+      // Constrain the range of mRot.x
+      while (outPose.orientation.x  < -M_PI_F) 
+         outPose.orientation.x += M_2PI_F;
+      while (outPose.orientation.x  > M_PI_F) 
+         outPose.orientation.x -= M_2PI_F;
+
+      // Yaw
+
+      // Rotate (heading) head or body?
+      if ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson()))
+      {
+         // Rotate head
+         outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
+      }
+      else
+      {
+         // Rotate body
+         outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
+      }
+
+      // Constrain the range of mRot.z
+      while (outPose.orientation.z < 0.0f)
+         outPose.orientation.z += M_2PI_F;
+      while (outPose.orientation.z > M_2PI_F)
+         outPose.orientation.z -= M_2PI_F;
+
+      // Bank
+      if (mDataBlock->cameraCanBank)
+      {
+         outPose.orientation.y = (inPose.orientation.y - mLastAbsoluteRoll);
+      }
+
+      // Constrain the range of mRot.y
+      while (outPose.orientation.y > M_PI_F) 
+         outPose.orientation.y -= M_2PI_F;
+   }
+
+   return outPose;
+}
 
 void Player::getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat)
 {
@@ -6133,6 +6189,10 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    {
       stream->writeFlag(mFalling);
 
+      stream->writeFlag(mSwimming);
+      stream->writeFlag(mJetting);  
+      stream->writeInt(mPose, NumPoseBits);
+	  
       stream->writeInt(mState,NumStateBits);
       if (stream->writeFlag(mState == RecoverState))
          stream->writeInt(mRecoverTicks,PlayerData::RecoverDelayBits);
@@ -6152,13 +6212,16 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          stream->writeInt((S32)len, 13);
       }
       stream->writeFloat(mRot.z / M_2PI_F, 7);
-      stream->writeSignedFloat(mHead.x / mDataBlock->maxLookAngle, 6);
+      stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
       stream->writeSignedFloat(mHead.z / mDataBlock->maxFreelookAngle, 6);
       delta.move.pack(stream);
       stream->writeFlag(!(mask & NoWarpMask));
    }
    // Ghost need energy to predict reliably
-   stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy,EnergyLevelBits);
+   if (mDataBlock->maxEnergy > 0.f)
+      stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy, EnergyLevelBits);
+   else
+      stream->writeFloat(0.f, EnergyLevelBits);
    return retMask;
 }
 
@@ -6226,7 +6289,11 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
    if (stream->readFlag()) {
       mPredictionCount = sMaxPredictionTicks;
       mFalling = stream->readFlag();
-
+ 
+      mSwimming = stream->readFlag();
+      mJetting = stream->readFlag();  
+      mPose = (Pose)(stream->readInt(NumPoseBits)); 
+	  
       ActionState actionState = (ActionState)stream->readInt(NumStateBits);
       if (stream->readFlag()) {
          mRecoverTicks = stream->readInt(PlayerData::RecoverDelayBits);
@@ -6250,7 +6317,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       
       rot.y = rot.x = 0.0f;
       rot.z = stream->readFloat(7) * M_2PI_F;
-      mHead.x = stream->readSignedFloat(6) * mDataBlock->maxLookAngle;
+      mHead.x = stream->readSignedFloat(6) * (mDataBlock->maxLookAngle - mDataBlock->minLookAngle);
       mHead.z = stream->readSignedFloat(6) * mDataBlock->maxFreelookAngle;
       delta.move.unpack(stream);
 
@@ -6817,31 +6884,13 @@ void Player::playFootstepSound( bool triggeredLeft, Material* contactMaterial, S
       // Play default sound.
 
       S32 sound = -1;
-      if( contactMaterial && contactMaterial->mFootstepSoundId != -1 )
+      if (contactMaterial && (contactMaterial->mImpactSoundId>-1 && contactMaterial->mImpactSoundId<PlayerData::MaxSoundOffsets))
          sound = contactMaterial->mFootstepSoundId;
       else if( contactObject && contactObject->getTypeMask() & VehicleObjectType )
          sound = 2;
 
-      switch ( sound )
-      {
-      case 0: // Soft
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootSoft], &footMat );
-         break;
-      case 1: // Hard
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootHard], &footMat );
-         break;
-      case 2: // Metal
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootMetal], &footMat );
-         break;
-      case 3: // Snow
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootSnow], &footMat );
-         break;
-      /*
-      default: //Hard
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootHard], &footMat );
-         break;
-      */
-      }
+      if (sound>=0)
+         SFX->playOnce(mDataBlock->sound[sound], &footMat);
    }
 }
 
@@ -6866,36 +6915,13 @@ void Player:: playImpactSound()
          else
          {
             S32 sound = -1;
-            if( material && material->mImpactSoundId )
+            if (material && (material->mImpactSoundId>-1 && material->mImpactSoundId<PlayerData::MaxSoundOffsets))
                sound = material->mImpactSoundId;
             else if( rInfo.object->getTypeMask() & VehicleObjectType )
                sound = 2; // Play metal;
 
-            switch( sound )
-            {
-            case 0:
-               //Soft
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactSoft ], &getTransform() );
-               break;
-            case 1:
-               //Hard
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactHard ], &getTransform() );
-               break;
-            case 2:
-               //Metal
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactMetal ], &getTransform() );
-               break;
-            case 3:
-               //Snow
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactSnow ], &getTransform() );
-               break;
-               /*
-            default:
-               //Hard
-               alxPlay(mDataBlock->sound[PlayerData::ImpactHard], &getTransform());
-               break;
-               */
-            }
+            if (sound >= 0)
+               SFX->playOnce(mDataBlock->sound[PlayerData::ImpactStart + sound], &getTransform());
          }
       }
    }

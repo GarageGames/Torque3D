@@ -37,6 +37,7 @@
 #include "gfx/util/screenspace.h"
 #include "lighting/advanced/advancedLightBinManager.h"
 
+S32 sgMaxTerrainMaterialsPerPass = 3;
 
 AFTER_MODULE_INIT( MaterialManager )
 {
@@ -45,6 +46,27 @@ AFTER_MODULE_INIT( MaterialManager )
 }
 
 Vector<TerrainCellMaterial*> TerrainCellMaterial::smAllMaterials;
+
+Vector<String> _initSamplerNames()
+{
+   Vector<String> samplerNames;
+   samplerNames.push_back("$baseTexMap");
+   samplerNames.push_back("$layerTex");   
+   samplerNames.push_back("$macrolayerTex");   
+   samplerNames.push_back("$lightMapTex");
+   samplerNames.push_back("$lightInfoBuffer");
+   for(int i = 0; i < 3; ++i)
+   {
+      samplerNames.push_back(avar("$normalMap%d",i));
+      samplerNames.push_back(avar("$detailMap%d",i));
+      samplerNames.push_back(avar("$macroMap%d",i));
+   }   
+
+   return samplerNames;
+}
+
+
+const Vector<String> TerrainCellMaterial::mSamplerNames = _initSamplerNames();
 
 TerrainCellMaterial::TerrainCellMaterial()
    :  mCurrPass( 0 ),
@@ -289,12 +311,12 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    if ( GFX->getPixelShaderVersion() < 3.0f )
       baseOnly = true;
 
-   // NOTE: At maximum we only try to combine 3 materials 
+   // NOTE: At maximum we only try to combine sgMaxTerrainMaterialsPerPass materials 
    // into a single pass.  This is sub-optimal for the simplest
    // cases, but the most common case results in much fewer
    // shader generation failures and permutations leading to
    // faster load time and less hiccups during gameplay.
-   U32 matCount = getMin( 3, materials->size() );
+   U32 matCount = getMin( sgMaxTerrainMaterialsPerPass, materials->size() );
 
    Vector<GFXTexHandle> normalMaps;
 
@@ -328,24 +350,27 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    {
       FeatureSet features;
       features.addFeature( MFT_VertTransform );
-      features.addFeature( MFT_TerrainBaseMap );
 
       if ( prePassMat )
       {
          features.addFeature( MFT_EyeSpaceDepthOut );
          features.addFeature( MFT_PrePassConditioner );
+         features.addFeature( MFT_DeferredTerrainBaseMap );
+         features.addFeature(MFT_isDeferred);
 
          if ( advancedLightmapSupport )
-            features.addFeature( MFT_RenderTarget1_Zero );
+            features.addFeature( MFT_RenderTarget3_Zero );
       }
       else
       {
+         features.addFeature( MFT_TerrainBaseMap );
          features.addFeature( MFT_RTLighting );
 
          // The HDR feature is always added... it will compile out
          // if HDR is not enabled in the engine.
          features.addFeature( MFT_HDROut );
       }
+      features.addFeature(MFT_DeferredTerrainBlankInfoMap);
 
       // Enable lightmaps and fogging if we're in BL.
       if ( reflectMat || useBLM )
@@ -384,8 +409,16 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
 
 		 // check for macro detail texture
          if (  !(mat->getMacroSize() <= 0 || mat->getMacroDistance() <= 0 || mat->getMacroMap().isEmpty() ) )
+         {
+            if(prePassMat)
+               features.addFeature( MFT_DeferredTerrainMacroMap, featureIndex );
+            else
 	         features.addFeature( MFT_TerrainMacroMap, featureIndex );
+         }
 
+         if(prePassMat)
+             features.addFeature( MFT_DeferredTerrainDetailMap, featureIndex );
+         else
          features.addFeature( MFT_TerrainDetailMap, featureIndex );
 
          pass->materials.push_back( (*materials)[i] );
@@ -460,7 +493,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
          const bool logErrors = matCount == 1;
          GFXShader::setLogging( logErrors, true );
 
-         pass->shader = SHADERGEN->getShader( featureData, getGFXVertexFormat<TerrVertex>(), NULL );
+         pass->shader = SHADERGEN->getShader( featureData, getGFXVertexFormat<TerrVertex>(), NULL, mSamplerNames );
       }
 
       // If we got a shader then we can continue.
@@ -499,14 +532,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    pass->oneOverTerrainSize = pass->shader->getShaderConstHandle( "$oneOverTerrainSize" );
    pass->squareSize = pass->shader->getShaderConstHandle( "$squareSize" );
 
-   // NOTE: We're assuming rtParams0 here as we know its the only
-   // render target we currently get in a terrain material and the
-   // DeferredRTLightingFeatHLSL will always use 0.
-   //
-   // This could change in the future and we would need to fix
-   // the ShaderFeature API to allow us to do this right.
-   //
-   pass->lightParamsConst = pass->shader->getShaderConstHandle( "$rtParams0" );
+   pass->lightParamsConst = pass->shader->getShaderConstHandle( "$rtParamslightInfoBuffer" );
 
    // Now prepare the basic stateblock.
    GFXStateBlockDesc desc;
@@ -522,16 +548,13 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
       // MFT_TerrainAdditive feature to lerp the
       // output normal with the previous pass.
       //
-      if ( prePassMat )
-         desc.setColorWrites( true, true, false, false );
+      //if ( prePassMat )
+         //desc.setColorWrites( true, true, false, false );
    }
 
    // We write to the zbuffer if this is a prepass
    // material or if the prepass is disabled.
-   // We also write the zbuffer if we're using OpenGL, because in OpenGL the prepass
-   // cannot share the same zbuffer as the backbuffer.
    desc.setZReadWrite( true,  !MATMGR->getPrePassEnabled() || 
-                              GFX->getAdapterType() == OpenGL ||
                               prePassMat ||
                               reflectMat );
 
@@ -645,9 +668,9 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    if ( prePassMat )
       desc.addDesc( RenderPrePassMgr::getOpaqueStenciWriteDesc( false ) );
 
-   // Flip the cull for reflection materials.
-   if ( reflectMat )
-      desc.setCullMode( GFXCullCW );
+   // Shut off culling for prepass materials (reflection support).
+   if ( prePassMat )
+      desc.setCullMode( GFXCullNone );
 
    pass->stateBlock = GFX->createStateBlock( desc );
 

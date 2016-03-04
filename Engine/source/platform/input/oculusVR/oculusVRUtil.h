@@ -25,7 +25,12 @@
 
 #include "math/mPoint2.h"
 #include "math/mMatrix.h"
-#include "OVR.h"
+#include "OVR_CAPI_0_5_0.h"
+
+// NOTE: math code in oculus uses "Offset" which is a preprocessor macro
+#define TorqueOffset Offset
+#undef Offset
+#include "Extras/OVR_Math.h"
 
 namespace OculusVRUtil
 {
@@ -47,5 +52,7 @@ namespace OculusVRUtil
    /// Convert an OVR sensor's magnetometer reading (direction and field strength) to Torque 3D vector (in Gauss)
    void convertMagnetometer(OVR::Vector3f& inMagnetometer, VectorF& outMagnetometer);
 }
+
+#define Offset TorqueOffset
 
 #endif   // _OCULUSVRUTIL_H_

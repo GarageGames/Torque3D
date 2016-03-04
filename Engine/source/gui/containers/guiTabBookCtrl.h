@@ -158,7 +158,7 @@ class GuiTabBookCtrl : public GuiContainer
       /// Tab rendering subroutine, renders one tab with specified options
       /// @param   tabRect   the rectangle to render the tab into
       /// @param   tab   pointer to the tab page control for which to render the tab
-      void renderTab( RectI tabRect, GuiTabPageCtrl* tab );
+      void renderTab(const RectI& tabRect, GuiTabPageCtrl* tab);
 
       /// @}
 

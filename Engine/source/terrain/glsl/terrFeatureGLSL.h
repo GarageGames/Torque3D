@@ -36,7 +36,10 @@
 class TerrainFeatGLSL : public ShaderFeatureGLSL
 {
 protected:
+   ShaderIncludeDependency mTorqueDep;
    
+public:
+   TerrainFeatGLSL();
    Var* _getInDetailCoord(Vector<ShaderComponent*> &componentList );
    
    Var* _getInMacroCoord(Vector<ShaderComponent*> &componentList );
@@ -64,6 +67,8 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Base Texture"; }
+
+   virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const;
 };
 
 
@@ -87,6 +92,8 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Detail Texture"; }
+
+   virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const;
 };
 
 
@@ -110,6 +117,8 @@ public:
    virtual Resources getResources( const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Macro Texture"; }
+
+   virtual U32 getOutputTargets( const MaterialFeatureData &fd ) const;
 };
 
 
@@ -149,6 +158,17 @@ public:
                             const MaterialFeatureData &fd );
 
    virtual String getName() { return "Terrain Additive"; }
+};
+
+class TerrainBlankInfoMapFeatGLSL : public ShaderFeatureGLSL
+{
+public:
+
+   virtual void processPix(Vector<ShaderComponent*> &componentList,
+      const MaterialFeatureData &fd);
+
+   virtual U32 getOutputTargets(const MaterialFeatureData &fd) const;
+   virtual String getName() { return "Blank Matinfo map"; }
 };
 
 #endif // _TERRFEATUREGLSL_H_

@@ -100,6 +100,8 @@ function PE_EmitterEditor::guiSync( %this )
    PE_EmitterEditor-->PEE_reverseOrder.setValue( %data.reverseOrder );
    PE_EmitterEditor-->PEE_useEmitterSizes.setValue( %data.useEmitterSizes );
    PE_EmitterEditor-->PEE_useEmitterColors.setValue( %data.useEmitterColors );
+   
+   PE_EmitterEditor-->PEE_glow.setValue( %data.glow );
 
    // Sync up particle selectors.
    

@@ -39,8 +39,8 @@
 
 enum GFXBufferType
 {
-      GFXBufferTypeStatic,   ///< Static vertex buffers are created and filled one time.
-                   ///< incur a performance penalty.  Resizing a static vertex buffer is not
+      GFXBufferTypeStatic,   ///< Static vertex buffers are created and rarely updated.
+                   ///< Updating might incur a performance penalty.  Resizing a static vertex buffer is not
                    ///< allowed.
       GFXBufferTypeDynamic,  ///< Dynamic vertex buffers are meant for vertices that can be changed
                    ///< often.  Vertices written into dynamic vertex buffers will remain valid
@@ -48,7 +48,8 @@ enum GFXBufferType
                    ///< allowed.
       GFXBufferTypeVolatile, ///< Volatile vertex or index buffers are meant for vertices or indices that are essentially
                    ///< only used once.  They can be resized without any performance penalty.
-      
+      GFXBufferTypeImmutable, ///< Immutable buffers must specify the data when creating the buffer. Cannot be modified.
+
       GFXBufferType_COUNT ///< Number of buffer types.
 };
 
@@ -181,6 +182,7 @@ enum GFXFormat
    // 32 bit texture formats...
    GFXFormatR8G8B8A8,// first in group...
    GFXFormatR8G8B8X8,
+   GFXFormatB8G8R8A8,
    GFXFormatR32F,
    GFXFormatR16G16,
    GFXFormatR16G16F,

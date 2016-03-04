@@ -30,6 +30,7 @@
 #include "gui/worldEditor/editTSCtrl.h"
 #include "gui/worldEditor/gizmo.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "core/util/tVector.h"
 #include "core/util/safeDelete.h"
 #include "gfx/gfxDrawUtil.h"
@@ -55,7 +56,7 @@ Point3F Selection<ForestItem>::getOrigin()
 
    Selection<ForestItem>::iterator itr = begin();
 
-   for ( ; itr != end(); itr++ )
+   for (; itr != end(); ++itr)
    {
       const MatrixF &mat = itr->getTransform();
       Point3F wPos;
@@ -449,10 +450,11 @@ void ForestSelectionTool::onRender2D()
       F32 hscale = wwidth * 2 / F32(mEditor->getWidth());
       F32 vscale = wheight * 2 / F32(mEditor->getHeight());
 
-      F32 left = (mDragRect.point.x - mEditor->getPosition().x) * hscale - wwidth;
-      F32 right = (mDragRect.point.x - mEditor->getPosition().x + mDragRect.extent.x) * hscale - wwidth;
-      F32 top = wheight - vscale * (mDragRect.point.y - mEditor->getPosition().y);
-      F32 bottom = wheight - vscale * (mDragRect.point.y - mEditor->getPosition().y + mDragRect.extent.y);
+      Point2I editorPosition = mEditor->getPosition();
+      F32 left = (mDragRect.point.x - editorPosition.x) * hscale - wwidth;
+      F32 right = (mDragRect.point.x - editorPosition.x + mDragRect.extent.x) * hscale - wwidth;
+      F32 top = wheight - vscale * (mDragRect.point.y - editorPosition.y);
+      F32 bottom = wheight - vscale * (mDragRect.point.y - editorPosition.y + mDragRect.extent.y);
       gDragFrustum.set(lastCameraQuery.ortho, left, right, top, bottom, lastCameraQuery.nearPlane, lastCameraQuery.farPlane, lastCameraQuery.cameraMatrix );
 
       mForest->getData()->getItems( gDragFrustum, &mDragSelection );      
@@ -516,7 +518,7 @@ bool ForestSelectionTool::updateGuiInfo()
 
    Con::executef( statusbar, "setInfo", text.c_str() );
 
-   Con::executef( statusbar, "setSelectionObjectsByCount", Con::getIntArg( mSelection.size() ) );
+   Con::executef( statusbar, "setSelectionObjectsByCount", mSelection.size() );
 
    return true;
 }
@@ -558,32 +560,32 @@ void ForestSelectionTool::onUndoAction()
       mBounds.intersect( mSelection[i].getWorldBox() );
 }
 
-ConsoleMethod( ForestSelectionTool, getSelectionCount, S32, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, getSelectionCount, S32, (), , "" )
 {
    return object->getSelectionCount();
 }
 
-ConsoleMethod( ForestSelectionTool, deleteSelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, deleteSelection, void, (), , "" )
 {
    object->deleteSelection();
 }
 
-ConsoleMethod( ForestSelectionTool, clearSelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, clearSelection, void, (), , "" )
 {
    object->clearSelection();
 }
 
-ConsoleMethod( ForestSelectionTool, cutSelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, cutSelection, void, (), , "" )
 {
    object->cutSelection();
 }
 
-ConsoleMethod( ForestSelectionTool, copySelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, copySelection, void, (), , "" )
 {
    object->copySelection();
 }
 
-ConsoleMethod( ForestSelectionTool, pasteSelection, void, 2, 2, "" )
+DefineConsoleMethod( ForestSelectionTool, pasteSelection, void, (), , "" )
 {
    object->pasteSelection();
 }

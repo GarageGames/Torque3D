@@ -111,6 +111,8 @@ uniform vec4       rippleMagnitude;
 uniform vec4       specularParams;
 uniform mat4     modelMat;
 
+out vec4 OUT_col;
+
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------
@@ -118,6 +120,7 @@ void main()
 { 
    // Modulate baseColor by the ambientColor.
    vec4 waterBaseColor = baseColor * vec4( ambientColor.rgb, 1 );
+   waterBaseColor = toLinear(waterBaseColor);
    
    // Get the bumpNorm...
    vec3 bumpNorm = ( texture( bumpMap, IN_rippleTexCoord01.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.x;
@@ -136,7 +139,7 @@ void main()
    distortPos.xy += bumpNorm.xy * distortAmt;   
  
  #ifdef UNDERWATER
-   OUT_FragColor0 = hdrEncode( textureProj( refractBuff, distortPos ) );   
+   OUT_col = hdrEncode( textureProj( refractBuff, distortPos ) );   
  #else
 
    vec3 eyeVec = IN_objPos.xyz - eyePos;
@@ -208,7 +211,7 @@ void main()
 
    #endif
    
-   OUT_FragColor0 = OUT;
+   OUT_col = hdrEncode( OUT );
    
 #endif   
 }
