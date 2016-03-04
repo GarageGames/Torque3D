@@ -624,8 +624,8 @@ void TerrainDetailMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
    meta->addStatement( new GenOp( "      @ *= @.y * @.w;\r\n",
                                     detailColor, detailInfo, inDet ) );
 
-   meta->addStatement( new GenOp( "      @ = lerp( @, @ + @, @ );\r\n",
-                                    outColor, outColor, baseColor, detailColor, detailBlend ) );
+   meta->addStatement( new GenOp( "      @ += @ * @;\r\n",
+                                    outColor, detailColor, detailBlend));
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 
@@ -824,7 +824,7 @@ void TerrainMacroMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentL
    }
 
    // Add to the blend total.
-   meta->addStatement( new GenOp( "   @ = max( @, @ );\r\n", blendTotal, blendTotal, detailBlend ) );
+   meta->addStatement( new GenOp( "   @ += @;\r\n", blendTotal, detailBlend ) );
 
    Var *detailColor = (Var*)LangElement::find( "macroColor" ); 
    if ( !detailColor )
@@ -877,8 +877,8 @@ void TerrainMacroMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentL
 
    Var *outColor = (Var*)LangElement::find( getOutputTargetVarName(target) );
 
-   meta->addStatement( new GenOp( "      @ = lerp( @, @ + @, @ );\r\n",
-                                    outColor, outColor, outColor, detailColor, detailBlend ) );
+   meta->addStatement(new GenOp("      @ += @ * @;\r\n",
+                                    outColor, detailColor, detailBlend));
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 

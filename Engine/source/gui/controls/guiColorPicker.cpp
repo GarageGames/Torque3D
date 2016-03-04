@@ -122,67 +122,75 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y;
    
    //A couple of checks to determine if color blend
+   //A couple of checks to determine if color blend
    if(c1 == colorWhite && c3 == colorAlpha && c4 == colorBlack)
    {
       //Color
-      PrimBuild::begin(GFXTriangleFan, 4);
-      PrimBuild::color( c2 );
-      PrimBuild::vertex2i( r, t );
+      PrimBuild::begin(GFXTriangleStrip, 4);
 
       PrimBuild::color( c2 );
-      PrimBuild::vertex2i( r, b );
+      PrimBuild::vertex2i(l, t);
+
+      PrimBuild::color( c2 );
+      PrimBuild::vertex2i(r, t);
 
       PrimBuild::color( c2 );
       PrimBuild::vertex2i( l, b );
 
       PrimBuild::color( c2 );
-      PrimBuild::vertex2i( l, t );
+      PrimBuild::vertex2i(r, b);
+
       PrimBuild::end();
 
       //White
-      PrimBuild::begin( GFXTriangleFan, 4 );
-      PrimBuild::color( colorAlphaW );
-      PrimBuild::vertex2i( r, t );
+      PrimBuild::begin(GFXTriangleStrip, 4);
+
+      PrimBuild::color(c1);
+      PrimBuild::vertex2i(l, t);
 
       PrimBuild::color( colorAlphaW );
-      PrimBuild::vertex2i( r, b );
+      PrimBuild::vertex2i(r, t);
 
       PrimBuild::color( c1 );
       PrimBuild::vertex2i( l, b );
 
-      PrimBuild::color( c1 );
-      PrimBuild::vertex2i( l, t );
+      PrimBuild::color(colorAlphaW);
+      PrimBuild::vertex2i(r, b);
+
       PrimBuild::end();
 
-      //Black
-      PrimBuild::begin( GFXTriangleFan, 4 );
+      //Black 
+      PrimBuild::begin(GFXTriangleStrip, 4);
+
+      PrimBuild::color(c3);
+      PrimBuild::vertex2i(l, t);
       PrimBuild::color( c3 );
       PrimBuild::vertex2i( r, t );
 
       PrimBuild::color( c4 );
-      PrimBuild::vertex2i( r, b );
+      PrimBuild::vertex2i(l, b);
 
       PrimBuild::color( c4 );
-      PrimBuild::vertex2i( l, b );
+      PrimBuild::vertex2i(r, b);
 
-      PrimBuild::color( c3 );
-      PrimBuild::vertex2i( l, t );
       PrimBuild::end();
    }
    else
    {
-      PrimBuild::begin( GFXTriangleFan, 4 );
+      PrimBuild::begin(GFXTriangleStrip, 4);
+
       PrimBuild::color( c1 );
       PrimBuild::vertex2i( l, t );
 
       PrimBuild::color( c2 );
       PrimBuild::vertex2i( r, t );
 
+      PrimBuild::color(c4);
+      PrimBuild::vertex2i(l, b);
+	  
       PrimBuild::color( c3 );
       PrimBuild::vertex2i( r, b );
 
-      PrimBuild::color( c4 );
-      PrimBuild::vertex2i( l, b );
       PrimBuild::end();
    }
 }
@@ -191,45 +199,48 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
 /// Function to draw a set of boxes blending throughout an array of colors
 void GuiColorPickerCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors)
 {
-
    GFX->setStateBlock(mStateBlock);
-   
+
    S32 l = bounds.point.x, r = bounds.point.x + bounds.extent.x + 4;
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y + 4;
-   
-   // Calculate increment value
-   S32 x_inc = int(mFloor((r - l) / F32(numColors-1)));
-   S32 y_inc = int(mFloor((b - t) / F32(numColors-1)));
 
-   for( U16 i = 0;i < numColors - 1; i++ ) 
+   // Calculate increment value
+   S32 x_inc = int(mFloor((r - l) / F32(numColors - 1)));
+   S32 y_inc = int(mFloor((b - t) / F32(numColors - 1)));
+
+   for (U16 i = 0; i < numColors - 1; i++)
    {
       // This is not efficent, but then again it doesn't really need to be. -pw
-      PrimBuild::begin( GFXTriangleFan, 4 );
+      PrimBuild::begin(GFXTriangleStrip, 4);
 
       if (!vertical)  // Horizontal (+x)
       {
          // First color
-         PrimBuild::color( colors[i] );
-         PrimBuild::vertex2i( l, t );
-         PrimBuild::vertex2i( l, b );
+         PrimBuild::color(colors[i]);
+         PrimBuild::vertex2i(l, t);
+         PrimBuild::color(colors[i + 1]);
+         PrimBuild::vertex2i(l + x_inc, t);
 
          // Second color
-         PrimBuild::color( colors[i+1] );
-         PrimBuild::vertex2i( l + x_inc, b );
-         PrimBuild::vertex2i( l + x_inc, t );
+         PrimBuild::color(colors[i]);
+         PrimBuild::vertex2i(l, b);
+         PrimBuild::color(colors[i + 1]);
+         PrimBuild::vertex2i(l + x_inc, b);
          l += x_inc;
       }
       else  // Vertical (+y)
       {
          // First color
-         PrimBuild::color( colors[i] );
-         PrimBuild::vertex2i( l, t );
-         PrimBuild::vertex2i( r, t );
+         PrimBuild::color(colors[i]);
+         PrimBuild::vertex2i(l, t);
+         PrimBuild::color(colors[i + 1]);
+         PrimBuild::vertex2i(l, t + y_inc);
 
          // Second color
-         PrimBuild::color( colors[i+1] );
-         PrimBuild::vertex2i( r, t + y_inc );
-         PrimBuild::vertex2i( l, t + y_inc );
+         PrimBuild::color(colors[i]);
+         PrimBuild::vertex2i(r, t);
+         PrimBuild::color(colors[i + 1]);
+         PrimBuild::vertex2i(r, t + y_inc);
          t += y_inc;
       }
       PrimBuild::end();
