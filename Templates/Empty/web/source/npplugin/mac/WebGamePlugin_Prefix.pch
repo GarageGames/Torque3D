@@ -1,0 +1,5 @@
+//
+// Prefix header for all source files of the 'WebGamePlugin' target in the 'WebGamePlugin' project.
+//
+
+#include <Carbon/Carbon.h>

@@ -1,0 +1,98 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GameTSCtrl(PlayGui) {
+   canSaveDynamicFields = "1";
+   isContainer = "1";
+   Profile = "GuiContentProfile";
+   HorizSizing = "right";
+   VertSizing = "bottom";
+   position = "0 0";
+   Extent = "1024 768";
+   MinExtent = "8 8";
+   canSave = "1";
+   Visible = "1";
+   tooltipprofile = "GuiToolTipProfile";
+   hovertime = "1000";
+   Margin = "0 0 0 0";
+   Padding = "0 0 0 0";
+   AnchorTop = "1";
+   AnchorBottom = "0";
+   AnchorLeft = "1";
+   AnchorRight = "0";
+   cameraZRot = "0";
+   forceFOV = "0";
+      Enabled = "1";
+      helpTag = "0";
+      noCursor = "1";
+
+   new GuiBitmapCtrl(CenterPrintDlg) {
+      canSaveDynamicFields = "0";
+      isContainer = "0";
+      Profile = "CenterPrintProfile";
+      HorizSizing = "center";
+      VertSizing = "center";
+      position = "237 375";
+      Extent = "550 20";
+      MinExtent = "8 8";
+      canSave = "1";
+      Visible = "0";
+      tooltipprofile = "GuiToolTipProfile";
+      hovertime = "1000";
+      bitmap = "art/gui/hudfill.png";
+      wrap = "0";
+
+      new GuiMLTextCtrl(CenterPrintText) {
+         canSaveDynamicFields = "0";
+         isContainer = "0";
+         Profile = "CenterPrintTextProfile";
+         HorizSizing = "center";
+         VertSizing = "center";
+         position = "0 0";
+         Extent = "546 12";
+         MinExtent = "8 8";
+         canSave = "1";
+         Visible = "1";
+         tooltipprofile = "GuiToolTipProfile";
+         hovertime = "1000";
+         lineSpacing = "2";
+         allowColorChars = "0";
+         maxChars = "-1";
+         useURLMouseCursor = "0";
+      };
+   };
+   new GuiBitmapCtrl(BottomPrintDlg) {
+      canSaveDynamicFields = "0";
+      isContainer = "0";
+      Profile = "CenterPrintProfile";
+      HorizSizing = "center";
+      VertSizing = "top";
+      position = "237 719";
+      Extent = "550 20";
+      MinExtent = "8 8";
+      canSave = "1";
+      Visible = "0";
+      tooltipprofile = "GuiToolTipProfile";
+      hovertime = "1000";
+      bitmap = "art/gui/hudfill.png";
+      wrap = "0";
+
+      new GuiMLTextCtrl(BottomPrintText) {
+         canSaveDynamicFields = "0";
+         isContainer = "0";
+         Profile = "CenterPrintTextProfile";
+         HorizSizing = "center";
+         VertSizing = "center";
+         position = "0 0";
+         Extent = "546 12";
+         MinExtent = "8 8";
+         canSave = "1";
+         Visible = "1";
+         tooltipprofile = "GuiToolTipProfile";
+         hovertime = "1000";
+         lineSpacing = "2";
+         allowColorChars = "0";
+         maxChars = "-1";
+         useURLMouseCursor = "0";
+      };
+   };
+};
+//--- OBJECT WRITE END ---

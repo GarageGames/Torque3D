@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'IEEmptyPlugin'
+		'IEEmptyPlugin.DLL'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}
