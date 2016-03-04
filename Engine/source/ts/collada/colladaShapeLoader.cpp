@@ -529,6 +529,16 @@ bool ColladaShapeLoader::canLoadCachedDTS(const Torque::Path& path)
       }
    }
 
+   //assume the dts is good since it was zipped on purpose
+   Torque::FS::FileSystemRef ref = Torque::FS::GetFileSystem(cachedPath);
+   if (ref && !dStrcmp("Zip", ref->getTypeStr()))
+   {
+      bool forceLoadDAE = Con::getBoolVariable("$collada::forceLoadDAE", false);
+
+      if (!forceLoadDAE && Torque::FS::IsFile(cachedPath))
+          return true;
+   }
+     
    return false;
 }
 
@@ -709,11 +719,17 @@ TSShape* loadColladaShape(const Torque::Path &path)
 #ifndef DAE2DTS_TOOL
          // Cache the Collada model to a DTS file for faster loading next time.
          FileStream dtsStream;
+         
          if (dtsStream.open(cachedPath.getFullPath(), Torque::FS::File::Write))
          {
+            Torque::FS::FileSystemRef ref = Torque::FS::GetFileSystem(daePath);
+            if (ref && !dStrcmp("Zip", ref->getTypeStr()))
+               Con::errorf("No cached dts file found in archive for %s. Forcing cache to disk.", daePath.getFullFileName().c_str());
+
             Con::printf("Writing cached COLLADA shape to %s", cachedPath.getFullPath().c_str());
             tss->write(&dtsStream);
          }
+
 #endif // DAE2DTS_TOOL
 
          // Add collada materials to materials.cs
