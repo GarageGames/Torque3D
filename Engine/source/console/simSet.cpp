@@ -233,8 +233,11 @@ void SimSet::callOnChildren( const String &method, S32 argc, ConsoleValueRef arg
 {
    // Prep the arguments for the console exec...
    // Make sure and leave args[1] empty.
-   ConsoleValueRef args[21];
-   args[0] = method.c_str();
+   ConsoleValueRef args[21] = { };
+   ConsoleValue name_method;
+   name_method.setStackStringValue(method.c_str());
+   args[0] = ConsoleValueRef::fromValue(&name_method);
+
    for (S32 i = 0; i < argc; i++)
       args[i + 2] = argv[i];
 

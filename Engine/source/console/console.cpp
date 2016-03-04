@@ -1252,7 +1252,7 @@ ConsoleValueRef _internalExecute(SimObject *object, S32 argc, ConsoleValueRef ar
    if(object->getNamespace())
    {
       U32 ident = object->getId();
-      ConsoleValueRef oldIdent = argv[1];
+      ConsoleValueRef oldIdent(argv[1]);
 
       StringTableEntry funcName = StringTable->insert(argv[0]);
       Namespace::Entry *ent = object->getNamespace()->lookup(funcName);
@@ -1266,7 +1266,9 @@ ConsoleValueRef _internalExecute(SimObject *object, S32 argc, ConsoleValueRef ar
       }
 
       // Twiddle %this argument
-      argv[1] = (S32)ident;
+      ConsoleValue func_ident;
+      func_ident.setIntValue((S32)ident);
+      argv[1] = ConsoleValueRef::fromValue(&func_ident);
 
       SimObject *save = gEvalState.thisObject;
       gEvalState.thisObject = object;
