@@ -786,7 +786,7 @@ void TerrainSmoothAction::initPersistFields()
 
 void TerrainSmoothAction::smooth( TerrainBlock *terrain, F32 factor, U32 steps )
 {
-   AssertFatal( terrain, "TerrainSmoothAction::smooth() - Got null object!" );
+   AssertFatal(terrain, "TerrainSmoothAction::smooth() - Got null object!");
 
    // Store our input parameters.
    mTerrainId = terrain->getId();
@@ -799,8 +799,8 @@ void TerrainSmoothAction::smooth( TerrainBlock *terrain, F32 factor, U32 steps )
 
 DefineConsoleMethod( TerrainSmoothAction, smooth, void, ( TerrainBlock *terrain, F32 factor, U32 steps ), , "( TerrainBlock obj, F32 factor, U32 steps )")
 {
-	if (terrain)
-   	object->smooth( terrain, factor, mClamp( steps, 1, 13 ) );
+   if (terrain)
+      object->smooth( terrain, factor, mClamp( steps, 1, 13 ) );
 }
 
 void TerrainSmoothAction::undo()
@@ -890,18 +890,19 @@ DefineConsoleMethod( TerrainSolderEdgesAction, solder, void, (), , "()" )
 
 void TerrainSolderEdgesAction::undo()
 {
-	for (Vector<U32>::iterator itr = mTerrainIdSet.begin(); itr != mTerrainIdSet.end(); ++itr) {
+   for (Vector<U32>::iterator itr = mTerrainIdSet.begin(); itr != mTerrainIdSet.end(); ++itr) {
+
       // Find the terrain.
       const SimObjectId id = *itr;
       TerrainBlock* terrain;
-      if ( !Sim::findObject( id, terrain ) || !terrain ) {
+      if ( !Sim::findObject( id, terrain ) || !terrain )
          continue;
-      }
+
       // Get the terrain file.
       TerrainFile* terrFile = terrain->getFile();
       // Copy our stored heightmap to the file.
-	  const std::map< SimObjectId, storedHeight_t >::iterator ftr = mStoredHeightSet.find( id );
-      terrFile->setHeightMap( ftr->second, false );
+      const Map< SimObjectId, storedHeight_t >::Iterator ftr = mStoredHeightSet.find( id );
+      terrFile->setHeightMap( ftr->value, false );
       // Tell the terrain to update itself.
       terrain->updateGrid( Point2I::Zero, Point2I::Max, true );
    }
@@ -911,44 +912,46 @@ void TerrainSolderEdgesAction::undo()
 void TerrainSolderEdgesAction::redo()
 {
    // Calc average heights on the edges.
-   typedef std::map< SimObjectId, heightSet_t >  terrainSet_t;
+   typedef Map< SimObjectId, heightSet_t >  terrainSet_t;
    terrainSet_t  terrainSet;
    for (Vector<U32>::iterator itr = mTerrainIdSet.begin(); itr != mTerrainIdSet.end(); ++itr) {
       const SimObjectId id = *itr;
       TerrainBlock* terrain;
-      if ( !Sim::findObject( id, terrain ) || !terrain ) { continue; }
+
+      if ( !Sim::findObject( id, terrain ) || !terrain )
+         continue;
 
       // Skip hidden terrain.
-      if ( terrain->isHidden() ) { continue; }
+      if ( terrain->isHidden() )
+         continue;
 
       // Store terrains.
       const TerrainFile* terrFile  = terrain->getFile();
-      mStoredHeightSet.insert( std::make_pair(
-          id,
-          terrFile->getHeightMap()
-      ) );
+      mStoredHeightSet.insert( id, terrFile->getHeightMap() );
 
       // Do action.
-	  const heightSet_t heightSet = harvestAvgHeight( terrain );
-      terrainSet.insert( std::make_pair( id, heightSet ) );
+      const heightSet_t heightSet = harvestAvgHeight( terrain );
+      terrainSet.insert( id, heightSet );
    }
 
 
    // Set heights for terrains.
-   for (terrainSet_t::iterator itr = terrainSet.begin(); itr != terrainSet.end(); ++itr) {
-      const SimObjectId id = itr->first;
+   for (terrainSet_t::Iterator itr = terrainSet.begin(); itr != terrainSet.end(); ++itr) {
+      const SimObjectId id = itr->key;
       TerrainBlock* terrain;
-      if ( !Sim::findObject( id, terrain ) || !terrain ) { continue; }
-      const terrainSet_t::iterator ftr = terrainSet.find( id );
-      if (ftr != terrainSet.end()) {
-         setAvgHeight( terrain, ftr->second );
-      }
+
+      if ( !Sim::findObject( id, terrain ) || !terrain )
+         continue;
+
+      const terrainSet_t::Iterator ftr = terrainSet.find( id );
+      if (ftr != terrainSet.end())
+         setAvgHeight( terrain, ftr->value );
    }
 
 
    // Tell terrains to update itself.
-   for (terrainSet_t::iterator itr = terrainSet.begin(); itr != terrainSet.end(); ++itr) {
-      const SimObjectId id = itr->first;
+   for (terrainSet_t::Iterator itr = terrainSet.begin(); itr != terrainSet.end(); ++itr) {
+      const SimObjectId id = itr->key;
       TerrainBlock* terrain;
       if ( !Sim::findObject( id, terrain ) || !terrain ) { continue; }
       terrain->updateGrid( Point2I::Zero, Point2I::Max, true );
@@ -956,12 +959,10 @@ void TerrainSolderEdgesAction::redo()
 }
 
 
-TerrainSolderEdgesAction::heightSet_t
-TerrainSolderEdgesAction::harvestAvgHeight(
-   const TerrainBlock*  terrain
-) {
-   AssertFatal( terrain, "" );
-   AssertFatal( !terrain->isHidden(), "" );
+TerrainSolderEdgesAction::heightSet_t TerrainSolderEdgesAction::harvestAvgHeight(const TerrainBlock*  terrain)
+{
+   AssertFatal(terrain, "");
+   AssertFatal(!terrain->isHidden(), "");
 
    heightSet_t r;
 
@@ -969,19 +970,6 @@ TerrainSolderEdgesAction::harvestAvgHeight(
    const F32 squareSize = terrain->getSquareSize();
    Point3F  shift;
    terrain->getTransform().getColumn( 3, &shift );
-
-   /*const auto harvestHeight = [ &r, blockSize, squareSize, shift ] (
-      const Point2I&  c
-   ) {
-      const Point3F  wc(
-         shift.x + c.x * squareSize,
-         shift.y + c.y * squareSize,
-         shift.z
-      );
-      const F32 h = calcAvgHeight( wc );
-      const U32 i = c.x + blockSize * c.y;
-      r.insert( std::make_pair( i, h ) );
-   };*/
 
    // x
    for (Point2I  c( 0, 0 );  c.x < blockSize;  ++c.x) {
@@ -1002,75 +990,54 @@ TerrainSolderEdgesAction::harvestAvgHeight(
    return r;
 }
 
-void TerrainSolderEdgesAction::harvestHeight(const Point2I& c, heightSet_t& r, const U32 blockSize, const F32 squareSize, Point3F shift )
+void TerrainSolderEdgesAction::harvestHeight(const Point2I& c, heightSet_t& r, const U32 blockSize, const F32 squareSize, Point3F shift)
 {
-	const Point3F  wc(
+   const Point3F  wc(
          shift.x + c.x * squareSize,
          shift.y + c.y * squareSize,
          shift.z
       );
-      const F32 h = calcAvgHeight( wc );
-      const U32 i = c.x + blockSize * c.y;
-      r.insert( std::make_pair( i, h ) );
+
+   const F32 h = calcAvgHeight(wc);
+   const U32 i = c.x + blockSize * c.y;
+   r.insert(i, h);
 }
 
 
 TerrainBlock* TerrainSolderEdgesAction::harvest(const Point3F& c, uniqueTHSet_t& set)
 {
-	TerrainBlock*  terrain =
-         getTerrainUnderWorldPoint( Point3F( c.x, c.y, c.z + 5000.0f) );
-      if ( !terrain || terrain->isHidden() ) { return terrain; }
-      Point3F  offset;
-      terrain->getTransform().getColumn( 3, &offset );
-      const Point2F  pos( c.x - offset.x, c.y - offset.y );
-      F32  h = F32_MAX;
-      if ( !terrain->getHeight( pos, &h ) ) {
-         Con::warnf(
-            "TerrainSolderEdgesAction::harvestUniqueTHOneDirection()"
-            "  Don't harvested a height for the terrain %d.",
-            terrain->getId() );
-         return terrain;
-      }
-      // add only unique
-	  const std::map< TerrainBlock*, F32 >::const_iterator ftr = set.find( terrain );
-      if (ftr == set.end()) {
-         set.insert( std::make_pair( terrain, h ) );
-      }
+   TerrainBlock* terrain = getTerrainUnderWorldPoint( Point3F( c.x, c.y, c.z + 5000.0f) );
+   if ( !terrain || terrain->isHidden() ) { return terrain; }
+
+   Point3F  offset;
+   terrain->getTransform().getColumn( 3, &offset );
+   const Point2F  pos( c.x - offset.x, c.y - offset.y );
+   F32  h = F32_MAX;
+
+   if ( !terrain->getHeight( pos, &h ) )
+   {
+      Con::warnf(
+         "TerrainSolderEdgesAction::harvestUniqueTHOneDirection()"
+         " Don't harvested a height for the terrain %d.",
+         terrain->getId() );
       return terrain;
+   }
+
+   // add only unique
+   if (set.find(terrain) == set.end())
+      set.insert( terrain, h );
+
+   return terrain;
 }
 
-F32 TerrainSolderEdgesAction::calcAvgHeight(
-   const Point3F&  wc
-) {
-   uniqueTHSet_t  set;
-
-   //const auto harvest = [ &set ] ( const Point3F& c ) -> TerrainBlock* {
-   //   TerrainBlock*  terrain =
-   //      getTerrainUnderWorldPoint( Point3F( c.x, c.y, c.z + 5000.0f) );
-   //   if ( !terrain || terrain->isHidden() ) { return terrain; }
-   //   Point3F  offset;
-   //   terrain->getTransform().getColumn( 3, &offset );
-   //   const Point2F  pos( c.x - offset.x, c.y - offset.y );
-   //   F32  h = F32_MAX;
-   //   if ( !terrain->getHeight( pos, &h ) ) {
-   //      Con::warnf(
-   //         "TerrainSolderEdgesAction::harvestUniqueTHOneDirection()"
-   //         "  Don't harvested a height for the terrain %d.",
-   //         terrain->getId() );
-   //      return terrain;
-   //   }
-   //   // add only unique
-	  //const std::map< TerrainBlock*, F32 >::const_iterator ftr = set.find( terrain );
-   //   if (ftr == set.cend()) {
-   //      set.insert( std::make_pair( terrain, h ) );
-   //   }
-   //   return terrain;
-   //}; // harvest()
-
+F32 TerrainSolderEdgesAction::calcAvgHeight( const Point3F&  wc )
+{
+   uniqueTHSet_t set;
 
    // terrain by 'wc'
    const TerrainBlock* terrainWC = harvest( wc, set );
-   if ( !terrainWC || terrainWC->isHidden() ) { return F32_MAX; }
+   if ( !terrainWC || terrainWC->isHidden() )
+      return F32_MAX;
 
    const F32 squareSize = terrainWC->getSquareSize();
 
@@ -1079,31 +1046,30 @@ F32 TerrainSolderEdgesAction::calcAvgHeight(
    //     8 1 5
    //     4 * 2
    //     7 3 6
-   for (U32 k = 1; k <= 8; ++k) {
+   for (U32 k = 1; k <= 8; ++k)
+   {
       const direction_t d = direction( k );
       const Point3F  wd(
          wc.x + d.x * squareSize,
          wc.y + d.y * squareSize,
          wc.z
       );
+
       harvest( wd,set );
-
-   } // for (U32 k = 1; k <= 8; ...
-
+   }
 
    // calc an average height
    F32 avgHeight = 0;
-   for (uniqueTHSet_t::const_iterator itr = set.begin(); itr != set.end(); ++itr) {
-      avgHeight += itr->second;
-   }
+   for (uniqueTHSet_t::Iterator itr = set.begin(); itr != set.end(); ++itr)
+      avgHeight += itr->value;
+
    avgHeight /= set.size();
 
    return avgHeight;
 }
 
-
-TerrainSolderEdgesAction::direction_t
-TerrainSolderEdgesAction::direction( U32 k ) {
+TerrainSolderEdgesAction::direction_t TerrainSolderEdgesAction::direction( U32 k )
+{
    // 8 1 5
    // 4 0 2
    // 7 3 6
@@ -1122,15 +1088,14 @@ TerrainSolderEdgesAction::direction( U32 k ) {
 }
 
 
-void TerrainSolderEdgesAction::setAvgHeight(
-   TerrainBlock*       terrain,
-   const heightSet_t&  hs
-) {
-   AssertFatal( terrain, "" );
+void TerrainSolderEdgesAction::setAvgHeight(TerrainBlock* terrain, const heightSet_t&  hs)
+{
+   AssertFatal(terrain, "");
 
-   for (heightSet_t::const_iterator itr = hs.begin(); itr != hs.end(); ++itr) {
-      const U32 i = itr->first;
-      const F32 h = floatToFixed( itr->second );
+   for (heightSet_t::ConstIterator itr = hs.begin(); itr != hs.end(); ++itr)
+   {
+      const U32 i = itr->key;
+      const F32 h = floatToFixed( itr->value );
       terrain->getFile()->setHeight( i, h );
    }
 }

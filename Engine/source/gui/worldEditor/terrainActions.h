@@ -35,9 +35,9 @@
 #ifndef _NOISE2D_H_
 #include "util/noise2d.h"
 #endif
-
-#include <map>
-
+#ifndef _TDICTIONARY_H_
+#include "core/util/tDictionary.h"
+#endif
 
 class TerrainAction
 {
@@ -381,10 +381,10 @@ public:
    void solder();
 
 private:
-   typedef std::map< U32, F32 >  heightSet_t;
+   typedef Map< U32, F32 >  heightSet_t;
    static heightSet_t harvestAvgHeight( const TerrainBlock* );
    
-   typedef std::map< TerrainBlock*, F32 >  uniqueTHSet_t;
+   typedef Map< TerrainBlock*, F32 >  uniqueTHSet_t;
    static F32 calcAvgHeight( const Point3F& );
 
    static void setAvgHeight( TerrainBlock*, const heightSet_t& );
@@ -402,7 +402,7 @@ protected:
    Vector< SimObjectId >  mTerrainIdSet;
 
    typedef Vector< U16 >  storedHeight_t;
-   std::map< SimObjectId, storedHeight_t >  mStoredHeightSet;
+   Map< SimObjectId, storedHeight_t >  mStoredHeightSet;
 };
 
 
