@@ -200,7 +200,6 @@ void PaintMaterialAction::process(Selection * sel, const Gui3DMouseEvent &, bool
    Point2F p;
    Point3F norm;
 
-
    for( U32 i = 0; i < sel->size(); i++ )
    {
       GridInfo &inf = (*sel)[i];
@@ -212,9 +211,8 @@ void PaintMaterialAction::process(Selection * sel, const Gui3DMouseEvent &, bool
          if ( !terrain->getNormal( p, &norm, true ) )
             continue;
 
-         if (  norm.z > minSlope ||
-               norm.z < maxSlope )
-            continue;  
+         if ( norm.z > minSlope || norm.z < maxSlope )
+            continue;
       }
 
       // If grid is already set to our material, or it is an
@@ -265,10 +263,11 @@ void RaiseHeightAction::process( Selection *sel, const Gui3DMouseEvent &evt, boo
    // only works on brushes...
 
    Brush *brush = dynamic_cast<Brush*>(sel);
+
    if ( !brush )
       return;
 
-   if ( type == End )   
+   if ( type == End )
       return;
 
    Point2I brushPos = brush->getPosition();
