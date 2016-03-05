@@ -35,6 +35,9 @@
 #ifndef _NOISE2D_H_
 #include "util/noise2d.h"
 #endif
+#ifndef _TDICTIONARY_H_
+#include "core/util/tDictionary.h"
+#endif
 
 class TerrainAction
 {
@@ -354,6 +357,52 @@ public:
    /// Performs the initial smoothing and stores
    /// the heighfield state for later undo.
    void smooth( TerrainBlock *terrain, F32 factor, U32 steps );
+};
+
+
+/// An undo action used to perform terrain solder edges.
+class TerrainSolderEdgesAction : public UndoAction
+{
+   typedef UndoAction Parent;
+
+public:
+   TerrainSolderEdgesAction();
+
+   // SimObject
+   DECLARE_CONOBJECT( TerrainSolderEdgesAction );
+   static void initPersistFields();
+
+   // UndoAction
+   virtual void undo();
+   virtual void redo();
+
+   /// Performs the initial solder edges and stores
+   /// the heighfield state for later undo.
+   void solder();
+
+private:
+   typedef Map< U32, F32 >  heightSet_t;
+   static heightSet_t harvestAvgHeight( const TerrainBlock* );
+   
+   typedef Map< TerrainBlock*, F32 >  uniqueTHSet_t;
+   static F32 calcAvgHeight( const Point3F& );
+
+   static void setAvgHeight( TerrainBlock*, const heightSet_t& );
+
+   // @return Vector on this direction:
+   //         8 1 5
+   //         4 0 2
+   //         7 3 6
+   typedef Point2I  direction_t;
+   static direction_t direction( U32 k );
+   static TerrainBlock* harvest(const Point3F&, uniqueTHSet_t& );
+   static void harvestHeight(const Point2I&, heightSet_t&, const U32, const F32, Point3F );
+
+protected:
+   Vector< SimObjectId >  mTerrainIdSet;
+
+   typedef Vector< U16 >  storedHeight_t;
+   Map< SimObjectId, storedHeight_t >  mStoredHeightSet;
 };
 
 

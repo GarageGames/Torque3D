@@ -170,10 +170,9 @@ bool TerrainBlock::_initBaseShader()
    desc.zDefined = true;
    desc.zWriteEnable = false;
    desc.zEnable = false;
-   desc.setBlend( true, GFXBlendSrcAlpha, GFXBlendOne  );
+   desc.setBlend( true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha );
    desc.cullDefined = true;
    desc.cullMode = GFXCullNone;
-   desc.colorWriteAlpha = false;
    mBaseShaderSB = GFX->createStateBlock( desc );
 
    return true;
@@ -249,8 +248,6 @@ void TerrainBlock::_updateBaseTexture(bool writeToCache)
 
    mBaseTarget->attachTexture( GFXTextureTarget::Color0, blendTex );
    GFX->setActiveRenderTarget( mBaseTarget );
-
-   GFX->clear( GFXClearTarget, ColorI(0,0,0,255), 1.0f, 0 );
 
    GFX->setTexture( 0, mLayerTex );
    mBaseShaderConsts->setSafe( mBaseLayerSizeConst, (F32)mLayerTex->getWidth() );      

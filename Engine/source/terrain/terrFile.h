@@ -41,6 +41,18 @@ class FileStream;
 class GBitmap;
 
 
+/// Conversion from 11.5 fixed point to floating point.
+inline F32 fixedToFloat( U16 val )
+{
+   return F32(val) * 0.03125f;
+}
+
+/// Conversion from floating point to 11.5 fixed point.
+inline U16 floatToFixed( F32 val )
+{
+   return U16(val * 32.0f + 0.5f);
+}
+
 ///
 struct TerrainSquare
 {
@@ -177,9 +189,21 @@ public:
 
    void setHeight( U32 x, U32 y, U16 height );
 
+   void setHeight( U32 i, U16 height );
+
    const U16* getHeightAddress( U32 x, U32 y ) const;
 
    U16 getHeight( U32 x, U32 y ) const;
+
+   void getHeight( F32* h, const Point2I& ) const;
+
+   void getHeight4(
+      F32* a,  F32* b,  F32* c,  F32* d,
+      const Point2I&  pa,
+      const Point2I&  pb,
+      const Point2I&  pc,
+      const Point2I&  pd
+   ) const;
 
    U16 getMaxHeight() const { return mGridMap[mGridLevels]->maxHeight; }
 
@@ -191,13 +215,23 @@ public:
 
    /// Check if the given point is valid within the (non-tiled) terrain file.
    bool isPointInTerrain( U32 x, U32 y ) const;
+
+private:
+   // Clamp X and Y to the size of terrain.
+   void clamp( U32* x,  U32* y ) const;
 };
 
+inline void TerrainFile::clamp( U32* x,  U32* y ) const
+{
+   if (*x >= mSize)
+      *x = mSize - 1;
+   if (*y >= mSize)
+      *y = mSize - 1;
+}
 
 inline TerrainSquare* TerrainFile::findSquare( U32 level, U32 x, U32 y ) const
 {
-   x %= mSize;
-   y %= mSize;
+   clamp( &x, &y );
    x >>= level;
    y >>= level;
 
@@ -206,36 +240,59 @@ inline TerrainSquare* TerrainFile::findSquare( U32 level, U32 x, U32 y ) const
 
 inline void TerrainFile::setHeight( U32 x, U32 y, U16 height )
 {
-   x %= mSize;
-   y %= mSize;
-   mHeightMap[ x + ( y * mSize ) ] = height;
+   clamp( &x, &y );
+   setHeight( x + y * mSize,  height );
+}
+
+inline void TerrainFile::setHeight( U32 i, U16 height )
+{
+   mHeightMap[ i ] = height;
 }
 
 inline const U16* TerrainFile::getHeightAddress( U32 x, U32 y ) const
 {
-   x %= mSize;
-   y %= mSize;
+   clamp( &x, &y );
    return &mHeightMap[ x + ( y * mSize ) ];
 }
 
 inline U16 TerrainFile::getHeight( U32 x, U32 y ) const
 {
-   x %= mSize;
-   y %= mSize;
+   clamp( &x, &y );
    return mHeightMap[ x + ( y * mSize ) ];
+}
+
+inline void TerrainFile::getHeight( F32* h,  const Point2I&  p ) const
+{
+   const Point2I pp(
+      mClamp( p.x, 0, mSize - 1 ),
+      mClamp( p.y, 0, mSize - 1 )
+   );
+   *h = fixedToFloat( getHeight( (U32)pp.x, (U32)pp.y ) );
+}
+
+inline void TerrainFile::getHeight4(
+   F32* a,  F32* b,  F32* c,  F32* d,
+   const Point2I&  pa,
+   const Point2I&  pb,
+   const Point2I&  pc,
+   const Point2I&  pd
+) const
+{
+   getHeight( a, pa );
+   getHeight( b, pb );
+   getHeight( c, pc );
+   getHeight( d, pd );
 }
 
 inline U8 TerrainFile::getLayerIndex( U32 x, U32 y ) const
 {
-   x %= mSize;
-   y %= mSize;
+   clamp( &x, &y );
    return mLayerMap[ x + ( y * mSize ) ];
 }
 
 inline void TerrainFile::setLayerIndex( U32 x, U32 y, U8 index )
 {
-   x %= mSize;
-   y %= mSize;
+   clamp( &x, &y );
    mLayerMap[ x + ( y * mSize ) ] = index;
 }
 
@@ -249,8 +306,7 @@ inline BaseMatInstance* TerrainFile::getMaterialMapping( U32 index ) const
 
 inline StringTableEntry TerrainFile::getMaterialName( U32 x, U32 y) const
 {
-   x %= mSize;
-   y %= mSize;
+   clamp( &x, &y );
    const U8 &index = mLayerMap[ x + ( y * mSize ) ];
 
    if ( index < mMaterials.size() )
@@ -260,17 +316,6 @@ inline StringTableEntry TerrainFile::getMaterialName( U32 x, U32 y) const
 }
 
 
-/// Conversion from 11.5 fixed point to floating point.
-inline F32 fixedToFloat( U16 val )
-{
-   return F32(val) * 0.03125f;
-}
-
-/// Conversion from floating point to 11.5 fixed point.
-inline U16 floatToFixed( F32 val )
-{
-   return U16(val * 32.0 + 0.5f);
-}
 
 inline bool TerrainFile::isPointInTerrain( U32 x, U32 y ) const
 {

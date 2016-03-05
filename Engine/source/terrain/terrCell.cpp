@@ -140,6 +140,7 @@ void TerrCell::createPrimBuffer( GFXPrimitiveBufferHandle *primBuffer )
       }
    }
 
+
    // Now add indices for the 'skirts'.
    // These could probably be reduced to a loop.
 
@@ -282,7 +283,7 @@ TerrCell* TerrCell::init( TerrainBlock *terrain )
 }
 
 
-void TerrCell::_init( TerrainBlock *terrain,               
+void TerrCell::_init( TerrainBlock *terrain,
                       const Point2I &point,
                       U32 size,
                       U32 level )
@@ -435,40 +436,44 @@ void TerrCell::_updateVertexBuffer()
 
    TerrVertex *vert = mVertexBuffer.lock();
 
-   Point2I gridPt;
-   Point2F point;
-   F32 height;
-   Point3F normal;   
-   
    const TerrainFile *file = mTerrain->getFile();
 
+   Point2I gridPt = Point2I::Zero;
    for ( U32 y = 0; y < smVBStride; y++ )
    {
+      gridPt.y = mPoint.y + y * stepSize;
       for ( U32 x = 0; x < smVBStride; x++ )
       {
          // We clamp here to keep the geometry from reading across
          // one side of the height map to the other causing walls
          // around the edges of the terrain.
-         gridPt.x = mClamp( mPoint.x + x * stepSize, 0, blockSize - 1 );
-         gridPt.y = mClamp( mPoint.y + y * stepSize, 0, blockSize - 1 );
+         gridPt.x = mPoint.x + x * stepSize;
+
+         // Corrected calc the position for height.
+         const Point2I  p(
+            (gridPt.x < blockSize) ? gridPt.x : (blockSize - 1),
+            (gridPt.y < blockSize) ? gridPt.y : (blockSize - 1)
+         );
+         F32 height;
+         file->getHeight( &height, p );
 
          // Setup this point.
-         point.x = (F32)gridPt.x * squareSize;
-         point.y = (F32)gridPt.y * squareSize;
-         height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
-         vert->point.x = point.x;
-         vert->point.y = point.y;
+         vert->point.x = (F32)gridPt.x * squareSize;
+         vert->point.y = (F32)gridPt.y * squareSize;
          vert->point.z = height;
 
          // Get the normal.
-         mTerrain->getSmoothNormal( point, &normal, true, false );
-         vert->normal = normal;
+         const Point2F pn((F32)p.x * squareSize, (F32)p.y * squareSize);
+         mTerrain->getSmoothNormal( pn, &vert->normal, true, false );
 
          // Get the tangent z.
-         vert->tangentZ = fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) ) - height;
+         const Point2I  p1( p.x + 1, p.y );
+         F32 height1;
+         file->getHeight( &height1, p1 );
+         vert->tangentZ = height1 - height;
 
          // Test the empty state for this vert.
-         if ( file->isEmptyAt( gridPt.x, gridPt.y ) )
+         if ( file->isEmptyAt( p.x, p.y ) )
          {
             mHasEmpty = true;
             mEmptyVertexList.push_back( vbcounter );
@@ -481,6 +486,9 @@ void TerrCell::_updateVertexBuffer()
 
    // Add verts for 'skirts' around/beneath the edge verts of this cell.
    // This could probably be reduced to a loop...
+
+   Point2F point  = Point2F::Zero;
+   Point3F normal = Point3F::Zero;
    
    const F32 skirtDepth = mSize / smMinCellSize * mTerrain->getSquareSize();
 
@@ -492,7 +500,7 @@ void TerrCell::_updateVertexBuffer()
       
       point.x = (F32)gridPt.x * squareSize;
       point.y = (F32)gridPt.y * squareSize;
-      height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+      const F32 height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
       vert->point.x = point.x;
       vert->point.y = point.y;
       vert->point.z = height - skirtDepth;
@@ -516,7 +524,7 @@ void TerrCell::_updateVertexBuffer()
 
       point.x = (F32)gridPt.x * squareSize;
       point.y = (F32)gridPt.y * squareSize;
-      height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+      const F32 height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
       vert->point.x = point.x;
       vert->point.y = point.y;
       vert->point.z = height - skirtDepth;
@@ -540,7 +548,7 @@ void TerrCell::_updateVertexBuffer()
 
       point.x = (F32)gridPt.x * squareSize;
       point.y = (F32)gridPt.y * squareSize;
-      height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+      const F32 height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
       vert->point.x = point.x;
       vert->point.y = point.y;
       vert->point.z = height - skirtDepth;
@@ -564,7 +572,7 @@ void TerrCell::_updateVertexBuffer()
 
       point.x = (F32)gridPt.x * squareSize;
       point.y = (F32)gridPt.y * squareSize;
-      height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
+      const F32 height = fixedToFloat( file->getHeight( gridPt.x, gridPt.y ) );
       vert->point.x = point.x;
       vert->point.y = point.y;
       vert->point.z = height - skirtDepth;
@@ -577,10 +585,9 @@ void TerrCell::_updateVertexBuffer()
       vert->tangentZ = height - fixedToFloat( file->getHeight( gridPt.x + 1, gridPt.y ) );
 
       vbcounter++;
-      ++vert;      
+      ++vert;
    }
 
-   AssertFatal( vbcounter == smVBSize, "bad" );
    mVertexBuffer.unlock();
 }
 
@@ -657,9 +664,8 @@ void TerrCell::_updatePrimitiveBuffer()
          }
 
          idxBuff += 6;
-         maxIndex = index + 1 + smVBStride;         
-         counter += 6;         
-
+         maxIndex = index + 1 + smVBStride;
+         counter += 6;
          mTriCount += 2;
       }
    }
@@ -827,29 +833,33 @@ void TerrCell::_updateMaterials()
 {
    PROFILE_SCOPE( TerrCell_UpdateMaterials );
 
+   const U32 blockSize = mTerrain->getBlockSize();
+
    // This should really only be called for cells of smMinCellSize,
    // in which case stepSize is always one.
-   U32 stepSize = mSize / smMinCellSize;
+   const U32 stepSize = mSize / smMinCellSize;
    mMaterials = 0;
-   U8 index;
-   U32 x, y;
 
    const TerrainFile *file = mTerrain->getFile();
 
-   // Step thru the samples in the map then.
-   for ( y = 0; y < smVBStride; y++ )
+   // Calc 'gridPt' by analogy with _updateVertexBuffer().
+   Point2I  gridPt = Point2I::Zero;
+   for ( U32 y = 0; y < smVBStride; y++ )
    {
-      for ( x = 0; x < smVBStride; x++ )
+      gridPt.y = mPoint.y + y * stepSize;
+      for ( U32 x = 0; x < smVBStride; x++ )
       {
-         index = file->getLayerIndex(  mPoint.x + x * stepSize, 
-                                       mPoint.y + y * stepSize );
-         
+         gridPt.x = mPoint.x + x * stepSize;
+         const U32 lx = (gridPt.x < blockSize) ? gridPt.x : (blockSize - 1);
+         const U32 ly = (gridPt.y < blockSize) ? gridPt.y : (blockSize - 1);
+         const U8 index = file->getLayerIndex( lx, ly );
+
          // Skip empty layers and anything that doesn't fit
          // the 64bit material flags.
          if ( index == U8_MAX || index > 63 )
             continue;
 
-         mMaterials |= (U64)((U64)1<<index);
+         mMaterials |= (U64)(1<<index);
       }
    }
 

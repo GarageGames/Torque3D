@@ -23,10 +23,7 @@
 #include "console/engineAPI.h"
 #include "platform/platform.h"
 #include "gui/worldEditor/terrainActions.h"
-
 #include "gui/core/guiCanvas.h"
-
-//------------------------------------------------------------------------------
 
 void SelectAction::process(Selection * sel, const Gui3DMouseEvent & event, bool selChanged, Type type)
 {
@@ -80,8 +77,6 @@ void DeselectAction::process(Selection * sel, const Gui3DMouseEvent & event, boo
    }
 }
 
-//------------------------------------------------------------------------------
-
 void SoftSelectAction::process(Selection * sel, const Gui3DMouseEvent &, bool selChanged, Type type)
 {
    TerrainBlock *terrBlock = mTerrainEditor->getActiveTerrain();
@@ -99,7 +94,6 @@ void SoftSelectAction::process(Selection * sel, const Gui3DMouseEvent &, bool se
    if(type == Begin || type == Process)
       mFilter.set(1, &mTerrainEditor->mSoftSelectFilter);
 
-   //
    if(selChanged)
    {
       F32 radius = mTerrainEditor->mSoftSelectRadius;
@@ -111,7 +105,7 @@ void SoftSelectAction::process(Selection * sel, const Gui3DMouseEvent &, bool se
 
       for(U32 i = 0; i < sel->size(); i++)
       {
-         GridInfo & info = (*sel)[i];
+         GridInfo& info = (*sel)[i];
 
          info.mPrimarySelect = true;
          info.mWeight = mFilter.getValue(0);
@@ -168,8 +162,6 @@ void SoftSelectAction::process(Selection * sel, const Gui3DMouseEvent &, bool se
    }
 }
 
-//------------------------------------------------------------------------------
-
 void OutlineSelectAction::process(Selection * sel, const Gui3DMouseEvent & event, bool, Type type)
 {
    TORQUE_UNUSED(sel); TORQUE_UNUSED(event); TORQUE_UNUSED(type);
@@ -192,8 +184,6 @@ void OutlineSelectAction::process(Selection * sel, const Gui3DMouseEvent & event
    mLastEvent = event;
 }
 
-//------------------------------------------------------------------------------
-
 void PaintMaterialAction::process(Selection * sel, const Gui3DMouseEvent &, bool selChanged, Type)
 {
    S32 mat = mTerrainEditor->getPaintMaterialIndex();
@@ -210,7 +200,6 @@ void PaintMaterialAction::process(Selection * sel, const Gui3DMouseEvent &, bool
    Point2F p;
    Point3F norm;
 
-
    for( U32 i = 0; i < sel->size(); i++ )
    {
       GridInfo &inf = (*sel)[i];
@@ -222,9 +211,8 @@ void PaintMaterialAction::process(Selection * sel, const Gui3DMouseEvent &, bool
          if ( !terrain->getNormal( p, &norm, true ) )
             continue;
 
-         if (  norm.z > minSlope ||
-               norm.z < maxSlope )
-            continue;  
+         if ( norm.z > minSlope || norm.z < maxSlope )
+            continue;
       }
 
       // If grid is already set to our material, or it is an
@@ -275,10 +263,11 @@ void RaiseHeightAction::process( Selection *sel, const Gui3DMouseEvent &evt, boo
    // only works on brushes...
 
    Brush *brush = dynamic_cast<Brush*>(sel);
+
    if ( !brush )
       return;
 
-   if ( type == End )   
+   if ( type == End )
       return;
 
    Point2I brushPos = brush->getPosition();
@@ -786,7 +775,7 @@ void TerrainSmoothAction::initPersistFields()
 
 void TerrainSmoothAction::smooth( TerrainBlock *terrain, F32 factor, U32 steps )
 {
-   AssertFatal( terrain, "TerrainSmoothAction::smooth() - Got null object!" );
+   AssertFatal(terrain, "TerrainSmoothAction::smooth() - Got null object!");
 
    // Store our input parameters.
    mTerrainId = terrain->getId();
@@ -799,8 +788,8 @@ void TerrainSmoothAction::smooth( TerrainBlock *terrain, F32 factor, U32 steps )
 
 DefineConsoleMethod( TerrainSmoothAction, smooth, void, ( TerrainBlock *terrain, F32 factor, U32 steps ), , "( TerrainBlock obj, F32 factor, U32 steps )")
 {
-	if (terrain)
-   	object->smooth( terrain, factor, mClamp( steps, 1, 13 ) );
+   if (terrain)
+      object->smooth( terrain, factor, mClamp( steps, 1, 13 ) );
 }
 
 void TerrainSmoothAction::undo()
@@ -838,4 +827,268 @@ void TerrainSmoothAction::redo()
 
    // Tell the terrain to update itself.
    terrain->updateGrid( Point2I::Zero, Point2I::Max, true );
+}
+
+
+IMPLEMENT_CONOBJECT( TerrainSolderEdgesAction );
+
+ConsoleDocClass( TerrainSolderEdgesAction,
+   "@brief Terrain action used for soldering edges of all terrains.\n\n"
+   "Editor use only.\n\n"
+   "@internal"
+);
+
+
+TerrainSolderEdgesAction::TerrainSolderEdgesAction()
+   :  UndoAction( "Terrain Solder Edges" )
+{
+}
+
+
+void TerrainSolderEdgesAction::initPersistFields()
+{
+   Parent::initPersistFields();
+}
+
+
+void TerrainSolderEdgesAction::solder()
+{
+   // Harvest all terrains from the level.
+   SimpleQueryList queryList;
+   gServerContainer.findObjects(
+       TerrainObjectType,
+       SimpleQueryList::insertionCallback,
+       &queryList
+   );
+   Vector<SceneObject *> &ql = queryList.mList;
+   for (Vector<SceneObject *>::iterator itr = ql.begin(); itr != ql.end(); ++itr) {
+      mTerrainIdSet.push_back( ( *itr )->getId() );
+   }
+
+   // The redo can do the rest.
+   redo();
+}
+
+
+//ConsoleMethod( TerrainSolderEdgesAction, solder, void, 2, 2, "()" )
+DefineConsoleMethod( TerrainSolderEdgesAction, solder, void, (), , "()" )
+{
+   object->solder();
+}
+
+
+void TerrainSolderEdgesAction::undo()
+{
+   for (Vector<U32>::iterator itr = mTerrainIdSet.begin(); itr != mTerrainIdSet.end(); ++itr)
+   {
+      // Find the terrain.
+      const SimObjectId id = *itr;
+      TerrainBlock* terrain;
+      if ( !Sim::findObject( id, terrain ) || !terrain )
+         continue;
+
+      // Get the terrain file.
+      TerrainFile* terrFile = terrain->getFile();
+      // Copy our stored heightmap to the file.
+      const Map< SimObjectId, storedHeight_t >::Iterator ftr = mStoredHeightSet.find( id );
+      terrFile->setHeightMap( ftr->value, false );
+      // Tell the terrain to update itself.
+      terrain->updateGrid( Point2I::Zero, Point2I::Max, true );
+   }
+}
+
+
+void TerrainSolderEdgesAction::redo()
+{
+   // Calc average heights on the edges.
+   typedef Map< SimObjectId, heightSet_t > terrainSet_t;
+   terrainSet_t  terrainSet;
+
+   for (Vector<U32>::iterator itr = mTerrainIdSet.begin(); itr != mTerrainIdSet.end(); ++itr)
+   {
+      const SimObjectId id = *itr;
+      TerrainBlock* terrain;
+
+      if ( !Sim::findObject( id, terrain ) || !terrain )
+         continue;
+
+      // Skip hidden terrain.
+      if ( terrain->isHidden() )
+         continue;
+
+      // Store terrains.
+      const TerrainFile* terrFile  = terrain->getFile();
+      mStoredHeightSet.insert( id, terrFile->getHeightMap() );
+
+      // Do action.
+      const heightSet_t heightSet = harvestAvgHeight( terrain );
+      terrainSet.insert( id, heightSet );
+   }
+
+   // Set heights for terrains.
+   for (terrainSet_t::Iterator itr = terrainSet.begin(); itr != terrainSet.end(); ++itr)
+   {
+      const SimObjectId id = itr->key;
+      TerrainBlock* terrain;
+
+      if ( !Sim::findObject( id, terrain ) || !terrain )
+         continue;
+
+      const terrainSet_t::Iterator ftr = terrainSet.find( id );
+      if (ftr != terrainSet.end())
+         setAvgHeight( terrain, ftr->value );
+   }
+
+
+   // Tell terrains to update itself.
+   for (terrainSet_t::Iterator itr = terrainSet.begin(); itr != terrainSet.end(); ++itr)
+   {
+      const SimObjectId id = itr->key;
+      TerrainBlock* terrain;
+
+      if ( !Sim::findObject( id, terrain ) || !terrain )
+         continue;
+
+      terrain->updateGrid( Point2I::Zero, Point2I::Max, true );
+   }
+}
+
+
+TerrainSolderEdgesAction::heightSet_t TerrainSolderEdgesAction::harvestAvgHeight(const TerrainBlock*  terrain)
+{
+   AssertFatal(terrain, "");
+   AssertFatal(!terrain->isHidden(), "");
+
+   heightSet_t r;
+
+   const U32 blockSize  = terrain->getBlockSize();
+   const F32 squareSize = terrain->getSquareSize();
+   Point3F  shift;
+   terrain->getTransform().getColumn( 3, &shift );
+
+   // x
+   for (Point2I  c( 0, 0 );  c.x < blockSize;  ++c.x) {
+      harvestHeight( c, r, blockSize, squareSize, shift );
+   }
+   for (Point2I  c( 0, blockSize - 1 );  c.x < blockSize;  ++c.x) {
+      harvestHeight( c, r, blockSize, squareSize, shift );
+   }
+
+   // y
+   for (Point2I  c( 0, 0 );  c.y < blockSize;  ++c.y) {
+      harvestHeight( c, r, blockSize, squareSize, shift );
+   }
+   for (Point2I  c( blockSize - 1, 0 );  c.y < blockSize;  ++c.y) {
+      harvestHeight( c, r, blockSize, squareSize, shift );
+   }
+
+   return r;
+}
+
+void TerrainSolderEdgesAction::harvestHeight(const Point2I& c, heightSet_t& r, const U32 blockSize, const F32 squareSize, Point3F shift)
+{
+   const Point3F  wc(
+         shift.x + c.x * squareSize,
+         shift.y + c.y * squareSize,
+         shift.z
+      );
+
+   const F32 h = calcAvgHeight(wc);
+   const U32 i = c.x + blockSize * c.y;
+   r.insert(i, h);
+}
+
+
+TerrainBlock* TerrainSolderEdgesAction::harvest(const Point3F& c, uniqueTHSet_t& set)
+{
+   TerrainBlock* terrain = getTerrainUnderWorldPoint( Point3F( c.x, c.y, c.z + 5000.0f) );
+   if ( !terrain || terrain->isHidden() ) { return terrain; }
+
+   Point3F offset;
+   terrain->getTransform().getColumn(3, &offset);
+   const Point2F pos(c.x - offset.x, c.y - offset.y);
+   F32 h = F32_MAX;
+
+   if (!terrain->getHeight( pos, &h ))
+   {
+      Con::warnf("Don't harvested a height for the terrain %d.", terrain->getId());
+      return terrain;
+   }
+
+   // add only unique
+   if (set.find(terrain) == set.end())
+      set.insert( terrain, h );
+
+   return terrain;
+}
+
+F32 TerrainSolderEdgesAction::calcAvgHeight(const Point3F& wc)
+{
+   uniqueTHSet_t set;
+
+   // terrain by 'wc'
+   const TerrainBlock* terrainWC = harvest(wc, set);
+
+   if (!terrainWC || terrainWC->isHidden())
+      return F32_MAX;
+
+   const F32 squareSize = terrainWC->getSquareSize();
+
+   // terrain by 'direction' from 'wc'
+   // * = wc
+   // 8 1 5
+   // 4 * 2
+   // 7 3 6
+   for (U32 k = 1; k <= 8; ++k)
+   {
+      const direction_t d = direction( k );
+      const Point3F  wd(
+         wc.x + d.x * squareSize,
+         wc.y + d.y * squareSize,
+         wc.z
+      );
+
+      harvest( wd,set );
+   }
+
+   // calc an average height
+   F32 avgHeight = 0;
+   for (uniqueTHSet_t::Iterator itr = set.begin(); itr != set.end(); ++itr)
+      avgHeight += itr->value;
+
+   avgHeight /= set.size();
+
+   return avgHeight;
+}
+
+TerrainSolderEdgesAction::direction_t TerrainSolderEdgesAction::direction( U32 k )
+{
+   // 8 1 5
+   // 4 0 2
+   // 7 3 6
+   static const direction_t D[ 9 ] = {
+      Point2I(  0,  0 ),
+      Point2I(  0,  1 ),
+      Point2I(  1,  0 ),
+      Point2I(  0, -1 ),
+      Point2I( -1,  0 ),
+      Point2I(  1,  1 ),
+      Point2I(  1, -1 ),
+      Point2I( -1, -1 ),
+      Point2I( -1,  1 )
+   };
+   return D[ k ];
+}
+
+
+void TerrainSolderEdgesAction::setAvgHeight(TerrainBlock* terrain, const heightSet_t&  hs)
+{
+   AssertFatal(terrain, "");
+
+   for (heightSet_t::ConstIterator itr = hs.begin(); itr != hs.end(); ++itr)
+   {
+      const U32 i = itr->key;
+      const F32 h = floatToFixed( itr->value );
+      terrain->getFile()->setHeight( i, h );
+   }
 }
