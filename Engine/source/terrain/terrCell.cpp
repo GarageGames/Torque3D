@@ -846,20 +846,20 @@ void TerrCell::_updateMaterials()
    Point2I  gridPt = Point2I::Zero;
    for ( U32 y = 0; y < smVBStride; y++ )
    {
-	   gridPt.y = mPoint.y + y * stepSize;
+      gridPt.y = mPoint.y + y * stepSize;
       for ( U32 x = 0; x < smVBStride; x++ )
       {
          gridPt.x = mPoint.x + x * stepSize;
          const U32 lx = (gridPt.x < blockSize) ? gridPt.x : (blockSize - 1);
          const U32 ly = (gridPt.y < blockSize) ? gridPt.y : (blockSize - 1);
          const U8 index = file->getLayerIndex( lx, ly );
-         
+
          // Skip empty layers and anything that doesn't fit
          // the 64bit material flags.
          if ( index == U8_MAX || index > 63 )
             continue;
 
-		 mMaterials |= (U64)(1<<index);
+         mMaterials |= (U64)(1<<index);
       }
    }
 
