@@ -365,7 +365,7 @@ Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
          
          // Statement allows for casting of different types which
 		   // eliminates vector truncation problems.
-         String statement = String::ToString( "   @ = (%s)mul(@, @).xy;\r\n", type );
+         String statement = String::ToString( "   @ = (%s)mul(@, @);\r\n", type );
          meta->addStatement( new GenOp( statement, texCoord, texMat, inTex ) );
       }
       else
