@@ -20,7 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#pragma once
+#ifndef _TORQUECONFIG_H_
+#define _TORQUECONFIG_H_
 
 //-----------------------------------------------------------------------------
 //Hi, and welcome to the Torque Config file.
