@@ -1087,10 +1087,10 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
       if ( !( dinst->mFlags & PermanentDecal || dinst->mFlags & CustomDecal ) )
       {         
          delta = ( curSimTime - dinst->mCreateTime );
-         if ( delta > dinst->mDataBlock->lifeSpan )         
+         if (delta > dinst->mDataBlock->lifeSpan * smDecalLifeTimeScale)			 
          {            
-            diff = delta - dinst->mDataBlock->lifeSpan;
-            dinst->mVisibility = 1.0f - (F32)diff / (F32)dinst->mDataBlock->fadeTime;
+			diff = delta - (dinst->mDataBlock->lifeSpan * smDecalLifeTimeScale);
+            dinst->mVisibility = 1.0f - (F32)diff / ((F32)dinst->mDataBlock->fadeTime * smDecalLifeTimeScale);
 
             if ( dinst->mVisibility <= 0.0f )
             {
