@@ -62,10 +62,14 @@
 #ifndef _DYNAMIC_CONSOLETYPES_H_
    #include "console/dynamicTypes.h"
 #endif
+#ifndef _NETCONNECTION_H_  
+#include "sim/netConnection.h"  
+#endif  
 
 // Need full definition visible for SimObjectPtr<ParticleEmitter>
 #include "T3D/fx/particleEmitter.h"
 
+class ManualImageSetEvent;
 class GFXCubemap;
 class TSShapeInstance;
 class SceneRenderState;
@@ -96,6 +100,7 @@ class ShapeBaseConvex : public Convex
    friend class ShapeBase;
    friend class Vehicle;
    friend class RigidShape;
+   friend class ManualImageSetEvent;  
 
   protected:
    ShapeBase*  pShapeBase;
@@ -1040,12 +1045,6 @@ protected:
    /// @param   imageSlot   Image slot id
    U32  getImageReloadState(U32 imageSlot);
 
-   /// Sets the state of the image by state index
-   /// @param   imageSlot   Image slot id
-   /// @param   state       State id
-   /// @param   force       Force image to state or let it finish then change
-   void setImageState(U32 imageSlot, U32 state, bool force = false);
-
    void updateAnimThread(U32 imageSlot, S32 imageShapeIndex, ShapeBaseImageData::StateData* lastState=NULL);
 
    /// Get the animation prefix for the image
@@ -1178,7 +1177,13 @@ public:
    void setTeamId(S32 team);
    //< ZOD: End addition
    /// @}
-
+   
+   /// Sets the state of the image by state index
+   /// @param   imageSlot   Image slot id
+   /// @param   state       State id
+   /// @param   force       Force image to state or let it finish then change
+   void setImageState(U32 imageSlot, U32 state, bool force = false);
+   
    /// @name Name & Skin tags
    /// @{
    void setShapeName(const char*);
@@ -1570,6 +1575,8 @@ public:
    /// @param   pos   Muzzle point (out)
    void getMuzzlePoint(U32 imageSlot,Point3F* pos);
 
+   bool setManualImageState(U32 imageSlot, const char* state);
+
    /// @}
 
    /// @name Transforms
@@ -1888,5 +1895,35 @@ inline WaterObject* ShapeBase::getCurrentWaterObject()
    
    return mCurrentWaterObject;
 }
+
+//------------------------------------------------------------------------------  
+// Manual shapeBaseImage state change NetEvent  
+//------------------------------------------------------------------------------  
+  
+class ManualImageSetEvent : public NetEvent  
+{  
+    typedef NetEvent Parent;  
+  
+    void pack(NetConnection*, BitStream*);  
+    void write(NetConnection*, BitStream*){}  
+    void unpack(NetConnection*, BitStream*);  
+    void process(NetConnection*);  
+  
+public:  
+    ManualImageSetEvent() {  
+        mBadPacket = false;  
+        mShapeBase = NULL;  
+        mImageSlot = -1;  
+        mState = -1;  
+    };  
+    ~ManualImageSetEvent() {};  
+  
+    bool mBadPacket;  
+    SimObjectPtr<ShapeBase> mShapeBase;  
+    U32 mImageSlot;  
+    S32 mState;  
+  
+    DECLARE_CONOBJECT(ManualImageSetEvent);  
+}; 
 
 #endif  // _H_SHAPEBASE_

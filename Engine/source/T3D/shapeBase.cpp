@@ -5014,3 +5014,11 @@ DefineEngineMethod( ShapeBase, getModelFile, const char *, (),,
 	const char *fieldName = StringTable->insert( String("shapeFile") );
    return datablock->getDataField( fieldName, NULL );
 }
+
+ConsoleMethod( ShapeBase, setManualImageState, void, 4, 4, "(int slot, string state)")  
+{  
+    int imageSlot = dAtoi(argv[2]);  
+    const char* state = argv[3];  
+    if (imageSlot >= 0 && imageSlot < ShapeBase::MaxMountedImages)  
+        object->setManualImageState(imageSlot, state);   
+} 

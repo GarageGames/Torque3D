@@ -3418,3 +3418,77 @@ void ShapeBase::shakeCamera( U32 imageSlot )
       }
    }
 }
+
+    bool ShapeBase::setManualImageState(U32 imageSlot, const char* state)  
+    {  
+        if(!isServerObject()) return false;  
+      
+        MountedImage& image = mMountedImageList[imageSlot];  
+        S32 stateNum = image.dataBlock->lookupState(state);  
+        if (image.dataBlock && stateNum > 0) {  
+      
+            // Set the server-side image state  
+            setImageState(imageSlot, stateNum, true);  
+      
+            // Send the state change over the network  
+            SimGroup* pClientGroup = Sim::getClientGroup();  
+            for (SimGroup::iterator itr = pClientGroup->begin(); itr != pClientGroup->end(); itr++) {  
+                NetConnection* nc = static_cast<NetConnection*>(*itr);  
+                if(nc->getGhostIndex(this) == -1)  
+                    continue;  
+      
+                ManualImageSetEvent* imgEvnt = new ManualImageSetEvent;  
+      
+                imgEvnt->mShapeBase = this;  
+                imgEvnt->mImageSlot = imageSlot;  
+                imgEvnt->mState = stateNum;  
+      
+                nc->postNetEvent(imgEvnt);  
+            }  
+            return true;  
+        }  
+        return false;  
+    }  
+      
+    //------------------------------------------------------------------------------  
+    // Manual shapeBaseImage state change NetEvent  
+    //------------------------------------------------------------------------------  
+    IMPLEMENT_CO_CLIENTEVENT_V1(ManualImageSetEvent);  
+      
+    void ManualImageSetEvent::pack(NetConnection* conn, BitStream* stream)  
+    {  
+        if(stream->writeFlag(mShapeBase.isNull() || mImageSlot < 0 || mState < 0))  
+            return;  
+      
+        S32 shapeId = conn->getGhostIndex(mShapeBase);  
+        if(stream->writeFlag(shapeId != -1))  
+            stream->writeInt(shapeId, NetConnection::GhostIdBitSize);  
+      
+        stream->writeRangedU32(mImageSlot, 0, ShapeBase::MaxMountedImages);  
+        stream->writeInt(mState, 5);  
+    }  
+      
+    void ManualImageSetEvent::unpack(NetConnection* conn, BitStream* stream)  
+    {  
+        if(mBadPacket = stream->readFlag())  
+            return;  
+      
+        if(stream->readFlag()) {  
+            S32 shapeId = stream->readInt(NetConnection::GhostIdBitSize);  
+            mShapeBase = dynamic_cast<ShapeBase*>(conn->resolveGhost(shapeId));  
+        }  
+        else {  
+            mShapeBase = NULL;  
+            mBadPacket = true;  
+        }  
+      
+        mImageSlot = stream->readRangedU32(0, ShapeBase::MaxMountedImages);  
+        mState = stream->readInt(5);  
+	} 
+      
+    void ManualImageSetEvent::process(NetConnection* conn)  
+    {  
+        if(mBadPacket)  
+            return;  
+        mShapeBase->setImageState(mImageSlot, mState, true);  
+    }  
