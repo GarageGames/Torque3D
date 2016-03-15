@@ -1329,3 +1329,8 @@ DefineEngineFunction( getBestHDRFormat, GFXFormat, (),,
 
    return format;
 }
+
+DefineConsoleFunction(ResetGFX, void, (), , "")
+{
+   GFX->beginReset();
+}
