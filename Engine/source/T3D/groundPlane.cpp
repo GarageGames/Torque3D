@@ -65,7 +65,8 @@ ConsoleDocClass( GroundPlane,
 );
 
 GroundPlane::GroundPlane()
-   : mSquareSize( 128.0f ),
+   : mZOffset (0.0f),
+     mSquareSize( 128.0f ),
      mScaleU( 1.0f ),
      mScaleV( 1.0f ),
      mMaterial( NULL ),
@@ -92,6 +93,7 @@ void GroundPlane::initPersistFields()
 {
    addGroup( "Plane" );
 
+      addField( "zOffset",       TypeF32,          Offset( mZOffset, GroundPlane ), "How high the ground plane should be" );
       addField( "squareSize",    TypeF32,          Offset( mSquareSize, GroundPlane ), "Square size in meters to which %GroundPlane subdivides its geometry." );
       addField( "scaleU",        TypeF32,          Offset( mScaleU, GroundPlane ), "Scale of texture repeat in the U direction." );
       addField( "scaleV",        TypeF32,          Offset( mScaleV, GroundPlane ), "Scale of texture repeat in the V direction." );
@@ -176,6 +178,7 @@ U32 GroundPlane::packUpdate( NetConnection* connection, U32 mask, BitStream* str
 {
    U32 retMask = Parent::packUpdate( connection, mask, stream );
 
+   stream->write( mZOffset );
    stream->write( mSquareSize );
    stream->write( mScaleU );
    stream->write( mScaleV );
@@ -188,6 +191,7 @@ void GroundPlane::unpackUpdate( NetConnection* connection, BitStream* stream )
 {
    Parent::unpackUpdate( connection, stream );
 
+   stream->read( &mZOffset );
    stream->read( &mSquareSize );
    stream->read( &mScaleU );
    stream->read( &mScaleV );
@@ -518,7 +522,7 @@ void GroundPlane::generateGrid( U32 width, U32 height, F32 squareSize,
       {
          vertices->point.x = x;
          vertices->point.y = y;
-         vertices->point.z = 0.0;
+         vertices->point.z = ( mZOffset );
 
          vertices->texCoord.x = ( x / squareSize ) * mScaleU;
          vertices->texCoord.y = ( y / squareSize ) * -mScaleV;

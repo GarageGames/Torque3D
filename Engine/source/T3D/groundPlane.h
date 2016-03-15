@@ -97,6 +97,7 @@ private:
    typedef GFXVertexBufferHandle< VertexType > VertexBuffer;
    typedef GFXPrimitiveBufferHandle PrimitiveBuffer;
 
+   F32               mZOffset;      ///< How high or low the ground plane should be.
    F32               mSquareSize;   ///< World units per grid cell edge.
    F32               mScaleU;       ///< Scale factor for U texture coordinates.
    F32               mScaleV;       ///< Scale factor for V texture coordinates.
