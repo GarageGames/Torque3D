@@ -1192,4 +1192,9 @@ inline void GFXDevice::setVertexFormat( const GFXVertexFormat *vertexFormat )
 #define GFXAssertFatal(x, error)
 #endif
 
+DefineConsoleFunction(ResetGFX, void, (), , "")
+{
+   GFX->beginReset();
+}
+
 #endif // _GFXDEVICE_H_
