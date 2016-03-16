@@ -608,6 +608,7 @@ void SkyBox::_initMaterial()
    FeatureSet features = MATMGR->getDefaultFeatures();
    features.removeFeature( MFT_RTLighting );
    features.removeFeature( MFT_Visibility );
+   features.addFeature(MFT_SkyBox);
 
    // Now initialize the material.
    mMatInstance->init(features, getGFXVertexFormat<GFXVertexPNT>());
