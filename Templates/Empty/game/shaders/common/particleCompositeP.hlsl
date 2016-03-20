@@ -20,22 +20,30 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 #include "torque.hlsl"
+#include "shaderModel.hlsl"
 
-uniform sampler2D colorSource : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(colorSource, 0);
 uniform float4 offscreenTargetParams;
 
 #ifdef TORQUE_LINEAR_DEPTH
 #define REJECT_EDGES
-uniform sampler2D edgeSource : register(S1);
+TORQUE_UNIFORM_SAMPLER2D(edgeSource, 1);
 uniform float4 edgeTargetParams;
 #endif
 
+struct Conn
+{
+   float4 hpos : TORQUE_POSITION;
+   float4 offscreenPos : TEXCOORD0;
+   float4 backbufferPos : TEXCOORD1;
+};
 
-float4 main( float4 offscreenPos : TEXCOORD0, float4 backbufferPos : TEXCOORD1 ) : COLOR
+
+float4 main(Conn IN) : TORQUE_TARGET0
 {  
    // Off-screen particle source screenspace position in XY
    // Back-buffer screenspace position in ZW
-   float4 ssPos = float4(offscreenPos.xy / offscreenPos.w, backbufferPos.xy / backbufferPos.w);
+   float4 ssPos = float4(IN.offscreenPos.xy / IN.offscreenPos.w, IN.backbufferPos.xy / IN.backbufferPos.w);
    
 	float4 uvScene = ( ssPos + 1.0 ) / 2.0;
 	uvScene.yw = 1.0 - uvScene.yw;
@@ -44,10 +52,10 @@ float4 main( float4 offscreenPos : TEXCOORD0, float4 backbufferPos : TEXCOORD1 )
 #ifdef REJECT_EDGES
    // Cut out particles along the edges, this will create the stencil mask
 	uvScene.zw = viewportCoordToRenderTarget(uvScene.zw, edgeTargetParams);
-	float edge = tex2D( edgeSource, uvScene.zw ).r;
+	float edge = TORQUE_TEX2D( edgeSource, uvScene.zw ).r;
 	clip( -edge );
 #endif
 	
 	// Sample offscreen target and return
-   return tex2D( colorSource, uvScene.xy );
+   return TORQUE_TEX2D( colorSource, uvScene.xy );
 }

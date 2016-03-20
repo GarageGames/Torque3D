@@ -22,9 +22,9 @@
 
 #include "./postFx.hlsl"
 
-uniform sampler2D inputTex : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(inputTex, 0);
 
-float4 main( PFXVertToPix IN ) : COLOR
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
-   return tex2D( inputTex, IN.uv0 );   
+   return TORQUE_TEX2D( inputTex, IN.uv0 );   
 }

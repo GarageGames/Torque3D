@@ -21,10 +21,12 @@
 //-----------------------------------------------------------------------------
 
 #include "../postFx.hlsl"
-#include "shadergen:/autogenConditioners.h"
+#include "../../shaderModelAutoGen.hlsl"
+
+TORQUE_UNIFORM_SAMPLER2D(prepassBuffer,0);
 
 // GPU Gems 3, pg 443-444
-float GetEdgeWeight(float2 uv0, in sampler2D prepassBuffer, in float2 targetSize)
+float GetEdgeWeight(float2 uv0, in float2 targetSize)
 {
    float2 offsets[9] = {
       float2( 0.0,  0.0),
@@ -44,10 +46,11 @@ float GetEdgeWeight(float2 uv0, in sampler2D prepassBuffer, in float2 targetSize
    float Depth[9];
    float3 Normal[9];
    
+   [unroll] //no getting around this, may as well save the annoying warning message
    for(int i = 0; i < 9; i++)
    {
       float2 uv = uv0 + offsets[i] * PixelSize;
-      float4 gbSample = prepassUncondition( prepassBuffer, uv );
+      float4 gbSample = TORQUE_PREPASS_UNCONDITION( prepassBuffer, uv );
       Depth[i] = gbSample.a;
       Normal[i] = gbSample.rgb;
    }
@@ -82,9 +85,9 @@ float GetEdgeWeight(float2 uv0, in sampler2D prepassBuffer, in float2 targetSize
    return dot(normalResults, float4(1.0, 1.0, 1.0, 1.0)) * 0.25;
 }
 
-float4 main( PFXVertToPix IN, 
-             uniform sampler2D prepassBuffer :register(S0),
-             uniform float2 targetSize : register(C0) ) : COLOR0
+uniform float2 targetSize;
+
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
-   return GetEdgeWeight(IN.uv0, prepassBuffer, targetSize );//rtWidthHeightInvWidthNegHeight.zw);
+   return GetEdgeWeight(IN.uv0, targetSize);//rtWidthHeightInvWidthNegHeight.zw);
 }

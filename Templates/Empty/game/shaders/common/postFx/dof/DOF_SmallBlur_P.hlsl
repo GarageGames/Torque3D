@@ -24,22 +24,23 @@
 // colorMapSampler, which is the same size as the render target.  
 // The sample weights are 1/16 in the corners, 2/16 on the edges,  
 // and 4/16 in the center.  
+#include "../../shaderModel.hlsl"
 
-uniform sampler2D colorSampler;  // Output of DofNearCoc()  
+TORQUE_UNIFORM_SAMPLER2D(colorSampler, 0); // Output of DofNearCoc()
 
 struct Pixel
 {  
-   float4 position : POSITION;  
+   float4 position : TORQUE_POSITION;  
    float4 texCoords : TEXCOORD0;  
 };  
 
-float4 main( Pixel IN ) : COLOR
+float4 main( Pixel IN ) : TORQUE_TARGET0
 {  
    float4 color;  
    color = 0.0;  
-   color += tex2D( colorSampler, IN.texCoords.xz );  
-   color += tex2D( colorSampler, IN.texCoords.yz );  
-   color += tex2D( colorSampler, IN.texCoords.xw );  
-   color += tex2D( colorSampler, IN.texCoords.yw );  
+   color += TORQUE_TEX2D( colorSampler, IN.texCoords.xz );  
+   color += TORQUE_TEX2D( colorSampler, IN.texCoords.yz );  
+   color += TORQUE_TEX2D( colorSampler, IN.texCoords.xw );  
+   color += TORQUE_TEX2D( colorSampler, IN.texCoords.yw );  
    return color / 4.0;  
 }  

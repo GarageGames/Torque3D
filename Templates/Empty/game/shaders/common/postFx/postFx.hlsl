@@ -20,17 +20,18 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "../shaderModel.hlsl"
 
 struct PFXVert
 {
-   float4 pos        : POSITION;
+   float3 pos        : POSITION;
    float2 uv         : TEXCOORD0;
    float3 wsEyeRay   : TEXCOORD1;
 };
 
 struct PFXVertToPix
 {
-   float4 hpos       : POSITION;
+   float4 hpos       : TORQUE_POSITION;
    float2 uv0        : TEXCOORD0;
    float2 uv1        : TEXCOORD1;
    float2 uv2        : TEXCOORD2;

@@ -20,12 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"
 #include "../../postfx/postFx.hlsl"
 
+TORQUE_UNIFORM_SAMPLER2D(glowBuffer, 0);
 
-float4 main( PFXVertToPix IN,
-             uniform sampler2D glowBuffer : register(S0) ) : COLOR0
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
-   return tex2D(glowBuffer, IN.uv0);
+   return TORQUE_TEX2D(glowBuffer, IN.uv0);
 }

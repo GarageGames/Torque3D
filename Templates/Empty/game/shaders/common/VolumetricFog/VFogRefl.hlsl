@@ -20,17 +20,19 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+// Volumetric Fog Reflection pixel shader V1.00
+#include "../shaderModel.hlsl"
 uniform float4 fogColor;
 uniform float fogDensity;
 uniform float reflStrength;
 
 struct ConnectData
 {
-   float4 hpos : POSITION;
+   float4 hpos : TORQUE_POSITION;
    float4 pos : TEXCOORD0;
 };
 
-float4 main( ConnectData IN ) : COLOR0
+float4 main( ConnectData IN ) : TORQUE_TARGET0
 {
    return float4(fogColor.rgb,saturate(fogDensity*reflStrength));
 }

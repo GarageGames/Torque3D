@@ -22,36 +22,37 @@
 
 #define IN_HLSL
 #include "shdrConsts.h"
+#include "shaderModel.hlsl"
 
 //-----------------------------------------------------------------------------
 // Structures                                                                  
 //-----------------------------------------------------------------------------
 struct VertData
 {
+   float3 position        : POSITION;
+   float3 normal          : NORMAL;
    float2 texCoord        : TEXCOORD0;
    float2 lmCoord         : TEXCOORD1;
    float3 T               : TEXCOORD2;
-   float3 B               : TEXCOORD3;
-   float3 normal          : NORMAL;
-   float4 position        : POSITION;
+   float3 B               : TEXCOORD3;   
 };
 
 
 struct ConnectData
 {
-   float4 hpos            : POSITION;
+   float4 hpos            : TORQUE_POSITION;
    float4 texCoord        : TEXCOORD0;
    float2 tex2            : TEXCOORD1;
 };
 
+uniform float4x4 modelview;
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------
-ConnectData main( VertData IN,
-                  uniform float4x4 modelview )
+ConnectData main( VertData IN )
 {
    ConnectData OUT;
-   OUT.hpos = mul(modelview, IN.position);
+   OUT.hpos = mul(modelview, float4(IN.position,1.0));
 
    float4x4 texGenTest = { 0.5,  0.0,  0.0,  0.5,
                            0.0, -0.5,  0.0,  0.5,

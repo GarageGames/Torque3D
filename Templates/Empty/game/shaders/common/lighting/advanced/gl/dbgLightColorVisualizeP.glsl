@@ -24,14 +24,12 @@
 #include "shadergen:/autogenConditioners.h"
 
 in vec2 uv0;
-uniform sampler2D lightInfoBuffer;
+uniform sampler2D lightPrePassTex;
 
 out vec4 OUT_col;
 
 void main()
 {   
-   vec3 lightcolor;   
-   float nl_Att, specular;   
-   lightinfoUncondition( texture( lightInfoBuffer, uv0 ), lightcolor, nl_Att, specular );   
-   OUT_col = vec4( lightcolor, 1.0 ); 
+   vec4 lightColor = texture( lightPrePassTex, uv0 );
+   OUT_col = vec4( lightColor.rgb, 1.0 ); 
 }

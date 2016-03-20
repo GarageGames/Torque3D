@@ -1,6 +1,6 @@
 singleton ShaderData( ClearGBufferShader )
 {
-   DXVertexShaderFile = "shaders/common/postFx/postFxV.hlsl";
+   DXVertexShaderFile = "shaders/common/lighting/advanced/deferredClearGBufferV.hlsl";
    DXPixelShaderFile  = "shaders/common/lighting/advanced/deferredClearGBufferP.hlsl";
 
    OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";

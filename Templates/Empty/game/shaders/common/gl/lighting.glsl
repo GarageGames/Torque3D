@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "./torque.glsl"
 
 #ifndef TORQUE_SHADERGEN
 
@@ -207,14 +208,42 @@ void compute4Lights( vec3 wsView,
 ///
 float AL_CalcSpecular( vec3 toLight, vec3 normal, vec3 toEye )
 {
-   #ifdef PHONG_SPECULAR 
-      // (R.V)^c
-      float specVal = dot( normalize( -reflect( toLight, normal ) ), toEye );
-   #else
-      // (N.H)^c [Blinn-Phong, TGEA style, default]
-      float specVal = dot( normal, normalize( toLight + toEye ) );
-   #endif
+   // (R.V)^c
+   float specVal = dot( normalize( -reflect( toLight, normal ) ), toEye );
 
    // Return the specular factor.
    return pow( max( specVal, 0.00001f ), AL_ConstantSpecularPower );
+}
+
+/// The output for Deferred Lighting
+///
+///   @param toLight    Normalized vector representing direction from the pixel 
+///                     being lit, to the light source, in world space.
+///
+///   @param normal  Normalized surface normal.
+///   
+///   @param toEye   The normalized vector representing direction from the pixel 
+///                  being lit to the camera.
+///
+vec4 AL_DeferredOutput(
+      vec3   lightColor,
+      vec3   diffuseColor,
+      vec4   matInfo,
+      vec4   ambient,
+      float specular,
+      float shadowAttenuation)
+{
+   vec3 specularColor = vec3(specular);
+   bool metalness = getFlag(matInfo.r, 3);
+   if ( metalness )
+   {
+       specularColor = 0.04 * (1 - specular) + diffuseColor * specular;
+   }
+
+   //specular = color * map * spec^gloss
+   float specularOut = (specularColor * matInfo.b * min(pow(max(specular,1.0f), max((matInfo.a / AL_ConstantSpecularPower),1.0f)),matInfo.a)).r;
+      
+   lightColor *= vec3(shadowAttenuation);
+   lightColor += ambient.rgb;
+   return vec4(lightColor.rgb, specularOut); 
 }

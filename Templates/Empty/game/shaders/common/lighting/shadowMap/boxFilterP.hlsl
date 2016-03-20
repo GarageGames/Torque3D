@@ -23,10 +23,12 @@
 //*****************************************************************************
 // Box Filter
 //*****************************************************************************
+#include "../ShaderModel.hlsl"
 
 struct ConnectData
 {
-   float2 tex0 : TEXCOORD0;
+   float4 hpos            : TORQUE_POSITION;
+   float2 tex0            : TEXCOORD0;
 };
 
 // If not defined from ShaderData then define 
@@ -40,12 +42,12 @@ float log_conv ( float x0, float X, float y0, float Y )
     return (X + log(x0 + (y0 * exp(Y - X))));
 }
 
-float4 main(   ConnectData IN,
-               uniform sampler2D diffuseMap0 : register(S0),
-               uniform float texSize : register(C0),
-               uniform float2 blurDimension : register(C2),
-               uniform float2 blurBoundaries : register(C3)
-   ) : COLOR0
+TORQUE_UNIFORM_SAMPLER2D(diffuseMap0, 0);
+uniform float texSize : register(C0);
+uniform float2 blurDimension : register(C2);
+uniform float2 blurBoundaries : register(C3);
+
+float4 main( ConnectData IN ) : TORQUE_TARGET0
 {   
    // 5x5
    if (IN.tex0.x <= blurBoundaries.x)
@@ -56,8 +58,8 @@ float4 main(   ConnectData IN,
 
       float2 texCoord = IN.tex0;
       
-      float accum = log_conv(0.3125, tex2D(diffuseMap0, texCoord - sampleOffset), 0.375, tex2D(diffuseMap0, texCoord));
-      accum = log_conv(1, accum, 0.3125, tex2D(diffuseMap0, texCoord + sampleOffset));      
+      float accum = log_conv(0.3125, TORQUE_TEX2D(diffuseMap0, texCoord - sampleOffset), 0.375, tex2D(diffuseMap0, texCoord));
+      accum = log_conv(1, accum, 0.3125, TORQUE_TEX2D(diffuseMap0, texCoord + sampleOffset));
                
       return accum;
    } else {
@@ -73,7 +75,7 @@ float4 main(   ConnectData IN,
                   
          return accum;
       } else {
-         return tex2D(diffuseMap0, IN.tex0);
+         return TORQUE_TEX2D(diffuseMap0, IN.tex0);
       }
    }
 }

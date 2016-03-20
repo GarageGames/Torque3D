@@ -23,7 +23,7 @@
 #include "../../torque.hlsl"
 #include "../postFx.hlsl"
 
-uniform sampler2D inputTex : register( S0 );
+TORQUE_UNIFORM_SAMPLER2D(inputTex, 0);
 uniform float2 texSize0;
 
 uniform float g_fMinLuminace;
@@ -36,7 +36,7 @@ static float2 gTapOffsets[9] =
 };
 
 
-float4 main( PFXVertToPix IN ) : COLOR
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
    float2 tsize = 1.0 / texSize0;
 
@@ -46,7 +46,7 @@ float4 main( PFXVertToPix IN ) : COLOR
    for ( int i = 0; i < 9; i++ )
    {
       // Decode the hdr value.
-      sample = hdrDecode( tex2D( inputTex, IN.uv0 + ( gTapOffsets[i] * tsize ) ).rgb );
+      sample = hdrDecode( TORQUE_TEX2D( inputTex, IN.uv0 + ( gTapOffsets[i] * tsize ) ).rgb );
 
       // Get the luminance and add it to the average.
       float lum = max( hdrLuminance( sample ), g_fMinLuminace );

@@ -23,6 +23,8 @@
 /// The vertex shader used in the generation and caching of the
 /// base terrain texture.
 
+#include "../shaderModel.hlsl"
+
 struct VertData
 {
    float3 position : POSITION;
@@ -31,17 +33,18 @@ struct VertData
 
 struct ConnectData
 {
-   float4 hpos : POSITION;
+   float4 hpos : TORQUE_POSITION;
    float2 layerCoord : TEXCOORD0;
    float2 texCoord : TEXCOORD1;
 };
 
-ConnectData main( VertData IN,
-                  uniform float2 texScale : register(C0) )
+uniform float2 texScale;
+
+ConnectData main( VertData IN )
 {
    ConnectData OUT;
 
-   OUT.hpos = float4( IN.position.xyz, 1 );
+   OUT.hpos = float4( IN.position, 1 );
    OUT.layerCoord = IN.texCoord;
    OUT.texCoord = IN.texCoord * texScale;
 

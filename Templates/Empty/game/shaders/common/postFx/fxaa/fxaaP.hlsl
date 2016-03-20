@@ -20,38 +20,53 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "../../shaderModel.hlsl"
+
 #define FXAA_PC 1
+#if (TORQUE_SM <= 30)
 #define FXAA_HLSL_3 1
+#elif TORQUE_SM < 49
+#define FXAA_HLSL_4 1
+#elif TORQUE_SM >=50
+#define FXAA_HLSL_5 1
+#endif
 #define FXAA_QUALITY__PRESET 12
 #define FXAA_GREEN_AS_LUMA 1
 
 #include "Fxaa3_11.h"
-#include "../postFx.hlsl"
 
 struct VertToPix
 {
-   float4 hpos       : POSITION;
+   float4 hpos       : TORQUE_POSITION;
    float2 uv0        : TEXCOORD0;
 };
 
-uniform sampler2D colorTex : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(colorTex, 0);
 
 uniform float2 oneOverTargetSize;
 
 
-float4 main( VertToPix IN ) : COLOR
+float4 main( VertToPix IN ) : TORQUE_TARGET0
 {
+#if (TORQUE_SM >= 10 && TORQUE_SM <=30)
+   FxaaTex tex = colorTex;
+#elif TORQUE_SM >=40
+   FxaaTex tex;
+   tex.smpl = colorTex;
+   tex.tex = texture_colorTex;
+#endif
+   
    return FxaaPixelShader(
 
     IN.uv0, // vertex position
 
     0, // Unused... console stuff
 
-    colorTex, // The color back buffer
+    tex, // The color back buffer
 
-    colorTex, // Used for 360 optimization
+    tex, // Used for 360 optimization
 
-    colorTex, // Used for 360 optimization
+    tex, // Used for 360 optimization
 
     oneOverTargetSize,
 
