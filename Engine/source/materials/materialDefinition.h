@@ -295,7 +295,6 @@ public:
    bool mDynamicCubemap;
 
    // Deferred Shading
-   bool mIsSky;
    F32 mMatInfoFlags[MAX_STAGES];
    bool mTranslucent;   
    BlendOp mTranslucentBlendOp;
