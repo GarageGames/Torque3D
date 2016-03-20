@@ -62,7 +62,6 @@ void DeferredSpecMapGLSL::processPix( Vector<ShaderComponent*> &componentList, c
    specularMap->uniform = true;
    specularMap->sampler = true;
    specularMap->constNum = Var::getTexUnitNum();
-   LangElement *texOp = new GenOp( "tex2D(@, @)", specularMap, texCoord );
    //matinfo.g slot reserved for AO later
    meta->addStatement(new GenOp("   @.g = 1.0;\r\n", material));
    meta->addStatement(new GenOp("   @.b = dot(tex2D(@, @).rgb, vec3(0.3, 0.59, 0.11));\r\n", material, specularMap, texCoord));

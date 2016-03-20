@@ -114,7 +114,7 @@ class GuiEditCtrl : public GuiControl
       SimSet*              mSelectedSet;
 
       // grid drawing
-      GFXVertexBufferHandle<GFXVertexPC> mDots;
+      GFXVertexBufferHandle<GFXVertexPCT> mDots;
       GFXStateBlockRef mDotSB;
 
       mouseModes           mMouseDownMode;

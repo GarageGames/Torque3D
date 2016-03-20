@@ -1303,7 +1303,7 @@ void WorldEditor::renderObjectFace(SceneObject * obj, const VectorF & normal, co
 
    PrimBuild::color( col );
 
-   PrimBuild::begin( GFXTriangleFan, 4 );
+   PrimBuild::begin( GFXTriangleStrip, 4 );
       for(U32 k = 0; k < 4; k++)
       {
          PrimBuild::vertex3f(projPnts[k].x, projPnts[k].y, projPnts[k].z);
@@ -1503,7 +1503,7 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
    if(vCount > 4000)
       batchSize = 4000;
 
-   GFXVertexBufferHandle<GFXVertexPC> vb;
+   GFXVertexBufferHandle<GFXVertexPCT> vb;
    vb.set(GFX, 3*batchSize, GFXBufferTypeVolatile);
    void *lockPtr = vb.lock();
    if(!lockPtr) return;

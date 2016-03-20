@@ -317,8 +317,7 @@ void VolumetricFog::handleResize(VolumetricFogRTManager *RTM, bool resize)
    {
       F32 width = (F32)mPlatformWindow->getClientExtent().x;
       F32 height = (F32)mPlatformWindow->getClientExtent().y;
-      if (!mPlatformWindow->isFullscreen())
-         height -= 20;//subtract caption bar from rendertarget size.
+
       mTexScale.x = 2.0f - ((F32)mTexture.getWidth() / width);
       mTexScale.y = 2.0f - ((F32)mTexture.getHeight() / height);
    }
@@ -1075,7 +1074,6 @@ void VolumetricFog::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMa
 
    mPPShaderConsts->setSafe(mPPModelViewProjSC, xform);
 
-   LightInfo *lightinfo = LIGHTMGR->getSpecialLight(LightManager::slSunLightType);
    const ColorF &sunlight = state->getAmbientLightColor();
 
    Point3F ambientColor(sunlight.red, sunlight.green, sunlight.blue);
@@ -1160,6 +1158,11 @@ void VolumetricFog::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMa
       GFX->setStateBlock(mStateblockF);
 
    GFX->drawPrimitive(0);
+
+   // Ensure these two textures are bound to the pixel shader input on the second run as they are used as pixel shader outputs (render targets).
+   GFX->setTexture(1, NULL); //mDepthBuffer
+   GFX->setTexture(2, NULL); //mFrontBuffer
+   GFX->updateStates(); //update the dirty texture state we set above
 }
 
 void VolumetricFog::reflect_render(ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat)
@@ -1209,9 +1212,6 @@ void VolumetricFog::InitTexture()
 
       F32 width = (F32)mPlatformWindow->getClientExtent().x;
       F32 height = (F32)mPlatformWindow->getClientExtent().y;
-
-      if (!mPlatformWindow->isFullscreen())
-         height -= 20;//subtract caption bar from rendertarget size.
 
       mTexScale.x = 2.0f - ((F32)mTexture.getWidth() / width);
       mTexScale.y = 2.0f - ((F32)mTexture.getHeight() / height);

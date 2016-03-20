@@ -209,7 +209,7 @@ bool ProcessedShaderMaterial::init( const FeatureSet &features,
    if ( mFeatures.hasFeature( MFT_UseInstancing ) )
    {
       mInstancingState = new InstancingState();
-      mInstancingState->setFormat( &_getRPD( 0 )->shader->mInstancingFormat, mVertexFormat );
+      mInstancingState->setFormat( _getRPD( 0 )->shader->getInstancingFormat(), mVertexFormat );
    }
    return true;
 }

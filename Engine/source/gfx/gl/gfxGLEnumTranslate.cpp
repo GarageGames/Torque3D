@@ -53,7 +53,6 @@ void GFXGLEnumTranslate::init()
    GFXGLPrimType[GFXLineStrip] = GL_LINE_STRIP;
    GFXGLPrimType[GFXTriangleList] = GL_TRIANGLES;
    GFXGLPrimType[GFXTriangleStrip] = GL_TRIANGLE_STRIP;
-   GFXGLPrimType[GFXTriangleFan] = GL_TRIANGLE_FAN;
 
    // Blend
    GFXGLBlend[GFXBlendZero] = GL_ZERO;

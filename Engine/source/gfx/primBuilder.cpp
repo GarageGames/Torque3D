@@ -117,7 +117,6 @@ GFXVertexBuffer * endToBuffer( U32 &numPrims )
       }
 
       case GFXTriangleStrip:
-      case GFXTriangleFan:
       {
          numPrims = mCurVertIndex - 2;
          break;
@@ -171,7 +170,6 @@ void end( bool useGenericShaders )
       }
 
       case GFXTriangleStrip:
-      case GFXTriangleFan:
       {
          stripStart = 2;
          vertStride = 1;

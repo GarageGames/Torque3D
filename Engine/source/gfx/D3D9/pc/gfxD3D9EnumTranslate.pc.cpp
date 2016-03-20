@@ -302,7 +302,6 @@ void GFXD3D9EnumTranslate::init()
    GFXD3D9PrimType[GFXLineStrip] = D3DPT_LINESTRIP;
    GFXD3D9PrimType[GFXTriangleList] = D3DPT_TRIANGLELIST;
    GFXD3D9PrimType[GFXTriangleStrip] = D3DPT_TRIANGLESTRIP;
-   GFXD3D9PrimType[GFXTriangleFan] = D3DPT_TRIANGLEFAN;
    VALIDATE_LOOKUPTABLE( GFXD3D9PrimType, GFXPT );
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

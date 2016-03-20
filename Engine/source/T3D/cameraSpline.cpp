@@ -188,7 +188,7 @@ void CameraSpline::renderTimeMap()
    gBuilding = true;
 
    // Build vertex buffer
-   GFXVertexBufferHandle<GFXVertexPC> vb;
+   GFXVertexBufferHandle<GFXVertexPCT> vb;
    vb.set(GFX, mTimeMap.size(), GFXBufferTypeVolatile);
    void *ptr = vb.lock();
    if(!ptr) return;
