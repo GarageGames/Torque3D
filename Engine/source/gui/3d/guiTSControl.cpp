@@ -719,7 +719,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 			GFXStateBlockDesc bitmapStretchSR;
 			bitmapStretchSR.setCullMode(GFXCullNone);
 			bitmapStretchSR.setZReadWrite(false, false);
-			bitmapStretchSR.setBlend(true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
+			bitmapStretchSR.setBlend(false, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
 			bitmapStretchSR.samplersDefined = true;
 
 			bitmapStretchSR.samplers[0] = GFXSamplerStateDesc::getClampLinear();

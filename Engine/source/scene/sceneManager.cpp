@@ -259,7 +259,7 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       renderStateLeft.setSceneRenderStyle(SRS_SideBySide);
       renderStateLeft.setSceneRenderField(0);
 
-      renderSceneNoLights( &renderStateLeft, objectMask, baseObject, baseZone );
+      renderSceneNoLights( &renderStateLeft, objectMask, baseObject, baseZone ); // left
 
       // Indicate that we've just finished a field
       //GFX->clear(GFXClearTarget | GFXClearZBuffer | GFXClearStencil, ColorI(255,0,0), 1.0f, 0);
@@ -279,7 +279,7 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       renderStateRight.setSceneRenderStyle(SRS_SideBySide);
       renderStateRight.setSceneRenderField(1);
 
-      renderSceneNoLights( &renderStateRight, objectMask, baseObject, baseZone );
+      renderSceneNoLights( &renderStateRight, objectMask, baseObject, baseZone ); // right
 
       // Indicate that we've just finished a field
       //GFX->clear(GFXClearTarget | GFXClearZBuffer | GFXClearStencil, ColorI(0,255,0), 1.0f, 0);
