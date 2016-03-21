@@ -78,7 +78,6 @@ void RenderGlowMgr::GlowMaterialHook::_overrideFeatures( ProcessedMaterial *mat,
    // Don't allow fog or HDR encoding on 
    // the glow materials.
    fd.features.removeFeature( MFT_Fog );
-   fd.features.removeFeature( MFT_HDROut );
    fd.features.addFeature( MFT_Imposter );
 }
 
