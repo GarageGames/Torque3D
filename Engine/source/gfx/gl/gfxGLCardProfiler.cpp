@@ -50,16 +50,6 @@ void GFXGLCardProfiler::init()
    mVideoMemory = static_cast<GFXGLDevice*>(GFX)->getTotalVideoMemory();
 
    Parent::init();
-   
-   // Set new enums here so if our profile script forces this to be false we keep the GL_ZEROs.
-   if(queryProfile("GL::suppFloatTexture"))
-   {
-      GFXGLTextureInternalFormat[GFXFormatR16G16F] = GL_RGBA_FLOAT16_ATI;
-      GFXGLTextureFormat[GFXFormatR16G16F] = GL_RGBA;
-      GFXGLTextureInternalFormat[GFXFormatR16G16B16A16F] = GL_RGBA_FLOAT16_ATI;
-      GFXGLTextureInternalFormat[GFXFormatR32G32B32A32F] = GL_RGBA_FLOAT32_ATI;
-      GFXGLTextureInternalFormat[GFXFormatR32F] = GL_RGBA_FLOAT32_ATI;
-   }
 }
 
 void GFXGLCardProfiler::setupCardCapabilities()
