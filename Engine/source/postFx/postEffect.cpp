@@ -154,7 +154,6 @@ GFX_ImplementTextureProfile( VRTextureProfile,
 GFX_ImplementTextureProfile( VRDepthProfile,
                             GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::PreserveSize |
-                            GFXTextureProfile::RenderTarget |
                             GFXTextureProfile::NoMipmap |
                             GFXTextureProfile::ZTarget,
                             GFXTextureProfile::NONE );

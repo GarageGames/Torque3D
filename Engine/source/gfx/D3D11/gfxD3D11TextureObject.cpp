@@ -67,6 +67,12 @@ GFXLockedRect *GFXD3D11TextureObject::lock(U32 mipLevel /*= 0*/, RectI *inRect /
 
    D3D11_MAPPED_SUBRESOURCE mapInfo;
 
+	/*if (!mProfile->canModify())
+	{
+		AssertFatal(false, "Tried to modify external texture");
+		return NULL;
+	}*/
+
    if( mProfile->isRenderTarget() )
    {
       //AssertFatal( 0, "GFXD3D11TextureObject::lock - Need to handle mapping render targets" );

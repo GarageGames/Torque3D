@@ -37,6 +37,7 @@
 #include "gfx/gfxTransformSaver.h"
 #include "gfx/gfxDrawUtil.h"
 #include "gfx/gfxDebugEvent.h"
+#include "core/stream/fileStream.h"
 
 GFXTextureObject *gLastStereoTexture = NULL;
 
@@ -569,7 +570,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    DebugDrawer::get()->render();
 
    // Render the canvas overlay if its available
-   if (mRenderStyle == RenderStyleStereoSideBySide && mStereoGuiTarget.getPointer())
+   if (false && mRenderStyle == RenderStyleStereoSideBySide && mStereoGuiTarget.getPointer())
    {
       GFXDEBUGEVENT_SCOPE( StereoGui_Render, ColorI( 255, 0, 0 ) );
       MatrixF proj(1);
@@ -638,7 +639,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
             GFXStateBlockDesc bitmapStretchSR;
             bitmapStretchSR.setCullMode(GFXCullNone);
             bitmapStretchSR.setZReadWrite(false, false);
-            bitmapStretchSR.setBlend(true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
+				bitmapStretchSR.setBlend(false , GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
             bitmapStretchSR.samplersDefined = true;
 
             bitmapStretchSR.samplers[0] = GFXSamplerStateDesc::getClampLinear();
@@ -666,11 +667,78 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    GFX->setCurrentRenderStyle(prevRenderStyle);
    GFX->setCurrentProjectionOffset(prevProjectionOffset);
 
+	GFX->updateStates(true);
    
    if(mRenderStyle == RenderStyleStereoSideBySide && gLastStereoTexture)
    {
+		GFX->setWorldMatrix(MatrixF(1));
+		GFX->setViewMatrix(MatrixF::Identity);
       GFX->setClipRect(updateRect);
-      GFX->getDrawUtil()->drawBitmapStretch(gLastStereoTexture, updateRect);
+
+		GFX->getDrawUtil()->drawRectFill(RectI(Point2I(0,0), Point2I(1024, 768)), ColorI::BLACK);
+		GFX->getDrawUtil()->drawRect(RectI(Point2I(0, 0), Point2I(1024, 768)), ColorI::RED);
+
+		if (!mStereoOverlayVB.getPointer())
+		{
+			mStereoOverlayVB.set(GFX, 4, GFXBufferTypeStatic);
+			GFXVertexPCT *verts = mStereoOverlayVB.lock(0, 4);
+
+			F32 texLeft = 0.0f;
+			F32 texRight = 1.0f;
+			F32 texTop = 1.0f;
+			F32 texBottom = 0.0f;
+
+			F32 rectWidth = 1024.0;
+			F32 rectHeight = 768.0;
+
+			F32 screenLeft = 0;
+			F32 screenRight = rectWidth;
+			F32 screenTop = 0;
+			F32 screenBottom = rectHeight;
+
+			const F32 fillConv = 0.0f;
+			const F32 frustumDepthAdjusted = 0.0f;
+			verts[0].point.set(screenLeft - fillConv, screenTop - fillConv, 0.f);
+			verts[1].point.set(screenRight - fillConv, screenTop - fillConv, 0.f);
+			verts[2].point.set(screenLeft - fillConv, screenBottom - fillConv, 0.f);
+			verts[3].point.set(screenRight - fillConv, screenBottom - fillConv, 0.f);
+
+			verts[0].color = verts[1].color = verts[2].color = verts[3].color = ColorI(255,255,255,255);
+
+			verts[0].texCoord.set(texLeft, texTop);
+			verts[1].texCoord.set(texRight, texTop);
+			verts[2].texCoord.set(texLeft, texBottom);
+			verts[3].texCoord.set(texRight, texBottom);
+
+			mStereoOverlayVB.unlock();
+		}
+
+		if (!mStereoGuiSB.getPointer())
+		{
+			// DrawBitmapStretchSR
+			GFXStateBlockDesc bitmapStretchSR;
+			bitmapStretchSR.setCullMode(GFXCullNone);
+			bitmapStretchSR.setZReadWrite(false, false);
+			bitmapStretchSR.setBlend(true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
+			bitmapStretchSR.samplersDefined = true;
+
+			bitmapStretchSR.samplers[0] = GFXSamplerStateDesc::getClampLinear();
+			bitmapStretchSR.samplers[0].minFilter = GFXTextureFilterPoint;
+			bitmapStretchSR.samplers[0].mipFilter = GFXTextureFilterPoint;
+			bitmapStretchSR.samplers[0].magFilter = GFXTextureFilterPoint;
+
+			mStereoGuiSB = GFX->createStateBlock(bitmapStretchSR);
+		}
+		//static GFXTexHandle texHandle("art/gui/splash", &GFXDefaultPersistentProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__));
+		GFX->setVertexBuffer(mStereoOverlayVB);
+		GFX->setStateBlock(mStereoGuiSB);
+		GFX->setTexture(0, gLastStereoTexture);// texHandle);// gLastStereoTexture);
+		GFX->setupGenericShaders(GFXDevice::GSModColorTexture);
+		GFX->drawPrimitive(GFXTriangleStrip, 0, 2);
+		
+		
+		
+		//GFX->getDrawUtil()->drawBitmapStretch(gLastStereoTexture, updateRect);
    }
 
    // Allow subclasses to render 2D elements.
