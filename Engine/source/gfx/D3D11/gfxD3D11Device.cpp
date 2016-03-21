@@ -128,6 +128,9 @@ void GFXD3D11Device::enumerateAdapters(Vector<GFXAdapter*> &adapterList)
 		DXGI_ADAPTER_DESC1 desc;
 		EnumAdapter->GetDesc1(&desc);
 
+		// LUID identifies adapter for oculus rift
+		dMemcpy(&toAdd->mLUID, &desc.AdapterLuid, sizeof(toAdd->mLUID));
+
 		size_t size=wcslen(desc.Description);
 		char *str = new char[size+1];
 

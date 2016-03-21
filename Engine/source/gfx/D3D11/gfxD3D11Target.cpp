@@ -163,6 +163,13 @@ void GFXD3D11TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *te
             mTargetSize = Point2I(sd.Width, sd.Height);
 
             S32 format = sd.Format;
+
+				if (format == DXGI_FORMAT_R8G8B8A8_TYPELESS || format == DXGI_FORMAT_B8G8R8A8_TYPELESS)
+				{
+					mTargetFormat = GFXFormatR8G8B8A8;
+					return;
+				}
+
             GFXREVERSE_LOOKUP( GFXD3D11TextureFormat, GFXFormat, format );
             mTargetFormat = (GFXFormat)format;
          }
