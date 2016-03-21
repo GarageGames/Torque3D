@@ -153,11 +153,14 @@ bool RenderPrePassMgr::_updateTargets()
    }
 
    GFXFormat colorFormat = mTargetFormat;
+
+   /*
    bool independentMrtBitDepth = GFX->getCardProfiler()->queryProfile("independentMrtBitDepth", false);
    //If independent bit depth on a MRT is supported than just use 8bit channels for the albedo color.
    if(independentMrtBitDepth)
       colorFormat = GFXFormatR8G8B8A8;
-   
+   */
+
    // andrewmac: Deferred Shading Color Buffer
    if (mColorTex.getFormat() != colorFormat || mColorTex.getWidthHeight() != mTargetSize || GFX->recentlyReset())
    {
