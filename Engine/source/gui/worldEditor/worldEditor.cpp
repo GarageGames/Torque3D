@@ -1303,7 +1303,7 @@ void WorldEditor::renderObjectFace(SceneObject * obj, const VectorF & normal, co
 
    PrimBuild::color( col );
 
-   PrimBuild::begin( GFXTriangleFan, 4 );
+   PrimBuild::begin( GFXTriangleStrip, 4 );
       for(U32 k = 0; k < 4; k++)
       {
          PrimBuild::vertex3f(projPnts[k].x, projPnts[k].y, projPnts[k].z);
@@ -1492,7 +1492,7 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
    F32 tmpT = t;
    while (tmpT < size - 1)
    {
-      tmpT = spline.advanceDist(tmpT, 4.0f);
+      tmpT = spline.advanceDist(tmpT, 1.0f);
       vCount++;
    }
 
@@ -1514,7 +1514,7 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
    {
       CameraSpline::Knot k;
       spline.value(t, &k);
-      t = spline.advanceDist(t, 4.0f);
+      t = spline.advanceDist(t, 1.0f);
 
       k.mRotation.mulP(a, &vb[vIdx+0].point);
       k.mRotation.mulP(b, &vb[vIdx+1].point);
@@ -1524,9 +1524,9 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
       vb[vIdx+1].point += k.mPosition;
       vb[vIdx+2].point += k.mPosition;
 
-      vb[vIdx+0].color.set(0, 255, 0, 100);
-      vb[vIdx+1].color.set(0, 255, 0, 100);
-      vb[vIdx+2].color.set(0, 255, 0, 100);
+      vb[vIdx+0].color.set(0, 255, 0, 0);
+      vb[vIdx+1].color.set(0, 255, 0, 255);
+      vb[vIdx+2].color.set(0, 255, 0, 0);
 
       // vb[vIdx+3] = vb[vIdx+1];
 
