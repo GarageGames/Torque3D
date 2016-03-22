@@ -341,7 +341,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
        fd.features.addFeature( MFT_CubeMap );
    }
 
-   if (mMaterial->mIsSky)
+   if (features.hasFeature(MFT_SkyBox))
    {
       fd.features.addFeature(MFT_CubeMap);
       fd.features.addFeature(MFT_SkyBox);
