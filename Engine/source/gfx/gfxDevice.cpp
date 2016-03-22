@@ -1329,3 +1329,8 @@ DefineEngineFunction( getBestHDRFormat, GFXFormat, (),,
 
    return format;
 }
+
+DefineConsoleFunction(ResetGFX, void, (), , "forces the gbuffer to be reinitialized in cases of improper/lack of buffer clears.")
+{
+   GFX->beginReset();
+}
