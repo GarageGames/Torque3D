@@ -81,7 +81,7 @@ struct D3D11OculusTexture : public OculusTexture
 		dsDesc.Height = sizeH;
 		dsDesc.MipLevels = 1;
 		dsDesc.ArraySize = 1;
-		dsDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		dsDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;// DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 		dsDesc.SampleDesc.Count = 1;   // No multi-sampling allowed
 		dsDesc.SampleDesc.Quality = 0;
 		dsDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -101,7 +101,7 @@ struct D3D11OculusTexture : public OculusTexture
 		{
 			ovrD3D11Texture* tex = (ovrD3D11Texture*)&TextureSet->Textures[i];
 			D3D11_RENDER_TARGET_VIEW_DESC rtvd = {};
-			rtvd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			rtvd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;// DXGI_FORMAT_R8G8B8A8_UNORM;
 			rtvd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
 			GFXD3D11TextureObject* object = new GFXD3D11TextureObject(GFX, &VRTextureProfile);
@@ -125,7 +125,7 @@ struct D3D11OculusTexture : public OculusTexture
 			object->mBitmapSize = object->mTextureSize;
 			int fmt = probeDesc.Format;
 
-			if (fmt == DXGI_FORMAT_R8G8B8A8_TYPELESS)
+			if (fmt == DXGI_FORMAT_R8G8B8A8_TYPELESS || fmt == DXGI_FORMAT_B8G8R8A8_TYPELESS)
 			{
 				object->mFormat = GFXFormatR8G8B8A8; // usual case
 			}
@@ -391,7 +391,7 @@ bool OculusVRHMDDevice::setupTargets()
 		dsDesc.Height = rtSize.y;
 		dsDesc.MipLevels = 1;
 		dsDesc.ArraySize = 1;
-		dsDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		dsDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;// DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 		dsDesc.SampleDesc.Count = 1;
 		dsDesc.SampleDesc.Quality = 0;
 		dsDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -416,7 +416,7 @@ bool OculusVRHMDDevice::setupTargets()
 		// Create texture handle so we can render it in-game
 		ovrD3D11Texture* mirror_tex = (ovrD3D11Texture*)mDebugMirrorTexture;
 		D3D11_RENDER_TARGET_VIEW_DESC rtvd = {};
-		rtvd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		rtvd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;// DXGI_FORMAT_R8G8B8A8_UNORM;
 		rtvd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 
 		GFXD3D11TextureObject* object = new GFXD3D11TextureObject(GFX, &VRTextureProfile);
@@ -441,7 +441,7 @@ bool OculusVRHMDDevice::setupTargets()
 		object->mBitmapSize = object->mTextureSize;
 		int fmt = probeDesc.Format;
 
-		if (fmt == DXGI_FORMAT_R8G8B8A8_TYPELESS)
+		if (fmt == DXGI_FORMAT_R8G8B8A8_TYPELESS || fmt == DXGI_FORMAT_B8G8R8A8_TYPELESS)
 		{
 			object->mFormat = GFXFormatR8G8B8A8; // usual case
 		}
@@ -652,7 +652,7 @@ void OculusVRHMDDevice::onEndFrame()
 	mDebugRenderLayer.Viewport[1] = mRenderLayer.Viewport[1];
 
 	// TODO: use ovrViewScaleDesc
-   ovrLayerHeader* layers = &mRenderLayer.Header;
+	ovrLayerHeader* layers = &mRenderLayer.Header;
 	ovrResult result = ovr_SubmitFrame(mDevice, 0, &viewScaleDesc, &layers, 1);
 	mTextureSwapSet->AdvanceToNextTexture();
 
