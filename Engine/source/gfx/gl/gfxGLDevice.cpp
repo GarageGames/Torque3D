@@ -81,8 +81,8 @@ void loadGLExtensions(void *context)
    GL::gglPerformExtensionBinds(context);
 }
 
-void STDCALL glDebugCallback(GLenum source, GLenum type, GLuint id,
-    GLenum severity, GLsizei length, const GLchar* message, void* userParam)
+void STDCALL glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, 
+	const GLchar *message, const void *userParam)
 {
     if (severity == GL_DEBUG_SEVERITY_HIGH)
         Con::errorf("OPENGL: %s", message);

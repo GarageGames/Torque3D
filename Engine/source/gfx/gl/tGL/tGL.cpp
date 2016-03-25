@@ -25,13 +25,19 @@
 #include "core/strings/stringFunctions.h"
 #include "console/console.h"
 
+#ifdef TORQUE_OS_WIN
+   #include "tWGL.h"
+#endif
+
 namespace GL
 {
    void gglPerformBinds()
    {
-      glewExperimental = GL_TRUE;
-      GLenum err = glewInit();
-      AssertFatal(GLEW_OK == err, avar("Error: %s\n", glewGetErrorString(err)) );
+      // JTH: epoxy has one oddity with windows. You need to bind the context
+      // after creating the context to udpate the internals of epoxy.
+#ifdef TORQUE_OS_WIN
+      epoxy_handle_external_wglMakeCurrent();
+#endif
    }
 
    void gglPerformExtensionBinds(void *context)

@@ -272,7 +272,7 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    int debugFlag = 0;
 #endif
 
-   if( gglHasWExtension(ARB_create_context) )
+   if( gglHasWExtension(hdcGL, ARB_create_context) )
    {
       int const create_attribs[] = {
                WGL_CONTEXT_MAJOR_VERSION_ARB, OGL_MAJOR,
