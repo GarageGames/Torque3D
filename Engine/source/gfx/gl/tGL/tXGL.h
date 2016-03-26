@@ -30,8 +30,7 @@
 #include "tGL.h"
 #include <epoxy/glx.h>
 
-// TODO glx
-#define gglHasXExtension(EXTENSION) 
+#define gglHasXExtension(display, screen, EXTENSION) epoxy_has_glx_extension(display, screen, "GLX_" # EXTENSION)
 
 #endif //TORQUE_OS_LINUX
 
