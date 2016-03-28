@@ -205,6 +205,9 @@ enum GFXFormat
    GFXFormatDXT4,
    GFXFormatDXT5,
 
+   // sRGB formats
+   GFXFormatR8G8B8A8_SRGB,
+
    GFXFormat_COUNT,
 
    GFXFormat_8BIT = GFXFormatA8,

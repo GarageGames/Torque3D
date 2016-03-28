@@ -72,6 +72,7 @@ void GFXD3D11EnumTranslate::init()
    GFXD3D11TextureFormat[GFXFormatD24S8] = DXGI_FORMAT_D24_UNORM_S8_UINT;
    GFXD3D11TextureFormat[GFXFormatD24FS8] = DXGI_FORMAT_UNKNOWN;
    GFXD3D11TextureFormat[GFXFormatD16] = DXGI_FORMAT_D16_UNORM;
+   GFXD3D11TextureFormat[GFXFormatR8G8B8A8_SRGB] = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
    GFXD3D11TextureFilter[GFXTextureFilterNone] = D3D11_FILTER_MIN_MAG_MIP_POINT;
