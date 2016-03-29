@@ -28,7 +28,7 @@
 struct IWbemLocator;
 struct IWbemServices;
 
-struct IDXGIFactory;
+struct IDXGIFactory1;
 struct IDxDiagProvider;
 
 class WMIVideoInfo : public PlatformVideoInfo
@@ -39,7 +39,7 @@ private:
    bool mComInitialized;
 
    void*             mDXGIModule;
-   IDXGIFactory*     mDXGIFactory;
+   IDXGIFactory1*     mDXGIFactory;
    IDxDiagProvider*  mDxDiagProvider;
 
    bool _initializeDXGI();
@@ -54,6 +54,7 @@ protected:
    static WCHAR *smPVIQueryTypeToWMIString [];
    bool _queryProperty( const PVIQueryType queryType, const U32 adapterId, String *outValue );
    bool _initialize();
+   String _lookUpVendorId(U32 vendorId);
 
 public:
    WMIVideoInfo();

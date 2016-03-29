@@ -167,6 +167,8 @@ protected:
          mInstFormat = instFormat;
          mDeclFormat.copy( *vertexFormat );
          mDeclFormat.append( *mInstFormat, 1 );
+         // Let the declaration know we have instancing.
+         mDeclFormat.enableInstancing();
          mDeclFormat.getDecl();
 
          delete [] mBuffer;

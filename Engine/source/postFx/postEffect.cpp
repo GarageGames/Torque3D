@@ -510,23 +510,23 @@ void PostEffect::_updateScreenGeometry(   const Frustum &frustum,
 
    PFXVertex *vert = outVB->lock();
 
-   vert->point.set( -1.0, -1.0, 0.0 );
-   vert->texCoord.set( 0.0f, 1.0f );
-   vert->wsEyeRay = frustumPoints[Frustum::FarBottomLeft] - cameraOffsetPos;
-   vert++;
-
-   vert->point.set( -1.0, 1.0, 0.0 );
-   vert->texCoord.set( 0.0f, 0.0f );
+   vert->point.set(-1.0, 1.0, 0.0);
+   vert->texCoord.set(0.0f, 0.0f);
    vert->wsEyeRay = frustumPoints[Frustum::FarTopLeft] - cameraOffsetPos;
    vert++;
 
-   vert->point.set( 1.0, 1.0, 0.0 );
-   vert->texCoord.set( 1.0f, 0.0f );
+   vert->point.set(1.0, 1.0, 0.0);
+   vert->texCoord.set(1.0f, 0.0f);
    vert->wsEyeRay = frustumPoints[Frustum::FarTopRight] - cameraOffsetPos;
    vert++;
 
-   vert->point.set( 1.0, -1.0, 0.0 );
-   vert->texCoord.set( 1.0f, 1.0f );
+   vert->point.set(-1.0, -1.0, 0.0);
+   vert->texCoord.set(0.0f, 1.0f);
+   vert->wsEyeRay = frustumPoints[Frustum::FarBottomLeft] - cameraOffsetPos;
+   vert++;
+
+   vert->point.set(1.0, -1.0, 0.0);
+   vert->texCoord.set(1.0f, 1.0f);
    vert->wsEyeRay = frustumPoints[Frustum::FarBottomRight] - cameraOffsetPos;
    vert++;
 
@@ -1275,7 +1275,7 @@ void PostEffect::process(  const SceneRenderState *state,
 
    // Draw it.
    GFX->setVertexBuffer( vb );
-   GFX->drawPrimitive( GFXTriangleFan, 0, 2 );
+   GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
 
    // Allow PostEffecVis to hook in.
    PFXVIS->onPFXProcessed( this );

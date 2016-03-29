@@ -826,6 +826,7 @@ GFXVertexBuffer * GFXD3D9Device::allocVertexBuffer(   U32 numVerts,
 
    switch(bufferType)
    {
+   case GFXBufferTypeImmutable:
    case GFXBufferTypeStatic:
       pool = isD3D9Ex() ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
       break;

@@ -21,25 +21,28 @@
 //-----------------------------------------------------------------------------
 
 #include "terrain.hlsl"
+#include "../shaderModel.hlsl"
 
 struct ConnectData
 {
-   float4 hpos : POSITION;
+   float4 hpos : TORQUE_POSITION;
    float2 layerCoord : TEXCOORD0;
    float2 texCoord : TEXCOORD1;
 };
 
-float4 main(   ConnectData IN,
-               uniform sampler2D layerTex : register(S0),
-               uniform sampler2D textureMap : register(S1),
-               uniform float texId,
-               uniform float layerSize ) : COLOR
+TORQUE_UNIFORM_SAMPLER2D(layerTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(textureMap, 1);
+
+uniform float texId;
+uniform float layerSize;
+
+float4 main( ConnectData IN ) : TORQUE_TARGET0
 {
-   float4 layerSample = round( tex2D( layerTex, IN.layerCoord ) * 255.0f );
+   float4 layerSample = round( TORQUE_TEX2D( layerTex, IN.layerCoord ) * 255.0f );
 
    float blend = calcBlend( texId, IN.layerCoord, layerSize, layerSample );
 
    clip( blend - 0.0001 );
 
-   return float4( tex2D( textureMap, IN.texCoord ).rgb, blend );
+   return float4( TORQUE_TEX2D(textureMap, IN.texCoord).rgb, blend);
 }

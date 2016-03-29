@@ -25,14 +25,14 @@
 
 struct Vert
 {
-   float4 pos        : POSITION;
+   float3 pos        : POSITION;
    float2 tc         : TEXCOORD0;
    float3 wsEyeRay   : TEXCOORD1;
 };
 
 struct Pixel
 {  
-   float4 position : POSITION;  
+   float4 position : TORQUE_POSITION;  
    float2 tcColor0 : TEXCOORD0;  
    float2 tcColor1 : TEXCOORD1;  
    float2 tcDepth0 : TEXCOORD2;  
@@ -47,7 +47,7 @@ uniform float2    oneOverTargetSize;
 Pixel main( Vert IN )  
 {  
    Pixel OUT; 
-   OUT.position = IN.pos;
+   OUT.position = float4(IN.pos,1.0);
    
    float2 uv = viewportCoordToRenderTarget( IN.tc, rtParams0 ); 
    //OUT.position = mul( IN.pos, modelView );  

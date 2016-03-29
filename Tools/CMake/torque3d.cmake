@@ -83,6 +83,10 @@ else()
 	option(TORQUE_DEDICATED "Torque dedicated" OFF)
 endif()
 
+if(WIN32)
+	option(TORQUE_D3D11 "Allow Direct3D 11 render" OFF)
+endif()
+
 ###############################################################################
 # options
 ###############################################################################
@@ -391,8 +395,9 @@ if(WIN32)
     addPath("${srcDir}/platformWin32/videoInfo")
     addPath("${srcDir}/platformWin32/minidump")
     addPath("${srcDir}/windowManager/win32")
-    #addPath("${srcDir}/gfx/D3D8")
-    addPath("${srcDir}/gfx/D3D")
+	if(TORQUE_D3D11)
+		addPath("${srcDir}/gfx/D3D11")
+	endif()
     addPath("${srcDir}/gfx/D3D9")
     addPath("${srcDir}/gfx/D3D9/pc")
     addPath("${srcDir}/shaderGen/HLSL")    

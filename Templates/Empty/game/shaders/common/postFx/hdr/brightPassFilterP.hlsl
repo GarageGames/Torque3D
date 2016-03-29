@@ -21,12 +21,11 @@
 //-----------------------------------------------------------------------------
 
 #include "../postFx.hlsl"
-#include "shadergen:/autogenConditioners.h"
 #include "../../torque.hlsl"
 
 
-uniform sampler2D inputTex : register(S0);
-uniform sampler2D luminanceTex  : register(S1);
+TORQUE_UNIFORM_SAMPLER2D(inputTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(luminanceTex, 1);
 uniform float2 oneOverTargetSize;
 uniform float brightPassThreshold;
 uniform float g_fMiddleGray;
@@ -40,17 +39,17 @@ static float2 gTapOffsets[4] =
    { -0.5, -0.5 }, { 0.5, 0.5 }
 };
 
-float4 main( PFXVertToPix IN ) : COLOR
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
    float4 average = { 0.0f, 0.0f, 0.0f, 0.0f };      
 
    // Combine and average 4 samples from the source HDR texture.
    for( int i = 0; i < 4; i++ )
-      average += hdrDecode( tex2D( inputTex, IN.uv0 + ( gTapOffsets[i] * oneOverTargetSize ) ) );
+      average += hdrDecode( TORQUE_TEX2D( inputTex, IN.uv0 + ( gTapOffsets[i] * oneOverTargetSize ) ) );
    average *= 0.25f;
 
    // Determine the brightness of this particular pixel.   
-   float adaptedLum = tex2D( luminanceTex, float2( 0.5f, 0.5f ) ).r;
+   float adaptedLum = TORQUE_TEX2D( luminanceTex, float2( 0.5f, 0.5f ) ).r;
    float lum = (g_fMiddleGray / (adaptedLum + 0.0001)) * hdrLuminance( average.rgb );
    //float lum = hdrLuminance( average.rgb );
    

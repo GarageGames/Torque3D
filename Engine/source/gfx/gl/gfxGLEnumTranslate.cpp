@@ -53,7 +53,6 @@ void GFXGLEnumTranslate::init()
    GFXGLPrimType[GFXLineStrip] = GL_LINE_STRIP;
    GFXGLPrimType[GFXTriangleList] = GL_TRIANGLES;
    GFXGLPrimType[GFXTriangleStrip] = GL_TRIANGLE_STRIP;
-   GFXGLPrimType[GFXTriangleFan] = GL_TRIANGLE_FAN;
 
    // Blend
    GFXGLBlend[GFXBlendZero] = GL_ZERO;
@@ -190,6 +189,8 @@ void GFXGLEnumTranslate::init()
    GFXGLTextureType[GFXFormatDXT3] = GL_UNSIGNED_BYTE;
    GFXGLTextureType[GFXFormatDXT4] = GL_ZERO;
    GFXGLTextureType[GFXFormatDXT5] = GL_UNSIGNED_BYTE;
+
+   GFXGLTextureType[GFXFormatR8G8B8A8_SRGB] = GL_SRGB8_ALPHA8;
 
    static GLint Swizzle_GFXFormatA8[] = { GL_NONE, GL_NONE, GL_NONE, GL_RED };
    static GLint Swizzle_GFXFormatL[] = { GL_RED, GL_RED, GL_RED, GL_ALPHA };

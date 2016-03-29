@@ -20,18 +20,21 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "shaderModel.hlsl"
+
 struct Conn
 {
-   float2 texCoord : TEXCOORD0;
+   float4 position : TORQUE_POSITION;
    float4 color : COLOR0;
+   float2 texCoord	: TEXCOORD0;
    float fade : TEXCOORD1;
 };
 
-uniform sampler2D inputTex : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(inputTex, 0);
 uniform float4 ambient;
 
-float4 main( Conn IN ) : COLOR0
+float4 main( Conn IN ) : TORQUE_TARGET0
 {
-   float shadow = tex2D( inputTex, IN.texCoord ).a * IN.color.a;           
+   float shadow = TORQUE_TEX2D( inputTex, IN.texCoord ).a * IN.color.a;           
    return ( ambient * shadow ) + ( 1 - shadow );
 }

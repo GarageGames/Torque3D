@@ -153,6 +153,9 @@ public:
    /// The copy constructor.
    GFXVertexFormat( const GFXVertexFormat &format ) { copy( format ); }
 
+   /// Tell this format it has instancing
+   void enableInstancing();
+
    /// Copy the other vertex format.
    void copy( const GFXVertexFormat &format );
 
@@ -163,7 +166,7 @@ public:
    const String& getDescription() const;
 
    /// Clears all the vertex elements.
-   void clear();
+   void clear();   
 
    /// Adds a vertex element to the format.
    ///
@@ -181,6 +184,9 @@ public:
 
    /// Returns true if there is a COLOR semantic in this vertex format.
    bool hasColor() const;
+
+   /// Return true if instancing is used with this vertex format.
+   bool hasInstancing() const;
 
    /// Returns the texture coordinate count by 
    /// counting the number of TEXCOORD semantics.
@@ -224,6 +230,9 @@ protected:
 
    /// Is true if there is a COLOR semantic in this vertex format.
    bool mHasColor;
+
+   /// Is instaning used with this vertex format.
+   bool mHasInstancing;
 
    /// The texture coordinate count by counting the 
    /// number of "TEXCOORD" semantics.

@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "shaderModel.hlsl"
 #include "torque.hlsl"
 
 //-----------------------------------------------------------------------------
@@ -27,7 +28,7 @@
 //-----------------------------------------------------------------------------
 struct ConnectData
 {
-   float4 hpos                : POSITION;   
+   float4 hpos                : TORQUE_POSITION;   
    float4 texCoord12          : TEXCOORD0;
    float4 texCoord34          : TEXCOORD1;   
    float3 vLightTS            : TEXCOORD2;   // light vector in tangent space, denormalized
@@ -38,7 +39,7 @@ struct ConnectData
 //-----------------------------------------------------------------------------
 // Uniforms                                                                        
 //-----------------------------------------------------------------------------
-uniform sampler2D normalHeightMap : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(normalHeightMap, 0);
 uniform float3    ambientColor;
 uniform float3    sunColor;
 uniform float     cloudCoverage;
@@ -99,7 +100,7 @@ float3 ComputeIllumination( float2 texCoord,
    return finalColor;
 }   
 
-float4 main( ConnectData IN ) : COLOR
+float4 main( ConnectData IN ) : TORQUE_TARGET0
 { 
    //  Normalize the interpolated vectors:
    float3 vViewTS   = normalize( IN.vViewTS  );
@@ -109,11 +110,11 @@ float4 main( ConnectData IN ) : COLOR
     
    float2 texSample = IN.texCoord12.xy;
    
-   float4 noise1 = tex2D( normalHeightMap, IN.texCoord12.zw );
+   float4 noise1 = TORQUE_TEX2D( normalHeightMap, IN.texCoord12.zw );
    noise1 = normalize( ( noise1 - 0.5 ) * 2.0 );   
    //return noise1;
    
-   float4 noise2 = tex2D( normalHeightMap, IN.texCoord34.xy );
+   float4 noise2 = TORQUE_TEX2D(normalHeightMap, IN.texCoord34.xy);
    noise2 = normalize( ( noise2 - 0.5 ) * 2.0 );
    //return noise2;
       
@@ -122,7 +123,7 @@ float4 main( ConnectData IN ) : COLOR
    
    float noiseHeight = noise1.a * noise2.a * ( cloudCoverage / 2.0 + 0.5 );         
 
-   float3 vNormalTS = normalize( tex2D( normalHeightMap, texSample ).xyz * 2.0 - 1.0 );   
+   float3 vNormalTS = normalize( TORQUE_TEX2D(normalHeightMap, texSample).xyz * 2.0 - 1.0);
    vNormalTS += noiseNormal;
    vNormalTS = normalize( vNormalTS );   
    
@@ -130,7 +131,7 @@ float4 main( ConnectData IN ) : COLOR
    cResultColor.rgb = ComputeIllumination( texSample, vLightTS, vViewTS, vNormalTS );
       
    float coverage = ( cloudCoverage - 0.5 ) * 2.0;
-   cResultColor.a = tex2D( normalHeightMap, texSample ).a + coverage + noiseHeight;     
+   cResultColor.a = TORQUE_TEX2D(normalHeightMap, texSample).a + coverage + noiseHeight;
    
    if ( cloudCoverage > -1.0 )
       cResultColor.a /= 1.0 + coverage;

@@ -1503,7 +1503,7 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
    if(vCount > 4000)
       batchSize = 4000;
 
-   GFXVertexBufferHandle<GFXVertexPC> vb;
+   GFXVertexBufferHandle<GFXVertexPCT> vb;
    vb.set(GFX, 3*batchSize, GFXBufferTypeVolatile);
    void *lockPtr = vb.lock();
    if(!lockPtr) return;

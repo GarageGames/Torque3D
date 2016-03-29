@@ -21,10 +21,10 @@
 //-----------------------------------------------------------------------------
 
 #include "../postFx.hlsl"
-#include "shadergen:/autogenConditioners.h"
 
-float4 main( PFXVertToPix IN, 
-             uniform sampler2D edgeBuffer :register(S0) ) : COLOR0
+TORQUE_UNIFORM_SAMPLER2D(edgeBuffer);
+
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
-   return float4( tex2D( edgeBuffer, IN.uv0 ).rrr, 1.0 );
+   return float4( TORQUE_TEX2D( edgeBuffer, IN.uv0 ).rrr, 1.0 );
 }

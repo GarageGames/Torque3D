@@ -30,11 +30,11 @@
 
 #define MAX_COVERTYPES 8
 
+uniform float2 gc_fadeParams;
+uniform float2 gc_windDir;
 uniform float3 gc_camRight;
 uniform float3 gc_camUp;
 uniform float4 gc_typeRects[MAX_COVERTYPES];
-uniform float2 gc_fadeParams;               
-uniform float2 gc_windDir;
 
 // .x = gust length
 // .y = premultiplied simulation time and gust frequency

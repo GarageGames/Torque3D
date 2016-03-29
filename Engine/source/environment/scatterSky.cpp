@@ -1067,17 +1067,17 @@ void ScatterSky::_renderMoon( ObjectRenderInst *ri, SceneRenderState *state, Bas
 
    // Initialize points with basic info
    Point3F points[4];
-   points[0] = Point3F(-BBRadius, 0.0, -BBRadius);
+   points[0] = Point3F( -BBRadius, 0.0, -BBRadius);
    points[1] = Point3F( -BBRadius, 0.0, BBRadius);
-   points[2] = Point3F( BBRadius, 0.0,  BBRadius);
-   points[3] = Point3F( BBRadius, 0.0,  -BBRadius);
+   points[2] = Point3F( BBRadius, 0.0, -BBRadius);
+   points[3] = Point3F( BBRadius, 0.0, BBRadius);
 
    static const Point2F sCoords[4] =
    {
       Point2F( 0.0f, 0.0f ),
       Point2F( 0.0f, 1.0f ),
-      Point2F( 1.0f, 1.0f ),
-      Point2F( 1.0f, 0.0f )
+      Point2F( 1.0f, 0.0f ),
+      Point2F( 1.0f, 1.0f )
    };
 
    // Get info we need to adjust points
@@ -1126,7 +1126,7 @@ void ScatterSky::_renderMoon( ObjectRenderInst *ri, SceneRenderState *state, Bas
       mMoonMatInst->setSceneInfo( state, sgData );
 
       GFX->setVertexBuffer( vb );
-      GFX->drawPrimitive( GFXTriangleFan, 0, 2 );
+      GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
    }
 }
 

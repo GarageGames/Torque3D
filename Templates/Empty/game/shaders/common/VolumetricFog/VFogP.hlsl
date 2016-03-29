@@ -21,44 +21,44 @@
 //-----------------------------------------------------------------------------
 
 // Volumetric Fog final pixel shader V2.00
-
-#include "shadergen:/autogenConditioners.h"
+#include "../shaderModel.hlsl"
+#include "../shaderModelAutoGen.hlsl"
 #include "../torque.hlsl"
 
-uniform sampler2D prepassTex : register(S0);
-uniform sampler2D depthBuffer : register(S1);
-uniform sampler2D frontBuffer : register(S2);
-uniform sampler2D density : register(S3);
+TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(depthBuffer, 1);
+TORQUE_UNIFORM_SAMPLER2D(frontBuffer, 2);
+TORQUE_UNIFORM_SAMPLER2D(density, 3);
   
+uniform float3 ambientColor;
 uniform float accumTime;
 uniform float4 fogColor;
+uniform float4 modspeed;//xy speed layer 1, zw speed layer 2
+uniform float2 viewpoint;
+uniform float2 texscale;
 uniform float fogDensity;
 uniform float preBias;
 uniform float textured;
 uniform float modstrength;
-uniform float4 modspeed;//xy speed layer 1, zw speed layer 2
-uniform float2 viewpoint;
-uniform float2 texscale;
-uniform float3 ambientColor;
 uniform float numtiles;
 uniform float fadesize;
 uniform float2 PixelSize;
 
 struct ConnectData
 {
-   float4 hpos : POSITION;
+   float4 hpos : TORQUE_POSITION;
    float4 htpos : TEXCOORD0;
    float2 uv0 : TEXCOORD1;
 };
 
-float4 main( ConnectData IN ) : COLOR0
+float4 main( ConnectData IN ) : TORQUE_TARGET0
 {
 	float2 uvscreen=((IN.htpos.xy/IN.htpos.w) + 1.0 ) / 2.0;
 	uvscreen.y = 1.0 - uvscreen.y;
 	
-	float obj_test = prepassUncondition( prepassTex, uvscreen).w * preBias;
-	float depth = tex2D(depthBuffer,uvscreen).r;
-	float front = tex2D(frontBuffer,uvscreen).r;
+   float obj_test = TORQUE_PREPASS_UNCONDITION(prepassTex, uvscreen).w * preBias;
+   float depth = TORQUE_TEX2D(depthBuffer, uvscreen).r;
+   float front = TORQUE_TEX2D(frontBuffer, uvscreen).r;
 
 	if (depth <= front)
 		return float4(0,0,0,0);
@@ -73,8 +73,8 @@ float4 main( ConnectData IN ) : COLOR0
 	{
 		float2 offset = viewpoint + ((-0.5 + (texscale * uvscreen)) * numtiles);
 
-		float2 mod1 = tex2D(density,(offset + (modspeed.xy*accumTime))).rg;
-		float2 mod2= tex2D(density,(offset + (modspeed.zw*accumTime))).rg;
+      float2 mod1 = TORQUE_TEX2D(density, (offset + (modspeed.xy*accumTime))).rg;
+      float2 mod2 = TORQUE_TEX2D(density, (offset + (modspeed.zw*accumTime))).rg;
 		diff = (mod2.r + mod1.r) * modstrength;
 		col *= (2.0 - ((mod1.g + mod2.g) * fadesize))/2.0;
 	}

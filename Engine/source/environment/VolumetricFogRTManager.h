@@ -62,7 +62,6 @@ class VolumetricFogRTManager : public SceneObject
       U32 mFogHasAnswered;
       U32 mWidth;
       U32 mHeight;
-      bool mFullScreen;
    
       void onRemove();
       void onSceneRemove();

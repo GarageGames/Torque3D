@@ -30,13 +30,13 @@
 
 struct Vert
 {
-   float4 position : POSITION;
+   float3 position : POSITION;
    float2 texCoords : TEXCOORD0;
 };
 
 struct Pixel
 {  
-   float4 position : POSITION;  
+   float4 position : TORQUE_POSITION;  
    float4 texCoords : TEXCOORD0;  
 };  
 
@@ -47,7 +47,7 @@ Pixel main( Vert IN )
 {  
    Pixel OUT;  
    const float4 halfPixel = { -0.5, 0.5, -0.5, 0.5 };     
-   OUT.position = IN.position; //Transform_ObjectToClip( IN.position );  
+   OUT.position = float4(IN.position,1.0); //Transform_ObjectToClip( IN.position );  
    
    //float2 uv = IN.texCoords + rtParams0.xy;
    float2 uv = viewportCoordToRenderTarget( IN.texCoords, rtParams0 );

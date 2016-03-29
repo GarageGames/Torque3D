@@ -273,7 +273,7 @@ DefineEngineMethod( Path, getPathId, S32, (),,
 //--------------------------------------------------------------------------
 
 GFXStateBlockRef Marker::smStateBlock;
-GFXVertexBufferHandle<GFXVertexPC> Marker::smVertexBuffer;
+GFXVertexBufferHandle<GFXVertexPCT> Marker::smVertexBuffer;
 GFXPrimitiveBufferHandle Marker::smPrimitiveBuffer;
 
 static Point3F wedgePoints[4] = {
@@ -295,7 +295,7 @@ void Marker::initGFXResources()
    smStateBlock = GFX->createStateBlock(d);
    
    smVertexBuffer.set(GFX, 4, GFXBufferTypeStatic);
-   GFXVertexPC* verts = smVertexBuffer.lock();
+   GFXVertexPCT* verts = smVertexBuffer.lock();
    verts[0].point = wedgePoints[0] * 0.25f;
    verts[1].point = wedgePoints[1] * 0.25f;
    verts[2].point = wedgePoints[2] * 0.25f;

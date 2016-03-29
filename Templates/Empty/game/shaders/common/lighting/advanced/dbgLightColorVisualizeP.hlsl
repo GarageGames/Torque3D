@@ -20,15 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"
+#include "../../shaderModelAutoGen.hlsl"
 #include "../../postfx/postFx.hlsl"
 
+TORQUE_UNIFORM_SAMPLER2D(lightPrePassTex,0);
 
-float4 main( PFXVertToPix IN, 
-             uniform sampler2D lightPrePassTex : register(S0) ) : COLOR0
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {   
-   float3 lightcolor;   
-   float nl_Att, specular;   
-   lightinfoUncondition( tex2D( lightPrePassTex, IN.uv0 ), lightcolor, nl_Att, specular );   
-   return float4( lightcolor, 1.0 );   
+   float4 lightColor = TORQUE_TEX2D( lightPrePassTex, IN.uv0 );    
+   return float4( lightColor.rgb, 1.0 );   
 }

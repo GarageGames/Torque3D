@@ -26,14 +26,13 @@
 #include "./postFx.hlsl"
 #include "./../torque.hlsl"
 
-
-uniform sampler2D backBuffer : register( s0 );
+TORQUE_UNIFORM_SAMPLER2D(backBuffer, 0);
 uniform float distCoeff;
 uniform float cubeDistort;
 uniform float3 colorDistort;
 
 
-float4 main( PFXVertToPix IN ) : COLOR0
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
     float2 tex = IN.uv0;
 
@@ -54,7 +53,7 @@ float4 main( PFXVertToPix IN ) : COLOR0
     {
         float x = distort[i] * ( tex.x - 0.5 ) + 0.5;
         float y = distort[i] * ( tex.y - 0.5 ) + 0.5;
-        outColor[i] = tex2Dlod( backBuffer, float4(x,y,0,0) )[i];
+        outColor[i] = TORQUE_TEX2DLOD( backBuffer, float4(x,y,0,0) )[i];
     }
 
     return float4( outColor.rgb, 1 );

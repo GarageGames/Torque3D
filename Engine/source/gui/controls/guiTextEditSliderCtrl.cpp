@@ -355,7 +355,7 @@ void GuiTextEditSliderCtrl::onRender(Point2I offset, const RectI &updateRect)
                Point2I(start.x+14,midPoint.y),
                mProfile->mFontColor);
 
-   GFXVertexBufferHandle<GFXVertexPC> verts(GFX, 6, GFXBufferTypeVolatile);
+   GFXVertexBufferHandle<GFXVertexPCT> verts(GFX, 6, GFXBufferTypeVolatile);
    verts.lock();
 
    verts[0].color.set( 0, 0, 0 );

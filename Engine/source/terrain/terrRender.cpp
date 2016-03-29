@@ -208,14 +208,14 @@ void TerrainBlock::_updateBaseTexture(bool writeToCache)
       F32 copyOffsetY = 2.0f * GFX->getFillConventionOffset() / (F32)destSize.y;
 
       GFXVertexPT points[4];
-      points[0].point      = Point3F( -1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0 );
-      points[0].texCoord   = Point2F(  0.0, 1.0f );
-      points[1].point      = Point3F( -1.0 - copyOffsetX,  1.0 + copyOffsetY, 0.0 );
-      points[1].texCoord   = Point2F(  0.0, 0.0f );
-      points[2].point      = Point3F(  1.0 - copyOffsetX,  1.0 + copyOffsetY, 0.0 );
-      points[2].texCoord   = Point2F(  1.0, 0.0f );
-      points[3].point      = Point3F(  1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0 );
-      points[3].texCoord   = Point2F(  1.0, 1.0f );
+      points[0].point = Point3F(1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0);
+      points[0].texCoord = Point2F(1.0, 1.0f);
+      points[1].point = Point3F(1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0);
+      points[1].texCoord = Point2F(1.0, 0.0f);
+      points[2].point = Point3F(-1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0);
+      points[2].texCoord = Point2F(0.0, 1.0f);
+      points[3].point = Point3F(-1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0);
+      points[3].texCoord = Point2F(0.0, 0.0f);
 
       vb.set( GFX, 4, GFXBufferTypeVolatile );
       GFXVertexPT *ptr = vb.lock();
@@ -274,7 +274,7 @@ void TerrainBlock::_updateBaseTexture(bool writeToCache)
       mBaseShaderConsts->setSafe( mBaseTexScaleConst, Point2F( scale, -scale ) );
       mBaseShaderConsts->setSafe( mBaseTexIdConst, (F32)i );
 
-      GFX->drawPrimitive( GFXTriangleFan, 0, 2 );
+      GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
    }
 
    mBaseTarget->resolve();

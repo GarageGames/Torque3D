@@ -514,7 +514,7 @@ void GFXPCD3D9Device::init( const GFXVideoMode &mode, PlatformWindow *window /* 
    mCardProfiler = new GFXD3D9CardProfiler(mAdapterIndex);
    mCardProfiler->init();
 
-   gScreenShot = new ScreenShotD3D;
+   gScreenShot = new ScreenShotD3D9;
 
    // Set the video capture frame grabber.
    mVideoFrameGrabber = new VideoFrameGrabberD3D9();
