@@ -132,7 +132,7 @@ class Marker : public SceneObject
    static void initGFXResources();
 
    static GFXStateBlockRef smStateBlock;
-   static GFXVertexBufferHandle<GFXVertexPCT> smVertexBuffer;
+   static GFXVertexBufferHandle<GFXVertexPC> smVertexBuffer;
    static GFXPrimitiveBufferHandle smPrimitiveBuffer;
 
   public:
