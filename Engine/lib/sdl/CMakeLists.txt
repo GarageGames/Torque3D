@@ -1273,6 +1273,7 @@ if(SDL_STATIC)
 endif()
 
 ##### Installation targets #####
+if( NOT SDL_DISABLE_INSTALL )
 install(TARGETS ${_INSTALL_LIBS}
   LIBRARY DESTINATION "lib${LIB_SUFFIX}"
   ARCHIVE DESTINATION "lib${LIB_SUFFIX}")
@@ -1306,4 +1307,4 @@ if(NOT WINDOWS OR CYGWIN)
 else()
   install(TARGETS SDL2 RUNTIME DESTINATION bin)
 endif()
-
+endif()
