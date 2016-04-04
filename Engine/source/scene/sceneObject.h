@@ -371,6 +371,7 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
 
       SceneObject();
       virtual ~SceneObject();
+      bool mPathfindingIgnore;
 
       /// Triggered when a SceneObject onAdd is called.
       static Signal< void( SceneObject* ) > smSceneObjectAdd;
