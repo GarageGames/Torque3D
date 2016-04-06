@@ -30,6 +30,7 @@
 #include "platform/profiler.h"
 #include "core/tAlgorithm.h"
 
+#include "gfx/gfxDevice.h"
 namespace MathUtils
 {
 
@@ -1449,6 +1450,7 @@ void makeProjection( MatrixF *outMatrix,
                      F32 farPlane,
                      bool gfxRotate )
 {
+   bool isGL = GFX->getAdapterType() == OpenGL;
 
    Point4F row;
    row.x = 2.0*nearPlane / (right-left);
@@ -1465,13 +1467,13 @@ void makeProjection( MatrixF *outMatrix,
 
    row.x = (left+right) / (right-left);
    row.y = (top+bottom) / (top-bottom);
-   row.z = farPlane / (nearPlane-farPlane);
+   row.z = isGL ? -(farPlane + nearPlane) / (farPlane - nearPlane) : farPlane / (nearPlane - farPlane);
    row.w = -1.0;
    outMatrix->setRow( 2, row );
 
    row.x = 0.0;
    row.y = 0.0;
-   row.z = nearPlane * farPlane / (nearPlane-farPlane);
+   row.z = isGL ? 2 * nearPlane * farPlane / (nearPlane - farPlane)  : nearPlane * farPlane / (nearPlane - farPlane);
    row.w = 0.0;
    outMatrix->setRow( 3, row );
 
@@ -1492,6 +1494,8 @@ void makeOrthoProjection(  MatrixF *outMatrix,
                            F32 farPlane,
                            bool gfxRotate )
 {
+   bool isGL = GFX->getAdapterType() == OpenGL;
+
    Point4F row;
    row.x = 2.0f / (right - left);
    row.y = 0.0f;
@@ -1509,15 +1513,15 @@ void makeOrthoProjection(  MatrixF *outMatrix,
    row.y = 0.0f;
    row.w = 0.0f;
 
-   // This may need be modified to work with OpenGL (d3d has 0..1 
+   // This needs to be modified to work with OpenGL (d3d has 0..1 
    // projection for z, vs -1..1 in OpenGL)
-   row.z = 1.0f / (nearPlane - farPlane); 
+   row.z = isGL ? 2.0f / (nearPlane - farPlane) : 1.0f / (nearPlane - farPlane);
 
    outMatrix->setRow( 2, row );
 
    row.x = (left + right) / (left - right);
    row.y = (top + bottom) / (bottom - top);
-   row.z = nearPlane / (nearPlane - farPlane);
+   row.z = isGL ? (nearPlane + farPlane) / (nearPlane - farPlane) : nearPlane / (nearPlane - farPlane);
    row.w = 1.0f;
    outMatrix->setRow( 3, row );
 
