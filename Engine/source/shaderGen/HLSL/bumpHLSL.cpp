@@ -37,20 +37,18 @@ void BumpFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
    output = meta;
 
-   const bool useTexAnim = fd.features[MFT_TexAnim];
-
    // Output the texture coord.
    getOutTexCoord(   "texCoord", 
                      "float2", 
                      true, 
-                     useTexAnim, 
                      meta, 
-                     componentList );
+                     componentList,
+                     fd );
 
    if ( fd.features.hasFeature( MFT_DetailNormalMap ) )
       addOutDetailTexCoord( componentList, 
                             meta,
-                            useTexAnim );
+                            fd );
 
    // Also output the worldToTanget transform which
    // we use to create the world space normal.
@@ -300,9 +298,9 @@ void ParallaxFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    getOutTexCoord(   "texCoord", 
                      "float2", 
                      true, 
-                     fd.features[MFT_TexAnim], 
                      meta, 
-                     componentList );
+                     componentList,
+                     fd );
 
    // Grab the input position.
    Var *inPos = (Var*)LangElement::find( "inPosition" );

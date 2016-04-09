@@ -124,9 +124,9 @@ void DeferredSpecMapHLSL::processVert( Vector<ShaderComponent*> &componentList,
    getOutTexCoord(   "texCoord", 
                      "float2", 
                      true, 
-                     fd.features[MFT_TexAnim], 
                      meta, 
-                     componentList );
+                     componentList,
+                     fd );
    output = meta;
 }
 
