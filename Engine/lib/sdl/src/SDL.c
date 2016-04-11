@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -405,6 +405,8 @@ SDL_GetPlatform()
     return "BSDI";
 #elif __DREAMCAST__
     return "Dreamcast";
+#elif __EMSCRIPTEN__
+    return "Emscripten";
 #elif __FREEBSD__
     return "FreeBSD";
 #elif __HAIKU__
@@ -421,6 +423,8 @@ SDL_GetPlatform()
     return "MacOS Classic";
 #elif __MACOSX__
     return "Mac OS X";
+#elif __NACL__
+    return "NaCl";
 #elif __NETBSD__
     return "NetBSD";
 #elif __OPENBSD__
@@ -437,6 +441,8 @@ SDL_GetPlatform()
     return "Solaris";
 #elif __WIN32__
     return "Windows";
+#elif __WINRT__
+    return "WinRT";
 #elif __IPHONEOS__
     return "iOS";
 #elif __PSP__
