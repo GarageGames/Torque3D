@@ -198,45 +198,25 @@ void GFXGLEnumTranslate::init()
    GFXGLTextureSwizzle[GFXFormatL8] = Swizzle_GFXFormatL; // old GL_LUMINANCE8
    GFXGLTextureSwizzle[GFXFormatL16] = Swizzle_GFXFormatL; // old GL_LUMINANCE16
 
-   if( gglHasExtension(ARB_texture_float) )
-   {      
-      GFXGLTextureInternalFormat[GFXFormatR32F] = GL_R32F;
-      GFXGLTextureFormat[GFXFormatR32F] = GL_RED;
-      GFXGLTextureType[GFXFormatR32F] = GL_FLOAT;
+   GFXGLTextureInternalFormat[GFXFormatR32F] = GL_R32F;
+   GFXGLTextureFormat[GFXFormatR32F] = GL_RED;
+   GFXGLTextureType[GFXFormatR32F] = GL_FLOAT;
 
-      GFXGLTextureInternalFormat[GFXFormatR32G32B32A32F] = GL_RGBA32F_ARB;
-      GFXGLTextureFormat[GFXFormatR32G32B32A32F] = GL_RGBA;
-      GFXGLTextureType[GFXFormatR32G32B32A32F] = GL_FLOAT;
+   GFXGLTextureInternalFormat[GFXFormatR32G32B32A32F] = GL_RGBA32F_ARB;
+   GFXGLTextureFormat[GFXFormatR32G32B32A32F] = GL_RGBA;
+   GFXGLTextureType[GFXFormatR32G32B32A32F] = GL_FLOAT;
 
-      if( gglHasExtension(ARB_half_float_pixel) )
-      {
-         GFXGLTextureInternalFormat[GFXFormatR16F] = GL_R16F;
-         GFXGLTextureFormat[GFXFormatR16F] = GL_RED;
-         GFXGLTextureType[GFXFormatR16F] = GL_HALF_FLOAT_ARB;
+   GFXGLTextureInternalFormat[GFXFormatR16F] = GL_R16F;
+   GFXGLTextureFormat[GFXFormatR16F] = GL_RED;
+   GFXGLTextureType[GFXFormatR16F] = GL_HALF_FLOAT_ARB;
 
-         GFXGLTextureInternalFormat[GFXFormatR16G16F] = GL_RG16F;
-         GFXGLTextureFormat[GFXFormatR16G16F] = GL_RG;
-         GFXGLTextureType[GFXFormatR16G16F] = GL_HALF_FLOAT_ARB;
+   GFXGLTextureInternalFormat[GFXFormatR16G16F] = GL_RG16F;
+   GFXGLTextureFormat[GFXFormatR16G16F] = GL_RG;
+   GFXGLTextureType[GFXFormatR16G16F] = GL_HALF_FLOAT_ARB;
 
-         GFXGLTextureInternalFormat[GFXFormatR16G16B16A16F] = GL_RGBA16F_ARB;
-         GFXGLTextureFormat[GFXFormatR16G16B16A16F] = GL_RGBA;
-         GFXGLTextureType[GFXFormatR16G16B16A16F] = GL_HALF_FLOAT_ARB;
-      }
-      else
-      {
-         GFXGLTextureInternalFormat[GFXFormatR16F] = GL_R32F;
-         GFXGLTextureFormat[GFXFormatR16F] = GL_RED;
-         GFXGLTextureType[GFXFormatR16F] = GL_FLOAT;
-
-         GFXGLTextureInternalFormat[GFXFormatR16G16F] = GL_RG32F;
-         GFXGLTextureFormat[GFXFormatR16G16F] = GL_RG;
-         GFXGLTextureType[GFXFormatR16G16F] = GL_FLOAT;
-
-         GFXGLTextureInternalFormat[GFXFormatR16G16B16A16F] = GL_RGBA32F_ARB;
-         GFXGLTextureFormat[GFXFormatR16G16B16A16F] = GL_RGBA;
-         GFXGLTextureType[GFXFormatR16G16B16A16F] = GL_FLOAT;
-      }
-   }
+   GFXGLTextureInternalFormat[GFXFormatR16G16B16A16F] = GL_RGBA16F_ARB;
+   GFXGLTextureFormat[GFXFormatR16G16B16A16F] = GL_RGBA;
+   GFXGLTextureType[GFXFormatR16G16B16A16F] = GL_HALF_FLOAT_ARB;
 
    if( gglHasExtension(ARB_ES2_compatibility) )
    {
