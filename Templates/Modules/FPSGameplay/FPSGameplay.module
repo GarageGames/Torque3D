@@ -1,0 +1,10 @@
+<ModuleDefinition
+	ModuleId="FPSGameplay"
+	VersionId="1"
+	Description="Starter module for FPS gameplay."
+	ScriptFile="FPSGameplay.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Game"
+    Dependencies="clientServer=1,UI=1">
+</ModuleDefinition>

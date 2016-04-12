@@ -1,1 +1,0 @@
-exec("./guiPlatformGenericMenubar.ed.gui");

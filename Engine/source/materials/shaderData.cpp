@@ -48,7 +48,7 @@ ConsoleDocClass( ShaderData,
 	"// Used for the procedural clould system\n"
 	"singleton ShaderData( CloudLayerShader )\n"
 	"{\n"
-	"	DXVertexShaderFile   = \"shaders/common/cloudLayerV.hlsl\";\n"
+	"	DXVertexShaderFile   = \String(Con::getVariable(\"$Core::CommonShaderPath\")) + \"/cloudLayerV.hlsl\";\n"
 	"	DXPixelShaderFile    = \"shaders/common/cloudLayerP.hlsl\";\n"
 	"	OGLVertexShaderFile = \"shaders/common/gl/cloudLayerV.glsl\";\n"
 	"	OGLPixelShaderFile = \"shaders/common/gl/cloudLayerP.glsl\";\n"

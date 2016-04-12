@@ -1,0 +1,9 @@
+<ModuleDefinition
+	ModuleId="BlankGame"
+	VersionId="1"
+	Description="Ultra barebones game setup. procedurally generates a level and then connects to it locally."
+	ScriptFile="BlankGame.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Game">
+</ModuleDefinition>
