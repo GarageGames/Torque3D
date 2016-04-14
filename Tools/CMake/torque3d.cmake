@@ -79,8 +79,8 @@ if(WIN32)
 	#mark_as_advanced(TORQUE_OPENGL)
 else()
 	set(TORQUE_OPENGL ON) # we need OpenGL to render on Linux/Mac
-	option(TORQUE_DEDICATED "Torque dedicated" OFF)
 endif()
+	option(TORQUE_DEDICATED "Torque dedicated" OFF)
 
 if(WIN32)
 	option(TORQUE_D3D11 "Allow Direct3D 11 render" OFF)
