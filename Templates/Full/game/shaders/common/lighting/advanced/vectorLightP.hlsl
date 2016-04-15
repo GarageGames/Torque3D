@@ -206,11 +206,11 @@ float4 main( FarFrustumQuadConnectP IN ) : TORQUE_TARGET0
    float3 subsurface = float3(0.0,0.0,0.0); 
    if (getFlag( matInfo.r, 1 ))
    {
-      subsurface =colorSample;
+      subsurface = colorSample.rgb;
       if (colorSample.r>colorSample.g)
-         subsurface.r*=2;
+         subsurface = float3(0.772549, 0.337255, 0.262745);
 	  else
-         subsurface.g*=2;
+         subsurface = float3(0.337255, 0.772549, 0.262745);
 	}
    // Sample/unpack the normal/z data
    float4 prepassSample = TORQUE_PREPASS_UNCONDITION( prePassBuffer, IN.uv0 );
@@ -324,5 +324,5 @@ float4 main( FarFrustumQuadConnectP IN ) : TORQUE_TARGET0
       lightColorOut = debugColor;
    #endif
 
-   return AL_DeferredOutput(lightColorOut+subsurface*(2.0-Sat_NL_Att), colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
+   return AL_DeferredOutput(lightColorOut+subsurface*(1.0-Sat_NL_Att), colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
 }
