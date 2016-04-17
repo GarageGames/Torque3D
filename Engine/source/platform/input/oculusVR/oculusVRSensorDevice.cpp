@@ -26,6 +26,7 @@
 #include "platform/platformInput.h"
 #include "console/simBase.h"
 #include "console/engineAPI.h" 
+#include "math/mAngAxis.h"
 #include "OVR_CAPI_0_8_0.h"
 
 U32 OculusVRSensorDevice::OVR_SENSORROT[OculusVRConstants::MaxSensors] = {0};
@@ -184,7 +185,8 @@ bool OculusVRSensorDevice::process(U32 deviceType, bool generateRotAsAngAxis, bo
    {
       if(generateRotAsAngAxis)
       {
-         INPUTMGR->buildInputEvent(deviceType, OculusVRConstants::DefaultOVRBase, SI_ROT, OVR_SENSORROT[mActionCodeIndex], SI_MOVE, currentBuffer->mRotQuat);
+         AngAxisF axisAA(currentBuffer->mRotQuat);
+         INPUTMGR->buildInputEvent(deviceType, OculusVRConstants::DefaultOVRBase, SI_ROT, OVR_SENSORROT[mActionCodeIndex], SI_MOVE, axisAA);
       }
 
       if(generateRotAsEuler)

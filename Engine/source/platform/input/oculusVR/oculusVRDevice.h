@@ -115,8 +115,8 @@ public:
    virtual bool providesFrameEyePose() const;
    virtual void getFrameEyePose(DisplayPose *outPose, U32 eyeId) const;
    virtual bool providesEyeOffsets() const;
+   virtual bool providesFovPorts() const { return true;  }
    virtual void getEyeOffsets(Point3F *dest) const;
-   virtual bool providesFovPorts() const;
    virtual void getFovPorts(FovPort *out) const;
    virtual bool providesProjectionOffset() const;
    virtual const Point2F& getProjectionOffset() const;
@@ -153,6 +153,8 @@ public:
    
    virtual void setCurrentConnection(GameConnection *connection);
    virtual GameConnection* getCurrentConnection();
+
+   GFXTexHandle getPreviewTexture();
 
    bool _handleDeviceEvent( GFXDevice::GFXDeviceEventType evt );
 

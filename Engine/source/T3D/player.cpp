@@ -56,6 +56,7 @@
 #include "T3D/decal/decalManager.h"
 #include "T3D/decal/decalData.h"
 #include "materials/baseMatInstance.h"
+#include "math/mathUtils.h"
 
 #ifdef TORQUE_EXTENDED_MOVE
    #include "T3D/gameBase/extended/extendedMove.h"
@@ -2489,6 +2490,8 @@ void Player::allowAllPoses()
    mAllowSwimming = true;
 }
 
+AngAxisF gPlayerMoveRot;
+
 void Player::updateMove(const Move* move)
 {
    delta.move = *move;
@@ -2531,6 +2534,7 @@ void Player::updateMove(const Move* move)
       delta.headVec = mHead;
 
       bool doStandardMove = true;
+      bool absoluteDelta = false;
       GameConnection* con = getControllingClient();
 
 #ifdef TORQUE_EXTENDED_MOVE
@@ -2618,6 +2622,27 @@ void Player::updateMove(const Move* move)
             while (mHead.y > M_PI_F) 
                mHead.y -= M_2PI_F;
          }
+         else
+         {
+            // Orient the player so we are looking towards the required position, ignoring any banking
+            AngAxisF moveRot(Point3F(emove->rotX[emoveIndex], emove->rotY[emoveIndex], emove->rotZ[emoveIndex]), emove->rotW[emoveIndex]);
+            MatrixF trans(1);
+            moveRot.setMatrix(&trans);
+
+            Point3F vecForward(0, 1, 0);
+            Point3F orient;
+            EulerF rot;
+            trans.mulV(vecForward);
+
+            F32 yawAng;
+            F32 pitchAng;
+            MathUtils::getAnglesFromVector(vecForward, yawAng, pitchAng);
+            mRot.z = yawAng;
+            mHead = EulerF(0);
+            mHead.x = -pitchAng;
+
+            absoluteDelta = true;
+         }
       }
 #endif
 
@@ -2666,6 +2691,13 @@ void Player::updateMove(const Move* move)
 
       delta.head = mHead;
       delta.headVec -= mHead;
+
+      if (absoluteDelta)
+      {
+         delta.headVec = Point3F(0, 0, 0);
+         delta.rotVec = Point3F(0, 0, 0);
+      }
+
       for(U32 i=0; i<3; ++i)
       {
          if (delta.headVec[i] > M_PI_F)
@@ -5587,58 +5619,6 @@ void Player::getMuzzleTransform(U32 imageSlot,MatrixF* mat)
    enableHeadZCalc();
   
    *mat = nmat;
-}
-
-DisplayPose Player::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
-{
-   // NOTE: this is intended to be similar to updateMove
-   DisplayPose outPose;
-   outPose.orientation = getRenderTransform().toEuler();
-   outPose.position = inPose.position;
-
-   if (con && con->getControlSchemeAbsoluteRotation())
-   {
-      // Pitch
-      outPose.orientation.x = (inPose.orientation.x - mLastAbsolutePitch);
-
-      // Constrain the range of mRot.x
-      while (outPose.orientation.x  < -M_PI_F) 
-         outPose.orientation.x += M_2PI_F;
-      while (outPose.orientation.x  > M_PI_F) 
-         outPose.orientation.x -= M_2PI_F;
-
-      // Yaw
-
-      // Rotate (heading) head or body?
-      if ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson()))
-      {
-         // Rotate head
-         outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
-      }
-      else
-      {
-         // Rotate body
-         outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
-      }
-
-      // Constrain the range of mRot.z
-      while (outPose.orientation.z < 0.0f)
-         outPose.orientation.z += M_2PI_F;
-      while (outPose.orientation.z > M_2PI_F)
-         outPose.orientation.z -= M_2PI_F;
-
-      // Bank
-      if (mDataBlock->cameraCanBank)
-      {
-         outPose.orientation.y = (inPose.orientation.y - mLastAbsoluteRoll);
-      }
-
-      // Constrain the range of mRot.y
-      while (outPose.orientation.y > M_PI_F) 
-         outPose.orientation.y -= M_2PI_F;
-   }
-
-   return outPose;
 }
 
 void Player::getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat)

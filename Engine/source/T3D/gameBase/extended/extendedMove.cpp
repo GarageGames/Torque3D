@@ -1,6 +1,7 @@
 #include "T3D/gameBase/extended/extendedMove.h"
 #include "core/stream/bitStream.h"
 #include "math/mathIO.h"
+#include "math/mAngAxis.h"
 #include "core/module.h"
 #include "console/consoleTypes.h"
 #include "core/strings/stringFunctions.h"
@@ -268,7 +269,7 @@ void ExtendedMove::clamp()
          crotX[i] = CLAMPROT(rotX[i]);
          crotY[i] = CLAMPROT(rotY[i]);
          crotZ[i] = CLAMPROT(rotZ[i]);
-         crotW[i] = CLAMPROT(rotW[i]);
+         crotW[i] = CLAMPROT(rotW[i] / M_2PI_F);
       }
    }
 
@@ -293,7 +294,7 @@ void ExtendedMove::unclamp()
          rotX[i] = UNCLAMPROT(crotX[i]);
          rotY[i] = UNCLAMPROT(crotY[i]);
          rotZ[i] = UNCLAMPROT(crotZ[i]);
-         rotW[i] = UNCLAMPROT(crotW[i]);
+         rotW[i] = UNCLAMPROT(crotW[i]) * M_2PI_F;
       }
    }
 
