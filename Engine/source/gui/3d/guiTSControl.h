@@ -55,6 +55,8 @@ struct CameraQuery
    RectI       stereoViewports[2]; // destination viewports
    GFXTextureTarget* stereoTargets[2];
    GuiCanvas* drawCanvas; // Canvas we are drawing to. Needed for VR
+
+   IDisplayDevice* displayDevice;
 };
 
 /// Abstract base class for 3D viewport GUIs.
@@ -65,7 +67,8 @@ class GuiTSCtrl : public GuiContainer
 public:
    enum RenderStyles {
       RenderStyleStandard           = 0,
-      RenderStyleStereoSideBySide   = (1<<0)
+      RenderStyleStereoSideBySide   = (1<<0),
+     RenderStyleStereoSeparate     = (1<<1),
    };
 
 protected:
@@ -104,12 +107,16 @@ protected:
    NamedTexTargetRef mStereoGuiTarget;
    GFXVertexBufferHandle<GFXVertexPCT> mStereoOverlayVB;
    GFXStateBlockRef mStereoGuiSB;
+
+   GFXVertexBufferHandle<GFXVertexPCT> mStereoPreviewVB;
+   GFXStateBlockRef mStereoPreviewSB;
    
 public:
    
    GuiTSCtrl();
 
    void onPreRender();
+   void _internalRender(RectI viewport, Frustum &frustum);
    void onRender(Point2I offset, const RectI &updateRect);
    virtual bool processCameraQuery(CameraQuery *query);
 
@@ -178,6 +185,7 @@ public:
    bool shouldRenderChildControls() { return mRenderStyle == RenderStyleStandard; }
 
    void setStereoGui(GuiOffscreenCanvas *canvas);
+   void renderDisplayPreview(const RectI &updateRect, GFXTexHandle &previewTexture);
 
    DECLARE_CONOBJECT(GuiTSCtrl);
    DECLARE_CATEGORY( "Gui 3D" );

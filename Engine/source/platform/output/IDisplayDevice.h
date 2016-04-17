@@ -34,8 +34,16 @@ class GuiCanvas;
 /// Defines the basic display pose common to most display devices
 typedef struct DisplayPose
 {
-   EulerF orientation;  /// Direction device is facing
+   QuatF orientation;  /// Direction device is facing
    Point3F position;    /// Relative position of device in view space
+
+   Point3F velocity;
+   Point3F angularVelocity;
+
+   U32 state; /// Generic state
+
+   bool valid; /// Pose set
+   bool connected; /// Device connected
 } IDevicePose;
 
 class IDisplayDevice
@@ -63,6 +71,9 @@ public:
    virtual GameConnection* getCurrentConnection() = 0;
 
    virtual void onStartFrame() = 0;
+
+   /// Returns a texture handle representing a preview of the composited VR view
+   virtual GFXTexHandle getPreviewTexture() = 0;
 };
 
 #endif   // _IDISPLAYDEVICE_H_

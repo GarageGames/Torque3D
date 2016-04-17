@@ -355,6 +355,7 @@ bool GameProcessCameraQuery(CameraQuery *query)
       query->eyeOffset[1] = Point3F::Zero;
       query->hasFovPort = false;
       query->hasStereoTargets = false;
+      query->displayDevice = NULL;
       
       F32 cameraFov = 0.0f;
       bool fovSet = false;
@@ -364,6 +365,9 @@ bool GameProcessCameraQuery(CameraQuery *query)
       if(!gEditingMission && connection->hasDisplayDevice())
       {
          IDisplayDevice* display = connection->getDisplayDevice();
+
+         query->displayDevice = display;
+
          // Note: all eye values are invalid until this is called
          display->setDrawCanvas(query->drawCanvas);
 

@@ -219,6 +219,12 @@ public:
       /// The device has started rendering a frame's field (such as for side-by-side rendering)
       deStartOfField,
 
+	  /// left stereo frame has been rendered
+	  deLeftStereoFrameRendered,
+
+	  /// right stereo frame has been rendered
+	  deRightStereoFrameRendered,
+
       /// The device is about to finish rendering a frame's field
       deEndOfField,
    };
@@ -248,6 +254,7 @@ public:
    {
       RS_Standard          = 0,
       RS_StereoSideBySide  = (1<<0),     // Render into current Render Target side-by-side
+	  RS_StereoSeparate    = (1<<1)      // Render in two separate passes (then combined by vr compositor)
    };
 
    enum GFXDeviceLimits

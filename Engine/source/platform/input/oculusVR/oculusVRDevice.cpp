@@ -62,7 +62,7 @@ MODULE_END;
 // OculusVRDevice
 //-----------------------------------------------------------------------------
 
-bool OculusVRDevice::smEnableDevice = true;
+bool OculusVRDevice::smEnableDevice = false;
 
 bool OculusVRDevice::smSimulateHMD = true;
 
@@ -318,17 +318,6 @@ void OculusVRDevice::getEyeOffsets(Point3F *dest) const
    hmd->getEyeOffsets(dest);
 }
 
-bool OculusVRDevice::providesFovPorts() const
-{
-   if(!mHMDDevices.size())
-      return false;
-
-   const OculusVRHMDDevice* hmd = getHMDDevice(mActiveDeviceId);
-   if(!hmd)
-      return Point3F::Zero;
-
-   return true;
-}
 
 void OculusVRDevice::getFovPorts(FovPort *out) const
 {
@@ -558,6 +547,20 @@ GameConnection* OculusVRDevice::getCurrentConnection()
       return NULL;
 
    return hmd->getCurrentConnection();
+}
+
+//-----------------------------------------------------------------------------
+
+GFXTexHandle OculusVRDevice::getPreviewTexture()
+{
+   if (!mHMDDevices.size())
+      return NULL;
+
+   OculusVRHMDDevice* hmd = getHMDDevice(mActiveDeviceId);
+   if (!hmd)
+      return NULL;
+
+   return hmd->getPreviewTexture();
 }
 
 //-----------------------------------------------------------------------------

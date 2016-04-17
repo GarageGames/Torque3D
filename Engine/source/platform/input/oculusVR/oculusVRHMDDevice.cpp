@@ -43,7 +43,6 @@
 #include "OVR_CAPI_GL.h"
 #define OCULUS_USE_GL
 #endif
-extern GFXTextureObject *gLastStereoTexture;
 
 struct OculusTexture
 {
@@ -317,6 +316,14 @@ void OculusVRHMDDevice::dismissWarning()
    //ovr_DismissHSWDisplay(mDevice);
 }
 
+GFXTexHandle OculusVRHMDDevice::getPreviewTexture()
+{
+   if (!mIsValid || !mDevice)
+      return NULL;
+
+   return mDebugMirrorTextureHandle;
+}
+
 bool OculusVRHMDDevice::setupTargets()
 {
 	// Create eye render buffers
@@ -380,9 +387,6 @@ bool OculusVRHMDDevice::setupTargets()
 		// Right
 		mEyeRT[1] = mStereoRT;
 		mEyeViewport[1] = RectI(Point2I(mRenderLayer.Viewport[1].Pos.x, mRenderLayer.Viewport[1].Pos.y), Point2I(mRenderLayer.Viewport[1].Size.w, mRenderLayer.Viewport[1].Size.h));
-
-		gLastStereoTexture = NULL;
-
 
 		GFXD3D11Device* device = static_cast<GFXD3D11Device*>(GFX);
 
@@ -453,7 +457,6 @@ bool OculusVRHMDDevice::setupTargets()
 		}
 		
 		mDebugMirrorTextureHandle = object;
-		gLastStereoTexture = mDebugMirrorTextureHandle;
 	}
 	else
 	{
@@ -673,10 +676,11 @@ void OculusVRHMDDevice::getFrameEyePose(DisplayPose *outPose, U32 eyeId) const
    OVR::Quatf orientation = pose.Orientation;
    const OVR::Vector3f position = pose.Position;
 
-   EulerF rotEuler;
-   OculusVRUtil::convertRotation(orientation, rotEuler);
+   MatrixF torqueMat(1);
+   OVR::Matrix4f mat(orientation);
+   OculusVRUtil::convertRotation(mat.M, torqueMat);
 
-   outPose->orientation = rotEuler;
+   outPose->orientation = QuatF(torqueMat);
    outPose->position = Point3F(-position.x, position.z, -position.y);
 }
 

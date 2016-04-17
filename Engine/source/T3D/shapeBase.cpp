@@ -1975,9 +1975,8 @@ void ShapeBase::getEyeCameraTransform(IDisplayDevice *displayDevice, U32 eyeId, 
    Point3F eyePos;
    Point3F rotEyePos;
 
-   DisplayPose inPose;
-   displayDevice->getFrameEyePose(&inPose, eyeId);
-   DisplayPose newPose = calcCameraDeltaPose(displayDevice->getCurrentConnection(), inPose);
+   DisplayPose newPose;
+   displayDevice->getFrameEyePose(&newPose, eyeId);
 
    // Ok, basically we just need to add on newPose to the camera transform
    // NOTE: currently we dont support third-person camera in this mode
@@ -1987,55 +1986,13 @@ void ShapeBase::getEyeCameraTransform(IDisplayDevice *displayDevice, U32 eyeId, 
 
    QuatF baserot = cameraTransform;
    QuatF qrot = QuatF(newPose.orientation);
-   QuatF concatRot;
-   concatRot.mul(baserot, qrot);
-   concatRot.setMatrix(&temp);
-   temp.setPosition(cameraTransform.getPosition() + concatRot.mulP(newPose.position, &rotEyePos));
+   //QuatF concatRot;
+   //concatRot.mul(baserot, qrot);
+   qrot.setMatrix(&temp);
 
+   temp.setPosition(cameraTransform.getPosition() + qrot.mulP(newPose.position, &rotEyePos));
+   
    *outMat = temp;
-}
-
-DisplayPose ShapeBase::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
-{
-   // NOTE: this is intended to be similar to updateMove
-   // WARNING: does not take into account any move values
-
-   DisplayPose outPose;
-   outPose.orientation = getRenderTransform().toEuler();
-   outPose.position = inPose.position;
-
-   if (con && con->getControlSchemeAbsoluteRotation())
-   {
-      // Pitch
-      outPose.orientation.x = inPose.orientation.x;
-
-      // Constrain the range of mRot.x
-      while (outPose.orientation.x < -M_PI_F) 
-         outPose.orientation.x += M_2PI_F;
-      while (outPose.orientation.x > M_PI_F) 
-         outPose.orientation.x -= M_2PI_F;
-
-      // Yaw
-      outPose.orientation.z = inPose.orientation.z;
-
-      // Constrain the range of mRot.z
-      while (outPose.orientation.z < -M_PI_F) 
-         outPose.orientation.z += M_2PI_F;
-      while (outPose.orientation.z > M_PI_F) 
-         outPose.orientation.z -= M_2PI_F;
-
-      // Bank
-      if (mDataBlock->cameraCanBank)
-      {
-         outPose.orientation.y = inPose.orientation.y;
-      }
-
-      // Constrain the range of mRot.y
-      while (outPose.orientation.y > M_PI_F) 
-         outPose.orientation.y -= M_2PI_F;
-   }
-
-   return outPose;
 }
 
 void ShapeBase::getCameraParameters(F32 *min,F32* max,Point3F* off,MatrixF* rot)
