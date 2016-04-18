@@ -514,6 +514,8 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
       mStateBlockDirty = false;
    }
 
+   _updateRenderTargets();
+
    if( mTexturesDirty )
    {
       mTexturesDirty = false;

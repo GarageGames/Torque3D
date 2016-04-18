@@ -173,7 +173,7 @@ public:
 
    const char *getType() const { return "selection"; }
    void rebuild();
-   void render(Vector<GFXVertexPC> & vertexBuffer, S32 & verts, S32 & elems, S32 & prims, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone) const;
+   void render(Vector<GFXVertexPCT> & vertexBuffer, S32 & verts, S32 & elems, S32 & prims, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone) const;
    void setSize(const Point2I &){}
 
 protected:

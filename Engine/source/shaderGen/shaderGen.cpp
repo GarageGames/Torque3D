@@ -264,7 +264,7 @@ void ShaderGen::_processVertFeatures( Vector<GFXShaderMacro> &macros, bool macro
          if ( macrosOnly )
             continue;
 
-         feature->mInstancingFormat = &mInstancingFormat;
+         feature->setInstancingFormat( &mInstancingFormat );
          feature->processVert( mComponents, mFeatureData );
 
          String line;
@@ -304,7 +304,7 @@ void ShaderGen::_processPixFeatures( Vector<GFXShaderMacro> &macros, bool macros
          if ( macrosOnly )
             continue;
 
-         feature->mInstancingFormat = &mInstancingFormat;
+         feature->setInstancingFormat( &mInstancingFormat );
          feature->processPix( mComponents, mFeatureData );
 
          String line;
@@ -488,8 +488,7 @@ GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const G
    generateShader( featureData, vertFile, pixFile, &pixVersion, vertexFormat, cacheKey, shaderMacros );
 
    GFXShader *shader = GFX->createShader();
-   shader->mInstancingFormat.copy( mInstancingFormat ); // TODO: Move to init() below!
-   if ( !shader->init( vertFile, pixFile, pixVersion, shaderMacros, samplers ) )
+   if (!shader->init(vertFile, pixFile, pixVersion, shaderMacros, samplers, &mInstancingFormat))
    {
       delete shader;
       return NULL;

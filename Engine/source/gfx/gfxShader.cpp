@@ -35,7 +35,8 @@ bool GFXShader::smLogWarnings = true;
 
 GFXShader::GFXShader()
    :  mPixVersion( 0.0f ),
-      mReloadKey( 0 )
+      mReloadKey( 0 ),
+      mInstancingFormat( NULL )
 {
 }
 
@@ -43,6 +44,8 @@ GFXShader::~GFXShader()
 {
    Torque::FS::RemoveChangeNotification( mVertexFile, this, &GFXShader::_onFileChanged );
    Torque::FS::RemoveChangeNotification( mPixelFile, this, &GFXShader::_onFileChanged );
+
+   SAFE_DELETE(mInstancingFormat);
 }
 
 #ifndef TORQUE_OPENGL
@@ -60,8 +63,16 @@ bool GFXShader::init(   const Torque::Path &vertFile,
                         const Torque::Path &pixFile, 
                         F32 pixVersion, 
                         const Vector<GFXShaderMacro> &macros,
-                        const Vector<String> &samplerNames)
+                        const Vector<String> &samplerNames,
+                        GFXVertexFormat *instanceFormat)
 {
+   // Take care of instancing
+   if (instanceFormat)
+   {
+      mInstancingFormat = new GFXVertexFormat;
+      mInstancingFormat->copy(*instanceFormat);
+   }
+
    // Store the inputs for use in reloading.
    mVertexFile = vertFile;
    mPixelFile = pixFile;

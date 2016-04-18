@@ -30,7 +30,7 @@
 #include <d3dx9tex.h>
 
 
-GBitmap* ScreenShotD3D::_captureBackBuffer()
+GBitmap* ScreenShotD3D9::_captureBackBuffer()
 {
 #ifdef TORQUE_OS_XENON
    return NULL;

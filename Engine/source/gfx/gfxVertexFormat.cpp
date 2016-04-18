@@ -70,6 +70,7 @@ GFXVertexFormat::GFXVertexFormat()
       mHasColor( false ),
       mHasNormal( false ),
       mHasTangent( false ),
+      mHasInstancing( false ),
       mTexCoordCount( 0 ),
       mSizeInBytes( 0 ),
       mDecl( NULL )
@@ -83,6 +84,7 @@ void GFXVertexFormat::copy( const GFXVertexFormat &format )
    mHasNormal = format.mHasNormal;
    mHasTangent = format.mHasTangent;
    mHasColor = format.mHasColor;
+   mHasInstancing = format.mHasInstancing;
    mTexCoordCount = format.mTexCoordCount;
    mSizeInBytes = format.mSizeInBytes;
    mDescription = format.mDescription;
@@ -161,6 +163,14 @@ bool GFXVertexFormat::hasColor() const
    return mHasColor;
 }
 
+bool GFXVertexFormat::hasInstancing() const
+{
+   if (mDirty)
+      const_cast<GFXVertexFormat*>(this)->_updateDirty();
+
+   return mHasInstancing;
+}
+
 U32 GFXVertexFormat::getTexCoordCount() const
 {
    if ( mDirty )
@@ -175,6 +185,11 @@ U32 GFXVertexFormat::getSizeInBytes() const
       const_cast<GFXVertexFormat*>(this)->_updateDirty();
 
    return mSizeInBytes;
+}
+
+void GFXVertexFormat::enableInstancing()
+{
+   mHasInstancing = true;
 }
 
 void GFXVertexFormat::_updateDirty()

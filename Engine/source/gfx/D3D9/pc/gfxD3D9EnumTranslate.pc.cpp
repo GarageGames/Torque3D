@@ -114,6 +114,7 @@ void GFXD3D9EnumTranslate::init()
    GFXD3D9TextureFormat[GFXFormatD24S8] = D3DFMT_D24S8;
    GFXD3D9TextureFormat[GFXFormatD24FS8] = D3DFMT_D24FS8;
    GFXD3D9TextureFormat[GFXFormatD16] = D3DFMT_D16;
+   GFXD3D9TextureFormat[GFXFormatR8G8B8A8_SRGB] = D3DFMT_UNKNOWN;
    VALIDATE_LOOKUPTABLE( GFXD3D9TextureFormat, GFXFormat);
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -302,7 +303,6 @@ void GFXD3D9EnumTranslate::init()
    GFXD3D9PrimType[GFXLineStrip] = D3DPT_LINESTRIP;
    GFXD3D9PrimType[GFXTriangleList] = D3DPT_TRIANGLELIST;
    GFXD3D9PrimType[GFXTriangleStrip] = D3DPT_TRIANGLESTRIP;
-   GFXD3D9PrimType[GFXTriangleFan] = D3DPT_TRIANGLEFAN;
    VALIDATE_LOOKUPTABLE( GFXD3D9PrimType, GFXPT );
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

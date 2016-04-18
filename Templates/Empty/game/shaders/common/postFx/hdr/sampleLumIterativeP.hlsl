@@ -22,7 +22,7 @@
 
 #include "../postFx.hlsl"
 
-uniform sampler2D inputTex : register( S0 );
+TORQUE_UNIFORM_SAMPLER2D(inputTex, 0);
 uniform float2 oneOverTargetSize;
 
 
@@ -34,7 +34,7 @@ static float2 gTapOffsets[16] =
    { -1.5, 1.5 },  { -0.5, 1.5 },  { 0.5, 1.5 },  { 1.5, 1.5 }
 };
 
-float4 main( PFXVertToPix IN ) : COLOR
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
    float2 pixelSize = oneOverTargetSize;
 
@@ -42,7 +42,7 @@ float4 main( PFXVertToPix IN ) : COLOR
 
    for ( int i = 0; i < 16; i++ )
    {
-      float lum = tex2D( inputTex, IN.uv0 + ( gTapOffsets[i] * pixelSize ) ).r;
+      float lum = TORQUE_TEX2D( inputTex, IN.uv0 + ( gTapOffsets[i] * pixelSize ) ).r;
       average += lum;
    }
 

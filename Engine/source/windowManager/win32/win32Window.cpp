@@ -805,6 +805,8 @@ LRESULT PASCAL Win32Window::WindowProc( HWND hWnd, UINT message, WPARAM wParam, 
 				Con::warnf("Win32Window::WindowProc - resetting device due to window size change.");
 				window->getGFXTarget()->resetMode();
 			}
+
+         window->getScreenResChangeSignal().trigger(window, true);
 		}
 		return 0;
 

@@ -20,7 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"
+#include "../../shaderModel.hlsl"
+#include "../../shaderModelAutoGen.hlsl"
 
 #include "farFrustumQuad.hlsl"
 #include "../../torque.hlsl"
@@ -29,16 +30,55 @@
 #include "../shadowMap/shadowMapIO_HLSL.h"
 #include "softShadow.hlsl"
 
-
-uniform sampler2D shadowMap : register(S1);
-uniform sampler2D dynamicShadowMap : register(S2);
+TORQUE_UNIFORM_SAMPLER2D(prePassBuffer, 0);
+TORQUE_UNIFORM_SAMPLER2D(shadowMap, 1);
+TORQUE_UNIFORM_SAMPLER2D(dynamicShadowMap, 2);
 
 #ifdef USE_SSAO_MASK
-uniform sampler2D ssaoMask : register(S3);
+TORQUE_UNIFORM_SAMPLER2D(ssaoMask, 3);
 uniform float4 rtParams3;
 #endif
+//register 4?
+TORQUE_UNIFORM_SAMPLER2D(lightBuffer, 5);
+TORQUE_UNIFORM_SAMPLER2D(colorBuffer, 6);
+TORQUE_UNIFORM_SAMPLER2D(matInfoBuffer, 7);
 
-float4 AL_VectorLightShadowCast( sampler2D sourceShadowMap,
+uniform float  lightBrightness;
+uniform float3 lightDirection;
+
+uniform float4 lightColor;
+uniform float4 lightAmbient;
+
+uniform float shadowSoftness;
+uniform float3 eyePosWorld;
+
+uniform float4 atlasXOffset;
+uniform float4 atlasYOffset;
+uniform float4 zNearFarInvNearFar;
+uniform float4 lightMapParams;
+uniform float4 farPlaneScalePSSM;
+uniform float4 overDarkPSSM;
+
+uniform float2 fadeStartLength;
+uniform float2 atlasScale;
+
+uniform float4x4 eyeMat;
+
+// Static Shadows
+uniform float4x4 worldToLightProj;
+uniform float4 scaleX;
+uniform float4 scaleY;
+uniform float4 offsetX;
+uniform float4 offsetY;
+// Dynamic Shadows
+uniform float4x4 dynamicWorldToLightProj;
+uniform float4 dynamicScaleX;
+uniform float4 dynamicScaleY;
+uniform float4 dynamicOffsetX;
+uniform float4 dynamicOffsetY;
+uniform float4 dynamicFarPlaneScalePSSM;
+
+float4 AL_VectorLightShadowCast( TORQUE_SAMPLER2D(sourceShadowMap),
                                 float2 texCoord,
                                 float4x4 worldToLightProj,
                                 float4 worldPos,
@@ -52,8 +92,7 @@ float4 AL_VectorLightShadowCast( sampler2D sourceShadowMap,
                                 float2 atlasScale,
                                 float shadowSoftness, 
                                 float dotNL ,
-                                float4 overDarkPSSM
-)
+                                float4 overDarkPSSM)
 {
       // Compute shadow map coordinate
       float4 pxlPosLightProj = mul(worldToLightProj, worldPos);
@@ -144,7 +183,7 @@ float4 AL_VectorLightShadowCast( sampler2D sourceShadowMap,
       distToLight *= farPlaneScale;
 
       return float4(debugColor,
-                    softShadow_filter(  sourceShadowMap,
+                    softShadow_filter(  TORQUE_SAMPLER2D_MAKEARG(sourceShadowMap),
                                  texCoord,
                                  shadowCoord,
                                  farPlaneScale * shadowSoftness,
@@ -153,50 +192,10 @@ float4 AL_VectorLightShadowCast( sampler2D sourceShadowMap,
                                  dot( finalMask, overDarkPSSM ) ) );
 };
 
-float4 main( FarFrustumQuadConnectP IN,
-
-             uniform sampler2D prePassBuffer : register(S0),
-             
-             uniform sampler2D lightBuffer : register(S5),
-             uniform sampler2D colorBuffer : register(S6),
-             uniform sampler2D matInfoBuffer : register(S7),
-             
-             uniform float3 lightDirection,
-             uniform float4 lightColor,
-             uniform float  lightBrightness,
-             uniform float4 lightAmbient,
-             uniform float4x4 eyeMat,
-             
-             uniform float3 eyePosWorld,
-             uniform float4 atlasXOffset,
-             uniform float4 atlasYOffset,
-             uniform float2 atlasScale,
-             uniform float4 zNearFarInvNearFar,
-             uniform float4 lightMapParams,
-             uniform float2 fadeStartLength,
-             uniform float4 overDarkPSSM,
-             uniform float shadowSoftness,
-
-             // Static Shadows
-             uniform float4x4 worldToLightProj,
-             uniform float4 scaleX,
-             uniform float4 scaleY,
-             uniform float4 offsetX,
-             uniform float4 offsetY,
-             uniform float4 farPlaneScalePSSM,
-
-             // Dynamic Shadows
-             uniform float4x4 dynamicWorldToLightProj,
-             uniform float4 dynamicScaleX,
-             uniform float4 dynamicScaleY,
-             uniform float4 dynamicOffsetX,
-             uniform float4 dynamicOffsetY,
-             uniform float4 dynamicFarPlaneScalePSSM
-
-            ) : COLOR0
+float4 main( FarFrustumQuadConnectP IN ) : TORQUE_TARGET0
 {
    // Emissive.
-   float4 matInfo = tex2D( matInfoBuffer, IN.uv0 );   
+   float4 matInfo = TORQUE_TEX2D( matInfoBuffer, IN.uv0 );   
    bool emissive = getFlag( matInfo.r, 0 );
    if ( emissive )
    {
@@ -204,7 +203,7 @@ float4 main( FarFrustumQuadConnectP IN,
    }
    
    // Sample/unpack the normal/z data
-   float4 prepassSample = prepassUncondition( prePassBuffer, IN.uv0 );
+   float4 prepassSample = TORQUE_PREPASS_UNCONDITION( prePassBuffer, IN.uv0 );
    float3 normal = prepassSample.rgb;
    float depth = prepassSample.a;
 
@@ -229,7 +228,7 @@ float4 main( FarFrustumQuadConnectP IN,
 
    #else
       
-      float4 static_shadowed_colors = AL_VectorLightShadowCast( shadowMap,
+      float4 static_shadowed_colors = AL_VectorLightShadowCast( TORQUE_SAMPLER2D_MAKEARG(shadowMap),
                                                         IN.uv0.xy,
                                                         worldToLightProj,
                                                         worldPos,
@@ -241,7 +240,7 @@ float4 main( FarFrustumQuadConnectP IN,
                                                         shadowSoftness, 
                                                         dotNL,
                                                         overDarkPSSM);
-      float4 dynamic_shadowed_colors = AL_VectorLightShadowCast( dynamicShadowMap,
+      float4 dynamic_shadowed_colors = AL_VectorLightShadowCast( TORQUE_SAMPLER2D_MAKEARG(dynamicShadowMap),
                                                         IN.uv0.xy,
                                                         dynamicWorldToLightProj,
                                                         worldPos,
@@ -307,7 +306,7 @@ float4 main( FarFrustumQuadConnectP IN,
 
    // Sample the AO texture.      
    #ifdef USE_SSAO_MASK
-      float ao = 1.0 - tex2D( ssaoMask, viewportCoordToRenderTarget( IN.uv0.xy, rtParams3 ) ).r;
+      float ao = 1.0 - TORQUE_TEX2D( ssaoMask, viewportCoordToRenderTarget( IN.uv0.xy, rtParams3 ) ).r;
       addToResult *= ao;
    #endif
 
@@ -315,6 +314,6 @@ float4 main( FarFrustumQuadConnectP IN,
       lightColorOut = debugColor;
    #endif
 
-   float4 colorSample = tex2D( colorBuffer, IN.uv0 );
+   float4 colorSample = TORQUE_TEX2D( colorBuffer, IN.uv0 );
    return AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
 }

@@ -388,7 +388,6 @@ void RenderPrePassMgr::render( SceneRenderState *state )
    GFXTextureObject *lastLM = NULL;
    GFXCubemap *lastCubemap = NULL;
    GFXTextureObject *lastReflectTex = NULL;
-   GFXTextureObject *lastMiscTex = NULL;
    GFXTextureObject *lastAccuTex = NULL;
    
    // Next render all the meshes.

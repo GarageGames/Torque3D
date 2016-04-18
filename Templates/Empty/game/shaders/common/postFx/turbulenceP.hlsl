@@ -25,8 +25,10 @@
 uniform float  accumTime;
 uniform float2 projectionOffset;
 uniform float4 targetViewport;
+TORQUE_UNIFORM_SAMPLER2D(inputTex, 0);
 
-float4 main( PFXVertToPix IN, uniform sampler2D inputTex : register(S0) ) : COLOR
+
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
 	float speed = 2.0;
 	float distortion = 6.0;
@@ -38,5 +40,5 @@ float4 main( PFXVertToPix IN, uniform sampler2D inputTex : register(S0) ) : COLO
 	y = clamp(y, targetViewport.y, targetViewport.w);
 	x = clamp(x, targetViewport.x, targetViewport.z);
 	
-    return tex2D (inputTex, float2(x, y));
+   return TORQUE_TEX2D(inputTex, float2(x, y));
 }

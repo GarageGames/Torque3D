@@ -196,7 +196,7 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
    }
 
    // draw the curv
-   GFXVertexBufferHandle<GFXVertexPC> verts(GFX, ext.x, GFXBufferTypeVolatile);
+   GFXVertexBufferHandle<GFXVertexPCT> verts(GFX, ext.x, GFXBufferTypeVolatile);
 
    verts.lock();
 

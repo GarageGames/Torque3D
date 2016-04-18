@@ -32,6 +32,7 @@ float calcBlend( float texId, vec2 layerCoord, float layerSize, vec4 layerSample
    vec4 diff = clamp( abs( layerSample - texId ), 0.0, 1.0 );
    float noBlend = float(any( bvec4(1 - diff) ));
 
+   // Check if any of the layer samples 
    // match the current texture id.
    vec4 factors = vec4(0);
    for(int i = 0; i < 4; i++)

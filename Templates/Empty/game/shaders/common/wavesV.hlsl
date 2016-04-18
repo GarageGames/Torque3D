@@ -22,7 +22,7 @@
 
 #define IN_HLSL
 #include "shdrConsts.h"
-#include "hlslStructs.h"
+#include "hlslStructs.hlsl"
 
 //-----------------------------------------------------------------------------
 // Constants
@@ -42,21 +42,20 @@ struct Conn
 };
 
 
+uniform float4x4 modelview : register(VC_WORLD_PROJ);
+uniform float3x3 cubeTrans : register(VC_CUBE_TRANS);
+uniform float3   cubeEyePos : register(VC_CUBE_EYE_POS);
+uniform float3   inLightVec : register(VC_LIGHT_DIR1);
+uniform float3   eyePos : register(VC_EYE_POS);
 
 //-----------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------
-Conn main( VertexIn_PNTTTB In, 
-           uniform float4x4 modelview : register(VC_WORLD_PROJ),
-           uniform float3x3 cubeTrans : register(VC_CUBE_TRANS),
-           uniform float3   cubeEyePos : register(VC_CUBE_EYE_POS),
-           uniform float3   inLightVec : register(VC_LIGHT_DIR1),
-           uniform float3   eyePos     : register(VC_EYE_POS)
-)
+Conn main( VertexIn_PNTTTB In)
 {
    Conn Out;
 
-   Out.HPOS = mul(modelview, In.pos);
+   Out.HPOS = mul(modelview, float4(In.pos,1.0));
    Out.TEX0 = In.uv0;
 
    

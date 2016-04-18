@@ -68,7 +68,6 @@ enum GFXPrimitiveType
    GFXLineStrip,
    GFXTriangleList,
    GFXTriangleStrip,
-   GFXTriangleFan,
    GFXPT_COUNT
 };
 
@@ -206,6 +205,9 @@ enum GFXFormat
    GFXFormatDXT4,
    GFXFormatDXT5,
 
+   // sRGB formats
+   GFXFormatR8G8B8A8_SRGB,
+
    GFXFormat_COUNT,
 
    GFXFormat_8BIT = GFXFormatA8,
@@ -277,8 +279,8 @@ enum GFXBlend
 enum GFXAdapterType 
 {
    OpenGL = 0,
+   Direct3D11,
    Direct3D9,
-   Direct3D8,
    NullDevice,
    Direct3D9_360,
    GFXAdapterType_Count

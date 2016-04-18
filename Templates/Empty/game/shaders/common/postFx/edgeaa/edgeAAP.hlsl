@@ -21,17 +21,17 @@
 //-----------------------------------------------------------------------------
 
 #include "../postFx.hlsl"
-#include "shadergen:/autogenConditioners.h"
 
-float4 main( PFXVertToPix IN, 
-             uniform sampler2D edgeBuffer : register(S0),
-             uniform sampler2D backBuffer : register(S1),
-             uniform float2 targetSize : register(C0) ) : COLOR0
+TORQUE_UNIFORM_SAMPLER2D(edgeBuffer,0);
+TORQUE_UNIFORM_SAMPLER2D(backBuffer, 1);
+uniform float2 targetSize;
+
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
    float2 pixelSize = 1.0 / targetSize;
 
    // Sample edge buffer, bail if not on an edge
-   float edgeSample = tex2D(edgeBuffer, IN.uv0).r;
+   float edgeSample = TORQUE_TEX2D(edgeBuffer, IN.uv0).r;
    clip(edgeSample - 1e-6);
    
    // Ok we're on an edge, so multi-tap sample, average, and return
@@ -58,7 +58,7 @@ float4 main( PFXVertToPix IN,
       
       float2 offsetUV = IN.uv1 + edgeSample * ( offsets[i] * 0.5 ) * pixelSize;//rtWidthHeightInvWidthNegHeight.zw;
       //offsetUV *= 0.999;
-      accumColor+= tex2D(backBuffer, offsetUV);
+      accumColor += TORQUE_TEX2D(backBuffer, offsetUV);
    }
    accumColor /= 9.0;
    

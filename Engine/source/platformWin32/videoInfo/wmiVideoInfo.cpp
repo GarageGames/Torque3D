@@ -25,6 +25,7 @@
 //#include <comdef.h>
 #include <wbemidl.h>
 //#include <atlconv.h>
+#include <DXGI.h>
 #pragma comment(lib, "comsuppw.lib") 
 #pragma comment(lib, "wbemuuid.lib")
 
@@ -53,58 +54,6 @@ struct MYGUID : public GUID
    }
 };
 
-//------------------------------------------------------------------------------
-// DXGI decls for retrieving device info on Vista.  We manually declare that
-// stuff here, so we don't depend on headers and compile on any setup.  At
-// run-time, it depends on whether we can successfully load the DXGI DLL; if
-// not, nothing of this here will be used.
-
-struct IDXGIObject;
-struct IDXGIFactory;
-struct IDXGIAdapter;
-struct IDXGIOutput;
-
-struct DXGI_SWAP_CHAIN_DESC;
-struct DXGI_ADAPTER_DESC;
-
-struct IDXGIObject : public IUnknown
-{
-   virtual HRESULT STDMETHODCALLTYPE SetPrivateData( REFGUID, UINT, const void* ) = 0; 
-   virtual HRESULT STDMETHODCALLTYPE SetPrivateDataInterface( REFGUID, const IUnknown* ) = 0;
-   virtual HRESULT STDMETHODCALLTYPE GetPrivateData( REFGUID, UINT*, void* ) = 0;
-   virtual HRESULT STDMETHODCALLTYPE GetParent( REFIID, void** ) = 0;
-};
-
-struct IDXGIFactory : public IDXGIObject
-{
-   virtual HRESULT STDMETHODCALLTYPE EnumAdapters( UINT, IDXGIAdapter** ) = 0;
-   virtual HRESULT STDMETHODCALLTYPE MakeWindowAssociation( HWND, UINT ) = 0;
-   virtual HRESULT STDMETHODCALLTYPE GetWindowAssociation( HWND ) = 0;
-   virtual HRESULT STDMETHODCALLTYPE CreateSwapChain( IUnknown*, DXGI_SWAP_CHAIN_DESC* ) = 0;
-   virtual HRESULT STDMETHODCALLTYPE CreateSoftwareAdapter( HMODULE, IDXGIAdapter** ) = 0;
-};
-                 
-struct IDXGIAdapter : public IDXGIObject
-{
-   virtual HRESULT STDMETHODCALLTYPE EnumOutputs( UINT, IDXGIOutput** ) = 0;
-   virtual HRESULT STDMETHODCALLTYPE GetDesc( DXGI_ADAPTER_DESC* ) = 0;
-   virtual HRESULT STDMETHODCALLTYPE CheckInterfaceSupport( REFGUID, LARGE_INTEGER* ) = 0;
-};
-
-struct DXGI_ADAPTER_DESC
-{
-   WCHAR Description[ 128 ];
-   UINT VendorId;
-   UINT DeviceId;
-   UINT SubSysId;
-   UINT Revision;
-   SIZE_T DedicatedVideoMemory;
-   SIZE_T DedicatedSystemMemory;
-   SIZE_T SharedSystemMemory;
-   LUID AdapterLuid;
-};
-
-static MYGUID IID_IDXGIFactory( 0x7b7166ec, 0x21c7, 0x44ae, 0xb2, 0x1a, 0xc9, 0xae, 0x32, 0x1a, 0xe3, 0x69 );
 
 //------------------------------------------------------------------------------
 // DXDIAG declarations.
@@ -180,6 +129,26 @@ WMIVideoInfo::~WMIVideoInfo()
 
    if( mComInitialized )
       CoUninitialize();
+}
+
+//------------------------------------------------------------------------------
+
+String WMIVideoInfo::_lookUpVendorId(U32 vendorId)
+{
+   String vendor;
+   switch (vendorId)
+   {
+   case 0x10DE:
+      vendor = "NVIDIA";
+      break;
+   case 0x1002:
+      vendor = "AMD";
+      break;
+   case 0x8086:
+      vendor = "INTEL";
+      break;
+   }
+   return vendor;
 }
 
 //------------------------------------------------------------------------------
@@ -282,16 +251,15 @@ bool WMIVideoInfo::_initializeWMI()
 
 bool WMIVideoInfo::_initializeDXGI()
 {
-   // Try going for DXGI.  Will only succeed on Vista.
-#if 0
+   // Try using for DXGI 1.1, will only succeed on Windows 7+.
    mDXGIModule = ( HMODULE ) LoadLibrary( L"dxgi.dll" );
    if( mDXGIModule != 0 )
    {
-      typedef HRESULT (* CreateDXGIFactoryFuncType )( REFIID, void** );
+      typedef HRESULT (WINAPI* CreateDXGIFactoryFuncType )( REFIID, void** );
       CreateDXGIFactoryFuncType factoryFunction =
-         ( CreateDXGIFactoryFuncType ) GetProcAddress( ( HMODULE ) mDXGIModule, "CreateDXGIFactory" );
+         ( CreateDXGIFactoryFuncType ) GetProcAddress( ( HMODULE ) mDXGIModule, "CreateDXGIFactory1" );
 
-      if( factoryFunction && factoryFunction( IID_IDXGIFactory, ( void** ) &mDXGIFactory ) == S_OK )
+      if( factoryFunction && factoryFunction( IID_IDXGIFactory1, ( void** ) &mDXGIFactory ) == S_OK )
          return true;
       else
       {
@@ -299,7 +267,7 @@ bool WMIVideoInfo::_initializeDXGI()
          mDXGIModule = 0;
       }
    }
-#endif 
+
    return false;
 }
 
@@ -483,20 +451,36 @@ bool WMIVideoInfo::_queryPropertyDxDiag( const PVIQueryType queryType, const U32
 
 bool WMIVideoInfo::_queryPropertyDXGI( const PVIQueryType queryType, const U32 adapterId, String *outValue )
 {
-#if 0
+
    if( mDXGIFactory )
    {
-      IDXGIAdapter* adapter;
-      if( mDXGIFactory->EnumAdapters( adapterId, &adapter ) != S_OK )
+      // Special case to deal with PVI_NumAdapters
+      if (queryType == PVI_NumAdapters)
+      {
+         U32 count = 0;
+         IDXGIAdapter1 *adapter;
+         while (mDXGIFactory->EnumAdapters1(count, &adapter) != DXGI_ERROR_NOT_FOUND)
+         {
+            ++count;
+            adapter->Release();
+         }
+
+         String value = String::ToString("%d", count);
+         *outValue = value;
+         return true;
+      }
+
+      IDXGIAdapter1* adapter;
+      if( mDXGIFactory->EnumAdapters1( adapterId, &adapter ) != S_OK )
          return false;
 
-      DXGI_ADAPTER_DESC desc;
-      if( adapter->GetDesc( &desc ) != S_OK )
+      DXGI_ADAPTER_DESC1 desc;
+      if( adapter->GetDesc1( &desc ) != S_OK )
       {
          adapter->Release();
          return false;
       }
-
+ 
       String value;
       switch( queryType )
       {
@@ -511,15 +495,17 @@ bool WMIVideoInfo::_queryPropertyDXGI( const PVIQueryType queryType, const U32 a
       case PVI_VRAM:
          value = String( avar( "%i", desc.DedicatedVideoMemory / 1048576 ) );
          break;
-
-         //RDTODO
+      case PVI_ChipSet:
+         value = _lookUpVendorId(desc.VendorId);
+         break;
+      //TODO PVI_DriverVersion
       }
 
       adapter->Release();
       *outValue = value;
       return true;
    }
-#endif
+
    return false;
 }
 

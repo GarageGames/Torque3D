@@ -24,14 +24,14 @@
 
 struct ConnectData
 {
-   float4 hpos : POSITION;
+   float4 hpos : TORQUE_POSITION;
    float2 texCoord : TEXCOORD0;
 };
 
-uniform sampler2D diffuseMap        : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(diffuseMap, 0);
 
-float4 main( ConnectData IN ) : COLOR
+float4 main( ConnectData IN ) : TORQUE_TARGET0
 {
-   float4 col = tex2D( diffuseMap, IN.texCoord );
+   float4 col = TORQUE_TEX2D(diffuseMap, IN.texCoord);
    return hdrEncode( col );
 }

@@ -20,14 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"
 #include "../../postfx/postFx.hlsl"
+#include "../../shaderModelAutoGen.hlsl"
 
+TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER1D(depthViz, 1);
 
-float4 main( PFXVertToPix IN,
-             uniform sampler2D prepassTex : register(S0),
-             uniform sampler1D depthViz : register(S1) ) : COLOR0
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
-   float depth = prepassUncondition( prepassTex, IN.uv0 ).w;
-   return float4( tex1D( depthViz, depth ).rgb, 1.0 );
+   float depth = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 ).w;
+   return float4( TORQUE_TEX1D( depthViz, depth ).rgb, 1.0 );
 }

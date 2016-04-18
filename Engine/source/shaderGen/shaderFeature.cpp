@@ -85,3 +85,8 @@ Var* ShaderFeature::findOrCreateLocal( const char *name,
 
    return outVar;
 }
+
+void ShaderFeature::setInstancingFormat(GFXVertexFormat *format)
+{
+   mInstancingFormat = format;
+}

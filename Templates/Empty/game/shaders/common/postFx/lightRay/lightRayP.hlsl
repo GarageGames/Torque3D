@@ -22,28 +22,29 @@
 
 #include "../postFx.hlsl"
 
-uniform sampler2D frameSampler : register( s0 );
-uniform sampler2D backBuffer : register( s1 );
+TORQUE_UNIFORM_SAMPLER2D(frameSampler, 0);
+TORQUE_UNIFORM_SAMPLER2D(backBuffer, 1);
+
 
 uniform float3 camForward;
+uniform int numSamples;
 uniform float3 lightDirection;
+uniform float density;
 uniform float2 screenSunPos;
 uniform float2 oneOverTargetSize;
-uniform int numSamples;
-uniform float density;
 uniform float weight;
 uniform float decay;
 uniform float exposure;
 
-float4 main( PFXVertToPix IN ) : COLOR0  
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0 
 {  
     float4 texCoord = float4( IN.uv0.xy, 0, 0 );        
     
     // Store initial sample.
-    half3 color = (half3)tex2D( frameSampler, texCoord.xy ).rgb;  
+    half3 color = (half3)TORQUE_TEX2D( frameSampler, texCoord.xy ).rgb;  
 	
 	// Store original bb color.
-	float4 bbCol = tex2D( backBuffer, IN.uv1 );
+	float4 bbCol = TORQUE_TEX2D( backBuffer, IN.uv1 );
 
     // Set up illumination decay factor.
     half illuminationDecay = 1.0;  		
@@ -68,7 +69,7 @@ float4 main( PFXVertToPix IN ) : COLOR0
         texCoord.xy -= deltaTexCoord;  
 
         // Retrieve sample at new location.
-        half3 sample = (half3)tex2Dlod( frameSampler, texCoord );  
+        half3 sample = (half3)TORQUE_TEX2DLOD( frameSampler, texCoord );  
 
         // Apply sample attenuation scale/decay factors.
         sample *= half(illuminationDecay * weight);

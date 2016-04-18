@@ -20,15 +20,19 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "../../shaderModel.hlsl"
+
 struct MaterialDecoratorConnectV
 {
+   float4 hpos : TORQUE_POSITION;
    float2 uv0 : TEXCOORD0;
 };
 
-float4 main( MaterialDecoratorConnectV IN, 
-             uniform sampler2D shadowMap : register(S0),
-             uniform sampler1D depthViz  : register(S1) ) : COLOR0
+TORQUE_UNIFORM_SAMPLER2D(shadowMap, 0);
+TORQUE_UNIFORM_SAMPLER1D(depthViz, 1);
+
+float4 main( MaterialDecoratorConnectV IN ) : TORQUE_TARGET0
 {   
-   float depth = saturate( tex2D( shadowMap, IN.uv0 ).r );
-   return float4( tex1D( depthViz, depth ).rgb, 1 );
+   float depth = saturate( TORQUE_TEX2D( shadowMap, IN.uv0 ).r );
+   return float4( TORQUE_TEX1D( depthViz, depth ).rgb, 1 );
 }

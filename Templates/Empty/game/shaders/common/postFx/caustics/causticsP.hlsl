@@ -21,25 +21,26 @@
 //-----------------------------------------------------------------------------
 
 #include "../postFx.hlsl"
-#include "shadergen:/autogenConditioners.h"
+#include "../../shaderModelAutoGen.hlsl"
 
+uniform float     accumTime;
 uniform float3    eyePosWorld;
 uniform float4    rtParams0;
 uniform float4    waterFogPlane;
-uniform float     accumTime;
+
+TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(causticsTex0, 1);
+TORQUE_UNIFORM_SAMPLER2D(causticsTex1, 2);
 
 float distanceToPlane(float4 plane, float3 pos)
 {
    return (plane.x * pos.x + plane.y * pos.y + plane.z * pos.z) + plane.w;
 }
 
-float4 main( PFXVertToPix IN, 
-             uniform sampler2D prepassTex :register(S0),
-             uniform sampler2D causticsTex0 :register(S1),
-             uniform sampler2D causticsTex1 :register(S2) ) : COLOR
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {   
    //Sample the pre-pass
-   float4 prePass = prepassUncondition( prepassTex, IN.uv0 );
+   float4 prePass = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 );
    
    //Get depth
    float depth = prePass.w;   
@@ -65,12 +66,12 @@ float4 main( PFXVertToPix IN,
    causticsUV1.xy -= float2(accumTime*0.15, timeSin*0.15);   
    
    //Sample caustics texture   
-   float4 caustics = tex2D(causticsTex0, causticsUV0);   
-   caustics *= tex2D(causticsTex1, causticsUV1);
+   float4 caustics = TORQUE_TEX2D(causticsTex0, causticsUV0);   
+   caustics *= TORQUE_TEX2D(causticsTex1, causticsUV1);
    
    //Use normal Z to modulate caustics  
    //float waterDepth = 1 - saturate(pos.z + waterFogPlane.w + 1);
-   caustics *= saturate(prePass.z) * pow(1-depth, 64) * waterDepth; 
+   caustics *= saturate(prePass.z) * pow(abs(1-depth), 64) * waterDepth; 
       
    return caustics;   
 }
