@@ -491,6 +491,7 @@ namespace Con
    bool isBasePath(const char* SrcPath, const char* pBasePath);
    void ensureTrailingSlash(char* pDstPath, const char* pSrcPath);
    bool stripRepeatSlashes(char* pDstPath, const char* pSrcPath, S32 dstSize);
+   StringTableEntry getDSOPath(const char *scriptPath);
 
    void addPathExpando(const char* pExpandoName, const char* pPath);
    void removePathExpando(const char* pExpandoName);
@@ -801,6 +802,16 @@ namespace Con
    /// NOTE: this function restores the console stack on return.
    ConsoleValueRef execute(SimObject *object, S32 argc, const char* argv[], bool thisCallOnly = false);
    ConsoleValueRef execute(SimObject *object, S32 argc, ConsoleValueRef argv[], bool thisCallOnly = false);
+
+   /// Executes a script file and compiles it for use in script.
+   ///
+   /// @param  string   File name that is the script to be executed and compiled.
+   /// @param fileName Path to the file to execute
+   /// @param noCalls Deprecated
+   /// @param journalScript Deprecated
+   ///
+   /// @return True if the script was successfully executed, false if not.
+   bool executeFile(const char* fileName, bool noCalls, bool journalScript);
 
    /// Evaluate an arbitrary chunk of code.
    ///
