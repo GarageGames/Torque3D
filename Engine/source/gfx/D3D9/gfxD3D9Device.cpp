@@ -147,16 +147,16 @@ inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSCo
 #ifdef WANT_TO_SIMULATE_UI_ON_360
    if( mGenericShader[GSColor] == NULL )
    {
-      mGenericShader[GSColor] =           createShader( "shaders/common/genericColorV.hlsl", 
-         "shaders/common/genericColorP.hlsl", 
+      mGenericShader[GSColor] =           createShader( String(Con::getVariable("$Core::CommonShaderPath")) + "/genericColorV.hlsl", 
+         String(Con::getVariable("$Core::CommonShaderPath")) + "/genericColorP.hlsl", 
          2.f );
 
-      mGenericShader[GSModColorTexture] = createShader( "shaders/common/genericModColorTextureV.hlsl", 
-         "shaders/common/genericModColorTextureP.hlsl", 
+      mGenericShader[GSModColorTexture] = createShader( String(Con::getVariable("$Core::CommonShaderPath")) + "/genericModColorTextureV.hlsl", 
+         String(Con::getVariable("$Core::CommonShaderPath")) + "/genericModColorTextureP.hlsl", 
          2.f );
 
-      mGenericShader[GSAddColorTexture] = createShader( "shaders/common/genericAddColorTextureV.hlsl", 
-         "shaders/common/genericAddColorTextureP.hlsl", 
+      mGenericShader[GSAddColorTexture] = createShader( String(Con::getVariable("$Core::CommonShaderPath")) + "/genericAddColorTextureV.hlsl", 
+         String(Con::getVariable("$Core::CommonShaderPath")) + "/genericAddColorTextureP.hlsl", 
          2.f );
    }
 

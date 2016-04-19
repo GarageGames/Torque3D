@@ -29,7 +29,7 @@ elseif( CMAKE_CXX_SIZEOF_DATA_PTR EQUAL 4 )
 endif()
 
 if(NOT TORQUE_TEMPLATE)
-    set(TORQUE_TEMPLATE "Full" CACHE STRING "the template to use")
+    set(TORQUE_TEMPLATE "BaseGame" CACHE STRING "the template to use")
 endif()
 if(NOT TORQUE_APP_DIR)
     set(TORQUE_APP_DIR "${CMAKE_SOURCE_DIR}/My Projects/${TORQUE_APP_NAME}")

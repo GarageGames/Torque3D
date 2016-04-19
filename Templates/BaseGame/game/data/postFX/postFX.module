@@ -1,0 +1,9 @@
+<ModuleDefinition
+	ModuleId="PostFX"
+	VersionId="1"
+	Description="Default PostFX elements"
+	ScriptFile="postFX.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Game">
+</ModuleDefinition>

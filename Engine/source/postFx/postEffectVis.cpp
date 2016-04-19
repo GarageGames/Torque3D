@@ -43,6 +43,8 @@ ConsoleDoc(
 
 MODULE_BEGIN( PostEffectVis )
 
+   MODULE_SHUTDOWN_AFTER(PostEffectManager)
+
    MODULE_INIT
    {
       ManagedSingleton< PostEffectVis >::createSingleton();

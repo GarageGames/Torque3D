@@ -30,7 +30,7 @@
 
 
 PixelSpecularHLSL::PixelSpecularHLSL()
-   : mDep( "shaders/common/lighting.hlsl" )
+   : mDep(String(Con::getVariable("$Core::CommonShaderPath")) + "/lighting.hlsl")
 {
    addDependency( &mDep );
 }

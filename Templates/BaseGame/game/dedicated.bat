@@ -1,0 +1,1 @@
+NewTemplate.exe -dedicated -mission levels/Empty_Room.mis

@@ -1,0 +1,9 @@
+<ModuleDefinition
+	ModuleId="coreArt"
+	VersionId="1"
+	Description="Module that implements the some standard, core art for the game and tools."
+	ScriptFile="coreArt.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Game">
+</ModuleDefinition>

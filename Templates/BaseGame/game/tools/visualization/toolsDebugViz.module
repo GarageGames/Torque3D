@@ -1,0 +1,9 @@
+<ModuleDefinition
+	ModuleId="toolsDebugViz"
+	VersionId="1"
+	Description="Sets up debug visualization modes for the editor"
+	ScriptFile="toolsDebugViz.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Tools">
+</ModuleDefinition>
