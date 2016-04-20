@@ -262,6 +262,7 @@ function EditorGui::buildMenus(%this)
       barTitle = "Tools";
          
       item[0] = "Network Graph" TAB "n" TAB "toggleNetGraph();";
+      item[1] = "Profiler" TAB "ctrl F2" TAB "showMetrics(true);";
    };
    %this.menuBar.insert(%toolsMenu, %this.menuBar.getCount());
       
