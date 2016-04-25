@@ -11,6 +11,11 @@
 #include "gfx/D3D11/gfxD3D11EnumTranslate.h"
 #include "gfx/gfxStringEnumTranslate.h"
 
+
+#include "gfx/D3D9/gfxD3D9Device.h"
+#include "gfx/D3D9/gfxD3D9TextureObject.h"
+#include "gfx/D3D9/gfxD3D9EnumTranslate.h"
+
 /*
 #include "gfx/gl/gfxGLDevice.h"
 #include "gfx/gl/gfxGLTextureObject.h"
@@ -19,6 +24,8 @@
 
 #include "platform/input/oculusVR/oculusVRUtil.h"
 
+
+//------------------------------------------------------------
 
 U32 OpenVRProvider::OVR_SENSORROT[vr::k_unMaxTrackedDeviceCount] = { 0 };
 U32 OpenVRProvider::OVR_SENSORROTANG[vr::k_unMaxTrackedDeviceCount] = { 0 };
@@ -107,6 +114,9 @@ bool OpenVRRenderState::setupRenderTargets(U32 mode)
    mStereoRT->attachTexture(GFXTextureTarget::DepthStencil, stereoDepthTexture);
 
    mEyeRT[0] = mEyeRT[1] = mStereoRT;
+
+   mOutputEyeTextures[0].init(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8, &VRTextureProfile, "OpenVR Stereo RT Color OUTPUT");
+   mOutputEyeTextures[1].init(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8, &VRTextureProfile, "OpenVR Stereo RT Color OUTPUT");
 
    return true;
 }
@@ -272,6 +282,9 @@ void OpenVRRenderState::reset(vr::IVRSystem* hmd)
    mDistortionVerts = NULL;
    mDistortionInds = NULL;
 
+   mOutputEyeTextures[0].clear();
+   mOutputEyeTextures[1].clear();
+
    if (!mHMD)
       return;
 
@@ -303,6 +316,7 @@ OpenVRProvider::OpenVRProvider() :
    buildInputCodeTable();
    GFXDevice::getDeviceEventSignal().notify(this, &OpenVRProvider::_handleDeviceEvent);
    INPUTMGR->registerDevice(this);
+   dMemset(&mLUID, '\0', sizeof(mLUID));
 }
 
 OpenVRProvider::~OpenVRProvider()
@@ -333,6 +347,49 @@ bool OpenVRProvider::enable()
       Con::printf(buf);
       return false;
    }
+
+   dMemset(&mLUID, '\0', sizeof(mLUID));
+
+#ifdef TORQUE_OS_WIN32
+
+   // For windows we need to lookup the DXGI record for this and grab the LUID for the display adapter. We need the LUID since 
+   // T3D uses EnumAdapters1 not EnumAdapters whereas openvr uses EnumAdapters.
+   int32_t AdapterIdx;
+   IDXGIAdapter* EnumAdapter;
+   IDXGIFactory1* DXGIFactory;
+   mHMD->GetDXGIOutputInfo(&AdapterIdx);
+   // Get the LUID of the device
+
+   HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&DXGIFactory));
+
+   if (FAILED(hr))
+	   AssertFatal(false, "OpenVRProvider::enable -> CreateDXGIFactory1 call failure");
+
+   hr = DXGIFactory->EnumAdapters(AdapterIdx, &EnumAdapter);
+
+   if (FAILED(hr))
+   {
+	   Con::warnf("VR: HMD device has an invalid adapter.");
+   }
+   else
+   {
+	   DXGI_ADAPTER_DESC desc;
+	   hr = EnumAdapter->GetDesc(&desc);
+	   if (FAILED(hr))
+	   {
+		   Con::warnf("VR: HMD device has an invalid adapter.");
+	   }
+	   else
+	   {
+		   dMemcpy(&mLUID, &desc.AdapterLuid, sizeof(mLUID));
+	   }
+	   SAFE_RELEASE(EnumAdapter);
+   }
+
+   SAFE_RELEASE(DXGIFactory);
+#endif
+
+
 
    mRenderModels = (vr::IVRRenderModels *)vr::VR_GetGenericInterface(vr::IVRRenderModels_Version, &eError);
    if (!mRenderModels)
@@ -440,6 +497,9 @@ bool OpenVRProvider::process()
 {
    if (!mHMD)
       return true;
+
+   if (!vr::VRCompositor())
+	   return true;
 
    // Process SteamVR events
    vr::VREvent_t event;
@@ -570,7 +630,7 @@ void OpenVRProvider::setDrawCanvas(GuiCanvas *canvas)
 
    if (!vr::VRCompositor())
    {
-      printf("Compositor initialization failed. See log file for details\n");
+      Con::errorf("VR: Compositor initialization failed. See log file for details\n");
       return;
    }
 
@@ -614,16 +674,30 @@ void OpenVRProvider::onEyeRendered(U32 index)
    if (!mHMD)
       return;
 
+   vr::EVRCompositorError err = vr::VRCompositorError_None;
+
+   GFXTexHandle eyeTex = mHMDRenderState.mOutputEyeTextures[index].getTextureHandle();
+   mHMDRenderState.mEyeRT[0]->resolveTo(eyeTex);
+   mHMDRenderState.mOutputEyeTextures[index].advance();
+
    if (GFX->getAdapterType() == Direct3D11)
    {
-      vr::Texture_t eyeTexture = { (void*)static_cast<GFXD3D11TextureObject*>(mHMDRenderState.mStereoRenderTextures[index].getPointer())->get2DTex(), vr::API_DirectX, vr::ColorSpace_Gamma };
-      vr::VRCompositor()->Submit((vr::EVREye)(vr::Eye_Left + index), &eyeTexture);
+	  GFXFormat fmt1 = eyeTex->getFormat();
+      vr::Texture_t eyeTexture = { (void*)static_cast<GFXD3D11TextureObject*>(eyeTex.getPointer())->get2DTex(), vr::API_DirectX, vr::ColorSpace_Gamma };
+      err = vr::VRCompositor()->Submit((vr::EVREye)(vr::Eye_Left + index), &eyeTexture);
+   }
+   else if (GFX->getAdapterType() == Direct3D9)
+   {
+	   //vr::Texture_t eyeTexture = { (void*)static_cast<GFXD3D9TextureObject*>(mHMDRenderState.mStereoRenderTextures[index].getPointer())->get2DTex(), vr::API_DirectX, vr::ColorSpace_Gamma };
+	   //err = vr::VRCompositor()->Submit((vr::EVREye)(vr::Eye_Left + index), &eyeTexture);
    }
    else if (GFX->getAdapterType() == OpenGL)
    {/*
       vr::Texture_t eyeTexture = { (void*)static_cast<GFXGLTextureObject*>(mHMDRenderState.mStereoRenderTextures[index].getPointer())->getHandle(), vr::API_OpenGL, vr::ColorSpace_Gamma };
       vr::VRCompositor()->Submit((vr::EVREye)(vr::Eye_Left + index), &eyeTexture);*/
    }
+
+   AssertFatal(err != vr::VRCompositorError_None, "VR compositor error!");
 }
 
 bool OpenVRProvider::_handleDeviceEvent(GFXDevice::GFXDeviceEventType evt)
@@ -673,6 +747,29 @@ bool OpenVRProvider::_handleDeviceEvent(GFXDevice::GFXDeviceEventType evt)
    }
 
    return true;
+}
+
+S32 OpenVRProvider::getDisplayDeviceId() const
+{
+	return -1;
+#ifdef TORQUE_OS_WIN32
+	if (GFX->getAdapterType() == Direct3D11)
+	{
+		Vector<GFXAdapter*> adapterList;
+		GFXD3D11Device::enumerateAdapters(adapterList);
+
+		for (U32 i = 0, sz = adapterList.size(); i < sz; i++)
+		{
+			GFXAdapter* adapter = adapterList[i];
+			if (dMemcmp(&adapter->mLUID, &mLUID, sizeof(mLUID)) == 0)
+			{
+				return adapter->mIndex;
+			}
+		}
+	}
+#endif
+
+	return -1;
 }
 
 void OpenVRProvider::processVREvent(const vr::VREvent_t & event)
@@ -868,6 +965,21 @@ DefineEngineFunction(setOpenVRHMDAsGameConnectionDisplayDevice, bool, (GameConne
 
    conn->setDisplayDevice(ManagedSingleton<OpenVRProvider>::instance());
    return true;
+}
+
+
+DefineEngineFunction(OpenVRGetDisplayDeviceId, S32, (), ,
+	"@brief MacOS display ID.\n\n"
+	"@param index The HMD index.\n"
+	"@return The ID of the HMD display device, if any.\n"
+	"@ingroup Game")
+{
+	if (!ManagedSingleton<OpenVRProvider>::instanceOrNull())
+	{
+		return -1;
+	}
+
+	return ManagedSingleton<OpenVRProvider>::instance()->getDisplayDeviceId();
 }
 
 DefineEngineFunction(OpenVRResetSensors, void, (), ,

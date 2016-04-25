@@ -293,19 +293,19 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
    // Get the user's preference for device...
    const String   renderer   = Con::getVariable("$pref::Video::displayDevice");
    const String   outputDevice = Con::getVariable("$pref::Video::displayOutputDevice");
-	const String   adapterDevice = Con::getVariable("$Video::forceDisplayAdapter");
+   const String   adapterDevice = Con::getVariable("$Video::forceDisplayAdapter");
 
-	GFXAdapterType adapterType = getAdapterTypeFromName(renderer.c_str());;
-	GFXAdapter     *adapter;
+   GFXAdapterType adapterType = getAdapterTypeFromName(renderer.c_str());;
+   GFXAdapter     *adapter;
 
-	if (adapterDevice.isEmpty())
-	{
-		adapter = chooseAdapter(adapterType, outputDevice.c_str());
-	}
-	else
-	{
-		adapter = chooseAdapter(adapterType, dAtoi(adapterDevice.c_str()));
-	}
+   if (adapterDevice.isEmpty())
+   {
+      adapter = chooseAdapter(adapterType, outputDevice.c_str());
+   }
+   else if (dAtoi(adapterDevice.c_str()) != -1)
+   {
+      adapter = chooseAdapter(adapterType, dAtoi(adapterDevice.c_str()));
+   }
 
    // Did they have one? Return it.
    if(adapter)

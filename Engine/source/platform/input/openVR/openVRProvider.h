@@ -20,6 +20,44 @@
 
 class OpenVRHMDDevice;
 
+class VRTextureSet
+{
+public:
+	static const int TextureCount = 2;
+	GFXTexHandle mTextures[2];
+	U32 mIndex;
+
+	VRTextureSet() : mIndex(0)
+	{
+	}
+
+	void init(U32 width, U32 height, GFXFormat fmt, GFXTextureProfile *profile, const String &desc)
+	{
+		for (U32 i = 0; i < TextureCount; i++)
+		{
+			mTextures[i].set(width, height, fmt, profile, desc);
+		}
+	}
+
+	void clear()
+	{
+		for (U32 i = 0; i < TextureCount; i++)
+		{
+			mTextures[i] = NULL;
+		}
+	}
+
+	void advance()
+	{
+		mIndex = (mIndex + 1) & TextureCount;
+	}
+
+	GFXTexHandle& getTextureHandle()
+	{
+		return mTextures[mIndex];
+	}
+};
+
 struct OpenVRRenderState
 {
    vr::IVRSystem *mHMD;
@@ -37,6 +75,8 @@ struct OpenVRRenderState
 
    GFXVertexBufferHandle<GFXVertexPTTT> mDistortionVerts;
    GFXPrimitiveBufferHandle mDistortionInds;
+
+   VRTextureSet mOutputEyeTextures[2];
 
    bool setupRenderTargets(U32 mode);
    void setupDistortion();
@@ -114,6 +154,8 @@ public:
    virtual void onEyeRendered(U32 index);
 
    bool _handleDeviceEvent(GFXDevice::GFXDeviceEventType evt);
+
+   S32 getDisplayDeviceId() const;
    /// }
 
    /// @name OpenVR handling
@@ -140,6 +182,7 @@ public:
    char mDeviceClassChar[vr::k_unMaxTrackedDeviceCount];
 
    OpenVRRenderState mHMDRenderState;
+   GFXAdapterLUID mLUID;
    /// }
 
    GuiCanvas* mDrawCanvas;
