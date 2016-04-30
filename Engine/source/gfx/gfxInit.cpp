@@ -296,15 +296,19 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
    const String   adapterDevice = Con::getVariable("$Video::forceDisplayAdapter");
 
    GFXAdapterType adapterType = getAdapterTypeFromName(renderer.c_str());;
-   GFXAdapter     *adapter;
+   GFXAdapter     *adapter = NULL;
 
    if (adapterDevice.isEmpty())
    {
       adapter = chooseAdapter(adapterType, outputDevice.c_str());
    }
-   else if (dAtoi(adapterDevice.c_str()) != -1)
+   else
    {
-      adapter = chooseAdapter(adapterType, dAtoi(adapterDevice.c_str()));
+	  S32 adapterIdx = dAtoi(adapterDevice.c_str());
+	  if (adapterIdx == -1)
+		  adapter = chooseAdapter(adapterType, outputDevice.c_str());
+	  else
+		  adapter = chooseAdapter(adapterType, adapterIdx);
    }
 
    // Did they have one? Return it.
