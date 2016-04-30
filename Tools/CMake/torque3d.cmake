@@ -195,7 +195,13 @@ addPath("${srcDir}/windowManager/test")
 addPath("${srcDir}/math")
 addPath("${srcDir}/math/util")
 addPath("${srcDir}/math/test")
+
+if(NOT TORQUE_SDL) 
+   set(BLACKLIST "fileDialog.cpp" )
+endif()
 addPath("${srcDir}/platform")
+set(BLACKLIST "" )
+
 addPath("${srcDir}/cinterface")
 addPath("${srcDir}/platform/nativeDialogs")
 if( NOT TORQUE_DEDICATED )
@@ -365,6 +371,28 @@ if(TORQUE_SDL)
        else()
          set(ENV{LDFLAGS} "${CXX_FLAG32} ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
        endif()
+
+       find_package(PkgConfig REQUIRED)
+       pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+
+       # Setup CMake to use GTK+, tell the compiler where to look for headers
+       # and to the linker where to look for libraries
+       include_directories(${GTK3_INCLUDE_DIRS})
+       link_directories(${GTK3_LIBRARY_DIRS})
+
+       # Add other flags to the compiler
+       add_definitions(${GTK3_CFLAGS_OTHER})
+
+       set(BLACKLIST "nfd_win.cpp"  )
+       addLib(nativeFileDialogs)
+
+       set(BLACKLIST ""  )
+       target_link_libraries(nativeFileDialogs ${GTK3_LIBRARIES})
+ 	else()
+ 	   set(BLACKLIST "nfd_gtk.c" )
+ 	   addLib(nativeFileDialogs)
+       set(BLACKLIST ""  )
+ 	   addLib(comctl32)	   
     endif()
     
     #override and hide SDL2 cache variables
@@ -388,7 +416,11 @@ endforeach()
 ###############################################################################
 if(WIN32)
     addPath("${srcDir}/platformWin32")
+    if(TORQUE_SDL) 
+ 		set(BLACKLIST "fileDialog.cpp" )
+ 	endif()
     addPath("${srcDir}/platformWin32/nativeDialogs")
+    set(BLACKLIST "" )
     addPath("${srcDir}/platformWin32/menus")
     addPath("${srcDir}/platformWin32/threads")
     addPath("${srcDir}/platformWin32/videoInfo")
@@ -634,6 +666,9 @@ addInclude("${libDir}/libogg/include")
 addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
+if(TORQUE_SDL)
+   addInclude("${libDir}/nativeFileDialogs/include")
+endif()
 if(TORQUE_OPENGL)
 	addInclude("${libDir}/glew/include")
 endif()
