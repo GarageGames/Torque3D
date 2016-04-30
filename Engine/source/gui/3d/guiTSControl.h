@@ -35,6 +35,10 @@
 #include "materials/matTextureTarget.h"
 #endif
 
+#ifndef _GUIOFFSCREENCANVAS_H_
+#include "gui/core/guiOffscreenCanvas.h"
+#endif
+
 class IDisplayDevice;
 class GuiOffscreenCanvas;
 
@@ -52,6 +56,7 @@ struct CameraQuery
    bool        hasFovPort;
    bool        hasStereoTargets;
    MatrixF     cameraMatrix;
+   S32         currentEye;
    RectI       stereoViewports[2]; // destination viewports
    GFXTextureTarget* stereoTargets[2];
    GuiCanvas* drawCanvas; // Canvas we are drawing to. Needed for VR
@@ -68,7 +73,7 @@ public:
    enum RenderStyles {
       RenderStyleStandard           = 0,
       RenderStyleStereoSideBySide   = (1<<0),
-     RenderStyleStereoSeparate     = (1<<1),
+      RenderStyleStereoSeparate     = (1<<1),
    };
 
 protected:
@@ -110,6 +115,8 @@ protected:
 
    GFXVertexBufferHandle<GFXVertexPCT> mStereoPreviewVB;
    GFXStateBlockRef mStereoPreviewSB;
+
+   SimObjectPtr<GuiOffscreenCanvas> mStereoCanvas;
    
 public:
    
