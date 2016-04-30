@@ -697,7 +697,7 @@ void OpenVRProvider::onEyeRendered(U32 index)
       vr::VRCompositor()->Submit((vr::EVREye)(vr::Eye_Left + index), &eyeTexture);*/
    }
 
-   AssertFatal(err != vr::VRCompositorError_None, "VR compositor error!");
+   AssertFatal(err == vr::VRCompositorError_None, "VR compositor error!");
 }
 
 bool OpenVRProvider::_handleDeviceEvent(GFXDevice::GFXDeviceEventType evt)

@@ -49,7 +49,7 @@ public:
 
 	void advance()
 	{
-		mIndex = (mIndex + 1) & TextureCount;
+		mIndex = (mIndex + 1) % TextureCount;
 	}
 
 	GFXTexHandle& getTextureHandle()
