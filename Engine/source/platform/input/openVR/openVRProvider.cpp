@@ -22,7 +22,26 @@
 #include "gfx/gl/gfxGLEnumTranslate.h"
 */
 
-#include "platform/input/oculusVR/oculusVRUtil.h"
+namespace OpenVRUtil
+{
+   /// Convert an OVR sensor's rotation to a Torque 3D matrix
+   void convertRotation(const F32 inRotMat[4][4], MatrixF& outRotation)
+   {   
+      // Set rotation.  We need to convert from sensor coordinates to
+      // Torque coordinates.  The sensor matrix is stored row-major.
+      // The conversion is:
+      //
+      // Sensor                       Torque
+      // a b c         a  b  c        a -c  b
+      // d e f   -->  -g -h -i  -->  -g  i -h
+      // g h i         d  e  f        d -f  e
+      outRotation.setColumn(0, Point4F( inRotMat[0][0], -inRotMat[2][0],  inRotMat[1][0], 0.0f));
+      outRotation.setColumn(1, Point4F(-inRotMat[0][2],  inRotMat[2][2], -inRotMat[1][2], 0.0f));
+      outRotation.setColumn(2, Point4F( inRotMat[0][1], -inRotMat[2][1],  inRotMat[1][1], 0.0f));
+      outRotation.setPosition(Point3F::Zero);
+   }
+}
+
 
 
 //------------------------------------------------------------
@@ -562,7 +581,7 @@ void OpenVRTransformToRotPos(MatrixF mat, QuatF &outRot, Point3F &outPos)
    inRotMat[3][2] = col3.z;
    inRotMat[3][3] = col3.w;
 
-   OculusVRUtil::convertRotation(inRotMat, torqueMat);
+   OpenVRUtil::convertRotation(inRotMat, torqueMat);
 
    Point3F pos = torqueMat.getPosition();
    outRot = QuatF(torqueMat);
