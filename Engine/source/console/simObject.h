@@ -606,6 +606,10 @@ class SimObject: public ConsoleObject, public TamlCallbacks
       /// Called when the object's name is changed.
       virtual void onNameChange(const char *name);
       
+      /// Called when the adding of the object to the sim is complete, all sub-objects have been processed as well
+      // This is a special-case function that only really gets used with Entities/BehaviorObjects.
+      virtual void onPostAdd() {}
+
       ///
       ///  Specifically, these are called by setDataField
       ///  when a static or dynamic field is modified, see
