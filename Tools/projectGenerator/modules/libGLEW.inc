@@ -1,5 +1,6 @@
+<?php
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2016 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,17 +21,17 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef T_GL_H
-#define T_GL_H
-#include <GL/glew.h>
+beginModule( 'libGLEW' );
 
-#if defined (TORQUE_OS_WIN)
-// This doesn't work on Mesa drivers.
-#define gglHasExtension(EXTENSION) GLEW_##EXTENSION
-#else
-// Slower but reliably detects extensions on Mesa.
-#define gglHasExtension(EXTENSION) glewGetExtension("GL_" # EXTENSION)
-#endif
+   includeLib( 'libGLEW' );
+   addLibIncludePath( "glew/include" );
 
-#endif
+   if (inProjectConfig())
+   {
+      addProjectDependency( 'libGLEW' ); 
+      addSolutionProjectRef( 'libGLEW' );
+   }
+   
+endModule();
 
+?>

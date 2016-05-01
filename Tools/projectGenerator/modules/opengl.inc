@@ -31,11 +31,11 @@ beginModule('openGL');
 	{
 		addEngineSrcDir("gfx/gl");
 		addEngineSrcDir("gfx/gl/tGL");
+		addEngineSrcDir("gfx/gl/util");
 		addEngineSrcDir("shaderGen/GLSL");
 		addEngineSrcDir("lighting/advanced/glsl");
 		addEngineSrcDir("terrain/glsl");
 		addEngineSrcDir("forest/glsl");
-		addLibSrcFile("glew/src/glew.c");
 	}
 
 	if(!isDefined("TORQUE_SDL"))
@@ -48,7 +48,7 @@ beginModule('openGL');
     if ( T3D_Generator::$platform == "win32" )
     {
         addProjectLibInput('OpenGL32.lib');
-        addProjectDefine('GLEW_STATIC');
+		addProjectDefine('GLEW_STATIC');
     }
 
 endModule();

@@ -43,6 +43,8 @@ class Torque3D
         includeLib( 'collada_dom' );
         includeLib( 'pcre' ); 
         includeLib( 'convexDecomp' ); 
+        includeLib( 'libGLEW' );
+        includeLib( 'openal' );
 
         // Use FMOD on consoles
         if ( T3D_Generator::$platform != "360" && T3D_Generator::$platform != "ps3" )
@@ -104,6 +106,8 @@ class Torque3D
         addLibIncludePath( "opcode" );
         addLibIncludePath( "squish" );
         addLibIncludePath( 'convexDecomp' ); 
+        addLibIncludePath( 'libGLEW' ); 
+        addLibIncludePath( 'openal' );
         
         if ( T3D_Generator::$platform != "360" && T3D_Generator::$platform != "ps3" )
         {
@@ -120,6 +124,7 @@ class Torque3D
         includeModule( 'advancedLighting' );
         includeModule( 'basicLighting' );
         includeModule( 'collada' );
+        IncludeModule( 'opengl' );
         
         if ( T3D_Generator::$platform != "360" && T3D_Generator::$platform != "ps3" )
         {
@@ -127,12 +132,10 @@ class Torque3D
           includeModule( 'theora' );
         }
        
-        if(T3D_Generator::$platform == "mac" || T3D_Generator::$platform == "win32")
-           includeModule( 'openal' );
-
+        //Dushan - Include OpenAL module on all supported platforms (Mac, Windows and Linux)
+        includeModule( 'openal' );
    
         // Dependencies
-        
         addProjectDependency( 'lmng' );
         addProjectDependency( 'lpng' );
         addProjectDependency( 'lungif' );
@@ -144,6 +147,7 @@ class Torque3D
         addProjectDependency( 'collada_dom' );
         addProjectDependency( 'pcre' );
         addProjectDependency( 'convexDecomp' ); 
+        addProjectDependency( 'libGLEW' ); 
         
         if ( T3D_Generator::$platform != "360" && T3D_Generator::$platform != "ps3" )
         {
@@ -246,6 +250,8 @@ class Torque3D
               addSolutionProjectRef( 'tinyxml' );
               addSolutionProjectRef( 'zlib' );
               addSolutionProjectRef( 'convexDecomp' ); 
+              addSolutionProjectRef( 'libGLEW' ); 
+              addSolutionProjectRef( 'openal' ); 
               
               if (T3D_Generator::$platform == "win32")
               {
