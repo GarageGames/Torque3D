@@ -31,6 +31,14 @@
 #include "math/mPoint3.h"
 #endif
 
+#ifndef _MQUAT_H_
+#include "math/mQuat.h"
+#endif
+
+#ifndef _MMATRIX_H_
+#include "math/mMatrix.h"
+#endif
+
 #ifndef _MANGAXIS_H_
 #include "math/mAngAxis.h"
 #endif
@@ -42,545 +50,336 @@
 class RotationF
 {
    //-------------------------------------- Public data
-  public:
-   F32 x;   ///< X co-ordinate.
-   F32 y;   ///< Y co-ordinate.
-   F32 z;   ///< Z co-ordinate.
-   F32 w;   ///< W co-ordinate.
+public:
 
-   enum RotationTypes
-   {
-      Euler = 0,
-      AxisAngle
-   };
+   QuatF mRotation;
 
    enum UnitFormat
    {
       Radians = 0,
       Degrees
    };
-   
-   RotationTypes mRotationType;
 
    UnitFormat mUnitsFormat;
 
-  public:
    RotationF();               ///< Create an uninitialized point.
    RotationF(const RotationF&); ///< Copy constructor.
 
-   /// Create point from coordinates.
-   RotationF(F32 _x, F32 _y, F32 _z, F32 _w, UnitFormat format = Radians);
+   //
+   //Eulers
+   RotationF(EulerF euler, UnitFormat format = Degrees);
+   RotationF(F32 _x, F32 _y, F32 _z, UnitFormat format = Degrees);
 
-   /// Set point's coordinates.
-   void set(F32 _x, F32 _y, F32 _z, F32 _w, UnitFormat format = Radians);
+   void set(EulerF euler, UnitFormat format = Degrees);
+   void set(F32 _x, F32 _y, F32 _z, UnitFormat format = Degrees);
 
-   //Euler setup
-   RotationF(EulerF euler, UnitFormat format = Radians);
-   RotationF(F32 _x, F32 _y, F32 _z, UnitFormat format = Radians);
+   //As with AxisAngles, we make the assumption here that if not told otherwise, inbound rotations are in Degrees.
+   RotationF operator=(const EulerF&);
+   RotationF operator-(const EulerF&) const;
+   RotationF operator+(const EulerF&) const;
+   RotationF& operator-=(const EulerF&);
+   RotationF& operator+=(const EulerF&);
+   S32 operator==(const EulerF&) const;
+   S32 operator!=(const EulerF&) const;
 
-   void set(F32 _x, F32 _y, F32 _z, UnitFormat format = Radians);
+   //
+   //AxisAngle
+   RotationF(AngAxisF aa, UnitFormat format = Degrees);
+   void set(AngAxisF aa, UnitFormat format = Degrees);
 
-   //Matrix
-   RotationF(MatrixF mat);
-   void set(MatrixF _mat);
+   //As with Eulers, we make the assumption here that if not told otherwise, inbound rotations are in Degrees.
+   RotationF operator=(const AngAxisF&);
+   RotationF operator-(const AngAxisF&) const;
+   RotationF operator+(const AngAxisF&) const;
+   RotationF& operator-=(const AngAxisF&);
+   RotationF& operator+=(const AngAxisF&);
+   S32 operator==(const AngAxisF&) const;
+   S32 operator!=(const AngAxisF&) const;
 
-   RotationF& operator=(const MatrixF&);
-
+   //
    //Quat
    RotationF(QuatF quat);
    void set(QuatF _quat);
 
-   RotationF& operator=(const QuatF&);
+   RotationF operator=(const QuatF&);
+   RotationF operator-(const QuatF&) const;
+   RotationF operator+(const QuatF&) const;
+   RotationF& operator-=(const QuatF&);
+   RotationF& operator+=(const QuatF&);
+   S32 operator==(const QuatF&) const;
+   S32 operator!=(const QuatF&) const;
 
-   /// Interpolate from _pt1 to _pt2, based on _factor.
-   ///
-   /// @param   _pt1    Starting point.
-   /// @param   _pt2    Ending point.
-   /// @param   _factor Interpolation factor (0.0 .. 1.0).
+   //
+   //Matrix
+   RotationF(MatrixF mat);
+   void set(MatrixF _mat);
+
+   RotationF operator=(const MatrixF&);
+   RotationF operator-(const MatrixF&) const;
+   RotationF operator+(const MatrixF&) const;
+   RotationF& operator-=(const MatrixF&);
+   RotationF& operator+=(const MatrixF&);
+   S32 operator==(const MatrixF&) const;
+   S32 operator!=(const MatrixF&) const;
+
+   //
    void interpolate(const RotationF& _pt1, const RotationF& _pt2, F32 _factor);
 
-   void zero();
-
-   operator F32*() { return (&x); }
-   operator const F32*() const { return &x; }
-   
    F32 len() const;
 
-   RotationF operator/(F32) const;
+   void normalize();
 
-   RotationF operator*(F32) const;
+   //Non-converting operators
+   S32 operator ==(const RotationF &) const;
+   S32 operator !=(const RotationF &) const;
+
    RotationF  operator+(const RotationF&) const;
    RotationF& operator+=(const RotationF&);
-   RotationF  operator-(const RotationF&) const;      
-   RotationF operator*(const RotationF&) const;
-   RotationF& operator*=(const RotationF&);
+   RotationF  operator-(const RotationF&) const;
+   RotationF&  operator-=(const RotationF&);
 
    RotationF& operator=(const RotationF&);
 
    //Conversion stuffs
-   RotationF& operator=(const AngAxisF&);
-
-   RotationF& operator=(const Point3F&);
-
-   EulerF asEulerF(UnitFormat format = Radians) const;
-
-   AngAxisF asAxisAngle(UnitFormat format = Radians) const;
-   
+   EulerF asEulerF(UnitFormat format = Degrees) const;
+   AngAxisF asAxisAngle(UnitFormat format = Degrees) const;
    MatrixF asMatrixF() const;
-
    QuatF asQuatF() const;
-
-   //set functions
-   void set(EulerF _eul, UnitFormat format = Radians);
-   void set(AngAxisF _aa, UnitFormat format = Radians);
-
-	//-------------------------------------- Public static constants
-  public:
-	const static RotationF One;
-	const static RotationF Zero;
 };
 
-//------------------------------------------------------------------------------
-//
 inline RotationF::RotationF()
 {
-   mRotationType = AxisAngle;
+   mRotation.Identity;
+
+   mUnitsFormat = Degrees;
 }
 
 inline RotationF::RotationF(const RotationF& _copy)
- : x(_copy.x), y(_copy.y), z(_copy.z), w(_copy.w), mRotationType(_copy.mRotationType)
+   : mRotation(_copy.mRotation), mUnitsFormat(_copy.mUnitsFormat)
+{}
+
+inline int RotationF::operator ==(const RotationF& _rotation) const
 {
+   return this->mRotation == _rotation.mRotation;
 }
 
-inline RotationF::RotationF(F32 _x, F32 _y, F32 _z, F32 _w, UnitFormat format)
- : x(_x), y(_y), z(_z), w(_w)
+inline int RotationF::operator !=(const RotationF& _rotation) const
 {
-   mRotationType = AxisAngle;
+   return this->mRotation != _rotation.mRotation;
 }
 
-inline void RotationF::set(F32 _x, F32 _y, F32 _z, F32 _w, UnitFormat format)
+//When it comes to actually trying to add rotations, we, in fact, actually multiply their data together.
+//Since we're specifically operating on usability for RotationF, we'll operate on this, rather than the literal addition of the values
+inline RotationF& RotationF::operator +=(const RotationF& _rotation)
 {
-   x = _x;
-   y = _y;
-   z = _z;
-
-   if(format == Degrees)
-      w = mDegToRad(_w);
-   else
-      w = _w;
-}
-
-//Euler setup
-inline RotationF::RotationF(F32 _x, F32 _y, F32 _z, UnitFormat format)
- : x(_x), y(_y), z(_z)
-{
-   mRotationType = Euler;
-}
-
-inline void RotationF::set(F32 _x, F32 _y, F32 _z, UnitFormat format)
-{
-   if(format == Radians)
-   {
-      x = _x;
-      y = _y;
-      z = _z;
-      w = 1;
-   }
-   else
-   {
-      x = mDegToRad(_x);
-      y = mDegToRad(_y);
-      z = mDegToRad(_z);
-      w = 1;
-   }
-
-   mRotationType = Euler;
-}
-
-inline RotationF::RotationF(EulerF euler, UnitFormat format)
-{
-   if (format == Radians)
-   {
-      x = euler.x;
-      y = euler.y;
-      z = euler.z;
-      w = 1;
-   }
-   else
-   {
-      x = mDegToRad(euler.x);
-      y = mDegToRad(euler.y);
-      z = mDegToRad(euler.z);
-      w = 1;
-   }
-
-   mRotationType = Euler;
-}
-
-inline RotationF::RotationF(MatrixF mat)
-{
-   set(mat);
-}
-
-inline RotationF::RotationF(QuatF quat)
-{
-   set(quat);
-}
-
-inline F32 RotationF::len() const
-{
-   if(mRotationType == AxisAngle)
-      return mSqrt(x*x + y*y + z*z + w*w);
-   else
-      return mSqrt(x*x + y*y + z*z);
-}
-
-inline void RotationF::interpolate(const RotationF& _from, const RotationF& _to, F32 _factor)
-{
-   x = (_from.x * (1.0f - _factor)) + (_to.x * _factor);
-   y = (_from.y * (1.0f - _factor)) + (_to.y * _factor);
-   z = (_from.z * (1.0f - _factor)) + (_to.z * _factor);
-
-   if(mRotationType == AxisAngle)
-      w = (_from.w * (1.0f - _factor)) + (_to.w * _factor);
-}
-
-inline void RotationF::zero()
-{
-   x = y = z = w = 0.0f;
-}
-
-inline RotationF& RotationF::operator=(const RotationF &_vec)
-{
-   mRotationType = _vec.mRotationType;
-
-   mUnitsFormat = _vec.mUnitsFormat;
-
-   x = _vec.x;
-   y = _vec.y;
-   z = _vec.z;
-
-   if(mRotationType == AxisAngle)
-      w = _vec.w;
-   else
-      w = 1;
-
-   if(mRotationType == Euler)
-   {
-      x = mFmod( x, M_2PI_F );
-      y = mFmod( y, M_2PI_F );
-      z = mFmod( z, M_2PI_F );
-   }
-   else
-   {
-      w = mFmod( w, M_2PI_F );
-   }
-
+   this->mRotation *= _rotation.mRotation;
    return *this;
 }
 
-inline RotationF RotationF::operator+(const RotationF& _add) const
+inline RotationF RotationF::operator +(const RotationF& _rotation) const 
 {
-   //return RotationF( x + _add.x, y + _add.y, z + _add.z, w + _add.w );
-   if(mRotationType == Euler)
-   {
-      return RotationF( x + _add.x, y + _add.y, z + _add.z, w + _add.w );
-   }
-   else
-   {
-      MatrixF tempMat = asMatrixF();
-      MatrixF tempMatAdd = _add.asMatrixF();
-
-      tempMat.mul(tempMatAdd);
-
-      RotationF out;
-      out.set(tempMat);
-      return out;
-   }
+   QuatF tempRot = this->mRotation;
+   tempRot *=_rotation.mRotation;
+   return tempRot;
 }
 
-inline RotationF& RotationF::operator+=(const RotationF& _add)
+//Much like addition, when subtracting, we're not literally subtracting the values, but infact multiplying the inverse.
+//This subtracts the rotation angles to get the difference
+inline RotationF& RotationF::operator -=(const RotationF& _rotation)
 {
-   if(mRotationType == Euler)
-   {
-      if(_add.mRotationType == Euler)
-      {
-         x += _add.x;
-         y += _add.y;
-         z += _add.z;
-         w = 1;
-      }
-      else
-      {
-         EulerF temp = _add.asEulerF();
-         x += temp.x;
-         y += temp.y;
-         z += temp.z;
-         w = 1;
-      }
-
-      return *this;
-   }
-   else
-   {
-      MatrixF tempMat = asMatrixF();
-      MatrixF tempMatAdd = _add.asMatrixF();
-
-      tempMat.mul(tempMatAdd);
-
-      set(tempMat);
-      return *this;
-   }
-}
-
-inline RotationF RotationF::operator-(const RotationF& _rSub) const
-{
-   return RotationF( x - _rSub.x, y - _rSub.y, z - _rSub.z, w - _rSub.w );
-}
-
-inline RotationF RotationF::operator*(const RotationF &_vec) const
-{
-   return RotationF(x * _vec.x, y * _vec.y, z * _vec.z, w * _vec.w);
-}
-
-inline RotationF RotationF::operator*(F32 _mul) const
-{
-   return RotationF(x * _mul, y * _mul, z * _mul, w * _mul);
-}
-
-inline RotationF RotationF::operator /(F32 t) const
-{
-   F32 f = 1.0f / t;
-   return RotationF( x * f, y * f, z * f, w * f );
-}
-
-inline RotationF& RotationF::operator=(const AngAxisF& _aa) 
-{
-   mRotationType = AxisAngle;
-   mUnitsFormat = Radians;
-
-   set(_aa);
+   QuatF inverse = _rotation.mRotation;
+   this->mRotation *= inverse.inverse();
    return *this;
 }
 
-inline RotationF& RotationF::operator=(const MatrixF& _mat)
+inline RotationF RotationF::operator -(const RotationF& _rotation) const
 {
-   //probably change this later
-   mRotationType = Euler;
-   mUnitsFormat = Radians;
+   QuatF tempRot = this->mRotation;
+   QuatF inverse = _rotation.mRotation;
+   tempRot *= inverse.inverse();
+   return tempRot;
+}
 
-   set(_mat);
+inline RotationF& RotationF::operator =(const RotationF& _rotation)
+{
+   this->mRotation = _rotation.mRotation;
    return *this;
 }
 
-inline RotationF& RotationF::operator=(const QuatF& _qat)
+//====================================================================
+// Euler operators
+//====================================================================
+inline RotationF RotationF::operator=(const EulerF& _euler)
 {
-   mRotationType = AxisAngle;
-   mUnitsFormat = Radians;
+   return RotationF(_euler, Degrees);
+}
 
-   set(_qat);
+inline RotationF RotationF::operator-(const EulerF& _euler) const
+{
+   RotationF temp = this->mRotation;
+   temp -= RotationF(_euler, Degrees);
+   return temp;
+}
+
+inline RotationF RotationF::operator+(const EulerF& _euler) const
+{
+   RotationF temp = this->mRotation;
+   temp += RotationF(_euler, Degrees);
+   return temp;
+}
+
+inline RotationF& RotationF::operator-=(const EulerF& _euler)
+{
+   *this -= RotationF(_euler, Degrees);
    return *this;
 }
 
-inline RotationF& RotationF::operator=(const Point3F& _eul)
+inline RotationF& RotationF::operator+=(const EulerF& _euler)
 {
-   mRotationType = Euler;
-   mUnitsFormat = Radians;
-
-   set(_eul);
+   *this += RotationF(_euler, Degrees);
    return *this;
 }
-//------------------------------------------------------------------------------
-//-------------------------------------- RotationF
-inline EulerF RotationF::asEulerF(UnitFormat format) const 
-{ 
-   if(mRotationType == Euler)
-   {
-      if(format == Radians)
-         return Point3F(x,y,z); 
-      else
-         return Point3F(mRadToDeg(x), mRadToDeg(y), mRadToDeg(z));
-   }
-   else
-   {
-      AngAxisF tempAA = AngAxisF(Point3F(x, y, z), w);
-      MatrixF temp;
-      tempAA.setMatrix(&temp);
 
-      if(format == Radians)
-      {
-         return temp.toEuler();
-      }
-      else
-      {
-         EulerF tempEul = temp.toEuler();
-         return EulerF(mRadToDeg(tempEul.x), mRadToDeg(tempEul.y), mRadToDeg(tempEul.z));
-      }
-   }
-}
-
-inline AngAxisF RotationF::asAxisAngle(UnitFormat format) const 
-{ 
-   if(mRotationType == AxisAngle)
-   {
-      if(format == Radians)
-         return AngAxisF(Point3F(x,y,z),w); 
-      else
-         return AngAxisF(Point3F(x,y,z),mRadToDeg(w));
-   }
-   else
-   {
-      AngAxisF tempAA;
-      QuatF q;
-      q.set(Point3F(x,y,z));
-
-      tempAA.set(q);
-
-      if(format == Radians)
-      {
-         return tempAA;
-      }
-      else
-      {
-         tempAA.angle = mRadToDeg(tempAA.angle);
-         return tempAA;
-      }
-   }
-}
-   
-inline MatrixF RotationF::asMatrixF() const 
-{ 
-   if(mRotationType == AxisAngle)
-   {
-      AngAxisF tempAA;
-      tempAA.axis.x = x;
-      tempAA.axis.y = y;
-      tempAA.axis.z = z;
-      tempAA.angle = w;
-
-      MatrixF tempMat;
-      tempAA.setMatrix(&tempMat);
-      return tempMat;
-   }
-   else
-   {
-      MatrixF temp, imat, xmat, ymat, zmat;
-      xmat.set(EulerF(x,0,0));
-      ymat.set(EulerF(0.0f, y, 0.0f));
-      zmat.set(EulerF(0,0,z));
-
-      imat.mul(zmat, xmat);
-      temp.mul(imat, ymat);
-
-      return temp;
-   }
-}
-
-inline QuatF RotationF::asQuatF() const 
-{ 
-   if(mRotationType == Euler)
-   {
-      QuatF q = QuatF(Point3F(x,y,z));
-      return q;
-   }
-   else
-   {
-      QuatF q = QuatF(Point3F(x,y,z), w);
-      return q;
-   }
-}
-
-//set functions
-inline void RotationF::set(EulerF _eul, UnitFormat format)
+inline S32 RotationF::operator==(const EulerF& _euler) const
 {
-   if(format == Radians)
-   {
-      x = _eul.x;
-      y = _eul.y;
-      z = _eul.z;
-   }
-   else
-   {
-      x = mDegToRad(_eul.x);
-      y = mDegToRad(_eul.y);
-      z = mDegToRad(_eul.z);
-   }
-
-   //first, wrap to +/- PI
-   x = mFmod( x, M_2PI_F );
-   y = mFmod( y, M_2PI_F );
-   z = mFmod( z, M_2PI_F );
-
-   mRotationType = Euler;
+   return *this == RotationF(_euler);
 }
 
-inline void RotationF::set(AngAxisF _aa, UnitFormat format)
+inline S32 RotationF::operator!=(const EulerF& _euler) const
 {
-   if(format == Radians)
-   {
-      x = _aa.axis.x;
-      y = _aa.axis.y;
-      z = _aa.axis.z;
-      w = _aa.angle;
-   }
-   else
-   {
-      x = _aa.axis.x;
-      y = _aa.axis.y;
-      z = _aa.axis.z;
-      w = mDegToRad(_aa.angle);
-   }
-
-   w = mFmod( w, M_2PI_F );
-
-   mRotationType = AxisAngle;
+   return *this != RotationF(_euler);
 }
 
-inline void RotationF::set(QuatF _quat)
+//====================================================================
+// AxisAngle operators
+//====================================================================
+inline RotationF RotationF::operator=(const AngAxisF& _aa)
 {
-   //Taking in a quat assumes radians (check on this?)
-   AngAxisF tempAA;
-   tempAA.set(_quat);
-
-   x = tempAA.axis.x;
-   y = tempAA.axis.y;
-   z = tempAA.axis.z;
-   w = tempAA.angle;
-
-   w = mFmod( w, M_2PI_F );
-
-   mRotationType = AxisAngle;
+   return RotationF(_aa, Degrees);
 }
 
-inline void RotationF::set(MatrixF _mat)
+inline RotationF RotationF::operator-(const AngAxisF& _aa) const
 {
-   //Taking in a matrix assumes radians (check on this?)
-   EulerF temp;
-   temp = _mat.toEuler();
-   x = temp.x;
-   y = temp.y;
-   z = temp.z;
-   w = 1;
-
-   //first, wrap to +/- PI
-   x = mFmod( x, M_2PI_F );
-   y = mFmod( y, M_2PI_F );
-   z = mFmod( z, M_2PI_F );
-
-   mRotationType = Euler;
-}
-//-------------------------------------------------------------------
-// Non-Member Operators
-//-------------------------------------------------------------------
-
-inline RotationF operator*(F32 mul, const RotationF& multiplicand)
-{
-   return multiplicand * mul;
+   RotationF temp = this->mRotation;
+   temp -= RotationF(_aa, Degrees);
+   return temp;
 }
 
-inline bool mIsNaN( const RotationF &p )
+inline RotationF RotationF::operator+(const AngAxisF& _aa) const
 {
-   return mIsNaN_F( p.x ) || mIsNaN_F( p.y ) || mIsNaN_F( p.z ) || mIsNaN_F( p.w );
+   RotationF temp = this->mRotation;
+   temp += RotationF(_aa, Degrees);
+   return temp;
+}
+
+inline RotationF& RotationF::operator-=(const AngAxisF& _aa)
+{
+   *this -= RotationF(_aa, Degrees);
+   return *this;
+}
+
+inline RotationF& RotationF::operator+=(const AngAxisF& _aa)
+{
+   *this += RotationF(_aa, Degrees);
+   return *this;
+}
+
+inline S32 RotationF::operator==(const AngAxisF& _aa) const
+{
+   return *this == RotationF(_aa);
+}
+
+inline S32 RotationF::operator!=(const AngAxisF& _aa) const
+{
+   return *this != RotationF(_aa);
+}
+
+//====================================================================
+// QuatF operators
+//====================================================================
+inline RotationF RotationF::operator=(const QuatF& _quat)
+{
+   return RotationF(_quat);
+}
+
+inline RotationF RotationF::operator-(const QuatF& _quat) const
+{
+   RotationF temp = this->mRotation;
+   temp -= RotationF(_quat);
+   return temp;
+}
+
+inline RotationF RotationF::operator+(const QuatF& _quat) const
+{
+   RotationF temp = this->mRotation;
+   temp += RotationF(_quat);
+   return temp;
+}
+
+inline RotationF& RotationF::operator-=(const QuatF& _quat)
+{
+   *this -= RotationF(_quat);
+   return *this;
+}
+
+inline RotationF& RotationF::operator+=(const QuatF& _quat)
+{
+   *this += RotationF(_quat);
+   return *this;
+}
+
+inline S32 RotationF::operator==(const QuatF& _quat) const
+{
+   return *this == RotationF(_quat);
+}
+
+inline S32 RotationF::operator!=(const QuatF& _quat) const
+{
+   return *this != RotationF(_quat);
+}
+
+//====================================================================
+// MatrixF operators
+//====================================================================
+inline RotationF RotationF::operator=(const MatrixF& _mat)
+{
+   return RotationF(_mat);
+}
+
+inline RotationF RotationF::operator-(const MatrixF& _mat) const
+{
+   RotationF temp = this->mRotation;
+   temp -= RotationF(_mat);
+   return temp;
+}
+
+inline RotationF RotationF::operator+(const MatrixF& _mat) const
+{
+   RotationF temp = this->mRotation;
+   temp += RotationF(_mat);
+   return temp;
+}
+
+inline RotationF& RotationF::operator-=(const MatrixF& _mat)
+{
+   *this -= RotationF(_mat);
+   return *this;
+}
+
+inline RotationF& RotationF::operator+=(const MatrixF& _mat)
+{
+   *this += RotationF(_mat);
+   return *this;
+}
+
+inline S32 RotationF::operator==(const MatrixF& _mat) const
+{
+   return *this == RotationF(_mat);
+}
+
+inline S32 RotationF::operator!=(const MatrixF& _mat) const
+{
+   return *this != RotationF(_mat);
 }
 
 #endif // MROTATION_H
