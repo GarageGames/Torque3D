@@ -30,10 +30,14 @@ if (WIN32)
    addDef(BUILD_WGL)
 else()
    addPath("${libDir}/epoxy/src/glx")
-   addDef(BUILD_GLX)
+   addDef(BUILD_GLX)   
 endif()
 
 addInclude("${libDir}/epoxy/include")
 addInclude("${libDir}/epoxy/src")
 
 finishLibrary()
+# VS 2015 has a problem with sdl and epoxy together and requires optimizations to be disabled
+if (MSVC14)
+	target_compile_options(epoxy PRIVATE "/Od")
+endif()
