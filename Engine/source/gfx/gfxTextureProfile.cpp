@@ -59,6 +59,10 @@ GFX_ImplementTextureProfile(GFXDefaultZTargetProfile,
                             GFXTextureProfile::DiffuseMap, 
                             GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::ZTarget | GFXTextureProfile::NoDiscard, 
                             GFXTextureProfile::NONE);
+GFX_ImplementTextureProfile(GFXDynamicTextureProfile,
+                            GFXTextureProfile::DiffuseMap,
+                            GFXTextureProfile::Dynamic,
+                            GFXTextureProfile::NONE);
 
 //-----------------------------------------------------------------------------
 

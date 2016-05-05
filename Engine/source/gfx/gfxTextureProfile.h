@@ -215,5 +215,7 @@ GFX_DeclareTextureProfile(GFXDefaultStaticDXT5nmProfile);
 GFX_DeclareTextureProfile(GFXSystemMemProfile);
 // Depth buffer texture
 GFX_DeclareTextureProfile(GFXDefaultZTargetProfile);
+// Dynamic Texure
+GFX_DeclareTextureProfile(GFXDynamicTextureProfile);
 
 #endif
