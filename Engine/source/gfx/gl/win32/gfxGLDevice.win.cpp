@@ -272,6 +272,11 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    int debugFlag = 0;
 #endif
 
+   // Create a temp rendering context, needed a current context to use wglCreateContextAttribsARB
+   HGLRC tempGLRC = wglCreateContext(hdcGL);
+   if (!wglMakeCurrent(hdcGL, tempGLRC))
+      AssertFatal(false, "Couldn't make temp GL context.");
+
    if( gglHasWExtension(hdcGL, ARB_create_context) )
    {
       int const create_attribs[] = {
@@ -291,6 +296,10 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    } 
    else
       mContext = wglCreateContext( hdcGL );
+
+   // Delete temp rendering context
+   wglMakeCurrent(NULL, NULL);
+   wglDeleteContext(tempGLRC);
 
    if( !wglMakeCurrent( hdcGL, (HGLRC)mContext ) )
       AssertFatal( false , "GFXGLDevice::init - cannot make our context current. Or maybe we can't create it." );
