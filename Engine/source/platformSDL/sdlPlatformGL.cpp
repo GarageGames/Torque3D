@@ -2,6 +2,10 @@
 #include "windowManager/sdl/sdlWindow.h"
 #include "console/console.h"
 
+#ifdef TORQUE_OS_WIN
+#include "gfx/gl/tGL/tWGL.h"
+#endif
+
 namespace PlatformGL
 {
 
@@ -64,6 +68,11 @@ namespace PlatformGL
            Con::printf( err );
            AssertFatal(0, err );
        }
+
+       #ifdef TORQUE_OS_WIN
+		    // JTH: Update the internals of epoxy on windows.
+		    epoxy_handle_external_wglMakeCurrent();
+       #endif
    }
 
    void setVSync(const int i)

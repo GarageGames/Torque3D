@@ -22,15 +22,12 @@
 
 #ifndef T_GL_H
 #define T_GL_H
-#include "GL/glew.h"
 
-#if defined (TORQUE_OS_WIN)
-// This doesn't work on Mesa drivers.
-#define gglHasExtension(EXTENSION) GLEW_##EXTENSION
-#else
-// Slower but reliably detects extensions on Mesa.
-#define gglHasExtension(EXTENSION) glewGetExtension("GL_" # EXTENSION)
-#endif
+#include <epoxy/gl.h>
+
+// JTH: This is slow, we should probably check extensions once and cache them
+// directly inside of some compatability table.
+#define gglHasExtension(EXTENSION) epoxy_has_gl_extension("GL_" #EXTENSION)
 
 #endif
 
