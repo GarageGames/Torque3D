@@ -196,14 +196,15 @@ addPath("${srcDir}/math")
 addPath("${srcDir}/math/util")
 addPath("${srcDir}/math/test")
 
+addPath("${srcDir}/platform")
 if(NOT TORQUE_SDL) 
    set(BLACKLIST "fileDialog.cpp" )
 endif()
-addPath("${srcDir}/platform")
+addPath("${srcDir}/platform/nativeDialogs")
 set(BLACKLIST "" )
 
 addPath("${srcDir}/cinterface")
-addPath("${srcDir}/platform/nativeDialogs")
+
 if( NOT TORQUE_DEDICATED )
     addPath("${srcDir}/platform/menus")
 endif()
