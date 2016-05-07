@@ -96,6 +96,9 @@ void GFXGLTextureObject::unlock(U32 mipLevel)
    if(!mLockedRect.bits)
       return;
 
+   // I know this is in unlock, but in GL we actually do our submission in unlock.
+   PROFILE_SCOPE(GFXGLTextureObject_lockRT);
+
    PRESERVE_TEXTURE(mBinding);
    glBindTexture(mBinding, mHandle);
    glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, mBuffer);
@@ -137,6 +140,8 @@ void GFXGLTextureObject::reInit()
 
 bool GFXGLTextureObject::copyToBmp(GBitmap * bmp)
 {
+   PROFILE_SCOPE(GFXGLTextureObject_copyToBmp);
+
    if (!bmp)
       return false;
 
@@ -175,6 +180,7 @@ bool GFXGLTextureObject::copyToBmp(GBitmap * bmp)
 
    glGetTexImage(mBinding, 0, GFXGLTextureFormat[mFormat], GFXGLTextureType[mFormat], orig);
    
+   PROFILE_START(GFXGLTextureObject_copyToBmp_pixCopy);
    for(int i = 0; i < srcPixelCount; ++i)
    {
       dest[0] = orig[0];
@@ -186,6 +192,7 @@ bool GFXGLTextureObject::copyToBmp(GBitmap * bmp)
       orig += srcBytesPerPixel;
       dest += dstBytesPerPixel;
    }
+   PROFILE_END();
 
    return true;
 }
