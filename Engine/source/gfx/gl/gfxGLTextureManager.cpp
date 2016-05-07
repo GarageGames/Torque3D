@@ -234,10 +234,10 @@ static void _fastTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
    
    if(pDL->getFormat() == GFXFormatR8G8B8A8 || pDL->getFormat() == GFXFormatR8G8B8X8)
    {
-      FrameAllocatorMarker mem;
-      U8* pboMemory = (U8*)mem.alloc(bufSize);
+      U8* pboMemory = (U8*)dMalloc(bufSize);
       GFX->getDeviceSwizzle32()->ToBuffer(pboMemory, pDL->getBits(0), bufSize);
       glBufferSubData(GL_PIXEL_UNPACK_BUFFER_ARB, 0, bufSize, pboMemory );
+      dFree(pboMemory);
    }
    else
    {
