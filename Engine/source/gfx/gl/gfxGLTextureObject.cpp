@@ -140,8 +140,6 @@ void GFXGLTextureObject::reInit()
 
 bool GFXGLTextureObject::copyToBmp(GBitmap * bmp)
 {
-   PROFILE_SCOPE(GFXGLTextureObject_copyToBmp);
-
    if (!bmp)
       return false;
 
