@@ -143,7 +143,7 @@ void GFXGLDevice::initGLState()
    // Setting mPixelShaderVersion to 3.0 will allow Advanced Lighting to run.   
    mPixelShaderVersion = 3.0;
 
-   mSupportsAnisotropic = mCardProfiler->queryProfile( "GL::suppAnisotropic" );
+   mSupportsAnisotropic = mCardProfiler->queryProfile( "GL_EXT_TEXTURE_FILTER_ANISOTROPIC" );
 
    String vendorStr = (const char*)glGetString( GL_VENDOR );
    if( vendorStr.find("NVIDIA", 0, String::NoCase | String::Left) != String::NPos)

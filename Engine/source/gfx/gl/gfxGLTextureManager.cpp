@@ -304,8 +304,7 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
    glBindTexture(texture->getBinding(), texture->getHandle());
    texture->mFormat = dds->mFormat;
    U32 numMips = dds->mSurfaces[0]->mMips.size();
-   if(GFX->getCardProfiler()->queryProfile("GL::Workaround::noManualMips"))
-      numMips = 1;
+
    for(U32 i = 0; i < numMips; i++)
    {
       if(isCompressedFormat(dds->mFormat))
