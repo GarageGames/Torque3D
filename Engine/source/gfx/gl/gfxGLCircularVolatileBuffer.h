@@ -158,7 +158,7 @@ public:
       const U32 cSizeInMB = 10;
       mBufferSize = (cSizeInMB << 20);
 
-      if( gglHasExtension(ARB_buffer_storage) )
+      if( GFXGL->mCapabilities.bufferStorage )
       {      
          const GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
          glBufferStorage(mBinding, mBufferSize, NULL, flags);
@@ -198,7 +198,7 @@ public:
 
       outOffset = mBufferFreePos;
 
-      if( gglHasExtension(ARB_buffer_storage) )
+      if( GFXGL->mCapabilities.bufferStorage )
       {         
          outPtr = (U8*)(mBufferPtr) + mBufferFreePos; 
       }
@@ -227,7 +227,7 @@ public:
 
    void unlock()
    {
-      if( gglHasExtension(ARB_buffer_storage) )
+      if( GFXGL->mCapabilities.bufferStorage )
       {
          return;
       }

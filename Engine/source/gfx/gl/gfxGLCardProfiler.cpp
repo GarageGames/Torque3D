@@ -56,9 +56,6 @@ void GFXGLCardProfiler::setupCardCapabilities()
 {
    GLint maxTexSize;
    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
-
-   const char* versionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));
-   F32 glVersion = dAtof(versionString);
    
    // OpenGL doesn't have separate maximum width/height.
    setCapability("maxTextureWidth", maxTexSize);
@@ -66,8 +63,25 @@ void GFXGLCardProfiler::setupCardCapabilities()
    setCapability("maxTextureSize", maxTexSize);
 
    // Check for anisotropic filtering support.
-   bool suppAnisotropic = gglHasExtension( EXT_texture_filter_anisotropic );
-   setCapability( "GL_EXT_TEXTURE_FILTER_ANISOTROPIC", suppAnisotropic );
+   setCapability("GL_EXT_texture_filter_anisotropic", gglHasExtension(EXT_texture_filter_anisotropic));
+
+	// Check for buffer storage
+	setCapability("GL_ARB_buffer_storage", gglHasExtension(ARB_buffer_storage));
+
+	// Check for shader model 5.0
+	setCapability("GL_ARB_gpu_shader5", gglHasExtension(ARB_gpu_shader5));
+
+	// Check for texture storage
+	setCapability("GL_ARB_texture_storage", gglHasExtension(ARB_texture_storage));
+
+	// Check for sampler objects
+	setCapability("GL_ARB_sampler_objects", gglHasExtension(ARB_sampler_objects));
+
+	// Check for copy image support
+	setCapability("GL_ARB_copy_image", gglHasExtension(ARB_copy_image));
+
+	// Check for vertex attrib binding
+	setCapability("GL_ARB_vertex_attrib_binding", gglHasExtension(ARB_vertex_attrib_binding));
 }
 
 bool GFXGLCardProfiler::_queryCardCap(const String& query, U32& foundResult)

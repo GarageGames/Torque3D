@@ -146,7 +146,7 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
 
     glTexParameteri(binding, GL_TEXTURE_MAX_LEVEL, retTex->mMipLevels-1 );
     
-    if( gglHasExtension(ARB_texture_storage) )
+    if( GFXGL->mCapabilities.textureStorage )
     {
         if(binding == GL_TEXTURE_2D)
             glTexStorage2D( retTex->getBinding(), retTex->mMipLevels, GFXGLTextureInternalFormat[format], width, height );
