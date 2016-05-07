@@ -65,23 +65,23 @@ void GFXGLCardProfiler::setupCardCapabilities()
    // Check for anisotropic filtering support.
    setCapability("GL_EXT_texture_filter_anisotropic", gglHasExtension(EXT_texture_filter_anisotropic));
 
-	// Check for buffer storage
-	setCapability("GL_ARB_buffer_storage", gglHasExtension(ARB_buffer_storage));
+   // Check for buffer storage
+   setCapability("GL_ARB_buffer_storage", gglHasExtension(ARB_buffer_storage));
 
-	// Check for shader model 5.0
-	setCapability("GL_ARB_gpu_shader5", gglHasExtension(ARB_gpu_shader5));
+   // Check for shader model 5.0
+   setCapability("GL_ARB_gpu_shader5", gglHasExtension(ARB_gpu_shader5));
 
-	// Check for texture storage
-	setCapability("GL_ARB_texture_storage", gglHasExtension(ARB_texture_storage));
+   // Check for texture storage
+   setCapability("GL_ARB_texture_storage", gglHasExtension(ARB_texture_storage));
 
-	// Check for sampler objects
-	setCapability("GL_ARB_sampler_objects", gglHasExtension(ARB_sampler_objects));
+   // Check for sampler objects
+   setCapability("GL_ARB_sampler_objects", gglHasExtension(ARB_sampler_objects));
 
-	// Check for copy image support
-	setCapability("GL_ARB_copy_image", gglHasExtension(ARB_copy_image));
+   // Check for copy image support
+   setCapability("GL_ARB_copy_image", gglHasExtension(ARB_copy_image));
 
-	// Check for vertex attrib binding
-	setCapability("GL_ARB_vertex_attrib_binding", gglHasExtension(ARB_vertex_attrib_binding));
+   // Check for vertex attrib binding
+   setCapability("GL_ARB_vertex_attrib_binding", gglHasExtension(ARB_vertex_attrib_binding));
 }
 
 bool GFXGLCardProfiler::_queryCardCap(const String& query, U32& foundResult)
