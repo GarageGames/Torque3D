@@ -66,6 +66,7 @@ public:
    virtual void getStereoTargets(GFXTextureTarget **out) const = 0;
 
    virtual void setDrawCanvas(GuiCanvas *canvas) = 0;
+   virtual void setDrawMode(GFXDevice::GFXDeviceRenderStyles style) = 0;
 
    virtual void setCurrentConnection(GameConnection *connection) = 0;
    virtual GameConnection* getCurrentConnection() = 0;

@@ -19,12 +19,39 @@
 #include <openvr.h>
 
 class OpenVRHMDDevice;
+class OpenVROverlay;
 
-class VRTextureSet
+typedef vr::VROverlayInputMethod OpenVROverlayInputMethod;
+typedef vr::VROverlayTransformType OpenVROverlayTransformType;
+typedef vr::EGamepadTextInputMode OpenVRGamepadTextInputMode;
+typedef vr::EGamepadTextInputLineMode OpenVRGamepadTextInputLineMode;
+typedef vr::ETrackingResult OpenVRTrackingResult;
+typedef vr::ETrackingUniverseOrigin OpenVRTrackingUniverseOrigin;
+typedef vr::EOverlayDirection OpenVROverlayDirection;
+typedef vr::EVRState OpenVRState;
+
+DefineEnumType(OpenVROverlayTransformType);
+
+namespace OpenVRUtil
+{
+   /// Convert a matrix in OVR space to torque space
+   void convertTransformFromOVR(const MatrixF &inRotTMat, MatrixF& outRotation);
+
+   /// Convert a matrix in torque space to OVR space
+   void convertTransformToOVR(const MatrixF& inRotation, MatrixF& outRotation);
+
+   /// Converts vr::HmdMatrix34_t to a MatrixF
+   MatrixF convertSteamVRAffineMatrixToMatrixFPlain(const vr::HmdMatrix34_t &mat);
+
+   /// Converts a MatrixF to a vr::HmdMatrix34_t
+   void convertMatrixFPlainToSteamVRAffineMatrix(const MatrixF &inMat, vr::HmdMatrix34_t &outMat);
+};
+
+template<int TEXSIZE> class VRTextureSet
 {
 public:
-	static const int TextureCount = 2;
-	GFXTexHandle mTextures[2];
+	static const int TextureCount = TEXSIZE;
+	GFXTexHandle mTextures[TEXSIZE];
 	U32 mIndex;
 
 	VRTextureSet() : mIndex(0)
@@ -68,20 +95,15 @@ struct OpenVRRenderState
 
    RectI mEyeViewport[2];
    GFXTextureTargetRef mStereoRT;
-   GFXTextureTargetRef mEyeRT[2];
 
-   GFXTexHandle mStereoRenderTextures[2];
-   GFXTexHandle mStereoDepthTextures[2];
+   GFXTexHandle mStereoRenderTexture;
+   GFXTexHandle mStereoDepthTexture;
 
-   GFXVertexBufferHandle<GFXVertexPTTT> mDistortionVerts;
-   GFXPrimitiveBufferHandle mDistortionInds;
+   VRTextureSet<4> mOutputEyeTextures;
 
-   VRTextureSet mOutputEyeTextures[2];
+   GFXDevice::GFXDeviceRenderStyles mRenderMode;
 
-   bool setupRenderTargets(U32 mode);
-   void setupDistortion();
-
-   void renderDistortion(U32 eye);
+   bool setupRenderTargets(GFXDevice::GFXDeviceRenderStyles mode);
 
    void renderPreview();
 
@@ -142,6 +164,7 @@ public:
    virtual void getStereoTargets(GFXTextureTarget **out) const;
 
    virtual void setDrawCanvas(GuiCanvas *canvas);
+   virtual void setDrawMode(GFXDevice::GFXDeviceRenderStyles style);
 
    virtual void setCurrentConnection(GameConnection *connection);
    virtual GameConnection* getCurrentConnection();
@@ -152,6 +175,8 @@ public:
    virtual void onEndFrame();
 
    virtual void onEyeRendered(U32 index);
+
+   virtual void setRoomTracking(bool room);
 
    bool _handleDeviceEvent(GFXDevice::GFXDeviceEventType evt);
 
@@ -166,6 +191,21 @@ public:
    void submitInputChanges();
 
    void resetSensors();
+   /// }
+
+
+   /// @name Console API
+   /// {
+   OpenVROverlay *getGamepadFocusOverlay();
+   void setOverlayNeighbour(vr::EOverlayDirection dir, OpenVROverlay *overlay);
+
+   bool isDashboardVisible();
+   void showDashboard(const char *overlayToShow);
+
+   vr::TrackedDeviceIndex_t getPrimaryDashboardDevice();
+
+   void setKeyboardTransformAbsolute(const MatrixF &xfm);
+   void setKeyboardPositionForOverlay(OpenVROverlay *overlay, const RectI &rect);
    /// }
 
    /// @name OpenVR state
@@ -183,6 +223,8 @@ public:
 
    OpenVRRenderState mHMDRenderState;
    GFXAdapterLUID mLUID;
+
+   vr::ETrackingUniverseOrigin mTrackingSpace;
    /// }
 
    GuiCanvas* mDrawCanvas;
@@ -210,6 +252,6 @@ public:
 };
 
 /// Returns the OculusVRDevice singleton.
-#define OCULUSVRDEV ManagedSingleton<OpenVRProvider>::instance()
+#define OPENVR ManagedSingleton<OpenVRProvider>::instance()
 
 #endif   // _OCULUSVRDEVICE_H_

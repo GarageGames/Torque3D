@@ -538,6 +538,47 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       return;
    }
 
+   // jamesu - currently a little bit of a hack. Ideally we need to ditch the viewports in the query data and just rely on the display device
+   if (mLastCameraQuery.displayDevice)
+   {
+      if (mRenderStyle == RenderStyleStereoSideBySide)
+      {
+         mLastCameraQuery.displayDevice->setDrawMode(GFXDevice::RS_StereoSideBySide);
+      }
+      else if (mRenderStyle == RenderStyleStereoSeparate)
+      {
+         mLastCameraQuery.displayDevice->setDrawMode(GFXDevice::RS_StereoSeparate);
+      }
+      else
+      {
+         mLastCameraQuery.displayDevice->setDrawMode(GFXDevice::RS_Standard);
+      }
+
+      // The connection's display device may want to set the projection offset
+      if (mLastCameraQuery.displayDevice->providesProjectionOffset())
+      {
+         mLastCameraQuery.projectionOffset = mLastCameraQuery.displayDevice->getProjectionOffset();
+      }
+
+      // The connection's display device may want to set the eye offset
+      if (mLastCameraQuery.displayDevice->providesEyeOffsets())
+      {
+         mLastCameraQuery.displayDevice->getEyeOffsets(mLastCameraQuery.eyeOffset);
+      }
+
+      // Grab field of view for both eyes
+      if (mLastCameraQuery.displayDevice->providesFovPorts())
+      {
+         mLastCameraQuery.displayDevice->getFovPorts(mLastCameraQuery.fovPort);
+         mLastCameraQuery.hasFovPort = true;
+      }
+
+      mLastCameraQuery.displayDevice->getStereoViewports(mLastCameraQuery.stereoViewports);
+      mLastCameraQuery.displayDevice->getStereoTargets(mLastCameraQuery.stereoTargets);
+
+      mLastCameraQuery.hasStereoTargets = mLastCameraQuery.stereoTargets[0];
+   }
+
    GFXTargetRef origTarget = GFX->getActiveRenderTarget();
    U32 origStyle = GFX->getCurrentRenderStyle();
 
@@ -612,6 +653,9 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 
       GFX->activateStereoTarget(-1);
       _internalRender(RectI(updateRect.point, updateRect.extent), frustum);
+     
+      // Notify device we've rendered the right, thus the last stereo frame.
+      GFX->getDeviceEventSignal().trigger(GFXDevice::deRightStereoFrameRendered);
 
       // Render preview
       if (mLastCameraQuery.displayDevice)
@@ -626,7 +670,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
          }
       }
    }
-   else if (mRenderStyle == RenderStyleStereoSeparate && mLastCameraQuery.stereoTargets[0])
+   else if (mRenderStyle == RenderStyleStereoSeparate && mLastCameraQuery.displayDevice)
    {
       // In this case we render the scene twice to different render targets, then
       // render the final composite view 
@@ -699,7 +743,6 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       Point2I screensize = getRoot()->getWindowSize();
       tempRect.point.y = screensize.y - (tempRect.point.y + tempRect.extent.y);
 #endif
-      GFX->setCurrentRenderStyle(GFXDevice::RS_Standard);
 
       // set up the camera and viewport stuff:
       F32 wwidth;
