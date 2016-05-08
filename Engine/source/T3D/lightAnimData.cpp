@@ -222,7 +222,7 @@ bool LightAnimData::AnimValue<COUNT>::animate( F32 time, F32 *output )
          lerpFactor = scaledTime - posFrom;
    	   keyFrameLerp = ( keyFrameTo - keyFrameFrom ) * lerpFactor;
 
-         output[i] = (value1[i] + ((keyFrameFrom + keyFrameLerp) * valueRange)) * initialValue;
+         output[i] = value1[i] + ((keyFrameFrom + keyFrameLerp) * valueRange);
       }
    }
 
