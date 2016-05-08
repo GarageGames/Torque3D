@@ -529,6 +529,8 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    GFXTransformSaver saver;
    bool renderingToTarget = false;
 
+   mLastCameraQuery.displayDevice = NULL;
+
    if (!processCameraQuery(&mLastCameraQuery))
    {
       // We have no camera, but render the GUI children 

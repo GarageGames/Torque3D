@@ -343,7 +343,7 @@ OpenVRProvider::OpenVRProvider() :
    INPUTMGR->registerDevice(this);
    dMemset(&mLUID, '\0', sizeof(mLUID));
 
-   mTrackingSpace = vr::TrackingUniverseSeated;
+   mTrackingSpace = vr::TrackingUniverseStanding;
 }
 
 OpenVRProvider::~OpenVRProvider()
@@ -586,7 +586,7 @@ void OpenVRProvider::getFrameEyePose(IDevicePose *pose, U32 eye) const
 {
    AssertFatal(eye >= 0 && eye < 2, "Out of bounds eye");
 
-   MatrixF mat = mHMDRenderState.mHMDPose * mHMDRenderState.mEyePose[eye];
+   MatrixF mat = mHMDRenderState.mEyePose[eye] * mHMDRenderState.mHMDPose; // same order as in the openvr example
 
    OpenVRTransformToRotPos(mat, pose->orientation, pose->position);
    pose->velocity = Point3F(0);
@@ -603,6 +603,9 @@ void OpenVRProvider::getEyeOffsets(Point3F *dest) const
 {
    dest[0] = mHMDRenderState.mEyePose[0].getPosition();
    dest[1] = mHMDRenderState.mEyePose[1].getPosition();
+
+   dest[0] = Point3F(-dest[0].x, dest[0].y, dest[0].z); // convert from vr-space
+   dest[1] = Point3F(-dest[1].x, dest[1].y, dest[1].z);
 }
 
 bool OpenVRProvider::providesFovPorts() const
