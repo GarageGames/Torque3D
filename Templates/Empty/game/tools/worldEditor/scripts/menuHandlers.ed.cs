@@ -244,6 +244,8 @@ function EditorSaveMissionMenu()
 
 function EditorSaveMission()
 {
+   // just save the mission without renaming it
+   
    // first check for dirty and read-only files:
    if((EWorldEditor.isDirty || ETerrainEditor.isMissionDirty) && !isWriteableFileName($Server::MissionFile))
    {
