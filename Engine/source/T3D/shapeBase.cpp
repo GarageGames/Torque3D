@@ -4888,7 +4888,8 @@ DefineEngineMethod( ShapeBase, getTargetCount, S32, (),,
 		if ((ShapeBase*)obj->getClientObject())
 			obj = (ShapeBase*)obj->getClientObject();
 
-		return obj->getShapeInstance()->getTargetCount();
+      if (obj->getShapeInstance() != NULL)
+		   return obj->getShapeInstance()->getTargetCount();
 	}
 
 	return -1;
