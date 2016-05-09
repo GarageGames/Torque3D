@@ -210,14 +210,14 @@ bool FileDialog::Execute()
    }
    String strippedFilters = suffix;
    strippedFilters.replace(";",",");
-      strippedFilters += String(";") + suffix;
+   strippedFilters += String(";") + suffix;
 
    // Get the current working directory, so we can back up to it once Windows has
    // done its craziness and messed with it.
    StringTableEntry cwd = Platform::getCurrentDirectory();
    if (mData.mDefaultPath == StringTable->lookup("") || !Platform::isDirectory(mData.mDefaultPath))
       mData.mDefaultPath = cwd;
-
+   String rootDir = String(cwd);
    // Execute Dialog (Blocking Call)
    nfdchar_t *outPath = NULL;
    nfdpathset_t pathSet;
@@ -226,6 +226,7 @@ bool FileDialog::Execute()
    String defaultPath = String(mData.mDefaultPath);
 #if defined(TORQUE_OS_WIN)
    defaultPath.replace("/", "\\");
+   rootDir.replace("/", "\\");
 #endif
 
    if (mData.mStyle & FileDialogData::FDS_OPEN)
@@ -234,6 +235,11 @@ bool FileDialog::Execute()
       result = NFD_SaveDialog(strippedFilters.c_str(), defaultPath.c_str(), &outPath);
    else if (mData.mStyle & FileDialogData::FDS_MULTIPLEFILES)
       result = NFD_OpenDialogMultiple(strippedFilters.c_str(), defaultPath.c_str(), &pathSet);
+
+   String resultPath = String(outPath).replace(rootDir, String(""));
+   resultPath = resultPath.replace(0, 1, String("")).c_str(); //kill '\\' prefix
+   resultPath = resultPath.replace(String("\\"), String("/"));
+   
 
    // Did we select a file?
    if (result != NFD_OKAY)
@@ -245,7 +251,7 @@ bool FileDialog::Execute()
    if (mData.mStyle & FileDialogData::FDS_OPEN || mData.mStyle & FileDialogData::FDS_SAVE)
    {
       // Single file selection, do it the easy way
-      mData.mFile = StringTable->insert(outPath);
+      mData.mFile = Platform::makeRelativePathName(resultPath.c_str(), NULL);
    }
    else if (mData.mStyle & FileDialogData::FDS_MULTIPLEFILES)
    {
@@ -265,7 +271,7 @@ bool FileDialog::Execute()
       else
       {
          //nope, just one file, so set it as normal
-         setDataField(StringTable->insert("files"), "0", outPath);
+         setDataField(StringTable->insert("files"), "0", Platform::makeRelativePathName(resultPath.c_str(), NULL));
          setDataField(StringTable->insert("fileCount"), NULL, "1");
       }
    }
