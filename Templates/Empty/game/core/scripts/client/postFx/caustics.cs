@@ -38,7 +38,7 @@ singleton ShaderData( PFX_CausticsShader )
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/caustics/causticsP.hlsl";
          
-   OGLVertexShaderFile  = "shaders/common/postFx/gl//postFxV.glsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile   = "shaders/common/postFx/caustics/gl/causticsP.glsl";
       
    samplerNames[0] = "$prepassTex";
@@ -51,7 +51,7 @@ singleton ShaderData( PFX_CausticsShader )
 singleton PostEffect( CausticsPFX )
 {
    isEnabled = false;
-   renderTime = "PFXBeforeBin";
+   renderTime = "PFXAfterDiffuse";
    renderBin = "ObjTranslucentBin";      
    //renderPriority = 0.1;
       
