@@ -11,12 +11,14 @@ struct ExtendedMove : public Move
    enum Constants {
       MaxPositionsRotations = 3,
 
-      MaxPositionBits = 13,
+      MaxPositionBits = 16,
       MaxRotationBits = 16,
    };
 
    // Position is in millimeters
-   S32 posX[MaxPositionsRotations], posY[MaxPositionsRotations], posZ[MaxPositionsRotations];
+   F32 posX[MaxPositionsRotations], posY[MaxPositionsRotations], posZ[MaxPositionsRotations];
+
+   S32 cposX[MaxPositionsRotations], cposY[MaxPositionsRotations], cposZ[MaxPositionsRotations];
 
    bool EulerBasedRotation[MaxPositionsRotations];
 

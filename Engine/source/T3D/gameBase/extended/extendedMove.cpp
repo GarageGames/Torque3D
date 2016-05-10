@@ -79,7 +79,8 @@ void ExtendedMoveManager::init()
 
 const ExtendedMove NullExtendedMove;
 
-#define CLAMPPOS(x) (x<0 ? -((-x) & (1<<(MaxPositionBits-1))-1) : (x & (1<<(MaxPositionBits-1))-1))
+#define CLAMPPOS(x) ((S32)(((x + 1) * .5) * ((1 << MaxPositionBits) - 1)) & ((1<<MaxPositionBits)-1))
+#define UNCLAMPPOS(x) ((F32)(x * 2 / F32((1 << MaxPositionBits) - 1) - 1.0f))
 #define CLAMPROT(f) ((S32)(((f + 1) * .5) * ((1 << MaxRotationBits) - 1)) & ((1<<MaxRotationBits)-1))
 #define UNCLAMPROT(x) ((F32)(x * 2 / F32((1 << MaxRotationBits) - 1) - 1.0f))
 
@@ -94,6 +95,10 @@ ExtendedMove::ExtendedMove() : Move()
       rotY[i] = 0;
       rotZ[i] = 0;
       rotW[i] = 1;
+
+     cposX[i] = 0;
+     cposY[i] = 0;
+     cposZ[i] = 0;
 
       EulerBasedRotation[i] = false;
    }
@@ -134,20 +139,20 @@ void ExtendedMove::pack(BitStream *stream, const Move * basemove)
       {
          // Position
          if(stream->writeFlag(posX[i] != extBaseMove->posX[i]))
-            stream->writeSignedInt(posX[i], MaxPositionBits);
+            stream->writeSignedInt(cposX[i], MaxPositionBits);
          if(stream->writeFlag(posY[i] != extBaseMove->posY[i]))
-            stream->writeSignedInt(posY[i], MaxPositionBits);
+            stream->writeSignedInt(cposY[i], MaxPositionBits);
          if(stream->writeFlag(posZ[i] != extBaseMove->posZ[i]))
-            stream->writeSignedInt(posZ[i], MaxPositionBits);
+            stream->writeSignedInt(cposZ[i], MaxPositionBits);
 
          // Rotation
          stream->writeFlag(EulerBasedRotation[i]);
          if(stream->writeFlag(rotX[i] != extBaseMove->rotX[i]))
-            stream->writeInt(crotX[i], MaxRotationBits);
+            stream->writeInt(crotX[i], EulerBasedRotation[i] ? MaxRotationBits : MaxPositionBits);
          if(stream->writeFlag(rotY[i] != extBaseMove->rotY[i]))
-            stream->writeInt(crotY[i], MaxRotationBits);
+            stream->writeInt(crotY[i], EulerBasedRotation[i] ? MaxRotationBits : MaxPositionBits);
          if(stream->writeFlag(rotZ[i] != extBaseMove->rotZ[i]))
-            stream->writeInt(crotZ[i], MaxRotationBits);
+            stream->writeInt(crotZ[i], EulerBasedRotation[i] ? MaxRotationBits : MaxPositionBits);
          if(!EulerBasedRotation[i])
          {
             if(stream->writeFlag(rotW[i] != extBaseMove->rotW[i]))
@@ -176,18 +181,27 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
       for(U32 i=0; i<MaxPositionsRotations; ++i)
       {
          // Position
-         if(stream->readFlag())
+         if (stream->readFlag())
+         {
             posX[i] = stream->readSignedInt(MaxPositionBits);
+            cposX[i] = UNCLAMPPOS(posX[i]);
+         }
          else
             posX[i] = extBaseMove->posX[i];
 
-         if(stream->readFlag())
-            posY[i] = stream->readSignedInt(MaxPositionBits);
+         if (stream->readFlag())
+         {
+            cposY[i] = stream->readSignedInt(MaxPositionBits);
+            posY[i] = UNCLAMPPOS(cposY[i]);
+         }
          else
             posY[i] = extBaseMove->posY[i];
 
-         if(stream->readFlag())
-            posZ[i] = stream->readSignedInt(MaxPositionBits);
+         if (stream->readFlag())
+         {
+            cposZ[i] = stream->readSignedInt(MaxPositionBits);
+            posZ[i] = UNCLAMPPOS(cposZ[i]);
+         }
          else
             posZ[i] = extBaseMove->posZ[i];
 
@@ -198,8 +212,8 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
             scale = M_2PI_F;
          if(stream->readFlag())
          {
-            crotX[i] = stream->readInt(MaxRotationBits);
-            rotX[i] = UNCLAMPROT(crotX[i]) * scale;
+            crotX[i] = stream->readInt(EulerBasedRotation[i] ? MaxRotationBits : MaxPositionBits);
+            rotX[i] = EulerBasedRotation[i] ? (UNCLAMPROT(crotX[i]) * scale) : UNCLAMPPOS(crotX[i]);
          }
          else
          {
@@ -208,8 +222,8 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
 
          if(stream->readFlag())
          {
-            crotY[i] = stream->readInt(MaxRotationBits);
-            rotY[i] = UNCLAMPROT(crotY[i]) * scale;
+            crotY[i] = stream->readInt(EulerBasedRotation[i] ? MaxRotationBits : MaxPositionBits);
+            rotY[i] = EulerBasedRotation[i] ? (UNCLAMPROT(crotY[i]) * scale) : UNCLAMPPOS(crotY[i]);
          }
          else
          {
@@ -218,8 +232,8 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
 
          if(stream->readFlag())
          {
-            crotZ[i] = stream->readInt(MaxRotationBits);
-            rotZ[i] = UNCLAMPROT(crotZ[i]) * scale;
+            crotZ[i] = stream->readInt(EulerBasedRotation[i] ? MaxRotationBits : MaxPositionBits);
+            rotZ[i] = EulerBasedRotation[i] ? (UNCLAMPROT(crotZ[i]) * scale) : UNCLAMPPOS(crotZ[i]);
          }
          else
          {
@@ -231,7 +245,7 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
             if(stream->readFlag())
             {
                crotW[i] = stream->readInt(MaxRotationBits);
-               rotW[i] = UNCLAMPROT(crotW[i]);
+               rotW[i] = UNCLAMPROT(crotW[i]) * M_2PI_F;
             }
             else
             {
@@ -266,9 +280,9 @@ void ExtendedMove::clamp()
       }
       else
       {
-         crotX[i] = CLAMPROT(rotX[i]);
-         crotY[i] = CLAMPROT(rotY[i]);
-         crotZ[i] = CLAMPROT(rotZ[i]);
+         crotX[i] = CLAMPPOS(rotX[i]);
+         crotY[i] = CLAMPPOS(rotY[i]);
+         crotZ[i] = CLAMPPOS(rotZ[i]);
          crotW[i] = CLAMPROT(rotW[i] / M_2PI_F);
       }
    }
@@ -282,6 +296,10 @@ void ExtendedMove::unclamp()
    // Unclamp the values the same as for net traffic so the client matches the server
    for(U32 i=0; i<MaxPositionsRotations; ++i)
    {
+      posX[i] = UNCLAMPPOS(posX[i]);
+      posY[i] = UNCLAMPPOS(posY[i]);
+      posZ[i] = UNCLAMPPOS(posZ[i]);
+
       // Rotations
       if(EulerBasedRotation[i])
       {
@@ -291,9 +309,9 @@ void ExtendedMove::unclamp()
       }
       else
       {
-         rotX[i] = UNCLAMPROT(crotX[i]);
-         rotY[i] = UNCLAMPROT(crotY[i]);
-         rotZ[i] = UNCLAMPROT(crotZ[i]);
+         rotX[i] = UNCLAMPPOS(crotX[i]);
+         rotY[i] = UNCLAMPPOS(crotY[i]);
+         rotZ[i] = UNCLAMPPOS(crotZ[i]);
          rotW[i] = UNCLAMPROT(crotW[i]) * M_2PI_F;
       }
    }
