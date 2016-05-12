@@ -36,7 +36,7 @@
 #include "math/mRandom.h"
 #include "math/mEase.h"
 #include "math/mathUtils.h"
-
+#include "math/mRotation.h"
 #include "core/strings/stringUnit.h"
 
 IMPLEMENT_SCOPE( MathTypes, Math,, "" );
@@ -113,7 +113,10 @@ IMPLEMENT_STRUCT( EaseF,
    EaseF, MathTypes,
    "" )
 END_IMPLEMENT_STRUCT;
-
+IMPLEMENT_STRUCT(RotationF,
+   RotationF, MathTypes,
+   "")
+END_IMPLEMENT_STRUCT;
 
 //-----------------------------------------------------------------------------
 // TypePoint2I
@@ -572,6 +575,49 @@ ConsoleSetType( TypeEaseF )
    }
 }
 
+//-----------------------------------------------------------------------------
+// TypeRotationF
+//-----------------------------------------------------------------------------
+ConsoleType(RotationF, TypeRotationF, RotationF, "")
+ImplementConsoleTypeCasters(TypeRotationF, RotationF)
+
+ConsoleGetType(TypeRotationF)
+{
+   RotationF *pt = (RotationF *)dptr;
+   EulerF eulRot = pt->asEulerF();
+
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+
+   if (pt->mUnitsFormat == RotationF::Radians)
+   {
+      dSprintf(returnBuffer, bufSize, "%g %g %g", mRadToDeg(eulRot.x), mRadToDeg(eulRot.y), mRadToDeg(eulRot.z));
+   }
+   else
+   {
+      //we're going to assume that when operating in script we'll want to use eulers with degrees.
+      dSprintf(returnBuffer, bufSize, "%g %g %g", eulRot.x, eulRot.y, eulRot.z);
+   }
+
+   return returnBuffer;
+}
+
+ConsoleSetType(TypeRotationF)
+{
+   if (argc == 1)
+   {
+      F32 x, y, z;
+      dSscanf(argv[0], "%g %g %g", &x, &y, &z);
+
+      ((RotationF *)dptr)->set(x, y, z);
+   }
+   else if (argc == 3)
+   {
+      ((RotationF *)dptr)->set(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]));
+   }
+   else
+      Con::printf("RotationF must be set as { x, y, z, w } or \"x y z w\"");
+}
 
 //-----------------------------------------------------------------------------
 
