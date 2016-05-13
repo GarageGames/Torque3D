@@ -73,7 +73,9 @@ $pref::Video::disableCubemapping = false;
 ///
 $pref::Video::disableParallaxMapping = false;
 
-$pref::Video::Gamma = 1.0;
+$pref::Video::Gamma = 2.2;
+$pref::Video::Contrast = 1.0;
+$pref::Video::Brightness = 0;
 
 // Console-friendly defaults
 if($platform $= "xenon")

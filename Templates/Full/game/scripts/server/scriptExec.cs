@@ -32,6 +32,7 @@ exec("./health.cs");
 exec("./projectile.cs");
 exec("./radiusDamage.cs");
 exec("./teleporter.cs");
+exec("./physicsShape.cs");
 
 // Load our supporting weapon script, it contains methods used by all weapons.
 exec("./weapon.cs");
