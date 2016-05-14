@@ -28,7 +28,8 @@
 #include "gui/editor/inspector/dynamicGroup.h"
 #include "gui/containers/guiScrollCtrl.h"
 #include "gui/editor/inspector/customField.h"
-
+#include "gui/editor/inspector/entityGroup.h"
+#include "gui/editor/inspector/mountingGroup.h"
 
 IMPLEMENT_CONOBJECT(GuiInspector);
 
@@ -583,6 +584,27 @@ void GuiInspector::refresh()
    general->registerObject();
    mGroups.push_back(general);
    addObject(general);
+
+   //Behavior inspector group
+   if (mTargets.first()->getClassRep()->isSubclassOf("Entity"))
+   {
+      GuiInspectorEntityGroup *components = new GuiInspectorEntityGroup("Components", this);
+      if (components != NULL)
+      {
+         components->registerObject();
+         mGroups.push_back(components);
+         addObject(components);
+      }
+
+      //Mounting group override
+      GuiInspectorGroup *mounting = new GuiInspectorMountingGroup("Mounting", this);
+      if (mounting != NULL)
+      {
+         mounting->registerObject();
+         mGroups.push_back(mounting);
+         addObject(mounting);
+      }
+   }
 
    // Create the inspector groups for static fields.
 
