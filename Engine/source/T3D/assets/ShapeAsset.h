@@ -76,6 +76,8 @@ public:
 
    TSShape* getShape() { return mShape; }
 
+   Resource<TSShape> getShapeResource() { return mShape; }
+
 protected:
    virtual void            onAssetRefresh(void) {}
 };
