@@ -22,6 +22,8 @@
 #include "gfx/gl/gfxGLEnumTranslate.h"
 #endif
 
+AngAxisF gLastMoveRot; // jamesu - this is just here for temp debugging
+
 namespace OpenVRUtil
 {
    void convertTransformFromOVR(const MatrixF &inRotTMat, MatrixF& outRotation)
@@ -91,6 +93,19 @@ namespace OpenVRUtil
       outMat.m[2][1] = row2.y;
       outMat.m[2][2] = row2.z;
       outMat.m[2][3] = row2.w;
+   }
+
+   U32 convertOpenVRButtonToTorqueButton(uint32_t vrButton)
+   {
+      switch (vrButton)
+      {
+      case vr::VRMouseButton_Left:
+         return KEY_BUTTON0;
+      case vr::VRMouseButton_Right:
+         return KEY_BUTTON1;
+      case vr::VRMouseButton_Middle:
+         return KEY_BUTTON2;
+      }
    }
 
 
@@ -343,7 +358,7 @@ OpenVRProvider::OpenVRProvider() :
    INPUTMGR->registerDevice(this);
    dMemset(&mLUID, '\0', sizeof(mLUID));
 
-   mTrackingSpace = vr::TrackingUniverseStanding;
+   mTrackingSpace = vr::TrackingUniverseSeated;
 }
 
 OpenVRProvider::~OpenVRProvider()
@@ -896,11 +911,16 @@ void OpenVRProvider::updateTrackedPoses()
       {
          mValidPoseCount++;
          MatrixF mat = OpenVRUtil::convertSteamVRAffineMatrixToMatrixFPlain(mTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
-         mat.inverse();
 
          if (nDevice == vr::k_unTrackedDeviceIndex_Hmd)
          {
             mHMDRenderState.mHMDPose = mat;
+            // jaeesu - store the last rotation for temp debugging
+            MatrixF torqueMat(1);
+            OpenVRUtil::convertTransformFromOVR(mat, torqueMat);
+            gLastMoveRot = AngAxisF(torqueMat);
+            //Con::printf("gLastMoveRot = %f,%f,%f,%f", gLastMoveRot.axis.x, gLastMoveRot.axis.y, gLastMoveRot.axis.z, gLastMoveRot.angle);
+            mHMDRenderState.mHMDPose.inverse();
          }
 
          vr::TrackedDevicePose_t &outPose = mTrackedDevicePose[nDevice];
@@ -1119,3 +1139,8 @@ DefineEngineStaticMethod(OpenVR, resetSensors, void, (), ,
 }
 
 // Overlay stuff
+
+DefineEngineFunction(OpenVRIsCompiledIn, bool, (), , "")
+{
+   return true;
+}

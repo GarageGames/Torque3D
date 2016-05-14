@@ -33,6 +33,7 @@ public:
    };
 
    vr::VROverlayHandle_t mOverlayHandle;
+   vr::VROverlayHandle_t mThumbOverlayHandle;
 
    // Desired OpenVR state
    U32 mOverlayFlags;
@@ -41,14 +42,18 @@ public:
    vr::VROverlayTransformType mOverlayTransformType;
    MatrixF mTransform;
    vr::TrackedDeviceIndex_t mTransformDeviceIndex;
-   const char* mTransformDeviceComponent;
+   String mTransformDeviceComponent;
 
 
    vr::VROverlayInputMethod mInputMethod;
    Point2F mMouseScale;
 
-   MatrixF mTrackingOrigin;
+   vr::ETrackingUniverseOrigin mTrackingOrigin;
    vr::TrackedDeviceIndex_t mControllerDeviceIndex;
+
+   GFXTexHandle mStagingTexture; ///< Texture used by openvr
+
+   ColorF mOverlayColor;
 
    bool mOverlayTypeDirty; ///< Overlay type is dirty
    bool mOverlayDirty; ///< Overlay properties are dirty
@@ -60,6 +65,8 @@ public:
    virtual ~OpenVROverlay();
 
    static void initPersistFields();
+
+   DECLARE_CONOBJECT(OpenVROverlay);
 
    bool onAdd();
    void onRemove();
@@ -76,10 +83,13 @@ public:
    bool isGamepadFocussed();
    bool isActiveDashboardOverlay();
 
-   MatrixF getTransformForOverlayCoordinates(const vr::ETrackingUniverseOrigin trackingOrigin, const Point2F &pos);
-   bool castRay(const vr::ETrackingUniverseOrigin trackingOrigin, const Point3F &origin, const Point3F &direction, RayInfo *info);
+   MatrixF getTransformForOverlayCoordinates(const Point2F &pos);
+   bool castRay(const Point3F &origin, const Point3F &direction, RayInfo *info);
 
    void moveGamepadFocusToNeighbour();
+
+   void handleOpenVREvents();
+   void onFrameRendered();
 };
 
 typedef OpenVROverlay::OverlayType OpenVROverlayType;

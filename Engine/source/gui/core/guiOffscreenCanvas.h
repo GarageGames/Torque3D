@@ -23,6 +23,7 @@ public:
    void onRemove();
    
    void renderFrame(bool preRenderOnly, bool bufferSwap);
+   virtual void onFrameRendered();
    
    Point2I getWindowSize();
 
