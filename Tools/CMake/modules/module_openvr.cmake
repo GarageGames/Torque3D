@@ -4,11 +4,11 @@
 option(TORQUE_OPENVR "Enable openvr module" OFF)
 mark_as_advanced(TORQUE_OPENVR)
 if(TORQUE_OPENVR)
-	if(TORQUE_OCULUSVR_SDK_PATH STREQUAL "")
+	if(TORQUE_OPENVR_SDK_PATH STREQUAL "")
 		set(TORQUE_OPENVR_SDK_PATH "" CACHE PATH "openvr library path" FORCE)
 	endif()
 else() # hide variable
-    set(TORQUE_OPENVR_SDK_PATH "" CACHE INTERNAL "" FORCE) 
+	set(TORQUE_OPENVR_SDK_PATH "" CACHE INTERNAL "" FORCE) 
 endif() 
  
 if(TORQUE_OPENVR)
