@@ -284,6 +284,10 @@ SimObject* Taml::read( const char* pFilename )
         // No, so warn.
         Con::warnf( "Taml::read() - Failed to load an object from the file '%s'.", mFilePathBuffer );
     }
+    else
+    {
+       pSimObject->onPostAdd();
+    }
 
     return pSimObject;
 }
