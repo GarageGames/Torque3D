@@ -30,7 +30,14 @@ typedef vr::ETrackingUniverseOrigin OpenVRTrackingUniverseOrigin;
 typedef vr::EOverlayDirection OpenVROverlayDirection;
 typedef vr::EVRState OpenVRState;
 
+DefineEnumType(OpenVROverlayInputMethod);
 DefineEnumType(OpenVROverlayTransformType);
+DefineEnumType(OpenVRGamepadTextInputMode);
+DefineEnumType(OpenVRGamepadTextInputLineMode);
+DefineEnumType(OpenVRTrackingResult);
+DefineEnumType(OpenVRTrackingUniverseOrigin);
+DefineEnumType(OpenVROverlayDirection);
+DefineEnumType(OpenVRState);
 
 namespace OpenVRUtil
 {
@@ -45,6 +52,8 @@ namespace OpenVRUtil
 
    /// Converts a MatrixF to a vr::HmdMatrix34_t
    void convertMatrixFPlainToSteamVRAffineMatrix(const MatrixF &inMat, vr::HmdMatrix34_t &outMat);
+
+   U32 convertOpenVRButtonToTorqueButton(uint32_t vrButton);
 };
 
 template<int TEXSIZE> class VRTextureSet
