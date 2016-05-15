@@ -240,6 +240,8 @@ int main(int argc, const char **argv)
    
    if(strlen(argv[0]) != 0) {
    int len = strlen(argv[0]);
+   } else {
+      return -1;
    }
    
    char *libName = new char[len+4]; // len + .so + NUL
