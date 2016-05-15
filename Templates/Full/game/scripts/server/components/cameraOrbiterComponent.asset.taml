@@ -1,0 +1,7 @@
+<ComponentAsset
+    AssetName="CameraOrbiterComponentAsset"
+    componentName=""
+    componentClass="CameraOrbiterComponent"
+    friendlyName="Camera Orbiter"
+    componentType="Game"
+    description="Acts as a boon arm for a camera component."/>
