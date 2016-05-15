@@ -237,7 +237,11 @@ extern "C"
 int main(int argc, const char **argv)
 {
    // assume bin name is in argv[0]
+   
+   if(strlen(argv[0]) != 0) {
    int len = strlen(argv[0]);
+   }
+   
    char *libName = new char[len+4]; // len + .so + NUL
 
    strcpy(libName, argv[0]);
