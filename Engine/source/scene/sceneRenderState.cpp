@@ -26,8 +26,10 @@
 #include "renderInstance/renderPassManager.h"
 #include "math/util/matrixSet.h"
 
+#ifdef TORQUE_EXPERIMENTAL_EC
 #include "T3D/Components/render/renderComponentInterface.h"
 #include "T3D/Components/Component.h"
+#endif
 
 //-----------------------------------------------------------------------------
 
@@ -106,6 +108,7 @@ void SceneRenderState::renderObjects( SceneObject** objects, U32 numObjects )
       object->prepRenderImage( this );
    }
 
+#ifdef TORQUE_EXPERIMENTAL_EC
    U32 interfaceCount = RenderComponentInterface::all.size();
    for (U32 i = 0; i < RenderComponentInterface::all.size(); i++)
    {
@@ -116,6 +119,8 @@ void SceneRenderState::renderObjects( SceneObject** objects, U32 numObjects )
          RenderComponentInterface::all[i]->prepRenderImage(this);
       }
    }
+#endif
+
    PROFILE_END();
 
    // Render what the objects have batched.

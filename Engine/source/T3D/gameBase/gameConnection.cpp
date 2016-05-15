@@ -38,8 +38,11 @@
 #include "T3D/gameBase/gameConnectionEvents.h"
 #include "console/engineAPI.h"
 #include "math/mTransform.h"
+
+#ifdef TORQUE_EXPERIMENTAL_EC
 #include "T3D/Entity.h"
 #include "T3D/Components/coreInterfaces.h"
+#endif
 
 #ifdef TORQUE_HIFI_NET
    #include "T3D/gameBase/hifi/hifiMoveList.h"
@@ -733,6 +736,7 @@ bool GameConnection::getControlCameraFov(F32 * fov)
    }
    if (cObj)
    {
+#ifdef TORQUE_EXPERIMENTAL_EC
       if (Entity* ent = dynamic_cast<Entity*>(cObj))
       {
          if (CameraInterface* camInterface = ent->getComponent<CameraInterface>())
@@ -744,6 +748,9 @@ bool GameConnection::getControlCameraFov(F32 * fov)
       {
       *fov = cObj->getCameraFov();
       }
+#else
+      *fov = cObj->getCameraFov();
+#endif
       return(true);
    }
 
@@ -763,6 +770,7 @@ bool GameConnection::isValidControlCameraFov(F32 fov)
 
    if (cObj)
    {
+#ifdef TORQUE_EXPERIMENTAL_EC
       if (Entity* ent = dynamic_cast<Entity*>(cObj))
       {
          if (CameraInterface* camInterface = ent->getComponent<CameraInterface>())
@@ -774,6 +782,9 @@ bool GameConnection::isValidControlCameraFov(F32 fov)
       {
          return cObj->isValidCameraFov(fov);
       }
+#else
+      return cObj->isValidCameraFov(fov);
+#endif
    }
 
    return NULL;
@@ -791,6 +802,8 @@ bool GameConnection::setControlCameraFov(F32 fov)
    }
    if (cObj)
    {
+
+#ifdef TORQUE_EXPERIMENTAL_EC
       F32 newFov = 90.f;
       if (Entity* ent = dynamic_cast<Entity*>(cObj))
       {
@@ -806,10 +819,15 @@ bool GameConnection::setControlCameraFov(F32 fov)
       }
       else
       {
+         // allow shapebase to clamp fov to its datablock values
+         cObj->setCameraFov(mClampF(fov, MinCameraFov, MaxCameraFov));
+         newFov = cObj->getCameraFov();
+      }
+#else
       // allow shapebase to clamp fov to its datablock values
       cObj->setCameraFov(mClampF(fov, MinCameraFov, MaxCameraFov));
       F32 newFov = cObj->getCameraFov();
-      }
+#endif
 
       // server fov of client has 1degree resolution
       if( S32(newFov) != S32(mCameraFov) || newFov != fov )
