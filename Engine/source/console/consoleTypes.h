@@ -74,6 +74,8 @@ DefineConsoleType( TypeCommand, String )
 DefineConsoleType( TypeFilename, const char * )
 DefineConsoleType( TypeStringFilename, String )
 
+DefineConsoleType(TypeRotationF, RotationF)
+
 /// A universally unique identifier.
 DefineConsoleType( TypeUUID, Torque::UUID )
 

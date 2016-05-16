@@ -284,7 +284,8 @@ void GuiInspectorField::setData( const char* data, bool callbacks )
                   || type == TypeMatrixPosition
                   || type == TypeMatrixRotation
                   || type == TypeBox3F
-                  || type == TypeRectUV )
+                  || type == TypeRectUV
+                  || type == TypeRotationF)
          {
             //TODO: we should actually take strings into account and not chop things up between quotes
 
