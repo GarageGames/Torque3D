@@ -48,5 +48,8 @@
 #ifndef _MEASE_H_
 #include "math/mEase.h"
 #endif
+#ifndef MROTATION_H
+#include "math/mRotation.h"
+#endif
 
 #endif //_MMATH_H_
