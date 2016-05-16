@@ -583,7 +583,7 @@ ConsoleSetType( TypeEaseF )
 // TypeRotationF
 //-----------------------------------------------------------------------------
 ConsoleType(RotationF, TypeRotationF, RotationF, "")
-//ImplementConsoleTypeCasters( TypeRotationF, RotationF )
+ImplementConsoleTypeCasters( TypeRotationF, RotationF )
 
 ConsoleGetType(TypeRotationF)
 {

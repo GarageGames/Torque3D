@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 #include "math/mRotation.h"
+#include "console/console.h"
+#include "console/engineAPI.h"
 
 #ifdef TORQUE_TESTS_ENABLED
 #include "testing/unitTesting.h"
@@ -297,3 +299,50 @@ TEST(Maths, RotationF_Calculations)
    //TODO: implement unit test
 };
 #endif
+
+DefineConsoleStaticMethod(Rotation, Add, RotationF, (RotationF a, RotationF b), ,
+   "Adds two rotations together.\n"
+   "@param a Rotation one."
+   "@param b Rotation two."
+   "@returns v sum of both rotations."
+   "@ingroup Math")
+{
+   return a + b;
+}
+
+DefineConsoleStaticMethod(Rotation, Subtract, RotationF, (RotationF a, RotationF b), ,
+   "Subtracts two rotations.\n"
+   "@param a Rotation one."
+   "@param b Rotation two."
+   "@returns v difference of both rotations."
+   "@ingroup Math")
+{
+   return a - b;
+}
+
+DefineConsoleStaticMethod(Rotation, Interpolate, RotationF, (RotationF a, RotationF b, F32 factor), ,
+   "Interpolates between two rotations.\n"
+   "@param a Rotation one."
+   "@param b Rotation two."
+   "@param factor The amount to interpolate between the two."
+   "@returns v, interpolated result."
+   "@ingroup Math")
+{
+   RotationF result;
+   result.interpolate(a, b, factor);
+   return result;
+}
+
+DefineConsoleStaticMethod(Rotation, LookAt, RotationF, (Point3F origin, Point3F target, Point3F up),
+   (Point3F(0, 0, 0), Point3F(0, 0, 0), Point3F(0, 0, 1)),
+   "Provides a rotation orientation to look at a target from a given position.\n"
+   "@param origin Position of the object doing the looking."
+   "@param target Position to be looked at."
+   "@param up The up angle to orient the rotation."
+   "@returns v orientation result."
+   "@ingroup Math")
+{
+   RotationF result;
+   result.lookAt(origin, target, up);
+   return result;
+}
