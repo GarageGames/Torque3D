@@ -184,33 +184,56 @@ static const U32 convertUTF16toUTF8DoubleNULL(const UTF16 *unistring, UTF8  *out
 //
 bool FileDialog::Execute()
 {
-   String suffix;
+   String strippedFilters;
 
    U32 filtersCount = StringUnit::getUnitCount(mData.mFilters, "|");
 
    for (U32 i = 1; i < filtersCount; ++i)
    {
       //The first of each pair is the name, which we'll skip because NFD doesn't support named filters atm
-      const char *filter = StringUnit::getUnit(mData.mFilters, i, "|");
+      String filter = StringUnit::getUnit(mData.mFilters, i, "|");
 
-      if (!dStrcmp(filter, "*.*"))
+      if (!dStrcmp(filter.c_str(), "*.*"))
          continue;
 
-      U32 c = 2;
-      const char* tmpchr = &filter[c];
-      String tString = String(tmpchr);
-      tString.ToLower(tString);
-      suffix += tString;
-      suffix += String(",");
-      suffix += tString.ToUpper(tString);
+      U32 subFilterCount = StringUnit::getUnitCount(filter, ";");
+
+      //if we have a 'super filter', break it down to sub-options as well
+      if (subFilterCount > 1)
+      {
+         String suffixFilter;
+         String subFilters;
+
+         for (U32 f = 0; f < subFilterCount; ++f)
+         {
+            String subFilter = StringUnit::getUnit(filter, f, ";");
+
+            suffixFilter += String::ToLower(subFilter) + "," + String::ToUpper(subFilter) + ",";
+            subFilters += String::ToLower(subFilter) + "," + String::ToUpper(subFilter) + ";";
+         }
+
+         suffixFilter = suffixFilter.substr(0, suffixFilter.length() - 1);
+         suffixFilter += ";";
+
+         strippedFilters += suffixFilter + subFilters;
+      }
+      else //otherwise, just add the filter
+      {
+         strippedFilters += String::ToLower(filter) + "," + String::ToUpper(filter) + ";";
+      }
 
       ++i;
-      if (i < filtersCount-2)
-         suffix += String(";");
+      if (i < filtersCount - 2)
+         strippedFilters += String(";");
    }
-   String strippedFilters = suffix;
-   strippedFilters.replace(";",",");
-   strippedFilters += String(";") + suffix;
+
+   //strip the last character, if it's unneeded
+   if (strippedFilters.endsWith(";"))
+   {
+      strippedFilters = strippedFilters.substr(0, strippedFilters.length() - 1);
+   }
+
+   strippedFilters.replace("*.", "");
 
    // Get the current working directory, so we can back up to it once Windows has
    // done its craziness and messed with it.
@@ -236,10 +259,14 @@ bool FileDialog::Execute()
    else if (mData.mStyle & FileDialogData::FDS_MULTIPLEFILES)
       result = NFD_OpenDialogMultiple(strippedFilters.c_str(), defaultPath.c_str(), &pathSet);
 
+   if (result == NFD_CANCEL)
+   {
+      return false;
+   }
+
    String resultPath = String(outPath).replace(rootDir, String(""));
    resultPath = resultPath.replace(0, 1, String("")).c_str(); //kill '\\' prefix
    resultPath = resultPath.replace(String("\\"), String("/"));
-   
 
    // Did we select a file?
    if (result != NFD_OKAY)
@@ -278,7 +305,6 @@ bool FileDialog::Execute()
 
    // Return success.
    return true;
-
 }
 
 DefineEngineMethod(FileDialog, Execute, bool, (), ,
