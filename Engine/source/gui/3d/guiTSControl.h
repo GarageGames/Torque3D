@@ -49,13 +49,13 @@ struct CameraQuery
    F32         farPlane;
    F32         fov;
    FovPort     fovPort[2]; // fov for each eye
-   Point2F     projectionOffset;
    Point3F     eyeOffset[2];
    MatrixF     eyeTransforms[2];
    bool        ortho;
    bool        hasFovPort;
    bool        hasStereoTargets;
    MatrixF     cameraMatrix;
+   MatrixF     headMatrix; // center matrix (for HMDs)
    S32         currentEye;
    RectI       stereoViewports[2]; // destination viewports
    GFXTextureTarget* stereoTargets[2];

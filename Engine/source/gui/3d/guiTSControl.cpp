@@ -160,7 +160,6 @@ GuiTSCtrl::GuiTSCtrl()
    mLastCameraQuery.farPlane = 10.0f;
    mLastCameraQuery.nearPlane = 0.01f;
 
-   mLastCameraQuery.projectionOffset = Point2F::Zero;
    mLastCameraQuery.hasFovPort = false;
    mLastCameraQuery.hasStereoTargets = false;
 
@@ -556,12 +555,6 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
          mLastCameraQuery.displayDevice->setDrawMode(GFXDevice::RS_Standard);
       }
 
-      // The connection's display device may want to set the projection offset
-      if (mLastCameraQuery.displayDevice->providesProjectionOffset())
-      {
-         mLastCameraQuery.projectionOffset = mLastCameraQuery.displayDevice->getProjectionOffset();
-      }
-
       // The connection's display device may want to set the eye offset
       if (mLastCameraQuery.displayDevice->providesEyeOffsets())
       {
@@ -586,7 +579,6 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    // Set up the appropriate render style
    U32 prevRenderStyle = GFX->getCurrentRenderStyle();
-   Point2F prevProjectionOffset = GFX->getCurrentProjectionOffset();
    Point2I renderSize = getExtent();
    Frustum frustum;
 
@@ -595,8 +587,8 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    if (mRenderStyle == RenderStyleStereoSideBySide)
    {
       GFX->setCurrentRenderStyle(GFXDevice::RS_StereoSideBySide);
-      GFX->setCurrentProjectionOffset(mLastCameraQuery.projectionOffset);
       GFX->setStereoEyeOffsets(mLastCameraQuery.eyeOffset);
+      GFX->setStereoHeadTransform(mLastCameraQuery.headMatrix);
 
       if (!mLastCameraQuery.hasStereoTargets)
       {
@@ -626,12 +618,14 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
          // Use the view matrix determined from the display device
          myTransforms[0] = mLastCameraQuery.eyeTransforms[0];
          myTransforms[1] = mLastCameraQuery.eyeTransforms[1];
+         myTransforms[2] = mLastCameraQuery.cameraMatrix;
       }
       else
       {
          // Use the view matrix determined from the control object
          myTransforms[0] = mLastCameraQuery.cameraMatrix;
          myTransforms[1] = mLastCameraQuery.cameraMatrix;
+         myTransforms[2] = mLastCameraQuery.cameraMatrix;
 
          QuatF qrot = mLastCameraQuery.cameraMatrix;
          Point3F pos = mLastCameraQuery.cameraMatrix.getPosition();
@@ -678,6 +672,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       // render the final composite view 
       GFX->setCurrentRenderStyle(GFXDevice::RS_StereoSeparate);
       GFX->setStereoEyeOffsets(mLastCameraQuery.eyeOffset);
+      GFX->setStereoHeadTransform(mLastCameraQuery.headMatrix);
       GFX->setStereoFovPort(mLastCameraQuery.fovPort); // NOTE: this specifies fov for BOTH eyes
       GFX->setSteroViewports(mLastCameraQuery.stereoViewports);
       GFX->setStereoTargets(mLastCameraQuery.stereoTargets);

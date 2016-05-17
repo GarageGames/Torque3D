@@ -597,15 +597,27 @@ void OpenVRTransformToRotPos(MatrixF mat, QuatF &outRot, Point3F &outPos)
    outPos = pos;// Point3F(-pos.x, pos.z, -pos.y);
 }
 
-void OpenVRProvider::getFrameEyePose(IDevicePose *pose, U32 eye) const
+void OpenVRProvider::getFrameEyePose(IDevicePose *pose, S32 eyeId) const
 {
-   AssertFatal(eye >= 0 && eye < 2, "Out of bounds eye");
+   AssertFatal(eyeId >= -1 && eyeId < 2, "Out of bounds eye");
 
-   MatrixF mat = mHMDRenderState.mEyePose[eye] * mHMDRenderState.mHMDPose; // same order as in the openvr example
+	if (eyeId == -1)
+	{
+		// NOTE: this is codename for "head"
+		MatrixF mat = mHMDRenderState.mHMDPose; // same order as in the openvr example
 
-   OpenVRTransformToRotPos(mat, pose->orientation, pose->position);
-   pose->velocity = Point3F(0);
-   pose->angularVelocity = Point3F(0);
+		OpenVRTransformToRotPos(mat, pose->orientation, pose->position);
+		pose->velocity = Point3F(0);
+		pose->angularVelocity = Point3F(0);
+	}
+	else
+	{
+		MatrixF mat = mHMDRenderState.mEyePose[eyeId] * mHMDRenderState.mHMDPose; // same order as in the openvr example
+
+		OpenVRTransformToRotPos(mat, pose->orientation, pose->position);
+		pose->velocity = Point3F(0);
+		pose->angularVelocity = Point3F(0);
+	}
 }
 
 bool OpenVRProvider::providesEyeOffsets() const
@@ -631,16 +643,6 @@ bool OpenVRProvider::providesFovPorts() const
 void OpenVRProvider::getFovPorts(FovPort *out) const
 {
    dMemcpy(out, mHMDRenderState.mEyeFov, sizeof(mHMDRenderState.mEyeFov));
-}
-
-bool OpenVRProvider::providesProjectionOffset() const
-{
-   return mHMD != NULL;
-}
-
-const Point2F& OpenVRProvider::getProjectionOffset() const
-{
-   return Point2F(0, 0);
 }
 
 void OpenVRProvider::getStereoViewports(RectI *out) const

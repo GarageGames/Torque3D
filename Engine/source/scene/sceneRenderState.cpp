@@ -48,11 +48,11 @@ SceneRenderState::SceneRenderState( SceneManager* sceneManager,
       mDisableAdvancedLightingBins( false ),
       mRenderArea( view.getFrustum().getBounds() ),
       mAmbientLightColor( sceneManager->getAmbientLightColor() ),
-      mSceneRenderStyle( SRS_Standard ),
-      mRenderField( 0 )
+      mSceneRenderStyle( SRS_Standard )
 {
    // Setup the default parameters for the screen metrics methods.
-   mDiffuseCameraTransform = view.getViewWorldMatrix();
+   mDiffuseCameraTransform = view.getHeadWorldViewMatrix();
+   mDiffuseCameraTransform.inverse();
 
    // The vector eye is the camera vector with its 
    // length normalized to 1 / zFar.

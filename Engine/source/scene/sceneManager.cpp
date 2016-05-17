@@ -239,7 +239,6 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       MatrixF originalWorld = GFX->getWorldMatrix();
       Frustum originalFrustum = GFX->getFrustum();
 
-      Point2F projOffset = GFX->getCurrentProjectionOffset();
       const FovPort *currentFovPort = GFX->getStereoFovPort();
       const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
       const MatrixF *worldEyeTransforms = GFX->getInverseStereoEyeTransforms();
@@ -257,7 +256,6 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       SceneCameraState cameraStateLeft = SceneCameraState::fromGFX();
       SceneRenderState renderStateLeft( this, renderState->getScenePassType(), cameraStateLeft );
       renderStateLeft.setSceneRenderStyle(SRS_SideBySide);
-      renderStateLeft.setSceneRenderField(0);
 
       renderSceneNoLights( &renderStateLeft, objectMask, baseObject, baseZone ); // left
 
@@ -277,7 +275,6 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       SceneCameraState cameraStateRight = SceneCameraState::fromGFX();
       SceneRenderState renderStateRight( this, renderState->getScenePassType(), cameraStateRight );
       renderStateRight.setSceneRenderStyle(SRS_SideBySide);
-      renderStateRight.setSceneRenderField(1);
 
       renderSceneNoLights( &renderStateRight, objectMask, baseObject, baseZone ); // right
 
