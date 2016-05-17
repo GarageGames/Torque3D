@@ -193,7 +193,7 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
 
       // Fill Blue if no Dialogs
       if(this->size() == 0)
-         GFX->clear( GFXClearTarget, ColorF(0,0,1,1), 1.0f, 0 );
+         GFX->clear( GFXClearTarget, ColorF(0,0,0,1), 1.0f, 0 );
 
       GFX->setClipRect( contentRect );
 

@@ -96,9 +96,9 @@ ExtendedMove::ExtendedMove() : Move()
       rotZ[i] = 0;
       rotW[i] = 1;
 
-     cposX[i] = 0;
-     cposY[i] = 0;
-     cposZ[i] = 0;
+      cposX[i] = 0;
+      cposY[i] = 0;
+      cposZ[i] = 0;
 
       EulerBasedRotation[i] = false;
    }
@@ -139,11 +139,11 @@ void ExtendedMove::pack(BitStream *stream, const Move * basemove)
       {
          // Position
          if(stream->writeFlag(posX[i] != extBaseMove->posX[i]))
-            stream->writeSignedInt(cposX[i], MaxPositionBits);
+            stream->writeInt(cposX[i], MaxPositionBits);
          if(stream->writeFlag(posY[i] != extBaseMove->posY[i]))
-            stream->writeSignedInt(cposY[i], MaxPositionBits);
+            stream->writeInt(cposY[i], MaxPositionBits);
          if(stream->writeFlag(posZ[i] != extBaseMove->posZ[i]))
-            stream->writeSignedInt(cposZ[i], MaxPositionBits);
+            stream->writeInt(cposZ[i], MaxPositionBits);
 
          // Rotation
          stream->writeFlag(EulerBasedRotation[i]);
@@ -183,7 +183,7 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
          // Position
          if (stream->readFlag())
          {
-            posX[i] = stream->readSignedInt(MaxPositionBits);
+            posX[i] = stream->readInt(MaxPositionBits);
             cposX[i] = UNCLAMPPOS(posX[i]);
          }
          else
@@ -191,7 +191,7 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
 
          if (stream->readFlag())
          {
-            cposY[i] = stream->readSignedInt(MaxPositionBits);
+            cposY[i] = stream->readInt(MaxPositionBits);
             posY[i] = UNCLAMPPOS(cposY[i]);
          }
          else
@@ -199,7 +199,7 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
 
          if (stream->readFlag())
          {
-            cposZ[i] = stream->readSignedInt(MaxPositionBits);
+            cposZ[i] = stream->readInt(MaxPositionBits);
             posZ[i] = UNCLAMPPOS(cposZ[i]);
          }
          else
@@ -267,9 +267,9 @@ void ExtendedMove::clamp()
    for(U32 i=0; i<MaxPositionsRotations; ++i)
    {
       // Positions
-      posX[i] = CLAMPPOS(posX[i]);
-      posY[i] = CLAMPPOS(posY[i]);
-      posZ[i] = CLAMPPOS(posZ[i]);
+      cposX[i] = CLAMPPOS(posX[i]);
+      cposY[i] = CLAMPPOS(posY[i]);
+      cposZ[i] = CLAMPPOS(posZ[i]);
 
       // Rotations
       if(EulerBasedRotation[i])
@@ -285,6 +285,16 @@ void ExtendedMove::clamp()
          crotZ[i] = CLAMPPOS(rotZ[i]);
          crotW[i] = CLAMPROT(rotW[i] / M_2PI_F);
       }
+
+      /*if (i == 0)
+      {
+          F32 x, y, z, a;
+          x = UNCLAMPPOS(crotX[i]);
+          y = UNCLAMPPOS(crotY[i]);
+          z = UNCLAMPPOS(crotZ[i]);
+          a = UNCLAMPROT(crotW[i]) * M_2PI_F;
+          //Con::printf("rot %f,%f,%f,%f clamped to %f,%f,%f,%f", rotX[i], rotY[i], rotZ[i], rotW[i], x,y,z,a);
+      }*/
    }
 
    // Perform the standard Move clamp
@@ -296,9 +306,9 @@ void ExtendedMove::unclamp()
    // Unclamp the values the same as for net traffic so the client matches the server
    for(U32 i=0; i<MaxPositionsRotations; ++i)
    {
-      posX[i] = UNCLAMPPOS(posX[i]);
-      posY[i] = UNCLAMPPOS(posY[i]);
-      posZ[i] = UNCLAMPPOS(posZ[i]);
+      posX[i] = UNCLAMPPOS(cposX[i]);
+      posY[i] = UNCLAMPPOS(cposY[i]);
+      posZ[i] = UNCLAMPPOS(cposZ[i]);
 
       // Rotations
       if(EulerBasedRotation[i])

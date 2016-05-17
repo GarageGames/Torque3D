@@ -418,7 +418,7 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
    );
 
    reflectRenderState.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-   reflectRenderState.setDiffuseCameraTransform( params.query->cameraMatrix );
+   reflectRenderState.setDiffuseCameraTransform( params.query->headMatrix );
 
    // render scene
    LIGHTMGR->registerGlobalLights( &reflectRenderState.getCullingFrustum(), false );
@@ -581,7 +581,7 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    reflectTarget->attachTexture( GFXTextureTarget::Color0, reflectTex );
    reflectTarget->attachTexture( GFXTextureTarget::DepthStencil, depthBuff );
    GFX->pushActiveRenderTarget();
-   GFX->setActiveRenderTarget( reflectTarget );   
+   GFX->setActiveRenderTarget( reflectTarget );
 
    U32 objTypeFlag = -1;
    SceneCameraState reflectCameraState = SceneCameraState::fromGFX();
@@ -604,7 +604,6 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       // Store previous values
       RectI originalVP = GFX->getViewport();
 
-      Point2F projOffset = GFX->getCurrentProjectionOffset();
       const FovPort *currentFovPort = GFX->getStereoFovPort();
       MatrixF inverseEyeTransforms[2];
 
@@ -629,9 +628,8 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       SceneCameraState cameraStateLeft = SceneCameraState::fromGFX();
       SceneRenderState renderStateLeft( gClientSceneGraph, SPT_Reflect, cameraStateLeft );
       renderStateLeft.setSceneRenderStyle(SRS_SideBySide);
-      renderStateLeft.setSceneRenderField(0);
       renderStateLeft.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-      renderStateLeft.setDiffuseCameraTransform( params.query->eyeTransforms[0] );
+      renderStateLeft.setDiffuseCameraTransform( params.query->headMatrix );
 
       gClientSceneGraph->renderSceneNoLights( &renderStateLeft, objTypeFlag );
 
@@ -648,9 +646,8 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       SceneCameraState cameraStateRight = SceneCameraState::fromGFX();
       SceneRenderState renderStateRight( gClientSceneGraph, SPT_Reflect, cameraStateRight );
       renderStateRight.setSceneRenderStyle(SRS_SideBySide);
-      renderStateRight.setSceneRenderField(1);
       renderStateRight.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-      renderStateRight.setDiffuseCameraTransform( params.query->eyeTransforms[1] );
+      renderStateRight.setDiffuseCameraTransform( params.query->headMatrix );
       renderStateRight.disableAdvancedLightingBins(true);
 
       gClientSceneGraph->renderSceneNoLights( &renderStateRight, objTypeFlag );
@@ -669,7 +666,7 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       );
 
       reflectRenderState.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-      reflectRenderState.setDiffuseCameraTransform( params.query->cameraMatrix );
+      reflectRenderState.setDiffuseCameraTransform( params.query->headMatrix );
 
       gClientSceneGraph->renderSceneNoLights( &reflectRenderState, objTypeFlag );
    }

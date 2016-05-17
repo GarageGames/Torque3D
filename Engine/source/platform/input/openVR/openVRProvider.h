@@ -157,7 +157,7 @@ public:
    /// @name Display handling
    /// {
    virtual bool providesFrameEyePose() const;
-   virtual void getFrameEyePose(IDevicePose *pose, U32 eye) const;
+   virtual void getFrameEyePose(IDevicePose *pose, S32 eyeId) const;
 
    virtual bool providesEyeOffsets() const;
    /// Returns eye offset not taking into account any position tracking info
@@ -165,9 +165,6 @@ public:
 
    virtual bool providesFovPorts() const;
    virtual void getFovPorts(FovPort *out) const;
-
-   virtual bool providesProjectionOffset() const;
-   virtual const Point2F& getProjectionOffset() const;
 
    virtual void getStereoViewports(RectI *out) const;
    virtual void getStereoTargets(GFXTextureTarget **out) const;
