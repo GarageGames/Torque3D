@@ -3000,7 +3000,7 @@ void DeferredSkyHLSL::processVert( Vector<ShaderComponent*> &componentList,
 {
    Var *outPosition = (Var*)LangElement::find( "hpos" );
    MultiLine *meta = new MultiLine;
-   meta->addStatement( new GenOp( "   @.w = @.z;\r\n", outPosition, outPosition ) );
+   //meta->addStatement( new GenOp( "   @.w = @.z;\r\n", outPosition, outPosition ) );
 
    output = meta;
 }

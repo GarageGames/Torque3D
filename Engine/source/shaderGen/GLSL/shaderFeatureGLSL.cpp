@@ -2805,7 +2805,7 @@ void DeferredSkyGLSL::processVert( Vector<ShaderComponent*> &componentList,
 {
    Var *outPosition = (Var*)LangElement::find( "gl_Position" );
    MultiLine *meta = new MultiLine;
-   meta->addStatement( new GenOp( "   @.w = @.z;\r\n", outPosition, outPosition ) );
+   //meta->addStatement( new GenOp( "   @.w = @.z;\r\n", outPosition, outPosition ) );
 
    output = meta;
 }
