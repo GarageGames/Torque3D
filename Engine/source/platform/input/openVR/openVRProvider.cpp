@@ -1,4 +1,5 @@
 #include "platform/input/openVR/openVRProvider.h"
+#include "platform/input/openVR/openVROverlay.h"
 #include "platform/platformInput.h"
 #include "core/module.h"
 #include "console/engineAPI.h"
@@ -547,7 +548,7 @@ void OpenVRProvider::buildInputCodeTable()
 bool OpenVRProvider::process()
 {
    if (!mHMD)
-      return true;
+      return true;	
 
    if (!vr::VRCompositor())
 	   return true;
@@ -558,6 +559,12 @@ bool OpenVRProvider::process()
    {
       processVREvent(event);
    }
+
+	// process overlay events
+	for (U32 i = 0; i < mOverlays.size(); i++)
+	{
+		mOverlays[i]->handleOpenVREvents();
+	}
 
    // Process SteamVR controller state
    for (vr::TrackedDeviceIndex_t unDevice = 0; unDevice < vr::k_unMaxTrackedDeviceCount; unDevice++)
@@ -1012,6 +1019,20 @@ void OpenVRProvider::resetSensors()
    {
       mHMD->ResetSeatedZeroPose();
    }
+}
+
+void OpenVRProvider::registerOverlay(OpenVROverlay* overlay)
+{
+	mOverlays.push_back(overlay);
+}
+
+void OpenVRProvider::unregisterOverlay(OpenVROverlay* overlay)
+{
+	S32 index = mOverlays.find_next(overlay);
+	if (index != -1)
+	{
+		mOverlays.erase(index);
+	}
 }
 
 OpenVROverlay *OpenVRProvider::getGamepadFocusOverlay()

@@ -54,6 +54,24 @@ namespace OpenVRUtil
    void convertMatrixFPlainToSteamVRAffineMatrix(const MatrixF &inMat, vr::HmdMatrix34_t &outMat);
 
    U32 convertOpenVRButtonToTorqueButton(uint32_t vrButton);
+
+	/// Converts a point to OVR coords
+	inline Point3F convertPointToOVR(const Point3F &point)
+	{
+		return Point3F(-point.x, -point.z, point.y);
+	}
+
+	/// Converts a point from OVR coords
+	inline Point3F convertPointFromOVR(const Point3F &point)
+	{
+		return Point3F(-point.x, point.z, -point.y);
+	}
+
+	// Converts a point from OVR coords, from an input float array
+	inline Point3F convertPointFromOVR(const vr::HmdVector3_t& v)
+	{
+		return Point3F(-v.v[0], v.v[2], -v.v[1]);
+	}
 };
 
 template<int TEXSIZE> class VRTextureSet
@@ -199,6 +217,12 @@ public:
    void resetSensors();
    /// }
 
+	/// @name Overlay registration
+	/// {
+	void registerOverlay(OpenVROverlay* overlay);
+	void unregisterOverlay(OpenVROverlay* overlay);
+	/// }
+
 
    /// @name Console API
    /// {
@@ -231,6 +255,8 @@ public:
    GFXAdapterLUID mLUID;
 
    vr::ETrackingUniverseOrigin mTrackingSpace;
+
+	Vector<OpenVROverlay*> mOverlays;
    /// }
 
    GuiCanvas* mDrawCanvas;

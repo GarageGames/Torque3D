@@ -12,6 +12,7 @@
 #endif
 
 #include "postFx/postEffectCommon.h"
+#include "gui/controls/guiTextEditCtrl.h"
 
 ImplementEnumType(OpenVROverlayType,
    "Desired overlay type for OpenVROverlay. .\n\n"
@@ -32,6 +33,9 @@ OpenVROverlay::OpenVROverlay()
    mTrackingOrigin = vr::TrackingUniverseSeated;
 
    mTargetFormat = GFXFormatR8G8B8A8_LINEAR_FORCE; // needed for openvr!
+   mManualMouseHandling = true;
+
+   mMouseScale = Point2F(1, 1);
 }
 
 OpenVROverlay::~OpenVROverlay()
@@ -75,7 +79,7 @@ void OpenVROverlay::initPersistFields()
    addProtectedField("transformDeviceComponent", TypeString, Offset(mTransformDeviceComponent, OpenVROverlay), &setProtectedOverlayDirty, &defaultProtectedGetFn,
       "Rotation of overlay.");
 
-   addProtectedField("inputMethod", TypeOpenVROverlayInputMethod, Offset(mTransformDeviceComponent, OpenVROverlay), &setProtectedOverlayDirty, &defaultProtectedGetFn,
+   addProtectedField("inputMethod", TypeOpenVROverlayInputMethod, Offset(mInputMethod, OpenVROverlay), &setProtectedOverlayDirty, &defaultProtectedGetFn,
       "Type of input method.");
    addProtectedField("mouseScale", TypePoint2F, Offset(mMouseScale, OpenVROverlay), &setProtectedOverlayDirty, &defaultProtectedGetFn,
       "Scale of mouse input.");
@@ -86,6 +90,8 @@ void OpenVROverlay::initPersistFields()
    addProtectedField("controllerDevice", TypeS32, Offset(mControllerDeviceIndex, OpenVROverlay), &setProtectedOverlayDirty, &defaultProtectedGetFn,
       "Index of controller to attach overlay to.");
 
+   addField("manualMouseHandling", TypeBool, Offset(mManualMouseHandling, OpenVROverlay), "Forces openvr to create mouse events for overlay");
+
    Parent::initPersistFields();
 }
 
@@ -95,6 +101,12 @@ bool OpenVROverlay::onAdd()
    {
       mOverlayTypeDirty = true;
       mOverlayDirty = true;
+
+		if (OPENVR)
+		{
+			OPENVR->registerOverlay(this);
+		}
+
       return true;
    }
 
@@ -114,6 +126,11 @@ void OpenVROverlay::onRemove()
       vr::VROverlay()->DestroyOverlay(mThumbOverlayHandle);
       mThumbOverlayHandle = NULL;
    }
+
+	if (OPENVR)
+	{
+		OPENVR->unregisterOverlay(this);
+	}
 }
 
 void OpenVROverlay::resetOverlay()
@@ -202,10 +219,10 @@ void OpenVROverlay::updateOverlay()
    overlay->SetOverlayWidthInMeters(mOverlayHandle, mOverlayWidth);
 
    // NOTE: if flags in openvr change, double check this
-   /*for (U32 i = vr::VROverlayFlags_None; i <= vr::VROverlayFlags_ShowTouchPadScrollWheel; i++)
+   for (U32 i = vr::VROverlayFlags_None; i <= vr::VROverlayFlags_ShowTouchPadScrollWheel; i++)
    {
       overlay->SetOverlayFlag(mOverlayHandle, (vr::VROverlayFlags)i, mOverlayFlags & (1 << i));
-   }*/
+   }
 
    mOverlayDirty = false;
 }
@@ -216,11 +233,14 @@ void OpenVROverlay::showOverlay()
    if (mOverlayHandle == NULL)
       return;
 
-   vr::EVROverlayError err = vr::VROverlay()->ShowOverlay(mOverlayHandle);
-   if (err != vr::VROverlayError_None)
-   {
-      Con::errorf("VR Overlay error!");
-   }
+	if (mOverlayType != OVERLAYTYPE_DASHBOARD)
+	{
+		vr::EVROverlayError err = vr::VROverlay()->ShowOverlay(mOverlayHandle);
+		if (err != vr::VROverlayError_None)
+		{
+			Con::errorf("VR Overlay error!");
+		}
+	}
 
    if (!mStagingTexture)
    {
@@ -233,7 +253,10 @@ void OpenVROverlay::hideOverlay()
    if (mOverlayHandle == NULL)
       return;
 
-   vr::VROverlay()->HideOverlay(mOverlayHandle);
+	if (mOverlayType != OVERLAYTYPE_DASHBOARD)
+	{
+		vr::VROverlay()->HideOverlay(mOverlayHandle);
+	}
 }
 
 
@@ -294,21 +317,24 @@ bool OpenVROverlay::castRay(const Point3F &origin, const Point3F &direction, Ray
    vr::VROverlayIntersectionParams_t params;
    vr::VROverlayIntersectionResults_t result;
 
+	Point3F ovrOrigin = OpenVRUtil::convertPointToOVR(origin);
+	Point3F ovrDirection = OpenVRUtil::convertPointToOVR(direction);
+
    params.eOrigin = mTrackingOrigin;
-   params.vSource.v[0] = origin.x;
-   params.vSource.v[1] = origin.y;
-   params.vSource.v[2] = origin.z;
-   params.vDirection.v[0] = direction.x; // TODO: need to transform this to vr-space
-   params.vDirection.v[1] = direction.y;
-   params.vDirection.v[2] = direction.z;
+   params.vSource.v[0] = ovrOrigin.x;
+   params.vSource.v[1] = ovrOrigin.y;
+   params.vSource.v[2] = ovrOrigin.z;
+   params.vDirection.v[0] = ovrDirection.x;
+   params.vDirection.v[1] = ovrDirection.y;
+   params.vDirection.v[2] = ovrDirection.z;
 
    bool rayHit = vr::VROverlay()->ComputeOverlayIntersection(mOverlayHandle, &params, &result);
 
    if (rayHit && info)
    {
       info->t = result.fDistance;
-      info->point = Point3F(result.vPoint.v[0], result.vPoint.v[1], result.vPoint.v[2]); // TODO: need to transform this FROM vr-space
-      info->normal = Point3F(result.vNormal.v[0], result.vNormal.v[1], result.vNormal.v[2]);
+      info->point = OpenVRUtil::convertPointFromOVR(result.vPoint); // TODO: need to transform this FROM vr-space
+      info->normal = OpenVRUtil::convertPointFromOVR(result.vNormal);
       info->texCoord = Point2F(result.vUVs.v[0], result.vUVs.v[1]);
       info->object = NULL;
       info->userData = this;
@@ -324,6 +350,19 @@ void OpenVROverlay::moveGamepadFocusToNeighbour()
 
 void OpenVROverlay::handleOpenVREvents()
 {
+	if (mManualMouseHandling)
+	{
+		// tell OpenVR to make some events for us
+		for (vr::TrackedDeviceIndex_t unDeviceId = 1; unDeviceId < vr::k_unControllerStateAxisCount; unDeviceId++)
+		{
+			if (vr::VROverlay()->HandleControllerOverlayInteractionAsMouse(mOverlayHandle, unDeviceId))
+			{
+				break;
+			}
+		}
+	}
+
+
    vr::VREvent_t vrEvent;
    while (vr::VROverlay()->PollNextOverlayEvent(mOverlayHandle, &vrEvent, sizeof(vrEvent)))
    {
@@ -334,20 +373,23 @@ void OpenVROverlay::handleOpenVREvents()
       eventInfo.modifier = (InputModifiers)0;
       eventInfo.ascii = 0;
 
+		Con::printf("Overlay event %i", vrEvent.eventType);
+
       switch (vrEvent.eventType)
       {
       case vr::VREvent_MouseMove:
       {
+			Con::printf("mousemove %f,%f", vrEvent.data.mouse.x, vrEvent.data.mouse.y);
          eventInfo.objType = SI_AXIS;
          eventInfo.objInst = SI_XAXIS;
          eventInfo.action = SI_MAKE;
-         eventInfo.fValue = vrEvent.data.mouse.x;
+         eventInfo.fValue = getExtent().x * vrEvent.data.mouse.x;
          processMouseEvent(eventInfo);
 
          eventInfo.objType = SI_AXIS;
          eventInfo.objInst = SI_YAXIS;
          eventInfo.action = SI_MAKE;
-         eventInfo.fValue = vrEvent.data.mouse.y;
+         eventInfo.fValue = getExtent().y * (1.0 - vrEvent.data.mouse.y);
          processMouseEvent(eventInfo);
       }
       break;
@@ -381,7 +423,13 @@ void OpenVROverlay::handleOpenVREvents()
       case vr::VREvent_Quit:
          AssertFatal(false, "WTF is going on here");
          break;
-      }
+
+		case vr::VREvent_KeyboardCharInput:
+		case vr::VREvent_KeyboardDone:
+			updateTextControl((GuiControl*)vrEvent.data.keyboard.uUserValue);
+			break;
+		}
+
    }
 
    if (mThumbOverlayHandle != vr::k_ulOverlayHandleInvalid)
@@ -398,6 +446,20 @@ void OpenVROverlay::handleOpenVREvents()
          }
       }
    }
+}
+
+void OpenVROverlay::updateTextControl(GuiControl* ctrl)
+{
+	if (!ctrl)
+		return;
+
+	GuiTextCtrl* textCtrl = dynamic_cast<GuiTextCtrl*>(ctrl);
+	if (textCtrl)
+	{
+		char text[GuiTextCtrl::MAX_STRING_LENGTH];
+		vr::VROverlay()->GetKeyboardText(text, GuiTextCtrl::MAX_STRING_LENGTH);
+		textCtrl->setText(text);
+	}
 }
 
 void OpenVROverlay::onFrameRendered()
@@ -444,6 +506,34 @@ void OpenVROverlay::onFrameRendered()
    //Con::printf("Overlay visible ? %s", vr::VROverlay()->IsOverlayVisible(mOverlayHandle) ? "YES" : "NO");
 }
 
+void OpenVROverlay::enableKeyboardTranslation()
+{
+	vr::IVROverlay *overlay = vr::VROverlay();
+	if (!overlay || !mOverlayHandle)
+		return;
+
+	GuiTextEditCtrl* ctrl = dynamic_cast<GuiTextEditCtrl*>(getFirstResponder());
+	if (ctrl)
+	{
+		vr::EGamepadTextInputMode inputMode = ctrl->isPasswordText() ? vr::k_EGamepadTextInputModePassword : vr::k_EGamepadTextInputModeNormal;
+		char text[GuiTextCtrl::MAX_STRING_LENGTH + 1];
+		ctrl->getText(text);
+		overlay->ShowKeyboardForOverlay(mOverlayHandle, inputMode, vr::k_EGamepadTextInputLineModeSingleLine, ctrl->getTooltip().c_str(), GuiTextCtrl::MAX_STRING_LENGTH, text, false, (uint64_t)ctrl);
+	}
+}
+
+void OpenVROverlay::disableKeyboardTranslation()
+{
+	vr::IVROverlay *overlay = vr::VROverlay();
+	if (!overlay || !mOverlayHandle)
+		return;
+
+	overlay->HideKeyboard();
+}
+
+void OpenVROverlay::setNativeAcceleratorsEnabled(bool enabled)
+{
+}
 
 DefineEngineMethod(OpenVROverlay, showOverlay, void, (), , "")
 {

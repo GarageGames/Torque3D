@@ -124,6 +124,7 @@ public:
    void invalidText(bool playSound = true);
    void validText();
    bool isValidText();
+	inline bool isPasswordText() { return mPasswordText; }
 
    bool isAllTextSelected();
    void selectAllText();
