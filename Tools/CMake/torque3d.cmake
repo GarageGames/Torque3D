@@ -726,7 +726,34 @@ endif()
 
 if(TORQUE_TEMPLATE)
     message("Prepare Template(${TORQUE_TEMPLATE}) install...")
-    INSTALL(DIRECTORY "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game"                 DESTINATION "${TORQUE_APP_DIR}")
+    file(GLOB_RECURSE INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/*")
+    
+    IF( NOT TORQUE_EXPERIMENTAL_EC)
+        list(REMOVE_ITEM INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/art/art.module.taml")
+        list(REMOVE_ITEM INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/art/shapes/actors/Soldier/soldier.asset.taml")
+        list(REMOVE_ITEM INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/scripts.module.taml")
+        
+        foreach(ITEM ${INSTALL_FILES_AND_DIRS})
+            get_filename_component( dir ${ITEM} DIRECTORY )
+            get_filename_component( fileName ${ITEM} NAME )
+            if( ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/components 
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/components/game
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/components/input
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/gameObjects
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/tools/componentEditor
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/tools/componentEditor/gui
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/tools/componentEditor/scripts )
+                list(REMOVE_ITEM INSTALL_FILES_AND_DIRS ${dir}/${fileName})
+            ENDIF()
+        endforeach()
+    ENDIF()
+    
+    foreach(ITEM ${INSTALL_FILES_AND_DIRS})
+        get_filename_component( dir ${ITEM} DIRECTORY )
+        STRING(REGEX REPLACE "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/" "${TORQUE_APP_DIR}/" INSTALL_DIR ${dir})
+        install( FILES ${ITEM} DESTINATION ${INSTALL_DIR} )
+    endforeach()
+    
     if(WIN32)
         INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/cleanShaders.bat"     DESTINATION "${TORQUE_APP_DIR}")
         INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteCachedDTSs.bat" DESTINATION "${TORQUE_APP_DIR}")
