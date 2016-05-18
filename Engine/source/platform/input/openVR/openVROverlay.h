@@ -57,6 +57,7 @@ public:
 
    bool mOverlayTypeDirty; ///< Overlay type is dirty
    bool mOverlayDirty; ///< Overlay properties are dirty
+	bool mManualMouseHandling;
    OverlayType mOverlayType;
 
    //
@@ -89,7 +90,12 @@ public:
    void moveGamepadFocusToNeighbour();
 
    void handleOpenVREvents();
+	void updateTextControl(GuiControl* ctrl);
    void onFrameRendered();
+
+	virtual void enableKeyboardTranslation();
+	virtual void disableKeyboardTranslation();
+	virtual void setNativeAcceleratorsEnabled(bool enabled);
 };
 
 typedef OpenVROverlay::OverlayType OpenVROverlayType;
