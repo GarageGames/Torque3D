@@ -22,8 +22,6 @@
 
 function CameraComponent::onAdd(%this) 
 {
-   Parent::onBehaviorAdd(%this);
-
    %this.addComponentField(clientOwner, "The client that views this camera", "int", "1", "");
 
    %test = %this.clientOwner;

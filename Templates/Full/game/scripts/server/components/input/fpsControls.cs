@@ -24,8 +24,6 @@
 
 function FPSControls::onAdd(%this)
 {
-   Parent::onBehaviorAdd(%this);
-
    //
 	%this.beginGroup("Keys");
 		%this.addComponentField(forwardKey, "Key to bind to vertical thrust", keybind, "keyboard w");

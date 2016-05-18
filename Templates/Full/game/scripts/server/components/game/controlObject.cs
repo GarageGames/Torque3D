@@ -24,8 +24,6 @@
 
 function ControlObjectComponent::onAdd(%this)
 {
-   Parent::onBehaviorAdd(%this);
-
    %this.addComponentField(clientOwner, "The shape to use for rendering", "int", "1", "");
 
    %clientID = %this.getClientID();

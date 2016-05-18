@@ -26,12 +26,6 @@ function ThirdPersonPlayerObject::onAdd(%this)
    
    %this.aimedMaxPitch = 90;
    %this.aimedMinPitch = -90;
-   
-   %this.arms = SGOManager.spawn("FirstPersonArms", true);
-   
-   %this.add(arms);
-   
-   //%this.mesh.mountObject(%this.arms, "Eye");
 }
 
 function ThirdPersonPlayerObject::onRemove(%this)
