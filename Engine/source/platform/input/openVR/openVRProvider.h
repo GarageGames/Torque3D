@@ -135,6 +135,7 @@ struct OpenVRRenderState
    void renderPreview();
 
    void reset(vr::IVRSystem* hmd);
+   void updateHMDProjection();
 };
 
 class OpenVRProvider : public IDisplayDevice, public IInputDevice
