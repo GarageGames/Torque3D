@@ -618,14 +618,12 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
          // Use the view matrix determined from the display device
          myTransforms[0] = mLastCameraQuery.eyeTransforms[0];
          myTransforms[1] = mLastCameraQuery.eyeTransforms[1];
-         myTransforms[2] = mLastCameraQuery.cameraMatrix;
       }
       else
       {
          // Use the view matrix determined from the control object
          myTransforms[0] = mLastCameraQuery.cameraMatrix;
          myTransforms[1] = mLastCameraQuery.cameraMatrix;
-         myTransforms[2] = mLastCameraQuery.cameraMatrix;
 
          QuatF qrot = mLastCameraQuery.cameraMatrix;
          Point3F pos = mLastCameraQuery.cameraMatrix.getPosition();
