@@ -329,6 +329,11 @@ void OpenVRRenderState::reset(vr::IVRSystem* hmd)
    if (!mHMD)
       return;
 
+   updateHMDProjection();
+}
+
+void OpenVRRenderState::updateHMDProjection()
+{
    vr::HmdMatrix34_t mat = mHMD->GetEyeToHeadTransform(vr::Eye_Left);
    mEyePose[0] = OpenVRUtil::convertSteamVRAffineMatrixToMatrixFPlain(mat);
    mEyePose[0].inverse();
@@ -911,6 +916,9 @@ void OpenVRProvider::updateTrackedPoses()
 
    compositor->WaitGetPoses(mTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
 
+   // Make sure we're using the latest eye offset in case user has changed IPD
+   mHMDRenderState.updateHMDProjection();
+
    mValidPoseCount = 0;
 
    for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice)
@@ -924,7 +932,7 @@ void OpenVRProvider::updateTrackedPoses()
          if (nDevice == vr::k_unTrackedDeviceIndex_Hmd)
          {
             mHMDRenderState.mHMDPose = mat;
-            // jaeesu - store the last rotation for temp debugging
+            // jamesu - store the last rotation for temp debugging
             MatrixF torqueMat(1);
             OpenVRUtil::convertTransformFromOVR(mat, torqueMat);
             gLastMoveRot = AngAxisF(torqueMat);
