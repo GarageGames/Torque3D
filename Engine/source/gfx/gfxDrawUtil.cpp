@@ -61,6 +61,7 @@ void GFXDrawUtil::_setupStateBlocks()
    bitmapStretchSR.setZReadWrite(false);
    bitmapStretchSR.setBlend(true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
    bitmapStretchSR.samplersDefined = true;
+   bitmapStretchSR.setColorWrites(true, true, true, false);
 
    // Linear: Create wrap SB
    bitmapStretchSR.samplers[0] = GFXSamplerStateDesc::getWrapLinear();
