@@ -428,6 +428,10 @@ if(TORQUE_DEDICATED)
     addDef(TORQUE_DEDICATED)
 endif()
 
+if(TORQUE_EXPERIMENTAL_EC)
+	addDef(TORQUE_EXPERIMENTAL_EC)
+endif()
+
 #modules dir
 file(GLOB modules "modules/*.cmake")
 foreach(module ${modules})
