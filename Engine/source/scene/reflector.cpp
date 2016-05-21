@@ -39,6 +39,7 @@
 #include "math/mathUtils.h"
 #include "math/util/frustum.h"
 #include "gfx/screenshot.h"
+#include "postFx/postEffectManager.h"
 
 extern ColorI gCanvasClearColor;
 
@@ -603,6 +604,8 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    {
       // Store previous values
       RectI originalVP = GFX->getViewport();
+      MatrixF origNonClipProjection = gClientSceneGraph->getNonClipProjection();
+      PFXFrameState origPFXState = PFXMGR->getFrameState();
 
       const FovPort *currentFovPort = GFX->getStereoFovPort();
       MatrixF inverseEyeTransforms[2];
@@ -655,6 +658,8 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       // Restore previous values
       GFX->setFrustum(gfxFrustum);
       GFX->setViewport(originalVP);
+      gClientSceneGraph->setNonClipProjection(origNonClipProjection);
+      PFXMGR->setFrameState(origPFXState);
    }
    else
    {
