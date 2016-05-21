@@ -3795,16 +3795,19 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
       //We check if our object is an entity, and if it is, we call a 'onInspect' function.
       //This function is pretty much a special notifier to the entity so if it has any behaviors that do special
       //stuff in the editor, it can fire that up
-      Entity* e = dynamic_cast<Entity*>(item->getObject());
-      if (item->mScriptInfo.mText != StringTable->insert("Components"))
+      if (item->isInspectorData())
       {
          Entity* e = dynamic_cast<Entity*>(item->getObject());
-         if (e)
+         if (item->mScriptInfo.mText != StringTable->insert("Components"))
          {
-            if (item->isExpanded())
-               e->onInspect();
-            else
-               e->onEndInspect();
+            Entity* e = dynamic_cast<Entity*>(item->getObject());
+            if (e)
+            {
+               if (item->isExpanded())
+                  e->onInspect();
+               else
+                  e->onEndInspect();
+            }
          }
       }
 #endif
