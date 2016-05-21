@@ -85,6 +85,7 @@ function EWCreatorWindow::init( %this )
       %this.registerMissionObject( "SFXSpace",      "Sound Space" );
       %this.registerMissionObject( "OcclusionVolume", "Occlusion Volume" );
       %this.registerMissionObject( "AccumulationVolume", "Accumulation Volume" );
+      %this.registerMissionObject( "Entity",       "Entity" );
       
    %this.endGroup();
    

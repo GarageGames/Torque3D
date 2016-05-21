@@ -29,7 +29,7 @@ function ItemRotationComponent::onAdd(%this)
    %this.addComponentField(horizontal, "Rotate horizontal or verticle, true for horizontal", "bool", "1", "");
 }
 
-function ItemRotateBehavior::Update(%this)
+function ItemRotationComponent::Update(%this)
 {
     %tickRate = 0.032;
     

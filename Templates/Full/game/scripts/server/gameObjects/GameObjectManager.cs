@@ -39,15 +39,12 @@ function execGameObjects()
 	}
 }
 
-function spawnGameObject(%name, %addToMissionGroup)
+function findGameObject(%name)
 {
-	if(%addToMissionGroup $= "")
-		%addToMissionGroup = true;
-		
    //find all GameObjectAssets
    %assetQuery = new AssetQuery();
    if(!AssetDatabase.findAssetType(%assetQuery, "GameObjectAsset"))
-      return; //if we didn't find ANY, just exit
+      return 0; //if we didn't find ANY, just exit
       
    %count = %assetQuery.getCount();
       
@@ -61,15 +58,64 @@ function spawnGameObject(%name, %addToMissionGroup)
 		{
 		   if(isFile(%gameObjectAsset.TAMLFilePath))
          {
-            %newSGOObject = TamlRead(%gameObjectAsset.TAMLFilePath);
-            
-            if(%addToMissionGroup == true)
-               MissionGroup.add(%newSGOObject);
-               
-            return %newSGOObject;
+            return %gameObjectAsset;
          }
 		}
 	}
 		
 	return 0;
+}
+
+function spawnGameObject(%name, %addToMissionGroup)
+{
+	if(%addToMissionGroup $= "")
+		%addToMissionGroup = true;
+		
+   %gameObjectAsset = findGameObject(%name);
+   
+   if(isObject(%gameObjectAsset))
+   {
+      %newSGOObject = TamlRead(%gameObjectAsset.TAMLFilePath);
+            
+      if(%addToMissionGroup == true)
+         MissionGroup.add(%newSGOObject);
+         
+      return %newSGOObject;
+   }
+		
+	return 0;
+}
+
+function saveGameObject(%name, %tamlPath, %scriptPath)
+{
+	%gameObjectAsset = findGameObject(%name);
+   
+   //find if it already exists. If it does, we'll update it, if it does not, we'll  make a new asset
+   if(isObject(%gameObjectAsset))
+   {
+      %assetID = %gameObjectAsset.getAssetId();
+      
+      %gameObjectAsset.TAMLFilePath = %tamlPath;
+      %gameObjectAsset.scriptFilePath = %scriptPath;
+      
+      TAMLWrite(%gameObjectAsset, AssetDatabase.getAssetFilePath(%assetID));
+      AssetDatabase.refreshAsset(%assetID);
+   }
+   else
+   {
+      //Doesn't exist, so make a new one
+      %gameObjectAsset = new GameObjectAsset()
+      {
+         assetName = %name @ "Asset";
+         gameObjectName = %name;
+         TAMLFilePath = %tamlPath;
+         scriptFilePath = %scriptPath;
+      };
+      
+      //Save it alongside the taml file
+      %path = filePath(%tamlPath);
+      
+      TAMLWrite(%gameObjectAsset, %path @ "/" @ %name @ ".asset.taml");
+      AssetDatabase.refreshAllAssets(true);
+   }
 }
