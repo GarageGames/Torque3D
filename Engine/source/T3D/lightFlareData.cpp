@@ -277,8 +277,8 @@ bool LightFlareData::_testVisibility(const SceneRenderState *state, LightFlareSt
    // the last result.
    const Point3F &lightPos = flareState->lightMat.getPosition();  
    const RectI &viewport = RectI(Point2I(0, 0), GFX->getViewport().extent);
+   MatrixF camProjMatrix = state->getSceneManager()->getNonClipProjection();
 
-   MatrixF camProjMatrix = projMatrix = state->getSceneManager()->getNonClipProjection();
    bool onScreen = MathUtils::mProjectWorldToScreen( lightPos, outLightPosSS, viewport, GFX->getWorldMatrix(), camProjMatrix );
 
    // It is onscreen, so raycast as a simple occlusion test.

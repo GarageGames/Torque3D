@@ -41,6 +41,8 @@
 // For player object bounds workaround.
 #include "T3D/player.h"
 
+#include "postFx/postEffectManager.h"
+
 extern bool gEditingMission;
 
 
@@ -239,6 +241,10 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       MatrixF originalWorld = GFX->getWorldMatrix();
       Frustum originalFrustum = GFX->getFrustum();
 
+      // Save PFX & SceneManager projections
+      MatrixF origNonClipProjection = renderState->getSceneManager()->getNonClipProjection();
+      PFXFrameState origPFXState = PFXMGR->getFrameState();
+
       const FovPort *currentFovPort = GFX->getStereoFovPort();
       const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
       const MatrixF *worldEyeTransforms = GFX->getInverseStereoEyeTransforms();
@@ -255,7 +261,9 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
 
       SceneCameraState cameraStateLeft = SceneCameraState::fromGFX();
       SceneRenderState renderStateLeft( this, renderState->getScenePassType(), cameraStateLeft );
+      renderStateLeft.getSceneManager()->setNonClipProjection(GFX->getProjectionMatrix());
       renderStateLeft.setSceneRenderStyle(SRS_SideBySide);
+      PFXMGR->setFrameMatrices(GFX->getWorldMatrix(), GFX->getProjectionMatrix());
 
       renderSceneNoLights( &renderStateLeft, objectMask, baseObject, baseZone ); // left
 
@@ -274,7 +282,9 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
 
       SceneCameraState cameraStateRight = SceneCameraState::fromGFX();
       SceneRenderState renderStateRight( this, renderState->getScenePassType(), cameraStateRight );
+      renderStateRight.getSceneManager()->setNonClipProjection(GFX->getProjectionMatrix());
       renderStateRight.setSceneRenderStyle(SRS_SideBySide);
+      PFXMGR->setFrameMatrices(GFX->getWorldMatrix(), GFX->getProjectionMatrix());
 
       renderSceneNoLights( &renderStateRight, objectMask, baseObject, baseZone ); // right
 
@@ -283,6 +293,9 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       GFX->endField();
 
       // Restore previous values
+      renderState->getSceneManager()->setNonClipProjection(origNonClipProjection);
+      PFXMGR->setFrameState(origPFXState);
+
       GFX->setWorldMatrix(originalWorld);
       GFX->setFrustum(originalFrustum);
       GFX->setViewport(originalVP);
