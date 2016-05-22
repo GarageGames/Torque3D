@@ -278,6 +278,12 @@ public:
    static U32 OVR_AXISJOYSTICK[vr::k_unMaxTrackedDeviceCount];
    static U32 OVR_AXISTRIGGER[vr::k_unMaxTrackedDeviceCount];
 
+   /// @name HMD Rotation offset
+   /// {
+   static EulerF smHMDRotOffset;
+   static F32 smHMDmvYaw;
+   static F32 smHMDmvPitch;
+   /// }
 
 public:
    // For ManagedSingleton.
