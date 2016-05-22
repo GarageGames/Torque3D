@@ -106,6 +106,8 @@ namespace OpenVRUtil
          return KEY_BUTTON1;
       case vr::VRMouseButton_Middle:
          return KEY_BUTTON2;
+      default:
+         return KEY_NULL;
       }
    }
 
@@ -223,6 +225,10 @@ U32 OpenVRProvider::OVR_AXISNONE[vr::k_unMaxTrackedDeviceCount] = { 0 };
 U32 OpenVRProvider::OVR_AXISTRACKPAD[vr::k_unMaxTrackedDeviceCount] = { 0 };
 U32 OpenVRProvider::OVR_AXISJOYSTICK[vr::k_unMaxTrackedDeviceCount] = { 0 };
 U32 OpenVRProvider::OVR_AXISTRIGGER[vr::k_unMaxTrackedDeviceCount] = { 0 };
+
+EulerF OpenVRProvider::smHMDRotOffset(0);
+F32 OpenVRProvider::smHMDmvYaw = 0;
+F32 OpenVRProvider::smHMDmvPitch = 0;
 
 static String GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL)
 {
@@ -384,6 +390,13 @@ void OpenVRProvider::staticInit()
    Con::setIntVariable("$OpenVR::OverlayFlags_SendVRScrollEvents", 1 << (U32)vr::VROverlayFlags_SendVRScrollEvents);
    Con::setIntVariable("$OpenVR::OverlayFlags_SendVRTouchpadEvents", 1 << (U32)vr::VROverlayFlags_SendVRTouchpadEvents);
    Con::setIntVariable("$OpenVR::OverlayFlags_ShowTouchPadScrollWheel", 1 << (U32)vr::VROverlayFlags_ShowTouchPadScrollWheel);
+
+   Con::addVariable("$OpenVR::HMDRotOffsetX", TypeF32, &smHMDRotOffset.x);
+   Con::addVariable("$OpenVR::HMDRotOffsetY", TypeF32, &smHMDRotOffset.y);
+   Con::addVariable("$OpenVR::HMDRotOffsetZ", TypeF32, &smHMDRotOffset.z);
+
+   Con::addVariable("$OpenVR::HMDmvYaw", TypeF32, &smHMDmvYaw);
+   Con::addVariable("$OpenVR::HMDmvPitch", TypeF32, &smHMDmvPitch);
 }
 
 bool OpenVRProvider::enable()
@@ -557,6 +570,22 @@ bool OpenVRProvider::process()
 
    if (!vr::VRCompositor())
 	   return true;
+
+   // Update HMD rotation offset
+   smHMDRotOffset.z += smHMDmvYaw;
+   smHMDRotOffset.x += smHMDmvPitch;
+
+   while (smHMDRotOffset.x < -M_PI_F)
+      smHMDRotOffset.x += M_2PI_F;
+   while (smHMDRotOffset.x > M_PI_F)
+      smHMDRotOffset.x -= M_2PI_F;
+   while (smHMDRotOffset.z < -M_PI_F)
+      smHMDRotOffset.z += M_2PI_F;
+   while (smHMDRotOffset.z > M_PI_F)
+      smHMDRotOffset.z -= M_2PI_F;
+
+   smHMDmvYaw = 0;
+   smHMDmvPitch = 0;
 
    // Process SteamVR events
    vr::VREvent_t event;
@@ -932,6 +961,16 @@ void OpenVRProvider::updateTrackedPoses()
          if (nDevice == vr::k_unTrackedDeviceIndex_Hmd)
          {
             mHMDRenderState.mHMDPose = mat;
+            MatrixF rotOffset(1);
+            EulerF localRot(-smHMDRotOffset.x, -smHMDRotOffset.z, smHMDRotOffset.y);
+
+            // NOTE: offsetting before is probably the best we're going to be able to do here, since if we apply the matrix AFTER 
+            // we will get correct movements relative to the camera HOWEVER this also distorts any future movements from the HMD since 
+            // we will then be on a really weird rotation axis.
+            QuatF(localRot).setMatrix(&rotOffset);
+            rotOffset.inverse();
+            mHMDRenderState.mHMDPose = rotOffset * mHMDRenderState.mHMDPose;
+
             // jamesu - store the last rotation for temp debugging
             MatrixF torqueMat(1);
             OpenVRUtil::convertTransformFromOVR(mat, torqueMat);
