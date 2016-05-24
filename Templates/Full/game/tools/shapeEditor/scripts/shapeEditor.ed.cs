@@ -380,7 +380,8 @@ function ShapeEdSelectWindow::navigate( %this, %address )
 
       // Ignore assets in the tools folder
       %fullPath = makeRelativePath( %fullPath, getMainDotCSDir() );
-      %splitPath = strreplace( %fullPath, "/", " " );
+      %splitPath = strreplace( %fullPath, " ", "_" );
+      %splitPath = strreplace( %splitPath, "/", " " );
       if ( getWord( %splitPath, 0 ) $= "tools" )
       {
          %fullPath = findNextFileMultiExpr( %filePatterns );
@@ -393,6 +394,7 @@ function ShapeEdSelectWindow::navigate( %this, %address )
       // Add this file's path ( parent folders ) to the
       // popup menu if it isn't there yet.
       %temp = strreplace( %pathFolders, " ", "/" );
+      %temp = strreplace( %temp, "_", " " );
       %r = ShapeEdSelectMenu.findText( %temp );
       if ( %r == -1 )
          ShapeEdSelectMenu.add( %temp );
