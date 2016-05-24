@@ -336,6 +336,7 @@ void GFXGLDevice::resurrect()
 
 GFXVertexBuffer* GFXGLDevice::findVolatileVBO(U32 numVerts, const GFXVertexFormat *vertexFormat, U32 vertSize)
 {
+   PROFILE_SCOPE(GFXGLDevice_findVBPool);
    for(U32 i = 0; i < mVolatileVBs.size(); i++)
       if (  mVolatileVBs[i]->mNumVerts >= numVerts &&
             mVolatileVBs[i]->mVertexFormat.isEqual( *vertexFormat ) &&
@@ -344,6 +345,7 @@ GFXVertexBuffer* GFXGLDevice::findVolatileVBO(U32 numVerts, const GFXVertexForma
          return mVolatileVBs[i];
 
    // No existing VB, so create one
+   PROFILE_SCOPE(GFXGLDevice_createVBPool);
    StrongRefPtr<GFXGLVertexBuffer> buf(new GFXGLVertexBuffer(GFX, numVerts, vertexFormat, vertSize, GFXBufferTypeVolatile));
    buf->registerResourceWithDevice(this);
    mVolatileVBs.push_back(buf);
@@ -369,6 +371,7 @@ GFXVertexBuffer *GFXGLDevice::allocVertexBuffer(   U32 numVerts,
                                                    GFXBufferType bufferType,
                                                    void* data )  
 {
+   PROFILE_SCOPE(GFXGLDevice_allocVertexBuffer);
    if(bufferType == GFXBufferTypeVolatile)
       return findVolatileVBO(numVerts, vertexFormat, vertSize);
          
@@ -534,6 +537,7 @@ inline GLsizei GFXGLDevice::primCountToIndexCount(GFXPrimitiveType primType, U32
 
 GFXVertexDecl* GFXGLDevice::allocVertexDecl( const GFXVertexFormat *vertexFormat ) 
 {
+   PROFILE_SCOPE(GFXGLDevice_allocVertexDecl);
    typedef Map<void*, GFXGLVertexDecl> GFXGLVertexDeclMap;
    static GFXGLVertexDeclMap declMap;   
    GFXGLVertexDeclMap::Iterator itr = declMap.find( (void*)vertexFormat->getDescription().c_str() ); // description string are interned, safe to use c_str()
@@ -866,6 +870,7 @@ void GFXGLDevice::setShader(GFXShader *shader, bool force)
 
 void GFXGLDevice::setShaderConstBufferInternal(GFXShaderConstBuffer* buffer)
 {
+   PROFILE_SCOPE(GFXGLDevice_setShaderConstBufferInternal);
    static_cast<GFXGLShaderConstBuffer*>(buffer)->activate();
 }
 

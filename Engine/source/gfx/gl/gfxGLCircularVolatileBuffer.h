@@ -20,7 +20,8 @@ public:
    }
 
    void init(U32 start, U32 end)
-   {         
+   {  
+      PROFILE_SCOPE(GFXGLQueryFence_issue);
       mStart = start;
       mEnd = end;
       mSync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -35,7 +36,8 @@ public:
    }
 
    void wait()
-   {      
+   {   
+      PROFILE_SCOPE(GFXGLQueryFence_block);
       GLbitfield waitFlags = 0;
       GLuint64 waitDuration = 0;
       while( 1 ) 
