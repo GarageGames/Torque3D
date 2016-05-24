@@ -211,7 +211,7 @@ void GFXGLTextureObject::bind(U32 textureUnit)
    glBindTexture(mBinding, mHandle);
    GFXGL->getOpenglCache()->setCacheBindedTex(textureUnit, mBinding, mHandle);
 
-   if( gglHasExtension(ARB_sampler_objects) )
+   if(GFXGL->mCapabilities.samplerObjects)
 	   return;
   
    GFXGLStateBlockRef sb = mGLDevice->getCurrentStateBlock();
@@ -298,8 +298,8 @@ void GFXGLTextureObject::reloadFromCache()
    else if(mBinding == GL_TEXTURE_1D)
 		glTexSubImage1D(mBinding, 0, 0, (mTextureSize.x > 1 ? mTextureSize.x : mTextureSize.y), GFXGLTextureFormat[mFormat], GFXGLTextureType[mFormat], mZombieCache);
    
-   if(GFX->getCardProfiler()->queryProfile("GL::Workaround::needsExplicitGenerateMipmap") && mMipLevels != 1)
-      glGenerateMipmapEXT(mBinding);
+   if(mMipLevels != 1)
+      glGenerateMipmap(mBinding);
       
    delete[] mZombieCache;
    mZombieCache = NULL;

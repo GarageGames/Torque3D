@@ -410,7 +410,7 @@ void GFXGLTextureTarget::resolveTo(GFXTextureObject* obj)
    AssertFatal(dynamic_cast<GFXGLTextureObject*>(obj), "GFXGLTextureTarget::resolveTo - Incorrect type of texture, expected a GFXGLTextureObject");
    GFXGLTextureObject* glTexture = static_cast<GFXGLTextureObject*>(obj);
 
-   if( gglHasExtension(ARB_copy_image) && mTargets[Color0]->isCompatible(glTexture) )
+   if( GFXGL->mCapabilities.copyImage && mTargets[Color0]->isCompatible(glTexture) )
    {
       GLenum binding = mTargets[Color0]->getBinding();      
       binding = (binding >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && binding <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z) ? GL_TEXTURE_CUBE_MAP : binding;
