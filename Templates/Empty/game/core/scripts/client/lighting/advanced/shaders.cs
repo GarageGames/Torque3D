@@ -39,9 +39,11 @@ new GFXStateBlockData( AL_VectorLightState )
    mSamplerNames[0] = "prePassBuffer";
    samplerStates[1] = SamplerClampPoint;  // Shadow Map (Do not change this to linear, as all cards can not filter equally.)
    mSamplerNames[1] = "shadowMap";
-   samplerStates[2] = SamplerClampLinear;  // SSAO Mask
-   mSamplerNames[2] = "ssaoMask";
-   samplerStates[3] = SamplerWrapPoint;   // Random Direction Map
+   samplerStates[2] = SamplerClampPoint;  // Shadow Map (Do not change this to linear, as all cards can not filter equally.)
+   mSamplerNames[2] = "dynamicShadowMap";
+   samplerStates[3] = SamplerClampLinear;  // SSAO Mask
+   mSamplerNames[3] = "ssaoMask";
+   samplerStates[4] = SamplerWrapPoint;   // Random Direction Map
    
    cullDefined = true;
    cullMode = GFXCullNone;
@@ -114,8 +116,10 @@ new GFXStateBlockData( AL_ConvexLightState )
    mSamplerNames[0] = "prePassBuffer";
    samplerStates[1] = SamplerClampPoint;  // Shadow Map (Do not use linear, these are perspective projections)
    mSamplerNames[1] = "shadowMap";
-   samplerStates[2] = SamplerClampLinear; // Cookie Map   
-   samplerStates[3] = SamplerWrapPoint;   // Random Direction Map
+   samplerStates[2] = SamplerClampPoint;  // Shadow Map (Do not use linear, these are perspective projections)
+   mSamplerNames[2] = "dynamicShadowMap";
+   samplerStates[3] = SamplerClampLinear; // Cookie Map   
+   samplerStates[4] = SamplerWrapPoint;   // Random Direction Map
    
    cullDefined = true;
    cullMode = GFXCullCW;

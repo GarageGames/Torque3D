@@ -252,6 +252,18 @@ function EditorGui::buildMenus(%this)
          // last menu items in EditorLightingMenu::onAdd().
    };
    %this.menuBar.insert(%lightingMenu, %this.menuBar.getCount());
+   
+   // Tools Menu
+   %toolsMenu = new PopupMenu()
+   {
+      superClass = "MenuBuilder";
+      class = "EditorUtilitiesMenu";
+
+      barTitle = "Tools";
+         
+      item[0] = "Network Graph" TAB "n" TAB "toggleNetGraph();";
+   };
+   %this.menuBar.insert(%toolsMenu, %this.menuBar.getCount());
       
    // Help Menu
    %helpMenu = new PopupMenu()

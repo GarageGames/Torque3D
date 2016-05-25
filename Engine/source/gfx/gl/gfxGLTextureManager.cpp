@@ -146,7 +146,7 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
 
     glTexParameteri(binding, GL_TEXTURE_MAX_LEVEL, retTex->mMipLevels-1 );
     
-    if( gglHasExtension(ARB_texture_storage) )
+    if( GFXGL->mCapabilities.textureStorage )
     {
         if(binding == GL_TEXTURE_2D)
             glTexStorage2D( retTex->getBinding(), retTex->mMipLevels, GFXGLTextureInternalFormat[format], width, height );
@@ -234,6 +234,7 @@ static void _fastTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
    
    if(pDL->getFormat() == GFXFormatR8G8B8A8 || pDL->getFormat() == GFXFormatR8G8B8X8)
    {
+      PROFILE_SCOPE(Swizzle32_Upload);
       FrameAllocatorMarker mem;
       U8* pboMemory = (U8*)mem.alloc(bufSize);
       GFX->getDeviceSwizzle32()->ToBuffer(pboMemory, pDL->getBits(0), bufSize);
@@ -241,6 +242,7 @@ static void _fastTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
    }
    else
    {
+      PROFILE_SCOPE(SwizzleNull_Upload);
       glBufferSubData(GL_PIXEL_UNPACK_BUFFER_ARB, 0, bufSize, pDL->getBits(0) );
    }
    
@@ -262,6 +264,7 @@ static void _slowTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
 
 bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *pDL)
 {
+   PROFILE_SCOPE(GFXGLTextureManager_loadTexture);
    GFXGLTextureObject *texture = static_cast<GFXGLTextureObject*>(aTexture);
    
    AssertFatal(texture->getBinding() == GL_TEXTURE_1D || texture->getBinding() == GL_TEXTURE_2D, 
@@ -291,6 +294,8 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *pDL)
 
 bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
 {
+   PROFILE_SCOPE(GFXGLTextureManager_loadTextureDDS);
+
    AssertFatal(!(dds->mFormat == GFXFormatDXT2 || dds->mFormat == GFXFormatDXT4), "GFXGLTextureManager::_loadTexture - OpenGL does not support DXT2 or DXT4 compressed textures");
    GFXGLTextureObject* texture = static_cast<GFXGLTextureObject*>(aTexture);
    
@@ -304,10 +309,11 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
    glBindTexture(texture->getBinding(), texture->getHandle());
    texture->mFormat = dds->mFormat;
    U32 numMips = dds->mSurfaces[0]->mMips.size();
-   if(GFX->getCardProfiler()->queryProfile("GL::Workaround::noManualMips"))
-      numMips = 1;
+
    for(U32 i = 0; i < numMips; i++)
    {
+      PROFILE_SCOPE(GFXGLTexMan_loadSurface);
+
       if(isCompressedFormat(dds->mFormat))
       {
          if((!isPow2(dds->getWidth()) || !isPow2(dds->getHeight())) && GFX->getCardProfiler()->queryProfile("GL::Workaround::noCompressedNPoTTextures"))
@@ -344,6 +350,7 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
 
 bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, void *raw)
 {
+   PROFILE_SCOPE(GFXGLTextureManager_loadTextureRaw);
    if(aTexture->getDepth() < 1)
       return false;
    

@@ -45,6 +45,18 @@ class GFXGLVertexDecl;
 class GFXGLDevice : public GFXDevice
 {
 public:
+   struct GLCapabilities
+   {
+      bool anisotropicFiltering;
+      bool bufferStorage;
+      bool shaderModel5;
+      bool textureStorage;
+      bool samplerObjects;
+      bool copyImage;
+      bool vertexAttributeBinding;
+   };
+   GLCapabilities mCapabilities;
+
    void zombify();
    void resurrect();
    GFXGLDevice(U32 adapterIndex);
