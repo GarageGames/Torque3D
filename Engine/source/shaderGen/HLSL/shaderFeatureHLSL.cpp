@@ -1258,7 +1258,10 @@ void DiffuseVertColorFeatureHLSL::processPix(   Vector<ShaderComponent*> &compon
    }
    
    MultiLine* meta = new MultiLine;
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( vertColor, Material::Mul ) ) );
+   if (fd.features[MFT_isDeferred])
+      meta->addStatement(new GenOp("   @;\r\n", assignColor(vertColor, Material::Mul, NULL, ShaderFeature::RenderTarget1)));
+   else
+      meta->addStatement(new GenOp("   @;\r\n", assignColor(vertColor, Material::Mul)));
    output = meta;
 }
 
