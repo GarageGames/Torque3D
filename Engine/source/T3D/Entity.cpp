@@ -404,8 +404,7 @@ U32 Entity::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       //mathWrite(*stream, getPosition());
       mathWrite(*stream, mPos);
 
-      //mathWrite(*stream, getRotation());
-      mathWrite(*stream, getRotation().asEulerF());
+      mathWrite(*stream, getRotation());
 
       mDelta.move.pack(stream);
 
@@ -502,10 +501,7 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
 
       RotationF rot;
 
-      EulerF eRot;
-      mathRead(*stream, &eRot);
-
-      rot = RotationF(eRot);
+      mathRead(*stream, &rot);
 
       mDelta.move.unpack(stream);
 
@@ -602,7 +598,8 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
             mDelta.posVec = (cp - mDelta.pos) / mDelta.dt;
             QuatF cr;
             cr.interpolate(mDelta.rot[1], mDelta.rot[0], mDelta.dt);
-            mDelta.rot[1].interpolate(cr, pos, mDelta.dt / dt);
+
+            mDelta.rot[1].interpolate(cr, rot.asQuatF(), mDelta.dt / dt);
             mDelta.rot[0].extrapolate(mDelta.rot[1], cr, mDelta.dt);
          }
 
