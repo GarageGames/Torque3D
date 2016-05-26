@@ -146,7 +146,7 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
 
     glTexParameteri(binding, GL_TEXTURE_MAX_LEVEL, retTex->mMipLevels-1 );
     
-    if( gglHasExtension(ARB_texture_storage) )
+    if( GFXGL->mCapabilities.textureStorage )
     {
         if(binding == GL_TEXTURE_2D)
             glTexStorage2D( retTex->getBinding(), retTex->mMipLevels, GFXGLTextureInternalFormat[format], width, height );
@@ -309,8 +309,7 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
    glBindTexture(texture->getBinding(), texture->getHandle());
    texture->mFormat = dds->mFormat;
    U32 numMips = dds->mSurfaces[0]->mMips.size();
-   if(GFX->getCardProfiler()->queryProfile("GL::Workaround::noManualMips"))
-      numMips = 1;
+
    for(U32 i = 0; i < numMips; i++)
    {
       PROFILE_SCOPE(GFXGLTexMan_loadSurface);

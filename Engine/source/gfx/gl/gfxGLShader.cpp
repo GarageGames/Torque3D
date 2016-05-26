@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "gfx/gl/gfxGLShader.h"
 #include "gfx/gl/gfxGLVertexAttribLocation.h"
+#include "gfx/gl/gfxGLDevice.h"
 
 #include "core/frameAllocator.h"
 #include "core/stream/fileStream.h"
@@ -958,7 +959,7 @@ bool GFXGLShader::_loadShaderFromStream(  GLuint shader,
    buffers.push_back( dStrdup( versionDecl ) );
    lengths.push_back( dStrlen( versionDecl ) );
 
-   if(gglHasExtension(ARB_gpu_shader5))
+   if(GFXGL->mCapabilities.shaderModel5)
    {
       const char *extension = "#extension GL_ARB_gpu_shader5 : enable\r\n";
       buffers.push_back( dStrdup( extension ) );

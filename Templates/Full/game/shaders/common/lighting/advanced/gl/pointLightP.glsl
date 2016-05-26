@@ -147,6 +147,17 @@ void main()
 	   return;
    }
 
+   vec4 colorSample = texture( colorBuffer, uvScene );
+   vec3 subsurface = vec3(0.0,0.0,0.0); 
+   if (getFlag( matInfo.r, 1 ))
+   {
+      subsurface = colorSample.rgb;
+      if (colorSample.r>colorSample.g)
+         subsurface = vec3(0.772549, 0.337255, 0.262745);
+	  else
+         subsurface = vec3(0.337255, 0.772549, 0.262745);
+	}
+	
    // Sample/unpack the normal/z data
    vec4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
    vec3 normal = prepassSample.rgb;
@@ -258,6 +269,5 @@ void main()
       addToResult = ( 1.0 - shadowed ) * abs(lightMapParams);
    }
 
-   vec4 colorSample = texture( colorBuffer, uvScene );
-   OUT_col = AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
+   OUT_col = AL_DeferredOutput(lightColorOut+subsurface*(1.0-Sat_NL_Att), colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
 }
