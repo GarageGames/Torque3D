@@ -23,7 +23,7 @@
 #include "platform/platform.h"
 #include "console/simBase.h"
 #include "console/consoleTypes.h"
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #include "core/util/safeDelete.h"
 #include "core/resourceManager.h"
 #include "core/stream/fileStream.h"

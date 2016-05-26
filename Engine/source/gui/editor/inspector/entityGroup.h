@@ -25,7 +25,7 @@
 
 #include "gui/editor/inspector/group.h"
 #include "console/simFieldDictionary.h"
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #include "gui/controls/guiPopUpCtrlEx.h"
 
 class GuiInspectorEntityGroup : public GuiInspectorGroup

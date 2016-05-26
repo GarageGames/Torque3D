@@ -40,8 +40,8 @@
 #include "math/mTransform.h"
 
 #ifdef TORQUE_EXPERIMENTAL_EC
-#include "T3D/Entity.h"
-#include "T3D/Components/coreInterfaces.h"
+#include "T3D/entity.h"
+#include "T3D/components/coreInterfaces.h"
 #endif
 
 #ifdef TORQUE_HIFI_NET

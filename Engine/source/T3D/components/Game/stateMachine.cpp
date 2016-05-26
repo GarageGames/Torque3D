@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/Components/Game/stateMachine.h"
+#include "T3D/components/game/stateMachine.h"
 
 StateMachine::StateMachine()
 {

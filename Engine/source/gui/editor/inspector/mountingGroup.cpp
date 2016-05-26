@@ -24,11 +24,11 @@
 #include "gui/editor/guiInspector.h"
 #include "gui/editor/inspector/mountingGroup.h"
 #include "core/strings/stringUnit.h"
-#include "T3D/Entity.h"
-#include "T3D/Components/Component.h"
+#include "T3D/entity.h"
+#include "T3D/components/component.h"
 
 //Need this to get node lists
-#include "T3D/Components/render/renderComponentInterface.h"
+#include "T3D/components/render/renderComponentInterface.h"
 
 IMPLEMENT_CONOBJECT(GuiInspectorMountingGroup);
 

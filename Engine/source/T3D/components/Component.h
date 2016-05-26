@@ -27,10 +27,10 @@
 #include "sim/netObject.h"
 #endif
 #ifndef ENTITY_H
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 #ifndef CORE_INTERFACES_H
-#include "T3D/Components/coreInterfaces.h"
+#include "T3D/components/coreInterfaces.h"
 #endif
 
 class Entity;

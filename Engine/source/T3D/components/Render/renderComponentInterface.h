@@ -30,7 +30,7 @@
 #include "ts/TSShapeInstance.h"
 #endif
 #ifndef CORE_INTERFACES_H
-#include "T3D/Components/coreInterfaces.h"
+#include "T3D/components/coreInterfaces.h"
 #endif
 
 class RenderComponentInterface : public Interface < RenderComponentInterface >

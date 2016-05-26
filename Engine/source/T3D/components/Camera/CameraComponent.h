@@ -24,7 +24,7 @@
 #define CAMERA_COMPONENT_H
 
 #ifndef COMPONENT_H
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #endif
 #ifndef _SCENERENDERSTATE_H_
 #include "scene/sceneRenderState.h"
@@ -33,10 +33,10 @@
 #include "math/mBox.h"
 #endif
 #ifndef ENTITY_H
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 #ifndef CORE_INTERFACES_H
-#include "T3D/Components/coreInterfaces.h"
+#include "T3D/components/coreInterfaces.h"
 #endif
 
 class SceneRenderState;

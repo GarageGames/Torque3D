@@ -24,16 +24,16 @@
 #define ANIMATION_COMPONENT_H
 
 #ifndef COMPONENT_H
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #endif
 #ifndef _TSSHAPE_H_
 #include "ts/tsShapeInstance.h"
 #endif
 #ifndef ENTITY_H
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 #ifndef RENDER_COMPONENT_INTERFACE_H
-#include "T3D/Components/render/renderComponentInterface.h"
+#include "T3D/components/render/renderComponentInterface.h"
 #endif
 
 class SceneRenderState;

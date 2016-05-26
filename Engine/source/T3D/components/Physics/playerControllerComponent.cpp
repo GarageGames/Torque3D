@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/Components/Physics/playerControllerComponent.h"
+#include "T3D/components/physics/playerControllercomponent.h"
 #include "platform/platform.h"
 #include "console/consoleTypes.h"
 #include "core/util/safeDelete.h"
@@ -37,7 +37,7 @@
 #include "collision/collision.h"
 #include "T3D/physics/physicsPlayer.h"
 #include "T3D/physics/physicsPlugin.h"
-#include "T3D/Components/Collision/collisionInterfaces.h"
+#include "T3D/components/collision/collisionInterfaces.h"
 #include "T3D/trigger.h"
 #include "T3D/components/collision/collisionTrigger.h"
 

@@ -36,19 +36,19 @@
 #include "math/mBox.h"
 #endif
 #ifndef ENTITY_H
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 #ifndef CORE_INTERFACES_H
-#include "T3D/Components/coreInterfaces.h"
+#include "T3D/components/coreInterfaces.h"
 #endif
 #ifndef COLLISION_INTERFACES_H
-#include "T3D/Components/collision/collisionInterfaces.h"
+#include "T3D/components/collision/collisionInterfaces.h"
 #endif
 #ifndef RENDER_COMPONENT_INTERFACE_H
-#include "T3D/Components/render/renderComponentInterface.h"
+#include "T3D/components/render/renderComponentInterface.h"
 #endif
 #ifndef PHYSICS_COMPONENT_INTERFACE_H
-#include "T3D/Components/physics/physicsComponentInterface.h"
+#include "T3D/components/physics/physicsComponentInterface.h"
 #endif
 #ifndef _T3D_PHYSICSCOMMON_H_
 #include "T3D/physics/physicsCommon.h"

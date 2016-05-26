@@ -25,7 +25,7 @@
 
 #include "gui/editor/inspector/group.h"
 #include "console/simFieldDictionary.h"
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #include "gui/controls/guiPopUpCtrlEx.h"
 
 #ifndef _GUI_INSPECTOR_TYPES_H_
@@ -33,7 +33,7 @@
 #endif
 
 #ifndef _ENTITY_H_
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 
 class GuiInspectorMountingGroup;

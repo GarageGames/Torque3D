@@ -30,7 +30,7 @@
 #include "T3D/gameBase/moveManager.h"
 #endif
 #ifndef COMPONENT_H
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #endif
 #ifndef MROTATION_H
 #include "math/mRotation.h"
@@ -61,10 +61,10 @@ private:
 
    bool mInitialized;
 
-   Signal< void(Component*) > Entity::onComponentAdded;
-   Signal< void(Component*) > Entity::onComponentRemoved;
+   Signal< void(Component*) > onComponentAdded;
+   Signal< void(Component*) > onComponentRemoved;
 
-   Signal< void(MatrixF*) > Entity::onTransformSet;
+   Signal< void(MatrixF*) > onTransformSet;
 
 protected:
 

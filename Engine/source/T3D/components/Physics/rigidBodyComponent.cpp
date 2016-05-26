@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/Components/physics/RigidBodyComponent.h"
+#include "T3D/components/physics/rigidBodycomponent.h"
 #include "core/util/safeDelete.h"
 #include "console/consoleTypes.h"
 #include "console/consoleObject.h"
@@ -31,7 +31,7 @@
 #include "T3D/physics/physicsPlugin.h"
 #include "T3D/physics/physicsWorld.h"
 #include "T3D/physics/physicsCollision.h"
-#include "T3D/Components/Collision/collisionComponent.h"
+#include "T3D/components/collision/collisioncomponent.h"
 
 bool RigidBodyComponent::smNoCorrections = false;
 bool RigidBodyComponent::smNoSmoothing = false;

@@ -24,7 +24,7 @@
 #define PLAYER_CONTORLLER_COMPONENT_H
 
 #ifndef PHYSICSBEHAVIOR_H
-#include "T3D/Components/Physics/physicsBehavior.h"
+#include "T3D/components/physics/physicsBehavior.h"
 #endif
 #ifndef __RESOURCE_H__
 #include "core/resource.h"
@@ -39,7 +39,7 @@
 #include "math/mBox.h"
 #endif
 #ifndef ENTITY_H
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 #ifndef _CONVEX_H_
 #include "collision/convex.h"
@@ -54,10 +54,10 @@
 #include "T3D/physics/physicsWorld.h"
 #endif
 #ifndef PHYSICS_COMPONENT_INTERFACE_H
-#include "T3D/Components/physics/physicsComponentInterface.h"
+#include "T3D/components/physics/physicsComponentInterface.h"
 #endif
 #ifndef COLLISION_INTERFACES_H
-#include "T3D/Components/collision/collisionInterfaces.h"
+#include "T3D/components/collision/collisionInterfaces.h"
 #endif
 
 class SceneRenderState;

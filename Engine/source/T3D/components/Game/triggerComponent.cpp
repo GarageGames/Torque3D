@@ -3,7 +3,7 @@
 // Copyright (C) GarageGames.com, Inc.
 //-----------------------------------------------------------------------------
 #include "console/consoleTypes.h"
-#include "T3D/Components/game/TriggerComponent.h"
+#include "T3D/components/game/Triggercomponent.h"
 #include "core/util/safeDelete.h"
 #include "console/consoleTypes.h"
 #include "console/consoleObject.h"
@@ -11,7 +11,7 @@
 #include "console/engineAPI.h"
 #include "sim/netConnection.h"
 #include "T3D/gameBase/gameConnection.h"
-#include "T3D/Components/coreInterfaces.h"
+#include "T3D/components/coreInterfaces.h"
 #include "math/mathUtils.h"
 #include "collision/concretePolyList.h"
 #include "collision/clippedPolyList.h"

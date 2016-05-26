@@ -24,7 +24,7 @@
 #include "gui/editor/guiInspector.h"
 #include "gui/editor/inspector/entityGroup.h"
 #include "core/strings/stringUnit.h"
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 
 #include "console/engineAPI.h"
 

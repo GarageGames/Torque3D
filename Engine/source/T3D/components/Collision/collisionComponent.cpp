@@ -20,9 +20,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/Components/Collision/collisionComponent.h"
-#include "T3D/Components/Collision/collisionComponent_ScriptBinding.h"
-#include "T3D/Components/Physics/physicsBehavior.h"
+#include "T3D/components/collision/collisioncomponent.h"
+#include "T3D/components/collision/collisionComponent_ScriptBinding.h"
+#include "T3D/components/physics/physicsBehavior.h"
 #include "console/consoleTypes.h"
 #include "core/util/safeDelete.h"
 #include "core/resourceManager.h"

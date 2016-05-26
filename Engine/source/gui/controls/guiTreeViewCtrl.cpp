@@ -37,7 +37,7 @@
 #endif
 #include "console/engineAPI.h"
 #ifdef TORQUE_EXPERIMENTAL_EC
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 
 IMPLEMENT_CONOBJECT(GuiTreeViewCtrl);

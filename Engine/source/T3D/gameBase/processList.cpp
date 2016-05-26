@@ -28,8 +28,8 @@
 #include "console/consoleTypes.h"
 
 #ifdef TORQUE_EXPERIMENTAL_EC
-#include "T3D/Components/coreInterfaces.h"
-#include "T3D/Components/Component.h"
+#include "T3D/components/coreInterfaces.h"
+#include "T3D/components/component.h"
 #endif
 //----------------------------------------------------------------------------
 

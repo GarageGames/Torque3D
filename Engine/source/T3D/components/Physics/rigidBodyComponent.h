@@ -24,16 +24,16 @@
 #define RIGID_BODY_COMPONENT_H
 
 #ifndef COMPONENT_H
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #endif
 #ifndef _T3D_PHYSICSCOMMON_H_
 #include "T3D/physics/physicsCommon.h"
 #endif
 #ifndef COLLISION_COMPONENT_H
-#include "T3D/Components/collision/collisionComponent.h"
+#include "T3D/components/collision/collisioncomponent.h"
 #endif
 #ifndef PHYSICS_COMPONENT_INTERFACE_H
-#include "T3D/Components/physics/physicsComponentInterface.h"
+#include "T3D/components/physics/physicsComponentInterface.h"
 #endif
 
 class PhysicsBody;

@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
-#include "T3D/components/Render/MeshComponent.h"
+#include "T3D/components/render/meshcomponent.h"
 #include "scene/sceneObject.h"
 #include "math/mTransform.h"
 

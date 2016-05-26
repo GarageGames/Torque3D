@@ -20,9 +20,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/Components/Animation/AnimationComponent.h"
-#include "T3D/Components/Animation/AnimationComponent_ScriptBinding.h"
-#include "T3D/components/Render/MeshComponent.h"
+#include "T3D/components/animation/animationcomponent.h"
+#include "T3D/components/animation/animationComponent_ScriptBinding.h"
+#include "T3D/components/render/meshcomponent.h"
 
 #include "platform/platform.h"
 #include "console/consoleTypes.h"

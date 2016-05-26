@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
-#include "T3D/Components/Collision/CollisionComponent.h"
+#include "T3D/components/collision/collisioncomponent.h"
 #include "materials/baseMatInstance.h"
 
 DefineConsoleMethod(CollisionComponent, getNumberOfContacts, S32, (), ,

@@ -27,8 +27,8 @@
 #include "math/util/matrixSet.h"
 
 #ifdef TORQUE_EXPERIMENTAL_EC
-#include "T3D/Components/render/renderComponentInterface.h"
-#include "T3D/Components/Component.h"
+#include "T3D/components/render/renderComponentInterface.h"
+#include "T3D/components/component.h"
 #endif
 
 //-----------------------------------------------------------------------------

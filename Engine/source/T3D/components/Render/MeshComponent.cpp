@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 #include "platform/platform.h"
 #include "console/consoleTypes.h"
-#include "T3D/Components/Render/MeshComponent.h"
+#include "T3D/components/render/meshcomponent.h"
 #include "core/util/safeDelete.h"
 #include "core/resourceManager.h"
 #include "core/stream/fileStream.h"
@@ -44,7 +44,7 @@
 #include "materials/materialManager.h"
 #include "materials/matInstance.h"
 #include "core/strings/findMatch.h"
-#include "T3D/components/Render/MeshComponent_ScriptBinding.h"
+#include "T3D/components/render/meshComponent_ScriptBinding.h"
 
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor

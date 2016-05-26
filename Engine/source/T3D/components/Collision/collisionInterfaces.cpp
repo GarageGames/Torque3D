@@ -20,9 +20,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/Components/collision/collisionInterfaces.h"
+#include "T3D/components/collision/collisionInterfaces.h"
 #include "scene/sceneObject.h"
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #include "console/engineAPI.h"
 #include "T3D/trigger.h"
 #include "materials/baseMatInstance.h"

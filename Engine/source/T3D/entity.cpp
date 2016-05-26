@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #include "core/stream/bitStream.h"
 #include "console/consoleTypes.h"
 #include "console/consoleObject.h"
@@ -34,9 +34,9 @@
 #include "math/mathIO.h"
 #include "math/mTransform.h"
 
-#include "T3D/Components/coreInterfaces.h"
-#include "T3D/Components/render/renderComponentInterface.h"
-#include "T3D/Components/Collision/collisionInterfaces.h"
+#include "T3D/components/coreInterfaces.h"
+#include "T3D/components/render/renderComponentInterface.h"
+#include "T3D/components/collision/collisionInterfaces.h"
 
 #include "gui/controls/guiTreeViewCtrl.h"
 

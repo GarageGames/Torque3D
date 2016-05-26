@@ -5,7 +5,7 @@
 
 #ifndef _PHYSICSBEHAVIOR_H_
 #define _PHYSICSBEHAVIOR_H_
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 
 #ifndef __RESOURCE_H__
 #include "core/resource.h"
@@ -20,7 +20,7 @@
 #include "math/mBox.h"
 #endif
 #ifndef _ENTITY_H_
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 #ifndef _CONVEX_H_
 #include "collision/convex.h"
@@ -36,7 +36,7 @@
 #endif
 
 #ifndef _RENDER_COMPONENT_INTERFACE_H_
-#include "T3D/Components/render/renderComponentInterface.h"
+#include "T3D/components/render/renderComponentInterface.h"
 #endif
 
 class TSShapeInstance;

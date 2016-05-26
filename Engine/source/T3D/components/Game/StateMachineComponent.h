@@ -24,10 +24,10 @@
 #define STATE_MACHINE_COMPONENT_H
 
 #ifndef COMPONENT_H
-   #include "T3D/Components/Component.h"
+   #include "T3D/components/component.h"
 #endif
 #ifndef STATE_MACHINE_H
-#include "T3D/components/Game/stateMachine.h"
+#include "T3D/components/game/stateMachine.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////////

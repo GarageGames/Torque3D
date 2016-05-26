@@ -24,7 +24,7 @@
 #define STATIC_MESH_COMPONENT_H
 
 #ifndef COMPONENT_H
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #endif
 #ifndef __RESOURCE_H__
 #include "core/resource.h"
@@ -39,16 +39,16 @@
 #include "math/mBox.h"
 #endif
 #ifndef ENTITY_H
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 #ifndef _NETSTRINGTABLE_H_
    #include "sim/netStringTable.h"
 #endif
 #ifndef CORE_INTERFACES_H
-#include "T3D/Components/coreInterfaces.h"
+#include "T3D/components/coreInterfaces.h"
 #endif
 #ifndef RENDER_COMPONENT_INTERFACE_H
-#include "T3D/Components/Render/renderComponentInterface.h"
+#include "T3D/components/render/renderComponentInterface.h"
 #endif
 #ifndef _ASSET_PTR_H_
 #include "assets/assetPtr.h"

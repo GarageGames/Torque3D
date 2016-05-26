@@ -24,10 +24,10 @@
 #define CAMERA_ORBITER_COMPONENT_H
 
 #ifndef COMPONENT_H
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #endif
 #ifndef CAMERA_COMPONENT_H
-#include "T3D/Components/camera/cameraComponent.h"
+#include "T3D/components/camera/cameracomponent.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////////

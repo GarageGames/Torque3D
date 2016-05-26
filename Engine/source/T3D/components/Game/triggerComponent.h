@@ -6,15 +6,15 @@
 #define _TRIGGER_COMPONENT_H_
 
 #ifndef _COMPONENT_H_
-#include "T3D/Components/Component.h"
+#include "T3D/components/component.h"
 #endif
 
 #ifndef _ENTITY_H_
-#include "T3D/Entity.h"
+#include "T3D/entity.h"
 #endif
 
 #ifndef _COLLISION_INTERFACES_H_
-#include "T3D/Components/collision/collisionInterfaces.h"
+#include "T3D/components/collision/collisionInterfaces.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////////

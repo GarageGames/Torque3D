@@ -24,7 +24,7 @@
 #define PHYSICS_COMPONENT_INTERFACE_H
 
 #ifndef CORE_INTERFACES_H
-#include "T3D/Components/coreInterfaces.h"
+#include "T3D/components/coreInterfaces.h"
 #endif
 
 class PhysicsComponentInterface : public Interface<PhysicsComponentInterface>

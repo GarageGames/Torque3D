@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "T3D/Components/Collision/CollisionTrigger.h"
+#include "T3D/components/collision/collisionTrigger.h"
 
 #include "scene/sceneRenderState.h"
 #include "console/consoleTypes.h"

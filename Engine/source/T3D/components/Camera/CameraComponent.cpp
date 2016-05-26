@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/Components/camera/CameraComponent.h"
-#include "T3D/Components/Camera/CameraComponent_ScriptBinding.h"
+#include "T3D/components/camera/cameracomponent.h"
+#include "T3D/components/camera/cameraComponent_ScriptBinding.h"
 #include "platform/platform.h"
 #include "console/consoleTypes.h"
 #include "core/util/safeDelete.h"
@@ -37,7 +37,7 @@
 #include "T3D/gameBase/gameConnection.h"
 #include "T3D/gameFunctions.h"
 #include "math/mathUtils.h"
-#include "T3D/Components/render/renderComponentInterface.h"
+#include "T3D/components/render/renderComponentInterface.h"
 
 IMPLEMENT_CALLBACK( CameraComponent, validateCameraFov, F32, (F32 fov), (fov),
                    "@brief Called on the server when the client has requested a FOV change.\n\n"
