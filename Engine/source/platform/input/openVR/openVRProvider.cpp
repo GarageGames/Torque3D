@@ -229,6 +229,7 @@ U32 OpenVRProvider::OVR_AXISTRIGGER[vr::k_unMaxTrackedDeviceCount] = { 0 };
 EulerF OpenVRProvider::smHMDRotOffset(0);
 F32 OpenVRProvider::smHMDmvYaw = 0;
 F32 OpenVRProvider::smHMDmvPitch = 0;
+bool OpenVRProvider::smRotateYawWithMoveActions = false;
 
 static String GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL)
 {
@@ -397,6 +398,8 @@ void OpenVRProvider::staticInit()
 
    Con::addVariable("$OpenVR::HMDmvYaw", TypeF32, &smHMDmvYaw);
    Con::addVariable("$OpenVR::HMDmvPitch", TypeF32, &smHMDmvPitch);
+
+   Con::addVariable("$OpenVR::HMDRotateYawWithMoveActions", TypeBool, &smRotateYawWithMoveActions);
 }
 
 bool OpenVRProvider::enable()
@@ -570,6 +573,11 @@ bool OpenVRProvider::process()
 
    if (!vr::VRCompositor())
 	   return true;
+
+   if (smRotateYawWithMoveActions)
+   {
+	   smHMDmvYaw += MoveManager::mRightAction - MoveManager::mLeftAction + MoveManager::mXAxis_L;
+   }
 
    // Update HMD rotation offset
    smHMDRotOffset.z += smHMDmvYaw;
@@ -969,7 +977,7 @@ void OpenVRProvider::updateTrackedPoses()
             // we will then be on a really weird rotation axis.
             QuatF(localRot).setMatrix(&rotOffset);
             rotOffset.inverse();
-            mHMDRenderState.mHMDPose = rotOffset * mHMDRenderState.mHMDPose;
+            mHMDRenderState.mHMDPose = mat = rotOffset * mHMDRenderState.mHMDPose;
 
             // jamesu - store the last rotation for temp debugging
             MatrixF torqueMat(1);

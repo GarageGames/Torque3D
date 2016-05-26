@@ -283,6 +283,7 @@ public:
    static EulerF smHMDRotOffset;
    static F32 smHMDmvYaw;
    static F32 smHMDmvPitch;
+   static bool smRotateYawWithMoveActions;
    /// }
 
 public:
