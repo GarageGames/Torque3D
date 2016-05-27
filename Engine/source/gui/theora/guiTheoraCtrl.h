@@ -57,6 +57,8 @@ class GuiTheoraCtrl : public GuiControl
       /// If true, playback will start automatically when the control receives its
       /// onWake().
       bool mPlayOnWake;
+
+      bool mLoop;
       
       /// Which transcoder to use on the Theora decoder.  This is mostly
       /// meant as a development aid.
