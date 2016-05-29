@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/components/game/StateMachinecomponent.h"
+#include "T3D/components/game/stateMachineComponent.h"
 
 #include "platform/platform.h"
 #include "console/consoleTypes.h"

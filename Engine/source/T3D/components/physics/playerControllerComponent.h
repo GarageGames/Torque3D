@@ -203,7 +203,7 @@ public:
    //This is a weird artifact of the PhysicsReps. We want the collision component to be privvy to any events that happen
    //so when the physics components do a findContact test during their update, they'll have a signal collision components
    //can be listening to to update themselves with that info
-   Signal< void(SceneObject*) > PlayerControllerComponent::onContactSignal;
+   Signal< void(SceneObject*) > onContactSignal;
 
    //
    DECLARE_CALLBACK(void, updateMove, (PlayerControllerComponent* obj));

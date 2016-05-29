@@ -32,12 +32,11 @@
 #ifndef COMPONENT_H
 #include "T3D/components/component.h"
 #endif
-#ifndef MROTATION_H
-#include "math/mRotation.h"
-#endif
 #ifndef _CONTAINERQUERY_H_
 #include "T3D/containerQuery.h"
 #endif
+
+class Component;
 
 //**************************************************************************
 // Entity
@@ -272,9 +271,6 @@ Vector<T*> Entity::getComponents()
    // Loop through our child objects.
    for (U32 i = 0; i < mComponents.size(); i++)
    {
-      if (!mComponents[i]->isEnabled())
-         continue;
-
       curObj = dynamic_cast<T*>(mComponents[i]);
 
       // Add this child object if appropriate.

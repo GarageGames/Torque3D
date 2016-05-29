@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/components/physics/playerControllercomponent.h"
+#include "T3D/components/physics/playerControllerComponent.h"
 #include "platform/platform.h"
 #include "console/consoleTypes.h"
 #include "core/util/safeDelete.h"

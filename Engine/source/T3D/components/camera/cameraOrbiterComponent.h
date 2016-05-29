@@ -27,7 +27,7 @@
 #include "T3D/components/component.h"
 #endif
 #ifndef CAMERA_COMPONENT_H
-#include "T3D/components/camera/cameracomponent.h"
+#include "T3D/components/camera/cameraComponent.h"
 #endif
 
 //////////////////////////////////////////////////////////////////////////

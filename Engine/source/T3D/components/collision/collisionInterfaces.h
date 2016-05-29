@@ -82,8 +82,8 @@ public:
       VectorF vector;
    };
 
-   Signal< void( SceneObject* ) > CollisionInterface::onCollisionSignal;
-   Signal< void( SceneObject* ) > CollisionInterface::onContactSignal;
+   Signal< void( SceneObject* ) > onCollisionSignal;
+   Signal< void( SceneObject* ) > onContactSignal;
 
 protected:
    CollisionTimeout* mTimeoutList;
@@ -149,7 +149,7 @@ public:
 
    virtual PhysicsCollision* getCollisionData() = 0;
 
-   Signal< void(PhysicsCollision* collision) > CollisionInterface::onCollisionChanged;
+   Signal< void(PhysicsCollision* collision) > onCollisionChanged;
 };
 
 class BuildConvexInterface //: public Interface<CollisionInterface>

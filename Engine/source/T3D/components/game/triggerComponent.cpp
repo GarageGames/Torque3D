@@ -3,7 +3,7 @@
 // Copyright (C) GarageGames.com, Inc.
 //-----------------------------------------------------------------------------
 #include "console/consoleTypes.h"
-#include "T3D/components/game/Triggercomponent.h"
+#include "T3D/components/game/triggerComponent.h"
 #include "core/util/safeDelete.h"
 #include "console/consoleTypes.h"
 #include "console/consoleObject.h"
@@ -234,7 +234,8 @@ bool TriggerComponent::testObject(SceneObject* enter)
                //anywho, build our list and then we'll check intersections
                ClippedPolyList myList;
 
-               myList.setTransform(&(mOwner->getTransform()), mOwner->getScale());
+               MatrixF ownerTransform = mOwner->getTransform();
+               myList.setTransform(&ownerTransform, mOwner->getScale());
                myList.setObject(mOwner);
 
                myCI->buildPolyList(PLC_Collision, &myList, enterBox, sphere);

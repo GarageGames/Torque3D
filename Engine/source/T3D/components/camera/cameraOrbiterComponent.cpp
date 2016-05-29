@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/components/camera/cameraOrbitercomponent.h"
+#include "T3D/components/camera/cameraOrbiterComponent.h"
 #include "core/util/safeDelete.h"
 #include "console/consoleTypes.h"
 #include "console/consoleObject.h"

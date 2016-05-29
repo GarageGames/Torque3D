@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
-#include "T3D/components/camera/cameracomponent.h"
+#include "T3D/components/camera/cameraComponent.h"
 
 //Basically, this only exists for backwards compatibility for parts of the editors
 ConsoleMethod(CameraComponent, getMode, const char*, 2, 2, "() - We get the first behavior of the requested type on our owner object.\n"

@@ -35,6 +35,8 @@ if(UNIX)
 	# for asm files
 	SET (CMAKE_ASM_NASM_OBJECT_FORMAT "elf")
 	ENABLE_LANGUAGE (ASM_NASM)
+    
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
 # TODO: fmod support
@@ -257,7 +259,7 @@ addPath("${srcDir}/gui/3d")
 addPath("${srcDir}/postFx")
 
 if(NOT TORQUE_EXPERIMENTAL_EC) 
-   set(BLACKLIST "Entity.cpp;Entity.h" )
+   set(BLACKLIST "entity.cpp;entity.h" )
 endif()
 addPath("${srcDir}/T3D")
 set(BLACKLIST "" )
@@ -274,12 +276,12 @@ addPath("${srcDir}/T3D/turret")
 
 if( TORQUE_EXPERIMENTAL_EC )
 	addPath("${srcDir}/T3D/components/")
-	addPath("${srcDir}/T3D/components/Animation")
-	addPath("${srcDir}/T3D/components/Camera")
-	addPath("${srcDir}/T3D/components/Collision")
-	addPath("${srcDir}/T3D/components/Game")
-	addPath("${srcDir}/T3D/components/Physics")
-	addPath("${srcDir}/T3D/components/Render")
+	addPath("${srcDir}/T3D/components/animation")
+	addPath("${srcDir}/T3D/components/camera")
+	addPath("${srcDir}/T3D/components/collision")
+	addPath("${srcDir}/T3D/components/game")
+	addPath("${srcDir}/T3D/components/physics")
+	addPath("${srcDir}/T3D/components/render")
 endif()
 
 addPath("${srcDir}/main/")

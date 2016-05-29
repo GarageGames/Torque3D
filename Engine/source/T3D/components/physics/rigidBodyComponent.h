@@ -30,7 +30,7 @@
 #include "T3D/physics/physicsCommon.h"
 #endif
 #ifndef COLLISION_COMPONENT_H
-#include "T3D/components/collision/collisioncomponent.h"
+#include "T3D/components/collision/collisionComponent.h"
 #endif
 #ifndef PHYSICS_COMPONENT_INTERFACE_H
 #include "T3D/components/physics/physicsComponentInterface.h"

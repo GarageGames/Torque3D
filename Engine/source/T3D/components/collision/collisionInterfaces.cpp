@@ -126,7 +126,7 @@ void CollisionInterface::handleCollisionNotifyList()
    mCollisionNotifyList.clear();
 }
 
-Chunker<CollisionInterface::CollisionTimeout> sTimeoutChunker;
+Chunker<CollisionInterface::CollisionTimeout> sCollisionTimeoutChunker;
 CollisionInterface::CollisionTimeout* CollisionInterface::sFreeTimeoutList = 0;
 
 void CollisionInterface::queueCollision( SceneObject *obj, const VectorF &vec)
@@ -174,7 +174,7 @@ void CollisionInterface::queueCollision( SceneObject *obj, const VectorF &vec)
    }
    else
    {
-      ptr = sTimeoutChunker.alloc();
+      ptr = sCollisionTimeoutChunker.alloc();
    }
 
    ptr->object = obj;

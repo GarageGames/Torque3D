@@ -160,7 +160,7 @@ public:
          return mFields[index];
    }
 
-   Signal< void(StateMachine*, S32 stateIdx) > StateMachine::onStateChanged;
+   Signal< void(StateMachine*, S32 stateIdx) > onStateChanged;
 
    //
    inline bool readStateName(State* state, SimXMLDocument* reader)

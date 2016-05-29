@@ -77,7 +77,7 @@ GuiControl* GuiInspectorMountingGroup::buildMenuCtrl()
    //GuiInspectorTypeMenuBase::_registerEditControl( retCtrl );
 
 	char szName[512];
-   dSprintf( szName, 512, "IE_%s_%d_%s_Field", retCtrl->getClassName(), mParentInspector->getInspectObject()->getId(), mCaption);
+   dSprintf( szName, 512, "IE_%s_%d_%s_Field", retCtrl->getClassName(), mParentInspector->getInspectObject()->getId(), mCaption.c_str());
 
    // Register the object
    retCtrl->registerObject( szName );

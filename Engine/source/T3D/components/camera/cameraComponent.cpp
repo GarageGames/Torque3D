@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/components/camera/cameracomponent.h"
+#include "T3D/components/camera/cameraComponent.h"
 #include "T3D/components/camera/cameraComponent_ScriptBinding.h"
 #include "platform/platform.h"
 #include "console/consoleTypes.h"

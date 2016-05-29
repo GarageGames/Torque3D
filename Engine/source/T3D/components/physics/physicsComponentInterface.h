@@ -43,7 +43,7 @@ public:
 
    F32 getMass() { return mMass; }
 
-   Signal< void(VectorF normal, Vector<SceneObject*> overlappedObjects) > PhysicsComponentInterface::onPhysicsCollision;
+   Signal< void(VectorF normal, Vector<SceneObject*> overlappedObjects) > onPhysicsCollision;
 };
 
 #endif

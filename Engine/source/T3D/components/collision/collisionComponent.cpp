@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "T3D/components/collision/collisioncomponent.h"
+#include "T3D/components/collision/collisionComponent.h"
 #include "T3D/components/collision/collisionComponent_ScriptBinding.h"
 #include "T3D/components/physics/physicsBehavior.h"
 #include "console/consoleTypes.h"

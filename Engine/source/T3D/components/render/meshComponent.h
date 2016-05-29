@@ -153,7 +153,7 @@ public:
    virtual TSShape* getShape() { if (mMeshAsset)  return mMeshAsset->getShape(); else return NULL; }
    virtual TSShapeInstance* getShapeInstance() { return mShapeInstance; }
 
-   Resource<TSShape> getShapeResource() { if (mMeshAsset)  return mMeshAsset->getShapeResource(); else return NULL; }
+   Resource<TSShape> getShapeResource() { return mMeshAsset->getShapeResource(); }
 
    void _onResourceChanged(const Torque::Path &path);
 

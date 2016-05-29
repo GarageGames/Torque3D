@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 #include "platform/platform.h"
 #include "console/consoleTypes.h"
-#include "T3D/components/render/meshcomponent.h"
+#include "T3D/components/render/meshComponent.h"
 #include "core/util/safeDelete.h"
 #include "core/resourceManager.h"
 #include "core/stream/fileStream.h"
@@ -222,7 +222,9 @@ U32 MeshComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       for(U32 i=0; i < mChangingMaterials.size(); i++)
       {
          stream->writeInt(mChangingMaterials[i].slot, 16);
-         con->packNetStringHandleU(stream, NetStringHandle(mChangingMaterials[i].matName));
+
+         NetStringHandle matNameStr = mChangingMaterials[i].matName.c_str();
+         con->packNetStringHandleU(stream, matNameStr);
       }
 
       mChangingMaterials.clear();

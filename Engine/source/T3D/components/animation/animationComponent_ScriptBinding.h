@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/engineAPI.h"
-#include "T3D/components/animation/animationcomponent.h"
+#include "T3D/components/animation/animationComponent.h"
 
 DefineEngineMethod(AnimationComponent, playThread, bool, (S32 slot, const char* name, bool transition, F32 transitionTime), (-1, "", true, 0.5),
    "@brief Start a new animation thread, or restart one that has been paused or "

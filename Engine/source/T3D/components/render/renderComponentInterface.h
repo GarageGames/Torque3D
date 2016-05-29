@@ -24,10 +24,10 @@
 #define RENDER_COMPONENT_INTERFACE_H
 
 #ifndef _TSSHAPE_H_
-#include "ts/TSShape.h"
+#include "ts/tsShape.h"
 #endif
 #ifndef _TSSHAPEINSTANCE_H_
-#include "ts/TSShapeInstance.h"
+#include "ts/tsShapeInstance.h"
 #endif
 #ifndef CORE_INTERFACES_H
 #include "T3D/components/coreInterfaces.h"
@@ -40,7 +40,7 @@ public:
 
    virtual TSShape* getShape() = 0;
 
-   Signal< void(RenderComponentInterface*) > RenderComponentInterface::onShapeChanged;
+   Signal< void(RenderComponentInterface*) > onShapeChanged;
 
    virtual TSShapeInstance* getShapeInstance() = 0;
 
@@ -50,7 +50,7 @@ public:
 
    virtual void setNodeTransforms(Vector<MatrixF> transforms) = 0;
 
-   Signal< void(RenderComponentInterface*) > RenderComponentInterface::onShapeInstanceChanged;
+   Signal< void(RenderComponentInterface*) > onShapeInstanceChanged;
 };
 
 class CastRayRenderedInterface// : public Interface<CastRayRenderedInterface>
