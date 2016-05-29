@@ -39,6 +39,9 @@
 #include "T3D/components/collision/collisionInterfaces.h"
 
 #include "gui/controls/guiTreeViewCtrl.h"
+#include "assets/assetManager.h"
+#include "assets/assetQuery.h"
+#include "T3D/assets/ComponentAsset.h"
 
 #include "console/consoleInternal.h"
 #include "T3D/gameBase/std/stdMoveList.h"
@@ -1353,7 +1356,8 @@ Component *Entity::getComponent(String componentType)
 void Entity::onInspect()
 {
    Vector<EditorInspectInterface*> updaters = getComponents<EditorInspectInterface>();
-   for (Vector<EditorInspectInterface*>::iterator it = updaters.begin(); it != updaters.end(); it++) {
+   for (Vector<EditorInspectInterface*>::iterator it = updaters.begin(); it != updaters.end(); it++) 
+   {
       (*it)->onInspect();
    }
 
@@ -1374,9 +1378,45 @@ void Entity::onInspect()
    newItem->mState.set(GuiTreeViewCtrl::Item::ForceItemName);
    //newItem->mInspectorInfo.mObject = this;
 
-   for (U32 i = 0; i < mComponents.size(); i++)
+   AssetManager *assetDB = dynamic_cast<AssetManager*>(Sim::findObject("AssetDatabase"));
+   if (!assetDB)
+      return;
+
+   //This is used in the event of script-created assets, which likely only have
+   //the name and other 'friendly' properties stored in a ComponentAsset.
+   //So we'll do a query for those assets and find the asset based on the component's
+   //class name
+   AssetQuery* qry = new AssetQuery();
+   qry->registerObject();
+
+   assetDB->findAssetType(qry, "ComponentAsset");
+
+   for (U32 i = 0; i < mComponents.size(); ++i)
    {
       String compName = mComponents[i]->getFriendlyName();
+
+      if (compName == String(""))
+      {
+         String componentClass = mComponents[i]->getClassNamespace();
+
+         //Means that it's a script-derived component and we should consult the asset to try
+         //to get the info for it
+         S32 compAssetCount = qry->mAssetList.size();
+         for (U32 c = 0; c < compAssetCount; ++c)
+         {
+            StringTableEntry assetID = qry->mAssetList[c];
+
+            ComponentAsset* compAsset = assetDB->acquireAsset<ComponentAsset>(assetID);
+
+            String compAssetClass = compAsset->getComponentName();
+            if (componentClass == compAssetClass)
+            {
+               compName = compAsset->getFriendlyName();
+               break;
+            }
+         }
+      }
+
       S32 compID = editorTree->insertItem(componentID, compName);
       newItem = editorTree->getItem(compID);
       newItem->mInspectorInfo.mObject = mComponents[i];

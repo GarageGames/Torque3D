@@ -66,6 +66,12 @@ public:
    /// Declare Console Object.
    DECLARE_CONOBJECT(ComponentAsset);
 
+   StringTableEntry getComponentName() { return mComponentName; }
+   StringTableEntry getComponentClass() { return mComponentClass; }
+   StringTableEntry getFriendlyName() { return mFriendlyName; }
+   StringTableEntry getFriendlyType() { return mComponentType; }
+   StringTableEntry getDescription() { return mDescription; }
+
 protected:
    virtual void            initializeAsset(void) {}
    virtual void            onAssetRefresh(void) {}
