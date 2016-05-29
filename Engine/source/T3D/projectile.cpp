@@ -148,6 +148,8 @@ ProjectileData::ProjectileData()
 
    waterExplosion = NULL;
    waterExplosionId = 0;
+   playerExplosion = NULL;  
+   playerExplosionId = 0;  
 
    //hasLight = false;
    //lightRadius = 1;
@@ -218,6 +220,8 @@ void ProjectileData::initPersistFields()
       "@brief Explosion datablock used when the projectile explodes outside of water.\n\n");
    addField("waterExplosion", TYPEID< ExplosionData >(), Offset(waterExplosion, ProjectileData),
       "@brief Explosion datablock used when the projectile explodes underwater.\n\n");
+   addField("playerExplosion", TYPEID< ExplosionData >(), Offset(playerExplosion, ProjectileData),
+      "@brief Explosion datablock used when the projectile explodes on a player.\n\n");
 
    addField("splash", TYPEID< SplashData >(), Offset(splash, ProjectileData),
       "@brief Splash datablock used to create splash effects as the projectile enters or leaves water\n\n");
@@ -311,6 +315,10 @@ bool ProjectileData::preload(bool server, String &errorStr)
       if (!waterExplosion && waterExplosionId != 0)
          if (Sim::findObject(waterExplosionId, waterExplosion) == false)
             Con::errorf(ConsoleLogEntry::General, "ProjectileData::preload: Invalid packet, bad datablockId(waterExplosion): %d", waterExplosionId);
+		
+      if (!playerExplosion && playerExplosionId != 0)
+         if (Sim::findObject(playerExplosionId, playerExplosion) == false)
+            Con::errorf(ConsoleLogEntry::General, "ProjectileData::preload: Invalid packet, bad datablockId(playerExplosion): %d", playerExplosionId);
 
       if (!splash && splashId != 0)
          if (Sim::findObject(splashId, splash) == false)
@@ -379,6 +387,10 @@ void ProjectileData::packData(BitStream* stream)
    if (stream->writeFlag(waterExplosion != NULL))
       stream->writeRangedU32(waterExplosion->getId(), DataBlockObjectIdFirst,
                                                       DataBlockObjectIdLast);
+													  
+   if (stream->writeFlag(playerExplosion != NULL))
+      stream->writeRangedU32(playerExplosion->getId(), DataBlockObjectIdFirst,
+                                                      DataBlockObjectIdLast);
 
    if (stream->writeFlag(splash != NULL))
       stream->writeRangedU32(splash->getId(), DataBlockObjectIdFirst,
@@ -442,6 +454,9 @@ void ProjectileData::unpackData(BitStream* stream)
 
    if (stream->readFlag())
       waterExplosionId = stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast);
+  
+   if (stream->readFlag())
+      playerExplosionId = stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast);
    
    if (stream->readFlag())
       splashId = stream->readRangedU32(DataBlockObjectIdFirst, DataBlockObjectIdLast);
@@ -993,6 +1008,12 @@ void Projectile::explode( const Point3F &p, const Point3F &n, const U32 collideT
          pExplosion = new Explosion;
          pExplosion->onNewDataBlock(mDataBlock->waterExplosion, false);
       }
+	  else
+      if (mDataBlock->playerExplosion && (collideType & PlayerObjectType))  
+      {  
+         pExplosion = new Explosion;  
+         pExplosion->onNewDataBlock(mDataBlock->playerExplosion, false);  
+      }  
       else
       if (mDataBlock->explosion)
       {

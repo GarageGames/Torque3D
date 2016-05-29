@@ -103,6 +103,8 @@ public:
 
    ExplosionData* waterExplosion;      // Water Explosion Datablock
    S32 waterExplosionId;               // Water Explosion ID
+   ExplosionData* playerExplosion;      // Player Explosion Datablock  
+   S32 playerExplosionId;               // Player Explosion ID 
 
    SplashData* splash;                 // Water Splash Datablock
    S32 splashId;                       // Water splash ID
