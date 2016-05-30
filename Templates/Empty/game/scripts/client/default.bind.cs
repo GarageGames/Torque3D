@@ -39,6 +39,36 @@ function escapeFromGame()
 
 moveMap.bindCmd(keyboard, "escape", "", "handleEscape();");
 
+function showPlayerList(%val)
+{
+   if (%val)
+      PlayerListGui.toggle();
+}
+
+moveMap.bind( keyboard, F2, showPlayerList );
+
+function hideHUDs(%val)
+{
+   if (%val)
+      HudlessPlayGui.toggle();
+}
+
+moveMap.bind(keyboard, "ctrl h", hideHUDs);
+
+function doScreenShotHudless(%val)
+{
+   if(%val)
+   {
+      canvas.setContent(HudlessPlayGui);
+      //doScreenshot(%val);
+      schedule(10, 0, "doScreenShot", %val);
+   }
+   else
+      canvas.setContent(PlayGui);
+}
+
+moveMap.bind(keyboard, "alt p", doScreenShotHudless);
+
 //------------------------------------------------------------------------------
 // Movement Keys
 //------------------------------------------------------------------------------
@@ -152,12 +182,30 @@ function jump(%val)
 
 function gamePadMoveX( %val )
 {
-   $mvXAxis_L = %val;
+   if(%val > 0)
+   {
+      $mvRightAction = %val * $movementSpeed;
+      $mvLeftAction = 0;
+   }
+   else
+   {
+      $mvRightAction = 0;
+      $mvLeftAction = -%val * $movementSpeed;
+   }
 }
 
 function gamePadMoveY( %val )
 {
-   $mvYAxis_L = %val;
+   if(%val > 0)
+   {
+      $mvForwardAction = %val * $movementSpeed;
+      $mvBackwardAction = 0;
+   }
+   else
+   {
+      $mvForwardAction = 0;
+      $mvBackwardAction = -%val * $movementSpeed;
+   }
 }
 
 function gamepadYaw(%val)
@@ -234,6 +282,24 @@ moveMap.bindCmd(gamepad, dpadu, "toggleDepthViz();", "");
 moveMap.bindCmd(gamepad, dpadd, "toggleNormalsViz();", "");
 moveMap.bindCmd(gamepad, dpadr, "toggleLightSpecularViz();", "");
 
+// ----------------------------------------------------------------------------
+// Stance/pose
+// ----------------------------------------------------------------------------
+
+function doCrouch(%val)
+{
+   $mvTriggerCount3++;
+}
+
+moveMap.bind(keyboard, lcontrol, doCrouch);
+moveMap.bind(gamepad, btn_b, doCrouch);
+
+function doSprint(%val)
+{
+   $mvTriggerCount5++;
+}
+
+moveMap.bind(keyboard, lshift, doSprint);
 
 //------------------------------------------------------------------------------
 // Mouse Trigger
@@ -244,13 +310,13 @@ function mouseFire(%val)
    $mvTriggerCount0++;
 }
 
-function altTrigger(%val)
-{
-   $mvTriggerCount1++;
-}
+//function altTrigger(%val)
+//{
+   //$mvTriggerCount1++;
+//}
 
 moveMap.bind( mouse, button0, mouseFire );
-moveMap.bind( mouse, button1, altTrigger );
+//moveMap.bind( mouse, button1, altTrigger );
 
 //------------------------------------------------------------------------------
 // Gamepad Trigger
@@ -323,6 +389,8 @@ function turnOffZoom()
 {
    ServerConnection.zoomed = false;
    setFov(ServerConnection.getControlCameraDefaultFov());
+   Reticle.setVisible(true);
+   zoomReticle.setVisible(false);
 
    // Rather than just disable the DOF effect, we want to set it to the level's
    // preset values.
@@ -342,6 +410,8 @@ function toggleZoom(%val)
    {
       ServerConnection.zoomed = true;
       setFov($Player::CurrentFOV);
+      Reticle.setVisible(false);
+      zoomReticle.setVisible(true);
 
       DOFPostEffect.setAutoFocus( true );
       DOFPostEffect.setFocusParams( 0.5, 0.5, 50, 500, -5, 5 );
@@ -353,9 +423,14 @@ function toggleZoom(%val)
    }
 }
 
-moveMap.bind(keyboard, f, setZoomFOV);
-moveMap.bind(keyboard, r, toggleZoom);
-moveMap.bind( gamepad, btn_b, toggleZoom );
+function mouseButtonZoom(%val)
+{
+   toggleZoom(%val);
+}
+
+moveMap.bind(keyboard, f, setZoomFOV); // f for field of view
+moveMap.bind(keyboard, z, toggleZoom); // z for zoom
+moveMap.bind( mouse, button1, mouseButtonZoom );
 
 //------------------------------------------------------------------------------
 // Camera & View functions
@@ -383,12 +458,111 @@ function toggleCamera(%val)
       commandToServer('ToggleCamera');
 }
 
-moveMap.bind( keyboard, z, toggleFreeLook );
+moveMap.bind( keyboard, v, toggleFreeLook ); // v for vanity
 moveMap.bind(keyboard, tab, toggleFirstPerson );
 moveMap.bind(keyboard, "alt c", toggleCamera);
 
-moveMap.bind( gamepad, btn_back, toggleCamera );
+moveMap.bind( gamepad, btn_start, toggleCamera );
+moveMap.bind( gamepad, btn_x, toggleFirstPerson );
 
+// ----------------------------------------------------------------------------
+// Misc. Player stuff
+// ----------------------------------------------------------------------------
+
+// Gideon does not have these animations, so the player does not need access to
+// them.  Commenting instead of removing so as to retain an example for those
+// who will want to use a player model that has these animations and wishes to
+// use them.
+
+//moveMap.bindCmd(keyboard, "ctrl w", "commandToServer('playCel',\"wave\");", "");
+//moveMap.bindCmd(keyboard, "ctrl s", "commandToServer('playCel',\"salute\");", "");
+
+moveMap.bindCmd(keyboard, "ctrl k", "commandToServer('suicide');", "");
+
+//------------------------------------------------------------------------------
+// Item manipulation
+//------------------------------------------------------------------------------
+moveMap.bindCmd(keyboard, "1", "commandToServer('use',\"Ryder\");", "");
+moveMap.bindCmd(keyboard, "2", "commandToServer('use',\"Lurker\");", "");
+moveMap.bindCmd(keyboard, "3", "commandToServer('use',\"LurkerGrenadeLauncher\");", "");
+moveMap.bindCmd(keyboard, "4", "commandToServer('use',\"ProxMine\");", "");
+moveMap.bindCmd(keyboard, "5", "commandToServer('use',\"DeployableTurret\");", "");
+
+moveMap.bindCmd(keyboard, "r", "commandToServer('reloadWeapon');", "");
+
+function unmountWeapon(%val)
+{
+   if (%val)
+      commandToServer('unmountWeapon');
+}
+
+moveMap.bind(keyboard, 0, unmountWeapon);
+
+function throwWeapon(%val)
+{
+   if (%val)
+      commandToServer('Throw', "Weapon");
+}
+function tossAmmo(%val)
+{
+   if (%val)
+      commandToServer('Throw', "Ammo");
+}
+
+moveMap.bind(keyboard, "alt w", throwWeapon);
+moveMap.bind(keyboard, "alt a", tossAmmo);
+
+function nextWeapon(%val)
+{
+   if (%val)
+      commandToServer('cycleWeapon', "next");
+}
+
+function prevWeapon(%val)
+{
+   if (%val)
+      commandToServer('cycleWeapon', "prev");
+}
+
+function mouseWheelWeaponCycle(%val)
+{
+   if (%val < 0)
+      commandToServer('cycleWeapon', "next");
+   else if (%val > 0)
+      commandToServer('cycleWeapon', "prev");
+}
+
+moveMap.bind(keyboard, q, nextWeapon);
+moveMap.bind(keyboard, "ctrl q", prevWeapon);
+moveMap.bind(mouse, "zaxis", mouseWheelWeaponCycle);
+
+//------------------------------------------------------------------------------
+// Message HUD functions
+//------------------------------------------------------------------------------
+
+function pageMessageHudUp( %val )
+{
+   if ( %val )
+      pageUpMessageHud();
+}
+
+function pageMessageHudDown( %val )
+{
+   if ( %val )
+      pageDownMessageHud();
+}
+
+function resizeMessageHud( %val )
+{
+   if ( %val )
+      cycleMessageHudSize();
+}
+
+moveMap.bind(keyboard, u, toggleMessageHud );
+//moveMap.bind(keyboard, y, teamMessageHud );
+moveMap.bind(keyboard, "pageUp", pageMessageHudUp );
+moveMap.bind(keyboard, "pageDown", pageMessageHudDown );
+moveMap.bind(keyboard, "p", resizeMessageHud );
 
 //------------------------------------------------------------------------------
 // Demo recording functions
@@ -441,12 +615,87 @@ GlobalActionMap.bind(keyboard, "ctrl o", bringUpOptions);
 //------------------------------------------------------------------------------
 // Debugging Functions
 //------------------------------------------------------------------------------
-function showMetrics(%val)
+$MetricsParamArray[0] = "fps ";
+$MetricsParamArray[1] = "shadow "; 
+$MetricsParamArray[2] = "gfx "; 
+$MetricsParamArray[3] = "sfx ";
+$MetricsParamArray[4] = "terrain ";
+$MetricsParamArray[5] = "groundcover ";
+$MetricsParamArray[6] = "forest ";
+$MetricsParamArray[7] = "net ";
+$EnableProfiler = false;
+$string = ""; //string used to collet the parameters for metrics function
+
+function showMetrics(%var)
 {
-   if(%val)
-      metrics("fps gfx shadow sfx terrain groundcover forest net");
+	$string = "";
+	if(ppShowFps.getValue())
+	{
+		$string = $string @ $MetricsParamArray[0];
+	}
+	if(ppShowShadow.getValue())
+	{
+		$string = $string @ $MetricsParamArray[1];
+	}
+	if(ppShowGfx.getValue())
+	{
+		$string = $string @ $MetricsParamArray[2];
+	}
+	if(ppShowSfx.getValue())
+	{
+		$string = $string @ $MetricsParamArray[3];
+	}
+	if(ppShowTerrain.getValue())
+	{
+		$string = $string @ $MetricsParamArray[4];
+	}
+	if(ppShowForest.getValue())
+	{
+		$string = $string @ $MetricsParamArray[5];
+	}
+	if(ppShowGroundcover.getValue())
+	{
+		$string = $string @ $MetricsParamArray[6];
+	}
+	if(ppShowNet.getValue())
+	{
+		$string = $string @ $MetricsParamArray[7];
+	}
+
+	if(%var)
+	{
+		$EnableProfiler = !($EnableProfiler);
+
+	   if($EnableProfiler)
+	   {
+			metrics($string);	
+	   }
+	   else if((false == $EnableProfiler))
+	   {
+		   metrics();
+	   }
+	}
+	else if($EnableProfiler)  //will enter only when the enable/disable button was pressed
+	{
+		metrics($string);
+	}
+
+   
 }
-GlobalActionMap.bind(keyboard, "ctrl F2", showMetrics);
+function showMetricsKey(%var)
+{
+   if(%var)
+   {
+		metrics($string);
+   }
+   else if((true == $EnableProfiler))
+   {
+	   $EnableProfiler = false;
+	   metrics();
+   }
+
+}
+GlobalActionMap.bind(keyboard, "ctrl F2", showMetricsKey);
 
 //------------------------------------------------------------------------------
 //
@@ -474,6 +723,40 @@ function doProfile(%val)
 
 GlobalActionMap.bind(keyboard, "ctrl F3", doProfile);
 
+$IsdoProfileFromGuiOn = false;
+function doProfileFromGui()
+{
+	$IsdoProfileFromGuiOn = !($IsdoProfileFromGuiOn);
+	if ($IsdoProfileFromGuiOn)
+   {
+	   %duration = getTrailingNumber(Duration.getText()); //Convert string to int
+	   
+	   if(1 > %duration )
+	   {
+		   %duration = 1;
+		   echo("Warning:Duration is smaller then 1ms. Clip to 1ms!");
+	   }
+	   if(4000 < %duration )
+	   {
+		   %duration = 4000;
+		   echo("Warning:Durtion is greater then 4s. Clip to 4s!");
+	   }
+      // -- start profile
+      echo("Starting profile session...");
+	  schedule(%duration, 0 ,"doProfileFromGui");
+      profilerReset();
+      profilerEnable(true);
+   }
+   else
+   {
+      // -- finish off profile
+      echo("Ending profile session...");
+
+      profilerDumpToFile("profilerDumpToFile" @ getSimTime() @ ".txt");
+      profilerEnable(false);
+   }
+}
+
 //------------------------------------------------------------------------------
 // Misc.
 //------------------------------------------------------------------------------
@@ -481,3 +764,95 @@ GlobalActionMap.bind(keyboard, "ctrl F3", doProfile);
 GlobalActionMap.bind(keyboard, "tilde", toggleConsole);
 GlobalActionMap.bindCmd(keyboard, "alt k", "cls();","");
 GlobalActionMap.bindCmd(keyboard, "alt enter", "", "Canvas.attemptFullscreenToggle();");
+GlobalActionMap.bindCmd(keyboard, "F1", "", "contextHelp();");
+moveMap.bindCmd(keyboard, "n", "toggleNetGraph();", "");
+
+// ----------------------------------------------------------------------------
+// Useful vehicle stuff
+// ----------------------------------------------------------------------------
+
+// Trace a line along the direction the crosshair is pointing
+// If you find a car with a player in it...eject them
+function carjack()
+{
+   %player = LocalClientConnection.getControlObject();
+
+   if (%player.getClassName() $= "Player")
+   {
+      %eyeVec = %player.getEyeVector();
+
+      %startPos = %player.getEyePoint();
+      %endPos = VectorAdd(%startPos, VectorScale(%eyeVec, 1000));
+
+      %target = ContainerRayCast(%startPos, %endPos, $TypeMasks::VehicleObjectType);
+
+      if (%target)
+      {
+         // See if anyone is mounted in the car's driver seat
+         %mount = %target.getMountNodeObject(0);
+
+         // Can only carjack bots
+         // remove '&& %mount.getClassName() $= "AIPlayer"' to allow you
+         // to carjack anyone/anything
+         if (%mount && %mount.getClassName() $= "AIPlayer")
+         {
+            commandToServer('carUnmountObj', %mount);
+         }
+      }
+   }
+}
+
+// Bind the keys to the carjack command
+moveMap.bindCmd(keyboard, "ctrl z", "carjack();", "");
+
+
+// Starting vehicle action map code
+if ( isObject( vehicleMap ) )
+   vehicleMap.delete();
+new ActionMap(vehicleMap);
+
+// The key command for flipping the car
+vehicleMap.bindCmd(keyboard, "ctrl x", "commandToServer(\'flipCar\');", "");
+
+function getOut()
+{
+   vehicleMap.pop();
+   moveMap.push();
+   commandToServer('dismountVehicle');
+}
+
+function brakeLights()
+{
+   // Turn on/off the Cheetah's head lights.
+   commandToServer('toggleBrakeLights');
+}
+
+function brake(%val)
+{
+   commandToServer('toggleBrakeLights');
+   $mvTriggerCount2++;
+}
+
+vehicleMap.bind( keyboard, w, moveforward );
+vehicleMap.bind( keyboard, s, movebackward );
+vehicleMap.bind( keyboard, up, moveforward );
+vehicleMap.bind( keyboard, down, movebackward );
+vehicleMap.bind( mouse, xaxis, yaw );
+vehicleMap.bind( mouse, yaxis, pitch );
+vehicleMap.bind( mouse, button0, mouseFire );
+vehicleMap.bind( mouse, button1, altTrigger );
+vehicleMap.bindCmd(keyboard, "ctrl f","getout();","");
+vehicleMap.bind(keyboard, space, brake);
+vehicleMap.bindCmd(keyboard, "l", "brakeLights();", "");
+vehicleMap.bindCmd(keyboard, "escape", "", "handleEscape();");
+vehicleMap.bind( keyboard, v, toggleFreeLook ); // v for vanity
+//vehicleMap.bind(keyboard, tab, toggleFirstPerson );
+vehicleMap.bind(keyboard, "alt c", toggleCamera);
+// bind the left thumbstick for steering
+vehicleMap.bind( gamepad, thumblx, "D", "-0.23 0.23", gamepadYaw );
+// bind the gas, break, and reverse buttons
+vehicleMap.bind( gamepad, btn_a, moveforward );
+vehicleMap.bind( gamepad, btn_b, brake );
+vehicleMap.bind( gamepad, btn_x, movebackward );
+// bind exiting the vehicle to a button
+vehicleMap.bindCmd(gamepad, btn_y,"getout();","");
