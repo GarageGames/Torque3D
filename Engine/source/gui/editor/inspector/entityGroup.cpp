@@ -41,6 +41,8 @@ bool GuiInspectorEntityGroup::onAdd()
 {
    if (!Parent::onAdd())
       return false;
+
+   return true;
 }
 
 //-----------------------------------------------------------------------------
