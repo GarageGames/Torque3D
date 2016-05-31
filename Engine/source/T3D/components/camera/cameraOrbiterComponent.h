@@ -62,6 +62,9 @@ public:
    virtual void onComponentAdd();
    virtual void onComponentRemove();
 
+   virtual void componentAddedToOwner(Component *comp);
+   virtual void componentRemovedFromOwner(Component *comp);
+
    virtual U32 packUpdate(NetConnection *con, U32 mask, BitStream *stream);
    virtual void unpackUpdate(NetConnection *con, BitStream *stream);
 

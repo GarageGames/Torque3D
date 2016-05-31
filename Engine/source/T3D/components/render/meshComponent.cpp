@@ -53,6 +53,7 @@ MeshComponent::MeshComponent() : Component()
 {
    mShapeName = StringTable->insert("");
    mShapeAsset = StringTable->insert("");
+   mShapeInstance = NULL;
 
    mChangingMaterials.clear();
 

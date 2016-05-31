@@ -405,8 +405,9 @@ U32 Entity::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       //mathWrite( *stream, getScale() );
       //stream->writeAffineTransform(mObjToWorld);
       //mathWrite(*stream, getPosition());
-      mathWrite(*stream, mPos);
+      //mathWrite(*stream, mPos);
 
+      stream->writeCompressedPoint(mPos);
       mathWrite(*stream, getRotation());
 
       mDelta.move.pack(stream);
@@ -500,7 +501,8 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
 
       Point3F pos;
 
-      mathRead(*stream, &pos);
+      stream->readCompressedPoint(&pos);
+      //mathRead(*stream, &pos);
 
       RotationF rot;
 
@@ -893,8 +895,10 @@ void Entity::setMountRotation(EulerF rotOffset)
 void Entity::getCameraTransform(F32* pos, MatrixF* mat)
 {
    Vector<CameraInterface*> updaters = getComponents<CameraInterface>();
-   for (Vector<CameraInterface*>::iterator it = updaters.begin(); it != updaters.end(); it++) {
-      if ((*it)->getCameraTransform(pos, mat)) {
+   for (Vector<CameraInterface*>::iterator it = updaters.begin(); it != updaters.end(); it++) 
+   {
+      if ((*it)->getCameraTransform(pos, mat)) 
+      {
          return;
       }
    }
@@ -1210,7 +1214,7 @@ void Entity::removeObject(SimObject* object)
 
 bool Entity::addComponent(Component *comp)
 {
-   if (comp == NULL || !comp->isProperlyAdded())
+   if (comp == NULL)
       return false;
 
    //double-check were not re-adding anything

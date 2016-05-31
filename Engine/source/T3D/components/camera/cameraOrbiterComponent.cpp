@@ -92,6 +92,32 @@ void CameraOrbiterComponent::onComponentRemove()
    Parent::onComponentRemove();
 }
 
+void CameraOrbiterComponent::componentAddedToOwner(Component *comp)
+{
+   if (comp->getId() == getId())
+      return;
+
+   //test if this is a shape component!
+   CameraComponent *camComponent = dynamic_cast<CameraComponent*>(comp);
+   if (camComponent)
+   {
+      mCamera = camComponent;
+   }
+}
+
+void CameraOrbiterComponent::componentRemovedFromOwner(Component *comp)
+{
+   if (comp->getId() == getId()) //?????????
+      return;
+
+   //test if this is a shape component!
+   CameraComponent *camComponent = dynamic_cast<CameraComponent*>(comp);
+   if (camComponent)
+   {
+      mCamera = NULL;
+   }
+}
+
 U32 CameraOrbiterComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 {
    U32 retMask = Parent::packUpdate(con, mask, stream);

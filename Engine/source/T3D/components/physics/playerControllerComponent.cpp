@@ -69,6 +69,8 @@ PlayerControllerComponent::PlayerControllerComponent() : Component()
    mFriction = 0.3f;
    mElasticity = 0.4f;
    mMaxVelocity = 3000.f;
+   mVelocity = VectorF::Zero;
+   mContactTimer = 0;
    mSticky = false;
    
    mFalling = false;
@@ -88,7 +90,7 @@ PlayerControllerComponent::PlayerControllerComponent() : Component()
 
    mDescription = getDescriptionText("A general-purpose physics player controller.");
 
-   mNetFlags.set(Ghostable | ScopeAlways);
+   //mNetFlags.set(Ghostable | ScopeAlways);
 
    mMass = 9.0f;         // from ShapeBase
    mDrag = 1.0f;         // from ShapeBase

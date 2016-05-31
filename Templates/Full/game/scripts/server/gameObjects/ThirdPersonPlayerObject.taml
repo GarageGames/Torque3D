@@ -1,6 +1,5 @@
 <Entity
     scale="1 1 1"
-    isSelectionEnabled="false"
     class="ThirdPersonPlayerObject"
     canSave="true"
     canSaveDynamicFields="true"

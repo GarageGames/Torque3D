@@ -149,6 +149,8 @@ bool AnimationComponent::onAdd()
 void AnimationComponent::onRemove()
 {
    Parent::onRemove();
+
+   mOwnerRenderInst = NULL;
 }
 
 void AnimationComponent::onComponentAdd()
@@ -387,7 +389,7 @@ S32 AnimationComponent::getThreadSequenceID(S32 slot)
 
 void AnimationComponent::updateThread(Thread& st)
 {
-   if (!mOwnerShapeInstance)
+   if (!mOwnerRenderInst)
       return;
 
    switch (st.state)
@@ -628,7 +630,7 @@ void AnimationComponent::startSequenceSound(Thread& thread)
 
 void AnimationComponent::advanceThreads(F32 dt)
 {
-   if (!mOwnerShapeInstance)
+   if (!mOwnerRenderInst)
       return;
 
    for (U32 i = 0; i < MaxScriptThreads; i++)
