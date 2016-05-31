@@ -77,8 +77,10 @@ function spawnGameObject(%name, %addToMissionGroup)
    {
       %newSGOObject = TamlRead(%gameObjectAsset.TAMLFilePath);
             
-      if(%addToMissionGroup == true)
+      if(%addToMissionGroup == true) //save instance when saving level
          MissionGroup.add(%newSGOObject);
+      else // clear instance on level exit
+         MissionCleanup.add(%newSGOObject);
          
       return %newSGOObject;
    }
