@@ -897,7 +897,7 @@ bool Explosion::onAdd()
 
       if( applyShake && obj )
       {
-         VectorF diff = obj->getPosition() - getPosition();
+         VectorF diff = obj->getWorldBox().getCenter() - getPosition(); //changed to use player's center instead of origin, it is more accurate
          F32 dist = diff.len();
          if( dist < mDataBlock->camShakeRadius )
          {
