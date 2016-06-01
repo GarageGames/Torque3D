@@ -58,6 +58,10 @@ protected:
    F32 mOriginOffset;
 
    ///
+   F32 mSlopeAngle;
+   ///
+
+   ///
    F32 mStepHeight;
    ///
    void _releaseController();
