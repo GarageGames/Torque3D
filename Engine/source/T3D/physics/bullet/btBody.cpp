@@ -381,7 +381,7 @@ void BtBody::setSimulationEnabled( bool enabled )
 
 void BtBody::moveKinematicTo(const MatrixF &transform)
 {
-   AssertFatal(mActor, "Px3Body::moveKinematicTo - The actor is null!");
+   AssertFatal(mActor, "BtBody::moveKinematicTo - The actor is null!");
 
    U32 bodyflags = mActor->getCollisionFlags();
    const bool isKinematic = bodyflags & BF_KINEMATIC;
