@@ -44,6 +44,7 @@
 #include "materials/shaderData.h"
 #include "postFx/postEffectManager.h"
 #include "postFx/postEffectVis.h"
+#include "environment/scatterSky.h" //sunBokeh feature
 
 using namespace Torque;
 
@@ -303,6 +304,7 @@ PostEffect::PostEffect()
       mScreenSunPosSC( NULL ),
       mLightDirectionSC( NULL ),
       mCameraForwardSC( NULL ),
+	  mSunVisibilitySC( NULL ), //sunBokeh feature
       mAccumTimeSC( NULL ),
       mDeltaTimeSC( NULL ),
       mInvCameraMatSC( NULL )
@@ -602,6 +604,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       mScreenSunPosSC = mShader->getShaderConstHandle( "$screenSunPos" );
       mLightDirectionSC = mShader->getShaderConstHandle( "$lightDirection" );
       mCameraForwardSC = mShader->getShaderConstHandle( "$camForward" );
+	  mSunVisibilitySC = mShader->getShaderConstHandle( "$sunVisibility" ); //sunBokeh feature 
 
       mAccumTimeSC = mShader->getShaderConstHandle( "$accumTime" );
       mDeltaTimeSC = mShader->getShaderConstHandle( "$deltaTime" );
@@ -849,6 +852,15 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
          mat.inverse();
          mShaderConsts->set( mInvCameraMatSC, mat, mInvCameraMatSC->getType() );
       }
+	  
+	  if( mSunVisibilitySC->isValid() )  //sunBokeh feature
+      {  
+         ScatterSky* pSky = dynamic_cast<ScatterSky*>(Sim::findObject("Himmel"));    
+         if(pSky)    
+            mShaderConsts->set( mSunVisibilitySC, pSky->getSunVisibility() );    
+         else    
+            mShaderConsts->set( mSunVisibilitySC, 0.0f );    
+      }  
 
    } // if ( state )
 

@@ -141,6 +141,7 @@ protected:
    GFXShaderConstHandle *mAccumTimeSC;
    GFXShaderConstHandle *mDeltaTimeSC;
    GFXShaderConstHandle *mInvCameraMatSC;
+   GFXShaderConstHandle *mSunVisibilitySC; //sunBokeh feature
 
    bool mAllowReflectPass;
 

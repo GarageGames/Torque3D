@@ -655,6 +655,11 @@ void ScatterSky::prepRenderImage( SceneRenderState *state )
       state->getRenderPass()->addInst( ri );
    }
    */
+   // Screen flare occlusion fix //sunBokeh feature
+      F32 screenRadius = GFX->getViewport().extent.y * mFlareScale * 0.01f;  
+      Point3F lightWorldPos = state->getCameraPosition() - state->getFarPlane() * mLight->getDirection() * 0.9f;  
+      F32 dist = ( lightWorldPos - state->getCameraPosition() ).len();  
+      mFlareState.worldRadius = screenRadius * dist / state->getWorldToScreenScale().y;  
 
    // Light flare effect render instance.
    if ( mFlareData && mNightInterpolant != 1.0f )

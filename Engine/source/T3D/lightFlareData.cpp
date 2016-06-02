@@ -121,6 +121,7 @@ LightFlareData::LightFlareData()
    mElementCount( 0 ),
    mScale( 1.0f ),
    mOcclusionRadius( 0.0f ),
+   mVisibility( 1.0f ),  //sunBokeh feature
    mRenderReflectPass( true )
 {
    dMemset( mElementRect, 0, sizeof( RectF ) * MAX_ELEMENTS );   
@@ -445,6 +446,8 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    const RectI &viewport = GFX->getViewport();
    Point3F oneOverViewportExtent( 1.0f / (F32)viewport.extent.x, 1.0f / (F32)viewport.extent.y, 0.0f );
 
+   // Sun visibility, assume 0 at start of frame  
+   mVisibility = 0;  //sunBokeh feature
    // Really convert it to screen space.
    lightPosSS.x -= viewport.point.x;
    lightPosSS.y -= viewport.point.y;
@@ -514,6 +517,7 @@ void LightFlareData::prepRender( SceneRenderState *state, LightFlareState *flare
    // These are the factors which affect the "alpha" of the flare effect.
    // Modulate more in as appropriate.
    ColorF baseColor = ColorF::WHITE * lightSourceBrightnessScale * occlusionFade;
+   mVisibility      = lightSourceBrightnessScale * fadeInOutScale * occlusionFade;  //sunBokeh feature
 
    // Setup the vertex buffer for the maximum flare elements.
    const U32 vertCount = 4 * mElementCount;
