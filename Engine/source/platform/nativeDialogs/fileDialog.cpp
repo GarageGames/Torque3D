@@ -29,7 +29,9 @@
 #include "console/consoleTypes.h"
 #include "platform/profiler.h"
 #include "console/engineAPI.h"
+#ifndef TORQUE_PLAYER
 #include <nfd.h>
+#endif
 #include "core/strings/stringUnit.h"
 #include "core/frameAllocator.h"
 
@@ -184,6 +186,11 @@ static const U32 convertUTF16toUTF8DoubleNULL(const UTF16 *unistring, UTF8  *out
 //
 bool FileDialog::Execute()
 {
+   //If we've flagged as TORQUE_PLAYER, we're going to be utlizing tools, so the file dialogs are not needed.
+   //As such, we'll just return out immediately skipping any file dialog functionality
+#ifdef TORQUE_PLAYER
+   return false;
+#else
    String strippedFilters;
 
    U32 filtersCount = StringUnit::getUnitCount(mData.mFilters, "|");
@@ -305,6 +312,7 @@ bool FileDialog::Execute()
 
    // Return success.
    return true;
+#endif
 }
 
 DefineEngineMethod(FileDialog, Execute, bool, (), ,
