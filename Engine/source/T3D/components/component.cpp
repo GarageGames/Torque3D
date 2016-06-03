@@ -410,20 +410,22 @@ void Component::addComponentField(const char *fieldName, const char *desc, const
    S32 fieldTypeMask = -1;
    StringTableEntry fieldType = StringTable->insert(type);
 
-   if (fieldType == StringTable->insert("TypeS32"))
+   if (fieldType == StringTable->insert("int"))
       fieldTypeMask = TypeS32;
-   else if (fieldType == StringTable->insert("TypeF32"))
+   else if (fieldType == StringTable->insert("float"))
       fieldTypeMask = TypeF32;
-   else if (fieldType == StringTable->insert("TypePoint3F"))
+   else if (fieldType == StringTable->insert("vector"))
       fieldTypeMask = TypePoint3F;
-   else if (fieldType == StringTable->insert("TypeMaterialName"))
+   else if (fieldType == StringTable->insert("material"))
       fieldTypeMask = TypeMaterialName;
-   else if (fieldType == StringTable->insert("TypeImageFilename"))
+   else if (fieldType == StringTable->insert("image"))
       fieldTypeMask = TypeImageFilename;
-   else if (fieldType == StringTable->insert("TypeShapeFilename"))
+   else if (fieldType == StringTable->insert("shape"))
       fieldTypeMask = TypeShapeFilename;
-   else if (fieldType == StringTable->insert("TypeBool"))
+   else if (fieldType == StringTable->insert("bool"))
       fieldTypeMask = TypeBool;
+   else if (fieldType == StringTable->insert("object"))
+      fieldTypeMask = TypeSimObjectPtr;
    else
       fieldTypeMask = TypeString;
 

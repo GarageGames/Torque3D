@@ -3798,7 +3798,7 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
       if (item->isInspectorData())
       {
          Entity* e = dynamic_cast<Entity*>(item->getObject());
-         if (item->mScriptInfo.mText != StringTable->insert("Components"))
+         //if (item->mScriptInfo.mText != StringTable->insert("Components"))
          {
             Entity* e = dynamic_cast<Entity*>(item->getObject());
             if (e)

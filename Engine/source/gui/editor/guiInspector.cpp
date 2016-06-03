@@ -32,6 +32,7 @@
 #ifdef TORQUE_EXPERIMENTAL_EC
 #include "gui/editor/inspector/entityGroup.h"
 #include "gui/editor/inspector/mountingGroup.h"
+#include "gui/editor/inspector/componentGroup.h"
 #endif
 
 IMPLEMENT_CONOBJECT(GuiInspector);
@@ -608,6 +609,17 @@ void GuiInspector::refresh()
          mGroups.push_back(mounting);
          addObject(mounting);
       }
+   }
+
+   if (mTargets.first()->getClassRep()->isSubclassOf("Component"))
+   {
+      //Build the component field groups as the component describes it
+      Component* comp = dynamic_cast<Component*>(mTargets.first().getPointer());
+
+      GuiInspectorComponentGroup *compGroup = new GuiInspectorComponentGroup("Component Fields", this);
+      compGroup->registerObject();
+      mGroups.push_back(compGroup);
+      addObject(compGroup);
    }
 #endif
 

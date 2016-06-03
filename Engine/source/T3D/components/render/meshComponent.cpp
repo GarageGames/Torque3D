@@ -115,6 +115,8 @@ void MeshComponent::onRemove()
 {
    Parent::onRemove();
 
+   mMeshAsset.clear();
+
    SAFE_DELETE(mShapeInstance);
 }
 

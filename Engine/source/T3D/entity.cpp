@@ -230,7 +230,7 @@ bool Entity::onAdd()
 
 void Entity::onRemove()
 {
-   clearComponents(false);
+   clearComponents(true);
 
    removeFromScene();
 
