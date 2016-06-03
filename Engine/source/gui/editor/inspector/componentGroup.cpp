@@ -76,20 +76,12 @@ bool GuiInspectorComponentGroup::inspectGroup()
    if (!mParent || !mParent->getNumInspectObjects())
       return false;
 
+   clearFields();
+
    // to prevent crazy resizing, we'll just freeze our stack for a sec..
    mStack->freeze(true);
 
-   mStack->clear();
-
    bool bNoGroup = false;
-
-   // Un-grouped fields are all sorted into the 'general' group
-   if (dStricmp(mCaption, "General") == 0)
-      bNoGroup = true;
-
-   // Just delete all fields and recreate them (like the dynamicGroup)
-   // because that makes creating controls for array fields a lot easier
-   clearFields();
 
    bool bNewItems = false;
    bool bMakingArray = false;
@@ -116,52 +108,47 @@ bool GuiInspectorComponentGroup::inspectGroup()
       fieldGui->init(mParent, this);
 
       AbstractClassRep::Field *refField;
-      //check statics
-      refField = const_cast<AbstractClassRep::Field *>(comp->findField(field->mFieldName));
-      if (!refField)
+
+      //check dynamics
+      SimFieldDictionary* fieldDictionary = comp->getFieldDictionary();
+      SimFieldDictionaryIterator itr(fieldDictionary);
+
+      while (*itr)
       {
-         //check dynamics
-         SimFieldDictionary* fieldDictionary = comp->getFieldDictionary();
-         SimFieldDictionaryIterator itr(fieldDictionary);
-
-         while (*itr)
+         SimFieldDictionary::Entry* entry = *itr;
+         if (entry->slotName == field->mFieldName)
          {
-            SimFieldDictionary::Entry* entry = *itr;
-            if (entry->slotName == field->mFieldName)
-            {
-               AbstractClassRep::Field f;
-               f.pFieldname = StringTable->insert(field->mFieldName);
+            AbstractClassRep::Field f;
+            f.pFieldname = StringTable->insert(field->mFieldName);
 
-               if (field->mFieldDescription)
-                  f.pFieldDocs = field->mFieldDescription;
+            if (field->mFieldDescription)
+               f.pFieldDocs = field->mFieldDescription;
 
-               f.type = field->mFieldType;
-               f.offset = -1;
-               f.elementCount = 1;
-               f.validator = NULL;
-               f.flag = 0; //change to be the component type
+            f.type = field->mFieldType;
+            f.offset = -1;
+            f.elementCount = 1;
+            f.validator = NULL;
+            f.flag = 0; //change to be the component type
 
-               f.setDataFn = &defaultProtectedSetFn;
-               f.getDataFn = &defaultProtectedGetFn;
-               f.writeDataFn = &defaultProtectedWriteFn;
+            f.setDataFn = &defaultProtectedSetFn;
+            f.getDataFn = &defaultProtectedGetFn;
+            f.writeDataFn = &defaultProtectedWriteFn;
 
-               if (!dStrcmp(field->mGroup, ""))
-                  f.pGroupname = "Component";
-               else
-                  f.pGroupname = field->mGroup;
+            f.pFieldDocs = field->mFieldDescription;
 
-               ConsoleBaseType* conType = ConsoleBaseType::getType(field->mFieldType);
-               AssertFatal(conType, "ConsoleObject::addField - invalid console type");
-               f.table = conType->getEnumTable();
+            f.pGroupname = "Component Fields";
 
-               tempFields.push_back(f);
+            ConsoleBaseType* conType = ConsoleBaseType::getType(field->mFieldType);
+            AssertFatal(conType, "ConsoleObject::addField - invalid console type");
+            f.table = conType->getEnumTable();
 
-               refField = &f;
+            tempFields.push_back(f);
 
-               break;
-            }
-            ++itr;
+            refField = &f;
+
+            break;
          }
+         ++itr;
       }
 
       if (!refField)
@@ -216,6 +203,11 @@ ConsoleMethod(GuiInspectorComponentGroup, inspectGroup, bool, 2, 2, "Refreshes t
 
 void GuiInspectorComponentGroup::clearFields()
 {
+   // delete everything else
+   mStack->clear();
+
+   // clear the mChildren list.
+   mChildren.clear();
 }
 
 SimFieldDictionary::Entry* GuiInspectorComponentGroup::findDynamicFieldInDictionary(StringTableEntry fieldName)

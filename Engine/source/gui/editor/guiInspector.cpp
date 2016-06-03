@@ -616,10 +616,13 @@ void GuiInspector::refresh()
       //Build the component field groups as the component describes it
       Component* comp = dynamic_cast<Component*>(mTargets.first().getPointer());
 
-      GuiInspectorComponentGroup *compGroup = new GuiInspectorComponentGroup("Component Fields", this);
-      compGroup->registerObject();
-      mGroups.push_back(compGroup);
-      addObject(compGroup);
+      if (comp->getComponentFieldCount() > 0)
+      {
+         GuiInspectorComponentGroup *compGroup = new GuiInspectorComponentGroup("Component Fields", this);
+         compGroup->registerObject();
+         mGroups.push_back(compGroup);
+         addObject(compGroup);
+      }
    }
 #endif
 
