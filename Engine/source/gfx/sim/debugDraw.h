@@ -105,7 +105,9 @@ public:
    static void init();
 
    /// Called globally to render debug draw state. Also does state updates.
-   void render();
+   void render(bool clear=true);
+
+   bool willDraw() { return isDrawing && mHead; }
 
    void toggleFreeze()  { shouldToggleFreeze = true; };
    void toggleDrawing() 
