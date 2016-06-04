@@ -548,16 +548,24 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
 
    // store current matrices
    GFXTransformSaver saver;
-   
-   Point2I viewport(params.viewportExtent);
-   if(GFX->getCurrentRenderStyle() == GFXDevice::RS_StereoSideBySide)
-   {
-      viewport.x *= 0.5f;
-   }
-   F32 aspectRatio = F32( viewport.x ) / F32( viewport.y );
 
    Frustum frustum;
-   frustum.set(false, params.query->fov, aspectRatio, params.query->nearPlane, params.query->farPlane);
+
+   S32 stereoTarget = GFX->getCurrentStereoTarget();
+   if (stereoTarget != -1)
+   {
+	   MathUtils::makeFovPortFrustum(&frustum, false, params.query->nearPlane, params.query->farPlane, params.query->fovPort[stereoTarget]);
+   }
+   else
+   {
+	   Point2I viewport(params.viewportExtent);
+	   if (GFX->getCurrentRenderStyle() == GFXDevice::RS_StereoSideBySide)
+	   {
+		   viewport.x *= 0.5f;
+	   }
+	   F32 aspectRatio = F32(viewport.x) / F32(viewport.y);
+	   frustum.set(false, params.query->fov, aspectRatio, params.query->nearPlane, params.query->farPlane);
+   }
 
    // Manipulate the frustum for tiled screenshots
    const bool screenShotMode = gScreenShot && gScreenShot->isPending();
