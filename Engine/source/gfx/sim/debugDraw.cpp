@@ -139,6 +139,77 @@ void DebugDrawer::setupStateBlocks()
    mRenderAlpha = GFX->createStateBlock(d);
 }
 
+void DebugDrawer::drawBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color)
+{
+	Point3F point0(a.x, a.y, a.z);
+	Point3F point1(a.x, b.y, a.z);
+	Point3F point2(b.x, b.y, a.z);
+	Point3F point3(b.x, a.y, a.z);
+
+	Point3F point4(a.x, a.y, b.z);
+	Point3F point5(a.x, b.y, b.z);
+	Point3F point6(b.x, b.y, b.z);
+	Point3F point7(b.x, a.y, b.z);
+
+	// Draw one plane
+	drawLine(point0, point1, color);
+	drawLine(point1, point2, color);
+	drawLine(point2, point3, color);
+	drawLine(point3, point0, color);
+
+	// Draw the other plane
+	drawLine(point4, point5, color);
+	drawLine(point5, point6, color);
+	drawLine(point6, point7, color);
+	drawLine(point7, point4, color);
+
+	// Draw the connecting corners
+	drawLine(point0, point4, color);
+	drawLine(point1, point5, color);
+	drawLine(point2, point6, color);
+	drawLine(point3, point7, color);
+}
+
+void DebugDrawer::drawTransformedBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color, const MatrixF& transform)
+{
+	Point3F point0(a.x, a.y, a.z);
+	Point3F point1(a.x, b.y, a.z);
+	Point3F point2(b.x, b.y, a.z);
+	Point3F point3(b.x, a.y, a.z);
+
+	Point3F point4(a.x, a.y, b.z);
+	Point3F point5(a.x, b.y, b.z);
+	Point3F point6(b.x, b.y, b.z);
+	Point3F point7(b.x, a.y, b.z);
+
+	transform.mulP(point0);
+	transform.mulP(point1);
+	transform.mulP(point2);
+	transform.mulP(point3);
+	transform.mulP(point4);
+	transform.mulP(point5);
+	transform.mulP(point6);
+	transform.mulP(point7);
+
+	// Draw one plane
+	drawLine(point0, point1, color);
+	drawLine(point1, point2, color);
+	drawLine(point2, point3, color);
+	drawLine(point3, point0, color);
+
+	// Draw the other plane
+	drawLine(point4, point5, color);
+	drawLine(point5, point6, color);
+	drawLine(point6, point7, color);
+	drawLine(point7, point4, color);
+
+	// Draw the connecting corners
+	drawLine(point0, point4, color);
+	drawLine(point1, point5, color);
+	drawLine(point2, point6, color);
+	drawLine(point3, point7, color);
+}
+
 void DebugDrawer::render()
 {
 #ifdef ENABLE_DEBUGDRAW
