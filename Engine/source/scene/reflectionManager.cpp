@@ -28,6 +28,7 @@
 #include "console/consoleTypes.h"
 #include "core/tAlgorithm.h"
 #include "math/mMathFn.h"
+#include "math/mathUtils.h"
 #include "T3D/gameBase/gameConnection.h"
 #include "ts/tsShapeInstance.h"
 #include "gui/3d/guiTSControl.h"
@@ -134,12 +135,22 @@ void ReflectionManager::update(  F32 timeSlice,
    // Setup a culler for testing the 
    // visibility of reflectors.
    Frustum culler;
-   culler.set( false,
-               query.fov,
-               (F32)resolution.x / (F32)resolution.y,
-               query.nearPlane, 
-               query.farPlane,
-               query.cameraMatrix );
+
+   S32 stereoTarget = GFX->getCurrentStereoTarget();
+   if (stereoTarget != -1)
+   {
+	   MathUtils::makeFovPortFrustum(&culler, false, query.nearPlane, query.farPlane, query.fovPort[stereoTarget]);
+   }
+   else
+   {
+	   culler.set(false,
+		   query.fov,
+		   (F32)resolution.x / (F32)resolution.y,
+		   query.nearPlane,
+		   query.farPlane,
+		   query.cameraMatrix);
+   }
+
 
    // Manipulate the frustum for tiled screenshots
    const bool screenShotMode = gScreenShot && gScreenShot->isPending();
