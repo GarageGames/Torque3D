@@ -120,6 +120,9 @@ public:
    ///
    /// @{
 
+   void drawBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
+   void drawTransformedBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color, const MatrixF& transform);
+
    void drawBox(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
    void drawLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));	
    void drawTri(const Point3F &a, const Point3F &b, const Point3F &c, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
