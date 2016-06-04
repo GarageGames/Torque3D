@@ -210,7 +210,7 @@ void DebugDrawer::drawTransformedBoxOutline(const Point3F &a, const Point3F &b, 
 	drawLine(point3, point7, color);
 }
 
-void DebugDrawer::render()
+void DebugDrawer::render(bool clear)
 {
 #ifdef ENABLE_DEBUGDRAW
    if(!isDrawing)
@@ -335,7 +335,7 @@ void DebugDrawer::render()
          shouldToggleFreeze = false;
       }
 
-      if(p->dieTime <= curTime && !isFrozen && p->dieTime != U32_MAX)
+      if(clear && p->dieTime <= curTime && !isFrozen && p->dieTime != U32_MAX)
       {
          *walk = p->next;
          mPrimChunker.free(p);
