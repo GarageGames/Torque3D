@@ -56,6 +56,7 @@ protected:
 	bool mIsEnabled;
 	bool mIsSimulating;
 	bool mIsServer;
+   bool mIsSceneLocked;
 	U32 mTickCount;
 	ProcessList *mProcessList;
 	F32 mEditorTimeScale;
@@ -96,11 +97,15 @@ public:
 	void releaseWriteLock();
 	bool isServer(){return mIsServer;}
 	physx::PxController* createController( physx::PxControllerDesc &desc );
+   void lockScene();
+   void unlockScene();
 	//static
 	static bool restartSDK( bool destroyOnly = false, Px3World *clientWorld = NULL, Px3World *serverWorld = NULL );
 	static void releaseWriteLocks();
 	static physx::PxCooking *getCooking();
    static void setTiming(F32 stepTime,U32 maxIterations);
+   static void lockScenes();
+   static void unlockScenes();
 };
 
 #endif // _PX3WORLD_H_

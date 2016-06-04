@@ -127,6 +127,8 @@ struct VehicleData: public ShapeBaseData
    F32 splashFreqMod;
    F32 splashVelEpsilon;
 
+   bool enablePhysicsRep;
+
    //
    VehicleData();
    bool preload(bool server, String &errorStr);
@@ -142,6 +144,7 @@ struct VehicleData: public ShapeBaseData
 
 
 //----------------------------------------------------------------------------
+class PhysicsBody;
 
 class Vehicle: public ShapeBase
 {
@@ -176,6 +179,8 @@ class Vehicle: public ShapeBase
       Point3F cameraRot;
       Point3F cameraRotVec;
    };
+
+   PhysicsBody *mPhysicsRep;
 
    StateDelta mDelta;
    S32 mPredictionCount;            ///< Number of ticks to predict
@@ -261,6 +266,8 @@ public:
    void processTick(const Move *move);
    bool onAdd();
    void onRemove();
+
+   void _createPhysics();
 
    /// Interpolates between move ticks @see processTick
    /// @param   dt   Change in time between the last call and this call to the function
