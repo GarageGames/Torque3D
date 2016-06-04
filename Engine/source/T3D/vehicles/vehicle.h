@@ -127,6 +127,8 @@ struct VehicleData: public ShapeBaseData
    F32 splashFreqMod;
    F32 splashVelEpsilon;
 
+   bool enablePhysicsRep;
+
    //
    VehicleData();
    bool preload(bool server, String &errorStr);
@@ -142,6 +144,7 @@ struct VehicleData: public ShapeBaseData
 
 
 //----------------------------------------------------------------------------
+class PhysicsBody;
 
 class Vehicle: public ShapeBase
 {
@@ -176,6 +179,9 @@ class Vehicle: public ShapeBase
       Point3F cameraRot;
       Point3F cameraRotVec;
    };
+
+   PhysicsBody *mPhysicsRep;
+   void _createPhysics();
 
    StateDelta mDelta;
    S32 mPredictionCount;            ///< Number of ticks to predict

@@ -91,6 +91,9 @@ function PE_ParticleEditor::guiSync( %this )
    PE_ParticleEditor-->PEP_dragCoefficient_slider.setValue( %data.dragCoefficient );
    PE_ParticleEditor-->PEP_dragCoefficient_textEdit.setText( %data.dragCoefficient );
    
+   PE_ParticleEditor-->PEP_windCoefficient_slider.setValue( %data.windCoefficient );
+   PE_ParticleEditor-->PEP_windCoefficient_textEdit.setText( %data.windCoefficient );
+   
    PE_ParticleEditor-->PEP_spinRandomMin_slider.setValue( %data.spinRandomMin );
    PE_ParticleEditor-->PEP_spinRandomMin_textEdit.setText( %data.spinRandomMin );
    
@@ -131,6 +134,17 @@ function PE_ParticleEditor::guiSync( %this )
    
    PE_ParticleEditor-->PEP_pointTime_slider3.setValue( %data.times[ 3 ] );
    PE_ParticleEditor-->PEP_pointTime_textEdit3.setText( %data.times[ 3 ] );
+   
+   //particle animation
+   PE_ParticleEditor-->PEP_animateTexture.setValue( %data.animateTexture );
+   
+   PE_ParticleEditor-->PEP_framesPerSec_slider.setValue( %data.framesPerSec );
+   PE_ParticleEditor-->PEP_framesPerSec_textEdit.setText( %data.framesPerSec );
+   
+   PE_ParticleEditor-->PEP_animTexFramesList_textEdit.setText( %data.animTexFrames );
+   
+   PE_ParticleEditor-->PEP_animTileCount_textEdit.setText( %data.animTexTiling );
+   
 }
 
 //---------------------------------------------------------------------------------------------

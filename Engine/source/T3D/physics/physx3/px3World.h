@@ -56,6 +56,7 @@ protected:
 	bool mIsEnabled;
 	bool mIsSimulating;
 	bool mIsServer;
+   bool mIsSceneLocked;
 	U32 mTickCount;
 	ProcessList *mProcessList;
 	F32 mEditorTimeScale;
@@ -101,6 +102,12 @@ public:
 	static void releaseWriteLocks();
 	static physx::PxCooking *getCooking();
    static void setTiming(F32 stepTime,U32 maxIterations);
+
+   static void lockScenes();
+   static void unlockScenes();
+   void lockScene();
+   void unlockScene();
+
 };
 
 #endif // _PX3WORLD_H_
