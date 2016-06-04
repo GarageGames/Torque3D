@@ -358,19 +358,6 @@ void GuiTSCtrl::_internalRender(RectI viewport, Frustum &frustum)
    GFXTransformSaver saver;
    Point2I renderSize = viewport.extent;
 
-   if (mReflectPriority > 0)
-   {
-      // Get the total reflection priority.
-      F32 totalPriority = 0;
-      for (U32 i = 0; i < smAwakeTSCtrls.size(); i++)
-         if (smAwakeTSCtrls[i]->isVisible())
-            totalPriority += smAwakeTSCtrls[i]->mReflectPriority;
-
-      REFLECTMGR->update(mReflectPriority / totalPriority,
-         getExtent(),
-         mLastCameraQuery);
-   }
-
    if (mForceFOV != 0)
       mLastCameraQuery.fov = mDegToRad(mForceFOV);
 
@@ -378,6 +365,19 @@ void GuiTSCtrl::_internalRender(RectI viewport, Frustum &frustum)
    {
       MatrixF rotMat(EulerF(0, 0, mDegToRad(mCameraZRot)));
       mLastCameraQuery.cameraMatrix.mul(rotMat);
+   }
+
+   if (mReflectPriority > 0)
+   {
+	   // Get the total reflection priority.
+	   F32 totalPriority = 0;
+	   for (U32 i = 0; i < smAwakeTSCtrls.size(); i++)
+		   if (smAwakeTSCtrls[i]->isVisible())
+			   totalPriority += smAwakeTSCtrls[i]->mReflectPriority;
+
+	   REFLECTMGR->update(mReflectPriority / totalPriority,
+		   renderSize,
+		   mLastCameraQuery);
    }
 
    GFX->setViewport(viewport);
@@ -423,7 +423,27 @@ void GuiTSCtrl::_internalRender(RectI viewport, Frustum &frustum)
    PFXMGR->setFrameMatrices(mSaveModelview, mSaveProjection);
 
    renderWorld(viewport);
-   DebugDrawer::get()->render();
+
+   DebugDrawer* debugDraw = DebugDrawer::get();
+   if (mRenderStyle == RenderStyleStereoSideBySide && debugDraw->willDraw())
+   {
+	   // For SBS we need to render over each viewport
+	   Frustum frustum;
+
+	   GFX->setViewport(mLastCameraQuery.stereoViewports[0]);
+	   MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[0]);
+	   GFX->setFrustum(frustum);
+	   debugDraw->render(false);
+
+	   GFX->setViewport(mLastCameraQuery.stereoViewports[1]);
+	   MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[1]);
+	   GFX->setFrustum(frustum);
+	   debugDraw->render();
+   }
+   else
+   {
+	   debugDraw->render();
+   }
 
    // Render the canvas overlay if its available
    if (mStereoCanvas.getPointer() && mStereoGuiTarget.getPointer() && mStereoCanvas->size() != 0)
