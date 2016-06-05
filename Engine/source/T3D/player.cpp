@@ -2620,7 +2620,6 @@ void Player::updateMove(const Move* move)
          }
       }
 #endif
-
       if(doStandardMove)
       {
          F32 p = move->pitch * (mPose == SprintPose ? mDataBlock->sprintPitchScale : 1.0f);
@@ -2641,10 +2640,33 @@ void Player::updateMove(const Move* move)
          }
          else
          {
-            mRot.z += y;
-            // Rotate the head back to the front, center horizontal
-            // as well if we're controlling another object.
-            mHead.z *= 0.5f;
+
+            if(move->altFreeLook && (con && !con->isFirstPerson()))
+            {
+
+               while (mHead.z > M_PI_F)
+                  mHead.z -= M_2PI_F;
+               while (mHead.z < -M_PI_F)
+                  mHead.z += M_2PI_F;
+
+               if(move->y > 0.0f || move->y < 0.0f)
+               {
+               	  mRot.z += y;
+                  F32 change = mHead.z * 0.5f;
+                  mHead.z = change;
+                  mRot.z += change;
+               } else
+               {
+               	mHead.z += y;
+               }
+            } else
+            {
+            	mRot.z += y;
+            	F32 change = mHead.z * 0.5f;
+            	mHead.z = change;
+            	mRot.z += change;
+            }
+
             if (mControlObject)
                mHead.x *= 0.5f;
          }
@@ -6187,6 +6209,7 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    if (stream->writeFlag(mask & MoveMask))
    {
+
       stream->writeFlag(mFalling);
 
       stream->writeFlag(mSwimming);
@@ -6213,8 +6236,16 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       }
       stream->writeFloat(mRot.z / M_2PI_F, 7);
       stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
-      stream->writeSignedFloat(mHead.z / mDataBlock->maxFreelookAngle, 6);
+
       delta.move.pack(stream);
+
+      F32 denom = 1.0f;
+      if(delta.move.altFreeLook)
+      	denom = M_2PI_F;
+      else
+      	denom = mDataBlock->maxFreelookAngle;
+      stream->writeSignedFloat(mHead.z / denom, 6);
+
       stream->writeFlag(!(mask & NoWarpMask));
    }
    // Ghost need energy to predict reliably
@@ -6318,8 +6349,16 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       rot.y = rot.x = 0.0f;
       rot.z = stream->readFloat(7) * M_2PI_F;
       mHead.x = stream->readSignedFloat(6) * (mDataBlock->maxLookAngle - mDataBlock->minLookAngle);
-      mHead.z = stream->readSignedFloat(6) * mDataBlock->maxFreelookAngle;
+      
       delta.move.unpack(stream);
+
+      F32 multi = 1.0f;
+      if(delta.move.altFreeLook)
+      	multi = M_2PI_F;
+      else
+      	multi = mDataBlock->maxFreelookAngle;
+
+      mHead.z = stream->readSignedFloat(6) * multi;
 
       delta.head = mHead;
       delta.headVec.set(0.0f, 0.0f, 0.0f);

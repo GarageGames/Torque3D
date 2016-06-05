@@ -47,6 +47,7 @@ F32 MoveManager::mLeftAction = 0;
 F32 MoveManager::mRightAction = 0;
 
 bool MoveManager::mFreeLook = false;
+bool MoveManager::mAltFreeLook = false;
 F32 MoveManager::mPitch = 0;
 F32 MoveManager::mYaw = 0;
 F32 MoveManager::mRoll = 0;
@@ -92,6 +93,9 @@ void MoveManager::init()
    Con::addVariable("mvFreeLook", TypeBool, &mFreeLook, 
       "Boolean state for if freelook is active or not.\n"
 	   "@ingroup Game");
+   Con::addVariable("mvAltFreeLook", TypeBool, &mAltFreeLook,
+   	   "Boolean state for if altfreelook is active or not.\n"
+   	   "@ingroup Game");
    Con::addVariable("mvDeviceIsKeyboardMouse", TypeBool, &mDeviceIsKeyboardMouse, 
       "Boolean state for it the system is using a keyboard and mouse or not.\n"
 	   "@ingroup Game");
@@ -160,6 +164,7 @@ Move::Move()
    checksum = false;
    deviceIsKeyboardMouse = false;
    freeLook = false;
+   altFreeLook = false;
    trigger[0] = false;
    trigger[1] = false;
    trigger[2] = false;
@@ -260,6 +265,7 @@ bool Move::packMove(BitStream *stream, const Move* basemove, bool alwaysWriteAll
                              (pz!=basemove->pz)         ||
                              (deviceIsKeyboardMouse!=basemove->deviceIsKeyboardMouse) ||
                              (freeLook!=basemove->freeLook) ||
+                             (altFreeLook!=basemove->altFreeLook) ||
                              triggerDifferent;
    
    if (alwaysWriteAll || stream->writeFlag(somethingDifferent))
@@ -278,6 +284,7 @@ bool Move::packMove(BitStream *stream, const Move* basemove, bool alwaysWriteAll
       if (stream->writeFlag(pz != basemove->pz))
          stream->writeInt(pz, 6);
       stream->writeFlag(freeLook);
+      stream->writeFlag(altFreeLook);
       stream->writeFlag(deviceIsKeyboardMouse);
 
       if (stream->writeFlag(triggerDifferent))
@@ -317,6 +324,7 @@ bool Move::unpackMove(BitStream *stream, const Move* basemove, bool alwaysReadAl
       py = stream->readFlag() ? stream->readInt(6) : basemove->py;
       pz = stream->readFlag() ? stream->readInt(6) : basemove->pz;
       freeLook = stream->readFlag();
+      altFreeLook = stream->readFlag();
       deviceIsKeyboardMouse = stream->readFlag();
 
       bool triggersDiffer = stream->readFlag();

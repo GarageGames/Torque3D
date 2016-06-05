@@ -60,6 +60,7 @@ bool MoveList::getNextMove(Move &curMove)
    curMove.z = MoveManager::mUpAction - MoveManager::mDownAction;
 
    curMove.freeLook = MoveManager::mFreeLook;
+   curMove.altFreeLook = MoveManager::mAltFreeLook;
    curMove.deviceIsKeyboardMouse = MoveManager::mDeviceIsKeyboardMouse;
 
    for(U32 i = 0; i < MaxTriggerKeys; i++)
