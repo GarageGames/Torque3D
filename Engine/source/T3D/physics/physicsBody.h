@@ -113,6 +113,10 @@ public:
 
    ///
    virtual void applyImpulse( const Point3F &origin, const Point3F &force ) = 0;
+
+   ///
+   virtual void moveKinematicTo(const MatrixF &xfm) = 0;
+
 };
 
 
