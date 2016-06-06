@@ -149,6 +149,20 @@ inline bool mathRead(Stream& stream, EaseF* e)
    return success;
 }
 
+inline bool mathRead(Stream& stream, RotationF* e)
+{
+   bool success = stream.read(&e->x);
+   success &= stream.read(&e->y);
+   success &= stream.read(&e->z);
+   success &= stream.read(&e->w);
+
+   U32 rotType;
+   success &= stream.read(&rotType);
+   e->mRotationType = (RotationF::RotationTypes)rotType;
+
+   return success;
+}
+
 //------------------------------------------------------------------------------
 //-------------------------------------- WRITING
 //
@@ -261,6 +275,16 @@ inline bool mathWrite(Stream& stream, const EaseF& e)
    success     &= stream.write(e.param[0]);
    success     &= stream.write(e.param[1]);
    return success;
+}
+
+inline bool mathWrite(Stream& stream, const RotationF& e)
+{
+   bool success = stream.write(e.x);
+   success &= stream.write(e.y);
+   success &= stream.write(e.z);
+   success &= stream.write(e.w);
+   success &= stream.write(e.mRotationType);
+   return success;;
 }
 
 #endif //_MATHIO_H_

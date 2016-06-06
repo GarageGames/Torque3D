@@ -329,3 +329,33 @@ Box3F Px3Player::getWorldBounds()
    return px3Cast<Box3F>( bounds );
 }
 
+bool Px3Player::testSpacials(const Point3F &nPos, const Point3F &nSize) const
+{
+   F32 offset = nSize.z * 0.5f;
+   F32 radius = getMax(nSize.x, nSize.y) * 0.5f - mSkinWidth;
+   F32 height = (nSize.z - (radius * 2.0f)) * 0.5f;
+   height -= mSkinWidth * 2.0f;
+   physx::PxCapsuleGeometry geom(radius, height);
+
+   physx::PxVec3 pos(nPos.x, nPos.y, nPos.z + offset);
+   physx::PxQuat orientation(Float_HalfPi, physx::PxVec3(0.0f, 1.0f, 0.0f));
+
+   physx::PxOverlapBuffer hit;
+   physx::PxQueryFilterData queryFilter(physx::PxQueryFlag::eANY_HIT | physx::PxQueryFlag::eSTATIC | physx::PxQueryFlag::eDYNAMIC);
+   queryFilter.data.word0 = PX3_DEFAULT;
+   bool hasHit = mWorld->getScene()->overlap(geom, physx::PxTransform(pos, orientation), hit, queryFilter);
+
+   return !hasHit;   // Return true if there are no overlapping objects
+}
+
+void Px3Player::setSpacials(const Point3F &nPos, const Point3F &nSize)
+{
+   mOriginOffset = nSize.z * 0.5f;
+   F32 radius = getMax(nSize.x, nSize.y) * 0.5f - mSkinWidth;
+   F32 height = nSize.z - (radius * 2.0f);
+   height -= mSkinWidth * 2.0f;
+
+   mWorld->releaseWriteLock();
+   mController->resize(height);
+   px3GetFirstShape(mController->getActor())->getCapsuleGeometry(mGeometry);
+}

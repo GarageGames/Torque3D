@@ -145,6 +145,17 @@ DefineConsoleFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove),
       obj->enableCollision();
 }
 
+
+DefineConsoleFunction(NavMeshIgnore, void, (S32 objid, bool _ignore), (0, true),
+   "@brief Flag this object as not generating a navmesh result.")
+{
+   SceneObject *obj;
+   if(!Sim::findObject(objid, obj))
+      return;
+
+      obj->mPathfindingIgnore = _ignore;
+}
+
 DefineConsoleFunction(NavMeshUpdateOne, void, (S32 meshid, S32 objid, bool remove), (0, 0, false),
    "@brief Update all tiles in a given NavMesh that intersect the given object's world box.")
 {
@@ -839,6 +850,7 @@ void NavMesh::buildNextTile()
 static void buildCallback(SceneObject* object,void *key)
 {
    SceneContainer::CallbackInfo* info = reinterpret_cast<SceneContainer::CallbackInfo*>(key);
+   if (!object->mPathfindingIgnore)
    object->buildPolyList(info->context,info->polyList,info->boundingBox,info->boundingSphere);
 }
 
@@ -861,7 +873,7 @@ unsigned char *NavMesh::buildTileData(const Tile &tile, TileData &data, U32 &dat
    data.geom.clear();
    info.polyList = &data.geom;
    info.key = this;
-   getContainer()->findObjects(box, StaticShapeObjectType | TerrainObjectType, buildCallback, &info);
+   getContainer()->findObjects(box, StaticObjectType | DynamicShapeObjectType, buildCallback, &info);
 
    // Parse water objects into the same list, but remember how much geometry was /not/ water.
    U32 nonWaterVertCount = data.geom.getVertCount();

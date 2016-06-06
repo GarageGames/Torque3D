@@ -1015,7 +1015,7 @@ void GFXDrawUtil::_drawSolidPolyhedron( const GFXStateBlockDesc &desc, const Any
 
    // Allocate a temp buffer for the face indices.
 
-   const U32 numIndices = poly.getNumEdges() * 2;
+   const U32 numIndices = poly.getNumEdges() * 3;
    const U32 numPlanes = poly.getNumPlanes();
 
    GFXPrimitiveBufferHandle prims( mDevice, numIndices, 0, GFXBufferTypeVolatile );

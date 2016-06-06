@@ -22,13 +22,13 @@
 
 new GFXStateBlockData( ScatterSkySBData )
 {
-   cullDefined = true;
+   //cullDefined = true;
    cullMode = "GFXCullNone";
    
    zDefined = true;
    zEnable = true;
    zWriteEnable = false;
-   zFunc = "GFXCmpLessEqual";
+   //zFunc = "GFXCmpLessEqual";
    
    samplersDefined = true;
    samplerStates[0] = SamplerClampLinear;   

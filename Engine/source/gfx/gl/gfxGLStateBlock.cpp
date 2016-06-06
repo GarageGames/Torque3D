@@ -39,7 +39,7 @@ GFXGLStateBlock::GFXGLStateBlock(const GFXStateBlockDesc& desc) :
    mDesc(desc),
    mCachedHashValue(desc.getHashValue())
 {
-    if( !gglHasExtension(ARB_sampler_objects) )
+    if( !GFXGL->mCapabilities.samplerObjects )
 	   return;
 
    static Map<GFXSamplerStateDesc, U32> mSamplersMap;
@@ -88,6 +88,7 @@ const GFXStateBlockDesc& GFXGLStateBlock::getDesc() const
 /// @param oldState  The current state, used to make sure we don't set redundant states on the device.  Pass NULL to reset all states.
 void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
 {
+   PROFILE_SCOPE(GFXGLStateBlock_Activate);
    // Big scary warning copied from Apple docs 
    // http://developer.apple.com/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/opengl_performance/chapter_13_section_2.html#//apple_ref/doc/uid/TP40001987-CH213-SW12
    // Don't set a state that's already set. Once a feature is enabled, it does not need to be enabled again.
@@ -165,7 +166,7 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
 #undef CHECK_TOGGLE_STATE
 
    //sampler objects
-   if( gglHasExtension(ARB_sampler_objects) )
+   if( GFXGL->mCapabilities.samplerObjects )
    {
       for (U32 i = 0; i < getMin(getOwningDevice()->getNumSamplers(), (U32) TEXTURE_STAGE_COUNT); i++)
       {

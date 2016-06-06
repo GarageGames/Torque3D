@@ -36,7 +36,7 @@
 #include "math/mRandom.h"
 #include "math/mEase.h"
 #include "math/mathUtils.h"
-
+#include "math/mRotation.h"
 #include "core/strings/stringUnit.h"
 
 IMPLEMENT_SCOPE( MathTypes, Math,, "" );
@@ -113,7 +113,14 @@ IMPLEMENT_STRUCT( EaseF,
    EaseF, MathTypes,
    "" )
 END_IMPLEMENT_STRUCT;
-
+IMPLEMENT_STRUCT(RotationF,
+   RotationF, MathTypes,
+   "")
+   FIELD(x, x, 1, "X coordinate.")
+   FIELD(y, y, 1, "Y coordinate.")
+   FIELD(z, z, 1, "Z coordinate.")
+   FIELD(w, w, 1, "W coordinate.")
+END_IMPLEMENT_STRUCT;
 
 //-----------------------------------------------------------------------------
 // TypePoint2I
@@ -572,6 +579,55 @@ ConsoleSetType( TypeEaseF )
    }
 }
 
+//-----------------------------------------------------------------------------
+// TypeRotationF
+//-----------------------------------------------------------------------------
+ConsoleType(RotationF, TypeRotationF, RotationF, "")
+ImplementConsoleTypeCasters( TypeRotationF, RotationF )
+
+ConsoleGetType(TypeRotationF)
+{
+   RotationF *pt = (RotationF *)dptr;
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+
+   EulerF out = pt->asEulerF(RotationF::Degrees);
+   dSprintf(returnBuffer, bufSize, "%g %g %g", out.x, out.y, out.z);
+
+   return returnBuffer;
+}
+
+ConsoleSetType(TypeRotationF)
+{
+   if (argc == 1)
+   {
+      U32 elements = StringUnit::getUnitCount(argv[0], " \t\n");
+      if (elements == 3)
+      {
+         EulerF in;
+         dSscanf(argv[0], "%g %g %g", &in.x, &in.y, &in.z);
+         ((RotationF *)dptr)->set(in, RotationF::Degrees);
+      }
+      else
+      {
+         AngAxisF in;
+         dSscanf(argv[0], "%g %g %g %g", &in.axis.x, &in.axis.y, &in.axis.z, &in.angle);
+         ((RotationF *)dptr)->set(in, RotationF::Degrees);
+      }
+   }
+   else if (argc == 3)
+   {
+      EulerF in(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2]));
+      ((RotationF *)dptr)->set(in, RotationF::Degrees);
+   }
+   else if (argc == 4)
+   {
+      AngAxisF in(Point3F(dAtof(argv[0]), dAtof(argv[1]), dAtof(argv[2])), dAtof(argv[3]));
+      ((RotationF *)dptr)->set(in, RotationF::Degrees);
+   }
+   else
+      Con::printf("RotationF must be set as { x, y, z, w } or \"x y z w\"");
+}
 
 //-----------------------------------------------------------------------------
 

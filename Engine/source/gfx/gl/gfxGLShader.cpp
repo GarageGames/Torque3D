@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "gfx/gl/gfxGLShader.h"
 #include "gfx/gl/gfxGLVertexAttribLocation.h"
+#include "gfx/gl/gfxGLDevice.h"
 
 #include "core/frameAllocator.h"
 #include "core/stream/fileStream.h"
@@ -344,6 +345,7 @@ void GFXGLShaderConstBuffer::set(GFXShaderConstHandle* handle, const MatrixF* ma
 
 void GFXGLShaderConstBuffer::activate()
 {
+   PROFILE_SCOPE(GFXGLShaderConstBuffer_activate);
    mShader->setConstantsFromBuffer(this);
    mWasLost = false;
 }
@@ -394,6 +396,7 @@ void GFXGLShader::clearShaders()
 
 bool GFXGLShader::_init()
 {
+   PROFILE_SCOPE(GFXGLShader_Init);
    // Don't initialize empty shaders.
    if ( mVertexFile.isEmpty() && mPixelFile.isEmpty() )
       return false;
@@ -956,7 +959,7 @@ bool GFXGLShader::_loadShaderFromStream(  GLuint shader,
    buffers.push_back( dStrdup( versionDecl ) );
    lengths.push_back( dStrlen( versionDecl ) );
 
-   if(gglHasExtension(ARB_gpu_shader5))
+   if(GFXGL->mCapabilities.shaderModel5)
    {
       const char *extension = "#extension GL_ARB_gpu_shader5 : enable\r\n";
       buffers.push_back( dStrdup( extension ) );
@@ -1013,6 +1016,7 @@ bool GFXGLShader::initShader( const Torque::Path &file,
                               bool isVertex, 
                               const Vector<GFXShaderMacro> &macros )
 {
+   PROFILE_SCOPE(GFXGLShader_CompileShader);
    GLuint activeShader = glCreateShader(isVertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
    if(isVertex)
       mVertexShader = activeShader;
@@ -1072,6 +1076,7 @@ bool GFXGLShader::initShader( const Torque::Path &file,
 /// Returns our list of shader constants, the material can get this and just set the constants it knows about
 const Vector<GFXShaderConstDesc>& GFXGLShader::getShaderConstDesc() const
 {
+   PROFILE_SCOPE(GFXGLShader_GetShaderConstants);
    return mConstants;
 }
 
