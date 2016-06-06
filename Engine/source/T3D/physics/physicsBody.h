@@ -117,6 +117,10 @@ public:
    virtual void findContact(SceneObject **contactObject,
       VectorF *contactNormal,
       Vector<SceneObject*> *outOverlapObjects) const = 0;
+
+   ///
+   virtual void moveKinematicTo(const MatrixF &xfm) = 0;
+
 };
 
 

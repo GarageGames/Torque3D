@@ -120,6 +120,8 @@ public:
 
    virtual void findContact(SceneObject **contactObject, VectorF *contactNormal,
       Vector<SceneObject*> *outOverlapObjects) const;
+   virtual void moveKinematicTo(const MatrixF &xfm);
+
 };
 
 #endif // _PX3BODY_H_

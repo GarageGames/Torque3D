@@ -30,7 +30,6 @@ ImplementFeatureType( MFT_VertTransform, MFG_Transform, 0, true );
 
 ImplementFeatureType( MFT_TexAnim, MFG_PreTexture, 1.0f, true );
 ImplementFeatureType( MFT_Parallax, MFG_PreTexture, 2.0f, true );
-ImplementFeatureType( MFT_DiffuseVertColor, MFG_PreTexture, 3.0f, true );
 
 ImplementFeatureType( MFT_AccuScale, MFG_PreTexture, 4.0f, true );
 ImplementFeatureType( MFT_AccuDirection, MFG_PreTexture, 4.0f, true );
@@ -42,6 +41,7 @@ ImplementFeatureType( MFT_DiffuseMap, MFG_Texture, 2.0f, true );
 ImplementFeatureType( MFT_OverlayMap, MFG_Texture, 3.0f, true );
 ImplementFeatureType( MFT_DetailMap, MFG_Texture, 4.0f, true );
 ImplementFeatureType( MFT_DiffuseColor, MFG_Texture, 5.0f, true );
+ImplementFeatureType( MFT_DiffuseVertColor, MFG_Texture, 6.0f, true );
 ImplementFeatureType( MFT_AlphaTest, MFG_Texture, 7.0f, true );
 ImplementFeatureType( MFT_SpecularMap, MFG_Texture, 8.0f, true );
 ImplementFeatureType( MFT_NormalMap, MFG_Texture, 9.0f, true );

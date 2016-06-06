@@ -468,4 +468,22 @@ void Px3Body::findContact(SceneObject **contactObject,
       }
    }
 
+}void Px3Body::moveKinematicTo(const MatrixF &transform)
+{
+   AssertFatal(mActor, "Px3Body::moveKinematicTo - The actor is null!");
+
+   const bool isKinematic = mBodyFlags & BF_KINEMATIC;
+   if (!isKinematic)
+   {
+      Con::errorf("Px3Body::moveKinematicTo is only for kinematic bodies.");
+      return;
+   }
+
+   mWorld->lockScene();
+
+   physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
+   actor->setKinematicTarget(px3Cast<physx::PxTransform>(transform));
+
+   mWorld->unlockScene();
 }
+

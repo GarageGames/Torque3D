@@ -918,9 +918,6 @@ function MaterialEditorGui::guiSync( %this, %material )
    MaterialEditorPropertiesWindow-->vertLitCheckbox.setValue((%material).vertLit[%layer]);
    MaterialEditorPropertiesWindow-->vertColorSwatch.color = (%material).vertColor[%layer];
    MaterialEditorPropertiesWindow-->subSurfaceCheckbox.setValue((%material).subSurface[%layer]);
-   MaterialEditorPropertiesWindow-->subSurfaceColorSwatch.color = (%material).subSurfaceColor[%layer];
-   MaterialEditorPropertiesWindow-->subSurfaceRolloffTextEdit.setText((%material).subSurfaceRolloff[%layer]);
-   MaterialEditorPropertiesWindow-->minnaertTextEdit.setText((%material).minnaertConstant[%layer]);
 
    // Animation properties
    MaterialEditorPropertiesWindow-->RotationAnimation.setValue(0);
