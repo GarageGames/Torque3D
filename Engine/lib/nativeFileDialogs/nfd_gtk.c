@@ -49,7 +49,8 @@ static void AddFiltersToDialog( GtkWidget *dialog, const char *filterList )
             char typebufWildcard[NFD_MAX_STRLEN];
             
             /* add another type to the filter */
-            if (strlen(typebuf) <= 0 || strlen(typebuf) > NFD_MAX_STRLEN-1) {
+            if (strlen(typebuf) <= 0 || strlen(typebuf) > NFD_MAX_STRLEN-1) 
+            {
               p_filterList++;
               continue;
             }
