@@ -1,0 +1,5 @@
+<GameObjectAsset
+    AssetName="ThirdPersonPlayerGameObjectAsset"
+    gameObjectName="ThirdPersonPlayer"
+    TAMLFilePath="scripts/server/gameObjects/ThirdPersonPlayerObject.taml"
+    scriptFilePath="scripts/server/gameObjects/ThirdPersonPlayerObject.cs"/>

@@ -76,7 +76,7 @@ AssetManager::AssetManager() :
     mMaxLoadedPrivateAssetsCount( 0 ),
     mAcquiredReferenceCount( 0 ),
     mEchoInfo( false ),
-    mIgnoreAutoUnload( false )
+    mIgnoreAutoUnload( true )
 {
 }
 

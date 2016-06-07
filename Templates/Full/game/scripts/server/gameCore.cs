@@ -573,6 +573,31 @@ function GameCore::onClientEnterGame(%game, %client)
       %client.isAiControlled(),
       %client.isAdmin,
       %client.isSuperAdmin);
+      
+   %entityIds = parseMissionGroupForIds("Entity", "");
+   %entityCount = getWordCount(%entityIds);
+   
+   for(%i=0; %i < %entityCount; %i++)
+   {
+      %entity = getWord(%entityIds, %i);
+      
+      for(%e=0; %e < %entity.getCount(); %e++)
+      {
+         %child = %entity.getObject(%e);
+         if(%child.getCLassName() $= "Entity")
+            %entityIds = %entityIds SPC %child.getID();  
+      }
+      
+      for(%c=0; %c < %entity.getComponentCount(); %c++)
+      {
+         %comp = %entity.getComponentByIndex(%c);
+         
+         if(%comp.isMethod("onClientConnect"))
+         {
+            %comp.onClientConnect(%client);  
+         }
+      }
+   }
 }
 
 function GameCore::onClientLeaveGame(%game, %client)
