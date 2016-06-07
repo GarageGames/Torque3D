@@ -36,7 +36,9 @@
    #include "gui/editor/editorFunctions.h"
 #endif
 #include "console/engineAPI.h"
-
+#ifdef TORQUE_EXPERIMENTAL_EC
+#include "T3D/entity.h"
+#endif
 
 IMPLEMENT_CONOBJECT(GuiTreeViewCtrl);
 
@@ -486,6 +488,14 @@ void GuiTreeViewCtrl::Item::getDisplayText(U32 bufLen, char *buf)
 {
    FrameAllocatorMarker txtAlloc;
 
+   //if we're doing the special case of forcing the item text, just skip the rest of this junk
+   if (mState.test(ForceItemName))
+   {
+      StringTableEntry text = (mScriptInfo.mText) ? mScriptInfo.mText : StringTable->EmptyString();
+      dStrncpy(buf, text, bufLen);
+      return;
+   }
+
    if( mState.test( InspectorData ) )
    {
       SimObject *pObject = getObject();
@@ -637,6 +647,20 @@ void GuiTreeViewCtrl::Item::getTooltipText(U32 bufLen, char *buf)
 
 bool GuiTreeViewCtrl::Item::isParent() const
 {
+#ifdef TORQUE_EXPERIMENTAL_EC
+   //We might have a special case with entities
+   //So if our entity either has children, or has some component with the EditorInspect interface, we return true
+   if (mInspectorInfo.mObject)
+   {
+      Entity* e = dynamic_cast<Entity*>(mInspectorInfo.mObject.getObject());
+      if (e)
+      {
+         if (e->size() > 0 || e->getComponentCount() != 0)
+            return true;
+      }
+   }
+#endif
+
    if(mState.test(VirtualParent))
    {
       if( !isInspectorData() )
@@ -1517,6 +1541,11 @@ S32 GuiTreeViewCtrl::getPrevSiblingItem(S32 itemId)
 bool GuiTreeViewCtrl::isValidDragTarget( Item* item )
 {
    bool isValid = true;
+   
+   // First, check if we're just going to override this from manually setting the ForceAllowDrag flag
+   // If that's set, we're assuming special circumstances and will just let it go on it's way
+   if (item->isDragTargetAllowed())
+      return true;
    
    // If this is inspector data, first make sure the item accepts all
    // selected objects as children.  This prevents bad surprises when
@@ -3462,6 +3491,11 @@ void GuiTreeViewCtrl::onMouseDragged(const GuiEvent &event)
    if (mSelectedItems.size() == 0)
       return;
       
+   //Check through to make sure all attempted dragged items even allow it
+   for (U32 i = 0; i < mSelectedItems.size(); i++)
+      if (!mSelectedItems[i]->isDragAllowed())
+         return;
+      
    // Give us a little delta before we actually start a mouse drag so that
    // if the user moves the mouse a little while clicking, he/she does not
    // accidentally trigger a drag.
@@ -3755,6 +3789,28 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
       item->setExpanded(!item->isExpanded());
       if( !item->isInspectorData() && item->mState.test(Item::VirtualParent) )
          onVirtualParentExpand(item);
+      
+#ifdef TORQUE_EXPERIMENTAL_EC
+      //Slightly hacky, but I'm not sure of a better setup until we get major update to the editors
+      //We check if our object is an entity, and if it is, we call a 'onInspect' function.
+      //This function is pretty much a special notifier to the entity so if it has any behaviors that do special
+      //stuff in the editor, it can fire that up
+      if (item->isInspectorData())
+      {
+         Entity* e = dynamic_cast<Entity*>(item->getObject());
+         //if (item->mScriptInfo.mText != StringTable->insert("Components"))
+         {
+            Entity* e = dynamic_cast<Entity*>(item->getObject());
+            if (e)
+            {
+               if (item->isExpanded())
+                  e->onInspect();
+               else
+                  e->onEndInspect();
+            }
+         }
+      }
+#endif
       
       mFlags.set( RebuildVisible );
       scrollVisible(item);
@@ -4492,6 +4548,13 @@ bool GuiTreeViewCtrl::objectSearch( const SimObject *object, Item **item )
       if ( !pItem )
          continue;
 
+#ifdef TORQUE_EXPERIMENTAL_EC
+      //A bit hackish, but we make a special exception here for items that are named 'Components', as they're merely
+      //virtual parents to act as a container to an Entity's components
+      if (pItem->mScriptInfo.mText == StringTable->insert("Components"))
+         continue;
+#endif
+
 		SimObject *pObj = pItem->getObject();
 
 		if ( pObj && pObj == object )
@@ -4555,6 +4618,11 @@ bool GuiTreeViewCtrl::onVirtualParentBuild(Item *item, bool bForceFullUpdate)
    
    // Go through our items and purge those that have disappeared from
    // the set.
+#ifdef TORQUE_EXPERIMENTAL_EC
+   //Entities will be a special case here, if we're an entity, skip this step
+   if (dynamic_cast<Entity*>(srcObj))
+      return true;
+#endif
    
    for( Item* ptr = item->mChild; ptr != NULL; )
    {

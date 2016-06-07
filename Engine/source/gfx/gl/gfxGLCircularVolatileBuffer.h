@@ -20,7 +20,8 @@ public:
    }
 
    void init(U32 start, U32 end)
-   {         
+   {  
+      PROFILE_SCOPE(GFXGLQueryFence_issue);
       mStart = start;
       mEnd = end;
       mSync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -35,7 +36,8 @@ public:
    }
 
    void wait()
-   {      
+   {   
+      PROFILE_SCOPE(GFXGLQueryFence_block);
       GLbitfield waitFlags = 0;
       GLuint64 waitDuration = 0;
       while( 1 ) 
@@ -158,7 +160,7 @@ public:
       const U32 cSizeInMB = 10;
       mBufferSize = (cSizeInMB << 20);
 
-      if( gglHasExtension(ARB_buffer_storage) )
+      if( GFXGL->mCapabilities.bufferStorage )
       {      
          const GLbitfield flags = GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT;
          glBufferStorage(mBinding, mBufferSize, NULL, flags);
@@ -198,7 +200,7 @@ public:
 
       outOffset = mBufferFreePos;
 
-      if( gglHasExtension(ARB_buffer_storage) )
+      if( GFXGL->mCapabilities.bufferStorage )
       {         
          outPtr = (U8*)(mBufferPtr) + mBufferFreePos; 
       }
@@ -227,7 +229,7 @@ public:
 
    void unlock()
    {
-      if( gglHasExtension(ARB_buffer_storage) )
+      if( GFXGL->mCapabilities.bufferStorage )
       {
          return;
       }

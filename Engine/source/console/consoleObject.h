@@ -473,6 +473,8 @@ public:
    enum FieldFlags
    {
       FIELD_HideInInspectors     = BIT( 0 ),    ///< Do not show the field in inspectors.
+      FIELD_ComponentInspectors = BIT(1),       ///< Custom fields used by components. They are likely to be non-standard size/configuration, so 
+                                                ///< They are handled specially
    };
 
    struct Field

@@ -378,3 +378,89 @@ void BtBody::setSimulationEnabled( bool enabled )
 
    mIsEnabled = enabled;
 }
+
+void BtBody::findContact(SceneObject **contactObject,
+   VectorF *contactNormal,
+   Vector<SceneObject*> *outOverlapObjects) const
+{
+   AssertFatal(mActor, "BtPlayer::findContact - The controller is null!");
+
+   VectorF normal;
+   F32 maxDot = -1.0f;
+
+   // Go thru the contact points... get the first contact.
+   //mWorld->getDynamicsWorld()->computeOverlappingPairs();
+   btOverlappingPairCache *pairCache = mWorld->getDynamicsWorld()->getBroadphase()->getOverlappingPairCache();
+
+   btBroadphasePairArray& pairArray = pairCache->getOverlappingPairArray();
+   U32 numPairs = pairArray.size();
+   btManifoldArray manifoldArray;
+
+   for (U32 i = 0; i < numPairs; i++)
+   {
+      const btBroadphasePair &pair = pairArray[i];
+
+      btBroadphasePair *collisionPair = pairCache->findPair(pair.m_pProxy0, pair.m_pProxy1);
+      if (!collisionPair || !collisionPair->m_algorithm)
+         continue;
+
+      btCollisionObject *other = (btCollisionObject*)pair.m_pProxy0->m_clientObject;
+      if (other == mActor)
+         other = (btCollisionObject*)pair.m_pProxy1->m_clientObject;
+
+     // AssertFatal(!outOverlapObjects->contains(PhysicsUserData::getObject(other->getUserPointer())),
+      //   "Got multiple pairs of the same object!");
+      outOverlapObjects->push_back(PhysicsUserData::getObject(other->getUserPointer()));
+
+      if (other->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE)
+         continue;
+
+      manifoldArray.clear();
+      collisionPair->m_algorithm->getAllContactManifolds(manifoldArray);
+
+      for (U32 j = 0; j < manifoldArray.size(); j++)
+      {
+         btPersistentManifold *manifold = manifoldArray[j];
+         btScalar directionSign = manifold->getBody0() == mActor ? 1.0f : -1.0f;
+
+         for (U32 p = 0; p < manifold->getNumContacts(); p++)
+         {
+            const btManifoldPoint &pt = manifold->getContactPoint(p);
+
+            // Test the normal... is it the most vertical one we got?
+            normal = btCast<Point3F>(pt.m_normalWorldOnB * directionSign);
+            F32 dot = mDot(normal, VectorF(0, 0, 1));
+            if (dot > maxDot)
+            {
+               maxDot = dot;
+
+               btCollisionObject *colObject = (btCollisionObject*)collisionPair->m_pProxy0->m_clientObject;
+               *contactObject = PhysicsUserData::getObject(colObject->getUserPointer());
+               *contactNormal = normal;
+            }
+         }
+      }
+   }
+}
+
+void BtBody::moveKinematicTo(const MatrixF &transform)
+{
+   AssertFatal(mActor, "BtBody::moveKinematicTo - The actor is null!");
+
+   U32 bodyflags = mActor->getCollisionFlags();
+   const bool isKinematic = bodyflags & BF_KINEMATIC;
+   if (!isKinematic)
+   {
+      Con::errorf("BtBody::moveKinematicTo is only for kinematic bodies.");
+      return;
+   }
+
+   if (mCenterOfMass)
+   {
+      MatrixF xfm;
+      xfm.mul(transform, *mCenterOfMass);
+      mActor->setCenterOfMassTransform(btCast<btTransform>(xfm));
+   }
+   else
+      mActor->setCenterOfMassTransform(btCast<btTransform>(transform));
+}

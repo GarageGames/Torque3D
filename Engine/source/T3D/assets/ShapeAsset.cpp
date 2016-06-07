@@ -100,8 +100,6 @@ mAcquireReferenceCount(0),
 mpOwningAssetManager(NULL),
 mAssetInitialized(false)
 {
-   // Generate an asset definition.
-   mpAssetDefinition = new AssetDefinition();
 }
 
 //-----------------------------------------------------------------------------
@@ -154,4 +152,8 @@ void ShapeAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
+}
+
+void ShapeAsset::onAssetRefresh(void)
+{
 }

@@ -78,7 +78,7 @@ void GFXGLWindowTarget::resolveTo(GFXTextureObject* obj)
    AssertFatal(dynamic_cast<GFXGLTextureObject*>(obj), "GFXGLTextureTarget::resolveTo - Incorrect type of texture, expected a GFXGLTextureObject");
    GFXGLTextureObject* glTexture = static_cast<GFXGLTextureObject*>(obj);
 
-   if( gglHasExtension(ARB_copy_image) )
+   if( GFXGL->mCapabilities.copyImage )
    {
       if(mBackBufferColorTex.getWidth() == glTexture->getWidth()
          && mBackBufferColorTex.getHeight() == glTexture->getHeight()

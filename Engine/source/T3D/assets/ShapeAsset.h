@@ -19,8 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#ifndef _SHAPE_ASSET_H_
-#define _SHAPE_ASSET_H_
+#ifndef SHAPE_ASSET_H
+#define SHAPE_ASSET_H
 
 #ifndef _ASSET_BASE_H_
 #include "assets/assetBase.h"
@@ -76,11 +76,13 @@ public:
 
    TSShape* getShape() { return mShape; }
 
+   Resource<TSShape> getShapeResource() { return mShape; }
+
 protected:
-   virtual void            onAssetRefresh(void) {}
+   virtual void            onAssetRefresh(void);
 };
 
 DefineConsoleType(TypeShapeAssetPtr, ShapeAsset)
 
-#endif // _ASSET_BASE_H_
+#endif
 

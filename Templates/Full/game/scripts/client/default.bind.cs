@@ -618,7 +618,12 @@ GlobalActionMap.bind(keyboard, "ctrl o", bringUpOptions);
 function showMetrics(%val)
 {
    if(%val)
-      metrics("fps gfx shadow sfx terrain groundcover forest net");
+   {
+      if(!Canvas.isMember(FrameOverlayGui))
+         metrics("fps gfx shadow sfx terrain groundcover forest net");
+      else
+         metrics("");
+   }
 }
 GlobalActionMap.bind(keyboard, "ctrl F2", showMetrics);
 

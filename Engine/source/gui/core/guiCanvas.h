@@ -37,7 +37,7 @@
 #include "core/util/tSignal.h"
 #endif
 
-#include "component/interfaces/IProcessInput.h"
+#include "platform/input/IProcessInput.h"
 #include "windowManager/platformWindowMgr.h"
 #include "gfx/gfxFence.h"
 

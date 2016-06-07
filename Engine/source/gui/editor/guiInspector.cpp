@@ -29,6 +29,11 @@
 #include "gui/containers/guiScrollCtrl.h"
 #include "gui/editor/inspector/customField.h"
 
+#ifdef TORQUE_EXPERIMENTAL_EC
+#include "gui/editor/inspector/entityGroup.h"
+#include "gui/editor/inspector/mountingGroup.h"
+#include "gui/editor/inspector/componentGroup.h"
+#endif
 
 IMPLEMENT_CONOBJECT(GuiInspector);
 
@@ -583,6 +588,43 @@ void GuiInspector::refresh()
    general->registerObject();
    mGroups.push_back(general);
    addObject(general);
+
+#ifdef TORQUE_EXPERIMENTAL_EC
+   //Entity inspector group
+   if (mTargets.first()->getClassRep()->isSubclassOf("Entity"))
+   {
+      GuiInspectorEntityGroup *components = new GuiInspectorEntityGroup("Components", this);
+      if (components != NULL)
+      {
+         components->registerObject();
+         mGroups.push_back(components);
+         addObject(components);
+      }
+
+      //Mounting group override
+      GuiInspectorGroup *mounting = new GuiInspectorMountingGroup("Mounting", this);
+      if (mounting != NULL)
+      {
+         mounting->registerObject();
+         mGroups.push_back(mounting);
+         addObject(mounting);
+      }
+   }
+
+   if (mTargets.first()->getClassRep()->isSubclassOf("Component"))
+   {
+      //Build the component field groups as the component describes it
+      Component* comp = dynamic_cast<Component*>(mTargets.first().getPointer());
+
+      if (comp->getComponentFieldCount() > 0)
+      {
+         GuiInspectorComponentGroup *compGroup = new GuiInspectorComponentGroup("Component Fields", this);
+         compGroup->registerObject();
+         mGroups.push_back(compGroup);
+         addObject(compGroup);
+      }
+   }
+#endif
 
    // Create the inspector groups for static fields.
 

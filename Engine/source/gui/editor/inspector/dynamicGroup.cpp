@@ -26,6 +26,10 @@
 #include "gui/editor/inspector/dynamicField.h"
 #include "console/engineAPI.h"
 
+#ifdef TORQUE_EXPERIMENTAL_EC
+#include "T3D/components/component.h"
+#endif
+
 IMPLEMENT_CONOBJECT(GuiInspectorDynamicGroup);
 
 ConsoleDocClass( GuiInspectorDynamicGroup,
@@ -122,6 +126,16 @@ bool GuiInspectorDynamicGroup::inspectGroup()
       SimFieldDictionary * fieldDictionary = target->getFieldDictionary();
       for(SimFieldDictionaryIterator ditr(fieldDictionary); *ditr; ++ditr)
       {
+#ifdef TORQUE_EXPERIMENTAL_EC
+         if (target->getClassRep()->isSubclassOf("Component"))
+         {
+            Component* compTarget = dynamic_cast<Component*>(target);
+
+            ComponentField* compField = compTarget->getComponentField((*ditr)->slotName);
+            if (compField)
+               continue;
+         }
+#endif
          if( i == 0 )
          {
             flist.increment();

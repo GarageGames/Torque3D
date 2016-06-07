@@ -56,54 +56,32 @@ void GFXGLCardProfiler::setupCardCapabilities()
 {
    GLint maxTexSize;
    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTexSize);
-
-   const char* versionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));
-   F32 glVersion = dAtof(versionString);
    
    // OpenGL doesn't have separate maximum width/height.
    setCapability("maxTextureWidth", maxTexSize);
    setCapability("maxTextureHeight", maxTexSize);
    setCapability("maxTextureSize", maxTexSize);
 
-   // If extensions haven't been inited, we're in trouble here.
-   bool suppVBO = (gglHasExtension(ARB_vertex_buffer_object) || glVersion >= 1.499f);
-   setCapability("GL::suppVertexBufferObject", suppVBO);
-
-   // check if render to texture supported is available
-   bool suppRTT = gglHasExtension(EXT_framebuffer_object);
-   setCapability("GL::suppRenderTexture", suppRTT);
-   
-   bool suppBlit = gglHasExtension(EXT_framebuffer_blit);
-   setCapability("GL::suppRTBlit", suppBlit);
-   
-   bool suppFloatTex = gglHasExtension(ARB_texture_float);
-   setCapability("GL::suppFloatTexture", suppFloatTex);
-
    // Check for anisotropic filtering support.
-   bool suppAnisotropic = gglHasExtension( EXT_texture_filter_anisotropic );
-   setCapability( "GL::suppAnisotropic", suppAnisotropic );
+   setCapability("GL_EXT_texture_filter_anisotropic", gglHasExtension(EXT_texture_filter_anisotropic));
 
-   // check to see if we have the fragment shader extension or the gl version is high enough for glsl to be core
-   // also check to see if the language version is high enough
-   F32 glslVersion = dAtof(reinterpret_cast<const char*>(glGetString( GL_SHADING_LANGUAGE_VERSION)));
-   bool suppSPU = (gglHasExtension(ARB_fragment_shader) || glVersion >= 1.999f) && glslVersion >= 1.0999;
-   setCapability("GL::suppFragmentShader", suppSPU);
-   
-   bool suppAppleFence = gglHasExtension(APPLE_fence);
-   setCapability("GL::APPLE::suppFence", suppAppleFence);
-   
-   // When enabled, call glGenerateMipmapEXT() to generate mipmaps instead of relying on GL_GENERATE_MIPMAP
-   setCapability("GL::Workaround::needsExplicitGenerateMipmap", false);
-   // When enabled, binds and unbinds a texture target before doing the depth buffer copy.  Failure to do
-   // so will cause a hard freeze on Mac OS 10.4 with a Radeon X1600
-   setCapability("GL::Workaround::X1600DepthBufferCopy", false);
-   // When enabled, does not copy the last column and row of the depth buffer in a depth buffer copy.  Failure
-   // to do so will cause a kernel panic on Mac OS 10.5(.1) with a Radeon HD 2600 (fixed in 10.5.2)
-   setCapability("GL::Workaround::HD2600DepthBufferCopy", false);
-   
-   // Certain Intel drivers have a divide by 0 crash if mipmaps are specified with
-   // glTexSubImage2D.
-   setCapability("GL::Workaround::noManualMips", false);
+   // Check for buffer storage
+   setCapability("GL_ARB_buffer_storage", gglHasExtension(ARB_buffer_storage));
+
+   // Check for shader model 5.0
+   setCapability("GL_ARB_gpu_shader5", gglHasExtension(ARB_gpu_shader5));
+
+   // Check for texture storage
+   setCapability("GL_ARB_texture_storage", gglHasExtension(ARB_texture_storage));
+
+   // Check for sampler objects
+   setCapability("GL_ARB_sampler_objects", gglHasExtension(ARB_sampler_objects));
+
+   // Check for copy image support
+   setCapability("GL_ARB_copy_image", gglHasExtension(ARB_copy_image));
+
+   // Check for vertex attrib binding
+   setCapability("GL_ARB_vertex_attrib_binding", gglHasExtension(ARB_vertex_attrib_binding));
 }
 
 bool GFXGLCardProfiler::_queryCardCap(const String& query, U32& foundResult)
