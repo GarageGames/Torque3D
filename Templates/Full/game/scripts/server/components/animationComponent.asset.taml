@@ -1,0 +1,7 @@
+<ComponentAsset
+    AssetName="AnimationComponentAsset"
+    componentName=""
+    componentClass="AnimationComponent"
+    friendlyName="Animation"
+    componentType="Animation"
+    description="Allows a mesh component to be animated."/>

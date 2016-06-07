@@ -1,0 +1,13 @@
+<ModuleDefinition
+	ModuleId="Scripts"
+	VersionId="1"
+	Description="Default module for the Full template game assets."
+	ScriptFile=""
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Game"
+	Dependencies="">
+    <DeclaredAssets
+      Extension="asset.taml"
+      Recurse="true"/>
+</ModuleDefinition>

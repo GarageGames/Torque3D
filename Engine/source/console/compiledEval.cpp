@@ -994,6 +994,7 @@ breakContinue:
                   // This error is usually caused by failing to call Parent::initPersistFields in the class' initPersistFields().
                   Con::warnf(ConsoleLogEntry::General, "%s: Register object failed for object %s of class %s.", getFileLine(ip), currentNewObject->getName(), currentNewObject->getClassName());
                   delete currentNewObject;
+                  currentNewObject = NULL;
                   ip = failJump;
                   // Prevent stack value corruption
                   CSTK.popFrame();
@@ -1094,6 +1095,9 @@ breakContinue:
 
          case OP_FINISH_OBJECT:
          {
+            if (currentNewObject)
+               currentNewObject->onPostAdd();
+
             //Assert( objectCreationStackIndex >= 0 );
             // Restore the object info from the stack [7/9/2007 Black]
             currentNewObject = objectCreationStack[ --objectCreationStackIndex ].newObject;

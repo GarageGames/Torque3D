@@ -1,0 +1,7 @@
+<ComponentAsset
+    AssetName="PlayerSpawnerComponentAsset"
+    componentName="PlayerSpawner"
+    componentClass="Component"
+    friendlyName="Player Spawner"
+    componentType="Game"
+    description="When a client connects, it spawns a player object for them and attaches them to it."/>
