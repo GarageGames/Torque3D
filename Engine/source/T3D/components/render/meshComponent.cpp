@@ -167,7 +167,8 @@ bool MeshComponent::setMeshAsset(const char* assetName)
 {
    // Fetch the asset Id.
    mMeshAssetId = StringTable->insert(assetName);
-   mMeshAsset.setAssetId(mMeshAssetId);
+
+   mMeshAsset = mMeshAssetId;
 
    if (mMeshAsset.isNull())
    {

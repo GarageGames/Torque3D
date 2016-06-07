@@ -79,7 +79,7 @@ public:
    Resource<TSShape> getShapeResource() { return mShape; }
 
 protected:
-   virtual void            onAssetRefresh(void) {}
+   virtual void            onAssetRefresh(void);
 };
 
 DefineConsoleType(TypeShapeAssetPtr, ShapeAsset)
