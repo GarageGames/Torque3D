@@ -228,9 +228,9 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
 
 static void _fastTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
 {
-   glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, texture->getBuffer());
+   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, texture->getBuffer());
    U32 bufSize = pDL->getWidth(0) * pDL->getHeight(0) * pDL->getBytesPerPixel();
-   glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, bufSize, NULL, GL_STREAM_DRAW);
+   glBufferData(GL_PIXEL_UNPACK_BUFFER, bufSize, NULL, GL_STREAM_DRAW);
    
    if(pDL->getFormat() == GFXFormatR8G8B8A8 || pDL->getFormat() == GFXFormatR8G8B8X8)
    {
@@ -238,12 +238,12 @@ static void _fastTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
       FrameAllocatorMarker mem;
       U8* pboMemory = (U8*)mem.alloc(bufSize);
       GFX->getDeviceSwizzle32()->ToBuffer(pboMemory, pDL->getBits(0), bufSize);
-      glBufferSubData(GL_PIXEL_UNPACK_BUFFER_ARB, 0, bufSize, pboMemory );
+      glBufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, bufSize, pboMemory );
    }
    else
    {
       PROFILE_SCOPE(SwizzleNull_Upload);
-      glBufferSubData(GL_PIXEL_UNPACK_BUFFER_ARB, 0, bufSize, pDL->getBits(0) );
+      glBufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, bufSize, pDL->getBits(0) );
    }
    
    if(texture->getBinding() == GL_TEXTURE_2D)
@@ -251,7 +251,7 @@ static void _fastTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
    else
 	   glTexSubImage1D(texture->getBinding(), 0, 0, (pDL->getWidth(0) > 1 ? pDL->getWidth(0) : pDL->getHeight(0)), GFXGLTextureFormat[pDL->getFormat()], GFXGLTextureType[pDL->getFormat()], NULL);
    
-   glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 static void _slowTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
