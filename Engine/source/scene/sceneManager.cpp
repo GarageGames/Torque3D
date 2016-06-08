@@ -256,7 +256,7 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       GFX->setWorldMatrix(worldEyeTransforms[0]);
 
       Frustum gfxFrustum = originalFrustum;
-      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[0], eyeTransforms[0]);
+      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[0]);
       GFX->setFrustum(gfxFrustum);
 
       SceneCameraState cameraStateLeft = SceneCameraState::fromGFX();
@@ -277,7 +277,7 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       GFX->setWorldMatrix(worldEyeTransforms[1]);
 
       gfxFrustum = originalFrustum;
-      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[1], eyeTransforms[1]);
+      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[1]);
       GFX->setFrustum(gfxFrustum);
 
       SceneCameraState cameraStateRight = SceneCameraState::fromGFX();
