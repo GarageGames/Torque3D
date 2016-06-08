@@ -123,7 +123,7 @@ public:
    GuiTSCtrl();
 
    void onPreRender();
-   void _internalRender(RectI viewport, Frustum &frustum);
+   void _internalRender(RectI guiViewport, RectI renderViewport, Frustum &frustum);
    void onRender(Point2I offset, const RectI &updateRect);
    virtual bool processCameraQuery(CameraQuery *query);
 
