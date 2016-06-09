@@ -65,7 +65,11 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    // accu map
    Var *accuMap = new Var;
-   accuMap->setType( "sampler2D" );
+   if (mIsDirect3D11)
+      accuMap->setType("SamplerState");
+   else
+      accuMap->setType("sampler2D");
+
    accuMap->setName( "accuMap" );
    accuMap->uniform = true;
    accuMap->sampler = true;
