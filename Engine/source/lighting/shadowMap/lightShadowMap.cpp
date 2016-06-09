@@ -313,9 +313,11 @@ void LightShadowMap::render(  RenderPassManager* renderPass,
         return;
     mStaticRefreshTimer->reset();
 
+    /* TODO: find out why this is causing issue with translucent objects
     if (_dynamic && (mDynamicRefreshTimer->getElapsedMs() < getLightInfo()->getDynamicRefreshFreq()))
         return;
     mDynamicRefreshTimer->reset();
+    */
 
    mDebugTarget.setTexture( NULL );
    _render( renderPass, diffuseState );
