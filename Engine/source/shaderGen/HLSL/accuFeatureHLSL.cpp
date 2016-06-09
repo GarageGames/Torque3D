@@ -65,7 +65,11 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    // accu map
    Var *accuMap = new Var;
-   accuMap->setType( "sampler2D" );
+   if (mIsDirect3D11)
+      accuMap->setType("SamplerState");
+   else
+      accuMap->setType("sampler2D");
+
    accuMap->setName( "accuMap" );
    accuMap->uniform = true;
    accuMap->sampler = true;
@@ -166,7 +170,7 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    meta->addStatement( new GenOp( "   @.z *= @*2.0;\r\n", accuVec, accuDirection ) );
 
    // saturate based on strength
-   meta->addStatement( new GenOp( "   @ = saturate( dot( @, @.xyz * pow(@, 5) ) );\r\n", plcAccu, bumpNorm, accuVec, accuStrength ) );
+   meta->addStatement( new GenOp( "   @ = saturate( dot( @.xyz, @.xyz * pow(@, 5) ) );\r\n", plcAccu, bumpNorm, accuVec, accuStrength ) );
 
    // add coverage
    meta->addStatement( new GenOp( "   @.a += (2 * pow(@/2, 5)) - 0.5;\r\n", accuPlc, accuCoverage ) );
