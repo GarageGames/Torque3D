@@ -902,6 +902,7 @@ breakContinue:
 
                      // Fail to create the object.
                      delete object;
+                     currentNewObject = NULL;
                      ip = failJump;
                      break;
                   }
@@ -1016,6 +1017,7 @@ breakContinue:
                Con::errorf(ConsoleLogEntry::General, "%s: preload failed for %s: %s.", getFileLine(ip),
                            currentNewObject->getName(), errorStr.c_str());
                dataBlock->deleteObject();
+               currentNewObject = NULL;
                ip = failJump;
 			   
                // Prevent stack value corruption
