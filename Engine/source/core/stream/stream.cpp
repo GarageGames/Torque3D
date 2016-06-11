@@ -155,7 +155,7 @@ void Stream::readLongString(U32 maxStringLen, char *stringBuf)
 {
    U32 len;
    read(&len);
-   if(len > maxStringLen)
+   if(len >= maxStringLen)
    {
       m_streamStatus = IOError;
       return;
