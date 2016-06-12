@@ -160,7 +160,7 @@ void AIPlayer::initPersistFields()
       addField("allowDrop", TypeBool, Offset(mLinkTypes.drop, AIPlayer),
          "Allow the character to use drop links.");
       addField("allowSwim", TypeBool, Offset(mLinkTypes.swim, AIPlayer),
-         "Allow the character tomove in water.");
+         "Allow the character to move in water.");
       addField("allowLedge", TypeBool, Offset(mLinkTypes.ledge, AIPlayer),
          "Allow the character to jump ledges.");
       addField("allowClimb", TypeBool, Offset(mLinkTypes.climb, AIPlayer),
