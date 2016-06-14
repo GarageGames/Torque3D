@@ -6,6 +6,12 @@
 #include "T3D/gameBase/gameConnection.h"
 #include "gui/core/guiCanvas.h"
 #include "postFx/postEffectCommon.h"
+#include "renderInstance/renderPassManager.h"
+#include "scene/sceneRenderState.h"
+#include "materials/baseMatInstance.h"
+#include "materials/materialManager.h"
+#include "console/consoleInternal.h"
+#include "core/stream/fileStream.h"
 
 #include "gfx/D3D11/gfxD3D11Device.h"
 #include "gfx/D3D11/gfxD3D11TextureObject.h"
@@ -17,11 +23,19 @@
 #include "gfx/D3D9/gfxD3D9TextureObject.h"
 #include "gfx/D3D9/gfxD3D9EnumTranslate.h"
 
+#include "materials/matTextureTarget.h"
+
 #ifdef TORQUE_OPENGL
 #include "gfx/gl/gfxGLDevice.h"
 #include "gfx/gl/gfxGLTextureObject.h"
 #include "gfx/gl/gfxGLEnumTranslate.h"
 #endif
+
+struct OpenVRLoadedTexture
+{
+	vr::TextureID_t texId;
+	NamedTexTarget texTarget;
+};
 
 AngAxisF gLastMoveRot; // jamesu - this is just here for temp debugging
 
@@ -74,6 +88,8 @@ namespace OpenVRUtil
       return outMat;
    }
 
+
+
    void convertMatrixFPlainToSteamVRAffineMatrix(const MatrixF &inMat, vr::HmdMatrix34_t &outMat)
    {
       Point4F row0; inMat.getRow(0, &row0);
@@ -123,6 +139,114 @@ namespace OpenVRUtil
       bounds.vMax = (rect.point.y + rect.extent.y) * yRatio;
       return bounds;
    }
+
+   String GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL)
+   {
+	   uint32_t unRequiredBufferLen = pHmd->GetStringTrackedDeviceProperty(unDevice, prop, NULL, 0, peError);
+	   if (unRequiredBufferLen == 0)
+		   return "";
+
+	   char *pchBuffer = new char[unRequiredBufferLen];
+	   unRequiredBufferLen = pHmd->GetStringTrackedDeviceProperty(unDevice, prop, pchBuffer, unRequiredBufferLen, peError);
+	   String sResult = pchBuffer;
+	   delete[] pchBuffer;
+	   return sResult;
+   }
+
+}
+
+//------------------------------------------------------------
+
+bool OpenVRRenderModel::init(const vr::RenderModel_t & vrModel, StringTableEntry materialName)
+{
+	SAFE_DELETE(mMaterialInstance);
+	mMaterialInstance = MATMGR->createMatInstance(materialName, getGFXVertexFormat< VertexType >());
+	if (!mMaterialInstance)
+		return false;
+
+	mLocalBox = Box3F::Invalid;
+
+	// Prepare primitives
+	U16 *indPtr = NULL;
+	GFXPrimitive *primPtr = NULL;
+	mPrimitiveBuffer.set(GFX, vrModel.unTriangleCount * 3, 1, GFXBufferTypeStatic, "OpenVR Controller buffer");
+
+	mPrimitiveBuffer.lock(&indPtr, &primPtr);
+	if (!indPtr || !primPtr)
+		return false;
+
+	primPtr->minIndex = 0;
+	primPtr->numPrimitives = vrModel.unTriangleCount;
+	primPtr->numVertices = vrModel.unVertexCount;
+	primPtr->startIndex = 0;
+	primPtr->startVertex = 0;
+	primPtr->type = GFXTriangleList;
+
+	//dMemcpy(indPtr, vrModel.rIndexData, sizeof(U16) * vrModel.unTriangleCount * 3);
+
+	for (U32 i = 0; i < vrModel.unTriangleCount; i++)
+	{
+		const U32 idx = i * 3;
+		indPtr[idx + 0] = vrModel.rIndexData[idx + 2];
+		indPtr[idx + 1] = vrModel.rIndexData[idx + 1];
+		indPtr[idx + 2] = vrModel.rIndexData[idx + 0];
+	}
+
+	mPrimitiveBuffer.unlock();
+
+	// Prepare verts
+	mVertexBuffer.set(GFX, vrModel.unVertexCount, GFXBufferTypeStatic);
+	VertexType *vertPtr = mVertexBuffer.lock();
+	if (!vertPtr)
+		return false;
+
+	// Convert to torque coordinate system
+	for (U32 i = 0; i < vrModel.unVertexCount; i++)
+	{
+		const vr::RenderModel_Vertex_t &vert = vrModel.rVertexData[i];
+		vertPtr->point = OpenVRUtil::convertPointFromOVR(vert.vPosition);
+		vertPtr->point.x = -vertPtr->point.x;
+		vertPtr->point.y = -vertPtr->point.y;
+		vertPtr->point.z = -vertPtr->point.z;
+		vertPtr->normal = OpenVRUtil::convertPointFromOVR(vert.vNormal);
+		vertPtr->normal.x = -vertPtr->normal.x;
+		vertPtr->normal.y = -vertPtr->normal.y;
+		vertPtr->normal.z = -vertPtr->normal.z;
+		vertPtr->texCoord = Point2F(vert.rfTextureCoord[0], vert.rfTextureCoord[1]);
+		vertPtr++;
+	}
+
+	mVertexBuffer.unlock();
+
+	for (U32 i = 0, sz = vrModel.unVertexCount; i < sz; i++)
+	{
+		Point3F pos = Point3F(vrModel.rVertexData[i].vPosition.v[0], vrModel.rVertexData[i].vPosition.v[1], vrModel.rVertexData[i].vPosition.v[2]);
+		mLocalBox.extend(pos);
+	}
+
+	return true;
+}
+
+void OpenVRRenderModel::draw(SceneRenderState *state, MeshRenderInst* renderInstance)
+{
+	renderInstance->type = RenderPassManager::RIT_Mesh;
+	renderInstance->matInst = state->getOverrideMaterial(mMaterialInstance);
+	if (!renderInstance->matInst)
+		return;
+
+	renderInstance->vertBuff = &mVertexBuffer;
+	renderInstance->primBuff = &mPrimitiveBuffer;
+	renderInstance->prim = NULL;
+	renderInstance->primBuffIndex = 0;
+
+	if (renderInstance->matInst->getMaterial()->isTranslucent())
+	{
+		renderInstance->type = RenderPassManager::RIT_Translucent;
+		renderInstance->translucentSort = true;
+	}
+
+	renderInstance->defaultKey = renderInstance->matInst->getStateHint();
+	renderInstance->defaultKey2 = (uintptr_t)renderInstance->vertBuff;
 }
 
 //------------------------------------------------------------
@@ -207,6 +331,16 @@ ImplementEnumType(OpenVRState,
 { vr::VRState_Ready, "Ready" },
 { vr::VRState_Ready_Alert, "Ready_Alert" },
 { vr::VRState_NotReady, "NotReady" },
+EndImplementEnumType;
+
+ImplementEnumType(OpenVRTrackedDeviceClass,
+	"Types of devices which are tracked .\n\n"
+	"@ingroup OpenVR")
+{ vr::TrackedDeviceClass_Invalid, "Invalid" },
+{ vr::TrackedDeviceClass_HMD, "HMD" },
+{ vr::TrackedDeviceClass_Controller, "Controller" },
+{ vr::TrackedDeviceClass_TrackingReference, "TrackingReference" },
+{ vr::TrackedDeviceClass_Other, "Other" },
 EndImplementEnumType;
 
 //------------------------------------------------------------
@@ -371,7 +505,7 @@ OpenVRProvider::OpenVRProvider() :
    INPUTMGR->registerDevice(this);
    dMemset(&mLUID, '\0', sizeof(mLUID));
 
-   mTrackingSpace = vr::TrackingUniverseSeated;
+   mTrackingSpace = vr::TrackingUniverseStanding;
 }
 
 OpenVRProvider::~OpenVRProvider()
@@ -404,6 +538,8 @@ void OpenVRProvider::staticInit()
 
 bool OpenVRProvider::enable()
 {
+   mOpenVRNS = Namespace::find(StringTable->insert("OpenVR"));
+
    disable();
 
    // Load openvr runtime
@@ -479,11 +615,18 @@ bool OpenVRProvider::enable()
    mDriver = GetTrackedDeviceString(mHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_TrackingSystemName_String);
    mDisplay = GetTrackedDeviceString(mHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String);
 
+   mHMDRenderState.mHMDPose = MatrixF(1);
+   mHMDRenderState.mEyePose[0] = MatrixF(1);
+   mHMDRenderState.mEyePose[1] = MatrixF(1);
+
    mHMDRenderState.reset(mHMD);
    mHMD->ResetSeatedZeroPose();
    dMemset(mPreviousInputTrackedDevicePose, '\0', sizeof(mPreviousInputTrackedDevicePose));
 
    mEnabled = true;
+
+   dMemset(mCurrentControllerState, '\0', sizeof(mCurrentControllerState));
+   dMemset(mPreviousCurrentControllerState, '\0', sizeof(mPreviousCurrentControllerState));
 
    return true;
 }
@@ -614,7 +757,7 @@ bool OpenVRProvider::process()
       vr::VRControllerState_t state;
       if (mHMD->GetControllerState(unDevice, &state))
       {
-         // TODO
+		  mCurrentControllerState[unDevice] = state;
       }
    }
 
@@ -643,7 +786,21 @@ void OpenVRTransformToRotPos(MatrixF mat, QuatF &outRot, Point3F &outPos)
 
    Point3F pos = torqueMat.getPosition();
    outRot = QuatF(torqueMat);
-   outPos = pos;// Point3F(-pos.x, pos.z, -pos.y);
+   outPos = pos;
+   outRot.mulP(pos, &outPos); // jamesu - position needs to be multiplied by rotation in this case
+}
+
+void OpenVRTransformToRotPosMat(MatrixF mat, QuatF &outRot, Point3F &outPos, MatrixF &outMat)
+{
+	// Directly set the rotation and position from the eye transforms
+	MatrixF torqueMat(1);
+	OpenVRUtil::convertTransformFromOVR(mat, torqueMat);
+
+	Point3F pos = torqueMat.getPosition();
+	outRot = QuatF(torqueMat);
+	outPos = pos;
+	outRot.mulP(pos, &outPos); // jamesu - position needs to be multiplied by rotation in this case
+	outMat = torqueMat;
 }
 
 void OpenVRProvider::getFrameEyePose(IDevicePose *pose, S32 eyeId) const
@@ -655,15 +812,29 @@ void OpenVRProvider::getFrameEyePose(IDevicePose *pose, S32 eyeId) const
 		// NOTE: this is codename for "head"
 		MatrixF mat = mHMDRenderState.mHMDPose; // same order as in the openvr example
 
+#ifdef DEBUG_DISPLAY_POSE
+		pose->originalMatrix = mat;
+		OpenVRTransformToRotPosMat(mat, pose->orientation, pose->position, pose->actualMatrix);
+#else
 		OpenVRTransformToRotPos(mat, pose->orientation, pose->position);
+#endif
+
 		pose->velocity = Point3F(0);
 		pose->angularVelocity = Point3F(0);
 	}
 	else
 	{
 		MatrixF mat = mHMDRenderState.mEyePose[eyeId] * mHMDRenderState.mHMDPose; // same order as in the openvr example
+		//mat =  mHMDRenderState.mHMDPose * mHMDRenderState.mEyePose[eyeId]; // same order as in the openvr example
 
+
+#ifdef DEBUG_DISPLAY_POSE
+		pose->originalMatrix = mat;
+		OpenVRTransformToRotPosMat(mat, pose->orientation, pose->position, pose->actualMatrix);
+#else
 		OpenVRTransformToRotPos(mat, pose->orientation, pose->position);
+#endif
+
 		pose->velocity = Point3F(0);
 		pose->angularVelocity = Point3F(0);
 	}
@@ -914,10 +1085,14 @@ S32 OpenVRProvider::getDisplayDeviceId() const
 	return -1;
 }
 
-void OpenVRProvider::processVREvent(const vr::VREvent_t & event)
+void OpenVRProvider::processVREvent(const vr::VREvent_t & evt)
 {
-   switch (event.eventType)
+   mVREventSignal.trigger(evt);
+   switch (evt.eventType)
    {
+   case vr::VREvent_InputFocusCaptured:
+	   //Con::executef()
+	   break;
    case vr::VREvent_TrackedDeviceActivated:
    {
       // Setup render model
@@ -969,6 +1144,8 @@ void OpenVRProvider::updateTrackedPoses()
          if (nDevice == vr::k_unTrackedDeviceIndex_Hmd)
          {
             mHMDRenderState.mHMDPose = mat;
+
+			/*
             MatrixF rotOffset(1);
             EulerF localRot(-smHMDRotOffset.x, -smHMDRotOffset.z, smHMDRotOffset.y);
 
@@ -978,6 +1155,7 @@ void OpenVRProvider::updateTrackedPoses()
             QuatF(localRot).setMatrix(&rotOffset);
             rotOffset.inverse();
             mHMDRenderState.mHMDPose = mat = rotOffset * mHMDRenderState.mHMDPose;
+			*/
 
             // jamesu - store the last rotation for temp debugging
             MatrixF torqueMat(1);
@@ -989,6 +1167,11 @@ void OpenVRProvider::updateTrackedPoses()
 
          vr::TrackedDevicePose_t &outPose = mTrackedDevicePose[nDevice];
          OpenVRTransformToRotPos(mat, inPose.orientation, inPose.position);
+
+#ifdef DEBUG_DISPLAY_POSE
+		 OpenVRUtil::convertTransformFromOVR(mat, inPose.actualMatrix);
+		 inPose.originalMatrix = mat;
+#endif
 
          inPose.state = outPose.eTrackingResult;
          inPose.valid = outPose.bPoseIsValid;
@@ -1012,18 +1195,23 @@ void OpenVRProvider::submitInputChanges()
       IDevicePose curPose = mCurrentDevicePose[i];
       IDevicePose prevPose = mPreviousInputTrackedDevicePose[i];
 
+	  S32 eventIdx = -1;
+	  
+	  if (!mDeviceEventMap.tryGetValue(i, eventIdx) || eventIdx < 0)
+		  continue;
+
       if (!curPose.valid || !curPose.connected)
          continue;
 
       if (curPose.orientation != prevPose.orientation)
       {
          AngAxisF axisAA(curPose.orientation);
-         INPUTMGR->buildInputEvent(mDeviceType, 0, SI_ROT, OVR_SENSORROT[i], SI_MOVE, axisAA);
+         INPUTMGR->buildInputEvent(mDeviceType, 0, SI_ROT, OVR_SENSORROT[eventIdx], SI_MOVE, axisAA);
       }
 
       if (curPose.position != prevPose.position)
       {
-         INPUTMGR->buildInputEvent(mDeviceType, 0, SI_POS, OVR_SENSORPOSITION[i], SI_MOVE, curPose.position);
+         INPUTMGR->buildInputEvent(mDeviceType, 0, SI_POS, OVR_SENSORPOSITION[eventIdx], SI_MOVE, curPose.position);
       }
 
       if (curPose.velocity != prevPose.velocity)
@@ -1034,7 +1222,7 @@ void OpenVRProvider::submitInputChanges()
          angles.y = curPose.velocity.y;
          angles.z = curPose.velocity.z;
 
-         INPUTMGR->buildInputEvent(mDeviceType, 0, SI_POS, OVR_SENSORVELOCITY[i], SI_MOVE, angles);
+         INPUTMGR->buildInputEvent(mDeviceType, 0, SI_POS, OVR_SENSORVELOCITY[eventIdx], SI_MOVE, angles);
       }
 
       if (curPose.angularVelocity != prevPose.angularVelocity)
@@ -1045,7 +1233,7 @@ void OpenVRProvider::submitInputChanges()
          angles[1] = mRadToDeg(curPose.velocity.y);
          angles[2] = mRadToDeg(curPose.velocity.z);
 
-         INPUTMGR->buildInputEvent(mDeviceType, 0, SI_POS, OVR_SENSORANGVEL[i], SI_MOVE, angles);
+         INPUTMGR->buildInputEvent(mDeviceType, 0, SI_POS, OVR_SENSORANGVEL[eventIdx], SI_MOVE, angles);
       }
       /*
       if (curPose.connected != prevPose.connected)
@@ -1076,6 +1264,28 @@ void OpenVRProvider::resetSensors()
    }
 }
 
+void OpenVRProvider::mapDeviceToEvent(U32 deviceIdx, S32 eventIdx)
+{
+	mDeviceEventMap[deviceIdx] = eventIdx;
+}
+
+void OpenVRProvider::resetEventMap()
+{
+	mDeviceEventMap.clear();
+}
+
+IDevicePose OpenVRProvider::getTrackedDevicePose(U32 idx)
+{
+	if (idx >= vr::k_unMaxTrackedDeviceCount)
+	{
+		IDevicePose ret;
+		ret.connected = ret.valid = false;
+		return ret;
+	}
+
+	return mCurrentDevicePose[idx];
+}
+
 void OpenVRProvider::registerOverlay(OpenVROverlay* overlay)
 {
 	mOverlays.push_back(overlay);
@@ -1088,6 +1298,261 @@ void OpenVRProvider::unregisterOverlay(OpenVROverlay* overlay)
 	{
 		mOverlays.erase(index);
 	}
+}
+
+const S32 OpenVRProvider::preloadRenderModelTexture(U32 index)
+{
+	S32 idx = -1;
+	if (mLoadedTextureLookup.tryGetValue(index, idx))
+		return idx;
+
+	char buffer[256];
+	dSprintf(buffer, sizeof(buffer), "openvrtex_%u", index);
+
+	OpenVRProvider::LoadedRenderTexture loadedTexture;
+	loadedTexture.vrTextureId = index;
+	loadedTexture.vrTexture = NULL;
+	loadedTexture.texture = NULL;
+	loadedTexture.textureError = vr::VRRenderModelError_Loading;
+	loadedTexture.targetTexture = new NamedTexTarget();
+	loadedTexture.targetTexture->registerWithName(buffer);
+	mLoadedTextures.push_back(loadedTexture);
+	mLoadedTextureLookup[index] = mLoadedTextures.size() - 1;
+
+	return mLoadedTextures.size() - 1;
+}
+
+const S32 OpenVRProvider::preloadRenderModel(StringTableEntry name)
+{
+	S32 idx = -1;
+	if (mLoadedModelLookup.tryGetValue(name, idx))
+		return idx;
+
+	OpenVRProvider::LoadedRenderModel loadedModel;
+	loadedModel.name = name;
+	loadedModel.model = NULL;
+	loadedModel.vrModel = NULL;
+	loadedModel.modelError = vr::VRRenderModelError_Loading;
+	loadedModel.loadedTexture = false;
+	loadedModel.textureId = -1;
+	mLoadedModels.push_back(loadedModel);
+	mLoadedModelLookup[name] = mLoadedModels.size() - 1;
+
+	return mLoadedModels.size() - 1;
+}
+
+
+bool OpenVRProvider::getRenderModel(S32 idx, OpenVRRenderModel **ret, bool &failed)
+{
+	if (idx < 0 || idx > mLoadedModels.size())
+	{
+		failed = true;
+		return true;
+	}
+
+	OpenVRProvider::LoadedRenderModel &loadedModel = mLoadedModels[idx];
+	//Con::printf("RenderModel[%i] STAGE 1", idx);
+
+	failed = false;
+
+	if (loadedModel.modelError > vr::VRRenderModelError_Loading)
+	{
+		failed = true;
+		return true;
+	}
+
+	// Stage 1 : model
+	if (!loadedModel.model)
+	{
+		loadedModel.modelError = vr::VRRenderModels()->LoadRenderModel_Async(loadedModel.name, &loadedModel.vrModel);
+		//Con::printf(" vr::VRRenderModels()->LoadRenderModel_Async(\"%s\", %x); -> %i", loadedModel.name, &loadedModel.vrModel, loadedModel.modelError);
+		if (loadedModel.modelError == vr::VRRenderModelError_None)
+		{
+			if (loadedModel.vrModel == NULL)
+			{
+				failed = true;
+				return true;
+			}
+			// Load the model
+			loadedModel.model = new OpenVRRenderModel();
+		}
+		else if (loadedModel.modelError == vr::VRRenderModelError_Loading)
+		{
+			return false;
+		}
+	}
+
+	//Con::printf("RenderModel[%i] STAGE 2 (texId == %i)", idx, loadedModel.vrModel->diffuseTextureId);
+
+	// Stage 2 : texture
+	if (!loadedModel.loadedTexture && loadedModel.model)
+	{
+		if (loadedModel.textureId == -1)
+		{
+			loadedModel.textureId = preloadRenderModelTexture(loadedModel.vrModel->diffuseTextureId);
+		}
+
+		if (loadedModel.textureId == -1)
+		{
+			failed = true;
+			return true;
+		}
+
+		if (!getRenderModelTexture(loadedModel.textureId, NULL, failed))
+		{
+			return false;
+		}
+
+		if (failed)
+		{
+			return true;
+		}
+
+		loadedModel.loadedTexture = true;
+
+		//Con::printf("RenderModel[%i] GOT TEXTURE");
+
+		// Now we can load the model. Note we first need to get a Material for the mapped texture
+		NamedTexTarget *namedTexture = mLoadedTextures[loadedModel.textureId].targetTexture;
+		String materialName = MATMGR->getMapEntry(namedTexture->getName().c_str());
+		if (materialName.isEmpty())
+		{
+			char buffer[256];
+			dSprintf(buffer, sizeof(buffer), "#%s", namedTexture->getName().c_str());
+			materialName = buffer;
+
+			//Con::printf("RenderModel[%i] materialName == %s", idx, buffer);
+
+			Material* mat = new Material();
+			mat->mMapTo = namedTexture->getName();
+			mat->mDiffuseMapFilename[0] = buffer;
+			mat->mEmissive[0] = true;
+
+			dSprintf(buffer, sizeof(buffer), "%s_Material", namedTexture->getName().c_str());
+			if (!mat->registerObject(buffer))
+			{
+				Con::errorf("Couldn't create placeholder openvr material %s!", buffer);
+				failed = true;
+				return true;
+			}
+
+			materialName = buffer;
+		}
+		
+		loadedModel.model->init(*loadedModel.vrModel, materialName);
+	}
+
+	if ((loadedModel.modelError > vr::VRRenderModelError_Loading) || 
+	    (loadedModel.textureId >= 0 && mLoadedTextures[loadedModel.textureId].textureError > vr::VRRenderModelError_Loading))
+	{
+		failed = true;
+	}
+
+	if (!failed && ret)
+	{
+		*ret = loadedModel.model;
+	}
+	return true;
+}
+
+bool OpenVRProvider::getRenderModelTexture(S32 idx, GFXTextureObject **outTex, bool &failed)
+{
+	if (idx < 0 || idx > mLoadedModels.size())
+	{
+		failed = true;
+		return true;
+	}
+
+	failed = false;
+
+	OpenVRProvider::LoadedRenderTexture &loadedTexture = mLoadedTextures[idx];
+
+	if (loadedTexture.textureError > vr::VRRenderModelError_Loading)
+	{
+		failed = true;
+		return true;
+	}
+
+	if (!loadedTexture.texture)
+	{
+		if (!loadedTexture.vrTexture)
+		{
+			loadedTexture.textureError = vr::VRRenderModels()->LoadTexture_Async(loadedTexture.vrTextureId, &loadedTexture.vrTexture);
+			if (loadedTexture.textureError == vr::VRRenderModelError_None)
+			{
+				// Load the texture
+				GFXTexHandle tex;
+
+				const U32 sz = loadedTexture.vrTexture->unWidth * loadedTexture.vrTexture->unHeight * 4;
+				GBitmap *bmp = new GBitmap(loadedTexture.vrTexture->unWidth, loadedTexture.vrTexture->unHeight, false, GFXFormatR8G8B8A8);
+
+				Swizzles::bgra.ToBuffer(bmp->getAddress(0,0,0), loadedTexture.vrTexture->rubTextureMapData, sz);
+
+				char buffer[256];
+				dSprintf(buffer, 256, "OVRTEX-%i.png", loadedTexture.vrTextureId);
+
+				FileStream fs;
+				fs.open(buffer, Torque::FS::File::Write);
+				bmp->writeBitmap("PNG", fs);
+				fs.close();
+
+				tex.set(bmp, &GFXDefaultStaticDiffuseProfile, true, "OpenVR Texture");
+				//tex.set(loadedTexture.vrTexture->unWidth, loadedTexture.vrTexture->unHeight, 1, (void*)pixels, GFXFormatR8G8B8A8, &GFXDefaultStaticDiffuseProfile, "OpenVR Texture", 1);
+
+
+				loadedTexture.targetTexture->setTexture(tex);
+				loadedTexture.texture = tex;
+			}
+			else if (loadedTexture.textureError == vr::VRRenderModelError_Loading)
+			{
+				return false;
+			}
+		}
+	}
+
+	if (loadedTexture.textureError > vr::VRRenderModelError_Loading)
+	{
+		failed = true;
+	}
+
+	if (!failed && outTex)
+	{
+		*outTex = loadedTexture.texture;
+	}
+
+	return true;
+}
+
+bool OpenVRProvider::getRenderModelTextureName(S32 idx, String &outName)
+{
+	if (idx < 0 || idx >= mLoadedTextures.size())
+		return false;
+
+	if (mLoadedTextures[idx].targetTexture)
+	{
+		outName = mLoadedTextures[idx].targetTexture->getName();
+		return true;
+	}
+
+	return false;
+}
+
+void OpenVRProvider::resetRenderModels()
+{
+	for (U32 i = 0, sz = mLoadedModels.size(); i < sz; i++)
+	{
+		SAFE_DELETE(mLoadedModels[i].model);
+		if (mLoadedModels[i].vrModel) mRenderModels->FreeRenderModel(mLoadedModels[i].vrModel);
+	}
+	for (U32 i = 0, sz = mLoadedTextures.size(); i < sz; i++)
+	{
+		SAFE_DELETE(mLoadedTextures[i].targetTexture);
+		if (mLoadedTextures[i].vrTexture) mRenderModels->FreeTexture(mLoadedTextures[i].vrTexture);
+	}
+	mLoadedModels.clear();
+	mLoadedTextures.clear();
+	mLoadedModelLookup.clear();
+	mLoadedTextureLookup.clear();
 }
 
 OpenVROverlay *OpenVRProvider::getGamepadFocusOverlay()
@@ -1124,6 +1589,54 @@ void OpenVRProvider::setKeyboardTransformAbsolute(const MatrixF &xfm)
 void OpenVRProvider::setKeyboardPositionForOverlay(OpenVROverlay *overlay, const RectI &rect)
 {
 
+}
+
+void OpenVRProvider::getControllerDeviceIndexes(vr::TrackedDeviceClass &deviceClass, Vector<S32> &outList)
+{
+	for (U32 i = 0; i<vr::k_unMaxTrackedDeviceCount; i++)
+	{
+		if (!mCurrentDevicePose[i].connected)
+			continue;
+
+		vr::TrackedDeviceClass klass = mHMD->GetTrackedDeviceClass(i);
+		if (klass == deviceClass)
+		{
+			outList.push_back(i);
+		}
+	}
+}
+
+StringTableEntry OpenVRProvider::getControllerModel(U32 idx)
+{
+	if (idx >= vr::k_unMaxTrackedDeviceCount || !mRenderModels)
+		return NULL;
+
+	String str = GetTrackedDeviceString(mHMD, idx, vr::Prop_RenderModelName_String, NULL);
+	return StringTable->insert(str, true);
+}
+
+DefineEngineStaticMethod(OpenVR, getControllerDeviceIndexes, const char*, (OpenVRTrackedDeviceClass klass),,
+	"@brief Gets the indexes of devices which match the required device class")
+{
+	if (!ManagedSingleton<OpenVRProvider>::instanceOrNull())
+	{
+		return "";
+	}
+
+	Vector<S32> outList;
+	OPENVR->getControllerDeviceIndexes(klass, outList);
+	return EngineMarshallData<Vector<S32>>(outList);
+}
+
+DefineEngineStaticMethod(OpenVR, getControllerModel, const char*, (S32 idx), ,
+	"@brief Gets the indexes of devices which match the required device class")
+{
+	if (!ManagedSingleton<OpenVRProvider>::instanceOrNull())
+	{
+		return "";
+	}
+
+	return OPENVR->getControllerModel(idx);
 }
 
 DefineEngineStaticMethod(OpenVR, isDeviceActive, bool, (), ,
@@ -1214,6 +1727,30 @@ DefineEngineStaticMethod(OpenVR, resetSensors, void, (), ,
    }
 
    OPENVR->resetSensors();
+}
+
+DefineEngineStaticMethod(OpenVR, mapDeviceToEvent, void, (S32 deviceId, S32 eventId), ,
+	"@brief Maps a device to an event code.\n\n"
+	"@ingroup Game")
+{
+	if (!ManagedSingleton<OpenVRProvider>::instanceOrNull())
+	{
+		return;
+	}
+
+	OPENVR->mapDeviceToEvent(deviceId, eventId);
+}
+
+DefineEngineStaticMethod(OpenVR, resetEventMap, void, (), ,
+	"@brief Resets event map.\n\n"
+	"@ingroup Game")
+{
+	if (!ManagedSingleton<OpenVRProvider>::instanceOrNull())
+	{
+		return;
+	}
+
+	OPENVR->resetEventMap();
 }
 
 // Overlay stuff

@@ -39,6 +39,7 @@ class DecalData;
 class SplashData;
 class PhysicsPlayer;
 class Player;
+class OpenVRTrackedObject;
 
 //----------------------------------------------------------------------------
 
@@ -518,6 +519,8 @@ protected:
    Point3F mLastPos;          ///< Holds the last position for physics updates
    Point3F mLastWaterPos;     ///< Same as mLastPos, but for water
 
+   SimObjectPtr<OpenVRTrackedObject> mControllers[2];
+
    struct ContactInfo 
    {
       bool contacted, jump, run;
@@ -577,11 +580,16 @@ protected:
 
    PhysicsPlayer* getPhysicsRep() const { return mPhysicsRep; }
 
+#ifdef TORQUE_OPENVR
+   void setControllers(Vector<OpenVRTrackedObject*> controllerList);
+#endif
+
   protected:
    virtual void reSkin();
 
    void setState(ActionState state, U32 ticks=0);
    void updateState();
+
 
    // Jetting
    bool mJetting;

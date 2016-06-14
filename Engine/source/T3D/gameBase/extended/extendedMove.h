@@ -41,14 +41,16 @@ extern const ExtendedMove NullExtendedMove;
 class ExtendedMoveManager
 {
 public:
-   static S32 mPosX[ExtendedMove::MaxPositionsRotations];
-   static S32 mPosY[ExtendedMove::MaxPositionsRotations];
-   static S32 mPosZ[ExtendedMove::MaxPositionsRotations];
+   static F32 mPosX[ExtendedMove::MaxPositionsRotations];
+   static F32 mPosY[ExtendedMove::MaxPositionsRotations];
+   static F32 mPosZ[ExtendedMove::MaxPositionsRotations];
    static bool mRotIsEuler[ExtendedMove::MaxPositionsRotations];
    static F32 mRotAX[ExtendedMove::MaxPositionsRotations];
    static F32 mRotAY[ExtendedMove::MaxPositionsRotations];
    static F32 mRotAZ[ExtendedMove::MaxPositionsRotations];
    static F32 mRotAA[ExtendedMove::MaxPositionsRotations];
+
+   static F32 mPosScale;
 
    static void init();
 };

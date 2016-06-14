@@ -57,9 +57,15 @@
 #include "T3D/decal/decalData.h"
 #include "materials/baseMatInstance.h"
 #include "math/mathUtils.h"
+#include "gfx/sim/debugDraw.h"
 
 #ifdef TORQUE_EXTENDED_MOVE
    #include "T3D/gameBase/extended/extendedMove.h"
+#endif
+
+#ifdef TORQUE_OPENVR
+#include "platform/input/openVR/openVRProvider.h"
+#include "platform/input/openVR/openVRTrackedObject.h"
 #endif
 
 // Amount of time if takes to transition to a new action sequence.
@@ -2496,6 +2502,19 @@ void Player::updateMove(const Move* move)
 {
    delta.move = *move;
 
+#ifdef TORQUE_OPENVR
+   if (mControllers[0])
+   {
+	   mControllers[0]->processTick(move);
+   }
+
+   if (mControllers[1])
+   {
+	   mControllers[1]->processTick(move);
+   }
+
+#endif
+
    // Is waterCoverage high enough to be 'swimming'?
    {
       bool swimming = mWaterCoverage > 0.65f && canSwim();      
@@ -2628,18 +2647,29 @@ void Player::updateMove(const Move* move)
             AngAxisF moveRot(Point3F(emove->rotX[emoveIndex], emove->rotY[emoveIndex], emove->rotZ[emoveIndex]), emove->rotW[emoveIndex]);
             MatrixF trans(1);
             moveRot.setMatrix(&trans);
+            trans.inverse();
 
-            Point3F vecForward(0, 1, 0);
+            Point3F vecForward(0, 10, 0);
+            Point3F viewAngle;
             Point3F orient;
             EulerF rot;
             trans.mulV(vecForward);
+            viewAngle = vecForward;
+            vecForward.z = 0; // flatten
+            vecForward.normalizeSafe();
 
             F32 yawAng;
             F32 pitchAng;
             MathUtils::getAnglesFromVector(vecForward, yawAng, pitchAng);
+
+            mRot = EulerF(0);
             mRot.z = yawAng;
             mHead = EulerF(0);
-            mHead.x = -pitchAng;
+
+            while (mRot.z < 0.0f)
+               mRot.z += M_2PI_F;
+            while (mRot.z > M_2PI_F)
+               mRot.z -= M_2PI_F;
 
             absoluteDelta = true;
          }
@@ -7140,3 +7170,38 @@ void Player::renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    mConvex.renderWorkingList();
    GFX->leaveDebugEvent();
 }
+
+#ifdef TORQUE_OPENVR
+void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
+{
+	mControllers[0] = controllerList.size() > 0 ? controllerList[0] : NULL;
+	mControllers[1] = controllerList.size() > 1 ? controllerList[1] : NULL;
+}
+
+ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
+{
+	OpenVRTrackedObject *controllerL, *controllerR;
+	Vector<OpenVRTrackedObject*> list;
+
+	if (Sim::findObject(argv[2], controllerL))
+	{
+		list.push_back(controllerL);
+	}
+	else
+	{
+		list.push_back(NULL);
+	}
+
+	if (Sim::findObject(argv[3], controllerR))
+	{
+		list.push_back(controllerR);
+	}
+	else
+	{
+		list.push_back(NULL);
+	}
+
+	object->setControllers(list);
+}
+
+#endif

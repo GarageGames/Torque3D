@@ -16,14 +16,16 @@ MODULE_BEGIN( ExtendedMoveManager )
 
 MODULE_END;
 
-S32 ExtendedMoveManager::mPosX[ExtendedMove::MaxPositionsRotations] = { 0, };
-S32 ExtendedMoveManager::mPosY[ExtendedMove::MaxPositionsRotations] = { 0, };
-S32 ExtendedMoveManager::mPosZ[ExtendedMove::MaxPositionsRotations] = { 0, };
+F32 ExtendedMoveManager::mPosX[ExtendedMove::MaxPositionsRotations] = { 0, };
+F32 ExtendedMoveManager::mPosY[ExtendedMove::MaxPositionsRotations] = { 0, };
+F32 ExtendedMoveManager::mPosZ[ExtendedMove::MaxPositionsRotations] = { 0, };
 bool ExtendedMoveManager::mRotIsEuler[ExtendedMove::MaxPositionsRotations] = { 0, };
 F32 ExtendedMoveManager::mRotAX[ExtendedMove::MaxPositionsRotations] = { 0, };
 F32 ExtendedMoveManager::mRotAY[ExtendedMove::MaxPositionsRotations] = { 0, };
 F32 ExtendedMoveManager::mRotAZ[ExtendedMove::MaxPositionsRotations] = { 0, };
 F32 ExtendedMoveManager::mRotAA[ExtendedMove::MaxPositionsRotations] = { 1, };
+
+F32 ExtendedMoveManager::mPosScale = 2.0f;
 
 void ExtendedMoveManager::init()
 {
@@ -32,17 +34,17 @@ void ExtendedMoveManager::init()
       char varName[256];
 
       dSprintf(varName, sizeof(varName), "mvPosX%d", i);
-      Con::addVariable(varName, TypeS32, &mPosX[i], 
+      Con::addVariable(varName, TypeF32, &mPosX[i], 
          "X position of controller in millimeters.  Only 13 bits are networked.\n"
 	      "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvPosY%d", i);
-      Con::addVariable(varName, TypeS32, &mPosY[i], 
+      Con::addVariable(varName, TypeF32, &mPosY[i],
          "Y position of controller in millimeters.  Only 13 bits are networked.\n"
 	      "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvPosZ%d", i);
-      Con::addVariable(varName, TypeS32, &mPosZ[i], 
+      Con::addVariable(varName, TypeF32, &mPosZ[i],
          "Z position of controller in millimeters.  Only 13 bits are networked.\n"
 	      "@ingroup Game");
 
@@ -75,6 +77,11 @@ void ExtendedMoveManager::init()
          "Angle rotation (in degrees) component of controller.\n"
 	      "@ingroup Game");
    }
+
+   Con::addVariable("mvPosScale", TypeF32, &mPosScale,
+	   "@brief Indicates the scale to be given to mvPos values.\n\n"
+	   ""
+	   "@ingroup Game");
 }
 
 const ExtendedMove NullExtendedMove;
@@ -183,8 +190,8 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
          // Position
          if (stream->readFlag())
          {
-            posX[i] = stream->readInt(MaxPositionBits);
-            cposX[i] = UNCLAMPPOS(posX[i]);
+            cposX[i] = stream->readInt(MaxPositionBits);
+            posX[i] = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
          }
          else
             posX[i] = extBaseMove->posX[i];
@@ -192,7 +199,7 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
          if (stream->readFlag())
          {
             cposY[i] = stream->readInt(MaxPositionBits);
-            posY[i] = UNCLAMPPOS(cposY[i]);
+            posY[i] = UNCLAMPPOS(cposY[i]) * ExtendedMoveManager::mPosScale;
          }
          else
             posY[i] = extBaseMove->posY[i];
@@ -200,7 +207,7 @@ void ExtendedMove::unpack(BitStream *stream, const Move * basemove)
          if (stream->readFlag())
          {
             cposZ[i] = stream->readInt(MaxPositionBits);
-            posZ[i] = UNCLAMPPOS(cposZ[i]);
+            posZ[i] = UNCLAMPPOS(cposZ[i]) * ExtendedMoveManager::mPosScale;
          }
          else
             posZ[i] = extBaseMove->posZ[i];
@@ -267,9 +274,9 @@ void ExtendedMove::clamp()
    for(U32 i=0; i<MaxPositionsRotations; ++i)
    {
       // Positions
-      cposX[i] = CLAMPPOS(posX[i]);
-      cposY[i] = CLAMPPOS(posY[i]);
-      cposZ[i] = CLAMPPOS(posZ[i]);
+      cposX[i] = CLAMPPOS(posX[i] / ExtendedMoveManager::mPosScale);
+      cposY[i] = CLAMPPOS(posY[i] / ExtendedMoveManager::mPosScale);
+      cposZ[i] = CLAMPPOS(posZ[i] / ExtendedMoveManager::mPosScale);
 
       // Rotations
       if(EulerBasedRotation[i])
@@ -286,15 +293,23 @@ void ExtendedMove::clamp()
          crotW[i] = CLAMPROT(rotW[i] / M_2PI_F);
       }
 
-      /*if (i == 0)
+	  #ifdef DEBUG_CONTROLLER_MOVE
+      if (i == 1)
       {
           F32 x, y, z, a;
           x = UNCLAMPPOS(crotX[i]);
           y = UNCLAMPPOS(crotY[i]);
           z = UNCLAMPPOS(crotZ[i]);
           a = UNCLAMPROT(crotW[i]) * M_2PI_F;
-          //Con::printf("rot %f,%f,%f,%f clamped to %f,%f,%f,%f", rotX[i], rotY[i], rotZ[i], rotW[i], x,y,z,a);
-      }*/
+
+		  Con::printf("INPUT POS == %f,%f,%f", ExtendedMoveManager::mPosX[i], ExtendedMoveManager::mPosY[i], ExtendedMoveManager::mPosZ[i]);
+          Con::printf("rot %f,%f,%f,%f clamped to %f,%f,%f,%f", rotX[i], rotY[i], rotZ[i], rotW[i], x,y,z,a);
+		  x = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
+		  y = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
+		  z = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
+		  Con::printf("pos %f,%f,%f clamped to %f,%f,%f", posX[i], posY[i], posZ[i], x, y, z);
+      }
+	  #endif
    }
 
    // Perform the standard Move clamp
@@ -306,9 +321,9 @@ void ExtendedMove::unclamp()
    // Unclamp the values the same as for net traffic so the client matches the server
    for(U32 i=0; i<MaxPositionsRotations; ++i)
    {
-      posX[i] = UNCLAMPPOS(cposX[i]);
-      posY[i] = UNCLAMPPOS(cposY[i]);
-      posZ[i] = UNCLAMPPOS(cposZ[i]);
+      posX[i] = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
+      posY[i] = UNCLAMPPOS(cposY[i]) * ExtendedMoveManager::mPosScale;
+      posZ[i] = UNCLAMPPOS(cposZ[i]) * ExtendedMoveManager::mPosScale;
 
       // Rotations
       if(EulerBasedRotation[i])

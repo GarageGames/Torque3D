@@ -20,6 +20,11 @@
 
 class OpenVRHMDDevice;
 class OpenVROverlay;
+class BaseMatInstance;
+class SceneRenderState;
+struct MeshRenderInst;
+class Namespace;
+class NamedTexTarget;
 
 typedef vr::VROverlayInputMethod OpenVROverlayInputMethod;
 typedef vr::VROverlayTransformType OpenVROverlayTransformType;
@@ -29,6 +34,7 @@ typedef vr::ETrackingResult OpenVRTrackingResult;
 typedef vr::ETrackingUniverseOrigin OpenVRTrackingUniverseOrigin;
 typedef vr::EOverlayDirection OpenVROverlayDirection;
 typedef vr::EVRState OpenVRState;
+typedef vr::TrackedDeviceClass OpenVRTrackedDeviceClass;
 
 DefineEnumType(OpenVROverlayInputMethod);
 DefineEnumType(OpenVROverlayTransformType);
@@ -38,6 +44,7 @@ DefineEnumType(OpenVRTrackingResult);
 DefineEnumType(OpenVRTrackingUniverseOrigin);
 DefineEnumType(OpenVROverlayDirection);
 DefineEnumType(OpenVRState);
+DefineEnumType(OpenVRTrackedDeviceClass);
 
 namespace OpenVRUtil
 {
@@ -112,6 +119,36 @@ public:
 	}
 };
 
+/// Simple class to handle rendering native OpenVR model data
+class OpenVRRenderModel
+{
+public:
+	typedef GFXVertexPNT VertexType;
+	GFXVertexBufferHandle<VertexType> mVertexBuffer;
+	GFXPrimitiveBufferHandle mPrimitiveBuffer;
+	BaseMatInstance* mMaterialInstance; ///< Material to use for rendering. NOTE:  
+	Box3F mLocalBox;
+
+	OpenVRRenderModel() : mMaterialInstance(NULL)
+	{
+	}
+
+	~OpenVRRenderModel()
+	{
+		SAFE_DELETE(mMaterialInstance);
+	}
+
+	Box3F getWorldBox(MatrixF &mat)
+	{
+		Box3F ret = mLocalBox;
+		mat.mul(ret);
+		return ret;
+	}
+
+	bool init(const vr::RenderModel_t & vrModel, StringTableEntry materialName);
+	void draw(SceneRenderState *state, MeshRenderInst* renderInstance);
+};
+
 struct OpenVRRenderState
 {
    vr::IVRSystem *mHMD;
@@ -157,8 +194,30 @@ public:
       DIFF_RAW = (DIFF_ACCEL | DIFF_ANGVEL | DIFF_MAG),
    };
 
+   struct LoadedRenderModel
+   {
+	   StringTableEntry name;
+	   vr::RenderModel_t *vrModel;
+	   OpenVRRenderModel *model;
+	   vr::EVRRenderModelError modelError;
+	   S32 textureId;
+	   bool loadedTexture;
+   };
+
+   struct LoadedRenderTexture
+   {
+	   U32 vrTextureId;
+	   vr::RenderModel_TextureMap_t *vrTexture;
+	   GFXTextureObject *texture;
+	   NamedTexTarget *targetTexture;
+	   vr::EVRRenderModelError textureError;
+   };
+
    OpenVRProvider();
    ~OpenVRProvider();
+
+   typedef Signal <void(const vr::VREvent_t &evt)> VREventSignal;
+   VREventSignal& getVREventSignal() { return mVREventSignal;  }
 
    static void staticInit();
 
@@ -166,6 +225,7 @@ public:
    bool disable();
 
    bool getActive() { return mHMD != NULL; }
+   inline vr::IVRRenderModels* getRenderModels() { return mRenderModels; }
 
    /// @name Input handling
    /// {
@@ -216,12 +276,27 @@ public:
    void submitInputChanges();
 
    void resetSensors();
+
+   void mapDeviceToEvent(U32 deviceIdx, S32 eventIdx);
+   void resetEventMap();
+
+   IDevicePose getTrackedDevicePose(U32 idx);
    /// }
 
 	/// @name Overlay registration
 	/// {
 	void registerOverlay(OpenVROverlay* overlay);
 	void unregisterOverlay(OpenVROverlay* overlay);
+	/// }
+
+	/// @name Model loading
+	/// {
+	const S32 preloadRenderModel(StringTableEntry name);
+	const S32 preloadRenderModelTexture(U32 index);
+	bool getRenderModel(S32 idx, OpenVRRenderModel **ret, bool &failed);
+	bool getRenderModelTexture(S32 idx, GFXTextureObject **outTex, bool &failed);
+	bool getRenderModelTextureName(S32 idx, String &outName);
+	void resetRenderModels();
 	/// }
 
 
@@ -237,6 +312,9 @@ public:
 
    void setKeyboardTransformAbsolute(const MatrixF &xfm);
    void setKeyboardPositionForOverlay(OpenVROverlay *overlay, const RectI &rect);
+
+   void getControllerDeviceIndexes(vr::TrackedDeviceClass &deviceClass, Vector<S32> &outList);
+   StringTableEntry getControllerModel(U32 idx);
    /// }
 
    /// @name OpenVR state
@@ -250,6 +328,9 @@ public:
    IDevicePose mPreviousInputTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
    U32 mValidPoseCount;
 
+   vr::VRControllerState_t mCurrentControllerState[vr::k_unMaxTrackedDeviceCount];
+   vr::VRControllerState_t mPreviousCurrentControllerState[vr::k_unMaxTrackedDeviceCount];
+
    char mDeviceClassChar[vr::k_unMaxTrackedDeviceCount];
 
    OpenVRRenderState mHMDRenderState;
@@ -258,6 +339,16 @@ public:
    vr::ETrackingUniverseOrigin mTrackingSpace;
 
 	Vector<OpenVROverlay*> mOverlays;
+
+	VREventSignal mVREventSignal;
+	Namespace *mOpenVRNS;
+
+	Vector<LoadedRenderModel> mLoadedModels;
+	Vector<LoadedRenderTexture> mLoadedTextures;
+	Map<StringTableEntry, S32> mLoadedModelLookup;
+	Map<U32, S32> mLoadedTextureLookup;
+
+	Map<U32, S32> mDeviceEventMap;
    /// }
 
    GuiCanvas* mDrawCanvas;
