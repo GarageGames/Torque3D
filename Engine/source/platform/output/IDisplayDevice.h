@@ -40,6 +40,11 @@ typedef struct DisplayPose
    Point3F velocity;
    Point3F angularVelocity;
 
+#ifdef DEBUG_DISPLAY_POSE 
+   MatrixF actualMatrix;
+   MatrixF originalMatrix;
+#endif
+
    U32 state; /// Generic state
 
    bool valid; /// Pose set

@@ -27,4 +27,6 @@ if(TORQUE_OPENVR)
 		endif()
 		addLib( "openvr_api" )
 	endif()
+
+    addDef(TORQUE_OPENVR)
 endif()

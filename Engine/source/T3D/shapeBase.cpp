@@ -1982,17 +1982,14 @@ void ShapeBase::getEyeCameraTransform(IDisplayDevice *displayDevice, U32 eyeId, 
    // NOTE: currently we dont support third-person camera in this mode
    MatrixF cameraTransform(1);
    F32 fakePos = 0;
+   //cameraTransform = getRenderTransform(); // use this for controllers TODO
    getCameraTransform(&fakePos, &cameraTransform);
 
-   QuatF baserot = cameraTransform;
-   QuatF qrot = QuatF(newPose.orientation);
-   //QuatF concatRot;
-   //concatRot.mul(baserot, qrot);
-   qrot.setMatrix(&temp);
+   temp = MatrixF(1);
+   newPose.orientation.setMatrix(&temp);
+   temp.setPosition(newPose.position);
 
-   temp.setPosition(cameraTransform.getPosition() + qrot.mulP(newPose.position, &rotEyePos));
-   
-   *outMat = temp;
+   *outMat = cameraTransform * temp;
 }
 
 void ShapeBase::getCameraParameters(F32 *min,F32* max,Point3F* off,MatrixF* rot)

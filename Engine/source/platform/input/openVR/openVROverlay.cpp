@@ -63,7 +63,7 @@ void OpenVROverlay::initPersistFields()
       "Type of overlay.");
    addProtectedField("overlayFlags", TypeS32, Offset(mOverlayFlags, OpenVROverlay), &setProtectedOverlayDirty, &defaultProtectedGetFn,
       "Flags for overlay.");
-   addProtectedField("overlayWidth", TypeS32, Offset(mOverlayWidth, OpenVROverlay), &setProtectedOverlayDirty, &defaultProtectedGetFn,
+   addProtectedField("overlayWidth", TypeF32, Offset(mOverlayWidth, OpenVROverlay), &setProtectedOverlayDirty, &defaultProtectedGetFn,
       "Width of overlay.");
    addProtectedField("overlayColor", TypeColorF, Offset(mOverlayColor, OpenVROverlay), &setProtectedOverlayDirty, &defaultProtectedGetFn,
       "Backing color of overlay.");
@@ -127,7 +127,7 @@ void OpenVROverlay::onRemove()
       mThumbOverlayHandle = NULL;
    }
 
-	if (OPENVR)
+	if (ManagedSingleton<OpenVRProvider>::instanceOrNull())
 	{
 		OPENVR->unregisterOverlay(this);
 	}
@@ -373,13 +373,13 @@ void OpenVROverlay::handleOpenVREvents()
       eventInfo.modifier = (InputModifiers)0;
       eventInfo.ascii = 0;
 
-		Con::printf("Overlay event %i", vrEvent.eventType);
+		//Con::printf("Overlay event %i", vrEvent.eventType);
 
       switch (vrEvent.eventType)
       {
       case vr::VREvent_MouseMove:
       {
-			Con::printf("mousemove %f,%f", vrEvent.data.mouse.x, vrEvent.data.mouse.y);
+			//Con::printf("mousemove %f,%f", vrEvent.data.mouse.x, vrEvent.data.mouse.y);
          eventInfo.objType = SI_AXIS;
          eventInfo.objInst = SI_XAXIS;
          eventInfo.action = SI_MAKE;
