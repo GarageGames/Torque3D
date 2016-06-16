@@ -649,7 +649,6 @@ datablock PlayerData(DefaultPlayerData)
 
    //exitingWater         = ExitingWaterLightSound;
 
-   observeParameters = "0.5 4.5 4.5";
 
    cameraMinDist = "0";
    DecalData = "PlayerFootprint";
