@@ -494,7 +494,6 @@ datablock PlayerData(DefaultPlayerData)
    imageAnimPrefixFP = "soldier";
    shapeNameFP[0] = "art/shapes/actors/Soldier/FP/FP_SoldierArms.DAE";
 
-   canObserve = 1;
    cmdCategory = "Clients";
 
    cameraDefaultFov = 55.0;
