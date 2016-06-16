@@ -517,7 +517,6 @@ datablock PlayerData(DefaultPlayerData)
    maxDamage = 100;
    maxEnergy =  60;
    repairRate = 0.33;
-   energyPerDamagePoint = 75;
 
    rechargeRate = 0.256;
 

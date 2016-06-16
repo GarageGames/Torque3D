@@ -38,7 +38,6 @@ struct StaticShapeData: public ShapeBaseData {
    bool  noIndividualDamage;
    S32   dynamicTypeField;
    bool  isShielded;
-   F32   energyPerDamagePoint;
 
    //
    DECLARE_CONOBJECT(StaticShapeData);
