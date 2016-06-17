@@ -38,16 +38,6 @@ function CustomCheetah::onAdd(%this, %obj)
    %itemRock.car = %obj;
    %obj.mountObject(%itemRock, %this.turretSlot, "-1.4 0 .5 0 0 1 0");
 
-   // RigidShape
-   %rigidRock = new RigidShape() {
-      datablock = BouncingBoulder;
-      scale = "0.2 0.2 0.2";
-   };
-   %rigidRock.setShapeName("RigidShape");
-   %obj.rigidRock = %itemRock;
-   %rigidRock.car = %obj;
-   %obj.mountObject(%rigidRock, %this.turretSlot, "0 1.4 .6 0 0 1 0");
-
    // Vehicle
    %vehicleMount = new WheeledVehicle() {
       datablock = CheetahCar;
@@ -80,12 +70,6 @@ function CustomCheetah::onRemove(%this, %obj)
    {
       %obj.unmountObject(%obj.vehicleMount);
       %obj.vehicleMount.delete();
-   }
-
-   if( isObject(%obj.rigidRock) )
-   {
-      %obj.unmountObject(%obj.rigidRock);
-      %obj.rigidRock.delete();
    }
 
    if( isObject(%obj.itemRock) )
