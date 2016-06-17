@@ -177,7 +177,8 @@ enum SceneObjectTypeMasks
                                  StaticShapeObjectType |
                                  DynamicShapeObjectType |
                                  EntityObjectType |
-                                 ZoneObjectType ), // This improves the result of zone traversals.
+                                 ZoneObjectType |
+                                 LightObjectType ), // This improves the result of zone traversals.
 
    /// Mask for objects that should be specifically excluded from zone culling.
    CULLING_EXCLUDE_TYPEMASK = (  TerrainObjectType |

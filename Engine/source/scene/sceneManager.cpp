@@ -451,6 +451,13 @@ void SceneManager::_renderScene( SceneRenderState* state, U32 objectMask, SceneZ
 
    PROFILE_END();
 
+   //store our rendered objects into a list we can easily look up against later if required
+   mRenderedObjectsList.clear();
+   for (U32 i = 0; i < numRenderObjects; ++i)
+   {
+      mRenderedObjectsList.push_back(mBatchQueryList[i]);
+   }
+
    // Render the remaining objects.
 
    PROFILE_START( Scene_renderObjects );
