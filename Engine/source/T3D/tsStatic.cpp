@@ -764,20 +764,21 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if ( stream->writeFlag( mask & SkinMask ) )
       con->packNetStringHandleU( stream, mSkinNameHandle );
 
-   if ( stream->writeFlag( mask & AdvancedStaticOptionsMask ) )  
+   if (stream->writeFlag(mask & AdvancedStaticOptionsMask))
    {
-      stream->writeString( mShapeName );
-      stream->write( (U32)mDecalType );
+      stream->writeString(mShapeName);
+      stream->write((U32)mDecalType);
 
-      stream->writeFlag( mAllowPlayerStep );
-      stream->writeFlag( mMeshCulling );
-      stream->writeFlag( mUseOriginSort );
+      stream->writeFlag(mAllowPlayerStep);
+      stream->writeFlag(mMeshCulling);
+      stream->writeFlag(mUseOriginSort);
 
-      stream->write( mRenderNormalScalar );
+      stream->write(mRenderNormalScalar);
 
-      stream->write( mForceDetail );
+      stream->write(mForceDetail);
 
-      stream->writeFlag( mPlayAmbient );
+      stream->writeFlag(mPlayAmbient);
+   }
 
    if ( stream->writeFlag(mUseAlphaFade) )  
    {  
@@ -846,19 +847,20 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
       }
    }
 
-   if ( stream->readFlag() ) // AdvancedStaticOptionsMask
+   if (stream->readFlag()) // AdvancedStaticOptionsMask
    {
       mShapeName = stream->readSTString();
 
-      stream->read( (U32*)&mDecalType );
+      stream->read((U32*)&mDecalType);
 
       mAllowPlayerStep = stream->readFlag();
-      mMeshCulling = stream->readFlag();   
+      mMeshCulling = stream->readFlag();
       mUseOriginSort = stream->readFlag();
 
-      stream->read( &mRenderNormalScalar );
+      stream->read(&mRenderNormalScalar);
 
-      stream->read( &mForceDetail );
+      stream->read(&mForceDetail);
+   }
 
    mUseAlphaFade = stream->readFlag();  
    if (mUseAlphaFade)
