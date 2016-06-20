@@ -871,6 +871,7 @@ breakContinue:
                {
                   Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-SimObject class %s.", getFileLine(ip), (const char*)callArgv[1]);
                   delete object;
+                  currentNewObject = NULL;
                   ip = failJump;
                   break;
                }
