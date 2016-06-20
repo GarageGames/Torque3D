@@ -590,7 +590,7 @@ void GameBase::onMount( SceneObject *obj, S32 node )
    // Are we mounting to a GameBase object?
    GameBase *gbaseObj = dynamic_cast<GameBase*>( obj );
 
-   if ( gbaseObj && gbaseObj->getControlObject() != this )
+   if ( gbaseObj && gbaseObj->getControlObject() != this && gbaseObj->getControllingObject() != this)
       processAfter( gbaseObj );
 
    if (!isGhost()) {
