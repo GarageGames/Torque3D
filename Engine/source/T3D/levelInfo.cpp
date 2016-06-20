@@ -36,7 +36,7 @@
 #include "math/mathIO.h"
 
 #include "torqueConfig.h"
-
+#include "T3D/accumulationVolume.h"
 
 IMPLEMENT_CO_NETOBJECT_V1(LevelInfo);
 
@@ -377,4 +377,5 @@ void LevelInfo::setLevelAccuTexture(const String& name)
       else
          gLevelAccuMap = mAccuTexture;
    }
+   AccumulationVolume::refreshVolumes();
 }
