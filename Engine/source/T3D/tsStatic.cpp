@@ -310,11 +310,10 @@ bool TSStatic::onAdd()
 
    _updateShouldTick();
 
-   // Accumulation
-   if ( isClientObject() && mShapeInstance )
+   // Accumulation and environment mapping
+   if (isClientObject() && mShapeInstance)
    {
-      if ( mShapeInstance->hasAccumulation() ) 
-         AccumulationVolume::addObject(this);
+      AccumulationVolume::addObject(this);
    }
 
    return true;
