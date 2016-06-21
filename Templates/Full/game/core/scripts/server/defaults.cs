@@ -36,9 +36,9 @@ $Pref::Server::Info = "This is a Torque 3D server.";
 // usefull to the client, such as the url or ftp address of where the
 // latest version of the game can be obtained.
 $Pref::Server::ConnectionError =
-   "You do not have the correct version of the FPS starter kit or "@
+   "You do not have the correct version of "@$appName@" or "@
    "the related art needed to play on this server, please contact "@
-   "the server operator for more information.";
+   "the server administrator.";
 
 // The network port is also defined by the client, this value 
 // overrides pref::net::port for dedicated servers
