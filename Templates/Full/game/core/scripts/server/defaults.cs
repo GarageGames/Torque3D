@@ -36,7 +36,7 @@ $Pref::Server::Info = "This is a Torque 3D server.";
 // usefull to the client, such as the url or ftp address of where the
 // latest version of the game can be obtained.
 $Pref::Server::ConnectionError =
-   "You do not have the correct version of Torque3D or "@
+   "You do not have the correct version of "@$appName@" or "@
    "the related art needed to play on this server, please contact "@
    "the server administrator.";
 
