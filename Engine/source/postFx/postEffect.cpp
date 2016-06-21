@@ -45,6 +45,8 @@
 #include "postFx/postEffectManager.h"
 #include "postFx/postEffectVis.h"
 #include "environment/scatterSky.h" //sunBokeh feature
+#include "T3D/gameBase/gameConnection.h" //sunBokeh feature
+#include "T3D/lightFlareData.h" //sunBokeh feature
 
 using namespace Torque;
 
@@ -855,9 +857,10 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
 	  
 	  if( mSunVisibilitySC->isValid() )  //sunBokeh feature
       {  
-         ScatterSky* pSky = dynamic_cast<ScatterSky*>(Sim::findObject("Himmel"));    
-         if(pSky)    
-            mShaderConsts->set( mSunVisibilitySC, pSky->getSunVisibility() );    
+		 LightInfo *sunLight = LIGHTMGR->getSpecialLight( LightManager::slSunLightType );
+
+         if(sunLight)    
+            mShaderConsts->set( mSunVisibilitySC, _testVisibility(state) );	
          else    
             mShaderConsts->set( mSunVisibilitySC, 0.0f );    
       }  
@@ -916,6 +919,79 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
    EffectConstTable::Iterator iter = mEffectConsts.begin();
    for ( ; iter != mEffectConsts.end(); iter++ )
       iter->value->setToBuffer( mShaderConsts );
+}
+
+// sunBokeh feature to test if sun is visible
+F32 PostEffect::_testVisibility(const SceneRenderState *state)
+{
+   // Grab our projection matrix
+   // from the frustum.
+   Frustum frust = state->getCameraFrustum();
+   MatrixF proj( true );
+   frust.getProjectionMatrix( &proj );
+
+   // Grab the ScatterSky world matrix.
+   MatrixF camMat = state->getCameraTransform();
+   camMat.inverse();
+   MatrixF tmp( true );
+   tmp = camMat;
+   tmp.setPosition( Point3F( 0, 0, 0 ) );
+
+   Point3F sunPos( 0, 0, 0 );
+
+   // Get the light manager and sun light object.
+   LightInfo *sunLight = LIGHTMGR->getSpecialLight( LightManager::slSunLightType );
+
+   // Grab the light direction and scale
+   // by the ScatterSky radius to get the world
+   // space sun position.
+   const VectorF &lightDir = sunLight->getDirection();
+
+   Point3F lightPos = sunLight->getPosition();
+
+   RectI viewPort = GFX->getViewport();
+
+   // Get the screen space sun position.
+   MathUtils::mProjectWorldToScreen(lightPos, &sunPos, viewPort, tmp, proj);
+
+   // And normalize it to the 0 to 1 range.
+   sunPos.x -= (F32)viewPort.point.x;
+   sunPos.y -= (F32)viewPort.point.y;
+   sunPos.x /= (F32)viewPort.extent.x;
+   sunPos.y /= (F32)viewPort.extent.y;
+
+   //------------------------------------------------------------
+
+   const Point3F &camPos = state->getCameraPosition();
+
+      // Use a raycast to determine occlusion.
+      GameConnection *conn = GameConnection::getConnectionToServer();
+      if ( !conn )
+         return false;
+
+      const bool fps = conn->isFirstPerson();
+      GameBase *control = conn->getControlObject();
+      if ( control && fps )
+         control->disableCollision();
+
+      RayInfo rayInfo;
+	  
+	  U32 LosMask = STATIC_COLLISION_TYPEMASK |
+                                    ShapeBaseObjectType |
+                                    StaticShapeObjectType |
+                                    ItemObjectType;
+
+	  F32 lightVisible = 0.0f;
+
+      if ( !gClientContainer.castRay( camPos, lightPos, LosMask, &rayInfo ) )
+
+	  lightVisible = 1.0f ;
+	  
+	 
+      if ( control && fps )
+         control->enableCollision();
+	 
+	  return lightVisible;
 }
 
 void PostEffect::_setupTexture( U32 stage, GFXTexHandle &inputTex, const RectI *inTexViewport )

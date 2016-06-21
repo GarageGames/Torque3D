@@ -179,6 +179,9 @@ protected:
    String mRenderBin;
 
    F32 mRenderPriority;
+   
+   /// Test sun visibility feature for sunBokeh
+   F32 _testVisibility( const SceneRenderState *state );
 
    /// This is true if the effect has been succesfully
    /// initialized and all requirements are met for use.

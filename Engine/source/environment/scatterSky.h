@@ -109,11 +109,7 @@ public:
    F32 getAzimuth() const { return mSunAzimuth; }
    ///
    F32 getElevation() const { return mSunElevation; }
-   /// sunBokeh feature
-   F32 getSunVisibility() const { if (mFlareData) return mFlareData->getVisibility(); else return 0; }
-   // Same method as above, but also checks if the data is valid, needs more CPU time, only use if above method fails
-   //F32 getSunVisibility() const { if dynamic_cast<LightFlareData*>(mFlareData) return mFlareData->getVisibility(); else return 0; }
-
+   
 protected:
 
    void _render( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat );
