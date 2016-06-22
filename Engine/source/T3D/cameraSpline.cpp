@@ -29,6 +29,16 @@
 
 //-----------------------------------------------------------------------------
 
+CameraSpline::Knot::Knot()
+{
+   mPosition = Point3F::Zero;
+   mRotation = QuatF::Identity;
+   mSpeed = 0.0f;
+   mType = NORMAL;
+   mPath = SPLINE;
+   prev = NULL; next = NULL;
+};
+
 CameraSpline::Knot::Knot(const Knot &k)
 {
    mPosition = k.mPosition;
