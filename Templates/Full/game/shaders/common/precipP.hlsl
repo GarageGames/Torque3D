@@ -29,7 +29,7 @@
 struct Conn
 {
    float4 position : TORQUE_POSITION;
-   float4 texCoord	: TEXCOORD0;
+   float2 texCoord	: TEXCOORD0;
    float4 color : COLOR0;
 };
 

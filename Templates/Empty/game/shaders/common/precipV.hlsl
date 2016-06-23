@@ -32,13 +32,14 @@
 struct Vert
 {
 	float3 position	: POSITION;
-	float4 texCoord	: TEXCOORD0;
+	float2 texCoord	: TEXCOORD0;
+   float4 color : COLOR0;
 };
 
 struct Conn
 {
 	float4 position : TORQUE_POSITION;
-	float4 texCoord	: TEXCOORD0;
+	float2 texCoord	: TEXCOORD0;
 	float4 color : COLOR0;
 };
 
