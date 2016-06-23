@@ -19,7 +19,7 @@ They are available from the [downloads](http://wiki.torque3d.org/main:downloads)
 
 * [Torque 3D main repository](https://github.com/GarageGames/Torque3D) (you are here!)
 * [Project Manager repository](https://github.com/GarageGames/Torque3D-ProjectManager)
-* [Offline documentation repository](https://github.com/GarageGames/Torque3D-Documentation)
+* [Offline documentation repository](https://github.com/RichardRanft/Torque3D-Documentation/tree/RTS-Tutorial-Fix)
 
 # License
 
