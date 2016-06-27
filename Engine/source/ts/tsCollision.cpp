@@ -1630,7 +1630,12 @@ bool TSMesh::castRayOpcode( const Point3F &s, const Point3F &e, RayInfo *info, T
          }
 
          // slerp
-         Point3F s = ( (max - min) - (facePoint - min) ) / (max - min);
+         Point3F divSafe = (max - min);
+         if (divSafe.x == 0.0f) divSafe.x = POINT_EPSILON;
+         if (divSafe.y == 0.0f) divSafe.y = POINT_EPSILON;
+         if (divSafe.z == 0.0f) divSafe.z = POINT_EPSILON;
+
+         Point3F s = ( (max - min) - (facePoint - min) ) / divSafe;
 
          // compute axis
          S32		bestAxis = 0;
