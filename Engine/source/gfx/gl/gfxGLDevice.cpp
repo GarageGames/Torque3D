@@ -165,9 +165,6 @@ void GFXGLDevice::initGLState()
       glBindFramebuffer = &_t3d_glBindFramebuffer;
    }
 
-#ifdef TORQUE_NSIGHT_WORKAROUND
-   __GLEW_ARB_buffer_storage = false;
-#endif
 #if TORQUE_DEBUG
    if( gglHasExtension(ARB_debug_output) )
    {

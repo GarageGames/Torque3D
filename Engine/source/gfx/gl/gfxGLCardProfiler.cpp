@@ -66,7 +66,11 @@ void GFXGLCardProfiler::setupCardCapabilities()
    setCapability("GL_EXT_texture_filter_anisotropic", gglHasExtension(EXT_texture_filter_anisotropic));
 
    // Check for buffer storage
+#ifdef TORQUE_NSIGHT_WORKAROUND
+   setCapability("GL_ARB_buffer_storage", false);
+#else
    setCapability("GL_ARB_buffer_storage", gglHasExtension(ARB_buffer_storage));
+#endif
 
    // Check for shader model 5.0
    setCapability("GL_ARB_gpu_shader5", gglHasExtension(ARB_gpu_shader5));
