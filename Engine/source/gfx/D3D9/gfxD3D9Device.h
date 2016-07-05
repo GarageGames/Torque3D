@@ -150,6 +150,10 @@ protected:
    IDirect3DVertexShader9 *mLastVertShader;
    IDirect3DPixelShader9 *mLastPixShader;
 
+   GFXShaderRef mGenericShader[GS_COUNT];
+   GFXShaderConstBufferRef mGenericShaderBuffer[GS_COUNT];
+   GFXShaderConstHandle *mModelViewProjSC[GS_COUNT];
+
    S32 mCreateFenceType;
 
    LPDIRECT3D9       mD3D;        ///< D3D Handle
@@ -325,8 +329,6 @@ public:
 
    /// Reset
    virtual void reset( D3DPRESENT_PARAMETERS &d3dpp ) = 0;
-
-   GFXShaderRef mGenericShader[GS_COUNT];
 
    virtual void setupGenericShaders( GenericShaderType type  = GSColor );
 
