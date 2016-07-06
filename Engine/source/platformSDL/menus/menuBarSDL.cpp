@@ -31,6 +31,8 @@
 
 #include "platformSDL/menus/PlatformSDLPopupMenuData.h"
 
+#include "platformSDL/menus/guiPlatformGenericMenuBar.h"
+
 #ifdef TORQUE_SDL
 
 //-----------------------------------------------------------------------------
@@ -43,30 +45,6 @@
 // };
 
 Map<GuiMenuBar::Menu*, PopupMenu*> PlatformPopupMenuData::mMenuMap;
-
-class GuiPlatformGenericMenuBar : public GuiMenuBar
-{
-   typedef GuiMenuBar Parent;
-public:
-   DECLARE_CONOBJECT(GuiPlatformGenericMenuBar);
-
-   virtual void menuItemSelected(Menu *menu, MenuItem *item)
-   {
-      AssertFatal(menu && item, "");
-
-      PopupMenu *popupMenu = PlatformPopupMenuData::mMenuMap[ menu ];
-      AssertFatal(popupMenu, "");
-
-      popupMenu->handleSelect( item->id );
-
-      Parent::menuItemSelected(menu, item);
-   }
-
-protected:
-   /// menu id / item id
-   Map<CompoundKey<U32, U32>, String> mCmds;
-
-};
 
 IMPLEMENT_CONOBJECT(GuiPlatformGenericMenuBar);
 

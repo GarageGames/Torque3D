@@ -23,7 +23,7 @@
 #ifdef TORQUE_SDL
 
 #include "platform/menus/popupMenu.h"
-#include "platform/menus//menuBar.h"
+#include "platform/menus/menuBar.h"
 #include "console/consoleTypes.h"
 #include "gui/core/guiCanvas.h"
 #include "core/util/safeDelete.h"
@@ -37,10 +37,25 @@
 #include "platformSDL/menus/PlatformSDLPopupMenuData.h"
 #include "console/engineAPI.h"
 
+#include "platformSDL/menus/guiPlatformGenericMenuBar.h"
+#include "gui/editor/guiPopupMenuCtrl.h"
+
 //////////////////////////////////////////////////////////////////////////
 // Platform Menu Data
 //////////////////////////////////////////////////////////////////////////
+GuiPlatformGenericMenuBar* findMenuBarCtrl()
+{
+   GuiControl* control;
+   Sim::findObject("PlatformGenericMenubar", control);
+   AssertFatal(control, "");
+   if (!control)
+      return NULL;
 
+   GuiPlatformGenericMenuBar* menuBar;
+   menuBar = dynamic_cast<GuiPlatformGenericMenuBar*>(control->findObjectByInternalName(StringTable->insert("menubar"), true));
+   AssertFatal(menuBar, "");
+   return menuBar;
+}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -84,7 +99,9 @@ void PopupMenu::createPlatformMenu()
 S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accelerator, const char* cmd)
 {   
    GuiMenuBar::MenuItem *item = GuiMenuBar::findMenuItem( mData->mMenuGui, title );
-   if(item)
+   
+   //We'll make a special exception for the spacer items
+   if(item && dStrcmp(title, ""))
    {
       setItem( pos, title, accelerator, cmd);
       return pos;
@@ -215,8 +232,133 @@ bool PopupMenu::handleSelect(U32 command, const char *text /* = NULL */)
 
 void PopupMenu::showPopup(GuiCanvas *owner, S32 x /* = -1 */, S32 y /* = -1 */)
 {
-    if(owner == NULL || isAttachedToMenuBar())
+    if(owner == NULL)
       return;
+
+    GuiControl* editorGui;
+    Sim::findObject("EditorGui", editorGui);
+
+    if (editorGui)
+    {
+       GuiPopupMenuTextListCtrl* textList;
+       GuiPopupMenuBackgroundCtrl* backgroundCtrl;
+       Sim::findObject("PopUpMenuControl", backgroundCtrl);
+
+       GuiControlProfile* profile;
+       Sim::findObject("GuiMenubarProfile", profile);
+
+       if (!profile)
+          return;
+
+       if (!backgroundCtrl)
+       {
+          textList = new GuiPopupMenuTextListCtrl();
+
+          textList->registerObject();
+
+          backgroundCtrl = new GuiPopupMenuBackgroundCtrl(textList);
+
+          backgroundCtrl->registerObject("PopUpMenuControl");
+
+          textList->setControlProfile(profile);
+
+          backgroundCtrl->addObject(textList);
+       }
+       else
+       {
+          textList = dynamic_cast<GuiPopupMenuTextListCtrl*>(backgroundCtrl->first());
+       }
+
+       if (!backgroundCtrl || !textList)
+          return;
+
+       owner->pushDialogControl(backgroundCtrl, 10);
+
+       backgroundCtrl->setExtent(editorGui->getExtent());
+
+       textList->clear();
+       textList->mMenu = mData->mMenuGui;
+       textList->mMenuBar = findMenuBarCtrl();
+       textList->mPopup = this;
+
+       S32 textWidth = 0, width = 0;
+       S32 acceleratorWidth = 0;
+       GFont *font = profile->mFont;
+
+       Point2I maxBitmapSize = Point2I(0, 0);
+
+       S32 numBitmaps = profile->mBitmapArrayRects.size();
+       if (numBitmaps)
+       {
+          RectI *bitmapBounds = profile->mBitmapArrayRects.address();
+          for (S32 i = 0; i < numBitmaps; i++)
+          {
+             if (bitmapBounds[i].extent.x > maxBitmapSize.x)
+                maxBitmapSize.x = bitmapBounds[i].extent.x;
+             if (bitmapBounds[i].extent.y > maxBitmapSize.y)
+                maxBitmapSize.y = bitmapBounds[i].extent.y;
+          }
+       }
+
+       for (GuiMenuBar::MenuItem *walk = mData->mMenuGui->firstMenuItem; walk; walk = walk->nextMenuItem)
+       {
+          if (!walk->visible)
+             continue;
+
+          S32 iTextWidth = font->getStrWidth(walk->text);
+          S32 iAcceleratorWidth = walk->accelerator ? font->getStrWidth(walk->accelerator) : 0;
+
+          if (iTextWidth > textWidth)
+             textWidth = iTextWidth;
+          if (iAcceleratorWidth > acceleratorWidth)
+             acceleratorWidth = iAcceleratorWidth;
+       }
+       width = textWidth + acceleratorWidth + maxBitmapSize.x * 2 + 2 + 4;
+
+       textList->setCellSize(Point2I(width, font->getHeight() + 2));
+       textList->clearColumnOffsets();
+       textList->addColumnOffset(-1); // add an empty column in for the bitmap index.
+       textList->addColumnOffset(maxBitmapSize.x + 1);
+       textList->addColumnOffset(maxBitmapSize.x + 1 + textWidth + 4);
+
+       U32 entryCount = 0;
+
+       for (GuiMenuBar::MenuItem *walk = mData->mMenuGui->firstMenuItem; walk; walk = walk->nextMenuItem)
+       {
+          if (!walk->visible)
+             continue;
+
+          char buf[512];
+
+          //  If this menu item is a submenu, then set the isSubmenu to 2 to indicate
+          // an arrow should be drawn.  Otherwise set the isSubmenu normally.
+          char isSubmenu = 1;
+          if (walk->isSubmenu)
+             isSubmenu = 2;
+
+          char bitmapIndex = 1;
+          if (walk->bitmapIndex >= 0 && (walk->bitmapIndex * 3 <= profile->mBitmapArrayRects.size()))
+             bitmapIndex = walk->bitmapIndex + 2;
+          dSprintf(buf, sizeof(buf), "%c%c\t%s\t%s", bitmapIndex, isSubmenu, walk->text, walk->accelerator ? walk->accelerator : "");
+          textList->addEntry(entryCount, buf);
+
+          if (!walk->enabled)
+             textList->setEntryActive(entryCount, false);
+
+          entryCount++;
+       }
+
+       Point2I pos = owner->getCursorPos();
+       textList->setPosition(pos);
+
+       //nudge in if we'd overshoot the screen
+       S32 widthDiff = (textList->getPosition().x + textList->getExtent().x) - backgroundCtrl->getWidth();
+       if (widthDiff > 0)
+       {
+          Point2I popupPos = textList->getPosition();
+          textList->setPosition(popupPos.x - widthDiff, popupPos.y);
+       }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////

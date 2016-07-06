@@ -1619,7 +1619,7 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
    }
 
    // Open context menu if this is a SimGroup
-   else if( %obj.isMemberOfClass( "SimGroup" ) )
+   else if( !%obj.isMemberOfClass( "SceneObject" ) )
    {
       %popup = ETSimGroupContextPopup;
       if( !isObject( %popup ) )
@@ -1643,20 +1643,6 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
 
             object = -1;
          };
-         
-      if(%obj.isMemberOfClass("Entity"))
-      {
-         %popup = ETEntityContextPopup;      
-         if( !isObject( %popup ) )
-            %popup = new PopupMenu( ETEntityContextPopup : ETSimGroupContextPopup )
-            {
-               superClass = "MenuBuilder";
-               isPopup = "1";
-
-               item[ 12 ] = "-";
-               item[ 13 ] = "Convert to Game Object" TAB "" TAB "EWorldEditor.createGameObject( %this.object );";
-            };
-      }
 
       %popup.object = %obj;
       
@@ -1689,9 +1675,23 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
 
             object = -1;
          };
+         
+      if(%obj.isMemberOfClass("Entity"))
+      {
+         %popup = ETEntityContextPopup;      
+         if( !isObject( %popup ) )
+            %popup = new PopupMenu( ETEntityContextPopup : ETSimGroupContextPopup )
+            {
+               superClass = "MenuBuilder";
+               isPopup = "1";
+
+               item[ 12 ] = "-";
+               item[ 13 ] = "Convert to Game Object" TAB "" TAB "EWorldEditor.createGameObject( %this.object );";
+            };
+      }
      
       // Specialized version for ConvexShapes. 
-      if( %obj.isMemberOfClass( "ConvexShape" ) )
+      else if( %obj.isMemberOfClass( "ConvexShape" ) )
       {
          %popup = ETConvexShapeContextPopup;      
          if( !isObject( %popup ) )
