@@ -99,7 +99,9 @@ void PopupMenu::createPlatformMenu()
 S32 PopupMenu::insertItem(S32 pos, const char *title, const char* accelerator, const char* cmd)
 {   
    GuiMenuBar::MenuItem *item = GuiMenuBar::findMenuItem( mData->mMenuGui, title );
-   if(item)
+   
+   //We'll make a special exception for the spacer items
+   if(item && dStrcmp(title, ""))
    {
       setItem( pos, title, accelerator, cmd);
       return pos;
