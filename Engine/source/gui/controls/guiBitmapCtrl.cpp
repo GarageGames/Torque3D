@@ -56,7 +56,8 @@ ConsoleDocClass( GuiBitmapCtrl,
 GuiBitmapCtrl::GuiBitmapCtrl(void)
  : mBitmapName(),
    mStartPoint( 0, 0 ),
-   mWrap( false )
+   mWrap( false ),
+   mColor(ColorI::WHITE)
 {	
 }
 
@@ -78,7 +79,8 @@ void GuiBitmapCtrl::initPersistFields()
    
       addProtectedField( "bitmap", TypeImageFilename, Offset( mBitmapName, GuiBitmapCtrl ),
          &setBitmapName, &defaultProtectedGetFn,
-         "The bitmap file to display in the control." );
+         "The bitmap file to display in the control.");
+      addField("color", TypeColorI, Offset(mColor, GuiBitmapCtrl),"color mul");
       addField( "wrap",   TypeBool,     Offset( mWrap, GuiBitmapCtrl ),
          "If true, the bitmap is tiled inside the control rather than stretched to fit." );
       
@@ -169,6 +171,7 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
    if (mTextureObject)
    {
       GFX->getDrawUtil()->clearBitmapModulation();
+      GFX->getDrawUtil()->setBitmapModulation(mColor);
 		if(mWrap)
 		{
          // We manually draw each repeat because non power of two textures will 

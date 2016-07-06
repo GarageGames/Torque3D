@@ -58,6 +58,7 @@ void GuiBitmapBarCtrl::onRender(Point2I offset, const RectI &updateRect)
    if (mTextureObject)
    {
       GFX->getDrawUtil()->clearBitmapModulation();
+      GFX->getDrawUtil()->setBitmapModulation(mColor);
       F32 pct = (mPercent / 100.0);
       GFXTextureObject* texture = mTextureObject;
       Point2I modifiedSRC;
