@@ -29,6 +29,8 @@
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 
+#include "materials/matTextureTarget.h"
+
 
 IMPLEMENT_CONOBJECT(GuiBitmapCtrl);
 
@@ -266,4 +268,25 @@ DefineConsoleMethod( GuiBitmapCtrl, setBitmap, void, ( const char * fileRoot, bo
    char filename[1024];
    Con::expandScriptFilename(filename, sizeof(filename), fileRoot);
    object->setBitmap(filename, resize );
+}
+
+DefineEngineMethod( GuiBitmapCtrl, setNamedTexture, bool, (String namedtexture),,
+   "@brief Set a texture as the image.\n\n"
+   "@param namedtexture The name of the texture (NamedTexTarget).\n"
+   "@return true if the texture exists." )
+{
+   GFXTexHandle theTex;
+   NamedTexTarget *namedTarget = NULL;
+   namedTarget = NamedTexTarget::find(namedtexture.c_str());
+   if ( namedTarget )
+   {
+      theTex = namedTarget->getTexture( 0 );
+   }
+   
+   if ( theTex.isValid() )
+   {
+      object->setBitmapHandle( theTex , false );
+      return true; //a new texture was set correctly
+   }
+   return false; //we couldn't change the texture
 }
