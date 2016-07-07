@@ -170,7 +170,7 @@ public:
    void setAimLocation( const Point3F &location );
    Point3F getAimLocation() const { return mAimLocation; }
    void clearAim();
-   void AIPlayer::getMuzzleVector(U32 imageSlot,VectorF* vec);
+   void getMuzzleVector(U32 imageSlot,VectorF* vec);
    bool checkInLos(GameBase* target = NULL, bool _useMuzzle = false, bool _checkEnabled = false);
    bool checkInFoV(GameBase* target = NULL, F32 camFov = 45.0f, bool _checkEnabled = false);
    F32 getTargetDistance(GameBase* target, bool _checkEnabled);
