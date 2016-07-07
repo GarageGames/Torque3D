@@ -963,7 +963,7 @@ void Precipitation::initRenderObjects()
 
    // Create a volitile vertex buffer which
    // we'll lock and fill every frame.
-   mRainVB.set(GFX, mMaxVBDrops * 4, GFXBufferTypeVolatile);
+   mRainVB.set(GFX, mMaxVBDrops * 4, GFXBufferTypeDynamic);
 
    // Init the index buffer for rendering the
    // entire or a partially filled vb.
