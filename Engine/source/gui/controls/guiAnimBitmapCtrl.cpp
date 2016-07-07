@@ -269,6 +269,7 @@ void guiAnimBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
       }
 
       GFX->getDrawUtil()->clearBitmapModulation();
+      GFX->getDrawUtil()->setBitmapModulation(mColor);
 
       GFXTextureObject* texture = mTextureObject;
 
