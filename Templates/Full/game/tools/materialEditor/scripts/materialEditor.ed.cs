@@ -27,12 +27,12 @@ function MaterialEditorGui::establishMaterials(%this)
    //Cubemap used to preview other cubemaps in the editor.
    singleton CubemapData( matEdCubeMapPreviewMat )
    {
-      cubeFace[0] = "tools/materialeditor/gui/cube_xNeg";
-      cubeFace[1] = "tools/materialeditor/gui/cube_xPos";
-      cubeFace[2] = "tools/materialeditor/gui/cube_ZNeg";
-      cubeFace[3] = "tools/materialeditor/gui/cube_ZPos";
-      cubeFace[4] = "tools/materialeditor/gui/cube_YNeg";
-      cubeFace[5] = "tools/materialeditor/gui/cube_YPos";
+      cubeFace[0] = "tools/materialEditor/gui/cube_xNeg";
+      cubeFace[1] = "tools/materialEditor/gui/cube_xPos";
+      cubeFace[2] = "tools/materialEditor/gui/cube_ZNeg";
+      cubeFace[3] = "tools/materialEditor/gui/cube_ZPos";
+      cubeFace[4] = "tools/materialEditor/gui/cube_YNeg";
+      cubeFace[5] = "tools/materialEditor/gui/cube_YPos";
       parentGroup = "RootGroup";
    };
    
@@ -40,7 +40,7 @@ function MaterialEditorGui::establishMaterials(%this)
    singleton Material(materialEd_previewMaterial)
    {
       mapTo = "matEd_mappedMat";
-      diffuseMap[0] = "tools/materialeditor/gui/matEd_mappedMat";
+      diffuseMap[0] = "tools/materialEditor/gui/matEd_mappedMat";
    };
 
    singleton CustomMaterial( materialEd_justAlphaMaterial )
@@ -371,32 +371,32 @@ function MaterialEditorGui::updatePreviewObject(%this)
 	{
 		case "sphere":
          matEd_quickPreview_Popup.selected = %newModel;
-         matEd_previewObjectView.setModel("tools/materialeditor/gui/spherePreview.dts");
+         matEd_previewObjectView.setModel("tools/materialEditor/gui/spherePreview.dts");
          matEd_previewObjectView.setOrbitDistance(4);
 				
 		case "cube":
          matEd_quickPreview_Popup.selected = %newModel;
-         matEd_previewObjectView.setModel("tools/materialeditor/gui/cubePreview.dts");
+         matEd_previewObjectView.setModel("tools/materialEditor/gui/cubePreview.dts");
          matEd_previewObjectView.setOrbitDistance(5);
 				
 		case "pyramid":
          matEd_quickPreview_Popup.selected = %newModel;
-         matEd_previewObjectView.setModel("tools/materialeditor/gui/pyramidPreview.dts");
+         matEd_previewObjectView.setModel("tools/materialEditor/gui/pyramidPreview.dts");
          matEd_previewObjectView.setOrbitDistance(5);
 				
 		case "cylinder":
          matEd_quickPreview_Popup.selected = %newModel;
-         matEd_previewObjectView.setModel("tools/materialeditor/gui/cylinderPreview.dts");
+         matEd_previewObjectView.setModel("tools/materialEditor/gui/cylinderPreview.dts");
          matEd_previewObjectView.setOrbitDistance(4.2);
 				
 		case "torus":
          matEd_quickPreview_Popup.selected = %newModel;
-         matEd_previewObjectView.setModel("tools/materialeditor/gui/torusPreview.dts");
+         matEd_previewObjectView.setModel("tools/materialEditor/gui/torusPreview.dts");
          matEd_previewObjectView.setOrbitDistance(4.2);
 				
 		case "knot":
          matEd_quickPreview_Popup.selected = %newModel;
-         matEd_previewObjectView.setModel("tools/materialeditor/gui/torusknotPreview.dts");
+         matEd_previewObjectView.setModel("tools/materialEditor/gui/torusknotPreview.dts");
 	}
 }
 
@@ -802,7 +802,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    if((%material).diffuseMap[%layer] $= "") 
    {
       MaterialEditorPropertiesWindow-->diffuseMapNameText.setText( "None" );
-      MaterialEditorPropertiesWindow-->diffuseMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
+      MaterialEditorPropertiesWindow-->diffuseMapDisplayBitmap.setBitmap( "tools/materialEditor/gui/unknownImage" );
    }
    else
    {
@@ -813,7 +813,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    if((%material).normalMap[%layer] $= "") 
    {
       MaterialEditorPropertiesWindow-->normalMapNameText.setText( "None" );
-      MaterialEditorPropertiesWindow-->normalMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
+      MaterialEditorPropertiesWindow-->normalMapDisplayBitmap.setBitmap( "tools/materialEditor/gui/unknownImage" );
    }
    else
    {
@@ -824,7 +824,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    if((%material).overlayMap[%layer] $= "") 
    {
       MaterialEditorPropertiesWindow-->overlayMapNameText.setText( "None" );
-      MaterialEditorPropertiesWindow-->overlayMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
+      MaterialEditorPropertiesWindow-->overlayMapDisplayBitmap.setBitmap( "tools/materialEditor/gui/unknownImage" );
    }
    else
    {
@@ -835,7 +835,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    if((%material).detailMap[%layer] $= "") 
    {
       MaterialEditorPropertiesWindow-->detailMapNameText.setText( "None" );
-      MaterialEditorPropertiesWindow-->detailMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
+      MaterialEditorPropertiesWindow-->detailMapDisplayBitmap.setBitmap( "tools/materialEditor/gui/unknownImage" );
    }
    else
    {
@@ -846,7 +846,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    if((%material).detailNormalMap[%layer] $= "") 
    {
       MaterialEditorPropertiesWindow-->detailNormalMapNameText.setText( "None" );
-      MaterialEditorPropertiesWindow-->detailNormalMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
+      MaterialEditorPropertiesWindow-->detailNormalMapDisplayBitmap.setBitmap( "tools/materialEditor/gui/unknownImage" );
    }
    else
    {
@@ -857,7 +857,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    if((%material).lightMap[%layer] $= "") 
    {
       MaterialEditorPropertiesWindow-->lightMapNameText.setText( "None" );
-      MaterialEditorPropertiesWindow-->lightMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
+      MaterialEditorPropertiesWindow-->lightMapDisplayBitmap.setBitmap( "tools/materialEditor/gui/unknownImage" );
    }
    else
    {
@@ -868,7 +868,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    if((%material).toneMap[%layer] $= "") 
    {
       MaterialEditorPropertiesWindow-->toneMapNameText.setText( "None" );
-      MaterialEditorPropertiesWindow-->toneMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
+      MaterialEditorPropertiesWindow-->toneMapDisplayBitmap.setBitmap( "tools/materialEditor/gui/unknownImage" );
    }
    else
    {
@@ -879,7 +879,7 @@ function MaterialEditorGui::guiSync( %this, %material )
    if((%material).specularMap[%layer] $= "") 
    {
       MaterialEditorPropertiesWindow-->specMapNameText.setText( "None" );
-      MaterialEditorPropertiesWindow-->specMapDisplayBitmap.setBitmap( "tools/materialeditor/gui/unknownImage" );
+      MaterialEditorPropertiesWindow-->specMapDisplayBitmap.setBitmap( "tools/materialEditor/gui/unknownImage" );
    }
    else
    {
@@ -1141,7 +1141,7 @@ function MaterialEditorGui::updateTextureMap( %this, %type, %action )
    else
    {
       %textCtrl.setText("None");
-      %bitmapCtrl.setBitmap("tools/materialeditor/gui/unknownImage");
+      %bitmapCtrl.setBitmap("tools/materialEditor/gui/unknownImage");
       MaterialEditorGui.updateActiveMaterial(%type @ "Map[" @ %layer @ "]","");
    }
 }
@@ -1185,7 +1185,7 @@ function MaterialEditorGui::updateSpecMap(%this,%action)
    else
    {
       MaterialEditorPropertiesWindow-->specMapNameText.setText("None");
-      MaterialEditorPropertiesWindow-->specMapDisplayBitmap.setBitmap("tools/materialeditor/gui/unknownImage");
+      MaterialEditorPropertiesWindow-->specMapDisplayBitmap.setBitmap("tools/materialEditor/gui/unknownImage");
       MaterialEditorGui.updateActiveMaterial("specularMap[" @ %layer @ "]","");
    }
    
@@ -1604,12 +1604,12 @@ function MaterialEditorGui::createNewCubemap( %this, %cubemap )
    
    new CubemapData(%cubemap) 
    {
-      cubeFace[0] = "tools/materialeditor/gui/cube_xNeg";
-      cubeFace[1] = "tools/materialeditor/gui/cube_xPos";
-      cubeFace[2] = "tools/materialeditor/gui/cube_ZNeg";
-      cubeFace[3] = "tools/materialeditor/gui/cube_ZPos";
-      cubeFace[4] = "tools/materialeditor/gui/cube_YNeg";
-      cubeFace[5] = "tools/materialeditor/gui/cube_YPos";
+      cubeFace[0] = "tools/materialEditor/gui/cube_xNeg";
+      cubeFace[1] = "tools/materialEditor/gui/cube_xPos";
+      cubeFace[2] = "tools/materialEditor/gui/cube_ZNeg";
+      cubeFace[3] = "tools/materialEditor/gui/cube_ZPos";
+      cubeFace[4] = "tools/materialEditor/gui/cube_YNeg";
+      cubeFace[5] = "tools/materialEditor/gui/cube_YPos";
 
       parentGroup = RootGroup;
    };
