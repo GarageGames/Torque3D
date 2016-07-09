@@ -113,7 +113,7 @@
       tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Paint (5)";
       hovertime = "1000";
-      bitmap = "tools/foresteditor/images/paint-forest-btn";
+      bitmap = "tools/forestEditor/images/paint-forest-btn";
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
@@ -134,7 +134,7 @@
       tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Erase (6)";
       hovertime = "1000";
-      bitmap = "tools/foresteditor/images/erase-all-btn";
+      bitmap = "tools/forestEditor/images/erase-all-btn";
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
@@ -156,7 +156,7 @@
       tooltipprofile = "ToolsGuiToolTipProfile";
       ToolTip = "Erase Selected (7)";
       hovertime = "1000";
-      bitmap = "tools/foresteditor/images/erase-element-btn";
+      bitmap = "tools/forestEditor/images/erase-element-btn";
       buttonType = "RadioButton";
       useMouseEvents = "0";
    };
