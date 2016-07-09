@@ -115,7 +115,7 @@ typedef unsigned long  U64;
 
 //--------------------------------------
 // Identify the CPU
-#if defined(i386)
+#if defined(i386) || defined(__i386) || defined(__i386__)
 #  define TORQUE_CPU_STRING "Intel x86"
 #  define TORQUE_CPU_X86
 #  define TORQUE_LITTLE_ENDIAN
