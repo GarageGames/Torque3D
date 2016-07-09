@@ -916,6 +916,7 @@ ShapeBase::ShapeBase()
    mFadeDelay( 0.0f ),
    mCameraFov( 90.0f ),
    mIsControlled( false ),
+   mAiPose( 0 ), //< ZOD: https://www.garagegames.com/community/resources/view/22501
    mLastRenderFrame( 0 ),
    mLastRenderDistance( 0.0f )
 {

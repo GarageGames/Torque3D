@@ -235,6 +235,13 @@ void AIPlayer::setMoveTolerance( const F32 tolerance )
  */
 void AIPlayer::setMoveDestination( const Point3F &location, bool slowdown )
 {
+//> ZOD: Game Mechanic Kit v1.2.13: aiBot hack to avoid stopping right after beginning of the move
+   MatrixF eye;
+   getEyeTransform(&eye);
+   Point3F pos = eye.getPosition();
+   mLastLocation = pos;
+   mLastLocation.z += mMoveTolerance * 2;
+//< Game Mechanic Kit: End addition
    mMoveDestination = location;
    mMoveState = ModeMove;
    mMoveSlowdown = slowdown;
@@ -245,14 +252,14 @@ void AIPlayer::setMoveDestination( const Point3F &location, bool slowdown )
  * Sets the object the bot is targeting
  *
  * @param targetObject The object to target
- */
+
 void AIPlayer::setAimObject( GameBase *targetObject )
 {
    mAimObject = targetObject;
    mTargetInLOS = false;
    mAimOffset = Point3F(0.0f, 0.0f, 0.0f);
 }
-
+*/
 /**
  * Sets the object the bot is targeting and an offset to add to target location
  *
@@ -271,12 +278,11 @@ void AIPlayer::setAimObject(GameBase *targetObject, const Point3F& offset)
  *
  * @param location Point to aim at
  */
-void AIPlayer::setAimLocation( const Point3F &location )
+void AIPlayer::setAimLocation( const Point3F &location, Point3F offset )
 {
-   mAimObject = 0;
    mAimLocationSet = true;
    mAimLocation = location;
-   mAimOffset = Point3F(0.0f, 0.0f, 0.0f);
+   mAimOffset = offset;
 }
 
 /**
@@ -539,29 +545,44 @@ bool AIPlayer::getAIMove(Move *movePtr)
    // Test for target location in sight if it's an object. The LOS is
    // run from the eye position to the center of the object's bounding,
    // which is not very accurate.
-   if (mAimObject) {
-      MatrixF eyeMat;
-      getEyeTransform(&eyeMat);
-      eyeMat.getColumn(3,&location);
-      Point3F targetLoc = mAimObject->getBoxCenter();
-
-      // This ray ignores non-static shapes. Cast Ray returns true
-      // if it hit something.
-      RayInfo dummy;
-      if (getContainer()->castRay( location, targetLoc,
-            StaticShapeObjectType | StaticObjectType |
-            TerrainObjectType, &dummy)) {
-         if (mTargetInLOS) {
-            throwCallback( "onTargetExitLOS" );
-            mTargetInLOS = false;
-         }
-      }
-      else
-         if (!mTargetInLOS) {
-            throwCallback( "onTargetEnterLOS" );
+//< ZOD: Use new los function
+   if (mAimObject)
+   {
+      if (checkInLos(mAimObject, true, true))
+	  {
+         throwCallback( "onTargetEnterLOS" );
+	     if (!mTargetInLOS)
+		 {
             mTargetInLOS = true;
-         }
+		 }
+	  }
+	  else
+	  {
+         throwCallback( "onTargetExitLOS" );
+	     if (!mTargetInLOS)
+		 {
+            mTargetInLOS = false;
+		 }
+	  }
    }
+//> ZOD: End edit
+//< ZOD: https://www.garagegames.com/community/resources/view/22501
+    Pose desiredPose = mPose;
+  
+    //yorks select for Ai using mAiPose
+   if ( mSwimming )
+        desiredPose = SwimPose;
+    else if ( mAiPose == 1 && canCrouch() )
+        desiredPose = CrouchPose;
+    else if ( mAiPose == 2 && canProne() )
+        desiredPose = PronePose;
+    else if ( mAiPose == 3 && canSprint() )
+        desiredPose = SprintPose;
+    else if ( canStand() )
+        desiredPose = StandPose;
+  
+    setPose( desiredPose );
+//< ZOD: End addition
 
    // Replicate the trigger state into the move so that
    // triggers can be controlled from scripts.
@@ -587,9 +608,23 @@ bool AIPlayer::getAIMove(Move *movePtr)
 #endif // TORQUE_NAVIGATION_ENABLED
 
    mLastLocation = location;
-
+//< ZOD: Dusty Monk/Michael Bacon · 11/15/2007: http://www.garagegames.com/community/blogs/view/13856
+   movePtr->clamp(); //Clamp the move for network traffic..
+//> Dusty Monk: End
    return true;
 }
+
+//< ZOD: https://www.garagegames.com/community/resources/view/22501
+void AIPlayer::setAiPose( F32 pose )
+{
+   mAiPose = pose;
+}
+
+F32 AIPlayer::getAiPose()
+{
+   return mAiPose; 
+}
+//< ZOD: End addition
 
 /**
  * Utility function to throw callbacks. Callbacks always occure
@@ -1095,6 +1130,12 @@ DefineEngineMethod( AIPlayer, getMoveSpeed, F32, ( ),,
    return object->getMoveSpeed();
 }
 
+DefineEngineMethod( AIPlayer, setMoveTolerance, void, ( F32 tolerance ),,
+	"@Sets the movetolerance\n")
+{
+	object->setMoveTolerance(tolerance);
+}
+
 DefineEngineMethod( AIPlayer, setMoveDestination, void, ( Point3F goal, bool slowDown ), ( true ),
    "@brief Tells the AI to move to the location provided\n\n"
 
@@ -1122,7 +1163,7 @@ DefineEngineMethod( AIPlayer, getMoveDestination, Point3F, (),,
 {
 	return object->getMoveDestination();
 }
-
+/*
 DefineEngineMethod( AIPlayer, setAimLocation, void, ( Point3F target ),,
    "@brief Tells the AIPlayer to aim at the location provided.\n\n"
 
@@ -1131,6 +1172,19 @@ DefineEngineMethod( AIPlayer, setAimLocation, void, ( Point3F target ),,
    "@see getAimLocation()\n")
 {
 	object->setAimLocation(target);
+}
+*/
+ConsoleMethod( AIPlayer, setAimLocation, void, 3, 4, "( Point3F target, [Point3F offset] )"
+              "Sets the bot's target object. Optionally set an offset from target location."
+			  "@hide")
+{
+   Point3F off( 0.0f, 0.0f, 0.0f );
+   Point3F target( 0.0f, 0.0f, 0.0f );
+   if (argc == 4)
+      dSscanf( argv[3], "%g %g %g", &off.x, &off.y, &off.z );
+
+   dSscanf( argv[2], "%g %g %g", &target.x, &target.y, &target.z );
+   object->setAimLocation(target, off);
 }
 
 DefineEngineMethod( AIPlayer, getAimLocation, Point3F, (),,
@@ -1348,3 +1402,21 @@ DefineEngineMethod( AIPlayer, clearMoveTriggers, void, ( ),,
 {
    object->clearMoveTriggers();
 }
+
+//< ZOD: https://www.garagegames.com/community/resources/view/22501
+DefineEngineMethod( AIPlayer, setAiPose, void, ( F32 pose ),,
+   "@brief Sets the AiPose for an AI object.nn"
+   "@param pose StandPose=0,CrouchPose=1,PronePose=2,SprintPose=3.  "
+   "Uses the new AiPose variable from shapebase (as defined in "
+   "its PlayerData datablock)nn")
+{
+	object->setAiPose(pose);
+}
+
+DefineEngineMethod( AIPlayer, getAiPose, F32, (),,
+   "@brief Get the object's current AiPose.nn"
+   "@return StandPose=0,CrouchPose=1,PronePose=2,SprintPose=3n")
+{
+   return object->getAiPose();
+}
+//< ZOD: End addition

@@ -882,6 +882,7 @@ protected:
    F32 mEnergy;                     ///< Current enery level.
    F32 mRechargeRate;               ///< Energy recharge rate (in units/tick).
    S32 mTeamId;                     ///< ZOD: Team identification for shape name
+   F32 mAiPose;                     ///< ZOD: https://www.garagegames.com/community/resources/view/22501
    F32 mMass;                       ///< Mass.
    F32 mOneOverMass;                ///< Inverse of mass.
                                     /// @note This is used to optimize certain physics calculations.

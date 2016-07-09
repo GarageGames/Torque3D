@@ -165,7 +165,8 @@ public:
    void setAimObject( GameBase *targetObject );
    void setAimObject(GameBase *targetObject, const Point3F& offset);
    GameBase* getAimObject() const  { return mAimObject; }
-   void setAimLocation( const Point3F &location );
+   //void setAimLocation( const Point3F &location );
+   void setAimLocation( const Point3F &location, Point3F offset ); //> ZOD: Edit for offset
    Point3F getAimLocation() const { return mAimLocation; }
    void clearAim();
    bool checkInLos(GameBase* target = NULL, bool _useMuzzle = false, bool _checkEnabled = false);
@@ -179,6 +180,10 @@ public:
    void setMoveDestination( const Point3F &location, bool slowdown );
    Point3F getMoveDestination() const { return mMoveDestination; }
    void stopMove();
+//< ZOD: https://www.garagegames.com/community/resources/view/22501
+   void setAiPose( const F32 pose );
+   F32  getAiPose();
+//> ZOD: End addition
 
    // Trigger sets/gets
    void setMoveTrigger( U32 slot, const bool isSet = true );

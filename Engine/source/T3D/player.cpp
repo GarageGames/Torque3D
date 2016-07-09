@@ -3172,7 +3172,8 @@ void Player::updateMove(const Move* move)
 
    // Update the PlayerPose
    Pose desiredPose = mPose;
-
+   if (!mIsAiControlled) //< ZOD: https://www.garagegames.com/community/resources/view/22501
+   {
    if ( mSwimming )
       desiredPose = SwimPose; 
    else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
@@ -3183,6 +3184,7 @@ void Player::updateMove(const Move* move)
       desiredPose = SprintPose;
    else if ( canStand() )
       desiredPose = StandPose;
+   }
 
    setPose( desiredPose );
 }
@@ -6185,7 +6187,11 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if (stream->writeFlag(mask & MoveMask))
    {
       stream->writeFlag(mFalling);
-
+//< ZOD: https://www.garagegames.com/community/resources/view/22501
+      stream->writeFlag(mSwimming);
+      stream->writeFlag(mJetting);
+      stream->writeInt(mPose, NumPoseBits);
+//> ZOD: End addition
       stream->writeInt(mState,NumStateBits);
       if (stream->writeFlag(mState == RecoverState))
          stream->writeInt(mRecoverTicks,PlayerData::RecoverDelayBits);
@@ -6282,7 +6288,11 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
    if (stream->readFlag()) {
       mPredictionCount = sMaxPredictionTicks;
       mFalling = stream->readFlag();
-
+//< ZOD: https://www.garagegames.com/community/resources/view/22501
+        mSwimming = stream->readFlag();
+        mJetting = stream->readFlag();
+        mPose = (Pose)(stream->readInt(NumPoseBits));
+//> ZOD: End addition
       ActionState actionState = (ActionState)stream->readInt(NumStateBits);
       if (stream->readFlag()) {
          mRecoverTicks = stream->readInt(PlayerData::RecoverDelayBits);
