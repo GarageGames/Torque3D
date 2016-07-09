@@ -103,7 +103,7 @@ typedef unsigned long  U64;
 #  define TORQUE_OS_STRING "MacOS X"
 #  define TORQUE_OS_MAC
 #  include "platform/types.mac.h"
-#  if defined(i386)
+#  if defined(__i386__)
 // Disabling ASM on XCode for shared library build code relocation issues
 // This could be reconfigured for static builds, though minimal impact
 //#     define TORQUE_SUPPORTS_NASM
@@ -115,7 +115,7 @@ typedef unsigned long  U64;
 
 //--------------------------------------
 // Identify the CPU
-#if defined(i386)
+#if defined(__i386__)
 #  define TORQUE_CPU_STRING "Intel x86"
 #  define TORQUE_CPU_X86
 #  define TORQUE_LITTLE_ENDIAN
