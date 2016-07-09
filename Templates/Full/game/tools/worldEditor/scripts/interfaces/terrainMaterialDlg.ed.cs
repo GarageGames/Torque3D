@@ -218,7 +218,7 @@ function TerrainMaterialDlg::changeBase( %this )
       if( %ctrl.bitmap !$= "" )
          %file = %ctrl.bitmap;
       else
-         %file = "tools/materialeditor/gui/unknownImage";
+         %file = "tools/materialEditor/gui/unknownImage";
    }
    
    %file = makeRelativePath( %file, getMainDotCsDir() );
@@ -240,7 +240,7 @@ function TerrainMaterialDlg::changeDetail( %this )
       if( %ctrl.bitmap !$= "" )
          %file = %ctrl.bitmap;
       else
-         %file = "tools/materialeditor/gui/unknownImage";
+         %file = "tools/materialEditor/gui/unknownImage";
    }
    
    %file = makeRelativePath( %file, getMainDotCsDir() );
@@ -262,7 +262,7 @@ function TerrainMaterialDlg::changeMacro( %this )
       if( %ctrl.bitmap !$= "" )
          %file = %ctrl.bitmap;
       else
-         %file = "tools/materialeditor/gui/unknownImage";
+         %file = "tools/materialEditor/gui/unknownImage";
    }
    
    %file = makeRelativePath( %file, getMainDotCsDir() );
@@ -285,7 +285,7 @@ function TerrainMaterialDlg::changeNormal( %this )
       if( %ctrl.bitmap !$= "" )
          %file = %ctrl.bitmap;
       else
-         %file = "tools/materialeditor/gui/unknownImage";
+         %file = "tools/materialEditor/gui/unknownImage";
    }
 
    %file = makeRelativePath( %file, getMainDotCsDir() );
@@ -376,22 +376,22 @@ function TerrainMaterialDlg::setActiveMaterial( %this, %mat )
       
       %this-->matNameCtrl.setText( %mat.internalName );
       if (%mat.diffuseMap $= ""){
-         %this-->baseTexCtrl.setBitmap( "tools/materialeditor/gui/unknownImage" );
+         %this-->baseTexCtrl.setBitmap( "tools/materialEditor/gui/unknownImage" );
       }else{
          %this-->baseTexCtrl.setBitmap( %mat.diffuseMap ); 
       }
       if (%mat.detailMap $= ""){
-         %this-->detailTexCtrl.setBitmap( "tools/materialeditor/gui/unknownImage" );
+         %this-->detailTexCtrl.setBitmap( "tools/materialEditor/gui/unknownImage" );
       }else{
          %this-->detailTexCtrl.setBitmap( %mat.detailMap );
       }
       if (%mat.macroMap $= ""){
-         %this-->macroTexCtrl.setBitmap( "tools/materialeditor/gui/unknownImage" );
+         %this-->macroTexCtrl.setBitmap( "tools/materialEditor/gui/unknownImage" );
       }else{
          %this-->macroTexCtrl.setBitmap( %mat.macroMap );
       }      
       if (%mat.normalMap $= ""){
-         %this-->normTexCtrl.setBitmap( "tools/materialeditor/gui/unknownImage" );
+         %this-->normTexCtrl.setBitmap( "tools/materialEditor/gui/unknownImage" );
       }else{
          %this-->normTexCtrl.setBitmap( %mat.normalMap ); 
       }
@@ -428,22 +428,22 @@ function TerrainMaterialDlg::saveDirtyMaterial( %this, %mat )
    
    %newName = %this-->matNameCtrl.getText(); 
    
-   if (%this-->baseTexCtrl.bitmap $= "tools/materialeditor/gui/unknownImage"){
+   if (%this-->baseTexCtrl.bitmap $= "tools/materialEditor/gui/unknownImage"){
       %newDiffuse = "";
    }else{
       %newDiffuse = %this-->baseTexCtrl.bitmap;  
    }
-   if (%this-->normTexCtrl.bitmap $= "tools/materialeditor/gui/unknownImage"){
+   if (%this-->normTexCtrl.bitmap $= "tools/materialEditor/gui/unknownImage"){
       %newNormal = "";
    }else{
       %newNormal = %this-->normTexCtrl.bitmap;  
    }
-   if (%this-->detailTexCtrl.bitmap $= "tools/materialeditor/gui/unknownImage"){
+   if (%this-->detailTexCtrl.bitmap $= "tools/materialEditor/gui/unknownImage"){
       %newDetail = "";
    }else{
       %newDetail = %this-->detailTexCtrl.bitmap;  
    }
-   if (%this-->macroTexCtrl.bitmap $= "tools/materialeditor/gui/unknownImage"){
+   if (%this-->macroTexCtrl.bitmap $= "tools/materialEditor/gui/unknownImage"){
       %newMacro = "";
    }else{
       %newMacro = %this-->macroTexCtrl.bitmap;  
