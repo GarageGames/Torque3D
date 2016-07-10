@@ -315,7 +315,7 @@ function DecalEditorGui::updateDecalPreview( %this, %material )
    if( isObject( %material ) )
       DecalPreviewWindow-->decalPreview.setBitmap( MaterialEditorGui.searchForTexture( %material.getId(), %material.diffuseMap[0]) );
    else
-      DecalPreviewWindow-->decalPreview.setBitmap("tools/materialeditor/gui/unknownImage");
+      DecalPreviewWindow-->decalPreview.setBitmap("tools/materialEditor/gui/unknownImage");
 }
 
 function DecalEditorGui::updateInstancePreview( %this, %material )
@@ -323,7 +323,7 @@ function DecalEditorGui::updateInstancePreview( %this, %material )
    if( isObject( %material ) )
       DecalPreviewWindow-->instancePreview.setBitmap( MaterialEditorGui.searchForTexture( %material.getId(), %material.diffuseMap[0]) );      
    else
-      DecalPreviewWindow-->instancePreview.setBitmap("tools/materialeditor/gui/unknownImage");   
+      DecalPreviewWindow-->instancePreview.setBitmap("tools/materialEditor/gui/unknownImage");   
 }
 
 function DecalEditorGui::rebuildInstanceTree( %this )
