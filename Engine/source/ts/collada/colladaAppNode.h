@@ -24,7 +24,7 @@
 #define _COLLADA_APPNODE_H_
 
 #ifndef _TDICTIONARY_H_
-#include "core/tDictionary.h"
+#include "core/util/tDictionary.h"
 #endif
 #ifndef _APPNODE_H_
 #include "ts/loader/appNode.h"

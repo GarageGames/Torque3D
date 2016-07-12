@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "../../hlslStructs.h"
+#include "../../hlslStructs.hlsl"
 #include "farFrustumQuad.hlsl"
 
 
@@ -36,8 +36,8 @@ FarFrustumQuadConnectV main( VertexIn_PNTT IN,
    
    // Interpolators will generate eye rays the 
    // from far-frustum corners.
-   OUT.wsEyeRay = IN.tangent.xyz;
-   OUT.vsEyeRay = IN.normal.xyz;
+   OUT.wsEyeRay = IN.tangent;
+   OUT.vsEyeRay = IN.normal;
 
    return OUT;
 }

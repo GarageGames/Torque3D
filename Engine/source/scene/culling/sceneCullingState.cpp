@@ -88,6 +88,8 @@ SceneCullingState::SceneCullingState( SceneManager* sceneManager, const SceneCam
       SceneCullingVolume::Includer,
       PlaneSetF( planes, 4 )
    );
+
+   clearExtraPlanesCull();
 }
 
 //-----------------------------------------------------------------------------
@@ -788,6 +790,9 @@ U32 SceneCullingState::cullObjects( SceneObject** objects, U32 numObjects, U32 c
          isCulled = ( result == SceneZoneCullingState::CullingTestNegative ||
                       result == SceneZoneCullingState::CullingTestPositiveByOcclusion );
       }
+
+      if( !isCulled )
+         isCulled = isOccludedWithExtraPlanesCull( object->getWorldBox() );
 
       if( !isCulled )
          objects[ numRemainingObjects ++ ] = object;

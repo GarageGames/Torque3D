@@ -20,14 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"
+#include "../shaderModel.hlsl"
 
 //-----------------------------------------------------------------------------
 // Structures                                                                  
 //-----------------------------------------------------------------------------
 struct VertData
 {
-   float4 position         : POSITION;
+   float3 position         : POSITION;
    float3 normal           : NORMAL;
    float2 undulateData     : TEXCOORD0;
    float4 horizonFactor    : TEXCOORD1;
@@ -35,7 +35,7 @@ struct VertData
 
 struct ConnectData
 {
-   float4 hpos             : POSITION;   
+   float4 hpos             : TORQUE_POSITION;   
    
    // TexCoord 0 and 1 (xy,zw) for ripple texture lookup
    float4 rippleTexCoord01 : TEXCOORD0;   
@@ -94,12 +94,12 @@ ConnectData main( VertData IN )
                        0.0,  0.0,  0.0,  1.0 };
          
    IN.position.z = lerp( IN.position.z, eyePos.z, IN.horizonFactor.x );
-   
-   OUT.objPos = IN.position;
-   OUT.objPos.w = mul( modelMat, IN.position ).z;
+   float4 inPos = float4( IN.position, 1.0);
+   OUT.objPos = inPos;
+   OUT.objPos.w = mul( modelMat, inPos ).z;
    
    // Send pre-undulation screenspace position
-   OUT.posPreWave = mul( modelview, IN.position );
+   OUT.posPreWave = mul( modelview, inPos );
    OUT.posPreWave = mul( texGen, OUT.posPreWave );
       
    // Calculate the undulation amount for this vertex.   
@@ -132,7 +132,7 @@ ConnectData main( VertData IN )
    OUT.rippleTexCoord2.w = saturate( OUT.rippleTexCoord2.w - 0.2 ) / 0.8;
    
    // Apply wave undulation to the vertex.
-   OUT.posPostWave = IN.position;
+   OUT.posPostWave = inPos;
    OUT.posPostWave.xyz += IN.normal.xyz * undulateAmt;         
    
    // Convert to screen 
@@ -197,7 +197,7 @@ ConnectData main( VertData IN )
    for ( int i = 0; i < 3; i++ )
    {
       binormal.z += undulateFade * waveDir[i].x * waveData[i].y * cos( waveDir[i].x * undulatePos.x + waveDir[i].y * undulatePos.y + elapsedTime * waveData[i].x );
-	  tangent.z += undulateFade * waveDir[i].y * waveData[i].y * cos( waveDir[i].x * undulatePos.x + waveDir[i].y * undulatePos.y + elapsedTime * waveData[i].x );
+      tangent.z += undulateFade * waveDir[i].y * waveData[i].y * cos( waveDir[i].x * undulatePos.x + waveDir[i].y * undulatePos.y + elapsedTime * waveData[i].x );
    } 
       
    binormal = binormal;

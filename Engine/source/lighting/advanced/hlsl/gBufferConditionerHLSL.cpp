@@ -28,7 +28,7 @@
 #include "materials/materialFeatureTypes.h"
 #include "materials/materialFeatureData.h"
 #include "shaderGen/hlsl/shaderFeatureHLSL.h"
-
+#include "gfx/gfxDevice.h"
 
 GBufferConditionerHLSL::GBufferConditionerHLSL( const GFXFormat bufferFormat, const NormalSpace nrmSpace ) : 
       Parent( bufferFormat )
@@ -114,7 +114,7 @@ void GBufferConditionerHLSL::processVert( Vector<ShaderComponent*> &componentLis
       // TODO: Total hack because Conditioner is directly derived
       // from ShaderFeature and not from ShaderFeatureHLSL.
       NamedFeatureHLSL dummy( String::EmptyString );
-      dummy.mInstancingFormat = mInstancingFormat;
+      dummy.setInstancingFormat( mInstancingFormat );
       Var *worldViewOnly = dummy.getWorldView( componentList, fd.features[MFT_UseInstancing], meta );
 
       meta->addStatement(  new GenOp("   @ = mul(@, float4( normalize(@), 0.0 ) ).xyz;\r\n", 
@@ -170,7 +170,7 @@ void GBufferConditionerHLSL::processPix(  Vector<ShaderComponent*> &componentLis
    if ( fd.features[ MFT_IsTranslucentZWrite ] )
    {
       alphaVal = new Var( "outAlpha", "float" );
-      meta->addStatement( new GenOp( "   @ = OUT.col.a; // MFT_IsTranslucentZWrite\r\n", new DecOp( alphaVal ) ) );
+      meta->addStatement( new GenOp( "   @ = OUT.col1.a; // MFT_IsTranslucentZWrite\r\n", new DecOp( alphaVal ) ) );
    }
 
    // If using interlaced normals, invert the normal
@@ -222,6 +222,7 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
       retVal = Parent::printMethodHeader( methodType, methodName, stream, meta );
    else
    {
+      const bool isDirect3D11 = GFX->getAdapterType() == Direct3D11;
       Var *methodVar = new Var;
       methodVar->setName(methodName);
       methodVar->setType("inline float4");
@@ -237,12 +238,28 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
       screenUV->setType("float2");
       DecOp *screenUVDecl = new DecOp(screenUV);
 
+      Var *prepassTex = NULL;
+      DecOp *prepassTexDecl = NULL;
+      if (isDirect3D11)
+      {
+         prepassSampler->setType("SamplerState");
+         prepassTex = new Var;
+         prepassTex->setName("prepassTexVar");
+         prepassTex->setType("Texture2D");
+         prepassTex->texture = true;
+         prepassTex->constNum = prepassSampler->constNum;
+         prepassTexDecl = new DecOp(prepassTex);
+      }
+
       Var *bufferSample = new Var;
       bufferSample->setName("bufferSample");
       bufferSample->setType("float4");
       DecOp *bufferSampleDecl = new DecOp(bufferSample); 
 
-      meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, prepassSamplerDecl, screenUVDecl ) );
+      if (isDirect3D11)
+         meta->addStatement(new GenOp("@(@, @, @)\r\n", methodDecl, prepassSamplerDecl, prepassTexDecl, screenUVDecl));
+      else
+         meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, prepassSamplerDecl, screenUVDecl ) );
 
       meta->addStatement( new GenOp( "{\r\n" ) );
 
@@ -255,10 +272,14 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
       // The gbuffer has no mipmaps, so use tex2dlod when 
       // possible so that the shader compiler can optimize.
       meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
-      meta->addStatement( new GenOp( "      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
-      meta->addStatement( new GenOp( "   #else\r\n" ) );
-      meta->addStatement( new GenOp( "      @ = tex2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
-      meta->addStatement( new GenOp( "   #endif\r\n\r\n" ) );
+      if (isDirect3D11)
+         meta->addStatement(new GenOp("      @ = @.SampleLevel(@, @,0);\r\n", bufferSampleDecl, prepassTex, prepassSampler, screenUV));
+      else
+         meta->addStatement(new GenOp("      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, prepassSampler, screenUV));
+
+      meta->addStatement(new GenOp("   #else\r\n"));
+      meta->addStatement(new GenOp("      @ = tex2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV));
+      meta->addStatement(new GenOp("   #endif\r\n\r\n"));
 #endif
 
       // We don't use this way of passing var's around, so this should cause a crash

@@ -1,0 +1,7 @@
+<ComponentAsset
+    AssetName="ItemRotationComponentAsset"
+    componentName="ItemRotationComponent"
+    componentClass="Component"
+    friendlyName="Item Rotation"
+    componentType="Game"
+    description="Rotates the entity around an axis, like an item pickup."/>

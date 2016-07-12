@@ -82,13 +82,6 @@ const F32 ScatterSky::smEarthRadius = (6378.0f * 1000.0f);
 const F32 ScatterSky::smAtmosphereRadius = 200000.0f;
 const F32 ScatterSky::smViewerHeight = 1.0f;
 
-GFXImplementVertexFormat( ScatterSkyVertex )
-{
-   addElement( "POSITION", GFXDeclType_Float3 );
-   addElement( "NORMAL", GFXDeclType_Float3 );
-   addElement( "COLOR", GFXDeclType_Color );
-}
-
 ScatterSky::ScatterSky()
 {
    mPrimCount = 0;
@@ -151,6 +144,8 @@ ScatterSky::ScatterSky()
    mBrightness = 1.0f;
 
    mCastShadows = true;
+   mStaticRefreshFreq = 8;
+   mDynamicRefreshFreq = 8;
    mDirty = true;
 
    mLight = LightManager::createLightInfo();
@@ -271,6 +266,8 @@ void ScatterSky::_conformLights()
    mLight->setAmbient( mAmbientColor );
    mLight->setColor( mSunColor );
    mLight->setCastShadows( mCastShadows );
+   mLight->setStaticRefreshFreq(mStaticRefreshFreq);
+   mLight->setDynamicRefreshFreq(mDynamicRefreshFreq);
 
    FogData fog = getSceneManager()->getFogData();
    fog.color = mFogColor;
@@ -381,6 +378,9 @@ void ScatterSky::initPersistFields()
       addField( "castShadows", TypeBool, Offset( mCastShadows, ScatterSky ),
          "Enables/disables shadows cast by objects due to ScatterSky light." );
 
+      addField("staticRefreshFreq", TypeS32, Offset(mStaticRefreshFreq, ScatterSky), "static shadow refresh rate (milliseconds)");
+      addField("dynamicRefreshFreq", TypeS32, Offset(mDynamicRefreshFreq, ScatterSky), "dynamic shadow refresh rate (milliseconds)");
+
       addField( "brightness", TypeF32, Offset( mBrightness, ScatterSky ),
          "The brightness of the ScatterSky's light object." );
 
@@ -487,6 +487,8 @@ U32 ScatterSky::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->write( mBrightness );
 
       stream->writeFlag( mCastShadows );
+      stream->write(mStaticRefreshFreq);
+      stream->write(mDynamicRefreshFreq);
 
       stream->write( mFlareScale );
 
@@ -588,6 +590,8 @@ void ScatterSky::unpackUpdate(NetConnection *con, BitStream *stream)
       stream->read( &mBrightness );
 
       mCastShadows = stream->readFlag();
+      stream->read(&mStaticRefreshFreq);
+      stream->read(&mDynamicRefreshFreq);
 
       stream->read( &mFlareScale );
 
@@ -761,7 +765,7 @@ void ScatterSky::_initVBIB()
    F32 zOffset = -( mCos( mSqrt( 1.0f ) ) + 0.01f );
 
    mVB.set( GFX, mVertCount, GFXBufferTypeStatic );
-   ScatterSkyVertex *pVert = mVB.lock();
+   GFXVertexP *pVert = mVB.lock();
    if(!pVert) return;
 
    for ( U32 y = 0; y < vertStride; y++ )
@@ -951,11 +955,20 @@ void ScatterSky::_render( ObjectRenderInst *ri, SceneRenderState *state, BaseMat
 
    Point3F camPos2 = state->getCameraPosition();
    MatrixF xfm(true);
-   xfm.setPosition(camPos2 - Point3F( 0, 0, mZOffset));
+   
    GFX->multWorld(xfm);
    MatrixF xform(proj);//GFX->getProjectionMatrix());
    xform *= GFX->getViewMatrix();
    xform *=  GFX->getWorldMatrix();
+
+   if(state->isReflectPass())
+   {
+      static MatrixF rotMat(EulerF(0.0, 0.0, M_PI_F));
+      xform.mul(rotMat);
+      rotMat.set(EulerF(M_PI_F, 0.0, 0.0));
+      xform.mul(rotMat);
+   }
+   xform.setPosition(xform.getPosition() - Point3F(0, 0, mZOffset));
 
    mShaderConsts->setSafe( mModelViewProjSC, xform );
    mShaderConsts->setSafe( mMiscSC, miscParams );
@@ -1054,17 +1067,17 @@ void ScatterSky::_renderMoon( ObjectRenderInst *ri, SceneRenderState *state, Bas
 
    // Initialize points with basic info
    Point3F points[4];
-   points[0] = Point3F(-BBRadius, 0.0, -BBRadius);
+   points[0] = Point3F( -BBRadius, 0.0, -BBRadius);
    points[1] = Point3F( -BBRadius, 0.0, BBRadius);
-   points[2] = Point3F( BBRadius, 0.0,  BBRadius);
-   points[3] = Point3F( BBRadius, 0.0,  -BBRadius);
+   points[2] = Point3F( BBRadius, 0.0, -BBRadius);
+   points[3] = Point3F( BBRadius, 0.0, BBRadius);
 
    static const Point2F sCoords[4] =
    {
       Point2F( 0.0f, 0.0f ),
       Point2F( 0.0f, 1.0f ),
-      Point2F( 1.0f, 1.0f ),
-      Point2F( 1.0f, 0.0f )
+      Point2F( 1.0f, 0.0f ),
+      Point2F( 1.0f, 1.0f )
    };
 
    // Get info we need to adjust points
@@ -1113,7 +1126,7 @@ void ScatterSky::_renderMoon( ObjectRenderInst *ri, SceneRenderState *state, Bas
       mMoonMatInst->setSceneInfo( state, sgData );
 
       GFX->setVertexBuffer( vb );
-      GFX->drawPrimitive( GFXTriangleFan, 0, 2 );
+      GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
    }
 }
 

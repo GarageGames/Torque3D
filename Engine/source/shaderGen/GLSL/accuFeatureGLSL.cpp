@@ -56,7 +56,7 @@ void AccuTexFeatGLSL::processPix(Vector<ShaderComponent*> &componentList,
    output = meta;
 
    // OUT.col
-   Var *color = (Var*) LangElement::find( "col" );
+   Var *color = (Var*) LangElement::find( "col1" );
    if (!color)
    {
       output = new GenOp("   //NULL COLOR!");

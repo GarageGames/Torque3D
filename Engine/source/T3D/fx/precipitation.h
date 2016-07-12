@@ -239,7 +239,7 @@ class Precipitation : public GameBase
    void destroySplash(Raindrop *drop);       ///< Removes a drop from the splash list
 
    GFXPrimitiveBufferHandle mRainIB;
-   GFXVertexBufferHandle<GFXVertexPT> mRainVB;
+   GFXVertexBufferHandle<GFXVertexPCT> mRainVB;
 
    bool onAdd();
    void onRemove();

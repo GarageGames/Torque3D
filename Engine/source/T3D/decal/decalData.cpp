@@ -284,6 +284,7 @@ void DecalData::unpackData( BitStream *stream )
    Parent::unpackData( stream );
 
    stream->read( &lookupName );
+   assignName(lookupName);
    stream->read( &size );  
    stream->read( &materialName );
    _updateMaterial();

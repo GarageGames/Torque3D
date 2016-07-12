@@ -1702,7 +1702,7 @@ void ParticleEmitter::setupBillboard( Particle *part,
       lVerts->color = partCol; } \
 
    // Here we deal with UVs for animated particle (billboard)
-   if (part->dataBlock->animateTexture)
+   if (part->dataBlock->animateTexture && !part->dataBlock->animTexFrames.empty())
    { 
      S32 fm = (S32)(part->currentAge*(1.0/1000.0)*part->dataBlock->framesPerSec);
      U8 fm_tile = part->dataBlock->animTexFrames[fm % part->dataBlock->numFrames];

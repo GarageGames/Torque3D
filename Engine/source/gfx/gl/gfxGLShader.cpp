@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "gfx/gl/gfxGLShader.h"
 #include "gfx/gl/gfxGLVertexAttribLocation.h"
+#include "gfx/gl/gfxGLDevice.h"
 
 #include "core/frameAllocator.h"
 #include "core/stream/fileStream.h"
@@ -344,6 +345,7 @@ void GFXGLShaderConstBuffer::set(GFXShaderConstHandle* handle, const MatrixF* ma
 
 void GFXGLShaderConstBuffer::activate()
 {
+   PROFILE_SCOPE(GFXGLShaderConstBuffer_activate);
    mShader->setConstantsFromBuffer(this);
    mWasLost = false;
 }
@@ -394,6 +396,7 @@ void GFXGLShader::clearShaders()
 
 bool GFXGLShader::_init()
 {
+   PROFILE_SCOPE(GFXGLShader_Init);
    // Don't initialize empty shaders.
    if ( mVertexFile.isEmpty() && mPixelFile.isEmpty() )
       return false;
@@ -664,10 +667,14 @@ void GFXGLShader::initHandles()
    glUseProgram(0);
 
    //instancing
+   if (!mInstancingFormat)
+      return;
+
    U32 offset = 0;
-   for ( U32 i=0; i < mInstancingFormat.getElementCount(); i++ )
+
+   for ( U32 i=0; i < mInstancingFormat->getElementCount(); i++ )
    {
-      const GFXVertexElement &element = mInstancingFormat.getElement( i );
+      const GFXVertexElement &element = mInstancingFormat->getElement( i );
       
       String constName = String::ToString( "$%s", element.getSemantic().c_str() );
 
@@ -702,9 +709,9 @@ void GFXGLShader::initHandles()
 
          // If this is a matrix we will have 2 or 3 more of these
          // semantics with the same name after it.
-         for ( ; i < mInstancingFormat.getElementCount(); i++ )
+         for ( ; i < mInstancingFormat->getElementCount(); i++ )
          {
-            const GFXVertexElement &nextElement = mInstancingFormat.getElement( i );
+            const GFXVertexElement &nextElement = mInstancingFormat->getElement( i );
             if ( nextElement.getSemantic() != element.getSemantic() )
             {
                i--;
@@ -952,14 +959,7 @@ bool GFXGLShader::_loadShaderFromStream(  GLuint shader,
    buffers.push_back( dStrdup( versionDecl ) );
    lengths.push_back( dStrlen( versionDecl ) );
 
-   if(gglHasExtension(EXT_gpu_shader4))
-   {
-      const char *extension = "#extension GL_EXT_gpu_shader4 : enable\r\n";
-      buffers.push_back( dStrdup( extension ) );
-      lengths.push_back( dStrlen( extension ) );
-   }
-
-   if(gglHasExtension(ARB_gpu_shader5))
+   if(GFXGL->mCapabilities.shaderModel5)
    {
       const char *extension = "#extension GL_ARB_gpu_shader5 : enable\r\n";
       buffers.push_back( dStrdup( extension ) );
@@ -1016,6 +1016,7 @@ bool GFXGLShader::initShader( const Torque::Path &file,
                               bool isVertex, 
                               const Vector<GFXShaderMacro> &macros )
 {
+   PROFILE_SCOPE(GFXGLShader_CompileShader);
    GLuint activeShader = glCreateShader(isVertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER);
    if(isVertex)
       mVertexShader = activeShader;
@@ -1075,6 +1076,7 @@ bool GFXGLShader::initShader( const Torque::Path &file,
 /// Returns our list of shader constants, the material can get this and just set the constants it knows about
 const Vector<GFXShaderConstDesc>& GFXGLShader::getShaderConstDesc() const
 {
+   PROFILE_SCOPE(GFXGLShader_GetShaderConstants);
    return mConstants;
 }
 

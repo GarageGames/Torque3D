@@ -378,3 +378,31 @@ void BtBody::setSimulationEnabled( bool enabled )
 
    mIsEnabled = enabled;
 }
+
+void BtBody::findContact(SceneObject **contactObject,
+   VectorF *contactNormal,
+   Vector<SceneObject*> *outOverlapObjects) const
+{
+}
+
+void BtBody::moveKinematicTo(const MatrixF &transform)
+{
+   AssertFatal(mActor, "BtBody::moveKinematicTo - The actor is null!");
+
+   U32 bodyflags = mActor->getCollisionFlags();
+   const bool isKinematic = bodyflags & BF_KINEMATIC;
+   if (!isKinematic)
+   {
+      Con::errorf("BtBody::moveKinematicTo is only for kinematic bodies.");
+      return;
+   }
+
+   if (mCenterOfMass)
+   {
+      MatrixF xfm;
+      xfm.mul(transform, *mCenterOfMass);
+      mActor->setCenterOfMassTransform(btCast<btTransform>(xfm));
+   }
+   else
+      mActor->setCenterOfMassTransform(btCast<btTransform>(transform));
+}

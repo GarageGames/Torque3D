@@ -113,6 +113,9 @@ class GuiBitmapButtonCtrl : public GuiButtonCtrl
       /// File name for bitmap.
       String mBitmapName;
       
+      /// alpha masking
+      bool mMasked;
+      
       ///
       Textures mTextures[ NumModifiers ];
       
@@ -163,6 +166,7 @@ class GuiBitmapButtonCtrl : public GuiButtonCtrl
       virtual void onRender(Point2I offset, const RectI &updateRect);
 
       static void initPersistFields();
+      bool pointInControl(const Point2I& parentCoordPoint);
 
       DECLARE_CONOBJECT(GuiBitmapButtonCtrl);
       DECLARE_DESCRIPTION( "A button control rendered entirely from bitmaps.\n"

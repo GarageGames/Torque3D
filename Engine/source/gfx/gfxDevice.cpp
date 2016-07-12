@@ -148,7 +148,7 @@ GFXDevice::GFXDevice()
    mGlobalAmbientColor = ColorF(0.0f, 0.0f, 0.0f, 1.0f);
 
    mLightMaterialDirty = false;
-   dMemset(&mCurrentLightMaterial, NULL, sizeof(GFXLightMaterial));
+   dMemset(&mCurrentLightMaterial, 0, sizeof(GFXLightMaterial));
 
    // State block 
    mStateBlockDirty = false;
@@ -513,6 +513,8 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
       mCurrentStateBlock = mNewStateBlock;
       mStateBlockDirty = false;
    }
+
+   _updateRenderTargets();
 
    if( mTexturesDirty )
    {
@@ -1328,4 +1330,9 @@ DefineEngineFunction( getBestHDRFormat, GFXFormat, (),,
                                                    true );
 
    return format;
+}
+
+DefineConsoleFunction(ResetGFX, void, (), , "forces the gbuffer to be reinitialized in cases of improper/lack of buffer clears.")
+{
+   GFX->beginReset();
 }

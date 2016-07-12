@@ -22,11 +22,11 @@
 
 #include "shaders/common/postFx/postFx.hlsl"
 
-uniform sampler2D diffuseMap : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(diffuseMap, 0);
 
 struct VertToPix
 {
-	float4 hpos       : POSITION;
+	float4 hpos       : TORQUE_POSITION;
 	float2 uv        : TEXCOORD0;
 };
 
@@ -35,15 +35,15 @@ static float weight[3] = { 0.2270270270, 0.3162162162, 0.0702702703 };
 
 uniform float2 oneOverTargetSize;
 
-float4 main( VertToPix IN ) : COLOR
+float4 main( VertToPix IN ) : TORQUE_TARGET0
 {	
-	float4 OUT = tex2D( diffuseMap, IN.uv ) * weight[0];
+	float4 OUT = TORQUE_TEX2D( diffuseMap, IN.uv ) * weight[0];
 			        
 	for ( int i=1; i < 3; i++ )
 	{
 		float2 sample = (BLUR_DIR * offset[i]) * oneOverTargetSize;
-		OUT += tex2D( diffuseMap, IN.uv + sample ) * weight[i];  
-		OUT += tex2D( diffuseMap, IN.uv - sample ) * weight[i];  
+		OUT += TORQUE_TEX2D( diffuseMap, IN.uv + sample ) * weight[i];  
+      OUT += TORQUE_TEX2D(diffuseMap, IN.uv - sample) * weight[i];
 	}
 					   
 	return OUT;

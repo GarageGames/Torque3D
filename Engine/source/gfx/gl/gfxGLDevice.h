@@ -45,6 +45,18 @@ class GFXGLVertexDecl;
 class GFXGLDevice : public GFXDevice
 {
 public:
+   struct GLCapabilities
+   {
+      bool anisotropicFiltering;
+      bool bufferStorage;
+      bool shaderModel5;
+      bool textureStorage;
+      bool samplerObjects;
+      bool copyImage;
+      bool vertexAttributeBinding;
+   };
+   GLCapabilities mCapabilities;
+
    void zombify();
    void resurrect();
    GFXGLDevice(U32 adapterIndex);
@@ -173,8 +185,9 @@ protected:
    virtual GFXVertexBuffer *allocVertexBuffer(  U32 numVerts, 
                                                 const GFXVertexFormat *vertexFormat,
                                                 U32 vertSize, 
-                                                GFXBufferType bufferType );
-   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType );
+                                                GFXBufferType bufferType,
+                                                void* data = NULL);
+   virtual GFXPrimitiveBuffer *allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType, void* data = NULL );
    
    // NOTE: The GL device doesn't need a vertex declaration at
    // this time, but we need to return something to keep the system

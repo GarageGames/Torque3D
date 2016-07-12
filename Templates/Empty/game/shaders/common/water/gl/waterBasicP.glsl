@@ -120,6 +120,7 @@ void main()
 { 
    // Modulate baseColor by the ambientColor.
    vec4 waterBaseColor = baseColor * vec4( ambientColor.rgb, 1 );
+   waterBaseColor = toLinear(waterBaseColor);
    
    // Get the bumpNorm...
    vec3 bumpNorm = ( texture( bumpMap, IN_rippleTexCoord01.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.x;

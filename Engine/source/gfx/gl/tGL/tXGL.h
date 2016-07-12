@@ -28,9 +28,9 @@
 #ifdef TORQUE_OS_LINUX
 
 #include "tGL.h"
-#include "GL/glxew.h"
+#include <epoxy/glx.h>
 
-#define gglHasXExtension(EXTENSION) GLXEW##EXTENSION
+#define gglHasXExtension(display, screen, EXTENSION) epoxy_has_glx_extension(display, screen, "GLX_" # EXTENSION)
 
 #endif //TORQUE_OS_LINUX
 

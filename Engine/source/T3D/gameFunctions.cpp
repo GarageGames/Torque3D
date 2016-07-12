@@ -339,7 +339,7 @@ bool GameProcessCameraQuery(CameraQuery *query)
 
    if (connection && connection->getControlCameraTransform(0.032f, &query->cameraMatrix))
    {
-      query->object = dynamic_cast<ShapeBase*>(connection->getControlObject());
+      query->object = dynamic_cast<GameBase*>(connection->getCameraObject());
       query->nearPlane = gClientSceneGraph->getNearClip();
 
       // Scale the normal visible distance by the performance 

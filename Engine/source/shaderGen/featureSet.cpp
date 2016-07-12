@@ -170,7 +170,7 @@ void FeatureSet::removeFeature( const FeatureType &type )
    }
 }
 
-U32 FeatureSet::getNextFeatureIndex( const FeatureType &type, S32 index ) const
+S32 FeatureSet::getNextFeatureIndex( const FeatureType &type, S32 index ) const
 {
    for ( U32 i=0; i < mFeatures.size(); i++ )
    {

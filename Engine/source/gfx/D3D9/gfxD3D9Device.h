@@ -150,6 +150,10 @@ protected:
    IDirect3DVertexShader9 *mLastVertShader;
    IDirect3DPixelShader9 *mLastPixShader;
 
+   GFXShaderRef mGenericShader[GS_COUNT];
+   GFXShaderConstBufferRef mGenericShaderBuffer[GS_COUNT];
+   GFXShaderConstHandle *mModelViewProjSC[GS_COUNT];
+
    S32 mCreateFenceType;
 
    LPDIRECT3D9       mD3D;        ///< D3D Handle
@@ -298,10 +302,12 @@ public:
    virtual GFXVertexBuffer* allocVertexBuffer(  U32 numVerts, 
                                                 const GFXVertexFormat *vertexFormat,
                                                 U32 vertSize,
-                                                GFXBufferType bufferType );
+                                                GFXBufferType bufferType,
+                                                void* data = NULL );
    virtual GFXPrimitiveBuffer *allocPrimitiveBuffer(  U32 numIndices, 
                                                       U32 numPrimitives, 
-                                                      GFXBufferType bufferType );
+                                                      GFXBufferType bufferType,
+                                                      void* data = NULL );
    virtual void deallocVertexBuffer( GFXD3D9VertexBuffer *vertBuff );
    virtual GFXVertexDecl* allocVertexDecl( const GFXVertexFormat *vertexFormat );
    virtual void setVertexDecl( const GFXVertexDecl *decl );
@@ -323,8 +329,6 @@ public:
 
    /// Reset
    virtual void reset( D3DPRESENT_PARAMETERS &d3dpp ) = 0;
-
-   GFXShaderRef mGenericShader[GS_COUNT];
 
    virtual void setupGenericShaders( GenericShaderType type  = GSColor );
 

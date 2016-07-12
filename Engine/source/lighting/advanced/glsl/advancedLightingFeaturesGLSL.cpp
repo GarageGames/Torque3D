@@ -156,8 +156,8 @@ void DeferredRTLightingFeatGLSL::processPix( Vector<ShaderComponent*> &component
          oneOverTargetSize->constSortPos = cspPass;
       }
 
-      meta->addStatement( new GenOp( "   float id_NL_Att, id_specular;\r\n   float3 id_lightcolor;\r\n" ) );
-      meta->addStatement( new GenOp( avar( "   %s(tex2D(@, @ + float2(0.0, @.y)), id_lightcolor, id_NL_Att, id_specular);\r\n", 
+      meta->addStatement( new GenOp( "   float id_NL_Att, id_specular;\r\n   vec3 id_lightcolor;\r\n" ) );
+      meta->addStatement( new GenOp( avar( "   %s(tex2D(@, @ + vec2(0.0, @.y)), id_lightcolor, id_NL_Att, id_specular);\r\n", 
          unconditionLightInfo.c_str() ), lightInfoBuffer, uvScene, oneOverTargetSize ) );
 
       meta->addStatement( new GenOp("   @ = lerp(@, id_lightcolor, 0.5);\r\n", d_lightcolor, d_lightcolor ) );
@@ -167,7 +167,7 @@ void DeferredRTLightingFeatGLSL::processPix( Vector<ShaderComponent*> &component
 
    // This is kind of weak sauce
    if( !fd.features[MFT_VertLit] && !fd.features[MFT_ToneMap] && !fd.features[MFT_LightMap] && !fd.features[MFT_SubSurface] )
-      meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(@, 1.0)", d_lightcolor ), Material::Mul ) ) );
+      meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(@, 1.0)", d_lightcolor ), Material::Mul ) ) );
 
    output = meta;
 }
@@ -311,7 +311,7 @@ void DeferredBumpFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
          meta->addStatement( new GenOp( "   @.xy += @.xy * @;\r\n", bumpNorm, detailBump, detailBumpScale ) );
       }
 
-      // This var is read from GBufferConditionerHLSL and 
+      // This var is read from GBufferConditionerGLSL and 
       // used in the prepass output.
       //
       // By using the 'half' type here we get a bunch of partial
@@ -533,11 +533,13 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
       specPow->constSortPos = cspPotentialPrimitive;
    }
 
-   Var *specStrength = new Var;
-   specStrength->setType( "float" );
-   specStrength->setName( "specularStrength" );
-   specStrength->uniform = true;
-   specStrength->constSortPos = cspPotentialPrimitive;
+   Var *specStrength = (Var*)LangElement::find( "specularStrength" );
+   if (!specStrength)
+   {
+       specStrength = new Var( "specularStrength", "float" );
+       specStrength->uniform = true;
+       specStrength->constSortPos = cspPotentialPrimitive;
+   }
 
    Var *lightInfoSamp = (Var *)LangElement::find( "lightInfoSample" );
    Var *d_specular = (Var*)LangElement::find( "d_specular" );
@@ -555,10 +557,10 @@ void DeferredPixelSpecularGLSL::processPix(  Vector<ShaderComponent*> &component
          meta->addStatement(new GenOp("   @ = clamp( lerp( @, @ * @, @.a), 0, 1);\r\n", d_specular, d_specular, accuSpecular, d_specular, accuPlc));
    }
    // (a^m)^n = a^(m*n)
-   meta->addStatement( new GenOp( "   @ = pow( abs(@), max((@ / AL_ConstantSpecularPower),1.0f)) * @;\r\n", 
+   		meta->addStatement( new GenOp( "   @ = pow( abs(@), max((@ / AL_ConstantSpecularPower),1.0f)) * @;\r\n", 
       specDecl, d_specular, specPow, specStrength ) );
 
-   LangElement *specMul = new GenOp( "float4( @.rgb, 0 ) * @", specCol, specular );
+   LangElement *specMul = new GenOp( "vec4( @.rgb, 0 ) * @", specCol, specular );
    LangElement *final = specMul;
 
    // We we have a normal map then mask the specular 
@@ -682,10 +684,10 @@ void DeferredMinnaertGLSL::processPix( Vector<ShaderComponent*> &componentList,
 
    Var *d_NL_Att = (Var*)LangElement::find( "d_NL_Att" );
 
-   meta->addStatement( new GenOp( avar( "   float4 normalDepth = %s(@, @);\r\n", unconditionPrePassMethod.c_str() ), prepassBuffer, uvScene ) );
+   meta->addStatement( new GenOp( avar( "   vec4 normalDepth = %s(@, @);\r\n", unconditionPrePassMethod.c_str() ), prepassBuffer, uvScene ) );
    meta->addStatement( new GenOp( "   float vDotN = dot(normalDepth.xyz, @);\r\n", wsViewVec ) );
    meta->addStatement( new GenOp( "   float Minnaert = pow( @, @) * pow(vDotN, 1.0 - @);\r\n", d_NL_Att, minnaertConstant, minnaertConstant ) );
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(Minnaert, Minnaert, Minnaert, 1.0)" ), Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(Minnaert, Minnaert, Minnaert, 1.0)" ), Material::Mul ) ) );
 
    output = meta;
 }
@@ -713,7 +715,7 @@ void DeferredSubSurfaceGLSL::processPix(  Vector<ShaderComponent*> &componentLis
    MultiLine *meta = new MultiLine;
    meta->addStatement( new GenOp( "   float subLamb = smoothstep(-@.a, 1.0, @) - smoothstep(0.0, 1.0, @);\r\n", subSurfaceParams, d_NL_Att, d_NL_Att ) );
    meta->addStatement( new GenOp( "   subLamb = max(0.0, subLamb);\r\n" ) );
-   meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(@ + (subLamb * @.rgb), 1.0)", d_lightcolor, subSurfaceParams ), Material::Mul ) ) );
+   meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "vec4(@ + (subLamb * @.rgb), 1.0)", d_lightcolor, subSurfaceParams ), Material::Mul ) ) );
 
    output = meta;
 }

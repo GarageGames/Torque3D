@@ -1,0 +1,7 @@
+<ComponentAsset
+    AssetName="ControlObjectComponentAsset"
+    componentName="ControlObjectComponent"
+    componentClass="Component"
+    friendlyName="Control Object"
+    componentType="Game"
+    description="Allows the component owner to be controlled by a client."/>

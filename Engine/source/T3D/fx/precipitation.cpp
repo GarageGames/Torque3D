@@ -298,6 +298,7 @@ Precipitation::Precipitation()
    mSplashShaderCameraPosSC = NULL;
    mSplashShaderAmbientSC = NULL;
 
+   mMaxVBDrops = 5000;
 }
 
 Precipitation::~Precipitation()
@@ -963,7 +964,7 @@ void Precipitation::initRenderObjects()
 
    // Create a volitile vertex buffer which
    // we'll lock and fill every frame.
-   mRainVB.set(GFX, mMaxVBDrops * 4, GFXBufferTypeVolatile);
+   mRainVB.set(GFX, mMaxVBDrops * 4, GFXBufferTypeDynamic);
 
    // Init the index buffer for rendering the
    // entire or a partially filled vb.
@@ -1557,7 +1558,7 @@ void Precipitation::renderObject(ObjectRenderInst *ri, SceneRenderState *state, 
    Point3F pos;
    VectorF orthoDir, velocity, right, up, rightUp(0.0f, 0.0f, 0.0f), leftUp(0.0f, 0.0f, 0.0f);
    F32 distance = 0;
-   GFXVertexPT* vertPtr = NULL;
+   GFXVertexPCT* vertPtr = NULL;
    const Point2F *tc;
 
    // Do this here and we won't have to in the loop!

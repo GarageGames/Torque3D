@@ -117,6 +117,11 @@ public:
                               F32 staticFriction );
    virtual void applyCorrection( const MatrixF &xfm );
    virtual void applyImpulse( const Point3F &origin, const Point3F &force );
+
+   virtual void findContact(SceneObject **contactObject, VectorF *contactNormal,
+      Vector<SceneObject*> *outOverlapObjects) const;
+   virtual void moveKinematicTo(const MatrixF &xfm);
+
 };
 
 #endif // _PX3BODY_H_

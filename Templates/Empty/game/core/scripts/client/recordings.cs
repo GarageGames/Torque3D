@@ -134,3 +134,19 @@ function demoPlaybackComplete()
 
    Canvas.pushDialog(RecordingsDlg);
 }
+
+function deleteDemoRecord()
+{
+   %sel = RecordingsDlgList.getSelectedId();
+   %rowText = RecordingsDlgList.getRowTextById(%sel);
+   %file = $currentMod @ "/recordings/" @ getField(%rowText, 0) @ ".rec";
+   
+   if(!isfile(%file))
+   {
+      RecordingsDlgList.removeRowById(%sel);
+      return;
+   }
+   
+   RecordingsDlgList.removeRowById(%sel);
+   fileDelete(%file);
+}

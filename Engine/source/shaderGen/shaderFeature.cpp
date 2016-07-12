@@ -47,10 +47,24 @@ ShaderFeature::Resources ShaderFeature::getResources( const MaterialFeatureData 
 const char* ShaderFeature::getOutputTargetVarName( OutputTarget target ) const
 {
    const char* targName = "col";
-   if ( target != DefaultTarget )
+
+   switch(target)
    {
+      case DefaultTarget:
+         targName = "col";
+         break;
+
+      case RenderTarget1:
       targName = "col1";
-      AssertFatal(target == RenderTarget1, "yeah Pat is lame and didn't want to do bit math stuff, TODO");
+         break;
+
+      case RenderTarget2:
+         targName = "col2";
+         break;
+
+      case RenderTarget3:
+         targName = "col3";
+         break;
    }
 
    return targName;
@@ -70,4 +84,9 @@ Var* ShaderFeature::findOrCreateLocal( const char *name,
    }
 
    return outVar;
+}
+
+void ShaderFeature::setInstancingFormat(GFXVertexFormat *format)
+{
+   mInstancingFormat = format;
 }

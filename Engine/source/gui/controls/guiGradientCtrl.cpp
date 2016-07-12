@@ -319,81 +319,79 @@ void GuiGradientCtrl::renderColorBox(RectI &bounds)
 void GuiGradientCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, Vector<ColorRange> colorRange)
 {
    GFX->setStateBlock(mStateBlock);
-   
-	// Create new global dimensions
+
+   // Create new global dimensions
    S32 l = bounds.point.x + mSwatchFactor, r = bounds.point.x + bounds.extent.x - mSwatchFactor;
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y - mSwatchFactor;
-	
-	// Draw border using new global dimensions
-	if (mProfile->mBorder)
-      GFX->getDrawUtil()->drawRect( RectI( Point2I(l,t),Point2I(r,b) ), mProfile->mBorderColor);
-	
-	// Update local dimensions
-	mBlendRangeBox.point = globalToLocalCoord(Point2I(l, t));
-	mBlendRangeBox.extent = globalToLocalCoord(Point2I(r, b));
 
-   ColorRange& firstColorRange = colorRange.first();
-	
-	if(colorRange.size() == 1) // Only one color to draw
-	{
-		PrimBuild::begin( GFXTriangleFan, 4 );
+   // Draw border using new global dimensions
+   if (mProfile->mBorder)
+      GFX->getDrawUtil()->drawRect(RectI(Point2I(l, t), Point2I(r, b)), mProfile->mBorderColor);
 
-      PrimBuild::color(firstColorRange.swatch->getColor());
-		PrimBuild::vertex2i( l, t );
-		PrimBuild::vertex2i( l, b );
+   // Update local dimensions
+   mBlendRangeBox.point = globalToLocalCoord(Point2I(l, t));
+   mBlendRangeBox.extent = globalToLocalCoord(Point2I(r, b));
 
-      PrimBuild::color(firstColorRange.swatch->getColor());
-		PrimBuild::vertex2i( r, b );
-		PrimBuild::vertex2i( r, t );
+   if (colorRange.size() == 1) // Only one color to draw
+   {
+      PrimBuild::begin(GFXTriangleStrip, 4);
 
-		PrimBuild::end();
-	}
-	else
-	{
-		PrimBuild::begin( GFXTriangleFan, 4 );
+      PrimBuild::color(colorRange.first().swatch->getColor());
+      PrimBuild::vertex2i(l, t);
+      PrimBuild::vertex2i(r, t);
 
-      PrimBuild::color(firstColorRange.swatch->getColor());
-		PrimBuild::vertex2i( l, t );
-		PrimBuild::vertex2i( l, b );
+      PrimBuild::color(colorRange.first().swatch->getColor());
+      PrimBuild::vertex2i(l, b);
+      PrimBuild::vertex2i(r, b);
 
-      PrimBuild::color(firstColorRange.swatch->getColor());
-      PrimBuild::vertex2i(l + firstColorRange.swatch->getPosition().x, b);
-      PrimBuild::vertex2i(l + firstColorRange.swatch->getPosition().x, t);
+      PrimBuild::end();
+   }
+   else
+   {
+      PrimBuild::begin(GFXTriangleStrip, 4);
 
-		PrimBuild::end();
+      PrimBuild::color(colorRange.first().swatch->getColor());
+      PrimBuild::vertex2i(l, t);
+      PrimBuild::vertex2i(l + colorRange.first().swatch->getPosition().x, t);
 
-		for( U16 i = 0;i < colorRange.size() - 1; i++ ) 
-		{
-			PrimBuild::begin( GFXTriangleFan, 4 );
-			if (!vertical)  // Horizontal (+x)
-			{
-				// First color
-				PrimBuild::color( colorRange[i].swatch->getColor() );
-				PrimBuild::vertex2i( l + colorRange[i].swatch->getPosition().x, t );
-				PrimBuild::vertex2i( l + colorRange[i].swatch->getPosition().x, b );
-				
-				// First color
-				PrimBuild::color( colorRange[i+1].swatch->getColor() );
-				PrimBuild::vertex2i( l + colorRange[i+1].swatch->getPosition().x, b );
-				PrimBuild::vertex2i( l + colorRange[i+1].swatch->getPosition().x, t );
-			}
-			PrimBuild::end();
-		}
+      PrimBuild::color(colorRange.first().swatch->getColor());
+      PrimBuild::vertex2i(l, b);
+      PrimBuild::vertex2i(l + colorRange.first().swatch->getPosition().x, b);
 
-      ColorRange& lastColorRange = colorRange.last();
+      PrimBuild::end();
 
-		PrimBuild::begin( GFXTriangleFan, 4 );
+      for (U16 i = 0; i < colorRange.size() - 1; i++)
+      {
+         PrimBuild::begin(GFXTriangleStrip, 4);
+         if (!vertical)  // Horizontal (+x)
+         {
+            // First color
+            PrimBuild::color(colorRange[i].swatch->getColor());
+            PrimBuild::vertex2i(l + colorRange[i].swatch->getPosition().x, t);
+            PrimBuild::color(colorRange[i + 1].swatch->getColor());
+            PrimBuild::vertex2i(l + colorRange[i + 1].swatch->getPosition().x, t);
 
-      PrimBuild::color(lastColorRange.swatch->getColor());
-      PrimBuild::vertex2i(l + lastColorRange.swatch->getPosition().x, t);
-      PrimBuild::vertex2i(l + lastColorRange.swatch->getPosition().x, b);
-		
-      PrimBuild::color(lastColorRange.swatch->getColor());
-		PrimBuild::vertex2i( r, b );
-		PrimBuild::vertex2i( r, t );
+            // First color
+            PrimBuild::color(colorRange[i].swatch->getColor());
+            PrimBuild::vertex2i(l + colorRange[i].swatch->getPosition().x, b);
+            PrimBuild::color(colorRange[i + 1].swatch->getColor());
+            PrimBuild::vertex2i(l + colorRange[i + 1].swatch->getPosition().x, b);
+         }
+         PrimBuild::end();
+      }
 
-		PrimBuild::end();
-	}
+      PrimBuild::begin(GFXTriangleStrip, 4);
+
+      PrimBuild::color(colorRange.last().swatch->getColor());
+      PrimBuild::vertex2i(l + colorRange.last().swatch->getPosition().x, t);
+      PrimBuild::vertex2i(r, t);
+
+      PrimBuild::color(colorRange.last().swatch->getColor());
+      PrimBuild::vertex2i(l + colorRange.last().swatch->getPosition().x, b);
+      PrimBuild::vertex2i(r, b);
+
+      PrimBuild::end();
+   }
 }
 
 void GuiGradientCtrl::onMouseDown(const GuiEvent &event)

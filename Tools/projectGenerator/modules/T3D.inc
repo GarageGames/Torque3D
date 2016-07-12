@@ -46,6 +46,14 @@ addEngineSrcDir('physics');
 addEngineSrcDir('gui/3d');
 addEngineSrcDir('postFx' );
 
+addEngineSrcDir('assets');
+addEngineSrcDir('module');
+addEngineSrcDir('persistence/rapidjson');
+addEngineSrcDir('persistence/taml');
+addEngineSrcDir('persistence/taml/binary');
+addEngineSrcDir('persistence/taml/json');
+addEngineSrcDir('persistence/taml/xml');
+
 // 3D game
 addEngineSrcDir('T3D');
 addEngineSrcDir('T3D/examples');
@@ -57,6 +65,7 @@ addEngineSrcDir('T3D/decal');
 addEngineSrcDir('T3D/sfx');
 addEngineSrcDir('T3D/gameBase');
 addEngineSrcDir('T3D/turret');
+addEngineSrcDir('T3D/assets');
 
 global $TORQUE_HIFI_NET;
 global $TORQUE_EXTENDED_MOVE;

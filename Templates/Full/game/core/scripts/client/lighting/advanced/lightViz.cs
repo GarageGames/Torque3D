@@ -56,7 +56,7 @@ new ShaderData( AL_DepthVisualizeShader )
    OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgDepthVisualizeP.glsl";
 
-   samplerNames[0] = "prepassBuffer";
+   samplerNames[0] = "prepassTex";
    samplerNames[1] = "depthViz";
 
    pixVersion = 2.0;
@@ -113,7 +113,7 @@ new ShaderData( AL_NormalsVisualizeShader )
    OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgNormalVisualizeP.glsl";
    
-   samplerNames[0] = "prepassBuffer";
+   samplerNames[0] = "prepassTex";
    
    pixVersion = 2.0;
 };
@@ -149,7 +149,7 @@ new ShaderData( AL_LightColorVisualizeShader )
    OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgLightColorVisualizeP.glsl";
    
-   samplerNames[0] = "lightInfoBuffer";
+   samplerNames[0] = "lightPrePassTex";
    
    pixVersion = 2.0;
 };
@@ -184,7 +184,7 @@ new ShaderData( AL_LightSpecularVisualizeShader )
    OGLVertexShaderFile = "shaders/common/postFx/gl/postFxV.glsl";
    OGLPixelShaderFile  = "shaders/common/lighting/advanced/gl/dbgLightSpecularVisualizeP.glsl";
    
-   samplerNames[0] = "lightInfoBuffer";
+   samplerNames[0] = "lightPrePassTex";
    
    pixVersion = 2.0;
 };
@@ -278,5 +278,18 @@ function toggleLightSpecularViz( %enable )
       AL_LightSpecularVisualize.enable();
    else if ( !%enable )
       AL_LightSpecularVisualize.disable();    
+}
+
+function toggleBackbufferViz( %enable )
+{   
+   if ( %enable $= "" )
+   {
+      $AL_BackbufferVisualizeVar = AL_DeferredShading.isEnabled() ? true : false;
+      AL_DeferredShading.toggle();
+   }
+   else if ( %enable )
+      AL_DeferredShading.disable();
+   else if ( !%enable )
+      AL_DeferredShading.enable();    
 }
 

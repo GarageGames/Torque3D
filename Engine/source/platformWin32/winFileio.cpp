@@ -66,6 +66,17 @@ bool dFileDelete(const char * name)
       return RemoveDirectory( buf );
 }
 
+bool Platform::fileDelete(const char * name)
+{
+   if (!name || (dStrlen(name) >= MAX_PATH))
+      return(false);
+   //return(::DeleteFile(name));
+   if (Platform::isFile(name))
+      return(remove(name) == 0);
+   else
+      return ::RemoveDirectoryA(name) != 0;
+}
+
 bool dFileRename(const char *oldName, const char *newName)
 {
    AssertFatal( oldName != NULL && newName != NULL, "dFileRename - NULL file name" );
@@ -1310,6 +1321,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
    dsize_t subtrLen = subPath ? dStrlen(subPath) : 0;
    char trail = trLen > 0 ? basePath[ trLen - 1 ] : '\0';
    char subTrail = subtrLen > 0 ? subPath[ subtrLen - 1 ] : '\0';
+   char subLead = subtrLen > 0 ? subPath[0] : '\0';
 
    if( trail == '/' )
    {
@@ -1369,13 +1381,23 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
       {
          if( ( subPath  && ( dStrncmp( subPath, "", 1 ) != 0 ) ) )
          {
-            char szPath [ 1024 ];
-            dMemset( szPath, 0, 1024 );
-            if( trail != '/' )
-               dSprintf( szPath, 1024, "%s%s", basePath, subPath );
+            char szPath[1024];
+            dMemset(szPath, 0, 1024);
+            if (trail == '/')
+            {
+               if (subLead == '/')
+                  dSprintf(szPath, 1024, "%s%s", basePath, &subPath[1]);
+               else
+                  dSprintf(szPath, 1024, "%s%s", basePath, subPath);
+            }
             else
-               dSprintf( szPath, 1024, "%s%s", basePath, &subPath[1] );
-            directoryVector.push_back( StringTable->insert( szPath ) );
+            {
+               if (subLead == '/')
+                  dSprintf(szPath, 1024, "%s%s", basePath, subPath);
+               else
+                  dSprintf(szPath, 1024, "%s/%s", basePath, subPath);
+            }
+            directoryVector.push_back(StringTable->insert(szPath));
          }
          else
             directoryVector.push_back( StringTable->insert( basePath ) );

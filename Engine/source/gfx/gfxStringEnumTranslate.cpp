@@ -347,7 +347,6 @@ void GFXStringEnumTranslate::init()
    GFX_STRING_ASSIGN_MACRO( GFXStringPrimType, GFXLineStrip );
    GFX_STRING_ASSIGN_MACRO( GFXStringPrimType, GFXTriangleList );
    GFX_STRING_ASSIGN_MACRO( GFXStringPrimType, GFXTriangleStrip );
-   GFX_STRING_ASSIGN_MACRO( GFXStringPrimType, GFXTriangleFan );
    VALIDATE_LOOKUPTABLE( GFXStringPrimType, GFXPT );
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------

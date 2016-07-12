@@ -33,6 +33,7 @@
 #include "gfx/D3D9/gfxD3D9OcclusionQuery.h"
 #include "gfx/D3D9/gfxD3D9Shader.h"
 #include "windowManager/platformWindow.h"
+#include "materials/shaderData.h"
 #ifndef TORQUE_OS_XENON
 #  include "windowManager/win32/win32Window.h"
 #endif
@@ -82,6 +83,9 @@ GFXD3D9Device::GFXD3D9Device( LPDIRECT3D9 d3d, U32 index )
    mCurrentConstBuffer = NULL;
 
    mOcclusionQuerySupported = false;
+
+   for (U32 i = 0; i < GS_COUNT; ++i) 
+      mModelViewProjSC[i] = NULL;
 
    // Set up the Enum translation tables
    GFXD3D9EnumTranslate::init();
@@ -139,40 +143,65 @@ GFXD3D9Device::~GFXD3D9Device()
 }
 
 //------------------------------------------------------------------------------
-// setupGenericShaders - This function is totally not needed on PC because there
-// is fixed-function support in D3D9
+// setupGenericShaders 
 //------------------------------------------------------------------------------
 inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSColor */ )
 {
-#ifdef WANT_TO_SIMULATE_UI_ON_360
-   if( mGenericShader[GSColor] == NULL )
+   AssertFatal(type != GSTargetRestore, ""); //not used
+
+   if (mGenericShader[GSColor] == NULL)
    {
-      mGenericShader[GSColor] =           createShader( "shaders/common/genericColorV.hlsl", 
-         "shaders/common/genericColorP.hlsl", 
-         2.f );
+      ShaderData *shaderData;
 
-      mGenericShader[GSModColorTexture] = createShader( "shaders/common/genericModColorTextureV.hlsl", 
-         "shaders/common/genericModColorTextureP.hlsl", 
-         2.f );
+      shaderData = new ShaderData();
+      shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/colorV.hlsl");
+      shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/colorP.hlsl");
+      shaderData->setField("pixVersion", "3.0");
+      shaderData->registerObject();
+      mGenericShader[GSColor] = shaderData->getShader();
+      mGenericShaderBuffer[GSColor] = mGenericShader[GSColor]->allocConstBuffer();
+      mModelViewProjSC[GSColor] = mGenericShader[GSColor]->getShaderConstHandle("$modelView");
+      Sim::getRootGroup()->addObject(shaderData);
 
-      mGenericShader[GSAddColorTexture] = createShader( "shaders/common/genericAddColorTextureV.hlsl", 
-         "shaders/common/genericAddColorTextureP.hlsl", 
-         2.f );
+      shaderData = new ShaderData();
+      shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/modColorTextureV.hlsl");
+      shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/modColorTextureP.hlsl");
+      shaderData->setField("pixVersion", "3.0");
+      shaderData->registerObject();
+      mGenericShader[GSModColorTexture] = shaderData->getShader();
+      mGenericShaderBuffer[GSModColorTexture] = mGenericShader[GSModColorTexture]->allocConstBuffer();
+      mModelViewProjSC[GSModColorTexture] = mGenericShader[GSModColorTexture]->getShaderConstHandle("$modelView");
+      Sim::getRootGroup()->addObject(shaderData);
+
+      shaderData = new ShaderData();
+      shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/addColorTextureV.hlsl");
+      shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/addColorTextureP.hlsl");
+      shaderData->setField("pixVersion", "3.0");
+      shaderData->registerObject();
+      mGenericShader[GSAddColorTexture] = shaderData->getShader();
+      mGenericShaderBuffer[GSAddColorTexture] = mGenericShader[GSAddColorTexture]->allocConstBuffer();
+      mModelViewProjSC[GSAddColorTexture] = mGenericShader[GSAddColorTexture]->getShaderConstHandle("$modelView");
+      Sim::getRootGroup()->addObject(shaderData);
+
+      shaderData = new ShaderData();
+      shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/textureV.hlsl");
+      shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/textureP.hlsl");
+      shaderData->setField("pixVersion", "3.0");
+      shaderData->registerObject();
+      mGenericShader[GSTexture] = shaderData->getShader();
+      mGenericShaderBuffer[GSTexture] = mGenericShader[GSTexture]->allocConstBuffer();
+      mModelViewProjSC[GSTexture] = mGenericShader[GSTexture]->getShaderConstHandle("$modelView");
+      Sim::getRootGroup()->addObject(shaderData);
+
+      //Force an update
+      mViewportDirty = true;
    }
 
-   mGenericShader[type]->process();
+   MatrixF tempMatrix = mProjectionMatrix * mViewMatrix * mWorldMatrix[mWorldStackSize];
+   mGenericShaderBuffer[type]->setSafe(mModelViewProjSC[type], tempMatrix);
 
-   MatrixF world, view, proj;
-   mWorldMatrix[mWorldStackSize].transposeTo( world );
-   mViewMatrix.transposeTo( view );
-   mProjectionMatrix.transposeTo( proj );
-
-   mTempMatrix = world * view * proj;
-
-   setVertexShaderConstF( VC_WORLD_PROJ, (F32 *)&mTempMatrix, 4 );
-#else
-   disableShaders();
-#endif
+   setShader(mGenericShader[type]);
+   setShaderConstBuffer(mGenericShaderBuffer[type]);
 }
 
 //-----------------------------------------------------------------------------
@@ -731,7 +760,8 @@ void GFXD3D9Device::setShader( GFXShader *shader, bool force )
 //-----------------------------------------------------------------------------
 GFXPrimitiveBuffer * GFXD3D9Device::allocPrimitiveBuffer(   U32 numIndices, 
                                                             U32 numPrimitives, 
-                                                            GFXBufferType bufferType )
+                                                            GFXBufferType bufferType,
+                                                            void* data )
 {
    // Allocate a buffer to return
    GFXD3D9PrimitiveBuffer * res = new GFXD3D9PrimitiveBuffer(this, numIndices, numPrimitives, bufferType);
@@ -741,12 +771,13 @@ GFXPrimitiveBuffer * GFXD3D9Device::allocPrimitiveBuffer(   U32 numIndices,
    D3DPOOL pool = D3DPOOL_DEFAULT;
 
    // Assumptions:
-   //    - static buffers are write once, use many
+   //    - static buffers are write rarely, use many
    //    - dynamic buffers are write many, use many
    //    - volatile buffers are write once, use once
    // You may never read from a buffer.
    switch(bufferType)
    {
+   case GFXBufferTypeImmutable:
    case GFXBufferTypeStatic:
       pool = isD3D9Ex() ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
       break;
@@ -781,6 +812,14 @@ GFXPrimitiveBuffer * GFXD3D9Device::allocPrimitiveBuffer(   U32 numIndices,
       D3D9Assert(mD3DDevice->CreateIndexBuffer( sizeof(U16) * numIndices , usage, GFXD3D9IndexFormat[GFXIndexFormat16], pool, &res->ib, 0),
          "Failed to allocate an index buffer.");
    }
+   
+   if(data)
+   {
+      void* dest;
+      res->lock(0, numIndices, &dest);
+      dMemcpy(dest, data, sizeof(U16) * numIndices);
+      res->unlock();
+   }
 
    return res;
 }
@@ -791,7 +830,8 @@ GFXPrimitiveBuffer * GFXD3D9Device::allocPrimitiveBuffer(   U32 numIndices,
 GFXVertexBuffer * GFXD3D9Device::allocVertexBuffer(   U32 numVerts, 
                                                       const GFXVertexFormat *vertexFormat, 
                                                       U32 vertSize, 
-                                                      GFXBufferType bufferType )
+                                                      GFXBufferType bufferType, 
+                                                      void* data)
 {
    PROFILE_SCOPE( GFXD3D9Device_allocVertexBuffer );
 
@@ -808,13 +848,14 @@ GFXVertexBuffer * GFXD3D9Device::allocVertexBuffer(   U32 numVerts,
    res->mNumVerts = 0;
 
    // Assumptions:
-   //    - static buffers are write once, use many
+   //    - static buffers are write rarely, use many
    //    - dynamic buffers are write many, use many
    //    - volatile buffers are write once, use once
    // You may never read from a buffer.
 
    switch(bufferType)
    {
+   case GFXBufferTypeImmutable:
    case GFXBufferTypeStatic:
       pool = isD3D9Ex() ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
       break;
@@ -850,6 +891,15 @@ GFXVertexBuffer * GFXD3D9Device::allocVertexBuffer(   U32 numVerts,
    }
 
    res->mNumVerts = numVerts;
+   
+   if(data)
+   {
+      void* dest;
+      res->lock(0, numVerts, &dest);
+      dMemcpy(dest, data, vertSize * numVerts);
+      res->unlock();
+   }
+   
    return res;
 }
 

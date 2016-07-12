@@ -21,18 +21,17 @@
 //-----------------------------------------------------------------------------
 
 #include "../postFx.hlsl"
-#include "shadergen:/autogenConditioners.h"
 
-uniform sampler2D currLum : register( S0 );
-uniform sampler2D lastAdaptedLum : register( S1 );
+TORQUE_UNIFORM_SAMPLER2D(currLum, 0);
+TORQUE_UNIFORM_SAMPLER2D(lastAdaptedLum, 1);
 
 uniform float adaptRate;
 uniform float deltaTime;
 
-float4 main( PFXVertToPix IN ) : COLOR
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
-   float fAdaptedLum = tex2D( lastAdaptedLum, float2(0.5f, 0.5f) ).r;
-   float fCurrentLum = tex2D( currLum, float2(0.5f, 0.5f) ).r;
+   float fAdaptedLum = TORQUE_TEX2D( lastAdaptedLum, float2(0.5f, 0.5f) ).r;
+   float fCurrentLum = TORQUE_TEX2D( currLum, float2(0.5f, 0.5f) ).r;
 
    // The user's adapted luminance level is simulated by closing the gap between
    // adapted luminance and current luminance by 2% every frame, based on a

@@ -442,22 +442,12 @@ void SpawnSphere::unpackUpdate(NetConnection * con, BitStream * stream)
 
 void SpawnSphere::processTick( const Move *move )
 {
-   if ( isServerObject() && isMounted() )
-   {
-      MatrixF mat( true );
-      mMount.object->getRenderMountTransform( 0.f, mMount.node, mMount.xfm, &mat );
-      setTransform( mat );
-   }
+   Parent::processTick( move );
 }
 
 void SpawnSphere::advanceTime( F32 timeDelta )
 {
-   if ( isMounted() )
-   {
-      MatrixF mat( true );
-      mMount.object->getRenderMountTransform( 0.f, mMount.node, mMount.xfm, &mat );
-      setTransform( mat );
-   }
+   Parent::advanceTime( timeDelta );
 }
 
 void SpawnSphere::initPersistFields()

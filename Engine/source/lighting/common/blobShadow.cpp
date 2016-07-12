@@ -338,7 +338,7 @@ void BlobShadow::render( F32 camDist, const TSRenderState &rdata )
    GFX->setVertexBuffer(mShadowBuffer);
 
    for(U32 p=0; p<mPartition.size(); p++)
-      GFX->drawPrimitive(GFXTriangleFan, mPartition[p].vertexStart, (mPartition[p].vertexCount - 2));
+      GFX->drawPrimitive(GFXTriangleStrip, mPartition[p].vertexStart, (mPartition[p].vertexCount - 2));
 
    // This is a bad nasty hack which forces the shadow to reconstruct itself every frame.
    mPartition.clear();

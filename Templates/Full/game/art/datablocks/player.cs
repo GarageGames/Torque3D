@@ -494,7 +494,6 @@ datablock PlayerData(DefaultPlayerData)
    imageAnimPrefixFP = "soldier";
    shapeNameFP[0] = "art/shapes/actors/Soldier/FP/FP_SoldierArms.DAE";
 
-   canObserve = 1;
    cmdCategory = "Clients";
 
    cameraDefaultFov = 55.0;
@@ -517,7 +516,6 @@ datablock PlayerData(DefaultPlayerData)
    maxDamage = 100;
    maxEnergy =  60;
    repairRate = 0.33;
-   energyPerDamagePoint = 75;
 
    rechargeRate = 0.256;
 
@@ -650,7 +648,6 @@ datablock PlayerData(DefaultPlayerData)
 
    //exitingWater         = ExitingWaterLightSound;
 
-   observeParameters = "0.5 4.5 4.5";
 
    cameraMinDist = "0";
    DecalData = "PlayerFootprint";

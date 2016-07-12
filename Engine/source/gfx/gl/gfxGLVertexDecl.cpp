@@ -15,7 +15,7 @@ void GFXGLVertexDecl::init(const GFXVertexFormat *format)
 void GFXGLVertexDecl::prepareVertexFormat() const
 {
    AssertFatal(mFormat, "GFXGLVertexDecl - Not inited");
-   if( gglHasExtension(ARB_vertex_attrib_binding) )
+   if( GFXGL->mCapabilities.vertexAttributeBinding )
    {
       for ( U32 i=0; i < glVerticesFormat.size(); i++ )
       {
@@ -36,7 +36,7 @@ void GFXGLVertexDecl::prepareBuffer_old(U32 stream, GLint mBuffer, GLint mDiviso
    PROFILE_SCOPE(GFXGLVertexDecl_prepare);
    AssertFatal(mFormat, "GFXGLVertexDecl - Not inited");
 
-   if( gglHasExtension(ARB_vertex_attrib_binding) )
+   if( GFXGL->mCapabilities.vertexAttributeBinding )
       return;   
 
 	// Bind the buffer...

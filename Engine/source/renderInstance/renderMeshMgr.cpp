@@ -144,6 +144,14 @@ void RenderMeshMgr::render(SceneRenderState * state)
       if( !mat )
          mat = MATMGR->getWarningMatInstance();
 
+      // Check if bin is disabled in advanced lighting.
+      // Allow forward rendering pass on custom materials.
+
+      if ( ( MATMGR->getPrePassEnabled() && mBasicOnly && !mat->isCustomMaterial() ) )
+      {
+         j++;
+         continue;
+      }
 
       U32 matListEnd = j;
       lastMiscTex = sgData.miscTex;

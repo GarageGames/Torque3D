@@ -99,6 +99,8 @@ Var::Var()
    sampler = false;
    mapsToSampler = false;
    arraySize = 1;
+   texture = false;
+   rank = 0;
 }
 
 Var::Var( const char *inName, const char *inType )
@@ -113,6 +115,8 @@ Var::Var( const char *inName, const char *inType )
    texCoordNum = 0;
    constSortPos = cspUninit;
    arraySize = 1;
+   texture = false;
+   rank = 0;
 
    setName( inName );
    setType( inType );

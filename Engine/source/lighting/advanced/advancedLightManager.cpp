@@ -105,7 +105,7 @@ void AdvancedLightManager::activate( SceneManager *sceneManager )
    // we prefer the floating point format if it works.
    Vector<GFXFormat> formats;
    formats.push_back( GFXFormatR16G16B16A16F );
-   formats.push_back( GFXFormatR16G16B16A16 );
+   //formats.push_back( GFXFormatR16G16B16A16 );
    GFXFormat blendTargetFormat = GFX->selectSupportedFormat( &GFXDefaultRenderTargetProfile,
                                                          formats,
                                                          true,
@@ -357,10 +357,13 @@ void AdvancedLightManager::setLightInfo(  ProcessedMaterial *pmat,
    LightingShaderConstants *lsc = getLightingShaderConstants(shaderConsts);
 
    LightShadowMap *lsm = SHADOWMGR->getCurrentShadowMap();
+   LightShadowMap *dynamicShadowMap = SHADOWMGR->getCurrentDynamicShadowMap();
 
    LightInfo *light;
-   if ( lsm )
+   if (lsm)
       light = lsm->getLightInfo();
+   else if ( dynamicShadowMap )
+      light = dynamicShadowMap->getLightInfo();
    else
    {
       light = sgData.lights[0];
@@ -385,10 +388,11 @@ void AdvancedLightManager::setLightInfo(  ProcessedMaterial *pmat,
                         lsc->mLightInvRadiusSqSC,
                         lsc->mLightSpotDirSC,
                         lsc->mLightSpotAngleSC,
-						lsc->mLightSpotFalloffSC,
+                        lsc->mLightSpotFalloffSC,
                         shaderConsts );
 
-   if ( lsm && light->getCastShadows() )
+   // Static
+   if (lsm && light->getCastShadows())
    {
       if (  lsc->mWorldToLightProjSC->isValid() )
          shaderConsts->set(   lsc->mWorldToLightProjSC, 
@@ -426,6 +430,46 @@ void AdvancedLightManager::setLightInfo(  ProcessedMaterial *pmat,
                               lsc->mViewToLightProjSC->getType() );
       }
    }
+
+   // Dynamic
+   if ( dynamicShadowMap )
+   {
+      if (  lsc->mDynamicWorldToLightProjSC->isValid() )
+         shaderConsts->set(   lsc->mDynamicWorldToLightProjSC, 
+                              dynamicShadowMap->getWorldToLightProj(), 
+                              lsc->mDynamicWorldToLightProjSC->getType() );
+
+      if (  lsc->mDynamicViewToLightProjSC->isValid() )
+      {
+         // TODO: Should probably cache these results and 
+         // not do this mul here on every material that needs
+         // this transform.
+
+         shaderConsts->set(   lsc->mDynamicViewToLightProjSC, 
+                              dynamicShadowMap->getWorldToLightProj() * state->getCameraTransform(), 
+                              lsc->mDynamicViewToLightProjSC->getType() );
+      }
+
+      shaderConsts->setSafe( lsc->mShadowMapSizeSC, 1.0f / (F32)dynamicShadowMap->getTexSize() );
+
+      // Do this last so that overrides can properly override parameters previously set
+      dynamicShadowMap->setShaderParameters(shaderConsts, lsc);
+   }   
+   else
+   {
+      if ( lsc->mDynamicViewToLightProjSC->isValid() )
+      {
+         // TODO: Should probably cache these results and 
+         // not do this mul here on every material that needs
+         // this transform.
+         MatrixF proj;
+         light->getWorldToLightProj( &proj );
+
+         shaderConsts->set(   lsc->mDynamicViewToLightProjSC, 
+                              proj * state->getCameraTransform(), 
+                              lsc->mDynamicViewToLightProjSC->getType() );
+      }
+   }
 }
 
 void AdvancedLightManager::registerGlobalLight(LightInfo *light, SimObject *obj)
@@ -454,19 +498,31 @@ bool AdvancedLightManager::setTextureStage(  const SceneData &sgData,
                                              ShaderConstHandles *handles )
 {
    LightShadowMap* lsm = SHADOWMGR->getCurrentShadowMap();
+   LightShadowMap* dynamicShadowMap = SHADOWMGR->getCurrentDynamicShadowMap();
 
    // Assign Shadowmap, if it exists
    LightingShaderConstants* lsc = getLightingShaderConstants(shaderConsts);
    if ( !lsc )
       return false;
 
-   if ( lsm && lsm->getLightInfo()->getCastShadows() )
-      return lsm->setTextureStage( currTexFlag, lsc );
-
-
    if ( currTexFlag == Material::DynamicLight )
    {
+      // Static
+      if ( lsm && lsm->getLightInfo()->getCastShadows() )
+         return lsm->setTextureStage( currTexFlag, lsc );
+
       S32 reg = lsc->mShadowMapSC->getSamplerRegister();
+   	if ( reg != -1 )
+      	GFX->setTexture( reg, GFXTexHandle::ONE );
+
+      return true;
+   } else if ( currTexFlag == Material::DynamicShadowMap )
+   {
+      // Dynamic
+      if ( dynamicShadowMap )
+         return dynamicShadowMap->setTextureStage( currTexFlag, lsc );
+
+      S32 reg = lsc->mDynamicShadowMapSC->getSamplerRegister();
    	if ( reg != -1 )
       	GFX->setTexture( reg, GFXTexHandle::ONE );
 

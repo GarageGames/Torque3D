@@ -39,7 +39,7 @@ out vec4 OUT_col;
 void main()
 {
    vec4 kernel = vec4( 0.175, 0.275, 0.375, 0.475 ) * 0.5f;
-   
+
    OUT_col = vec4(0);
    OUT_col += texture( diffuseMap, uv0 ) * kernel.x;
    OUT_col += texture( diffuseMap, uv1 ) * kernel.y;
@@ -55,5 +55,5 @@ void main()
    // can use alpha test to save fillrate.
    vec3 rgb2lum = vec3( 0.30, 0.59, 0.11 );
    OUT_col.a = dot( OUT_col.rgb, rgb2lum );
-   
+
 }

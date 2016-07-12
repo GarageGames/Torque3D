@@ -30,6 +30,8 @@ class GFXGLWindowTarget : public GFXWindowTarget
 public:
 
    GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d);
+   ~GFXGLWindowTarget();
+
    const Point2I getSize() 
    { 
       return mWindow->getClientExtent();

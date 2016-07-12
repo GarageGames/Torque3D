@@ -30,7 +30,6 @@ ImplementFeatureType( MFT_VertTransform, MFG_Transform, 0, true );
 
 ImplementFeatureType( MFT_TexAnim, MFG_PreTexture, 1.0f, true );
 ImplementFeatureType( MFT_Parallax, MFG_PreTexture, 2.0f, true );
-ImplementFeatureType( MFT_DiffuseVertColor, MFG_PreTexture, 3.0f, true );
 
 ImplementFeatureType( MFT_AccuScale, MFG_PreTexture, 4.0f, true );
 ImplementFeatureType( MFT_AccuDirection, MFG_PreTexture, 4.0f, true );
@@ -42,10 +41,12 @@ ImplementFeatureType( MFT_DiffuseMap, MFG_Texture, 2.0f, true );
 ImplementFeatureType( MFT_OverlayMap, MFG_Texture, 3.0f, true );
 ImplementFeatureType( MFT_DetailMap, MFG_Texture, 4.0f, true );
 ImplementFeatureType( MFT_DiffuseColor, MFG_Texture, 5.0f, true );
+ImplementFeatureType( MFT_DiffuseVertColor, MFG_Texture, 6.0f, true );
 ImplementFeatureType( MFT_AlphaTest, MFG_Texture, 7.0f, true );
 ImplementFeatureType( MFT_SpecularMap, MFG_Texture, 8.0f, true );
 ImplementFeatureType( MFT_NormalMap, MFG_Texture, 9.0f, true );
 ImplementFeatureType( MFT_DetailNormalMap, MFG_Texture, 10.0f, true );
+ImplementFeatureType( MFT_Imposter, U32(-1), -1, true );
 
 ImplementFeatureType( MFT_AccuMap, MFG_PreLighting, 2.0f, true );
 
@@ -55,10 +56,9 @@ ImplementFeatureType( MFT_LightMap, MFG_Lighting, 4.0f, true );
 ImplementFeatureType( MFT_ToneMap, MFG_Lighting, 5.0f, true );
 ImplementFeatureType( MFT_VertLitTone, MFG_Lighting, 6.0f, false );
 ImplementFeatureType( MFT_VertLit, MFG_Lighting, 7.0f, true );
-ImplementFeatureType( MFT_EnvMap, MFG_Lighting, 8.0f, true );
-ImplementFeatureType( MFT_CubeMap, MFG_Lighting, 9.0f, true );
-ImplementFeatureType( MFT_PixSpecular, MFG_Lighting, 10.0f, true );
-ImplementFeatureType( MFT_MinnaertShading, MFG_Lighting, 12.0f, true );
+ImplementFeatureType( MFT_PixSpecular, MFG_Lighting, 9.0f, true );
+ImplementFeatureType( MFT_MinnaertShading, MFG_Lighting, 10.0f, true );
+ImplementFeatureType( MFT_CubeMap, MFG_Lighting, 11.0f, true );
 
 ImplementFeatureType( MFT_GlowMask, MFG_PostLighting, 1.0f, true );
 ImplementFeatureType( MFT_Visibility, MFG_PostLighting, 2.0f, true );
@@ -84,6 +84,8 @@ ImplementFeatureType( MFT_NormalsOut, MFG_PreLighting, 1.0f, false );
 
 ImplementFeatureType( MFT_LightbufferMRT, MFG_PreLighting, 1.0f, false );
 ImplementFeatureType( MFT_RenderTarget1_Zero, MFG_PreTexture, 1.0f, false );
+ImplementFeatureType( MFT_RenderTarget2_Zero, MFG_PreTexture, 1.0f, false );
+ImplementFeatureType( MFT_RenderTarget3_Zero, MFG_PreTexture, 1.0f, false );
 
 ImplementFeatureType( MFT_Foliage, MFG_PreTransform, 1.0f, false );
 
@@ -92,3 +94,12 @@ ImplementFeatureType( MFT_ParticleNormal, MFG_PreTransform, 2.0f, false );
 ImplementFeatureType( MFT_ForwardShading, U32(-1), -1, true );
 
 ImplementFeatureType( MFT_ImposterVert, MFG_PreTransform, 1.0, false );
+
+// Deferred Shading
+ImplementFeatureType( MFT_isDeferred, U32(-1), -1, true );
+ImplementFeatureType( MFT_SkyBox, MFG_Transform, 1.0f, false );
+ImplementFeatureType( MFT_DeferredEmptySpec, MFG_Texture, 8.01f, false );
+
+ImplementFeatureType( MFT_DeferredSpecMap, MFG_Texture, 8.2f, false );
+ImplementFeatureType( MFT_DeferredSpecVars, MFG_Texture, 8.5f, false );
+ImplementFeatureType( MFT_DeferredMatInfoFlags, MFG_Texture, 8.7f, false );

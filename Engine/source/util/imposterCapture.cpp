@@ -136,6 +136,7 @@ void ImposterCaptureMaterialHook::_overrideFeatures(  ProcessedMaterial *mat,
       fd.features.addFeature( MFT_NormalsOut );
 
    fd.features.addFeature( MFT_ForwardShading );
+   fd.features.addFeature( MFT_Imposter );
 }
 
 ImposterCaptureMaterialHook* ImposterCaptureMaterialHook::_getOrCreateHook( BaseMatInstance *inMat )

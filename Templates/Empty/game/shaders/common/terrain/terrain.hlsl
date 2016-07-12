@@ -35,6 +35,7 @@ float calcBlend( float texId, float2 layerCoord, float layerSize, float4 layerSa
    // Check if any of the layer samples 
    // match the current texture id.
    float4 factors = 0;
+   [unroll]
    for(int i = 0; i < 4; i++)
       if(layerSample[i] == texId)
          factors[i] = 1;

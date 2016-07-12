@@ -28,10 +28,12 @@
 #include "../../../gl/lighting.glsl"
 #include "../../shadowMap/shadowMapIO_GLSL.h"
 #include "softShadow.glsl"
+#include "../../../gl/torque.glsl"
 
 in vec4 wsEyeDir;
 in vec4 ssPos;
 in vec4 vsEyeDir;
+in vec4 color;
 
 #ifdef USE_COOKIE_TEX
 
@@ -107,7 +109,12 @@ uniform sampler2D prePassBuffer;
 	uniform samplerCube shadowMap;
 #else
 	uniform sampler2D shadowMap;
+	uniform sampler2D dynamicShadowMap;
 #endif
+
+uniform sampler2D lightBuffer;
+uniform sampler2D colorBuffer;
+uniform sampler2D matInfoBuffer;
 
 uniform vec4 rtParams0;
 
@@ -119,9 +126,10 @@ uniform vec2 lightAttenuation;
 uniform vec4 lightMapParams;
 uniform vec4 vsFarPlane;
 uniform mat3 viewToLightProj;
+uniform mat3 dynamicViewToLightProj;
 uniform vec4 lightParams;
 uniform float shadowSoftness;
-			   
+
 out vec4 OUT_col;
 
 void main()               
@@ -130,6 +138,15 @@ void main()
    vec3 ssPos = ssPos.xyz / ssPos.w;
    vec2 uvScene = getUVFromSSPos( ssPos, rtParams0 );
    
+   // Emissive.
+   vec4 matInfo = texture( matInfoBuffer, uvScene );   
+   bool emissive = getFlag( matInfo.r, 0 );
+   if ( emissive )
+   {
+       OUT_col = vec4(0.0, 0.0, 0.0, 0.0);
+	   return;
+   }
+
    // Sample/unpack the normal/z data
    vec4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
    vec3 normal = prepassSample.rgb;
@@ -175,7 +192,7 @@ void main()
 
          vec2 shadowCoord = decodeShadowCoord( tMul( viewToLightProj, -lightVec ) ).xy;
          
-         float shadowed = softShadow_filter( shadowMap,
+         float static_shadowed = softShadow_filter( shadowMap,
                                              ssPos.xy,
                                              shadowCoord,
                                              shadowSoftness,
@@ -183,17 +200,28 @@ void main()
                                              nDotL,
                                              lightParams.y );
 
+         vec2 dynamicShadowCoord = decodeShadowCoord( tMul( dynamicViewToLightProj, -lightVec ) ).xy;
+         float dynamic_shadowed = softShadow_filter( dynamicShadowMap,
+                                             ssPos.xy,
+                                             dynamicShadowCoord,
+                                             shadowSoftness,
+                                             distToLight,
+                                             nDotL,
+                                             lightParams.y );
+
+         float shadowed = min(static_shadowed, dynamic_shadowed);
       #endif
 
    #endif // !NO_SHADOW
    
+   vec3 lightcol = lightColor.rgb;
    #ifdef USE_COOKIE_TEX
 
       // Lookup the cookie sample.
       vec4 cookie = texture( cookieMap, tMul( viewToLightProj, -lightVec ) );
 
       // Multiply the light with the cookie tex.
-      lightColor.rgb *= cookie.rgb;
+      lightcol *= cookie.rgb;
 
       // Use a maximum channel luminance to attenuate 
       // the lighting else we get specular in the dark
@@ -211,7 +239,7 @@ void main()
                                        normalize( -eyeRay ) ) * lightBrightness * atten * shadowed;
 
    float Sat_NL_Att = saturate( nDotL * atten * shadowed ) * lightBrightness;
-   vec3 lightColorOut = lightMapParams.rgb * lightColor.rgb;
+   vec3 lightColorOut = lightMapParams.rgb * lightcol;
    vec4 addToResult = vec4(0.0);
     
    // TODO: This needs to be removed when lightmapping is disabled
@@ -230,5 +258,6 @@ void main()
       addToResult = ( 1.0 - shadowed ) * abs(lightMapParams);
    }
 
-   OUT_col = lightinfoCondition( lightColorOut, Sat_NL_Att, specular, addToResult );
+   vec4 colorSample = texture( colorBuffer, uvScene );
+   OUT_col = AL_DeferredOutput(lightColorOut, colorSample.rgb, matInfo, addToResult, specular, Sat_NL_Att);
 }

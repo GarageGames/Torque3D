@@ -107,8 +107,7 @@ void RenderTexTargetBinManager::initPersistFields()
 
 bool RenderTexTargetBinManager::setTargetSize(const Point2I &newTargetSize)
 {
-   if( GFX->getAdapterType() != OpenGL && // Targets need to match up exactly in size on OpenGL.
-       mTargetSize.x >= newTargetSize.x &&
+   if( mTargetSize.x >= newTargetSize.x &&
        mTargetSize.y >= newTargetSize.y )
       return true;
 

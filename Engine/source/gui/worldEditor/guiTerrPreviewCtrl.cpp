@@ -265,18 +265,18 @@ void GuiTerrPreviewCtrl::onRender(Point2I offset, const RectI &updateRect)
 
          // the texture if flipped horz to reflect how the terrain is really drawn
          PrimBuild::color3f(1.0f, 1.0f, 1.0f);
-         PrimBuild::begin(GFXTriangleFan, 4);
-            PrimBuild::texCoord2f(textureP1.x, textureP2.y);
-            PrimBuild::vertex2f(screenP1.x, screenP2.y);       // left bottom
+         PrimBuild::begin(GFXTriangleStrip, 4);
+         PrimBuild::texCoord2f(textureP1.x, textureP1.y);
+         PrimBuild::vertex2f(screenP1.x, screenP1.y);       // left top
 
-            
-            PrimBuild::texCoord2f(textureP2.x, textureP2.y);
-            PrimBuild::vertex2f(screenP2.x, screenP2.y);       // right bottom
-            PrimBuild::texCoord2f(textureP2.x, textureP1.y);
-            PrimBuild::vertex2f(screenP2.x, screenP1.y);       // right top
+         PrimBuild::texCoord2f(textureP2.x, textureP1.y);
+         PrimBuild::vertex2f(screenP2.x, screenP1.y);       // right top
 
-            PrimBuild::texCoord2f(textureP1.x, textureP1.y);
-            PrimBuild::vertex2f(screenP1.x, screenP1.y);       // left top
+         PrimBuild::texCoord2f(textureP1.x, textureP2.y);
+         PrimBuild::vertex2f(screenP1.x, screenP2.y);       // left bottom
+
+         PrimBuild::texCoord2f(textureP2.x, textureP2.y);
+         PrimBuild::vertex2f(screenP2.x, screenP2.y);       // right bottom
          PrimBuild::end();
       }
    }

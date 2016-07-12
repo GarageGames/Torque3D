@@ -35,6 +35,8 @@ if(UNIX)
 	# for asm files
 	SET (CMAKE_ASM_NASM_OBJECT_FORMAT "elf")
 	ENABLE_LANGUAGE (ASM_NASM)
+    
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif()
 
 # TODO: fmod support
@@ -64,7 +66,6 @@ option(TORQUE_EXTENDED_MOVE "Extended move support" OFF)
 mark_as_advanced(TORQUE_EXTENDED_MOVE)
 if(WIN32)
 	option(TORQUE_SDL "Use SDL for window and input" OFF)
-	mark_as_advanced(TORQUE_SDL)
 else()
 	set(TORQUE_SDL ON) # we need sdl to work on Linux/Mac
 endif()
@@ -82,6 +83,13 @@ else()
 	set(TORQUE_OPENGL ON) # we need OpenGL to render on Linux/Mac
 	option(TORQUE_DEDICATED "Torque dedicated" OFF)
 endif()
+
+if(WIN32)
+	option(TORQUE_D3D11 "Allow Direct3D 11 render" OFF)
+endif()
+
+option(TORQUE_EXPERIMENTAL_EC "Experimental Entity/Component systems" OFF)
+mark_as_advanced(TORQUE_EXPERIMENTAL_EC)
 
 ###############################################################################
 # options
@@ -170,8 +178,6 @@ addPathRec("${srcDir}/app")
 addPath("${srcDir}/sfx/media")
 addPath("${srcDir}/sfx/null")
 addPath("${srcDir}/sfx")
-addPath("${srcDir}/component")
-addPath("${srcDir}/component/interfaces")
 addPath("${srcDir}/console")
 addPath("${srcDir}/core")
 addPath("${srcDir}/core/stream")
@@ -192,9 +198,16 @@ addPath("${srcDir}/windowManager/test")
 addPath("${srcDir}/math")
 addPath("${srcDir}/math/util")
 addPath("${srcDir}/math/test")
+
 addPath("${srcDir}/platform")
-addPath("${srcDir}/cinterface")
+if(NOT TORQUE_SDL) 
+   set(BLACKLIST "fileDialog.cpp" )
+endif()
 addPath("${srcDir}/platform/nativeDialogs")
+set(BLACKLIST "" )
+
+addPath("${srcDir}/cinterface")
+
 if( NOT TORQUE_DEDICATED )
     addPath("${srcDir}/platform/menus")
 endif()
@@ -244,7 +257,13 @@ addPath("${srcDir}/ts/arch")
 addPath("${srcDir}/physics")
 addPath("${srcDir}/gui/3d")
 addPath("${srcDir}/postFx")
+
+if(NOT TORQUE_EXPERIMENTAL_EC) 
+   set(BLACKLIST "entity.cpp;entity.h" )
+endif()
 addPath("${srcDir}/T3D")
+set(BLACKLIST "" )
+
 addPath("${srcDir}/T3D/examples")
 addPath("${srcDir}/T3D/fps")
 addPath("${srcDir}/T3D/fx")
@@ -254,7 +273,22 @@ addPath("${srcDir}/T3D/decal")
 addPath("${srcDir}/T3D/sfx")
 addPath("${srcDir}/T3D/gameBase")
 addPath("${srcDir}/T3D/turret")
+
+if( TORQUE_EXPERIMENTAL_EC )
+	addPath("${srcDir}/T3D/components/")
+	addPath("${srcDir}/T3D/components/animation")
+	addPath("${srcDir}/T3D/components/camera")
+	addPath("${srcDir}/T3D/components/collision")
+	addPath("${srcDir}/T3D/components/game")
+	addPath("${srcDir}/T3D/components/physics")
+	addPath("${srcDir}/T3D/components/render")
+endif()
+
 addPath("${srcDir}/main/")
+addPath("${srcDir}/assets")
+addPath("${srcDir}/module")
+addPath("${srcDir}/T3D/assets")
+addPathRec("${srcDir}/persistence")
 addPathRec("${srcDir}/ts/collada")
 addPathRec("${srcDir}/ts/loader")
 addPathRec("${projectSrcDir}")
@@ -327,7 +361,11 @@ if(TORQUE_TOOLS)
     addPath("${srcDir}/environment/editors")
     addPath("${srcDir}/forest/editor")
     addPath("${srcDir}/gui/editor")
+    if(NOT TORQUE_EXPERIMENTAL_EC) 
+        set(BLACKLIST "entityGroup.cpp;entityGroup.h;mountingGroup.cpp;mountingGroup.h;componentGroup.cpp;componentGroup.h" )
+    endif()
     addPath("${srcDir}/gui/editor/inspector")
+    set(BLACKLIST "" )
 endif()
 
 if(TORQUE_HIFI)
@@ -358,6 +396,28 @@ if(TORQUE_SDL)
        else()
          set(ENV{LDFLAGS} "${CXX_FLAG32} ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
        endif()
+
+       find_package(PkgConfig REQUIRED)
+       pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+
+       # Setup CMake to use GTK+, tell the compiler where to look for headers
+       # and to the linker where to look for libraries
+       include_directories(${GTK3_INCLUDE_DIRS})
+       link_directories(${GTK3_LIBRARY_DIRS})
+
+       # Add other flags to the compiler
+       add_definitions(${GTK3_CFLAGS_OTHER})
+
+       set(BLACKLIST "nfd_win.cpp"  )
+       addLib(nativeFileDialogs)
+
+       set(BLACKLIST ""  )
+       target_link_libraries(nativeFileDialogs ${GTK3_LIBRARIES})
+ 	else()
+ 	   set(BLACKLIST "nfd_gtk.c" )
+ 	   addLib(nativeFileDialogs)
+       set(BLACKLIST ""  )
+ 	   addLib(comctl32)	   
     endif()
     
     #override and hide SDL2 cache variables
@@ -368,6 +428,10 @@ endif()
 
 if(TORQUE_DEDICATED)
     addDef(TORQUE_DEDICATED)
+endif()
+
+if(TORQUE_EXPERIMENTAL_EC)
+	addDef(TORQUE_EXPERIMENTAL_EC)
 endif()
 
 #modules dir
@@ -381,14 +445,19 @@ endforeach()
 ###############################################################################
 if(WIN32)
     addPath("${srcDir}/platformWin32")
+    if(TORQUE_SDL) 
+ 		set(BLACKLIST "fileDialog.cpp" )
+ 	endif()
     addPath("${srcDir}/platformWin32/nativeDialogs")
+    set(BLACKLIST "" )
     addPath("${srcDir}/platformWin32/menus")
     addPath("${srcDir}/platformWin32/threads")
     addPath("${srcDir}/platformWin32/videoInfo")
     addPath("${srcDir}/platformWin32/minidump")
     addPath("${srcDir}/windowManager/win32")
-    #addPath("${srcDir}/gfx/D3D8")
-    addPath("${srcDir}/gfx/D3D")
+	if(TORQUE_D3D11)
+		addPath("${srcDir}/gfx/D3D11")
+	endif()
     addPath("${srcDir}/gfx/D3D9")
     addPath("${srcDir}/gfx/D3D9/pc")
     addPath("${srcDir}/shaderGen/HLSL")    
@@ -469,12 +538,9 @@ if( TORQUE_OPENGL )
     if( TORQUE_OPENGL AND NOT TORQUE_DEDICATED )
         addPath("${srcDir}/gfx/gl")
         addPath("${srcDir}/gfx/gl/tGL")        
-    addPath("${srcDir}/shaderGen/GLSL")
+        addPath("${srcDir}/shaderGen/GLSL")
         addPath("${srcDir}/terrain/glsl")
         addPath("${srcDir}/forest/glsl")    
-
-    # glew
-    LIST(APPEND ${PROJECT_NAME}_files "${libDir}/glew/src/glew.c")
     endif()
     
     if(WIN32 AND NOT TORQUE_SDL)
@@ -527,6 +593,9 @@ addLib(squish)
 addLib(collada)
 addLib(pcre)
 addLib(convexDecomp)
+if (TORQUE_OPENGL)
+   addLib(epoxy)
+endif()
 
 if(WIN32)
     # copy pasted from T3D build system, some might not be needed
@@ -536,6 +605,13 @@ if(WIN32)
    
    if(TORQUE_OPENGL)
       addLib(OpenGL32.lib)
+   endif()
+		
+   # JTH: DXSDK is compiled with older runtime, and MSVC 2015+ is when __vsnprintf is undefined.
+   # This is a workaround by linking with the older legacy library functions.
+   # See this for more info: http://stackoverflow.com/a/34230122
+   if (MSVC14)
+      addLib(legacy_stdio_definitions.lib)
    endif()
 endif()
 
@@ -586,9 +662,6 @@ endif()
 
 if(TORQUE_OPENGL)
 	addDef(TORQUE_OPENGL)
-   if(WIN32)
-      addDef(GLEW_STATIC)
-    endif()
 endif()
 
 if(TORQUE_SDL)
@@ -619,17 +692,17 @@ addInclude("${libDir}/libogg/include")
 addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
+if(TORQUE_SDL)
+   addInclude("${libDir}/nativeFileDialogs/include")
+endif()
 if(TORQUE_OPENGL)
-	addInclude("${libDir}/glew/include")
+	addInclude("${libDir}/epoxy/include")
+	addInclude("${libDir}/epoxy/src")
 endif()
 
 if(UNIX)
 	addInclude("/usr/include/freetype2/freetype")
 	addInclude("/usr/include/freetype2")
-endif()
-
-if(TORQUE_OPENGL)
-	addInclude("${libDir}/glew/include")
 endif()
 
 # external things
@@ -659,7 +732,34 @@ endif()
 
 if(TORQUE_TEMPLATE)
     message("Prepare Template(${TORQUE_TEMPLATE}) install...")
-    INSTALL(DIRECTORY "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game"                 DESTINATION "${TORQUE_APP_DIR}")
+    file(GLOB_RECURSE INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/*")
+    
+    IF( NOT TORQUE_EXPERIMENTAL_EC)
+        list(REMOVE_ITEM INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/art/art.module.taml")
+        list(REMOVE_ITEM INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/art/shapes/actors/Soldier/soldier.asset.taml")
+        list(REMOVE_ITEM INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/scripts.module.taml")
+        
+        foreach(ITEM ${INSTALL_FILES_AND_DIRS})
+            get_filename_component( dir ${ITEM} DIRECTORY )
+            get_filename_component( fileName ${ITEM} NAME )
+            if( ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/components 
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/components/game
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/components/input
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/gameObjects
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/tools/componentEditor
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/tools/componentEditor/gui
+                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/tools/componentEditor/scripts )
+                list(REMOVE_ITEM INSTALL_FILES_AND_DIRS ${dir}/${fileName})
+            ENDIF()
+        endforeach()
+    ENDIF()
+    
+    foreach(ITEM ${INSTALL_FILES_AND_DIRS})
+        get_filename_component( dir ${ITEM} DIRECTORY )
+        STRING(REGEX REPLACE "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/" "${TORQUE_APP_DIR}/" INSTALL_DIR ${dir})
+        install( FILES ${ITEM} DESTINATION ${INSTALL_DIR} )
+    endforeach()
+    
     if(WIN32)
         INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/cleanShaders.bat"     DESTINATION "${TORQUE_APP_DIR}")
         INSTALL(FILES "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/DeleteCachedDTSs.bat" DESTINATION "${TORQUE_APP_DIR}")

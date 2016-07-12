@@ -385,6 +385,8 @@ U32 PolyhedronImpl< Base >::extractFace( U32 plane, IndexType* outIndices, U32 m
    // so it should be sufficiently fast to just loop over the original
    // set.
 
+   U32 indexItr = 0;
+
    do 
    {
       // Add the vertex for the current edge.
@@ -392,7 +394,15 @@ U32 PolyhedronImpl< Base >::extractFace( U32 plane, IndexType* outIndices, U32 m
       if( idx >= maxOutIndices )
          return 0;
 
-      outIndices[ idx ++ ] = currentVertex;
+      ++indexItr;
+
+      if (indexItr >= 3)
+      {
+         outIndices[idx++] = firstEdge->vertex[0];
+         indexItr = 0;
+      }
+
+      outIndices[idx++] = currentVertex;
 
       // Look for next edge.
 

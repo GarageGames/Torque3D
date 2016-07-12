@@ -38,7 +38,6 @@ struct StaticShapeData: public ShapeBaseData {
    bool  noIndividualDamage;
    S32   dynamicTypeField;
    bool  isShielded;
-   F32   energyPerDamagePoint;
 
    //
    DECLARE_CONOBJECT(StaticShapeData);
@@ -76,7 +75,6 @@ public:
    bool onNewDataBlock(GameBaseData *dptr, bool reload);
 
    void processTick(const Move *move);
-   void interpolateTick(F32 delta);
    void setTransform(const MatrixF &mat);
 
    U32  packUpdate  (NetConnection *conn, U32 mask, BitStream *stream);

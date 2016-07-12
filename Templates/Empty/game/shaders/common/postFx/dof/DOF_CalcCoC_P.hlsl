@@ -23,21 +23,22 @@
 #include "./../postFx.hlsl"
 
 // These are set by the game engine.  
-uniform sampler2D shrunkSampler : register(S0);  // Output of DofDownsample()  
-uniform sampler2D blurredSampler : register(S1); // Blurred version of the shrunk sampler  
+TORQUE_UNIFORM_SAMPLER2D(shrunkSampler, 0);  // Output of DofDownsample()
+TORQUE_UNIFORM_SAMPLER2D(blurredSampler, 1); // Blurred version of the shrunk sampler
+
 
 // This is the pixel shader function that calculates the actual  
 // value used for the near circle of confusion.  
 // "texCoords" are 0 at the bottom left pixel and 1 at the top right.  
-float4 main( PFXVertToPix IN ) : COLOR
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
    float3 color;  
    float coc;  
    half4 blurred;  
    half4 shrunk;  
    
-   shrunk = tex2D( shrunkSampler, IN.uv0 );  
-   blurred = tex2D( blurredSampler, IN.uv1 );  
+   shrunk = half4(TORQUE_TEX2D( shrunkSampler, IN.uv0 ));  
+   blurred = half4(TORQUE_TEX2D( blurredSampler, IN.uv1 ));  
    color = shrunk.rgb;  
    //coc = shrunk.a;
    //coc = blurred.a;

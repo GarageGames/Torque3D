@@ -191,10 +191,11 @@ void AdvancedLightBinManager::addLight( LightInfo *light )
    // Find a shadow map for this light, if it has one
    ShadowMapParams *lsp = light->getExtended<ShadowMapParams>();
    LightShadowMap *lsm = lsp->getShadowMap();
+   LightShadowMap *dynamicShadowMap = lsp->getShadowMap(true);
 
    // Get the right shadow type.
    ShadowType shadowType = ShadowType_None;
-   if (  light->getCastShadows() && 
+   if (  light->getCastShadows() &&  
          lsm && lsm->hasShadowTex() &&
          !ShadowMapPass::smDisableShadows )
       shadowType = lsm->getShadowType();
@@ -203,6 +204,7 @@ void AdvancedLightBinManager::addLight( LightInfo *light )
    LightBinEntry lEntry;
    lEntry.lightInfo = light;
    lEntry.shadowMap = lsm;
+   lEntry.dynamicShadowMap = dynamicShadowMap;
    lEntry.lightMaterial = _getLightMaterial( lightType, shadowType, lsp->hasCookieTex() );
 
    if( lightType == LightInfo::Spot )
@@ -303,7 +305,7 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       {
          vectorMatInfo->matInstance->setSceneInfo( state, sgData );
          vectorMatInfo->matInstance->setTransforms( matrixSet, state );
-         GFX->drawPrimitive( GFXTriangleFan, 0, 2 );
+         GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
       }
    }
 
@@ -316,6 +318,8 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       const U32 numPrims = curEntry.numPrims;
       const U32 numVerts = curEntry.vertBuffer->mNumVerts;
 
+      ShadowMapParams *lsp = curLightInfo->getExtended<ShadowMapParams>();
+
       // Skip lights which won't affect the scene.
       if ( !curLightMat || curLightInfo->getBrightness() <= 0.001f )
          continue;
@@ -325,14 +329,13 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
       setupSGData( sgData, state, curLightInfo );
       curLightMat->setLightParameters( curLightInfo, state, worldToCameraXfm );
       mShadowManager->setLightShadowMap( curEntry.shadowMap );
-
-      // Let the shadow know we're about to render from it.
-      if ( curEntry.shadowMap )
-         curEntry.shadowMap->preLightRender();
+      mShadowManager->setLightDynamicShadowMap( curEntry.dynamicShadowMap );
 
       // Set geometry
       GFX->setVertexBuffer( curEntry.vertBuffer );
       GFX->setPrimitiveBuffer( curEntry.primBuffer );
+
+      lsp->getOcclusionQuery()->begin();
 
       // Render the material passes
       while( curLightMat->matInstance->setupPass( state, sgData ) )
@@ -348,13 +351,12 @@ void AdvancedLightBinManager::render( SceneRenderState *state )
             GFX->drawPrimitive(GFXTriangleList, 0, numPrims);
       }
 
-      // Tell it we're done rendering.
-      if ( curEntry.shadowMap )
-         curEntry.shadowMap->postLightRender();
+      lsp->getOcclusionQuery()->end();
    }
 
    // Set NULL for active shadow map (so nothing gets confused)
    mShadowManager->setLightShadowMap(NULL);
+   mShadowManager->setLightDynamicShadowMap(NULL);
    GFX->setVertexBuffer( NULL );
    GFX->setPrimitiveBuffer( NULL );
 
@@ -480,24 +482,24 @@ void AdvancedLightBinManager::_setupPerFrameParameters( const SceneRenderState *
    // passes.... this is a volatile VB and updates every frame.
    FarFrustumQuadVert verts[4];
    {
-      verts[0].point.set( wsFrustumPoints[Frustum::FarBottomLeft] - cameraPos );
-      invCam.mulP( wsFrustumPoints[Frustum::FarBottomLeft], &verts[0].normal );
-      verts[0].texCoord.set( -1.0, -1.0 );
-      verts[0].tangent.set(wsFrustumPoints[Frustum::FarBottomLeft] - cameraOffsetPos);
+      verts[0].point.set(wsFrustumPoints[Frustum::FarTopLeft] - cameraPos);
+      invCam.mulP(wsFrustumPoints[Frustum::FarTopLeft], &verts[0].normal);
+      verts[0].texCoord.set(-1.0, 1.0);
+      verts[0].tangent.set(wsFrustumPoints[Frustum::FarTopLeft] - cameraOffsetPos);
 
-      verts[1].point.set( wsFrustumPoints[Frustum::FarTopLeft] - cameraPos );
-      invCam.mulP( wsFrustumPoints[Frustum::FarTopLeft], &verts[1].normal );
-      verts[1].texCoord.set( -1.0, 1.0 );
-      verts[1].tangent.set(wsFrustumPoints[Frustum::FarTopLeft] - cameraOffsetPos);
+      verts[1].point.set(wsFrustumPoints[Frustum::FarTopRight] - cameraPos);
+      invCam.mulP(wsFrustumPoints[Frustum::FarTopRight], &verts[1].normal);
+      verts[1].texCoord.set(1.0, 1.0);
+      verts[1].tangent.set(wsFrustumPoints[Frustum::FarTopRight] - cameraOffsetPos);
 
-      verts[2].point.set( wsFrustumPoints[Frustum::FarTopRight] - cameraPos );
-      invCam.mulP( wsFrustumPoints[Frustum::FarTopRight], &verts[2].normal );
-      verts[2].texCoord.set( 1.0, 1.0 );
-      verts[2].tangent.set(wsFrustumPoints[Frustum::FarTopRight] - cameraOffsetPos);
+      verts[2].point.set(wsFrustumPoints[Frustum::FarBottomLeft] - cameraPos);
+      invCam.mulP(wsFrustumPoints[Frustum::FarBottomLeft], &verts[2].normal);
+      verts[2].texCoord.set(-1.0, -1.0);
+      verts[2].tangent.set(wsFrustumPoints[Frustum::FarBottomLeft] - cameraOffsetPos);
 
-      verts[3].point.set( wsFrustumPoints[Frustum::FarBottomRight] - cameraPos );
-      invCam.mulP( wsFrustumPoints[Frustum::FarBottomRight], &verts[3].normal );
-      verts[3].texCoord.set( 1.0, -1.0 );
+      verts[3].point.set(wsFrustumPoints[Frustum::FarBottomRight] - cameraPos);
+      invCam.mulP(wsFrustumPoints[Frustum::FarBottomRight], &verts[3].normal);
+      verts[3].texCoord.set(1.0, -1.0);
       verts[3].tangent.set(wsFrustumPoints[Frustum::FarBottomRight] - cameraOffsetPos);
    }
    mFarFrustumQuadVerts.set( GFX, 4 );

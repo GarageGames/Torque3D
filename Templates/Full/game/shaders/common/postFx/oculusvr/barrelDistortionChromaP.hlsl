@@ -24,7 +24,7 @@
 #include "../postFx.hlsl"  
 #include "../../torque.hlsl"
 
-uniform sampler2D backBuffer : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(backBuffer, 0);
 
 uniform float3 LensCenter;    // x=Left X, y=Right X, z=Y
 uniform float2 ScreenCenter;
@@ -33,7 +33,7 @@ uniform float2 ScaleIn;
 uniform float4 HmdWarpParam;
 uniform float4 HmdChromaAbParam; // Chromatic aberration correction
 
-float4 main( PFXVertToPix IN ) : COLOR0  
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0  
 {
    float2 texCoord;
    float xOffset;
@@ -75,18 +75,18 @@ float4 main( PFXVertToPix IN ) : COLOR0
    {
       // Now do blue texture lookup.
       tcBlue.x += xOffset;
-      float blue = tex2D(backBuffer, tcBlue).b;
+      float blue = TORQUE_TEX2D(backBuffer, tcBlue).b;
 
       // Do green lookup (no scaling).
       float2 tcGreen = lensCenter + Scale * theta1;
       tcGreen.x += xOffset;
-      float green = tex2D(backBuffer, tcGreen).g;
+      float green = TORQUE_TEX2D(backBuffer, tcGreen).g;
 
       // Do red scale and lookup.
       float2 thetaRed = theta1 * (HmdChromaAbParam.x + HmdChromaAbParam.y * rSq);
       float2 tcRed = lensCenter + Scale * thetaRed;
       tcRed.x += xOffset;
-      float red = tex2D(backBuffer, tcRed).r;
+      float red = TORQUE_TEX2D(backBuffer, tcRed).r;
 
       color = float4(red, green, blue, 1);
    }

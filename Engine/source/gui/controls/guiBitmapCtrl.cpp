@@ -29,6 +29,8 @@
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 
+#include "materials/matTextureTarget.h"
+
 
 IMPLEMENT_CONOBJECT(GuiBitmapCtrl);
 
@@ -56,7 +58,8 @@ ConsoleDocClass( GuiBitmapCtrl,
 GuiBitmapCtrl::GuiBitmapCtrl(void)
  : mBitmapName(),
    mStartPoint( 0, 0 ),
-   mWrap( false )
+   mWrap( false ),
+   mColor(ColorI::WHITE)
 {	
 }
 
@@ -78,7 +81,8 @@ void GuiBitmapCtrl::initPersistFields()
    
       addProtectedField( "bitmap", TypeImageFilename, Offset( mBitmapName, GuiBitmapCtrl ),
          &setBitmapName, &defaultProtectedGetFn,
-         "The bitmap file to display in the control." );
+         "The bitmap file to display in the control.");
+      addField("color", TypeColorI, Offset(mColor, GuiBitmapCtrl),"color mul");
       addField( "wrap",   TypeBool,     Offset( mWrap, GuiBitmapCtrl ),
          "If true, the bitmap is tiled inside the control rather than stretched to fit." );
       
@@ -169,6 +173,7 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
    if (mTextureObject)
    {
       GFX->getDrawUtil()->clearBitmapModulation();
+      GFX->getDrawUtil()->setBitmapModulation(mColor);
 		if(mWrap)
 		{
          // We manually draw each repeat because non power of two textures will 
@@ -263,4 +268,25 @@ DefineConsoleMethod( GuiBitmapCtrl, setBitmap, void, ( const char * fileRoot, bo
    char filename[1024];
    Con::expandScriptFilename(filename, sizeof(filename), fileRoot);
    object->setBitmap(filename, resize );
+}
+
+DefineEngineMethod( GuiBitmapCtrl, setNamedTexture, bool, (String namedtexture),,
+   "@brief Set a texture as the image.\n\n"
+   "@param namedtexture The name of the texture (NamedTexTarget).\n"
+   "@return true if the texture exists." )
+{
+   GFXTexHandle theTex;
+   NamedTexTarget *namedTarget = NULL;
+   namedTarget = NamedTexTarget::find(namedtexture.c_str());
+   if ( namedTarget )
+   {
+      theTex = namedTarget->getTexture( 0 );
+   }
+   
+   if ( theTex.isValid() )
+   {
+      object->setBitmapHandle( theTex , false );
+      return true; //a new texture was set correctly
+   }
+   return false; //we couldn't change the texture
 }

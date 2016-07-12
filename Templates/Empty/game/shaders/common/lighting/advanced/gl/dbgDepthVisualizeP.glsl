@@ -24,13 +24,13 @@
 #include "shadergen:/autogenConditioners.h"
 
 in vec2 uv0;
-uniform sampler2D prepassBuffer;
+uniform sampler2D prepassTex;
 uniform sampler1D depthViz;
 
 out vec4 OUT_col;
 
 void main()
 {
-   float depth = prepassUncondition( prepassBuffer, uv0 ).w;
+   float depth = prepassUncondition( prepassTex, uv0 ).w;
    OUT_col = vec4( texture( depthViz, depth ).rgb, 1.0 );
 }

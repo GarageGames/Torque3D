@@ -415,7 +415,7 @@ inline void Box3F::extend(const Point3F & p)
 #define EXTEND_AXIS(AXIS)    \
 if (p.AXIS < minExtents.AXIS)       \
    minExtents.AXIS = p.AXIS;        \
-else if (p.AXIS > maxExtents.AXIS)  \
+if (p.AXIS > maxExtents.AXIS)  \
    maxExtents.AXIS = p.AXIS;
 
    EXTEND_AXIS(x)

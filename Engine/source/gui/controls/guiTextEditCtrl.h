@@ -93,6 +93,8 @@ protected:
    void playDeniedSound();
    void execConsoleCallback();
 
+   bool mTextValid;
+
    virtual void handleCharInput( U16 ascii );
 
    S32 findNextWord();   
@@ -119,6 +121,10 @@ public:
    S32   getCursorPos()   { return( mCursorPos ); }
    void  setCursorPos( const S32 newPos );
    
+   void invalidText(bool playSound = true);
+   void validText();
+   bool isValidText();
+
    bool isAllTextSelected();
    void selectAllText();
    void clearSelectedText();

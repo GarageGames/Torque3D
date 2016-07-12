@@ -23,31 +23,34 @@
 //-----------------------------------------------------------------------------
 // Structures                                                                  
 //-----------------------------------------------------------------------------
+
+#include "shaderModel.hlsl"
+
 struct ConnectData
 {
-   float2 texCoord   : TEXCOORD0;
-   float4 tex2       : TEXCOORD1;
+   float4 hpos            : TORQUE_POSITION;
+   float2 texCoord        : TEXCOORD0;
+   float4 tex2            : TEXCOORD1;
 };
 
 
 struct Fragout
 {
-   float4 col : COLOR0;
+   float4 col : TORQUE_TARGET0;
 };
 
+TORQUE_UNIFORM_SAMPLER2D(texMap, 0);
+TORQUE_UNIFORM_SAMPLER2D(refractMap, 1);
 
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------
-Fragout main( ConnectData IN,
-              uniform sampler2D texMap          : register(S0),
-              uniform sampler2D refractMap      : register(S1)
-)
+Fragout main( ConnectData IN )
 {
    Fragout OUT;
 
-   float4 diffuseColor = tex2D( texMap, IN.texCoord );
-   float4 reflectColor = tex2Dproj( refractMap, IN.tex2 );
+   float4 diffuseColor = TORQUE_TEX2D( texMap, IN.texCoord );
+   float4 reflectColor = TORQUE_TEX2DPROJ(refractMap, IN.tex2);
 
    OUT.col = diffuseColor + reflectColor * diffuseColor.a;
 

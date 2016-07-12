@@ -50,6 +50,8 @@ LightInfo::LightInfo()
       mOuterConeAngle( 90.0f ),
       mType( Vector ),
       mCastShadows( false ),
+      mStaticRefreshFreq( 250 ),
+      mDynamicRefreshFreq( 8 ),
       mPriority( 1.0f ),
       mScore( 0.0f ),
       mDebugRender( false )
@@ -72,6 +74,8 @@ void LightInfo::set( const LightInfo *light )
    mOuterConeAngle = light->mOuterConeAngle;
    mType = light->mType;
    mCastShadows = light->mCastShadows;
+   mStaticRefreshFreq = light->mStaticRefreshFreq;
+   mDynamicRefreshFreq = light->mDynamicRefreshFreq;
 
    for ( U32 i=0; i < mExtended.size(); i++ )
    {

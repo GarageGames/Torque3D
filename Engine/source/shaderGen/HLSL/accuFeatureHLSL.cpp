@@ -56,7 +56,7 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    output = meta;
 
    // OUT.col
-   Var *color = (Var*) LangElement::find( "col" );
+   Var *color = (Var*) LangElement::find( "col1" );
    if (!color)
    {
       output = new GenOp("   //NULL COLOR!");
@@ -65,7 +65,11 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    // accu map
    Var *accuMap = new Var;
-   accuMap->setType( "sampler2D" );
+   if (mIsDirect3D11)
+      accuMap->setType("SamplerState");
+   else
+      accuMap->setType("sampler2D");
+
    accuMap->setName( "accuMap" );
    accuMap->uniform = true;
    accuMap->sampler = true;
@@ -85,7 +89,8 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 
    // accu constants
    Var *accuScale = (Var*)LangElement::find( "accuScale" );
-   if ( !accuScale ) {
+   if ( !accuScale )
+   {
       accuScale = new Var;
       accuScale->setType( "float" );
       accuScale->setName( "accuScale" );
@@ -94,7 +99,8 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       accuScale->constSortPos = cspPotentialPrimitive;
    }
    Var *accuDirection = (Var*)LangElement::find( "accuDirection" );
-   if ( !accuDirection ) {
+   if ( !accuDirection )
+   {
       accuDirection = new Var;
       accuDirection->setType( "float" );
       accuDirection->setName( "accuDirection" );
@@ -103,7 +109,8 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       accuDirection->constSortPos = cspPotentialPrimitive;
    }
    Var *accuStrength = (Var*)LangElement::find( "accuStrength" );
-   if ( !accuStrength ) {
+   if ( !accuStrength )
+   {
       accuStrength = new Var;
       accuStrength->setType( "float" );
       accuStrength->setName( "accuStrength" );
@@ -112,7 +119,8 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       accuStrength->constSortPos = cspPotentialPrimitive;
    }
    Var *accuCoverage = (Var*)LangElement::find( "accuCoverage" );
-   if ( !accuCoverage ) {
+   if ( !accuCoverage )
+   {
       accuCoverage = new Var;
       accuCoverage->setType( "float" );
       accuCoverage->setName( "accuCoverage" );
@@ -121,7 +129,8 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       accuCoverage->constSortPos = cspPotentialPrimitive;
    }
    Var *accuSpecular = (Var*)LangElement::find( "accuSpecular" );
-   if ( !accuSpecular ) {
+   if ( !accuSpecular )
+   {
       accuSpecular = new Var;
       accuSpecular->setType( "float" );
       accuSpecular->setName( "accuSpecular" );
@@ -133,14 +142,26 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    Var *inTex = getInTexCoord( "texCoord", "float2", true, componentList );
    Var *accuVec = getInTexCoord( "accuVec", "float3", true, componentList );
    Var *bumpNorm = (Var *)LangElement::find( "bumpSample" );
-   if( bumpNorm == NULL ) {
+   if( bumpNorm == NULL )
+   {
       bumpNorm = (Var *)LangElement::find( "bumpNormal" );
       if (!bumpNorm)
         return;
    }
 
    // get the accu pixel color
-   meta->addStatement( new GenOp( "   @ = tex2D(@, @ * @);\r\n", colorAccuDecl, accuMap, inTex, accuScale ) );
+   if (mIsDirect3D11)
+   {
+      Var *accuMapTex = new Var;
+      accuMapTex->setType("Texture2D");
+      accuMapTex->setName("accuMapTex");
+      accuMapTex->uniform = true;
+      accuMapTex->texture = true;
+      accuMapTex->constNum = accuMap->constNum;
+      meta->addStatement(new GenOp("   @ = @.Sample(@, @ * @);\r\n", colorAccuDecl, accuMapTex, accuMap, inTex, accuScale));
+   }
+   else
+      meta->addStatement(new GenOp("   @ = tex2D(@, @ * @);\r\n", colorAccuDecl, accuMap, inTex, accuScale));
 
    // scale up normals
    meta->addStatement( new GenOp( "   @.xyz = @.xyz * 2.0 - 0.5;\r\n", bumpNorm, bumpNorm ) );
@@ -149,7 +170,7 @@ void AccuTexFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    meta->addStatement( new GenOp( "   @.z *= @*2.0;\r\n", accuVec, accuDirection ) );
 
    // saturate based on strength
-   meta->addStatement( new GenOp( "   @ = saturate( dot( @, @.xyz * pow(@, 5) ) );\r\n", plcAccu, bumpNorm, accuVec, accuStrength ) );
+   meta->addStatement( new GenOp( "   @ = saturate( dot( @.xyz, @.xyz * pow(@, 5) ) );\r\n", plcAccu, bumpNorm, accuVec, accuStrength ) );
 
    // add coverage
    meta->addStatement( new GenOp( "   @.a += (2 * pow(@/2, 5)) - 0.5;\r\n", accuPlc, accuCoverage ) );

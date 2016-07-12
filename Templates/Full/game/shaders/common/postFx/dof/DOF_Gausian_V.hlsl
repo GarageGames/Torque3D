@@ -24,13 +24,13 @@
 #include "./../../torque.hlsl"
 
 
-uniform float2 texSize0;
 uniform float4 rtParams0;
+uniform float2 texSize0;
 uniform float2 oneOverTargetSize; 
 
 struct VertToPix
 {
-   float4 hpos       : POSITION;
+   float4 hpos       : TORQUE_POSITION;
 
    float2 uv0        : TEXCOORD0;
    float2 uv1        : TEXCOORD1;
@@ -47,7 +47,7 @@ VertToPix main( PFXVert IN )
 {
    VertToPix OUT;
    
-   OUT.hpos = IN.pos;
+   OUT.hpos = float4(IN.pos,1.0);
    
    IN.uv = viewportCoordToRenderTarget( IN.uv, rtParams0 );
    

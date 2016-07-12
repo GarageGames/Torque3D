@@ -26,15 +26,18 @@
 //-----------------------------------------------------------------------------
 // Structures                                                                  
 //-----------------------------------------------------------------------------
+
+#include "../ShaderModel.hlsl"
+
 struct VertData
 {
-   float2 texCoord        : TEXCOORD0;
-   float4 position        : POSITION;
+   float3 position        : POSITION;
+   float2 texCoord        : TEXCOORD0;   
 };
 
 struct ConnectData
 {
-   float4 hpos            : POSITION;
+   float4 hpos            : TORQUE_POSITION;
    float2 tex0            : TEXCOORD0;
 };
 
@@ -47,7 +50,7 @@ ConnectData main( VertData IN,
 {
    ConnectData OUT;
 
-   OUT.hpos = mul(modelview, IN.position);   
+   OUT.hpos = mul(modelview, float4(IN.position,1.0));   
    OUT.tex0 = IN.texCoord;
 
    return OUT;
