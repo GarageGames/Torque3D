@@ -24,8 +24,10 @@
 #include "platform/input/oculusVR/oculusVRSensorData.h"
 #include "platform/input/oculusVR/oculusVRUtil.h"
 #include "platform/platformInput.h"
-#include"console/simBase.h"
+#include "console/simBase.h"
 #include "console/engineAPI.h" 
+#include "math/mAngAxis.h"
+#include "OVR_CAPI_0_8_0.h"
 
 U32 OculusVRSensorDevice::OVR_SENSORROT[OculusVRConstants::MaxSensors] = {0};
 U32 OculusVRSensorDevice::OVR_SENSORROTANG[OculusVRConstants::MaxSensors] = {0};
@@ -66,7 +68,7 @@ void OculusVRSensorDevice::cleanUp()
 {
    mIsValid = false;
 
-   ovrHmd_ConfigureTracking(mDevice, 0, 0);
+   ovr_ConfigureTracking(mDevice, 0, 0);
 }
 
 void OculusVRSensorDevice::set(ovrHmd sensor, S32 actionCodeIndex)
@@ -74,7 +76,7 @@ void OculusVRSensorDevice::set(ovrHmd sensor, S32 actionCodeIndex)
    mIsValid = false;
    mDevice = sensor;
 
-   mSupportedTrackingCaps = sensor->TrackingCaps;
+   mSupportedTrackingCaps = ovr_GetTrackingCaps(sensor);
    mCurrentTrackingCaps = ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position;
 
    mCurrentTrackingCaps = mSupportedTrackingCaps & mCurrentTrackingCaps;
@@ -82,15 +84,17 @@ void OculusVRSensorDevice::set(ovrHmd sensor, S32 actionCodeIndex)
 
    mPositionTrackingDisabled = !(mCurrentTrackingCaps & ovrTrackingCap_Position);
 
+	ovrHmdDesc desc = ovr_GetHmdDesc(sensor);
+
    // DeviceInfo
-   mProductName = sensor->ProductName;
-   mManufacturer = sensor->Manufacturer;
-   mVersion = sensor->Type;
+   mProductName = desc.ProductName;
+   mManufacturer = desc.Manufacturer;
+   mVersion = desc.Type;
 
    // SensorInfo
-   mVendorId = sensor->VendorId;
-   mProductId = sensor->ProductId;
-   mSerialNumber = sensor->SerialNumber;
+   mVendorId = desc.VendorId;
+   mProductId = desc.ProductId;
+   mSerialNumber = desc.SerialNumber;
 
    mActionCodeIndex = actionCodeIndex;
 
@@ -163,7 +167,7 @@ bool OculusVRSensorDevice::process(U32 deviceType, bool generateRotAsAngAxis, bo
       return false;
 
    // Grab current state
-   ovrTrackingState ts = ovrHmd_GetTrackingState(mDevice, ovr_GetTimeInSeconds());
+   ovrTrackingState ts = ovr_GetTrackingState(mDevice, ovr_GetTimeInSeconds(), ovrTrue);
    mLastStatus = ts.StatusFlags;
 
    // Store the current data from the sensor and compare with previous data
@@ -181,7 +185,8 @@ bool OculusVRSensorDevice::process(U32 deviceType, bool generateRotAsAngAxis, bo
    {
       if(generateRotAsAngAxis)
       {
-         INPUTMGR->buildInputEvent(deviceType, OculusVRConstants::DefaultOVRBase, SI_ROT, OVR_SENSORROT[mActionCodeIndex], SI_MOVE, currentBuffer->mRotQuat);
+         AngAxisF axisAA(currentBuffer->mRotQuat);
+         INPUTMGR->buildInputEvent(deviceType, OculusVRConstants::DefaultOVRBase, SI_ROT, OVR_SENSORROT[mActionCodeIndex], SI_MOVE, axisAA);
       }
 
       if(generateRotAsEuler)
@@ -249,7 +254,7 @@ void OculusVRSensorDevice::reset()
    if(!mIsValid)
       return;
 
-   ovrHmd_RecenterPose(mDevice);
+   ovr_RecenterPose(mDevice);
 }
 
 bool OculusVRSensorDevice::getYawCorrection() const
@@ -322,7 +327,7 @@ EulerF OculusVRSensorDevice::getEulerRotation()
    if(!mIsValid)
       return Point3F::Zero;
 
-   ovrTrackingState ts = ovrHmd_GetTrackingState(mDevice, ovr_GetTimeInSeconds());
+   ovrTrackingState ts = ovr_GetTrackingState(mDevice, ovr_GetTimeInSeconds(), ovrTrue);
    OVR::Quatf orientation = ts.HeadPose.ThePose.Orientation;
 
    // Sensor rotation in Euler format
@@ -337,7 +342,7 @@ EulerF OculusVRSensorDevice::getRawEulerRotation()
    if(!mIsValid)
       return Point3F::Zero;
 
-   ovrTrackingState ts = ovrHmd_GetTrackingState(mDevice, ovr_GetTimeInSeconds());
+   ovrTrackingState ts = ovr_GetTrackingState(mDevice, ovr_GetTimeInSeconds(), ovrTrue);
    OVR::Quatf orientation = ts.HeadPose.ThePose.Orientation;
 
    // Sensor rotation in Euler format
@@ -351,7 +356,7 @@ VectorF OculusVRSensorDevice::getAcceleration()
    if(!mIsValid)
       return VectorF::Zero;
    
-   ovrTrackingState ts = ovrHmd_GetTrackingState(mDevice, ovr_GetTimeInSeconds());
+   ovrTrackingState ts = ovr_GetTrackingState(mDevice, ovr_GetTimeInSeconds(), ovrTrue);
    OVR::Vector3f a = ts.HeadPose.LinearAcceleration;
 
    // Sensor acceleration in VectorF format
@@ -366,7 +371,7 @@ EulerF OculusVRSensorDevice::getAngularVelocity()
    if(!mIsValid)
       return EulerF::Zero;
    
-   ovrTrackingState ts = ovrHmd_GetTrackingState(mDevice, ovr_GetTimeInSeconds());
+   ovrTrackingState ts = ovr_GetTrackingState(mDevice, ovr_GetTimeInSeconds(), ovrTrue);
    OVR::Vector3f v = ts.HeadPose.AngularVelocity;
    
    // Sensor angular velocity in EulerF format
@@ -381,7 +386,7 @@ Point3F OculusVRSensorDevice::getPosition()
    if(!mIsValid)
       return Point3F();
    
-   ovrTrackingState ts = ovrHmd_GetTrackingState(mDevice, ovr_GetTimeInSeconds());
+   ovrTrackingState ts = ovr_GetTrackingState(mDevice, ovr_GetTimeInSeconds(), ovrTrue);
    OVR::Vector3f v = ts.HeadPose.ThePose.Position;
    return Point3F(-v.x, v.z, -v.y);
 }
@@ -399,5 +404,5 @@ void OculusVRSensorDevice::updateTrackingCaps()
    if (!mPositionTrackingDisabled)
       mCurrentTrackingCaps |= ovrTrackingCap_Position;
 
-   ovrHmd_ConfigureTracking(mDevice, mCurrentTrackingCaps, 0);
+   ovr_ConfigureTracking(mDevice, mCurrentTrackingCaps, 0);
 }

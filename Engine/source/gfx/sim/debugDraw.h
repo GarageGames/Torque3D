@@ -105,7 +105,9 @@ public:
    static void init();
 
    /// Called globally to render debug draw state. Also does state updates.
-   void render();
+   void render(bool clear=true);
+
+   bool willDraw() { return isDrawing && mHead; }
 
    void toggleFreeze()  { shouldToggleFreeze = true; };
    void toggleDrawing() 
@@ -119,6 +121,9 @@ public:
    /// @name ddrawmeth Debug Draw Methods
    ///
    /// @{
+
+   void drawBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
+   void drawTransformedBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color, const MatrixF& transform);
 
    void drawBox(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
    void drawLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));	

@@ -39,6 +39,7 @@
 #include "math/mathUtils.h"
 #include "math/util/frustum.h"
 #include "gfx/screenshot.h"
+#include "postFx/postEffectManager.h"
 
 extern ColorI gCanvasClearColor;
 
@@ -418,7 +419,7 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
    );
 
    reflectRenderState.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-   reflectRenderState.setDiffuseCameraTransform( params.query->cameraMatrix );
+   reflectRenderState.setDiffuseCameraTransform( params.query->headMatrix );
 
    // render scene
    LIGHTMGR->registerGlobalLights( &reflectRenderState.getCullingFrustum(), false );
@@ -532,31 +533,48 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    texDim = getMin( texDim, params.viewportExtent.x );
    texDim = getMin( texDim, params.viewportExtent.y );
 
-   bool texResize = ( texDim != mLastTexSize );  
-   mLastTexSize = texDim;
+   S32 currentTarget = params.eyeId >= 0 ? params.eyeId : 0;
 
-   const Point2I texSize( texDim, texDim );
+   const Point2I texSize = Point2I(texDim, texDim);
+
+   bool texResize = (texSize != mLastTexSize);
+   mLastTexSize = texSize;
 
    if (  texResize || 
-         reflectTex.isNull() ||
+         innerReflectTex[currentTarget].isNull() || 
+       innerReflectTex[currentTarget]->getSize() != texSize || 
          reflectTex->getFormat() != REFLECTMGR->getReflectFormat() )
    {
-      reflectTex = REFLECTMGR->allocRenderTarget( texSize );
-      depthBuff = LightShadowMap::_getDepthTarget( texSize.x, texSize.y );
+      innerReflectTex[currentTarget] = REFLECTMGR->allocRenderTarget( texSize );
    }
+
+   if ( texResize || depthBuff.isNull() )
+   {
+     depthBuff = LightShadowMap::_getDepthTarget(texSize.x, texSize.y);
+   }
+
+   reflectTex = innerReflectTex[currentTarget];
 
    // store current matrices
    GFXTransformSaver saver;
-   
-   Point2I viewport(params.viewportExtent);
-   if(GFX->getCurrentRenderStyle() == GFXDevice::RS_StereoSideBySide)
-   {
-      viewport.x *= 0.5f;
-   }
-   F32 aspectRatio = F32( viewport.x ) / F32( viewport.y );
 
    Frustum frustum;
-   frustum.set(false, params.query->fov, aspectRatio, params.query->nearPlane, params.query->farPlane);
+
+   S32 stereoTarget = GFX->getCurrentStereoTarget();
+   if (stereoTarget != -1)
+   {
+      MathUtils::makeFovPortFrustum(&frustum, false, params.query->nearPlane, params.query->farPlane, params.query->fovPort[stereoTarget]);
+   }
+   else
+   {
+      Point2I viewport(params.viewportExtent);
+      if (GFX->getCurrentRenderStyle() == GFXDevice::RS_StereoSideBySide)
+      {
+         viewport.x *= 0.5f;
+      }
+      F32 aspectRatio = F32(viewport.x) / F32(viewport.y);
+      frustum.set(false, params.query->fov, aspectRatio, params.query->nearPlane, params.query->farPlane);
+   }
 
    // Manipulate the frustum for tiled screenshots
    const bool screenShotMode = gScreenShot && gScreenShot->isPending();
@@ -578,10 +596,10 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
 
    if(reflectTarget.isNull())
       reflectTarget = GFX->allocRenderToTextureTarget();
-   reflectTarget->attachTexture( GFXTextureTarget::Color0, reflectTex );
+   reflectTarget->attachTexture( GFXTextureTarget::Color0, innerReflectTex[currentTarget] );
    reflectTarget->attachTexture( GFXTextureTarget::DepthStencil, depthBuff );
    GFX->pushActiveRenderTarget();
-   GFX->setActiveRenderTarget( reflectTarget );   
+   GFX->setActiveRenderTarget( reflectTarget );
 
    U32 objTypeFlag = -1;
    SceneCameraState reflectCameraState = SceneCameraState::fromGFX();
@@ -603,10 +621,21 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    {
       // Store previous values
       RectI originalVP = GFX->getViewport();
+      MatrixF origNonClipProjection = gClientSceneGraph->getNonClipProjection();
+      PFXFrameState origPFXState = PFXMGR->getFrameState();
 
-      Point2F projOffset = GFX->getCurrentProjectionOffset();
-      const FovPort *currentFovPort = GFX->getStereoFovPort();
-      MatrixF inverseEyeTransforms[2];
+     const FovPort *currentFovPort = params.query->fovPort;
+     MatrixF inverseEyeTransforms[2];
+     Frustum gfxFrustum;
+
+     // Calculate viewport based on texture size
+     RectI stereoViewports[2];
+     stereoViewports[0] = params.query->stereoViewports[0];
+     stereoViewports[1] = params.query->stereoViewports[1];
+     stereoViewports[0].extent.x = stereoViewports[1].extent.x = texSize.x / 2;
+     stereoViewports[0].extent.y = stereoViewports[1].extent.y = texSize.y;
+     stereoViewports[0].point.x = 0;
+     stereoViewports[1].point.x = stereoViewports[0].extent.x;
 
       // Calculate world transforms for eyes
       inverseEyeTransforms[0] = params.query->eyeTransforms[0];
@@ -614,50 +643,64 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       inverseEyeTransforms[0].inverse();
       inverseEyeTransforms[1].inverse();
 
-      Frustum originalFrustum = GFX->getFrustum();
-
+     //
       // Render left half of display
-      GFX->activateStereoTarget(0);
-      GFX->setWorldMatrix(params.query->eyeTransforms[0]);
+      //
 
-      Frustum gfxFrustum = originalFrustum;
-      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[0], inverseEyeTransforms[0]);
+     GFX->setViewport(stereoViewports[0]);
+     GFX->setCurrentStereoTarget(0);
+      MathUtils::makeFovPortFrustum(&gfxFrustum, params.query->ortho, params.query->nearPlane, params.query->farPlane, params.query->fovPort[0]);
+     gfxFrustum.update();
       GFX->setFrustum(gfxFrustum);
 
       setGFXMatrices( params.query->eyeTransforms[0] );
 
-      SceneCameraState cameraStateLeft = SceneCameraState::fromGFX();
-      SceneRenderState renderStateLeft( gClientSceneGraph, SPT_Reflect, cameraStateLeft );
+     SceneRenderState renderStateLeft
+      (
+        gClientSceneGraph,
+        SPT_Reflect,
+        SceneCameraState::fromGFX()
+      );
+
       renderStateLeft.setSceneRenderStyle(SRS_SideBySide);
-      renderStateLeft.setSceneRenderField(0);
       renderStateLeft.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-      renderStateLeft.setDiffuseCameraTransform( params.query->eyeTransforms[0] );
+     renderStateLeft.setDiffuseCameraTransform(params.query->headMatrix);
+     //renderStateLeft.disableAdvancedLightingBins(true);
 
       gClientSceneGraph->renderSceneNoLights( &renderStateLeft, objTypeFlag );
 
+     //
       // Render right half of display
-      GFX->activateStereoTarget(1);
-      GFX->setWorldMatrix(params.query->eyeTransforms[1]);
+     //
 
-      gfxFrustum = originalFrustum;
-      MathUtils::makeFovPortFrustum(&gfxFrustum, gfxFrustum.isOrtho(), gfxFrustum.getNearDist(), gfxFrustum.getFarDist(), currentFovPort[1], inverseEyeTransforms[1]);
+     GFX->setViewport(stereoViewports[1]);
+     GFX->setCurrentStereoTarget(1);
+     MathUtils::makeFovPortFrustum(&gfxFrustum, params.query->ortho, params.query->nearPlane, params.query->farPlane, params.query->fovPort[1]);
+     gfxFrustum.update();
       GFX->setFrustum(gfxFrustum);
 
       setGFXMatrices( params.query->eyeTransforms[1] );
 
-      SceneCameraState cameraStateRight = SceneCameraState::fromGFX();
-      SceneRenderState renderStateRight( gClientSceneGraph, SPT_Reflect, cameraStateRight );
+     SceneRenderState renderStateRight
+     (
+        gClientSceneGraph,
+        SPT_Reflect,
+        SceneCameraState::fromGFX()
+     );
+
       renderStateRight.setSceneRenderStyle(SRS_SideBySide);
-      renderStateRight.setSceneRenderField(1);
       renderStateRight.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-      renderStateRight.setDiffuseCameraTransform( params.query->eyeTransforms[1] );
-      renderStateRight.disableAdvancedLightingBins(true);
+      renderStateRight.setDiffuseCameraTransform( params.query->headMatrix );
+      //renderStateRight.disableAdvancedLightingBins(true);
 
       gClientSceneGraph->renderSceneNoLights( &renderStateRight, objTypeFlag );
 
       // Restore previous values
-      GFX->setFrustum(gfxFrustum);
+      GFX->setFrustum(frustum);
       GFX->setViewport(originalVP);
+      gClientSceneGraph->setNonClipProjection(origNonClipProjection);
+      PFXMGR->setFrameState(origPFXState);
+     GFX->setCurrentStereoTarget(-1);
    }
    else
    {
@@ -669,7 +712,7 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       );
 
       reflectRenderState.getMaterialDelegate().bind( REFLECTMGR, &ReflectionManager::getReflectionMaterial );
-      reflectRenderState.setDiffuseCameraTransform( params.query->cameraMatrix );
+      reflectRenderState.setDiffuseCameraTransform( params.query->headMatrix );
 
       gClientSceneGraph->renderSceneNoLights( &reflectRenderState, objTypeFlag );
    }
@@ -679,6 +722,14 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
    // Clean up.
    reflectTarget->resolve();
    GFX->popActiveRenderTarget();
+
+#ifdef DEBUG_REFLECT_TEX
+   static U32 reflectStage = 0;
+   char buf[128]; dSprintf(buf, 128, "F:\\REFLECT-OUT%i.PNG", reflectStage);
+   //reflectTex->dumpToDisk("PNG", buf);
+   reflectStage++;
+   if (reflectStage > 1) reflectStage = 0;
+#endif
 
    // Restore detail adjust amount.
    TSShapeInstance::smDetailAdjust = detailAdjustBackup;
@@ -793,7 +844,7 @@ MatrixF PlaneReflector::getFrustumClipProj( MatrixF &modelview )
    // as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
    // transform it into camera space by multiplying it
    // by the inverse of the projection matrix
-   Vector4F	q;
+   Vector4F   q;
    q.x = sgn(clipPlane.x) / proj(0,0);
    q.y = sgn(clipPlane.y) / proj(1,1);
    q.z = -1.0F;

@@ -504,6 +504,9 @@ public:
    /// Build an input event based on a QuatF
    void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, QuatF& qValue);
 
+   /// Build an input event based on a AngAxisF
+   void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, AngAxisF& qValue);
+
 protected:
    U32 mNextDeviceTypeCode;
    U32 mNextDeviceCode;

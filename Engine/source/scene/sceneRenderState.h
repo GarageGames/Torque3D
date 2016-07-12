@@ -72,9 +72,6 @@ class SceneRenderState
       /// The render style being performed
       SceneRenderStyle mSceneRenderStyle;
 
-      /// When doing stereo rendering, the current field that is being rendered
-      S32 mRenderField;
-
       /// The render pass which we are setting up with this scene state.
       RenderPassManager* mRenderPass;
 
@@ -236,12 +233,6 @@ class SceneRenderState
 
       /// Set the rendering style used for the scene
       void setSceneRenderStyle(SceneRenderStyle style) { mSceneRenderStyle = style; }
-
-      /// Get the stereo field being rendered
-      S32 getSceneRenderField() const { return mRenderField; }
-
-      /// Set the stereo field being rendered
-      void setSceneRenderField(S32 field) { mRenderField = field; }
 
       /// @}
 

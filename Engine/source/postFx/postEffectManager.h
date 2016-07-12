@@ -127,6 +127,7 @@ public:
    const PFXFrameState &getFrameState() const { return mFrameState[mFrameStateSwitch]; }
    const PFXFrameState &getLastFrameState() const { return mFrameState[!mFrameStateSwitch]; }
 
+   void setFrameState(const PFXFrameState& newState) { mFrameState[mFrameStateSwitch] = newState; }
    void setFrameMatrices( const MatrixF &worldToCamera, const MatrixF &cameraToScreen );
    
    // For ManagedSingleton.

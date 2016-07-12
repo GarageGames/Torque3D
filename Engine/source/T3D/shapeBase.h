@@ -1588,9 +1588,6 @@ public:
    /// orient and position values of the display device.
    virtual void getEyeCameraTransform( IDisplayDevice *display, U32 eyeId, MatrixF *outMat );
 
-   /// Calculates a delta camera angle and view position based on inPose
-   virtual DisplayPose calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose);
-
    /// Gets the index of a node inside a mounted image given the name
    /// @param   imageSlot   Image slot
    /// @param   nodeName    Node name

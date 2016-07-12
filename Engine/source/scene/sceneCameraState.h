@@ -51,6 +51,9 @@ class SceneCameraState
       /// The inverse of the frustum's transform stored here for caching.
       MatrixF mWorldViewMatrix;
 
+      /// Actual head position (will be - eye pos)
+      MatrixF mHeadWorldViewMatrix;
+
       /// The projection matrix.
       MatrixF mProjectionMatrix;
 
@@ -87,6 +90,9 @@ class SceneCameraState
 
       /// Return the world-space view vector.
       const Point3F& getViewDirection() const { return mViewDirection; }
+
+      /// Returns the world->view transform for the head (used to calculate various display metrics)
+      const MatrixF& getHeadWorldViewMatrix() const { return mHeadWorldViewMatrix; }
 
       /// Return the view->world transform.  This is a shortcut for getFrustum().getTransform().
       const MatrixF& getViewWorldMatrix() const { return mFrustum.getTransform(); }

@@ -1450,9 +1450,8 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
          }
          else
          {
-            // Handle rotation (QuatF)
-            QuatF quat(pEvent->fValue, pEvent->fValue2, pEvent->fValue3, pEvent->fValue4);
-            AngAxisF aa(quat);
+            // Handle rotation (AngAxisF)
+            AngAxisF aa(Point3F(pEvent->fValue, pEvent->fValue2, pEvent->fValue3), pEvent->fValue4);
             aa.axis.normalize();
             argv[1] = Con::getFloatArg( aa.axis.x );
             argv[2] = Con::getFloatArg( aa.axis.y );

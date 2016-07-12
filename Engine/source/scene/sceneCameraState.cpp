@@ -32,6 +32,7 @@ SceneCameraState::SceneCameraState( const RectI& viewport, const Frustum& frustu
    : mViewport( viewport ),
      mFrustum( frustum ),
      mWorldViewMatrix( worldView ),
+     mHeadWorldViewMatrix( worldView ),
      mProjectionMatrix( projection )
 {
    mViewDirection = frustum.getTransform().getForwardVector();
@@ -39,7 +40,7 @@ SceneCameraState::SceneCameraState( const RectI& viewport, const Frustum& frustu
 
 //-----------------------------------------------------------------------------
 
-SceneCameraState SceneCameraState::fromGFX()
+SceneCameraState SceneCameraState::fromGFX( )
 {
    return fromGFXWithViewport( GFX->getViewport() );
 }
@@ -56,10 +57,20 @@ SceneCameraState SceneCameraState::fromGFXWithViewport( const RectI& viewport )
    Frustum frustum = GFX->getFrustum();
    frustum.setTransform( camera );
 
-   return SceneCameraState(
+   SceneCameraState ret = SceneCameraState(
       viewport,
       frustum,
       world,
       GFX->getProjectionMatrix()
    );
+
+   // If rendering to stereo, make sure we get the head matrix
+   S32 stereoTarget = GFX->getCurrentStereoTarget();
+   if (stereoTarget != -1)
+   {
+      ret.mHeadWorldViewMatrix = GFX->getStereoHeadTransform();
+      ret.mHeadWorldViewMatrix.inverse();
+   }
+
+   return ret;
 }
