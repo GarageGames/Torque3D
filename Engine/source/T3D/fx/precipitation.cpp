@@ -298,6 +298,7 @@ Precipitation::Precipitation()
    mSplashShaderCameraPosSC = NULL;
    mSplashShaderAmbientSC = NULL;
 
+   mMaxVBDrops = 5000;
 }
 
 Precipitation::~Precipitation()
