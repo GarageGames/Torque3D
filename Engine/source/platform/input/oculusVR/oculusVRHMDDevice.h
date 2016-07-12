@@ -102,7 +102,7 @@ protected:
    OculusVRSensorDevice *mSensor;
    U32 mActionCodeIndex;
 
-	ovrGraphicsLuid mLuid;
+   ovrGraphicsLuid mLuid;
 
 protected:
    void updateRenderInfo();
@@ -126,7 +126,7 @@ public:
    U32 getVersion() const { return mVersion; }
 
    // Windows display device name used in EnumDisplaySettings/CreateDC
-	const char* getDisplayDeviceType () const { return mDisplayDeviceType.c_str(); }
+   const char* getDisplayDeviceType () const { return mDisplayDeviceType.c_str(); }
 
    // MacOS display ID
    S32 getDisplayDeviceId() const { return mDisplayId; }
@@ -190,7 +190,7 @@ public:
    String dumpMetrics();
 
    // Stereo RT
-	GFXTexHandle mDebugStereoTexture;
+   GFXTexHandle mDebugStereoTexture;
    GFXTexHandle mStereoDepthTexture;
    GFXTextureTargetRef mStereoRT;
 
@@ -204,12 +204,12 @@ public:
    F32 smDesiredPixelDensity;
 
    ovrTrackingState mLastTrackingState;
-	OculusTexture* mTextureSwapSet;
-	ovrLayerEyeFov mRenderLayer;
-	ovrLayerDirect mDebugRenderLayer;
-	ovrViewScaleDesc mScaleDesc;
-	ovrTexture* mDebugMirrorTexture;
-	GFXTexHandle mDebugMirrorTextureHandle;
+   OculusTexture* mTextureSwapSet;
+   ovrLayerEyeFov mRenderLayer;
+   ovrLayerDirect mDebugRenderLayer;
+   ovrViewScaleDesc mScaleDesc;
+   ovrTexture* mDebugMirrorTexture;
+   GFXTexHandle mDebugMirrorTextureHandle;
 
    GFXDevice::GFXDeviceRenderStyles mDesiredRenderingMode;
 

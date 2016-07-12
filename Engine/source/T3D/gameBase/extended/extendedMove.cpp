@@ -36,17 +36,17 @@ void ExtendedMoveManager::init()
       dSprintf(varName, sizeof(varName), "mvPosX%d", i);
       Con::addVariable(varName, TypeF32, &mPosX[i], 
          "X position of controller in millimeters.  Only 13 bits are networked.\n"
-	      "@ingroup Game");
+         "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvPosY%d", i);
       Con::addVariable(varName, TypeF32, &mPosY[i],
          "Y position of controller in millimeters.  Only 13 bits are networked.\n"
-	      "@ingroup Game");
+         "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvPosZ%d", i);
       Con::addVariable(varName, TypeF32, &mPosZ[i],
          "Z position of controller in millimeters.  Only 13 bits are networked.\n"
-	      "@ingroup Game");
+         "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotIsEuler%d", i);
       Con::addVariable(varName, TypeBool, &mRotIsEuler[i], 
@@ -55,33 +55,33 @@ void ExtendedMoveManager::init()
          "(a vector and angle).  When true, the given rotation is a three component "
          "Euler angle.  When using Euler angles, the $mvRotA component of the ExtendedMove "
          "is ignored for this set of rotations.\n"
-	      "@ingroup Game");
+         "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotX%d", i);
       Con::addVariable(varName, TypeF32, &mRotAX[i], 
          "X rotation vector component of controller.\n"
-	      "@ingroup Game");
+         "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotY%d", i);
       Con::addVariable(varName, TypeF32, &mRotAY[i], 
          "Y rotation vector component of controller.\n"
-	      "@ingroup Game");
+         "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotZ%d", i);
       Con::addVariable(varName, TypeF32, &mRotAZ[i], 
          "Z rotation vector component of controller.\n"
-	      "@ingroup Game");
+         "@ingroup Game");
 
       dSprintf(varName, sizeof(varName), "mvRotA%d", i);
       Con::addVariable(varName, TypeF32, &mRotAA[i], 
          "Angle rotation (in degrees) component of controller.\n"
-	      "@ingroup Game");
+         "@ingroup Game");
    }
 
    Con::addVariable("mvPosScale", TypeF32, &mPosScale,
-	   "@brief Indicates the scale to be given to mvPos values.\n\n"
-	   ""
-	   "@ingroup Game");
+      "@brief Indicates the scale to be given to mvPos values.\n\n"
+      ""
+      "@ingroup Game");
 }
 
 const ExtendedMove NullExtendedMove;
@@ -293,7 +293,7 @@ void ExtendedMove::clamp()
          crotW[i] = CLAMPROT(rotW[i] / M_2PI_F);
       }
 
-	  #ifdef DEBUG_CONTROLLER_MOVE
+      #ifdef DEBUG_CONTROLLER_MOVE
       if (i == 1)
       {
           F32 x, y, z, a;
@@ -302,14 +302,14 @@ void ExtendedMove::clamp()
           z = UNCLAMPPOS(crotZ[i]);
           a = UNCLAMPROT(crotW[i]) * M_2PI_F;
 
-		  Con::printf("INPUT POS == %f,%f,%f", ExtendedMoveManager::mPosX[i], ExtendedMoveManager::mPosY[i], ExtendedMoveManager::mPosZ[i]);
+          Con::printf("INPUT POS == %f,%f,%f", ExtendedMoveManager::mPosX[i], ExtendedMoveManager::mPosY[i], ExtendedMoveManager::mPosZ[i]);
           Con::printf("rot %f,%f,%f,%f clamped to %f,%f,%f,%f", rotX[i], rotY[i], rotZ[i], rotW[i], x,y,z,a);
-		  x = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
-		  y = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
-		  z = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
-		  Con::printf("pos %f,%f,%f clamped to %f,%f,%f", posX[i], posY[i], posZ[i], x, y, z);
+          x = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
+          y = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
+          z = UNCLAMPPOS(cposX[i]) * ExtendedMoveManager::mPosScale;
+          Con::printf("pos %f,%f,%f clamped to %f,%f,%f", posX[i], posY[i], posZ[i], x, y, z);
       }
-	  #endif
+      #endif
    }
 
    // Perform the standard Move clamp

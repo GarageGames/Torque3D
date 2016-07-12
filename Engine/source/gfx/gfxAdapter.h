@@ -37,8 +37,8 @@
 
 struct GFXAdapterLUID
 {
-	unsigned long LowPart;
-	long HighPart;
+   unsigned long LowPart;
+   long HighPart;
 };
 
 struct GFXAdapter 

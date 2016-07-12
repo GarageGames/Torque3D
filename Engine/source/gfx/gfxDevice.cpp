@@ -160,8 +160,8 @@ GFXDevice::GFXDevice()
    // misc
    mAllowRender = true;
    mCurrentRenderStyle = RS_Standard;
-	mCurrentStereoTarget = -1;
-	mStereoHeadTransform = MatrixF(1);
+   mCurrentStereoTarget = -1;
+   mStereoHeadTransform = MatrixF(1);
    mCanCurrentlyRender = false;
    mInitialized = false;
    

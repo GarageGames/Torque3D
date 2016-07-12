@@ -1783,7 +1783,7 @@ void Player::onRemove()
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBox.maxExtents.set(-1e9f, -1e9f, -1e9f);
 
-   SAFE_DELETE( mPhysicsRep );		
+   SAFE_DELETE( mPhysicsRep );
 
    Parent::onRemove();
 }
@@ -2505,12 +2505,12 @@ void Player::updateMove(const Move* move)
 #ifdef TORQUE_OPENVR
    if (mControllers[0])
    {
-	   mControllers[0]->processTick(move);
+      mControllers[0]->processTick(move);
    }
 
    if (mControllers[1])
    {
-	   mControllers[1]->processTick(move);
+      mControllers[1]->processTick(move);
    }
 
 #endif
@@ -3337,9 +3337,9 @@ bool Player::canCrouch()
    if ( mDataBlock->actionList[PlayerData::CrouchRootAnim].sequence == -1 )
       return false;       
 
-	// We are already in this pose, so don't test it again...
-	if ( mPose == CrouchPose )
-		return true;
+   // We are already in this pose, so don't test it again...
+   if ( mPose == CrouchPose )
+      return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3389,8 +3389,8 @@ bool Player::canStand()
       return false;
 
    // We are already in this pose, so don't test it again...
-	if ( mPose == StandPose )
-		return true;
+   if ( mPose == StandPose )
+      return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3453,9 +3453,9 @@ bool Player::canProne()
    if ( !mPhysicsRep )
       return true;
 
-	// We are already in this pose, so don't test it again...
-	if ( mPose == PronePose )
-		return true;
+   // We are already in this pose, so don't test it again...
+   if ( mPose == PronePose )
+      return true;
 
    return mPhysicsRep->testSpacials( getPosition(), mDataBlock->proneBoxSize );
 }
@@ -3652,7 +3652,7 @@ MatrixF * Player::Death::fallToGround(F32 dt, const Point3F& loc, F32 curZ, F32 
          normal.normalize();
          mat.set(EulerF (0.0f, 0.0f, curZ));
          mat.mulV(upY, & ahead);
-	      mCross(ahead, normal, &sideVec);
+         mCross(ahead, normal, &sideVec);
          sideVec.normalize();
          mCross(normal, sideVec, &ahead);
 
@@ -5846,7 +5846,7 @@ F32 Player::getSpeed() const
 
 void Player::setVelocity(const VectorF& vel)
 {
-	AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
+   AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
 
    mVelocity = vel;
    setMaskBits(MoveMask);
@@ -5854,7 +5854,7 @@ void Player::setVelocity(const VectorF& vel)
 
 void Player::applyImpulse(const Point3F&,const VectorF& vec)
 {
-	AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
+   AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
 
    // Players ignore angular velocity
    VectorF vel;
@@ -6202,7 +6202,7 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->writeFlag(mSwimming);
       stream->writeFlag(mJetting);  
       stream->writeInt(mPose, NumPoseBits);
-	  
+     
       stream->writeInt(mState,NumStateBits);
       if (stream->writeFlag(mState == RecoverState))
          stream->writeInt(mRecoverTicks,PlayerData::RecoverDelayBits);
@@ -6303,7 +6303,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       mSwimming = stream->readFlag();
       mJetting = stream->readFlag();  
       mPose = (Pose)(stream->readInt(NumPoseBits)); 
-	  
+     
       ActionState actionState = (ActionState)stream->readInt(NumStateBits);
       if (stream->readFlag()) {
          mRecoverTicks = stream->readInt(PlayerData::RecoverDelayBits);
@@ -7174,34 +7174,34 @@ void Player::renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMa
 #ifdef TORQUE_OPENVR
 void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
 {
-	mControllers[0] = controllerList.size() > 0 ? controllerList[0] : NULL;
-	mControllers[1] = controllerList.size() > 1 ? controllerList[1] : NULL;
+   mControllers[0] = controllerList.size() > 0 ? controllerList[0] : NULL;
+   mControllers[1] = controllerList.size() > 1 ? controllerList[1] : NULL;
 }
 
 ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
 {
-	OpenVRTrackedObject *controllerL, *controllerR;
-	Vector<OpenVRTrackedObject*> list;
+   OpenVRTrackedObject *controllerL, *controllerR;
+   Vector<OpenVRTrackedObject*> list;
 
-	if (Sim::findObject(argv[2], controllerL))
-	{
-		list.push_back(controllerL);
-	}
-	else
-	{
-		list.push_back(NULL);
-	}
+   if (Sim::findObject(argv[2], controllerL))
+   {
+      list.push_back(controllerL);
+   }
+   else
+   {
+      list.push_back(NULL);
+   }
 
-	if (Sim::findObject(argv[3], controllerR))
-	{
-		list.push_back(controllerR);
-	}
-	else
-	{
-		list.push_back(NULL);
-	}
+   if (Sim::findObject(argv[3], controllerR))
+   {
+      list.push_back(controllerR);
+   }
+   else
+   {
+      list.push_back(NULL);
+   }
 
-	object->setControllers(list);
+   object->setControllers(list);
 }
 
 #endif

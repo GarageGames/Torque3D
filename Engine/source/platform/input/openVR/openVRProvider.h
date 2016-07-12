@@ -62,91 +62,91 @@ namespace OpenVRUtil
 
    U32 convertOpenVRButtonToTorqueButton(uint32_t vrButton);
 
-	/// Converts a point to OVR coords
-	inline Point3F convertPointToOVR(const Point3F &point)
-	{
-		return Point3F(-point.x, -point.z, point.y);
-	}
+   /// Converts a point to OVR coords
+   inline Point3F convertPointToOVR(const Point3F &point)
+   {
+      return Point3F(-point.x, -point.z, point.y);
+   }
 
-	/// Converts a point from OVR coords
-	inline Point3F convertPointFromOVR(const Point3F &point)
-	{
-		return Point3F(-point.x, point.z, -point.y);
-	}
+   /// Converts a point from OVR coords
+   inline Point3F convertPointFromOVR(const Point3F &point)
+   {
+      return Point3F(-point.x, point.z, -point.y);
+   }
 
-	// Converts a point from OVR coords, from an input float array
-	inline Point3F convertPointFromOVR(const vr::HmdVector3_t& v)
-	{
-		return Point3F(-v.v[0], v.v[2], -v.v[1]);
-	}
+   // Converts a point from OVR coords, from an input float array
+   inline Point3F convertPointFromOVR(const vr::HmdVector3_t& v)
+   {
+      return Point3F(-v.v[0], v.v[2], -v.v[1]);
+   }
 };
 
 template<int TEXSIZE> class VRTextureSet
 {
 public:
-	static const int TextureCount = TEXSIZE;
-	GFXTexHandle mTextures[TEXSIZE];
-	U32 mIndex;
+   static const int TextureCount = TEXSIZE;
+   GFXTexHandle mTextures[TEXSIZE];
+   U32 mIndex;
 
-	VRTextureSet() : mIndex(0)
-	{
-	}
+   VRTextureSet() : mIndex(0)
+   {
+   }
 
-	void init(U32 width, U32 height, GFXFormat fmt, GFXTextureProfile *profile, const String &desc)
-	{
-		for (U32 i = 0; i < TextureCount; i++)
-		{
-			mTextures[i].set(width, height, fmt, profile, desc);
-		}
-	}
+   void init(U32 width, U32 height, GFXFormat fmt, GFXTextureProfile *profile, const String &desc)
+   {
+      for (U32 i = 0; i < TextureCount; i++)
+      {
+         mTextures[i].set(width, height, fmt, profile, desc);
+      }
+   }
 
-	void clear()
-	{
-		for (U32 i = 0; i < TextureCount; i++)
-		{
-			mTextures[i] = NULL;
-		}
-	}
+   void clear()
+   {
+      for (U32 i = 0; i < TextureCount; i++)
+      {
+         mTextures[i] = NULL;
+      }
+   }
 
-	void advance()
-	{
-		mIndex = (mIndex + 1) % TextureCount;
-	}
+   void advance()
+   {
+      mIndex = (mIndex + 1) % TextureCount;
+   }
 
-	GFXTexHandle& getTextureHandle()
-	{
-		return mTextures[mIndex];
-	}
+   GFXTexHandle& getTextureHandle()
+   {
+      return mTextures[mIndex];
+   }
 };
 
 /// Simple class to handle rendering native OpenVR model data
 class OpenVRRenderModel
 {
 public:
-	typedef GFXVertexPNT VertexType;
-	GFXVertexBufferHandle<VertexType> mVertexBuffer;
-	GFXPrimitiveBufferHandle mPrimitiveBuffer;
-	BaseMatInstance* mMaterialInstance; ///< Material to use for rendering. NOTE:  
-	Box3F mLocalBox;
+   typedef GFXVertexPNT VertexType;
+   GFXVertexBufferHandle<VertexType> mVertexBuffer;
+   GFXPrimitiveBufferHandle mPrimitiveBuffer;
+   BaseMatInstance* mMaterialInstance; ///< Material to use for rendering. NOTE:  
+   Box3F mLocalBox;
 
-	OpenVRRenderModel() : mMaterialInstance(NULL)
-	{
-	}
+   OpenVRRenderModel() : mMaterialInstance(NULL)
+   {
+   }
 
-	~OpenVRRenderModel()
-	{
-		SAFE_DELETE(mMaterialInstance);
-	}
+   ~OpenVRRenderModel()
+   {
+      SAFE_DELETE(mMaterialInstance);
+   }
 
-	Box3F getWorldBox(MatrixF &mat)
-	{
-		Box3F ret = mLocalBox;
-		mat.mul(ret);
-		return ret;
-	}
+   Box3F getWorldBox(MatrixF &mat)
+   {
+      Box3F ret = mLocalBox;
+      mat.mul(ret);
+      return ret;
+   }
 
-	bool init(const vr::RenderModel_t & vrModel, StringTableEntry materialName);
-	void draw(SceneRenderState *state, MeshRenderInst* renderInstance);
+   bool init(const vr::RenderModel_t & vrModel, StringTableEntry materialName);
+   void draw(SceneRenderState *state, MeshRenderInst* renderInstance);
 };
 
 struct OpenVRRenderState
@@ -196,21 +196,21 @@ public:
 
    struct LoadedRenderModel
    {
-	   StringTableEntry name;
-	   vr::RenderModel_t *vrModel;
-	   OpenVRRenderModel *model;
-	   vr::EVRRenderModelError modelError;
-	   S32 textureId;
-	   bool loadedTexture;
+      StringTableEntry name;
+      vr::RenderModel_t *vrModel;
+      OpenVRRenderModel *model;
+      vr::EVRRenderModelError modelError;
+      S32 textureId;
+      bool loadedTexture;
    };
 
    struct LoadedRenderTexture
    {
-	   U32 vrTextureId;
-	   vr::RenderModel_TextureMap_t *vrTexture;
-	   GFXTextureObject *texture;
-	   NamedTexTarget *targetTexture;
-	   vr::EVRRenderModelError textureError;
+      U32 vrTextureId;
+      vr::RenderModel_TextureMap_t *vrTexture;
+      GFXTextureObject *texture;
+      NamedTexTarget *targetTexture;
+      vr::EVRRenderModelError textureError;
    };
 
    OpenVRProvider();
@@ -283,21 +283,21 @@ public:
    IDevicePose getTrackedDevicePose(U32 idx);
    /// }
 
-	/// @name Overlay registration
-	/// {
-	void registerOverlay(OpenVROverlay* overlay);
-	void unregisterOverlay(OpenVROverlay* overlay);
-	/// }
+   /// @name Overlay registration
+   /// {
+   void registerOverlay(OpenVROverlay* overlay);
+   void unregisterOverlay(OpenVROverlay* overlay);
+   /// }
 
-	/// @name Model loading
-	/// {
-	const S32 preloadRenderModel(StringTableEntry name);
-	const S32 preloadRenderModelTexture(U32 index);
-	bool getRenderModel(S32 idx, OpenVRRenderModel **ret, bool &failed);
-	bool getRenderModelTexture(S32 idx, GFXTextureObject **outTex, bool &failed);
-	bool getRenderModelTextureName(S32 idx, String &outName);
-	void resetRenderModels();
-	/// }
+   /// @name Model loading
+   /// {
+   const S32 preloadRenderModel(StringTableEntry name);
+   const S32 preloadRenderModelTexture(U32 index);
+   bool getRenderModel(S32 idx, OpenVRRenderModel **ret, bool &failed);
+   bool getRenderModelTexture(S32 idx, GFXTextureObject **outTex, bool &failed);
+   bool getRenderModelTextureName(S32 idx, String &outName);
+   void resetRenderModels();
+   /// }
 
 
    /// @name Console API
@@ -338,17 +338,17 @@ public:
 
    vr::ETrackingUniverseOrigin mTrackingSpace;
 
-	Vector<OpenVROverlay*> mOverlays;
+   Vector<OpenVROverlay*> mOverlays;
 
-	VREventSignal mVREventSignal;
-	Namespace *mOpenVRNS;
+   VREventSignal mVREventSignal;
+   Namespace *mOpenVRNS;
 
-	Vector<LoadedRenderModel> mLoadedModels;
-	Vector<LoadedRenderTexture> mLoadedTextures;
-	Map<StringTableEntry, S32> mLoadedModelLookup;
-	Map<U32, S32> mLoadedTextureLookup;
+   Vector<LoadedRenderModel> mLoadedModels;
+   Vector<LoadedRenderTexture> mLoadedTextures;
+   Map<StringTableEntry, S32> mLoadedModelLookup;
+   Map<U32, S32> mLoadedTextureLookup;
 
-	Map<U32, S32> mDeviceEventMap;
+   Map<U32, S32> mDeviceEventMap;
    /// }
 
    GuiCanvas* mDrawCanvas;

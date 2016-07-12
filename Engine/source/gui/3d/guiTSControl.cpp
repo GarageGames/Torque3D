@@ -64,9 +64,9 @@ Vector<GuiTSCtrl*> GuiTSCtrl::smAwakeTSCtrls;
 ImplementEnumType( GuiTSRenderStyles,
    "Style of rendering for a GuiTSCtrl.\n\n"
    "@ingroup Gui3D" )
-	{ GuiTSCtrl::RenderStyleStandard,         "standard"              },
-	{ GuiTSCtrl::RenderStyleStereoSideBySide, "stereo side by side"   },
-	{ GuiTSCtrl::RenderStyleStereoSeparate,   "stereo separate" },
+   { GuiTSCtrl::RenderStyleStandard,         "standard"              },
+   { GuiTSCtrl::RenderStyleStereoSideBySide, "stereo side by side"   },
+   { GuiTSCtrl::RenderStyleStereoSeparate,   "stereo separate" },
 EndImplementEnumType;
 
 //-----------------------------------------------------------------------------
@@ -199,9 +199,9 @@ void GuiTSCtrl::initPersistFields()
 void GuiTSCtrl::consoleInit()
 {
    Con::addVariable("$TSControl::frameCount", TypeS32, &smFrameCount, "The number of frames that have been rendered since this control was created.\n"
-	   "@ingroup Rendering\n");
+      "@ingroup Rendering\n");
    Con::addVariable("$TSControl::useLatestDisplayTransform", TypeBool, &smUseLatestDisplayTransform, "Use the latest view transform when rendering stereo instead of the one calculated by the last move.\n"
-	   "@ingroup Rendering\n");
+      "@ingroup Rendering\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -371,15 +371,15 @@ void GuiTSCtrl::_internalRender(RectI guiViewport, RectI renderViewport, Frustum
 
    if (mReflectPriority > 0)
    {
-	   // Get the total reflection priority.
-	   F32 totalPriority = 0;
-	   for (U32 i = 0; i < smAwakeTSCtrls.size(); i++)
-		   if (smAwakeTSCtrls[i]->isVisible())
-			   totalPriority += smAwakeTSCtrls[i]->mReflectPriority;
+      // Get the total reflection priority.
+      F32 totalPriority = 0;
+      for (U32 i = 0; i < smAwakeTSCtrls.size(); i++)
+         if (smAwakeTSCtrls[i]->isVisible())
+            totalPriority += smAwakeTSCtrls[i]->mReflectPriority;
 
-	   REFLECTMGR->update(mReflectPriority / totalPriority,
-		   renderSize,
-		   mLastCameraQuery);
+      REFLECTMGR->update(mReflectPriority / totalPriority,
+         renderSize,
+         mLastCameraQuery);
    }
 
    GFX->setActiveRenderTarget(origTarget);
@@ -431,22 +431,22 @@ void GuiTSCtrl::_internalRender(RectI guiViewport, RectI renderViewport, Frustum
    DebugDrawer* debugDraw = DebugDrawer::get();
    if (mRenderStyle == RenderStyleStereoSideBySide && debugDraw->willDraw())
    {
-	   // For SBS we need to render over each viewport
-	   Frustum frustum;
+      // For SBS we need to render over each viewport
+      Frustum frustum;
 
-	   GFX->setViewport(mLastCameraQuery.stereoViewports[0]);
-	   MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[0]);
-	   GFX->setFrustum(frustum);
-	   debugDraw->render(false);
+      GFX->setViewport(mLastCameraQuery.stereoViewports[0]);
+      MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[0]);
+      GFX->setFrustum(frustum);
+      debugDraw->render(false);
 
-	   GFX->setViewport(mLastCameraQuery.stereoViewports[1]);
-	   MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[1]);
-	   GFX->setFrustum(frustum);
-	   debugDraw->render();
+      GFX->setViewport(mLastCameraQuery.stereoViewports[1]);
+      MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[1]);
+      GFX->setFrustum(frustum);
+      debugDraw->render();
    }
    else
    {
-	   debugDraw->render();
+      debugDraw->render();
    }
 
    saver.restore();
@@ -637,23 +637,23 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[0]);
       mLastCameraQuery.cameraMatrix = myTransforms[0];
       frustum.update();
-	  GFX->activateStereoTarget(0);
-	  mLastCameraQuery.currentEye = 0;
-	  GFX->beginField();
-	  _internalRender(RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[0]->getSize()), RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[0]->getSize()), frustum);
+     GFX->activateStereoTarget(0);
+     mLastCameraQuery.currentEye = 0;
+     GFX->beginField();
+     _internalRender(RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[0]->getSize()), RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[0]->getSize()), frustum);
       GFX->getDeviceEventSignal().trigger(GFXDevice::deLeftStereoFrameRendered);
-	  GFX->endField();
+     GFX->endField();
 
       // Right
-	  GFX->activateStereoTarget(1);
-	  mLastCameraQuery.currentEye = 1;
+     GFX->activateStereoTarget(1);
+     mLastCameraQuery.currentEye = 1;
       MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[1]);
       mLastCameraQuery.cameraMatrix = myTransforms[1];
-	  frustum.update();
-	  GFX->beginField();
-	  _internalRender(RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[1]->getSize()), RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[0]->getSize()), frustum);
-	  GFX->getDeviceEventSignal().trigger(GFXDevice::deRightStereoFrameRendered);
-	  GFX->endField();
+     frustum.update();
+     GFX->beginField();
+     _internalRender(RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[1]->getSize()), RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[0]->getSize()), frustum);
+     GFX->getDeviceEventSignal().trigger(GFXDevice::deRightStereoFrameRendered);
+     GFX->endField();
 
       mLastCameraQuery.cameraMatrix = origMatrix;
 

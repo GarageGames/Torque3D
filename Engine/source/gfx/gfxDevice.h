@@ -219,11 +219,11 @@ public:
       /// The device has started rendering a frame's field (such as for side-by-side rendering)
       deStartOfField,
 
-	  /// left stereo frame has been rendered
-	  deLeftStereoFrameRendered,
+     /// left stereo frame has been rendered
+     deLeftStereoFrameRendered,
 
-	  /// right stereo frame has been rendered
-	  deRightStereoFrameRendered,
+     /// right stereo frame has been rendered
+     deRightStereoFrameRendered,
 
       /// The device is about to finish rendering a frame's field
       deEndOfField,
@@ -254,7 +254,7 @@ public:
    {
       RS_Standard          = 0,
       RS_StereoSideBySide  = (1<<0),     // Render into current Render Target side-by-side
-	  RS_StereoSeparate    = (1<<1)      // Render in two separate passes (then combined by vr compositor)
+     RS_StereoSeparate    = (1<<1)      // Render in two separate passes (then combined by vr compositor)
    };
 
    enum GFXDeviceLimits
@@ -409,7 +409,7 @@ public:
          setViewport(mStereoViewports[eyeId]);
       }
 
-		mCurrentStereoTarget = eyeId;
+      mCurrentStereoTarget = eyeId;
    }
 
    GFXCardProfiler* getCardProfiler() const { return mCardProfiler; }
@@ -481,7 +481,7 @@ public:
    /// Returns the first format from the list which meets all 
    /// the criteria of the texture profile and query options.      
    virtual GFXFormat selectSupportedFormat(GFXTextureProfile *profile,
-	   const Vector<GFXFormat> &formats, bool texture, bool mustblend, bool mustfilter) = 0;
+      const Vector<GFXFormat> &formats, bool texture, bool mustblend, bool mustfilter) = 0;
 
    /// @}
 

@@ -200,18 +200,18 @@ GFXAdapter* GFXInit::getAdapterOfType( GFXAdapterType type, const char* outputDe
 
 GFXAdapter* GFXInit::getAdapterOfType(GFXAdapterType type, S32 outputDeviceIndex)
 {
-	for (U32 i = 0; i < smAdapters.size(); i++)
-	{
-		if (smAdapters[i]->mType == type)
-		{
-			if (smAdapters[i]->mIndex == outputDeviceIndex)
-			{
-				return smAdapters[i];
-			}
-		}
-	}
+   for (U32 i = 0; i < smAdapters.size(); i++)
+   {
+      if (smAdapters[i]->mType == type)
+      {
+         if (smAdapters[i]->mIndex == outputDeviceIndex)
+         {
+            return smAdapters[i];
+         }
+      }
+   }
 
-	return NULL;
+   return NULL;
 }
 
 GFXAdapter* GFXInit::chooseAdapter( GFXAdapterType type, const char* outputDevice)
@@ -237,23 +237,23 @@ GFXAdapter* GFXInit::chooseAdapter( GFXAdapterType type, const char* outputDevic
 
 GFXAdapter* GFXInit::chooseAdapter(GFXAdapterType type, S32 outputDeviceIndex)
 {
-	GFXAdapter* adapter = GFXInit::getAdapterOfType(type, outputDeviceIndex);
+   GFXAdapter* adapter = GFXInit::getAdapterOfType(type, outputDeviceIndex);
 
-	if (!adapter && type != OpenGL)
-	{
-		Con::errorf("The requested renderer, %s, doesn't seem to be available."
-			" Trying the default, OpenGL.", getAdapterNameFromType(type));
-		adapter = GFXInit::getAdapterOfType(OpenGL, outputDeviceIndex);
-	}
+   if (!adapter && type != OpenGL)
+   {
+      Con::errorf("The requested renderer, %s, doesn't seem to be available."
+         " Trying the default, OpenGL.", getAdapterNameFromType(type));
+      adapter = GFXInit::getAdapterOfType(OpenGL, outputDeviceIndex);
+   }
 
-	if (!adapter)
-	{
-		Con::errorf("The OpenGL renderer doesn't seem to be available. Trying the GFXNulDevice.");
-		adapter = GFXInit::getAdapterOfType(NullDevice, 0);
-	}
+   if (!adapter)
+   {
+      Con::errorf("The OpenGL renderer doesn't seem to be available. Trying the GFXNulDevice.");
+      adapter = GFXInit::getAdapterOfType(NullDevice, 0);
+   }
 
-	AssertFatal(adapter, "There is no rendering device available whatsoever.");
-	return adapter;
+   AssertFatal(adapter, "There is no rendering device available whatsoever.");
+   return adapter;
 }
 
 const char* GFXInit::getAdapterNameFromType(GFXAdapterType type)
@@ -304,11 +304,11 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
    }
    else
    {
-	  S32 adapterIdx = dAtoi(adapterDevice.c_str());
-	  if (adapterIdx == -1)
-		  adapter = chooseAdapter(adapterType, outputDevice.c_str());
-	  else
-		  adapter = chooseAdapter(adapterType, adapterIdx);
+     S32 adapterIdx = dAtoi(adapterDevice.c_str());
+     if (adapterIdx == -1)
+        adapter = chooseAdapter(adapterType, outputDevice.c_str());
+     else
+        adapter = chooseAdapter(adapterType, adapterIdx);
    }
 
    // Did they have one? Return it.

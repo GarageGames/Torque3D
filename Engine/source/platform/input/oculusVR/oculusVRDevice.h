@@ -83,8 +83,8 @@ protected:
    /// Which HMD is the active one
    U32 mActiveDeviceId;
 
-	/// Device id we need to use to hook up with oculus
-	ovrGraphicsLuid mLuid;
+   /// Device id we need to use to hook up with oculus
+   ovrGraphicsLuid mLuid;
 
 protected:
    void cleanUp();
