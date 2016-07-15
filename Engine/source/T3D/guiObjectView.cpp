@@ -489,16 +489,6 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
 
    // Determine the camera position, and store off render state.
    
-   MatrixF modelview;
-   MatrixF mv;
-   Point3F cp;
-
-   modelview = GFX->getWorldMatrix();
-
-   mv = modelview;
-   mv.inverse();
-   mv.getColumn( 3, &cp );
-
    RenderPassManager* renderPass = gClientSceneGraph->getDefaultRenderPass();
 
    S32 time = Platform::getVirtualMilliseconds();
@@ -510,17 +500,11 @@ void GuiObjectView::renderWorld( const RectI& updateRect )
   
    GFX->setStateBlock( mDefaultGuiSB );
 
-   F32 left, right, top, bottom, nearPlane, farPlane;
-   bool isOrtho;
-   GFX->getFrustum( &left, &right, &bottom, &top, &nearPlane, &farPlane, &isOrtho );
-
-   Frustum frust( false, left, right, top, bottom, nearPlane, farPlane, MatrixF::Identity );
-
    SceneRenderState state
    (
       gClientSceneGraph,
       SPT_Diffuse,
-      SceneCameraState( GFX->getViewport(), frust, MatrixF::Identity, GFX->getProjectionMatrix() ),
+      SceneCameraState( GFX->getViewport(), mSaveFrustum, MatrixF::Identity, GFX->getProjectionMatrix() ),
       renderPass,
       true
    );
