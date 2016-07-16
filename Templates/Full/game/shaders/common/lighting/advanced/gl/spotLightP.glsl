@@ -85,7 +85,7 @@ void main()
    bool emissive = getFlag( matInfo.r, 0 );
    if ( emissive )
    {
-       OUT_col = vec4(0.0, 0.0, 0.0, 0.0);
+       OUT_col = vec4(1.0, 1.0, 1.0, 0.0);
 	   return;
    }
    
