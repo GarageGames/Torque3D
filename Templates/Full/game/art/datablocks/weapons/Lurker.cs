@@ -604,7 +604,6 @@ datablock ShapeBaseImageData(LurkerGrenadeLauncherImage)
 {
    // Basic Item properties
    shapeFile = "art/shapes/weapons/Lurker/TP_Lurker.DAE";
-   shapeFileFP = "art/shapes/weapons/Lurker/FP_Lurker.DAE";
    emap = true;
 
    imageAnimPrefix = "Rifle";
