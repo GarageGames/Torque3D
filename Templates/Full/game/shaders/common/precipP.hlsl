@@ -23,27 +23,31 @@
 //-----------------------------------------------------------------------------
 // Structures                                                                  
 //-----------------------------------------------------------------------------
+
+#include "shaderModel.hlsl"
+
 struct Conn
 {
-   float2 texCoord : TEXCOORD0;
+   float4 position : TORQUE_POSITION;
+   float2 texCoord	: TEXCOORD0;
    float4 color : COLOR0;
 };
 
 struct Frag
 {
-   float4 col : COLOR0;
+   float4 col : TORQUE_TARGET0;
 };
+
+TORQUE_UNIFORM_SAMPLER2D(diffuseMap, 0);
 
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------
-Frag main( Conn In,
-           uniform sampler2D diffuseMap : register(S0)
-)
+Frag main( Conn In)
 {
    Frag Out;
 
-   Out.col = tex2D(diffuseMap, In.texCoord) * In.color;
+   Out.col = TORQUE_TEX2D(diffuseMap, In.texCoord) * In.color;
 
    return Out;
 }

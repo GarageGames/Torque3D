@@ -86,15 +86,16 @@ bool LangFile::load(const UTF8 *filename)
 
 bool LangFile::load(Stream *s)
 {
-	freeTable();
-	
-	while(s->getStatus() != Stream::EOS)
-	{
-		char buf[256];
-		s->readString(buf);
-		addString((const UTF8*)buf);
-	}
-	return true;
+   freeTable();
+
+   while (s->getStatus() == Stream::Ok)
+   {
+      char buf[2048];
+      s->readLongString(2048, buf);
+      if (s->getStatus() == Stream::Ok)
+         addString((const UTF8*)buf);
+   }
+   return true;
 }
 
 bool LangFile::save(const UTF8 *filename)
@@ -115,15 +116,15 @@ bool LangFile::save(const UTF8 *filename)
 
 bool LangFile::save(Stream *s)
 {
-	if(!isLoaded())
-		return false;
-	
-	U32 i;
-	for(i = 0;i < mStringTable.size();i++)
-	{
-		s->writeString((char*)mStringTable[i]);
-	}
-	return true;
+   if (!isLoaded())
+      return false;
+
+   U32 i;
+   for (i = 0; i < mStringTable.size(); i++)
+   {
+      s->writeLongString(2048, (char*)mStringTable[i]); //irei1as_ lang
+   }
+   return true;
 }
 
 const UTF8 * LangFile::getString(U32 id)
@@ -477,3 +478,101 @@ const LangTable *getModLangTable(const UTF8 *mod)
 	}
 	return NULL;
 }
+
+//lang_ localization
+bool compiledFileNeedsUpdate(UTF8* filename)
+{
+   Torque::Path filePath = Torque::Path(filename);
+   Torque::FS::FileNodeRef sourceFile = Torque::FS::GetFileNode(filePath);
+   Torque::Path compiledPath = Torque::Path(filePath);
+   compiledPath.setExtension("lso");
+   Torque::FS::FileNodeRef compiledFile = Torque::FS::GetFileNode(compiledPath);
+
+   Torque::Time sourceModifiedTime, compiledModifiedTime;
+
+   if (sourceFile != NULL)
+      sourceModifiedTime = sourceFile->getModifiedTime();
+
+   if (compiledFile != NULL)
+      compiledModifiedTime = compiledFile->getModifiedTime();
+
+   if (sourceModifiedTime > compiledModifiedTime)
+      return true;
+   return false;
+}
+
+ConsoleFunction(CompileLanguage, void, 2, 3, "(string inputFile, [bool createMap]) Compiles a LSO language file."
+   " if createIndex is true, will also create languageMap.cs with"
+   " the global variables for each string index."
+   " The input file must follow this example layout:"
+   " TXT_HELLO_WORLD = Hello world in english!")
+{
+   UTF8 scriptFilenameBuffer[1024];
+   Con::expandScriptFilename((char*)scriptFilenameBuffer, sizeof(scriptFilenameBuffer), argv[1]);
+
+   if (!Torque::FS::IsFile(scriptFilenameBuffer))
+   {
+      Con::errorf("CompileLanguage - file %s not found", scriptFilenameBuffer);
+      return;
+   }
+
+   FileObject file;
+   if (!file.readMemory(scriptFilenameBuffer))
+   {
+      Con::errorf("CompileLanguage - couldn't read file %s", scriptFilenameBuffer);
+      return;
+   }
+
+   if (compiledFileNeedsUpdate(scriptFilenameBuffer))
+   {
+      bool createMap = argc > 2 ? dAtob(argv[2]) : false;
+      FileStream *mapStream = NULL;
+      if (createMap)
+      {
+         Torque::Path mapPath = scriptFilenameBuffer;
+         mapPath.setFileName("languageMap");
+         mapPath.setExtension("cs");
+         if ((mapStream = FileStream::createAndOpen(mapPath, Torque::FS::File::Write)) == NULL)
+            Con::errorf("CompileLanguage - failed creating languageMap.cs");
+      }
+
+      LangFile langFile;
+      const U8* inLine = NULL;
+      const char* separatorStr = " = ";
+      S32 stringId = 0;
+      while ((inLine = file.readLine())[0] != 0)
+      {
+         char* line;
+         chompUTF8BOM((const char *)inLine, &line);
+         char* div = dStrstr(line, separatorStr);
+         if (div == NULL)
+         {
+            Con::errorf("Separator %s not found in line: %s", separatorStr, line);
+            Con::errorf("Could not determine string name ID");
+            continue;
+         }
+         *div = 0;
+         char* text = div + dStrlen(separatorStr);
+
+         langFile.addString((const UTF8*)text);
+
+         if (mapStream)
+         {
+            String mapLine = String::ToString("$%s = %i;", line, stringId);
+            mapStream->writeLine((const U8*)mapLine.c_str());
+            String commentLine = String::ToString("// %s", text);
+            mapStream->writeLine((const U8*)commentLine.c_str());
+         }
+
+         stringId++;
+      }
+
+      Torque::Path lsoPath = scriptFilenameBuffer;
+      lsoPath.setExtension("lso");
+      langFile.save(lsoPath.getFullPath());
+
+      if (mapStream)
+         delete mapStream;
+   }
+}
+//end lang_ localization

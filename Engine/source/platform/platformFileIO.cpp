@@ -79,6 +79,95 @@ DefineConsoleFunction( getTemporaryFileName, const char *, (), ,
 }
 
 //-----------------------------------------------------------------------------
+static char filePathBuffer[1024];
+static bool deleteDirectoryRecusrive(const char* pPath)
+{
+   // Sanity!
+   AssertFatal(pPath != NULL, "Cannot delete directory that is NULL.");
+
+   // Find directories.
+   Vector<StringTableEntry> directories;
+   if (!Platform::dumpDirectories(pPath, directories, 0))
+   {
+      // Warn.
+      Con::warnf("Could not retrieve sub-directories of '%s'.", pPath);
+      return false;
+   }
+
+   // Iterate directories.
+   for (Vector<StringTableEntry>::iterator basePathItr = directories.begin(); basePathItr != directories.end(); ++basePathItr)
+   {
+      // Fetch base path.
+      StringTableEntry basePath = *basePathItr;
+
+      // Skip if the base path.
+      if (basePathItr == directories.begin() && dStrcmp(pPath, basePath) == 0)
+         continue;
+
+      // Delete any directories recursively.
+      if (!deleteDirectoryRecusrive(basePath))
+         return false;
+   }
+
+   // Find files.
+   Vector<Platform::FileInfo> files;
+   if (!Platform::dumpPath(pPath, files, 0))
+   {
+      // Warn.
+      Con::warnf("Could not retrieve files for directory '%s'.", pPath);
+      return false;
+   }
+
+   // Iterate files.
+   for (Vector<Platform::FileInfo>::iterator fileItr = files.begin(); fileItr != files.end(); ++fileItr)
+   {
+      // Format file.
+      dSprintf(filePathBuffer, sizeof(filePathBuffer), "%s/%s", fileItr->pFullPath, fileItr->pFileName);
+
+      // Delete file.
+      if (!Platform::fileDelete(filePathBuffer))
+      {
+         // Warn.
+         Con::warnf("Could not delete file '%s'.", filePathBuffer);
+         return false;
+      }
+   }
+
+   // Delete the directory.
+   if (!Platform::fileDelete(pPath))
+   {
+      // Warn.
+      Con::warnf("Could not delete directory '%s'.", pPath);
+      return false;
+   }
+
+   return true;
+}
+
+//-----------------------------------------------------------------------------
+
+bool Platform::deleteDirectory(const char* pPath)
+{
+   // Sanity!
+   AssertFatal(pPath != NULL, "Cannot delete directory that is NULL.");
+
+   // Is the path a file?
+   if (Platform::isFile(pPath))
+   {
+      // Yes, so warn.
+      Con::warnf("Cannot delete directory '%s' as it specifies a file.", pPath);
+      return false;
+   }
+
+   // Expand module location.
+   char pathBuffer[1024];
+   Con::expandPath(pathBuffer, sizeof(pathBuffer), pPath, NULL, true);
+
+   // Delete directory recursively.
+   return deleteDirectoryRecusrive(pathBuffer);
+}
+
+//-----------------------------------------------------------------------------
 
 static StringTableEntry sgMainCSDir = NULL;
 

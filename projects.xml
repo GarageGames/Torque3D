@@ -29,6 +29,7 @@ Here are some examples:
 
   <entry type="modules">
     <module name="openGL">OpenGL Rendering</module>
+    <module name="d3d11">Direct3D 11 Rendering</module>
     <module name="fmod">FMod Sound Engine</module>
     <module name="leapMotion" path="$LEAPMOTION_SDK_PATH">Leap Motion Controller</module>
     <module name="razerHydra" path="$RAZERHYDRA_SDK_PATH">Razer Hydra Controller</module>

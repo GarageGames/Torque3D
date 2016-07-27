@@ -264,7 +264,7 @@ void ShaderGen::_processVertFeatures( Vector<GFXShaderMacro> &macros, bool macro
          if ( macrosOnly )
             continue;
 
-         feature->mInstancingFormat = &mInstancingFormat;
+         feature->setInstancingFormat( &mInstancingFormat );
          feature->processVert( mComponents, mFeatureData );
 
          String line;
@@ -304,7 +304,7 @@ void ShaderGen::_processPixFeatures( Vector<GFXShaderMacro> &macros, bool macros
          if ( macrosOnly )
             continue;
 
-         feature->mInstancingFormat = &mInstancingFormat;
+         feature->setInstancingFormat( &mInstancingFormat );
          feature->processPix( mComponents, mFeatureData );
 
          String line;
@@ -465,12 +465,12 @@ GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const G
    // Don't get paranoid!  This has 1 in 18446744073709551616
    // chance for collision... it won't happen in this lifetime.
    //
-   U64 hash = Torque::hash64( (const U8*)shaderDescription.c_str(), shaderDescription.length(), 0 );
+   U32 hash = Torque::hash( (const U8*)shaderDescription.c_str(), shaderDescription.length(), 0 );
    hash = convertHostToLEndian(hash);
-   U32 high = (U32)( hash >> 32 );
-   U32 low = (U32)( hash & 0x00000000FFFFFFFF );
-   String cacheKey = String::ToString( "%x%x", high, low );
-
+   //U32 high = (U32)( hash >> 32 );
+   //U32 low = (U32)( hash & 0x00000000FFFFFFFF );
+   //String cacheKey = String::ToString( "%x%x", high, low );
+   String cacheKey = String::ToString("%x", hash);
    // return shader if exists
    GFXShader *match = mProcShaders[cacheKey];
    if ( match )
@@ -488,8 +488,7 @@ GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const G
    generateShader( featureData, vertFile, pixFile, &pixVersion, vertexFormat, cacheKey, shaderMacros );
 
    GFXShader *shader = GFX->createShader();
-   shader->mInstancingFormat.copy( mInstancingFormat ); // TODO: Move to init() below!
-   if ( !shader->init( vertFile, pixFile, pixVersion, shaderMacros, samplers ) )
+   if (!shader->init(vertFile, pixFile, pixVersion, shaderMacros, samplers, &mInstancingFormat))
    {
       delete shader;
       return NULL;

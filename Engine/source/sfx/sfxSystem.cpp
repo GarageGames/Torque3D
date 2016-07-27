@@ -1467,7 +1467,7 @@ DefineConsoleFunction( sfxCreateSource, S32, ( const char * sfxType, const char 
    if ( track )
    {
       // In this overloaded use of the function, arg0..arg2 are x, y, and z.
-      if ( dStrIsEmpty(arg0) )
+      if ( String::isEmpty(arg0) )
       {
          source = SFX->createSource( track );
       }
@@ -1489,7 +1489,7 @@ DefineConsoleFunction( sfxCreateSource, S32, ( const char * sfxType, const char 
       }
       else
       {
-         if ( dStrIsEmpty(arg1) )
+         if ( String::isEmpty(arg1) )
          {
             source = SFX->createSource( tempProfile );
          }
@@ -1552,7 +1552,7 @@ DefineConsoleFunction( sfxPlay, S32, ( const char * trackName, const char * poin
    "Start playing the given source or create a new source for the given track and play it.\n"
    "@hide" )
 {
-   if ( dStrIsEmpty(pointOrX) )
+   if ( String::isEmpty(pointOrX) )
    {
       SFXSource* source = dynamic_cast<SFXSource*>( Sim::findObject( trackName ) );
       if ( source )
@@ -1570,11 +1570,11 @@ DefineConsoleFunction( sfxPlay, S32, ( const char * trackName, const char * poin
    }
 
    Point3F pos(0.f, 0.f, 0.f);
-   if ( !dStrIsEmpty( pointOrX ) && dStrIsEmpty( y ) && dStrIsEmpty( z )  )
+   if ( !String::isEmpty( pointOrX ) && String::isEmpty( y ) && String::isEmpty( z )  )
    {
       dSscanf( pointOrX, "%g %g %g", &pos.x, &pos.y, &pos.z );
    }
-   else if( !dStrIsEmpty( pointOrX ) && !dStrIsEmpty( y ) && !dStrIsEmpty( z ) )
+   else if( !String::isEmpty( pointOrX ) && !String::isEmpty( y ) && !String::isEmpty( z ) )
       pos.set( dAtof(pointOrX), dAtof(y), dAtof(z) );
 
    MatrixF transform;
@@ -1679,7 +1679,7 @@ DefineConsoleFunction( sfxPlayOnce, S32, ( const char * sfxType, const char * ar
    if( track )
    {
       // In this overloaded use, arg0..arg2 are x, y, z, and arg3 is the fadeInTime.
-      if (dStrIsEmpty(arg0))
+      if (String::isEmpty(arg0))
       {
          source = SFX->playOnce( track );
       }
@@ -1701,7 +1701,7 @@ DefineConsoleFunction( sfxPlayOnce, S32, ( const char * sfxType, const char * ar
       }
       else
       {
-         if (dStrIsEmpty(arg1))
+         if (String::isEmpty(arg1))
             source = SFX->playOnce( tempProfile );
          else
          {

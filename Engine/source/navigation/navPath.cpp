@@ -224,7 +224,7 @@ void NavPath::initPersistFields()
    addField("allowDrop", TypeBool, Offset(mLinkTypes.drop, NavPath),
       "Allow the path to use drop links.");
    addField("allowSwim", TypeBool, Offset(mLinkTypes.swim, NavPath),
-      "Allow the path tomove in water.");
+      "Allow the path to move in water.");
    addField("allowLedge", TypeBool, Offset(mLinkTypes.ledge, NavPath),
       "Allow the path to jump ledges.");
    addField("allowClimb", TypeBool, Offset(mLinkTypes.climb, NavPath),

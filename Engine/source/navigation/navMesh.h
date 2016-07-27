@@ -325,7 +325,7 @@ private:
    Vector<TileData> mTileData;
 
    /// List of indices to the tile array which are dirty.
-   std::queue<U32> mDirtyTiles;
+   Vector<U32> mDirtyTiles;
 
    /// Update tile dimensions.
    void updateTiles(bool dirty = false);

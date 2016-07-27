@@ -55,6 +55,25 @@ Var * ShaderConnectorHLSL::getIndexedElement( U32 index, RegisterType type, U32 
          Var *newVar = new Var;
          mElementList.push_back( newVar );
          newVar->setConnectName( "POSITION" );
+         newVar->rank = 0;
+         return newVar;
+      }
+
+   case RT_VPOS:
+      {
+         Var *newVar = new Var;
+         mElementList.push_back(newVar);
+         newVar->setConnectName("VPOS");
+         newVar->rank = 0;
+         return newVar;
+      }
+
+   case RT_SVPOSITION:
+      {
+         Var *newVar = new Var;
+         mElementList.push_back(newVar);
+         newVar->setConnectName("SV_Position");
+         newVar->rank = 0;
          return newVar;
       }
 
@@ -63,6 +82,7 @@ Var * ShaderConnectorHLSL::getIndexedElement( U32 index, RegisterType type, U32 
          Var *newVar = new Var;
          mElementList.push_back( newVar );
          newVar->setConnectName( "NORMAL" );
+         newVar->rank = 1;
          return newVar;
       }
 
@@ -71,6 +91,7 @@ Var * ShaderConnectorHLSL::getIndexedElement( U32 index, RegisterType type, U32 
          Var *newVar = new Var;
          mElementList.push_back( newVar );
          newVar->setConnectName( "BINORMAL" );
+         newVar->rank = 2;
          return newVar;
       }
 
@@ -79,6 +100,7 @@ Var * ShaderConnectorHLSL::getIndexedElement( U32 index, RegisterType type, U32 
          Var *newVar = new Var;
          mElementList.push_back( newVar );
          newVar->setConnectName( "TANGENT" );
+         newVar->rank = 3;
          return newVar;
       }
 
@@ -87,14 +109,7 @@ Var * ShaderConnectorHLSL::getIndexedElement( U32 index, RegisterType type, U32 
          Var *newVar = new Var;
          mElementList.push_back( newVar );
          newVar->setConnectName( "COLOR" );
-         return newVar;
-      }
-
-   case RT_VPOS:
-      {
-         Var *newVar = new Var;
-         mElementList.push_back( newVar );
-         newVar->setConnectName( "VPOS" );
+         newVar->rank = 4;
          return newVar;
       }
 
@@ -113,6 +128,7 @@ Var * ShaderConnectorHLSL::getIndexedElement( U32 index, RegisterType type, U32 
          newVar->setConnectName( out );
          newVar->constNum = index;
          newVar->arraySize = numElements;
+         newVar->rank = 5 + index;
 
          return newVar;
       }
@@ -124,67 +140,27 @@ Var * ShaderConnectorHLSL::getIndexedElement( U32 index, RegisterType type, U32 
    return NULL;
 }
 
+
+
+S32 QSORT_CALLBACK ShaderConnectorHLSL::_hlsl4VarSort(const void* e1, const void* e2)
+{
+   Var* a = *((Var **)e1);
+   Var* b = *((Var **)e2);
+
+   return a->rank - b->rank;
+}
+
 void ShaderConnectorHLSL::sortVars()
 {
-   if ( GFX->getPixelShaderVersion() >= 2.0 ) 
+
+   // If shader model 4+ than we gotta sort the vars to make sure the order is consistent
+   if (GFX->getPixelShaderVersion() >= 4.f)
+   {
+      dQsort((void *)&mElementList[0], mElementList.size(), sizeof(Var *), _hlsl4VarSort);
       return;
-
-   // Sort connector variables - They must be sorted on hardware that is running
-   // ps 1.4 and below.  The reason is that texture coordinate registers MUST
-   // map exactly to their respective texture stage.  Ie.  if you have fog
-   // coordinates being passed into a pixel shader in texture coordinate register
-   // number 4, the fog texture MUST reside in texture stage 4 for it to work.
-   // The problem is solved by pushing non-texture coordinate data to the end
-   // of the structure so that the texture coodinates are all at the "top" of the
-   // structure in the order that the features are processed.
-
-   // create list of just the texCoords, sorting by 'mapsToSampler'
-   Vector< Var * > texCoordList;
-   
-   // - first pass is just coords mapped to a sampler
-   for( U32 i=0; i<mElementList.size(); i++ )
-   {
-      Var *var = mElementList[i];
-      if( var->mapsToSampler )
-      {
-         texCoordList.push_back( var );
-      }
-   }
-   
-   // - next pass is for the others
-   for( U32 i=0; i<mElementList.size(); i++ )
-   {
-      Var *var = mElementList[i];
-      if( dStrstr( (const char *)var->connectName, "TEX" ) &&
-          !var->mapsToSampler )
-      {
-         texCoordList.push_back( var );
-      }
-   }
-   
-   // rename the connectNames
-   for( U32 i=0; i<texCoordList.size(); i++ )
-   {
-      char out[32];
-      dSprintf( (char*)out, sizeof(out), "TEXCOORD%d", i );
-      texCoordList[i]->setConnectName( out );
    }
 
-   // write new, sorted list over old one
-   if( texCoordList.size() )
-   {
-      U32 index = 0;
-   
-      for( U32 i=0; i<mElementList.size(); i++ )
-      {
-         Var *var = mElementList[i];
-         if( dStrstr( (const char *)var->connectName, "TEX" ) )
-         {
-            mElementList[i] = texCoordList[index];
-            index++;
-         }
-      }
-   }
+   return;
 }
 
 void ShaderConnectorHLSL::setName( char *newName )
@@ -246,7 +222,7 @@ void ParamsDefHLSL::assignConstantNumbers()
          Var *var = dynamic_cast<Var*>(LangElement::elementList[i]);
          if( var )
          {            
-            bool shaderConst = var->uniform && !var->sampler;
+            bool shaderConst = var->uniform && !var->sampler && !var->texture;
             AssertFatal((!shaderConst) || var->constSortPos != cspUninit, "Const sort position has not been set, variable will not receive a constant number!!");
             if( shaderConst && var->constSortPos == bin)
             {
@@ -327,6 +303,10 @@ void PixelParamsDefHLSL::print( Stream &stream, bool isVerterShader )
             if( var->sampler )
             {
                dSprintf( (char*)varNum, sizeof(varNum), ": register(S%d)", var->constNum );
+            }
+            else if (var->texture)
+            {
+               dSprintf((char*)varNum, sizeof(varNum), ": register(T%d)", var->constNum);
             }
             else
             {

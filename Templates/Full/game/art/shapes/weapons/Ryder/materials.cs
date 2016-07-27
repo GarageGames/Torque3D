@@ -31,6 +31,7 @@ singleton Material(FP_Ryder_Base)
    translucentBlendOp = "None";
    pixelSpecular[0] = "1";
    useAnisotropic[0] = "1";
+   castDynamicShadows = true;    
 };
 
 singleton Material(TP_Ryder_Base)
@@ -43,6 +44,7 @@ singleton Material(TP_Ryder_Base)
    specularPower[0] = "10";
    translucentBlendOp = "None";
    pixelSpecular[0] = "1";
+   castDynamicShadows = true;    
 };
 
 singleton Material(Ryder_MuzzleFlash_Base)

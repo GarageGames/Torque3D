@@ -39,6 +39,7 @@
 #include "core/util/tSignal.h"
 #endif
 
+#include "persistence/taml/tamlChildren.h"
 
 //---------------------------------------------------------------------------
 /// A set of SimObjects.
@@ -89,7 +90,7 @@
 ///         }
 /// @endcode
 ///
-class SimSet: public SimObject
+class SimSet : public SimObject, public TamlChildren
 {
    public:
 
@@ -152,8 +153,10 @@ class SimSet: public SimObject
       iterator   end()   { return objectList.end(); }
       value operator[] (S32 index) { return objectList[U32(index)]; }
 
-      iterator find( iterator first, iterator last, SimObject *obj)
+      inline iterator find( iterator first, iterator last, SimObject *obj)
       { return ::find(first, last, obj); }
+      inline iterator find(SimObject *obj) 
+      { return ::find(begin(), end(), obj); }
 
       /// Reorder the position of "obj" to either be the last object in the list or, if
       /// "target" is given, to come before "target" in the list of children.
@@ -222,7 +225,7 @@ class SimSet: public SimObject
       /// @note The child sets themselves count towards the total too.
       U32 sizeRecursive();
 
-      SimObject* findObjectByInternalName(StringTableEntry internalName, bool searchChildren = false);
+      virtual SimObject* findObjectByInternalName(StringTableEntry internalName, bool searchChildren = false);
       SimObject* findObjectByLineNumber(const char* fileName, S32 declarationLine, bool searchChildren = false);   
 
       /// Find the given object in this set.  Returns NULL if the object
@@ -277,6 +280,32 @@ class SimSet: public SimObject
       virtual bool readObject(Stream *stream);
 
       virtual SimSet* clone();
+
+      // TamlChildren
+      virtual U32 getTamlChildCount(void) const
+      {
+         return (U32)size();
+      }
+
+      virtual SimObject* getTamlChild(const U32 childIndex) const
+      {
+         // Sanity!
+         AssertFatal(childIndex < (U32)size(), "SimSet::getTamlChild() - Child index is out of range.");
+
+         // For when the assert is not used.
+         if (childIndex >= (U32)size())
+            return NULL;
+
+         return at(childIndex);
+      }
+
+      virtual void addTamlChild(SimObject* pSimObject)
+      {
+         // Sanity!
+         AssertFatal(pSimObject != NULL, "SimSet::addTamlChild() - Cannot add a NULL child object.");
+
+         addObject(pSimObject);
+      }
 };
 
 #ifdef TORQUE_DEBUG_GUARD

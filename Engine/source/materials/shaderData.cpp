@@ -236,6 +236,7 @@ GFXShader* ShaderData::_createShader( const Vector<GFXShaderMacro> &macros )
    {
       case Direct3D9_360:
       case Direct3D9:
+      case Direct3D11:
       {
          success = shader->init( mDXVertexShaderName, 
                                  mDXPixelShaderName, 

@@ -1744,3 +1744,48 @@ DefineEngineFunction( decalManagerRemoveDecal, bool, ( S32 decalID ),,
    gDecalManager->removeDecal(inst);
    return true;
 }
+
+DefineEngineFunction( decalManagerEditDecal, bool, ( S32 decalID, Point3F pos, Point3F normal, F32 rotAroundNormal, F32 decalScale ),,
+   "Edit specified decal of the decal manager.\n"
+   "@param decalID ID of the decal to edit.\n"
+   "@param pos World position for the decal.\n"
+   "@param normal Decal normal vector (if the decal was a tire lying flat on a "
+   "surface, this is the vector pointing in the direction of the axle).\n"
+   "@param rotAroundNormal Angle (in radians) to rotate this decal around its normal vector.\n"
+   "@param decalScale Scale factor applied to the decal.\n"
+   "@return Returns true if successful, false if decalID not found.\n"
+   "" )
+{
+   DecalInstance *decalInstance = gDecalManager->getDecal( decalID );
+   if( !decalInstance )
+		return false;
+
+   //Internally we need Point3F tangent instead of the user friendly F32 rotAroundNormal
+   MatrixF mat( true );
+   MathUtils::getMatrixFromUpVector( normal, &mat );
+
+   AngAxisF rot( normal, rotAroundNormal );
+   MatrixF rotmat;
+   rot.setMatrix( &rotmat );
+   mat.mul( rotmat );
+
+   Point3F tangent;
+   mat.getColumn( 1, &tangent );
+   
+   //if everything is unchanged just do nothing and  return "everything is ok"
+   if ( pos.equal(decalInstance->mPosition) &&
+        normal.equal(decalInstance->mNormal) &&
+        tangent.equal(decalInstance->mTangent) &&
+        mFabs( decalInstance->mSize - (decalInstance->mDataBlock->size * decalScale) ) < POINT_EPSILON )
+           return true;
+
+   decalInstance->mPosition = pos;
+   decalInstance->mNormal = normal;
+   decalInstance->mTangent = tangent;
+   decalInstance->mSize = decalInstance->mDataBlock->size * decalScale;
+
+   gDecalManager->clipDecal( decalInstance, NULL, NULL);
+   
+   gDecalManager->notifyDecalModified( decalInstance );
+   return true;
+}

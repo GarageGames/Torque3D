@@ -117,6 +117,10 @@ class SceneManager
       /// If true, render the AABBs of objects for debugging.
       static bool smRenderBoundingBoxes;
 
+      //A cache list of objects that made it through culling, so we don't have to attempt to re-test
+      //visibility of objects later.
+      Vector< SceneObject* > mRenderedObjectsList;
+
    protected:
 
       /// Whether this is the client-side scene.

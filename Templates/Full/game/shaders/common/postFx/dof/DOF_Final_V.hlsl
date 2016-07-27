@@ -59,7 +59,7 @@ PFXVertToPix main( PFXVert IN )
    */
    
    
-   OUT.hpos = IN.pos;
+   OUT.hpos = float4(IN.pos,1.0);
    OUT.uv0 = viewportCoordToRenderTarget( IN.uv, rtParams0 ); 
    OUT.uv1 = viewportCoordToRenderTarget( IN.uv, rtParams1 ); // + float2( -5, 1 ) * oneOverTargetSize; 
    OUT.uv2 = viewportCoordToRenderTarget( IN.uv, rtParams2 ); 

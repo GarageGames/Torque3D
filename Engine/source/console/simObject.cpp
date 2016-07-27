@@ -34,7 +34,7 @@
 #include "core/frameAllocator.h"
 #include "core/stream/fileStream.h"
 #include "core/fileObject.h"
-
+#include "persistence/taml/tamlCustom.h"
 
 IMPLEMENT_CONOBJECT( SimObject );
 
@@ -435,6 +435,97 @@ SimPersistID* SimObject::getOrCreatePersistentId()
        mPersistentId->incRefCount();
    }
    return mPersistentId;
+}
+
+
+
+void SimObject::onTamlCustomRead(TamlCustomNodes const& customNodes)
+{
+   // Debug Profiling.
+   //PROFILE_SCOPE(SimObject_OnTamlCustomRead);
+
+   // Fetch field list.
+   const AbstractClassRep::FieldList& fieldList = getFieldList();
+   const U32 fieldCount = fieldList.size();
+   for (U32 index = 0; index < fieldCount; ++index)
+   {
+      // Fetch field.
+      const AbstractClassRep::Field* pField = &fieldList[index];
+
+      // Ignore if field not appropriate.
+      if (pField->type == AbstractClassRep::StartArrayFieldType || pField->elementCount > 1)
+      {
+         // Find cell custom node.
+         const TamlCustomNode* pCustomCellNodes = NULL;
+         if (pField->pGroupname != NULL)
+            pCustomCellNodes = customNodes.findNode(pField->pGroupname);
+         if (!pCustomCellNodes)
+         {
+            char* niceFieldName = const_cast<char *>(pField->pFieldname);
+            niceFieldName[0] = dToupper(niceFieldName[0]);
+            String str_niceFieldName = String(niceFieldName);
+            pCustomCellNodes = customNodes.findNode(str_niceFieldName + "s");
+         }
+
+         // Continue if we have explicit cells.
+         if (pCustomCellNodes != NULL)
+         {
+            // Fetch children cell nodes.
+            const TamlCustomNodeVector& cellNodes = pCustomCellNodes->getChildren();
+
+            U8 idx = 0;
+            // Iterate cells.
+            for (TamlCustomNodeVector::const_iterator cellNodeItr = cellNodes.begin(); cellNodeItr != cellNodes.end(); ++cellNodeItr)
+            {
+               char buf[5];
+               dSprintf(buf, 5, "%d", idx);
+
+               // Fetch cell node.
+               TamlCustomNode* pCellNode = *cellNodeItr;
+
+               // Fetch node name.
+               StringTableEntry nodeName = pCellNode->getNodeName();
+
+               // Is this a valid alias?
+               if (nodeName != pField->pFieldname)
+               {
+                  // No, so warn.
+                  Con::warnf("SimObject::onTamlCustomRead() - Encountered an unknown custom name of '%s'.  Only '%s' is valid.", nodeName, pField->pFieldname);
+                  continue;
+               }
+
+               // Fetch fields.
+               const TamlCustomFieldVector& fields = pCellNode->getFields();
+
+               // Iterate property fields.
+               for (TamlCustomFieldVector::const_iterator fieldItr = fields.begin(); fieldItr != fields.end(); ++fieldItr)
+               {
+                  // Fetch field.
+                  const TamlCustomField* pField = *fieldItr;
+
+                  // Fetch field name.
+                  StringTableEntry fieldName = pField->getFieldName();
+
+                  const AbstractClassRep::Field* field = findField(fieldName);
+
+                  // Check common fields.
+                  if (field)
+                  {
+                     setDataField(fieldName, buf, pField->getFieldValue());
+                  }
+                  else
+                  {
+                     // Unknown name so warn.
+                     Con::warnf("SimObject::onTamlCustomRead() - Encountered an unknown custom field name of '%s'.", fieldName);
+                     continue;
+                  }
+               }
+
+               idx++;
+            }
+         }
+      }
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -924,6 +1015,220 @@ const char *SimObject::getDataField(StringTableEntry slotName, const char *array
 
    return "";
 }
+
+
+const char *SimObject::getPrefixedDataField(StringTableEntry fieldName, const char *array)
+{
+   // Sanity!
+   AssertFatal(fieldName != NULL, "Cannot get field value with NULL field name.");
+
+   // Fetch field value.
+   const char* pFieldValue = getDataField(fieldName, array);
+
+   // Sanity.
+   //AssertFatal(pFieldValue != NULL, "Field value cannot be NULL.");
+   if (!pFieldValue)
+      return NULL;
+
+   // Return without the prefix if there's no value.
+   if (*pFieldValue == 0)
+      return StringTable->EmptyString();
+
+   // Fetch the field prefix.
+   StringTableEntry fieldPrefix = getDataFieldPrefix(fieldName);
+
+   // Sanity!
+   AssertFatal(fieldPrefix != NULL, "Field prefix cannot be NULL.");
+
+   // Calculate a buffer size including prefix.
+   const U32 valueBufferSize = dStrlen(fieldPrefix) + dStrlen(pFieldValue) + 1;
+
+   // Fetch a buffer.
+   char* pValueBuffer = Con::getReturnBuffer(valueBufferSize);
+
+   // Format the value buffer.
+   dSprintf(pValueBuffer, valueBufferSize, "%s%s", fieldPrefix, pFieldValue);
+
+   return pValueBuffer;
+}
+
+//-----------------------------------------------------------------------------
+
+void SimObject::setPrefixedDataField(StringTableEntry fieldName, const char *array, const char *value)
+{
+   // Sanity!
+   AssertFatal(fieldName != NULL, "Cannot set object field value with NULL field name.");
+   AssertFatal(value != NULL, "Field value cannot be NULL.");
+
+   // Set value without prefix if there's no value.
+   if (*value == 0)
+   {
+      setDataField(fieldName, NULL, value);
+      return;
+   }
+
+   // Fetch the field prefix.
+   StringTableEntry fieldPrefix = getDataFieldPrefix(fieldName);
+
+   // Sanity.
+   AssertFatal(fieldPrefix != NULL, "Field prefix cannot be NULL.");
+
+   // Do we have a field prefix?
+   if (fieldPrefix == StringTable->EmptyString())
+   {
+      // No, so set the data field in the usual way.
+      setDataField(fieldName, NULL, value);
+      return;
+   }
+
+   // Yes, so fetch the length of the field prefix.
+   const U32 fieldPrefixLength = dStrlen(fieldPrefix);
+
+   // Yes, so does it start with the object field prefix?
+   if (dStrnicmp(value, fieldPrefix, fieldPrefixLength) != 0)
+   {
+      // No, so set the data field in the usual way.
+      setDataField(fieldName, NULL, value);
+      return;
+   }
+
+   // Yes, so set the data excluding the prefix.
+   setDataField(fieldName, NULL, value + fieldPrefixLength);
+}
+
+//-----------------------------------------------------------------------------
+
+const char *SimObject::getPrefixedDynamicDataField(StringTableEntry fieldName, const char *array, const S32 fieldType)
+{
+   // Sanity!
+   AssertFatal(fieldName != NULL, "Cannot get field value with NULL field name.");
+
+   // Fetch field value.
+   const char* pFieldValue = getDataField(fieldName, array);
+
+   // Sanity.
+   AssertFatal(pFieldValue != NULL, "Field value cannot be NULL.");
+
+   // Return the field if no field type is specified.
+   if (fieldType == -1)
+      return pFieldValue;
+
+   // Return without the prefix if there's no value.
+   if (*pFieldValue == 0)
+      return StringTable->EmptyString();
+
+   // Fetch the console base type.
+   ConsoleBaseType* pConsoleBaseType = ConsoleBaseType::getType(fieldType);
+
+   // Did we find the console base type?
+   if (pConsoleBaseType == NULL)
+   {
+      // No, so warn.
+      Con::warnf("getPrefixedDynamicDataField() - Invalid field type '%d' specified for field '%s' with value '%s'.",
+         fieldType, fieldName, pFieldValue);
+   }
+
+   // Fetch the field prefix.
+   StringTableEntry fieldPrefix = pConsoleBaseType->getTypePrefix();
+
+   // Sanity!
+   AssertFatal(fieldPrefix != NULL, "Field prefix cannot be NULL.");
+
+   // Calculate a buffer size including prefix.
+   const U32 valueBufferSize = dStrlen(fieldPrefix) + dStrlen(pFieldValue) + 1;
+
+   // Fetch a buffer.
+   char* pValueBuffer = Con::getReturnBuffer(valueBufferSize);
+
+   // Format the value buffer.
+   dSprintf(pValueBuffer, valueBufferSize, "%s%s", fieldPrefix, pFieldValue);
+
+   return pValueBuffer;
+}
+
+//-----------------------------------------------------------------------------
+
+void SimObject::setPrefixedDynamicDataField(StringTableEntry fieldName, const char *array, const char *value, const S32 fieldType)
+{
+   // Sanity!
+   AssertFatal(fieldName != NULL, "Cannot set object field value with NULL field name.");
+   AssertFatal(value != NULL, "Field value cannot be NULL.");
+
+   // Set value without prefix if no field type was specified.
+   if (fieldType == -1)
+   {
+      setDataField(fieldName, NULL, value);
+      return;
+   }
+
+   // Fetch the console base type.
+   ConsoleBaseType* pConsoleBaseType = ConsoleBaseType::getType(fieldType);
+
+   // Did we find the console base type?
+   if (pConsoleBaseType == NULL)
+   {
+      // No, so warn.
+      Con::warnf("setPrefixedDynamicDataField() - Invalid field type '%d' specified for field '%s' with value '%s'.",
+         fieldType, fieldName, value);
+   }
+
+   // Set value without prefix if there's no value or we didn't find the console base type.
+   if (*value == 0 || pConsoleBaseType == NULL)
+   {
+      setDataField(fieldName, NULL, value);
+      return;
+   }
+
+   // Fetch the field prefix.
+   StringTableEntry fieldPrefix = pConsoleBaseType->getTypePrefix();
+
+   // Sanity.
+   AssertFatal(fieldPrefix != NULL, "Field prefix cannot be NULL.");
+
+   // Do we have a field prefix?
+   if (fieldPrefix == StringTable->EmptyString())
+   {
+      // No, so set the data field in the usual way.
+      setDataField(fieldName, NULL, value);
+      return;
+   }
+
+   // Yes, so fetch the length of the field prefix.
+   const U32 fieldPrefixLength = dStrlen(fieldPrefix);
+
+   // Yes, so does it start with the object field prefix?
+   if (dStrnicmp(value, fieldPrefix, fieldPrefixLength) != 0)
+   {
+      // No, so set the data field in the usual way.
+      setDataField(fieldName, NULL, value);
+      return;
+   }
+
+   // Yes, so set the data excluding the prefix.
+   setDataField(fieldName, NULL, value + fieldPrefixLength);
+}
+
+//-----------------------------------------------------------------------------
+
+StringTableEntry SimObject::getDataFieldPrefix(StringTableEntry fieldName)
+{
+   // Sanity!
+   AssertFatal(fieldName != NULL, "Cannot get field prefix with NULL field name.");
+
+   // Find the field.
+   const AbstractClassRep::Field* pField = findField(fieldName);
+
+   // Return nothing if field was not found.
+   if (pField == NULL)
+      return StringTable->EmptyString();
+
+   // Yes, so fetch the console base type.
+   ConsoleBaseType* pConsoleBaseType = ConsoleBaseType::getType(pField->type);
+
+   // Fetch the type prefix.
+   return pConsoleBaseType->getTypePrefix();
+}
+
 
 //-----------------------------------------------------------------------------
 

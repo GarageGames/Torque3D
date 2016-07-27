@@ -32,6 +32,8 @@
 #include "shaderGen/HLSL/paraboloidHLSL.h"
 #include "materials/materialFeatureTypes.h"
 #include "core/module.h"
+// Deferred Shading
+#include "lighting/advanced/hlsl/deferredShadingFeaturesHLSL.h"
 #include "shaderGen/HLSL/accuFeatureHLSL.h"
 
 static ShaderGen::ShaderGenInitDelegate sInitDelegate;
@@ -70,6 +72,9 @@ void _initShaderGenHLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_GlossMap, new NamedFeatureHLSL( "Gloss Map" ) );
    FEATUREMGR->registerFeature( MFT_LightbufferMRT, new NamedFeatureHLSL( "Lightbuffer MRT" ) );
    FEATUREMGR->registerFeature( MFT_RenderTarget1_Zero, new RenderTargetZeroHLSL( ShaderFeature::RenderTarget1 ) );
+   FEATUREMGR->registerFeature( MFT_RenderTarget2_Zero, new RenderTargetZeroHLSL( ShaderFeature::RenderTarget2 ) );
+   FEATUREMGR->registerFeature( MFT_RenderTarget3_Zero, new RenderTargetZeroHLSL( ShaderFeature::RenderTarget3 ) );
+   FEATUREMGR->registerFeature( MFT_Imposter, new NamedFeatureHLSL( "Imposter" ) );
 
    FEATUREMGR->registerFeature( MFT_DiffuseMapAtlas, new NamedFeatureHLSL( "Diffuse Map Atlas" ) );
    FEATUREMGR->registerFeature( MFT_NormalMapAtlas, new NamedFeatureHLSL( "Normal Map Atlas" ) );
@@ -94,6 +99,14 @@ void _initShaderGenHLSL( ShaderGen *shaderGen )
    FEATUREMGR->registerFeature( MFT_ForwardShading, new NamedFeatureHLSL( "Forward Shaded Material" ) );
 
    FEATUREMGR->registerFeature( MFT_ImposterVert, new ImposterVertFeatureHLSL );
+
+   // Deferred Shading
+   FEATUREMGR->registerFeature( MFT_isDeferred, new NamedFeatureHLSL( "Deferred Material" ) );
+   FEATUREMGR->registerFeature( MFT_DeferredSpecMap, new DeferredSpecMapHLSL );
+   FEATUREMGR->registerFeature( MFT_DeferredSpecVars, new DeferredSpecVarsHLSL );
+   FEATUREMGR->registerFeature( MFT_DeferredMatInfoFlags, new DeferredMatInfoFlagsHLSL );
+   FEATUREMGR->registerFeature( MFT_DeferredEmptySpec, new DeferredEmptySpecHLSL );
+   FEATUREMGR->registerFeature( MFT_SkyBox, new DeferredSkyHLSL );
 }
 
 MODULE_BEGIN( ShaderGenHLSL )
@@ -106,6 +119,7 @@ MODULE_BEGIN( ShaderGenHLSL )
       sInitDelegate.bind(_initShaderGenHLSL);
       SHADERGEN->registerInitDelegate(Direct3D9, sInitDelegate);
       SHADERGEN->registerInitDelegate(Direct3D9_360, sInitDelegate);
+      SHADERGEN->registerInitDelegate(Direct3D11, sInitDelegate);
    }
    
 MODULE_END;

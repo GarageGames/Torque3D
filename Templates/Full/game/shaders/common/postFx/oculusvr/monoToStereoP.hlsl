@@ -20,15 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"  
 #include "../postFx.hlsl"  
 #include "../../torque.hlsl"
 
-uniform sampler2D backBuffer : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(backBuffer, 0);
 
 uniform float2 LensXOffsets;
 
-float4 main( PFXVertToPix IN ) : COLOR0  
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
    float2 texCoord;
    float xOffset;
@@ -54,7 +53,7 @@ float4 main( PFXVertToPix IN ) : COLOR0
    texCoord.x *= 0.5;
    texCoord.x += 0.25;
    
-   float4 color = tex2D(backBuffer, texCoord);
+   float4 color = TORQUE_TEX2D(backBuffer, texCoord);
 
    return color;    
 }

@@ -141,7 +141,7 @@ bool BasicClouds::onAdd()
       GFXStateBlockDesc desc;
       desc.setCullMode( GFXCullNone );
       desc.setBlend( true );
-      desc.setZReadWrite( false, false );
+      desc.setZReadWrite( true, false );
       desc.samplersDefined = true;
       desc.samplers[0].addressModeU = GFXAddressWrap;
       desc.samplers[0].addressModeV = GFXAddressWrap;

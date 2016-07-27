@@ -111,6 +111,10 @@ public:
                               F32 staticFriction );
    virtual void applyCorrection( const MatrixF &xfm );
    virtual void applyImpulse( const Point3F &origin, const Point3F &force );
+
+   virtual void findContact(SceneObject **contactObject, VectorF *contactNormal, Vector<SceneObject*> *outOverlapObjects) const;
+   virtual void moveKinematicTo(const MatrixF &xfm);
+
 };
 
 #endif // _T3D_PHYSICS_BTBODY_H_

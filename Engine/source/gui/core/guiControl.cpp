@@ -175,6 +175,9 @@ ImplementEnumType( GuiHorizontalSizing,
 	{ GuiControl::horizResizeLeft,            "left"      },
    { GuiControl::horizResizeCenter,          "center"    },
    { GuiControl::horizResizeRelative,        "relative"  },
+   { GuiControl::horizResizeAspectLeft,      "aspectLeft" },
+   { GuiControl::horizResizeAspectRight,     "aspectRight" },
+   { GuiControl::horizResizeAspectCenter,    "aspectCenter" },
 	{ GuiControl::horizResizeWindowRelative,  "windowRelative"  }
 EndImplementEnumType;
 
@@ -186,6 +189,9 @@ ImplementEnumType( GuiVerticalSizing,
 	{ GuiControl::vertResizeTop,              "top"        },
    { GuiControl::vertResizeCenter,           "center"     },
    { GuiControl::vertResizeRelative,         "relative"   },
+   { GuiControl::vertResizeAspectTop,        "aspectTop"  },
+   { GuiControl::vertResizeAspectBottom,     "aspectBottom" },
+   { GuiControl::vertResizeAspectCenter,     "aspectCenter" },
 	{ GuiControl::vertResizeWindowRelative,   "windowRelative"   }
 EndImplementEnumType;
 
@@ -270,11 +276,11 @@ void GuiControl::initPersistFields()
 
       addField("variable",          TypeString,       Offset(mConsoleVariable, GuiControl),
          "Name of the variable to which the value of this control will be synchronized." );
-      addField("command",           TypeRealString,   Offset(mConsoleCommand, GuiControl),
+      addField("command",           TypeCommand,   Offset(mConsoleCommand, GuiControl),
          "Command to execute on the primary action of the control.\n\n"
          "@note Within this script snippet, the control on which the #command is being executed is bound to "
             "the global variable $ThisControl." );
-      addField("altCommand",        TypeRealString,   Offset(mAltConsoleCommand, GuiControl),
+      addField("altCommand",        TypeCommand,   Offset(mAltConsoleCommand, GuiControl),
          "Command to execute on the secondary action of the control.\n\n"
          "@note Within this script snippet, the control on which the #altCommand is being executed is bound to "
             "the global variable $ThisControl." );
@@ -1370,6 +1376,36 @@ void GuiControl::parentResized(const RectI &oldParentRect, const RectI &newParen
       newPosition.x = newLeft;
       newExtent.x = newWidth;
    }
+   else if (mHorizSizing == horizResizeAspectLeft && oldParentRect.extent.x != 0)
+   {
+      S32 newLeft = mRoundToNearest((F32(newPosition.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x));
+      S32 newWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y));
+
+      newPosition.x = newLeft;
+      newExtent.x = newWidth;
+   }
+   else if (mHorizSizing == horizResizeAspectRight && oldParentRect.extent.x != 0)
+   {
+      S32 newLeft = mRoundToNearest((F32(newPosition.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x));
+      S32 newWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y)); //origional aspect ratio corrected width
+      S32 rWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x)); //parent aspect ratio relative width
+
+      S32 offset = rWidth - newWidth; // account for change in relative width
+      newLeft += offset;
+      newPosition.x = newLeft;
+      newExtent.x = newWidth;
+   }
+   else if (mHorizSizing == horizResizeAspectCenter && oldParentRect.extent.x != 0)
+   {
+      S32 newLeft = mRoundToNearest((F32(newPosition.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x));
+      S32 newWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y)); //origional aspect ratio corrected width
+      S32 rWidth = mRoundToNearest((F32(newExtent.x) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x)); //parent aspect ratio relative width
+
+      S32 offset = rWidth - newWidth; // account for change in relative width
+      newLeft += offset/2;
+      newPosition.x = newLeft;
+      newExtent.x = newWidth;
+   }
 
 	if (mVertSizing == vertResizeCenter)
 	   newPosition.y = (newParentRect.extent.y - getHeight()) >> 1;
@@ -1382,6 +1418,36 @@ void GuiControl::parentResized(const RectI &oldParentRect, const RectI &newParen
       S32 newTop = mRoundToNearest( ( F32( newPosition.y ) / F32( oldParentRect.extent.y ) ) * F32( newParentRect.extent.y ) );
       S32 newHeight = mRoundToNearest( ( F32( newExtent.y ) / F32( oldParentRect.extent.y ) ) * F32( newParentRect.extent.y ) );
 
+      newPosition.y = newTop;
+      newExtent.y = newHeight;
+   }
+   else if (mVertSizing == vertResizeAspectTop && oldParentRect.extent.y != 0)
+   {
+      S32 newTop = mRoundToNearest((F32(newPosition.y) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y));
+      S32 newHeight = mRoundToNearest((F32(newExtent.y) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x));
+
+      newPosition.y = newTop;
+      newExtent.y = newHeight;
+   }
+   else if (mVertSizing == vertResizeAspectBottom && oldParentRect.extent.y != 0)
+   {
+      S32 newTop = mRoundToNearest((F32(newPosition.y) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y));
+      S32 newHeight = mRoundToNearest((F32(newExtent.y) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x)); //origional aspect ratio corrected hieght
+      S32 rHeight = mRoundToNearest((F32(newExtent.y) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y)); //parent aspect ratio relative hieght
+
+      S32 offset = rHeight - newHeight; // account for change in relative hieght
+      newTop += offset;
+      newPosition.y = newTop;
+      newExtent.y = newHeight;
+   }
+   else if (mVertSizing == vertResizeAspectCenter && oldParentRect.extent.y != 0)
+   {
+      S32 newTop = mRoundToNearest((F32(newPosition.y) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y));
+      S32 newHeight = mRoundToNearest((F32(newExtent.y) / F32(oldParentRect.extent.x)) * F32(newParentRect.extent.x)); //origional aspect ratio corrected hieght
+      S32 rHeight = mRoundToNearest((F32(newExtent.y) / F32(oldParentRect.extent.y)) * F32(newParentRect.extent.y)); //parent aspect ratio relative hieght
+
+      S32 offset = rHeight - newHeight; // account for change in relative hieght
+      newTop += offset / 2;
       newPosition.y = newTop;
       newExtent.y = newHeight;
    }
@@ -2831,9 +2897,9 @@ DefineConsoleMethod( GuiControl, setExtent, void, ( const char* extOrX, const ch
    "@hide" )
 {
    Point2I extent;
-   if(!dStrIsEmpty(extOrX) && dStrIsEmpty(y))
+   if(!String::isEmpty(extOrX) && String::isEmpty(y))
       dSscanf(extOrX, "%d %d", &extent.x, &extent.y);
-   else if(!dStrIsEmpty(extOrX) && !dStrIsEmpty(y))
+   else if(!String::isEmpty(extOrX) && !String::isEmpty(y))
    {
       extent.x = dAtoi(extOrX);
       extent.y = dAtoi(y);

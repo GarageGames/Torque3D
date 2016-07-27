@@ -39,8 +39,8 @@
 
 enum GFXBufferType
 {
-      GFXBufferTypeStatic,   ///< Static vertex buffers are created and filled one time.
-                   ///< incur a performance penalty.  Resizing a static vertex buffer is not
+      GFXBufferTypeStatic,   ///< Static vertex buffers are created and rarely updated.
+                   ///< Updating might incur a performance penalty.  Resizing a static vertex buffer is not
                    ///< allowed.
       GFXBufferTypeDynamic,  ///< Dynamic vertex buffers are meant for vertices that can be changed
                    ///< often.  Vertices written into dynamic vertex buffers will remain valid
@@ -48,7 +48,8 @@ enum GFXBufferType
                    ///< allowed.
       GFXBufferTypeVolatile, ///< Volatile vertex or index buffers are meant for vertices or indices that are essentially
                    ///< only used once.  They can be resized without any performance penalty.
-      
+      GFXBufferTypeImmutable, ///< Immutable buffers must specify the data when creating the buffer. Cannot be modified.
+
       GFXBufferType_COUNT ///< Number of buffer types.
 };
 
@@ -67,7 +68,6 @@ enum GFXPrimitiveType
    GFXLineStrip,
    GFXTriangleList,
    GFXTriangleStrip,
-   GFXTriangleFan,
    GFXPT_COUNT
 };
 
@@ -205,6 +205,9 @@ enum GFXFormat
    GFXFormatDXT4,
    GFXFormatDXT5,
 
+   // sRGB formats
+   GFXFormatR8G8B8A8_SRGB,
+
    GFXFormat_COUNT,
 
    GFXFormat_8BIT = GFXFormatA8,
@@ -276,8 +279,8 @@ enum GFXBlend
 enum GFXAdapterType 
 {
    OpenGL = 0,
+   Direct3D11,
    Direct3D9,
-   Direct3D8,
    NullDevice,
    Direct3D9_360,
    GFXAdapterType_Count

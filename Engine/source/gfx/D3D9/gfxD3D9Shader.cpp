@@ -1307,10 +1307,15 @@ void GFXD3D9Shader::_buildSamplerShaderConstantHandles( Vector<GFXShaderConstDes
 
 void GFXD3D9Shader::_buildInstancingShaderConstantHandles()
 {
+   // If we have no instancing than just return
+   if (!mInstancingFormat)
+      return;
+
    U32 offset = 0;
-   for ( U32 i=0; i < mInstancingFormat.getElementCount(); i++ )
+
+   for ( U32 i=0; i < mInstancingFormat->getElementCount(); i++ )
    {
-      const GFXVertexElement &element = mInstancingFormat.getElement( i );
+      const GFXVertexElement &element = mInstancingFormat->getElement( i );
       
       String constName = String::ToString( "$%s", element.getSemantic().c_str() );
 
@@ -1347,9 +1352,9 @@ void GFXD3D9Shader::_buildInstancingShaderConstantHandles()
 
       // If this is a matrix we will have 2 or 3 more of these
       // semantics with the same name after it.
-      for ( ; i < mInstancingFormat.getElementCount(); i++ )
+      for ( ; i < mInstancingFormat->getElementCount(); i++ )
       {
-         const GFXVertexElement &nextElement = mInstancingFormat.getElement( i );
+         const GFXVertexElement &nextElement = mInstancingFormat->getElement( i );
          if ( nextElement.getSemantic() != element.getSemantic() )
          {
             i--;

@@ -22,11 +22,13 @@
 
 #include "../../torque.hlsl"
 #include "../postFx.hlsl"
+#include "../../shaderModelAutoGen.hlsl"
 
-uniform sampler2D sceneTex : register( s0 );
-uniform sampler2D luminanceTex : register( s1 );
-uniform sampler2D bloomTex : register( s2 );
-uniform sampler1D colorCorrectionTex : register( s3 );
+TORQUE_UNIFORM_SAMPLER2D(sceneTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(luminanceTex, 1);
+TORQUE_UNIFORM_SAMPLER2D(bloomTex, 2);
+TORQUE_UNIFORM_SAMPLER1D(colorCorrectionTex, 3);
+TORQUE_UNIFORM_SAMPLER2D(prepassTex, 4);
 
 uniform float2 texSize0;
 uniform float2 texSize2;
@@ -34,20 +36,20 @@ uniform float2 texSize2;
 uniform float g_fEnableToneMapping;
 uniform float g_fMiddleGray;
 uniform float g_fWhiteCutoff;
-
 uniform float g_fEnableBlueShift;
-uniform float3 g_fBlueShiftColor; 
 
+uniform float3 g_fBlueShiftColor;
 uniform float g_fBloomScale;
 
 uniform float g_fOneOverGamma;
+uniform float Brightness;
+uniform float Contrast;
 
-
-float4 main( PFXVertToPix IN ) : COLOR0
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
-   float4 sample = hdrDecode( tex2D( sceneTex, IN.uv0 ) );
-   float adaptedLum = tex2D( luminanceTex, float2( 0.5f, 0.5f ) ).r;
-   float4 bloom = tex2D( bloomTex, IN.uv0 );
+   float4 sample = hdrDecode( TORQUE_TEX2D( sceneTex, IN.uv0 ) );
+   float adaptedLum = TORQUE_TEX2D( luminanceTex, float2( 0.5f, 0.5f ) ).r;
+   float4 bloom = TORQUE_TEX2D( bloomTex, IN.uv0 );
 
    // For very low light conditions, the rods will dominate the perception
    // of light, and therefore color will be desaturated and shifted
@@ -81,15 +83,24 @@ float4 main( PFXVertToPix IN ) : COLOR0
    }
 
    // Add the bloom effect.
-   sample += g_fBloomScale * bloom;
+   float depth = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 ).w;
+   if (depth>0.9999)
+      sample += g_fBloomScale * bloom;
 
    // Apply the color correction.
-   sample.r = tex1D( colorCorrectionTex, sample.r ).r;
-   sample.g = tex1D( colorCorrectionTex, sample.g ).g;
-   sample.b = tex1D( colorCorrectionTex, sample.b ).b;
+   sample.r = TORQUE_TEX1D( colorCorrectionTex, sample.r ).r;
+   sample.g = TORQUE_TEX1D( colorCorrectionTex, sample.g ).g;
+   sample.b = TORQUE_TEX1D( colorCorrectionTex, sample.b ).b;
 
+	  
    // Apply gamma correction
    sample.rgb = pow( abs(sample.rgb), g_fOneOverGamma );
+ 
+   // Apply contrast
+   sample.rgb = ((sample.rgb - 0.5f) * Contrast) + 0.5f;
+ 
+   // Apply brightness
+   sample.rgb += Brightness;
 
    return sample;
 }

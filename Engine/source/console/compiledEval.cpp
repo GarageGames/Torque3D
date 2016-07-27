@@ -209,6 +209,13 @@ namespace Con
       return ret;
    }
 
+   char* getBoolArg(bool arg)
+   {
+      char *ret = STR.getArgBuffer(32);
+      dSprintf(ret, 32, "%d", arg);
+      return ret;
+   }
+
    char *getStringArg( const char *arg )
    {
       U32 len = dStrlen( arg ) + 1;
@@ -864,6 +871,7 @@ breakContinue:
                {
                   Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-SimObject class %s.", getFileLine(ip), (const char*)callArgv[1]);
                   delete object;
+                  currentNewObject = NULL;
                   ip = failJump;
                   break;
                }
@@ -895,6 +903,7 @@ breakContinue:
 
                      // Fail to create the object.
                      delete object;
+                     currentNewObject = NULL;
                      ip = failJump;
                      break;
                   }
@@ -987,6 +996,7 @@ breakContinue:
                   // This error is usually caused by failing to call Parent::initPersistFields in the class' initPersistFields().
                   Con::warnf(ConsoleLogEntry::General, "%s: Register object failed for object %s of class %s.", getFileLine(ip), currentNewObject->getName(), currentNewObject->getClassName());
                   delete currentNewObject;
+                  currentNewObject = NULL;
                   ip = failJump;
                   // Prevent stack value corruption
                   CSTK.popFrame();
@@ -1008,6 +1018,7 @@ breakContinue:
                Con::errorf(ConsoleLogEntry::General, "%s: preload failed for %s: %s.", getFileLine(ip),
                            currentNewObject->getName(), errorStr.c_str());
                dataBlock->deleteObject();
+               currentNewObject = NULL;
                ip = failJump;
 			   
                // Prevent stack value corruption
@@ -1087,6 +1098,9 @@ breakContinue:
 
          case OP_FINISH_OBJECT:
          {
+            if (currentNewObject)
+               currentNewObject->onPostAdd();
+
             //Assert( objectCreationStackIndex >= 0 );
             // Restore the object info from the stack [7/9/2007 Black]
             currentNewObject = objectCreationStack[ --objectCreationStackIndex ].newObject;

@@ -124,6 +124,7 @@ GuiBitmapButtonCtrl::GuiBitmapButtonCtrl()
    mUseModifiers = false;
    mUseStates = true;
    setExtent( 140, 30 );
+   mMasked = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -157,6 +158,7 @@ void GuiBitmapButtonCtrl::initPersistFields()
          "Defaults to true.\n\n"
          "If you do not use per-state images on this button set this to false to speed up the loading process "
          "by inhibiting searches for the individual images." );
+      addField("masked", TypeBool, Offset(mMasked, GuiBitmapButtonCtrl),"Use alpha masking for interaction.");
          
    endGroup( "Bitmap" );
       
@@ -550,4 +552,43 @@ void GuiBitmapButtonTextCtrl::renderButton( GFXTexHandle &texture, const Point2I
 
    GFX->getDrawUtil()->setBitmapModulation( mProfile->mFontColor );
    renderJustifiedText(textPos, getExtent(), mButtonText);
+}
+
+bool GuiBitmapButtonCtrl::pointInControl(const Point2I& parentCoordPoint)
+{
+   if (mMasked && getTextureForCurrentState())
+   {
+      ColorI rColor(0, 0, 0, 0);
+      GBitmap* bmp;
+
+      const RectI &bounds = getBounds();
+      S32 xt = parentCoordPoint.x - bounds.point.x;
+      S32 yt = parentCoordPoint.y - bounds.point.y;
+
+      bmp = getTextureForCurrentState().getBitmap();
+      if (!bmp)
+      {
+         setBitmap(mBitmapName);
+         bmp = getTextureForCurrentState().getBitmap();
+      }
+
+      S32 relativeXRange = this->getExtent().x;
+      S32 relativeYRange = this->getExtent().y;
+      S32 fileXRange = bmp->getHeight(0);
+      S32 fileYRange = bmp->getWidth(0);
+      //Con::errorf("xRange:[%i -- %i],  Range:[%i -- %i]  pos:(%i,%i)",relativeXRange,fileXRange,relativeYRange,fileYRange,xt,yt);
+
+      S32 fileX = (xt*fileXRange) / relativeXRange;
+      S32 fileY = (yt*fileYRange) / relativeYRange;
+      //Con::errorf("Checking %s @ (%i,%i)",this->getName(),fileX,fileY);
+
+      bmp->getColor(fileX, fileY, rColor);
+
+      if (rColor.alpha)
+         return true;
+      else
+         return false;
+   }
+   else
+      return Parent::pointInControl(parentCoordPoint);
 }

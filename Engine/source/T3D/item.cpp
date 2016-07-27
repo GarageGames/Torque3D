@@ -556,6 +556,9 @@ void Item::processTick(const Move* move)
 {
    Parent::processTick(move);
 
+   if ( isMounted() )
+      return;
+
    //
    if (mCollisionObject && !--mCollisionTimeout)
       mCollisionObject = 0;
@@ -606,6 +609,8 @@ void Item::processTick(const Move* move)
 void Item::interpolateTick(F32 dt)
 {
    Parent::interpolateTick(dt);
+   if ( isMounted() )
+      return;
 
    // Client side interpolation
    Point3F pos = delta.pos + delta.posVec * dt;
@@ -1365,6 +1370,8 @@ void Item::buildConvex(const Box3F& box, Convex* convex)
 void Item::advanceTime(F32 dt)
 {
    Parent::advanceTime(dt);
+   if ( isMounted() )
+      return;
 
    if( mRotate )
    {

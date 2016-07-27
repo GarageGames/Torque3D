@@ -160,12 +160,8 @@ Move::Move()
    checksum = false;
    deviceIsKeyboardMouse = false;
    freeLook = false;
-   trigger[0] = false;
-   trigger[1] = false;
-   trigger[2] = false;
-   trigger[3] = false;
-   trigger[4] = false;
-   trigger[5] = false;
+   for (S32 i = 0; i< MaxTriggerKeys; i++)
+      trigger[i] = false;
 }
 
 static inline F32 clampFloatWrap(F32 val)

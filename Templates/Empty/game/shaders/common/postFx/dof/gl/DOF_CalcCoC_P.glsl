@@ -25,7 +25,7 @@
 
 // These are set by the game engine.  
 uniform sampler2D shrunkSampler;  // Output of DofDownsample()  
-uniform sampler2D blurredSampler; // Blurred version of the shrunk sampler
+uniform sampler2D blurredSampler; // Blurred version of the shrunk sampler  
 
 out vec4 OUT_col;
 

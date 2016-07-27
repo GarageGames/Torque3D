@@ -1403,7 +1403,7 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
 
       for(U32 j = 0; j < 6; j++)
       {
-         PrimBuild::begin( GFXTriangleFan, 4 );
+         PrimBuild::begin( GFXTriangleStrip, 4 );
 
          PrimBuild::vertex3fv( sgCenterBoxPnts[sgBoxVerts[j][0]] * tipScale);
          PrimBuild::vertex3fv( sgCenterBoxPnts[sgBoxVerts[j][1]] * tipScale);
@@ -1599,7 +1599,7 @@ void Gizmo::_renderAxisBoxes()
 
       for(U32 j = 0; j < 6; j++)
       {
-         PrimBuild::begin( GFXTriangleFan, 4 );
+         PrimBuild::begin( GFXTriangleStrip, 4 );
 
          PrimBuild::vertex3fv( sgCenterBoxPnts[sgBoxVerts[j][0]] * tipScale + sgAxisVectors[axisIdx] * pos );
          PrimBuild::vertex3fv( sgCenterBoxPnts[sgBoxVerts[j][1]] * tipScale + sgAxisVectors[axisIdx] * pos );
@@ -1663,7 +1663,7 @@ void Gizmo::_renderAxisCircles()
          ColorI color = mProfile->inActiveColor;
          color.alpha = 100;
          PrimBuild::color( color );
-         PrimBuild::begin( GFXTriangleFan, segments+2 );
+         PrimBuild::begin( GFXTriangleStrip, segments+2 );
          
          PrimBuild::vertex3fv( Point3F(0,0,0) );
 

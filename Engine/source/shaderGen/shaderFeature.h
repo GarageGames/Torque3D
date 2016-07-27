@@ -99,10 +99,9 @@ protected:
    ///
    S32 mProcessIndex;
 
-public:
-
-   // TODO: Make this protected and give it a proper API.
    GFXVertexFormat *mInstancingFormat;
+
+public:   
 
    //**************************************************************************
    /*!
@@ -153,7 +152,7 @@ public:
    void setProcessIndex( S32 index ) { mProcessIndex = index; }
 
    ///
-   U32 getProcessIndex() const { return mProcessIndex; }
+   S32 getProcessIndex() const { return mProcessIndex; }
 
    //-----------------------------------------------------------------------
    // Virtual Functions
@@ -293,6 +292,8 @@ public:
    static Var* findOrCreateLocal(   const char *name, 
                                     const char *type, 
                                     MultiLine *multi );
+   // Set the instancing format
+   void setInstancingFormat(GFXVertexFormat *format);
 };
 
 #endif // _SHADERFEATURE_H_

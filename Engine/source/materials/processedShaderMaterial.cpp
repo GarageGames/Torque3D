@@ -106,6 +106,9 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
       for (S32 i = 0; i < Material::MAX_TEX_PER_PASS; ++i)
          mTexHandlesSC[i] = shader->getShaderConstHandle(mat->mSamplerNames[i]);
    }
+
+   // Deferred Shading
+   mMatInfoFlagsSC = shader->getShaderConstHandle(ShaderGenVars::matInfoFlags);
 }
 
 ///
@@ -206,30 +209,8 @@ bool ProcessedShaderMaterial::init( const FeatureSet &features,
    if ( mFeatures.hasFeature( MFT_UseInstancing ) )
    {
       mInstancingState = new InstancingState();
-      mInstancingState->setFormat( &_getRPD( 0 )->shader->mInstancingFormat, mVertexFormat );
+      mInstancingState->setFormat( _getRPD( 0 )->shader->getInstancingFormat(), mVertexFormat );
    }
-
-   // Check for a RenderTexTargetBin assignment
-   // *IMPORTANT NOTE* 
-   // This is a temporary solution for getting diffuse mapping working with tex targets for standard materials
-   // It should be removed once this is done properly, at that time the sAllowTextureTargetAssignment should also be removed 
-   // from Material (it is necessary for catching shadow maps/post effect this shouldn't be applied to)
-   if (Material::sAllowTextureTargetAssignment)
-      if (mMaterial && mMaterial->mDiffuseMapFilename[0].isNotEmpty() && mMaterial->mDiffuseMapFilename[0].substr( 0, 1 ).equal("#"))
-      {
-         String texTargetBufferName = mMaterial->mDiffuseMapFilename[0].substr(1, mMaterial->mDiffuseMapFilename[0].length() - 1);
-         NamedTexTarget *texTarget = NamedTexTarget::find( texTargetBufferName ); 
-
-         RenderPassData* rpd = getPass(0);      
-
-         if (rpd)
-         {
-            rpd->mTexSlot[0].texTarget = texTarget;
-            rpd->mTexType[0] = Material::TexTarget;
-            rpd->mSamplerNames[0] = "diffuseMap";
-         }
-      }
-
    return true;
 }
 
@@ -353,11 +334,18 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
       fd.features.addFeature( MFT_VertLit );
    
    // cubemaps only available on stage 0 for now - bramage   
-   if ( stageNum < 1 && 
+   if ( stageNum < 1 && mMaterial->isTranslucent() &&
          (  (  mMaterial->mCubemapData && mMaterial->mCubemapData->mCubemap ) ||
                mMaterial->mDynamicCubemap ) )
-   fd.features.addFeature( MFT_CubeMap );
+   {
+       fd.features.addFeature( MFT_CubeMap );
+   }
 
+   if (features.hasFeature(MFT_SkyBox))
+   {
+      fd.features.addFeature(MFT_CubeMap);
+      fd.features.addFeature(MFT_SkyBox);
+   }
    fd.features.addFeature( MFT_Visibility );
 
    if (  lastStage && 
@@ -428,7 +416,6 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
 
    if ( mMaterial->mAccuEnabled[stageNum] )
    {
-      fd.features.addFeature( MFT_AccuMap );
       mHasAccumulation = true;
    }
 
@@ -441,19 +428,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
       fd.features.removeFeature( MFT_AccuMap );
       mHasAccumulation = false;
    }
-
-   // if we still have the AccuMap feature, we add all accu constant features
-   if ( fd.features[ MFT_AccuMap ] ) {
-      // add the dependencies of the accu map
-      fd.features.addFeature( MFT_AccuScale );
-      fd.features.addFeature( MFT_AccuDirection );
-      fd.features.addFeature( MFT_AccuStrength );
-      fd.features.addFeature( MFT_AccuCoverage );
-      fd.features.addFeature( MFT_AccuSpecular );
-      // now remove some features that are not compatible with this
-      fd.features.removeFeature( MFT_UseInstancing );
-   }
-
+   
    // Without a base texture use the diffuse color
    // feature to ensure some sort of output.
    if (!fd.features[MFT_DiffuseMap])
@@ -1175,7 +1150,13 @@ void ProcessedShaderMaterial::_setShaderConstants(SceneRenderState * state, cons
          0.0f, 0.0f ); // TODO: Wrap mode flags?
       shaderConsts->setSafe(handles->mBumpAtlasTileSC, atlasTileParams);
    }
-   
+
+   // Deferred Shading: Determine Material Info Flags
+   S32 matInfoFlags = 
+            (mMaterial->mEmissive[stageNum] ? 1 : 0) | //emissive
+            (mMaterial->mSubSurface[stageNum] ? 2 : 0); //subsurface
+   mMaterial->mMatInfoFlags[stageNum] = matInfoFlags / 255.0f;
+   shaderConsts->setSafe(handles->mMatInfoFlagsSC, mMaterial->mMatInfoFlags[stageNum]);   
    if( handles->mAccuScaleSC->isValid() )
       shaderConsts->set( handles->mAccuScaleSC, mMaterial->mAccuScale[stageNum] );
    if( handles->mAccuDirectionSC->isValid() )

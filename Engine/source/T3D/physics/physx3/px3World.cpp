@@ -62,7 +62,8 @@ Px3World::Px3World(): mScene( NULL ),
    mIsEnabled( false ),
    mEditorTimeScale( 1.0f ),
    mAccumulator( 0 ),
-   mControllerManager( NULL )
+   mControllerManager(NULL),
+   mIsSceneLocked(false)
 {
 }
 
@@ -333,6 +334,62 @@ void Px3World::releaseWriteLock()
 	// simulation hasn't really ticked!
 	mScene->checkResults( true );
 	//AssertFatal( mScene->isWritable(), "PhysX3World::releaseWriteLock() - We should have been writable now!" );
+}
+
+void Px3World::lockScenes()
+{
+   Px3World *world = dynamic_cast<Px3World*>(PHYSICSMGR->getWorld("server"));
+
+   if (world)
+      world->lockScene();
+
+   world = dynamic_cast<Px3World*>(PHYSICSMGR->getWorld("client"));
+
+   if (world)
+      world->lockScene();
+}
+
+void Px3World::unlockScenes()
+{
+   Px3World *world = dynamic_cast<Px3World*>(PHYSICSMGR->getWorld("server"));
+
+   if (world)
+      world->unlockScene();
+
+   world = dynamic_cast<Px3World*>(PHYSICSMGR->getWorld("client"));
+
+   if (world)
+      world->unlockScene();
+}
+
+void Px3World::lockScene()
+{
+   if (!mScene)
+      return;
+
+   if (mIsSceneLocked)
+   {
+      Con::printf("Px3World: Attempting to lock a scene that is already locked.");
+      return;
+   }
+
+   mScene->lockWrite();
+   mIsSceneLocked = true;
+}
+
+void Px3World::unlockScene()
+{
+   if (!mScene)
+      return;
+
+   if (!mIsSceneLocked)
+   {
+      Con::printf("Px3World: Attempting to unlock a scene that is not locked.");
+      return;
+   }
+
+   mScene->unlockWrite();
+   mIsSceneLocked = false;
 }
 
 bool Px3World::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *ri, const Point3F &impulse )

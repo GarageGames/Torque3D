@@ -269,6 +269,7 @@ GuiControlProfile::GuiControlProfile(void) :
    mFillColor(255,0,255,255),
    mFillColorHL(255,0,255,255),
    mFillColorNA(255,0,255,255),
+   mFillColorERR(255,0,0,255),
    mFillColorSEL(255,0,255,255),
    mBorderColor(255,0,255,255),
    mBorderColorHL(255,0,255,255),
@@ -334,6 +335,7 @@ GuiControlProfile::GuiControlProfile(void) :
       mFillColor     = def->mFillColor;
       mFillColorHL   = def->mFillColorHL;
       mFillColorNA   = def->mFillColorNA;
+      mFillColorERR  = def->mFillColorERR;
       mFillColorSEL  = def->mFillColorSEL;
 
       mBorder        = def->mBorder;
@@ -398,6 +400,7 @@ void GuiControlProfile::initPersistFields()
       addField("fillColor",     TypeColorI,     Offset(mFillColor, GuiControlProfile));
       addField("fillColorHL",   TypeColorI,     Offset(mFillColorHL, GuiControlProfile));
       addField("fillColorNA",   TypeColorI,     Offset(mFillColorNA, GuiControlProfile));
+      addField("fillColorERR",  TypeColorI,     Offset(mFillColorERR, GuiControlProfile));
       addField("fillColorSEL",  TypeColorI,     Offset(mFillColorSEL, GuiControlProfile));
       addField("border",        TypeS32,        Offset(mBorder, GuiControlProfile),
          "Border type (0=no border)." );
@@ -717,7 +720,7 @@ IMPLEMENT_STRUCT( RectSpacingI,
       
 END_IMPLEMENT_STRUCT;
 
-ConsoleType( RectSpacingI, TypeRectSpacingI, RectSpacingI )
+ConsoleType(RectSpacingI, TypeRectSpacingI, RectSpacingI, "")
 ImplementConsoleTypeCasters( TypeRectSpacingI, RectSpacingI )
 
 ConsoleGetType( TypeRectSpacingI )

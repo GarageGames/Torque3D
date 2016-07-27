@@ -1,0 +1,7 @@
+<ComponentAsset
+    AssetName="MeshComponentAsset"
+    componentName=""
+    componentClass="MeshComponent"
+    friendlyName="Mesh"
+    componentType="Render"
+    description="Enables an entity to render a shape."/>

@@ -72,7 +72,6 @@ uniform float    undulateMaxDist;
 
 in vec4 vPosition;
 in vec3 vNormal;
-in vec4 vColor;
 in vec2 vTexCoord0;
 in vec4 vTexCoord1;
 

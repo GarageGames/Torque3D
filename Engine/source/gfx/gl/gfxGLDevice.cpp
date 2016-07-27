@@ -81,8 +81,8 @@ void loadGLExtensions(void *context)
    GL::gglPerformExtensionBinds(context);
 }
 
-void STDCALL glDebugCallback(GLenum source, GLenum type, GLuint id,
-    GLenum severity, GLsizei length, const GLchar* message, void* userParam)
+void STDCALL glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, 
+	const GLchar *message, const void *userParam)
 {
     if (severity == GL_DEBUG_SEVERITY_HIGH)
         Con::errorf("OPENGL: %s", message);
@@ -140,10 +140,18 @@ void GFXGLDevice::initGLState()
    
    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
    
+   // [JTH 5/6/2016] GLSL 1.50 is really SM 4.0
    // Setting mPixelShaderVersion to 3.0 will allow Advanced Lighting to run.   
    mPixelShaderVersion = 3.0;
 
-   mSupportsAnisotropic = mCardProfiler->queryProfile( "GL::suppAnisotropic" );
+	// Set capability extensions.
+   mCapabilities.anisotropicFiltering = mCardProfiler->queryProfile("GL_EXT_texture_filter_anisotropic");
+   mCapabilities.bufferStorage = mCardProfiler->queryProfile("GL_ARB_buffer_storage");
+   mCapabilities.shaderModel5 = mCardProfiler->queryProfile("GL_ARB_gpu_shader5");
+   mCapabilities.textureStorage = mCardProfiler->queryProfile("GL_ARB_texture_storage");
+   mCapabilities.samplerObjects = mCardProfiler->queryProfile("GL_ARB_sampler_objects");
+   mCapabilities.copyImage = mCardProfiler->queryProfile("GL_ARB_copy_image");
+   mCapabilities.vertexAttributeBinding = mCardProfiler->queryProfile("GL_ARB_vertex_attrib_binding");
 
    String vendorStr = (const char*)glGetString( GL_VENDOR );
    if( vendorStr.find("NVIDIA", 0, String::NoCase | String::Left) != String::NPos)
@@ -157,9 +165,6 @@ void GFXGLDevice::initGLState()
       glBindFramebuffer = &_t3d_glBindFramebuffer;
    }
 
-#ifdef TORQUE_NSIGHT_WORKAROUND
-   __GLEW_ARB_buffer_storage = false;
-#endif
 #if TORQUE_DEBUG
    if( gglHasExtension(ARB_debug_output) )
    {
@@ -215,6 +220,9 @@ GFXGLDevice::GFXGLDevice(U32 adapterIndex) :
       mCurrentVB[i] = NULL;
       mCurrentVB_Divisor[i] = 0;
    }
+
+   // Initiailize capabilities to false.
+   memset(&mCapabilities, 0, sizeof(GLCapabilities));
 
    loadGLCore();
 
@@ -325,6 +333,7 @@ void GFXGLDevice::resurrect()
 
 GFXVertexBuffer* GFXGLDevice::findVolatileVBO(U32 numVerts, const GFXVertexFormat *vertexFormat, U32 vertSize)
 {
+   PROFILE_SCOPE(GFXGLDevice_findVBPool);
    for(U32 i = 0; i < mVolatileVBs.size(); i++)
       if (  mVolatileVBs[i]->mNumVerts >= numVerts &&
             mVolatileVBs[i]->mVertexFormat.isEqual( *vertexFormat ) &&
@@ -333,6 +342,7 @@ GFXVertexBuffer* GFXGLDevice::findVolatileVBO(U32 numVerts, const GFXVertexForma
          return mVolatileVBs[i];
 
    // No existing VB, so create one
+   PROFILE_SCOPE(GFXGLDevice_createVBPool);
    StrongRefPtr<GFXGLVertexBuffer> buf(new GFXGLVertexBuffer(GFX, numVerts, vertexFormat, vertSize, GFXBufferTypeVolatile));
    buf->registerResourceWithDevice(this);
    mVolatileVBs.push_back(buf);
@@ -355,23 +365,48 @@ GFXPrimitiveBuffer* GFXGLDevice::findVolatilePBO(U32 numIndices, U32 numPrimitiv
 GFXVertexBuffer *GFXGLDevice::allocVertexBuffer(   U32 numVerts, 
                                                    const GFXVertexFormat *vertexFormat, 
                                                    U32 vertSize, 
-                                                   GFXBufferType bufferType ) 
+                                                   GFXBufferType bufferType,
+                                                   void* data )  
 {
+   PROFILE_SCOPE(GFXGLDevice_allocVertexBuffer);
    if(bufferType == GFXBufferTypeVolatile)
       return findVolatileVBO(numVerts, vertexFormat, vertSize);
          
    GFXGLVertexBuffer* buf = new GFXGLVertexBuffer( GFX, numVerts, vertexFormat, vertSize, bufferType );
-   buf->registerResourceWithDevice(this);
+   buf->registerResourceWithDevice(this);   
+
+   if(data)
+   {
+      void* dest;
+      buf->lock(0, numVerts, &dest);
+      dMemcpy(dest, data, vertSize * numVerts);
+      buf->unlock();
+   }
+
    return buf;
 }
 
-GFXPrimitiveBuffer *GFXGLDevice::allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType ) 
+GFXPrimitiveBuffer *GFXGLDevice::allocPrimitiveBuffer( U32 numIndices, U32 numPrimitives, GFXBufferType bufferType, void* data ) 
 {
+   GFXPrimitiveBuffer* buf;
+   
    if(bufferType == GFXBufferTypeVolatile)
-      return findVolatilePBO(numIndices, numPrimitives);
-         
-   GFXGLPrimitiveBuffer* buf = new GFXGLPrimitiveBuffer(GFX, numIndices, numPrimitives, bufferType);
-   buf->registerResourceWithDevice(this);
+   {
+      buf = findVolatilePBO(numIndices, numPrimitives);
+   }
+   else
+   {
+      buf = new GFXGLPrimitiveBuffer(GFX, numIndices, numPrimitives, bufferType);
+      buf->registerResourceWithDevice(this);
+   }
+   
+   if(data)
+   {
+      void* dest;
+      buf->lock(0, numIndices, &dest);
+      dMemcpy(dest, data, sizeof(U16) * numIndices);
+      buf->unlock();
+   }
    return buf;
 }
 
@@ -489,9 +524,6 @@ inline GLsizei GFXGLDevice::primCountToIndexCount(GFXPrimitiveType primType, U32
       case GFXTriangleStrip :
          return 2 + primitiveCount;
          break;
-      case GFXTriangleFan :
-         return 2 + primitiveCount;
-         break;
       default:
          AssertFatal(false, "GFXGLDevice::primCountToIndexCount - unrecognized prim type");
          break;
@@ -502,6 +534,7 @@ inline GLsizei GFXGLDevice::primCountToIndexCount(GFXPrimitiveType primType, U32
 
 GFXVertexDecl* GFXGLDevice::allocVertexDecl( const GFXVertexFormat *vertexFormat ) 
 {
+   PROFILE_SCOPE(GFXGLDevice_allocVertexDecl);
    typedef Map<void*, GFXGLVertexDecl> GFXGLVertexDeclMap;
    static GFXGLVertexDeclMap declMap;   
    GFXGLVertexDeclMap::Iterator itr = declMap.find( (void*)vertexFormat->getDescription().c_str() ); // description string are interned, safe to use c_str()
@@ -765,7 +798,8 @@ void GFXGLDevice::setupGenericShaders( GenericShaderType type )
       shaderData->registerObject();
       mGenericShader[GSColor] =  shaderData->getShader();
       mGenericShaderBuffer[GSColor] = mGenericShader[GSColor]->allocConstBuffer();
-      mModelViewProjSC[GSColor] = mGenericShader[GSColor]->getShaderConstHandle( "$modelView" ); 
+      mModelViewProjSC[GSColor] = mGenericShader[GSColor]->getShaderConstHandle( "$modelView" );
+      Sim::getRootGroup()->addObject(shaderData);
 
       shaderData = new ShaderData();
       shaderData->setField("OGLVertexShaderFile", "shaders/common/fixedFunction/gl/modColorTextureV.glsl");
@@ -775,7 +809,8 @@ void GFXGLDevice::setupGenericShaders( GenericShaderType type )
       shaderData->registerObject();
       mGenericShader[GSModColorTexture] = shaderData->getShader();
       mGenericShaderBuffer[GSModColorTexture] = mGenericShader[GSModColorTexture]->allocConstBuffer();
-      mModelViewProjSC[GSModColorTexture] = mGenericShader[GSModColorTexture]->getShaderConstHandle( "$modelView" ); 
+      mModelViewProjSC[GSModColorTexture] = mGenericShader[GSModColorTexture]->getShaderConstHandle( "$modelView" );
+      Sim::getRootGroup()->addObject(shaderData);
 
       shaderData = new ShaderData();
       shaderData->setField("OGLVertexShaderFile", "shaders/common/fixedFunction/gl/addColorTextureV.glsl");
@@ -785,7 +820,8 @@ void GFXGLDevice::setupGenericShaders( GenericShaderType type )
       shaderData->registerObject();
       mGenericShader[GSAddColorTexture] = shaderData->getShader();
       mGenericShaderBuffer[GSAddColorTexture] = mGenericShader[GSAddColorTexture]->allocConstBuffer();
-      mModelViewProjSC[GSAddColorTexture] = mGenericShader[GSAddColorTexture]->getShaderConstHandle( "$modelView" ); 
+      mModelViewProjSC[GSAddColorTexture] = mGenericShader[GSAddColorTexture]->getShaderConstHandle( "$modelView" );
+      Sim::getRootGroup()->addObject(shaderData);
 
       shaderData = new ShaderData();
       shaderData->setField("OGLVertexShaderFile", "shaders/common/fixedFunction/gl/textureV.glsl");
@@ -796,6 +832,7 @@ void GFXGLDevice::setupGenericShaders( GenericShaderType type )
       mGenericShader[GSTexture] = shaderData->getShader();
       mGenericShaderBuffer[GSTexture] = mGenericShader[GSTexture]->allocConstBuffer();
       mModelViewProjSC[GSTexture] = mGenericShader[GSTexture]->getShaderConstHandle( "$modelView" );
+      Sim::getRootGroup()->addObject(shaderData);
    }
 
    MatrixF tempMatrix =  mProjectionMatrix * mViewMatrix * mWorldMatrix[mWorldStackSize];  
@@ -830,6 +867,7 @@ void GFXGLDevice::setShader(GFXShader *shader, bool force)
 
 void GFXGLDevice::setShaderConstBufferInternal(GFXShaderConstBuffer* buffer)
 {
+   PROFILE_SCOPE(GFXGLDevice_setShaderConstBufferInternal);
    static_cast<GFXGLShaderConstBuffer*>(buffer)->activate();
 }
 

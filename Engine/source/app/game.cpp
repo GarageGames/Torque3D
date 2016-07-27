@@ -202,6 +202,26 @@ DefineConsoleFunction( getRealTime, S32, (), , "()"
    return Platform::getRealMilliseconds();
 }
 
+ConsoleFunction( getLocalTime, const char *, 1, 1, "Return the current local time as: weekday month day year hour min sec.\n\n"
+                "Local time is platform defined.")
+{
+   Platform::LocalTime lt;
+   Platform::getLocalTime(lt);
+
+   static const U32 bufSize = 128;
+   char *retBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(retBuffer, bufSize, "%d %d %d %d %02d %02d %02d",
+      lt.weekday,
+      lt.month + 1,
+      lt.monthday,
+      lt.year + 1900,
+      lt.hour,
+      lt.min,
+      lt.sec);
+
+   return retBuffer;
+}
+
 ConsoleFunctionGroupEnd(Platform);
 
 //-----------------------------------------------------------------------------

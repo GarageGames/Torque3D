@@ -91,6 +91,9 @@ ConsoleDocClass( TSStatic,
 );
 
 TSStatic::TSStatic()
+:
+   cubeDescId( 0 ),
+   reflectorDesc( NULL )
 {
    mNetFlags.set(Ghostable | ScopeAlways);
 
@@ -185,6 +188,11 @@ void TSStatic::initPersistFields()
          "Enables translucent sorting of the TSStatic by its origin instead of the bounds." );
 
    endGroup("Rendering");
+
+   addGroup( "Reflection" );
+      addField( "cubeReflectorDesc", TypeRealString, Offset( cubeDescName, TSStatic ), 
+         "References a ReflectorDesc datablock that defines performance and quality properties for dynamic reflections.\n");
+   endGroup( "Reflection" );
 
    addGroup("Collision");
 
@@ -292,6 +300,14 @@ bool TSStatic::onAdd()
 
    addToScene();
 
+   if ( isClientObject() )
+   {      
+      mCubeReflector.unregisterReflector();
+
+      if ( reflectorDesc )
+         mCubeReflector.registerReflector( this, reflectorDesc );      
+   }
+
    _updateShouldTick();
 
    // Accumulation
@@ -356,6 +372,16 @@ bool TSStatic::_createShape()
 
    if ( mAmbientThread )
       mShapeInstance->setSequence( mAmbientThread, ambientSeq, 0);
+
+   // Resolve CubeReflectorDesc.
+   if ( cubeDescName.isNotEmpty() )
+   {
+      Sim::findObject( cubeDescName, reflectorDesc );
+   }
+   else if( cubeDescId > 0 )
+   {
+      Sim::findObject( cubeDescId, reflectorDesc );
+   }
 
    return true;
 }
@@ -429,6 +455,8 @@ void TSStatic::onRemove()
    mShapeInstance = NULL;
 
    mAmbientThread = NULL;
+   if ( isClientObject() )
+       mCubeReflector.unregisterReflector();
 
    Parent::onRemove();
 }
@@ -492,10 +520,15 @@ void TSStatic::reSkin()
 
 void TSStatic::processTick( const Move *move )
 {
-   AssertFatal( mPlayAmbient && mAmbientThread, "TSSTatic::adanceTime called with nothing to play." );
-
-   if ( isServerObject() )
+   if ( isServerObject() && mPlayAmbient && mAmbientThread )
       mShapeInstance->advanceTime( TickSec, mAmbientThread );
+
+   if ( isMounted() )
+   {
+      MatrixF mat( true );
+      mMount.object->getMountTransform(mMount.node, mMount.xfm, &mat );
+      setTransform( mat );
+   }
 }
 
 void TSStatic::interpolateTick( F32 delta )
@@ -504,14 +537,20 @@ void TSStatic::interpolateTick( F32 delta )
 
 void TSStatic::advanceTime( F32 dt )
 {
-   AssertFatal( mPlayAmbient && mAmbientThread, "TSSTatic::advanceTime called with nothing to play." );
-   
-   mShapeInstance->advanceTime( dt, mAmbientThread );
+   if ( mPlayAmbient && mAmbientThread )
+      mShapeInstance->advanceTime( dt, mAmbientThread );
+
+   if ( isMounted() )
+   {
+      MatrixF mat( true );
+      mMount.object->getRenderMountTransform( dt, mMount.node, mMount.xfm, &mat );
+      setRenderTransform( mat );
+   }
 }
 
 void TSStatic::_updateShouldTick()
 {
-   bool shouldTick = mPlayAmbient && mAmbientThread;
+   bool shouldTick = (mPlayAmbient && mAmbientThread) || isMounted();
 
    if ( isTicking() != shouldTick )
       setProcessTick( shouldTick );
@@ -561,6 +600,12 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
 
    F32 invScale = (1.0f/getMax(getMax(mObjScale.x,mObjScale.y),mObjScale.z));   
 
+   // If we're currently rendering our own reflection we
+   // don't want to render ourselves into it.
+   if ( mCubeReflector.isRendering() )
+      return;
+
+
    if ( mForceDetail == -1 )
       mShapeInstance->setDetailFromDistance( state, dist * invScale );
    else
@@ -576,6 +621,9 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    rdata.setSceneState( state );
    rdata.setFadeOverride( 1.0f );
    rdata.setOriginSort( mUseOriginSort );
+
+   if ( mCubeReflector.isEnabled() )
+      rdata.setCubemap( mCubeReflector.getCubemap() );
 
    // Acculumation
    rdata.setAccuTex(mAccuTex);
@@ -603,6 +651,20 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    MatrixF mat = getRenderTransform();
    mat.scale( mObjScale );
    GFX->setWorldMatrix( mat );
+
+   if ( state->isDiffusePass() && mCubeReflector.isEnabled() && mCubeReflector.getOcclusionQuery() )
+   {
+       RenderPassManager *pass = state->getRenderPass();
+       OccluderRenderInst *ri = pass->allocInst<OccluderRenderInst>();  
+       
+       ri->type = RenderPassManager::RIT_Occluder;
+       ri->query = mCubeReflector.getOcclusionQuery();
+       mObjToWorld.mulP( mObjBox.getCenter(), &ri->position );
+       ri->scale.set( mObjBox.getExtents() );
+       ri->orientation = pass->allocUniqueXform( mObjToWorld ); 
+       ri->isSphere = false;
+       state->getRenderPass()->addInst( ri );
+   }
 
    mShapeInstance->animate();
    if(mShapeInstance)
@@ -657,12 +719,15 @@ void TSStatic::onScaleChanged()
       else
          _updatePhysics();
    }
+
+   setMaskBits( ScaleMask );
 }
 
 void TSStatic::setTransform(const MatrixF & mat)
 {
    Parent::setTransform(mat);
-   setMaskBits( TransformMask );
+   if ( !isMounted() )
+      setMaskBits( TransformMask );
 
    if ( mPhysicsRep )
       mPhysicsRep->setTransform( mat );
@@ -683,9 +748,15 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 {
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
-   mathWrite( *stream, getTransform() );
-   mathWrite( *stream, getScale() );
-   stream->writeString( mShapeName );
+   if ( stream->writeFlag( mask & TransformMask ) )  
+      mathWrite( *stream, getTransform() );
+
+   if ( stream->writeFlag( mask & ScaleMask ) )  
+   {
+      // Only write one bit if the scale is one.
+      if ( stream->writeFlag( mObjScale != Point3F::One ) )
+         mathWrite( *stream, mObjScale );   
+   }
 
    if ( stream->writeFlag( mask & UpdateCollisionMask ) )
       stream->write( (U32)mCollisionType );
@@ -693,17 +764,21 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if ( stream->writeFlag( mask & SkinMask ) )
       con->packNetStringHandleU( stream, mSkinNameHandle );
 
-   stream->write( (U32)mDecalType );
+   if (stream->writeFlag(mask & AdvancedStaticOptionsMask))
+   {
+      stream->writeString(mShapeName);
+      stream->write((U32)mDecalType);
 
-   stream->writeFlag( mAllowPlayerStep );
-   stream->writeFlag( mMeshCulling );
-   stream->writeFlag( mUseOriginSort );
+      stream->writeFlag(mAllowPlayerStep);
+      stream->writeFlag(mMeshCulling);
+      stream->writeFlag(mUseOriginSort);
 
-   stream->write( mRenderNormalScalar );
+      stream->write(mRenderNormalScalar);
 
-   stream->write( mForceDetail );
+      stream->write(mForceDetail);
 
-   stream->writeFlag( mPlayAmbient );
+      stream->writeFlag(mPlayAmbient);
+   }
 
    if ( stream->writeFlag(mUseAlphaFade) )  
    {  
@@ -715,6 +790,10 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if ( mLightPlugin )
       retMask |= mLightPlugin->packUpdate(this, AdvancedStaticOptionsMask, con, mask, stream);
 
+   if( stream->writeFlag( reflectorDesc != NULL ) )
+   {
+      stream->writeRangedU32( reflectorDesc->getId(), DataBlockObjectIdFirst,  DataBlockObjectIdLast );
+   }
    return retMask;
 }
 
@@ -722,14 +801,25 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
 {
    Parent::unpackUpdate(con, stream);
 
-   MatrixF mat;
-   Point3F scale;
-   mathRead( *stream, &mat );
-   mathRead( *stream, &scale );
-   setScale( scale);
-   setTransform(mat);
+   if ( stream->readFlag() ) // TransformMask
+   {
+      MatrixF mat;
+      mathRead( *stream, &mat );
+      setTransform(mat);
+      setRenderTransform(mat);
+   }
 
-   mShapeName = stream->readSTString();
+   if ( stream->readFlag() ) // ScaleMask
+   {
+      if ( stream->readFlag() )
+      {
+         VectorF scale;
+         mathRead( *stream, &scale );
+         setScale( scale );
+      }
+      else
+         setScale( Point3F::One );
+   }
 
    if ( stream->readFlag() ) // UpdateCollisionMask
    {
@@ -757,17 +847,21 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
       }
    }
 
-   stream->read( (U32*)&mDecalType );
+   if (stream->readFlag()) // AdvancedStaticOptionsMask
+   {
+      mShapeName = stream->readSTString();
 
-   mAllowPlayerStep = stream->readFlag();
-   mMeshCulling = stream->readFlag();   
-   mUseOriginSort = stream->readFlag();
+      stream->read((U32*)&mDecalType);
 
-   stream->read( &mRenderNormalScalar );
+      mAllowPlayerStep = stream->readFlag();
+      mMeshCulling = stream->readFlag();
+      mUseOriginSort = stream->readFlag();
 
-   stream->read( &mForceDetail );
+      stream->read(&mRenderNormalScalar);
 
-   mPlayAmbient = stream->readFlag();
+      stream->read(&mForceDetail);
+      mPlayAmbient = stream->readFlag();
+   }
 
    mUseAlphaFade = stream->readFlag();  
    if (mUseAlphaFade)
@@ -780,6 +874,11 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
    if ( mLightPlugin )
    {
       mLightPlugin->unpackUpdate(this, con, stream);
+   }
+
+   if( stream->readFlag() )
+   {
+      cubeDescId = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
    }
 
    if ( isProperlyAdded() )
@@ -1098,6 +1197,19 @@ void TSStaticPolysoupConvex::getFeatures(const MatrixF& mat,const VectorF& n, Co
    cf->mFaceList.last().vertex[2] = firstVert+3;
 
    // All done!
+}
+
+void TSStatic::onMount( SceneObject *obj, S32 node )
+{
+   Parent::onMount(obj, node);
+   _updateShouldTick();
+}
+
+void TSStatic::onUnmount( SceneObject *obj, S32 node )
+{
+   Parent::onUnmount( obj, node );
+   setMaskBits( TransformMask );
+   _updateShouldTick();
 }
 
 //------------------------------------------------------------------------

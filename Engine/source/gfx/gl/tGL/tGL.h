@@ -22,9 +22,12 @@
 
 #ifndef T_GL_H
 #define T_GL_H
-#include "GL/glew.h"
 
-#define gglHasExtension(EXTENSION) GLEW_##EXTENSION
+#include <epoxy/gl.h>
+
+// JTH: This is slow, we should probably check extensions once and cache them
+// directly inside of some compatability table.
+#define gglHasExtension(EXTENSION) epoxy_has_gl_extension("GL_" #EXTENSION)
 
 #endif
 

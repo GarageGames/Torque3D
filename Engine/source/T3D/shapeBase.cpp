@@ -879,6 +879,7 @@ IMPLEMENT_CALLBACK( ShapeBase, validateCameraFov, F32, (F32 fov), (fov),
 ShapeBase::ShapeBase()
  : mDataBlock( NULL ),
    mIsAiControlled( false ),
+   mAiPose( 0 ),
    mControllingObject( NULL ),
    mMoveMotion( false ),
    mShapeBaseMount( NULL ),
@@ -1324,6 +1325,12 @@ void ShapeBase::processTick(const Move* move)
       if (mWhiteOut <= 0.0)
          mWhiteOut = 0.0;
    }
+
+   if (isMounted()) {
+      MatrixF mat;
+      mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
+      Parent::setTransform(mat);
+   }
 }
 
 void ShapeBase::advanceTime(F32 dt)
@@ -1381,6 +1388,12 @@ void ShapeBase::advanceTime(F32 dt)
          if(mFadeOut)
             mFadeVal = 1 - mFadeVal;
       }
+   }
+
+   if (isMounted()) {
+      MatrixF mat;
+      mMount.object->getRenderMountTransform( 0.0f, mMount.node, mMount.xfm, &mat );
+      Parent::setRenderTransform(mat);
    }
 }
 
@@ -4922,17 +4935,18 @@ DefineEngineMethod( ShapeBase, getTargetCount, S32, (),,
    
    "@see getTargetName()\n")
 {
-	ShapeBase *obj = dynamic_cast< ShapeBase* > ( object );
-	if(obj)
-	{
-		// Try to use the client object (so we get the reskinned targets in the Material Editor)
-		if ((ShapeBase*)obj->getClientObject())
-			obj = (ShapeBase*)obj->getClientObject();
+   ShapeBase *obj = dynamic_cast< ShapeBase* > ( object );
+   if(obj)
+   {
+      // Try to use the client object (so we get the reskinned targets in the Material Editor)
+      if ((ShapeBase*)obj->getClientObject())
+         obj = (ShapeBase*)obj->getClientObject();
 
-		return obj->getShapeInstance()->getTargetCount();
+      if (obj->getShapeInstance() != NULL)
+         return obj->getShapeInstance()->getTargetCount();
 	}
-
-	return -1;
+   
+   return -1;
 }
 
 DefineEngineMethod( ShapeBase, changeMaterial, void, ( const char* mapTo, Material* oldMat, Material* newMat ),,

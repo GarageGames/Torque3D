@@ -426,7 +426,7 @@ void fxFoliageReplicator::CreateFoliage(void)
    Point3F	MaxPoint(  0.5,  0.5,  0.5 );
 
    // Check Host.
-   AssertFatal(isClientObject(), "Trying to create Foliage on Server, this is bad!")
+   AssertFatal(isClientObject(), "Trying to create Foliage on Server, this is bad!");
 
       // Cannot continue without Foliage Texture!
       if (dStrlen(mFieldData.mFoliageFile) == 0) 
@@ -1134,7 +1134,7 @@ void fxFoliageReplicator::ProcessQuadrant(fxFoliageQuadrantNode* pParentNode, fx
 void fxFoliageReplicator::SyncFoliageReplicators(void)
 {
    // Check Host.
-   AssertFatal(isServerObject(), "We *MUST* be on server when Synchronising Foliage!")
+   AssertFatal(isServerObject(), "We *MUST* be on server when Synchronising Foliage!");
 
       // Find the Replicator Set.
    SimSet *fxFoliageSet = dynamic_cast<SimSet*>(Sim::findObject("fxFoliageSet"));
@@ -1196,7 +1196,7 @@ void fxFoliageReplicator::DestroyFoliageItems()
 void fxFoliageReplicator::DestroyFoliage(void)
 {
    // Check Host.
-   AssertFatal(isClientObject(), "Trying to destroy Foliage on Server, this is bad!")
+   AssertFatal(isClientObject(), "Trying to destroy Foliage on Server, this is bad!");
 
       // Destroy Quad-tree.
       mPotentialFoliageNodes = 0;

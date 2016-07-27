@@ -74,6 +74,8 @@ DefineConsoleType( TypeCommand, String )
 DefineConsoleType( TypeFilename, const char * )
 DefineConsoleType( TypeStringFilename, String )
 
+DefineConsoleType(TypeRotationF, RotationF)
+
 /// A universally unique identifier.
 DefineConsoleType( TypeUUID, Torque::UUID )
 
@@ -122,6 +124,8 @@ DefineConsoleType( TypeColorI, ColorI )
 DefineConsoleType( TypeColorF, ColorF )
 DefineConsoleType( TypeSimObjectName, SimObject* )
 DefineConsoleType( TypeShader, GFXShader * )
+
+DefineConsoleType(TypeSimObjectPtr, SimObject*)
 
 /// A persistent reference to an object.  This reference indirectly goes
 /// through the referenced object's persistent ID.

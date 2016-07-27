@@ -73,100 +73,380 @@ new GuiControlProfile (NetGraphPacketLossProfile)
 };
 
 //--- OBJECT WRITE BEGIN ---
-new GuiControl(NetGraphGui) {
-   profile = "NetGraphProfile";
+%guiContent = new GuiControl(NetGraphGui) {
+   position = "0 0";
+   extent = "1024 768";
+   minExtent = "8 2";
    horizSizing = "left";
    vertSizing = "bottom";
-   position = "0 0";
-   extent = "640 480";
-   minExtent = "8 2";
+   profile = "NetGraphProfile";
    visible = "1";
-   noCursor = "1";
-   
+   active = "1";
+   tooltipProfile = "GuiToolTipProfile";
+   hovertime = "1000";
+   isContainer = "1";
+   canSave = "1";
+   canSaveDynamicFields = "1";
+      noCursor = "1";
+
    new GuiGraphCtrl(NetGraph) {
-      profile = "NetGraphKeyContainerProfile";
-      horizSizing = "left";
-      vertSizing = "bottom";
-      position = "432 5";
+      centerY = "1";
+      plotColor[0] = "1 1 1 1";
+      plotColor[1] = "1 0 0 1";
+      plotColor[2] = "0 1 0 1";
+      plotColor[3] = "0 0 1 1";
+      plotColor[4] = "0 1 1 1";
+      plotColor[5] = "0 0 0 1";
+      plotType[0] = "PolyLine";
+      plotType[1] = "PolyLine";
+      plotType[2] = "PolyLine";
+      plotType[3] = "PolyLine";
+      plotType[4] = "PolyLine";
+      plotType[5] = "PolyLine";
+      plotInterval[0] = "0";
+      plotInterval[1] = "0";
+      plotInterval[2] = "0";
+      plotInterval[3] = "0";
+      plotInterval[4] = "0";
+      plotInterval[5] = "0";
+      position = "816 5";
       extent = "200 200";
       minExtent = "8 2";
-      visible = "1";
-   };
-   
-   new GuiControl() {
-      profile = "NetGraphKeyContainerProfile";
       horizSizing = "left";
       vertSizing = "bottom";
-      position = "432 205";
-      extent = "200 52";
-      minExtent = "8 2";
+      profile = "NetGraphKeyContainerProfile";
       visible = "1";
+      active = "1";
+      tooltipProfile = "GuiToolTipProfile";
+      hovertime = "1000";
+      isContainer = "0";
+      canSave = "1";
+      canSaveDynamicFields = "0";
+   };
+   new GuiControl() {
+      position = "816 205";
+      extent = "200 104";
+      minExtent = "8 2";
+      horizSizing = "left";
+      vertSizing = "bottom";
+      profile = "NetGraphKeyContainerProfile";
+      visible = "1";
+      active = "1";
+      tooltipProfile = "GuiToolTipProfile";
+      hovertime = "1000";
+      isContainer = "1";
+      canSave = "1";
+      canSaveDynamicFields = "0";
 
       new GuiTextCtrl(GhostsActive) {
-         profile = "NetGraphGhostsActiveProfile";
-         horizSizing = "left";
-         vertSizing = "bottom";
+         text = "Ghosts Active";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
          position = "0 0";
          extent = "100 18";
          minExtent = "8 2";
-         visible = "1";
-         text = "Ghosts Active";
-         maxLength = "255";
-      };
-      new GuiTextCtrl(GhostUpdates) {
-         profile = "NetGraphGhostUpdatesProfile";
          horizSizing = "left";
          vertSizing = "bottom";
+         profile = "NetGraphGhostsActiveProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl(GhostUpdates) {
+         text = "Ghost Updates";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
          position = "100 0";
          extent = "100 18";
          minExtent = "8 2";
+         horizSizing = "left";
+         vertSizing = "bottom";
+         profile = "NetGraphGhostUpdatesProfile";
          visible = "1";
-         text = "Ghost Updates";
-         maxLength = "255";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
       };
       new GuiTextCtrl(BitsSent) {
-         profile = "NetGraphBitsSentProfile";
-         horizSizing = "left";
-         vertSizing = "bottom";
-         position = "0 18 ";
-         extent = "100 18";
-         minExtent = "8 2";
-         visible = "1";
          text = "Bytes Sent";
          maxLength = "255";
-      };
-      new GuiTextCtrl(BitsReceived) {
-         profile = "NetGraphBitsReceivedProfile";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "0 18";
+         extent = "100 18";
+         minExtent = "8 2";
          horizSizing = "left";
          vertSizing = "bottom";
+         profile = "NetGraphBitsSentProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl(BitsReceived) {
+         text = "Bytes Received";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
          position = "100 18";
          extent = "100 18";
          minExtent = "8 2";
-         visible = "1";
-         text = "Bytes Received";
-         maxLength = "255";
-      };
-      new GuiTextCtrl(Latency) {
-         profile = "NetGraphLatencyProfile";
          horizSizing = "left";
          vertSizing = "bottom";
+         profile = "NetGraphBitsReceivedProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl(Latency) {
+         text = "Latency";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
          position = "0 36";
          extent = "100 18";
          minExtent = "8 2";
-         visible = "1";
-         text = "Latency";
-         maxLength = "255";
-      };
-      new GuiTextCtrl(PacketLoss) {
-         profile = "NetGraphPacketLossProfile";
          horizSizing = "left";
          vertSizing = "bottom";
+         profile = "NetGraphLatencyProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl(PacketLoss) {
+         text = "Packet Loss";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
          position = "100 36";
          extent = "59 18";
          minExtent = "8 2";
+         horizSizing = "left";
+         vertSizing = "bottom";
+         profile = "NetGraphPacketLossProfile";
          visible = "1";
-         text = "Packet Loss";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl() {
+         text = "Network Simulation:";
          maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "0 52";
+         extent = "97 18";
+         minExtent = "8 2";
+         horizSizing = "left";
+         vertSizing = "bottom";
+         profile = "NetGraphPacketLossProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl() {
+         text = "Simulated Latency:";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "0 68";
+         extent = "91 18";
+         minExtent = "8 2";
+         horizSizing = "left";
+         vertSizing = "bottom";
+         profile = "NetGraphPacketLossProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl() {
+         text = "ms";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "179 68";
+         extent = "20 18";
+         minExtent = "8 2";
+         horizSizing = "left";
+         vertSizing = "bottom";
+         profile = "NetGraphPacketLossProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextEditCtrl(NetGraphSimLatency) {
+         historySize = "0";
+         tabComplete = "0";
+         sinkAllKeyEvents = "0";
+         password = "0";
+         passwordMask = "*";
+         text = "0";
+         maxLength = "1024";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "112 67";
+         extent = "64 18";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "GuiTextEditProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl() {
+         text = "Simulated Packet Loss:";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "0 83";
+         extent = "111 18";
+         minExtent = "8 2";
+         horizSizing = "left";
+         vertSizing = "bottom";
+         profile = "NetGraphPacketLossProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl() {
+         text = "%";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "179 84";
+         extent = "20 18";
+         minExtent = "8 2";
+         horizSizing = "left";
+         vertSizing = "bottom";
+         profile = "NetGraphPacketLossProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextEditCtrl(NetGraphSimPacket) {
+         historySize = "0";
+         tabComplete = "0";
+         sinkAllKeyEvents = "0";
+         password = "0";
+         passwordMask = "*";
+         text = "0";
+         maxLength = "1024";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "112 85";
+         extent = "64 18";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "GuiTextEditProfile";
+         visible = "1";
+         active = "1";
+         command = "if(NetGraphSimLatency.text $= \"\" || NetGraphSimLatency.text  < 0)\n{\n   NetGraphSimLatency.text = 0;\n}\n\nif(NetGraphSimPacket.text $= \"\" || NetGraphSimPacket.text  < 0)\n{\n   NetGraphSimLatency.text = 0;\n}\nelse if(NetGraphSimPacket.text > 100)\n{\n   NetGraphSimPacket.text = 100;\n}\n\nnetSimulateLag( NetGraphSimLatency.text, NetGraphSimPacket.text );";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "1";
+         canSave = "1";
+         canSaveDynamicFields = "0";
       };
    };
 };
@@ -186,7 +466,10 @@ function toggleNetGraph()
         Canvas.add(NetGraphGui);
     }
     else
+    {
       Canvas.remove(NetGraphGui);
+      netSimulateLag( 0, 0 ); 
+    }
 }
 
 function NetGraph::updateStats()
@@ -235,4 +518,40 @@ function NetGraph::toggleKey()
     Latency.visible = 0;
     PacketLoss.visible = 0;
   }
+}
+
+function NetGraphSimLatency::onReturn(%this)
+{
+   NetGraph.updateNetworkSimulation();
+}
+
+function NetGraphSimPacket::onReturn(%this)
+{
+   NetGraph.updateNetworkSimulation();
+}
+
+function NetGraph::updateNetworkSimulation(%this)
+{
+   %latency = NetGraphSimLatency.getText();
+   
+   if(%latency $= "" || %latency  < 0)
+   {
+      NetGraphSimLatency.text = 0;
+      %latency = 0;
+   }
+   
+   %packetLoss = NetGraphSimPacket.getText();
+   
+   if(%packetLoss $= "" || %packetLoss  < 0)
+   {
+      NetGraphSimLatency.text = 0;
+      %packetLoss = 0;
+   }
+   else if(%packetLoss > 100)
+   {
+      NetGraphSimPacket.text = 100;
+      %packetLoss = 100;
+   }
+   
+   netSimulateLag( %latency, %packetLoss );
 }

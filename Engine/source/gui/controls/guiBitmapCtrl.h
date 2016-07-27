@@ -44,6 +44,7 @@ class GuiBitmapCtrl : public GuiControl
       GFXTexHandle mTextureObject;
       
       Point2I mStartPoint;
+      ColorI   mColor;
       
       /// If true, bitmap tiles inside control.  Otherwise stretches.
       bool mWrap;

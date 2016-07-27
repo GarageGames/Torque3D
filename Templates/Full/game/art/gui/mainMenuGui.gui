@@ -16,7 +16,7 @@
    isContainer = "1";
    canSave = "1";
    canSaveDynamicFields = "1";
-      enabled = "1";
+      Enabled = "1";
       isDecoy = "0";
 
    new GuiBitmapCtrl(MainMenuAppLogo) {
@@ -35,7 +35,7 @@
       isContainer = "0";
       canSave = "1";
       canSaveDynamicFields = "1";
-         enabled = "1";
+         Enabled = "1";
          isDecoy = "0";
    };
    new GuiControl() {
@@ -59,7 +59,7 @@
          buttonType = "PushButton";
          useMouseEvents = "1";
          position = "9 18";
-         extent = "289 75";
+         extent = "219 75";
          minExtent = "8 8";
          horizSizing = "relative";
          vertSizing = "bottom";
@@ -175,6 +175,26 @@
          hovertime = "1000";
          isContainer = "0";
          internalName = "ExitButton";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiButtonCtrl() {
+         text = "Replay";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         useMouseEvents = "0";
+         position = "215 18";
+         extent = "83 75";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "GuiMenuButtonProfile";
+         visible = "1";
+         active = "1";
+         command = "Canvas.pushDialog(RecordingsDlg);";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
          canSave = "1";
          canSaveDynamicFields = "0";
       };

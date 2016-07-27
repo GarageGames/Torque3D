@@ -73,6 +73,7 @@ function initializeCore()
    exec("~/art/gui/console.gui");
    exec("~/art/gui/consoleVarDlg.gui");
    exec("~/art/gui/netGraphGui.gui");
+   exec("~/art/gui/RecordingsDlg.gui");
    
    // Gui Helper Scripts.
    exec("~/scripts/gui/help.cs");

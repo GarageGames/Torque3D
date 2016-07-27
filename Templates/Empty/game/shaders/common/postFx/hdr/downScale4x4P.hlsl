@@ -29,23 +29,24 @@
 //-----------------------------------------------------------------------------
 struct VertIn
 {
-	float4 hpos : POSITION;
+	float4 hpos : TORQUE_POSITION;
 	float4 texCoords[8] : TEXCOORD0;
 };
+
+TORQUE_UNIFORM_SAMPLER2D(inputTex, 0);
  
 //-----------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------
-float4 main(  VertIn IN,
-              uniform sampler2D inputTex : register(S0) ) : COLOR
+float4 main(  VertIn IN) : TORQUE_TARGET0
 {
    // We calculate the texture coords
    // in the vertex shader as an optimization.
    float4 sample = 0.0f;
    for ( int i = 0; i < 8; i++ )
    {
-      sample += tex2D( inputTex, IN.texCoords[i].xy );
-      sample += tex2D( inputTex, IN.texCoords[i].zw );
+      sample += TORQUE_TEX2D( inputTex, IN.texCoords[i].xy );
+      sample += TORQUE_TEX2D( inputTex, IN.texCoords[i].zw );
    }
    
 	return sample / 16;

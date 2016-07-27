@@ -25,7 +25,7 @@
 
 struct VertToPix
 {
-   float4 hpos       : POSITION;
+   float4 hpos       : TORQUE_POSITION;
    float2 uv0        : TEXCOORD0;
 };
 
@@ -35,7 +35,7 @@ VertToPix main( PFXVert IN )
 {
    VertToPix OUT;
    
-   OUT.hpos = IN.pos;
+   OUT.hpos = float4(IN.pos,1);
    OUT.uv0 = viewportCoordToRenderTarget( IN.uv, rtParams0 ); 
    
    return OUT;

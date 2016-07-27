@@ -162,6 +162,9 @@ Material::Material()
 
       mSeqFramePerSec[i] = 0.0f;
       mSeqSegSize[i] = 0.0f;
+
+      // Deferred Shading
+      mMatInfoFlags[i] = 0.0f;
    }
 
    dMemset(mCellIndex, 0, sizeof(mCellIndex));
@@ -169,6 +172,9 @@ Material::Material()
    dMemset(mCellSize, 0, sizeof(mCellSize));
    dMemset(mNormalMapAtlas, 0, sizeof(mNormalMapAtlas));
    dMemset(mUseAnisotropic, 0, sizeof(mUseAnisotropic));
+
+   // Deferred Shading : Metalness
+   dMemset(mUseMetalness, 0, sizeof(mUseMetalness));
 
    mImposterLimits = Point4F::Zero;
 
@@ -182,6 +188,7 @@ Material::Material()
    mAlphaRef = 1;
 
    mCastShadows = true;
+   mCastDynamicShadows = false;
 
    mPlanarReflection = false;
 
@@ -288,10 +295,7 @@ void Material::initPersistFields()
       
       addField( "useAnisotropic", TypeBool, Offset(mUseAnisotropic, Material), MAX_STAGES,
          "Use anisotropic filtering for the textures of this stage." );
-
-      addField("envMap", TypeImageFilename, Offset(mEnvMapFilename, Material), MAX_STAGES,
-         "The name of an environment map cube map to apply to this material." );
-
+     
       addField("vertLit", TypeBool, Offset(mVertLit, Material), MAX_STAGES,
          "If true the vertex color is used for lighting." );
 
@@ -378,9 +382,6 @@ void Material::initPersistFields()
       addProtectedField("bumpTex",        TypeImageFilename,   Offset(mNormalMapFilename, Material),
          defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
          "For backwards compatibility.\n@see normalMap\n"); 
-      addProtectedField("envTex",         TypeImageFilename,   Offset(mEnvMapFilename, Material),
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
-         "For backwards compatibility.\n@see envMap\n"); 
       addProtectedField("colorMultiply",  TypeColorF,          Offset(mDiffuse, Material),
          defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
          "For backwards compatibility.\n@see diffuseColor\n"); 
@@ -389,6 +390,9 @@ void Material::initPersistFields()
 
    addField( "castShadows", TypeBool, Offset(mCastShadows, Material),
       "If set to false the lighting system will not cast shadows from this material." );
+
+   addField( "castDynamicShadows", TypeBool, Offset(mCastDynamicShadows, Material),
+      "If set to false the lighting system will not cast dynamic shadows from this material." );
 
    addField("planarReflection", TypeBool, Offset(mPlanarReflection, Material), "@internal" );
 

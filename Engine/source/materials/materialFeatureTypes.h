@@ -94,6 +94,7 @@ DeclareFeatureType( MFT_OverlayMap );
 DeclareFeatureType( MFT_DetailMap );
 DeclareFeatureType( MFT_DiffuseColor );
 DeclareFeatureType( MFT_DetailNormalMap );
+DeclareFeatureType( MFT_Imposter );
 
 DeclareFeatureType( MFT_AccuMap );
 DeclareFeatureType( MFT_AccuScale );
@@ -120,7 +121,6 @@ DeclareFeatureType( MFT_ToneMap );
 DeclareFeatureType( MFT_VertLit );
 DeclareFeatureType( MFT_VertLitTone );
 
-DeclareFeatureType( MFT_EnvMap );
 DeclareFeatureType( MFT_CubeMap );
 DeclareFeatureType( MFT_PixSpecular );
 DeclareFeatureType( MFT_SpecularMap );
@@ -157,8 +157,10 @@ DeclareFeatureType( MFT_InterlacedPrePass );
 /// to the second render-target
 DeclareFeatureType( MFT_LightbufferMRT );
 
-/// This feature outputs black to RenderTarget1
+/// This feature outputs black to RenderTarget3
 DeclareFeatureType( MFT_RenderTarget1_Zero );
+DeclareFeatureType( MFT_RenderTarget2_Zero );
+DeclareFeatureType( MFT_RenderTarget3_Zero );
 
 DeclareFeatureType( MFT_Foliage );
 
@@ -178,4 +180,11 @@ DeclareFeatureType( MFT_ForwardShading );
 DeclareFeatureType( MFT_ImposterVert );
 
 
+// Deferred Shading
+DeclareFeatureType( MFT_isDeferred );
+DeclareFeatureType( MFT_SkyBox );
+DeclareFeatureType( MFT_DeferredSpecMap );
+DeclareFeatureType( MFT_DeferredSpecVars );
+DeclareFeatureType( MFT_DeferredMatInfoFlags );
+DeclareFeatureType( MFT_DeferredEmptySpec );
 #endif // _MATERIALFEATURETYPES_H_

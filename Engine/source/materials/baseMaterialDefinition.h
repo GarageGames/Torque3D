@@ -37,6 +37,7 @@ public:
    virtual bool isDoubleSided() const = 0;
    virtual bool isLightmapped() const = 0;
    virtual bool castsShadows() const = 0;
+   virtual bool castsDynamicShadows() const = 0;
 };
 
 #endif // _BASEMATERIALDEFINITION_H_

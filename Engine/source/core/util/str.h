@@ -191,6 +191,7 @@ public:
    static String ToUpper(const String &string);
 
    static String GetTrailingNumber(const char* str, S32& number);
+   static String GetFirstNumber(const char* str, U32& startPos, U32& endPos);
 
    /// @}
 

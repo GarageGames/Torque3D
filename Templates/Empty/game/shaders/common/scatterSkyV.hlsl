@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "shaderModel.hlsl"
 
 // The scale equation calculated by Vernier's Graphical Analysis
 float vernierScale(float fCos)
@@ -38,17 +39,13 @@ float vernierScale(float fCos)
 struct Vert
 {
    // .xyz  = point
-   float4 position : POSITION;
-   
-   float3 normal   : NORMAL;
-   
-   float4 color : TEXCOORD0;  
+   float3 position : POSITION; 
 };
 
 // This is the shader output data.
 struct Conn
 {
-   float4 position : POSITION;
+   float4 position : TORQUE_POSITION;
    float4 rayleighColor : TEXCOORD0;
    float4 mieColor : TEXCOORD1;
    float3 v3Direction : TEXCOORD2;
@@ -61,17 +58,16 @@ float3 desaturate(const float3 color, const float desaturation)
    return lerp(color, dot(gray_conv , color), desaturation);  
 }  
   
-uniform float4 colorize;  
+uniform float4x4 modelView;
+uniform float4 misc;
+uniform float4 sphereRadii;
+uniform float4 scatteringCoeffs;
+uniform float4 colorize;
+uniform float3 camPos;
+uniform float3 lightDir;
+uniform float4 invWaveLength;
 
-Conn main(  Vert In,
-            uniform float4x4 modelView          : register(C0),
-            uniform float4 misc                 : register(C4),
-            uniform float4 sphereRadii          : register(C5),
-            uniform float4 scatteringCoeffs     : register(C6),
-            uniform float3 camPos               : register(C7),
-            uniform float3 lightDir             : register(C8),
-            uniform float4 invWaveLength        : register(C9)
-            )	         
+Conn main(  Vert In  )	         
 {
    // Pull some variables out:
    float camHeight = misc.x;
@@ -95,7 +91,7 @@ Conn main(  Vert In,
    // Get the ray from the camera to the vertex, 
    // and its length (which is the far point of the ray 
    // passing through the atmosphere).
-   float4 v3Pos = In.position / 6378000.0; // outerRadius;
+   float4 v3Pos = float4(In.position,1.0) / 6378000.0; // outerRadius;
    float3 newCamPos = float3( 0, 0, camHeight );
    v3Pos.z += innerRadius;
    float3 v3Ray = v3Pos.xyz - newCamPos;
@@ -139,13 +135,13 @@ Conn main(  Vert In,
 
    // Finally, scale the Mie and Rayleigh colors 
    // and set up the varying variables for the pixel shader.
-   Out.position = mul( modelView, In.position );
+   Out.position = mul( modelView, float4(In.position,1.0) );
    Out.mieColor.rgb = v3FrontColor * mieBrightness;
    Out.mieColor.a = 1.0f;
    Out.rayleighColor.rgb = v3FrontColor * (invWaveLength.xyz * rayleighBrightness);
    Out.rayleighColor.a = 1.0f;
    Out.v3Direction = newCamPos - v3Pos.xyz;
-   Out.pos = In.position.xyz;
+   Out.pos = In.position;
 
 #ifdef USE_COLORIZE  
   
@@ -159,4 +155,3 @@ Conn main(  Vert In,
 
    return Out;
 }
-

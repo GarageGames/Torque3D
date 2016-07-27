@@ -65,6 +65,14 @@
 #include "platform/platformVFS.h"
 #endif
 
+#ifndef _MODULE_MANAGER_H
+#include "module/moduleManager.h"
+#endif
+
+#ifndef _ASSET_MANAGER_H_
+#include "assets/assetManager.h"
+#endif
+
 DITTS( F32, gTimeScale, 1.0 );
 DITTS( U32, gTimeAdvance, 0 );
 DITTS( U32, gFrameSkip, 0 );
@@ -257,7 +265,7 @@ void StandardMainLoop::init()
 
    // Initialize modules.
    
-   ModuleManager::initializeSystem();
+   EngineModuleManager::initializeSystem();
          
    // Initialise ITickable.
 #ifdef TORQUE_TGB_ONLY
@@ -288,6 +296,15 @@ void StandardMainLoop::init()
 	Con::addVariable("MiniDump::Params", TypeString, &gMiniDumpParams);
 	Con::addVariable("MiniDump::ExecDir", TypeString, &gMiniDumpExecDir);
 #endif
+
+   // Register the module manager.
+   ModuleDatabase.registerObject("ModuleDatabase");
+
+   // Register the asset database.
+   AssetDatabase.registerObject("AssetDatabase");
+
+   // Register the asset database as a module listener.
+   ModuleDatabase.addListener(&AssetDatabase);
    
    ActionMap* globalMap = new ActionMap;
    globalMap->registerObject("GlobalActionMap");
@@ -317,10 +334,16 @@ void StandardMainLoop::shutdown()
 
    delete tm;
    preShutdown();
+
+   // Unregister the module database.
+   ModuleDatabase.unregisterObject();
+
+   // Unregister the asset database.
+   AssetDatabase.unregisterObject();
    
    // Shut down modules.
    
-   ModuleManager::shutdownSystem();
+   EngineModuleManager::shutdownSystem();
    
    ThreadPool::GlobalThreadPool::deleteSingleton();
 

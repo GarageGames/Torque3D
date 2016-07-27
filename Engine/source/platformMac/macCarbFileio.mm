@@ -724,6 +724,11 @@ bool Platform::hasSubDirectory(const char *path)
    return false; // either this dir had no subdirectories, or they were all on the exclude list.
 }
 
+ bool Platform::fileDelete(const char * name)
+ {
+   return dFileDelete(name);
+ }
+
 //-----------------------------------------------------------------------------
 bool recurseDumpDirectories(const char *basePath, const char *path, Vector<StringTableEntry> &directoryVector, S32 depth, bool noBasePath)
 {

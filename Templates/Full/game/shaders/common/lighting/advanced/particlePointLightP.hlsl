@@ -20,35 +20,36 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"
-
 #include "farFrustumQuad.hlsl"
 #include "lightingUtils.hlsl"
 #include "../../lighting.hlsl"
+#include "../../shaderModel.hlsl"
+#include "../../shaderModelAutoGen.hlsl"
 
 
 struct ConvexConnectP
 {
+   float4 pos : TORQUE_POSITION;
    float4 ssPos : TEXCOORD0;
    float3 vsEyeDir : TEXCOORD1;
 };
 
-float4 main(   ConvexConnectP IN,
-               uniform sampler2D prePassBuffer : register(S0),
-               
-               uniform float4 lightPosition,
-               uniform float4 lightColor,
-               uniform float  lightRange,
-               
-               uniform float4 vsFarPlane,
-               uniform float4 rtParams0 ) : COLOR0
+TORQUE_UNIFORM_SAMPLER2D(prePassBuffer, 0);
+
+uniform float4 lightPosition;
+uniform float4 lightColor;
+uniform float  lightRange;
+uniform float4 vsFarPlane;
+uniform float4 rtParams0;
+
+float4 main(   ConvexConnectP IN ) : TORQUE_TARGET0
 {
    // Compute scene UV
    float3 ssPos = IN.ssPos.xyz / IN.ssPos.w;
    float2 uvScene = getUVFromSSPos(ssPos, rtParams0);
    
    // Sample/unpack the normal/z data
-   float4 prepassSample = prepassUncondition(prePassBuffer, uvScene);
+   float4 prepassSample = TORQUE_PREPASS_UNCONDITION(prePassBuffer, uvScene);
    float3 normal = prepassSample.rgb;
    float depth = prepassSample.a;
    

@@ -417,3 +417,28 @@ void Px3Body::applyImpulse( const Point3F &origin, const Point3F &force )
 
 }
 
+void Px3Body::findContact(SceneObject **contactObject,
+   VectorF *contactNormal,
+   Vector<SceneObject*> *outOverlapObjects) const
+{
+}
+
+void Px3Body::moveKinematicTo(const MatrixF &transform)
+{
+   AssertFatal(mActor, "Px3Body::moveKinematicTo - The actor is null!");
+
+   const bool isKinematic = mBodyFlags & BF_KINEMATIC;
+   if (!isKinematic)
+   {
+      Con::errorf("Px3Body::moveKinematicTo is only for kinematic bodies.");
+      return;
+   }
+
+   mWorld->lockScene();
+
+   physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
+   actor->setKinematicTarget(px3Cast<physx::PxTransform>(transform));
+
+   mWorld->unlockScene();
+}
+

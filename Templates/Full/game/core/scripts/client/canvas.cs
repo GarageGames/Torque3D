@@ -39,9 +39,14 @@ function configureCanvas()
    %rate = getWord($pref::Video::mode, $WORD::REFRESH);
    %fsaa = getWord($pref::Video::mode, $WORD::AA);
    
-   echo("--------------");
-   echo("Attempting to set resolution to \"" @ $pref::Video::mode @ "\"");
+   if($cliFullscreen !$= "") {
+      %fs = $cliFullscreen;
+      $cliFullscreen = "";
+   }
    
+   echo("--------------");
+   echo("Attempting to set resolution to \"" @ %resX SPC %resY SPC %fs SPC %bpp SPC %rate SPC %fsaa @ "\"");
+      
    %deskRes    = getDesktopResolution();      
    %deskResX   = getWord(%deskRes, $WORD::RES_X);
    %deskResY   = getWord(%deskRes, $WORD::RES_Y);

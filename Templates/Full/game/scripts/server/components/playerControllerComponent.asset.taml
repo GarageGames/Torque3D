@@ -1,0 +1,7 @@
+<ComponentAsset
+    AssetName="PlayerControllerComponentAsset"
+    componentName=""
+    componentClass="PlayerControllerComponent"
+    friendlyName="Player Controller"
+    componentType="Game"
+    description="Enables an entity to move like a player object."/>

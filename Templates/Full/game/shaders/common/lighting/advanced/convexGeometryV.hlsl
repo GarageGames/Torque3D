@@ -20,17 +20,24 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "../../hlslStructs.h"
+#include "../../hlslStructs.hlsl"
+#include "../../shaderModel.hlsl"
+
+struct VertData
+{
+   float3 pos : POSITION;
+   float4 color : COLOR;
+};
 
 struct ConvexConnectV
 {
-   float4 hpos : POSITION;
+   float4 hpos : TORQUE_POSITION;
    float4 wsEyeDir : TEXCOORD0;
    float4 ssPos : TEXCOORD1;
    float4 vsEyeDir : TEXCOORD2;
 };
 
-ConvexConnectV main( VertexIn_P IN,
+ConvexConnectV main( VertData IN,
                      uniform float4x4 modelview,
                      uniform float4x4 objTrans,
                      uniform float4x4 worldViewOnly,
@@ -38,9 +45,9 @@ ConvexConnectV main( VertexIn_P IN,
 {
    ConvexConnectV OUT;
 
-   OUT.hpos = mul( modelview, IN.pos );
-   OUT.wsEyeDir = mul( objTrans, IN.pos ) - float4( eyePosWorld, 0.0 );
-   OUT.vsEyeDir = mul( worldViewOnly, IN.pos );
+   OUT.hpos = mul( modelview, float4(IN.pos,1.0) );
+   OUT.wsEyeDir = mul(objTrans, float4(IN.pos, 1.0)) - float4(eyePosWorld, 0.0);
+   OUT.vsEyeDir = mul(worldViewOnly, float4(IN.pos, 1.0));
    OUT.ssPos = OUT.hpos;
 
    return OUT;

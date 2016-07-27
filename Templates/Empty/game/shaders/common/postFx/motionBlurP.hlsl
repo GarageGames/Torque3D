@@ -22,23 +22,22 @@
 
 #include "./postFx.hlsl"
 #include "../torque.hlsl"
-#include "shadergen:/autogenConditioners.h"
+#include "../shaderModelAutoGen.hlsl"
 
 uniform float4x4 matPrevScreenToWorld;
 uniform float4x4 matWorldToScreen;
 
 // Passed in from setShaderConsts()
 uniform float velocityMultiplier;
+TORQUE_UNIFORM_SAMPLER2D(backBuffer, 0);
+TORQUE_UNIFORM_SAMPLER2D(prepassTex, 1);
 
-uniform sampler2D backBuffer  : register(S0);
-uniform sampler2D prepassTex  : register(S1);
-
-float4 main(PFXVertToPix IN) : COLOR0
+float4 main(PFXVertToPix IN) : TORQUE_TARGET0
 {
    float samples = 5;
    
    // First get the prepass texture for uv channel 0
-   float4 prepass = prepassUncondition( prepassTex, IN.uv0 );
+   float4 prepass = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 );
    
    // Next extract the depth
    float depth = prepass.a;
@@ -58,12 +57,12 @@ float4 main(PFXVertToPix IN) : COLOR0
    float2 velocity = ((screenPos - previousPos) / velocityMultiplier).xy;
    
    // Generate the motion blur
-   float4 color = tex2D(backBuffer, IN.uv0);
+   float4 color = TORQUE_TEX2D(backBuffer, IN.uv0);
 	IN.uv0 += velocity;
 	
    for(int i = 1; i<samples; ++i, IN.uv0 += velocity)
    {
-      float4 currentColor = tex2D(backBuffer, IN.uv0);
+      float4 currentColor = TORQUE_TEX2D(backBuffer, IN.uv0);
       color += currentColor;
    }
    

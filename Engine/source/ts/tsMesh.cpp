@@ -57,7 +57,7 @@
 #  include "platformXbox/platformXbox.h"
 #endif
 
-GFXPrimitiveType drawTypes[] = { GFXTriangleList, GFXTriangleStrip, GFXTriangleFan };
+GFXPrimitiveType drawTypes[] = { GFXTriangleList, GFXTriangleStrip };
 #define getDrawType(a) (drawTypes[a])
 
 
@@ -2442,7 +2442,6 @@ void TSMesh::_createVBIB( TSVertexBufferHandle &vb, GFXPrimitiveBufferHandle &pb
             break;
 
          case GFXTriangleStrip:
-         case GFXTriangleFan:
             pInfo.type = drawType;
             pInfo.numPrimitives = draw.numElements - 2;
             pInfo.startIndex = draw.start;
@@ -3002,17 +3001,6 @@ void TSMesh::createTangents(const Vector<Point3F> &_verts, const Vector<Point3F>
             {
                findTangent( p1Index, p2Index, baseIdx[j], tan0.address(), tan1, _verts );
                p1Index = p2Index;
-               p2Index = baseIdx[j];
-            }
-            break;
-         }
-      case GFXTriangleFan:
-         {
-            p1Index = baseIdx[0];
-            p2Index = baseIdx[1];
-            for( U32 j = 2; j < numElements; j++ )
-            {
-               findTangent( p1Index, p2Index, baseIdx[j], tan0.address(), tan1, _verts );
                p2Index = baseIdx[j];
             }
             break;

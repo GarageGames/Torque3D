@@ -36,6 +36,8 @@ LightDescription::LightDescription()
    brightness( 1.0f ),
    range( 5.0f ),
    castShadows( false ),
+   mStaticRefreshFreq( 250 ),
+   mDynamicRefreshFreq( 8 ),
    animationData( NULL ),
    animationDataId( 0 ),
    animationPeriod( 1.0f ),
@@ -94,6 +96,8 @@ void LightDescription::initPersistFields()
       addField( "brightness", TypeF32, Offset( brightness, LightDescription ), "Adjusts the lights power, 0 being off completely." );      
       addField( "range", TypeF32, Offset( range, LightDescription ), "Controls the size (radius) of the light" );
       addField( "castShadows", TypeBool, Offset( castShadows, LightDescription ), "Enables/disabled shadow casts by this light." );
+      addField( "staticRefreshFreq", TypeS32, Offset( mStaticRefreshFreq, LightDescription ), "static shadow refresh rate (milliseconds)" );
+      addField( "dynamicRefreshFreq", TypeS32, Offset( mDynamicRefreshFreq, LightDescription ), "dynamic shadow refresh rate (milliseconds)" );
 
    endGroup( "Light" );
 
@@ -153,6 +157,8 @@ void LightDescription::packData( BitStream *stream )
    stream->write( brightness );
    stream->write( range );
    stream->writeFlag( castShadows );
+   stream->write(mStaticRefreshFreq);
+   stream->write(mDynamicRefreshFreq);
 
    stream->write( animationPeriod );
    stream->write( animationPhase );
@@ -181,6 +187,8 @@ void LightDescription::unpackData( BitStream *stream )
    stream->read( &brightness );     
    stream->read( &range );
    castShadows = stream->readFlag();
+   stream->read(&mStaticRefreshFreq);
+   stream->read(&mDynamicRefreshFreq);
 
    stream->read( &animationPeriod );
    stream->read( &animationPhase );
@@ -200,6 +208,8 @@ void LightDescription::submitLight( LightState *state, const MatrixF &xfm, Light
    li->setRange( range );
    li->setColor( color );
    li->setCastShadows( castShadows );
+   li->setStaticRefreshFreq(mStaticRefreshFreq);
+   li->setDynamicRefreshFreq(mDynamicRefreshFreq);
    li->setTransform( xfm );
 
    if ( animationData )

@@ -31,7 +31,7 @@ daeElement *daeMetaGroup::placeElement( daeElement *parent, daeElement *child, d
 	(void)offset;
 	daeString nm = child->getElementName();
 	if ( findChild( nm ) == NULL ) {
-		return false;
+		return NULL;
 	}
 	daeElementRef el;
 

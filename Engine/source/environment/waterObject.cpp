@@ -50,7 +50,6 @@ GFXImplementVertexFormat( GFXWaterVertex )
 {
    addElement( "POSITION", GFXDeclType_Float3 );
    addElement( "NORMAL", GFXDeclType_Float3 );
-   addElement( "COLOR", GFXDeclType_Color );   
    addElement( "TEXCOORD", GFXDeclType_Float2, 0 );
    addElement( "TEXCOORD", GFXDeclType_Float4, 1 );   
 }
@@ -207,7 +206,7 @@ WaterObject::WaterObject()
    mEmissive( false ),
    mUnderwaterColor(9, 6, 5, 240)
 {
-   mTypeMask = WaterObjectType | StaticObjectType;
+   mTypeMask = WaterObjectType;
 
    for( U32 i=0; i < MAX_WAVES; i++ )
    {
@@ -827,25 +826,25 @@ void WaterObject::drawUnderwaterFilter( SceneRenderState *state )
    // draw quad
    
 
-   GFXVertexBufferHandle<GFXVertexPC> verts( GFX, 4, GFXBufferTypeVolatile );
+   GFXVertexBufferHandle<GFXVertexPCT> verts( GFX, 4, GFXBufferTypeVolatile );
    verts.lock();
 
-   verts[0].point.set( -1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0 );
+   verts[0].point.set(1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0);
    verts[0].color = mUnderwaterColor;
 
-   verts[1].point.set( -1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0 );
+   verts[1].point.set(1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0);
    verts[1].color = mUnderwaterColor;
 
-   verts[2].point.set( 1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0 );
+   verts[2].point.set(-1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0);
    verts[2].color = mUnderwaterColor;
 
-   verts[3].point.set( 1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0 );
+   verts[3].point.set(-1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0);
    verts[3].color = mUnderwaterColor;
 
    verts.unlock();
 
    GFX->setVertexBuffer( verts );
-   GFX->drawPrimitive( GFXTriangleFan, 0, 2 );
+   GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
 
    // reset states / transforms
    GFX->setProjectionMatrix( proj );
@@ -1142,7 +1141,7 @@ bool WaterObject::initMaterial( S32 idx )
       else
          mat = MATMGR->createMatInstance( mSurfMatName[idx] );
 
-      const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPC>();
+      const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPCT>();
 
       if ( mat && mat->init( MATMGR->getDefaultFeatures(), flags ) )
       {      

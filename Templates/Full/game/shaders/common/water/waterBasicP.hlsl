@@ -57,7 +57,7 @@
 
 struct ConnectData
 {
-   float4 hpos             : POSITION;   
+   float4 hpos             : TORQUE_POSITION;   
    
    // TexCoord 0 and 1 (xy,zw) for ripple texture lookup
    float4 rippleTexCoord01 : TEXCOORD0;   
@@ -92,11 +92,11 @@ float fresnel(float NdotV, float bias, float power)
 //-----------------------------------------------------------------------------
 // Uniforms                                                                  
 //-----------------------------------------------------------------------------
-uniform sampler      bumpMap     : register( S0 );
+TORQUE_UNIFORM_SAMPLER2D(bumpMap,0);
 //uniform sampler2D    prepassTex  : register( S1 );
-uniform sampler2D    reflectMap  : register( S2 );
-uniform sampler      refractBuff : register( S3 );
-uniform samplerCUBE  skyMap      : register( S4 );
+TORQUE_UNIFORM_SAMPLER2D(reflectMap,2);
+TORQUE_UNIFORM_SAMPLER2D(refractBuff,3);
+TORQUE_UNIFORM_SAMPLERCUBE(skyMap,4);
 //uniform sampler      foamMap     : register( S5 );
 uniform float4       baseColor;
 uniform float4       miscParams;
@@ -113,15 +113,16 @@ uniform float4x4     modelMat;
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------
-float4 main( ConnectData IN ) : COLOR
+float4 main( ConnectData IN ) : TORQUE_TARGET0
 { 
    // Modulate baseColor by the ambientColor.
    float4 waterBaseColor = baseColor * float4( ambientColor.rgb, 1 );
+   waterBaseColor = toLinear(waterBaseColor);
    
    // Get the bumpNorm...
-   float3 bumpNorm = ( tex2D( bumpMap, IN.rippleTexCoord01.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.x;
-   bumpNorm       += ( tex2D( bumpMap, IN.rippleTexCoord01.zw ).rgb * 2.0 - 1.0 ) * rippleMagnitude.y;      
-   bumpNorm       += ( tex2D( bumpMap, IN.rippleTexCoord2 ).rgb * 2.0 - 1.0 ) * rippleMagnitude.z;  
+   float3 bumpNorm = ( TORQUE_TEX2D( bumpMap, IN.rippleTexCoord01.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.x;
+   bumpNorm       += ( TORQUE_TEX2D( bumpMap, IN.rippleTexCoord01.zw ).rgb * 2.0 - 1.0 ) * rippleMagnitude.y;      
+   bumpNorm       += ( TORQUE_TEX2D( bumpMap, IN.rippleTexCoord2 ).rgb * 2.0 - 1.0 ) * rippleMagnitude.z;  
    
    bumpNorm = normalize( bumpNorm );
    bumpNorm = lerp( bumpNorm, float3(0,0,1), 1.0 - rippleMagnitude.w );
@@ -135,7 +136,7 @@ float4 main( ConnectData IN ) : COLOR
    distortPos.xy += bumpNorm.xy * distortAmt;   
  
  #ifdef UNDERWATER
-   return hdrEncode( tex2Dproj( refractBuff, distortPos ) );   
+   return hdrEncode( TORQUE_TEX2DPROJ( refractBuff, distortPos ) );   
  #else
 
    float3 eyeVec = IN.objPos.xyz - eyePos;
@@ -153,16 +154,16 @@ float4 main( ConnectData IN ) : COLOR
    float fakeColorAmt = ang;   
       
     // Get reflection map color
-   float4 refMapColor = hdrDecode( tex2Dproj( reflectMap, distortPos ) ); 
+   float4 refMapColor = hdrDecode( TORQUE_TEX2DPROJ( reflectMap, distortPos ) ); 
    // If we do not have a reflection texture then we use the cubemap.
-   refMapColor = lerp( refMapColor, texCUBE( skyMap, reflectionVec ), NO_REFLECT );      
+   refMapColor = lerp( refMapColor, TORQUE_TEXCUBE( skyMap, reflectionVec ), NO_REFLECT );      
    
    // Combine reflection color and fakeColor.
    float4 reflectColor = lerp( refMapColor, fakeColor, fakeColorAmt );
    //return refMapColor;
    
    // Get refract color
-   float4 refractColor = hdrDecode( tex2Dproj( refractBuff, distortPos ) );   
+   float4 refractColor = hdrDecode( TORQUE_TEX2DPROJ( refractBuff, distortPos ) );   
    
    // calc "diffuse" color by lerping from the water color
    // to refraction image based on the water clarity.
@@ -197,7 +198,7 @@ float4 main( ConnectData IN ) : COLOR
    
       // Fog it.   
       float factor = computeSceneFog( eyePos, 
-                                      IN.objPos, 
+                                      IN.objPos.xyz, 
                                       WORLD_Z,
                                       fogData.x,
                                       fogData.y,

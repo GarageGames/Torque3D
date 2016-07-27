@@ -94,8 +94,8 @@ public:
                         PhysicsWorld *world );
    virtual Point3F move( const VectorF &displacement, CollisionList &outCol );
    virtual void findContact( SceneObject **contactObject, VectorF *contactNormal, Vector<SceneObject*> *outOverlapObjects ) const;
-   virtual bool testSpacials( const Point3F &nPos, const Point3F &nSize ) const { return true; }
-   virtual void setSpacials( const Point3F &nPos, const Point3F &nSize ) {}
+   virtual bool testSpacials( const Point3F &nPos, const Point3F &nSize ) const;
+   virtual void setSpacials( const Point3F &nPos, const Point3F &nSize );
    virtual void enableCollision();
    virtual void disableCollision();
 };

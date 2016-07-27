@@ -65,6 +65,8 @@ protected:
    F32  mEndElevation;
 
    bool mCastShadows;
+   S32 mStaticRefreshFreq;
+   S32 mDynamicRefreshFreq;
 
    LightInfo *mLight;
 
