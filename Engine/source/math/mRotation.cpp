@@ -300,7 +300,7 @@ TEST(Maths, RotationF_Calculations)
 };
 #endif
 
-DefineConsoleStaticMethod(Rotation, Add, RotationF, (RotationF a, RotationF b), ,
+DefineConsoleStaticMethod(rotation, Add, RotationF, (RotationF a, RotationF b), ,
    "Adds two rotations together.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -309,8 +309,8 @@ DefineConsoleStaticMethod(Rotation, Add, RotationF, (RotationF a, RotationF b), 
 {
    return a + b;
 }
-
-DefineConsoleStaticMethod(Rotation, Subtract, RotationF, (RotationF a, RotationF b), ,
+ 
+DefineConsoleStaticMethod(rotation, Subtract, RotationF, (RotationF a, RotationF b), ,
    "Subtracts two rotations.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -319,8 +319,8 @@ DefineConsoleStaticMethod(Rotation, Subtract, RotationF, (RotationF a, RotationF
 {
    return a - b;
 }
-
-DefineConsoleStaticMethod(Rotation, Interpolate, RotationF, (RotationF a, RotationF b, F32 factor), ,
+ 
+DefineConsoleStaticMethod(rotation, Interpolate, RotationF, (RotationF a, RotationF b, F32 factor), ,
    "Interpolates between two rotations.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -332,8 +332,8 @@ DefineConsoleStaticMethod(Rotation, Interpolate, RotationF, (RotationF a, Rotati
    result.interpolate(a, b, factor);
    return result;
 }
-
-DefineConsoleStaticMethod(Rotation, LookAt, RotationF, (Point3F origin, Point3F target, Point3F up),
+ 
+DefineConsoleStaticMethod(rotation, LookAt, RotationF, (Point3F origin, Point3F target, Point3F up),
    (Point3F(0, 0, 0), Point3F(0, 0, 0), Point3F(0, 0, 1)),
    "Provides a rotation orientation to look at a target from a given position.\n"
    "@param origin Position of the object doing the looking."
