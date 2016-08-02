@@ -166,6 +166,7 @@ inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSCo
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/modColorTextureV.hlsl");
       shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/modColorTextureP.hlsl");
+      shaderData->setSamplerName("$diffuseMap", 0);
       shaderData->setField("pixVersion", "3.0");
       shaderData->registerObject();
       mGenericShader[GSModColorTexture] = shaderData->getShader();
@@ -176,6 +177,7 @@ inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSCo
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/addColorTextureV.hlsl");
       shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/addColorTextureP.hlsl");
+      shaderData->setSamplerName("$diffuseMap", 0);
       shaderData->setField("pixVersion", "3.0");
       shaderData->registerObject();
       mGenericShader[GSAddColorTexture] = shaderData->getShader();
@@ -186,6 +188,7 @@ inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSCo
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/textureV.hlsl");
       shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/textureP.hlsl");
+      shaderData->setSamplerName("$diffuseMap", 0);
       shaderData->setField("pixVersion", "3.0");
       shaderData->registerObject();
       mGenericShader[GSTexture] = shaderData->getShader();
