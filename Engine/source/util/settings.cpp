@@ -92,9 +92,9 @@ const UTF8 *Settings::value(const UTF8 *settingName, const UTF8 *defaultValue)
    const UTF8 *storedDefaultValue = getDataField(defaultNameEntry, NULL);
    setModStaticFields(true);
 
-   if(dStrcmp(value, "") != 0)
+   if(String::compare(value, "") != 0)
       return value;
-   else if(dStrcmp(storedDefaultValue, "") != 0)
+   else if(String::compare(storedDefaultValue, "") != 0)
       return storedDefaultValue;
    else
 	  return defaultValue;
@@ -124,9 +124,9 @@ void Settings::remove(const UTF8 *settingName, bool includeDefaults)
         SimFieldDictionary::Entry* fieldEntry = *itr;
 
         // is this a field of our current group
-        if ( (dStrcmp(nameEntry, "") == 0) || 
-					dStrcmp( nameEntry, fieldEntry->slotName ) == 0 ||
-					(includeDefaults && dStrcmp( nameEntryDefault, fieldEntry->slotName ) == 0) )
+        if ( (String::compare(nameEntry, "") == 0) || 
+					String::compare( nameEntry, fieldEntry->slotName ) == 0 ||
+					(includeDefaults && String::compare( nameEntryDefault, fieldEntry->slotName ) == 0) )
         {
             // Yes, so remove it.
             pFieldDictionary->setFieldValue( fieldEntry->slotName, "" );
@@ -293,7 +293,7 @@ void Settings::readLayer(SimXMLDocument *document, String groupStack)
 	  const UTF8 *name = document->attribute("name");
 	  const UTF8 *value = document->getText();
 	  
-	  if(dStrcmp(type, "Group") == 0)
+	  if(String::compare(type, "Group") == 0)
 	  {
 		 String newStack = groupStack;
 
@@ -302,7 +302,7 @@ void Settings::readLayer(SimXMLDocument *document, String groupStack)
 
 		 newStack += name;
          readLayer(document, newStack);
-	  } else if(dStrcmp(type, "Setting") == 0)
+	  } else if(String::compare(type, "Setting") == 0)
 	  {
 		 String nameString = groupStack;
          
@@ -664,9 +664,9 @@ DefineConsoleMethod(Settings, value, const char*, (const char * settingName, con
 {
    StringTableEntry fieldName = StringTable->insert( settingName );
    
-   if (dStrcmp(defaultValue, "") != 0)
+   if (String::compare(defaultValue, "") != 0)
       return object->value( fieldName, defaultValue );
-   else if (dStrcmp(settingName, "") != 0)
+   else if (String::compare(settingName, "") != 0)
       return object->value( fieldName );
 
    return "";

@@ -567,7 +567,7 @@ bool GuiInspectorField::hasSameValueInAllObjects()
       if( !value2 )
          value2 = "";
 
-      if( dStrcmp( value1, value2 ) != 0 )
+      if( String::compare( value1, value2 ) != 0 )
          return false;
    }
          

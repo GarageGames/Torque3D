@@ -490,13 +490,13 @@ void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
       sActiveFilter.type = ServerFilter::Normal;
 
       // Update the active filter:
-      if ( !sActiveFilter.gameType || dStrcmp( sActiveFilter.gameType, gameType ) != 0 )
+      if ( !sActiveFilter.gameType || String::compare( sActiveFilter.gameType, gameType ) != 0 )
       {
          sActiveFilter.gameType = (char*) dRealloc( sActiveFilter.gameType, dStrlen( gameType ) + 1 );
          dStrcpy( sActiveFilter.gameType, gameType );
       }
 
-      if ( !sActiveFilter.missionType || dStrcmp( sActiveFilter.missionType, missionType ) != 0 )
+      if ( !sActiveFilter.missionType || String::compare( sActiveFilter.missionType, missionType ) != 0 )
       {
          sActiveFilter.missionType = (char*) dRealloc( sActiveFilter.missionType, dStrlen( missionType ) + 1 );
          dStrcpy( sActiveFilter.missionType, missionType );
@@ -1728,7 +1728,7 @@ static void handleGamePingResponse( const NetAddress* address, BitStream* stream
    // Verify the version:
    char buf[256];
    stream->readString( buf );
-   if ( dStrcmp( buf, versionString ) != 0 )
+   if ( String::compare( buf, versionString ) != 0 )
    {
       // Version is different, so remove it from consideration:
       Con::printf( "Server %s is a different version.", addrString );
@@ -1943,7 +1943,7 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
 
    // Get the mission type:
    stream->readString( stringBuf );
-   if ( !si->missionType || dStrcmp( si->missionType, stringBuf ) != 0 )
+   if ( !si->missionType || String::compare( si->missionType, stringBuf ) != 0 )
    {
       si->missionType = (char*) dRealloc( (void*) si->missionType, dStrlen( stringBuf ) + 1 );
       dStrcpy( si->missionType, stringBuf );
@@ -1964,7 +1964,7 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
    char* temp = dStrstr( static_cast<char*>( stringBuf ), const_cast<char*>( ".mis" ) );
    if ( temp )
       *temp = '\0';
-   if ( !si->missionName || dStrcmp( si->missionName, stringBuf ) != 0 )
+   if ( !si->missionName || String::compare( si->missionName, stringBuf ) != 0 )
    {
       si->missionName = (char*) dRealloc( (void*) si->missionName, dStrlen( stringBuf ) + 1 );
       dStrcpy( si->missionName, stringBuf );
@@ -2039,7 +2039,7 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
 
    // Get the server info:
    stream->readString( stringBuf );
-   if ( !si->statusString || ( isUpdate && dStrcmp( si->statusString, stringBuf ) != 0 ) )
+   if ( !si->statusString || ( isUpdate && String::compare( si->statusString, stringBuf ) != 0 ) )
    {
       si->infoString = (char*) dRealloc( (void*) si->infoString, dStrlen( stringBuf ) + 1 );
       dStrcpy( si->infoString, stringBuf );
@@ -2047,7 +2047,7 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
 
    // Get the content string:
    readLongCString( stream, stringBuf );
-   if ( !si->statusString || ( isUpdate && dStrcmp( si->statusString, stringBuf ) != 0 ) )
+   if ( !si->statusString || ( isUpdate && String::compare( si->statusString, stringBuf ) != 0 ) )
    {
       si->statusString = (char*) dRealloc( (void*) si->statusString, dStrlen( stringBuf ) + 1 );
       dStrcpy( si->statusString, stringBuf );

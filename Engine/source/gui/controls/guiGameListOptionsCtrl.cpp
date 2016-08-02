@@ -408,7 +408,7 @@ bool GuiGameListOptionsCtrl::selectOption(S32 rowIndex, const char * theOption)
 
    for (Vector<StringTableEntry>::iterator anOption = row->mOptions.begin(); anOption < row->mOptions.end(); ++anOption)
    {
-      if (dStrcmp(*anOption, theOption) == 0)
+      if (String::compare(*anOption, theOption) == 0)
       {
          S32 newIndex = anOption - row->mOptions.begin();
          row->mSelectedOption = newIndex;

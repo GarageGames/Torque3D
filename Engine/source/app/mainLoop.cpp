@@ -453,7 +453,7 @@ bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
    if (argc > 1)
    {
       // If so, check if the first parameter is a file to open.
-      if ( (dStrcmp(argv[1], "") != 0 ) && (str.open(argv[1], Torque::FS::File::Read)) )
+      if ( (String::compare(argv[1], "") != 0 ) && (str.open(argv[1], Torque::FS::File::Read)) )
       {
          // If it opens, we assume it is the script to run.
          useDefaultScript = false;

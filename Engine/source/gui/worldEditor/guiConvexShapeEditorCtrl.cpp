@@ -124,7 +124,7 @@ bool GuiConvexEditorCtrl::onWake()
    SimGroup::iterator itr = missionGroup->begin();
    for ( ; itr != missionGroup->end(); itr++ )
    {
-      if ( dStrcmp( (*itr)->getClassName(), "ConvexShape" ) == 0 )
+      if ( String::compare( (*itr)->getClassName(), "ConvexShape" ) == 0 )
       {
          mConvexSEL = static_cast<ConvexShape*>( *itr );
          mGizmo->set( mConvexSEL->getTransform(), mConvexSEL->getPosition(), mConvexSEL->getScale() );

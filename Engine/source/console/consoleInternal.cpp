@@ -1584,11 +1584,11 @@ namespace {
       if( dStrncmp( nativeType, "const ", 6 ) == 0 )
          nativeType += 6;
 
-      if( dStrcmp( nativeType, "char*" ) == 0 || dStrcmp( nativeType, "char *" ) == 0 )
+      if( String::compare( nativeType, "char*" ) == 0 || String::compare( nativeType, "char *" ) == 0 )
          return "string";
-      else if( dStrcmp( nativeType, "S32" ) == 0 || dStrcmp( nativeType, "U32" ) == 0 )
+      else if( String::compare( nativeType, "S32" ) == 0 || String::compare( nativeType, "U32" ) == 0 )
          return "int";
-      else if( dStrcmp( nativeType, "F32" ) == 0 )
+      else if( String::compare( nativeType, "F32" ) == 0 )
          return "float";
          
       const U32 length = dStrlen( nativeType );

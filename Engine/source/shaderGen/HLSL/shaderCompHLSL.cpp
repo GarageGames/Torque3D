@@ -228,11 +228,11 @@ void ParamsDefHLSL::assignConstantNumbers()
             {
                var->constNum = mCurrConst;
                // Increment our constant number based on the variable type
-               if (dStrcmp((const char*)var->type, "float4x4") == 0)
+               if (String::compare((const char*)var->type, "float4x4") == 0)
                {
                   mCurrConst += (4 * var->arraySize);
                } else {
-                  if (dStrcmp((const char*)var->type, "float3x3") == 0)
+                  if (String::compare((const char*)var->type, "float3x3") == 0)
                   {
                      mCurrConst += (3 * var->arraySize);
                   } else {

@@ -2353,7 +2353,7 @@ void Player::getDamageLocation(const Point3F& in_rPos, const char *&out_rpVert, 
    else
       out_rpVert = "head";
 
-   if(dStrcmp(out_rpVert, "head") != 0)
+   if(String::compare(out_rpVert, "head") != 0)
    {
       if (newPoint.y >= 0.0f)
       {

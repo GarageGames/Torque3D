@@ -142,7 +142,7 @@ U32 CompilerStringTable::add(const char *str, bool caseSens, bool tag)
 
       if(caseSens)
       {
-         if(!dStrcmp((*walk)->string, str))
+         if(!String::compare((*walk)->string, str))
             return (*walk)->start;
       }
       else

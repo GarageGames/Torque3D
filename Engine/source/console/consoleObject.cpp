@@ -135,7 +135,7 @@ void AbstractClassRep::registerClassRep(AbstractClassRep* in_pRep)
 #ifdef TORQUE_DEBUG  // assert if this class is already registered.
    for(AbstractClassRep *walk = classLinkList; walk; walk = walk->nextClass)
    {
-      AssertFatal(dStrcmp(in_pRep->mClassName, walk->mClassName),
+      AssertFatal(String::compare(in_pRep->mClassName, walk->mClassName),
          "Duplicate class name registered in AbstractClassRep::registerClassRep()");
    }
 #endif

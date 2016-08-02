@@ -326,7 +326,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
    // TODO: This seems ugly... we should trigger
    // features like this differently in the future.
    //
-   bool useBLM = dStrcmp( LIGHTMGR->getId(), "BLM" ) == 0;
+   bool useBLM = String::compare( LIGHTMGR->getId(), "BLM" ) == 0;
 
    // Do we need to disable normal mapping?
    const bool disableNormalMaps = MATMGR->getExclusionFeatures().hasFeature( MFT_NormalMap ) || useBLM;

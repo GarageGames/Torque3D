@@ -641,7 +641,7 @@ DefineTSShapeConstructorMethod( writeChangeSet, void, (),,
    while ( !f.isEOF() )
    {
       const char* buffer = (const char *) f.readLine();
-      if ( !dStrcmp( buffer, beginMessage ))
+      if ( !String::compare( buffer, beginMessage ))
          break;
       stream->writeText( buffer );
       stream->writeText( "\r\n" );
@@ -662,7 +662,7 @@ DefineTSShapeConstructorMethod( writeChangeSet, void, (),,
    while ( !f.isEOF() )
    {
       const char* buffer = (const char *) f.readLine();
-      if ( !dStrcmp( buffer, endMessage ))
+      if ( !String::compare( buffer, endMessage ))
          break;
    }
 

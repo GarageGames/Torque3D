@@ -175,7 +175,7 @@ void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream)
          // An object with the given ID already exists.  Make sure it has the right class.
          
          AbstractClassRep* classRep = AbstractClassRep::findClassRep( cptr->getNetClassGroup(), NetClassTypeDataBlock, classId );
-         if( classRep && dStrcmp( classRep->getClassName(), ptr->getClassName() ) != 0 )
+         if( classRep && String::compare( classRep->getClassName(), ptr->getClassName() ) != 0 )
          {
             Con::warnf( "A '%s' datablock with id: %d already existed. "
                         "Clobbering it with new '%s' datablock from server.",

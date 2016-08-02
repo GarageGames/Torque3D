@@ -391,7 +391,7 @@ static bool _dispatch(HWND hWnd,UINT message,WPARAM wParam,WPARAM lParam)
 
 			// FIXME [tom, 5/1/2007] Hard coding this is lame since there's a const in win32Window.cpp
 			// CodeReview - this fails if there is a second jug app in the arena.
-			if (hwnd == NULL || dStrcmp(classBuf, L"TorqueJuggernaughtWindow") != 0)
+			if (hwnd == NULL || String::compare(classBuf, L"TorqueJuggernaughtWindow") != 0)
 			{
 				// We are being made inactive and the window being made active isn't
 				// a jugg window. Thus, we need to deactivate input.

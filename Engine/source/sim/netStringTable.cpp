@@ -72,7 +72,7 @@ U32 NetStringTable::addString(const char *string)
    U32 bucket = hash % HashTableSize;
    for(U32 walk = hashTable[bucket];walk; walk = table[walk].next)
    {
-      if(!dStrcmp(table[walk].string, string))
+      if(!String::compare(table[walk].string, string))
       {
          table[walk].refCount++;
          return walk;

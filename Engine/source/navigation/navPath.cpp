@@ -135,7 +135,7 @@ bool NavPath::setProtectedFrom(void *obj, const char *index, const char *data)
 {
    NavPath *object = static_cast<NavPath*>(obj);
 
-   if(dStrcmp(data, ""))
+   if(String::compare(data, ""))
    {
       object->mFromSet = true;
       return true;
@@ -151,7 +151,7 @@ bool NavPath::setProtectedTo(void *obj, const char *index, const char *data)
 {
    NavPath *object = static_cast<NavPath*>(obj);
 
-   if(dStrcmp(data, ""))
+   if(String::compare(data, ""))
    {
       object->mToSet = true;
       return true;
@@ -709,7 +709,7 @@ DefineEngineMethod(NavPath, plan, bool, (),,
 DefineEngineMethod(NavPath, onNavMeshUpdate, void, (const char *data),,
    "@brief Callback when this path's NavMesh is loaded or rebuilt.")
 {
-   if(object->mMesh && !dStrcmp(data, object->mMesh->getIdString()))
+   if(object->mMesh && !String::compare(data, object->mMesh->getIdString()))
       object->plan();
 }
 

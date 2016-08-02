@@ -867,7 +867,7 @@ bool TerrainEditor::isMainTile(const GridPoint & gPoint) const
    const S32 blockSize = (S32)gPoint.terrainBlock->getBlockSize();
 
    Point2I testPos = gPoint.gridPos;
-   if (!dStrcmp(getCurrentAction(),"paintMaterial"))
+   if (!String::compare(getCurrentAction(),"paintMaterial"))
    {
       if (testPos.x == blockSize)
          testPos.x--;
@@ -1181,7 +1181,7 @@ TerrainBlock* TerrainEditor::collide(const Gui3DMouseEvent & evt, Point3F & pos)
    if (mTerrainBlocks.size() == 0)
       return NULL;
 
-   if ( mMouseDown && !dStrcmp(getCurrentAction(),"paintMaterial") )
+   if ( mMouseDown && !String::compare(getCurrentAction(),"paintMaterial") )
    {
       if ( !mActiveTerrain )
          return NULL;
@@ -1780,7 +1780,7 @@ void TerrainEditor::on3DMouseDown(const Gui3DMouseEvent & event)
    if(mTerrainBlocks.size() == 0)
       return;
 
-   if (!dStrcmp(getCurrentAction(),"paintMaterial"))
+   if (!String::compare(getCurrentAction(),"paintMaterial"))
    {
       Point3F pos;
       TerrainBlock* hitTerrain = collide(event, pos);
@@ -1805,7 +1805,7 @@ void TerrainEditor::on3DMouseDown(const Gui3DMouseEvent & event)
          return;
       }
    }
-   else if ((event.modifier & SI_ALT) && !dStrcmp(getCurrentAction(),"setHeight"))
+   else if ((event.modifier & SI_ALT) && !String::compare(getCurrentAction(),"setHeight"))
    {
       // Set value to terrain height at mouse position
       GridInfo info;
@@ -1847,7 +1847,7 @@ void TerrainEditor::on3DMouseMove(const Gui3DMouseEvent & event)
       // We do not change the active terrain as the mouse moves when
       // in painting mode.  This is because it causes the material 
       // window to change as you cursor over to it.
-      if ( dStrcmp(getCurrentAction(),"paintMaterial") != 0 )
+      if ( String::compare(getCurrentAction(),"paintMaterial") != 0 )
       {
          // Set the active terrain
          bool changed = mActiveTerrain != hitTerrain;
@@ -2028,7 +2028,7 @@ void TerrainEditor::getTerrainBlocksMaterialList(Vector<StringTableEntry>& list)
 
 void TerrainEditor::setBrushType( const char *type )
 {
-   if ( mMouseBrush && dStrcmp( mMouseBrush->getType(), type ) == 0 )
+   if ( mMouseBrush && String::compare( mMouseBrush->getType(), type ) == 0 )
       return;
 
    if(!dStricmp(type, "box"))
@@ -2199,7 +2199,7 @@ void TerrainEditor::processAction(const char* sAction)
       return;
 
    TerrainAction * action = mCurrentAction;
-   if (dStrcmp(sAction, "") != 0)
+   if (String::compare(sAction, "") != 0)
    {
       action = lookupAction(sAction);
 

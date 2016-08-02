@@ -135,7 +135,7 @@ void printClassHeader(const char* usage, const char * className, const char * su
          }
 
          // Print all fields that aren't associated with the 'field' keyword.
-         if( dStrcmp( keyword, "field" ) )
+         if( String::compare( keyword, "field" ) )
             Con::printf( "%s", lineStr );    // print lineStr as an unformatted string (otherwise '%' characters in the string could cause problems)
 
 

@@ -403,7 +403,7 @@ void AIClient::onAdd( const char *nameSpace ) {
 
    // This doesn't work...
    //
-   if( dStrcmp( nameSpace, mNameSpace->mName ) ) {
+   if( String::compare( nameSpace, mNameSpace->mName ) ) {
       Con::linkNamespaces( mNameSpace->mName, nameSpace );
       mNameSpace = Con::lookupNamespace( nameSpace );
    }
@@ -547,7 +547,7 @@ DefineConsoleFunction( aiAddPlayer, S32, (const char * name, const char * ns), (
    aiPlayer->onConnect_callback( name );
 
    // Now execute the onAdd command and feed it the namespace
-   if(dStrcmp( ns,"" ) != 0 )
+   if(String::compare( ns,"" ) != 0 )
       aiPlayer->onAdd( ns );
    else
       aiPlayer->onAdd( "AIClient" );
