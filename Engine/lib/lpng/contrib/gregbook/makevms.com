@@ -20,13 +20,13 @@ $ if zpath .eqs. ""
 $ then
 $   write sys$output "zlib include not found. Exiting..."
 $   exit 2
-$ endif 
+$ endif
 $!
 $ if pngpath .eqs. ""
 $ then
 $   write sys$output "libpng include not found. Exiting..."
 $   exit 2
-$ endif 
+$ endif
 $!
 $!    Look for the compiler used.
 $!
