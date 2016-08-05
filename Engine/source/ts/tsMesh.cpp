@@ -46,6 +46,7 @@
 #include "scene/sceneManager.h"
 #include "scene/sceneRenderState.h"
 #include "materials/matInstance.h"
+#include "materials/materialFeatureTypes.h"
 #include "renderInstance/renderPassManager.h"
 #include "materials/customMaterialDefinition.h"
 #include "gfx/util/triListOpt.h"
@@ -257,7 +258,8 @@ void TSMesh::innerRender( TSMaterialList *materials, const TSRenderState &rdata,
 
       // Get the instancing material if this mesh qualifies.
       if ( meshType != SkinMeshType && pb->mPrimitiveArray[i].numVertices < smMaxInstancingVerts )
-         matInst = InstancingMaterialHook::getInstancingMat( matInst );
+         if (matInst && !matInst->getFeatures().hasFeature(MFT_HardwareSkinning))
+            matInst = InstancingMaterialHook::getInstancingMat( matInst );
 
 #endif
 
