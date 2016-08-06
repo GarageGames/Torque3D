@@ -55,8 +55,6 @@ class MoveList;
 struct Move;
 struct AuthInfo;
 
-#define GameString TORQUE_APP_NAME
-
 const F32 MinCameraFov              = 1.f;      ///< min camera FOV
 const F32 MaxCameraFov              = 179.f;    ///< max camera FOV
 
