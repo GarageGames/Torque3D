@@ -105,6 +105,8 @@ void GFXGLVertexDecl::_initVerticesFormat(U32 stream)
       if(element.getStreamIndex() != stream)
          continue;
 
+      AssertFatal(!mFormat->hasBlendIndices() || !element.isSemantic(GFXSemantic::TEXCOORD) || (mFormat->hasBlendIndices() && element.isSemantic(GFXSemantic::TEXCOORD) && element.getSemanticIndex() < 2), "skinning with more than 2 used texcoords!");
+
       vertexSize += element.getSizeInBytes();
    }
 

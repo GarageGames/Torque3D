@@ -26,6 +26,7 @@
 #include "shaderGen/shaderComp.h"
 #include "shaderGen/langElement.h"
 #include "gfx/gfxDevice.h"
+#include "gfx/gl/gfxGLVertexAttribLocation.h"
 
 
 Var * AppVertConnectorGLSL::getElement(   RegisterType type, 
@@ -107,7 +108,8 @@ Var * AppVertConnectorGLSL::getElement(   RegisterType type,
          newVar->constNum = mCurBlendIndicesElem;
          mElementList.push_back(newVar);
          char out[32];
-         dSprintf((char*)out, sizeof(out), "vBlendIndex%d", mCurBlendIndicesElem);
+         const U32 blendIndicesOffset = Torque::GL_VertexAttrib_BlendIndex0 - Torque::GL_VertexAttrib_TexCoord0;
+         dSprintf((char*)out, sizeof(out), "vTexCoord%d", blendIndicesOffset + mCurBlendIndicesElem);
          mCurBlendIndicesElem += 1;
          newVar->setConnectName(out);
          return newVar;
@@ -119,7 +121,8 @@ Var * AppVertConnectorGLSL::getElement(   RegisterType type,
          newVar->constNum = mCurBlendWeightsElem;
          mElementList.push_back(newVar);
          char out[32];
-         dSprintf((char*)out, sizeof(out), "vBlendWeight%d", mCurBlendWeightsElem);
+         const U32 blendWeightsOffset = Torque::GL_VertexAttrib_BlendWeight0 - Torque::GL_VertexAttrib_TexCoord0;
+         dSprintf((char*)out, sizeof(out), "vTexCoord%d", blendWeightsOffset + mCurBlendWeightsElem);
          mCurBlendWeightsElem += 1;
          newVar->setConnectName(out);
          return newVar;

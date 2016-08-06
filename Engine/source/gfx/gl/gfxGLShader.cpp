@@ -455,14 +455,6 @@ bool GFXGLShader::_init()
    glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_Tangent,     "vTangent");
    glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TangentW,    "vTangentW");
    glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_Binormal,    "vBinormal");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_BlendIndex0, "vBlendIndex0");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_BlendIndex1, "vBlendIndex1");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_BlendIndex2, "vBlendIndex2");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_BlendIndex3, "vBlendIndex3");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_BlendWeight0, "vBlendWeight0");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_BlendWeight1, "vBlendWeight1");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_BlendWeight2, "vBlendWeight2");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_BlendWeight3, "vBlendWeight3");
    glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord0,   "vTexCoord0");
    glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord1,   "vTexCoord1");
    glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord2,   "vTexCoord2");
