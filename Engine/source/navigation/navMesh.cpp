@@ -1593,12 +1593,15 @@ bool NavMesh::load()
    S32 s;
    file.read(sizeof(S32), (char*)&s);
    setLinkCount(s);
-   file.read(sizeof(F32) * s * 6, (char*)const_cast<F32*>(mLinkVerts.address()));
-   file.read(sizeof(F32) * s,     (char*)const_cast<F32*>(mLinkRads.address()));
-   file.read(sizeof(U8) * s,      (char*)const_cast<U8*>(mLinkDirs.address()));
-   file.read(sizeof(U8) * s,      (char*)const_cast<U8*>(mLinkAreas.address()));
-   file.read(sizeof(U16) * s,     (char*)const_cast<U16*>(mLinkFlags.address()));
-   file.read(sizeof(F32) * s,     (char*)const_cast<U32*>(mLinkIDs.address()));
+   if (s > 0)
+   {
+      file.read(sizeof(F32) * s * 6, (char*)const_cast<F32*>(mLinkVerts.address()));
+      file.read(sizeof(F32) * s, (char*)const_cast<F32*>(mLinkRads.address()));
+      file.read(sizeof(U8) * s, (char*)const_cast<U8*>(mLinkDirs.address()));
+      file.read(sizeof(U8) * s, (char*)const_cast<U8*>(mLinkAreas.address()));
+      file.read(sizeof(U16) * s, (char*)const_cast<U16*>(mLinkFlags.address()));
+      file.read(sizeof(F32) * s, (char*)const_cast<U32*>(mLinkIDs.address()));
+   }
    mLinksUnsynced.fill(false);
    mLinkSelectStates.fill(Unselected);
    mDeleteLinks.fill(false);

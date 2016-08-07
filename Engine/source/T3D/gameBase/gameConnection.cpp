@@ -407,7 +407,7 @@ bool GameConnection::readConnectAccept(BitStream *stream, const char **errorStri
 void GameConnection::writeConnectRequest(BitStream *stream)
 {
    Parent::writeConnectRequest(stream);
-   stream->writeString(GameString);
+   stream->writeString(TORQUE_APP_NAME);
    stream->write(CurrentProtocolVersion);
    stream->write(MinRequiredProtocolVersion);
    stream->writeString(mJoinPassword);
@@ -424,7 +424,7 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
    U32 currentProtocol, minProtocol;
    char gameString[256];
    stream->readString(gameString);
-   if(dStrcmp(gameString, GameString))
+   if(dStrcmp(gameString, TORQUE_APP_NAME))
    {
       *errorString = "CHR_GAME";
       return false;

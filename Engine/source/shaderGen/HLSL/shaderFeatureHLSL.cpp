@@ -2089,10 +2089,7 @@ void ReflectCubeFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    if (fd.features[MFT_isDeferred])
    {
       Var* targ = (Var*)LangElement::find(getOutputTargetVarName(ShaderFeature::RenderTarget1));
-      if (fd.features[MFT_DeferredSpecMap])
-         meta->addStatement(new GenOp("   @.rgb = lerp( @.rgb, (@).rgb, (@.b));\r\n", targ, targ, texCube, lerpVal));
-      else
-         meta->addStatement(new GenOp("   @.rgb = lerp( @.rgb, (@).rgb, (@.b*128/5));\r\n", targ, targ, texCube, lerpVal));
+      meta->addStatement(new GenOp("   @.rgb = lerp( @.rgb, (@).rgb, (@.b));\r\n", targ, targ, texCube, lerpVal));
    }
    else
        meta->addStatement( new GenOp( "   @;\r\n", assignColor( texCube, blendOp, lerpVal ) ) );         
@@ -2994,16 +2991,3 @@ void ImposterVertFeatureHLSL::determineFeature( Material *material,
       outFeatureData->features.addFeature( MFT_ImposterVert );
 }
 
-
-//****************************************************************************
-// Vertex position
-//****************************************************************************
-void DeferredSkyHLSL::processVert( Vector<ShaderComponent*> &componentList, 
-                                    const MaterialFeatureData &fd )
-{
-   Var *outPosition = (Var*)LangElement::find( "hpos" );
-   MultiLine *meta = new MultiLine;
-   //meta->addStatement( new GenOp( "   @.w = @.z;\r\n", outPosition, outPosition ) );
-
-   output = meta;
-}

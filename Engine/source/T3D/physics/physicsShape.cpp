@@ -271,7 +271,7 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
 {
    if ( !Parent::preload( server, errorBuffer ) )
       return false;
-
+   
    // If we don't have a physics plugin active then
    // we have to fail completely.
    if ( !PHYSICSMGR )
@@ -280,19 +280,24 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
       return false;
    }
 
-   if ( !shapeName || !shapeName[0] ) 
+   if( shapeName && shapeName[0] != '\0' && !bool(shape) )
    {
-      errorBuffer = "PhysicsShapeData::preload - No shape name defined.";
-      return false;
-   }
+      // Load the shape.
+      shape = ResourceManager::get().load(shapeName);
+      if( bool(shape) == false )
+      {
+         errorBuffer = String::ToString("PhysicsShapeData::load: Couldn't load shape \"%s\"", shapeName);
+         return false;
+      }
+      else
+      {
+         TSShapeInstance* pDummy = new TSShapeInstance(shape, !server);
+         delete pDummy;
+      }
 
-   // Load the shape.
-   shape = ResourceManager::get().load( shapeName );
-   if ( bool(shape) == false )
-   {
-      errorBuffer = String::ToString( "PhysicsShapeData::preload - Unable to load shape '%s'.", shapeName );
-      return false;
    }
+   else
+      return false;
 
    // Prepare the shared physics collision shape.
    if ( !colShape )

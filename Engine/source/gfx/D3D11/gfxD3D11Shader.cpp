@@ -609,7 +609,6 @@ void GFXD3D11ShaderConstBuffer::activate( GFXD3D11ShaderConstBuffer *prevShaderB
    ZeroMemory(&pConstData, sizeof(D3D11_MAPPED_SUBRESOURCE));
    
    const U8* buf;
-   HRESULT hr;
    U32 nbBuffers = 0;
    if(mVertexConstBuffer->isDirty())
    {
