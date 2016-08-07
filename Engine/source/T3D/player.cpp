@@ -6884,7 +6884,7 @@ void Player::playFootstepSound( bool triggeredLeft, Material* contactMaterial, S
       // Play default sound.
 
       S32 sound = -1;
-      if (contactMaterial && (contactMaterial->mImpactSoundId>-1 && contactMaterial->mImpactSoundId<PlayerData::MaxSoundOffsets))
+      if (contactMaterial && (contactMaterial->mFootstepSoundId>-1 && contactMaterial->mFootstepSoundId<PlayerData::MaxSoundOffsets))
          sound = contactMaterial->mFootstepSoundId;
       else if( contactObject && contactObject->getTypeMask() & VehicleObjectType )
          sound = 2;
