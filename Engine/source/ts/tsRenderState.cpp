@@ -46,7 +46,8 @@ TSRenderState::TSRenderState( const TSRenderState &state )
       mNoRenderNonTranslucent( state.mNoRenderNonTranslucent ),
       mMaterialHint( state.mMaterialHint ),
       mCuller( state.mCuller ),
+      mUseOriginSort( state.mUseOriginSort ),
       mLightQuery( state.mLightQuery ),
-      mUseOriginSort( state.mUseOriginSort )
+      mAccuTex( state.mAccuTex )
 {
 }
