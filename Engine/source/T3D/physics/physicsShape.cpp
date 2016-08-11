@@ -272,7 +272,8 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
    if ( !Parent::preload( server, errorBuffer ) )
       return false;
    
-   if (server) return true;
+   if (server)
+	   return true;
    
    // If we don't have a physics plugin active then
    // we have to fail completely.
