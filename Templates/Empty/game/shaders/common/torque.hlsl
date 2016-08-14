@@ -294,7 +294,25 @@ float4 toLinear(float4 tex)
    return tex;
 }
 // Encodes gamma.
-float4 toLinear(float4 tex)
+float4 toGamma(float4 tex)
+{
+   return tex;
+}
+float3 toLinear(float3 tex)
+{
+   return tex;
+}
+// Encodes gamma.
+float3 toGamma(float3 tex)
+{
+   return tex;
+}
+float3 toLinear(float3 tex)
+{
+   return tex;
+}
+// Encodes gamma.
+float3 toLinear(float3 tex)
 {
    return tex;
 }
@@ -308,6 +326,16 @@ float4 toLinear(float4 tex)
 float4 toGamma(float4 tex)
 {
    return float4(pow(abs(tex.rgb), 1.0/2.2), tex.a);
+}
+// Sample in linear space. Decodes gamma.
+float3 toLinear(float3 tex)
+{
+   return pow(abs(tex.rgb), 2.2);
+}
+// Encodes gamma.
+float3 toGamma(float3 tex)
+{
+   return pow(abs(tex.rgb), 1.0/2.2);
 }
 #endif //
 
