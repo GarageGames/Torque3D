@@ -1127,13 +1127,43 @@ void GFXD3D9Shader::_getShaderConstants( ID3DXConstantTable *table,
                   case D3DXPC_MATRIX_ROWS :
                   case D3DXPC_MATRIX_COLUMNS :                     
                      {
-                        switch (constantDesc.Rows)                        
+                        S32 fd, sd;
+                        fd = constantDesc.RegisterCount / constantDesc.Elements;
+                        sd = constantDesc.Class == D3DXPC_MATRIX_ROWS ? constantDesc.Columns : constantDesc.Rows;
+
+                        switch (fd)
                         {
+                           case 2 :
+                              AssertFatal(sd == 2, "non-square 2x? mats not supported");
+                              desc.constType = GFXSCT_Float2x2;
+                              break;
                            case 3 :
-                              desc.constType = constantDesc.Columns == 4 ? GFXSCT_Float3x4 : GFXSCT_Float3x3;
+                              switch (sd)
+                              {
+                              case 3 :
+                                 desc.constType = GFXSCT_Float3x3;
+                                 break;
+                              case 4 :
+                                 desc.constType = GFXSCT_Float4x3;
+                                 break;
+                              default:
+                                 AssertFatal(false, "Unsupported matrix size");
+                                 break;
+                              }
                               break;
                            case 4 :
-                              desc.constType = constantDesc.Columns == 3 ? GFXSCT_Float4x3 : GFXSCT_Float4x4;
+                              switch (sd)
+                              {
+                              case 3:
+                                 desc.constType = GFXSCT_Float3x4;
+                                 break;
+                              case 4:
+                                 desc.constType = GFXSCT_Float4x4;
+                                 break;
+                              default:
+                                 AssertFatal(false, "Unsupported matrix size");
+                                 break;
+                              }
                               break;
                         }
                      }
