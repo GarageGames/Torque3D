@@ -157,6 +157,7 @@ TSMesh* AppMesh::constructTSMesh()
 
    // Finish initializing the shape
    tsmesh->setFlags(flags);
+   tsmesh->updateMeshFlags();
    tsmesh->computeBounds();
    tsmesh->numFrames = numFrames;
    tsmesh->numMatFrames = numMatFrames;

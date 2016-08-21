@@ -1426,12 +1426,16 @@ String GFXD3D11Device::_createTempShaderInternal(const GFXVertexFormat *vertexFo
    StringBuilder mainBodyData;
    //make shader
    mainBodyData.append("VertOut main(VertIn IN){VertOut OUT;");
+
+   bool addedPadding = false;
    for (U32 i = 0; i < elemCount; i++)
    {
       const GFXVertexElement &element = vertexFormat->getElement(i);
       String semantic = element.getSemantic();
       String semanticOut = semantic;
       String type;
+
+      AssertFatal(!(addedPadding && !element.isSemantic(GFXSemantic::PADDING)), "Padding added before data");
 
       if (element.isSemantic(GFXSemantic::POSITION))
       {
@@ -1458,6 +1462,21 @@ String GFXD3D11Device::_createTempShaderInternal(const GFXVertexFormat *vertexFo
          semantic = "BINORMAL";
          semanticOut = semantic;
       }
+      else if (element.isSemantic(GFXSemantic::BLENDINDICES))
+      {
+         semantic = String::ToString("BLENDINDICES%d", element.getSemanticIndex());
+         semanticOut = semantic;
+      }
+      else if (element.isSemantic(GFXSemantic::BLENDWEIGHT))
+      {
+         semantic = String::ToString("BLENDWEIGHT%d", element.getSemanticIndex());
+         semanticOut = semantic;
+      }
+      else if (element.isSemantic(GFXSemantic::PADDING))
+      {
+         addedPadding = true;
+         continue;
+      }
       else
       {
          //Anything that falls thru to here will be a texture coord.
@@ -1480,6 +1499,9 @@ String GFXD3D11Device::_createTempShaderInternal(const GFXVertexFormat *vertexFo
       case DXGI_FORMAT_B8G8R8A8_UNORM:
       case DXGI_FORMAT_R8G8B8A8_UNORM:
          type = "float4";
+         break;
+      case DXGI_FORMAT_R8G8B8A8_UINT:
+         type = "uint4";
          break;
       }
 
@@ -1570,16 +1592,17 @@ GFXVertexDecl* GFXD3D11Device::allocVertexDecl( const GFXVertexFormat *vertexFor
    U32 stream;
    D3D11_INPUT_ELEMENT_DESC *vd = new D3D11_INPUT_ELEMENT_DESC[ elemCount];
 
-   for ( U32 i=0; i < elemCount; i++ )
+   S32 elemIndex = 0;
+   for (S32 i = 0; i < elemCount; i++, elemIndex++)
    {
-	   
-      const GFXVertexElement &element = vertexFormat->getElement( i );
-      
+
+      const GFXVertexElement &element = vertexFormat->getElement(elemIndex);
+
       stream = element.getStreamIndex();
 
       vd[i].InputSlot = stream;
-	 
-      vd[i].AlignedByteOffset =  D3D11_APPEND_ALIGNED_ELEMENT;
+
+      vd[i].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
       vd[i].Format = GFXD3D11DeclType[element.getType()];
       // If instancing is enabled, the per instance data is only used on stream 1.
       if (vertexFormat->hasInstancing() && stream == 1)
@@ -1596,16 +1619,32 @@ GFXVertexDecl* GFXD3D11Device::allocVertexDecl( const GFXVertexFormat *vertexFor
       // texture coords for now... this may change later.
       vd[i].SemanticIndex = 0;
 
-      if ( element.isSemantic( GFXSemantic::POSITION ) )
+      if (element.isSemantic(GFXSemantic::POSITION))
          vd[i].SemanticName = "POSITION";
-      else if ( element.isSemantic( GFXSemantic::NORMAL ) )
+      else if (element.isSemantic(GFXSemantic::NORMAL))
          vd[i].SemanticName = "NORMAL";
-      else if ( element.isSemantic( GFXSemantic::COLOR ) )
+      else if (element.isSemantic(GFXSemantic::COLOR))
          vd[i].SemanticName = "COLOR";
-      else if ( element.isSemantic( GFXSemantic::TANGENT ) )
+      else if (element.isSemantic(GFXSemantic::TANGENT))
          vd[i].SemanticName = "TANGENT";
-      else if ( element.isSemantic( GFXSemantic::BINORMAL ) )
+      else if (element.isSemantic(GFXSemantic::BINORMAL))
          vd[i].SemanticName = "BINORMAL";
+      else if (element.isSemantic(GFXSemantic::BLENDWEIGHT))
+      {
+         vd[i].SemanticName = "BLENDWEIGHT";
+         vd[i].SemanticIndex = element.getSemanticIndex();
+      }
+      else if (element.isSemantic(GFXSemantic::BLENDINDICES))
+      {
+         vd[i].SemanticName = "BLENDINDICES";
+         vd[i].SemanticIndex = element.getSemanticIndex();
+      }
+      else if (element.isSemantic(GFXSemantic::PADDING))
+      {
+         i--;
+         elemCount--;
+         continue;
+      }
       else
       {
           //Anything that falls thru to here will be a texture coord.

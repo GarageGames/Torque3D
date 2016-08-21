@@ -1459,10 +1459,17 @@ void TSMesh::prepOpcodeCollision()
    AssertFatal( (curIts - its) == mi->GetNbTriangles(), "Triangle count mismatch!" );
 
    for( S32 i = 0; i < mi->GetNbVertices(); i++ )
+   {
       if( mVertexData.isReady() )
-         pts[i].Set( mVertexData[i].vert().x, mVertexData[i].vert().y, mVertexData[i].vert().z );
+      {
+         const __TSMeshVertexBase &vertData = mVertexData.getBase(i);
+         pts[i].Set( vertData.vert().x, vertData.vert().y, vertData.vert().z );
+      }
       else
+      {
          pts[i].Set( verts[i].x, verts[i].y, verts[i].z );
+      }
+   }
 
    mi->SetPointers( its, pts );
 

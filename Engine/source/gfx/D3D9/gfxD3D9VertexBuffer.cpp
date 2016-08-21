@@ -228,4 +228,3 @@ void GFXD3D9VertexBuffer::resurrect()
          "GFXD3D9VertexBuffer::resurrect - Failed to allocate VB" );
    }
 }
-

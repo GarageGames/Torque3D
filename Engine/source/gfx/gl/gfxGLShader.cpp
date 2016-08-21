@@ -92,6 +92,8 @@ static U32 shaderConstTypeSize(GFXShaderConstType type)
       return 16;
    case GFXSCT_Float3x3:
       return 36;
+   case GFXSCT_Float4x3:
+      return 48;
    case GFXSCT_Float4x4:
       return 64;
    default:
@@ -305,6 +307,9 @@ void GFXGLShaderConstBuffer::set(GFXShaderConstHandle* handle, const MatrixF& ma
       reinterpret_cast<F32*>(mBuffer + _glHandle->mOffset)[7] = mat[9];
       reinterpret_cast<F32*>(mBuffer + _glHandle->mOffset)[8] = mat[10];
       break;
+   case GFXSCT_Float4x3:
+      dMemcpy(mBuffer + _glHandle->mOffset, (const F32*)mat, (sizeof(F32) * 12));// matrix with end row chopped off
+      break;
    case GFXSCT_Float4x4:
    {      
       if(_glHandle->mInstancingConstant)
@@ -334,6 +339,13 @@ void GFXGLShaderConstBuffer::set(GFXShaderConstHandle* handle, const MatrixF* ma
    AssertFatal(!_glHandle->mInstancingConstant, "GFXGLShaderConstBuffer::set - Instancing not supported for matrix arrays");
 
    switch (matrixType) {
+      case GFXSCT_Float4x3:
+         // Copy each item with the last row chopped off
+         for (int i = 0; i<arraySize; i++)
+         {
+            dMemcpy(mBuffer + _glHandle->mOffset + (i*(sizeof(F32) * 12)), (F32*)(mat + i), sizeof(F32) * 12);
+         }
+      break;
       case GFXSCT_Float4x4:
          dMemcpy(mBuffer + _glHandle->mOffset, (F32*)mat, _glHandle->getSize());
          break;
@@ -572,6 +584,9 @@ void GFXGLShader::initConstantDescs()
          case GL_FLOAT_MAT4:
             desc.constType = GFXSCT_Float4x4;
             break;
+         case GL_FLOAT_MAT4x3: // jamesu - columns, rows
+            desc.constType = GFXSCT_Float4x3;
+            break;
          case GL_SAMPLER_1D:
          case GL_SAMPLER_2D:
          case GL_SAMPLER_3D:
@@ -804,6 +819,11 @@ void GFXGLShader::setConstantsFromBuffer(GFXGLShaderConstBuffer* buffer)
             break;
          case GFXSCT_Float3x3:
             glUniformMatrix3fv(handle->mLocation, handle->mDesc.arraySize, true, (GLfloat*)(mConstBuffer + handle->mOffset));
+            break;
+         case GFXSCT_Float4x3:
+            // NOTE: To save a transpose here we could store the matrix transposed (i.e. column major) in the constant buffer.
+            // See _mesa_uniform_matrix in the mesa source for the correct transpose algorithm for a 4x3 matrix. 
+            glUniformMatrix4x3fv(handle->mLocation, handle->mDesc.arraySize, true, (GLfloat*)(mConstBuffer + handle->mOffset));
             break;
          case GFXSCT_Float4x4:
             glUniformMatrix4fv(handle->mLocation, handle->mDesc.arraySize, true, (GLfloat*)(mConstBuffer + handle->mOffset));
