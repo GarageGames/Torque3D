@@ -916,7 +916,10 @@ TSMesh* TSShape::copyMesh( const TSMesh* srcMesh ) const
 }
 
 bool TSShape::addMesh(TSMesh* mesh, const String& meshName)
-{
+{ 
+   // Ensure mesh is in editable state
+   mesh->makeEditable();
+
    // Determine the object name and detail size from the mesh name
    S32 detailSize = 999;
    String objName(String::GetTrailingNumber(meshName, detailSize));

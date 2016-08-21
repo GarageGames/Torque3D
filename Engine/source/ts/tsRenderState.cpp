@@ -51,7 +51,6 @@ TSRenderState::TSRenderState( const TSRenderState &state )
       mUseOriginSort( state.mUseOriginSort ),
       mLightQuery( state.mLightQuery ),
       mAccuTex( state.mAccuTex ),
-      mUseOriginSort( state.mUseOriginSort ),
       mNodeTransforms( state.mNodeTransforms ),
       mNodeTransformCount( state.mNodeTransformCount )
 {

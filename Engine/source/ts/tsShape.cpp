@@ -732,7 +732,7 @@ void TSShape::initVertexBufferPointers()
             mesh->getMeshType() == TSMesh::SkinMeshType))
       {
          // Set buffer
-         AssertFatal(mesh->mNumVerts >= mesh->vertsPerFrame, "invalid verts per frame");
+         AssertFatal(mesh->mNumVerts == 0 || mesh->mNumVerts >= mesh->vertsPerFrame, "invalid verts per frame");
          if (mesh->mVertSize > 0 && !mesh->mVertexData.isReady())
          {
             U32 boneOffset = 0;
