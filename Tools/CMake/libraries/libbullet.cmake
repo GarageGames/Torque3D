@@ -40,8 +40,8 @@ if( WIN32 )
   addDef( "WIN32" )
 
   addPath( "${libDir}/bullet/src/BulletMultiThreaded" )
-  addPath( "${libDir}/bullet/src/BulletMultiThreaded/SpuNarrowPhaseCollisionTask" )
   addPath( "${libDir}/bullet/src/MiniCL/MiniCLTask" )
+  addPath( "${libDir}/bullet/src/BulletMultiThreaded/SpuNarrowPhaseCollisionTask" )
   addInclude( "${libDir}/bullet/src/vectormath/scalar" )
 endif()
 
