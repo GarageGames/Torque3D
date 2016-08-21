@@ -217,6 +217,19 @@ bool ProcessedShaderMaterial::init( const FeatureSet &features,
       mInstancingState = new InstancingState();
       mInstancingState->setFormat( _getRPD( 0 )->shader->getInstancingFormat(), mVertexFormat );
    }
+   if (mMaterial && mMaterial->mDiffuseMapFilename[0].isNotEmpty() && mMaterial->mDiffuseMapFilename[0].substr(0, 1).equal("#"))
+   {
+      String texTargetBufferName = mMaterial->mDiffuseMapFilename[0].substr(1, mMaterial->mDiffuseMapFilename[0].length() - 1);
+      NamedTexTarget *texTarget = NamedTexTarget::find(texTargetBufferName);
+      RenderPassData* rpd = getPass(0);
+
+      if (rpd)
+      {
+         rpd->mTexSlot[0].texTarget = texTarget;
+         rpd->mTexType[0] = Material::TexTarget;
+         rpd->mSamplerNames[0] = "diffuseMap";
+      }
+   }
    return true;
 }
 
