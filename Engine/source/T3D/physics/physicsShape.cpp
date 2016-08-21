@@ -31,6 +31,7 @@
 #include "T3D/physics/physicsBody.h"
 #include "T3D/physics/physicsWorld.h"
 #include "T3D/physics/physicsCollision.h"
+#include "T3D/gameBase/gameConnection.h"
 #include "collision/concretePolyList.h"
 #include "ts/tsShapeInstance.h"
 #include "scene/sceneRenderState.h"
@@ -271,7 +272,7 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
 {
    if ( !Parent::preload( server, errorBuffer ) )
       return false;
-   
+      
    // If we don't have a physics plugin active then
    // we have to fail completely.
    if ( !PHYSICSMGR )
@@ -280,27 +281,24 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
       return false;
    }
 
-   if( shapeName && shapeName[0] != '\0' && !bool(shape) )
+   bool shapeError = false;
+
+   if (shapeName && shapeName[0])
    {
-      // Load the shape.
+      // Resolve shapename
       shape = ResourceManager::get().load(shapeName);
-      if( bool(shape) == false )
+      if (bool(shape) == false)
       {
-         errorBuffer = String::ToString("PhysicsShapeData::load: Couldn't load shape \"%s\"", shapeName);
+         errorBuffer = String::ToString("PhysicsShapeData: Couldn't load shape \"%s\"", shapeName);
          return false;
       }
-      else
-      {
-         TSShapeInstance* pDummy = new TSShapeInstance(shape, !server);
-         delete pDummy;
-      }
+      if (!server && !shape->preloadMaterialList(shape.getPath()) && NetConnection::filesWereDownloaded())
+         shapeError = true;
 
    }
-   else
-      return false;
 
    // Prepare the shared physics collision shape.
-   if ( !colShape )
+   if ( !colShape && shape )
    {
       colShape = shape->buildColShape( false, Point3F::One );
 
@@ -308,8 +306,14 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
       // we need to fail... can't have a shape without collision.
       if ( !colShape )
       {
-         errorBuffer = String::ToString( "PhysicsShapeData::preload - No collision found for shape '%s'.", shapeName );
-         return false;
+         //no collision so we create a simple box collision shape from the shapes bounds and alert the user
+         Con::warnf( "PhysicsShapeData::preload - No collision found for shape '%s', auto-creating one", shapeName );
+         Point3F halfWidth = shape->bounds.getExtents() * 0.5f;
+         colShape = PHYSICSMGR->createCollision();
+         MatrixF centerXfm(true);
+         centerXfm.setPosition(shape->bounds.getCenter());
+         colShape->addBox(halfWidth, centerXfm);
+         return true;
       }
    }   
 
@@ -381,7 +385,7 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
                            MatrixF::Identity );
    */
 
-   return true;
+   return !shapeError;
 }
 
 
@@ -699,7 +703,7 @@ bool PhysicsShape::_createShape()
    mAmbientSeq = -1;
 
    PhysicsShapeData *db = getDataBlock();
-   if ( !db )
+   if ( !db || !db->shape)
       return false;
 
    // Set the world box.
