@@ -642,7 +642,7 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
    // 4:3 aspect ratio, we've changed the reference value
    // to 300 to be more compatible with legacy shapes.
    //
-   const F32 pixelScale = (state->getViewport().extent.x / state->getViewport().extent.y);
+   const F32 pixelScale = (state->getViewport().extent.x / state->getViewport().extent.y)*2;
 
    // This is legacy DTS support for older "multires" based
    // meshes.  The original crossbow weapon uses this.
