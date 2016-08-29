@@ -153,7 +153,7 @@ PlatformWindow *PlatformWindowManagerSDL::createWindow(GFXDevice *device, const 
 {
    // Do the allocation.
    PlatformWindowSDL *window = new PlatformWindowSDL();   
-   U32 windowFlags = /*SDL_WINDOW_SHOWN |*/ SDL_WINDOW_RESIZABLE;
+   U32 windowFlags = /*SDL_WINDOW_SHOWN |*/ SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN;
 
    if(GFX->getAdapterType() == OpenGL)
        windowFlags |= SDL_WINDOW_OPENGL;
@@ -341,11 +341,6 @@ void PlatformWindowManagerSDL::raiseCurtain()
       return;
 
    // TODO SDL
-}
-
-bool Platform::closeSplashWindow()
-{
-    return true;
 }
 
 void Platform::openFolder(const char* path )
