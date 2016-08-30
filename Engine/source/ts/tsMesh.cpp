@@ -3429,8 +3429,8 @@ void TSBasicVertexFormat::addMeshRequirements(TSMesh *mesh)
    bool hasTexcoord2 = false;
    bool hasSkin = false;
 
-   hasColors = mesh->getHasColor() || (texCoordOffset != -1);
-   hasTexcoord2 = mesh->getHasTVert2() || (colorOffset != -1);
+   hasColors = mesh->getHasColor() || (colorOffset != -1);
+   hasTexcoord2 = mesh->getHasTVert2() || (texCoordOffset != -1);
    hasSkin = (mesh->getMeshType() == TSMesh::SkinMeshType) || (boneOffset != -1);
 
    S32 offset = sizeof(TSMesh::__TSMeshVertexBase);

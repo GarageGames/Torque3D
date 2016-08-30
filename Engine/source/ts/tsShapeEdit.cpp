@@ -742,8 +742,25 @@ void TSShape::removeMeshFromObject(S32 objIndex, S32 meshIndex)
       {
          if (meshIndex < objects[i].numMeshes)
          {
-            meshes.erase(objects[i].startMeshIndex + meshIndex);
+            U32 idxToRemove = objects[i].startMeshIndex + meshIndex;
+            meshes.erase(idxToRemove);
             objects[i].numMeshes--;
+
+            // Clear invalid parent
+            for (U32 k = 0; k < meshes.size(); k++)
+            {
+               if (meshes[k] == NULL)
+                  continue;
+
+               if (meshes[k]->parentMesh == idxToRemove)
+               {
+                  meshes[k]->parentMesh = -1;
+               }
+               else if (meshes[k]->parentMesh > idxToRemove)
+               {
+                  meshes[k]->parentMesh--;
+               }
+            }
 
             for (S32 j = 0; j < objects.size(); j++)
             {
@@ -770,7 +787,25 @@ void TSShape::removeMeshFromObject(S32 objIndex, S32 meshIndex)
    S32 oldNumMeshes = obj.numMeshes;
    while (obj.numMeshes && !meshes[obj.startMeshIndex + obj.numMeshes - 1])
    {
-      meshes.erase(obj.startMeshIndex + obj.numMeshes - 1);
+      U32 idxToRemove = obj.startMeshIndex + obj.numMeshes - 1;
+      meshes.erase(idxToRemove);
+
+      // Clear invalid parent
+      for (U32 k = 0; k < meshes.size(); k++)
+      {
+         if (meshes[k] == NULL)
+            continue;
+
+         if (meshes[k]->parentMesh == idxToRemove)
+         {
+            meshes[k]->parentMesh = -1;
+         }
+         else if (meshes[k]->parentMesh > idxToRemove)
+         {
+            meshes[k]->parentMesh--;
+         }
+      }
+
       obj.numMeshes--;
    }
 
@@ -857,6 +892,12 @@ bool TSShape::removeObject(const String& name)
 
    // Update smallest visible detail
    updateSmallestVisibleDL();
+
+   // Ensure shape is dirty
+   if (meshes[0])
+   {
+      meshes[0]->makeEditable();
+   }
 
    // Re-initialise the shape
    init();
@@ -1296,6 +1337,12 @@ bool TSShape::removeDetail( S32 size )
      }
      
       billboardDetails.erase( dl );
+   }
+
+   // Ensure shape is dirty
+   if (meshes[0])
+   {
+      meshes[0]->makeEditable();
    }
 
    // Update smallest visible detail

@@ -576,7 +576,12 @@ void TSShape::init()
       if (!mesh)
          continue;
 
-      if (mesh->parentMesh >= 0)
+      if (mesh->parentMesh >= meshes.size())
+      {
+         Con::warnf("Mesh %i has a bad parentMeshObject (%i)", iter - meshes.begin(), mesh->parentMesh);
+      }
+      
+      if (mesh->parentMesh >= 0 && mesh->parentMesh < meshes.size())
       {
          mesh->parentMeshObject = meshes[mesh->parentMesh];
       }
@@ -736,7 +741,7 @@ void TSShape::initVertexBufferPointers()
          if (mesh->mVertSize > 0 && !mesh->mVertexData.isReady())
          {
             U32 boneOffset = 0;
-            U32 colorOffset = 0;
+            U32 texCoordOffset = 0;
             AssertFatal(mesh->mVertSize == mVertexFormat.getSizeInBytes(), "mismatch in format size");
 
             if (mBasicVertexFormat.boneOffset >= 0)
@@ -744,13 +749,13 @@ void TSShape::initVertexBufferPointers()
                boneOffset = mBasicVertexFormat.boneOffset;
             }
 
-            if (mBasicVertexFormat.colorOffset >= 0)
+            if (mBasicVertexFormat.texCoordOffset >= 0)
             {
-               colorOffset = mBasicVertexFormat.colorOffset;
+               texCoordOffset = mBasicVertexFormat.texCoordOffset;
             }
 
             // Initialize the vertex data
-            mesh->mVertexData.set(mShapeVertexData.base + mesh->mVertOffset, mesh->mVertSize, mesh->mNumVerts, colorOffset, boneOffset, false);
+            mesh->mVertexData.set(mShapeVertexData.base + mesh->mVertOffset, mesh->mVertSize, mesh->mNumVerts, texCoordOffset, boneOffset, false);
             mesh->mVertexData.setReady(true);
          }
       }
@@ -856,6 +861,7 @@ void TSShape::initVertexFeatures()
    }
 
    // Now we can create the VBO
+   mShapeVertexData.set(NULL, 0);
    U8 *vertexData = (U8*)dMalloc_aligned(destVertex, 16);
    U8 *vertexDataPtr = vertexData;
    mShapeVertexData.set(vertexData, destVertex);
@@ -872,7 +878,7 @@ void TSShape::initVertexFeatures()
          continue;
 
       U32 boneOffset = 0;
-      U32 colorOffset = 0;
+      U32 texCoordOffset = 0;
       AssertFatal(mesh->mVertSize == mVertexFormat.getSizeInBytes(), "mismatch in format size");
 
       if (mBasicVertexFormat.boneOffset >= 0)
@@ -880,9 +886,9 @@ void TSShape::initVertexFeatures()
          boneOffset = mBasicVertexFormat.boneOffset;
       }
 
-      if (mBasicVertexFormat.colorOffset >= 0)
+      if (mBasicVertexFormat.texCoordOffset >= 0)
       {
-         colorOffset = mBasicVertexFormat.colorOffset;
+         texCoordOffset = mBasicVertexFormat.texCoordOffset;
       }
 
       // Dump everything
@@ -891,7 +897,14 @@ void TSShape::initVertexFeatures()
       AssertFatal(mesh->mVertOffset == vertexDataPtr - vertexData, "vertex offset mismatch");
       mesh->mNumVerts = mesh->getNumVerts();
 
-      mesh->mVertexData.set(mShapeVertexData.base + mesh->mVertOffset, mesh->mVertSize, mesh->mNumVerts, colorOffset, boneOffset, false);
+      // Correct bad meshes
+      if (mesh->mNumVerts != 0 && mesh->vertsPerFrame > mesh->mNumVerts)
+      {
+         Con::warnf("Shape mesh has bad vertsPerFrame (%i, should be <= %i)", mesh->vertsPerFrame, mesh->mNumVerts);
+         mesh->vertsPerFrame = mesh->mNumVerts;
+      }
+
+      mesh->mVertexData.set(mShapeVertexData.base + mesh->mVertOffset, mesh->mVertSize, mesh->mNumVerts, texCoordOffset, boneOffset, false);
       mesh->convertToVertexData();
       mesh->mVertexData.setReady(true);
 
@@ -1494,7 +1507,7 @@ void TSShape::assembleShape()
    }
 
    // read in the meshes (sans skins)...straightforward read one at a time
-   ptr32 = tsalloc.allocShape32(numMeshes + numSkins*numDetails); // leave room for skins on old shapes
+   TSMesh **ptrmesh = (TSMesh**)tsalloc.allocShape32((numMeshes + numSkins*numDetails) * (sizeof(TSMesh*) / 4));
    S32 curObject = 0; // for tracking skipped meshes
    for (i=0; i<numMeshes; i++)
    {
@@ -1504,10 +1517,9 @@ void TSShape::assembleShape()
          // decal mesh deprecated
          skip = true;
       TSMesh * mesh = TSMesh::assembleMesh(meshType,skip);
-      if (ptr32)
+      if (ptrmesh)
       {
-         ptr32[i] = skip ?  0 : (intptr_t)mesh; // @todo 64bit
-         meshes.push_back(skip ?  0 : mesh);
+         ptrmesh[i] = skip ?  0 : mesh;
       }
 
       // fill in location of verts, tverts, and normals for detail levels
@@ -1536,6 +1548,7 @@ void TSShape::assembleShape()
          }
       }
    }
+   meshes.set(ptrmesh, numMeshes);
 
    tsalloc.checkGuard();
 
