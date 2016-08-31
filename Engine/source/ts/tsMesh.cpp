@@ -2606,7 +2606,7 @@ void TSMesh::disassemble()
    tsalloc.copyToBuffer32( (S32*)&mCenter, 3 );
    tsalloc.set32( (S32)mRadius );
 
-   bool shouldMakeEditable = TSShape::smVersion < 27;
+   bool shouldMakeEditable = TSShape::smVersion < 27 || mVertSize == 0;
 
    // Re-create the vectors
    if (shouldMakeEditable)
