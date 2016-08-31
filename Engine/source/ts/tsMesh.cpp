@@ -2799,6 +2799,18 @@ void TSSkinMesh::assemble( bool skip )
          batchData.initialNorms.set((Point3F*)ptr32, numVerts);
          encodedNorms.set(NULL, 0);
       }
+
+      // Sometimes we'll have a mesh with 0 verts but initialVerts is set,
+      // so set these accordingly
+      if (verts.size() == 0)
+      {
+         verts = batchData.initialVerts;
+      }
+
+      if (norms.size() == 0)
+      {
+         norms = batchData.initialNorms;
+      }
    }
    else
    {
