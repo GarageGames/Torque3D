@@ -55,6 +55,7 @@ singleton PostEffect( GammaPostFX )
    
    texture[0] = "$backBuffer";  
    texture[1] = $HDRPostFX::colorCorrectionRamp;  
+   targetFormat = "GFXFormatR16G16B16A16F";
 };
 
 function GammaPostFX::preProcess( %this )
