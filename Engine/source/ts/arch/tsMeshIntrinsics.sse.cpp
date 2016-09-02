@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 #include "ts/tsMesh.h"
 
-#if defined(TORQUE_CPU_X86)
+#if (defined( TORQUE_CPU_X86 ) || defined( TORQUE_CPU_X64 ))
 #include "ts/tsMeshIntrinsics.h"
 #include <xmmintrin.h>
 
