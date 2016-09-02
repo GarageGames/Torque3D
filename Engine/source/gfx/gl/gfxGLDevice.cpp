@@ -608,13 +608,11 @@ void GFXGLDevice::drawIndexedPrimitive(   GFXPrimitiveType primType,
                                           U32 startIndex, 
                                           U32 primitiveCount )
 {
-   AssertFatal( startVertex == 0, "GFXGLDevice::drawIndexedPrimitive() - Non-zero startVertex unsupported!" );
-
    preDrawPrimitive();
 
-   U16* buf = (U16*)static_cast<GFXGLPrimitiveBuffer*>(mCurrentPrimitiveBuffer.getPointer())->getBuffer() + startIndex;
+   U16* buf = (U16*)static_cast<GFXGLPrimitiveBuffer*>(mCurrentPrimitiveBuffer.getPointer())->getBuffer() + startIndex + mCurrentPrimitiveBuffer->mVolatileStart;
 
-   const U32 baseVertex = mCurrentVB[0]->mBufferVertexOffset;
+   const U32 baseVertex = mCurrentVB[0]->mBufferVertexOffset + startVertex;
 
    if(mDrawInstancesCount)
       glDrawElementsInstancedBaseVertex(GFXGLPrimType[primType], primCountToIndexCount(primType, primitiveCount), GL_UNSIGNED_SHORT, buf, mDrawInstancesCount, baseVertex);

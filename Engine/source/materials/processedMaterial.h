@@ -142,6 +142,9 @@ public:
    /// Sets the transformation matrix, i.e. Model * View * Projection
    virtual void setTransforms(const MatrixSet &matrixSet, SceneRenderState *state, const U32 pass) = 0;
    
+   /// Sets the node transforms for HW Skinning
+   virtual void setNodeTransforms(const MatrixF *address, const U32 numTransforms, const U32 pass) = 0;
+   
    /// Sets the scene info like lights for the given pass.
    virtual void setSceneInfo(SceneRenderState *, const SceneData& sgData, U32 pass) = 0;
 

@@ -71,12 +71,16 @@ protected:
    Vector <Var*> mElementList;
 
    U32 mCurTexElem;
+   U32 mCurBlendIndicesElem;
+   U32 mCurBlendWeightsElem;
    U8 mName[32];
 
 public:
 
    ShaderConnector();
    virtual ~ShaderConnector();
+
+   U32 getCurTexElem() { return mCurTexElem; }
 
    ///
    virtual Var* getElement(   RegisterType type, 

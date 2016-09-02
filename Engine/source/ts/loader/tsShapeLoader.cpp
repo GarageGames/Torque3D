@@ -1229,6 +1229,7 @@ void TSShapeLoader::install()
    shape->tubeRadius = shape->radius;
 
    shape->init();
+   shape->finalizeEditable();
 }
 
 void TSShapeLoader::computeBounds(Box3F& bounds)

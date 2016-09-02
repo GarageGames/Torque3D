@@ -282,7 +282,7 @@ void MeshFit::addSourceMesh( const TSShape::Object& obj, const TSMesh* mesh )
    S32 count, stride;
    U8* pVert;
 
-   if ( mesh->mVertexData.isReady() )
+   if ( mesh->mVertexData.isReady() && mesh->verts.size() == 0 )
    {
       count = mesh->mVertexData.size();
       stride = mesh->mVertexData.vertSize();
@@ -327,8 +327,6 @@ TSMesh* MeshFit::createTriMesh( F32* verts, S32 numVerts, U32* indices, S32 numT
    mesh->numMatFrames = 1;
    mesh->vertsPerFrame = numVerts;
    mesh->setFlags(0);
-   mesh->mHasColor = false;
-   mesh->mHasTVert2 = false;
    mesh->mNumVerts = numVerts;
 
    mesh->indices.reserve( numTris * 3 );
@@ -406,12 +404,28 @@ void MeshFit::addBox( const Point3F& sides, const MatrixF& mat )
    if ( !mesh )
       return;
 
-   for ( S32 i = 0; i < mesh->mVertexData.size(); i++ )
+   if (mesh->verts.size() > 0)
    {
-      Point3F v = mesh->mVertexData[i].vert();
-      v.convolve( sides );
-      mesh->mVertexData[i].vert( v );
+      for (S32 i = 0; i < mesh->verts.size(); i++)
+      {
+         Point3F v = mesh->verts[i];
+         v.convolve(sides);
+         mesh->verts[i] = v;
+      }
+
+      mesh->mVertexData.setReady(false);
    }
+   else
+   {
+      for (S32 i = 0; i < mesh->mVertexData.size(); i++)
+      {
+         TSMesh::__TSMeshVertexBase &vdata = mesh->mVertexData.getBase(i);
+         Point3F v = vdata.vert();
+         v.convolve(sides);
+         vdata.vert(v);
+      }
+   }
+
    mesh->computeBounds();
 
    mMeshes.increment();
@@ -437,8 +451,9 @@ void MeshFit::addSphere( F32 radius, const Point3F& center )
 
    for ( S32 i = 0; i < mesh->mVertexData.size(); i++ )
    {
-      Point3F v = mesh->mVertexData[i].vert();
-      mesh->mVertexData[i].vert( v * radius );
+      TSMesh::__TSMeshVertexBase &vdata = mesh->mVertexData.getBase(i);
+      Point3F v = vdata.vert();
+      vdata.vert( v * radius );
    }
    mesh->computeBounds();
 
@@ -470,9 +485,9 @@ void MeshFit::addCapsule( F32 radius, F32 height, const MatrixF& mat )
    F32 offset = ( height / ( 2 * radius ) ) - 0.5f;
    for ( S32 i = 0; i < mesh->mVertexData.size(); i++ )
    {
-      Point3F v = mesh->mVertexData[i].vert();
+      Point3F v = mesh->mVertexData.getBase(i).vert();
       v.y += ( ( v.y > 0 ) ? offset : -offset );
-      mesh->mVertexData[i].vert( v * radius );
+      mesh->mVertexData.getBase(i).vert( v * radius );
    }
    mesh->computeBounds();
 
@@ -784,13 +799,14 @@ DefineTSShapeConstructorMethod( addPrimitive, bool, ( const char* meshName, cons
    MatrixF mat( txfm.getMatrix() );
 
    // Transform the mesh vertices
-   if ( mesh->mVertexData.isReady() )
+   if ( mesh->mVertexData.isReady() && mesh->verts.size() == 0 )
    {
       for (S32 i = 0; i < mesh->mVertexData.size(); i++)
       {
+         TSMesh::__TSMeshVertexBase &vdata = mesh->mVertexData.getBase(i);
          Point3F v;
-         mat.mulP( mesh->mVertexData[i].vert(), &v );
-         mesh->mVertexData[i].vert( v );
+         mat.mulP( vdata.vert(), &v );
+         vdata.vert( v );
       }
    }
    else

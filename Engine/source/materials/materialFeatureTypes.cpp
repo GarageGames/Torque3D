@@ -103,3 +103,6 @@ ImplementFeatureType( MFT_DeferredEmptySpec, MFG_Texture, 8.01f, false );
 ImplementFeatureType( MFT_DeferredSpecMap, MFG_Texture, 8.2f, false );
 ImplementFeatureType( MFT_DeferredSpecVars, MFG_Texture, 8.5f, false );
 ImplementFeatureType( MFT_DeferredMatInfoFlags, MFG_Texture, 8.7f, false );
+
+ImplementFeatureType( MFT_HardwareSkinning, MFG_Transform,-2.0, false );
+

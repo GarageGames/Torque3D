@@ -36,7 +36,7 @@
 #include "math/mathIO.h"
 
 #include "torqueConfig.h"
-
+#include "T3D/accumulationVolume.h"
 
 IMPLEMENT_CO_NETOBJECT_V1(LevelInfo);
 
@@ -69,6 +69,8 @@ extern ColorI gCanvasClearColor;
 /// @see DecalManager
 extern F32 gDecalBias;
 
+/// @see AccumulationVolume
+extern GFXTexHandle gLevelAccuMap;
 
 /// Default SFXAmbience used to reset the global soundscape.
 static SFXAmbience sDefaultAmbience;
@@ -96,6 +98,8 @@ LevelInfo::LevelInfo()
    mNetFlags.set( ScopeAlways | Ghostable );
 
    mAdvancedLightmapSupport = false;
+   mAccuTextureName = "";
+   mAccuTexture = NULL;
 
    // Register with the light manager activation signal, and we need to do it first
    // so the advanced light bin manager can be instructed about MRT lightmaps
@@ -107,6 +111,11 @@ LevelInfo::LevelInfo()
 LevelInfo::~LevelInfo()
 {
    LightManager::smActivateSignal.remove(this, &LevelInfo::_onLMActivate);
+   if (!mAccuTexture.isNull())
+   {
+      mAccuTexture.free();
+      gLevelAccuMap.free();
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -157,6 +166,9 @@ void LevelInfo::initPersistFields()
       addField( "advancedLightmapSupport", TypeBool, Offset( mAdvancedLightmapSupport, LevelInfo ),
          "Enable expanded support for mixing static and dynamic lighting (more costly)" );
 
+      addProtectedField("AccuTexture", TypeStringFilename, Offset(mAccuTextureName, LevelInfo),
+         &_setLevelAccuTexture, &defaultProtectedGetFn, "Accumulation texture.");
+
    endGroup( "Lighting" );
    
    addGroup( "Sound" );
@@ -203,7 +215,8 @@ U32 LevelInfo::packUpdate(NetConnection *conn, U32 mask, BitStream *stream)
 
    sfxWrite( stream, mSoundAmbience );
    stream->writeInt( mSoundDistanceModel, 1 );
-      
+
+   stream->write(mAccuTextureName);
    return retMask;
 }
 
@@ -248,6 +261,8 @@ void LevelInfo::unpackUpdate(NetConnection *conn, BitStream *stream)
 
       SFX->setDistanceModel( mSoundDistanceModel );
    }
+   stream->read(&mAccuTextureName);
+   setLevelAccuTexture(mAccuTextureName);
 }
 
 //-----------------------------------------------------------------------------
@@ -341,4 +356,26 @@ void LevelInfo::_onLMActivate(const char *lm, bool enable)
       lightMgr->getLightBinManager()->MRTLightmapsDuringPrePass(mAdvancedLightmapSupport);
    }
 #endif
+}
+
+bool LevelInfo::_setLevelAccuTexture(void *object, const char *index, const char *data)
+{
+   LevelInfo* volume = reinterpret_cast< LevelInfo* >(object);
+   volume->setLevelAccuTexture(data);
+   return false;
+}
+
+
+void LevelInfo::setLevelAccuTexture(const String& name)
+{
+   mAccuTextureName = name;
+   if (isClientObject() && mAccuTextureName.isNotEmpty())
+   {
+      mAccuTexture.set(mAccuTextureName, &GFXDefaultStaticDiffuseProfile, "AccumulationVolume::mAccuTexture");
+      if (mAccuTexture.isNull())
+         Con::warnf("AccumulationVolume::setTexture - Unable to load texture: %s", mAccuTextureName.c_str());
+      else
+         gLevelAccuMap = mAccuTexture;
+   }
+   AccumulationVolume::refreshVolumes();
 }

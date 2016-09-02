@@ -35,6 +35,7 @@
 #include "gfx/sim/cubemapData.h"
 #include "gfx/gfxCubemap.h"
 #include "core/util/safeDelete.h"
+#include "ts/tsShape.h"
 
 class MatInstParameters;
 
@@ -248,8 +249,10 @@ void MatInstance::construct()
    mActiveParameters = NULL;
    mDefaultParameters = NULL;
    mHasNormalMaps = false;
+   mUsesHardwareSkinning = false;
    mIsForwardLit = false;
    mIsValid = false;
+   mIsHardwareSkinned = false;
 
    MATMGR->_track(this);
 }
@@ -360,6 +363,11 @@ bool MatInstance::processMaterial()
 
       FeatureSet features( mFeatureList );
       features.exclude( MATMGR->getExclusionFeatures() );
+
+      if (mVertexFormat->hasBlendIndices() && TSShape::smUseHardwareSkinning)
+      {
+         features.addFeature( MFT_HardwareSkinning );
+      }
       
       if( !mProcessedMaterial->init(features, mVertexFormat, mFeaturesDelegate) )
       {
@@ -373,10 +381,13 @@ bool MatInstance::processMaterial()
 
       const FeatureSet &finalFeatures = mProcessedMaterial->getFeatures();
       mHasNormalMaps = finalFeatures.hasFeature( MFT_NormalMap );
+      mUsesHardwareSkinning = finalFeatures.hasFeature( MFT_HardwareSkinning );
 
       mIsForwardLit =   (  custMat && custMat->mForwardLit ) || 
                         (  !finalFeatures.hasFeature( MFT_IsEmissive ) &&
                            finalFeatures.hasFeature( MFT_ForwardShading ) );
+
+      mIsHardwareSkinned = finalFeatures.hasFeature( MFT_HardwareSkinning );
 
       return true;
    }
@@ -453,6 +464,12 @@ void MatInstance::setTransforms(const MatrixSet &matrixSet, SceneRenderState *st
 {
    PROFILE_SCOPE(MatInstance_setTransforms);
    mProcessedMaterial->setTransforms(matrixSet, state, getCurPass());
+}
+
+void MatInstance::setNodeTransforms(const MatrixF *address, const U32 numTransforms)
+{
+   PROFILE_SCOPE(MatInstance_setNodeTransforms);
+   mProcessedMaterial->setNodeTransforms(address, numTransforms, getCurPass());
 }
 
 void MatInstance::setSceneInfo(SceneRenderState * state, const SceneData& sgData)

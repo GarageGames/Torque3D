@@ -420,7 +420,7 @@ void OggTheoraDecoder::_transcode( th_ycbcr_buffer ycbcr, U8* buffer, const U32 
 }
 
 //-----------------------------------------------------------------------------
-
+#if defined( TORQUE_CPU_X86 )
 void OggTheoraDecoder::_transcode420toRGBA_SSE2( th_ycbcr_buffer ycbcr, U8* buffer, U32 width, U32 height, U32 pitch )
 {
    AssertFatal( width % 2 == 0, "OggTheoraDecoder::_transcode420toRGBA_SSE2() - width must be multiple of 2" );
@@ -692,3 +692,4 @@ void OggTheoraDecoder::_transcode420toRGBA_SSE2( th_ycbcr_buffer ycbcr, U8* buff
    
    #endif
 }
+#endif

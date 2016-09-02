@@ -113,6 +113,9 @@ const char* ShaderGenComponentFactoryGLSL::typeToString( GFXDeclType type )
       case GFXDeclType_Float3:
          return "vec3";
 
+      case GFXDeclType_UByte4:
+         return "vec4";
+
       case GFXDeclType_Float4:
       case GFXDeclType_Color:
          return "vec4";
@@ -159,6 +162,16 @@ ShaderComponent* ShaderGenComponentFactoryGLSL::createVertexInputConnector( cons
       {
          var = vertComp->getElement( RT_COLOR );
          var->setName( "diffuse" );
+      }
+      else if (element.isSemantic(GFXSemantic::BLENDINDICES))
+      {
+         var = vertComp->getElement(RT_BLENDINDICES);
+         var->setName(String::ToString("vBlendIndex%d", element.getSemanticIndex()));
+      }
+      else if (element.isSemantic(GFXSemantic::BLENDWEIGHT))
+      {
+         var = vertComp->getElement(RT_BLENDWEIGHT);
+         var->setName(String::ToString("vBlendWeight%d", element.getSemanticIndex()));
       }
       else if ( element.isSemantic( GFXSemantic::TEXCOORD ) )
       {

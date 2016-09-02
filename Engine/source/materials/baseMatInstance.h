@@ -80,6 +80,9 @@ protected:
    /// This is set by initialization and used by the prepass.
    bool mHasNormalMaps;
 
+   /// This material makes use of bone transforms
+   bool mUsesHardwareSkinning;
+
 public:
 
    virtual ~BaseMatInstance();
@@ -149,6 +152,9 @@ public:
    /// @see setupPass
    virtual void setTransforms( const MatrixSet &matrixSet, SceneRenderState *state ) = 0;
 
+   /// Sets node transforms for the current stage. Used for hardware skinning.
+   virtual void setNodeTransforms( const MatrixF *address, const U32 numTransforms ) = 0;
+
    /// This initializes various material scene state settings and
    /// should be called after setupPass() within the pass loop.
    /// @see setupPass
@@ -213,6 +219,8 @@ public:
 
    /// Fast test for use of normal maps in this material.
    bool hasNormalMap() const { return mHasNormalMaps; }
+
+   bool usesHardwareSkinning() const { return mUsesHardwareSkinning; }
 
    ///
    MatFeaturesDelegate& getFeaturesDelegate() { return mFeaturesDelegate; }
