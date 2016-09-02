@@ -681,7 +681,7 @@ void AdvancedLightBinManager::LightMaterialInfo::setLightParameters( const Light
    F32 lumiance = mDot(*((const Point3F *)&lightInfo->getColor()), colorToLumiance );
    col.alpha *= lumiance;
 
-   matParams->setSafe( lightColor, col );
+   matParams->setSafe( lightColor, col.toLinear() );
    matParams->setSafe( lightBrightness, lightInfo->getBrightness() );
 
    switch( lightInfo->getType() )
@@ -697,7 +697,7 @@ void AdvancedLightBinManager::LightMaterialInfo::setLightParameters( const Light
          // the vector light. This prevents a divide by zero.
          ColorF ambientColor = renderState->getAmbientLightColor();
          ambientColor.alpha = 0.00001f;
-         matParams->setSafe( lightAmbient, ambientColor );
+         matParams->setSafe( lightAmbient, ambientColor.toLinear() );
 
          // If no alt color is specified, set it to the average of
          // the ambient and main color to avoid artifacts.
@@ -711,7 +711,7 @@ void AdvancedLightBinManager::LightMaterialInfo::setLightParameters( const Light
             lightAlt = (lightInfo->getColor() + renderState->getAmbientLightColor()) / 2.0f;
 
          ColorF trilightColor = lightAlt;
-         matParams->setSafe(lightTrilight, trilightColor);
+         matParams->setSafe(lightTrilight, trilightColor.toLinear());
       }
       break;
 

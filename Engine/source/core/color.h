@@ -104,6 +104,9 @@ class ColorF
                                       (alpha >= 0.0f && alpha <= 1.0f); }
    void clamp();
 
+   ColorF toLinear() const;
+   ColorF toGamma() const;
+
    static const ColorF ZERO;
    static const ColorF ONE;
    static const ColorF WHITE;
@@ -460,6 +463,16 @@ inline void ColorF::clamp()
       alpha = 1.0f;
    else if (alpha < 0.0f)
       alpha = 0.0f;
+}
+
+inline ColorF ColorF::toLinear() const
+{
+   return ColorF(mPow(red, 2.2f), mPow(green, 2.2f), mPow(blue, 2.2f), alpha);
+}
+
+inline ColorF ColorF::toGamma() const
+{
+   return ColorF(mPow(red, 1.0f / 2.2f), mPow(green, 1.0f / 2.2f), mPow(blue, 1.0f / 2.2f), alpha);
 }
 
 //------------------------------------------------------------------------------
