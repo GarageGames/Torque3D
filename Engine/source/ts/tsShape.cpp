@@ -71,6 +71,7 @@ TSShape::TSShape()
    mShapeDataSize = 0;
 
    mUseDetailFromScreenError = false;
+   mNeedReinit = false;
 
    mDetailLevelLookup.setSize( 1 );
    mDetailLevelLookup[0].set( -1, 0 );
@@ -413,43 +414,51 @@ void TSShape::getObjectDetails(S32 objIndex, Vector<S32>& objDetails)
 
 void TSShape::init()
 {
-   S32 numSubShapes = subShapeFirstNode.size();
-   AssertFatal(numSubShapes==subShapeFirstObject.size(),"TSShape::init");
+   initObjects();
+   initVertexFeatures();
+   initMaterialList();
+   mNeedReinit = false;
+}
 
-   S32 i,j;
+void TSShape::initObjects()
+{
+   S32 numSubShapes = subShapeFirstNode.size();
+   AssertFatal(numSubShapes == subShapeFirstObject.size(), "TSShape::initObjects");
+
+   S32 i, j;
 
    // set up parent/child relationships on nodes and objects
-   for (i=0; i<nodes.size(); i++)
+   for (i = 0; i<nodes.size(); i++)
       nodes[i].firstObject = nodes[i].firstChild = nodes[i].nextSibling = -1;
-   for (i=0; i<nodes.size(); i++)
+   for (i = 0; i<nodes.size(); i++)
    {
       S32 parentIndex = nodes[i].parentIndex;
-      if (parentIndex>=0)
+      if (parentIndex >= 0)
       {
          if (nodes[parentIndex].firstChild<0)
-            nodes[parentIndex].firstChild=i;
+            nodes[parentIndex].firstChild = i;
          else
          {
             S32 child = nodes[parentIndex].firstChild;
-            while (nodes[child].nextSibling>=0)
+            while (nodes[child].nextSibling >= 0)
                child = nodes[child].nextSibling;
             nodes[child].nextSibling = i;
          }
       }
    }
-   for (i=0; i<objects.size(); i++)
+   for (i = 0; i<objects.size(); i++)
    {
       objects[i].nextSibling = -1;
 
       S32 nodeIndex = objects[i].nodeIndex;
-      if (nodeIndex>=0)
+      if (nodeIndex >= 0)
       {
          if (nodes[nodeIndex].firstObject<0)
             nodes[nodeIndex].firstObject = i;
          else
          {
             S32 objectIndex = nodes[nodeIndex].firstObject;
-            while (objects[objectIndex].nextSibling>=0)
+            while (objects[objectIndex].nextSibling >= 0)
                objectIndex = objects[objectIndex].nextSibling;
             objects[objectIndex].nextSibling = i;
          }
@@ -457,7 +466,7 @@ void TSShape::init()
    }
 
    mFlags = 0;
-   for (i=0; i<sequences.size(); i++)
+   for (i = 0; i<sequences.size(); i++)
    {
       if (!sequences[i].animatesScale())
          continue;
@@ -465,32 +474,32 @@ void TSShape::init()
       U32 curVal = mFlags & AnyScale;
       U32 newVal = sequences[i].flags & AnyScale;
       mFlags &= ~(AnyScale);
-      mFlags |= getMax(curVal,newVal); // take the larger value (can only convert upwards)
+      mFlags |= getMax(curVal, newVal); // take the larger value (can only convert upwards)
    }
 
    // set up alphaIn and alphaOut vectors...
    alphaIn.setSize(details.size());
    alphaOut.setSize(details.size());
 
-   for (i=0; i<details.size(); i++)
+   for (i = 0; i<details.size(); i++)
    {
       if (details[i].size<0)
       {
          // we don't care...
-         alphaIn[i]  = 0.0f;
+         alphaIn[i] = 0.0f;
          alphaOut[i] = 0.0f;
       }
-      else if (i+1==details.size() || details[i+1].size<0)
+      else if (i + 1 == details.size() || details[i + 1].size<0)
       {
-         alphaIn[i]  = 0.0f;
+         alphaIn[i] = 0.0f;
          alphaOut[i] = smAlphaOutLastDetail;
       }
       else
       {
-         if (details[i+1].subShapeNum<0)
+         if (details[i + 1].subShapeNum<0)
          {
             // following detail is a billboard detail...treat special...
-            alphaIn[i]  = smAlphaInBillboard;
+            alphaIn[i] = smAlphaInBillboard;
             alphaOut[i] = smAlphaOutBillboard;
          }
          else
@@ -502,7 +511,7 @@ void TSShape::init()
       }
    }
 
-   for (i=mSmallestVisibleDL-1; i>=0; i--)
+   for (i = mSmallestVisibleDL - 1; i >= 0; i--)
    {
       if (i<smNumSkipLoadDetails)
       {
@@ -510,19 +519,19 @@ void TSShape::init()
          // is larger than our cap...zap all the meshes and decals
          // associated with it and use the next detail level
          // instead...
-         S32 ss    = details[i].subShapeNum;
-         S32 od    = details[i].objectDetailNum;
+         S32 ss = details[i].subShapeNum;
+         S32 od = details[i].objectDetailNum;
 
-         if (ss==details[i+1].subShapeNum && od==details[i+1].objectDetailNum)
+         if (ss == details[i + 1].subShapeNum && od == details[i + 1].objectDetailNum)
             // doh! already done this one (init can be called multiple times on same shape due
             // to sequence importing).
             continue;
-         details[i].subShapeNum = details[i+1].subShapeNum;
-         details[i].objectDetailNum = details[i+1].objectDetailNum;
+         details[i].subShapeNum = details[i + 1].subShapeNum;
+         details[i].objectDetailNum = details[i + 1].objectDetailNum;
       }
    }
 
-   for (i=0; i<details.size(); i++)
+   for (i = 0; i<details.size(); i++)
    {
       S32 count = 0;
       S32 ss = details[i].subShapeNum;
@@ -534,13 +543,13 @@ void TSShape::init()
          continue;
       }
       S32 start = subShapeFirstObject[ss];
-      S32 end   = start + subShapeNumObjects[ss];
-      for (j=start; j<end; j++)
+      S32 end = start + subShapeNumObjects[ss];
+      for (j = start; j<end; j++)
       {
          Object & obj = objects[j];
          if (od<obj.numMeshes)
          {
-            TSMesh * mesh = meshes[obj.startMeshIndex+od];
+            TSMesh * mesh = meshes[obj.startMeshIndex + od];
             count += mesh ? mesh->getNumPolys() : 0;
          }
       }
@@ -555,11 +564,11 @@ void TSShape::init()
       {
          ConvexHullAccelerator* accel = detailCollisionAccelerators[dca];
          if (accel != NULL) {
-            delete [] accel->vertexList;
-            delete [] accel->normalList;
+            delete[] accel->vertexList;
+            delete[] accel->normalList;
             for (S32 j = 0; j < accel->numVerts; j++)
-               delete [] accel->emitStrings[j];
-            delete [] accel->emitStrings;
+               delete[] accel->emitStrings[j];
+            delete[] accel->emitStrings;
             delete accel;
          }
       }
@@ -580,7 +589,7 @@ void TSShape::init()
       {
          Con::warnf("Mesh %i has a bad parentMeshObject (%i)", iter - meshes.begin(), mesh->parentMesh);
       }
-      
+
       if (mesh->parentMesh >= 0 && mesh->parentMesh < meshes.size())
       {
          mesh->parentMeshObject = meshes[mesh->parentMesh];
@@ -592,9 +601,6 @@ void TSShape::init()
 
       mesh->mVertexFormat = &mVertexFormat;
    }
-
-   initVertexFeatures();
-   initMaterialList();
 }
 
 void TSShape::initVertexBuffers()

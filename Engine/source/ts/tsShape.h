@@ -413,6 +413,7 @@ class TSShape
    GFXPrimitiveBufferHandle mShapeVertexIndices;
 
    bool mSequencesConstructed;
+   bool mNeedReinit;
 
 
    // shape class has few methods --
@@ -427,7 +428,10 @@ class TSShape
    bool preloadMaterialList(const Torque::Path &path); ///< called to preload and validate the materials in the mat list
 
    void setupBillboardDetails( const String &cachePath );
-   
+
+   /// Inits object list (no geometry buffers)
+   void initObjects();
+
    /// Initializes the main vertex buffer
    void initVertexBuffers();
 
@@ -557,8 +561,6 @@ class TSShape
 
    const GFXVertexFormat* getVertexFormat() const { return &mVertexFormat; }
 
-   bool needsBufferUpdate();
-
    /// @}
 
    /// @name Alpha Transitions
@@ -685,6 +687,10 @@ class TSShape
 
    bool setSequenceBlend(const String& seqName, bool blend, const String& blendRefSeqName, S32 blendRefFrame);
    bool setSequenceGroundSpeed(const String& seqName, const Point3F& trans, const Point3F& rot);
+
+   void makeEditable();
+   bool needsReinit();
+   bool needsBufferUpdate();
    /// @}
 };
 
