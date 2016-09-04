@@ -279,6 +279,7 @@ protected:
    TSVertexBufferHandle mSoftwareVertexBuffer;
 
    bool            mOwnMaterialList; ///< Does this own the material list pointer?
+   bool            mUseOwnBuffer; ///< Force using our own copy of the vertex buffer
 
    bool           mAlphaAlways;
    F32            mAlphaAlwaysValue;
@@ -341,6 +342,7 @@ protected:
    /// an optional feature set.
    void initMaterialList(  const FeatureSet *features = NULL );
 
+   void setUseOwnBuffer();
    bool ownMaterialList() const { return mOwnMaterialList; }
 
    /// Get the number of material targets in this shape instance

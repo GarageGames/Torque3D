@@ -435,6 +435,9 @@ bool TSShape::addNode(const String& name, const String& parentName, const Point3
       }
    }
 
+   // Need to make everything editable since node indexes etc will change
+   makeEditable();
+
    // Insert node at the end of the subshape
    S32 subShapeIndex = (parentIndex >= 0) ? getSubShapeForNode(parentIndex) : 0;
    S32 nodeIndex = subShapeNumNodes[subShapeIndex];
@@ -493,8 +496,7 @@ bool TSShape::addNode(const String& name, const String& parentName, const Point3
       }
    }
 
-   // Re-initialise the shape
-   init();
+   initObjects();
 
    return true;
 }
@@ -547,6 +549,9 @@ bool TSShape::removeNode(const String& name)
          "will be reassigned to the node's parent ('%s')", name.c_str(), nodeObjects.size(),
          ((nodeParentIndex >= 0) ? getName(nodes[nodeParentIndex].nameIndex).c_str() : "null"));
    }
+
+   // Need to make everything editable since node indexes etc will change
+   makeEditable();
 
    // Update animation sequences
    for (S32 iSeq = 0; iSeq < sequences.size(); iSeq++)
@@ -626,8 +631,7 @@ bool TSShape::removeNode(const String& name)
    // Remove the sequence name if it is no longer in use
    removeName(name);
 
-   // Re-initialise the shape
-   init();
+   initObjects();
 
    return true;
 }
@@ -742,8 +746,25 @@ void TSShape::removeMeshFromObject(S32 objIndex, S32 meshIndex)
       {
          if (meshIndex < objects[i].numMeshes)
          {
-            meshes.erase(objects[i].startMeshIndex + meshIndex);
+            U32 idxToRemove = objects[i].startMeshIndex + meshIndex;
+            meshes.erase(idxToRemove);
             objects[i].numMeshes--;
+
+            // Clear invalid parent
+            for (U32 k = 0; k < meshes.size(); k++)
+            {
+               if (meshes[k] == NULL)
+                  continue;
+
+               if (meshes[k]->parentMesh == idxToRemove)
+               {
+                  meshes[k]->parentMesh = -1;
+               }
+               else if (meshes[k]->parentMesh > idxToRemove)
+               {
+                  meshes[k]->parentMesh--;
+               }
+            }
 
             for (S32 j = 0; j < objects.size(); j++)
             {
@@ -770,7 +791,25 @@ void TSShape::removeMeshFromObject(S32 objIndex, S32 meshIndex)
    S32 oldNumMeshes = obj.numMeshes;
    while (obj.numMeshes && !meshes[obj.startMeshIndex + obj.numMeshes - 1])
    {
-      meshes.erase(obj.startMeshIndex + obj.numMeshes - 1);
+      U32 idxToRemove = obj.startMeshIndex + obj.numMeshes - 1;
+      meshes.erase(idxToRemove);
+
+      // Clear invalid parent
+      for (U32 k = 0; k < meshes.size(); k++)
+      {
+         if (meshes[k] == NULL)
+            continue;
+
+         if (meshes[k]->parentMesh == idxToRemove)
+         {
+            meshes[k]->parentMesh = -1;
+         }
+         else if (meshes[k]->parentMesh > idxToRemove)
+         {
+            meshes[k]->parentMesh--;
+         }
+      }
+
       obj.numMeshes--;
    }
 
@@ -820,6 +859,9 @@ bool TSShape::removeObject(const String& name)
       return false;
    }
 
+   // Need to make everything editable since node indexes etc will change
+   makeEditable();
+
    // Destroy all meshes in the object
    TSShape::Object& obj = objects[objIndex];
    while ( obj.numMeshes )
@@ -858,8 +900,7 @@ bool TSShape::removeObject(const String& name)
    // Update smallest visible detail
    updateSmallestVisibleDL();
 
-   // Re-initialise the shape
-   init();
+   initObjects();
 
    return true;
 }
@@ -919,6 +960,9 @@ bool TSShape::addMesh(TSMesh* mesh, const String& meshName)
 { 
    // Ensure mesh is in editable state
    mesh->makeEditable();
+
+   // Need to make everything editable since node indexes etc will change
+   makeEditable();
 
    // Determine the object name and detail size from the mesh name
    S32 detailSize = 999;
@@ -1008,8 +1052,7 @@ bool TSShape::addMesh(TSMesh* mesh, const String& meshName)
       }
    }
 
-   // Re-initialise the shape
-   init();
+   initObjects();
 
    return true;
 }
@@ -1099,6 +1142,9 @@ bool TSShape::setMeshSize(const String& meshName, S32 size)
       return false;
    }
 
+   // Need to make everything editable since node indexes etc will change
+   makeEditable();
+
    // Remove the mesh from the object, but don't destroy it
    TSShape::Object& obj = objects[objIndex];
    TSMesh* mesh = meshes[obj.startMeshIndex + meshIndex];
@@ -1110,8 +1156,7 @@ bool TSShape::setMeshSize(const String& meshName, S32 size)
    // Update smallest visible detail
    updateSmallestVisibleDL();
 
-   // Re-initialise the shape
-   init();
+   initObjects();
 
    return true;
 }
@@ -1126,6 +1171,9 @@ bool TSShape::removeMesh(const String& meshName)
       return false;
    }
 
+   // Need to make everything editable since node indexes etc will change
+   makeEditable();
+
    // Destroy and remove the mesh
    TSShape::Object& obj = objects[objIndex];
    destructInPlace(meshes[obj.startMeshIndex + meshIndex]);
@@ -1138,8 +1186,7 @@ bool TSShape::removeMesh(const String& meshName)
    // Update smallest visible detail
    updateSmallestVisibleDL();
 
-   // Re-initialise the shape
-   init();
+   initObjects();
 
    return true;
 }
@@ -1253,8 +1300,8 @@ S32 TSShape::setDetailSize(S32 oldSize, S32 newSize)
    // Update smallest visible detail
    updateSmallestVisibleDL();
 
-   // Re-initialise the shape
-   init();
+   // Nothing major, just reint object lists
+   initObjects();
 
    return newIndex;
 }
@@ -1268,6 +1315,9 @@ bool TSShape::removeDetail( S32 size )
       Con::errorf( "TSShape::removeDetail: Invalid detail index (%d)", dl );
       return false;
    }
+
+   // Need to make everything editable since node indexes etc will change
+   makeEditable();
 
    // Destroy and remove each mesh in the detail level
    for ( S32 objIndex = objects.size()-1; objIndex >= 0; objIndex-- )
@@ -1301,8 +1351,7 @@ bool TSShape::removeDetail( S32 size )
    // Update smallest visible detail
    updateSmallestVisibleDL();
 
-   // Re-initialise the shape
-   init();
+   initObjects();
 
    return true;
 }
@@ -2068,7 +2117,7 @@ bool TSShape::setSequenceGroundSpeed(const String& seqName, const Point3F& trans
 
    // Fixup ground frame indices
    seq.numGroundFrames += frameAdjust;
-   for (S32 i = seqIndex+1; i < sequences.size(); i++)
+   for (S32 i = seqIndex + 1; i < sequences.size(); i++)
       sequences[i].firstGroundFrame += frameAdjust;
 
    // Generate the ground-frames
@@ -2092,4 +2141,26 @@ bool TSShape::setSequenceGroundSpeed(const String& seqName, const Point3F& trans
    seq.flags |= TSShape::MakePath;
 
    return true;
+}
+
+void TSShape::makeEditable()
+{
+   mNeedReinit = true;
+   if (mShapeVertexData.base == NULL)
+      return;
+
+   for (U32 i = 0; i < meshes.size(); i++)
+   {
+      if (meshes[i])
+      {
+         meshes[i]->makeEditable();
+      }
+   }
+
+   mShapeVertexData.set(NULL, 0);
+}
+
+bool TSShape::needsReinit()
+{
+   return mVertexSize == 0 || mShapeVertexData.base == NULL || mNeedReinit;
 }

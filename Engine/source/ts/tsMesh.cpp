@@ -2606,7 +2606,7 @@ void TSMesh::disassemble()
    tsalloc.copyToBuffer32( (S32*)&mCenter, 3 );
    tsalloc.set32( (S32)mRadius );
 
-   bool shouldMakeEditable = TSShape::smVersion < 27;
+   bool shouldMakeEditable = TSShape::smVersion < 27 || mVertSize == 0;
 
    // Re-create the vectors
    if (shouldMakeEditable)
@@ -2798,6 +2798,18 @@ void TSSkinMesh::assemble( bool skip )
          ptr32 = getSharedData32(parentMesh, 3 * numVerts, (S32**)smNormsList.address(), skip);
          batchData.initialNorms.set((Point3F*)ptr32, numVerts);
          encodedNorms.set(NULL, 0);
+      }
+
+      // Sometimes we'll have a mesh with 0 verts but initialVerts is set,
+      // so set these accordingly
+      if (verts.size() == 0)
+      {
+         verts = batchData.initialVerts;
+      }
+
+      if (norms.size() == 0)
+      {
+         norms = batchData.initialNorms;
       }
    }
    else
@@ -3429,8 +3441,8 @@ void TSBasicVertexFormat::addMeshRequirements(TSMesh *mesh)
    bool hasTexcoord2 = false;
    bool hasSkin = false;
 
-   hasColors = mesh->getHasColor() || (texCoordOffset != -1);
-   hasTexcoord2 = mesh->getHasTVert2() || (colorOffset != -1);
+   hasColors = mesh->getHasColor() || (colorOffset != -1);
+   hasTexcoord2 = mesh->getHasTVert2() || (texCoordOffset != -1);
    hasSkin = (mesh->getMeshType() == TSMesh::SkinMeshType) || (boneOffset != -1);
 
    S32 offset = sizeof(TSMesh::__TSMeshVertexBase);
