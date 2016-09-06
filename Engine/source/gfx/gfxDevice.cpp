@@ -1320,7 +1320,7 @@ DefineEngineFunction( getBestHDRFormat, GFXFormat, (),,
    // Figure out the best HDR format.  This is the smallest
    // format which supports blending and filtering.
    Vector<GFXFormat> formats;
-   formats.push_back( GFXFormatR10G10B10A2 );
+   //formats.push_back( GFXFormatR10G10B10A2 ); TODO: replace with SRGB format once DX9 is gone - BJR
    formats.push_back( GFXFormatR16G16B16A16F );
    formats.push_back( GFXFormatR16G16B16A16 );    
    GFXFormat format = GFX->selectSupportedFormat(  &GFXDefaultRenderTargetProfile,
