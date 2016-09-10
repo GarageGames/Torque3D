@@ -162,6 +162,13 @@ DefineConsoleFunction( setNetPort, bool, (int port, bool bind), (true), "(int po
    return Net::openPort((S32)port, bind);
 }
 
+DefineConsoleFunction(isAddressTypeAvailable, bool, (int addressType), , "(protocol id)"
+	"@brief Determines if a specified address type can be reached.\n\n"
+	"@ingroup Networking")
+{
+	return Net::isAddressTypeAvailable((NetAddress::Type)addressType);
+}
+
 DefineConsoleFunction( closeNetPort, void, (), , "()" 
    "@brief Closes the current network port\n\n"
    "@ingroup Networking")

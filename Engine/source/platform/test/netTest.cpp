@@ -52,7 +52,7 @@ struct TcpHandle
       else
       {
          Process::requestShutdown();
-         mSocket = NULL;
+         mSocket = NetSocket::INVALID;
          ASSERT_EQ(Net::Disconnected, state)
             << "Ended with a network error!";
       }
@@ -72,7 +72,7 @@ TEST(Net, TCPRequest)
 {
    TcpHandle handler;
 
-   handler.mSocket = InvalidSocket;
+   handler.mSocket = NetSocket::INVALID;
    handler.mDataReceived = 0;
 
    // Hook into the signals.
@@ -119,7 +119,7 @@ struct JournalHandle
       else
       {
          Process::requestShutdown();
-         mSocket = NULL;
+         mSocket = NetSocket::INVALID;
          ASSERT_EQ(Net::Disconnected, state)
             << "Ended with a network error!";
       }
@@ -135,7 +135,7 @@ struct JournalHandle
 
    void makeRequest()
    {
-      mSocket = InvalidSocket;
+      mSocket = NetSocket::INVALID;
       mDataReceived = 0;
 
       // Hook into the signals.

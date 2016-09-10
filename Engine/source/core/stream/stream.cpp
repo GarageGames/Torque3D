@@ -300,16 +300,7 @@ bool Stream::write(const NetAddress &na)
 {
    bool success = write(na.type);
    success &= write(na.port);
-   success &= write(na.netNum[0]);
-   success &= write(na.netNum[1]);
-   success &= write(na.netNum[2]);
-   success &= write(na.netNum[3]);
-   success &= write(na.nodeNum[0]);
-   success &= write(na.nodeNum[1]);
-   success &= write(na.nodeNum[2]);
-   success &= write(na.nodeNum[3]);
-   success &= write(na.nodeNum[4]);
-   success &= write(na.nodeNum[5]);
+   success &= write(sizeof(na.address), &na.address);
    return success;
 }
 
@@ -317,16 +308,20 @@ bool Stream::read(NetAddress *na)
 {
    bool success = read(&na->type);
    success &= read(&na->port);
-   success &= read(&na->netNum[0]);
-   success &= read(&na->netNum[1]);
-   success &= read(&na->netNum[2]);
-   success &= read(&na->netNum[3]);
-   success &= read(&na->nodeNum[0]);
-   success &= read(&na->nodeNum[1]);
-   success &= read(&na->nodeNum[2]);
-   success &= read(&na->nodeNum[3]);
-   success &= read(&na->nodeNum[4]);
-   success &= read(&na->nodeNum[5]);
+   success &= read(sizeof(na->address), &na->address);
+   return success;
+}
+
+bool Stream::write(const NetSocket &so)
+{
+   return write(so.getHandle());
+}
+
+bool Stream::read(NetSocket* so)
+{
+   S32 handle = -1;
+   bool success = read(&handle);
+   *so = NetSocket::fromHandle(handle);
    return success;
 }
 
