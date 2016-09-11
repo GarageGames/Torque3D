@@ -304,6 +304,30 @@ macro(finishExecutable)
     _postTargetProcess()
 endmacro()
 
+# JTH: macro to build Torque3D as a shared library
+macro(finishTorque3DSharedLib)
+    # now inspect the paths we got
+    set(firstDir "")
+    foreach(dir ${${PROJECT_NAME}_paths})
+        if("${firstDir}" STREQUAL "")
+            set(firstDir "${dir}")
+        endif()
+    endforeach()
+    generateFiltersSpecial("${firstDir}")
+
+    # set per target compile flags
+    if(TORQUE_CXX_FLAGS_${PROJECT_NAME})
+        set_source_files_properties(${${PROJECT_NAME}_files} PROPERTIES COMPILE_FLAGS "${TORQUE_CXX_FLAGS_${PROJECT_NAME}}")
+    else()
+        set_source_files_properties(${${PROJECT_NAME}_files} PROPERTIES COMPILE_FLAGS "${TORQUE_CXX_FLAGS_EXECUTABLES}")
+    endif()
+
+    add_library("${PROJECT_NAME}" SHARED  ${${PROJECT_NAME}_files})
+    addInclude("${firstDir}")
+
+    _postTargetProcess()
+endmacro()
+
 macro(setupVersionNumbers)
     set(TORQUE_APP_VERSION_MAJOR 1 CACHE INTEGER "")
     set(TORQUE_APP_VERSION_MINOR 0 CACHE INTEGER "")

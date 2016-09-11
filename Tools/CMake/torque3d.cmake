@@ -20,7 +20,27 @@
 # IN THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-project(${TORQUE_APP_NAME})
+# JTH: Torque Shared Library support
+# Unfortunatly this must come first, because we name the DLL Torque3D.DLL
+# And we have to force the project to build as a shared library plus an executable.
+option(TORQUE_SHARED "Builds Torque3D as a shared library instead of an executable." OFF)
+
+if (TORQUE_SHARED)
+    # JTH: now we make the executable project
+    # The EXE has the torque.rc file, not the DLL
+    project(${TORQUE_APP_NAME})
+    addPath("${srcDir}/main")
+    addDef(TORQUE_SHARED)
+    addDef(TORQUE_DEBUG debug)
+    # add windows rc file for the icon
+    addFile("${projectSrcDir}/torque.rc")
+    finishExecutable()
+
+    # All of the source is stored in Torque3D
+    project("Torque3D")
+else()
+    project(${TORQUE_APP_NAME})
+endif()
 
 if(UNIX)
     if(NOT CXX_FLAG32)
@@ -284,7 +304,10 @@ if( TORQUE_EXPERIMENTAL_EC )
 	addPath("${srcDir}/T3D/components/render")
 endif()
 
-addPath("${srcDir}/main/")
+if (NOT TORQUE_SHARED)
+    addPath("${srcDir}/main/")
+endif()
+
 addPath("${srcDir}/assets")
 addPath("${srcDir}/module")
 addPath("${srcDir}/T3D/assets")
@@ -463,8 +486,6 @@ if(WIN32)
     addPath("${srcDir}/shaderGen/HLSL")    
     addPath("${srcDir}/terrain/hlsl")
     addPath("${srcDir}/forest/hlsl")
-    # add windows rc file for the icon
-    addFile("${projectSrcDir}/torque.rc")
 endif()
 
 if(APPLE)
@@ -550,7 +571,13 @@ endif()
 
 ###############################################################################
 ###############################################################################
-finishExecutable()
+if (TORQUE_SHARED)
+    finishTorque3DSharedLib()
+else()
+    # add windows rc file for the icon
+    addFile("${projectSrcDir}/torque.rc")
+    finishExecutable()
+endif()
 ###############################################################################
 ###############################################################################
 
@@ -566,8 +593,8 @@ CONFIGURE_FILE("${cmakeDir}/torqueConfig.h.in" "${projectSrcDir}/torqueConfig.h"
 if(NOT EXISTS "${projectSrcDir}/torque.ico")
     CONFIGURE_FILE("${cmakeDir}/torque.ico" "${projectSrcDir}/torque.ico" COPYONLY)
 endif()
-if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}.torsion")
-    CONFIGURE_FILE("${cmakeDir}/template.torsion.in" "${projectOutDir}/${PROJECT_NAME}.torsion")
+if(NOT EXISTS "${projectOutDir}/${TORQUE_APP_NAME}.torsion")
+    CONFIGURE_FILE("${cmakeDir}/template.torsion.in" "${projectOutDir}/${TORQUE_APP_NAME}.torsion")
 endif()
 if(EXISTS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" AND NOT EXISTS "${projectOutDir}/main.cs")
     CONFIGURE_FILE("${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/main.cs.in" "${projectOutDir}/main.cs")
@@ -576,8 +603,8 @@ if(WIN32)
     if(NOT EXISTS "${projectSrcDir}/torque.rc")
         CONFIGURE_FILE("${cmakeDir}/torque-win.rc.in" "${projectSrcDir}/torque.rc")
     endif()
-    if(NOT EXISTS "${projectOutDir}/${PROJECT_NAME}-debug.bat")
-        CONFIGURE_FILE("${cmakeDir}/app-debug-win.bat.in" "${projectOutDir}/${PROJECT_NAME}-debug.bat")
+    if(NOT EXISTS "${projectOutDir}/${TORQUE_APP_NAME}-debug.bat")
+        CONFIGURE_FILE("${cmakeDir}/app-debug-win.bat.in" "${projectOutDir}/${TORQUE_APP_NAME}-debug.bat")
     endif()
     if(NOT EXISTS "${projectOutDir}/cleanup.bat")
         CONFIGURE_FILE("${cmakeDir}/cleanup-win.bat.in" "${projectOutDir}/cleanup.bat")
@@ -646,11 +673,9 @@ addDef(TORQUE_ENABLE_ASSERTS "Debug;RelWithDebInfo")
 addDef(TORQUE_DEBUG_GFX_MODE "RelWithDebInfo")
 addDef(TORQUE_SHADERGEN)
 addDef(INITGUID)
-addDef(NTORQUE_SHARED)
 addDef(UNICODE)
 addDef(_UNICODE) # for VS
 addDef(TORQUE_UNICODE)
-#addDef(TORQUE_SHARED) # not used anymore as the game is the executable directly
 addDef(LTC_NO_PROTOTYPES) # for libTomCrypt
 addDef(BAN_OPCODE_AUTOLINK)
 addDef(ICE_NO_DLL)
@@ -660,6 +685,12 @@ addDef(DOM_INCLUDE_TINYXML)
 addDef(PCRE_STATIC)
 addDef(_CRT_SECURE_NO_WARNINGS)
 addDef(_CRT_SECURE_NO_DEPRECATE)
+
+if (TORQUE_SHARED)
+    addDef(TORQUE_SHARED)
+else()
+    addDef(NTORQUE_SHARED)
+endif()
 
 if(UNIX)
 	addDef(LINUX)	
