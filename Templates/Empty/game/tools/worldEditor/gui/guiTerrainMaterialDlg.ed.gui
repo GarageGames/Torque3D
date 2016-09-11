@@ -261,7 +261,7 @@
                Visible = "1";
                tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
-               bitmap = "tools/materialeditor/gui/unknownImage";
+               bitmap = "tools/materialEditor/gui/unknownImage";
                wrap = "0";
             };
             new GuiBitmapButtonCtrl() {
@@ -358,7 +358,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               Command = "TerrainMaterialDlg-->baseTexCtrl.setBitmap(\"tools/materialeditor/gui/unknownImage\");";
+               Command = "TerrainMaterialDlg-->baseTexCtrl.setBitmap(\"tools/materialEditor/gui/unknownImage\");";
                tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                groupNum = "-1";
@@ -466,7 +466,7 @@
                Visible = "1";
                tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
-               bitmap = "tools/materialeditor/gui/unknownImage";
+               bitmap = "tools/materialEditor/gui/unknownImage";
                wrap = "0";
             };
             new GuiTextCtrl() {
@@ -563,7 +563,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               Command = "TerrainMaterialDlg-->normTexCtrl.setBitmap(\"tools/materialeditor/gui/unknownImage\");";
+               Command = "TerrainMaterialDlg-->normTexCtrl.setBitmap(\"tools/materialEditor/gui/unknownImage\");";
                tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                groupNum = "-1";
@@ -662,7 +662,7 @@
             canSaveDynamicFields = "0";
 
             new GuiBitmapCtrl() {
-               bitmap = "tools/materialeditor/gui/unknownImage";
+               bitmap = "tools/materialEditor/gui/unknownImage";
                wrap = "0";
                position = "1 1";
                extent = "47 47";
@@ -787,7 +787,7 @@
                profile = "ToolsGuiDefaultProfile";
                visible = "1";
                active = "1";
-               command = "TerrainMaterialDlg-->macroTexCtrl.setBitmap(\"tools/materialeditor/gui/unknownImage\");";
+               command = "TerrainMaterialDlg-->macroTexCtrl.setBitmap(\"tools/materialEditor/gui/unknownImage\");";
                tooltipProfile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                isContainer = "0";
@@ -999,7 +999,7 @@
                Visible = "1";
                tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
-               bitmap = "tools/materialeditor/gui/unknownImage";
+               bitmap = "tools/materialEditor/gui/unknownImage";
                wrap = "0";
             };
             new GuiBitmapButtonCtrl() {
@@ -1096,7 +1096,7 @@
                MinExtent = "8 2";
                canSave = "1";
                Visible = "1";
-               Command = "TerrainMaterialDlg-->detailTexCtrl.setBitmap(\"tools/materialeditor/gui/unknownImage\");";
+               Command = "TerrainMaterialDlg-->detailTexCtrl.setBitmap(\"tools/materialEditor/gui/unknownImage\");";
                tooltipprofile = "ToolsGuiToolTipProfile";
                hovertime = "1000";
                groupNum = "-1";

@@ -158,7 +158,7 @@
             tooltipprofile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             wrap = "0";
-            bitmap= "tools/materialeditor/gui/unknownImage";
+            bitmap= "tools/materialEditor/gui/unknownImage";
          };
          new GuiBitmapCtrl(ETerrainMaterialSelectedBorder) {
             canSaveDynamicFields = "0";
