@@ -35,6 +35,10 @@ if (TORQUE_SHARED)
     # add windows rc file for the icon
     addFile("${projectSrcDir}/torque.rc")
     finishExecutable()
+    # Link Torque3D.lib
+    # Reference: http://stackoverflow.com/a/2224732
+    target_link_libraries(${TORQUE_APP_NAME} debug "Debug\\Torque3D_DEBUG")
+    target_link_libraries(${TORQUE_APP_NAME} optimized "Release\\Torque3D")
 
     # All of the source is stored in Torque3D
     project("Torque3D")
@@ -573,6 +577,18 @@ endif()
 ###############################################################################
 if (TORQUE_SHARED)
     finishTorque3DSharedLib()
+
+    # JTH: We need to add the definitions file so that specific functions export properly
+    # Reference: http://stackoverflow.com/a/18793155
+    if (MSVC)
+        # JTH: SDL misses a couple of functions specific to the windows platform implementation.
+        # These functions are not compiled and are defined out when compiling with SDL.
+        if (TORQUE_SDL)
+            set_target_properties(Torque3D PROPERTIES LINK_FLAGS "/DEF:\"${libDir}/Torque3D/msvc/torque3d_with_sdl.def\"")
+        else()
+            set_target_properties(Torque3D PROPERTIES LINK_FLAGS "/DEF:\"${libDir}/Torque3D/msvc/torque3d.def\"")
+        endif()
+    endif()
 else()
     # add windows rc file for the icon
     addFile("${projectSrcDir}/torque.rc")
