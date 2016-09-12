@@ -28,9 +28,9 @@
 #ifdef TORQUE_OPENGL
 
 #include "tGL.h"
-#include <epoxy/wgl.h>
+#include <glad/glad_wgl.h>
 
-#define gglHasWExtension(window, EXTENSION) epoxy_has_wgl_extension(window, "WGL_" # EXTENSION)
+#define gglHasWExtension(window, EXTENSION) GLAD_WGL_##EXTENSION
 
 #endif //TORQUE_OPENGL
 
