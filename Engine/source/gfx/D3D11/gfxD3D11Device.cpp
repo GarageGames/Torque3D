@@ -1597,7 +1597,7 @@ GFXVertexDecl* GFXD3D11Device::allocVertexDecl( const GFXVertexFormat *vertexFor
 
    S32 elemIndex = 0;
    for (S32 i = 0; i < elemCount; i++, elemIndex++)
-
+   {
       const GFXVertexElement &element = vertexFormat->getElement(elemIndex);
 
       stream = element.getStreamIndex();
