@@ -23,7 +23,7 @@
 #ifndef _TSMESHINTRINSICS_ARCH_H_
 #define _TSMESHINTRINSICS_ARCH_H_
 
-#if defined(TORQUE_CPU_X86)
+#if (defined( TORQUE_CPU_X86 ) || defined( TORQUE_CPU_X64 )) 
 # // x86 CPU family implementations
 extern void zero_vert_normal_bulk_SSE(const dsize_t count, U8 * __restrict const outPtr, const dsize_t outStride);
 #
