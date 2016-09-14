@@ -1670,12 +1670,15 @@ bool NavMesh::save()
 
    S32 s = mLinkIDs.size();
    file.write(sizeof(S32), (const char*)&s);
-   file.write(sizeof(F32) * s * 6, (const char*)mLinkVerts.address());
-   file.write(sizeof(F32) * s,     (const char*)mLinkRads.address());
-   file.write(sizeof(U8) * s,      (const char*)mLinkDirs.address());
-   file.write(sizeof(U8) * s,      (const char*)mLinkAreas.address());
-   file.write(sizeof(U16) * s,     (const char*)mLinkFlags.address());
-   file.write(sizeof(U32) * s,     (const char*)mLinkIDs.address());
+   if (s > 0)
+   {
+      file.write(sizeof(F32) * s * 6, (const char*)mLinkVerts.address());
+      file.write(sizeof(F32) * s,     (const char*)mLinkRads.address());
+      file.write(sizeof(U8) * s,      (const char*)mLinkDirs.address());
+      file.write(sizeof(U8) * s,      (const char*)mLinkAreas.address());
+      file.write(sizeof(U16) * s,     (const char*)mLinkFlags.address());
+      file.write(sizeof(U32) * s,     (const char*)mLinkIDs.address());
+   }
 
    file.close();
 
