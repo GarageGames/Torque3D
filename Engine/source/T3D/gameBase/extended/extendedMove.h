@@ -11,12 +11,14 @@ struct ExtendedMove : public Move
    enum Constants {
       MaxPositionsRotations = 3,
 
-      MaxPositionBits = 13,
+      MaxPositionBits = 16,
       MaxRotationBits = 16,
    };
 
    // Position is in millimeters
-   S32 posX[MaxPositionsRotations], posY[MaxPositionsRotations], posZ[MaxPositionsRotations];
+   F32 posX[MaxPositionsRotations], posY[MaxPositionsRotations], posZ[MaxPositionsRotations];
+
+   S32 cposX[MaxPositionsRotations], cposY[MaxPositionsRotations], cposZ[MaxPositionsRotations];
 
    bool EulerBasedRotation[MaxPositionsRotations];
 
@@ -39,14 +41,16 @@ extern const ExtendedMove NullExtendedMove;
 class ExtendedMoveManager
 {
 public:
-   static S32 mPosX[ExtendedMove::MaxPositionsRotations];
-   static S32 mPosY[ExtendedMove::MaxPositionsRotations];
-   static S32 mPosZ[ExtendedMove::MaxPositionsRotations];
+   static F32 mPosX[ExtendedMove::MaxPositionsRotations];
+   static F32 mPosY[ExtendedMove::MaxPositionsRotations];
+   static F32 mPosZ[ExtendedMove::MaxPositionsRotations];
    static bool mRotIsEuler[ExtendedMove::MaxPositionsRotations];
    static F32 mRotAX[ExtendedMove::MaxPositionsRotations];
    static F32 mRotAY[ExtendedMove::MaxPositionsRotations];
    static F32 mRotAZ[ExtendedMove::MaxPositionsRotations];
    static F32 mRotAA[ExtendedMove::MaxPositionsRotations];
+
+   static F32 mPosScale;
 
    static void init();
 };

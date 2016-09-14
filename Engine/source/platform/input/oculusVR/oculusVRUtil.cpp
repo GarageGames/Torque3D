@@ -44,10 +44,7 @@ void convertRotation(const F32 inRotMat[4][4], MatrixF& outRotation)
 void convertRotation(OVR::Quatf& inRotation, EulerF& outRotation)
 {
    F32 yaw, pitch, roll;
-   inRotation.GetEulerAngles<OVR::Axis_Y, OVR::Axis_X, OVR::Axis_Z>(&yaw, &pitch, &roll);
-   outRotation.x = -pitch;
-   outRotation.y = roll;
-   outRotation.z = -yaw;
+   inRotation.GetEulerAngles<OVR::Axis_X, OVR::Axis_Z, OVR::Axis_Y, OVR::Rotate_CW, OVR::Handed_R>(&outRotation.x, &outRotation.y, &outRotation.z);
 }
 
 void calculateAxisRotation(const MatrixF& inRotation, const F32& maxAxisRadius, Point2F& outRotation)

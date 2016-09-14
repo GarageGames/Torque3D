@@ -33,7 +33,7 @@
 #include "math/mQuat.h"
 #include "math/mPoint4.h"
 #include "gfx/gfxDevice.h"
-#include "OVR_CAPI_0_5_0.h"
+#include "OVR_CAPI_0_8_0.h"
 
 #define DEFAULT_RIFT_UNIT 0
 
@@ -83,6 +83,9 @@ protected:
    /// Which HMD is the active one
    U32 mActiveDeviceId;
 
+   /// Device id we need to use to hook up with oculus
+   ovrGraphicsLuid mLuid;
+
 protected:
    void cleanUp();
 
@@ -90,7 +93,7 @@ protected:
    /// Input Event Manager
    void buildCodeTable();
 
-   void addHMDDevice(ovrHmd hmd);
+   void addHMDDevice(ovrHmd hmd, ovrGraphicsLuid luid);
 
    void createSimulatedHMD();
 
@@ -112,8 +115,8 @@ public:
    virtual bool providesFrameEyePose() const;
    virtual void getFrameEyePose(DisplayPose *outPose, U32 eyeId) const;
    virtual bool providesEyeOffsets() const;
+   virtual bool providesFovPorts() const { return true;  }
    virtual void getEyeOffsets(Point3F *dest) const;
-   virtual bool providesFovPorts() const;
    virtual void getFovPorts(FovPort *out) const;
    virtual bool providesProjectionOffset() const;
    virtual const Point2F& getProjectionOffset() const;
@@ -150,6 +153,8 @@ public:
    
    virtual void setCurrentConnection(GameConnection *connection);
    virtual GameConnection* getCurrentConnection();
+
+   GFXTexHandle getPreviewTexture();
 
    bool _handleDeviceEvent( GFXDevice::GFXDeviceEventType evt );
 

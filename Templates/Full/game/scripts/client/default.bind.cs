@@ -752,3 +752,21 @@ vehicleMap.bind( gamepad, btn_b, brake );
 vehicleMap.bind( gamepad, btn_x, movebackward );
 // bind exiting the vehicle to a button
 vehicleMap.bindCmd(gamepad, btn_y,"getout();","");
+
+
+// ----------------------------------------------------------------------------
+// Oculus Rift
+// ----------------------------------------------------------------------------
+
+function OVRSensorRotEuler(%pitch, %roll, %yaw)
+{
+   //echo("Sensor euler: " @ %pitch SPC %roll SPC %yaw);
+   $mvRotZ0 = %yaw;
+   $mvRotX0 = %pitch;
+   $mvRotY0 = %roll;
+}
+
+$mvRotIsEuler0 = true;
+$OculusVR::GenerateAngleAxisRotationEvents = false;
+$OculusVR::GenerateEulerRotationEvents = true;
+moveMap.bind( oculusvr, ovr_sensorrotang0, OVRSensorRotEuler );

@@ -35,6 +35,12 @@
 #include "core/util/delegate.h"
 #endif
 
+struct GFXAdapterLUID
+{
+   unsigned long LowPart;
+   long HighPart;
+};
+
 struct GFXAdapter 
 {
 public:
@@ -58,6 +64,9 @@ public:
    /// Supported shader model. 0.f means none supported.
    F32 mShaderModel;
 
+	/// LUID for windows oculus support
+	GFXAdapterLUID mLUID;
+
    const char * getName() const { return mName; }
    const char * getOutputName() const { return mOutputName; }
    GFXAdapterType mType;
@@ -72,6 +81,7 @@ public:
       mOutputName[0] = 0;
       mShaderModel = 0.f;
       mIndex = 0;
+		dMemset(&mLUID, '\0', sizeof(mLUID));
    }
 
    ~GFXAdapter()

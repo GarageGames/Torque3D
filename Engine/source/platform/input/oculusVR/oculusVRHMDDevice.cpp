@@ -26,11 +26,17 @@
 #include "postFx/postEffectCommon.h"
 #include "gui/core/guiCanvas.h"
 #include "platform/input/oculusVR/oculusVRUtil.h"
+#include "core/stream/fileStream.h"
 
-#include "gfx/D3D9/gfxD3D9Device.h"
-// Use D3D9 for win32
+
+#include "gfx/D3D11/gfxD3D11Device.h"
+#include "gfx/D3D11/gfxD3D11EnumTranslate.h"
+#include "gfx/gfxStringEnumTranslate.h"
+#undef D3D11
+
+// Use D3D11 for win32
 #ifdef TORQUE_OS_WIN
-#define OVR_D3D_VERSION 9
+#define OVR_D3D_VERSION 11
 #include "OVR_CAPI_D3D.h"
 #define OCULUS_USE_D3D
 #else
@@ -38,15 +44,125 @@
 #define OCULUS_USE_GL
 #endif
 
-extern GFXTextureObject *gLastStereoTexture;
+struct OculusTexture
+{
+   virtual void AdvanceToNextTexture() = 0;
 
-OculusVRHMDDevice::OculusVRHMDDevice() :
-mWindowSize(1280,800)
+   virtual ~OculusTexture() {
+   }
+};
+
+//------------------------------------------------------------
+// ovrSwapTextureSet wrapper class that also maintains the render target views
+// needed for D3D11 rendering.
+struct D3D11OculusTexture : public OculusTexture
+{
+   ovrHmd                   hmd;
+   ovrSwapTextureSet      * TextureSet;
+   static const int         TextureCount = 2;
+   GFXTexHandle  TexRtv[TextureCount];
+   GFXDevice *Owner;
+
+   D3D11OculusTexture(GFXDevice* owner) :
+      hmd(nullptr),
+      TextureSet(nullptr),
+      Owner(owner)
+   {
+      TexRtv[0] = TexRtv[1] = nullptr;
+   }
+
+   bool Init(ovrHmd _hmd, int sizeW, int sizeH)
+   {
+      hmd = _hmd;
+
+      D3D11_TEXTURE2D_DESC dsDesc;
+      dsDesc.Width = sizeW;
+      dsDesc.Height = sizeH;
+      dsDesc.MipLevels = 1;
+      dsDesc.ArraySize = 1;
+      dsDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;// DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+      dsDesc.SampleDesc.Count = 1;   // No multi-sampling allowed
+      dsDesc.SampleDesc.Quality = 0;
+      dsDesc.Usage = D3D11_USAGE_DEFAULT;
+      dsDesc.CPUAccessFlags = 0;
+      dsDesc.MiscFlags = 0;
+      dsDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+
+
+      GFXD3D11Device* device = static_cast<GFXD3D11Device*>(GFX);
+      ovrResult result = ovr_CreateSwapTextureSetD3D11(hmd, device->mD3DDevice, &dsDesc, ovrSwapTextureSetD3D11_Typeless, &TextureSet);
+      if (!OVR_SUCCESS(result))
+         return false;
+
+      AssertFatal(TextureSet->TextureCount == TextureCount, "TextureCount mismatch.");
+
+      for (int i = 0; i < TextureCount; ++i)
+      {
+         ovrD3D11Texture* tex = (ovrD3D11Texture*)&TextureSet->Textures[i];
+         D3D11_RENDER_TARGET_VIEW_DESC rtvd = {};
+         rtvd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;// DXGI_FORMAT_R8G8B8A8_UNORM;
+         rtvd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+         GFXD3D11TextureObject* object = new GFXD3D11TextureObject(GFX, &VRTextureProfile);
+         object->registerResourceWithDevice(GFX);
+         *(object->getSRViewPtr()) = tex->D3D11.pSRView;
+         *(object->get2DTexPtr()) = tex->D3D11.pTexture;
+         device->mD3DDevice->CreateRenderTargetView(tex->D3D11.pTexture, &rtvd, object->getRTViewPtr());
+
+         // Add refs for texture release later on
+         if (object->getSRView()) object->getSRView()->AddRef();
+         //object->getRTView()->AddRef();
+         if (object->get2DTex()) object->get2DTex()->AddRef();
+         object->isManaged = true;
+
+         // Get the actual size of the texture...
+         D3D11_TEXTURE2D_DESC probeDesc;
+         ZeroMemory(&probeDesc, sizeof(D3D11_TEXTURE2D_DESC));
+         object->get2DTex()->GetDesc(&probeDesc);
+
+         object->mTextureSize.set(probeDesc.Width, probeDesc.Height, 0);
+         object->mBitmapSize = object->mTextureSize;
+         int fmt = probeDesc.Format;
+
+         if (fmt == DXGI_FORMAT_R8G8B8A8_TYPELESS || fmt == DXGI_FORMAT_B8G8R8A8_TYPELESS)
+         {
+            object->mFormat = GFXFormatR8G8B8A8; // usual case
+         }
+         else
+         {
+            // TODO: improve this. this can be very bad.
+            GFXREVERSE_LOOKUP(GFXD3D11TextureFormat, GFXFormat, fmt);
+            object->mFormat = (GFXFormat)fmt;
+         }
+         TexRtv[i] = object;
+      }
+
+      return true;
+   }
+
+   ~D3D11OculusTexture()
+   {
+      for (int i = 0; i < TextureCount; ++i)
+      {
+         SAFE_DELETE(TexRtv[i]);
+      }
+      if (TextureSet)
+      {
+         ovr_DestroySwapTextureSet(hmd, TextureSet);
+      }
+   }
+
+   void AdvanceToNextTexture()
+   {
+      TextureSet->CurrentIndex = (TextureSet->CurrentIndex + 1) % TextureSet->TextureCount;
+   }
+};
+
+
+OculusVRHMDDevice::OculusVRHMDDevice()
 {
    mIsValid = false;
    mDevice = NULL;
-   mSupportedDistortionCaps = 0;
-   mCurrentDistortionCaps = 0;
    mCurrentCaps = 0;
    mSupportedCaps = 0;
    mVsync = true;
@@ -60,6 +176,7 @@ mWindowSize(1280,800)
    mConnection = NULL;
    mSensor = NULL;
    mActionCodeIndex = 0;
+   mTextureSwapSet = NULL;
 }
 
 OculusVRHMDDevice::~OculusVRHMDDevice()
@@ -79,14 +196,14 @@ void OculusVRHMDDevice::cleanUp()
 
    if(mDevice)
    {
-      ovrHmd_Destroy(mDevice);
+      ovr_Destroy(mDevice);
       mDevice = NULL;
    }
 
    mIsValid = false;
 }
 
-void OculusVRHMDDevice::set(ovrHmd hmd, U32 actionCodeIndex)
+void OculusVRHMDDevice::set(ovrHmd hmd, ovrGraphicsLuid luid, U32 actionCodeIndex)
 {
    cleanUp();
 
@@ -95,50 +212,42 @@ void OculusVRHMDDevice::set(ovrHmd hmd, U32 actionCodeIndex)
 
    mDevice = hmd;
 
-   mSupportedCaps = hmd->HmdCaps;
-   mCurrentCaps = mSupportedCaps & (ovrHmdCap_DynamicPrediction | ovrHmdCap_LowPersistence | (!mVsync ? ovrHmdCap_NoVSync : 0));
+   ovrHmdDesc desc = ovr_GetHmdDesc(hmd);
+   int caps = ovr_GetTrackingCaps(hmd);
 
-   mSupportedDistortionCaps = hmd->DistortionCaps;
-   mCurrentDistortionCaps   = mSupportedDistortionCaps & (ovrDistortionCap_TimeWarp | ovrDistortionCap_Vignette | ovrDistortionCap_Overdrive);
-	
-   mTimewarp = mSupportedDistortionCaps & ovrDistortionCap_TimeWarp;
+   mSupportedCaps = desc.AvailableHmdCaps;
+   mCurrentCaps = mSupportedCaps;
+   
+   mTimewarp = true;
 
    // DeviceInfo
-   mProductName = hmd->ProductName;
-   mManufacturer = hmd->Manufacturer;
-   mVersion = hmd->FirmwareMajor;
+   mProductName = desc.ProductName;
+   mManufacturer = desc.Manufacturer;
+   mVersion = desc.FirmwareMajor;
 
-   mDisplayDeviceName = hmd->DisplayDeviceName;
-   mDisplayId = hmd->DisplayId;
+   //
+   Vector<GFXAdapter*> adapterList;
+   GFXD3D11Device::enumerateAdapters(adapterList);
 
-   mDesktopPosition.x = hmd->WindowsPos.x;
-   mDesktopPosition.y = hmd->WindowsPos.y;
+   dMemcpy(&mLuid, &luid, sizeof(mLuid));
+   mDisplayId = -1;
 
-   mResolution.x = hmd->Resolution.w;
-   mResolution.y = hmd->Resolution.h;
-
-   mProfileInterpupillaryDistance = ovrHmd_GetFloat(hmd, OVR_KEY_IPD, OVR_DEFAULT_IPD);
-   mLensSeparation = ovrHmd_GetFloat(hmd, "LensSeparation", 0);
-   ovrHmd_GetFloatArray(hmd, "ScreenSize", &mScreenSize.x, 2);
-
-   dMemcpy(mCurrentFovPorts, mDevice->DefaultEyeFov, sizeof(mDevice->DefaultEyeFov));
-
-   for (U32 i=0; i<2; i++)
+   for (U32 i = 0, sz = adapterList.size(); i < sz; i++)
    {
-      mCurrentFovPorts[i].UpTan = mDevice->DefaultEyeFov[i].UpTan;
-      mCurrentFovPorts[i].DownTan = mDevice->DefaultEyeFov[i].DownTan;
-      mCurrentFovPorts[i].LeftTan = mDevice->DefaultEyeFov[i].LeftTan;
-      mCurrentFovPorts[i].RightTan = mDevice->DefaultEyeFov[i].RightTan;
+      GFXAdapter* adapter = adapterList[i];
+      if (dMemcmp(&adapter->mLUID, &mLuid, sizeof(mLuid)) == 0)
+      {
+         mDisplayId = adapter->mIndex;
+         mDisplayDeviceType = "D3D11"; // TOFIX this
+      }
    }
 
-   if (mDevice->HmdCaps & ovrHmdCap_ExtendDesktop)
-   {
-      mWindowSize = Point2I(mDevice->Resolution.w, mDevice->Resolution.h);
-   }
-   else
-   {
-      mWindowSize = Point2I(1100, 618);
-   }
+   mResolution.x = desc.Resolution.w;
+   mResolution.y = desc.Resolution.h;
+
+   mProfileInterpupillaryDistance = ovr_GetFloat(hmd, OVR_KEY_IPD, OVR_DEFAULT_IPD);
+   mLensSeparation = ovr_GetFloat(hmd, "LensSeparation", 0);
+   ovr_GetFloatArray(hmd, "ScreenSize", &mScreenSize.x, 2);
 
    mActionCodeIndex = actionCodeIndex;
 
@@ -146,6 +255,8 @@ void OculusVRHMDDevice::set(ovrHmd hmd, U32 actionCodeIndex)
 
    mSensor = new OculusVRSensorDevice();
    mSensor->set(mDevice, mActionCodeIndex);
+
+   mDebugMirrorTexture = NULL;
 
    updateCaps();
 }
@@ -163,25 +274,26 @@ void OculusVRHMDDevice::setOptimalDisplaySize(GuiCanvas *canvas)
    PlatformWindow *window = canvas->getPlatformWindow();
    GFXTarget *target = window->getGFXTarget();
 
-   if (target && target->getSize() != mWindowSize)
+   Point2I requiredSize(0, 0);
+
+   ovrHmdDesc desc = ovr_GetHmdDesc(mDevice);
+   ovrSizei leftSize = ovr_GetFovTextureSize(mDevice, ovrEye_Left, desc.DefaultEyeFov[0], mCurrentPixelDensity);
+   ovrSizei rightSize = ovr_GetFovTextureSize(mDevice, ovrEye_Right, desc.DefaultEyeFov[1], mCurrentPixelDensity);
+
+   requiredSize.x = leftSize.w + rightSize.h;
+   requiredSize.y = mMax(leftSize.h, rightSize.h);
+   
+   if (target && target->getSize() != requiredSize)
    {
       GFXVideoMode newMode;
       newMode.antialiasLevel = 0;
       newMode.bitDepth = 32;
       newMode.fullScreen = false;
       newMode.refreshRate = 75;
-      newMode.resolution = mWindowSize;
+      newMode.resolution = requiredSize;
       newMode.wideScreen = false;
       window->setVideoMode(newMode);
-      //AssertFatal(window->getClientExtent().x == mWindowSize[0] && window->getClientExtent().y == mWindowSize[1], "Window didn't resize to correct dimensions");
-   }
-
-   // Need to move window over to the rift side of the desktop
-   if (mDevice->HmdCaps & ovrHmdCap_ExtendDesktop && !OculusVRDevice::smWindowDebug)
-   {
-#ifndef OCULUS_WINDOW_DEBUG
-        window->setPosition(getDesktopPosition());
-#endif
+      //AssertFatal(window->getClientExtent().x == requiredSize.x && window->getClientExtent().y == requiredSize.y, "Window didn't resize to correct dimensions");
    }
 }
 
@@ -190,53 +302,161 @@ bool OculusVRHMDDevice::isDisplayingWarning()
    if (!mIsValid || !mDevice)
       return false;
 
+   return false;/*
    ovrHSWDisplayState displayState;
    ovrHmd_GetHSWDisplayState(mDevice, &displayState);
 
-   return displayState.Displayed;
+   return displayState.Displayed;*/
 }
 
 void OculusVRHMDDevice::dismissWarning()
 {
    if (!mIsValid || !mDevice)
       return;
-   ovrHmd_DismissHSWDisplay(mDevice);
+   //ovr_DismissHSWDisplay(mDevice);
+}
+
+GFXTexHandle OculusVRHMDDevice::getPreviewTexture()
+{
+   if (!mIsValid || !mDevice)
+      return NULL;
+
+   return mDebugMirrorTextureHandle;
 }
 
 bool OculusVRHMDDevice::setupTargets()
 {
-   ovrFovPort eyeFov[2] = {mDevice->DefaultEyeFov[0], mDevice->DefaultEyeFov[1]};
+   // Create eye render buffers
+   ID3D11RenderTargetView * eyeRenderTexRtv[2];
+   ovrLayerEyeFov           ld = { { ovrLayerType_EyeFov } };
+   mRenderLayer = ld;
 
-   mRecomendedEyeTargetSize[0] = ovrHmd_GetFovTextureSize(mDevice, ovrEye_Left,  eyeFov[0], mCurrentPixelDensity);
-   mRecomendedEyeTargetSize[1] = ovrHmd_GetFovTextureSize(mDevice, ovrEye_Right, eyeFov[1], mCurrentPixelDensity);
+   GFXD3D11Device* device = static_cast<GFXD3D11Device*>(GFX);
+
+   ovrHmdDesc desc = ovr_GetHmdDesc(mDevice);
+   for (int i = 0; i < 2; i++)
+   {
+      mRenderLayer.Fov[i] = desc.DefaultEyeFov[i];
+      mRenderLayer.Viewport[i].Size = ovr_GetFovTextureSize(mDevice, (ovrEyeType)i, mRenderLayer.Fov[i], mCurrentPixelDensity);
+      mEyeRenderDesc[i] = ovr_GetRenderDesc(mDevice, (ovrEyeType_)(ovrEye_Left+i), mRenderLayer.Fov[i]);
+   }
+
+   ovrSizei recommendedEyeTargetSize[2];
+   recommendedEyeTargetSize[0] = mRenderLayer.Viewport[0].Size;
+   recommendedEyeTargetSize[1] = mRenderLayer.Viewport[1].Size;
+
+   if (mTextureSwapSet)
+   {
+      delete mTextureSwapSet;
+      mTextureSwapSet = NULL;
+   }
 
    // Calculate render target size
    if (mDesiredRenderingMode == GFXDevice::RS_StereoSideBySide)
    {
       // Setup a single texture, side-by-side viewports
       Point2I rtSize(
-         mRecomendedEyeTargetSize[0].w + mRecomendedEyeTargetSize[1].w,
-         mRecomendedEyeTargetSize[0].h > mRecomendedEyeTargetSize[1].h ? mRecomendedEyeTargetSize[0].h : mRecomendedEyeTargetSize[1].h
+         recommendedEyeTargetSize[0].w + recommendedEyeTargetSize[1].w,
+         recommendedEyeTargetSize[0].h > recommendedEyeTargetSize[1].h ? recommendedEyeTargetSize[0].h : recommendedEyeTargetSize[1].h
          );
 
       GFXFormat targetFormat = GFX->getActiveRenderTarget()->getFormat();
       mRTFormat = targetFormat;
 
-      rtSize = generateRenderTarget(mStereoRT, mStereoTexture, mStereoDepthTexture, rtSize);
-      
+      rtSize = generateRenderTarget(mStereoRT, mStereoDepthTexture, rtSize);
+
+      // Generate the swap texture we need to store the final image
+      D3D11OculusTexture* tex = new D3D11OculusTexture(GFX);
+      if (tex->Init(mDevice, rtSize.x, rtSize.y))
+      {
+         mTextureSwapSet = tex;
+      }
+
+      mRenderLayer.ColorTexture[0] = tex->TextureSet;
+      mRenderLayer.ColorTexture[1] = tex->TextureSet;
+
+      mRenderLayer.Viewport[0].Pos.x = 0;
+      mRenderLayer.Viewport[0].Pos.y = 0;
+      mRenderLayer.Viewport[1].Pos.x = (rtSize.x + 1) / 2;
+      mRenderLayer.Viewport[1].Pos.y = 0;
+
       // Left
-      mEyeRenderSize[0] = rtSize;
       mEyeRT[0] = mStereoRT;
-      mEyeTexture[0] = mStereoTexture;
-      mEyeViewport[0] = RectI(Point2I(0,0), Point2I((mRecomendedEyeTargetSize[0].w+1)/2, mRecomendedEyeTargetSize[0].h));
+      mEyeViewport[0] = RectI(Point2I(mRenderLayer.Viewport[0].Pos.x, mRenderLayer.Viewport[0].Pos.y), Point2I(mRenderLayer.Viewport[0].Size.w, mRenderLayer.Viewport[0].Size.h));
 
       // Right
-      mEyeRenderSize[1] = rtSize;
       mEyeRT[1] = mStereoRT;
-      mEyeTexture[1] = mStereoTexture;
-      mEyeViewport[1] = RectI(Point2I((mRecomendedEyeTargetSize[0].w+1)/2,0), Point2I((mRecomendedEyeTargetSize[1].w+1)/2, mRecomendedEyeTargetSize[1].h));
+      mEyeViewport[1] = RectI(Point2I(mRenderLayer.Viewport[1].Pos.x, mRenderLayer.Viewport[1].Pos.y), Point2I(mRenderLayer.Viewport[1].Size.w, mRenderLayer.Viewport[1].Size.h));
 
-      gLastStereoTexture = mEyeTexture[0];
+      GFXD3D11Device* device = static_cast<GFXD3D11Device*>(GFX);
+
+      D3D11_TEXTURE2D_DESC dsDesc;
+      dsDesc.Width = rtSize.x;
+      dsDesc.Height = rtSize.y;
+      dsDesc.MipLevels = 1;
+      dsDesc.ArraySize = 1;
+      dsDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;// DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+      dsDesc.SampleDesc.Count = 1;
+      dsDesc.SampleDesc.Quality = 0;
+      dsDesc.Usage = D3D11_USAGE_DEFAULT;
+      dsDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+      dsDesc.CPUAccessFlags = 0;
+      dsDesc.MiscFlags = 0;
+
+      // Create typeless when we are rendering as non-sRGB since we will override the texture format in the RTV
+      bool reinterpretSrgbAsLinear = true;
+      unsigned compositorTextureFlags = 0;
+      if (reinterpretSrgbAsLinear)
+         compositorTextureFlags |= ovrSwapTextureSetD3D11_Typeless;
+
+      ovrResult result = ovr_CreateMirrorTextureD3D11(mDevice, device->mD3DDevice, &dsDesc, compositorTextureFlags, &mDebugMirrorTexture);
+      
+      if (result == ovrError_DisplayLost || !mDebugMirrorTexture)
+      {
+         AssertFatal(false, "Something went wrong");
+         return NULL;
+      }
+
+      // Create texture handle so we can render it in-game
+      ovrD3D11Texture* mirror_tex = (ovrD3D11Texture*)mDebugMirrorTexture;
+      D3D11_RENDER_TARGET_VIEW_DESC rtvd = {};
+      rtvd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;// DXGI_FORMAT_R8G8B8A8_UNORM;
+      rtvd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+      GFXD3D11TextureObject* object = new GFXD3D11TextureObject(GFX, &VRTextureProfile);
+      object->registerResourceWithDevice(GFX);
+      *(object->getSRViewPtr()) = mirror_tex->D3D11.pSRView;
+      *(object->get2DTexPtr()) = mirror_tex->D3D11.pTexture;
+      device->mD3DDevice->CreateRenderTargetView(mirror_tex->D3D11.pTexture, &rtvd, object->getRTViewPtr());
+
+
+      // Add refs for texture release later on
+      if (object->getSRView()) object->getSRView()->AddRef();
+      //object->getRTView()->AddRef();
+      if (object->get2DTex()) object->get2DTex()->AddRef();
+      object->isManaged = true;
+
+      // Get the actual size of the texture...
+      D3D11_TEXTURE2D_DESC probeDesc;
+      ZeroMemory(&probeDesc, sizeof(D3D11_TEXTURE2D_DESC));
+      object->get2DTex()->GetDesc(&probeDesc);
+
+      object->mTextureSize.set(probeDesc.Width, probeDesc.Height, 0);
+      object->mBitmapSize = object->mTextureSize;
+      int fmt = probeDesc.Format;
+
+      if (fmt == DXGI_FORMAT_R8G8B8A8_TYPELESS || fmt == DXGI_FORMAT_B8G8R8A8_TYPELESS)
+      {
+         object->mFormat = GFXFormatR8G8B8A8; // usual case
+      }
+      else
+      {
+         // TODO: improve this. this can be very bad.
+         GFXREVERSE_LOOKUP(GFXD3D11TextureFormat, GFXFormat, fmt);
+         object->mFormat = (GFXFormat)fmt;
+      }
+      
+      mDebugMirrorTextureHandle = object;
    }
    else
    {
@@ -261,17 +481,14 @@ String OculusVRHMDDevice::dumpMetrics()
    F32 ipd = this->getIPD();
    U32 lastStatus = mSensor->getLastTrackingStatus();
 
-   sb.format("   | OVR Sensor %i | rot: %f %f %f, pos: %f %f %f, FOV (%f %f %f %f, %f %f %f %f), IPD %f, Track:%s%s, Disort:%s%s%s",
+   sb.format("   | OVR Sensor %i | rot: %f %f %f, pos: %f %f %f, FOV (%f %f %f %f, %f %f %f %f), IPD %f, Track:%s%s",
              mActionCodeIndex,
              rot.x, rot.y, rot.z,
              pos.x, pos.y, pos.z,
              eyeFov[0].upTan, eyeFov[0].downTan, eyeFov[0].leftTan, eyeFov[0].rightTan, eyeFov[1].upTan, eyeFov[1].downTan, eyeFov[1].leftTan, eyeFov[1].rightTan,
              getIPD(),
              lastStatus & ovrStatus_OrientationTracked ? " ORIENT" : "",
-             lastStatus & ovrStatus_PositionTracked ? " POS" : "",
-             mCurrentDistortionCaps & ovrDistortionCap_TimeWarp ? " TIMEWARP" : "",
-             mCurrentDistortionCaps & ovrDistortionCap_Vignette ? " VIGNETTE" : "",
-             mCurrentDistortionCaps & ovrDistortionCap_Overdrive ? " OVERDRIVE" : "");
+             lastStatus & ovrStatus_PositionTracked ? " POS" : "");
 
    return sb.data();
 }
@@ -292,82 +509,23 @@ void OculusVRHMDDevice::updateRenderInfo()
       return;
    
    PlatformWindow *window = mDrawCanvas->getPlatformWindow();
-   ovrFovPort eyeFov[2] = {mDevice->DefaultEyeFov[0], mDevice->DefaultEyeFov[1]};
+
+   ovrHmdDesc desc = ovr_GetHmdDesc(mDevice);
 
    // Update window size if it's incorrect
    Point2I backbufferSize = mDrawCanvas->getBounds().extent;
 
-   // Reset
-   ovrHmd_ConfigureRendering(mDevice, NULL, 0, NULL, NULL);
-
-#ifdef OCULUS_USE_D3D
-   // Generate render target textures
-   GFXD3D9Device *d3d9GFX = dynamic_cast<GFXD3D9Device*>(GFX);
-   if (d3d9GFX)
+   // Finally setup!
+   if (!setupTargets())
    {
-      ovrD3D9Config cfg;
-      cfg.D3D9.Header.API = ovrRenderAPI_D3D9;
-      cfg.D3D9.Header.Multisample = 0;
-      cfg.D3D9.Header.BackBufferSize = OVR::Sizei(backbufferSize.x, backbufferSize.y);
-      cfg.D3D9.pDevice = d3d9GFX->getDevice();
-      cfg.D3D9.pDevice->GetSwapChain(0, &cfg.D3D9.pSwapChain);
-
-      // Finally setup!
-      if (!setupTargets())
-      {
-         onDeviceDestroy();
-         return;
-      }
-
-      ovrHmd_AttachToWindow(mDevice, window->getPlatformDrawable(), NULL, NULL);
-
-      if (!ovrHmd_ConfigureRendering( mDevice, &cfg.Config, mCurrentDistortionCaps, eyeFov, mEyeRenderDesc ))
-      {
-         Con::errorf("Couldn't configure oculus rendering!");
-         return;
-      }
+      onDeviceDestroy();
+      return;
    }
-#endif
-
-#ifdef OCULUS_USE_GL
-   // Generate render target textures
-   GFXGLDevice *glGFX = dynamic_cast<GFXGLDevice*>(GFX);
-   if (glGFX)
-   {
-      ovrGLConfig cfg;
-      cfg.OGL.Header.API = ovrRenderAPI_OpenGL;
-      cfg.OGL.Header.Multisample = 0;
-      cfg.OGL.Header.BackBufferSize = OVR::Sizei(backbufferSize.x, backbufferSize.y);
-
-#ifdef WIN32
-      cfg.OGL.Window = GetActiveWindow();//window->getPlatformDrawable();
-      cfg.OGL.DC = wglGetCurrentDC();
-#else
-      cfg.OGL.Disp = NULL;
-#endif
-
-      // Finally setup!
-      if (!setupTargets())
-      {
-         onDeviceDestroy();
-         return;
-      }
-
-      ovrHmd_AttachToWindow(mDevice, window->getPlatformDrawable(), NULL, NULL);
-
-      if (!ovrHmd_ConfigureRendering( mDevice, &cfg.Config, mCurrentDistortionCaps, eyeFov, mEyeRenderDesc ))
-      {
-         Con::errorf("Couldn't configure oculus rendering!");
-         return;
-      }
-   }
-#endif
-
 
    mRenderConfigurationDirty = false;
 }
 
-Point2I OculusVRHMDDevice::generateRenderTarget(GFXTextureTargetRef &target, GFXTexHandle &texture, GFXTexHandle &depth, Point2I desiredSize)
+Point2I OculusVRHMDDevice::generateRenderTarget(GFXTextureTargetRef &target, GFXTexHandle &depth, Point2I desiredSize)
 {
     // Texture size that we already have might be big enough.
     Point2I newRTSize;
@@ -402,12 +560,12 @@ Point2I OculusVRHMDDevice::generateRenderTarget(GFXTextureTargetRef &target, GFX
     newRTSize.setMax(Point2I(64, 64));
 
     // Stereo RT needs to be the same size as the recommended RT
-    if ( newRT || texture.getWidthHeight() != newRTSize )
+    /*if ( newRT || mDebugStereoTexture.getWidthHeight() != newRTSize )
     {
-       texture.set( newRTSize.x, newRTSize.y, mRTFormat, &VRTextureProfile,  avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
-       target->attachTexture( GFXTextureTarget::Color0, texture );
-       Con::printf("generateRenderTarget generated %x", texture.getPointer());
-    }
+       mDebugStereoTexture.set( newRTSize.x, newRTSize.y, mRTFormat, &VRTextureProfile,  avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+       target->attachTexture( GFXTextureTarget::Color0, mDebugStereoTexture);
+       Con::printf("generateRenderTarget generated %x", mDebugStereoTexture.getPointer());
+    }*/
 
     if ( depth.getWidthHeight() != newRTSize )
     {
@@ -424,6 +582,13 @@ void OculusVRHMDDevice::clearRenderTargets()
    mStereoRT = NULL;
    mEyeRT[0] = NULL;
    mEyeRT[1] = NULL;
+
+   if (mDebugMirrorTexture)
+   {
+      ovr_DestroyMirrorTexture(mDevice, mDebugMirrorTexture);
+      mDebugMirrorTexture = NULL;
+      mDebugMirrorTextureHandle = NULL;
+   }
 }
 
 void OculusVRHMDDevice::updateCaps()
@@ -431,34 +596,7 @@ void OculusVRHMDDevice::updateCaps()
    if (!mIsValid || !mDevice)
       return;
 
-   U32 oldDistortionCaps = mCurrentDistortionCaps;
-   
-   // Distortion
-   if (mTimewarp)
-   {
-      mCurrentDistortionCaps |= ovrDistortionCap_TimeWarp;
-   }
-   else
-   {
-      mCurrentDistortionCaps &= ~ovrDistortionCap_TimeWarp;
-   }
-
-   if (oldDistortionCaps != mCurrentDistortionCaps)
-   {
-      mRenderConfigurationDirty = true;
-   }
-
-   // Device
-   if (!mVsync)
-   {
-      mCurrentCaps |= ovrHmdCap_NoVSync;
-   }
-   else
-   {
-      mCurrentCaps &= ~ovrHmdCap_NoVSync;
-   }
-   
-   ovrHmd_SetEnabledCaps(mDevice, mCurrentCaps);
+   ovr_SetEnabledCaps(mDevice, mCurrentCaps);
 }
 
 static bool sInFrame = false; // protects against recursive onStartFrame calls
@@ -469,20 +607,23 @@ void OculusVRHMDDevice::onStartFrame()
       return;
 
    sInFrame = true;
-   
-#ifndef OCULUS_DEBUG_FRAME
-   ovrHmd_BeginFrame(mDevice, 0);
-#endif
 
    ovrVector3f hmdToEyeViewOffset[2] = { mEyeRenderDesc[0].HmdToEyeViewOffset, mEyeRenderDesc[1].HmdToEyeViewOffset };
-   ovrHmd_GetEyePoses(mDevice, 0, hmdToEyeViewOffset, mCurrentEyePoses, &mLastTrackingState);
+   ovrTrackingState hmdState = ovr_GetTrackingState(mDevice, 0, ovrTrue);
+   ovr_CalcEyePoses(hmdState.HeadPose.ThePose, hmdToEyeViewOffset, mRenderLayer.RenderPose);
 
    for (U32 i=0; i<2; i++)
    {
-      mCurrentEyePoses[i].Position.x *= OculusVRDevice::smPositionTrackingScale;
-      mCurrentEyePoses[i].Position.y *= OculusVRDevice::smPositionTrackingScale;
-      mCurrentEyePoses[i].Position.z *= OculusVRDevice::smPositionTrackingScale;
+      mRenderLayer.RenderPose[i].Position.x *= OculusVRDevice::smPositionTrackingScale;
+      mRenderLayer.RenderPose[i].Position.y *= OculusVRDevice::smPositionTrackingScale;
+      mRenderLayer.RenderPose[i].Position.z *= OculusVRDevice::smPositionTrackingScale;
    }
+
+   mRenderLayer.SensorSampleTime = ovr_GetTimeInSeconds();
+
+   // Set current dest texture on stereo render target
+   D3D11OculusTexture* texSwap = (D3D11OculusTexture*)mTextureSwapSet;
+   mStereoRT->attachTexture(GFXTextureTarget::Color0, texSwap->TexRtv[texSwap->TextureSet->CurrentIndex]);
 
    sInFrame = false;
    mFrameReady = true;
@@ -490,87 +631,40 @@ void OculusVRHMDDevice::onStartFrame()
 
 void OculusVRHMDDevice::onEndFrame()
 {
-   if (!mIsValid || !mDevice || !mDrawCanvas || sInFrame || !mFrameReady)
+   if (!mIsValid || !mDevice || !mDrawCanvas || sInFrame || !mFrameReady || !mTextureSwapSet)
       return;
 
    Point2I eyeSize;
    GFXTarget *windowTarget = mDrawCanvas->getPlatformWindow()->getGFXTarget();
 
-#ifndef OCULUS_DEBUG_FRAME
-   
-#ifdef OCULUS_USE_D3D
-   GFXD3D9Device *d3d9GFX = dynamic_cast<GFXD3D9Device*>(GFX);
-   if (d3d9GFX && mEyeRT[0].getPointer())
+   GFXD3D11Device *d3d11GFX = dynamic_cast<GFXD3D11Device*>(GFX);
+
+   ovrViewScaleDesc viewScaleDesc;
+   ovrVector3f hmdToEyeViewOffset[2] = { mEyeRenderDesc[0].HmdToEyeViewOffset, mEyeRenderDesc[1].HmdToEyeViewOffset };
+   viewScaleDesc.HmdSpaceToWorldScaleInMeters = 1.0f;
+   viewScaleDesc.HmdToEyeViewOffset[0] = hmdToEyeViewOffset[0];
+   viewScaleDesc.HmdToEyeViewOffset[1] = hmdToEyeViewOffset[1];
+
+
+   ovrLayerDirect           ld = { { ovrLayerType_Direct } };
+   mDebugRenderLayer = ld;
+
+   mDebugRenderLayer.ColorTexture[0] = mRenderLayer.ColorTexture[0];
+   mDebugRenderLayer.ColorTexture[1] = mRenderLayer.ColorTexture[1];
+   mDebugRenderLayer.Viewport[0] = mRenderLayer.Viewport[0];
+   mDebugRenderLayer.Viewport[1] = mRenderLayer.Viewport[1];
+
+   // TODO: use ovrViewScaleDesc
+   ovrLayerHeader* layers = &mRenderLayer.Header;
+   ovrResult result = ovr_SubmitFrame(mDevice, 0, &viewScaleDesc, &layers, 1);
+   mTextureSwapSet->AdvanceToNextTexture();
+
+   if (OVR_SUCCESS(result))
    {
-      // Left
-      ovrD3D9Texture eyeTextures[2];
-      eyeSize = mEyeTexture[0].getWidthHeight();
-      eyeTextures[0].D3D9.Header.API = ovrRenderAPI_D3D9;
-      eyeTextures[0].D3D9.Header.RenderViewport.Pos.x = mEyeViewport[0].point.x;
-      eyeTextures[0].D3D9.Header.RenderViewport.Pos.y = mEyeViewport[0].point.y;
-      eyeTextures[0].D3D9.Header.RenderViewport.Size.w = mEyeViewport[0].extent.x;
-      eyeTextures[0].D3D9.Header.RenderViewport.Size.h = mEyeViewport[0].extent.y;
-      eyeTextures[0].D3D9.Header.TextureSize.w = eyeSize.x;
-      eyeTextures[0].D3D9.Header.TextureSize.h = eyeSize.y;
-      eyeTextures[0].D3D9.pTexture = mEyeRT[0].getPointer() ? static_cast<GFXD3D9TextureObject*>(mEyeTexture[0].getPointer())->get2DTex() : NULL;
-
-      // Right
-      eyeSize = mEyeTexture[1].getWidthHeight();
-      eyeTextures[1].D3D9.Header.API = ovrRenderAPI_D3D9;
-      eyeTextures[1].D3D9.Header.RenderViewport.Pos.x = mEyeViewport[1].point.x;
-      eyeTextures[1].D3D9.Header.RenderViewport.Pos.y = mEyeViewport[1].point.y;
-      eyeTextures[1].D3D9.Header.RenderViewport.Size.w = mEyeViewport[1].extent.x;
-      eyeTextures[1].D3D9.Header.RenderViewport.Size.h = mEyeViewport[1].extent.y;
-      eyeTextures[1].D3D9.Header.TextureSize.w = eyeSize.x;
-      eyeTextures[1].D3D9.Header.TextureSize.h = eyeSize.y;
-      eyeTextures[1].D3D9.pTexture = mEyeRT[0].getPointer() ? static_cast<GFXD3D9TextureObject*>(mEyeTexture[1].getPointer())->get2DTex() : NULL;
-
-      // Submit!
-      GFX->disableShaders();
-
-      GFX->setActiveRenderTarget(windowTarget);
-      GFX->clear(GFXClearZBuffer | GFXClearStencil | GFXClearTarget, ColorI(255,0,0), 1.0f, 0);
-      ovrHmd_EndFrame(mDevice, mCurrentEyePoses, (ovrTexture*)(&eyeTextures[0]));
+      int woo = 1;
    }
-#endif
 
-#ifdef OCULUS_USE_GL
-   GFXGLDevice *glGFX = dynamic_cast<GFXGLDevice*>(GFX);
-   if (glGFX && mEyeRT[0].getPointer())
-   {
-      // Left
-      ovrGLTexture eyeTextures[2];
-      eyeSize = mEyeTexture[0].getWidthHeight();
-      eyeTextures[0].OGL.Header.API = ovrRenderAPI_GL;
-      eyeTextures[0].OGL.Header.RenderViewport.Pos.x = mEyeViewport[0].point.x;
-      eyeTextures[0].OGL.Header.RenderViewport.Pos.y = mEyeViewport[0].point.y;
-      eyeTextures[0].OGL.Header.RenderViewport.Size.w = mEyeViewport[0].extent.x;
-      eyeTextures[0].OGL.Header.RenderViewport.Size.h = mEyeViewport[0].extent.y;
-      eyeTextures[0].OGL.Header.TextureSize.w = eyeSize.x;
-      eyeTextures[0].OGL.Header.TextureSize.h = eyeSize.y;
-      eyeTextures[0].OGL.TexId = mEyeRT[0].getPointer() ? static_cast<GFXGLTextureObject*>(mEyeTexture[0].getPointer())->getHandle() : 0;
-
-      // Right
-      eyeSize = mEyeTexture[1].getWidthHeight();
-      eyeTextures[1].OGL.Header.API = ovrRenderAPI_GL;
-      eyeTextures[1].OGL.Header.RenderViewport.Pos.x = mEyeViewport[1].point.x;
-      eyeTextures[1].OGL.Header.RenderViewport.Pos.y = mEyeViewport[1].point.y;
-      eyeTextures[1].OGL.Header.RenderViewport.Size.w = mEyeViewport[1].extent.x;
-      eyeTextures[1].OGL.Header.RenderViewport.Size.h = mEyeViewport[1].extent.y;
-      eyeTextures[1].OGL.Header.TextureSize.w = eyeSize.x;
-      eyeTextures[1].OGL.Header.TextureSize.h = eyeSize.y;
-      eyeTextures[0].OGL.TexId = mEyeRT[1].getPointer() ? static_cast<GFXGLTextureObject*>(mEyeTexture[1].getPointer())->getHandle() : 0;
-
-      // Submit!
-      GFX->disableShaders();
-
-      GFX->setActiveRenderTarget(windowTarget);
-      GFX->clear(GFXClearZBuffer | GFXClearStencil | GFXClearTarget, ColorI(255,0,0), 1.0f, 0);
-      ovrHmd_EndFrame(mDevice, mCurrentEyePoses, (ovrTexture*)(&eyeTextures[0]));
-   }
-#endif
-
-#endif
+   // TODO: render preview in display?
 
    mFrameReady = false;
 }
@@ -578,14 +672,15 @@ void OculusVRHMDDevice::onEndFrame()
 void OculusVRHMDDevice::getFrameEyePose(DisplayPose *outPose, U32 eyeId) const
 {
    // Directly set the rotation and position from the eye transforms
-   ovrPosef pose = mCurrentEyePoses[eyeId];
+   ovrPosef pose = mRenderLayer.RenderPose[eyeId];
    OVR::Quatf orientation = pose.Orientation;
    const OVR::Vector3f position = pose.Position;
 
-   EulerF rotEuler;
-   OculusVRUtil::convertRotation(orientation, rotEuler);
+   MatrixF torqueMat(1);
+   OVR::Matrix4f mat(orientation);
+   OculusVRUtil::convertRotation(mat.M, torqueMat);
 
-   outPose->orientation = rotEuler;
+   outPose->orientation = QuatF(torqueMat);
    outPose->position = Point3F(-position.x, position.z, -position.y);
 }
 
@@ -605,18 +700,17 @@ void OculusVRHMDDevice::onDeviceDestroy()
       mEyeRT[1]->zombify();
    }
 
+   if (mTextureSwapSet)
+   {
+      delete mTextureSwapSet;
+      mTextureSwapSet = NULL;
+   }
+
    mStereoRT = NULL;
-   mStereoTexture = NULL;
    mStereoDepthTexture = NULL;
 
-   mEyeTexture[0] = NULL;
-   mEyeDepthTexture[0] = NULL;
-   mEyeTexture[1] = NULL;
-   mEyeDepthTexture[1] = NULL;
    mEyeRT[0] = NULL;
    mEyeRT[1] = NULL;
 
    mRenderConfigurationDirty = true;
-   
-   ovrHmd_ConfigureRendering(mDevice, NULL, 0, NULL, NULL);
 }

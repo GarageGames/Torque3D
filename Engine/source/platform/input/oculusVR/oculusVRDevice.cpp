@@ -62,7 +62,7 @@ MODULE_END;
 // OculusVRDevice
 //-----------------------------------------------------------------------------
 
-bool OculusVRDevice::smEnableDevice = true;
+bool OculusVRDevice::smEnableDevice = false;
 
 bool OculusVRDevice::smSimulateHMD = true;
 
@@ -156,26 +156,27 @@ void OculusVRDevice::buildCodeTable()
    OculusVRSensorDevice::buildCodeTable();
 }
 
-void OculusVRDevice::addHMDDevice(ovrHmd hmd)
+void OculusVRDevice::addHMDDevice(ovrHmd hmd, ovrGraphicsLuid luid)
 {
    if(!hmd)
       return;
 
    OculusVRHMDDevice* hmdd = new OculusVRHMDDevice();
-   hmdd->set(hmd,mHMDDevices.size());
+   hmdd->set(hmd, luid, mHMDDevices.size());
    mHMDDevices.push_back(hmdd);
 
-   Con::printf("   HMD found: %s by %s [v%d]", hmd->ProductName, hmd->Manufacturer, hmd->Type);
+	ovrHmdDesc desc = ovr_GetHmdDesc(hmd);
+   Con::printf("   HMD found: %s by %s [v%d]", desc.ProductName, desc.Manufacturer, desc.Type);
 }
 
 void OculusVRDevice::createSimulatedHMD()
-{
+{/* TOFIX
    OculusVRHMDDevice* hmdd = new OculusVRHMDDevice();
-   ovrHmd hmd = ovrHmd_CreateDebug(ovrHmd_DK2);
+   ovrHmd hmd = ovr_CreateDebug(ovrHmd_DK2);
    hmdd->set(hmd,mHMDDevices.size());
    mHMDDevices.push_back(hmdd);
 
-   Con::printf("   HMD simulated: %s by %s [v%d]", hmdd->getProductName(), hmdd->getManufacturer(), hmdd->getVersion());
+   Con::printf("   HMD simulated: %s by %s [v%d]", hmdd->getProductName(), hmdd->getManufacturer(), hmdd->getVersion()); */
 }
 
 bool OculusVRDevice::enable()
@@ -185,16 +186,17 @@ bool OculusVRDevice::enable()
 
    Con::printf("Oculus VR Device Init:");
 
-   if(sOcculusEnabled && ovr_Initialize())
+   if(sOcculusEnabled && OVR_SUCCESS(ovr_Initialize(0)))
    {
       mEnabled = true;
 
       // Enumerate HMDs and pick the first one
-      ovrHmd hmd = ovrHmd_Create(0);
-      if(hmd)
+		ovrHmd hmd;
+		ovrGraphicsLuid luid;
+      if(OVR_SUCCESS(ovr_Create(&hmd, &luid)))
       {
          // Add the HMD to our list
-         addHMDDevice(hmd);
+         addHMDDevice(hmd, luid);
 
          setActive(true);
       }
@@ -316,17 +318,6 @@ void OculusVRDevice::getEyeOffsets(Point3F *dest) const
    hmd->getEyeOffsets(dest);
 }
 
-bool OculusVRDevice::providesFovPorts() const
-{
-   if(!mHMDDevices.size())
-      return false;
-
-   const OculusVRHMDDevice* hmd = getHMDDevice(mActiveDeviceId);
-   if(!hmd)
-      return Point3F::Zero;
-
-   return true;
-}
 
 void OculusVRDevice::getFovPorts(FovPort *out) const
 {
@@ -560,6 +551,20 @@ GameConnection* OculusVRDevice::getCurrentConnection()
 
 //-----------------------------------------------------------------------------
 
+GFXTexHandle OculusVRDevice::getPreviewTexture()
+{
+   if (!mHMDDevices.size())
+      return NULL;
+
+   OculusVRHMDDevice* hmd = getHMDDevice(mActiveDeviceId);
+   if (!hmd)
+      return NULL;
+
+   return hmd->getPreviewTexture();
+}
+
+//-----------------------------------------------------------------------------
+
 DefineEngineFunction(isOculusVRDeviceActive, bool, (),,
    "@brief Used to determine if the Oculus VR input device is active\n\n"
 
@@ -700,7 +705,7 @@ DefineEngineFunction(getOVRHMDVersion, S32, (S32 index),,
    return hmd->getVersion();
 }
 
-DefineEngineFunction(getOVRHMDDisplayDeviceName, const char*, (S32 index),,
+DefineEngineFunction(getOVRHMDDisplayDeviceType, const char*, (S32 index),,
    "@brief Windows display device name used in EnumDisplaySettings/CreateDC.\n\n"
    "@param index The HMD index.\n"
    "@return The name of the HMD display device, if any.\n"
@@ -717,7 +722,7 @@ DefineEngineFunction(getOVRHMDDisplayDeviceName, const char*, (S32 index),,
       return "";
    }
 
-   return hmd->getDisplayDeviceName();
+   return hmd->getDisplayDeviceType();
 }
 
 DefineEngineFunction(getOVRHMDDisplayDeviceId, S32, (S32 index),,
@@ -738,26 +743,6 @@ DefineEngineFunction(getOVRHMDDisplayDeviceId, S32, (S32 index),,
    }
 
    return hmd->getDisplayDeviceId();
-}
-
-DefineEngineFunction(getOVRHMDDisplayDesktopPos, Point2I, (S32 index),,
-   "@brief Desktop coordinate position of the screen (can be negative; may not be present on all platforms).\n\n"
-   "@param index The HMD index.\n"
-   "@return Position of the screen.\n"
-   "@ingroup Game")
-{
-   if(!ManagedSingleton<OculusVRDevice>::instanceOrNull())
-   {
-      return Point2I::Zero;
-   }
-
-   const OculusVRHMDDevice* hmd = OCULUSVRDEV->getHMDDevice(index);
-   if(!hmd)
-   {
-      return Point2I::Zero;
-   }
-
-   return hmd->getDesktopPosition();
 }
 
 DefineEngineFunction(getOVRHMDResolution, Point2I, (S32 index),,

@@ -267,6 +267,10 @@ public:
    bool getControlCameraTransform(F32 dt,MatrixF* mat);
    bool getControlCameraVelocity(Point3F *vel);
 
+   /// Returns the head transform for the control object, using supplemental information
+   /// from the provided IDisplayDevice
+   bool getControlCameraHeadTransform(IDisplayDevice *display, MatrixF *transform);
+
    /// Returns the eye transforms for the control object, using supplemental information 
    /// from the provided IDisplayDevice.
    bool getControlCameraEyeTransforms(IDisplayDevice *display, MatrixF *transforms);

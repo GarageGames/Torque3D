@@ -25,7 +25,7 @@
 
 #include "math/mPoint2.h"
 #include "math/mMatrix.h"
-#include "OVR_CAPI_0_5_0.h"
+#include "OVR_CAPI_0_8_0.h"
 
 // NOTE: math code in oculus uses "Offset" which is a preprocessor macro
 #define TorqueOffset Offset
