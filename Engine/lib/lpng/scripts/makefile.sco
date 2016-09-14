@@ -1,7 +1,7 @@
 # makefile for SCO OSr5  ELF and Unixware 7 with Native cc
 # Contributed by Mike Hopkirk (hops@sco.com) modified from Makefile.lnx
 #   force ELF build dynamic linking, SONAME setting in lib and RPATH in app
-# Copyright (C) 2002, 2006, 2010-2011 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2006, 2010-2014 Glenn Randers-Pehrson
 # Copyright (C) 1998 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 #
@@ -10,8 +10,8 @@
 # and license in png.h
 
 # Library name:
-LIBNAME = libpng15
-PNGMAJ = 15
+LIBNAME = libpng16
+PNGMAJ = 16
 
 # Shared library names:
 LIBSO=$(LIBNAME).so
@@ -25,6 +25,7 @@ AR_RC=ar rc
 MKDIR_P=mkdir
 LN_SF=ln -f -s
 RANLIB=echo
+CP=cp
 RM_F=/bin/rm -f
 
 # where make install puts libpng.a, $(OLDSO)*, and png.h
@@ -37,8 +38,9 @@ exec_prefix=$(prefix)
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
-CFLAGS= -dy -belf -I$(ZLIBINC) -O3
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng15 -lz -lm
+CPPFLAGS=-I$(ZLIBINC)
+CFLAGS= -dy -belf -O3
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz -lm
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
@@ -60,6 +62,10 @@ DI=$(DESTDIR)$(INCPATH)
 DL=$(DESTDIR)$(LIBPATH)
 DM=$(DESTDIR)$(MANPATH)
 
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
@@ -68,14 +74,16 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 
 .SUFFIXES:      .c .o .pic.o
 
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -KPIC -o $@ $*.c
 
 all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)
@@ -86,7 +94,7 @@ libpng.pc:
 	-e s!@exec_prefix@!$(exec_prefix)! \
 	-e s!@libdir@!$(LIBPATH)! \
 	-e s!@includedir@!$(INCPATH)! \
-	-e s!-lpng15!-lpng15\ -lz\ -lm! > libpng.pc
+	-e s!-lpng16!-lpng16\ -lz\ -lm! > libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
@@ -94,7 +102,7 @@ libpng-config:
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo ccopts=\"-belf\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
-	echo libs=\"-lpng15 -lz -lm\"; \
+	echo libs=\"-lpng16 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 	chmod +x libpng-config
 
@@ -175,14 +183,14 @@ install: install-static install-shared install-man install-config
 test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
-	$(CC) -I$(DI) $(CFLAGS) \
+	$(CC) -I$(DI) $(CPPFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(DL) -L$(ZLIBLIB) \
 	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags`
 	./pngtestd pngtest.png
 
 test-installed:
-	$(CC) $(CFLAGS) \
+	$(CC) $(CPPFLAGS) $(CFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) \
 	   -o pngtesti `$(BINPATH)/$(LIBNAME)-config --ldflags`

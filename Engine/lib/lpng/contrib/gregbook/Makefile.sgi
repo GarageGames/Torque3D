@@ -23,9 +23,9 @@
 
 # macros --------------------------------------------------------------------
 
-PNGINC = -I/usr/local/include/libpng15
-PNGLIB = -L/usr/local/lib -lpng15	  # dynamically linked against libpng
-#PNGLIB = /usr/local/lib/libpng15.a # statically linked against libpng
+PNGINC = -I/usr/local/include/libpng16
+PNGLIB = -L/usr/local/lib -lpng16	  # dynamically linked against libpng
+#PNGLIB = /usr/local/lib/libpng16.a # statically linked against libpng
 # or:
 #PNGINC = -I../..
 #PNGLIB = -L../.. -lpng
@@ -53,7 +53,8 @@ CC = cc
 LD = cc
 RM = rm -f
 # ABI must be the same as that used to build libpng.
-ABI=
+ABI =
+CPPFLAGS =
 CFLAGS = $(ABI) -O -fullwarn $(INCS)
 LDFLAGS = $(ABI)
 O = .o
@@ -73,7 +74,7 @@ EXES = $(RPNG)$(E) $(RPNG2)$(E) $(WPNG)$(E)
 # implicit make rules -------------------------------------------------------
 
 .c$(O):
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 
 # dependencies --------------------------------------------------------------
