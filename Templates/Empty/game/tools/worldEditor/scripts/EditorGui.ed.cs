@@ -2135,10 +2135,19 @@ function EWorldEditor::toggleLockChildren( %this, %simGroup )
 {
    foreach( %child in %simGroup )
    {
+      if( %child.class $= "SimGroup" )
+      {
+         %this.toggleHideChildren( %child );
+      }
       if( %child.isMemberOfClass( "SimGroup" ) )
-         %this.toggleLockChildren( %child );
-      else
+      {
+         %this.toggleHideChildren( %child );
          %child.setLocked( !%child.locked );
+      }
+      else
+      {
+         %child.setLocked( !%child.locked );
+      }
    }
    
    EWorldEditor.syncGui();
@@ -2148,10 +2157,19 @@ function EWorldEditor::toggleHideChildren( %this, %simGroup )
 {
    foreach( %child in %simGroup )
    {
-      if( %child.isMemberOfClass( "SimGroup" ) )
+      if( %child.class $= "SimGroup" )
+      {
          %this.toggleHideChildren( %child );
-      else
+      }
+      if( %child.isMemberOfClass( "SimGroup" ) )
+      {
+         %this.toggleHideChildren( %child );
          %this.hideObject( %child, !%child.hidden );
+      }
+      else
+      {
+         %this.hideObject( %child, !%child.hidden );
+      }
    }
    
    EWorldEditor.syncGui();
