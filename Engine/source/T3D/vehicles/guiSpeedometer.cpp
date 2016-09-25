@@ -147,22 +147,29 @@ void GuiSpeedometerHud::initPersistFields()
 //-----------------------------------------------------------------------------
 /**
    Gui onRender method.
-   Renders a health bar with filled background and border.
+   Renders an analog speedometer needle over a specified bitmap background.
 */
 void GuiSpeedometerHud::onRender(Point2I offset, const RectI &updateRect)
 {
-   // Must have a connection and player control object
+   // Must have a connection
    GameConnection* conn = GameConnection::getConnectionToServer();
    if (!conn)
       return;
-   Vehicle* control = dynamic_cast<Vehicle*>(conn->getControlObject());
-   if (!control)
-      return;
+
+   // Requires either a vehicle control object or a vehicle-mounted player		
+   Vehicle* vehicle = dynamic_cast<Vehicle*>(conn->getControlObject());
+   if(!vehicle){
+      Player * player = dynamic_cast<Player*>(conn->getControlObject());
+      if(!player) return;
+      if (!player->isMounted()) return;
+      vehicle = dynamic_cast<Vehicle*>(player->getObjectMount());
+      if(!vehicle) return;
+   }
 
    Parent::onRender(offset,updateRect);
 
    // Use the vehicle's velocity as its speed...
-   mSpeed = control->getVelocity().len();
+   mSpeed = vehicle->getVelocity().len();
    if (mSpeed > mMaxSpeed)
       mSpeed = mMaxSpeed;
 
