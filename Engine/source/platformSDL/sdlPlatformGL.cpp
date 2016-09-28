@@ -11,12 +11,6 @@ namespace PlatformGL
 
    void init()
    {
-       static bool inited = false;
-
-       if(inited)
-           return;
-
-       inited = true;
        const U32 majorOGL = 3;
        const U32 minorOGL = 2;
        U32 debugFlag = 0;
@@ -28,6 +22,9 @@ namespace PlatformGL
        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorOGL);
        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, debugFlag);
+#ifdef TORQUE_GL_SOFTWARE
+       SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 0);
+#endif
 
        SDL_ClearError();
    }

@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2013 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,59 +20,54 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "platform/types.h"
-#include "platform/platformDlibrary.h"
-#include <dlfcn.h>
+#import "platform/platform.h"
+#import <stdlib.h>
+#import <string.h>
+#import <mm_malloc.h>
 
-class MacDLibrary : public DLibrary
+//--------------------------------------
+void* dRealMalloc(dsize_t in_size)
 {
-   void* _handle;
-public:
-   MacDLibrary();
-   ~MacDLibrary();
-   bool open(const char* file);
-   void close();
-   void* bind(const char* name);
-};
-
-MacDLibrary::MacDLibrary()
-{
-   _handle = NULL;
+   return malloc(in_size);
 }
 
-MacDLibrary::~MacDLibrary()
+
+//--------------------------------------
+void dRealFree(void* in_pFree)
 {
-   close();
+   free(in_pFree);
 }
 
-bool MacDLibrary::open(const char* file)
+void *dMalloc_aligned(dsize_t in_size, int alignment)
 {
-   Platform::getExecutablePath();
-   _handle = dlopen(file, RTLD_LAZY | RTLD_LOCAL);
-   return _handle != NULL;
+   return _mm_malloc(in_size, alignment);
 }
 
-void* MacDLibrary::bind(const char* name)
+void dFree_aligned(void* p)
 {
-   return _handle ? dlsym(_handle, name) : NULL;
+   return _mm_free(p);
 }
 
-void MacDLibrary::close()
+void* dMemcpy(void *dst, const void *src, dsize_t size)
 {
-   if(_handle)
-      dlclose(_handle);
-   
-   _handle = NULL;
+   return memcpy(dst,src,size);
 }
 
-DLibraryRef OsLoadLibrary(const char* file)
+
+//--------------------------------------
+void* dMemmove(void *dst, const void *src, dsize_t size)
 {
-   MacDLibrary* library = new MacDLibrary();
-   if(!library->open(file))
-   {
-      delete library;
-      return NULL;
-   }
-   
-   return library;
+   return memmove(dst,src,size);
+}
+
+//--------------------------------------
+void* dMemset(void *dst, int c, dsize_t size)
+{
+   return memset(dst,c,size);
+}
+
+//--------------------------------------
+int dMemcmp(const void *ptr1, const void *ptr2, dsize_t len)
+{
+   return(memcmp(ptr1, ptr2, len));
 }

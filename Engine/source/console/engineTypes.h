@@ -613,7 +613,7 @@ namespace _Private {
 
 ///
 #define FIELD( fieldName, exportName, numElements, doc ) \
-   { #exportName, doc, numElements, TYPE( ( ( ThisType* ) 16 )->fieldName ), FIELDOFFSET( fieldName ) }, // Artificial offset to avoid compiler warnings.
+   { #exportName, doc, numElements, TYPE( ( ( ThisType* ) 16 )->fieldName ), (U32)FIELDOFFSET( fieldName ) }, // Artificial offset to avoid compiler warnings.
 
 ///
 #define FIELD_AS( type, fieldName, exportName, numElements, doc ) \

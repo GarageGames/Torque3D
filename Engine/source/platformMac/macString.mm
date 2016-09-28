@@ -20,49 +20,50 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <CoreServices/CoreServices.h>
-#include "platform/platform.h"
-#include "platform/threads/semaphore.h"
+#import "platform/platform.h"
+#import <stdlib.h>
+#import <stdarg.h>
+#import <string.h>
+#import <ctype.h>
+#import <stdio.h>
+#import "core/strings/stringFunctions.h"
 
-class PlatformSemaphore
+char *dStrnew(const char *src)
 {
-public:
-   MPSemaphoreID mSemaphore;
-
-   PlatformSemaphore(S32 initialCount)
-   {
-      OSStatus err = MPCreateSemaphore(S32_MAX - 1, initialCount, &mSemaphore);
-      AssertFatal(err == noErr, "Failed to allocate semaphore!");
-   }
-
-   ~PlatformSemaphore()
-   {
-      OSStatus err = MPDeleteSemaphore(mSemaphore);
-      AssertFatal(err == noErr, "Failed to destroy semaphore!");
-   }
-};
-
-Semaphore::Semaphore(S32 initialCount)
-{
-   mData = new PlatformSemaphore(initialCount);
+   char *buffer = new char[dStrlen(src) + 1];
+   dStrcpy(buffer, src);
+   return buffer;
 }
 
-Semaphore::~Semaphore()
+char* dStrstr(char *str1, char *str2)
 {
-   AssertFatal(mData && mData->mSemaphore, "Semaphore::destroySemaphore: invalid semaphore");
-   delete mData;
+   return strstr(str1,str2);
 }
 
-bool Semaphore::acquire( bool block, S32 timeoutMS )
+int dSprintf(char *buffer, dsize_t /*bufferSize*/, const char *format, ...)
 {
-   AssertFatal(mData && mData->mSemaphore, "Semaphore::acquireSemaphore: invalid semaphore");
-   OSStatus err = MPWaitOnSemaphore(mData->mSemaphore, block ? ( timeoutMS == -1 ? kDurationForever : timeoutMS ) : kDurationImmediate);
-   return(err == noErr);
+   va_list args;
+   va_start(args, format);
+   S32 len = vsprintf(buffer, format, args);
+   va_end(args);
+   return (len);
 }
 
-void Semaphore::release()
+
+int dVsprintf(char *buffer, dsize_t /*bufferSize*/, const char *format, va_list arglist)
 {
-   AssertFatal(mData && mData->mSemaphore, "Semaphore::releaseSemaphore: invalid semaphore");
-   OSStatus err = MPSignalSemaphore(mData->mSemaphore);
-   AssertFatal(err == noErr, "Failed to release semaphore!");
+   S32 len = vsprintf(buffer, format, arglist);
+   
+   return (len);
 }
+
+int dFflushStdout()
+{
+   return fflush(stdout);
+}
+
+int dFflushStderr()
+{
+   return fflush(stderr);
+}
+

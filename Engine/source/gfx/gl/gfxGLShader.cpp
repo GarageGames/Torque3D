@@ -32,6 +32,8 @@
 #include "gfx/gfxStructs.h"
 #include "console/console.h"
 
+#define CHECK_AARG(pos, name) static StringTableEntry attr_##name = StringTable->insert(#name); if (argName == attr_##name) { glBindAttribLocation(mProgram, pos, attr_##name); continue; }
+
 
 class GFXGLShaderConstHandle : public GFXShaderConstHandle
 {
@@ -447,34 +449,62 @@ bool GFXGLShader::_init()
    // If either shader was present and failed to compile, bail.
    if(!compiledVertexShader || !compiledPixelShader)
       return false;
-
-   //bind vertex attributes
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_Position,    "vPosition");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_Normal,      "vNormal");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_Color,       "vColor");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_Tangent,     "vTangent");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TangentW,    "vTangentW");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_Binormal,    "vBinormal");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord0,   "vTexCoord0");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord1,   "vTexCoord1");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord2,   "vTexCoord2");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord3,   "vTexCoord3");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord4,   "vTexCoord4");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord5,   "vTexCoord5");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord6,   "vTexCoord6");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord7,   "vTexCoord7");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord8,   "vTexCoord8");
-   glBindAttribLocation(mProgram, Torque::GL_VertexAttrib_TexCoord9,   "vTexCoord9");
-
-   //bind fragment out color
-   glBindFragDataLocation(mProgram, 0, "OUT_col");
-   glBindFragDataLocation(mProgram, 1, "OUT_col1");
-   glBindFragDataLocation(mProgram, 2, "OUT_col2");
-   glBindFragDataLocation(mProgram, 3, "OUT_col3");
-
+  
    // Link it!
    glLinkProgram( mProgram );
+   
+   GLint activeAttribs  = 0;
+   glGetProgramiv(mProgram, GL_ACTIVE_ATTRIBUTES, &activeAttribs );
+   
+   GLint maxLength;
+   glGetProgramiv(mProgram, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxLength);
+   
+   FrameTemp<GLchar> tempData(maxLength+1);
+   *tempData.address() = '\0';
+   // Check atributes
+   for (U32 i=0; i<activeAttribs; i++)
+   {
+      GLint size;
+      GLenum type;
+      
+      glGetActiveAttrib(mProgram, i, maxLength + 1, NULL, &size, &type, tempData.address());
+      
+      StringTableEntry argName = StringTable->insert(tempData.address());
+      
+      CHECK_AARG(Torque::GL_VertexAttrib_Position,    vPosition);
+      CHECK_AARG(Torque::GL_VertexAttrib_Normal,      vNormal);
+      CHECK_AARG(Torque::GL_VertexAttrib_Color,       vColor);
+      CHECK_AARG(Torque::GL_VertexAttrib_Tangent,     vTangent);
+      CHECK_AARG(Torque::GL_VertexAttrib_TangentW,    vTangentW);
+      CHECK_AARG(Torque::GL_VertexAttrib_Binormal,    vBinormal);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord0,   vTexCoord0);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord1,   vTexCoord1);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord2,   vTexCoord2);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord3,   vTexCoord3);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord4,   vTexCoord4);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord5,   vTexCoord5);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord6,   vTexCoord6);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord7,   vTexCoord7);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord8,   vTexCoord8);
+      CHECK_AARG(Torque::GL_VertexAttrib_TexCoord9,   vTexCoord9);
+   }
 
+   //always have OUT_col
+   glBindFragDataLocation(mProgram, 0, "OUT_col");
+   // Check OUT_colN
+   for(U32 i=1;i<4;i++)
+   {
+      char buffer[10];
+      dSprintf(buffer, sizeof(buffer), "OUT_col%u",i);
+      GLint location = glGetFragDataLocation(mProgram, buffer);
+      if(location>0)
+         glBindFragDataLocation(mProgram, i, buffer);
+
+   }
+   
+   // Link it again!
+   glLinkProgram( mProgram );
+   
    GLint linkStatus;
    glGetProgramiv( mProgram, GL_LINK_STATUS, &linkStatus );
    
@@ -486,22 +516,23 @@ bool GFXGLShader::_init()
       FrameAllocatorMarker fam;
       char* log = (char*)fam.alloc( logLength );
       glGetProgramInfoLog( mProgram, logLength, NULL, log );
-
+      
       if ( linkStatus == GL_FALSE )
       {
          if ( smLogErrors )
          {
             Con::errorf( "GFXGLShader::init - Error linking shader!" );
-            Con::errorf( "Program %s / %s: %s", 
-                mVertexFile.getFullPath().c_str(), mPixelFile.getFullPath().c_str(), log);
+            Con::errorf( "Program %s / %s: %s",
+               mVertexFile.getFullPath().c_str(), mPixelFile.getFullPath().c_str(), log);
          }
       }
       else if ( smLogWarnings )
       {
-         Con::warnf( "Program %s / %s: %s", 
-             mVertexFile.getFullPath().c_str(), mPixelFile.getFullPath().c_str(), log);
+         Con::warnf( "Program %s / %s: %s",
+            mVertexFile.getFullPath().c_str(), mPixelFile.getFullPath().c_str(), log);
       }
    }
+
 
    // If we failed to link, bail.
    if ( linkStatus == GL_FALSE )

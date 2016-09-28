@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2013 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,55 +20,44 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <ApplicationServices/ApplicationServices.h>
-#include "platform/platformFont.h"
+#import "platform/platformFont.h"
+#import <CoreText/CoreText.h>
+//-----------------------------------------------------------------------------
 
-
-class MacCarbFont : public PlatformFont
+class OSXFont : public PlatformFont
 {
 private:
-   // Caches style, layout and colorspace data to speed up character drawing.
-   // TODO: style colors
-   ATSUStyle      mStyle;       
-   ATSUTextLayout mLayout;       
+   
+   // Font reference.
+   CTFontRef       mFontRef;
+   
+   // Distance from drawing point to typographic baseline.
+   // Think of the drawing point as the upper left corner of a text box.
+   // NOTE: 'baseline' is synonymous with 'ascent' in Torque.
+   U32             mBaseline;
+   
+   // Distance between lines.
+   U32             mHeight;
+   
+   // Glyph rendering color-space.
    CGColorSpaceRef mColorSpace;
    
-   // Cache the baseline and height for the getter methods below.
-   U32               mHeight;    // distance between lines
-   U32               mBaseline;  // distance from drawing point to typographic baseline,
-                                 // think of the drawing point as the upper left corner of a text box.
-                                 // note: 'baseline' is synonymous with 'ascent' in Torque.
-                                 
-   // Cache the size and name requested in create()
-   U32               mSize;
-   StringTableEntry  mName;
-   
 public:
-   MacCarbFont();
-   virtual ~MacCarbFont();
+   OSXFont();
+   virtual ~OSXFont();
    
    /// Look up the requested font, cache style, layout, colorspace, and some metrics.
-   virtual bool create( const char* name, U32 size, U32 charset = TGE_ANSI_CHARSET);
+   virtual bool create( const char* name, dsize_t size, U32 charset = TGE_ANSI_CHARSET);
    
    /// Determine if the character requested is a drawable character, or if it should be ignored.
-   virtual bool isValidChar( const UTF16 ch) const;
-   virtual bool isValidChar( const UTF8 *str) const;
+   virtual bool isValidChar( const UTF16 character) const;
+   virtual bool isValidChar( const UTF8* str) const;
    
    /// Get some vertical data on the font at large. Useful for drawing multiline text, and sizing text boxes.
-   virtual U32 getFontHeight() const;
-   virtual U32 getFontBaseLine() const;
+   virtual U32 getFontHeight() const { return mHeight; }
+   virtual U32 getFontBaseLine() const { return mBaseline; }
    
    // Draw the character to a temporary bitmap, and fill the CharInfo with various text metrics.
-   virtual PlatformFont::CharInfo &getCharInfo(const UTF16 ch) const;
+   virtual PlatformFont::CharInfo &getCharInfo(const UTF16 character) const;
    virtual PlatformFont::CharInfo &getCharInfo(const UTF8 *str) const;
 };
-
-inline U32 MacCarbFont::getFontHeight() const
-{
-   return mHeight;
-}
-
-inline U32 MacCarbFont::getFontBaseLine() const
-{
-   return mBaseline;
-}

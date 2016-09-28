@@ -672,11 +672,6 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    }
    else
    {
-#ifdef TORQUE_OS_MAC
-      Point2I screensize = getRoot()->getWindowSize();
-      tempRect.point.y = screensize.y - (tempRect.point.y + tempRect.extent.y);
-#endif
-
       // set up the camera and viewport stuff:
       F32 wwidth;
       F32 wheight;
@@ -716,12 +711,6 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       }
 
       RectI tempRect = updateRect;
-
-#ifdef TORQUE_OS_MAC
-      Point2I screensize = getRoot()->getWindowSize();
-      tempRect.point.y = screensize.y - (tempRect.point.y + tempRect.extent.y);
-#endif
-
       _internalRender(tempRect, tempRect, frustum);
    }
 

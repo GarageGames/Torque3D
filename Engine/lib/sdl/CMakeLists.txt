@@ -183,8 +183,8 @@ endif()
 set(SDL_LIBS "-lSDL2")
 set(SDL_CFLAGS "")
 
-# Emscripten toolchain has a nonempty default value for this, and the checks 
-# in this file need to change that, so remember the original value, and 
+# Emscripten toolchain has a nonempty default value for this, and the checks
+# in this file need to change that, so remember the original value, and
 # restore back to that afterwards. For check_function_exists() to work in
 # Emscripten, this value must be at its default value.
 set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
@@ -212,7 +212,7 @@ include_directories(${SDL2_BINARY_DIR}/include ${SDL2_SOURCE_DIR}/include)
 set(OPT_DEF_ASM TRUE)
 if(EMSCRIPTEN)
   # Set up default values for the currently supported set of subsystems:
-  # Emscripten/Javascript does not have assembly support, a dynamic library 
+  # Emscripten/Javascript does not have assembly support, a dynamic library
   # loading architecture, low-level CPU inspection or multithreading.
   set(OPT_DEF_ASM FALSE)
   set(SDL_SHARED_ENABLED_BY_DEFAULT OFF)
@@ -387,11 +387,14 @@ if(USE_GCC OR USE_CLANG)
     list(APPEND EXTRA_CFLAGS "-Wshadow")
   endif()
 
-  set(CMAKE_REQUIRED_FLAGS "-Wl,--no-undefined")
-  check_c_compiler_flag("" HAVE_NO_UNDEFINED)
-  set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
-  if(HAVE_NO_UNDEFINED)
-    list(APPEND EXTRA_LDFLAGS "-Wl,--no-undefined")
+  # --no-undefined is unsupported with clang
+  if(NOT USE_CLANG)
+    set(CMAKE_REQUIRED_FLAGS "-Wl,--no-undefined")
+    check_c_compiler_flag("" HAVE_NO_UNDEFINED)
+    set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
+    if(HAVE_NO_UNDEFINED)
+      list(APPEND EXTRA_LDFLAGS "-Wl,--no-undefined")
+    endif()
   endif()
 endif()
 
@@ -836,7 +839,7 @@ elseif(UNIX AND NOT APPLE)
         #include <linux/kd.h>
         #include <linux/keyboard.h>
 
-        int main(int argc, char **argv) 
+        int main(int argc, char **argv)
         {
             struct kbentry kbe;
             kbe.kb_table = KG_CTRL;
