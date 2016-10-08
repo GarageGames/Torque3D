@@ -422,7 +422,11 @@ if(TORQUE_SDL)
     
     #override and hide SDL2 cache variables
     set(SDL_SHARED ON CACHE INTERNAL "" FORCE)
-    set(SDL_STATIC OFF CACHE INTERNAL "" FORCE)
+	if(WIN32)
+		set(SDL_STATIC OFF CACHE INTERNAL "" FORCE)
+	else()
+		set(SDL_STATIC ON CACHE INTERNAL "" FORCE)
+	endif()
     add_subdirectory( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
 endif()
 
