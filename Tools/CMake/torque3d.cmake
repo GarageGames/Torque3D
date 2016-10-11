@@ -382,48 +382,55 @@ endif()
 
 if(TORQUE_SDL)
     addPathRec("${srcDir}/windowManager/sdl")
-    addPathRec("${srcDir}/platformSDL")
     
     if(TORQUE_OPENGL)
       addPathRec("${srcDir}/gfx/gl/sdl")
+      addPathRec("${srcDir}/platformSDL")
+    else()
+      set(BLACKLIST "sdlPlatformGL.cpp")
+      addPathRec("${srcDir}/platformSDL")
+      set(BLACKLIST "")
     endif()
     
-    if(UNIX)
-       #set(CMAKE_SIZEOF_VOID_P 4) #force 32 bit
-       set(ENV{CFLAGS} "${CXX_FLAG32} -g -O3")
-       if("${TORQUE_ADDITIONAL_LINKER_FLAGS}" STREQUAL "")
-         set(ENV{LDFLAGS} "${CXX_FLAG32}")
-       else()
-         set(ENV{LDFLAGS} "${CXX_FLAG32} ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
-       endif()
+    if(NOT TORQUE_PLAYER)
+        if(UNIX)
+            #set(CMAKE_SIZEOF_VOID_P 4) #force 32 bit
+            set(ENV{CFLAGS} "${CXX_FLAG32} -g -O3")
+            if("${TORQUE_ADDITIONAL_LINKER_FLAGS}" STREQUAL "")
+                set(ENV{LDFLAGS} "${CXX_FLAG32}")
+            else()
+                set(ENV{LDFLAGS} "${CXX_FLAG32} ${TORQUE_ADDITIONAL_LINKER_FLAGS}")
+            endif()
 
-       find_package(PkgConfig REQUIRED)
-       pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
+            find_package(PkgConfig REQUIRED)
+            pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
-       # Setup CMake to use GTK+, tell the compiler where to look for headers
-       # and to the linker where to look for libraries
-       include_directories(${GTK3_INCLUDE_DIRS})
-       link_directories(${GTK3_LIBRARY_DIRS})
+            # Setup CMake to use GTK+, tell the compiler where to look for headers
+            # and to the linker where to look for libraries
+            include_directories(${GTK3_INCLUDE_DIRS})
+            link_directories(${GTK3_LIBRARY_DIRS})
 
-       # Add other flags to the compiler
-       add_definitions(${GTK3_CFLAGS_OTHER})
+            # Add other flags to the compiler
+            add_definitions(${GTK3_CFLAGS_OTHER})
 
-       set(BLACKLIST "nfd_win.cpp"  )
-       addLib(nativeFileDialogs)
+            set(BLACKLIST "nfd_win.cpp"  )
+            addLib(nativeFileDialogs)
 
-       set(BLACKLIST ""  )
-       target_link_libraries(nativeFileDialogs ${GTK3_LIBRARIES})
- 	else()
- 	   set(BLACKLIST "nfd_gtk.c" )
- 	   addLib(nativeFileDialogs)
-       set(BLACKLIST ""  )
- 	   addLib(comctl32)	   
+            set(BLACKLIST ""  )
+            target_link_libraries(nativeFileDialogs ${GTK3_LIBRARIES})
+        else()
+            set(BLACKLIST "nfd_gtk.c" )
+            addLib(nativeFileDialogs)
+            set(BLACKLIST ""  )
+            addLib(comctl32)	   
+        endif()
     endif()
     
     #override and hide SDL2 cache variables
-    set(SDL_SHARED ON CACHE INTERNAL "" FORCE)
-    set(SDL_STATIC OFF CACHE INTERNAL "" FORCE)
+    set(SDL_SHARED OFF CACHE INTERNAL "" FORCE)
+    set(SDL_STATIC ON CACHE INTERNAL "" FORCE)
     add_subdirectory( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
+    link_directories( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
 endif()
 
 if(TORQUE_DEDICATED)
@@ -697,7 +704,7 @@ addInclude("${libDir}/libogg/include")
 addInclude("${libDir}/opcode")
 addInclude("${libDir}/collada/include")
 addInclude("${libDir}/collada/include/1.4")
-if(TORQUE_SDL)
+if(TORQUE_SDL AND NOT TORQUE_PLAYER)
    addInclude("${libDir}/nativeFileDialogs/include")
 endif()
 if(TORQUE_OPENGL)
