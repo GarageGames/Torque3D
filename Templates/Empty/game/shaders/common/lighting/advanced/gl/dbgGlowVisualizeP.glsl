@@ -21,14 +21,13 @@
 //-----------------------------------------------------------------------------
 
 #include "../../../gl/hlslCompat.glsl"
-#include "shadergen:/autogenConditioners.h"
-#include "../../../postFx/gl/postFX.glsl"
 
+in vec2 uv0;
 uniform sampler2D glowBuffer;
 
 out vec4 OUT_FragColor0;
 
 void main()
-{ 
+{
    OUT_FragColor0 = texture(glowBuffer, uv0);
 }

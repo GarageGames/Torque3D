@@ -20,49 +20,48 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <CoreServices/CoreServices.h>
-#include "platform/platform.h"
-#include "platform/threads/semaphore.h"
+#include "console/console.h"
+#include "platform/threads/mutex.h"
+#include "core/util/safeDelete.h"
 
-class PlatformSemaphore
+#include <SDL.h>
+#include <SDL_thread.h>
+
+struct PlatformMutexData
 {
-public:
-   MPSemaphoreID mSemaphore;
-
-   PlatformSemaphore(S32 initialCount)
-   {
-      OSStatus err = MPCreateSemaphore(S32_MAX - 1, initialCount, &mSemaphore);
-      AssertFatal(err == noErr, "Failed to allocate semaphore!");
-   }
-
-   ~PlatformSemaphore()
-   {
-      OSStatus err = MPDeleteSemaphore(mSemaphore);
-      AssertFatal(err == noErr, "Failed to destroy semaphore!");
-   }
+   SDL_mutex *mutex;
 };
 
-Semaphore::Semaphore(S32 initialCount)
+Mutex::Mutex()
 {
-   mData = new PlatformSemaphore(initialCount);
+   mData = new PlatformMutexData;
+   mData->mutex = SDL_CreateMutex();
 }
 
-Semaphore::~Semaphore()
+Mutex::~Mutex()
 {
-   AssertFatal(mData && mData->mSemaphore, "Semaphore::destroySemaphore: invalid semaphore");
-   delete mData;
+   AssertFatal(mData, "Mutex::destroyMutex: invalid mutex");
+   SDL_DestroyMutex(mData->mutex);
+   SAFE_DELETE(mData);
 }
 
-bool Semaphore::acquire( bool block, S32 timeoutMS )
+bool Mutex::lock(bool block)
 {
-   AssertFatal(mData && mData->mSemaphore, "Semaphore::acquireSemaphore: invalid semaphore");
-   OSStatus err = MPWaitOnSemaphore(mData->mSemaphore, block ? ( timeoutMS == -1 ? kDurationForever : timeoutMS ) : kDurationImmediate);
-   return(err == noErr);
+   if(mData == NULL)
+      return false;
+   if(block)
+   {
+      return SDL_LockMutex(mData->mutex) == 0;
+   }
+   else
+   {
+      return SDL_TryLockMutex(mData->mutex) == 0;
+   }
 }
 
-void Semaphore::release()
+void Mutex::unlock()
 {
-   AssertFatal(mData && mData->mSemaphore, "Semaphore::releaseSemaphore: invalid semaphore");
-   OSStatus err = MPSignalSemaphore(mData->mSemaphore);
-   AssertFatal(err == noErr, "Failed to release semaphore!");
+   if(mData == NULL)
+      return;
+   SDL_UnlockMutex(mData->mutex);
 }

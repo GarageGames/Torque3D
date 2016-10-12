@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// Copyright (c) 2013 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -20,10 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "platform/platform.h"
-#include <stdlib.h>
-#include <string.h>
-#include <mm_malloc.h>
+#import "platform/platform.h"
+#import <stdlib.h>
+#import <string.h>
+#import <mm_malloc.h>
 
 //--------------------------------------
 void* dRealMalloc(dsize_t in_size)
@@ -51,20 +51,20 @@ void dFree_aligned(void* p)
 void* dMemcpy(void *dst, const void *src, dsize_t size)
 {
    return memcpy(dst,src,size);
-}   
+}
 
 
 //--------------------------------------
 void* dMemmove(void *dst, const void *src, dsize_t size)
 {
    return memmove(dst,src,size);
-}  
- 
+}
+
 //--------------------------------------
 void* dMemset(void *dst, int c, dsize_t size)
 {
-   return memset(dst,c,size);   
-}   
+   return memset(dst,c,size);
+}
 
 //--------------------------------------
 int dMemcmp(const void *ptr1, const void *ptr2, dsize_t len)

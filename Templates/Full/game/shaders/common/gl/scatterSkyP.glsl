@@ -31,8 +31,6 @@ in vec4  mieColor;
 #define IN_mieColor mieColor
 in vec3  v3Direction;
 #define IN_v3Direction v3Direction
-in float zPosition;
-#define IN_zPosition zPosition
 in vec3  pos;
 #define IN_pos pos
 
@@ -65,12 +63,6 @@ void main()
    float fac = dot( normalize( pos ), sunDir );
    fac = max( nightInterpAndExposure.y, pow( clamp( fac, 0.0, 1.0 ), 2 ) );
    OUT_col = mix( color, nightSkyColor, nightInterpAndExposure.y );
-   
-   // Clip based on the camera-relative
-   // z position of the vertex, passed through
-   // from the vertex position.
-   if(zPosition < 0.0)
-      discard;
 
    OUT_col.a = 1;
    

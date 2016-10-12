@@ -20,11 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "platformMac/platformMacCarb.h"
-#include "platform/platform.h"
-#include "console/console.h"
-#include "math/mMath.h"
-#include "core/strings/stringFunctions.h"
+#import "platform/platform.h"
+#import "console/console.h"
+#import "math/mMath.h"
+#import "core/strings/stringFunctions.h"
 
 extern void mInstallLibrary_C();
 extern void mInstallLibrary_Vec();
@@ -52,7 +51,7 @@ void Platform::setMathControlStateKnown()
 }
 
 //--------------------------------------
-ConsoleFunction( MathInit, void, 1, 10, "(DETECT|C|VEC|SSE)")
+ConsoleFunction( MathInit, void, 1, 10, "(DETECT|C|SSE)")
 {
    U32 properties = CPU_PROP_C;  // C entensions are always used
    
@@ -71,16 +70,12 @@ ConsoleFunction( MathInit, void, 1, 10, "(DETECT|C|VEC|SSE)")
          properties |= CPU_PROP_C; 
          continue; 
       }
-      if (dStricmp(*argv, "VEC") == 0) { 
-         properties |= CPU_PROP_ALTIVEC; 
-         continue; 
-      }
       if( dStricmp( *argv, "SSE" ) == 0 )
       {
          properties |= CPU_PROP_SSE;
          continue;
       }
-      Con::printf("Error: MathInit(): ignoring unknown math extension '%s'", *argv);
+      //Con::printf("Error: MathInit(): ignoring unknown math extension '%s'", *argv);
    }
    Math::init(properties);
 }
@@ -99,15 +94,8 @@ void Math::init(U32 properties)
 
    Con::printf("Math Init:");
    Con::printf("   Installing Standard C extensions");
-   mInstallLibrary_C();
-   
-   #if defined(__VEC__)
-   if (properties & CPU_PROP_ALTIVEC)
-   {
-      Con::printf("   Installing Altivec extensions");
-      mInstallLibrary_Vec();
-   }
-   #endif
+   mInstallLibrary_C();   
+
    #ifdef TORQUE_CPU_X86
    if( properties & CPU_PROP_SSE )
    {

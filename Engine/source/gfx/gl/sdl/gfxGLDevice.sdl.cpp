@@ -155,12 +155,12 @@ void GFXGLDevice::enumerateVideoModes()
 void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
 {
     AssertFatal(window, "GFXGLDevice::init - no window specified, can't init device without a window!");
-    PlatformWindowSDL* x11Window = dynamic_cast<PlatformWindowSDL*>(window);
-    AssertFatal(x11Window, "Window is not a valid PlatformWindowSDL object");
+    PlatformWindowSDL* sdlWindow = dynamic_cast<PlatformWindowSDL*>(window);
+    AssertFatal(sdlWindow, "Window is not a valid PlatformWindowSDL object");
 
     // Create OpenGL context
-    mContext = PlatformGL::CreateContextGL( x11Window );
-    PlatformGL::MakeCurrentGL( x11Window, mContext );
+    mContext = PlatformGL::CreateContextGL( sdlWindow );
+    PlatformGL::MakeCurrentGL( sdlWindow, mContext );
         
     loadGLCore();
     loadGLExtensions(0);
@@ -224,6 +224,11 @@ void GFXGLWindowTarget::_teardownCurrentMode()
 
 void GFXGLWindowTarget::_setupNewMode()
 {
+}
+
+void GFXGLWindowTarget::_makeContextCurrent()
+{
+   PlatformGL::MakeCurrentGL(mWindow, mContext);
 }
 
 #endif

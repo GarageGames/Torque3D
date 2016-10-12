@@ -20,11 +20,12 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <pthread.h>
 #include "platform/threads/thread.h"
 #include "platform/threads/semaphore.h"
 #include "platform/threads/mutex.h"
 #include <stdlib.h>
+#include <SDL.h>
+#include <SDL_thread.h>
 
 class PlatformThreadData
 {
@@ -33,7 +34,8 @@ public:
    void*                   mRunArg;
    Thread*                 mThread;
    Semaphore               mGateway; // default count is 1
-   U32                     mThreadID;
+   SDL_threadID            mThreadID;
+   SDL_Thread*             mSdlThread;
    bool                    mDead;
 };
 
@@ -45,16 +47,12 @@ ThreadManager::MainThreadId ThreadManager::smMainThreadId;
 //               Neccesary because Thread::run() is provided as a non-threaded
 //               way to execute the thread's run function. So we have to keep
 //               track of the thread's lock here.
-static void *ThreadRunHandler(void * arg)
+static int ThreadRunHandler(void * arg)
 {
    PlatformThreadData *mData = reinterpret_cast<PlatformThreadData*>(arg);
    Thread *thread = mData->mThread;
 
-   // mThreadID is filled in twice, once here and once in pthread_create().
-   // We fill in mThreadID here as well as in pthread_create() because addThread()
-   // can execute before pthread_create() returns and sets mThreadID.
-   // The value from pthread_create() and pthread_self() are guaranteed to be equivalent (but not identical)
-   mData->mThreadID = ThreadManager::getCurrentThreadId();
+   mData->mThreadID = SDL_ThreadID();
    
    ThreadManager::addThread(thread);
    thread->run(mData->mRunArg);
@@ -69,9 +67,7 @@ static void *ThreadRunHandler(void * arg)
    if( autoDelete )
       delete thread;
       
-   // return value for pthread lib's benefit
-   return NULL;
-   // the end of this function is where the created pthread will die.
+   return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -85,6 +81,7 @@ Thread::Thread(ThreadRunFunction func, void* arg, bool start_thread, bool autode
    mData->mThread = this;
    mData->mThreadID = 0;
    mData->mDead = false;
+   mData->mSdlThread = NULL;
    autoDelete = autodelete;
 }
 
@@ -94,6 +91,7 @@ Thread::~Thread()
    if( isAlive() )
       join();
 
+   
    delete mData;
 }
 
@@ -111,14 +109,12 @@ void Thread::start( void* arg )
    if( !mData->mRunArg )
       mData->mRunArg = arg;
 
-   pthread_create((pthread_t*)(&mData->mThreadID), NULL, ThreadRunHandler, mData);
+   mData->mSdlThread = SDL_CreateThread(ThreadRunHandler,NULL,mData);
+
 }
 
 bool Thread::join()
-{
-   // not using pthread_join here because pthread_join cannot deal
-   // with multiple simultaneous calls.
-   
+{  
    mData->mGateway.acquire();
    AssertFatal( !isAlive(), "Thread::join() - thread not dead after join()" );
    mData->mGateway.release();
@@ -139,7 +135,7 @@ bool Thread::isAlive()
 
 U32 Thread::getId()
 {
-   return mData->mThreadID;
+   return (U32)mData->mThreadID;
 }
 
 void Thread::_setName( const char* )
@@ -150,10 +146,10 @@ void Thread::_setName( const char* )
 
 U32 ThreadManager::getCurrentThreadId()
 {
-   return (U32)pthread_self();
+   return (U32)SDL_ThreadID();
 }
 
 bool ThreadManager::compare(U32 threadId_1, U32 threadId_2)
 {
-   return pthread_equal((_opaque_pthread_t*)threadId_1, (_opaque_pthread_t*)threadId_2);
+   return (threadId_1 == threadId_2);
 }

@@ -20,10 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <CoreServices/CoreServices.h>
-#include "platform/platformTimer.h"
-#include <time.h>
-#include <unistd.h>
+#import <CoreServices/CoreServices.h>
+#import <mach/mach_time.h>
+#import "platform/platformTimer.h"
+#import <time.h>
+#import <unistd.h>
 
 //--------------------------------------
 
@@ -81,18 +82,17 @@ U32 Platform::getTime()
 /// Storing milliseconds in a U32 overflows every 49.71 days
 U32 Platform::getRealMilliseconds()
 {
-   // Duration is a S32 value.
-   // if negative, it is in microseconds.
-   // if positive, it is in milliseconds.
-   Duration durTime = AbsoluteToDuration(UpTime());
-   U32 ret;
-   if( durTime < 0 )
-      ret = durTime / -1000;
-   else 
-      ret = durTime;
-
-   return ret;
-}   
+   const uint32_t oneMillion = 1000000;
+   static mach_timebase_info_data_t s_timebase_info;
+   
+   if (s_timebase_info.denom == 0) {
+      (void) mach_timebase_info(&s_timebase_info);
+   }
+   
+   // mach_absolute_time() returns billionth of seconds,
+   // so divide by one million to get milliseconds
+   return (U32)((mach_absolute_time() * s_timebase_info.numer) / (oneMillion * s_timebase_info.denom));
+}
 
 U32 Platform::getVirtualMilliseconds()
 {

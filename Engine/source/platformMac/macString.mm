@@ -20,59 +20,50 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "platform/types.h"
-#include "platform/platformDlibrary.h"
-#include <dlfcn.h>
+#import "platform/platform.h"
+#import <stdlib.h>
+#import <stdarg.h>
+#import <string.h>
+#import <ctype.h>
+#import <stdio.h>
+#import "core/strings/stringFunctions.h"
 
-class MacDLibrary : public DLibrary
+char *dStrnew(const char *src)
 {
-   void* _handle;
-public:
-   MacDLibrary();
-   ~MacDLibrary();
-   bool open(const char* file);
-   void close();
-   void* bind(const char* name);
-};
-
-MacDLibrary::MacDLibrary()
-{
-   _handle = NULL;
+   char *buffer = new char[dStrlen(src) + 1];
+   dStrcpy(buffer, src);
+   return buffer;
 }
 
-MacDLibrary::~MacDLibrary()
+char* dStrstr(char *str1, char *str2)
 {
-   close();
+   return strstr(str1,str2);
 }
 
-bool MacDLibrary::open(const char* file)
+int dSprintf(char *buffer, dsize_t /*bufferSize*/, const char *format, ...)
 {
-   Platform::getExecutablePath();
-   _handle = dlopen(file, RTLD_LAZY | RTLD_LOCAL);
-   return _handle != NULL;
+   va_list args;
+   va_start(args, format);
+   S32 len = vsprintf(buffer, format, args);
+   va_end(args);
+   return (len);
 }
 
-void* MacDLibrary::bind(const char* name)
-{
-   return _handle ? dlsym(_handle, name) : NULL;
-}
 
-void MacDLibrary::close()
+int dVsprintf(char *buffer, dsize_t /*bufferSize*/, const char *format, va_list arglist)
 {
-   if(_handle)
-      dlclose(_handle);
+   S32 len = vsprintf(buffer, format, arglist);
    
-   _handle = NULL;
+   return (len);
 }
 
-DLibraryRef OsLoadLibrary(const char* file)
+int dFflushStdout()
 {
-   MacDLibrary* library = new MacDLibrary();
-   if(!library->open(file))
-   {
-      delete library;
-      return NULL;
-   }
-   
-   return library;
+   return fflush(stdout);
 }
+
+int dFflushStderr()
+{
+   return fflush(stderr);
+}
+

@@ -27,26 +27,9 @@
 void GFXGLCardProfiler::init()
 {
    mChipSet = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
-
-   // get the major and minor parts of the GL version. These are defined to be
-   // in the order "[major].[minor] [other]|[major].[minor].[release] [other] in the spec
-   const char *versionStart = reinterpret_cast<const char*>(glGetString(GL_VERSION));
-   const char *versionEnd = versionStart;
-   // get the text for the version "x.x.xxxx "
-   for( S32 tok = 0; tok < 2; ++tok )
-   {
-      char *text = dStrdup( versionEnd );
-      dStrtok(text, ". ");
-      versionEnd += dStrlen( text ) + 1;
-      dFree( text );
-   }
-
-   mRendererString = "GL";
-   mRendererString += String::SpanToString(versionStart, versionEnd - 1);
-
+   mRendererString = "OpenGL";
    mCardDescription = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-   mVersionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));
-   
+   mVersionString = reinterpret_cast<const char*>(glGetString(GL_VERSION));   
    mVideoMemory = static_cast<GFXGLDevice*>(GFX)->getTotalVideoMemory();
 
    Parent::init();
@@ -85,7 +68,8 @@ void GFXGLCardProfiler::setupCardCapabilities()
    setCapability("GL_ARB_copy_image", gglHasExtension(ARB_copy_image));
 
    // Check for vertex attrib binding
-   setCapability("GL_ARB_vertex_attrib_binding", gglHasExtension(ARB_vertex_attrib_binding));
+   setCapability("GL_ARB_vertex_attrib_binding", gglHasExtension(ARB_vertex_attrib_binding));    
+
 }
 
 bool GFXGLCardProfiler::_queryCardCap(const String& query, U32& foundResult)

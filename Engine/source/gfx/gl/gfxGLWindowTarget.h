@@ -64,6 +64,8 @@ private:
    void _setupNewMode();
    void _setupAttachments();
    void _WindowPresent();
+   //set this windows context to be current
+   void _makeContextCurrent();
 };
 
 #endif

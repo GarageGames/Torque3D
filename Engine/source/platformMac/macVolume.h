@@ -23,13 +23,8 @@
 #ifndef _MACCARBVOLUME_H_
 #define _MACCARBVOLUME_H_
 
-#ifndef _POSIXVOLUME_H_
-   #include "platformPOSIX/posixVolume.h"
-#endif
-#ifndef _TVECTOR_H_
-   #include "core/util/tVector.h"
-#endif
-
+#import "platformPOSIX/posixVolume.h"
+#import "core/util/tVector.h"
 
 class MacFileSystem;
 

@@ -20,16 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <CoreServices/CoreServices.h>
-
-#include "platform/platform.h"
-#include "platformMac/macCarbVolume.h"
-#include "platform/platformVolume.h"
-#include "console/console.h"
-
-
-//#define DEBUG_SPEW
-
+#import <CoreServices/CoreServices.h>
+#import "platform/platform.h"
+#import "platformMac/macVolume.h"
+#import "platform/platformVolume.h"
+#import "console/console.h"
 
 struct MacFileSystemChangeNotifier::Event
 {
@@ -37,7 +32,6 @@ struct MacFileSystemChangeNotifier::Event
    Torque::Path mDir;
    bool mHasChanged;
 };
-
 
 static void fsNotifyCallback(
    ConstFSEventStreamRef stream,

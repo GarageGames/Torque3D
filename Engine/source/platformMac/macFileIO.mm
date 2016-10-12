@@ -20,49 +20,30 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
+#import <Cocoa/Cocoa.h>
+#import <stdio.h>
+#import <stdlib.h>
+#import <errno.h>
+#import <utime.h>
+#import <sys/time.h>
+#import <sys/types.h>
+#import <dirent.h>
+#import <unistd.h>
+#import <sys/stat.h>
 
-#include <utime.h>
-#include <sys/time.h>
-
-#include <sys/types.h>
-#include <dirent.h>
-#include <unistd.h>
-#include <sys/stat.h>
-
-// Get our GL header included before Apple's
-#include "platformMac/platformMacCarb.h"
-// Don't include Apple's
-#define __gl_h_
-
-#include "platform/tmm_off.h"
-#include <Cocoa/Cocoa.h>
-#include "platform/tmm_on.h"
-
-#include "core/fileio.h"
-#include "core/util/tVector.h"
-#include "core/stringTable.h"
-#include "core/strings/stringFunctions.h"
-#include "console/console.h"
-#include "platform/profiler.h"
-#include "cinterface/cinterface.h";
-
-#include "core/volume.h"
+#import "core/fileio.h"
+#import "core/util/tVector.h"
+#import "core/stringTable.h"
+#import "core/strings/stringFunctions.h"
+#import "console/console.h"
+#import "platform/profiler.h"
+#import "cinterface/cinterface.h";
+#import "core/volume.h"
 
 //TODO: file io still needs some work...
 
 #define MAX_MAC_PATH_LONG     2048
 
-//-----------------------------------------------------------------------------
-#if defined(TORQUE_OS_MAC)
-#include <CoreFoundation/CFBundle.h>
-#else
-#include <CFBundle.h>
-#endif
-
-//-----------------------------------------------------------------------------
 bool dFileDelete(const char * name)
 {
    if(!name )
@@ -78,11 +59,83 @@ bool dFileDelete(const char * name)
 //-----------------------------------------------------------------------------
 bool dFileTouch(const char *path)
 {
-   if (!path || !*path) 
+   if (!path || !*path)
       return false;
    
    // set file at path's modification and access times to now.
    return( utimes( path, NULL) == 0); // utimes returns 0 on success.
+}
+//-----------------------------------------------------------------------------
+bool dPathCopy(const char* source, const char* dest, bool nooverwrite)
+{
+   NSFileManager *manager = [NSFileManager defaultManager];
+   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+   
+   NSString *nsource = [[NSString stringWithUTF8String:source] stringByStandardizingPath];
+   NSString *ndest   = [[NSString stringWithUTF8String:dest] stringByStandardizingPath];
+   NSString *ndestFolder = [ndest stringByDeletingLastPathComponent];
+   
+   if(! [manager fileExistsAtPath:nsource])
+   {
+      Con::errorf("dPathCopy: no file exists at %s",source);
+      return false;
+   }
+   
+   if( [manager fileExistsAtPath:ndest] )
+   {
+      if(nooverwrite)
+      {
+         Con::errorf("dPathCopy: file already exists at %s",dest);
+         return false;
+      }
+      Con::warnf("Deleting files at path: %s", dest);
+      bool deleted = [manager removeFileAtPath:ndest handler:nil];
+      if(!deleted)
+      {
+         Con::errorf("Copy failed! Could not delete files at path: %s", dest);
+         return false;
+      }
+   }
+   
+   if([manager fileExistsAtPath:ndestFolder] == NO)
+   {
+      ndestFolder = [ndestFolder stringByAppendingString:@"/"]; // createpath requires a trailing slash
+      Platform::createPath([ndestFolder UTF8String]);
+   }
+   
+   bool ret = [manager copyPath:nsource toPath:ndest handler:nil];
+   
+   [pool release];
+   return ret;
+   
+}
+
+//-----------------------------------------------------------------------------
+
+bool dFileRename(const char *source, const char *dest)
+{
+   if(source == NULL || dest == NULL)
+      return false;
+   
+   NSFileManager *manager = [NSFileManager defaultManager];
+   
+   NSString *nsource = [manager stringWithFileSystemRepresentation:source length:dStrlen(source)];
+   NSString *ndest   = [manager stringWithFileSystemRepresentation:dest length:dStrlen(dest)];
+   
+   if(! [manager fileExistsAtPath:nsource])
+   {
+      Con::errorf("dFileRename: no file exists at %s",source);
+      return false;
+   }
+   
+   if( [manager fileExistsAtPath:ndest] )
+   {
+      Con::warnf("dFileRename: Deleting files at path: %s", dest);
+   }
+   
+   bool ret = [manager movePath:nsource toPath:ndest handler:nil];
+   
+   return ret;
 }
 
 //-----------------------------------------------------------------------------
@@ -121,7 +174,7 @@ File::~File()
 // Sets capability appropriate to the openMode.
 // Returns the currentStatus of the file.
 //-----------------------------------------------------------------------------
-File::Status File::open(const char *filename, const AccessMode openMode)
+File::FileStatus File::open(const char *filename, const AccessMode openMode)
 {
    if (dStrlen(filename) > MAX_MAC_PATH_LONG)
       Con::warnf("File::open: Filename length is pretty long...");
@@ -150,7 +203,7 @@ File::Status File::open(const char *filename, const AccessMode openMode)
    }
    
    // handle not created successfully
-   if (handle == NULL)                
+   if (handle == NULL)
       return setStatus();
    
    // successfully created file, so set the file capabilities...
@@ -177,7 +230,7 @@ File::Status File::open(const char *filename, const AccessMode openMode)
       setPosition(0);
    
    // success!
-   return currentStatus;                                
+   return currentStatus;
 }
 
 //-----------------------------------------------------------------------------
@@ -203,7 +256,7 @@ U32 File::getPosition() const
 //
 // Returns the currentStatus of the file.
 //-----------------------------------------------------------------------------
-File::Status File::setPosition(S32 position, bool absolutePos)
+File::FileStatus File::setPosition(S32 position, bool absolutePos)
 {
    AssertFatal(Closed != currentStatus, "File::setPosition: file closed");
    AssertFatal(handle != NULL, "File::setPosition: invalid file handle");
@@ -232,11 +285,11 @@ File::Status File::setPosition(S32 position, bool absolutePos)
    // ftell returns -1 on error. set error status
    if (0xffffffff == finalPos)
       return setStatus();
-
+   
    // success, at end of file
    else if (finalPos >= getSize())
       return currentStatus = EOS;
-
+   
    // success!
    else
       return currentStatus = Ok;
@@ -271,7 +324,7 @@ U32 File::getSize() const
 // It is an error to flush a read-only file.
 // Returns the currentStatus of the file.
 //-----------------------------------------------------------------------------
-File::Status File::flush()
+File::FileStatus File::flush()
 {
    AssertFatal(Closed != currentStatus, "File::flush: file closed");
    AssertFatal(handle != NULL, "File::flush: invalid file handle");
@@ -288,7 +341,7 @@ File::Status File::flush()
 //
 // Returns the currentStatus
 //-----------------------------------------------------------------------------
-File::Status File::close()
+File::FileStatus File::close()
 {
    // check if it's already closed...
    if (Closed == currentStatus)
@@ -307,7 +360,7 @@ File::Status File::close()
 //-----------------------------------------------------------------------------
 // Self-explanatory.
 //-----------------------------------------------------------------------------
-File::Status File::getStatus() const
+File::FileStatus File::getStatus() const
 {
    return currentStatus;
 }
@@ -315,7 +368,7 @@ File::Status File::getStatus() const
 //-----------------------------------------------------------------------------
 // Sets and returns the currentStatus when an error has been encountered.
 //-----------------------------------------------------------------------------
-File::Status File::setStatus()
+File::FileStatus File::setStatus()
 {
    switch (errno)
    {
@@ -336,7 +389,7 @@ File::Status File::setStatus()
 //-----------------------------------------------------------------------------
 // Sets and returns the currentStatus to status.
 //-----------------------------------------------------------------------------
-File::Status File::setStatus(File::Status status)
+File::FileStatus File::setStatus(File::FileStatus status)
 {
    return currentStatus = status;
 }
@@ -347,7 +400,7 @@ File::Status File::setStatus(File::Status status)
 // The number of bytes read is available in bytesRead if a non-Null pointer is
 // provided.
 //-----------------------------------------------------------------------------
-File::Status File::read(U32 size, char *dst, U32 *bytesRead)
+File::FileStatus File::read(U32 size, char *dst, U32 *bytesRead)
 {
    AssertFatal(Closed != currentStatus, "File::read: file closed");
    AssertFatal(handle != NULL, "File::read: invalid file handle");
@@ -368,7 +421,7 @@ File::Status File::read(U32 size, char *dst, U32 *bytesRead)
    // if bytesRead is a valid pointer, send number of bytes read there.
    if(bytesRead)
       *bytesRead = nBytes;
-     
+   
    // successfully read size bytes
    return currentStatus;
 }
@@ -379,7 +432,7 @@ File::Status File::read(U32 size, char *dst, U32 *bytesRead)
 // The number of bytes written is available in bytesWritten if a non-Null
 // pointer is provided.
 //-----------------------------------------------------------------------------
-File::Status File::write(U32 size, const char *src, U32 *bytesWritten)
+File::FileStatus File::write(U32 size, const char *src, U32 *bytesWritten)
 {
    AssertFatal(Closed != currentStatus, "File::write: file closed");
    AssertFatal(handle != NULL, "File::write: invalid file handle");
@@ -389,7 +442,7 @@ File::Status File::write(U32 size, const char *src, U32 *bytesWritten)
    
    if ((Ok != currentStatus && EOS != currentStatus) || 0 == size)
       return currentStatus;
-
+   
    // write bytes to the stream
    U32 nBytes = fwrite(src, 1, size,(FILE*)handle);
    
@@ -435,7 +488,7 @@ bool Platform::getFileTimes(const char *path, FileTime *createTime, FileTime *mo
    // So instead of creation time we return changed time,
    // just like the Linux platform impl does.
    
-   if (!path || !*path) 
+   if (!path || !*path)
       return false;
    
    struct stat statData;
@@ -459,12 +512,12 @@ bool Platform::createPath(const char *file)
    // if the path exists, we're done.
    struct stat statData;
    if( stat(file, &statData) == 0 )
-   { 
+   {
       return true;               // exists, rejoice.
    }
    
    Con::warnf( "creating path %s", file );
-
+   
    // get the parent path.
    // we're not using basename because it's not thread safe.
    U32 len = dStrlen(file);
@@ -527,46 +580,17 @@ bool Platform::setCurrentDirectory(StringTableEntry newDir)
 }
 
 //-----------------------------------------------------------------------------
-void Platform::openFolder(const char* path )
-{
-   // TODO: users can still run applications by calling openfolder on an app bundle.
-   // this may be a bad thing.
-   if(!Platform::isDirectory(path))
-   {
-      Con::errorf(avar("Error: not a directory: %s",path));
-      return;
-   }
-   
-   const char* arg = avar("open '%s'", path);
-   U32 ret = system(arg);
-   if(ret != 0)
-      Con::printf(strerror(errno));
-}
-
-void Platform::openFile(const char* path )
-{
-   if( !Platform::isFile( path ) )
-   {
-      Con::errorf( avar( "Error: not a file: %s", path ) );
-      return;
-   }
-   
-   const char* arg = avar( "open '%s'", path );
-   U32 ret = system( arg );
-   if( ret != 0 )
-      Con::printf( strerror( errno ) );
-}
 
 // helper func for getWorkingDirectory
 bool isMainDotCsPresent(NSString* dir)
-{ 
+{
    return [[NSFileManager defaultManager] fileExistsAtPath:[dir stringByAppendingPathComponent:@"main.cs"]] == YES;
 }
 
 //-----------------------------------------------------------------------------
 /// Finds and sets the current working directory.
-/// Torque tries to automatically detect whether you have placed the game files 
-/// inside or outside the application's bundle. It checks for the presence of 
+/// Torque tries to automatically detect whether you have placed the game files
+/// inside or outside the application's bundle. It checks for the presence of
 /// the file 'main.cs'. If it finds it, Torque will assume that the other game
 /// files are there too. If Torque does not see 'main.cs' inside its bundle, it
 /// will assume the files are outside the bundle.
@@ -594,13 +618,14 @@ StringTableEntry Platform::getExecutablePath()
       
       //first check the cwd for main.cs
       static char buf[4096];
-      NSString* currentDir = [[NSString alloc ] initWithCString:getcwd(buf,(4096 * sizeof(char))) ];
+      NSString* currentDir = [[NSString alloc ] initWithUTF8String:getcwd(buf,(4096 * sizeof(char))) ];
       
       if (isMainDotCsPresent(currentDir))
       {
          cwd = buf;
          [pool release];
-         return cwd; 
+         [currentDir release];
+         return cwd;
       }
       
       NSString* string = [[NSBundle mainBundle] pathForResource:@"main" ofType:@"cs"];
@@ -612,6 +637,7 @@ StringTableEntry Platform::getExecutablePath()
       cwd = dStrdup([string UTF8String]);
       chdir(cwd);
       [pool release];
+      [currentDir release];
    }
    
    return cwd;
@@ -630,7 +656,7 @@ StringTableEntry Platform::getExecutableName()
 //-----------------------------------------------------------------------------
 bool Platform::isFile(const char *path)
 {
-   if (!path || !*path) 
+   if (!path || !*path)
       return false;
    
    // make sure we can stat the file
@@ -652,7 +678,7 @@ bool Platform::isFile(const char *path)
 //-----------------------------------------------------------------------------
 bool Platform::isDirectory(const char *path)
 {
-   if (!path || !*path) 
+   if (!path || !*path)
       return false;
    
    // make sure we can stat the file
@@ -670,7 +696,7 @@ bool Platform::isDirectory(const char *path)
 
 S32 Platform::getFileSize(const char* pFilePath)
 {
-   if (!pFilePath || !*pFilePath) 
+   if (!pFilePath || !*pFilePath)
       return 0;
    
    struct stat statData;
@@ -702,7 +728,7 @@ inline bool isGoodDirectory(dirent* entry)
 }
 
 //-----------------------------------------------------------------------------
-bool Platform::hasSubDirectory(const char *path) 
+bool Platform::hasSubDirectory(const char *path)
 {
    DIR *dir;
    dirent *entry;
@@ -713,7 +739,7 @@ bool Platform::hasSubDirectory(const char *path)
    
    while( (entry = readdir(dir)) )
    {
-      if(isGoodDirectory(entry) ) 
+      if(isGoodDirectory(entry) )
       {
          closedir(dir);
          return true; // we have a subdirectory, that isnt on the exclude list.
@@ -724,97 +750,152 @@ bool Platform::hasSubDirectory(const char *path)
    return false; // either this dir had no subdirectories, or they were all on the exclude list.
 }
 
- bool Platform::fileDelete(const char * name)
- {
-   return dFileDelete(name);
- }
-
-//-----------------------------------------------------------------------------
-bool recurseDumpDirectories(const char *basePath, const char *path, Vector<StringTableEntry> &directoryVector, S32 depth, bool noBasePath)
+bool Platform::fileDelete(const char * name)
 {
-   DIR *dir;
-   dirent *entry;
-   U32 len = dStrlen(basePath) + dStrlen(path) + 2;
-   char pathbuf[len];
+   return dFileDelete(name);
+}
+
+static bool recurseDumpDirectories(const char *basePath, const char *subPath, Vector<StringTableEntry> &directoryVector, S32 currentDepth, S32 recurseDepth, bool noBasePath)
+{
+   char Path[1024];
+   DIR *dip;
+   struct dirent *d;
    
-   // construct the file path
-   dSprintf(pathbuf, len, "%s/%s", basePath, path);
-   pathbuf[len] = '\0';
+   dsize_t trLen = basePath ? dStrlen(basePath) : 0;
+   dsize_t subtrLen = subPath ? dStrlen(subPath) : 0;
+   char trail = trLen > 0 ? basePath[trLen - 1] : '\0';
+   char subTrail = subtrLen > 0 ? subPath[subtrLen - 1] : '\0';
    
-   // be sure it opens.
-   dir = opendir(pathbuf);
-   if(!dir)
+   if (trail == '/')
+   {
+      if (subPath && (dStrncmp(subPath, "", 1) != 0))
+      {
+         if (subTrail == '/')
+            dSprintf(Path, 1024, "%s%s", basePath, subPath);
+         else
+            dSprintf(Path, 1024, "%s%s/", basePath, subPath);
+      }
+      else
+         dSprintf(Path, 1024, "%s", basePath);
+   }
+   else
+   {
+      if (subPath && (dStrncmp(subPath, "", 1) != 0))
+      {
+         if (subTrail == '/')
+            dSprintf(Path, 1024, "%s%s", basePath, subPath);
+         else
+            dSprintf(Path, 1024, "%s%s/", basePath, subPath);
+      }
+      else
+         dSprintf(Path, 1024, "%s/", basePath);
+   }
+   
+   dip = opendir(Path);
+   if (dip == NULL)
       return false;
    
-   // look inside the current directory
-   while( (entry = readdir(dir)) )
+   //////////////////////////////////////////////////////////////////////////
+   // add path to our return list ( provided it is valid )
+   //////////////////////////////////////////////////////////////////////////
+   if (!Platform::isExcludedDirectory(subPath))
    {
-      // we just want directories.
-      if(!isGoodDirectory(entry))
-         continue;
-      
-      // TODO: better unicode file name handling
-      //      // Apple's file system stores unicode file names in decomposed form.
-      //      // ATSUI will not reliably draw out just the accent character by itself,
-      //      // so our text renderer has no chance of rendering decomposed form unicode.
-      //      // We have to convert the entry name to precomposed normalized form.
-      //      CFStringRef cfdname = CFStringCreateWithCString(NULL,entry->d_name,kCFStringEncodingUTF8);
-      //      CFMutableStringRef cfentryName = CFStringCreateMutableCopy(NULL,0,cfdname);
-      //      CFStringNormalize(cfentryName,kCFStringNormalizationFormC);
-      //      
-      //      U32 entryNameLen = CFStringGetLength(cfentryName) * 4 + 1;
-      //      char entryName[entryNameLen];
-      //      CFStringGetCString(cfentryName, entryName, entryNameLen, kCFStringEncodingUTF8);
-      //      entryName[entryNameLen-1] = NULL; // sometimes, CFStringGetCString() doesn't null terminate.
-      //      CFRelease(cfentryName);
-      //      CFRelease(cfdname);
-      
-      // construct the new path string, we'll need this below.
-      U32 newpathlen = dStrlen(path) + dStrlen(entry->d_name) + 2;
-      char newpath[newpathlen];
-      if(dStrlen(path) > 0) // prevent extra slashes in the path
-         dSprintf(newpath, newpathlen,"%s/%s",path,entry->d_name);
-      else
-         dStrncpy(newpath,entry->d_name, newpathlen);
-      newpath[newpathlen] = '\0';
-      
-      // we have a directory, add it to the list.
-      if( noBasePath )
-         directoryVector.push_back(StringTable->insert(newpath));
-      else {
-         U32 fullpathlen = dStrlen(basePath) + dStrlen(newpath) + 2;
-         char fullpath[fullpathlen];
-         dSprintf(fullpath,fullpathlen,"%s/%s",basePath,newpath);
-         fullpath[fullpathlen] = '\0';
-         
-         directoryVector.push_back(StringTable->insert(fullpath));
+      if (noBasePath)
+      {
+         // We have a path and it's not an empty string or an excluded directory
+         if ( (subPath && (dStrncmp (subPath, "", 1) != 0)) )
+            directoryVector.push_back(StringTable->insert(subPath));
       }
-      
-      // and recurse into it, unless we've run out of depth
-      if( depth != 0) // passing a val of -1 as the recurse depth means go forever
-         recurseDumpDirectories(basePath, newpath, directoryVector, depth-1, noBasePath);
+      else
+      {
+         if ( (subPath && (dStrncmp(subPath, "", 1) != 0)) )
+         {
+            char szPath[1024];
+            dMemset(szPath, 0, 1024);
+            if (trail == '/')
+            {
+               if ((basePath[dStrlen(basePath) - 1]) != '/')
+                  dSprintf(szPath, 1024, "%s%s", basePath, &subPath[1]);
+               else
+                  dSprintf(szPath, 1024, "%s%s", basePath, subPath);
+            }
+            else
+            {
+               if ((basePath[dStrlen(basePath) - 1]) != '/')
+                  dSprintf(szPath, 1024, "%s%s", basePath, subPath);
+               else
+                  dSprintf(szPath, 1024, "%s/%s", basePath, subPath);
+            }
+            
+            directoryVector.push_back(StringTable->insert(szPath));
+         }
+         else
+            directoryVector.push_back(StringTable->insert(basePath));
+      }
    }
-   closedir(dir);
+   //////////////////////////////////////////////////////////////////////////
+   // Iterate through and grab valid directories
+   //////////////////////////////////////////////////////////////////////////
+   
+   while (d = readdir(dip))
+   {
+      bool	isDir;
+      isDir = false;
+      if (d->d_type == DT_UNKNOWN)
+      {
+         char child [1024];
+         if ((Path[dStrlen(Path) - 1] == '/'))
+            dSprintf(child, 1024, "%s%s", Path, d->d_name);
+         else
+            dSprintf(child, 1024, "%s/%s", Path, d->d_name);
+         isDir = Platform::isDirectory (child);
+      }
+      else if (d->d_type & DT_DIR)
+         isDir = true;
+      
+      if ( isDir )
+      {
+         if (dStrcmp(d->d_name, ".") == 0 ||
+             dStrcmp(d->d_name, "..") == 0)
+            continue;
+         if (Platform::isExcludedDirectory(d->d_name))
+            continue;
+         if ( (subPath && (dStrncmp(subPath, "", 1) != 0)) )
+         {
+            char child[1024];
+            if ((subPath[dStrlen(subPath) - 1] == '/'))
+               dSprintf(child, 1024, "%s%s", subPath, d->d_name);
+            else
+               dSprintf(child, 1024, "%s/%s", subPath, d->d_name);
+            if (currentDepth < recurseDepth || recurseDepth == -1 )
+               recurseDumpDirectories(basePath, child, directoryVector,
+                                      currentDepth + 1, recurseDepth,
+                                      noBasePath);
+         }
+         else
+         {
+            char child[1024];
+            if ( (basePath[dStrlen(basePath) - 1]) == '/')
+               dStrcpy (child, d->d_name);
+            else
+               dSprintf(child, 1024, "/%s", d->d_name);
+            if (currentDepth < recurseDepth || recurseDepth == -1)
+               recurseDumpDirectories(basePath, child, directoryVector,
+                                      currentDepth + 1, recurseDepth,
+                                      noBasePath);
+         }
+      }
+   }
+   closedir(dip);
    return true;
 }
 
 //-----------------------------------------------------------------------------
 bool Platform::dumpDirectories(const char *path, Vector<StringTableEntry> &directoryVector, S32 depth, bool noBasePath)
 {
-   PROFILE_START(dumpDirectories);
-
-   int len = dStrlen(path);
-   char newpath[len];
-   
-   dStrncpy(newpath,path,len);
-   newpath[len] = '\0';
-   if(newpath[len - 1] == '/') 
-      newpath[len - 1] = '\0'; // cut off the trailing slash, if there is one
-   
-   bool ret = recurseDumpDirectories(newpath, "", directoryVector, depth, noBasePath);
-   PROFILE_END();
-   
-   return ret;
+   bool retVal = recurseDumpDirectories(path, "", directoryVector, 0, depth, noBasePath);
+   clearExcludedDirectories();
+   return retVal;
 }
 
 //-----------------------------------------------------------------------------
@@ -877,7 +958,7 @@ bool Platform::dumpPath(const char *path, Vector<Platform::FileInfo>& fileVector
    
    dStrncpy(newpath,path,len);
    newpath[len] = '\0'; // null terminate
-   if(newpath[len - 1] == '/') 
+   if(newpath[len - 1] == '/')
       newpath[len - 1] = '\0'; // cut off the trailing slash, if there is one
    
    bool ret = recurseDumpPath( newpath, fileVector, depth);
