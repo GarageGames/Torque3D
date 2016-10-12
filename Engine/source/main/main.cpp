@@ -32,49 +32,17 @@ extern "C"
    int (*torque_winmain)( HINSTANCE hInstance, HINSTANCE h, LPSTR lpszCmdLine, int nShow) = NULL;
 };
 
-bool getDllName(std::wstring& dllName, const std::wstring& suffix)
-{
-   wchar_t filenameBuf[MAX_PATH];
-   DWORD length = GetModuleFileNameW( NULL, filenameBuf, MAX_PATH );
-   if(length == 0) return false;
-   dllName = std::wstring(filenameBuf);
-   size_t dotPos = dllName.find_last_of(L".");
-   if(dotPos == std::wstring::npos)
-   {
-      dllName.clear();
-      return false;
-   }
-   dllName.erase(dotPos);
-   dllName += suffix + L".dll";
-   return true;
-}
-
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCommandShow)
 {
-   // Try to find the game DLL, which may have one of several file names.
-   HMODULE hGame = NULL;
-   std::wstring dllName = std::wstring();
-   // The file name is the same as this executable's name, plus a suffix.
-   const std::wstring dllSuffices[] = {L" DLL", L""};
-   const unsigned int numSuffices = sizeof(dllSuffices) / sizeof(std::wstring);
+   // JTH: It is always Torque3D for the DLL name.
+   // Debug has a _DEBUG attached to it.
+#ifdef TORQUE_DEBUG
+   std::wstring dllName = L"Torque3D_DEBUG.dll";
+#else
+   std::wstring dllName = L"Torque3D.dll";
+#endif
 
-   for (unsigned int i = 0; i < numSuffices; i++)
-   {
-      // Attempt to glue the suffix onto the current filename.
-      if(!getDllName(dllName, dllSuffices[i]))
-         continue;
-      // Load the DLL at that address.
-      hGame = LoadLibraryW(dllName.c_str());
-      if (hGame)
-         break;
-   }
-
-   if(!dllName.length())
-   {
-      MessageBoxW(NULL, L"Unable to find game dll", L"Error",  MB_OK|MB_ICONWARNING);
-      return -1;
-   }
-
+   HMODULE hGame = LoadLibraryW(dllName.c_str());
    enum { errorSize = 4096 };
    if (!hGame)
    {
