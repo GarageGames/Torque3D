@@ -689,6 +689,7 @@ void SFXController::_play()
    // Unpause sources, if we are paused.
    
    if( mStatus == SFXStatusPaused )
+   {
       for( U32 i = 0; i < mSources.size(); ++ i )
          if( mSources[ i ].mPtr != NULL )
             mSources[ i ].mPtr->play( 0.f ); // We want our fade values to take effect.
@@ -697,6 +698,7 @@ void SFXController::_play()
             mSources.erase( i );
             -- i;
          }
+   }
 }
 
 //-----------------------------------------------------------------------------

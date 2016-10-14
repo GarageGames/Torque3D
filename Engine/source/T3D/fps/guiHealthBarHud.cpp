@@ -163,6 +163,7 @@ void GuiHealthBarHud::onRender(Point2I offset, const RectI &updateRect)
 
    // Pulse the damage fill if it's below the threshold
    if (mPulseRate != 0)
+   {
       if (mValue < mPulseThreshold) 
       {
          U32 time = Platform::getVirtualMilliseconds();
@@ -171,7 +172,7 @@ void GuiHealthBarHud::onRender(Point2I offset, const RectI &updateRect)
       }
       else
          mDamageFillColor.alpha = 1;
-
+   }
    // Render damage fill %
    RectI rect(updateRect);
    if(getWidth() > getHeight())
