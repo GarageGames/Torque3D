@@ -681,7 +681,6 @@ void TSShape::initVertexBuffers()
    if (TSSkinMesh::smDebugSkinVerts)
    {
       U32 vertsInBuffer = mShapeVertexData.size / mVertexSize;
-      U32 primsInBuffer = piInput - mShapeVertexIndices->mPrimitiveArray;
       U32 indsInBuffer = ibIndices - indicesStart;
 
       for (U32 i = 0; i < primStart; i++)
@@ -723,7 +722,6 @@ void TSShape::getVertexBuffer(TSVertexBufferHandle &vb, GFXBufferType bufferType
 {
    vb.set(GFX, mVertexSize, &mVertexFormat, mShapeVertexData.size / mVertexSize, bufferType);
 
-   U8 *vertexData = mShapeVertexData.base;
    U8 *vertPtr = vb.lock();
    dMemcpy(vertPtr, mShapeVertexData.base, mShapeVertexData.size);
    vb.unlock();
@@ -770,12 +768,6 @@ void TSShape::initVertexBufferPointers()
 
 void TSShape::initVertexFeatures()
 {
-   bool hasColors = false;
-   bool hasTexcoord2 = false;
-   bool hasSkin = false;
-   U32 vertStart = 0;
-   U32 primStart = 0;
-   U32 indStart = 0;
 
    if (!needsBufferUpdate())
    {
@@ -876,7 +868,6 @@ void TSShape::initVertexFeatures()
    for (Vector<TSMesh*>::iterator iter = meshes.begin(); iter != meshes.end(); iter++)
    {
       TSMesh *mesh = *iter;
-      U32 idx = iter - meshes.begin();
 
       if (!mesh ||
          (mesh->getMeshType() != TSMesh::StandardMeshType &&
@@ -1457,7 +1448,6 @@ void TSShape::assembleShape()
       if (tsalloc.getBuffer() && vboSize > 0)
       {
          U8 *vertexData = (U8*)dMalloc_aligned(vboSize, 16);
-         U8 *vertexDataPtr = vertexData;
          dMemcpy(vertexData, vboData, vboSize);
          mShapeVertexData.set(vertexData, vboSize);
          mShapeVertexData.vertexDataReady = true;
@@ -1759,8 +1749,6 @@ void TSShape::disassembleShape()
    {
       // Vertex format now included with mesh data. Note this doesn't include index data which
       // is constructed directly in the buffer from the meshes
-      S8 *vboData = NULL;
-      S32 vboSize = 0;
 
       mBasicVertexFormat.writeAlloc(&tsalloc);
 
