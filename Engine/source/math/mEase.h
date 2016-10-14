@@ -289,15 +289,16 @@ inline F32 mEaseInOutExpo(F32 t, F32 b, F32 c, F32 d)
 // t: current time, b: beginning value, c: change in position, d: duration
 inline F32 mEaseInCirc (F32 t, F32 b, F32 c, F32 d) 
 {
-    t/=d;
+	t/=d;
 	return -c * (mSqrt(1 - (t)*t) - 1) + b;
 };
 
 // circular easing out - decelerating to zero velocity
 inline F32 mEaseOutCirc (F32 t, F32 b, F32 c, F32 d) 
 {
-    t/=d;
-	return c * mSqrt(1 - (t-1)*t) + b;
+	t/=d;
+	t--;
+	return c * mSqrt(1 - (t)*t) + b;
 };
 
 // circular easing in/out - acceleration until halfway, then deceleration
@@ -305,7 +306,7 @@ inline F32 mEaseInOutCirc(F32 t, F32 b, F32 c, F32 d)
 {
 	if ((t/=d/2) < 1) 
       return -c/2 * (mSqrt(1 - t*t) - 1) + b;
-    t-=2;
+	t-=2;
 	return c/2 * (mSqrt(1 - (t)*t) + 1) + b;
 };
 
