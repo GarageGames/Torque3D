@@ -252,7 +252,7 @@ void StaticShape::onUnmount(ShapeBase*,S32)
 U32 StaticShape::packUpdate(NetConnection *connection, U32 mask, BitStream *bstream)
 {
    U32 retMask = Parent::packUpdate(connection,mask,bstream);
-   if (bstream->writeFlag(mask & PositionMask | ExtendedInfoMask))
+   if (bstream->writeFlag(mask & (PositionMask | ExtendedInfoMask)))
    {
 
       // Write the transform (do _not_ use writeAffineTransform.  Since this is a static

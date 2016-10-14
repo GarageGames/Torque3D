@@ -1043,9 +1043,9 @@ NavMesh *AIPlayer::findNavMesh() const
          }
          else
          {
-            if(getNavSize() == Small && !m->mSmallCharacters ||
-               getNavSize() == Regular && !m->mRegularCharacters ||
-               getNavSize() == Large && !m->mLargeCharacters)
+            if((getNavSize() == Small && !m->mSmallCharacters) ||
+               (getNavSize() == Regular && !m->mRegularCharacters) ||
+               (getNavSize() == Large && !m->mLargeCharacters))
                continue;
          }
          if(!mesh || m->getWorldBox().getVolume() < mesh->getWorldBox().getVolume())

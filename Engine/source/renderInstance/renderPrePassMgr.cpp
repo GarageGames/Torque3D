@@ -612,9 +612,9 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
    mIsLightmappedGeometry = ( fd.features.hasFeature( MFT_ToneMap ) ||
                               fd.features.hasFeature( MFT_LightMap ) ||
                               fd.features.hasFeature( MFT_VertLit ) ||
-                              ( bEnableMRTLightmap && fd.features.hasFeature( MFT_IsTranslucent ) ||
+                              ( bEnableMRTLightmap && (fd.features.hasFeature( MFT_IsTranslucent ) ||
                                                       fd.features.hasFeature( MFT_ForwardShading ) ||
-                                                      fd.features.hasFeature( MFT_IsTranslucentZWrite ) ) );
+                                                      fd.features.hasFeature( MFT_IsTranslucentZWrite) ) ) );
 
    // Integrate proper opaque stencil write state
    mUserDefined.addDesc( mPrePassMgr->getOpaqueStenciWriteDesc( mIsLightmappedGeometry ) );

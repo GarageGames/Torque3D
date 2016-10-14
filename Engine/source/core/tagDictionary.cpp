@@ -296,7 +296,7 @@ bool TagDictionary::match(const char* pattern, const char* str)
       return !*str;
 
      case '*':
-      return match(pattern+1, str) || *str && match(pattern, str+1);
+      return match(pattern+1, str) || (*str && match(pattern, str+1));
 
      case '?':
       return *str && match(pattern+1, str+1);

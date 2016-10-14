@@ -2160,8 +2160,8 @@ void River::_makeRenderBatches( const Point3F &cameraPos )
 
          F32 dist = getMin( dist0, dist1 );
          highDetail = ( dist < lodDistSquared );
-         if ( highDetail && lastDetail == 0 ||
-            !highDetail && lastDetail == 1 )
+         if ( (highDetail && lastDetail == 0) ||
+            (!highDetail && lastDetail == 1) )
          {
             // We hit a segment with a different lod than the previous.
             // Save what we have so far...
