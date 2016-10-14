@@ -155,17 +155,17 @@ ImposterCaptureMaterialHook* ImposterCaptureMaterialHook::_getOrCreateHook( Base
 
 
 ImposterCapture::ImposterCapture()
-:  mShapeInstance( NULL ),
-   mDl( 0 ),
+:  mDl( 0 ),
    mDim( 0 ),
    mRadius( 0.0f ),
    mCenter( Point3F( 0, 0, 0 ) ),
-   mRenderPass( NULL ),
-   mMeshRenderBin( NULL ),
    mBlackBmp( NULL ),
    mWhiteBmp( NULL ),
    mState( NULL ),
-   mRenderTarget( NULL )
+   mShapeInstance( NULL ),
+   mRenderTarget( NULL ),
+   mRenderPass( NULL ),
+   mMeshRenderBin( NULL )
 {     
 }                                   
 

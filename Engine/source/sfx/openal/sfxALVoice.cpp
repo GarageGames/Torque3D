@@ -69,10 +69,10 @@ SFXALVoice::SFXALVoice( const OPENALFNTABLE &oalft,
                         ALuint sourceName )
 
    :  Parent( buffer ),
-      mOpenAL( oalft ), 
-      mResumeAtSampleOffset( -1.0f ),
       mSourceName( sourceName ),
-      mSampleOffset( 0 )
+      mResumeAtSampleOffset( -1.0f ),
+      mSampleOffset( 0 ),
+      mOpenAL( oalft )
 {
    AL_SANITY_CHECK();
 }

@@ -95,12 +95,12 @@ static inline S32 sampleG( U8* pCb, U8* pCr )
 
 OggTheoraDecoder::OggTheoraDecoder( const ThreadSafeRef< OggInputStream >& stream )
    : Parent( stream ),
-#ifdef TORQUE_DEBUG
-     mLock( 0 ),
-#endif
      mTheoraSetup( NULL ),
      mTheoraDecoder( NULL ),
      mTranscoder( TRANSCODER_Auto )
+#ifdef TORQUE_DEBUG
+     ,mLock( 0 )
+#endif
 {
    // Initialize.
       

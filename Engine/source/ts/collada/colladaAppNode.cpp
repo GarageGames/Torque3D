@@ -57,9 +57,12 @@ static char* TrimFirstWord(char* str)
 }
 
 ColladaAppNode::ColladaAppNode(const domNode* node, ColladaAppNode* parent)
-      : p_domNode(node), appParent(parent), nodeExt(new ColladaExtension_node(node)),
-      lastTransformTime(TSShapeLoader::DefaultTime-1), defaultTransformValid(false),
-      invertMeshes(false)
+      : p_domNode(node), appParent(parent),
+        nodeExt(new ColladaExtension_node(node)),
+        invertMeshes(false),
+        lastTransformTime(TSShapeLoader::DefaultTime-1),
+        defaultTransformValid(false)
+      
 {
    mName = dStrdup(_GetNameOrId(node));
    mParentName = dStrdup(parent ? parent->getName() : "ROOT");

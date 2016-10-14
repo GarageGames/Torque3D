@@ -95,9 +95,9 @@ SFXEmitter::SFXEmitter()
    :  SceneObject(),
       mSource( NULL ),
       mTrack( NULL ),
+      mUseTrackDescriptionOnly( false ),
       mLocalProfile( &mDescription ),
-      mPlayOnAdd( true ),
-      mUseTrackDescriptionOnly( false )
+      mPlayOnAdd( true )
 {
    mTypeMask |= MarkerObjectType;
    mNetFlags.set( Ghostable | ScopeAlways );

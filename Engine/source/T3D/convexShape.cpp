@@ -227,12 +227,12 @@ bool ConvexShape::protectedSetSurface( void *object, const char *index, const ch
 
 
 ConvexShape::ConvexShape()
- : mMaterialInst( NULL ),   
-   mNormalLength( 0.3f ),
+ : mMaterialName( "Grid512_OrangeLines_Mat" ),
+   mMaterialInst( NULL ),
    mVertCount( 0 ),
    mPrimCount( 0 ),
-   mMaterialName( "Grid512_OrangeLines_Mat" ),
-   mPhysicsRep( NULL )
+   mPhysicsRep( NULL ),
+   mNormalLength( 0.3f )
 {   
    mNetFlags.set( Ghostable | ScopeAlways );
    

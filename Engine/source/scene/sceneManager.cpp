@@ -108,17 +108,17 @@ SceneManager* gServerSceneGraph = NULL;
 //-----------------------------------------------------------------------------
 
 SceneManager::SceneManager( bool isClient )
-   : mLightManager( NULL ),
-     mCurrentRenderState( NULL ),
-     mIsClient( isClient ),
+   : mIsClient( isClient ),
+     mZoneManager( NULL ),
      mUsePostEffectFog( true ),
      mDisplayTargetResolution( 0, 0 ),
-     mDefaultRenderPass( NULL ),
+     mCurrentRenderState( NULL ),
      mVisibleDistance( 500.f ),
      mVisibleGhostDistance( 0 ),
      mNearClip( 0.1f ),
+     mLightManager( NULL ),
      mAmbientLightColor( ColorF( 0.1f, 0.1f, 0.1f, 1.0f ) ),
-     mZoneManager( NULL )
+     mDefaultRenderPass( NULL )
 {
    VECTOR_SET_ASSOCIATION( mBatchQueryList );
 

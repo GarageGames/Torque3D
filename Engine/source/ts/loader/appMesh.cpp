@@ -26,7 +26,7 @@
 Vector<AppMaterial*> AppMesh::appMaterials;
 
 AppMesh::AppMesh()
-   : flags(0), numFrames(0), numMatFrames(0), vertsPerFrame(0)
+   : flags(0), vertsPerFrame(0),numFrames(0),  numMatFrames(0)
 {
 }
 
