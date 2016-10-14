@@ -96,9 +96,9 @@ U32 ClippedPolyList::addPointAndNormal(const Point3F& p, const Point3F& normal)
     AssertFatal(mNormalList.size() == mVertexList.size(), "Normals count does not match vertex count!");    
 
    // Build the plane mask
-   register U32      mask = 1;
-   register S32      count = mPlaneList.size();
-   register PlaneF * plane = mPlaneList.address();
+   U32      mask = 1;
+   S32      count = mPlaneList.size();
+   PlaneF * plane = mPlaneList.address();
 
    v.mask = 0;
    while(--count >= 0) {

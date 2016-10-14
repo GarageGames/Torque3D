@@ -1244,8 +1244,8 @@ void TSSkinMesh::updateSkinBuffer( const Vector<MatrixF> &transforms, U8* buffer
 
    AssertFatal(batchData.vertexBatchOperations.size() == batchData.initialVerts.size(), "Assumption failed!");
 
-   register Point3F skinnedVert;
-   register Point3F skinnedNorm;
+   Point3F skinnedVert;
+   Point3F skinnedNorm;
 
    for (Vector<BatchData::BatchedVertex>::const_iterator itr = batchData.vertexBatchOperations.begin();
       itr != batchData.vertexBatchOperations.end(); itr++)

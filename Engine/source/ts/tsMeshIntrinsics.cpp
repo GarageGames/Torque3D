@@ -33,11 +33,11 @@ void (*zero_vert_normal_bulk)(const dsize_t count, U8 * __restrict const outPtr,
 
 void zero_vert_normal_bulk_C(const dsize_t count, U8 * __restrict const outPtr, const dsize_t outStride)
 {
-   register char *outData = reinterpret_cast<char *>(outPtr);
+   char *outData = reinterpret_cast<char *>(outPtr);
 
    // TODO: Try prefetch w/ ptr de-reference
 
-   for(register S32 i = 0; i < count; i++)
+   for(S32 i = 0; i < count; i++)
    {
       TSMesh::__TSMeshVertexBase *outElem = reinterpret_cast<TSMesh::__TSMeshVertexBase *>(outData);
       outElem->_vert.zero();

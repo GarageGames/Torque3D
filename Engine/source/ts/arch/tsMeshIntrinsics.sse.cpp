@@ -28,11 +28,11 @@
 void zero_vert_normal_bulk_SSE(const dsize_t count, U8 * __restrict const outPtr, const dsize_t outStride)
 {
    // A U8 * version of the in/out pointer
-   register char *outData = reinterpret_cast<char *>(outPtr);
+   char *outData = reinterpret_cast<char *>(outPtr);
    
-   register __m128 vPos;
-   register __m128 vNrm;
-   register __m128 vMask;
+   __m128 vPos;
+   __m128 vNrm;
+   __m128 vMask;
 
    const __m128 _point3f_zero_mask = { 0.0f, 0.0f, 0.0f, 1.0f };
    vMask = _mm_load_ps((const F32*)&_point3f_zero_mask);
