@@ -182,7 +182,6 @@ static const U32 sDeviceInfoProvider = 0;
 static const U32 sDeviceInfoName = 1;
 static const U32 sDeviceInfoUseHardware = 2;
 static const U32 sDeviceInfoMaxBuffers = 3;
-static const U32 sDeviceInfoCaps = 4;
 
 
 //-----------------------------------------------------------------------------

@@ -36,15 +36,6 @@
 //----------------------------------------------------------------------------
 
 // Client prediction
-static F32 sMinWarpTicks = 0.5 ;        // Fraction of tick at which instant warp occures
-static S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
-
-const U32 sClientCollisionMask = (TerrainObjectType     |
-                                  StaticShapeObjectType |
-                                  VehicleObjectType);
-
-const U32 sServerCollisionMask = (sClientCollisionMask);
-
 // Trigger objects that are not normally collided with.
 static U32 sTriggerMask = ItemObjectType     |
                           TriggerObjectType  |

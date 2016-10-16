@@ -110,9 +110,6 @@ ConsoleDocClass( GuiShapeNameHud,
    "@ingroup GuiGame\n"
 );
 
-/// Default distance for object's information to be displayed.
-static const F32 cDefaultVisibleDistance = 500.0f;
-
 GuiShapeNameHud::GuiShapeNameHud()
 {
    mFillColor.set( 0.25f, 0.25f, 0.25f, 0.25f );

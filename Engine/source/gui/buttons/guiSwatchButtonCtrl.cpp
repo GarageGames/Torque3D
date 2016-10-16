@@ -93,7 +93,6 @@ void GuiSwatchButtonCtrl::onRender( Point2I offset, const RectI &updateRect )
 {
    bool highlight = mMouseOver;
 
-   ColorI backColor   = mSwatchColor;
    ColorI borderColor = mActive ? ( highlight ? mProfile->mBorderColorHL : mProfile->mBorderColor ) : mProfile->mBorderColorNA;
 
    RectI renderRect( offset, getExtent() );

@@ -1580,8 +1580,6 @@ void DecalRoad::_captureVerts()
          box.intersect( batch.bounds );               
    }
 
-   Point3F pos = getPosition();
-
    mWorldBox = box;
    resetObjectBox();
 

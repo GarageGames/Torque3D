@@ -1953,7 +1953,6 @@ void GuiMenuBar::closeSubmenu()
 //  Find if the mouse pointer is within a menu item
 GuiMenuBar::MenuItem *GuiMenuBar::findHitMenuItem(Point2I mousePoint)
 {
-   Point2I pos = globalToLocalCoord(mousePoint);
 
 //   for(Menu *walk = menuList; walk; walk = walk->nextMenu)
 //      if(walk->visible && walk->bounds.pointInRect(pos))
