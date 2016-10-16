@@ -45,9 +45,6 @@
 // Debug Profiling.
 #include "platform/profiler.h"
 
-static U32 execDepth = 0;
-static U32 journalDepth = 1;
-
 //-----------------------------------------------------------------------------
 
 IMPLEMENT_CONOBJECT(ShapeAsset);

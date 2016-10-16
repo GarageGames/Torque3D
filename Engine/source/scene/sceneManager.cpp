@@ -246,7 +246,6 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       PFXFrameState origPFXState = PFXMGR->getFrameState();
 
       const FovPort *currentFovPort = GFX->getStereoFovPort();
-      const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
       const MatrixF *worldEyeTransforms = GFX->getInverseStereoEyeTransforms();
 
       // Render left half of display

@@ -511,7 +511,6 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    U32 origStyle = GFX->getCurrentRenderStyle();
 
    // Set up the appropriate render style
-   U32 prevRenderStyle = GFX->getCurrentRenderStyle();
    Point2I renderSize = getExtent();
    Frustum frustum;
 
@@ -795,7 +794,6 @@ void GuiTSCtrl::renderDisplayPreview(const RectI &updateRect, GFXTexHandle &prev
       F32 screenBottom = rectHeight;
 
       const F32 fillConv = 0.0f;
-      const F32 frustumDepthAdjusted = 0.0f;
       verts[0].point.set(screenLeft - fillConv, screenTop - fillConv, 0.f);
       verts[1].point.set(screenRight - fillConv, screenTop - fillConv, 0.f);
       verts[2].point.set(screenLeft - fillConv, screenBottom - fillConv, 0.f);

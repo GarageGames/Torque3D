@@ -624,7 +624,6 @@ void PlaneReflector::updateReflection( const ReflectParams &params )
       MatrixF origNonClipProjection = gClientSceneGraph->getNonClipProjection();
       PFXFrameState origPFXState = PFXMGR->getFrameState();
 
-     const FovPort *currentFovPort = params.query->fovPort;
      MatrixF inverseEyeTransforms[2];
      Frustum gfxFrustum;
 
