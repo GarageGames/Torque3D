@@ -240,7 +240,7 @@ void StaticShape::setTransform(const MatrixF& mat)
    setMaskBits(PositionMask);
 }
 
-void StaticShape::onUnmount(ShapeBase*,S32)
+void StaticShape::onUnmount(SceneObject*,S32)
 {
    // Make sure the client get's the final server pos.
    setMaskBits(PositionMask);

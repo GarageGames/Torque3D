@@ -4514,7 +4514,7 @@ void Player::onImageAnimThreadUpdate(U32 imageSlot, S32 imageShapeIndex, F32 dt)
    }
 }
 
-void Player::onUnmount( ShapeBase *obj, S32 node )
+void Player::onUnmount( SceneObject *obj, S32 node )
 {
    // Reset back to root position during dismount.
    setActionThread(PlayerData::RootAnim,true,false,false);

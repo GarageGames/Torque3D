@@ -491,8 +491,8 @@ struct ShapeBaseImageData: public GameBaseData {
 
    /// @name Callbacks
    /// @{
-   DECLARE_CALLBACK( void, onMount, ( ShapeBase* obj, S32 slot, F32 dt ) );
-   DECLARE_CALLBACK( void, onUnmount, ( ShapeBase* obj, S32 slot, F32 dt ) );
+   DECLARE_CALLBACK( void, onMount, ( SceneObject* obj, S32 slot, F32 dt ) );
+   DECLARE_CALLBACK( void, onUnmount, ( SceneObject* obj, S32 slot, F32 dt ) );
    /// @}
 };
 

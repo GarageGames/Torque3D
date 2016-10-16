@@ -628,7 +628,7 @@ protected:
 
    /// @name Mounted objects
    /// @{
-   virtual void onUnmount( ShapeBase *obj, S32 node );
+   virtual void onUnmount( SceneObject *obj, S32 node );
    virtual void unmount();
    /// @}
 
