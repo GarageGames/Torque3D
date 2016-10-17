@@ -125,7 +125,7 @@ class BoxBase
          NUM_PLANES
       };
 
-      enum PlaneMasks
+      enum PlaneMasks : U32
       {
          PlaneMaskLeft     = ( 1 << LeftPlane ),
          PlaneMaskRight    = ( 1 << RightPlane ),

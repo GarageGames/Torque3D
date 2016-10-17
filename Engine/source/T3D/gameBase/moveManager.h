@@ -36,7 +36,12 @@ class BitStream;
 
 struct Move
 {
-   enum { ChecksumBits = 16, ChecksumMask = ((1<<ChecksumBits)-1), ChecksumMismatch = U32(-1) };
+   enum : U32 
+   { 
+      ChecksumBits = 16, 
+      ChecksumMask = ((1<<ChecksumBits)-1), 
+      ChecksumMismatch = U32(-1) 
+   };
 
    // packed storage rep, set in clamp
    S32 px, py, pz;

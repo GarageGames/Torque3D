@@ -48,7 +48,8 @@ class GuiTextListCtrl : public GuiArrayCtrl
       UP = 0,
       DOWN = 1
    };
-   enum {
+   enum : U32
+   {
       InvalidId = 0xFFFFFFFF
    };
    Vector<S32> mColumnOffsets;
