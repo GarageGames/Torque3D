@@ -33,7 +33,7 @@
 class FileStream : public Stream
 {
 public:
-   enum
+   enum : U32
    {
       BUFFER_SIZE = 8 * 1024,       // this can be changed to anything appropriate [in k]
       BUFFER_INVALID = 0xffffffff   // file offsets must all be less than this

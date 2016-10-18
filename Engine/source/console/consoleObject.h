@@ -441,7 +441,7 @@ public:
    /// @see addGroup, endGroup
    /// @see addGroup, endGroup
    /// @see addDeprecatedField
-   enum ACRFieldTypes
+   enum ACRFieldTypes : U32
    {
       /// The first custom field type... all fields
       /// types greater or equal to this one are not
