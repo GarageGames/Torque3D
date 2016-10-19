@@ -62,4 +62,4 @@ namespace Con {
 
 /// @}
 
-#endif _CONSOLEXMLEXPORT_H_
+#endif //_CONSOLEXMLEXPORT_H_
