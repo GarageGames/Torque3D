@@ -145,8 +145,8 @@ S32 CreatorTree::Node::getSelected()
 //------------------------------------------------------------------------------
 CreatorTree::CreatorTree() :
    mCurId(0),
-   mTxtOffset(5),
-   mRoot(0)
+   mRoot(0),
+   mTxtOffset(5)
 {
    VECTOR_SET_ASSOCIATION(mNodeList);
    clear();

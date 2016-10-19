@@ -32,14 +32,14 @@ extern InputModifiers convertModifierBits(const U32 in);
 //-----------------------------------------------------------------------------
 // Constructor/Destructor
 //-----------------------------------------------------------------------------
-WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) : 
+WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) :
+                                             mNotifyPosition(true),
                                              mWindow(window),
                                              mInputController(NULL),
                                              mLastCursorPos(0,0),
                                              mClampToWindow(true),
-                                             mPixelsPerMickey(1.0f),
-                                             mNotifyPosition(true),
-                                             mFocused(false)
+                                             mFocused(false),
+                                             mPixelsPerMickey(1.0f)
 {
    AssertFatal(mWindow, "NULL PlatformWindow on WindowInputGenerator creation");
 

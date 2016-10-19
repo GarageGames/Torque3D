@@ -93,9 +93,9 @@ ConsoleSetType(TypeShapeAssetPtr)
 //-----------------------------------------------------------------------------
 
 ShapeAsset::ShapeAsset() :
-mAcquireReferenceCount(0),
 mpOwningAssetManager(NULL),
-mAssetInitialized(false)
+mAssetInitialized(false),
+mAcquireReferenceCount(0)
 {
 }
 

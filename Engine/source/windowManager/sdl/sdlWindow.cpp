@@ -74,17 +74,17 @@ namespace
 }
 
 PlatformWindowSDL::PlatformWindowSDL():
-mShouldLockMouse(false),
-mMouseLocked(false),
 mOwningManager(NULL),
 mNextWindow(NULL),
 mWindowHandle(NULL),
 mOldParent(NULL),
-mTarget(NULL),
 mDevice(NULL),
+mTarget(NULL),
+mPosition(0,0),
+mMouseLocked(false),
+mShouldLockMouse(false),
 mSuppressReset(false),
-mMenuHandle(NULL),
-mPosition(0,0)
+mMenuHandle(NULL)
 {
 	mCursorController = new PlatformCursorControllerSDL( this );
 

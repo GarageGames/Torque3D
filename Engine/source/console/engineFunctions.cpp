@@ -43,13 +43,13 @@ EngineFunctionInfo::EngineFunctionInfo(   const char* name,
                                           void* address,
                                           U32 flags )
    : SuperType( name, EngineExportKindFunction, scope, docString ),
-     mBindingName( bindingName ),
+     mFunctionFlags( flags ),
      mFunctionType( functionType ),
      mDefaultArgumentValues( defaultArgs ),
-     mFunctionFlags( flags ),
+     mBindingName( bindingName ),
      mPrototypeString( prototypeString ),
-     mNextFunction( smFirstFunction ),
-     mAddress( address )
+     mAddress( address ),
+     mNextFunction( smFirstFunction )
 {
    AssertFatal( functionType, "EngineFunctionInfo - Function cannot have void type!" );
    smFirstFunction = this;

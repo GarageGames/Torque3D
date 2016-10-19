@@ -401,12 +401,12 @@ ConsoleDocClass( PhysicsShape,
 PhysicsShape::PhysicsShape()
    :  mPhysicsRep( NULL ),
       mWorld( NULL ),
-      mShapeInst( NULL ),
       mResetPos( MatrixF::Identity ),
+      mShapeInst( NULL ),
       mDestroyed( false ),
       mPlayAmbient( false ),
-      mAmbientThread( NULL ),
-      mAmbientSeq( -1 )
+      mAmbientSeq( -1 ),
+      mAmbientThread( NULL )
 {
    mNetFlags.set( Ghostable | ScopeAlways );
    mTypeMask |= DynamicShapeObjectType;

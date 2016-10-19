@@ -79,16 +79,16 @@ static SFXAmbience sDefaultAmbience;
 //-----------------------------------------------------------------------------
 
 LevelInfo::LevelInfo()
-   :  mNearClip( 0.1f ),
+   :  mWorldSize( 10000.0f ),
+      mNearClip( 0.1f ),
       mVisibleDistance( 1000.0f ),
       mVisibleGhostDistance ( 0 ),
       mDecalBias( 0.0015f ),
       mCanvasClearColor( 255, 0, 255, 255 ),
+      mAmbientLightBlendPhase( 1.f ),
       mSoundAmbience( NULL ),
-      mSoundscape( NULL ),
       mSoundDistanceModel( SFXDistanceModelLinear ),
-      mWorldSize( 10000.0f ),
-      mAmbientLightBlendPhase( 1.f )
+      mSoundscape( NULL )
 {
    mFogData.density = 0.0f;
    mFogData.densityOffset = 0.0f;

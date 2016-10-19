@@ -58,8 +58,8 @@ ConsoleDocClass( GuiBitmapCtrl,
 GuiBitmapCtrl::GuiBitmapCtrl(void)
  : mBitmapName(),
    mStartPoint( 0, 0 ),
-   mWrap( false ),
-   mColor(ColorI::WHITE)
+   mColor(ColorI::WHITE),
+   mWrap( false )
 {	
 }
 

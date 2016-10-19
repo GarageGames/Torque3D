@@ -36,8 +36,8 @@ static VectorPtr< ConsoleBaseType* > gConsoleTypeTable( __FILE__, __LINE__ );
 //-----------------------------------------------------------------------------
 
 ConsoleBaseType::ConsoleBaseType( const S32 size, S32 *idPtr, const char *aTypeName )
-   :  mInspectorFieldType( NULL ),
-      mTypeSize( size ),
+   :  mTypeSize( size ),
+      mInspectorFieldType( NULL ),
       mTypeInfo( NULL )
 {
    mTypeName = StringTable->insert( aTypeName );

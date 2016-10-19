@@ -58,7 +58,7 @@ public:
       glGenQueries(1, &mQueryId);
    }
 
-    GLTimer() : mName(NULL), mQueryId(0), mData(NULL)
+    GLTimer() : mName(NULL), mData(NULL), mQueryId(0)
     {
 
     }

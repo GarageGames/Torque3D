@@ -593,14 +593,14 @@ IMPLEMENT_CO_NETOBJECT_V1(River);
 
 
 River::River()
- : mMetersPerSegment(10.0f),
-   mSegmentsPerBatch(10),
+ : mSegmentsPerBatch(10),
+   mMetersPerSegment(10.0f),
    mDepthScale(1.0f),
+   mFlowMagnitude(1.0f),
+   mLodDistance( 50.0f ),
    mMaxDivisionSize(2.5f),
    mMinDivisionSize(0.25f),
-	mColumnCount(5),
-   mFlowMagnitude(1.0f),
-   mLodDistance( 50.0f )   
+   mColumnCount(5)   
 {   
    mNetFlags.set( Ghostable | ScopeAlways );
 

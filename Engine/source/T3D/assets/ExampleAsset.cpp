@@ -91,9 +91,9 @@ ConsoleSetType(TypeExampleAssetPtr)
 //-----------------------------------------------------------------------------
 
 ExampleAsset::ExampleAsset() :
-mAcquireReferenceCount(0),
 mpOwningAssetManager(NULL),
-mAssetInitialized(false)
+mAssetInitialized(false),
+mAcquireReferenceCount(0)
 {
    // Generate an asset definition.
    mpAssetDefinition = new AssetDefinition();
