@@ -1,0 +1,5 @@
+
+#define MHRTYPE 256
+
+#define IDR_DEFAULT_44100_MHR 0
+#define IDR_DEFAULT_48000_MHR 1
