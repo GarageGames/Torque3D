@@ -531,7 +531,7 @@ void Convex::updateStateList(const MatrixF& mat, const Point3F& scale, const Poi
 
    // Add collision states for new overlapping objects
    for (CollisionWorkingList* itr0 = mWorking.wLink.mNext; itr0 != &mWorking; itr0 = itr0->wLink.mNext) {
-      register Convex* cv = itr0->mConvex;
+      Convex* cv = itr0->mConvex;
       if (cv->mTag != sTag && box1.isOverlapped(cv->getBoundingBox())) {
          CollisionState* state = new GjkCollisionState;
          state->set(this,cv,mat,cv->getTransform());
