@@ -43,9 +43,6 @@
 
 const U32 csmStaticCollisionMask = TerrainObjectType | StaticShapeObjectType | StaticObjectType;
 
-const U32 csmDynamicCollisionMask = StaticShapeObjectType;
-
-
 IMPLEMENT_CO_DATABLOCK_V1(DebrisData);
 
 ConsoleDocClass( DebrisData,

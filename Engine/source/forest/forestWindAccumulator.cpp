@@ -77,8 +77,6 @@ void ForestWindAccumulator::updateWind( const VectorF &windForce, F32 timeDelta 
    // an infinite mass.
    mParticles[0].position = target;
 
-   Point2F relVel = target * timeDelta;
-
    Point2F diff( 0, 0 );
    Point2F springForce( 0, 0 );
 

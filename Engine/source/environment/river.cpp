@@ -1592,8 +1592,6 @@ void River::_generateSlices()
       }
    }
 
-   Point3F pos = getPosition();
-
    mWorldBox = box;
    //mObjBox.minExtents -= pos;
    //mObjBox.maxExtents -= pos;

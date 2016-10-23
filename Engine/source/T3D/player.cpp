@@ -109,8 +109,6 @@ static S32 sMaxPredictionTicks = 30;   // Number of ticks to predict
 
 S32 Player::smExtendedMoveHeadPosRotIndex = 0;  // The ExtendedMove position/rotation index used for head movements
 
-// Anchor point compression
-const F32 sAnchorMaxDistance = 32.0f;
 
 //
 static U32 sCollisionMoveMask =  TerrainObjectType       |

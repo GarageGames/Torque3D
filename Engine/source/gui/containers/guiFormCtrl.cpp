@@ -384,8 +384,6 @@ void GuiFormCtrl::onMouseUp(const GuiEvent &event)
    mouseUnlock();
    setUpdate();
 
-   Point2I localClick = globalToLocalCoord(event.mousePoint);
-
    // If we're clicking in the header then resize
    //if(localClick.y < mThumbSize.y && mDepressed)
    //   setCollapsed(!mCollapsed);

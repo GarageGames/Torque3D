@@ -1102,8 +1102,6 @@ void ConvexShape::_updateGeometry( bool updateCollision )
 		const Vector< ConvexShape::Triangle > &triangles = face.triangles;
 		const ColorI &faceColor = sgConvexFaceColors[ i % sgConvexFaceColorCount ];
 
-		const Point3F binormal = mCross( face.normal, face.tangent );
-
 		for ( S32 j = 0; j < triangles.size(); j++ )
 		{
 			for ( S32 k = 0; k < 3; k++ )

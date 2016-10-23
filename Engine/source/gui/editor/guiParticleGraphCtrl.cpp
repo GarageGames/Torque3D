@@ -748,7 +748,6 @@ void GuiParticleGraphCtrl::onMouseDown(const GuiEvent &event)
 	  if(event.mouseClickCount == 2)
 	  {
         Point2F plotPoint = getPlotPoint(hitNut.x, hitNut.y);
-		  Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
         S32 point = removePlotPoint(hitNut.x, hitNut.y);
 
         // Argument Buffer.
@@ -885,8 +884,6 @@ void GuiParticleGraphCtrl::onRightMouseDown(const GuiEvent &event)
    if( hitNut != Point2I(-1,-1) )
    {
       Point2F plotPoint = getPlotPoint(hitNut.x, hitNut.y);
-
-      Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
       S32 point = removePlotPoint(hitNut.x, hitNut.y);
 
       // Argument Buffer.
@@ -913,8 +910,6 @@ void GuiParticleGraphCtrl::onRightMouseDragged(const GuiEvent &event)
    if( hitNut != Point2I(-1,-1) )
    {
       Point2F plotPoint = getPlotPoint(hitNut.x, hitNut.y);
-
-      Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
       S32 point = removePlotPoint(hitNut.x, hitNut.y);
 
 	   // Argument Buffer.
