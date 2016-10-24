@@ -60,7 +60,7 @@ ConsoleDocClass( TurretShapeData,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( TurretShapeData, onMountObject, void, ( TurretShape* turret, SceneObject* obj, S32 node ),( turret, obj, node ),
+IMPLEMENT_CALLBACK( TurretShapeData, onMountObject, void, ( SceneObject* turret, SceneObject* obj, S32 node ),( turret, obj, node ),
    "@brief Informs the TurretShapeData object that a player is mounting it.\n\n"
    "@param turret The TurretShape object.\n"
    "@param obj The player that is mounting.\n"
@@ -68,7 +68,7 @@ IMPLEMENT_CALLBACK( TurretShapeData, onMountObject, void, ( TurretShape* turret,
    "@note Server side only.\n"
 );
 
-IMPLEMENT_CALLBACK( TurretShapeData, onUnmountObject, void, ( TurretShape* turret, SceneObject* obj ),( turret, obj ),
+IMPLEMENT_CALLBACK( TurretShapeData, onUnmountObject, void, ( SceneObject* turret, SceneObject* obj ),( turret, obj ),
    "@brief Informs the TurretShapeData object that a player is unmounting it.\n\n"
    "@param turret The TurretShape object.\n"
    "@param obj The player that is unmounting.\n"
@@ -924,7 +924,7 @@ void TurretShape::unmountObject( SceneObject *obj )
    }
 }
 
-void TurretShape::onUnmount(ShapeBase*,S32)
+void TurretShape::onUnmount(SceneObject*,S32)
 {
    // Make sure the client get's the final server pos of this turret.
    setMaskBits(PositionMask);
