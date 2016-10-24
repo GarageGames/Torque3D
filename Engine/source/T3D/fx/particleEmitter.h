@@ -87,7 +87,7 @@ class ParticleEmitterData : public GameBaseData
    /// of the ambient color on the particle.
    F32 ambientFactor;
 
-   U32   lifetimeMS;                         ///< Lifetime of particles
+   S32   lifetimeMS;                         ///< Lifetime of particles
    U32   lifetimeVarianceMS;                 ///< Varience in lifetime from 0 to n
 
    bool  overrideAdvance;                    ///<

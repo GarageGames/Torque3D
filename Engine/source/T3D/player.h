@@ -484,7 +484,7 @@ protected:
    /// @{
 
    struct ActionAnimation {
-      U32 action;
+      S32 action;
       TSThread* thread;
       S32 delayTicks;               // before picking another.
       bool forward;
