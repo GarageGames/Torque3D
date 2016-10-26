@@ -486,7 +486,7 @@ function EWCreatorWindow::navigate( %this, %address )
          }
          
          // Is this file in the current folder?        
-         if ( stricmp( %pathFolders, %address ) == 0 )
+         if ( (%dirCount == 0 && %address $= "") || stricmp( %pathFolders, %address ) == 0 )
          {
             %this.addPrefabIcon( %fullPath );            
          }
