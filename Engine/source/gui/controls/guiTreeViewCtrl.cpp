@@ -4113,10 +4113,20 @@ void GuiTreeViewCtrl::onRenderCell(Point2I offset, Point2I cell, bool, bool )
       {
          if ( pGroup != NULL)
          {
-            if (item->isExpanded())
-               item->mIcon = SimGroup1;
+            //Check if we're a SceneObject, and pick the default icon as appropriate
+            
+            if (pObject->getClassName() != String("SimGroup"))
+            {
+               item->mIcon = Icon31;
+            }
             else
-               item->mIcon = SimGroup2;
+            {
+               //If we're purely a SimGroup, pick our icon.
+               if (item->isExpanded())
+                  item->mIcon = SimGroup1;
+               else
+                  item->mIcon = SimGroup2;
+            }
          }
          else
             item->mIcon = SimGroup2;
