@@ -320,7 +320,7 @@ void StandardMainLoop::init()
    Sampler::init();
 
    // Hook in for UDP notification
-   Net::smPacketReceive.notify(GNet, &NetInterface::processPacketReceiveEvent);
+   Net::getPacketReceiveEvent().notify(GNet, &NetInterface::processPacketReceiveEvent);
 
    #ifdef TORQUE_DEBUG_GUARD
       Memory::flagCurrentAllocs( Memory::FLAG_Static );

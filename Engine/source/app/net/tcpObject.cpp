@@ -215,9 +215,9 @@ TCPObject::TCPObject()
 
    if(gTCPCount == 1)
    {
-      Net::smConnectionAccept.notify(processConnectedAcceptEvent);
-      Net::smConnectionReceive.notify(processConnectedReceiveEvent);
-      Net::smConnectionNotify.notify(processConnectedNotifyEvent);
+      Net::getConnectionAcceptedEvent().notify(processConnectedAcceptEvent);
+      Net::getConnectionReceiveEvent().notify(processConnectedReceiveEvent);
+      Net::getConnectionNotifyEvent().notify(processConnectedNotifyEvent);
    }
 }
 
@@ -230,9 +230,9 @@ TCPObject::~TCPObject()
 
    if(gTCPCount == 0)
    {
-      Net::smConnectionAccept.remove(processConnectedAcceptEvent);
-      Net::smConnectionReceive.remove(processConnectedReceiveEvent);
-      Net::smConnectionNotify.remove(processConnectedNotifyEvent);
+      Net::getConnectionAcceptedEvent().remove(processConnectedAcceptEvent);
+      Net::getConnectionReceiveEvent().remove(processConnectedReceiveEvent);
+      Net::getConnectionNotifyEvent().remove(processConnectedNotifyEvent);
    }
 }
 

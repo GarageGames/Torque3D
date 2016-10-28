@@ -204,10 +204,10 @@ struct Net
 
    static const S32 MaxPacketDataSize = MAXPACKETSIZE;
 
-   static ConnectionNotifyEvent   smConnectionNotify;
-   static ConnectionAcceptedEvent smConnectionAccept;
-   static ConnectionReceiveEvent  smConnectionReceive;
-   static PacketReceiveEvent      smPacketReceive;
+   static ConnectionNotifyEvent&   getConnectionNotifyEvent();
+   static ConnectionAcceptedEvent& getConnectionAcceptedEvent();
+   static ConnectionReceiveEvent&  getConnectionReceiveEvent();
+   static PacketReceiveEvent&      getPacketReceiveEvent();
 
    static bool smMulticastEnabled;
    static bool smIpv4Enabled;
@@ -232,7 +232,7 @@ struct Net
    static NetSocket openListenPort(U16 port, NetAddress::Type = NetAddress::IPAddress);
    static NetSocket openConnectTo(const char *stringAddress); // does the DNS resolve etc.
    static void closeConnectTo(NetSocket socket);
-   static Error sendtoSocket(NetSocket socket, const U8 *buffer, S32 bufferSize);
+   static Error sendtoSocket(NetSocket socket, const U8 *buffer, S32 bufferSize, S32 *bytesWritten=NULL);
 
    static bool compareAddresses(const NetAddress *a1, const NetAddress *a2);
    static Net::Error stringToAddress(const char *addressString, NetAddress *address, bool hostLookup=true, int family=0);
@@ -242,7 +242,7 @@ struct Net
    static NetSocket openSocket();
    static Error closeSocket(NetSocket socket);
 
-   static Error send(NetSocket socket, const U8 *buffer, S32 bufferSize);
+   static Error send(NetSocket socket, const U8 *buffer, S32 bufferSize, S32 *outBytesWritten=NULL);
    static Error recv(NetSocket socket, U8 *buffer, S32 bufferSize, S32 *bytesRead);
 
    static Error connect(NetSocket socket, const NetAddress *address);
@@ -255,7 +255,7 @@ struct Net
    static Error setBlocking(NetSocket socket, bool blockingIO);
 
    /// Gets the desired default listen address for a specified address type
-   static bool getListenAddress(const NetAddress::Type type, NetAddress *address, bool forceDefaults=false);
+   static Net::Error getListenAddress(const NetAddress::Type type, NetAddress *address, bool forceDefaults=false);
    static void getIdealListenAddress(NetAddress *address);
 
    // Multicast for ipv6 local net browsing
