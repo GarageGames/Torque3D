@@ -54,6 +54,7 @@ typedef S32 socklen_t;
 #include <netinet/in.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <net/if.h>
 
 typedef sockaddr_in SOCKADDR_IN;
 typedef sockaddr * PSOCKADDR;
