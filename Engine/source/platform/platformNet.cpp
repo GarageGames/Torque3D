@@ -231,10 +231,14 @@ namespace PlatformNetState
          return Net::UnknownError;
       }
 #else
+      int theError = errno;
       if (errno == EAGAIN)
          return Net::WouldBlock;
       if (errno == 0)
          return Net::NoError;
+      if (errno == EINPROGRESS)
+         return Net::WouldBlock;
+      
       return Net::UnknownError;
 #endif
    }
@@ -593,7 +597,12 @@ void Net::shutdown()
    Process::remove(&Net::process);
 
    while (gPolledSockets.size() > 0)
-      closeConnectTo(gPolledSockets[0]->handleFd);
+   {
+      if (gPolledSockets[0] == NULL)
+         gPolledSockets.erase(gPolledSockets.begin());
+      else
+         closeConnectTo(gPolledSockets[0]->handleFd);
+   }
 
    closePort();
    PlatformNetState::initCount--;
@@ -623,7 +632,7 @@ static void NetAddressToIPSocket(const NetAddress *address, struct sockaddr_in *
    dMemset(sockAddr, 0, sizeof(struct sockaddr_in));
    sockAddr->sin_family = AF_INET;
    sockAddr->sin_port = htons(address->port);
-   #if defined(TORQUE_OS_BSD)
+   #if defined(TORQUE_OS_BSD) || defined(TORQUE_OS_MAC)
    sockAddr->sin_len = sizeof(struct sockaddr_in);
    #endif
    if (address->type == NetAddress::IPBroadcastAddress)
@@ -862,10 +871,10 @@ void Net::closeConnectTo(NetSocket handleFd)
    // if this socket is in the list of polled sockets, remove it
    for (S32 i = 0; i < gPolledSockets.size(); ++i)
    {
-      if (gPolledSockets[i]->handleFd == handleFd)
+      if (gPolledSockets[i] && gPolledSockets[i]->handleFd == handleFd)
       {
          delete gPolledSockets[i];
-         gPolledSockets.erase(i);
+         gPolledSockets[i] = NULL;
          break;
       }
    }
@@ -1120,12 +1129,21 @@ void Net::process()
    NetAddress out_h_addr;
    S32 out_h_length = 0;
    RawData readBuff;
+   NetSocket removeSockHandle;
 
    for (S32 i = 0; i < gPolledSockets.size();
       /* no increment, this is done at end of loop body */)
    {
       removeSock = false;
       currentSock = gPolledSockets[i];
+      
+      // Cleanup if we've removed it
+      if (currentSock == NULL)
+      {
+         gPolledSockets.erase(i);
+         continue;
+      }
+      
       switch (currentSock->state)
       {
       case PolledSocket::InvalidState:
@@ -1143,9 +1161,11 @@ void Net::process()
 #endif
          {
             Con::errorf("Error getting socket options: %s",  strerror(errno));
+            
+            removeSock = true;
+            removeSockHandle = currentSock->handleFd;
 
             smConnectionNotify->trigger(currentSock->handleFd, Net::ConnectFailed);
-            removeSock = true;
          }
          else
          {
@@ -1167,8 +1187,11 @@ void Net::process()
             {
                // some kind of error
                Con::errorf("Error connecting: %s", strerror(errno));
-               smConnectionNotify->trigger(currentSock->handleFd, Net::ConnectFailed);
+               
                removeSock = true;
+               removeSockHandle = currentSock->handleFd;
+               
+               smConnectionNotify->trigger(currentSock->handleFd, Net::ConnectFailed);
             }
          }
          break;
@@ -1191,18 +1214,22 @@ void Net::process()
                // ack! this shouldn't happen
                if (bytesRead < 0)
                   Con::errorf("Unexpected error on socket: %s", strerror(errno));
+               
+               removeSock = true;
+               removeSockHandle = currentSock->handleFd;
 
                // zero bytes read means EOF
                smConnectionNotify->trigger(currentSock->handleFd, Net::Disconnected);
-
-               removeSock = true;
             }
          }
          else if (err != Net::NoError && err != Net::WouldBlock)
          {
             Con::errorf("Error reading from socket: %s",  strerror(errno));
-            smConnectionNotify->trigger(currentSock->handleFd, Net::Disconnected);
+            
             removeSock = true;
+            removeSockHandle = currentSock->handleFd;
+            
+            smConnectionNotify->trigger(currentSock->handleFd, Net::Disconnected);
          }
          break;
       case PolledSocket::NameLookupRequired:
@@ -1219,6 +1246,7 @@ void Net::process()
             Con::errorf("DNS lookup failed: %s", currentSock->remoteAddr);
             newState = Net::DNSFailed;
             removeSock = true;
+            removeSockHandle = currentSock->handleFd;
          }
          else
          {
@@ -1269,6 +1297,7 @@ void Net::process()
                currentSock->remoteAddr);
                newState = Net::ConnectFailed;
                removeSock = true;
+               removeSockHandle = currentSock->handleFd;
             }
 
             if (ai_addr)
@@ -1283,6 +1312,7 @@ void Net::process()
                      currentSock->remoteAddr, err);
                      newState = Net::ConnectFailed;
                      removeSock = true;
+                     removeSockHandle = currentSock->handleFd;
                   }
                   else
                   {
@@ -1316,7 +1346,7 @@ void Net::process()
       // only increment index if we're not removing the connection,  since
       // the removal will shift the indices down by one
       if (removeSock)
-         closeConnectTo(currentSock->handleFd);
+         closeConnectTo(removeSockHandle);
       else
          i++;
    }
