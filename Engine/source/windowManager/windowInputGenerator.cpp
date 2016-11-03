@@ -32,14 +32,14 @@ extern InputModifiers convertModifierBits(const U32 in);
 //-----------------------------------------------------------------------------
 // Constructor/Destructor
 //-----------------------------------------------------------------------------
-WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) : 
+WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) :
+                                             mNotifyPosition(true),
                                              mWindow(window),
                                              mInputController(NULL),
                                              mLastCursorPos(0,0),
                                              mClampToWindow(true),
-                                             mPixelsPerMickey(1.0f),
-                                             mNotifyPosition(true),
-                                             mFocused(false)
+                                             mFocused(false),
+                                             mPixelsPerMickey(1.0f)
 {
    AssertFatal(mWindow, "NULL PlatformWindow on WindowInputGenerator creation");
 
@@ -82,7 +82,7 @@ WindowInputGenerator::~WindowInputGenerator()
 //-----------------------------------------------------------------------------
 void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 {
-   if (!mInputController || !mFocused)
+   if (!mInputController)// || !mFocused)
       return;
 
    if (inputEvent.action == SI_MAKE && inputEvent.deviceType == KeyboardDeviceType)
@@ -331,7 +331,7 @@ void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 actio
 void WindowInputGenerator::handleInputEvent( U32 deviceInst, F32 fValue, F32 fValue2, F32 fValue3, F32 fValue4, S32 iValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier )
 {
    // Skip it if we don't have focus.
-   if(!mInputController || !mFocused)
+   if(!mInputController)// || !mFocused)
       return;
 
    // Convert to an InputEventInfo and pass it around for processing.

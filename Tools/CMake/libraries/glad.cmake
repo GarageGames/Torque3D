@@ -27,7 +27,7 @@ addPath("${libDir}/glad/src")
 # TODO EGL support if we ever use EGL instead of GLX
 if (WIN32)
    addPath("${libDir}/glad/src/wgl")
-else()
+elseif (UNIX AND NOT APPLE)
    addPath("${libDir}/glad/src/glx") 
 endif()
 

@@ -245,11 +245,6 @@ void PostEffectManager::renderEffects( const SceneRenderState *state,
                                        const PFXRenderTime effectTiming, 
                                        const String &binName )
 {
-   // MACHAX - The proper fix is to ensure that PostFX do not get rendered if 
-   // their shader failed to load.
-#ifdef TORQUE_OS_MAC
-   return;
-#endif
 
    // Check the global render effect state as 
    // well as the 

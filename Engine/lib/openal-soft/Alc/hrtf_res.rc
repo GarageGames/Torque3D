@@ -1,0 +1,4 @@
+#include "hrtf_res.h"
+
+IDR_DEFAULT_44100_MHR MHRTYPE "../hrtf/default-44100.mhr"
+IDR_DEFAULT_48000_MHR MHRTYPE "../hrtf/default-48000.mhr"

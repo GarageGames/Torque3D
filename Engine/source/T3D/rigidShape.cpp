@@ -187,8 +187,6 @@ IMPLEMENT_CALLBACK( RigidShape, onLeaveLiquid, void, ( const char* objId, const 
 
 namespace {
 
-   const U32 sMoveRetryCount = 3;
-
    // Client prediction
    const S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
    const S32 sMaxPredictionTicks = 30;    // Number of ticks to predict

@@ -31,8 +31,8 @@ ForestUndoAction::ForestUndoAction( const Resource<ForestData> &data,
                                     ForestEditorCtrl *editor,
                                     const char *description )
  : UndoAction( description ),
-   mData( data ),
-   mEditor( editor )
+   mEditor( editor ),
+   mData( data )
 {
 }
 

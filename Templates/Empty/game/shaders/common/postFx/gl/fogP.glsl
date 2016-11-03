@@ -48,5 +48,5 @@ void main()
                                    fogData.y, 
                                    fogData.z );
 
-   OUT_col = hdrEncode( vec4( fogColor.rgb, 1.0 - saturate( factor ) ) );     
+   OUT_col = hdrEncode( vec4( toLinear(fogColor.rgb), 1.0 - saturate( factor ) ) );     
 }

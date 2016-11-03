@@ -1440,10 +1440,9 @@ F32 AIPlayer::getTargetDistance(GameBase* target, bool _checkEnabled)
    return (getPosition() - target->getPosition()).len();
 }
 
-DefineEngineMethod(AIPlayer, getTargetDistance, bool, (ShapeBase* obj, bool checkEnabled), (NULL, false),
-   "@brief Check whether an object is within a specified veiw cone.\n"
+DefineEngineMethod(AIPlayer, getTargetDistance, F32, (ShapeBase* obj, bool checkEnabled), (NULL, false),
+   "@brief The distance to a given object.\n"
    "@obj Object to check. (If blank, it will check the current target).\n"
-   "@fov view angle in degrees.(Defaults to 45)\n"
    "@checkEnabled check whether the object can take damage and if so is still alive.(Defaults to false)\n")
 {
    return object->getTargetDistance(obj, checkEnabled);

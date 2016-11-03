@@ -74,17 +74,17 @@ namespace
 }
 
 PlatformWindowSDL::PlatformWindowSDL():
-mShouldLockMouse(false),
-mMouseLocked(false),
 mOwningManager(NULL),
 mNextWindow(NULL),
 mWindowHandle(NULL),
 mOldParent(NULL),
-mTarget(NULL),
 mDevice(NULL),
+mTarget(NULL),
+mPosition(0,0),
+mMouseLocked(false),
+mShouldLockMouse(false),
 mSuppressReset(false),
-mMenuHandle(NULL),
-mPosition(0,0)
+mMenuHandle(NULL)
 {
 	mCursorController = new PlatformCursorControllerSDL( this );
 
@@ -426,16 +426,19 @@ void PlatformWindowSDL::defaultRender()
 
 void PlatformWindowSDL::_triggerMouseLocationNotify(const SDL_Event& evt)
 {
+   U32 mods = getTorqueModFromSDL(SDL_GetModState());
+
    if(!mMouseLocked)
-      mouseEvent.trigger(getWindowId(), 0, evt.motion.x, evt.motion.y, false);
+      mouseEvent.trigger(getWindowId(), mods, evt.motion.x, evt.motion.y, false);
    else
-      mouseEvent.trigger(getWindowId(), 0, evt.motion.xrel, evt.motion.yrel, true);
+      mouseEvent.trigger(getWindowId(), mods, evt.motion.xrel, evt.motion.yrel, true);
 }
 
 void PlatformWindowSDL::_triggerMouseWheelNotify(const SDL_Event& evt)
 {
+   U32 mods = getTorqueModFromSDL(SDL_GetModState());
    S32 wheelDelta = Con::getIntVariable("$pref::Input::MouseWheelSpeed", 120);
-   wheelEvent.trigger(getWindowId(), 0, evt.wheel.x * wheelDelta, evt.wheel.y * wheelDelta);
+   wheelEvent.trigger(getWindowId(), mods, evt.wheel.x * wheelDelta, evt.wheel.y * wheelDelta);
 }
 
 void PlatformWindowSDL::_triggerMouseButtonNotify(const SDL_Event& event)

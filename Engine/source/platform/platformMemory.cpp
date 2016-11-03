@@ -53,7 +53,8 @@ void * gMemMutex = NULL;
 #undef new
 #endif
 
-enum MemConstants {
+enum MemConstants : U32
+{
    Allocated            = BIT(0),
    Array                = BIT(1),
    DebugFlag            = BIT(2),

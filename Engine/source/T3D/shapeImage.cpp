@@ -97,14 +97,14 @@ ConsoleDocClass( ShapeBaseImageData,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( ShapeBaseImageData, onMount, void, ( ShapeBase* obj, S32 slot, F32 dt ), ( obj, slot, dt ),
+IMPLEMENT_CALLBACK( ShapeBaseImageData, onMount, void, ( SceneObject* obj, S32 slot, F32 dt ), ( obj, slot, dt ),
    "@brief Called when the Image is first mounted to the object.\n\n"
 
    "@param obj object that this Image has been mounted to\n"
    "@param slot Image mount slot on the object\n"
    "@param dt time remaining in this Image update\n" );
 
-IMPLEMENT_CALLBACK( ShapeBaseImageData, onUnmount, void, ( ShapeBase* obj, S32 slot, F32 dt ), ( obj, slot, dt ),
+IMPLEMENT_CALLBACK( ShapeBaseImageData, onUnmount, void, ( SceneObject* obj, S32 slot, F32 dt ), ( obj, slot, dt ),
    "@brief Called when the Image is unmounted from the object.\n\n"
 
    "@param obj object that this Image has been unmounted from\n"

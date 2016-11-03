@@ -533,7 +533,7 @@ void WaterPlane::setupVBIB( SceneRenderState *state )
       1,             // Top
       -(S32)gridStride,   // Right
       -1,             // Bottom
-      gridStride,    // Left
+      (S32)gridStride,    // Left
    };
 
    const U32 firstBorderVert = gridStride * gridSize + gridStride;

@@ -100,7 +100,10 @@ public:
       /// of a target texture after presentation or deactivated.
       ///
       /// This is mainly a depth buffer optimization.
-      NoDiscard = BIT(10)
+      NoDiscard = BIT(10),
+
+      /// Texture is managed by another process, thus should not be modified
+      NoModify = BIT(11)
 
    };
 
@@ -164,6 +167,7 @@ public:
    inline bool noMip() const { return testFlag(NoMipmap); }
    inline bool isPooled() const { return testFlag(Pooled); }
    inline bool canDiscard() const { return !testFlag(NoDiscard); }
+   inline bool canModify() const { return !testFlag(NoModify); }
 
 private:
    /// These constants control the packing for the profile; if you add flags, types, or

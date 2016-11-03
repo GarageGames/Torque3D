@@ -36,13 +36,13 @@ Signal< void( SFXBuffer* ) > SFXBuffer::smBufferDestroyedSignal;
 
 SFXBuffer::SFXBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescription* description, bool createAsyncState )
    : mStatus( STATUS_Null ),
-     mIsStreaming( description->mIsStreaming ),
      mFormat( stream->getFormat() ),
      mDuration( stream->getDuration() ),
-     mUniqueVoice( NULL ),
-     mIsDead( false ),
+     mIsStreaming( description->mIsStreaming ),
      mIsLooping( description->mIsLooping ),
-     mIsUnique( description->mIsStreaming )
+     mIsUnique( description->mIsStreaming ),
+     mIsDead( false ),
+     mUniqueVoice( NULL )
 {
    using namespace SFXInternal;
    
@@ -63,12 +63,12 @@ SFXBuffer::SFXBuffer( const ThreadSafeRef< SFXStream >& stream, SFXDescription* 
 
 SFXBuffer::SFXBuffer( SFXDescription* description )
    : mStatus( STATUS_Ready ),
-     mIsStreaming( false ), // Not streaming through our system.
      mDuration( 0 ), // Must be set by subclass.
-     mUniqueVoice( NULL ),
-     mIsDead( false ),
+     mIsStreaming( false ), // Not streaming through our system.
      mIsLooping( description->mIsLooping ),
-     mIsUnique( false ) // Must be set by subclass.
+     mIsUnique( false ), // Must be set by subclass.
+     mIsDead( false ),
+     mUniqueVoice( NULL )
 {
 }
 

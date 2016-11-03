@@ -55,11 +55,11 @@ EngineTypeInfo::EngineTypeInfo( const char* typeName, EngineExportScope* scope, 
    : SuperType( typeName, scope, docString ),
      mTypeKind( kind ),
      mInstanceSize( instanceSize ),
-     mNext( smFirst ),
      mEnumTable( NULL ),
      mFieldTable( NULL ),
      mPropertyTable( NULL ),
-     mSuperType( NULL )
+     mSuperType( NULL ),
+     mNext( smFirst )
 {
    mExportKind = EngineExportKindType;
    

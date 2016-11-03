@@ -34,12 +34,14 @@
 #include "math/mRect.h"
 #include "gfx/gfxDevice.h"
 
-#include "OVR_CAPI_0_5_0.h"
+#include "OVR_CAPI.h"
 
 class GuiCanvas;
 class GameConnection;
 struct DisplayPose;
 class OculusVRSensorDevice;
+struct OculusTexture;
+
 
 class OculusVRHMDDevice
 {
@@ -59,9 +61,6 @@ protected:
 
    ovrHmd mDevice;
 
-   U32 mSupportedDistortionCaps;
-   U32 mCurrentDistortionCaps;
-
    U32 mSupportedCaps;
    U32 mCurrentCaps;
 
@@ -70,14 +69,11 @@ protected:
    String   mManufacturer;
    U32      mVersion;
 
-   // Windows display device name used in EnumDisplaySettings/CreateDC
-   String   mDisplayDeviceName;
+   // Device type (D3D11, etc)
+   String   mDisplayDeviceType;
 
-   // MacOS display ID
+   // Adapter index
    S32      mDisplayId;
-
-   // Desktop coordinate position of the screen (can be negative; may not be present on all platforms)
-   Point2I  mDesktopPosition;
 
    // Whole screen resolution
    Point2I  mResolution;
@@ -99,17 +95,14 @@ protected:
    Point2F mProjectionCenterOffset;
 
    // Current pose of eyes
-   ovrPosef         mCurrentEyePoses[2];
    ovrEyeRenderDesc mEyeRenderDesc[2];
-
-   ovrFovPort mCurrentFovPorts[2];
-
-   Point2I mWindowSize;
 
    GameConnection *mConnection;
 
    OculusVRSensorDevice *mSensor;
    U32 mActionCodeIndex;
+
+   ovrGraphicsLuid mLuid;
 
 protected:
    void updateRenderInfo();
@@ -121,7 +114,7 @@ public:
    void cleanUp();
 
    // Set the HMD properties based on information from the OVR device
-   void set(ovrHmd hmd, U32 actionCodeIndex);
+   void set(ovrHmd hmd, ovrGraphicsLuid luid, U32 actionCodeIndex);
 
    // Sets optimal display size for canvas
    void setOptimalDisplaySize(GuiCanvas *canvas);
@@ -133,13 +126,10 @@ public:
    U32 getVersion() const { return mVersion; }
 
    // Windows display device name used in EnumDisplaySettings/CreateDC
-   const char* getDisplayDeviceName() const { return mDisplayDeviceName.c_str(); }
+   const char* getDisplayDeviceType () const { return mDisplayDeviceType.c_str(); }
 
    // MacOS display ID
    S32 getDisplayDeviceId() const { return mDisplayId; }
-
-   // Desktop coordinate position of the screen (can be negative; may not be present on all platforms)
-   const Point2I& getDesktopPosition() const { return mDesktopPosition; }
 
    // Whole screen resolution
    const Point2I& getResolution() const { return mResolution; }
@@ -166,7 +156,7 @@ public:
    void getStereoViewports(RectI *dest) const { dMemcpy(dest, mEyeViewport, sizeof(mEyeViewport)); }
    void getStereoTargets(GFXTextureTarget **dest) const { dest[0] = mEyeRT[0]; dest[1] = mEyeRT[1]; }
 
-   void getFovPorts(FovPort *dest) const { dMemcpy(dest, mCurrentFovPorts, sizeof(mCurrentFovPorts)); }
+   void getFovPorts(FovPort *dest) const { dMemcpy(dest, &mRenderLayer.Fov[0], sizeof(mRenderLayer.Fov)); }
    
    /// Returns eye offsets in torque coordinate space, i.e. z being up, x being left-right, and y being depth (forward).
    void getEyeOffsets(Point3F *offsets) const { 
@@ -181,7 +171,7 @@ public:
    void onEndFrame();
    void onDeviceDestroy();
 
-   Point2I generateRenderTarget(GFXTextureTargetRef &target, GFXTexHandle &texture, GFXTexHandle &depth, Point2I desiredSize);
+   Point2I generateRenderTarget(GFXTextureTargetRef &target, GFXTexHandle &depth, Point2I desiredSize);
    void clearRenderTargets();
 
    bool isDisplayingWarning();
@@ -195,23 +185,17 @@ public:
    virtual void setCurrentConnection(GameConnection *connection) { mConnection = connection; }
    virtual GameConnection* getCurrentConnection() { return mConnection; }
 
+   GFXTexHandle getPreviewTexture();
+
    String dumpMetrics();
 
    // Stereo RT
-   GFXTexHandle mStereoTexture;
+   GFXTexHandle mDebugStereoTexture;
    GFXTexHandle mStereoDepthTexture;
    GFXTextureTargetRef mStereoRT;
 
    // Eye RTs (if we are using separate targets)
    GFXTextureTargetRef mEyeRT[2];
-   GFXTexHandle mEyeTexture[2];
-   GFXTexHandle mEyeDepthTexture[2];
-
-   // Current render target size for each eye
-   Point2I mEyeRenderSize[2];
-
-   // Recommended eye target size for each eye
-   ovrSizei mRecomendedEyeTargetSize[2];
 
    // Desired viewport for each eye
    RectI mEyeViewport[2];
@@ -220,6 +204,12 @@ public:
    F32 smDesiredPixelDensity;
 
    ovrTrackingState mLastTrackingState;
+   OculusTexture* mTextureSwapSet;
+   ovrLayerEyeFov mRenderLayer;
+   ovrLayerDirect mDebugRenderLayer;
+   ovrViewScaleDesc mScaleDesc;
+   ovrTexture* mDebugMirrorTexture;
+   GFXTexHandle mDebugMirrorTextureHandle;
 
    GFXDevice::GFXDeviceRenderStyles mDesiredRenderingMode;
 

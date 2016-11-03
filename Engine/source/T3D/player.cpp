@@ -56,9 +56,16 @@
 #include "T3D/decal/decalManager.h"
 #include "T3D/decal/decalData.h"
 #include "materials/baseMatInstance.h"
+#include "math/mathUtils.h"
+#include "gfx/sim/debugDraw.h"
 
 #ifdef TORQUE_EXTENDED_MOVE
    #include "T3D/gameBase/extended/extendedMove.h"
+#endif
+
+#ifdef TORQUE_OPENVR
+#include "platform/input/openVR/openVRProvider.h"
+#include "platform/input/openVR/openVRTrackedObject.h"
 #endif
 
 // Amount of time if takes to transition to a new action sequence.
@@ -102,8 +109,6 @@ static S32 sMaxPredictionTicks = 30;   // Number of ticks to predict
 
 S32 Player::smExtendedMoveHeadPosRotIndex = 0;  // The ExtendedMove position/rotation index used for head movements
 
-// Anchor point compression
-const F32 sAnchorMaxDistance = 32.0f;
 
 //
 static U32 sCollisionMoveMask =  TerrainObjectType       |
@@ -1776,7 +1781,7 @@ void Player::onRemove()
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBox.maxExtents.set(-1e9f, -1e9f, -1e9f);
 
-   SAFE_DELETE( mPhysicsRep );		
+   SAFE_DELETE( mPhysicsRep );
 
    Parent::onRemove();
 }
@@ -2489,9 +2494,24 @@ void Player::allowAllPoses()
    mAllowSwimming = true;
 }
 
+AngAxisF gPlayerMoveRot;
+
 void Player::updateMove(const Move* move)
 {
    delta.move = *move;
+
+#ifdef TORQUE_OPENVR
+   if (mControllers[0])
+   {
+      mControllers[0]->processTick(move);
+   }
+
+   if (mControllers[1])
+   {
+      mControllers[1]->processTick(move);
+   }
+
+#endif
 
    // Is waterCoverage high enough to be 'swimming'?
    {
@@ -2531,6 +2551,7 @@ void Player::updateMove(const Move* move)
       delta.headVec = mHead;
 
       bool doStandardMove = true;
+      bool absoluteDelta = false;
       GameConnection* con = getControllingClient();
 
 #ifdef TORQUE_EXTENDED_MOVE
@@ -2618,6 +2639,38 @@ void Player::updateMove(const Move* move)
             while (mHead.y > M_PI_F) 
                mHead.y -= M_2PI_F;
          }
+         else
+         {
+            // Orient the player so we are looking towards the required position, ignoring any banking
+            AngAxisF moveRot(Point3F(emove->rotX[emoveIndex], emove->rotY[emoveIndex], emove->rotZ[emoveIndex]), emove->rotW[emoveIndex]);
+            MatrixF trans(1);
+            moveRot.setMatrix(&trans);
+            trans.inverse();
+
+            Point3F vecForward(0, 10, 0);
+            Point3F viewAngle;
+            Point3F orient;
+            EulerF rot;
+            trans.mulV(vecForward);
+            viewAngle = vecForward;
+            vecForward.z = 0; // flatten
+            vecForward.normalizeSafe();
+
+            F32 yawAng;
+            F32 pitchAng;
+            MathUtils::getAnglesFromVector(vecForward, yawAng, pitchAng);
+
+            mRot = EulerF(0);
+            mRot.z = yawAng;
+            mHead = EulerF(0);
+
+            while (mRot.z < 0.0f)
+               mRot.z += M_2PI_F;
+            while (mRot.z > M_2PI_F)
+               mRot.z -= M_2PI_F;
+
+            absoluteDelta = true;
+         }
       }
 #endif
 
@@ -2666,6 +2719,13 @@ void Player::updateMove(const Move* move)
 
       delta.head = mHead;
       delta.headVec -= mHead;
+
+      if (absoluteDelta)
+      {
+         delta.headVec = Point3F(0, 0, 0);
+         delta.rotVec = Point3F(0, 0, 0);
+      }
+
       for(U32 i=0; i<3; ++i)
       {
          if (delta.headVec[i] > M_PI_F)
@@ -3275,9 +3335,9 @@ bool Player::canCrouch()
    if ( mDataBlock->actionList[PlayerData::CrouchRootAnim].sequence == -1 )
       return false;       
 
-	// We are already in this pose, so don't test it again...
-	if ( mPose == CrouchPose )
-		return true;
+   // We are already in this pose, so don't test it again...
+   if ( mPose == CrouchPose )
+      return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3327,8 +3387,8 @@ bool Player::canStand()
       return false;
 
    // We are already in this pose, so don't test it again...
-	if ( mPose == StandPose )
-		return true;
+   if ( mPose == StandPose )
+      return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3391,9 +3451,9 @@ bool Player::canProne()
    if ( !mPhysicsRep )
       return true;
 
-	// We are already in this pose, so don't test it again...
-	if ( mPose == PronePose )
-		return true;
+   // We are already in this pose, so don't test it again...
+   if ( mPose == PronePose )
+      return true;
 
    return mPhysicsRep->testSpacials( getPosition(), mDataBlock->proneBoxSize );
 }
@@ -3590,7 +3650,7 @@ MatrixF * Player::Death::fallToGround(F32 dt, const Point3F& loc, F32 curZ, F32 
          normal.normalize();
          mat.set(EulerF (0.0f, 0.0f, curZ));
          mat.mulV(upY, & ahead);
-	      mCross(ahead, normal, &sideVec);
+         mCross(ahead, normal, &sideVec);
          sideVec.normalize();
          mCross(normal, sideVec, &ahead);
 
@@ -3773,11 +3833,13 @@ void Player::updateActionThread()
    // Select an action animation sequence, this assumes that
    // this function is called once per tick.
    if(mActionAnimation.action != PlayerData::NullAnimation)
+   {
       if (mActionAnimation.forward)
          mActionAnimation.atEnd = mShapeInstance->getPos(mActionAnimation.thread) == 1;
       else
          mActionAnimation.atEnd = mShapeInstance->getPos(mActionAnimation.thread) == 0;
-
+   }
+    
    // Only need to deal with triggers on the client
    if( isGhost() )
    {
@@ -4452,7 +4514,7 @@ void Player::onImageAnimThreadUpdate(U32 imageSlot, S32 imageShapeIndex, F32 dt)
    }
 }
 
-void Player::onUnmount( ShapeBase *obj, S32 node )
+void Player::onUnmount( SceneObject *obj, S32 node )
 {
    // Reset back to root position during dismount.
    setActionThread(PlayerData::RootAnim,true,false,false);
@@ -4519,6 +4581,7 @@ void Player::updateAnimationTree(bool firstPerson)
 {
    S32 mode = 0;
    if (firstPerson)
+   {
       if (mActionAnimation.firstPerson)
          mode = 0;
 //            TSShapeInstance::MaskNodeRotation;
@@ -4526,7 +4589,7 @@ void Player::updateAnimationTree(bool firstPerson)
 //            TSShapeInstance::MaskNodePosY;
       else
          mode = TSShapeInstance::MaskNodeAllButBlend;
-
+   }
    for (U32 i = 0; i < PlayerData::NumSpineNodes; i++)
       if (mDataBlock->spineNode[i] != -1)
          mShapeInstance->setNodeAnimationState(mDataBlock->spineNode[i],mode);
@@ -5589,58 +5652,6 @@ void Player::getMuzzleTransform(U32 imageSlot,MatrixF* mat)
    *mat = nmat;
 }
 
-DisplayPose Player::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
-{
-   // NOTE: this is intended to be similar to updateMove
-   DisplayPose outPose;
-   outPose.orientation = getRenderTransform().toEuler();
-   outPose.position = inPose.position;
-
-   if (con && con->getControlSchemeAbsoluteRotation())
-   {
-      // Pitch
-      outPose.orientation.x = (inPose.orientation.x - mLastAbsolutePitch);
-
-      // Constrain the range of mRot.x
-      while (outPose.orientation.x  < -M_PI_F) 
-         outPose.orientation.x += M_2PI_F;
-      while (outPose.orientation.x  > M_PI_F) 
-         outPose.orientation.x -= M_2PI_F;
-
-      // Yaw
-
-      // Rotate (heading) head or body?
-      if ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson()))
-      {
-         // Rotate head
-         outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
-      }
-      else
-      {
-         // Rotate body
-         outPose.orientation.z = (inPose.orientation.z - mLastAbsoluteYaw);
-      }
-
-      // Constrain the range of mRot.z
-      while (outPose.orientation.z < 0.0f)
-         outPose.orientation.z += M_2PI_F;
-      while (outPose.orientation.z > M_2PI_F)
-         outPose.orientation.z -= M_2PI_F;
-
-      // Bank
-      if (mDataBlock->cameraCanBank)
-      {
-         outPose.orientation.y = (inPose.orientation.y - mLastAbsoluteRoll);
-      }
-
-      // Constrain the range of mRot.y
-      while (outPose.orientation.y > M_PI_F) 
-         outPose.orientation.y -= M_2PI_F;
-   }
-
-   return outPose;
-}
-
 void Player::getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat)
 {
    disableHeadZCalc();
@@ -5836,7 +5847,7 @@ F32 Player::getSpeed() const
 
 void Player::setVelocity(const VectorF& vel)
 {
-	AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
+   AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
 
    mVelocity = vel;
    setMaskBits(MoveMask);
@@ -5844,7 +5855,7 @@ void Player::setVelocity(const VectorF& vel)
 
 void Player::applyImpulse(const Point3F&,const VectorF& vec)
 {
-	AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
+   AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
 
    // Players ignore angular velocity
    VectorF vel;
@@ -6192,7 +6203,7 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->writeFlag(mSwimming);
       stream->writeFlag(mJetting);  
       stream->writeInt(mPose, NumPoseBits);
-	  
+     
       stream->writeInt(mState,NumStateBits);
       if (stream->writeFlag(mState == RecoverState))
          stream->writeInt(mRecoverTicks,PlayerData::RecoverDelayBits);
@@ -6293,7 +6304,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       mSwimming = stream->readFlag();
       mJetting = stream->readFlag();  
       mPose = (Pose)(stream->readInt(NumPoseBits)); 
-	  
+     
       ActionState actionState = (ActionState)stream->readInt(NumStateBits);
       if (stream->readFlag()) {
          mRecoverTicks = stream->readInt(PlayerData::RecoverDelayBits);
@@ -7160,3 +7171,38 @@ void Player::renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    mConvex.renderWorkingList();
    GFX->leaveDebugEvent();
 }
+
+#ifdef TORQUE_OPENVR
+void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
+{
+   mControllers[0] = controllerList.size() > 0 ? controllerList[0] : NULL;
+   mControllers[1] = controllerList.size() > 1 ? controllerList[1] : NULL;
+}
+
+ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
+{
+   OpenVRTrackedObject *controllerL, *controllerR;
+   Vector<OpenVRTrackedObject*> list;
+
+   if (Sim::findObject(argv[2], controllerL))
+   {
+      list.push_back(controllerL);
+   }
+   else
+   {
+      list.push_back(NULL);
+   }
+
+   if (Sim::findObject(argv[3], controllerR))
+   {
+      list.push_back(controllerR);
+   }
+   else
+   {
+      list.push_back(NULL);
+   }
+
+   object->setControllers(list);
+}
+
+#endif

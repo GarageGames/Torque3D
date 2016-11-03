@@ -385,11 +385,6 @@ bool SceneCullingState::createCullingVolume( const Point3F* vertices, U32 numVer
          if( cosAngle > 0.1f )
             continue;
 
-         //TODO
-
-         const Point3F addNormals = currentPlane + lastPlane;
-         const Point3F crossNormals = mCross( currentPlane, lastPlane );
-
          Point3F newNormal = currentPlane + lastPlane;//addNormals - mDot( addNormals, crossNormals ) * crossNormals;
 
          //

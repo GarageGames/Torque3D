@@ -176,7 +176,6 @@ bool GFXD3D9ShaderBufferLayout::setMatrix(const ParamDesc& pd, const GFXShaderCo
    }
    else if (pd.constType == GFXSCT_Float4x3)
    {
-      F32 buffer[4*4];
       const U32 csize = 48;
 
       // Loop through and copy 

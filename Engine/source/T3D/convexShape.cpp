@@ -227,12 +227,12 @@ bool ConvexShape::protectedSetSurface( void *object, const char *index, const ch
 
 
 ConvexShape::ConvexShape()
- : mMaterialInst( NULL ),   
-   mNormalLength( 0.3f ),
+ : mMaterialName( "Grid512_OrangeLines_Mat" ),
+   mMaterialInst( NULL ),
    mVertCount( 0 ),
    mPrimCount( 0 ),
-   mMaterialName( "Grid512_OrangeLines_Mat" ),
-   mPhysicsRep( NULL )
+   mPhysicsRep( NULL ),
+   mNormalLength( 0.3f )
 {   
    mNetFlags.set( Ghostable | ScopeAlways );
    
@@ -1101,8 +1101,6 @@ void ConvexShape::_updateGeometry( bool updateCollision )
 		const Vector< U32 > &facePntMap = face.points;
 		const Vector< ConvexShape::Triangle > &triangles = face.triangles;
 		const ColorI &faceColor = sgConvexFaceColors[ i % sgConvexFaceColorCount ];
-
-		const Point3F binormal = mCross( face.normal, face.tangent );
 
 		for ( S32 j = 0; j < triangles.size(); j++ )
 		{

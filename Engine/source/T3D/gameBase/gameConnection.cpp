@@ -469,8 +469,8 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
 
    for(U32 i = 0; i < mConnectArgc+3; i++)
    {
-	   connectArgv[i].value = &connectArgvValue[i];
-	   connectArgvValue[i].init();
+      connectArgv[i].value = &connectArgvValue[i];
+      connectArgvValue[i].init();
    }
 
    for(U32 i = 0; i < mConnectArgc; i++)
@@ -678,6 +678,24 @@ bool GameConnection::getControlCameraTransform(F32 dt, MatrixF* mat)
                sChaseQueueTail = 0;
       }
    }
+   return true;
+}
+
+bool GameConnection::getControlCameraHeadTransform(IDisplayDevice *display, MatrixF *transform)
+{
+   GameBase* obj = getCameraObject();
+   if (!obj)
+      return false;
+
+   GameBase* cObj = obj;
+   while ((cObj = cObj->getControlObject()) != 0)
+   {
+      if (cObj->useObjsEyePoint())
+         obj = cObj;
+   }
+
+   obj->getEyeCameraTransform(display, -1, transform);
+
    return true;
 }
 
@@ -896,8 +914,8 @@ void GameConnection::onRemove()
       // clientgroup and what not (this is so that we can disconnect from a local server
       // without needing to destroy and recreate the server before we can connect to it 
       // again).
-	   // Safe-delete as we don't know whether the server connection is currently being
-	   // worked on.
+      // Safe-delete as we don't know whether the server connection is currently being
+      // worked on.
       getRemoteConnection()->safeDeleteObject();
       setRemoteConnectionObject(NULL);
    }

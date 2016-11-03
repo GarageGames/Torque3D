@@ -1162,6 +1162,7 @@ bool EditTSCtrl::processCameraQuery(CameraQuery * query)
 
          query->cameraMatrix = camRot;
          query->cameraMatrix.setPosition(camPos);
+         query->headMatrix = query->cameraMatrix;
          query->fov = mOrthoFOV;
       }
 

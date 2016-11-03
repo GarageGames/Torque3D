@@ -52,8 +52,8 @@ void main()
       colorBuffer *= (1.0 - colorBuffer.a);
    }
 
-   colorBuffer *= vec4(lightBuffer.rgb, 1.0);
    colorBuffer += vec4(specular, specular, specular, 1.0);
+   colorBuffer *= vec4(lightBuffer.rgb, 1.0);
 
    OUT_col = hdrEncode( vec4(colorBuffer.rgb, 1.0) );
 }

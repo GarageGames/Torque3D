@@ -286,6 +286,8 @@ class GuiControl : public SimGroup
       const char * getConsoleCommand(); ///< Returns the name of the function bound to this GuiControl
       LangTable *getGUILangTable(void);
       const UTF8 *getGUIString(S32 id);
+
+      inline String& getTooltip() { return mTooltip; } ///< Returns the tooltip
       
       /// @}
       

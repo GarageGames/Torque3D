@@ -363,3 +363,16 @@ void GFXGLWindowTarget::_teardownCurrentMode()
 void GFXGLWindowTarget::_setupNewMode()
 {
 }
+
+void GFXGLWindowTarget::_makeContextCurrent()
+{
+   HWND hwnd = GETHWND(getWindow());
+   HDC hdc = GetDC(hwnd);
+   if (!wglMakeCurrent(hdc, (HGLRC)mContext))
+   {
+      //HRESULT if needed for debug
+      //HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+      AssertFatal(false, "GFXGLWindowTarget::_makeContextCurrent() - cannot make our context current.");
+   }
+   
+}

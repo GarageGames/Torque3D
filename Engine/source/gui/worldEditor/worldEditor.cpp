@@ -3631,7 +3631,18 @@ void WorldEditor::makeSelectionPrefab( const char *filename )
       {
          for ( S32 i = 0; i < grp->size(); i++ )
             stack.push_back( grp->at(i) );
-         cleanup.push_back( grp );
+         
+         SceneObject* scn = dynamic_cast< SceneObject* >(grp);
+         if (scn)
+         {
+            if (Prefab::isValidChild(obj, true))
+               found.push_back(obj);
+         }
+         else
+         {
+            //Only push the cleanup of the group if it's ONLY a SimGroup.
+            cleanup.push_back(grp);
+         }
       }
       else
       {

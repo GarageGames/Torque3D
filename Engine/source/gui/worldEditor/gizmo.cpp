@@ -811,8 +811,6 @@ void Gizmo::on3DMouseDown( const Gui3DMouseEvent & event )
          camPos = event.pos;
       else
          camPos = mCameraPos;
-         
-      Point3F end = camPos + event.vec * smProjectDistance;
 
       if ( 0 <= mSelectionIdx && mSelectionIdx <= 2 )
       {       
