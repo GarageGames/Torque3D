@@ -356,7 +356,7 @@ void main()
    // Get some specular reflection.
    vec3 newbump = bumpNorm;
    newbump.xy *= 3.5;
-   newbump = normalize( bumpNorm );
+   newbump = normalize( newbump );
    vec3 halfAng = normalize( eyeVec + -lightVec );
    float specular = saturate( dot( newbump, halfAng ) );
    specular = pow( specular, SPEC_POWER );   
