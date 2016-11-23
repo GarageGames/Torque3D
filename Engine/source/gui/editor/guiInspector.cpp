@@ -921,15 +921,15 @@ DefineEngineMethod( GuiInspector, setObjectField, void, (const char* fieldname, 
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( GuiInspector, findByObject, S32, (SimObject* object), ,
+DefineEngineMethod( GuiInspector, findByObject, S32, (SimObject* obj), ,
 	"Returns the id of an awake inspector that is inspecting the passed object if one exists\n"
 	"@param object Object to find away inspector for."
 	"@return id of an awake inspector that is inspecting the passed object if one exists, else NULL or 0.")
 {
-   if ( !object )
+   if ( !obj)
       return NULL;
 
-   SimObject *inspector = GuiInspector::findByObject( object );
+   SimObject *inspector = GuiInspector::findByObject(obj);
 
    if ( !inspector )
       return NULL;
