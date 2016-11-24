@@ -84,6 +84,10 @@ void loadGLExtensions(void *context)
 void STDCALL glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, 
 	const GLchar *message, const void *userParam)
 {
+    // JTH [11/24/2016]: This is a temporary fix so that we do not get spammed for redundant fbo changes.
+    // This only happens on Intel cards. This should be looked into sometime in the near future.
+    if (dStrStartsWith(message, "API_ID_REDUNDANT_FBO"))
+        return;
     if (severity == GL_DEBUG_SEVERITY_HIGH)
         Con::errorf("OPENGL: %s", message);
     else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
