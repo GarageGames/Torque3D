@@ -20,24 +20,17 @@
 # IN THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-project(epoxy)
+project(glad)
 
-addPath("${libDir}/epoxy/src")
+addPath("${libDir}/glad/src")
 
 # TODO EGL support if we ever use EGL instead of GLX
 if (WIN32)
-   addPath("${libDir}/epoxy/src/wgl")
-   addDef(BUILD_WGL)
-elseif(UNIX AND NOT APPLE)
-   addPath("${libDir}/epoxy/src/glx")
-   addDef(BUILD_GLX)
+   addPath("${libDir}/glad/src/wgl")
+elseif (UNIX AND NOT APPLE)
+   addPath("${libDir}/glad/src/glx") 
 endif()
 
-addInclude("${libDir}/epoxy/include")
-addInclude("${libDir}/epoxy/src")
+addInclude("${libDir}/glad/include")
 
 finishLibrary()
-# VS 2015 has a problem with sdl and epoxy together and requires optimizations to be disabled
-if (MSVC14)
-	target_compile_options(epoxy PRIVATE "/Od")
-endif()

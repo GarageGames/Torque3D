@@ -84,6 +84,10 @@ void loadGLExtensions(void *context)
 void STDCALL glDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, 
 	const GLchar *message, const void *userParam)
 {
+    // JTH [11/24/2016]: This is a temporary fix so that we do not get spammed for redundant fbo changes.
+    // This only happens on Intel cards. This should be looked into sometime in the near future.
+    if (dStrStartsWith(message, "API_ID_REDUNDANT_FBO"))
+        return;
     if (severity == GL_DEBUG_SEVERITY_HIGH)
         Con::errorf("OPENGL: %s", message);
     else if (severity == GL_DEBUG_SEVERITY_MEDIUM)
@@ -113,7 +117,8 @@ void GFXGLDevice::initGLState()
    mCardProfiler = new GFXGLCardProfiler();
    mCardProfiler->init(); 
    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&mMaxShaderTextures);
-   glGetIntegerv(GL_MAX_TEXTURE_UNITS, (GLint*)&mMaxFFTextures);
+   // JTH: Needs removed, ffp
+   //glGetIntegerv(GL_MAX_TEXTURE_UNITS, (GLint*)&mMaxFFTextures);
    glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, (GLint*)&mMaxTRColors);
    mMaxTRColors = getMin( mMaxTRColors, (U32)(GFXTextureTarget::MaxRenderSlotId-1) );
    
@@ -617,7 +622,7 @@ void GFXGLDevice::setLightMaterialInternal(const GFXLightMaterial mat)
 
 void GFXGLDevice::setGlobalAmbientInternal(ColorF color)
 {
-   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, (GLfloat*)&color);
+   // ONLY NEEDED ON FFP
 }
 
 void GFXGLDevice::setTextureInternal(U32 textureUnit, const GFXTextureObject*texture)
@@ -673,12 +678,12 @@ void GFXGLDevice::setClipRect( const RectI &inRect )
    const F32 right = mClip.point.x + mClip.extent.x;
    const F32 bottom = mClip.extent.y;
    const F32 top = 0.0f;
-   const F32 near = 0.0f;
-   const F32 far = 1.0f;
+   const F32 nearPlane = 0.0f;
+   const F32 farPlane = 1.0f;
    
    const F32 tx = -(right + left)/(right - left);
    const F32 ty = -(top + bottom)/(top - bottom);
-   const F32 tz = -(far + near)/(far - near);
+   const F32 tz = -(farPlane + nearPlane)/(farPlane - nearPlane);
    
    static Point4F pt;
    pt.set(2.0f / (right - left), 0.0f, 0.0f, 0.0f);
@@ -687,7 +692,7 @@ void GFXGLDevice::setClipRect( const RectI &inRect )
    pt.set(0.0f, 2.0f/(top - bottom), 0.0f, 0.0f);
    mProjectionMatrix.setColumn(1, pt);
    
-   pt.set(0.0f, 0.0f, -2.0f/(far - near), 0.0f);
+   pt.set(0.0f, 0.0f, -2.0f/(farPlane - nearPlane), 0.0f);
    mProjectionMatrix.setColumn(2, pt);
    
    pt.set(tx, ty, tz, 1.0f);
