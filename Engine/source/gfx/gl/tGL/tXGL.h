@@ -30,7 +30,7 @@
 #include "tGL.h"
 #include <glad/glad_glx.h>
 
-#define gglHasXExtension(display, screen, EXTENSION) 
+#define gglHasXExtension(display, screen, EXTENSION) GLAD_GLX_##EXTENSION
 
 #endif //TORQUE_OS_LINUX
 
