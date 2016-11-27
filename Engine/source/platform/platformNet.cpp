@@ -1658,15 +1658,11 @@ Net::Error Net::send(NetSocket handleFd, const U8 *buffer, S32 bufferSize, S32 *
 
    errno = 0;
    S32 bytesWritten = ::send(socketFd, (const char*)buffer, bufferSize, 0);
-   if(bytesWritten == -1)
-#if defined(TORQUE_USE_WINSOCK)
-      Con::errorf("Could not write to socket. Error: %s",strerror_wsa( WSAGetLastError() ));
-#else
-      Con::errorf("Could not write to socket. Error: %s",strerror(errno));
-#endif
 
    if (outBytesWritten)
-      *outBytesWritten = bytesWritten;
+   {
+      *outBytesWritten = outBytesWritten < 0 ? 0 : bytesWritten;
+   }
 
    return PlatformNetState::getLastError();
 }
