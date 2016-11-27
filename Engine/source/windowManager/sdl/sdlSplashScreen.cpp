@@ -36,29 +36,39 @@ bool Platform::displaySplashWindow( String path )
    if(path.isEmpty())
       return false;
 
+   //TODO: Fix splash screen on MacOS
+   // SDL_Renderer forces GL context to be 2.1 even when using SDL_RENDEER_SOFTWARE
+#ifndef TORQUE_OS_MAC
    gSplashImage = SDL_LoadBMP(path);
 
-   //now the pop-up window
-   gSplashWindow = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-      gSplashImage->w, gSplashImage->h, SDL_WINDOW_BORDERLESS | SDL_WINDOW_SHOWN);
+   if (gSplashImage)
+   {
+      //now the pop-up window
+      gSplashWindow = SDL_CreateWindow("", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+         gSplashImage->w, gSplashImage->h, SDL_WINDOW_BORDERLESS | SDL_WINDOW_SHOWN);
 
-   gSplashRenderer = SDL_CreateRenderer(gSplashWindow, -1, SDL_RENDERER_ACCELERATED);
+      gSplashRenderer = SDL_CreateRenderer(gSplashWindow, -1, SDL_RENDERER_ACCELERATED);
 
-   gSplashTexture = SDL_CreateTextureFromSurface(gSplashRenderer, gSplashImage);
+      gSplashTexture = SDL_CreateTextureFromSurface(gSplashRenderer, gSplashImage);
 
-   SDL_RenderCopy(gSplashRenderer, gSplashTexture, NULL, NULL);
+      SDL_RenderCopy(gSplashRenderer, gSplashTexture, NULL, NULL);
 
-   SDL_RenderPresent(gSplashRenderer);
+      SDL_RenderPresent(gSplashRenderer);
+   }
+#endif
 
 	return true;
 }
 
 bool Platform::closeSplashWindow()
 {
+
+#ifndef TORQUE_OS_MAC
    SDL_DestroyTexture(gSplashTexture);
    SDL_FreeSurface(gSplashImage);
    SDL_DestroyRenderer(gSplashRenderer);
    SDL_DestroyWindow(gSplashWindow);
+#endif
 
    return true;
 }
