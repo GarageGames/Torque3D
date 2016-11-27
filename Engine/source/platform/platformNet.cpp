@@ -1777,13 +1777,12 @@ Net::Error Net::stringToAddress(const char *addressString, NetAddress  *address,
          if (!hostLookup && !hasInterface)
             return NeedHostLookup;
          
-         int ret = 0;
          struct addrinfo hint, *res = NULL;
          dMemset(&hint, 0, sizeof(hint));
          hint.ai_family = actualFamily;
          hint.ai_flags = hostLookup ? 0 : AI_NUMERICHOST;
          
-         if (ret = getaddrinfo(addressString, NULL, &hint, &res) == 0)
+         if (getaddrinfo(addressString, NULL, &hint, &res) == 0)
          {
             if (actualFamily != AF_UNSPEC)
             {
