@@ -25,6 +25,8 @@
 #include "console/console.h"
 #include "math/mMathFn.h"
 #include "math/mRandom.h"
+#include "math/mMath.h"
+#include "math/mathUtils.h"
 
 #include "console/engineAPI.h"
 
@@ -340,4 +342,34 @@ DefineConsoleFunction( mIsPow2, bool, ( S32 v ),,
     "@ingroup Math" )
 {
    return isPow2( v );
+}
+
+DefineConsoleFunction( mRandomDir, Point3F, (Point3F axis, F32 angleMin, F32 angleMax),,
+   "Returns a randomized direction based on a starting axis and the min/max angles.\n"
+   "@param axis Main axis to deviate the direction from."
+   "@param angleMin minimum amount of deviation from the axis."
+   "@param angleMax maximum amount of deviation from the axis."
+   "@returns Randomized direction vector."
+   "@ingroup Math")
+{
+   return MathUtils::randomDir(axis, angleMin, angleMax);
+}
+
+DefineConsoleFunction( mRandomPointInSphere, Point3F, (F32 radius), ,
+   "Returns a randomized point inside a sphere of a given radius.\n"
+   "@param radius The radius of the sphere to find a point in."
+   "@returns Randomized point inside a sphere."
+   "@ingroup Math")
+{
+   return MathUtils::randomPointInSphere(radius);
+}
+
+DefineConsoleFunction( mGetAngleBetweenVectors, F32, (VectorF vecA, VectorF vecB), ,
+   "Returns angle between two vectors.\n"
+   "@param vecA First input vector."
+   "@param vecB Second input vector."
+   "@returns Angle between both vectors in radians."
+   "@ingroup Math")
+{
+   return MathUtils::getAngleBetweenVectors(vecA, vecB);
 }
