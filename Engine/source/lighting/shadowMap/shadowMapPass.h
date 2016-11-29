@@ -84,10 +84,10 @@ public:
    static bool smDisableShadowsEditor;
    static bool smDisableShadowsPref;
 
-   /// milliseconds before static redraw
-   static S32 smStaticShadowUpdateFreq;
-   /// milliseconds before dynamic redraw
-   static S32 smDynamicShadowUpdateFreq;
+   /// distance moved per frame before forcing a shadow update
+   static F32 smShadowsTeleportDist;
+   /// angle turned per frame before forcing a shadow update
+   static F32 smShadowsTurnRate;
 
 private:
 
@@ -112,6 +112,8 @@ private:
    SimObjectPtr<DynamicShadowRenderPassManager> mDynamicShadowRPM;
    LightManager* mLightManager;
    ShadowMapManager* mShadowManager;
+   Point3F mPrevCamPos;
+   Point3F mPrevCamRot;
 };
 
 class ShadowRenderPassManager : public RenderPassManager
