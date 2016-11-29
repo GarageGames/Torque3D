@@ -114,6 +114,7 @@ private:
    ShadowMapManager* mShadowManager;
    Point3F mPrevCamPos;
    Point3F mPrevCamRot;
+   F32 mPrevCamFov;
 };
 
 class ShadowRenderPassManager : public RenderPassManager

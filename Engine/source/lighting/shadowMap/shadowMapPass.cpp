@@ -228,12 +228,14 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
 
    //force an update if we're jumping around (respawning, ect)
    MatrixF curCamMatrix = control->getTransform();
-   if (((curCamMatrix.getPosition() - mPrevCamPos).lenSquared() > mPow(smShadowsTeleportDist, 2)) ||
-       ((curCamMatrix.getForwardVector() - mPrevCamRot).lenSquared() > mPow(smShadowsTurnRate*M_PI_F / 180, 2)))
+   if (((curCamMatrix.getPosition() - mPrevCamPos).lenSquared() > mPow(smShadowsTeleportDist, 2)) || //update if we're teleporting
+       ((curCamMatrix.getForwardVector() - mPrevCamRot).lenSquared() > mPow(smShadowsTurnRate*M_PI_F / 180, 2)) || //update if we're turning too fast
+       (control->getCameraFov()) != mPrevCamFov) //update if we're zooming or unzooming
       forceUpdate = true;
 
    mPrevCamRot = curCamMatrix.getForwardVector();
    mPrevCamPos = curCamMatrix.getPosition();
+   mPrevCamFov = control->getCameraFov();
 
    // 2 Shadow Maps per Light. This may fail.
    for ( U32 i = 0; i < shadowMaps.size(); i += 2 )
