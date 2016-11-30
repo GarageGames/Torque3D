@@ -242,8 +242,17 @@ void Namespace::printNamespaceEntries(Namespace * g, bool dumpScript, bool dumpE
       // If it's a function
       if( eType >= Entry::ConsoleFunctionType )
       {
-         printClassMethod(true, typeNames[eType], funcName, ewalk->getArgumentsString().c_str(),
-            ewalk->getDocString().c_str());
+         if (ewalk->mHeader != NULL)
+         {
+            // The function was defined with types, so we can print out the actual return type
+            printClassMethod(true, ewalk->mHeader->mReturnString, funcName, ewalk->getArgumentsString().c_str(),
+               ewalk->getDocString().c_str());
+         }
+         else
+         {
+            printClassMethod(true, typeNames[eType], funcName, (ewalk->getArgumentsString() + "...").c_str(),
+               ewalk->getDocString().c_str());
+         }
       }
       else if(ewalk->mType == Entry::GroupMarker)
       {
