@@ -337,7 +337,7 @@ class EngineObject;
 /// @param type The C++ class type.
 /// @param doc Documentation string.
 #define IMPLEMENT_CLASS( type, doc )                                                   \
-   DEFINE_CALLIN( fn ## type ## _create, create, type, type*, (),,,                    \
+   DEFINE_CALLIN( fn_ ## type ## _create, create, type, type*, (),,,                    \
       "Create a new " #type " instance.\n"                                             \
       "@return A new " #type " instance with a reference count of 1." )                \
    {                                                                                   \

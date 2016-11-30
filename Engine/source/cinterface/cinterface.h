@@ -26,5 +26,12 @@
 extern "C" {
 
 const char* torque_getexecutablepath(); 
+DLL_DECL void torque_reset();
+DLL_DECL bool torque_engineinit(S32 argc, const char **argv);
+DLL_DECL S32 torque_enginetick();
+DLL_DECL S32 torque_engineshutdown();
 
+DLL_DECL S32 torque_getreturnstatus();
+DLL_DECL void torque_enginesignalshutdown();
+DLL_DECL bool torque_isdebugbuild();
 }

@@ -19,6 +19,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#include "cinterface.h"
 
 #include "platform/platform.h"
 #include "console/compiler.h"
@@ -54,7 +55,7 @@ extern "C" {
 	}
 
    // initialize Torque 3D including argument handling
-	S32 torque_engineinit(S32 argc, const char **argv)
+	bool torque_engineinit(S32 argc, const char **argv)
 	{
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )

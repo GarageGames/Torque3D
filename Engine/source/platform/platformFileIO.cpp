@@ -620,3 +620,8 @@ DefineConsoleFunction( getUserHomeDirectory, const char *, (), , "getUserHomeDir
 {
    return Platform::getUserHomeDirectory();
 }
+
+DefineEngineFunction(setMainDotCsDir, void, (const char* path), , "setMainDotCsDir()")
+{
+   Platform::setMainDotCsDir(StringTable->insert(path));
+}

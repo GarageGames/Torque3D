@@ -451,7 +451,7 @@ class SimObject: public ConsoleObject, public TamlCallbacks
       {
          T* object = new T;
          object->incRefCount();
-         object->registerObject();
+         //object->registerObject();
          return object;
       }
 

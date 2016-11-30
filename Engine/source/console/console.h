@@ -34,6 +34,8 @@
 #endif
 #include <stdarg.h>
 
+#include "engineFunctions.h"
+
 #include "core/util/str.h"
 #include "core/util/journal/journaledSignal.h"
 
@@ -1185,9 +1187,12 @@ public:
       static ConsoleConstructor cfg_ConsoleFunctionGroup_##groupName##_GroupBegin(NULL,#groupName,usage)
 
 #  define ConsoleFunction(name,returnType,minArgs,maxArgs,usage1) \
-   returnType cf_##name(SimObject *, S32, ConsoleValueRef *argv); \
-   ConsoleConstructor cc_##name##_obj(NULL,#name,cf_##name,usage1,minArgs,maxArgs); \
-      returnType cf_##name(SimObject *, S32 argc, ConsoleValueRef *argv)
+   TORQUE_API returnType cf_ ## name ## (SimObject *, S32, ConsoleValueRef *argv); \
+   ConsoleConstructor cc_##name##_obj(NULL,#name,cf_ ## name,usage1,minArgs,maxArgs); \
+   TORQUE_API returnType fn_ ## name ##(S32 argc, const char** argv) { \
+      StringStackConsoleWrapper args(argc, argv); \
+      return cf_ ## name ## (NULL, args.count(), args); } \
+   TORQUE_API   returnType cf_ ## name ## (SimObject *, S32 argc, ConsoleValueRef *argv)
 
 #  define ConsoleToolFunction(name,returnType,minArgs,maxArgs,usage1) \
    returnType ctf_##name(SimObject *, S32, ConsoleValueRef *argv); \
