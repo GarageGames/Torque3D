@@ -1050,12 +1050,12 @@ void ColladaUtils::exportColladaMaterials(TiXmlElement* rootNode, const Optimize
 
       TiXmlElement* initNode = new TiXmlElement("init_from");
       imageNode->LinkEndChild(initNode);
-	  TiXmlText* initText = new TiXmlText(avar("%s", diffuseMap.c_str())); // need the extension to load the texture
+	  TiXmlText* initText = new TiXmlText(avar("file://%s", diffuseMap.c_str())); // need the extension to load the texture
       initNode->LinkEndChild(initText);
 
    }
 
-   // Finally the effects library
+   // Next the effects library
    TiXmlElement* effectLibNode = new TiXmlElement("library_effects");
    rootNode->LinkEndChild(effectLibNode);
 
@@ -1186,7 +1186,7 @@ void ColladaUtils::exportColladaMaterials(TiXmlElement* rootNode, const Optimize
 	  colorRefractionNode->LinkEndChild(colorRefractionNodeText); 
    }
 
-   // Next the material library
+   // Finally the material library
    TiXmlElement* matLibNode = new TiXmlElement("library_materials");
    rootNode->LinkEndChild(matLibNode);
 
