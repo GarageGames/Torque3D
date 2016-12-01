@@ -39,7 +39,7 @@
 #include "console/engineAPI.h"
 #include <stdarg.h>
 #include "platform/threads/mutex.h"
-#include <cinterface/c_interface.h>
+#include "cinterface/cinterface.h"
 
 
 extern StringStack STR;

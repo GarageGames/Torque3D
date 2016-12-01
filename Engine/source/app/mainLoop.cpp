@@ -60,7 +60,7 @@
 
 // For the TickMs define... fix this for T2D...
 #include "T3D/gameBase/processList.h"
-#include <cinterface/c_interface.h>
+#include "cinterface/cinterface.h"
 
 #ifdef TORQUE_ENABLE_VFS
 #include "platform/platformVFS.h"
@@ -442,7 +442,8 @@ bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
 
    bool foundExternalMain = false;
    CInterface::CallMain(&foundExternalMain);
-   if (foundExternalMain) return true;
+   if (foundExternalMain) 
+      return true;
 
 #ifdef TORQUE_ENABLE_VFS
    Zip::ZipArchive *vfs = openEmbeddedVFSArchive();

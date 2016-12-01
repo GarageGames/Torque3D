@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #pragma once
-#include <platform/platformDlibrary.h>
+#include "platform/platformDlibrary.h"
 #include "console/engineAPI.h"
 
 // cinterface can override this (useful for plugins, etc)
@@ -62,7 +62,8 @@ class CInterface {
    void _CallMain(bool *res);
    bool _isMethod(const char* className, const char* methodName);
 public:
-   CInterface() {
+   CInterface() 
+   {
       mFunctionCallback = NULL;
       mMethodCallback = NULL;
       mIsMethodCallback = NULL;
