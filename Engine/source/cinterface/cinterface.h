@@ -37,12 +37,20 @@ DLL_DECL S32 torque_getreturnstatus();
 DLL_DECL void torque_enginesignalshutdown();
 DLL_DECL bool torque_isdebugbuild();
 
-
 DLL_DECL void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void *mainPtr);
 DLL_DECL SimObjectPtr<SimObject>* FindObjectWrapperByName(const char* pName);
 DLL_DECL SimObjectPtr<SimObject>* FindObjectWrapperById(U32 pId);
 DLL_DECL SimObjectPtr<SimObject>* WrapObject(SimObject* pObject);
 DLL_DECL bool fnSimObject_registerObject(SimObject* pObject);
+
+DLL_DECL const char* fn_getConsoleString(const char* name);
+DLL_DECL void fn_setConsoleString(const char* name, const char* value);
+DLL_DECL S32 fn_getConsoleInt(const char* name);
+DLL_DECL void fn_setConsoleInt(const char* name, S32 value);
+DLL_DECL F32 fn_getConsoleFloat(const char* name);
+DLL_DECL void fn_setConsoleFloat(const char* name, F32 value);
+DLL_DECL bool fn_getConsoleBool(const char* name);
+DLL_DECL void fn_setConsoleBool(const char* name, bool value);
 
 }
 

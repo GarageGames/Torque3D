@@ -131,6 +131,46 @@ bool fnSimObject_registerObject(SimObject* pObject)
    return pObject->registerObject();
 }
 
+const char* fn_getConsoleString(const char* name)
+{
+   return Con::getVariable(name);
+   }
+
+void fn_setConsoleString(const char* name, const char* value)
+{
+   Con::setVariable(name, value);
+}
+
+S32 fn_getConsoleInt(const char* name)
+{
+   return Con::getIntVariable(name);
+   }
+
+void fn_setConsoleInt(const char* name, S32 value)
+{
+   Con::setIntVariable(name, value);
+}
+
+F32 fn_getConsoleFloat(const char* name)
+{
+   return Con::getFloatVariable(name);
+   }
+
+void fn_setConsoleFloat(const char* name, F32 value)
+{
+   Con::setFloatVariable(name, value);
+}
+
+bool fn_getConsoleBool(const char* name)
+{
+   return Con::getBoolVariable(name);
+   }
+
+void fn_setConsoleBool(const char* name, bool value)
+{
+   Con::setBoolVariable(name, value);
+}
+
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
    extern S32 CreateMiniDump(LPEXCEPTION_POINTERS ExceptionInfo);
@@ -256,16 +296,6 @@ extern "C" {
 		return false;
 #endif
 
-	}
-
-	S32 torque_getconsolebool(const char* name)
-	{
-		return Con::getBoolVariable(name);
-	}
-
-	void torque_setconsolebool(const char* name, bool value)
-	{
-		Con::setBoolVariable(name, value);
 	}
 
 	static char* gExecutablePath = NULL;
