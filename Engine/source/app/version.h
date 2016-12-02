@@ -42,10 +42,10 @@
 /// code version, the game name, and which type of game it is (TGB, TGE, TGEA, etc.).
 ///
 /// Version number is major * 1000 + minor * 100 + revision * 10.
-#define TORQUE_GAME_ENGINE          1060
+#define TORQUE_GAME_ENGINE          1070
 
 /// Human readable engine version string.
-#define TORQUE_GAME_ENGINE_VERSION_STRING  "1.0.6.0"
+#define TORQUE_GAME_ENGINE_VERSION_STRING  "1.0.7.0"
 
 /// Gets the engine version number.  The version number is specified as a global in version.cc
 U32 getVersionNumber();
