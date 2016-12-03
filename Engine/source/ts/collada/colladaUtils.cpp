@@ -943,7 +943,7 @@ void ColladaUtils::exportColladaHeader(TiXmlElement* rootNode)
 
    TiXmlElement* authorNode = new TiXmlElement("author");
    contributorNode->LinkEndChild(authorNode);
-   TiXmlText* authorNodeText = new TiXmlText("Torque3D User");
+   TiXmlText* authorNodeText = new TiXmlText("Torque3D MIT User");
    authorNode->LinkEndChild(authorNodeText);
 
    TiXmlElement* authoringToolNode = new TiXmlElement("authoring_tool");
@@ -1050,7 +1050,7 @@ void ColladaUtils::exportColladaMaterials(TiXmlElement* rootNode, const Optimize
 
       TiXmlElement* initNode = new TiXmlElement("init_from");
       imageNode->LinkEndChild(initNode);
-	  TiXmlText* initText = new TiXmlText(avar("file://%s", diffuseMap.c_str())); // need the extension to load the texture
+	  TiXmlText* initText = new TiXmlText(avar("file://%s", diffuseMap.c_str())); // "the file://" is needed to load the texture in some old apps (ex: 3ds Max 2009)
       initNode->LinkEndChild(initText);
 
    }
@@ -1087,7 +1087,12 @@ void ColladaUtils::exportColladaMaterials(TiXmlElement* rootNode, const Optimize
       TiXmlElement* initNode2 = new TiXmlElement("init_from");
       surfaceNode->LinkEndChild(initNode2);
       TiXmlText* init2Text = new TiXmlText(avar("%s", matNames[i].c_str()));
-      initNode2->LinkEndChild(init2Text);	  
+      initNode2->LinkEndChild(init2Text);
+
+      TiXmlElement* formatNode = new TiXmlElement("format");
+      surfaceNode->LinkEndChild(formatNode);
+      TiXmlText* formatText = new TiXmlText("A8R8G8B8");
+      formatNode->LinkEndChild(formatText);
 
 	  // ---------------------------
       TiXmlElement* newParam2Node = new TiXmlElement("newparam");
@@ -1108,75 +1113,137 @@ void ColladaUtils::exportColladaMaterials(TiXmlElement* rootNode, const Optimize
       profileNode->LinkEndChild(techniqueNode);
       techniqueNode->SetAttribute("sid", "common");
 
-      TiXmlElement* phongNode = new TiXmlElement("phong");
-      techniqueNode->LinkEndChild(phongNode);
+      TiXmlElement* blinnNode = new TiXmlElement("blinn");
+      techniqueNode->LinkEndChild(blinnNode);
 	  
 	  // ---------------------------
 	  TiXmlElement* emissionNode = new TiXmlElement("emission");
-	  phongNode->LinkEndChild(emissionNode);
+	  blinnNode->LinkEndChild(emissionNode);
 
       TiXmlElement* colorEmissionNode = new TiXmlElement("color");
       emissionNode->LinkEndChild(colorEmissionNode);
 	  colorEmissionNode->SetAttribute("sid", "emission"); 
 
-	  TiXmlText* colorEmissionNodeText = new TiXmlText("0 0 0 1");
+	  TiXmlText* colorEmissionNodeText = new TiXmlText("0.0 0.0 0.0 1.0");
 	  colorEmissionNode->LinkEndChild(colorEmissionNodeText);
 	  
 	  // ---------------------------
 	  TiXmlElement* ambientNode = new TiXmlElement("ambient");
-	  phongNode->LinkEndChild(ambientNode);
+	  blinnNode->LinkEndChild(ambientNode);
 
       TiXmlElement* colorAmbientNode = new TiXmlElement("color");
       ambientNode->LinkEndChild(colorAmbientNode);
 	  colorAmbientNode->SetAttribute("sid", "ambient"); 
 
-	  TiXmlText* colorAmbientNodeText = new TiXmlText("0 0 0 1");
+	  TiXmlText* colorAmbientNodeText = new TiXmlText("0.0 0.0 0.0 1.0");
 	  colorAmbientNode->LinkEndChild(colorAmbientNodeText);	  
 	  
 	  // ---------------------------
 	  TiXmlElement* diffuseNode = new TiXmlElement("diffuse");
-      phongNode->LinkEndChild(diffuseNode);
+      blinnNode->LinkEndChild(diffuseNode);
 	  TiXmlElement* textureDiffuseNode = new TiXmlElement("texture");
       diffuseNode->LinkEndChild(textureDiffuseNode);
 	  textureDiffuseNode->SetAttribute("texture", avar("%s-sampler", matNames[i].c_str()));
 	  textureDiffuseNode->SetAttribute("texcoord", "UVMap");
 	  
-	  // ---------------------------
-      /*TiXmlElement* diffuseNode = new TiXmlElement("diffuse");
-      phongNode->LinkEndChild(diffuseNode);
+      // Extra info useful for getting the texture to show up correctly in MAYA and 3DS Max
+      TiXmlElement* extraNode = new TiXmlElement("extra");
+      textureDiffuseNode->LinkEndChild(extraNode);
 
-      TiXmlElement* colorDiffuseNode = new TiXmlElement("color");
-      diffuseNode->LinkEndChild(colorDiffuseNode);
-	  colorDiffuseNode->SetAttribute("sid", "diffuse");
-		  
-	  TiXmlText* colorDiffuseNodeText = new TiXmlText("0.64 0.64 0.64 1");
-	  colorDiffuseNode->LinkEndChild(colorDiffuseNodeText);*/
+      TiXmlElement* extraTechNode = new TiXmlElement("technique");
+      extraNode->LinkEndChild(extraTechNode);
+      extraTechNode->SetAttribute("profile", "MAYA");
+
+      TiXmlElement* extraWrapUNode = new TiXmlElement("wrapU");
+      extraTechNode->LinkEndChild(extraWrapUNode);
+      extraWrapUNode->SetAttribute("sid", "wrapU0");
+
+      TiXmlText* extraWrapUText = new TiXmlText("TRUE");
+      extraWrapUNode->LinkEndChild(extraWrapUText);
+
+      TiXmlElement* extraWrapVNode = new TiXmlElement("wrapV");
+      extraTechNode->LinkEndChild(extraWrapVNode);
+      extraWrapVNode->SetAttribute("sid", "wrapV0");
+
+      TiXmlText* extraWrapVText = new TiXmlText("TRUE");
+      extraWrapVNode->LinkEndChild(extraWrapVText);
+
+      TiXmlElement* extraBlendNode = new TiXmlElement("blend_mode");
+      extraTechNode->LinkEndChild(extraBlendNode);
+
+      TiXmlText* extraBlendText = new TiXmlText("ADD");
+      extraBlendNode->LinkEndChild(extraBlendText);
 	  
 	  // ---------------------------
       TiXmlElement* specularNode = new TiXmlElement("specular");
-      phongNode->LinkEndChild(specularNode);
+      blinnNode->LinkEndChild(specularNode);
 
       TiXmlElement* colorSpecularNode = new TiXmlElement("color");
       specularNode->LinkEndChild(colorSpecularNode);
 	  colorSpecularNode->SetAttribute("sid", "specular");
 		  
-	  TiXmlText* colorSpecularNodeText = new TiXmlText("0.5 0.5 0.5 1");
+	  TiXmlText* colorSpecularNodeText = new TiXmlText("0.5 0.5 0.5 1.0");
 	  colorSpecularNode->LinkEndChild(colorSpecularNodeText);
 
 	  // ---------------------------	
       TiXmlElement* shininessNode = new TiXmlElement("shininess");
-      phongNode->LinkEndChild(shininessNode);
+      blinnNode->LinkEndChild(shininessNode);
 
       TiXmlElement* colorShininessNode = new TiXmlElement("float");
       shininessNode->LinkEndChild(colorShininessNode);
 	  colorShininessNode->SetAttribute("sid", "shininess");
 		  
-	  TiXmlText* colorShininessNodeText = new TiXmlText("50");
+	  TiXmlText* colorShininessNodeText = new TiXmlText("1.0");
 	  colorShininessNode->LinkEndChild(colorShininessNodeText);
+
+	  // ---------------------------	
+      TiXmlElement* reflectiveNode = new TiXmlElement("reflective");
+      blinnNode->LinkEndChild(reflectiveNode);
+
+      TiXmlElement* colorReflectiveNode = new TiXmlElement("color");
+      reflectiveNode->LinkEndChild(colorReflectiveNode);
+	  colorReflectiveNode->SetAttribute("sid", "reflective");
+		  
+	  TiXmlText* colorReflectiveNodeText = new TiXmlText("0.0 0.0 0.0 1.0");
+	  colorReflectiveNode->LinkEndChild(colorReflectiveNodeText);	  
+
+	  // ---------------------------	
+      TiXmlElement* reflectivityNode = new TiXmlElement("reflectivity");
+      blinnNode->LinkEndChild(reflectivityNode);
+
+      TiXmlElement* floatReflectivityNode = new TiXmlElement("float");
+      reflectivityNode->LinkEndChild(floatReflectivityNode);
+	  floatReflectivityNode->SetAttribute("sid", "reflectivity");
+		  
+	  TiXmlText* floatReflectivityText = new TiXmlText("0.5");
+	  floatReflectivityNode->LinkEndChild(floatReflectivityText);	
+	  
+	  // ---------------------------	
+      TiXmlElement* transparentNode = new TiXmlElement("transparent");
+      blinnNode->LinkEndChild(transparentNode);
+	  transparentNode->SetAttribute("opaque", "RGB_ZERO");
+
+      TiXmlElement* colorTransparentNode = new TiXmlElement("color");
+      transparentNode->LinkEndChild(colorTransparentNode);
+	  colorTransparentNode->SetAttribute("sid", "transparent");
+		  
+	  TiXmlText* colorTransparentNodeText = new TiXmlText("0.0 0.0 0.0 1.0");
+	  colorTransparentNode->LinkEndChild(colorTransparentNodeText);	
+
+	  // ---------------------------	
+      TiXmlElement* transparencyNode = new TiXmlElement("transparency");
+      blinnNode->LinkEndChild(transparencyNode);
+
+      TiXmlElement* floatTransparencyNode = new TiXmlElement("float");
+      transparencyNode->LinkEndChild(floatTransparencyNode);
+	  floatTransparencyNode->SetAttribute("sid", "transparency");
+		  
+	  TiXmlText* floatTransparencyText = new TiXmlText("0.0");
+	  floatTransparencyNode->LinkEndChild(floatTransparencyText);	 
 	  
 	  // ---------------------------	  
       TiXmlElement* refractionNode = new TiXmlElement("index_of_refraction");
-      phongNode->LinkEndChild(refractionNode);
+      blinnNode->LinkEndChild(refractionNode);
 
       TiXmlElement* colorRefractionNode = new TiXmlElement("float");
       refractionNode->LinkEndChild(colorRefractionNode);
@@ -1200,7 +1267,7 @@ void ColladaUtils::exportColladaMaterials(TiXmlElement* rootNode, const Optimize
 
       TiXmlElement* materialNode = new TiXmlElement("material");
       matLibNode->LinkEndChild(materialNode);
-      materialNode->SetAttribute("id", matNames[i].c_str());
+      materialNode->SetAttribute("id", avar("%s-material", matNames[i].c_str()));
       materialNode->SetAttribute("name", matNames[i].c_str());
 
       TiXmlElement* instEffectNode = new TiXmlElement("instance_effect");
@@ -1244,7 +1311,7 @@ void ColladaUtils::exportColladaTriangles(TiXmlElement* meshNode, const Optimize
 
       TiXmlElement* trianglesNode = new TiXmlElement("triangles");
       meshNode->LinkEndChild(trianglesNode);
-      trianglesNode->SetAttribute("material", ( i > -1 ) ? matNames[i].c_str() : "" );
+      trianglesNode->SetAttribute("material", ( i > -1 ) ? avar("%s-material", matNames[i].c_str()) : "" );
       trianglesNode->SetAttribute("count", avar("%d", triangleCount));
 
       TiXmlElement* trianglesVertInputNode = new TiXmlElement("input");
@@ -1511,8 +1578,8 @@ void ColladaUtils::exportColladaScene(TiXmlElement* rootNode, const String& mesh
    {
       TiXmlElement* instMatNode = new TiXmlElement("instance_material");
       techniqueNode->LinkEndChild(instMatNode);
-      instMatNode->SetAttribute("symbol", avar("%s", matNames[i].c_str()));
-      instMatNode->SetAttribute("target", avar("#%s", matNames[i].c_str()));
+      instMatNode->SetAttribute("symbol", avar("%s-material", matNames[i].c_str()));
+      instMatNode->SetAttribute("target", avar("#%s-material", matNames[i].c_str()));
       TiXmlElement* bindVertexNode = new TiXmlElement("bind_vertex_input");
       instMatNode->LinkEndChild(bindVertexNode);
       //bindVertexNode->SetAttribute("semantic", avar("%s-mesh-map-0", meshName.c_str()));
@@ -1521,8 +1588,73 @@ void ColladaUtils::exportColladaScene(TiXmlElement* rootNode, const String& mesh
       bindVertexNode->SetAttribute("input_set", "0"); 
     }
    
-  
- 
+	// Extra info useful for COLLADAMax importer (OpenCOLLADA)
+    TiXmlElement* extraInsGeoNode = new TiXmlElement("extra");
+    nodeNode->LinkEndChild(extraInsGeoNode);
+
+    TiXmlElement* extraInsGeoTechNode = new TiXmlElement("technique");
+    extraInsGeoNode->LinkEndChild(extraInsGeoTechNode);
+    extraInsGeoTechNode->SetAttribute("profile", "OpenCOLLADA");
+
+    TiXmlElement* castShadowsNode = new TiXmlElement("cast_shadows");
+    extraInsGeoTechNode->LinkEndChild(castShadowsNode);
+    castShadowsNode->SetAttribute("sid", "cast_shadows");
+    castShadowsNode->SetAttribute("type", "bool");
+	
+	TiXmlText* castShadowsText = new TiXmlText("1");
+	castShadowsNode->LinkEndChild(castShadowsText);
+	
+	//-----------------------------
+    TiXmlElement* receiveShadowsNode = new TiXmlElement("receive_shadows");
+    extraInsGeoTechNode->LinkEndChild(receiveShadowsNode);
+    receiveShadowsNode->SetAttribute("sid", "receive_shadows");
+    receiveShadowsNode->SetAttribute("type", "bool");
+	
+	TiXmlText* receiveShadowsText = new TiXmlText("1");
+	receiveShadowsNode->LinkEndChild(receiveShadowsText);	
+	
+	//-----------------------------
+    TiXmlElement* primaryVisibiltyNode = new TiXmlElement("primary_visibility");
+    extraInsGeoTechNode->LinkEndChild(primaryVisibiltyNode);
+    primaryVisibiltyNode->SetAttribute("sid", "primary_visibility");
+    primaryVisibiltyNode->SetAttribute("type", "int");
+	
+	TiXmlText* primaryVisibiltyText = new TiXmlText("1");
+	primaryVisibiltyNode->LinkEndChild(primaryVisibiltyText);
+
+	//-----------------------------
+    TiXmlElement* secondaryVisibilityNode = new TiXmlElement("secondary_visibility");
+    extraInsGeoTechNode->LinkEndChild(secondaryVisibilityNode);
+    secondaryVisibilityNode->SetAttribute("sid", "secondary_visibility");
+    secondaryVisibilityNode->SetAttribute("type", "int");
+	
+	TiXmlText* secondaryVisibilityText = new TiXmlText("1");
+	secondaryVisibilityNode->LinkEndChild(secondaryVisibilityText);	
+
+	// Extra info useful for COLLADAMaya importer (OpenCOLLADA)
+    TiXmlElement* extra2InsGeoNode = new TiXmlElement("extra");
+    nodeNode->LinkEndChild(extra2InsGeoNode);
+
+    TiXmlElement* extra2InsGeoTechNode = new TiXmlElement("technique");
+    extra2InsGeoNode->LinkEndChild(extra2InsGeoTechNode);
+    extra2InsGeoTechNode->SetAttribute("profile", "OpenCOLLADAMaya");
+
+    TiXmlElement* mayaNodeId = new TiXmlElement("originalMayaNodeId");
+    extra2InsGeoTechNode->LinkEndChild(mayaNodeId);
+    mayaNodeId->SetAttribute("sid", "originalMayaNodeId");
+    mayaNodeId->SetAttribute("type", "string");
+
+	TiXmlText* mayaNodeIdMesh = new TiXmlText(avar("%s", meshName.c_str()));
+	mayaNodeId->LinkEndChild(mayaNodeIdMesh);	
+
+    TiXmlElement* paramExtraNode = new TiXmlElement("param");
+    extra2InsGeoTechNode->LinkEndChild(paramExtraNode);
+    paramExtraNode->SetAttribute("sid", "colladaId");
+    paramExtraNode->SetAttribute("type", "string");	
+
+	TiXmlText* mayaParamMesh = new TiXmlText(avar("%s", meshName.c_str()));
+	paramExtraNode->LinkEndChild(mayaParamMesh);	
+	
    TiXmlElement* sceneNode = new TiXmlElement("scene");
    rootNode->LinkEndChild(sceneNode);
 
@@ -1550,6 +1682,7 @@ void ColladaUtils::exportToCollada(const Torque::Path& colladaFile, const Optimi
    TiXmlElement* rootNode = new TiXmlElement("COLLADA");
    rootNode->SetAttribute("xmlns", "http://www.collada.org/2005/11/COLLADASchema");
    rootNode->SetAttribute("version", "1.4.1");
+   rootNode->SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 
    // Add the root node to the document
    doc.LinkEndChild(rootNode);

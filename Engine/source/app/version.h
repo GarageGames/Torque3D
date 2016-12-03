@@ -41,7 +41,7 @@
 /// code version, the game name, and which type of game it is (TGB, TGE, TGEA, etc.).
 ///
 /// Version number is major * 1000 + minor * 100 + revision * 10.
-#define TORQUE_GAME_ENGINE          3630
+#define TORQUE_GAME_ENGINE          3900
 
 /// Human readable engine version string.
 #define TORQUE_GAME_ENGINE_VERSION_STRING  "3.10.0"
