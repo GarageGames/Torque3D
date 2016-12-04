@@ -118,7 +118,7 @@ class NPWebPlugin
       addProjectLibInput('ADVAPI32.LIB');
       addProjectLibInput('GDI32.LIB');
       addProjectLibInput('WINMM.LIB');
-      addProjectLibInput('WSOCK32.LIB');
+      addProjectLibInput('WS2_32.LIB');
       addProjectLibInput('vfw32.lib');
       addProjectLibInput('Imm32.lib');
       addProjectLibInput('UnicoWS.lib');

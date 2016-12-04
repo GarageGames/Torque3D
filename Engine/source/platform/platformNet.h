@@ -31,6 +31,8 @@
 #define MAXPACKETSIZE 1500
 #endif
 
+#define TORQUE_NET_DEFAULT_MULTICAST_ADDRESS "ff04::7467::656E::6574::776B"
+
 typedef S32 NetConnectionId;
 
 /// Generic network address
@@ -41,18 +43,130 @@ struct NetAddress
    S32 type;        ///< Type of address (IPAddress currently)
 
    /// Acceptable NetAddress types.
-   enum 
+   enum Type
    {
       IPAddress,
+      IPV6Address,
+
+      IPBroadcastAddress,
+      IPV6MulticastAddress
    };
 
-   U8 netNum[4];    ///< For IP:  sin_addr<br>
-   U8 nodeNum[6];   ///< For IP:  Not used.<br>
-   U16  port;       ///< For IP:  sin_port<br>
+   union
+   {
+      struct {
+         U8 netNum[4];
+      } ipv4;
+
+      struct {
+         U8 netNum[16];
+         U32 netFlow;
+         U32 netScope;
+      } ipv6;
+
+      struct {
+         U8 netNum[16];
+         U8 netFlow[4];
+         U8 netScope[4];
+      } ipv6_raw;
+
+   } address;
+
+   U16 port;
+
+   bool isSameAddress(const NetAddress &other) const
+   {
+	   if (type != other.type)
+		   return false;
+
+      switch (type)
+      {
+      case NetAddress::IPAddress:
+         return (dMemcmp(other.address.ipv4.netNum, address.ipv4.netNum, 4) == 0);
+         break;
+      case NetAddress::IPV6Address:
+         return (dMemcmp(other.address.ipv6.netNum, address.ipv6.netNum, 16) == 0);
+         break;
+      case NetAddress::IPBroadcastAddress:
+         return true;
+         break;
+      case NetAddress::IPV6MulticastAddress:
+         return true;
+         break;
+      }
+
+      return false;
+   }
+
+   bool isSameAddressAndPort(const NetAddress &other) const
+   {
+	   if (type != other.type)
+		   return false;
+
+	   switch (type)
+	   {
+	   case NetAddress::IPAddress:
+		   return (dMemcmp(other.address.ipv4.netNum, address.ipv4.netNum, 4) == 0) && other.port == port;
+		   break;
+	   case NetAddress::IPV6Address:
+		   return (dMemcmp(other.address.ipv6.netNum, address.ipv6.netNum, 16) == 0) && other.port == port;
+		   break;
+	   case NetAddress::IPBroadcastAddress:
+		   return true;
+		   break;
+	   case NetAddress::IPV6MulticastAddress:
+		   return true;
+		   break;
+	   }
+
+	   return false;
+   }
+
+   bool isEqual(const NetAddress &other) const
+   {
+	   if (type != other.type)
+		   return false;
+
+      switch (type)
+      {
+      case NetAddress::IPAddress:
+         return other.port == port && (dMemcmp(other.address.ipv4.netNum, address.ipv4.netNum, 4) == 0);
+         break;
+      case NetAddress::IPV6Address:
+         return other.port == port && other.address.ipv6.netFlow == address.ipv6.netFlow && other.address.ipv6.netScope == address.ipv6.netScope && (dMemcmp(other.address.ipv6.netNum, address.ipv6.netNum, 16) == 0);
+         break;
+      case NetAddress::IPBroadcastAddress:
+         return other.port == port;
+         break;
+      case NetAddress::IPV6MulticastAddress:
+         return other.port == port;
+         break;
+      }
+
+      return false;
+   }
+
+   U32 getHash() const;
 };
 
-typedef S32 NetSocket;
-const NetSocket InvalidSocket = -1;
+class NetSocket
+{
+protected:
+   S32 mHandle;
+
+public:
+   NetSocket() : mHandle(-1) { ; }
+
+   inline void setHandle(S32 handleId) { mHandle = handleId; }
+   inline S32 getHandle() const { return mHandle;  }
+   inline U32 getHash() const { return mHandle; }
+
+   bool operator==(const NetSocket &other) const { return mHandle == other.mHandle; }
+   bool operator!=(const NetSocket &other) const { return mHandle != other.mHandle; }
+
+   static NetSocket fromHandle(S32 handleId) { NetSocket ret; ret.mHandle = handleId; return ret; }
+   static NetSocket INVALID;
+};
 
 /// void event(NetSocket sock, U32 state) 
 typedef JournaledSignal<void(NetSocket,U32)> ConnectionNotifyEvent;
@@ -76,7 +190,8 @@ struct Net
       InvalidPacketProtocol,
       WouldBlock,
       NotASocket,
-      UnknownError
+      UnknownError,
+	  NeedHostLookup
    };
 
    enum ConnectionState {
@@ -87,18 +202,16 @@ struct Net
       Disconnected
    };
 
-   enum Protocol
-   {
-      UDPProtocol,
-      TCPProtocol
-   };
-
    static const S32 MaxPacketDataSize = MAXPACKETSIZE;
 
-   static ConnectionNotifyEvent   smConnectionNotify;
-   static ConnectionAcceptedEvent smConnectionAccept;
-   static ConnectionReceiveEvent  smConnectionReceive;
-   static PacketReceiveEvent      smPacketReceive;
+   static ConnectionNotifyEvent&   getConnectionNotifyEvent();
+   static ConnectionAcceptedEvent& getConnectionAcceptedEvent();
+   static ConnectionReceiveEvent&  getConnectionReceiveEvent();
+   static PacketReceiveEvent&      getPacketReceiveEvent();
+
+   static bool smMulticastEnabled;
+   static bool smIpv4Enabled;
+   static bool smIpv6Enabled;
 
    static bool init();
    static void shutdown();
@@ -116,34 +229,46 @@ struct Net
 
    // Reliable net functions (TCP)
    // all incoming messages come in on the Connected* events
-   static NetSocket openListenPort(U16 port);
+   static NetSocket openListenPort(U16 port, NetAddress::Type = NetAddress::IPAddress);
    static NetSocket openConnectTo(const char *stringAddress); // does the DNS resolve etc.
    static void closeConnectTo(NetSocket socket);
-   static Error sendtoSocket(NetSocket socket, const U8 *buffer, S32 bufferSize);
+   static Error sendtoSocket(NetSocket socket, const U8 *buffer, S32 bufferSize, S32 *bytesWritten=NULL);
 
    static bool compareAddresses(const NetAddress *a1, const NetAddress *a2);
-   static bool stringToAddress(const char *addressString, NetAddress *address);
+   static Net::Error stringToAddress(const char *addressString, NetAddress *address, bool hostLookup=true, int family=0);
    static void addressToString(const NetAddress *address, char addressString[256]);
 
    // lower level socked based network functions
    static NetSocket openSocket();
    static Error closeSocket(NetSocket socket);
 
-   static Error send(NetSocket socket, const U8 *buffer, S32 bufferSize);
+   static Error send(NetSocket socket, const U8 *buffer, S32 bufferSize, S32 *outBytesWritten=NULL);
    static Error recv(NetSocket socket, U8 *buffer, S32 bufferSize, S32 *bytesRead);
 
    static Error connect(NetSocket socket, const NetAddress *address);
    static Error listen(NetSocket socket, S32 maxConcurrentListens);
    static NetSocket accept(NetSocket acceptSocket, NetAddress *remoteAddress);
 
-   static Error bind(NetSocket socket, U16 port);
+   static Error bindAddress(const NetAddress &address, NetSocket socket, bool useUDP=false);
    static Error setBufferSize(NetSocket socket, S32 bufferSize);
    static Error setBroadcast(NetSocket socket, bool broadcastEnable);
    static Error setBlocking(NetSocket socket, bool blockingIO);
 
+   /// Gets the desired default listen address for a specified address type
+   static Net::Error getListenAddress(const NetAddress::Type type, NetAddress *address, bool forceDefaults=false);
+   static void getIdealListenAddress(NetAddress *address);
+
+   // Multicast for ipv6 local net browsing
+   static void enableMulticast();
+   static void disableMulticast();
+   static bool isMulticastEnabled();
+
+   // Protocol state
+   static bool isAddressTypeAvailable(NetAddress::Type addressType);
 
 private:
    static void process();
+   static void processListenSocket(NetSocket socket);
 
 };
 
