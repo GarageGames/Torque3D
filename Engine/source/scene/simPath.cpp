@@ -296,11 +296,12 @@ void Marker::initGFXResources()
    
    smVertexBuffer.set(GFX, 4, GFXBufferTypeStatic);
    GFXVertexPCT* verts = smVertexBuffer.lock();
-   verts[0].point = wedgePoints[0] * 0.25f;
-   verts[1].point = wedgePoints[1] * 0.25f;
-   verts[2].point = wedgePoints[2] * 0.25f;
-   verts[3].point = wedgePoints[3] * 0.25f;
-   verts[0].color = verts[1].color = verts[2].color = verts[3].color = GFXVertexColor(ColorI(0, 255, 0, 255));
+   verts[0].point = wedgePoints[0] * 1.25f;
+   verts[1].point = wedgePoints[1] * 1.25f;
+   verts[2].point = wedgePoints[2] * 1.25f;
+   verts[3].point = wedgePoints[3] * 1.25f;
+   verts[1].color = GFXVertexColor(ColorI(255, 0, 0, 255));
+   verts[0].color = verts[2].color = verts[3].color = GFXVertexColor(ColorI(0, 0, 255, 255));
    smVertexBuffer.unlock();
    
    smPrimitiveBuffer.set(GFX, 24, 12, GFXBufferTypeStatic);
@@ -417,7 +418,7 @@ bool Marker::onAdd()
    if(!Parent::onAdd())
       return false;
 
-   mObjBox = Box3F(Point3F(-.25, -.25, -.25), Point3F(.25, .25, .25));
+   mObjBox = Box3F(Point3F(-1.25, -1.25, -1.25), Point3F(1.25, 1.25, 1.25));
    resetWorldBox();
 
    if(gEditingMission)
