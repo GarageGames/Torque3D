@@ -77,7 +77,7 @@ public:
                                  const MatrixF &localXfm ) = 0;
 
    /// Add a heightfield to the collision shape.
-   virtual bool addHeightfield(  const U16 *heights,
+   virtual bool addHeightfield(  const F32 *heights,
                                  const bool *holes,
                                  U32 blockSize,
                                  F32 metersPerSample,

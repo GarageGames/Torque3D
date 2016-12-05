@@ -44,28 +44,23 @@ class GBitmap;
 ///
 struct TerrainSquare
 {
-   U16 minHeight;
-
-   U16 maxHeight;
-
-   U16 heightDeviance;
+   F32 minHeight;
+   F32 maxHeight;
+   F32 heightDeviance;
 
    U16 flags;
 
-   enum 
+   enum
    {
       Split45  = BIT(0),
-
       Empty    = BIT(1),
-
       HasEmpty = BIT(2),
    };
 };
 
 
-/// NOTE:  The terrain uses 11.5 fixed point which gives
-/// us a height range from 0->2048 in 1/32 increments.
-typedef U16 TerrainHeight;
+/// NOTE:  The terrain uses natural heights.
+typedef F32 TerrainHeight;
 
 
 /// 
@@ -84,9 +79,8 @@ protected:
    /// The layer index at each height map sample.
    Vector<U8> mLayerMap;
 
-   /// The fixed point height map.
-   /// @see fixedToFloat
-   Vector<U16> mHeightMap;
+   /// The natural height map.
+   Vector<F32> mHeightMap;
 
    /// The memory pool used by the grid map layers.
    Vector<TerrainSquare> mGridMapPool;
@@ -117,6 +111,9 @@ protected:
    /// The legacy file loading code.
    void _loadLegacy( FileStream &stream );
 
+   // Load terrain from the format a version 7.
+   void _loadV7( FileStream &stream );
+
    /// Used to populate the materail vector by finding the 
    /// TerrainMaterial objects by name.
    void _resolveMaterials( const Vector<String> &materials );
@@ -131,7 +128,11 @@ public:
 
    enum Constants
    {
-      FILE_VERSION = 7
+      // V7  Store heights as int. Limitation on height is 2047.
+      // V8  Store heights as float. Any height is set up (natural height).
+      //     @todo Verify a behavior with the negative heights.
+      // @see save(), load()
+      FILE_VERSION = 8
    };
 
    TerrainFile();
@@ -147,6 +148,9 @@ public:
    static TerrainFile* load( const Torque::Path &path );
 
    bool save( const char *filename );
+
+   // @return 0 when file is inaccessible.
+   static U8 version( const Torque::Path &path );
 
    ///
    void import(   const GBitmap &heightMap, 
@@ -175,19 +179,19 @@ public:
 
    bool isEmptyAt( U32 x, U32 y ) const { return getLayerIndex( x, y ) == U8_MAX; }
 
-   void setHeight( U32 x, U32 y, U16 height );
+   void setHeight( U32 x, U32 y, F32 height );
 
-   const U16* getHeightAddress( U32 x, U32 y ) const;
+   const F32* getHeightAddress( U32 x, U32 y ) const;
 
-   U16 getHeight( U32 x, U32 y ) const;
+   F32 getHeight( U32 x, U32 y ) const;
 
-   U16 getMaxHeight() const { return mGridMap[mGridLevels]->maxHeight; }
+   F32 getMaxHeight() const { return mGridMap[mGridLevels]->maxHeight; }
 
    /// Returns the constant heightmap vector.
-   const Vector<U16>& getHeightMap() const { return mHeightMap; }
+   const Vector<F32>& getHeightMap() const { return mHeightMap; }
 
    /// Sets a new heightmap state.
-   void setHeightMap( const Vector<U16> &heightmap, bool updateCollision );
+   void setHeightMap( const Vector<F32> &heightmap, bool updateCollision );
 
    /// Check if the given point is valid within the (non-tiled) terrain file.
    bool isPointInTerrain( U32 x, U32 y ) const;
@@ -204,21 +208,21 @@ inline TerrainSquare* TerrainFile::findSquare( U32 level, U32 x, U32 y ) const
    return mGridMap[level] + x + ( y << ( mGridLevels - level ) );
 }
 
-inline void TerrainFile::setHeight( U32 x, U32 y, U16 height )
+inline void TerrainFile::setHeight( U32 x, U32 y, F32 height )
 {
    x %= mSize;
    y %= mSize;
    mHeightMap[ x + ( y * mSize ) ] = height;
 }
 
-inline const U16* TerrainFile::getHeightAddress( U32 x, U32 y ) const
+inline const F32* TerrainFile::getHeightAddress( U32 x, U32 y ) const
 {
    x %= mSize;
    y %= mSize;
    return &mHeightMap[ x + ( y * mSize ) ];
 }
 
-inline U16 TerrainFile::getHeight( U32 x, U32 y ) const
+inline F32 TerrainFile::getHeight( U32 x, U32 y ) const
 {
    x %= mSize;
    y %= mSize;
@@ -260,17 +264,12 @@ inline StringTableEntry TerrainFile::getMaterialName( U32 x, U32 y) const
 }
 
 
-/// Conversion from 11.5 fixed point to floating point.
-inline F32 fixedToFloat( U16 val )
-{
-   return F32(val) * 0.03125f;
+inline F32 getKFixedToFloat() {
+   // NOTE: 1 / 32 = 0.03125
+   return 32.0f;
 }
 
-/// Conversion from floating point to 11.5 fixed point.
-inline U16 floatToFixed( F32 val )
-{
-   return U16(val * 32.0 + 0.5f);
-}
+
 
 inline bool TerrainFile::isPointInTerrain( U32 x, U32 y ) const
 {

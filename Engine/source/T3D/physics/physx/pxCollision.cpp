@@ -209,7 +209,7 @@ bool PxCollision::addTriangleMesh(  const Point3F *vert,
    return true;
 }
 
-bool PxCollision::addHeightfield(   const U16 *heights,
+bool PxCollision::addHeightfield(   const F32 *heights,
                                     const bool *holes,
                                     U32 blockSize,
                                     F32 metersPerSample,
@@ -266,9 +266,8 @@ bool PxCollision::addHeightfield(   const U16 *heights,
    // Destroy the temp sample array.
    delete [] heightFieldDesc.samples;   
 
-   // TerrainBlock uses a 11.5 fixed point height format
-   // giving it a maximum height range of 0 to 2048.
-   desc->heightScale = 0.03125f;
+   // @todo optimize Escape collision-clases from the 'heightScale'.
+   desc->heightScale = 1.0f;
 
    desc->rowScale = metersPerSample;  
    desc->columnScale = metersPerSample;  

@@ -1084,7 +1084,7 @@ F32 TerrainEditor::getGridHeight(const GridPoint & gPoint)
    Point2I cPos;
    gridToCenter( gPoint.gridPos, cPos );
    const TerrainFile *file = gPoint.terrainBlock->getFile();
-   return fixedToFloat( file->getHeight( cPos.x, cPos.y ) );
+   return file->getHeight( cPos.x, cPos.y );
 }
 
 void TerrainEditor::gridUpdateComplete( bool materialChanged )

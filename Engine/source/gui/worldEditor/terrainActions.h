@@ -337,7 +337,7 @@ protected:
 
    F32 mFactor;
 
-   Vector<U16> mUnsmoothedHeights;
+   Vector<F32> mUnsmoothedHeights;
 
 public:
 

@@ -39,9 +39,9 @@ bool TerrainBlock::exportHeightMap( const UTF8 *filePath, const String &format )
 
    // First capture the max height... we'll normalize 
    // everything to this value.
-   U16 maxHeight = 0;
+   F32 maxHeight = -std::numeric_limits< F32 >::max();
 
-   Vector<const U16>::iterator iBits = mFile->mHeightMap.begin();
+   auto iBits = mFile->mHeightMap.begin();
    for ( S32 y = 0; y < mFile->mSize; y++ )
    {
       for ( S32 x = 0; x < mFile->mSize; x++ )
@@ -60,7 +60,7 @@ bool TerrainBlock::exportHeightMap( const UTF8 *filePath, const String &format )
       for ( S32 x = 0; x < mFile->mSize; x++ )
       {
          // PNG expects big endian.
-         U16 height = (U16)( ( (F32)(*iBits) / (F32)maxHeight ) * (F32)U16_MAX );
+         const U16 height = (U16)( ( (*iBits) / maxHeight ) * (F32)U16_MAX );
          *oBits = convertHostToBEndian( height );
          ++oBits;
          ++iBits;
@@ -83,8 +83,8 @@ bool TerrainBlock::exportHeightMap( const UTF8 *filePath, const String &format )
    // Print out the map size in meters, so that the user 
    // knows what values to use when importing it into 
    // another terrain tool.
-   S32 dim = mSquareSize * mFile->mSize;
-   S32 height = fixedToFloat( maxHeight );
+   const S32 dim = mSquareSize * mFile->mSize;
+   const S32 height = maxHeight;
    Con::printf( "Saved heightmap with dimensions %d x %d x %d.", dim, dim, height );
 
    return true;
