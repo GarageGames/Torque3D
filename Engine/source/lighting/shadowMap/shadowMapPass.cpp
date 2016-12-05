@@ -39,6 +39,7 @@
 #include "gfx/gfxDebugEvent.h"
 #include "platform/platformTimer.h"
 
+#include "T3D/gameBase/gameConnection.h"
 
 const String ShadowMapPass::PassTypeName("ShadowMap");
 
@@ -55,11 +56,10 @@ bool ShadowMapPass::smDisableShadows = false;
 bool ShadowMapPass::smDisableShadowsEditor = false;
 bool ShadowMapPass::smDisableShadowsPref = false;
 
-/// milliseconds before static redraw
-S32 ShadowMapPass::smStaticShadowUpdateFreq = 32;
-/// milliseconds before dynamic redraw
-S32 ShadowMapPass::smDynamicShadowUpdateFreq = 16;
-
+/// distance moved per frame before forcing a shadow update
+F32 ShadowMapPass::smShadowsTeleportDist = 4;
+/// angle turned per frame before forcing a shadow update
+F32 ShadowMapPass::smShadowsTurnRate = 1;
 /// We have a default 8ms render budget for shadow rendering.
 U32 ShadowMapPass::smRenderBudgetMs = 8;
 
@@ -89,7 +89,8 @@ ShadowMapPass::ShadowMapPass(LightManager* lightManager, ShadowMapManager* shado
    mDynamicShadowRPM->addManager( new RenderImposterMgr( 0.6f, 0.6f )  );
 
    mActiveLights = 0;
-
+   mPrevCamPos = Point3F::Zero;
+   mPrevCamRot = Point3F::Zero;
    mTimer = PlatformTimer::create();
 
    Con::addVariable( "$ShadowStats::activeMaps", TypeS32, &smActiveShadowMaps,
@@ -214,6 +215,28 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
    mTimer->getElapsedMs();
    mTimer->reset();
 
+   // Must have a connection and control object
+   GameConnection* conn = GameConnection::getConnectionToServer();
+   if (!conn)
+      return;
+
+   GameBase * control = dynamic_cast<GameBase*>(conn->getControlObject());
+   if (!control)
+      return;
+
+   bool forceUpdate = false;
+
+   //force an update if we're jumping around (respawning, ect)
+   MatrixF curCamMatrix = control->getTransform();
+   if (((curCamMatrix.getPosition() - mPrevCamPos).lenSquared() > mPow(smShadowsTeleportDist, 2)) || //update if we're teleporting
+       ((curCamMatrix.getForwardVector() - mPrevCamRot).lenSquared() > mPow(smShadowsTurnRate*M_PI_F / 180, 2)) || //update if we're turning too fast
+       (control->getCameraFov()) != mPrevCamFov) //update if we're zooming or unzooming
+      forceUpdate = true;
+
+   mPrevCamRot = curCamMatrix.getForwardVector();
+   mPrevCamPos = curCamMatrix.getPosition();
+   mPrevCamFov = control->getCameraFov();
+
    // 2 Shadow Maps per Light. This may fail.
    for ( U32 i = 0; i < shadowMaps.size(); i += 2 )
    {
@@ -226,8 +249,8 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
 		 mShadowManager->setLightShadowMap(lsm);
          mShadowManager->setLightDynamicShadowMap( dlsm );
 
-		 lsm->render(mShadowRPM, diffuseState, false);
-		 dlsm->render(mDynamicShadowRPM, diffuseState, true);
+         lsm->render(mShadowRPM, diffuseState, false, forceUpdate);
+         dlsm->render(mDynamicShadowRPM, diffuseState, true, forceUpdate);
 
          ++smUpdatedShadowMaps;
       }
