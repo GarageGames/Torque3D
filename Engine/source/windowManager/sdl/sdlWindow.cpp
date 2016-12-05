@@ -342,7 +342,7 @@ bool PlatformWindowSDL::isFocused()
    if( flags & SDL_WINDOW_INPUT_FOCUS || flags & SDL_WINDOW_INPUT_GRABBED || flags & SDL_WINDOW_MOUSE_FOCUS )
       return true;
 
-	return true;
+   return false;
 }
 
 bool PlatformWindowSDL::isMinimized()
