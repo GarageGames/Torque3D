@@ -40,6 +40,8 @@
 #include "util/messaging/message.h"
 #include "core/frameAllocator.h"
 
+#include "cinterface/cinterface.h"
+
 #ifndef TORQUE_TGB_ONLY
 #include "materials/materialDefinition.h"
 #include "materials/materialManager.h"
@@ -1701,7 +1703,7 @@ breakContinue:
             // Try to look it up.
             ns = Namespace::find(fnNamespace);
             nsEntry = ns->lookup(fnName);
-            if(!nsEntry)
+            if(!CInterface::GetCInterface().isMethod(fnNamespace, fnName) && !nsEntry)
             {
                ip+= 5;
                Con::warnf(ConsoleLogEntry::General,
@@ -1749,6 +1751,9 @@ breakContinue:
 
             const char *componentReturnValue = "";
 
+            bool cFunctionRes = false;
+            const char* cRetRes = NULL;
+
             if(callType == FuncCallExprNode::FunctionCall) 
             {
                if( !nsEntry )
@@ -1765,6 +1770,9 @@ breakContinue:
                   ns = NULL;
                }
                ns = NULL;
+
+               StringStackWrapper args(callArgc - 1, callArgv + 1);
+               cRetRes = CInterface::GetCInterface().CallFunction(fnName, args.argv, args.argc, &cFunctionRes);
             }
             else if(callType == FuncCallExprNode::MethodCall)
             {
@@ -1795,6 +1803,9 @@ breakContinue:
                   nsEntry = ns->lookup(fnName);
                else
                   nsEntry = NULL;
+
+               StringStackWrapper args(callArgc - 1, callArgv + 1);
+               cRetRes = CInterface::GetCInterface().CallMethod(gEvalState.thisObject, fnName, args.argv, args.argc, &cFunctionRes);
             }
             else // it's a ParentCall
             {
@@ -1821,7 +1832,7 @@ breakContinue:
                nsUsage = nsEntry->mUsage;
                routingId = 0;
             }
-            if(!nsEntry || noCalls)
+            if(!cFunctionRes && (!nsEntry || noCalls))
             {
                if(!noCalls && !( routingId == MethodOnComponent ) )
                {
@@ -1843,12 +1854,41 @@ breakContinue:
 
                break;
             }
-            if(nsEntry->mType == Namespace::Entry::ConsoleFunctionType)
+
+            if (cFunctionRes)
             {
                ConsoleValueRef ret;
-               if(nsEntry->mFunctionOffset)
-                  ret = nsEntry->mCode->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage);
+               StringStackConsoleWrapper retVal(1, &cRetRes);
+               ret = retVal.argv[0];
+               STR.popFrame();
+               // Functions are assumed to return strings, so look ahead to see if we can skip the conversion
+               if (code[ip] == OP_STR_TO_UINT)
+               {
+                  ip++;
+                  intStack[++_UINT] = (U32)((S32)ret);
+               }
+               else if (code[ip] == OP_STR_TO_FLT)
+               {
+                  ip++;
+                  floatStack[++_FLT] = (F32)ret;
+               }
+               else if (code[ip] == OP_STR_TO_NONE)
+               {
+                  STR.setStringValue(ret.getStringValue());
+                  ip++;
+               }
+               else
+                  STR.setStringValue((const char*)ret);
 
+               // This will clear everything including returnValue
+               CSTK.popFrame();
+               //STR.clearFunctionOffset();
+            }
+            else if(nsEntry->mType == Namespace::Entry::ConsoleFunctionType)
+            {
+               ConsoleValueRef ret;
+               if (nsEntry->mFunctionOffset)
+                  ret = nsEntry->mCode->exec(nsEntry->mFunctionOffset, fnName, nsEntry->mNamespace, callArgc, callArgv, false, nsEntry->mPackage);
                STR.popFrame();
                // Functions are assumed to return strings, so look ahead to see if we can skip the conversion
                if(code[ip] == OP_STR_TO_UINT)
