@@ -1216,6 +1216,9 @@ public:
          conmethod_return_##returnType ) cm_##className##_##name(static_cast<className*>(object),argc,argv); \
       };                                                                                              \
       ConsoleConstructor cc_##className##_##name##_obj(#className,#name,cm_##className##_##name##_caster,usage1,minArgs,maxArgs); \
+   TORQUE_API returnType fn##className##_##name(className* object, S32 argc, const char** argv) { \
+      StringStackConsoleWrapper args(argc, argv); \
+      return cm_##className##_##name(object, args.argc, args.argv); } \
       inline returnType cm_##className##_##name(className *object, S32 argc, ConsoleValueRef *argv)
 
 #  define ConsoleStaticMethod(className,name,returnType,minArgs,maxArgs,usage1) \
