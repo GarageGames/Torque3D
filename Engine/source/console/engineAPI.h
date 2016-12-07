@@ -2594,31 +2594,31 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K, L 
 /// }
 /// @endcode
 #define DefineEngineFunction( name, returnType, args, defaultArgs, usage )                                                       \
-   TORQUE_API returnType fn_ ## name args;                                                                            \
-   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## name                                                         \
+   returnType fn_ ## name ## _impl ## args;                                                                            \
+   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn_ ## name                                                         \
       ( _EngineFunctionTrampoline< returnType args >::Args a )                                                                   \
    {                                                                                                                             \
       _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                        \
-         _EngineFunctionTrampoline< returnType args >::jmp( fn_ ## name ##, a )                                             \
+         _EngineFunctionTrampoline< returnType args >::jmp( fn_ ## name ## _impl, a )                                             \
       );                                                                                                                         \
    }                                                                                                                             \
-   static _EngineFunctionDefaultArguments< void args > fn_ ## name ## DefaultArgs defaultArgs;                                   \
-   static EngineFunctionInfo fn_ ## name ## FunctionInfo(                                                                        \
+   static _EngineFunctionDefaultArguments< void args > fn_ ## name ## _impl ## DefaultArgs defaultArgs;                                   \
+   static EngineFunctionInfo fn_ ## name ## _impl ## FunctionInfo(                                                                        \
       #name,                                                                                                                     \
       &_SCOPE<>()(),                                                                                                             \
       usage,                                                                                                                     \
       #returnType " " #name #args,                                                                                               \
       "fn" #name,                                                                                                                \
       TYPE< returnType args >(),                                                                                                 \
-      &fn_ ## name ## DefaultArgs,                                                                                               \
-      ( void* ) &fn ## name,                                                                                                     \
+      &fn_ ## name ## _impl ## DefaultArgs,                                                                                               \
+      ( void* ) &fn_ ## name ## _impl,                                                                                                     \
       0                                                                                                                          \
    );                                                                                                                            \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## name ## caster( SimObject*, S32 argc, ConsoleValueRef *argv )       \
    {                                                                                                                             \
       return _EngineConsoleThunkType< returnType >::ReturnType( _EngineConsoleThunk< 1, returnType args >::thunk(                \
-         argc, argv, &fn_##name, fn_ ## name ## DefaultArgs                                                            \
+         argc, argv, &fn_ ## name ## _impl, fn_ ## name ## _impl ## DefaultArgs                                                            \
       ) );                                                                                                                       \
    }                                                                                                                             \
    static ConsoleFunctionHeader _ ## name ## header                                                                              \
@@ -2629,7 +2629,7 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K, L 
          _EngineConsoleThunk< 1, returnType args >::NUM_ARGS,                                                                    \
          false, &_ ## name ## header                                                                                             \
       );                                                                                                                         \
-   TORQUE_API returnType fn_ ## name args
+   returnType fn_ ## name ## _impl ## args
    
    
 // The next thing is a bit tricky.  DefineEngineMethod allows to make the 'object' (=this) argument to the function
@@ -2775,12 +2775,20 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K, L 
 // these macros can be removed and all definitions that make use of them can be removed
 // as well.
 #define DefineConsoleFunction( name, returnType, args, defaultArgs, usage )                                                      \
-   TORQUE_API returnType fn_ ## name args;                                                                            \
-   static _EngineFunctionDefaultArguments< void args > fn_ ## name ## DefaultArgs defaultArgs;                                   \
+   returnType fn_ ## name ## _impl ## args;                                                                            \
+   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn_ ## name                                                         \
+      ( _EngineFunctionTrampoline< returnType args >::Args a )                                                                   \
+   {                                                                                                                             \
+      _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
+      return EngineTypeTraits< returnType >::ReturnValue(                                                                        \
+         _EngineFunctionTrampoline< returnType args >::jmp( fn_ ## name ## _impl, a )                                             \
+      );                                                                                                                         \
+   }                                                                                                                             \
+   static _EngineFunctionDefaultArguments< void args > fn_ ## name ## _impl ## DefaultArgs defaultArgs;                                   \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## name ## caster( SimObject*, S32 argc, ConsoleValueRef *argv )       \
    {                                                                                                                             \
       return _EngineConsoleThunkType< returnType >::ReturnType( _EngineConsoleThunk< 1, returnType args >::thunk(                \
-         argc, argv, &fn_##name, fn_ ## name ## DefaultArgs                                                            \
+         argc, argv, &fn_ ## name ## _impl, fn_ ## name ## _impl ## DefaultArgs                                                            \
       ) );                                                                                                                       \
    }                                                                                                                             \
    static ConsoleFunctionHeader _ ## name ## header                                                                              \
@@ -2791,7 +2799,7 @@ struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K, L 
          _EngineConsoleThunk< 1, returnType args >::NUM_ARGS,                                                                    \
          false, &_ ## name ## header                                                                                             \
       );                                                                                                                         \
-   TORQUE_API returnType fn_ ## name args
+   returnType fn_ ## name ## _impl ## args
 
 #define DefineConsoleMethod( className, name, returnType, args, defaultArgs, usage )                                                            \
    struct _ ## className ## name ## frame                                                                                                       \
