@@ -140,13 +140,13 @@ float3x3 quatToMat( float4 quat )
 ///
 float2 parallaxOffset(TORQUE_SAMPLER2D(texMap), float2 texCoord, float3 negViewTS, float depthScale)
 {
-   float depth = TORQUE_TEX2D(texMap, texCoord).a;
-   float2 offset = negViewTS.xy * (depth * depthScale);
+   float depth = TORQUE_TEX2D(texMap, texCoord).a/(PARALLAX_REFINE_STEPS*2);
+   float2 offset = negViewTS.xy * (depth * depthScale)/(PARALLAX_REFINE_STEPS);
 
    for (int i = 0; i < PARALLAX_REFINE_STEPS; i++)
    {
-      depth = (depth + TORQUE_TEX2D(texMap, texCoord + offset).a) * 0.5;
-      offset = negViewTS.xy * (depth * depthScale);
+      depth = (depth + TORQUE_TEX2D(texMap, texCoord + offset).a)/(PARALLAX_REFINE_STEPS*2);
+      offset = negViewTS.xy * (depth * depthScale)/(PARALLAX_REFINE_STEPS);
    }
 
    return offset;
@@ -155,13 +155,13 @@ float2 parallaxOffset(TORQUE_SAMPLER2D(texMap), float2 texCoord, float3 negViewT
 /// Same as parallaxOffset but for dxtnm where depth is stored in the red channel instead of the alpha
 float2 parallaxOffsetDxtnm(TORQUE_SAMPLER2D(texMap), float2 texCoord, float3 negViewTS, float depthScale)
 {
-   float depth = TORQUE_TEX2D(texMap, texCoord).r;
-   float2 offset = negViewTS.xy * (depth * depthScale);
+   float depth = TORQUE_TEX2D(texMap, texCoord).r/(PARALLAX_REFINE_STEPS*2);
+   float2 offset = negViewTS.xy * (depth * depthScale)/(PARALLAX_REFINE_STEPS*2);
 
    for (int i = 0; i < PARALLAX_REFINE_STEPS; i++)
    {
-      depth = (depth + TORQUE_TEX2D(texMap, texCoord + offset).r) * 0.5;
-      offset = negViewTS.xy * (depth * depthScale);
+      depth = (depth + TORQUE_TEX2D(texMap, texCoord + offset).r)/(PARALLAX_REFINE_STEPS*2);
+      offset = negViewTS.xy * (depth * depthScale)/(PARALLAX_REFINE_STEPS*2);
    }
 
    return offset;
