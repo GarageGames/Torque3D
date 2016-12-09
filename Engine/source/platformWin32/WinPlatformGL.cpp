@@ -11,9 +11,9 @@ void PlatformGL::setVSync(const int i)
       {
          if (i == 1 || i == -1)
          {
-            int ret = wglSwapIntervalEXT(-1);
+            BOOL ret = wglSwapIntervalEXT(-1);
 
-            if (ret == -1)
+            if (!ret)
                wglSwapIntervalEXT(1);
          }
          else
