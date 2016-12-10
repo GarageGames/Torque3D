@@ -67,8 +67,6 @@ LangElement * ShaderFeatureGLSL::setupTexSpaceMat( Vector<ShaderComponent*> &, /
    {
       if(dStricmp((char*)T->type, "vec4") == 0)
          meta->addStatement( new GenOp( "   tSetMatrixRow(@, 1, cross( @, normalize(@) ) * @.w);\r\n", *texSpaceMat, T, N, T ) );
-      else if(tangentW)
-         meta->addStatement( new GenOp( "   tSetMatrixRow(@, 1, cross( @, normalize(@) ) * @);\r\n", *texSpaceMat, T, N, tangentW ) );
       else
          meta->addStatement( new GenOp( "   tSetMatrixRow(@, 1, cross( @, normalize(@) ));\r\n", *texSpaceMat, T, N ) );
    }

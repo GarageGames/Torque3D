@@ -838,7 +838,7 @@ void NavMesh::buildNextTile()
          ctx->stopTimer(RC_TIMER_TOTAL);
          if(getEventManager())
          {
-            String str = String::ToString("%d %.3f", getId(), ctx->getAccumulatedTime(RC_TIMER_TOTAL) / 1000.0f);
+            String str = String::ToString("%d", getId());
             getEventManager()->postEvent("NavMeshUpdate", str.c_str());
             setMaskBits(LoadFlag);
          }

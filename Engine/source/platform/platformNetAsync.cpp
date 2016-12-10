@@ -53,7 +53,7 @@ struct NetAsync::NameLookupRequest
 
       NameLookupRequest()
       {
-         sock = InvalidSocket;
+         sock = NetSocket::INVALID;
          remoteAddr[0] = 0;
          out_h_addr[0] = 0;
          out_h_length = -1;
@@ -81,9 +81,12 @@ protected:
    virtual void execute()
    {
 #ifndef TORQUE_OS_XENON
+
+	  NetAddress address;
+	  Net::Error error = Net::stringToAddress(mRequest.remoteAddr, &address, true);
+
       // do it
-      struct hostent* hostent = gethostbyname(mRequest.remoteAddr);
-      if (hostent == NULL)
+      if (error != Net::NoError)
       {
          // oh well!  leave the lookup data unmodified (h_length) should
          // still be -1 from initialization
@@ -94,9 +97,9 @@ protected:
          // copy the stuff we need from the hostent 
          dMemset(mRequest.out_h_addr, 0, 
             sizeof(mRequest.out_h_addr));
-         dMemcpy(mRequest.out_h_addr, hostent->h_addr, hostent->h_length);
+         dMemcpy(mRequest.out_h_addr, &address, sizeof(address));
 
-         mRequest.out_h_length = hostent->h_length;
+		 mRequest.out_h_length = sizeof(address);
          mRequest.complete = true;
       }
 #else
@@ -159,7 +162,7 @@ void NetAsync::queueLookup(const char* remoteAddr, NetSocket socket)
    ThreadPool::GLOBAL().queueWorkItem( workItem );
 }
 
-bool NetAsync::checkLookup(NetSocket socket, char* out_h_addr, 
+bool NetAsync::checkLookup(NetSocket socket, void* out_h_addr, 
                            S32* out_h_length, S32 out_h_addr_size)
 {
    bool found = false;

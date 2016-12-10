@@ -1032,6 +1032,18 @@ DefineConsoleFunction( VectorLerp, VectorF, ( VectorF a, VectorF b, F32 t ),,
    return c;
 }
 
+DefineConsoleFunction(VectorReflect, VectorF, (VectorF vec, VectorF normal), ,
+   "Compute the reflection of a vector based on a normal.\n"
+   "@param a The vector.\n"
+   "@param b The normal.\n"
+   "@return The reflected vector.\n\n"
+   "@ingroup Vectors")
+{
+   normal.normalize();
+
+   return MathUtils::reflect(vec, normal);
+}
+
 //-----------------------------------------------------------------------------
 
 DefineConsoleFunction( MatrixCreate, TransformF, ( VectorF position, AngAxisF orientation ),,

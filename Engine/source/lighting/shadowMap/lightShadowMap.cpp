@@ -304,13 +304,16 @@ bool LightShadowMap::setTextureStage( U32 currTexFlag, LightingShaderConstants* 
    return false;
 }
 
-void LightShadowMap::render(  RenderPassManager* renderPass,
-                              const SceneRenderState *diffuseState,
-                              bool _dynamic)
+void LightShadowMap::render(RenderPassManager* renderPass,
+   const SceneRenderState *diffuseState,
+   bool _dynamic, bool _forceUpdate)
 {
-    //  control how often shadow maps are refreshed
-    if (!_dynamic && (mStaticRefreshTimer->getElapsedMs() < getLightInfo()->getStaticRefreshFreq()))
-        return;
+   if (!_forceUpdate)
+   {
+      //  control how often shadow maps are refreshed
+      if (!_dynamic && (mStaticRefreshTimer->getElapsedMs() < getLightInfo()->getStaticRefreshFreq()))
+         return;
+   }
     mStaticRefreshTimer->reset();
 
     /* TODO: find out why this is causing issue with translucent objects
