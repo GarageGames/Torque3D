@@ -34,6 +34,30 @@ class FileDialog; // TODO SDL REMOVE
 /// SDL2 implementation of the window manager interface.
 class PlatformWindowManagerSDL : public PlatformWindowManager
 {
+public:
+   /// An enum that holds an event loop frame of the state of the
+   /// keyboard for how the keyboard is interpreted inside of Torque.
+   ///
+   /// SDL has a concept of text editing events as well as raw input
+   /// events. Because of this, SDL needs notified whenever it needs
+   /// to fire text based events. SDL will continue firing raw input
+   /// events as well during this time.
+   ///
+   /// The reason why this was created is because we needed time to
+   /// transition between raw input to raw input + text based events.
+   /// If we take a raw input and notify SDL we wanted text during the
+   /// event loop, SDL will issue a text input event as well. This was
+   /// causing issues with the console, where the console key would be
+   /// appended to the console buffer upon opening it. We fix this by
+   /// delaying the notification to SDL until the event loop is complete.
+   enum class KeyboardInputState
+   {
+      NONE = 0,       /// < No state change during this event loop cycle.
+      TEXT_INPUT = 1, /// < We want to change to text based events & raw input.
+      RAW_INPUT = 2   /// < We only want raw input.
+   };
+
+protected:
    friend class PlatformWindowSDL;
    friend class FileDialog; // TODO SDL REMOVE
 
@@ -69,6 +93,10 @@ class PlatformWindowManagerSDL : public PlatformWindowManager
 
    SignalSlot<void()> mOnProcessSignalSlot;
 
+   /// The input state that will change whenever SDL needs notified.
+   /// After it is handled, it will return to state NONE.
+   KeyboardInputState mInputState;
+
 public:
    PlatformWindowManagerSDL();
    ~PlatformWindowManagerSDL();
@@ -100,6 +128,12 @@ public:
    virtual void raiseCurtain();
 
    virtual void setDisplayWindow(bool set) { mDisplayWindow = set; }
+
+   /// Stores the input state so that the event loop will fire a check if we need
+   /// to change how keyboard input is being handled.
+   /// @param state The state of the keyboard input, either being raw input or text
+   ///  based input.
+   void updateSDLTextInputState(KeyboardInputState state);
 };
 
 #endif

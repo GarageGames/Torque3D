@@ -607,8 +607,10 @@ const UTF16 *PlatformWindowSDL::getCurtainWindowClassName()
 void PlatformWindowSDL::setKeyboardTranslation(const bool enabled)
 {
    mEnableKeyboardTranslation = enabled;
-   if (mEnableKeyboardTranslation)
-      SDL_StartTextInput();
+
+   // Flag for update. Let SDL know what kind of input state we are changing to.
+   if (enabled)
+      mOwningManager->updateSDLTextInputState(PlatformWindowManagerSDL::KeyboardInputState::TEXT_INPUT);
    else
-      SDL_StopTextInput();
+      mOwningManager->updateSDLTextInputState(PlatformWindowManagerSDL::KeyboardInputState::RAW_INPUT);
 }
