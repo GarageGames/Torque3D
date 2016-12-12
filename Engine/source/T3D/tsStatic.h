@@ -228,6 +228,7 @@ public:
 
    Resource<TSShape> getShape() const { return mShape; }
 	StringTableEntry getShapeFileName() { return mShapeName; }
+   void setShapeFileName(StringTableEntry shapeName) { mShapeName = shapeName; }
   
    TSShapeInstance* getShapeInstance() const { return mShapeInstance; }
 
