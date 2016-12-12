@@ -117,6 +117,8 @@ class WorldEditor : public EditTSCtrl
       void makeSelectionPrefab( const char *filename );
       void explodeSelectedPrefab();
 
+      void makeSelectionAMesh(const char *filename);
+
       //
       static SceneObject* getClientObj(SceneObject *);
       static void markAsSelected( SimObject* object, bool state );
