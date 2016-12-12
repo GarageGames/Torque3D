@@ -3753,18 +3753,18 @@ void WorldEditor::explodeSelectedPrefab()
    setDirty();
 }
 
-void WorldEditor::bakeSelectionToMesh(const char *filename)
+void WorldEditor::makeSelectionAMesh(const char *filename)
 {
    if (mSelected->size() == 0)
    {
-      Con::errorf("WorldEditor::makeSelectionPrefab - Nothing selected.");
+      Con::errorf("WorldEditor::makeSelectionAMesh - Nothing selected.");
       return;
    }
 
    SimGroup *missionGroup;
    if (!Sim::findObject("MissionGroup", missionGroup))
    {
-      Con::errorf("WorldEditor::makeSelectionPrefab - Could not find MissionGroup.");
+      Con::errorf("WorldEditor::makeSelectionAMesh - Could not find MissionGroup.");
       return;
    }
 
@@ -3918,11 +3918,11 @@ DefineEngineMethod( WorldEditor, explodeSelectedPrefab, void, (),,
    object->explodeSelectedPrefab();
 }
 
-DefineEngineMethod(WorldEditor, bakeSelectionToMesh, void, (const char* filename), ,
+DefineEngineMethod(WorldEditor, makeSelectionAMesh, void, (const char* filename), ,
    "Save selected objects to a .dae collada file and replace them in the level with a TSStatic object."
    "@param filename collada file to save the selected objects to.")
 {
-   object->bakeSelectionToMesh(filename);
+   object->makeSelectionAMesh(filename);
 }
 
 DefineEngineMethod( WorldEditor, mountRelative, void, ( SceneObject *objA, SceneObject *objB ),,
