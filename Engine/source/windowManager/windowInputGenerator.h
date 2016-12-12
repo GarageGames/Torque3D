@@ -51,6 +51,9 @@ class WindowInputGenerator
       /// (one unit of mouse movement is a mickey) to units in the GUI.
       F32             mPixelsPerMickey;
 
+      /// This tells us if the last key we pressed was used from the global action map.
+      bool mLastPressWasGlobalActionMap;
+
       // Event Handlers
       void handleMouseButton(WindowId did, U32 modifier,  U32 action, U16 button);
       void handleMouseWheel (WindowId did, U32 modifier,  S32 wheelDeltaX, S32 wheelDeltaY);
@@ -82,6 +85,13 @@ class WindowInputGenerator
       /// Returns true if the given keypress event should be send as a raw keyboard
       /// event even if it maps to a character input event.
       bool wantAsKeyboardEvent( U32 modifiers, U32 key );
+
+      /// Tells us if the last key was used within the global action map.
+      /// @return true if the key was a global action map key, false otherwise.
+      /// @note Useful and currently used to tell if we just opened the console 
+      ///  by using the console key. Currently this is used to fix a bug in SDL
+      ///  but it is not limited to that use.
+      bool lastKeyWasGlobalActionMap() const { return mLastPressWasGlobalActionMap; }
 
     void addAcceleratorKey( void *hnd, const String &cmd, U32 keycode, U32 modifier)
     {

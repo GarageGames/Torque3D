@@ -486,6 +486,19 @@ void PlatformWindowSDL::_triggerKeyNotify(const SDL_Event& evt)
    {
       keyEvent.trigger(getWindowId(), torqueModifiers, inputAction, torqueKey);
       //Con::printf("Key %d : %d", tKey.sym, inputAction);
+
+      if (inputAction == IA_MAKE && SDL_IsTextInputActive())
+      {
+         // We have to check if we already have a first responder active.
+         // We don't want to type the character if it actually creates another responder!
+         if (mWindowInputGenerator->lastKeyWasGlobalActionMap())
+         {
+            // Turn off Text input, and the next frame turn it back on. This tells SDL
+            // to not generate a text event for this global action map key.
+            SDL_StopTextInput();
+            mOwningManager->updateSDLTextInputState(PlatformWindowManagerSDL::KeyboardInputState::TEXT_INPUT);
+         }
+      }
    }
 }
 
