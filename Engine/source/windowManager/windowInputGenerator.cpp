@@ -39,7 +39,8 @@ WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) :
                                              mLastCursorPos(0,0),
                                              mClampToWindow(true),
                                              mFocused(false),
-                                             mPixelsPerMickey(1.0f)
+                                             mPixelsPerMickey(1.0f),
+                                             mLastPressWasGlobalActionMap(false)
 {
    AssertFatal(mWindow, "NULL PlatformWindow on WindowInputGenerator creation");
 
@@ -82,6 +83,9 @@ WindowInputGenerator::~WindowInputGenerator()
 //-----------------------------------------------------------------------------
 void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 {
+   // Reset last press being global
+   mLastPressWasGlobalActionMap = false;
+
    if (!mInputController)// || !mFocused)
       return;
 
@@ -102,7 +106,10 @@ void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 
    // Give the ActionMap first shot.
    if (ActionMap::handleEventGlobal(&inputEvent))
+   {
+      mLastPressWasGlobalActionMap = true;
       return;
+   }
 
    if (mInputController->processInputEvent(inputEvent))
       return;
