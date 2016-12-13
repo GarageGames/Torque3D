@@ -400,6 +400,32 @@ ConsoleDocClass( GuiInspectorTypeCheckBox,
 
 GuiControl* GuiInspectorTypeCheckBox::constructEditControl()
 {
+   if ( mField->flag.test(AbstractClassRep::FieldFlags::FIELD_ComponentInspectors) )
+   {
+      // This checkbox (bool field) is meant to be treated as a button.
+      GuiControl* retCtrl = new GuiButtonCtrl();
+
+      // If we couldn't construct the control, bail!
+      if( retCtrl == NULL )
+         return retCtrl;
+
+      GuiButtonCtrl *button = dynamic_cast<GuiButtonCtrl*>(retCtrl);
+
+      // Let's make it look pretty.
+      retCtrl->setDataField( StringTable->insert("profile"), NULL, "InspectorTypeButtonProfile" );
+      retCtrl->setField( "text", "Click Here" );
+
+      retCtrl->setScriptValue( getData() );
+
+      _registerEditControl( retCtrl );
+
+      // Configure it to update our value when the popup is closed
+      char szBuffer[512];
+      dSprintf( szBuffer, 512, "%d.apply(%d.getValue());",getId(), button->getId() );
+      button->setField("Command", szBuffer );
+
+      return retCtrl;
+   } else {
    GuiControl* retCtrl = new GuiCheckBoxCtrl();
 
    GuiCheckBoxCtrl *check = dynamic_cast<GuiCheckBoxCtrl*>(retCtrl);
@@ -420,6 +446,7 @@ GuiControl* GuiInspectorTypeCheckBox::constructEditControl()
    check->setField("Command", szBuffer );
 
    return retCtrl;
+   }
 }
 
 
@@ -1263,9 +1290,9 @@ void GuiInspectorTypeS32::setValue( StringTableEntry newValue )
 //-----------------------------------------------------------------------------
 
 GuiInspectorTypeBitMask32::GuiInspectorTypeBitMask32()
- : mRollout( NULL ),
-   mArrayCtrl( NULL ),
-   mHelper( NULL )
+ : mHelper( NULL ),
+   mRollout( NULL ),
+   mArrayCtrl( NULL )
 {
 }
 

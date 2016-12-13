@@ -61,7 +61,7 @@ typedef U32 SimObjectId;
 /// The RootGroupId is assigned to gRootGroup, in which most SimObjects
 /// are addded as child members. See simManager.cc for details, particularly
 /// Sim::initRoot() and following.
-enum SimObjectsConstants
+enum SimObjectsConstants : U32
 {
    DataBlockObjectIdFirst = 3,
    DataBlockObjectIdBitSize = 14,

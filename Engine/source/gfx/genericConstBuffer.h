@@ -190,6 +190,8 @@ public:
    {
       AssertFatal(   matrixType == GFXSCT_Float2x2 || 
                      matrixType == GFXSCT_Float3x3 || 
+                     matrixType == GFXSCT_Float3x4 || 
+                     matrixType == GFXSCT_Float4x3 || 
                      matrixType == GFXSCT_Float4x4, 
          "GenericConstBuffer::set() - Invalid matrix type!" );
 
@@ -200,6 +202,8 @@ public:
    {
       AssertFatal(   matrixType == GFXSCT_Float2x2 || 
                      matrixType == GFXSCT_Float3x3 || 
+                     matrixType == GFXSCT_Float3x4 ||
+                     matrixType == GFXSCT_Float4x3 ||  
                      matrixType == GFXSCT_Float4x4, 
          "GenericConstBuffer::set() - Invalid matrix type!" );
 

@@ -16,13 +16,13 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-#include <math.h>
 #include <float.h>
 #include <string.h>
 #include <stdio.h>
 #include "DetourNavMesh.h"
 #include "DetourNode.h"
 #include "DetourCommon.h"
+#include "DetourMath.h"
 #include "DetourAlloc.h"
 #include "DetourAssert.h"
 #include <new>
@@ -193,11 +193,13 @@ dtNavMesh::dtNavMesh() :
 	m_tileLutMask(0),
 	m_posLookup(0),
 	m_nextFree(0),
-	m_tiles(0),
-	m_saltBits(0),
-	m_tileBits(0),
-	m_polyBits(0)
+	m_tiles(0)
 {
+#ifndef DT_POLYREF64
+	m_saltBits = 0;
+	m_tileBits = 0;
+	m_polyBits = 0;
+#endif
 	memset(&m_params, 0, sizeof(dtNavMeshParams));
 	m_orig[0] = 0;
 	m_orig[1] = 0;
@@ -249,12 +251,15 @@ dtStatus dtNavMesh::init(const dtNavMeshParams* params)
 	}
 	
 	// Init ID generator values.
+#ifndef DT_POLYREF64
 	m_tileBits = dtIlog2(dtNextPow2((unsigned int)params->maxTiles));
 	m_polyBits = dtIlog2(dtNextPow2((unsigned int)params->maxPolys));
 	// Only allow 31 salt bits, since the salt mask is calculated using 32bit uint and it will overflow.
 	m_saltBits = dtMin((unsigned int)31, 32 - m_tileBits - m_polyBits);
+
 	if (m_saltBits < 10)
 		return DT_FAILURE | DT_INVALID_PARAM;
+#endif
 	
 	return DT_SUCCESS;
 }
@@ -345,7 +350,7 @@ int dtNavMesh::findConnectingPolys(const float* va, const float* vb,
 	return n;
 }
 
-void dtNavMesh::unconnectExtLinks(dtMeshTile* tile, dtMeshTile* target)
+void dtNavMesh::unconnectLinks(dtMeshTile* tile, dtMeshTile* target)
 {
 	if (!tile || !target) return;
 
@@ -358,10 +363,9 @@ void dtNavMesh::unconnectExtLinks(dtMeshTile* tile, dtMeshTile* target)
 		unsigned int pj = DT_NULL_LINK;
 		while (j != DT_NULL_LINK)
 		{
-			if (tile->links[j].side != 0xff &&
-				decodePolyIdTile(tile->links[j].ref) == targetNum)
+			if (decodePolyIdTile(tile->links[j].ref) == targetNum)
 			{
-				// Revove link.
+				// Remove link.
 				unsigned int nj = tile->links[j].next;
 				if (pj == DT_NULL_LINK)
 					poly->firstLink = nj;
@@ -612,14 +616,65 @@ void dtNavMesh::baseOffMeshLinks(dtMeshTile* tile)
 	}
 }
 
-void dtNavMesh::closestPointOnPolyInTile(const dtMeshTile* tile, unsigned int ip,
-										 const float* pos, float* closest) const
+void dtNavMesh::closestPointOnPoly(dtPolyRef ref, const float* pos, float* closest, bool* posOverPoly) const
 {
-	const dtPoly* poly = &tile->polys[ip];
+	const dtMeshTile* tile = 0;
+	const dtPoly* poly = 0;
+	getTileAndPolyByRefUnsafe(ref, &tile, &poly);
 	
-	float closestDistSqr = FLT_MAX;
+	// Off-mesh connections don't have detail polygons.
+	if (poly->getType() == DT_POLYTYPE_OFFMESH_CONNECTION)
+	{
+		const float* v0 = &tile->verts[poly->verts[0]*3];
+		const float* v1 = &tile->verts[poly->verts[1]*3];
+		const float d0 = dtVdist(pos, v0);
+		const float d1 = dtVdist(pos, v1);
+		const float u = d0 / (d0+d1);
+		dtVlerp(closest, v0, v1, u);
+		if (posOverPoly)
+			*posOverPoly = false;
+		return;
+	}
+	
+	const unsigned int ip = (unsigned int)(poly - tile->polys);
 	const dtPolyDetail* pd = &tile->detailMeshes[ip];
 	
+	// Clamp point to be inside the polygon.
+	float verts[DT_VERTS_PER_POLYGON*3];	
+	float edged[DT_VERTS_PER_POLYGON];
+	float edget[DT_VERTS_PER_POLYGON];
+	const int nv = poly->vertCount;
+	for (int i = 0; i < nv; ++i)
+		dtVcopy(&verts[i*3], &tile->verts[poly->verts[i]*3]);
+	
+	dtVcopy(closest, pos);
+	if (!dtDistancePtPolyEdgesSqr(pos, verts, nv, edged, edget))
+	{
+		// Point is outside the polygon, dtClamp to nearest edge.
+		float dmin = FLT_MAX;
+		int imin = -1;
+		for (int i = 0; i < nv; ++i)
+		{
+			if (edged[i] < dmin)
+			{
+				dmin = edged[i];
+				imin = i;
+			}
+		}
+		const float* va = &verts[imin*3];
+		const float* vb = &verts[((imin+1)%nv)*3];
+		dtVlerp(closest, va, vb, edget[imin]);
+		
+		if (posOverPoly)
+			*posOverPoly = false;
+	}
+	else
+	{
+		if (posOverPoly)
+			*posOverPoly = true;
+	}
+	
+	// Find height at the location.
 	for (int j = 0; j < pd->triCount; ++j)
 	{
 		const unsigned char* t = &tile->detailTris[(pd->triBase+j)*4];
@@ -631,13 +686,11 @@ void dtNavMesh::closestPointOnPolyInTile(const dtMeshTile* tile, unsigned int ip
 			else
 				v[k] = &tile->detailVerts[(pd->vertBase+(t[k]-poly->vertCount))*3];
 		}
-		float pt[3];
-		dtClosestPtPointTriangle(pt, pos, v[0], v[1], v[2]);
-		float d = dtVdistSqr(pos, pt);
-		if (d < closestDistSqr)
+		float h;
+		if (dtClosestHeightPointTriangle(pos, v[0], v[1], v[2], h))
 		{
-			dtVcopy(closest, pt);
-			closestDistSqr = d;
+			closest[1] = h;
+			break;
 		}
 	}
 }
@@ -661,12 +714,27 @@ dtPolyRef dtNavMesh::findNearestPolyInTile(const dtMeshTile* tile,
 	{
 		dtPolyRef ref = polys[i];
 		float closestPtPoly[3];
-		closestPointOnPolyInTile(tile, decodePolyIdPoly(ref), center, closestPtPoly);
-		float d = dtVdistSqr(center, closestPtPoly);
+		float diff[3];
+		bool posOverPoly = false;
+		float d;
+		closestPointOnPoly(ref, center, closestPtPoly, &posOverPoly);
+
+		// If a point is directly over a polygon and closer than
+		// climb height, favor that instead of straight line nearest point.
+		dtVsub(diff, center, closestPtPoly);
+		if (posOverPoly)
+		{
+			d = dtAbs(diff[1]) - tile->header->walkableClimb;
+			d = d > 0 ? d*d : 0;			
+		}
+		else
+		{
+			d = dtVlenSqr(diff);
+		}
+		
 		if (d < nearestDistanceSqr)
 		{
-			if (nearestPt)
-				dtVcopy(nearestPt, closestPtPoly);
+			dtVcopy(nearestPt, closestPtPoly);
 			nearestDistanceSqr = d;
 			nearest = ref;
 		}
@@ -768,6 +836,11 @@ int dtNavMesh::queryPolygonsInTile(const dtMeshTile* tile, const float* qmin, co
 /// reference it had previously used.  In this case the #dtPolyRef's for the
 /// tile will be restored to the same values they were before the tile was 
 /// removed.
+///
+/// The nav mesh assumes exclusive access to the data passed and will make
+/// changes to the dynamic portion of the data. For that reason the data
+/// should not be reused in other nav meshes until the tile has been successfully
+/// removed from this nav mesh.
 ///
 /// @see dtCreateNavMeshData, #removeTile
 dtStatus dtNavMesh::addTile(unsigned char* data, int dataSize, int flags,
@@ -1123,25 +1196,24 @@ dtStatus dtNavMesh::removeTile(dtTileRef ref, unsigned char** data, int* dataSiz
 	}
 	
 	// Remove connections to neighbour tiles.
-	// Create connections with neighbour tiles.
 	static const int MAX_NEIS = 32;
 	dtMeshTile* neis[MAX_NEIS];
 	int nneis;
 	
-	// Connect with layers in current tile.
+	// Disconnect from other layers in current tile.
 	nneis = getTilesAt(tile->header->x, tile->header->y, neis, MAX_NEIS);
 	for (int j = 0; j < nneis; ++j)
 	{
 		if (neis[j] == tile) continue;
-		unconnectExtLinks(neis[j], tile);
+		unconnectLinks(neis[j], tile);
 	}
 	
-	// Connect with neighbour tiles.
+	// Disconnect from neighbour tiles.
 	for (int i = 0; i < 8; ++i)
 	{
 		nneis = getNeighbourTilesAt(tile->header->x, tile->header->y, i, neis, MAX_NEIS);
 		for (int j = 0; j < nneis; ++j)
-			unconnectExtLinks(neis[j], tile);
+			unconnectLinks(neis[j], tile);
 	}
 		
 	// Reset tile.
@@ -1173,7 +1245,11 @@ dtStatus dtNavMesh::removeTile(dtTileRef ref, unsigned char** data, int* dataSiz
 	tile->offMeshCons = 0;
 
 	// Update salt, salt should never be zero.
+#ifdef DT_POLYREF64
+	tile->salt = (tile->salt+1) & ((1<<DT_SALT_BITS)-1);
+#else
 	tile->salt = (tile->salt+1) & ((1<<m_saltBits)-1);
+#endif
 	if (tile->salt == 0)
 		tile->salt++;
 

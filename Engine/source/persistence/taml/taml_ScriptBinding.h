@@ -308,4 +308,4 @@ DefineEngineFunction(GenerateTamlSchema, bool, (), , "() - Generate a TAML schem
     return Taml::generateTamlSchema();
 }
 
-#endif _TAML_SCRIPTBINDING_H
+#endif //_TAML_SCRIPTBINDING_H

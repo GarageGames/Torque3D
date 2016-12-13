@@ -108,6 +108,7 @@ protected:
 
       GFXStateBlockRef stateBlock;
       GFXStateBlockRef wireframeStateBlock;
+      GFXStateBlockRef reflectionStateBlock;
 
       GFXShaderConstHandle *modelViewProjConst;
       GFXShaderConstHandle *worldViewOnly;

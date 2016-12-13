@@ -97,9 +97,9 @@ void GFXD3D11TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *te
    if( tex == GFXTextureTarget::sDefaultDepthStencil )
    {
       mTargets[slot] = D3D11->mDeviceDepthStencil;
-	   mTargetViews[slot] = D3D11->mDeviceDepthStencilView;
-	   mTargets[slot]->AddRef();
-	   mTargetViews[slot]->AddRef();
+      mTargetViews[slot] = D3D11->mDeviceDepthStencilView;
+      mTargets[slot]->AddRef();
+      mTargetViews[slot]->AddRef();
    }
    else
    {
@@ -110,14 +110,14 @@ void GFXD3D11TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *te
 
       // Grab the surface level.
       if( slot == DepthStencil )
-      {		 
+      {       
          mTargets[slot] = d3dto->getSurface();
          if ( mTargets[slot] )
             mTargets[slot]->AddRef();
 
-		   mTargetViews[slot] = d3dto->getDSView();
-		   if( mTargetViews[slot])
-			   mTargetViews[slot]->AddRef();         
+         mTargetViews[slot] = d3dto->getDSView();
+         if( mTargetViews[slot])
+            mTargetViews[slot]->AddRef();         
 
       }
       else
@@ -126,12 +126,12 @@ void GFXD3D11TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *te
          // if the surface that it needs to render to is different than the mip level
          // in the actual texture. This will happen with MSAA.
          if( d3dto->getSurface() == NULL )
-		   {
+         {
             
-			   mTargets[slot] = d3dto->get2DTex();
-			   mTargets[slot]->AddRef();
-			   mTargetViews[slot] = d3dto->getRTView();
-			   mTargetViews[slot]->AddRef();			
+            mTargets[slot] = d3dto->get2DTex();
+            mTargets[slot]->AddRef();
+            mTargetViews[slot] = d3dto->getRTView();
+            mTargetViews[slot]->AddRef();         
          } 
          else 
          {
@@ -163,6 +163,13 @@ void GFXD3D11TextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *te
             mTargetSize = Point2I(sd.Width, sd.Height);
 
             S32 format = sd.Format;
+
+            if (format == DXGI_FORMAT_R8G8B8A8_TYPELESS || format == DXGI_FORMAT_B8G8R8A8_TYPELESS)
+            {
+               mTargetFormat = GFXFormatR8G8B8A8;
+               return;
+            }
+
             GFXREVERSE_LOOKUP( GFXD3D11TextureFormat, GFXFormat, format );
             mTargetFormat = (GFXFormat)format;
          }
@@ -276,7 +283,7 @@ void GFXD3D11TextureTarget::resolve()
       if (mResolveTargets[i])
       {
          D3D11_TEXTURE2D_DESC desc;
-		   mTargets[i]->GetDesc(&desc);
+         mTargets[i]->GetDesc(&desc);
          D3D11DEVICECONTEXT->CopySubresourceRegion(mResolveTargets[i]->get2DTex(), 0, 0, 0, 0, mTargets[i], 0, NULL);
       }
    }
@@ -400,10 +407,10 @@ void GFXD3D11WindowTarget::activate()
 
 void GFXD3D11WindowTarget::resolveTo(GFXTextureObject *tex)
 {
-	GFXDEBUGEVENT_SCOPE(GFXPCD3D11WindowTarget_resolveTo, ColorI::RED);
+   GFXDEBUGEVENT_SCOPE(GFXPCD3D11WindowTarget_resolveTo, ColorI::RED);
 
-	D3D11_TEXTURE2D_DESC desc;
-	ID3D11Texture2D* surf = ((GFXD3D11TextureObject*)(tex))->get2DTex();
-	surf->GetDesc(&desc);
-	D3D11DEVICECONTEXT->ResolveSubresource(surf, 0, D3D11->mDeviceBackbuffer, 0, desc.Format);
+   D3D11_TEXTURE2D_DESC desc;
+   ID3D11Texture2D* surf = ((GFXD3D11TextureObject*)(tex))->get2DTex();
+   surf->GetDesc(&desc);
+   D3D11DEVICECONTEXT->ResolveSubresource(surf, 0, D3D11->mDeviceBackbuffer, 0, desc.Format);
 }

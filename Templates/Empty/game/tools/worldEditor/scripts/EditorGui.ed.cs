@@ -1619,7 +1619,7 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
    }
 
    // Open context menu if this is a SimGroup
-   else if( %obj.isMemberOfClass( "SimGroup" ) )
+   else if( !%obj.isMemberOfClass( "SceneObject" ) )
    {
       %popup = ETSimGroupContextPopup;
       if( !isObject( %popup ) )
@@ -1675,9 +1675,23 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
 
             object = -1;
          };
+         
+      if(%obj.isMemberOfClass("Entity"))
+      {
+         %popup = ETEntityContextPopup;      
+         if( !isObject( %popup ) )
+            %popup = new PopupMenu( ETEntityContextPopup : ETSimGroupContextPopup )
+            {
+               superClass = "MenuBuilder";
+               isPopup = "1";
+
+               item[ 12 ] = "-";
+               item[ 13 ] = "Convert to Game Object" TAB "" TAB "EWorldEditor.createGameObject( %this.object );";
+            };
+      }
      
       // Specialized version for ConvexShapes. 
-      if( %obj.isMemberOfClass( "ConvexShape" ) )
+      else if( %obj.isMemberOfClass( "ConvexShape" ) )
       {
          %popup = ETConvexShapeContextPopup;      
          if( !isObject( %popup ) )
@@ -2121,10 +2135,19 @@ function EWorldEditor::toggleLockChildren( %this, %simGroup )
 {
    foreach( %child in %simGroup )
    {
+      if( %child.class $= "SimGroup" )
+      {
+         %this.toggleHideChildren( %child );
+      }
       if( %child.isMemberOfClass( "SimGroup" ) )
-         %this.toggleLockChildren( %child );
-      else
+      {
+         %this.toggleHideChildren( %child );
          %child.setLocked( !%child.locked );
+      }
+      else
+      {
+         %child.setLocked( !%child.locked );
+      }
    }
    
    EWorldEditor.syncGui();
@@ -2134,10 +2157,19 @@ function EWorldEditor::toggleHideChildren( %this, %simGroup )
 {
    foreach( %child in %simGroup )
    {
-      if( %child.isMemberOfClass( "SimGroup" ) )
+      if( %child.class $= "SimGroup" )
+      {
          %this.toggleHideChildren( %child );
-      else
+      }
+      if( %child.isMemberOfClass( "SimGroup" ) )
+      {
+         %this.toggleHideChildren( %child );
          %this.hideObject( %child, !%child.hidden );
+      }
+      else
+      {
+         %this.hideObject( %child, !%child.hidden );
+      }
    }
    
    EWorldEditor.syncGui();
@@ -2202,6 +2234,155 @@ function EWorldEditor::deleteMissionObject( %this, %object )
    MEDeleteUndoAction::submit( %object );
    EWorldEditor.isDirty = true;
    EditorTree.buildVisibleTree( true );
+}
+
+function EWorldEditor::createGameObject( %this, %entity )
+{
+   if(!isObject(GameObjectBuilder))
+   {
+      new GuiControl(GameObjectBuilder, EditorGuiGroup) {
+         profile = "ToolsGuiDefaultProfile";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         position = "0 0";
+         extent = "800 600";
+         minExtent = "8 8";
+         visible = "1";
+         setFirstResponder = "0";
+         modal = "1";
+         helpTag = "0";
+      
+         new GuiWindowCtrl(GameObjectBuilderTargetWindow) {
+            profile = "ToolsGuiWindowProfile";
+            horizSizing = "center";
+            vertSizing = "center";
+            position = "384 205";
+            extent = "256 102";
+            minExtent = "256 8";
+            visible = "1";
+            setFirstResponder = "0";
+            modal = "1";
+            helpTag = "0";
+            resizeWidth = "1";
+            resizeHeight = "1";
+            canMove = "1";
+            canClose = "0";
+            canMinimize = "0";
+            canMaximize = "0";
+            minSize = "50 50";
+            text = "Create Object";
+      
+            new GuiTextCtrl() {
+               profile = "GuiCenterTextProfile";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               position = "9 26";
+               extent = "84 16";
+               minExtent = "8 8";
+               visible = "1";
+               setFirstResponder = "0";
+               modal = "1";
+               helpTag = "0";
+               text = "Object Name:";
+            };
+            new GuiTextEditCtrl(GameObjectBuilderObjectName) {
+                class = ObjectBuilderGuiTextEditCtrl;
+               profile = "ToolsGuiTextEditProfile";
+               horizSizing = "width";
+               vertSizing = "bottom";
+               position = "78 26";
+               extent = "172 18";
+               minExtent = "8 8";
+               visible = "1";
+               setFirstResponder = "0";
+               modal = "1";
+               helpTag = "0";
+               historySize = "0";
+            };
+            new GuiButtonCtrl(GameObjectBuilderOKButton) {
+               profile = "ToolsGuiButtonProfile";
+               horizSizing = "width";
+               vertSizing = "bottom";
+               position = "7 250";
+               extent = "156 24";
+               minExtent = "8 8";
+               visible = "1";
+               setFirstResponder = "0";
+               modal = "1";
+               command = "EWorldEditor.buildGameObject();";
+               helpTag = "0";
+               text = "Create New";
+               Accelerator = "return";
+            };
+            new GuiButtonCtrl(GameObjectBuilderCancelButton) {
+               profile = "ToolsGuiButtonProfile";
+               horizSizing = "left";
+               vertSizing = "bottom";
+               position = "170 250";
+               extent = "80 24";
+               minExtent = "8 8";
+               visible = "1";
+               setFirstResponder = "0";
+               modal = "1";
+               command = "Canvas.popDialog(GameObjectBuilder);";
+               helpTag = "0";
+               text = "Cancel";
+               Accelerator = "escape";
+            };
+         };
+      };
+      
+      GameObjectBuilderTargetWindow.extent = getWord(GameObjectBuilderTargetWindow.extent, 0) SPC 88;
+      GameObjectBuilderOKButton.position = getWord(GameObjectBuilderOKButton.position, 0) SPC 57;
+      GameObjectBuilderCancelButton.position = getWord(GameObjectBuilderCancelButton.position, 0) SPC 57;
+   }
+
+   GameObjectBuilderObjectName.text = "";
+   GameObjectBuilder.selectedEntity = %entity;
+
+   Canvas.pushDialog(GameObjectBuilder);
+}
+
+function EWorldEditor::buildGameObject(%this)
+{
+	if(GameObjectBuilderObjectName.getText() $= "")
+	{
+		error("Attempted to make a new Game Object with no name!");
+		Canvas.popDialog(GameObjectBuilder);
+		return;
+	}
+
+	%path = EditorSettings.value( "WorldEditor/newGameObjectDir" );
+	%className = GameObjectBuilderObjectName.getText();
+	GameObjectBuilder.selectedEntity.class = %className;
+	Inspector.inspect(GameObjectBuilder.selectedEntity);
+	
+	%file = new FileObject();
+	
+	if(%file.openForWrite(%path @ "\\" @ %className @ ".cs"))
+	{
+		%file.writeline("function " @ %className @ "::onAdd(%this)\n{\n\n}\n");
+		%file.writeline("function " @ %className @ "::onRemove(%this)\n{\n\n}\n");
+		
+		//todo, pre-write any event functions of interest
+		
+		%file.close();
+	}
+	
+	//set up the paths
+	%tamlPath = %path @ "/" @ %className @ ".taml";
+	%scriptPath = %path @ "/" @ %className @ ".cs";
+	saveGameObject(%className, %tamlPath, %scriptPath);
+	
+	//reload it
+	execGameObjects();
+	
+	//now, add the script file and a ref to the taml into our SGO manifest so we can readily spawn it later.
+	TamlWrite(GameObjectBuilder.selectedEntity, %tamlpath);
+
+   GameObjectBuilder.selectedEntity = "";
+	
+	Canvas.popDialog(GameObjectBuilder);
 }
 
 function EWorldEditor::selectAllObjectsInSet( %this, %set, %deselect )

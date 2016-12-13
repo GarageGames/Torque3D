@@ -47,6 +47,8 @@
 Vector< SimObjectPtr<SceneObject> > AccumulationVolume::smAccuObjects;
 Vector< SimObjectPtr<AccumulationVolume> > AccumulationVolume::smAccuVolumes;
 
+GFXTexHandle gLevelAccuMap;
+
 //#define DEBUG_DRAW
 
 IMPLEMENT_CO_NETOBJECT_V1( AccumulationVolume );
@@ -296,7 +298,7 @@ void AccumulationVolume::refreshVolumes()
    {
       SimObjectPtr<SceneObject> object = smAccuObjects[n];
       if ( object.isValid() )
-         object->mAccuTex = GFXTexHandle::ZERO;
+         object->mAccuTex = gLevelAccuMap;
    }
 
    // 
@@ -337,7 +339,7 @@ void AccumulationVolume::updateObject(SceneObject* object)
 
    // We use ZERO instead of NULL so the accumulation
    // texture will be updated in renderMeshMgr.
-   object->mAccuTex = GFXTexHandle::ZERO;
+   object->mAccuTex = gLevelAccuMap;
 
    for (S32 i = 0; i < smAccuVolumes.size(); ++i)
    {

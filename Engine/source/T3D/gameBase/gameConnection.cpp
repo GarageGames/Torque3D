@@ -407,7 +407,7 @@ bool GameConnection::readConnectAccept(BitStream *stream, const char **errorStri
 void GameConnection::writeConnectRequest(BitStream *stream)
 {
    Parent::writeConnectRequest(stream);
-   stream->writeString(GameString);
+   stream->writeString(TORQUE_APP_NAME);
    stream->write(CurrentProtocolVersion);
    stream->write(MinRequiredProtocolVersion);
    stream->writeString(mJoinPassword);
@@ -424,7 +424,7 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
    U32 currentProtocol, minProtocol;
    char gameString[256];
    stream->readString(gameString);
-   if(dStrcmp(gameString, GameString))
+   if(dStrcmp(gameString, TORQUE_APP_NAME))
    {
       *errorString = "CHR_GAME";
       return false;
@@ -469,8 +469,8 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
 
    for(U32 i = 0; i < mConnectArgc+3; i++)
    {
-	   connectArgv[i].value = &connectArgvValue[i];
-	   connectArgvValue[i].init();
+      connectArgv[i].value = &connectArgvValue[i];
+      connectArgvValue[i].init();
    }
 
    for(U32 i = 0; i < mConnectArgc; i++)
@@ -678,6 +678,24 @@ bool GameConnection::getControlCameraTransform(F32 dt, MatrixF* mat)
                sChaseQueueTail = 0;
       }
    }
+   return true;
+}
+
+bool GameConnection::getControlCameraHeadTransform(IDisplayDevice *display, MatrixF *transform)
+{
+   GameBase* obj = getCameraObject();
+   if (!obj)
+      return false;
+
+   GameBase* cObj = obj;
+   while ((cObj = cObj->getControlObject()) != 0)
+   {
+      if (cObj->useObjsEyePoint())
+         obj = cObj;
+   }
+
+   obj->getEyeCameraTransform(display, -1, transform);
+
    return true;
 }
 
@@ -896,8 +914,8 @@ void GameConnection::onRemove()
       // clientgroup and what not (this is so that we can disconnect from a local server
       // without needing to destroy and recreate the server before we can connect to it 
       // again).
-	   // Safe-delete as we don't know whether the server connection is currently being
-	   // worked on.
+      // Safe-delete as we don't know whether the server connection is currently being
+      // worked on.
       getRemoteConnection()->safeDeleteObject();
       setRemoteConnectionObject(NULL);
    }

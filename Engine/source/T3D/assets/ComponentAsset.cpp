@@ -91,9 +91,9 @@ ConsoleSetType(TypeComponentAssetPtr)
 //-----------------------------------------------------------------------------
 
 ComponentAsset::ComponentAsset() :
-   mAcquireReferenceCount(0),
    mpOwningAssetManager(NULL),
-   mAssetInitialized(false)
+   mAssetInitialized(false),
+   mAcquireReferenceCount(0)
 {
    // Generate an asset definition.
    mpAssetDefinition = new AssetDefinition();

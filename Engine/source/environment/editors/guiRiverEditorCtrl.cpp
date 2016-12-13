@@ -52,9 +52,9 @@ ConsoleDocClass( GuiRiverEditorCtrl,
 );
 
 GuiRiverEditorCtrl::GuiRiverEditorCtrl()
- : mDefaultNormal( 0, 0, 1 ),
-   mDefaultWidth( 10.0f ),
-   mDefaultDepth( 5.0f )
+ : mDefaultWidth( 10.0f ),
+   mDefaultDepth( 5.0f ),
+   mDefaultNormal( 0, 0, 1 )
 {   
 	// Each of the mode names directly correlates with the River Editor's
 	// tool palette

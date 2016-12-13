@@ -245,6 +245,12 @@ void RenderGlowMgr::render( SceneRenderState *state )
             matrixSet.setProjection(*passRI->projection);
             glowMat->setTransforms(matrixSet, state);
 
+            // Setup HW skinning transforms if applicable
+            if (glowMat->usesHardwareSkinning())
+            {
+               glowMat->setNodeTransforms(passRI->mNodeTransforms, passRI->mNodeTransformCount);
+            }
+
             glowMat->setSceneInfo(state, sgData);
             glowMat->setBuffers(passRI->vertBuff, passRI->primBuff);
 

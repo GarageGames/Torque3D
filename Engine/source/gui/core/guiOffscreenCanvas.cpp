@@ -176,7 +176,7 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
    GFX->setWorldMatrix( MatrixF::Identity );
    GFX->setViewMatrix( MatrixF::Identity );
    GFX->setProjectionMatrix( MatrixF::Identity );
-
+   
    RectI contentRect(Point2I(0,0), mTargetSize);
    {
       // Render active GUI Dialogs
@@ -193,7 +193,7 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
 
       // Fill Blue if no Dialogs
       if(this->size() == 0)
-         GFX->clear( GFXClearTarget, ColorF(0,0,1,1), 1.0f, 0 );
+         GFX->clear( GFXClearTarget, ColorF(0,0,0,1), 1.0f, 0 );
 
       GFX->setClipRect( contentRect );
 
@@ -210,7 +210,7 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
 
       GFX->getDrawUtil()->clearBitmapModulation();
    }
-   
+
    mTarget->resolve();
    GFX->popActiveRenderTarget();
 
@@ -219,6 +219,13 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
    // Keep track of the last time we rendered.
    mLastRenderMs = Platform::getRealMilliseconds();
    mTargetDirty = mDynamicTarget;
+
+   onFrameRendered();
+}
+
+void GuiOffscreenCanvas::onFrameRendered()
+{
+
 }
 
 Point2I GuiOffscreenCanvas::getWindowSize()

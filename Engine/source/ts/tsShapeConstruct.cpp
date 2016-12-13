@@ -86,6 +86,11 @@ void TSShapeConstructor::_onTSShapeLoaded( Resource< TSShape >& resource )
    TSShapeConstructor* ctor = findShapeConstructor( resource.getPath().getFullPath() );
    if( ctor )
       ctor->_onLoad( resource );
+
+   if (ctor && ctor->mShape && ctor->mShape->needsReinit())
+   {
+      ctor->mShape->init();
+   }
 }
 
 void TSShapeConstructor::_onTSShapeUnloaded( const Torque::Path& path, TSShape* shape )
@@ -128,7 +133,7 @@ static void SplitSequencePathAndName( String& srcPath, String& srcName )
 IMPLEMENT_CONOBJECT(TSShapeConstructor);
 
 TSShapeConstructor::TSShapeConstructor()
- : mShapePath("")
+ : mShapePath(""), mLoadingShape(false)
 {
    mShape = NULL;
 }
@@ -374,8 +379,14 @@ bool TSShapeConstructor::onAdd()
 
    // If an instance of this shape has already been loaded, call onLoad now
    Resource<TSShape> shape = ResourceManager::get().find( mShapePath );
+
    if ( shape )
       _onLoad( shape );
+
+   if (mShape && mShape->needsReinit())
+   {
+      mShape->init();
+   }
 
    return true;
 }
@@ -394,6 +405,7 @@ void TSShapeConstructor::_onLoad(TSShape* shape)
 
    mShape = shape;
    mChangeSet.clear();
+   mLoadingShape = true;
 
    // Add sequences defined using field syntax
    for ( S32 i = 0; i < mSequences.size(); i++ )
@@ -411,6 +423,7 @@ void TSShapeConstructor::_onLoad(TSShape* shape)
 
    // Call script function
    onLoad_callback();
+   mLoadingShape = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -3278,4 +3291,16 @@ bool TSShapeConstructor::ChangeSet::addCmd_removeImposter( const TSShapeConstruc
    }
 
    return true;
+}
+
+void TSShapeConstructor::onActionPerformed()
+{
+   // Reinit shape if we modify stuff in the shape editor, otherwise delay
+   if (!mLoadingShape)
+   {
+      if (mShape && mShape->needsReinit())
+      {
+         mShape->init();
+      }
+   }
 }

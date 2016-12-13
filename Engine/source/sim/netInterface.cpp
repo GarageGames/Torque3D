@@ -41,7 +41,7 @@ NetInterface::NetInterface()
    GNet = this;
 
    mLastTimeoutCheckTime = 0;
-   mAllowConnections = true;
+   mAllowConnections = false;
 
 }
 
@@ -109,7 +109,7 @@ void NetInterface::processPacketReceiveEvent(NetAddress srcAddress, RawData pack
       pStream.read(&packetType);
       NetAddress *addr = &srcAddress;
 
-      if(packetType <= GameHeartbeat)
+      if(packetType <= GameHeartbeat || packetType == MasterServerExtendedListResponse)
          handleInfoPacket(addr, packetType, &pStream);
 #ifdef GGC_PLUGIN
       else if (packetType == GGCPacket)
@@ -556,10 +556,7 @@ void NetInterface::computeNetMD5(const NetAddress *address, U32 connectSequence,
 
    U32 in[16];
    in[0] = address->type;
-   in[1] = (U32(address->netNum[0]) << 24) |
-           (U32(address->netNum[1]) << 16) |
-           (U32(address->netNum[2]) << 8)  |
-           (U32(address->netNum[3]));
+   in[1] = address->getHash();
    in[2] = address->port;
    in[3] = connectSequence;
    for(U32 i = 0; i < 12; i++)

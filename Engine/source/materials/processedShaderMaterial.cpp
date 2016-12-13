@@ -44,6 +44,9 @@
 // We need to include customMaterialDefinition for ShaderConstHandles::init
 #include "materials/customMaterialDefinition.h"
 
+
+#include "ts/tsShape.h"
+
 ///
 /// ShaderConstHandles
 ///
@@ -98,6 +101,9 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
 
    for (S32 i = 0; i < TEXTURE_STAGE_COUNT; ++i)
       mRTParamsSC[i] = shader->getShaderConstHandle( String::ToString( "$rtParams%d", i ) );
+
+   // MFT_HardwareSkinning
+   mNodeTransforms = shader->getShaderConstHandle( "$nodeTransforms" );
 
    // Clear any existing texture handles.
    dMemset( mTexHandlesSC, 0, sizeof( mTexHandlesSC ) );
@@ -210,6 +216,19 @@ bool ProcessedShaderMaterial::init( const FeatureSet &features,
    {
       mInstancingState = new InstancingState();
       mInstancingState->setFormat( _getRPD( 0 )->shader->getInstancingFormat(), mVertexFormat );
+   }
+   if (mMaterial && mMaterial->mDiffuseMapFilename[0].isNotEmpty() && mMaterial->mDiffuseMapFilename[0].substr(0, 1).equal("#"))
+   {
+      String texTargetBufferName = mMaterial->mDiffuseMapFilename[0].substr(1, mMaterial->mDiffuseMapFilename[0].length() - 1);
+      NamedTexTarget *texTarget = NamedTexTarget::find(texTargetBufferName);
+      RenderPassData* rpd = getPass(0);
+
+      if (rpd)
+      {
+         rpd->mTexSlot[0].texTarget = texTarget;
+         rpd->mTexType[0] = Material::TexTarget;
+         rpd->mSamplerNames[0] = "diffuseMap";
+      }
    }
    return true;
 }
@@ -489,6 +508,12 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
                                        *info.type, 
                                        features, 
                                        &fd );
+   }
+
+   // Need to add the Hardware Skinning feature if its used
+   if ( features.hasFeature( MFT_HardwareSkinning ) )
+   {
+      fd.features.addFeature( MFT_HardwareSkinning );
    }
 
    // Now disable any features that were 
@@ -1215,6 +1240,20 @@ void ProcessedShaderMaterial::setTransforms(const MatrixSet &matrixSet, SceneRen
 
    if ( handles->m_vEyeSC->isValid() )
       shaderConsts->set( handles->m_vEyeSC, state->getVectorEye() );
+}
+
+void ProcessedShaderMaterial::setNodeTransforms(const MatrixF *transforms, const U32 transformCount, const U32 pass)
+{
+   PROFILE_SCOPE( ProcessedShaderMaterial_setNodeTransforms );
+
+   GFXShaderConstBuffer* shaderConsts = _getShaderConstBuffer(pass);
+   ShaderConstHandles* handles = _getShaderConstHandles(pass);
+
+   if ( handles->mNodeTransforms->isValid() )
+   {
+      S32 realTransformCount = getMin( transformCount, TSShape::smMaxSkinBones );
+      shaderConsts->set( handles->mNodeTransforms, transforms, realTransformCount, GFXSCT_Float4x3 );
+   }
 }
 
 void ProcessedShaderMaterial::setSceneInfo(SceneRenderState * state, const SceneData& sgData, U32 pass)

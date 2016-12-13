@@ -62,6 +62,7 @@
 #include "materials/materialFeatureTypes.h"
 #include "renderInstance/renderOcclusionMgr.h"
 #include "core/stream/fileStream.h"
+#include "T3D/accumulationVolume.h"
 
 IMPLEMENT_CO_DATABLOCK_V1(ShapeBaseData);
 
@@ -167,12 +168,9 @@ ShapeBaseData::ShapeBaseData()
    density( 1.0f ),
    maxEnergy( 0.0f ),
    maxDamage( 1.0f ),
-   destroyedLevel( 1.0f ),
-   disabledLevel( 1.0f ),
    repairRate( 0.0033f ),
-   eyeNode( -1 ),
-   earNode( -1 ),
-   cameraNode( -1 ),
+   disabledLevel( 1.0f ),
+   destroyedLevel( 1.0f ),
    cameraMaxDist( 0.0f ),
    cameraMinDist( 0.2f ),
    cameraDefaultFov( 75.0f ),
@@ -180,6 +178,11 @@ ShapeBaseData::ShapeBaseData()
    cameraMaxFov( 120.f ),
    cameraCanBank( false ),
    mountedImagesBank( false ),
+   mCRC( 0 ),
+   computeCRC( false ),
+   eyeNode( -1 ),
+   earNode( -1 ),
+   cameraNode( -1 ),
    debrisDetail( -1 ),
    damageSequence( -1 ),
    hulkSequence( -1 ),
@@ -188,9 +191,7 @@ ShapeBaseData::ShapeBaseData()
    useEyePoint( false ),
    isInvincible( false ),
    renderWhenDestroyed( true ),
-   computeCRC( false ),
-   inheritEnergyFromMount( false ),
-   mCRC( 0 )
+   inheritEnergyFromMount( false )
 {      
    dMemset( mountPointNode, -1, sizeof( S32 ) * SceneObject::NumMountPoints );
 }
@@ -1045,7 +1046,11 @@ bool ShapeBase::onAdd()
       if(mDataBlock->cloakTexName != StringTable->insert(""))
         mCloakTexture = TextureHandle(mDataBlock->cloakTexName, MeshTexture, false);
 */         
-
+   // Accumulation and environment mapping
+   if (isClientObject() && mShapeInstance)
+   {
+      AccumulationVolume::addObject(this);
+   }
    return true;
 }
 
@@ -1988,67 +1993,21 @@ void ShapeBase::getEyeCameraTransform(IDisplayDevice *displayDevice, U32 eyeId, 
    Point3F eyePos;
    Point3F rotEyePos;
 
-   DisplayPose inPose;
-   displayDevice->getFrameEyePose(&inPose, eyeId);
-   DisplayPose newPose = calcCameraDeltaPose(displayDevice->getCurrentConnection(), inPose);
+   DisplayPose newPose;
+   displayDevice->getFrameEyePose(&newPose, eyeId);
 
    // Ok, basically we just need to add on newPose to the camera transform
    // NOTE: currently we dont support third-person camera in this mode
    MatrixF cameraTransform(1);
    F32 fakePos = 0;
+   //cameraTransform = getRenderTransform(); // use this for controllers TODO
    getCameraTransform(&fakePos, &cameraTransform);
 
-   QuatF baserot = cameraTransform;
-   QuatF qrot = QuatF(newPose.orientation);
-   QuatF concatRot;
-   concatRot.mul(baserot, qrot);
-   concatRot.setMatrix(&temp);
-   temp.setPosition(cameraTransform.getPosition() + concatRot.mulP(newPose.position, &rotEyePos));
+   temp = MatrixF(1);
+   newPose.orientation.setMatrix(&temp);
+   temp.setPosition(newPose.position);
 
-   *outMat = temp;
-}
-
-DisplayPose ShapeBase::calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose)
-{
-   // NOTE: this is intended to be similar to updateMove
-   // WARNING: does not take into account any move values
-
-   DisplayPose outPose;
-   outPose.orientation = getRenderTransform().toEuler();
-   outPose.position = inPose.position;
-
-   if (con && con->getControlSchemeAbsoluteRotation())
-   {
-      // Pitch
-      outPose.orientation.x = inPose.orientation.x;
-
-      // Constrain the range of mRot.x
-      while (outPose.orientation.x < -M_PI_F) 
-         outPose.orientation.x += M_2PI_F;
-      while (outPose.orientation.x > M_PI_F) 
-         outPose.orientation.x -= M_2PI_F;
-
-      // Yaw
-      outPose.orientation.z = inPose.orientation.z;
-
-      // Constrain the range of mRot.z
-      while (outPose.orientation.z < -M_PI_F) 
-         outPose.orientation.z += M_2PI_F;
-      while (outPose.orientation.z > M_PI_F) 
-         outPose.orientation.z -= M_2PI_F;
-
-      // Bank
-      if (mDataBlock->cameraCanBank)
-      {
-         outPose.orientation.y = inPose.orientation.y;
-      }
-
-      // Constrain the range of mRot.y
-      while (outPose.orientation.y > M_PI_F) 
-         outPose.orientation.y -= M_2PI_F;
-   }
-
-   return outPose;
+   *outMat = cameraTransform * temp;
 }
 
 void ShapeBase::getCameraParameters(F32 *min,F32* max,Point3F* off,MatrixF* rot)

@@ -1165,8 +1165,12 @@ void TerrainAdditiveFeatHLSL::processPix( Vector<ShaderComponent*> &componentLis
                                           const MaterialFeatureData &fd )
 {
    Var *color = NULL;
+   Var *normal = NULL;
    if (fd.features[MFT_DeferredTerrainDetailMap])
+   {
        color = (Var*) LangElement::find( getOutputTargetVarName(ShaderFeature::RenderTarget1) );
+       normal = (Var*) LangElement::find( getOutputTargetVarName(ShaderFeature::DefaultTarget) );
+   }
    else
        color = (Var*) LangElement::find( getOutputTargetVarName(ShaderFeature::DefaultTarget) );
 
@@ -1179,6 +1183,8 @@ void TerrainAdditiveFeatHLSL::processPix( Vector<ShaderComponent*> &componentLis
    meta->addStatement( new GenOp( "   clip( @ - 0.0001 );\r\n", blendTotal ) );
    meta->addStatement( new GenOp( "   @.a = @;\r\n", color, blendTotal ) );
 
+   if (normal)
+	   meta->addStatement(new GenOp("   @.a = @;\r\n", normal, blendTotal));
 
    output = meta;
 }

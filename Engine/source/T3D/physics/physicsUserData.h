@@ -55,11 +55,12 @@ public:
 
    /// The constructor.
    PhysicsUserData()
-      :  mObject( NULL ),
+      :
+      #ifdef TORQUE_DEBUG
+          mTypeId( smTypeName ),
+      #endif
+         mObject( NULL ),
          mBody( NULL )
-         #ifdef TORQUE_DEBUG
-         , mTypeId( smTypeName )
-         #endif
       {}
 
    /// The destructor.

@@ -323,14 +323,6 @@ void ParallaxFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    meta->addStatement( new GenOp( "   @ = mul( @, float3( @.xyz - @ ) );\r\n", 
       outNegViewTS, objToTangentSpace, inPos, eyePos ) );
 
-   // TODO: I'm at a loss at why i need to flip the binormal/y coord
-   // to get a good view vector for parallax. Lighting works properly
-   // with the TS matrix as is... but parallax does not.
-   //
-   // Someone figure this out!
-   //
-   meta->addStatement( new GenOp( "   @.y = -@.y;\r\n", outNegViewTS, outNegViewTS ) );  
-
    // If we have texture anim matrix the tangent
    // space view vector may need to be rotated.
    Var *texMat = (Var*)LangElement::find( "texMat" );

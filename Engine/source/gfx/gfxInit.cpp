@@ -198,6 +198,22 @@ GFXAdapter* GFXInit::getAdapterOfType( GFXAdapterType type, const char* outputDe
    return NULL;
 }
 
+GFXAdapter* GFXInit::getAdapterOfType(GFXAdapterType type, S32 outputDeviceIndex)
+{
+   for (U32 i = 0; i < smAdapters.size(); i++)
+   {
+      if (smAdapters[i]->mType == type)
+      {
+         if (smAdapters[i]->mIndex == outputDeviceIndex)
+         {
+            return smAdapters[i];
+         }
+      }
+   }
+
+   return NULL;
+}
+
 GFXAdapter* GFXInit::chooseAdapter( GFXAdapterType type, const char* outputDevice)
 {
    GFXAdapter* adapter = GFXInit::getAdapterOfType(type, outputDevice);
@@ -216,6 +232,27 @@ GFXAdapter* GFXInit::chooseAdapter( GFXAdapterType type, const char* outputDevic
    }
    
    AssertFatal( adapter, "There is no rendering device available whatsoever.");
+   return adapter;
+}
+
+GFXAdapter* GFXInit::chooseAdapter(GFXAdapterType type, S32 outputDeviceIndex)
+{
+   GFXAdapter* adapter = GFXInit::getAdapterOfType(type, outputDeviceIndex);
+
+   if (!adapter && type != OpenGL)
+   {
+      Con::errorf("The requested renderer, %s, doesn't seem to be available."
+         " Trying the default, OpenGL.", getAdapterNameFromType(type));
+      adapter = GFXInit::getAdapterOfType(OpenGL, outputDeviceIndex);
+   }
+
+   if (!adapter)
+   {
+      Con::errorf("The OpenGL renderer doesn't seem to be available. Trying the GFXNulDevice.");
+      adapter = GFXInit::getAdapterOfType(NullDevice, 0);
+   }
+
+   AssertFatal(adapter, "There is no rendering device available whatsoever.");
    return adapter;
 }
 
@@ -256,8 +293,23 @@ GFXAdapter *GFXInit::getBestAdapterChoice()
    // Get the user's preference for device...
    const String   renderer   = Con::getVariable("$pref::Video::displayDevice");
    const String   outputDevice = Con::getVariable("$pref::Video::displayOutputDevice");
-   GFXAdapterType adapterType = getAdapterTypeFromName(renderer.c_str());
-   GFXAdapter     *adapter    = chooseAdapter(adapterType, outputDevice.c_str());
+   const String   adapterDevice = Con::getVariable("$Video::forceDisplayAdapter");
+
+   GFXAdapterType adapterType = getAdapterTypeFromName(renderer.c_str());;
+   GFXAdapter     *adapter = NULL;
+
+   if (adapterDevice.isEmpty())
+   {
+      adapter = chooseAdapter(adapterType, outputDevice.c_str());
+   }
+   else
+   {
+     S32 adapterIdx = dAtoi(adapterDevice.c_str());
+     if (adapterIdx == -1)
+        adapter = chooseAdapter(adapterType, outputDevice.c_str());
+     else
+        adapter = chooseAdapter(adapterType, adapterIdx);
+   }
 
    // Did they have one? Return it.
    if(adapter)

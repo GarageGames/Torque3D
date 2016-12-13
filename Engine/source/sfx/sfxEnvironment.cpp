@@ -32,7 +32,7 @@ IMPLEMENT_CO_DATABLOCK_V1( SFXEnvironment );
 // Reverb flags.
 static const U32 sReverbFlagDecayTimeScale         = 0x001;
 static const U32 sReverbFlagReflectionsScale       = 0x002;
-static const U32 sReverbFlagReflectionsDelayScale  = 0x004;
+//static const U32 sReverbFlagReflectionsDelayScale  = 0x004; unused, but kept for doc purposes -BJR
 static const U32 sReverbFlagReverbScale            = 0x008;
 static const U32 sReverbFlagReverbDelayScale       = 0x010;
 static const U32 sReverbFlagDecayHFLimit           = 0x020;

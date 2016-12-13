@@ -320,7 +320,7 @@ void StandardMainLoop::init()
    Sampler::init();
 
    // Hook in for UDP notification
-   Net::smPacketReceive.notify(GNet, &NetInterface::processPacketReceiveEvent);
+   Net::getPacketReceiveEvent().notify(GNet, &NetInterface::processPacketReceiveEvent);
 
    #ifdef TORQUE_DEBUG_GUARD
       Memory::flagCurrentAllocs( Memory::FLAG_Static );
@@ -604,15 +604,11 @@ bool StandardMainLoop::doMainLoop()
             lastFocus = newFocus;
          }
          
-#ifndef TORQUE_OS_MAC         
          // under the web plugin do not sleep the process when the child window loses focus as this will cripple the browser perfomance
          if (!Platform::getWebDeployment())
             tm->setBackground(!newFocus);
          else
             tm->setBackground(false);
-#else
-         tm->setBackground(false);
-#endif
       }
       else
       {

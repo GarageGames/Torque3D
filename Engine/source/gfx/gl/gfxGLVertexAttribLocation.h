@@ -21,8 +21,11 @@ namespace Torque
       GL_VertexAttrib_TexCoord7,
       GL_VertexAttrib_TexCoord8,
       GL_VertexAttrib_TexCoord9,
+      GL_VertexAttrib_COUNT,
+
       GL_VertexAttrib_LAST = GL_VertexAttrib_TexCoord9,
-      GL_VertexAttrib_COUNT
+      GL_VertexAttrib_BlendWeight0 = GL_VertexAttrib_TexCoord6,
+      GL_VertexAttrib_BlendIndex0 = GL_VertexAttrib_TexCoord2,
    };
 }
 

@@ -27,6 +27,7 @@
 #include "core/stringTable.h"
 #include "platform/platformInput.h"
 #include "math/mQuat.h"
+#include "math/mAngAxis.h"
 
 MODULE_BEGIN( InputEventManager )
 
@@ -546,3 +547,21 @@ void InputEventManager::buildInputEvent(U32 deviceType, U32 deviceInst, InputEve
 
    newEvent.postToSignal(Input::smInputEvent);
 }
+
+void InputEventManager::buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, AngAxisF& aValue)
+{
+   InputEventInfo newEvent;
+
+   newEvent.deviceType = deviceType;
+   newEvent.deviceInst = deviceInst;
+   newEvent.objType = objType;
+   newEvent.objInst = objInst;
+   newEvent.action = action;
+   newEvent.fValue = aValue.axis.x;
+   newEvent.fValue2 = aValue.axis.y;
+   newEvent.fValue3 = aValue.axis.z;
+   newEvent.fValue4 = aValue.angle;
+
+   newEvent.postToSignal(Input::smInputEvent);
+}
+

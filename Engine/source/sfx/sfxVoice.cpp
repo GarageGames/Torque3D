@@ -41,8 +41,8 @@ Signal< void( SFXVoice* voice ) > SFXVoice::smVoiceDestroyedSignal;
 //-----------------------------------------------------------------------------
 
 SFXVoice::SFXVoice( SFXBuffer* buffer )
-   : mBuffer( buffer ),
-     mStatus( SFXStatusNull ),
+   : mStatus( SFXStatusNull ),
+     mBuffer( buffer ),
      mOffset( 0 )
 {
 }

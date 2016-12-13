@@ -56,7 +56,7 @@ class StaticShape: public ShapeBase
    StaticShapeData*  mDataBlock;
    bool              mPowered;
 
-   void onUnmount(ShapeBase* obj,S32 node);
+   void onUnmount(SceneObject* obj,S32 node);
 
 protected:
    enum MaskBits {

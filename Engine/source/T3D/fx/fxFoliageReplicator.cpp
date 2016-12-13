@@ -132,7 +132,6 @@ ConsoleDocClass( fxFoliageReplicator,
 // Trig Table Lookups.
 //
 //------------------------------------------------------------------------------
-const F32 PeriodLen = (F32) 2.0f * (F32) M_PI;
 const F32 PeriodLenMinus = (F32) (2.0f * M_PI) - 0.01f;
 
 //------------------------------------------------------------------------------

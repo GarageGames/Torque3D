@@ -118,11 +118,14 @@ inline void GFXGLWindowTarget::_setupAttachments()
    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color->getHandle(), 0);
    mBackBufferDepthTex.set(dstSize.x, dstSize.y, GFXFormatD24S8, &BackBufferDepthProfile, "backBuffer");
    GFXGLTextureObject *depth = static_cast<GFXGLTextureObject*>(mBackBufferDepthTex.getPointer());
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth->getHandle(), 0);
+   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth->getHandle(), 0);
 }
 
 void GFXGLWindowTarget::makeActive()
 {
+   //make the rendering context active on this window
+   _makeContextCurrent();
+
    if(mBackBufferFBO)
    {
       glBindFramebuffer( GL_FRAMEBUFFER, mBackBufferFBO);

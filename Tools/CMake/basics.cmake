@@ -64,11 +64,16 @@ macro(addPath dir)
     if(${ARGC} GREATER 1 AND "${ARGV1}" STREQUAL "REC")
         set(glob_config GLOB_RECURSE)
     endif()
+	set(mac_files "")
+	if(APPLE)
+		set(mac_files ${dir}/*.mm ${dir}/*.m)
+	endif()
     file(${glob_config} tmp_files
              ${dir}/*.cpp
              ${dir}/*.c
              ${dir}/*.cc
              ${dir}/*.h
+             ${mac_files}
              #${dir}/*.asm
              )
     foreach(entry ${BLACKLIST})
@@ -165,6 +170,13 @@ macro(_process_libs)
     if(DEFINED ${PROJECT_NAME}_libs)
         target_link_libraries(${PROJECT_NAME} "${${PROJECT_NAME}_libs}")
     endif()
+endmacro()
+
+# apple frameworks
+macro(addFramework framework)
+	if (APPLE)
+		addLib("-framework ${framework}")
+	endif()
 endmacro()
 
 ###############################################################################
@@ -298,7 +310,13 @@ macro(finishExecutable)
         set_source_files_properties(${${PROJECT_NAME}_files} PROPERTIES COMPILE_FLAGS "${TORQUE_CXX_FLAGS_EXECUTABLES}")
     endif()
 
-    add_executable("${PROJECT_NAME}" WIN32 ${${PROJECT_NAME}_files})
+    if (APPLE)
+      set(ICON_FILE "${projectSrcDir}/torque.icns")
+        set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+        add_executable("${PROJECT_NAME}" MACOSX_BUNDLE ${ICON_FILE} ${${PROJECT_NAME}_files})
+    else()
+        add_executable("${PROJECT_NAME}" WIN32 ${${PROJECT_NAME}_files})
+    endif()
     addInclude("${firstDir}")
 
     _postTargetProcess()
@@ -347,12 +365,12 @@ if(WIN32)
     set(TORQUE_CXX_FLAGS_LIBS "/W0" CACHE TYPE STRING)
     mark_as_advanced(TORQUE_CXX_FLAGS_LIBS)
 
-    set(TORQUE_CXX_FLAGS_COMMON_DEFAULT "-DUNICODE -D_UNICODE -D_CRT_SECURE_NO_WARNINGS /MP /O2 /Ob2 /Oi /Ot /Oy /GT /Zi /W4 /nologo /GF /EHsc /GS- /Gy- /Qpar- /fp:fast /fp:except- /GR /Zc:wchar_t-" )
+    set(TORQUE_CXX_FLAGS_COMMON_DEFAULT "-DUNICODE -D_UNICODE -D_CRT_SECURE_NO_WARNINGS /MP /O2 /Ob2 /Oi /Ot /Oy /GT /Zi /W4 /nologo /GF /EHsc /GS- /Gy- /Qpar- /fp:precise /fp:except- /GR /Zc:wchar_t-" )
     if( TORQUE_CPU_X32 )
        set(TORQUE_CXX_FLAGS_COMMON_DEFAULT "${TORQUE_CXX_FLAGS_COMMON_DEFAULT} /arch:SSE2")
     endif()
     set(TORQUE_CXX_FLAGS_COMMON ${TORQUE_CXX_FLAGS_COMMON_DEFAULT} CACHE TYPE STRING)
-    
+
     mark_as_advanced(TORQUE_CXX_FLAGS_COMMON)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORQUE_CXX_FLAGS_COMMON}")
@@ -387,11 +405,18 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
 endif()
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
 	SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${projectOutDir}")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${projectOutDir}")
 	SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${projectOutDir}")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${projectOutDir}")
+endif()
+
+if(APPLE)
+  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE "${projectOutDir}")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${projectOutDir}")
+  SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG "${projectOutDir}")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG "${projectOutDir}")
 endif()
 
 # fix the debug/release subfolders on windows

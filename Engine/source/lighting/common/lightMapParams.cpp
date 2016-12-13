@@ -35,9 +35,9 @@ MODULE_END;
 LightInfoExType LightMapParams::Type( "" );
 
 LightMapParams::LightMapParams( LightInfo *light ) :
-   representedInLightmap(false), 
-   includeLightmappedGeometryInShadow(false), 
-   shadowDarkenColor(0.0f, 0.0f, 0.0f, -1.0f)
+   representedInLightmap(false),
+   shadowDarkenColor(0.0f, 0.0f, 0.0f, -1.0f),
+   includeLightmappedGeometryInShadow(false)
 {
    
 }

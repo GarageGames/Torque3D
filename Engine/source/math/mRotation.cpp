@@ -22,6 +22,7 @@
 #include "math/mRotation.h"
 #include "console/console.h"
 #include "console/engineAPI.h"
+#include "math/mathUtils.h"
 
 #ifdef TORQUE_TESTS_ENABLED
 #include "testing/unitTesting.h"
@@ -187,6 +188,15 @@ void RotationF::lookAt(const Point3F& _origin, const Point3F& _target, const Poi
    set(mat);
 }
 
+VectorF RotationF::getDirection()
+{
+   VectorF dir;
+   EulerF angles = asEulerF();
+   MathUtils::getVectorFromAngles(dir, angles.z, angles.x);
+
+   return dir;
+}
+
 //========================================================
 EulerF RotationF::asEulerF(UnitFormat _format) const
 {
@@ -345,4 +355,13 @@ DefineConsoleStaticMethod(rotation, LookAt, RotationF, (Point3F origin, Point3F 
    RotationF result;
    result.lookAt(origin, target, up);
    return result;
+}
+
+DefineConsoleStaticMethod(rotation, getDirection, Point3F, (RotationF rot),,
+"Takes the angles of the provided rotation and returns a direction vector.\n"
+"@param rot Our rotation."
+"@returns v Direction vector result."
+"@ingroup Math")
+{
+   return rot.getDirection();
 }

@@ -80,8 +80,8 @@ struct SilhouetteExtractorBasePerspective : public SilhouetteExtractorBase< Poly
 
       SilhouetteExtractorBasePerspective( const Polyhedron& polyhedron )
          : SilhouetteExtractorBase< Polyhedron >( polyhedron ),
-           mWaterMark( 0 ),
-           mPolygonOrientations( NULL ) {}
+           mPolygonOrientations( NULL ),
+           mWaterMark( 0 ) {}
 
       /// Initialize extraction.
       ///

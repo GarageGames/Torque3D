@@ -1,14 +1,14 @@
 
 echo "
   There is no \"configure\" script in this distribution (*.zip or *.7z) of
-  libpng-1.5.14.
+  libpng-1.6.25.
 
   Instead, please copy the appropriate makefile for your system from the
   \"scripts\" directory.  Read the INSTALL file for more details.
 
   Update, July 2004: you can get a \"configure\" based distribution
   from the libpng distribution sites.  Download the file
-  libpng-1.5.14.tar.gz, libpng-1.5.14.tar.xz, or libpng-1.5.14.tar.bz2
+  libpng-1.6.25.tar.gz or libpng-1.6.25.tar.xz.
 
   If the line endings in the files look funny, which is likely to be the
   case if you were trying to run \"configure\" on a Linux machine, you may

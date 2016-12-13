@@ -246,6 +246,7 @@ public:
 
    TSShape*                mShape;        // Edited shape; NULL while not loaded; not a Resource<TSShape> as we don't want it to prevent from unloading.
    ColladaUtils::ImportOptions   mOptions;
+   bool mLoadingShape;
 
 public:
 
@@ -261,6 +262,7 @@ public:
    bool onAdd();
 
    void onScriptChanged(const Torque::Path& path);
+   void onActionPerformed();
 
    bool writeField(StringTableEntry fieldname, const char *value);
    void writeChangeSet();
@@ -383,8 +385,16 @@ typedef domUpAxisType TSShapeConstructorUpAxis;
 typedef ColladaUtils::ImportOptions::eLodType TSShapeConstructorLodType;
 
 DefineEnumType( TSShapeConstructorUpAxis );
-DefineEnumType( TSShapeConstructorLodType );
+DefineEnumType(TSShapeConstructorLodType);
 
+class TSShapeConstructorMethodActionCallback
+{
+   TSShapeConstructor* mObject;
+
+public:
+   TSShapeConstructorMethodActionCallback(TSShapeConstructor *object) : mObject(object) { ; }
+   ~TSShapeConstructorMethodActionCallback() { mObject->onActionPerformed(); }
+};
 
 /* This macro simplifies the definition of a TSShapeConstructor API method. It
    wraps the actual EngineMethod definition and automatically calls the real
@@ -403,6 +413,7 @@ DefineEnumType( TSShapeConstructorLodType );
          Con::errorf( "TSShapeConstructor::" #name " - shape not loaded" );                     \
          return defRet;                                                                         \
       }                                                                                         \
+      TSShapeConstructorMethodActionCallback actionCallback(object);                            \
       return object->name rawArgs ;                                                             \
    }                                                                                            \
    /* Define the real TSShapeConstructor method */                                              \

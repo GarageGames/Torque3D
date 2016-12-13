@@ -62,8 +62,8 @@ struct DebrisData : public GameBaseData
    F32      elasticity;
    F32      lifetime;
    F32      lifetimeVariance;
-   U32      numBounces;
-   U32      bounceVariance;
+   S32      numBounces;
+   S32      bounceVariance;
    F32      minSpinSpeed;
    F32      maxSpinSpeed;
    bool     explodeOnMaxBounce;  // explodes after it has bounced max times

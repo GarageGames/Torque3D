@@ -49,8 +49,8 @@ ForestBrushElement::ForestBrushElement()
   mSinkMin( 0.0f ),
   mSinkMax( 0.0f ),
   mSinkRadius( 1 ),
-  mSlopeMax( 90.0f ),
   mSlopeMin( 0.0f ),
+  mSlopeMax( 90.0f ),
   mElevationMin( -10000.0f ),
   mElevationMax( 10000.0f ) 
 {

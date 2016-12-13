@@ -97,7 +97,7 @@ void LightDescription::initPersistFields()
       addField( "range", TypeF32, Offset( range, LightDescription ), "Controls the size (radius) of the light" );
       addField( "castShadows", TypeBool, Offset( castShadows, LightDescription ), "Enables/disabled shadow casts by this light." );
       addField( "staticRefreshFreq", TypeS32, Offset( mStaticRefreshFreq, LightDescription ), "static shadow refresh rate (milliseconds)" );
-      addField( "dynamicRefreshFreq", TypeS32, Offset( mDynamicRefreshFreq, LightDescription ), "dynamic shadow refresh rate (milliseconds)" );
+      addField( "dynamicRefreshFreq", TypeS32, Offset( mDynamicRefreshFreq, LightDescription ), "dynamic shadow refresh rate (milliseconds)", AbstractClassRep::FieldFlags::FIELD_HideInInspectors);
 
    endGroup( "Light" );
 

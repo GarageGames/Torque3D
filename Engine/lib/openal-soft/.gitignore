@@ -1,0 +1,7 @@
+build
+winbuild
+win64build
+include/SLES
+include/sndio.h
+include/sys
+openal-soft.kdev4

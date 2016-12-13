@@ -180,24 +180,24 @@ ImplementEnumType(baseTexFormat,
 EndImplementEnumType;
 
 TerrainBlock::TerrainBlock()
- : mSquareSize( 1.0f ),
-   mCastShadows( true ),
-   mScreenError( 16 ),   
-   mDetailsDirty( false ),
-   mLayerTexDirty( false ),
-   mLightMap( NULL ),
+ : mLightMap( NULL ),
    mLightMapSize( 256 ),
-   mMaxDetailDistance( 0.0f ),
-   mCell( NULL ),
    mCRC( 0 ),
-   mBaseTexSize( 1024 ),
-   mBaseTexFormat( TerrainBlock::JPG ),
-   mBaseMaterial( NULL ),
-   mDefaultMatInst( NULL ),
+   mMaxDetailDistance( 0.0f ),
    mBaseTexScaleConst( NULL ),
    mBaseTexIdConst( NULL ),
+   mDetailsDirty( false ),
+   mLayerTexDirty( false ),
+   mBaseTexSize( 1024 ),
+   mBaseTexFormat( TerrainBlock::PNG ),
+   mCell( NULL ),
+   mBaseMaterial( NULL ),
+   mDefaultMatInst( NULL ),
+   mSquareSize( 1.0f ),
    mPhysicsRep( NULL ),
-   mZoningDirty( false ),
+   mScreenError( 16 ),
+   mCastShadows( true ),
+   mZoningDirty( false )
    mUpdateBasetex ( true )
 {
    mTypeMask = TerrainObjectType | StaticObjectType | StaticShapeObjectType;

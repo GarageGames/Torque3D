@@ -354,7 +354,7 @@ void Ribbon::addSegmentPoint(Point3F &point, MatrixF &mat) {
    U32 segmentsToDelete = checkRibbonDistance(mDataBlock->segmentsPerUpdate);
 
    for (U32 i = 0; i < segmentsToDelete; i++) {
-      U32 last = mSegmentPoints.size() - 1;
+      S32 last = mSegmentPoints.size() - 1;
       if (last < 0)
          break;
       mTravelledDistance += last ? (mSegmentPoints[last] - mSegmentPoints[last-1]).len() : 0;

@@ -47,8 +47,6 @@ out vec4  mieColor;
 #define OUT_mieColor mieColor
 out vec3  v3Direction;
 #define OUT_v3Direction v3Direction
-out float zPosition;
-#define OUT_zPosition zPosition
 out vec3  pos;
 #define OUT_pos pos
  

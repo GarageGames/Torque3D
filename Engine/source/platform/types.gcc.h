@@ -125,16 +125,6 @@ typedef unsigned long  U64;
 #  define TORQUE_CPU_X64
 #  define TORQUE_LITTLE_ENDIAN
 
-#elif defined(__ppc__)
-#  define TORQUE_CPU_STRING "PowerPC"
-#  define TORQUE_CPU_PPC
-#  define TORQUE_BIG_ENDIAN
-
-#elif defined(SN_TARGET_PS3)
-#  define TORQUE_CPU_STRING "PowerPC"
-#  define TORQUE_CPU_PPC
-#  define TORQUE_BIG_ENDIAN
-
 #else
 #  error "GCC: Unsupported Target CPU"
 #endif

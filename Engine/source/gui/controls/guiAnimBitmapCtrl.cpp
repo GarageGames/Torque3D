@@ -124,7 +124,6 @@ bool guiAnimBitmapCtrl::ptSetFrame(void *object, const char *index, const char *
    }
 
    S32 val = dAtoi(data);
-   U32 i;
 
    if (val < 0)
    {

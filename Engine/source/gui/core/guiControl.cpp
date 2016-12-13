@@ -198,22 +198,22 @@ EndImplementEnumType;
 //-----------------------------------------------------------------------------
 
 GuiControl::GuiControl() : mAddGroup( NULL ),
-                           mLayer(0),
                            mBounds(0,0,64,64),
-                           mMinExtent(8,2),
                            mProfile(NULL),
-                           mLangTable(NULL),
-                           mFirstResponder(NULL),
+                           mTooltipProfile(NULL),
+                           mTipHoverTime(1000),
                            mVisible(true),
                            mActive(true),
                            mAwake(false),
-                           mHorizSizing(horizResizeRight),
-                           mVertSizing(vertResizeBottom),
-                           mTooltipProfile(NULL),
-                           mTipHoverTime(1000),
                            mIsContainer(false),
-									mCanResize(true),
-                           mCanHit( true )
+                           mCanResize(true),
+                           mCanHit( true ),
+                           mLayer(0),
+                           mMinExtent(8,2),
+                           mLangTable(NULL),
+                           mFirstResponder(NULL),
+                           mHorizSizing(horizResizeRight),
+                           mVertSizing(vertResizeBottom)
 {
    mConsoleVariable     = StringTable->EmptyString();
    mAcceleratorKey      = StringTable->EmptyString();

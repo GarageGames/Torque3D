@@ -99,14 +99,12 @@ void Input::init()
 //------------------------------------------------------------------------------
 ConsoleFunction( isJoystickDetected, bool, 1, 1, "isJoystickDetected()" )
 {
-   argc; argv;
    return( SDL_NumJoysticks() > 0 );
 }
 
 //------------------------------------------------------------------------------
 ConsoleFunction( getJoystickAxes, const char*, 2, 2, "getJoystickAxes( instance )" )
 {
-   argc;
    // TODO SDL
    return( "" );
 }

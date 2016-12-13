@@ -35,6 +35,8 @@
 #include "core/stream/fileStream.h"
 #include "core/util/safeDelete.h"
 #include "console/console.h"
+#include "math/mMathFn.h"
+
 
 using namespace Torque;
 
@@ -172,6 +174,39 @@ bool GFXD3D9ShaderBufferLayout::setMatrix(const ParamDesc& pd, const GFXShaderCo
 
       return false;
    }
+   else if (pd.constType == GFXSCT_Float4x3)
+   {
+      const U32 csize = 48;
+
+      // Loop through and copy 
+      bool ret = false;
+      U8* currDestPointer = basePointer + pd.offset;
+      const U8* currSourcePointer = static_cast<const U8*>(data);
+      const U8* endData = currSourcePointer + size;
+      while (currSourcePointer < endData)
+      {
+#ifdef TORQUE_DOUBLE_CHECK_43MATS
+         Point4F col;
+         ((MatrixF*)currSourcePointer)->getRow(3, &col);
+         AssertFatal(col.x == 0.0f && col.y == 0.0f && col.z == 0.0f && col.w == 1.0f, "3rd row used");
+#endif
+
+         if (dMemcmp(currDestPointer, currSourcePointer, csize) != 0)
+         {
+            dMemcpy(currDestPointer, currSourcePointer, csize);
+            ret = true;
+         }
+         else if (pd.constType == GFXSCT_Float4x3)
+         {
+            ret = true;
+         }
+
+         currDestPointer += csize;
+         currSourcePointer += sizeof(MatrixF);
+      }
+
+      return ret;
+   }
    else
    {
       PROFILE_SCOPE(GFXD3D9ShaderBufferLayout_setMatrix_not4x4);
@@ -185,6 +220,9 @@ bool GFXD3D9ShaderBufferLayout::setMatrix(const ParamDesc& pd, const GFXShaderCo
          break;
       case GFXSCT_Float3x3 :
          csize = 48;
+         break;
+      case GFXSCT_Float3x4 :
+         csize = 64;
          break;
       default:
          AssertFatal(false, "Unhandled case!");
@@ -202,6 +240,10 @@ bool GFXD3D9ShaderBufferLayout::setMatrix(const ParamDesc& pd, const GFXShaderCo
          if (dMemcmp(currDestPointer, currSourcePointer, csize) != 0)
          {
             dMemcpy(currDestPointer, currSourcePointer, csize);            
+            ret = true;
+         }
+         else if (pd.constType == GFXSCT_Float4x3)
+         {
             ret = true;
          }
 
@@ -390,8 +432,15 @@ void GFXD3D9ShaderConstBuffer::set(GFXShaderConstHandle* handle, const MatrixF& 
    AssertFatal(!h->isSampler(), "Handle is sampler constant!" );
    AssertFatal(h->mShader == mShader, "Mismatched shaders!"); 
 
-   MatrixF transposed;   
-   mat.transposeTo(transposed);
+   MatrixF transposed;
+   if (matrixType == GFXSCT_Float4x3)
+   {
+      transposed = mat;
+   }
+   else
+   {
+      mat.transposeTo(transposed);
+   }
 
    if (h->mInstancingConstant) 
    {
@@ -420,9 +469,17 @@ void GFXD3D9ShaderConstBuffer::set(GFXShaderConstHandle* handle, const MatrixF* 
 
    static Vector<MatrixF> transposed;
    if (arraySize > transposed.size())
-      transposed.setSize(arraySize);   
-   for (U32 i = 0; i < arraySize; i++)
-      mat[i].transposeTo(transposed[i]);
+      transposed.setSize(arraySize);
+
+   if (matrixType == GFXSCT_Float4x3)
+   {
+      dMemcpy(transposed.address(), mat, arraySize * sizeof(MatrixF));
+   }
+   else
+   {
+      for (U32 i = 0; i < arraySize; i++)
+         mat[i].transposeTo(transposed[i]);
+   }
 
    // TODO: Maybe support this in the future?
    if (h->mInstancingConstant) 
@@ -1069,13 +1126,43 @@ void GFXD3D9Shader::_getShaderConstants( ID3DXConstantTable *table,
                   case D3DXPC_MATRIX_ROWS :
                   case D3DXPC_MATRIX_COLUMNS :                     
                      {
-                        switch (constantDesc.RegisterCount)                        
+                        S32 fd, sd;
+                        fd = constantDesc.RegisterCount / constantDesc.Elements;
+                        sd = constantDesc.Class == D3DXPC_MATRIX_ROWS ? constantDesc.Columns : constantDesc.Rows;
+
+                        switch (fd)
                         {
+                           case 2 :
+                              AssertFatal(sd == 2, "non-square 2x? mats not supported");
+                              desc.constType = GFXSCT_Float2x2;
+                              break;
                            case 3 :
-                              desc.constType = GFXSCT_Float3x3;
+                              switch (sd)
+                              {
+                              case 3 :
+                                 desc.constType = GFXSCT_Float3x3;
+                                 break;
+                              case 4 :
+                                 desc.constType = GFXSCT_Float4x3;
+                                 break;
+                              default:
+                                 AssertFatal(false, "Unsupported matrix size");
+                                 break;
+                              }
                               break;
                            case 4 :
-                              desc.constType = GFXSCT_Float4x4;
+                              switch (sd)
+                              {
+                              case 3:
+                                 desc.constType = GFXSCT_Float3x4;
+                                 break;
+                              case 4:
+                                 desc.constType = GFXSCT_Float4x4;
+                                 break;
+                              default:
+                                 AssertFatal(false, "Unsupported matrix size");
+                                 break;
+                              }
                               break;
                         }
                      }
@@ -1436,9 +1523,15 @@ U32 GFXD3D9Shader::getAlignmentValue(const GFXShaderConstType constType) const
       case GFXSCT_Float3x3 : 
          return mRowSizeF * 3;
          break;
+      case GFXSCT_Float3x4 : 
+         return mRowSizeF * 4;
+         break;
       case GFXSCT_Float4x4 :
          return mRowSizeF * 4;
          break;   
+      case GFXSCT_Float4x3 : 
+         return mRowSizeF * 3;
+         break;
       //// Scalar
       case GFXSCT_Int :
       case GFXSCT_Int2 :

@@ -485,6 +485,7 @@ function EditorOpenMission(%filename)
 
 function EditorExportToCollada()
 {
+
    %dlg = new SaveFileDialog()
    {
       Filters        = "COLLADA Files (*.dae)|*.dae|";
@@ -517,6 +518,7 @@ function EditorExportToCollada()
 
 function EditorMakePrefab()
 {
+
    %dlg = new SaveFileDialog()
    {
       Filters        = "Prefab Files (*.prefab)|*.prefab|";
@@ -551,6 +553,38 @@ function EditorExplodePrefab()
    //echo( "EditorExplodePrefab()" );  
    EWorldEditor.explodeSelectedPrefab();
    EditorTree.buildVisibleTree( true );
+}
+
+function bakeSelectedToMesh()
+{
+
+   %dlg = new SaveFileDialog()
+   {
+      Filters        = "Collada file (*.dae)|*.dae|";
+      DefaultPath    = $Pref::WorldEditor::LastPath;
+      DefaultFile    = "";
+      ChangePath     = false;
+      OverwritePrompt   = true;
+   };
+         
+   %ret = %dlg.Execute();
+   if ( %ret )
+   {
+      $Pref::WorldEditor::LastPath = filePath( %dlg.FileName );
+      %saveFile = %dlg.FileName;
+   }
+   
+   if( fileExt( %saveFile ) !$= ".dae" )
+      %saveFile = %saveFile @ ".dae";
+   
+   %dlg.delete();
+   
+   if ( !%ret )
+      return;
+   
+   EWorldEditor.bakeSelectionToMesh( %saveFile );    
+   
+   EditorTree.buildVisibleTree( true );  
 }
 
 function EditorMount()
@@ -768,6 +802,15 @@ function EditorCameraSpeedMenu::setupGuiControls(%this)
    // Set up min/max camera slider range
    eval("CameraSpeedDropdownCtrlContainer-->Slider.range = \"" @ %minSpeed @ " " @ %maxSpeed @ "\";");
 }
+
+//////////////////////////////////////////////////////////////////////////
+// Tools Menu Handler
+//////////////////////////////////////////////////////////////////////////
+function EditorUtilitiesMenu::onSelectItem(%this, %id, %text)
+{
+   return Parent::onSelectItem(%this, %id, %text);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // World Menu Handler Object Menu
 //////////////////////////////////////////////////////////////////////////

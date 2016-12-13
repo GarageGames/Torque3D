@@ -106,6 +106,10 @@ void GFXGLDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
        AssertFatal(0, err );
    }
 
+   // Init GL
+   loadGLCore();
+   loadGLExtensions(tempContext);
+
    //check minimun Opengl 3.2
    int major, minor;
    glGetIntegerv(GL_MAJOR_VERSION, &major);
@@ -114,8 +118,6 @@ void GFXGLDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
    {
       return;
    }
-
-   loadGLCore();
     
    GFXAdapter *toAdd = new GFXAdapter;
    toAdd->mIndex = 0;
@@ -155,15 +157,15 @@ void GFXGLDevice::enumerateVideoModes()
 void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
 {
     AssertFatal(window, "GFXGLDevice::init - no window specified, can't init device without a window!");
-    PlatformWindowSDL* x11Window = dynamic_cast<PlatformWindowSDL*>(window);
-    AssertFatal(x11Window, "Window is not a valid PlatformWindowSDL object");
+    PlatformWindowSDL* sdlWindow = dynamic_cast<PlatformWindowSDL*>(window);
+    AssertFatal(sdlWindow, "Window is not a valid PlatformWindowSDL object");
 
     // Create OpenGL context
-    mContext = PlatformGL::CreateContextGL( x11Window );
-    PlatformGL::MakeCurrentGL( x11Window, mContext );
+    mContext = PlatformGL::CreateContextGL( sdlWindow );
+    PlatformGL::MakeCurrentGL( sdlWindow, mContext );
         
     loadGLCore();
-    loadGLExtensions(0);
+    loadGLExtensions(mContext);
     
     // It is very important that extensions be loaded before we call initGLState()
     initGLState();
@@ -224,6 +226,11 @@ void GFXGLWindowTarget::_teardownCurrentMode()
 
 void GFXGLWindowTarget::_setupNewMode()
 {
+}
+
+void GFXGLWindowTarget::_makeContextCurrent()
+{
+   PlatformGL::MakeCurrentGL(mWindow, mContext);
 }
 
 #endif

@@ -465,7 +465,6 @@ void GuiNavEditorCtrl::on3DMouseDragged(const Gui3DMouseEvent & event)
    mGizmo->on3DMouseDragged(event);
    if(mGizmo->isDirty())
    {
-      Point3F pos = mGizmo->getPosition();
       Point3F scale = mGizmo->getScale();
       const MatrixF &mat = mGizmo->getTransform();
       VectorF normal;

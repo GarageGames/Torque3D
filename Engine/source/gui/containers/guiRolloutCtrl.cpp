@@ -176,7 +176,6 @@ void GuiRolloutCtrl::removeObject( SimObject *obj )
 
 void GuiRolloutCtrl::onMouseDown( const GuiEvent &event )
 {
-   Point2I localPoint = globalToLocalCoord( event.mousePoint );
    mouseLock();
 }
 
