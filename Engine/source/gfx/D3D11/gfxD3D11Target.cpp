@@ -314,21 +314,34 @@ void GFXD3D11TextureTarget::resurrect()
 
 GFXD3D11WindowTarget::GFXD3D11WindowTarget()
 {
-   mWindow       = NULL;
-   mBackbuffer   = NULL;
+   mWindow = NULL;
+   mBackBuffer = NULL;
+   mDepthStencilView = NULL;
+   mDepthStencil = NULL;
+   mBackBufferView = NULL;
+   mSecondaryWindow = false;
 }
 
 GFXD3D11WindowTarget::~GFXD3D11WindowTarget()
 {
-   SAFE_RELEASE(mBackbuffer);
+   SAFE_RELEASE(mDepthStencilView)
+   SAFE_RELEASE(mDepthStencil);
+   SAFE_RELEASE(mBackBufferView);
+   SAFE_RELEASE(mBackBuffer);
+   SAFE_RELEASE(mSwapChain);
 }
 
 void GFXD3D11WindowTarget::initPresentationParams()
 {
    // Get some video mode related info.
-   GFXVideoMode vm = mWindow->getVideoMode();
-   Win32Window* win = static_cast<Win32Window*>(mWindow);
-   HWND hwnd = win->getHWND();
+   const GFXVideoMode &vm = mWindow->getVideoMode();
+   HWND hwnd = (HWND)mWindow->getSystemWindow(PlatformWindow::WindowSystem_Windows);
+
+   // Do some validation...
+   if (vm.fullScreen && mSecondaryWindow)
+   {
+      AssertFatal(false, "GFXD3D11WindowTarget::initPresentationParams - Cannot go fullscreen with secondary window!");
+   }
 
    mPresentationParams = D3D11->setupPresentParams(vm, hwnd);
 }
@@ -347,40 +360,178 @@ GFXFormat GFXD3D11WindowTarget::getFormat()
 
 bool GFXD3D11WindowTarget::present()
 {
-   return (D3D11->getSwapChain()->Present(!D3D11->smDisableVSync, 0) == S_OK);
+   return (mSwapChain->Present(!D3D11->smDisableVSync, 0) == S_OK);
 }
 
-void GFXD3D11WindowTarget::setImplicitSwapChain()
+void GFXD3D11WindowTarget::createSwapChain()
 {
-   if (!mBackbuffer)      
-      D3D11->mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackbuffer);
+   //create dxgi factory & swapchain
+   IDXGIFactory1* DXGIFactory;
+   HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory1), reinterpret_cast<void**>(&DXGIFactory));
+   if (FAILED(hr))
+      AssertFatal(false, "GFXD3D11WindowTarget::createSwapChain - couldn't create dxgi factory.");
+
+   hr = DXGIFactory->CreateSwapChain(D3D11DEVICE, &mPresentationParams, &mSwapChain);
+
+   if (FAILED(hr))
+      AssertFatal(false, "GFXD3D11WindowTarget::createSwapChain - couldn't create swap chain.");
+
+   SAFE_RELEASE(DXGIFactory);   
+}
+
+void GFXD3D11WindowTarget::createBuffersAndViews()
+{
+   //release old if they exist
+   SAFE_RELEASE(mDepthStencilView);
+   SAFE_RELEASE(mDepthStencil);
+   SAFE_RELEASE(mBackBufferView);
+   SAFE_RELEASE(mBackBuffer);
+
+   //grab video mode
+   const GFXVideoMode &vm = mWindow->getVideoMode();
+   //create depth/stencil
+   D3D11_TEXTURE2D_DESC desc;
+   desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+   desc.CPUAccessFlags = 0;
+   desc.Format = GFXD3D11TextureFormat[GFXFormatD24S8];
+   desc.MipLevels = 1;
+   desc.ArraySize = 1;
+   desc.Usage = D3D11_USAGE_DEFAULT;
+   desc.Width = vm.resolution.x;
+   desc.Height = vm.resolution.y;
+   desc.SampleDesc.Count = 1;
+   desc.SampleDesc.Quality = 0;
+   desc.MiscFlags = 0;
+
+   HRESULT hr = D3D11DEVICE->CreateTexture2D(&desc, NULL, &mDepthStencil);
+   if (FAILED(hr))
+      AssertFatal(false, "GFXD3D11WindowTarget::createBuffersAndViews - couldn't create device's depth-stencil surface.");
+
+   D3D11_DEPTH_STENCIL_VIEW_DESC depthDesc;
+   depthDesc.Format = GFXD3D11TextureFormat[GFXFormatD24S8];
+   depthDesc.Flags = 0;
+   depthDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+   depthDesc.Texture2D.MipSlice = 0;
+
+   hr = D3D11DEVICE->CreateDepthStencilView(mDepthStencil, &depthDesc, &mDepthStencilView);
+   if (FAILED(hr))
+      AssertFatal(false, "GFXD3D11WindowTarget::createBuffersAndViews - couldn't create depth stencil view");
+
+   setBackBuffer();
+
+   //create back buffer view
+   D3D11_RENDER_TARGET_VIEW_DESC RTDesc;
+   RTDesc.Format = GFXD3D11TextureFormat[GFXFormatR8G8B8A8];
+   RTDesc.Texture2D.MipSlice = 0;
+   RTDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+   hr = D3D11DEVICE->CreateRenderTargetView(mBackBuffer, &RTDesc, &mBackBufferView);
+
+   if (FAILED(hr))
+      AssertFatal(false, "GFXD3D11WindowTarget::createBuffersAndViews - couldn't create back buffer target view");
+
+   //debug names
+#ifdef TORQUE_DEBUG
+   if (!mSecondaryWindow)
+   {
+      String backBufferName = "MainBackBuffer";
+      String depthSteniclName = "MainDepthStencil";
+      String backBuffViewName = "MainBackBuffView";
+      String depthStencViewName = "MainDepthView";
+      mBackBuffer->SetPrivateData(WKPDID_D3DDebugObjectName, backBufferName.size(), backBufferName.c_str());
+      mDepthStencil->SetPrivateData(WKPDID_D3DDebugObjectName, depthSteniclName.size(), depthSteniclName.c_str());
+      mDepthStencilView->SetPrivateData(WKPDID_D3DDebugObjectName, depthStencViewName.size(), depthStencViewName.c_str());
+      mBackBufferView->SetPrivateData(WKPDID_D3DDebugObjectName, backBuffViewName.size(), backBuffViewName.c_str());
+   }
+#endif
 }
 
 void GFXD3D11WindowTarget::resetMode()
 {
+   HRESULT hr;
+   if (mSwapChain)
+   {
+      // The current video settings.
+      DXGI_SWAP_CHAIN_DESC desc;
+      hr = mSwapChain->GetDesc(&desc);
+      if (FAILED(hr))
+         AssertFatal(false, "GFXD3D11WindowTarget::resetMode - failed to get swap chain description!");
+
+      bool fullscreen = !desc.Windowed;
+      Point2I backbufferSize(desc.BufferDesc.Width, desc.BufferDesc.Height);
+
+      // The settings we are now applying.
+      const GFXVideoMode &vm = mWindow->getVideoMode();
+
+      // Early out if none of the settings which require a device reset
+      // have changed.      
+      if (backbufferSize == vm.resolution &&
+         fullscreen == vm.fullScreen)
+         return;
+   }
+
+   //release old buffers and views
+   SAFE_RELEASE(mDepthStencilView)
+   SAFE_RELEASE(mDepthStencil);
+   SAFE_RELEASE(mBackBufferView);
+   SAFE_RELEASE(mBackBuffer);
+
+   if(!mSecondaryWindow)
+      D3D11->beginReset();
+
    mWindow->setSuppressReset(true);
 
    // Setup our presentation params.
    initPresentationParams();
 
-   // Otherwise, we have to reset the device, if we're the implicit swapchain.
-   D3D11->reset(mPresentationParams);
+   if (!mPresentationParams.Windowed)
+   {
+      mPresentationParams.BufferDesc.RefreshRate.Numerator = 0;
+      mPresentationParams.BufferDesc.RefreshRate.Denominator = 0;
+      hr = mSwapChain->ResizeTarget(&mPresentationParams.BufferDesc);
+
+      if (FAILED(hr))
+         AssertFatal(false, "GFXD3D11WindowTarget::resetMode - failed to resize target!");
+
+   }
+
+   hr = mSwapChain->ResizeBuffers(mPresentationParams.BufferCount, mPresentationParams.BufferDesc.Width, mPresentationParams.BufferDesc.Height, 
+      mPresentationParams.BufferDesc.Format, mPresentationParams.Windowed ? 0 : DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+
+   if (FAILED(hr))
+      AssertFatal(false, "GFXD3D11WindowTarget::resetMode - failed to resize back buffer!");
+
+   hr = mSwapChain->SetFullscreenState(!mPresentationParams.Windowed, NULL);
+
+   if (FAILED(hr))
+      AssertFatal(false, "GFXD3D11WindowTarget::resetMode - failed to change screen states!");
 
    // Update our size, too.
    mSize = Point2I(mPresentationParams.BufferDesc.Width, mPresentationParams.BufferDesc.Height);
 
    mWindow->setSuppressReset(false);
-   GFX->beginReset();
+
+   //re-create buffers and views
+   createBuffersAndViews();
+
+   if (!mSecondaryWindow)
+      D3D11->endReset(this);
 }
 
 void GFXD3D11WindowTarget::zombify()
 {
-   SAFE_RELEASE(mBackbuffer);
+   SAFE_RELEASE(mBackBuffer);
 }
 
 void GFXD3D11WindowTarget::resurrect()
 {
-   setImplicitSwapChain();
+   setBackBuffer();
+}
+
+void GFXD3D11WindowTarget::setBackBuffer()
+{
+   if (!mBackBuffer)
+      mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackBuffer);
 }
 
 void GFXD3D11WindowTarget::activate()
@@ -391,10 +542,10 @@ void GFXD3D11WindowTarget::activate()
    ID3D11RenderTargetView* rtViews[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
    D3D11DEVICECONTEXT->OMSetRenderTargets(8, rtViews, NULL);
-   D3D11DEVICECONTEXT->OMSetRenderTargets(1, &D3D11->mDeviceBackBufferView, D3D11->mDeviceDepthStencilView);
+   D3D11DEVICECONTEXT->OMSetRenderTargets(1, &mBackBufferView, mDepthStencilView);
 
    DXGI_SWAP_CHAIN_DESC pp;
-   D3D11->mSwapChain->GetDesc(&pp);
+   mSwapChain->GetDesc(&pp);
 
    // Update our video mode here, too.
    GFXVideoMode vm;
@@ -412,5 +563,35 @@ void GFXD3D11WindowTarget::resolveTo(GFXTextureObject *tex)
    D3D11_TEXTURE2D_DESC desc;
    ID3D11Texture2D* surf = ((GFXD3D11TextureObject*)(tex))->get2DTex();
    surf->GetDesc(&desc);
-   D3D11DEVICECONTEXT->ResolveSubresource(surf, 0, D3D11->mDeviceBackbuffer, 0, desc.Format);
+   D3D11DEVICECONTEXT->ResolveSubresource(surf, 0, mBackBuffer, 0, desc.Format);
+}
+
+IDXGISwapChain *GFXD3D11WindowTarget::getSwapChain()
+{
+   mSwapChain->AddRef();
+   return mSwapChain;
+}
+
+ID3D11Texture2D *GFXD3D11WindowTarget::getBackBuffer()
+{
+   mBackBuffer->AddRef();
+   return mBackBuffer;
+}
+
+ID3D11Texture2D *GFXD3D11WindowTarget::getDepthStencil()
+{
+   mDepthStencil->AddRef();
+   return mDepthStencil;
+}
+
+ID3D11RenderTargetView* GFXD3D11WindowTarget::getBackBufferView()
+{
+   mBackBufferView->AddRef();
+   return mBackBufferView;
+}
+
+ID3D11DepthStencilView* GFXD3D11WindowTarget::getDepthStencilView()
+{
+   mDepthStencilView->AddRef();
+   return mDepthStencilView;
 }
