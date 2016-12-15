@@ -197,7 +197,7 @@ TerrainBlock::TerrainBlock()
    mPhysicsRep( NULL ),
    mScreenError( 16 ),
    mCastShadows( true ),
-   mZoningDirty( false )
+   mZoningDirty( false ),
    mUpdateBasetex ( true )
 {
    mTypeMask = TerrainObjectType | StaticObjectType | StaticShapeObjectType;
