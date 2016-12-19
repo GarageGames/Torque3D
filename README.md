@@ -29,4 +29,4 @@ They are available from the [downloads](http://wiki.torque3d.org/main:downloads)
 
 # License 
 
-All assets and code are under the [![license](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/GarageGames/Torque3D/blob/master/LICENSE.md)
+All assets and code are under the [![license](https://img.shields.io/github/license/GarageGames/Torque3D.svg)](https://github.com/GarageGames/Torque3D/blob/master/LICENSE.md)
