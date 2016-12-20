@@ -1994,12 +1994,8 @@ void Net::enableMulticast()
          {
             NetAddress listenAddress;
             char listenAddressStr[256];
-            error = PlatformNetState::getSocketAddress(socketFd, AF_INET6, &listenAddress);
-            if (error == NoError)
-            {
-               Net::addressToString(&listenAddress, listenAddressStr);
-               Con::printf("Multicast initialized on %s", listenAddressStr);
-            }
+            Net::addressToString(&multicastAddress, listenAddressStr);
+            Con::printf("Multicast initialized on %s", listenAddressStr);
          }
 
           if (error != NoError)
