@@ -1,0 +1,14 @@
+version: 1.17.2.{build}
+
+environment:
+    matrix:
+      - GEN: "Visual Studio 14 2015"
+        CFG: Release
+      - GEN: "Visual Studio 14 2015 Win64"
+        CFG: Release
+
+build_script:
+    - cd build
+    - cmake .. -G"%GEN%"
+    - cmake --build . --config %CFG% --clean-first
+

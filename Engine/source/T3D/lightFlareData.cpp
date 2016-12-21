@@ -118,11 +118,11 @@ ConsoleDocClass( LightFlareData,
 );
 
 LightFlareData::LightFlareData()
- : mFlareEnabled( true ),
-   mElementCount( 0 ),
-   mScale( 1.0f ),
+ : mScale( 1.0f ),
+   mFlareEnabled( true ),
    mOcclusionRadius( 0.0f ),
-   mRenderReflectPass( true )
+   mRenderReflectPass( true ),
+   mElementCount( 0 )
 {
    dMemset( mElementRect, 0, sizeof( RectF ) * MAX_ELEMENTS );   
    dMemset( mElementScale, 0, sizeof( F32 ) * MAX_ELEMENTS );

@@ -555,6 +555,38 @@ function EditorExplodePrefab()
    EditorTree.buildVisibleTree( true );
 }
 
+function makeSelectedAMesh()
+{
+
+   %dlg = new SaveFileDialog()
+   {
+      Filters        = "Collada file (*.dae)|*.dae|";
+      DefaultPath    = $Pref::WorldEditor::LastPath;
+      DefaultFile    = "";
+      ChangePath     = false;
+      OverwritePrompt   = true;
+   };
+         
+   %ret = %dlg.Execute();
+   if ( %ret )
+   {
+      $Pref::WorldEditor::LastPath = filePath( %dlg.FileName );
+      %saveFile = %dlg.FileName;
+   }
+   
+   if( fileExt( %saveFile ) !$= ".dae" )
+      %saveFile = %saveFile @ ".dae";
+   
+   %dlg.delete();
+   
+   if ( !%ret )
+      return;
+   
+   EWorldEditor.makeSelectionAMesh( %saveFile );    
+   
+   EditorTree.buildVisibleTree( true );  
+}
+
 function EditorMount()
 {
    echo( "EditorMount" );

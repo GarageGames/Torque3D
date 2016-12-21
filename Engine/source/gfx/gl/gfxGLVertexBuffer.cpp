@@ -41,10 +41,11 @@ GFXGLVertexBuffer::GFXGLVertexBuffer(  GFXDevice *device,
                                        const GFXVertexFormat *vertexFormat, 
                                        U32 vertexSize, 
                                        GFXBufferType bufferType )
-   :  GFXVertexBuffer( device, numVerts, vertexFormat, vertexSize, bufferType ), 
-      mZombieCache(NULL),
+   :  GFXVertexBuffer( device, numVerts, vertexFormat, vertexSize, bufferType ),
       mBufferOffset(0),
-      mBufferVertexOffset(0)
+      mBufferVertexOffset(0),
+      mZombieCache(NULL)
+
 {
    if( mBufferType == GFXBufferTypeVolatile )
    {

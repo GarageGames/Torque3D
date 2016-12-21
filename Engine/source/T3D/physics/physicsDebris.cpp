@@ -312,11 +312,11 @@ PhysicsDebris* PhysicsDebris::create(  PhysicsDebrisData *datablock,
 }
 
 PhysicsDebris::PhysicsDebris()
-   :  mDataBlock( NULL ),
-      mLifetime( 0.0f ),
+   :  mLifetime( 0.0f ),
+      mInitialLinVel( Point3F::Zero ),
+      mDataBlock( NULL ),
       mShapeInstance( NULL ),
-      mWorld( NULL ),
-      mInitialLinVel( Point3F::Zero )
+      mWorld( NULL )
 {
    mTypeMask |= DebrisObjectType | DynamicShapeObjectType;
 

@@ -78,16 +78,16 @@ EndImplementEnumType;
 
 
 ForestBrushTool::ForestBrushTool()
- : mSize( 5.0f ),
+ : mRandom( Platform::getRealMilliseconds() + 1 ),
+   mSize( 5.0f ),
    mPressure( 0.1f ),
    mHardness( 1.0f ),
-   mDrawBrush( false ),
-   mCurrAction( NULL ),
-   mStrokeEvent( 0 ),
-   mBrushDown( false ),
-   mColor( ColorI::WHITE ),
    mMode( Paint ),
-   mRandom( Platform::getRealMilliseconds() + 1 )
+   mColor( ColorI::WHITE ),
+   mBrushDown( false ),
+   mDrawBrush( false ),
+   mStrokeEvent( 0 ),
+   mCurrAction( NULL )
 {	
 }
 

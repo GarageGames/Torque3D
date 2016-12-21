@@ -32,14 +32,15 @@ extern InputModifiers convertModifierBits(const U32 in);
 //-----------------------------------------------------------------------------
 // Constructor/Destructor
 //-----------------------------------------------------------------------------
-WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) : 
+WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) :
+                                             mNotifyPosition(true),
                                              mWindow(window),
                                              mInputController(NULL),
                                              mLastCursorPos(0,0),
                                              mClampToWindow(true),
+                                             mFocused(false),
                                              mPixelsPerMickey(1.0f),
-                                             mNotifyPosition(true),
-                                             mFocused(false)
+                                             mLastPressWasGlobalActionMap(false)
 {
    AssertFatal(mWindow, "NULL PlatformWindow on WindowInputGenerator creation");
 
@@ -82,6 +83,9 @@ WindowInputGenerator::~WindowInputGenerator()
 //-----------------------------------------------------------------------------
 void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 {
+   // Reset last press being global
+   mLastPressWasGlobalActionMap = false;
+
    if (!mInputController)// || !mFocused)
       return;
 
@@ -102,7 +106,10 @@ void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 
    // Give the ActionMap first shot.
    if (ActionMap::handleEventGlobal(&inputEvent))
+   {
+      mLastPressWasGlobalActionMap = true;
       return;
+   }
 
    if (mInputController->processInputEvent(inputEvent))
       return;

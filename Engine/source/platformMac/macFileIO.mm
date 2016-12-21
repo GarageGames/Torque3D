@@ -37,7 +37,7 @@
 #import "core/strings/stringFunctions.h"
 #import "console/console.h"
 #import "platform/profiler.h"
-#import "cinterface/cinterface.h";
+#import "cinterface/cinterface.h"
 #import "core/volume.h"
 
 //TODO: file io still needs some work...

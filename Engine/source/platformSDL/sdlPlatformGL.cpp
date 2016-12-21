@@ -65,11 +65,6 @@ namespace PlatformGL
            Con::printf( err );
            AssertFatal(0, err );
        }
-
-       #ifdef TORQUE_OS_WIN
-		    // JTH: Update the internals of epoxy on windows.
-		    epoxy_handle_external_wglMakeCurrent();
-       #endif
    }
 
    void setVSync(const int i)

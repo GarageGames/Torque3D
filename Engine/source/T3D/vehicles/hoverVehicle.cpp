@@ -69,8 +69,6 @@ ConsoleDocClass( HoverVehicle,
 );
 
 namespace {
-
-const U32 sIntergrationsPerTick = 1;
 const F32 sHoverVehicleGravity  = -20;
 
 const U32 sCollisionMoveMask = (TerrainObjectType     | PlayerObjectType  | 

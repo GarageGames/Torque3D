@@ -59,6 +59,8 @@ PlatformWindowManagerSDL::PlatformWindowManagerSDL()
    mDisplayWindow = true;
    mOffscreenRender = false;
 
+   mInputState = KeyboardInputState::NONE;
+
    buildMonitorsList();
 }
 
@@ -262,6 +264,21 @@ void PlatformWindowManagerSDL::_process()
       }
    }
 
+   // After the event loop is processed, we can now see if we have to notify
+   // SDL that we want text based events. This fixes a bug where text based
+   // events would be generated while key presses would still be happening.
+   // See KeyboardInputState for further documentation.
+   if (mInputState != KeyboardInputState::NONE)
+   {
+      // Update text mode toggling.
+      if (mInputState == KeyboardInputState::TEXT_INPUT)
+         SDL_StartTextInput();
+      else
+         SDL_StopTextInput();
+
+      // Done until we need to update it again.
+      mInputState = KeyboardInputState::NONE;
+   }
 }
 
 PlatformWindow * PlatformWindowManagerSDL::getWindowById( WindowId id )
@@ -343,6 +360,12 @@ void PlatformWindowManagerSDL::raiseCurtain()
    // TODO SDL
 }
 
+void PlatformWindowManagerSDL::updateSDLTextInputState(KeyboardInputState state)
+{
+   // Force update state. This will respond at the end of the event loop.
+   mInputState = state;
+}
+
 void Platform::openFolder(const char* path )
 {
     AssertFatal(0, "Not Implemented");
@@ -369,4 +392,8 @@ AFTER_MODULE_INIT(gfx)
 {   
    int res = SDL_Init( SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_HAPTIC | SDL_INIT_GAMECONTROLLER | SDL_INIT_EVENTS | SDL_INIT_NOPARACHUTE );
    AssertFatal(res != -1, "SDL init error");
+
+   // By default, SDL enables text input. We disable it on initialization, and
+   // we will enable it whenever the time is right.
+   SDL_StopTextInput();
 }

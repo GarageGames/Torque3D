@@ -108,17 +108,17 @@ SceneManager* gServerSceneGraph = NULL;
 //-----------------------------------------------------------------------------
 
 SceneManager::SceneManager( bool isClient )
-   : mLightManager( NULL ),
-     mCurrentRenderState( NULL ),
-     mIsClient( isClient ),
+   : mIsClient( isClient ),
+     mZoneManager( NULL ),
      mUsePostEffectFog( true ),
      mDisplayTargetResolution( 0, 0 ),
-     mDefaultRenderPass( NULL ),
+     mCurrentRenderState( NULL ),
      mVisibleDistance( 500.f ),
      mVisibleGhostDistance( 0 ),
      mNearClip( 0.1f ),
+     mLightManager( NULL ),
      mAmbientLightColor( ColorF( 0.1f, 0.1f, 0.1f, 1.0f ) ),
-     mZoneManager( NULL )
+     mDefaultRenderPass( NULL )
 {
    VECTOR_SET_ASSOCIATION( mBatchQueryList );
 
@@ -246,7 +246,6 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
       PFXFrameState origPFXState = PFXMGR->getFrameState();
 
       const FovPort *currentFovPort = GFX->getStereoFovPort();
-      const MatrixF *eyeTransforms = GFX->getStereoEyeTransforms();
       const MatrixF *worldEyeTransforms = GFX->getInverseStereoEyeTransforms();
 
       // Render left half of display

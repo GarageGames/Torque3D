@@ -177,7 +177,7 @@ void MD5Final( unsigned char digest[16], MD5Context* ctx)
  */
 void MD5Transform( int buf[4], int in[16])
 {
-    register int a, b, c, d;
+    int a, b, c, d;
 
     a = buf[0];
     b = buf[1];

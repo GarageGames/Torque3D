@@ -67,8 +67,8 @@ LangElement * ShaderFeatureHLSL::setupTexSpaceMat( Vector<ShaderComponent*> &, /
    {
       if(dStricmp((char*)T->type, "float4") == 0)
          meta->addStatement( new GenOp( "   @[1] = cross( @, normalize(@) ) * @.w;\r\n", *texSpaceMat, T, N, T ) );
-      else if(tangentW)
-         meta->addStatement( new GenOp( "   @[1] = cross( @, normalize(@) ) * @;\r\n", *texSpaceMat, T, N, tangentW ) );
+      else if (tangentW)
+         meta->addStatement(new GenOp("   @[1] = cross( @, normalize(@) ) * @;\r\n", *texSpaceMat, T, N, tangentW));
       else
          meta->addStatement( new GenOp( "   @[1] = cross( @, normalize(@) );\r\n", *texSpaceMat, T, N ) );
    }

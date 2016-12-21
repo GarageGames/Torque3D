@@ -23,11 +23,10 @@
 #ifndef T_GL_H
 #define T_GL_H
 
-#include <epoxy/gl.h>
+#include <glad/glad.h>
 
-// JTH: This is slow, we should probably check extensions once and cache them
-// directly inside of some compatability table.
-#define gglHasExtension(EXTENSION) epoxy_has_gl_extension("GL_" #EXTENSION)
+// JTH: When we use glad, extensions are chached into simple booleans (ints)
+#define gglHasExtension(EXTENSION) GLAD_GL_##EXTENSION
 
 #endif
 

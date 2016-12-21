@@ -34,6 +34,8 @@
 /// What's the name of your application? Used in a variety of places.
 #define TORQUE_APP_NAME            "Full"
 
+#define TORQUE_NET_DEFAULT_MULTICAST_ADDRESS "ff04::7467:656E:6574:776B"
+
 /// What version of the application specific source code is this?
 ///
 /// Version number is major * 1000 + minor * 100 + revision * 10.

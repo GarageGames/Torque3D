@@ -149,13 +149,9 @@ void ReflectionManager::update(  F32 timeSlice,
       // Calculate an ideal culling size here, we'll just assume double fov based on the first fovport based on 
       // the head position.
       FovPort port = query.fovPort[0];
-      F32 leftSize = query.nearPlane * port.leftTan;
-      F32 rightSize = query.nearPlane * port.rightTan;
       F32 upSize = query.nearPlane * port.upTan;
       F32 downSize = query.nearPlane * port.downTan;
 
-      F32 left = -leftSize;
-      F32 right = rightSize;
       F32 top = upSize;
       F32 bottom = -downSize;
 
@@ -212,7 +208,6 @@ void ReflectionManager::update(  F32 timeSlice,
    mTimer->getElapsedMs();
    mTimer->reset();
    U32 numUpdated = 0;
-   U32 currentTarget = stereoTarget >= 0 ? stereoTarget : 0;
    reflectorIter = mReflectors.begin();
    for ( ; reflectorIter != mReflectors.end(); reflectorIter++ )
    {      

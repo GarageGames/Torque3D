@@ -148,7 +148,8 @@ public:
    /// Set the TTL for the last item we entered...
    ///
    /// Primitives default to lasting one frame (ie, ttl=0)
-   enum {
+   enum : U32
+   {
       DD_INFINITE = U32_MAX
    };
    // How long should this primitive be draw for, 0 = one frame, DD_INFINITE = draw forever

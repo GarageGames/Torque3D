@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-option(TORQUE_TESTING "Enable unit test module" ON)
+option(TORQUE_TESTING "Enable unit test module" OFF)
 mark_as_advanced(TORQUE_TESTING)
 
 if(TORQUE_TESTING)

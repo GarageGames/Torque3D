@@ -118,7 +118,7 @@ struct FrustumData : public PolyhedronData
       };
 
       /// Used to mask out planes for testing.
-      enum 
+      enum : U32
       {
          PlaneMaskLeft     = ( 1 << PlaneLeft ),
          PlaneMaskRight    = ( 1 << PlaneRight ),

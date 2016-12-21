@@ -86,15 +86,6 @@ const S32 TimeManager::getBackgroundThreshold() const
 }
 
 //----------------------------------------------------------------------------------
-
-#pragma message("Mac/Lunix will need to implement this or get unresolved externals.")
-#pragma message(" It was previously defined here with a Win32 ifdef which goes against")
-#pragma message(" how torque implements its platform agnostic systems - JDD")
-//PlatformTimer *PlatformTimer::create()
-//{
-//   return new DefaultPlatformTimer();
-//}
-
 PlatformTimer::PlatformTimer()
 {
 }

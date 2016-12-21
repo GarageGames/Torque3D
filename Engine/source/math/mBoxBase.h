@@ -49,7 +49,8 @@ class BoxBase
          FarTopLeft,
          FarBottomLeft,
 
-         NUM_POINTS
+         NUM_POINTS,
+		 InvalidPoint = NUM_POINTS
       };
 
       /// Return the point index for the opposite corner of @a p.
@@ -125,7 +126,7 @@ class BoxBase
          NUM_PLANES
       };
 
-      enum PlaneMasks
+      enum PlaneMasks : U32
       {
          PlaneMaskLeft     = ( 1 << LeftPlane ),
          PlaneMaskRight    = ( 1 << RightPlane ),
@@ -192,8 +193,6 @@ class BoxBase
                   default: AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid index" );
                }
                break;
-            default:
-               AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid plane" );
             case BottomPlane:
                switch( i )
                {
@@ -204,7 +203,10 @@ class BoxBase
                   default: AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid index" );
                }
                break;
+            default:
+               AssertFatal( false, "BoxBase::getPlanePointIndex - Invalid plane" );
          }
+        return InvalidPoint;
       }
 
       /// Indices for the edges of the box.

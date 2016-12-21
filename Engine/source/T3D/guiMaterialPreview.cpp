@@ -36,15 +36,15 @@
 
 // GuiMaterialPreview
 GuiMaterialPreview::GuiMaterialPreview()
-:  mMaxOrbitDist(5.0f),
-   mMinOrbitDist(0.0f),
-   mOrbitDist(5.0f),
-   mMouseState(None),
+:  mMouseState(None),
    mModel(NULL),
-   mLastMousePoint(0, 0),
-   lastRenderTime(0),
    runThread(0),
-   mFakeSun(NULL)
+   lastRenderTime(0),
+   mLastMousePoint(0, 0),
+   mFakeSun(NULL),
+   mMaxOrbitDist(5.0f),
+   mMinOrbitDist(0.0f),
+   mOrbitDist(5.0f)
 {
    mActive = true;
    mCameraMatrix.identity();
