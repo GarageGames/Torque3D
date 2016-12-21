@@ -146,7 +146,6 @@ protected:
    virtual GFXD3D11VertexBuffer* findVBPool( const GFXVertexFormat *vertexFormat, U32 numVertsNeeded );
    virtual GFXD3D11VertexBuffer* createVBPool( const GFXVertexFormat *vertexFormat, U32 vertSize );
 
-   IDXGISwapChain* getSwapChain();
    // State overrides
    // {
 
@@ -281,7 +280,8 @@ public:
    ID3D11Device* getDevice(){ return mD3DDevice; }
 
    /// Reset
-   void reset( DXGI_SWAP_CHAIN_DESC &d3dpp );
+   void beginReset();
+   void endReset(GFXD3D11WindowTarget *windowTarget);
 
    virtual void setupGenericShaders( GenericShaderType type  = GSColor );
 
