@@ -23,7 +23,6 @@ They are available from the [downloads](http://wiki.torque3d.org/main:downloads)
 
 ## Related repositories
 
-* [Torque 3D main repository](https://github.com/GarageGames/Torque3D) (you are here!)
 * [Project Manager repository](https://github.com/GarageGames/Torque3D-ProjectManager)
 * [Offline documentation repository](https://github.com/GarageGames/Torque3D-Documentation)
 
