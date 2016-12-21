@@ -316,7 +316,7 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
 
       if(isCompressedFormat(dds->mFormat))
       {
-         if((!isPow2(dds->getWidth()) || !isPow2(dds->getHeight())) && GFX->getCardProfiler()->queryProfile("GL::Workaround::noCompressedNPoTTextures"))
+         if((!isPow2(dds->getWidth()) || !isPow2(dds->getHeight())))
          {
             U32 squishFlag = squish::kDxt1;
             switch (dds->mFormat)
