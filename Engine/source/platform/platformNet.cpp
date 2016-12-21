@@ -201,6 +201,7 @@ public:
 const SOCKET InvalidSocketHandle = -1;
 
 static void IPSocketToNetAddress(const struct sockaddr_in *sockAddr, NetAddress *address);
+static void IPSocket6ToNetAddress(const struct sockaddr_in6 *sockAddr, NetAddress *address);
 
 namespace PlatformNetState
 {
@@ -217,7 +218,7 @@ namespace PlatformNetState
 
    static ReservedSocketList<SOCKET> smReservedSocketList;
 
-   static Net::Error getLastError()
+   Net::Error getLastError()
    {
 #if defined(TORQUE_USE_WINSOCK)
       S32 err = WSAGetLastError();
@@ -243,7 +244,7 @@ namespace PlatformNetState
 #endif
    }
 
-   static S32 getDefaultGameProtocol()
+   S32 getDefaultGameProtocol()
    {
       // we turn off VDP in non-release builds because VDP does not support broadcast packets
       // which are required for LAN queries (PC->Xbox connectivity).  The wire protocol still
@@ -259,7 +260,7 @@ namespace PlatformNetState
       return protocol;
    }
 
-   static struct addrinfo* pickAddressByProtocol(struct addrinfo* addr, int protocol)
+   struct addrinfo* pickAddressByProtocol(struct addrinfo* addr, int protocol)
    {
       for (addr; addr != NULL; addr = addr->ai_next)
       {
@@ -271,7 +272,7 @@ namespace PlatformNetState
    }
 
    /// Extracts core address parts from an address string. Returns false if it's malformed.
-   static bool extractAddressParts(const char *addressString, char outAddress[256], int &outPort, int &outFamily)
+   bool extractAddressParts(const char *addressString, char outAddress[256], int &outPort, int &outFamily)
    {
       outPort = 0;
       outFamily = AF_UNSPEC;
@@ -358,6 +359,42 @@ namespace PlatformNetState
       }
 
       return true;
+   }
+
+   Net::Error getSocketAddress(SOCKET socketFd, int requiredFamily, NetAddress *outAddress)
+   {
+      Net::Error error = Net::UnknownError;
+
+      if (requiredFamily == AF_INET)
+      {
+         sockaddr_in ipAddr;
+         int len = sizeof(ipAddr);
+         if (getsockname(socketFd, (struct sockaddr*)&ipAddr, &len) >= 0)
+         {
+            IPSocketToNetAddress(&ipAddr, outAddress);
+            error = Net::NoError;
+         }
+         else
+         {
+            error = getLastError();
+         }
+      }
+      else if (requiredFamily == AF_INET6)
+      {
+         sockaddr_in6 ipAddr;
+         int len = sizeof(ipAddr);
+         if (getsockname(socketFd, (struct sockaddr*)&ipAddr, &len) >= 0)
+         {
+            IPSocket6ToNetAddress(&ipAddr, outAddress);
+            error = Net::NoError;
+         }
+         else
+         {
+            error = getLastError();
+         }
+      }
+
+      return error;
    }
 };
 
@@ -924,12 +961,6 @@ bool Net::openPort(S32 port, bool doBind)
       PlatformNetState::udp6Socket = NetSocket::INVALID;
    }
 
-   // Frequently port "0" is used even though it makes no sense, so instead use the default port.
-   if (port == 0)
-   {
-      port = PlatformNetState::defaultPort;
-   }
-
    // Update prefs
    Net::smMulticastEnabled = Con::getBoolVariable("pref::Net::Multicast6Enabled", true);
    Net::smIpv4Enabled = Con::getBoolVariable("pref::Net::IPV4Enabled", true);
@@ -942,6 +973,8 @@ bool Net::openPort(S32 port, bool doBind)
 
    SOCKET socketFd = InvalidSocketHandle;
    NetAddress address;
+   NetAddress listenAddress;
+   char listenAddressStr[256];
 
    if (Net::smIpv4Enabled)
    {
@@ -969,12 +1002,18 @@ bool Net::openPort(S32 port, bool doBind)
                
             if (error == NoError)
                error = setBlocking(PlatformNetState::udpSocket, false);
-               
+
             if (error == NoError)
             {
-               Con::printf("UDP initialized on ipv4 port %d", port);
+               error = PlatformNetState::getSocketAddress(socketFd, AF_INET, &listenAddress);
+               if (error == NoError)
+               {
+                  Net::addressToString(&listenAddress, listenAddressStr);
+                  Con::printf("UDP initialized on ipv4 %s", listenAddressStr);
+               }
             }
-            else
+
+            if (error != NoError)
             {
                closeSocket(PlatformNetState::udpSocket);
                PlatformNetState::udpSocket = NetSocket::INVALID;
@@ -1019,9 +1058,15 @@ bool Net::openPort(S32 port, bool doBind)
 
             if (error == NoError)
             {
-               Con::printf("UDP initialized on ipv6 port %d", port);
+               error = PlatformNetState::getSocketAddress(socketFd, AF_INET6, &listenAddress);
+               if (error == NoError)
+               {
+                  Net::addressToString(&listenAddress, listenAddressStr);
+                  Con::printf("UDP initialized on ipv6 %s", listenAddressStr);
+               }
             }
-            else
+            
+            if (error != NoError)
             {
                closeSocket(PlatformNetState::udp6Socket);
                PlatformNetState::udp6Socket = NetSocket::INVALID;
@@ -1579,7 +1624,7 @@ Net::Error Net::getListenAddress(const NetAddress::Type type, NetAddress *addres
       if (!serverIP || serverIP[0] == '\0')
       {
          address->type = type;
-         address->port = PlatformNetState::defaultPort;
+         address->port = 0;
          *((U32*)address->address.ipv4.netNum) = INADDR_ANY;
          return Net::NoError;
       }
@@ -1591,7 +1636,7 @@ Net::Error Net::getListenAddress(const NetAddress::Type type, NetAddress *addres
    else if (type == NetAddress::IPBroadcastAddress)
    {
       address->type = type;
-      address->port = PlatformNetState::defaultPort;
+      address->port = 0;
       *((U32*)address->address.ipv4.netNum) = INADDR_BROADCAST;
       return Net::NoError;
    }
@@ -1603,7 +1648,7 @@ Net::Error Net::getListenAddress(const NetAddress::Type type, NetAddress *addres
          sockaddr_in6 addr;
          dMemset(&addr, '\0', sizeof(addr));
 
-         addr.sin6_port = htons(PlatformNetState::defaultPort);
+         addr.sin6_port = 0;
          addr.sin6_addr = in6addr_any;
 
          IPSocket6ToNetAddress(&addr, address);
@@ -1947,9 +1992,13 @@ void Net::enableMulticast()
 
          if (error == NoError)
          {
-            Con::printf("Multicast initialized on port %d", PlatformNetState::defaultPort);
+            NetAddress listenAddress;
+            char listenAddressStr[256];
+            Net::addressToString(&multicastAddress, listenAddressStr);
+            Con::printf("Multicast initialized on %s", listenAddressStr);
          }
-         else
+
+          if (error != NoError)
          {
             PlatformNetState::multicast6Socket = NetSocket::INVALID;
             Con::printf("Unable to multicast UDP - error %d", error);
