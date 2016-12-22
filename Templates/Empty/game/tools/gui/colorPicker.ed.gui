@@ -718,6 +718,22 @@
          canSave = "1";
          canSaveDynamicFields = "0";
       };
+      new GuiCheckBoxCtrl() {
+         text = "use sRGB";
+         groupNum = "-1";
+         buttonType = "ToggleButton";
+         useMouseEvents = "0";
+         position = "360 105";
+         extent = "66 16";
+         minExtent = "8 2";
+         horizSizing = "right";
+         vertSizing = "bottom";
+         profile = "GuiCheckBoxProfile";
+         visible = "1";
+         active = "1";
+         variable = "$displayAsSRGB";
+		 command = "useSRGBctrl($displayAsSRGB);";
+      };
    };
 };
 //--- OBJECT WRITE END ---
@@ -726,6 +742,15 @@ $ColorPickerCallback = ""; // Control that we need to update
 $ColorPickerCancelCallback = "";
 $ColorPickerUpdateCallback = "";
 $ColorCallbackType   = 1;  // ColorI
+
+function useSRGBctrl(%colorScale)
+{
+ColorPickerDlg.useSRGB = %colorScale;
+ColorRangeSelect.useSRGB = %colorScale;
+ColorBlendSelect.useSRGB = %colorScale;
+myColor.useSRGB = %colorScale;
+oldColor.useSRGB = %colorScale;
+}
 
 // This function pushes the color picker dialog and returns to a callback the selected value
 function GetColorI( %currentColor, %callback, %root, %updateCallback, %cancelCallback )
