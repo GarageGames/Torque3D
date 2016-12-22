@@ -2141,13 +2141,18 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( displaySplashWindow, bool, (const char* path), ("art/gui/splash.bmp"),
+DefineEngineFunction( displaySplashWindow, bool, (const char* path), (""),
    "Display a startup splash window suitable for showing while the engine still starts up.\n\n"
    "@note This is currently only implemented on Windows.\n\n"
    "@param path	relative path to splash screen image to display.\n"
    "@return True if the splash window could be successfully initialized.\n\n"
    "@ingroup Platform" )
 {
+   if (path == "")
+   {
+      path = Con::getVariable("$Core::splashWindowImage");
+   }
+
    return Platform::displaySplashWindow(path);
 }
 
