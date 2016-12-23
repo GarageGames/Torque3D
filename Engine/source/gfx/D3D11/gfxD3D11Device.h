@@ -129,6 +129,11 @@ protected:
 
    F32 mPixVersion;
 
+   D3D_FEATURE_LEVEL mFeatureLevel;
+   // Shader Model targers
+   String mVertexShaderTarget;
+   String mPixelShaderTarget;
+
    bool mDebugLayers;
 
    DXGI_SAMPLE_DESC mMultisampleDesc;
@@ -195,8 +200,6 @@ public:
    static GFXDevice *createInstance( U32 adapterIndex );
 
    static void enumerateAdapters( Vector<GFXAdapter*> &adapterList );
-
-   GFXTextureObject* createRenderSurface( U32 width, U32 height, GFXFormat format, U32 mipLevel );
 
    ID3D11DepthStencilView* getDepthStencilView() { return mDeviceDepthStencilView; }
    ID3D11RenderTargetView* getRenderTargetView() { return mDeviceBackBufferView; }
@@ -294,6 +297,12 @@ public:
 
    // Default multisample parameters
    DXGI_SAMPLE_DESC getMultisampleType() const { return mMultisampleDesc; }
+
+   // Get feature level this gfx device supports
+   D3D_FEATURE_LEVEL getFeatureLevel() const { mFeatureLevel; }
+   // Shader Model targers
+   const String &getVertexShaderTarget() const { return mVertexShaderTarget; }
+   const String &getPixelShaderTarget() const { return mPixelShaderTarget; }
 };
 
 #endif
