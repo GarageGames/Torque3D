@@ -3377,10 +3377,10 @@ void ShapeBase::shakeCamera( U32 imageSlot )
    // first check if explosion is near camera
    GameConnection* connection = GameConnection::getConnectionToServer();
    ShapeBase *obj = dynamic_cast<ShapeBase*>(connection->getControlObject());
-
+   
    bool applyShake = true;
 
-   if (obj)
+   if (obj && !mIsAiControlled)
    {
       ShapeBase* cObj = obj;
       while ((cObj = cObj->getControlObject()) != 0)
@@ -3393,7 +3393,7 @@ void ShapeBase::shakeCamera( U32 imageSlot )
       }
    }
 
-   if (applyShake && obj)
+   if (applyShake && obj && !mIsAiControlled)
    {
       VectorF diff;
       getMuzzlePoint(imageSlot, &diff);
