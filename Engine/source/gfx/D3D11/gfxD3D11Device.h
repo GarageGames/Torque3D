@@ -49,6 +49,10 @@ class D3D11OculusTexture;
 
 class GFXD3D11Device : public GFXDevice
 {
+public:
+   typedef Map<U32, ID3D11SamplerState*> SamplerMap;
+private:
+
    friend class GFXResource;
    friend class GFXD3D11PrimitiveBuffer;
    friend class GFXD3D11VertexBuffer;
@@ -97,6 +101,9 @@ protected:
    /// @see allocVertexDecl
    typedef Map<String,D3D11VertexDecl*> VertexDeclMap;
    VertexDeclMap mVertexDecls;
+
+   /// Used to lookup sampler state for a given hash key
+   SamplerMap mSamplersMap;
 
    ID3D11RenderTargetView* mDeviceBackBufferView;
    ID3D11DepthStencilView* mDeviceDepthStencilView;
@@ -303,6 +310,10 @@ public:
    // Shader Model targers
    const String &getVertexShaderTarget() const { return mVertexShaderTarget; }
    const String &getPixelShaderTarget() const { return mPixelShaderTarget; }
+
+   // grab the sampler map
+   const SamplerMap &getSamplersMap() const { return mSamplersMap; }
+   SamplerMap &getSamplersMap() { return mSamplersMap; }
 };
 
 #endif
