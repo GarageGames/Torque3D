@@ -30,7 +30,7 @@
 #include "tGL.h"
 #include <glad/glad_wgl.h>
 
-#define gglHasWExtension(window, EXTENSION) GLAD_WGL_##EXTENSION
+#define gglHasWExtension(EXTENSION) GLAD_WGL_##EXTENSION
 
 #endif //TORQUE_OPENGL
 

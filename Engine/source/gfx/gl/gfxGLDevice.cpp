@@ -172,10 +172,19 @@ void GFXGLDevice::initGLState()
 
    PlatformGL::setVSync(smDisableVSync ? 0 : 1);
 
+   //install vsync callback
+   Con::NotifyDelegate clbk(this, &GFXGLDevice::vsyncCallback);
+   Con::addVariableNotify("$pref::Video::disableVerticalSync", clbk);
+
    //OpenGL 3 need a binded VAO for render
    GLuint vao;
    glGenVertexArrays(1, &vao);
    glBindVertexArray(vao);
+}
+
+void GFXGLDevice::vsyncCallback()
+{
+   PlatformGL::setVSync(smDisableVSync ? 0 : 1);
 }
 
 GFXGLDevice::GFXGLDevice(U32 adapterIndex) :
