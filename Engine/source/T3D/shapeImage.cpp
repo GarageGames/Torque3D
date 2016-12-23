@@ -3380,7 +3380,7 @@ void ShapeBase::shakeCamera( U32 imageSlot )
    
    bool applyShake = true;
 
-   if (obj && !mIsAiControlled)
+   if (obj)
    {
       ShapeBase* cObj = obj;
       while ((cObj = cObj->getControlObject()) != 0)
