@@ -49,6 +49,10 @@ class D3D11OculusTexture;
 
 class GFXD3D11Device : public GFXDevice
 {
+public:
+   typedef Map<U32, ID3D11SamplerState*> SamplerMap;
+private:
+
    friend class GFXResource;
    friend class GFXD3D11PrimitiveBuffer;
    friend class GFXD3D11VertexBuffer;
@@ -66,9 +70,9 @@ class GFXD3D11Device : public GFXDevice
    virtual GFXWindowTarget *allocWindowTarget(PlatformWindow *window);
    virtual GFXTextureTarget *allocRenderToTextureTarget();
 
-   virtual void enterDebugEvent(ColorI color, const char *name){};
-   virtual void leaveDebugEvent(){};
-   virtual void setDebugMarker(ColorI color, const char *name){};
+   virtual void enterDebugEvent(ColorI color, const char *name);
+   virtual void leaveDebugEvent();
+   virtual void setDebugMarker(ColorI color, const char *name);
 
 protected:
 
@@ -97,6 +101,9 @@ protected:
    /// @see allocVertexDecl
    typedef Map<String,D3D11VertexDecl*> VertexDeclMap;
    VertexDeclMap mVertexDecls;
+
+   /// Used to lookup sampler state for a given hash key
+   SamplerMap mSamplersMap;
 
    ID3D11RenderTargetView* mDeviceBackBufferView;
    ID3D11DepthStencilView* mDeviceDepthStencilView;
@@ -128,6 +135,11 @@ protected:
    U32  mAdapterIndex;
 
    F32 mPixVersion;
+
+   D3D_FEATURE_LEVEL mFeatureLevel;
+   // Shader Model targers
+   String mVertexShaderTarget;
+   String mPixelShaderTarget;
 
    bool mDebugLayers;
 
@@ -195,8 +207,6 @@ public:
    static GFXDevice *createInstance( U32 adapterIndex );
 
    static void enumerateAdapters( Vector<GFXAdapter*> &adapterList );
-
-   GFXTextureObject* createRenderSurface( U32 width, U32 height, GFXFormat format, U32 mipLevel );
 
    ID3D11DepthStencilView* getDepthStencilView() { return mDeviceDepthStencilView; }
    ID3D11RenderTargetView* getRenderTargetView() { return mDeviceBackBufferView; }
@@ -294,6 +304,16 @@ public:
 
    // Default multisample parameters
    DXGI_SAMPLE_DESC getMultisampleType() const { return mMultisampleDesc; }
+
+   // Get feature level this gfx device supports
+   D3D_FEATURE_LEVEL getFeatureLevel() const { mFeatureLevel; }
+   // Shader Model targers
+   const String &getVertexShaderTarget() const { return mVertexShaderTarget; }
+   const String &getPixelShaderTarget() const { return mPixelShaderTarget; }
+
+   // grab the sampler map
+   const SamplerMap &getSamplersMap() const { return mSamplersMap; }
+   SamplerMap &getSamplersMap() { return mSamplersMap; }
 };
 
 #endif
