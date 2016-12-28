@@ -45,7 +45,7 @@ void main()
    color.b = texture( colorCorrectionTex, color.b ).b;
 
    // Apply gamma correction
-   color.rgb = pow( abs(color.rgb), vec3(OneOverGamma) );
+   color.rgb = pow( clamp(color.rgb, vec3(0.0),vec3(1.0)), vec3(OneOverGamma) );
 
    // Apply contrast
    color.rgb = ((color.rgb - 0.5f) * Contrast) + 0.5f;
