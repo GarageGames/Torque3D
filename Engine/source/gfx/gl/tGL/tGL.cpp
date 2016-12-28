@@ -41,7 +41,12 @@ namespace GL
 
    void gglPerformExtensionBinds(void *context)
    {
-	
+   #ifdef  TORQUE_OS_WIN 
+      if (!gladLoadWGL(wglGetCurrentDC()))
+      {
+         AssertFatal(false, "Unable to load GLAD WGL extensions. Make sure your OpenGL drivers are up to date!");
+      }
+   #endif
    }
 }
 

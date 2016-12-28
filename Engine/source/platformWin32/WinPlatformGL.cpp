@@ -5,8 +5,24 @@
 
 void PlatformGL::setVSync(const int i)
 {
-   if (gglHasWExtension(wglGetCurrentDC(), EXT_swap_control))
+   if (gglHasWExtension(EXT_swap_control))
    {
+      if (gglHasWExtension(EXT_swap_control_tear))
+      {
+         if (i == 1 || i == -1)
+         {
+            BOOL ret = wglSwapIntervalEXT(-1);
+
+            if (!ret)
+               wglSwapIntervalEXT(1);
+         }
+         else
+         {
+            wglSwapIntervalEXT(i);
+         }
+         return;
+      }
+      //fallback with no EXT_swap_control_tear
       wglSwapIntervalEXT(i);
    }
 }
