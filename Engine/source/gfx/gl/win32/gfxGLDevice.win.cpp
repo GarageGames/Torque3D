@@ -269,7 +269,7 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    if (!wglMakeCurrent(hdcGL, tempGLRC))
       AssertFatal(false, "Couldn't make temp GL context.");
 
-   if( gglHasWExtension(hdcGL, ARB_create_context) )
+   if( gglHasWExtension( ARB_create_context) )
    {
       int const create_attribs[] = {
                WGL_CONTEXT_MAJOR_VERSION_ARB, OGL_MAJOR,
