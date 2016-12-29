@@ -37,7 +37,6 @@
 #endif
 
 class ProcessList;
-class btThreadSupportInterface;
 class PhysicsBody;
 
 
@@ -54,7 +53,6 @@ protected:
    btCollisionDispatcher *mDispatcher;
    btConstraintSolver *mSolver;
    btDefaultCollisionConfiguration *mCollisionConfiguration;
-  	btThreadSupportInterface *mThreadSupportCollision;
 
    bool mErrorReport;
 

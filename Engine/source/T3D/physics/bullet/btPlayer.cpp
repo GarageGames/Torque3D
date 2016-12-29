@@ -342,7 +342,7 @@ void BtPlayer::_stepForward( btVector3 *inOutCurrPos, const btVector3 &displacem
 		start.setOrigin( *inOutCurrPos );
 		end.setOrigin( *inOutCurrPos + disp );
 
-      BtPlayerSweepCallback callback( mGhostObject, disp.length2() > 0.0f ? disp.normalized() : disp );
+      BtPlayerSweepCallback callback( mGhostObject, disp.length2() > SIMD_EPSILON ? disp.normalized() : disp );
 		callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
 		callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
 
