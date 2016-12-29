@@ -263,7 +263,8 @@ function EditorGui::buildMenus(%this)
          
       item[0] = "Network Graph" TAB "n" TAB "toggleNetGraph();";
       item[1] = "Profiler" TAB "ctrl F2" TAB "showMetrics(true);";
-      item[2] = "Make Selected a Mesh" TAB "" TAB "makeSelectedAMesh();";
+	  item[2] = "Torque SimView" TAB "" TAB "tree();";
+      item[3] = "Make Selected a Mesh" TAB "" TAB "makeSelectedAMesh();";
    };
    %this.menuBar.insert(%toolsMenu, %this.menuBar.getCount());
       
