@@ -790,9 +790,8 @@ bool GFXD3D11Shader::_init()
       d3dMacros[i+smGlobalMacros.size()].Definition = mMacros[i].value.c_str();
    }
 
-   //TODO support D3D_FEATURE_LEVEL properly with shaders instead of hard coding at hlsl 5
    d3dMacros[macroCount - 2].Name = "TORQUE_SM";
-   d3dMacros[macroCount - 2].Definition = "50";
+   d3dMacros[macroCount - 2].Definition = D3D11->getShaderModel().c_str();
 
    memset(&d3dMacros[macroCount - 1], 0, sizeof(D3D_SHADER_MACRO));
 

@@ -106,6 +106,7 @@ GFXD3D11Device::GFXD3D11Device(U32 index)
 
    mVertexShaderTarget = String::EmptyString;
    mPixelShaderTarget = String::EmptyString;
+   mShaderModel = String::EmptyString;
 
    mDrawInstancesCount = 0;
 
@@ -491,16 +492,19 @@ void GFXD3D11Device::init(const GFXVideoMode &mode, PlatformWindow *window)
       mVertexShaderTarget = "vs_5_0";
       mPixelShaderTarget = "ps_5_0";
       mPixVersion = 5.0f;
+      mShaderModel = "50";
       break;
    case D3D_FEATURE_LEVEL_10_1:
       mVertexShaderTarget = "vs_4_1";
       mPixelShaderTarget = "ps_4_1";
       mPixVersion = 4.1f;
+      mShaderModel = "41";
       break;
    case D3D_FEATURE_LEVEL_10_0:
       mVertexShaderTarget = "vs_4_0";
       mPixelShaderTarget = "ps_4_0";
       mPixVersion = 4.0f;
+      mShaderModel = "40";
       break;
    default:
       AssertFatal(false, "GFXD3D11Device::init - We don't support this feature level");
