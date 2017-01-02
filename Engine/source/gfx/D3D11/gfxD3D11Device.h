@@ -140,6 +140,8 @@ protected:
    // Shader Model targers
    String mVertexShaderTarget;
    String mPixelShaderTarget;
+   // String for use with shader macros in the form of shader model version * 10
+   String mShaderModel;
 
    bool mDebugLayers;
 
@@ -306,10 +308,11 @@ public:
    DXGI_SAMPLE_DESC getMultisampleType() const { return mMultisampleDesc; }
 
    // Get feature level this gfx device supports
-   D3D_FEATURE_LEVEL getFeatureLevel() const { mFeatureLevel; }
+   D3D_FEATURE_LEVEL getFeatureLevel() const { return mFeatureLevel; }
    // Shader Model targers
    const String &getVertexShaderTarget() const { return mVertexShaderTarget; }
    const String &getPixelShaderTarget() const { return mPixelShaderTarget; }
+   const String &getShaderModel() const { return mShaderModel; }
 
    // grab the sampler map
    const SamplerMap &getSamplersMap() const { return mSamplersMap; }

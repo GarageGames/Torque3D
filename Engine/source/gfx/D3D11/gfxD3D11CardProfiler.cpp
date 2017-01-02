@@ -47,10 +47,25 @@ void GFXD3D11CardProfiler::init()
 
       mCardDescription = adapter.description;
       mChipSet = adapter.chipSet;
-      mVersionString = adapter.driverVersion;
+      mVersionString = _getFeatureLevelStr();
       mVideoMemory = adapter.vram;
    }
    Parent::init();
+}
+
+String GFXD3D11CardProfiler::_getFeatureLevelStr()
+{
+   switch (D3D11->getFeatureLevel())
+   {
+   case D3D_FEATURE_LEVEL_11_0:
+      return String("Feature level 11.0");
+   case D3D_FEATURE_LEVEL_10_1:
+      return String("Feature level 10.1");
+   case D3D_FEATURE_LEVEL_10_0:
+      return String("Feature level 10.0");
+   default:
+      return String("Unknown feature level");
+   }
 }
 
 void GFXD3D11CardProfiler::setupCardCapabilities()
