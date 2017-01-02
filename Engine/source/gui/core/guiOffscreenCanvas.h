@@ -56,6 +56,9 @@ protected:
 
    bool mTargetDirty;
    bool mDynamicTarget;
+   
+   bool mUseDepth;
+   GFXTexHandle mTargetDepth;
 
 public:
    static Vector<GuiOffscreenCanvas*> sList;
