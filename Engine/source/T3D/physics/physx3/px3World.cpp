@@ -63,7 +63,8 @@ Px3World::Px3World(): mScene( NULL ),
    mEditorTimeScale( 1.0f ),
    mAccumulator( 0 ),
    mControllerManager(NULL),
-   mIsSceneLocked(false)
+   mIsSceneLocked(false),
+   mRenderBuffer(NULL)
 {
 }
 
@@ -177,6 +178,8 @@ void Px3World::destroyWorld()
 {
 	getPhysicsResults();
 
+   mRenderBuffer = NULL;
+
 	// Release the tick processing signals.
 	if ( mProcessList )
 	{
@@ -223,13 +226,14 @@ bool Px3World::initWorld( bool isServer, ProcessList *processList )
       sceneDesc.cpuDispatcher = smCpuDispatcher;
       Con::printf("PhysX3 using Cpu: %d workers", smCpuDispatcher->getWorkerCount());
    }
-
  	
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_CCD;
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
    sceneDesc.filterShader  = physx::PxDefaultSimulationFilterShader;
 
 	mScene = gPhysics3SDK->createScene(sceneDesc);
+   //cache renderbuffer for use with debug drawing
+   mRenderBuffer = const_cast<physx::PxRenderBuffer*>(&mScene->getRenderBuffer());
 
 	physx::PxDominanceGroupPair debrisDominance( 0.0f, 1.0f );
 	mScene->setDominanceGroupPair(0,31,debrisDominance);
@@ -548,22 +552,17 @@ static ColorI getDebugColor( physx::PxU32 packed )
 
 void Px3World::onDebugDraw( const SceneRenderState *state )
 {
-   if ( !mScene )
+   if ( !mScene || !mRenderBuffer )
       return;
 
    mScene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE,1.0f);
    mScene->setVisualizationParameter(physx::PxVisualizationParameter::eBODY_AXES,1.0f);
    mScene->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES,1.0f);
 
-   const physx::PxRenderBuffer *renderBuffer = &mScene->getRenderBuffer();
-
-   if(!renderBuffer)
-      return;
-
    // Render points
    {
-      physx::PxU32 numPoints = renderBuffer->getNbPoints();
-      const physx::PxDebugPoint *points = renderBuffer->getPoints();
+      physx::PxU32 numPoints = mRenderBuffer->getNbPoints();
+      const physx::PxDebugPoint *points = mRenderBuffer->getPoints();
 
       PrimBuild::begin( GFXPointList, numPoints );
       
@@ -579,8 +578,8 @@ void Px3World::onDebugDraw( const SceneRenderState *state )
 
    // Render lines
    {
-      physx::PxU32 numLines = renderBuffer->getNbLines();
-      const physx::PxDebugLine *lines = renderBuffer->getLines();
+      physx::PxU32 numLines = mRenderBuffer->getNbLines();
+      const physx::PxDebugLine *lines = mRenderBuffer->getLines();
 
       PrimBuild::begin( GFXLineList, numLines * 2 );
 
@@ -598,8 +597,8 @@ void Px3World::onDebugDraw( const SceneRenderState *state )
 
    // Render triangles
    {
-      physx::PxU32 numTris = renderBuffer->getNbTriangles();
-      const physx::PxDebugTriangle *triangles = renderBuffer->getTriangles();
+      physx::PxU32 numTris = mRenderBuffer->getNbTriangles();
+      const physx::PxDebugTriangle *triangles = mRenderBuffer->getTriangles();
 
       PrimBuild::begin( GFXTriangleList, numTris * 3 );
       
