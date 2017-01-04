@@ -417,6 +417,16 @@ void Px3Body::applyImpulse( const Point3F &origin, const Point3F &force )
 
 }
 
+void Px3Body::applyTorque( const Point3F &torque )
+{
+   AssertFatal(mActor, "Px3Body::applyImpulse - The actor is null!");
+
+   mWorld->releaseWriteLock();
+   physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
+   if (mIsEnabled && isDynamic())
+      actor->addTorque( px3Cast<physx::PxVec3>(torque), physx::PxForceMode::eFORCE, true);
+}
+
 void Px3Body::findContact(SceneObject **contactObject,
    VectorF *contactNormal,
    Vector<SceneObject*> *outOverlapObjects) const

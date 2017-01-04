@@ -356,6 +356,17 @@ void BtBody::applyImpulse( const Point3F &origin, const Point3F &force )
       mActor->activate();
 }
 
+void BtBody::applyTorque(const Point3F &torque)
+{
+   AssertFatal(mActor, "BtBody::applyTorque - The actor is null!");
+   AssertFatal(isDynamic(), "BtBody::applyTorque - This call is only for dynamics!");
+
+   mActor->applyTorque( btCast<btVector3>(torque) );
+
+   if (!mActor->isActive())
+      mActor->activate();
+}
+
 Box3F BtBody::getWorldBounds()
 {   
    btVector3 min, max;
