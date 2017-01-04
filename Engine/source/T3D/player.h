@@ -606,6 +606,7 @@ protected:
    Point3F _move( const F32 travelTime, Collision *outCol );
    F32 _doCollisionImpact( const Collision *collision, bool fallingCollision);
    void _handleCollision( const Collision &collision );
+   bool _physicsEnabled();
    virtual bool updatePos(const F32 travelTime = TickSec);
 
    ///Update head animation
