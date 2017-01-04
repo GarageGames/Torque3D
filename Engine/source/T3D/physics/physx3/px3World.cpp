@@ -50,9 +50,6 @@ physx::PxDefaultCpuDispatcher* Px3World::smCpuDispatcher=NULL;
 Px3ConsoleStream* Px3World::smErrorCallback = NULL;
 physx::PxVisualDebuggerConnection* Px3World::smPvdConnection=NULL;
 physx::PxDefaultAllocator Px3World::smMemoryAlloc;
-//Physics timing
-F32 Px3World::smPhysicsStepTime = 1.0f/(F32)TickMs;
-U32 Px3World::smPhysicsMaxIterations = 4;
 
 Px3World::Px3World(): mScene( NULL ),
    mProcessList( NULL ),
@@ -74,12 +71,6 @@ Px3World::~Px3World()
 physx::PxCooking *Px3World::getCooking()
 {
 	return smCooking;
-}
-
-void Px3World::setTiming(F32 stepTime,U32 maxIterations)
-{
-   smPhysicsStepTime = stepTime;
-   smPhysicsMaxIterations = maxIterations;
 }
 
 bool Px3World::restartSDK( bool destroyOnly, Px3World *clientWorld, Px3World *serverWorld)
@@ -246,20 +237,20 @@ bool Px3World::initWorld( bool isServer, ProcessList *processList )
 // Most of this borrowed from bullet physics library, see btDiscreteDynamicsWorld.cpp
 bool Px3World::_simulate(const F32 dt)
 {
-   int numSimulationSubSteps = 0;
+   S32 numSimulationSubSteps = 0;
    //fixed timestep with interpolation
    mAccumulator += dt;
    if (mAccumulator >= smPhysicsStepTime)
    {
-      numSimulationSubSteps = int(mAccumulator / smPhysicsStepTime);
+      numSimulationSubSteps = S32(mAccumulator / smPhysicsStepTime);
       mAccumulator -= numSimulationSubSteps * smPhysicsStepTime;
    }
 	if (numSimulationSubSteps)
 	{
 		//clamp the number of substeps, to prevent simulation grinding spiralling down to a halt
-		int clampedSimulationSteps = (numSimulationSubSteps > smPhysicsMaxIterations)? smPhysicsMaxIterations : numSimulationSubSteps;
+		S32 clampedSimulationSteps = (numSimulationSubSteps > smPhysicsMaxSubSteps)? smPhysicsMaxSubSteps : numSimulationSubSteps;
 		
-		for (int i=0;i<clampedSimulationSteps;i++)
+		for (S32 i=0;i<clampedSimulationSteps;i++)
 		{
 			mScene->fetchResults(true);
 			mScene->simulate(smPhysicsStepTime);
@@ -617,9 +608,4 @@ void Px3World::onDebugDraw( const SceneRenderState *state )
       PrimBuild::end();
    }
 
-}
-//set simulation timing via script
-DefineEngineFunction( physx3SetSimulationTiming, void, ( F32 stepTime, U32 maxSteps ),, "Set simulation timing of the PhysX 3 plugin" )
-{
-   Px3World::setTiming(stepTime,maxSteps);
 }
