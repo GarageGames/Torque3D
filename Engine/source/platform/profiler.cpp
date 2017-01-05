@@ -27,7 +27,7 @@
 #endif
 
 #if defined(TORQUE_OS_MAC)
-#include <CoreServices/CoreServices.h> // For high resolution timer
+#include <mach/mach_time.h>
 #endif
 
 #include "core/stream/fileStream.h"
@@ -135,20 +135,26 @@ U32 endHighResolutionTimer(U32 time[2])
 
 
 void startHighResolutionTimer(U32 time[2]) {
-    UnsignedWide t;
-    Microseconds(&t);
-    time[0] = t.lo;
-    time[1] = t.hi;
+	U64 now = mach_absolute_time();
+	AssertFatal(sizeof(U32[2]) == sizeof(U64), "Can't pack mach_absolute_time into U32[2]");
+	memcpy(time, &now, sizeof(U64));
 }
 
 U32 endHighResolutionTimer(U32 time[2])  {
-   UnsignedWide t;
-   Microseconds(&t);
-   return t.lo - time[0]; 
-   // given that we're returning a 32 bit integer, and this is unsigned subtraction... 
-   // it will just wrap around, we don't need the upper word of the time.
-   // NOTE: the code assumes that more than 3 hrs will not go by between calls to startHighResolutionTimer() and endHighResolutionTimer().
-   // I mean... that damn well better not happen anyway.
+	static mach_timebase_info_data_t    sTimebaseInfo = {0, 0};
+	
+	U64 now = mach_absolute_time();
+	AssertFatal(sizeof(U32[2]) == sizeof(U64), "Can't pack mach_absolute_time into U32[2]");
+	U64 then;
+	memcpy(&then, time, sizeof(U64));
+	
+	if(sTimebaseInfo.denom == 0){
+		mach_timebase_info(&sTimebaseInfo);
+	}
+	// Handle the micros/nanos conversion first, because shedding a few bits is better than overflowing.
+	U64 elapsedMicros = ((now - then) / 1000) * sTimebaseInfo.numer / sTimebaseInfo.denom;
+	
+	return (U32)elapsedMicros; // Just truncate, and hope we didn't overflow
 }
 
 #else
