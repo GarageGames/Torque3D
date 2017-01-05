@@ -863,6 +863,12 @@ void PhysicsShape::applyTorque( const Point3F &torque )
       mPhysicsRep->applyTorque( torque );
 }
 
+void PhysicsShape::applyForce( const Point3F &force )
+{
+   if (mPhysicsRep && mPhysicsRep->isDynamic())
+      mPhysicsRep->applyForce( force );
+}
+
 void PhysicsShape::applyRadialImpulse( const Point3F &origin, F32 radius, F32 magnitude )
 {
    if ( !mPhysicsRep || !mPhysicsRep->isDynamic() )
@@ -1193,4 +1199,12 @@ DefineEngineMethod( PhysicsShape, applyTorque, void, (Point3F torque), ,
    "@note This value is ignored on physics shapes that are not dynamic. Wakes up the dynamic physics shape if it is sleeping.\n")
 {
    object->applyTorque( torque );
+}
+
+DefineEngineMethod(PhysicsShape, applyForce, void, (Point3F force), ,
+   "@brief Add a force to a dynamic physics shape.\n\n"
+   "@param force to apply to the dynamic physics shape\n"
+   "@note This value is ignored on physics shapes that are not dynamic. Wakes up the dynamic physics shape if it is sleeping.\n")
+{
+   object->applyForce( force );
 }
