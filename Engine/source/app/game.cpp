@@ -33,6 +33,7 @@
 #include "console/simBase.h"
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/controls/guiMLTextCtrl.h"
 #ifdef TORQUE_TGB_ONLY
 #include "T2D/oldModel/networking/t2dGameConnection.h"
@@ -57,22 +58,22 @@ bool gEditingMission = false;
 
 ConsoleFunctionGroupBegin( InputManagement, "Functions that let you deal with input from scripts" );
 
-ConsoleFunction( deactivateDirectInput, void, 1, 1, "()"
+DefineConsoleFunction( deactivateDirectInput, void, (), ,
+         "()"
             "@brief Disables DirectInput.\n\n"
             "Also deactivates any connected joysticks.\n\n"
 			"@ingroup Input" )
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    if ( Input::isActive() )
       Input::deactivate();
 }
 
-ConsoleFunction( activateDirectInput, void, 1, 1,"()"
+DefineConsoleFunction( activateDirectInput, void, (), ,
+            "()"
             "@brief Activates DirectInput.\n\n"
             "Also activates any connected joysticks."
 			"@ingroup Input")
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    if ( !Input::isActive() )
       Input::activate();
 }
@@ -81,11 +82,8 @@ ConsoleFunctionGroupEnd( InputManagement );
 //--------------------------------------------------------------------------
 
 static const U32 MaxPlayerNameLength = 16;
-ConsoleFunction( strToPlayerName, const char*, 2, 2, "strToPlayerName( string )" )
+DefineConsoleFunction( strToPlayerName, const char*, (const char* ptr ), , "strToPlayerName(string);" )
 {
-   TORQUE_UNUSED(argc);
-
-   const char* ptr = argv[1];
 
 	// Strip leading spaces and underscores:
    while ( *ptr == ' ' || *ptr == '_' )
@@ -140,16 +138,16 @@ ConsoleFunction( strToPlayerName, const char*, 2, 2, "strToPlayerName( string )"
 
 ConsoleFunctionGroupBegin( Platform , "General platform functions.");
 
-ConsoleFunction( lockMouse, void, 2, 2, "(bool isLocked)"
+DefineConsoleFunction( lockMouse, void, (bool isLocked ), , "(bool isLocked)" 
             "@brief Lock or unlock the mouse to the window.\n\n"
             "When true, prevents the mouse from leaving the bounds of the game window.\n\n"
             "@ingroup Input")
 {
-   Platform::setWindowLocked(dAtob(argv[1]));
+   Platform::setWindowLocked(isLocked);
 }
 
 
-ConsoleFunction( setNetPort, bool, 2, 3, "(int port, bool bind=true)"
+DefineConsoleFunction( setNetPort, bool, (int port, bool bind), (true), "(int port, bool bind=true)" 
    "@brief Set the network port for the game to use.\n\n"
 
    "@param port The port to use.\n"
@@ -161,37 +159,41 @@ ConsoleFunction( setNetPort, bool, 2, 3, "(int port, bool bind=true)"
    "If you don't have firewall tunneling tech you can set this to false to avoid the prompt.\n\n"
    "@ingroup Networking")
 {
-   bool bind = true;
-   if (argc == 3)
-      bind = dAtob(argv[2]);
-   return Net::openPort(dAtoi(argv[1]), bind);
+   return Net::openPort((S32)port, bind);
 }
 
-ConsoleFunction( closeNetPort, void, 1, 1, "()"
+DefineConsoleFunction(isAddressTypeAvailable, bool, (int addressType), , "(protocol id)"
+	"@brief Determines if a specified address type can be reached.\n\n"
+	"@ingroup Networking")
+{
+	return Net::isAddressTypeAvailable((NetAddress::Type)addressType);
+}
+
+DefineConsoleFunction( closeNetPort, void, (), , "()" 
    "@brief Closes the current network port\n\n"
    "@ingroup Networking")
 {
    Net::closePort();
 }
 
-ConsoleFunction( saveJournal, void, 2, 2, "(string filename)"
+DefineConsoleFunction( saveJournal, void, (const char * filename), , "(string filename)" 
                 "Save the journal to the specified file.\n\n"
 				"@ingroup Platform")
 {
-   Journal::Record(argv[1]);
+   Journal::Record(filename);
 }
 
-ConsoleFunction( playJournal, void, 2, 3, "(string filename)"
+DefineConsoleFunction( playJournal, void, (const char * filename), , "(string filename)" 
                 "@brief Begin playback of a journal from a specified field.\n\n"
 				"@param filename Name and path of file journal file\n"
 				"@ingroup Platform")
 {
    // CodeReview - BJG 4/24/2007 - The break flag needs to be wired back in.
    // bool jBreak = (argc > 2)? dAtob(argv[2]): false;
-   Journal::Play(argv[1]);
+   Journal::Play(filename);
 }
 
-ConsoleFunction( getSimTime, S32, 1, 1, "()"
+DefineConsoleFunction( getSimTime, S32, (), , "()" 
 				"Return the current sim time in milliseconds.\n\n"
                 "@brief Sim time is time since the game started.\n\n"
 				"@ingroup Platform")
@@ -199,12 +201,32 @@ ConsoleFunction( getSimTime, S32, 1, 1, "()"
    return Sim::getCurrentTime();
 }
 
-ConsoleFunction( getRealTime, S32, 1, 1, "()"
+DefineConsoleFunction( getRealTime, S32, (), , "()" 
 				"@brief Return the current real time in milliseconds.\n\n"
                 "Real time is platform defined; typically time since the computer booted.\n\n"
 				"@ingroup Platform")
 {
    return Platform::getRealMilliseconds();
+}
+
+ConsoleFunction( getLocalTime, const char *, 1, 1, "Return the current local time as: weekday month day year hour min sec.\n\n"
+                "Local time is platform defined.")
+{
+   Platform::LocalTime lt;
+   Platform::getLocalTime(lt);
+
+   static const U32 bufSize = 128;
+   char *retBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(retBuffer, bufSize, "%d %d %d %d %02d %02d %02d",
+      lt.weekday,
+      lt.month + 1,
+      lt.monthday,
+      lt.year + 1900,
+      lt.hour,
+      lt.min,
+      lt.sec);
+
+   return retBuffer;
 }
 
 ConsoleFunctionGroupEnd(Platform);

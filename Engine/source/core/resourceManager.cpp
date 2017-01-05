@@ -29,6 +29,8 @@
 
 #include "console/engineAPI.h"
 
+using namespace Torque;
+
 static AutoPtr< ResourceManager > smInstance;
 
 ResourceManager::ResourceManager()
@@ -219,16 +221,18 @@ ResourceBase ResourceManager::nextResource()
 
 ConsoleFunctionGroupBegin(ResourceManagerFunctions, "Resource management functions.");
 
-#ifdef TORQUE_DEBUG
+
 ConsoleFunction(resourceDump, void, 1, 1, "()"
 				"@brief List the currently managed resources\n\n"
 				"Currently used by editors only, internal\n"
 				"@ingroup Editors\n"
 				"@internal")
 {
+#ifdef TORQUE_DEBUG
    ResourceManager::get().dumpToConsole();
-}
 #endif
+}
+
 
 DefineEngineFunction( reloadResource, void, ( const char* path ),,
    "Force the resource at specified input path to be reloaded\n"

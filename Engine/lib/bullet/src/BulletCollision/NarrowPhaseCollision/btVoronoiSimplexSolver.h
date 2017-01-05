@@ -15,14 +15,23 @@ subject to the following restrictions:
 
 
 
-#ifndef btVoronoiSimplexSolver_H
-#define btVoronoiSimplexSolver_H
+#ifndef BT_VORONOI_SIMPLEX_SOLVER_H
+#define BT_VORONOI_SIMPLEX_SOLVER_H
 
 #include "btSimplexSolverInterface.h"
 
 
 
 #define VORONOI_SIMPLEX_MAX_VERTS 5
+
+///disable next define, or use defaultCollisionConfiguration->getSimplexSolver()->setEqualVertexThreshold(0.f) to disable/configure
+#define BT_USE_EQUAL_VERTEX_THRESHOLD
+
+#ifdef BT_USE_DOUBLE_PRECISION
+#define VORONOI_DEFAULT_EQUAL_VERTEX_THRESHOLD 1e-12f
+#else
+#define VORONOI_DEFAULT_EQUAL_VERTEX_THRESHOLD 0.0001f
+#endif//BT_USE_DOUBLE_PRECISION
 
 struct btUsageBitfield{
 	btUsageBitfield()
@@ -87,12 +96,14 @@ struct	btSubSimplexClosestResult
 /// btVoronoiSimplexSolver is an implementation of the closest point distance algorithm from a 1-4 points simplex to the origin.
 /// Can be used with GJK, as an alternative to Johnson distance algorithm.
 #ifdef NO_VIRTUAL_INTERFACE
-class btVoronoiSimplexSolver
+ATTRIBUTE_ALIGNED16(class) btVoronoiSimplexSolver
 #else
-class btVoronoiSimplexSolver : public btSimplexSolverInterface
+ATTRIBUTE_ALIGNED16(class) btVoronoiSimplexSolver : public btSimplexSolverInterface
 #endif
 {
 public:
+
+	BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	int	m_numVertices;
 
@@ -106,7 +117,10 @@ public:
 	btVector3	m_cachedP2;
 	btVector3	m_cachedV;
 	btVector3	m_lastW;
+	
+	btScalar	m_equalVertexThreshold;
 	bool		m_cachedValidClosest;
+
 
 	btSubSimplexClosestResult m_cachedBC;
 
@@ -122,10 +136,23 @@ public:
 
 public:
 
+	btVoronoiSimplexSolver()
+		:  m_equalVertexThreshold(VORONOI_DEFAULT_EQUAL_VERTEX_THRESHOLD)
+	{
+	}
 	 void reset();
 
 	 void addVertex(const btVector3& w, const btVector3& p, const btVector3& q);
 
+	 void	setEqualVertexThreshold(btScalar threshold)
+	 {
+		 m_equalVertexThreshold = threshold;
+	 }
+
+	 btScalar	getEqualVertexThreshold() const
+	 {
+		 return m_equalVertexThreshold;
+	 }
 
 	 bool closest(btVector3& v);
 
@@ -154,4 +181,5 @@ public:
 
 };
 
-#endif //VoronoiSimplexSolver
+#endif //BT_VORONOI_SIMPLEX_SOLVER_H
+

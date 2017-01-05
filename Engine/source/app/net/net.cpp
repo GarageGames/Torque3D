@@ -31,27 +31,14 @@
 #include "sim/netObject.h"
 #include "app/net/serverQuery.h"
 #include "console/engineAPI.h"
-
+#include <vector>
+#include "net.h"
 //----------------------------------------------------------------
 // remote procedure call console functions
 //----------------------------------------------------------------
 
-class RemoteCommandEvent : public NetEvent
-{
-public:
-   typedef NetEvent Parent;
-   enum {
-      MaxRemoteCommandArgs = 20,
-      CommandArgsBits = 5
-   };
 
-private:
-   S32 mArgc;
-   char *mArgv[MaxRemoteCommandArgs + 1];
-   NetStringHandle mTagv[MaxRemoteCommandArgs + 1];
-   static char mBuf[1024];
-public:
-   RemoteCommandEvent(S32 argc=0, const char **argv=NULL, NetConnection *conn = NULL)
+   RemoteCommandEvent::RemoteCommandEvent(S32 argc, const char **argv, NetConnection *conn)
    {
       mArgc = argc;
       for(S32 i = 0; i < argc; i++)
@@ -73,7 +60,7 @@ public:
    }
 
 #ifdef TORQUE_DEBUG_NET
-   const char *getDebugName()
+   const char *RemoteCommandEvent::getDebugName()
    {
       static char buffer[256];
       dSprintf(buffer, sizeof(buffer), "%s [%s]", getClassName(), mTagv[1].isValidString() ? mTagv[1].getString() : "--unknown--" );
@@ -81,13 +68,13 @@ public:
    }
 #endif
 
-   ~RemoteCommandEvent()
+   RemoteCommandEvent::~RemoteCommandEvent()
    {
       for(S32 i = 0; i < mArgc; i++)
          dFree(mArgv[i+1]);
    }
 
-   virtual void pack(NetConnection* conn, BitStream *bstream)
+   void RemoteCommandEvent::pack(NetConnection* conn, BitStream *bstream)
    {
       bstream->writeInt(mArgc, CommandArgsBits);
       // write it out reversed... why?
@@ -98,12 +85,12 @@ public:
          conn->packString(bstream, mArgv[i+1]);
    }
 
-   virtual void write(NetConnection* conn, BitStream *bstream)
+   void RemoteCommandEvent::write(NetConnection* conn, BitStream *bstream)
    {
       pack(conn, bstream);
    }
 
-   virtual void unpack(NetConnection* conn, BitStream *bstream)
+   void RemoteCommandEvent::unpack(NetConnection* conn, BitStream *bstream)
    {
 
       mArgc = bstream->readInt(CommandArgsBits);
@@ -115,7 +102,7 @@ public:
       }
    }
 
-   virtual void process(NetConnection *conn)
+   void RemoteCommandEvent::process(NetConnection *conn)
    {
       static char idBuf[10];
 
@@ -165,8 +152,52 @@ public:
       }
    }
 
-   DECLARE_CONOBJECT(RemoteCommandEvent);
-};
+   void RemoteCommandEvent::sendRemoteCommand(NetConnection *conn, S32 argc, const char **argv)
+	   {
+	   if(U8(argv[0][0]) != StringTagPrefixByte)
+		   {
+		   Con::errorf(ConsoleLogEntry::Script, "Remote Command Error - command must be a tag.");
+		   return;
+		   }
+	   S32 i;
+	   for(i = argc - 1; i >= 0; i--)
+		   {
+		   if(argv[i][0] != 0)
+			   break;
+		   argc = i;
+		   }
+	   for(i = 0; i < argc; i++)
+		   conn->validateSendString(argv[i]);
+	   RemoteCommandEvent *cevt = new RemoteCommandEvent(argc, argv, conn);
+	   conn->postNetEvent(cevt);
+	   }
+
+   const char* RemoteCommandEvent::getTaggedString(const char* tag)
+	{
+	const char *indexPtr = tag;
+	if (*indexPtr == StringTagPrefixByte)
+		indexPtr++;
+	return gNetStringTable->lookupString(dAtoi(indexPtr));
+	}
+
+   void RemoteCommandEvent::removeTaggedString(S32 tag)
+	{
+	if (tag)
+		gNetStringTable->removeString(tag, true);
+	}
+
+   const char* RemoteCommandEvent::addTaggedString(const char* str)
+	   {
+	   NetStringHandle s(str);
+	   gNetStringTable->incStringRefScript(s.getIndex());
+
+	   char *ret = Con::getReturnBuffer(10);
+	   ret[0] = StringTagPrefixByte;
+	   dSprintf(ret + 1, 9, "%d", s.getIndex());
+	   return ret;
+	   }
+
+
 char RemoteCommandEvent::mBuf[1024];
 
 IMPLEMENT_CO_NETEVENT_V1(RemoteCommandEvent);
@@ -176,30 +207,13 @@ ConsoleDocClass( RemoteCommandEvent,
 				"Not intended for game development, for exposing ConsoleFunctions (such as commandToClient) only.\n\n"
 				"@internal");
 
-static void sendRemoteCommand(NetConnection *conn, S32 argc, const char **argv)
-{
-   if(U8(argv[0][0]) != StringTagPrefixByte)
-   {
-      Con::errorf(ConsoleLogEntry::Script, "Remote Command Error - command must be a tag.");
-      return;
-   }
-   S32 i;
-   for(i = argc - 1; i >= 0; i--)
-   {
-      if(argv[i][0] != 0)
-         break;
-      argc = i;
-   }
-   for(i = 0; i < argc; i++)
-      conn->validateSendString(argv[i]);
-   RemoteCommandEvent *cevt = new RemoteCommandEvent(argc, argv, conn);
-   conn->postNetEvent(cevt);
-}
+
 
 ConsoleFunctionGroupBegin( Net, "Functions for use with the network; tagged strings and remote commands.");
 
+
 ConsoleFunction( commandToServer, void, 2, RemoteCommandEvent::MaxRemoteCommandArgs + 1, "(string func, ...)"
-   "@brief Send a command to the server.\n\n"
+	"@brief Send a command to the server.\n\n"
 
    "@param func Name of the server command being called\n"
    "@param ... Various parameters being passed to server command\n\n"
@@ -237,7 +251,8 @@ ConsoleFunction( commandToServer, void, 2, RemoteCommandEvent::MaxRemoteCommandA
    NetConnection *conn = NetConnection::getConnectionToServer();
    if(!conn)
       return;
-   sendRemoteCommand(conn, argc - 1, argv + 1);
+   StringStackWrapper args(argc - 1, argv + 1);
+   RemoteCommandEvent::sendRemoteCommand(conn, args.count(), args);
 }
 
 ConsoleFunction( commandToClient, void, 3, RemoteCommandEvent::MaxRemoteCommandArgs + 2, "(NetConnection client, string func, ...)"
@@ -274,11 +289,15 @@ ConsoleFunction( commandToClient, void, 3, RemoteCommandEvent::MaxRemoteCommandA
    NetConnection *conn;
    if(!Sim::findObject(argv[1], conn))
       return;
-   sendRemoteCommand(conn, argc - 2, argv + 2);
+   StringStackWrapper args(argc - 2, argv + 2);
+   RemoteCommandEvent::sendRemoteCommand(conn, args.count(), args);
 }
 
 
-ConsoleFunction(removeTaggedString, void, 2, 2, "(int tag)"
+
+
+
+DefineEngineFunction(removeTaggedString, void, (S32 tag), (-1),
    "@brief Remove a tagged string from the Net String Table\n\n"
 
    "@param tag The tag associated with the string\n\n"
@@ -287,11 +306,12 @@ ConsoleFunction(removeTaggedString, void, 2, 2, "(int tag)"
    "@see addTaggedString()\n"
    "@see getTaggedString()\n"
    "@ingroup Networking\n")
-{
-   gNetStringTable->removeString(dAtoi(argv[1]+1), true);
-}
+   {
+   RemoteCommandEvent::removeTaggedString(tag);
+   }
 
-ConsoleFunction( addTaggedString, const char*, 2, 2, "(string str)"
+
+DefineEngineFunction(addTaggedString, const char* , (const char* str), (""),
    "@brief Use the addTaggedString function to tag a new string and add it to the NetStringTable\n\n"
 
    "@param str The string to be tagged and placed in the NetStringTable. Tagging ignores case, "
@@ -303,17 +323,12 @@ ConsoleFunction( addTaggedString, const char*, 2, 2, "(string str)"
    "@see removeTaggedString()\n"
    "@see getTaggedString()\n"
    "@ingroup Networking\n")
-{
-   NetStringHandle s(argv[1]);
-   gNetStringTable->incStringRefScript(s.getIndex());
+   {
+   return RemoteCommandEvent::addTaggedString(str);
+   }
 
-   char *ret = Con::getReturnBuffer(10);
-   ret[0] = StringTagPrefixByte;
-   dSprintf(ret + 1, 9, "%d", s.getIndex());
-   return ret;
-}
 
-ConsoleFunction( getTaggedString, const char*, 2, 2, "(int tag)"
+DefineEngineFunction(getTaggedString, const char* , (const char *tag), (""),
    "@brief Use the getTaggedString function to convert a tag to a string.\n\n"
 
    "This is not the same as detag() which can only be used within the context "
@@ -328,12 +343,11 @@ ConsoleFunction( getTaggedString, const char*, 2, 2, "(int tag)"
    "@see addTaggedString()\n"
    "@see removeTaggedString()\n"
    "@ingroup Networking\n")
-{
-   const char *indexPtr = argv[1];
-   if (*indexPtr == StringTagPrefixByte)
-      indexPtr++;
-   return gNetStringTable->lookupString(dAtoi(indexPtr));
-}
+	{
+	return RemoteCommandEvent::getTaggedString(tag);
+	}
+
+
 
 ConsoleFunction( buildTaggedString, const char*, 2, 11, "(string format, ...)"
    "@brief Build a string using the specified tagged string format.\n\n"
@@ -370,10 +384,11 @@ ConsoleFunction( buildTaggedString, const char*, 2, 11, "(string format, ...)"
    if (*indexPtr == StringTagPrefixByte)
       indexPtr++;
    const char *fmtString = gNetStringTable->lookupString(dAtoi(indexPtr));
-   char *strBuffer = Con::getReturnBuffer(512);
+   static const U32 bufSize = 512;
+   char *strBuffer = Con::getReturnBuffer(bufSize);
    const char *fmtStrPtr = fmtString;
    char *strBufPtr = strBuffer;
-   S32 strMaxLength = 511;
+   S32 strMaxLength = bufSize - 1;
    if (!fmtString)
       goto done;
 

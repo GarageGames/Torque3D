@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef TRIANGLE_MESH_H
-#define TRIANGLE_MESH_H
+#ifndef BT_TRIANGLE_MESH_H
+#define BT_TRIANGLE_MESH_H
 
 #include "btTriangleIndexVertexArray.h"
 #include "LinearMath/btVector3.h"
@@ -27,7 +27,7 @@ subject to the following restrictions:
 class btTriangleMesh : public btTriangleIndexVertexArray
 {
 	btAlignedObjectArray<btVector3>	m_4componentVertices;
-	btAlignedObjectArray<float>		m_3componentVertices;
+	btAlignedObjectArray<btScalar>	m_3componentVertices;
 
 	btAlignedObjectArray<unsigned int>		m_32bitIndices;
 	btAlignedObjectArray<unsigned short int>		m_16bitIndices;
@@ -52,11 +52,14 @@ class btTriangleMesh : public btTriangleIndexVertexArray
 		///By default addTriangle won't search for duplicate vertices, because the search is very slow for large triangle meshes.
 		///In general it is better to directly use btTriangleIndexVertexArray instead.
 		void	addTriangle(const btVector3& vertex0,const btVector3& vertex1,const btVector3& vertex2, bool removeDuplicateVertices=false);
-		
+
+		///Add a triangle using its indices. Make sure the indices are pointing within the vertices array, so add the vertices first (and to be sure, avoid removal of duplicate vertices)	
+		void	addTriangleIndices(int index1, int index2, int index3 );
+	
 		int getNumTriangles() const;
 
-		virtual void	preallocateVertices(int numverts){(void) numverts;}
-		virtual void	preallocateIndices(int numindices){(void) numindices;}
+		virtual void	preallocateVertices(int numverts);
+		virtual void	preallocateIndices(int numindices);
 
 		///findOrAddVertex is an internal method, use addTriangle instead
 		int		findOrAddVertex(const btVector3& vertex, bool removeDuplicateVertices);
@@ -65,5 +68,5 @@ class btTriangleMesh : public btTriangleIndexVertexArray
 		
 };
 
-#endif //TRIANGLE_MESH_H
+#endif //BT_TRIANGLE_MESH_H
 

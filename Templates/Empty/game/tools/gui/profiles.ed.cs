@@ -764,7 +764,7 @@ singleton GuiControlProfile( GuiInspectorGroupProfile )
    opaque = false;
    border = false;
   
-   bitmap = "tools/editorclasses/gui/images/rollout";
+   bitmap = "tools/editorClasses/gui/images/rollout";
    
    textOffset = "20 0";
 
@@ -1062,4 +1062,18 @@ singleton GuiControlProfile( GuiCreatorIconButtonProfile )
    //bevelColorHL = "255 255 255";
    //bevelColorLL = "0 0 0";
    category = "Editor";
+};
+
+singleton GuiControlProfile( GuiMenuBarProfile )
+{
+   fillcolor = "255 255 255";
+   fillcolorHL = "213 231 248";
+   borderColor = "98 163 229";
+   borderColorHL = "122 177 232";
+   border = 0;
+   borderThickness = 1;
+   opaque = true;
+   mouseOverSelected = true;
+   category = "Editor";
+   bitmap = "tools/gui/images/checkbox-menubar";
 };

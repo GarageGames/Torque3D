@@ -97,11 +97,25 @@ function ShapeBase::clearDamageDt(%this)
    }
 }
 
+
+function GameBase::damage(%this, %sourceObject, %position, %damage, %damageType)
+{
+   // All damage applied by one object to another should go through this method.
+   // This function is provided to allow objects some chance of overriding or
+   // processing damage values and types.  As opposed to having weapons call
+   // ShapeBase::applyDamage directly. Damage is redirected to the datablock,
+   // this is standard procedure for many built in callbacks.
+      
+   %datablock = %this.getDataBlock();
+   if ( isObject( %datablock ) )
+      %datablock.damage(%this, %sourceObject, %position, %damage, %damageType);
+}
+
 //-----------------------------------------------------------------------------
 // ShapeBase datablock
 //-----------------------------------------------------------------------------
 
-function ShapeBaseData::damage(%this, %obj, %position, %source, %amount, %damageType)
+function ShapeBaseData::damage(%this, %obj, %source, %position, %amount, %damageType)
 {
    // Ignore damage by default. This empty method is here to
    // avoid console warnings.

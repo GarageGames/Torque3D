@@ -39,6 +39,9 @@ singleton ShaderData( FXAA_ShaderData )
    DXVertexShaderFile 	= "shaders/common/postFx/fxaa/fxaaV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/fxaa/fxaaP.hlsl";
    
+   OGLVertexShaderFile  = "shaders/common/postFx/fxaa/gl/fxaaV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/fxaa/gl/fxaaP.glsl";
+   
    samplerNames[0] = "$colorTex";
 
    pixVersion = 3.0;

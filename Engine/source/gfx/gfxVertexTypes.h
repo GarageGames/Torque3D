@@ -36,6 +36,10 @@
 #include "math/mPoint3.h"
 #endif
 
+GFXDeclareVertexFormat( GFXVertexPad )
+{
+   U32 data;
+};
 
 GFXDeclareVertexFormat( GFXVertexP )
 {
@@ -110,6 +114,14 @@ GFXDeclareVertexFormat( GFXVertexPNTT )
    Point3F normal;
    Point3F tangent;
    Point2F texCoord;
+};
+
+GFXDeclareVertexFormat( GFXVertexPCNTT )
+{
+   Point3F point;
+   GFXVertexColor color;
+   Point3F normal;
+   Point2F texCoord[2];
 };
 
 GFXDeclareVertexFormat( GFXVertexPNTBT )

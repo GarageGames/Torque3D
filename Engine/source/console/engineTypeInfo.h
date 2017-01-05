@@ -44,7 +44,7 @@ enum EngineTypeKind
    EngineTypeKindClass           ///< Pointer to opaque EngineObject.
 };
 
-DECLARE_ENUM( EngineTypeKind );
+DECLARE_ENUM_R( EngineTypeKind );
 
 /// Flags for an EngineTypeInfo.
 enum EngineTypeFlags
@@ -173,8 +173,8 @@ class EngineFieldTable
       /// Construct a field table from a NULL-terminated array of Field
       /// records.
       EngineFieldTable( const Field* fields )
-         : mFields( fields ),
-           mNumFields( 0 )
+         : mNumFields( 0 ),
+           mFields( fields )
       {
          while( fields[ mNumFields ].getName() )
             mNumFields ++;
@@ -362,7 +362,7 @@ class EngineTypeInfo : public EngineExportScope
       // them to retroactively install property tables.  Will be removed
       // when the console interop is removed and all classes are migrated
       // to the new system.
-      template< typename T > friend class ConcreteClassRep;
+      template< typename T > friend class ConcreteAbstractClassRep;
       
    protected:
       

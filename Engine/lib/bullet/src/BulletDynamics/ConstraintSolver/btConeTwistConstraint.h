@@ -33,18 +33,33 @@ and swing 1 and 2 are along the z and y axes respectively.
 
 
 
-#ifndef CONETWISTCONSTRAINT_H
-#define CONETWISTCONSTRAINT_H
+#ifndef BT_CONETWISTCONSTRAINT_H
+#define BT_CONETWISTCONSTRAINT_H
 
 #include "LinearMath/btVector3.h"
 #include "btJacobianEntry.h"
 #include "btTypedConstraint.h"
 
+#ifdef BT_USE_DOUBLE_PRECISION
+#define btConeTwistConstraintData2	btConeTwistConstraintDoubleData
+#define btConeTwistConstraintDataName	"btConeTwistConstraintDoubleData"
+#else
+#define btConeTwistConstraintData2	btConeTwistConstraintData 
+#define btConeTwistConstraintDataName	"btConeTwistConstraintData" 
+#endif //BT_USE_DOUBLE_PRECISION
+
+
 class btRigidBody;
 
+enum btConeTwistFlags
+{
+	BT_CONETWIST_FLAGS_LIN_CFM = 1,
+	BT_CONETWIST_FLAGS_LIN_ERP = 2,
+	BT_CONETWIST_FLAGS_ANG_CFM = 4
+};
 
 ///btConeTwistConstraint can be used to simulate ragdoll joints (upper arm, leg etc)
-class btConeTwistConstraint : public btTypedConstraint
+ATTRIBUTE_ALIGNED16(class) btConeTwistConstraint : public btTypedConstraint
 {
 #ifdef IN_PARALLELL_SOLVER
 public:
@@ -99,13 +114,32 @@ public:
 	btScalar	 m_maxMotorImpulse;
 	btVector3	 m_accMotorImpulse;
 	
+	// parameters
+	int			m_flags;
+	btScalar	m_linCFM;
+	btScalar	m_linERP;
+	btScalar	m_angCFM;
+	
+protected:
+
+	void init();
+
+	void computeConeLimitInfo(const btQuaternion& qCone, // in
+		btScalar& swingAngle, btVector3& vSwingAxis, btScalar& swingLimit); // all outs
+
+	void computeTwistLimitInfo(const btQuaternion& qTwist, // in
+		btScalar& twistAngle, btVector3& vTwistAxis); // all outs
+
+	void adjustSwingAxisToUseEllipseNormal(btVector3& vSwingAxis) const;
+
+
 public:
+
+	BT_DECLARE_ALIGNED_ALLOCATOR();
 
 	btConeTwistConstraint(btRigidBody& rbA,btRigidBody& rbB,const btTransform& rbAFrame, const btTransform& rbBFrame);
 	
 	btConeTwistConstraint(btRigidBody& rbA,const btTransform& rbAFrame);
-
-	btConeTwistConstraint();
 
 	virtual void	buildJacobian();
 
@@ -119,7 +153,9 @@ public:
 
 	virtual	void	solveConstraintObsolete(btSolverBody& bodyA,btSolverBody& bodyB,btScalar	timeStep);
 
+    
 	void	updateRHS(btScalar	timeStep);
+
 
 	const btRigidBody& getRigidBodyA() const
 	{
@@ -133,6 +169,11 @@ public:
 	void	setAngularOnly(bool angularOnly)
 	{
 		m_angularOnly = angularOnly;
+	}
+	
+	bool    getAngularOnly() const
+	{
+	    return m_angularOnly;
 	}
 
 	void	setLimit(int limitIndex,btScalar limitValue)
@@ -160,6 +201,33 @@ public:
 		};
 	}
 
+    btScalar getLimit(int limitIndex) const
+	{
+		switch (limitIndex)
+		{
+		case 3:
+			{
+				return m_twistSpan;
+				break;
+			}
+		case 4:
+			{
+				return m_swingSpan2;
+				break;
+			}
+		case 5:
+			{
+				return m_swingSpan1;
+				break;
+			}
+		default:
+			{
+			    btAssert(0 && "Invalid limitIndex specified for btConeTwistConstraint");
+			    return 0.0;
+			}
+		};
+	}
+
 	// setLimit(), a few notes:
 	// _softness:
 	//		0->1, recommend ~0.8->1.
@@ -182,8 +250,8 @@ public:
 		m_relaxationFactor = _relaxationFactor;
 	}
 
-	const btTransform& getAFrame() { return m_rbAFrame; };	
-	const btTransform& getBFrame() { return m_rbBFrame; };
+	const btTransform& getAFrame() const { return m_rbAFrame; };	
+	const btTransform& getBFrame() const { return m_rbBFrame; };
 
 	inline int getSolveTwistLimit()
 	{
@@ -203,28 +271,43 @@ public:
 	void calcAngleInfo();
 	void calcAngleInfo2(const btTransform& transA, const btTransform& transB,const btMatrix3x3& invInertiaWorldA,const btMatrix3x3& invInertiaWorldB);
 
-	inline btScalar getSwingSpan1()
+	inline btScalar getSwingSpan1() const
 	{
 		return m_swingSpan1;
 	}
-	inline btScalar getSwingSpan2()
+	inline btScalar getSwingSpan2() const
 	{
 		return m_swingSpan2;
 	}
-	inline btScalar getTwistSpan()
+	inline btScalar getTwistSpan() const
 	{
 		return m_twistSpan;
 	}
-	inline btScalar getTwistAngle()
+	inline btScalar getLimitSoftness() const
+	{
+		return m_limitSoftness;
+	}
+	inline btScalar getBiasFactor() const
+	{
+		return m_biasFactor;
+	}
+	inline btScalar getRelaxationFactor() const
+	{
+		return m_relaxationFactor;
+	}
+	inline btScalar getTwistAngle() const
 	{
 		return m_twistAngle;
 	}
 	bool isPastSwingLimit() { return m_solveSwingLimit; }
 
-
+	btScalar getDamping() const { return m_damping; }
 	void setDamping(btScalar damping) { m_damping = damping; }
 
 	void enableMotor(bool b) { m_bMotorEnabled = b; }
+	bool isMotorEnabled() const { return m_bMotorEnabled; }
+	btScalar getMaxMotorImpulse() const { return m_maxMotorImpulse; }
+	bool isMaxMotorImpulseNormalized() const { return m_bNormalizedMotorStrength; }
 	void setMaxMotorImpulse(btScalar maxMotorImpulse) { m_maxMotorImpulse = maxMotorImpulse; m_bNormalizedMotorStrength = false; }
 	void setMaxMotorImpulseNormalized(btScalar maxMotorImpulse) { m_maxMotorImpulse = maxMotorImpulse; m_bNormalizedMotorStrength = true; }
 
@@ -236,24 +319,117 @@ public:
 	// note: if q violates the joint limits, the internal target is clamped to avoid conflicting impulses (very bad for stability)
 	// note: don't forget to enableMotor()
 	void setMotorTarget(const btQuaternion &q);
+	const btQuaternion& getMotorTarget() const { return m_qTarget; }
 
 	// same as above, but q is the desired rotation of frameA wrt frameB in constraint space
 	void setMotorTargetInConstraintSpace(const btQuaternion &q);
 
 	btVector3 GetPointForAngle(btScalar fAngleInRadians, btScalar fLength) const;
 
+	///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5). 
+	///If no axis is provided, it uses the default axis for this constraint.
+	virtual	void setParam(int num, btScalar value, int axis = -1);
+
+	virtual void setFrames(const btTransform& frameA, const btTransform& frameB);
+
+	const btTransform& getFrameOffsetA() const
+	{
+		return m_rbAFrame;
+	}
+
+	const btTransform& getFrameOffsetB() const
+	{
+		return m_rbBFrame;
+	}
 
 
-protected:
-	void init();
+	///return the local value of parameter
+	virtual	btScalar getParam(int num, int axis = -1) const;
 
-	void computeConeLimitInfo(const btQuaternion& qCone, // in
-		btScalar& swingAngle, btVector3& vSwingAxis, btScalar& swingLimit); // all outs
+	int getFlags() const
+	{
+		return m_flags;
+	}
 
-	void computeTwistLimitInfo(const btQuaternion& qTwist, // in
-		btScalar& twistAngle, btVector3& vTwistAxis); // all outs
+	virtual	int	calculateSerializeBufferSize() const;
 
-	void adjustSwingAxisToUseEllipseNormal(btVector3& vSwingAxis) const;
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+	virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
+
 };
 
-#endif //CONETWISTCONSTRAINT_H
+
+	
+struct	btConeTwistConstraintDoubleData
+{
+	btTypedConstraintDoubleData	m_typeConstraintData;
+	btTransformDoubleData m_rbAFrame;
+	btTransformDoubleData m_rbBFrame;
+
+	//limits
+	double	m_swingSpan1;
+	double	m_swingSpan2;
+	double	m_twistSpan;
+	double	m_limitSoftness;
+	double	m_biasFactor;
+	double	m_relaxationFactor;
+
+	double	m_damping;
+		
+	
+
+};
+
+#ifdef BT_BACKWARDS_COMPATIBLE_SERIALIZATION
+///this structure is not used, except for loading pre-2.82 .bullet files
+struct	btConeTwistConstraintData
+{
+	btTypedConstraintData	m_typeConstraintData;
+	btTransformFloatData m_rbAFrame;
+	btTransformFloatData m_rbBFrame;
+
+	//limits
+	float	m_swingSpan1;
+	float	m_swingSpan2;
+	float	m_twistSpan;
+	float	m_limitSoftness;
+	float	m_biasFactor;
+	float	m_relaxationFactor;
+
+	float	m_damping;
+		
+	char m_pad[4];
+
+};
+#endif //BT_BACKWARDS_COMPATIBLE_SERIALIZATION
+//
+
+SIMD_FORCE_INLINE int	btConeTwistConstraint::calculateSerializeBufferSize() const
+{
+	return sizeof(btConeTwistConstraintData2);
+
+}
+
+
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+SIMD_FORCE_INLINE const char*	btConeTwistConstraint::serialize(void* dataBuffer, btSerializer* serializer) const
+{
+	btConeTwistConstraintData2* cone = (btConeTwistConstraintData2*) dataBuffer;
+	btTypedConstraint::serialize(&cone->m_typeConstraintData,serializer);
+
+	m_rbAFrame.serialize(cone->m_rbAFrame);
+	m_rbBFrame.serialize(cone->m_rbBFrame);
+	
+	cone->m_swingSpan1 = m_swingSpan1;
+	cone->m_swingSpan2 = m_swingSpan2;
+	cone->m_twistSpan = m_twistSpan;
+	cone->m_limitSoftness = m_limitSoftness;
+	cone->m_biasFactor = m_biasFactor;
+	cone->m_relaxationFactor = m_relaxationFactor;
+	cone->m_damping = m_damping;
+
+	return btConeTwistConstraintDataName;
+}
+
+
+#endif //BT_CONETWISTCONSTRAINT_H

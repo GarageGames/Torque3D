@@ -48,6 +48,8 @@ class ShaderFeatureConstHandles
 {
 public:
 
+   virtual ~ShaderFeatureConstHandles() { }
+
    virtual void init( GFXShader *shader ) = 0;
 
    virtual void setConsts( SceneRenderState *state, 
@@ -100,7 +102,12 @@ protected:
 public:
 
    // TODO: Make this protected and give it a proper API.
+   const GFXVertexFormat *mVertexFormat;
+
+   // TODO: Make this protected and give it a proper API.
    GFXVertexFormat *mInstancingFormat;
+
+public:   
 
    //**************************************************************************
    /*!
@@ -138,7 +145,8 @@ public:
    ShaderFeature()
       :  output( NULL ),
          mProcessIndex( 0 ),
-         mInstancingFormat( NULL )
+         mInstancingFormat( NULL ),
+         mVertexFormat( NULL )
    {
    }
 
@@ -151,7 +159,7 @@ public:
    void setProcessIndex( S32 index ) { mProcessIndex = index; }
 
    ///
-   U32 getProcessIndex() const { return mProcessIndex; }
+   S32 getProcessIndex() const { return mProcessIndex; }
 
    //-----------------------------------------------------------------------
    // Virtual Functions
@@ -284,13 +292,15 @@ public:
 
    /// Called after processing the vertex and processing the pixel 
    /// to cleanup any temporary structures stored in the feature.
-   virtual void reset() { output = NULL; mProcessIndex = 0; mInstancingFormat = NULL; }
+   virtual void reset() { output = NULL; mProcessIndex = 0; mInstancingFormat = NULL; mVertexFormat = NULL; }
 
    /// A simpler helper function which either finds
    /// the existing local var or creates one.
    static Var* findOrCreateLocal(   const char *name, 
                                     const char *type, 
                                     MultiLine *multi );
+   // Set the instancing format
+   void setInstancingFormat(GFXVertexFormat *format);
 };
 
 #endif // _SHADERFEATURE_H_

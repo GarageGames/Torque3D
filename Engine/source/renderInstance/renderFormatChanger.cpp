@@ -218,24 +218,35 @@ void RenderFormatToken::_updateTargets()
       // Update color target
       if(mColorFormat != GFXFormat_COUNT)
       {
+         // try reuse of old color texture
+         if( !mTargetColorTexture[i] || mTargetColorTexture[i].getFormat() != mColorFormat 
+            || mTargetColorTexture[i].getWidthHeight() != rtSize)
+         {
          mTargetColorTexture[i].set( rtSize.x, rtSize.y, mColorFormat, 
             &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
             1, mTargetAALevel );
          mTargetChain[i]->attachTexture( GFXTextureTarget::Color0, mTargetColorTexture[i] );
       }
+      }
 
-      mTargetChain[i]->attachTexture( GFXTextureTarget::Color0, mTargetColorTexture[i] );
+
       
 
       // Update depth target
       if(mDepthFormat != GFXFormat_COUNT)
       {
+         // try reuse of old depth texture
+         if( !mTargetDepthStencilTexture[i] || mTargetDepthStencilTexture[i].getFormat() != mColorFormat 
+            || mTargetDepthStencilTexture[i].getWidthHeight() != rtSize)
+         {
          mTargetDepthStencilTexture[i].set( rtSize.x, rtSize.y, mDepthFormat, 
             &GFXDefaultZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
             1, mTargetAALevel );
+            mTargetChain[i]->attachTexture( GFXTextureTarget::DepthStencil, mTargetDepthStencilTexture[i] );
+         }
       }
 
-      mTargetChain[i]->attachTexture( GFXTextureTarget::DepthStencil, mTargetDepthStencilTexture[i] );
+     
    }
 }
 
@@ -243,7 +254,7 @@ void RenderFormatToken::_teardownTargets()
 {
    mTarget.release();
 
-   for(int i = 0; i < TargetChainLength; i++)
+   for(S32 i = 0; i < TargetChainLength; i++)
    {
       mTargetColorTexture[i] = NULL;
       mTargetDepthStencilTexture[i] = NULL;

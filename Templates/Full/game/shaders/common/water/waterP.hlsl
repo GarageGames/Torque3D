@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"
+#include "../shaderModelAutoGen.hlsl"
 #include "../torque.hlsl"
 
 //-----------------------------------------------------------------------------
@@ -69,7 +69,7 @@
 
 struct ConnectData
 {
-   float4 hpos             : POSITION;   
+   float4 hpos             : TORQUE_POSITION;   
    
    // TexCoord 0 and 1 (xy,zw) for ripple texture lookup
    float4 rippleTexCoord01 : TEXCOORD0;   
@@ -105,13 +105,13 @@ float fresnel(float NdotV, float bias, float power)
 //-----------------------------------------------------------------------------
 // Uniforms                                                                  
 //-----------------------------------------------------------------------------
-uniform sampler      bumpMap     : register( S0 );
-uniform sampler2D    prepassTex  : register( S1 );
-uniform sampler2D    reflectMap  : register( S2 );
-uniform sampler      refractBuff : register( S3 );
-uniform samplerCUBE  skyMap      : register( S4 );
-uniform sampler      foamMap     : register( S5 );
-uniform sampler1D    depthGradMap    : register( S6 );
+TORQUE_UNIFORM_SAMPLER2D(bumpMap,0);
+TORQUE_UNIFORM_SAMPLER2D(prepassTex, 1);
+TORQUE_UNIFORM_SAMPLER2D(reflectMap, 2);
+TORQUE_UNIFORM_SAMPLER2D(refractBuff, 3);
+TORQUE_UNIFORM_SAMPLERCUBE(skyMap, 4);
+TORQUE_UNIFORM_SAMPLER2D(foamMap, 5);
+TORQUE_UNIFORM_SAMPLER1D(depthGradMap, 6);
 uniform float4       specularParams;
 uniform float4       baseColor;
 uniform float4       miscParams;
@@ -138,12 +138,12 @@ uniform float        reflectivity;
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------
-float4 main( ConnectData IN ) : COLOR
+float4 main( ConnectData IN ) : TORQUE_TARGET0
 {    
    // Get the bumpNorm...
-   float3 bumpNorm = ( tex2D( bumpMap, IN.rippleTexCoord01.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.x;
-   bumpNorm       += ( tex2D( bumpMap, IN.rippleTexCoord01.zw ).rgb * 2.0 - 1.0 ) * rippleMagnitude.y;      
-   bumpNorm       += ( tex2D( bumpMap, IN.rippleTexCoord2.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.z;         
+   float3 bumpNorm = ( TORQUE_TEX2D( bumpMap, IN.rippleTexCoord01.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.x;
+   bumpNorm       += ( TORQUE_TEX2D( bumpMap, IN.rippleTexCoord01.zw ).rgb * 2.0 - 1.0 ) * rippleMagnitude.y;      
+   bumpNorm       += ( TORQUE_TEX2D( bumpMap, IN.rippleTexCoord2.xy ).rgb * 2.0 - 1.0 ) * rippleMagnitude.z;         
   
    bumpNorm = normalize( bumpNorm );
    bumpNorm = lerp( bumpNorm, float3(0,0,1), 1.0 - rippleMagnitude.w );
@@ -155,7 +155,7 @@ float4 main( ConnectData IN ) : COLOR
    
    float2 prepassCoord = viewportCoordToRenderTarget( IN.posPostWave, rtParams1 );
 
-   float startDepth = prepassUncondition( prepassTex, prepassCoord ).w;  
+   float startDepth = TORQUE_PREPASS_UNCONDITION( prepassTex, prepassCoord ).w;  
    
    // The water depth in world units of the undistorted pixel.
    float startDelta = ( startDepth - pixelDepth );
@@ -180,7 +180,7 @@ float4 main( ConnectData IN ) : COLOR
    prepassCoord = viewportCoordToRenderTarget( distortPos, rtParams1 );   
 
    // Get prepass depth at the position of this distorted pixel.
-   float prepassDepth = prepassUncondition( prepassTex, prepassCoord ).w;      
+   float prepassDepth = TORQUE_PREPASS_UNCONDITION( prepassTex, prepassCoord ).w;      
    if ( prepassDepth > 0.99 )
      prepassDepth = 5.0;
     
@@ -212,7 +212,7 @@ float4 main( ConnectData IN ) : COLOR
          prepassCoord = viewportCoordToRenderTarget( distortPos, rtParams1 );
 
          // Get prepass depth at the position of this distorted pixel.
-         prepassDepth = prepassUncondition( prepassTex, prepassCoord ).w;
+         prepassDepth = TORQUE_PREPASS_UNCONDITION( prepassTex, prepassCoord ).w;
 	 if ( prepassDepth > 0.99 )
             prepassDepth = 5.0;
          delta = ( prepassDepth - pixelDepth ) * farPlaneDist;
@@ -260,8 +260,8 @@ float4 main( ConnectData IN ) : COLOR
    IN.foamTexCoords.xy += foamRippleOffset; 
    IN.foamTexCoords.zw += foamRippleOffset;
    
-   float4 foamColor = tex2D( foamMap, IN.foamTexCoords.xy );   
-   foamColor += tex2D( foamMap, IN.foamTexCoords.zw ); 
+   float4 foamColor = TORQUE_TEX2D( foamMap, IN.foamTexCoords.xy );   
+   foamColor += TORQUE_TEX2D( foamMap, IN.foamTexCoords.zw ); 
    foamColor = saturate( foamColor );
    
    // Modulate foam color by ambient color
@@ -282,18 +282,18 @@ float4 main( ConnectData IN ) : COLOR
    foamColor.rgb *= FOAM_OPACITY * foamAmt * foamColor.a;
 
    // Get reflection map color.
-   float4 refMapColor = hdrDecode( tex2D( reflectMap, reflectCoord ) );  
+   float4 refMapColor = TORQUE_TEX2D( reflectMap, reflectCoord );  
    
    // If we do not have a reflection texture then we use the cubemap.
-   refMapColor = lerp( refMapColor, texCUBE( skyMap, reflectionVec ), NO_REFLECT );
+   refMapColor = lerp( refMapColor, TORQUE_TEXCUBE( skyMap, reflectionVec ), NO_REFLECT );
    
-   fakeColor = ( texCUBE( skyMap, reflectionVec ) );
+   fakeColor = ( TORQUE_TEXCUBE( skyMap, reflectionVec ) );
    fakeColor.a = 1;
    // Combine reflection color and fakeColor.
    float4 reflectColor = lerp( refMapColor, fakeColor, fakeColorAmt );
    
    // Get refract color
-   float4 refractColor = hdrDecode( tex2D( refractBuff, refractCoord ) );    
+   float4 refractColor = hdrDecode( TORQUE_TEX2D( refractBuff, refractCoord ) );    
    
    // We darken the refraction color a bit to make underwater 
    // elements look wet.  We fade out this darkening near the
@@ -310,7 +310,8 @@ float4 main( ConnectData IN ) : COLOR
    float fogAmt = 1.0 - saturate( exp( -FOG_DENSITY * fogDelta )  );  
    
    // Calculate the water "base" color based on depth.
-   float4 waterBaseColor = baseColor * tex1D( depthGradMap, saturate( delta / depthGradMax ) );
+   float4 waterBaseColor = baseColor * TORQUE_TEX1D( depthGradMap, saturate( delta / depthGradMax ) );
+   waterBaseColor = toLinear(waterBaseColor);
       
    // Modulate baseColor by the ambientColor.
    waterBaseColor *= float4( ambientColor.rgb, 1 );     
@@ -342,7 +343,7 @@ float4 main( ConnectData IN ) : COLOR
    // Get some specular reflection.
    float3 newbump = bumpNorm;
    newbump.xy *= 3.5;
-   newbump = normalize( bumpNorm );
+   newbump = normalize( newbump );
    float3 halfAng = normalize( eyeVec + -lightVec );
    float specular = saturate( dot( newbump, halfAng ) );
    specular = pow( specular, SPEC_POWER );   
@@ -353,7 +354,7 @@ float4 main( ConnectData IN ) : COLOR
 
 #else
 
-   float4 refractColor = hdrDecode( tex2D( refractBuff, refractCoord ) );   
+   float4 refractColor = hdrDecode( TORQUE_TEX2D( refractBuff, refractCoord ) );   
    float4 OUT = refractColor;  
    
 #endif

@@ -25,6 +25,8 @@
 #include "console/console.h"
 #include "math/mMathFn.h"
 #include "math/mRandom.h"
+#include "math/mMath.h"
+#include "math/mathUtils.h"
 
 #include "console/engineAPI.h"
 
@@ -41,8 +43,9 @@ DefineConsoleFunction( mSolveQuadratic, const char*, ( F32 a, F32 b, F32 c ),,
    F32 x[2];
    U32 sol = mSolveQuadratic( a, b, c, x );
 
-   char * retBuffer = Con::getReturnBuffer(256);
-   dSprintf(retBuffer, 256, "%d %g %g", sol, x[0], x[1]);
+   static const U32 bufSize = 256;
+   char * retBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(retBuffer, bufSize, "%d %g %g", sol, x[0], x[1]);
    return retBuffer;
 }
 
@@ -59,8 +62,9 @@ DefineConsoleFunction( mSolveCubic, const char*, ( F32 a, F32 b, F32 c, F32 d ),
    F32 x[3];
    U32 sol = mSolveCubic( a, b, c, d, x );
 
-   char * retBuffer = Con::getReturnBuffer(256);
-   dSprintf(retBuffer, 256, "%d %g %g %g", sol, x[0], x[1], x[2]);
+   static const U32 bufSize = 256;
+   char * retBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(retBuffer, bufSize, "%d %g %g %g", sol, x[0], x[1], x[2]);
    return retBuffer;
 }
 
@@ -76,9 +80,10 @@ DefineConsoleFunction( mSolveQuartic, const char*, ( F32 a, F32 b, F32 c, F32 d,
     "@ingroup Math" )
 {
    F32 x[4];
-   char * retBuffer = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char * retBuffer = Con::getReturnBuffer(bufSize);
    U32 sol = mSolveQuartic(a, b, c, d, e, x);
-   dSprintf(retBuffer, 256, "%d %g %g %g %g", sol, x[0], x[1], x[2], x[3]);
+   dSprintf(retBuffer, bufSize, "%d %g %g %g %g", sol, x[0], x[1], x[2], x[3]);
    return retBuffer;
 }
 
@@ -91,13 +96,26 @@ DefineConsoleFunction( mFloor, S32, ( F32 v ),,
    return (S32)mFloor( v );
 }
 
-DefineConsoleFunction( mRound, S32, ( F32 v ),,
-    "Round v to the nearest integer.\n"
-    "@param v Number to convert to integer."
-    "@returns Number converted to integer."
-    "@ingroup Math" )
+DefineConsoleFunction( mRound, S32, ( F32 v  ),,
+    "Round v to the nth decimal place or the nearest whole number by default."
+    "@param v Value to roundn"
+    "@return The rounded value as a S32."  
+    "@ingroup Math" )  
 {
-   return (S32)mFloor( v + 0.5f );
+   return mRound(v);
+}
+
+DefineConsoleFunction( mRoundColour, F32, ( F32 v, S32 n ), (0),
+   "Round v to the nth decimal place or the nearest whole number by default."
+   "@param v Value to roundn"
+   "@param n Number of decimal places to round to, 0 by defaultn"
+   "@return The rounded value as a S32."
+   "@ingroup Math")
+{
+   if (n <= 0)
+      return mRound(v);
+   else
+      return mRound(v, n);
 }
 
 DefineConsoleFunction( mCeil, S32, ( F32 v ),,
@@ -116,13 +134,15 @@ DefineConsoleFunction( mFloatLength, const char*, ( F32 v, U32 precision ),,
     "@returns Number formatted to the specified number of decimal places."
     "@ingroup Math" )
 {
-   char fmtString[8] = "%.0f";
-   if (precision > 9)
+   char fmtString[8] = "%.9f";
+
+   if (precision >= 9)
       precision = 9;
    fmtString[2] = '0' + precision;
 
-   char * outBuffer = Con::getReturnBuffer(256);
-   dSprintf(outBuffer, 255, fmtString, v);
+   static const U32 bufSize = 256;
+   char * outBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(outBuffer, bufSize, fmtString, v);
    return outBuffer;
 }
 
@@ -322,4 +342,34 @@ DefineConsoleFunction( mIsPow2, bool, ( S32 v ),,
     "@ingroup Math" )
 {
    return isPow2( v );
+}
+
+DefineConsoleFunction( mRandomDir, Point3F, (Point3F axis, F32 angleMin, F32 angleMax),,
+   "Returns a randomized direction based on a starting axis and the min/max angles.\n"
+   "@param axis Main axis to deviate the direction from."
+   "@param angleMin minimum amount of deviation from the axis."
+   "@param angleMax maximum amount of deviation from the axis."
+   "@returns Randomized direction vector."
+   "@ingroup Math")
+{
+   return MathUtils::randomDir(axis, angleMin, angleMax);
+}
+
+DefineConsoleFunction( mRandomPointInSphere, Point3F, (F32 radius), ,
+   "Returns a randomized point inside a sphere of a given radius.\n"
+   "@param radius The radius of the sphere to find a point in."
+   "@returns Randomized point inside a sphere."
+   "@ingroup Math")
+{
+   return MathUtils::randomPointInSphere(radius);
+}
+
+DefineConsoleFunction( mGetAngleBetweenVectors, F32, (VectorF vecA, VectorF vecB), ,
+   "Returns angle between two vectors.\n"
+   "@param vecA First input vector."
+   "@param vecB Second input vector."
+   "@returns Angle between both vectors in radians."
+   "@ingroup Math")
+{
+   return MathUtils::getAngleBetweenVectors(vecA, vecB);
 }

@@ -364,7 +364,7 @@ public:
 /// datablock. It is used to control information that does not change
 /// or is unlikely to change during execution of a program. It is also
 /// a level of abstraction between script and GUI control so that you can
-/// use the same control, say a button, and have it look completly different
+/// use the same control, say a button, and have it look completely different
 /// just with a different profile.
 class GuiControlProfile : public SimObject
 {
@@ -376,7 +376,7 @@ public:
 
    U32  mUseCount;                                 ///< Total number of controls currently referencing this profile.
    U32  mLoadCount;                                ///< Number of controls in woken state using this profile; resources for the profile are loaded when this is >0.
-   bool mTabable;                                  ///< True if this object is accessable from using the tab key
+   bool mTabable;                                  ///< True if this object is accessible from using the tab key
 
    bool mCanKeyFocus;                              ///< True if the object can be given keyboard focus (in other words, made a first responder @see GuiControl)
    bool mModal;                                    ///< True if this is a Modeless dialog meaning it will pass input through instead of taking it all
@@ -385,6 +385,7 @@ public:
    ColorI mFillColor;                              ///< Fill color, this is used to fill the bounds of the control if it is opaque
    ColorI mFillColorHL;                            ///< This is used instead of mFillColor if the object is highlighted
    ColorI mFillColorNA;                            ///< This is used instead of mFillColor if the object is not active or disabled
+   ColorI mFillColorERR;                           ///< This is used instead of mFillColor if the object has an error or is invalid
    ColorI mFillColorSEL;                           ///< This is used instead of mFillColor if the object is selected
 
    S32 mBorder;                                    ///< For most controls, if mBorder is > 0 a border will be drawn, some controls use this to draw different types of borders however @see guiDefaultControlRender.cc

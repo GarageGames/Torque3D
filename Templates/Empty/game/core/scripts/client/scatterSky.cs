@@ -22,13 +22,13 @@
 
 new GFXStateBlockData( ScatterSkySBData )
 {
-   cullDefined = true;
+   //cullDefined = true;
    cullMode = "GFXCullNone";
    
    zDefined = true;
    zEnable = true;
    zWriteEnable = false;
-   zFunc = "GFXCmpLessEqual";
+   //zFunc = "GFXCmpLessEqual";
    
    samplersDefined = true;
    samplerStates[0] = SamplerClampLinear;   
@@ -43,6 +43,8 @@ singleton ShaderData( ScatterSkyShaderData )
    
    OGLVertexShaderFile     = "shaders/common/gl/scatterSkyV.glsl";
    OGLPixelShaderFile      = "shaders/common/gl/scatterSkyP.glsl";   
+   
+   samplerNames[0] = "$nightSky";
    
    pixVersion = 2.0;
 };

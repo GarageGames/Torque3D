@@ -42,6 +42,8 @@
 #include "math/mathIO.h"
 #include "math/mTransform.h"
 #include "T3D/gameBase/gameProcess.h"
+#include "T3D/gameBase/gameConnection.h"
+#include "T3D/accumulationVolume.h"
 
 IMPLEMENT_CONOBJECT(SceneObject);
 
@@ -140,6 +142,9 @@ SceneObject::SceneObject()
 
    mObjectFlags.set( RenderEnabledFlag | SelectionEnabledFlag );
    mIsScopeAlways = false;
+
+   mAccuTex = NULL;
+   mPathfindingIgnore = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -151,6 +156,7 @@ SceneObject::~SceneObject()
    AssertFatal( !mSceneObjectLinks,
       "SceneObject::~SceneObject() - object is still linked to SceneTrackers" );
 
+   mAccuTex = NULL;
    unlink();
 }
 
@@ -664,6 +670,12 @@ static void scopeCallback( SceneObject* obj, void* conPtr )
 
 void SceneObject::onCameraScopeQuery( NetConnection* connection, CameraScopeQuery* query )
 {
+   SceneManager* sceneManager = getSceneManager();
+   GameConnection* conn  = dynamic_cast<GameConnection*> (connection);
+   if (conn && (query->visibleDistance = conn->getVisibleGhostDistance()) == 0.0f)
+      if ((query->visibleDistance = sceneManager->getVisibleGhostDistance()) == 0.0f)
+         query->visibleDistance = sceneManager->getVisibleDistance();
+
    // Object itself is in scope.
 
    if( this->isScopeable() )
@@ -709,9 +721,9 @@ const char* SceneObject::_getRenderEnabled( void* object, const char* data )
 {
    SceneObject* obj = reinterpret_cast< SceneObject* >( object );
    if( obj->mObjectFlags.test( RenderEnabledFlag ) )
-      return "true";
+      return "1";
    else
-      return "false";
+      return "0";
 }
 
 //-----------------------------------------------------------------------------
@@ -933,7 +945,8 @@ void SceneObject::setProcessTick( bool t )
 
    if ( mProcessTick )
    {
-      plUnlink();
+      if ( !getMountedObjectCount() )
+         plUnlink(); // Only unlink if there is nothing mounted to us
       mProcessTick = false;
    }
    else
@@ -1312,6 +1325,13 @@ DefineEngineMethod( SceneObject, getPosition, Point3F, (),,
    "@return the current world position of the object\n" )
 {
    return object->getTransform().getPosition();
+}
+
+DefineEngineMethod( SceneObject, setPosition, void, (Point3F pos),,
+   "Set the object's world position.\n"
+   "@param pos the new world position of the object\n" )
+{
+   return object->setPosition(pos);
 }
 
 //-----------------------------------------------------------------------------

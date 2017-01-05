@@ -72,9 +72,8 @@ function initClient()
    configureCanvas();
 
    // Load up the Game GUIs
-   exec("art/gui/defaultGameProfiles.cs");
-   exec("art/gui/PlayGui.gui");
-   exec("art/gui/ChatHud.gui");
+   exec("art/gui/playGui.gui");
+   exec("art/gui/chatHud.gui");
    exec("art/gui/playerList.gui");
    exec("art/gui/hudlessGui.gui");
 
@@ -124,7 +123,7 @@ function initClient()
    setDefaultFov( $pref::Player::defaultFov );
    setZoomSpeed( $pref::Player::zoomSpeed );
 
-   if( isFile( "./audioData.cs" ) )
+   if( isScriptFile( expandFilename("./audioData.cs") ) )
       exec( "./audioData.cs" );
 
    // Start up the main menu... this is separated out into a

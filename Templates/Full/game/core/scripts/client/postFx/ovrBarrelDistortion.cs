@@ -32,6 +32,11 @@ singleton ShaderData( OVRMonoToStereoShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/oculusvr/monoToStereoP.hlsl";
+   
+   //OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.hlsl";
+   //OGLPixelShaderFile   = "shaders/common/postFx/oculusvr/gl/monoToStereoP.glsl";
+   
+   samplerNames[0] = "$backBuffer";
 
    pixVersion = 2.0;   
 };
@@ -40,6 +45,19 @@ singleton ShaderData( OVRBarrelDistortionShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/oculusvr/barrelDistortionP.hlsl";
+   
+   //OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   //OGLPixelShaderFile   = "shaders/common/postFx/oculusvr/gl/barrelDistortionP.glsl";
+   
+   samplerNames[0] = "$backBuffer";
+
+   pixVersion = 2.0;   
+};
+
+singleton ShaderData( OVRBarrelDistortionChromaShader )
+{
+   DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
+   DXPixelShaderFile 	= "shaders/common/postFx/oculusvr/barrelDistortionChromaP.hlsl";
 
    pixVersion = 2.0;   
 };
@@ -71,6 +89,32 @@ singleton BarrelDistortionPostEffect( OVRBarrelDistortionPostFX )
 
    // The barrel distortion   
    shader = OVRBarrelDistortionShader;
+   stateBlock = OVRBarrelDistortionStateBlock;
+   
+   texture[0] = "$backBuffer";
+   
+   scaleOutput = 1.25;
+};
+
+//-----------------------------------------------------------------------------
+// Barrel Distortion with Chromatic Aberration Correction PostFx
+//
+// To be used with the Oculus Rift.
+// Expects a stereo pair to exist on the back buffer and then applies the
+// appropriate barrel distortion.
+// This version applies a chromatic aberration correction during the
+// barrel distortion.
+//-----------------------------------------------------------------------------
+singleton BarrelDistortionPostEffect( OVRBarrelDistortionChromaPostFX )
+{
+   isEnabled = false;
+   allowReflectPass = false;
+   
+   renderTime = "PFXAfterDiffuse";
+   renderPriority = 100;
+
+   // The barrel distortion   
+   shader = OVRBarrelDistortionChromaShader;
    stateBlock = OVRBarrelDistortionStateBlock;
    
    texture[0] = "$backBuffer";

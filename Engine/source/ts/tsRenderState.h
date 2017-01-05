@@ -27,13 +27,15 @@
 #include "math/mMatrix.h"
 #endif
 
-
+#ifndef _GFXDEVICE_H_
+#include "gfx/gfxDevice.h"
+#endif
 
 class SceneRenderState;
 class GFXCubemap;
 class Frustum;
 class LightQuery;
-
+class TSShape;
 
 /// A simple class for passing render state through the pre-render pipeline.
 ///
@@ -103,7 +105,19 @@ protected:
    /// are forward lit and need lights.
    LightQuery *mLightQuery;
 
+   // The accumulation texture provided by an accumulation
+   // volume. This is passed down per-object.
+   GFXTextureObject* mAccuTex;
+
+   /// List of matrices to use for hardware skinning
+   MatrixF *mNodeTransforms;
+
+   /// Count of matrices in the mNodeTransforms list
+   U32 mNodeTransformCount;
+
 public:
+
+   
 
    TSRenderState();
    TSRenderState( const TSRenderState &state );
@@ -146,6 +160,14 @@ public:
    ///@see mLightQuery
    void setLightQuery( LightQuery *query ) { mLightQuery = query; }
    LightQuery* getLightQuery() const { return mLightQuery; }
+
+   ///@see mAccuTex
+   void setAccuTex( GFXTextureObject* query ) { mAccuTex = query; }
+   GFXTextureObject* getAccuTex() const { return mAccuTex; }
+
+   ///@ see mNodeTransforms, mNodeTransformCount
+   void setNodeTransforms(MatrixF *list, U32 count) { mNodeTransforms = list; mNodeTransformCount = count; }
+   void getNodeTransforms(MatrixF **list, U32 *count) const { *list = mNodeTransforms; *count = mNodeTransformCount; }
 
    /// @}
 };

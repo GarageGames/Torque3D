@@ -23,7 +23,7 @@
 #include "platform/platform.h"
 #include "forest/editor/forestBrushElement.h"
 
-#include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "forest/forestItem.h"
 
 
@@ -49,8 +49,8 @@ ForestBrushElement::ForestBrushElement()
   mSinkMin( 0.0f ),
   mSinkMax( 0.0f ),
   mSinkRadius( 1 ),
-  mSlopeMax( 90.0f ),
   mSlopeMin( 0.0f ),
+  mSlopeMax( 90.0f ),
   mElevationMin( -10000.0f ),
   mElevationMax( 10000.0f ) 
 {
@@ -187,10 +187,10 @@ bool ForestBrush::containsItemData( const ForestItemData *inData )
    return false;
 }
 
-ConsoleMethod( ForestBrush, containsItemData, bool, 3, 3, "( ForestItemData obj )" )
+DefineConsoleMethod( ForestBrush, containsItemData, bool, ( const char * obj ), , "( ForestItemData obj )" )
 {
    ForestItemData *data = NULL;
-   if ( !Sim::findObject( argv[2], data ) )
+   if ( !Sim::findObject( obj, data ) )
    {
       Con::warnf( "ForestBrush::containsItemData - invalid object passed" );
       return false;

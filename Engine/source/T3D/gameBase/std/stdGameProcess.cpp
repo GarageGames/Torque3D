@@ -37,6 +37,11 @@
 #include "T3D/gameBase/std/stdMoveList.h"
 #include "T3D/fx/cameraFXMgr.h"
 
+#ifdef TORQUE_EXPERIMENTAL_EC
+#include "T3D/components/coreInterfaces.h"
+#include "T3D/components/component.h"
+#endif
+
 MODULE_BEGIN( ProcessList )
 
    MODULE_INIT
@@ -132,6 +137,18 @@ bool StdClientProcessList::advanceTime( SimTime timeDelta )
       obj = obj->mProcessLink.next;
    }
 
+#ifdef TORQUE_EXPERIMENTAL_EC
+   for (U32 i = 0; i < UpdateInterface::all.size(); i++)
+   {
+      Component *comp = dynamic_cast<Component*>(UpdateInterface::all[i]);
+
+      if (!comp->isClientObject() || !comp->isActive())
+            continue;
+
+      UpdateInterface::all[i]->interpolateTick(mLastDelta);
+   }
+#endif
+
    // Inform objects of total elapsed delta so they can advance
    // client side animations.
    F32 dt = F32(timeDelta) / 1000;
@@ -146,6 +163,21 @@ bool StdClientProcessList::advanceTime( SimTime timeDelta )
       obj = obj->mProcessLink.next;
    }
    
+#ifdef TORQUE_EXPERIMENTAL_EC
+   for (U32 i = 0; i < UpdateInterface::all.size(); i++)
+   {
+      Component *comp = dynamic_cast<Component*>(UpdateInterface::all[i]);
+
+      if (comp)
+      {
+         if (!comp->isClientObject() || !comp->isActive())
+            continue;
+      }
+
+      UpdateInterface::all[i]->advanceTime(dt);
+   }
+#endif
+
    return ret;
 }
 

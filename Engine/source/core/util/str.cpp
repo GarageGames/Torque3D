@@ -42,6 +42,7 @@ namespace KeyCmp
 #include "core/util/tVector.h"
 #include "core/dataChunker.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 
 #include "math/mMathFn.h"
 
@@ -345,7 +346,7 @@ class String::StringData : protected StringDataImpl
          {
             // Do this atomically to protect interned strings.
             
-            UTF16* utf16 = convertUTF8toUTF16( mData );
+            UTF16* utf16 = createUTF16string( mData );
             if( !dCompareAndSwap( mUTF16,( UTF16* ) NULL, utf16 ) )
                delete [] utf16;
          }
@@ -476,22 +477,25 @@ static U32 sgStringMemBytes;
 /// Tracks the number of Strings which are currently instantiated.
 static U32 sgStringInstances;
 
-ConsoleFunction( dumpStringMemStats, void, 1, 1, "()"
+
+
+#endif
+DefineConsoleFunction( dumpStringMemStats, void, (), , "()"
 				"@brief Dumps information about String memory usage\n\n"
 				"@ingroup Debugging\n"
 				"@ingroup Strings\n")
 {
+#ifdef TORQUE_DEBUG
    Con::printf( "String Data: %i instances, %i bytes", sgStringInstances, sgStringMemBytes );
-}
-
 #endif
+}
 
 //-----------------------------------------------------------------------------
 
 void* String::StringData::operator new( size_t size, U32 len )
 {
    AssertFatal( len != 0, "String::StringData::operator new() - string must not be empty" );
-   StringData *str = reinterpret_cast<StringData*>( dMalloc( size + len * sizeof(StringChar) ) );
+   StringData *str = static_cast<StringData*>( dMalloc( size + len * sizeof(StringChar) ) );
 
    str->mLength      = len;
 
@@ -519,7 +523,7 @@ void String::StringData::operator delete(void *ptr)
 void* String::StringData::operator new( size_t size, U32 len, DataChunker& chunker )
 {
    AssertFatal( len != 0, "String::StringData::operator new() - string must not be empty" );
-   StringData *str = reinterpret_cast<StringData*>( chunker.alloc( size + len * sizeof(StringChar) ) );
+   StringData *str = static_cast<StringData*>( chunker.alloc( size + len * sizeof(StringChar) ) );
 
    str->mLength      = len;
 
@@ -563,7 +567,6 @@ String::String(const StringChar *str, SizeType len)
    PROFILE_SCOPE(String_char_len_constructor);
    if (str && *str && len!=0)
    {
-      AssertFatal(len<=dStrlen(str), "String::String: string too short");
       _string = new ( len ) StringData( str );
    }
    else
@@ -576,7 +579,7 @@ String::String(const UTF16 *str)
 
    if( str && str[ 0 ] )
    {
-      UTF8* utf8 = convertUTF16toUTF8( str );
+      UTF8* utf8 = createUTF8string( str );
       U32 len = dStrlen( utf8 );
       _string = new ( len ) StringData( utf8 );
       delete [] utf8;
@@ -651,6 +654,11 @@ String::SizeType String::numChars() const
 bool String::isEmpty() const
 {
    return ( _string == StringData::Empty() );
+}
+
+bool String::isEmpty(const char* str)
+{
+	return str == 0 || str[0] == '\0';
 }
 
 bool String::isShared() const
@@ -760,7 +768,7 @@ String& String::operator=(const String &src)
 
 String& String::operator+=(const StringChar *src)
 {
-   if( src == NULL && !*src )
+   if( src == NULL || !*src )
       return *this;
 
    // Append the given string into a new string
@@ -1419,7 +1427,7 @@ void String::copy(StringChar* dst, const StringChar *src, U32 len)
 
 //-----------------------------------------------------------------------------
 
-#if defined(TORQUE_OS_WIN32) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
 // This standard function is not defined when compiling with VC7...
 #define vsnprintf	_vsnprintf
 #endif
@@ -1430,19 +1438,19 @@ String::StrFormat::~StrFormat()
       dFree( _dynamicBuffer );
 }
 
-S32 String::StrFormat::format( const char *format, void *args )
+S32 String::StrFormat::format( const char *format, va_list args )
 {
    _len=0;
    return formatAppend(format,args);
 }
 
-S32 String::StrFormat::formatAppend( const char *format, void *args )
+S32 String::StrFormat::formatAppend( const char *format, va_list args )
 {
    // Format into the fixed buffer first.
    S32 startLen = _len;
    if (_dynamicBuffer == NULL)
    {
-      _len += vsnprintf(_fixedBuffer + _len, sizeof(_fixedBuffer) - _len, format, *(va_list*)args);
+      _len += vsnprintf(_fixedBuffer + _len, sizeof(_fixedBuffer) - _len, format, args);
       if (_len >= 0 && _len < sizeof(_fixedBuffer))
          return _len;
 
@@ -1531,9 +1539,9 @@ String String::ToString(const char *str, ...)
    return ret;
 }
 
-String String::VToString(const char* str, void* args)
+String String::VToString(const char* str, va_list args)
 {
-   StrFormat format(str,&args);
+   StrFormat format(str,args);
 
    // Copy it into a string
    U32         len = format.length();
@@ -1619,4 +1627,104 @@ String String::GetTrailingNumber(const char* str, S32& number)
       p--;
 
    return base.substr(0, p - base.c_str());
+}
+
+String String::GetFirstNumber(const char* str, U32& startPos, U32& endPos)
+{
+   // Check for trivial strings
+   if (!str || !str[0])
+      return String::EmptyString;
+
+   // Find the number at the end of the string
+   String base(str);
+   const char* p = base.c_str();
+   const char* end = base.c_str() + base.length() - 1;
+   bool dec = false;
+   startPos = 0;
+
+   //Check if we are just a digit
+   if(p == end && isdigit(*p))
+      return base;
+
+   //Look for the first digit
+   while ((p != end) && (dIsspace(*p) || !isdigit(*p)))
+   {
+      p++;
+      startPos++;
+   }
+
+   //Handle if we are at the end and found nothing
+   if(p == end && !isdigit(*p))
+      return "";
+
+   //update our end position at least to the start of our number
+   endPos = startPos;
+
+   //Backup our ptr
+   const char* backup = p;
+
+   //Check for any negative or decimal values
+   if(startPos > 0)
+   {
+      p--;
+      startPos--;
+      if(*p == '.')
+      {
+         dec = true;
+
+         //ignore any duplicate periods
+         while ((p != base.c_str()) && (*p == '.'))
+         {
+            p--;
+            startPos--;
+         }
+
+         //Found a decimal lets still check for negative sign
+         if(startPos > 0)
+         {
+            p--;
+            startPos--;
+            if((*p != '-') && (*p != '_'))
+            {
+               startPos++;
+               p++;
+            }
+         }
+      }
+      else if((*p != '-') && (*p != '_'))
+      {
+         //go back to where we where cause no decimal or negative sign found
+         startPos++;
+         p++;
+      }
+   }
+
+   //Restore where we were
+   p = backup;
+
+   //look for the end of the digits
+   bool justFoundDec = false;
+   while (p != end)
+   {
+      if(*p == '.')
+      {
+         if(dec && !justFoundDec)
+            break;
+         else
+         {
+            dec = true;
+            justFoundDec = true;
+         }
+      }
+      else if(!isdigit(*p))
+         break;
+      else if(justFoundDec)
+         justFoundDec = false;
+
+      p++;
+      endPos++;
+   }
+
+   U32 len = (!isdigit(*p)) ? endPos - startPos : (endPos + 1) - startPos;
+   return base.substr(startPos, len);
 }

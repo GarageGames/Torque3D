@@ -19,10 +19,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#include "../../shaderModel.hlsl"
 
 struct FarFrustumQuadConnectV
 {
-   float4 hpos : POSITION;
+	float4 hpos : TORQUE_POSITION;
    float2 uv0 : TEXCOORD0;
    float3 wsEyeRay : TEXCOORD1;
    float3 vsEyeRay : TEXCOORD2;
@@ -30,6 +31,7 @@ struct FarFrustumQuadConnectV
 
 struct FarFrustumQuadConnectP
 {
+	float4 hpos  : TORQUE_POSITION;
    float2 uv0 : TEXCOORD0;
    float3 wsEyeRay : TEXCOORD1;
    float3 vsEyeRay : TEXCOORD2;

@@ -448,9 +448,8 @@ void PxWorld::releaseActor( NxActor &actor )
    // Clear the userdata.
    actor.userData = NULL;   
 
-   // If the scene is not simulating then we have the
-   // write lock and can safely delete it now.
-   if ( !mIsSimulating )
+   // actors are one of the few objects that are stable removing this way in physx 2.8
+   if (mScene->isWritable() )
    {
       mScene->releaseActor( actor );
    }

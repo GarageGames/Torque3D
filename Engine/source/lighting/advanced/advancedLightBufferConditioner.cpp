@@ -51,7 +51,7 @@ Var *AdvancedLightBufferConditioner::_conditionOutput( Var *unconditionedOutput,
       if(getBufferFormat() == GFXFormatR16G16B16A16)
          meta->addStatement( new GenOp( "   @ = max(4.0, (float4(lightColor, specular) * NL_att + float4(bufferSample.rgb, 0.0)) / 4.0);\r\n", outputDecl ) );
       else
-         meta->addStatement( new GenOp( "   @ = float4(lightColor, specular) * NL_att + float4(bufferSample.rgb, 0.0);\r\n", outputDecl ) );
+         meta->addStatement( new GenOp( "   @ = float4(lightColor, 0) * NL_att + float4(bufferSample.rgb, specular);\r\n", outputDecl ) );
    }
    else
    {
@@ -80,7 +80,7 @@ Var *AdvancedLightBufferConditioner::_unconditionInput( Var *conditionedInput, M
       meta->addStatement( new GenOp( "   NL_att = @.b;\r\n", conditionedInput ) );
       meta->addStatement( new GenOp( "   lightColor = DecodeLuv(float3(saturate(NL_att), @.rg * 0.62));\r\n", conditionedInput ) );
    }
-   meta->addStatement( new GenOp( "   specular = max(@.a / NL_att, 0.00001f);\r\n", conditionedInput ) );
+   meta->addStatement( new GenOp( "   specular = @.a;\r\n", conditionedInput ) );
 
    return NULL;
 }
@@ -142,7 +142,7 @@ Var *AdvancedLightBufferConditioner::printMethodHeader( MethodType methodType, c
          meta->addStatement( new GenOp( "      -1.0217f,   1.9777f,    0.0439f,\r\n" ) );
          meta->addStatement( new GenOp( "      0.0753f,    -0.2543f,   1.1892f\r\n" ) );
          meta->addStatement( new GenOp( "   };\r\n" ) );
-         meta->addStatement( new GenOp( "   return mul(XYZ2RGB, XYZ);\r\n" ) );
+         meta->addStatement( new GenOp( "   return tMul(XYZ2RGB, XYZ);\r\n" ) );
          meta->addStatement( new GenOp( "}\r\n\r\n" ) );
       }
       else

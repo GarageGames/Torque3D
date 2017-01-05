@@ -53,6 +53,7 @@ struct ReflectParams
    Point2I viewportExtent;
    Frustum culler;
    U32 startOfUpdateMs;
+   S8 eyeId;
 };
 
 
@@ -191,7 +192,7 @@ public:
    {
       refplane.set( Point3F(0,0,0), Point3F(0,0,1) );
       objectSpace = false;
-      mLastTexSize = 0;
+      mLastTexSize = Point2I(0,0);
    }
 
    virtual ~PlaneReflector() {}
@@ -202,15 +203,18 @@ public:
    virtual F32 calcScore( const ReflectParams &params );
    virtual void updateReflection( const ReflectParams &params ); 
 
+   /// Set up the GFX matrices
+   void setGFXMatrices( const MatrixF &camTrans );
+
    /// Set up camera matrix for a reflection on the plane
-   MatrixF getCameraReflection( MatrixF &camTrans );
+   MatrixF getCameraReflection( const MatrixF &camTrans );
 
    /// Oblique frustum clipping - use near plane of zbuffer as a clip plane
    MatrixF getFrustumClipProj( MatrixF &modelview );
 
 protected:
 
-   U32 mLastTexSize;
+   Point2I mLastTexSize;
 
    // The camera position at the last update.
    Point3F mLastPos;
@@ -221,7 +225,10 @@ protected:
 public:
 
    GFXTextureTargetRef reflectTarget;
-   GFXTexHandle reflectTex;   
+
+   GFXTexHandle innerReflectTex[2]; /// < Textures we actually render to
+   GFXTexHandle reflectTex; ///< Last texture we rendered to
+   GFXTexHandle depthBuff;
    PlaneF refplane;
    bool objectSpace;
 };

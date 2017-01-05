@@ -92,7 +92,7 @@ ConsoleDocClass( RigidShapeData,
    "@see RigidShape\n"
    "@see ShapeBase\n\n"
 
-   "@ingroup Platform\n"
+   "@ingroup Physics\n"
 );
 
 
@@ -149,11 +149,11 @@ ConsoleDocClass( RigidShape,
    "@see RigidShapeData\n"
    "@see ShapeBase\n\n"
    
-   "@ingroup Platform\n"
+   "@ingroup Physics\n"
 );
 
 
-IMPLEMENT_CALLBACK( RigidShape, onEnterLiquid, void, ( const char* objId, const char* waterCoverage, const char* liquidType ),
+IMPLEMENT_CALLBACK( RigidShape, onEnterLiquid, void, ( const char* objId, F32 waterCoverage, const char* liquidType ),
 													 ( objId, waterCoverage, liquidType ),
    "@brief Called whenever this RigidShape object enters liquid.\n\n"
    "@param objId The ID of the rigidShape object.\n"
@@ -187,8 +187,6 @@ IMPLEMENT_CALLBACK( RigidShape, onLeaveLiquid, void, ( const char* objId, const 
 
 namespace {
 
-   const U32 sMoveRetryCount = 3;
-
    // Client prediction
    const S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
    const S32 sMaxPredictionTicks = 30;    // Number of ticks to predict
@@ -196,7 +194,7 @@ namespace {
 
    // Physics and collision constants
    static F32 sRestTol = 0.5;             // % of gravity energy to be at rest
-   static int sRestCount = 10;            // Consecutive ticks before comming to rest
+   static S32 sRestCount = 10;            // Consecutive ticks before comming to rest
 
    const U32 sCollisionMoveMask = ( TerrainObjectType     | PlayerObjectType  | 
                                     StaticShapeObjectType | VehicleObjectType |
@@ -302,6 +300,7 @@ bool RigidShapeData::preload(bool server, String &errorStr)
    if (!collisionDetails.size() || collisionDetails[0] == -1)
    {
       Con::errorf("RigidShapeData::preload failed: Rigid shapes must define a collision-1 detail");
+      errorStr = String::ToString("RigidShapeData: Couldn't load shape \"%s\"",shapeName);
       return false;
    }
 
@@ -731,6 +730,8 @@ void RigidShape::onRemove()
 void RigidShape::processTick(const Move* move)
 {     
    Parent::processTick(move);
+   if ( isMounted() )
+      return;
 
    // Warp to catch up to server
    if (mDelta.warpCount < mDelta.warpTicks) 
@@ -774,7 +775,8 @@ void RigidShape::processTick(const Move* move)
 
       // Update the physics based on the integration rate
       S32 count = mDataBlock->integration;
-      updateWorkingCollisionSet(getCollisionMask());
+      if (!mDisableMove)
+         updateWorkingCollisionSet(getCollisionMask());
       for (U32 i = 0; i < count; i++)
          updatePos(TickSec / count);
 
@@ -793,6 +795,8 @@ void RigidShape::processTick(const Move* move)
 void RigidShape::interpolateTick(F32 dt)
 {     
    Parent::interpolateTick(dt);
+   if ( isMounted() )
+      return;
 
    if(dt == 0.0f)
       setRenderPosition(mDelta.pos, mDelta.rot[1]);
@@ -811,6 +815,9 @@ void RigidShape::advanceTime(F32 dt)
    Parent::advanceTime(dt);
 
    updateFroth(dt);
+
+   if ( isMounted() )
+      return;
 
    // Update 3rd person camera offset.  Camera update is done
    // here as it's a client side only animation.
@@ -1086,7 +1093,7 @@ void RigidShape::updatePos(F32 dt)
       // Water script callbacks      
       if (!inLiquid && mWaterCoverage != 0.0f) 
       {
-         onEnterLiquid_callback(getIdString(), Con::getFloatArg(mWaterCoverage), mLiquidType.c_str() );
+         onEnterLiquid_callback(getIdString(), mWaterCoverage, mLiquidType.c_str() );
          inLiquid = true;
       }
       else if (inLiquid && mWaterCoverage == 0.0f) 
@@ -1139,11 +1146,11 @@ void RigidShape::updatePos(F32 dt)
 
 void RigidShape::updateForces(F32 /*dt*/)
 {
+   if (mDisableMove) return;
    Point3F gravForce(0, 0, sRigidShapeGravity * mRigid.mass * mGravityMod);
 
    MatrixF currTransform;
    mRigid.getTransform(&currTransform);
-   mRigid.atRest = false;
 
    Point3F torque(0, 0, 0);
    Point3F force(0, 0, 0);
@@ -1651,7 +1658,7 @@ void RigidShape::_renderMassAndContacts( ObjectRenderInst *ri, SceneRenderState 
    GFX->getDrawUtil()->drawCube( desc, Point3F(0.1f,0.1f,0.1f), mDataBlock->massCenter, ColorI(255, 255, 255), &mRenderObjToWorld );
 
    // Collision points...
-   for (int i = 0; i < mCollisionList.getCount(); i++)
+   for (S32 i = 0; i < mCollisionList.getCount(); i++)
    {
       const Collision& collision = mCollisionList[i];
       GFX->getDrawUtil()->drawCube( desc, Point3F(0.05f,0.05f,0.05f), collision.point, ColorI(0, 0, 255) );
@@ -1659,7 +1666,7 @@ void RigidShape::_renderMassAndContacts( ObjectRenderInst *ri, SceneRenderState 
 
    // Render the normals as one big batch... 
    PrimBuild::begin(GFXLineList, mCollisionList.getCount() * 2);
-   for (int i = 0; i < mCollisionList.getCount(); i++)
+   for (S32 i = 0; i < mCollisionList.getCount(); i++)
    {
 
       const Collision& collision = mCollisionList[i];

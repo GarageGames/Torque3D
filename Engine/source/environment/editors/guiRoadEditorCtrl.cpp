@@ -24,6 +24,7 @@
 #include "environment/editors/guiRoadEditorCtrl.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "scene/sceneManager.h"
 #include "collision/collision.h"
 #include "math/util/frustum.h"
@@ -978,7 +979,7 @@ F32 GuiRoadEditorCtrl::getNodeWidth()
    return 0.0f;   
 }
 
-void GuiRoadEditorCtrl::setNodePosition( Point3F pos )
+void GuiRoadEditorCtrl::setNodePosition(const Point3F& pos)
 {
    if ( mSelRoad && mSelNode != -1 )
    {
@@ -1036,85 +1037,71 @@ void GuiRoadEditorCtrl::submitUndo( const UTF8 *name )
    undoMan->addAction( action );
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, deleteNode, void, 2, 2, "deleteNode()" )
+DefineConsoleMethod( GuiRoadEditorCtrl, deleteNode, void, (), , "deleteNode()" )
 {
    object->deleteSelectedNode();
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, getMode, const char*, 2, 2, "" )
+DefineConsoleMethod( GuiRoadEditorCtrl, getMode, const char*, (), , "" )
 {
    return object->getMode();
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, setMode, void, 3, 3, "setMode( String mode )" )
+DefineConsoleMethod( GuiRoadEditorCtrl, setMode, void, ( const char * mode ), , "setMode( String mode )" )
 {
-	String newMode = ( argv[2] );
+   String newMode = ( mode );
    object->setMode( newMode );
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, getNodeWidth, F32, 2, 2, "" )
+DefineConsoleMethod( GuiRoadEditorCtrl, getNodeWidth, F32, (), , "" )
 {
    return object->getNodeWidth();
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, setNodeWidth, void, 3, 3, "" )
+DefineConsoleMethod( GuiRoadEditorCtrl, setNodeWidth, void, ( F32 width ), , "" )
 {
-   object->setNodeWidth( dAtof(argv[2]) );
+   object->setNodeWidth( width );
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, getNodePosition, const char*, 2, 2, "" )
+DefineConsoleMethod( GuiRoadEditorCtrl, getNodePosition, Point3F, (), , "" )
 {
-	char* returnBuffer = Con::getReturnBuffer(256);
 
-	dSprintf(returnBuffer, 256, "%f %f %f",
-      object->getNodePosition().x, object->getNodePosition().y, object->getNodePosition().z);
-
-	return returnBuffer;
+	return object->getNodePosition();
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, setNodePosition, void, 3, 3, "" )
+DefineConsoleMethod( GuiRoadEditorCtrl, setNodePosition, void, ( Point3F pos ), , "" )
 {
-	Point3F pos;
-
-	S32 count = dSscanf( argv[2], "%f %f %f", 
-		&pos.x, &pos.y, &pos.z);
-	
-	if ( (count != 3) )
-   {
-		Con::printf("Failed to parse node information \"px py pz\" from '%s'", argv[3]);
-      return;
-   }
 
    object->setNodePosition( pos );
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, setSelectedRoad, void, 2, 3, "" )
+DefineConsoleMethod( GuiRoadEditorCtrl, setSelectedRoad, void, ( const char * pathRoad ), (""), "" )
 {
-   if ( argc == 2 )
+   if (dStrcmp( pathRoad,"")==0 )
       object->setSelectedRoad(NULL);
    else
    {
       DecalRoad *road = NULL;
-      if ( Sim::findObject( argv[2], road ) )
+      if ( Sim::findObject( pathRoad, road ) )
          object->setSelectedRoad(road);
    }
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, getSelectedRoad, const char*, 2, 2, "" )
+DefineConsoleMethod( GuiRoadEditorCtrl, getSelectedRoad, S32, (), , "" )
 {
    DecalRoad *road = object->getSelectedRoad();
    if ( road )
-      return road->getIdString();
+      return road->getId();
    
    return NULL;
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, getSelectedNode, S32, 2, 2, "" )
+DefineConsoleMethod( GuiRoadEditorCtrl, getSelectedNode, S32, (), , "" )
 {
    return object->getSelectedNode();
 }
 
-ConsoleMethod( GuiRoadEditorCtrl, deleteRoad, void, 2, 2, "" )
+DefineConsoleMethod( GuiRoadEditorCtrl, deleteRoad, void, (), , "" )
 {
    object->deleteSelectedRoad();
 }

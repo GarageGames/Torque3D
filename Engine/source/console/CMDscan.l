@@ -105,7 +105,7 @@ HEXDIGIT [a-fA-F0-9]
 %%
          ;
 {SPACE}+ { }
-("///"[^/][^\n\r]*[\n\r]*)+ { return(Sc_ScanDocBlock()); }
+("///"([^/\n\r][^\n\r]*)?[\n\r]+)+ { return(Sc_ScanDocBlock()); }
 "//"[^\n\r]*   ;
 [\r]        ;
 [\n]        {lineIndex++;}
@@ -245,11 +245,12 @@ void CMDerror(char *format, ...)
    char tempBuf[BUFMAX];
    va_list args;
    va_start( args, format );
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
    _vsnprintf( tempBuf, BUFMAX, format, args );
 #else
    vsnprintf( tempBuf, BUFMAX, format, args );
 #endif
+    va_end(args);
 
    if(fileName)
    {

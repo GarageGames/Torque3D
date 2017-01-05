@@ -72,9 +72,6 @@ class SceneRenderState
       /// The render style being performed
       SceneRenderStyle mSceneRenderStyle;
 
-      /// When doing stereo rendering, the current field that is being rendered
-      S32 mRenderField;
-
       /// The render pass which we are setting up with this scene state.
       RenderPassManager* mRenderPass;
 
@@ -145,8 +142,11 @@ class SceneRenderState
       const SceneCullingState& getCullingState() const { return mCullingState; }
       SceneCullingState& getCullingState() { return mCullingState; }
 
-      /// Returns the root frustum.
-      const Frustum& getFrustum() const { return getCullingState().getFrustum(); }
+      /// Returns the root culling frustum.
+      const Frustum& getCullingFrustum() const { return getCullingState().getCullingFrustum(); }
+
+      /// Returns the root camera frustum.
+      const Frustum& getCameraFrustum() const { return getCullingState().getCameraFrustum(); }
 
       /// @}
 
@@ -234,12 +234,6 @@ class SceneRenderState
       /// Set the rendering style used for the scene
       void setSceneRenderStyle(SceneRenderStyle style) { mSceneRenderStyle = style; }
 
-      /// Get the stereo field being rendered
-      S32 getSceneRenderField() const { return mRenderField; }
-
-      /// Set the stereo field being rendered
-      void setSceneRenderField(S32 field) { mRenderField = field; }
-
       /// @}
 
       /// @name Transforms, projections, and viewports.
@@ -262,10 +256,10 @@ class SceneRenderState
       const MatrixF& getCameraTransform() const { return getCullingState().getCameraState().getViewWorldMatrix(); }
 
       /// Returns the minimum distance something must be from the camera to not be culled.
-      F32 getNearPlane() const { return getFrustum().getNearDist();   }
+      F32 getNearPlane() const { return getCullingFrustum().getNearDist();   }
 
       /// Returns the maximum distance something can be from the camera to not be culled.
-      F32 getFarPlane() const { return getFrustum().getFarDist();    }
+      F32 getFarPlane() const { return getCullingFrustum().getFarDist();    }
 
       /// Returns the camera vector normalized to 1 / far distance.
       const Point3F& getVectorEye() const { return mVectorEye; }

@@ -22,6 +22,7 @@
 
 #include "platform/platform.h"
 
+#include "console/engineAPI.h"
 #include "core/volume.h"
 #include "ts/collada/colladaUtils.h"
 #include "ts/collada/colladaAppNode.h"
@@ -50,7 +51,7 @@ static void processNode(GuiTreeViewCtrl* tree, domNode* node, S32 parentID, Scen
    S32 nodeID = tree->insertItem(parentID, _GetNameOrId(node), "node", "", 0, 0);
 
    // Update mesh and poly counts
-   for (int i = 0; i < node->getContents().getCount(); i++)
+   for (S32 i = 0; i < node->getContents().getCount(); i++)
    {
       domGeometry* geom = 0;
       const char* elemName = "";
@@ -125,7 +126,7 @@ static void processNode(GuiTreeViewCtrl* tree, domNode* node, S32 parentID, Scen
    }
 }
 
-ConsoleFunction( enumColladaForImport, bool, 3, 3,
+DefineConsoleFunction( enumColladaForImport, bool, (const char * shapePath, const char * ctrl), , 
    "(string shapePath, GuiTreeViewCtrl ctrl) Collect scene information from "
    "a COLLADA file and store it in a GuiTreeView control. This function is "
    "used by the COLLADA import gui to show a preview of the scene contents "
@@ -137,15 +138,15 @@ ConsoleFunction( enumColladaForImport, bool, 3, 3,
    "@internal")
 {
    GuiTreeViewCtrl* tree;
-   if (!Sim::findObject(argv[2], tree))
+   if (!Sim::findObject(ctrl, tree))
    {
-      Con::errorf("enumColladaScene::Could not find GuiTreeViewCtrl '%s'", argv[2]);
+      Con::errorf("enumColladaScene::Could not find GuiTreeViewCtrl '%s'", ctrl);
       return false;
    }
 
    // Check if a cached DTS is available => no need to import the collada file
    // if we can load the DTS instead
-   Torque::Path path(argv[1]);
+   Torque::Path path(shapePath);
    if (ColladaShapeLoader::canLoadCachedDTS(path))
       return false;
 
@@ -178,13 +179,13 @@ ConsoleFunction( enumColladaForImport, bool, 3, 3,
    SceneStats stats;
 
    // Query DOM for shape summary details
-   for (int i = 0; i < root->getLibrary_visual_scenes_array().getCount(); i++)
+   for (S32 i = 0; i < root->getLibrary_visual_scenes_array().getCount(); i++)
    {
       const domLibrary_visual_scenes* libScenes = root->getLibrary_visual_scenes_array()[i];
-      for (int j = 0; j < libScenes->getVisual_scene_array().getCount(); j++)
+      for (S32 j = 0; j < libScenes->getVisual_scene_array().getCount(); j++)
       {
          const domVisual_scene* visualScene = libScenes->getVisual_scene_array()[j];
-         for (int k = 0; k < visualScene->getNode_array().getCount(); k++)
+         for (S32 k = 0; k < visualScene->getNode_array().getCount(); k++)
             processNode(tree, visualScene->getNode_array()[k], nodesID, stats);
       }
    }

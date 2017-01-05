@@ -108,6 +108,9 @@ bool RenderMeshExample::onAdd()
    // Add this object to the scene
    addToScene();
 
+   // Refresh this object's material (if any)
+   updateMaterial();
+
    return true;
 }
 
@@ -266,7 +269,7 @@ void RenderMeshExample::prepRenderImage( SceneRenderState *state )
       createGeometry();
 
    // If we have no material then skip out.
-   if ( !mMaterialInst )
+   if ( !mMaterialInst || !state)
       return;
 
    // If we don't have a material instance after the override then 
@@ -283,6 +286,13 @@ void RenderMeshExample::prepRenderImage( SceneRenderState *state )
 
    // Set our RenderInst as a standard mesh render
    ri->type = RenderPassManager::RIT_Mesh;
+
+   //If our material has transparency set on this will redirect it to proper render bin
+   if ( matInst->getMaterial()->isTranslucent() )
+   {
+      ri->type = RenderPassManager::RIT_Translucent;
+      ri->translucentSort = true;
+   }
 
    // Calculate our sorting point
    if ( state )
@@ -333,7 +343,7 @@ void RenderMeshExample::prepRenderImage( SceneRenderState *state )
 
    // We sort by the material then vertex buffer
    ri->defaultKey = matInst->getStateHint();
-   ri->defaultKey2 = (U32)ri->vertBuff; // Not 64bit safe!
+   ri->defaultKey2 = (uintptr_t)ri->vertBuff; // Not 64bit safe!
 
    // Submit our RenderInst to the RenderPassManager
    state->getRenderPass()->addInst( ri );

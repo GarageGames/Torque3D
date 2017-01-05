@@ -50,6 +50,12 @@ GuiInspectorVariableField::~GuiInspectorVariableField()
 
 bool GuiInspectorVariableField::onAdd()
 {    
+   if( !mInspector )
+   {
+      Con::errorf("GuiInspectorVariableField::onAdd - Fail - No inspector");
+      return false;
+   }
+
    setInspectorProfile();   
 
    // Hack: skip our immediate parent

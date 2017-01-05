@@ -53,8 +53,8 @@ SimObjectPtr<RenderPassManager> ProjectedShadow::smRenderPass = NULL;
 SimObjectPtr<PostEffect> ProjectedShadow::smShadowFilter = NULL;
 F32 ProjectedShadow::smDepthAdjust = 10.0f;
 
-float ProjectedShadow::smFadeStartPixelSize = 200.0f;
-float ProjectedShadow::smFadeEndPixelSize = 35.0f;
+F32 ProjectedShadow::smFadeStartPixelSize = 200.0f;
+F32 ProjectedShadow::smFadeEndPixelSize = 35.0f;
 
 
 GFX_ImplementTextureProfile( BLProjectedShadowProfile,
@@ -62,14 +62,14 @@ GFX_ImplementTextureProfile( BLProjectedShadowProfile,
                               GFXTextureProfile::PreserveSize | 
                               GFXTextureProfile::RenderTarget |
                               GFXTextureProfile::Pooled,
-                              GFXTextureProfile::None );
+                              GFXTextureProfile::NONE );
 
 GFX_ImplementTextureProfile( BLProjectedShadowZProfile,
                               GFXTextureProfile::DiffuseMap,
                               GFXTextureProfile::PreserveSize | 
                               GFXTextureProfile::ZTarget |
                               GFXTextureProfile::Pooled,
-                              GFXTextureProfile::None );
+                              GFXTextureProfile::NONE );
 
 
 ProjectedShadow::ProjectedShadow( SceneObject *object )
@@ -230,6 +230,9 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
       lightCount++;
    }
 
+   if (mShapeBase)
+      fade *= mShapeBase->getFadeVal();
+
    lightDir.normalize();
    
    // No light... no shadow.
@@ -324,7 +327,7 @@ bool ProjectedShadow::_updateDecal( const SceneRenderState *state )
    bool shouldClip = lightDirChanged || hasMoved || hasScaled;
 
    // Now, check and see if the object is visible.
-   const Frustum &frust = state->getFrustum();
+   const Frustum &frust = state->getCullingFrustum();
    if ( frust.isCulled( SphereF( mDecalInstance->mPosition, mDecalInstance->mSize * mDecalInstance->mSize ) ) && !shouldClip )
       return false;
 

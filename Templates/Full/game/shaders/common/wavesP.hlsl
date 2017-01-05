@@ -22,13 +22,14 @@
 
 #define IN_HLSL
 #include "shdrConsts.h"
+#include "shaderModel.hlsl"
 
 //-----------------------------------------------------------------------------
 // Data
 //-----------------------------------------------------------------------------
 struct v2f
 {
-   float4 HPOS             : POSITION;
+   float4 HPOS             : TORQUE_POSITION;
 	float2 TEX0             : TEXCOORD0;
 	float4 tangentToCube0   : TEXCOORD1;
 	float4 tangentToCube1   : TEXCOORD2;
@@ -42,21 +43,23 @@ struct v2f
 
 struct Fragout
 {
-   float4 col : COLOR0;
+   float4 col : TORQUE_TARGET0;
 };
+
+// Uniforms
+TORQUE_UNIFORM_SAMPLER2D(diffMap,0);
+//TORQUE_UNIFORM_SAMPLERCUBE(cubeMap, 1); not used?
+TORQUE_UNIFORM_SAMPLER2D(bumpMap,2);
+
+uniform float4    specularColor   : register(PC_MAT_SPECCOLOR);
+uniform float4    ambient : register(PC_AMBIENT_COLOR);
+uniform float     specularPower : register(PC_MAT_SPECPOWER);
+uniform float accumTime : register(PC_ACCUM_TIME);
 
 //-----------------------------------------------------------------------------
 // Main
 //-----------------------------------------------------------------------------
-Fragout main(v2f IN,
-				uniform sampler2D    diffMap  : register(S0),
-				uniform sampler2D    bumpMap  : register(S2),
-            uniform samplerCUBE  cubeMap  : register(S1),
-            uniform float4    specularColor   : register(PC_MAT_SPECCOLOR),
-            uniform float     specularPower   : register(PC_MAT_SPECPOWER),
-            uniform float4    ambient         : register(PC_AMBIENT_COLOR),
-            uniform float accumTime   : register(PC_ACCUM_TIME)
-)
+Fragout main(v2f IN)
 {
 	Fragout OUT;
 
@@ -68,8 +71,8 @@ Fragout main(v2f IN,
    texOffset.y = IN.TEX0.y + cos( accumTime * 3.0 + IN.TEX0.x * 6.28319 * 2.0 ) * 0.05;
    
    
-   float4 bumpNorm = tex2D( bumpMap, texOffset ) * 2.0 - 1.0;
-   float4 diffuse = tex2D( diffMap, texOffset );
+   float4 bumpNorm = TORQUE_TEX2D( bumpMap, texOffset ) * 2.0 - 1.0;
+   float4 diffuse = TORQUE_TEX2D( diffMap, texOffset );
 
    OUT.col = diffuse * (saturate( dot( IN.lightVec, bumpNorm.xyz ) ) + ambient);
    

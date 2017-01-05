@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "util/settings.h"
+#include "console/engineAPI.h"
 #include "console/consoleTypes.h"
 #include "console/SimXMLDocument.h"
 
@@ -288,7 +289,6 @@ void Settings::readLayer(SimXMLDocument *document, String groupStack)
 {
    for(S32 i=0; document->pushChildElement(i); i++)
    {
-	  bool groupCount = 0;
 	  const UTF8 *type = document->elementValue();
 	  const UTF8 *name = document->attribute("name");
 	  const UTF8 *value = document->getText();
@@ -302,7 +302,6 @@ void Settings::readLayer(SimXMLDocument *document, String groupStack)
 
 		 newStack += name;
          readLayer(document, newStack);
-		 groupCount++;
 	  } else if(dStrcmp(type, "Setting") == 0)
 	  {
 		 String nameString = groupStack;
@@ -483,19 +482,12 @@ const char* Settings::findNextValue()
 }
 
 // make sure to replace the strings
-ConsoleMethod(Settings, findFirstValue, const char*, 2, 5, "settingObj.findFirstValue();")
+DefineConsoleMethod(Settings, findFirstValue, const char*, ( const char* pattern, bool deepSearch, bool includeDefaults ), ("", false, false), "settingObj.findFirstValue();")
 {
-	if( argc == 3 )
-		return object->findFirstValue( argv[2] );
-	else if( argc == 4 )
-		return object->findFirstValue( argv[2], argv[3] );
-	else if( argc == 5 )
-		return object->findFirstValue( argv[2], argv[3], argv[4] );
-	else
-		return "";
+   return object->findFirstValue( pattern, deepSearch, includeDefaults );
 }
 
-ConsoleMethod(Settings, findNextValue, const char*, 2, 2, "settingObj.findNextValue();")
+DefineConsoleMethod(Settings, findNextValue, const char*, (), , "settingObj.findNextValue();")
 {
 	return object->findNextValue();
 }
@@ -635,13 +627,13 @@ void SettingSaveNode::buildDocument(SimXMLDocument *document, bool skipWrite)
       document->addText(mValue);
    } else
    {
-	  for(int i=0; i<mSettingNodes.size(); i++)
+	  for(S32 i=0; i<mSettingNodes.size(); i++)
 	  {
          SettingSaveNode *node = mSettingNodes[i];
 		 node->buildDocument(document);
 	  }
 
-      for(int i=0; i<mGroupNodes.size(); i++)
+      for(S32 i=0; i<mGroupNodes.size(); i++)
 	  {
          SettingSaveNode *node = mGroupNodes[i];
 		 node->buildDocument(document);
@@ -652,48 +644,41 @@ void SettingSaveNode::buildDocument(SimXMLDocument *document, bool skipWrite)
       document->popElement();
 }
 
-ConsoleMethod(Settings, setValue, void, 3, 4, "settingObj.setValue(settingName, value);")
+DefineConsoleMethod(Settings, setValue, void, (const char * settingName, const char * value), (""), "settingObj.setValue(settingName, value);")
 {
-   const char *fieldName = StringTable->insert( argv[2] );
+   StringTableEntry fieldName = StringTable->insert( settingName );
    
-   if(argc == 3)
-      object->setValue( fieldName);
-   else if(argc == 4)
-      object->setValue( fieldName, argv[3] );
+   if (!String::isEmpty(value))
+      object->setValue( fieldName, value );
+   else
+      object->setValue( fieldName );
 }
 
-ConsoleMethod(Settings, setDefaultValue, void, 4, 4, "settingObj.setDefaultValue(settingName, value);")
+DefineConsoleMethod(Settings, setDefaultValue, void, (const char * settingName, const char * value), , "settingObj.setDefaultValue(settingName, value);")
 {
-   const char *fieldName = StringTable->insert( argv[2] );
-   object->setDefaultValue( fieldName, argv[3] );
+   StringTableEntry fieldName = StringTable->insert( settingName );
+   object->setDefaultValue( fieldName, value );
 }
 
-ConsoleMethod(Settings, value, const char*, 3, 4, "settingObj.value(settingName, defaultValue);")
+DefineConsoleMethod(Settings, value, const char*, (const char * settingName, const char * defaultValue), (""), "settingObj.value(settingName, defaultValue);")
 {
-   const char *fieldName = StringTable->insert( argv[2] );
+   StringTableEntry fieldName = StringTable->insert( settingName );
    
-   if(argc == 3)
+   if (dStrcmp(defaultValue, "") != 0)
+      return object->value( fieldName, defaultValue );
+   else if (dStrcmp(settingName, "") != 0)
       return object->value( fieldName );
-   if(argc == 4)
-      return object->value( fieldName, argv[3] );
 
    return "";
 }
 
-ConsoleMethod(Settings, remove, void, 3, 4, "settingObj.remove(settingName, includeDefaults = false);")
+DefineConsoleMethod(Settings, remove, void, (const char * settingName, bool includeDefaults), (false), "settingObj.remove(settingName, includeDefaults = false);")
 {
    // there's a problem with some fields not being removed properly, but works if you run it twice,
    // a temporary solution for now is simply to call the remove twice
-	if(argc == 3)
-	{
-		object->remove( argv[2] );
-		object->remove( argv[2] );
-	}
-	else if(argc == 4)
-	{
-		object->remove( argv[2], argv[3] );
-		object->remove( argv[2], argv[3] );
-	}
+
+	object->remove( settingName, includeDefaults );
+	object->remove( settingName, includeDefaults );
 }
 
 ConsoleMethod(Settings, write, bool, 2, 2, "%success = settingObj.write();")
@@ -702,33 +687,27 @@ ConsoleMethod(Settings, write, bool, 2, 2, "%success = settingObj.write();")
    return object->write();
 }
 
-ConsoleMethod(Settings, read, bool, 2, 2, "%success = settingObj.read();")
+DefineConsoleMethod(Settings, read, bool, (), , "%success = settingObj.read();")
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    return object->read();
 }
 
-ConsoleMethod(Settings, beginGroup, void, 3, 4, "settingObj.beginGroup(groupName, fromStart = false);")
+DefineConsoleMethod(Settings, beginGroup, void, (const char * groupName, bool includeDefaults), (false), "settingObj.beginGroup(groupName, fromStart = false);")
 {
-   if(argc == 3)
-      object->beginGroup( argv[2] );
-   if(argc == 4)
-	  object->beginGroup( argv[2], dAtob(argv[3]) );
+	object->beginGroup( groupName, includeDefaults );
 }
 
-ConsoleMethod(Settings, endGroup, void, 2, 2, "settingObj.endGroup();")
+DefineConsoleMethod(Settings, endGroup, void, (), , "settingObj.endGroup();")
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    object->endGroup();
 }
 
-ConsoleMethod(Settings, clearGroups, void, 2, 2, "settingObj.clearGroups();")
+DefineConsoleMethod(Settings, clearGroups, void, (), , "settingObj.clearGroups();")
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    object->clearGroups();
 }
 
-ConsoleMethod(Settings, getCurrentGroups, const char*, 2, 2, "settingObj.getCurrentGroups();")
+DefineConsoleMethod(Settings, getCurrentGroups, const char*, (), , "settingObj.getCurrentGroups();")
 {
    return object->getCurrentGroups();
 }

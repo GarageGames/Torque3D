@@ -26,7 +26,9 @@ uniform sampler2D diffuseMap0;
 uniform float texSize;
 uniform vec2 blurDimension;
 
-varying vec2 tex0;
+in vec2 tex0;
+
+out vec4 OUT_col;
 
 void main()
 {
@@ -40,8 +42,8 @@ void main()
    vec4 accum = vec4(0.0, 0.0, 0.0, 0.0);
    for(int i = 0; i < int(blurSamples); i++)
    {
-      accum += texture2D(diffuseMap0, BaseTexCoord + float(i) * SampleOffset);
+      accum += texture(diffuseMap0, BaseTexCoord + float(i) * SampleOffset);
    }
    accum /= blurSamples;
-   gl_FragColor = accum;
+   OUT_col = accum;
 }

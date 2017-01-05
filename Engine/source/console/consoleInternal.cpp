@@ -34,7 +34,6 @@
 
 //#define DEBUG_SPEW
 
-
 #define ST_INIT_SIZE 15
 
 static char scratchBuffer[1024];
@@ -168,13 +167,13 @@ void Dictionary::exportVariables(const char *varString, const char *fileName, bo
 
    for(s = sortList.begin(); s != sortList.end(); s++)
    {
-      switch((*s)->type)
+      switch((*s)->value.type)
       {
-         case Entry::TypeInternalInt:
-            dSprintf(buffer, sizeof(buffer), "%s = %d;%s", (*s)->name, (*s)->ival, cat);
+         case ConsoleValue::TypeInternalInt:
+            dSprintf(buffer, sizeof(buffer), "%s = %d;%s", (*s)->name, (*s)->value.ival, cat);
             break;
-         case Entry::TypeInternalFloat:
-            dSprintf(buffer, sizeof(buffer), "%s = %g;%s", (*s)->name, (*s)->fval, cat);
+         case ConsoleValue::TypeInternalFloat:
+            dSprintf(buffer, sizeof(buffer), "%s = %g;%s", (*s)->name, (*s)->value.fval, cat);
             break;
          default:
             expandEscape(expandBuffer, (*s)->getStringValue());
@@ -228,13 +227,13 @@ void Dictionary::exportVariables( const char *varString, Vector<String> *names, 
 
       if ( values )
       {
-         switch ( (*s)->type )
+         switch ( (*s)->value.type )
          {
-         case Entry::TypeInternalInt:
-            values->push_back( String::ToString( (*s)->ival ) );         
+         case ConsoleValue::TypeInternalInt:
+            values->push_back( String::ToString( (*s)->value.ival ) );         
             break;
-         case Entry::TypeInternalFloat:
-            values->push_back( String::ToString( (*s)->fval ) );         
+         case ConsoleValue::TypeInternalFloat:
+            values->push_back( String::ToString( (*s)->value.fval ) );         
             break;
          default:         
             expandEscape( expandBuffer, (*s)->getStringValue() );
@@ -262,9 +261,9 @@ void Dictionary::deleteVariables(const char *varString)
    }
 }
 
-S32 HashPointer(StringTableEntry ptr)
+U32 HashPointer(StringTableEntry ptr)
 {
-   return (S32)(((dsize_t)ptr) >> 2);
+   return (U32)(((dsize_t)ptr) >> 2);
 }
 
 Dictionary::Entry *Dictionary::lookup(StringTableEntry name)
@@ -284,6 +283,7 @@ Dictionary::Entry *Dictionary::lookup(StringTableEntry name)
 Dictionary::Entry *Dictionary::add(StringTableEntry name)
 {
    // Try to find an existing match.
+   //printf("Add Variable %s\n", name);
    
    Entry* ret = lookup( name );
    if( ret )
@@ -307,7 +307,7 @@ Dictionary::Entry *Dictionary::add(StringTableEntry name)
          for( Entry* entry = hashTable->data[ i ]; entry != NULL; )
          {
             Entry* next = entry->nextEntry;
-            S32 index = HashPointer( entry->name ) % newTableSize;
+            U32 index = HashPointer( entry->name ) % newTableSize;
             
             entry->nextEntry = newTableData[ index ];
             newTableData[ index ] = entry;
@@ -330,7 +330,7 @@ Dictionary::Entry *Dictionary::add(StringTableEntry name)
 
    ret = hashTable->mChunker.alloc();
    constructInPlace( ret, name );
-   S32 idx = HashPointer(name) % hashTable->size;
+   U32 idx = HashPointer(name) % hashTable->size;
    ret->nextEntry = hashTable->data[idx];
    hashTable->data[idx] = ret;
    
@@ -454,7 +454,7 @@ char *typeValueEmpty = "";
 Dictionary::Entry::Entry(StringTableEntry in_name)
 {
    name = in_name;
-   type = TypeInternalString;
+   value.type = ConsoleValue::TypeInternalString;
    notify = NULL;
    nextEntry = NULL;
    mUsage = NULL;
@@ -462,17 +462,12 @@ Dictionary::Entry::Entry(StringTableEntry in_name)
 
    // NOTE: This is data inside a nameless
    // union, so we don't need to init the rest.
-   ival = 0;
-   fval = 0;
-   sval = typeValueEmpty;
-   bufferLen = 0;
+   value.init();
 }
 
 Dictionary::Entry::~Entry()
 {
-   if (  type <= TypeInternalString &&
-         sval != typeValueEmpty )
-      dFree(sval);
+   value.cleanup();
 
    if ( notify )
       delete notify;
@@ -497,15 +492,11 @@ const char *Dictionary::getVariable(StringTableEntry name, bool *entValid)
    return "";
 }
 
-void Dictionary::Entry::setStringValue(const char * value)
+void ConsoleValue::setStringValue(const char * value)
 {
-   if( mIsConstant )
-   {
-      Con::errorf( "Cannot assign value to constant '%s'.", name );
-      return;
-   }
+   if (value == NULL) value = typeValueEmpty;
 
-   if(type <= TypeInternalString)
+   if(type <= ConsoleValue::TypeInternalString)
    {
       // Let's not remove empty-string-valued global vars from the dict.
       // If we remove them, then they won't be exported, and sometimes
@@ -519,6 +510,20 @@ void Dictionary::Entry::setStringValue(const char * value)
          return;
       }
 */
+	   if (value == typeValueEmpty)
+      {
+         if (bufferLen > 0)
+         {
+            dFree(sval);
+            bufferLen = 0;
+         }
+
+         sval = typeValueEmpty;
+         fval = 0.f;
+         ival = 0;
+         type = TypeInternalString;
+         return;
+      }
 
       U32 stringLen = dStrlen(value);
 
@@ -537,25 +542,130 @@ void Dictionary::Entry::setStringValue(const char * value)
          ival = 0;
       }
 
-      type = TypeInternalString;
-
       // may as well pad to the next cache line
       U32 newLen = ((stringLen + 1) + 15) & ~15;
-      
-      if(sval == typeValueEmpty)
+	  
+      if(bufferLen == 0)
          sval = (char *) dMalloc(newLen);
       else if(newLen > bufferLen)
          sval = (char *) dRealloc(sval, newLen);
+
+      type = TypeInternalString;
 
       bufferLen = newLen;
       dStrcpy(sval, value);
    }
    else
       Con::setData(type, dataPtr, 0, 1, &value, enumTable);      
+}
 
-   // Fire off the notification if we have one.
-   if ( notify )
-      notify->trigger();
+
+void ConsoleValue::setStackStringValue(const char *value)
+{
+   if (value == NULL) value = typeValueEmpty;
+
+   if(type <= ConsoleValue::TypeInternalString)
+   {
+      // sval might still be temporarily present so we need to check and free it
+      if (bufferLen > 0)
+      {
+         dFree(sval);
+         bufferLen = 0;
+      }
+
+	   if (value == typeValueEmpty)
+      {
+         sval = typeValueEmpty;
+         fval = 0.f;
+         ival = 0;
+         type = TypeInternalString;
+         return;
+      }
+
+      U32 stringLen = dStrlen(value);
+      if(stringLen < 256)
+      {
+         fval = dAtof(value);
+         ival = dAtoi(value);
+      }
+      else
+      {
+         fval = 0.f;
+         ival = 0;
+      }
+
+      type = TypeInternalStackString;
+      sval = (char*)value;
+      bufferLen = 0;
+   }
+   else
+      Con::setData(type, dataPtr, 0, 1, &value, enumTable);      
+}
+
+void ConsoleValue::setStringStackPtrValue(StringStackPtr ptrValue)
+{
+   if(type <= ConsoleValue::TypeInternalString)
+   {
+      const char *value = StringStackPtrRef(ptrValue).getPtr(&STR);
+	   if (bufferLen > 0)
+      {
+         dFree(sval);
+         bufferLen = 0;
+      }
+
+      U32 stringLen = dStrlen(value);
+      if(stringLen < 256)
+      {
+         fval = dAtof(value);
+         ival = dAtoi(value);
+      }
+      else
+      {
+         fval = 0.f;
+         ival = 0;
+      }
+
+      type = TypeInternalStringStackPtr;
+      sval = (char*)(value - STR.mBuffer);
+      bufferLen = 0;
+   }
+   else
+   {
+      const char *value = StringStackPtrRef(ptrValue).getPtr(&STR);
+      Con::setData(type, dataPtr, 0, 1, &value, enumTable);      
+   }
+}
+
+S32 Dictionary::getIntVariable(StringTableEntry name, bool *entValid)
+{
+   Entry *ent = lookup(name);
+   if(ent)
+   {
+      if(entValid)
+         *entValid = true;
+      return ent->getIntValue();
+   }
+
+   if(entValid)
+      *entValid = false;
+
+    return 0;
+}
+
+F32 Dictionary::getFloatVariable(StringTableEntry name, bool *entValid)
+{
+   Entry *ent = lookup(name);
+   if(ent)
+   {
+      if(entValid)
+         *entValid = true;
+      return ent->getFloatValue();
+   }
+
+   if(entValid)
+      *entValid = false;
+
+   return 0;
 }
 
 void Dictionary::setVariable(StringTableEntry name, const char *value)
@@ -582,19 +692,19 @@ Dictionary::Entry* Dictionary::addVariable(  const char *name,
 
    Entry *ent = add(StringTable->insert(name));
    
-   if (  ent->type <= Entry::TypeInternalString &&
-         ent->sval != typeValueEmpty )
-      dFree(ent->sval);
+   if (  ent->value.type <= ConsoleValue::TypeInternalString &&
+         ent->value.bufferLen > 0 )
+      dFree(ent->value.sval);
 
-   ent->type = type;
-   ent->dataPtr = dataPtr;
+   ent->value.type = type;
+   ent->value.dataPtr = dataPtr;
    ent->mUsage = usage;
    
    // Fetch enum table, if any.
    
    ConsoleBaseType* conType = ConsoleBaseType::getType( type );
    AssertFatal( conType, "Dictionary::addVariable - invalid console type" );
-   ent->enumTable = conType->getEnumTable();
+   ent->value.enumTable = conType->getEnumTable();
    
    return ent;
 }
@@ -616,7 +726,7 @@ void Dictionary::addVariableNotify( const char *name, const Con::NotifyDelegate 
     return;
 
    if ( !ent->notify )
-    ent->notify = new Entry::NotifySignal();
+      ent->notify = new Entry::NotifySignal();
 
    ent->notify->notify( callback );
 }
@@ -728,6 +838,8 @@ ExprEvalState::ExprEvalState()
    currentVariable = NULL;
    mStackDepth = 0;
    stack.reserve( 64 );
+   mShouldReset = false;
+   mResetLocked = false;
 }
 
 ExprEvalState::~ExprEvalState()
@@ -812,7 +924,7 @@ void Namespace::Entry::clear()
    // Clean up usage strings generated for script functions.
    if( ( mType == Namespace::Entry::ConsoleFunctionType ) && mUsage )
    {
-      delete mUsage;
+      dFree(mUsage);
       mUsage = NULL;
    }
 }
@@ -838,7 +950,7 @@ Namespace::~Namespace()
    clearEntries();
    if( mUsage && mCleanUpUsage )
    {
-      delete mUsage;
+      dFree(mUsage);
       mUsage = NULL;
       mCleanUpUsage = false;
    }
@@ -1268,14 +1380,20 @@ void Namespace::markGroup(const char* name, const char* usage)
 
 extern S32 executeBlock(StmtNode *block, ExprEvalState *state);
 
-const char *Namespace::Entry::execute(S32 argc, const char **argv, ExprEvalState *state)
+ConsoleValueRef Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprEvalState *state)
 {
+   STR.clearFunctionOffset();
+
    if(mType == ConsoleFunctionType)
    {
       if(mFunctionOffset)
+      {
          return mCode->exec(mFunctionOffset, argv[0], mNamespace, argc, argv, false, mPackage);
+      }
       else
-         return "";
+      {
+         return ConsoleValueRef();
+      }
    }
 
 #ifndef TORQUE_DEBUG
@@ -1284,7 +1402,7 @@ const char *Namespace::Entry::execute(S32 argc, const char **argv, ExprEvalState
    if(mToolOnly && ! Con::isCurrentScriptToolScript())
    {
       Con::errorf(ConsoleLogEntry::Script, "%s::%s - attempting to call tools only function from outside of tools", mNamespace->mName, mFunctionName);
-      return "";
+      return ConsoleValueRef();
    }
 #endif
 
@@ -1292,32 +1410,25 @@ const char *Namespace::Entry::execute(S32 argc, const char **argv, ExprEvalState
    {
       Con::warnf(ConsoleLogEntry::Script, "%s::%s - wrong number of arguments.", mNamespace->mName, mFunctionName);
       Con::warnf(ConsoleLogEntry::Script, "usage: %s", mUsage);
-      return "";
+      return ConsoleValueRef();
    }
 
-   static char returnBuffer[32];
    switch(mType)
    {
       case StringCallbackType:
-         return cb.mStringCallbackFunc(state->thisObject, argc, argv);
+         return ConsoleValueRef::fromValue(CSTK.pushStackString(cb.mStringCallbackFunc(state->thisObject, argc, argv)));
       case IntCallbackType:
-         dSprintf(returnBuffer, sizeof(returnBuffer), "%d",
-            cb.mIntCallbackFunc(state->thisObject, argc, argv));
-         return returnBuffer;
+		 return ConsoleValueRef::fromValue(CSTK.pushUINT((U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv)));
       case FloatCallbackType:
-         dSprintf(returnBuffer, sizeof(returnBuffer), "%g",
-            cb.mFloatCallbackFunc(state->thisObject, argc, argv));
-         return returnBuffer;
+		 return ConsoleValueRef::fromValue(CSTK.pushFLT((U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv)));
       case VoidCallbackType:
          cb.mVoidCallbackFunc(state->thisObject, argc, argv);
-         return "";
+         return ConsoleValueRef();
       case BoolCallbackType:
-         dSprintf(returnBuffer, sizeof(returnBuffer), "%d",
-            (U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv));
-         return returnBuffer;
+		 return ConsoleValueRef::fromValue(CSTK.pushUINT((U32)cb.mBoolCallbackFunc(state->thisObject, argc, argv)));
    }
-
-   return "";
+   
+   return ConsoleValueRef();
 }
 
 //-----------------------------------------------------------------------------

@@ -29,7 +29,7 @@
 
 // External scripting cinterface, suitable for import into any scripting system which support "C" interfaces (C#, Python, Lua, Java, etc)
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 #include "windowManager/win32/win32Window.h"
 #include "windowManager/win32/winDispatch.h"
 #endif
@@ -76,9 +76,10 @@ extern "C" {
       if (!entry)
          return "";
 
-      const char* argv[] = {"consoleExportXML", 0};
+      static const char* exportArgv[1] = { "consoleExportXML" };
+      static StringStackConsoleWrapper exportCmd(1, exportArgv);
 
-      return entry->cb.mStringCallbackFunc(NULL, 1, argv);      
+      return entry->cb.mStringCallbackFunc(NULL, exportCmd.argc, exportCmd.argv);      
    }
 
    MarshalNativeEntry* script_get_namespace_entry(const char* nameSpace, const char* name)
@@ -164,7 +165,7 @@ extern "C" {
       return false;
    }
 
-   void script_simobject_setfield_int(U32 objectId, const char* fieldName, int v)
+   void script_simobject_setfield_int(U32 objectId, const char* fieldName, S32 v)
    {
       SimObject *object = Sim::findObject( objectId );
       if( object )
@@ -215,14 +216,15 @@ extern "C" {
             return "";
       }
 
-      return entry->cb.mStringCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      return entry->cb.mStringCallbackFunc(o, args.count(), args);
    }
 
    bool script_call_namespace_entry_bool(Namespace::Entry* entry, S32 argc, const char** argv)
    {
       // maxArgs improper on a number of console function/methods
       if (argc < entry->mMinArgs)// || argc > entry->mMaxArgs)
-         return "";
+         return false;
 
       SimObject* o = NULL;
 
@@ -230,10 +232,11 @@ extern "C" {
       {
          o = Sim::findObject(dAtoi(argv[1]));
          if (!o)
-            return "";
+            return false;
       }
 
-      return entry->cb.mBoolCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      return entry->cb.mBoolCallbackFunc(o, args.count(), args);
    }
 
    S32 script_call_namespace_entry_int(Namespace::Entry* entry, S32 argc, const char** argv)
@@ -251,7 +254,8 @@ extern "C" {
             return 0;
       }
 
-      return entry->cb.mIntCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      return entry->cb.mIntCallbackFunc(o, args.count(), args);
    }
 
    F32 script_call_namespace_entry_float(Namespace::Entry* entry, S32 argc, const char** argv)
@@ -269,7 +273,8 @@ extern "C" {
             return 0.0f;
       }
 
-      return entry->cb.mFloatCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      return entry->cb.mFloatCallbackFunc(o, args.count(), args);
    }
 
 
@@ -288,15 +293,16 @@ extern "C" {
             return;
       }
 
-      entry->cb.mVoidCallbackFunc(o, argc, argv);      
+      StringStackConsoleWrapper args(argc, argv);
+      entry->cb.mVoidCallbackFunc(o, args.count(), args);
    }
 
-   int script_simobject_get_id(SimObject* so)
+   S32 script_simobject_get_id(SimObject* so)
    {
       return so->getId();
    }
 
-   int script_simobject_find(const char* classname, const char* name)
+   S32 script_simobject_find(const char* classname, const char* name)
    {
       SimObject *object;
       if( Sim::findObject( name, object ) )
@@ -383,9 +389,9 @@ extern "C" {
    }
 
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 
-   void script_input_event(int type, int value1, int value2)
+   void script_input_event(S32 type, S32 value1, S32 value2)
    {
       if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
       {

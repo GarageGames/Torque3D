@@ -16,6 +16,7 @@ subject to the following restrictions:
 ///btDbvtBroadphase implementation by Nathanael Presson
 
 #include "btDbvtBroadphase.h"
+#include "LinearMath/btThreads.h"
 
 //
 // Profiling
@@ -142,6 +143,11 @@ btDbvtBroadphase::btDbvtBroadphase(btOverlappingPairCache* paircache)
 	{
 		m_stageRoots[i]=0;
 	}
+#if BT_THREADSAFE
+    m_rayTestStacks.resize(BT_MAX_THREAD_COUNT);
+#else
+    m_rayTestStacks.resize(1);
+#endif
 #if DBVT_BP_PROFILE
 	clear(m_profiling);
 #endif
@@ -227,6 +233,23 @@ struct	BroadphaseRayTester : btDbvt::ICollide
 void	btDbvtBroadphase::rayTest(const btVector3& rayFrom,const btVector3& rayTo, btBroadphaseRayCallback& rayCallback,const btVector3& aabbMin,const btVector3& aabbMax)
 {
 	BroadphaseRayTester callback(rayCallback);
+    btAlignedObjectArray<const btDbvtNode*>* stack = &m_rayTestStacks[0];
+#if BT_THREADSAFE
+    // for this function to be threadsafe, each thread must have a separate copy
+    // of this stack.  This could be thread-local static to avoid dynamic allocations,
+    // instead of just a local.
+    int threadIndex = btGetCurrentThreadIndex();
+    btAlignedObjectArray<const btDbvtNode*> localStack;
+    if (threadIndex < m_rayTestStacks.size())
+    {
+        // use per-thread preallocated stack if possible to avoid dynamic allocations
+        stack = &m_rayTestStacks[threadIndex];
+    }
+    else
+    {
+        stack = &localStack;
+    }
+#endif
 
 	m_sets[0].rayTestInternal(	m_sets[0].m_root,
 		rayFrom,
@@ -236,6 +259,7 @@ void	btDbvtBroadphase::rayTest(const btVector3& rayFrom,const btVector3& rayTo, 
 		rayCallback.m_lambda_max,
 		aabbMin,
 		aabbMax,
+        *stack,
 		callback);
 
 	m_sets[1].rayTestInternal(	m_sets[1].m_root,
@@ -246,9 +270,37 @@ void	btDbvtBroadphase::rayTest(const btVector3& rayFrom,const btVector3& rayTo, 
 		rayCallback.m_lambda_max,
 		aabbMin,
 		aabbMax,
+        *stack,
 		callback);
 
 }
+
+
+struct	BroadphaseAabbTester : btDbvt::ICollide
+{
+	btBroadphaseAabbCallback& m_aabbCallback;
+	BroadphaseAabbTester(btBroadphaseAabbCallback& orgCallback)
+		:m_aabbCallback(orgCallback)
+	{
+	}
+	void					Process(const btDbvtNode* leaf)
+	{
+		btDbvtProxy*	proxy=(btDbvtProxy*)leaf->data;
+		m_aabbCallback.process(proxy);
+	}
+};	
+
+void	btDbvtBroadphase::aabbTest(const btVector3& aabbMin,const btVector3& aabbMax,btBroadphaseAabbCallback& aabbCallback)
+{
+	BroadphaseAabbTester callback(aabbCallback);
+
+	const ATTRIBUTE_ALIGNED16(btDbvtVolume)	bounds=btDbvtVolume::FromMM(aabbMin,aabbMax);
+		//process all children, that overlap with  the given AABB bounds
+	m_sets[0].collideTV(m_sets[0].m_root,bounds,callback);
+	m_sets[1].collideTV(m_sets[1].m_root,bounds,callback);
+
+}
+
 
 
 //
@@ -316,6 +368,47 @@ void							btDbvtBroadphase::setAabb(		btBroadphaseProxy* absproxy,
 			}
 		}	
 	}
+}
+
+
+//
+void							btDbvtBroadphase::setAabbForceUpdate(		btBroadphaseProxy* absproxy,
+														  const btVector3& aabbMin,
+														  const btVector3& aabbMax,
+														  btDispatcher* /*dispatcher*/)
+{
+	btDbvtProxy*						proxy=(btDbvtProxy*)absproxy;
+	ATTRIBUTE_ALIGNED16(btDbvtVolume)	aabb=btDbvtVolume::FromMM(aabbMin,aabbMax);
+	bool	docollide=false;
+	if(proxy->stage==STAGECOUNT)
+	{/* fixed -> dynamic set	*/ 
+		m_sets[1].remove(proxy->leaf);
+		proxy->leaf=m_sets[0].insert(aabb,proxy);
+		docollide=true;
+	}
+	else
+	{/* dynamic set				*/ 
+		++m_updates_call;
+		/* Teleporting			*/ 
+		m_sets[0].update(proxy->leaf,aabb);
+		++m_updates_done;
+		docollide=true;
+	}
+	listremove(proxy,m_stageRoots[proxy->stage]);
+	proxy->m_aabbMin = aabbMin;
+	proxy->m_aabbMax = aabbMax;
+	proxy->stage	=	m_stageCurrent;
+	listappend(proxy,m_stageRoots[m_stageCurrent]);
+	if(docollide)
+	{
+		m_needcleanup=true;
+		if(!m_deferedcollide)
+		{
+			btDbvtTreeCollider	collider(this);
+			m_sets[1].collideTTpersistentStack(m_sets[1].m_root,proxy->leaf,collider);
+			m_sets[0].collideTTpersistentStack(m_sets[0].m_root,proxy->leaf,collider);
+		}
+	}	
 }
 
 //

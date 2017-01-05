@@ -112,7 +112,7 @@ protected:
 
 public:
 
-   enum { MaxBrushDim = 40 };
+   enum { MaxBrushDim = 256 };
 
    Brush(TerrainEditor * editor);
    virtual ~Brush(){};
@@ -173,7 +173,7 @@ public:
 
    const char *getType() const { return "selection"; }
    void rebuild();
-   void render(Vector<GFXVertexPC> & vertexBuffer, S32 & verts, S32 & elems, S32 & prims, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone) const;
+   void render(Vector<GFXVertexPCT> & vertexBuffer, S32 & verts, S32 & elems, S32 & prims, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone) const;
    void setSize(const Point2I &){}
 
 protected:
@@ -230,7 +230,7 @@ class TerrainEditor : public EditTSCtrl
       void submitMaterialUndo( String actionName );
       void onMaterialUndo( TerrainBlock *terr );
 
-      void autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope );
+      void autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope, F32 mCoverage );
 
 	private:	
 

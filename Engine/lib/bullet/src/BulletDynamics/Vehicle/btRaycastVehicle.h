@@ -8,8 +8,8 @@
  * of this software for any purpose.  
  * It is provided "as is" without express or implied warranty.
 */
-#ifndef RAYCASTVEHICLE_H
-#define RAYCASTVEHICLE_H
+#ifndef BT_RAYCASTVEHICLE_H
+#define BT_RAYCASTVEHICLE_H
 
 #include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "BulletDynamics/ConstraintSolver/btTypedConstraint.h"
@@ -29,6 +29,10 @@ class btRaycastVehicle : public btActionInterface
 		btAlignedObjectArray<btVector3>	m_axle;
 		btAlignedObjectArray<btScalar>	m_forwardImpulse;
 		btAlignedObjectArray<btScalar>	m_sideImpulse;
+	
+		///backwards compatibility
+		int	m_userConstraintType;
+		int	m_userConstraintId;
 
 public:
 	class btVehicleTuning
@@ -40,7 +44,8 @@ public:
 				m_suspensionCompression(btScalar(0.83)),
 				m_suspensionDamping(btScalar(0.88)),
 				m_maxSuspensionTravelCm(btScalar(500.)),
-				m_frictionSlip(btScalar(10.5))
+				m_frictionSlip(btScalar(10.5)),
+				m_maxSuspensionForce(btScalar(6000.))
 			{
 			}
 			btScalar	m_suspensionStiffness;
@@ -48,12 +53,11 @@ public:
 			btScalar	m_suspensionDamping;
 			btScalar	m_maxSuspensionTravelCm;
 			btScalar	m_frictionSlip;
+			btScalar	m_maxSuspensionForce;
 
 		};
 private:
 
-	btScalar	m_tau;
-	btScalar	m_damping;
 	btVehicleRaycaster*	m_vehicleRaycaster;
 	btScalar		m_pitchControl;
 	btScalar	m_steeringValue; 
@@ -78,6 +82,7 @@ public:
 	///btActionInterface interface
 	virtual void updateAction( btCollisionWorld* collisionWorld, btScalar step)
 	{
+        (void) collisionWorld;
 		updateVehicle(step);
 	}
 	
@@ -105,7 +110,7 @@ public:
 
 	void	updateWheelTransform( int wheelIndex, bool interpolatedTransform = true );
 	
-	void	setRaycastWheelInfo( int wheelIndex , bool isInContact, const btVector3& hitPoint, const btVector3& hitNormal,btScalar depth);
+//	void	setRaycastWheelInfo( int wheelIndex , bool isInContact, const btVector3& hitPoint, const btVector3& hitNormal,btScalar depth);
 
 	btWheelInfo&	addWheel( const btVector3& connectionPointCS0, const btVector3& wheelDirectionCS0,const btVector3& wheelAxleCS,btScalar suspensionRestLength,btScalar wheelRadius,const btVehicleTuning& tuning, bool isFrontWheel);
 
@@ -188,6 +193,26 @@ public:
 	}
 
 
+	///backwards compatibility
+	int getUserConstraintType() const
+	{
+		return m_userConstraintType ;
+	}
+
+	void	setUserConstraintType(int userConstraintType)
+	{
+		m_userConstraintType = userConstraintType;
+	};
+
+	void	setUserConstraintId(int uid)
+	{
+		m_userConstraintId = uid;
+	}
+
+	int getUserConstraintId() const
+	{
+		return m_userConstraintId;
+	}
 
 };
 
@@ -205,5 +230,5 @@ public:
 };
 
 
-#endif //RAYCASTVEHICLE_H
+#endif //BT_RAYCASTVEHICLE_H
 

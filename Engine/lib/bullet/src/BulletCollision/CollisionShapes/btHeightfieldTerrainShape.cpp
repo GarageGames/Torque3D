@@ -21,7 +21,7 @@ subject to the following restrictions:
 
 btHeightfieldTerrainShape::btHeightfieldTerrainShape
 (
-int heightStickWidth, int heightStickLength, void* heightfieldData,
+int heightStickWidth, int heightStickLength, const void* heightfieldData,
 btScalar heightScale, btScalar minHeight, btScalar maxHeight,int upAxis,
 PHY_ScalarType hdt, bool flipQuadEdges
 )
@@ -33,12 +33,12 @@ PHY_ScalarType hdt, bool flipQuadEdges
 
 
 
-btHeightfieldTerrainShape::btHeightfieldTerrainShape(int heightStickWidth, int heightStickLength,void* heightfieldData,btScalar maxHeight,int upAxis,bool useFloatData,bool flipQuadEdges)
+btHeightfieldTerrainShape::btHeightfieldTerrainShape(int heightStickWidth, int heightStickLength,const void* heightfieldData,btScalar maxHeight,int upAxis,bool useFloatData,bool flipQuadEdges)
 {
 	// legacy constructor: support only float or unsigned char,
 	// 	and min height is zero
 	PHY_ScalarType hdt = (useFloatData) ? PHY_FLOAT : PHY_UCHAR;
-	btScalar minHeight = 0.0;
+	btScalar minHeight = 0.0f;
 
 	// previously, height = uchar * maxHeight / 65535.
 	// So to preserve legacy behavior, heightScale = maxHeight / 65535
@@ -53,21 +53,19 @@ btHeightfieldTerrainShape::btHeightfieldTerrainShape(int heightStickWidth, int h
 
 void btHeightfieldTerrainShape::initialize
 (
-int heightStickWidth, int heightStickLength, void* heightfieldData,
+int heightStickWidth, int heightStickLength, const void* heightfieldData,
 btScalar heightScale, btScalar minHeight, btScalar maxHeight, int upAxis,
 PHY_ScalarType hdt, bool flipQuadEdges
 )
 {
 	// validation
-	btAssert(heightStickWidth > 1 && "bad width");
-	btAssert(heightStickLength > 1 && "bad length");
-	btAssert(heightfieldData && "null heightfield data");
+	btAssert(heightStickWidth > 1);// && "bad width");
+	btAssert(heightStickLength > 1);// && "bad length");
+	btAssert(heightfieldData);// && "null heightfield data");
 	// btAssert(heightScale) -- do we care?  Trust caller here
-	btAssert(minHeight <= maxHeight && "bad min/max height");
-	btAssert(upAxis >= 0 && upAxis < 3 &&
-	    "bad upAxis--should be in range [0,2]");
-	btAssert(hdt != PHY_UCHAR || hdt != PHY_FLOAT || hdt != PHY_SHORT &&
-	    "Bad height data type enum");
+	btAssert(minHeight <= maxHeight);// && "bad min/max height");
+	btAssert(upAxis >= 0 && upAxis < 3);// && "bad upAxis--should be in range [0,2]");
+	btAssert(hdt != PHY_UCHAR || hdt != PHY_FLOAT || hdt != PHY_SHORT);// && "Bad height data type enum");
 
 	// initialize member variables
 	m_shapeType = TERRAIN_SHAPE_PROXYTYPE;
@@ -82,6 +80,7 @@ PHY_ScalarType hdt, bool flipQuadEdges
 	m_heightDataType = hdt;
 	m_flipQuadEdges = flipQuadEdges;
 	m_useDiamondSubdivision = false;
+	m_useZigzagSubdivision = false;
 	m_upAxis = upAxis;
 	m_localScaling.setValue(btScalar(1.), btScalar(1.), btScalar(1.));
 
@@ -109,7 +108,7 @@ PHY_ScalarType hdt, bool flipQuadEdges
 	default:
 		{
 			//need to get valid m_upAxis
-			btAssert(0 && "Bad m_upAxis");
+			btAssert(0);// && "Bad m_upAxis");
 		}
 	}
 
@@ -135,9 +134,7 @@ void btHeightfieldTerrainShape::getAabb(const btTransform& t,btVector3& aabbMin,
 
 	btMatrix3x3 abs_b = t.getBasis().absolute();  
 	btVector3 center = t.getOrigin();
-	btVector3 extent = btVector3(abs_b[0].dot(halfExtents),
-		   abs_b[1].dot(halfExtents),
-		  abs_b[2].dot(halfExtents));
+    btVector3 extent = halfExtents.dot3(abs_b[0], abs_b[1], abs_b[2]);
 	extent += btVector3(getMargin(),getMargin(),getMargin());
 
 	aabbMin = center - extent;
@@ -362,18 +359,19 @@ void	btHeightfieldTerrainShape::processAllTriangles(btTriangleCallback* callback
 		for(int x=startX; x<endX; x++)
 		{
 			btVector3 vertices[3];
-			if (m_flipQuadEdges || (m_useDiamondSubdivision && !((j+x) & 1)))
+			if (m_flipQuadEdges || (m_useDiamondSubdivision && !((j+x) & 1))|| (m_useZigzagSubdivision  && !(j & 1)))
 			{
         //first triangle
         getVertex(x,j,vertices[0]);
-        getVertex(x+1,j,vertices[1]);
-        getVertex(x+1,j+1,vertices[2]);
+		getVertex(x, j + 1, vertices[1]);
+		getVertex(x + 1, j + 1, vertices[2]);
         callback->processTriangle(vertices,x,j);
         //second triangle
-        getVertex(x,j,vertices[0]);
+      //  getVertex(x,j,vertices[0]);//already got this vertex before, thanks to Danny Chapman
         getVertex(x+1,j+1,vertices[1]);
-        getVertex(x,j+1,vertices[2]);
-        callback->processTriangle(vertices,x,j);				
+		getVertex(x + 1, j, vertices[2]);
+		callback->processTriangle(vertices, x, j);
+
 			} else
 			{
         //first triangle
@@ -383,7 +381,7 @@ void	btHeightfieldTerrainShape::processAllTriangles(btTriangleCallback* callback
         callback->processTriangle(vertices,x,j);
         //second triangle
         getVertex(x+1,j,vertices[0]);
-        getVertex(x,j+1,vertices[1]);
+        //getVertex(x,j+1,vertices[1]);
         getVertex(x+1,j+1,vertices[2]);
         callback->processTriangle(vertices,x,j);
 			}

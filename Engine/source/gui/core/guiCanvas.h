@@ -33,15 +33,13 @@
 #include "platform/platformInput.h"
 #endif
 
-#include "component/interfaces/IProcessInput.h"
+#ifndef _SIGNAL_H_
+#include "core/util/tSignal.h"
+#endif
+
+#include "platform/input/IProcessInput.h"
 #include "windowManager/platformWindowMgr.h"
 #include "gfx/gfxFence.h"
-
-#ifdef TORQUE_DEMO_PURCHASE
-#ifndef _PURCHASESCREEN_H_
-#include "demo/purchase/purchaseScreen.h"
-#endif
-#endif
 
 /// A canvas on which rendering occurs.
 ///
@@ -80,6 +78,8 @@
 /// screen will be painted normally. If you are making an animated GuiControl
 /// you need to add your control to the dirty areas of the canvas.
 ///
+class guiCanvas;
+typedef Signal<void(GuiCanvas* canvas)> CanvasSizeChangeSignal;
 class GuiCanvas : public GuiControl, public IProcessInput
 {
 
@@ -107,6 +107,8 @@ protected:
    bool        mForceMouseToGUI;
    bool        mClampTorqueCursor;
    bool        mAlwaysHandleMouseButtons;
+
+   bool        mDisplayWindow;
 
    /// @}
 
@@ -187,6 +189,10 @@ protected:
    virtual void setupFences();
    
    void checkLockMouseMove( const GuiEvent& event );
+   //Signal used to let others know this canvas has changed size.
+	static CanvasSizeChangeSignal smCanvasSizeChangeSignal;
+
+   GuiControl *mMenuBarCtrl;
 
 public:
    DECLARE_CONOBJECT(GuiCanvas);
@@ -198,7 +204,11 @@ public:
    virtual bool onAdd();
    virtual void onRemove();
 
+   void setMenuBar(SimObject *obj);
+
    static void initPersistFields();
+
+   static CanvasSizeChangeSignal& getCanvasSizeChangeSignal() { return smCanvasSizeChangeSignal; }
 
    /// @name Rendering methods
    ///
@@ -325,6 +335,10 @@ public:
 
    /// Returns true if the cursor is being rendered.
    virtual bool isCursorShown();
+
+   void cursorClick(S32 buttonId, bool isDown);
+
+   void cursorNudge(F32 x, F32 y);
    /// @}
 
    ///used by the tooltip resource
@@ -432,21 +446,6 @@ public:
 
 private:
    static const U32 MAX_GAMEPADS = 4; ///< The maximum number of supported gamepads
-
-#ifdef TORQUE_DEMO_PURCHASE
-private:
-   PurchaseScreen* mPurchaseScreen;
-   U32             mLastPurchaseHideTime;
-
-public:
-   void showPurchaseScreen(bool show, bool startBlocker, const char* location, bool doExit);
-   void updatePurchaseScreen(const char* value);
-#endif
-
-#ifdef TORQUE_DEMO_TIMEOUT
-private:
-   void checkTimeOut();
-#endif
 };
 
 #endif

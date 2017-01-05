@@ -49,6 +49,7 @@
 #include "collision/concretePolyList.h"
 #include "T3D/physics/physicsPlugin.h"
 #include "T3D/physics/physicsBody.h"
+#include "T3D/physics/physicsCollision.h"
 #include "environment/nodeListManager.h"
 
 #define MIN_METERS_PER_SEGMENT 1.0f
@@ -202,8 +203,8 @@ void MeshRoadNodeEvent::padListToSize()
       newlist->mDepths.merge(list->mDepths);
       newlist->mNormals.merge(list->mNormals);
 
-      mNodeList = newlist;
       delete list;
+      mNodeList = list = newlist;
    }
 
    // Pad our list end?
@@ -863,7 +864,7 @@ void MeshRoad::prepRenderImage( SceneRenderState* state )
 
          // We sort by the material then vertex buffer.
          ri->defaultKey = matInst->getStateHint();
-         ri->defaultKey2 = (U32)ri->vertBuff; // Not 64bit safe!
+         ri->defaultKey2 = (uintptr_t)ri->vertBuff; // Not 64bit safe!
 
          renderPass->addInst( ri );  
       }
@@ -1074,7 +1075,7 @@ void MeshRoad::unpackUpdate(NetConnection * con, BitStream * stream)
          stream->read( &mMaterialName[i] );
         
          if ( !Sim::findObject( mMaterialName[i], pMat ) )
-            Con::printf( "DecalRoad::unpackUpdate, failed to find Material of name &s!", mMaterialName[i].c_str() );
+            Con::printf( "DecalRoad::unpackUpdate, failed to find Material of name %s", mMaterialName[i].c_str() );
          else         
             mMaterial[i] = pMat;         
       }
@@ -1551,7 +1552,7 @@ bool MeshRoad::castRay( const Point3F &s, const Point3F &e, RayInfo *info )
       info->point.interpolate(start, end, out);
       info->face = -1;
       info->object = this;
-
+      info->material = this->mMatInst[0];
       return true;
    }
 
@@ -1712,8 +1713,6 @@ void MeshRoad::_generateSlices()
       }
    }
 
-   Point3F pos = getPosition();
-
    mWorldBox = box;
    resetObjectBox();
 
@@ -1722,6 +1721,8 @@ void MeshRoad::_generateSlices()
 
 void MeshRoad::_generateSegments()
 {
+   SAFE_DELETE( mPhysicsRep );
+
    mSegments.clear();
 
    for ( U32 i = 0; i < mSlices.size() - 1; i++ )
@@ -1736,8 +1737,22 @@ void MeshRoad::_generateSegments()
 
    if ( PHYSICSMGR )
    {
-      SAFE_DELETE( mPhysicsRep );
-      //mPhysicsRep = PHYSICSMGR->createBody();
+      ConcretePolyList polylist;
+      if ( buildPolyList( PLC_Collision, &polylist, getWorldBox(), getWorldSphere() ) )
+      {
+         polylist.triangulate();
+
+         PhysicsCollision *colShape = PHYSICSMGR->createCollision();
+         colShape->addTriangleMesh( polylist.mVertexList.address(),
+            polylist.mVertexList.size(),
+            polylist.mIndexList.address(),
+            polylist.mIndexList.size() / 3,
+            MatrixF::Identity );
+
+         PhysicsWorld *world = PHYSICSMGR->getWorld( isServerObject() ? "server" : "client" );
+         mPhysicsRep = PHYSICSMGR->createBody();
+         mPhysicsRep->init( colShape, 0, 0, this, world );
+      }
    }
 }
 

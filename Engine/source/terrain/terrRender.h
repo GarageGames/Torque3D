@@ -27,7 +27,7 @@
 #include "terrain/terrData.h"
 #endif
 
-enum TerrConstants 
+enum TerrConstants : U32
 {
    MaxClipPlanes       = 8, ///< left, right, top, bottom - don't need far tho...
    //MaxTerrainMaterials = 256,

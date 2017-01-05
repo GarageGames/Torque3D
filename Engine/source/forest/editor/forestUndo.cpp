@@ -31,8 +31,8 @@ ForestUndoAction::ForestUndoAction( const Resource<ForestData> &data,
                                     ForestEditorCtrl *editor,
                                     const char *description )
  : UndoAction( description ),
-   mData( data ),
-   mEditor( editor )
+   mEditor( editor ),
+   mData( data )
 {
 }
 
@@ -68,7 +68,7 @@ void ForestCreateUndoAction::redo()
       // We store the datablock ID rather than the actual pointer
       // since the pointer could go bad.
       ForestItemData *data;
-      if ( !Sim::findObject( (SimObjectId)(item.getData()), data ) )
+      if ( !Sim::findObject( (SimObjectId)(uintptr_t)(item.getData()), data ) )
       {
          Con::errorf( "ForestCreateUndoAction::redo() - ForestItemData for item to restore does not seem to exist. Undo stack may be hosed." );
          continue;
@@ -140,7 +140,7 @@ void ForestDeleteUndoAction::undo()
       // We store the datablock ID rather than the actual pointer
       // since the pointer could go bad.
       ForestItemData *data;
-      if ( !Sim::findObject( (SimObjectId)(item.getData()), data ) )
+      if ( !Sim::findObject( (SimObjectId)(uintptr_t)(item.getData()), data ) )
       {
          Con::errorf( "ForestDeleteUndoAction::undo() - ForestItemData for item to restore does not seem to exist. Undo stack may be hosed." );
          continue;
@@ -201,7 +201,7 @@ void ForestUpdateAction::_swapState()
       // We store the datablock ID rather than the actual pointer
       // since the pointer could go bad.
       ForestItemData *data;
-      if ( !Sim::findObject( (SimObjectId)(item.getData()), data ) )
+      if ( !Sim::findObject( (SimObjectId)(uintptr_t)(item.getData()), data ) )
       {
          Con::errorf( "ForestUpdateAction::_swapState() - ForestItemData for item to restore does not seem to exist. Undo stack may be hosed." );
          continue;

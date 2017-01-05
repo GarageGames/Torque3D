@@ -27,9 +27,10 @@
 #include "gfx/gfxStringEnumTranslate.h"
 #include "materials/materialFeatureTypes.h"
 #include "materials/materialFeatureData.h"
+#include "shaderGen/GLSL/shaderFeatureGLSL.h"
 
 
-GBufferConditionerGLSL::GBufferConditionerGLSL( const GFXFormat bufferFormat ) :
+GBufferConditionerGLSL::GBufferConditionerGLSL( const GFXFormat bufferFormat, const NormalSpace nrmSpace ) : 
       Parent( bufferFormat )
 {
    // Figure out how we should store the normal data. These are the defaults.
@@ -39,20 +40,18 @@ GBufferConditionerGLSL::GBufferConditionerGLSL( const GFXFormat bufferFormat ) :
    // Note:  We clear to a depth 1 (the w component) so
    // that the unrendered parts of the scene end up 
    // farthest to the camera.
-
+   const NormalStorage &twoCmpNrmStorageType = ( nrmSpace == WorldSpace ? Spherical : LambertAzimuthal );
    switch(bufferFormat)
    {
       case GFXFormatR8G8B8A8:
-         // TODO: Some kind of logic here. Spherical is better, but is more
-         // expensive. 
-         mNormalStorageType = Spherical;
+         mNormalStorageType = twoCmpNrmStorageType;
          mBitsPerChannel = 8;
          break;
 
       case GFXFormatR16G16B16A16F:
          // Floating point buffers don't need to encode negative values
          mCanWriteNegativeValues = true;
-         mNormalStorageType = Spherical;
+         mNormalStorageType = twoCmpNrmStorageType;
          mBitsPerChannel = 16;
          break;
 
@@ -61,7 +60,7 @@ GBufferConditionerGLSL::GBufferConditionerGLSL( const GFXFormat bufferFormat ) :
       // precision and high quality normals within a 64bit
       // buffer format.
       case GFXFormatR16G16B16A16:
-         mNormalStorageType = Spherical;
+         mNormalStorageType = twoCmpNrmStorageType;
          mBitsPerChannel = 16;
          break;
 
@@ -83,34 +82,49 @@ GBufferConditionerGLSL::~GBufferConditionerGLSL()
 void GBufferConditionerGLSL::processVert( Vector<ShaderComponent*> &componentList, 
                                           const MaterialFeatureData &fd )
 {
-   output = NULL;
+   // If we have a normal map then that feature will
+   // take care of passing gbNormal to the pixel shader.
+   if ( fd.features[MFT_NormalMap] )
+      return;
 
-   if( !fd.features[MFT_NormalMap] )
+   MultiLine *meta = new MultiLine;
+   output = meta;
+
+   // grab incoming vert normal
+   Var *inNormal = (Var*) LangElement::find( "normal" );
+   if (!inNormal)
    {
-      // grab incoming vert normal
-      Var *inNormal = (Var*) LangElement::find( "normal" );
-      AssertFatal( inNormal, "Something went bad with ShaderGen. The normal should be already defined." );
+      inNormal = new Var("normal", "vec3");
+      meta->addStatement(new GenOp("   @ = vec3( 0.0, 0.0, 1.0 );\r\n", new DecOp(inNormal)));
+      Con::errorf("ShagerGen: Something went bad with ShaderGen. The normal should be already defined.");
+   }
+   AssertFatal( inNormal, "Something went bad with ShaderGen. The normal should be already defined." );
 
-      // grab output for gbuffer normal
-      ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
-      Var *outNormal = connectComp->getElement( RT_TEXCOORD );
-      outNormal->setName( "gbNormal" );
-      outNormal->setType( "vec3" );
+   // grab output for gbuffer normal
+   ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
+   Var *outNormal = connectComp->getElement( RT_TEXCOORD );
+   outNormal->setName( "gbNormal" );
+   outNormal->setStructName( "OUT" );
+   outNormal->setType( "float3" );
 
-      // create objToWorld variable
-      Var *objToWorld = (Var*) LangElement::find( "objTrans" );
-      if( !objToWorld )
-      {
-         objToWorld = new Var;
-         objToWorld->setType( "mat4" );
-         objToWorld->setName( "objTrans" );
-         objToWorld->uniform = true;
-         objToWorld->constSortPos = cspPrimitive;   
-      }
+   if( !fd.features[MFT_ParticleNormal] )
+   {
+      // Kick out the view-space normal
 
-      // Kick out the world-space normal
-      LangElement *statement = new GenOp( "   @ = vec3(@ * vec4(normalize(@), 0.0));\r\n", outNormal, objToWorld, inNormal );
-      output = statement;
+      // TODO: Total hack because Conditioner is directly derived
+      // from ShaderFeature and not from ShaderFeatureGLSL.
+      NamedFeatureGLSL dummy( String::EmptyString );
+      dummy.setInstancingFormat( mInstancingFormat );
+      Var *worldViewOnly = dummy.getWorldView( componentList, fd.features[MFT_UseInstancing], meta );
+
+      meta->addStatement(  new GenOp("   @ = tMul(@, float4( normalize(@), 0.0 ) ).xyz;\r\n", 
+                              outNormal, worldViewOnly, inNormal ) );
+   }
+   else
+   {
+      // Assume the particle normal generator has already put this in view space
+      // and normalized it
+      meta->addStatement( new GenOp( "   @ = @;\r\n", outNormal, inNormal ) );
    }
 }
 
@@ -129,7 +143,8 @@ void GBufferConditionerGLSL::processPix(  Vector<ShaderComponent*> &componentLis
    {
       gbNormal = connectComp->getElement( RT_TEXCOORD );
       gbNormal->setName( "gbNormal" );
-      gbNormal->setType( "vec3" );
+      gbNormal->setStructName( "IN" );
+      gbNormal->setType( "float3" );
       gbNormal->mapsToSampler = false;
       gbNormal->uniform = false;
    }
@@ -143,15 +158,44 @@ void GBufferConditionerGLSL::processPix(  Vector<ShaderComponent*> &componentLis
 
 
    Var *unconditionedOut = new Var;
-   unconditionedOut->setType("vec4");
+   unconditionedOut->setType("float4");
    unconditionedOut->setName("normal_depth");
 
    LangElement *outputDecl = new DecOp( unconditionedOut );
 
+   // If we're doing prepass blending then we need 
+   // to steal away the alpha channel before the 
+   // conditioner stomps on it.
+   Var *alphaVal = NULL;
+   if ( fd.features[ MFT_IsTranslucentZWrite ] )
+   {
+      alphaVal = new Var( "outAlpha", "float" );
+      meta->addStatement( new GenOp( "   @ = OUT_col1.a; // MFT_IsTranslucentZWrite\r\n", new DecOp( alphaVal ) ) );
+   }
+
+   // If using interlaced normals, invert the normal
+   if(fd.features[MFT_InterlacedPrePass])
+   {
+      // NOTE: Its safe to not call ShaderFeatureGLSL::addOutVpos() in the vertex
+      // shader as for SM 3.0 nothing is needed there.
+      Var *Vpos = (Var*) LangElement::find( "gl_Position" ); //Var *Vpos = ShaderFeatureGLSL::getInVpos( meta, componentList );
+
+      Var *iGBNormal = new Var( "interlacedGBNormal", "float3" );
+      meta->addStatement(new GenOp("   @ = (frac(@.y * 0.5) < 0.1 ? reflect(@, float3(0.0, -1.0, 0.0)) : @);\r\n", new DecOp(iGBNormal), Vpos, gbNormal, gbNormal));
+      gbNormal = iGBNormal;
+   }
+
    // NOTE: We renormalize the normal here as they
    // will not stay normalized during interpolation.
-   meta->addStatement( new GenOp("   @ = @;", outputDecl, new GenOp( "vec4(normalize(@), @)", gbNormal, depth ) ) );
+   meta->addStatement( new GenOp("   @ = @;", outputDecl, new GenOp( "float4(normalize(@), @)", gbNormal, depth ) ) );
    meta->addStatement( assignOutput( unconditionedOut ) );
+
+   // If we have an alpha var then we're doing prepass lerp blending.
+   if ( alphaVal )
+   {
+      Var *outColor = (Var*)LangElement::find( getOutputTargetVarName( DefaultTarget ) );
+      meta->addStatement( new GenOp( "   @.ba = float2( 0, @ ); // MFT_IsTranslucentZWrite\r\n", outColor, alphaVal ) );
+   }
 
    output = meta;
 }
@@ -180,7 +224,7 @@ Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const Str
    {
       Var *methodVar = new Var;
       methodVar->setName(methodName);
-      methodVar->setType("vec4");
+      methodVar->setType("float4");
       DecOp *methodDecl = new DecOp(methodVar);
 
       Var *prepassSampler = new Var;
@@ -190,12 +234,12 @@ Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const Str
 
       Var *screenUV = new Var;
       screenUV->setName("screenUVVar");
-      screenUV->setType("vec2");
+      screenUV->setType("float2");
       DecOp *screenUVDecl = new DecOp(screenUV);
 
       Var *bufferSample = new Var;
       bufferSample->setName("bufferSample");
-      bufferSample->setType("vec4");
+      bufferSample->setType("float4");
       DecOp *bufferSampleDecl = new DecOp(bufferSample); 
 
       meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, prepassSamplerDecl, screenUVDecl ) );
@@ -204,9 +248,18 @@ Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const Str
 
       meta->addStatement( new GenOp( "   // Sampler g-buffer\r\n" ) );
 
+#ifdef TORQUE_OS_XENON
+      meta->addStatement( new GenOp( "   @;\r\n", bufferSampleDecl ) );
+      meta->addStatement( new GenOp( "   asm { tfetch2D @, @, @, MagFilter = point, MinFilter = point, MipFilter = point };\r\n", bufferSample, screenUV, prepassSampler ) );
+#else
       // The gbuffer has no mipmaps, so use tex2dlod when 
-      // so that the shader compiler can optimize.
-      meta->addStatement( new GenOp( "   @ = texture2DLod(@, @, 0.0);\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
+      // possible so that the shader compiler can optimize.
+      meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
+      meta->addStatement( new GenOp( "      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
+      meta->addStatement( new GenOp( "   #else\r\n" ) );
+      meta->addStatement( new GenOp( "      @ = tex2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
+      meta->addStatement( new GenOp( "   #endif\r\n\r\n" ) );
+#endif
 
       // We don't use this way of passing var's around, so this should cause a crash
       // if something uses this improperly
@@ -218,39 +271,67 @@ Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const Str
 
 GenOp* GBufferConditionerGLSL::_posnegEncode( GenOp *val )
 {
-   return mCanWriteNegativeValues ? val : new GenOp("0.5 * (@ + 1.0)", val);
+   if(mNormalStorageType == LambertAzimuthal)
+      return mCanWriteNegativeValues ? val : new GenOp(avar("(%f * (@ + %f))", 1.0f/(M_SQRT2_F * 2.0f), M_SQRT2_F), val);
+   else
+      return mCanWriteNegativeValues ? val : new GenOp("(0.5 * (@ + 1.0))", val);
 }
 
 GenOp* GBufferConditionerGLSL::_posnegDecode( GenOp *val )
 {
-   return mCanWriteNegativeValues ? val : new GenOp("@ * 2.0 - 1.0", val);
+   if(mNormalStorageType == LambertAzimuthal)
+      return mCanWriteNegativeValues ? val : new GenOp(avar("(@ * %f - %f)", M_SQRT2_F * 2.0f, M_SQRT2_F), val);
+   else
+      return mCanWriteNegativeValues ? val : new GenOp("(@ * 2.0 - 1.0)", val);
 }
 
 Var* GBufferConditionerGLSL::_conditionOutput( Var *unconditionedOutput, MultiLine *meta )
 {
    Var *retVar = new Var;
-   retVar->setType("vec4");
+   retVar->setType("float4");
    retVar->setName("_gbConditionedOutput");
    LangElement *outputDecl = new DecOp( retVar );
 
    switch(mNormalStorageType)
    {
       case CartesianXYZ:
-         meta->addStatement( new GenOp( "   // g-buffer conditioner: vec4(normal.xyz, depth)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);\r\n", outputDecl, 
+         meta->addStatement( new GenOp( "   // g-buffer conditioner: float4(normal.xyz, depth)\r\n" ) );
+         meta->addStatement( new GenOp( "   @ = float4(@, @.a);\r\n", outputDecl, 
             _posnegEncode(new GenOp("@.xyz", unconditionedOutput)), unconditionedOutput ) );
          break;
 
       case CartesianXY:
-         meta->addStatement( new GenOp( "   // g-buffer conditioner: vec4(normal.xy, depth Hi + z-sign, depth Lo)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);", outputDecl, 
-            _posnegEncode(new GenOp("vec3(@.xy, sign(@.z))", unconditionedOutput, unconditionedOutput)), unconditionedOutput ) );
+         meta->addStatement( new GenOp( "   // g-buffer conditioner: float4(normal.xy, depth Hi + z-sign, depth Lo)\r\n" ) );
+         meta->addStatement( new GenOp( "   @ = float4(@, @.a);", outputDecl, 
+            _posnegEncode(new GenOp("float3(@.xy, sign(@.z))", unconditionedOutput, unconditionedOutput)), unconditionedOutput ) );
          break;
 
       case Spherical:
-         meta->addStatement( new GenOp( "   // g-buffer conditioner: vec4(normal.theta, normal.phi, depth Hi, depth Lo)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, 0.0, @.a);\r\n", outputDecl, 
-            _posnegEncode(new GenOp("vec2(atan2(@.y, @.x) / 3.14159265358979323846f, @.z)", unconditionedOutput, unconditionedOutput, unconditionedOutput ) ), 
+         meta->addStatement( new GenOp( "   // g-buffer conditioner: float4(normal.theta, normal.phi, depth Hi, depth Lo)\r\n" ) );
+         meta->addStatement( new GenOp( "   @ = float4(@, 0.0, @.a);\r\n", outputDecl, 
+            _posnegEncode(new GenOp("float2(atan2(@.y, @.x) / 3.14159265358979323846f, @.z)", unconditionedOutput, unconditionedOutput, unconditionedOutput ) ), 
+            unconditionedOutput ) );
+
+         // HACK: This fixes the noise present when using a floating point
+         // gbuffer on Geforce cards and the "flat areas unlit" issues.
+         //
+         // We need work around atan2() above to fix this issue correctly
+         // without the extra overhead of this test.
+         //
+         meta->addStatement( new GenOp( "   if ( abs( dot( @.xyz, float3( 0.0, 0.0, 1.0 ) ) ) > 0.999f ) @ = float4( 0, 1 * sign( @.z ), 0, @.a );\r\n", 
+            unconditionedOutput, retVar, unconditionedOutput, unconditionedOutput ) );
+         break;
+
+      case LambertAzimuthal:
+         //http://en.wikipedia.org/wiki/Lambert_azimuthal_equal-area_projection
+         //
+         // Note we're casting to half to use partial precision
+         // sqrt which is much faster on older Geforces while
+         // still being acceptable for normals.
+         //
+         meta->addStatement( new GenOp( "   // g-buffer conditioner: float4(normal.X, normal.Y, depth Hi, depth Lo)\r\n" ) );
+         meta->addStatement( new GenOp( "   @ = float4(@, 0.0, @.a);\r\n", outputDecl, 
+            _posnegEncode(new GenOp("sqrt(half(2.0/(1.0 - @.y))) * half2(@.xz)", unconditionedOutput, unconditionedOutput)), 
             unconditionedOutput ) );
          break;
    }
@@ -258,12 +339,11 @@ Var* GBufferConditionerGLSL::_conditionOutput( Var *unconditionedOutput, MultiLi
    // Encode depth into two channels
    if(mNormalStorageType != CartesianXYZ)
    {
-      const U64 maxValPerChannel = 1 << mBitsPerChannel;
-      const U64 extraVal = (maxValPerChannel * maxValPerChannel - 1) - (maxValPerChannel - 1) * 2;
+      const U64 maxValPerChannel = (U64)1 << mBitsPerChannel;
       meta->addStatement( new GenOp( "   \r\n   // Encode depth into hi/lo\r\n" ) );
-      meta->addStatement( new GenOp( avar( "   vec3 _tempDepth = fract(@.a * vec3(1.0, %llu.0, %llu.0));\r\n", maxValPerChannel - 1, extraVal ), 
+      meta->addStatement( new GenOp( avar( "   float2 _tempDepth = frac(@.a * float2(1.0, %llu.0));\r\n", maxValPerChannel - 1 ), 
          unconditionedOutput ) );
-      meta->addStatement( new GenOp( avar( "   @.zw = _tempDepth.xy - _tempDepth.yz * vec2(1.0/%llu.0, 1.0/%llu.0);\r\n\r\n", maxValPerChannel - 1, maxValPerChannel - 1  ), 
+      meta->addStatement( new GenOp( avar( "   @.zw = _tempDepth.xy - _tempDepth.yy * float2(1.0/%llu.0, 0.0);\r\n\r\n", maxValPerChannel - 1 ), 
          retVar ) );
    }
 
@@ -274,42 +354,52 @@ Var* GBufferConditionerGLSL::_conditionOutput( Var *unconditionedOutput, MultiLi
 Var* GBufferConditionerGLSL::_unconditionInput( Var *conditionedInput, MultiLine *meta )
 {
    Var *retVar = new Var;
-   retVar->setType("vec4");
+   retVar->setType("float4");
    retVar->setName("_gbUnconditionedInput");
    LangElement *outputDecl = new DecOp( retVar );
 
    switch(mNormalStorageType)
    {
       case CartesianXYZ:
-         meta->addStatement( new GenOp( "   // g-buffer unconditioner: vec4(normal.xyz, depth)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);\r\n", outputDecl, 
+         meta->addStatement( new GenOp( "   // g-buffer unconditioner: float4(normal.xyz, depth)\r\n" ) );
+         meta->addStatement( new GenOp( "   @ = float4(@, @.a);\r\n", outputDecl, 
             _posnegDecode(new GenOp("@.xyz", conditionedInput)), conditionedInput ) );
          break;
 
       case CartesianXY:
-         meta->addStatement( new GenOp( "   // g-buffer unconditioner: vec4(normal.xy, depth Hi + z-sign, depth Lo)\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(@, @.a);\r\n", outputDecl, 
+         meta->addStatement( new GenOp( "   // g-buffer unconditioner: float4(normal.xy, depth Hi + z-sign, depth Lo)\r\n" ) );
+         meta->addStatement( new GenOp( "   @ = float4(@, @.a);\r\n", outputDecl, 
             _posnegDecode(new GenOp("@.xyz", conditionedInput)), conditionedInput ) );
          meta->addStatement( new GenOp( "   @.z *= sqrt(1.0 - dot(@.xy, @.xy));\r\n", retVar, retVar, retVar ) );
          break;
 
       case Spherical:
-         meta->addStatement( new GenOp( "   // g-buffer unconditioner: vec4(normal.theta, normal.phi, depth Hi, depth Lo)\r\n" ) );
-         meta->addStatement( new GenOp( "   vec2 spGPUAngles = @;\r\n", _posnegDecode(new GenOp("@.xy", conditionedInput)) ) );
-         meta->addStatement( new GenOp( "   vec2 sincosTheta;\r\n" ) );
-         meta->addStatement( new GenOp( "   sincosTheta.x = sin(spGPUAngles.x * 3.14159265358979323846);\r\n" ) );
-         meta->addStatement( new GenOp( "   sincosTheta.y = cos(spGPUAngles.x * 3.14159265358979323846);\r\n" ) );
-         meta->addStatement( new GenOp( "   vec2 sincosPhi = vec2(sqrt(1.0 - spGPUAngles.y * spGPUAngles.y), spGPUAngles.y);\r\n" ) );
-         meta->addStatement( new GenOp( "   @ = vec4(sincosTheta.y * sincosPhi.x, sincosTheta.x * sincosPhi.x, sincosPhi.y, @.a);\r\n", outputDecl, conditionedInput ) );
+         meta->addStatement( new GenOp( "   // g-buffer unconditioner: float4(normal.theta, normal.phi, depth Hi, depth Lo)\r\n" ) );
+         meta->addStatement( new GenOp( "   float2 spGPUAngles = @;\r\n", _posnegDecode(new GenOp("@.xy", conditionedInput)) ) );
+         meta->addStatement( new GenOp( "   float2 sincosTheta;\r\n" ) );
+         meta->addStatement( new GenOp( "   sincos(spGPUAngles.x * 3.14159265358979323846f, sincosTheta.x, sincosTheta.y);\r\n" ) );
+         meta->addStatement( new GenOp( "   float2 sincosPhi = float2(sqrt(1.0 - spGPUAngles.y * spGPUAngles.y), spGPUAngles.y);\r\n" ) );
+         meta->addStatement( new GenOp( "   @ = float4(sincosTheta.y * sincosPhi.x, sincosTheta.x * sincosPhi.x, sincosPhi.y, @.a);\r\n", outputDecl, conditionedInput ) );
+         break;
+
+      case LambertAzimuthal:
+         // Note we're casting to half to use partial precision
+         // sqrt which is much faster on older Geforces while
+         // still being acceptable for normals.
+         //      
+         meta->addStatement( new GenOp( "   // g-buffer unconditioner: float4(normal.X, normal.Y, depth Hi, depth Lo)\r\n" ) );
+         meta->addStatement( new GenOp( "   float2 _inpXY = @;\r\n", _posnegDecode(new GenOp("@.xy", conditionedInput)) ) );
+         meta->addStatement( new GenOp( "   float _xySQ = dot(_inpXY, _inpXY);\r\n" ) );
+         meta->addStatement( new GenOp( "   @ = float4( sqrt(half(1.0 - (_xySQ / 4.0))) * _inpXY, -1.0 + (_xySQ / 2.0), @.a).xzyw;\r\n", outputDecl, conditionedInput ) );
          break;
    }
 
    // Recover depth from encoding
    if(mNormalStorageType != CartesianXYZ)
    {
-      const U64 maxValPerChannel = 1 << mBitsPerChannel;
+      const U64 maxValPerChannel = (U64)1 << mBitsPerChannel;
       meta->addStatement( new GenOp( "   \r\n   // Decode depth\r\n" ) );
-      meta->addStatement( new GenOp( avar( "   @.w = dot( @.zw, vec2(1.0, 1.0/%llu.0));\r\n", maxValPerChannel - 1 ), 
+      meta->addStatement( new GenOp( avar( "   @.w = dot( @.zw, float2(1.0, 1.0/%llu.0));\r\n", maxValPerChannel - 1 ), 
          retVar, conditionedInput ) );
    }
 

@@ -73,7 +73,7 @@ class SFXSoundscape
          FlagUnique        = BIT( 1 ),    ///< No other instance of this ambience on stack.
       };
       
-      enum DirtyBits
+      enum DirtyBits : U32
       {
          AmbienceDirty = BIT( 0 ),        ///< Associated ambience has changed.
          AllDirty = 0xFFFFFFFF

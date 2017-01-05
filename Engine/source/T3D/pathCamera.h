@@ -83,7 +83,7 @@ private:
    S32 mNodeBase;
    S32 mNodeCount;
    F32 mPosition;
-   int mState;
+   S32 mState;
    F32 mTarget;
    bool mTargetSet;
 
@@ -93,7 +93,7 @@ private:
 public:
    DECLARE_CONOBJECT(PathCamera);
    
-   DECLARE_CALLBACK( void, onNode, (const char* node));
+   DECLARE_CALLBACK( void, onNode, (S32 node));
 
    PathCamera();
    ~PathCamera();

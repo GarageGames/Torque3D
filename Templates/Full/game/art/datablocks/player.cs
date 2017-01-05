@@ -385,6 +385,7 @@ datablock ParticleData(LightPuff)
    times[0]      = 0.3;
    times[1]      = 1.0;
    times[2] = 1.0;
+   textureName = "art/particles/dustParticle.png";
 };
 
 datablock ParticleEmitterData(LightPuffEmitter)
@@ -481,7 +482,7 @@ datablock DebrisData( PlayerDebris )
 datablock PlayerData(DefaultPlayerData)
 {
    renderFirstPerson = false;
-
+   firstPersonShadows = true;
    computeCRC = false;
 
    // Third person shape
@@ -493,7 +494,6 @@ datablock PlayerData(DefaultPlayerData)
    imageAnimPrefixFP = "soldier";
    shapeNameFP[0] = "art/shapes/actors/Soldier/FP/FP_SoldierArms.DAE";
 
-   canObserve = 1;
    cmdCategory = "Clients";
 
    cameraDefaultFov = 55.0;
@@ -516,7 +516,6 @@ datablock PlayerData(DefaultPlayerData)
    maxDamage = 100;
    maxEnergy =  60;
    repairRate = 0.33;
-   energyPerDamagePoint = 75;
 
    rechargeRate = 0.256;
 
@@ -543,6 +542,7 @@ datablock PlayerData(DefaultPlayerData)
    maxCrouchBackwardSpeed = 2.0;
    maxCrouchSideSpeed = 2.0;
 
+   swimForce = 4320;
    maxUnderwaterForwardSpeed = 8.4;
    maxUnderwaterBackwardSpeed = 7.8;
    maxUnderwaterSideSpeed = 4.0;
@@ -648,7 +648,6 @@ datablock PlayerData(DefaultPlayerData)
 
    //exitingWater         = ExitingWaterLightSound;
 
-   observeParameters = "0.5 4.5 4.5";
 
    cameraMinDist = "0";
    DecalData = "PlayerFootprint";

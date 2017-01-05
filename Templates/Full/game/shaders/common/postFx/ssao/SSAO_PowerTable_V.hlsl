@@ -33,7 +33,7 @@ PFXVertToPix main( PFXVert IN )
 {
    PFXVertToPix OUT;
    
-   OUT.hpos = IN.pos;
+   OUT.hpos = float4(IN.pos,1.0);
    OUT.uv0 = IN.uv; //viewportCoordToRenderTarget( IN.uv, rtParams0 ); 
    OUT.uv1 = IN.uv; //viewportCoordToRenderTarget( IN.uv, rtParams1 ); 
    OUT.uv2 = IN.uv; //viewportCoordToRenderTarget( IN.uv, rtParams2 ); 

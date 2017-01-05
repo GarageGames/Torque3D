@@ -28,6 +28,9 @@
 #include "core/util/safeDelete.h"
 #include "windowManager/platformCursorController.h"
 #include "windowManager/windowInputGenerator.h"
+#ifndef _SIGNAL_H_ //Volumetric Fog
+#include "core/util/tSignal.h"
+#endif
 
 //forward decl's
 class PlatformWindowManager;
@@ -35,7 +38,7 @@ class GFXDevice;
 struct GFXVideoMode;
 class GFXWindowTarget;
 class IProcessInput;
-
+typedef Signal<void(PlatformWindow *PlatformWindow, bool resize)> ScreenResChangeSignal;
 /// Abstract representation of a native OS window.
 ///
 /// Every windowing system has its own representations and conventions as
@@ -89,23 +92,28 @@ protected:
    /// Offscreen Render
    bool mOffscreenRender;
 
+   /// This is set as part of the canvas being shown, and flags that the windows should render as normal from now on.
+   // Basically a flag that lets the window manager know that we've handled the splash screen, and to operate as normal.
+   bool mDisplayWindow;
+
    /// Protected constructor so that the win
    PlatformWindow()
    {
       mIsBackground = false; // This could be toggled to true to prefer performance.
       mMinimumSize.set(0,0);
-		mLockedSize.set(0,0);
-		mResizeLocked = false;
+      mLockedSize.set(0,0);
+      mResizeLocked = false;
       mEnableKeyboardTranslation = false;
       mEnableAccelerators = true;
       mCursorController = NULL;
+      mSuppressReset = false;
+      mOffscreenRender = false;
+      mDisplayWindow = false;
+
       // This controller maps window input (Mouse/Keyboard) to a generic input consumer
       mWindowInputGenerator = new WindowInputGenerator( this );
-      mSuppressReset = false;
-
-      mOffscreenRender = false;
    }
-
+   static ScreenResChangeSignal smScreenResChangeSignal;
 public:
 
    /// To get rid of a window, just delete it. Make sure the GFXDevice is
@@ -119,9 +127,20 @@ public:
    /// Get the WindowController associated with this window
    virtual void setInputController( IProcessInput *controller ) { if( mWindowInputGenerator ) mWindowInputGenerator->setInputController( controller ); };
 
+   WindowInputGenerator* getInputGenerator() const { return mWindowInputGenerator; }
+
    /// Get the ID that uniquely identifies this window in the context of its
    /// window manager.
    virtual WindowId getWindowId() { return 0; };
+
+   enum WindowSystem
+   {
+      WindowSystem_Unknown = 0,
+      WindowSystem_Windows,
+      WindowSystem_X11,
+   };
+
+   virtual void* getSystemWindow(const WindowSystem system) { return NULL; }
 
    /// Set the flag that determines whether to suppress a GFXDevice reset
    inline void setSuppressReset(bool suppress) { mSuppressReset = suppress; };
@@ -142,7 +161,7 @@ public:
    virtual GFXWindowTarget *getGFXTarget()=0;
 
    /// Set the video mode for this window.
-   virtual void setVideoMode(const GFXVideoMode &mode)=0;
+   virtual void setVideoMode(const GFXVideoMode &mode);
 
    /// Get our current video mode - if the window has been resized, it will
    /// reflect this.
@@ -180,6 +199,8 @@ public:
    /// This is called to poll the window as to it's idle state.  
    virtual bool getOffscreenRender() { return mOffscreenRender; };
 
+   /// Set whether this window is should display as normal
+   virtual void setDisplayWindow(bool val ) { mDisplayWindow = val; };
 
    /// Set Focused State (Foreground)
    ///
@@ -479,6 +500,7 @@ public:
    IdleEvent         idleEvent;
 
    /// @}
+   static ScreenResChangeSignal& getScreenResChangeSignal() { return smScreenResChangeSignal; }
    
    /// Get the platform specific object needed to create or attach an accelerated
    /// graohics drawing context on or to the window
@@ -489,6 +511,7 @@ public:
    virtual void* getPlatformDrawable() const = 0;
 protected:
    virtual void _setFullscreen(const bool fullScreen) {};
+   virtual void _setVideoMode(const GFXVideoMode &mode) {};
 };
 
 #endif

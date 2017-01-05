@@ -279,10 +279,11 @@ void TerrainConvex::getFeatures(const MatrixF& mat,const VectorF& n, ConvexFeatu
    cf->mFaceList.increment(numFaces);
    for (i = 0; i < numFaces; i++)
    {
-      cf->mFaceList[faceListStart + i].normal    = normal[fp[i * 4 + 0]];
-      cf->mFaceList[faceListStart + i].vertex[0] = vertexCount + fp[i * 4 + 1];
-      cf->mFaceList[faceListStart + i].vertex[1] = vertexCount + fp[i * 4 + 2];
-      cf->mFaceList[faceListStart + i].vertex[2] = vertexCount + fp[i * 4 + 3];
+      ConvexFeature::Face& face = cf->mFaceList[faceListStart + i];
+      face.normal = normal[fp[i * 4 + 0]];
+      face.vertex[0] = vertexCount + fp[i * 4 + 1];
+      face.vertex[1] = vertexCount + fp[i * 4 + 2];
+      face.vertex[2] = vertexCount + fp[i * 4 + 3];
    }
 }
 
@@ -422,7 +423,7 @@ void TerrainBlock::buildConvex(const Box3F& box,Convex* convex)
 
          // Build points
          Point3F* pos = cp->point;
-         for (int i = 0; i < 4 ; i++,pos++) {
+         for (S32 i = 0; i < 4 ; i++,pos++) {
             S32 dx = i >> 1;
             S32 dy = dx ^ (i & 1);
             pos->x = (F32)((x + dx) * mSquareSize);
@@ -480,7 +481,7 @@ static void clrbuf(U32* p, U32 s)
       *p++ = U32_MAX;
 }
 
-bool TerrainBlock::buildPolyList(PolyListContext, AbstractPolyList* polyList, const Box3F &box, const SphereF&)
+bool TerrainBlock::buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF&)
 {
 	PROFILE_SCOPE( TerrainBlock_buildPolyList );
 
@@ -530,11 +531,24 @@ bool TerrainBlock::buildPolyList(PolyListContext, AbstractPolyList* polyList, co
 
       swap(vb[0],vb[1]);
       clrbuf(vb[1],xExt + 1);
+
+      F32 wy1 = y * mSquareSize, wy2 = (y + 1) * mSquareSize;
+      if(context == PLC_Navigation &&
+         ((wy1 > osBox.maxExtents.y && wy2 > osBox.maxExtents.y) ||
+          (wy1 < osBox.minExtents.y && wy2 < osBox.minExtents.y)))
+         continue;
+
       //
       for (S32 x = xStart; x < xEnd; x++) 
       {
          S32 xi = x & BlockMask;
          const TerrainSquare *sq = mFile->findSquare( 0, xi, yi );
+
+         F32 wx1 = x * mSquareSize, wx2 = (x + 1) * mSquareSize;
+         if(context == PLC_Navigation &&
+            ((wx1 > osBox.maxExtents.x && wx2 > osBox.maxExtents.x) ||
+             (wx1 < osBox.minExtents.x && wx2 < osBox.minExtents.x)))
+            continue;
 
          if ( x != xi || y != yi )
             continue;
@@ -656,10 +670,10 @@ bool TerrainBlock::castRayI(const Point3F &start, const Point3F &end, RayInfo *i
    Point3F pStart(start.x * invBlockWorldSize, start.y * invBlockWorldSize, start.z);
    Point3F pEnd(end.x * invBlockWorldSize, end.y * invBlockWorldSize, end.z);
 
-   int blockX = (S32)mFloor(pStart.x);
-   int blockY = (S32)mFloor(pStart.y);
+   S32 blockX = (S32)mFloor(pStart.x);
+   S32 blockY = (S32)mFloor(pStart.y);
 
-   int dx, dy;
+   S32 dx, dy;
 
    F32 invDeltaX;
    if(pEnd.x == pStart.x)
@@ -891,7 +905,7 @@ bool TerrainBlock::castRayBlock( const Point3F &pStart,
          }
          continue;
       }
-      int subSqWidth = 1 << (level - 1);
+      S32 subSqWidth = 1 << (level - 1);
       F32 xIntercept = (blockPos.x + subSqWidth) * invBlockSize;
       F32 xInt = calcInterceptX(pStart.x, invDeltaX, xIntercept);
       F32 yIntercept = (blockPos.y + subSqWidth) * invBlockSize;

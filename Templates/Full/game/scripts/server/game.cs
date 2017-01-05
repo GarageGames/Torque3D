@@ -50,6 +50,7 @@ function onServerCreated()
 
    // Load up any objects or datablocks saved to the editor managed scripts
    %datablockFiles = new ArrayObject();
+   %datablockFiles.add( "art/ribbons/ribbonExec.cs" );   
    %datablockFiles.add( "art/particles/managedParticleData.cs" );
    %datablockFiles.add( "art/particles/managedParticleEmitterData.cs" );
    %datablockFiles.add( "art/decals/managedDecalData.cs" );

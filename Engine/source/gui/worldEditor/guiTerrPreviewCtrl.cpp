@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "console/consoleTypes.h"
 #include "terrain/terrData.h"
 #include "gui/worldEditor/guiTerrPreviewCtrl.h"
@@ -87,41 +88,35 @@ void GuiTerrPreviewCtrl::initPersistFields()
 }
 
 
-ConsoleMethod( GuiTerrPreviewCtrl, reset, void, 2, 2, "Reset the view of the terrain.")
+DefineConsoleMethod( GuiTerrPreviewCtrl, reset, void, (), , "Reset the view of the terrain.")
 {
    object->reset();
 }
 
-ConsoleMethod( GuiTerrPreviewCtrl, setRoot, void, 2, 2, "Add the origin to the root and reset the origin.")
+DefineConsoleMethod( GuiTerrPreviewCtrl, setRoot, void, (), , "Add the origin to the root and reset the origin.")
 {
    object->setRoot();
 }
 
-ConsoleMethod( GuiTerrPreviewCtrl, getRoot, const char *, 2, 2, "Return a Point2F representing the position of the root.")
+DefineConsoleMethod( GuiTerrPreviewCtrl, getRoot, Point2F, (), , "Return a Point2F representing the position of the root.")
 {
-   Point2F p = object->getRoot();
+   return object->getRoot();
 
-   static char rootbuf[32];
-   dSprintf(rootbuf,sizeof(rootbuf),"%g %g", p.x, -p.y);
-   return rootbuf;
 }
 
-ConsoleMethod( GuiTerrPreviewCtrl, setOrigin, void, 4, 4, "(float x, float y)"
+DefineConsoleMethod( GuiTerrPreviewCtrl, setOrigin, void, (Point2F pos), , "(float x, float y)"
               "Set the origin of the view.")
 {
-   object->setOrigin( Point2F( dAtof(argv[2]), -dAtof(argv[3]) ) );
+   object->setOrigin( pos );
 }
 
-ConsoleMethod( GuiTerrPreviewCtrl, getOrigin, const char*, 2, 2, "Return a Point2F containing the position of the origin.")
+DefineConsoleMethod( GuiTerrPreviewCtrl, getOrigin, Point2F, (), , "Return a Point2F containing the position of the origin.")
 {
-   Point2F p = object->getOrigin();
+   return object->getOrigin();
 
-   static char originbuf[32];
-   dSprintf(originbuf,sizeof(originbuf),"%g %g", p.x, -p.y);
-   return originbuf;
 }
 
-ConsoleMethod( GuiTerrPreviewCtrl, getValue, const char*, 2, 2, "Returns a 4-tuple containing: root_x root_y origin_x origin_y")
+DefineConsoleMethod( GuiTerrPreviewCtrl, getValue, const char*, (), , "Returns a 4-tuple containing: root_x root_y origin_x origin_y")
 {
    Point2F r = object->getRoot();
    Point2F o = object->getOrigin();
@@ -131,11 +126,11 @@ ConsoleMethod( GuiTerrPreviewCtrl, getValue, const char*, 2, 2, "Returns a 4-tup
    return valuebuf;
 }
 
-ConsoleMethod( GuiTerrPreviewCtrl, setValue, void, 3, 3, "Accepts a 4-tuple in the same form as getValue returns.\n\n"
+DefineConsoleMethod( GuiTerrPreviewCtrl, setValue, void, (const char * tuple), , "Accepts a 4-tuple in the same form as getValue returns.\n\n"
               "@see GuiTerrPreviewCtrl::getValue()")
 {
    Point2F r,o;
-   dSscanf(argv[2],"%g %g %g %g", &r.x, &r.y, &o.x, &o.y);
+   dSscanf(tuple, "%g %g %g %g", &r.x, &r.y, &o.x, &o.y);
    r.y = -r.y;
    o.y = -o.y;
    object->reset();
@@ -245,7 +240,7 @@ void GuiTerrPreviewCtrl::onRender(Point2I offset, const RectI &updateRect)
    for(U32 i = 0; i < GFX->getNumSamplers(); i++)
       GFX->setTexture(i, NULL);
    
-   GFX->disableShaders();
+   GFX->setupGenericShaders(GFXDevice::GSModColorTexture);
    
    Point2F terrPos(terrBlock->getPosition().x, terrBlock->getPosition().y);
 
@@ -270,18 +265,18 @@ void GuiTerrPreviewCtrl::onRender(Point2I offset, const RectI &updateRect)
 
          // the texture if flipped horz to reflect how the terrain is really drawn
          PrimBuild::color3f(1.0f, 1.0f, 1.0f);
-         PrimBuild::begin(GFXTriangleFan, 4);
-            PrimBuild::texCoord2f(textureP1.x, textureP2.y);
-            PrimBuild::vertex2f(screenP1.x, screenP2.y);       // left bottom
+         PrimBuild::begin(GFXTriangleStrip, 4);
+         PrimBuild::texCoord2f(textureP1.x, textureP1.y);
+         PrimBuild::vertex2f(screenP1.x, screenP1.y);       // left top
 
-            
-            PrimBuild::texCoord2f(textureP2.x, textureP2.y);
-            PrimBuild::vertex2f(screenP2.x, screenP2.y);       // right bottom
-            PrimBuild::texCoord2f(textureP2.x, textureP1.y);
-            PrimBuild::vertex2f(screenP2.x, screenP1.y);       // right top
+         PrimBuild::texCoord2f(textureP2.x, textureP1.y);
+         PrimBuild::vertex2f(screenP2.x, screenP1.y);       // right top
 
-            PrimBuild::texCoord2f(textureP1.x, textureP1.y);
-            PrimBuild::vertex2f(screenP1.x, screenP1.y);       // left top
+         PrimBuild::texCoord2f(textureP1.x, textureP2.y);
+         PrimBuild::vertex2f(screenP1.x, screenP2.y);       // left bottom
+
+         PrimBuild::texCoord2f(textureP2.x, textureP2.y);
+         PrimBuild::vertex2f(screenP2.x, screenP2.y);       // right bottom
          PrimBuild::end();
       }
    }

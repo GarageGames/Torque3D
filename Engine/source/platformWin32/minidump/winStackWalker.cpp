@@ -48,7 +48,7 @@
 #endif
 
 // Entry for each Callstack-Entry
-const int STACKWALK_MAX_NAMELEN = 1024; // max name length for symbols
+const S32 STACKWALK_MAX_NAMELEN = 1024; // max name length for symbols
 struct CallstackEntry
 {
    DWORD64 offset;  // if 0, we have no valid entry
@@ -393,7 +393,7 @@ bool StackWalker::ShowCallstack(HANDLE hThread, CONTEXT const & context, PReadPr
    IMAGEHLP_SYMBOL64 *pSym = NULL;
    IMAGEHLP_MODULE64 Module;
    IMAGEHLP_LINE64 Line;
-   int frameNum;
+   S32 frameNum;
 
    if (!m_modulesLoaded) LoadModules();
 
@@ -687,7 +687,7 @@ bool StackWalker::GetModuleListTH32(HANDLE hProcess, DWORD pid)
       return false;
 
    keepGoing = !!pM32F( hSnap, &me );
-   int cnt = 0;
+   S32 cnt = 0;
    while (keepGoing)
    {
       this->LoadModule(hProcess, me.szExePath, me.szModule, (DWORD64) me.modBaseAddr, me.modBaseSize);
@@ -715,7 +715,7 @@ bool StackWalker::GetModuleListPSAPI(HANDLE hProcess)
    char *tt = NULL;
    char *tt2 = NULL;
    const SIZE_T TTBUFLEN = 8096;
-   int cnt = 0;
+   S32 cnt = 0;
 
    hMods = (HMODULE*) malloc(sizeof(HMODULE) * (TTBUFLEN / sizeof HMODULE));
    tt = (char*) malloc(sizeof(char) * TTBUFLEN);

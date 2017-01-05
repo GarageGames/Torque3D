@@ -27,6 +27,7 @@
 #include "console/consoleInternal.h"
 #include "core/strings/stringUnit.h"
 #include "console/engineAPI.h"
+#include "core/stream/fileStream.h"
 
 TCPObject *TCPObject::table[TCPObject::TableSize] = {0, };
 
@@ -138,6 +139,15 @@ IMPLEMENT_CALLBACK(TCPObject, onLine, void, (const char* line), (line),
    "@param line Data sent from the server.\n"
    );
 
+IMPLEMENT_CALLBACK(TCPObject, onPacket, bool, (const char* data), (data),
+   "@brief Called when we get a packet with no newlines or nulls (probably websocket).\n\n"
+   "@param data Data sent from the server.\n"
+   "@return true if script handled the packet.\n"
+   );
+IMPLEMENT_CALLBACK(TCPObject, onEndReceive, void, (), (),
+   "@brief Called when we are done reading all lines.\n\n"
+   );
+
 IMPLEMENT_CALLBACK(TCPObject, onDNSResolved, void, (),(),
    "Called whenever the DNS has been resolved.\n"
    );
@@ -160,8 +170,8 @@ IMPLEMENT_CALLBACK(TCPObject, onDisconnect, void, (),(),
 
 TCPObject *TCPObject::find(NetSocket tag)
 {
-   for(TCPObject *walk = table[U32(tag) & TableMask]; walk; walk = walk->mNext)
-      if(walk->mTag == tag)
+   for(TCPObject *walk = table[tag.getHash() & TableMask]; walk; walk = walk->mNext)
+      if(walk->mTag.getHash() == tag.getHash())
          return walk;
    return NULL;
 }
@@ -170,13 +180,13 @@ void TCPObject::addToTable(NetSocket newTag)
 {
    removeFromTable();
    mTag = newTag;
-   mNext = table[U32(mTag) & TableMask];
-   table[U32(mTag) & TableMask] = this;
+   mNext = table[mTag.getHash() & TableMask];
+   table[mTag.getHash() & TableMask] = this;
 }
 
 void TCPObject::removeFromTable()
 {
-   for(TCPObject **walk = &table[U32(mTag) & TableMask]; *walk; walk = &((*walk)->mNext))
+   for(TCPObject **walk = &table[mTag.getHash() & TableMask]; *walk; walk = &((*walk)->mNext))
    {
       if(*walk == this)
       {
@@ -197,7 +207,7 @@ TCPObject::TCPObject()
    mBuffer = NULL;
    mBufferSize = 0;
    mPort = 0;
-   mTag = InvalidSocket;
+   mTag = NetSocket::INVALID;
    mNext = NULL;
    mState = Disconnected;
 
@@ -205,9 +215,9 @@ TCPObject::TCPObject()
 
    if(gTCPCount == 1)
    {
-      Net::smConnectionAccept.notify(processConnectedAcceptEvent);
-      Net::smConnectionReceive.notify(processConnectedReceiveEvent);
-      Net::smConnectionNotify.notify(processConnectedNotifyEvent);
+      Net::getConnectionAcceptedEvent().notify(processConnectedAcceptEvent);
+      Net::getConnectionReceiveEvent().notify(processConnectedReceiveEvent);
+      Net::getConnectionNotifyEvent().notify(processConnectedNotifyEvent);
    }
 }
 
@@ -220,19 +230,19 @@ TCPObject::~TCPObject()
 
    if(gTCPCount == 0)
    {
-      Net::smConnectionAccept.remove(processConnectedAcceptEvent);
-      Net::smConnectionReceive.remove(processConnectedReceiveEvent);
-      Net::smConnectionNotify.remove(processConnectedNotifyEvent);
+      Net::getConnectionAcceptedEvent().remove(processConnectedAcceptEvent);
+      Net::getConnectionReceiveEvent().remove(processConnectedReceiveEvent);
+      Net::getConnectionNotifyEvent().remove(processConnectedNotifyEvent);
    }
 }
 
-bool TCPObject::processArguments(S32 argc, const char **argv)
+bool TCPObject::processArguments(S32 argc, ConsoleValueRef *argv)
 {
    if(argc == 0)
       return true;
    else if(argc == 1)
    {
-      addToTable(U32(dAtoi(argv[0])));
+      addToTable(NetSocket::fromHandle(dAtoi(argv[0])));
       return true;
    }
    return false;
@@ -355,12 +365,31 @@ void TCPObject::onConnectFailed()
    onConnectFailed_callback();
 }
 
-void TCPObject::finishLastLine()
+bool TCPObject::finishLastLine()
 {
    if(mBufferSize)
    {
       mBuffer[mBufferSize] = 0;
       processLine((UTF8*)mBuffer);
+      dFree(mBuffer);
+      mBuffer = 0;
+      mBufferSize = 0;
+
+      return true;
+   }
+
+   return false;
+}
+
+bool TCPObject::isBufferEmpty()
+{
+   return (mBufferSize <= 0);
+}
+
+void TCPObject::emptyBuffer()
+{
+   if(mBufferSize)
+   {
       dFree(mBuffer);
       mBuffer = 0;
       mBufferSize = 0;
@@ -377,7 +406,7 @@ void TCPObject::onDisconnect()
 void TCPObject::listen(U16 port)
 {
    mState = Listening;
-   U32 newTag = Net::openListenPort(port);
+   NetSocket newTag = Net::openListenPort(port);
    addToTable(newTag);
 }
 
@@ -389,7 +418,7 @@ void TCPObject::connect(const char *address)
 
 void TCPObject::disconnect()
 {
-   if( mTag != InvalidSocket ) {
+   if( mTag != NetSocket::INVALID ) {
       Net::closeConnectTo(mTag);
    }
    removeFromTable();
@@ -398,6 +427,25 @@ void TCPObject::disconnect()
 void TCPObject::send(const U8 *buffer, U32 len)
 {
    Net::sendtoSocket(mTag, buffer, S32(len));
+}
+
+bool TCPObject::sendFile(const char* fileName)
+{
+   //Open the file for reading
+   FileStream readFile;
+   if(!readFile.open(fileName, Torque::FS::File::Read))
+   {
+      return false;
+   }
+
+   //Read each byte into our buffer
+   Vector<U8> buffer(readFile.getStreamSize());
+   readFile.read(buffer.size(), &buffer);
+
+   //Send the buffer
+   send(buffer.address(), buffer.size());
+
+   	return true;
 }
 
 DefineEngineMethod(TCPObject, send, void, (const char *data),, 
@@ -421,7 +469,21 @@ DefineEngineMethod(TCPObject, send, void, (const char *data),,
    object->send( (const U8*)data, dStrlen(data) );
 }
 
-DefineEngineMethod(TCPObject, listen, void, (int port),, 
+DefineEngineMethod(TCPObject, sendFile, bool, (const char *fileName),, 
+   "@brief Transmits the file in binary to the connected computer.\n\n"
+
+   "@param fileName The filename of the file to transfer.\n")
+{
+   return object->sendFile(fileName);
+}
+
+DefineEngineMethod(TCPObject, finishLastLine, void, (),, 
+   "@brief Eat the rest of the lines.\n")
+{
+   object->finishLastLine();
+}
+
+DefineEngineMethod(TCPObject, listen, void, (U32 port),, 
    "@brief Start listening on the specified port for connections.\n\n"
 
    "This method starts a listener which looks for incoming TCP connections to a port.  "
@@ -499,6 +561,29 @@ void processConnectedReceiveEvent(NetSocket sock, RawData incomingData)
       size -= ret;
       buffer += ret;
    }
+
+   //If our buffer now has something in it then it's probably a web socket packet and lets handle it
+   if(!tcpo->isBufferEmpty())
+   {
+      //Copy all the data into a string (may be a quicker way of doing this)
+      U8 *data = (U8*)incomingData.data;
+      String temp;
+      for(S32 i = 0; i < incomingData.size; i++)
+      {
+         temp += data[i];
+      }
+
+      //Send the packet to script
+      bool handled = tcpo->onPacket_callback(temp);
+
+      //If the script did something with it, clear the buffer
+      if(handled)
+      {
+         tcpo->emptyBuffer();
+      }
+   }
+
+   tcpo->onEndReceive_callback();
 }
 
 void processConnectedAcceptEvent(NetSocket listeningPort, NetSocket newConnection, NetAddress originatingAddress)
@@ -507,7 +592,7 @@ void processConnectedAcceptEvent(NetSocket listeningPort, NetSocket newConnectio
    if(!tcpo)
       return;
 
-   tcpo->onConnectionRequest(&originatingAddress, newConnection);
+   tcpo->onConnectionRequest(&originatingAddress, (U32)newConnection.getHandle());
 }
 
 void processConnectedNotifyEvent( NetSocket sock, U32 state )

@@ -29,6 +29,16 @@
 
 //-----------------------------------------------------------------------------
 
+CameraSpline::Knot::Knot()
+{
+   mPosition = Point3F::Zero;
+   mRotation = QuatF::Identity;
+   mSpeed = 0.0f;
+   mType = NORMAL;
+   mPath = SPLINE;
+   prev = NULL; next = NULL;
+};
+
 CameraSpline::Knot::Knot(const Knot &k)
 {
    mPosition = k.mPosition;
@@ -188,12 +198,13 @@ void CameraSpline::renderTimeMap()
    gBuilding = true;
 
    // Build vertex buffer
-   GFXVertexBufferHandle<GFXVertexPC> vb;
+   GFXVertexBufferHandle<GFXVertexPCT> vb;
    vb.set(GFX, mTimeMap.size(), GFXBufferTypeVolatile);
-   vb.lock();
+   void *ptr = vb.lock();
+   if(!ptr) return;
 
-   MRandomLCG random(1376312589 * (U32)this);
-   int index = 0;
+   MRandomLCG random(1376312589 * (uintptr_t)this);
+   S32 index = 0;
    for(Vector<TimeMap>::iterator itr=mTimeMap.begin(); itr != mTimeMap.end(); itr++)
    {
       Knot a;
@@ -213,7 +224,7 @@ void CameraSpline::renderTimeMap()
 
    // Render the buffer
    GFX->pushWorldMatrix();
-   GFX->disableShaders();
+   GFX->setupGenericShaders();
    GFX->setVertexBuffer(vb);
    GFX->drawPrimitive(GFXLineStrip,0,index);
    GFX->popWorldMatrix();

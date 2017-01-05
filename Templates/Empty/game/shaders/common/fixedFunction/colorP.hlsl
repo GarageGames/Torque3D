@@ -20,7 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-float4 main( float4 color_in : COLOR0, uniform sampler2D diffuseMap : register(S0) ) : COLOR0
+#include "../shaderModel.hlsl"
+
+struct Conn
 {
-   return color_in;
+   float4 HPOS             : TORQUE_POSITION;
+   float4 color            : COLOR;
+};
+
+float4 main(Conn IN) : TORQUE_TARGET0
+{
+   return IN.color;
 }

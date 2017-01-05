@@ -22,30 +22,25 @@
 
 #include "platformX86UNIX/platformX86UNIX.h"
 #include "platform/threads/semaphore.h"
-#include <unistd.h>     
-#include <sys/types.h>  
-#include <errno.h>      
-#include <semaphore.h> 
-#include <time.h>
+// Instead of that mess that was here before, lets use the SDL lib to deal
+// with the semaphores.
+
+#include <SDL.h>
+#include <SDL_thread.h>
 
 struct PlatformSemaphore
 {
-   sem_t semaphore;
-   bool initialized;
+   SDL_sem *semaphore;
 
    PlatformSemaphore(S32 initialCount)
    {
-	   initialized = true;
-	   if (sem_init(&semaphore, 0, initialCount) == -1) {
-		   initialized = false;
-			AssertFatal(0, "PlatformSemaphore constructor - Failed to create Semaphore.");
-	   } 
+       semaphore = SDL_CreateSemaphore(initialCount);
+       AssertFatal(semaphore, "PlatformSemaphore constructor - Failed to create SDL Semaphore.");
    }
 
    ~PlatformSemaphore()
    {
-       sem_destroy(&semaphore);
-	   initialized = false;
+       SDL_DestroySemaphore(semaphore);
    }
 };
 
@@ -62,37 +57,28 @@ Semaphore::~Semaphore()
 
 bool Semaphore::acquire(bool block, S32 timeoutMS)
 {
-   AssertFatal(mData && mData->initialized, "Semaphore::acquire - Invalid semaphore.");
+   AssertFatal(mData && mData->semaphore, "Semaphore::acquire - Invalid semaphore.");
    if (block)
    {
-      //SDL was removed so I do not now if this still holds true or not with OS calls but my guess is they are used underneath SDL anyway 
       // Semaphore acquiring is different from the MacOS/Win realization because SDL_SemWaitTimeout() with "infinite" timeout can be too heavy on some platforms.
       // (see "man SDL_SemWaitTimeout(3)" for more info)
       // "man" states to avoid the use of SDL_SemWaitTimeout at all, but at current stage this looks like a valid and working solution, so keeping it this way.
       // [bank / Feb-2010]
       if (timeoutMS == -1)
       {
-         if (sem_wait(&mData->semaphore) < 0)
-            AssertFatal(false, "Semaphore::acquire - Wait failed.");
+         if (SDL_SemWait(mData->semaphore) < 0)
+            AssertFatal(false, "Semaphore::acquie - Wait failed.");
       }
       else
       {
-	     //convert timeoutMS to timespec
-         timespec ts;
-		 if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
-			 AssertFatal(false, "Semaphore::acquire - clock_realtime failed.");
-		 }
-		 ts.tv_sec += timeoutMS / 1000;
-		 ts.tv_nsec += (timeoutMS % 1000) * 1000;
-
-         if (sem_timedwait(&mData->semaphore, &ts) < 0)
-            AssertFatal(false, "Semaphore::acquire - Wait with timeout failed.");
+         if (SDL_SemWaitTimeout(mData->semaphore, timeoutMS) < 0)
+            AssertFatal(false, "Semaphore::acquie - Wait with timeout failed.");
       }
       return (true);
    }
    else
    {
-      int res = sem_trywait(&mData->semaphore);
+      int res = SDL_SemTryWait(mData->semaphore);
       return (res == 0);
    }
 }
@@ -100,5 +86,5 @@ bool Semaphore::acquire(bool block, S32 timeoutMS)
 void Semaphore::release()
 {
    AssertFatal(mData, "Semaphore::releaseSemaphore - Invalid semaphore.");
-   sem_post(&mData->semaphore);
+   SDL_SemPost(mData->semaphore);
 }

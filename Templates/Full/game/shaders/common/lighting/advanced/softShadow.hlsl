@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "../../shaderModel.hlsl"
 
 #if defined( SOFTSHADOW ) && defined( SOFTSHADOW_HIGH_QUALITY )
 
@@ -69,10 +70,9 @@ static float2 sNonUniformTaps[NUM_PRE_TAPS] =
 
 /// The texture used to do per-pixel pseudorandom
 /// rotations of the filter taps.
-uniform sampler2D gTapRotationTex : register(S3);
+TORQUE_UNIFORM_SAMPLER2D(gTapRotationTex, 4);
 
-
-float softShadow_sampleTaps(  sampler2D shadowMap,
+float softShadow_sampleTaps(  TORQUE_SAMPLER2D(shadowMap1),
                               float2 sinCos,
                               float2 shadowPos,
                               float filterRadius,
@@ -88,7 +88,7 @@ float softShadow_sampleTaps(  sampler2D shadowMap,
    {
       tap.x = ( sNonUniformTaps[t].x * sinCos.y - sNonUniformTaps[t].y * sinCos.x ) * filterRadius;
       tap.y = ( sNonUniformTaps[t].y * sinCos.y + sNonUniformTaps[t].x * sinCos.x ) * filterRadius;
-      float occluder = tex2Dlod( shadowMap, float4( shadowPos + tap, 0, 0 ) ).r;
+      float occluder = TORQUE_TEX2DLOD( shadowMap1, float4( shadowPos + tap, 0, 0 ) ).r;
 
       float esm = saturate( exp( esmFactor * ( occluder - distToLight ) ) );
       shadow += esm / float( endTap - startTap );
@@ -98,7 +98,7 @@ float softShadow_sampleTaps(  sampler2D shadowMap,
 }
 
 
-float softShadow_filter(   sampler2D shadowMap,
+float softShadow_filter(   TORQUE_SAMPLER2D(shadowMap),
                            float2 vpos,
                            float2 shadowPos,
                            float filterRadius,
@@ -111,16 +111,15 @@ float softShadow_filter(   sampler2D shadowMap,
       // If softshadow is undefined then we skip any complex 
       // filtering... just do a single sample ESM.
 
-      float occluder = tex2Dlod( shadowMap, float4( shadowPos, 0, 0 ) ).r;
+      float occluder = TORQUE_TEX2DLOD(shadowMap, float4(shadowPos, 0, 0)).r;
       float shadow = saturate( exp( esmFactor * ( occluder - distToLight ) ) );
 
    #else
-
       // Lookup the random rotation for this screen pixel.
-      float2 sinCos = ( tex2Dlod( gTapRotationTex, float4( vpos * 16, 0, 0 ) ).rg - 0.5 ) * 2;
+      float2 sinCos = ( TORQUE_TEX2DLOD(gTapRotationTex, float4(vpos * 16, 0, 0)).rg - 0.5) * 2;
 
       // Do the prediction taps first.
-      float shadow = softShadow_sampleTaps(  shadowMap,
+      float shadow = softShadow_sampleTaps(  TORQUE_SAMPLER2D_MAKEARG(shadowMap),
                                              sinCos,
                                              shadowPos,
                                              filterRadius,
@@ -137,7 +136,7 @@ float softShadow_filter(   sampler2D shadowMap,
          // in a partially shadowed area.
          if ( shadow * ( 1.0 - shadow ) * max( dotNL, 0 ) > 0.06 )
          {
-            shadow += softShadow_sampleTaps( shadowMap,
+            shadow += softShadow_sampleTaps( TORQUE_SAMPLER2D_MAKEARG(shadowMap),
                                              sinCos,
                                              shadowPos,
                                              filterRadius,

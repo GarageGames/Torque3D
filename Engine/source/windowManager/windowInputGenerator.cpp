@@ -23,7 +23,7 @@
 #include "windowManager/windowInputGenerator.h"
 #include "windowManager/platformWindow.h"
 #include "sim/actionMap.h"
-#include "component/interfaces/IProcessInput.h"
+#include "platform/input/IProcessInput.h"
 
 
 extern InputModifiers convertModifierBits(const U32 in);
@@ -32,14 +32,15 @@ extern InputModifiers convertModifierBits(const U32 in);
 //-----------------------------------------------------------------------------
 // Constructor/Destructor
 //-----------------------------------------------------------------------------
-WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) : 
+WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) :
+                                             mNotifyPosition(true),
                                              mWindow(window),
                                              mInputController(NULL),
                                              mLastCursorPos(0,0),
                                              mClampToWindow(true),
+                                             mFocused(false),
                                              mPixelsPerMickey(1.0f),
-                                             mNotifyPosition(true),
-                                             mFocused(false)
+                                             mLastPressWasGlobalActionMap(false)
 {
    AssertFatal(mWindow, "NULL PlatformWindow on WindowInputGenerator creation");
 
@@ -82,14 +83,38 @@ WindowInputGenerator::~WindowInputGenerator()
 //-----------------------------------------------------------------------------
 void WindowInputGenerator::generateInputEvent( InputEventInfo &inputEvent )
 {
-   if( !mInputController || !mFocused )
+   // Reset last press being global
+   mLastPressWasGlobalActionMap = false;
+
+   if (!mInputController)// || !mFocused)
       return;
+
+   if (inputEvent.action == SI_MAKE && inputEvent.deviceType == KeyboardDeviceType)
+   {
+      for (int i = 0; i < mAcceleratorMap.size(); ++i)
+      {
+         const AccKeyMap &acc = mAcceleratorMap[i];
+         if (!mWindow->getKeyboardTranslation() &&
+            (acc.modifier & inputEvent.modifier || (acc.modifier == 0 && inputEvent.modifier == 0))
+            && acc.keyCode == inputEvent.objInst)
+         {
+            Con::evaluatef(acc.cmd);
+            return;
+         }
+      }
+   }
 
    // Give the ActionMap first shot.
    if (ActionMap::handleEventGlobal(&inputEvent))
+   {
+      mLastPressWasGlobalActionMap = true;
+      return;
+   }
+
+   if (mInputController->processInputEvent(inputEvent))
       return;
 
-   if( mInputController->processInputEvent( inputEvent ) )
+   if (mWindow->getKeyboardTranslation())
       return;
 
    // If we get here we failed to process it with anything prior... so let
@@ -313,7 +338,7 @@ void WindowInputGenerator::handleKeyboard( WindowId did, U32 modifier, U32 actio
 void WindowInputGenerator::handleInputEvent( U32 deviceInst, F32 fValue, F32 fValue2, F32 fValue3, F32 fValue4, S32 iValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier )
 {
    // Skip it if we don't have focus.
-   if(!mInputController || !mFocused)
+   if(!mInputController)// || !mFocused)
       return;
 
    // Convert to an InputEventInfo and pass it around for processing.

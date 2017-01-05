@@ -22,6 +22,7 @@
 
 #include "platform/platform.h"
 #include "gui/3d/guiTSControl.h"
+#include "gui/core/guiOffscreenCanvas.h"
 
 #include "console/engineAPI.h"
 #include "scene/sceneManager.h"
@@ -34,7 +35,13 @@
 #include "scene/reflectionManager.h"
 #include "postFx/postEffectManager.h"
 #include "gfx/gfxTransformSaver.h"
+#include "gfx/gfxDrawUtil.h"
+#include "gfx/gfxDebugEvent.h"
+#include "core/stream/fileStream.h"
+#include "platform/output/IDisplayDevice.h"
+#include "T3D/gameBase/extended/extendedMove.h"
 
+#define TS_OVERLAY_SCREEN_WIDTH 0.75
 
 IMPLEMENT_CONOBJECT( GuiTSCtrl );
 
@@ -51,15 +58,16 @@ ConsoleDocClass( GuiTSCtrl,
 );
 
 U32 GuiTSCtrl::smFrameCount = 0;
+bool GuiTSCtrl::smUseLatestDisplayTransform = true;
 Vector<GuiTSCtrl*> GuiTSCtrl::smAwakeTSCtrls;
 
 ImplementEnumType( GuiTSRenderStyles,
    "Style of rendering for a GuiTSCtrl.\n\n"
    "@ingroup Gui3D" )
-	{ GuiTSCtrl::RenderStyleStandard,         "standard"              },
-	{ GuiTSCtrl::RenderStyleStereoSideBySide, "stereo side by side"   },
+   { GuiTSCtrl::RenderStyleStandard,         "standard"              },
+   { GuiTSCtrl::RenderStyleStereoSideBySide, "stereo side by side"   },
+   { GuiTSCtrl::RenderStyleStereoSeparate,   "stereo separate" },
 EndImplementEnumType;
-
 
 //-----------------------------------------------------------------------------
 
@@ -104,7 +112,7 @@ namespace
       start -= lineVec;
       end   += lineVec;
 
-      GFXVertexBufferHandle<GFXVertexPC> verts(GFX, 4, GFXBufferTypeVolatile);
+      GFXVertexBufferHandle<GFXVertexPCT> verts(GFX, 4, GFXBufferTypeVolatile);
       verts.lock();
 
       verts[0].point.set( start.x+perp.x, start.y+perp.y, z1 );
@@ -126,6 +134,7 @@ namespace
       desc.setBlend(true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
       GFX->setStateBlockByDesc( desc );
 
+      GFX->setupGenericShaders();
       GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
    }
 }
@@ -151,8 +160,8 @@ GuiTSCtrl::GuiTSCtrl()
    mLastCameraQuery.farPlane = 10.0f;
    mLastCameraQuery.nearPlane = 0.01f;
 
-   mLastCameraQuery.projectionOffset = Point2F::Zero;
-   mLastCameraQuery.eyeOffset = Point3F::Zero;
+   mLastCameraQuery.hasFovPort = false;
+   mLastCameraQuery.hasStereoTargets = false;
 
    mLastCameraQuery.ortho = false;
 }
@@ -190,7 +199,9 @@ void GuiTSCtrl::initPersistFields()
 void GuiTSCtrl::consoleInit()
 {
    Con::addVariable("$TSControl::frameCount", TypeS32, &smFrameCount, "The number of frames that have been rendered since this control was created.\n"
-	   "@ingroup Rendering\n");
+      "@ingroup Rendering\n");
+   Con::addVariable("$TSControl::useLatestDisplayTransform", TypeBool, &smUseLatestDisplayTransform, "Use the latest view transform when rendering stereo instead of the one calculated by the last move.\n"
+      "@ingroup Rendering\n");
 }
 
 //-----------------------------------------------------------------------------
@@ -204,6 +215,9 @@ bool GuiTSCtrl::onWake()
    AssertFatal( !smAwakeTSCtrls.contains( this ), 
       "GuiTSCtrl::onWake - This control is already in the awake list!" );
    smAwakeTSCtrls.push_back( this );
+
+   // For VR
+   mLastCameraQuery.drawCanvas = getRoot();
 
    return true;
 }
@@ -301,123 +315,84 @@ F32 GuiTSCtrl::calculateViewDistance(F32 radius)
 
 //-----------------------------------------------------------------------------
 
-void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
+static FovPort CalculateFovPortForCanvas(const RectI viewport, const CameraQuery &cameraQuery)
 {
-	// Save the current transforms so we can restore
-   // it for child control rendering below.
-   GFXTransformSaver saver;
-
-   if(!processCameraQuery(&mLastCameraQuery))
-   {
-      // We have no camera, but render the GUI children 
-      // anyway.  This makes editing GuiTSCtrl derived
-      // controls easier in the GuiEditor.
-      renderChildControls( offset, updateRect );
-      return;
-   }
-
-   if ( mReflectPriority > 0 )
-   {
-      // Get the total reflection priority.
-      F32 totalPriority = 0;
-      for ( U32 i=0; i < smAwakeTSCtrls.size(); i++ )
-         if ( smAwakeTSCtrls[i]->isVisible() )
-            totalPriority += smAwakeTSCtrls[i]->mReflectPriority;
-
-      REFLECTMGR->update(  mReflectPriority / totalPriority,
-                           getExtent(),
-                           mLastCameraQuery );
-   }
-
-   if(mForceFOV != 0)
-      mLastCameraQuery.fov = mDegToRad(mForceFOV);
-
-   if(mCameraZRot)
-   {
-      MatrixF rotMat(EulerF(0, 0, mDegToRad(mCameraZRot)));
-      mLastCameraQuery.cameraMatrix.mul(rotMat);
-   }
-
-   // Set up the appropriate render style
-   U32 prevRenderStyle = GFX->getCurrentRenderStyle();
-   Point2F prevProjectionOffset = GFX->getCurrentProjectionOffset();
-   Point3F prevEyeOffset = GFX->getStereoEyeOffset();
-   if(mRenderStyle == RenderStyleStereoSideBySide)
-   {
-      GFX->setCurrentRenderStyle(GFXDevice::RS_StereoSideBySide);
-      GFX->setCurrentProjectionOffset(mLastCameraQuery.projectionOffset);
-      GFX->setStereoEyeOffset(mLastCameraQuery.eyeOffset);
-   }
-   else
-   {
-      GFX->setCurrentRenderStyle(GFXDevice::RS_Standard);
-   }
-
-   // set up the camera and viewport stuff:
    F32 wwidth;
    F32 wheight;
-   F32 renderWidth = (mRenderStyle == RenderStyleStereoSideBySide) ? F32(getWidth())*0.5f : F32(getWidth());
-   F32 renderHeight = F32(getHeight());
+   F32 renderWidth = viewport.extent.x;
+   F32 renderHeight = viewport.extent.y;
    F32 aspectRatio = renderWidth / renderHeight;
-   
+
    // Use the FOV to calculate the viewport height scale
    // then generate the width scale from the aspect ratio.
-   if(!mLastCameraQuery.ortho)
+   if(!cameraQuery.ortho)
    {
-      wheight = mLastCameraQuery.nearPlane * mTan(mLastCameraQuery.fov / 2.0f);
+      wheight = /*cameraQuery.nearPlane * */ mTan(cameraQuery.fov / 2.0f);
       wwidth = aspectRatio * wheight;
    }
    else
    {
-      wheight = mLastCameraQuery.fov;
+      wheight = cameraQuery.fov;
       wwidth = aspectRatio * wheight;
    }
 
    F32 hscale = wwidth * 2.0f / renderWidth;
    F32 vscale = wheight * 2.0f / renderHeight;
 
-   Frustum frustum;
-   if(mRenderStyle == RenderStyleStereoSideBySide)
+   F32 left = 0.0f * hscale - wwidth;
+   F32 right = renderWidth * hscale - wwidth;
+   F32 top = wheight - vscale * 0.0f;
+   F32 bottom = wheight - vscale * renderHeight;
+
+   FovPort fovPort;
+   fovPort.upTan = top;
+   fovPort.downTan = -bottom;
+   fovPort.leftTan = -left;
+   fovPort.rightTan = right;
+
+   return fovPort;
+}
+
+void GuiTSCtrl::_internalRender(RectI guiViewport, RectI renderViewport, Frustum &frustum)
+{
+   GFXTransformSaver saver;
+   Point2I renderSize = renderViewport.extent;
+   GFXTarget *origTarget = GFX->getActiveRenderTarget();
+   S32 origStereoTarget = GFX->getCurrentStereoTarget();
+
+   if (mForceFOV != 0)
+      mLastCameraQuery.fov = mDegToRad(mForceFOV);
+
+   if (mCameraZRot)
    {
-      F32 left = 0.0f * hscale - wwidth;
-      F32 right = renderWidth * hscale - wwidth;
-      F32 top = wheight - vscale * 0.0f;
-      F32 bottom = wheight - vscale * renderHeight;
-
-      frustum.set( mLastCameraQuery.ortho, left, right, top, bottom, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane );
+      MatrixF rotMat(EulerF(0, 0, mDegToRad(mCameraZRot)));
+      mLastCameraQuery.cameraMatrix.mul(rotMat);
    }
-   else
+
+   if (mReflectPriority > 0)
    {
-      F32 left = (updateRect.point.x - offset.x) * hscale - wwidth;
-      F32 right = (updateRect.point.x + updateRect.extent.x - offset.x) * hscale - wwidth;
-      F32 top = wheight - vscale * (updateRect.point.y - offset.y);
-      F32 bottom = wheight - vscale * (updateRect.point.y + updateRect.extent.y - offset.y);
+      // Get the total reflection priority.
+      F32 totalPriority = 0;
+      for (U32 i = 0; i < smAwakeTSCtrls.size(); i++)
+         if (smAwakeTSCtrls[i]->isVisible())
+            totalPriority += smAwakeTSCtrls[i]->mReflectPriority;
 
-      frustum.set( mLastCameraQuery.ortho, left, right, top, bottom, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane );
+      REFLECTMGR->update(mReflectPriority / totalPriority,
+         renderSize,
+         mLastCameraQuery);
    }
 
-	// Manipulate the frustum for tiled screenshots
-	const bool screenShotMode = gScreenShot && gScreenShot->isPending();
-   if ( screenShotMode )
-   {
-      gScreenShot->tileFrustum( frustum );      
-      GFX->setViewMatrix(MatrixF::Identity);
-   }
-      
-   RectI tempRect = updateRect;
-   
-#ifdef TORQUE_OS_MAC
-   Point2I screensize = getRoot()->getWindowSize();
-   tempRect.point.y = screensize.y - (tempRect.point.y + tempRect.extent.y);
-#endif
-
-   GFX->setViewport( tempRect );
+   GFX->setActiveRenderTarget(origTarget);
+   GFX->setCurrentStereoTarget(origStereoTarget);
+   GFX->setViewport(renderViewport);
 
    // Clear the zBuffer so GUI doesn't hose object rendering accidentally
-   GFX->clear( GFXClearZBuffer , ColorI(20,20,20), 1.0f, 0 );
+   GFX->clear(GFXClearZBuffer, ColorI(20, 20, 20), 1.0f, 0);
 
-   GFX->setFrustum( frustum );
-   if(mLastCameraQuery.ortho)
+   GFX->setFrustum(frustum);
+   mSaveProjection = GFX->getProjectionMatrix();
+
+   if (mLastCameraQuery.ortho)
    {
       mOrthoWidth = frustum.getWidth();
       mOrthoHeight = frustum.getHeight();
@@ -426,7 +401,7 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    // We're going to be displaying this render at size of this control in
    // pixels - let the scene know so that it can calculate e.g. reflections
    // correctly for that final display result.
-   gClientSceneGraph->setDisplayTargetResolution(getExtent());
+   gClientSceneGraph->setDisplayTargetResolution(renderSize);
 
    // Set the GFX world matrix to the world-to-camera transform, but don't 
    // change the cameraMatrix in mLastCameraQuery. This is because 
@@ -435,39 +410,321 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
    // depend on that value.
    MatrixF worldToCamera = mLastCameraQuery.cameraMatrix;
    worldToCamera.inverse();
-   GFX->setWorldMatrix( worldToCamera );
+   GFX->setWorldMatrix(worldToCamera);
 
    mSaveProjection = GFX->getProjectionMatrix();
    mSaveModelview = GFX->getWorldMatrix();
-   mSaveViewport = updateRect;
+   mSaveViewport = guiViewport;
    mSaveWorldToScreenScale = GFX->getWorldToScreenScale();
    mSaveFrustum = GFX->getFrustum();
-   mSaveFrustum.setTransform( mLastCameraQuery.cameraMatrix );
+   mSaveFrustum.setTransform(mLastCameraQuery.cameraMatrix);
 
    // Set the default non-clip projection as some 
    // objects depend on this even in non-reflect cases.
-   gClientSceneGraph->setNonClipProjection( mSaveProjection );
+   gClientSceneGraph->setNonClipProjection(mSaveProjection);
 
    // Give the post effect manager the worldToCamera, and cameraToScreen matrices
-   PFXMGR->setFrameMatrices( mSaveModelview, mSaveProjection );
+   PFXMGR->setFrameMatrices(mSaveModelview, mSaveProjection);
 
-   renderWorld(updateRect);
-   DebugDrawer::get()->render();
+   renderWorld(guiViewport);
 
-	// Restore the previous matrix state before
-   // we begin rendering the child controls.
+   DebugDrawer* debugDraw = DebugDrawer::get();
+   if (mRenderStyle == RenderStyleStereoSideBySide && debugDraw->willDraw())
+   {
+      // For SBS we need to render over each viewport
+      Frustum frustum;
+
+      GFX->setViewport(mLastCameraQuery.stereoViewports[0]);
+      MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[0]);
+      GFX->setFrustum(frustum);
+      debugDraw->render(false);
+
+      GFX->setViewport(mLastCameraQuery.stereoViewports[1]);
+      MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[1]);
+      GFX->setFrustum(frustum);
+      debugDraw->render();
+   }
+   else
+   {
+      debugDraw->render();
+   }
+
    saver.restore();
+}
 
-   // Restore the render style and any stereo parameters
-   GFX->setCurrentRenderStyle(prevRenderStyle);
-   GFX->setCurrentProjectionOffset(prevProjectionOffset);
-   GFX->setStereoEyeOffset(prevEyeOffset);
+//-----------------------------------------------------------------------------
+
+void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
+{
+   // Save the current transforms so we can restore
+   // it for child control rendering below.
+   GFXTransformSaver saver;
+   bool renderingToTarget = false;
+
+   mLastCameraQuery.displayDevice = NULL;
+
+   if (!processCameraQuery(&mLastCameraQuery))
+   {
+      // We have no camera, but render the GUI children 
+      // anyway.  This makes editing GuiTSCtrl derived
+      // controls easier in the GuiEditor.
+      renderChildControls(offset, updateRect);
+      return;
+   }
+
+   // jamesu - currently a little bit of a hack. Ideally we need to ditch the viewports in the query data and just rely on the display device
+   if (mLastCameraQuery.displayDevice)
+   {
+      if (mRenderStyle == RenderStyleStereoSideBySide)
+      {
+         mLastCameraQuery.displayDevice->setDrawMode(GFXDevice::RS_StereoSideBySide);
+      }
+      else if (mRenderStyle == RenderStyleStereoSeparate)
+      {
+         mLastCameraQuery.displayDevice->setDrawMode(GFXDevice::RS_StereoSeparate);
+      }
+      else
+      {
+         mLastCameraQuery.displayDevice->setDrawMode(GFXDevice::RS_Standard);
+      }
+
+      // The connection's display device may want to set the eye offset
+      if (mLastCameraQuery.displayDevice->providesEyeOffsets())
+      {
+         mLastCameraQuery.displayDevice->getEyeOffsets(mLastCameraQuery.eyeOffset);
+      }
+
+      // Grab field of view for both eyes
+      if (mLastCameraQuery.displayDevice->providesFovPorts())
+      {
+         mLastCameraQuery.displayDevice->getFovPorts(mLastCameraQuery.fovPort);
+         mLastCameraQuery.hasFovPort = true;
+      }
+
+      mLastCameraQuery.displayDevice->getStereoViewports(mLastCameraQuery.stereoViewports);
+      mLastCameraQuery.displayDevice->getStereoTargets(mLastCameraQuery.stereoTargets);
+
+      mLastCameraQuery.hasStereoTargets = mLastCameraQuery.stereoTargets[0];
+   }
+
+   GFXTargetRef origTarget = GFX->getActiveRenderTarget();
+   U32 origStyle = GFX->getCurrentRenderStyle();
+
+   // Set up the appropriate render style
+   Point2I renderSize = getExtent();
+   Frustum frustum;
+
+   mLastCameraQuery.currentEye = -1;
+
+   if (mRenderStyle == RenderStyleStereoSideBySide)
+   {
+      GFX->setCurrentRenderStyle(GFXDevice::RS_StereoSideBySide);
+      GFX->setStereoEyeOffsets(mLastCameraQuery.eyeOffset);
+      GFX->setStereoHeadTransform(mLastCameraQuery.headMatrix);
+
+      if (!mLastCameraQuery.hasStereoTargets)
+      {
+         // Need to calculate our current viewport here
+         mLastCameraQuery.stereoViewports[0] = updateRect;
+         mLastCameraQuery.stereoViewports[0].extent.x /= 2;
+         mLastCameraQuery.stereoViewports[1] = mLastCameraQuery.stereoViewports[0];
+         mLastCameraQuery.stereoViewports[1].point.x += mLastCameraQuery.stereoViewports[1].extent.x;
+      }
+
+      if (!mLastCameraQuery.hasFovPort)
+      {
+         // Need to make our own fovPort
+         mLastCameraQuery.fovPort[0] = CalculateFovPortForCanvas(mLastCameraQuery.stereoViewports[0], mLastCameraQuery);
+         mLastCameraQuery.fovPort[1] = CalculateFovPortForCanvas(mLastCameraQuery.stereoViewports[1], mLastCameraQuery);
+      }
+
+      GFX->setStereoFovPort(mLastCameraQuery.fovPort); // NOTE: this specifies fov for BOTH eyes
+      GFX->setSteroViewports(mLastCameraQuery.stereoViewports);
+      GFX->setStereoTargets(mLastCameraQuery.stereoTargets);
+
+      MatrixF myTransforms[2];
+      Frustum frustum;
+
+      if (smUseLatestDisplayTransform)
+      {
+         // Use the view matrix determined from the display device
+         myTransforms[0] = mLastCameraQuery.eyeTransforms[0];
+         myTransforms[1] = mLastCameraQuery.eyeTransforms[1];
+      }
+      else
+      {
+         // Use the view matrix determined from the control object
+         myTransforms[0] = mLastCameraQuery.cameraMatrix;
+         myTransforms[1] = mLastCameraQuery.cameraMatrix;
+         mLastCameraQuery.headMatrix = mLastCameraQuery.cameraMatrix; // override head
+
+         QuatF qrot = mLastCameraQuery.cameraMatrix;
+         Point3F pos = mLastCameraQuery.cameraMatrix.getPosition();
+         Point3F rotEyePos;
+
+         myTransforms[0].setPosition(pos + qrot.mulP(mLastCameraQuery.eyeOffset[0], &rotEyePos));
+         myTransforms[1].setPosition(pos + qrot.mulP(mLastCameraQuery.eyeOffset[1], &rotEyePos));
+      }
+
+      GFX->setStereoEyeTransforms(myTransforms);
+
+      // Allow render size to originate from the render target
+      if (mLastCameraQuery.stereoTargets[0])
+      {
+         renderSize = mLastCameraQuery.stereoTargets[0]->getSize();
+         renderingToTarget = true;
+      }
+
+      // NOTE: these calculations are essentially overridden later by the fov port settings when rendering each eye.
+      MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[0]);
+
+      GFX->activateStereoTarget(-1);
+      _internalRender(RectI(updateRect.point, updateRect.extent), RectI(Point2I(0,0), renderSize), frustum);
+     
+      // Notify device we've rendered the right, thus the last stereo frame.
+      GFX->getDeviceEventSignal().trigger(GFXDevice::deRightStereoFrameRendered);
+
+      // Render preview
+      if (mLastCameraQuery.displayDevice)
+      {
+         GFXTexHandle previewTexture = mLastCameraQuery.displayDevice->getPreviewTexture();
+         if (!previewTexture.isNull())
+         {
+            GFX->setActiveRenderTarget(origTarget);
+            GFX->setCurrentRenderStyle(origStyle);
+            GFX->setClipRect(updateRect);
+            renderDisplayPreview(updateRect, previewTexture);
+         }
+      }
+   }
+   else if (mRenderStyle == RenderStyleStereoSeparate && mLastCameraQuery.displayDevice)
+   {
+      // In this case we render the scene twice to different render targets, then
+      // render the final composite view 
+      GFX->setCurrentRenderStyle(GFXDevice::RS_StereoSeparate);
+      GFX->setStereoEyeOffsets(mLastCameraQuery.eyeOffset);
+      GFX->setStereoHeadTransform(mLastCameraQuery.headMatrix);
+      GFX->setStereoFovPort(mLastCameraQuery.fovPort); // NOTE: this specifies fov for BOTH eyes
+      GFX->setSteroViewports(mLastCameraQuery.stereoViewports);
+      GFX->setStereoTargets(mLastCameraQuery.stereoTargets);
+
+      MatrixF myTransforms[2];
+
+      if (smUseLatestDisplayTransform)
+      {
+         // Use the view matrix determined from the display device
+         myTransforms[0] = mLastCameraQuery.eyeTransforms[0];
+         myTransforms[1] = mLastCameraQuery.eyeTransforms[1];
+      }
+      else
+      {
+         // Use the view matrix determined from the control object
+         myTransforms[0] = mLastCameraQuery.cameraMatrix;
+         myTransforms[1] = mLastCameraQuery.cameraMatrix;
+
+         QuatF qrot = mLastCameraQuery.cameraMatrix;
+         Point3F pos = mLastCameraQuery.cameraMatrix.getPosition();
+         Point3F rotEyePos;
+
+         myTransforms[0].setPosition(pos + qrot.mulP(mLastCameraQuery.eyeOffset[0], &rotEyePos));
+         myTransforms[1].setPosition(pos + qrot.mulP(mLastCameraQuery.eyeOffset[1], &rotEyePos));
+      }
+
+      MatrixF origMatrix = mLastCameraQuery.cameraMatrix;
+
+      // Left
+      MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[0]);
+      mLastCameraQuery.cameraMatrix = myTransforms[0];
+      frustum.update();
+     GFX->activateStereoTarget(0);
+     mLastCameraQuery.currentEye = 0;
+     GFX->beginField();
+     _internalRender(RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[0]->getSize()), RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[0]->getSize()), frustum);
+      GFX->getDeviceEventSignal().trigger(GFXDevice::deLeftStereoFrameRendered);
+     GFX->endField();
+
+      // Right
+     GFX->activateStereoTarget(1);
+     mLastCameraQuery.currentEye = 1;
+      MathUtils::makeFovPortFrustum(&frustum, mLastCameraQuery.ortho, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane, mLastCameraQuery.fovPort[1]);
+      mLastCameraQuery.cameraMatrix = myTransforms[1];
+     frustum.update();
+     GFX->beginField();
+     _internalRender(RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[1]->getSize()), RectI(Point2I(0, 0), mLastCameraQuery.stereoTargets[0]->getSize()), frustum);
+     GFX->getDeviceEventSignal().trigger(GFXDevice::deRightStereoFrameRendered);
+     GFX->endField();
+
+      mLastCameraQuery.cameraMatrix = origMatrix;
+
+      // Render preview
+      if (mLastCameraQuery.displayDevice)
+      {
+         GFXTexHandle previewTexture = mLastCameraQuery.displayDevice->getPreviewTexture();
+         if (!previewTexture.isNull())
+         {
+            GFX->setActiveRenderTarget(origTarget);
+            GFX->setCurrentRenderStyle(origStyle);
+            GFX->setClipRect(updateRect);
+            renderDisplayPreview(updateRect, previewTexture);
+         }
+      }
+   }
+   else
+   {
+      // set up the camera and viewport stuff:
+      F32 wwidth;
+      F32 wheight;
+      F32 renderWidth = F32(renderSize.x);
+      F32 renderHeight = F32(renderSize.y);
+      F32 aspectRatio = renderWidth / renderHeight;
+
+      // Use the FOV to calculate the viewport height scale
+      // then generate the width scale from the aspect ratio.
+      if (!mLastCameraQuery.ortho)
+      {
+         wheight = mLastCameraQuery.nearPlane * mTan(mLastCameraQuery.fov / 2.0f);
+         wwidth = aspectRatio * wheight;
+      }
+      else
+      {
+         wheight = mLastCameraQuery.fov;
+         wwidth = aspectRatio * wheight;
+      }
+
+      F32 hscale = wwidth * 2.0f / renderWidth;
+      F32 vscale = wheight * 2.0f / renderHeight;
+
+      F32 left = (updateRect.point.x - offset.x) * hscale - wwidth;
+      F32 right = (updateRect.point.x + updateRect.extent.x - offset.x) * hscale - wwidth;
+      F32 top = wheight - vscale * (updateRect.point.y - offset.y);
+      F32 bottom = wheight - vscale * (updateRect.point.y + updateRect.extent.y - offset.y);
+
+      frustum.set(mLastCameraQuery.ortho, left, right, top, bottom, mLastCameraQuery.nearPlane, mLastCameraQuery.farPlane);
+
+      // Manipulate the frustum for tiled screenshots
+      const bool screenShotMode = gScreenShot && gScreenShot->isPending();
+      if (screenShotMode)
+      {
+         gScreenShot->tileFrustum(frustum);
+         GFX->setViewMatrix(MatrixF::Identity);
+      }
+
+      RectI tempRect = updateRect;
+      _internalRender(tempRect, tempRect, frustum);
+   }
+
+   // TODO: Some render to sort of overlay system?
 
    // Allow subclasses to render 2D elements.
+   GFX->setActiveRenderTarget(origTarget);
+   GFX->setCurrentRenderStyle(origStyle);
    GFX->setClipRect(updateRect);
-   renderGui( offset, updateRect );
+   renderGui(offset, updateRect);
 
-   renderChildControls(offset, updateRect);
+   if (shouldRenderChildControls())
+   {
+      renderChildControls(offset, updateRect);
+   }
    smFrameCount++;
 }
 
@@ -496,6 +753,84 @@ void GuiTSCtrl::drawLineList( const Vector<Point3F> &points, const ColorI color,
 {
    for ( S32 i = 0; i < points.size() - 1; i++ )
       drawLine( points[i], points[i+1], color, width );
+}
+
+//-----------------------------------------------------------------------------
+
+void GuiTSCtrl::setStereoGui(GuiOffscreenCanvas *canvas)
+{
+   mStereoGuiTarget = canvas ? canvas->getTarget() : NULL;
+   mStereoCanvas = canvas;
+}
+
+
+//-----------------------------------------------------------------------------
+
+void GuiTSCtrl::renderDisplayPreview(const RectI &updateRect, GFXTexHandle &previewTexture)
+{
+   GFX->setWorldMatrix(MatrixF(1));
+   GFX->setViewMatrix(MatrixF::Identity);
+   GFX->setClipRect(updateRect);
+
+   GFX->getDrawUtil()->drawRectFill(RectI(Point2I(0, 0), Point2I(1024, 768)), ColorI::BLACK);
+   GFX->getDrawUtil()->drawRect(RectI(Point2I(0, 0), Point2I(1024, 768)), ColorI::RED);
+
+   if (!mStereoPreviewVB.getPointer())
+   {
+      mStereoPreviewVB.set(GFX, 4, GFXBufferTypeStatic);
+      GFXVertexPCT *verts = mStereoPreviewVB.lock(0, 4);
+
+      F32 texLeft = 0.0f;
+      F32 texRight = 1.0f;
+      F32 texTop = 0.0f;
+      F32 texBottom = 1.0f;
+
+      F32 rectWidth = updateRect.extent.x;
+      F32 rectHeight = updateRect.extent.y;
+
+      F32 screenLeft = 0;
+      F32 screenRight = rectWidth;
+      F32 screenTop = 0;
+      F32 screenBottom = rectHeight;
+
+      const F32 fillConv = 0.0f;
+      verts[0].point.set(screenLeft - fillConv, screenTop - fillConv, 0.f);
+      verts[1].point.set(screenRight - fillConv, screenTop - fillConv, 0.f);
+      verts[2].point.set(screenLeft - fillConv, screenBottom - fillConv, 0.f);
+      verts[3].point.set(screenRight - fillConv, screenBottom - fillConv, 0.f);
+
+      verts[0].color = verts[1].color = verts[2].color = verts[3].color = ColorI(255, 255, 255, 255);
+
+      verts[0].texCoord.set(texLeft, texTop);
+      verts[1].texCoord.set(texRight, texTop);
+      verts[2].texCoord.set(texLeft, texBottom);
+      verts[3].texCoord.set(texRight, texBottom);
+
+      mStereoPreviewVB.unlock();
+   }
+
+   if (!mStereoPreviewSB.getPointer())
+   {
+      // DrawBitmapStretchSR
+      GFXStateBlockDesc bitmapStretchSR;
+      bitmapStretchSR.setCullMode(GFXCullNone);
+      bitmapStretchSR.setZReadWrite(false, false);
+      bitmapStretchSR.setBlend(false, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha);
+      bitmapStretchSR.samplersDefined = true;
+
+      bitmapStretchSR.samplers[0] = GFXSamplerStateDesc::getClampLinear();
+      bitmapStretchSR.samplers[0].minFilter = GFXTextureFilterPoint;
+      bitmapStretchSR.samplers[0].mipFilter = GFXTextureFilterPoint;
+      bitmapStretchSR.samplers[0].magFilter = GFXTextureFilterPoint;
+
+      mStereoPreviewSB = GFX->createStateBlock(bitmapStretchSR);
+   }
+
+   GFX->setVertexBuffer(mStereoPreviewVB);
+   GFX->setStateBlock(mStereoPreviewSB);
+   GFX->setTexture(0, previewTexture);
+   GFX->setupGenericShaders(GFXDevice::GSModColorTexture);
+   GFX->drawPrimitive(GFXTriangleStrip, 0, 2);
 }
 
 //=============================================================================
@@ -539,10 +874,17 @@ DefineEngineMethod( GuiTSCtrl, getWorldToScreenScale, Point2F, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( GuiTSCtrl, calculateViewDistance, float, ( float radius ),,
+DefineEngineMethod( GuiTSCtrl, calculateViewDistance, F32, ( F32 radius ),,
    "Given the camera's current FOV, get the distance from the camera's viewpoint at which the given radius will fit in the render area.\n"
    "@param radius Radius in world-space units which should fit in the view.\n"
    "@return The distance from the viewpoint at which the given radius would be fully visible." )
 {
    return object->calculateViewDistance( radius );
+}
+
+DefineEngineMethod( GuiTSCtrl, setStereoGui, void, ( GuiOffscreenCanvas* canvas ),,
+   "Sets the current stereo texture to an offscreen canvas\n"
+   "@param canvas The desired canvas." )
+{
+   object->setStereoGui(canvas);
 }

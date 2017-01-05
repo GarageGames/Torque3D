@@ -27,7 +27,7 @@ subject to the following restrictions:
 // constructor
 // anchor, axis1 and axis2 are in world coordinate system
 // axis1 must be orthogonal to axis2
-btUniversalConstraint::btUniversalConstraint(btRigidBody& rbA, btRigidBody& rbB, btVector3& anchor, btVector3& axis1, btVector3& axis2)
+btUniversalConstraint::btUniversalConstraint(btRigidBody& rbA, btRigidBody& rbB, const btVector3& anchor, const btVector3& axis1, const btVector3& axis2)
 : btGeneric6DofConstraint(rbA, rbB, btTransform::getIdentity(), btTransform::getIdentity(), true),
  m_anchor(anchor),
  m_axis1(axis1),
@@ -42,8 +42,8 @@ btUniversalConstraint::btUniversalConstraint(btRigidBody& rbA, btRigidBody& rbB,
 	// new position of X, allowed limits are (-PI,PI);
 	// So to simulate ODE Universal joint we should use parent axis as Z, child axis as Y and limit all other DOFs
 	// Build the frame in world coordinate system first
-	btVector3 zAxis = axis1.normalize();
-	btVector3 yAxis = axis2.normalize();
+	btVector3 zAxis = m_axis1.normalize();
+	btVector3 yAxis = m_axis2.normalize();
 	btVector3 xAxis = yAxis.cross(zAxis); // we want right coordinate system
 	btTransform frameInW;
 	frameInW.setIdentity();
@@ -60,4 +60,28 @@ btUniversalConstraint::btUniversalConstraint(btRigidBody& rbA, btRigidBody& rbB,
 	setAngularLowerLimit(btVector3(0.f, -SIMD_HALF_PI + UNIV_EPS, -SIMD_PI + UNIV_EPS));
 	setAngularUpperLimit(btVector3(0.f,  SIMD_HALF_PI - UNIV_EPS,  SIMD_PI - UNIV_EPS));
 }
+
+void btUniversalConstraint::setAxis(const btVector3& axis1,const btVector3& axis2)
+{
+  m_axis1 = axis1;
+  m_axis2 = axis2;
+
+	btVector3 zAxis = axis1.normalized();
+	btVector3 yAxis = axis2.normalized();
+	btVector3 xAxis = yAxis.cross(zAxis); // we want right coordinate system
+
+	btTransform frameInW;
+	frameInW.setIdentity();
+	frameInW.getBasis().setValue(	xAxis[0], yAxis[0], zAxis[0],	
+                                xAxis[1], yAxis[1], zAxis[1],
+                                xAxis[2], yAxis[2], zAxis[2]);
+	frameInW.setOrigin(m_anchor);
+
+	// now get constraint frame in local coordinate systems
+	m_frameInA = m_rbA.getCenterOfMassTransform().inverse() * frameInW;
+	m_frameInB = m_rbB.getCenterOfMassTransform().inverse() * frameInW;
+
+  calculateTransforms();
+}
+
 

@@ -20,14 +20,11 @@ subject to the following restrictions:
 
 
 
-btPoint2PointConstraint::btPoint2PointConstraint()
-:btTypedConstraint(POINT2POINT_CONSTRAINT_TYPE),
-m_useSolveConstraintObsolete(false)
-{
-}
+
 
 btPoint2PointConstraint::btPoint2PointConstraint(btRigidBody& rbA,btRigidBody& rbB, const btVector3& pivotInA,const btVector3& pivotInB)
 :btTypedConstraint(POINT2POINT_CONSTRAINT_TYPE,rbA,rbB),m_pivotInA(pivotInA),m_pivotInB(pivotInB),
+m_flags(0),
 m_useSolveConstraintObsolete(false)
 {
 
@@ -36,6 +33,7 @@ m_useSolveConstraintObsolete(false)
 
 btPoint2PointConstraint::btPoint2PointConstraint(btRigidBody& rbA,const btVector3& pivotInA)
 :btTypedConstraint(POINT2POINT_CONSTRAINT_TYPE,rbA),m_pivotInA(pivotInA),m_pivotInB(rbA.getCenterOfMassTransform()(pivotInA)),
+m_flags(0),
 m_useSolveConstraintObsolete(false)
 {
 	
@@ -118,15 +116,14 @@ void btPoint2PointConstraint::getInfo2NonVirtual (btConstraintInfo2* info, const
 		a1neg.getSkewSymmetricMatrix(angular0,angular1,angular2);
 	}
     
-	/*info->m_J2linearAxis[0] = -1;
-    info->m_J2linearAxis[s+1] = -1;
-    info->m_J2linearAxis[2*s+2] = -1;
-	*/
+	info->m_J2linearAxis[0] = -1;
+    info->m_J2linearAxis[info->rowskip+1] = -1;
+    info->m_J2linearAxis[2*info->rowskip+2] = -1;
 	
 	btVector3 a2 = body1_trans.getBasis()*getPivotInB();
    
 	{
-		btVector3 a2n = -a2;
+	//	btVector3 a2n = -a2;
 		btVector3* angular0 = (btVector3*)(info->m_J2angularAxis);
 		btVector3* angular1 = (btVector3*)(info->m_J2angularAxis+info->rowskip);
 		btVector3* angular2 = (btVector3*)(info->m_J2angularAxis+2*info->rowskip);
@@ -136,14 +133,21 @@ void btPoint2PointConstraint::getInfo2NonVirtual (btConstraintInfo2* info, const
 
 
     // set right hand side
-    btScalar k = info->fps * info->erp;
+	btScalar currERP = (m_flags & BT_P2P_FLAGS_ERP) ? m_erp : info->erp;
+    btScalar k = info->fps * currERP;
     int j;
-
 	for (j=0; j<3; j++)
     {
-        info->m_constraintError[j*info->rowskip] = k * (a2[j] + body1_trans.getOrigin()[j] -                     a1[j] - body0_trans.getOrigin()[j]);
+        info->m_constraintError[j*info->rowskip] = k * (a2[j] + body1_trans.getOrigin()[j] - a1[j] - body0_trans.getOrigin()[j]);
 		//printf("info->m_constraintError[%d]=%f\n",j,info->m_constraintError[j]);
     }
+	if(m_flags & BT_P2P_FLAGS_CFM)
+	{
+		for (j=0; j<3; j++)
+		{
+			info->cfm[j*info->rowskip] = m_cfm;
+		}
+	}
 
 	btScalar impulseClamp = m_setting.m_impulseClamp;//
 	for (j=0; j<3; j++)
@@ -154,85 +158,11 @@ void btPoint2PointConstraint::getInfo2NonVirtual (btConstraintInfo2* info, const
 			info->m_upperLimit[j*info->rowskip] = impulseClamp;
 		}
 	}
+	info->m_damping = m_setting.m_damping;
 	
 }
 
 
-void	btPoint2PointConstraint::solveConstraintObsolete(btSolverBody& bodyA,btSolverBody& bodyB,btScalar	timeStep)
-{
-
-	if (m_useSolveConstraintObsolete)
-	{
-		btVector3 pivotAInW = m_rbA.getCenterOfMassTransform()*m_pivotInA;
-		btVector3 pivotBInW = m_rbB.getCenterOfMassTransform()*m_pivotInB;
-
-
-		btVector3 normal(0,0,0);
-		
-
-	//	btVector3 angvelA = m_rbA.getCenterOfMassTransform().getBasis().transpose() * m_rbA.getAngularVelocity();
-	//	btVector3 angvelB = m_rbB.getCenterOfMassTransform().getBasis().transpose() * m_rbB.getAngularVelocity();
-
-		for (int i=0;i<3;i++)
-		{		
-			normal[i] = 1;
-			btScalar jacDiagABInv = btScalar(1.) / m_jac[i].getDiagonal();
-
-			btVector3 rel_pos1 = pivotAInW - m_rbA.getCenterOfMassPosition(); 
-			btVector3 rel_pos2 = pivotBInW - m_rbB.getCenterOfMassPosition();
-			//this jacobian entry could be re-used for all iterations
-			
-			btVector3 vel1,vel2;
-			bodyA.getVelocityInLocalPointObsolete(rel_pos1,vel1);
-			bodyB.getVelocityInLocalPointObsolete(rel_pos2,vel2);
-			btVector3 vel = vel1 - vel2;
-			
-			btScalar rel_vel;
-			rel_vel = normal.dot(vel);
-
-		/*
-			//velocity error (first order error)
-			btScalar rel_vel = m_jac[i].getRelativeVelocity(m_rbA.getLinearVelocity(),angvelA,
-															m_rbB.getLinearVelocity(),angvelB);
-		*/
-		
-			//positional error (zeroth order error)
-			btScalar depth = -(pivotAInW - pivotBInW).dot(normal); //this is the error projected on the normal
-			
-			btScalar deltaImpulse = depth*m_setting.m_tau/timeStep  * jacDiagABInv -  m_setting.m_damping * rel_vel * jacDiagABInv;
-
-			btScalar impulseClamp = m_setting.m_impulseClamp;
-			
-			const btScalar sum = btScalar(m_appliedImpulse) + deltaImpulse;
-			if (sum < -impulseClamp)
-			{
-				deltaImpulse = -impulseClamp-m_appliedImpulse;
-				m_appliedImpulse = -impulseClamp;
-			}
-			else if (sum > impulseClamp) 
-			{
-				deltaImpulse = impulseClamp-m_appliedImpulse;
-				m_appliedImpulse = impulseClamp;
-			}
-			else
-			{
-				m_appliedImpulse = sum;
-			}
-
-			
-			btVector3 impulse_vector = normal * deltaImpulse;
-			
-			btVector3 ftorqueAxis1 = rel_pos1.cross(normal);
-			btVector3 ftorqueAxis2 = rel_pos2.cross(normal);
-			bodyA.applyImpulse(normal*m_rbA.getInvMass(), m_rbA.getInvInertiaTensorWorld()*ftorqueAxis1,deltaImpulse);
-			bodyB.applyImpulse(normal*m_rbB.getInvMass(), m_rbB.getInvInertiaTensorWorld()*ftorqueAxis2,-deltaImpulse);
-
-
-			normal[i] = 0;
-		}
-	}
-
-}
 
 void	btPoint2PointConstraint::updateRHS(btScalar	timeStep)
 {
@@ -240,3 +170,60 @@ void	btPoint2PointConstraint::updateRHS(btScalar	timeStep)
 
 }
 
+///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5). 
+///If no axis is provided, it uses the default axis for this constraint.
+void btPoint2PointConstraint::setParam(int num, btScalar value, int axis)
+{
+	if(axis != -1)
+	{
+		btAssertConstrParams(0);
+	}
+	else
+	{
+		switch(num)
+		{
+			case BT_CONSTRAINT_ERP :
+			case BT_CONSTRAINT_STOP_ERP :
+				m_erp = value; 
+				m_flags |= BT_P2P_FLAGS_ERP;
+				break;
+			case BT_CONSTRAINT_CFM :
+			case BT_CONSTRAINT_STOP_CFM :
+				m_cfm = value; 
+				m_flags |= BT_P2P_FLAGS_CFM;
+				break;
+			default: 
+				btAssertConstrParams(0);
+		}
+	}
+}
+
+///return the local value of parameter
+btScalar btPoint2PointConstraint::getParam(int num, int axis) const 
+{
+	btScalar retVal(SIMD_INFINITY);
+	if(axis != -1)
+	{
+		btAssertConstrParams(0);
+	}
+	else
+	{
+		switch(num)
+		{
+			case BT_CONSTRAINT_ERP :
+			case BT_CONSTRAINT_STOP_ERP :
+				btAssertConstrParams(m_flags & BT_P2P_FLAGS_ERP);
+				retVal = m_erp; 
+				break;
+			case BT_CONSTRAINT_CFM :
+			case BT_CONSTRAINT_STOP_CFM :
+				btAssertConstrParams(m_flags & BT_P2P_FLAGS_CFM);
+				retVal = m_cfm; 
+				break;
+			default: 
+				btAssertConstrParams(0);
+		}
+	}
+	return retVal;
+}
+	

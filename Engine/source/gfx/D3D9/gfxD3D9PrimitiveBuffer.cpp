@@ -112,3 +112,4 @@ void GFXD3D9PrimitiveBuffer::resurrect()
         usage , GFXD3D9IndexFormat[GFXIndexFormat16], pool, &ib, 0),
         "GFXD3D9PrimitiveBuffer::resurrect - Failed to allocate an index buffer.");
 }
+

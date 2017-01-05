@@ -25,6 +25,7 @@
 
 #include "core/frameAllocator.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "core/stringTable.h"
 #include "console/consoleInternal.h"
 #include "console/ast.h"
@@ -112,24 +113,25 @@ MODULE_END;
 // BRKCLR file line - sent when a breakpoint cannot be moved to a breakable line on the client.
 //
 
-
-ConsoleFunction( dbgSetParameters, void, 3, 4, "(int port, string password, bool waitForClient)"
+DefineConsoleFunction( dbgSetParameters, void, (S32 port, const char * password, bool waitForClient ), (false), "( int port, string password, bool waitForClient )"
                 "Open a debug server port on the specified port, requiring the specified password, "
 				"and optionally waiting for the debug client to connect.\n"
 				"@internal Primarily used for Torsion and other debugging tools")
 {
    if (TelDebugger)
-	   TelDebugger->setDebugParameters(dAtoi(argv[1]), argv[2], argc > 3 ? dAtob(argv[3]) : false );
+   {
+      TelDebugger->setDebugParameters(port, password, waitForClient );
+   }
 }
 
-ConsoleFunction( dbgIsConnected, bool, 1, 1, "()"
+DefineConsoleFunction( dbgIsConnected, bool, (), , "()"
                 "Returns true if a script debugging client is connected else return false.\n"
 				"@internal Primarily used for Torsion and other debugging tools")
 {
    return TelDebugger && TelDebugger->isConnected();
 }
 
-ConsoleFunction( dbgDisconnect, void, 1, 1, "()"
+DefineConsoleFunction( dbgDisconnect, void, (), , "()"
                 "Forcibly disconnects any attached script debugging client.\n"
 				"@internal Primarily used for Torsion and other debugging tools")
 {
@@ -149,8 +151,8 @@ TelnetDebugger::TelnetDebugger()
    Con::addConsumer(debuggerConsumer);
 
    mAcceptPort = -1;
-   mAcceptSocket = InvalidSocket;
-   mDebugSocket = InvalidSocket;
+   mAcceptSocket = NetSocket::INVALID;
+   mDebugSocket = NetSocket::INVALID;
 
    mState = NotConnected;
    mCurPos = 0;
@@ -187,9 +189,9 @@ TelnetDebugger::~TelnetDebugger()
 {
    Con::removeConsumer(debuggerConsumer);
 
-   if(mAcceptSocket != InvalidSocket)
+   if(mAcceptSocket != NetSocket::INVALID)
       Net::closeSocket(mAcceptSocket);
-   if(mDebugSocket != InvalidSocket)
+   if(mDebugSocket != NetSocket::INVALID)
       Net::closeSocket(mDebugSocket);
 }
 
@@ -215,10 +217,10 @@ void TelnetDebugger::send(const char *str)
 
 void TelnetDebugger::disconnect()
 {
-   if ( mDebugSocket != InvalidSocket )
+   if ( mDebugSocket != NetSocket::INVALID )
    {
       Net::closeSocket(mDebugSocket);
-      mDebugSocket = InvalidSocket;
+      mDebugSocket = NetSocket::INVALID;
    }
 
    removeAllBreakpoints();
@@ -234,16 +236,20 @@ void TelnetDebugger::setDebugParameters(S32 port, const char *password, bool wai
 //   if(port == mAcceptPort)
 //      return;
 
-   if(mAcceptSocket != InvalidSocket)
+   if(mAcceptSocket != NetSocket::INVALID)
    {
       Net::closeSocket(mAcceptSocket);
-      mAcceptSocket = InvalidSocket;
+      mAcceptSocket = NetSocket::INVALID;
    }
    mAcceptPort = port;
    if(mAcceptPort != -1 && mAcceptPort != 0)
    {
+	  NetAddress address;
+	  Net::getIdealListenAddress(&address);
+	  address.port = mAcceptPort;
+
       mAcceptSocket = Net::openSocket();
-      Net::bind(mAcceptSocket, mAcceptPort);
+      Net::bindAddress(address, mAcceptSocket);
       Net::listen(mAcceptSocket, 4);
 
       Net::setBlocking(mAcceptSocket, false);
@@ -277,32 +283,33 @@ void TelnetDebugger::process()
 {
    NetAddress address;
 
-   if(mAcceptSocket != InvalidSocket)
+   if(mAcceptSocket != NetSocket::INVALID)
    {
       // ok, see if we have any new connections:
       NetSocket newConnection;
       newConnection = Net::accept(mAcceptSocket, &address);
 
-      if(newConnection != InvalidSocket && mDebugSocket == InvalidSocket)
+      if(newConnection != NetSocket::INVALID && mDebugSocket == NetSocket::INVALID)
       {
-   		Con::printf ("Debugger connection from %i.%i.%i.%i",
-   				address.netNum[0], address.netNum[1], address.netNum[2], address.netNum[3]);
+         char buffer[256];
+         Net::addressToString(&address, buffer);
+         Con::printf("Debugger connection from %s", buffer);
 
          mState = PasswordTry;
          mDebugSocket = newConnection;
 
          Net::setBlocking(newConnection, false);
       }
-      else if(newConnection != InvalidSocket)
+      else if(newConnection != NetSocket::INVALID)
          Net::closeSocket(newConnection);
    }
    // see if we have any input to process...
 
-   if(mDebugSocket == InvalidSocket)
+   if(mDebugSocket == NetSocket::INVALID)
       return;
 
    checkDebugRecv();
-   if(mDebugSocket == InvalidSocket)
+   if(mDebugSocket == NetSocket::INVALID)
       removeAllBreakpoints();
 }
 
@@ -432,7 +439,7 @@ void TelnetDebugger::breakProcess()
    {
       Platform::sleep(10);
       checkDebugRecv();
-      if(mDebugSocket == InvalidSocket)
+      if(mDebugSocket == NetSocket::INVALID)
       {
          mProgramPaused = false;
          removeAllBreakpoints();

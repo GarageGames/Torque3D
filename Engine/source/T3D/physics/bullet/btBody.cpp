@@ -335,18 +335,35 @@ void BtBody::applyImpulse( const Point3F &origin, const Point3F &force )
    AssertFatal( mActor, "BtBody::applyImpulse - The actor is null!" );
    AssertFatal( isDynamic(), "BtBody::applyImpulse - This call is only for dynamics!" );
 
+   // Convert the world position to local
+   MatrixF trans = btCast<MatrixF>( mActor->getCenterOfMassTransform() );
+   trans.inverse();
+   Point3F localOrigin( origin );
+   trans.mulP( localOrigin );
+
    if ( mCenterOfMass )
    {
-      Point3F relOrigin( origin );
+      Point3F relOrigin( localOrigin );
       mCenterOfMass->mulP( relOrigin );
       Point3F relForce( force );
       mCenterOfMass->mulV( relForce );
       mActor->applyImpulse( btCast<btVector3>( relForce ), btCast<btVector3>( relOrigin ) );
    }
    else
-      mActor->applyImpulse( btCast<btVector3>( force ), btCast<btVector3>( origin ) );
+      mActor->applyImpulse( btCast<btVector3>( force ), btCast<btVector3>( localOrigin ) );
 
    if ( !mActor->isActive() )
+      mActor->activate();
+}
+
+void BtBody::applyTorque(const Point3F &torque)
+{
+   AssertFatal(mActor, "BtBody::applyTorque - The actor is null!");
+   AssertFatal(isDynamic(), "BtBody::applyTorque - This call is only for dynamics!");
+
+   mActor->applyTorque( btCast<btVector3>(torque) );
+
+   if (!mActor->isActive())
       mActor->activate();
 }
 
@@ -371,4 +388,32 @@ void BtBody::setSimulationEnabled( bool enabled )
       mWorld->getDynamicsWorld()->addRigidBody( mActor );
 
    mIsEnabled = enabled;
+}
+
+void BtBody::findContact(SceneObject **contactObject,
+   VectorF *contactNormal,
+   Vector<SceneObject*> *outOverlapObjects) const
+{
+}
+
+void BtBody::moveKinematicTo(const MatrixF &transform)
+{
+   AssertFatal(mActor, "BtBody::moveKinematicTo - The actor is null!");
+
+   U32 bodyflags = mActor->getCollisionFlags();
+   const bool isKinematic = bodyflags & BF_KINEMATIC;
+   if (!isKinematic)
+   {
+      Con::errorf("BtBody::moveKinematicTo is only for kinematic bodies.");
+      return;
+   }
+
+   if (mCenterOfMass)
+   {
+      MatrixF xfm;
+      xfm.mul(transform, *mCenterOfMass);
+      mActor->setCenterOfMassTransform(btCast<btTransform>(xfm));
+   }
+   else
+      mActor->setCenterOfMassTransform(btCast<btTransform>(transform));
 }

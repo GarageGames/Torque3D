@@ -65,10 +65,10 @@ bool	btSubsimplexConvexCast::calcTimeOfImpact(
 
 	btVector3 n;
 	n.setValue(btScalar(0.),btScalar(0.),btScalar(0.));
-	bool hasResult = false;
+	
 	btVector3 c;
 
-	btScalar lastLambda = lambda;
+	
 
 
 	btScalar dist2 = v.length2();
@@ -109,16 +109,19 @@ bool	btSubsimplexConvexCast::calcTimeOfImpact(
 				//m_simplexSolver->reset();
 				//check next line
 				 w = supVertexA-supVertexB;
-				lastLambda = lambda;
+				
 				n = v;
-				hasResult = true;
+				
 			}
 		} 
-		m_simplexSolver->addVertex( w, supVertexA , supVertexB);
+		///Just like regular GJK only add the vertex if it isn't already (close) to current vertex, it would lead to divisions by zero and NaN etc.
+		if (!m_simplexSolver->inSimplex(w))
+			m_simplexSolver->addVertex( w, supVertexA , supVertexB);
+
 		if (m_simplexSolver->closest(v))
 		{
 			dist2 = v.length2();
-			hasResult = true;
+			
 			//todo: check this normal for validity
 			//n=v;
 			//printf("V=%f , %f, %f\n",v[0],v[1],v[2]);

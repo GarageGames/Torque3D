@@ -51,6 +51,10 @@
 #include "scene/sceneContainer.h"
 #endif
 
+#ifndef _GFXDEVICE_H_
+#include "gfx/gfxDevice.h"
+#endif
+
 
 class SceneManager;
 class SceneRenderState;
@@ -367,6 +371,7 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
 
       SceneObject();
       virtual ~SceneObject();
+      bool mPathfindingIgnore;
 
       /// Triggered when a SceneObject onAdd is called.
       static Signal< void( SceneObject* ) > smSceneObjectAdd;
@@ -765,8 +770,14 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
       static bool _setFieldRotation( void *object, const char *index, const char *data );
       static bool _setFieldScale( void *object, const char *index, const char *data );
       static bool _setMountPID( void* object, const char* index, const char* data );
+      static bool _setAccuEnabled( void *object, const char *index, const char *data );
 
       /// @}
+
+   // Accumulation Texture
+   // Note: This was placed in SceneObject to both ShapeBase and TSStatic could support it.
+   public:
+      GFXTextureObject* mAccuTex;
 };
 
 #endif  // _SCENEOBJECT_H_

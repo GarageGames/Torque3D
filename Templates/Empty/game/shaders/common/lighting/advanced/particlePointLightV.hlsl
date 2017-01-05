@@ -20,24 +20,26 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "../../hlslStructs.h"
+#include "../../hlslStructs.hlsl"
+#include "../../shaderModel.hlsl"
 
 struct ConvexConnectV
 {
-   float4 hpos : POSITION;
+   float4 hpos : TORQUE_POSITION;
    float4 ssPos : TEXCOORD0;
    float3 vsEyeDir : TEXCOORD1;
 };
 
-ConvexConnectV main( VertexIn_P IN,
-                     uniform float4x4 viewProj,
-                     uniform float4x4 view,
-                     uniform float3 particlePosWorld,
-                     uniform float  lightRange )
+uniform float4x4 viewProj;
+uniform float4x4 view;
+uniform float3 particlePosWorld;
+uniform float  lightRange;
+
+ConvexConnectV main( VertexIn_P IN  )
 {
    ConvexConnectV OUT;
-   
-   float4 vPosWorld = IN.pos + float4(particlePosWorld, 0.0) + float4(IN.pos.xyz, 0.0) * lightRange;
+   float4 pos = float4(IN.pos, 0.0);
+   float4 vPosWorld = pos + float4(particlePosWorld, 0.0) + pos * lightRange;
    OUT.hpos = mul(viewProj, vPosWorld);
    OUT.vsEyeDir = mul(view, vPosWorld);
    OUT.ssPos = OUT.hpos;

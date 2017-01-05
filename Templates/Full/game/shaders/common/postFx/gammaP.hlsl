@@ -24,23 +24,30 @@
 #include "./postFx.hlsl"  
 #include "../torque.hlsl"
 
-uniform sampler2D backBuffer : register(S0);
-uniform sampler1D colorCorrectionTex : register( s1 );
+TORQUE_UNIFORM_SAMPLER2D(backBuffer, 0);
+TORQUE_UNIFORM_SAMPLER1D(colorCorrectionTex, 1);
 
 uniform float OneOverGamma;
+uniform float Brightness;
+uniform float Contrast;
 
-
-float4 main( PFXVertToPix IN ) : COLOR0  
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0  
 {
-    float4 color = tex2D(backBuffer, IN.uv0.xy);
+    float4 color = TORQUE_TEX2D(backBuffer, IN.uv0.xy);
 
    // Apply the color correction.
-   color.r = tex1D( colorCorrectionTex, color.r ).r;
-   color.g = tex1D( colorCorrectionTex, color.g ).g;
-   color.b = tex1D( colorCorrectionTex, color.b ).b;
+   color.r = TORQUE_TEX1D( colorCorrectionTex, color.r ).r;
+   color.g = TORQUE_TEX1D( colorCorrectionTex, color.g ).g;
+   color.b = TORQUE_TEX1D( colorCorrectionTex, color.b ).b;
 
    // Apply gamma correction
-    color.rgb = pow( abs(color.rgb), OneOverGamma );
+    color.rgb = pow( saturate(color.rgb), OneOverGamma );
+
+   // Apply contrast
+   color.rgb = ((color.rgb - 0.5f) * Contrast) + 0.5f;
+ 
+   // Apply brightness
+   color.rgb += Brightness;
 
     return color;    
 }

@@ -65,6 +65,7 @@ const String ShaderGenVars::lightSpotAngle("$inLightSpotAngle");
 const String ShaderGenVars::lightSpotFalloff("$inLightSpotFalloff");
 const String ShaderGenVars::specularColor("$specularColor");
 const String ShaderGenVars::specularPower("$specularPower");
+const String ShaderGenVars::specularStrength("$specularStrength");
 
 // These are ignored by the D3D layers.
 const String ShaderGenVars::fogMap("$fogMap");
@@ -80,3 +81,6 @@ const String ShaderGenVars::dLightMap("$dlightMap");
 const String ShaderGenVars::dLightMapSec("$dlightMapSec");
 const String ShaderGenVars::dLightMask("$dlightMask");
 const String ShaderGenVars::toneMap("$toneMap");
+
+// Deferred shading
+const String ShaderGenVars::matInfoFlags("$matInfoFlags");

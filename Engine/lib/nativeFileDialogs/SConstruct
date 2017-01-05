@@ -1,0 +1,99 @@
+# 
+# Native File Dialog
+#
+# Scons build script -- GCC, Clang, Visual Studio
+# Does not build test
+
+
+import os
+        
+
+# target arch is build arch -- extend here for OS cross compiling
+target_os=str(Platform())
+
+# Corresponds to TARGET_ARCH set to environ.
+target_arch = ARGUMENTS.get('target_arch', None)
+
+# visual studio does not import from environment
+if target_os != 'win32':
+    IMPORT_FROM_ENV =['CC', 'CXX', 'CFLAGS', 'CXXFLAGS', 'ARFLAGS']
+else:
+    IMPORT_FROM_ENV =[]
+
+
+debug = int(ARGUMENTS.get( 'debug', 0 ))
+
+nfd_files = ['nfd_common.c']
+
+# Due to a Scons limitation, TARGET_ARCH cannot be appended to an existing environment.
+if target_arch != None:
+    nfd_env = Environment( TARGET_ARCH=target_arch )
+else:
+    nfd_env = Environment()
+
+# import specific environment variables from the command line, overriding
+# Scons environment defaults
+for env_key in IMPORT_FROM_ENV:
+    if env_key in os.environ:
+        print "Making %s => %s" % ( env_key, os.environ[env_key] )
+        nfd_env[env_key] = os.environ[env_key]
+
+# Windows runtime library types
+win_rtl = {'debug': '/MDd',     
+           'release': '/MD'}   
+
+def set_debug(env):
+    if target_os == 'win32':
+        env.Append( CCFLAGS=['/Z7',       # obj contains full symbols
+                            win_rtl['debug']
+                        ])
+    else:
+        env.Append( CFLAGS=['-g'] )
+
+
+def set_release(env):
+    if target_os == 'win32':
+        env.Append( CCFLAGS=[win_rtl['release'],  
+                            '/O2'] )
+    else:
+        env.Append( CFLAGS=['-O3'] )
+                    
+
+def set_warnings(env):
+    if target_os == 'win32':
+        env.Append( CCFLAGS=['/W3'],
+                    CPPDEFINES=['_CRT_SECURE_NO_WARNINGS'] )
+    else:
+        env.Append( CFLAGS=['-Wall', '-pedantic'] )
+
+
+def get_lib_name(base, is_debug):
+    if is_debug:
+        return base + '_d'
+    else:
+        return base
+
+
+# Cocoa OS X builds - clang
+if target_os == 'darwin':
+    nfd_files.append('nfd_cocoa.m')
+    nfd_env.CC='clang -fcolor-diagnostics'
+
+# Linux GTK+ 3 builds - GCC
+elif target_os == 'posix':
+    nfd_files.append('nfd_gtk.c')
+    nfd_env.ParseConfig( 'pkg-config --cflags gtk+-3.0' )
+
+# Windows builds - Visual Studio
+elif target_os == 'win32':
+    nfd_files.append('nfd_win.cpp')
+
+if debug:
+    set_debug(nfd_env)
+else:
+    set_release(nfd_env)
+
+set_warnings(nfd_env)
+
+nfd_env.Append( CPPPATH=['.','./include'] )
+nfd_env.StaticLibrary( get_lib_name('nfd', debug), nfd_files )

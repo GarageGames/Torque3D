@@ -31,6 +31,7 @@
 #include "util/noise2d.h"
 #include "core/volume.h"
 
+using namespace Torque;
 
 ConsoleStaticMethod( TerrainBlock, createNew, S32, 5, 5, 
    "TerrainBlock.create( String terrainName, U32 resolution, String materialName, bool genNoise )\n"

@@ -195,7 +195,7 @@ class RigidShape: public ShapeBase
    CollisionList mContacts;
    Rigid mRigid;
    ShapeBaseConvex mConvex;
-   int restCount;
+   S32 restCount;
 
    SimObjectPtr<ParticleEmitter> mDustEmitterList[RigidShapeData::VC_NUM_DUST_EMITTERS];
    SimObjectPtr<ParticleEmitter> mSplashEmitterList[RigidShapeData::VC_NUM_SPLASH_EMITTERS];
@@ -296,7 +296,7 @@ public:
    void unpackUpdate(NetConnection *conn,           BitStream *stream);
 
    DECLARE_CONOBJECT(RigidShape);
-   DECLARE_CALLBACK( void, onEnterLiquid, ( const char* objId, const char* waterCoverage, const char* liquidType ));
+   DECLARE_CALLBACK( void, onEnterLiquid, ( const char* objId, F32 waterCoverage, const char* liquidType ));
    DECLARE_CALLBACK( void, onLeaveLiquid, ( const char* objId, const char* liquidType ));
 };
 

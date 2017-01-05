@@ -76,7 +76,7 @@ class WorldEditor : public EditTSCtrl
          Point3F p2;
       };
 
-      void ignoreObjClass(U32 argc, const char** argv);
+      void ignoreObjClass(U32 argc, ConsoleValueRef* argv);
       void clearIgnoreList();
 
       static bool setObjectsUseBoxCenter( void *object, const char *index, const char *data ) { static_cast<WorldEditor*>(object)->setObjectsUseBoxCenter( dAtob( data ) ); return false; };
@@ -92,7 +92,6 @@ class WorldEditor : public EditTSCtrl
       S32 getSelectionSize();
       S32 getSelectObject(S32 index);	
       const Point3F& getSelectionCentroid();
-      const char* getSelectionCentroidText();
       const Box3F& getSelectionBounds();
       Point3F getSelectionExtent();
       F32 getSelectionRadius();
@@ -117,6 +116,8 @@ class WorldEditor : public EditTSCtrl
 
       void makeSelectionPrefab( const char *filename );
       void explodeSelectedPrefab();
+
+      void makeSelectionAMesh(const char *filename);
 
       //
       static SceneObject* getClientObj(SceneObject *);

@@ -1,0 +1,98 @@
+<Entity
+    scale="1 1 1"
+    class="ThirdPersonPlayerObject"
+    canSave="true"
+    canSaveDynamicFields="true"
+    position="0 0 0"
+    rotation="0 0 0">
+    <Component
+        networked="false"
+        enabled="true"
+        class="ControlObjectComponent"
+        clientOwner="1" />
+    <CollisionComponent
+        friendlyName="Collision(Component)"
+        networked="false"
+        enabled="true"
+        collisionType="Bounds"
+        LineOfSightType="Collision Mesh"
+        decalType="Collision Mesh"
+        CollisionMeshPrefix="Collision"
+        BlockCollisions="true" />
+    <PlayerControllerComponent
+        componentType="Physics"
+        friendlyName="Simple Physics"
+        description="Simple physics behavior that allows gravity and impulses."
+        networked="false"
+        enabled="true"
+        gravity="0 0 -9"
+        velocity="0 0 0"
+        isStatic="false" />
+    <MeshComponent
+        componentType="Render"
+        friendlyName="Mesh Component"
+        description="Causes the object to render a non-animating 3d shape using the file provided."
+        networked="true"
+        enabled="true"
+        MeshAsset="Art:SoldierPlayer" />
+    <Component
+        networked="false"
+        enabled="true"
+        class="FPSControls" />
+    <CameraComponent
+        networked="false"
+        enabled="true"
+        FOV="80"
+        MinFOV="5"
+        MaxFOV="175"
+        ScreenAspect="1024 768"
+        targetNode="Eye"
+        positionOffset="0 0 0"
+        rotationOffset="0 0 0"
+        useParentTransform="false" />
+    <CameraOrbiterComponent
+        orbitDistance="5"
+        maxPitchAngle="70"
+        minPitchAngle="-70"
+        networked="false"
+        enabled="true" />
+	<AnimationComponent
+        componentType="Render"
+        friendlyName="Animation Component"
+        description="An animation component"
+        networked="true"
+        enabled="true"/>
+    <SpotLight
+        range="10"
+        innerAngle="40"
+        outerAngle="45"
+        isEnabled="true"
+        color="1 1 1 1"
+        brightness="1"
+        castShadows="false"
+        priority="1"
+        animate="true"
+        animationPeriod="1"
+        animationPhase="1"
+        flareScale="1"
+        attenuationRatio="0 1 1"
+        shadowType="Spot"
+        texSize="512"
+        overDarkFactor="2000 1000 500 100"
+        shadowDistance="400"
+        shadowSoftness="0.15"
+        numSplits="1"
+        logWeight="0.91"
+        fadeStartDistance="0"
+        lastSplitTerrainOnly="false"
+        representedInLightmap="false"
+        shadowDarkenColor="0 0 0 -1"
+        includeLightmappedGeometryInShadow="false"
+        position="0 0 1.6137"
+        rotation="0 0 1 0"
+        mountNode="-1"
+        mountPos="0 0 1.5"
+        mountRot="1 0 0 0"
+        canSave="true"
+        canSaveDynamicFields="true" />
+</Entity>

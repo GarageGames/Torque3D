@@ -79,7 +79,7 @@ void ConsoleLogger::initPersistFields()
 
 //-----------------------------------------------------------------------------
 
-bool ConsoleLogger::processArguments( S32 argc, const char **argv )
+bool ConsoleLogger::processArguments( S32 argc, ConsoleValueRef *argv )
 {
    if( argc == 0 )
       return false;
@@ -175,7 +175,7 @@ bool ConsoleLogger::detach()
    mStream.close();
 
    // Remove this object from the list of active loggers
-   for( int i = 0; i < mActiveLoggers.size(); i++ ) 
+   for( S32 i = 0; i < mActiveLoggers.size(); i++ ) 
    {
       if( mActiveLoggers[i] == this ) 
       {
@@ -225,7 +225,7 @@ void ConsoleLogger::log( const char *consoleLine )
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( ConsoleLogger, attach, bool, 2, 2, "() Attaches the logger to the console and begins writing to file"
+DefineConsoleMethod( ConsoleLogger, attach, bool, (), , "() Attaches the logger to the console and begins writing to file"
 			  "@tsexample\n"
 			  "// Create the logger\n"
 			  "// Will automatically start writing to testLogging.txt with normal priority\n"
@@ -247,7 +247,7 @@ ConsoleMethod( ConsoleLogger, attach, bool, 2, 2, "() Attaches the logger to the
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( ConsoleLogger, detach, bool, 2, 2, "() Detaches the logger from the console and stops writing to file"
+DefineConsoleMethod( ConsoleLogger, detach, bool, (), , "() Detaches the logger from the console and stops writing to file"
 			  "@tsexample\n"
 			  "// Create the logger\n"
 			  "// Will automatically start writing to testLogging.txt with normal priority\n"

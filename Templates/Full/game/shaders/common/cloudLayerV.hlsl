@@ -23,10 +23,11 @@
 //-----------------------------------------------------------------------------
 // Structures                                                                  
 //-----------------------------------------------------------------------------
+#include "shaderModel.hlsl"
 
 struct CloudVert
 {
-   float4 pos        : POSITION;
+   float3 pos        : POSITION;
    float3 normal     : NORMAL;
    float3 binormal   : BINORMAL;
    float3 tangent    : TANGENT;
@@ -35,7 +36,7 @@ struct CloudVert
 
 struct ConnectData
 {
-   float4 hpos                : POSITION;   
+   float4 hpos                : TORQUE_POSITION;   
    float4 texCoord12          : TEXCOORD0;
    float4 texCoord34          : TEXCOORD1;   
    float3 vLightTS            : TEXCOORD2;   // light vector in tangent space, denormalized
@@ -61,8 +62,7 @@ ConnectData main( CloudVert IN )
 {   
    ConnectData OUT;
 
-   OUT.hpos = mul(modelview, IN.pos);
-   
+   OUT.hpos = mul(modelview, float4(IN.pos,1.0));
    // Offset the uv so we don't have a seam directly over our head.
    float2 uv = IN.uv0 + float2( 0.5, 0.5 );
    
@@ -85,7 +85,7 @@ ConnectData main( CloudVert IN )
    float3 vBinormalWS = -IN.binormal;
 
    // Compute position in world space:
-   float4 vPositionWS = IN.pos + float4( eyePosWorld, 1 ); //mul( IN.pos, objTrans );
+   float4 vPositionWS = float4(IN.pos, 1.0) + float4(eyePosWorld, 1); //mul( IN.pos, objTrans );
 
    // Compute and output the world view vector (unnormalized):
    float3 vViewWS = eyePosWorld - vPositionWS.xyz;

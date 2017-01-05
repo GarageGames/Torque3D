@@ -104,7 +104,7 @@ BOOL CALLBACK EnumFamCallBack(LPLOGFONT logFont, LPNEWTEXTMETRIC textMetric, DWO
 
    const U32 len = dStrlen( logFont->lfFaceName ) * 3 + 1;
    FrameTemp<UTF8> buffer( len );
-   convertUTF16toUTF8( logFont->lfFaceName, buffer, len );
+   convertUTF16toUTF8N( logFont->lfFaceName, buffer, len );
 
    fonts->push_back( StringTable->insert( buffer ) );
 
@@ -116,7 +116,7 @@ void PlatformFont::enumeratePlatformFonts( Vector<StringTableEntry>& fonts, UTF1
    EnumFontFamilies( fontHDC, fontFamily, (FONTENUMPROC)EnumFamCallBack, (LPARAM)&fonts );
 }
 
-PlatformFont *createPlatformFont(const char *name, U32 size, U32 charset /* = TGE_ANSI_CHARSET */)
+PlatformFont *createPlatformFont(const char *name, dsize_t size, U32 charset /* = TGE_ANSI_CHARSET */)
 {
     PlatformFont *retFont = new WinFont;
 
@@ -139,7 +139,7 @@ WinFont::~WinFont()
     }
 }
 
-bool WinFont::create(const char *name, U32 size, U32 charset /* = TGE_ANSI_CHARSET */)
+bool WinFont::create(const char *name, dsize_t size, U32 charset /* = TGE_ANSI_CHARSET */)
 {
    if(name == NULL || size < 1)
       return false;

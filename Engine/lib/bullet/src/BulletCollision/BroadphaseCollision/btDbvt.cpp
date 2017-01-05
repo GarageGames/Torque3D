@@ -38,8 +38,9 @@ static DBVT_INLINE btDbvtVolume	merge(	const btDbvtVolume& a,
 									  const btDbvtVolume& b)
 {
 #if (DBVT_MERGE_IMPL==DBVT_IMPL_SSE)
-	ATTRIBUTE_ALIGNED16(char locals[sizeof(btDbvtAabbMm)]);
-	btDbvtVolume&	res=*(btDbvtVolume*)locals;
+	ATTRIBUTE_ALIGNED16( char locals[sizeof(btDbvtAabbMm)]);
+	btDbvtVolume* ptr = (btDbvtVolume*) locals;
+	btDbvtVolume&	res=*ptr;
 #else
 		btDbvtVolume	res;
 #endif
@@ -61,7 +62,7 @@ static void						getmaxdepth(const btDbvtNode* node,int depth,int& maxdepth)
 	if(node->isinternal())
 	{
 		getmaxdepth(node->childs[0],depth+1,maxdepth);
-		getmaxdepth(node->childs[0],depth+1,maxdepth);
+		getmaxdepth(node->childs[1],depth+1,maxdepth);
 	} else maxdepth=btMax(maxdepth,depth);
 }
 
@@ -250,7 +251,8 @@ static btDbvtVolume				bounds(	const tNodeArray& leaves)
 {
 #if DBVT_MERGE_IMPL==DBVT_IMPL_SSE
 	ATTRIBUTE_ALIGNED16(char	locals[sizeof(btDbvtVolume)]);
-	btDbvtVolume&	volume=*(btDbvtVolume*)locals;
+	btDbvtVolume* ptr = (btDbvtVolume*) locals;
+	btDbvtVolume&	volume=*ptr;
 	volume=leaves[0]->volume;
 #else
 	btDbvtVolume volume=leaves[0]->volume;

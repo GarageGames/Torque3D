@@ -51,6 +51,7 @@ enum eGIMPACT_SHAPE_TYPE
 };
 
 
+
 //! Helper class for tetrahedrons
 class btTetrahedronShapeEx:public btBU_Simplex1to4
 {
@@ -189,10 +190,10 @@ public:
 	//!@{
 
 	//! Base method for determinig which kind of GIMPACT shape we get
-	virtual eGIMPACT_SHAPE_TYPE getGImpactShapeType() = 0;
+	virtual eGIMPACT_SHAPE_TYPE getGImpactShapeType() const = 0 ;
 
 	//! gets boxset
-	SIMD_FORCE_INLINE btGImpactBoxSet * getBoxSet()
+	SIMD_FORCE_INLINE const btGImpactBoxSet * getBoxSet() const
 	{
 		return &m_box_set;
 	}
@@ -276,6 +277,7 @@ public:
 	//! virtual method for ray collision
 	virtual void rayTest(const btVector3& rayFrom, const btVector3& rayTo, btCollisionWorld::RayResultCallback& resultCallback)  const
 	{
+        (void) rayFrom; (void) rayTo; (void) resultCallback;
 	}
 
 	//! Function for retrieve triangles.
@@ -284,6 +286,16 @@ public:
 	*/
 	virtual void	processAllTriangles(btTriangleCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const
 	{
+        (void) callback; (void) aabbMin; (void) aabbMax;
+	}
+
+	//! Function for retrieve triangles.
+	/*!
+	It gives the triangles in local space
+	*/
+	virtual void processAllTrianglesRay(btTriangleCallback* /*callback*/,const btVector3& /*rayFrom*/, const btVector3& /*rayTo*/) const
+	{
+		
 	}
 
 	//!@}
@@ -307,6 +319,7 @@ public:
 
 
 		CompoundPrimitiveManager(const CompoundPrimitiveManager& compound)
+            : btPrimitiveManagerBase()
 		{
 			m_compoundShape = compound.m_compoundShape;
 		}
@@ -349,6 +362,7 @@ public:
 		virtual void get_primitive_triangle(int prim_index,btPrimitiveTriangle & triangle) const
 		{
 			btAssert(0);
+            (void) prim_index; (void) triangle;
 		}
 
 	};
@@ -365,6 +379,7 @@ public:
 
 	btGImpactCompoundShape(bool children_has_transform = true)
 	{
+        (void) children_has_transform;
 		m_primitive_manager.m_compoundShape = this;
 		m_box_set.setPrimitiveManager(&m_primitive_manager);
 	}
@@ -478,11 +493,13 @@ public:
 
 	virtual void getBulletTriangle(int prim_index,btTriangleShapeEx & triangle) const
 	{
+        (void) prim_index; (void) triangle;
 		btAssert(0);
 	}
 
 	virtual void getBulletTetrahedron(int prim_index,btTetrahedronShapeEx & tetrahedron) const
 	{
+        (void) prim_index; (void) tetrahedron;
 		btAssert(0);
 	}
 
@@ -495,7 +512,7 @@ public:
 		return "GImpactCompound";
 	}
 
-	virtual eGIMPACT_SHAPE_TYPE getGImpactShapeType()
+	virtual eGIMPACT_SHAPE_TYPE getGImpactShapeType() const
 	{
 		return CONST_GIMPACT_COMPOUND_SHAPE;
 	}
@@ -551,6 +568,7 @@ public:
 		}
 
  		TrimeshPrimitiveManager(const TrimeshPrimitiveManager & manager)
+            : btPrimitiveManagerBase()
 		{
 			m_meshInterface = manager.m_meshInterface;
 			m_part = manager.m_part;
@@ -627,25 +645,25 @@ public:
 			return (int )numverts;
 		}
 
-		SIMD_FORCE_INLINE void get_indices(int face_index,int &i0,int &i1,int &i2) const
+		SIMD_FORCE_INLINE void get_indices(int face_index,unsigned int &i0,unsigned int &i1,unsigned int &i2) const
 		{
 			if(indicestype == PHY_SHORT)
 			{
-				short * s_indices = (short *)(indexbase + face_index*indexstride);
+				unsigned short* s_indices = (unsigned short *)(indexbase + face_index * indexstride);
 				i0 = s_indices[0];
 				i1 = s_indices[1];
 				i2 = s_indices[2];
 			}
 			else
 			{
-				int * i_indices = (int *)(indexbase + face_index*indexstride);
+				unsigned int * i_indices = (unsigned int *)(indexbase + face_index*indexstride);
 				i0 = i_indices[0];
 				i1 = i_indices[1];
 				i2 = i_indices[2];
 			}
 		}
 
-		SIMD_FORCE_INLINE void get_vertex(int vertex_index, btVector3 & vertex) const
+		SIMD_FORCE_INLINE void get_vertex(unsigned int vertex_index, btVector3 & vertex) const
 		{
 			if(type == PHY_DOUBLE)
 			{
@@ -674,7 +692,7 @@ public:
 
 		virtual void get_primitive_triangle(int prim_index,btPrimitiveTriangle & triangle) const
 		{
-			int indices[3];
+			unsigned int indices[3];
 			get_indices(prim_index,indices[0],indices[1],indices[2]);
 			get_vertex(indices[0],triangle.m_vertices[0]);
 			get_vertex(indices[1],triangle.m_vertices[1]);
@@ -684,7 +702,7 @@ public:
 
 		SIMD_FORCE_INLINE void get_bullet_triangle(int prim_index,btTriangleShapeEx & triangle) const
 		{
-			int indices[3];
+			unsigned int indices[3];
 			get_indices(prim_index,indices[0],indices[1],indices[2]);
 			get_vertex(indices[0],triangle.m_vertices1[0]);
 			get_vertex(indices[1],triangle.m_vertices1[1]);
@@ -704,17 +722,8 @@ public:
 		m_box_set.setPrimitiveManager(&m_primitive_manager);
 	}
 
-
-	btGImpactMeshShapePart(btStridingMeshInterface * meshInterface,	int part)
-	{
-		m_primitive_manager.m_meshInterface = meshInterface;
-		m_primitive_manager.m_part = part;
-		m_box_set.setPrimitiveManager(&m_primitive_manager);
-	}
-
-	virtual ~btGImpactMeshShapePart()
-	{
-	}
+    btGImpactMeshShapePart( btStridingMeshInterface * meshInterface, int part );
+    virtual ~btGImpactMeshShapePart();
 
 	//! if true, then its children must get transforms.
 	virtual bool childrenHasTransform() const
@@ -724,19 +733,8 @@ public:
 
 
 	//! call when reading child shapes
-	virtual void lockChildShapes() const
-	{
-		void * dummy = (void*)(m_box_set.getPrimitiveManager());
-		TrimeshPrimitiveManager * dummymanager = static_cast<TrimeshPrimitiveManager *>(dummy);
-		dummymanager->lock();
-	}
-
-	virtual void unlockChildShapes()  const
-	{
-		void * dummy = (void*)(m_box_set.getPrimitiveManager());
-		TrimeshPrimitiveManager * dummymanager = static_cast<TrimeshPrimitiveManager *>(dummy);
-		dummymanager->unlock();
-	}
+    virtual void lockChildShapes() const;
+    virtual void unlockChildShapes()  const;
 
 	//! Gets the number of children
 	virtual int	getNumChildShapes() const
@@ -748,6 +746,7 @@ public:
 	//! Gets the children
 	virtual btCollisionShape* getChildShape(int index)
 	{
+        (void) index;
 		btAssert(0);
 		return NULL;
 	}
@@ -757,6 +756,7 @@ public:
 	//! Gets the child
 	virtual const btCollisionShape* getChildShape(int index) const
 	{
+        (void) index;
 		btAssert(0);
 		return NULL;
 	}
@@ -764,6 +764,7 @@ public:
 	//! Gets the children transform
 	virtual btTransform	getChildTransform(int index) const
 	{
+        (void) index;
 		btAssert(0);
 		return btTransform();
 	}
@@ -774,6 +775,8 @@ public:
 	*/
 	virtual void setChildTransform(int index, const btTransform & transform)
 	{
+        (void) index;
+        (void) transform;
 		btAssert(0);
 	}
 
@@ -803,7 +806,7 @@ public:
 		return "GImpactMeshShapePart";
 	}
 
-	virtual eGIMPACT_SHAPE_TYPE getGImpactShapeType()
+	virtual eGIMPACT_SHAPE_TYPE getGImpactShapeType() const
 	{
 		return CONST_GIMPACT_TRIMESH_SHAPE_PART;
 	}
@@ -827,6 +830,8 @@ public:
 
 	virtual void getBulletTetrahedron(int prim_index,btTetrahedronShapeEx & tetrahedron) const
 	{
+        (void) prim_index;
+        (void) tetrahedron;
 		btAssert(0);
 	}
 
@@ -870,6 +875,7 @@ public:
     }
 
 	virtual void	processAllTriangles(btTriangleCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const;
+	virtual void	processAllTrianglesRay(btTriangleCallback* callback,const btVector3& rayFrom,const btVector3& rayTo) const;
 };
 
 
@@ -1038,11 +1044,13 @@ public:
 
 	virtual void getBulletTriangle(int prim_index,btTriangleShapeEx & triangle) const
 	{
+        (void) prim_index; (void) triangle;
 		btAssert(0);
 	}
 
 	virtual void getBulletTetrahedron(int prim_index,btTetrahedronShapeEx & tetrahedron) const
 	{
+        (void) prim_index; (void) tetrahedron;
 		btAssert(0);
 	}
 
@@ -1065,12 +1073,14 @@ public:
     */
     virtual void getChildAabb(int child_index,const btTransform& t,btVector3& aabbMin,btVector3& aabbMax) const
     {
+        (void) child_index; (void) t; (void) aabbMin; (void) aabbMax;
         btAssert(0);
     }
 
 	//! Gets the children
 	virtual btCollisionShape* getChildShape(int index)
 	{
+        (void) index;
 		btAssert(0);
 		return NULL;
 	}
@@ -1079,6 +1089,7 @@ public:
 	//! Gets the child
 	virtual const btCollisionShape* getChildShape(int index) const
 	{
+        (void) index;
 		btAssert(0);
 		return NULL;
 	}
@@ -1086,6 +1097,7 @@ public:
 	//! Gets the children transform
 	virtual btTransform	getChildTransform(int index) const
 	{
+        (void) index;
 		btAssert(0);
 		return btTransform();
 	}
@@ -1096,11 +1108,12 @@ public:
 	*/
 	virtual void setChildTransform(int index, const btTransform & transform)
 	{
+        (void) index; (void) transform;
 		btAssert(0);
 	}
 
 
-	virtual eGIMPACT_SHAPE_TYPE getGImpactShapeType()
+	virtual eGIMPACT_SHAPE_TYPE getGImpactShapeType() const
 	{
 		return CONST_GIMPACT_TRIMESH_SHAPE;
 	}
@@ -1118,7 +1131,34 @@ public:
 	It gives the triangles in local space
 	*/
 	virtual void	processAllTriangles(btTriangleCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const;
+
+	virtual void	processAllTrianglesRay (btTriangleCallback* callback,const btVector3& rayFrom,const btVector3& rayTo) const;
+
+	virtual	int	calculateSerializeBufferSize() const;
+
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+	virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
+
 };
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct	btGImpactMeshShapeData
+{
+	btCollisionShapeData	m_collisionShapeData;
+
+	btStridingMeshInterfaceData m_meshInterface;
+
+	btVector3FloatData	m_localScaling;
+
+	float	m_collisionMargin;
+
+	int		m_gimpactSubType;
+};
+
+SIMD_FORCE_INLINE	int	btGImpactMeshShape::calculateSerializeBufferSize() const
+{
+	return sizeof(btGImpactMeshShapeData);
+}
 
 
 #endif //GIMPACT_MESH_SHAPE_H

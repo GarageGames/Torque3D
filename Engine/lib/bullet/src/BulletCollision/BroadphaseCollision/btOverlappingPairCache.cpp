@@ -34,7 +34,6 @@ int gFindPairs =0;
 
 btHashedOverlappingPairCache::btHashedOverlappingPairCache():
 	m_overlapFilterCallback(0),
-	m_blockedForChanges(false),
 	m_ghostPairCallback(0)
 {
 	int initialAllocatedSize= 2;
@@ -53,7 +52,7 @@ btHashedOverlappingPairCache::~btHashedOverlappingPairCache()
 
 void	btHashedOverlappingPairCache::cleanOverlappingPair(btBroadphasePair& pair,btDispatcher* dispatcher)
 {
-	if (pair.m_algorithm)
+	if (pair.m_algorithm && dispatcher)
 	{
 		{
 			pair.m_algorithm->~btCollisionAlgorithm();
@@ -240,7 +239,7 @@ btBroadphasePair* btHashedOverlappingPairCache::internalAddPair(btBroadphaseProx
 		}*/
 	int count = m_overlappingPairArray.size();
 	int oldCapacity = m_overlappingPairArray.capacity();
-	void* mem = &m_overlappingPairArray.expand();
+	void* mem = &m_overlappingPairArray.expandNonInitializing();
 
 	//this is where we add an actual pair, so also call the 'ghost'
 	if (m_ghostPairCallback)
@@ -373,10 +372,10 @@ void* btHashedOverlappingPairCache::removeOverlappingPair(btBroadphaseProxy* pro
 	return userData;
 }
 //#include <stdio.h>
-
+#include "LinearMath/btQuickprof.h"
 void	btHashedOverlappingPairCache::processAllOverlappingPairs(btOverlapCallback* callback,btDispatcher* dispatcher)
 {
-
+	BT_PROFILE("btHashedOverlappingPairCache::processAllOverlappingPairs");
 	int i;
 
 //	printf("m_overlappingPairArray.size()=%d\n",m_overlappingPairArray.size());
@@ -467,7 +466,7 @@ btBroadphasePair*	btSortedOverlappingPairCache::addOverlappingPair(btBroadphaseP
 	if (!needsBroadphaseCollision(proxy0,proxy1))
 		return 0;
 	
-	void* mem = &m_overlappingPairArray.expand();
+	void* mem = &m_overlappingPairArray.expandNonInitializing();
 	btBroadphasePair* pair = new (mem) btBroadphasePair(*proxy0,*proxy1);
 	
 	gOverlappingPairs++;

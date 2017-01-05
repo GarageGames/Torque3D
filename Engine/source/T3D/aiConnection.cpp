@@ -21,6 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "T3D/aiConnection.h"
+#include "console/engineAPI.h"
 
 IMPLEMENT_CONOBJECT( AIConnection );
 
@@ -147,6 +148,7 @@ ConsoleFunction(aiConnect, S32 , 2, 20, "(...)"
    // Make sure and leav args[1] empty.
    const char* args[21];
    args[0] = "onConnect";
+   args[1] = NULL; // Filled in later
    for (S32 i = 1; i < argc; i++)
       args[i + 1] = argv[i];
 
@@ -158,7 +160,7 @@ ConsoleFunction(aiConnect, S32 , 2, 20, "(...)"
 
 
 //-----------------------------------------------------------------------------
-ConsoleMethod(AIConnection,setMove,void,4, 4,"(string field, float value)"
+DefineConsoleMethod(AIConnection, setMove, void, (const char * field, F32 value), ,"(string field, float value)"
               "Set a field on the current move.\n\n"
               "@param   field One of {'x','y','z','yaw','pitch','roll'}\n"
               "@param   value Value to set field to.")
@@ -166,59 +168,59 @@ ConsoleMethod(AIConnection,setMove,void,4, 4,"(string field, float value)"
    Move move = object->getMove();
 
    // Ok, a little slow for now, but this is just an example..
-   if (!dStricmp(argv[2],"x"))
-      move.x = mClampF(dAtof(argv[3]),-1,1);
+   if (!dStricmp(field,"x"))
+      move.x = mClampF(value,-1,1);
       else
-   if (!dStricmp(argv[2],"y"))
-      move.y = mClampF(dAtof(argv[3]),-1,1);
+   if (!dStricmp(field,"y"))
+      move.y = mClampF(value,-1,1);
       else
-   if (!dStricmp(argv[2],"z"))
-      move.z = mClampF(dAtof(argv[3]),-1,1);
+   if (!dStricmp(field,"z"))
+      move.z = mClampF(value,-1,1);
       else
-   if (!dStricmp(argv[2],"yaw"))
-      move.yaw = moveClamp(dAtof(argv[3]));
+   if (!dStricmp(field,"yaw"))
+      move.yaw = moveClamp(value);
       else
-   if (!dStricmp(argv[2],"pitch"))
-      move.pitch = moveClamp(dAtof(argv[3]));
+   if (!dStricmp(field,"pitch"))
+      move.pitch = moveClamp(value);
       else
-   if (!dStricmp(argv[2],"roll"))
-      move.roll = moveClamp(dAtof(argv[3]));
+   if (!dStricmp(field,"roll"))
+      move.roll = moveClamp(value);
 
    //
    object->setMove(&move);
 }
 
-ConsoleMethod(AIConnection,getMove,F32,3, 3,"(string field)"
+DefineConsoleMethod(AIConnection,getMove,F32, (const char * field), ,"(string field)"
               "Get the given field of a move.\n\n"
               "@param field One of {'x','y','z','yaw','pitch','roll'}\n"
               "@returns The requested field on the current move.")
 {
    const Move& move = object->getMove();
-   if (!dStricmp(argv[2],"x"))
+   if (!dStricmp(field,"x"))
       return move.x;
-   if (!dStricmp(argv[2],"y"))
+   if (!dStricmp(field,"y"))
       return move.y;
-   if (!dStricmp(argv[2],"z"))
+   if (!dStricmp(field,"z"))
       return move.z;
-   if (!dStricmp(argv[2],"yaw"))
+   if (!dStricmp(field,"yaw"))
       return move.yaw;
-   if (!dStricmp(argv[2],"pitch"))
+   if (!dStricmp(field,"pitch"))
       return move.pitch;
-   if (!dStricmp(argv[2],"roll"))
+   if (!dStricmp(field,"roll"))
       return move.roll;
    return 0;
 }
 
 
-ConsoleMethod(AIConnection,setFreeLook,void,3, 3,"(bool isFreeLook)"
+DefineConsoleMethod(AIConnection,setFreeLook,void,(bool isFreeLook), ,"(bool isFreeLook)"
               "Enable/disable freelook on the current move.")
 {
    Move move = object->getMove();
-   move.freeLook = dAtob(argv[2]);
+   move.freeLook = isFreeLook;
    object->setMove(&move);
 }
 
-ConsoleMethod(AIConnection,getFreeLook,bool,2, 2,"getFreeLook()"
+DefineConsoleMethod(AIConnection, getFreeLook, bool, (), ,"getFreeLook()"
               "Is freelook on for the current move?")
 {
    return object->getMove().freeLook;
@@ -227,21 +229,20 @@ ConsoleMethod(AIConnection,getFreeLook,bool,2, 2,"getFreeLook()"
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(AIConnection,setTrigger,void,4, 4,"(int trigger, bool set)"
+DefineConsoleMethod(AIConnection,setTrigger,void, (S32 idx, bool set), ,"(int trigger, bool set)"
               "Set a trigger.")
 {
-   S32 idx = dAtoi(argv[2]);
-   if (idx >= 0 && idx < MaxTriggerKeys)  {
+   if (idx >= 0 && idx < MaxTriggerKeys)  
+   {
       Move move = object->getMove();
-      move.trigger[idx] = dAtob(argv[3]);
+      move.trigger[idx] = set;
       object->setMove(&move);
    }
 }
 
-ConsoleMethod(AIConnection,getTrigger,bool,4, 4,"(int trigger)"
+DefineConsoleMethod(AIConnection,getTrigger,bool, (S32 idx), ,"(int trigger)"
               "Is the given trigger set?")
 {
-   S32 idx = dAtoi(argv[2]);
    if (idx >= 0 && idx < MaxTriggerKeys)
       return object->getMove().trigger[idx];
    return false;
@@ -250,7 +251,7 @@ ConsoleMethod(AIConnection,getTrigger,bool,4, 4,"(int trigger)"
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(AIConnection,getAddress,const char*,2, 2,"")
+DefineConsoleMethod(AIConnection,getAddress,const char*,(), ,"")
 {
    // Override the netConnection method to return to indicate
    // this is an ai connection.

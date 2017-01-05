@@ -91,7 +91,9 @@ void SFX3DObject::getEarTransform( MatrixF& transform ) const
    if ( !shapeInstance )
    {
       // Just in case.
-      transform = mObject->getTransform();
+      GameConnection* connection = dynamic_cast<GameConnection *>(NetConnection::getConnectionToServer());
+      if ( !connection || !connection->getControlCameraTransform( 0.0f, &transform ) )
+         transform = mObject->getTransform();
       return;
    }
 

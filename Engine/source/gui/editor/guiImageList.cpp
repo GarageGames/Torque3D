@@ -47,8 +47,6 @@ U32 GuiImageList::Insert( const char* texturePath, GFXTextureProfile *Type )
 {
   TextureEntry *t = new TextureEntry;
 
-  if ( ! t ) return -1;
-
   t->TexturePath = StringTable->insert(texturePath);
   if ( *t->TexturePath ) 
   {
@@ -182,7 +180,7 @@ DefineEngineMethod( GuiImageList, count, S32, (),,
   return object->Count();
 }
 
-DefineEngineMethod( GuiImageList, remove, bool, (int index),,
+DefineEngineMethod( GuiImageList, remove, bool, (S32 index),,
    "@brief Removes an image from the list by index.\n\n"
    "@param index Image index to remove.\n"
    "@tsexample\n"

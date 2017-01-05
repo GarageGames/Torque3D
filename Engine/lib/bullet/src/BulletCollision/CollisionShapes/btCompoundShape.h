@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef COMPOUND_SHAPE_H
-#define COMPOUND_SHAPE_H
+#ifndef BT_COMPOUND_SHAPE_H
+#define BT_COMPOUND_SHAPE_H
 
 #include "btCollisionShape.h"
 
@@ -53,6 +53,7 @@ SIMD_FORCE_INLINE bool operator==(const btCompoundShapeChild& c1, const btCompou
 /// Currently, removal of child shapes is only supported when disabling the aabb tree (pass 'false' in the constructor of btCompoundShape)
 ATTRIBUTE_ALIGNED16(class) btCompoundShape	: public btCollisionShape
 {
+protected:
 	btAlignedObjectArray<btCompoundShapeChild> m_children;
 	btVector3						m_localAabbMin;
 	btVector3						m_localAabbMax;
@@ -62,10 +63,14 @@ ATTRIBUTE_ALIGNED16(class) btCompoundShape	: public btCollisionShape
 	///increment m_updateRevision when adding/removing/replacing child shapes, so that some caches can be updated
 	int								m_updateRevision;
 
+	btScalar	m_collisionMargin;
+
+	btVector3	m_localScaling;
+
 public:
 	BT_DECLARE_ALIGNED_ALLOCATOR();
 
-	btCompoundShape(bool enableDynamicAabbTree = true);
+	explicit btCompoundShape(bool enableDynamicAabbTree = true, const int initialChildCapacity = 0);
 
 	virtual ~btCompoundShape();
 
@@ -101,7 +106,7 @@ public:
 	}
 
 	///set a new transform for a child, and update internal data structures (local aabb and dynamic tree)
-	void	updateChildTransform(int childIndex, const btTransform& newChildTransform);
+	void	updateChildTransform(int childIndex, const btTransform& newChildTransform, bool shouldRecalculateLocalAabb = true);
 
 
 	btCompoundShapeChild* getChildList()
@@ -116,10 +121,8 @@ public:
 	Use this yourself if you modify the children or their transforms. */
 	virtual void recalculateLocalAabb(); 
 
-	virtual void	setLocalScaling(const btVector3& scaling)
-	{
-		m_localScaling = scaling;
-	}
+	virtual void	setLocalScaling(const btVector3& scaling);
+
 	virtual const btVector3& getLocalScaling() const 
 	{
 		return m_localScaling;
@@ -140,13 +143,17 @@ public:
 		return "Compound";
 	}
 
-	//this is optional, but should make collision queries faster, by culling non-overlapping nodes
-	void	createAabbTreeFromChildren();
-
-	btDbvt*							getDynamicAabbTree()
+	const btDbvt*	getDynamicAabbTree() const
 	{
 		return m_dynamicAabbTree;
 	}
+	
+	btDbvt*	getDynamicAabbTree()
+	{
+		return m_dynamicAabbTree;
+	}
+
+	void createAabbTreeFromChildren();
 
 	///computes the exact moment of inertia and the transform from the coordinate system defined by the principal axes of the moment of inertia
 	///and the center of mass to the current coordinate system. "masses" points to an array of masses of the children. The resulting transform
@@ -160,13 +167,46 @@ public:
 		return m_updateRevision;
 	}
 
-private:
-	btScalar	m_collisionMargin;
-protected:
-	btVector3	m_localScaling;
+	virtual	int	calculateSerializeBufferSize() const;
+
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+	virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
+
+
+};
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct btCompoundShapeChildData
+{
+	btTransformFloatData	m_transform;
+	btCollisionShapeData	*m_childShape;
+	int						m_childShapeType;
+	float					m_childMargin;
+};
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct	btCompoundShapeData
+{
+	btCollisionShapeData		m_collisionShapeData;
+
+	btCompoundShapeChildData	*m_childShapePtr;
+
+	int							m_numChildShapes;
+
+	float	m_collisionMargin;
 
 };
 
 
+SIMD_FORCE_INLINE	int	btCompoundShape::calculateSerializeBufferSize() const
+{
+	return sizeof(btCompoundShapeData);
+}
 
-#endif //COMPOUND_SHAPE_H
+
+
+
+
+
+
+#endif //BT_COMPOUND_SHAPE_H

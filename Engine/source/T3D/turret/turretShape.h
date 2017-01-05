@@ -23,7 +23,7 @@
 #ifndef _TURRETSHAPE_H_
 #define _TURRETSHAPE_H_
 
-#ifndef _SHAPEBASE_H_
+#ifndef _ITEM_H_
    #include "T3D/item.h"
 #endif
 
@@ -93,8 +93,8 @@ public:
 
    virtual bool preload(bool server, String &errorStr);
 
-   DECLARE_CALLBACK( void, onMountObject, ( TurretShape* turret, SceneObject* obj, S32 node ) );
-   DECLARE_CALLBACK( void, onUnmountObject, ( TurretShape* turret, SceneObject* obj ) );
+   DECLARE_CALLBACK( void, onMountObject, ( SceneObject* turret, SceneObject* obj, S32 node ) );
+   DECLARE_CALLBACK( void, onUnmountObject, ( SceneObject* turret, SceneObject* obj ) );
    DECLARE_CALLBACK( void, onStickyCollision, ( TurretShape* obj ) );
 };
 
@@ -150,7 +150,7 @@ protected:
    void _applyLimits(Point3F& rot);
    bool _outsideLimits(Point3F& rot);        ///< Return true if any angle is outside of the limits
 
-   void onUnmount(ShapeBase* obj,S32 node);
+   void onUnmount(SceneObject* obj,S32 node);
 
    // Script level control
    bool allowManualRotation;

@@ -22,6 +22,7 @@
 
 #include "core/strings/stringFunctions.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "platformWin32/platformWin32.h"
 
 
@@ -73,7 +74,7 @@ void initDisplayDeviceInfo()
    Con::setVariable( "$PCI_DEV", dev );
 }
 
-ConsoleFunction( initDisplayDeviceInfo, void, 1, 1, "()"
+DefineConsoleFunction( initDisplayDeviceInfo, void, (), , "()"
 				"@brief Initializes variables that track device and vendor information/IDs\n\n"
 				"@ingroup Rendering")
 {

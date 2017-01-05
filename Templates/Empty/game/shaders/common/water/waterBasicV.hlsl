@@ -20,12 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "../shaderModel.hlsl"
 //-----------------------------------------------------------------------------
 // Structures                                                                  
 //-----------------------------------------------------------------------------
 struct VertData
 {
-   float4 position         : POSITION;
+   float3 position         : POSITION;
    float3 normal           : NORMAL;
    float2 undulateData     : TEXCOORD0;
    float4 horizonFactor    : TEXCOORD1;
@@ -33,7 +34,7 @@ struct VertData
 
 struct ConnectData
 {
-   float4 hpos             : POSITION;   
+   float4 hpos             : TORQUE_POSITION;   
    
    // TexCoord 0 and 1 (xy,zw) for ripple texture lookup
    float4 rippleTexCoord01 : TEXCOORD0;   
@@ -95,21 +96,21 @@ ConnectData main( VertData IN )
       // IN.position.xy += offsetXY;
       // IN.undulateData += offsetXY; 
    // }         
-   
-   float4 worldPos = mul( modelMat, IN.position );
+   float4 inPos = float4(IN.position, 1.0);
+   float4 worldPos = mul(modelMat, inPos);
       
    IN.position.z = lerp( IN.position.z, eyePos.z, IN.horizonFactor.x );
    
    //OUT.objPos = worldPos;
-   OUT.objPos.xyz = IN.position.xyz;
+   OUT.objPos.xyz = IN.position;
    OUT.objPos.w = worldPos.z;
    
    // Send pre-undulation screenspace position
-   OUT.posPreWave = mul( modelview, IN.position );
+   OUT.posPreWave = mul( modelview, inPos );
    OUT.posPreWave = mul( texGen, OUT.posPreWave );
       
    // Calculate the undulation amount for this vertex.   
-   float2 undulatePos = mul( modelMat, float4( IN.undulateData.xy, 0, 1 ) );
+   float2 undulatePos = mul( modelMat, float4( IN.undulateData.xy, 0, 1 )).xy;
    //if ( undulatePos.x < 0 )
    //   undulatePos = IN.position.xy;
    
@@ -128,12 +129,12 @@ ConnectData main( VertData IN )
    float undulateFade = 1;
    
    // Scale down wave magnitude amount based on distance from the camera.      
-   float dist = distance( IN.position.xyz, eyePos );
+   float dist = distance( IN.position, eyePos );
    dist = clamp( dist, 1.0, undulateMaxDist );          
    undulateFade *= ( 1 - dist / undulateMaxDist ); 
    
    // Also scale down wave magnitude if the camera is very very close.
-   undulateFade *= saturate( ( distance( IN.position.xyz, eyePos ) - 0.5 ) / 10.0 );
+   undulateFade *= saturate( ( distance( IN.position, eyePos ) - 0.5 ) / 10.0 );
    
    undulateAmt *= undulateFade;
    
@@ -141,7 +142,7 @@ ConnectData main( VertData IN )
    //undulateAmt = 0;
    
    // Apply wave undulation to the vertex.
-   OUT.posPostWave = IN.position; 
+   OUT.posPostWave = inPos;
    OUT.posPostWave.xyz += IN.normal.xyz * undulateAmt;   
    
    // Save worldSpace position of this pixel/vert
@@ -210,7 +211,7 @@ ConnectData main( VertData IN )
    for ( int i = 0; i < 3; i++ )
    {
       binormal.z += undulateFade * waveDir[i].x * waveData[i].y * cos( waveDir[i].x * IN.undulateData.x + waveDir[i].y * IN.undulateData.y + elapsedTime * waveData[i].x );
-	  tangent.z += undulateFade * waveDir[i].y * waveData[i].y * cos( waveDir[i].x * IN.undulateData.x + waveDir[i].y * IN.undulateData.y + elapsedTime * waveData[i].x );
+      tangent.z += undulateFade * waveDir[i].y * waveData[i].y * cos( waveDir[i].x * IN.undulateData.x + waveDir[i].y * IN.undulateData.y + elapsedTime * waveData[i].x );
    } 
       
    binormal = normalize( binormal );

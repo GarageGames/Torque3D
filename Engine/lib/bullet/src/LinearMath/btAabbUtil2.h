@@ -14,8 +14,8 @@ subject to the following restrictions:
 
 
 
-#ifndef AABB_UTIL2
-#define AABB_UTIL2
+#ifndef BT_AABB_UTIL2
+#define BT_AABB_UTIL2
 
 #include "btTransform.h"
 #include "btVector3.h"
@@ -184,9 +184,7 @@ SIMD_FORCE_INLINE	void btTransformAabb(const btVector3& halfExtents, btScalar ma
 	btVector3 halfExtentsWithMargin = halfExtents+btVector3(margin,margin,margin);
 	btMatrix3x3 abs_b = t.getBasis().absolute();  
 	btVector3 center = t.getOrigin();
-	btVector3 extent = btVector3(abs_b[0].dot(halfExtentsWithMargin),
-		   abs_b[1].dot(halfExtentsWithMargin),
-		  abs_b[2].dot(halfExtentsWithMargin));
+    btVector3 extent = halfExtentsWithMargin.dot3( abs_b[0], abs_b[1], abs_b[2] );
 	aabbMinOut = center - extent;
 	aabbMaxOut = center + extent;
 }
@@ -203,9 +201,7 @@ SIMD_FORCE_INLINE	void btTransformAabb(const btVector3& localAabbMin,const btVec
 		btVector3 localCenter = btScalar(0.5)*(localAabbMax+localAabbMin);
 		btMatrix3x3 abs_b = trans.getBasis().absolute();  
 		btVector3 center = trans(localCenter);
-		btVector3 extent = btVector3(abs_b[0].dot(localHalfExtents),
-			   abs_b[1].dot(localHalfExtents),
-			  abs_b[2].dot(localHalfExtents));
+        btVector3 extent = localHalfExtents.dot3( abs_b[0], abs_b[1], abs_b[2] );
 		aabbMinOut = center-extent;
 		aabbMaxOut = center+extent;
 }
@@ -231,6 +227,6 @@ SIMD_FORCE_INLINE	void btTransformAabb(const btVector3& localAabbMin,const btVec
 	}
 #endif //USE_BANCHLESS
 
-#endif
+#endif //BT_AABB_UTIL2
 
 

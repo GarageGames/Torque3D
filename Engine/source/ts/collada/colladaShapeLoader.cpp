@@ -50,6 +50,15 @@
 #include "core/util/zip/zipVolume.h"
 #include "gfx/bitmap/gBitmap.h"
 
+MODULE_BEGIN( ColladaShapeLoader )
+   MODULE_INIT_AFTER( ShapeLoader )
+   MODULE_INIT
+   {
+      TSShapeLoader::addFormat("Collada", "dae");
+      TSShapeLoader::addFormat("Google Earth", "kmz");
+   }
+MODULE_END;
+
 // 
 static DAE sDAE;                 // Collada model database (holds the last loaded file)
 static Torque::Path sLastPath;   // Path of the last loaded Collada file
@@ -96,8 +105,8 @@ ColladaShapeLoader::ColladaShapeLoader(domCOLLADA* _root)
 ColladaShapeLoader::~ColladaShapeLoader()
 {
    // Delete all of the animation channels
-   for (int iAnim = 0; iAnim < animations.size(); iAnim++) {
-      for (int iChannel = 0; iChannel < animations[iAnim]->size(); iChannel++)
+   for (S32 iAnim = 0; iAnim < animations.size(); iAnim++) {
+      for (S32 iChannel = 0; iChannel < animations[iAnim]->size(); iChannel++)
          delete (*animations[iAnim])[iChannel];
       delete animations[iAnim];
    }
@@ -113,7 +122,7 @@ void ColladaShapeLoader::processAnimation(const domAnimation* anim, F32& maxEndT
    const char* sSKEWNames[] =   { ".ROTATEX", ".ROTATEY", ".ROTATEZ", ".AROUNDX", ".AROUNDY", ".AROUNDZ", ".ANGLE", "" };
    const char* sNullNames[] =   { "" };
 
-   for (int iChannel = 0; iChannel < anim->getChannel_array().getCount(); iChannel++) {
+   for (S32 iChannel = 0; iChannel < anim->getChannel_array().getCount(); iChannel++) {
 
       // Get the animation elements: <channel>, <sampler>
       domChannel* channel = anim->getChannel_array()[iChannel];
@@ -150,7 +159,7 @@ void ColladaShapeLoader::processAnimation(const domAnimation* anim, F32& maxEndT
       channel->setUserData(targetChannels->last());
       AnimData& data = *targetChannels->last();
 
-      for (int iInput = 0; iInput < sampler->getInput_array().getCount(); iInput++) {
+      for (S32 iInput = 0; iInput < sampler->getInput_array().getCount(); iInput++) {
 
          const domInputLocal* input = sampler->getInput_array()[iInput];
          const domSource* source = daeSafeCast<domSource>(input->getSource().getElement());
@@ -219,7 +228,7 @@ void ColladaShapeLoader::processAnimation(const domAnimation* anim, F32& maxEndT
    }
 
    // Process child animations
-   for (int iAnim = 0; iAnim < anim->getAnimation_array().getCount(); iAnim++)
+   for (S32 iAnim = 0; iAnim < anim->getAnimation_array().getCount(); iAnim++)
       processAnimation(anim->getAnimation_array()[iAnim], maxEndTime, minFrameTime);
 }
 
@@ -227,20 +236,20 @@ void ColladaShapeLoader::enumerateScene()
 {
    // Get animation clips
    Vector<const domAnimation_clip*> animationClips;
-   for (int iClipLib = 0; iClipLib < root->getLibrary_animation_clips_array().getCount(); iClipLib++) {
+   for (S32 iClipLib = 0; iClipLib < root->getLibrary_animation_clips_array().getCount(); iClipLib++) {
       const domLibrary_animation_clips* libraryClips = root->getLibrary_animation_clips_array()[iClipLib];
-      for (int iClip = 0; iClip < libraryClips->getAnimation_clip_array().getCount(); iClip++)
+      for (S32 iClip = 0; iClip < libraryClips->getAnimation_clip_array().getCount(); iClip++)
          appSequences.push_back(new ColladaAppSequence(libraryClips->getAnimation_clip_array()[iClip]));
    }
 
    // Process all animations => this attaches animation channels to the targeted
    // Collada elements, and determines the length of the sequence if it is not
    // already specified in the Collada <animation_clip> element
-   for (int iSeq = 0; iSeq < appSequences.size(); iSeq++) {
+   for (S32 iSeq = 0; iSeq < appSequences.size(); iSeq++) {
       ColladaAppSequence* appSeq = dynamic_cast<ColladaAppSequence*>(appSequences[iSeq]);
       F32 maxEndTime = 0;
       F32 minFrameTime = 1000.0f;
-      for (int iAnim = 0; iAnim < appSeq->getClip()->getInstance_animation_array().getCount(); iAnim++) {
+      for (S32 iAnim = 0; iAnim < appSeq->getClip()->getInstance_animation_array().getCount(); iAnim++) {
          domAnimation* anim = daeSafeCast<domAnimation>(appSeq->getClip()->getInstance_animation_array()[iAnim]->getUrl().getElement());
          if (anim)
             processAnimation(anim, maxEndTime, minFrameTime);
@@ -256,11 +265,11 @@ void ColladaShapeLoader::enumerateScene()
 
    // First grab all of the top-level nodes
    Vector<domNode*> sceneNodes;
-   for (int iSceneLib = 0; iSceneLib < root->getLibrary_visual_scenes_array().getCount(); iSceneLib++) {
+   for (S32 iSceneLib = 0; iSceneLib < root->getLibrary_visual_scenes_array().getCount(); iSceneLib++) {
       const domLibrary_visual_scenes* libScenes = root->getLibrary_visual_scenes_array()[iSceneLib];
-      for (int iScene = 0; iScene < libScenes->getVisual_scene_array().getCount(); iScene++) {
+      for (S32 iScene = 0; iScene < libScenes->getVisual_scene_array().getCount(); iScene++) {
          const domVisual_scene* visualScene = libScenes->getVisual_scene_array()[iScene];
-         for (int iNode = 0; iNode < visualScene->getNode_array().getCount(); iNode++)
+         for (S32 iNode = 0; iNode < visualScene->getNode_array().getCount(); iNode++)
             sceneNodes.push_back(visualScene->getNode_array()[iNode]);
       }
    }
@@ -272,10 +281,10 @@ void ColladaShapeLoader::enumerateScene()
       case ColladaUtils::ImportOptions::DetectDTS:
          // Check for a baseXX->startXX hierarchy at the top-level, if we find
          // one, use trailing numbers for LOD, otherwise use a single size
-         for (int iNode = 0; singleDetail && (iNode < sceneNodes.size()); iNode++) {
+         for (S32 iNode = 0; singleDetail && (iNode < sceneNodes.size()); iNode++) {
             domNode* node = sceneNodes[iNode];
             if (dStrStartsWith(_GetNameOrId(node), "base")) {
-               for (int iChild = 0; iChild < node->getNode_array().getCount(); iChild++) {
+               for (S32 iChild = 0; iChild < node->getNode_array().getCount(); iChild++) {
                   domNode* child = node->getNode_array()[iChild];
                   if (dStrStartsWith(_GetNameOrId(child), "start")) {
                      singleDetail = false;
@@ -484,7 +493,7 @@ void updateMaterialsScript(const Torque::Path &path, bool copyTextures = false)
    // If importing a sketchup file, the paths will point inside the KMZ so we need to cache them.
    if (copyTextures)
    {
-      for (int iMat = 0; iMat < persistMgr.getDirtyList().size(); iMat++)
+      for (S32 iMat = 0; iMat < persistMgr.getDirtyList().size(); iMat++)
       {
          Material *mat = dynamic_cast<Material*>( persistMgr.getDirtyList()[iMat].getObject() );
 
@@ -520,6 +529,16 @@ bool ColladaShapeLoader::canLoadCachedDTS(const Torque::Path& path)
       }
    }
 
+   //assume the dts is good since it was zipped on purpose
+   Torque::FS::FileSystemRef ref = Torque::FS::GetFileSystem(cachedPath);
+   if (ref && !dStrcmp("Zip", ref->getTypeStr()))
+   {
+      bool forceLoadDAE = Con::getBoolVariable("$collada::forceLoadDAE", false);
+
+      if (!forceLoadDAE && Torque::FS::IsFile(cachedPath))
+          return true;
+   }
+     
    return false;
 }
 
@@ -700,11 +719,17 @@ TSShape* loadColladaShape(const Torque::Path &path)
 #ifndef DAE2DTS_TOOL
          // Cache the Collada model to a DTS file for faster loading next time.
          FileStream dtsStream;
+         
          if (dtsStream.open(cachedPath.getFullPath(), Torque::FS::File::Write))
          {
+            Torque::FS::FileSystemRef ref = Torque::FS::GetFileSystem(daePath);
+            if (ref && !dStrcmp("Zip", ref->getTypeStr()))
+               Con::errorf("No cached dts file found in archive for %s. Forcing cache to disk.", daePath.getFullFileName().c_str());
+
             Con::printf("Writing cached COLLADA shape to %s", cachedPath.getFullPath().c_str());
             tss->write(&dtsStream);
          }
+
 #endif // DAE2DTS_TOOL
 
          // Add collada materials to materials.cs

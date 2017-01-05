@@ -86,6 +86,11 @@ void TSShapeConstructor::_onTSShapeLoaded( Resource< TSShape >& resource )
    TSShapeConstructor* ctor = findShapeConstructor( resource.getPath().getFullPath() );
    if( ctor )
       ctor->_onLoad( resource );
+
+   if (ctor && ctor->mShape && ctor->mShape->needsReinit())
+   {
+      ctor->mShape->init();
+   }
 }
 
 void TSShapeConstructor::_onTSShapeUnloaded( const Torque::Path& path, TSShape* shape )
@@ -128,7 +133,7 @@ static void SplitSequencePathAndName( String& srcPath, String& srcName )
 IMPLEMENT_CONOBJECT(TSShapeConstructor);
 
 TSShapeConstructor::TSShapeConstructor()
- : mShapePath("")
+ : mShapePath(""), mLoadingShape(false)
 {
    mShape = NULL;
 }
@@ -374,8 +379,14 @@ bool TSShapeConstructor::onAdd()
 
    // If an instance of this shape has already been loaded, call onLoad now
    Resource<TSShape> shape = ResourceManager::get().find( mShapePath );
+
    if ( shape )
       _onLoad( shape );
+
+   if (mShape && mShape->needsReinit())
+   {
+      mShape->init();
+   }
 
    return true;
 }
@@ -394,6 +405,7 @@ void TSShapeConstructor::_onLoad(TSShape* shape)
 
    mShape = shape;
    mChangeSet.clear();
+   mLoadingShape = true;
 
    // Add sequences defined using field syntax
    for ( S32 i = 0; i < mSequences.size(); i++ )
@@ -411,6 +423,7 @@ void TSShapeConstructor::_onLoad(TSShape* shape)
 
    // Call script function
    onLoad_callback();
+   mLoadingShape = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -1216,8 +1229,9 @@ DefineTSShapeConstructorMethod( getMeshName, const char*, ( const char* name, S3
 
    CHECK_INDEX_IN_RANGE( getMeshName, index, objectDetails.size(), "" );
 
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%s %d", name, (S32)mShape->details[objectDetails[index]].size);
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%s %d", name, (S32)mShape->details[objectDetails[index]].size);
    return returnBuffer;
 }}
 
@@ -1602,8 +1616,9 @@ DefineTSShapeConstructorMethod( getImposterSettings, const char*, ( S32 index ),
    // Return information about the detail level
    const TSShape::Detail& det = mShape->details[index];
 
-   char* returnBuffer = Con::getReturnBuffer(512);
-   dSprintf(returnBuffer, 512, "%d\t%d\t%d\t%d\t%d\t%d\t%g",
+   static const U32 bufSize = 512;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d\t%d\t%d\t%d\t%d\t%d\t%g",
       (S32)( det.subShapeNum < 0 ),          // isImposter
       det.bbEquatorSteps,
       det.bbPolarSteps,
@@ -1727,8 +1742,9 @@ DefineTSShapeConstructorMethod( getSequenceSource, const char*, ( const char* na
    GET_SEQUENCE( getSequenceSource, seq, name, "" );
 
    // Return information about the source data for this sequence
-   char* returnBuffer = Con::getReturnBuffer(512);
-   dSprintf( returnBuffer, 512, "%s\t%d\t%d\t%d",
+   static const U32 bufSize = 512;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf( returnBuffer, bufSize, "%s\t%d\t%d\t%d",
       seq->sourceData.from.c_str(), seq->sourceData.start,
       seq->sourceData.end, seq->sourceData.total );
    return returnBuffer;
@@ -1802,8 +1818,9 @@ DefineTSShapeConstructorMethod( getSequenceGroundSpeed, const char*, ( const cha
       rot = mat.toEuler();
    }
 
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf( returnBuffer, 256, "%g %g %g %g %g %g",
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf( returnBuffer, bufSize, "%g %g %g %g %g %g",
       trans.x, trans.y, trans.z, rot.x, rot.y, rot.z );
    return returnBuffer;
 }}
@@ -1896,8 +1913,9 @@ DefineTSShapeConstructorMethod( getSequenceBlend, const char*, ( const char* nam
    GET_SEQUENCE( getSequenceBlend, seq, name, "0" );
 
    // Return the blend information (flag reference_sequence reference_frame)
-   char* returnBuffer = Con::getReturnBuffer(512);
-   dSprintf( returnBuffer, 512, "%d\t%s\t%d", (int)seq->isBlend(),
+   static const U32 bufSize = 512;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf( returnBuffer, bufSize, "%d\t%s\t%d", (int)seq->isBlend(),
       seq->sourceData.blendSeq.c_str(), seq->sourceData.blendFrame );
    return returnBuffer;
 }}
@@ -2038,8 +2056,9 @@ DefineTSShapeConstructorMethod( getTrigger, const char*, ( const char* name, S32
    if (!(trig.state & TSShape::Trigger::StateOn))
       state = -state;
 
-   char* returnBuffer = Con::getReturnBuffer(32);
-   dSprintf(returnBuffer, 32, "%d %d", frame, state);
+   static const U32 bufSize = 32;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d", frame, state);
    return returnBuffer;
 }}
 
@@ -3272,4 +3291,16 @@ bool TSShapeConstructor::ChangeSet::addCmd_removeImposter( const TSShapeConstruc
    }
 
    return true;
+}
+
+void TSShapeConstructor::onActionPerformed()
+{
+   // Reinit shape if we modify stuff in the shape editor, otherwise delay
+   if (!mLoadingShape)
+   {
+      if (mShape && mShape->needsReinit())
+      {
+         mShape->init();
+      }
+   }
 }

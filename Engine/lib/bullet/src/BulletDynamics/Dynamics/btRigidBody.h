@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef RIGIDBODY_H
-#define RIGIDBODY_H
+#ifndef BT_RIGIDBODY_H
+#define BT_RIGIDBODY_H
 
 #include "LinearMath/btAlignedObjectArray.h"
 #include "LinearMath/btTransform.h"
@@ -28,6 +28,27 @@ class btTypedConstraint;
 
 extern btScalar gDeactivationTime;
 extern bool gDisableDeactivation;
+
+#ifdef BT_USE_DOUBLE_PRECISION
+#define btRigidBodyData	btRigidBodyDoubleData
+#define btRigidBodyDataName	"btRigidBodyDoubleData"
+#else
+#define btRigidBodyData	btRigidBodyFloatData
+#define btRigidBodyDataName	"btRigidBodyFloatData"
+#endif //BT_USE_DOUBLE_PRECISION
+
+
+enum	btRigidBodyFlags
+{
+	BT_DISABLE_WORLD_GRAVITY = 1,
+	///BT_ENABLE_GYROPSCOPIC_FORCE flags is enabled by default in Bullet 2.83 and onwards.
+	///and it BT_ENABLE_GYROPSCOPIC_FORCE becomes equivalent to BT_ENABLE_GYROSCOPIC_FORCE_IMPLICIT_BODY
+	///See Demos/GyroscopicDemo and computeGyroscopicImpulseImplicit
+	BT_ENABLE_GYROSCOPIC_FORCE_EXPLICIT = 2,
+	BT_ENABLE_GYROSCOPIC_FORCE_IMPLICIT_WORLD=4,
+	BT_ENABLE_GYROSCOPIC_FORCE_IMPLICIT_BODY=8,
+	BT_ENABLE_GYROPSCOPIC_FORCE = BT_ENABLE_GYROSCOPIC_FORCE_IMPLICIT_BODY,
+};
 
 
 ///The btRigidBody is the main class for rigid body objects. It is derived from btCollisionObject, so it keeps a pointer to a btCollisionShape.
@@ -45,7 +66,6 @@ class btRigidBody  : public btCollisionObject
 	btVector3		m_linearVelocity;
 	btVector3		m_angularVelocity;
 	btScalar		m_inverseMass;
-	btVector3		m_angularFactor;
 	btVector3		m_linearFactor;
 
 	btVector3		m_gravity;	
@@ -70,8 +90,23 @@ class btRigidBody  : public btCollisionObject
 	//m_optionalMotionState allows to automatic synchronize the world transform for active objects
 	btMotionState*	m_optionalMotionState;
 
-	//keep track of typed constraints referencing this rigid body
+	//keep track of typed constraints referencing this rigid body, to disable collision between linked bodies
 	btAlignedObjectArray<btTypedConstraint*> m_constraintRefs;
+
+	int				m_rigidbodyFlags;
+	
+	int				m_debugBodyId;
+	
+
+protected:
+
+	ATTRIBUTE_ALIGNED16(btVector3		m_deltaLinearVelocity);
+	btVector3		m_deltaAngularVelocity;
+	btVector3		m_angularFactor;
+	btVector3		m_invMass;
+	btVector3		m_pushVelocity;
+	btVector3		m_turnVelocity;
+
 
 public:
 
@@ -97,6 +132,11 @@ public:
 
 		///best simulation results when friction is non-zero
 		btScalar			m_friction;
+		///the m_rollingFriction prevents rounded shapes, such as spheres, cylinders and capsules from rolling forever.
+		///See Bullet/Demos/RollingFrictionDemo for usage
+		btScalar			m_rollingFriction;
+        btScalar			m_spinningFriction;//torsional friction around contact normal
+        
 		///best simulation results using zero restitution.
 		btScalar			m_restitution;
 
@@ -111,7 +151,6 @@ public:
 		btScalar			m_additionalAngularDampingThresholdSqr;
 		btScalar			m_additionalAngularDampingFactor;
 
-		
 		btRigidBodyConstructionInfo(	btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia=btVector3(0,0,0)):
 		m_mass(mass),
 			m_motionState(motionState),
@@ -120,6 +159,8 @@ public:
 			m_linearDamping(btScalar(0.)),
 			m_angularDamping(btScalar(0.)),
 			m_friction(btScalar(0.5)),
+			m_rollingFriction(btScalar(0)),
+            m_spinningFriction(btScalar(0)),
 			m_restitution(btScalar(0.)),
 			m_linearSleepingThreshold(btScalar(0.8)),
 			m_angularSleepingThreshold(btScalar(1.f)),
@@ -161,13 +202,13 @@ public:
 	///but a rigidbody is derived from btCollisionObject, so we can safely perform an upcast
 	static const btRigidBody*	upcast(const btCollisionObject* colObj)
 	{
-		if (colObj->getInternalType()==btCollisionObject::CO_RIGID_BODY)
+		if (colObj->getInternalType()&btCollisionObject::CO_RIGID_BODY)
 			return (const btRigidBody*)colObj;
 		return 0;
 	}
 	static btRigidBody*	upcast(btCollisionObject* colObj)
 	{
-		if (colObj->getInternalType()==btCollisionObject::CO_RIGID_BODY)
+		if (colObj->getInternalType()&btCollisionObject::CO_RIGID_BODY)
 			return (btRigidBody*)colObj;
 		return 0;
 	}
@@ -227,6 +268,7 @@ public:
 	void setLinearFactor(const btVector3& linearFactor)
 	{
 		m_linearFactor = linearFactor;
+		m_invMass = m_linearFactor*m_inverseMass;
 	}
 	btScalar		getInvMass() const { return m_inverseMass; }
 	const btMatrix3x3& getInvInertiaTensorWorld() const { 
@@ -242,12 +284,12 @@ public:
 		m_totalForce += force*m_linearFactor;
 	}
 
-	const btVector3& getTotalForce()
+	const btVector3& getTotalForce() const
 	{
 		return m_totalForce;
 	};
 
-	const btVector3& getTotalTorque()
+	const btVector3& getTotalTorque() const
 	{
 		return m_totalTorque;
 	};
@@ -301,19 +343,6 @@ public:
 		}
 	}
 
-	//Optimization for the iterative solver: avoid calculating constant terms involving inertia, normal, relative position
-	SIMD_FORCE_INLINE void internalApplyImpulse(const btVector3& linearComponent, const btVector3& angularComponent,btScalar impulseMagnitude)
-	{
-		if (m_inverseMass != btScalar(0.))
-		{
-			m_linearVelocity += linearComponent*m_linearFactor*impulseMagnitude;
-			if (m_angularFactor)
-			{
-				m_angularVelocity += angularComponent*m_angularFactor*impulseMagnitude;
-			}
-		}
-	}
-	
 	void clearForces() 
 	{
 		m_totalForce.setValue(btScalar(0.0), btScalar(0.0), btScalar(0.0));
@@ -340,11 +369,13 @@ public:
 
 	inline void setLinearVelocity(const btVector3& lin_vel)
 	{ 
+		m_updateRevision++;
 		m_linearVelocity = lin_vel; 
 	}
 
 	inline void setAngularVelocity(const btVector3& ang_vel) 
 	{ 
+		m_updateRevision++;
 		m_angularVelocity = ang_vel; 
 	}
 
@@ -461,11 +492,13 @@ public:
 
 	void	setAngularFactor(const btVector3& angFac)
 	{
+		m_updateRevision++;
 		m_angularFactor = angFac;
 	}
 
 	void	setAngularFactor(btScalar angFac)
 	{
+		m_updateRevision++;
 		m_angularFactor.setValue(angFac,angFac,angFac);
 	}
 	const btVector3&	getAngularFactor() const
@@ -479,8 +512,6 @@ public:
 		return (getBroadphaseProxy() != 0);
 	}
 
-	virtual bool checkCollideWithOverride(btCollisionObject* co);
-
 	void addConstraintRef(btTypedConstraint* c);
 	void removeConstraintRef(btTypedConstraint* c);
 
@@ -489,15 +520,100 @@ public:
 		return m_constraintRefs[index];
 	}
 
-	int getNumConstraintRefs()
+	int getNumConstraintRefs() const
 	{
 		return m_constraintRefs.size();
 	}
 
-	int	m_debugBodyId;
+	void	setFlags(int flags)
+	{
+		m_rigidbodyFlags = flags;
+	}
+
+	int getFlags() const
+	{
+		return m_rigidbodyFlags;
+	}
+
+
+	
+
+	///perform implicit force computation in world space
+	btVector3 computeGyroscopicImpulseImplicit_World(btScalar dt) const;
+	
+	///perform implicit force computation in body space (inertial frame)
+	btVector3 computeGyroscopicImpulseImplicit_Body(btScalar step) const;
+
+	///explicit version is best avoided, it gains energy
+	btVector3 computeGyroscopicForceExplicit(btScalar maxGyroscopicForce) const;
+	btVector3 getLocalInertia() const;
+
+	///////////////////////////////////////////////
+
+	virtual	int	calculateSerializeBufferSize()	const;
+
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+	virtual	const char*	serialize(void* dataBuffer,  class btSerializer* serializer) const;
+
+	virtual void serializeSingleObject(class btSerializer* serializer) const;
+
+};
+
+//@todo add m_optionalMotionState and m_constraintRefs to btRigidBodyData
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct	btRigidBodyFloatData
+{
+	btCollisionObjectFloatData	m_collisionObjectData;
+	btMatrix3x3FloatData		m_invInertiaTensorWorld;
+	btVector3FloatData		m_linearVelocity;
+	btVector3FloatData		m_angularVelocity;
+	btVector3FloatData		m_angularFactor;
+	btVector3FloatData		m_linearFactor;
+	btVector3FloatData		m_gravity;	
+	btVector3FloatData		m_gravity_acceleration;
+	btVector3FloatData		m_invInertiaLocal;
+	btVector3FloatData		m_totalForce;
+	btVector3FloatData		m_totalTorque;
+	float					m_inverseMass;
+	float					m_linearDamping;
+	float					m_angularDamping;
+	float					m_additionalDampingFactor;
+	float					m_additionalLinearDampingThresholdSqr;
+	float					m_additionalAngularDampingThresholdSqr;
+	float					m_additionalAngularDampingFactor;
+	float					m_linearSleepingThreshold;
+	float					m_angularSleepingThreshold;
+	int						m_additionalDamping;
+};
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct	btRigidBodyDoubleData
+{
+	btCollisionObjectDoubleData	m_collisionObjectData;
+	btMatrix3x3DoubleData		m_invInertiaTensorWorld;
+	btVector3DoubleData		m_linearVelocity;
+	btVector3DoubleData		m_angularVelocity;
+	btVector3DoubleData		m_angularFactor;
+	btVector3DoubleData		m_linearFactor;
+	btVector3DoubleData		m_gravity;	
+	btVector3DoubleData		m_gravity_acceleration;
+	btVector3DoubleData		m_invInertiaLocal;
+	btVector3DoubleData		m_totalForce;
+	btVector3DoubleData		m_totalTorque;
+	double					m_inverseMass;
+	double					m_linearDamping;
+	double					m_angularDamping;
+	double					m_additionalDampingFactor;
+	double					m_additionalLinearDampingThresholdSqr;
+	double					m_additionalAngularDampingThresholdSqr;
+	double					m_additionalAngularDampingFactor;
+	double					m_linearSleepingThreshold;
+	double					m_angularSleepingThreshold;
+	int						m_additionalDamping;
+	char	m_padding[4];
 };
 
 
 
-#endif
+#endif //BT_RIGIDBODY_H
 

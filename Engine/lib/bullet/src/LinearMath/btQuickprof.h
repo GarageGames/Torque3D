@@ -12,225 +12,59 @@
 
 
 
-#ifndef QUICK_PROF_H
-#define QUICK_PROF_H
-
-//To disable built-in profiling, please comment out next line
-//#define BT_NO_PROFILE 1
-#ifndef BT_NO_PROFILE
+#ifndef BT_QUICK_PROF_H
+#define BT_QUICK_PROF_H
 
 #include "btScalar.h"
-#include "LinearMath/btAlignedAllocator.h"
-#include <new>
-
-
-
-
-//if you don't need btClock, you can comment next line
 #define USE_BT_CLOCK 1
 
 #ifdef USE_BT_CLOCK
-#ifdef __CELLOS_LV2__
-#include <sys/sys_time.h>
-#include <sys/time_util.h>
-#include <stdio.h>
-#endif
-
-#if defined (SUNOS) || defined (__SUNOS__) 
-#include <stdio.h> 
-#endif
-
-#if defined(WIN32) || defined(_WIN32)
-
-#define USE_WINDOWS_TIMERS 
-#define WIN32_LEAN_AND_MEAN 
-#define NOWINRES 
-#define NOMCX 
-#define NOIME 
-#ifdef _XBOX
-#include <Xtl.h>
-#else
-#include <windows.h>
-#endif
-#include <time.h>
-
-#else
-#include <sys/time.h>
-#endif
-
-#define mymin(a,b) (a > b ? a : b)
 
 ///The btClock is a portable basic clock that measures accurate time in seconds, use for profiling.
 class btClock
 {
 public:
-	btClock()
-	{
-#ifdef USE_WINDOWS_TIMERS
-		QueryPerformanceFrequency(&mClockFrequency);
-#endif
-		reset();
-	}
+	btClock();
 
-	~btClock()
-	{
-	}
+	btClock(const btClock& other);
+	btClock& operator=(const btClock& other);
+
+	~btClock();
 
 	/// Resets the initial reference time.
-	void reset()
-	{
-#ifdef USE_WINDOWS_TIMERS
-		QueryPerformanceCounter(&mStartTime);
-		mStartTick = GetTickCount();
-		mPrevElapsedTime = 0;
-#else
-#ifdef __CELLOS_LV2__
-
-		typedef uint64_t  ClockSize;
-		ClockSize newTime;
-		//__asm __volatile__( "mftb %0" : "=r" (newTime) : : "memory");
-		SYS_TIMEBASE_GET( newTime );
-		mStartTime = newTime;
-#else
-		gettimeofday(&mStartTime, 0);
-#endif
-
-#endif
-	}
+	void reset();
 
 	/// Returns the time in ms since the last call to reset or since 
 	/// the btClock was created.
-	unsigned long int getTimeMilliseconds()
-	{
-#ifdef USE_WINDOWS_TIMERS
-		LARGE_INTEGER currentTime;
-		QueryPerformanceCounter(&currentTime);
-		LONGLONG elapsedTime = currentTime.QuadPart - 
-			mStartTime.QuadPart;
-
-		// Compute the number of millisecond ticks elapsed.
-		unsigned long msecTicks = (unsigned long)(1000 * elapsedTime / 
-			mClockFrequency.QuadPart);
-
-		// Check for unexpected leaps in the Win32 performance counter.  
-		// (This is caused by unexpected data across the PCI to ISA 
-		// bridge, aka south bridge.  See Microsoft KB274323.)
-		unsigned long elapsedTicks = GetTickCount() - mStartTick;
-		signed long msecOff = (signed long)(msecTicks - elapsedTicks);
-		if (msecOff < -100 || msecOff > 100)
-		{
-			// Adjust the starting time forwards.
-			LONGLONG msecAdjustment = mymin(msecOff * 
-				mClockFrequency.QuadPart / 1000, elapsedTime - 
-				mPrevElapsedTime);
-			mStartTime.QuadPart += msecAdjustment;
-			elapsedTime -= msecAdjustment;
-
-			// Recompute the number of millisecond ticks elapsed.
-			msecTicks = (unsigned long)(1000 * elapsedTime / 
-				mClockFrequency.QuadPart);
-		}
-
-		// Store the current elapsed time for adjustments next time.
-		mPrevElapsedTime = elapsedTime;
-
-		return msecTicks;
-#else
-
-#ifdef __CELLOS_LV2__
-		uint64_t freq=sys_time_get_timebase_frequency();
-		double dFreq=((double) freq) / 1000.0;
-		typedef uint64_t  ClockSize;
-		ClockSize newTime;
-		SYS_TIMEBASE_GET( newTime );
-		//__asm __volatile__( "mftb %0" : "=r" (newTime) : : "memory");
-
-		return (unsigned long int)((double(newTime-mStartTime)) / dFreq);
-#else
-
-		struct timeval currentTime;
-		gettimeofday(&currentTime, 0);
-		return (currentTime.tv_sec - mStartTime.tv_sec) * 1000 + 
-			(currentTime.tv_usec - mStartTime.tv_usec) / 1000;
-#endif //__CELLOS_LV2__
-#endif
-	}
+	unsigned long int getTimeMilliseconds();
 
 	/// Returns the time in us since the last call to reset or since 
 	/// the Clock was created.
-	unsigned long int getTimeMicroseconds()
-	{
-#ifdef USE_WINDOWS_TIMERS
-		LARGE_INTEGER currentTime;
-		QueryPerformanceCounter(&currentTime);
-		LONGLONG elapsedTime = currentTime.QuadPart - 
-			mStartTime.QuadPart;
-
-		// Compute the number of millisecond ticks elapsed.
-		unsigned long msecTicks = (unsigned long)(1000 * elapsedTime / 
-			mClockFrequency.QuadPart);
-
-		// Check for unexpected leaps in the Win32 performance counter.  
-		// (This is caused by unexpected data across the PCI to ISA 
-		// bridge, aka south bridge.  See Microsoft KB274323.)
-		unsigned long elapsedTicks = GetTickCount() - mStartTick;
-		signed long msecOff = (signed long)(msecTicks - elapsedTicks);
-		if (msecOff < -100 || msecOff > 100)
-		{
-			// Adjust the starting time forwards.
-			LONGLONG msecAdjustment = mymin(msecOff * 
-				mClockFrequency.QuadPart / 1000, elapsedTime - 
-				mPrevElapsedTime);
-			mStartTime.QuadPart += msecAdjustment;
-			elapsedTime -= msecAdjustment;
-		}
-
-		// Store the current elapsed time for adjustments next time.
-		mPrevElapsedTime = elapsedTime;
-
-		// Convert to microseconds.
-		unsigned long usecTicks = (unsigned long)(1000000 * elapsedTime / 
-			mClockFrequency.QuadPart);
-
-		return usecTicks;
-#else
-
-#ifdef __CELLOS_LV2__
-		uint64_t freq=sys_time_get_timebase_frequency();
-		double dFreq=((double) freq)/ 1000000.0;
-		typedef uint64_t  ClockSize;
-		ClockSize newTime;
-		//__asm __volatile__( "mftb %0" : "=r" (newTime) : : "memory");
-		SYS_TIMEBASE_GET( newTime );
-
-		return (unsigned long int)((double(newTime-mStartTime)) / dFreq);
-#else
-
-		struct timeval currentTime;
-		gettimeofday(&currentTime, 0);
-		return (currentTime.tv_sec - mStartTime.tv_sec) * 1000000 + 
-			(currentTime.tv_usec - mStartTime.tv_usec);
-#endif//__CELLOS_LV2__
-#endif 
-	}
-
+	unsigned long int getTimeMicroseconds();
+	
+	/// Returns the time in s since the last call to reset or since 
+	/// the Clock was created.
+	btScalar getTimeSeconds();
+	
 private:
-#ifdef USE_WINDOWS_TIMERS
-	LARGE_INTEGER mClockFrequency;
-	DWORD mStartTick;
-	LONGLONG mPrevElapsedTime;
-	LARGE_INTEGER mStartTime;
-#else
-#ifdef __CELLOS_LV2__
-	uint64_t	mStartTime;
-#else
-	struct timeval mStartTime;
-#endif
-#endif //__CELLOS_LV2__
-
+	struct btClockData* m_data;
 };
 
 #endif //USE_BT_CLOCK
+
+
+//To disable built-in profiling, please comment out next line
+#define BT_NO_PROFILE 1
+#ifndef BT_NO_PROFILE
+#include <stdio.h>//@todo remove this, backwards compatibility
+
+#include "btAlignedAllocator.h"
+#include <new>
+
+
+
+
+
 
 
 
@@ -256,7 +90,8 @@ public:
 	const char *	Get_Name( void )				{ return Name; }
 	int				Get_Total_Calls( void )		{ return TotalCalls; }
 	float				Get_Total_Time( void )		{ return TotalTime; }
-
+	void*			GetUserPointer() const {return m_userPtr;}
+	void			SetUserPointer(void* ptr) { m_userPtr = ptr;}
 protected:
 
 	const char *	Name;
@@ -268,6 +103,7 @@ protected:
 	CProfileNode *	Parent;
 	CProfileNode *	Child;
 	CProfileNode *	Sibling;
+	void*	m_userPtr;
 };
 
 ///An iterator to navigate through the tree
@@ -289,15 +125,20 @@ public:
 	int				Get_Current_Total_Calls( void )	{ return CurrentChild->Get_Total_Calls(); }
 	float				Get_Current_Total_Time( void )	{ return CurrentChild->Get_Total_Time(); }
 
+	void*	Get_Current_UserPointer( void )			{ return CurrentChild->GetUserPointer(); }
+	void	Set_Current_UserPointer(void* ptr) {CurrentChild->SetUserPointer(ptr);}
 	// Access the current parent
 	const char *	Get_Current_Parent_Name( void )			{ return CurrentParent->Get_Name(); }
 	int				Get_Current_Parent_Total_Calls( void )	{ return CurrentParent->Get_Total_Calls(); }
 	float				Get_Current_Parent_Total_Time( void )	{ return CurrentParent->Get_Total_Time(); }
 
+	
+
 protected:
 
 	CProfileNode *	CurrentParent;
 	CProfileNode *	CurrentChild;
+	
 
 	CProfileIterator( CProfileNode * start );
 	friend	class		CProfileManager;
@@ -365,6 +206,6 @@ public:
 
 
 
-#endif //QUICK_PROF_H
+#endif //BT_QUICK_PROF_H
 
 

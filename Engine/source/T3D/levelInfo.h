@@ -36,6 +36,9 @@
    #include "sfx/sfxCommon.h"
 #endif
 
+#ifndef _GFXTEXTUREHANDLE_H_
+#include "gfx/gfxTextureHandle.h"
+#endif
 
 class SFXAmbience;
 class SFXSoundscape;
@@ -54,6 +57,8 @@ class LevelInfo : public NetObject
       F32 mNearClip;
 
       F32 mVisibleDistance;
+
+      F32 mVisibleGhostDistance;
 
       F32 mDecalBias;
 
@@ -95,6 +100,9 @@ class LevelInfo : public NetObject
       void _updateSceneGraph();
 
       void _onLMActivate(const char *lm, bool enable);
+   protected:
+      // Name (path) of the accumulation texture.
+      String mAccuTextureName;
 
    public:
 
@@ -129,9 +137,12 @@ class LevelInfo : public NetObject
          UpdateMask = BIT(0)
       };
 
+      GFXTexHandle mAccuTexture;
+
       virtual U32 packUpdate( NetConnection *conn, U32 mask, BitStream *stream );
       virtual void unpackUpdate( NetConnection *conn, BitStream *stream );
-
+      static bool _setLevelAccuTexture(void *object, const char *index, const char *data);
+      void setLevelAccuTexture(const String& name);
       /// @}
 };
 

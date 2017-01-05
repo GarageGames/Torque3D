@@ -23,17 +23,25 @@
 //-----------------------------------------------------------------------------
 // Structures                                                                  
 //-----------------------------------------------------------------------------
+
+#include "shaderModel.hlsl"
+
 struct ConnectData
 {
-   float4 texCoord   : TEXCOORD0;
-   float2 tex2       : TEXCOORD1;
+   float4 hpos            : TORQUE_POSITION;
+   float2 texCoord        : TEXCOORD0;
+   float4 tex2            : TEXCOORD1;
 };
 
 
 struct Fragout
 {
-   float4 col : COLOR0;
+   float4 col : TORQUE_TARGET0;
 };
+
+TORQUE_UNIFORM_SAMPLER2D(texMap, 0);
+TORQUE_UNIFORM_SAMPLER2D(refractMap, 1);
+TORQUE_UNIFORM_SAMPLER2D(bumpMap, 2);
 
 
 //-----------------------------------------------------------------------------
@@ -54,15 +62,11 @@ float fadeAxis( float val )
 //-----------------------------------------------------------------------------
 // Main                                                                        
 //-----------------------------------------------------------------------------
-Fragout main( ConnectData IN,
-              uniform sampler2D refractMap      : register(S1),
-              uniform sampler2D texMap          : register(S0),
-              uniform sampler2D bumpMap         : register(S2)
-)
+Fragout main( ConnectData IN )
 {
    Fragout OUT;
 
-   float3 bumpNorm = tex2D( bumpMap, IN.tex2 ) * 2.0 - 1.0;
+   float3 bumpNorm = TORQUE_TEX2D( bumpMap, IN.tex2 ) * 2.0 - 1.0;
    float2 offset = float2( bumpNorm.x, bumpNorm.y );
    float4 texIndex = IN.texCoord;
 
@@ -74,8 +78,8 @@ Fragout main( ConnectData IN,
    const float distortion = 0.2;
    texIndex.xy += offset * distortion * fadeVal;
 
-   float4 reflectColor = tex2Dproj( refractMap, texIndex );
-   float4 diffuseColor = tex2D( texMap, IN.tex2 );
+   float4 reflectColor = TORQUE_TEX2DPROJ( refractMap, texIndex );
+   float4 diffuseColor = TORQUE_TEX2D( texMap, IN.tex2 );
 
    OUT.col = diffuseColor + reflectColor * diffuseColor.a;
 

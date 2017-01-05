@@ -162,10 +162,12 @@ void GuiHealthTextHud::onRender(Point2I offset, const RectI &updateRect)
       else  
          mValue = 100 - (100 * control->getDamageValue());    
    }  
+
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
   
    // If enabled draw background first  
    if (mShowFill)  
-      GFX->getDrawUtil()->drawRectFill(updateRect, mFillColor);  
+      drawUtil->drawRectFill(updateRect, mFillColor);  
   
    // Prepare text and center it  
    S32 val = (S32)mValue;    
@@ -190,11 +192,11 @@ void GuiHealthTextHud::onRender(Point2I offset, const RectI &updateRect)
       }  
    }  
   
-   GFX->getDrawUtil()->setBitmapModulation(tColor);    
-   GFX->getDrawUtil()->drawText(mProfile->mFont, offset, buf);    
-   GFX->getDrawUtil()->clearBitmapModulation();    
+   drawUtil->setBitmapModulation(tColor);    
+   drawUtil->drawText(mProfile->mFont, offset, buf);    
+   drawUtil->clearBitmapModulation();    
   
    // If enabled draw the border last  
    if (mShowFrame)  
-      GFX->getDrawUtil()->drawRect(updateRect, mFrameColor);  
+      drawUtil->drawRect(updateRect, mFrameColor);  
 }  

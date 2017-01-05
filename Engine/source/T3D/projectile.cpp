@@ -320,9 +320,9 @@ bool ProjectileData::preload(bool server, String &errorStr)
          if (Sim::findObject(decalId, decal) == false)
             Con::errorf(ConsoleLogEntry::General, "ProjectileData::preload: Invalid packet, bad datablockId(decal): %d", decalId);
 
-      String errorStr;
-      if( !sfxResolve( &sound, errorStr ) )
-         Con::errorf(ConsoleLogEntry::General, "ProjectileData::preload: Invalid packet: %s", errorStr.c_str());
+      String sfxErrorStr;
+      if( !sfxResolve( &sound, sfxErrorStr ) )
+         Con::errorf(ConsoleLogEntry::General, "ProjectileData::preload: Invalid packet: %s", sfxErrorStr.c_str());
 
       if (!lightDesc && lightDescId != 0)
          if (Sim::findObject(lightDescId, lightDesc) == false)
@@ -550,14 +550,15 @@ S32 ProjectileData::scaleValue( S32 value, bool down )
 //
 Projectile::Projectile()
  : mPhysicsWorld( NULL ),
+   mDataBlock( NULL ),
+   mParticleEmitter( NULL ),
+   mParticleWaterEmitter( NULL ),
+   mSound( NULL ),
    mCurrPosition( 0, 0, 0 ),
    mCurrVelocity( 0, 0, 1 ),
    mSourceObjectId( -1 ),
    mSourceObjectSlot( -1 ),
    mCurrTick( 0 ),
-   mParticleEmitter( NULL ),
-   mParticleWaterEmitter( NULL ),
-   mSound( NULL ),
    mProjectileShape( NULL ),
    mActivateThread( NULL ),
    mMaintainThread( NULL ),
@@ -696,6 +697,12 @@ bool Projectile::onAdd()
 {
    if(!Parent::onAdd())
       return false;
+
+   if( !mDataBlock )
+   {
+      Con::errorf("Projectile::onAdd - Fail - Not datablock");
+      return false;
+   }
 
    if (isServerObject())
    {
@@ -1011,7 +1018,7 @@ void Projectile::explode( const Point3F &p, const Point3F &n, const U32 collideT
 
       // Client (impact) decal.
       if ( mDataBlock->decal )     
-         gDecalManager->addDecal( p, n, 0.0f, mDataBlock->decal );
+         gDecalManager->addDecal(p, n, 0.0f, mDataBlock->decal);
 
       // Client object
       updateSound();
@@ -1106,68 +1113,67 @@ void Projectile::simulate( F32 dt )
       if ( isServerObject() && ( rInfo.object->getTypeMask() & csmStaticCollisionMask ) == 0 )
          setMaskBits( BounceMask );
 
+      MatrixF xform( true );
+      xform.setColumn( 3, rInfo.point );
+      setTransform( xform );
+      mCurrPosition    = rInfo.point;
+
+      // Get the object type before the onCollision call, in case
+      // the object is destroyed.
+      U32 objectType = rInfo.object->getTypeMask();
+
+      // re-enable the collision response on the source object since
+      // we need to process the onCollision and explode calls
+      if ( disableSourceObjCollision )
+         mSourceObject->enableCollision();
+
+      // Ok, here is how this works:
+      // onCollision is called to notify the server scripts that a collision has occurred, then
+      // a call to explode is made to start the explosion process. The call to explode is made
+      // twice, once on the server and once on the client.
+      // The server process is responsible for two things:
+      //    1) setting the ExplosionMask network bit to guarantee that the client calls explode
+      //    2) initiate the explosion process on the server scripts
+      // The client process is responsible for only one thing:
+      //    1) drawing the appropriate explosion
+
+      // It is possible that during the processTick the server may have decided that a hit
+      // has occurred while the client prediction has decided that a hit has not occurred.
+      // In this particular scenario the client will have failed to call onCollision and
+      // explode during the processTick. However, the explode function will be called
+      // during the next packet update, due to the ExplosionMask network bit being set.
+      // onCollision will remain uncalled on the client however, therefore no client
+      // specific code should be placed inside the function!
+      onCollision( rInfo.point, rInfo.normal, rInfo.object );
       // Next order of business: do we explode on this hit?
       if ( mCurrTick > mDataBlock->armingDelay || mDataBlock->armingDelay == 0 )
       {
-         MatrixF xform( true );
-         xform.setColumn( 3, rInfo.point );
-         setTransform( xform );
-         mCurrPosition    = rInfo.point;
          mCurrVelocity    = Point3F::Zero;
-
-         // Get the object type before the onCollision call, in case
-         // the object is destroyed.
-         U32 objectType = rInfo.object->getTypeMask();
-
-         // re-enable the collision response on the source object since
-         // we need to process the onCollision and explode calls
-         if ( disableSourceObjCollision )
-            mSourceObject->enableCollision();
-
-         // Ok, here is how this works:
-         // onCollision is called to notify the server scripts that a collision has occurred, then
-         // a call to explode is made to start the explosion process. The call to explode is made
-         // twice, once on the server and once on the client.
-         // The server process is responsible for two things:
-         //    1) setting the ExplosionMask network bit to guarantee that the client calls explode
-         //    2) initiate the explosion process on the server scripts
-         // The client process is responsible for only one thing:
-         //    1) drawing the appropriate explosion
-
-         // It is possible that during the processTick the server may have decided that a hit
-         // has occurred while the client prediction has decided that a hit has not occurred.
-         // In this particular scenario the client will have failed to call onCollision and
-         // explode during the processTick. However, the explode function will be called
-         // during the next packet update, due to the ExplosionMask network bit being set.
-         // onCollision will remain uncalled on the client however, therefore no client
-         // specific code should be placed inside the function!
-         onCollision( rInfo.point, rInfo.normal, rInfo.object );
          explode( rInfo.point, rInfo.normal, objectType );
+      }
 
-         // break out of the collision check, since we've exploded
-         // we don't want to mess with the position and velocity
+      if ( mDataBlock->isBallistic )
+      {
+         // Otherwise, this represents a bounce.  First, reflect our velocity
+         //  around the normal...
+         Point3F bounceVel = mCurrVelocity - rInfo.normal * (mDot( mCurrVelocity, rInfo.normal ) * 2.0);
+         mCurrVelocity = bounceVel;
+
+         // Add in surface friction...
+         Point3F tangent = bounceVel - rInfo.normal * mDot(bounceVel, rInfo.normal);
+         mCurrVelocity  -= tangent * mDataBlock->bounceFriction;
+
+         // Now, take elasticity into account for modulating the speed of the grenade
+         mCurrVelocity *= mDataBlock->bounceElasticity;
+
+         // Set the new position to the impact and the bounce
+         // will apply on the next frame.
+         //F32 timeLeft = 1.0f - rInfo.t;
+         newPosition = oldPosition = rInfo.point + rInfo.normal * 0.05f;
       }
       else
       {
-         if ( mDataBlock->isBallistic )
-         {
-            // Otherwise, this represents a bounce.  First, reflect our velocity
-            //  around the normal...
-            Point3F bounceVel = mCurrVelocity - rInfo.normal * (mDot( mCurrVelocity, rInfo.normal ) * 2.0);
-            mCurrVelocity = bounceVel;
-
-            // Add in surface friction...
-            Point3F tangent = bounceVel - rInfo.normal * mDot(bounceVel, rInfo.normal);
-            mCurrVelocity  -= tangent * mDataBlock->bounceFriction;
-
-            // Now, take elasticity into account for modulating the speed of the grenade
-            mCurrVelocity *= mDataBlock->bounceElasticity;
-
-            // Set the new position to the impact and the bounce
-            // will apply on the next frame.
-            //F32 timeLeft = 1.0f - rInfo.t;
-            newPosition = oldPosition = rInfo.point + rInfo.normal * 0.05f;
-         }
+         mCurrVelocity    = Point3F::Zero;
       }
    }
 

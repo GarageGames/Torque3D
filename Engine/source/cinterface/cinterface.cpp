@@ -23,13 +23,14 @@
 #include "platform/platform.h"
 #include "console/compiler.h"
 #include "console/consoleInternal.h"
+#include "console/engineAPI.h"
 #include "core/util/tDictionary.h"
 #include "core/strings/stringFunctions.h"
 #include "app/mainLoop.h"
 #include "windowManager/platformWindow.h"
 #include "windowManager/platformWindowMgr.h"
 
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
 #include "windowManager/win32/win32Window.h"
 #include "windowManager/win32/winDispatch.h"
 extern void createFontInit(void);
@@ -37,21 +38,10 @@ extern void createFontShutdown(void);
 #endif
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-   extern INT CreateMiniDump(LPEXCEPTION_POINTERS ExceptionInfo);
+   extern S32 CreateMiniDump(LPEXCEPTION_POINTERS ExceptionInfo);
 #endif
 
 static HashTable<StringTableEntry,StringTableEntry> gSecureScript;
-
-#ifdef TORQUE_OS_MAC
-
-// ObjC hooks for shared library support
-// See:  macMain.mm
-
-void torque_mac_engineinit(int argc, const char **argv);
-void  torque_mac_enginetick();
-void torque_mac_engineshutdown();
-
-#endif 
 
 extern bool LinkConsoleFunctions;
 
@@ -64,7 +54,7 @@ extern "C" {
 	}
 
    // initialize Torque 3D including argument handling
-	int torque_engineinit(S32 argc, const char **argv)
+	S32 torque_engineinit(S32 argc, const char **argv)
 	{
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
@@ -77,10 +67,6 @@ extern "C" {
 		createFontInit();
 #endif
 
-
-#ifdef TORQUE_OS_MAC
-		torque_mac_engineinit(argc, argv);
-#endif
 		// Initialize the subsystems.
 		StandardMainLoop::init();
 
@@ -105,16 +91,11 @@ extern "C" {
 	}
 
    // tick Torque 3D's main loop
-	int torque_enginetick()
+	S32 torque_enginetick()
 	{
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
       __try {
-#endif
-
-
-#ifdef TORQUE_OS_MAC
-		torque_mac_enginetick();
 #endif
 
 		bool ret = StandardMainLoop::doMainLoop(); 
@@ -132,6 +113,11 @@ extern "C" {
 
 	}
 
+	S32 torque_getreturnstatus()
+	{
+		return StandardMainLoop::getReturnStatus();
+	}
+
    // signal an engine shutdown (as with the quit(); console command)
 	void torque_enginesignalshutdown()
 	{
@@ -139,7 +125,7 @@ extern "C" {
 	}
 
    // shutdown the engine
-	int torque_engineshutdown()
+	S32 torque_engineshutdown()
 	{
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
@@ -151,10 +137,6 @@ extern "C" {
 
 #if !defined(TORQUE_OS_XENON) && !defined(TORQUE_OS_PS3) && defined(_MSC_VER)
 		createFontShutdown();
-#endif
-
-#ifdef TORQUE_OS_MAC
-		torque_mac_engineshutdown();
 #endif
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
@@ -181,7 +163,7 @@ extern "C" {
 
 	}
 
-	int torque_getconsolebool(const char* name)
+	S32 torque_getconsolebool(const char* name)
 	{
 		return Con::getBoolVariable(name);
 	}
@@ -262,7 +244,8 @@ extern "C" {
 		if (!entry)
 			return;
 
-		entry->cb.mVoidCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		entry->cb.mVoidCallbackFunc(NULL, args.count(), args);
 	}
 
 	F32 torque_callfloatfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -273,7 +256,8 @@ extern "C" {
 		if (!entry)
 			return 0.0f;
 
-		return entry->cb.mFloatCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mFloatCallbackFunc(NULL, args.count(), args);
 	}
 
 	S32 torque_callintfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -284,7 +268,8 @@ extern "C" {
 		if (!entry)
 			return 0;
 
-		return entry->cb.mIntCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mIntCallbackFunc(NULL, args.count(), args);
 	}
 
 
@@ -295,7 +280,8 @@ extern "C" {
 		if (!entry)
 			return "";
 
-		return entry->cb.mStringCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mStringCallbackFunc(NULL, args.count(), args);
 	}
 
 	bool torque_callboolfunction(const char* nameSpace, const char* name, S32 argc, const char ** argv)
@@ -303,9 +289,10 @@ extern "C" {
 		Namespace::Entry* entry = GetEntry(nameSpace, name);
 
 		if (!entry)
-			return "";
+			return false;
 
-		return entry->cb.mBoolCallbackFunc(NULL, argc, argv);      
+		StringStackConsoleWrapper args(argc, argv);
+		return entry->cb.mBoolCallbackFunc(NULL, args.count(), args);
 	}
 
 
@@ -319,7 +306,8 @@ extern "C" {
 		if(!entry->mFunctionOffset)
 			return "";
 
-		const char* ret = entry->mCode->exec(entry->mFunctionOffset, StringTable->insert(name), entry->mNamespace, argc, argv, false, entry->mPackage);
+		StringStackConsoleWrapper args(argc, argv);
+		const char* ret = entry->mCode->exec(entry->mFunctionOffset, StringTable->insert(name), entry->mNamespace, args.count(), args, false, entry->mPackage);
 
 		if (!ret || !dStrlen(ret))
 			return "";
@@ -415,7 +403,7 @@ extern "C" {
 			PlatformWindowManager::get()->getFirstWindow()->setSize(Point2I(width,height));
 	}
 
-#ifdef TORQUE_OS_WIN32
+#if defined(TORQUE_OS_WIN) && !defined(TORQUE_SDL)
    // retrieve the hwnd of our render window
    void* torque_gethwnd()
    {
@@ -447,20 +435,16 @@ extern "C" {
 // By default, it is marked as secure by the web plugins and then can be called from
 // Javascript on the web page to ensure that function calls across the language
 // boundry are working with arguments and return values
-ConsoleFunction(testJavaScriptBridge, const char *, 4, 4, "testBridge(arg1, arg2, arg3)")
+DefineConsoleFunction( testJavaScriptBridge, const char *, (const char* arg1, const char* arg2, const char* arg3), , "testBridge(arg1, arg2, arg3)")
 {
 	S32 failed = 0;
-	if(argc != 4)
-		failed = 1;
-	else
-	{
-		if (dStrcmp(argv[1],"one"))
+		if (dStrcmp(arg1,"one"))
 			failed = 2;
-		if (dStrcmp(argv[2],"two"))
+		if (dStrcmp(arg2,"two"))
 			failed = 2;
-		if (dStrcmp(argv[3],"three"))
+		if (dStrcmp(arg3,"three"))
 			failed = 2;
-	}
+	
 
 	//attempt to call from TorqueScript -> JavaScript
 	const char* jret = Con::evaluate("JS::bridgeCallback(\"one\",\"two\",\"three\");");
@@ -468,9 +452,10 @@ ConsoleFunction(testJavaScriptBridge, const char *, 4, 4, "testBridge(arg1, arg2
 	if (dStrcmp(jret,"42"))
 		failed = 3;
 
-	char *ret = Con::getReturnBuffer(256);
+	static const U32 bufSize = 256;
+	char *ret = Con::getReturnBuffer(bufSize);
 
-	dSprintf(ret, 256, "%i", failed);
+	dSprintf(ret, bufSize, "%i", failed);
 
 	return ret;
 }

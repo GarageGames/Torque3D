@@ -158,8 +158,9 @@ void GuiProgressBitmapCtrl::setBitmap( const char* name )
 
 const char* GuiProgressBitmapCtrl::getScriptValue()
 {
-   char * ret = Con::getReturnBuffer(64);
-   dSprintf(ret, 64, "%g", mProgress);
+   static const U32 bufSize = 64;
+   char * ret = Con::getReturnBuffer(bufSize);
+   dSprintf(ret, bufSize, "%g", mProgress);
    return ret;
 }
 
@@ -205,8 +206,10 @@ void GuiProgressBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 		mDim = getHeight();
 	else
 		mDim = getWidth();
+
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
 	
-	GFX->getDrawUtil()->clearBitmapModulation();
+	drawUtil->clearBitmapModulation();
 
 	if(mNumberOfBitmaps == 1)
 	{
@@ -217,14 +220,14 @@ void GuiProgressBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 			//drawing stretch bitmap
 			RectI progressRect = ctrlRect;
 			progressRect.extent.x = width;
-			GFX->getDrawUtil()->drawBitmapStretchSR(mProfile->mTextureObject, progressRect, mProfile->mBitmapArrayRects[0]);
+			drawUtil->drawBitmapStretchSR(mProfile->mTextureObject, progressRect, mProfile->mBitmapArrayRects[0]);
 		}
 	}
 	else if(mNumberOfBitmaps >= 3)
 	{
 		//drawing left-end bitmap
 		RectI progressRectLeft(ctrlRect.point.x, ctrlRect.point.y, mDim, mDim);
-		GFX->getDrawUtil()->drawBitmapStretchSR(mProfile->mTextureObject, progressRectLeft, mProfile->mBitmapArrayRects[0]);
+		drawUtil->drawBitmapStretchSR(mProfile->mTextureObject, progressRectLeft, mProfile->mBitmapArrayRects[0]);
 
 		//draw the progress with image
 		S32 width = (S32)((F32)(getWidth()) * mProgress);
@@ -236,11 +239,11 @@ void GuiProgressBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 			progressRect.extent.x = (width - mDim - mDim);
 			if (progressRect.extent.x < 0)
 				progressRect.extent.x = 0;
-			GFX->getDrawUtil()->drawBitmapStretchSR(mProfile->mTextureObject, progressRect, mProfile->mBitmapArrayRects[1]);
+			drawUtil->drawBitmapStretchSR(mProfile->mTextureObject, progressRect, mProfile->mBitmapArrayRects[1]);
 		
 			//drawing right-end bitmap
 			RectI progressRectRight(progressRect.point.x + progressRect.extent.x, ctrlRect.point.y, mDim, mDim );
-			GFX->getDrawUtil()->drawBitmapStretchSR(mProfile->mTextureObject, progressRectRight, mProfile->mBitmapArrayRects[2]);
+			drawUtil->drawBitmapStretchSR(mProfile->mTextureObject, progressRectRight, mProfile->mBitmapArrayRects[2]);
 		}
 	}
 	else
@@ -248,7 +251,7 @@ void GuiProgressBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
 
 	//if there's a border, draw it
    if (mProfile->mBorder)
-      GFX->getDrawUtil()->drawRect(ctrlRect, mProfile->mBorderColor);
+      drawUtil->drawRect(ctrlRect, mProfile->mBorderColor);
 
    Parent::onRender( offset, updateRect );
 

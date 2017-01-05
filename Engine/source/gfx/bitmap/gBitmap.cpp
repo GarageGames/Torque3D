@@ -33,6 +33,7 @@
 #include "platform/profiler.h"
 #include "console/engineAPI.h"
 
+using namespace Torque;
 
 const U32 GBitmap::csFileVersion   = 3;
 
@@ -292,6 +293,7 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
       break;
      case GFXFormatR8G8B8:       mBytesPerPixel = 3;
       break;
+     case GFXFormatR8G8B8A8_LINEAR_FORCE:
      case GFXFormatR8G8B8X8:
      case GFXFormatR8G8B8A8:     mBytesPerPixel = 4;
       break;
@@ -325,7 +327,7 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
 
          mNumMipLevels++;
          allocPixels += currWidth * currHeight * mBytesPerPixel;
-      } while (currWidth != 1 || currHeight != 1);
+      } while (currWidth != 1 && currHeight != 1);
    }
    AssertFatal(mNumMipLevels <= c_maxMipLevels, "GBitmap::allocateBitmap: too many miplevels");
 
@@ -795,11 +797,11 @@ bool GBitmap::combine( const GBitmap *bitmapA, const GBitmap *bitmapB, const GFX
    const U8 *aBits = bitmapA->getBits();
    const U8 *bBits = bitmapB->getBits();
 
-   for( int y = 0; y < getHeight(); y++ )
+   for( S32 y = 0; y < getHeight(); y++ )
    {
-      for( int x = 0; x < getWidth(); x++ )
+      for( S32 x = 0; x < getWidth(); x++ )
       {
-         for( int _byte = 0; _byte < mBytesPerPixel; _byte++ )
+         for( S32 _byte = 0; _byte < mBytesPerPixel; _byte++ )
          {
             U8 pxA = 0;
             U8 pxB = 0;

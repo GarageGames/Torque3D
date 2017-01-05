@@ -22,6 +22,7 @@
 
 #include "util/fpsTracker.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 
 FPSTracker gFPS;
 
@@ -46,7 +47,7 @@ void FPSTracker::reset()
 
 void FPSTracker::update()
 {
-   const float alpha  = 0.07f;
+   const F32 alpha  = 0.07f;
    F32 realSeconds    = (F32)Platform::getRealMilliseconds()/1000.0f;
    F32 virtualSeconds = (F32)Platform::getVirtualMilliseconds()/1000.0f;
 
@@ -87,7 +88,7 @@ void FPSTracker::update()
    }
 }
 
-ConsoleFunction( resetFPSTracker, void, 1, 1, "()"
+DefineConsoleFunction( resetFPSTracker, void, (), , "()"
    "@brief Reset FPS stats (fps::)\n\n"
    "@ingroup Game")
 {

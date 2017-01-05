@@ -117,7 +117,7 @@ ConsoleDocClass( DecalManager,
 
 namespace {
 
-int QSORT_CALLBACK cmpDecalInstance(const void* p1, const void* p2)
+S32 QSORT_CALLBACK cmpDecalInstance(const void* p1, const void* p2)
 {
    const DecalInstance** pd1 = (const DecalInstance**)p1;
    const DecalInstance** pd2 = (const DecalInstance**)p2;
@@ -125,7 +125,7 @@ int QSORT_CALLBACK cmpDecalInstance(const void* p1, const void* p2)
    return int(((char *)(*pd1)->mDataBlock) - ((char *)(*pd2)->mDataBlock));
 }
 
-int QSORT_CALLBACK cmpPointsXY( const void *p1, const void *p2 )
+S32 QSORT_CALLBACK cmpPointsXY( const void *p1, const void *p2 )
 {
    const Point3F *pnt1 = (const Point3F*)p1;
    const Point3F *pnt2 = (const Point3F*)p2;
@@ -142,7 +142,7 @@ int QSORT_CALLBACK cmpPointsXY( const void *p1, const void *p2 )
       return 0;
 }
 
-int QSORT_CALLBACK cmpQuadPointTheta( const void *p1, const void *p2 )
+S32 QSORT_CALLBACK cmpQuadPointTheta( const void *p1, const void *p2 )
 {
    const Point4F *pnt1 = (const Point4F*)p1;
    const Point4F *pnt2 = (const Point4F*)p2;
@@ -157,7 +157,7 @@ int QSORT_CALLBACK cmpQuadPointTheta( const void *p1, const void *p2 )
 
 static Point3F gSortPoint;
 
-int QSORT_CALLBACK cmpDecalDistance( const void *p1, const void *p2 )
+S32 QSORT_CALLBACK cmpDecalDistance( const void *p1, const void *p2 )
 {
    const DecalInstance** pd1 = (const DecalInstance**)p1;
    const DecalInstance** pd2 = (const DecalInstance**)p2;
@@ -168,7 +168,7 @@ int QSORT_CALLBACK cmpDecalDistance( const void *p1, const void *p2 )
    return mSign( dist1 - dist2 );
 }
 
-int QSORT_CALLBACK cmpDecalRenderOrder( const void *p1, const void *p2 )
+S32 QSORT_CALLBACK cmpDecalRenderOrder( const void *p1, const void *p2 )
 {   
    const DecalInstance** pd1 = (const DecalInstance**)p1;
    const DecalInstance** pd2 = (const DecalInstance**)p2;
@@ -179,14 +179,14 @@ int QSORT_CALLBACK cmpDecalRenderOrder( const void *p1, const void *p2 )
       return 1;
    else
    {
-      int priority = (*pd1)->getRenderPriority() - (*pd2)->getRenderPriority();
+      S32 priority = (*pd1)->getRenderPriority() - (*pd2)->getRenderPriority();
 
       if ( priority != 0 )
          return priority;
 
       if ( (*pd2)->mFlags & SaveDecal )
       {
-         int id = ( (*pd1)->mDataBlock->getMaterial()->getId() - (*pd2)->mDataBlock->getMaterial()->getId() );      
+         S32 id = ( (*pd1)->mDataBlock->getMaterial()->getId() - (*pd2)->mDataBlock->getMaterial()->getId() );      
          if ( id != 0 )
             return id;
 
@@ -1004,7 +1004,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
    PROFILE_START( DecalManager_RenderDecals_SphereTreeCull );
 
-   const Frustum& rootFrustum = state->getFrustum();
+   const Frustum& rootFrustum = state->getCameraFrustum();
 
    // Populate vector of decal instances to be rendered with all
    // decals from visible decal spheres.
@@ -1235,8 +1235,30 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
          currentBatch = &batches.last();
          currentBatch->startDecal = i;
          currentBatch->decalCount = 1;
-         currentBatch->iCount = decal->mIndxCount;
-         currentBatch->vCount = decal->mVertCount;
+
+         // Shrink and warning: preventing a potential crash.
+         currentBatch->iCount =
+             (decal->mIndxCount > smMaxIndices) ? smMaxIndices : decal->mIndxCount;
+         currentBatch->vCount =
+             (decal->mVertCount > smMaxVerts) ? smMaxVerts : decal->mVertCount;
+#ifdef TORQUE_DEBUG
+         // we didn't mean send a spam to the console
+         static U32 countMsgIndx = 0;
+         if ( (decal->mIndxCount > smMaxIndices) && ((countMsgIndx++ % 1024) == 0) ) {
+            Con::warnf(
+               "DecalManager::prepRenderImage() - Shrinked indices of decal."
+               " Lost %u.",  (decal->mIndxCount - smMaxIndices)
+            );
+         }
+         static U32 countMsgVert = 0;
+         if ( (decal->mVertCount > smMaxVerts) && ((countMsgVert++ % 1024) == 0) ) {
+            Con::warnf(
+               "DecalManager::prepRenderImage() - Shrinked vertices of decal."
+               " Lost %u.",  (decal->mVertCount - smMaxVerts)
+            );
+         }
+#endif
+
          currentBatch->mat = mat;
          currentBatch->matInst = decal->mDataBlock->getMaterialInstance();
          currentBatch->priority = decal->getRenderPriority();         
@@ -1299,15 +1321,21 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
       {
          DecalInstance *dinst = mDecalQueue[j];
 
-         for ( U32 k = 0; k < dinst->mIndxCount; k++ )
+         const U32 indxCount =
+             (dinst->mIndxCount > currentBatch.iCount) ?
+             currentBatch.iCount : dinst->mIndxCount;
+         for ( U32 k = 0; k < indxCount; k++ )
          {
             *( pbPtr + ioffset + k ) = dinst->mIndices[k] + voffset;            
          }
 
-         ioffset += dinst->mIndxCount;
+         ioffset += indxCount;
 
-         dMemcpy( vpPtr + voffset, dinst->mVerts, sizeof( DecalVertex ) * dinst->mVertCount );
-         voffset += dinst->mVertCount;
+         const U32 vertCount =
+             (dinst->mVertCount > currentBatch.vCount) ?
+             currentBatch.vCount : dinst->mVertCount;
+         dMemcpy( vpPtr + voffset, dinst->mVerts, sizeof( DecalVertex ) * vertCount );
+         voffset += vertCount;
 
          // Ugly hack for ProjectedShadow!
          if ( (dinst->mFlags & CustomDecal) && dinst->mCustomTex != NULL )
@@ -1357,8 +1385,10 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
       pb->lock( &pbPtr );
 
       // Memcpy from system to video memory.
-      dMemcpy( vpPtr, vertData, sizeof( DecalVertex ) * currentBatch.vCount );
-      dMemcpy( pbPtr, indexData, sizeof( U16 ) * currentBatch.iCount );
+      const U32 vpCount = sizeof( DecalVertex ) * currentBatch.vCount;
+      dMemcpy( vpPtr, vertData, vpCount );
+      const U32 pbCount = sizeof( U16 ) * currentBatch.iCount;
+      dMemcpy( pbPtr, indexData, pbCount );
 
       pb->unlock();
       vb->unlock();
@@ -1448,7 +1478,7 @@ void DecalManager::_renderDecalSpheres( ObjectRenderInst* ri, SceneRenderState* 
       DecalSphere *decalSphere = grid[i];
       const SphereF &worldSphere = decalSphere->mWorldSphere;
 
-      if( state->getFrustum().isCulled( worldSphere ) )
+      if( state->getCullingFrustum().isCulled( worldSphere ) )
          continue;
 
       drawUtil->drawSphere( desc, worldSphere.radius, worldSphere.center, sphereColor );
@@ -1712,5 +1742,50 @@ DefineEngineFunction( decalManagerRemoveDecal, bool, ( S32 decalID ),,
       return false;
 
    gDecalManager->removeDecal(inst);
+   return true;
+}
+
+DefineEngineFunction( decalManagerEditDecal, bool, ( S32 decalID, Point3F pos, Point3F normal, F32 rotAroundNormal, F32 decalScale ),,
+   "Edit specified decal of the decal manager.\n"
+   "@param decalID ID of the decal to edit.\n"
+   "@param pos World position for the decal.\n"
+   "@param normal Decal normal vector (if the decal was a tire lying flat on a "
+   "surface, this is the vector pointing in the direction of the axle).\n"
+   "@param rotAroundNormal Angle (in radians) to rotate this decal around its normal vector.\n"
+   "@param decalScale Scale factor applied to the decal.\n"
+   "@return Returns true if successful, false if decalID not found.\n"
+   "" )
+{
+   DecalInstance *decalInstance = gDecalManager->getDecal( decalID );
+   if( !decalInstance )
+		return false;
+
+   //Internally we need Point3F tangent instead of the user friendly F32 rotAroundNormal
+   MatrixF mat( true );
+   MathUtils::getMatrixFromUpVector( normal, &mat );
+
+   AngAxisF rot( normal, rotAroundNormal );
+   MatrixF rotmat;
+   rot.setMatrix( &rotmat );
+   mat.mul( rotmat );
+
+   Point3F tangent;
+   mat.getColumn( 1, &tangent );
+   
+   //if everything is unchanged just do nothing and  return "everything is ok"
+   if ( pos.equal(decalInstance->mPosition) &&
+        normal.equal(decalInstance->mNormal) &&
+        tangent.equal(decalInstance->mTangent) &&
+        mFabs( decalInstance->mSize - (decalInstance->mDataBlock->size * decalScale) ) < POINT_EPSILON )
+           return true;
+
+   decalInstance->mPosition = pos;
+   decalInstance->mNormal = normal;
+   decalInstance->mTangent = tangent;
+   decalInstance->mSize = decalInstance->mDataBlock->size * decalScale;
+
+   gDecalManager->clipDecal( decalInstance, NULL, NULL);
+   
+   gDecalManager->notifyDecalModified( decalInstance );
    return true;
 }

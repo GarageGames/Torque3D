@@ -25,6 +25,7 @@
 
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gfx/gfxDrawUtil.h"
 
 
@@ -123,13 +124,13 @@ public:
             GFXTextureObject* texture = mTextureObject;
             RectI srcRegion;
             RectI dstRegion;
-            float xdone = ((float)getExtent().x/(float)texture->mBitmapSize.x)+1;
-            float ydone = ((float)getExtent().y/(float)texture->mBitmapSize.y)+1;
+            F32 xdone = ((F32)getExtent().x/(F32)texture->mBitmapSize.x)+1;
+            F32 ydone = ((F32)getExtent().y/(F32)texture->mBitmapSize.y)+1;
 
-            int xshift = mStartPoint.x%texture->mBitmapSize.x;
-            int yshift = mStartPoint.y%texture->mBitmapSize.y;
-            for(int y = 0; y < ydone; ++y)
-               for(int x = 0; x < xdone; ++x)
+            S32 xshift = mStartPoint.x%texture->mBitmapSize.x;
+            S32 yshift = mStartPoint.y%texture->mBitmapSize.y;
+            for(S32 y = 0; y < ydone; ++y)
+               for(S32 x = 0; x < xdone; ++x)
                {
                   srcRegion.set(0,0,texture->mBitmapSize.x,texture->mBitmapSize.y);
                   dstRegion.set( ((texture->mBitmapSize.x*x)+offset.x)-xshift,
@@ -176,13 +177,13 @@ ConsoleDocClass( GuiIdleCamFadeBitmapCtrl,
 				"This is going to be deprecated, and any useful code ported to FadeinBitmap\n\n"
 				"@internal");
 
-ConsoleMethod(GuiIdleCamFadeBitmapCtrl, fadeIn, void, 2, 2, "()"
+DefineConsoleMethod(GuiIdleCamFadeBitmapCtrl, fadeIn, void, (), , "()"
 			  "@internal")
 {
    object->fadeIn();
 }
 
-ConsoleMethod(GuiIdleCamFadeBitmapCtrl, fadeOut, void, 2, 2, "()"
+DefineConsoleMethod(GuiIdleCamFadeBitmapCtrl, fadeOut, void, (), , "()"
 			  "@internal")
 {
    object->fadeOut();

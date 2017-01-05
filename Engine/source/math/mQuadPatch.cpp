@@ -52,7 +52,7 @@ void QuadPatch::submitControlPoints( SplCtrlPts &points )
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
-void QuadPatch::setControlPoint( Point3F &point, int index )
+void QuadPatch::setControlPoint( Point3F &point, S32 index )
 {
    ( (SplCtrlPts*) getControlPoints() )->setPoint( point, index );
    calcABC( getControlPoint(0) );

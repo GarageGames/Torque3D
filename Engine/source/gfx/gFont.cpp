@@ -42,7 +42,7 @@ GFX_ImplementTextureProfile(GFXFontTextureProfile,
                             GFXTextureProfile::Static |
                             GFXTextureProfile::KeepBitmap |
                             GFXTextureProfile::NoMipmap, 
-                            GFXTextureProfile::None);
+                            GFXTextureProfile::NONE);
 
 template<> void *Resource<GFont>::create(const Torque::Path &path)
 {
@@ -265,7 +265,7 @@ void GFont::dumpInfo() const
    if(mapCount)
       Con::printf("      - Codepoints range from 0x%x to 0x%x.", mapBegin, mapEnd);
    else
-      Con::printf("      - No mapped codepoints.", mapBegin, mapEnd);
+      Con::printf("      - No mapped codepoints.");
    Con::printf("      - Platform font is %s.", (mPlatformFont ? "present" : "not present") );
 }
 
@@ -423,7 +423,7 @@ U32 GFont::getStrNWidth(const UTF8 *str, U32 n)
 {
    // UTF8 conversion is expensive. Avoid converting in a tight loop.
    FrameTemp<UTF16> str16(n + 1);
-   convertUTF8toUTF16(str, str16, n + 1);
+   convertUTF8toUTF16N(str, str16, n + 1);
    return getStrNWidth(str16, dStrlen(str16));
 }
 
@@ -462,7 +462,7 @@ U32 GFont::getStrNWidth(const UTF16 *str, U32 n)
 U32 GFont::getStrNWidthPrecise(const UTF8 *str, U32 n)
 {
    FrameTemp<UTF16> str16(n + 1);
-   convertUTF8toUTF16(str, str16, n + 1);
+   convertUTF8toUTF16N(str, str16, n + 1);
    return getStrNWidthPrecise(str16, dStrlen(str16));
 }
 
@@ -568,6 +568,7 @@ void GFont::wrapString(const UTF8 *txt, U32 lineWidth, Vector<U32> &startLineOff
 
    for (U32 i = 0; i < len;)
    {
+      U32 wide = 0; 
       startLine = i;
       startLineOffset.push_back(startLine);
 
@@ -584,6 +585,10 @@ void GFont::wrapString(const UTF8 *txt, U32 lineWidth, Vector<U32> &startLineOff
          else if(isValidChar(txt[i]))
          {
             lineStrWidth += getCharInfo(txt[i]).xIncrement;
+            if(txt[i] < 0) // symbols which code > 127
+            {  
+               wide++; i++;
+            }
             if( lineStrWidth > lineWidth )
             {
                needsNewLine = true;
@@ -595,7 +600,7 @@ void GFont::wrapString(const UTF8 *txt, U32 lineWidth, Vector<U32> &startLineOff
       if (!needsNewLine)
       {
          // we are done!
-         lineLen.push_back(i - startLine);
+         lineLen.push_back(i - startLine - wide);
          return;
       }
 
@@ -628,7 +633,7 @@ void GFont::wrapString(const UTF8 *txt, U32 lineWidth, Vector<U32> &startLineOff
          }
       }
 
-      lineLen.push_back(j - startLine);
+      lineLen.push_back(j - startLine - wide);
       i = j;
 
       // Now we need to increment through any space characters at the
@@ -918,17 +923,18 @@ void GFont::importStrip(const char *fileName, U32 padding, U32 kerning)
 
       // Allocate a new bitmap for this glyph, taking into account kerning and padding.
       glyphList.increment();
-      glyphList.last().bitmap = new GBitmap(mCharInfoList[i].width + kerning + 2*padding, mCharInfoList[i].height + 2*padding, false, strip->getFormat());
-      glyphList.last().charId = i;
+      GlyphMap& lastGlyphMap = glyphList.last();
+      lastGlyphMap.bitmap = new GBitmap(mCharInfoList[i].width + kerning + 2 * padding, mCharInfoList[i].height + 2 * padding, false, strip->getFormat());
+      lastGlyphMap.charId = i;
 
       // Copy the rect.
-      RectI ri(curWidth, getBaseline() - mCharInfoList[i].yOrigin, glyphList.last().bitmap->getWidth(), glyphList.last().bitmap->getHeight());
+      RectI ri(curWidth, getBaseline() - mCharInfoList[i].yOrigin, lastGlyphMap.bitmap->getWidth(), lastGlyphMap.bitmap->getHeight());
       Point2I outRi(0,0);
-      glyphList.last().bitmap->copyRect(strip, ri, outRi); 
+      lastGlyphMap.bitmap->copyRect(strip, ri, outRi);
 
       // Update glyph attributes.
-      mCharInfoList[i].width = glyphList.last().bitmap->getWidth();
-      mCharInfoList[i].height = glyphList.last().bitmap->getHeight();
+      mCharInfoList[i].width = lastGlyphMap.bitmap->getWidth();
+      mCharInfoList[i].height = lastGlyphMap.bitmap->getHeight();
       mCharInfoList[i].xOffset -= kerning + padding;
       mCharInfoList[i].xIncrement += kerning;
       mCharInfoList[i].yOffset -= padding;

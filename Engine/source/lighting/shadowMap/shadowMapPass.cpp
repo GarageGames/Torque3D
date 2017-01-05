@@ -39,6 +39,7 @@
 #include "gfx/gfxDebugEvent.h"
 #include "platform/platformTimer.h"
 
+#include "T3D/gameBase/gameConnection.h"
 
 const String ShadowMapPass::PassTypeName("ShadowMap");
 
@@ -55,6 +56,10 @@ bool ShadowMapPass::smDisableShadows = false;
 bool ShadowMapPass::smDisableShadowsEditor = false;
 bool ShadowMapPass::smDisableShadowsPref = false;
 
+/// distance moved per frame before forcing a shadow update
+F32 ShadowMapPass::smShadowsTeleportDist = 4;
+/// angle turned per frame before forcing a shadow update
+F32 ShadowMapPass::smShadowsTurnRate = 1;
 /// We have a default 8ms render budget for shadow rendering.
 U32 ShadowMapPass::smRenderBudgetMs = 8;
 
@@ -62,20 +67,30 @@ ShadowMapPass::ShadowMapPass(LightManager* lightManager, ShadowMapManager* shado
 {
    mLightManager = lightManager;
    mShadowManager = shadowManager;
+
+   // Setup our render pass managers
+
+   // Static
    mShadowRPM = new ShadowRenderPassManager();
    mShadowRPM->assignName( "ShadowRenderPassManager" );
    mShadowRPM->registerObject();
    Sim::getRootGroup()->addObject( mShadowRPM );
-
-   // Setup our render pass manager
-
    mShadowRPM->addManager( new RenderMeshMgr(RenderPassManager::RIT_Mesh, 0.3f, 0.3f) );
-   //mShadowRPM->addManager( new RenderObjectMgr() );
    mShadowRPM->addManager( new RenderTerrainMgr( 0.5f, 0.5f )  );
    mShadowRPM->addManager( new RenderImposterMgr( 0.6f, 0.6f )  );
 
-   mActiveLights = 0;
+   // Dynamic
+   mDynamicShadowRPM = new DynamicShadowRenderPassManager();
+   mDynamicShadowRPM->assignName( "DynamicShadowRenderPassManager" );
+   mDynamicShadowRPM->registerObject();
+   Sim::getRootGroup()->addObject( mDynamicShadowRPM );
+   mDynamicShadowRPM->addManager( new RenderMeshMgr(RenderPassManager::RIT_Mesh, 0.3f, 0.3f) );
+   mDynamicShadowRPM->addManager( new RenderTerrainMgr( 0.5f, 0.5f )  );
+   mDynamicShadowRPM->addManager( new RenderImposterMgr( 0.6f, 0.6f )  );
 
+   mActiveLights = 0;
+   mPrevCamPos = Point3F::Zero;
+   mPrevCamRot = Point3F::Zero;
    mTimer = PlatformTimer::create();
 
    Con::addVariable( "$ShadowStats::activeMaps", TypeS32, &smActiveShadowMaps,
@@ -117,6 +132,9 @@ ShadowMapPass::~ShadowMapPass()
 
    if ( mShadowRPM )
       mShadowRPM->deleteObject();
+
+   if ( mDynamicShadowRPM )
+      mDynamicShadowRPM->deleteObject();
 }
 
 void ShadowMapPass::render(   SceneManager *sceneManager, 
@@ -147,7 +165,7 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
    // First do a loop thru the lights setting up the shadow
    // info array for this pass.
    Vector<LightShadowMap*> shadowMaps;
-   shadowMaps.reserve( mActiveLights );
+   shadowMaps.reserve( mActiveLights * 2 );
    for ( U32 i = 0; i < mActiveLights; i++ )
    {
       ShadowMapParams *params = mLights[i]->getExtended<ShadowMapParams>();
@@ -155,12 +173,14 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
       // Before we do anything... skip lights without shadows.      
       if ( !mLights[i]->getCastShadows() || smDisableShadows )
          continue;
-
+      
+      // --- Static Shadow Map ---
       LightShadowMap *lsm = params->getOrCreateShadowMap();
+      LightShadowMap *dlsm = params->getOrCreateShadowMap(true);
 
       // First check the visiblity query... if it wasn't 
       // visible skip it.
-      if ( lsm->wasOccluded() )
+      if(params->getOcclusionQuery()->getStatus(true) == GFXOcclusionQuery::Occluded)
          continue;
 
       // Any shadow that is visible is counted as being 
@@ -168,13 +188,25 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
       ++smActiveShadowMaps;
 
       // Do a priority update for this shadow.
-      lsm->updatePriority( diffuseState, currTime );
+      lsm->updatePriority(diffuseState, currTime);
 
-      shadowMaps.push_back( lsm );
+      shadowMaps.push_back(lsm);
+
+      // --- Dynamic Shadow Map ---
+
+      // Any shadow that is visible is counted as being 
+      // active regardless if we update it or not.
+      ++smActiveShadowMaps;
+
+      // Do a priority update for this shadow.
+      dlsm->updatePriority(diffuseState, currTime);
+
+      shadowMaps.push_back( dlsm );
    }
 
    // Now sort the shadow info by priority.
-   shadowMaps.sort( LightShadowMap::cmpPriority );
+   // andrewmac: tempoarily disabled until I find a better solution.
+   //shadowMaps.sort( LightShadowMap::cmpPriority );
 
    GFXDEBUGEVENT_SCOPE( ShadowMapPass_Render, ColorI::RED );
 
@@ -183,22 +215,50 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
    mTimer->getElapsedMs();
    mTimer->reset();
 
-   for ( U32 i = 0; i < shadowMaps.size(); i++ )
+   // Must have a connection and control object
+   GameConnection* conn = GameConnection::getConnectionToServer();
+   if (!conn)
+      return;
+
+   GameBase * control = dynamic_cast<GameBase*>(conn->getControlObject());
+   if (!control)
+      return;
+
+   bool forceUpdate = false;
+
+   //force an update if we're jumping around (respawning, ect)
+   MatrixF curCamMatrix = control->getTransform();
+   if (((curCamMatrix.getPosition() - mPrevCamPos).lenSquared() > mPow(smShadowsTeleportDist, 2)) || //update if we're teleporting
+       ((curCamMatrix.getForwardVector() - mPrevCamRot).lenSquared() > mPow(smShadowsTurnRate*M_PI_F / 180, 2)) || //update if we're turning too fast
+       (control->getCameraFov()) != mPrevCamFov) //update if we're zooming or unzooming
+      forceUpdate = true;
+
+   mPrevCamRot = curCamMatrix.getForwardVector();
+   mPrevCamPos = curCamMatrix.getPosition();
+   mPrevCamFov = control->getCameraFov();
+
+   // 2 Shadow Maps per Light. This may fail.
+   for ( U32 i = 0; i < shadowMaps.size(); i += 2 )
    {
-      LightShadowMap *lsm = shadowMaps[i];
+	   LightShadowMap *lsm = shadowMaps[i];
+	   LightShadowMap *dlsm = shadowMaps[i + 1];
 
       {
          GFXDEBUGEVENT_SCOPE( ShadowMapPass_Render_Shadow, ColorI::RED );
 
-         mShadowManager->setLightShadowMap( lsm );
-         lsm->render( mShadowRPM, diffuseState );
+		 mShadowManager->setLightShadowMap(lsm);
+         mShadowManager->setLightDynamicShadowMap( dlsm );
+
+         lsm->render(mShadowRPM, diffuseState, false, forceUpdate);
+         dlsm->render(mDynamicShadowRPM, diffuseState, true, forceUpdate);
+
          ++smUpdatedShadowMaps;
       }
 
       // View dependent shadows or ones that are covering the entire
       // screen are updated every frame no matter the time left in
       // our shadow rendering budget.
-      if ( lsm->isViewDependent() || lsm->getLastScreenSize() >= 1.0f )
+      if ( dlsm->isViewDependent() || dlsm->getLastScreenSize() >= 1.0f )
       {
          ++smNearShadowMaps;
          continue;
@@ -224,6 +284,7 @@ void ShadowMapPass::render(   SceneManager *sceneManager,
    // The NULL here is importaint as having it around
    // will cause extra work in AdvancedLightManager::setLightInfo().
    mShadowManager->setLightShadowMap( NULL );
+   mShadowManager->setLightDynamicShadowMap( NULL );
 }
 
 void ShadowRenderPassManager::addInst( RenderInst *inst )
@@ -237,7 +298,29 @@ void ShadowRenderPassManager::addInst( RenderInst *inst )
          return;
 
       const BaseMaterialDefinition *mat = meshRI->matInst->getMaterial();
-      if ( !mat->castsShadows() || mat->isTranslucent() )
+      if ( !mat->castsShadows() || mat->castsDynamicShadows() || mat->isTranslucent() )
+      {
+         // Do not add this instance, return here and avoid the default behavior
+         // of calling up to Parent::addInst()
+         return;
+      }
+   }
+
+   Parent::addInst(inst);
+}
+
+void DynamicShadowRenderPassManager::addInst( RenderInst *inst )
+{
+   PROFILE_SCOPE(DynamicShadowRenderPassManager_addInst);
+
+   if ( inst->type == RIT_Mesh )
+   {
+      MeshRenderInst *meshRI = static_cast<MeshRenderInst*>( inst );
+      if ( !meshRI->matInst )
+         return;
+
+      const BaseMaterialDefinition *mat = meshRI->matInst->getMaterial();
+      if ( !mat->castsShadows() || !mat->castsDynamicShadows() || mat->isTranslucent() )
       {
          // Do not add this instance, return here and avoid the default behavior
          // of calling up to Parent::addInst()

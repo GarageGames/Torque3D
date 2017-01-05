@@ -273,7 +273,7 @@ DefineEngineMethod( Path, getPathId, S32, (),,
 //--------------------------------------------------------------------------
 
 GFXStateBlockRef Marker::smStateBlock;
-GFXVertexBufferHandle<GFXVertexPC> Marker::smVertexBuffer;
+GFXVertexBufferHandle<GFXVertexPCT> Marker::smVertexBuffer;
 GFXPrimitiveBufferHandle Marker::smPrimitiveBuffer;
 
 static Point3F wedgePoints[4] = {
@@ -295,12 +295,13 @@ void Marker::initGFXResources()
    smStateBlock = GFX->createStateBlock(d);
    
    smVertexBuffer.set(GFX, 4, GFXBufferTypeStatic);
-   GFXVertexPC* verts = smVertexBuffer.lock();
-   verts[0].point = wedgePoints[0] * 0.25f;
-   verts[1].point = wedgePoints[1] * 0.25f;
-   verts[2].point = wedgePoints[2] * 0.25f;
-   verts[3].point = wedgePoints[3] * 0.25f;
-   verts[0].color = verts[1].color = verts[2].color = verts[3].color = GFXVertexColor(ColorI(0, 255, 0, 255));
+   GFXVertexPCT* verts = smVertexBuffer.lock();
+   verts[0].point = wedgePoints[0] * 1.25f;
+   verts[1].point = wedgePoints[1] * 1.25f;
+   verts[2].point = wedgePoints[2] * 1.25f;
+   verts[3].point = wedgePoints[3] * 1.25f;
+   verts[1].color = GFXVertexColor(ColorI(255, 0, 0, 255));
+   verts[0].color = verts[2].color = verts[3].color = GFXVertexColor(ColorI(0, 0, 255, 255));
    smVertexBuffer.unlock();
    
    smPrimitiveBuffer.set(GFX, 24, 12, GFXBufferTypeStatic);
@@ -371,7 +372,6 @@ Marker::Marker()
    mTypeMask |= MarkerObjectType;
 
    mSeqNum   = 0;
-   mSmoothingType = SmoothingTypeLinear;
    mMSToNext = 1000;
    mSmoothingType = SmoothingTypeSpline;
    mKnotType = KnotTypeNormal;
@@ -404,9 +404,9 @@ void Marker::initPersistFields()
 {
    addGroup( "Misc" );
    addField("seqNum",   TypeS32, Offset(mSeqNum,   Marker), "Marker position in sequence of markers on this path.\n");
-   addField("type", TYPEID< KnotType >(), Offset(mKnotType, Marker), "Type of this marker/knot. A \"normal\" knot will have a smooth camera translation/rotation effect.\n\"Position Only\"ùwill do the same for translations, leaving rotation un-touched.\nLastly, a \"Kink\" means the rotation will take effect immediately for an abrupt rotation change.\n");
+   addField("type", TYPEID< KnotType >(), Offset(mKnotType, Marker), "Type of this marker/knot. A \"normal\" knot will have a smooth camera translation/rotation effect.\n\"Position Only\" will do the same for translations, leaving rotation un-touched.\nLastly, a \"Kink\" means the rotation will take effect immediately for an abrupt rotation change.\n");
    addField("msToNext", TypeS32, Offset(mMSToNext, Marker), "Milliseconds to next marker in sequence.\n");
-   addField("smoothingType", TYPEID< SmoothingType >(), Offset(mSmoothingType, Marker), "Path smoothing at this marker/knot. \"Linear\"ùmeans no smoothing, while \"Spline\" means to smooth.\n");
+   addField("smoothingType", TYPEID< SmoothingType >(), Offset(mSmoothingType, Marker), "Path smoothing at this marker/knot. \"Linear\" means no smoothing, while \"Spline\" means to smooth.\n");
    endGroup("Misc");
 
    Parent::initPersistFields();
@@ -418,7 +418,7 @@ bool Marker::onAdd()
    if(!Parent::onAdd())
       return false;
 
-   mObjBox = Box3F(Point3F(-.25, -.25, -.25), Point3F(.25, .25, .25));
+   mObjBox = Box3F(Point3F(-1.25, -1.25, -1.25), Point3F(1.25, 1.25, 1.25));
    resetWorldBox();
 
    if(gEditingMission)

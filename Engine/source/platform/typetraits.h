@@ -222,11 +222,11 @@ struct _TypeTraits< T* >
    typedef _DestructPtr Destruct;
 
    template< typename A >
-   static bool isTaggedPtr( A* ptr ) { return ( U32( ptr ) & 0x1 ); } //TODO: 64bits
+   static bool isTaggedPtr( A* ptr ) { return ( uintptr_t( ptr ) & 0x1 ); }
    template< typename A >
-   static A* getTaggedPtr( A* ptr ) { return ( A* ) ( U32( ptr ) | 0x1 ); } //TODO: 64bits
+   static A* getTaggedPtr( A* ptr ) { return ( A* ) ( uintptr_t( ptr ) | 0x1 ); }
    template< typename A >
-   static A* getUntaggedPtr( A* ptr ) { return ( A* ) ( U32( ptr ) & 0xFFFFFFFE ); } //TODO: 64bit
+   static A* getUntaggedPtr( A* ptr ) { return ( A* ) ( uintptr_t( ptr ) & (~0x1) ); }
 };
 
 template< typename T >

@@ -19,15 +19,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#ifndef _SCREENSHOTD3D_H_
-#define _SCREENSHOTD3D_H_
+#ifndef _SCREENSHOTD3D9_H_
+#define _SCREENSHOTD3D9_H_
 
 #include "gfx/screenshot.h"
 
 //**************************************************************************
 // D3D implementation of screenshot
 //**************************************************************************
-class ScreenShotD3D : public ScreenShot
+class ScreenShotD3D9 : public ScreenShot
 {
 protected:
 
@@ -36,4 +36,4 @@ protected:
 };
 
 
-#endif  // _SCREENSHOTD3D_H_
+#endif  // _SCREENSHOTD3D9_H_

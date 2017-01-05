@@ -29,6 +29,12 @@
 #ifndef _TVECTOR_H_
 #include "core/util/tVector.h"
 #endif
+#ifndef _SIMBASE_H_
+#include "console/simBase.h"
+#endif
+#ifndef _ENGINEAPI_H_
+#include "console/engineAPI.h"
+#endif
 
 class UndoManager;
 

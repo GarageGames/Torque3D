@@ -20,25 +20,26 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "shaderModel.hlsl"
 #include "torque.hlsl"
-
 
 struct Conn
 {
+   float4 hpos : TORQUE_POSITION;
    float4 rayleighColor : TEXCOORD0;
    float4 mieColor : TEXCOORD1;
    float3 v3Direction : TEXCOORD2;
    float3 pos : TEXCOORD3;
 };
 
-uniform samplerCUBE nightSky : register(S0);
+TORQUE_UNIFORM_SAMPLERCUBE(nightSky, 0);
 uniform float4 nightColor;
 uniform float2 nightInterpAndExposure;
 uniform float useCubemap;
 uniform float3 lightDir;
 uniform float3 sunDir;
 
-float4 main( Conn In ) : COLOR0
+float4 main( Conn In ) : TORQUE_TARGET0
 { 
 
    float fCos = dot( lightDir, In.v3Direction ) / length(In.v3Direction);
@@ -54,7 +55,7 @@ float4 main( Conn In ) : COLOR0
   
    float4 Out; 
    
-   float4 nightSkyColor = texCUBE( nightSky, -In.v3Direction );
+   float4 nightSkyColor = TORQUE_TEXCUBE(nightSky, -In.v3Direction);
    nightSkyColor = lerp( nightColor, nightSkyColor, useCubemap );
    
    float fac = dot( normalize( In.pos ), sunDir );
@@ -62,6 +63,7 @@ float4 main( Conn In ) : COLOR0
    Out = lerp( color, nightSkyColor, nightInterpAndExposure.y );
    
    Out.a = 1;
+   Out = saturate(Out);
 
    return hdrEncode( Out );
 }

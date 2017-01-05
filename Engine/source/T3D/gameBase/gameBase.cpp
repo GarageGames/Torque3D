@@ -97,14 +97,14 @@ IMPLEMENT_CALLBACK( GameBaseData, onRemove, void, ( GameBase* obj ), ( obj ),
    "@param obj the GameBase object\n\n"
    "@see onAdd for an example\n" );
 
-IMPLEMENT_CALLBACK( GameBaseData, onMount, void, ( GameBase* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
+IMPLEMENT_CALLBACK( GameBaseData, onMount, void, ( SceneObject* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
    "@brief Called when the object is mounted to another object in the scene.\n\n"
    "@param obj the GameBase object being mounted\n"
    "@param mountObj the object we are mounted to\n"
    "@param node the mountObj node we are mounted to\n\n"
    "@see onAdd for an example\n" );
 
-IMPLEMENT_CALLBACK( GameBaseData, onUnmount, void, ( GameBase* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
+IMPLEMENT_CALLBACK( GameBaseData, onUnmount, void, ( SceneObject* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
    "@brief Called when the object is unmounted from another object in the scene.\n\n"
    "@param obj the GameBase object being unmounted\n"
    "@param mountObj the object we are unmounted from\n"
@@ -388,7 +388,9 @@ F32 GameBase::getUpdatePriority(CameraScopeQuery *camInfo, U32 updateMask, S32 u
    // Weight by field of view, objects directly in front
    // will be weighted 1, objects behind will be 0
    F32 dot = mDot(pos,camInfo->orientation);
-   bool inFov = dot > camInfo->cosFov;
+
+   bool inFov = dot > camInfo->cosFov * 1.5f;
+
    F32 wFov = inFov? 1.0f: 0;
 
    // Weight by linear velocity parallel to the viewing plane
@@ -406,7 +408,7 @@ F32 GameBase::getUpdatePriority(CameraScopeQuery *camInfo, U32 updateMask, S32 u
 
    // Weight by interest.
    F32 wInterest;
-   if (getTypeMask() & PlayerObjectType)
+   if (getTypeMask() & (PlayerObjectType || VehicleObjectType ))
       wInterest = 0.75f;
    else if (getTypeMask() & ProjectileObjectType)
    {
@@ -588,7 +590,7 @@ void GameBase::onMount( SceneObject *obj, S32 node )
    // Are we mounting to a GameBase object?
    GameBase *gbaseObj = dynamic_cast<GameBase*>( obj );
 
-   if ( gbaseObj && gbaseObj->getControlObject() != this )
+   if ( gbaseObj && gbaseObj->getControlObject() != this && gbaseObj->getControllingObject() != this)
       processAfter( gbaseObj );
 
    if (!isGhost()) {
@@ -614,7 +616,7 @@ void GameBase::onUnmount( SceneObject *obj, S32 node )
 
 bool GameBase::setDataBlockProperty( void *obj, const char *index, const char *db)
 {
-   if( db == NULL || !db || !db[ 0 ] )
+   if( db == NULL || !db[ 0 ] )
    {
       Con::errorf( "GameBase::setDataBlockProperty - Can't unset datablock on GameBase objects" );
       return false;

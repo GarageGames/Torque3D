@@ -120,17 +120,14 @@ inline void Swizzle<T, mapLength>::ToBuffer( void *destination, const void *sour
 {
    // TODO: OpenMP?
    AssertFatal( size % ( sizeof( T ) * mapLength ) == 0, "Bad buffer size for swizzle, see docs." );
-   AssertFatal( destination != NULL, "Swizzle::ToBuffer - got a NULL destination pointer!" );
-   AssertFatal( source != NULL, "Swizzle::ToBuffer - got a NULL source pointer!" );
+   if (!destination || !source) return;
 
    T *dest = reinterpret_cast<T *>( destination );
    const T *src = reinterpret_cast<const T *>( source );
 
-   for( int i = 0; i < size / ( mapLength * sizeof( T ) ); i++ )
+   for( S32 i = 0; i < size / ( mapLength * sizeof( T ) ); i++ )
    {
-      dMemcpy( dest, src, mapLength * sizeof( T ) );
-
-      for( int j = 0; j < mapLength; j++ )
+      for( S32 j = 0; j < mapLength; j++ )
          *dest++ = src[mMap[j]];
       
       src += mapLength;

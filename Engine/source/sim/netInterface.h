@@ -46,7 +46,7 @@ public:
       GameInfoRequest               = 18,
       GameInfoResponse              = 20,
       GameHeartbeat                 = 22,
-	  GGCPacket                     = 24,
+      GGCPacket                     = 24,
       ConnectChallengeRequest       = 26,
       ConnectChallengeReject        = 28,
       ConnectChallengeResponse      = 30,
@@ -54,6 +54,9 @@ public:
       ConnectReject                 = 34,
       ConnectAccept                 = 36,
       Disconnect                    = 38,
+      MasterServerExtendedListResponse = 40,
+      MasterServerChallenge            = 42,
+      MasterServerExtendedListRequest  = 44,
    };
 protected:
 

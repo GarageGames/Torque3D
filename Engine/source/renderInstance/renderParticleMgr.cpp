@@ -74,14 +74,15 @@ RenderParticleMgr::RenderParticleMgr()
 {
    // Render particles at 1/4 resolution
    mTargetSizeType = WindowSizeScaled;
-   mTargetScale.set(0.25f, 0.25f);
+   mTargetScale.set(0.5f, 0.5f);
 
    // We use the target chain like a texture pool, not like a swap chain
    if(!RenderToSingleTarget)
       setTargetChainLength(5);
    else
       mOffscreenSystems.setSize(1);
-
+   
+   notifyType( RenderPassManager::RIT_Particle );
    LightManager::smActivateSignal.notify( this, &RenderParticleMgr::_onLMActivate );
 }
 
@@ -157,7 +158,7 @@ void RenderParticleMgr::addElement( RenderInst *inst )
       pri->bbModelViewProj->mul(tempPt);
       tempPt = tempPt / tempPt.w;
 
-      for(int i = 0; i < 1; i++)
+      for(S32 i = 0; i < 1; i++)
       {
          screenClipper.mPlaneList.push_back(planes[i]);
          screenClipper.mPlaneList.last() += tempPt.asPoint3F();
@@ -167,7 +168,7 @@ void RenderParticleMgr::addElement( RenderInst *inst )
       screenSpaceBoundingBox.minExtents = Point3F::Zero;
       screenSpaceBoundingBox.maxExtents = Point3F::Zero;
 
-      for(int i = 0; i < 8; i++)
+      for(S32 i = 0; i < 8; i++)
       {
          tempPt = cubePoints[i];
          pri->bbModelViewProj->mul(tempPt);
@@ -337,14 +338,10 @@ void RenderParticleMgr::render( SceneRenderState *state )
 void RenderParticleMgr::_initGFXResources()
 {
    // Screen quad
-   U16 *prims = NULL;
-   mScreenQuadPrimBuff.set(GFX, 4, 2, GFXBufferTypeStatic);
-   mScreenQuadPrimBuff.lock(&prims);
-   (*prims++) = 0;
-   (*prims++) = 1;
-   (*prims++) = 2;
-   (*prims++) = 3;
-   mScreenQuadPrimBuff.unlock();
+   U16 prims [] = {
+      0, 1, 2, 3,
+   };
+   mScreenQuadPrimBuff.immutable(GFX, 4, 2, prims);
 
    mScreenQuadVertBuff.set(GFX, 4, GFXBufferTypeStatic);
    CompositeQuadVert *verts = mScreenQuadVertBuff.lock();
@@ -377,7 +374,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
    // Draw system path, or draw composite path
    if(ri->systemState == PSS_DrawComplete)
       return;
-
+   
    if(ri->systemState != PSS_AwaitingCompositeDraw)
    {
       // Set proper stateblock, and update state
@@ -386,7 +383,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
          GFX->setStateBlock( _getOffscreenStateBlock(ri) );
          ri->systemState = PSS_AwaitingCompositeDraw;
          mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mModelViewProjSC, 
-           *ri->modelViewProj * mOffscreenSystems[ri->targetIndex].clipMatrix );
+            *ri->modelViewProj * mOffscreenSystems[ri->targetIndex].clipMatrix );
       }
       else
       {
@@ -398,63 +395,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
          mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mModelViewProjSC, *ri->modelViewProj );
       }
 
-      // We want to turn everything into variation on a pre-multiplied alpha blend
-      F32 alphaFactor = 0.0f, alphaScale = 1.0f;
-      switch(ri->blendStyle)
-      {
-         // SrcAlpha, InvSrcAlpha
-      case ParticleRenderInst::BlendNormal:
-         alphaFactor = 1.0f;
-         break;
-
-         // SrcAlpha, One
-      case ParticleRenderInst::BlendAdditive:
-         alphaFactor = 1.0f;
-         alphaScale = 0.0f;
-         break;
-
-         // SrcColor, One
-      case ParticleRenderInst::BlendGreyscale:
-         alphaFactor = -1.0f;
-         alphaScale = 0.0f;
-         break;
-      }
-      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaFactorSC, alphaFactor );
-      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaScaleSC, alphaScale );
-
-      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mFSModelViewProjSC, *ri->modelViewProj  );
-      mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mOneOverFarSC, 1.0f / state->getFarPlane() );     
-
-      if ( mParticleShaderConsts.mOneOverSoftnessSC->isValid() )
-      {
-         F32 oneOverSoftness = 1.0f;
-         if ( ri->softnessDistance > 0.0f )
-            oneOverSoftness = 1.0f / ( ri->softnessDistance / state->getFarPlane() );
-         mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mOneOverSoftnessSC, oneOverSoftness );
-      }
-
-      GFX->setShader( mParticleShader );
-      GFX->setShaderConstBuffer( mParticleShaderConsts.mShaderConsts );
-
-      GFX->setTexture( 0, ri->diffuseTex );
-
-      // Set up the prepass texture.
-      if ( mParticleShaderConsts.mPrePassTargetParamsSC->isValid() )
-      {
-         GFXTextureObject *texObject = mPrepassTarget ? mPrepassTarget->getTexture(0) : NULL;
-         GFX->setTexture( 1, texObject );
-
-         Point4F rtParams( 0.0f, 0.0f, 1.0f, 1.0f );
-         if ( texObject )
-            ScreenSpace::RenderTargetParameters(texObject->getSize(), mPrepassTarget->getViewport(), rtParams);
-
-         mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mPrePassTargetParamsSC, rtParams );
-      }
-
-      GFX->setPrimitiveBuffer( *ri->primBuff );
-      GFX->setVertexBuffer( *ri->vertBuff );
-
-      GFX->drawIndexedPrimitive( GFXTriangleList, 0, 0, ri->count * 4, 0, ri->count * 2 );
+      renderParticle(ri, state);
    }
    else if(ri->systemState == PSS_AwaitingCompositeDraw)
    {
@@ -475,7 +416,7 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
       // Set offscreen texture
       Point4F rtParams;
       GFXTextureObject *particleSource = mNamedTarget.getTexture();
-      GFX->setTexture( 0, particleSource );
+      GFX->setTexture( mParticleCompositeShaderConsts.mSamplerColorSource->getSamplerRegister(), particleSource );
       if(particleSource)
       {
          ScreenSpace::RenderTargetParameters(particleSource->getSize(), mNamedTarget.getViewport(), rtParams);
@@ -484,11 +425,18 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
 
       // And edges
       GFXTextureObject *texObject = mEdgeTarget ? mEdgeTarget->getTexture() : NULL;
-      GFX->setTexture( 1, texObject );
+      GFX->setTexture( mParticleCompositeShaderConsts.mSamplerEdgeSource->getSamplerRegister(), texObject );
       if(texObject)
       {
          ScreenSpace::RenderTargetParameters(texObject->getSize(), mEdgeTarget->getViewport(), rtParams);
          mParticleCompositeShaderConsts.mShaderConsts->setSafe( mParticleCompositeShaderConsts.mEdgeTargetParamsSC, rtParams );
+      }
+      else
+      {
+         AssertFatal(false, "No edge texture target defined, if you want to use mixed particle"
+            "rendering, then make sure that the EdgeDetectPostEffect is enabled.");
+         ri->systemState = PSS_AwaitingHighResDraw;
+         return;
       }
 
       // Set shader and constant buffer
@@ -521,6 +469,68 @@ void RenderParticleMgr::renderInstance(ParticleRenderInst *ri, SceneRenderState 
    }
 }
 
+void RenderParticleMgr::renderParticle(ParticleRenderInst* ri, SceneRenderState* state)
+{
+   // We want to turn everything into variation on a pre-multiplied alpha blend
+   F32 alphaFactor = 0.0f, alphaScale = 1.0f;
+   switch(ri->blendStyle)
+   {
+      // SrcAlpha, InvSrcAlpha
+   case ParticleRenderInst::BlendNormal:
+      alphaFactor = 1.0f;
+      break;
+
+      // SrcAlpha, One
+   case ParticleRenderInst::BlendAdditive:
+      alphaFactor = 1.0f;
+      alphaScale = 0.0f;
+      break;
+
+      // SrcColor, One
+   case ParticleRenderInst::BlendGreyscale:
+      alphaFactor = -1.0f;
+      alphaScale = 0.0f;
+      break;
+   }
+
+   mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaFactorSC, alphaFactor );
+   mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mAlphaScaleSC, alphaScale );
+
+   mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mFSModelViewProjSC, *ri->modelViewProj  );
+   mParticleShaderConsts.mShaderConsts->setSafe( mParticleShaderConsts.mOneOverFarSC, 1.0f / state->getFarPlane() );     
+
+   if ( mParticleShaderConsts.mOneOverSoftnessSC->isValid() )
+   {
+      F32 oneOverSoftness = 1.0f;
+      if ( ri->softnessDistance > 0.0f )
+         oneOverSoftness = 1.0f / ( ri->softnessDistance / state->getFarPlane() );
+      mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mOneOverSoftnessSC, oneOverSoftness );
+   }
+
+   GFX->setShader( mParticleShader );
+   GFX->setShaderConstBuffer( mParticleShaderConsts.mShaderConsts );
+
+      GFX->setTexture( mParticleShaderConsts.mSamplerDiffuse->getSamplerRegister(), ri->diffuseTex );
+
+   // Set up the prepass texture.
+   if ( mParticleShaderConsts.mPrePassTargetParamsSC->isValid() )
+   {
+      GFXTextureObject *texObject = mPrepassTarget ? mPrepassTarget->getTexture(0) : NULL;
+         GFX->setTexture( mParticleShaderConsts.mSamplerPrePassTex->getSamplerRegister(), texObject );
+
+      Point4F rtParams( 0.0f, 0.0f, 1.0f, 1.0f );
+      if ( texObject )
+         ScreenSpace::RenderTargetParameters(texObject->getSize(), mPrepassTarget->getViewport(), rtParams);
+
+      mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mPrePassTargetParamsSC, rtParams );
+   }
+
+   GFX->setPrimitiveBuffer( *ri->primBuff );
+   GFX->setVertexBuffer( *ri->vertBuff );
+
+   GFX->drawIndexedPrimitive( GFXTriangleList, 0, 0, ri->count * 4, 0, ri->count * 2 );
+}
+
 bool RenderParticleMgr::_initShader()
 {
    ShaderData *shaderData = NULL;
@@ -548,6 +558,11 @@ bool RenderParticleMgr::_initShader()
       mParticleShaderConsts.mAlphaScaleSC = mParticleShader->getShaderConstHandle( "$alphaScale" );
       mParticleShaderConsts.mFSModelViewProjSC = mParticleShader->getShaderConstHandle( "$fsModelViewProj" );
       mParticleShaderConsts.mPrePassTargetParamsSC = mParticleShader->getShaderConstHandle( "$prePassTargetParams" );
+
+      //samplers
+      mParticleShaderConsts.mSamplerDiffuse = mParticleShader->getShaderConstHandle("$diffuseMap");
+      mParticleShaderConsts.mSamplerPrePassTex = mParticleShader->getShaderConstHandle("$prepassTex");
+      mParticleShaderConsts.mSamplerParaboloidLightMap = mParticleShader->getShaderConstHandle("$paraboloidLightMap");
    }
 
    shaderData = NULL;
@@ -563,6 +578,8 @@ bool RenderParticleMgr::_initShader()
    {
       mParticleCompositeShaderConsts.mShaderConsts = mParticleCompositeShader->allocConstBuffer();
       mParticleCompositeShaderConsts.mScreenRect = mParticleCompositeShader->getShaderConstHandle( "$screenRect" );
+      mParticleCompositeShaderConsts.mSamplerColorSource = mParticleCompositeShader->getShaderConstHandle( "$colorSource" );
+      mParticleCompositeShaderConsts.mSamplerEdgeSource = mParticleCompositeShader->getShaderConstHandle( "$edgeSource" );
       mParticleCompositeShaderConsts.mEdgeTargetParamsSC = mParticleCompositeShader->getShaderConstHandle( "$edgeTargetParams" );
       mParticleCompositeShaderConsts.mOffscreenTargetParamsSC = mParticleCompositeShader->getShaderConstHandle( "$offscreenTargetParams" );
    }
@@ -686,8 +703,8 @@ GFXStateBlockRef RenderParticleMgr::_getHighResStateBlock(ParticleRenderInst *ri
 GFXStateBlockRef RenderParticleMgr::_getMixedResStateBlock(ParticleRenderInst *ri)
 {
    const U8 blendStyle = ri->blendStyle;
-   if ( mHighResBlocks[blendStyle].isValid() )
-      return mHighResBlocks[blendStyle];
+   if ( mMixedResBlocks[blendStyle].isValid() )
+      return mMixedResBlocks[blendStyle];
 
    GFXStateBlockDesc d;
 
@@ -751,8 +768,8 @@ GFXStateBlockRef RenderParticleMgr::_getMixedResStateBlock(ParticleRenderInst *r
    // Prepass sampler
    d.samplers[1] = GFXSamplerStateDesc::getClampPoint();
 
-   mHighResBlocks[blendStyle] = GFX->createStateBlock(d);
-   return mHighResBlocks[blendStyle];
+   mMixedResBlocks[blendStyle] = GFX->createStateBlock(d);
+   return mMixedResBlocks[blendStyle];
 }
 
 GFXStateBlockRef RenderParticleMgr::_getCompositeStateBlock(ParticleRenderInst *ri)

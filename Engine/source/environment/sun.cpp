@@ -27,6 +27,7 @@
 #include "math/mathIO.h"
 #include "core/stream/bitStream.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "scene/sceneManager.h"
 #include "math/mathUtils.h"
 #include "lighting/lightInfo.h"
@@ -65,6 +66,8 @@ Sun::Sun()
    mSunAzimuth = 0.0f;
    mSunElevation = 35.0f;
    mCastShadows = true;
+   mStaticRefreshFreq = 250;
+   mDynamicRefreshFreq = 8;
 
    mAnimateSun = false;
    mTotalTime = 0.0f;
@@ -162,7 +165,10 @@ void Sun::initPersistFields()
          "Adjust the Sun's global contrast/intensity");      
 
       addField( "castShadows", TypeBool, Offset( mCastShadows, Sun ), 
-         "Enables/disables shadows cast by objects due to Sun light");      
+         "Enables/disables shadows cast by objects due to Sun light");    
+
+      addField("staticRefreshFreq", TypeS32, Offset(mStaticRefreshFreq, Sun), "static shadow refresh rate (milliseconds)");
+      addField("dynamicRefreshFreq", TypeS32, Offset(mDynamicRefreshFreq, Sun), "dynamic shadow refresh rate (milliseconds)", AbstractClassRep::FieldFlags::FIELD_HideInInspectors);
 
    endGroup( "Lighting" );
 
@@ -219,7 +225,9 @@ U32 Sun::packUpdate(NetConnection *conn, U32 mask, BitStream *stream )
       stream->write( mLightColor );
       stream->write( mLightAmbient );
       stream->write( mBrightness );      
-      stream->writeFlag( mCastShadows );
+      stream->writeFlag( mCastShadows ); 
+      stream->write(mStaticRefreshFreq);
+      stream->write(mDynamicRefreshFreq);
       stream->write( mFlareScale );
 
       if ( stream->writeFlag( mFlareData ) )
@@ -253,6 +261,8 @@ void Sun::unpackUpdate( NetConnection *conn, BitStream *stream )
       stream->read( &mLightAmbient );
       stream->read( &mBrightness );      
       mCastShadows = stream->readFlag();
+      stream->read(&mStaticRefreshFreq);
+      stream->read(&mDynamicRefreshFreq);
       stream->read( &mFlareScale );
 
       if ( stream->readFlag() )
@@ -425,6 +435,8 @@ void Sun::_conformLights()
    // directional color are the same.
    bool castShadows = mLightColor != mLightAmbient && mCastShadows; 
    mLight->setCastShadows( castShadows );
+   mLight->setStaticRefreshFreq(mStaticRefreshFreq);
+   mLight->setDynamicRefreshFreq(mDynamicRefreshFreq);
 }
 
 void Sun::_initCorona()
@@ -455,22 +467,22 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
    Point3F points[4];
    points[0] = Point3F(-BBRadius, 0.0, -BBRadius);
    points[1] = Point3F( -BBRadius, 0.0, BBRadius);
-   points[2] = Point3F( BBRadius, 0.0,  BBRadius);
-   points[3] = Point3F( BBRadius, 0.0,  -BBRadius);
+   points[2] = Point3F( BBRadius, 0.0,  -BBRadius);
+   points[3] = Point3F(BBRadius, 0.0, BBRadius);
 
    static const Point2F sCoords[4] = 
    {
       Point2F( 0.0f, 0.0f ),
       Point2F( 0.0f, 1.0f ),      
-      Point2F( 1.0f, 1.0f ),
-      Point2F( 1.0f, 0.0f )
+      Point2F( 1.0f, 0.0f ),
+      Point2F(1.0f, 1.0f)
    };
 
    // Get info we need to adjust points
    const MatrixF &camView = state->getCameraTransform();
 
    // Finalize points
-   for(int i = 0; i < 4; i++)
+   for(S32 i = 0; i < 4; i++)
    {
       // align with camera
       camView.mulV(points[i]);
@@ -487,6 +499,7 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
    GFXVertexBufferHandle< GFXVertexPCT > vb;
    vb.set( GFX, 4, GFXBufferTypeVolatile );
    GFXVertexPCT *pVert = vb.lock();
+   if(!pVert) return;
 
    for ( S32 i = 0; i < 4; i++ )
    {
@@ -512,7 +525,7 @@ void Sun::_renderCorona( ObjectRenderInst *ri, SceneRenderState *state, BaseMatI
       mCoronaMatInst->setSceneInfo( state, sgData );
 
       GFX->setVertexBuffer( vb );      
-      GFX->drawPrimitive( GFXTriangleFan, 0, 2 );
+      GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
    }
 }
 
@@ -545,18 +558,13 @@ void Sun::_onUnselected()
    Parent::_onUnselected();
 }
 
-ConsoleMethod(Sun, apply, void, 2, 2, "")
+DefineConsoleMethod(Sun, apply, void, (), , "")
 {
    object->inspectPostApply();
 }
 
-ConsoleMethod(Sun, animate, void, 7, 7, "animate( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation )")
+DefineConsoleMethod(Sun, animate, void, ( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation ), , "animate( F32 duration, F32 startAzimuth, F32 endAzimuth, F32 startElevation, F32 endElevation )")
 {
-   F32 duration = dAtof(argv[2]);
-   F32 startAzimuth = dAtof(argv[3]);
-   F32 endAzimuth   = dAtof(argv[4]);
-   F32 startElevation = dAtof(argv[5]);
-   F32 endElevation   = dAtof(argv[6]);
 
    object->animate(duration, startAzimuth, endAzimuth, startElevation, endElevation);
 }

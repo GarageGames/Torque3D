@@ -116,6 +116,8 @@ void PointLight::_conformLights()
 
    mLight->setBrightness( mBrightness );
    mLight->setCastShadows( mCastShadows );
+   mLight->setStaticRefreshFreq(mStaticRefreshFreq);
+   mLight->setDynamicRefreshFreq(mDynamicRefreshFreq);
    mLight->setPriority( mPriority );
 
    // Update the bounds and scale to fit our light.

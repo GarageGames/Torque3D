@@ -29,11 +29,12 @@
 #include "core/color.h"
 #include "console/simBase.h"
 #include "math/mRect.h"
+#include "core/strings/stringUnit.h"
 
 //-----------------------------------------------------------------------------
 // TypeString
 //-----------------------------------------------------------------------------
-ConsoleType( string, TypeString, const char* )
+ConsoleType( string, TypeString, const char*, "" )
 ImplementConsoleTypeCasters( TypeString, const char* );
 
 ConsoleGetType( TypeString )
@@ -52,7 +53,7 @@ ConsoleSetType( TypeString )
 //-----------------------------------------------------------------------------
 // TypeCaseString
 //-----------------------------------------------------------------------------
-ConsoleType( caseString, TypeCaseString, const char* )
+ConsoleType(caseString, TypeCaseString, const char*, "")
 
 ConsoleSetType( TypeCaseString )
 {
@@ -70,7 +71,7 @@ ConsoleGetType( TypeCaseString )
 //-----------------------------------------------------------------------------
 // TypeRealString
 //-----------------------------------------------------------------------------
-ConsoleType( string, TypeRealString, String )
+ConsoleType(string, TypeRealString, String, "")
 ImplementConsoleTypeCasters( TypeRealString, String )
 
 ConsoleGetType( TypeRealString )
@@ -93,7 +94,7 @@ ConsoleSetType( TypeRealString )
 //-----------------------------------------------------------------------------
 // TypeCommand
 //-----------------------------------------------------------------------------
-ConsoleType( string, TypeCommand, String )
+ConsoleType(string, TypeCommand, String, "")
 
 ConsoleGetType( TypeCommand )
 {
@@ -283,13 +284,14 @@ ConsoleProcessData( TypeShapeFilename )
 //-----------------------------------------------------------------------------
 // TypeS8
 //-----------------------------------------------------------------------------
-ConsoleType( char, TypeS8, S8 )
+ConsoleType(char, TypeS8, S8, "")
 ImplementConsoleTypeCasters( TypeS8, S8 )
 
 ConsoleGetType( TypeS8 )
 {
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d", *((U8 *) dptr) );
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d", *((U8 *) dptr) );
    return returnBuffer;
 }
 
@@ -304,13 +306,14 @@ ConsoleSetType( TypeS8 )
 //-----------------------------------------------------------------------------
 // TypeS32
 //-----------------------------------------------------------------------------
-ConsoleType( int, TypeS32, S32 )
+ConsoleType(int, TypeS32, S32, "")
 ImplementConsoleTypeCasters(TypeS32, S32)
 
 ConsoleGetType( TypeS32 )
 {
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d", *((S32 *) dptr) );
+   static const U32 bufSize = 512;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d", *((S32 *) dptr) );
    return returnBuffer;
 }
 
@@ -326,7 +329,7 @@ ConsoleSetType( TypeS32 )
 //-----------------------------------------------------------------------------
 // TypeS32Vector
 //-----------------------------------------------------------------------------
-ConsoleType( intList, TypeS32Vector, Vector<S32> )
+ConsoleType(intList, TypeS32Vector, Vector<S32>, "")
 ImplementConsoleTypeCasters( TypeS32Vector, Vector< S32 > )
 
 ConsoleGetType( TypeS32Vector )
@@ -383,13 +386,14 @@ ConsoleSetType( TypeS32Vector )
 //-----------------------------------------------------------------------------
 // TypeF32
 //-----------------------------------------------------------------------------
-ConsoleType( float, TypeF32, F32 )
+ConsoleType(float, TypeF32, F32, "")
 ImplementConsoleTypeCasters(TypeF32, F32)
 
 ConsoleGetType( TypeF32 )
 {
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%g", *((F32 *) dptr) );
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%g", *((F32 *) dptr) );
    return returnBuffer;
 }
 ConsoleSetType( TypeF32 )
@@ -403,7 +407,7 @@ ConsoleSetType( TypeF32 )
 //-----------------------------------------------------------------------------
 // TypeF32Vector
 //-----------------------------------------------------------------------------
-ConsoleType( floatList, TypeF32Vector, Vector<F32> )
+ConsoleType(floatList, TypeF32Vector, Vector<F32>, "")
 ImplementConsoleTypeCasters( TypeF32Vector, Vector< F32 > )
 
 ConsoleGetType( TypeF32Vector )
@@ -460,7 +464,7 @@ ConsoleSetType( TypeF32Vector )
 //-----------------------------------------------------------------------------
 // TypeBool
 //-----------------------------------------------------------------------------
-ConsoleType( bool, TypeBool, bool )
+ConsoleType(bool, TypeBool, bool, "")
 ImplementConsoleTypeCasters( TypeBool, bool )
 
 ConsoleGetType( TypeBool )
@@ -480,14 +484,15 @@ ConsoleSetType( TypeBool )
 //-----------------------------------------------------------------------------
 // TypeBoolVector
 //-----------------------------------------------------------------------------
-ConsoleType( boolList, TypeBoolVector, Vector<bool> )
+ConsoleType(boolList, TypeBoolVector, Vector<bool>, "")
 ImplementConsoleTypeCasters( TypeBoolVector, Vector< bool > )
 
 ConsoleGetType( TypeBoolVector )
 {
    Vector<bool> *vec = (Vector<bool>*)dptr;
-   char* returnBuffer = Con::getReturnBuffer(1024);
-   S32 maxReturn = 1024;
+   static const U32 bufSize = 1024;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   S32 maxReturn = bufSize;
    returnBuffer[0] = '\0';
    S32 returnLeng = 0;
    for (Vector<bool>::iterator itr = vec->begin(); itr < vec->end(); itr++)
@@ -536,7 +541,7 @@ ConsoleSetType( TypeBoolVector )
 //-----------------------------------------------------------------------------
 // TypeFlag
 //-----------------------------------------------------------------------------
-ConsoleType( flag, TypeFlag, S32 )
+ConsoleType(flag, TypeFlag, S32, "")
 
 ConsoleGetType( TypeFlag )
 {
@@ -562,14 +567,25 @@ ConsoleSetType( TypeFlag )
 //-----------------------------------------------------------------------------
 // TypeColorF
 //-----------------------------------------------------------------------------
-ConsoleType( ColorF, TypeColorF, ColorF )
+ConsoleType(ColorF, TypeColorF, ColorF, "")
 ImplementConsoleTypeCasters( TypeColorF, ColorF )
 
 ConsoleGetType( TypeColorF )
 {
-   ColorF * color = (ColorF*)dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%g %g %g %g", color->red, color->green, color->blue, color->alpha);
+   // Fetch color.
+   const ColorF* color = (ColorF*)dptr;
+
+   // Fetch stock color name.
+   StringTableEntry colorName = StockColor::name( *color );
+
+   // Write as color name if was found.
+   if ( colorName != StringTable->EmptyString() ) 
+      return colorName;
+
+   // Format as color components.
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%g %g %g %g", color->red, color->green, color->blue, color->alpha);
    return(returnBuffer);
 }
 
@@ -578,6 +594,22 @@ ConsoleSetType( TypeColorF )
    ColorF *tmpColor = (ColorF *) dptr;
    if(argc == 1)
    {
+      // Is only a single argument passed?
+      if ( StringUnit::getUnitCount( argv[0], " " ) == 1 )
+      {
+         // Is this a stock color name?
+         if ( !StockColor::isColor(argv[0]) )
+         {
+            // No, so warn.
+            Con::warnf( "TypeColorF() - Invalid single argument of '%s' could not be interpreted as a stock color name.  Using default.", argv[0] );
+         }
+
+         // Set stock color (if it's invalid we'll get the default.
+         tmpColor->set( argv[0] );
+
+         return;
+      }
+
       tmpColor->set(0, 0, 0, 1);
       F32 r,g,b,a;
       S32 args = dSscanf(argv[0], "%g %g %g %g", &r, &g, &b, &a);
@@ -602,20 +634,31 @@ ConsoleSetType( TypeColorF )
       tmpColor->alpha  = dAtof(argv[3]);
    }
    else
-      Con::printf("Color must be set as { r, g, b [,a] }");
+      Con::printf("Color must be set as { r, g, b [,a] }, { r g b [b] } or { stockColorName }");
 }
 
 //-----------------------------------------------------------------------------
 // TypeColorI
 //-----------------------------------------------------------------------------
-ConsoleType( ColorI, TypeColorI, ColorI )
+ConsoleType(ColorI, TypeColorI, ColorI, "")
 ImplementConsoleTypeCasters( TypeColorI, ColorI )
 
 ConsoleGetType( TypeColorI )
 {
-   ColorI *color = (ColorI *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d %d %d %d", color->red, color->green, color->blue, color->alpha);
+   // Fetch color.
+   ColorI* color = (ColorI*)dptr;
+
+   // Fetch stock color name.
+   StringTableEntry colorName = StockColor::name( *color );
+
+   // Write as color name if was found.
+   if ( colorName != StringTable->EmptyString() ) 
+      return colorName;
+
+   // Format as color components.
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d %d %d %d", color->red, color->green, color->blue, color->alpha);
    return returnBuffer;
 }
 
@@ -624,6 +667,22 @@ ConsoleSetType( TypeColorI )
    ColorI *tmpColor = (ColorI *) dptr;
    if(argc == 1)
    {
+      // Is only a single argument passed?
+      if ( StringUnit::getUnitCount( argv[0], " " ) == 1 )
+      {
+         // Is this a stock color name?
+         if ( !StockColor::isColor(argv[0]) )
+         {
+            // No, so warn.
+            Con::warnf( "TypeColorF() - Invalid single argument of '%s' could not be interpreted as a stock color name.  Using default.", argv[0] );
+         }
+
+         // Set stock color (if it's invalid we'll get the default.
+         tmpColor->set( argv[0] );
+
+         return;
+      }
+
       tmpColor->set(0, 0, 0, 255);
       S32 r,g,b,a;
       S32 args = dSscanf(argv[0], "%d %d %d %d", &r, &g, &b, &a);
@@ -648,13 +707,38 @@ ConsoleSetType( TypeColorI )
       tmpColor->alpha  = dAtoi(argv[3]);
    }
    else
-      Con::printf("Color must be set as { r, g, b [,a] }");
+      Con::printf("Color must be set as { r, g, b [,a] }, { r g b [b] }  or { stockColorName }");
+}
+
+//-----------------------------------------------------------------------------
+// TypeSimObjectPtr
+//-----------------------------------------------------------------------------
+ConsoleType(SimObject, TypeSimObjectPtr, SimObject*, "")
+
+ConsoleSetType(TypeSimObjectPtr)
+{
+   if (argc == 1)
+   {
+      SimObject **obj = (SimObject **)dptr;
+      *obj = Sim::findObject(argv[0]);
+   }
+   else
+      Con::printf("(TypeSimObjectPtr) Cannot set multiple args to a single S32.");
+}
+
+ConsoleGetType(TypeSimObjectPtr)
+{
+   SimObject **obj = (SimObject**)dptr;
+   static const U32 bufSize = 128;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%s", *obj ? (*obj)->getName() ? (*obj)->getName() : (*obj)->getIdString() : "");
+   return returnBuffer;
 }
 
 //-----------------------------------------------------------------------------
 // TypeSimObjectName
 //-----------------------------------------------------------------------------
-ConsoleType( SimObject, TypeSimObjectName, SimObject* )
+ConsoleType(SimObject, TypeSimObjectName, SimObject*, "")
 
 ConsoleSetType( TypeSimObjectName )
 {
@@ -670,15 +754,16 @@ ConsoleSetType( TypeSimObjectName )
 ConsoleGetType( TypeSimObjectName )
 {
    SimObject **obj = (SimObject**)dptr;
-   char* returnBuffer = Con::getReturnBuffer(128);
-   dSprintf(returnBuffer, 128, "%s", *obj && (*obj)->getName() ? (*obj)->getName() : "");
+   static const U32 bufSize = 128;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%s", *obj && (*obj)->getName() ? (*obj)->getName() : "");
    return returnBuffer;
 }
 
 //-----------------------------------------------------------------------------
 // TypeName
 //-----------------------------------------------------------------------------
-ConsoleType( string, TypeName, const char* )
+ConsoleType(string, TypeName, const char*, "")
 
 ConsoleGetType( TypeName )
 {
@@ -693,7 +778,7 @@ ConsoleSetType( TypeName )
 //------------------------------------------------------------------------------
 // TypeParticleParameterString
 //------------------------------------------------------------------------------
-ConsoleType( string, TypeParticleParameterString, const char* )
+ConsoleType(string, TypeParticleParameterString, const char*, "")
 
 ConsoleGetType( TypeParticleParameterString )
 {
@@ -712,7 +797,7 @@ ConsoleSetType( TypeParticleParameterString )
 // TypeMaterialName
 //-----------------------------------------------------------------------------
 
-ConsoleType( string, TypeMaterialName, String )
+ConsoleType(string, TypeMaterialName, String, "")
 
 ConsoleGetType( TypeMaterialName )
 {
@@ -734,12 +819,13 @@ ConsoleSetType( TypeMaterialName )
 // TypeTerrainMaterialIndex
 //-----------------------------------------------------------------------------
 
-ConsoleType( int, TypeTerrainMaterialIndex, S32 )
+ConsoleType(int, TypeTerrainMaterialIndex, S32, "")
 
 ConsoleGetType( TypeTerrainMaterialIndex )
 {
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d", *((S32 *) dptr) );
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%d", *((S32 *) dptr) );
    return returnBuffer;
 }
 
@@ -755,7 +841,7 @@ ConsoleSetType( TypeTerrainMaterialIndex )
 // TypeTerrainMaterialName
 //-----------------------------------------------------------------------------
 
-ConsoleType( string, TypeTerrainMaterialName, const char* )
+ConsoleType(string, TypeTerrainMaterialName, const char*, "")
 
 ConsoleGetType( TypeTerrainMaterialName )
 {
@@ -774,7 +860,7 @@ ConsoleSetType( TypeTerrainMaterialName )
 // TypeCubemapName
 //-----------------------------------------------------------------------------
 
-ConsoleType( string, TypeCubemapName, String )
+ConsoleType(string, TypeCubemapName, String, "")
 
 ConsoleGetType( TypeCubemapName )
 {
@@ -795,13 +881,14 @@ ConsoleSetType( TypeCubemapName )
 //-----------------------------------------------------------------------------
 // TypeRectUV
 //-----------------------------------------------------------------------------
-ConsoleType( RectF, TypeRectUV, RectF )
+ConsoleType(RectF, TypeRectUV, RectF, "")
 
 ConsoleGetType( TypeRectUV )
 {
    RectF *rect = (RectF *) dptr;
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%g %g %g %g", rect->point.x, rect->point.y,
+   static const U32 bufSize = 256;
+   char* returnBuffer = Con::getReturnBuffer(bufSize);
+   dSprintf(returnBuffer, bufSize, "%g %g %g %g", rect->point.x, rect->point.y,
             rect->extent.x, rect->extent.y);
    return returnBuffer;
 }
@@ -820,7 +907,7 @@ ConsoleSetType( TypeRectUV )
 //-----------------------------------------------------------------------------
 // TypeUUID
 //-----------------------------------------------------------------------------
-ConsoleType( uuid, TypeUUID, Torque::UUID )
+ConsoleType(uuid, TypeUUID, Torque::UUID, "")
 ImplementConsoleTypeCasters( TypeUUID, Torque::UUID )
 
 ConsoleGetType( TypeUUID )
@@ -844,7 +931,7 @@ ConsoleSetType( TypeUUID )
 //-----------------------------------------------------------------------------
 // TypePID
 //-----------------------------------------------------------------------------
-ConsoleType( pid, TypePID, SimPersistID* )
+ConsoleType(pid, TypePID, SimPersistID*, "")
 ImplementConsoleTypeCasters( TypePID, SimPersistID* )
 
 ConsoleGetType( TypePID )
@@ -883,7 +970,7 @@ ConsoleSetType( TypePID )
 //-----------------------------------------------------------------------------
 // TypeSimPersistId
 //-----------------------------------------------------------------------------
-ConsoleType( SimPersistId, TypeSimPersistId, SimPersistID* )
+ConsoleType(SimPersistId, TypeSimPersistId, SimPersistID*, "")
 
 ConsoleGetType( TypeSimPersistId )
 {

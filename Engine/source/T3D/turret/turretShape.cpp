@@ -36,15 +36,6 @@
 //----------------------------------------------------------------------------
 
 // Client prediction
-static F32 sMinWarpTicks = 0.5 ;        // Fraction of tick at which instant warp occures
-static S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
-
-const U32 sClientCollisionMask = (TerrainObjectType     |
-                                  StaticShapeObjectType |
-                                  VehicleObjectType);
-
-const U32 sServerCollisionMask = (sClientCollisionMask);
-
 // Trigger objects that are not normally collided with.
 static U32 sTriggerMask = ItemObjectType     |
                           TriggerObjectType  |
@@ -69,7 +60,7 @@ ConsoleDocClass( TurretShapeData,
    "@ingroup gameObjects\n"
 );
 
-IMPLEMENT_CALLBACK( TurretShapeData, onMountObject, void, ( TurretShape* turret, SceneObject* obj, S32 node ),( turret, obj, node ),
+IMPLEMENT_CALLBACK( TurretShapeData, onMountObject, void, ( SceneObject* turret, SceneObject* obj, S32 node ),( turret, obj, node ),
    "@brief Informs the TurretShapeData object that a player is mounting it.\n\n"
    "@param turret The TurretShape object.\n"
    "@param obj The player that is mounting.\n"
@@ -77,7 +68,7 @@ IMPLEMENT_CALLBACK( TurretShapeData, onMountObject, void, ( TurretShape* turret,
    "@note Server side only.\n"
 );
 
-IMPLEMENT_CALLBACK( TurretShapeData, onUnmountObject, void, ( TurretShape* turret, SceneObject* obj ),( turret, obj ),
+IMPLEMENT_CALLBACK( TurretShapeData, onUnmountObject, void, ( SceneObject* turret, SceneObject* obj ),( turret, obj ),
    "@brief Informs the TurretShapeData object that a player is unmounting it.\n\n"
    "@param turret The TurretShape object.\n"
    "@param obj The player that is unmounting.\n"
@@ -632,13 +623,6 @@ void TurretShape::processTick(const Move* move)
    if (!isGhost())
       updateAnimation(TickSec);
 
-   if (isMounted()) {
-      MatrixF mat;
-      mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
-      ShapeBase::setTransform(mat);
-      ShapeBase::setRenderTransform(mat);
-   }
-
    updateMove(move);
 }
 
@@ -679,19 +663,11 @@ void TurretShape::advanceTime(F32 dt)
       }
    }
 
-   // If there is a recoil or image-based thread then
-   // we also need to update the nodes.
-   if (mRecoilThread || mImageStateThread)
-      updateNodes = true;
-
    Parent::advanceTime(dt);
 
    updateAnimation(dt);
 
-   if (updateNodes)
-   {
-      _updateNodes(mRot);
-   }
+   _setRotation(mRot);
 }
 
 void TurretShape::setTransform( const MatrixF& mat )
@@ -948,7 +924,7 @@ void TurretShape::unmountObject( SceneObject *obj )
    }
 }
 
-void TurretShape::onUnmount(ShapeBase*,S32)
+void TurretShape::onUnmount(SceneObject*,S32)
 {
    // Make sure the client get's the final server pos of this turret.
    setMaskBits(PositionMask);
@@ -1059,9 +1035,9 @@ void TurretShape::writePacketData(GameConnection *connection, BitStream *stream)
 {
    // Update client regardless of status flags.
    Parent::writePacketData(connection, stream);
-
-   stream->write(mRot.x);
-   stream->write(mRot.z);
+   
+   stream->writeSignedFloat(mRot.x / M_2PI_F, 7);
+   stream->writeSignedFloat(mRot.z / M_2PI_F, 7);
 }
 
 void TurretShape::readPacketData(GameConnection *connection, BitStream *stream)
@@ -1069,9 +1045,8 @@ void TurretShape::readPacketData(GameConnection *connection, BitStream *stream)
    Parent::readPacketData(connection, stream);
 
    Point3F rot(0.0f, 0.0f, 0.0f);
-   stream->read(&rot.x);
-   stream->read(&rot.z);
-
+   rot.x = stream->readSignedFloat(7) * M_2PI_F;
+   rot.z = stream->readSignedFloat(7) * M_2PI_F;
    _setRotation(rot);
 
    mTurretDelta.rot = rot;
@@ -1100,8 +1075,8 @@ U32 TurretShape::packUpdate(NetConnection *connection, U32 mask, BitStream *stre
 
    if (stream->writeFlag(mask & TurretUpdateMask))
    {
-      stream->write(mRot.x);
-      stream->write(mRot.z);
+      stream->writeSignedFloat(mRot.x / M_2PI_F, 7);
+      stream->writeSignedFloat(mRot.z / M_2PI_F, 7);
       stream->write(allowManualRotation);
       stream->write(allowManualFire);
    }
@@ -1137,8 +1112,8 @@ void TurretShape::unpackUpdate(NetConnection *connection, BitStream *stream)
    if (stream->readFlag())
    {
       Point3F rot(0.0f, 0.0f, 0.0f);
-      stream->read(&rot.x);
-      stream->read(&rot.z);
+      rot.x = stream->readSignedFloat(7) * M_2PI_F;
+      rot.z = stream->readSignedFloat(7) * M_2PI_F;
       _setRotation(rot);
 
       // New delta for client side interpolation
@@ -1155,7 +1130,7 @@ void TurretShape::unpackUpdate(NetConnection *connection, BitStream *stream)
 void TurretShape::getWeaponMountTransform( S32 index, const MatrixF &xfm, MatrixF *outMat )
 {
    // Returns mount point to world space transform
-   if ( index >= 0 && index < SceneObject::NumMountPoints) {
+   if ( index >= 0 && index < ShapeBase::MaxMountedImages) {
       S32 ni = mDataBlock->weaponMountNode[index];
       if (ni != -1) {
          MatrixF mountTransform = mShapeInstance->mNodeTransforms[ni];
@@ -1180,7 +1155,7 @@ void TurretShape::getWeaponMountTransform( S32 index, const MatrixF &xfm, Matrix
 void TurretShape::getRenderWeaponMountTransform( F32 delta, S32 mountPoint, const MatrixF &xfm, MatrixF *outMat )
 {
    // Returns mount point to world space transform
-   if ( mountPoint >= 0 && mountPoint < SceneObject::NumMountPoints) {
+   if ( mountPoint >= 0 && mountPoint < ShapeBase::MaxMountedImages) {
       S32 ni = mDataBlock->weaponMountNode[mountPoint];
       if (ni != -1) {
          MatrixF mountTransform = mShapeInstance->mNodeTransforms[ni];

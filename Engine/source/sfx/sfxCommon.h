@@ -224,8 +224,8 @@ class SFXFormat
                   U8 bitsPerSample = 0,
                   U32 samplesPerSecond = 0 )
          :  mChannels( channels ),
-            mSamplesPerSecond( samplesPerSecond ), 
-            mBitsPerSample( bitsPerSample )
+            mBitsPerSample( bitsPerSample ),
+            mSamplesPerSecond( samplesPerSecond )
       {}
 
       /// Copy constructor.
@@ -561,7 +561,7 @@ class SFXMaterialProperties
 
 
 /// An array of float values with optional random variances.
-template< int NUM_VALUES >
+template< S32 NUM_VALUES >
 struct SFXVariantFloat
 {
    /// Base value.

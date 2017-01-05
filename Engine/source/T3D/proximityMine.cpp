@@ -136,11 +136,11 @@ bool ProximityMineData::preload( bool server, String& errorStr )
    if ( !server )
    {
       // Resolve sounds
-      String errorStr;
-      if( !sfxResolve( &armingSound, errorStr ) )
-         Con::errorf( ConsoleLogEntry::General, "ProximityMineData::preload: Invalid packet: %s", errorStr.c_str() );
-      if( !sfxResolve( &triggerSound, errorStr ) )
-         Con::errorf( ConsoleLogEntry::General, "ProximityMineData::preload: Invalid packet: %s", errorStr.c_str() );
+      String sfxErrorStr;
+      if( !sfxResolve( &armingSound, sfxErrorStr ) )
+         Con::errorf( ConsoleLogEntry::General, "ProximityMineData::preload: Invalid packet: %s", sfxErrorStr.c_str() );
+      if( !sfxResolve( &triggerSound, sfxErrorStr ) )
+         Con::errorf( ConsoleLogEntry::General, "ProximityMineData::preload: Invalid packet: %s", sfxErrorStr.c_str() );
    }
 
    if ( mShape )
@@ -451,7 +451,7 @@ void ProximityMine::processTick( const Move* move )
             SimpleQueryList sql;
             getContainer()->findObjects( triggerBox, sTriggerCollisionMask,
                SimpleQueryList::insertionCallback, &sql );
-            for ( int i = 0; i < sql.mList.size(); i++ )
+            for ( S32 i = 0; i < sql.mList.size(); i++ )
             {
                // Detect movement in the trigger area
                if ( ( sql.mList[i] == mOwner && !mDataBlock->triggerOnOwner ) ||

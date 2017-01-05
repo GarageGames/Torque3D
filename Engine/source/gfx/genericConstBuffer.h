@@ -106,7 +106,7 @@ public:
    virtual ~GenericConstBufferLayout() {}
 
    /// Add a parameter to the buffer
-   void addParameter(const String& name, const GFXShaderConstType constType, const U32 offset, const U32 size, const U32 arraySize, const U32 alignValue);
+   virtual void addParameter(const String& name, const GFXShaderConstType constType, const U32 offset, const U32 size, const U32 arraySize, const U32 alignValue);
 
    /// Get the size of the buffer
    inline U32 getBufferSize() const { return mBufferSize; }
@@ -190,6 +190,8 @@ public:
    {
       AssertFatal(   matrixType == GFXSCT_Float2x2 || 
                      matrixType == GFXSCT_Float3x3 || 
+                     matrixType == GFXSCT_Float3x4 || 
+                     matrixType == GFXSCT_Float4x3 || 
                      matrixType == GFXSCT_Float4x4, 
          "GenericConstBuffer::set() - Invalid matrix type!" );
 
@@ -200,6 +202,8 @@ public:
    {
       AssertFatal(   matrixType == GFXSCT_Float2x2 || 
                      matrixType == GFXSCT_Float3x3 || 
+                     matrixType == GFXSCT_Float3x4 ||
+                     matrixType == GFXSCT_Float4x3 ||  
                      matrixType == GFXSCT_Float4x4, 
          "GenericConstBuffer::set() - Invalid matrix type!" );
 
@@ -209,6 +213,9 @@ public:
    /// Gets the dirty buffer range and clears the dirty
    /// state at the same time.
    inline const U8* getDirtyBuffer( U32 *start, U32 *size );
+
+   /// Gets the entire buffer ignoring dirty range
+   inline const U8* getEntireBuffer();
 
    /// Sets the entire buffer as dirty or clears the dirty state.
    inline void setDirty( bool dirty );
@@ -346,6 +353,13 @@ inline const U8* GenericConstBuffer::getDirtyBuffer( U32 *start, U32 *size )
    mDirtyEnd = 0;
 
    return buffer;
+}
+
+inline const U8* GenericConstBuffer::getEntireBuffer()
+{
+   AssertFatal(mBuffer, "GenericConstBuffer::getDirtyBuffer() - Buffer is empty!");
+
+   return mBuffer;
 }
 
 inline bool GenericConstBuffer::isEqual( const GenericConstBuffer *buffer ) const

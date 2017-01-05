@@ -20,11 +20,48 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function getLoadFilename(%filespec, %callback, %currentFile)
-{   
+function getLoadFilename(%filespec, %callback, %currentFile, %getRelative, %defaultPath)
+{
+   //If no default path passed in then try to get one from the file
+   if(%defaultPath $= "")
+   {
+      if ( filePath( %currentFile ) !$= "" )
+         %defaultPath = filePath(%currentFile);
+   }
+   
    %dlg = new OpenFileDialog()
    {
       Filters = %filespec;
+      DefaultFile = %currentFile;
+      DefaultPath = %defaultPath;
+      ChangePath = false;
+      MustExist = true;
+      MultipleFiles = false;
+   };
+   
+   %ok = %dlg.Execute();
+   if ( %ok )
+   {
+      %file = %dlg.FileName;
+      if(%getRelative)
+         %file = strreplace(%file,getWorkingDirectory() @ "/", "");
+      eval(%callback @ "(\"" @ %file @ "\");");
+      $Tools::FileDialogs::LastFilePath = filePath( %dlg.FileName );
+   }
+   
+   %dlg.delete();
+   
+   return %ok;
+}
+
+// Opens a choose file dialog with format filters already loaded
+// in. This avoids the issue of passing a massive list of format 
+// filters into a function as an arguement.
+function getLoadFormatFilename(%callback, %currentFile)
+{   
+   %dlg = new OpenFileDialog()
+   {
+      Filters = getFormatFilters() @ "(All Files (*.*)|*.*|";
       DefaultFile = %currentFile;
       ChangePath = false;
       MustExist = true;

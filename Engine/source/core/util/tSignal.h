@@ -54,7 +54,6 @@ public:
    {
       mList.next = mList.prev = &mList;
       mList.order = 0.5f;
-      mTriggerNext = NULL;
    }
 
    ~SignalBase();
@@ -77,6 +76,8 @@ protected:
 
       void insert(DelegateLink* node, F32 order);
       void unlink();
+
+      virtual ~DelegateLink() {}
    };
 
    DelegateLink mList;
@@ -90,6 +91,78 @@ protected:
    /// we unlink a node, we can check it against this field and move the traversal
    /// along if needed.
    Vector<DelegateLink*> mTriggerNext;
+};
+
+template<typename Signature> class SignalBaseT;
+
+/// Class for handle automatic diconnect form Signal when destroyed
+template< typename Signature >
+class SignalSlot
+{
+public:
+   typedef Delegate< Signature > DelegateSig;
+   typedef SignalBaseT< Signature > SignalSig;
+
+   SignalSlot() : mSignal(NULL)
+   {
+
+   }
+
+   ~SignalSlot()
+   {
+      disconnect();
+   }
+
+   const DelegateSig& getDelegate() { return mDlg; }
+
+   /// setDelegate disconect form Signal old delegate and connect new delegate
+   template<typename X>
+   void setDelegate( const X &fn ) { setDelegate( DelegateSig( fn ) ); }
+
+   template<typename X, typename Y>
+   void setDelegate( const X &ptr, const Y &fn ) { setDelegate( DelegateSig( ptr, fn ) ); }
+
+   void setDelegate( const DelegateSig &dlg) 
+   {
+      SignalSig* signal = mSignal;
+      if( isConnected() )
+         disconnect();      
+
+      mDlg = dlg;
+      if( signal && mDlg )
+         signal->notify( mDlg );
+   }
+
+   /// is connected to Signal
+   bool isConnected() const { return mSignal; }
+
+   /// disconnect from Signal
+   void disconnect()
+   {
+      if( mSignal )
+      {
+         SignalSig *oldSignal = mSignal;
+         mSignal = NULL;
+         oldSignal->remove( mDlg );
+      }
+   }
+
+protected:
+   friend class SignalBaseT< Signature >;
+
+   void _setSignal(SignalSig *sig)
+   {      
+      mSignal = sig;
+   }
+
+   SignalSig* _getSignal() const { return mSignal; }   
+
+   DelegateSig mDlg;
+   SignalSig *mSignal;
+
+private:
+   SignalSlot( const SignalSlot&) {}
+   SignalSlot& operator=( const SignalSlot&) {}
 };
 
 template<typename Signature> class SignalBaseT : public SignalBase
@@ -135,7 +208,7 @@ public:
          {
             if( del->mDelegate == dlg )
             {
-               for ( int i = 0; i < mTriggerNext.size(); i++ )
+               for ( S32 i = 0; i < mTriggerNext.size(); i++ )
                {
                   if( mTriggerNext[i] == ptr )
                      mTriggerNext[i] = ptr->next;
@@ -161,6 +234,18 @@ public:
    {
       DelegateSig dlg(func);
       notify(dlg, order);
+   }
+
+   void notify( SignalSlot<Signature> &slot, F32 order = 0.5f)
+   {
+      if( !slot.getDelegate() )
+         return;
+
+      if( slot.isConnected() )
+         slot.disconnect();
+
+      slot._setSignal( this );
+      mList.insert( new SlotLinkImpl(slot), order );
    }
 
    template <class T,class U>
@@ -196,6 +281,23 @@ protected:
    {
       DelegateSig mDelegate;
       DelegateLinkImpl(DelegateSig dlg) : mDelegate(dlg) {}
+   };
+
+   struct SlotLinkImpl : public DelegateLinkImpl
+   {      
+      SlotLinkImpl(SignalSlot<Signature>& slot) : mSlot( &slot ), DelegateLinkImpl( slot.getDelegate() )
+      {
+
+      }
+
+      ~SlotLinkImpl()
+      {
+         if( mSlot )
+            mSlot->_setSignal( NULL ); 
+      }
+
+   protected:
+      SignalSlot<Signature> *mSlot;
    };
 
    DelegateSig & getDelegate(SignalBase::DelegateLink * link)

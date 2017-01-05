@@ -24,6 +24,7 @@
 #include "environment/skyBox.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "scene/sceneRenderState.h"
 #include "renderInstance/renderPassManager.h"
 #include "gfx/primBuilder.h"
@@ -251,7 +252,7 @@ void SkyBox::_renderObject( ObjectRenderInst *ri, SceneRenderState *state, BaseM
 
 void SkyBox::_initRender()
 {
-   GFXVertexPNTT *tmpVerts = NULL;
+   GFXVertexPNT *tmpVerts = NULL;
 
    U32 vertCount = 36;
 
@@ -263,7 +264,7 @@ void SkyBox::_initRender()
    // Create temp vertex pointer
    // so we can read from it
    // for generating the normals below.
-   tmpVerts = new GFXVertexPNTT[vertCount];
+   tmpVerts = new GFXVertexPNT[vertCount];
 
    // We don't bother sharing
    // vertices here, in order to
@@ -399,9 +400,14 @@ void SkyBox::_initRender()
       mIsVBDirty = false;
    }
 
-   GFXVertexPNTT *vertPtr = mVB.lock();
+   GFXVertexPNT *vertPtr = mVB.lock();
+   if (!vertPtr)
+   {
+      delete[] tmpVerts;
+      return;
+   }
 
-   dMemcpy( vertPtr, tmpVerts, sizeof ( GFXVertexPNTT ) * vertCount );
+   dMemcpy(vertPtr, tmpVerts, sizeof( GFXVertexPNT) * vertCount);
 
    mVB.unlock();
 
@@ -412,6 +418,7 @@ void SkyBox::_initRender()
       mFogBandVB.set( GFX, 48, GFXBufferTypeStatic );
 
    GFXVertexPC *bandVertPtr = mFogBandVB.lock();
+   if(!bandVertPtr) return;
 
    // Grab the fog color.
    ColorI fogColor( mLastFogColor.red * 255, mLastFogColor.green * 255, mLastFogColor.blue * 255 );
@@ -592,7 +599,8 @@ void SkyBox::_initMaterial()
 
    // We want to disable culling and z write.
    GFXStateBlockDesc desc;
-   desc.setCullMode( GFXCullCW );
+   desc.setCullMode( GFXCullNone );
+   desc.setBlend( true );
    desc.setZReadWrite( true, false );
    mMatInstance->addStateBlockDesc( desc );
 
@@ -600,9 +608,10 @@ void SkyBox::_initMaterial()
    FeatureSet features = MATMGR->getDefaultFeatures();
    features.removeFeature( MFT_RTLighting );
    features.removeFeature( MFT_Visibility );
+   features.addFeature(MFT_SkyBox);
 
    // Now initialize the material.
-   mMatInstance->init( features, getGFXVertexFormat<GFXVertexPNTT>() );
+   mMatInstance->init(features, getGFXVertexFormat<GFXVertexPNT>());
 }
 
 void SkyBox::_updateMaterial()
@@ -631,7 +640,7 @@ BaseMatInstance* SkyBox::_getMaterialInstance()
    return mMatInstance;
 }
 
-ConsoleMethod( SkyBox, postApply, void, 2, 2, "")
+DefineConsoleMethod( SkyBox, postApply, void, (), , "")
 {
 	object->inspectPostApply();
 }

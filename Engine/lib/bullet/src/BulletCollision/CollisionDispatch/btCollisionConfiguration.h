@@ -15,9 +15,9 @@ subject to the following restrictions:
 
 #ifndef BT_COLLISION_CONFIGURATION
 #define BT_COLLISION_CONFIGURATION
+
 struct btCollisionAlgorithmCreateFunc;
 
-class btStackAlloc;
 class btPoolAllocator;
 
 ///btCollisionConfiguration allows to configure Bullet collision detection
@@ -37,9 +37,11 @@ public:
 
 	virtual btPoolAllocator* getCollisionAlgorithmPool() = 0;
 
-	virtual btStackAlloc*	getStackAllocator() = 0;
 
 	virtual btCollisionAlgorithmCreateFunc* getCollisionAlgorithmCreateFunc(int proxyType0,int proxyType1) =0;
+
+	virtual btCollisionAlgorithmCreateFunc* getClosestPointsAlgorithmCreateFunc(int proxyType0, int proxyType1) = 0;
+
 
 };
 

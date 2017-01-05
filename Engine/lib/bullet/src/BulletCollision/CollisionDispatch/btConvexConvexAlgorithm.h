@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CONVEX_CONVEX_ALGORITHM_H
-#define CONVEX_CONVEX_ALGORITHM_H
+#ifndef BT_CONVEX_CONVEX_ALGORITHM_H
+#define BT_CONVEX_CONVEX_ALGORITHM_H
 
 #include "btActivatingCollisionAlgorithm.h"
 #include "BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h"
@@ -24,6 +24,7 @@ subject to the following restrictions:
 #include "btCollisionCreateFunc.h"
 #include "btCollisionDispatcher.h"
 #include "LinearMath/btTransformUtil.h" //for btConvexSeparatingDistanceUtil
+#include "BulletCollision/NarrowPhaseCollision/btPolyhedralContactClipping.h"
 
 class btConvexPenetrationDepthSolver;
 
@@ -32,7 +33,7 @@ class btConvexPenetrationDepthSolver;
 ///Either improve GJK for large size ratios (testing a 100 units versus a 0.1 unit object) or only enable the util
 ///for certain pairs that have a small size ratio
 
-#define USE_SEPDISTANCE_UTIL2 1
+//#define USE_SEPDISTANCE_UTIL2 1
 
 ///The convexConvexAlgorithm collision algorithm implements time of impact, convex closest points and penetration depth calculations between two convex objects.
 ///Multiple contact points are calculated by perturbing the orientation of the smallest object orthogonal to the separating normal.
@@ -42,9 +43,10 @@ class btConvexConvexAlgorithm : public btActivatingCollisionAlgorithm
 #ifdef USE_SEPDISTANCE_UTIL2
 	btConvexSeparatingDistanceUtil	m_sepDistance;
 #endif
-	btSimplexSolverInterface*		m_simplexSolver;
 	btConvexPenetrationDepthSolver* m_pdSolver;
 
+	btVertexArray worldVertsB1;
+	btVertexArray worldVertsB2;
 	
 	bool	m_ownManifold;
 	btPersistentManifold*	m_manifoldPtr;
@@ -59,12 +61,11 @@ class btConvexConvexAlgorithm : public btActivatingCollisionAlgorithm
 
 public:
 
-	btConvexConvexAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,btCollisionObject* body0,btCollisionObject* body1, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold);
-
+	btConvexConvexAlgorithm(btPersistentManifold* mf,const btCollisionAlgorithmConstructionInfo& ci,const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold);
 
 	virtual ~btConvexConvexAlgorithm();
 
-	virtual void processCollision (btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
+	virtual void processCollision (const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
 
 	virtual btScalar calculateTimeOfImpact(btCollisionObject* body0,btCollisionObject* body1,const btDispatcherInfo& dispatchInfo,btManifoldResult* resultOut);
 
@@ -88,22 +89,21 @@ public:
 	{
 
 		btConvexPenetrationDepthSolver*		m_pdSolver;
-		btSimplexSolverInterface*			m_simplexSolver;
 		int m_numPerturbationIterations;
 		int m_minimumPointsPerturbationThreshold;
 
-		CreateFunc(btSimplexSolverInterface*			simplexSolver, btConvexPenetrationDepthSolver* pdSolver);
+		CreateFunc(btConvexPenetrationDepthSolver* pdSolver);
 		
 		virtual ~CreateFunc();
 
-		virtual	btCollisionAlgorithm* CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0,btCollisionObject* body1)
+		virtual	btCollisionAlgorithm* CreateCollisionAlgorithm(btCollisionAlgorithmConstructionInfo& ci, const btCollisionObjectWrapper* body0Wrap,const btCollisionObjectWrapper* body1Wrap)
 		{
 			void* mem = ci.m_dispatcher1->allocateCollisionAlgorithm(sizeof(btConvexConvexAlgorithm));
-			return new(mem) btConvexConvexAlgorithm(ci.m_manifold,ci,body0,body1,m_simplexSolver,m_pdSolver,m_numPerturbationIterations,m_minimumPointsPerturbationThreshold);
+			return new(mem) btConvexConvexAlgorithm(ci.m_manifold,ci,body0Wrap,body1Wrap,m_pdSolver,m_numPerturbationIterations,m_minimumPointsPerturbationThreshold);
 		}
 	};
 
 
 };
 
-#endif //CONVEX_CONVEX_ALGORITHM_H
+#endif //BT_CONVEX_CONVEX_ALGORITHM_H

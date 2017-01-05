@@ -52,7 +52,7 @@ ConsoleDocClass( GuiTextListCtrl,
 );
 
 
-IMPLEMENT_CALLBACK( GuiTextListCtrl, onSelect, void, (const char* cellid, const char* text),( cellid , text ),
+IMPLEMENT_CALLBACK( GuiTextListCtrl, onSelect, void, (S32 cellid, const char* text),( cellid , text ),
    "@brief Called whenever an item in the list is selected.\n\n"
    "@param cellid The ID of the cell that was selected\n"
    "@param text The text in the selected cel\n\n"
@@ -66,7 +66,7 @@ IMPLEMENT_CALLBACK( GuiTextListCtrl, onSelect, void, (const char* cellid, const 
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiTextListCtrl, onDeleteKey, void, ( const char* id ),( id ),
+IMPLEMENT_CALLBACK( GuiTextListCtrl, onDeleteKey, void, ( S32 id ),( id ),
    "@brief Called when the delete key has been pressed.\n\n"
    "@param id Id of the selected item in the list\n"
    "@tsexample\n"
@@ -79,12 +79,12 @@ IMPLEMENT_CALLBACK( GuiTextListCtrl, onDeleteKey, void, ( const char* id ),( id 
    "@see GuiControl\n\n"
 );
 
-static int sortColumn;
+static S32 sortColumn;
 static bool sIncreasing;
 
 static const char *getColumn(const char *text)
 {
-   int ct = sortColumn;
+   S32 ct = sortColumn;
    while(ct--)
    {
       text = dStrchr(text, '\t');
@@ -172,7 +172,7 @@ bool GuiTextListCtrl::cellSelected(Point2I cell)
 
 void GuiTextListCtrl::onCellSelected(Point2I cell)
 {
-   onSelect_callback(Con::getIntArg(mList[cell.y].id), mList[cell.y].text);
+   onSelect_callback(mList[cell.y].id, mList[cell.y].text);
    execConsoleCallback();
 }
 
@@ -497,7 +497,7 @@ bool GuiTextListCtrl::onKeyDown( const GuiEvent &event )
       break;
    case KEY_DELETE:
       if ( mSelectedCell.y >= 0 && mSelectedCell.y < mList.size() )
-      onDeleteKey_callback(Con::getIntArg( mList[mSelectedCell.y].id ) );
+      onDeleteKey_callback( mList[mSelectedCell.y].id );
       break;
    default:
    return( Parent::onKeyDown( event ) );
@@ -530,7 +530,7 @@ DefineEngineMethod( GuiTextListCtrl, getSelectedId, S32, (),,
    return object->getSelectedId();
 }
 
-DefineEngineMethod( GuiTextListCtrl, setSelectedById, void, (int id),,
+DefineEngineMethod( GuiTextListCtrl, setSelectedById, void, (S32 id),,
    "@brief Finds the specified entry by id, then marks its row as selected.\n\n"
    "@param id Entry within the text list to make selected.\n"
    "@tsexample\n"
@@ -548,7 +548,7 @@ DefineEngineMethod( GuiTextListCtrl, setSelectedById, void, (int id),,
    object->setSelectedCell(Point2I(0, index));
 }
 
-DefineEngineMethod( GuiTextListCtrl, setSelectedRow, void, (int rowNum),,
+DefineEngineMethod( GuiTextListCtrl, setSelectedRow, void, (S32 rowNum),,
    "@briefSelects the specified row.\n\n"
    "@param rowNum Row number to set selected.\n"
    "@tsexample\n"
@@ -584,7 +584,7 @@ DefineEngineMethod( GuiTextListCtrl, clearSelection, void, (),,
    object->setSelectedCell(Point2I(-1, -1));
 }
 
-DefineEngineMethod( GuiTextListCtrl, addRow, S32, (int id, const char* text, int index),(0,"",-1),
+DefineEngineMethod( GuiTextListCtrl, addRow, S32, (S32 id, const char* text, S32 index),(0,"",-1),
    "@brief Adds a new row at end of the list with the defined id and text.\n"
    "If index is used, then the new row is inserted at the row location of 'index'.\n\n"
    "@param id Id of the new row.\n"
@@ -612,7 +612,7 @@ DefineEngineMethod( GuiTextListCtrl, addRow, S32, (int id, const char* text, int
    return ret;
 }
 
-DefineEngineMethod( GuiTextListCtrl, setRowById, void, (int id, const char* text),,
+DefineEngineMethod( GuiTextListCtrl, setRowById, void, (S32 id, const char* text),,
    "@brief Sets the text at the defined id.\n\n"
    "@param id Id to change.\n"
    "@param text Text to use at the Id.\n"
@@ -629,7 +629,7 @@ DefineEngineMethod( GuiTextListCtrl, setRowById, void, (int id, const char* text
    object->setEntry(id, text);
 }
 
-DefineEngineMethod( GuiTextListCtrl, sort, void, ( int columnId, bool increasing ), ( true ),
+DefineEngineMethod( GuiTextListCtrl, sort, void, ( S32 columnId, bool increasing ), ( true ),
    "@brief Performs a standard (alphabetical) sort on the values in the specified column.\n\n"
    "@param columnId Column ID to perform the sort on.\n"
    "@param increasing If false, sort will be performed in reverse.\n"
@@ -646,7 +646,7 @@ DefineEngineMethod( GuiTextListCtrl, sort, void, ( int columnId, bool increasing
      object->sort( columnId, increasing );
 }
 
-DefineEngineMethod( GuiTextListCtrl, sortNumerical, void, (int columnID, bool increasing), ( true ),
+DefineEngineMethod( GuiTextListCtrl, sortNumerical, void, (S32 columnID, bool increasing), ( true ),
    "@brief Perform a numerical sort on the values in the specified column.\n\n"
    "Detailed description\n\n"
    "@param columnId Column ID to perform the sort on.\n"
@@ -687,7 +687,7 @@ DefineEngineMethod( GuiTextListCtrl, rowCount, S32, (),,
    return object->getNumEntries();
 }
 
-DefineEngineMethod( GuiTextListCtrl, getRowId, S32, (int index),,
+DefineEngineMethod( GuiTextListCtrl, getRowId, S32, (S32 index),,
    "@brief Get the row ID for an index.\n\n"
    "@param index Index to get the RowID at\n"
    "@tsexample\n"
@@ -705,7 +705,7 @@ DefineEngineMethod( GuiTextListCtrl, getRowId, S32, (int index),,
    return object->mList[index].id;
 }
 
-DefineEngineMethod( GuiTextListCtrl, getRowTextById, const char*, (int id),,
+DefineEngineMethod( GuiTextListCtrl, getRowTextById, const char*, (S32 id),,
    "@brief Get the text of a row with the specified id.\n\n"
    "@tsexample\n"
    "// Define the id\n"
@@ -722,7 +722,7 @@ DefineEngineMethod( GuiTextListCtrl, getRowTextById, const char*, (int id),,
    return object->mList[index].text;
 }
 
-DefineEngineMethod( GuiTextListCtrl, getRowNumById, S32, (int id),,
+DefineEngineMethod( GuiTextListCtrl, getRowNumById, S32, (S32 id),,
    "@brief Get the row number for a specified id.\n\n"
    "@param id Id to get the row number at\n"
    "@tsexample\n"
@@ -739,7 +739,7 @@ DefineEngineMethod( GuiTextListCtrl, getRowNumById, S32, (int id),,
    return index;
 }
 
-DefineEngineMethod( GuiTextListCtrl, getRowText, const char*, (int index),,
+DefineEngineMethod( GuiTextListCtrl, getRowText, const char*, (S32 index),,
    "@brief Get the text of the row with the specified index.\n\n"
    "@param index Row index to acquire the text at.\n"
    "@tsexample\n"
@@ -756,7 +756,7 @@ DefineEngineMethod( GuiTextListCtrl, getRowText, const char*, (int index),,
    return object->mList[index].text;
 }
 
-DefineEngineMethod( GuiTextListCtrl, removeRowById, void, (int id),,
+DefineEngineMethod( GuiTextListCtrl, removeRowById, void, (S32 id),,
    "@brief Remove row with the specified id.\n\n"
    "@param id Id to remove the row entry at\n"
    "@tsexample\n"
@@ -770,7 +770,7 @@ DefineEngineMethod( GuiTextListCtrl, removeRowById, void, (int id),,
    object->removeEntry(id);
 }
 
-DefineEngineMethod( GuiTextListCtrl, removeRow, void, (int index),,
+DefineEngineMethod( GuiTextListCtrl, removeRow, void, (S32 index),,
    "@brief Remove a row from the table, based on its index.\n\n"
    "@param index Row index to remove from the list.\n"
    "@tsexample\n"
@@ -784,7 +784,7 @@ DefineEngineMethod( GuiTextListCtrl, removeRow, void, (int index),,
    object->removeEntryByIndex(index);
 }
 
-DefineEngineMethod( GuiTextListCtrl, scrollVisible, void, (int rowNum),,
+DefineEngineMethod( GuiTextListCtrl, scrollVisible, void, (S32 rowNum),,
    "@brief Scroll so the specified row is visible\n\n"
    "@param rowNum Row number to make visible\n"
    "@tsexample\n"
@@ -813,7 +813,7 @@ DefineEngineMethod( GuiTextListCtrl, findTextIndex, S32, (const char* needle),,
    return( object->findEntryByText(needle) );
 }
 
-DefineEngineMethod( GuiTextListCtrl, setRowActive, void, (int rowNum, bool active),,
+DefineEngineMethod( GuiTextListCtrl, setRowActive, void, (S32 rowNum, bool active),,
    "@brief Mark a specified row as active/not.\n\n"
    "@param rowNum Row number to change the active state.\n"
    "@param active Boolean active state to set the row number.\n"
@@ -830,7 +830,7 @@ DefineEngineMethod( GuiTextListCtrl, setRowActive, void, (int rowNum, bool activ
    object->setEntryActive( U32( rowNum ), active );
 }
 
-DefineEngineMethod( GuiTextListCtrl, isRowActive, bool, (int rowNum),,
+DefineEngineMethod( GuiTextListCtrl, isRowActive, bool, (S32 rowNum),,
    "@brief Check if the specified row is currently active or not.\n\n"
    "@param rowNum Row number to check the active state.\n"
    "@tsexample\n"

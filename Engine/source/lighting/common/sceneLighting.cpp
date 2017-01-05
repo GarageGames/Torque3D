@@ -24,6 +24,7 @@
 #include "lighting/common/sceneLighting.h"
 
 #include "T3D/gameBase/gameConnection.h"
+#include "console/engineAPI.h"
 #include "console/consoleTypes.h"
 #include "scene/sceneManager.h"
 #include "lighting/common/shadowVolumeBSP.h"
@@ -605,7 +606,7 @@ void SceneLighting::completed(bool success)
    }
 
    if(gCompleteCallback && gCompleteCallback[0])
-      Con::executef(gCompleteCallback);
+      Con::executef((const char*)gCompleteCallback);
 
    dFree(gCompleteCallback);
    gCompleteCallback = NULL;
@@ -859,7 +860,7 @@ struct CacheEntry {
 };
 
 // object list sort methods: want list in reverse
-static int QSORT_CALLBACK minSizeSort(const void * p1, const void * p2)
+static S32 QSORT_CALLBACK minSizeSort(const void * p1, const void * p2)
 {
 	const CacheEntry * entry1 = (const CacheEntry *)p1;
 	const CacheEntry * entry2 = (const CacheEntry *)p2;
@@ -867,7 +868,7 @@ static int QSORT_CALLBACK minSizeSort(const void * p1, const void * p2)
 	return(entry2->mFileObject->getSize() - entry1->mFileObject->getSize());
 }
 
-static int QSORT_CALLBACK maxSizeSort(const void * p1, const void * p2)
+static S32 QSORT_CALLBACK maxSizeSort(const void * p1, const void * p2)
 {
 	const CacheEntry * entry1 = (const CacheEntry *)p1;
 	const CacheEntry * entry2 = (const CacheEntry *)p2;
@@ -875,7 +876,7 @@ static int QSORT_CALLBACK maxSizeSort(const void * p1, const void * p2)
 	return(entry1->mFileObject->getSize() - entry2->mFileObject->getSize());
 }
 
-static int QSORT_CALLBACK lastCreatedSort(const void * p1, const void * p2)
+static S32 QSORT_CALLBACK lastCreatedSort(const void * p1, const void * p2)
 {
 	const CacheEntry * entry1 = (const CacheEntry *)p1;
 	const CacheEntry * entry2 = (const CacheEntry *)p2;
@@ -899,7 +900,7 @@ static int QSORT_CALLBACK lastCreatedSort(const void * p1, const void * p2)
 	return(Platform::compareFileTimes(create[1], create[0]));
 }
 
-static int QSORT_CALLBACK lastModifiedSort(const void * p1, const void * p2)
+static S32 QSORT_CALLBACK lastModifiedSort(const void * p1, const void * p2)
 {
 	const CacheEntry * entry1 = (const CacheEntry *)p1;
 	const CacheEntry * entry2 = (const CacheEntry *)p2;
@@ -1011,13 +1012,14 @@ void SceneLighting::processCache()
 	// go through and remove the best candidate first (sorted reverse)
 	while(((curCacheSize >> 10) > quota) && files.size())
 	{
-		curCacheSize -= files.last().mFileObject->getSize();
+      CacheEntry& lastFile = files.last();
+      curCacheSize -= lastFile.mFileObject->getSize();
 
 		// no sneaky names
-		if(!dStrstr(files.last().mFileName, ".."))
+      if (!dStrstr(lastFile.mFileName, ".."))
 		{
-			Con::warnf("Removing lighting file '%s'.", files.last().mFileName);
-			dFileDelete(files.last().mFileName);
+         Con::warnf("Removing lighting file '%s'.", lastFile.mFileName);
+         dFileDelete(lastFile.mFileName);
 		}
 
 		files.pop_back();
@@ -1051,7 +1053,7 @@ U32 SceneLighting::calcMissionCRC()
    // of U32's, and so the result will be different on big/little endian hardware.
    // To fix this, swap endians on the CRC's in the vector. This must be done
    // _after_ the qsort.
-   for( int i = 0; i < crc.size(); i++ )
+   for( S32 i = 0; i < crc.size(); i++ )
       crc[i] = endianSwap( crc[i] );
 #endif
 

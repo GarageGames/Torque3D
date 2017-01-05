@@ -20,12 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-const int nSamples = 4;
-const float fSamples = 4.0;
-
-// The scale depth (the altitude at which the average atmospheric density is found)
-const float fScaleDepth = 0.25;
-const float fInvScaleDepth = 1.0 / 0.25;
+#include "hlslCompat.glsl"
 
 // The scale equation calculated by Vernier's Graphical Analysis
 float vernierScale(float fCos)
@@ -40,12 +35,20 @@ float vernierScale(float fCos)
 	return 0.25 * outx;
 }
 
+in vec4 vPosition;
+
+// This is the shader input vertex structure.
+#define IN_position vPosition
+
 // This is the shader output data.
-varying vec4 rayleighColor;
-varying vec4 mieColor;
-varying vec3 v3Direction;
-varying float zPosition;
-varying vec3 pos;
+out vec4  rayleighColor;
+#define OUT_rayleighColor rayleighColor
+out vec4  mieColor;
+#define OUT_mieColor mieColor
+out vec3  v3Direction;
+#define OUT_v3Direction v3Direction
+out vec3  pos;
+#define OUT_pos pos
  
 uniform mat4 modelView;
 uniform vec4 misc;
@@ -54,13 +57,16 @@ uniform vec4 scatteringCoeffs;
 uniform vec3 camPos;
 uniform vec3 lightDir;
 uniform vec4 invWaveLength;
- 
-void main()        
-{
-   vec4 position = gl_Vertex.xyzw;
-   vec3 normal = gl_Normal.xyz;
-   vec4 color = gl_MultiTexCoord0.xyzw;
+uniform vec4 colorize;
 
+vec3 desaturate(const vec3 color, const float desaturation) 
+{  
+   const vec3 gray_conv = vec3 (0.30, 0.59, 0.11);  
+   return mix(color, vec3(dot(gray_conv , color)), desaturation);  
+}  
+ 
+void main()
+{
    // Pull some variables out:
    float camHeight = misc.x;
    float camHeightSqr = misc.y;
@@ -83,7 +89,7 @@ void main()
    // Get the ray from the camera to the vertex, 
    // and its length (which is the far point of the ray 
    // passing through the atmosphere).
-   vec3 v3Pos = position.xyz / 6378000.0;// / outerRadius;
+   vec3 v3Pos = vec3(IN_position / 6378000.0);// / outerRadius;
    vec3 newCamPos = vec3( 0, 0, camHeight );
    v3Pos.z += innerRadius;
    vec3 v3Ray = v3Pos.xyz - newCamPos;
@@ -97,16 +103,7 @@ void main()
    float fDepth = exp(scaleOverScaleDepth * (innerRadius - camHeight));
    float fStartAngle = dot(v3Ray, v3Start) / fHeight;
 
-   float x = 1.0 - fStartAngle;
-   float x5 = x * 5.25;
-   float x5p6 = (-6.80 + x5);
-   float xnew = (3.83 + x * x5p6);
-   float xfinal = (0.459 + x * xnew);
-   float xfinal2 = -0.00287 + x * xfinal;
-   float othx = exp( xfinal2 ); 
-   float vscale1 = 0.25 * othx;
-
-   float fStartOffset = fDepth * vscale1;//vernierScale(fStartAngle);
+   float fStartOffset = fDepth * vernierScale( fStartAngle );
 
    // Initialize the scattering loop variables.
    float fSampleLength = fFar / 2.0;
@@ -123,24 +120,8 @@ void main()
       float fLightAngle = dot(lightDir, v3SamplePoint) / fHeight;
       float fCameraAngle = dot(v3Ray, v3SamplePoint) / fHeight;
 
-      x = 1.0 - fCameraAngle;
-      x5 = x * 5.25;
-      x5p6 = (-6.80 + x5);
-      xnew = (3.83 + x * x5p6);
-      xfinal = (0.459 + x * xnew);
-      xfinal2 = -0.00287 + x * xfinal;
-      othx = exp( xfinal2 ); 
-      float vscale3 = 0.25 * othx;
-
-
-      x = 1.0 - fLightAngle;
-      x5 = x * 5.25;
-      x5p6 = (-6.80 + x5);
-      xnew = (3.83 + x * x5p6);
-      xfinal = (0.459 + x * xnew);
-      xfinal2 = -0.00287 + x * xfinal;
-      othx = exp( xfinal2 ); 
-      float vscale2 = 0.25 * othx;
+      float vscale3 = vernierScale( fCameraAngle );
+      float vscale2 = vernierScale( fLightAngle );
 
       float fScatter = (fStartOffset + fDepth*(vscale2 - vscale3));
       vec3 v3Attenuate = exp(-fScatter * (invWaveLength.xyz * rayleigh4PI + mie4PI));
@@ -150,16 +131,24 @@ void main()
    
    // Finally, scale the Mie and Rayleigh colors 
    // and set up the varying variables for the pixel shader.
-   gl_Position = modelView * position;
-   mieColor.rgb = v3FrontColor * mieBrightness;
-   mieColor.a = 1.0;
-	rayleighColor.rgb = v3FrontColor * (invWaveLength.xyz * rayleighBrightness);
-	rayleighColor.a = 1.0;
-   v3Direction = newCamPos - v3Pos.xyz;      
+   gl_Position = modelView * IN_position;
+   OUT_mieColor.rgb = v3FrontColor * mieBrightness;
+   OUT_mieColor.a = 1.0;
+   OUT_rayleighColor.rgb = v3FrontColor * (invWaveLength.xyz * rayleighBrightness);
+   OUT_rayleighColor.a = 1.0;
+   OUT_v3Direction = newCamPos - v3Pos.xyz;
+   OUT_pos = IN_position.xyz;
    
-   // This offset is to get rid of the black line between the atmosky and the waterPlane
-   // along the horizon.
-   zPosition = position.z + 4000.0;
-   pos = position.xyz;
+#ifdef USE_COLORIZE  
+  
+   OUT_rayleighColor.rgb = desaturate(OUT_rayleighColor.rgb, 1) * colorize.a;  
+     
+   OUT_rayleighColor.r *= colorize.r;  
+   OUT_rayleighColor.g *= colorize.g;  
+   OUT_rayleighColor.b *= colorize.b;  
+     
+#endif 
+   
+   correctSSP(gl_Position);
 }
 

@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CONSTRAINT_SOLVER_H
-#define CONSTRAINT_SOLVER_H
+#ifndef BT_CONSTRAINT_SOLVER_H
+#define BT_CONSTRAINT_SOLVER_H
 
 #include "LinearMath/btScalar.h"
 
@@ -28,6 +28,15 @@ class btIDebugDraw;
 class btStackAlloc;
 class	btDispatcher;
 /// btConstraintSolver provides solver interface
+
+
+enum btConstraintSolverType
+{
+	BT_SEQUENTIAL_IMPULSE_SOLVER=1,
+	BT_MLCP_SOLVER=2,
+	BT_NNCG_SOLVER=4
+};
+
 class btConstraintSolver
 {
 
@@ -38,15 +47,19 @@ public:
 	virtual void prepareSolve (int /* numBodies */, int /* numManifolds */) {;}
 
 	///solve a group of constraints
-	virtual btScalar solveGroup(btCollisionObject** bodies,int numBodies,btPersistentManifold** manifold,int numManifolds,btTypedConstraint** constraints,int numConstraints, const btContactSolverInfo& info,class btIDebugDraw* debugDrawer, btStackAlloc* stackAlloc,btDispatcher* dispatcher) = 0;
+	virtual btScalar solveGroup(btCollisionObject** bodies,int numBodies,btPersistentManifold** manifold,int numManifolds,btTypedConstraint** constraints,int numConstraints, const btContactSolverInfo& info,class btIDebugDraw* debugDrawer,btDispatcher* dispatcher) = 0;
 
-	virtual void allSolved (const btContactSolverInfo& /* info */,class btIDebugDraw* /* debugDrawer */, btStackAlloc* /* stackAlloc */) {;}
+	virtual void allSolved (const btContactSolverInfo& /* info */,class btIDebugDraw* /* debugDrawer */) {;}
 
 	///clear internal cached data and reset random seed
 	virtual	void	reset() = 0;
+
+	virtual btConstraintSolverType	getSolverType() const=0;
+
+
 };
 
 
 
 
-#endif //CONSTRAINT_SOLVER_H
+#endif //BT_CONSTRAINT_SOLVER_H

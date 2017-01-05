@@ -21,9 +21,8 @@
 //-----------------------------------------------------------------------------
 
 #include "../postFx.hlsl"
-#include "shadergen:/autogenConditioners.h"
 
-uniform sampler2D inputTex : register(S0);
+TORQUE_UNIFORM_SAMPLER2D(inputTex, 0);
 uniform float2 oneOverTargetSize;
 uniform float gaussMultiplier;
 uniform float gaussMean;
@@ -48,7 +47,7 @@ float computeGaussianValue( float x, float mean, float std_deviation )
     return tmp * tmp2;
 }
 
-float4 main( PFXVertToPix IN ) : COLOR
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {
    float4 color = { 0.0f, 0.0f, 0.0f, 0.0f };
    float offset = 0;
@@ -62,7 +61,7 @@ float4 main( PFXVertToPix IN ) : COLOR
       offset = (i - 4.0) * oneOverTargetSize.x;
       x = (i - 4.0) / 4.0;
       weight = gaussMultiplier * computeGaussianValue( x, gaussMean, gaussStdDev );
-      color += (tex2D( inputTex, IN.uv0 + float2( offset, 0.0f ) ) * weight );
+      color += (TORQUE_TEX2D( inputTex, IN.uv0 + float2( offset, 0.0f ) ) * weight );
    }
    
    return float4( color.rgb, 1.0f );

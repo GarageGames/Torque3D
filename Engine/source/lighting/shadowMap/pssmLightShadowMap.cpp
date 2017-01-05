@@ -37,6 +37,7 @@
 #include "materials/shaderData.h"
 #include "ts/tsShapeInstance.h"
 #include "console/consoleTypes.h"
+#include "math/mathUtils.h"
 
 
 AFTER_MODULE_INIT( Sim )
@@ -63,15 +64,15 @@ F32 PSSMLightShadowMap::smSmallestVisiblePixelSize = 25.0f;
 
 PSSMLightShadowMap::PSSMLightShadowMap( LightInfo *light )
    :  LightShadowMap( light ),
-      mNumSplits( 0 )
+      mNumSplits( 1 )
 {  
    mIsViewDependent = true;
 }
 
 void PSSMLightShadowMap::_setNumSplits( U32 numSplits, U32 texSize )
 {
-   AssertFatal( numSplits > 0 && numSplits <= MAX_SPLITS, 
-      "PSSMLightShadowMap::_setNumSplits() - Splits must be between 1 and 4!" );
+   AssertFatal(numSplits > 0 && numSplits <= MAX_SPLITS,
+      avar("PSSMLightShadowMap::_setNumSplits() - Splits must be between 1 and %d!", MAX_SPLITS));
 
    releaseTextures();
   
@@ -204,10 +205,13 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
    if (  mShadowMapTex.isNull() || 
          mNumSplits != params->numSplits || 
          mTexSize != texSize )
+   {
       _setNumSplits( params->numSplits, texSize );
+      mShadowMapDepth = _getDepthTarget( mShadowMapTex->getWidth(), mShadowMapTex->getHeight() );   
+   }
    mLogWeight = params->logWeight;
 
-   Frustum fullFrustum( diffuseState->getFrustum() );
+   Frustum fullFrustum( diffuseState->getCameraFrustum() );
    fullFrustum.cropNearFar(fullFrustum.getNearDist(), params->shadowDistance);
 
    GFXFrustumSaver frustSaver;
@@ -216,14 +220,13 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
    // Set our render target
    GFX->pushActiveRenderTarget();
    mTarget->attachTexture( GFXTextureTarget::Color0, mShadowMapTex );
-   mTarget->attachTexture( GFXTextureTarget::DepthStencil, 
-      _getDepthTarget( mShadowMapTex->getWidth(), mShadowMapTex->getHeight() ) );
+   mTarget->attachTexture( GFXTextureTarget::DepthStencil, mShadowMapDepth );
    GFX->setActiveRenderTarget( mTarget );
    GFX->clear( GFXClearStencil | GFXClearZBuffer | GFXClearTarget, ColorI(255,255,255), 1.0f, 0 );
 
    // Calculate our standard light matrices
    MatrixF lightMatrix;
-   calcLightMatrices( lightMatrix, diffuseState->getFrustum() );
+   calcLightMatrices( lightMatrix, diffuseState->getCameraFrustum() );
    lightMatrix.inverse();
    MatrixF lightViewProj = GFX->getProjectionMatrix() * lightMatrix;
 
@@ -245,6 +248,9 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
    const F32 savedDetailAdjust = TSShapeInstance::smDetailAdjust;
    TSShapeInstance::smDetailAdjust *= smDetailAdjustScale;
    TSShapeInstance::smSmallestVisiblePixelSize = smSmallestVisiblePixelSize;
+
+   Vector< Vector<PlaneF> > _extraCull;
+   _calcPlanesCullForShadowCasters( _extraCull, fullFrustum, mLight->getDirection() );
 
    for (U32 i = 0; i < mNumSplits; i++)
    {
@@ -363,11 +369,16 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
       shadowRenderState.setDiffuseCameraTransform( diffuseState->getCameraTransform() );
       shadowRenderState.setWorldToScreenScale( diffuseState->getWorldToScreenScale() );
 
+      PlaneSetF planeSet( _extraCull[i].address(), _extraCull[i].size() );
+      shadowRenderState.getCullingState().setExtraPlanesCull( planeSet );
+
       U32 objectMask = SHADOW_TYPEMASK;
       if ( i == mNumSplits-1 && params->lastSplitTerrainOnly )
          objectMask = TerrainObjectType;
 
       sceneManager->renderSceneNoLights( &shadowRenderState, objectMask );
+
+      shadowRenderState.getCullingState().clearExtraPlanesCull();
 
       _debugRender( &shadowRenderState );
    }
@@ -384,6 +395,9 @@ void PSSMLightShadowMap::_render(   RenderPassManager* renderPass,
 void PSSMLightShadowMap::setShaderParameters(GFXShaderConstBuffer* params, LightingShaderConstants* lsc)
 {
    PROFILE_SCOPE( PSSMLightShadowMap_setShaderParameters );
+
+   AssertFatal(mNumSplits > 0 && mNumSplits <= MAX_SPLITS,
+      avar("PSSMLightShadowMap::_setNumSplits() - Splits must be between 1 and %d!", MAX_SPLITS));
 
    if ( lsc->mTapRotationTexSC->isValid() )
       GFX->setTexture( lsc->mTapRotationTexSC->getSamplerRegister(), 
@@ -430,18 +444,28 @@ void PSSMLightShadowMap::setShaderParameters(GFXShaderConstBuffer* params, Light
       }
    }
 
-   params->setSafe(lsc->mScaleXSC, sx);
-   params->setSafe(lsc->mScaleYSC, sy);
-   params->setSafe(lsc->mOffsetXSC, ox);
-   params->setSafe(lsc->mOffsetYSC, oy);
+   // These values change based on static/dynamic.
+   if ( mIsDynamic )
+   {
+      params->setSafe(lsc->mDynamicScaleXSC, sx);
+      params->setSafe(lsc->mDynamicScaleYSC, sy);
+      params->setSafe(lsc->mDynamicOffsetXSC, ox);
+      params->setSafe(lsc->mDynamicOffsetYSC, oy);
+      params->setSafe( lsc->mDynamicFarPlaneScalePSSM, mFarPlaneScalePSSM);
+   } else {
+      params->setSafe(lsc->mScaleXSC, sx);
+      params->setSafe(lsc->mScaleYSC, sy);
+      params->setSafe(lsc->mOffsetXSC, ox);
+      params->setSafe(lsc->mOffsetYSC, oy);
+      params->setSafe( lsc->mFarPlaneScalePSSM, mFarPlaneScalePSSM);
+   }
+
    params->setSafe(lsc->mAtlasXOffsetSC, aXOff);
    params->setSafe(lsc->mAtlasYOffsetSC, aYOff);
    params->setSafe(lsc->mAtlasScaleSC, shadowMapAtlas);
 
    Point4F lightParams( mLight->getRange().x, p->overDarkFactor.x, 0.0f, 0.0f );
    params->setSafe( lsc->mLightParamsSC, lightParams );
-      
-   params->setSafe( lsc->mFarPlaneScalePSSM, mFarPlaneScalePSSM);
 
    Point2F fadeStartLength(p->fadeStartDist, 0.0f);
    if (fadeStartLength.x == 0.0f)
@@ -456,4 +480,118 @@ void PSSMLightShadowMap::setShaderParameters(GFXShaderConstBuffer* params, Light
 
    // The softness is a factor of the texel size.
    params->setSafe( lsc->mShadowSoftnessConst, p->shadowSoftness * ( 1.0f / mTexSize ) );
+}
+
+void PSSMLightShadowMap::_calcPlanesCullForShadowCasters(Vector< Vector<PlaneF> > &out, const Frustum &viewFrustum, const Point3F &_ligthDir)
+{
+
+#define ENABLE_CULL_ASSERT
+
+   PROFILE_SCOPE(PSSMLightShadowMap_render_getCullFrustrum);
+
+   Point3F ligthDir = _ligthDir;
+   PlaneF lightFarPlane, lightNearPlane;
+   MatrixF lightFarPlaneMat(true);
+   MatrixF invLightFarPlaneMat(true);
+
+   // init data
+   {
+      ligthDir.normalize();
+      Point3F viewDir = viewFrustum.getTransform().getForwardVector();
+      viewDir.normalize();
+      const Point3F viewPosition = viewFrustum.getPosition();
+      const F32 viewDistance = viewFrustum.getBounds().len();
+      lightNearPlane = PlaneF(viewPosition + (viewDistance * -ligthDir), ligthDir);
+
+      const Point3F lightFarPlanePos = viewPosition + (viewDistance * ligthDir);
+      lightFarPlane = PlaneF(lightFarPlanePos, -ligthDir);
+
+      lightFarPlaneMat = MathUtils::createOrientFromDir(-ligthDir);
+      lightFarPlaneMat.setPosition(lightFarPlanePos);
+      lightFarPlaneMat.invertTo(&invLightFarPlaneMat);
+   }
+
+   Vector<Point2F> projVertices;
+
+   //project all frustum vertices into plane
+   // all vertices are 2d and local to far plane
+   projVertices.setSize(8);
+   for (int i = 0; i < 8; ++i) //
+   {
+      const Point3F &point = viewFrustum.getPoints()[i];
+#ifdef ENABLE_CULL_ASSERT
+      AssertFatal( PlaneF::Front == lightNearPlane.whichSide(point), "" );
+      AssertFatal( PlaneF::Front == lightFarPlane.whichSide(point), "" );
+#endif
+
+      Point3F localPoint(lightFarPlane.project(point));
+      invLightFarPlaneMat.mulP(localPoint);
+      projVertices[i] = Point2F(localPoint.x, localPoint.z);
+   }
+
+   //create hull arround projected proints
+   Vector<Point2F> hullVerts;
+   MathUtils::mBuildHull2D(projVertices, hullVerts);
+
+   Vector<PlaneF> planes;
+   planes.push_back(lightNearPlane);
+   planes.push_back(lightFarPlane);
+
+   //build planes
+   for (int i = 0; i < (hullVerts.size() - 1); ++i)
+   {
+      Point2F pos2D = (hullVerts[i] + hullVerts[i + 1]) / 2;
+      Point3F pos3D(pos2D.x, 0, pos2D.y);
+
+      Point3F pos3DA(hullVerts[i].x, 0, hullVerts[i].y);
+      Point3F pos3DB(hullVerts[i + 1].x, 0, hullVerts[i + 1].y);
+
+      // move hull points to 3d space
+      lightFarPlaneMat.mulP(pos3D);
+      lightFarPlaneMat.mulP(pos3DA);
+      lightFarPlaneMat.mulP(pos3DB);
+
+      PlaneF plane(pos3D, MathUtils::mTriangleNormal(pos3DB, pos3DA, (pos3DA - ligthDir)));
+      planes.push_back(plane);
+   }
+
+   //recalculate planes for each splits
+   for (int split = 0; split < mNumSplits; ++split)
+   {
+      Frustum subFrustum(viewFrustum);
+      subFrustum.cropNearFar(mSplitDist[split], mSplitDist[split + 1]);
+      subFrustum.setFarDist(getMin(subFrustum.getFarDist()*2.5f, viewFrustum.getFarDist()));
+      subFrustum.update();
+
+      Vector<PlaneF> subPlanes = planes;
+
+      for (int planeIdx = 0; planeIdx < subPlanes.size(); ++planeIdx)
+      {
+         PlaneF &plane = subPlanes[planeIdx];
+         F32 minDist = 0;
+
+         //calculate near vertex distance
+         for (int vertexIdx = 0; vertexIdx < 8; ++vertexIdx)
+         {
+            Point3F point = subFrustum.getPoints()[vertexIdx];
+            minDist = getMin(plane.distToPlane(point), minDist);
+         }
+
+         // move plane to near vertex
+         Point3F newPos = plane.getPosition() + (plane.getNormal() * minDist);
+         plane = PlaneF(newPos, plane.getNormal());
+
+#ifdef ENABLE_CULL_ASSERT
+         for(int x = 0; x < 8; ++x)
+         {
+            AssertFatal( PlaneF::Back != plane.whichSide( subFrustum.getPoints()[x] ), "");
+         }
+#endif
+      }
+
+      out.push_back(subPlanes);
+   }
+
+#undef ENABLE_CULL_ASSERT
+
 }

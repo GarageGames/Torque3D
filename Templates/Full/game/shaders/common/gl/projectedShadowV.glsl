@@ -20,13 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-//*****************************************************************************
-// Precipitation vertex shader
-//*****************************************************************************
+#include "hlslCompat.glsl"
 
-varying vec2 texCoord;
-varying vec4 color;
-varying float fade;
+in vec4 vPosition;
+in vec4 vColor;
+in vec2 vTexCoord0;
+in vec2 vTexCoord1;
+
+out vec2 texCoord;
+out vec4 color;
+out float fade;
 
 uniform mat4 modelview;
 uniform float shadowLength;
@@ -34,11 +37,13 @@ uniform vec3 shadowCasterPosition;
 
 void main()
 {
-   gl_Position = modelview * vec4(gl_Vertex.xyz, 1.0);
+   gl_Position = modelview * vec4(vPosition.xyz, 1.0);
    
-   color = gl_Color;
-   texCoord = gl_MultiTexCoord1.st;
+   color = vColor;
+   texCoord = vTexCoord0.st;
    
-   float fromCasterDist = length(gl_Vertex.xyz - shadowCasterPosition) - shadowLength;
-   fade = 1.0 - clamp(fromCasterDist/shadowLength, 0.0, 1.0);
+   float fromCasterDist = length(vPosition.xyz - shadowCasterPosition) - shadowLength;
+   fade = 1.0 - clamp( fromCasterDist / shadowLength , 0.0, 1.0 );
+   
+   correctSSP(gl_Position);
 }

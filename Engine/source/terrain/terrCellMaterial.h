@@ -108,6 +108,7 @@ protected:
 
       GFXStateBlockRef stateBlock;
       GFXStateBlockRef wireframeStateBlock;
+      GFXStateBlockRef reflectionStateBlock;
 
       GFXShaderConstHandle *modelViewProjConst;
       GFXShaderConstHandle *worldViewOnly;
@@ -143,6 +144,8 @@ protected:
    Vector<Pass> mPasses;
 
    U32 mCurrPass;
+
+   static const Vector<String> mSamplerNames;
 
    GFXTexHandle mBaseMapTexture;
 

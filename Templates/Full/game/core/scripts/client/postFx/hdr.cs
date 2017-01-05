@@ -22,7 +22,7 @@
 
 
 /// Blends between the scene and the tone mapped scene.
-$HDRPostFX::enableToneMapping = 1.0;
+$HDRPostFX::enableToneMapping = 0.5;
 
 /// The tone mapping middle grey or exposure value used
 /// to adjust the overall "balance" of the image.
@@ -77,7 +77,13 @@ $HDRPostFX::colorCorrectionRamp = "core/scripts/client/postFx/null_color_ramp.pn
 singleton ShaderData( HDR_BrightPassShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
-   DXPixelShaderFile 	= "shaders/common/postFx/hdr/brightPassFilterP.hlsl";
+   DXPixelShaderFile 	= "shaders/common/postFx/hdr/brightPassFilterP.hlsl";   
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/hdr/gl/brightPassFilterP.glsl";
+   
+   samplerNames[0] = "$inputTex";
+   samplerNames[1] = "$luminanceTex";
+   
    pixVersion = 3.0;
 };
 
@@ -85,6 +91,11 @@ singleton ShaderData( HDR_DownScale4x4Shader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/hdr/downScale4x4V.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/hdr/downScale4x4P.hlsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/hdr/gl/downScale4x4V.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/hdr/gl/downScale4x4P.glsl";
+   
+   samplerNames[0] = "$inputTex";
+   
    pixVersion = 2.0;
 };
 
@@ -92,6 +103,11 @@ singleton ShaderData( HDR_BloomGaussBlurHShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/hdr/bloomGaussBlurHP.hlsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/hdr/gl/bloomGaussBlurHP.glsl";
+   
+   samplerNames[0] = "$inputTex";
+   
    pixVersion = 3.0;
 };
 
@@ -99,6 +115,11 @@ singleton ShaderData( HDR_BloomGaussBlurVShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/hdr/bloomGaussBlurVP.hlsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/hdr/gl/bloomGaussBlurVP.glsl";
+   
+   samplerNames[0] = "$inputTex";
+   
    pixVersion = 3.0;
 };
 
@@ -106,6 +127,11 @@ singleton ShaderData( HDR_SampleLumShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/hdr/sampleLumInitialP.hlsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/hdr/gl/sampleLumInitialP.glsl";
+   
+   samplerNames[0] = "$inputTex";
+   
    pixVersion = 3.0;
 };
 
@@ -113,6 +139,11 @@ singleton ShaderData( HDR_DownSampleLumShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/hdr/sampleLumIterativeP.hlsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/hdr/gl/sampleLumIterativeP.glsl";
+   
+   samplerNames[0] = "$inputTex";
+   
    pixVersion = 3.0;
 };
 
@@ -120,6 +151,12 @@ singleton ShaderData( HDR_CalcAdaptedLumShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/hdr/calculateAdaptedLumP.hlsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/hdr/gl/calculateAdaptedLumP.glsl";
+   
+   samplerNames[0] = "$currLum";
+   samplerNames[1] = "$lastAdaptedLum";
+   
    pixVersion = 3.0;
 };
 
@@ -127,6 +164,16 @@ singleton ShaderData( HDR_CombineShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/hdr/finalPassCombineP.hlsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/hdr/gl/finalPassCombineP.glsl";
+   
+   samplerNames[0] = "$sceneTex";
+   samplerNames[1] = "$luminanceTex";
+   samplerNames[2] = "$bloomTex";
+   samplerNames[3] = "$colorCorrectionTex";
+   
+   samplerNames[4] = "prepassTex";
+
    pixVersion = 3.0;
 };
 
@@ -208,8 +255,10 @@ function HDRPostFX::setShaderConsts( %this )
    %combinePass.setShaderConst( "$g_fEnableBlueShift", $HDRPostFX::enableBlueShift );   
    %combinePass.setShaderConst( "$g_fBlueShiftColor", $HDRPostFX::blueShiftColor );   
    
-   %clampedGamma  = mClamp( $pref::Video::Gamma, 0.001, 2.2);
+   %clampedGamma  = mClamp( $pref::Video::Gamma, 2.0, 2.5);
    %combinePass.setShaderConst( "$g_fOneOverGamma",  1 / %clampedGamma );       
+   %combinePass.setShaderConst( "$Brightness", $pref::Video::Brightness );
+   %combinePass.setShaderConst( "$Contrast", $pref::Video::Contrast );
 
    %whiteCutoff = ( $HDRPostFX::whiteCutoff * $HDRPostFX::whiteCutoff ) *
                   ( $HDRPostFX::whiteCutoff * $HDRPostFX::whiteCutoff );                  
@@ -269,7 +318,7 @@ function HDRPostFX::onDisabled( %this )
    GammaPostFX.enable();
    
    // Restore the non-HDR offscreen surface format.
-   %format = "GFXFormatR8G8B8A8";
+   %format = getBestHDRFormat();
    AL_FormatToken.format = %format;
    setReflectFormat( %format );
    
@@ -285,7 +334,7 @@ singleton PostEffect( HDRPostFX )
 {
    isEnabled = false;
    allowReflectPass = false;
-      
+
    // Resolve the HDR before we render any editor stuff
    // and before we resolve the scene to the backbuffer.
    renderTime = "PFXBeforeBin";
@@ -310,6 +359,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
+         allowReflectPass = false;
          shader = HDR_DownScale4x4Shader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -320,6 +370,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
+         allowReflectPass = false;
          internalName = "bloomH";
          
          shader = HDR_BloomGaussBlurHShader;
@@ -331,6 +382,7 @@ singleton PostEffect( HDRPostFX )
 
       new PostEffect()
       {
+         allowReflectPass = false;
          internalName = "bloomV";
                   
          shader = HDR_BloomGaussBlurVShader;
@@ -345,6 +397,7 @@ singleton PostEffect( HDRPostFX )
    // Now calculate the adapted luminance.
    new PostEffect()
    {
+      allowReflectPass = false;
       internalName = "adaptLum";
       
       shader = HDR_SampleLumShader;
@@ -356,6 +409,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
+         allowReflectPass = false;
          shader = HDR_DownSampleLumShader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -366,6 +420,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
+         allowReflectPass = false;
          shader = HDR_DownSampleLumShader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -376,6 +431,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
+         allowReflectPass = false;
          shader = HDR_DownSampleLumShader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -389,7 +445,8 @@ singleton PostEffect( HDRPostFX )
       // one... PostEffect takes care to manage that.
       new PostEffect()
       {
-         internalName = "finalLum";         
+         allowReflectPass = false;
+         internalName = "finalLum";
          shader = HDR_CalcAdaptedLumShader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -405,6 +462,7 @@ singleton PostEffect( HDRPostFX )
    // version of the scene.
    new PostEffect()
    {
+      allowReflectPass = false;
       internalName = "combinePass";
       
       shader = HDR_CombineShader;
@@ -421,6 +479,11 @@ singleton ShaderData( LuminanceVisShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/hdr/luminanceVisP.hlsl";
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/hdr/gl/luminanceVisP.glsl";
+   
+   samplerNames[0] = "$inputTex";
+   
    pixVersion = 3.0;
 };
 

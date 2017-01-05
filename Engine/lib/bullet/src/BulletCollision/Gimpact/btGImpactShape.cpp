@@ -23,7 +23,61 @@ subject to the following restrictions:
 #include "btGImpactMassUtil.h"
 
 
+btGImpactMeshShapePart::btGImpactMeshShapePart( btStridingMeshInterface * meshInterface, int part )
+{
+    // moved from .h to .cpp because of conditional compilation
+    // (The setting of BT_THREADSAFE may differ between various cpp files, so it is best to
+    // avoid using it in h files)
+    m_primitive_manager.m_meshInterface = meshInterface;
+    m_primitive_manager.m_part = part;
+    m_box_set.setPrimitiveManager( &m_primitive_manager );
+#if BT_THREADSAFE
+    // If threadsafe is requested, this object uses a different lock/unlock
+    //  model with the btStridingMeshInterface -- lock once when the object is constructed
+    //  and unlock once in the destructor.
+    // The other way of locking and unlocking for each collision check in the narrowphase
+    // is not threadsafe.  Note these are not thread-locks, they are calls to the meshInterface's
+    // getLockedReadOnlyVertexIndexBase virtual function, which by default just returns a couple of
+    // pointers.  In theory a client could override the lock function to do all sorts of
+    // things like reading data from GPU memory, or decompressing data on the fly, but such things
+    // do not seem all that likely or useful, given the performance cost.
+    m_primitive_manager.lock();
+#endif
+}
+
+btGImpactMeshShapePart::~btGImpactMeshShapePart()
+{
+    // moved from .h to .cpp because of conditional compilation
+#if BT_THREADSAFE
+    m_primitive_manager.unlock();
+#endif
+}
+
+void btGImpactMeshShapePart::lockChildShapes() const
+{
+    // moved from .h to .cpp because of conditional compilation
+#if ! BT_THREADSAFE
+    // called in the narrowphase -- not threadsafe!
+    void * dummy = (void*) ( m_box_set.getPrimitiveManager() );
+    TrimeshPrimitiveManager * dummymanager = static_cast<TrimeshPrimitiveManager *>( dummy );
+    dummymanager->lock();
+#endif
+}
+
+void btGImpactMeshShapePart::unlockChildShapes()  const
+{
+    // moved from .h to .cpp because of conditional compilation
+#if ! BT_THREADSAFE
+    // called in the narrowphase -- not threadsafe!
+    void * dummy = (void*) ( m_box_set.getPrimitiveManager() );
+    TrimeshPrimitiveManager * dummymanager = static_cast<TrimeshPrimitiveManager *>( dummy );
+    dummymanager->unlock();
+#endif
+}
+
+
 #define CALC_EXACT_INERTIA 1
+
 
 void btGImpactCompoundShape::calculateLocalInertia(btScalar mass,btVector3& inertia) const
 {
@@ -144,6 +198,31 @@ void btGImpactMeshShape::rayTest(const btVector3& rayFrom, const btVector3& rayT
 {
 }
 
+void btGImpactMeshShapePart::processAllTrianglesRay(btTriangleCallback* callback,const btVector3& rayFrom, const btVector3& rayTo) const
+{
+	lockChildShapes();
+
+	btAlignedObjectArray<int> collided;
+	btVector3 rayDir(rayTo - rayFrom);
+	rayDir.normalize();
+	m_box_set.rayQuery(rayDir, rayFrom, collided);
+
+	if(collided.size()==0)
+	{
+		unlockChildShapes();
+		return;
+	}
+
+	int part = (int)getPart();
+	btPrimitiveTriangle triangle;
+	int i = collided.size();
+	while(i--)
+	{
+		getPrimitiveTriangle(collided[i],triangle);
+		callback->processTriangle(triangle.m_vertices,part,collided[i]);
+	}
+	unlockChildShapes();
+}
 
 void btGImpactMeshShapePart::processAllTriangles(btTriangleCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const
 {
@@ -181,3 +260,32 @@ void btGImpactMeshShape::processAllTriangles(btTriangleCallback* callback,const 
 		m_mesh_parts[i]->processAllTriangles(callback,aabbMin,aabbMax);
 	}
 }
+
+void btGImpactMeshShape::processAllTrianglesRay(btTriangleCallback* callback,const btVector3& rayFrom, const btVector3& rayTo) const
+{
+	int i = m_mesh_parts.size();
+	while(i--)
+	{
+		m_mesh_parts[i]->processAllTrianglesRay(callback, rayFrom, rayTo);
+	}
+}
+
+
+///fills the dataBuffer and returns the struct name (and 0 on failure)
+const char*	btGImpactMeshShape::serialize(void* dataBuffer, btSerializer* serializer) const
+{
+	btGImpactMeshShapeData* trimeshData = (btGImpactMeshShapeData*) dataBuffer;
+
+	btCollisionShape::serialize(&trimeshData->m_collisionShapeData,serializer);
+
+	m_meshInterface->serialize(&trimeshData->m_meshInterface, serializer);
+
+	trimeshData->m_collisionMargin = float(m_collisionMargin);
+
+	localScaling.serializeFloat(trimeshData->m_localScaling);
+
+	trimeshData->m_gimpactSubType = int(getGImpactShapeType());
+
+	return "btGImpactMeshShapeData";
+}
+

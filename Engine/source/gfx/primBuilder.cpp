@@ -117,7 +117,6 @@ GFXVertexBuffer * endToBuffer( U32 &numPrims )
       }
 
       case GFXTriangleStrip:
-      case GFXTriangleFan:
       {
          numPrims = mCurVertIndex - 2;
          break;
@@ -171,7 +170,6 @@ void end( bool useGenericShaders )
       }
 
       case GFXTriangleStrip:
-      case GFXTriangleFan:
       {
          stripStart = 2;
          vertStride = 1;
@@ -179,8 +177,19 @@ void end( bool useGenericShaders )
       }
    }
 
-   if ( useGenericShaders )
-      GFX->setupGenericShaders( GFXDevice::GSModColorTexture );
+    if ( useGenericShaders )
+    {
+        GFXStateBlock *currentBlock = GFX->getStateBlock();
+        if (currentBlock && currentBlock->getDesc().samplersDefined)
+        {
+            if (currentBlock->getDesc().vertexColorEnable)
+                GFX->setupGenericShaders( GFXDevice::GSModColorTexture );
+            else
+                GFX->setupGenericShaders( GFXDevice::GSTexture );
+        }
+        else
+            GFX->setupGenericShaders( GFXDevice::GSColor );
+    }
 
    const GFXVertexPCT *srcVerts = mTempVertBuff.address();
    U32 numVerts = mCurVertIndex;

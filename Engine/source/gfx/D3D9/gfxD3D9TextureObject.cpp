@@ -205,8 +205,8 @@ bool GFXD3D9TextureObject::copyToBmp(GBitmap* bmp)
    // check format limitations
    // at the moment we only support RGBA for the source (other 4 byte formats should
    // be easy to add though)
-   AssertFatal(mFormat == GFXFormatR8G8B8A8, "copyToBmp: invalid format");
-   if (mFormat != GFXFormatR8G8B8A8)
+   AssertFatal(mFormat == GFXFormatR8G8B8A8 || mFormat == GFXFormatR8G8B8, "copyToBmp: invalid format");
+   if (mFormat != GFXFormatR8G8B8A8 && mFormat != GFXFormatR8G8B8)
       return false;
 
    PROFILE_START(GFXD3D9TextureObject_copyToBmp);
@@ -242,9 +242,9 @@ bool GFXD3D9TextureObject::copyToBmp(GBitmap* bmp)
 
    PROFILE_START(GFXD3D9TextureObject_copyToBmp_pixCopy);
    // copy data into bitmap
-   for (int row = 0; row < height; ++row)
+   for (S32 row = 0; row < height; ++row)
    {
-      for (int col = 0; col < width; ++col)
+      for (S32 col = 0; col < width; ++col)
       {
          destPtr[0] = srcPtr[2]; // red
          destPtr[1] = srcPtr[1]; // green

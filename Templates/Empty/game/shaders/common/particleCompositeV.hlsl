@@ -20,22 +20,28 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "hlslStructs.h"
+#include "shaderModel.hlsl"
 
-struct VertOut
+struct Vertex
 {
-   float4 hpos : POSITION;
+   float3 pos : POSITION;
+   float4 uvCoord : COLOR0;
+};
+
+struct Conn
+{
+   float4 hpos : TORQUE_POSITION;
    float4 offscreenPos : TEXCOORD0;
    float4 backbufferPos : TEXCOORD1;
 };
 
 uniform float4 screenRect; // point, extent
 
-VertOut main( float4 uvCoord : COLOR )
+Conn main(Vertex IN)
 {
-   VertOut OUT;
+   Conn OUT;
    
-   OUT.hpos = float4(uvCoord.xy, 1.0, 1.0);
+   OUT.hpos = float4(IN.uvCoord.xy, 1.0, 1.0);
    OUT.hpos.xy *= screenRect.zw;
    OUT.hpos.xy += screenRect.xy;
    

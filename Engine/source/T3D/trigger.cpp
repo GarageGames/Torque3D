@@ -188,7 +188,7 @@ bool Trigger::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
    F32 const *si = &start.x;
    F32 const *ei = &end.x;
 
-   for (int i = 0; i < 3; i++)
+   for (S32 i = 0; i < 3; i++)
    {
       if (*si < *ei)
       {
@@ -236,7 +236,7 @@ DECLARE_STRUCT( Polyhedron );
 IMPLEMENT_STRUCT( Polyhedron, Polyhedron,,
    "" )
 END_IMPLEMENT_STRUCT;
-ConsoleType( floatList, TypeTriggerPolyhedron, Polyhedron )
+ConsoleType(floatList, TypeTriggerPolyhedron, Polyhedron, "")
 
 
 ConsoleGetType( TypeTriggerPolyhedron )
@@ -259,12 +259,14 @@ ConsoleGetType( TypeTriggerPolyhedron )
    AssertFatal(currVec == 3, "Internal error: Bad trigger polyhedron");
 
    // Build output string.
-   char* retBuf = Con::getReturnBuffer(1024);
-   dSprintf(retBuf, 1023, "%7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f",
+   static const U32 bufSize = 1024;
+   char* retBuf = Con::getReturnBuffer(bufSize);
+   dSprintf(retBuf, bufSize, "%7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f %7.7f",
             origin.x, origin.y, origin.z,
             vecs[0].x, vecs[0].y, vecs[0].z,
             vecs[2].x, vecs[2].y, vecs[2].z,
             vecs[1].x, vecs[1].y, vecs[1].z);
+            
 
    return retBuf;
 }

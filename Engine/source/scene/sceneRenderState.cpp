@@ -26,7 +26,10 @@
 #include "renderInstance/renderPassManager.h"
 #include "math/util/matrixSet.h"
 
-
+#ifdef TORQUE_EXPERIMENTAL_EC
+#include "T3D/components/render/renderComponentInterface.h"
+#include "T3D/components/component.h"
+#endif
 
 //-----------------------------------------------------------------------------
 
@@ -45,11 +48,11 @@ SceneRenderState::SceneRenderState( SceneManager* sceneManager,
       mDisableAdvancedLightingBins( false ),
       mRenderArea( view.getFrustum().getBounds() ),
       mAmbientLightColor( sceneManager->getAmbientLightColor() ),
-      mSceneRenderStyle( SRS_Standard ),
-      mRenderField( 0 )
+      mSceneRenderStyle( SRS_Standard )
 {
    // Setup the default parameters for the screen metrics methods.
-   mDiffuseCameraTransform = view.getViewWorldMatrix();
+   mDiffuseCameraTransform = view.getHeadWorldViewMatrix();
+   mDiffuseCameraTransform.inverse();
 
    // The vector eye is the camera vector with its 
    // length normalized to 1 / zFar.
@@ -104,6 +107,20 @@ void SceneRenderState::renderObjects( SceneObject** objects, U32 numObjects )
       SceneObject* object = objects[ i ];
       object->prepRenderImage( this );
    }
+
+#ifdef TORQUE_EXPERIMENTAL_EC
+   U32 interfaceCount = RenderComponentInterface::all.size();
+   for (U32 i = 0; i < RenderComponentInterface::all.size(); i++)
+   {
+      Component* comp = dynamic_cast<Component*>(RenderComponentInterface::all[i]);
+
+      if (comp->isClientObject() && comp->isActive())
+      {
+         RenderComponentInterface::all[i]->prepRenderImage(this);
+      }
+   }
+#endif
+
    PROFILE_END();
 
    // Render what the objects have batched.

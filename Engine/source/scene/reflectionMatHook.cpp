@@ -89,8 +89,6 @@ void ReflectionMaterialHook::_overrideFeatures(  ProcessedMaterial *mat,
       return;
    }
 
-   // Forward shading on materials in reflections
-   fd.features.addFeature( MFT_ForwardShading );
    fd.features.addFeature( MFT_Fog );
 }
 

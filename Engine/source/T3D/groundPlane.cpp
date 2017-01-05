@@ -69,9 +69,9 @@ GroundPlane::GroundPlane()
      mScaleU( 1.0f ),
      mScaleV( 1.0f ),
      mMaterial( NULL ),
+     mPhysicsRep( NULL ),
      mMin( 0.0f, 0.0f ),
-     mMax( 0.0f, 0.0f ),
-     mPhysicsRep( NULL )
+     mMax( 0.0f, 0.0f )
 {
    mTypeMask |= StaticObjectType | StaticShapeObjectType;
    mNetFlags.set( Ghostable | ScopeAlways );
@@ -288,10 +288,44 @@ void GroundPlane::buildConvex( const Box3F& box, Convex* convex )
    }
 }
 
-bool GroundPlane::buildPolyList( PolyListContext context, AbstractPolyList* polyList, const Box3F&, const SphereF& )
+bool GroundPlane::buildPolyList( PolyListContext context, AbstractPolyList* polyList, const Box3F& box, const SphereF& )
 {
    polyList->setObject( this );
    polyList->setTransform( &MatrixF::Identity, Point3F( 1.0f, 1.0f, 1.0f ) );
+
+   if(context == PLC_Navigation)
+   {
+      F32 z = getPosition().z;
+      Point3F
+         p0(box.minExtents.x, box.maxExtents.y, z),
+         p1(box.maxExtents.x, box.maxExtents.y, z),
+         p2(box.maxExtents.x, box.minExtents.y, z),
+         p3(box.minExtents.x, box.minExtents.y, z);
+
+      // Add vertices to poly list.
+      U32 v0 = polyList->addPoint(p0);
+      polyList->addPoint(p1);
+      polyList->addPoint(p2);
+      polyList->addPoint(p3);
+
+      // Add plane between first three vertices.
+      polyList->begin(0, 0);
+      polyList->vertex(v0);
+      polyList->vertex(v0+1);
+      polyList->vertex(v0+2);
+      polyList->plane(v0, v0+1, v0+2);
+      polyList->end();
+
+      // Add plane between last three vertices.
+      polyList->begin(0, 1);
+      polyList->vertex(v0+2);
+      polyList->vertex(v0+3);
+      polyList->vertex(v0);
+      polyList->plane(v0+2, v0+3, v0);
+      polyList->end();
+
+      return true;
+   }
 
    Box3F planeBox = getPlaneBox();
    polyList->addBox( planeBox, mMaterial );
@@ -318,7 +352,7 @@ void GroundPlane::prepRenderImage( SceneRenderState* state )
    PROFILE_SCOPE( GroundPlane_prepRender );
 
    // Update the geometry.
-   createGeometry( state->getFrustum() );
+   createGeometry( state->getCullingFrustum() );
    if( mVertexBuffer.isNull() )
       return;
 

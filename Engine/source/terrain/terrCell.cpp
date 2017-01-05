@@ -49,11 +49,11 @@ const U32 TerrCell::smTriCount      = TerrCell::smPBSize / 3;              // 33
 
 
 TerrCell::TerrCell()
-   :  mMaterials( 0 ),
+   :  mTriCount( 0 ),
+      mHasEmpty( false ),
       mMaterial( NULL ),
-      mIsInteriorOnly( false ),
-      mTriCount( 0 ),
-      mHasEmpty( false )
+      mMaterials( 0 ),
+      mIsInteriorOnly( false )
 {
    dMemset( mChildren, 0, sizeof( mChildren ) );
 }
@@ -849,7 +849,7 @@ void TerrCell::_updateMaterials()
          if ( index == U8_MAX || index > 63 )
             continue;
 
-         mMaterials |= (U64)(1<<index);
+         mMaterials |= (U64)((U64)1<<index);
       }
    }
 

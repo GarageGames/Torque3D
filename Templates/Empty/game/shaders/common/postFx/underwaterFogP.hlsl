@@ -20,10 +20,9 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"
 #include "./postFx.hlsl"
 #include "../torque.hlsl"
-
+#include "../shaderModelAutoGen.hlsl"
 //-----------------------------------------------------------------------------
 // Defines                                                                  
 //-----------------------------------------------------------------------------
@@ -38,24 +37,25 @@
 // Uniforms                                                                  
 //-----------------------------------------------------------------------------
 
-uniform sampler2D prepassTex : register(S0); 
-uniform sampler2D backbuffer : register(S1);
-uniform sampler1D waterDepthGradMap : register(S2);
+TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(backbuffer, 1);
+TORQUE_UNIFORM_SAMPLER1D(waterDepthGradMap, 2);
+
 uniform float3    eyePosWorld;
+uniform float     waterDepthGradMax;
 uniform float3    ambientColor;     
 uniform float4    waterColor;       
 uniform float4    waterFogData;    
 uniform float4    waterFogPlane;    
 uniform float2    nearFar;      
 uniform float4    rtParams0;
-uniform float     waterDepthGradMax;
 
 
-float4 main( PFXVertToPix IN ) : COLOR
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {    
    //float2 prepassCoord = IN.uv0;
    //IN.uv0 = ( IN.uv0.xy * rtParams0.zw ) + rtParams0.xy;
-   float depth = prepassUncondition( prepassTex, IN.uv0 ).w;
+   float depth = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 ).w;
    //return float4( depth.rrr, 1 );
    
    // Skip fogging the extreme far plane so that 
@@ -124,15 +124,15 @@ float4 main( PFXVertToPix IN ) : COLOR
    //return float4( fogAmt.rrr, 1 );
 
    // Calculate the water "base" color based on depth.
-   float4 fogColor = waterColor * tex1D( waterDepthGradMap, saturate( delta / waterDepthGradMax ) );      
+   float4 fogColor = waterColor * TORQUE_TEX1D( waterDepthGradMap, saturate( delta / waterDepthGradMax ) );      
    // Modulate baseColor by the ambientColor.
    fogColor *= float4( ambientColor.rgb, 1 );
    
-   float3 inColor = hdrDecode( tex2D( backbuffer, IN.uv0 ).rgb );
+   float3 inColor = hdrDecode( TORQUE_TEX2D( backbuffer, IN.uv0 ).rgb );
    inColor.rgb *= 1.0 - saturate( abs( planeDist ) / WET_DEPTH ) * WET_DARKENING;
    //return float4( inColor, 1 );
    
-   float3 outColor = lerp( inColor, fogColor, fogAmt );
+   float3 outColor = lerp( inColor, fogColor.rgb, fogAmt );
    
    return float4( hdrEncode( outColor ), 1 );        
 }

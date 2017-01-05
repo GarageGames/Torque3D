@@ -67,6 +67,24 @@ enum PFXTargetClear
 
 DefineEnumType( PFXTargetClear );
 
+
+/// PFXTargetViewport specifies how the viewport should be
+/// set up for a PostEffect's target.
+enum PFXTargetViewport
+{
+   /// The default viewport set up to match the target size
+   PFXTargetViewport_TargetSize,
+
+   /// Use the current GFX viewport
+   PFXTargetViewport_GFXViewport,
+
+   /// Use the input texture 0 if it is named, otherwise
+   /// revert to PFXTargetViewport_TargetSize if there is none
+   PFXTargetViewport_NamedInTexture0,
+};
+
+DefineEnumType( PFXTargetViewport );
+
 ///
 struct PFXFrameState
 {
@@ -82,6 +100,10 @@ struct PFXFrameState
 
 ///
 GFX_DeclareTextureProfile( PostFxTextureProfile );
+
+GFX_DeclareTextureProfile( VRTextureProfile );
+
+GFX_DeclareTextureProfile( VRDepthProfile );
 
 ///
 GFXDeclareVertexFormat( PFXVertex )

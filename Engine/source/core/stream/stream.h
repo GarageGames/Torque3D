@@ -29,7 +29,9 @@
 #ifndef _ENDIAN_H_
 #include "core/util/endian.h"
 #endif
-
+#ifndef _STRINGFUNCTIONS_H_
+#include "core/strings/stringFunctions.h"
+#endif
 
 /// @defgroup stream_overload Primitive Type Stream Operation Overloads
 /// These macros declare the read and write functions for all primitive types.
@@ -43,6 +45,7 @@ class ColorF;
 struct NetAddress;
 class RawData;
 class String;
+class NetSocket;
 
 namespace Torque {
    class ByteBuffer;
@@ -57,7 +60,7 @@ class Stream
    // Public structs and enumerations...
 public:
      /// Status constants for the stream
-   enum Status {
+   enum StreamStatus {
       Ok = 0,           ///< Ok!
       IOError,          ///< Read or Write error
       EOS,              ///< End of Stream reached (mostly for reads)
@@ -74,20 +77,20 @@ public:
 
    // Accessible only through inline accessors
 private:
-   Status m_streamStatus;
+   StreamStatus m_streamStatus;
 
    // Derived accessible data modifiers...
 protected:
-   void setStatus(const Status in_newStatus) { m_streamStatus = in_newStatus; }
+   void setStatus(const StreamStatus in_newStatus) { m_streamStatus = in_newStatus; }
 
 public:
    Stream();
    virtual ~Stream() {}
 
    /// Gets the status of the stream
-   Stream::Status getStatus() const { return m_streamStatus; }
+   Stream::StreamStatus getStatus() const { return m_streamStatus; }
    /// Gets a printable string form of the status
-   static const char* getStatusString(const Status in_status);
+   static const char* getStatusString(const StreamStatus in_status);
 
    // Derived classes must override these...
 protected:
@@ -130,11 +133,20 @@ public:
    /// writeString is safer.
    void writeLongString(U32 maxStringLen, const char *string);
 
+   inline bool Put(char character) { return write(character); }
+
    /// Write raw text to the stream
    void writeText(const char *text);
 
    /// Writes a string to the stream.
    virtual void writeString(const char *stringBuf, S32 maxLen=255);
+
+   /// Writes a formatted buffer to the stream.
+   /// NOTE: A maximum string length of 4K is allowed.
+   bool writeFormattedBuffer(const char *format, ...);
+
+   /// Writes a NULL terminated string buffer.
+   bool writeStringBuffer(const char* buffer) { return write(dStrlen(buffer), buffer); }
 
    // read/write real strings
    void write(const String & str) { _write(str); }
@@ -153,6 +165,11 @@ public:
    bool write(const NetAddress &);
    /// Read a network address from the stream.
    bool read(NetAddress*);
+
+   /// Write a network socket to the stream.
+   bool write(const NetSocket &);
+   /// Read a network socket from the stream.
+   bool read(NetSocket*);
 
    /// Write some raw data onto the stream.
    bool write(const RawData &);

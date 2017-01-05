@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef SOFT_BODY_HELPERS_H
-#define SOFT_BODY_HELPERS_H
+#ifndef BT_SOFT_BODY_HELPERS_H
+#define BT_SOFT_BODY_HELPERS_H
 
 #include "btSoftBody.h"
 
@@ -109,24 +109,26 @@ struct	btSoftBodyHelpers
 	static	btSoftBody*		CreateFromTriMesh(	btSoftBodyWorldInfo& worldInfo,
 		const btScalar*	vertices,
 		const int* triangles,
-		int ntriangles);
+		int ntriangles,
+		bool randomizeConstraints = true);
 	/* Create from convex-hull												*/ 
 	static	btSoftBody*		CreateFromConvexHull(	btSoftBodyWorldInfo& worldInfo,
 		const btVector3* vertices,
-		int nvertices);
+		int nvertices,
+		bool randomizeConstraints = true);
 
 
 	/* Export TetGen compatible .smesh file									*/ 
-	static void				ExportAsSMeshFile(	btSoftBody* psb,
-												const char* filename);	
+//	static void				ExportAsSMeshFile(	btSoftBody* psb,
+//												const char* filename);	
 	/* Create from TetGen .ele, .face, .node files							*/ 
-	static btSoftBody*		CreateFromTetGenFile(	btSoftBodyWorldInfo& worldInfo,
-													const char* ele,
-													const char* face,
-													const char* node,
-													bool bfacelinks,
-													bool btetralinks,
-													bool bfacesfromtetras);
+//	static btSoftBody*		CreateFromTetGenFile(	btSoftBodyWorldInfo& worldInfo,
+//													const char* ele,
+//													const char* face,
+//													const char* node,
+//													bool bfacelinks,
+//													bool btetralinks,
+//													bool bfacesfromtetras);
 	/* Create from TetGen .ele, .face, .node data							*/ 
 	static btSoftBody*		CreateFromTetGenData(	btSoftBodyWorldInfo& worldInfo,
 													const char* ele,
@@ -135,7 +137,12 @@ struct	btSoftBodyHelpers
 													bool bfacelinks,
 													bool btetralinks,
 													bool bfacesfromtetras);
-	
+
+	/// Sort the list of links to move link calculations that are dependent upon earlier
+	/// ones as far as possible away from the calculation of those values
+	/// This tends to make adjacent loop iterations not dependent upon one another,
+	/// so out-of-order processors can execute instructions from multiple iterations at once
+	static void ReoptimizeLinkOrder(btSoftBody *psb );
 };
 
-#endif //SOFT_BODY_HELPERS_H
+#endif //BT_SOFT_BODY_HELPERS_H

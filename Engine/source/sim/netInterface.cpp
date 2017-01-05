@@ -26,6 +26,7 @@
 #include "core/stream/bitStream.h"
 #include "math/mRandom.h"
 #include "core/util/journal/journal.h"
+#include "console/engineAPI.h"
 
 #ifdef GGC_PLUGIN
 #include "GGCNatTunnel.h" 
@@ -40,7 +41,7 @@ NetInterface::NetInterface()
    GNet = this;
 
    mLastTimeoutCheckTime = 0;
-   mAllowConnections = true;
+   mAllowConnections = false;
 
 }
 
@@ -108,7 +109,7 @@ void NetInterface::processPacketReceiveEvent(NetAddress srcAddress, RawData pack
       pStream.read(&packetType);
       NetAddress *addr = &srcAddress;
 
-      if(packetType <= GameHeartbeat)
+      if(packetType <= GameHeartbeat || packetType == MasterServerExtendedListResponse)
          handleInfoPacket(addr, packetType, &pStream);
 #ifdef GGC_PLUGIN
       else if (packetType == GGCPacket)
@@ -531,7 +532,7 @@ void NetInterface::checkTimeouts()
 #define F3(x, y, z) (x ^ y ^ z)
 #define F4(x, y, z) (y ^ (x | ~z))
 
-inline U32 rotlFixed(U32 x, unsigned int y)
+inline U32 rotlFixed(U32 x, U32 y)
 {
    return (x >> y) | (x << (32 - y));
 }
@@ -555,10 +556,7 @@ void NetInterface::computeNetMD5(const NetAddress *address, U32 connectSequence,
 
    U32 in[16];
    in[0] = address->type;
-   in[1] = (U32(address->netNum[0]) << 24) |
-           (U32(address->netNum[1]) << 16) |
-           (U32(address->netNum[2]) << 8)  |
-           (U32(address->netNum[3]));
+   in[1] = address->getHash();
    in[2] = address->port;
    in[3] = connectSequence;
    for(U32 i = 0; i < 12; i++)
@@ -640,15 +638,14 @@ void NetInterface::computeNetMD5(const NetAddress *address, U32 connectSequence,
 
 ConsoleFunctionGroupBegin(NetInterface, "Global control functions for the netInterfaces.");
 
-ConsoleFunction(allowConnections,void,2,2,"allowConnections(bool allow);"
+DefineConsoleFunction( allowConnections, void, ( bool allow ), , "allowConnections(bool allow)"
    "@brief Sets whether or not the global NetInterface allows connections from remote hosts.\n\n"
 
    "@param allow Set to true to allow remote connections.\n"
 
    "@ingroup Networking\n")
 {
-   TORQUE_UNUSED(argc);
-   GNet->setAllowsConnections(dAtob(argv[1]));
+   GNet->setAllowsConnections(allow);
 }
 
 ConsoleFunctionGroupEnd(NetInterface);

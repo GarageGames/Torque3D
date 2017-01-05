@@ -114,7 +114,7 @@ static void dumpVariable(  Stream& stream,
 {
    // Skip variables defined in script.
    
-   if( entry->type < 0 )
+   if( entry->value.type < 0 )
       return;
          
    // Skip internals... don't export them.
@@ -149,7 +149,7 @@ static void dumpVariable(  Stream& stream,
             
    // Skip variables for which we can't decipher their type.
 
-   ConsoleBaseType* type = ConsoleBaseType::getType( entry->type );
+   ConsoleBaseType* type = ConsoleBaseType::getType( entry->value.type );
    if( !type )
    {
       Con::errorf( "Can't find type for variable '%s'", entry->name );
@@ -307,7 +307,7 @@ static void dumpNamespaceEntries( Stream &stream, Namespace *g, bool callbacks =
    // Go through all the entries in the namespace.
    for ( Namespace::Entry *ewalk = g->mEntryList; ewalk; ewalk = ewalk->mNext )
    {
-      int eType = ewalk->mType;
+      S32 eType = ewalk->mType;
 
       // We do not dump script defined functions... only engine exports.
       if(    eType == Namespace::Entry::ConsoleFunctionType
@@ -706,7 +706,7 @@ static bool dumpEngineDocs( const char *outputFile )
    // Dump pre-declarations for any groups we encountered
    // so that we don't have to explicitly define them.
    HashTable<String,U32>::Iterator iter = smDocGroups.begin();
-   for ( ; iter != smDocGroups.end(); iter++ )
+   for (; iter != smDocGroups.end(); ++iter)
       stream.writeText( String::ToString( "/*! @addtogroup %s */\r\n\r\n", iter->key.c_str() ) );
 
    return true;

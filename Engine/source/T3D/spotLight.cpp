@@ -122,6 +122,8 @@ void SpotLight::_conformLights()
    mLight->setColor( mColor );
    mLight->setBrightness( mBrightness );
    mLight->setCastShadows( mCastShadows );
+   mLight->setStaticRefreshFreq(mStaticRefreshFreq);
+   mLight->setDynamicRefreshFreq(mDynamicRefreshFreq);
    mLight->setPriority( mPriority );
 
    mOuterConeAngle = getMax( 0.01f, mOuterConeAngle );

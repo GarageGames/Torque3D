@@ -60,10 +60,6 @@ public:
          "This will add a lowpass filter effect to the DSP effect chain of all sounds mixed in software.\n\n"
          "@note Only applies when using an %FMOD sound device.\n\n"
          "@ingroup SFXFMOD" );
-      Con::addVariable( "$pref::SFX::FMOD::useSoftwareReverbLowmem", TypeBool, &SFXFMODDevice::smPrefUseSoftwareReverbLowmem,
-         "If true, %FMOD's SFX reverb is run using 22/24kHz delay buffers, halving the memory required.\n\n"
-         "@note Only applies when using an %FMOD sound device.\n\n"
-         "@ingroup SFXFMOD" );
       Con::addVariable( "$pref::SFX::FMOD::enableProfile", TypeBool, &SFXFMODDevice::smPrefEnableProfile,
          "Whether to enable support for %FMOD's profiler.\n\n"
          "@note Only applies when using an %FMOD sound device.\n\n"
@@ -173,7 +169,11 @@ void SFXFMODProvider::init()
    const char* pDllName; // plugin-based DLL
    const char* eventDllName;
    
-#ifdef TORQUE_OS_WIN32
+#ifdef _WIN64
+   dllName = "fmodex64.dll";
+   pDllName = "fmodexp64.dll";
+   eventDllName = "fmod_event64.dll";
+#elif defined(TORQUE_OS_WIN)
    dllName = "fmodex.dll";
    pDllName = "fmodexp.dll";
    eventDllName = "fmod_event.dll";

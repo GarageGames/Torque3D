@@ -75,11 +75,11 @@ bool ExtendedMoveList::getNextExtMove( ExtendedMove &curMove )
       else
       {
          //Rotation is passed in as an Angle Axis in degrees.  We need to convert this into a Quat.
-         QuatF q(Point3F(ExtendedMoveManager::mRotAX[i], ExtendedMoveManager::mRotAY[i], ExtendedMoveManager::mRotAZ[i]), mDegToRad(ExtendedMoveManager::mRotAA[i]));
-         curMove.rotX[i] = q.x;
-         curMove.rotY[i] = q.y;
-         curMove.rotZ[i] = q.z;
-         curMove.rotW[i] = q.w;
+         AngAxisF q(Point3F(ExtendedMoveManager::mRotAX[i], ExtendedMoveManager::mRotAY[i], ExtendedMoveManager::mRotAZ[i]), mDegToRad(ExtendedMoveManager::mRotAA[i]));
+         curMove.rotX[i] = q.axis.x;
+         curMove.rotY[i] = q.axis.y;
+         curMove.rotZ[i] = q.axis.z;
+         curMove.rotW[i] = q.angle;
       }
    }
 

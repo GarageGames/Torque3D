@@ -1,0 +1,12 @@
+
+
+1.5.1
+released this on Feb 22 2016
+
+Patch release; one bug has been fixed, which would cause silent failure if too many nodes were requested and used in a dtNavMeshQuery.
+    #179: Fail when too many nodes are requested
+
+1.5.0
+released this on Jan 24 2016
+
+This is the first release of the Recast and Detour libraries since August 2009, containing all fixes and enhancements made since then. As you can imagine, this includes a huge number of commits, so we will forego the list of changes for this release - future releases will contain at least a summary of changes.

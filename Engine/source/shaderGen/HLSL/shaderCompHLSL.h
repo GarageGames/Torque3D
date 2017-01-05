@@ -30,6 +30,8 @@
 
 class ShaderConnectorHLSL : public ShaderConnector
 {
+private:
+   static S32 QSORT_CALLBACK _hlsl4VarSort(const void* e1, const void* e2);
 public:
 
    // ShaderConnector
@@ -45,7 +47,7 @@ public:
    virtual void reset();
    virtual void sortVars();
 
-   virtual void print( Stream &stream );
+   virtual void print( Stream &stream, bool isVertexShader );
 };
 
 
@@ -59,14 +61,14 @@ protected:
 class VertexParamsDefHLSL : public ParamsDefHLSL
 {
 public:
-   virtual void print( Stream &stream );
+   virtual void print( Stream &stream, bool isVerterShader );
 };
 
 
 class PixelParamsDefHLSL : public ParamsDefHLSL
 {
 public:
-   virtual void print( Stream &stream );
+   virtual void print( Stream &stream, bool isVerterShader );
 };
 
 #endif // _SHADERCOMP_HLSL_H_

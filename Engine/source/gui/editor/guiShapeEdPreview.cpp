@@ -42,7 +42,7 @@
 
 static const F32 sMoveScaler = 50.0f;
 static const F32 sZoomScaler = 200.0f;
-static const int sNodeRectSize = 16;
+static const S32 sNodeRectSize = 16;
 
 IMPLEMENT_CONOBJECT( GuiShapeEdPreview );
 
@@ -330,10 +330,11 @@ void GuiShapeEdPreview::setCurrentDetail(S32 dl)
 {
    if ( mModel )
    {
-      S32 smallest = mModel->getShape()->mSmallestVisibleDL;
-      mModel->getShape()->mSmallestVisibleDL = mModel->getShape()->details.size()-1;
+      TSShape* shape = mModel->getShape();
+      S32 smallest = shape->mSmallestVisibleDL;
+      shape->mSmallestVisibleDL = shape->details.size() - 1;
       mModel->setCurrentDetail( dl );
-      mModel->getShape()->mSmallestVisibleDL = smallest;
+      shape->mSmallestVisibleDL = smallest;
 
       // Match the camera distance to this detail if necessary
       //@todo if ( !gui->mFixedDetail )
@@ -359,19 +360,21 @@ bool GuiShapeEdPreview::setObjectModel(const char* modelName)
       mModel = new TSShapeInstance( model, true );
       AssertFatal( mModel, avar("GuiShapeEdPreview: Failed to load model %s. Please check your model name and load a valid model.", modelName ));
 
+      TSShape* shape = mModel->getShape();
+
       // Initialize camera values:
-      mOrbitPos = mModel->getShape()->center;
+      mOrbitPos = shape->center;
 
       // Set camera move and zoom speed according to model size
-      mMoveSpeed = mModel->getShape()->radius / sMoveScaler;
-      mZoomSpeed = mModel->getShape()->radius / sZoomScaler;
+      mMoveSpeed = shape->radius / sMoveScaler;
+      mZoomSpeed = shape->radius / sZoomScaler;
 
       // Reset node selection
       mHoverNode = -1;
       mSelectedNode = -1;
       mSelectedObject = -1;
       mSelectedObjDetail = 0;
-      mProjectedNodes.setSize( mModel->getShape()->nodes.size() );
+      mProjectedNodes.setSize( shape->nodes.size() );
 
       // Reset detail stats
       mCurrentDL = 0;
@@ -511,8 +514,6 @@ bool GuiShapeEdPreview::mountShape(const char* modelName, const char* nodeName, 
       return false;
 
    TSShapeInstance* tsi = new TSShapeInstance( model, true );
-   if ( !tsi )
-      return false;
 
    if ( slot == -1 )
    {
@@ -683,9 +684,11 @@ void GuiShapeEdPreview::refreshShape()
       mModel->initNodeTransforms();
       mModel->initMeshObjects();
 
-      mProjectedNodes.setSize( mModel->getShape()->nodes.size() );
+      TSShape* shape = mModel->getShape();
 
-      if ( mSelectedObject >= mModel->getShape()->objects.size() )
+      mProjectedNodes.setSize( shape->nodes.size() );
+
+      if ( mSelectedObject >= shape->objects.size() )
       {
          mSelectedObject = -1;
          mSelectedObjDetail = 0;
@@ -694,22 +697,22 @@ void GuiShapeEdPreview::refreshShape()
       // Re-compute the collision mesh stats
       mColMeshes = 0;
       mColPolys = 0;
-      for ( S32 i = 0; i < mModel->getShape()->details.size(); i++ )
+      for ( S32 i = 0; i < shape->details.size(); i++ )
       {
-         const TSShape::Detail& det = mModel->getShape()->details[i];
-         const String& detName = mModel->getShape()->getName( det.nameIndex );
+         const TSShape::Detail& det = shape->details[i];
+         const String& detName = shape->getName( det.nameIndex );
          if ( ( det.subShapeNum < 0 ) || !detName.startsWith( "collision-" ) )
             continue;
 
          mColPolys += det.polyCount;
 
          S32 od = det.objectDetailNum;
-         S32 start = mModel->getShape()->subShapeFirstObject[det.subShapeNum];
-         S32 end   = start + mModel->getShape()->subShapeNumObjects[det.subShapeNum];
+         S32 start = shape->subShapeFirstObject[det.subShapeNum];
+         S32 end   = start + shape->subShapeNumObjects[det.subShapeNum];
          for ( S32 j = start; j < end; j++ )
          {
-            const TSShape::Object &obj = mModel->getShape()->objects[j];
-            const TSMesh* mesh = ( od < obj.numMeshes ) ? mModel->getShape()->meshes[obj.startMeshIndex + od] : NULL;
+            const TSShape::Object &obj = shape->objects[j];
+            const TSMesh* mesh = ( od < obj.numMeshes ) ? shape->meshes[obj.startMeshIndex + od] : NULL;
             if ( mesh )
                mColMeshes++;
          }
@@ -1542,10 +1545,12 @@ void GuiShapeEdPreview::renderSunDirection() const
       GFXStateBlockDesc desc;
       desc.setZReadWrite( true, true );
 
-      GFX->getDrawUtil()->drawArrow( desc, start, end, color );
-      GFX->getDrawUtil()->drawArrow( desc, start + up, end + up, color );
-      GFX->getDrawUtil()->drawArrow( desc, start + right, end + right, color );
-      GFX->getDrawUtil()->drawArrow( desc, start + up + right, end + up + right, color );
+      GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
+      drawUtil->drawArrow( desc, start, end, color );
+      drawUtil->drawArrow( desc, start + up, end + up, color );
+      drawUtil->drawArrow( desc, start + right, end + right, color );
+      drawUtil->drawArrow( desc, start + up + right, end + up + right, color );
    }
 }
 
@@ -1603,6 +1608,8 @@ void GuiShapeEdPreview::renderNodes() const
 
 void GuiShapeEdPreview::renderNodeAxes(S32 index, const ColorF& nodeColor) const
 {
+   if(mModel->mNodeTransforms.size() <= index || index < 0)
+      return;
    const Point3F xAxis( 1.0f,  0.15f, 0.15f );
    const Point3F yAxis( 0.15f, 1.0f,  0.15f );
    const Point3F zAxis( 0.15f, 0.15f, 1.0f  );
@@ -1626,6 +1633,8 @@ void GuiShapeEdPreview::renderNodeAxes(S32 index, const ColorF& nodeColor) const
 
 void GuiShapeEdPreview::renderNodeName(S32 index, const ColorF& textColor) const
 {
+   if(index < 0 || index >= mModel->getShape()->nodes.size() || index >= mProjectedNodes.size())
+      return;
    const TSShape::Node& node = mModel->getShape()->nodes[index];
    const String& nodeName = mModel->getShape()->getName( node.nameIndex );
 

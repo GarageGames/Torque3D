@@ -258,15 +258,12 @@ static ConsoleDocFragment _MessageVectordump2(
    "MessageVector",
    "void dump( string filename, string header);");
 
-ConsoleMethod( MessageVector, dump, void, 3, 4, "(string filename, string header=NULL)"
+DefineConsoleMethod( MessageVector, dump, void, (const char * filename, const char * header), (""), "(string filename, string header=NULL)"
               "Dump the message vector to a file, optionally prefixing a header."
 			  "@hide")
 {
 
-   if ( argc == 4 )
-      object->dump( argv[2], argv[3] );
-   else
-      object->dump( argv[2] );
+   object->dump( filename, header );
 }
 
 DefineEngineMethod( MessageVector, getNumLines, S32, (),,
@@ -578,12 +575,13 @@ void MessageVector::registerSpectator(SpectatorCallback callBack, void *spectato
    }
 
    mSpectators.increment();
-   mSpectators.last().callback = callBack;
-   mSpectators.last().key      = spectatorKey;
+   SpectatorRef& lastSpectatorRef = mSpectators.last();
+   lastSpectatorRef.callback = callBack;
+   lastSpectatorRef.key = spectatorKey;
 
    // Need to message this spectator of all the lines currently inserted...
    for (i = 0; i < mMessageLines.size(); i++) {
-      (*mSpectators.last().callback)(mSpectators.last().key,
+      (*lastSpectatorRef.callback)(lastSpectatorRef.key,
                                      LineInserted, i);
    }
 }

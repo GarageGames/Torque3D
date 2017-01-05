@@ -116,6 +116,31 @@ $c->setDotNetInfo('vc2010_csproj.tpl');
 
 $c->setDontCompilePatterns( "#/platformPOSIX.*#", "#/platformMac.*#", "#\.mac\.#", "#/mac/#", "#\.mm$#", "#\.m$#" );
 
+///////////////////////////// VS2012 /////////////////////////////
+
+$c = BuildTarget::add(	'VS2012',							   // Name
+                        'buildFiles/VisualStudio 2012',	   // Solution output directory
+                        'projects/',	                   // Project output directory (relative to solution)
+                        '../../source/',				   // Base directory         
+                        'vc2012_proj.tpl',				   // App Project Template
+                        'vc2012_shared.tpl',				   // Shared App Project Template
+                        'vc2012_lib_proj.tpl',			   // Lib Project Template
+                        'vc2012_dll_proj.tpl',			   // Shared Lib Project Template
+                        'vc2012_activex_proj.tpl',		   // ActiveX Control	
+                        '.vcxproj' );				       // File ext to write the project to
+                  
+// Solution template and extension
+$c->setSolutionInfo( 'vc2012_sln.tpl', '', '.sln', 'vc2012_filter.tpl' );
+
+$c->setFileExtensions( 'c', 'cc', 'h', 'cpp', 'inl', 'asm', 'rc', 'm', 'mm', 'cs' );
+$c->setSourceFileExtensions( 'c', 'cc', 'cpp' );
+
+$c->setPlatforms( "win", "win32" );
+
+$c->setDotNetInfo('vc2012_csproj.tpl');
+
+$c->setDontCompilePatterns( "#/platformPOSIX.*#", "#/platformMac.*#", "#\.mac\.#", "#/mac/#", "#\.mm$#", "#\.m$#" );
+
 /////////////////////////// XCode /////////////////////////////
 
 $c = BuildTarget::add( 'Xcode',						         // Name
@@ -184,7 +209,7 @@ $c->setDontCompilePatterns( "*\.h*", "*win32*", "*\.win\.*", "/D3D.*/", "#/gl/#"
 
 ///////////////////////////// Build /////////////////////////////
 
-// 'buildManifest_'.$name.'_'.Generator::$platform.'.txt',
+// 'buildManifest_'.$name.'_'.T3D_Generator::$platform.'.txt',
 
 $c = BuildTarget::add( 'build',						// Name         
                   'buildFiles',         			// Solution output directory

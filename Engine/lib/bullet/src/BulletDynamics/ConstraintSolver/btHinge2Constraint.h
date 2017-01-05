@@ -13,14 +13,14 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef HINGE2_CONSTRAINT_H
-#define HINGE2_CONSTRAINT_H
+#ifndef BT_HINGE2_CONSTRAINT_H
+#define BT_HINGE2_CONSTRAINT_H
 
 
 
 #include "LinearMath/btVector3.h"
 #include "btTypedConstraint.h"
-#include "btGeneric6DofSpringConstraint.h"
+#include "btGeneric6DofSpring2Constraint.h"
 
 
 
@@ -29,13 +29,15 @@ subject to the following restrictions:
 // 2 rotational degrees of freedom, similar to Euler rotations around Z (axis 1) and X (axis 2)
 // 1 translational (along axis Z) with suspension spring
 
-class btHinge2Constraint : public btGeneric6DofSpringConstraint
+ATTRIBUTE_ALIGNED16(class) btHinge2Constraint : public btGeneric6DofSpring2Constraint
 {
 protected:
 	btVector3	m_anchor;
 	btVector3	m_axis1;
 	btVector3	m_axis2;
 public:
+		BT_DECLARE_ALIGNED_ALLOCATOR();
+		
 	// constructor
 	// anchor, axis1 and axis2 are in world coordinate system
 	// axis1 must be orthogonal to axis2
@@ -54,5 +56,5 @@ public:
 
 
 
-#endif // HINGE2_CONSTRAINT_H
+#endif // BT_HINGE2_CONSTRAINT_H
 

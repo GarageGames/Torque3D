@@ -73,7 +73,7 @@ class ParticleEmitterData : public GameBaseData
    F32   ejectionVelocity;                   ///< Ejection velocity
    F32   velocityVariance;                   ///< Variance for velocity between 0 and n
    F32   ejectionOffset;                     ///< Z offset from emitter point to eject from
-
+   F32   ejectionOffsetVariance;             ///< Z offset Variance from emitter point to eject 
    F32   thetaMin;                           ///< Minimum angle, from the horizontal plane, to eject from
    F32   thetaMax;                           ///< Maximum angle, from the horizontal plane, to eject from
 
@@ -87,7 +87,7 @@ class ParticleEmitterData : public GameBaseData
    /// of the ambient color on the particle.
    F32 ambientFactor;
 
-   U32   lifetimeMS;                         ///< Lifetime of particles
+   S32   lifetimeMS;                         ///< Lifetime of particles
    U32   lifetimeVarianceMS;                 ///< Varience in lifetime from 0 to n
 
    bool  overrideAdvance;                    ///<
@@ -114,6 +114,7 @@ class ParticleEmitterData : public GameBaseData
    GFXTexHandle          textureHandle;      ///< Emitter texture handle from txrName
    bool                  highResOnly;        ///< This particle system should not use the mixed-resolution particle rendering
    bool                  renderReflection;   ///< Enables this emitter to render into reflection passes.
+   bool glow;                                ///< Renders this emitter into the glow buffer.
 
    bool reload();
 };

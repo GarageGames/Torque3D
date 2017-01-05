@@ -5,7 +5,10 @@ Final bug fixes.
 Better C++ wrapper/full C++ implementation?
 Fix problem with C++ and EXTERN "C".
 cHRM transformation.
-Remove setjmp/longjmp usage in favor of returning error codes.
+Remove setjmp/longjmp usage in favor of returning error codes. As a start on
+  this, minimize the use of png_error(), replacing them with
+  png_warning(); return(0; or similar.
+Palette creation.
 Add "grayscale->palette" transformation and "palette->grayscale" detection.
 Improved dithering.
 Multi-lingual error and warning message support.

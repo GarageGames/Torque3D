@@ -47,6 +47,8 @@ public:
    virtual U32 getDepth() = 0;
    virtual bool hasMips() = 0;
    virtual GLenum getBinding() = 0;
+   virtual GFXFormat getFormat() = 0;
+   virtual bool isCompatible(const GFXGLTextureObject* tex) = 0;
    
    U32 getMipLevel() { return mipLevel; }
    U32 getZOffset() { return zOffset; }
@@ -73,6 +75,14 @@ public:
    virtual U32 getDepth() { return mTex->getDepth(); }
    virtual bool hasMips() { return mTex->mMipLevels != 1; }
    virtual GLenum getBinding() { return mTex->getBinding(); }
+   virtual GFXFormat getFormat() { return mTex->getFormat(); }
+   virtual bool isCompatible(const GFXGLTextureObject* tex)
+   {
+      return mTex->getFormat() == tex->getFormat()
+         && mTex->getWidth() == tex->getWidth()
+         && mTex->getHeight() == tex->getHeight();
+   }
+   GFXGLTextureObject* getTextureObject() const {return mTex; }
    
 private:
    StrongRefPtr<GFXGLTextureObject> mTex;
@@ -95,6 +105,13 @@ public:
    virtual U32 getDepth() { return 0; }
    virtual bool hasMips() { return mTex->getNumMipLevels() != 1; }
    virtual GLenum getBinding() { return GFXGLCubemap::getEnumForFaceNumber(mFace); }
+   virtual GFXFormat getFormat() { return mTex->getFormat(); }
+   virtual bool isCompatible(const GFXGLTextureObject* tex)
+   {
+      return mTex->getFormat() == tex->getFormat()
+         && mTex->getWidth() == tex->getWidth()
+         && mTex->getHeight() == tex->getHeight();
+   }
    
 private:
    StrongRefPtr<GFXGLCubemap> mTex;
@@ -102,7 +119,7 @@ private:
 };
 
 // Internal implementations
-class _GFXGLTextureTargetImpl
+class _GFXGLTextureTargetImpl // TODO OPENGL remove and implement on GFXGLTextureTarget
 {
 public:
    GFXGLTextureTarget* mTarget;
@@ -128,149 +145,125 @@ public:
    virtual void finish();
 };
 
-// Handy macro for checking the status of a framebuffer.  Framebuffers can fail in 
-// all sorts of interesting ways, these are just the most common.  Further, no existing GL profiling 
-// tool catches framebuffer errors when the framebuffer is created, so we actually need this.
-#define CHECK_FRAMEBUFFER_STATUS()\
-{\
-GLenum status;\
-status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);\
-switch(status) {\
-case GL_FRAMEBUFFER_COMPLETE_EXT:\
-break;\
-case GL_FRAMEBUFFER_UNSUPPORTED_EXT:\
-AssertFatal(false, "Unsupported FBO");\
-break;\
-case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:\
-AssertFatal(false, "Incomplete FBO Attachment");\
-break;\
-case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:\
-AssertFatal(false, "Incomplete FBO dimensions");\
-break;\
-case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:\
-AssertFatal(false, "Incomplete FBO formats");\
-default:\
-/* programming error; will fail on all hardware */\
-AssertFatal(false, "Something really bad happened with an FBO");\
-}\
-}
-
 _GFXGLTextureTargetFBOImpl::_GFXGLTextureTargetFBOImpl(GFXGLTextureTarget* target)
 {
    mTarget = target;
-   glGenFramebuffersEXT(1, &mFramebuffer);
+   glGenFramebuffers(1, &mFramebuffer);
 }
 
 _GFXGLTextureTargetFBOImpl::~_GFXGLTextureTargetFBOImpl()
 {
-   glDeleteFramebuffersEXT(1, &mFramebuffer);
+   glDeleteFramebuffers(1, &mFramebuffer);
 }
 
 void _GFXGLTextureTargetFBOImpl::applyState()
 {   
    // REMINDER: When we implement MRT support, check against GFXGLDevice::getNumRenderTargets()
    
-   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, mFramebuffer);
-   
-   _GFXGLTargetDesc* color0 = mTarget->getTargetDesc(GFXTextureTarget::Color0);
-   if(color0)
-   {
-      if(color0->getDepth() == 0)
-         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, color0->getBinding(), color0->getHandle(), color0->getMipLevel());
+   PRESERVE_FRAMEBUFFER();
+   glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer);
+
+   bool drawbufs[16];
+   int bufsize = 0;
+   for (int i = 0; i < 16; i++)
+           drawbufs[i] = false;
+   bool hasColor = false;
+   for(int i = 0; i < GFXGL->getNumRenderTargets(); ++i)
+   {   
+      _GFXGLTargetDesc* color = mTarget->getTargetDesc( static_cast<GFXTextureTarget::RenderSlot>(GFXTextureTarget::Color0+i ));
+      if(color)
+      {
+         hasColor = true;
+         const GLenum binding = color->getBinding();
+         if( binding == GL_TEXTURE_2D || (binding >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && binding <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z) )
+            glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, color->getBinding( ), color->getHandle( ), color->getMipLevel( ) );
+         else if( binding == GL_TEXTURE_1D )
+            glFramebufferTexture1D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, color->getBinding( ), color->getHandle( ), color->getMipLevel( ) );
+         else if( binding == GL_TEXTURE_3D )
+            glFramebufferTexture3D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, color->getBinding( ), color->getHandle( ), color->getMipLevel( ), color->getZOffset( ) );
+         else
+             Con::errorf("_GFXGLTextureTargetFBOImpl::applyState - Bad binding");
+      }
       else
-         glFramebufferTexture3DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, color0->getBinding(), color0->getHandle(), color0->getMipLevel(), color0->getZOffset());
-   }
-   else
-   {
-      // Clears the texture (note that the binding is irrelevent)
-      glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, 0, 0);
+      {
+         // Clears the texture (note that the binding is irrelevent)
+         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0+i, GL_TEXTURE_2D, 0, 0);
+      }
    }
    
    _GFXGLTargetDesc* depthStecil = mTarget->getTargetDesc(GFXTextureTarget::DepthStencil);
    if(depthStecil)
    {
       // Certain drivers have issues with depth only FBOs.  That and the next two asserts assume we have a color target.
-      AssertFatal(color0, "GFXGLTextureTarget::applyState() - Cannot set DepthStencil target without Color0 target!");
-      AssertFatal(depthStecil->getWidth() == color0->getWidth(), "GFXGLTextureTarget::applyState() - DepthStencil and Color0 targets MUST have the same width!");
-      AssertFatal(depthStecil->getHeight() == color0->getHeight(), "GFXGLTextureTarget::applyState() - DepthStencil and Color0 targets MUST have the same height!");
-      glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, depthStecil->getBinding(), depthStecil->getHandle(), depthStecil->getMipLevel());
+      AssertFatal(hasColor, "GFXGLTextureTarget::applyState() - Cannot set DepthStencil target without Color0 target!");
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, depthStecil->getBinding(), depthStecil->getHandle(), depthStecil->getMipLevel());
    }
    else
    {
       // Clears the texture (note that the binding is irrelevent)
-      glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, 0, 0);
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
    }
-   
-   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+
+   GLenum *buf = new GLenum[bufsize];
+   int count = 0;
+   for (int i = 0; i < bufsize; i++)
+   {
+           if (drawbufs[i])
+           {
+                   buf[count] = GL_COLOR_ATTACHMENT0 + i;
+                   count++;
+           }
+   }
+ 
+   glDrawBuffers(bufsize, buf);
+ 
+   delete[] buf;
+   CHECK_FRAMEBUFFER_STATUS();
 }
 
 void _GFXGLTextureTargetFBOImpl::makeActive()
 {
-   glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, mFramebuffer);
-   glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, mFramebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer);
+    GFXGL->getOpenglCache()->setCacheBinded(GL_FRAMEBUFFER, mFramebuffer);
+
+    int i = 0;
+    GLenum draws[16];
+    for( i = 0; i < GFXGL->getNumRenderTargets(); ++i)
+    {
+        _GFXGLTargetDesc* color = mTarget->getTargetDesc( static_cast<GFXTextureTarget::RenderSlot>(GFXTextureTarget::Color0+i ));
+        if(color)
+            draws[i] = GL_COLOR_ATTACHMENT0 + i;
+        else
+            break;
+    }
+
+    glDrawBuffers( i, draws );
 }
 
 void _GFXGLTextureTargetFBOImpl::finish()
 {
-   glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
-   glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
-   
-   _GFXGLTargetDesc* color0 = mTarget->getTargetDesc(GFXTextureTarget::Color0);
-   if(!color0 || !(color0->hasMips()))
-      return;
-   
-   // Generate mips if necessary
-   // Assumes a 2D texture.
-   glActiveTexture(GL_TEXTURE0);
-   PRESERVE_2D_TEXTURE();
-   glBindTexture(GL_TEXTURE_2D, color0->getHandle());
-   glGenerateMipmapEXT(GL_TEXTURE_2D);
-}
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+   GFXGL->getOpenglCache()->setCacheBinded(GL_FRAMEBUFFER, 0);
 
-// This implementations uses AUX buffers (we should always have at least one) to do render to texture.  It is currently only used when we need access to the windows depth buffer.
-class _GFXGLTextureTargetAUXBufferImpl : public _GFXGLTextureTargetImpl
-{
-public:
-   _GFXGLTextureTargetAUXBufferImpl(GFXGLTextureTarget* target);
+   for(int i = 0; i < GFXGL->getNumRenderTargets(); ++i)
+   {   
+      _GFXGLTargetDesc* color = mTarget->getTargetDesc( static_cast<GFXTextureTarget::RenderSlot>(GFXTextureTarget::Color0+i ) );
+      if(!color || !(color->hasMips()))
+         continue;
    
-   virtual void applyState();
-   virtual void makeActive();
-   virtual void finish();
-};
+      // Generate mips if necessary
+      // Assumes a 2D texture.
+      GLenum binding = color->getBinding();
+      binding = (binding >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && binding <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z) ? GL_TEXTURE_CUBE_MAP : binding;
 
-_GFXGLTextureTargetAUXBufferImpl::_GFXGLTextureTargetAUXBufferImpl(GFXGLTextureTarget* target)
-{
-   mTarget = target;
-}
-
-void _GFXGLTextureTargetAUXBufferImpl::applyState()
-{
-   
-}
-
-void _GFXGLTextureTargetAUXBufferImpl::makeActive()
-{
-   glDrawBuffer(GL_AUX0);
-   glReadBuffer(GL_AUX0);
-}
-
-void _GFXGLTextureTargetAUXBufferImpl::finish()
-{
-   // Bind the Color0 texture
-   _GFXGLTargetDesc* color0 = mTarget->getTargetDesc(GFXTextureTarget::Color0);
-   
-   glActiveTexture(GL_TEXTURE0);
-   // Assume we're a 2D texture for now.
-   PRESERVE_2D_TEXTURE();
-   glBindTexture(color0->getBinding(), color0->getHandle());
-   glCopyTexSubImage2D(color0->getBinding(), 0, 0, 0, 0, 0, color0->getWidth(), color0->getHeight());
-   
-   glDrawBuffer(GL_BACK);
-   glReadBuffer(GL_BACK);
+      PRESERVE_TEXTURE( binding );
+      glBindTexture( binding, color->getHandle() );
+      glGenerateMipmap( binding );
+   }
 }
 
 // Actual GFXGLTextureTarget interface
-GFXGLTextureTarget::GFXGLTextureTarget()
+GFXGLTextureTarget::GFXGLTextureTarget() : mCopyFboSrc(0), mCopyFboDst(0)
 {
    for(U32 i=0; i<MaxRenderSlotId; i++)
       mTargets[i] = NULL;
@@ -278,12 +271,17 @@ GFXGLTextureTarget::GFXGLTextureTarget()
    GFXTextureManager::addEventDelegate( this, &GFXGLTextureTarget::_onTextureEvent );
 
    _impl = new _GFXGLTextureTargetFBOImpl(this);
-   _needsAux = false;
+    
+   glGenFramebuffers(1, &mCopyFboSrc);
+   glGenFramebuffers(1, &mCopyFboDst);
 }
 
 GFXGLTextureTarget::~GFXGLTextureTarget()
 {
-   GFXTextureManager::removeEventDelegate( this, &GFXGLTextureTarget::_onTextureEvent );
+   GFXTextureManager::removeEventDelegate(this, &GFXGLTextureTarget::_onTextureEvent);
+
+   glDeleteFramebuffers(1, &mCopyFboSrc);
+   glDeleteFramebuffers(1, &mCopyFboDst);
 }
 
 const Point2I GFXGLTextureTarget::getSize()
@@ -296,18 +294,20 @@ const Point2I GFXGLTextureTarget::getSize()
 
 GFXFormat GFXGLTextureTarget::getFormat()
 {
-   // TODO: Fix me!
+   if(mTargets[Color0].isValid())
+      return mTargets[Color0]->getFormat();
+
    return GFXFormatR8G8B8A8;
 }
 
 void GFXGLTextureTarget::attachTexture( RenderSlot slot, GFXTextureObject *tex, U32 mipLevel/*=0*/, U32 zOffset /*= 0*/ )
 {
-   // GFXTextureTarget::sDefaultDepthStencil is a hint that we want the window's depth buffer.
-   if(tex == GFXTextureTarget::sDefaultDepthStencil)
-      _needsAux = true;
-   
-   if(slot == DepthStencil && tex != GFXTextureTarget::sDefaultDepthStencil)
-      _needsAux = false;
+   if( tex == GFXTextureTarget::sDefaultDepthStencil )
+      tex = GFXGL->getDefaultDepthTex();
+
+   _GFXGLTextureTargetDesc* mTex = static_cast<_GFXGLTextureTargetDesc*>(mTargets[slot].ptr());
+   if( (!tex && !mTex) || (mTex && mTex->getTextureObject() == tex) )
+      return;
    
    // Triggers an update when we next render
    invalidateState();
@@ -376,10 +376,7 @@ void GFXGLTextureTarget::applyState()
    // So we don't do this over and over again
    stateApplied();
    
-   // Ensure we have the proper implementation (consider changing to an enum?)
-   if(_needsAux && dynamic_cast<_GFXGLTextureTargetAUXBufferImpl*>(_impl.ptr()) == NULL)
-      _impl = new _GFXGLTextureTargetAUXBufferImpl(this);
-   else if(!_needsAux && dynamic_cast<_GFXGLTextureTargetFBOImpl*>(_impl.ptr()) == NULL)
+   if(_impl.isNull())
       _impl = new _GFXGLTextureTargetFBOImpl(this);
            
    _impl->applyState();
@@ -413,26 +410,27 @@ void GFXGLTextureTarget::resolveTo(GFXTextureObject* obj)
    AssertFatal(dynamic_cast<GFXGLTextureObject*>(obj), "GFXGLTextureTarget::resolveTo - Incorrect type of texture, expected a GFXGLTextureObject");
    GFXGLTextureObject* glTexture = static_cast<GFXGLTextureObject*>(obj);
 
+   if( GFXGL->mCapabilities.copyImage && mTargets[Color0]->isCompatible(glTexture) )
+   {
+      GLenum binding = mTargets[Color0]->getBinding();      
+      binding = (binding >= GL_TEXTURE_CUBE_MAP_POSITIVE_X && binding <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z) ? GL_TEXTURE_CUBE_MAP : binding;
+      U32 srcStartDepth = binding == GL_TEXTURE_CUBE_MAP ? mTargets[Color0]->getBinding() - GL_TEXTURE_CUBE_MAP_POSITIVE_X : 0;
+      glCopyImageSubData(
+        mTargets[Color0]->getHandle(), binding, 0, 0, 0, srcStartDepth,
+        glTexture->getHandle(), glTexture->getBinding(), 0, 0, 0, 0,
+        mTargets[Color0]->getWidth(), mTargets[Color0]->getHeight(), 1);
+
+      return;
+   }
+
    PRESERVE_FRAMEBUFFER();
    
-   GLuint dest;
-   GLuint src;
+   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mCopyFboDst);
+   glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glTexture->getBinding(), glTexture->getHandle(), 0);
    
-   glGenFramebuffersEXT(1, &dest);
-   glGenFramebuffersEXT(1, &src);
+   glBindFramebuffer(GL_READ_FRAMEBUFFER, mCopyFboSrc);
+   glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, mTargets[Color0]->getBinding(), mTargets[Color0]->getHandle(), 0);
    
-   glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, dest);
-   glFramebufferTexture2DEXT(GL_DRAW_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, glTexture->getHandle(), 0);
-   
-   glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, src);
-   glFramebufferTexture2DEXT(GL_READ_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D,mTargets[Color0]->getHandle(), 0);
-   
-   glBlitFramebufferEXT(0, 0, mTargets[Color0]->getWidth(), mTargets[Color0]->getHeight(),
+   glBlitFramebuffer(0, 0, mTargets[Color0]->getWidth(), mTargets[Color0]->getHeight(),
       0, 0, glTexture->getWidth(), glTexture->getHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
-   
-   glBindFramebufferEXT(GL_DRAW_FRAMEBUFFER_EXT, 0);
-   glBindFramebufferEXT(GL_READ_FRAMEBUFFER_EXT, 0);
-   
-   glDeleteFramebuffersEXT(1, &dest);
-   glDeleteFramebuffersEXT(1, &src);
 }

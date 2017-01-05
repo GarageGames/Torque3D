@@ -30,6 +30,8 @@ class GFXGLWindowTarget : public GFXWindowTarget
 public:
 
    GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d);
+   ~GFXGLWindowTarget();
+
    const Point2I getSize() 
    { 
       return mWindow->getClientExtent();
@@ -48,15 +50,28 @@ public:
    virtual void resolveTo(GFXTextureObject* obj);
    
    void _onAppSignal(WindowId wnd, S32 event);
+
+   // create pixel format for the window
+   void createPixelFormat();
    
 private:
    friend class GFXGLDevice;
+
+   GLuint mCopyFBO, mBackBufferFBO;
+   GFXTexHandle mBackBufferColorTex, mBackBufferDepthTex;
    Point2I size;   
    GFXDevice* mDevice;
+   /// Is this a secondary window
+   bool mSecondaryWindow;
    void* mContext;
    void* mFullscreenContext;
    void _teardownCurrentMode();
    void _setupNewMode();
+   void _setupAttachments();
+   void _WindowPresent();
+   //set this windows context to be current
+   void _makeContextCurrent();
+   
 };
 
 #endif

@@ -27,6 +27,8 @@
 #include "aldlist.h"
 #if defined(TORQUE_OS_MAC)
 #include <OpenAL/alc.h>
+#elif defined(TORQUE_OS_LINUX)
+#include <AL/alc.h>
 #else
 #include <al/alc.h>
 #endif
@@ -161,9 +163,9 @@ const char *ALDeviceList::GetDeviceName(int index)
 void ALDeviceList::GetDeviceVersion(int index, int *major, int *minor)
 {
 	if (index < GetNumDevices()) {
-		if (*major)
+		if (major)
 			*major = vDeviceInfo[index].iMajorVersion;
-		if (*minor)
+		if (minor)
 			*minor = vDeviceInfo[index].iMinorVersion;
 	}
 	return;
@@ -172,7 +174,7 @@ void ALDeviceList::GetDeviceVersion(int index, int *major, int *minor)
 /*
  * Returns the maximum number of Sources that can be generate on the given device
  */
-unsigned int ALDeviceList::GetMaxNumSources(int index)
+U32 ALDeviceList::GetMaxNumSources(S32 index)
 {
 	if (index < GetNumDevices())
 		return vDeviceInfo[index].uiSourceCount;
@@ -204,10 +206,10 @@ int ALDeviceList::GetDefaultDevice()
 /* 
  * Deselects devices which don't have the specified minimum version
  */
-void ALDeviceList::FilterDevicesMinVer(int major, int minor)
+void ALDeviceList::FilterDevicesMinVer(S32 major, S32 minor)
 {
 	int dMajor, dMinor;
-	for (unsigned int i = 0; i < vDeviceInfo.size(); i++) {
+	for (U32 i = 0; i < vDeviceInfo.size(); i++) {
 		GetDeviceVersion(i, &dMajor, &dMinor);
 		if ((dMajor < major) || ((dMajor == major) && (dMinor < minor))) {
 			vDeviceInfo[i].bSelected = false;
@@ -218,10 +220,10 @@ void ALDeviceList::FilterDevicesMinVer(int major, int minor)
 /* 
  * Deselects devices which don't have the specified maximum version
  */
-void ALDeviceList::FilterDevicesMaxVer(int major, int minor)
+void ALDeviceList::FilterDevicesMaxVer(S32 major, S32 minor)
 {
-	int dMajor, dMinor;
-	for (unsigned int i = 0; i < vDeviceInfo.size(); i++) {
+	S32 dMajor, dMinor;
+	for (U32 i = 0; i < vDeviceInfo.size(); i++) {
 		GetDeviceVersion(i, &dMajor, &dMinor);
 		if ((dMajor > major) || ((dMajor == major) && (dMinor > minor))) {
 			vDeviceInfo[i].bSelected = false;
@@ -234,7 +236,7 @@ void ALDeviceList::FilterDevicesMaxVer(int major, int minor)
  */
 void ALDeviceList::FilterDevicesExtension(SFXALCaps cap)
 {
-	for (unsigned int i = 0; i < vDeviceInfo.size(); i++)
+	for (U32 i = 0; i < vDeviceInfo.size(); i++)
 		vDeviceInfo[i].bSelected = vDeviceInfo[i].iCapsFlags & cap;
 }
 
@@ -243,7 +245,7 @@ void ALDeviceList::FilterDevicesExtension(SFXALCaps cap)
  */
 void ALDeviceList::ResetFilters()
 {
-	for (int i = 0; i < GetNumDevices(); i++) {
+	for (S32 i = 0; i < GetNumDevices(); i++) {
 		vDeviceInfo[i].bSelected = true;
 	}
 	filterIndex = 0;
@@ -287,7 +289,7 @@ int ALDeviceList::GetNextFilteredDevice()
 unsigned int ALDeviceList::GetMaxNumSources()
 {
 	ALuint uiSources[256];
-	unsigned int iSourceCount = 0;
+	U32 iSourceCount = 0;
 
 	// Clear AL Error Code
 	ALFunction.alGetError();
@@ -304,7 +306,7 @@ unsigned int ALDeviceList::GetMaxNumSources()
 	ALFunction.alDeleteSources(iSourceCount, uiSources);
 	if (ALFunction.alGetError() != AL_NO_ERROR)
 	{
-		for (unsigned int i = 0; i < 256; i++)
+		for (U32 i = 0; i < 256; i++)
 		{
 			ALFunction.alDeleteSources(1, &uiSources[i]);
 		}

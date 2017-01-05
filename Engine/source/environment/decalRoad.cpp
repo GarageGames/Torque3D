@@ -155,8 +155,8 @@ void DecalRoadNodeEvent::padListToSize()
       newlist->mPositions.merge(list->mPositions);
       newlist->mWidths.merge(list->mWidths);
 
-      mNodeList = newlist;
       delete list;
+      mNodeList = list = newlist;
    }
 
    // Pad our list end?
@@ -272,11 +272,11 @@ SimObjectPtr<SimSet> DecalRoad::smServerDecalRoadSet = NULL;
 // Constructors
 
 DecalRoad::DecalRoad()
- : mLoadRenderData( true ),
-   mBreakAngle( 3.0f ),
+ : mBreakAngle( 3.0f ),
    mSegmentsPerBatch( 10 ),
    mTextureLength( 5.0f ),
    mRenderPriority( 10 ),
+   mLoadRenderData( true ),
    mMaterial( NULL ),
    mMatInst( NULL ),
    mUpdateEventId( -1 ),
@@ -721,7 +721,7 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
    if ( !smShowRoad && smEditorOpen )
       return;
 
-   const Frustum &frustum = state->getFrustum();
+   const Frustum &frustum = state->getCameraFrustum();
 
    MeshRenderInst coreRI;
    coreRI.clear();
@@ -732,7 +732,7 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
    MathUtils::getZBiasProjectionMatrix( gDecalBias, frustum, tempMat );
    coreRI.projection = tempMat;
 
-   coreRI.type = RenderPassManager::RIT_Decal;
+   coreRI.type = RenderPassManager::RIT_DecalRoad;
    coreRI.vertBuff = &mVB;
    coreRI.primBuff = &mPB;
    coreRI.matInst = matInst;
@@ -1452,7 +1452,8 @@ void DecalRoad::_captureVerts()
    mPB.set( GFX, mTriangleCount * 3, 0, GFXBufferTypeStatic );
 
    // Lock the VertexBuffer
-   GFXVertexPNTBT *vertPtr = mVB.lock();   
+   GFXVertexPNTBT *vertPtr = mVB.lock();
+   if(!vertPtr) return;
    U32 vertIdx = 0;
 
    //
@@ -1578,8 +1579,6 @@ void DecalRoad::_captureVerts()
       else      
          box.intersect( batch.bounds );               
    }
-
-   Point3F pos = getPosition();
 
    mWorldBox = box;
    resetObjectBox();

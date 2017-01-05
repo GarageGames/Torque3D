@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CONCAVE_SHAPE_H
-#define CONCAVE_SHAPE_H
+#ifndef BT_CONCAVE_SHAPE_H
+#define BT_CONCAVE_SHAPE_H
 
 #include "btCollisionShape.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
@@ -33,12 +33,14 @@ typedef enum PHY_ScalarType {
 
 ///The btConcaveShape class provides an interface for non-moving (static) concave shapes.
 ///It has been implemented by the btStaticPlaneShape, btBvhTriangleMeshShape and btHeightfieldTerrainShape.
-class btConcaveShape : public btCollisionShape
+ATTRIBUTE_ALIGNED16(class) btConcaveShape : public btCollisionShape
 {
 protected:
 	btScalar m_collisionMargin;
 
 public:
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+	
 	btConcaveShape();
 
 	virtual ~btConcaveShape();
@@ -57,4 +59,4 @@ public:
 
 };
 
-#endif //CONCAVE_SHAPE_H
+#endif //BT_CONCAVE_SHAPE_H

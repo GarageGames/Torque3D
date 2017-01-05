@@ -137,7 +137,7 @@ static S32 buildFileList(const char* pattern, bool recurse, bool multiMatch)
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( findFirstFile, String, ( const char* pattern, bool recurse ), ( true ),
+DefineEngineFunction( findFirstFile, String, ( const char* pattern, bool recurse ), ( "", true ),
    "@brief Returns the first file in the directory system matching the given pattern.\n\n"
 
    "Use the corresponding findNextFile() to step through "
@@ -209,7 +209,7 @@ DefineEngineFunction( findNextFile, String, ( const char* pattern ), ( "" ),
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( getFileCount, S32, ( const char* pattern, bool recurse ), ( true ),
+DefineEngineFunction( getFileCount, S32, ( const char* pattern, bool recurse ), ( "", true ),
 	"@brief Returns the number of files in the directory tree that match the given patterns\n\n"
 
    "This function differs from getFileCountMultiExpr() in that it supports a single search "
@@ -245,7 +245,7 @@ DefineEngineFunction( getFileCount, S32, ( const char* pattern, bool recurse ), 
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction(findFirstFileMultiExpr, String, ( const char* pattern, bool recurse ), (true),
+DefineEngineFunction(findFirstFileMultiExpr, String, ( const char* pattern, bool recurse ), ( "", true),
 	"@brief Returns the first file in the directory system matching the given patterns.\n\n"
 
    "Use the corresponding findNextFileMultiExpr() to step through "
@@ -327,7 +327,7 @@ DefineEngineFunction(findNextFileMultiExpr, String, ( const char* pattern ), (""
    return sgFindFilesResults[sgFindFilesPos++];
 }
 
-DefineEngineFunction(getFileCountMultiExpr, S32, ( const char* pattern, bool recurse ), (true),
+DefineEngineFunction(getFileCountMultiExpr, S32, ( const char* pattern, bool recurse ), ( "", true),
 	"@brief Returns the number of files in the directory tree that match the given patterns\n\n"
 
    "If you're interested in a list of files that match the given patterns and not just "
@@ -452,7 +452,7 @@ DefineEngineFunction(stopFileChangeNotifications, void, (),,
 }
 
 
-DefineEngineFunction(getDirectoryList, String, ( const char* path, S32 depth ), ( 0 ),
+DefineEngineFunction(getDirectoryList, String, ( const char* path, S32 depth ), ( "", 0 ),
 	"@brief Gathers a list of directories starting at the given path.\n\n"
 
 	"@param path String containing the path of the directory\n"
@@ -511,7 +511,7 @@ DefineEngineFunction(fileSize, S32, ( const char* fileName ),,
 	"@brief Determines the size of a file on disk\n\n"
 
 	"@param fileName Name and path of the file to check\n"
-	"@return Returns filesize in KB, or -1 if no file\n"
+	"@return Returns filesize in bytes, or -1 if no file\n"
 
 	"@ingroup FileSystem")
 {
@@ -599,10 +599,10 @@ DefineEngineFunction(fileExt, String, ( const char* fileName ),,
 }
 
 DefineEngineFunction(fileBase, String, ( const char* fileName ),,
-   "@brief Get the base of a file name (removes extension)\n\n"
+   "@brief Get the base of a file name (removes extension and path)\n\n"
 
    "@param fileName Name and path of file to check\n"
-   "@return String containing the file name, minus extension\n"
+   "@return String containing the file name, minus extension and path\n"
    "@ingroup FileSystem")
 {
 
@@ -626,10 +626,10 @@ DefineEngineFunction(fileBase, String, ( const char* fileName ),,
 }
 
 DefineEngineFunction(fileName, String, ( const char* fileName ),,
-	"@brief Get the file name of a file (removes extension and path)\n\n"
+	"@brief Get only the file name of a path and file name string (removes path)\n\n"
 
 	"@param fileName Name and path of file to check\n"
-	"@return String containing the file name, minus extension and path\n"
+	"@return String containing the file name, minus the path\n"
 	"@ingroup FileSystem")
 {
    S32 pathLen = dStrlen( fileName );
@@ -686,7 +686,7 @@ DefineEngineFunction(getWorkingDirectory, String, (),,
 // are just string processing functions. They are needed by the 3D tools which
 // are not currently built with TORQUE_TOOLS defined.
 
-DefineEngineFunction(makeFullPath, String, ( const char* path, const char* cwd ), (""),
+DefineEngineFunction(makeFullPath, String, ( const char* path, const char* cwd ), ( "", ""),
 	"@brief Converts a relative file path to a full path\n\n"
 
 	"For example, \"./console.log\" becomes \"C:/Torque/t3d/examples/FPS Example/game/console.log\"\n"
@@ -695,12 +695,13 @@ DefineEngineFunction(makeFullPath, String, ( const char* path, const char* cwd )
 	"@return String containing non-relative directory of path\n"
 	"@ingroup FileSystem")
 {
-   char *buf = Con::getReturnBuffer(512);
-   Platform::makeFullPathName(path, buf, 512, dStrlen(cwd) > 1 ? cwd : NULL);
+   static const U32 bufSize = 512;
+   char *buf = Con::getReturnBuffer(bufSize);
+   Platform::makeFullPathName(path, buf, bufSize, dStrlen(cwd) > 1 ? cwd : NULL);
    return buf;
 }
 
-DefineEngineFunction(makeRelativePath, String, ( const char* path, const char* to ), (""),
+DefineEngineFunction(makeRelativePath, String, ( const char* path, const char* to ), ( "", ""),
 	"@brief Turns a full or local path to a relative one\n\n"
 
    "For example, \"./game/art\" becomes \"game/art\"\n"
@@ -713,7 +714,7 @@ DefineEngineFunction(makeRelativePath, String, ( const char* path, const char* t
    return Platform::makeRelativePathName( path, dStrlen(to) > 1 ? to : NULL );
 }
 
-DefineEngineFunction(pathConcat, String, ( const char* path, const char* file),,
+DefineEngineFunction(pathConcat, String, ( const char* path, const char* file), ( "", ""),
 	"@brief Combines two separate strings containing a file path and file name together into a single string\n\n"
 
 	"@param path String containing file path\n"
@@ -721,8 +722,9 @@ DefineEngineFunction(pathConcat, String, ( const char* path, const char* file),,
 	"@return String containing concatenated file name and path\n"
 	"@ingroup FileSystem")
 {
-   char *buf = Con::getReturnBuffer(1024);
-   Platform::makeFullPathName(file, buf, 1024, path);
+   static const U32 bufSize = 1024;
+   char *buf = Con::getReturnBuffer(bufSize);
+   Platform::makeFullPathName(file, buf, bufSize, path);
    return buf;
 }
 
@@ -781,7 +783,7 @@ DefineEngineFunction( openFile, void, ( const char* file ),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( pathCopy, bool, ( const char* fromFile, const char* toFile, bool noOverwrite ), ( true ),
+DefineEngineFunction( pathCopy, bool, ( const char* fromFile, const char* toFile, bool noOverwrite ), ( "", "", true ),
    "@brief Copy a file to a new location.\n"
    "@param fromFile %Path of the file to copy.\n"
    "@param toFile %Path where to copy @a fromFile to.\n"

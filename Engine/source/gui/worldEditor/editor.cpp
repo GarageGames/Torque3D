@@ -23,6 +23,7 @@
 #include "gui/worldEditor/editor.h"
 #include "console/console.h"
 #include "console/consoleInternal.h"
+#include "console/engineAPI.h"
 #include "gui/controls/guiTextListCtrl.h"
 #include "T3D/shapeBase.h"
 #include "T3D/gameBase/gameConnection.h"
@@ -121,15 +122,14 @@ void EditManager::editorDisabled()
 static GameBase * getControlObj()
 {
    GameConnection * connection = GameConnection::getLocalClientConnection();
-   ShapeBase* control = 0;
+   GameBase* control = 0;
    if(connection)
-      control = dynamic_cast<ShapeBase*>(connection->getControlObject());
+      control = connection->getControlObject();
    return(control);
 }
 
-ConsoleMethod( EditManager, setBookmark, void, 3, 3, "(int slot)")
+DefineConsoleMethod( EditManager, setBookmark, void, (S32 val), , "(int slot)")
 {
-   S32 val = dAtoi(argv[2]);
    if(val < 0 || val > 9)
       return;
 
@@ -138,9 +138,8 @@ ConsoleMethod( EditManager, setBookmark, void, 3, 3, "(int slot)")
       object->mBookmarks[val] = control->getTransform();
 }
 
-ConsoleMethod( EditManager, gotoBookmark, void, 3, 3, "(int slot)")
+DefineConsoleMethod( EditManager, gotoBookmark, void, (S32 val), , "(int slot)")
 {
-   S32 val = dAtoi(argv[2]);
    if(val < 0 || val > 9)
       return;
 
@@ -149,17 +148,17 @@ ConsoleMethod( EditManager, gotoBookmark, void, 3, 3, "(int slot)")
       control->setTransform(object->mBookmarks[val]);
 }
 
-ConsoleMethod( EditManager, editorEnabled, void, 2, 2, "Perform the onEditorEnabled callback on all SimObjects and set gEditingMission true" )
+DefineConsoleMethod( EditManager, editorEnabled, void, (), , "Perform the onEditorEnabled callback on all SimObjects and set gEditingMission true" )
 {
    object->editorEnabled();
 }
 
-ConsoleMethod( EditManager, editorDisabled, void, 2, 2, "Perform the onEditorDisabled callback on all SimObjects and set gEditingMission false" )
+DefineConsoleMethod( EditManager, editorDisabled, void, (), , "Perform the onEditorDisabled callback on all SimObjects and set gEditingMission false" )
 {
    object->editorDisabled();
 }
 
-ConsoleMethod( EditManager, isEditorEnabled, bool, 2, 2, "Return the value of gEditingMission." )
+DefineConsoleMethod( EditManager, isEditorEnabled, bool, (), , "Return the value of gEditingMission." )
 {
    return gEditingMission;
 }

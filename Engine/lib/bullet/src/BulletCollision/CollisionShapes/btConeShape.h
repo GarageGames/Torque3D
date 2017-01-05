@@ -13,14 +13,14 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CONE_MINKOWSKI_H
-#define CONE_MINKOWSKI_H
+#ifndef BT_CONE_MINKOWSKI_H
+#define BT_CONE_MINKOWSKI_H
 
 #include "btConvexInternalShape.h"
 #include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h" // for the types
 
 ///The btConeShape implements a cone shape primitive, centered around the origin and aligned with the Y axis. The btConeShapeX is aligned around the X axis and btConeShapeZ around the Z axis.
-class btConeShape : public btConvexInternalShape
+ATTRIBUTE_ALIGNED16(class) btConeShape : public btConvexInternalShape
 
 {
 
@@ -32,6 +32,8 @@ class btConeShape : public btConvexInternalShape
 
 
 public:
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+	
 	btConeShape (btScalar radius,btScalar height);
 	
 	virtual btVector3	localGetSupportingVertex(const btVector3& vec) const;
@@ -40,6 +42,15 @@ public:
 
 	btScalar getRadius() const { return m_radius;}
 	btScalar getHeight() const { return m_height;}
+
+	void setRadius(const btScalar radius)
+	{
+		m_radius = radius;
+	}
+	void setHeight(const btScalar height)
+	{
+		m_height = height;
+	}
 
 
 	virtual void	calculateLocalInertia(btScalar mass,btVector3& inertia) const
@@ -81,6 +92,21 @@ public:
 		{
 			return m_coneIndices[1];
 		}
+
+	virtual btVector3	getAnisotropicRollingFrictionDirection() const
+	{
+		return btVector3 (0,1,0);
+	}
+
+	virtual void	setLocalScaling(const btVector3& scaling);
+	
+	
+	virtual	int	calculateSerializeBufferSize() const;
+	
+	///fills the dataBuffer and returns the struct name (and 0 on failure)
+	virtual	const char*	serialize(void* dataBuffer, btSerializer* serializer) const;
+	
+
 };
 
 ///btConeShape implements a Cone shape, around the X axis
@@ -88,13 +114,67 @@ class btConeShapeX : public btConeShape
 {
 	public:
 		btConeShapeX(btScalar radius,btScalar height);
+
+	virtual btVector3	getAnisotropicRollingFrictionDirection() const
+	{
+		return btVector3 (1,0,0);
+	}
+
+	//debugging
+	virtual const char*	getName()const
+	{
+		return "ConeX";
+	}
+	
+	
 };
 
 ///btConeShapeZ implements a Cone shape, around the Z axis
 class btConeShapeZ : public btConeShape
 {
-	public:
-		btConeShapeZ(btScalar radius,btScalar height);
+public:
+	btConeShapeZ(btScalar radius,btScalar height);
+
+	virtual btVector3	getAnisotropicRollingFrictionDirection() const
+	{
+		return btVector3 (0,0,1);
+	}
+
+	//debugging
+	virtual const char*	getName()const
+	{
+		return "ConeZ";
+	}
+	
+	
 };
-#endif //CONE_MINKOWSKI_H
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct	btConeShapeData
+{
+	btConvexInternalShapeData	m_convexInternalShapeData;
+	
+	int	m_upIndex;
+	
+	char	m_padding[4];
+};
+
+SIMD_FORCE_INLINE	int	btConeShape::calculateSerializeBufferSize() const
+{
+	return sizeof(btConeShapeData);
+}
+
+///fills the dataBuffer and returns the struct name (and 0 on failure)
+SIMD_FORCE_INLINE	const char*	btConeShape::serialize(void* dataBuffer, btSerializer* serializer) const
+{
+	btConeShapeData* shapeData = (btConeShapeData*) dataBuffer;
+	
+	btConvexInternalShape::serialize(&shapeData->m_convexInternalShapeData,serializer);
+	
+	shapeData->m_upIndex = m_coneIndices[1];
+	
+	return "btConeShapeData";
+}
+
+#endif //BT_CONE_MINKOWSKI_H
 

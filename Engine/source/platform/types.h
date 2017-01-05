@@ -23,8 +23,15 @@
 #ifndef _TORQUE_TYPES_H_
 #define _TORQUE_TYPES_H_
 
-//------------------------------------------------------------------------------
-//-------------------------------------- Basic Types...
+#if (defined _MSC_VER) && (_MSC_VER <= 1500)
+#include "platformWin32/stdint.h"
+#else
+#include <stdint.h>
+#endif
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-----------------------------------------Basic Types--------------------------------------------------//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef signed char        S8;      ///< Compiler independent Signed Char
 typedef unsigned char      U8;      ///< Compiler independent Unsigned Char
@@ -38,22 +45,34 @@ typedef unsigned int       U32;     ///< Compiler independent Unsigned 32-bit in
 typedef float              F32;     ///< Compiler independent 32-bit float
 typedef double             F64;     ///< Compiler independent 64-bit float
 
-struct EmptyType {};             ///< "Null" type used by templates
+struct EmptyType {};                ///< "Null" type used by templates
 
-#define TORQUE_UNUSED(var) (void)var
+#define TORQUE_UNUSED(var) (void)sizeof(var)
 
-//------------------------------------------------------------------------------
-//------------------------------------- String Types
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//----------------------------------------String Types--------------------------------------------------//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 typedef char           UTF8;        ///< Compiler independent 8  bit Unicode encoded character
+
+#if defined(_MSC_VER) && defined(__clang__)
+// Clang's MSVC compatibility mode doesn't currently support /Zc:wchar_t-,
+// which we rely on to avoid type conversion errors when calling system
+// APIs when UTF16 is defined as unsigned short.  So, just define UTF16
+// as wchar_t instead since it's always a 2 byte unsigned on windows anyway.
+typedef wchar_t        UTF16;
+#else
 typedef unsigned short UTF16;       ///< Compiler independent 16 bit Unicode encoded character
+#endif
+
 typedef unsigned int   UTF32;       ///< Compiler independent 32 bit Unicode encoded character
 
 typedef const char* StringTableEntry;
 
-//------------------------------------------------------------------------------
-//-------------------------------------- Type constants...
-#define __EQUAL_CONST_F F32(0.000001)                             ///< Constant float epsilon used for F32 comparisons
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//-------------------------------------- Type constants-------------------------------------------------//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#define __EQUAL_CONST_F F32(0.000001)                                  ///< Constant float epsilon used for F32 comparisons
 
 extern const F32 Float_Inf;
 static const F32 Float_One  = F32(1.0);                           ///< Constant float 1.0
@@ -109,67 +128,28 @@ static const F32 F32_MAX = F32(3.402823466e+38F);                 ///< Constant 
 #endif
 
 /// Integral type matching the host's memory address width.
-#ifdef TORQUE_64BITS
+#ifdef TORQUE_CPU_X64
    typedef U64 MEM_ADDRESS;
 #else
    typedef U32 MEM_ADDRESS;
 #endif
 
-//-------------------------------------- Some all-around useful inlines and globals
-//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//---------------------------------------- GeneralMath Helpers ---------------------------------------- //
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Returns power of 2 number which is as small as possible but
-/// still greater than or equal to input number.  Note: returns 0
-/// for an input of 0 even though that is not a power of 2.
-/// @param num Any U32
-inline U32 getNextPow2(U32 num)
-{
-   // Taken from: http://graphics.stanford.edu/~seander/bithacks.html
-
-   num--;
-   num |= num >> 1;
-   num |= num >> 2;
-   num |= num >> 4;
-   num |= num >> 8;
-   num |= num >> 16;
-   num++;
-
-   return num;
-}
-
-/// Return integer log2 of input number (rounding down).  So, e.g.,
-/// getBinLog2(7) == 2 whereas getBinLog2(8) == 3.  If known
-/// @param num Any U32
-/// @param knownPow2 Is num a known power of 2?
-inline U32 getBinLog2(U32 num, bool knownPow2 = false)
-{
-   // Taken from: http://graphics.stanford.edu/~seander/bithacks.html
-   
-   static const U32 MultiplyDeBruijnBitPosition[32] = 
-   {
-      0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8, 
-      31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
-   };
-   
-   if (!knownPow2)
-   {
-      num |= num >> 1; // first round down to power of 2 
-      num |= num >> 2;
-      num |= num >> 4;
-      num |= num >> 8;
-      num |= num >> 16;
-      num = (num >> 1) + 1;
-   }
-   
-   return MultiplyDeBruijnBitPosition[(num * 0x077CB531UL) >> 27];
-}
-
-///   Determines if the given U32 is some 2^n
-/// @param num Any U32
-///   @returns true if in_num is a power of two, otherwise false
+/// Determines if number is a power of two.
+/// Zero is not a power of two. So we want take into account that edge case
 inline bool isPow2(const U32 num)
 {
-   return (num & (num - 1)) == 0;
+   return (num != 0) && ((num & (num - 1)) == 0);
+}
+
+/// Determines the binary logarithm of the input value rounded down to the nearest power of 2.
+inline U32 getBinLog2(U32 value)
+{
+   F32 floatValue = F32(value);
+   return (*((U32 *) &floatValue) >> 23) - 127;
 }
 
 /// Determines the binary logarithm of the next greater power of two of the input number.
@@ -178,119 +158,46 @@ inline U32 getNextBinLog2(U32 number)
    return getBinLog2(number) + (isPow2(number) ? 0 : 1);
 }
 
-//----------------Many versions of min and max-------------
-//---not using template functions because MS VC++ chokes---
-
-/// Returns the lesser of the two parameters: a & b.
-inline U32 getMin(U32 a, U32 b)
+/// Determines the next greater power of two from the value. If the value is a power of two, it is returned.
+inline U32 getNextPow2(U32 value)
 {
-   return a>b ? b : a;
+   return isPow2(value) ? value : (1 << (getBinLog2(value) + 1));
 }
 
-/// Returns the lesser of the two parameters: a & b.
-inline U16 getMin(U16 a, U16 b)
-{
-   return a>b ? b : a;
-}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//------------------------------------Many versions of min and max--------------------------------------//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Returns the lesser of the two parameters: a & b.
-inline U8 getMin(U8 a, U8 b)
-{
-   return a>b ? b : a;
-}
+#define DeclareTemplatizedMinMax(type) \
+  inline type getMin(type a, type b) { return a > b ? b : a; } \
+  inline type getMax(type a, type b) { return a > b ? a : b; }
 
-/// Returns the lesser of the two parameters: a & b.
-inline S32 getMin(S32 a, S32 b)
-{
-   return a>b ? b : a;
-}
+DeclareTemplatizedMinMax( U32 )
+DeclareTemplatizedMinMax( S32 )
+DeclareTemplatizedMinMax( U16 )
+DeclareTemplatizedMinMax( S16 )
+DeclareTemplatizedMinMax( U8 )
+DeclareTemplatizedMinMax( S8 )
+DeclareTemplatizedMinMax( F32 )
+DeclareTemplatizedMinMax( F64 )
 
-/// Returns the lesser of the two parameters: a & b.
-inline S16 getMin(S16 a, S16 b)
-{
-   return a>b ? b : a;
-}
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
+//------------------------------------------------FOURCC------------------------------------------------//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Returns the lesser of the two parameters: a & b.
-inline S8 getMin(S8 a, S8 b)
-{
-   return a>b ? b : a;
-}
-
-/// Returns the lesser of the two parameters: a & b.
-inline float getMin(float a, float b)
-{
-   return a>b ? b : a;
-}
-
-/// Returns the lesser of the two parameters: a & b.
-inline double getMin(double a, double b)
-{
-   return a>b ? b : a;
-}
-
-/// Returns the greater of the two parameters: a & b.
-inline U32 getMax(U32 a, U32 b)
-{
-   return a>b ? a : b;
-}
-
-/// Returns the greater of the two parameters: a & b.
-inline U16 getMax(U16 a, U16 b)
-{
-   return a>b ? a : b;
-}
-
-/// Returns the greater of the two parameters: a & b.
-inline U8 getMax(U8 a, U8 b)
-{
-   return a>b ? a : b;
-}
-
-/// Returns the greater of the two parameters: a & b.
-inline S32 getMax(S32 a, S32 b)
-{
-   return a>b ? a : b;
-}
-
-/// Returns the greater of the two parameters: a & b.
-inline S16 getMax(S16 a, S16 b)
-{
-   return a>b ? a : b;
-}
-
-/// Returns the greater of the two parameters: a & b.
-inline S8 getMax(S8 a, S8 b)
-{
-   return a>b ? a : b;
-}
-
-/// Returns the greater of the two parameters: a & b.
-inline float getMax(float a, float b)
-{
-   return a>b ? a : b;
-}
-
-/// Returns the greater of the two parameters: a & b.
-inline double getMax(double a, double b)
-{
-   return a>b ? a : b;
-}
-
-//-------------------------------------- Use this instead of Win32 FOURCC()
-//                                        macro...
-//
-#define makeFourCCTag(ch0, ch1, ch2, ch3)    \
-   (((U32(ch0) & 0xFF) << 0)  |             \
-    ((U32(ch1) & 0xFF) << 8)  |             \
-    ((U32(ch2) & 0xFF) << 16) |             \
-    ((U32(ch3) & 0xFF) << 24) )
-
-#define makeFourCCString(ch0, ch1, ch2, ch3) { ch0, ch1, ch2, ch3 }
+#if defined(TORQUE_BIG_ENDIAN)
+#define makeFourCCTag(c0,c1,c2,c3) ((U32) ((((U32)((U8)(c0)))<<24) + (((U32)((U8)(c1)))<<16) + (((U32)((U8)(c2)))<<8) + ((((U32)((U8)(c3))))))
+#else
+#ifdef TORQUE_LITTLE_ENDIAN
+#define makeFourCCTag(c3,c2,c1,c0) ((U32) ((((U32)((U8)(c0)))<<24) + (((U32)((U8)(c1)))<<16) + (((U32)((U8)(c2)))<<8) + (((U32)((U8)(c3))))))
+#else
+#error BYTE_ORDER not defined
+#endif
+#endif
 
 #define BIT(x) (1 << (x))                       ///< Returns value with bit x set (2^x)
 
-#if defined(TORQUE_OS_WIN32)
+#if defined(TORQUE_OS_WIN)
 #define STDCALL __stdcall
 #else
 #define STDCALL

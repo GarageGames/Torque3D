@@ -60,8 +60,6 @@ SFXVoice* SFXNullDevice::createVoice( bool is3D, SFXBuffer *buffer )
    AssertFatal( nullBuffer, "SFXNullDevice::createVoice() - Got bad buffer!" );
 
    SFXNullVoice* voice = new SFXNullVoice( nullBuffer );
-   if ( !voice )
-      return NULL;
 
    _addVoice( voice );
 	return voice;

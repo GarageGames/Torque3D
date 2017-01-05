@@ -13,8 +13,8 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef OVERLAPPING_PAIR_CACHE_H
-#define OVERLAPPING_PAIR_CACHE_H
+#ifndef BT_OVERLAPPING_PAIR_CACHE_H
+#define BT_OVERLAPPING_PAIR_CACHE_H
 
 
 #include "btBroadphaseInterface.h"
@@ -94,7 +94,12 @@ class btHashedOverlappingPairCache : public btOverlappingPairCache
 {
 	btBroadphasePairArray	m_overlappingPairArray;
 	btOverlapFilterCallback* m_overlapFilterCallback;
-	bool		m_blockedForChanges;
+
+protected:
+	
+	btAlignedObjectArray<int>	m_hashTable;
+	btAlignedObjectArray<int>	m_next;
+	btOverlappingPairCallback*	m_ghostPairCallback;
 
 
 public:
@@ -265,11 +270,6 @@ private:
 	virtual void	sortOverlappingPairs(btDispatcher* dispatcher);
 	
 
-protected:
-	
-	btAlignedObjectArray<int>	m_hashTable;
-	btAlignedObjectArray<int>	m_next;
-	btOverlappingPairCallback*	m_ghostPairCallback;
 	
 };
 
@@ -457,12 +457,13 @@ public:
 	
 	virtual void	sortOverlappingPairs(btDispatcher* dispatcher)
 	{
+        (void) dispatcher;
 	}
 
 
 };
 
 
-#endif //OVERLAPPING_PAIR_CACHE_H
+#endif //BT_OVERLAPPING_PAIR_CACHE_H
 
 

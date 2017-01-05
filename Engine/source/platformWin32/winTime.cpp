@@ -66,7 +66,7 @@ String Platform::localTimeToString( const LocalTime &lt )
    
    TCHAR buffer[1024] = {0};
 
-   int result = 0;
+   S32 result = 0;
 
    String outStr;
 
@@ -139,7 +139,7 @@ void Platform::fileToLocalTime(const FileTime & ft, LocalTime * lt)
          lt->sec = time->wSecond;
          lt->min = time->wMinute;
          lt->hour = time->wHour;
-         lt->month = time->wMonth;
+         lt->month = time->wMonth - 1;
          lt->monthday = time->wDay;
          lt->weekday = time->wDayOfWeek;
          lt->year = (time->wYear < 1900) ? 1900 : (time->wYear - 1900);

@@ -23,6 +23,7 @@
 #include "platform/platform.h"
 #include "util/messaging/eventManager.h"
 
+#include "console/engineAPI.h"
 #include "console/consoleTypes.h"
 #include "console/consoleInternal.h"
 
@@ -418,30 +419,30 @@ void EventManager::dumpSubscribers()
 //-----------------------------------------------------------------------------
 // Console Methods
 //-----------------------------------------------------------------------------
-ConsoleMethod( EventManager, registerEvent, bool, 3, 3, "( String event )\n"
+DefineConsoleMethod( EventManager, registerEvent, bool, ( const char * evt ), , "( String event )\n"
               "Register an event with the event manager.\n"
               "@param event The event to register.\n"
               "@return Whether or not the event was registered successfully." )
 {
-   return object->registerEvent( argv[2] );
+   return object->registerEvent( evt );
 }
 
-ConsoleMethod( EventManager, unregisterEvent, void, 3, 3, "( String event )\n"
+DefineConsoleMethod( EventManager, unregisterEvent, void, ( const char * evt ), , "( String event )\n"
               "Remove an event from the EventManager.\n"
               "@param event The event to remove.\n" )
 {
-   object->unregisterEvent( argv[2] );
+   object->unregisterEvent( evt );
 }
 
-ConsoleMethod( EventManager, isRegisteredEvent, bool, 3, 3, "( String event )\n"
+DefineConsoleMethod( EventManager, isRegisteredEvent, bool, ( const char * evt ), , "( String event )\n"
               "Check if an event is registered or not.\n"
               "@param event The event to check.\n"
               "@return Whether or not the event exists." )
 {
-   return object->isRegisteredEvent( argv[2] );
+   return object->isRegisteredEvent( evt );
 }
 
-ConsoleMethod( EventManager, postEvent, bool, 3, 4, "( String event, String data )\n"
+DefineConsoleMethod( EventManager, postEvent, bool, ( const char * evt, const char * data ), (""), "( String event, String data )\n"
               "~Trigger an event.\n"
               "@param event The event to trigger.\n"
               "@param data The data associated with the event.\n"
@@ -453,10 +454,10 @@ ConsoleMethod( EventManager, postEvent, bool, 3, 4, "( String event, String data
       return false;
    }
 
-   return object->postEvent( argv[2], argc > 3 ? argv[3] : "" );
+   return object->postEvent( evt, data );
 }
 
-ConsoleMethod( EventManager, subscribe, bool, 4, 5, "( SimObject listener, String event, String callback )\n\n"
+DefineConsoleMethod( EventManager, subscribe, bool, ( const char * listenerName, const char * evt, const char * callback ), (""), "( SimObject listener, String event, String callback )\n\n"
               "Subscribe a listener to an event.\n"
               "@param listener The listener to subscribe.\n"
               "@param event The event to subscribe to.\n"
@@ -464,49 +465,50 @@ ConsoleMethod( EventManager, subscribe, bool, 4, 5, "( SimObject listener, Strin
               "@return Whether or not the subscription was successful." )
 {
    // Find the listener object.
-   SimObject *cbObj = dynamic_cast<SimObject *>(Sim::findObject(argv[2]));
+   SimObject *cbObj = dynamic_cast<SimObject *>(Sim::findObject(listenerName));
    if( cbObj == NULL )
    {
       Con::warnf( "EventManager::subscribe - Invalid listener." );
       return false;
    }
 
-   return object->subscribe( cbObj, argv[3], argc > 4 ? argv[4] : NULL );
+   return object->subscribe( cbObj, evt, callback );
 }
 
-ConsoleMethod( EventManager, remove, void, 4, 4, "( SimObject listener, String event )\n\n"
+DefineConsoleMethod( EventManager, remove, void, ( const char * listenerName, const char * evt), , "( SimObject listener, String event )\n\n"
               "Remove a listener from an event.\n"
               "@param listener The listener to remove.\n"
               "@param event The event to be removed from.\n")
 {
    // Find the listener object.
-   SimObject * listener = dynamic_cast< SimObject * >( Sim::findObject( argv[2] ) );
+   SimObject * listener = dynamic_cast< SimObject * >( Sim::findObject( listenerName ) );
    if( listener )
-      object->remove( listener, argv[3] );
+      object->remove( listener, evt );
 }
 
-ConsoleMethod( EventManager, removeAll, void, 3, 3, "( SimObject listener )\n\n"
+DefineConsoleMethod( EventManager, removeAll, void, ( const char * listenerName ), , "( SimObject listener )\n\n"
               "Remove a listener from all events.\n"
               "@param listener The listener to remove.\n")
 {
    // Find the listener object.
-   SimObject * listener = dynamic_cast< SimObject * >( Sim::findObject( argv[2] ) );
+
+   SimObject * listener = dynamic_cast< SimObject * >( Sim::findObject( listenerName ) );
    if( listener )
       object->removeAll( listener );
 }
 
-ConsoleMethod( EventManager, dumpEvents, void, 2, 2, "()\n\n"
+DefineConsoleMethod( EventManager, dumpEvents, void, (), , "()\n\n"
               "Print all registered events to the console." )
 {
    object->dumpEvents();
 }
 
-ConsoleMethod( EventManager, dumpSubscribers, void, 2, 3, "( String event )\n\n"
+DefineConsoleMethod( EventManager, dumpSubscribers, void, ( const char * listenerName ), (""), "( String event )\n\n"
               "Print all subscribers to an event to the console.\n"
               "@param event The event whose subscribers are to be printed. If this parameter isn't specified, all events will be dumped." )
 {
-   if( argc > 2 )
-      object->dumpSubscribers( argv[2] );
+   if (dStrcmp(listenerName, "") != 0)
+      object->dumpSubscribers( listenerName );
    else
       object->dumpSubscribers();
 }

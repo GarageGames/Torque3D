@@ -20,16 +20,18 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "shaderModel.hlsl"
+
 struct Vertex
 {
-   float4 pos : POSITION;
+   float3 pos : POSITION;
    float4 color : COLOR0;
    float2 uv0 : TEXCOORD0;
 };
 
 struct Conn
 {
-   float4 hpos : POSITION;
+   float4 hpos : TORQUE_POSITION;
    float4 color : TEXCOORD0;
    float2 uv0 : TEXCOORD1;
 	float4 pos : TEXCOORD2;
@@ -43,8 +45,8 @@ Conn main( Vertex In )
 {
    Conn Out;
 
-   Out.hpos = mul( modelViewProj, In.pos );
-	Out.pos = mul( fsModelViewProj, In.pos );
+   Out.hpos = mul( modelViewProj, float4(In.pos,1.0) );
+   Out.pos = mul(fsModelViewProj, float4(In.pos, 1.0) );
 	Out.color = In.color;
 	Out.uv0 = In.uv0;
 	

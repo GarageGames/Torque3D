@@ -310,8 +310,8 @@ void NetConnection::eventReadPacket(BitStream *bstream)
          setLastError("Invalid packet. (bad event class id)");
          return;
       }
-      NetEvent *evt = (NetEvent *) ConsoleObject::create(getNetClassGroup(), NetClassTypeEvent, classId);
-      if(!evt)
+      StrongRefPtr<NetEvent> evt = (NetEvent *) ConsoleObject::create(getNetClassGroup(), NetClassTypeEvent, classId);
+      if(evt.isNull())
       {
          setLastError("Invalid packet. (bad ghost class id)");
          return;
@@ -344,7 +344,7 @@ void NetConnection::eventReadPacket(BitStream *bstream)
       if(unguaranteedPhase)
       {
          evt->process(this);
-         evt->decRef();
+         evt = NULL;
          if(mErrorBuffer.isNotEmpty())
             return;
          continue;

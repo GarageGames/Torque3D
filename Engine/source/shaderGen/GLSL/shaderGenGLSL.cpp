@@ -22,8 +22,9 @@
 
 #include "platform/platform.h"
 #include "shaderGen/GLSL/shaderGenGLSL.h"
-
 #include "shaderGen/GLSL/shaderCompGLSL.h"
+#include "shaderGen/featureMgr.h"
+#include "gfx/gl/tGL/tGL.h"
 
 
 void ShaderGenPrinterGLSL::printShaderHeader( Stream& stream )
@@ -56,19 +57,39 @@ void ShaderGenPrinterGLSL::printMainComment( Stream& stream )
 
 void ShaderGenPrinterGLSL::printVertexShaderCloser( Stream& stream )
 {
-   const char *closer = "}\r\n";
+   // We are render OpenGL upside down for use DX9 texture coords.
+   // Must be the last vertex feature.
+   const char *closer = "   gl_Position.y *= -1;\r\n}\r\n";
    stream.write( dStrlen(closer), closer );
 }
 
 void ShaderGenPrinterGLSL::printPixelShaderOutputStruct( Stream& stream, const MaterialFeatureData &featureData )
 {
-   // Nothing here
+    // Determine the number of output targets we need
+    U32 numMRTs = 0;
+    for (U32 i = 0; i < FEATUREMGR->getFeatureCount(); i++)
+    {
+        const FeatureInfo &info = FEATUREMGR->getAt(i);
+        if (featureData.features.hasFeature(*info.type))
+            numMRTs |= info.feature->getOutputTargets(featureData);
+    }
+
+    WRITESTR(avar("//Fragment shader OUT\r\n"));
+    WRITESTR(avar("out vec4 OUT_col;\r\n"));
+    for( U32 i = 1; i < 4; i++ )
+    {
+        if( numMRTs & 1 << i )
+            WRITESTR(avar("out vec4 OUT_col%d;\r\n", i));
+    }
+
+    WRITESTR("\r\n");
+    WRITESTR("\r\n");
 }
 
 void ShaderGenPrinterGLSL::printPixelShaderCloser( Stream& stream )
 {
-   const char *closer = "   gl_FragColor = col;\r\n}\r\n";
-   stream.write( dStrlen(closer), closer );
+    const char *closer = "   \r\n}\r\n";
+    stream.write( dStrlen(closer), closer );
 }
 
 void ShaderGenPrinterGLSL::printLine(Stream& stream, const String& line)
@@ -91,6 +112,9 @@ const char* ShaderGenComponentFactoryGLSL::typeToString( GFXDeclType type )
 
       case GFXDeclType_Float3:
          return "vec3";
+
+      case GFXDeclType_UByte4:
+         return "vec4";
 
       case GFXDeclType_Float4:
       case GFXDeclType_Color:
@@ -124,6 +148,11 @@ ShaderComponent* ShaderGenComponentFactoryGLSL::createVertexInputConnector( cons
          var = vertComp->getElement( RT_TANGENT );
          var->setName( "T" );
       }
+      else if ( element.isSemantic( GFXSemantic::TANGENTW ) )
+      {
+         var = vertComp->getElement( RT_TANGENTW );
+         var->setName( "tangentW" );
+      }
       else if ( element.isSemantic( GFXSemantic::BINORMAL ) )
       {
          var = vertComp->getElement( RT_BINORMAL );
@@ -133,6 +162,16 @@ ShaderComponent* ShaderGenComponentFactoryGLSL::createVertexInputConnector( cons
       {
          var = vertComp->getElement( RT_COLOR );
          var->setName( "diffuse" );
+      }
+      else if (element.isSemantic(GFXSemantic::BLENDINDICES))
+      {
+         var = vertComp->getElement(RT_BLENDINDICES);
+         var->setName(String::ToString("vBlendIndex%d", element.getSemanticIndex()));
+      }
+      else if (element.isSemantic(GFXSemantic::BLENDWEIGHT))
+      {
+         var = vertComp->getElement(RT_BLENDWEIGHT);
+         var->setName(String::ToString("vBlendWeight%d", element.getSemanticIndex()));
       }
       else if ( element.isSemantic( GFXSemantic::TEXCOORD ) )
       {
@@ -152,7 +191,7 @@ ShaderComponent* ShaderGenComponentFactoryGLSL::createVertexInputConnector( cons
       if ( !var )
          continue;
 
-      var->setStructName( "" );
+      var->setStructName( "IN" );
       var->setType( typeToString( element.getType() ) );
    }
 

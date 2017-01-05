@@ -1450,9 +1450,8 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
          }
          else
          {
-            // Handle rotation (QuatF)
-            QuatF quat(pEvent->fValue, pEvent->fValue2, pEvent->fValue3, pEvent->fValue4);
-            AngAxisF aa(quat);
+            // Handle rotation (AngAxisF)
+            AngAxisF aa(Point3F(pEvent->fValue, pEvent->fValue2, pEvent->fValue3), pEvent->fValue4);
             aa.axis.normalize();
             argv[1] = Con::getFloatArg( aa.axis.x );
             argv[2] = Con::getFloatArg( aa.axis.y );
@@ -1508,9 +1507,9 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
             else
             {
                if( value > 0 )
-                  value = ( value - pNode->deadZoneBegin ) * ( 1.f / ( 1.f - pNode->deadZoneBegin ) );
+                  value = ( value - pNode->deadZoneEnd ) * ( 1.f / ( 1.f - pNode->deadZoneEnd ) );
                else
-                  value = ( value + pNode->deadZoneBegin ) * ( 1.f / ( 1.f - pNode->deadZoneBegin ) );
+                  value = ( value - pNode->deadZoneBegin ) * ( 1.f / ( 1.f + pNode->deadZoneBegin ) );
             }
          }
 
@@ -1872,7 +1871,8 @@ static ConsoleDocFragment _ActionMapbind2(
 ConsoleMethod( ActionMap, bind, bool, 5, 10, "actionMap.bind( device, action, [modifier spec, mod...], command )" 
 			  "@hide")
 {
-   return object->processBind( argc - 2, argv + 2, NULL );
+   StringStackWrapper args(argc - 2, argv + 2);
+   return object->processBind( args.count(), args, NULL );
 }
 
 static ConsoleDocFragment _ActionMapbindObj1(
@@ -1920,14 +1920,15 @@ static ConsoleDocFragment _ActionMapbindObj2(
 ConsoleMethod( ActionMap, bindObj, bool, 6, 11, "(device, action, [modifier spec, mod...], command, object)"
 			  "@hide")
 {
-    SimObject* simObject = Sim::findObject(argv[argc - 1]);
-    if ( simObject == NULL )
-    {
-        Con::warnf("ActionMap::bindObj() - Cannot bind, specified object was not found!");
-        return false;
-    }
+   SimObject* simObject = Sim::findObject(argv[argc - 1]);
+   if ( simObject == NULL )
+   {
+      Con::warnf("ActionMap::bindObj() - Cannot bind, specified object was not found!");
+      return false;
+   }
 
-    return object->processBind( argc - 3, argv + 2, simObject );
+   StringStackWrapper args(argc - 3, argv + 2);
+   return object->processBind( args.count(), args, simObject );
 }
 
 //------------------------------------------------------------------------------

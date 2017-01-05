@@ -81,9 +81,6 @@ function EditorPlugin::onEditorSleep( %this )
 /// Push Gui's, stuff like that
 function EditorPlugin::onActivated( %this )
 {
-   if(isDemo())
-      startToolTime(%this.getName());
-      
    %this.isActivated = true;
 }
 
@@ -91,9 +88,6 @@ function EditorPlugin::onActivated( %this )
 /// Pop Gui's, stuff like that
 function EditorPlugin::onDeactivated( %this )
 {
-   if(isDemo())
-      endToolTime(%this.getName());
-      
    %this.isActivated = false;
 }
 

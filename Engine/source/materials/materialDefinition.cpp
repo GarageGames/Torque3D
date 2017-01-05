@@ -24,6 +24,7 @@
 #include "materials/materialDefinition.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "math/mathTypes.h"
 #include "materials/materialManager.h"
 #include "sceneData.h"
@@ -34,6 +35,7 @@
 #include "sfx/sfxTrack.h"
 #include "sfx/sfxTypes.h"
 #include "core/util/safeDelete.h"
+#include "T3D/accumulationVolume.h"
 
 
 IMPLEMENT_CONOBJECT( Material );
@@ -116,8 +118,16 @@ Material::Material()
       mSpecular[i].set( 1.0f, 1.0f, 1.0f, 1.0f );
 
       mSpecularPower[i] = 8.0f;
+      mSpecularStrength[i] = 1.0f;
       mPixelSpecular[i] = false;
 
+      mAccuEnabled[i]   = false;
+      mAccuScale[i]     = 1.0f;
+      mAccuDirection[i] = 1.0f;
+      mAccuStrength[i]  = 0.6f;
+      mAccuCoverage[i]  = 0.9f;
+      mAccuSpecular[i]  = 16.0f;
+	  
       mParallaxScale[i] = 0.0f;
 
       mVertLit[i] = false;
@@ -152,6 +162,9 @@ Material::Material()
 
       mSeqFramePerSec[i] = 0.0f;
       mSeqSegSize[i] = 0.0f;
+
+      // Deferred Shading
+      mMatInfoFlags[i] = 0.0f;
    }
 
    dMemset(mCellIndex, 0, sizeof(mCellIndex));
@@ -159,6 +172,9 @@ Material::Material()
    dMemset(mCellSize, 0, sizeof(mCellSize));
    dMemset(mNormalMapAtlas, 0, sizeof(mNormalMapAtlas));
    dMemset(mUseAnisotropic, 0, sizeof(mUseAnisotropic));
+
+   // Deferred Shading : Metalness
+   dMemset(mUseMetalness, 0, sizeof(mUseMetalness));
 
    mImposterLimits = Point4F::Zero;
 
@@ -172,6 +188,7 @@ Material::Material()
    mAlphaRef = 1;
 
    mCastShadows = true;
+   mCastDynamicShadows = false;
 
    mPlanarReflection = false;
 
@@ -239,12 +256,33 @@ void Material::initPersistFields()
          "The color of the specular highlight when not using a specularMap." );
 
       addField("specularPower", TypeF32, Offset(mSpecularPower, Material), MAX_STAGES,
-         "The intensity of the specular highlight when not using a specularMap." );
+         "The hardness of the specular highlight when not using a specularMap." );
+
+		addField("specularStrength", TypeF32, Offset(mSpecularStrength, Material), MAX_STAGES,
+         "The strength of the specular highlight when not using a specularMap." );
 
       addField("pixelSpecular", TypeBool, Offset(mPixelSpecular, Material), MAX_STAGES, 
          "This enables per-pixel specular highlights controlled by the alpha channel of the "
          "normal map texture.  Note that if pixel specular is enabled the DXTnm format will not "
          "work with your normal map, unless you are also using a specular map." );
+
+      addProtectedField( "accuEnabled", TYPEID< bool >(), Offset( mAccuEnabled, Material ),
+            &_setAccuEnabled, &defaultProtectedGetFn, MAX_STAGES, "Accumulation texture." );
+
+      addField("accuScale",      TypeF32, Offset(mAccuScale, Material), MAX_STAGES,
+         "The scale that is applied to the accu map texture. You can use this to fit the texture to smaller or larger objects.");
+		 
+      addField("accuDirection",  TypeF32, Offset(mAccuDirection, Material), MAX_STAGES,
+         "The direction of the accumulation. Chose whether you want the accu map to go from top to bottom (ie. snow) or upwards (ie. mold).");
+		 
+      addField("accuStrength",   TypeF32, Offset(mAccuStrength, Material), MAX_STAGES,
+         "The strength of the accu map. This changes the transparency of the accu map texture. Make it subtle or add more contrast.");
+		 
+      addField("accuCoverage",   TypeF32, Offset(mAccuCoverage, Material), MAX_STAGES,
+         "The coverage ratio of the accu map texture. Use this to make the entire shape pick up some of the accu map texture or none at all.");
+		 
+      addField("accuSpecular",   TypeF32, Offset(mAccuSpecular, Material), MAX_STAGES,
+         "Changes specularity to this value where the accumulated material is present.");
 
       addField( "specularMap", TypeImageFilename, Offset(mSpecularMapFilename, Material), MAX_STAGES,
          "The specular map texture. The RGB channels of this texture provide a per-pixel replacement for the 'specular' parameter on the material. "
@@ -257,10 +295,7 @@ void Material::initPersistFields()
       
       addField( "useAnisotropic", TypeBool, Offset(mUseAnisotropic, Material), MAX_STAGES,
          "Use anisotropic filtering for the textures of this stage." );
-
-      addField("envMap", TypeImageFilename, Offset(mEnvMapFilename, Material), MAX_STAGES,
-         "The name of an environment map cube map to apply to this material." );
-
+     
       addField("vertLit", TypeBool, Offset(mVertLit, Material), MAX_STAGES,
          "If true the vertex color is used for lighting." );
 
@@ -347,9 +382,6 @@ void Material::initPersistFields()
       addProtectedField("bumpTex",        TypeImageFilename,   Offset(mNormalMapFilename, Material),
          defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES, 
          "For backwards compatibility.\n@see normalMap\n"); 
-      addProtectedField("envTex",         TypeImageFilename,   Offset(mEnvMapFilename, Material),
-         defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
-         "For backwards compatibility.\n@see envMap\n"); 
       addProtectedField("colorMultiply",  TypeColorF,          Offset(mDiffuse, Material),
          defaultProtectedSetNotEmptyFn, emptyStringProtectedGetFn, MAX_STAGES,
          "For backwards compatibility.\n@see diffuseColor\n"); 
@@ -358,6 +390,9 @@ void Material::initPersistFields()
 
    addField( "castShadows", TypeBool, Offset(mCastShadows, Material),
       "If set to false the lighting system will not cast shadows from this material." );
+
+   addField( "castDynamicShadows", TypeBool, Offset(mCastDynamicShadows, Material),
+      "If set to false the lighting system will not cast dynamic shadows from this material." );
 
    addField("planarReflection", TypeBool, Offset(mPlanarReflection, Material), "@internal" );
 
@@ -590,55 +625,55 @@ void Material::StageData::getFeatureSet( FeatureSet *outFeatures ) const
    }
 }
 
-ConsoleMethod( Material, flush, void, 2, 2, 
+DefineConsoleMethod( Material, flush, void, (),, 
    "Flushes all material instances that use this material." )
 {
    object->flush();
 }
 
-ConsoleMethod( Material, reload, void, 2, 2, 
+DefineConsoleMethod( Material, reload, void, (),, 
    "Reloads all material instances that use this material." )
 {
    object->reload();
 }
 
-ConsoleMethod( Material, dumpInstances, void, 2, 2, 
+DefineConsoleMethod( Material, dumpInstances, void, (),, 
    "Dumps a formatted list of the currently allocated material instances for this material to the console." )
 {
    MATMGR->dumpMaterialInstances( object );
 }
 
-ConsoleMethod( Material, getAnimFlags, const char*, 3, 3, "" )
+DefineConsoleMethod( Material, getAnimFlags, const char*, (U32 id), , "" )
 {
    char * animFlags = Con::getReturnBuffer(512);
 
-   if(object->mAnimFlags[ dAtoi(argv[2]) ] & Material::Scroll)
+   if(object->mAnimFlags[ id ] & Material::Scroll)
    {
 	   if(dStrcmp( animFlags, "" ) == 0)
 	      dStrcpy( animFlags, "$Scroll" );
    }
-   if(object->mAnimFlags[ dAtoi(argv[2]) ] & Material::Rotate)
+   if(object->mAnimFlags[ id ] & Material::Rotate)
    {
 	   if(dStrcmp( animFlags, "" ) == 0)
 	      dStrcpy( animFlags, "$Rotate" );
 	   else
 			dStrcat( animFlags, " | $Rotate");
    }
-   if(object->mAnimFlags[ dAtoi(argv[2]) ] & Material::Wave)
+   if(object->mAnimFlags[ id ] & Material::Wave)
    {
 	   if(dStrcmp( animFlags, "" ) == 0)
 	      dStrcpy( animFlags, "$Wave" );
 	   else
 			dStrcat( animFlags, " | $Wave");
    }
-   if(object->mAnimFlags[ dAtoi(argv[2]) ] & Material::Scale)
+   if(object->mAnimFlags[ id ] & Material::Scale)
    {
 	   if(dStrcmp( animFlags, "" ) == 0)
 	      dStrcpy( animFlags, "$Scale" );
 	   else
 			dStrcat( animFlags, " | $Scale");
    }
-   if(object->mAnimFlags[ dAtoi(argv[2]) ] & Material::Sequence)
+   if(object->mAnimFlags[ id ] & Material::Sequence)
    {
 	   if(dStrcmp( animFlags, "" ) == 0)
 	      dStrcpy( animFlags, "$Sequence" );
@@ -649,20 +684,34 @@ ConsoleMethod( Material, getAnimFlags, const char*, 3, 3, "" )
 	return animFlags;
 }
 
-ConsoleMethod(Material, getFilename, const char*, 2, 2, "Get filename of material")
+DefineConsoleMethod(Material, getFilename, const char*, (),, "Get filename of material")
 {
 	SimObject *material = static_cast<SimObject *>(object);
    return material->getFilename();
 }
 
-ConsoleMethod( Material, isAutoGenerated, bool, 2, 2, 
+DefineConsoleMethod( Material, isAutoGenerated, bool, (),, 
               "Returns true if this Material was automatically generated by MaterialList::mapMaterials()" )
 {
    return object->isAutoGenerated();
 }
 
-ConsoleMethod( Material, setAutoGenerated, void, 3, 3, 
+DefineConsoleMethod( Material, setAutoGenerated, void, (bool isAutoGenerated), , 
               "setAutoGenerated(bool isAutoGenerated): Set whether or not the Material is autogenerated." )
 {
-   object->setAutoGenerated(dAtob(argv[2]));
+   object->setAutoGenerated(isAutoGenerated);
+}
+
+// Accumulation
+bool Material::_setAccuEnabled( void *object, const char *index, const char *data )
+{
+   Material* mat = reinterpret_cast< Material* >( object );
+
+   if ( index )
+   {
+      U32 i = dAtoui(index);
+      mat->mAccuEnabled[i] = dAtob(data);
+      AccumulationVolume::refreshVolumes();
+   }
+   return true;
 }

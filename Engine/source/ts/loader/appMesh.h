@@ -99,7 +99,7 @@ public:
    virtual bool isSkin() { return false; }
    virtual void lookupSkinData() = 0;
 
-   virtual void lockMesh(F32 t, const MatrixF& objectOffset) { }
+   virtual void lockMesh(F32 t, const MatrixF& objOffset) { }
 };
 
 #endif // _APPMESH_H_

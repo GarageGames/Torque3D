@@ -78,7 +78,7 @@
       new GuiTabBookCtrl(ppOptionsTabBook) {
          tabPosition = "Top";
          tabMargin = "7";
-         minTabWidth = "64";
+         minTabWidth = "32";
          tabHeight = "20";
          allowReorder = "0";
          defaultPage = "-1";
@@ -1689,12 +1689,56 @@
             canSave = "1";
             canSaveDynamicFields = "0";
 
-            new GuiSliderCtrl(ppOptionsLightRaysBrightScalar) {
+           new GuiSliderCtrl(ppOptionsLightRaysBrightScalar) {
                range = "0 5";
                ticks = "1000";
                snap = "0";
                value = "0.75";
-               position = "96 96";
+               position = "96 46";
+               extent = "264 17";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiSliderBoxProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };			
+            new GuiTextCtrl(ppOptionsLightRaysBrightnessScalarLabel) {
+               text = "Brightness";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "26 48";
+               extent = "87 15";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Controls how bright the rays and the object casting them are in the scene.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+			
+		    new GuiSliderCtrl(ppOptionsLightRaysSampleScalar) {
+               range = "20 512";
+               ticks = "512";
+               snap = "0";
+               value = "40";
+               position = "96 75";
                extent = "264 17";
                minExtent = "8 2";
                horizSizing = "right";
@@ -1708,16 +1752,17 @@
                canSave = "1";
                canSaveDynamicFields = "0";
             };
-            new GuiTextCtrl(ppOptionsLightRaysBrightnessScalarLabel) {
-               text = "Brightness";
-               maxLength = "1024";
+			
+			new GuiTextCtrl(ppOptionsLightRaysSampleScalarLabel) {
+               text = "Samples";
+               maxLength = "512";
                margin = "0 0 0 0";
                padding = "0 0 0 0";
                anchorTop = "1";
                anchorBottom = "0";
                anchorLeft = "1";
                anchorRight = "0";
-               position = "26 98";
+               position = "26 76";
                extent = "87 15";
                minExtent = "8 2";
                horizSizing = "right";
@@ -1726,7 +1771,143 @@
                visible = "1";
                active = "1";
                tooltipProfile = "GuiToolTipProfile";
-               tooltip = "Controls how bright the rays and the object casting them are in the scene.";
+               tooltip = "Controls the number of samples for the shader.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+			
+			new GuiSliderCtrl(ppOptionsLightRaysDensityScalar) {
+               range = "0.01 1";
+               ticks = "1000";
+               snap = "0";
+               value = "0.94";
+               position = "96 105";
+               extent = "264 17";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiSliderBoxProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+			
+			new GuiTextCtrl(ppOptionsLightRaysDensityScalarLabel) {
+               text = "Density";
+               maxLength = "1000";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "26 106";
+               extent = "87 15";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Controls the density of the rays.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+			
+			new GuiSliderCtrl(ppOptionsLightRaysWeightScalar) {
+               range = "0.1 10";
+               ticks = "1000";
+               snap = "0";
+               value = "5.65";
+               position = "96 135";
+               extent = "264 17";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiSliderBoxProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+			
+			new GuiTextCtrl(ppOptionsLightRaysWeightScalarLabel) {
+               text = "Weight";
+               maxLength = "1000";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "26 136";
+               extent = "87 15";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Controls the weight of the rays.";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+			
+			
+			new GuiSliderCtrl(ppOptionsLightRaysDecayScalar) {
+               range = "0.01 1";
+               ticks = "1000";
+               snap = "0";
+               value = "1.0";
+               position = "96 165";
+               extent = "264 17";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiSliderBoxProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+			
+			new GuiTextCtrl(ppOptionsLightRaysDecayScalarLabel) {
+               text = "Decay";
+               maxLength = "1000";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "26 166";
+               extent = "87 15";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Controls the decay of the rays.";
                hovertime = "1000";
                isContainer = "0";
                canSave = "1";
@@ -2193,6 +2374,98 @@
                active = "1";
                tooltipProfile = "GuiToolTipProfile";
                tooltip = "Enable/Disable the Depth of field postFX";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+         };
+         new GuiTabPageCtrl(ppOptionsVignetteTab) {
+            fitBook = "0";
+            text = "Vignette";
+            maxLength = "1024";
+            docking = "Client";
+            margin = "0 0 0 0";
+            padding = "0 0 0 0";
+            anchorTop = "1";
+            anchorBottom = "1";
+            anchorLeft = "1";
+            anchorRight = "1";
+            position = "0 40";
+            extent = "394 193";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "GuiTabPageProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            tooltip = "Options for the Vignette postFX";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+            Enabled = "1";
+
+            new GuiCheckBoxCtrl(ppOptionsEnableVignette) {
+               text = "Enable";
+               groupNum = "-1";
+               buttonType = "ToggleButton";
+               useMouseEvents = "0";
+               position = "329 7";
+               extent = "53 20";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiCheckBoxProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Enable/Disable the vignette postFX";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiSliderCtrl(ppOptionsVignetteVMax) {
+               range = "0.001 5";
+               ticks = "1000";
+               snap = "0";
+               value = "0.6";
+               position = "96 46";
+               extent = "221 17";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiSliderBoxProfile";
+               visible = "1";
+               active = "1";
+               variable = "$VignettePostEffect::VMax";
+               tooltipProfile = "GuiToolTipProfile";
+               hovertime = "1000";
+               isContainer = "0";
+               canSave = "1";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl(ppOptionsVignetteVMaxLabel) {
+               text = "Radius";
+               maxLength = "1024";
+               margin = "0 0 0 0";
+               padding = "0 0 0 0";
+               anchorTop = "1";
+               anchorBottom = "0";
+               anchorLeft = "1";
+               anchorRight = "0";
+               position = "26 48";
+               extent = "41 18";
+               minExtent = "8 2";
+               horizSizing = "right";
+               vertSizing = "bottom";
+               profile = "GuiTextProfile";
+               visible = "1";
+               active = "1";
+               tooltipProfile = "GuiToolTipProfile";
+               tooltip = "Controls the maximum exposure of vignetting.";
                hovertime = "1000";
                isContainer = "0";
                canSave = "1";

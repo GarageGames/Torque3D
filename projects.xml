@@ -1,0 +1,57 @@
+<!-- World Builder Launcher Project Entries
+
+Entry Attribute Descriptions
+
+'type'
+projectDirectory  = Assumes that one directory down is the project, and inside is the executable
+file              = Execute the file directly
+
+'path'
+Path to the root project directory, or directly to the file (including file itself)
+
+'args'
+Any additional command line switches to be sent to the executable.
+
+Here are some examples:
+<entries>
+  <entry type="projectDirectory" path="Demos" args="">Demos</entry>
+  <entry type="projectDirectory" path="Genre Kits" args="">Genre Kits</entry>
+  <entry type="file" path="Demos/Stronghold/game/rStronghold.exe" args="">Stronghold Demo</entry>
+</entries>
+-->
+<entries>
+  <entry type="projectDirectory" path="My Projects" args="">My Projects</entry>
+  <entry type="projectDirectory" path="Games" args="">Games</entry>
+  <entry type="projectDirectory" path="Demos" args="">Demos</entry>
+  <entry type="projectDirectory" path="Examples" args="">Examples</entry>
+  <entry type="projectDirectory" path="Genre Kits" args="">Genre Kits</entry>
+  <entry type="templateDirectory" path="Templates" args="">Templates</entry>
+
+  <entry type="modules">
+    <module name="openGL">OpenGL Rendering</module>
+    <module name="d3d11">Direct3D 11 Rendering</module>
+    <module name="fmod">FMod Sound Engine</module>
+    <module name="leapMotion" path="$LEAPMOTION_SDK_PATH">Leap Motion Controller</module>
+    <module name="razerHydra" path="$RAZERHYDRA_SDK_PATH">Razer Hydra Controller</module>
+    <module name="oculusVR" path="$OCULUSVR_SDK_PATH">Oculus VR Devices</module>
+    <module name="webDeploy">Web Deployment</module>
+    <module name="navigation" default="1">Recast Navigation</module>
+    <module name="testing" default="1">Unit testing</module>
+    <moduleGroup description="Physics Library">
+      <module name="" donotwrite="1" default="1">Torque Physics</module>
+      <module name="physX">PhysX 2.8 Physics Library</module>
+      <module name="physX3">PhysX 3.2 Physics Library</module>
+      <module name="bullet">Bullet Physics Library</module>
+    </moduleGroup>
+  </entry>
+
+  <entry type="projectDefines">
+    <projectDefine name="TORQUE_MINIDUMP">Minidump Support</projectDefine>
+  </entry>
+
+  <entry type="moveClasses">
+    <moveClass name="" donotwrite="1" default="1">Standard Move Class</moveClass>
+    <moveClass name="$TORQUE_HIFI_NET">HIFI Networking</moveClass>
+    <moveClass name="$TORQUE_EXTENDED_MOVE">ExtendedMove</moveClass>
+  </entry>
+</entries>

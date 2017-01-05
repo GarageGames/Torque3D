@@ -99,7 +99,7 @@ AITurretShapeData::AITurretShapeData()
 
    weaponLeadVelocity = 0;
 
-   for (int i = 0; i < MaxStates; i++) {
+   for (S32 i = 0; i < MaxStates; i++) {
       stateName[i] = 0;
       stateTransitionAtRest[i] = 0;
       stateTransitionNotAtRest[i] = 0;
@@ -892,7 +892,7 @@ void AITurretShape::_trackTarget(F32 dt)
    //if (pitch > M_PI_F)
    //   pitch = -(pitch - M_2PI_F);
 
-   Point3F rot(pitch, 0.0f, -yaw);
+   Point3F rot(-pitch, 0.0f, yaw);
 
    // If we have a rotation rate make sure we follow it
    if (mHeadingRate > 0)

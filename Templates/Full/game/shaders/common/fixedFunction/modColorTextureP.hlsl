@@ -20,9 +20,18 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-float4 main( float4 color_in : COLOR0, 
-             float2 texCoord_in : TEXCOORD0,
-             uniform sampler2D diffuseMap : register(S0) ) : COLOR0
+#include "../shaderModel.hlsl"
+
+struct Conn
 {
-   return tex2D(diffuseMap, texCoord_in) * color_in;
+   float4 HPOS             : TORQUE_POSITION;
+   float4 color            : COLOR;
+   float2 texCoord         : TEXCOORD0;
+};
+
+TORQUE_UNIFORM_SAMPLER2D(diffuseMap, 0);
+
+float4 main( Conn IN ) : TORQUE_TARGET0
+{
+   return TORQUE_TEX2D(diffuseMap, IN.texCoord) * IN.color;
 }

@@ -78,6 +78,7 @@ struct ShaderGenVars
    const static String lightSpotFalloff;
    const static String specularColor;
    const static String specularPower;
+   const static String specularStrength;
    
    // Textures
    const static String fogMap;
@@ -93,6 +94,9 @@ struct ShaderGenVars
    const static String dLightMapSec;
    const static String dLightMask;
    const static String toneMap;
+
+   // Deferred Shading
+   const static String matInfoFlags;
 };
 
 #endif

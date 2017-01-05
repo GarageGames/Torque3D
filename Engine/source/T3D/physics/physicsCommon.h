@@ -46,9 +46,9 @@ struct PhysicsState
          momentum( Point3F::Zero ),
          orientation( QuatF::Identity ),
          angularMomentum( Point3F::Zero ),
+         sleeping( false ),
          linVelocity( Point3F::Zero ),
-         angVelocity( Point3F::Zero ),
-         sleeping( false )
+         angVelocity( Point3F::Zero )
    {
    }
 

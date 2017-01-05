@@ -74,6 +74,9 @@ enum ProcessorType
    CPU_AMD_K6_2,
    CPU_AMD_K6_3,
    CPU_AMD_Athlon,
+   CPU_AMD_Phenom,
+   CPU_AMD_PhenomII,
+   CPU_AMD_Bulldozer,
    CPU_AMD_Unknown,
    CPU_Cyrix_6x86,
    CPU_Cyrix_MediaGX,
@@ -171,6 +174,15 @@ namespace Platform
       bool isdst;     ///< True if daylight savings time is active
    };
 
+	enum ALERT_ASSERT_RESULT
+	{
+		ALERT_ASSERT_DEBUG,
+		ALERT_ASSERT_IGNORE,
+		ALERT_ASSERT_IGNORE_ALL,
+		ALERT_ASSERT_EXIT
+	};
+
+
    void getLocalTime(LocalTime &);
    
    /// Converts the local time to a formatted string appropriate
@@ -204,7 +216,7 @@ namespace Platform
    bool excludeOtherInstances(const char *string);
    bool checkOtherInstances(const char *string);
    void restartInstance();
-   void postQuitMessage(const U32 in_quitVal);
+   void postQuitMessage(const S32 in_quitVal);
    void forceShutdown(S32 returnValue);
 
    // Debug
@@ -212,7 +224,7 @@ namespace Platform
    void debugBreak();
    
    // Random
-   float getRandom();
+   F32 getRandom();
    
    // Window state
    void setWindowLocked(bool locked);
@@ -290,6 +302,9 @@ namespace Platform
    void clearExcludedDirectories();
    bool isExcludedDirectory(const char *pDir);
 
+   bool deleteDirectory(const char* pPath);
+   bool fileDelete(const char *name);
+
    /// Given a directory path, create all necessary directories for that path to exist.
    bool createPath(const char *path); // create a directory path
 
@@ -297,6 +312,7 @@ namespace Platform
    void AlertOK(const char *windowTitle, const char *message);
    bool AlertOKCancel(const char *windowTitle, const char *message);
    bool AlertRetry(const char *windowTitle, const char *message);
+   ALERT_ASSERT_RESULT AlertAssert(const char *windowTitle, const char *message);
 
    // Volumes
    struct VolumeInformation
@@ -337,6 +353,9 @@ namespace Platform
 
    // display Splash Window
    bool displaySplashWindow( String path );
+
+   // close Splash Window
+   bool closeSplashWindow();
 
    void openFolder( const char* path );
 
@@ -412,7 +431,7 @@ namespace Platform
 //------------------------------------------------------------------------------
 // Misc StdLib functions
 #define QSORT_CALLBACK FN_CDECL
-inline void dQsort(void *base, U32 nelem, U32 width, int (QSORT_CALLBACK *fcmp)(const void *, const void *))
+inline void dQsort(void *base, U32 nelem, U32 width, S32 (QSORT_CALLBACK *fcmp)(const void *, const void *))
 {
    qsort(base, nelem, width, fcmp);
 }
@@ -507,7 +526,7 @@ extern void* dRealloc_r(void* in_pResize, dsize_t in_size, const char*, const ds
 extern void* dRealMalloc(dsize_t);
 extern void  dRealFree(void*);
 
-extern void *dMalloc_aligned(dsize_t in_size, int alignment);
+extern void *dMalloc_aligned(dsize_t in_size, S32 alignment);
 extern void dFree_aligned(void *);
 
 
@@ -525,8 +544,8 @@ template<class T,class S> void dCopyArray(T *dst, const S *src, dsize_t size)
 
 extern void* dMemcpy(void *dst, const void *src, dsize_t size);
 extern void* dMemmove(void *dst, const void *src, dsize_t size);
-extern void* dMemset(void *dst, int c, dsize_t size);
-extern int   dMemcmp(const void *ptr1, const void *ptr2, dsize_t size);
+extern void* dMemset(void *dst, S32 c, dsize_t size);
+extern S32   dMemcmp(const void *ptr1, const void *ptr2, dsize_t size);
 
 // Special case of the above function when the arrays are the same type (use memcpy)
 template<class T> void dCopyArray(T *dst, const T *src, dsize_t size)
@@ -565,8 +584,8 @@ enum DFILE_STATUS
 
 extern FILE_HANDLE dOpenFileRead(const char *name, DFILE_STATUS &error);
 extern FILE_HANDLE dOpenFileReadWrite(const char *name, bool append, DFILE_STATUS &error);
-extern int dFileRead(FILE_HANDLE handle, U32 bytes, char *dst, DFILE_STATUS &error);
-extern int dFileWrite(FILE_HANDLE handle, U32 bytes, const char *dst, DFILE_STATUS &error);
+extern S32 dFileRead(FILE_HANDLE handle, U32 bytes, char *dst, DFILE_STATUS &error);
+extern S32 dFileWrite(FILE_HANDLE handle, U32 bytes, const char *dst, DFILE_STATUS &error);
 extern void dFileClose(FILE_HANDLE handle);
 
 extern StringTableEntry osGetTemporaryDirectory();

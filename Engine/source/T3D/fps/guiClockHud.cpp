@@ -87,6 +87,7 @@ ConsoleDocClass( GuiClockHud,
 GuiClockHud::GuiClockHud()
 {
    mShowFrame = mShowFill = true;
+   mTimeReversed = false;
    mFillColor.set(0, 0, 0, 0.5);
    mFrameColor.set(0, 1, 0, 1);
    mTextColor.set( 0, 1, 0, 1 );
@@ -112,9 +113,11 @@ void GuiClockHud::initPersistFields()
 
 void GuiClockHud::onRender(Point2I offset, const RectI &updateRect)
 {
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
    // Background first
    if (mShowFill)
-      GFX->getDrawUtil()->drawRectFill(updateRect, mFillColor);
+      drawUtil->drawRectFill(updateRect, mFillColor);
 
    // Convert ms time into hours, minutes and seconds.
    S32 time = S32(getTime());
@@ -128,13 +131,13 @@ void GuiClockHud::onRender(Point2I offset, const RectI &updateRect)
    // Center the text
    offset.x += (getWidth() - mProfile->mFont->getStrWidth((const UTF8 *)buf)) / 2;
    offset.y += (getHeight() - mProfile->mFont->getHeight()) / 2;
-   GFX->getDrawUtil()->setBitmapModulation(mTextColor);
-   GFX->getDrawUtil()->drawText(mProfile->mFont, offset, buf);
-   GFX->getDrawUtil()->clearBitmapModulation();
+   drawUtil->setBitmapModulation(mTextColor);
+   drawUtil->drawText(mProfile->mFont, offset, buf);
+   drawUtil->clearBitmapModulation();
 
    // Border last
    if (mShowFrame)
-      GFX->getDrawUtil()->drawRect(updateRect, mFrameColor);
+      drawUtil->drawRect(updateRect, mFrameColor);
 }
 
 

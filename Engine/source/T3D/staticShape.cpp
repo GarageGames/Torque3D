@@ -28,6 +28,7 @@
 #include "console/simBase.h"
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "T3D/gameBase/moveManager.h"
 #include "ts/tsShapeInstance.h"
 #include "T3D/staticShape.h"
@@ -231,22 +232,6 @@ void StaticShape::processTick(const Move* move)
       setImageTriggerState(0,move->trigger[0]);
       setImageTriggerState(1,move->trigger[1]);
    }
-
-   if (isMounted()) {
-      MatrixF mat;
-      mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
-      Parent::setTransform(mat);
-      Parent::setRenderTransform(mat);
-   }
-}
-
-void StaticShape::interpolateTick(F32 delta)
-{
-   if (isMounted()) {
-      MatrixF mat;
-      mMount.object->getRenderMountTransform( delta, mMount.node, mMount.xfm, &mat );
-      Parent::setRenderTransform(mat);
-   }
 }
 
 void StaticShape::setTransform(const MatrixF& mat)
@@ -255,7 +240,7 @@ void StaticShape::setTransform(const MatrixF& mat)
    setMaskBits(PositionMask);
 }
 
-void StaticShape::onUnmount(ShapeBase*,S32)
+void StaticShape::onUnmount(SceneObject*,S32)
 {
    // Make sure the client get's the final server pos.
    setMaskBits(PositionMask);
@@ -266,14 +251,14 @@ void StaticShape::onUnmount(ShapeBase*,S32)
 
 U32 StaticShape::packUpdate(NetConnection *connection, U32 mask, BitStream *bstream)
 {
-   U32 retMask = Parent::packUpdate(connection,mask,bstream);
+   U32 retMask = Parent::packUpdate(connection, mask, bstream);
    if (bstream->writeFlag(mask & PositionMask | ExtendedInfoMask))
    {
 
       // Write the transform (do _not_ use writeAffineTransform.  Since this is a static
       //  object, the transform must be RIGHT THE *&)*$&^ ON or it will goof up the
       //  synchronization between the client and the server.
-      mathWrite(*bstream,mObjToWorld);
+      mathWrite(*bstream, mObjToWorld);
       mathWrite(*bstream, mObjScale);
    }
 
@@ -290,11 +275,11 @@ U32 StaticShape::packUpdate(NetConnection *connection, U32 mask, BitStream *bstr
 
 void StaticShape::unpackUpdate(NetConnection *connection, BitStream *bstream)
 {
-   Parent::unpackUpdate(connection,bstream);
+   Parent::unpackUpdate(connection, bstream);
    if (bstream->readFlag())
    {
       MatrixF mat;
-      mathRead(*bstream,&mat);
+      mathRead(*bstream, &mat);
       Parent::setTransform(mat);
       Parent::setRenderTransform(mat);
 
@@ -317,15 +302,15 @@ void StaticShape::unpackUpdate(NetConnection *connection, BitStream *bstream)
 // This appears to be legacy T2 stuff
 // Marked internal, as this is flagged to be deleted
 // [8/1/2010 mperry]
-ConsoleMethod( StaticShape, setPoweredState, void, 3, 3, "(bool isPowered)"
+DefineConsoleMethod(StaticShape, setPoweredState, void, (bool isPowered), , "(bool isPowered)"
 			  "@internal")
 {
    if(!object->isServerObject())
       return;
-   object->setPowered(dAtob(argv[2]));
+   object->setPowered(isPowered);
 }
 
-ConsoleMethod( StaticShape, getPoweredState, bool, 2, 2, "@internal")
+DefineConsoleMethod(StaticShape, getPoweredState, bool, (), , "@internal")
 {
    if(!object->isServerObject())
       return(false);

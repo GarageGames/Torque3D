@@ -64,6 +64,9 @@ ShaderData::ShaderData()
 
    mUseDevicePixVersion = false;
    mPixVersion = 1.0;
+
+   for( int i = 0; i < NumTextures; ++i)
+      mRTParams[i] = false;
 }
 
 void ShaderData::initPersistFields()
@@ -115,6 +118,14 @@ void ShaderData::initPersistFields()
       "@endtsexample\n\n"
       );
 
+   addField("samplerNames",              TypeRealString,      Offset(mSamplerNames,   ShaderData), NumTextures, 
+      "@brief Indicates names of samplers present in shader. Order is important.\n\n"
+	   "Order of sampler names are used to assert correct sampler register/location"
+      "Other objects (GFXStateBlockData, PostEffect...) use index number to link samplers."
+      );
+
+   addField("rtParams",              TypeBool,      Offset(mRTParams,   ShaderData), NumTextures, "");
+
    Parent::initPersistFields();
 
    // Make sure we get activation signals.
@@ -132,6 +143,12 @@ bool ShaderData::onAdd()
    smAllShaderData.push_back( this );
 
    // NOTE: We initialize the shader on request.
+
+   for(int i = 0; i < NumTextures; ++i)
+   {
+      if( mSamplerNames[i].isNotEmpty() && !mSamplerNames[i].startsWith("$") )      
+         mSamplerNames[i].insert(0, "$");      
+   }
 
    return true;
 }
@@ -190,6 +207,8 @@ GFXShader* ShaderData::getShader( const Vector<GFXShaderMacro> &macros )
    if ( !shader )
       return NULL;
 
+   _checkDefinition(shader);
+
    // Store the shader in the cache and return it.
    mShaders.insertUnique( cacheKey, shader );
    return shader;
@@ -207,16 +226,23 @@ GFXShader* ShaderData::_createShader( const Vector<GFXShaderMacro> &macros )
    GFXShader *shader = GFX->createShader();
    bool success = false;
 
+   Vector<String> samplers;
+   samplers.setSize(ShaderData::NumTextures);
+   for(int i = 0; i < ShaderData::NumTextures; ++i)
+      samplers[i] = mSamplerNames[i][0] == '$' ? mSamplerNames[i] : "$"+mSamplerNames[i];
+
    // Initialize the right shader type.
    switch( GFX->getAdapterType() )
    {
       case Direct3D9_360:
       case Direct3D9:
+      case Direct3D11:
       {
          success = shader->init( mDXVertexShaderName, 
                                  mDXPixelShaderName, 
                                  pixver,
-                                 macros );
+                                 macros,
+                                 samplers);
          break;
       }
 
@@ -225,7 +251,8 @@ GFXShader* ShaderData::_createShader( const Vector<GFXShaderMacro> &macros )
          success = shader->init( mOGLVertexShaderName,
                                  mOGLPixelShaderName,
                                  pixver,
-                                 macros );
+                                 macros,
+                                 samplers);
          break;
       }
          
@@ -234,6 +261,29 @@ GFXShader* ShaderData::_createShader( const Vector<GFXShaderMacro> &macros )
          success = false;
          break;
    }
+
+#if defined(TORQUE_DEBUG)
+   //Assert Sampler registers
+   const Vector<GFXShaderConstDesc>& descs = shader->getShaderConstDesc();
+   for(int i = 0; i < descs.size(); ++i)
+   {
+      if(descs[i].constType != GFXSCT_Sampler && descs[i].constType != GFXSCT_SamplerCube)
+         continue;
+      
+      GFXShaderConstHandle *handle = shader->findShaderConstHandle(descs[i].name);
+      if(!handle || !handle->isValid())
+         continue;
+
+      int reg = handle->getSamplerRegister();
+      if( descs[i].name != samplers[reg] )
+      {
+         const char *err = avar("ShaderData(%s): samplerNames[%d] = \"%s\" are diferent to sampler in shader: %s : register(S%d)"
+            ,getName(), reg, samplers[reg].c_str(), handle->getName().c_str(), reg);
+         Con::printf(err);
+         GFXAssertFatal(0, err);
+      }
+   }
+#endif
 
    // If we failed to load the shader then
    // cleanup and return NULL.
@@ -268,6 +318,69 @@ void ShaderData::_onLMActivate( const char *lm, bool activate )
    // flush and rebuild all shaders.
 
    reloadAllShaders();
+}
+
+bool ShaderData::hasSamplerDef(const String &_samplerName, int &pos) const
+{
+   String samplerName = _samplerName.startsWith("$") ? _samplerName : "$"+_samplerName;   
+   for(int i = 0; i < NumTextures; ++i)
+   {
+      if( mSamplerNames[i].equal(samplerName, String::NoCase ) )
+      {
+         pos = i;
+         return true;
+      }
+   }
+
+   pos = -1;
+   return false;
+}
+
+bool ShaderData::_checkDefinition(GFXShader *shader)
+{
+   bool error = false;
+   Vector<String> samplers;
+   samplers.reserve(NumTextures);
+   bool rtParams[NumTextures];
+   for(int i = 0; i < NumTextures; ++i)
+      rtParams[i] = false;   
+
+   const Vector<GFXShaderConstDesc> &shaderConstDesc = shader->getShaderConstDesc(); 
+
+   for(int i = 0; i < shaderConstDesc.size(); ++i)
+   {
+      const GFXShaderConstDesc &desc = shaderConstDesc[i];
+      if(desc.constType == GFXSCT_Sampler)
+      {
+         samplers.push_back(desc.name );
+      }      
+   }
+
+   for(int i = 0; i < samplers.size(); ++i)
+   {
+      int pos;
+      bool find = hasSamplerDef(samplers[i], pos);
+
+      if(find && pos >= 0 && mRTParams[pos])
+      {              
+         if( !shader->findShaderConstHandle( String::ToString("$rtParams%d", pos)) )
+         {
+            String error = String::ToString("ShaderData(%s) sampler[%d] used but rtParams%d not used in shader compilation. Possible error", shader->getPixelShaderFile().c_str(), pos, pos);
+            Con::errorf( error );
+            error = true;
+         }
+      }     
+
+      if(!find)
+      {
+         String error = String::ToString("ShaderData(%s) sampler %s not defined", shader->getPixelShaderFile().c_str(), samplers[i].c_str());
+         Con::errorf(error );
+         GFXAssertFatal(0, error );
+         error = true;
+      }
+   }  
+
+   return !error;
 }
 
 DefineEngineMethod( ShaderData, reload, void, (),,

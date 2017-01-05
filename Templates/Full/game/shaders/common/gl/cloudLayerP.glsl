@@ -21,13 +21,21 @@
 //-----------------------------------------------------------------------------
 
 #include "hlslCompat.glsl"
-
-varying vec4 texCoord12;
-varying vec4 texCoord34;
-varying vec3 vLightTS; // light vector in tangent space, denormalized
-varying vec3 vViewTS;  // view vector in tangent space, denormalized
-varying vec3 vNormalWS; // Normal vector in world space
-varying float worldDist;
+#include "torque.glsl"
+//-----------------------------------------------------------------------------
+// Structures                                                                  
+//-----------------------------------------------------------------------------
+//ConnectData
+in vec4 texCoord12;
+#define IN_texCoord12 texCoord12
+in vec4 texCoord34;
+#define IN_texCoord34 texCoord34
+in vec3 vLightTS; // light vector in tangent space, denormalized
+#define IN_vLightTS vLightTS
+in vec3 vViewTS;  // view vector in tangent space, denormalized
+#define IN_vViewTS vViewTS
+in float worldDist;
+#define IN_worldDist worldDist
 
 //-----------------------------------------------------------------------------
 // Uniforms                                                                        
@@ -37,6 +45,9 @@ uniform vec3      ambientColor;
 uniform vec3      sunColor;
 uniform float     cloudCoverage;
 uniform vec3      cloudBaseColor;
+uniform float	  cloudExposure;
+
+out vec4 OUT_col;
 
 //-----------------------------------------------------------------------------
 // Globals                                                                        
@@ -97,26 +108,25 @@ void main()
    //  Normalize the interpolated vectors:
    vec3 vViewTS   = normalize( vViewTS  );
    vec3 vLightTS  = normalize( vLightTS );
-   vec3 vNormalWS = normalize( vNormalWS );
      
-   vec4 cResultColor = float4( 0, 0, 0, 1 );
+   vec4 cResultColor = vec4( 0, 0, 0, 1 );
     
-   vec2 texSample = texCoord12.xy;
+   vec2 texSample = IN_texCoord12.xy;
    
-   vec4 noise1 = texture2D( normalHeightMap, texCoord12.zw );
+   vec4 noise1 = texture( normalHeightMap, IN_texCoord12.zw );
    noise1 = normalize( ( noise1 - 0.5 ) * 2.0 );   
    //return noise1;
    
-   vec4 noise2 = texture2D( normalHeightMap, texCoord34.xy );
+   vec4 noise2 = texture( normalHeightMap, IN_texCoord34.xy );
    noise2 = normalize( ( noise2 - 0.5 ) * 2.0 );
    //return noise2;
       
    vec3 noiseNormal = normalize( noise1 + noise2 ).xyz;
-   //return float4( noiseNormal, 1.0 );
+   //return vec4( noiseNormal, 1.0 );
    
    float noiseHeight = noise1.a * noise2.a * ( cloudCoverage / 2.0 + 0.5 );         
 
-   vec3 vNormalTS = normalize( texture2D( normalHeightMap, texSample ).xyz * 2.0 - 1.0 );   
+   vec3 vNormalTS = normalize( texture( normalHeightMap, texSample ).xyz * 2.0 - 1.0 );   
    vNormalTS += noiseNormal;
    vNormalTS = normalize( vNormalTS );   
    
@@ -124,16 +134,14 @@ void main()
    cResultColor.rgb = ComputeIllumination( texSample, vLightTS, vViewTS, vNormalTS );
       
    float coverage = ( cloudCoverage - 0.5 ) * 2.0;
-   cResultColor.a = texture2D( normalHeightMap, texSample ).a + coverage + noiseHeight;     
+   cResultColor.a = texture( normalHeightMap, texSample ).a + coverage + noiseHeight;     
    
    if ( cloudCoverage > -1.0 )
       cResultColor.a /= 1.0 + coverage;
         
-   cResultColor.a = saturate( cResultColor.a * pow( saturate(cloudCoverage), 0.25 ) );
+   cResultColor.a = clamp( cResultColor.a * pow( saturate(cloudCoverage), 0.25 ), 0.0, 1.0 );
 
-   cResultColor.a = mix( cResultColor.a, 0.0, 1.0 - pow(worldDist,2.0) );
+   cResultColor.a = mix( cResultColor.a, 0.0, 1.0 - pow(IN_worldDist,2.0) );
 
-   // If using HDR rendering, make sure to tonemap the resuld color prior to outputting it.
-   // But since this example isn't doing that, we just output the computed result color here:
-   gl_FragColor = cResultColor;
+   OUT_col = hdrEncode(cResultColor);
 }   

@@ -20,6 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+$PostFXManager::Settings::EnableVignette = "0";
+$PostFXManager::Settings::EnableDOF = "0";
+$PostFXManager::Settings::EnabledSSAO = "0";
+$PostFXManager::Settings::EnableHDR = "0";
+$PostFXManager::Settings::EnableLightRays = "0";
+$PostFXManager::Settings::EnablePostFX = "0";
+$PostFXManager::Settings::Vignette::VMax = "0.6";
 $PostFXManager::Settings::DOF::BlurCurveFar = "";
 $PostFXManager::Settings::DOF::BlurCurveNear = "";
 $PostFXManager::Settings::DOF::BlurMax = "";
@@ -41,6 +48,10 @@ $PostFXManager::Settings::HDR::keyValue = "0.18";
 $PostFXManager::Settings::HDR::minLuminace = "0.001";
 $PostFXManager::Settings::HDR::whiteCutoff = "1";
 $PostFXManager::Settings::LightRays::brightScalar = "0.75";
+$PostFXManager::Settings::LightRays::decay = "1.0";
+$PostFXManager::Settings::LightRays::density = "0.94";
+$PostFXManager::Settings::LightRays::numSamples = "40";
+$PostFXManager::Settings::LightRays::weight = "5.65";
 $PostFXManager::Settings::SSAO::blurDepthTol = "0.001";
 $PostFXManager::Settings::SSAO::blurNormalTol = "0.95";
 $PostFXManager::Settings::SSAO::lDepthMax = "2";

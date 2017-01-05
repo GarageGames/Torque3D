@@ -39,6 +39,10 @@
 #include "core/util/tVector.h"
 #endif
 
+#ifndef _MATHUTIL_FRUSTUM_H_
+#include "math/util/frustum.h"
+#endif
+
 
 class Box3F;
 class RectI;
@@ -150,6 +154,13 @@ namespace MathUtils
    ///
    /// <b>ASSUMES Z AXIS IS UP</b>
    void getVectorFromAngles( VectorF &vec, F32 yawAng, F32 pitchAng );
+
+   /// Returns the angle between two given vectors
+   /// 
+   /// Angles is in RADIANS
+   ///
+   F32 getAngleBetweenVectors(VectorF vecA, VectorF vecB);
+
 
    /// Simple reflection equation - pass in a vector and a normal to reflect off of
    inline Point3F reflect( Point3F &inVec, Point3F &norm )
@@ -326,6 +337,13 @@ namespace MathUtils
                      F32 aspectRatio, 
                      F32 nearPlane );
 
+   void makeFovPortFrustum( Frustum *outFrustum,
+                             bool isOrtho,
+                             F32 nearDist,
+                             F32 farDist,
+                             const FovPort &inPort,
+                             const MatrixF &transform = MatrixF(1) );
+
    /// Build a GFX projection matrix from the frustum parameters
    /// including the optional rotation required by GFX.
    void makeProjection( MatrixF *outMatrix, 
@@ -405,6 +423,9 @@ namespace MathUtils
                                      PlaneF* outPlanes );
 
    //void findFarthestPoint( const Point3F* points, U32 numPoints, const Point3F& fromPoint, )
+
+   /// Build a convex hull from a cloud of 2D points, first and last hull point are the same.
+   void mBuildHull2D(const Vector<Point2F> inPoints, Vector<Point2F> &hullPoints);
 
 } // namespace MathUtils
 

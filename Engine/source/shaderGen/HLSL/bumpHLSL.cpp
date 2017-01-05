@@ -70,6 +70,13 @@ void BumpFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    Var *bumpMap = getNormalMapTex();
    LangElement *texOp = NULL;
 
+   //if it's D3D11 let's create the texture object
+   Var* bumpMapTex = NULL;
+   if (mIsDirect3D11)
+   {
+      bumpMapTex = (Var*)LangElement::find("bumpMapTex");
+   }
+
    // Handle atlased textures
    // http://www.infinity-universe.com/Infinity/index.php?option=com_content&task=view&id=65&Itemid=47
    if(fd.features[MFT_NormalMapAtlas])
@@ -127,18 +134,25 @@ void BumpFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       // Add a newline
       meta->addStatement( new GenOp( "\r\n" ) );
 
-      if(is_sm3)
+      if (mIsDirect3D11)
       {
-         texOp = new GenOp( "tex2Dlod(@, float4(@, 0.0, mipLod_bump))", bumpMap, texCoord );
+         texOp = new GenOp("@.SampleLevel(@, @, mipLod_bump)", bumpMapTex, bumpMap, texCoord);
+      }
+      else if (is_sm3)
+      {
+         texOp = new GenOp("tex2Dlod(@, float4(@, 0.0, mipLod_bump))", bumpMap, texCoord);
       }
       else
       {
-         texOp = new GenOp( "tex2D(@, @)", bumpMap, texCoord );
+         texOp = new GenOp("tex2D(@, @)", bumpMap, texCoord);
       }
    }
    else
    {
-      texOp = new GenOp( "tex2D(@, @)", bumpMap, texCoord );
+      if (mIsDirect3D11)
+         texOp = new GenOp("@.Sample(@, @)", bumpMapTex, bumpMap, texCoord);
+      else
+         texOp = new GenOp("tex2D(@, @)", bumpMap, texCoord);
    }
 
    Var *bumpNorm = new Var( "bumpNormal", "float4" );
@@ -156,8 +170,26 @@ void BumpFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
       bumpMap->sampler = true;
       bumpMap->constNum = Var::getTexUnitNum();
 
+      Var* detailBumpTex = NULL;
+      if (mIsDirect3D11)
+      {
+         bumpMap->setType("SamplerState");
+         detailBumpTex = new Var;
+         detailBumpTex->setName("detailBumpTex");
+         detailBumpTex->setType("Texture2D");
+         detailBumpTex->uniform = true;
+         detailBumpTex->texture = true;
+         detailBumpTex->constNum = bumpMap->constNum;
+      }
+      else
+         bumpMap->setType("sampler2D");
+
       texCoord = getInTexCoord( "detCoord", "float2", true, componentList );
-      texOp = new GenOp( "tex2D(@, @)", bumpMap, texCoord );
+
+      if (mIsDirect3D11)
+         texOp = new GenOp("@.Sample(@, @)", detailBumpTex, bumpMap, texCoord);
+      else
+         texOp = new GenOp("tex2D(@, @)", bumpMap, texCoord);
 
       Var *detailBump = new Var;
       detailBump->setName( "detailBump" );
@@ -222,12 +254,14 @@ void BumpFeatHLSL::setTexData(   Material::StageData &stageDat,
    if ( fd.features[MFT_NormalMap] )
    {
       passData.mTexType[ texIndex ] = Material::Bump;
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
       passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_NormalMap );
    }
 
    if ( fd.features[ MFT_DetailNormalMap ] )
    {
       passData.mTexType[ texIndex ] = Material::DetailBump;
+      passData.mSamplerNames[ texIndex ] = "detailBumpMap";
       passData.mTexSlot[ texIndex++ ].texObject = stageDat.getTex( MFT_DetailNormalMap );
    }
 }
@@ -289,14 +323,6 @@ void ParallaxFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    meta->addStatement( new GenOp( "   @ = mul( @, float3( @.xyz - @ ) );\r\n", 
       outNegViewTS, objToTangentSpace, inPos, eyePos ) );
 
-   // TODO: I'm at a loss at why i need to flip the binormal/y coord
-   // to get a good view vector for parallax. Lighting works properly
-   // with the TS matrix as is... but parallax does not.
-   //
-   // Someone figure this out!
-   //
-   meta->addStatement( new GenOp( "   @.y = -@.y;\r\n", outNegViewTS, outNegViewTS ) );  
-
    // If we have texture anim matrix the tangent
    // space view vector may need to be rotated.
    Var *texMat = (Var*)LangElement::find( "texMat" );
@@ -343,10 +369,27 @@ void ParallaxFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    // Get the rest of our inputs.
    Var *parallaxInfo = _getUniformVar( "parallaxInfo", "float", cspPotentialPrimitive );
    Var *normalMap = getNormalMapTex();
+   Var *bumpMapTexture = (Var*)LangElement::find("bumpMapTex");
 
    // Call the library function to do the rest.
-   meta->addStatement( new GenOp( "   @.xy += parallaxOffset( @, @.xy, @, @ );\r\n", 
-      texCoord, normalMap, texCoord, negViewTS, parallaxInfo ) );
+   if (fd.features.hasFeature(MFT_IsDXTnm, getProcessIndex()))
+   {
+      if (mIsDirect3D11)
+         meta->addStatement(new GenOp("   @.xy += parallaxOffsetDxtnm( @, @, @.xy, @, @ );\r\n",
+         texCoord, bumpMapTexture, normalMap, texCoord, negViewTS, parallaxInfo));
+      else
+         meta->addStatement(new GenOp("   @.xy += parallaxOffsetDxtnm( @, @.xy, @, @ );\r\n",
+            texCoord, normalMap, texCoord, negViewTS, parallaxInfo));
+   }
+   else
+   {
+      if (mIsDirect3D11)
+         meta->addStatement(new GenOp("   @.xy += parallaxOffset( @, @, @.xy, @, @ );\r\n",
+         texCoord, bumpMapTexture, normalMap, texCoord, negViewTS, parallaxInfo));
+      else
+         meta->addStatement(new GenOp("   @.xy += parallaxOffset( @, @.xy, @, @ );\r\n",
+            texCoord, normalMap, texCoord, negViewTS, parallaxInfo));
+   }
 
    // TODO: Fix second UV maybe?
 
@@ -382,6 +425,7 @@ void ParallaxFeatHLSL::setTexData(  Material::StageData &stageDat,
    GFXTextureObject *tex = stageDat.getTex( MFT_NormalMap );
    if ( tex )
    {
+      passData.mSamplerNames[ texIndex ] = "bumpMap";
       passData.mTexType[ texIndex ] = Material::Bump;
       passData.mTexSlot[ texIndex++ ].texObject = tex;
    }

@@ -21,36 +21,32 @@
 //-----------------------------------------------------------------------------
 
 #include "torque.glsl"
+#include "hlslCompat.glsl"
 
-// Calculates the Mie phase function
-float getMiePhase(float fCos, float fCos2, float g, float g2)
-{
-	return 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow(abs(1.0 + g2 - 2.0*g*fCos), 1.5);
-}
 
-// Calculates the Rayleigh phase function
-float getRayleighPhase(float fCos2)
-{
-	//return 1.0;
-	return 0.75 + 0.75*fCos2;
-}
+// Conn
+in vec4  rayleighColor;
+#define IN_rayleighColor rayleighColor
+in vec4  mieColor;
+#define IN_mieColor mieColor
+in vec3  v3Direction;
+#define IN_v3Direction v3Direction
+in vec3  pos;
+#define IN_pos pos
 
-varying vec4 rayleighColor;
-varying vec4 mieColor;
-varying vec3 v3Direction;
-varying float zPosition;
-varying vec3 pos;
-
-uniform samplerCube nightSky;
+uniform samplerCube nightSky ;
 uniform vec4 nightColor;
 uniform vec2 nightInterpAndExposure;
 uniform float useCubemap;
 uniform vec3 lightDir;
 uniform vec3 sunDir;
 
-void main()         
+out vec4 OUT_col;
+
+void main()
 { 
-   float fCos = dot( lightDir, v3Direction ) / length(v3Direction);
+
+   float fCos = dot( lightDir, IN_v3Direction ) / length(IN_v3Direction);
    float fCos2 = fCos*fCos;
     
    float g = -0.991;
@@ -58,22 +54,19 @@ void main()
 
    float fMiePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow(abs(1.0 + g2 - 2.0*g*fCos), 1.5);
    
-   vec4 color = rayleighColor + fMiePhase * mieColor;
+   vec4 color = IN_rayleighColor + fMiePhase * IN_mieColor;
    color.a = color.b;
    
-   vec4 nightSkyColor = textureCube(nightSky, -v3Direction);
+   vec4 nightSkyColor = texture(nightSky, -v3Direction);
    nightSkyColor = mix(nightColor, nightSkyColor, useCubemap);
 
    float fac = dot( normalize( pos ), sunDir );
    fac = max( nightInterpAndExposure.y, pow( clamp( fac, 0.0, 1.0 ), 2 ) );
-   gl_FragColor = mix( color, nightSkyColor, nightInterpAndExposure.y );
-   
-   // Clip based on the camera-relative
-   // z position of the vertex, passed through
-   // from the vertex position.
-   if(zPosition < 0.0)
-      discard;
+   OUT_col = mix( color, nightSkyColor, nightInterpAndExposure.y );
 
-   gl_FragColor.a = 1;
-   gl_FragColor = hdrEncode( gl_FragColor );
+   OUT_col.a = 1;
+   
+   OUT_col = clamp(OUT_col, 0.0, 1.0);
+   
+   OUT_col = hdrEncode( OUT_col );
 }

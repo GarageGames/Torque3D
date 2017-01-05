@@ -35,6 +35,13 @@
 #ifndef _DYNAMIC_CONSOLETYPES_H_
 #include "console/dynamicTypes.h"
 #endif
+#ifndef __SCENEMANAGER_H__  
+#include "scene/sceneManager.h"    
+#define __SCENEMANAGER_H__  
+#endif
+#ifndef _IDISPLAYDEVICE_H_
+#include "platform/output/IDisplayDevice.h"
+#endif
 
 class NetConnection;
 class ProcessList;
@@ -103,8 +110,8 @@ public:
    DECLARE_CALLBACK( void, onAdd, ( GameBase* obj ) );
    DECLARE_CALLBACK( void, onRemove, ( GameBase* obj ) );
    DECLARE_CALLBACK( void, onNewDataBlock, ( GameBase* obj ) );
-   DECLARE_CALLBACK( void, onMount, ( GameBase* obj, SceneObject* mountObj, S32 node ) );
-   DECLARE_CALLBACK( void, onUnmount, ( GameBase* obj, SceneObject* mountObj, S32 node ) );
+   DECLARE_CALLBACK( void, onMount, ( SceneObject* obj, SceneObject* mountObj, S32 node ) );
+   DECLARE_CALLBACK( void, onUnmount, ( SceneObject* obj, SceneObject* mountObj, S32 node ) );
    /// @}
 };
 
@@ -409,11 +416,12 @@ public:
    virtual bool isValidCameraFov( F32 fov ) { return true; }
    virtual bool useObjsEyePoint() const { return false; }
    virtual bool onlyFirstPerson() const { return false; }
-   virtual F32 getDamageFlash() const { return 1.0f; }
-   virtual F32 getWhiteOut() const { return 1.0f; }
+   virtual F32 getDamageFlash() const { return 0.0f; }
+   virtual F32 getWhiteOut() const { return 0.0f; }
    
    // Not implemented here, but should return the Camera to world transformation matrix
    virtual void getCameraTransform (F32 *pos, MatrixF *mat ) { *mat = MatrixF::Identity; }
+   virtual void getEyeCameraTransform ( IDisplayDevice *device, U32 eyeId, MatrixF *mat ) { *mat = MatrixF::Identity; }
 
    /// Returns the water object we are colliding with, it is up to derived
    /// classes to actually set this object.

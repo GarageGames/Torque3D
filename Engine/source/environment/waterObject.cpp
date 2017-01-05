@@ -50,7 +50,6 @@ GFXImplementVertexFormat( GFXWaterVertex )
 {
    addElement( "POSITION", GFXDeclType_Float3 );
    addElement( "NORMAL", GFXDeclType_Float3 );
-   addElement( "COLOR", GFXDeclType_Color );   
    addElement( "TEXCOORD", GFXDeclType_Float2, 0 );
    addElement( "TEXCOORD", GFXDeclType_Float4, 1 );   
 }
@@ -91,6 +90,7 @@ void WaterMatParams::clear()
    mSpecularParamsSC = NULL;
    mDepthGradMaxSC = NULL;
    mReflectivitySC = NULL;
+   mDepthGradSamplerSC = NULL;
 }
 
 void WaterMatParams::init( BaseMatInstance* matInst )
@@ -132,6 +132,7 @@ void WaterMatParams::init( BaseMatInstance* matInst )
    mSpecularParamsSC = matInst->getMaterialParameterHandle( "$specularParams" );   
    mDepthGradMaxSC = matInst->getMaterialParameterHandle( "$depthGradMax" );
    mReflectivitySC = matInst->getMaterialParameterHandle( "$reflectivity" );
+   mDepthGradSamplerSC = matInst->getMaterialParameterHandle( "$depthGradMap" );
 }
 
 
@@ -178,23 +179,24 @@ ConsoleDocClass( WaterObject,
 WaterObject::WaterObject()
  : mViscosity( 1.0f ),
    mDensity( 1.0f ),
-   mReflectivity( 0.5f ),
-   mReflectNormalUp( true ),   
+   mLiquidType( "Water" ),
+   mFresnelBias( 0.3f ),
+   mFresnelPower( 6.0f ),
+   mReflectNormalUp( true ),
+   mReflectivity( 0.5f ),   
    mDistortStartDist( 0.1f ),
    mDistortEndDist( 20.0f ),
    mDistortFullDepth( 3.5f ),
-   mUndulateMaxDist(50.0f),
    mOverallFoamOpacity( 1.0f ),
    mFoamMaxDepth( 2.0f ),
    mFoamAmbientLerp( 0.5f ),
    mFoamRippleInfluence( 0.05f ),
-   mUnderwaterPostFx( NULL ),
-   mLiquidType( "Water" ),
-   mFresnelBias( 0.3f ),
-   mFresnelPower( 6.0f ),
    mClarity( 0.5f ),
-   mBasicLighting( false ),
+   mUnderwaterColor(9, 6, 5, 240),
+   mUndulateMaxDist(50.0f),
    mMiscParamW( 0.0f ),
+   mUnderwaterPostFx( NULL ),
+   mBasicLighting( false ),
    mOverallWaveMagnitude( 1.0f ),
    mOverallRippleMagnitude( 0.1f ),
    mCubemap( NULL ),
@@ -202,10 +204,9 @@ WaterObject::WaterObject()
    mSpecularPower( 48.0f ),
    mSpecularColor( 1.0f, 1.0f, 1.0f, 1.0f ),
    mDepthGradientMax( 50.0f ),
-   mEmissive( false ),
-   mUnderwaterColor(9, 6, 5, 240)
+   mEmissive( false )
 {
-   mTypeMask = WaterObjectType | StaticObjectType;
+   mTypeMask = WaterObjectType;
 
    for( U32 i=0; i < MAX_WAVES; i++ )
    {
@@ -407,7 +408,7 @@ void WaterObject::inspectPostApply()
    setMaskBits( UpdateMask | WaveMask | TextureMask | SoundMask );
 }
 
-bool WaterObject::processArguments( S32 argc, const char **argv )
+bool WaterObject::processArguments( S32 argc, ConsoleValueRef *argv )
 {
    if( typeid( *this ) == typeid( WaterObject ) )
    {
@@ -732,6 +733,11 @@ void WaterObject::renderObject( ObjectRenderInst *ri, SceneRenderState *state, B
 
    bool doQuery = ( !mPlaneReflector.mQueryPending && query && mReflectorDesc.useOcclusionQuery );
 
+   // We need to call this for avoid a DX9 or Nvidia bug.
+   // At some resollutions read from render target,
+   // break current occlusion query.
+   REFLECTMGR->getRefractTex();
+
    if ( doQuery )
       query->begin();
 
@@ -747,22 +753,20 @@ void WaterObject::renderObject( ObjectRenderInst *ri, SceneRenderState *state, B
 
 void WaterObject::setCustomTextures( S32 matIdx, U32 pass, const WaterMatParams &paramHandles )
 {
-   // TODO: Retrieve sampler numbers from parameter handles, see r22631.
-   
    // Always use the ripple texture.
-   GFX->setTexture( 0, mRippleTex );
+   GFX->setTexture( paramHandles.mRippleSamplerSC->getSamplerRegister(pass), mRippleTex );
 
    // Only above-water in advanced-lighting uses the foam texture.
    if ( matIdx == WaterMat )
    {
-      GFX->setTexture( 5, mFoamTex );
-      GFX->setTexture( 6, mDepthGradientTex );
+      GFX->setTexture( paramHandles.mFoamSamplerSC->getSamplerRegister(pass), mFoamTex );
+      GFX->setTexture( paramHandles.mDepthGradSamplerSC->getSamplerRegister(pass), mDepthGradientTex );
    }
 
    if ( ( matIdx == WaterMat || matIdx == BasicWaterMat ) && mCubemap )   
-      GFX->setCubeTexture( 4, mCubemap->mCubemap );
-   else
-      GFX->setCubeTexture( 4, NULL );
+      GFX->setCubeTexture( paramHandles.mCubemapSamplerSC->getSamplerRegister(pass), mCubemap->mCubemap );
+   else if(paramHandles.mCubemapSamplerSC->getSamplerRegister(pass) != -1 )
+      GFX->setCubeTexture( paramHandles.mCubemapSamplerSC->getSamplerRegister(pass), NULL );
 }
 
 void WaterObject::drawUnderwaterFilter( SceneRenderState *state )
@@ -775,7 +779,7 @@ void WaterObject::drawUnderwaterFilter( SceneRenderState *state )
    GFX->setWorldMatrix( newMat );   
 
    // set up render states
-   GFX->disableShaders();
+   GFX->setupGenericShaders();
    GFX->setStateBlock( mUnderwaterSB );
 
    /*
@@ -822,25 +826,25 @@ void WaterObject::drawUnderwaterFilter( SceneRenderState *state )
    // draw quad
    
 
-   GFXVertexBufferHandle<GFXVertexPC> verts( GFX, 4, GFXBufferTypeVolatile );
+   GFXVertexBufferHandle<GFXVertexPCT> verts( GFX, 4, GFXBufferTypeVolatile );
    verts.lock();
 
-   verts[0].point.set( -1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0 );
+   verts[0].point.set(1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0);
    verts[0].color = mUnderwaterColor;
 
-   verts[1].point.set( -1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0 );
+   verts[1].point.set(1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0);
    verts[1].color = mUnderwaterColor;
 
-   verts[2].point.set( 1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0 );
+   verts[2].point.set(-1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0);
    verts[2].color = mUnderwaterColor;
 
-   verts[3].point.set( 1.0 - copyOffsetX, -1.0 + copyOffsetY, 0.0 );
+   verts[3].point.set(-1.0 - copyOffsetX, 1.0 + copyOffsetY, 0.0);
    verts[3].color = mUnderwaterColor;
 
    verts.unlock();
 
    GFX->setVertexBuffer( verts );
-   GFX->drawPrimitive( GFXTriangleFan, 0, 2 );
+   GFX->drawPrimitive( GFXTriangleStrip, 0, 2 );
 
    // reset states / transforms
    GFX->setProjectionMatrix( proj );
@@ -886,6 +890,10 @@ void WaterObject::onRemove()
    {
       mPlaneReflector.unregisterReflector();
       cleanupMaterials();
+
+      PostEffect *underWaterEffect = getUnderwaterEffect( );
+      if( underWaterEffect )
+         underWaterEffect->disable( );
    }
 
    Parent::onRemove();
@@ -1133,7 +1141,7 @@ bool WaterObject::initMaterial( S32 idx )
       else
          mat = MATMGR->createMatInstance( mSurfMatName[idx] );
 
-      const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPC>();
+      const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPCT>();
 
       if ( mat && mat->init( MATMGR->getDefaultFeatures(), flags ) )
       {      

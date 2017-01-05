@@ -53,7 +53,7 @@ void GFXCardProfiler::loadProfileScript(const char* aScriptName)
 
    Con::printf("      - Loaded card profile %s", scriptName.c_str());
 
-   Con::executef("eval", script);
+   Con::evaluate(script, false, NULL);
    delete[] script;
 }
 
@@ -106,6 +106,7 @@ void GFXCardProfiler::init()
    Con::printf("   o Chipset : '%s'", getChipString().c_str());
    Con::printf("   o Card    : '%s'", getCardString().c_str());
    Con::printf("   o Version : '%s'", getVersionString().c_str());
+   Con::printf("   o VRAM    : %d MB", getVideoMemoryInMB());
 
    // Do card-specific setup...
    Con::printf("   - Scanning card capabilities...");
@@ -231,3 +232,14 @@ DefineEngineStaticMethod( GFXCardProfilerAPI, queryProfile, S32, ( const char *n
 {
 	return (S32)GFX->getCardProfiler()->queryProfile( name, (U32)defaultValue );
 }
+
+
+DefineEngineStaticMethod( GFXCardProfilerAPI, getBestDepthFormat, String, (),,
+                         "Returns the card name." )
+{
+    if (GFX->getCardProfiler()->queryProfile("GL::Workaround::intel_mac_depth", false))
+        return "GFXFormatD16";
+    else
+        return "GFXFormatD24S8";
+}
+

@@ -150,8 +150,8 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
          F64 videotime = th_granule_time(td,ogg_page_granulepos(&videopage));
          if (videotime > 0)
          {            
-            int hundredths=(int)(videotime*100-(long)videotime*100);
-            int seconds=(long)videotime%60;
+            S32 hundredths=(int)(videotime*100-(long)videotime*100);
+            S32 seconds=(long)videotime%60;
             Platform::outputDebugString("Encoding time %g %02i.%02i", videotime, seconds, hundredths);
          }
       }
@@ -193,7 +193,7 @@ class VideoEncoderTheora : public VideoEncoder, public Thread
    
 public:
    VideoEncoderTheora() :
-      mLastFrame(NULL)      
+      mCurrentFrame(0), td(NULL), mLastFrame(NULL)
    {
       setStatus(false);      
    }
@@ -254,12 +254,12 @@ public:
       th_info_clear(&ti);              
 
       // This is needed for youtube compatibility
-      int vp3_compatible = 1;
+      S32 vp3_compatible = 1;
       th_encode_ctl(td, TH_ENCCTL_SET_VP3_COMPATIBLE, &vp3_compatible, sizeof(vp3_compatible));      
       
       // Set the encoder to max speed
-      int speed_max;      
-      int ret;
+      S32 speed_max;      
+      S32 ret;
       ret = th_encode_ctl(td, TH_ENCCTL_GET_SPLEVEL_MAX, &speed_max, sizeof(speed_max));
       if(ret<0){
          Platform::outputDebugString("VideoEncoderTheora::begin() - could not determine maximum speed level.");

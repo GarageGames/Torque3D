@@ -157,7 +157,7 @@ bool NetConnection::mFilesWereDownloaded = false;
 
 static inline U32 HashNetAddress(const NetAddress *addr)
 {
-   return *((U32 *)addr->netNum) % NetConnection::HashTableSize;
+   return addr->getHash() % NetConnection::HashTableSize;
 }
 
 NetConnection *NetConnection::lookup(const NetAddress *addr)
@@ -215,7 +215,7 @@ U32 NetConnection::getSequence()
 static U32 gPacketRateToServer = 32;
 static U32 gPacketUpdateDelayToServer = 32;
 static U32 gPacketRateToClient = 10;
-static U32 gPacketSize = 200;
+static U32 gPacketSize = 508;
 
 void NetConnection::consoleInit()
 {
@@ -351,6 +351,7 @@ void NetConnection::setNetClassGroup(U32 grp)
 }
 
 NetConnection::NetConnection()
+ : mNetAddress()
 {
    mTranslateStrings = false;
    mConnectSequence = 0;
@@ -433,6 +434,9 @@ NetConnection::NetConnection()
 
    // Disable starting a new journal recording or playback from here on
    Journal::Disable();
+
+   // Ensure NetAddress is cleared
+   dMemset(&mNetAddress, '\0', sizeof(NetAddress));
 }
 
 NetConnection::~NetConnection()
@@ -1116,7 +1120,6 @@ void NetConnection::validateSendString(const char *str)
 
 void NetConnection::packString(BitStream *stream, const char *str)
 {
-   char buf[16];
    if(!*str)
    {
       stream->writeInt(NullString, 2);
@@ -1130,6 +1133,7 @@ void NetConnection::packString(BitStream *stream, const char *str)
    }
    if(str[0] == '-' || (str[0] >= '0' && str[0] <= '9'))
    {
+      char buf[16];
       S32 num = dAtoi(str);
       dSprintf(buf, sizeof(buf), "%d", num);
       if(!dStrcmp(buf, str))
@@ -1417,7 +1421,7 @@ DefineEngineMethod( NetConnection, connect, void, (const char* remoteAddress),,
    )
 {
    NetAddress addr;
-   if(!Net::stringToAddress(remoteAddress, &addr))
+   if (Net::stringToAddress(remoteAddress, &addr) != Net::NoError)
    {
       Con::errorf("NetConnection::connect: invalid address - %s", remoteAddress);
       return;

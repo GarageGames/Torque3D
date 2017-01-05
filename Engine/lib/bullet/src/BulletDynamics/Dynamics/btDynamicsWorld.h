@@ -32,7 +32,10 @@ enum btDynamicsWorldType
 {
 	BT_SIMPLE_DYNAMICS_WORLD=1,
 	BT_DISCRETE_DYNAMICS_WORLD=2,
-	BT_CONTINUOUS_DYNAMICS_WORLD=3
+	BT_CONTINUOUS_DYNAMICS_WORLD=3,
+	BT_SOFT_RIGID_DYNAMICS_WORLD=4,
+	BT_GPU_DYNAMICS_WORLD=5,
+    BT_SOFT_MULTIBODY_DYNAMICS_WORLD=6
 };
 
 ///The btDynamicsWorld is the interface class for several dynamics implementation, basic, discrete, parallel, and continuous etc.
@@ -85,6 +88,8 @@ public:
 		virtual void	synchronizeMotionStates() = 0;
 
 		virtual void	addRigidBody(btRigidBody* body) = 0;
+
+		virtual void	addRigidBody(btRigidBody* body, short group, short mask) = 0;
 
 		virtual void	removeRigidBody(btRigidBody* body) = 0;
 
@@ -142,6 +147,21 @@ public:
 
 
 };
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct btDynamicsWorldDoubleData
+{
+	btContactSolverInfoDoubleData	m_solverInfo;
+	btVector3DoubleData	m_gravity;
+};
+
+///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+struct btDynamicsWorldFloatData
+{
+	btContactSolverInfoFloatData	m_solverInfo;
+	btVector3FloatData	m_gravity;
+};
+
 
 #endif //BT_DYNAMICS_WORLD_H
 

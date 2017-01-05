@@ -32,6 +32,7 @@
 #include "app/game.h"
 #include "T3D/gameBase/gameConnection.h"
 #include "T3D/gameBase/gameConnectionEvents.h"
+#include "console/engineAPI.h"
 
 #define DebugChecksum 0xF00DBAAD
 
@@ -234,7 +235,7 @@ void SimDataBlockEvent::process(NetConnection *cptr)
    if(mProcess)
    {
       //call the console function to set the number of blocks to be sent
-      Con::executef("onDataBlockObjectReceived", Con::getIntArg(mIndex), Con::getIntArg(mTotal));
+      Con::executef("onDataBlockObjectReceived", mIndex, mTotal);
 
       String &errorBuffer = NetConnection::getErrorBuffer();
                      

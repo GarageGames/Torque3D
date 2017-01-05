@@ -217,7 +217,7 @@ struct GhostInfo;
 /// the documentation on AbstractClassRep for more details.
 ///
 /// @nosubgrouping
-class NetObject: public SimObject
+class NetObject : public SimGroup
 {
    // The Ghost Manager needs read/write access
    friend class  NetConnection;
@@ -228,7 +228,7 @@ class NetObject: public SimObject
    friend class GhostAlwaysObjectEvent;
 
 private:
-   typedef SimObject Parent;
+   typedef SimGroup Parent;
 
    /// Mask indicating which states are dirty and need to be retransmitted on this
    /// object.

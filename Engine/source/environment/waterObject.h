@@ -49,7 +49,6 @@ GFXDeclareVertexFormat( GFXWaterVertex )
 {
    Point3F point;
    Point3F normal;
-   GFXVertexColor color;
    Point2F undulateData;
    Point4F horizonFactor;
 };
@@ -97,6 +96,7 @@ struct WaterMatParams
    MaterialParameterHandle* mSpecularParamsSC;   
    MaterialParameterHandle* mDepthGradMaxSC;
    MaterialParameterHandle* mReflectivitySC;
+   MaterialParameterHandle* mDepthGradSamplerSC;
 
    void clear();
    void init(BaseMatInstance* matInst);
@@ -156,7 +156,7 @@ public:
    virtual bool onAdd();
    virtual void onRemove();
    virtual void inspectPostApply();
-   virtual bool processArguments(S32 argc, const char **argv);
+   virtual bool processArguments(S32 argc, ConsoleValueRef *argv);
 
    // NetObject
    virtual U32  packUpdate( NetConnection * conn, U32 mask, BitStream *stream );

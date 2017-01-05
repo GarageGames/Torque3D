@@ -20,15 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shadergen:/autogenConditioners.h"
-//#include "./../postFx.hlsl"
+#include "../../ShaderModelAutoGen.hlsl"
+#include "./../postFx.hlsl"
 
-uniform sampler2D occludeMap : register(S0);
-uniform sampler2D prepassMap : register(S1);
+TORQUE_UNIFORM_SAMPLER2D(occludeMap, 0);
+TORQUE_UNIFORM_SAMPLER2D(prepassMap, 1);
 
 struct VertToPix
 {
-   float4 hpos       : POSITION;
+   float4 hpos       : TORQUE_POSITION;
 
    float4 uv0        : TEXCOORD0;
    float2 uv1        : TEXCOORD1;
@@ -49,7 +49,7 @@ uniform float blurNormalTol;
 void sample( float2 uv, float weight, float4 centerTap, inout int usedCount, inout float occlusion, inout float total )
 {
    //return;
-   float4 tap = prepassUncondition( prepassMap, uv );   
+   float4 tap = TORQUE_PREPASS_UNCONDITION( prepassMap, uv );   
    
    if ( abs( tap.a - centerTap.a ) < blurDepthTol )
    {
@@ -57,19 +57,19 @@ void sample( float2 uv, float weight, float4 centerTap, inout int usedCount, ino
       {
          usedCount++;
          total += weight;
-         occlusion += tex2D( occludeMap, uv ).r * weight;
+         occlusion += TORQUE_TEX2D( occludeMap, uv ).r * weight;
       }
    }   
 }
 
-float4 main( VertToPix IN ) : COLOR
+float4 main( VertToPix IN ) : TORQUE_TARGET0
 {   
    //float4 centerTap;
-   float4 centerTap = prepassUncondition( prepassMap, IN.uv0.zw );
+   float4 centerTap = TORQUE_PREPASS_UNCONDITION( prepassMap, IN.uv0.zw );
    
    //return centerTap;
    
-   //float centerOcclude = tex2D( occludeMap, IN.uv0.zw ).r;
+   //float centerOcclude = TORQUE_TEX2D( occludeMap, IN.uv0.zw ).r;
    //return float4( centerOcclude.rrr, 1 );
 
    float4 kernel = float4( 0.175, 0.275, 0.375, 0.475 ); //25f;
@@ -88,7 +88,7 @@ float4 main( VertToPix IN ) : COLOR
    sample( IN.uv6, kernel.z, centerTap, usedCount, occlusion, total );
    sample( IN.uv7, kernel.w, centerTap, usedCount, occlusion, total );   
    
-   occlusion += tex2D( occludeMap, IN.uv0.zw ).r * 0.5;
+   occlusion += TORQUE_TEX2D( occludeMap, IN.uv0.zw ).r * 0.5;
    total += 0.5;
    //occlusion /= 3.0;
    
@@ -100,7 +100,7 @@ float4 main( VertToPix IN ) : COLOR
    
    //return float4( 0,0,0,occlusion );
    
-   //float3 color = tex2D( colorMap, IN.uv0.zw );
+   //float3 color = TORQUE_TEX2D( colorMap, IN.uv0.zw );
       
    //return float4( color, occlusion );
 }

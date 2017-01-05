@@ -20,58 +20,86 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "../../gl/hlslCompat.glsl"  
 #include "shadergen:/autogenConditioners.h"
+
+//-----------------------------------------------------------------------------
+// Structures                                                                  
+//-----------------------------------------------------------------------------
+struct VertData
+{
+   vec4   position         ;// POSITION;
+   vec3   normal           ;// NORMAL;
+   vec2   undulateData     ;// TEXCOORD0;
+   vec4   horizonFactor    ;// TEXCOORD1;
+};
 
 //-----------------------------------------------------------------------------
 // Defines                                                                  
 //-----------------------------------------------------------------------------
+//VertData IN
+in vec4 vPosition;
+in vec3 vNormal;
+in vec2 vTexCoord0;
+in vec4 vTexCoord1;
 
-// waveData
-#define WAVE_SPEED(i)      waveData[i].x
-#define WAVE_MAGNITUDE(i)  waveData[i].y
+#define IN_position_       vPosition
+#define IN_normal          vNormal
+#define IN_undulateData    vTexCoord0
+#define IN_horizonFactor   vTexCoord1
 
-// Outgoing data
-// Worldspace position of this pixel
-varying vec3 worldPos;
+//ConnectData OUT
+//
+   out vec4   hpos             ;
 
 // TexCoord 0 and 1 (xy,zw) for ripple texture lookup
-varying vec4 rippleTexCoord01;
+out vec4 rippleTexCoord01;
 
-// TexCoord 2 for ripple texture lookup
-varying vec2 rippleTexCoord2;
+   // xy is TexCoord 2 for ripple texture lookup 
+   // z is the Worldspace unit distance/depth of this vertex/pixel
+   // w is amount of the crestFoam ( more at crest of waves ).
+   out vec4   rippleTexCoord2  ;
 
 // Screenspace vert position BEFORE wave transformation
-varying vec4 posPreWave;
+out vec4 posPreWave;
 
 // Screenspace vert position AFTER wave transformation
-varying vec4 posPostWave;
+out vec4 posPostWave;
 
-// Worldspace unit distance/depth of this vertex/pixel
-varying float pixelDist;
+   // Objectspace vert position BEFORE wave transformation	
+   // w coord is world space z position.
+   out vec4   objPos           ;  
 
-varying vec3 fogPos;
+   out vec4   foamTexCoords    ;
 
-varying float worldSpaceZ;
+   out mat3   tangentMat     ;
+//
 
-varying vec4 foamTexCoords;
+#define OUT_hpos hpos
+#define OUT_rippleTexCoord01 rippleTexCoord01
+#define OUT_rippleTexCoord2 rippleTexCoord2
+#define OUT_posPreWave posPreWave
+#define OUT_posPostWave posPostWave
+#define OUT_objPos objPos
+#define OUT_foamTexCoords foamTexCoords
+#define OUT_tangentMat tangentMat
 
 //-----------------------------------------------------------------------------
 // Uniforms                                                                  
 //-----------------------------------------------------------------------------
 uniform mat4 modelMat;
 uniform mat4 modelview;
-uniform mat3 cubeTrans;
-uniform mat4 objTrans;
-uniform vec3   cubeEyePos;
+uniform vec4     rippleMat[3];
 uniform vec3   eyePos;       
 uniform vec2   waveDir[3];
 uniform vec2   waveData[3];
 uniform vec2   rippleDir[3];
 uniform vec2   rippleTexScale[3];                    
 uniform vec3   rippleSpeed;
-uniform vec2   reflectTexSize;
+uniform vec4     foamDir;
+uniform vec4     foamTexScale;
+uniform vec2     foamSpeed;
 uniform vec3   inLightVec;
-uniform vec3   reflectNormal;
 uniform float    gridElementSize;
 uniform float    elapsedTime;
 uniform float    undulateMaxDist;
@@ -81,97 +109,133 @@ uniform float    undulateMaxDist;
 //-----------------------------------------------------------------------------
 void main()
 {
-   // Copy incoming attributes into locals so we can modify them in place.
-   vec4 position = gl_Vertex.xyzw;
-   vec3 normal = gl_Normal.xyz;
-   vec2 undulateData = gl_MultiTexCoord0.st;
-   vec4 horizonFactor = gl_MultiTexCoord1.xyzw;
+   vec4 IN_position      = IN_position_;   
    
    // use projection matrix for reflection / refraction texture coords
-   mat4 texGen = { 0.5, 0.0, 0.0, 0.5, //+ 0.5 / reflectTexSize.x,
-                   0.0, 0.5, 0.0, 0.5, //+ 1.0 / reflectTexSize.y,
-                   0.0, 0.0, 1.0, 0.0,
-                   0.0, 0.0, 0.0, 1.0 };
+   mat4 texGen = mat4FromRow( 0.5,  0.0,  0.0,  0.5,
+                       0.0, -0.5,  0.0,  0.5,
+                       0.0,  0.0,  1.0,  0.0,
+                       0.0,  0.0,  0.0,  1.0 );   
 
-   // Move the vertex based on the horizonFactor if specified to do so for this vert.
-   if ( horizonFactor.z > 0 )
-   {
-      vec2 offsetXY = eyePos.xy - eyePos.xy % gridElementSize;         
-      position.xy += offsetXY;
-      undulateData += offsetXY;
-   }      
+   IN_position.z = mix( IN_position.z, eyePos.z, IN_horizonFactor.x );
       
-   fogPos = position;
-   position.z = mix( position.z, eyePos.z, horizonFactor.x );
+   OUT_objPos = IN_position;
+   OUT_objPos.w = tMul( modelMat, IN_position ).z;
    
    // Send pre-undulation screenspace position
-   posPreWave = modelview * position;
-   posPreWave = texGen * posPreWave;
+   OUT_posPreWave = tMul( modelview, IN_position );
+   OUT_posPreWave = tMul( texGen, OUT_posPreWave );
       
    // Calculate the undulation amount for this vertex.   
-   vec2 undulatePos = undulateData; 
-   float undulateAmt = 0;
+   vec2   undulatePos = tMul( modelMat, vec4  ( IN_undulateData.xy, 0, 1 ) ).xy;
+   float undulateAmt = 0.0;
    
-   for ( int i = 0; i < 3; i++ )
-   {
-      undulateAmt += WAVE_MAGNITUDE(i) * sin( elapsedTime * WAVE_SPEED(i) + 
-                                              undulatePos.x * waveDir[i].x +
-                                              undulatePos.y * waveDir[i].y );
-   }      
+   undulateAmt += waveData[0].y * sin( elapsedTime * waveData[0].x + 
+                                       undulatePos.x * waveDir[0].x +
+                                       undulatePos.y * waveDir[0].y );
+   undulateAmt += waveData[1].y * sin( elapsedTime * waveData[1].x + 
+                                       undulatePos.x * waveDir[1].x +
+                                       undulatePos.y * waveDir[1].y );
+   undulateAmt += waveData[2].y * sin( elapsedTime * waveData[2].x + 
+                                       undulatePos.x * waveDir[2].x +
+                                       undulatePos.y * waveDir[2].y ); 								   
+   
+   float undulateFade = 1;
    
    // Scale down wave magnitude amount based on distance from the camera.   
-   float dist = distance( position, eyePos );
+   float dist = distance( IN_position.xyz, eyePos );
    dist = clamp( dist, 1.0, undulateMaxDist );          
-   undulateAmt *= ( 1 - dist / undulateMaxDist ); 
+   undulateFade *= ( 1 - dist / undulateMaxDist ); 
    
    // Also scale down wave magnitude if the camera is very very close.
-   undulateAmt *= clamp( ( distance( IN.position, eyePos ) - 0.5 ) / 10.0, 0.0, 1.0 );
+   undulateFade *= saturate( ( distance( IN_position.xyz, eyePos ) - 0.5 ) / 10.0 );
+   
+   undulateAmt *= undulateFade;
+   
+   OUT_rippleTexCoord2.w = undulateAmt / ( waveData[0].y + waveData[1].y + waveData[2].y );	
+   OUT_rippleTexCoord2.w = saturate( OUT_rippleTexCoord2.w - 0.2 ) / 0.8;
    
    // Apply wave undulation to the vertex.
-   posPostWave = position;
-   posPostWave.xyz += normal.xyz * undulateAmt;   
-   
-   // Save worldSpace position of this pixel/vert
-   worldPos = posPostWave.xyz;   
+   OUT_posPostWave = IN_position;
+   OUT_posPostWave.xyz += IN_normal.xyz * undulateAmt;         
    
    // Convert to screen 
-   posPostWave = modelview * posPostWave;
+   OUT_posPostWave = tMul( modelview, OUT_posPostWave );
    
    // Setup the OUT position symantic variable
-   gl_Position = posPostWave;
-   gl_Position.z = mix(gl_Position.z, gl_Position.w, horizonFactor.x);
+   OUT_hpos = OUT_posPostWave; 
+   //OUT_hpos.z = mix( OUT_hpos.z, OUT_hpos.w, IN_horizonFactor.x );
    
-   worldSpaceZ = modelMat * vec4(fogPos, 1.0) ).z;
-   if ( horizonFactor.x > 0.0 )
-   {
-      vec3 awayVec = normalize( fogPos.xyz - eyePos );
-      fogPos.xy += awayVec.xy * 1000.0;
-   }
+   // if ( IN_horizonFactor.x > 0 )
+   // {
+      // vec3   awayVec = normalize( OUT_objPos.xyz - eyePos );
+      // OUT_objPos.xy += awayVec.xy * 1000.0;
+   // }
    
    // Save world space camera dist/depth of the outgoing pixel
-   pixelDist = gl_Position.z;              
+   OUT_rippleTexCoord2.z = OUT_hpos.z;              
 
    // Convert to reflection texture space   
-   posPostWave = texGen * posPostWave;
+   OUT_posPostWave = tMul( texGen, OUT_posPostWave );
               
-   float2 ripplePos = undulateData;     
-   float2 txPos = normalize( ripplePos );
-   txPos *= 50000.0;   
-   ripplePos = mix( ripplePos, txPos, IN.horizonFactor.x );
+   vec2   txPos = undulatePos;
+   if ( bool(IN_horizonFactor.x) )
+      txPos = normalize( txPos ) * 50000.0;
       
    // set up tex coordinates for the 3 interacting normal maps   
-   rippleTexCoord01.xy = mix( ripplePos * rippleTexScale[0], txPos.xy * rippleTexScale[0], IN.horizonFactor.x );
-   rippleTexCoord01.xy += rippleDir[0] * elapsedTime * rippleSpeed.x;
+   OUT_rippleTexCoord01.xy = txPos * rippleTexScale[0];
+   OUT_rippleTexCoord01.xy += rippleDir[0] * elapsedTime * rippleSpeed.x;
 
-   rippleTexCoord01.zw = mix( ripplePos * rippleTexScale[1], txPos.xy * rippleTexScale[1], IN.horizonFactor.x );
-   rippleTexCoord01.zw += rippleDir[1] * elapsedTime * rippleSpeed.y;
+   mat2 texMat;   
+   texMat[0][0] = rippleMat[0].x;
+   texMat[1][0] = rippleMat[0].y;
+   texMat[0][1] = rippleMat[0].z;
+   texMat[1][1] = rippleMat[0].w;
+   OUT_rippleTexCoord01.xy = tMul( texMat, OUT_rippleTexCoord01.xy );      
 
-   rippleTexCoord2.xy = mix( ripplePos * rippleTexScale[2], txPos.xy * rippleTexScale[2], IN.horizonFactor.x );
-   rippleTexCoord2.xy += rippleDir[2] * elapsedTime * rippleSpeed.z; 
+   OUT_rippleTexCoord01.zw = txPos * rippleTexScale[1];
+   OUT_rippleTexCoord01.zw += rippleDir[1] * elapsedTime * rippleSpeed.y;
+   
+   texMat[0][0] = rippleMat[1].x;
+   texMat[1][0] = rippleMat[1].y;
+   texMat[0][1] = rippleMat[1].z;
+   texMat[1][1] = rippleMat[1].w;
+   OUT_rippleTexCoord01.zw = tMul( texMat, OUT_rippleTexCoord01.zw );         
 
-   foamTexCoords.xy = mix( ripplePos * 0.2, txPos.xy * rippleTexScale[0], IN.horizonFactor.x );   
-   foamTexCoords.xy += rippleDir[0] * sin( ( elapsedTime + 500.0 ) * -0.4 ) * 0.15;
+   OUT_rippleTexCoord2.xy = txPos * rippleTexScale[2];
+   OUT_rippleTexCoord2.xy += rippleDir[2] * elapsedTime * rippleSpeed.z; 
 
-   foamTexCoords.zw = mix( ripplePos * 0.3, txPos.xy * rippleTexScale[1], IN.horizonFactor.x );   
-   foamTexCoords.zw += rippleDir[1] * sin( elapsedTime * 0.4 ) * 0.15;
+   texMat[0][0] = rippleMat[2].x;
+   texMat[1][0] = rippleMat[2].y;
+   texMat[0][1] = rippleMat[2].z;
+   texMat[1][1] = rippleMat[2].w;
+   OUT_rippleTexCoord2.xy = tMul( texMat, OUT_rippleTexCoord2.xy );    
+   
+   OUT_foamTexCoords.xy = txPos * foamTexScale.xy + foamDir.xy * foamSpeed.x * elapsedTime;
+   OUT_foamTexCoords.zw = txPos * foamTexScale.zw + foamDir.zw * foamSpeed.y * elapsedTime;
+
+   
+   vec3   binormal = vec3  ( 1, 0, 0 );
+   vec3   tangent = vec3  ( 0, 1, 0 );
+   vec3   normal;
+   for ( int i = 0; i < 3; i++ )
+   {
+      binormal.z += undulateFade * waveDir[i].x * waveData[i].y * cos( waveDir[i].x * undulatePos.x + waveDir[i].y * undulatePos.y + elapsedTime * waveData[i].x );
+	  tangent.z += undulateFade * waveDir[i].y * waveData[i].y * cos( waveDir[i].x * undulatePos.x + waveDir[i].y * undulatePos.y + elapsedTime * waveData[i].x );
+   } 
+
+   binormal = binormal;
+   tangent = tangent;
+   normal = cross( binormal, tangent );
+   
+   mat3 worldToTangent;
+   worldToTangent[0] = binormal;
+   worldToTangent[1] = tangent;
+   worldToTangent[2] = normal;
+
+   OUT_tangentMat = transpose(worldToTangent);
+
+   gl_Position = OUT_hpos;
+   correctSSP(gl_Position);
 }
+

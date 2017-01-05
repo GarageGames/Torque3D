@@ -35,27 +35,27 @@
 #include <X11/Xos.h>
 #include <X11/Xatom.h>
 #include <X11/Xft/Xft.h>
-#include <X11/extensions/Xrender.h>      // For XRenderColor
+//#include <X11/extensions/Xrender.h>      // For XRenderColor
 
 // Needed for getenv in createFont
 #include <stdlib.h>
 XftFont *loadFont(const char *name, S32 size, Display *display)
 {
   XftFont *fontInfo = NULL;
-  char* fontname = const_cast<char*>(name);
+  const char* fontname = name;
   if (dStrlen(fontname)==0)
     fontname = "arial";
-  else if (stristr(const_cast<char*>(name), "arial") != NULL)
+  else if (stristr(name, "arial") != NULL)
     fontname = "arial";
-  else if (stristr(const_cast<char*>(name), "lucida console") != NULL)
+  else if (stristr(name, "lucida console") != NULL)
     fontname = "lucida console";
 
-  char* weight = "medium";
-  char* slant = "roman"; // no slant
+  const char* weight = "medium";
+  const char* slant = "roman"; // no slant
 
-  if (stristr(const_cast<char*>(name), "bold") != NULL)
+  if (stristr(name, "bold") != NULL)
     weight = "bold";
-  if (stristr(const_cast<char*>(name), "italic") != NULL)
+  if (stristr(name, "italic") != NULL)
     slant = "italic";
 
   int mSize = size - 2 - (int)((float)size * 0.1);
@@ -76,7 +76,7 @@ XftFont *loadFont(const char *name, S32 size, Display *display)
       XftNameUnparse(fontInfo->pattern, xftname, 1024);
 
 #ifdef DEBUG
-      Con::printf("Font '%s %d' mapped to '%s'\n", name, size, xftname);
+    Con::printf("Font '%s %d' mapped to '%s'\n", name, size, xftname);
 #endif
 
   return fontInfo;
@@ -186,7 +186,7 @@ XftFont *loadFont(const char *name, S32 size, Display *display)
 
 
 // XA: New class for the unix unicode font
-PlatformFont *createPlatformFont(const char *name, U32 size, U32 charset /* = TGE_ANSI_CHARSET */)
+PlatformFont *createPlatformFont(const char *name, dsize_t size, U32 charset /* = TGE_ANSI_CHARSET */)
 {
   PlatformFont *retFont = new x86UNIXFont;
 
@@ -204,7 +204,7 @@ x86UNIXFont::~x86UNIXFont()
 {}
 
 
-bool x86UNIXFont::create(const char *name, U32 size, U32 charset)
+bool x86UNIXFont::create(const char *name, dsize_t size, U32 charset)
 {
   Display *display = XOpenDisplay(getenv("DISPLAY"));
   if (display == NULL)
@@ -345,4 +345,3 @@ PlatformFont::CharInfo &x86UNIXFont::getCharInfo(const UTF8 *str) const
 {
   return getCharInfo(oneUTF32toUTF16(oneUTF8toUTF32(str,NULL)));
 }
-
