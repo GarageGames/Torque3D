@@ -178,7 +178,7 @@ void GFXShader::_unlinkBuffer( GFXShaderConstBuffer *buf )
 
 
 DefineEngineFunction( addGlobalShaderMacro, void, 
-   ( const char *name, const char *value ), ( NULL ),
+   ( const char *name, const char *value ), ( nullAsType<const char*>() ),
    "Adds a global shader macro which will be merged with the script defined "
    "macros on every shader.  The macro will replace the value of an existing "
    "macro of the same name.  For the new macro to take effect all the shaders "

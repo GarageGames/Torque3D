@@ -2147,7 +2147,7 @@ ConsoleDocFragment _popDialog2(
    "void popDialog();"
 );
 
-DefineConsoleMethod( GuiCanvas, popDialog, void, (GuiControl * gui), (NULL), "(GuiControl ctrl=NULL)"
+DefineConsoleMethod( GuiCanvas, popDialog, void, (GuiControl * gui), (nullAsType<GuiControl*>()), "(GuiControl ctrl=NULL)"
 			  "@hide")
 {
    if (gui)

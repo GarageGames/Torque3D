@@ -547,9 +547,12 @@ namespace engineAPI{
 			template<size_t index, size_t method_offset = 0, typename ...RealArgTs>
 			static IthArgType<index> getRealArgValue(S32 argc, ConsoleValueRef *argv, const _EngineFunctionDefaultArguments< void(RealArgTs...) >& defaultArgs)
 			{
-				return (startArgc + index) < argc
-				? EngineUnmarshallData< IthArgType<index> >()( argv[ startArgc + index ] )
-				: std::get<index + method_offset>(defaultArgs.mArgs);
+				if((startArgc + index) < argc)
+				{
+					return EngineUnmarshallData< IthArgType<index> >()( argv[ startArgc + index ] );
+				} else {
+					return std::get<index + method_offset>(defaultArgs.mArgs);
+				}
 			}
 			
 			template<size_t ...I>
