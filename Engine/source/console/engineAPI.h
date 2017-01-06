@@ -568,7 +568,15 @@ namespace engineAPI{
 			using SeqType = typename Gens<sizeof...(ArgTs)>::type;
 		};
 		
-		struct MarshallHelpers {
+		template<typename ArgVT> struct MarshallHelpers {
+			template<typename ...ArgTs> static void marshallEach(S32 &argc, ArgVT *argv, const ArgTs& ...args){}
+			template<typename H, typename ...Tail> static void marshallEach(S32 &argc, ArgVT *argv, const H& head, const Tail& ...tail){
+				argv[argc++] = EngineMarshallData(head);
+				marshallEach(argc, argv, tail...);
+			}
+		};
+		
+		template<> struct MarshallHelpers<ConsoleValueRef> {
 			template<typename ...ArgTs> static void marshallEach(S32 &argc, ConsoleValueRef *argv, const ArgTs& ...args){}
 			template<typename H, typename ...Tail> static void marshallEach(S32 &argc, ConsoleValueRef *argv, const H& head, const Tail& ...tail){
 				EngineMarshallData(head, argc, argv);
@@ -1174,7 +1182,7 @@ public:
 struct _EngineConsoleCallbackHelper : public _BaseEngineConsoleCallbackHelper
 {
 private:
-	using Helper = engineAPI::detail::MarshallHelpers;
+	using Helper = engineAPI::detail::MarshallHelpers<ConsoleValueRef>;
 public:
 
    _EngineConsoleCallbackHelper( StringTableEntry callbackName, SimObject* pThis )
@@ -1219,7 +1227,7 @@ public:
 template<typename P1> struct _EngineConsoleExecCallbackHelper : public _BaseEngineConsoleCallbackHelper
 {
 private:
-	using Helper = engineAPI::detail::MarshallHelpers;
+	using Helper = engineAPI::detail::MarshallHelpers<ConsoleValueRef>;
 public:
 
    _EngineConsoleExecCallbackHelper( SimObject* pThis )
@@ -1263,7 +1271,7 @@ public:
 template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEngineConsoleCallbackHelper
 {
 private:
-	using Helper = engineAPI::detail::MarshallHelpers;
+	using Helper = engineAPI::detail::MarshallHelpers<ConsoleValueRef>;
 public:
    _EngineConsoleExecCallbackHelper( const char *callbackName )
    {
