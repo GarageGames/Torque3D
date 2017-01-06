@@ -114,20 +114,20 @@ U32 endHighResolutionTimer(U32 time[2])
 void startHighResolutionTimer(U32 time[2])
 {
    __asm__ __volatile__(
-                   "rdtsc\n"
-                   : "=a" (time[0]), "=d" (time[1])
-                   );
+      "rdtsc\n"
+      : "=a" (time[0]), "=d" (time[1])
+      );
 }
 
 U32 endHighResolutionTimer(U32 time[2])
 {
    U32 ticks;
    __asm__ __volatile__(
-                   "rdtsc\n"
-                   "sub  0x4(%%ecx),  %%edx\n"
-                   "sbb  (%%ecx),  %%eax\n"
-                   : "=a" (ticks) : "c" (time)
-                   );
+      "rdtsc\n"
+      "sub  0x4(%%ecx),  %%edx\n"
+      "sbb  (%%ecx),  %%eax\n"
+      : "=a" (ticks) : "c" (time)
+      );
    return ticks;
 }
 
