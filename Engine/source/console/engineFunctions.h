@@ -23,6 +23,8 @@
 #ifndef _ENGINEFUNCTIONS_H_
 #define _ENGINEFUNCTIONS_H_
 
+#include <tuple>
+
 #ifndef _ENGINEEXPORTS_H_
    #include "console/engineExports.h"
 #endif

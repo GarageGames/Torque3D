@@ -1602,7 +1602,7 @@ DefineEngineFunction( containerSearchCurrRadiusDist, F32, ( bool useClientContai
 
 //TODO: make RayInfo an API type
 DefineEngineFunction( containerRayCast, const char*,
-   ( Point3F start, Point3F end, U32 mask, SceneObject *pExempt, bool useClientContainer ), ( NULL, false ),
+   ( Point3F start, Point3F end, U32 mask, SceneObject *pExempt, bool useClientContainer ), ( nullAsType<SceneObject*>(), false ),
    "@brief Cast a ray from start to end, checking for collision against items matching mask.\n\n"
 
    "If pExempt is specified, then it is temporarily excluded from collision checks (For "

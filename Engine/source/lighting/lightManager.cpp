@@ -442,7 +442,7 @@ DefineEngineFunction( setLightManager, bool, ( const char *name ),,
    return gClientSceneGraph->setLightManager( name );
 }
 
-DefineEngineFunction( lightScene, bool, ( const char *completeCallbackFn, const char *mode ), ( NULL, NULL ),
+DefineEngineFunction( lightScene, bool, ( const char *completeCallbackFn, const char *mode ), ( nullAsType<const char*>(), nullAsType<const char*>() ),
    "Will generate static lighting for the scene if supported by the active light manager.\n\n"
    "If mode is \"forceAlways\", the lightmaps will be regenerated regardless of whether "
    "lighting cache files can be written to. If mode is \"forceWritable\", then the lightmaps "

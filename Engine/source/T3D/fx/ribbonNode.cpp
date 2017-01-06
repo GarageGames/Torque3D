@@ -39,7 +39,6 @@ ConsoleDocClass( RibbonNodeData,
 ConsoleDocClass( RibbonNode, ""
    );
 
-
 //-----------------------------------------------------------------------------
 // RibbonNodeData
 //-----------------------------------------------------------------------------
@@ -299,7 +298,7 @@ void RibbonNode::setRibbonDatablock(RibbonData* data)
    mRibbonDatablock = data;
 }
 
-DefineEngineMethod(RibbonNode, setRibbonDatablock, void, (RibbonData* ribbonDatablock), (0),
+DefineEngineMethod(RibbonNode, setRibbonDatablock, void, (RibbonData* ribbonDatablock), (nullAsType<RibbonData*>()),
    "Assigns the datablock for this ribbon node.\n"
    "@param ribbonDatablock RibbonData datablock to assign\n"
    "@tsexample\n"
