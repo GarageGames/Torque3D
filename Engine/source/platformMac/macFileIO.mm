@@ -740,9 +740,9 @@ bool Platform::isSubDirectory(const char *pathParent, const char *pathSub)
 inline bool isGoodDirectory(dirent* entry)
 {
    return (entry->d_type == DT_DIR                          // is a dir
-           && dStrcmp(entry->d_name,".") != 0                 // not here
-           && dStrcmp(entry->d_name,"..") != 0                // not parent
-           && !Platform::isExcludedDirectory(entry->d_name)); // not excluded
+         && dStrcmp(entry->d_name,".") != 0                 // not here
+         && dStrcmp(entry->d_name,"..") != 0                // not parent
+         && !Platform::isExcludedDirectory(entry->d_name)); // not excluded
 }
 
 //-----------------------------------------------------------------------------
@@ -874,7 +874,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
       if ( isDir )
       {
          if (dStrcmp(d->d_name, ".") == 0 ||
-             dStrcmp(d->d_name, "..") == 0)
+            dStrcmp(d->d_name, "..") == 0)
             continue;
          if (Platform::isExcludedDirectory(d->d_name))
             continue;
@@ -887,8 +887,8 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
                dSprintf(child, 1024, "%s/%s", subPath, d->d_name);
             if (currentDepth < recurseDepth || recurseDepth == -1 )
                recurseDumpDirectories(basePath, child, directoryVector,
-                                      currentDepth + 1, recurseDepth,
-                                      noBasePath);
+                                 currentDepth + 1, recurseDepth,
+                                 noBasePath);
          }
          else
          {
@@ -899,8 +899,8 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
                dSprintf(child, 1024, "/%s", d->d_name);
             if (currentDepth < recurseDepth || recurseDepth == -1)
                recurseDumpDirectories(basePath, child, directoryVector,
-                                      currentDepth + 1, recurseDepth,
-                                      noBasePath);
+                                 currentDepth + 1, recurseDepth,
+                                 noBasePath);
          }
       }
    }

@@ -48,7 +48,7 @@ Profiler *gProfiler = NULL;
 //#define TORQUE_PROFILER_DEBUG
 
 // Machinery to record the stack of node names, as a debugging aid to find
-// mismatched PROFILE_START and PROFILE_END blocks. We profile from the 
+// mismatched PROFILE_START and PROFILE_END blocks. We profile from the
 // beginning to catch profile block errors that occur when torque is starting up.
 #ifdef TORQUE_PROFILER_DEBUG
 Vector<StringTableEntry> gProfilerNodeStack;
@@ -191,7 +191,7 @@ Profiler::Profiler()
    mCurrentProfilerData->mInvokeCount = 0;
    mCurrentProfilerData->mTotalTime = 0;
    mCurrentProfilerData->mSubTime = 0;
-#ifdef TORQUE_ENABLE_PROFILE_PATH   
+#ifdef TORQUE_ENABLE_PROFILE_PATH
    mCurrentProfilerData->mPath = "";
 #endif
    mRootProfilerData = mCurrentProfilerData;
@@ -201,7 +201,7 @@ Profiler::Profiler()
 
    mProfileList = NULL;
 
-   mEnabled = TORQUE_PROFILE_AT_ENGINE_START;   
+   mEnabled = TORQUE_PROFILE_AT_ENGINE_START;
    mNextEnable = TORQUE_PROFILE_AT_ENGINE_START;
    mStackDepth = 0;
    gProfiler = this;
@@ -289,7 +289,7 @@ void Profiler::validate()
          if(!wk)
             Platform::debugBreak();
          for(wk = dp->mParent->mChildHash[walk->mNameHash & (ProfilerData::HashTableSize - 1)] ;
-               wk; wk = wk->mNextHash)
+            wk; wk = wk->mNextHash)
             if(wk == dp)
                break;
          if(!wk)
@@ -352,7 +352,7 @@ void Profiler::hashPush(ProfilerRootData *root)
    mStackDepth++;
    PROFILER_DEBUG_PUSH_NODE(root->mName);
    AssertFatal(mStackDepth <= mMaxStackDepth,
-                  "Stack overflow in profiler.  You may have mismatched PROFILE_START and PROFILE_ENDs");
+            "Stack overflow in profiler.  You may have mismatched PROFILE_START and PROFILE_ENDs");
    if(!mEnabled)
       return;
 
@@ -364,7 +364,7 @@ void Profiler::hashPush(ProfilerRootData *root)
    }
 
    if(mCurrentProfilerData->mLastSeenProfiler &&
-            mCurrentProfilerData->mLastSeenProfiler->mRoot == root)
+      mCurrentProfilerData->mLastSeenProfiler->mRoot == root)
       nextProfiler = mCurrentProfilerData->mLastSeenProfiler;
 
    if(!nextProfiler)
@@ -715,9 +715,9 @@ void Profiler::enableMarker(const char *marker, bool enable)
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( profilerMarkerEnable, void, ( const char* markerName, bool enable ), ( true ),   
+DefineEngineFunction( profilerMarkerEnable, void, ( const char* markerName, bool enable ), ( true ),
    "@brief Enable or disable a specific profile.\n\n"
-   "@param enable     Optional paramater to enable or disable the profile.\n"
+   "@param enable   Optional paramater to enable or disable the profile.\n"
    "@param markerName Name of a specific marker to enable or disable.\n"
    "@note Calling this function will first call profilerReset(), clearing all data from profiler. "
    "All profile markers are enabled by default.\n\n"
@@ -767,7 +767,7 @@ DefineEngineFunction( profilerDumpToFile, void, ( const char* fileName ),,
 }
 
 DefineEngineFunction( profilerReset, void, (),,
-                "@brief Resets the profiler, clearing it of all its data.\n\n"
+            "@brief Resets the profiler, clearing it of all its data.\n\n"
             "If the profiler is currently running, it will first be disabled. "
             "All markers will retain their current enabled/disabled status.\n\n"
             "@ingroup Debugging" )
