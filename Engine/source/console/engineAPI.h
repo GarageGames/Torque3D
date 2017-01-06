@@ -437,6 +437,7 @@ inline const char* _EngineConsoleThunkReturnValue( const T& value )
 {
    return EngineMarshallData( value );
 }
+
 inline bool _EngineConsoleThunkReturnValue( bool value )
 {
    return value;
@@ -518,7 +519,7 @@ struct _EngineConsoleThunkCountArgs
 		return sizeof...(ArgTs);
 	}
 	
-	operator U32() const{ // WHAT IS THIS??
+	operator U32() const{ // FIXME: WHAT IS THIS?? I'm pretty sure it's incorrect, and it's the version that is invoked by all the macros
 		return 0;
 	}
 };
@@ -527,799 +528,93 @@ struct _EngineConsoleThunkCountArgs
 
 
 // Encapsulation of a legacy console function invocation.
+namespace engineAPI{
+	namespace detail{
+		template<S32 startArgc, typename R, typename ...ArgTs>
+		struct ThunkHelpers {
+			using SelfType = ThunkHelpers<startArgc, R, ArgTs...>;
+			using FunctionType = R(*)(ArgTs...);
+			template<typename Frame> using MethodType = R(Frame::*)(ArgTs ...) const;
+			template<size_t I> using IthArgType = typename std::tuple_element<I, std::tuple<ArgTs ...> >::type;
+			
+			template<size_t ...> struct Seq {};
+			template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
+			template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
+			
+			typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
+			static constexpr S32 NUM_ARGS = sizeof...(ArgTs) + startArgc;
+			
+			template<size_t index, size_t method_offset = 0, typename ...RealArgTs>
+			static IthArgType<index> getRealArgValue(S32 argc, ConsoleValueRef *argv, const _EngineFunctionDefaultArguments< void(RealArgTs...) >& defaultArgs)
+			{
+				return (startArgc + index) < argc
+				? EngineUnmarshallData< IthArgType<index> >()( argv[ startArgc + index ] )
+				: std::get<index + method_offset>(defaultArgs.mArgs);
+			}
+			
+			template<size_t ...I>
+			static R dispatchHelper(S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs, Seq<I...>){
+				return fn(SelfType::getRealArgValue<I>(argc, argv, defaultArgs) ...);
+			}
+			
+			template<typename Frame, size_t ...I>
+			static R dispatchHelper(S32 argc, ConsoleValueRef *argv, MethodType<Frame> fn, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, ArgTs...) >& defaultArgs, Seq<I...>){
+				return (frame->*fn)(SelfType::getRealArgValue<I,1>(argc, argv, defaultArgs) ...);
+			}
+			
+			using SeqType = typename Gens<sizeof...(ArgTs)>::type;
+		};
+	}
+}
 
 template< S32 startArgc, typename T >
 struct _EngineConsoleThunk {};
 
-template< S32 startArgc, typename R >
-struct _EngineConsoleThunk< startArgc, R() >
+template< S32 startArgc, typename R, typename ...ArgTs >
+struct _EngineConsoleThunk< startArgc, R(ArgTs...) >
 {
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 0;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )(), const _EngineFunctionDefaultArguments< void() >& )
+private:
+	using Helper = engineAPI::detail::ThunkHelpers<startArgc, R, ArgTs...>;
+	using SeqType = typename Helper::SeqType;
+public:
+	typedef typename Helper::FunctionType FunctionType;
+	typedef typename Helper::ReturnType ReturnType;
+	template<typename Frame> using MethodType = typename Helper::template MethodType<Frame>;
+	static constexpr S32 NUM_ARGS = Helper::NUM_ARGS;
+	
+   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
    {
-      return _EngineConsoleThunkReturnValue( fn() );
+	   return _EngineConsoleThunkReturnValue( Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType()));
    }
    template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )() const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType* ) >& )
+	static ReturnType thunk( S32 argc, ConsoleValueRef *argv, MethodType<Frame> fn, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, ArgTs...) >& defaultArgs)
    {
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )() );
+	   return _EngineConsoleThunkReturnValue( Helper::dispatchHelper(argc, argv, fn, frame, defaultArgs, SeqType()));
    }
 };
 
-template< S32 startArgc >
-struct _EngineConsoleThunk< startArgc, void() >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 0;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )(), const _EngineFunctionDefaultArguments< void() >& )
-   {
-      fn();
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )() const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType* ) >& )
-   {
-      return ( frame->*fn )();
-   }
+// Have to do a partial specialization for void-returning functions :(
+template<S32 startArgc, typename ...ArgTs>
+struct _EngineConsoleThunk<startArgc, void(ArgTs...)> {
+private:
+	using Helper = engineAPI::detail::ThunkHelpers<startArgc, void, ArgTs...>;
+	using SeqType = typename Helper::SeqType;
+public:
+	typedef typename Helper::FunctionType FunctionType;
+	typedef typename Helper::ReturnType ReturnType;
+	template<typename Frame> using MethodType = typename Helper::template MethodType<Frame>;
+	static constexpr S32 NUM_ARGS = Helper::NUM_ARGS;
+	
+	static void thunk( S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
+	{
+		Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType());
+	}
+	template< typename Frame >
+	static void thunk( S32 argc, ConsoleValueRef *argv, MethodType<Frame> fn, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, ArgTs...) >& defaultArgs)
+	{
+		Helper::dispatchHelper(argc, argv, fn, frame, defaultArgs, SeqType());
+	}
 };
-
-
-
-template< S32 startArgc, typename R, typename A >
-struct _EngineConsoleThunk< startArgc, R( A ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 1 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A ), const _EngineFunctionDefaultArguments< void( A ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a ) );
-   }
-};
-
-template< S32 startArgc, typename A >
-struct _EngineConsoleThunk< startArgc, void( A ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 1 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A ), const _EngineFunctionDefaultArguments< void( A ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      
-      fn( a );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      
-      ( frame->*fn )( a );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B >
-struct _EngineConsoleThunk< startArgc, R( A, B ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 2 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B ), const _EngineFunctionDefaultArguments< void( A, B ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B >
-struct _EngineConsoleThunk< startArgc, void( A, B ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 2 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B ), const _EngineFunctionDefaultArguments< void( A, B ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      
-      fn( a, b );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      
-      ( frame->*fn )( a, b );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C >
-struct _EngineConsoleThunk< startArgc, R( A, B, C ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 3 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C ), const _EngineFunctionDefaultArguments< void( A, B, C ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C >
-struct _EngineConsoleThunk< startArgc, void( A, B, C ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 3 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C ), const _EngineFunctionDefaultArguments< void( A, B, C ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      
-      fn( a, b, c );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      
-      ( frame->*fn )( a, b, c );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C, typename D >
-struct _EngineConsoleThunk< startArgc, R( A, B, C, D ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 4 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C, D ), const _EngineFunctionDefaultArguments< void( A, B, C, D ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c, d ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C, D ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c, d ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C, typename D >
-struct _EngineConsoleThunk< startArgc, void( A, B, C, D ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 4 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C, D ), const _EngineFunctionDefaultArguments< void( A, B, C, D ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      
-      fn( a, b, c, d );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C, D ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      
-      ( frame->*fn )( a, b, c, d );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C, typename D, typename E >
-struct _EngineConsoleThunk< startArgc, R( A, B, C, D, E ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 5 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C, D, E ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c, d, e ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C, D, E ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c, d, e ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C, typename D, typename E >
-struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 5 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C, D, E ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      
-      fn( a, b, c, d, e );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C, D, E ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      
-      ( frame->*fn )( a, b, c, d, e );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C, typename D, typename E, typename F >
-struct _EngineConsoleThunk< startArgc, R( A, B, C, D, E, F ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 6 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C, D, E, F ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c, d, e, f ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C, D, E, F ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c, d, e, f ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C, typename D, typename E, typename F >
-struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 6 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C, D, E, F ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      
-      fn( a, b, c, d, e, f );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C, D, E, F ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      
-      ( frame->*fn )( a, b, c, d, e, f );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-struct _EngineConsoleThunk< startArgc, R( A, B, C, D, E, F, G ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 7 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C, D, E, F, G ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c, d, e, f, g ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C, D, E, F, G ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c, d, e, f, g ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 7 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C, D, E, F, G ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      
-      fn( a, b, c, d, e, f, g );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C, D, E, F, G ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      
-      ( frame->*fn )( a, b, c, d, e, f, g );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-struct _EngineConsoleThunk< startArgc, R( A, B, C, D, E, F, G, H ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 8 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C, D, E, F, G, H ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c, d, e, f, g, h ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C, D, E, F, G, H ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c, d, e, f, g, h ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 8 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C, D, E, F, G, H ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      
-      fn( a, b, c, d, e, f, g, h );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C, D, E, F, G, H ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      
-      ( frame->*fn )( a, b, c, d, e, f, g, h );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-struct _EngineConsoleThunk< startArgc, R( A, B, C, D, E, F, G, H, I ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 9 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C, D, E, F, G, H, I ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.i ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c, d, e, f, g, h, i ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C, D, E, F, G, H, I ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H, I ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.j ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c, d, e, f, g, h, i ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 9 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C, D, E, F, G, H, I ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.i ) );
-      
-      fn( a, b, c, d, e, f, g, h, i );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C, D, E, F, G, H, I ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H, I ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.j ) );
-      
-      ( frame->*fn )( a, b, c, d, e, f, g, h, i );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-struct _EngineConsoleThunk< startArgc, R( A, B, C, D, E, F, G, H, I, J ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 10 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C, D, E, F, G, H, I, J ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I, J ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.i ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.j ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c, d, e, f, g, h, i, j ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C, D, E, F, G, H, I, J ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H, I, J ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.j ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.k ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c, d, e, f, g, h, i, j ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 10 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C, D, E, F, G, H, I, J ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I, J ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.i ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.j ) );
-      
-      fn( a, b, c, d, e, f, g, h, i, j );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C, D, E, F, G, H, I, J ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H, I, J ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.j ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.k ) );
-      
-      ( frame->*fn )( a, b, c, d, e, f, g, h, i, j );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-struct _EngineConsoleThunk< startArgc, R( A, B, C, D, E, F, G, H, I, J, K ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 11 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C, D, E, F, G, H, I, J, K ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I, J, K ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.i ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.j ) );
-      K k = ( startArgc + 10 < argc ? EngineUnmarshallData< K >()( argv[ startArgc + 10 ] ) : K( defaultArgs.k ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c, d, e, f, g, h, i, j, k ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C, D, E, F, G, H, I, J, K ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H, I, J, K ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.j ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.k ) );
-      K k = ( startArgc + 10 < argc ? EngineUnmarshallData< K >()( argv[ startArgc + 10 ] ) : K( defaultArgs.l ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c, d, e, f, g, h, i, j, k ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 11 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C, D, E, F, G, H, I, J, K ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I, J, K ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.i ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.j ) );
-      K k = ( startArgc + 10 < argc ? EngineUnmarshallData< K >()( argv[ startArgc + 10 ] ) : K( defaultArgs.k ) );
-      
-      fn( a, b, c, d, e, f, g, h, i, j, k );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C, D, E, F, G, H, I, J, K ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H, I, J, K ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.j ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.k ) );
-      K k = ( startArgc + 10 < argc ? EngineUnmarshallData< K >()( argv[ startArgc + 10 ] ) : K( defaultArgs.l ) );
-      
-      ( frame->*fn )( a, b, c, d, e, f, g, h, i, j, k );
-   }
-};
-
-
-template< S32 startArgc, typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-struct _EngineConsoleThunk< startArgc, R( A, B, C, D, E, F, G, H, I, J, K, L ) >
-{
-   typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-   static const S32 NUM_ARGS = 12 + startArgc;
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( *fn )( A, B, C, D, E, F, G, H, I, J, K, L ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I, J, K, L ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.i ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.j ) );
-      K k = ( startArgc + 10 < argc ? EngineUnmarshallData< K >()( argv[ startArgc + 10 ] ) : K( defaultArgs.k ) );
-      L l = ( startArgc + 11 < argc ? EngineUnmarshallData< L >()( argv[ startArgc + 11 ] ) : L( defaultArgs.l ) );
-      
-      return _EngineConsoleThunkReturnValue( fn( a, b, c, d, e, f, g, h, i, j, k, l ) );
-   }
-   template< typename Frame >
-   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, R ( Frame::*fn )( A, B, C, D, E, F, G, H, I, J, K, L ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H, I, J, K, L ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.j ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.k ) );
-      K k = ( startArgc + 10 < argc ? EngineUnmarshallData< K >()( argv[ startArgc + 10 ] ) : K( defaultArgs.l ) );
-      L l = ( startArgc + 11 < argc ? EngineUnmarshallData< L >()( argv[ startArgc + 11 ] ) : L( defaultArgs.l ) );
-      
-      return _EngineConsoleThunkReturnValue( ( frame->*fn )( a, b, c, d, e, f, g, h, i, j, k, l ) );
-   }
-};
-
-template< S32 startArgc, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-struct _EngineConsoleThunk< startArgc, void( A, B, C, D, E, F, G, H, I, J, K, L ) >
-{
-   typedef void ReturnType;
-   static const S32 NUM_ARGS = 12 + startArgc;
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( *fn )( A, B, C, D, E, F, G, H, I, J, K, L ), const _EngineFunctionDefaultArguments< void( A, B, C, D, E, F, G, H, I, J, K, L ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.a ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.b ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.c ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.d ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.e ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.f ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.g ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.h ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.i ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.j ) );
-      K k = ( startArgc + 10 < argc ? EngineUnmarshallData< K >()( argv[ startArgc + 10 ] ) : K( defaultArgs.k ) );
-      L l = ( startArgc + 11 < argc ? EngineUnmarshallData< L >()( argv[ startArgc + 11 ] ) : L( defaultArgs.l ) );
-      
-      fn( a, b, c, d, e, f, g, h, i, j, k, l );
-   }
-   template< typename Frame >
-   static void thunk( S32 argc, ConsoleValueRef *argv, void ( Frame::*fn )( A, B, C, D, E, F, G, H, I, J, K, L ) const, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, A, B, C, D, E, F, G, H, I, J, K, L ) >& defaultArgs )
-   {
-      A a = ( startArgc + 0 < argc ? EngineUnmarshallData< A >()( argv[ startArgc + 0 ] ) : A( defaultArgs.b ) );
-      B b = ( startArgc + 1 < argc ? EngineUnmarshallData< B >()( argv[ startArgc + 1 ] ) : B( defaultArgs.c ) );
-      C c = ( startArgc + 2 < argc ? EngineUnmarshallData< C >()( argv[ startArgc + 2 ] ) : C( defaultArgs.d ) );
-      D d = ( startArgc + 3 < argc ? EngineUnmarshallData< D >()( argv[ startArgc + 3 ] ) : D( defaultArgs.e ) );
-      E e = ( startArgc + 4 < argc ? EngineUnmarshallData< E >()( argv[ startArgc + 4 ] ) : E( defaultArgs.f ) );
-      F f = ( startArgc + 5 < argc ? EngineUnmarshallData< F >()( argv[ startArgc + 5 ] ) : F( defaultArgs.g ) );
-      G g = ( startArgc + 6 < argc ? EngineUnmarshallData< G >()( argv[ startArgc + 6 ] ) : G( defaultArgs.h ) );
-      H h = ( startArgc + 7 < argc ? EngineUnmarshallData< H >()( argv[ startArgc + 7 ] ) : H( defaultArgs.i ) );
-      I i = ( startArgc + 8 < argc ? EngineUnmarshallData< I >()( argv[ startArgc + 8 ] ) : I( defaultArgs.j ) );
-      J j = ( startArgc + 9 < argc ? EngineUnmarshallData< J >()( argv[ startArgc + 9 ] ) : J( defaultArgs.k ) );
-      K k = ( startArgc + 10 < argc ? EngineUnmarshallData< K >()( argv[ startArgc + 10 ] ) : K( defaultArgs.l ) );
-      L l = ( startArgc + 11 < argc ? EngineUnmarshallData< L >()( argv[ startArgc + 11 ] ) : L( defaultArgs.l ) );
-      
-      ( frame->*fn )( a, b, c, d, e, f, g, h, i, j, k, l );
-   }
-};
-
 
 
 /// @}
