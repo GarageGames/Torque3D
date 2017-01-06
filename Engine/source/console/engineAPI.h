@@ -1128,98 +1128,13 @@ struct _EngineCallbackHelper
          : mThis( pThis ),
            mFn( fn ) {}
       
-      template< typename R >
-      R call() const
+      template< typename R, typename ...ArgTs >
+      R call(ArgTs ...args) const
       {
-         typedef R( FunctionType )( EngineObject* );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis ) );
+         typedef R( FunctionType )( EngineObject*, ArgTs... );
+         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, args... ) );
       }
 
-      
-      template< typename R, typename A >
-      R call( A a ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a ) );
-      }
-      
-      template< typename R, typename A, typename B >
-      R call( A a, B b ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C >
-      R call( A a, B b, C c ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C, typename D >
-      R call( A a, B b, C c, D d ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C, D );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C, typename D, typename E >
-      R call( A a, B b, C c, D d, E e ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C, D, E );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d, e ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
-      R call( A a, B b, C c, D d, E e, F f ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C, D, E, F );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d, e, f ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-      R call( A a, B b, C c, D d, E e, F f, G g ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C, D, E, F, G );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d, e, f, g ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C, D, E, F, G, H );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d, e, f, g, h ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C, D, E, F, G, H, I );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d, e, f, g, h, i ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C, D, E, F, G, H, I, J );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d, e, f, g, h, i, j ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C, D, E, F, G, H, I, J, K );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d, e, f, g, h, i, j, k ) );
-      }
-      
-      template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-      R call( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j, K k, L l ) const
-      {
-         typedef R( FunctionType )( EngineObject*, A, B, C, D, E, F, G, H, I, J, K, L );
-         return R( reinterpret_cast< FunctionType* >( const_cast<void*>(mFn) )( mThis, a, b, c, d, e, f, g, h, i, j, k, l ) );
-      }
-      
 };
 
 
