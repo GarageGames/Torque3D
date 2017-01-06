@@ -994,7 +994,7 @@ bool Platform::fileTimeToString(FileTime * time, char * string, U32 strLen) { re
 #if defined(TORQUE_DEBUG)
 ConsoleFunction(testHasSubdir,void,2,2,"tests platform::hasSubDirectory") {
 	Con::printf("testing %s",(const char*)argv[1]);
-	Platform::addExcludedDirectory(".svn"); 
+	Platform::addExcludedDirectory(".svn");
 	if(Platform::hasSubDirectory(argv[1]))
 		Con::printf(" has subdir");
 	else
