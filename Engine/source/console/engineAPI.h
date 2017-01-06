@@ -1154,7 +1154,7 @@ struct _BaseEngineConsoleCallbackHelper
 public:
 
    /// Matches up to storeArgs.
-   static const U32 MAX_ARGUMENTS = 11;
+   static constexpr U32 MAX_ARGUMENTS = 11;
 
    SimObject* mThis;
    S32 mInitialArgc;
