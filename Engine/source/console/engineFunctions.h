@@ -91,10 +91,7 @@ struct _EngineFunctionDefaultArguments {};
 template<typename ...ArgTs>
 struct _EngineFunctionDefaultArguments< void(ArgTs...) > : public EngineFunctionDefaultArguments
 {
-	
-	
 	template<typename T> using DefVST = typename EngineTypeTraits<T>::DefaultArgumentValueStoreType;
-	
 	std::tuple<DefVST<ArgTs>  ...> mArgs;
 private:
 	using SelfType = _EngineFunctionDefaultArguments< void(ArgTs...) >;
@@ -105,22 +102,24 @@ private:
 	template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
 	
 	template<typename ...TailTs, size_t ...I>
-	void copyHelper(std::tuple<DefVST<TailTs> ...> defaultArgs, Seq<I...>)  {
+	static void copyHelper(std::tuple<DefVST<ArgTs> ...> &args, std::tuple<DefVST<TailTs> ...> &defaultArgs, Seq<I...>)  {
 		constexpr size_t offset = (sizeof...(ArgTs) - sizeof...(TailTs));
-		std::tie(std::get<I + offset>(mArgs)...) = defaultArgs;
+		std::tie(std::get<I + offset>(args)...) = defaultArgs;
 	}
 	
-	template<typename ...TailTs> using MaybeVoidEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), void>::type;
+	template<typename ...TailTs> using MaybeSelfEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
 	
-	template<typename ...TailTs> MaybeVoidEnabled<TailTs...> tailInit(DefVST<TailTs> ...tail) {
-		mNumDefaultArgs = sizeof...(TailTs);
-		copyHelper(std::make_tuple(tail...), typename Gens<sizeof...(TailTs)>::type());
+	template<typename ...TailTs> static MaybeSelfEnabled<TailTs...> tailInit(DefVST<TailTs> ...tail) {
+		std::tuple<ArgTs...> argsT;
+		std::tuple<TailTs...> tailT = std::make_tuple(tail...);
+		SelfType::copyHelper(argsT, tailT, typename Gens<sizeof...(TailTs)>::type());
+		return argsT;
 	};
+	
 public:
-   template<typename ...TailTs> _EngineFunctionDefaultArguments(DefVST<TailTs> ...tail)
-	{
-		tailInit(tail...);
-	}
+	template<typename ...TailTs> _EngineFunctionDefaultArguments(DefVST<TailTs> ...tail)
+	: EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(tailInit(tail...))
+	{}
 };
 
 #pragma pack( pop )
