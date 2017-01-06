@@ -611,7 +611,7 @@ void Profiler::dump()
 	
 	
 	if (mDumpToConsole == true)
-	{
+	{ 
 		Con::printf("Profiler Data Dump:");
 		Con::printf("Ordered by non-sub total time -");
 		Con::printf("%%NSTime  %% Time  Invoke #  Name");

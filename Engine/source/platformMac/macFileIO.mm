@@ -999,7 +999,7 @@ ConsoleFunction(testHasSubdir,void,2,2,"tests platform::hasSubDirectory") {
 		Con::printf(" has subdir");
 	else
 		Con::printf(" does not have subdir");
-}
+} 
 
 ConsoleFunction(testDumpDirectories,void,4,4,"testDumpDirectories('path', int depth, bool noBasePath)") {
 	Vector<StringTableEntry> paths;
