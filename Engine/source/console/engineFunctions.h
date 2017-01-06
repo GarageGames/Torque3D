@@ -109,16 +109,16 @@ private:
 	
 	template<typename ...TailTs> using MaybeSelfEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
 	
-	template<typename ...TailTs> static MaybeSelfEnabled<TailTs...> tailInit(DefVST<TailTs> ...tail) {
-		std::tuple<ArgTs...> argsT;
-		std::tuple<TailTs...> tailT = std::make_tuple(tail...);
-		SelfType::copyHelper(argsT, tailT, typename Gens<sizeof...(TailTs)>::type());
+	template<typename ...TailTs> static MaybeSelfEnabled<TailTs...> tailInit(TailTs ...tail) {
+		std::tuple<DefVST<ArgTs>...> argsT;
+		std::tuple<DefVST<TailTs>...> tailT = std::make_tuple(tail...);
+		SelfType::copyHelper<TailTs...>(argsT, tailT, typename Gens<sizeof...(TailTs)>::type());
 		return argsT;
 	};
 	
 public:
-	template<typename ...TailTs> _EngineFunctionDefaultArguments(DefVST<TailTs> ...tail)
-	: EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(tailInit(tail...))
+	template<typename ...TailTs> _EngineFunctionDefaultArguments(TailTs ...tail)
+	: EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(SelfType::tailInit(tail...))
 	{}
 };
 
