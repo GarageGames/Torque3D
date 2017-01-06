@@ -109,7 +109,7 @@ public:
 		  
 		  // Helper functions to fill in the command arguments
 		  template<typename ...ArgTs> inline void addArgs(ArgTs ...args){
-			  using Helper = engineAPI::detail::MarshallHelpers;
+			  using Helper = engineAPI::detail::MarshallHelpers<String>;
 			  Helper::marshallEach(argc, argv, args...);
 		  }
       };
