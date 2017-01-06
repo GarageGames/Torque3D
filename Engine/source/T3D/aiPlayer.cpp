@@ -35,9 +35,9 @@ static U32 sAIPlayerLoSMask = TerrainObjectType | StaticShapeObjectType | Static
 IMPLEMENT_CO_NETOBJECT_V1(AIPlayer);
 
 ConsoleDocClass( AIPlayer,
-	"@brief A Player object not controlled by conventional input, but by an AI engine.\n\n"
+   "@brief A Player object not controlled by conventional input, but by an AI engine.\n\n"
 
-	"The AIPlayer provides a Player object that may be controlled from script.  You control "
+   "The AIPlayer provides a Player object that may be controlled from script.  You control "
    "where the player moves and how fast.  You may also set where the AIPlayer is aiming at "
    "-- either a location or another game object.\n\n"
 
@@ -70,19 +70,19 @@ ConsoleDocClass( AIPlayer,
    "position to the center of the target's bounding box.  The LOS ray test only checks against interiors, "
    "statis shapes, and terrain.\n\n"
 
-	"@tsexample\n"
-	"// Create the demo player object\n"
-	"%player = new AiPlayer()\n"
-	"{\n"
-	"	dataBlock = DemoPlayer;\n"
-	"	path = \"\";\n"
-	"};\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+   "// Create the demo player object\n"
+   "%player = new AiPlayer()\n"
+   "{\n"
+   "  dataBlock = DemoPlayer;\n"
+   "  path = \"\";\n"
+   "};\n"
+   "@endtsexample\n\n"
 
-	"@see Player for a list of all inherited functions, variables, and base description\n"
+   "@see Player for a list of all inherited functions, variables, and base description\n"
 
-	"@ingroup AI\n"
-	"@ingroup gameObjects\n");
+   "@ingroup AI\n"
+   "@ingroup gameObjects\n");
 /**
  * Constructor
  */
@@ -147,7 +147,7 @@ void AIPlayer::initPersistFields()
 
       addField( "AttackRadius", TypeF32, Offset( mAttackRadius, AIPlayer ), 
          "@brief Distance considered in firing range for callback purposes.");
-      	  
+           
    endGroup( "AI" );
 
 #ifdef TORQUE_NAVIGATION_ENABLED
@@ -399,11 +399,11 @@ bool AIPlayer::getAIMove(Move *movePtr)
             {
                clearPath();
                mMoveState = ModeStop;
-			   throwCallback("onTargetInRange");
+            throwCallback("onTargetInRange");
             }
             else if((getPosition() - mFollowData.object->getPosition()).len() < mAttackRadius)
             {
-			   throwCallback("onTargetInFiringRange");
+            throwCallback("onTargetInFiringRange");
             }
          }
       }
@@ -854,7 +854,7 @@ DefineEngineMethod(AIPlayer, getPathDestination, Point3F, (),,
 
    "@see setPathDestination()\n")
 {
-	return object->getPathDestination();
+   return object->getPathDestination();
 }
 
 void AIPlayer::followNavPath(NavPath *path)
@@ -1148,7 +1148,7 @@ DefineEngineMethod( AIPlayer, setMoveSpeed, void, ( F32 speed ),,
    
    "@see getMoveDestination()\n")
 {
-	object->setMoveSpeed(speed);
+   object->setMoveSpeed(speed);
 }
 
 DefineEngineMethod( AIPlayer, getMoveSpeed, F32, ( ),,
@@ -1186,7 +1186,7 @@ DefineEngineMethod( AIPlayer, getMoveDestination, Point3F, (),,
    
    "@see setMoveDestination()\n")
 {
-	return object->getMoveDestination();
+   return object->getMoveDestination();
 }
 
 DefineEngineMethod( AIPlayer, setAimLocation, void, ( Point3F target ),,
@@ -1196,7 +1196,7 @@ DefineEngineMethod( AIPlayer, setAimLocation, void, ( Point3F target ),,
    
    "@see getAimLocation()\n")
 {
-	object->setAimLocation(target);
+   object->setAimLocation(target);
 }
 
 DefineEngineMethod( AIPlayer, getAimLocation, Point3F, (),,
@@ -1212,7 +1212,7 @@ DefineEngineMethod( AIPlayer, getAimLocation, Point3F, (),,
    "@see setAimLocation()\n"
    "@see setAimObject()\n")
 {
-	return object->getAimLocation();
+   return object->getAimLocation();
 }
 
 ConsoleDocFragment _setAimObject(
@@ -1240,7 +1240,7 @@ ConsoleDocFragment _setAimObject(
 
 DefineConsoleMethod( AIPlayer, setAimObject, void, ( const char * objName, Point3F offset ), (Point3F::Zero), "( GameBase obj, [Point3F offset] )"
               "Sets the bot's target object. Optionally set an offset from target location."
-			  "@hide")
+           "@hide")
 {
 
    // Find the target
@@ -1262,7 +1262,7 @@ DefineEngineMethod( AIPlayer, getAimObject, S32, (),,
    
    "@see setAimObject()\n")
 {
-	GameBase* obj = object->getAimObject();
+   GameBase* obj = object->getAimObject();
    return obj? obj->getId(): -1;
 }
 

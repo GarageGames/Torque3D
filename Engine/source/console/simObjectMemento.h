@@ -42,7 +42,7 @@ protected:
 
    /// The captured object's name.
    String mObjectName;
-	bool mIsDatablock;
+   bool mIsDatablock;
 
 public:
 

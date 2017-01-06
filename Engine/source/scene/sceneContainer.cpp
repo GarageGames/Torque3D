@@ -892,7 +892,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
                   *info = ri;
                   info->point.interpolate(start, end, info->t);
                   currentT = ri.t;
-						info->distance = (start - info->point).len();
+                  info->distance = (start - info->point).len();
                }
             }
          }
@@ -991,7 +991,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
                            *info = ri;
                            info->point.interpolate(start, end, info->t);
                            currentT = ri.t;
-						         info->distance = (start - info->point).len();
+                           info->distance = (start - info->point).len();
                         }
                      }
                   }
@@ -1088,7 +1088,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
                                  *info = ri;
                                  info->point.interpolate(start, end, info->t);
                                  currentT = ri.t;
-								         info->distance = (start - info->point).len();
+                                 info->distance = (start - info->point).len();
                               }
                            }
                         }

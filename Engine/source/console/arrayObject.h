@@ -102,7 +102,7 @@ public:
 
    /// Returns the value for a given index.
    /// Will return a null value for an invalid index
-   const String&	getValueFromIndex( S32 index ) const;
+   const String&  getValueFromIndex( S32 index ) const;
    
    ///
    S32 getIndexFromKeyValue( const String &key, const String &value ) const;

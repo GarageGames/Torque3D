@@ -1222,17 +1222,17 @@ DefineEngineMethod( TSStatic, getTargetName, const char*, ( S32 index ),(0),
    "@return the name of the indexed material.\n"
    "@see getTargetCount()\n")
 {
-	TSStatic *obj = dynamic_cast< TSStatic* > ( object );
-	if(obj)
-	{
-		// Try to use the client object (so we get the reskinned targets in the Material Editor)
-		if ((TSStatic*)obj->getClientObject())
-			obj = (TSStatic*)obj->getClientObject();
+   TSStatic *obj = dynamic_cast< TSStatic* > ( object );
+   if(obj)
+   {
+      // Try to use the client object (so we get the reskinned targets in the Material Editor)
+      if ((TSStatic*)obj->getClientObject())
+         obj = (TSStatic*)obj->getClientObject();
 
-		return obj->getShapeInstance()->getTargetName(index);
-	}
+      return obj->getShapeInstance()->getTargetName(index);
+   }
 
-	return "";
+   return "";
 }
 
 DefineEngineMethod( TSStatic, getTargetCount, S32,(),,
@@ -1240,17 +1240,17 @@ DefineEngineMethod( TSStatic, getTargetCount, S32,(),,
    "@return the number of materials in the shape.\n"
    "@see getTargetName()\n")
 {
-	TSStatic *obj = dynamic_cast< TSStatic* > ( object );
-	if(obj)
-	{
-		// Try to use the client object (so we get the reskinned targets in the Material Editor)
-		if ((TSStatic*)obj->getClientObject())
-			obj = (TSStatic*)obj->getClientObject();
+   TSStatic *obj = dynamic_cast< TSStatic* > ( object );
+   if(obj)
+   {
+      // Try to use the client object (so we get the reskinned targets in the Material Editor)
+      if ((TSStatic*)obj->getClientObject())
+         obj = (TSStatic*)obj->getClientObject();
 
-		return obj->getShapeInstance()->getTargetCount();
-	}
+      return obj->getShapeInstance()->getTargetCount();
+   }
 
-	return -1;
+   return -1;
 }
 
 // This method is able to change materials per map to with others. The material that is being replaced is being mapped to
@@ -1317,10 +1317,10 @@ DefineEngineMethod( TSStatic, getModelFile, const char *, (),,
 
    "@return the shape filename\n\n"
    "@tsexample\n"
-		"// Acquire the model filename used on this shape.\n"
-		"%modelFilename = %obj.getModelFile();\n"
+      "// Acquire the model filename used on this shape.\n"
+      "%modelFilename = %obj.getModelFile();\n"
    "@endtsexample\n"
    )
 {
-	return object->getShapeFileName();
+   return object->getShapeFileName();
 }

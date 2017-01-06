@@ -339,14 +339,14 @@ struct EngineUnmarshallData< ConsoleValueRef >
 
 
 template<typename T> struct _EngineTrampoline {
-	struct Args {};
+   struct Args {};
 };
 
 template< typename R, typename ...ArgTs >
 struct _EngineTrampoline< R( ArgTs ... ) >
 {
-	typedef std::tuple<ArgTs ...> Args;
-	std::tuple<ArgTs ...> argT;
+   typedef std::tuple<ArgTs ...> Args;
+   std::tuple<ArgTs ...> argT;
 };
 
 template< typename T >
@@ -363,21 +363,21 @@ template< typename R, typename ...ArgTs >
 struct _EngineFunctionTrampoline< R(ArgTs...) > : public _EngineFunctionTrampolineBase< R(ArgTs...) >
 {
 private:
-	using Super = _EngineFunctionTrampolineBase< R(ArgTs...) >;
-	using ArgsType = typename Super::Args;
-	
-	template<size_t ...> struct Seq {};
-	template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
-	template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
-	
-	template<size_t ...I>
-	static R dispatchHelper(typename Super::FunctionType fn, const ArgsType& args, Seq<I...>)  {
-		return R( fn(std::get<I>(args) ...) );
-	}
+   using Super = _EngineFunctionTrampolineBase< R(ArgTs...) >;
+   using ArgsType = typename Super::Args;
+   
+   template<size_t ...> struct Seq {};
+   template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
+   template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
+   
+   template<size_t ...I>
+   static R dispatchHelper(typename Super::FunctionType fn, const ArgsType& args, Seq<I...>)  {
+      return R( fn(std::get<I>(args) ...) );
+   }
 
-	using SeqType = typename Gens<sizeof...(ArgTs)>::type;
+   using SeqType = typename Gens<sizeof...(ArgTs)>::type;
 public:
-	static R jmp(typename Super::FunctionType fn, const ArgsType& args )
+   static R jmp(typename Super::FunctionType fn, const ArgsType& args )
    {
       return dispatchHelper(fn, args, SeqType());
    }
@@ -394,25 +394,25 @@ struct _EngineMethodTrampoline {};
 template< typename Frame, typename R, typename ...ArgTs >
 struct _EngineMethodTrampoline< Frame, R(ArgTs ...) > : public _EngineMethodTrampolineBase< R(ArgTs ...) >
 {
-	using FunctionType = R( typename Frame::ObjectType*, ArgTs ...);
+   using FunctionType = R( typename Frame::ObjectType*, ArgTs ...);
 private:
-	using Super = _EngineMethodTrampolineBase< R(ArgTs ...) >;
-	using ArgsType = typename _EngineFunctionTrampolineBase< R(ArgTs ...) >::Args;
-	
-	template<size_t ...> struct Seq {};
-	template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
-	template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
-	
-	template<size_t ...I>
-	static R dispatchHelper(Frame f, const ArgsType& args, Seq<I...>)  {
-		return R( f._exec(std::get<I>(args) ...) );
-	}
-	
-	using SeqType = typename Gens<sizeof...(ArgTs)>::type;
+   using Super = _EngineMethodTrampolineBase< R(ArgTs ...) >;
+   using ArgsType = typename _EngineFunctionTrampolineBase< R(ArgTs ...) >::Args;
+   
+   template<size_t ...> struct Seq {};
+   template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
+   template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
+   
+   template<size_t ...I>
+   static R dispatchHelper(Frame f, const ArgsType& args, Seq<I...>)  {
+      return R( f._exec(std::get<I>(args) ...) );
+   }
+   
+   using SeqType = typename Gens<sizeof...(ArgTs)>::type;
 public:
    static R jmp( typename Frame::ObjectType* object, const ArgsType& args )
    {
-	   
+      
       Frame f;
       f.object = object;
       return dispatchHelper(f, args, SeqType());
@@ -515,13 +515,13 @@ struct _EngineConsoleThunkType< void >
 struct _EngineConsoleThunkCountArgs
 {
 
-	template<typename ...ArgTs> U32 operator()(ArgTs... args){
-		return sizeof...(ArgTs);
-	}
-	
-	operator U32() const{ // FIXME: WHAT IS THIS?? I'm pretty sure it's incorrect, and it's the version that is invoked by all the macros
-		return 0;
-	}
+   template<typename ...ArgTs> U32 operator()(ArgTs... args){
+      return sizeof...(ArgTs);
+   }
+   
+   operator U32() const{ // FIXME: WHAT IS THIS?? I'm pretty sure it's incorrect, and it's the version that is invoked by all the macros
+      return 0;
+   }
 };
 
 
@@ -529,61 +529,61 @@ struct _EngineConsoleThunkCountArgs
 
 // Encapsulation of a legacy console function invocation.
 namespace engineAPI{
-	namespace detail{
-		template<S32 startArgc, typename R, typename ...ArgTs>
-		struct ThunkHelpers {
-			using SelfType = ThunkHelpers<startArgc, R, ArgTs...>;
-			using FunctionType = R(*)(ArgTs...);
-			template<typename Frame> using MethodType = R(Frame::*)(ArgTs ...) const;
-			template<size_t I> using IthArgType = typename std::tuple_element<I, std::tuple<ArgTs ...> >::type;
-			
-			template<size_t ...> struct Seq {};
-			template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
-			template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
-			
-			typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-			static constexpr S32 NUM_ARGS = sizeof...(ArgTs) + startArgc;
-			
-			template<size_t index, size_t method_offset = 0, typename ...RealArgTs>
-			static IthArgType<index> getRealArgValue(S32 argc, ConsoleValueRef *argv, const _EngineFunctionDefaultArguments< void(RealArgTs...) >& defaultArgs)
-			{
-				if((startArgc + index) < argc)
-				{
-					return EngineUnmarshallData< IthArgType<index> >()( argv[ startArgc + index ] );
-				} else {
-					return std::get<index + method_offset>(defaultArgs.mArgs);
-				}
-			}
-			
-			template<size_t ...I>
-			static R dispatchHelper(S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs, Seq<I...>){
-				return fn(SelfType::getRealArgValue<I>(argc, argv, defaultArgs) ...);
-			}
-			
-			template<typename Frame, size_t ...I>
-			static R dispatchHelper(S32 argc, ConsoleValueRef *argv, MethodType<Frame> fn, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, ArgTs...) >& defaultArgs, Seq<I...>){
-				return (frame->*fn)(SelfType::getRealArgValue<I,1>(argc, argv, defaultArgs) ...);
-			}
-			
-			using SeqType = typename Gens<sizeof...(ArgTs)>::type;
-		};
-		
-		template<typename ArgVT> struct MarshallHelpers {
-			template<typename ...ArgTs> static void marshallEach(S32 &argc, ArgVT *argv, const ArgTs& ...args){}
-			template<typename H, typename ...Tail> static void marshallEach(S32 &argc, ArgVT *argv, const H& head, const Tail& ...tail){
-				argv[argc++] = EngineMarshallData(head);
-				marshallEach(argc, argv, tail...);
-			}
-		};
-		
-		template<> struct MarshallHelpers<ConsoleValueRef> {
-			template<typename ...ArgTs> static void marshallEach(S32 &argc, ConsoleValueRef *argv, const ArgTs& ...args){}
-			template<typename H, typename ...Tail> static void marshallEach(S32 &argc, ConsoleValueRef *argv, const H& head, const Tail& ...tail){
-				EngineMarshallData(head, argc, argv);
-				marshallEach(argc, argv, tail...);
-			}
-		};
-	}
+   namespace detail{
+      template<S32 startArgc, typename R, typename ...ArgTs>
+      struct ThunkHelpers {
+         using SelfType = ThunkHelpers<startArgc, R, ArgTs...>;
+         using FunctionType = R(*)(ArgTs...);
+         template<typename Frame> using MethodType = R(Frame::*)(ArgTs ...) const;
+         template<size_t I> using IthArgType = typename std::tuple_element<I, std::tuple<ArgTs ...> >::type;
+         
+         template<size_t ...> struct Seq {};
+         template<size_t N, size_t ...S> struct Gens : Gens<N-1, N-1, S...> {};
+         template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
+         
+         typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
+         static constexpr S32 NUM_ARGS = sizeof...(ArgTs) + startArgc;
+         
+         template<size_t index, size_t method_offset = 0, typename ...RealArgTs>
+         static IthArgType<index> getRealArgValue(S32 argc, ConsoleValueRef *argv, const _EngineFunctionDefaultArguments< void(RealArgTs...) >& defaultArgs)
+         {
+            if((startArgc + index) < argc)
+            {
+               return EngineUnmarshallData< IthArgType<index> >()( argv[ startArgc + index ] );
+            } else {
+               return std::get<index + method_offset>(defaultArgs.mArgs);
+            }
+         }
+         
+         template<size_t ...I>
+         static R dispatchHelper(S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs, Seq<I...>){
+            return fn(SelfType::getRealArgValue<I>(argc, argv, defaultArgs) ...);
+         }
+         
+         template<typename Frame, size_t ...I>
+         static R dispatchHelper(S32 argc, ConsoleValueRef *argv, MethodType<Frame> fn, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, ArgTs...) >& defaultArgs, Seq<I...>){
+            return (frame->*fn)(SelfType::getRealArgValue<I,1>(argc, argv, defaultArgs) ...);
+         }
+         
+         using SeqType = typename Gens<sizeof...(ArgTs)>::type;
+      };
+      
+      template<typename ArgVT> struct MarshallHelpers {
+         template<typename ...ArgTs> static void marshallEach(S32 &argc, ArgVT *argv, const ArgTs& ...args){}
+         template<typename H, typename ...Tail> static void marshallEach(S32 &argc, ArgVT *argv, const H& head, const Tail& ...tail){
+            argv[argc++] = EngineMarshallData(head);
+            marshallEach(argc, argv, tail...);
+         }
+      };
+      
+      template<> struct MarshallHelpers<ConsoleValueRef> {
+         template<typename ...ArgTs> static void marshallEach(S32 &argc, ConsoleValueRef *argv, const ArgTs& ...args){}
+         template<typename H, typename ...Tail> static void marshallEach(S32 &argc, ConsoleValueRef *argv, const H& head, const Tail& ...tail){
+            EngineMarshallData(head, argc, argv);
+            marshallEach(argc, argv, tail...);
+         }
+      };
+   }
 }
 
 template< S32 startArgc, typename T >
@@ -593,22 +593,22 @@ template< S32 startArgc, typename R, typename ...ArgTs >
 struct _EngineConsoleThunk< startArgc, R(ArgTs...) >
 {
 private:
-	using Helper = engineAPI::detail::ThunkHelpers<startArgc, R, ArgTs...>;
-	using SeqType = typename Helper::SeqType;
+   using Helper = engineAPI::detail::ThunkHelpers<startArgc, R, ArgTs...>;
+   using SeqType = typename Helper::SeqType;
 public:
-	typedef typename Helper::FunctionType FunctionType;
-	typedef typename Helper::ReturnType ReturnType;
-	template<typename Frame> using MethodType = typename Helper::template MethodType<Frame>;
-	static constexpr S32 NUM_ARGS = Helper::NUM_ARGS;
-	
+   typedef typename Helper::FunctionType FunctionType;
+   typedef typename Helper::ReturnType ReturnType;
+   template<typename Frame> using MethodType = typename Helper::template MethodType<Frame>;
+   static constexpr S32 NUM_ARGS = Helper::NUM_ARGS;
+   
    static ReturnType thunk( S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
    {
-	   return _EngineConsoleThunkReturnValue( Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType()));
+      return _EngineConsoleThunkReturnValue( Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType()));
    }
    template< typename Frame >
-	static ReturnType thunk( S32 argc, ConsoleValueRef *argv, MethodType<Frame> fn, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, ArgTs...) >& defaultArgs)
+   static ReturnType thunk( S32 argc, ConsoleValueRef *argv, MethodType<Frame> fn, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, ArgTs...) >& defaultArgs)
    {
-	   return _EngineConsoleThunkReturnValue( Helper::dispatchHelper(argc, argv, fn, frame, defaultArgs, SeqType()));
+      return _EngineConsoleThunkReturnValue( Helper::dispatchHelper(argc, argv, fn, frame, defaultArgs, SeqType()));
    }
 };
 
@@ -616,23 +616,23 @@ public:
 template<S32 startArgc, typename ...ArgTs>
 struct _EngineConsoleThunk<startArgc, void(ArgTs...)> {
 private:
-	using Helper = engineAPI::detail::ThunkHelpers<startArgc, void, ArgTs...>;
-	using SeqType = typename Helper::SeqType;
+   using Helper = engineAPI::detail::ThunkHelpers<startArgc, void, ArgTs...>;
+   using SeqType = typename Helper::SeqType;
 public:
-	typedef typename Helper::FunctionType FunctionType;
-	typedef typename Helper::ReturnType ReturnType;
-	template<typename Frame> using MethodType = typename Helper::template MethodType<Frame>;
-	static constexpr S32 NUM_ARGS = Helper::NUM_ARGS;
-	
-	static void thunk( S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
-	{
-		Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType());
-	}
-	template< typename Frame >
-	static void thunk( S32 argc, ConsoleValueRef *argv, MethodType<Frame> fn, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, ArgTs...) >& defaultArgs)
-	{
-		Helper::dispatchHelper(argc, argv, fn, frame, defaultArgs, SeqType());
-	}
+   typedef typename Helper::FunctionType FunctionType;
+   typedef typename Helper::ReturnType ReturnType;
+   template<typename Frame> using MethodType = typename Helper::template MethodType<Frame>;
+   static constexpr S32 NUM_ARGS = Helper::NUM_ARGS;
+   
+   static void thunk( S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
+   {
+      Helper::dispatchHelper(argc, argv, fn, defaultArgs, SeqType());
+   }
+   template< typename Frame >
+   static void thunk( S32 argc, ConsoleValueRef *argv, MethodType<Frame> fn, Frame* frame, const _EngineFunctionDefaultArguments< void( typename Frame::ObjectType*, ArgTs...) >& defaultArgs)
+   {
+      Helper::dispatchHelper(argc, argv, fn, frame, defaultArgs, SeqType());
+   }
 };
 
 
@@ -1182,7 +1182,7 @@ public:
 struct _EngineConsoleCallbackHelper : public _BaseEngineConsoleCallbackHelper
 {
 private:
-	using Helper = engineAPI::detail::MarshallHelpers<ConsoleValueRef>;
+   using Helper = engineAPI::detail::MarshallHelpers<ConsoleValueRef>;
 public:
 
    _EngineConsoleCallbackHelper( StringTableEntry callbackName, SimObject* pThis )
@@ -1191,7 +1191,7 @@ public:
       mArgc = mInitialArgc = pThis ? 2 : 1 ;
       mCallbackName = callbackName;
    }
-	
+   
    template< typename R, typename ...ArgTs >
    R call(ArgTs ...args)
    {
@@ -1200,9 +1200,9 @@ public:
          ConsoleStackFrameSaver sav; sav.save();
          CSTK.reserveValues(mArgc + sizeof...(ArgTs), mArgv);
          mArgv[ 0 ].value->setStackStringValue(mCallbackName);
-		  
-		  Helper::marshallEach(mArgc, mArgv, args...);
-		  
+        
+        Helper::marshallEach(mArgc, mArgv, args...);
+        
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
       else
@@ -1211,9 +1211,9 @@ public:
          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc + sizeof...(ArgTs), NULL, false, &cb);
          evt->populateArgs(mArgv);
          mArgv[ 0 ].value->setStackStringValue(mCallbackName);
-		  
-		  Helper::marshallEach(mArgc, mArgv, args...);
-		  
+        
+        Helper::marshallEach(mArgc, mArgv, args...);
+        
          Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
 
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
@@ -1227,7 +1227,7 @@ public:
 template<typename P1> struct _EngineConsoleExecCallbackHelper : public _BaseEngineConsoleCallbackHelper
 {
 private:
-	using Helper = engineAPI::detail::MarshallHelpers<ConsoleValueRef>;
+   using Helper = engineAPI::detail::MarshallHelpers<ConsoleValueRef>;
 public:
 
    _EngineConsoleExecCallbackHelper( SimObject* pThis )
@@ -1247,7 +1247,7 @@ public:
          CSTK.reserveValues(mArgc+sizeof...(ArgTs), mArgv);
          mArgv[ 0 ].value->setStackStringValue(simCB);
 
-		  Helper::marshallEach(mArgc, mArgv, args...);
+        Helper::marshallEach(mArgc, mArgv, args...);
 
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
@@ -1257,8 +1257,8 @@ public:
          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+sizeof...(ArgTs), NULL, true, &cb);
          evt->populateArgs(mArgv);
          mArgv[ 0 ].value->setStackStringValue(simCB);
-		  
-		  Helper::marshallEach(mArgc, mArgv, args...);
+        
+        Helper::marshallEach(mArgc, mArgv, args...);
 
          Sim::postEvent(mThis, evt, Sim::getCurrentTime());
 
@@ -1271,7 +1271,7 @@ public:
 template<> struct _EngineConsoleExecCallbackHelper<const char*> : public _BaseEngineConsoleCallbackHelper
 {
 private:
-	using Helper = engineAPI::detail::MarshallHelpers<ConsoleValueRef>;
+   using Helper = engineAPI::detail::MarshallHelpers<ConsoleValueRef>;
 public:
    _EngineConsoleExecCallbackHelper( const char *callbackName )
    {
@@ -1288,9 +1288,9 @@ public:
          ConsoleStackFrameSaver sav; sav.save();
          CSTK.reserveValues(mArgc+sizeof...(ArgTs), mArgv);
          mArgv[ 0 ].value->setStackStringValue(mCallbackName);
-		  
-		  Helper::marshallEach(mArgc, mArgv, args...);
-		  
+        
+        Helper::marshallEach(mArgc, mArgv, args...);
+        
          return R( EngineUnmarshallData< R >()( _exec() ) );
       }
       else
@@ -1299,8 +1299,8 @@ public:
          SimConsoleThreadExecEvent *evt = new SimConsoleThreadExecEvent(mArgc+sizeof...(ArgTs), NULL, false, &cb);
          evt->populateArgs(mArgv);
          mArgv[ 0 ].value->setStackStringValue(mCallbackName);
-		  
-		  Helper::marshallEach(mArgc, mArgv, args...);
+        
+        Helper::marshallEach(mArgc, mArgv, args...);
 
          Sim::postEvent((SimObject*)Sim::getRootGroup(), evt, Sim::getCurrentTime());
          return R( EngineUnmarshallData< R >()( cb.waitForResult() ) );
