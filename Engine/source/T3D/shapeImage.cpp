@@ -80,7 +80,7 @@ EndImplementEnumType;
 ImplementEnumType( ShapeBaseImageLightType,
    "@brief The type of light to attach to this ShapeBaseImage.\n\n"
    "@ingroup gameObjects\n\n")
-	{ ShapeBaseImageData::NoLight,           "NoLight", "No light is attached.\n" },
+   { ShapeBaseImageData::NoLight,           "NoLight", "No light is attached.\n" },
    { ShapeBaseImageData::ConstantLight,     "ConstantLight", "A constant emitting light is attached.\n" },
    { ShapeBaseImageData::SpotLight,         "SpotLight", "A spotlight is attached.\n" },
    { ShapeBaseImageData::PulsingLight,      "PulsingLight", "A pusling light is attached.\n" },
@@ -1532,7 +1532,7 @@ bool ShapeBase::unmountImage(U32 imageSlot)
 {
    AssertFatal(imageSlot<MaxMountedImages,"Out of range image slot");
 
-	bool returnValue = false;
+   bool returnValue = false;
    MountedImage& image = mMountedImageList[imageSlot];
    if (image.dataBlock)
    {
@@ -2772,7 +2772,7 @@ void ShapeBase::setImageState(U32 imageSlot, U32 newState,bool force)
    if( stateData.sound && isGhost() )
    {
       const Point3F& velocity         = getVelocity();
-	   image.addSoundSource(SFX->createSource( stateData.sound, &getRenderTransform(), &velocity )); 
+      image.addSoundSource(SFX->createSource( stateData.sound, &getRenderTransform(), &velocity )); 
    }
 
    // Play animation
