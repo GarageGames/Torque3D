@@ -78,8 +78,8 @@ struct NetAddress
 
    bool isSameAddress(const NetAddress &other) const
    {
-	   if (type != other.type)
-		   return false;
+      if (type != other.type)
+         return false;
 
       switch (type)
       {
@@ -102,32 +102,32 @@ struct NetAddress
 
    bool isSameAddressAndPort(const NetAddress &other) const
    {
-	   if (type != other.type)
-		   return false;
+      if (type != other.type)
+         return false;
 
-	   switch (type)
-	   {
-	   case NetAddress::IPAddress:
-		   return (dMemcmp(other.address.ipv4.netNum, address.ipv4.netNum, 4) == 0) && other.port == port;
-		   break;
-	   case NetAddress::IPV6Address:
-		   return (dMemcmp(other.address.ipv6.netNum, address.ipv6.netNum, 16) == 0) && other.port == port;
-		   break;
-	   case NetAddress::IPBroadcastAddress:
-		   return true;
-		   break;
-	   case NetAddress::IPV6MulticastAddress:
-		   return true;
-		   break;
-	   }
+      switch (type)
+      {
+      case NetAddress::IPAddress:
+         return (dMemcmp(other.address.ipv4.netNum, address.ipv4.netNum, 4) == 0) && other.port == port;
+         break;
+      case NetAddress::IPV6Address:
+         return (dMemcmp(other.address.ipv6.netNum, address.ipv6.netNum, 16) == 0) && other.port == port;
+         break;
+      case NetAddress::IPBroadcastAddress:
+         return true;
+         break;
+      case NetAddress::IPV6MulticastAddress:
+         return true;
+         break;
+      }
 
-	   return false;
+      return false;
    }
 
    bool isEqual(const NetAddress &other) const
    {
-	   if (type != other.type)
-		   return false;
+      if (type != other.type)
+         return false;
 
       switch (type)
       {
@@ -193,7 +193,7 @@ struct Net
       WouldBlock,
       NotASocket,
       UnknownError,
-	  NeedHostLookup
+     NeedHostLookup
    };
 
    enum ConnectionState {
@@ -214,6 +214,12 @@ struct Net
    static bool smMulticastEnabled;
    static bool smIpv4Enabled;
    static bool smIpv6Enabled;
+   
+   static ConnectionNotifyEvent*   smConnectionNotify;
+   static ConnectionAcceptedEvent* smConnectionAccept;
+   static ConnectionReceiveEvent*  smConnectionReceive;
+   static PacketReceiveEvent*      smPacketReceive;
+
 
    static bool init();
    static void shutdown();
