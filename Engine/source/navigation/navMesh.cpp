@@ -1143,9 +1143,10 @@ void NavMesh::buildLinks()
       // Iterate over links
       for(U32 j = 0; j < mLinkIDs.size(); j++)
       {
+			if (mLinksUnsynced[j])
+			{
          if(tile.box.isContained(getLinkStart(j)) ||
-            tile.box.isContained(getLinkEnd(j)) &&
-            mLinksUnsynced[j])
+					tile.box.isContained(getLinkEnd(j)))
          {
             // Mark tile for build.
             mDirtyTiles.push_back_unique(i);
@@ -1160,6 +1161,7 @@ void NavMesh::buildLinks()
          }
       }
    }
+	}
    if(mDirtyTiles.size())
       ctx->startTimer(RC_TIMER_TOTAL);
 }

@@ -3930,9 +3930,9 @@ void Player::updateActionThread()
    if (mMountPending)
       mMountPending = (isMounted() ? 0 : (mMountPending - 1));
 
-   if (mActionAnimation.action == PlayerData::NullAnimation ||
-       ((!mActionAnimation.waitForEnd || mActionAnimation.atEnd)) &&
-       !mActionAnimation.holdAtEnd && (mActionAnimation.delayTicks -= !mMountPending) <= 0)
+   if ((mActionAnimation.action == PlayerData::NullAnimation) ||
+       ((!mActionAnimation.waitForEnd || mActionAnimation.atEnd) &&
+       (!mActionAnimation.holdAtEnd && (mActionAnimation.delayTicks -= !mMountPending) <= 0)))
    {
       //The scripting language will get a call back when a script animation has finished...
       //  example: When the chat menu animations are done playing...

@@ -481,7 +481,7 @@ U32 oneUTF32toUTF8(const UTF32 codepoint, UTF8 *threeByteCodeunitBuf)
    // Process the 1st byte. filter based on the # of expected bytes.
    mask = sgByteMask8LUT[bytecount];
    marker = ( ~mask << 1 );
-   threeByteCodeunitBuf[0] = marker | working & mask;
+   threeByteCodeunitBuf[0] = marker | (working & mask);
    
    PROFILE_END();
    return bytecount;
