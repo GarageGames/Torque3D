@@ -61,6 +61,7 @@ protected:
 	ProcessList *mProcessList;
 	F32 mEditorTimeScale;
 	bool mErrorReport;
+   physx::PxRenderBuffer *mRenderBuffer;
 	physx::PxControllerManager* mControllerManager;
 	static Px3ConsoleStream *smErrorCallback;
 	static physx::PxDefaultAllocator smMemoryAlloc;
