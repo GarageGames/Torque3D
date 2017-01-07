@@ -97,7 +97,7 @@ public:
       {
          eCommandType      type;       // Command type
          StringTableEntry  name;       // Command name
-		  static constexpr U32 MAX_ARGS = 10;
+        static constexpr U32 MAX_ARGS = 10;
          String            argv[MAX_ARGS];   // Command arguments
          S32               argc;       // Number of arguments
          Command() : type(CmdInvalid), name(0), argc(0) { }
@@ -106,12 +106,12 @@ public:
          {
             name = StringTable->insert( _name );
          }
-		  
-		  // Helper functions to fill in the command arguments
-		  template<typename ...ArgTs> inline void addArgs(ArgTs ...args){
-			  using Helper = engineAPI::detail::MarshallHelpers<String>;
-			  Helper::marshallEach(argc, argv, args...);
-		  }
+        
+        // Helper functions to fill in the command arguments
+        template<typename ...ArgTs> inline void addArgs(ArgTs ...args){
+           using Helper = engineAPI::detail::MarshallHelpers<String>;
+           Helper::marshallEach(argc, argv, args...);
+        }
       };
 
       Vector<Command>   mCommands;

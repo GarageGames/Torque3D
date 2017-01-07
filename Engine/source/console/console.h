@@ -95,8 +95,8 @@ struct ConsoleLogEntry
       Script,
       GUI,
       Network,
-	  GGConnect,
-	  NUM_TYPE
+     GGConnect,
+     NUM_TYPE
    } mType;
 
    /// Indicates the actual log entry.
@@ -897,28 +897,28 @@ template<typename P1> struct _EngineConsoleExecCallbackHelper;
 
 namespace Con
 {
-	/// @name Console Execution - executef
-	/// {
-	///
-	/// Implements a script function thunk which automatically converts parameters to relevant console types.
-	/// Can be used as follows:
-	/// - Con::executef("functionName", ...);
-	/// - Con::executef(mySimObject, "functionName", ...);
-	/// 
-	/// NOTE: if you get a rather cryptic template error coming through here, most likely you are trying to 
-	/// convert a parameter which EngineMarshallType does not have a specialization for.
-	/// Another problem can occur if you do not include "console/simBase.h" and "console/engineAPI.h" 
-	/// since _EngineConsoleExecCallbackHelper and SimConsoleThreadExecCallback are required.
-	///
-	/// @see _EngineConsoleExecCallbackHelper
-	///
-	template<typename R, typename ...ArgTs>
-	ConsoleValueRef executef(R r, ArgTs ...argTs)
-	{
-		_EngineConsoleExecCallbackHelper<R> callback( r );
-		return callback.template call<ConsoleValueRef>(argTs...);
-	}
-	/// }
+   /// @name Console Execution - executef
+   /// {
+   ///
+   /// Implements a script function thunk which automatically converts parameters to relevant console types.
+   /// Can be used as follows:
+   /// - Con::executef("functionName", ...);
+   /// - Con::executef(mySimObject, "functionName", ...);
+   /// 
+   /// NOTE: if you get a rather cryptic template error coming through here, most likely you are trying to 
+   /// convert a parameter which EngineMarshallType does not have a specialization for.
+   /// Another problem can occur if you do not include "console/simBase.h" and "console/engineAPI.h" 
+   /// since _EngineConsoleExecCallbackHelper and SimConsoleThreadExecCallback are required.
+   ///
+   /// @see _EngineConsoleExecCallbackHelper
+   ///
+   template<typename R, typename ...ArgTs>
+   ConsoleValueRef executef(R r, ArgTs ...argTs)
+   {
+      _EngineConsoleExecCallbackHelper<R> callback( r );
+      return callback.template call<ConsoleValueRef>(argTs...);
+   }
+   /// }
 };
 
 extern void expandEscape(char *dest, const char *src);
@@ -1143,19 +1143,19 @@ class ConsoleStackFrameSaver
 {
 public:
 
-	bool mSaved;
+   bool mSaved;
 
-	ConsoleStackFrameSaver() : mSaved(false)
-	{
-	}
+   ConsoleStackFrameSaver() : mSaved(false)
+   {
+   }
 
-	~ConsoleStackFrameSaver()
-	{
-		restore();
-	}
+   ~ConsoleStackFrameSaver()
+   {
+      restore();
+   }
 
-	void save();
-	void restore();
+   void save();
+   void restore();
 };
 
 
