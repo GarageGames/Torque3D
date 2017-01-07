@@ -324,8 +324,8 @@ void SFXController::_printInsn( Insn& insn)
          Con::printf( "[SFXController] ip=%d: slot=%d: state=%s: Delay %f:%f:%f",
             mIp, insn.mSlotIndex, insn.mState ? insn.mState->getName() : "",
             insn.mArg.mDelayTime.mValue[ 0 ],
-            insn.mArg.mDelayTime.mVariance[ 0 ],
-            insn.mArg.mDelayTime.mVariance[ 1 ]
+            insn.mArg.mDelayTime.mVariance[ 0 ][ 0 ],
+            insn.mArg.mDelayTime.mVariance[ 0 ][ 1 ]
          );
          break;
          
