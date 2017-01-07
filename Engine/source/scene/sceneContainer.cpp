@@ -307,7 +307,7 @@ void SceneContainer::insertIntoBins(SceneObject* obj,
    // For huge objects, dump them into the overflow bin.  Otherwise, everything
    //  goes into the grid...
    //
-   if ((maxX - minX + 1) < csmNumBins || (maxY - minY + 1) < csmNumBins && !obj->isGlobalBounds())
+   if ((maxX - minX + 1) < csmNumBins || ((maxY - minY + 1) < csmNumBins && !obj->isGlobalBounds()))
    {
       SceneObjectRef** pCurrInsert = &obj->mBinRefHead;
 

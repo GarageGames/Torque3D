@@ -165,11 +165,52 @@ macro(addLib libs)
    endforeach()
 endmacro()
 
+#addLibRelease will add to only release builds
+macro(addLibRelease libs)
+   foreach(lib ${libs})
+        # check if we can build it ourselfs
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libraries/${lib}.cmake")
+            addLibSrc("${CMAKE_CURRENT_SOURCE_DIR}/libraries/${lib}.cmake")
+        endif()
+        # then link against it
+        # two possibilities: a) target already known, so add it directly, or b) target not yet known, so add it to its cache
+        if(TARGET ${PROJECT_NAME})
+            target_link_libraries(${PROJECT_NAME} optimized "${lib}")
+        else()
+            list(APPEND ${PROJECT_NAME}_libsRelease ${lib})
+        endif()
+   endforeach()
+endmacro()
+
+#addLibDebug will add to only debug builds
+macro(addLibDebug libs)
+   foreach(lib ${libs})
+        # check if we can build it ourselfs
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/libraries/${lib}.cmake")
+            addLibSrc("${CMAKE_CURRENT_SOURCE_DIR}/libraries/${lib}.cmake")
+        endif()
+        # then link against it
+        # two possibilities: a) target already known, so add it directly, or b) target not yet known, so add it to its cache
+        if(TARGET ${PROJECT_NAME})
+            target_link_libraries(${PROJECT_NAME} debug "${lib}")
+        else()
+            list(APPEND ${PROJECT_NAME}_libsDebug ${lib})
+        endif()
+   endforeach()
+endmacro()
+
 # this applies cached definitions onto the target
 macro(_process_libs)
     if(DEFINED ${PROJECT_NAME}_libs)
         target_link_libraries(${PROJECT_NAME} "${${PROJECT_NAME}_libs}")
     endif()
+    if(DEFINED ${PROJECT_NAME}_libsRelease)
+        target_link_libraries(${PROJECT_NAME} optimized "${${PROJECT_NAME}_libsRelease}")
+    endif()
+    if(DEFINED ${PROJECT_NAME}_libsDebug)
+        target_link_libraries(${PROJECT_NAME} debug "${${PROJECT_NAME}_libsDebug}")
+    endif()
+
 endmacro()
 
 # apple frameworks

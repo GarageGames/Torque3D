@@ -111,6 +111,10 @@ public:
    virtual PhysicsBody* castRay( const Point3F &start, const Point3F &end, U32 bodyTypes = BT_All ) = 0;
 
    virtual void explosion( const Point3F &pos, F32 radius, F32 forceMagnitude ) = 0;
+
+   /// Physics timing
+   static F32 smPhysicsStepTime;
+   static U32 smPhysicsMaxSubSteps;
 };
 
 
