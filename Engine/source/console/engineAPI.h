@@ -542,7 +542,7 @@ namespace engineAPI{
          template<size_t ...I> struct Gens<0, I...>{ typedef Seq<I...> type; };
          
          typedef typename _EngineConsoleThunkType< R >::ReturnType ReturnType;
-         static constexpr S32 NUM_ARGS = sizeof...(ArgTs) + startArgc;
+         static const S32 NUM_ARGS = sizeof...(ArgTs) + startArgc;
          
          template<size_t index, size_t method_offset = 0, typename ...RealArgTs>
          static IthArgType<index> getRealArgValue(S32 argc, ConsoleValueRef *argv, const _EngineFunctionDefaultArguments< void(RealArgTs...) >& defaultArgs)
@@ -599,7 +599,7 @@ public:
    typedef typename Helper::FunctionType FunctionType;
    typedef typename Helper::ReturnType ReturnType;
    template<typename Frame> using MethodType = typename Helper::template MethodType<Frame>;
-   static constexpr S32 NUM_ARGS = Helper::NUM_ARGS;
+   static const S32 NUM_ARGS = Helper::NUM_ARGS;
    
    static ReturnType thunk( S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
    {
@@ -622,7 +622,7 @@ public:
    typedef typename Helper::FunctionType FunctionType;
    typedef typename Helper::ReturnType ReturnType;
    template<typename Frame> using MethodType = typename Helper::template MethodType<Frame>;
-   static constexpr S32 NUM_ARGS = Helper::NUM_ARGS;
+   static const S32 NUM_ARGS = Helper::NUM_ARGS;
    
    static void thunk( S32 argc, ConsoleValueRef *argv, FunctionType fn, const _EngineFunctionDefaultArguments< void(ArgTs...) >& defaultArgs)
    {
@@ -1162,7 +1162,7 @@ struct _BaseEngineConsoleCallbackHelper
 public:
 
    /// Matches up to storeArgs.
-   static constexpr U32 MAX_ARGUMENTS = 11;
+   static const U32 MAX_ARGUMENTS = 11;
 
    SimObject* mThis;
    S32 mInitialArgc;
