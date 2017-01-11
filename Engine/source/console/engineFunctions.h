@@ -105,8 +105,7 @@ private:
    
    template<typename ...TailTs, size_t ...I>
    static void copyHelper(std::tuple<DefVST<ArgTs> ...> &args, std::tuple<DefVST<TailTs> ...> &defaultArgs, Seq<I...>)  {
-      constexpr size_t offset = (sizeof...(ArgTs) - sizeof...(TailTs));
-      std::tie(std::get<I + offset>(args)...) = defaultArgs;
+      std::tie(std::get<I + (sizeof...(ArgTs) - sizeof...(TailTs))>(args)...) = defaultArgs;
    }
    
    template<typename ...TailTs> using MaybeSelfEnabled = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
