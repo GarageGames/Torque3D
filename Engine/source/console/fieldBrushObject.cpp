@@ -41,8 +41,8 @@ ConsoleDocClass( FieldBrushObject,
 FieldBrushObject::FieldBrushObject()
 {
     // Reset Description.
-    mDescription = StringTable->insert("");
-    mSortName    = StringTable->insert("");
+    mDescription = StringTable->EmptyString();
+    mSortName    = StringTable->EmptyString();
 }
 
 

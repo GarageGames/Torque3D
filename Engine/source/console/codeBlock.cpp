@@ -435,7 +435,7 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
       if(offset < globalSize)
          ste = StringTable->insert(globalStrings + offset);
       else
-         ste = StringTable->insert("");
+         ste = StringTable->EmptyString();
       U32 count;
       st.read(&count);
       while(count--)

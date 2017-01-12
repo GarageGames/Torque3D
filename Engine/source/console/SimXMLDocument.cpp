@@ -504,13 +504,13 @@ const char* SimXMLDocument::elementValue()
 {
    if(m_paNode.empty())
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
    const S32 iLastElement = m_paNode.size() - 1;
    TiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return pNode->Value();
@@ -545,18 +545,18 @@ const char* SimXMLDocument::attribute(const char* rAttribute)
 {
    if(m_paNode.empty())
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
    const S32 iLastElement = m_paNode.size() - 1;
    TiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    if(!pNode->Attribute(rAttribute))
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return pNode->Attribute(rAttribute);
@@ -629,20 +629,20 @@ const char* SimXMLDocument::firstAttribute()
    // Get the current element
    if(m_paNode.empty())
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
    const S32 iLastElement = m_paNode.size() - 1;
    TiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    // Gets its first attribute, if any
    m_CurrentAttribute = pNode->FirstAttribute();
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return m_CurrentAttribute->Name();
@@ -666,20 +666,20 @@ const char* SimXMLDocument::lastAttribute()
    // Get the current element
    if(m_paNode.empty())
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
    const S32 iLastElement = m_paNode.size() - 1;
    TiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    // Gets its last attribute, if any
    m_CurrentAttribute = pNode->LastAttribute();
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return m_CurrentAttribute->Name();
@@ -703,14 +703,14 @@ const char* SimXMLDocument::nextAttribute()
 {
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    // Gets its next attribute, if any
    m_CurrentAttribute = m_CurrentAttribute->Next();
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return m_CurrentAttribute->Name();
@@ -734,14 +734,14 @@ const char* SimXMLDocument::prevAttribute()
 {
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    // Gets its next attribute, if any
    m_CurrentAttribute = m_CurrentAttribute->Previous();
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return m_CurrentAttribute->Name();

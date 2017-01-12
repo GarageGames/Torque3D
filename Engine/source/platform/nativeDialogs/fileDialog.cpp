@@ -48,10 +48,10 @@ FileDialogData::FileDialogData()
    if (mDefaultPath == StringTable->lookup("") || !Platform::isDirectory(mDefaultPath))
       mDefaultPath = Platform::getCurrentDirectory();
 
-   mDefaultFile = StringTable->insert("");
-   mFilters = StringTable->insert("");
-   mFile = StringTable->insert("");
-   mTitle = StringTable->insert("");
+   mDefaultFile = StringTable->EmptyString();
+   mFilters = StringTable->EmptyString();
+   mFile = StringTable->EmptyString();
+   mTitle = StringTable->EmptyString();
 
    mStyle = 0;
 

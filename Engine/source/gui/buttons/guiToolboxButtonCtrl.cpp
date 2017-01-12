@@ -43,7 +43,7 @@ ConsoleDocClass( GuiToolboxButtonCtrl,
 //-------------------------------------
 GuiToolboxButtonCtrl::GuiToolboxButtonCtrl()
 {
-   mNormalBitmapName = StringTable->insert("");
+   mNormalBitmapName = StringTable->EmptyString();
    mLoweredBitmapName = StringTable->insert("sceneeditor/client/images/buttondown");
    mHoverBitmapName = StringTable->insert("sceneeditor/client/images/buttonup");
    setMinExtent(Point2I(16,16));

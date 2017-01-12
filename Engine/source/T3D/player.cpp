@@ -257,15 +257,15 @@ PlayerData::PlayerData()
    firstPersonShadows = false;
 
    // Used for third person image rendering
-   imageAnimPrefix = StringTable->insert("");
+   imageAnimPrefix = StringTable->EmptyString();
 
    allowImageStateAnimation = false;
 
    // Used for first person image rendering
-   imageAnimPrefixFP = StringTable->insert("");
+   imageAnimPrefixFP = StringTable->EmptyString();
    for (U32 i=0; i<ShapeBase::MaxMountedImages; ++i)
    {
-      shapeNameFP[i] = StringTable->insert("");
+      shapeNameFP[i] = StringTable->EmptyString();
       mCRCFP[i] = 0;
       mValidShapeFP[i] = false;
    }
@@ -418,7 +418,7 @@ PlayerData::PlayerData()
 
    jumpTowardsNormal = true;
 
-   physicsPlayerType = StringTable->insert("");
+   physicsPlayerType = StringTable->EmptyString();
 
    dMemset( actionList, 0, sizeof(actionList) );
 }

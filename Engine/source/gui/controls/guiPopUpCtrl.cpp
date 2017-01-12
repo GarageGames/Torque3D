@@ -233,31 +233,31 @@ void GuiPopupTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selec
 IMPLEMENT_CONOBJECT(GuiPopUpMenuCtrl);
 
 ConsoleDocClass( GuiPopUpMenuCtrl,
-	"@brief A control that allows to select a value from a drop-down list.\n\n"
+   "@brief A control that allows to select a value from a drop-down list.\n\n"
 
-	"For a nearly identical GUI with additional features, use GuiPopUpMenuCtrlEx.\n\n"
+   "For a nearly identical GUI with additional features, use GuiPopUpMenuCtrlEx.\n\n"
 
-	"@tsexample\n"
-	"new GuiPopUpMenuCtrl()\n"
-	"{\n"
-	"	maxPopupHeight = \"200\";\n"
-	"	sbUsesNAColor = \"0\";\n"
-	"	reverseTextList = \"0\";\n"
-	"	bitmapBounds = \"16 16\";\n"
-	"	maxLength = \"1024\";\n"
-	"	position = \"56 31\";\n"
-	"	extent = \"64 64\";\n"
-	"	minExtent = \"8 2\";\n"
-	"	profile = \"GuiPopUpMenuProfile\";\n"
-	"	tooltipProfile = \"GuiToolTipProfile\";\n"
-	"};\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+   "new GuiPopUpMenuCtrl()\n"
+   "{\n"
+   "  maxPopupHeight = \"200\";\n"
+   "  sbUsesNAColor = \"0\";\n"
+   "  reverseTextList = \"0\";\n"
+   "  bitmapBounds = \"16 16\";\n"
+   "  maxLength = \"1024\";\n"
+   "  position = \"56 31\";\n"
+   "  extent = \"64 64\";\n"
+   "  minExtent = \"8 2\";\n"
+   "  profile = \"GuiPopUpMenuProfile\";\n"
+   "  tooltipProfile = \"GuiToolTipProfile\";\n"
+   "};\n"
+   "@endtsexample\n\n"
 
-	"@note This is definitely going to be deprecated soon.\n\n"
+   "@note This is definitely going to be deprecated soon.\n\n"
 
-	"@see GuiPopUpMenuCtrlEx for more features and better explanations.\n"
+   "@see GuiPopUpMenuCtrlEx for more features and better explanations.\n"
 
-	"@ingroup GuiControls\n");
+   "@ingroup GuiControls\n");
 
 GuiPopUpMenuCtrl::GuiPopUpMenuCtrl(void)
 {
@@ -277,9 +277,9 @@ GuiPopUpMenuCtrl::GuiPopUpMenuCtrl(void)
    mRenderScrollInNA = false; //  Added
    mBackgroundCancel = false; //  Added
    mReverseTextList = false; //  Added - Don't reverse text list if displaying up
-   mBitmapName = StringTable->insert(""); //  Added
+   mBitmapName = StringTable->EmptyString(); //  Added
    mBitmapBounds.set(16, 16); //  Added
-	mIdMax = -1;
+   mIdMax = -1;
 }
 
 //------------------------------------------------------------------------------
@@ -302,11 +302,11 @@ void GuiPopUpMenuCtrl::initPersistFields(void)
 //------------------------------------------------------------------------------
 DefineConsoleMethod( GuiPopUpMenuCtrl, add, void, (const char * name, S32 idNum, U32 scheme), ("", -1, 0), "(string name, int idNum, int scheme=0)")
 {
-  	object->addEntry(name, idNum, scheme);
+   object->addEntry(name, idNum, scheme);
 }
 
 DefineConsoleMethod( GuiPopUpMenuCtrl, addScheme, void, (U32 id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL), , 
-	"(int id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL)")
+   "(int id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL)")
 {
 
    object->addScheme( id, fontColor, fontColorHL, fontColorSEL );
@@ -492,43 +492,43 @@ void GuiPopUpMenuCtrl::clear()
    setText("");
    mSelIndex = -1;
    mRevNum = 0;
-	mIdMax = -1;
+   mIdMax = -1;
 }
 
 //------------------------------------------------------------------------------
 void GuiPopUpMenuCtrl::clearEntry( S32 entry )
-{	
-	if( entry == -1 )
-		return;
+{  
+   if( entry == -1 )
+      return;
 
-	U32 i = 0;
-	for ( ; i < mEntries.size(); i++ )
+   U32 i = 0;
+   for ( ; i < mEntries.size(); i++ )
    {
       if ( mEntries[i].id == entry )
          break;
    }
 
-	mEntries.erase( i );
+   mEntries.erase( i );
 
-	if( mEntries.size() <= 0 )
-	{
-		mEntries.setSize(0);
-		setText("");
-		mSelIndex = -1;
-		mRevNum = 0;
-	}
-	else
-	{
-		if (entry < mSelIndex)
-		{
-			mSelIndex--;
-		}
-		else if( entry == mSelIndex )
-		{
-			setText("");
-			mSelIndex = -1;
-		}
-	}
+   if( mEntries.size() <= 0 )
+   {
+      mEntries.setSize(0);
+      setText("");
+      mSelIndex = -1;
+      mRevNum = 0;
+   }
+   else
+   {
+      if (entry < mSelIndex)
+      {
+         mSelIndex--;
+      }
+      else if( entry == mSelIndex )
+      {
+         setText("");
+         mSelIndex = -1;
+      }
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -620,21 +620,21 @@ void GuiPopUpMenuCtrl::addEntry( const char *buf, S32 id, U32 scheme )
       //Con::printf( "GuiPopupMenuCtrlEx::addEntry - Invalid buffer!" );
       return;
    }
-	
-	// Ensure that there are no other entries with exactly the same name
-	for ( U32 i = 0; i < mEntries.size(); i++ )
+   
+   // Ensure that there are no other entries with exactly the same name
+   for ( U32 i = 0; i < mEntries.size(); i++ )
    {
       if ( dStrcmp( mEntries[i].buf, buf ) == 0 )
          return;
    }
 
-	// If we don't give an id, create one from mIdMax
-	if( id == -1 )
-		id = mIdMax + 1;
-	
-	// Increase mIdMax when an id is greater than it
-	if( id > mIdMax )
-		mIdMax = id;
+   // If we don't give an id, create one from mIdMax
+   if( id == -1 )
+      id = mIdMax + 1;
+   
+   // Increase mIdMax when an id is greater than it
+   if( id > mIdMax )
+      mIdMax = id;
 
    Entry e;
    dStrcpy( e.buf, buf );
@@ -802,28 +802,28 @@ void GuiPopUpMenuCtrl::setFirstSelected( bool bNotifyScript )
          setText( mEntries[0].buf );
       }
 
-		// Execute the popup console command:
-		if( bNotifyScript )
+      // Execute the popup console command:
+      if( bNotifyScript )
       {
          if ( isMethod( "onSelect" ) )
             Con::executef( this, "onSelect", Con::getIntArg( mEntries[ mSelIndex ].id ), mEntries[mSelIndex].buf );
 
-			execConsoleCallback();
-      }
-   }
-	else
-	{
-		if ( mReplaceText ) //  Only change the displayed text if appropriate.
-			setText("");
-		
-		mSelIndex = -1;
-
-		if( bNotifyScript )
-      {
-			Con::executef( this, "onCancel" );
          execConsoleCallback();
       }
-	}
+   }
+   else
+   {
+      if ( mReplaceText ) //  Only change the displayed text if appropriate.
+         setText("");
+      
+      mSelIndex = -1;
+
+      if( bNotifyScript )
+      {
+         Con::executef( this, "onCancel" );
+         execConsoleCallback();
+      }
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -1278,11 +1278,11 @@ void GuiPopUpMenuCtrl::onAction()
    if ( setScroll )
    {
       // Resize the text list
-	  Point2I cellSize;
-	  mTl->getCellSize( cellSize );
-	  cellSize.x = width - mSc->scrollBarThickness() - sbBorder;
-	  mTl->setCellSize( cellSize );
-	  mTl->setWidth( cellSize.x );
+     Point2I cellSize;
+     mTl->getCellSize( cellSize );
+     cellSize.x = width - mSc->scrollBarThickness() - sbBorder;
+     mTl->setCellSize( cellSize );
+     mTl->setWidth( cellSize.x );
 
       if ( mSelIndex )
          mTl->scrollCellVisible( Point2I( 0, mSelIndex ) );
@@ -1315,7 +1315,7 @@ void GuiPopUpMenuCtrl::addChildren()
    else
    {
       // Use the children's profile rather than the parent's profile, if it exists.
-	  mSc->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile );
+     mSc->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile );
    }
 
    mSc->setField( "hScrollBar", "AlwaysOff" );

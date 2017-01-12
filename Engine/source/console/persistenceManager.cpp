@@ -328,7 +328,7 @@ void PersistenceManager::parseObject()
 
    if (mParser.tokenICmp(")"))
    {
-      mCurrentObject->name = StringTable->insert("");
+      mCurrentObject->name = StringTable->EmptyString();
 
       mCurrentObject->nameLine = mParser.getCurrentLine();
       mCurrentObject->namePosition = mParser.getTokenLineOffset();
