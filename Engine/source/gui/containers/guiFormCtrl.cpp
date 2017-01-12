@@ -158,7 +158,7 @@ void GuiFormCtrl::addObject(SimObject *newObj )
       
       GuiControl* parent = getParent();
       if ( parent )
-   	   parent->addObject( newObj );
+         parent->addObject( newObj );
 
       return;
    }

@@ -839,7 +839,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
    
    while (d = readdir(dip))
    {
-      bool	isDir;
+      bool  isDir;
       isDir = false;
       if (d->d_type == DT_UNKNOWN)
       {

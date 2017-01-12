@@ -65,10 +65,10 @@ ConsoleDocClass( GuiChunkedBitmapCtrl,
 
 void GuiChunkedBitmapCtrl::initPersistFields()
 {
-   addGroup("GuiChunkedBitmapCtrl");		
+   addGroup("GuiChunkedBitmapCtrl");      
    addField( "bitmap",        TypeFilename,  Offset( mBitmapName, GuiChunkedBitmapCtrl ), "This is the bitmap to render to the control." );
    addField( "useVariable",   TypeBool,      Offset( mUseVariable, GuiChunkedBitmapCtrl ), "This decides whether to use the \"bitmap\" file "
-	                                                                                      "or a bitmap stored in \"variable\"");
+                                                                                         "or a bitmap stored in \"variable\"");
    addField( "tile",          TypeBool,      Offset( mTile, GuiChunkedBitmapCtrl ), "This is no longer in use");
    endGroup("GuiChunkedBitmapCtrl");
    Parent::initPersistFields();
