@@ -1530,7 +1530,7 @@ void GuiListBoxCtrl::_mirror()
 
 StringTableEntry GuiListBoxCtrl::_makeMirrorItemName( SimObject *inObj )
 {
-   StringTableEntry outName = StringTable->insert("");
+   StringTableEntry outName = StringTable->EmptyString();
 
    if ( mMakeNameCallback.isNotEmpty() )
    {

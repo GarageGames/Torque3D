@@ -251,7 +251,7 @@ GuiMLTextCtrl::GuiMLTextCtrl()
   mIsEditCtrl( false ),
   mCursorPosition( false ),
   mMaxBufferSize( -1 ),
-  mInitialText( StringTable->insert("") ),
+  mInitialText( StringTable->EmptyString() ),
   mSelectionActive( false ),
   mSelectionStart( 0 ),
   mSelectionEnd( 0 ),
@@ -267,7 +267,7 @@ GuiMLTextCtrl::GuiMLTextCtrl()
   mFontList( NULL )
 {   
    mActive = true;
-   //mInitialText = StringTable->insert("");
+   //mInitialText = StringTable->EmptyString();
    Sim::findObject("InputDeniedSound", mDeniedSound);
 }
 

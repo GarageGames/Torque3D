@@ -1684,7 +1684,7 @@ DefineEngineMethod( GuiTextEditCtrl, getText, const char*, (),,
    "@see GuiControl")
 {
    if( !object->hasText() )
-      return StringTable->insert("");
+      return StringTable->EmptyString();
 
    char *retBuffer = Con::getReturnBuffer( GuiTextEditCtrl::MAX_STRING_LENGTH );
    object->getText( retBuffer );

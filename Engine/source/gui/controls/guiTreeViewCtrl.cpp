@@ -845,7 +845,7 @@ GuiTreeViewCtrl::GuiTreeViewCtrl()
 
    mClearAllOnSingleSelection = true;
 
-   mBitmapBase       = StringTable->insert("");
+   mBitmapBase       = StringTable->EmptyString();
    mTexRollover      = NULL;
    mTexSelected      = NULL;
    
@@ -4746,13 +4746,13 @@ StringTableEntry GuiTreeViewCtrl::getTextToRoot( S32 itemId, const char * delimi
    if(!item)
    {
       Con::errorf(ConsoleLogEntry::General, "GuiTreeViewCtrl::getTextToRoot: invalid start item id!");
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    if(item->isInspectorData())
    {
       Con::errorf(ConsoleLogEntry::General, "GuiTreeViewCtrl::getTextToRoot: cannot get text to root of inspector data items");
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    char bufferOne[1024];

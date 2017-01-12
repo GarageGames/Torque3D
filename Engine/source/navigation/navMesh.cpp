@@ -181,7 +181,7 @@ DefineConsoleFunction(NavMeshUpdateOne, void, (S32 meshid, S32 objid, bool remov
 NavMesh::NavMesh()
 {
    mTypeMask |= StaticShapeObjectType | MarkerObjectType;
-   mFileName = StringTable->insert("");
+   mFileName = StringTable->EmptyString();
    mNetFlags.clear(Ghostable);
 
    mSaveIntermediates = false;
@@ -211,7 +211,7 @@ NavMesh::NavMesh()
    mLargeCharacters = false;
    mVehicles = false;
 
-   mCoverSet = StringTable->insert("");
+   mCoverSet = StringTable->EmptyString();
    mInnerCover = false;
    mCoverDist = 1.0f;
    mPeekDist = 0.7f;

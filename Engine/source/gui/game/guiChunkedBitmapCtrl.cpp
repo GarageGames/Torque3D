@@ -86,7 +86,7 @@ DefineEngineMethod( GuiChunkedBitmapCtrl, setBitmap, void, (const char* filename
 
 GuiChunkedBitmapCtrl::GuiChunkedBitmapCtrl()
 {
-   mBitmapName = StringTable->insert("");
+   mBitmapName = StringTable->EmptyString();
    mUseVariable = false;
    mTile = false;
 }

@@ -1512,7 +1512,7 @@ void GuiWindowCtrl::setCloseCommand(const char *newCmd)
    if (newCmd)
       mCloseCommand = StringTable->insert(newCmd);
    else
-      mCloseCommand = StringTable->insert("");
+      mCloseCommand = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------

@@ -54,8 +54,8 @@ ConsoleDocClass( GuiTextCtrl,
 GuiTextCtrl::GuiTextCtrl()
 {
    //default fonts
-   mInitialText = StringTable->insert("");
-   mInitialTextID = StringTable->insert("");
+   mInitialText = StringTable->EmptyString();
+   mInitialTextID = StringTable->EmptyString();
    mText[0] = '\0';
    mMaxStrLen = GuiTextCtrl::MAX_STRING_LENGTH;
 }

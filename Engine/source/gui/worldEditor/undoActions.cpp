@@ -218,8 +218,8 @@ InspectorFieldUndoAction::InspectorFieldUndoAction()
 {
    mObjId = 0;
    mField = NULL; 
-   mSlotName = StringTable->insert("");
-   mArrayIdx = StringTable->insert("");
+   mSlotName = StringTable->EmptyString();
+   mArrayIdx = StringTable->EmptyString();
 }
 
 InspectorFieldUndoAction::InspectorFieldUndoAction( const UTF8 *actionName )
@@ -228,8 +228,8 @@ InspectorFieldUndoAction::InspectorFieldUndoAction( const UTF8 *actionName )
    mInspector = NULL;
    mObjId = 0;
    mField = NULL; 
-   mSlotName = StringTable->insert("");
-   mArrayIdx = StringTable->insert("");
+   mSlotName = StringTable->EmptyString();
+   mArrayIdx = StringTable->EmptyString();
 }
 
 void InspectorFieldUndoAction::initPersistFields()

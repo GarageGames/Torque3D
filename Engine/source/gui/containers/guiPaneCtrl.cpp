@@ -68,7 +68,7 @@ GuiPaneControl::GuiPaneControl()
    mMouseOver     = false;
    mDepressed     = false;
    mCaption       = "A Pane";
-   mCaptionID     = StringTable->insert("");
+   mCaptionID     = StringTable->EmptyString();
    mIsContainer   = true;
 
    mOriginalExtents.set(10,10);

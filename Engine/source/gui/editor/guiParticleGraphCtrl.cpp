@@ -50,7 +50,7 @@ GuiParticleGraphCtrl::GuiParticleGraphCtrl()
       mPlots[i].mGraphMin.x = 0;
       mPlots[i].mGraphMin.y = 0;
       mPlots[i].mGraphType = Polyline;
-      mPlots[i].mGraphName = StringTable->insert("");
+      mPlots[i].mGraphName = StringTable->EmptyString();
       mPlots[i].mHidden = false;
       mPlots[i].mGraphScale = 0.05f;
    }

@@ -49,7 +49,7 @@ ConsoleDocClass( GuiToggleButtonCtrl,
 GuiToggleButtonCtrl::GuiToggleButtonCtrl()
 {
    setExtent(140, 30);
-   mButtonText = StringTable->insert("");
+   mButtonText = StringTable->EmptyString();
    mStateOn = false;
    mButtonType = ButtonTypeCheck;
 }

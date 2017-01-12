@@ -328,7 +328,7 @@ GuiPopUpMenuCtrlEx::GuiPopUpMenuCtrlEx(void)
    mRenderScrollInNA = false; //  Added
    mBackgroundCancel = false; //  Added
    mReverseTextList = false; //  Added - Don't reverse text list if displaying up
-   mBitmapName = StringTable->insert(""); //  Added
+   mBitmapName = StringTable->EmptyString(); //  Added
    mBitmapBounds.set(16, 16); //  Added
    mHotTrackItems = false;
    mIdMax = -1;

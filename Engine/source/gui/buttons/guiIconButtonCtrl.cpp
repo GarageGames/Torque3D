@@ -85,7 +85,7 @@ ConsoleDocClass( GuiIconButtonCtrl,
 
 GuiIconButtonCtrl::GuiIconButtonCtrl()
 {
-   mBitmapName = StringTable->insert("");
+   mBitmapName = StringTable->EmptyString();
    mTextLocation = TextLocLeft;
    mIconLocation = IconLocLeft;
    mTextMargin = 4;
@@ -94,7 +94,7 @@ GuiIconButtonCtrl::GuiIconButtonCtrl()
    mFitBitmapToButton = false;
    mMakeIconSquare = false;
 
-   mErrorBitmapName = StringTable->insert("");
+   mErrorBitmapName = StringTable->EmptyString();
    mErrorTextureHandle = NULL;
 
    mAutoSize = false;

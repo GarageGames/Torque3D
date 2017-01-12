@@ -51,7 +51,7 @@ PopupMenu::PopupMenu() : mCanvas(NULL)
    mSubmenus = new SimSet;
    mSubmenus->registerObject();
 
-   mBarTitle = StringTable->insert("");
+   mBarTitle = StringTable->EmptyString();
    mIsPopup = false;
 
    mPopupGUID = sMaxPopupGUID++;
