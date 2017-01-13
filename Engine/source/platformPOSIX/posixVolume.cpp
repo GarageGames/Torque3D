@@ -206,7 +206,7 @@ bool PosixFileSystem::rename(const Path& from,const Path& to)
    String fa = buildFileName(_volume,from);
    String fb = buildFileName(_volume,to);
    
-   if (!rename(fa.c_str(),fb.c_str()))
+   if (!::rename(fa.c_str(),fb.c_str()))
       return true;
       
    return false;
