@@ -254,7 +254,7 @@ DefineEngineFunction(addBadWord, bool, (const char* badWord),,
 	return gBadWordFilter->addBadWord(badWord);
 }
 
-DefineEngineFunction(filterString, const char *, (const char* baseString, const char* replacementChars), (NULL, NULL),
+DefineEngineFunction(filterString, const char *, (const char* baseString, const char* replacementChars), (nullAsType<const char*>(), nullAsType<const char*>()),
    "@brief Replaces the characters in a string with designated text\n\n"
 
    "Uses the bad word filter to determine which characters within the string will be replaced.\n\n"

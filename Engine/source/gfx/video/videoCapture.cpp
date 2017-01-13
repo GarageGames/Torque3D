@@ -340,7 +340,7 @@ DefineEngineFunction( stopVideoCapture, void, (),,
 
 DefineEngineFunction( playJournalToVideo, void, 
    ( const char *journalFile, const char *videoFile, const char *encoder, F32 framerate, Point2I resolution ),
-	( NULL, "THEORA", 30.0f, Point2I::Zero ),
+   ( nullAsType<const char*>(), "THEORA", 30.0f, Point2I::Zero ),
    "Load a journal file and capture it video.\n"
    "@ingroup Rendering\n" )
 {
