@@ -264,6 +264,9 @@ void StandardMainLoop::init()
    
    ThreadPool::GlobalThreadPool::createSingleton();
 
+   // Set engineAPI initialized to true
+   engineAPI::gIsInitialized = true;
+
    // Initialize modules.
    
    EngineModuleManager::initializeSystem();
@@ -326,9 +329,6 @@ void StandardMainLoop::init()
    #ifdef TORQUE_DEBUG_GUARD
       Memory::flagCurrentAllocs( Memory::FLAG_Static );
    #endif
-
-   // Set engineAPI initialized to true
-   engineAPI::gIsInitialized = true;
 }
 
 void StandardMainLoop::shutdown()
