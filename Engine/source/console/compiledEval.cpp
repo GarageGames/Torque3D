@@ -1804,7 +1804,7 @@ breakContinue:
                else
                   nsEntry = NULL;
 
-               StringStackWrapper args(callArgc - 1, callArgv + 1);
+               StringStackWrapper args(callArgc - 2, callArgv + 2);
                cRetRes = CInterface::GetCInterface().CallMethod(gEvalState.thisObject, fnName, args.argv, args.argc, &cFunctionRes);
             }
             else // it's a ParentCall

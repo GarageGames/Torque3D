@@ -1266,7 +1266,7 @@ ConsoleValueRef _internalExecute(SimObject *object, S32 argc, ConsoleValueRef ar
       argv_str[i] = argv[i + 2];
    }
    bool result;
-   const char* methodRes = CInterface::CallFunction(argv[0], argv_str, argc - 2, &result);
+   const char* methodRes = CInterface::CallMethod(object, argv[0], argv_str, argc - 2, &result);
    if (result)
       return ConsoleValueRef::fromValue(CSTK.pushString(methodRes));
 
@@ -1366,6 +1366,7 @@ inline ConsoleValueRef _executef(S32 checkArgc, S32 argc, ConsoleValueRef *argv)
 //------------------------------------------------------------------------------
 bool isFunction(const char *fn)
 {
+   if(CInterface::isMethod(NULL, fn)) return true;
    const char *string = StringTable->lookup(fn);
    if(!string)
       return false;
