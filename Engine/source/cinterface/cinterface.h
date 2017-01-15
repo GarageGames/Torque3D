@@ -23,6 +23,7 @@
 #pragma once
 #include "platform/platformDlibrary.h"
 #include "console/engineAPI.h"
+#include "console/simBase.h"
 
 // cinterface can override this (useful for plugins, etc)
 extern "C" {
@@ -38,9 +39,11 @@ DLL_DECL void torque_enginesignalshutdown();
 DLL_DECL bool torque_isdebugbuild();
 
 DLL_DECL void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void *mainPtr);
-DLL_DECL SimObjectPtr<SimObject>* FindObjectWrapperByName(const char* pName);
-DLL_DECL SimObjectPtr<SimObject>* FindObjectWrapperById(U32 pId);
+DLL_DECL SimObject* FindDataBlockByName(const char* pName);
+DLL_DECL SimObject* FindObjectByName(const char* pName);
+DLL_DECL SimObject* FindObjectById(U32 pId);
 DLL_DECL SimObjectPtr<SimObject>* WrapObject(SimObject* pObject);
+DLL_DECL void Sim_DeleteObjectPtr(SimObjectPtr<SimObject>* pObjectPtr);
 DLL_DECL bool fnSimObject_registerObject(SimObject* pObject);
 
 DLL_DECL const char* fn_getConsoleString(const char* name);
@@ -51,6 +54,10 @@ DLL_DECL F32 fn_getConsoleFloat(const char* name);
 DLL_DECL void fn_setConsoleFloat(const char* name, F32 value);
 DLL_DECL bool fn_getConsoleBool(const char* name);
 DLL_DECL void fn_setConsoleBool(const char* name, bool value);
+DLL_DECL void fnSimDataBlock_AssignId(SimDataBlock* db);
+DLL_DECL void fnSimDataBlock_Preload(SimDataBlock* db);
+DLL_DECL void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent);
+DLL_DECL void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields);
 
 }
 

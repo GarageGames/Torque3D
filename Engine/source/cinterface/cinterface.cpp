@@ -110,20 +110,29 @@ void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void* mainPtr) 
    CInterface::GetCInterface().SetMainCallback(mainPtr);
 }
 
-SimObjectPtr<SimObject>* FindObjectWrapperById(U32 pId)
+SimObject* FindObjectById(U32 pId)
 {
-   return new SimObjectPtr<SimObject>(Sim::findObject(pId));
+   return Sim::findObject(pId);
 }
 
-SimObjectPtr<SimObject>* FindObjectWrapperByName(const char* pName)
+SimObject* FindObjectByName(const char* pName)
 {
-   SimObjectPtr<SimObject>* ptr = new SimObjectPtr<SimObject>(Sim::findObject(pName));
-   return ptr;
+   return Sim::findObject(pName);
+}
+
+SimObject* FindDataBlockByName(const char* pName)
+{
+   return Sim::getDataBlockGroup()->findObject(pName);
 }
 
 SimObjectPtr<SimObject>* WrapObject(SimObject* pObject)
 {
    return new SimObjectPtr<SimObject>(pObject);
+}
+
+void Sim_DeleteObjectPtr(SimObjectPtr<SimObject>* pObjectPtr)
+{
+   delete pObjectPtr;
 }
 
 bool fnSimObject_registerObject(SimObject* pObject)
@@ -171,6 +180,46 @@ void fn_setConsoleBool(const char* name, bool value)
    Con::setBoolVariable(name, value);
 }
 
+void fnSimObject_GetField(SimObject* obj, const char* fieldName, const char* arrayIndex)
+{
+   obj->getDataField(fieldName, arrayIndex);
+}
+
+void fnSimObject_SetField(SimObject* obj, const char* fieldName, const char* arrayIndex, const char* value)
+{
+   obj->setDataField(fieldName, arrayIndex, value);
+}
+
+void fnSimDataBlock_AssignId(SimDataBlock* db)
+{
+   db->assignId();
+}
+
+void fnSimDataBlock_Preload(SimDataBlock* db)
+{
+   static String errorStr;
+   if (!db->preload(true, errorStr))
+   {
+      Con::errorf(ConsoleLogEntry::General, "Preload failed for %s: %s.",
+         db->getName(), errorStr.c_str());
+      db->deleteObject();
+   }
+}
+
+void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent)
+{
+   if (parent)
+   {
+      obj->setCopySource(parent);
+      obj->assignFieldsFrom(parent);
+   }
+}
+
+void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields)
+{
+   obj->setModStaticFields(modStaticFields);
+   obj->setModDynamicFields(modDynamicFields);
+}
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
    extern S32 CreateMiniDump(LPEXCEPTION_POINTERS ExceptionInfo);
