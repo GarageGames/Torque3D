@@ -29,7 +29,7 @@ $defaultGame = "scripts";
 // Set profile directory
 $Pref::Video::ProfilePath = "core/profile";
 $Core::windowIcon = "core/torque.png";
-$Core::splashWindowImage = "art/gui/splash.bmp";
+$Core::splashWindowImage = "art/gui/splash.png";
 
 function createCanvas(%windowTitle)
 {
