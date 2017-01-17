@@ -478,11 +478,15 @@ void Lightning::renderObject(ObjectRenderInst *ri, SceneRenderState *state, Base
       desc.setBlend( true, GFXBlendSrcAlpha, GFXBlendOne);
       desc.setCullMode(GFXCullNone);
       desc.zWriteEnable = false;
-      desc.samplersDefined = true;
-      desc.samplers[0].magFilter = GFXTextureFilterLinear;
-      desc.samplers[0].minFilter = GFXTextureFilterLinear;
-      desc.samplers[0].addressModeU = GFXAddressWrap;
-      desc.samplers[0].addressModeV = GFXAddressWrap;
+
+      if (mDataBlock->strikeTextures[0].isValid())
+      {
+         desc.samplersDefined = true;
+         desc.samplers[0].magFilter = GFXTextureFilterLinear;
+         desc.samplers[0].minFilter = GFXTextureFilterLinear;
+         desc.samplers[0].addressModeU = GFXAddressWrap;
+         desc.samplers[0].addressModeV = GFXAddressWrap;
+      }
 
       mLightningSB = GFX->createStateBlock(desc);
 
@@ -494,7 +498,8 @@ void Lightning::renderObject(ObjectRenderInst *ri, SceneRenderState *state, Base
    Strike* walk = mStrikeListHead;
    while (walk != NULL)
    {
-      GFX->setTexture(0, mDataBlock->strikeTextures[0]);
+      if (mDataBlock->strikeTextures[0].isValid())
+         GFX->setTexture(0, mDataBlock->strikeTextures[0]);
 
       for( U32 i=0; i<3; i++ )
       {
@@ -731,18 +736,19 @@ void Lightning::strikeRandomPoint()
    Point3F strikePoint( gRandGen.randF( 0.0f, 1.0f ), gRandGen.randF( 0.0f, 1.0f ), 0.0f );
 
    // check if an object is within target range
+   Point3F worldPosStrikePoint = strikePoint;
 
-   strikePoint *= mObjScale;
-   strikePoint += getPosition();
-   strikePoint += Point3F( -mObjScale.x * 0.5f, -mObjScale.y * 0.5f, 0.0f );
+   worldPosStrikePoint *= mObjScale;
+   worldPosStrikePoint += getPosition();
+   worldPosStrikePoint += Point3F( -mObjScale.x * 0.5f, -mObjScale.y * 0.5f, 0.0f );
 
    Box3F queryBox;
    F32 boxWidth = strikeRadius * 2.0f;
 
    queryBox.minExtents.set( -boxWidth * 0.5f, -boxWidth * 0.5f, -mObjScale.z * 0.5f );
    queryBox.maxExtents.set(  boxWidth * 0.5f,  boxWidth * 0.5f,  mObjScale.z * 0.5f );
-   queryBox.minExtents += strikePoint;
-   queryBox.maxExtents += strikePoint;
+   queryBox.minExtents += worldPosStrikePoint;
+   queryBox.maxExtents += worldPosStrikePoint;
 
    SimpleQueryList sql;
    getContainer()->findObjects(queryBox, DAMAGEABLE_TYPEMASK,
