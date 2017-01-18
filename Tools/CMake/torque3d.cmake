@@ -640,6 +640,7 @@ if (APPLE)
   addFramework("CoreVideo")
   #grrr damn you sdl!
   addFramework("Carbon")
+  addFramework("AudioToolbox")
   addLib("iconv")
   #set a few arch defaults
   set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "OSX Architecture" FORCE)
