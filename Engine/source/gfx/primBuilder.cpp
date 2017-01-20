@@ -37,11 +37,22 @@ ColorI            mCurColor( 255, 255, 255 );
 Point2F           mCurTexCoord;
 const ColorI      _colWhite( 255, 255, 255, 255 );
 
-#ifdef TORQUE_DEBUG
 U32 mMaxVerts;
 
+static void CheckVertexBounds()
+{
+   // Grow vertex buffer
+   if(mCurVertIndex == mMaxVerts)
+   {
+      mMaxVerts *= 2;
+      mTempVertBuff.setSize(mMaxVerts);
+   }
+}
+
+#ifdef TORQUE_DEBUG
+
 #define INIT_VERTEX_SIZE(x) mMaxVerts = x;
-#define VERTEX_BOUNDS_CHECK() AssertFatal( mCurVertIndex < mMaxVerts, "PrimBuilder encountered an out of bounds vertex! Break and debug!" );
+#define VERTEX_BOUNDS_CHECK() CheckVertexBounds()
 
 // This next check shouldn't really be used a lot unless you are tracking down
 // a specific bug. -pw
@@ -49,8 +60,8 @@ U32 mMaxVerts;
 
 #else
 
-#define INIT_VERTEX_SIZE(x)
-#define VERTEX_BOUNDS_CHECK()
+#define INIT_VERTEX_SIZE(x) mMaxVerts = x;
+#define VERTEX_BOUNDS_CHECK() CheckVertexBounds()
 #define VERTEX_SIZE_CHECK()
 
 #endif
