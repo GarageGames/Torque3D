@@ -243,6 +243,7 @@ LightningData::LightningData()
    dMemset( strikeTextureNames, 0, sizeof( strikeTextureNames ) );
    dMemset( strikeTextures, 0, sizeof( strikeTextures ) );
    dMemset( thunderSounds, 0, sizeof( thunderSounds ) );
+   mNumStrikeTextures = 0;
 }
 
 LightningData::~LightningData()
@@ -297,10 +298,14 @@ bool LightningData::preload(bool server, String &errorStr)
       if( !sfxResolve( &strikeSound, sfxErrorStr ) )
          Con::errorf(ConsoleLogEntry::General, "LightningData::preload: Invalid packet: %s", sfxErrorStr.c_str());
 
+      mNumStrikeTextures = 0;
       for (U32 i = 0; i < MaxTextures; i++) 
       {
          if (strikeTextureNames[i][0])
+         {
             strikeTextures[i] = GFXTexHandle(strikeTextureNames[i], &GFXDefaultStaticDiffuseProfile, avar("%s() - strikeTextures[%d] (line %d)", __FUNCTION__, i, __LINE__));
+            mNumStrikeTextures++;
+         }
       }
    }
 
@@ -317,6 +322,9 @@ void LightningData::packData(BitStream* stream)
    U32 i;
    for (i = 0; i < MaxThunders; i++)
       sfxWrite( stream, thunderSounds[ i ] );
+
+   stream->writeInt(mNumStrikeTextures, 4);
+
    for (i = 0; i < MaxTextures; i++) {
       stream->writeString(strikeTextureNames[i]);
    }
@@ -331,6 +339,9 @@ void LightningData::unpackData(BitStream* stream)
    U32 i;
    for (i = 0; i < MaxThunders; i++)
       sfxRead( stream, &thunderSounds[ i ] );
+
+   mNumStrikeTextures = stream->readInt(4);
+
    for (i = 0; i < MaxTextures; i++) {
       strikeTextureNames[i] = stream->readSTString();
    }
@@ -479,7 +490,7 @@ void Lightning::renderObject(ObjectRenderInst *ri, SceneRenderState *state, Base
       desc.setCullMode(GFXCullNone);
       desc.zWriteEnable = false;
 
-      if (mDataBlock->strikeTextures[0].isValid())
+      if (mDataBlock->mNumStrikeTextures != 0)
       {
          desc.samplersDefined = true;
          desc.samplers[0].magFilter = GFXTextureFilterLinear;
@@ -498,8 +509,14 @@ void Lightning::renderObject(ObjectRenderInst *ri, SceneRenderState *state, Base
    Strike* walk = mStrikeListHead;
    while (walk != NULL)
    {
-      if (mDataBlock->strikeTextures[0].isValid())
+      if (mDataBlock->mNumStrikeTextures > 1)
+      {
+         GFX->setTexture(0, mDataBlock->strikeTextures[sgLightningRand.randI(0, mDataBlock->mNumStrikeTextures - 1)]);
+      }
+      else if (mDataBlock->mNumStrikeTextures > 0)
+      {
          GFX->setTexture(0, mDataBlock->strikeTextures[0]);
+      }
 
       for( U32 i=0; i<3; i++ )
       {

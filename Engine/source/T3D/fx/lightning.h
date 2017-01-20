@@ -70,6 +70,7 @@ class LightningData : public GameBaseData
 
    GFXTexHandle  strikeTextures[MaxTextures];
    U32           numThunders;
+   U32           mNumStrikeTextures;
 
   protected:
    bool onAdd();
