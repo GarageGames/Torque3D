@@ -47,6 +47,7 @@ class ShapeBase;
 class LightningStrikeEvent;
 class SFXTrack;
 
+#define MAX_LIGHTNING 3
 
 // -------------------------------------------------------------------------
 class LightningData : public GameBaseData

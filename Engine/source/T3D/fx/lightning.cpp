@@ -200,7 +200,7 @@ void LightningStrikeEvent::unpack(NetConnection* con, BitStream* stream)
 {
    if(!stream->readFlag())
       return;
-   S32 mClientId = stream->readRangedU32(0, NetConnection::MaxGhostCount);
+   mClientId = stream->readRangedU32(0, NetConnection::MaxGhostCount);
    mLightning = NULL;
    NetObject* pObject = con->resolveGhost(mClientId);
    if (pObject)
@@ -214,10 +214,10 @@ void LightningStrikeEvent::unpack(NetConnection* con, BitStream* stream)
       // target id
       S32 mTargetID    = stream->readRangedU32(0, NetConnection::MaxGhostCount);
 
-      NetObject* pObject = con->resolveGhost(mTargetID);
-      if( pObject != NULL )
+      NetObject* tObject = con->resolveGhost(mTargetID);
+      if(tObject != NULL )
       {
-         mTarget = dynamic_cast<SceneObject*>(pObject);
+         mTarget = dynamic_cast<SceneObject*>(tObject);
       }
       if( bool(mTarget) == false )
       {
@@ -325,7 +325,8 @@ void LightningData::packData(BitStream* stream)
 
    stream->writeInt(mNumStrikeTextures, 4);
 
-   for (i = 0; i < MaxTextures; i++) {
+   for (i = 0; i < MaxTextures; i++) 
+   {
       stream->writeString(strikeTextureNames[i]);
    }
 
@@ -342,7 +343,8 @@ void LightningData::unpackData(BitStream* stream)
 
    mNumStrikeTextures = stream->readInt(4);
 
-   for (i = 0; i < MaxTextures; i++) {
+   for (i = 0; i < MaxTextures; i++) 
+   {
       strikeTextureNames[i] = stream->readSTString();
    }
 
@@ -379,16 +381,16 @@ Lightning::~Lightning()
 {
    while( mThunderListHead )
    {
-      Thunder* next = mThunderListHead->next;
+      Thunder* nextThunder = mThunderListHead->next;
       delete mThunderListHead;
-      mThunderListHead = next;
+      mThunderListHead = nextThunder;
    }
 
    while( mStrikeListHead )
    {
-      Strike* next = mStrikeListHead->next;
+      Strike* nextStrike = mStrikeListHead->next;
       delete mStrikeListHead;
-      mStrikeListHead = next;
+      mStrikeListHead = nextStrike;
    }
 }
 
@@ -489,6 +491,7 @@ void Lightning::renderObject(ObjectRenderInst *ri, SceneRenderState *state, Base
       desc.setBlend( true, GFXBlendSrcAlpha, GFXBlendOne);
       desc.setCullMode(GFXCullNone);
       desc.zWriteEnable = false;
+      desc.vertexColorEnable = true;
 
       if (mDataBlock->mNumStrikeTextures != 0)
       {
@@ -518,7 +521,7 @@ void Lightning::renderObject(ObjectRenderInst *ri, SceneRenderState *state, Base
          GFX->setTexture(0, mDataBlock->strikeTextures[0]);
       }
 
-      for( U32 i=0; i<3; i++ )
+      for( U32 i=0; i<MAX_LIGHTNING; i++ )
       {
          if( walk->bolt[i].isFading )
          {
@@ -611,7 +614,7 @@ void Lightning::advanceTime(F32 dt)
    while (*pWalker != NULL) {
       Strike* pStrike = *pWalker;
 
-      for( U32 i=0; i<3; i++ )
+      for( U32 i=0; i<MAX_LIGHTNING; i++ )
       {
          pStrike->bolt[i].update( dt );
       }
@@ -695,7 +698,7 @@ void Lightning::processEvent(LightningStrikeEvent* pEvent)
       pStrike->currentAge = 0.0f;
       pStrike->next       = mStrikeListHead;
 
-      for( U32 i=0; i<3; i++ )
+      for( U32 i=0; i<MAX_LIGHTNING; i++ )
       {
          F32 randStart = boltStartRadius;
          F32 height = mObjScale.z * 0.5f + getPosition().z;
@@ -887,6 +890,7 @@ U32 Lightning::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
       stream->write(color.red);
       stream->write(color.green);
       stream->write(color.blue);
+      stream->write(color.alpha);
       stream->write(fadeColor.red);
       stream->write(fadeColor.green);
       stream->write(fadeColor.blue);
@@ -918,6 +922,7 @@ void Lightning::unpackUpdate(NetConnection* con, BitStream* stream)
       stream->read(&color.red);
       stream->read(&color.green);
       stream->read(&color.blue);
+      stream->read(&color.alpha);
       stream->read(&fadeColor.red);
       stream->read(&fadeColor.green);
       stream->read(&fadeColor.blue);
@@ -953,7 +958,7 @@ DefineEngineMethod(Lightning, strikeRandomPoint, void, (),,
       object->strikeRandomPoint();
 }
 
-DefineEngineMethod(Lightning, strikeObject, void, (ShapeBase* pSB),,
+DefineEngineMethod(Lightning, strikeObject, void, (ShapeBase* pSB), (nullAsType<ShapeBase*>()),
    "Creates a LightningStrikeEvent which strikes a specific object.\n"
    "@note This method is currently unimplemented.\n" )
 {
@@ -1177,7 +1182,7 @@ void LightningBolt::generateMinorNodes()
 //----------------------------------------------------------------------------
 // Recursive algo to create bolts that split off from main bolt
 //----------------------------------------------------------------------------
-void LightningBolt::createSplit( const Point3F &startPoint, const Point3F &endPoint, U32 depth, F32 width )
+void LightningBolt::createSplit( const Point3F &startingPoint, const Point3F &endingPoint, U32 depth, F32 splitWidth )
 {
    if( depth == 0 )
       return;
@@ -1186,17 +1191,17 @@ void LightningBolt::createSplit( const Point3F &startPoint, const Point3F &endPo
    if( chanceToEnd > 0.70f )
       return;
 
-   if( width < 0.75f )
-      width = 0.75f;
+   if(splitWidth < 0.75f )
+      splitWidth = 0.75f;
 
-   VectorF diff = endPoint - startPoint;
+   VectorF diff = endingPoint - startingPoint;
    F32 length = diff.len();
    diff.normalizeSafe();
 
    LightningBolt newBolt;
-   newBolt.startPoint = startPoint;
-   newBolt.endPoint = endPoint;
-   newBolt.width = width;
+   newBolt.startPoint = startingPoint;
+   newBolt.endPoint = endingPoint;
+   newBolt.width = splitWidth;
    newBolt.numMajorNodes = 3;
    newBolt.maxMajorAngle = 30.0f;
    newBolt.numMinorNodes = 3;
@@ -1207,13 +1212,13 @@ void LightningBolt::createSplit( const Point3F &startPoint, const Point3F &endPo
    splitList.pushBack( newBolt );
 
    VectorF newDir1 = MathUtils::randomDir( diff, 10.0f, 45.0f );
-   Point3F newEndPoint1 = endPoint + newDir1 * gRandGen.randF( 0.5f, 1.5f ) * length;
+   Point3F newEndPoint1 = endingPoint + newDir1 * gRandGen.randF( 0.5f, 1.5f ) * length;
 
    VectorF newDir2 = MathUtils::randomDir( diff, 10.0f, 45.0f );
-   Point3F newEndPoint2 = endPoint + newDir2 * gRandGen.randF( 0.5f, 1.5f ) * length;
+   Point3F newEndPoint2 = endingPoint + newDir2 * gRandGen.randF( 0.5f, 1.5f ) * length;
 
-   createSplit( endPoint, newEndPoint1, depth - 1, width * 0.30f );
-   createSplit( endPoint, newEndPoint2, depth - 1, width * 0.30f );
+   createSplit(endingPoint, newEndPoint1, depth - 1, splitWidth * 0.30f );
+   createSplit(endingPoint, newEndPoint2, depth - 1, splitWidth * 0.30f );
 
 }
 
