@@ -1317,7 +1317,7 @@ bool AIPlayer::checkInLos(GameBase* target, bool _useMuzzle, bool _checkEnabled)
    return hit;
 }
 
-DefineEngineMethod(AIPlayer, checkInLos, bool, (ShapeBase* obj,  bool useMuzzle, bool checkEnabled),(NULL, false, false),
+DefineEngineMethod(AIPlayer, checkInLos, bool, (ShapeBase* obj,  bool useMuzzle, bool checkEnabled),(nullAsType<ShapeBase*>(), false, false),
    "@brief Check whether an object is in line of sight.\n"
    "@obj Object to check. (If blank, it will check the current target).\n"
    "@useMuzzle Use muzzle position. Otherwise use eye position. (defaults to false).\n"
@@ -1366,7 +1366,7 @@ bool AIPlayer::checkInFoV(GameBase* target, F32 camFov, bool _checkEnabled)
    return (dot > mCos(camFov));
 }
 
-DefineEngineMethod(AIPlayer, checkInFoV, bool, (ShapeBase* obj, F32 fov, bool checkEnabled), (NULL, 45.0f, false),
+DefineEngineMethod(AIPlayer, checkInFoV, bool, (ShapeBase* obj, F32 fov, bool checkEnabled), (nullAsType<ShapeBase*>(), 45.0f, false),
    "@brief Check whether an object is within a specified veiw cone.\n"
    "@obj Object to check. (If blank, it will check the current target).\n"
    "@fov view angle in degrees.(Defaults to 45)\n"
@@ -1440,7 +1440,7 @@ F32 AIPlayer::getTargetDistance(GameBase* target, bool _checkEnabled)
    return (getPosition() - target->getPosition()).len();
 }
 
-DefineEngineMethod(AIPlayer, getTargetDistance, F32, (ShapeBase* obj, bool checkEnabled), (NULL, false),
+DefineEngineMethod(AIPlayer, getTargetDistance, F32, (ShapeBase* obj, bool checkEnabled), (nullAsType<ShapeBase*>(), false),
    "@brief The distance to a given object.\n"
    "@obj Object to check. (If blank, it will check the current target).\n"
    "@checkEnabled check whether the object can take damage and if so is still alive.(Defaults to false)\n")

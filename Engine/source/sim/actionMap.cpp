@@ -1991,7 +1991,7 @@ DefineEngineMethod( ActionMap, unbindObj, bool, ( const char* device, const char
     return object->processUnbind( device, action, simObject );
 }
 
-DefineEngineMethod( ActionMap, save, void, ( const char* fileName, bool append ), ( NULL, false ),
+DefineEngineMethod( ActionMap, save, void, ( const char* fileName, bool append ), ( nullAsType<const char*>(), false ),
    "@brief Saves the ActionMap to a file or dumps it to the console.\n\n"
    "@param fileName The file path to save the ActionMap to. If a filename is not specified "
    " the ActionMap will be dumped to the console.\n"

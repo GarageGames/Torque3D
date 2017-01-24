@@ -245,7 +245,7 @@ void RenderMeshMgr::render(SceneRenderState * state)
             if ( passRI->accuTex != lastAccuTex )
             {
                sgData.accuTex = passRI->accuTex;
-               lastAccuTex = lastAccuTex;
+               lastAccuTex = passRI->accuTex;
                dirty = true;
             }
 

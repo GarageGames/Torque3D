@@ -39,6 +39,7 @@
 #include "console/engineStructs.h"
 #endif
 
+template<typename T> inline const T nullAsType(){ return nullptr; }
 
 /// @file
 /// Legacy TS-based console type definitions.

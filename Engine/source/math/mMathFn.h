@@ -320,6 +320,11 @@ inline F32 mLog(const F32 val)
    return (F32) log(val);
 }
 
+inline F32 mLog2(const F32 val)
+{
+   return (F32) log2(val);
+}
+
 inline F32 mExp(const F32 val)
 {
    return (F32) exp(val);
@@ -380,6 +385,10 @@ inline F64 mLog(const F64 val)
    return (F64) log(val);
 }
 
+inline F64 mLog2(const F64 val)
+{
+   return (F64) log2(val);
+}
 
 inline F32 mCatmullrom(F32 t, F32 p0, F32 p1, F32 p2, F32 p3)
 {

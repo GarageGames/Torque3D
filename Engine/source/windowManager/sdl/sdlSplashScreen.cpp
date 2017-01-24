@@ -22,7 +22,7 @@
 
 #include "platform/platform.h"
 #include "console/console.h"
-
+#include "gfx/bitmap/gBitmap.h"
 #include "SDL.h"
 #include "windowManager/sdl/sdlWindow.h"
 
@@ -36,7 +36,52 @@ bool Platform::displaySplashWindow( String path )
    if(path.isEmpty())
       return false;
 
-   gSplashImage = SDL_LoadBMP(path);
+   Torque::Path iconPath = Torque::Path(path);
+
+   if (iconPath.getExtension() == String("bmp"))
+   {
+      Con::errorf("Unable to use bmp format images for the splash screen. Please use a different format.");
+      return false;
+   }
+
+   Resource<GBitmap> img = GBitmap::load(iconPath);
+   if (img != NULL)
+   {
+      U32 pitch;
+      U32 width = img->getWidth();
+      bool hasAlpha = img->getHasTransparency();
+      U32 depth;
+
+      if (hasAlpha)
+      {
+         pitch = 4 * width;
+         depth = 32;
+      }
+      else
+      {
+         pitch = 3 * width;
+         depth = 24;
+      }
+
+      Uint32 rmask, gmask, bmask, amask;
+      if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+      {
+         S32 shift = hasAlpha ? 8 : 0;
+         rmask = 0xff000000 >> shift;
+         gmask = 0x00ff0000 >> shift;
+         bmask = 0x0000ff00 >> shift;
+         amask = 0x000000ff >> shift;
+      }
+      else
+      {
+         rmask = 0x000000ff;
+         gmask = 0x0000ff00;
+         bmask = 0x00ff0000;
+         amask = hasAlpha ? 0xff000000 : 0;
+      }
+
+      gSplashImage = SDL_CreateRGBSurfaceFrom(img->getAddress(0, 0), img->getWidth(), img->getHeight(), depth, pitch, rmask, gmask, bmask, amask);
+   }
 
    //now the pop-up window
    if (gSplashImage)

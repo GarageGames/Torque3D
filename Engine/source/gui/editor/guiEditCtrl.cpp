@@ -2582,7 +2582,7 @@ DefineConsoleMethod( GuiEditCtrl, moveSelection, void, (S32 dx, S32 dy), , "Move
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, saveSelection, void, (const char * filename), (NULL), "( string fileName=null ) - Save selection to file or clipboard.")
+DefineConsoleMethod( GuiEditCtrl, saveSelection, void, (const char * filename), (nullAsType<const char*>()), "( string fileName=null ) - Save selection to file or clipboard.")
 {
       
    object->saveSelection( filename );
@@ -2590,7 +2590,7 @@ DefineConsoleMethod( GuiEditCtrl, saveSelection, void, (const char * filename), 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, loadSelection, void, (const char * filename), (NULL), "( string fileName=null ) - Load selection from file or clipboard.")
+DefineConsoleMethod( GuiEditCtrl, loadSelection, void, (const char * filename), (nullAsType<const char*>()), "( string fileName=null ) - Load selection from file or clipboard.")
 {
 
    object->loadSelection( filename );
