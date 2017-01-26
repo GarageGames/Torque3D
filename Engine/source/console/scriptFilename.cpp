@@ -343,10 +343,10 @@ bool collapseScriptFilename(char *filename, U32 size, const char *src)
 //-----------------------------------------------------------------------------
 
 ConsoleFunction(expandFilename, const char*, 2, 2, "(string filename)"
-				"@brief Grabs the full path of a specified file\n\n"
-				"@param filename Name of the local file to locate\n"
-				"@return String containing the full filepath on disk\n"
-				"@ingroup FileSystem")
+            "@brief Grabs the full path of a specified file\n\n"
+            "@param filename Name of the local file to locate\n"
+            "@return String containing the full filepath on disk\n"
+            "@ingroup FileSystem")
 {
    TORQUE_UNUSED(argc);
    static const U32 bufSize = 1024;
@@ -356,9 +356,9 @@ ConsoleFunction(expandFilename, const char*, 2, 2, "(string filename)"
 }
 
 ConsoleFunction(expandOldFilename, const char*, 2, 2, "(string filename)"
-				"@brief Retrofits a filepath that uses old Torque style\n\n"
-				"@return String containing filepath with new formatting\n"
-				"@ingroup FileSystem")
+            "@brief Retrofits a filepath that uses old Torque style\n\n"
+            "@return String containing filepath with new formatting\n"
+            "@ingroup FileSystem")
 {
    TORQUE_UNUSED(argc);
    static const U32 bufSize = 1024;
@@ -372,7 +372,7 @@ ConsoleFunction(expandOldFilename, const char*, 2, 2, "(string filename)"
 //-----------------------------------------------------------------------------
 
 ConsoleToolFunction(collapseFilename, const char*, 2, 2, "(string filename)"
-					"@internal Editor use only")
+               "@internal Editor use only")
 {
    TORQUE_UNUSED(argc);
    static const U32 bufSize = 1024;
@@ -382,7 +382,7 @@ ConsoleToolFunction(collapseFilename, const char*, 2, 2, "(string filename)"
 }
 
 ConsoleToolFunction(setScriptPathExpando, void, 3, 4, "(string expando, string path[, bool toolsOnly])"
-					"@internal Editor use only")
+               "@internal Editor use only")
 {
    if(argc == 4)
       Con::setScriptPathExpando(argv[1], argv[2], dAtob(argv[3]));
@@ -391,13 +391,13 @@ ConsoleToolFunction(setScriptPathExpando, void, 3, 4, "(string expando, string p
 }
 
 ConsoleToolFunction(removeScriptPathExpando, void, 2, 2, "(string expando)"
-					"@internal Editor use only")
+               "@internal Editor use only")
 {
    Con::removeScriptPathExpando(argv[1]);
 }
 
 ConsoleToolFunction(isScriptPathExpando, bool, 2, 2, "(string expando)"
-					"@internal Editor use only")
+               "@internal Editor use only")
 {
    return Con::isScriptPathExpando(argv[1]);
 }

@@ -39,10 +39,10 @@ SimConsoleEvent::SimConsoleEvent(S32 argc, ConsoleValueRef *argv, bool onObject)
       mArgv[i].value = new ConsoleValue();
       mArgv[i].value->type = ConsoleValue::TypeInternalString;
       mArgv[i].value->init();
-	  if (argv)
-	  {
-		mArgv[i].value->setStringValue((const char*)argv[i]);
-	  }
+     if (argv)
+     {
+      mArgv[i].value->setStringValue((const char*)argv[i]);
+     }
    }
 }
 

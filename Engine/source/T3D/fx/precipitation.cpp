@@ -129,10 +129,10 @@ PrecipitationData::PrecipitationData()
 {
    soundProfile      = NULL;
 
-   mDropName         = StringTable->insert("");
-   mDropShaderName   = StringTable->insert("");
-   mSplashName       = StringTable->insert("");
-   mSplashShaderName = StringTable->insert("");
+   mDropName         = StringTable->EmptyString();
+   mDropShaderName   = StringTable->EmptyString();
+   mSplashName       = StringTable->EmptyString();
+   mSplashShaderName = StringTable->EmptyString();
 
    mDropsPerSide     = 4;
    mSplashesPerSide  = 2;

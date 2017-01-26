@@ -67,17 +67,17 @@ DefineConsoleFunction( telnetSetParameters, void, ( int port, const char* consol
                 "@param consolePass Password for read/write access to console.\n"
                 "@param listenPass  Password for read access to console.\n"
                 "@param remoteEcho  [optional] Enable echoing back to the client, off by default.\n\n"
-				"@ingroup Debugging")
+            "@ingroup Debugging")
 {
    if (TelConsole)
-	   TelConsole->setTelnetParameters(port, consolePass, listenPass, remoteEcho);
+      TelConsole->setTelnetParameters(port, consolePass, listenPass, remoteEcho);
 }
 
 static void telnetCallback(U32 level, const char *consoleLine)
 {
    TORQUE_UNUSED(level);
    if (TelConsole)
-	  TelConsole->processConsoleLine(consoleLine);
+     TelConsole->processConsoleLine(consoleLine);
 }
 
 TelnetConsole::TelnetConsole()
@@ -121,9 +121,9 @@ void TelnetConsole::setTelnetParameters(S32 port, const char *telnetPassword, co
    mAcceptPort = port;
    if(mAcceptPort != -1 && mAcceptPort != 0)
    {
-	  NetAddress address;
-	  Net::getIdealListenAddress(&address);
-	  address.port = mAcceptPort;
+     NetAddress address;
+     Net::getIdealListenAddress(&address);
+     address.port = mAcceptPort;
 
       mAcceptSocket = Net::openSocket();
       Net::bindAddress(address, mAcceptSocket);

@@ -51,10 +51,10 @@ PopupMenu::PopupMenu() : mCanvas(NULL)
    mSubmenus = new SimSet;
    mSubmenus->registerObject();
 
-   mBarTitle = StringTable->insert("");
+   mBarTitle = StringTable->EmptyString();
    mIsPopup = false;
 
-	mPopupGUID = sMaxPopupGUID++;
+   mPopupGUID = sMaxPopupGUID++;
 }
 
 PopupMenu::~PopupMenu()
@@ -126,10 +126,10 @@ void PopupMenu::onMenuSelect()
 //-----------------------------------------------------------------------------
 
 void PopupMenu::handleSelectEvent(U32 popID, U32 command)
-{	
-	if (popID == mPopupGUID && canHandleID(command))	
-		if (handleSelect(command))
-			smSelectionEventHandled = true;
+{  
+   if (popID == mPopupGUID && canHandleID(command))   
+      if (handleSelect(command))
+         smSelectionEventHandled = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -138,8 +138,8 @@ void PopupMenu::onAttachToMenuBar(GuiCanvas *canvas, S32 pos, const char *title)
 {
    mCanvas = canvas;
 
-	// Attached menus must be notified of menu events
-	smPopupMenuEvent.notify(this, &PopupMenu::handleSelectEvent);
+   // Attached menus must be notified of menu events
+   smPopupMenuEvent.notify(this, &PopupMenu::handleSelectEvent);
    
    // Pass on to sub menus
    for(SimSet::iterator i = mSubmenus->begin();i != mSubmenus->end();++i)
@@ -160,8 +160,8 @@ void PopupMenu::onRemoveFromMenuBar(GuiCanvas *canvas)
 {
    mCanvas = NULL;
 
-	// We are no longer interested in select events, remove ourselves from the notification list in a safe way
-	Sim::postCurrentEvent(this, new PopUpNotifyRemoveEvent());
+   // We are no longer interested in select events, remove ourselves from the notification list in a safe way
+   Sim::postCurrentEvent(this, new PopUpNotifyRemoveEvent());
       
    // Pass on to sub menus
    for(SimSet::iterator i = mSubmenus->begin();i != mSubmenus->end();++i)

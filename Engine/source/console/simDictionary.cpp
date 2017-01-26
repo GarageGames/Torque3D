@@ -150,7 +150,7 @@ void SimNameDictionary::remove(SimObject* obj)
       if(*walk == obj)
       {
          *walk = obj->nextNameObject;
-			obj->nextNameObject = (SimObject*)-1;
+         obj->nextNameObject = (SimObject*)-1;
          hashEntryCount--;
 
          Mutex::unlockMutex(mutex);
@@ -164,7 +164,7 @@ void SimNameDictionary::remove(SimObject* obj)
       root.erase(name);
 #endif
    Mutex::unlockMutex(mutex);
-}	
+}  
 
 //----------------------------------------------------------------------------
 
@@ -279,7 +279,7 @@ void SimManagerNameDictionary::remove(SimObject* obj)
       if(*walk == obj)
       {
          *walk = obj->nextManagerNameObject;
-			obj->nextManagerNameObject = (SimObject*)-1;
+         obj->nextManagerNameObject = (SimObject*)-1;
          hashEntryCount--;
 
          Mutex::unlockMutex(mutex);
@@ -293,7 +293,7 @@ void SimManagerNameDictionary::remove(SimObject* obj)
       root.erase(name);
 #endif
    Mutex::unlockMutex(mutex);
-}	
+}  
 
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------

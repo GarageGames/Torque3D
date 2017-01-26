@@ -49,7 +49,7 @@ ConsoleDocClass( GuiToggleButtonCtrl,
 GuiToggleButtonCtrl::GuiToggleButtonCtrl()
 {
    setExtent(140, 30);
-   mButtonText = StringTable->insert("");
+   mButtonText = StringTable->EmptyString();
    mStateOn = false;
    mButtonType = ButtonTypeCheck;
 }
@@ -60,7 +60,7 @@ void GuiToggleButtonCtrl::onPreRender()
 
    // If we have a script variable, make sure we're in sync
    if ( mConsoleVariable[0] )
-   	mStateOn = Con::getBoolVariable( mConsoleVariable );
+      mStateOn = Con::getBoolVariable( mConsoleVariable );
 }
 
 void GuiToggleButtonCtrl::onRender(Point2I      offset,

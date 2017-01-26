@@ -68,7 +68,7 @@ GuiPaneControl::GuiPaneControl()
    mMouseOver     = false;
    mDepressed     = false;
    mCaption       = "A Pane";
-   mCaptionID     = StringTable->insert("");
+   mCaptionID     = StringTable->EmptyString();
    mIsContainer   = true;
 
    mOriginalExtents.set(10,10);
@@ -108,7 +108,7 @@ bool GuiPaneControl::onWake()
    }
 
    if(mCaptionID && *mCaptionID != 0)
-		setCaptionID(mCaptionID);
+      setCaptionID(mCaptionID);
 
    mProfile->constructBitmapArray();
    if(mProfile->mUseBitmapArray && mProfile->mBitmapArrayRects.size())
@@ -131,19 +131,19 @@ bool GuiPaneControl::onWake()
 
 void GuiPaneControl::setCaptionID(const char *id)
 {
-	S32 n = Con::getIntVariable(id, -1);
-	if(n != -1)
-	{
-		mCaptionID = StringTable->insert(id);
-		setCaptionID(n);
-	}
+   S32 n = Con::getIntVariable(id, -1);
+   if(n != -1)
+   {
+      mCaptionID = StringTable->insert(id);
+      setCaptionID(n);
+   }
 }
 
 //-----------------------------------------------------------------------------
 
 void GuiPaneControl::setCaptionID(S32 id)
 {
-	mCaption = getGUIString(id);
+   mCaption = getGUIString(id);
 }
 
 //-----------------------------------------------------------------------------

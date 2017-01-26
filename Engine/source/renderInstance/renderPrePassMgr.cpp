@@ -843,7 +843,7 @@ void ProcessedPrePassMaterial::addStateBlockDesc(const GFXStateBlockDesc& desc)
    if ( isTranslucent )
    {
       prePassStateBlock.setBlend( true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha );
-	   prePassStateBlock.setColorWrites(false, false, false, true);
+      prePassStateBlock.setColorWrites(false, false, false, true);
    }
 
    // Enable z reads, but only enable zwrites if we're not translucent.

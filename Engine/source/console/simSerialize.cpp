@@ -213,18 +213,18 @@ SimObject *loadObjectStream(Stream *stream)
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction(saveObject, bool, ( SimObject *object, const char *filename ),,
-				"@brief Serialize the object to a file.\n\n"
-				"@param object The object to serialize.\n"
-				"@param filename The file name and path.\n"
-				"@ingroup Console\n")
+            "@brief Serialize the object to a file.\n\n"
+            "@param object The object to serialize.\n"
+            "@param filename The file name and path.\n"
+            "@ingroup Console\n")
 {
    return object && Sim::saveObject(object, filename);
 }
 
 DefineEngineFunction(loadObject, SimObject*, ( const char *filename ),,
-				"@brief Loads a serialized object from a file.\n\n"
-				"@param Name and path to text file containing the object\n"
-				"@ingroup Console\n")
+            "@brief Loads a serialized object from a file.\n\n"
+            "@param Name and path to text file containing the object\n"
+            "@ingroup Console\n")
 {
    return Sim::loadObjectStream(filename);
 }

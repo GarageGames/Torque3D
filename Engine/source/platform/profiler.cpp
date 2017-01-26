@@ -724,37 +724,37 @@ DefineEngineFunction( profilerMarkerEnable, void, ( const char* markerName, bool
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction( profilerEnable, void, ( bool enable ),,
-				"@brief Enables or disables the profiler.\n\n"
-				"Data is only gathered while the profiler is enabled.\n\n"
-				"@note Profiler is not available in shipping builds.\n"
-				"T3D has predefined profiling areas surrounded by markers, "
-				"but you may need to define additional markers (in C++) around areas you wish to profile,"
-				" by using the PROFILE_START( markerName ); and PROFILE_END(); macros.\n\n"
-				"@ingroup Debugging\n" )
+            "@brief Enables or disables the profiler.\n\n"
+            "Data is only gathered while the profiler is enabled.\n\n"
+            "@note Profiler is not available in shipping builds.\n"
+            "T3D has predefined profiling areas surrounded by markers, "
+            "but you may need to define additional markers (in C++) around areas you wish to profile,"
+            " by using the PROFILE_START( markerName ); and PROFILE_END(); macros.\n\n"
+            "@ingroup Debugging\n" )
 {
    if(gProfiler)
       gProfiler->enable(enable);
 }
 
 DefineEngineFunction(profilerDump, void, (),,
-				"@brief Dumps current profiling stats to the console window.\n\n"
-				"@note Markers disabled with profilerMarkerEnable() will be skipped over. "
-				"If the profiler is currently running, it will be disabled.\n"
-				"@ingroup Debugging")
+            "@brief Dumps current profiling stats to the console window.\n\n"
+            "@note Markers disabled with profilerMarkerEnable() will be skipped over. "
+            "If the profiler is currently running, it will be disabled.\n"
+            "@ingroup Debugging")
 {
    if(gProfiler)
       gProfiler->dumpToConsole();
 }
 
 DefineEngineFunction( profilerDumpToFile, void, ( const char* fileName ),,
-				"@brief Dumps current profiling stats to a file.\n\n"
-				"@note If the profiler is currently running, it will be disabled.\n"
-				"@param fileName Name and path of file to save profiling stats to. Must use forward slashes (/). "
-				"Will attempt to create the file if it does not already exist.\n"
-				"@tsexample\n"
-				"profilerDumpToFile( \"C:/Torque/log1.txt\" );\n"
-				"@endtsexample\n\n"
-				"@ingroup Debugging" )
+            "@brief Dumps current profiling stats to a file.\n\n"
+            "@note If the profiler is currently running, it will be disabled.\n"
+            "@param fileName Name and path of file to save profiling stats to. Must use forward slashes (/). "
+            "Will attempt to create the file if it does not already exist.\n"
+            "@tsexample\n"
+            "profilerDumpToFile( \"C:/Torque/log1.txt\" );\n"
+            "@endtsexample\n\n"
+            "@ingroup Debugging" )
 {
    if(gProfiler)
       gProfiler->dumpToFile(fileName);
@@ -762,9 +762,9 @@ DefineEngineFunction( profilerDumpToFile, void, ( const char* fileName ),,
 
 DefineEngineFunction( profilerReset, void, (),,
                 "@brief Resets the profiler, clearing it of all its data.\n\n"
-				"If the profiler is currently running, it will first be disabled. "
-				"All markers will retain their current enabled/disabled status.\n\n"
-				"@ingroup Debugging" )
+            "If the profiler is currently running, it will first be disabled. "
+            "All markers will retain their current enabled/disabled status.\n\n"
+            "@ingroup Debugging" )
 {
    if(gProfiler)
       gProfiler->reset();
