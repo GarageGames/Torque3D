@@ -99,18 +99,12 @@ function Editor::checkActiveLoadDone()
 //------------------------------------------------------------------------------
 function toggleEditor(%make)
 {
-   if (Canvas.isFullscreen())
-   {
-      MessageBoxOK("Windowed Mode Required", "Please switch to windowed mode to access the Mission Editor.");
-      return;
-   }
-   
    if (%make)
-   {      
+   {  
       %timerId = startPrecisionTimer();
       
-      if( $InGuiEditor )
-         GuiEdit();
+      if( GuiEditorIsActive() )
+         toggleGuiEditor(1);
          
       if( !$missionRunning )
       {
@@ -141,29 +135,21 @@ function toggleEditor(%make)
                Editor.close("PlayGui");
             }
          }
-         else 
+         else
          {
-            if ( !$GuiEditorBtnPressed )
-            {
-               canvas.pushDialog( EditorLoadingGui );
-               canvas.repaint();
-            }
-            else
-            {
-               $GuiEditorBtnPressed = false;
-            }
+            canvas.pushDialog( EditorLoadingGui );
+            canvas.repaint();
             
             Editor.open();
 			
-			// Cancel the scheduled event to prevent
-			// the level from cycling after it's duration
-			// has elapsed.
+            // Cancel the scheduled event to prevent
+            // the level from cycling after it's duration
+            // has elapsed.
             cancel($Game::Schedule);
             
             if (theLevelInfo.type $= "DemoScene")
                commandToServer('dropCameraAtPlayer', true);
                
-            
             canvas.popDialog(EditorLoadingGui);
          }
          

@@ -86,7 +86,7 @@
                minExtent = "8 8";
                canSave = "1";
                visible = "1";
-               command = "GuiEditor.switchToWorldEditor();";
+               command = "toggleEditor(1);";
                tooltipProfile = "ToolsGuiToolTipProfile";
                ToolTip = "World Editor";
                hovertime = "1000";
