@@ -734,6 +734,7 @@ void Lightning::warningFlashes()
 {
    AssertFatal(isServerObject(), "Error, client objects may not initiate lightning!");
 
+   Point3F strikePoint( gRandGen.randF( 0.0f, 1.0f ), gRandGen.randF( 0.0f, 1.0f ), 0.0f );
 
    SimGroup* pClientGroup = Sim::getClientGroup();
    for (SimGroup::iterator itr = pClientGroup->begin(); itr != pClientGroup->end(); itr++) {
@@ -742,6 +743,9 @@ void Lightning::warningFlashes()
       {
          LightningStrikeEvent* pEvent = new LightningStrikeEvent;
          pEvent->mLightning = this;
+		 
+		 pEvent->mStart.x = strikePoint.x;
+		 pEvent->mStart.y = strikePoint.y;
 
          nc->postNetEvent(pEvent);
       }
