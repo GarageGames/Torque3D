@@ -35,6 +35,7 @@
 #include "core/stream/fileStream.h"
 #include "core/fileObject.h"
 #include "persistence/taml/tamlCustom.h"
+#include <cinterface/cinterface.h>
 
 IMPLEMENT_CONOBJECT( SimObject );
 
@@ -800,6 +801,9 @@ bool SimObject::isMethod( const char* methodName )
 {
    if( !methodName || !methodName[0] )
       return false;
+
+   if (CInterface::GetCInterface().isMethod(mNameSpace->getName(), methodName))
+      return true;
 
    StringTableEntry stname = StringTable->insert( methodName );
 
