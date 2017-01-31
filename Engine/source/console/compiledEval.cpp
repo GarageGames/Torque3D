@@ -1772,7 +1772,7 @@ breakContinue:
                ns = NULL;
 
                StringStackWrapper args(callArgc - 1, callArgv + 1);
-               cRetRes = CInterface::GetCInterface().CallFunction(fnName, args.argv, args.argc, &cFunctionRes);
+               cRetRes = CInterface::GetCInterface().CallFunction(fnNamespace, fnName, args.argv, args.argc, &cFunctionRes);
             }
             else if(callType == FuncCallExprNode::MethodCall)
             {

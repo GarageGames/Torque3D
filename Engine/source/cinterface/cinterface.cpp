@@ -50,9 +50,9 @@ bool CInterface::isMethod(const char* className, const char* methodName)
    return GetCInterface()._isMethod(className, methodName);
 }
 
-const char* CInterface::CallFunction(const char* name, const char **argv, int argc, bool *result)
+const char* CInterface::CallFunction(const char* nameSpace, const char* name, const char **argv, int argc, bool *result)
 {
-   return GetCInterface()._CallFunction(name, argv, argc, result);
+   return GetCInterface()._CallFunction(nameSpace, name, argv, argc, result);
 }
 
 const char* CInterface::CallMethod(SimObject* obj, const char* name, const char **argv, int argc, bool *res)
@@ -73,10 +73,10 @@ bool CInterface::_isMethod(const char* className, const char* methodName)
    return NULL;
 }
 
-const char* CInterface::_CallFunction(const char* name, const char **argv, int argc, bool *result)
+const char* CInterface::_CallFunction(const char* nameSpace, const char* name, const char **argv, int argc, bool *result)
 {
    if (mFunctionCallback)
-      return mFunctionCallback(name, argv, argc, result);
+      return mFunctionCallback(nameSpace, name, argv, argc, result);
 
    *result = false;
    return NULL;

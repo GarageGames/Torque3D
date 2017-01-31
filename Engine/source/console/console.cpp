@@ -1185,7 +1185,7 @@ ConsoleValueRef _internalExecute(S32 argc, ConsoleValueRef argv[])
       argv_str[i] = argv[i + 1];
    }
    bool result;
-   const char* methodRes = CInterface::CallFunction(argv[0], argv_str, argc - 1, &result);
+   const char* methodRes = CInterface::CallFunction(NULL, argv[0], argv_str, argc - 1, &result);
    if (result)
       return ConsoleValueRef::fromValue(CSTK.pushString(methodRes));
 
