@@ -51,23 +51,41 @@ namespace
    {
       U32 ret = 0;
 
-      if(mod & KMOD_LSHIFT)
-         ret |= IM_LSHIFT;
+      if (mod & KMOD_LSHIFT)
+      {
+         ret |= SI_LSHIFT;
+         ret |= SI_SHIFT;
+      }
 
-      if(mod & KMOD_RSHIFT)
-         ret |= IM_RSHIFT;
+      if (mod & KMOD_RSHIFT)
+      {
+         ret |= SI_RSHIFT;
+         ret |= SI_SHIFT;
+      }
 
-      if(mod & KMOD_LCTRL)
-         ret |= IM_LCTRL;
+      if (mod & KMOD_LCTRL)
+      {
+         ret |= SI_LCTRL;
+         ret |= SI_CTRL;
+      }
 
-      if(mod & KMOD_RCTRL)
-         ret |= IM_RCTRL;
+      if (mod & KMOD_RCTRL)
+      {
+         ret |= SI_RCTRL;
+         ret |= SI_CTRL;
+      }
 
-      if(mod & KMOD_LALT)
-         ret |= IM_LALT;
+      if (mod & KMOD_LALT)
+      {
+         ret |= SI_LALT;
+         ret |= SI_ALT;
+      }
 
-      if(mod & KMOD_RALT)
-         ret |= IM_RALT;
+      if (mod & KMOD_RALT)
+      {
+         ret |= SI_RALT;
+         ret |= SI_ALT;
+      }
 
       return ret;
    }

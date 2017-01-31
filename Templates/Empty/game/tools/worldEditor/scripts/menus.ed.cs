@@ -42,47 +42,59 @@ function EditorGui::buildMenus(%this)
    }
 
    // Sub menus (temporary, until MenuBuilder gets updated)
-      // The speed increments located here are overwritten in EditorCameraSpeedMenu::setupDefaultState.
-      // The new min/max for the editor camera speed range can be set in each level's levelInfo object.
-   %this.cameraSpeedMenu = new PopupMenu(EditorCameraSpeedOptions)
+   // The speed increments located here are overwritten in EditorCameraSpeedMenu::setupDefaultState.
+   // The new min/max for the editor camera speed range can be set in each level's levelInfo object.
+   if(!isObject(EditorCameraSpeedOptions))
    {
-      superClass = "MenuBuilder";
-      class = "EditorCameraSpeedMenu";
-      
-      item[0] = "Slowest" TAB %cmdCtrl @ "-Shift 1" TAB "5";
-      item[1] = "Slow" TAB %cmdCtrl @ "-Shift 2" TAB "35";
-      item[2] = "Slower" TAB %cmdCtrl @ "-Shift 3" TAB "70";
-      item[3] = "Normal" TAB %cmdCtrl @ "-Shift 4" TAB "100";
-      item[4] = "Faster" TAB %cmdCtrl @ "-Shift 5" TAB "130";
-      item[5] = "Fast" TAB %cmdCtrl @ "-Shift 6" TAB "165";
-      item[6] = "Fastest" TAB %cmdCtrl @ "-Shift 7" TAB "200";
-   };
-   %this.freeCameraTypeMenu = new PopupMenu(EditorFreeCameraTypeOptions)
+      %this.cameraSpeedMenu = new PopupMenu(EditorCameraSpeedOptions)
+      {
+         superClass = "MenuBuilder";
+         class = "EditorCameraSpeedMenu";
+         
+         item[0] = "Slowest" TAB %cmdCtrl @ "-Shift 1" TAB "5";
+         item[1] = "Slow" TAB %cmdCtrl @ "-Shift 2" TAB "35";
+         item[2] = "Slower" TAB %cmdCtrl @ "-Shift 3" TAB "70";
+         item[3] = "Normal" TAB %cmdCtrl @ "-Shift 4" TAB "100";
+         item[4] = "Faster" TAB %cmdCtrl @ "-Shift 5" TAB "130";
+         item[5] = "Fast" TAB %cmdCtrl @ "-Shift 6" TAB "165";
+         item[6] = "Fastest" TAB %cmdCtrl @ "-Shift 7" TAB "200";
+      };
+   }
+   if(!isObject(EditorFreeCameraTypeOptions))
    {
-      superClass = "MenuBuilder";
-      class = "EditorFreeCameraTypeMenu";
-      
-      item[0] = "Standard" TAB "Ctrl 1" TAB "EditorGuiStatusBar.setCamera(\"Standard Camera\");";
-      item[1] = "Orbit Camera" TAB "Ctrl 2" TAB "EditorGuiStatusBar.setCamera(\"Orbit Camera\");";
-      Item[2] = "-";
-      item[3] = "Smoothed" TAB "" TAB "EditorGuiStatusBar.setCamera(\"Smooth Camera\");";
-      item[4] = "Smoothed Rotate" TAB "" TAB "EditorGuiStatusBar.setCamera(\"Smooth Rot Camera\");";
-   };
-   %this.playerCameraTypeMenu = new PopupMenu(EditorPlayerCameraTypeOptions)
+      %this.freeCameraTypeMenu = new PopupMenu(EditorFreeCameraTypeOptions)
+      {
+         superClass = "MenuBuilder";
+         class = "EditorFreeCameraTypeMenu";
+         
+         item[0] = "Standard" TAB "Ctrl 1" TAB "EditorGuiStatusBar.setCamera(\"Standard Camera\");";
+         item[1] = "Orbit Camera" TAB "Ctrl 2" TAB "EditorGuiStatusBar.setCamera(\"Orbit Camera\");";
+         Item[2] = "-";
+         item[3] = "Smoothed" TAB "" TAB "EditorGuiStatusBar.setCamera(\"Smooth Camera\");";
+         item[4] = "Smoothed Rotate" TAB "" TAB "EditorGuiStatusBar.setCamera(\"Smooth Rot Camera\");";
+      };
+   }
+   if(!isObject(EditorPlayerCameraTypeOptions))
    {
-      superClass = "MenuBuilder";
-      class = "EditorPlayerCameraTypeMenu";
-      
-      Item[0] = "First Person" TAB "" TAB "EditorGuiStatusBar.setCamera(\"1st Person Camera\");";
-      Item[1] = "Third Person" TAB "" TAB "EditorGuiStatusBar.setCamera(\"3rd Person Camera\");";
-   };
-   %this.cameraBookmarksMenu = new PopupMenu(EditorCameraBookmarks)
+      %this.playerCameraTypeMenu = new PopupMenu(EditorPlayerCameraTypeOptions)
+      {
+         superClass = "MenuBuilder";
+         class = "EditorPlayerCameraTypeMenu";
+         
+         Item[0] = "First Person" TAB "" TAB "EditorGuiStatusBar.setCamera(\"1st Person Camera\");";
+         Item[1] = "Third Person" TAB "" TAB "EditorGuiStatusBar.setCamera(\"3rd Person Camera\");";
+      };
+   }
+   if(!isObject(EditorCameraBookmarks))
    {
-      superClass = "MenuBuilder";
-      class = "EditorCameraBookmarksMenu";
-      
-      //item[0] = "None";
-   };
+      %this.cameraBookmarksMenu = new PopupMenu(EditorCameraBookmarks)
+      {
+         superClass = "MenuBuilder";
+         class = "EditorCameraBookmarksMenu";
+         
+         //item[0] = "None";
+      };
+   }
    %this.viewTypeMenu = new PopupMenu()
    {
       superClass = "MenuBuilder";
@@ -98,7 +110,7 @@ function EditorGui::buildMenus(%this)
    };
       
    // Menu bar
-   %this.menuBar = new MenuBar()
+   %this.menuBar = new MenuBar(WorldEditorMenubar)
    {
       dynamicItemInsertPos = 3;
    };

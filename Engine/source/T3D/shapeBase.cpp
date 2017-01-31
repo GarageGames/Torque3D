@@ -152,13 +152,13 @@ ShapeBaseData::ShapeBaseData()
    shadowMaxVisibleDistance( 80.0f ),
    shadowProjectionDistance( 10.0f ),
    shadowSphereAdjust( 1.0f ),
-   shapeName( StringTable->insert("") ),
-   cloakTexName( StringTable->insert("") ),
+   shapeName( StringTable->EmptyString() ),
+   cloakTexName( StringTable->EmptyString() ),
    cubeDescId( 0 ),
    reflectorDesc( NULL ),
    debris( NULL ),
    debrisID( 0 ),
-   debrisShapeName( StringTable->insert("") ),
+   debrisShapeName( StringTable->EmptyString() ),
    explosion( NULL ),
    explosionID( 0 ),
    underwaterExplosion( NULL ),
@@ -447,12 +447,12 @@ bool ShapeBaseData::_setMass( void* object, const char* index, const char* data 
 {
    ShapeBaseData* shape = reinterpret_cast< ShapeBaseData* >( object );
 
-	F32 mass = dAtof(data);
+   F32 mass = dAtof(data);
 
-	if (mass <= 0)
-		mass = 0.01f;
+   if (mass <= 0)
+      mass = 0.01f;
 
-	shape->mass = mass;
+   shape->mass = mass;
 
    return false;
 }
@@ -935,8 +935,8 @@ ShapeBase::ShapeBase()
       mScriptThread[i].thread = 0;
       mScriptThread[i].state = Thread::Stop;
       mScriptThread[i].atEnd = false;
-	   mScriptThread[i].timescale = 1.f;
-	   mScriptThread[i].position = -1.f;
+      mScriptThread[i].timescale = 1.f;
+      mScriptThread[i].position = -1.f;
    }
 
    for (i = 0; i < MaxTriggerKeys; i++)
@@ -1042,7 +1042,7 @@ bool ShapeBase::onAdd()
    }   
 
 /*
-      if(mDataBlock->cloakTexName != StringTable->insert(""))
+      if(mDataBlock->cloakTexName != StringTable->EmptyString())
         mCloakTexture = TextureHandle(mDataBlock->cloakTexName, MeshTexture, false);
 */         
    // Accumulation and environment mapping
@@ -1512,8 +1512,8 @@ void ShapeBase::onCameraScopeQuery(NetConnection *cr, CameraScopeQuery * query)
    eyeTransform.getColumn(1, &query->orientation);
 
    // Get the visible distance.
-	if (getSceneManager() != NULL)
-		query->visibleDistance = getSceneManager()->getVisibleDistance();
+   if (getSceneManager() != NULL)
+      query->visibleDistance = getSceneManager()->getVisibleDistance();
 
    Parent::onCameraScopeQuery( cr, query );
 }
@@ -2154,18 +2154,18 @@ void ShapeBase::updateAudioPos()
 
 const char *ShapeBase::getThreadSequenceName( U32 slot )
 {
-	Thread& st = mScriptThread[slot];
-	if ( st.sequence == -1 )
-	{
-		// Invalid Animation.
-		return "";
-	}
+   Thread& st = mScriptThread[slot];
+   if ( st.sequence == -1 )
+   {
+      // Invalid Animation.
+      return "";
+   }
 
-	// Name Index
-	const U32 nameIndex = getShape()->sequences[st.sequence].nameIndex;
+   // Name Index
+   const U32 nameIndex = getShape()->sequences[st.sequence].nameIndex;
 
-	// Return Name.
-	return getShape()->getName( nameIndex );
+   // Return Name.
+   return getShape()->getName( nameIndex );
 }
 
 bool ShapeBase::setThreadSequence(U32 slot, S32 seq, bool reset)
@@ -2200,39 +2200,39 @@ bool ShapeBase::setThreadSequence(U32 slot, S32 seq, bool reset)
 
 void ShapeBase::updateThread(Thread& st)
 {
-	switch (st.state)
-	{
-		case Thread::Stop:
-			{
-				mShapeInstance->setTimeScale( st.thread, 1.f );
-				mShapeInstance->setPos( st.thread, ( st.timescale > 0.f ) ? 1.0f : 0.0f );
-			} // Drop through to pause state
+   switch (st.state)
+   {
+      case Thread::Stop:
+         {
+            mShapeInstance->setTimeScale( st.thread, 1.f );
+            mShapeInstance->setPos( st.thread, ( st.timescale > 0.f ) ? 1.0f : 0.0f );
+         } // Drop through to pause state
 
-		case Thread::Pause:
-			{
-				mShapeInstance->setTimeScale( st.thread, 0.f );
-			} break;
+      case Thread::Pause:
+         {
+            mShapeInstance->setTimeScale( st.thread, 0.f );
+         } break;
 
-		case Thread::Play:
-			{
-				if (st.atEnd)
-				{
-					mShapeInstance->setTimeScale(st.thread,1);
-					mShapeInstance->setPos( st.thread, ( st.timescale > 0.f ) ? 1.0f : 0.0f );
-					mShapeInstance->setTimeScale(st.thread,0);
+      case Thread::Play:
+         {
+            if (st.atEnd)
+            {
+               mShapeInstance->setTimeScale(st.thread,1);
+               mShapeInstance->setPos( st.thread, ( st.timescale > 0.f ) ? 1.0f : 0.0f );
+               mShapeInstance->setTimeScale(st.thread,0);
                st.state = Thread::Stop;
-				}
-				else
-				{
-					if ( st.position != -1.f )
-					{
-						mShapeInstance->setTimeScale( st.thread, 1.f );
-						mShapeInstance->setPos( st.thread, st.position );
-					}
+            }
+            else
+            {
+               if ( st.position != -1.f )
+               {
+                  mShapeInstance->setTimeScale( st.thread, 1.f );
+                  mShapeInstance->setPos( st.thread, st.position );
+               }
 
-					mShapeInstance->setTimeScale(st.thread, st.timescale );
-				}
-			} break;
+               mShapeInstance->setTimeScale(st.thread, st.timescale );
+            }
+         } break;
 
       case Thread::Destroy:
          {
@@ -2244,7 +2244,7 @@ void ShapeBase::updateThread(Thread& st)
                st.thread = 0;
             }
          } break;
-	}
+   }
 }
 
 bool ShapeBase::stopThread(U32 slot)
@@ -2297,50 +2297,50 @@ bool ShapeBase::playThread(U32 slot)
 
 bool ShapeBase::setThreadPosition( U32 slot, F32 pos )
 {
-	Thread& st = mScriptThread[slot];
-	if (st.sequence != -1)
-	{
-		setMaskBits(ThreadMaskN << slot);
-		st.position = pos;
-		st.atEnd = false;
-		updateThread(st);
+   Thread& st = mScriptThread[slot];
+   if (st.sequence != -1)
+   {
+      setMaskBits(ThreadMaskN << slot);
+      st.position = pos;
+      st.atEnd = false;
+      updateThread(st);
 
-		return true;
-	}
-	return false;
+      return true;
+   }
+   return false;
 }
 
 bool ShapeBase::setThreadDir(U32 slot,bool forward)
 {
-	Thread& st = mScriptThread[slot];
-	if (st.sequence != -1)
-	{
-		if ( ( st.timescale >= 0.f ) != forward )
-		{
-			setMaskBits(ThreadMaskN << slot);
-			st.timescale *= -1.f ;
-			st.atEnd = false;
-			updateThread(st);
-		}
-		return true;
-	}
-	return false;
+   Thread& st = mScriptThread[slot];
+   if (st.sequence != -1)
+   {
+      if ( ( st.timescale >= 0.f ) != forward )
+      {
+         setMaskBits(ThreadMaskN << slot);
+         st.timescale *= -1.f ;
+         st.atEnd = false;
+         updateThread(st);
+      }
+      return true;
+   }
+   return false;
 }
 
 bool ShapeBase::setThreadTimeScale( U32 slot, F32 timeScale )
 {
-	Thread& st = mScriptThread[slot];
-	if (st.sequence != -1)
-	{
-		if (st.timescale != timeScale)
-		{
-			setMaskBits(ThreadMaskN << slot);
-			st.timescale = timeScale;
-			updateThread(st);
-		}
-		return true;
-	}
-	return false;
+   Thread& st = mScriptThread[slot];
+   if (st.sequence != -1)
+   {
+      if (st.timescale != timeScale)
+      {
+         setMaskBits(ThreadMaskN << slot);
+         st.timescale = timeScale;
+         updateThread(st);
+      }
+      return true;
+   }
+   return false;
 }
 
 void ShapeBase::advanceThreads(F32 dt)
@@ -2349,7 +2349,7 @@ void ShapeBase::advanceThreads(F32 dt)
       Thread& st = mScriptThread[i];
       if (st.thread) {
          if (!mShapeInstance->getShape()->sequences[st.sequence].isCyclic() && !st.atEnd &&
-			 ( ( st.timescale > 0.f )? mShapeInstance->getPos(st.thread) >= 1.0:
+          ( ( st.timescale > 0.f )? mShapeInstance->getPos(st.thread) >= 1.0:
               mShapeInstance->getPos(st.thread) <= 0)) {
             st.atEnd = true;
             updateThread(st);
@@ -4392,7 +4392,7 @@ DefineEngineMethod( ShapeBase, isEnabled, bool, (),,
 
 DefineEngineMethod(ShapeBase, blowUp, void, (),, "@brief Explodes an object into pieces.")
 {
-	object->blowUp();
+   object->blowUp();
 }
 
 DefineEngineMethod( ShapeBase, applyDamage, void, ( F32 amount ),,
@@ -4696,22 +4696,22 @@ void ShapeBase::consoleInit()
       "@see ShapeBase::setDamageFlash()\n"
       "@see ShapeBase::getDamageFlash()\n"
       "@note Relies on the flash postFx.\n"
-	   "@ingroup gameObjects\n");
+      "@ingroup gameObjects\n");
    Con::addVariable("SB::WODec", TypeF32, &sWhiteoutDec, "Speed to reduce the whiteout effect per tick.\n\n"
       "@see ShapeBase::setWhiteOut()\n"
       "@see ShapeBase::getWhiteOut"
       "@note Relies on the flash postFx.\n"
-	   "@ingroup gameObjects\n");
+      "@ingroup gameObjects\n");
    Con::addVariable("SB::FullCorrectionDistance", TypeF32, &sFullCorrectionDistance, 
       "@brief Distance at which a weapon's muzzle vector is fully corrected to match where the player is looking.\n\n"
       "When a weapon image has correctMuzzleVector set and the Player is in 1st person, the muzzle vector from the "
       "weapon is modified to match where the player is looking.  Beyond the FullCorrectionDistance the muzzle vector "
       "is always corrected.  Between FullCorrectionDistance and the player, the weapon's muzzle vector is adjusted so that "
       "the closer the aim point is to the player, the closer the muzzle vector is to the true (non-corrected) one.\n"
-	   "@ingroup gameObjects\n");
+      "@ingroup gameObjects\n");
    Con::addVariable("SB::CloakSpeed", TypeF32, &sCloakSpeed, 
       "@brief Time to cloak, in seconds.\n\n"
-	   "@ingroup gameObjects\n");
+      "@ingroup gameObjects\n");
 }
 
 void ShapeBase::_updateHiddenMeshes()
@@ -4832,17 +4832,17 @@ DefineEngineMethod( ShapeBase, getTargetName, const char*, ( S32 index ),,
    
    "@see getTargetCount()\n")
 {
-	ShapeBase *obj = dynamic_cast< ShapeBase* > ( object );
-	if(obj)
-	{
-		// Try to use the client object (so we get the reskinned targets in the Material Editor)
-		if ((ShapeBase*)obj->getClientObject())
-			obj = (ShapeBase*)obj->getClientObject();
+   ShapeBase *obj = dynamic_cast< ShapeBase* > ( object );
+   if(obj)
+   {
+      // Try to use the client object (so we get the reskinned targets in the Material Editor)
+      if ((ShapeBase*)obj->getClientObject())
+         obj = (ShapeBase*)obj->getClientObject();
 
-		return obj->getShapeInstance()->getTargetName(index);
-	}
+      return obj->getShapeInstance()->getTargetName(index);
+   }
 
-	return "";
+   return "";
 }
 
 DefineEngineMethod( ShapeBase, getTargetCount, S32, (),,
@@ -4861,7 +4861,7 @@ DefineEngineMethod( ShapeBase, getTargetCount, S32, (),,
 
       if (obj->getShapeInstance() != NULL)
          return obj->getShapeInstance()->getTargetCount();
-	}
+   }
    
    return -1;
 }
@@ -4938,10 +4938,10 @@ DefineEngineMethod( ShapeBase, getModelFile, const char *, (),,
 
    "@return the shape filename\n\n" )
 {
-	GameBaseData * datablock = object->getDataBlock();
-	if( !datablock )
-		return String::EmptyString;
+   GameBaseData * datablock = object->getDataBlock();
+   if( !datablock )
+      return String::EmptyString;
 
-	const char *fieldName = StringTable->insert( String("shapeFile") );
+   const char *fieldName = StringTable->insert( String("shapeFile") );
    return datablock->getDataField( fieldName, NULL );
 }

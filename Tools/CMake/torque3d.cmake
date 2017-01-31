@@ -640,6 +640,7 @@ if (APPLE)
   addFramework("CoreVideo")
   #grrr damn you sdl!
   addFramework("Carbon")
+  addFramework("AudioToolbox")
   addLib("iconv")
   #set a few arch defaults
   set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "OSX Architecture" FORCE)
@@ -741,6 +742,12 @@ if(MSVC)
         set_property(TARGET ${PROJECT_NAME} PROPERTY OUTPUT_NAME_${CONF} ${PROJECT_NAME}_${SUFFIX})
     endforeach()
 endif()
+
+###############################################################################
+# Project-specific configuration:
+###############################################################################
+
+include(${TORQUE_APP_DIR}/${PROJECT_NAME}.cmake OPTIONAL)
 
 ###############################################################################
 # Installation

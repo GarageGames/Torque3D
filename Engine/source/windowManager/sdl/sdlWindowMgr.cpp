@@ -24,6 +24,7 @@
 #include "gfx/gfxDevice.h"
 #include "core/util/journal/process.h"
 #include "core/strings/unicode.h"
+#include "gfx/bitmap/gBitmap.h"
 
 #include "SDL.h"
 
@@ -164,6 +165,59 @@ PlatformWindow *PlatformWindowManagerSDL::createWindow(GFXDevice *device, const 
    window->mWindowId = SDL_GetWindowID( window->mWindowHandle );
    window->mOwningManager = this;
    mWindowMap[ window->mWindowId ] = window;
+
+   //Now, fetch our window icon, if any
+   Torque::Path iconPath = Torque::Path(Con::getVariable( "$Core::windowIcon" ));
+
+   if (iconPath.getExtension() == String("bmp"))
+   {
+      Con::errorf("Unable to use bmp format images for the window icon. Please use a different format.");
+   }
+   else
+   {
+      Resource<GBitmap> img = GBitmap::load(iconPath);
+      if (img != NULL)
+      {
+         U32 pitch;
+         U32 width = img->getWidth();
+         bool hasAlpha = img->getHasTransparency();
+         U32 depth;
+
+         if (hasAlpha)
+         {
+            pitch = 4 * width;
+            depth = 32;
+         }
+         else
+         {
+            pitch = 3 * width;
+            depth = 24;
+         }
+
+         Uint32 rmask, gmask, bmask, amask;
+         if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
+         {
+            S32 shift = hasAlpha ? 8 : 0;
+            rmask = 0xff000000 >> shift;
+            gmask = 0x00ff0000 >> shift;
+            bmask = 0x0000ff00 >> shift;
+            amask = 0x000000ff >> shift;
+         }
+         else
+         {
+            rmask = 0x000000ff;
+            gmask = 0x0000ff00;
+            bmask = 0x00ff0000;
+            amask = hasAlpha ? 0xff000000 : 0;
+         }
+
+         SDL_Surface* iconSurface = SDL_CreateRGBSurfaceFrom(img->getAddress(0, 0), img->getWidth(), img->getHeight(), depth, pitch, rmask, gmask, bmask, amask);
+
+         SDL_SetWindowIcon(window->mWindowHandle, iconSurface);
+
+         SDL_FreeSurface(iconSurface);
+      }
+   }
 
    if(device)
    {

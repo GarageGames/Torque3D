@@ -231,7 +231,7 @@ void GuiWindowCtrl::moveFromCollapseGroup()
          parent->mCollapseGroupVec[groupVec].first()->mCollapseGroupNum = -1;
          parent->mCollapseGroupVec[groupVec].erase(U32(0));
          parent->mCollapseGroupVec[groupVec].setSize(groupVecCount - 1);
-         parent->mCollapseGroupVec.erase(groupVec);	
+         parent->mCollapseGroupVec.erase(groupVec);   
       }
    }
    
@@ -381,7 +381,7 @@ void GuiWindowCtrl::refreshCollapseGroups()
    if( !parent )
       return;
    
-   CollapseGroupNumVec	collapseGroupNumVec;
+   CollapseGroupNumVec  collapseGroupNumVec;
 
    // iterate through the collided array, renumbering the windows pointers
    S32 assignGroupNum = 0;
@@ -463,7 +463,7 @@ void GuiWindowCtrl::handleCollapseGroup()
    if( !parent )
       return;
 
-   CollapseGroupNumVec	collapseGroupNumVec;
+   CollapseGroupNumVec  collapseGroupNumVec;
 
    if( mIsCollapsed ) // minimize window up to its header bar
    {
@@ -529,7 +529,7 @@ void GuiWindowCtrl::handleCollapseGroup()
             if((*iter)->mCollapseGroupNum > mCollapseGroupNum)
             {
                Point2I newChildPosition =  (*iter)->getPosition();
-               newChildPosition.y += moveChildYBy;					
+               newChildPosition.y += moveChildYBy;             
                (*iter)->resize(newChildPosition, (*iter)->getExtent());
             }
          }
@@ -547,7 +547,7 @@ bool GuiWindowCtrl::resizeCollapseGroup(bool resizeX, bool resizeY, Point2I resi
    if( !parent )
       return false;
 
-   CollapseGroupNumVec	collapseGroupNumVec;
+   CollapseGroupNumVec  collapseGroupNumVec;
 
    bool canResize = true;
    CollapseGroupNumVec::iterator iter = parent->mCollapseGroupVec[mCollapseGroup].begin();
@@ -980,7 +980,7 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
       moveWithCollapseGroup(newPosition);
 
    if(mCanCollapse && mCollapseGroup >= 0 && mResizeWindow == true )
-   {	
+   {  
       // Resize the window if allowed
       if( newExtent.y >= getMinExtent().y && newExtent.x >= getMinExtent().x)
       {
@@ -1212,7 +1212,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
       // We're either moving out of a collapse group or moving to another one
       // Not valid for windows not previously in a group
       if( mCollapseGroup >= 0 && 
-		  (snapType == -1 || (hitWindow && snapType >= 0 && mCollapseGroup != hitWindow->mCollapseGroup)))
+        (snapType == -1 || (hitWindow && snapType >= 0 && mCollapseGroup != hitWindow->mCollapseGroup)))
          moveFromCollapseGroup();
       
       // No window to connect to
@@ -1512,7 +1512,7 @@ void GuiWindowCtrl::setCloseCommand(const char *newCmd)
    if (newCmd)
       mCloseCommand = StringTable->insert(newCmd);
    else
-      mCloseCommand = StringTable->insert("");
+      mCloseCommand = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -1830,7 +1830,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
 
       // Only for collpasing groups, if were not, then do it like normal windows
       if( mCanCollapse && mCollapseGroup >= 0 )
-      {	
+      {  
          bool resizeMe = false;
          
          // Only the group window should control positioning

@@ -25,8 +25,9 @@
 #include <SDL.h>
 #include <SDL_thread.h>
 
-struct PlatformSemaphore
+class PlatformSemaphore
 {
+public:
    SDL_sem *semaphore;
 
    PlatformSemaphore(S32 initialCount)

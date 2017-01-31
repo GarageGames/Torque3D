@@ -251,14 +251,14 @@ void StaticShape::onUnmount(SceneObject*,S32)
 
 U32 StaticShape::packUpdate(NetConnection *connection, U32 mask, BitStream *bstream)
 {
-   U32 retMask = Parent::packUpdate(connection, mask, bstream);
-   if (bstream->writeFlag(mask & PositionMask | ExtendedInfoMask))
+   U32 retMask = Parent::packUpdate(connection,mask,bstream);
+   if (bstream->writeFlag(mask & (PositionMask | ExtendedInfoMask)))
    {
 
       // Write the transform (do _not_ use writeAffineTransform.  Since this is a static
       //  object, the transform must be RIGHT THE *&)*$&^ ON or it will goof up the
       //  synchronization between the client and the server.
-      mathWrite(*bstream, mObjToWorld);
+      mathWrite(*bstream,mObjToWorld);
       mathWrite(*bstream, mObjScale);
    }
 
@@ -275,11 +275,11 @@ U32 StaticShape::packUpdate(NetConnection *connection, U32 mask, BitStream *bstr
 
 void StaticShape::unpackUpdate(NetConnection *connection, BitStream *bstream)
 {
-   Parent::unpackUpdate(connection, bstream);
+   Parent::unpackUpdate(connection,bstream);
    if (bstream->readFlag())
    {
       MatrixF mat;
-      mathRead(*bstream, &mat);
+      mathRead(*bstream,&mat);
       Parent::setTransform(mat);
       Parent::setRenderTransform(mat);
 
@@ -302,7 +302,7 @@ void StaticShape::unpackUpdate(NetConnection *connection, BitStream *bstream)
 // This appears to be legacy T2 stuff
 // Marked internal, as this is flagged to be deleted
 // [8/1/2010 mperry]
-DefineConsoleMethod(StaticShape, setPoweredState, void, (bool isPowered), , "(bool isPowered)"
+DefineConsoleMethod( StaticShape, setPoweredState, void, (bool isPowered), , "(bool isPowered)"
 			  "@internal")
 {
    if(!object->isServerObject())
@@ -310,7 +310,7 @@ DefineConsoleMethod(StaticShape, setPoweredState, void, (bool isPowered), , "(bo
    object->setPowered(isPowered);
 }
 
-DefineConsoleMethod(StaticShape, getPoweredState, bool, (), , "@internal")
+DefineConsoleMethod( StaticShape, getPoweredState, bool, (), , "@internal")
 {
    if(!object->isServerObject())
       return(false);

@@ -153,7 +153,7 @@ public:
       {
          // Set Defaults.
          mSeed               = 1376312589;
-         mShapeFile          = StringTable->insert("");
+         mShapeFile          = StringTable->EmptyString();
          mShapeCount         = 10;
          mShapeRetries       = 100;
          mInnerRadiusX       = 0;

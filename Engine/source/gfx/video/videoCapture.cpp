@@ -314,6 +314,9 @@ DefineEngineFunction( startVideoCapture, void,
    "@see stopVideoCapture\n"
    "@ingroup Rendering\n" )
 {
+#ifdef TORQUE_DEBUG
+   Con::errorf("Recording video is disabled in debug!");
+#else
    if ( !canvas )
    {
       Con::errorf("startVideoCapture -Please specify a GuiCanvas object to record from!");
@@ -328,6 +331,7 @@ DefineEngineFunction( startVideoCapture, void,
       VIDCAP->setResolution(resolution);
 
    VIDCAP->begin(canvas);
+#endif
 }
 
 DefineEngineFunction( stopVideoCapture, void, (),,
@@ -340,7 +344,7 @@ DefineEngineFunction( stopVideoCapture, void, (),,
 
 DefineEngineFunction( playJournalToVideo, void, 
    ( const char *journalFile, const char *videoFile, const char *encoder, F32 framerate, Point2I resolution ),
-	( NULL, "THEORA", 30.0f, Point2I::Zero ),
+   ( nullAsType<const char*>(), "THEORA", 30.0f, Point2I::Zero ),
    "Load a journal file and capture it video.\n"
    "@ingroup Rendering\n" )
 {

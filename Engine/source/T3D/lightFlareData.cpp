@@ -440,7 +440,7 @@ void LightFlareData::prepRender(SceneRenderState *state, LightFlareState *flareS
    // We can only skip rendering if the light is not 
    // visible, and it has elapsed the fade out time.
    if (mIsZero(occlusionFade) ||
-      !lightVisible && visDelta > FadeOutTime)
+      (!lightVisible && visDelta > FadeOutTime))
       return;
 
    const RectI &viewport = GFX->getViewport();

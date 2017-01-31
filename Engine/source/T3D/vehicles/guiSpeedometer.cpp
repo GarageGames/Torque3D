@@ -19,11 +19,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
 #include "gui/controls/guiBitmapCtrl.h"
 #include "console/consoleTypes.h"
 #include "T3D/gameBase/gameConnection.h"
 #include "T3D/vehicles/vehicle.h"
+#include "T3D/player.h"
 #include "gfx/primBuilder.h"
 
 //-----------------------------------------------------------------------------
@@ -147,42 +147,57 @@ void GuiSpeedometerHud::initPersistFields()
 //-----------------------------------------------------------------------------
 /**
    Gui onRender method.
-   Renders a health bar with filled background and border.
+   Renders an analog speedometer needle over a specified bitmap background.
 */
 void GuiSpeedometerHud::onRender(Point2I offset, const RectI &updateRect)
 {
-   // Must have a connection and player control object
+   // Must have a connection
    GameConnection* conn = GameConnection::getConnectionToServer();
    if (!conn)
       return;
-   Vehicle* control = dynamic_cast<Vehicle*>(conn->getControlObject());
-   if (!control)
-      return;
+
+   // Requires either a vehicle control object or a vehicle-mounted player		
+   Vehicle* vehicle = dynamic_cast<Vehicle*>(conn->getControlObject());
+   if(!vehicle){
+      Player * player = dynamic_cast<Player*>(conn->getControlObject());
+      if(!player) return;
+      if (!player->isMounted()) return;
+      vehicle = dynamic_cast<Vehicle*>(player->getObjectMount());
+      if(!vehicle) return;
+   }
 
    Parent::onRender(offset,updateRect);
 
    // Use the vehicle's velocity as its speed...
-   mSpeed = control->getVelocity().len();
+   mSpeed = vehicle->getVelocity().len();
    if (mSpeed > mMaxSpeed)
       mSpeed = mMaxSpeed;
 
-   // Render the needle
-   GFX->pushWorldMatrix();
+    // Calculate center point if necessary and roll in offsets
    Point2F center = mCenter;
    if (mIsZero(center.x) && mIsZero(center.y))
    {
       center.x = getExtent().x / 2.0f;
       center.y = getExtent().y / 2.0f;
    }
-   MatrixF newMat(1);
+   F32 fillOffset = GFX->getFillConventionOffset(); // Find the fill offset
+   Point2F viewCenter(offset.x + fillOffset + center.x, offset.y + fillOffset + center.y);
 
-   newMat.setPosition(Point3F(getLeft() + center.x, getTop() + center.y, 0.0f));
+   // Handle rotation calculations	
+   F32 rotation, spinAngle;
+   rotation = mMinAngle + (mMaxAngle - mMinAngle) * (mSpeed / mMaxSpeed);
+   spinAngle = mDegToRad(rotation);
+   MatrixF rotMatrix(EulerF(0.0, 0.0, spinAngle));
 
-   F32 rotation = mMinAngle + (mMaxAngle - mMinAngle) * (mSpeed / mMaxSpeed);
-   AngAxisF newRot(Point3F(0.0f,0.0f,-1.0f), rotation);
-
-   newRot.setMatrix(&newMat);
-
+	// Set up the needle vertex list
+	Point3F vertList[5];
+	vertList[0].set(+mNeedleLength,-mNeedleWidth,0);
+	vertList[1].set(+mNeedleLength,+mNeedleWidth,0);
+	vertList[2].set(-mTailLength  ,+mNeedleWidth,0);
+	vertList[3].set(-mTailLength  ,-mNeedleWidth,0);   
+	vertList[4].set(+mNeedleLength,-mNeedleWidth,0); //// Get back to the start!
+	
+   // Create a GFXStateBlock description if one has not been set.
    if (mBlendSB.isNull())
    {
       GFXStateBlockDesc desc;
@@ -191,22 +206,15 @@ void GuiSpeedometerHud::onRender(Point2I offset, const RectI &updateRect)
       desc.samplers[0].textureColorOp = GFXTOPDisable;
       mBlendSB = GFX->createStateBlock(desc);
    }
-
    GFX->setStateBlock(mBlendSB);
-
    GFX->setTexture(0, NULL);
 
-   PrimBuild::begin(GFXLineStrip, 5);
+   // Render the needle
    PrimBuild::color4f(mColor.red, mColor.green, mColor.blue, mColor.alpha);
-
-   PrimBuild::vertex2f(+mNeedleLength,-mNeedleWidth);
-   PrimBuild::vertex2f(+mNeedleLength,+mNeedleWidth);
-   PrimBuild::vertex2f(-mTailLength  ,+mNeedleWidth);
-   PrimBuild::vertex2f(-mTailLength  ,-mNeedleWidth);
-
-   //// Get back to the start!
-   PrimBuild::vertex2f(+mNeedleLength,-mNeedleWidth);
-
+   PrimBuild::begin(GFXLineStrip, 5);
+   for(int k=0; k<5; k++){
+      rotMatrix.mulP(vertList[k]);
+      PrimBuild::vertex2f(vertList[k].x + viewCenter.x, vertList[k].y + viewCenter.y);
+   }
    PrimBuild::end();
 }
-

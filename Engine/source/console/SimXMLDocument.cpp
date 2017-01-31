@@ -49,40 +49,40 @@ ConsoleDocClass( SimXMLDocument,
    "// Thanks to Rex Hiebert for this example\n"
    "// Given the following XML\n"
    "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?>\n"
-	"<DataTables>\n"
-	"	<table tableName=\"2DShapes\">\n"
-	"		<rec id=\"1\">Triangle</rec>\n"
-	"		<rec id=\"2\">Square</rec>\n"
-	"		<rec id=\"3\">Circle</rec>\n"
-	"	</table>\n"
-	"	<table tableName=\"3DShapes\">\n"
-	"		<rec id=\"1\">Pyramid</rec>\n"
-	"		<rec id=\"2\">Cube</rec>\n"
-	"		<rec id=\"3\">Sphere</rec>\n"
-	"	</table>\n"
-	"</DataTables>\n\n"
+   "<DataTables>\n"
+   "  <table tableName=\"2DShapes\">\n"
+   "     <rec id=\"1\">Triangle</rec>\n"
+   "     <rec id=\"2\">Square</rec>\n"
+   "     <rec id=\"3\">Circle</rec>\n"
+   "  </table>\n"
+   "  <table tableName=\"3DShapes\">\n"
+   "     <rec id=\"1\">Pyramid</rec>\n"
+   "     <rec id=\"2\">Cube</rec>\n"
+   "     <rec id=\"3\">Sphere</rec>\n"
+   "  </table>\n"
+   "</DataTables>\n\n"
    "// Using SimXMLDocument by itself\n"
    "function readXmlExample(%filename)\n"
-	"{\n"
-	"   %xml = new SimXMLDocument() {};\n"
-	"   %xml.loadFile(%filename);\n\n"	   
-	"   %xml.pushChildElement(\"DataTables\");\n"
-	"   %xml.pushFirstChildElement(\"table\");\n"
-	"   while(true)\n"
-	"   {\n"
-	"	  echo(\"TABLE:\" SPC %xml.attribute(\"tableName\"));\n"
-	"	  %xml.pushFirstChildElement(\"rec\");\n"
-	"	  while (true)\n"
-	"	  {\n"
-	"		 %id = %xml.attribute(\"id\");\n"
-	"		 %desc = %xml.getData();\n"
-	"		 echo(\"  Shape\" SPC %id SPC %desc);\n"
-	"		 if (!%xml.nextSiblingElement(\"rec\")) break;\n"
-	"	  }\n"
-	"	  %xml.popElement();\n"
-	"	  if (!%xml.nextSiblingElement(\"table\")) break;\n"
-	"   }\n"
-	"}\n\n"
+   "{\n"
+   "   %xml = new SimXMLDocument() {};\n"
+   "   %xml.loadFile(%filename);\n\n"     
+   "   %xml.pushChildElement(\"DataTables\");\n"
+   "   %xml.pushFirstChildElement(\"table\");\n"
+   "   while(true)\n"
+   "   {\n"
+   "    echo(\"TABLE:\" SPC %xml.attribute(\"tableName\"));\n"
+   "    %xml.pushFirstChildElement(\"rec\");\n"
+   "    while (true)\n"
+   "    {\n"
+   "      %id = %xml.attribute(\"id\");\n"
+   "      %desc = %xml.getData();\n"
+   "      echo(\"  Shape\" SPC %id SPC %desc);\n"
+   "      if (!%xml.nextSiblingElement(\"rec\")) break;\n"
+   "    }\n"
+   "    %xml.popElement();\n"
+   "    if (!%xml.nextSiblingElement(\"table\")) break;\n"
+   "   }\n"
+   "}\n\n"
 
    "// Thanks to Scott Peal for this example\n"
    "// Using FileObject in conjunction with SimXMLDocument\n"
@@ -90,45 +90,45 @@ ConsoleDocClass( SimXMLDocument,
    "// <Models>\n"
    "//    <Model category=\"\" name=\"\" path=\"\" />\n"
    "// </Models>\n"
-	"function getModelsInCatagory()\n"
-	"{\n"
-	"   %file = \"./Catalog.xml\";\n"
-	"   %fo = new FileObject();\n"
-	"   %text = \"\";\n\n"
-	"   if(%fo.openForRead(%file))\n"
-	"   {\n"
-	"	  while(!%fo.isEOF())\n"
-	"	  {\n"
-	"		 %text = %text @ %fo.readLine();\n"
-	"		 if (!%fo.isEOF()) %text = %text @ \"\\n\";\n"
-	"	  }\n"
-	"   }\n"
-	"   else\n"
-	"   {\n"
-	"	  echo(\"Unable to locate the file: \" @ %file);\n"
-	"   }\n\n"
-	"   %fo.delete();\n\n"
-	"   %xml = new SimXMLDocument() {};\n"
-	"   %xml.parse(%text);\n"
-	"   // \"Get\" inside of the root element, \"Models\".\n"
-	"   %xml.pushChildElement(0);\n\n"
-	"   // \"Get\" into the first child element\n"
-	"   if (%xml.pushFirstChildElement(\"Model\"))\n"
-	"   {\n"
-	"	  while (true)\n"
-	"	  {\n"
-	"		 // \n"
-	"		 //  Here, i read the element's attributes.\n"
-	"		 //  You might want to save these values in an array or call the %xml.getElementValue()\n"
-	"		 //  if you have a different XML structure.\n\n"
-	"		 %catagory = %xml.attribute(\"catagory\");\n"
-	"		 %name = %xml.attribute(\"name\");\n"
-	"		 %path = %xml.attribute(\"path\");\n\n"
-	"		 // now, read the next \"Model\"\n"
-	"		 if (!%xml.nextSiblingElement(\"Model\")) break;\n"
-	"	  }\n"
-	"   }\n"
-	"}\n"
+   "function getModelsInCatagory()\n"
+   "{\n"
+   "   %file = \"./Catalog.xml\";\n"
+   "   %fo = new FileObject();\n"
+   "   %text = \"\";\n\n"
+   "   if(%fo.openForRead(%file))\n"
+   "   {\n"
+   "    while(!%fo.isEOF())\n"
+   "    {\n"
+   "      %text = %text @ %fo.readLine();\n"
+   "      if (!%fo.isEOF()) %text = %text @ \"\\n\";\n"
+   "    }\n"
+   "   }\n"
+   "   else\n"
+   "   {\n"
+   "    echo(\"Unable to locate the file: \" @ %file);\n"
+   "   }\n\n"
+   "   %fo.delete();\n\n"
+   "   %xml = new SimXMLDocument() {};\n"
+   "   %xml.parse(%text);\n"
+   "   // \"Get\" inside of the root element, \"Models\".\n"
+   "   %xml.pushChildElement(0);\n\n"
+   "   // \"Get\" into the first child element\n"
+   "   if (%xml.pushFirstChildElement(\"Model\"))\n"
+   "   {\n"
+   "    while (true)\n"
+   "    {\n"
+   "      // \n"
+   "      //  Here, i read the element's attributes.\n"
+   "      //  You might want to save these values in an array or call the %xml.getElementValue()\n"
+   "      //  if you have a different XML structure.\n\n"
+   "      %catagory = %xml.attribute(\"catagory\");\n"
+   "      %name = %xml.attribute(\"name\");\n"
+   "      %path = %xml.attribute(\"path\");\n\n"
+   "      // now, read the next \"Model\"\n"
+   "      if (!%xml.nextSiblingElement(\"Model\")) break;\n"
+   "    }\n"
+   "   }\n"
+   "}\n"
    "@endtsexample\n\n"
 
    "@note SimXMLDocument is a wrapper around TinyXml, a standard XML library.  If you're familiar "
@@ -504,13 +504,13 @@ const char* SimXMLDocument::elementValue()
 {
    if(m_paNode.empty())
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
    const S32 iLastElement = m_paNode.size() - 1;
    TiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return pNode->Value();
@@ -545,18 +545,18 @@ const char* SimXMLDocument::attribute(const char* rAttribute)
 {
    if(m_paNode.empty())
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
    const S32 iLastElement = m_paNode.size() - 1;
    TiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    if(!pNode->Attribute(rAttribute))
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return pNode->Attribute(rAttribute);
@@ -629,20 +629,20 @@ const char* SimXMLDocument::firstAttribute()
    // Get the current element
    if(m_paNode.empty())
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
    const S32 iLastElement = m_paNode.size() - 1;
    TiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    // Gets its first attribute, if any
    m_CurrentAttribute = pNode->FirstAttribute();
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return m_CurrentAttribute->Name();
@@ -666,20 +666,20 @@ const char* SimXMLDocument::lastAttribute()
    // Get the current element
    if(m_paNode.empty())
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
    const S32 iLastElement = m_paNode.size() - 1;
    TiXmlElement* pNode = m_paNode[iLastElement];
    if(!pNode)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    // Gets its last attribute, if any
    m_CurrentAttribute = pNode->LastAttribute();
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return m_CurrentAttribute->Name();
@@ -703,14 +703,14 @@ const char* SimXMLDocument::nextAttribute()
 {
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    // Gets its next attribute, if any
    m_CurrentAttribute = m_CurrentAttribute->Next();
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return m_CurrentAttribute->Name();
@@ -734,14 +734,14 @@ const char* SimXMLDocument::prevAttribute()
 {
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    // Gets its next attribute, if any
    m_CurrentAttribute = m_CurrentAttribute->Previous();
    if(!m_CurrentAttribute)
    {
-      return StringTable->insert("");
+      return StringTable->EmptyString();
    }
 
    return m_CurrentAttribute->Name();

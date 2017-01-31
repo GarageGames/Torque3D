@@ -188,7 +188,7 @@ bool GuiRolloutCtrl::_onMouseUp( const GuiEvent &event, bool lockedMouse )
    {
       // If Ctrl/Cmd-clicking a header, collapse all sibling GuiRolloutCtrls.
       
-      if(    ( mAutoCollapseSiblings && !mIsExpanded && !( event.modifier & SI_PRIMARY_CTRL )
+      if( (( mAutoCollapseSiblings && !mIsExpanded && !( event.modifier & SI_PRIMARY_CTRL ))
           || ( !mAutoCollapseSiblings && event.modifier & SI_PRIMARY_CTRL ) ) )
       {
          for( SimSet::iterator iter = getParent()->begin(); iter != getParent()->end(); ++ iter )
@@ -462,9 +462,9 @@ void GuiRolloutCtrl::processTick()
          newHeight -= mAnimateStep;
 
       if( !mIsAnimating )
-	  {
+     {
          mIsExpanded = false;
-	  }
+     }
    }
    else // We're expanding ourself (Showing our contents)
    {
@@ -559,13 +559,13 @@ void GuiRolloutCtrl::onRender( Point2I offset, const RectI &updateRect )
    if ( pChild )
    {
       if ( !mIsExpanded && !mIsAnimating && pChild->isVisible() )
-	  {
+     {
          pChild->setVisible( false );
-	  }
+     }
       else if ( (mIsExpanded || mIsAnimating) && !pChild->isVisible() )
-	  {
+     {
          pChild->setVisible( true );
-	  }
+     }
    }
    renderChildControls( offset, updateRect );
 
@@ -614,7 +614,7 @@ DefineEngineMethod( GuiRolloutCtrl, toggleCollapse, void, (),,
    if( object->isExpanded() )
       object->collapse();
    else
-	  object->expand();
+     object->expand();
 }
 
 //-----------------------------------------------------------------------------

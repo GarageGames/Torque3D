@@ -429,7 +429,7 @@ struct InputEventInfo
    U16 ascii;
    
    /// Modifiers to action: SI_LSHIFT, SI_LCTRL, etc.
-   InputModifiers modifier;
+   U32 modifier;
 
    inline void postToSignal(InputEvent &ie)
    {

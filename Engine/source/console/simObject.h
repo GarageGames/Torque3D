@@ -826,7 +826,7 @@ class SimObject: public ConsoleObject, public TamlCallbacks
       virtual bool readObject(Stream *stream);
       
       /// Set whether fields created at runtime should be saved. Default is true.
-      void setCanSaveDynamicFields( bool bCanSave ) { mCanSaveFieldDictionary	=	bCanSave; }
+      void setCanSaveDynamicFields( bool bCanSave ) { mCanSaveFieldDictionary =  bCanSave; }
       
       /// Get whether fields created at runtime should be saved. Default is true.
       bool getCanSaveDynamicFields( ) { return mCanSaveFieldDictionary;}

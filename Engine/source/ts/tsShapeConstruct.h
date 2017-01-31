@@ -97,7 +97,8 @@ public:
       {
          eCommandType      type;       // Command type
          StringTableEntry  name;       // Command name
-         String            argv[10];   // Command arguments
+         static const U32 MAX_ARGS = 10;
+         String            argv[MAX_ARGS];   // Command arguments
          S32               argc;       // Number of arguments
          Command() : type(CmdInvalid), name(0), argc(0) { }
          Command( const char* _name )
@@ -105,68 +106,12 @@ public:
          {
             name = StringTable->insert( _name );
          }
-
-         // Helper functions to fill in the command arguments
-         inline void addArgs() { }
-
-         template< typename A >
-            inline void addArgs( A a )
-         {
-            argv[argc++] = EngineMarshallData( a );
-         }
-         template< typename A, typename B > void addArgs( A a, B b )
-         {
-            addArgs( a );
-            addArgs( b );
-         } 
-         template< typename A, typename B, typename C >
-            inline void addArgs( A a, B b, C c )
-         {
-            addArgs( a );
-            addArgs( b, c );
-         }
-         template< typename A, typename B, typename C, typename D >
-            inline void addArgs( A a, B b, C c, D d )
-         {
-            addArgs( a );
-            addArgs( b, c, d );
-         }
-         template< typename A, typename B, typename C, typename D, typename E >
-            inline void addArgs( A a, B b, C c, D d, E e )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F >
-            inline void addArgs( A a, B b, C c, D d, E e, F f )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-            inline void addArgs( A a, B b, C c, D d, E e, F f, G g )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f, g );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-            inline void addArgs( A a, B b, C c, D d, E e, F f, G g, H h )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f, g, h );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-            inline void addArgs( A a, B b, C c, D d, E e, F f, G g, H h, I i )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f, g, h, i );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-            inline void addArgs( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f, g, h, i, j );
-         }
+        
+        // Helper functions to fill in the command arguments
+        template<typename ...ArgTs> inline void addArgs(ArgTs ...args){
+           using Helper = engineAPI::detail::MarshallHelpers<String>;
+           Helper::marshallEach(argc, argv, args...);
+        }
       };
 
       Vector<Command>   mCommands;
