@@ -870,25 +870,30 @@ void Lightning::strikeObject(ShapeBase* targetObj)
    Point3F strikePoint = targetObj->getPosition();
    Point3F objectCenter;
 
-   targetObj->getObjBox().getCenter(&objectCenter);
-   objectCenter.convolve(targetObj->getScale());
-   targetObj->getTransform().mulP(objectCenter);
+   Box3F wb = getWorldBox();
+   if (!wb.isContained(strikePoint))
+        return;
+
+   Point3F targetRel = strikePoint - getPosition();
+   Point3F length(wb.len_x() / 2.0f, wb.len_y() / 2.0f, wb.len_z() / 2.0f);
+
+   Point3F strikePos = targetRel / length;
 
    bool playerInWarmup = false;
    Player *playerObj = dynamic_cast< Player * >(targetObj);
    if (playerObj)
    {
-	   if (!playerObj->getControllingClient())
-	   {
-		   playerInWarmup = true;
-	   }
+       if (!playerObj->getControllingClient())
+       {
+           playerInWarmup = true;
+       }
    }
 
    if (!playerInWarmup)
    {
-	   applyDamage_callback(objectCenter, VectorF(0.0, 0.0, 1.0), targetObj);
+       applyDamage_callback(targetObj->getWorldSphere().center, VectorF(0.0, 0.0, 1.0), targetObj);
    }
-   
+ 
    SimGroup* pClientGroup = Sim::getClientGroup();
    for (SimGroup::iterator itr = pClientGroup->begin(); itr != pClientGroup->end(); itr++) {
       NetConnection* nc = static_cast<NetConnection*>(*itr);
@@ -897,15 +902,14 @@ void Lightning::strikeObject(ShapeBase* targetObj)
          LightningStrikeEvent* pEvent = new LightningStrikeEvent;
          pEvent->mLightning = this;
 		 
-		 pEvent->mStart.x = strikePoint.x;
-		 pEvent->mStart.y = strikePoint.y;
-		 pEvent->mTarget = targetObj;
+         pEvent->mStart.x = strikePoint.x;
+         pEvent->mStart.y = strikePoint.y;
+         pEvent->mTarget = targetObj;
 
          nc->postNetEvent(pEvent);
       }
    }
 }
-
 
 //--------------------------------------------------------------------------
 U32 Lightning::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
