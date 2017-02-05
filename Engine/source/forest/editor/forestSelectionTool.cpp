@@ -197,6 +197,9 @@ void ForestSelectionTool::_selectItem( const ForestItem &item )
 
 void ForestSelectionTool::deleteSelection()
 {
+   if (!mEditor)
+      return;
+
    ForestDeleteUndoAction *action = new ForestDeleteUndoAction( mForest->getData(), mEditor );
 
    for ( U32 i=0; i < mSelection.size(); i++ )

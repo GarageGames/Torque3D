@@ -252,7 +252,7 @@
                   objectNamesOnly = "1";
                   useInspectorTooltips = "0";
                   tooltipOnWidthOnly = "0";
-                  compareToObjectID = "1";
+                  compareToObjectID = "0";
                   canRenameObjects = "1";
                   renameInternal = "0";
                   isContainer = "1";
