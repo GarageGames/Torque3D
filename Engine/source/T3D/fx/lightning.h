@@ -229,7 +229,7 @@ class Lightning : public GameBase
 
    void warningFlashes();
    void strikeRandomPoint();
-   void strikeObject(ShapeBase*);
+   void strikeObject(ShapeBase* targetObj);
    void processEvent(LightningStrikeEvent*);
 
    DECLARE_CONOBJECT(Lightning);

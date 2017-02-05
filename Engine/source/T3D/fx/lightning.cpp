@@ -867,13 +867,53 @@ void Lightning::strikeRandomPoint()
 }
 
 //--------------------------------------------------------------------------
-void Lightning::strikeObject(ShapeBase*)
+void Lightning::strikeObject(ShapeBase* targetObj)
 {
    AssertFatal(isServerObject(), "Error, client objects may not initiate lightning!");
 
-   AssertFatal(false, "Lightning::strikeObject is not implemented.");
-}
+   Point3F strikePoint = targetObj->getPosition();
+   Point3F objectCenter;
 
+   Box3F wb = getWorldBox();
+   if (!wb.isContained(strikePoint))
+        return;
+
+   Point3F targetRel = strikePoint - getPosition();
+   Point3F length(wb.len_x() / 2.0f, wb.len_y() / 2.0f, wb.len_z() / 2.0f);
+
+   Point3F strikePos = targetRel / length;
+
+   bool playerInWarmup = false;
+   Player *playerObj = dynamic_cast< Player * >(targetObj);
+   if (playerObj)
+   {
+       if (!playerObj->getControllingClient())
+       {
+           playerInWarmup = true;
+       }
+   }
+
+   if (!playerInWarmup)
+   {
+       applyDamage_callback(targetObj->getWorldSphere().center, VectorF(0.0, 0.0, 1.0), targetObj);
+   }
+ 
+   SimGroup* pClientGroup = Sim::getClientGroup();
+   for (SimGroup::iterator itr = pClientGroup->begin(); itr != pClientGroup->end(); itr++) {
+      NetConnection* nc = static_cast<NetConnection*>(*itr);
+      if (nc != NULL)
+      {
+         LightningStrikeEvent* pEvent = new LightningStrikeEvent;
+         pEvent->mLightning = this;
+		 
+         pEvent->mStart.x = strikePoint.x;
+         pEvent->mStart.y = strikePoint.y;
+         pEvent->mTarget = targetObj;
+
+         nc->postNetEvent(pEvent);
+      }
+   }
+}
 
 //--------------------------------------------------------------------------
 U32 Lightning::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
