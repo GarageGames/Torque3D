@@ -45,6 +45,7 @@ class ColorF;
 struct NetAddress;
 class RawData;
 class String;
+class NetSocket;
 
 namespace Torque {
    class ByteBuffer;
@@ -164,6 +165,11 @@ public:
    bool write(const NetAddress &);
    /// Read a network address from the stream.
    bool read(NetAddress*);
+
+   /// Write a network socket to the stream.
+   bool write(const NetSocket &);
+   /// Read a network socket from the stream.
+   bool read(NetSocket*);
 
    /// Write some raw data onto the stream.
    bool write(const RawData &);

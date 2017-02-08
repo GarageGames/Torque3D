@@ -65,7 +65,7 @@ class SceneZoneSpaceManager
       ///   of time.
       typedef Signal< void( SceneZoneSpaceManager* ) > ZoningChangedSignal;
 
-      enum
+      enum : U32
       {
          /// Zone ID of the exterior zone.
          RootZoneId = 0,

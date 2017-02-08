@@ -163,7 +163,7 @@ public:
 
    void render(   RenderPassManager* renderPass,
                   const SceneRenderState *diffuseState,
-                  bool _dynamic);
+                  bool _dynamic, bool _forceUpdate);
 
    U32 getLastUpdate() const { return mLastUpdate; }
 

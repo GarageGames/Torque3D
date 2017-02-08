@@ -277,7 +277,7 @@
                            canSave = "1";
                            Visible = "1";
                            hovertime = "1000";
-                           bitmap = "tools/materialeditor/gui/unknownImage";
+                           bitmap = "tools/materialEditor/gui/unknownImage";
                            wrap = "0";
                         };
                         new GuiBitmapButtonCtrl() {
@@ -429,7 +429,7 @@
                            canSave = "1";
                            Visible = "1";
                            hovertime = "1000";
-                           bitmap = "tools/materialeditor/gui/unknownImage";
+                           bitmap = "tools/materialEditor/gui/unknownImage";
                            wrap = "0";
                         };
                         new GuiTextCtrl() {
@@ -555,7 +555,7 @@
                            canSave = "1";
                            Visible = "1";
                            hovertime = "1000";
-                           bitmap = "tools/materialeditor/gui/unknownImage";
+                           bitmap = "tools/materialEditor/gui/unknownImage";
                            wrap = "0";
                         };
                         new GuiTextCtrl() {
@@ -713,7 +713,7 @@
                            canSave = "1";
                            Visible = "1";
                            hovertime = "1000";
-                           bitmap = "tools/materialeditor/gui/unknownImage";
+                           bitmap = "tools/materialEditor/gui/unknownImage";
                            wrap = "0";
                         };
                         new GuiBitmapButtonCtrl() {
@@ -858,7 +858,7 @@
                            canSave = "1";
                            Visible = "1";
                            hovertime = "1000";
-                           bitmap = "tools/materialeditor/gui/unknownImage";
+                           bitmap = "tools/materialEditor/gui/unknownImage";
                            wrap = "0";
                         };
                         new GuiBitmapButtonCtrl() {
@@ -1003,7 +1003,7 @@
                            canSave = "1";
                            Visible = "1";
                            hovertime = "1000";
-                           bitmap = "tools/materialeditor/gui/unknownImage";
+                           bitmap = "tools/materialEditor/gui/unknownImage";
                            wrap = "0";
                         };
                         new GuiBitmapButtonCtrl() {
@@ -1129,7 +1129,7 @@
                            canSave = "1";
                            Visible = "1";
                            hovertime = "1000";
-                           bitmap = "tools/materialeditor/gui/unknownImage";
+                           bitmap = "tools/materialEditor/gui/unknownImage";
                            wrap = "0";
                         };
                         new GuiTextCtrl() {
@@ -1255,7 +1255,7 @@
                            canSave = "1";
                            Visible = "1";
                            hovertime = "1000";
-                           bitmap = "tools/materialeditor/gui/unknownImage";
+                           bitmap = "tools/materialEditor/gui/unknownImage";
                            wrap = "0";
                         };
                         new GuiTextCtrl() {
@@ -2235,6 +2235,29 @@
                            ToolTip = "Multiply vertex colors with diffuse colors for this layer.";
                            hovertime = "1000";
                            text = "Vertex colors";
+                           groupNum = "-1";
+                           buttonType = "ToggleButton";
+                           useMouseEvents = "0";
+                           useInactiveState = "0";
+                        };
+                        new GuiCheckBoxCtrl() {
+                           canSaveDynamicFields = "0";
+                           internalName = "subSurfaceCheckbox";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "ToolsGuiCheckBoxProfile";
+                           HorizSizing = "right";
+                           VertSizing = "bottom";
+                           position = "8 46";
+                           Extent = "79 16";
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           Command = "MaterialEditorGui.updateActiveMaterial(\"subSurface[\" @ MaterialEditorGui.currentLayer @ \"]\", $ThisControl.getValue());";
+                           tooltipprofile = "ToolsGuiDefaultProfile";
+                           ToolTip = "Enables the use of subsurface scattering for this layer.";
+                           hovertime = "1000";
+                           text = "Sub Surface";
                            groupNum = "-1";
                            buttonType = "ToggleButton";
                            useMouseEvents = "0";

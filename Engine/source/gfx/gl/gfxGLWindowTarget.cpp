@@ -37,7 +37,7 @@ GFX_ImplementTextureProfile( BackBufferDepthProfile,
 
 GFXGLWindowTarget::GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d)
       : GFXWindowTarget(win), mDevice(d), mContext(NULL), mFullscreenContext(NULL)
-      , mCopyFBO(0), mBackBufferFBO(0)
+      , mCopyFBO(0), mBackBufferFBO(0), mSecondaryWindow(false)
 {      
    win->appEvent.notify(this, &GFXGLWindowTarget::_onAppSignal);
 }
@@ -52,7 +52,14 @@ GFXGLWindowTarget::~GFXGLWindowTarget()
 
 void GFXGLWindowTarget::resetMode()
 {
-   if(mWindow->getVideoMode().fullScreen != mWindow->isFullscreen())
+   // Do some validation...
+   bool fullscreen = mWindow->getVideoMode().fullScreen;
+   if (fullscreen && mSecondaryWindow)
+   {
+      AssertFatal(false, "GFXGLWindowTarget::resetMode - Cannot go fullscreen with secondary window!");
+   }
+
+   if(fullscreen != mWindow->isFullscreen())
    {
       _teardownCurrentMode();
       _setupNewMode();
@@ -118,11 +125,14 @@ inline void GFXGLWindowTarget::_setupAttachments()
    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color->getHandle(), 0);
    mBackBufferDepthTex.set(dstSize.x, dstSize.y, GFXFormatD24S8, &BackBufferDepthProfile, "backBuffer");
    GFXGLTextureObject *depth = static_cast<GFXGLTextureObject*>(mBackBufferDepthTex.getPointer());
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth->getHandle(), 0);
+   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth->getHandle(), 0);
 }
 
 void GFXGLWindowTarget::makeActive()
 {
+   //make the rendering context active on this window
+   _makeContextCurrent();
+
    if(mBackBufferFBO)
    {
       glBindFramebuffer( GL_FRAMEBUFFER, mBackBufferFBO);

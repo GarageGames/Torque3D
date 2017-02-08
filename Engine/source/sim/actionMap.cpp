@@ -36,138 +36,138 @@
 IMPLEMENT_CONOBJECT(ActionMap);
 
 ConsoleDocClass( ActionMap,
-	"@brief ActionMaps assign platform input events to console commands.\n\n"
+   "@brief ActionMaps assign platform input events to console commands.\n\n"
 
-	"Any platform input event can be bound in a single, generic way. In theory, the game doesn't need to know if the event came from the keyboard, mouse, joystick "
-	"or some other input device. This allows users of the game to map keys and actions according to their own preferences. "
-	"Game action maps are arranged in a stack for processing so individual parts of the game can define specific "
-	"actions. For example, when the player jumps into a vehicle it could push a vehicle action map and pop the default player action map.\n\n"
+   "Any platform input event can be bound in a single, generic way. In theory, the game doesn't need to know if the event came from the keyboard, mouse, joystick "
+   "or some other input device. This allows users of the game to map keys and actions according to their own preferences. "
+   "Game action maps are arranged in a stack for processing so individual parts of the game can define specific "
+   "actions. For example, when the player jumps into a vehicle it could push a vehicle action map and pop the default player action map.\n\n"
 
-	"@section ActionMap_creation Creating an ActionMap\n"
+   "@section ActionMap_creation Creating an ActionMap\n"
 
-	"The input system allows for the creation of multiple ActionMaps, so long as they have unique names and do not already exist. It's a simple "
-	"three step process.\n\n"
-	"1. Check to see if the ActionMap exists\n"
-	"2. Delete it if it exists\n"
-	"3. Instantiate the ActionMap\n\n"
+   "The input system allows for the creation of multiple ActionMaps, so long as they have unique names and do not already exist. It's a simple "
+   "three step process.\n\n"
+   "1. Check to see if the ActionMap exists\n"
+   "2. Delete it if it exists\n"
+   "3. Instantiate the ActionMap\n\n"
 
-	"The following is an example of how to create a new ActionMap:\n"
+   "The following is an example of how to create a new ActionMap:\n"
 
-	"@tsexample\n"
-	"if ( isObject( moveMap ) )\n"
-	"	moveMap.delete();\n"
-	"new ActionMap(moveMap);"
-	"@endtsexample\n\n\n"
-	
-	"@section ActionMap_binding Binding Functions\n"
-	"Once you have created an ActionMap, you can start binding functionality to events. Currently, Torque 3D supports the following devices out of the box\n\n"
-	"* Mouse\n\n"
-	"* Keyboard\n\n"
-	"* Joystick/Gamepad\n\n"
-	"* Xbox 360 Controller\n\n"
+   "@tsexample\n"
+   "if ( isObject( moveMap ) )\n"
+   "  moveMap.delete();\n"
+   "new ActionMap(moveMap);"
+   "@endtsexample\n\n\n"
+   
+   "@section ActionMap_binding Binding Functions\n"
+   "Once you have created an ActionMap, you can start binding functionality to events. Currently, Torque 3D supports the following devices out of the box\n\n"
+   "* Mouse\n\n"
+   "* Keyboard\n\n"
+   "* Joystick/Gamepad\n\n"
+   "* Xbox 360 Controller\n\n"
 
-	"The two most commonly used binding methods are bind() and bindCmd(). Both are similar in that they will bind functionality to a device and event, "
+   "The two most commonly used binding methods are bind() and bindCmd(). Both are similar in that they will bind functionality to a device and event, "
    "but different in how the event is interpreted. With bind(), "
-	"you specify a device, action to bind, then a function to be called when the event happens.\n\n"
+   "you specify a device, action to bind, then a function to be called when the event happens.\n\n"
 
-	"@tsexample\n"
-	"// Simple function that prints to console\n"
-	"// %val - Sent by the device letting the user know\n"
-	"// if an input was pressed (true) or released (false)\n"
-	"function testInput(%val)\n"
-	"{\n"
-	"   if(%val)\n"
-	"	  echo(\"Key is down\");\n"
-	"   else\n"
-	"	  echo(\"Key was released\");\n"
-	"}\n\n"
-	"// Bind the \'K\' key to the testInput function\n"
-	"moveMap.bind(keyboard, \"k\", testInput);\n\n"
-	"@endtsexample\n\n\n"
+   "@tsexample\n"
+   "// Simple function that prints to console\n"
+   "// %val - Sent by the device letting the user know\n"
+   "// if an input was pressed (true) or released (false)\n"
+   "function testInput(%val)\n"
+   "{\n"
+   "   if(%val)\n"
+   "    echo(\"Key is down\");\n"
+   "   else\n"
+   "    echo(\"Key was released\");\n"
+   "}\n\n"
+   "// Bind the \'K\' key to the testInput function\n"
+   "moveMap.bind(keyboard, \"k\", testInput);\n\n"
+   "@endtsexample\n\n\n"
 
-	"bindCmd is an alternative method for binding commands. This function is similar to bind(), "
+   "bindCmd is an alternative method for binding commands. This function is similar to bind(), "
    "except two functions are set to be called when the event is processed.\n\n"
-	"One will be called when the event is activated (input down), while the other is activated when the event is broken (input release). "
+   "One will be called when the event is activated (input down), while the other is activated when the event is broken (input release). "
    "When using bindCmd(), pass the functions as strings rather than the function names.\n\n"
 
-	"@tsexample\n"
-	"// Print to the console when the spacebar is pressed\n"
-	"function onSpaceDown()\n"
-	"{\n"
-	"   echo(\"Space bar down!\");\n"
-	"}\n\n"
+   "@tsexample\n"
+   "// Print to the console when the spacebar is pressed\n"
+   "function onSpaceDown()\n"
+   "{\n"
+   "   echo(\"Space bar down!\");\n"
+   "}\n\n"
 
-	"// Print to the console when the spacebar is released\n"
-	"function onSpaceUp()\n"
-	"{\n"
-	"   echo(\"Space bar up!\");\n"
-	"}\n\n"
+   "// Print to the console when the spacebar is released\n"
+   "function onSpaceUp()\n"
+   "{\n"
+   "   echo(\"Space bar up!\");\n"
+   "}\n\n"
 
-	"// Bind the commands onSpaceDown and onSpaceUp to spacebar events\n"
-	"moveMap.bindCmd(keyboard, \"space\", \"onSpaceDown();\", \"onSpaceUp();\");\n"
-	"@endtsexample\n\n"
-	
-	"@section ActionMap_switching Switching ActionMaps\n"
-	"Let's say you want to have different ActionMaps activated based on game play situations. A classic example would be first person shooter controls and racing controls "
-	"in the same game. On foot, spacebar may cause your player to jump. In a vehicle, it may cause some kind of \"turbo charge\". You simply need to push/pop the ActionMaps appropriately:\n\n"
+   "// Bind the commands onSpaceDown and onSpaceUp to spacebar events\n"
+   "moveMap.bindCmd(keyboard, \"space\", \"onSpaceDown();\", \"onSpaceUp();\");\n"
+   "@endtsexample\n\n"
+   
+   "@section ActionMap_switching Switching ActionMaps\n"
+   "Let's say you want to have different ActionMaps activated based on game play situations. A classic example would be first person shooter controls and racing controls "
+   "in the same game. On foot, spacebar may cause your player to jump. In a vehicle, it may cause some kind of \"turbo charge\". You simply need to push/pop the ActionMaps appropriately:\n\n"
 
-	"First, create two separate ActionMaps:\n\n"
-	"@tsexample\n"
-	"// Create the two ActionMaps\n"
-	"if ( isObject( moveMap ) )\n"
-	"	moveMap.delete();\n"
-	"new ActionMap(moveMap);\n\n"
-	"if ( isObject( carMap ) )\n"
-	"	carMap.delete();\n"
-	"new ActionMap(carMap);\n\n"
-	"@endtsexample\n\n"
+   "First, create two separate ActionMaps:\n\n"
+   "@tsexample\n"
+   "// Create the two ActionMaps\n"
+   "if ( isObject( moveMap ) )\n"
+   "  moveMap.delete();\n"
+   "new ActionMap(moveMap);\n\n"
+   "if ( isObject( carMap ) )\n"
+   "  carMap.delete();\n"
+   "new ActionMap(carMap);\n\n"
+   "@endtsexample\n\n"
 
-	"Next, create the two separate functions. Both will be bound to spacebar, but not the same ActionMap:\n\n"
-	"@tsexample\n"
-	"// Print to the console the player is jumping\n"
-	"function playerJump(%val)\n"
-	"{\n"
-	"   if(%val)\n"
-	"	  echo(\"Player jumping!\");\n"
-	"}\n\n"
-	"// Print to the console the vehicle is charging\n"
-	"function turboCharge()\n"
-	"{\n"
-	"   if(%val)\n"
-	"	  echo(\"Vehicle turbo charging!\");\n"
-	"}\n"
-	"@endtsexample\n\n"
-	
-	"You are now ready to bind functions to your ActionMaps' devices:\n\n"
+   "Next, create the two separate functions. Both will be bound to spacebar, but not the same ActionMap:\n\n"
+   "@tsexample\n"
+   "// Print to the console the player is jumping\n"
+   "function playerJump(%val)\n"
+   "{\n"
+   "   if(%val)\n"
+   "    echo(\"Player jumping!\");\n"
+   "}\n\n"
+   "// Print to the console the vehicle is charging\n"
+   "function turboCharge()\n"
+   "{\n"
+   "   if(%val)\n"
+   "    echo(\"Vehicle turbo charging!\");\n"
+   "}\n"
+   "@endtsexample\n\n"
+   
+   "You are now ready to bind functions to your ActionMaps' devices:\n\n"
 
-	"@tsexample\n"
-	"// Bind the spacebar to the playerJump function\n"
-	"// when moveMap is the active ActionMap\n"
-	"moveMap.bind(keyboard, \"space\", playerJump);\n\n"
-	"// Bind the spacebar to the turboCharge function\n"
-	"// when carMap is the active ActionMap\n"
-	"carMap.bind(keyboard, \"space\", turboCharge);\n"
-	"@endtsexample\n"
+   "@tsexample\n"
+   "// Bind the spacebar to the playerJump function\n"
+   "// when moveMap is the active ActionMap\n"
+   "moveMap.bind(keyboard, \"space\", playerJump);\n\n"
+   "// Bind the spacebar to the turboCharge function\n"
+   "// when carMap is the active ActionMap\n"
+   "carMap.bind(keyboard, \"space\", turboCharge);\n"
+   "@endtsexample\n"
 
-	"Finally, you can use the push() and pop() commands on each ActionMap to toggle activation. To activate an ActionMap, use push():\n\n"
+   "Finally, you can use the push() and pop() commands on each ActionMap to toggle activation. To activate an ActionMap, use push():\n\n"
 
-	"@tsexample\n"
-	"// Make moveMap the active action map\n"
-	"// You should now be able to activate playerJump with spacebar\n"
-	"moveMap.push();\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+   "// Make moveMap the active action map\n"
+   "// You should now be able to activate playerJump with spacebar\n"
+   "moveMap.push();\n"
+   "@endtsexample\n\n"
 
-	"To switch ActionMaps, first pop() the old one. Then you can push() the new one:\n\n"
+   "To switch ActionMaps, first pop() the old one. Then you can push() the new one:\n\n"
 
-	"@tsexample\n"
-	"// Deactivate moveMap\n"
-	"moveMap.pop();\n\n"
-	"// Activate carMap\n"
-	"carMap.push();\n\n"
-	"@endtsexample\n\n\n"
+   "@tsexample\n"
+   "// Deactivate moveMap\n"
+   "moveMap.pop();\n\n"
+   "// Activate carMap\n"
+   "carMap.push();\n\n"
+   "@endtsexample\n\n\n"
 
-	"@ingroup Input"
-	
+   "@ingroup Input"
+   
 );
 
 // This is used for determing keys that have ascii codes for the foreign keyboards. IsAlpha doesn't work on foreign keys.
@@ -775,32 +775,32 @@ const char* ActionMap::getBinding( const char* command )
 //
 const char* ActionMap::getCommand( const char* device, const char* action )
 {
-	U32 deviceType;
-	U32 deviceInst;
-	if ( getDeviceTypeAndInstance( device, deviceType, deviceInst ) )
-	{
-		EventDescriptor eventDescriptor;
-		if ( createEventDescriptor( action, &eventDescriptor ) )
-		{
-			const ActionMap::Node* mapNode = findNode( deviceType, deviceInst, eventDescriptor.flags, eventDescriptor.eventCode );
-			if ( mapNode )
-			{
-				if ( mapNode->flags & Node::BindCmd )
-				{
-					S32 bufferLen = dStrlen( mapNode->makeConsoleCommand ) + dStrlen( mapNode->breakConsoleCommand ) + 2;
-					char* returnString = Con::getReturnBuffer( bufferLen );
-					dSprintf( returnString, bufferLen, "%s\t%s",
-							( mapNode->makeConsoleCommand ? mapNode->makeConsoleCommand : "" ),
-							( mapNode->breakConsoleCommand ? mapNode->breakConsoleCommand : "" ) );					
-					return( returnString );
-				}					
-				else
-					return( mapNode->consoleFunction );					
-			}
-		}
-	}
+   U32 deviceType;
+   U32 deviceInst;
+   if ( getDeviceTypeAndInstance( device, deviceType, deviceInst ) )
+   {
+      EventDescriptor eventDescriptor;
+      if ( createEventDescriptor( action, &eventDescriptor ) )
+      {
+         const ActionMap::Node* mapNode = findNode( deviceType, deviceInst, eventDescriptor.flags, eventDescriptor.eventCode );
+         if ( mapNode )
+         {
+            if ( mapNode->flags & Node::BindCmd )
+            {
+               S32 bufferLen = dStrlen( mapNode->makeConsoleCommand ) + dStrlen( mapNode->breakConsoleCommand ) + 2;
+               char* returnString = Con::getReturnBuffer( bufferLen );
+               dSprintf( returnString, bufferLen, "%s\t%s",
+                     ( mapNode->makeConsoleCommand ? mapNode->makeConsoleCommand : "" ),
+                     ( mapNode->breakConsoleCommand ? mapNode->breakConsoleCommand : "" ) );             
+               return( returnString );
+            }              
+            else
+               return( mapNode->consoleFunction );             
+         }
+      }
+   }
 
-	return( "" );
+   return( "" );
 }
 
 //------------------------------------------------------------------------------
@@ -808,92 +808,92 @@ const char* ActionMap::getCommand( const char* device, const char* action )
 // Obviously, this should only be used for axes.
 bool ActionMap::isInverted( const char* device, const char* action )
 {
-	U32 deviceType;
-	U32 deviceInst;
-	if ( getDeviceTypeAndInstance( device, deviceType, deviceInst ) )
-	{
-		EventDescriptor eventDescriptor;
-		if ( createEventDescriptor( action, &eventDescriptor ) )
-		{
-			const ActionMap::Node* mapNode = findNode( deviceType, deviceInst, eventDescriptor.flags, eventDescriptor.eventCode );
-			if ( mapNode )
-				return( mapNode->flags & Node::Inverted );
-		}
-	}
+   U32 deviceType;
+   U32 deviceInst;
+   if ( getDeviceTypeAndInstance( device, deviceType, deviceInst ) )
+   {
+      EventDescriptor eventDescriptor;
+      if ( createEventDescriptor( action, &eventDescriptor ) )
+      {
+         const ActionMap::Node* mapNode = findNode( deviceType, deviceInst, eventDescriptor.flags, eventDescriptor.eventCode );
+         if ( mapNode )
+            return( mapNode->flags & Node::Inverted );
+      }
+   }
 
-	Con::errorf( "The input event specified by %s %s is not in this action map!", device, action );
-	return( false );
+   Con::errorf( "The input event specified by %s %s is not in this action map!", device, action );
+   return( false );
 }
 
 //------------------------------------------------------------------------------
 F32 ActionMap::getScale( const char* device, const char* action )
 {
-	U32 deviceType;
-	U32 deviceInst;
-	if ( getDeviceTypeAndInstance( device, deviceType, deviceInst ) )
-	{
-		EventDescriptor eventDescriptor;
-		if ( createEventDescriptor( action, &eventDescriptor ) )
-		{
-			const ActionMap::Node* mapNode = findNode( deviceType, deviceInst, eventDescriptor.flags, eventDescriptor.eventCode );
-			if ( mapNode )
-			{
-			   if ( mapNode->flags & Node::HasScale )
-				   return( mapNode->scaleFactor );
+   U32 deviceType;
+   U32 deviceInst;
+   if ( getDeviceTypeAndInstance( device, deviceType, deviceInst ) )
+   {
+      EventDescriptor eventDescriptor;
+      if ( createEventDescriptor( action, &eventDescriptor ) )
+      {
+         const ActionMap::Node* mapNode = findNode( deviceType, deviceInst, eventDescriptor.flags, eventDescriptor.eventCode );
+         if ( mapNode )
+         {
+            if ( mapNode->flags & Node::HasScale )
+               return( mapNode->scaleFactor );
             else
                return( 1.0f );
          }
-		}
-	}
+      }
+   }
 
-	Con::errorf( "The input event specified by %s %s is not in this action map!", device, action );
-	return( 1.0f );
+   Con::errorf( "The input event specified by %s %s is not in this action map!", device, action );
+   return( 1.0f );
 }
 
 //------------------------------------------------------------------------------
 const char* ActionMap::getDeadZone( const char* device, const char* action )
 {
-	U32 deviceType;
-	U32 deviceInst;
-	if ( getDeviceTypeAndInstance( device, deviceType, deviceInst ) )
-	{
-		EventDescriptor eventDescriptor;
-		if ( createEventDescriptor( action, &eventDescriptor ) )
-		{
-			const ActionMap::Node* mapNode = findNode( deviceType, deviceInst, eventDescriptor.flags, eventDescriptor.eventCode );
-			if ( mapNode )
-			{
-			   if ( mapNode->flags & Node::HasDeadZone )
+   U32 deviceType;
+   U32 deviceInst;
+   if ( getDeviceTypeAndInstance( device, deviceType, deviceInst ) )
+   {
+      EventDescriptor eventDescriptor;
+      if ( createEventDescriptor( action, &eventDescriptor ) )
+      {
+         const ActionMap::Node* mapNode = findNode( deviceType, deviceInst, eventDescriptor.flags, eventDescriptor.eventCode );
+         if ( mapNode )
+         {
+            if ( mapNode->flags & Node::HasDeadZone )
             {
-				   char buf[64];
-				   dSprintf( buf, sizeof( buf ), "%g %g", mapNode->deadZoneBegin, mapNode->deadZoneEnd );
-				   char* returnString = Con::getReturnBuffer( dStrlen( buf ) + 1 );
-				   dStrcpy( returnString, buf );
-				   return( returnString );
-				}
-				else
-				   return( "0 0" );				   		
-			}
-		}
-	}
+               char buf[64];
+               dSprintf( buf, sizeof( buf ), "%g %g", mapNode->deadZoneBegin, mapNode->deadZoneEnd );
+               char* returnString = Con::getReturnBuffer( dStrlen( buf ) + 1 );
+               dStrcpy( returnString, buf );
+               return( returnString );
+            }
+            else
+               return( "0 0" );                    
+         }
+      }
+   }
 
-	Con::errorf( "The input event specified by %s %s is not in this action map!", device, action );
-	return( "" );
+   Con::errorf( "The input event specified by %s %s is not in this action map!", device, action );
+   return( "" );
 }
 
 //------------------------------------------------------------------------------
 const char* ActionMap::buildActionString( const InputEventInfo* event )
 {
-	const char* modifierString = getModifierString( event->modifier );
+   const char* modifierString = getModifierString( event->modifier );
 
-	char objectBuffer[64];
-	if ( !getKeyString( event->objInst, objectBuffer ) )
-		return( "" );
+   char objectBuffer[64];
+   if ( !getKeyString( event->objInst, objectBuffer ) )
+      return( "" );
 
-	U32 returnLen = dStrlen( modifierString ) + dStrlen( objectBuffer ) + 2;	
-	char* returnString = Con::getReturnBuffer( returnLen );
-	dSprintf( returnString, returnLen - 1, "%s%s", modifierString, objectBuffer );
-	return( returnString );
+   U32 returnLen = dStrlen( modifierString ) + dStrlen( objectBuffer ) + 2;   
+   char* returnString = Con::getReturnBuffer( returnLen );
+   dSprintf( returnString, returnLen - 1, "%s%s", modifierString, objectBuffer );
+   return( returnString );
 }
 
 //------------------------------------------------------------------------------
@@ -989,15 +989,15 @@ bool ActionMap::getDeviceName(const U32 deviceType, const U32 deviceInstance, ch
 //------------------------------------------------------------------------------
 const char* ActionMap::getModifierString(const U32 modifiers)
 {
-	U32 realModifiers = modifiers;
-	if ( modifiers & SI_LSHIFT || modifiers & SI_RSHIFT )
-		realModifiers |= SI_SHIFT;
-	if ( modifiers & SI_LCTRL || modifiers & SI_RCTRL )
-		realModifiers |= SI_CTRL;
-	if ( modifiers & SI_LALT || modifiers & SI_RALT )
-		realModifiers |= SI_ALT;
-	if ( modifiers & SI_MAC_LOPT || modifiers & SI_MAC_ROPT )
-		realModifiers |= SI_MAC_OPT;
+   U32 realModifiers = modifiers;
+   if ( modifiers & SI_LSHIFT || modifiers & SI_RSHIFT )
+      realModifiers |= SI_SHIFT;
+   if ( modifiers & SI_LCTRL || modifiers & SI_RCTRL )
+      realModifiers |= SI_CTRL;
+   if ( modifiers & SI_LALT || modifiers & SI_RALT )
+      realModifiers |= SI_ALT;
+   if ( modifiers & SI_MAC_LOPT || modifiers & SI_MAC_ROPT )
+      realModifiers |= SI_MAC_OPT;
 
    switch (realModifiers & (SI_SHIFT|SI_CTRL|SI_ALT|SI_MAC_OPT)) 
    {
@@ -1450,9 +1450,8 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
          }
          else
          {
-            // Handle rotation (QuatF)
-            QuatF quat(pEvent->fValue, pEvent->fValue2, pEvent->fValue3, pEvent->fValue4);
-            AngAxisF aa(quat);
+            // Handle rotation (AngAxisF)
+            AngAxisF aa(Point3F(pEvent->fValue, pEvent->fValue2, pEvent->fValue3), pEvent->fValue4);
             aa.axis.normalize();
             argv[1] = Con::getFloatArg( aa.axis.x );
             argv[2] = Con::getFloatArg( aa.axis.y );
@@ -1821,19 +1820,19 @@ static ConsoleDocFragment _ActionMapbind1(
    "@param command The function to bind to the action. Function must have a single boolean argument.\n"
    "@return True if the binding was successful, false if the device was unknown or description failed.\n\n"
    "@tsexample\n"
-	"// Simple function that prints to console\n"
-	"// %val - Sent by the device letting the user know\n"
-	"// if an input was pressed (true) or released (false)\n"
-	"function testInput(%val)\n"
-	"{\n"
-	"   if(%val)\n"
-	"	  echo(\"Key is down\");\n"
-	"   else\n"
-	"	  echo(\"Key was released\");\n"
-	"}\n\n"
-	"// Bind the \'K\' key to the testInput function\n"
-	"moveMap.bind(keyboard, k, testInput);\n\n"
-	"@endtsexample\n\n\n",
+   "// Simple function that prints to console\n"
+   "// %val - Sent by the device letting the user know\n"
+   "// if an input was pressed (true) or released (false)\n"
+   "function testInput(%val)\n"
+   "{\n"
+   "   if(%val)\n"
+   "    echo(\"Key is down\");\n"
+   "   else\n"
+   "    echo(\"Key was released\");\n"
+   "}\n\n"
+   "// Bind the \'K\' key to the testInput function\n"
+   "moveMap.bind(keyboard, k, testInput);\n\n"
+   "@endtsexample\n\n\n",
    "ActionMap",
    "bool bind( string device, string action, string command );");
 
@@ -1855,22 +1854,22 @@ static ConsoleDocFragment _ActionMapbind2(
    "@param command The function bound to the action. Must take in a single argument.\n"
    "@return True if the binding was successful, false if the device was unknown or description failed.\n\n"
    "@tsexample\n"
-	"// Simple function that adjusts the pitch of the camera based on the "
+   "// Simple function that adjusts the pitch of the camera based on the "
    "mouse's movement along the X axis.\n"
-	"function testPitch(%val)\n"
-	"{\n"
-	"   %pitchAdj = getMouseAdjustAmount(%val);\n"
-	"	 $mvPitch += %pitchAdj;\n"
-	"}\n\n"
-	"// Bind the mouse's X axis to the testPitch function\n"
-	"// DI is flagged, meaning input is inverted and has a deadzone\n"
-	"%this.bind( mouse, \"xaxis\", \"DI\", \"-0.23 0.23\", testPitch );\n"
-	"@endtsexample\n\n\n",
+   "function testPitch(%val)\n"
+   "{\n"
+   "   %pitchAdj = getMouseAdjustAmount(%val);\n"
+   "   $mvPitch += %pitchAdj;\n"
+   "}\n\n"
+   "// Bind the mouse's X axis to the testPitch function\n"
+   "// DI is flagged, meaning input is inverted and has a deadzone\n"
+   "%this.bind( mouse, \"xaxis\", \"DI\", \"-0.23 0.23\", testPitch );\n"
+   "@endtsexample\n\n\n",
    "ActionMap",
    "bool bind( string device, string action, string flag, string deadZone, string scale, string command );");
 
 ConsoleMethod( ActionMap, bind, bool, 5, 10, "actionMap.bind( device, action, [modifier spec, mod...], command )" 
-			  "@hide")
+           "@hide")
 {
    StringStackWrapper args(argc - 2, argv + 2);
    return object->processBind( args.count(), args, NULL );
@@ -1919,7 +1918,7 @@ static ConsoleDocFragment _ActionMapbindObj2(
    "bool bindObj( string device, string action, string flag, string deadZone, string scale, string command, SimObjectID object );");
 
 ConsoleMethod( ActionMap, bindObj, bool, 6, 11, "(device, action, [modifier spec, mod...], command, object)"
-			  "@hide")
+           "@hide")
 {
    SimObject* simObject = Sim::findObject(argv[argc - 1]);
    if ( simObject == NULL )
@@ -1942,20 +1941,20 @@ DefineEngineMethod( ActionMap, bindCmd, bool, ( const char* device, const char* 
     "@param makeCmd The command to execute when the device/action is made.\n"
     "@param breakCmd [optional] The command to execute when the device or action is unmade.\n"
     "@return True the bind was successful, false if the device was unknown or description failed.\n"
-	"@tsexample\n"
-	"// Print to the console when the spacebar is pressed\n"
-	"function onSpaceDown()\n"
-	"{\n"
-	"   echo(\"Space bar down!\");\n"
-	"}\n\n"
-	"// Print to the console when the spacebar is released\n"
-	"function onSpaceUp()\n"
-	"{\n"
-	"   echo(\"Space bar up!\");\n"
-	"}\n\n"
+   "@tsexample\n"
+   "// Print to the console when the spacebar is pressed\n"
+   "function onSpaceDown()\n"
+   "{\n"
+   "   echo(\"Space bar down!\");\n"
+   "}\n\n"
+   "// Print to the console when the spacebar is released\n"
+   "function onSpaceUp()\n"
+   "{\n"
+   "   echo(\"Space bar up!\");\n"
+   "}\n\n"
    "// Bind the commands onSpaceDown() and onSpaceUp() to spacebar events\n\n"
-	"moveMap.bindCmd(keyboard, \"space\", \"onSpaceDown();\", \"onSpaceUp();\");\n"
-	"@endtsexample\n\n")
+   "moveMap.bindCmd(keyboard, \"space\", \"onSpaceDown();\", \"onSpaceUp();\");\n"
+   "@endtsexample\n\n")
 {
    return object->processBindCmd( device, action, makeCmd, breakCmd );
 }
@@ -1965,9 +1964,9 @@ DefineEngineMethod( ActionMap, unbind, bool, ( const char* device, const char* a
    "@param device The device to unbind from. Can be a keyboard, mouse, joystick or a gamepad.\n"
    "@param action The device action to unbind from. The action is dependant upon the device. Specify a key for keyboards.\n"
    "@return True if the unbind was successful, false if the device was unknown or description failed.\n\n"
-	"@tsexample\n"
-	"moveMap.unbind(\"keyboard\", \"space\");\n"
-	"@endtsexample\n\n")
+   "@tsexample\n"
+   "moveMap.unbind(\"keyboard\", \"space\");\n"
+   "@endtsexample\n\n")
 {
    return object->processUnbind( device, action );
 }
@@ -1978,7 +1977,7 @@ DefineEngineMethod( ActionMap, unbindObj, bool, ( const char* device, const char
    "@param action The device action to unbind from. The action is dependant upon the device. Specify a key for keyboards.\n"
    "@param obj The object to perform unbind against.\n"
    "@return True if the unbind was successful, false if the device was unknown or description failed.\n"
-	"@tsexample\n"
+   "@tsexample\n"
    "moveMap.unbindObj(\"keyboard\", \"numpad1\", \"rangeChange\", %player);"
    "@endtsexample\n\n\n")
 {
@@ -1992,15 +1991,15 @@ DefineEngineMethod( ActionMap, unbindObj, bool, ( const char* device, const char
     return object->processUnbind( device, action, simObject );
 }
 
-DefineEngineMethod( ActionMap, save, void, ( const char* fileName, bool append ), ( NULL, false ),
+DefineEngineMethod( ActionMap, save, void, ( const char* fileName, bool append ), ( nullAsType<const char*>(), false ),
    "@brief Saves the ActionMap to a file or dumps it to the console.\n\n"
    "@param fileName The file path to save the ActionMap to. If a filename is not specified "
    " the ActionMap will be dumped to the console.\n"
    "@param append Whether to write the ActionMap at the end of the file or overwrite it.\n"
-	"@tsexample\n"
-	"// Write out the actionmap into the config.cs file\n"
+   "@tsexample\n"
+   "// Write out the actionmap into the config.cs file\n"
    "moveMap.save( \"scripts/client/config.cs\" );"
-	"@endtsexample\n\n")
+   "@endtsexample\n\n")
 {
    char buffer[1024];
 
@@ -2016,7 +2015,7 @@ DefineEngineMethod( ActionMap, save, void, ( const char* fileName, bool append )
 DefineEngineFunction( getCurrentActionMap, ActionMap*, (),,
    "@brief Returns the current %ActionMap.\n"
    "@see ActionMap"
-	"@ingroup Input")
+   "@ingroup Input")
 {
    SimSet* pActionMapSet = Sim::getActiveActionMapSet();
    return dynamic_cast< ActionMap* >( pActionMapSet->last() );
@@ -2025,10 +2024,10 @@ DefineEngineFunction( getCurrentActionMap, ActionMap*, (),,
 DefineEngineMethod( ActionMap, push, void, (),,
    "@brief Push the ActionMap onto the %ActionMap stack.\n\n"
    "Activates an ActionMap and placees it at the top of the ActionMap stack.\n\n"
-	"@tsexample\n"
-	"// Make moveMap the active action map\n"
-	"moveMap.push();\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+   "// Make moveMap the active action map\n"
+   "moveMap.push();\n"
+   "@endtsexample\n\n"
    "@see ActionMap")
 {
    SimSet* pActionMapSet = Sim::getActiveActionMapSet();
@@ -2038,10 +2037,10 @@ DefineEngineMethod( ActionMap, push, void, (),,
 DefineEngineMethod( ActionMap, pop, void, (),,
    "@brief Pop the ActionMap off the %ActionMap stack.\n\n"
    "Deactivates an %ActionMap and removes it from the @ActionMap stack.\n"
-	"@tsexample\n"
-	"// Deactivate moveMap\n"
-	"moveMap.pop();\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+   "// Deactivate moveMap\n"
+   "moveMap.pop();\n"
+   "@endtsexample\n\n"
    "@see ActionMap")
 {
    SimSet* pActionMapSet = Sim::getActiveActionMapSet();
@@ -2054,20 +2053,20 @@ DefineEngineMethod( ActionMap, getBinding, const char*, ( const char* command ),
    "@param command The function to search bindings for.\n"
    "@return The binding against the specified command. Returns an empty string(\"\") "
    "if a binding wasn't found.\n"
-	"@tsexample\n"
-	"// Find what the function \"jump()\" is bound to in moveMap\n"
-	"%bind = moveMap.getBinding( \"jump\" );\n\n"
-	"if ( %bind !$= \"\" )\n"
-	"{\n"
-	"// Find out what device is used in the binding\n"
-	"	%device = getField( %bind, 0 );\n\n"
-	"// Find out what action (such as a key) is used in the binding\n"
-	"	%action = getField( %bind, 1 );\n"
-	"}\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+   "// Find what the function \"jump()\" is bound to in moveMap\n"
+   "%bind = moveMap.getBinding( \"jump\" );\n\n"
+   "if ( %bind !$= \"\" )\n"
+   "{\n"
+   "// Find out what device is used in the binding\n"
+   "  %device = getField( %bind, 0 );\n\n"
+   "// Find out what action (such as a key) is used in the binding\n"
+   "  %action = getField( %bind, 1 );\n"
+   "}\n"
+   "@endtsexample\n\n"
    "@see getField")
 {
-	return object->getBinding( command );	
+   return object->getBinding( command );  
 }
 
 DefineEngineMethod( ActionMap, getCommand, const char*, ( const char* device, const char* action ),,
@@ -2075,15 +2074,15 @@ DefineEngineMethod( ActionMap, getCommand, const char*, ( const char* device, co
    "@param device The device that was bound. Can be a keyboard, mouse, joystick or a gamepad.\n"
    "@param action The device action that was bound.  The action is dependant upon the device. Specify a key for keyboards.\n"
    "@return The command against the specified device and action.\n"
-	"@tsexample\n"
-	"// Find what function is bound to a device\'s action\n"
-	"// In this example, \"jump()\" was assigned to the space key in another script\n"
-	"%command = moveMap.getCommand(\"keyboard\", \"space\");\n\n"
-	"// Should print \"jump\" in the console\n"
-	"echo(%command)\n"
-	"@endtsexample\n\n")
+   "@tsexample\n"
+   "// Find what function is bound to a device\'s action\n"
+   "// In this example, \"jump()\" was assigned to the space key in another script\n"
+   "%command = moveMap.getCommand(\"keyboard\", \"space\");\n\n"
+   "// Should print \"jump\" in the console\n"
+   "echo(%command)\n"
+   "@endtsexample\n\n")
 {
-	return object->getCommand( device, action );	
+   return object->getCommand( device, action ); 
 }
 
 DefineEngineMethod( ActionMap, isInverted, bool, ( const char* device, const char* action ),,
@@ -2092,12 +2091,12 @@ DefineEngineMethod( ActionMap, isInverted, bool, ( const char* device, const cha
    "@param device The device that was bound. Can be a keyboard, mouse, joystick or a gamepad.\n"
    "@param action The device action that was bound.  The action is dependant upon the device. Specify a key for keyboards.\n"
    "@return True if the specified device and action is inverted.\n"
-	"@tsexample\n"
+   "@tsexample\n"
    "%if ( moveMap.isInverted( \"mouse\", \"xaxis\"))\n"
    "   echo(\"Mouse's xAxis is inverted\");"
-	"@endtsexample\n\n")
+   "@endtsexample\n\n")
 {
-	return object->isInverted( device, action );	
+   return object->isInverted( device, action ); 
 }
 
 DefineEngineMethod( ActionMap, getScale, F32, ( const char* device, const char* action ),,
@@ -2105,11 +2104,11 @@ DefineEngineMethod( ActionMap, getScale, F32, ( const char* device, const char* 
    "@param device The device that was bound. Can be keyboard, mouse, joystick or gamepad.\n"
    "@param action The device action that was bound. The action is dependant upon the device. Specify a key for keyboards.\n"
    "@return Any scaling applied to the specified device and action.\n"
-	"@tsexample\n"
-	"%scale = %moveMap.getScale( \"gamepad\", \"thumbrx\");\n"
-	"@endtsexample\n\n")
+   "@tsexample\n"
+   "%scale = %moveMap.getScale( \"gamepad\", \"thumbrx\");\n"
+   "@endtsexample\n\n")
 {
-	return object->getScale( device, action );	
+   return object->getScale( device, action );   
 }
 
 DefineEngineMethod( ActionMap, getDeadZone, const char*, ( const char* device, const char* action ),,
@@ -2118,11 +2117,11 @@ DefineEngineMethod( ActionMap, getDeadZone, const char*, ( const char* device, c
    "@param action The device action that was bound. The action is dependant upon the device. Specify a key for keyboards.\n"
    "@return The dead zone for the specified device and action. Returns \"0 0\" if there is no dead zone " 
    "or an empty string(\"\") if the mapping was not found.\n"
-	"@tsexample\n"
-	"%deadZone = moveMap.getDeadZone( \"gamepad\", \"thumbrx\");\n"
-	"@endtsexample\n\n")
+   "@tsexample\n"
+   "%deadZone = moveMap.getDeadZone( \"gamepad\", \"thumbrx\");\n"
+   "@endtsexample\n\n")
 {
-	return object->getDeadZone( device, action );	
+   return object->getDeadZone( device, action );   
 }
 
 //------------------------------------------------------------------------------

@@ -293,6 +293,7 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
       break;
      case GFXFormatR8G8B8:       mBytesPerPixel = 3;
       break;
+     case GFXFormatR8G8B8A8_LINEAR_FORCE:
      case GFXFormatR8G8B8X8:
      case GFXFormatR8G8B8A8:     mBytesPerPixel = 4;
       break;
@@ -326,7 +327,10 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
 
          mNumMipLevels++;
          allocPixels += currWidth * currHeight * mBytesPerPixel;
-      } while (currWidth != 1 && currHeight != 1);
+      } while (currWidth != 1 || currHeight != 1);
+
+      U32 expectedMips = mFloor(mLog2(mMax(in_width, in_height))) + 1;
+      AssertFatal(mNumMipLevels == expectedMips, "GBitmap::allocateBitmap: mipmap count wrong");
    }
    AssertFatal(mNumMipLevels <= c_maxMipLevels, "GBitmap::allocateBitmap: too many miplevels");
 

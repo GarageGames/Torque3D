@@ -22,7 +22,7 @@
 
 
 /// Blends between the scene and the tone mapped scene.
-$HDRPostFX::enableToneMapping = 1.0;
+$HDRPostFX::enableToneMapping = 0.5;
 
 /// The tone mapping middle grey or exposure value used
 /// to adjust the overall "balance" of the image.
@@ -318,7 +318,7 @@ function HDRPostFX::onDisabled( %this )
    GammaPostFX.enable();
    
    // Restore the non-HDR offscreen surface format.
-   %format = "GFXFormatR8G8B8A8";
+   %format = getBestHDRFormat();
    AL_FormatToken.format = %format;
    setReflectFormat( %format );
    
@@ -333,8 +333,8 @@ function HDRPostFX::onDisabled( %this )
 singleton PostEffect( HDRPostFX )
 {
    isEnabled = false;
-   allowReflectPass = true;
-      
+   allowReflectPass = false;
+
    // Resolve the HDR before we render any editor stuff
    // and before we resolve the scene to the backbuffer.
    renderTime = "PFXBeforeBin";
@@ -359,7 +359,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
-         allowReflectPass = true;
+         allowReflectPass = false;
          shader = HDR_DownScale4x4Shader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -370,7 +370,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
-         allowReflectPass = true;
+         allowReflectPass = false;
          internalName = "bloomH";
          
          shader = HDR_BloomGaussBlurHShader;
@@ -382,7 +382,7 @@ singleton PostEffect( HDRPostFX )
 
       new PostEffect()
       {
-         allowReflectPass = true;
+         allowReflectPass = false;
          internalName = "bloomV";
                   
          shader = HDR_BloomGaussBlurVShader;
@@ -397,7 +397,7 @@ singleton PostEffect( HDRPostFX )
    // Now calculate the adapted luminance.
    new PostEffect()
    {
-      allowReflectPass = true;
+      allowReflectPass = false;
       internalName = "adaptLum";
       
       shader = HDR_SampleLumShader;
@@ -409,7 +409,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
-         allowReflectPass = true;
+         allowReflectPass = false;
          shader = HDR_DownSampleLumShader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -420,7 +420,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
-         allowReflectPass = true;
+         allowReflectPass = false;
          shader = HDR_DownSampleLumShader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -431,7 +431,7 @@ singleton PostEffect( HDRPostFX )
       
       new PostEffect()
       {
-         allowReflectPass = true;
+         allowReflectPass = false;
          shader = HDR_DownSampleLumShader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -445,8 +445,8 @@ singleton PostEffect( HDRPostFX )
       // one... PostEffect takes care to manage that.
       new PostEffect()
       {
-         allowReflectPass = true;
-         internalName = "finalLum";         
+         allowReflectPass = false;
+         internalName = "finalLum";
          shader = HDR_CalcAdaptedLumShader;
          stateBlock = HDR_DownSampleStateBlock;
          texture[0] = "$inTex";
@@ -462,7 +462,7 @@ singleton PostEffect( HDRPostFX )
    // version of the scene.
    new PostEffect()
    {
-      allowReflectPass = true;
+      allowReflectPass = false;
       internalName = "combinePass";
       
       shader = HDR_CombineShader;
@@ -471,7 +471,6 @@ singleton PostEffect( HDRPostFX )
       texture[1] = "#adaptedLum";            
       texture[2] = "#bloomFinal";
       texture[3] = $HDRPostFX::colorCorrectionRamp;
-      texture[4] = "#prepass";
       target = "$backBuffer";
    };
 };

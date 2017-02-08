@@ -35,7 +35,7 @@ class SceneRenderState;
 class GFXCubemap;
 class Frustum;
 class LightQuery;
-
+class TSShape;
 
 /// A simple class for passing render state through the pre-render pipeline.
 ///
@@ -109,6 +109,12 @@ protected:
    // volume. This is passed down per-object.
    GFXTextureObject* mAccuTex;
 
+   /// List of matrices to use for hardware skinning
+   MatrixF *mNodeTransforms;
+
+   /// Count of matrices in the mNodeTransforms list
+   U32 mNodeTransformCount;
+
 public:
 
    
@@ -158,6 +164,10 @@ public:
    ///@see mAccuTex
    void setAccuTex( GFXTextureObject* query ) { mAccuTex = query; }
    GFXTextureObject* getAccuTex() const { return mAccuTex; }
+
+   ///@ see mNodeTransforms, mNodeTransformCount
+   void setNodeTransforms(MatrixF *list, U32 count) { mNodeTransforms = list; mNodeTransformCount = count; }
+   void getNodeTransforms(MatrixF **list, U32 *count) const { *list = mNodeTransforms; *count = mNodeTransformCount; }
 
    /// @}
 };

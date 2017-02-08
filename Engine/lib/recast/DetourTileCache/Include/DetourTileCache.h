@@ -63,6 +63,8 @@ struct dtTileCacheParams
 
 struct dtTileCacheMeshProcess
 {
+	virtual ~dtTileCacheMeshProcess() { }
+
 	virtual void process(struct dtNavMeshCreateParams* params,
 						 unsigned char* polyAreas, unsigned short* polyFlags) = 0;
 };
@@ -162,7 +164,10 @@ public:
 	
 	
 private:
-	
+	// Explicitly disabled copy constructor and copy assignment operator.
+	dtTileCache(const dtTileCache&);
+	dtTileCache& operator=(const dtTileCache&);
+
 	enum ObstacleRequestAction
 	{
 		REQUEST_ADD,
@@ -201,7 +206,6 @@ private:
 	static const int MAX_UPDATE = 64;
 	dtCompressedTileRef m_update[MAX_UPDATE];
 	int m_nupdate;
-	
 };
 
 dtTileCache* dtAllocTileCache();

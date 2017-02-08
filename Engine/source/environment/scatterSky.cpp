@@ -379,7 +379,7 @@ void ScatterSky::initPersistFields()
          "Enables/disables shadows cast by objects due to ScatterSky light." );
 
       addField("staticRefreshFreq", TypeS32, Offset(mStaticRefreshFreq, ScatterSky), "static shadow refresh rate (milliseconds)");
-      addField("dynamicRefreshFreq", TypeS32, Offset(mDynamicRefreshFreq, ScatterSky), "dynamic shadow refresh rate (milliseconds)");
+      addField("dynamicRefreshFreq", TypeS32, Offset(mDynamicRefreshFreq, ScatterSky), "dynamic shadow refresh rate (milliseconds)", AbstractClassRep::FieldFlags::FIELD_HideInInspectors);
 
       addField( "brightness", TypeF32, Offset( mBrightness, ScatterSky ),
          "The brightness of the ScatterSky's light object." );
@@ -667,11 +667,11 @@ void ScatterSky::prepRenderImage( SceneRenderState *state )
       mFlareState.scale = mFlareScale;
       mFlareState.lightInfo = mLight;
 
-      Point3F lightPos = state->getCameraPosition() - state->getFarPlane() * mLight->getDirection() * 0.9f;
+      Point3F lightPos = state->getDiffuseCameraPosition() - state->getFarPlane() * mLight->getDirection() * 0.9f;
       mFlareState.lightMat.identity();
       mFlareState.lightMat.setPosition( lightPos );
 
-      F32 dist = ( lightPos - state->getCameraPosition( ) ).len( );
+      F32 dist = ( lightPos - state->getDiffuseCameraPosition( ) ).len( );
       F32 coronaScale = 0.5f;
       F32 screenRadius = GFX->getViewport( ).extent.y * coronaScale * 0.5f;
       mFlareState.worldRadius = screenRadius * dist / state->getWorldToScreenScale( ).y;

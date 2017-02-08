@@ -139,7 +139,7 @@ DefineConsoleFunction( spawnObject, S32, (   const char * spawnClass
                                          ,   const char * spawnProperties
                                          ,   const char * spawnScript 
                                          ),("","","","") ,"spawnObject(class [, dataBlock, name, properties, script])"
-				"@hide")
+            "@hide")
 {
    SimObject* spawnObject = Sim::spawnObject(spawnClass, spawnDataBlock, spawnName, spawnProperties, spawnScript);
 
@@ -203,12 +203,12 @@ ConsoleFunction(schedule, S32, 4, 0, "schedule(time, refobject|0, command, <arg1
 }
 
 DefineConsoleFunction( getUniqueName, const char*, (const char * baseName), ,
-	"( String baseName )\n"
-	"@brief Returns a unique unused SimObject name based on a given base name.\n\n"
-	"@baseName Name to conver to a unique string if another instance exists\n"
-	"@note Currently only used by editors\n"
-	"@ingroup Editors\n"
-	"@internal")
+   "( String baseName )\n"
+   "@brief Returns a unique unused SimObject name based on a given base name.\n\n"
+   "@baseName Name to conver to a unique string if another instance exists\n"
+   "@note Currently only used by editors\n"
+   "@ingroup Editors\n"
+   "@internal")
 {
    String outName = Sim::getUniqueName( baseName );
    
@@ -247,10 +247,10 @@ DefineConsoleFunction( getUniqueInternalName, const char*, (const char * baseNam
 }
 
 DefineConsoleFunction( isValidObjectName, bool, (const char * name), , "( string name )"
-				"@brief Return true if the given name makes for a valid object name.\n\n"
-				"@param name Name of object\n"
-				"@return True if name is allowed, false if denied (usually because it starts with a number, _, or invalid character"
-				"@ingroup Console")
+            "@brief Return true if the given name makes for a valid object name.\n\n"
+            "@param name Name of object\n"
+            "@return True if name is allowed, false if denied (usually because it starts with a number, _, or invalid character"
+            "@ingroup Console")
 {
    return Sim::isValidObjectName( name );
 }

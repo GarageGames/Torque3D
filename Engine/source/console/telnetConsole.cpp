@@ -67,24 +67,24 @@ DefineConsoleFunction( telnetSetParameters, void, ( int port, const char* consol
                 "@param consolePass Password for read/write access to console.\n"
                 "@param listenPass  Password for read access to console.\n"
                 "@param remoteEcho  [optional] Enable echoing back to the client, off by default.\n\n"
-				"@ingroup Debugging")
+            "@ingroup Debugging")
 {
    if (TelConsole)
-	   TelConsole->setTelnetParameters(port, consolePass, listenPass, remoteEcho);
+      TelConsole->setTelnetParameters(port, consolePass, listenPass, remoteEcho);
 }
 
 static void telnetCallback(U32 level, const char *consoleLine)
 {
    TORQUE_UNUSED(level);
    if (TelConsole)
-	  TelConsole->processConsoleLine(consoleLine);
+     TelConsole->processConsoleLine(consoleLine);
 }
 
 TelnetConsole::TelnetConsole()
 {
    Con::addConsumer(telnetCallback);
 
-   mAcceptSocket = InvalidSocket;
+   mAcceptSocket = NetSocket::INVALID;
    mAcceptPort = -1;
    mClientList = NULL;
    mRemoteEchoEnabled = false;
@@ -93,13 +93,13 @@ TelnetConsole::TelnetConsole()
 TelnetConsole::~TelnetConsole()
 {
    Con::removeConsumer(telnetCallback);
-   if(mAcceptSocket != InvalidSocket)
+   if(mAcceptSocket != NetSocket::INVALID)
       Net::closeSocket(mAcceptSocket);
    TelnetClient *walk = mClientList, *temp;
    while(walk)
    {
       temp = walk->nextClient;
-      if(walk->socket != InvalidSocket)
+      if(walk->socket != NetSocket::INVALID)
          Net::closeSocket(walk->socket);
       delete walk;
       walk = temp;
@@ -113,16 +113,20 @@ void TelnetConsole::setTelnetParameters(S32 port, const char *telnetPassword, co
 
    mRemoteEchoEnabled = remoteEcho;
 
-   if(mAcceptSocket != InvalidSocket)
+   if(mAcceptSocket != NetSocket::INVALID)
    {
       Net::closeSocket(mAcceptSocket);
-      mAcceptSocket = InvalidSocket;
+      mAcceptSocket = NetSocket::INVALID;
    }
    mAcceptPort = port;
    if(mAcceptPort != -1 && mAcceptPort != 0)
    {
+     NetAddress address;
+     Net::getIdealListenAddress(&address);
+     address.port = mAcceptPort;
+
       mAcceptSocket = Net::openSocket();
-      Net::bind(mAcceptSocket, mAcceptPort);
+      Net::bindAddress(address, mAcceptSocket);
       Net::listen(mAcceptSocket, 4);
 
       Net::setBlocking(mAcceptSocket, false);
@@ -151,16 +155,17 @@ void TelnetConsole::process()
 {
    NetAddress address;
 
-   if(mAcceptSocket != InvalidSocket)
+   if(mAcceptSocket != NetSocket::INVALID)
    {
       // ok, see if we have any new connections:
       NetSocket newConnection;
       newConnection = Net::accept(mAcceptSocket, &address);
 
-      if(newConnection != InvalidSocket)
+      if(newConnection != NetSocket::INVALID)
       {
-   		Con::printf ("Telnet connection from %i.%i.%i.%i",
-   				address.netNum[0], address.netNum[1], address.netNum[2], address.netNum[3]);
+         char buffer[256];
+         Net::addressToString(&address, buffer);
+         Con::printf("Telnet connection from %s", buffer);
 
          TelnetClient *cl = new TelnetClient;
          cl->socket = newConnection;
@@ -201,7 +206,7 @@ void TelnetConsole::process()
       if((err != Net::NoError && err != Net::WouldBlock) || numBytes == 0)
       {
          Net::closeSocket(client->socket);
-         client->socket = InvalidSocket;
+         client->socket = NetSocket::INVALID;
          continue;
       }
 
@@ -274,7 +279,7 @@ void TelnetConsole::process()
                   if(client->state == DisconnectThisDude)
                   {
                      Net::closeSocket(client->socket);
-                     client->socket = InvalidSocket;
+                     client->socket = NetSocket::INVALID;
                   }
                }
             }
@@ -312,7 +317,7 @@ void TelnetConsole::process()
    TelnetClient *cl;
    while((cl = *walk) != NULL)
    {
-      if(cl->socket == InvalidSocket)
+      if(cl->socket == NetSocket::INVALID)
       {
          *walk = cl->nextClient;
          delete cl;

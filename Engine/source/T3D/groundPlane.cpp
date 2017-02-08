@@ -69,9 +69,9 @@ GroundPlane::GroundPlane()
      mScaleU( 1.0f ),
      mScaleV( 1.0f ),
      mMaterial( NULL ),
+     mPhysicsRep( NULL ),
      mMin( 0.0f, 0.0f ),
-     mMax( 0.0f, 0.0f ),
-     mPhysicsRep( NULL )
+     mMax( 0.0f, 0.0f )
 {
    mTypeMask |= StaticObjectType | StaticShapeObjectType;
    mNetFlags.set( Ghostable | ScopeAlways );

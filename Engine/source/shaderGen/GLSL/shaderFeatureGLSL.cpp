@@ -33,6 +33,7 @@
 #include "core/util/autoPtr.h"
 
 #include "lighting/advanced/advancedLightBinManager.h"
+#include "ts/tsShape.h"
 
 LangElement * ShaderFeatureGLSL::setupTexSpaceMat( Vector<ShaderComponent*> &, // componentList
                                                    Var **texSpaceMat )
@@ -1896,10 +1897,7 @@ void ReflectCubeFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    if (fd.features[MFT_isDeferred])
    {
       Var* targ = (Var*)LangElement::find(getOutputTargetVarName(ShaderFeature::RenderTarget1));
-      if (fd.features[MFT_DeferredSpecMap])
-         meta->addStatement(new GenOp("   @.rgb = lerp( @.rgb, (@).rgb, (@.b));\r\n", targ, targ, texCube, lerpVal));
-      else
-         meta->addStatement(new GenOp("   @.rgb = lerp( @.rgb, (@).rgb, (@.b));\r\n", targ, targ, texCube, lerpVal));
+      meta->addStatement(new GenOp("   @.rgb = lerp( @.rgb, (@).rgb, (@.b));\r\n", targ, targ, texCube, lerpVal));
    }
    else
         meta->addStatement( new GenOp( "   @;\r\n", assignColor( texCube, blendOp, lerpVal ) ) );         
@@ -2801,15 +2799,65 @@ void ImposterVertFeatureGLSL::determineFeature( Material *material,
 }
 
 //****************************************************************************
-// Vertex position
+// HardwareSkinningFeatureGLSL
 //****************************************************************************
-void DeferredSkyGLSL::processVert( Vector<ShaderComponent*> &componentList, 
-                                    const MaterialFeatureData &fd )
+
+void HardwareSkinningFeatureGLSL::processVert(Vector<ShaderComponent*> &componentList,
+   const MaterialFeatureData &fd)
 {
-   Var *outPosition = (Var*)LangElement::find( "gl_Position" );
    MultiLine *meta = new MultiLine;
-   //meta->addStatement( new GenOp( "   @.w = @.z;\r\n", outPosition, outPosition ) );
+
+   Var *inPosition = (Var*)LangElement::find("inPosition");
+   Var *inNormal = (Var*)LangElement::find("inNormal");
+
+   if (!inPosition)
+      inPosition = (Var*)LangElement::find("position");
+
+   if (!inNormal)
+      inNormal = (Var*)LangElement::find("normal");
+
+   Var* posePos = new Var("posePos", "vec3");
+   Var* poseNormal = new Var("poseNormal", "vec3");
+   Var* poseMat = new Var("poseMat", "mat4x3");
+   Var* poseRotMat = new Var("poseRotMat", "mat3x3");
+   Var* nodeTransforms = (Var*)LangElement::find("nodeTransforms");
+
+   if (!nodeTransforms)
+   {
+      nodeTransforms = new Var("nodeTransforms", "mat4x3");
+      nodeTransforms->uniform = true;
+      nodeTransforms->arraySize = TSShape::smMaxSkinBones;
+      nodeTransforms->constSortPos = cspPrimitive;
+   }
+
+   U32 numIndices = mVertexFormat->getNumBlendIndices();
+   meta->addStatement(new GenOp("   @ = vec3(0.0);\r\n", new DecOp(posePos)));
+   meta->addStatement(new GenOp("   @ = vec3(0.0);\r\n", new DecOp(poseNormal)));
+   meta->addStatement(new GenOp("   @;\r\n", new DecOp(poseMat)));
+   meta->addStatement(new GenOp("   @;\r\n   int i;\r\n", new DecOp(poseRotMat)));
+
+   for (U32 i = 0; i<numIndices; i++)
+   {
+      // NOTE: To keep things simple, we assume all 4 bone indices are used in each element chunk.
+      LangElement* inIndices = (Var*)LangElement::find(String::ToString("vBlendIndex%d", i));
+      LangElement* inWeights = (Var*)LangElement::find(String::ToString("vBlendWeight%d", i));
+
+      AssertFatal(inIndices && inWeights, "Something went wrong here");
+      AssertFatal(poseMat && nodeTransforms && posePos && inPosition && inWeights && poseNormal && inNormal && poseRotMat, "Something went REALLY wrong here");
+
+      meta->addStatement(new GenOp("   for (i=0; i<4; i++) {\r\n"));
+      meta->addStatement(new GenOp("      int poseIdx = int(@[i]);\r\n", inIndices));
+      meta->addStatement(new GenOp("      float poseWeight = @[i];\r\n", inWeights));
+      meta->addStatement(new GenOp("      @ = @[poseIdx];\r\n", poseMat, nodeTransforms));
+      meta->addStatement(new GenOp("      @ = mat3x3(@);\r\n", poseRotMat, poseMat));
+      meta->addStatement(new GenOp("      @ += (@ * vec4(@, 1)).xyz * poseWeight;\r\n", posePos, poseMat, inPosition));
+      meta->addStatement(new GenOp("      @ += ((@ * @) * poseWeight);\r\n", poseNormal, poseRotMat, inNormal));
+      meta->addStatement(new GenOp("   }\r\n"));
+   }
+
+   // Assign new position and normal
+   meta->addStatement(new GenOp("   @ = @;\r\n", inPosition, posePos));
+   meta->addStatement(new GenOp("   @ = normalize(@);\r\n", inNormal, poseNormal));
 
    output = meta;
 }
-

@@ -39,10 +39,4 @@
 #include <BulletCollision/CollisionDispatch/btGhostObject.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
-#include <BulletMultiThreaded/PlatformDefinitions.h>
-#include <BulletMultiThreaded/SpuGatheringCollisionDispatcher.h>
-#include <BulletMultiThreaded/Win32ThreadSupport.h>
-#include <BulletMultiThreaded/SpuNarrowPhaseCollisionTask/SpuGatheringCollisionTask.h>
-
-
 #endif // _BULLET_H_

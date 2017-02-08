@@ -1,0 +1,188 @@
+openal-soft-1.17.2:
+
+    Implemented device enumeration for OSSv4.
+
+    Fixed building on OSX.
+
+    Fixed building on non-Windows systems without POSIX-2008.
+
+    Fixed Dedicated Dialog and Dedicated LFE effect output.
+
+    Added a build option to override the share install dir.
+
+    Added a build option to static-link libgcc for MinGW.
+
+openal-soft-1.17.1:
+
+    Fixed building with JACK and without PulseAudio.
+
+    Fixed building on FreeBSD.
+
+    Fixed the ALSA backend's allow-resampler option.
+
+    Fixed handling of inexact ALSA period counts.
+
+    Altered device naming scheme on Windows backends to better match other
+    drivers.
+
+    Updated the CoreAudio backend to use the AudioComponent API. This clears up
+    deprecation warnings for OSX 10.11, although requires OSX 10.6 or newer.
+
+openal-soft-1.17.0:
+
+    Implemented a JACK playback backend.
+
+    Implemented the AL_EXT_BFORMAT and AL_EXT_MULAW_BFORMAT extensions.
+
+    Implemented the ALC_SOFT_HRTF extension.
+
+    Implemented C, SSE3, and SSE4.1 based 4- and 8-point Sinc resamplers.
+
+    Implemented a C and SSE based band-limited Sinc resampler. This does 12- to
+    24-point Sinc resampling, and performs anti-aliasing.
+
+    Implemented B-Format output support for the wave file writer. This creates
+    FuMa-style first-order Ambisonics wave files (AMB format).
+
+    Implemented a stereo-mode config option for treating stereo modes as either
+    speakers or headphones.
+
+    Implemented per-device configuration options.
+
+    Fixed handling of PulseAudio and MMDevAPI devices that have identical
+    descriptions.
+
+    Fixed a potential lockup when stopping playback of suspended PulseAudio devices.
+
+    Fixed logging of Unicode characters on Windows.
+
+    Fixed 5.1 surround sound channels. By default it will now use the side
+    channels for the surround output. A configuration using rear channels is
+    still available.
+
+    Fixed the QSA backend potentially altering the capture format.
+
+    Fixed detecting MMDevAPI's default device.
+
+    Fixed returning the default capture device name.
+
+    Fixed mixing property calculations when deferring context updates.
+
+    Altered the behavior of alcSuspendContext and alcProcessContext to better
+    match certain Windows drivers.
+
+    Altered the panning algorithm, utilizing Ambisonics for better side and
+    back positioning cues with surround sound output.
+
+    Improved support for certain older Windows apps.
+
+    Improved the alffplay example to support surround sound streams.
+
+    Improved support for building as a sub-project.
+
+    Added an HRTF playback example.
+
+    Added a tone generator output test.
+
+    Added a toolchain to help with cross-compiling to Android.
+
+openal-soft-1.16.0:
+
+    Implemented EFX Chorus, Flanger, Distortion, Equalizer, and Compressor
+    effects.
+
+    Implemented high-pass and band-pass EFX filters.
+
+    Implemented the high-pass filter for the EAXReverb effect.
+
+    Implemented SSE2 and SSE4.1 linear resamplers.
+
+    Implemented Neon-enhanced non-HRTF mixers.
+
+    Implemented a QSA backend, for QNX.
+
+    Implemented the ALC_SOFT_pause_device, AL_SOFT_deferred_updates,
+    AL_SOFT_block_alignment, AL_SOFT_MSADPCM, and AL_SOFT_source_length
+    extensions.
+
+    Fixed resetting mmdevapi backend devices.
+
+    Fixed clamping when converting 32-bit float samples to integer.
+
+    Fixed modulation range in the Modulator effect.
+
+    Several fixes for the OpenSL playback backend.
+
+    Fixed device specifier names that have Unicode characters on Windows.
+
+    Added support for filenames and paths with Unicode (UTF-8) characters on
+    Windows.
+
+    Added support for alsoft.conf config files found in XDG Base Directory
+    Specification locations (XDG_CONFIG_DIRS and XDG_CONFIG_HOME, or their
+    defaults) on non-Windows systems.
+
+    Added a GUI configuration utility (requires Qt 4.8).
+
+    Added support for environment variable expansion in config options (not
+    keys or section names).
+
+    Added an example that uses SDL2 and ffmpeg.
+
+    Modified examples to use SDL_sound.
+
+    Modified CMake config option names for better sorting.
+
+    HRTF data sets specified in the hrtf_tables config option may now be
+    relative or absolute filenames.
+
+    Made the default HRTF data set an external file, and added a data set for
+    48khz playback in addition to 44.1khz.
+
+    Added support for C11 atomic methods.
+
+    Improved support for some non-GNU build systems.
+
+openal-soft-1.15.1:
+
+    Fixed a regression with retrieving the source's AL_GAIN property.
+
+openal-soft-1.15:
+
+    Fixed device enumeration with the OSS backend.
+
+    Reorganized internal mixing logic, so unneeded steps can potentially be
+    skipped for better performance.
+
+    Removed the lookup table for calculating the mixing pans. The panning is
+    now calculated directly for better precision.
+
+    Improved the panning of stereo source channels when using stereo output.
+
+    Improved source filter quality on send paths.
+
+    Added a config option to allow PulseAudio to move streams between devices.
+
+    The PulseAudio backend will now attempt to spawn a server by default.
+
+    Added a workaround for a DirectSound bug relating to float32 output.
+
+    Added SSE-based mixers, for HRTF and non-HRTF mixing.
+
+    Added support for the new AL_SOFT_source_latency extension.
+
+    Improved ALSA capture by avoiding an extra buffer when using sizes
+    supported by the underlying device.
+
+    Improved the makehrtf utility to support new options and input formats.
+
+    Modified the CFLAGS declared in the pkg-config file so the "AL/" portion of
+    the header includes can optionally be omitted.
+
+    Added a couple example code programs to show how to apply reverb, and
+    retrieve latency.
+
+    The configuration sample is now installed into the share/openal/ directory
+    instead of /etc/openal.
+
+    The configuration sample now gets installed by default.

@@ -42,17 +42,25 @@
 
 class PlatformWindow;
 class GFXD3D11ShaderConstBuffer;
+class OculusVRHMDDevice;
+class D3D11OculusTexture;
 
 //------------------------------------------------------------------------------
 
 class GFXD3D11Device : public GFXDevice
 {
+public:
+   typedef Map<U32, ID3D11SamplerState*> SamplerMap;
+private:
+
    friend class GFXResource;
    friend class GFXD3D11PrimitiveBuffer;
    friend class GFXD3D11VertexBuffer;
    friend class GFXD3D11TextureObject;
    friend class GFXD3D11TextureTarget;
    friend class GFXD3D11WindowTarget;
+	friend class OculusVRHMDDevice;
+	friend class D3D11OculusTexture;
 
    virtual GFXFormat selectSupportedFormat(GFXTextureProfile *profile,
    const Vector<GFXFormat> &formats, bool texture, bool mustblend, bool mustfilter);
@@ -62,9 +70,9 @@ class GFXD3D11Device : public GFXDevice
    virtual GFXWindowTarget *allocWindowTarget(PlatformWindow *window);
    virtual GFXTextureTarget *allocRenderToTextureTarget();
 
-   virtual void enterDebugEvent(ColorI color, const char *name){};
-   virtual void leaveDebugEvent(){};
-   virtual void setDebugMarker(ColorI color, const char *name){};
+   virtual void enterDebugEvent(ColorI color, const char *name);
+   virtual void leaveDebugEvent();
+   virtual void setDebugMarker(ColorI color, const char *name);
 
 protected:
 
@@ -93,6 +101,9 @@ protected:
    /// @see allocVertexDecl
    typedef Map<String,D3D11VertexDecl*> VertexDeclMap;
    VertexDeclMap mVertexDecls;
+
+   /// Used to lookup sampler state for a given hash key
+   SamplerMap mSamplersMap;
 
    ID3D11RenderTargetView* mDeviceBackBufferView;
    ID3D11DepthStencilView* mDeviceDepthStencilView;
@@ -125,6 +136,13 @@ protected:
 
    F32 mPixVersion;
 
+   D3D_FEATURE_LEVEL mFeatureLevel;
+   // Shader Model targers
+   String mVertexShaderTarget;
+   String mPixelShaderTarget;
+   // String for use with shader macros in the form of shader model version * 10
+   String mShaderModel;
+
    bool mDebugLayers;
 
    DXGI_SAMPLE_DESC mMultisampleDesc;
@@ -142,7 +160,6 @@ protected:
    virtual GFXD3D11VertexBuffer* findVBPool( const GFXVertexFormat *vertexFormat, U32 numVertsNeeded );
    virtual GFXD3D11VertexBuffer* createVBPool( const GFXVertexFormat *vertexFormat, U32 vertSize );
 
-   IDXGISwapChain* getSwapChain();
    // State overrides
    // {
 
@@ -192,8 +209,6 @@ public:
    static GFXDevice *createInstance( U32 adapterIndex );
 
    static void enumerateAdapters( Vector<GFXAdapter*> &adapterList );
-
-   GFXTextureObject* createRenderSurface( U32 width, U32 height, GFXFormat format, U32 mipLevel );
 
    ID3D11DepthStencilView* getDepthStencilView() { return mDeviceDepthStencilView; }
    ID3D11RenderTargetView* getRenderTargetView() { return mDeviceBackBufferView; }
@@ -277,7 +292,8 @@ public:
    ID3D11Device* getDevice(){ return mD3DDevice; }
 
    /// Reset
-   void reset( DXGI_SWAP_CHAIN_DESC &d3dpp );
+   void beginReset();
+   void endReset(GFXD3D11WindowTarget *windowTarget);
 
    virtual void setupGenericShaders( GenericShaderType type  = GSColor );
 
@@ -290,6 +306,17 @@ public:
 
    // Default multisample parameters
    DXGI_SAMPLE_DESC getMultisampleType() const { return mMultisampleDesc; }
+
+   // Get feature level this gfx device supports
+   D3D_FEATURE_LEVEL getFeatureLevel() const { return mFeatureLevel; }
+   // Shader Model targers
+   const String &getVertexShaderTarget() const { return mVertexShaderTarget; }
+   const String &getPixelShaderTarget() const { return mPixelShaderTarget; }
+   const String &getShaderModel() const { return mShaderModel; }
+
+   // grab the sampler map
+   const SamplerMap &getSamplersMap() const { return mSamplersMap; }
+   SamplerMap &getSamplersMap() { return mSamplersMap; }
 };
 
 #endif

@@ -66,9 +66,9 @@ IMPLEMENT_CALLBACK( GuiMLTextCtrl, onURL, void, ( const char* url ),( url ),
    "@tsexample\n"
    "// A URL address was clicked on in the control, causing the callback to occur.\n"
    "GuiMLTextCtrl::onUrl(%this,%url)\n"
-   "	{\n"
-   "		// Code to run whenever a URL was clicked on\n"
-   "	}\n"
+   "  {\n"
+   "     // Code to run whenever a URL was clicked on\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@see GuiControl\n\n"
 );
@@ -80,9 +80,9 @@ IMPLEMENT_CALLBACK( GuiMLTextCtrl, onResize, void, ( S32 width, S32 maxY ),( wid
    "@tsexample\n"
    "// Control size changed, causing the callback to occur.\n"
    "GuiMLTextCtrl::onResize(%this,%width,%maxY)\n"
-   "	{\n"
-   "		// Code to call when the control size changes\n"
-   "	}\n"
+   "  {\n"
+   "     // Code to call when the control size changes\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@see GuiControl\n\n"
 );
@@ -191,17 +191,17 @@ DefineEngineMethod( GuiMLTextCtrl, scrollToBottom, void, (),,
 }
 
 DefineEngineFunction(StripMLControlChars, const char*, (const char* inString),,
-					 "@brief Strip TorqueML control characters from the specified string, returning a 'clean' version.\n\n"
-					 "@param inString String to strip TorqueML control characters from.\n"
-					 "@tsexample\n"
-					 "// Define the string to strip TorqueML control characters from\n"
-					 "%string = \"<font:Arial:24>How Now <color:c43c12>Brown <color:000000>Cow\";\n\n"
-					 "// Request the stripped version of the string\n"
-					 "%strippedString = StripMLControlChars(%string);\n"
-					 "@endtsexample\n\n"
-					 "@return Version of the inputted string with all TorqueML characters removed.\n\n"
-					 "@see References\n\n"
-					 "@ingroup GuiCore")
+                "@brief Strip TorqueML control characters from the specified string, returning a 'clean' version.\n\n"
+                "@param inString String to strip TorqueML control characters from.\n"
+                "@tsexample\n"
+                "// Define the string to strip TorqueML control characters from\n"
+                "%string = \"<font:Arial:24>How Now <color:c43c12>Brown <color:000000>Cow\";\n\n"
+                "// Request the stripped version of the string\n"
+                "%strippedString = StripMLControlChars(%string);\n"
+                "@endtsexample\n\n"
+                "@return Version of the inputted string with all TorqueML characters removed.\n\n"
+                "@see References\n\n"
+                "@ingroup GuiCore")
 {
    return GuiMLTextCtrl::stripControlChars(inString);
 }
@@ -251,7 +251,7 @@ GuiMLTextCtrl::GuiMLTextCtrl()
   mIsEditCtrl( false ),
   mCursorPosition( false ),
   mMaxBufferSize( -1 ),
-  mInitialText( StringTable->insert("") ),
+  mInitialText( StringTable->EmptyString() ),
   mSelectionActive( false ),
   mSelectionStart( 0 ),
   mSelectionEnd( 0 ),
@@ -267,7 +267,7 @@ GuiMLTextCtrl::GuiMLTextCtrl()
   mFontList( NULL )
 {   
    mActive = true;
-   //mInitialText = StringTable->insert("");
+   //mInitialText = StringTable->EmptyString();
    Sim::findObject("InputDeniedSound", mDeniedSound);
 }
 
@@ -293,7 +293,7 @@ void GuiMLTextCtrl::initPersistFields()
       addField("deniedSound",       TypeSFXTrackName, Offset(mDeniedSound, GuiMLTextCtrl), "If the text will not fit in the control, the deniedSound is played.");
       addField("text",              TypeCaseString,  Offset( mInitialText, GuiMLTextCtrl ), "Text to display in this control.");
       addField("useURLMouseCursor", TypeBool,   Offset(mUseURLMouseCursor,   GuiMLTextCtrl), "If true, the mouse cursor will turn into a hand cursor while over a link in the text.\n"
-																							 "This is dependant on the markup language used by the GuiMLTextCtrl\n");
+                                                                      "This is dependant on the markup language used by the GuiMLTextCtrl\n");
    
    endGroup( "Text" );
    
@@ -649,9 +649,9 @@ void GuiMLTextCtrl::ensureCursorOnScreen()
    // If our parent isn't a scroll control, or we're not the only control
    //  in the content region, bail...
    GuiControl* pParent = getParent();
-	GuiScrollCtrl *sc = dynamic_cast<GuiScrollCtrl*>(pParent);
-	if(!sc)
-		return;
+   GuiScrollCtrl *sc = dynamic_cast<GuiScrollCtrl*>(pParent);
+   if(!sc)
+      return;
 
    // Ok.  Now we know that our parent is a scroll control.  Let's find the
    //  top of the cursor, and it's bottom.  We can then scroll the parent control
@@ -661,7 +661,7 @@ void GuiMLTextCtrl::ensureCursorOnScreen()
    ColorI color;
    getCursorPositionAndColor(cursorTopP, cursorBottomP, color);
 
-	sc->scrollRectVisible(RectI(cursorTopP.x, cursorTopP.y, 1, cursorBottomP.y - cursorTopP.y));
+   sc->scrollRectVisible(RectI(cursorTopP.x, cursorTopP.y, 1, cursorBottomP.y - cursorTopP.y));
 }
 
 //--------------------------------------
@@ -840,7 +840,7 @@ void GuiMLTextCtrl::onMouseUp(const GuiEvent& event)
 
       // Convert URL from UTF16 to UTF8.
       UTF8* url = mTextBuffer.createSubstring8(mHitURL->textStart, mHitURL->len);
-	  onURL_callback(url);
+     onURL_callback(url);
 
       delete[] url;
       mHitURL = NULL;
@@ -1018,7 +1018,7 @@ void GuiMLTextCtrl::scrollToTag( U32 id )
       Con::warnf( ConsoleLogEntry::General, "GuiMLTextCtrl::scrollToTag - tag id %d not found!", id );
       return;
    }
-	pappy->scrollRectVisible(RectI(0, tag->y, 1, 1));
+   pappy->scrollRectVisible(RectI(0, tag->y, 1, 1));
 }
 
 //--------------------------------------------------------------------------
@@ -1028,7 +1028,7 @@ void GuiMLTextCtrl::scrollToTop()
    GuiScrollCtrl *pappy = dynamic_cast<GuiScrollCtrl*>(getParent());
    if ( !pappy )
       return;
-	pappy->scrollRectVisible(RectI(0,0,0,0));
+   pappy->scrollRectVisible(RectI(0,0,0,0));
 }
 
 //--------------------------------------------------------------------------
@@ -2134,7 +2134,7 @@ textemit:
    emitNewLine(mScanPos);
    setHeight( mMaxY );
    onResize_callback( getWidth(), mMaxY );
-	
+   
    //make sure the cursor is still visible - this handles if we're a child of a scroll ctrl...
    ensureCursorOnScreen();
 }

@@ -6,17 +6,13 @@
 #include "gfx/gl/tGL/tWGL.h"
 #endif
 
+#include "gfx/gl/gfxGLUtils.h"
+
 namespace PlatformGL
 {
 
    void init()
    {
-       static bool inited = false;
-
-       if(inited)
-           return;
-
-       inited = true;
        const U32 majorOGL = 3;
        const U32 minorOGL = 2;
        U32 debugFlag = 0;
@@ -28,6 +24,9 @@ namespace PlatformGL
        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minorOGL);
        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
        SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, debugFlag);
+#ifdef TORQUE_GL_SOFTWARE
+       SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 0);
+#endif
 
        SDL_ClearError();
    }
@@ -68,15 +67,13 @@ namespace PlatformGL
            Con::printf( err );
            AssertFatal(0, err );
        }
-
-       #ifdef TORQUE_OS_WIN
-		    // JTH: Update the internals of epoxy on windows.
-		    epoxy_handle_external_wglMakeCurrent();
-       #endif
    }
 
    void setVSync(const int i)
    {
+      PRESERVE_FRAMEBUFFER();
+      // Nvidia needs to have the default framebuffer bound or the vsync calls fail
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
        if( i == 1 || i == -1 )
        {
            int ret = SDL_GL_SetSwapInterval(-1);
@@ -86,6 +83,7 @@ namespace PlatformGL
        }
        else
            SDL_GL_SetSwapInterval(0);
+
    }
 
 }

@@ -317,7 +317,7 @@ public:
 //------------------------------------------------------------------------------
 
 ColladaAppMesh::ColladaAppMesh(const domInstance_geometry* instance, ColladaAppNode* node)
-   : instanceGeom(instance), instanceCtrl(0), appNode(node), geomExt(0)
+   : appNode(node),instanceGeom(instance), instanceCtrl(0),  geomExt(0)
 {
    flags = 0;
    numFrames = 0;
@@ -325,7 +325,7 @@ ColladaAppMesh::ColladaAppMesh(const domInstance_geometry* instance, ColladaAppN
 }
 
 ColladaAppMesh::ColladaAppMesh(const domInstance_controller* instance, ColladaAppNode* node)
-   : instanceGeom(0), instanceCtrl(instance), appNode(node), geomExt(0)
+   : appNode(node),instanceGeom(0), instanceCtrl(instance),  geomExt(0)
 {
    flags = 0;
    numFrames = 0;

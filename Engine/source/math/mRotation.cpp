@@ -22,6 +22,7 @@
 #include "math/mRotation.h"
 #include "console/console.h"
 #include "console/engineAPI.h"
+#include "math/mathUtils.h"
 
 #ifdef TORQUE_TESTS_ENABLED
 #include "testing/unitTesting.h"
@@ -187,6 +188,15 @@ void RotationF::lookAt(const Point3F& _origin, const Point3F& _target, const Poi
    set(mat);
 }
 
+VectorF RotationF::getDirection()
+{
+   VectorF dir;
+   EulerF angles = asEulerF();
+   MathUtils::getVectorFromAngles(dir, angles.z, angles.x);
+
+   return dir;
+}
+
 //========================================================
 EulerF RotationF::asEulerF(UnitFormat _format) const
 {
@@ -300,7 +310,7 @@ TEST(Maths, RotationF_Calculations)
 };
 #endif
 
-DefineConsoleStaticMethod(Rotation, Add, RotationF, (RotationF a, RotationF b), ,
+DefineConsoleStaticMethod(rotation, Add, RotationF, (RotationF a, RotationF b), ,
    "Adds two rotations together.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -309,8 +319,8 @@ DefineConsoleStaticMethod(Rotation, Add, RotationF, (RotationF a, RotationF b), 
 {
    return a + b;
 }
-
-DefineConsoleStaticMethod(Rotation, Subtract, RotationF, (RotationF a, RotationF b), ,
+ 
+DefineConsoleStaticMethod(rotation, Subtract, RotationF, (RotationF a, RotationF b), ,
    "Subtracts two rotations.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -319,8 +329,8 @@ DefineConsoleStaticMethod(Rotation, Subtract, RotationF, (RotationF a, RotationF
 {
    return a - b;
 }
-
-DefineConsoleStaticMethod(Rotation, Interpolate, RotationF, (RotationF a, RotationF b, F32 factor), ,
+ 
+DefineConsoleStaticMethod(rotation, Interpolate, RotationF, (RotationF a, RotationF b, F32 factor), ,
    "Interpolates between two rotations.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -332,8 +342,8 @@ DefineConsoleStaticMethod(Rotation, Interpolate, RotationF, (RotationF a, Rotati
    result.interpolate(a, b, factor);
    return result;
 }
-
-DefineConsoleStaticMethod(Rotation, LookAt, RotationF, (Point3F origin, Point3F target, Point3F up),
+ 
+DefineConsoleStaticMethod(rotation, LookAt, RotationF, (Point3F origin, Point3F target, Point3F up),
    (Point3F(0, 0, 0), Point3F(0, 0, 0), Point3F(0, 0, 1)),
    "Provides a rotation orientation to look at a target from a given position.\n"
    "@param origin Position of the object doing the looking."
@@ -345,4 +355,13 @@ DefineConsoleStaticMethod(Rotation, LookAt, RotationF, (Point3F origin, Point3F 
    RotationF result;
    result.lookAt(origin, target, up);
    return result;
+}
+
+DefineConsoleStaticMethod(rotation, getDirection, Point3F, (RotationF rot),,
+"Takes the angles of the provided rotation and returns a direction vector.\n"
+"@param rot Our rotation."
+"@returns v Direction vector result."
+"@ingroup Math")
+{
+   return rot.getDirection();
 }

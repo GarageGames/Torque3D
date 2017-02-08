@@ -343,7 +343,7 @@ float4 main( ConnectData IN ) : TORQUE_TARGET0
    // Get some specular reflection.
    float3 newbump = bumpNorm;
    newbump.xy *= 3.5;
-   newbump = normalize( bumpNorm );
+   newbump = normalize( newbump );
    float3 halfAng = normalize( eyeVec + -lightVec );
    float specular = saturate( dot( newbump, halfAng ) );
    specular = pow( specular, SPEC_POWER );   

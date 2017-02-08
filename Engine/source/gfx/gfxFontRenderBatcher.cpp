@@ -50,6 +50,8 @@ FontRenderBatcher::FontRenderBatcher() : mStorage(8096)
       // result in the text always being black.  This may not be the case in OpenGL
       // so it may have to change.  -bramage
       f.samplers[0].textureColorOp = GFXTOPAdd;
+
+      f.setColorWrites(true, true, true, false); // NOTE: comment this out if alpha write is needed
       mFontSB = GFX->createStateBlock(f);
    }
 }

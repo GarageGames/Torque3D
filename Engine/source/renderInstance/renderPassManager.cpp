@@ -124,6 +124,7 @@ RenderPassManager::RenderBinEventSignal& RenderPassManager::getRenderBinSignal()
 
 void RenderPassManager::initPersistFields()
 {
+   Parent::initPersistFields();
 }
 
 RenderPassManager::RenderPassManager()

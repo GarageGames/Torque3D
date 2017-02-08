@@ -265,6 +265,9 @@ void ShaderGen::_processVertFeatures( Vector<GFXShaderMacro> &macros, bool macro
             continue;
 
          feature->setInstancingFormat( &mInstancingFormat );
+
+         feature->mVertexFormat = mVertexFormat;
+
          feature->processVert( mComponents, mFeatureData );
 
          String line;
@@ -465,12 +468,11 @@ GFXShader* ShaderGen::getShader( const MaterialFeatureData &featureData, const G
    // Don't get paranoid!  This has 1 in 18446744073709551616
    // chance for collision... it won't happen in this lifetime.
    //
-   U32 hash = Torque::hash( (const U8*)shaderDescription.c_str(), shaderDescription.length(), 0 );
+   U64 hash = Torque::hash64( (const U8*)shaderDescription.c_str(), shaderDescription.length(), 0 );
    hash = convertHostToLEndian(hash);
-   //U32 high = (U32)( hash >> 32 );
-   //U32 low = (U32)( hash & 0x00000000FFFFFFFF );
-   //String cacheKey = String::ToString( "%x%x", high, low );
-   String cacheKey = String::ToString("%x", hash);
+   U32 high = (U32)( hash >> 32 );
+   U32 low = (U32)( hash & 0x00000000FFFFFFFF );
+   String cacheKey = String::ToString( "%x%x", high, low );
    // return shader if exists
    GFXShader *match = mProcShaders[cacheKey];
    if ( match )

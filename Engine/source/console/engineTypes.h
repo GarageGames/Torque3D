@@ -284,58 +284,10 @@ template< typename T > const EngineTypeInfo* const _EngineFunctionTypeTraits< T 
 // are not guaranteed to be any meaningful value or base types to the engine type system.
 #define T( x ) typename EngineTypeTraits< x >::ValueType
 
-template< typename R >
-struct _EngineTypeTraits< R() > : public _EngineFunctionTypeTraits< T( R )() > {};
-template< typename R >
-struct _EngineTypeTraits< R( ... ) > : public _EngineFunctionTypeTraits< T( R )( ... ) > {};
-template< typename R, typename A >
-struct _EngineTypeTraits< R( A ) > : public _EngineFunctionTypeTraits< T( R )( T( A ) ) > {};
-template< typename R, typename A >
-struct _EngineTypeTraits< R( A, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), ... ) > {};
-template< typename R, typename A, typename B >
-struct _EngineTypeTraits< R( A, B ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ) ) > {};
-template< typename R, typename A, typename B >
-struct _EngineTypeTraits< R( A, B, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), ... ) > {};
-template< typename R, typename A, typename B, typename C >
-struct _EngineTypeTraits< R( A, B, C ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ) ) > {};
-template< typename R, typename A, typename B, typename C >
-struct _EngineTypeTraits< R( A, B, C, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), ... ) > {};
-template< typename R, typename A, typename B, typename C, typename D >
-struct _EngineTypeTraits< R( A, B, C, D ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ) ) > {};
-template< typename R, typename A, typename B, typename C, typename D >
-struct _EngineTypeTraits< R( A, B, C, D, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), ... ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E >
-struct _EngineTypeTraits< R( A, B, C, D, E ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ) ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E >
-struct _EngineTypeTraits< R( A, B, C, D, E, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), ... ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
-struct _EngineTypeTraits< R( A, B, C, D, E, F ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ) ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), ... ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ) ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), ... ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ) ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), ... ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ) ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), ... ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ) ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ), ... ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, K ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ), T( K ) ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, K, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ), T( K ), ... ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, K, L ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ), T( K ), T( L ) ) > {};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-struct _EngineTypeTraits< R( A, B, C, D, E, F, G, H, I, J, K, L, ... ) > : public _EngineFunctionTypeTraits< T( R )( T( A ), T( B ), T( C ), T( D ), T( E ), T( F ), T( G ), T( H ), T( I ), T( J ), T( K ), T( L ), ... ) > {};
+template<typename R, typename ...ArgTs>
+struct _EngineTypeTraits< R(ArgTs ...) > : public _EngineFunctionTypeTraits<T(R)(T(ArgTs)...)> {};
+template<typename R, typename ...ArgTs>
+struct _EngineTypeTraits< R(ArgTs ..., ...) > : public _EngineFunctionTypeTraits<T(R)(T(ArgTs)..., ...)> {};
 
 #undef T
 
@@ -613,7 +565,7 @@ namespace _Private {
 
 ///
 #define FIELD( fieldName, exportName, numElements, doc ) \
-   { #exportName, doc, numElements, TYPE( ( ( ThisType* ) 16 )->fieldName ), FIELDOFFSET( fieldName ) }, // Artificial offset to avoid compiler warnings.
+   { #exportName, doc, numElements, TYPE( ( ( ThisType* ) 16 )->fieldName ), (U32)FIELDOFFSET( fieldName ) }, // Artificial offset to avoid compiler warnings.
 
 ///
 #define FIELD_AS( type, fieldName, exportName, numElements, doc ) \

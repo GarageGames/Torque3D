@@ -150,9 +150,11 @@ bool GFXD3D11ConstBufferLayout::set(const ParamDesc& pd, const GFXShaderConstTyp
       (
       (pd.constType == GFXSCT_Float2x2 ||
       pd.constType == GFXSCT_Float3x3 ||
+      pd.constType == GFXSCT_Float4x3 ||
       pd.constType == GFXSCT_Float4x4) &&
       (constType == GFXSCT_Float2x2 ||
       constType == GFXSCT_Float3x3 ||
+      constType == GFXSCT_Float4x3 ||
       constType == GFXSCT_Float4x4)
       ), "Mismatched const type!");
 
@@ -161,6 +163,7 @@ bool GFXD3D11ConstBufferLayout::set(const ParamDesc& pd, const GFXShaderConstTyp
    {
    case GFXSCT_Float2x2:
    case GFXSCT_Float3x3:
+   case GFXSCT_Float4x3:
    case GFXSCT_Float4x4:
       return setMatrix(pd, constType, size, data, basePointer);
       break;
@@ -200,6 +203,39 @@ bool GFXD3D11ConstBufferLayout::setMatrix(const ParamDesc& pd, const GFXShaderCo
       }
 
       return false;
+   }
+   else if (pd.constType == GFXSCT_Float4x3)
+   {
+      const U32 csize = 48;
+
+      // Loop through and copy 
+      bool ret = false;
+      U8* currDestPointer = basePointer + pd.offset;
+      const U8* currSourcePointer = static_cast<const U8*>(data);
+      const U8* endData = currSourcePointer + size;
+      while (currSourcePointer < endData)
+      {
+#ifdef TORQUE_DOUBLE_CHECK_43MATS
+         Point4F col;
+         ((MatrixF*)currSourcePointer)->getRow(3, &col);
+         AssertFatal(col.x == 0.0f && col.y == 0.0f && col.z == 0.0f && col.w == 1.0f, "3rd row used");
+#endif
+
+         if (dMemcmp(currDestPointer, currSourcePointer, csize) != 0)
+         {
+            dMemcpy(currDestPointer, currSourcePointer, csize);
+            ret = true;
+         }
+         else if (pd.constType == GFXSCT_Float4x3)
+         {
+            ret = true;
+         }
+
+         currDestPointer += csize;
+         currSourcePointer += sizeof(MatrixF);
+      }
+
+      return ret;
    }
    else
    {
@@ -480,8 +516,15 @@ void GFXD3D11ShaderConstBuffer::set(GFXShaderConstHandle* handle, const MatrixF&
    AssertFatal(!h->isSampler(), "Handle is sampler constant!" );
    AssertFatal(h->mShader == mShader, "Mismatched shaders!"); 
 
-   MatrixF transposed;   
-   mat.transposeTo(transposed);
+   MatrixF transposed;
+   if (matrixType == GFXSCT_Float4x3)
+   {
+      transposed = mat;
+   }
+   else
+   {
+      mat.transposeTo(transposed);
+   }
 
    if (h->mInstancingConstant) 
    {
@@ -510,9 +553,17 @@ void GFXD3D11ShaderConstBuffer::set(GFXShaderConstHandle* handle, const MatrixF*
 
    static Vector<MatrixF> transposed;
    if (arraySize > transposed.size())
-      transposed.setSize(arraySize);   
-   for (U32 i = 0; i < arraySize; i++)
-      mat[i].transposeTo(transposed[i]);
+      transposed.setSize(arraySize);
+
+   if (matrixType == GFXSCT_Float4x3)
+   {
+      dMemcpy(transposed.address(), mat, arraySize * sizeof(MatrixF));
+   }
+   else
+   {
+      for (U32 i = 0; i < arraySize; i++)
+         mat[i].transposeTo(transposed[i]);
+   }
 
    // TODO: Maybe support this in the future?
    if (h->mInstancingConstant) 
@@ -609,7 +660,6 @@ void GFXD3D11ShaderConstBuffer::activate( GFXD3D11ShaderConstBuffer *prevShaderB
    ZeroMemory(&pConstData, sizeof(D3D11_MAPPED_SUBRESOURCE));
    
    const U8* buf;
-   HRESULT hr;
    U32 nbBuffers = 0;
    if(mVertexConstBuffer->isDirty())
    {
@@ -740,9 +790,8 @@ bool GFXD3D11Shader::_init()
       d3dMacros[i+smGlobalMacros.size()].Definition = mMacros[i].value.c_str();
    }
 
-   //TODO support D3D_FEATURE_LEVEL properly with shaders instead of hard coding at hlsl 5
    d3dMacros[macroCount - 2].Name = "TORQUE_SM";
-   d3dMacros[macroCount - 2].Definition = "50";
+   d3dMacros[macroCount - 2].Definition = D3D11->getShaderModel().c_str();
 
    memset(&d3dMacros[macroCount - 1], 0, sizeof(D3D_SHADER_MACRO));
 
@@ -760,18 +809,21 @@ bool GFXD3D11Shader::_init()
    mSamplerDescriptions.clear();
    mShaderConsts.clear();
 
+   String vertTarget = D3D11->getVertexShaderTarget();
+   String pixTarget = D3D11->getPixelShaderTarget();
+
    if ( !Con::getBoolVariable( "$shaders::forceLoadCSF", false ) )
    {
-      if (!mVertexFile.isEmpty() && !_compileShader( mVertexFile, "vs_5_0", d3dMacros, mVertexConstBufferLayout, mSamplerDescriptions ) )
+      if (!mVertexFile.isEmpty() && !_compileShader( mVertexFile, vertTarget, d3dMacros, mVertexConstBufferLayout, mSamplerDescriptions ) )
          return false;
 
-      if (!mPixelFile.isEmpty() && !_compileShader( mPixelFile, "ps_5_0", d3dMacros, mPixelConstBufferLayout, mSamplerDescriptions ) )
+      if (!mPixelFile.isEmpty() && !_compileShader( mPixelFile, pixTarget, d3dMacros, mPixelConstBufferLayout, mSamplerDescriptions ) )
          return false;
 
    } 
    else 
    {
-      if ( !_loadCompiledOutput( mVertexFile, "vs_5_0", mVertexConstBufferLayout, mSamplerDescriptions ) )
+      if ( !_loadCompiledOutput( mVertexFile, vertTarget, mVertexConstBufferLayout, mSamplerDescriptions ) )
       {
          if ( smLogErrors )
             Con::errorf( "GFXD3D11Shader::init - Unable to load precompiled vertex shader for '%s'.",  mVertexFile.getFullPath().c_str() );
@@ -779,7 +831,7 @@ bool GFXD3D11Shader::_init()
          return false;
       }
 
-      if ( !_loadCompiledOutput( mPixelFile, "ps_5_0", mPixelConstBufferLayout, mSamplerDescriptions ) )
+      if ( !_loadCompiledOutput( mPixelFile, pixTarget, mPixelConstBufferLayout, mSamplerDescriptions ) )
       {
          if ( smLogErrors )
             Con::errorf( "GFXD3D11Shader::init - Unable to load precompiled pixel shader for '%s'.",  mPixelFile.getFullPath().c_str() );
@@ -1002,20 +1054,20 @@ bool GFXD3D11Shader::_compileShader( const Torque::Path &filePath,
 
    return result;
 }
-void GFXD3D11Shader::_getShaderConstants( ID3D11ShaderReflection *table, 
+void GFXD3D11Shader::_getShaderConstants( ID3D11ShaderReflection *pTable, 
                                          GenericConstBufferLayout *bufferLayoutIn,
                                          Vector<GFXShaderConstDesc> &samplerDescriptions )
 {
    PROFILE_SCOPE( GFXD3D11Shader_GetShaderConstants );
 
-   AssertFatal(table, "NULL constant table not allowed, is this an assembly shader?");
+   AssertFatal(pTable, "NULL constant table not allowed, is this an assembly shader?");
 
    GFXD3D11ConstBufferLayout *bufferLayout = (GFXD3D11ConstBufferLayout*)bufferLayoutIn;
    Vector<ConstSubBufferDesc> &subBuffers = bufferLayout->getSubBufferDesc();
    subBuffers.clear();
 
    D3D11_SHADER_DESC tableDesc;
-   HRESULT hr = table->GetDesc(&tableDesc);
+   HRESULT hr = pTable->GetDesc(&tableDesc);
    if (FAILED(hr))
    {
 	   AssertFatal(false, "Shader Reflection table unable to be created");
@@ -1025,7 +1077,7 @@ void GFXD3D11Shader::_getShaderConstants( ID3D11ShaderReflection *table,
    U32 bufferOffset = 0;
    for (U32 i = 0; i < tableDesc.ConstantBuffers; i++)
    {
-	   ID3D11ShaderReflectionConstantBuffer* constantBuffer = table->GetConstantBufferByIndex(i);
+	   ID3D11ShaderReflectionConstantBuffer* constantBuffer = pTable->GetConstantBufferByIndex(i);
 	   D3D11_SHADER_BUFFER_DESC constantBufferDesc;
 
       if (constantBuffer->GetDesc(&constantBufferDesc) == S_OK)
@@ -1110,7 +1162,7 @@ void GFXD3D11Shader::_getShaderConstants( ID3D11ShaderReflection *table,
    {
       GFXShaderConstDesc desc;
       D3D11_SHADER_INPUT_BIND_DESC bindDesc;
-      table->GetResourceBindingDesc(i, &bindDesc);
+      pTable->GetResourceBindingDesc(i, &bindDesc);
 
       switch (bindDesc.Type)
       {
@@ -1191,19 +1243,13 @@ bool GFXD3D11Shader::_convertShaderVariable(const D3D11_SHADER_TYPE_DESC &typeDe
       case D3D_SVC_MATRIX_ROWS:
       case D3D_SVC_MATRIX_COLUMNS:
       {
-         switch (typeDesc.Columns)
+         switch (typeDesc.Rows)
          {
          case 3:
-            if (typeDesc.Rows == 3)
-            {
-               desc.constType = GFXSCT_Float3x3;
-            }
+            desc.constType = typeDesc.Columns == 4 ? GFXSCT_Float3x4 : GFXSCT_Float3x3;
             break;
          case 4:
-            if (typeDesc.Rows == 4)
-            {
-               desc.constType = GFXSCT_Float4x4;
-            }
+            desc.constType = typeDesc.Columns == 3 ? GFXSCT_Float4x3 : GFXSCT_Float4x4;
             break;
          }
       }
@@ -1512,6 +1558,9 @@ U32 GFXD3D11Shader::getAlignmentValue(const GFXShaderConstType constType) const
          return mRowSizeF * 2;
          break;
       case GFXSCT_Float3x3 : 
+         return mRowSizeF * 3;
+         break;
+      case GFXSCT_Float4x3:
          return mRowSizeF * 3;
          break;
       case GFXSCT_Float4x4 :

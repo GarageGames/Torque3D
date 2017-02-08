@@ -41,7 +41,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
    color.b = TORQUE_TEX1D( colorCorrectionTex, color.b ).b;
 
    // Apply gamma correction
-    color.rgb = pow( abs(color.rgb), OneOverGamma );
+    color.rgb = pow( saturate(color.rgb), OneOverGamma );
 
    // Apply contrast
    color.rgb = ((color.rgb - 0.5f) * Contrast) + 0.5f;

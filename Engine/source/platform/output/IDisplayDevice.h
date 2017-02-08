@@ -34,15 +34,30 @@ class GuiCanvas;
 /// Defines the basic display pose common to most display devices
 typedef struct DisplayPose
 {
-   EulerF orientation;  /// Direction device is facing
+   QuatF orientation;  /// Direction device is facing
    Point3F position;    /// Relative position of device in view space
+
+   Point3F velocity;
+   Point3F angularVelocity;
+
+#ifdef DEBUG_DISPLAY_POSE 
+   MatrixF actualMatrix;
+   MatrixF originalMatrix;
+#endif
+
+   U32 state; /// Generic state
+
+   bool valid; /// Pose set
+   bool connected; /// Device connected
 } IDevicePose;
 
 class IDisplayDevice
 {
 public:
    virtual bool providesFrameEyePose() const = 0;
-   virtual void getFrameEyePose(IDevicePose *pose, U32 eye) const = 0;
+
+	/// Get a display pose for the specified eye, or the HMD if eyeId is -1.
+   virtual void getFrameEyePose(IDevicePose *pose, S32 eyeId) const = 0;
 
    virtual bool providesEyeOffsets() const = 0;
    /// Returns eye offset not taking into account any position tracking info
@@ -51,18 +66,19 @@ public:
    virtual bool providesFovPorts() const = 0;
    virtual void getFovPorts(FovPort *out) const = 0;
 
-   virtual bool providesProjectionOffset() const = 0;
-   virtual const Point2F& getProjectionOffset() const = 0;
-
    virtual void getStereoViewports(RectI *out) const = 0;
    virtual void getStereoTargets(GFXTextureTarget **out) const = 0;
 
    virtual void setDrawCanvas(GuiCanvas *canvas) = 0;
+   virtual void setDrawMode(GFXDevice::GFXDeviceRenderStyles style) = 0;
 
    virtual void setCurrentConnection(GameConnection *connection) = 0;
    virtual GameConnection* getCurrentConnection() = 0;
 
    virtual void onStartFrame() = 0;
+
+   /// Returns a texture handle representing a preview of the composited VR view
+   virtual GFXTexHandle getPreviewTexture() = 0;
 };
 
 #endif   // _IDISPLAYDEVICE_H_

@@ -494,8 +494,6 @@ void GuiDecalEditorCtrl::renderScene(const RectI & updateRect)
    PROFILE_SCOPE( GuiDecalEditorCtrl_renderScene );
 
    GFXTransformSaver saver;
-
-   RectI bounds = getBounds();
    
    ColorI hlColor(0,255,0,255);
    ColorI regColor(255,0,0,255);

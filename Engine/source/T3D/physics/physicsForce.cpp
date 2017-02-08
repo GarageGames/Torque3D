@@ -41,9 +41,10 @@ ConsoleDocClass( PhysicsForce,
 
 
 PhysicsForce::PhysicsForce()
-   :  mWorld( NULL ),
-      mBody( NULL ),
-      mPhysicsTick( false )
+   :
+      mWorld( NULL ),
+      mPhysicsTick( false ),
+      mBody( NULL )
 {
 }
 

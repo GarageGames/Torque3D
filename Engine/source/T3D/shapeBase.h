@@ -491,8 +491,8 @@ struct ShapeBaseImageData: public GameBaseData {
 
    /// @name Callbacks
    /// @{
-   DECLARE_CALLBACK( void, onMount, ( ShapeBase* obj, S32 slot, F32 dt ) );
-   DECLARE_CALLBACK( void, onUnmount, ( ShapeBase* obj, S32 slot, F32 dt ) );
+   DECLARE_CALLBACK( void, onMount, ( SceneObject* obj, S32 slot, F32 dt ) );
+   DECLARE_CALLBACK( void, onUnmount, ( SceneObject* obj, S32 slot, F32 dt ) );
    /// @}
 };
 
@@ -1587,9 +1587,6 @@ public:
    /// Gets the view transform for a particular eye, taking into account the current absolute 
    /// orient and position values of the display device.
    virtual void getEyeCameraTransform( IDisplayDevice *display, U32 eyeId, MatrixF *outMat );
-
-   /// Calculates a delta camera angle and view position based on inPose
-   virtual DisplayPose calcCameraDeltaPose(GameConnection *con, const DisplayPose& inPose);
 
    /// Gets the index of a node inside a mounted image given the name
    /// @param   imageSlot   Image slot

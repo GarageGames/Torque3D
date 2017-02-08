@@ -57,7 +57,7 @@ RibbonData::RibbonData()
    mUseFadeOut = false;
    mFadeAwayStep = 0.032f;
    segmentsPerUpdate = 1;
-   mMatName = StringTable->insert("");
+   mMatName = StringTable->EmptyString();
    mTileScale = 1.0f;
    mFixedTexcoords = false;
    mSegmentSkipAmount = 0;
@@ -318,7 +318,7 @@ void Ribbon::processTick(const Move* move)
          safeDeleteObject();
          return;
          //}
-         //mSegmentPoints.pop_back();	
+         //mSegmentPoints.pop_back();  
       }
 
 
@@ -354,7 +354,7 @@ void Ribbon::addSegmentPoint(Point3F &point, MatrixF &mat) {
    U32 segmentsToDelete = checkRibbonDistance(mDataBlock->segmentsPerUpdate);
 
    for (U32 i = 0; i < segmentsToDelete; i++) {
-      U32 last = mSegmentPoints.size() - 1;
+      S32 last = mSegmentPoints.size() - 1;
       if (last < 0)
          break;
       mTravelledDistance += last ? (mSegmentPoints[last] - mSegmentPoints[last-1]).len() : 0;
@@ -456,7 +456,7 @@ void Ribbon::setShaderParams() {
    F32 length = (F32)mDataBlock->mRibbonLength;
    Point3F radius(numSegments / length, numSegments, length);
    MaterialParameters* matParams = mRibbonMat->getMaterialParameters();
-   matParams->setSafe( mRadiusSC, radius );	
+   matParams->setSafe( mRadiusSC, radius );  
 }
 
 //--------------------------------------------------------------------------

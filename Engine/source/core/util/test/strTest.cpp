@@ -41,7 +41,7 @@ protected:
 
       StrTest() : mData( 0 ), mUTF16( 0 ), mLength( 0 ) {}
       StrTest( const char* str )
-         : mData( str ), mLength( str ? dStrlen( str ) : 0 ), mUTF16( NULL )
+         : mData( str ), mUTF16( NULL ), mLength( str ? dStrlen( str ) : 0 )
       {
          if( str )
             mUTF16 = createUTF16string( mData );

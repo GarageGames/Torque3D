@@ -101,8 +101,8 @@ bool OggDecoder::_nextPacket()
 //-----------------------------------------------------------------------------
 
 OggInputStream::OggInputStream( Stream* stream )
-   : mStream( stream ),
-     mIsAtEnd( false )
+   : mIsAtEnd( false ),
+     mStream( stream )
 {
    ogg_sync_init( &mOggSyncState );
    

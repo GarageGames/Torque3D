@@ -33,7 +33,7 @@ function initRenderManager()
    {
       enabled = "false";
       
-      format = "GFXFormatR16G16B16A16F";
+      format = getBestHDRFormat();
       depthFormat = "GFXFormatD24S8";
       aaLevel = 0; // -1 = match backbuffer
       
@@ -59,7 +59,7 @@ function initRenderManager()
    DiffuseRenderPassManager.addManager( new RenderMeshMgr(MeshBin)         { bintype = "Mesh"; renderOrder = 0.5; processAddOrder = 0.5; basicOnly = true; } );
    DiffuseRenderPassManager.addManager( new RenderImposterMgr(ImposterBin) { renderOrder = 0.56; processAddOrder = 0.56; } );
    DiffuseRenderPassManager.addManager( new RenderObjectMgr(ObjectBin)     { bintype = "Object"; renderOrder = 0.6; processAddOrder = 0.6; } );
-     
+
    DiffuseRenderPassManager.addManager( new RenderObjectMgr(ShadowBin)     { bintype = "Shadow"; renderOrder = 0.7; processAddOrder = 0.7; } );
    DiffuseRenderPassManager.addManager( new RenderMeshMgr(DecalRoadBin)    { bintype = "DecalRoad"; renderOrder = 0.8; processAddOrder = 0.8; } );
    DiffuseRenderPassManager.addManager( new RenderMeshMgr(DecalBin)        { bintype = "Decal"; renderOrder = 0.81; processAddOrder = 0.81; } );

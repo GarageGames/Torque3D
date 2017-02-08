@@ -138,13 +138,13 @@ mat3x3 quatToMat( vec4 quat )
 ///
 vec2 parallaxOffset( sampler2D texMap, vec2 texCoord, vec3 negViewTS, float depthScale )
 {
-   float depth = texture( texMap, texCoord ).a;
-   vec2 offset = negViewTS.xy * vec2( depth * depthScale );
+   float depth = texture( texMap, texCoord ).a/(PARALLAX_REFINE_STEPS*2);
+   vec2 offset = negViewTS.xy * vec2( depth * depthScale )/vec2(PARALLAX_REFINE_STEPS*2);
 
    for ( int i=0; i < PARALLAX_REFINE_STEPS; i++ )
    {
-      depth = ( depth + texture( texMap, texCoord + offset ).a ) * 0.5;
-      offset = negViewTS.xy * vec2( depth * depthScale );
+      depth = ( depth + texture( texMap, texCoord + offset ).a )/(PARALLAX_REFINE_STEPS*2);
+      offset = negViewTS.xy * vec2( depth * depthScale )/vec2(PARALLAX_REFINE_STEPS*2);
    }
 
    return offset;
@@ -153,13 +153,13 @@ vec2 parallaxOffset( sampler2D texMap, vec2 texCoord, vec3 negViewTS, float dept
 /// Same as parallaxOffset but for dxtnm where depth is stored in the red channel instead of the alpha
 vec2 parallaxOffsetDxtnm(sampler2D texMap, vec2 texCoord, vec3 negViewTS, float depthScale)
 {
-   float depth = texture(texMap, texCoord).r;
-   vec2 offset = negViewTS.xy * vec2(depth * depthScale);
+   float depth = texture(texMap, texCoord).r/(PARALLAX_REFINE_STEPS*2);
+   vec2 offset = negViewTS.xy * vec2(depth * depthScale)/vec2(PARALLAX_REFINE_STEPS*2);
 
    for (int i = 0; i < PARALLAX_REFINE_STEPS; i++)
    {
-      depth = (depth + texture(texMap, texCoord + offset).r) * 0.5;
-      offset = negViewTS.xy * vec2(depth * depthScale);
+      depth = (depth + texture(texMap, texCoord + offset).r)/(PARALLAX_REFINE_STEPS*2);
+      offset = negViewTS.xy * vec2(depth * depthScale)/vec2(PARALLAX_REFINE_STEPS*2);
    }
 
    return offset;
@@ -304,6 +304,15 @@ vec4 toGamma(vec4 tex)
 {
    return tex;
 }
+vec3 toLinear(vec3 tex)
+{
+   return tex;
+}
+// Encodes gamma.
+vec3 toGamma(vec3 tex)
+{
+   return tex;
+}
 #else
 // Sample in linear space. Decodes gamma.
 vec4 toLinear(vec4 tex)
@@ -314,6 +323,16 @@ vec4 toLinear(vec4 tex)
 vec4 toGamma(vec4 tex)
 {
    return vec4(pow(abs(tex.rgb), vec3(1.0/2.2)), tex.a);
+}
+// Sample in linear space. Decodes gamma.
+vec3 toLinear(vec3 tex)
+{
+   return pow(abs(tex), vec3(2.2));
+}
+// Encodes gamma.
+vec3 toGamma(vec3 tex)
+{
+   return pow(abs(tex), vec3(1.0/2.2));
 }
 #endif //
 

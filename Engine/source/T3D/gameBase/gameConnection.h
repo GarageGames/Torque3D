@@ -55,8 +55,6 @@ class MoveList;
 struct Move;
 struct AuthInfo;
 
-#define GameString TORQUE_APP_NAME
-
 const F32 MinCameraFov              = 1.f;      ///< min camera FOV
 const F32 MaxCameraFov              = 179.f;    ///< max camera FOV
 
@@ -268,6 +266,10 @@ public:
    
    bool getControlCameraTransform(F32 dt,MatrixF* mat);
    bool getControlCameraVelocity(Point3F *vel);
+
+   /// Returns the head transform for the control object, using supplemental information
+   /// from the provided IDisplayDevice
+   bool getControlCameraHeadTransform(IDisplayDevice *display, MatrixF *transform);
 
    /// Returns the eye transforms for the control object, using supplemental information 
    /// from the provided IDisplayDevice.

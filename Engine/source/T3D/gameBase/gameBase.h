@@ -110,8 +110,8 @@ public:
    DECLARE_CALLBACK( void, onAdd, ( GameBase* obj ) );
    DECLARE_CALLBACK( void, onRemove, ( GameBase* obj ) );
    DECLARE_CALLBACK( void, onNewDataBlock, ( GameBase* obj ) );
-   DECLARE_CALLBACK( void, onMount, ( GameBase* obj, SceneObject* mountObj, S32 node ) );
-   DECLARE_CALLBACK( void, onUnmount, ( GameBase* obj, SceneObject* mountObj, S32 node ) );
+   DECLARE_CALLBACK( void, onMount, ( SceneObject* obj, SceneObject* mountObj, S32 node ) );
+   DECLARE_CALLBACK( void, onUnmount, ( SceneObject* obj, SceneObject* mountObj, S32 node ) );
    /// @}
 };
 

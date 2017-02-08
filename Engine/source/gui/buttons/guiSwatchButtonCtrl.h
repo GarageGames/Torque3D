@@ -40,7 +40,7 @@ class GuiSwatchButtonCtrl : public GuiButtonBaseCtrl
       
       /// The color to display on the button.
       ColorF mSwatchColor;
-      
+      bool mUseSRGB;          ///< use sRGB color scale
       /// Bitmap used for mGrid
       String mGridBitmap;
 

@@ -246,6 +246,8 @@ public:
    Point3F getVelocity() const { return mState.linVelocity; }
    void applyImpulse( const Point3F &pos, const VectorF &vec );
    void applyRadialImpulse( const Point3F &origin, F32 radius, F32 magnitude );
+   void applyTorque( const Point3F &torque );
+   void applyForce( const Point3F &force );
    void setScale(const VectorF & scale);
 
    // GameBase

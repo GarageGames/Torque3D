@@ -255,14 +255,6 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    HDC hdcGL = GetDC( hwnd );
    AssertFatal( hdcGL != NULL, "Failed to create device context" );
 
-   // Create pixel format descriptor...
-   PIXELFORMATDESCRIPTOR pfd;
-   CreatePixelFormat( &pfd, 32, 0, 0, false ); // 32 bit color... We do not need depth or stencil, OpenGL renders into a FBO and then copy the image to window
-   if( !SetPixelFormat( hdcGL, ChoosePixelFormat( hdcGL, &pfd ), &pfd ) )
-   {
-      AssertFatal( false, "GFXGLDevice::init - cannot get the one and only pixel format we check for." );
-   }
-
    int OGL_MAJOR = 3;
    int OGL_MINOR = 2;
    
@@ -277,7 +269,7 @@ void GFXGLDevice::init( const GFXVideoMode &mode, PlatformWindow *window )
    if (!wglMakeCurrent(hdcGL, tempGLRC))
       AssertFatal(false, "Couldn't make temp GL context.");
 
-   if( gglHasWExtension(hdcGL, ARB_create_context) )
+   if( gglHasWExtension( ARB_create_context) )
    {
       int const create_attribs[] = {
                WGL_CONTEXT_MAJOR_VERSION_ARB, OGL_MAJOR,
@@ -330,13 +322,21 @@ U32 GFXGLDevice::getTotalVideoMemory()
 
 //------------------------------------------------------------------------------
 
-GFXWindowTarget *GFXGLDevice::allocWindowTarget( PlatformWindow *window )
+GFXWindowTarget *GFXGLDevice::allocWindowTarget(PlatformWindow *window)
 {
-   AssertFatal(!mContext, "");
-   
-   init(window->getVideoMode(), window);
    GFXGLWindowTarget *ggwt = new GFXGLWindowTarget(window, this);
    ggwt->registerResourceWithDevice(this);
+   ggwt->createPixelFormat();
+
+   //first window
+   if (!mContext)
+   {
+      init(window->getVideoMode(), window);
+      ggwt->mSecondaryWindow = false;
+   }
+   else
+      ggwt->mSecondaryWindow = true;
+
    ggwt->mContext = mContext;
    AssertFatal(ggwt->mContext, "GFXGLDevice::allocWindowTarget - failed to allocate window target!");
 
@@ -362,4 +362,34 @@ void GFXGLWindowTarget::_teardownCurrentMode()
 
 void GFXGLWindowTarget::_setupNewMode()
 {
+}
+
+void GFXGLWindowTarget::createPixelFormat()
+{
+   HWND hwnd = GETHWND(mWindow);
+   // Create a device context
+   HDC hdcGL = GetDC(hwnd);
+   AssertFatal(hdcGL != NULL, "GFXGLWindowTarget::createPixelFormat() - Failed to create device context");
+
+   // Create pixel format descriptor...
+   PIXELFORMATDESCRIPTOR pfd;
+   CreatePixelFormat(&pfd, 32, 0, 0, false); // 32 bit color... We do not need depth or stencil, OpenGL renders into a FBO and then copy the image to window
+   if (!SetPixelFormat(hdcGL, ChoosePixelFormat(hdcGL, &pfd), &pfd))
+   {
+      AssertFatal(false, "GFXGLWindowTarget::createPixelFormat() - cannot get the one and only pixel format we check for.");
+   }
+}
+
+void GFXGLWindowTarget::_makeContextCurrent()
+{
+   HWND hwnd = GETHWND(getWindow());
+   HDC hdc = GetDC(hwnd);
+
+   if (!wglMakeCurrent(hdc, (HGLRC)mContext))
+   {
+      //HRESULT if needed for debug
+      //HRESULT hr = HRESULT_FROM_WIN32(GetLastError());
+      AssertFatal(false, "GFXGLWindowTarget::_makeContextCurrent() - cannot make our context current.");
+   }
+
 }

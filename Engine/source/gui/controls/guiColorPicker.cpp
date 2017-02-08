@@ -73,6 +73,7 @@ GuiColorPickerCtrl::GuiColorPickerCtrl()
    mSelectColor = false;
    mSetColor = mSetColor.BLACK;
    mBitmap = NULL;
+   mUseSRGB = false;
 }
 
 GuiColorPickerCtrl::~GuiColorPickerCtrl()
@@ -104,6 +105,7 @@ void GuiColorPickerCtrl::initPersistFields()
    addGroup("ColorPicker");
       addField("baseColor", TypeColorF, Offset(mBaseColor, GuiColorPickerCtrl));
       addField("pickColor", TypeColorF, Offset(mPickColor, GuiColorPickerCtrl));
+      addField("useSRGB", TypeBool, Offset(mUseSRGB, GuiColorPickerCtrl), "Render using sRGB scale");
       addField("selectorGap", TypeS32,  Offset(mSelectorGap, GuiColorPickerCtrl)); 
       addField("displayMode", TYPEID< PickMode >(), Offset(mDisplayMode, GuiColorPickerCtrl) );
       addField("actionOnMove", TypeBool,Offset(mActionOnMove, GuiColorPickerCtrl));
@@ -120,24 +122,35 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
 
    S32 l = bounds.point.x, r = bounds.point.x + bounds.extent.x;
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y;
-   
+
+   ColorF col[4];
+   col[0] = c1;
+   col[1] = c2;
+   col[2] = c3;
+   col[3] = c4;
+   if (!mUseSRGB)
+   {
+      for (U32 i = 0; i < 4; i++)
+         col[i] = col[i].toGamma();
+   }
+
    //A couple of checks to determine if color blend
    //A couple of checks to determine if color blend
-   if(c1 == colorWhite && c3 == colorAlpha && c4 == colorBlack)
+   if (c1 == colorWhite && c3 == colorAlpha && c4 == colorBlack)
    {
       //Color
       PrimBuild::begin(GFXTriangleStrip, 4);
 
-      PrimBuild::color( c2 );
+      PrimBuild::color(col[1]);
       PrimBuild::vertex2i(l, t);
 
-      PrimBuild::color( c2 );
+      PrimBuild::color(col[1]);
       PrimBuild::vertex2i(r, t);
 
-      PrimBuild::color( c2 );
-      PrimBuild::vertex2i( l, b );
+      PrimBuild::color(col[1]);
+      PrimBuild::vertex2i(l, b);
 
-      PrimBuild::color( c2 );
+      PrimBuild::color(col[1]);
       PrimBuild::vertex2i(r, b);
 
       PrimBuild::end();
@@ -145,14 +158,14 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
       //White
       PrimBuild::begin(GFXTriangleStrip, 4);
 
-      PrimBuild::color(c1);
+      PrimBuild::color(col[0]);
       PrimBuild::vertex2i(l, t);
 
-      PrimBuild::color( colorAlphaW );
+      PrimBuild::color(colorAlphaW);
       PrimBuild::vertex2i(r, t);
 
-      PrimBuild::color( c1 );
-      PrimBuild::vertex2i( l, b );
+      PrimBuild::color(col[0]);
+      PrimBuild::vertex2i(l, b);
 
       PrimBuild::color(colorAlphaW);
       PrimBuild::vertex2i(r, b);
@@ -162,15 +175,15 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
       //Black 
       PrimBuild::begin(GFXTriangleStrip, 4);
 
-      PrimBuild::color(c3);
+      PrimBuild::color(col[2]);
       PrimBuild::vertex2i(l, t);
-      PrimBuild::color( c3 );
-      PrimBuild::vertex2i( r, t );
+      PrimBuild::color(col[2]);
+      PrimBuild::vertex2i(r, t);
 
-      PrimBuild::color( c4 );
+      PrimBuild::color(col[3]);
       PrimBuild::vertex2i(l, b);
 
-      PrimBuild::color( c4 );
+      PrimBuild::color(col[3]);
       PrimBuild::vertex2i(r, b);
 
       PrimBuild::end();
@@ -179,17 +192,17 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
    {
       PrimBuild::begin(GFXTriangleStrip, 4);
 
-      PrimBuild::color( c1 );
-      PrimBuild::vertex2i( l, t );
+      PrimBuild::color(col[0]);
+      PrimBuild::vertex2i(l, t);
 
-      PrimBuild::color( c2 );
-      PrimBuild::vertex2i( r, t );
+      PrimBuild::color(col[1]);
+      PrimBuild::vertex2i(r, t);
 
-      PrimBuild::color(c4);
+      PrimBuild::color(col[3]);
       PrimBuild::vertex2i(l, b);
 	  
-      PrimBuild::color( c3 );
-      PrimBuild::vertex2i( r, b );
+      PrimBuild::color(col[2]);
+      PrimBuild::vertex2i(r, b);
 
       PrimBuild::end();
    }
@@ -199,6 +212,7 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
 /// Function to draw a set of boxes blending throughout an array of colors
 void GuiColorPickerCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, U8 numColors, ColorI *colors)
 {
+
    GFX->setStateBlock(mStateBlock);
 
    S32 l = bounds.point.x, r = bounds.point.x + bounds.extent.x + 4;
@@ -208,6 +222,20 @@ void GuiColorPickerCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, U8 numC
    S32 x_inc = int(mFloor((r - l) / F32(numColors - 1)));
    S32 y_inc = int(mFloor((b - t) / F32(numColors - 1)));
 
+   ColorI *col = new ColorI[numColors];
+   dMemcpy(col, colors, numColors * sizeof(ColorI));
+   if (mUseSRGB)
+   {
+      for (U16 i = 0; i < numColors - 1; i++)
+         col[i] = colors[i];
+   }
+   else
+   {
+      for (U16 i = 0; i < numColors - 1; i++)
+         col[i] = colors[i].toGamma();
+   }
+
+
    for (U16 i = 0; i < numColors - 1; i++)
    {
       // This is not efficent, but then again it doesn't really need to be. -pw
@@ -216,30 +244,30 @@ void GuiColorPickerCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, U8 numC
       if (!vertical)  // Horizontal (+x)
       {
          // First color
-         PrimBuild::color(colors[i]);
+         PrimBuild::color(col[i]);
          PrimBuild::vertex2i(l, t);
-         PrimBuild::color(colors[i + 1]);
+         PrimBuild::color(col[i + 1]);
          PrimBuild::vertex2i(l + x_inc, t);
 
          // Second color
-         PrimBuild::color(colors[i]);
+         PrimBuild::color(col[i]);
          PrimBuild::vertex2i(l, b);
-         PrimBuild::color(colors[i + 1]);
+         PrimBuild::color(col[i + 1]);
          PrimBuild::vertex2i(l + x_inc, b);
          l += x_inc;
       }
       else  // Vertical (+y)
       {
          // First color
-         PrimBuild::color(colors[i]);
+         PrimBuild::color(col[i]);
          PrimBuild::vertex2i(l, t);
-         PrimBuild::color(colors[i + 1]);
+         PrimBuild::color(col[i + 1]);
          PrimBuild::vertex2i(l, t + y_inc);
 
          // Second color
-         PrimBuild::color(colors[i]);
+         PrimBuild::color(col[i]);
          PrimBuild::vertex2i(r, t);
-         PrimBuild::color(colors[i + 1]);
+         PrimBuild::color(col[i + 1]);
          PrimBuild::vertex2i(r, t + y_inc);
          t += y_inc;
       }

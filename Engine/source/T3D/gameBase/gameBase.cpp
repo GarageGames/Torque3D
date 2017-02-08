@@ -97,14 +97,14 @@ IMPLEMENT_CALLBACK( GameBaseData, onRemove, void, ( GameBase* obj ), ( obj ),
    "@param obj the GameBase object\n\n"
    "@see onAdd for an example\n" );
 
-IMPLEMENT_CALLBACK( GameBaseData, onMount, void, ( GameBase* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
+IMPLEMENT_CALLBACK( GameBaseData, onMount, void, ( SceneObject* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
    "@brief Called when the object is mounted to another object in the scene.\n\n"
    "@param obj the GameBase object being mounted\n"
    "@param mountObj the object we are mounted to\n"
    "@param node the mountObj node we are mounted to\n\n"
    "@see onAdd for an example\n" );
 
-IMPLEMENT_CALLBACK( GameBaseData, onUnmount, void, ( GameBase* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
+IMPLEMENT_CALLBACK( GameBaseData, onUnmount, void, ( SceneObject* obj, SceneObject* mountObj, S32 node ), ( obj, mountObj, node ),
    "@brief Called when the object is unmounted from another object in the scene.\n\n"
    "@param obj the GameBase object being unmounted\n"
    "@param mountObj the object we are unmounted from\n"

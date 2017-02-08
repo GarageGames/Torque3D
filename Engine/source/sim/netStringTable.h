@@ -44,7 +44,8 @@ class NetStringTable
    friend class RemoteCommandEvent;
 #endif
 
-   enum Constants {
+   enum Constants : U32
+   {
       InitialSize = 16,
       InvalidEntry = 0xFFFFFFFF,
       HashTableSize = 2128,

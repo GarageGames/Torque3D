@@ -97,7 +97,8 @@ public:
       {
          eCommandType      type;       // Command type
          StringTableEntry  name;       // Command name
-         String            argv[10];   // Command arguments
+         static const U32 MAX_ARGS = 10;
+         String            argv[MAX_ARGS];   // Command arguments
          S32               argc;       // Number of arguments
          Command() : type(CmdInvalid), name(0), argc(0) { }
          Command( const char* _name )
@@ -105,68 +106,12 @@ public:
          {
             name = StringTable->insert( _name );
          }
-
-         // Helper functions to fill in the command arguments
-         inline void addArgs() { }
-
-         template< typename A >
-            inline void addArgs( A a )
-         {
-            argv[argc++] = EngineMarshallData( a );
-         }
-         template< typename A, typename B > void addArgs( A a, B b )
-         {
-            addArgs( a );
-            addArgs( b );
-         } 
-         template< typename A, typename B, typename C >
-            inline void addArgs( A a, B b, C c )
-         {
-            addArgs( a );
-            addArgs( b, c );
-         }
-         template< typename A, typename B, typename C, typename D >
-            inline void addArgs( A a, B b, C c, D d )
-         {
-            addArgs( a );
-            addArgs( b, c, d );
-         }
-         template< typename A, typename B, typename C, typename D, typename E >
-            inline void addArgs( A a, B b, C c, D d, E e )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F >
-            inline void addArgs( A a, B b, C c, D d, E e, F f )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-            inline void addArgs( A a, B b, C c, D d, E e, F f, G g )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f, g );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-            inline void addArgs( A a, B b, C c, D d, E e, F f, G g, H h )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f, g, h );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-            inline void addArgs( A a, B b, C c, D d, E e, F f, G g, H h, I i )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f, g, h, i );
-         }
-         template< typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-            inline void addArgs( A a, B b, C c, D d, E e, F f, G g, H h, I i, J j )
-         {
-            addArgs( a );
-            addArgs( b, c, d, e, f, g, h, i, j );
-         }
+        
+        // Helper functions to fill in the command arguments
+        template<typename ...ArgTs> inline void addArgs(ArgTs ...args){
+           using Helper = engineAPI::detail::MarshallHelpers<String>;
+           Helper::marshallEach(argc, argv, args...);
+        }
       };
 
       Vector<Command>   mCommands;
@@ -246,6 +191,7 @@ public:
 
    TSShape*                mShape;        // Edited shape; NULL while not loaded; not a Resource<TSShape> as we don't want it to prevent from unloading.
    ColladaUtils::ImportOptions   mOptions;
+   bool mLoadingShape;
 
 public:
 
@@ -261,6 +207,7 @@ public:
    bool onAdd();
 
    void onScriptChanged(const Torque::Path& path);
+   void onActionPerformed();
 
    bool writeField(StringTableEntry fieldname, const char *value);
    void writeChangeSet();
@@ -383,8 +330,16 @@ typedef domUpAxisType TSShapeConstructorUpAxis;
 typedef ColladaUtils::ImportOptions::eLodType TSShapeConstructorLodType;
 
 DefineEnumType( TSShapeConstructorUpAxis );
-DefineEnumType( TSShapeConstructorLodType );
+DefineEnumType(TSShapeConstructorLodType);
 
+class TSShapeConstructorMethodActionCallback
+{
+   TSShapeConstructor* mObject;
+
+public:
+   TSShapeConstructorMethodActionCallback(TSShapeConstructor *object) : mObject(object) { ; }
+   ~TSShapeConstructorMethodActionCallback() { mObject->onActionPerformed(); }
+};
 
 /* This macro simplifies the definition of a TSShapeConstructor API method. It
    wraps the actual EngineMethod definition and automatically calls the real
@@ -403,6 +358,7 @@ DefineEnumType( TSShapeConstructorLodType );
          Con::errorf( "TSShapeConstructor::" #name " - shape not loaded" );                     \
          return defRet;                                                                         \
       }                                                                                         \
+      TSShapeConstructorMethodActionCallback actionCallback(object);                            \
       return object->name rawArgs ;                                                             \
    }                                                                                            \
    /* Define the real TSShapeConstructor method */                                              \

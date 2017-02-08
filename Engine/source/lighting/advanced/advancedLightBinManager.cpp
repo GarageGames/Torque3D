@@ -453,30 +453,7 @@ void AdvancedLightBinManager::_setupPerFrameParameters( const SceneRenderState *
 
    // Perform a camera offset.  We need to manually perform this offset on the sun (or vector) light's
    // polygon, which is at the far plane.
-   const Point2F& projOffset = frustum.getProjectionOffset();
    Point3F cameraOffsetPos = cameraPos;
-   if(!projOffset.isZero())
-   {
-      // First we need to calculate the offset at the near plane.  The projOffset
-      // given above can be thought of a percent as it ranges from 0..1 (or 0..-1).
-      F32 nearOffset = frustum.getNearRight() * projOffset.x;
-
-      // Now given the near plane distance from the camera we can solve the right
-      // triangle and calcuate the SIN theta for the offset at the near plane.
-      // SIN theta = x/y
-      F32 sinTheta = nearOffset / frustum.getNearDist();
-
-      // Finally, we can calcuate the offset at the far plane, which is where our sun (or vector)
-      // light's polygon is drawn.
-      F32 farOffset = frustum.getFarDist() * sinTheta;
-
-      // We can now apply this far plane offset to the far plane itself, which then compensates
-      // for the project offset.
-      MatrixF camTrans = frustum.getTransform();
-      VectorF offset = camTrans.getRightVector();
-      offset *= farOffset;
-      cameraOffsetPos += offset;
-   }
 
    // Now build the quad for drawing full-screen vector light
    // passes.... this is a volatile VB and updates every frame.
@@ -681,7 +658,7 @@ void AdvancedLightBinManager::LightMaterialInfo::setLightParameters( const Light
    F32 lumiance = mDot(*((const Point3F *)&lightInfo->getColor()), colorToLumiance );
    col.alpha *= lumiance;
 
-   matParams->setSafe( lightColor, col );
+   matParams->setSafe( lightColor, col.toLinear() );
    matParams->setSafe( lightBrightness, lightInfo->getBrightness() );
 
    switch( lightInfo->getType() )
@@ -697,7 +674,7 @@ void AdvancedLightBinManager::LightMaterialInfo::setLightParameters( const Light
          // the vector light. This prevents a divide by zero.
          ColorF ambientColor = renderState->getAmbientLightColor();
          ambientColor.alpha = 0.00001f;
-         matParams->setSafe( lightAmbient, ambientColor );
+         matParams->setSafe( lightAmbient, ambientColor.toLinear() );
 
          // If no alt color is specified, set it to the average of
          // the ambient and main color to avoid artifacts.
@@ -711,7 +688,7 @@ void AdvancedLightBinManager::LightMaterialInfo::setLightParameters( const Light
             lightAlt = (lightInfo->getColor() + renderState->getAmbientLightColor()) / 2.0f;
 
          ColorF trilightColor = lightAlt;
-         matParams->setSafe(lightTrilight, trilightColor);
+         matParams->setSafe(lightTrilight, trilightColor.toLinear());
       }
       break;
 

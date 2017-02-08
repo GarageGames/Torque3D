@@ -23,6 +23,9 @@
 #include "platform/platform.h"
 #include "T3D/physics/physicsWorld.h"
 
+//Physics timing
+F32 PhysicsWorld::smPhysicsStepTime = 1.0f / 60.f; //default 60fps
+U32 PhysicsWorld::smPhysicsMaxSubSteps = 4;
 
 PhysicsWorld::PhysicsWorld()
    : mGravity( 0, 0, -20.0f ) // NOTE: This matches the gravity used for player objects.

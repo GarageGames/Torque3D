@@ -21,7 +21,6 @@
 
 class dtProximityGrid
 {
-	int m_maxItems;
 	float m_cellSize;
 	float m_invCellSize;
 	
@@ -44,7 +43,7 @@ public:
 	dtProximityGrid();
 	~dtProximityGrid();
 	
-	bool init(const int maxItems, const float cellSize);
+	bool init(const int poolSize, const float cellSize);
 	
 	void clear();
 	
@@ -59,7 +58,12 @@ public:
 	int getItemCountAt(const int x, const int y) const;
 	
 	inline const int* getBounds() const { return m_bounds; }
-	inline const float getCellSize() const { return m_cellSize; }
+	inline float getCellSize() const { return m_cellSize; }
+
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	dtProximityGrid(const dtProximityGrid&);
+	dtProximityGrid& operator=(const dtProximityGrid&);
 };
 
 dtProximityGrid* dtAllocProximityGrid();

@@ -33,16 +33,20 @@ namespace GL
 {
    void gglPerformBinds()
    {
-      // JTH: epoxy has one oddity with windows. You need to bind the context
-      // after creating the context to udpate the internals of epoxy.
-#ifdef TORQUE_OS_WIN
-      epoxy_handle_external_wglMakeCurrent();
-#endif
+      if (!gladLoadGL()) 
+      {
+	     AssertFatal(false, "Unable to load GLAD. Make sure your OpenGL drivers are up to date!");
+      }
    }
 
    void gglPerformExtensionBinds(void *context)
    {
-	
+   #ifdef  TORQUE_OS_WIN 
+      if (!gladLoadWGL(wglGetCurrentDC()))
+      {
+         AssertFatal(false, "Unable to load GLAD WGL extensions. Make sure your OpenGL drivers are up to date!");
+      }
+   #endif
    }
 }
 

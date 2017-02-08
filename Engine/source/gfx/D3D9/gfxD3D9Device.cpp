@@ -166,6 +166,7 @@ inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSCo
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/modColorTextureV.hlsl");
       shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/modColorTextureP.hlsl");
+      shaderData->setSamplerName("$diffuseMap", 0);
       shaderData->setField("pixVersion", "3.0");
       shaderData->registerObject();
       mGenericShader[GSModColorTexture] = shaderData->getShader();
@@ -176,6 +177,7 @@ inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSCo
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/addColorTextureV.hlsl");
       shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/addColorTextureP.hlsl");
+      shaderData->setSamplerName("$diffuseMap", 0);
       shaderData->setField("pixVersion", "3.0");
       shaderData->registerObject();
       mGenericShader[GSAddColorTexture] = shaderData->getShader();
@@ -186,6 +188,7 @@ inline void GFXD3D9Device::setupGenericShaders( GenericShaderType type /* = GSCo
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", "shaders/common/fixedFunction/textureV.hlsl");
       shaderData->setField("DXPixelShaderFile", "shaders/common/fixedFunction/textureP.hlsl");
+      shaderData->setSamplerName("$diffuseMap", 0);
       shaderData->setField("pixVersion", "3.0");
       shaderData->registerObject();
       mGenericShader[GSTexture] = shaderData->getShader();
@@ -626,6 +629,8 @@ void GFXD3D9Device::setVertexStream( U32 stream, GFXVertexBuffer *buffer )
          mVolatileVB = NULL;
    }
 
+   U32 offset = d3dBuffer && stream != 0 ? d3dBuffer->mVolatileStart * d3dBuffer->mVertexSize : 0;
+
    // NOTE: We do not use the stream offset here for stream 0
    // as that feature is *supposedly* not as well supported as 
    // using the start index in drawPrimitive.
@@ -635,7 +640,7 @@ void GFXD3D9Device::setVertexStream( U32 stream, GFXVertexBuffer *buffer )
    
    D3D9Assert( mD3DDevice->SetStreamSource(  stream, 
                                              d3dBuffer ? d3dBuffer->vb : NULL,
-                                             d3dBuffer && stream != 0 ? d3dBuffer->mVolatileStart * d3dBuffer->mVertexSize : 0, 
+                                             offset, 
                                              d3dBuffer ? d3dBuffer->mVertexSize : 0 ),
                                              "GFXD3D9Device::setVertexStream - Failed to set stream source." );
 }
@@ -926,10 +931,12 @@ GFXVertexDecl* GFXD3D9Device::allocVertexDecl( const GFXVertexFormat *vertexForm
    U32 elemCount = vertexFormat->getElementCount();
    U32 offsets[4] = { 0 };
    U32 stream;
+   S32 i = 0;
+   S32 elemIdx = 0;
    D3DVERTEXELEMENT9 *vd = new D3DVERTEXELEMENT9[ elemCount + 1 ];
-   for ( U32 i=0; i < elemCount; i++ )
+   for ( i=0; elemIdx < elemCount; i++, elemIdx++ )
    {
-      const GFXVertexElement &element = vertexFormat->getElement( i );
+      const GFXVertexElement &element = vertexFormat->getElement( elemIdx );
       
       stream = element.getStreamIndex();
 
@@ -952,6 +959,18 @@ GFXVertexDecl* GFXD3D9Device::allocVertexDecl( const GFXVertexFormat *vertexForm
          vd[i].Usage = D3DDECLUSAGE_TANGENT;
       else if ( element.isSemantic( GFXSemantic::BINORMAL ) )
          vd[i].Usage = D3DDECLUSAGE_BINORMAL;
+      else if ( element.isSemantic( GFXSemantic::BLENDINDICES ) )
+      {
+         vd[i].Usage = D3DDECLUSAGE_BLENDINDICES;
+         vd[i].UsageIndex = element.getSemanticIndex();
+      }
+      else if ( element.isSemantic( GFXSemantic::BLENDWEIGHT ) )
+      {
+         vd[i].Usage = D3DDECLUSAGE_BLENDWEIGHT;
+         vd[i].UsageIndex = element.getSemanticIndex();
+      }
+      else if ( element.isSemantic( GFXSemantic::PADDING ) )
+         i--;
       else
       {
          // Anything that falls thru to here will be a texture coord.
@@ -963,7 +982,7 @@ GFXVertexDecl* GFXD3D9Device::allocVertexDecl( const GFXVertexFormat *vertexForm
    }
 
    D3DVERTEXELEMENT9 declEnd = D3DDECL_END();
-   vd[elemCount] = declEnd;
+   vd[i] = declEnd;
 
    decl = new D3D9VertexDecl();
    D3D9Assert( mD3DDevice->CreateVertexDeclaration( vd, &decl->decl ), 

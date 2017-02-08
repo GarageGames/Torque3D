@@ -51,40 +51,58 @@ namespace
    {
       U32 ret = 0;
 
-      if(mod & KMOD_LSHIFT)
-         ret |= IM_LSHIFT;
+      if (mod & KMOD_LSHIFT)
+      {
+         ret |= SI_LSHIFT;
+         ret |= SI_SHIFT;
+      }
 
-      if(mod & KMOD_RSHIFT)
-         ret |= IM_RSHIFT;
+      if (mod & KMOD_RSHIFT)
+      {
+         ret |= SI_RSHIFT;
+         ret |= SI_SHIFT;
+      }
 
-      if(mod & KMOD_LCTRL)
-         ret |= IM_LCTRL;
+      if (mod & KMOD_LCTRL)
+      {
+         ret |= SI_LCTRL;
+         ret |= SI_CTRL;
+      }
 
-      if(mod & KMOD_RCTRL)
-         ret |= IM_RCTRL;
+      if (mod & KMOD_RCTRL)
+      {
+         ret |= SI_RCTRL;
+         ret |= SI_CTRL;
+      }
 
-      if(mod & KMOD_LALT)
-         ret |= IM_LALT;
+      if (mod & KMOD_LALT)
+      {
+         ret |= SI_LALT;
+         ret |= SI_ALT;
+      }
 
-      if(mod & KMOD_RALT)
-         ret |= IM_RALT;
+      if (mod & KMOD_RALT)
+      {
+         ret |= SI_RALT;
+         ret |= SI_ALT;
+      }
 
       return ret;
    }
 }
 
 PlatformWindowSDL::PlatformWindowSDL():
-mShouldLockMouse(false),
-mMouseLocked(false),
 mOwningManager(NULL),
 mNextWindow(NULL),
 mWindowHandle(NULL),
 mOldParent(NULL),
-mTarget(NULL),
 mDevice(NULL),
+mTarget(NULL),
+mPosition(0,0),
+mMouseLocked(false),
+mShouldLockMouse(false),
 mSuppressReset(false),
-mMenuHandle(NULL),
-mPosition(0,0)
+mMenuHandle(NULL)
 {
 	mCursorController = new PlatformCursorControllerSDL( this );
 
@@ -342,7 +360,7 @@ bool PlatformWindowSDL::isFocused()
    if( flags & SDL_WINDOW_INPUT_FOCUS || flags & SDL_WINDOW_INPUT_GRABBED || flags & SDL_WINDOW_MOUSE_FOCUS )
       return true;
 
-	return true;
+   return false;
 }
 
 bool PlatformWindowSDL::isMinimized()
@@ -426,16 +444,19 @@ void PlatformWindowSDL::defaultRender()
 
 void PlatformWindowSDL::_triggerMouseLocationNotify(const SDL_Event& evt)
 {
+   U32 mods = getTorqueModFromSDL(SDL_GetModState());
+
    if(!mMouseLocked)
-      mouseEvent.trigger(getWindowId(), 0, evt.motion.x, evt.motion.y, false);
+      mouseEvent.trigger(getWindowId(), mods, evt.motion.x, evt.motion.y, false);
    else
-      mouseEvent.trigger(getWindowId(), 0, evt.motion.xrel, evt.motion.yrel, true);
+      mouseEvent.trigger(getWindowId(), mods, evt.motion.xrel, evt.motion.yrel, true);
 }
 
 void PlatformWindowSDL::_triggerMouseWheelNotify(const SDL_Event& evt)
 {
+   U32 mods = getTorqueModFromSDL(SDL_GetModState());
    S32 wheelDelta = Con::getIntVariable("$pref::Input::MouseWheelSpeed", 120);
-   wheelEvent.trigger(getWindowId(), 0, evt.wheel.x * wheelDelta, evt.wheel.y * wheelDelta);
+   wheelEvent.trigger(getWindowId(), mods, evt.wheel.x * wheelDelta, evt.wheel.y * wheelDelta);
 }
 
 void PlatformWindowSDL::_triggerMouseButtonNotify(const SDL_Event& event)
@@ -483,6 +504,19 @@ void PlatformWindowSDL::_triggerKeyNotify(const SDL_Event& evt)
    {
       keyEvent.trigger(getWindowId(), torqueModifiers, inputAction, torqueKey);
       //Con::printf("Key %d : %d", tKey.sym, inputAction);
+
+      if (inputAction == IA_MAKE && SDL_IsTextInputActive())
+      {
+         // We have to check if we already have a first responder active.
+         // We don't want to type the character if it actually creates another responder!
+         if (mWindowInputGenerator->lastKeyWasGlobalActionMap())
+         {
+            // Turn off Text input, and the next frame turn it back on. This tells SDL
+            // to not generate a text event for this global action map key.
+            SDL_StopTextInput();
+            mOwningManager->updateSDLTextInputState(PlatformWindowManagerSDL::KeyboardInputState::TEXT_INPUT);
+         }
+      }
    }
 }
 
@@ -604,8 +638,10 @@ const UTF16 *PlatformWindowSDL::getCurtainWindowClassName()
 void PlatformWindowSDL::setKeyboardTranslation(const bool enabled)
 {
    mEnableKeyboardTranslation = enabled;
-   if (mEnableKeyboardTranslation)
-      SDL_StartTextInput();
+
+   // Flag for update. Let SDL know what kind of input state we are changing to.
+   if (enabled)
+      mOwningManager->updateSDLTextInputState(PlatformWindowManagerSDL::KeyboardInputState::TEXT_INPUT);
    else
-      SDL_StopTextInput();
+      mOwningManager->updateSDLTextInputState(PlatformWindowManagerSDL::KeyboardInputState::RAW_INPUT);
 }

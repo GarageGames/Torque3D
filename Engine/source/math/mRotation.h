@@ -132,6 +132,7 @@ public:
    //
    void interpolate(const RotationF& _pt1, const RotationF& _pt2, F32 _factor);
    void lookAt(const Point3F& _origin, const Point3F& _target, const Point3F& _up = Point3F(0, 0, 1));
+   VectorF getDirection();
 
    F32 len() const;
 

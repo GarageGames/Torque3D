@@ -63,8 +63,6 @@ static F32 sWorkingQueryBoxSizeMultiplier = 2.0f;  // How much larger should the
                                                    // will be updated due to motion, but any non-static shape
                                                    // that moves into the query box will not be noticed.
 
-const U32 sMoveRetryCount = 3;
-
 // Client prediction
 const S32 sMaxWarpTicks = 3;           // Max warp duration in ticks
 const S32 sMaxPredictionTicks = 30;    // Number of ticks to predict

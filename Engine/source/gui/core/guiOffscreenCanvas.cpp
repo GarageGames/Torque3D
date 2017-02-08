@@ -18,6 +18,7 @@ GuiOffscreenCanvas::GuiOffscreenCanvas()
    mTargetName = "offscreenCanvas";
    mTargetDirty = true;
    mDynamicTarget = false;
+   mUseDepth = false;
 }
 
 GuiOffscreenCanvas::~GuiOffscreenCanvas()
@@ -30,6 +31,7 @@ void GuiOffscreenCanvas::initPersistFields()
    addField( "targetFormat", TypeGFXFormat, Offset( mTargetFormat, GuiOffscreenCanvas ), "");
    addField( "targetName", TypeRealString, Offset( mTargetName, GuiOffscreenCanvas ), "");
    addField( "dynamicTarget", TypeBool, Offset( mDynamicTarget, GuiOffscreenCanvas ), "");
+   addField( "useDepth", TypeBool, Offset( mUseDepth, GuiOffscreenCanvas ), "");
 
    Parent::initPersistFields();
 }
@@ -70,6 +72,7 @@ void GuiOffscreenCanvas::onRemove()
 
    mTarget = NULL;
    mTargetTexture = NULL;
+   mTargetDepth = NULL;
 
    Parent::onRemove();
 }
@@ -89,6 +92,13 @@ void GuiOffscreenCanvas::_setupTargets()
       mTargetTexture.set( mTargetSize.x, mTargetSize.y, mTargetFormat, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ), 1, 0 );
    }
 
+   // Update depth if needed
+   if (mUseDepth && (!mTargetDepth.isValid() || mTargetSize != mTargetDepth.getWidthHeight()))
+   {
+      mTargetDepth.set( mTargetSize.x, mTargetSize.y, GFXFormatD24S8, &GFXDefaultZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ), 1, 0 );
+      mTarget->attachTexture( GFXTextureTarget::RenderSlot(GFXTextureTarget::DepthStencil), mTargetDepth );
+   }
+
    mTarget->attachTexture( GFXTextureTarget::RenderSlot(GFXTextureTarget::Color0), mTargetTexture );
    mNamedTarget.setTexture(0, mTargetTexture);
 }
@@ -97,6 +107,7 @@ void GuiOffscreenCanvas::_teardownTargets()
 {
    mNamedTarget.release();
    mTargetTexture = NULL;
+   mTargetDepth = NULL;
    mTargetDirty = true;
 }
 
@@ -176,7 +187,7 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
    GFX->setWorldMatrix( MatrixF::Identity );
    GFX->setViewMatrix( MatrixF::Identity );
    GFX->setProjectionMatrix( MatrixF::Identity );
-
+   
    RectI contentRect(Point2I(0,0), mTargetSize);
    {
       // Render active GUI Dialogs
@@ -193,7 +204,7 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
 
       // Fill Blue if no Dialogs
       if(this->size() == 0)
-         GFX->clear( GFXClearTarget, ColorF(0,0,1,1), 1.0f, 0 );
+         GFX->clear( GFXClearTarget, ColorF(0,0,0,1), 1.0f, 0 );
 
       GFX->setClipRect( contentRect );
 
@@ -210,7 +221,7 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
 
       GFX->getDrawUtil()->clearBitmapModulation();
    }
-   
+
    mTarget->resolve();
    GFX->popActiveRenderTarget();
 
@@ -219,6 +230,13 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
    // Keep track of the last time we rendered.
    mLastRenderMs = Platform::getRealMilliseconds();
    mTargetDirty = mDynamicTarget;
+
+   onFrameRendered();
+}
+
+void GuiOffscreenCanvas::onFrameRendered()
+{
+
 }
 
 Point2I GuiOffscreenCanvas::getWindowSize()

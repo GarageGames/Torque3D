@@ -1413,7 +1413,6 @@ ConsoleValueRef Namespace::Entry::execute(S32 argc, ConsoleValueRef *argv, ExprE
       return ConsoleValueRef();
    }
 
-   static char returnBuffer[32];
    switch(mType)
    {
       case StringCallbackType:

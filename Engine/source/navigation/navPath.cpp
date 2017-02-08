@@ -170,7 +170,7 @@ const char *NavPath::getProtectedFrom(void *obj, const char *data)
    if(object->mFromSet)
       return data;
    else
-      return StringTable->insert("");
+      return StringTable->EmptyString();
 }
 
 const char *NavPath::getProtectedTo(void *obj, const char *data)
@@ -180,7 +180,7 @@ const char *NavPath::getProtectedTo(void *obj, const char *data)
    if(object->mToSet)
       return data;
    else
-      return StringTable->insert("");
+      return StringTable->EmptyString();
 }
 
 IRangeValidator ValidIterations(1, S32_MAX);

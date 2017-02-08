@@ -1862,7 +1862,7 @@ $PE_guielement_ext_colorpicker = "18 18";
                            canSave = "1";
                            Visible = "1";
                            hovertime = "1000";
-                           bitmap = "tools/materialeditor/gui/unknownImage";
+                           bitmap = "tools/materialEditor/gui/unknownImage";
                            wrap = "0";
                         };
                         new GuiTextCtrl() {
@@ -2343,6 +2343,52 @@ $PE_guielement_ext_colorpicker = "18 18";
                            Extent = $PE_guielement_ext_value;
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateParticle( \"dragCoefficient\", $ThisControl.getText());";
                         };
+                     }; //End Particle Drag
+                     new GuiControl(){ // Particle Wind
+                        class = "AggregateControl";
+                        isContainer = "1";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        Position = $PE_guielement_pos_single_container ;
+                        Extent = $PE_guielement_ext_single_container ;
+                        
+                        new GuiTextCtrl() {
+                           Profile = "ToolsGuiTextProfile";
+                           HorizSizing = "width";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_name;
+                           Extent = $PE_guielement_ext_name;
+                           text = "Wind Coeff";
+                        };
+                        new GuiSliderCtrl(PEP_windCoefficient) {
+                           internalName = "PEP_windCoefficient_slider";
+                           canSaveDynamicFields = "0";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "ToolsGuiSliderProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_slider;
+                           Extent = $PE_guielement_ext_slider;
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           Command = "PE_ParticleEditor.updateParticle( \"windCoefficient\", $ThisControl.getValue(), true, true );";
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateParticle( \"windCoefficient\", $ThisControl.getValue(), true, false );";
+                           hovertime = "1000";
+                           range = "0 1";
+                           ticks = "0";
+                           value = "0.298143";
+                        };
+                        new GuiTextEditCtrl() {
+                           internalName = "PEP_windCoefficient_textEdit";
+                           Profile = "ToolsGuiTextEditProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_value;
+                           Extent = $PE_guielement_ext_value;
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateParticle( \"windCoefficient\", $ThisControl.getText());";
+                        };
                      };
                   }; // end stack
                }; // end "motion" rollout
@@ -2548,6 +2594,151 @@ $PE_guielement_ext_colorpicker = "18 18";
                      };
                   }; // end stack
                }; // end "Spin" rollout
+               new GuiRolloutCtrl() {
+                  class = "BehaviorQuickEditRollout";
+                  superclass = LBQuickEditRollout;
+                  Profile = "GuiRolloutProfile";
+                  HorizSizing = "width";
+                  VertSizing = "bottom";
+                  Position = "0 0";
+                  Extent = "197 0";
+                  Caption = "Animation";
+                  Margin = "4 4 4 0";
+                  DragSizable = false;
+                  container = true;
+                  parentRollout = %this.rollout;
+                  object = %behavior;
+                  
+                  new GuiStackControl() {
+                     StackingType = "Vertical";
+                     HorizStacking = "Left to Right";
+                     VertStacking = "Top to Bottom";
+                     Padding = "0";
+                     canSaveDynamicFields = "0";
+                     Enabled = "1";
+                     isContainer = "1";
+                     Profile = "ToolsGuiDefaultProfile";
+                     HorizSizing = "width";
+                     VertSizing = "bottom";
+                     Position = "1 3";
+                     Extent = "197 16";
+                     MinExtent = "16 16";
+                     canSave = "1";
+                     isDecoy = "0";
+                     Visible = "1";
+                     tooltipprofile = "ToolsGuiToolTipProfile";
+                     hovertime = "1000";
+                     
+                     new GuiCheckBoxCtrl() {
+                        internalName = "PEP_animateTexture";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        position = "55 14";
+                        Extent = "84 18";
+                        MinExtent = "8 2";
+                        text = "Animate Texture";
+                        command = "PE_ParticleEditor.updateParticle( \"animateTexture\", $ThisControl.getValue());";
+                     };
+                     new GuiControl(){ // Particle framesPerSec
+                        class = "AggregateControl";
+                        isContainer = "1";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        Position = $PE_guielement_pos_single_container ;
+                        Extent = $PE_guielement_ext_single_container ;
+                        
+                        new GuiTextCtrl() {
+                           Profile = "ToolsGuiTextProfile";
+                           HorizSizing = "width";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_name;
+                           Extent = $PE_guielement_ext_name;
+                           text = "framesPerSec";
+                        };
+                        new GuiSliderCtrl(PEP_framesPerSec) {
+                           internalName = "PEP_framesPerSec_slider";
+                           canSaveDynamicFields = "0";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "ToolsGuiSliderProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_slider;
+                           Extent = $PE_guielement_ext_slider;
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           hovertime = "1000";
+                           range = "0 60";
+                           ticks = "0";
+                           value = "0";
+                           Command = "PE_ParticleEditor.updateParticle( \"framesPerSec\", $ThisControl.getValue(), true, true );";
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateParticle( \"framesPerSec\", $ThisControl.getValue(), true, false );";
+                        };
+                        new GuiTextEditCtrl() {
+                           internalName = "PEP_framesPerSec_textEdit";
+                           Profile = "ToolsGuiTextEditProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_value;
+                           Extent = $PE_guielement_ext_value;
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateParticle( \"framesPerSec\", $ThisControl.getText());";
+                        };
+                     }; // end framesPerSec
+                     new GuiControl(){ // Particle animTexFramesList
+                        class = "AggregateControl";
+                        isContainer = "1";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        Position = $PE_guielement_pos_single_container;
+                        Extent = $PE_guielement_ext_single_container;
+                        
+                        new GuiTextCtrl() {
+                           Profile = "ToolsGuiTextProfile";
+                           HorizSizing = "width";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_name;
+                           Extent = $PE_guielement_ext_name;
+                           text = "animTexFrames";
+                        };
+                        new GuiTextEditCtrl() {
+                           internalName = "PEP_animTexFramesList_textEdit";
+                           Profile = "ToolsGuiTextEditProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_textedit;
+                           Extent = $PE_guielement_ext_textedit;
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateParticle( \"animTexFrames\", $ThisControl.getText());";
+                        };
+				    }; // end animTexFramesList
+                     new GuiControl(){ // Particle animTileCount
+                        class = "AggregateControl";
+                        isContainer = "1";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        Position = $PE_guielement_pos_single_container;
+                        Extent = $PE_guielement_ext_single_container;
+						
+                        new GuiTextCtrl() {
+                           Profile = "ToolsGuiTextProfile";
+                           HorizSizing = "width";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_name;
+                           Extent = $PE_guielement_ext_name;
+                           text = "TileCount (X Y)";
+                        };
+                        new GuiTextEditCtrl() {
+                           internalName = "PEP_animTileCount_textEdit";
+                           Profile = "ToolsGuiTextEditProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_value;
+                           Extent = $PE_guielement_ext_value;
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_ParticleEditor.updateParticle( \"animTexTiling\", $ThisControl.getText());";
+                        };
+				    }; // end animTileCount
+                  }; // end stack
+               }; // end "Anim" rollout
                new GuiRolloutCtrl() {
                   class = "BehaviorQuickEditRollout";
                   superclass = LBQuickEditRollout;

@@ -348,13 +348,13 @@ bool GameProcessCameraQuery(CameraQuery *query)
       query->farPlane = gClientSceneGraph->getVisibleDistance() * CameraAndFOV::sVisDistanceScale;
 
       // Provide some default values
-      query->projectionOffset = Point2F::Zero;
       query->stereoTargets[0] = 0;
       query->stereoTargets[1] = 0;
       query->eyeOffset[0] = Point3F::Zero;
       query->eyeOffset[1] = Point3F::Zero;
       query->hasFovPort = false;
       query->hasStereoTargets = false;
+      query->displayDevice = NULL;
       
       F32 cameraFov = 0.0f;
       bool fovSet = false;
@@ -364,6 +364,9 @@ bool GameProcessCameraQuery(CameraQuery *query)
       if(!gEditingMission && connection->hasDisplayDevice())
       {
          IDisplayDevice* display = connection->getDisplayDevice();
+
+         query->displayDevice = display;
+
          // Note: all eye values are invalid until this is called
          display->setDrawCanvas(query->drawCanvas);
 
@@ -371,12 +374,6 @@ bool GameProcessCameraQuery(CameraQuery *query)
 
          // Display may activate AFTER so we need to call this again just in case
          display->onStartFrame();
-
-         // The connection's display device may want to set the projection offset
-         if(display->providesProjectionOffset())
-         {
-            query->projectionOffset = display->getProjectionOffset();
-         }
 
          // The connection's display device may want to set the eye offset
          if(display->providesEyeOffsets())
@@ -394,6 +391,7 @@ bool GameProcessCameraQuery(CameraQuery *query)
          
          // Grab the latest overriding render view transforms
          connection->getControlCameraEyeTransforms(display, query->eyeTransforms);
+         connection->getControlCameraHeadTransform(display, &query->headMatrix);
 
          display->getStereoViewports(query->stereoViewports);
          display->getStereoTargets(query->stereoTargets);
@@ -403,6 +401,7 @@ bool GameProcessCameraQuery(CameraQuery *query)
       {
          query->eyeTransforms[0] = query->cameraMatrix;
          query->eyeTransforms[1] = query->cameraMatrix;
+         query->headMatrix = query->cameraMatrix;
       }
 
       // Use the connection's FOV settings if requried

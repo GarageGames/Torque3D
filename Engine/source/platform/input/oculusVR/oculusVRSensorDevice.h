@@ -30,7 +30,7 @@
 #include "math/mPoint4.h"
 #include "platform/input/oculusVR/oculusVRConstants.h"
 #include "platform/types.h"
-#include "OVR_CAPI_0_5_0.h"
+#include "OVR_CAPI.h"
 
 struct OculusVRSensorData;
 

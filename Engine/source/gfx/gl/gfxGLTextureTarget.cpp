@@ -196,7 +196,7 @@ void _GFXGLTextureTargetFBOImpl::applyState()
    {
       // Certain drivers have issues with depth only FBOs.  That and the next two asserts assume we have a color target.
       AssertFatal(hasColor, "GFXGLTextureTarget::applyState() - Cannot set DepthStencil target without Color0 target!");
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthStecil->getBinding(), depthStecil->getHandle(), depthStecil->getMipLevel());
+      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, depthStecil->getBinding(), depthStecil->getHandle(), depthStecil->getMipLevel());
    }
    else
    {

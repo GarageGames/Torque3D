@@ -170,8 +170,8 @@ IMPLEMENT_CALLBACK(TCPObject, onDisconnect, void, (),(),
 
 TCPObject *TCPObject::find(NetSocket tag)
 {
-   for(TCPObject *walk = table[U32(tag) & TableMask]; walk; walk = walk->mNext)
-      if(walk->mTag == tag)
+   for(TCPObject *walk = table[tag.getHash() & TableMask]; walk; walk = walk->mNext)
+      if(walk->mTag.getHash() == tag.getHash())
          return walk;
    return NULL;
 }
@@ -180,13 +180,13 @@ void TCPObject::addToTable(NetSocket newTag)
 {
    removeFromTable();
    mTag = newTag;
-   mNext = table[U32(mTag) & TableMask];
-   table[U32(mTag) & TableMask] = this;
+   mNext = table[mTag.getHash() & TableMask];
+   table[mTag.getHash() & TableMask] = this;
 }
 
 void TCPObject::removeFromTable()
 {
-   for(TCPObject **walk = &table[U32(mTag) & TableMask]; *walk; walk = &((*walk)->mNext))
+   for(TCPObject **walk = &table[mTag.getHash() & TableMask]; *walk; walk = &((*walk)->mNext))
    {
       if(*walk == this)
       {
@@ -207,7 +207,7 @@ TCPObject::TCPObject()
    mBuffer = NULL;
    mBufferSize = 0;
    mPort = 0;
-   mTag = InvalidSocket;
+   mTag = NetSocket::INVALID;
    mNext = NULL;
    mState = Disconnected;
 
@@ -215,9 +215,9 @@ TCPObject::TCPObject()
 
    if(gTCPCount == 1)
    {
-      Net::smConnectionAccept.notify(processConnectedAcceptEvent);
-      Net::smConnectionReceive.notify(processConnectedReceiveEvent);
-      Net::smConnectionNotify.notify(processConnectedNotifyEvent);
+      Net::getConnectionAcceptedEvent().notify(processConnectedAcceptEvent);
+      Net::getConnectionReceiveEvent().notify(processConnectedReceiveEvent);
+      Net::getConnectionNotifyEvent().notify(processConnectedNotifyEvent);
    }
 }
 
@@ -230,9 +230,9 @@ TCPObject::~TCPObject()
 
    if(gTCPCount == 0)
    {
-      Net::smConnectionAccept.remove(processConnectedAcceptEvent);
-      Net::smConnectionReceive.remove(processConnectedReceiveEvent);
-      Net::smConnectionNotify.remove(processConnectedNotifyEvent);
+      Net::getConnectionAcceptedEvent().remove(processConnectedAcceptEvent);
+      Net::getConnectionReceiveEvent().remove(processConnectedReceiveEvent);
+      Net::getConnectionNotifyEvent().remove(processConnectedNotifyEvent);
    }
 }
 
@@ -242,7 +242,7 @@ bool TCPObject::processArguments(S32 argc, ConsoleValueRef *argv)
       return true;
    else if(argc == 1)
    {
-      addToTable(U32(dAtoi(argv[0])));
+      addToTable(NetSocket::fromHandle(dAtoi(argv[0])));
       return true;
    }
    return false;
@@ -406,7 +406,7 @@ void TCPObject::onDisconnect()
 void TCPObject::listen(U16 port)
 {
    mState = Listening;
-   U32 newTag = Net::openListenPort(port);
+   NetSocket newTag = Net::openListenPort(port);
    addToTable(newTag);
 }
 
@@ -418,7 +418,7 @@ void TCPObject::connect(const char *address)
 
 void TCPObject::disconnect()
 {
-   if( mTag != InvalidSocket ) {
+   if( mTag != NetSocket::INVALID ) {
       Net::closeConnectTo(mTag);
    }
    removeFromTable();
@@ -592,7 +592,7 @@ void processConnectedAcceptEvent(NetSocket listeningPort, NetSocket newConnectio
    if(!tcpo)
       return;
 
-   tcpo->onConnectionRequest(&originatingAddress, newConnection);
+   tcpo->onConnectionRequest(&originatingAddress, (U32)newConnection.getHandle());
 }
 
 void processConnectedNotifyEvent( NetSocket sock, U32 state )

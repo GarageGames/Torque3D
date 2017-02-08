@@ -46,8 +46,21 @@
 class DataChunker
 {
 public:
+   /// Block of allocated memory.
+   ///
+   /// <b>This has nothing to do with datablocks as used in the rest of Torque.</b>
+   struct DataBlock
+   {
+      DataBlock* next;        ///< linked list pointer to the next DataBlock for this chunker
+      S32 curIndex;           ///< current allocation point within this DataBlock
+      DataBlock();
+      ~DataBlock();
+      inline U8 *getData();
+   };
+
    enum {
-      ChunkSize = 16376 ///< Default size of each DataBlock page in the DataChunker
+      PaddDBSize = (sizeof(DataBlock) + 3) & ~3, ///< Padded size of DataBlock
+      ChunkSize = 16384 - PaddDBSize ///< Default size of each DataBlock page in the DataChunker
    };
 
    /// Return a pointer to a chunk of memory from a pre-allocated block.
@@ -81,26 +94,39 @@ public:
       mCurBlock = temp;
    }
    
-private:
-   /// Block of allocated memory.
-   ///
-   /// <b>This has nothing to do with datablocks as used in the rest of Torque.</b>
-   struct DataBlock
+public:
+   U32 countUsedBlocks()
    {
-      DataBlock* prev;
-      DataBlock* next;        ///< linked list pointer to the next DataBlock for this chunker
-      U8 *data;               ///< allocated pointer for the base of this page
-      S32 curIndex;           ///< current allocation point within this DataBlock
-      DataBlock(S32 size);
-      ~DataBlock();
-   };
+      U32 count = 0;
+      if (!mCurBlock)
+         return 0;
+      for (DataBlock *ptr = mCurBlock; ptr != NULL; ptr = ptr->next)
+      {
+         count++;
+      }
+      return count;
+   }
+   
+   void setChunkSize(U32 size)
+   {
+      AssertFatal(mCurBlock == NULL, "Cant resize now");
+      mChunkSize = size;
+   }
 
-   DataBlock*  mFirstBlock;
-   DataBlock   *mCurBlock;    ///< current page we're allocating data from.  If the
+   
+public:
+
+   DataBlock*  mCurBlock;    ///< current page we're allocating data from.  If the
                               ///< data size request is greater than the memory space currently
                               ///< available in the current page, a new page will be allocated.
    S32         mChunkSize;    ///< The size allocated for each page in the DataChunker
 };
+
+
+inline U8 *DataChunker::DataBlock::getData()
+{
+   return (U8*)this + DataChunker::PaddDBSize;
+}
 
 //----------------------------------------------------------------------------
 

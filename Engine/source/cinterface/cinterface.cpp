@@ -43,17 +43,6 @@ extern void createFontShutdown(void);
 
 static HashTable<StringTableEntry,StringTableEntry> gSecureScript;
 
-#ifdef TORQUE_OS_MAC
-
-// ObjC hooks for shared library support
-// See:  macMain.mm
-
-void torque_mac_engineinit(S32 argc, const char **argv);
-void  torque_mac_enginetick();
-void torque_mac_engineshutdown();
-
-#endif 
-
 extern bool LinkConsoleFunctions;
 
 extern "C" {
@@ -78,10 +67,6 @@ extern "C" {
 		createFontInit();
 #endif
 
-
-#ifdef TORQUE_OS_MAC
-		torque_mac_engineinit(argc, argv);
-#endif
 		// Initialize the subsystems.
 		StandardMainLoop::init();
 
@@ -111,11 +96,6 @@ extern "C" {
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
       __try {
-#endif
-
-
-#ifdef TORQUE_OS_MAC
-		torque_mac_enginetick();
 #endif
 
 		bool ret = StandardMainLoop::doMainLoop(); 
@@ -157,10 +137,6 @@ extern "C" {
 
 #if !defined(TORQUE_OS_XENON) && !defined(TORQUE_OS_PS3) && defined(_MSC_VER)
 		createFontShutdown();
-#endif
-
-#ifdef TORQUE_OS_MAC
-		torque_mac_engineshutdown();
 #endif
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )

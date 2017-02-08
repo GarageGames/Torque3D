@@ -53,13 +53,13 @@ ConsoleDocClass( ScriptObject,
 );
 
 IMPLEMENT_CALLBACK( ScriptObject, onAdd, void, ( SimObjectId ID ), ( ID ),
-	"Called when this ScriptObject is added to the system.\n"
-	"@param ID Unique object ID assigned when created (%this in script).\n"
+   "Called when this ScriptObject is added to the system.\n"
+   "@param ID Unique object ID assigned when created (%this in script).\n"
 );
 
 IMPLEMENT_CALLBACK( ScriptObject, onRemove, void, ( SimObjectId ID ), ( ID ),
-	"Called when this ScriptObject is removed from the system.\n"
-	"@param ID Unique object ID assigned when created (%this in script).\n"
+   "Called when this ScriptObject is removed from the system.\n"
+   "@param ID Unique object ID assigned when created (%this in script).\n"
 );
 
 ScriptObject::ScriptObject()
@@ -105,18 +105,18 @@ ConsoleDocClass( ScriptTickObject,
 );
 
 IMPLEMENT_CALLBACK( ScriptTickObject, onInterpolateTick, void, ( F32 delta ), ( delta ),
-	"This is called every frame, but only if the object is set to process ticks.\n"
-	"@param delta The time delta for this frame.\n"
+   "This is called every frame, but only if the object is set to process ticks.\n"
+   "@param delta The time delta for this frame.\n"
 );
 
 IMPLEMENT_CALLBACK( ScriptTickObject, onProcessTick, void, (), (),
-	"Called once every 32ms if this object is set to process ticks.\n"
+   "Called once every 32ms if this object is set to process ticks.\n"
 );
 
 IMPLEMENT_CALLBACK( ScriptTickObject, onAdvanceTime, void, ( F32 timeDelta ), ( timeDelta ),
-	"This is called every frame regardless if the object is set to process ticks, but only "
+   "This is called every frame regardless if the object is set to process ticks, but only "
    "if the callOnAdvanceTime property is set to true.\n"
-	"@param timeDelta The time delta for this frame.\n"
+   "@param timeDelta The time delta for this frame.\n"
    "@see callOnAdvanceTime\n"
 );
 
@@ -188,37 +188,37 @@ DefineEngineMethod( ScriptTickObject, isProcessingTicks, bool, ( ),,
 IMPLEMENT_CONOBJECT(ScriptGroup);
 
 ConsoleDocClass( ScriptGroup,
-		"@brief Essentially a SimGroup, but with onAdd and onRemove script callbacks.\n\n"
+      "@brief Essentially a SimGroup, but with onAdd and onRemove script callbacks.\n\n"
 
-		"@tsexample\n"
-		"// First container, SimGroup containing a ScriptGroup\n"
-		"new SimGroup(Scenes)\n"
-		"{\n"
-		"	// Subcontainer, ScriptGroup containing variables\n"
-		"	// related to a cut scene and a starting WayPoint\n"
-		"	new ScriptGroup(WelcomeScene)\n"
-		"	{\n"
-		"		class = \"Scene\";\n"
-		"		pathName = \"Pathx\";\n"
-		"		description = \"A small orc village set in the Hardesty mountains. This town and its surroundings will be used to illustrate some the Torque Game Engine\'s features.\";\n"
-		"		pathTime = \"0\";\n"
-		"		title = \"Welcome to Orc Town\";\n\n"
-		"		new WayPoint(start)\n"
-		"		{\n"
-		"			position = \"163.873 -103.82 208.354\";\n"
-		"			rotation = \"0.136165 -0.0544916 0.989186 44.0527\";\n"
-		"			scale = \"1 1 1\";\n"
-		"			dataBlock = \"WayPointMarker\";\n"
-		"			team = \"0\";\n"
-		"		};\n"
-		"	};\n"
-		"};\n"
-		"@endtsexample\n\n"
+      "@tsexample\n"
+      "// First container, SimGroup containing a ScriptGroup\n"
+      "new SimGroup(Scenes)\n"
+      "{\n"
+      "  // Subcontainer, ScriptGroup containing variables\n"
+      "  // related to a cut scene and a starting WayPoint\n"
+      "  new ScriptGroup(WelcomeScene)\n"
+      "  {\n"
+      "     class = \"Scene\";\n"
+      "     pathName = \"Pathx\";\n"
+      "     description = \"A small orc village set in the Hardesty mountains. This town and its surroundings will be used to illustrate some the Torque Game Engine\'s features.\";\n"
+      "     pathTime = \"0\";\n"
+      "     title = \"Welcome to Orc Town\";\n\n"
+      "     new WayPoint(start)\n"
+      "     {\n"
+      "        position = \"163.873 -103.82 208.354\";\n"
+      "        rotation = \"0.136165 -0.0544916 0.989186 44.0527\";\n"
+      "        scale = \"1 1 1\";\n"
+      "        dataBlock = \"WayPointMarker\";\n"
+      "        team = \"0\";\n"
+      "     };\n"
+      "  };\n"
+      "};\n"
+      "@endtsexample\n\n"
 
-		"@see SimGroup\n"
+      "@see SimGroup\n"
 
-		"@ingroup Console\n"
-		"@ingroup Scripting"
+      "@ingroup Console\n"
+      "@ingroup Scripting"
 );
 
 ScriptGroup::ScriptGroup()
@@ -226,13 +226,13 @@ ScriptGroup::ScriptGroup()
 }
 
 IMPLEMENT_CALLBACK( ScriptGroup, onAdd, void, ( SimObjectId ID ), ( ID ),
-	"Called when this ScriptGroup is added to the system.\n"
-	"@param ID Unique object ID assigned when created (%this in script).\n" 
+   "Called when this ScriptGroup is added to the system.\n"
+   "@param ID Unique object ID assigned when created (%this in script).\n" 
 );
 
 IMPLEMENT_CALLBACK( ScriptGroup, onRemove, void, ( SimObjectId ID ), ( ID ),
-	"Called when this ScriptObject is removed from the system.\n"
-	"@param ID Unique object ID assigned when created (%this in script).\n" 
+   "Called when this ScriptObject is removed from the system.\n"
+   "@param ID Unique object ID assigned when created (%this in script).\n" 
 );
 
 bool ScriptGroup::onAdd()
@@ -248,7 +248,7 @@ bool ScriptGroup::onAdd()
 void ScriptGroup::onRemove()
 {
    // Call onRemove in script!
-	onRemove_callback(getId());
+   onRemove_callback(getId());
 
    Parent::onRemove();
 }

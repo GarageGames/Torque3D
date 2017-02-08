@@ -88,7 +88,7 @@ class GFXOcclusionQueryHandle
 public:
 
     GFXOcclusionQueryHandle() 
-        : mLastStatus(GFXOcclusionQuery::Unset), mLastData(0), mQuery(NULL), mWaiting(false) 
+        : mLastStatus(GFXOcclusionQuery::Unset), mLastData(0), mWaiting(false) , mQuery(NULL)
     {}
 
     ~GFXOcclusionQueryHandle()
