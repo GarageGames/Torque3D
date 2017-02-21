@@ -204,7 +204,7 @@ addIncludePath( getAppLibSrcDir() ); 	   // main lib source dir relative to app 
 if ( T3D_Generator::$platform == "win32" )
 {
    addIncludePath( getAppLibSrcDir() . 'directx8' );
-   addIncludePath( getAppLibSrcDir() . 'openal/win32' );
+   addIncludePath( getAppLibSrcDir() . 'openal-soft/include' );
    
    addProjectLibDir( getAppLibSrcDir() . 'SDL/win32' );
    addProjectLibDir( getAppLibSrcDir() . 'unicode' );

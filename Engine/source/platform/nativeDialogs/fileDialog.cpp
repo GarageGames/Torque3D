@@ -29,11 +29,13 @@
 #include "console/consoleTypes.h"
 #include "platform/profiler.h"
 #include "console/engineAPI.h"
-#include <nfd.h>
 #include "core/strings/stringUnit.h"
 #include "core/frameAllocator.h"
 
 #if defined(TORQUE_SDL)
+
+#include <nfd.h>
+
 //-----------------------------------------------------------------------------
 // PlatformFileDlgData Implementation
 //-----------------------------------------------------------------------------
