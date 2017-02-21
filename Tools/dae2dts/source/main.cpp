@@ -156,6 +156,8 @@ S32 TorqueMain( S32 argc, const char **argv )
    if ( verbose )
       Con::printf( "Reading dae file...\n" );
 
+   TSShape::smInitOnRead = false;
+
    // Attempt to load the DAE file
    Resource<TSShape> shape = ResourceManager::get().load( srcPath );
    if ( !shape )

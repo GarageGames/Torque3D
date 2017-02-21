@@ -1228,7 +1228,11 @@ void TSShapeLoader::install()
    shape->radius = (shape->bounds.maxExtents - shape->center).len();
    shape->tubeRadius = shape->radius;
 
-   shape->init();
+   if (TSShape::smInitOnRead)
+   {
+      shape->init();
+   }
+
    shape->finalizeEditable();
 }
 
