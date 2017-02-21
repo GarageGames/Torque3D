@@ -122,6 +122,10 @@ S32 TorqueMain( S32 argc, const char **argv )
    {
       Con::errorf( "Error: no DAE file specified.\n" );
       printUsage();
+
+      // Clean everything up.
+      StandardMainLoop::shutdown();
+
       return -1;
    }
 
