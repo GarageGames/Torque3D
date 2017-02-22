@@ -643,10 +643,10 @@ void WorldEditor::dropSelection(Selection*  sel)
             Point3F offset = -boxCenter;
             offset.z += bounds.len_z() * 0.5f;
 
-            sel->offset( offset, mGridSnap ? mGridPlaneSize : 0.f );
+            sel->offset(offset, (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
          }
          else
-            sel->offset( Point3F( -centroid ), mGridSnap ? mGridPlaneSize : 0.f );
+            sel->offset(Point3F(-centroid), (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
 
          break;
       }
@@ -657,7 +657,7 @@ void WorldEditor::dropSelection(Selection*  sel)
          if(mDropAtBounds && !sel->containsGlobalBounds())
             center = sel->getBoxBottomCenter();
 
-         sel->offset( Point3F( smCamPos - center ), mGridSnap ? mGridPlaneSize : 0.f );
+         sel->offset(Point3F(smCamPos - center), (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
          sel->orient(smCamMatrix, center);
          break;
       }
@@ -668,7 +668,7 @@ void WorldEditor::dropSelection(Selection*  sel)
          if(mDropAtBounds && !sel->containsGlobalBounds())
             sel->getBoxBottomCenter();
 
-         sel->offset( Point3F( smCamPos - center ), mGridSnap ? mGridPlaneSize : 0.f );
+         sel->offset(Point3F(smCamPos - center), (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
          break;
       }
 
@@ -680,7 +680,7 @@ void WorldEditor::dropSelection(Selection*  sel)
 
          Point3F offset = smCamPos - center;
          offset.z -= mDropBelowCameraOffset;
-         sel->offset( offset, mGridSnap ? mGridPlaneSize : 0.f );
+         sel->offset(offset, (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
          break;
       }
 
@@ -712,7 +712,7 @@ void WorldEditor::dropSelection(Selection*  sel)
          event.vec = wp - smCamPos;
          event.vec.normalizeSafe();
          event.vec *= viewdist;
-         sel->offset( Point3F( event.pos - center ) += event.vec, mGridSnap ? mGridPlaneSize : 0.f );
+         sel->offset(Point3F(event.pos - center) += event.vec, (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
 
          break;
       }
@@ -756,7 +756,7 @@ void WorldEditor::dropBelowSelection(Selection*  sel, const Point3F & centroid, 
    sel->enableCollision();
 
    if( hit )
-      sel->offset( ri.point - start, mGridSnap ? mGridPlaneSize : 0.f );
+      sel->offset(ri.point - start, (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
 }
 
 //------------------------------------------------------------------------------
@@ -800,7 +800,7 @@ void WorldEditor::terrainSnapSelection(Selection* sel, U8 modifier, Point3F gizm
    {
       mStuckToGround = true;
 
-      sel->offset( ri.point - centroid, mGridSnap ? mGridPlaneSize : 0.f );
+      sel->offset(ri.point - centroid, (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
 
       if(mTerrainSnapAlignment != AlignNone)
       {
@@ -1026,7 +1026,7 @@ void WorldEditor::softSnapSelection(Selection* sel, U8 modifier, Point3F gizmoPo
       if ( minT <= 1.0f )
          foundPoint += ( end - start ) * (0.5f - minT);
 
-      sel->offset( foundPoint - sel->getCentroid(), mGridSnap ? mGridPlaneSize : 0.f );
+      sel->offset(foundPoint - sel->getCentroid(), (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
    }
 
    mSoftSnapIsStuck = found;
@@ -3036,7 +3036,7 @@ void WorldEditor::transformSelection(bool position, Point3F& p, bool relativePos
    {
       if( relativePos )
       {
-         mSelected->offset( p, mGridSnap ? mGridPlaneSize : 0.f );
+         mSelected->offset(p, (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
       }
       else
       {
