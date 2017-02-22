@@ -2254,7 +2254,7 @@ void WorldEditor::on3DMouseDragged(const Gui3DMouseEvent & event)
             mGizmo->getProfile()->snapToGrid = snapToGrid;
          }
 
-         mSelected->offset( mGizmo->getOffset() );
+         mSelected->offset(mGizmo->getOffset(), mGridSnap ? mGridPlaneSize : 0.f);
 
          // Handle various sticking
          terrainSnapSelection( mSelected, event.modifier, mGizmo->getPosition() );
