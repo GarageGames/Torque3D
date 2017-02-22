@@ -1805,7 +1805,7 @@ WorldEditor::WorldEditor()
    mSoftSnapDebugPoint.set(0.0f, 0.0f, 0.0f);
    
    mGridSnap = false;
-   
+   mUseGroupCenter = true;
    mFadeIcons = true;
    mFadeIconsDist = 8.f;
 }
@@ -2254,7 +2254,7 @@ void WorldEditor::on3DMouseDragged(const Gui3DMouseEvent & event)
             mGizmo->getProfile()->snapToGrid = snapToGrid;
          }
 
-         mSelected->offset(mGizmo->getOffset(), mGridSnap ? mGridPlaneSize : 0.f);
+         mSelected->offset(mGizmo->getOffset(), (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
 
          // Handle various sticking
          terrainSnapSelection( mSelected, event.modifier, mGizmo->getPosition() );
@@ -2686,7 +2686,8 @@ void WorldEditor::initPersistFields()
    addGroup( "Grid" );
    
       addField( "gridSnap",               TypeBool,   Offset( mGridSnap, WorldEditor ),
-         "If true, transform operations will snap to the grid." );
+         "If true, transform operations will snap to the grid.");
+      addField("useGroupCenter", TypeBool, Offset(mUseGroupCenter, WorldEditor));
    
    endGroup( "Grid" );
    

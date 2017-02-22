@@ -349,6 +349,7 @@ class WorldEditor : public EditTSCtrl
       F32               mDropAtScreenCenterMax;
 
       bool              mGridSnap;
+      bool              mUseGroupCenter;
       bool              mStickToGround;
       bool              mStuckToGround;            ///< Selection is stuck to the ground
       AlignmentType     mTerrainSnapAlignment;     ///< How does the stickied object align to the terrain

@@ -28,7 +28,7 @@
       canMinimize = "0";
       canMaximize = "0";
       position = "400 31";
-      extent =" 175 257";
+      extent =" 175 267";
       MinExtent = "175 130";
       text = "Snap Options";
       closeCommand = "ESnapOptions.hideDialog();";
@@ -51,7 +51,7 @@
          Visible = "1";
          hovertime = "1000";
          Docking = "Client";
-         Margin = "3 22 3 3";
+         Margin = "3 32 3 3";
          Padding = "0 0 0 0";
          AnchorTop = "1";
          AnchorBottom = "0";
@@ -790,6 +790,25 @@
             tooltipProfile = "ToolsGuiToolTipProfile";
             hovertime = "1000";
             internalName = "GridSnapButton";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+         };
+      new GuiCheckBoxCtrl() {
+            text = "Use Group Center";
+            groupNum = "1";
+            useMouseEvents = "0";
+            isContainer = "0";
+            horizSizing = "right";
+            vertSizing = "top";
+            position = "4 246";
+            extent = "105 24";
+            minExtent = "8 8";
+            visible = "1";
+            active = "1";
+            command = "toggleSnappingOptions(\"byGroup\");";
+            tooltipProfile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            internalName = "GroupSnapButton";
             canSave = "1";
             canSaveDynamicFields = "0";
          };
