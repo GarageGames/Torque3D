@@ -2464,7 +2464,6 @@ function toggleSnappingOptions( %var )
    {
 	   EWorldEditor.UseGroupCenter = !EWorldEditor.UseGroupCenter;
 	   ESnapOptions->GroupSnapButton.setStateOn(EWorldEditor.UseGroupCenter);
-	   error(EWorldEditor.UseGroupCenter);
    }
    else
    { 
