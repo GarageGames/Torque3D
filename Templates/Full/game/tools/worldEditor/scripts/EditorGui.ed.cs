@@ -2050,6 +2050,7 @@ function EWorldEditor::syncGui( %this )
    EWorldEditorToolbar-->renderHandleBtn.setStateOn( EWorldEditor.renderObjHandle );
    EWorldEditorToolbar-->renderTextBtn.setStateOn( EWorldEditor.renderObjText );
 
+   EWorldEditorToolbar-->objectSnapDownBtn.setStateOn( %this.stickToGround );
    SnapToBar-->objectSnapBtn.setStateOn( EWorldEditor.getSoftSnap() );
    EWorldEditorToolbar-->softSnapSizeTextEdit.setText( EWorldEditor.getSoftSnapSize() );
    ESnapOptions-->SnapSize.setText( EWorldEditor.getSoftSnapSize() );
