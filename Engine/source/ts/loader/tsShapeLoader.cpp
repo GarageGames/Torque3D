@@ -1231,9 +1231,8 @@ void TSShapeLoader::install()
    if (TSShape::smInitOnRead)
    {
       shape->init();
+      shape->finalizeEditable();
    }
-
-   shape->finalizeEditable();
 }
 
 void TSShapeLoader::computeBounds(Box3F& bounds)
