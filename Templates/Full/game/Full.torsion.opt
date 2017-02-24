@@ -1,0 +1,14 @@
+<TorsionProjectOptions>
+<Address>127.0.0.1</Address>
+<Password>password</Password>
+<Port>6060</Port>
+<LastConfig>Debug</LastConfig>
+<Breakpoints/>
+<Bookmarks/>
+<OpenFiles>
+<File ScrollX="0" ScrollY="0">art\main.cs</File>
+<File ScrollX="0" ScrollY="9">core\main.cs</File>
+<File ScrollX="0" ScrollY="9" Active="true">..\..\Empty\game\core\main.cs</File>
+<File ScrollX="0" ScrollY="15">..\..\BaseGame\game\core\main.cs</File>
+</OpenFiles>
+</TorsionProjectOptions>

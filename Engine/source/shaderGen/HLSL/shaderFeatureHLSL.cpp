@@ -853,7 +853,7 @@ Var* ShaderFeatureHLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
 //****************************************************************************
 
 DiffuseMapFeatHLSL::DiffuseMapFeatHLSL()
-: mTorqueDep("shaders/common/torque.hlsl")
+: mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl"))
 {
 	addDependency(&mTorqueDep);
 }
@@ -2168,7 +2168,7 @@ void ReflectCubeFeatHLSL::setTexData(  Material::StageData &stageDat,
 //****************************************************************************
 
 RTLightingFeatHLSL::RTLightingFeatHLSL()
-   : mDep( "shaders/common/lighting.hlsl" )
+   : mDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/lighting.hlsl" ))
 {
    addDependency( &mDep );
 }
@@ -2383,7 +2383,7 @@ ShaderFeature::Resources RTLightingFeatHLSL::getResources( const MaterialFeature
 //****************************************************************************
 
 FogFeatHLSL::FogFeatHLSL()
-   : mFogDep( "shaders/common/torque.hlsl" )
+   : mFogDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl" ))
 {
    addDependency( &mFogDep );
 }
@@ -2514,7 +2514,7 @@ ShaderFeature::Resources FogFeatHLSL::getResources( const MaterialFeatureData &f
 //****************************************************************************
 
 VisibilityFeatHLSL::VisibilityFeatHLSL()
-   : mTorqueDep( "shaders/common/torque.hlsl" )
+   : mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl" ))
 {
    addDependency( &mTorqueDep );
 }
@@ -2681,7 +2681,7 @@ void RenderTargetZeroHLSL::processPix( Vector<ShaderComponent*> &componentList, 
 //****************************************************************************
 
 HDROutHLSL::HDROutHLSL()
-   : mTorqueDep( "shaders/common/torque.hlsl" )
+   : mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/torque.hlsl" ))
 {
    addDependency( &mTorqueDep );
 }
@@ -2702,7 +2702,7 @@ void HDROutHLSL::processPix(  Vector<ShaderComponent*> &componentList,
 #include "T3D/fx/groundCover.h"
 
 FoliageFeatureHLSL::FoliageFeatureHLSL()
-: mDep( "shaders/common/foliage.hlsl" )
+: mDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/foliage.hlsl" ))
 {
    addDependency( &mDep );
 }
@@ -2848,7 +2848,7 @@ void ParticleNormalFeatureHLSL::processVert(Vector<ShaderComponent*> &componentL
 //****************************************************************************
 
 ImposterVertFeatureHLSL::ImposterVertFeatureHLSL()
-   :  mDep( "shaders/common/imposter.hlsl" )
+   :  mDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/imposter.hlsl" ))
 {
    addDependency( &mDep );
 }
