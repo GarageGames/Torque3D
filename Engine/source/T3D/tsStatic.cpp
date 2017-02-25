@@ -102,10 +102,10 @@ TSStatic::TSStatic()
    mShapeName        = "";
    mShapeInstance    = NULL;
 
-   mPlayAmbient      = true;
+   mPlayAmbient      = false;
    mAmbientThread    = NULL;
 
-   mAllowPlayerStep = false;
+   mAllowPlayerStep = true;
 
    mConvexList = new Convex;
 
