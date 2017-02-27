@@ -6047,6 +6047,8 @@ void Player::writePacketData(GameConnection *connection, BitStream *stream)
    if (stream->writeFlag(mJumpDelay > 0))
       stream->writeInt(mJumpDelay,PlayerData::JumpDelayBits);
 
+   stream->writeInt(mPose, NumPoseBits);
+
    Point3F pos;
    getTransform().getColumn(3,&pos);
    if (stream->writeFlag(!isMounted())) {
@@ -6102,6 +6104,8 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
       mJumpDelay = stream->readInt(PlayerData::JumpDelayBits);
    else
       mJumpDelay = 0;
+
+   mPose = (Pose)stream->readInt(NumPoseBits);
 
    Point3F pos,rot;
    if (stream->readFlag()) {
@@ -6208,6 +6212,8 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       if (stream->writeFlag(mState == RecoverState))
          stream->writeInt(mRecoverTicks,PlayerData::RecoverDelayBits);
 
+      stream->writeInt(mPose, NumPoseBits);
+
       Point3F pos;
       getTransform().getColumn(3,&pos);
       stream->writeCompressedPoint(pos);
@@ -6312,6 +6318,9 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       }
       else
          setState(actionState);
+
+      Pose pose = (Pose)stream->readInt(NumPoseBits);
+      setPose(pose);
 
       Point3F pos,rot;
       stream->readCompressedPoint(&pos);
