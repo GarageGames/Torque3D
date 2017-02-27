@@ -68,7 +68,8 @@ ImplementEnumType( WorldEditorDropType,
    { WorldEditor::DropAtScreenCenter,     "screenCenter",   "Places at a position projected outwards from the screen's center.\n"    },
    { WorldEditor::DropAtCentroid,         "atCentroid",     "Places at the center position of the current centroid.\n"      },
    { WorldEditor::DropToTerrain,          "toTerrain",      "Places on the terrain.\n"       },
-   { WorldEditor::DropBelowSelection,     "belowSelection", "Places at a position below the selected object.\n"  }
+   { WorldEditor::DropBelowSelection,     "belowSelection", "Places at a position below the selected object.\n"  },
+   { WorldEditor::DropAtGizmo,            "atGizmo",        "Places at the gizmo point.\n"  }
 EndImplementEnumType;
 
 ImplementEnumType( WorldEditorAlignmentType,
@@ -728,10 +729,24 @@ void WorldEditor::dropSelection(Selection*  sel)
          dropBelowSelection(sel, centroid, mDropAtBounds);
          break;
       }
+
+      case DropAtGizmo:
+      {
+         dropAtGizmo(sel, mGizmo->getPosition()-centroid);
+         break;
+      }
    }
 
    //
    updateClientTransforms(sel);
+}
+
+void WorldEditor::dropAtGizmo(Selection*  sel, const Point3F & gizmoPos)
+{
+   if (!sel->size())
+      return;
+
+   sel->offset(gizmoPos, (!mUseGroupCenter && mGridSnap) ? mGridPlaneSize : 0.f);
 }
 
 void WorldEditor::dropBelowSelection(Selection*  sel, const Point3F & centroid, bool useBottomBounds)
@@ -3642,7 +3657,7 @@ void WorldEditor::makeSelectionPrefab( const char *filename )
          else
          {
             //Only push the cleanup of the group if it's ONLY a SimGroup.
-            cleanup.push_back(grp);
+         cleanup.push_back( grp );
          }
       }
       else
