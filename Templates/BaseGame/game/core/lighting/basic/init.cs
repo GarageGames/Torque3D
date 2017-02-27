@@ -40,11 +40,11 @@ singleton GFXStateBlockData( BL_ProjectedShadowSBData )
 
 singleton ShaderData( BL_ProjectedShadowShaderData )
 {
-   DXVertexShaderFile     = "data/shaders/common/projectedShadowV.hlsl";
-   DXPixelShaderFile      = "data/shaders/common/projectedShadowP.hlsl";   
+   DXVertexShaderFile     = $Core::CommonShaderPath @ "/projectedShadowV.hlsl";
+   DXPixelShaderFile      = $Core::CommonShaderPath @ "/projectedShadowP.hlsl";   
    
-   OGLVertexShaderFile     = "data/shaders/common/gl/projectedShadowV.glsl";
-   OGLPixelShaderFile      = "data/shaders/common/gl/projectedShadowP.glsl";   
+   OGLVertexShaderFile     = $Core::CommonShaderPath @ "/gl/projectedShadowV.glsl";
+   OGLPixelShaderFile      = $Core::CommonShaderPath @ "/gl/projectedShadowP.glsl";   
       
    samplerNames[0] = "inputTex";
    

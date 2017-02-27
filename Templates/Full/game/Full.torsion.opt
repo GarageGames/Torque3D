@@ -8,7 +8,13 @@
 <OpenFiles>
 <File ScrollX="0" ScrollY="0">art\main.cs</File>
 <File ScrollX="0" ScrollY="9">core\main.cs</File>
-<File ScrollX="0" ScrollY="9" Active="true">..\..\Empty\game\core\main.cs</File>
+<File ScrollX="0" ScrollY="9">..\..\Empty\game\core\main.cs</File>
 <File ScrollX="0" ScrollY="15">..\..\BaseGame\game\core\main.cs</File>
+<File ScrollX="0" ScrollY="130">core\scripts\client\postFx\MLAA.cs</File>
+<File ScrollX="0" ScrollY="228">core\scripts\client\postFx\ssao.cs</File>
+<File ScrollX="0" ScrollY="114">core\scripts\client\postFx\hdr.cs</File>
+<File ScrollX="0" ScrollY="0">core\scripts\client\postFx\dof.cs</File>
+<File ScrollX="0" ScrollY="9">core\scripts\client\postFx\caustics.cs</File>
+<File ScrollX="0" ScrollY="0" Active="true">..\..\..\..\..\RnDBuildTest\My Projects\RnDTest\game\modules\TheFactory\components\FakeGISpotlight.cs</File>
 </OpenFiles>
 </TorsionProjectOptions>

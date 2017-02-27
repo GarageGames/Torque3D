@@ -40,9 +40,6 @@ $pref::LightManager::sgUseToneMapping = "";
 */
 
 exec( "./shaders.cs" );
-exec( "./lightViz.cs" );
-exec( "./shadowViz.cs" );
-exec( "./shadowViz.gui" );
 exec( "./deferredShading.cs" );
 
 function onActivateAdvancedLM()

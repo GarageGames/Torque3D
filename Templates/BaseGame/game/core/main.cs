@@ -39,7 +39,7 @@
 $Core::MissingTexturePath = "core/images/missingTexture";
 $Core::UnAvailableTexturePath = "core/images/unavailable";
 $Core::WarningTexturePath = "core/images/warnMat";
-$Core::CommonShaderPath = "data/shaders/common";
+$Core::CommonShaderPath = "core/shaders";
 
 /// This is the path used by ShaderGen to cache procedural
 /// shaders.  If left blank ShaderGen will only cache shaders

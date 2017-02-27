@@ -20,20 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-exec("./fileDialogBase.ed.cs");
-exec("./openFileDialog.ed.cs");
-exec("./saveFileDialog.ed.cs");
-exec("./saveChangesMBDlg.ed.gui");
-exec("./simViewDlg.ed.gui");
-exec("./colorPicker.ed.gui");
-exec("./materialSelector.ed.gui");
-exec("./scriptEditorDlg.ed.gui");
-exec("./colladaImport.ed.gui");
-exec("./EditorLoadingGui.gui");
-exec("./GuiEaseEditDlg.ed.gui");
-exec("./GuiEaseEditDlg.ed.cs");
-exec("./guiObjectInspector.ed.cs");
-exec("./uvEditor.ed.gui");
-exec("./objectSelection.ed.cs");
-exec("./guiPlatformGenericMenubar.ed.cs");
-exec("./postFxManager.gui");
+#include "core/shaders/postfx/postFx.hlsl"
+#include "core/shaders/shaderModelAutoGen.hlsl"
+
+TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER1D(depthViz, 1);
+
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
+{
+   float depth = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 ).w;
+   return float4( TORQUE_TEX1D( depthViz, depth ).rgb, 1.0 );
+}

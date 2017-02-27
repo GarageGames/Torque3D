@@ -20,20 +20,44 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-exec("./fileDialogBase.ed.cs");
-exec("./openFileDialog.ed.cs");
-exec("./saveFileDialog.ed.cs");
-exec("./saveChangesMBDlg.ed.gui");
-exec("./simViewDlg.ed.gui");
-exec("./colorPicker.ed.gui");
-exec("./materialSelector.ed.gui");
-exec("./scriptEditorDlg.ed.gui");
-exec("./colladaImport.ed.gui");
-exec("./EditorLoadingGui.gui");
-exec("./GuiEaseEditDlg.ed.gui");
-exec("./GuiEaseEditDlg.ed.cs");
-exec("./guiObjectInspector.ed.cs");
-exec("./uvEditor.ed.gui");
-exec("./objectSelection.ed.cs");
-exec("./guiPlatformGenericMenubar.ed.cs");
-exec("./postFxManager.gui");
+singleton ShaderData( PFX_FlashShader )
+{
+   DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
+   DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/flashP.hlsl";
+   
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/gl/flashP.glsl";
+   
+   samplerNames[0] = "$backBuffer";
+
+   defines = "WHITE_COLOR=float4(1.0,1.0,1.0,0.0);MUL_COLOR=float4(1.0,0.25,0.25,0.0)";
+
+   pixVersion = 2.0;
+};
+ 
+singleton PostEffect( FlashFx )
+{
+   isEnabled = false;    
+   allowReflectPass = false;  
+
+   renderTime = "PFXAfterDiffuse";  
+
+   shader = PFX_FlashShader;   
+   texture[0] = "$backBuffer";  
+   renderPriority = 10;
+   stateBlock = PFX_DefaultStateBlock;  
+};
+
+function FlashFx::setShaderConsts( %this )
+{
+   if ( isObject( ServerConnection ) )
+   {
+      %this.setShaderConst( "$damageFlash", ServerConnection.getDamageFlash() );
+      %this.setShaderConst( "$whiteOut", ServerConnection.getWhiteOut() );
+   }
+   else
+   {
+      %this.setShaderConst( "$damageFlash", 0 );
+      %this.setShaderConst( "$whiteOut", 0 );
+   }
+}

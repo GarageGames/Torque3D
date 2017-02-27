@@ -22,16 +22,41 @@
 
 singleton ShaderData( PFX_PassthruShader )
 {   
-   DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFx/postFxV.hlsl";
-   DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFx/passthruP.hlsl";
+   DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
+   DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/passthruP.hlsl";
          
-//   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFx/postFxV.glsl";
-//   OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFx/gl/passthruP.glsl";
+//   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+//   OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/gl/passthruP.glsl";
       
    samplerNames[0] = "$inputTex";
    
    pixVersion = 2.0;
 };
+
+function postFXInit()
+{
+   exec("./postFX/postFxManager.gui");
+   
+   //Load the core postFX files themselves
+   if (!$Server::Dedicated)
+   {
+      //init the postFX
+      %pattern = "core/postFX/*.cs";   
+      %file = findFirstFile( %pattern );
+      if ( %file $= "" )
+      {
+         // Try for DSOs next.
+         %pattern = "core/postFX/*.cs.dso";
+         %file = findFirstFile( %pattern );
+      }
+      
+      while( %file !$= "" )
+      {      
+         exec( %file );
+         %file = findNextFile( %pattern );
+      }
+   }
+}
 
 function PostEffect::inspectVars( %this )
 {

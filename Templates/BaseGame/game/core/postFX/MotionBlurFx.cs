@@ -20,20 +20,34 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-exec("./fileDialogBase.ed.cs");
-exec("./openFileDialog.ed.cs");
-exec("./saveFileDialog.ed.cs");
-exec("./saveChangesMBDlg.ed.gui");
-exec("./simViewDlg.ed.gui");
-exec("./colorPicker.ed.gui");
-exec("./materialSelector.ed.gui");
-exec("./scriptEditorDlg.ed.gui");
-exec("./colladaImport.ed.gui");
-exec("./EditorLoadingGui.gui");
-exec("./GuiEaseEditDlg.ed.gui");
-exec("./GuiEaseEditDlg.ed.cs");
-exec("./guiObjectInspector.ed.cs");
-exec("./uvEditor.ed.gui");
-exec("./objectSelection.ed.cs");
-exec("./guiPlatformGenericMenubar.ed.cs");
-exec("./postFxManager.gui");
+singleton ShaderData( PFX_MotionBlurShader )  
+{     
+   DXVertexShaderFile   = $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";  //we use the bare-bones postFxV.hlsl
+   DXPixelShaderFile    = $Core::CommonShaderPath @ "/postFX/motionBlurP.hlsl";  //new pixel shader
+   
+   OGLVertexShaderFile   = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLPixelShaderFile    = $Core::CommonShaderPath @ "/postFX/gl/motionBlurP.glsl";
+   
+   samplerNames[0] = "$backBuffer";
+   samplerNames[1] = "$prepassTex";
+   
+   pixVersion = 3.0;  
+};  
+
+singleton PostEffect(MotionBlurFX)  
+{
+   isEnabled = false;
+
+   renderTime = "PFXAfterDiffuse";  
+
+   shader = PFX_MotionBlurShader;  
+   stateBlock = PFX_DefaultStateBlock;  
+   texture[0] = "$backbuffer";
+   texture[1] = "#prepass";
+   target = "$backBuffer";
+};
+
+function MotionBlurFX::setShaderConsts(%this)
+{
+   %this.setShaderConst( "$velocityMultiplier", 3000 );
+}

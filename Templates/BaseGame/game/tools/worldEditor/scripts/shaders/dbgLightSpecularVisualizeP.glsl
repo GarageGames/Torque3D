@@ -20,20 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-exec("./fileDialogBase.ed.cs");
-exec("./openFileDialog.ed.cs");
-exec("./saveFileDialog.ed.cs");
-exec("./saveChangesMBDlg.ed.gui");
-exec("./simViewDlg.ed.gui");
-exec("./colorPicker.ed.gui");
-exec("./materialSelector.ed.gui");
-exec("./scriptEditorDlg.ed.gui");
-exec("./colladaImport.ed.gui");
-exec("./EditorLoadingGui.gui");
-exec("./GuiEaseEditDlg.ed.gui");
-exec("./GuiEaseEditDlg.ed.cs");
-exec("./guiObjectInspector.ed.cs");
-exec("./uvEditor.ed.gui");
-exec("./objectSelection.ed.cs");
-exec("./guiPlatformGenericMenubar.ed.cs");
-exec("./postFxManager.gui");
+#include "core/shaders/gl/hlslCompat.glsl"
+
+in vec2 uv0;
+uniform sampler2D lightPrePassTex;
+
+out vec4 OUT_col;
+
+void main()
+{
+   float specular = texture( lightPrePassTex, uv0 ).a;
+   OUT_col = vec4( specular, specular, specular, 1.0 );
+}

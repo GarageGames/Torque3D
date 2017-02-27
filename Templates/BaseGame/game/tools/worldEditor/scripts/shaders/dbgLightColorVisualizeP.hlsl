@@ -20,20 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-exec("./fileDialogBase.ed.cs");
-exec("./openFileDialog.ed.cs");
-exec("./saveFileDialog.ed.cs");
-exec("./saveChangesMBDlg.ed.gui");
-exec("./simViewDlg.ed.gui");
-exec("./colorPicker.ed.gui");
-exec("./materialSelector.ed.gui");
-exec("./scriptEditorDlg.ed.gui");
-exec("./colladaImport.ed.gui");
-exec("./EditorLoadingGui.gui");
-exec("./GuiEaseEditDlg.ed.gui");
-exec("./GuiEaseEditDlg.ed.cs");
-exec("./guiObjectInspector.ed.cs");
-exec("./uvEditor.ed.gui");
-exec("./objectSelection.ed.cs");
-exec("./guiPlatformGenericMenubar.ed.cs");
-exec("./postFxManager.gui");
+#include "core/shaders/shaderModelAutoGen.hlsl"
+#include "core/shaders/postfx/postFx.hlsl"
+
+TORQUE_UNIFORM_SAMPLER2D(lightPrePassTex,0);
+
+float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
+{   
+   float4 lightColor = TORQUE_TEX2D( lightPrePassTex, IN.uv0 );    
+   return float4( lightColor.rgb, 1.0 );   
+}

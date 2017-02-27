@@ -20,20 +20,45 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-exec("./fileDialogBase.ed.cs");
-exec("./openFileDialog.ed.cs");
-exec("./saveFileDialog.ed.cs");
-exec("./saveChangesMBDlg.ed.gui");
-exec("./simViewDlg.ed.gui");
-exec("./colorPicker.ed.gui");
-exec("./materialSelector.ed.gui");
-exec("./scriptEditorDlg.ed.gui");
-exec("./colladaImport.ed.gui");
-exec("./EditorLoadingGui.gui");
-exec("./GuiEaseEditDlg.ed.gui");
-exec("./GuiEaseEditDlg.ed.cs");
-exec("./guiObjectInspector.ed.cs");
-exec("./uvEditor.ed.gui");
-exec("./objectSelection.ed.cs");
-exec("./guiPlatformGenericMenubar.ed.cs");
-exec("./postFxManager.gui");
+singleton GFXStateBlockData( PFX_CausticsStateBlock : PFX_DefaultStateBlock )
+{
+   blendDefined = true;
+   blendEnable = true; 
+   blendSrc = GFXBlendOne;
+   blendDest = GFXBlendOne;
+   
+   samplersDefined = true;
+   samplerStates[0] = SamplerClampLinear;
+   samplerStates[1] = SamplerWrapLinear;
+   samplerStates[2] = SamplerWrapLinear;
+};
+
+singleton ShaderData( PFX_CausticsShader )
+{   
+   DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
+   DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/caustics/causticsP.hlsl";
+         
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/caustics/gl/causticsP.glsl";
+      
+   samplerNames[0] = "$prepassTex";
+   samplerNames[1] = "$causticsTex0";
+   samplerNames[2] = "$causticsTex1";
+   
+   pixVersion = 3.0;
+};
+
+singleton PostEffect( CausticsPFX )
+{
+   isEnabled = false;
+   renderTime = "PFXAfterDiffuse";
+   renderBin = "ObjTranslucentBin";      
+   //renderPriority = 0.1;
+      
+   shader = PFX_CausticsShader;
+   stateBlock = PFX_CausticsStateBlock;
+   texture[0] = "#prepass";
+   texture[1] = "core/images/caustics_1";
+   texture[2] = "core/images/caustics_2";
+   target = "$backBuffer";
+};
