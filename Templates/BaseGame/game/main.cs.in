@@ -67,6 +67,8 @@ if( !$isDedicated )
    //Autodetect settings if it's our first time
    if($pref::Video::autoDetect)
       GraphicsMenu.Autodetect();
+
+   postFXInit();
    
    closeSplashWindow();
    
