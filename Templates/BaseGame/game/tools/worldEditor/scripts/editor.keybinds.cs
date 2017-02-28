@@ -20,51 +20,51 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-if ( isObject( editorMoveMap ) )
-   editorMoveMap.delete();
+if ( isObject( EditorMap ) )
+   EditorMap.delete();
    
-new ActionMap(editorMoveMap);
+new ActionMap(EditorMap);
 
 //------------------------------------------------------------------------------
 // Non-remapable binds
 //------------------------------------------------------------------------------
-editorMoveMap.bindCmd(keyboard, "escape", "", "Canvas.pushDialog(PauseMenu);");
+EditorMap.bindCmd(keyboard, "escape", "", "Canvas.pushDialog(PauseMenu);");
 
 //------------------------------------------------------------------------------
 // Movement Keys
 //------------------------------------------------------------------------------
-editorMoveMap.bind( keyboard, a, editorMoveleft );
-editorMoveMap.bind( keyboard, d, editorMoveright );
-editorMoveMap.bind( keyboard, left, editorMoveleft );
-editorMoveMap.bind( keyboard, right, editorMoveright );
+EditorMap.bind( keyboard, a, editorMoveleft );
+EditorMap.bind( keyboard, d, editorMoveright );
+EditorMap.bind( keyboard, left, editorMoveleft );
+EditorMap.bind( keyboard, right, editorMoveright );
 
-editorMoveMap.bind( keyboard, w, editorMoveforward );
-editorMoveMap.bind( keyboard, s, editorMovebackward );
-editorMoveMap.bind( keyboard, up, editorMoveforward );
-editorMoveMap.bind( keyboard, down, editorMovebackward );
+EditorMap.bind( keyboard, w, editorMoveforward );
+EditorMap.bind( keyboard, s, editorMovebackward );
+EditorMap.bind( keyboard, up, editorMoveforward );
+EditorMap.bind( keyboard, down, editorMovebackward );
 
-editorMoveMap.bind( keyboard, e, editorMoveup );
-editorMoveMap.bind( keyboard, c, editorMovedown );
+EditorMap.bind( keyboard, e, editorMoveup );
+EditorMap.bind( keyboard, c, editorMovedown );
 
-editorMoveMap.bind( mouse, xaxis, editorYaw );
-editorMoveMap.bind( mouse, yaxis, editorPitch );
+EditorMap.bind( mouse, xaxis, editorYaw );
+EditorMap.bind( mouse, yaxis, editorPitch );
 
 //------------------------------------------------------------------------------
 // Mouse Trigger
 //------------------------------------------------------------------------------
-editorMoveMap.bind( mouse, button0, editorClick );
-editorMoveMap.bind( mouse, button1, editorRClick );
+EditorMap.bind( mouse, button0, editorClick );
+EditorMap.bind( mouse, button1, editorRClick );
 
 //------------------------------------------------------------------------------
 // Camera & View functions
 //------------------------------------------------------------------------------
-editorMoveMap.bind(keyboard, "alt c", toggleCamera);
+EditorMap.bind(keyboard, "alt c", toggleCamera);
 
 //------------------------------------------------------------------------------
 // Helper Functions
 //------------------------------------------------------------------------------
-editorMoveMap.bind(keyboard, "F8", dropCameraAtPlayer);
-editorMoveMap.bind(keyboard, "F7", dropPlayerAtCamera);
+EditorMap.bind(keyboard, "F8", dropCameraAtPlayer);
+EditorMap.bind(keyboard, "F7", dropPlayerAtCamera);
 
 //------------------------------------------------------------------------------
 // Debugging Functions
@@ -77,4 +77,4 @@ GlobalActionMap.bind(keyboard, "ctrl F3", doProfile);
 //------------------------------------------------------------------------------
 GlobalActionMap.bind(keyboard, "tilde", toggleConsole);
 
-editorMoveMap.bind( mouse, "alt zaxis", editorWheelFadeScroll );
+EditorMap.bind( mouse, "alt zaxis", editorWheelFadeScroll );

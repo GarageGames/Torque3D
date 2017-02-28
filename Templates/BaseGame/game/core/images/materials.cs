@@ -20,13 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-singleton Material( BlankWhite )
-{
-   diffuseMap[0] = "data/art/white";
-   mapTo = "white";
-   materialTag0 = "Miscellaneous";
-};
-
 singleton Material( Empty )
 {
 };

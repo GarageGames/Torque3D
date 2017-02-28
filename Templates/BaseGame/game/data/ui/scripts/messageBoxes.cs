@@ -22,25 +22,14 @@
 
 
 // Cleanup Dialog created by 'core'
-if( isObject( MessagePopupDlg ) )
-   MessagePopupDlg.delete();
 if( isObject( MessageBoxYesNoDlg ) )
    MessageBoxYesNoDlg.delete();
-if( isObject( MessageBoxYesNoCancelDlg ) )
-   MessageBoxYesNoCancelDlg.delete();
-if( isObject( MessageBoxOKCancelDetailsDlg ) )
-   MessageBoxOKCancelDetailsDlg.delete();
-if( isObject( MessageBoxOKCancelDlg ) )
-   MessageBoxOKCancelDlg.delete();
 if( isObject( MessageBoxOKDlg ) )
    MessageBoxOKDlg.delete();
-if( isObject( IODropdownDlg ) )
-   IODropdownDlg.delete();
-   
 
 // Load Editor Dialogs
-exec("./guis/messageBoxOk.ed.gui");
-exec("./guis/messageBoxYesNo.ed.gui");
+exec("./guis/messageBoxOk.gui");
+exec("./guis/messageBoxYesNo.gui");
 
 // --------------------------------------------------------------------
 // Message Sound

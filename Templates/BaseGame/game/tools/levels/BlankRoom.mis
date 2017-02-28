@@ -1,42 +1,57 @@
 //--- OBJECT WRITE BEGIN ---
 new SimGroup(MissionGroup) {
+   canSave = "1";
    canSaveDynamicFields = "1";
       cdTrack = "2";
       CTF_scoreLimit = "5";
-      Enabled = "1";
+      enabled = "1";
       musicTrack = "lush";
 
-   new LevelInfo(theLevelInfo) {
+   new LevelInfo(TheLevelInfo) {
+      nearClip = "0.1";
       visibleDistance = "1000";
+      visibleGhostDistance = "0";
+      decalBias = "0.0015";
       fogColor = "0.6 0.6 0.7 1";
       fogDensity = "0";
       fogDensityOffset = "700";
       fogAtmosphereHeight = "0";
       canvasClearColor = "0 0 0 255";
-         canSaveDynamicFields = "1";
+      ambientLightBlendPhase = "1";
+      ambientLightBlendCurve = "0 0 -1 -1";
+      advancedLightmapSupport = "0";
+      soundAmbience = "AudioAmbienceDefault";
+      soundDistanceModel = "Linear";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+         desc0 = "A blank room ready to be populated with Torque objects. Guns, anyone?";
+         enabled = "1";
          levelName = "Blank Room";
-         desc0 = "A blank room ready to be populated with Torque objects.\n\nGuns, anyone?";
-         Enabled = "1";
    };
    new SkyBox(theSky) {
-      canSaveDynamicFields = "1";
-      Position = "0 0 0";
-      rotation = "1 0 0 0";
-      scale = "1 1 1";
-      Material = "BlackSkyMat";
+      Material = "BlankSkyMat";
       drawBottom = "0";
       fogBandHeight = "0";
-   };
-   new Sun(theSun) {
-      canSaveDynamicFields = "1";
-      Position = "0 0 0";
+      position = "0 0 0";
       rotation = "1 0 0 0";
       scale = "1 1 1";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+   };
+   new Sun(theSun) {
       azimuth = "230.396";
       elevation = "45";
       color = "0.968628 0.901961 0.901961 1";
-      ambient = "0.078431 0.113725 0.156863 1";
+      ambient = "0.337255 0.533333 0.619608 1";
+      brightness = "1";
       castShadows = "1";
+      staticRefreshFreq = "250";
+      dynamicRefreshFreq = "8";
+      coronaEnabled = "1";
+      coronaScale = "0.5";
+      coronaTint = "1 1 1 1";
+      coronaUseLightColor = "1";
+      flareScale = "1";
       attenuationRatio = "0 1 1";
       shadowType = "PSSM";
       texSize = "1024";
@@ -47,47 +62,36 @@ new SimGroup(MissionGroup) {
       logWeight = "0.9";
       fadeStartDistance = "0";
       lastSplitTerrainOnly = "0";
-      splitFadeDistances = "1 1 1 1";
+      representedInLightmap = "0";
+      shadowDarkenColor = "0 0 0 -1";
+      includeLightmappedGeometryInShadow = "0";
+      position = "0 0 0";
+      rotation = "1 0 0 0";
+      scale = "1 1 1";
+      canSave = "1";
+      canSaveDynamicFields = "1";
          bias = "0.1";
          Blur = "1";
-         Enabled = "1";
+         enabled = "1";
          height = "1024";
          lightBleedFactor = "0.8";
          minVariance = "0";
          pointShadowType = "PointShadowType_Paraboloid";
          shadowBox = "-100 -100 -100 100 100 100";
+         splitFadeDistances = "1 1 1 1";
          width = "3072";
    };
-   new SimGroup(PlayerDropPoints) {
+   new GroundPlane() {
+      squareSize = "128";
+      scaleU = "25";
+      scaleV = "25";
+      Material = "Grid_512_Grey";
+      canSave = "1";
       canSaveDynamicFields = "1";
-         Enabled = "1";
-
-      new SpawnSphere() {
-         canSaveDynamicFields = "1";
-         Position = "0 0 2";
+         enabled = "1";
+         position = "0 0 0";
          rotation = "1 0 0 0";
          scale = "1 1 1";
-         dataBlock = "SpawnSphereMarker";
-         radius = "5";
-         autoSpawn = "false";
-         sphereWeight = "1";
-         indoorWeight = "1";
-         outdoorWeight = "1";
-            Enabled = "1";
-            homingCount = "0";
-            lockCount = "0";
-      };
-   };
-   new GroundPlane() {
-      canSaveDynamicFields = "1";
-      Position = "0 0 0";
-      rotation = "1 0 0 0";
-      scale = "1 1 1";
-      squareSize = "128";
-      scaleU = "12";
-      scaleV = "12";
-      Material = "BlankWhite";
-         Enabled = "1";
    };
 };
 //--- OBJECT WRITE END ---

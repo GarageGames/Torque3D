@@ -201,7 +201,7 @@ function ConvexEditorPlugin::onSaveMission( %this, %missionFile )
 function ConvexEditorPlugin::initSettings( %this )
 {
    EditorSettings.beginGroup( "ConvexEditor", true );
-   EditorSettings.setDefaultValue(  "MaterialName",         "DefaultConvexShapeMat" );
+   EditorSettings.setDefaultValue(  "MaterialName",         "Grid_512_Orange" );
    EditorSettings.endGroup();
 }
 

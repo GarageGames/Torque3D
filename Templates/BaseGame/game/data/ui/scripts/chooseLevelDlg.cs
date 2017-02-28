@@ -26,7 +26,30 @@ function ChooseLevelDlg::onWake( %this )
    CL_levelList.clear();
    ChooseLevelWindow->SmallPreviews.clear();
    
+   %this->CurrentPreview.visible = false;
+   %this->levelName.visible = false;
+   %this->LevelDescriptionLabel.visible = false;
+   %this->LevelDescription.visible = false;
+   
    %count = LevelFilesList.count();
+   
+   if(%count == 0)
+   {
+      //We have no levels found. Prompt the user to open the editor to the default level if the tools are present
+      if(IsDirectory("tools"))
+      {
+         MessageBoxYesNo("Error", "No levels were found in any modules. Do you want to load the editor and start a new level?", 
+            "fastLoadWorldEdit(1);", "Canvas.popDialog(ChooseLevelDlg); Canvas.setContent(MainMenuGUI);");  
+      }
+      else
+      {
+         MessageBoxOK("Error", "No levels were found in any modules. Please ensure you have modules loaded that contain gameplay code and level files.", 
+            "Canvas.popDialog(ChooseLevelDlg); Canvas.setContent(MainMenuGUI);");
+      }
+      
+      return;
+   }
+   
    for ( %i=0; %i < %count; %i++ )
    {
       %file = LevelFilesList.getKey( %i );
@@ -211,21 +234,38 @@ function ChooseLevelWindow::previewSelected(%this, %preview)
 
    // Set the large preview image
    if (isObject(%preview) && %preview.bitmap !$= "")
+   {
+      %this->CurrentPreview.visible = true;
       %this->CurrentPreview.setBitmap(%preview.bitmap);
+   }
    else
-      %this->CurrentPreview.setBitmap("data/ui/art/no-preview");
+   {
+      %this->CurrentPreview.visible = false;
+   }
 
    // Set the current level name
    if (isObject(%preview) && %preview.levelName !$= "")
+   {
+      %this->LevelName.visible = true;
       %this->LevelName.setText(%preview.levelName);
+   }
    else
-      %this->LevelName.setText("Level");
+   {
+      %this->LevelName.visible = false;
+   }
 
    // Set the current level description
    if (isObject(%preview) && %preview.levelDesc !$= "")
+   {
+      %this->LevelDescription.visible = true;
+      %this->LevelDescriptionLabel.visible = true;
       %this->LevelDescription.setText(%preview.levelDesc);
+   }
    else
-      %this->LevelDescription.setText("A Torque Level");
+   {
+      %this->LevelDescription.visible = false;
+      %this->LevelDescriptionLabel.visible = false;
+   }
 }
 
 function ChooseLevelWindow::previousPreviews(%this)

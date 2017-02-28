@@ -49,7 +49,8 @@ function initializeWorldEditor()
    exec("./scripts/menus.ed.cs");
    exec("./scripts/menuHandlers.ed.cs");
    exec("./scripts/editor.ed.cs");
-   exec("./scripts/editor.bind.ed.cs");
+   exec("./scripts/editorInputCommands.cs");
+   exec("./scripts/editor.keybinds.cs");
    exec("./scripts/undoManager.ed.cs");
    exec("./scripts/lighting.ed.cs");
    exec("./scripts/EditorGui.ed.cs");

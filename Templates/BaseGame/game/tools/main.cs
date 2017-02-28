@@ -223,12 +223,31 @@ function fastLoadWorldEdit(%val)
          onStart();
       }
 
-      if(Canvas.getContent() == MainMenuGui.getId())
+      if(!$Game::running)
       {
          //startGame();
          activatePackage( "BootEditor" );
          ChooseLevelDlg.launchInEditor = false; 
          StartGame("tools/levels/BlankRoom.mis", "SinglePlayer");
+         
+         if(!isObject(Observer))
+         {
+            datablock CameraData(Observer) {};
+         }
+         
+         %cam = new Camera()
+         {
+            datablock = Observer;
+         };
+         
+         %cam.scopeToClient(LocalClientConnection);
+         
+         LocalClientConnection.setCameraObject(%cam);
+         LocalClientConnection.setControlObject(%cam);
+         
+         LocalClientConnection.camera = %cam;
+         
+         %cam.setPosition("0 0 0");
       }
       else
       {        

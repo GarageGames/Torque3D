@@ -1,7 +1,7 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GuiControl(ChooseLevelDlg) {
    position = "0 0";
-   extent = "1024 768";
+   extent = "1280 1024";
    minExtent = "8 8";
    horizSizing = "width";
    vertSizing = "height";
@@ -13,7 +13,7 @@
    isContainer = "1";
    canSave = "1";
    canSaveDynamicFields = "1";
-      Enabled = "1";
+      enabled = "1";
       launchInEditor = "0";
       returnGui = "MainMenuGui";
 
@@ -33,7 +33,8 @@
       canSaveDynamicFields = "0";
 
       new GuiBitmapCtrl() {
-         bitmap = "./art/no-preview";
+         bitmap = "data/ui/scripts/guis/art/no-preview";
+         color = "255 255 255 255";
          wrap = "0";
          position = "369 31";
          extent = "400 300";
@@ -41,15 +42,16 @@
          horizSizing = "right";
          vertSizing = "bottom";
          profile = "GuiDefaultProfile";
-         visible = "1";
+         visible = "0";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
          hovertime = "1000";
          isContainer = "0";
          internalName = "CurrentPreview";
+         hidden = "1";
          canSave = "1";
          canSaveDynamicFields = "1";
-            Enabled = "1";
+            enabled = "1";
       };
       new GuiTextCtrl() {
          text = "Empty Room";
@@ -66,12 +68,13 @@
          horizSizing = "right";
          vertSizing = "bottom";
          profile = "GuiMenuButtonProfile";
-         visible = "1";
+         visible = "0";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
          hovertime = "1000";
          isContainer = "0";
          internalName = "levelName";
+         hidden = "1";
          canSave = "1";
          canSaveDynamicFields = "0";
       };
@@ -90,11 +93,13 @@
          horizSizing = "right";
          vertSizing = "bottom";
          profile = "GuiMenuButtonProfile";
-         visible = "1";
+         visible = "0";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
          hovertime = "1000";
          isContainer = "0";
+         internalName = "LevelDescriptionLabel";
+         hidden = "1";
          canSave = "1";
          canSaveDynamicFields = "0";
       };
@@ -104,7 +109,7 @@
          maxChars = "-1";
          useURLMouseCursor = "0";
          position = "370 380";
-         extent = "165 28";
+         extent = "165 14";
          minExtent = "8 8";
          horizSizing = "right";
          vertSizing = "bottom";
@@ -119,11 +124,12 @@
          canSaveDynamicFields = "0";
       };
       new GuiBitmapButtonCtrl() {
-         bitmap = "./art/previous-button";
+         bitmap = "data/ui/scripts/guis/art/previous-button";
          bitmapMode = "Stretched";
          autoFitExtents = "0";
          useModifiers = "0";
          useStates = "1";
+         masked = "0";
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
@@ -143,15 +149,16 @@
          hidden = "1";
          canSave = "1";
          canSaveDynamicFields = "1";
-            Enabled = "1";
+            enabled = "1";
             wrap = "0";
       };
       new GuiBitmapButtonCtrl() {
-         bitmap = "./art/next-button";
+         bitmap = "data/ui/scripts/guis/art/next-button";
          bitmapMode = "Stretched";
          autoFitExtents = "0";
          useModifiers = "0";
          useStates = "1";
+         masked = "0";
          groupNum = "-1";
          buttonType = "PushButton";
          useMouseEvents = "0";
@@ -171,7 +178,7 @@
          hidden = "1";
          canSave = "1";
          canSaveDynamicFields = "1";
-            Enabled = "1";
+            enabled = "1";
             wrap = "0";
       };
       new GuiTextListCtrl(CL_levelList) {
@@ -219,28 +226,6 @@
          internalName = "SmallPreviews";
          canSave = "1";
          canSaveDynamicFields = "0";
-
-         new GuiButtonCtrl() {
-            text = "Empty";
-            groupNum = "-1";
-            buttonType = "ToggleButton";
-            useMouseEvents = "0";
-            position = "0 0";
-            extent = "368 35";
-            minExtent = "8 2";
-            horizSizing = "right";
-            vertSizing = "bottom";
-            profile = "GuiMenuButtonProfile";
-            visible = "1";
-            active = "1";
-            command = "ChooseLevelWindow.previewSelected(ChooseLevelWindow->SmallPreviews->SmallPreview0);";
-            tooltipProfile = "GuiToolTipProfile";
-            hovertime = "1000";
-            isContainer = "0";
-            internalName = "SmallPreview0";
-            canSave = "1";
-            canSaveDynamicFields = "0";
-         };
       };
       new GuiButtonCtrl(ChooseLevelDlgGoBtn) {
          text = "Start Level";
