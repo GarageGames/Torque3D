@@ -39,12 +39,13 @@ function ChooseLevelDlg::onWake( %this )
       if(IsDirectory("tools"))
       {
          MessageBoxYesNo("Error", "No levels were found in any modules. Do you want to load the editor and start a new level?", 
-            "fastLoadWorldEdit(1);", "Canvas.popDialog(ChooseLevelDlg); Canvas.setContent(MainMenuGUI);");  
+            "fastLoadWorldEdit(1);", 
+            "Canvas.popDialog(ChooseLevelDlg); if(isObject(ChooseLevelDlg.returnGui) && ChooseLevelDlg.returnGui.isMethod(\"onReturnTo\")) ChooseLevelDlg.returnGui.onReturnTo();");  
       }
       else
       {
          MessageBoxOK("Error", "No levels were found in any modules. Please ensure you have modules loaded that contain gameplay code and level files.", 
-            "Canvas.popDialog(ChooseLevelDlg); Canvas.setContent(MainMenuGUI);");
+            "Canvas.popDialog(ChooseLevelDlg); if(isObject(ChooseLevelDlg.returnGui) && ChooseLevelDlg.returnGui.isMethod(\"onReturnTo\")) ChooseLevelDlg.returnGui.onReturnTo();");
       }
       
       return;
