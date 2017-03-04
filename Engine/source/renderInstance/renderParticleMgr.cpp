@@ -589,43 +589,51 @@ bool RenderParticleMgr::_initShader()
 
 void RenderParticleMgr::_onLMActivate( const char*, bool activate )
 {
-   RenderPassManager *rpm = getRenderPass();
-   if ( !rpm )
-      return;
-
-   // Hunt for the pre-pass manager/target
-   RenderPrePassMgr *prePassBin = NULL;
-   for( U32 i = 0; i < rpm->getManagerCount(); i++ )
+   if ( activate )
    {
-      RenderBinManager *bin = rpm->getManager(i);
-      if( bin->getRenderInstType() == RenderPrePassMgr::RIT_PrePass )
+      RenderPassManager *rpm = getRenderPass();
+      if ( !rpm )
+         return;
+
+      // Hunt for the pre-pass manager/target
+      RenderPrePassMgr *prePassBin = NULL;
+      for( U32 i = 0; i < rpm->getManagerCount(); i++ )
       {
-         prePassBin = (RenderPrePassMgr*)bin;
-         break;
+         RenderBinManager *bin = rpm->getManager(i);
+         if( bin->getRenderInstType() == RenderPrePassMgr::RIT_PrePass )
+         {
+            prePassBin = (RenderPrePassMgr*)bin;
+            break;
+         }
       }
-   }
 
-   // If we found the prepass bin, set this bin to render very shortly afterwards
-   // and re-add this render-manager. If there is no pre-pass bin, or it doesn't
-   // have a depth-texture, we can't render offscreen.
-   mOffscreenRenderEnabled = prePassBin && (prePassBin->getTargetChainLength() > 0);
-   if(mOffscreenRenderEnabled)
-   {
-      rpm->removeManager(this);
-      setRenderOrder( prePassBin->getRenderOrder() + 0.011f );
-      rpm->addManager(this);
-   }
+      // If we found the prepass bin, set this bin to render very shortly afterwards
+      // and re-add this render-manager. If there is no pre-pass bin, or it doesn't
+      // have a depth-texture, we can't render offscreen.
+      mOffscreenRenderEnabled = prePassBin && (prePassBin->getTargetChainLength() > 0);
+      if(mOffscreenRenderEnabled)
+      {
+         rpm->removeManager(this);
+         setRenderOrder( prePassBin->getRenderOrder() + 0.011f );
+         rpm->addManager(this);
+      }
 
-   // Find the targets we use
-   mPrepassTarget = NamedTexTarget::find( "prepass" );
-   mEdgeTarget = NamedTexTarget::find( "edge" );
+      // Find the targets we use
+      mPrepassTarget = NamedTexTarget::find( "prepass" );
+      mEdgeTarget = NamedTexTarget::find( "edge" );
 
-   // Setup the shader
-   if ( activate ) 
+      // Setup the shader
       _initShader();
 
-   if ( mScreenQuadVertBuff.isNull() )
-      _initGFXResources();
+      if ( mScreenQuadVertBuff.isNull() )
+         _initGFXResources();
+   } 
+   else
+   {
+      mStencilClearSB = NULL;
+      mScreenQuadPrimBuff = NULL;
+      mScreenQuadVertBuff = NULL;
+   }
 }
 
 GFXStateBlockRef RenderParticleMgr::_getOffscreenStateBlock(ParticleRenderInst *ri)

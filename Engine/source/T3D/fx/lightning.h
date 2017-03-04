@@ -47,6 +47,7 @@ class ShapeBase;
 class LightningStrikeEvent;
 class SFXTrack;
 
+#define MAX_LIGHTNING 3
 
 // -------------------------------------------------------------------------
 class LightningData : public GameBaseData
@@ -70,6 +71,7 @@ class LightningData : public GameBaseData
 
    GFXTexHandle  strikeTextures[MaxTextures];
    U32           numThunders;
+   U32           mNumStrikeTextures;
 
   protected:
    bool onAdd();
@@ -227,7 +229,7 @@ class Lightning : public GameBase
 
    void warningFlashes();
    void strikeRandomPoint();
-   void strikeObject(ShapeBase*);
+   void strikeObject(ShapeBase* targetObj);
    void processEvent(LightningStrikeEvent*);
 
    DECLARE_CONOBJECT(Lightning);

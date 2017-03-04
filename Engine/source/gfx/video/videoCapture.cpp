@@ -314,6 +314,9 @@ DefineEngineFunction( startVideoCapture, void,
    "@see stopVideoCapture\n"
    "@ingroup Rendering\n" )
 {
+#ifdef TORQUE_DEBUG
+   Con::errorf("Recording video is disabled in debug!");
+#else
    if ( !canvas )
    {
       Con::errorf("startVideoCapture -Please specify a GuiCanvas object to record from!");
@@ -328,6 +331,7 @@ DefineEngineFunction( startVideoCapture, void,
       VIDCAP->setResolution(resolution);
 
    VIDCAP->begin(canvas);
+#endif
 }
 
 DefineEngineFunction( stopVideoCapture, void, (),,

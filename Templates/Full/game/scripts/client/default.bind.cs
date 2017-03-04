@@ -583,6 +583,49 @@ function stopRecordingDemo( %val )
 moveMap.bind( keyboard, F3, startRecordingDemo );
 moveMap.bind( keyboard, F4, stopRecordingDemo );
 
+//------------------------------------------------------------------------------
+// Theora Video Capture (Records a movie file)  
+//------------------------------------------------------------------------------
+
+function toggleMovieRecording(%val)
+{
+   if (!%val)
+      return;
+
+   %movieEncodingType = "THEORA";  // Valid encoder values are "PNG" and "THEORA" (default). 
+   %movieFPS = 30;  // video capture frame rate.
+   
+   if (!$RecordingMovie)
+   {
+       // locate a non-existent filename to use
+       for(%i = 0; %i < 1000; %i++)
+       {
+          %num = %i;
+          if(%num < 10)
+             %num = "0" @ %num;
+          if(%num < 100)
+             %num = "0" @ %num;
+       
+          %filePath = "movies/movie" @ %num;
+          if(!isfile(%filePath))
+             break;
+       }
+       if(%i == 1000)
+          return;
+
+      // Start the movie recording
+      recordMovie(%filePath, %movieFPS, %movieEncodingType);
+      
+   }
+   else
+   {
+      // Stop the current recording
+      stopMovie();
+   }
+}
+
+// Key binding works at any time and not just while in a game.
+GlobalActionMap.bind(keyboard, "alt m", toggleMovieRecording);
 
 //------------------------------------------------------------------------------
 // Helper Functions

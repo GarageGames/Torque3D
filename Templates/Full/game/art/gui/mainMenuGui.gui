@@ -126,7 +126,7 @@
          profile = "GuiMenuButtonProfile";
          visible = "1";
          active = "1";
-         command = "GuiEdit();";
+         command = "toggleGuiEditor(1);";
          tooltipProfile = "GuiToolTipProfile";
          tooltip = "The GUI Editor is accessible in-game by pressing F10";
          hovertime = "1000";

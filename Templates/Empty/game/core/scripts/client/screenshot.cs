@@ -55,6 +55,9 @@ function formatSessionNumber(%number)
 // Records a movie file from the Canvas content using the specified fps.
 // Possible encoder values are "PNG" and "THEORA" (default).
 //---------------------------------------------------------------------------------------------
+
+$RecordingMovie = false;
+
 function recordMovie(%movieName, %fps, %encoder)
 {
    // If the canvas doesn't exist yet, setup a flag so it'll 
@@ -65,12 +68,24 @@ function recordMovie(%movieName, %fps, %encoder)
    if (%encoder $= "") 
       %encoder = "THEORA";   
    %resolution = Canvas.getVideoMode();
+   
+   // Start the movie recording
+   ChatHud.AddLine( "\c4Recording movie file to [\c2" @ %movieName @ "\cr].ogv.");
+   echo("Recording movie to: " @ %movieName);   
    startVideoCapture(Canvas, %movieName, %encoder, %fps); 
+   
+    $RecordingMovie = true;
 }
 
 function stopMovie()
 {
+   // Stop the current recording
+   ChatHud.AddLine( "\c4Recording movie file finished.");
+   echo("Stopped movie recording");
+   
    stopVideoCapture();
+
+   $RecordingMovie = false;
 }
 
 /// This is bound in initializeCommon() to take
