@@ -1,0 +1,1698 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(ColladaImportDlg,EditorGuiGroup) {
+   isContainer = "1";
+   Profile = "ToolsGuiDefaultProfile";
+   HorizSizing = "width";
+   VertSizing = "height";
+   position = "0 0";
+   Extent = "1024 768";
+   MinExtent = "8 2";
+   canSave = "1";
+   Visible = "1";
+   tooltipprofile = "ToolsGuiToolTipProfile";
+   hovertime = "1000";
+   canSaveDynamicFields = "0";
+
+   new GuiWindowCtrl() {
+      resizeWidth = "0";
+      resizeHeight = "0";
+      canMove = "1";
+      canClose = "1";
+      canMinimize = "0";
+      canMaximize = "0";
+      minSize = "50 50";
+      closeCommand = "Canvas.popDialog(ColladaImportDlg);";
+      EdgeSnap = "1";
+      text = "";
+      Margin = "0 0 0 0";
+      Padding = "0 0 0 0";
+      AnchorTop = "1";
+      AnchorBottom = "0";
+      AnchorLeft = "1";
+      AnchorRight = "0";
+      isContainer = "1";
+      Profile = "ToolsGuiWindowProfile";
+      HorizSizing = "center";
+      VertSizing = "center";
+      position = "254 136";
+      Extent = "516 447";
+      MinExtent = "8 8";
+      canSave = "1";
+      Visible = "1";
+      Accelerator = "escape";
+      tooltipprofile = "ToolsGuiToolTipProfile";
+      hovertime = "1000";
+      internalName = "window";
+      canSaveDynamicFields = "0";
+
+      new GuiControl() {
+         isContainer = "1";
+         Profile = "ToolsGuiDefaultProfile";
+         HorizSizing = "width";
+         VertSizing = "height";
+         position = "8 24";
+         Extent = "238 417";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         canSaveDynamicFields = "0";
+
+         new GuiScrollCtrl() {
+            willFirstRespond = "1";
+            hScrollBar = "dynamic";
+            vScrollBar = "dynamic";
+            lockHorizScroll = "0";
+            lockVertScroll = "0";
+            constantThumbHeight = "0";
+            childMargin = "0 0";
+            mouseWheelScrollSpeed = "-1";
+            Margin = "0 0 0 0";
+            Padding = "0 0 0 0";
+            AnchorTop = "1";
+            AnchorBottom = "0";
+            AnchorLeft = "1";
+            AnchorRight = "0";
+            isContainer = "1";
+            Profile = "ToolsGuiScrollProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "0 3";
+            Extent = "238 366";
+            MinExtent = "8 2";
+            canSave = "1";
+            Visible = "1";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "1";
+
+            new GuiTreeViewCtrl(ColladaImportTreeView) {
+               tabSize = "16";
+               textOffset = "2";
+               fullRowSelect = "0";
+               itemHeight = "21";
+               destroyTreeOnSleep = "0";
+               MouseDragging = "0";
+               MultipleSelections = "0";
+               DeleteObjectAllowed = "0";
+               DragToItemAllowed = "0";
+               ClearAllOnSingleSelection = "1";
+               showRoot = "1";
+               internalNamesOnly = "0";
+               objectNamesOnly = "0";
+               useInspectorTooltips = "0";
+               tooltipOnWidthOnly = "0";
+               compareToObjectID = "1";
+               canRenameObjects = "1";
+               renameInternal = "0";
+               isContainer = "1";
+               Profile = "ToolsGuiTreeViewProfile";
+               HorizSizing = "width";
+               VertSizing = "height";
+               position = "1 1";
+               Extent = "74 63";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+         };
+      };
+      new GuiControl() {
+         isContainer = "1";
+         Profile = "ToolsGuiDefaultProfile";
+         HorizSizing = "width";
+         VertSizing = "height";
+         position = "254 24";
+         Extent = "254 417";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         canSaveDynamicFields = "0";
+
+         new GuiBitmapBorderCtrl() {
+            isContainer = "1";
+            Profile = "ToolsGuiGroupBorderProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "0 3";
+            Extent = "254 60";
+            MinExtent = "8 8";
+            canSave = "1";
+            Visible = "1";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+
+            new GuiTextCtrl() {
+               text = "Nodes";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "42 2";
+               Extent = "32 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "90 2";
+               Extent = "60 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "nodes";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Meshes";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "36 22";
+               Extent = "38 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "90 22";
+               Extent = "60 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "meshes";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Polygons";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "132 22";
+               Extent = "47 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "193 22";
+               Extent = "60 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "polygons";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Materials";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "135 2";
+               Extent = "44 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "193 2";
+               Extent = "60 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "Materials";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Lights";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "23 41";
+               Extent = "52 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "91 41";
+               Extent = "60 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "lights";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Animations";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "127 41";
+               Extent = "52 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "191 41";
+               Extent = "60 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "animations";
+               canSaveDynamicFields = "0";
+            };
+         };
+         new GuiBitmapBorderCtrl() {
+            isContainer = "1";
+            Profile = "ToolsGuiGroupBorderProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "0 68";
+            Extent = "254 153";
+            MinExtent = "8 8";
+            canSave = "1";
+            Visible = "1";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+
+            new GuiTextCtrl() {
+               text = "LOD";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "59 6";
+               Extent = "22 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiPopUpMenuCtrl() {
+               maxPopupHeight = "200";
+               sbUsesNAColor = "0";
+               reverseTextList = "0";
+               bitmapBounds = "16 16";
+               text = "DetectDTS";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiPopUpMenuProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "97 6";
+               Extent = "92 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               ToolTip = "Method used to determine LOD for meshes in the model";
+               hovertime = "1000";
+               internalName = "lodType";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               password = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               passwordMask = "*";
+               text = "";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextEditProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "196 6";
+               Extent = "49 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               ToolTip = "Detail size for all meshes in this model (when LOD type is SingleSize)";
+               hovertime = "1000";
+               internalName = "singleDetailSize";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Materials Prefix";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "11 32";
+               Extent = "73 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               password = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               passwordMask = "*";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextEditProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "97 32";
+               Extent = "148 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               AltCommand = "ColladaImportTreeView.refresh(\"materials\");";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "materialPrefix";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Import Nodes";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "13 58";
+               Extent = "72 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               password = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               passwordMask = "*";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextEditProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "97 58";
+               Extent = "148 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               AltCommand = "ColladaImportTreeView.refresh(\"nodes\");";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "alwaysImport";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Ignore Nodes";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "20 82";
+               Extent = "65 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               password = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               passwordMask = "*";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextEditProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "97 82";
+               Extent = "148 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               AltCommand = "ColladaImportTreeView.refresh(\"nodes\");";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "neverImport";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Import Meshes";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "13 106";
+               Extent = "72 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               password = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               passwordMask = "*";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextEditProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "97 106";
+               Extent = "148 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               AltCommand = "ColladaImportTreeView.refresh(\"nodes\");";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "alwaysImportMesh";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextCtrl() {
+               text = "Ignore Meshes";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextRightProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "13 130";
+               Extent = "72 16";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               password = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               passwordMask = "*";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextEditProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "97 130";
+               Extent = "148 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               AltCommand = "ColladaImportTreeView.refresh(\"nodes\");";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "neverImportMesh";
+               canSaveDynamicFields = "0";
+            };
+         };
+         new GuiBitmapBorderCtrl() {
+            isContainer = "1";
+            Profile = "ToolsGuiGroupBorderProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "0 226";
+            Extent = "254 105";
+            MinExtent = "8 8";
+            canSave = "1";
+            Visible = "1";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+
+            new GuiCheckBoxCtrl() {
+               useInactiveState = "0";
+               text = " Override up_axis";
+               groupNum = "-1";
+               buttonType = "ToggleButton";
+               useMouseEvents = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiCheckBoxProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "11 7";
+               Extent = "102 13";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               Command = "ColladaImportDlg.updateOverrideUpAxis($ThisControl.getValue());";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               ToolTip = "Overrides the <up_axis> specified in the DAE file";
+               hovertime = "1000";
+               internalName = "overrideUpAxis";
+               canSaveDynamicFields = "0";
+            };
+            new GuiPopUpMenuCtrl() {
+               maxPopupHeight = "200";
+               sbUsesNAColor = "0";
+               reverseTextList = "0";
+               bitmapBounds = "16 16";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiPopUpMenuProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "151 6";
+               Extent = "66 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "upAxis";
+               canSaveDynamicFields = "0";
+            };
+            new GuiCheckBoxCtrl() {
+               useInactiveState = "0";
+               text = " Override scale";
+               groupNum = "-1";
+               buttonType = "ToggleButton";
+               useMouseEvents = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiCheckBoxProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "11 27";
+               Extent = "92 13";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               Command = "ColladaImportDlg.updateOverrideScale($ThisControl.getValue());";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               ToolTip = "Overrides the <unit> scale specified in the DAE file";
+               hovertime = "1000";
+               internalName = "overrideScale";
+               canSaveDynamicFields = "0";
+            };
+            new GuiTextEditCtrl() {
+               historySize = "0";
+               password = "0";
+               tabComplete = "0";
+               sinkAllKeyEvents = "0";
+               passwordMask = "*";
+               text = "";
+               maxLength = "1024";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiTextEditProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "151 27";
+               Extent = "66 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               internalName = "scale";
+               canSaveDynamicFields = "0";
+            };
+            new GuiCheckBoxCtrl() {
+               useInactiveState = "0";
+               text = " Ignore bone scaling";
+               groupNum = "-1";
+               buttonType = "ToggleButton";
+               useMouseEvents = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiCheckBoxProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "11 48";
+               Extent = "114 13";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               ToolTip = "Ignores <scale> elements within <node>s to fix issues with some models";
+               hovertime = "1000";
+               internalName = "ignoreNodeScale";
+               canSaveDynamicFields = "0";
+            };
+            new GuiCheckBoxCtrl() {
+               useInactiveState = "0";
+               text = " Center model";
+               groupNum = "-1";
+               buttonType = "ToggleButton";
+               useMouseEvents = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiCheckBoxProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "11 67";
+               Extent = "82 13";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               ToolTip = "Translates model so the origin is at the center";
+               hovertime = "1000";
+               internalName = "adjustCenter";
+               canSaveDynamicFields = "0";
+            };
+            new GuiCheckBoxCtrl() {
+               useInactiveState = "0";
+               text = " Floor model";
+               groupNum = "-1";
+               buttonType = "ToggleButton";
+               useMouseEvents = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiCheckBoxProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "151 67";
+               Extent = "72 13";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               ToolTip = "Translates model so the origin is at the bottom";
+               hovertime = "1000";
+               internalName = "adjustFloor";
+               canSaveDynamicFields = "0";
+            };
+            new GuiCheckBoxCtrl() {
+               useInactiveState = "0";
+               text = " Force update materials.cs";
+               groupNum = "-1";
+               buttonType = "ToggleButton";
+               useMouseEvents = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiCheckBoxProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "11 86";
+               Extent = "148 13";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               ToolTip = "Forces update of materials.cs (even if Materials already exist)";
+               hovertime = "1000";
+               internalName = "forceUpdateMaterials";
+               canSaveDynamicFields = "0";
+            };
+         };
+         new GuiBitmapBorderCtrl() {
+            isContainer = "1";
+            Profile = "ToolsGuiGroupBorderProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "0 338";
+            Extent = "254 24";
+            MinExtent = "8 8";
+            canSave = "1";
+            Visible = "1";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+
+            new GuiCheckBoxCtrl() {
+               useInactiveState = "0";
+               text = " Add lights to scene";
+               groupNum = "-1";
+               buttonType = "ToggleButton";
+               useMouseEvents = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiCheckBoxProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "11 5";
+               Extent = "148 13";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               ToolTip = "Loads the lights from the DAE file and adds them to the current scene.";
+               hovertime = "1000";
+               internalName = "loadLights";
+               canSaveDynamicFields = "0";
+            };
+         };
+         new GuiButtonCtrl() {
+            text = "Load from .cfg";
+            groupNum = "-1";
+            buttonType = "PushButton";
+            useMouseEvents = "0";
+            isContainer = "0";
+            Profile = "ToolsGuiButtonProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "11 368";
+            Extent = "86 22";
+            MinExtent = "8 2";
+            canSave = "1";
+            Visible = "1";
+            Command = "ColladaImportDlg.readDtsConfig();";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+         };
+         new GuiButtonCtrl() {
+            text = "Save to .cfg";
+            groupNum = "-1";
+            buttonType = "PushButton";
+            useMouseEvents = "0";
+            isContainer = "0";
+            Profile = "ToolsGuiButtonProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "11 395";
+            Extent = "86 22";
+            MinExtent = "8 2";
+            canSave = "1";
+            Visible = "1";
+            Command = "ColladaImportDlg.writeDtsConfig();";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+         };
+         new GuiButtonCtrl() {
+            text = "OK";
+            groupNum = "-1";
+            buttonType = "PushButton";
+            useMouseEvents = "0";
+            isContainer = "0";
+            Profile = "ToolsGuiButtonProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "159 368";
+            Extent = "86 22";
+            MinExtent = "8 2";
+            canSave = "1";
+            Visible = "1";
+            Command = "ColladaImportDlg.onOK();";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            ToolTip = "Load the COLLADA model";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+         };
+         new GuiButtonCtrl() {
+            text = "Cancel";
+            groupNum = "-1";
+            buttonType = "PushButton";
+            useMouseEvents = "0";
+            isContainer = "0";
+            Profile = "ToolsGuiButtonProfile";
+            HorizSizing = "right";
+            VertSizing = "bottom";
+            position = "159 395";
+            Extent = "86 22";
+            MinExtent = "8 2";
+            canSave = "1";
+            Visible = "1";
+            Command = "ColladaImportDlg.onCancel();";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            ToolTip = "Exit without loading the COLLADA model";
+            hovertime = "1000";
+            canSaveDynamicFields = "0";
+         };
+      };
+   };
+};
+//--- OBJECT WRITE END ---
+
+new GuiControl(ColladaImportProgress,EditorGuiGroup) {
+   isContainer = "1";
+   Profile = "ToolsGuiDefaultProfile";
+   HorizSizing = "width";
+   VertSizing = "height";
+   position = "0 0";
+   Extent = "1024 768";
+   MinExtent = "8 8";
+   canSave = "1";
+   Visible = "1";
+   tooltipprofile = "ToolsGuiToolTipProfile";
+   hovertime = "1000";
+   canSaveDynamicFields = "0";
+
+   new GuiWindowCtrl() {
+      internalName = "window";
+      resizeWidth = "0";
+      resizeHeight = "0";
+      canMove = "1";
+      canClose = "0";
+      canMinimize = "0";
+      canMaximize = "0";
+      minSize = "50 50";
+      EdgeSnap = "1";
+      text = "Importing cowboy.dae";
+      Margin = "0 0 0 0";
+      Padding = "0 0 0 0";
+      AnchorTop = "1";
+      AnchorBottom = "0";
+      AnchorLeft = "1";
+      AnchorRight = "0";
+      isContainer = "1";
+      Profile = "ToolsGuiWindowProfile";
+      HorizSizing = "center";
+      VertSizing = "center";
+      position = "362 338";
+      Extent = "300 92";
+      MinExtent = "48 92";
+      canSave = "1";
+      Visible = "1";
+      tooltipprofile = "ToolsGuiToolTipProfile";
+      hovertime = "1000";
+      canSaveDynamicFields = "0";
+
+      new GuiProgressBitmapCtrl() {
+         internalName = "progressBar";
+         maxLength = "1024";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         isContainer = "1";
+         Profile = "ToolsGuiRLProgressBitmapProfile";
+         HorizSizing = "width";
+         VertSizing = "bottom";
+         position = "10 34";
+         Extent = "280 24";
+         MinExtent = "8 8";
+         canSave = "1";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl() {
+         internalName = "progressText";
+         maxLength = "1024";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         isContainer = "0";
+         Profile = "ToolsGuiTextProfile";
+         HorizSizing = "width";
+         VertSizing = "bottom";
+         position = "10 62";
+         Extent = "280 16";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         canSaveDynamicFields = "0";
+      };
+   };
+};
+
+function ColladaImportTreeView::onDefineIcons(%this)
+{
+   // Set the tree view icon indices and texture paths
+   %this._imageNone = 0;
+   %this._imageNode = 1;
+   %this._imageMesh = 2;
+   %this._imageMaterial = 3;
+   %this._imageLight = 4;
+   %this._imageAnimation = 5;
+   %this._imageExNode = 6;
+   %this._imageExMaterial = 7;
+
+   %icons = ":" @                                                    // no icon
+            "tools/gui/images/ColladaImport/iconNode:" @             // normal node
+            "tools/gui/images/ColladaImport/iconMesh:" @             // mesh
+            "tools/gui/images/ColladaImport/iconMaterial:" @         // new material
+            "tools/gui/images/ColladaImport/iconLight:" @            // light
+            "tools/gui/images/ColladaImport/iconAnimation:" @        // sequence
+            "tools/gui/images/ColladaImport/iconIgnoreNode:" @       // ignored node
+            "tools/gui/images/ColladaImport/iconExistingMaterial";   // existing material
+
+   %this.buildIconTable( %icons );
+}
+
+function ColladaImportDlg::showDialog(%this, %shapePath, %cmd)
+{
+   %this.path = %shapePath;
+   %this.cmd = %cmd;
+
+   // Only allow loading lights if creating a new scene object
+   %canLoadLights = (strstr(%this.cmd, "EWCreatorWindow.create") != -1);
+
+   // Check for an existing TSShapeConstructor object. Need to exec the script
+   // manually as the DAE resource may not have been loaded yet
+   %csPath = filePath(%this.path) @ "/" @ fileBase(%this.path) @ ".cs";
+   if (isFile(%csPath))
+      exec(%csPath);
+
+   %this.constructor = ShapeEditor.findConstructor(%this.path);
+
+   // Only show the import dialog if required. Note that 'enumColladaScene' will
+   // fail if the COLLADA file is missing, or a cached.dts is available.
+   $collada::forceLoadDAE = EditorSettings.value("forceLoadDAE");
+   if ( (fileExt(%shapePath) $= ".dts") ||
+      !enumColladaForImport(%shapePath, ColladaImportTreeView) )
+   {
+      eval(%cmd);
+      $collada::forceLoadDAE = false;
+
+      // Load lights from the DAE if possible
+      if (%canLoadLights && (%this.constructor > 0) && (%this.constructor.loadLights == 1))
+         %this.loadLights();
+
+      return;
+   }
+   $collada::forceLoadDAE = false;
+
+   // Initialise GUI
+   ColladaImportTreeView.onDefineIcons();
+
+   %this-->window.text = "COLLADA Import:" SPC %this.path;
+
+   %this-->upAxis.clear();
+   %this-->upAxis.add("X_AXIS", 1);
+   %this-->upAxis.add("Y_AXIS", 2);
+   %this-->upAxis.add("Z_AXIS", 3);
+
+   %this-->lodType.clear();
+   %this-->lodType.add("DetectDTS", 1);
+   %this-->lodType.add("SingleSize", 2);
+   %this-->lodType.add("TrailingNumber", 3);
+
+   %this-->loadLights.setActive(%canLoadLights);
+
+   // Set model details
+   %this-->nodes.setText(ColladaImportTreeView._nodeCount);
+   %this-->meshes.setText(ColladaImportTreeView._meshCount);
+   %this-->polygons.setText(ColladaImportTreeView._polygonCount);
+   %this-->materials.setText(ColladaImportTreeView._materialCount);
+   %this-->lights.setText(ColladaImportTreeView._lightCount);
+   %this-->animations.setText(ColladaImportTreeView._animCount);
+
+   %this.updateOverrideUpAxis(false);
+   %this.updateOverrideScale(false);
+
+   if (%this.constructor > 0)
+   {
+      if (%this.constructor.upAxis !$= "DEFAULT")
+      {
+         %this-->upAxis.setText(%this.constructor.upAxis);
+         %this.updateOverrideUpAxis(true);
+      }
+      if (%this.constructor.unit > 0)
+      {
+         %this-->scale.setText(%this.constructor.unit);
+         %this.updateOverrideScale(true);
+      }
+
+      %this-->lodType.setText(%this.constructor.lodType);
+      %this-->singleDetailSize.setText(%this.constructor.singleDetailSize);
+      %this-->materialPrefix.setText(%this.constructor.matNamePrefix);
+      %this-->alwaysImport.setText(strreplace(%this.constructor.alwaysImport, "\t", ";"));
+      %this-->neverImport.setText(strreplace(%this.constructor.neverImport, "\t", ";"));
+      %this-->alwaysImportMesh.setText(strreplace(%this.constructor.alwaysImportMesh, "\t", ";"));
+      %this-->neverImportMesh.setText(strreplace(%this.constructor.neverImportMesh, "\t", ";"));
+      %this-->ignoreNodeScale.setStateOn(%this.constructor.ignoreNodeScale);
+      %this-->adjustCenter.setStateOn(%this.constructor.adjustCenter);
+      %this-->adjustFloor.setStateOn(%this.constructor.adjustFloor);
+      %this-->forceUpdateMaterials.setStateOn(%this.constructor.forceUpdateMaterials);
+      %this-->loadLights.setStateOn(%this.constructor.loadLights);
+   }
+   else
+   {
+      // Default settings
+      %this-->lodType.setText("DetectDTS");
+      %this-->singleDetailSize.setText("2");
+      %this-->materialPrefix.setText("");
+      %this-->alwaysImport.setText("");
+      %this-->neverImport.setText("");
+      %this-->alwaysImportMesh.setText("");
+      %this-->neverImportMesh.setText("");
+      %this-->ignoreNodeScale.setStateOn(0);
+      %this-->adjustCenter.setStateOn(0);
+      %this-->adjustFloor.setStateOn(0);
+      %this-->forceUpdateMaterials.setStateOn(0);
+      %this-->loadLights.setStateOn(0);
+   }
+
+   Canvas.pushDialog(%this);
+
+   ColladaImportTreeView.refresh("all");
+}
+
+function ColladaImportDlg::readDtsConfig(%this)
+{
+   %filename = filePath( %this.path ) @ "/" @ fileBase( %this.path ) @ ".cfg";
+   %filename2 = filePath( %this.path ) @ "/" @ "dtsScene.cfg";
+
+   %fo = new FileObject();
+   if ( %fo.openForRead( %filename ) || %fo.openForRead( %filename2 ) )
+   {
+      %alwaysImport = "";
+      %neverImport = "";
+
+      %mode = "none";
+      while ( !%fo.isEOF() )
+      {
+         %line = trim( %fo.readLine() );
+
+         if ( %line $= "AlwaysExport:" )        // Start of the AlwaysExport list
+            %mode = "always";
+         else if ( %line $= "NeverExport:" )    // Start of the NeverExport list
+            %mode = "never";
+         else if ( startswith( %line, "+" ) || startswith( %line, "-" ) )   // Boolean parameters (not supported)
+            %mode = "none";
+         else if ( startswith( %line, "=" ) )   // Float and integer parameters (not supported)
+            %mode = "none";
+         else if ( !startswith( %line, "//" ) ) // Non-commented lines
+         {
+            switch$ (%mode)
+            {
+            case "always":
+               %alwaysImport = %alwaysImport TAB %line;
+            case "never":
+               %neverImport = %neverImport TAB %line;
+            }
+         }
+      }
+      %fo.close();
+
+      %alwaysImport = strreplace( trim( %alwaysImport ), "\t", ";" );
+      %neverImport = strreplace( trim( %neverImport ), "\t", ";" );
+
+      %this-->alwaysImport.setText( %alwaysImport );
+      %this-->neverImport.setText( %neverImport );
+   }
+   else
+   {
+      error( "Failed to open " @ %filename @ " or " @ %filename2 @ " for reading" );
+   }
+
+   %fo.delete();
+}
+
+function ColladaImportDlg::writeDtsConfig(%this)
+{
+   %filename = filePath( %this.path ) @ "/" @ fileBase( %this.path ) @ ".cfg";
+
+   %fo = new FileObject();
+   if ( %fo.openForWrite( %filename ) )
+   {
+      // AlwaysImport
+      %fo.writeLine("AlwaysExport:");
+      %alwaysImport = trim( strreplace( %this-->alwaysImport.getText(), ";", "\t" ) );
+      %count = getFieldCount( %alwaysImport );
+      for (%i = 0; %i < %count; %i++)
+         %fo.writeLine( getField( %alwaysImport, %i ) );
+      %fo.writeLine("");
+
+      // NeverImport
+      %fo.writeLine("NeverExport:");
+      %neverImport = trim( strreplace( %this-->neverImport.getText(), ";", "\t" ) );
+      %count = getFieldCount( %neverImport );
+      for (%i = 0; %i < %count; %i++)
+         %fo.writeLine( getField( %neverImport, %i ) );
+      %fo.writeLine("");
+
+      %fo.close();
+   }
+   else
+   {
+      error( "Failed to open " @ %filename @ " for writing" );
+   }
+
+   %fo.delete();
+}
+
+function ColladaImportDlg::updateOverrideUpAxis(%this, %override)
+{
+   %this-->overrideUpAxis.setStateOn(%override);
+   %this-->upAxis.setActive(%override);
+   if (!%override)
+      %this-->upAxis.setText(ColladaImportTreeView._upAxis);
+}
+
+function ColladaImportDlg::updateOverrideScale(%this, %override)
+{
+   %this-->overrideScale.setStateOn(%override);
+   %this-->scale.setActive(%override);
+   if (!%override)
+      %this-->scale.setText(ColladaImportTreeView._unit);
+}
+
+function ColladaImportTreeView::refresh(%this, %what)
+{
+   %shapeRoot = %this.getFirstRootItem();
+   %materialsRoot = %this.getNextSibling(%shapeRoot);
+   %animRoot = %this.getNextSibling(%materialsRoot);
+
+   // Refresh nodes
+   if ((%what $= "all") || (%what $= "nodes"))
+   {
+      // Indicate whether nodes will be ignored on import
+      %this._alwaysImport = strreplace(ColladaImportDlg-->alwaysImport.getText(), ";", "\t");
+      %this._neverImport = strreplace(ColladaImportDlg-->neverImport.getText(), ";", "\t");
+      %this._alwaysImportMesh = strreplace(ColladaImportDlg-->alwaysImportMesh.getText(), ";", "\t");
+      %this._neverImportMesh = strreplace(ColladaImportDlg-->neverImportMesh.getText(), ";", "\t");
+      %this.refreshNode(%this.getChild(%shapeRoot));
+   }
+
+   // Refresh materials
+   if ((%what $= "all") || (%what $= "materials"))
+   {
+      %matPrefix = ColladaImportDlg-->materialPrefix.getText();
+      %id = %this.getChild(%materialsRoot);
+      while (%id > 0)
+      {
+         %baseName = %this.getItemValue(%id);
+         %name = %matPrefix @ %baseName;
+
+         // Indicate whether material name is already mapped
+         %this.editItem(%id, %name, %baseName);
+         %mapped = getMaterialMapping(%name);
+         if (%mapped $= "")
+         {
+            %this.setItemTooltip(%id, "A new material will be mapped to this name");
+            %this.setItemImages(%id, %this._imageMaterial, %this._imageMaterial);
+         }
+         else
+         {
+            %this.setItemTooltip(%id, %mapped SPC "is already mapped to this material name");
+            %this.setItemImages(%id, %this._imageExMaterial, %this._imageExMaterial);
+         }
+
+         %id = %this.getNextSibling(%id);
+      }
+   }
+
+   // Refresh animations
+   if ((%what $= "all") || (%what $= "animations"))
+   {
+      %id = %this.getChild(%animRoot);
+      while (%id > 0)
+      {
+         %this.setItemImages(%id, %this._imageAnim, %this._imageAnim);
+         %id = %this.getNextSibling(%id);
+      }
+   }
+}
+
+function ColladaImportTreeView::refreshNode(%this, %id)
+{
+   while (%id > 0)
+   {
+      switch$ (%this.getItemValue(%id))
+      {
+         case "mesh":
+            // Check if this mesh will be ignored on import
+            if (strIsMatchMultipleExpr(%this._alwaysImportMesh, %this.getItemText(%id)) ||
+               !strIsMatchMultipleExpr(%this._neverImportMesh, %this.getItemText(%id)) )
+            {
+               %this.setItemTooltip(%id, "");
+               %this.setItemImages(%id, %this._imageMesh, %this._imageMesh);
+            }
+            else
+            {
+               %this.setItemTooltip(%id, "This mesh will be ignored on import");
+               %this.setItemImages(%id, %this._imageExNode, %this._imageExNode);
+            }
+
+         case "light":
+            %this.setItemImages(%id, %this._imageLight, %this._imageLight);
+
+         case "node":
+            // Check if this node will be ignored on import
+            if (strIsMatchMultipleExpr(%this._alwaysImport, %this.getItemText(%id)) ||
+               !strIsMatchMultipleExpr(%this._neverImport, %this.getItemText(%id)) )
+            {
+               %this.setItemTooltip(%id, "");
+               %this.setItemImages(%id, %this._imageNode, %this._imageNode);
+            }
+            else
+            {
+               %this.setItemTooltip(%id, "This node will be ignored on import");
+               %this.setItemImages(%id, %this._imageExNode, %this._imageExNode);
+            }
+      }
+
+      // recurse through children and siblings
+      %this.refreshNode(%this.getChild(%id));
+      %id = %this.getNextSibling(%id);
+   }
+}
+
+function ColladaImportDlg::onCancel(%this)
+{
+   Canvas.popDialog(%this);
+   ColladaImportTreeView.clear();
+}
+
+function ColladaImportDlg::onOK(%this)
+{
+   Canvas.popDialog(%this);
+   ColladaImportTreeView.clear();
+
+   // Need to create a TSShapeConstructor object if any settings are not
+   // at the default values
+   if ((%this-->overrideUpAxis.getValue() != 0)       ||
+       (%this-->overrideScale.getValue() != 0)        ||
+       (%this-->lodType.getText() !$= "DetectDTS")    ||
+       (%this-->singleDetailSize.getText() !$= "2")   ||
+       (%this-->materialPrefix.getText() !$= "")      ||
+       (%this-->alwaysImport.getText() !$= "")        ||
+       (%this-->neverImport.getText() !$= "")         ||
+       (%this-->alwaysImportMesh.getText() !$= "")    ||
+       (%this-->neverImportMesh.getText() !$= "")     ||
+       (%this-->ignoreNodeScale.getValue() != 0)      ||
+       (%this-->adjustCenter.getValue() != 0)         ||
+       (%this-->adjustFloor.getValue() != 0)          ||
+       (%this-->forceUpdateMaterials.getValue() != 0) ||
+       (%this-->loadLights.getValue() != 0))
+   {
+      if (%this.constructor <= 0)
+      {
+         // Create a new TSShapeConstructor object
+         %this.constructor = ShapeEditor.createConstructor(%this.path);
+      }
+   }
+
+   if (%this.constructor > 0)
+   {
+      // Store values from GUI
+      if (%this-->overrideUpAxis.getValue())
+         %this.constructor.upAxis = %this-->upAxis.getText();
+      else
+         %this.constructor.upAxis = "DEFAULT";
+
+      if (%this-->overrideScale.getValue())
+         %this.constructor.unit = %this-->scale.getText();
+      else
+         %this.constructor.unit = -1;
+
+      %this.constructor.lodType = %this-->lodType.getText();
+      %this.constructor.singleDetailSize = %this-->singleDetailSize.getText();
+      %this.constructor.matNamePrefix = %this-->materialPrefix.getText();
+      %this.constructor.alwaysImport = strreplace(%this-->alwaysImport.getText(), ";", "\t");
+      %this.constructor.neverImport = strreplace(%this-->neverImport.getText(), ";", "\t");
+      %this.constructor.alwaysImportMesh = strreplace(%this-->alwaysImportMesh.getText(), ";", "\t");
+      %this.constructor.neverImportMesh = strreplace(%this-->neverImportMesh.getText(), ";", "\t");
+      %this.constructor.ignoreNodeScale = %this-->ignoreNodeScale.getValue();
+      %this.constructor.adjustCenter = %this-->adjustCenter.getValue();
+      %this.constructor.adjustFloor = %this-->adjustFloor.getValue();
+      %this.constructor.forceUpdateMaterials = %this-->forceUpdateMaterials.getValue();
+      %this.constructor.loadLights = %this-->loadLights.getValue();
+
+      // Save new settings to file
+      ShapeEditor.saveConstructor( %this.constructor );
+   }
+
+   // Load the shape (always from the DAE)
+   $collada::forceLoadDAE = true;
+   eval(%this.cmd);
+   $collada::forceLoadDAE = false;
+
+   // Optionally load the lights from the DAE as well (only if adding a new shape
+   // to the scene)
+   if (%this-->loadLights.getValue())
+      %this.loadLights();
+}
+
+function ColladaImportDlg::loadLights(%this)
+{
+   // Get the ID of the last object added
+   %obj = MissionGroup.getObject(MissionGroup.getCount()-1);
+
+   // Create a new SimGroup to hold the model and lights
+   %group = new SimGroup();
+   loadColladaLights(%this.path, %group, %obj);
+
+   // Delete the SimGroup if no lights were found. Otherwise, add the model to
+   // the group as well.
+   if (%group.getCount() > 0)
+   {
+      %group.add(%obj);
+      %group.bringToFront(%obj);
+      MissionGroup.add(%group);
+      if (EditorTree.isVisible())
+      {
+         EditorTree.removeItem(EditorTree.findItemByObjectId(%obj));
+         EditorTree.buildVisibleTree(true);
+      }
+   }
+   else
+   {
+      %group.delete();
+   }
+}
+
+function updateTSShapeLoadProgress(%progress, %msg)
+{
+   // Check if the loading GUI is visible and use that instead of the
+   // separate import progress GUI if possible
+   if ( isObject(LoadingGui) && LoadingGui.isAwake() )
+   {
+      // Save/Restore load progress at the start/end of the import process
+      if ( %progress == 0 )
+      {
+         ColladaImportProgress.savedProgress = LoadingProgress.getValue();
+         ColladaImportProgress.savedText = LoadingProgressTxt.getValue();
+
+         ColladaImportProgress.msgPrefix = "Importing " @ %msg;
+         %msg = "Reading file into memory...";
+      }
+      else if ( %progress == 1.0 )
+      {
+         LoadingProgress.setValue( ColladaImportProgress.savedProgress );
+         LoadingProgressTxt.setValue( ColladaImportProgress.savedText );
+      }
+
+      %msg = ColladaImportProgress.msgPrefix @ ": " @ %msg;
+
+      %progressCtrl = LoadingProgress;
+      %textCtrl = LoadingProgressTxt;
+   }
+   else
+   {
+      // Show/Hide gui at the start/end of the import process
+      if ( %progress == 0 )
+      {
+         ColladaImportProgress-->window.text = "Importing" SPC %msg;
+         %msg = "Reading file into memory...";
+         Canvas.pushDialog(ColladaImportProgress);
+      }
+      else if ( %progress == 1.0 )
+      {
+         Canvas.popDialog(ColladaImportProgress);
+      }
+
+      %progressCtrl = ColladaImportProgress-->progressBar;
+      %textCtrl = ColladaImportProgress-->progressText;
+   }
+
+   // Update progress indicators
+   if (%progress == 0)
+   {
+      %progressCtrl.setValue(0.001);
+      %textCtrl.setText(%msg);
+   }
+   else if (%progress != 1.0)
+   {
+      %progressCtrl.setValue(%progress);
+      %textCtrl.setText(%msg);
+   }
+
+   Canvas.repaint(33);
+}
+
+
+// Convert all COLLADA models that match the given pattern (defaults to *) to DTS
+function convertColladaModels(%pattern)
+{
+   // Force loading the COLLADA file (to ensure cached DTS is updated)
+   $collada::forceLoadDAE = true;
+
+   %fullPath = findFirstFile("*.dae");
+   while (%fullPath !$= "")
+   {
+      // Check if this file is inside the given path
+      %fullPath = makeRelativePath(%fullPath, getMainDotCSDir());
+      if ((%pattern $= "") || strIsMatchMultipleExpr(%pattern, %fullPath))
+      {
+         // Load the model by creating a temporary TSStatic
+         echo("Converting " @ %fullPath @ " to DTS...");
+         %temp = new TSStatic() {
+            shapeName = %fullPath;
+            collisionType = "None";
+         };
+         %temp.delete();
+      }
+
+      %fullPath = findNextFile("*.dae");
+   }
+
+   $collada::forceLoadDAE = false;
+}

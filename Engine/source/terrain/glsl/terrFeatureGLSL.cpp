@@ -70,7 +70,7 @@ MODULE_END;
 
 
 TerrainFeatGLSL::TerrainFeatGLSL()
-   : mTorqueDep( "shaders/common/gl/torque.glsl" )
+   : mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/gl/torque.glsl" ))
    {      
    addDependency( &mTorqueDep );
    }
@@ -297,8 +297,8 @@ U32 TerrainBaseMapFeatGLSL::getOutputTargets( const MaterialFeatureData &fd ) co
 }
 
 TerrainDetailMapFeatGLSL::TerrainDetailMapFeatGLSL()
-   :  mTorqueDep( "shaders/common/gl/torque.glsl" ),
-      mTerrainDep( "shaders/common/terrain/terrain.glsl" )
+   :  mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/gl/torque.glsl" )),
+      mTerrainDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/terrain/terrain.glsl" ))
       
 {
    addDependency( &mTorqueDep );
@@ -667,8 +667,8 @@ U32 TerrainDetailMapFeatGLSL::getOutputTargets( const MaterialFeatureData &fd ) 
 
 
 TerrainMacroMapFeatGLSL::TerrainMacroMapFeatGLSL()
-   :  mTorqueDep( "shaders/common/gl/torque.glsl" ),
-      mTerrainDep( "shaders/common/terrain/terrain.glsl" )
+   :  mTorqueDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/gl/torque.glsl" )),
+      mTerrainDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/terrain/terrain.glsl" ))
       
 {
    addDependency( &mTorqueDep );

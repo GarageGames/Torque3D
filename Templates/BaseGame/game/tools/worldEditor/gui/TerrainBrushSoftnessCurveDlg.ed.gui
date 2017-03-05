@@ -1,0 +1,232 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl(TerrainBrushSoftnessCurveDlg, EditorGuiGroup) {
+   canSaveDynamicFields = "0";
+   Enabled = "1";
+   isContainer = "1";
+   Profile = "ToolsGuiOverlayProfile";
+   HorizSizing = "right";
+   VertSizing = "bottom";
+   position = "0 0";
+   Extent = "800 600";
+   MinExtent = "8 8";
+   canSave = "1";
+   Visible = "1";
+   hovertime = "1000";
+
+   new GuiWindowCtrl() {
+      canSaveDynamicFields = "0";
+      Enabled = "1";
+      isContainer = "1";
+      Profile = "ToolsGuiWindowProfile";
+      HorizSizing = "center";
+      VertSizing = "center";
+      position = "231 204";
+      Extent = "175 228";
+      MinExtent = "8 8";
+      canSave = "1";
+      Visible = "1";
+      hovertime = "1000";
+      Margin = "0 0 0 0";
+      Padding = "0 0 0 0";
+      AnchorTop = "1";
+      AnchorBottom = "0";
+      AnchorLeft = "1";
+      AnchorRight = "0";
+      resizeWidth = "0";
+      resizeHeight = "0";
+      canMove = "1";
+      canClose = "0";
+      canMinimize = "0";
+      canMaximize = "0";
+      minSize = "50 50";
+      EdgeSnap = "0";
+      text = "Brush Softness Curve";
+
+      new GuiButtonCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiButtonProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "84 196";
+         Extent = "83 24";
+         MinExtent = "8 8";
+         canSave = "1";
+         Visible = "1";
+         Command = "TerrainBrushSoftnessCurveDlg.onOk();";
+         hovertime = "1000";
+         text = "Ok";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         useMouseEvents = "0";
+      };
+      new GuiFilterCtrl() {
+         canSaveDynamicFields = "0";
+         internalName = "FilterCurveCtrl";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiDefaultProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "35 46";
+         Extent = "130 128";
+         MinExtent = "8 8";
+         canSave = "1";
+         Visible = "1";
+         hovertime = "1000";
+         controlPoints = "7";
+         filter = "1 0.833333 0.666667 0.5 0.333333 0.166667 0";
+         identity = "1 0";
+      };
+      new GuiTextCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiTextProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "8 43";
+         Extent = "22 17";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         text = "Hard";
+         maxLength = "1024";
+      };
+      new GuiTextCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiTextProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "11 159";
+         Extent = "20 19";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         text = "Soft";
+         maxLength = "1024";
+      };
+      new GuiTextCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiTextProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "36 174";
+         Extent = "33 19";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         text = "Inside";
+         maxLength = "1024";
+      };
+      new GuiTextCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiTextProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "129 176";
+         Extent = "39 17";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         hovertime = "1000";
+         Margin = "0 0 0 0";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         text = "Outside";
+         maxLength = "1024";
+      };
+      new GuiButtonCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiButtonProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "7 196";
+         Extent = "69 24";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         Command = "Canvas.popDialog( TerrainBrushSoftnessCurveDlg );";
+         hovertime = "1000";
+         text = "Cancel";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         useMouseEvents = "0";
+      };
+      new GuiButtonCtrl() {
+         canSaveDynamicFields = "0";
+         Enabled = "1";
+         isContainer = "0";
+         Profile = "ToolsGuiButtonProfile";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "122 26";
+         Extent = "44 17";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         Command = "TerrainBrushSoftnessCurveDlg.resetCurve();";
+         hovertime = "1000";
+         text = "Reset";
+         groupNum = "-1";
+         buttonType = "PushButton";
+         useMouseEvents = "0";
+      };
+   };
+};
+//--- OBJECT WRITE END ---
+
+
+function TerrainBrushSoftnessCurveDlg::onWake( %this )
+{
+   %curve = %this-->FilterCurveCtrl;  
+   %curve.setValue( ETerrainEditor.softSelectFilter );
+}
+
+function TerrainBrushSoftnessCurveDlg::onOk( %this )
+{
+   %curve = %this-->FilterCurveCtrl;   
+   ETerrainEditor.softSelectFilter = %curve.getValue(); 
+   ETerrainEditor.resetSelWeights(true); 
+      
+   Canvas.popDialog( %this );
+}
+
+function TerrainBrushSoftnessCurveDlg::resetCurve( %this )
+{
+   %curve = %this-->FilterCurveCtrl;
+   %curve.identity();
+}

@@ -200,7 +200,7 @@ singleton PostEffect( SSAOPostFx )
    stateBlock = SSAOStateBlock;
          
    texture[0] = "#prepass";         
-   texture[1] = "noise.png";
+   texture[1] = "./noise.png";
    texture[2] = "#ssao_pow_table";
    
    target = "$outTex";

@@ -37,8 +37,8 @@ void ShaderGenPrinterGLSL::printShaderHeader( Stream& stream )
    stream.write( dStrlen(header1), header1 );
 
    // Cheap HLSL compatibility.
-   const char* header3 = "#include \"shaders/common/gl/hlslCompat.glsl\"\r\n";      
-   stream.write( dStrlen(header3), header3 );
+   String header3 = String("#include \"") + String(Con::getVariable("$Core::CommonShaderPath")) + String("/gl/hlslCompat.glsl\"\r\n");
+   stream.write(dStrlen(header3), header3.c_str());
 
    const char* header4 = "\r\n";      
    stream.write( dStrlen(header4), header4 );
