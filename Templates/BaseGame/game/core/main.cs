@@ -41,11 +41,6 @@ $Core::UnAvailableTexturePath = "core/images/unavailable";
 $Core::WarningTexturePath = "core/images/warnMat";
 $Core::CommonShaderPath = "core/shaders";
 
-/// This is the path used by ShaderGen to cache procedural
-/// shaders.  If left blank ShaderGen will only cache shaders
-/// to memory and not to disk.
-$shaderGen::cachePath = "data/shaders";
-
 exec("./helperFunctions.cs");
 
 // We need some of the default GUI profiles in order to get the canvas and

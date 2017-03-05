@@ -25,7 +25,7 @@ singleton ShaderData( GammaShader )
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/gammaP.hlsl";
 
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/gl/gammaP.glsl";
    
    samplerNames[0] = "$backBuffer";

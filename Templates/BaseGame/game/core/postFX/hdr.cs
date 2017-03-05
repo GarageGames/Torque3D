@@ -77,7 +77,7 @@ singleton ShaderData( HDR_BrightPassShader )
 {
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/hdr/brightPassFilterP.hlsl";   
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/hdr/gl/brightPassFilterP.glsl";
    
    samplerNames[0] = "$inputTex";
@@ -102,7 +102,7 @@ singleton ShaderData( HDR_BloomGaussBlurHShader )
 {
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/hdr/bloomGaussBlurHP.hlsl";
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/hdr/gl/bloomGaussBlurHP.glsl";
    
    samplerNames[0] = "$inputTex";
@@ -114,7 +114,7 @@ singleton ShaderData( HDR_BloomGaussBlurVShader )
 {
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/hdr/bloomGaussBlurVP.hlsl";
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/hdr/gl/bloomGaussBlurVP.glsl";
    
    samplerNames[0] = "$inputTex";
@@ -126,7 +126,7 @@ singleton ShaderData( HDR_SampleLumShader )
 {
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/hdr/sampleLumInitialP.hlsl";
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/hdr/gl/sampleLumInitialP.glsl";
    
    samplerNames[0] = "$inputTex";
@@ -138,7 +138,7 @@ singleton ShaderData( HDR_DownSampleLumShader )
 {
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/hdr/sampleLumIterativeP.hlsl";
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/hdr/gl/sampleLumIterativeP.glsl";
    
    samplerNames[0] = "$inputTex";
@@ -150,7 +150,7 @@ singleton ShaderData( HDR_CalcAdaptedLumShader )
 {
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/hdr/calculateAdaptedLumP.hlsl";
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/hdr/gl/calculateAdaptedLumP.glsl";
    
    samplerNames[0] = "$currLum";
@@ -163,7 +163,7 @@ singleton ShaderData( HDR_CombineShader )
 {
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/hdr/finalPassCombineP.hlsl";
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/hdr/gl/finalPassCombineP.glsl";
    
    samplerNames[0] = "$sceneTex";
@@ -477,7 +477,7 @@ singleton ShaderData( LuminanceVisShader )
 {
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/hdr/luminanceVisP.hlsl";
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/hdr/gl/luminanceVisP.glsl";
    
    samplerNames[0] = "$inputTex";

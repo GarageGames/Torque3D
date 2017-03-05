@@ -37,7 +37,7 @@ singleton ShaderData( PFX_EdgeAADetectShader )
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/edgeaa/edgeDetectP.hlsl";
          
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/edgeaa/gl/edgeDetectP.glsl";
       
    samplerNames[0] = "$prepassBuffer";
@@ -64,7 +64,7 @@ singleton ShaderData( PFX_EdgeAADebugShader )
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/edgeaa/dbgEdgeDisplayP.hlsl";
          
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/edgeaa/gl/dbgEdgeDisplayP.glsl";
       
    samplerNames[0] = "$edgeBuffer";

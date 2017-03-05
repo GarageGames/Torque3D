@@ -25,8 +25,8 @@ singleton ShaderData( PFX_PassthruShader )
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/passthruP.hlsl";
          
-//   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
-//   OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/gl/passthruP.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
+   OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/gl/passthruP.glsl";
       
    samplerNames[0] = "$inputTex";
    

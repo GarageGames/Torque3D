@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "../../../../../../shaders/common/postFx/postFx.hlsl"
-#include "../../../../../../shaders/common/torque.hlsl"
+#include "../../postFx/postFx.hlsl"
+#include "../../torque.hlsl"
 
 float4 rtParams0;
 

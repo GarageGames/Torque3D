@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "shaders/common/postFx/postFx.hlsl"
+#include "../../postFx/postFx.hlsl"
 
 TORQUE_UNIFORM_SAMPLER2D(diffuseMap, 0);
 

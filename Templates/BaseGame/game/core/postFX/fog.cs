@@ -29,7 +29,7 @@ singleton ShaderData( FogPassShader )
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/fogP.hlsl";
          
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/gl/fogP.glsl";
             
    samplerNames[0] = "$prepassTex";
@@ -76,7 +76,7 @@ singleton ShaderData( UnderwaterFogPassShader )
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/underwaterFogP.hlsl";
          
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/gl/underwaterFogP.glsl";
             
    samplerNames[0] = "$prepassTex";

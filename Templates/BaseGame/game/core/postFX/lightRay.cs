@@ -35,7 +35,7 @@ singleton ShaderData( LightRayOccludeShader )
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/lightRay/lightRayOccludeP.hlsl";
    
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/lightRay/gl/lightRayOccludeP.glsl";
    
    samplerNames[0] = "$backBuffer";
@@ -49,7 +49,7 @@ singleton ShaderData( LightRayShader )
    DXVertexShaderFile 	= $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
    DXPixelShaderFile 	= $Core::CommonShaderPath @ "/postFX/lightRay/lightRayP.hlsl";
    
-   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/postFxV.glsl";
+   OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/lightRay/gl/lightRayP.glsl";
    
    samplerNames[0] = "$frameSampler";

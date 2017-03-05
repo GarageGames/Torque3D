@@ -135,6 +135,18 @@ singleton ShaderData( VolumetricFogReflectionShader )
 	
    OGLVertexShaderFile  = $Core::CommonShaderPath @ "/VolumetricFog/gl/VFogPreV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/VolumetricFog/gl/VFogRefl.glsl";
+
+   pixVersion = 3.0;
+};
+singleton ShaderData( CubemapSaveShader )
+{
+   DXVertexShaderFile = "shaders/common/cubemapSaveV.hlsl";
+   DXPixelShaderFile = "shaders/common/cubemapSaveP.hlsl";
+	
+   OGLVertexShaderFile  = "shaders/common/gl/cubemapSaveV.glsl";
+   OGLPixelShaderFile   = "shaders/common/gl/cubemapSaveP.glsl";
+   
+   samplerNames[0] = "$cubemapTex";
 	
    pixVersion = 3.0;
 };

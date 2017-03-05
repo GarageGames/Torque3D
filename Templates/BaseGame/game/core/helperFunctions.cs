@@ -166,7 +166,7 @@ function recursiveLoadDatablockFiles( %datablockFiles, %previousErrors )
    %reloadDatablockFiles.delete();         
 }
 
-function getPrefpath()
+function getUserPath()
 {
 	%temp = getUserHomeDirectory();  
 	echo(%temp);  
@@ -176,19 +176,25 @@ function getPrefpath()
 		echo(%temp);
 		if(!isDirectory(%temp)) 
 		{
-			$prefpath = "data";  
+			%userPath = "data";  
 		}
 		else  
 		{
 			//put it in appdata/roaming
-			$prefpath = %temp @ "/" @ $appName @ "/preferences";  
+			%userPath = %temp @ "/" @ $appName;  
 		}  
 	}  
 	else  
 	{  
 		//put it in user/documents  
-		$prefPath = %temp @ "/" @ $appName @ "/preferences";  
+		%userPath = %temp @ "/" @ $appName;  
 	}
+	return %userPath;
+}
+
+function getPrefpath()
+{
+   $prefPath = getUserPath() @ "/preferences";
 	return $prefPath;
 }
 

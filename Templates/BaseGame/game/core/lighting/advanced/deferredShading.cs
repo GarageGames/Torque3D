@@ -1,6 +1,6 @@
 singleton ShaderData( ClearGBufferShader )
 {
-   DXVertexShaderFile = $Core::CommonShaderPath @ "/postFX/postFxV.hlsl";
+   DXVertexShaderFile = $Core::CommonShaderPath @ "/lighting/advanced/deferredClearGBufferV.hlsl";
    DXPixelShaderFile  = $Core::CommonShaderPath @ "/lighting/advanced/deferredClearGBufferP.hlsl";
 
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
@@ -11,7 +11,7 @@ singleton ShaderData( ClearGBufferShader )
 
 singleton ShaderData( DeferredColorShader )
 {
-   DXVertexShaderFile = $Core::CommonShaderPath @ "/lighting/advanced/deferredClearGBufferV.hlsl";
+   DXVertexShaderFile = $Core::CommonShaderPath @ "/postFx/postFxV.hlsl";
    DXPixelShaderFile  = $Core::CommonShaderPath @ "/lighting/advanced/deferredColorShaderP.hlsl";
    
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";

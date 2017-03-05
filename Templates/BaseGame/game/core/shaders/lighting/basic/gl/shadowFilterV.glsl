@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "../../../../../../shaders/common/gl/torque.glsl"
+#include "../../../gl/torque.glsl"
 
 in vec4 vPosition;
 in vec2 vTexCoord0;
