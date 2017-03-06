@@ -58,7 +58,7 @@ singleton PostEffect( CausticsPFX )
    shader = PFX_CausticsShader;
    stateBlock = PFX_CausticsStateBlock;
    texture[0] = "#prepass";
-   texture[1] = "textures/caustics_1";
-   texture[2] = "textures/caustics_2";
+   texture[1] = "./textures/caustics_1";
+   texture[2] = "./textures/caustics_2";
    target = "$backBuffer";
 };

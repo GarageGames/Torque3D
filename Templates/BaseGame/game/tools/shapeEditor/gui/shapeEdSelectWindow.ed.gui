@@ -1,0 +1,504 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiControl() {
+   canSaveDynamicFields = "0";
+   isContainer = "1";
+   Profile = "ToolsGuiDefaultProfile";
+   HorizSizing = "width";
+   VertSizing = "height";
+   Position = "0 0";
+   Extent = "1024 768";
+   MinExtent = "8 2";
+   canSave = "1";
+   Visible = "1";
+   tooltipprofile = "ToolsGuiToolTipProfile";
+   hovertime = "1000";
+
+   //---------------------------------------------------------------------------
+   // Shape selector window
+   new GuiWindowCollapseCtrl(ShapeEdSelectWindow) {
+      canSaveDynamicFields = "0";
+      isContainer = "1";
+      Profile = "ToolsGuiWindowProfile";
+      HorizSizing = "windowRelative";
+      VertSizing = "windowRelative";
+      Position = getWord($pref::Video::mode, 0) - 209
+         SPC getWord(EditorGuiToolbar.extent, 1) - 1;
+      Extent = "210 213";
+      MinExtent = "210 114";
+      canSave = "1";
+      Visible = "0";
+      tooltipprofile = "ToolsGuiToolTipProfile";
+      hovertime = "1000";
+      Margin = "4 4 4 4";
+      Padding = "0 0 0 0";
+      AnchorTop = "1";
+      AnchorBottom = "0";
+      AnchorLeft = "1";
+      AnchorRight = "0";
+      resizeWidth = "1";
+      resizeHeight = "1";
+      canMove = "1";
+      canClose = "0";
+      canMinimize = "0";
+      canMaximize = "0";
+      minSize = "50 50";
+      EdgeSnap = "1";
+      text = "Shapes";
+
+      new GuiTabBookCtrl() {
+         internalName = "tabBook";
+         canSaveDynamicFields = "0";
+         isContainer = "1";
+         Profile = "ToolsGuiTabBookProfile";
+         HorizSizing = "width";
+         VertSizing = "height";
+         position = "4 24";
+         Extent = "202 165";
+         MinExtent = "8 -500";
+         canSave = "1";
+         Visible = "1";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         hovertime = "1000";
+         docking = "client";
+         Margin = "3 1 3 3";
+         Padding = "0 0 0 0";
+         AnchorTop = "1";
+         AnchorBottom = "0";
+         AnchorLeft = "1";
+         AnchorRight = "0";
+         TabPosition = "Top";
+         TabMargin = "6";
+         MinTabWidth = "32";
+
+         //---------------------------------------------------------------
+         // Scene shapes (ie. the MissionGroup)
+         new GuiTabPageCtrl() {
+            canSaveDynamicFields = "0";
+            isContainer = "1";
+            Profile = "ToolsGuiTabPageProfile";
+            HorizSizing = "width";
+            VertSizing = "height";
+            Position = "0 19";
+            Extent = "202 146";
+            MinExtent = "0 -500";
+            canSave = "1";
+            Visible = "0";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            Margin = "0 0 0 0";
+            Padding = "0 0 0 0";
+            AnchorTop = "1";
+            AnchorBottom = "0";
+            AnchorLeft = "1";
+            AnchorRight = "0";
+            text = "Scene";
+            maxLength = "1024";
+
+            new GuiScrollCtrl() {
+               canSaveDynamicFields = "0";
+               isContainer = "1";
+               Profile = "ToolsGuiScrollProfile";
+               HorizSizing = "width";
+               VertSizing = "height";
+               position = "0 0";
+               Extent = "202 146";
+               MinExtent = "8 -500";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               willFirstRespond = "1";
+               hScrollBar = "dynamic";
+               vScrollBar = "dynamic";
+               lockHorizScroll = false;
+               lockVertScroll = "false";
+               constantThumbHeight = "0";
+               childMargin = "0 0";
+               mouseWheelScrollSpeed = "-1";
+
+               new GuiTreeViewCtrl(ShapeEdShapeTreeView) {
+                  canSaveDynamicFields = "0";
+                  isContainer = "1";
+                  Profile = "ToolsGuiTreeViewProfile";
+                  HorizSizing = "right";
+                  VertSizing = "bottom";
+                  position = "1 1";
+                  Extent = "190 144";
+                  MinExtent = "8 -500";
+                  canSave = "1";
+                  Visible = "1";
+                  hovertime = "1000";
+                  tabSize = "16";
+                  textOffset = "2";
+                  fullRowSelect = "0";
+                  itemHeight = "21";
+                  destroyTreeOnSleep = "1";
+                  MouseDragging = "1";
+                  MultipleSelections = "1";
+                  DeleteObjectAllowed = "1";
+                  DragToItemAllowed = "1";
+                  showRoot = "1";
+                  internalNamesOnly = "0";
+                  showObjectIds = "0";
+                  showClassNames = "0";
+                  showObjectNames = "1";
+                  showInternalNames = "1";
+                  showClassNameForUnnamedObjects = "1";
+               };
+            };
+         };
+
+         //---------------------------------------------------------------
+         // All shapes
+         new GuiTabPageCtrl() {
+            canSaveDynamicFields = "0";
+            isContainer = "1";
+            Profile = "ToolsGuiTabPageProfile";
+            HorizSizing = "width";
+            VertSizing = "height";
+            position = "0 19";
+            Extent = "202 146";
+            MinExtent = "0 -500";
+            canSave = "1";
+            Visible = "0";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            Margin = "0 0 0 0";
+            Padding = "0 0 0 0";
+            AnchorTop = "1";
+            AnchorBottom = "0";
+            AnchorLeft = "1";
+            AnchorRight = "0";
+            text = "Library";
+            maxLength = "1024";
+
+            new GuiContainer() {
+               isContainer = "1";
+               HorizSizing = "width";
+               VertSizing = "height";
+               position = "0 0";
+               Extent = "202 146";
+               MinExtent = "0 -500";
+               Profile = "GuiInspectorProfile";
+            };
+            new GuiBitmapBorderCtrl() {
+               isContainer = "1";
+               HorizSizing = "width";
+               VertSizing = "height";
+               position = "0 0";
+               Extent = "202 146";
+               MinExtent = "0 -500";
+               Profile = "ToolsGuiTabBorderProfile";
+            };
+            new GuiBitmapButtonCtrl() {
+               canSaveDynamicFields = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiButtonProfile";
+               HorizSizing = "right";
+               VertSizing = "bottom";
+               position = "3 4";
+               Extent = "20 19";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               Command = "ShapeEdSelectWindow.navigateUp();";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               groupNum = "0";
+               buttonType = "PushButton";
+               useMouseEvents = "0";
+               bitmap = "tools/gui/images/folderUp";
+            };
+            new GuiPopUpMenuCtrl(ShapeEdSelectMenu) {
+               canSaveDynamicFields = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiPopUpMenuProfile";
+               HorizSizing = "width";
+               VertSizing = "bottom";
+               position = "26 4";
+               Extent = "172 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               text = "art";
+               maxLength = "1024";
+               maxPopupHeight = "200";
+               sbUsesNAColor = "0";
+               reverseTextList = "0";
+               bitmapBounds = "16 16";
+            };
+            new GuiScrollCtrl() {
+               canSaveDynamicFields = "0";
+               isContainer = "1";
+               Profile = "ToolsGuiScrollProfile";
+               HorizSizing = "width";
+               VertSizing = "height";
+               position = "0 24";
+               Extent = "202 122";
+               MinExtent = "8 -500";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               willFirstRespond = "1";
+               hScrollBar = "dynamic";
+               vScrollBar = "dynamic";
+               lockHorizScroll = false;
+               lockVertScroll = "false";
+               constantThumbHeight = "0";
+               childMargin = "0 0";
+               mouseWheelScrollSpeed = "-1";
+
+               new GuiDynamicCtrlArrayControl() {
+                  internalName = "shapeLibrary";
+                  canSaveDynamicFields = "0";
+                  isContainer = "1";
+                  Profile = "ToolsGuiTransparentProfile";
+                  HorizSizing = "right";
+                  VertSizing = "bottom";
+                  position = "1 1";
+                  Extent = "189 42";
+                  MinExtent = "8 11";
+                  canSave = "1";
+                  Visible = "1";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
+                  hovertime = "1000";
+                  colCount = "1";
+                  colSize = "64";
+                  rowCount = "0";
+                  RowSize = "64";
+                  rowSpacing = "4";
+                  colSpacing = "4";
+                  frozen = "0";
+                  autoCellSize = "1";
+                  fillRowFirst = "1";
+                  dynamicSize = "1";
+               };
+            };
+         };
+
+         //---------------------------------------------------------------
+         // Shape hints
+         new GuiTabPageCtrl() {
+            canSaveDynamicFields = "0";
+            isContainer = "1";
+            Profile = "ToolsGuiTabPageProfile";
+            HorizSizing = "width";
+            VertSizing = "height";
+            position = "0 19";
+            Extent = "202 146";
+            MinExtent = "0 -500";
+            canSave = "1";
+            Visible = "0";
+            tooltipprofile = "ToolsGuiToolTipProfile";
+            hovertime = "1000";
+            Margin = "0 0 0 0";
+            Padding = "0 0 0 0";
+            AnchorTop = "1";
+            AnchorBottom = "0";
+            AnchorLeft = "1";
+            AnchorRight = "0";
+            text = "Hints";
+            maxLength = "1024";
+
+            new GuiContainer() {
+               isContainer = "1";
+               HorizSizing = "width";
+               VertSizing = "height";
+               position = "0 0";
+               Extent = "202 146";
+               MinExtent = "0 -500";
+               Profile = "GuiInspectorProfile";
+            };
+            new GuiBitmapBorderCtrl() {
+               isContainer = "1";
+               HorizSizing = "width";
+               VertSizing = "height";
+               position = "0 0";
+               Extent = "202 146";
+               MinExtent = "0 -500";
+               Profile = "ToolsGuiTabBorderProfile";
+            };
+            new GuiScrollCtrl() {
+               canSaveDynamicFields = "0";
+               isContainer = "1";
+               Profile = "ToolsGuiScrollProfile";
+               HorizSizing = "width";
+               VertSizing = "height";
+               position = "0 24";
+               Extent = "202 123";
+               MinExtent = "8 -500";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               willFirstRespond = "1";
+               hScrollBar = "dynamic";
+               vScrollBar = "dynamic";
+               lockHorizScroll = true;
+               lockVertScroll = "false";
+               constantThumbHeight = "0";
+               childMargin = "0 0";
+               mouseWheelScrollSpeed = "-1";
+
+               new GuiStackControl() {
+                  canSaveDynamicFields = "0";
+                  isContainer = "1";
+                  Profile = "ToolsGuiTransparentProfile";
+                  HorizSizing = "width";
+                  VertSizing = "bottom";
+                  position = "0 1";
+                  Extent = "185 50";
+                  MinExtent = "8 8";
+                  canSave = "1";
+                  Visible = "1";
+                  tooltipprofile = "ToolsGuiToolTipProfile";
+                  hovertime = "1000";
+                  StackingType = "Vertical";
+                  HorizStacking = "Left to Right";
+                  VertStacking = "Top to Bottom";
+                  Padding = "2";
+
+                  new GuiRolloutCtrl() {
+                     Profile = "GuiShapeEdRolloutProfile";
+                     HorizSizing = "width";
+                     VertSizing = "bottom";
+                     position = "1 0";
+                     Extent = "184 24";
+                     MinExtent = "8 -500";
+                     Caption = "Nodes";
+                     Margin = "2 2 2 2";
+                     Expanded = "0";
+
+                     new GuiStackControl() {
+                        internalName = "nodeHints";
+                        canSaveDynamicFields = "0";
+                        isContainer = "1";
+                        Profile = "ToolsGuiTransparentProfile";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        position = "0 24";
+                        Extent = "184 0";
+                        MinExtent = "8 -500";
+                        canSave = "1";
+                        Visible = "1";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
+                        hovertime = "1000";
+                        StackingType = "Vertical";
+                        HorizStacking = "Left to Right";
+                        VertStacking = "Top to Bottom";
+                        Padding = "2";
+                     };
+                  };
+
+                  new GuiRolloutCtrl() {
+                     Profile = "GuiShapeEdRolloutProfile";
+                     HorizSizing = "width";
+                     VertSizing = "bottom";
+                     position = "1 26";
+                     Extent = "184 24";
+                     MinExtent = "8 -500";
+                     Caption = "Sequences";
+                     Margin = "2 2 2 2";
+                     Expanded = "0";
+
+                     new GuiStackControl() {
+                        internalName = "sequenceHints";
+                        canSaveDynamicFields = "0";
+                        isContainer = "1";
+                        Profile = "ToolsGuiTransparentProfile";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        Position = "0 0";
+                        Extent = "184 24";
+                        MinExtent = "8 -500";
+                        canSave = "1";
+                        Visible = "1";
+                        tooltipprofile = "ToolsGuiToolTipProfile";
+                        hovertime = "1000";
+                        StackingType = "Vertical";
+                        HorizStacking = "Left to Right";
+                        VertStacking = "Top to Bottom";
+                        Padding = "2";
+                     };
+                  };
+               };
+            };
+            new GuiTextCtrl(){
+               Position = "5 5";
+               Extent = "60 16";
+               text = "Shape Type";
+            };
+            new GuiPopUpMenuCtrl(ShapeEdHintMenu) {
+               canSaveDynamicFields = "0";
+               isContainer = "0";
+               Profile = "ToolsGuiPopUpMenuProfile";
+               HorizSizing = "width";
+               VertSizing = "bottom";
+               position = "66 4";
+               Extent = "132 18";
+               MinExtent = "8 2";
+               canSave = "1";
+               Visible = "1";
+               tooltipprofile = "ToolsGuiToolTipProfile";
+               hovertime = "1000";
+               Margin = "0 0 0 0";
+               Padding = "0 0 0 0";
+               AnchorTop = "1";
+               AnchorBottom = "0";
+               AnchorLeft = "1";
+               AnchorRight = "0";
+               text = "art";
+               maxLength = "1024";
+               maxPopupHeight = "200";
+               sbUsesNAColor = "0";
+               reverseTextList = "0";
+               bitmapBounds = "16 16";
+            };
+         };
+      };
+
+      // Force load DAEs
+      new GuiCheckBoxCtrl() {
+         Profile = "ToolsGuiCheckBoxProfile";
+         HorizSizing = "left";
+         VertSizing = "bottom";
+         Position = "135 27";
+         Extent = "72 13";
+         Variable = "EWorldEditor.forceLoadDAE";
+         Command = "EWorldEditor.forceLoadDAE = $ThisControl.getValue(); EditorSettings.setValue(\"forceLoadDAE\", EWorldEditor.forceLoadDAE);";
+         tooltipprofile = "ToolsGuiToolTipProfile";
+         ToolTip = "Forces loading of DAE files (ignores cached.dts if present)";
+         hovertime = "1000";
+         text = " Force DAE";
+      };
+
+   };
+};
+//--- OBJECT WRITE END ---
