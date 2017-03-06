@@ -786,6 +786,32 @@ $PE_guielement_ext_colorpicker = "18 18";
                            altCommand = "PE_EmitterEditor.updateEmitter( \"alignDirection\", $ThisControl.getText());";
                         };
                      };
+                     new GuiControl(){ // Emitter ribbon
+                        isContainer = "1";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        Position = $PE_guielement_pos_single_container ;
+                        Extent = $PE_guielement_ext_single_container ;
+                        
+                        new GuiTextCtrl() {
+                           Profile = "ToolsGuiTextProfile";
+                           HorizSizing = "width";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_name;
+                           Extent = $PE_guielement_ext_checkbox_name;
+                           text = "Render as a Ribbon";
+                        };
+                        new GuiCheckBoxCtrl() {
+                           internalName = "PEE_ribbonParticles";
+                           Profile = "ToolsGuiCheckBoxProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_checkbox;
+                           Extent = $PE_guielement_ext_checkbox;
+                           text = "";
+                           command = "PE_EmitterEditor.updateEmitter( \"ribbonParticles\", $ThisControl.getValue());";
+                        };                     
+                     };
                   }; // end stack
                }; // end "motion" rollout
                new GuiRolloutCtrl() {
@@ -995,6 +1021,94 @@ $PE_guielement_ext_colorpicker = "18 18";
                            position = $PE_guielement_pos_value;
                            Extent = $PE_guielement_ext_value;
                            altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"thetaMax\", $ThisControl.getText());";
+                        };             
+                     };
+                     
+                     new GuiControl(){ // Emitter Angle Variance
+                        isContainer = "1";
+                        class = "AggregateControl";
+                        HorizSizing = "width";
+                        VertSizing = "bottom";
+                        Position = $PE_guielement_pos_single_container ;
+                        Extent = $PE_guielement_ext_single_container ;
+                        
+                        new GuiBitmapCtrl(){ // 0 Degrees
+                           HorizSizing = "left";
+                           position = getWord($PE_guielement_pos_slider,0)+4 SPC "0";
+                           Extent = "2 18";
+                           minExtent = "0 0";
+                           bitmap = "tools/gui/images/separator-h";
+                           tooltip = "0 Degrees ( Up )";
+                        };
+                        new GuiBitmapCtrl(){ // 90 Degrees
+                           HorizSizing = "left";
+                           position = getWord($PE_guielement_pos_slider,0)+mCeil(getWord($PE_guielement_ext_slider,0)/4)+1 SPC "0";
+                           Extent = "2 18";
+                           minExtent = "0 0";
+                           bitmap = "tools/gui/images/separator-h";
+                           tooltip = "45 Degrees";
+                        };
+                        new GuiBitmapCtrl(){ // 180 Degrees
+                           HorizSizing = "left";
+                           minExtent = "0 0";
+                           position = getWord($PE_guielement_pos_slider,0)+mCeil(getWord($PE_guielement_ext_slider,0)/2)-1 SPC "0";
+                           Extent = "2 18";
+                           bitmap = "tools/gui/images/separator-h";
+                           tooltip = "90 Degrees";
+                        };
+                        new GuiBitmapCtrl(){ // 270 Degrees
+                           HorizSizing = "left";
+                           position = getWord($PE_guielement_pos_slider,0)+mCeil(getWord($PE_guielement_ext_slider,0)/2+mCeil(getWord($PE_guielement_ext_slider,0)/4))-4 SPC "0";
+                           Extent = "2 18";
+                           minExtent = "0 0";
+                           bitmap = "tools/gui/images/separator-h";
+                           tooltip = "135 Degrees";
+                        };
+                        new GuiBitmapCtrl(){ // 360 Degrees
+                           HorizSizing = "left";
+                           position = getWord($PE_guielement_pos_slider,0)+mCeil(getWord($PE_guielement_ext_slider,0))-5 SPC "0";
+                           Extent = "2 18";
+                           minExtent = "0 0";
+                           bitmap = "tools/gui/images/separator-h";
+                           tooltip = "180 Degrees";
+                        };
+                        
+                        new GuiTextCtrl() {
+                           Profile = "ToolsGuiTextProfile";
+                           HorizSizing = "width";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_name;
+                           Extent = $PE_guielement_ext_name;
+                           text = "Angle Variance";
+                        };
+                        new GuiSliderCtrl(PEE_thetaVar) {
+                           internalName = "PEE_thetaVar_slider";
+                           canSaveDynamicFields = "0";
+                           Enabled = "1";
+                           isContainer = "0";
+                           Profile = "ToolsGuiSliderProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_slider;
+                           Extent = $PE_guielement_ext_slider;
+                           MinExtent = "8 2";
+                           canSave = "1";
+                           Visible = "1";
+                           Command = "PE_EmitterEditor.updateEmitter( \"thetaVariance\", $ThisControl.getValue(), true, true );";
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"thetaVariance\", $ThisControl.getValue(), true, false );";
+                           hovertime = "1000";
+                           range = "0 180";
+                           ticks = "0";
+                           value = "0";
+                        };
+                        new GuiTextEditCtrl() {
+                           internalName = "PEE_thetaVar_textEdit";
+                           Profile = "ToolsGuiTextEditProfile";
+                           HorizSizing = "left";
+                           VertSizing = "bottom";
+                           position = $PE_guielement_pos_value;
+                           Extent = $PE_guielement_ext_value;
+                           altCommand = "$ThisControl.getParent().updateFromChild($ThisControl); PE_EmitterEditor.updateEmitter( \"thetaVariance\", $ThisControl.getText());";
                         };             
                      };
                      
