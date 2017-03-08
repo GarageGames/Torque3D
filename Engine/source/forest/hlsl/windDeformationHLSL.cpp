@@ -60,7 +60,7 @@ MODULE_END;
 
 
 WindDeformationHLSL::WindDeformationHLSL()
-   : mDep( "shaders/common/wind.hlsl" )
+   : mDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/wind.hlsl" ))
 {
    addDependency( &mDep );
 }

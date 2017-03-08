@@ -51,6 +51,7 @@ mModuleId(StringTable->EmptyString()),
     mSynchronized( false ),
     mDeprecated( false ),
     mCriticalMerge( false ),
+    mOverrideExitingObjects(false),
     mModuleDescription( StringTable->EmptyString() ),
     mAuthor(StringTable->EmptyString()),
     mModuleGroup(StringTable->EmptyString()),
@@ -91,6 +92,7 @@ void ModuleDefinition::initPersistFields()
     addProtectedField( "Synchronized", TypeBool, Offset(mSynchronized, ModuleDefinition), &setSynchronized, &defaultProtectedGetFn, &writeSynchronized, "Whether the module should be synchronized or not.  Optional: If not specified then the module is not synchronized." );
     addProtectedField( "Deprecated", TypeBool, Offset(mDeprecated, ModuleDefinition), &setDeprecated, &defaultProtectedGetFn, &writeDeprecated, "Whether the module is deprecated or not.  Optional: If not specified then the module is not deprecated." );
     addProtectedField( "CriticalMerge", TypeBool, Offset(mCriticalMerge, ModuleDefinition), &setDeprecated, &defaultProtectedGetFn, &writeCriticalMerge, "Whether the merging of a module prior to a restart is critical or not.  Optional: If not specified then the module is not merge critical." );
+    addProtectedField( "OverrideExistingObjects", TypeBool, Offset(mOverrideExitingObjects, ModuleDefinition), &setOverrideExistingObjects, &defaultProtectedGetFn, &writeOverrideExistingObjects, "Controls if when this module is loaded and the create function is executed, it will replace existing objects that share names or not.");
     addProtectedField( "Description", TypeString, Offset(mModuleDescription, ModuleDefinition), &setModuleDescription, &defaultProtectedGetFn, &writeModuleDescription, "The description typically used for debugging purposes but can be used for anything." );
     addProtectedField( "Author", TypeString, Offset(mAuthor, ModuleDefinition), &setAuthor, &defaultProtectedGetFn, &writeAuthor, "The author of the module." );
     addProtectedField( "Group", TypeString, Offset(mModuleGroup, ModuleDefinition), &setModuleGroup, &defaultProtectedGetFn, "The module group used typically when loading modules as a group." );

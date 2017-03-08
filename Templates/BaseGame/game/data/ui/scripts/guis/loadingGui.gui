@@ -1,0 +1,102 @@
+//--- OBJECT WRITE BEGIN ---
+%guiContent = new GuiChunkedBitmapCtrl(LoadingGui) {
+   bitmap = "data/ui/art/background-dark.png";
+   useVariable = "0";
+   tile = "0";
+   position = "0 0";
+   extent = "1600 838";
+   minExtent = "8 8";
+   horizSizing = "width";
+   vertSizing = "height";
+   profile = "GuiDefaultProfile";
+   visible = "1";
+   active = "1";
+   tooltipProfile = "GuiToolTipProfile";
+   hovertime = "1000";
+   isContainer = "1";
+   canSave = "1";
+   canSaveDynamicFields = "1";
+      Enabled = "1";
+
+   new GuiControl() {
+      position = "391 429";
+      extent = "497 166";
+      minExtent = "8 8";
+      horizSizing = "center";
+      vertSizing = "center";
+      profile = "GuiDefaultProfile";
+      visible = "1";
+      active = "1";
+      command = "disconnect();\nCanvas.setContent(MainMenuGui);";
+      accelerator = "escape";
+      tooltipProfile = "GuiToolTipProfile";
+      hovertime = "1000";
+      isContainer = "1";
+      canSave = "1";
+      canSaveDynamicFields = "0";
+
+      new GuiBitmapCtrl(LoadingLogo) {
+         bitmap = "data/ui/art/Torque-3D-logo.png";
+         wrap = "0";
+         position = "27 6";
+         extent = "443 139";
+         minExtent = "8 2";
+         horizSizing = "center";
+         vertSizing = "bottom";
+         profile = "GuiDefaultProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiProgressBitmapCtrl(LoadingProgress) {
+         maxLength = "1024";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "17 126";
+         extent = "464 24";
+         minExtent = "8 2";
+         horizSizing = "center";
+         vertSizing = "bottom";
+         profile = "GuiProgressBitmapProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+      new GuiTextCtrl(LoadingProgressTxt) {
+         text = "LOADING DATABLOCKS";
+         maxLength = "255";
+         margin = "0 0 0 0";
+         padding = "0 0 0 0";
+         anchorTop = "1";
+         anchorBottom = "0";
+         anchorLeft = "1";
+         anchorRight = "0";
+         position = "28 144";
+         extent = "440 20";
+         minExtent = "8 8";
+         horizSizing = "center";
+         vertSizing = "bottom";
+         profile = "GuiMenuTextProfile";
+         visible = "1";
+         active = "1";
+         tooltipProfile = "GuiToolTipProfile";
+         hovertime = "1000";
+         isContainer = "0";
+         canSave = "1";
+         canSaveDynamicFields = "0";
+      };
+   };
+};
+//--- OBJECT WRITE END ---
