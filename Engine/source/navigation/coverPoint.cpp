@@ -337,8 +337,8 @@ void CoverPoint::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMatIn
    // Draw arrows to represent peek directions.
    if(peekLeft())
       GFX->getDrawUtil()->drawArrow(desc, Point3F(0, 0, height * 0.5), Point3F(-0.5, 0, height * 0.5), ColorI::GREEN);
-   if(peekRight())
+   else if(peekRight())
       GFX->getDrawUtil()->drawArrow(desc, Point3F(0, 0, height * 0.5), Point3F(0.5, 0, height * 0.5), ColorI::GREEN);
-   if(peekOver())
+   else if(peekOver())
       GFX->getDrawUtil()->drawArrow(desc, Point3F(0, 0, height * 0.5), Point3F(0, 0, height), ColorI::GREEN);
 }
