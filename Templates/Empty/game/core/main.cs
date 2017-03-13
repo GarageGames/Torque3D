@@ -57,6 +57,9 @@ function onStart()
    // hlsl or glsl shader.   
    //$gfx::disassembleAllShaders = true;
 
+   // Uncomment this in order to allow using Direct3D9Ex
+   $pref::Video::preferDirect3D9Ex = true;   
+   
    // Uncomment useNVPerfHud to allow you to start up correctly
    // when you drop your executable onto NVPerfHud
    //$Video::useNVPerfHud = true;
