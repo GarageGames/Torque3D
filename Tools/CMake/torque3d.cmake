@@ -657,6 +657,18 @@ if (TORQUE_OPENGL)
    addLib(glad)
 endif()
 
+add_dependencies(${TORQUE_APP_NAME} lmng)
+add_dependencies(${TORQUE_APP_NAME} lpng)
+add_dependencies(${TORQUE_APP_NAME} lungif)
+add_dependencies(${TORQUE_APP_NAME} ljpeg)
+add_dependencies(${TORQUE_APP_NAME} zlib)
+add_dependencies(${TORQUE_APP_NAME} tinyxml)
+add_dependencies(${TORQUE_APP_NAME} opcode)
+add_dependencies(${TORQUE_APP_NAME} squish)
+add_dependencies(${TORQUE_APP_NAME} collada)
+add_dependencies(${TORQUE_APP_NAME} pcre)
+add_dependencies(${TORQUE_APP_NAME} convexDecomp) 
+
 if(WIN32)
     # copy pasted from T3D build system, some might not be needed
     set(TORQUE_EXTERNAL_LIBS "COMCTL32.LIB;COMDLG32.LIB;USER32.LIB;ADVAPI32.LIB;GDI32.LIB;WINMM.LIB;WS2_32.LIB;vfw32.lib;Imm32.lib;d3d9.lib;d3dx9.lib;DxErr.lib;ole32.lib;shell32.lib;oleaut32.lib;version.lib" CACHE STRING "external libs to link against")
