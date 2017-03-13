@@ -1,0 +1,57 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2012 GarageGames, LLC
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+//-----------------------------------------------------------------------------
+
+Welcome to the Action-Tactics gametype template for Torque3D MIT. Here is a brief explanation of what it is.
+
+The Action-Tactics gametype template is loosely based on the gameplay system used in the Playstation game Valkyria Chronicles by Sega.
+It is a turn-based system designed for single player. The player controls one team, the CPU/computer the other.
+
+Each turn is split into 2 phases, "active phase" when the player is in control of their team and "passive phase" when the CPU controlled team is active.
+During one teams "active phase", passive team members will continuously shoot at any moving target which they can see. 
+For the player, this means that their currently selected soldier will be attacked when they have the "move button" toggled on.
+A moving soldier loses energy, and when their energy is 0 they can no longer move, but will still be attacked if the "move button" is toggled on.
+With the "move button" toggled on, the player can point to any part of the terrain and place a marker by using the "left mouse button". 
+The currently selected soldier will move towards the marker and either stop when they reach it or when they run out of energy to move.
+A moving soldier can be stopped by pressing the "left mouse button" again.
+
+Each soldier is allowed a single shot during their "active phase". 
+This is achieved by toggling the "shoot button" and then pressing the "left mouse button" over the chosen target on the screen. eg: an enemy soldier.
+Headshots give double damage and will kill a CPU controlled team member with a single shot. Low shots give half damage. 
+Dead soldiers drop ammo and a health pack.
+
+To select another team member the player can cycle through them all by pressing the "team button". 
+In the demonstration mission the player starts with 3 soldiers in their team.
+
+Right mouse button toggles camera control on and off. 
+This disables the mouse pointer and allows the camera to rotate around the currently selected soldier by moving the mouse.
+
+The mouse scroll wheel zooms the camera in and out.
+
+When the player wishes to end their "active phase" of the turn, they press the "End Turn button".
+The CPU team now becomes active, and the players team become passive.
+When the CPU team has completed its turn a new turn begins. The players team becomes active and all soldiers have their energy restored.
+
+The objective of the demonstration mission is to attack the large "station" model at the far end of the terrain. 
+The game ends when either the enemy there have all been killed or the players team are all dead.
+
+The demonstration mission can be played as a game and uses stock art assets from Torque3D MIT.
+https://github.com/GarageGames/Torque3D
