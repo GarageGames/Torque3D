@@ -593,7 +593,10 @@ void SkyBox::_initMaterial()
       SAFE_DELETE( mMatInstance );
 
    if ( mMaterial )
+   {
+      mMaterial->mIsSky = true;
       mMatInstance = mMaterial->createMatInstance();
+   }
    else
       mMatInstance = MATMGR->createMatInstance( "WarningMaterial" );
 
