@@ -36,6 +36,9 @@
 #include "util/noise2d.h"
 #endif
 
+#include <map>
+
+
 class TerrainAction
 {
    protected:
@@ -324,6 +327,7 @@ class ThermalErosionAction : public TerrainAction
 };
 */
 
+
 /// An undo action used to perform terrain wide smoothing.
 class TerrainSmoothAction : public UndoAction
 {
@@ -354,6 +358,50 @@ public:
    /// Performs the initial smoothing and stores
    /// the heighfield state for later undo.
    void smooth( TerrainBlock *terrain, F32 factor, U32 steps );
+};
+
+
+/// An undo action used to perform terrain solder edges.
+class TerrainSolderEdgesAction : public UndoAction
+{
+   typedef UndoAction Parent;
+
+public:
+   TerrainSolderEdgesAction();
+
+   // SimObject
+   DECLARE_CONOBJECT( TerrainSolderEdgesAction );
+   static void initPersistFields();
+
+   // UndoAction
+   virtual void undo();
+   virtual void redo();
+
+   /// Performs the initial solder edges and stores
+   /// the heighfield state for later undo.
+   void solder();
+
+private:
+   typedef std::map< U32, F32 >  heightSet_t;
+   static heightSet_t harvestAvgHeight( const TerrainBlock* );
+   
+   typedef std::map< TerrainBlock*, F32 >  uniqueTHSet_t;
+   static F32 calcAvgHeight( const Point3F& );
+
+   static void setAvgHeight( TerrainBlock*, const heightSet_t& );
+
+   // @return Vector on this direction:
+   //         8 1 5
+   //         4 0 2
+   //         7 3 6
+   typedef Point2I  direction_t;
+   static direction_t direction( U32 k );
+
+protected:
+   Vector< SimObjectId >  mTerrainIdSet;
+
+   typedef Vector< U16 >  storedHeight_t;
+   std::map< SimObjectId, storedHeight_t >  mStoredHeightSet;
 };
 
 
