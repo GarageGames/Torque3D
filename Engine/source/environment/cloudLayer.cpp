@@ -29,6 +29,7 @@
 #include "gfx/gfxTextureManager.h"
 #include "core/stream/fileStream.h"
 #include "core/stream/bitStream.h"
+#include "console/engineAPI.h"//ME Change
 #include "scene/sceneRenderState.h"
 #include "renderInstance/renderPassManager.h"
 #include "gfx/primBuilder.h"
@@ -502,3 +503,16 @@ void CloudLayer::_initBuffers()
 
    mPB.unlock();   
 }
+//ME Change
+void CloudLayer::ChangeCoverage(F32 newCoverage)
+{
+   mCoverage = newCoverage;
+   setMaskBits( CloudLayerMask );
+}
+
+DefineEngineMethod(CloudLayer, ChangeCoverage, void, (F32 newCoverage),,
+   "Change coverage of cloudlayer.")
+{
+	object->ChangeCoverage(newCoverage);
+}
+//ME Change End
