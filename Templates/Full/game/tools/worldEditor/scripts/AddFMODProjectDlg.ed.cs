@@ -184,12 +184,13 @@ function AddFMODProjectDlg::onSelectFile( %this )
    if( $pref::WorldEditor::AddFMODProjectDlg::lastPath $= "" )
       $pref::WorldEditor::AddFMODProjectDlg::lastPath = getMainDotCsDir();
 
+   %ff = %this-->fileNameField.getText();
    %dlg = new OpenFileDialog()
    {
       Title       = "Select Compiled FMOD Designer Event File...";
       Filters     = "Compiled Event Files (*.fev)|*.fev|All Files (*.*)|*.*|";
       DefaultPath = $pref::WorldEditor::AddFMODProjectDlg::lastPath;
-      DefaultFile = fileName( %this-->fileNameField.getText() );
+      DefaultFile = fileName( %ff ) @ "." @ fileExt( %ff );
       MustExit    = true;
       ChangePath  = false;
    };

@@ -645,6 +645,11 @@ DefineEngineFunction(fileName, String, ( const char* fileName ),,
       name++;
    char *ret = Con::getReturnBuffer(dStrlen(name));
    dStrcpy(ret, name);
+
+   char *ext = dStrrchr(ret, '.');
+   if(ext)
+      *ext = '\0';
+
    return ret;
 }
 
