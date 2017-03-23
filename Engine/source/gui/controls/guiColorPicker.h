@@ -90,6 +90,7 @@ class GuiColorPickerCtrl : public GuiControl
    ColorF mPickColor;		///< Color that has been picked from control
    ColorF mBaseColor;		///< Colour we display (in case of pallet and blend mode)
    PickMode mDisplayMode;	///< Current color display mode of the selector
+   bool mUseSRGB;          ///< use sRGB color scale
    
    Point2I mSelectorPos;	///< Current position of the selector
    bool mPositionChanged;	///< Current position has changed since last render?

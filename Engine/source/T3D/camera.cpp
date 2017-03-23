@@ -572,7 +572,7 @@ void Camera::processTick(const Move* move)
          // process input/determine rotation vector
          if(virtualMode != StationaryMode &&
             virtualMode != TrackObjectMode &&
-            (!mLocked || virtualMode != OrbitObjectMode && virtualMode != OrbitPointMode))
+            (!mLocked || ((virtualMode != OrbitObjectMode) && (virtualMode != OrbitPointMode))))
          {
             if(!strafeMode)
             {

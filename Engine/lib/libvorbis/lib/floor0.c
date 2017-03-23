@@ -5,13 +5,13 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2009             *
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2015             *
  * by the Xiph.Org Foundation http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
 
  function: floor backend 0 implementation
- last mod: $Id: floor0.c 18184 2012-02-03 20:55:12Z xiphmont $
+ last mod: $Id: floor0.c 19457 2015-03-03 00:15:29Z giles $
 
  ********************************************************************/
 
@@ -147,6 +147,9 @@ static vorbis_look_floor *floor0_look(vorbis_dsp_state *vd,
                                       vorbis_info_floor *i){
   vorbis_info_floor0 *info=(vorbis_info_floor0 *)i;
   vorbis_look_floor0 *look=_ogg_calloc(1,sizeof(*look));
+
+  (void)vd;
+
   look->m=info->order;
   look->ln=info->barkmap;
   look->vi=info;
@@ -165,7 +168,7 @@ static void *floor0_inverse1(vorbis_block *vb,vorbis_look_floor *i){
   if(ampraw>0){ /* also handles the -1 out of data case */
     long maxval=(1<<info->ampbits)-1;
     float amp=(float)ampraw/maxval*info->ampdB;
-    int booknum=oggpack_read(&vb->opb,_ilog(info->numbooks));
+    int booknum=oggpack_read(&vb->opb,ov_ilog(info->numbooks));
 
     if(booknum!=-1 && booknum<info->numbooks){ /* be paranoid */
       codec_setup_info  *ci=vb->vd->vi->codec_setup;

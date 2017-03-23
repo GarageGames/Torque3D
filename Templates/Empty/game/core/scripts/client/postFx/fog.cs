@@ -62,6 +62,7 @@ singleton PostEffect( FogPostFx )
    
    renderPriority = 5;
    
+   targetFormat = getBestHDRFormat();
    isEnabled = true;
 };
 

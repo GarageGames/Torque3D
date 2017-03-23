@@ -41,6 +41,7 @@ protected:
    void setupCardCapabilities();
    bool _queryCardCap(const String &query, U32 &foundResult);
    bool _queryFormat(const GFXFormat fmt, const GFXTextureProfile *profile, bool &inOutAutogenMips);
+   String _getFeatureLevelStr();
 };
 
 #endif

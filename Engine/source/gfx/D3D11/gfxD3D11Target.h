@@ -76,16 +76,21 @@ class GFXD3D11WindowTarget : public GFXWindowTarget
    friend class GFXD3D11Device;
 
    /// Our backbuffer
-   ID3D11Texture2D *mBackbuffer;
+   ID3D11Texture2D *mBackBuffer;
+   ID3D11Texture2D *mDepthStencil;
+   ID3D11RenderTargetView* mBackBufferView;
+   ID3D11DepthStencilView* mDepthStencilView;
+   IDXGISwapChain *mSwapChain;
 
    /// Maximum size we can render to.
    Point2I mSize;
-
    /// D3D presentation info.
    DXGI_SWAP_CHAIN_DESC mPresentationParams;
-
    /// Internal interface that notifies us we need to reset our video mode.
    void resetMode();
+
+   /// Is this a secondary window
+   bool mSecondaryWindow;
 
 public:
 
@@ -97,7 +102,9 @@ public:
    virtual bool present();
 
    void initPresentationParams();
-   void setImplicitSwapChain();
+   void createSwapChain();
+   void createBuffersAndViews();
+   void setBackBuffer();
 
    virtual void activate();   
 
@@ -105,6 +112,13 @@ public:
    void resurrect();
 
    virtual void resolveTo( GFXTextureObject *tex );
+
+   // These are all reference counted and must be released by whomever uses the get* function
+   IDXGISwapChain *getSwapChain();
+   ID3D11Texture2D *getBackBuffer();
+   ID3D11Texture2D *getDepthStencil();
+   ID3D11RenderTargetView* getBackBufferView();
+   ID3D11DepthStencilView* getDepthStencilView();
 };
 
 #endif

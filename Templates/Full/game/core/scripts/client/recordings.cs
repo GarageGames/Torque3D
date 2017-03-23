@@ -97,7 +97,6 @@ function startDemoRecord()
 
    ChatHud.AddLine( "\c4Recording to file [\c2" @ $DemoFileName @ "\cr].");
 
-   ServerConnection.prepDemoRecord();
    ServerConnection.startRecording($DemoFileName);
 
    // make sure start worked

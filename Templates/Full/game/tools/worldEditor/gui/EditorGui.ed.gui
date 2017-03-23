@@ -67,7 +67,7 @@
          MinExtent = "8 8";
          canSave = "1";
          Visible = "1";
-         Command = "toggleEditor( true ); GuiEdit(); $GuiEditorBtnPressed = true;";
+         Command = "toggleGuiEditor(true); $GuiEditorBtnPressed = true;";
          tooltipprofile = "ToolsGuiToolTipProfile";
          ToolTip = "Open the GuiEditor";
          hovertime = "1000";

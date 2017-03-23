@@ -26,6 +26,11 @@
 #include "gfx/D3D11/gfxD3D11Device.h"
 #include "gfx/gfxStateBlock.h"
 
+namespace DictHash
+{
+   U32 hash(const GFXSamplerStateDesc &data);
+}
+
 class GFXD3D11StateBlock : public GFXStateBlock
 {   
 public:

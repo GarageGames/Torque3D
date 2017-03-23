@@ -68,45 +68,53 @@ bool dFileTouch(const char *path)
 //-----------------------------------------------------------------------------
 bool dPathCopy(const char* source, const char* dest, bool nooverwrite)
 {
-   NSFileManager *manager = [NSFileManager defaultManager];
-   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-   
-   NSString *nsource = [[NSString stringWithUTF8String:source] stringByStandardizingPath];
-   NSString *ndest   = [[NSString stringWithUTF8String:dest] stringByStandardizingPath];
-   NSString *ndestFolder = [ndest stringByDeletingLastPathComponent];
-   
-   if(! [manager fileExistsAtPath:nsource])
-   {
-      Con::errorf("dPathCopy: no file exists at %s",source);
+   if(source == NULL || dest == NULL)
       return false;
-   }
    
-   if( [manager fileExistsAtPath:ndest] )
-   {
-      if(nooverwrite)
+   @autoreleasepool {
+      NSFileManager *manager = [NSFileManager defaultManager];
+      
+      NSString *nsource = [manager stringWithFileSystemRepresentation:source length:dStrlen(source)];
+      NSString *ndest   = [manager stringWithFileSystemRepresentation:dest length:dStrlen(dest)];
+      NSString *ndestFolder = [ndest stringByDeletingLastPathComponent];
+      
+      if(! [manager fileExistsAtPath:nsource])
       {
-         Con::errorf("dPathCopy: file already exists at %s",dest);
+         Con::errorf("dPathCopy: no file exists at %s",source);
          return false;
       }
-      Con::warnf("Deleting files at path: %s", dest);
-      bool deleted = [manager removeFileAtPath:ndest handler:nil];
-      if(!deleted)
+      
+      if( [manager fileExistsAtPath:ndest] )
       {
-         Con::errorf("Copy failed! Could not delete files at path: %s", dest);
-         return false;
+         if(nooverwrite)
+         {
+            Con::errorf("dPathCopy: file already exists at %s",dest);
+            return false;
+         }
+         Con::warnf("Deleting files at path: %s", dest);
+         if(![manager removeItemAtPath:ndest error:nil] || [manager fileExistsAtPath:ndest])
+         {
+            Con::errorf("Copy failed! Could not delete files at path: %s", dest);
+            return false;
+         }
       }
+      
+      if([manager fileExistsAtPath:ndestFolder] == NO)
+      {
+         ndestFolder = [ndestFolder stringByAppendingString:@"/"]; // createpath requires a trailing slash
+         Platform::createPath([ndestFolder UTF8String]);
+      }
+      
+      bool ret = [manager copyItemAtPath:nsource toPath:ndest error:nil];
+      // n.b.: The "success" semantics don't guarantee a copy actually took place, so we'll verify
+      // because this is surprising behavior for a method called copy.
+      if( ![manager fileExistsAtPath:ndest] )
+      {
+         Con::warnf("The filemanager returned success, but the file was not copied. Something strange is happening");
+         ret = false;
+      }
+      return ret;
    }
-   
-   if([manager fileExistsAtPath:ndestFolder] == NO)
-   {
-      ndestFolder = [ndestFolder stringByAppendingString:@"/"]; // createpath requires a trailing slash
-      Platform::createPath([ndestFolder UTF8String]);
-   }
-   
-   bool ret = [manager copyPath:nsource toPath:ndest handler:nil];
-   
-   [pool release];
-   return ret;
    
 }
 
@@ -117,25 +125,35 @@ bool dFileRename(const char *source, const char *dest)
    if(source == NULL || dest == NULL)
       return false;
    
-   NSFileManager *manager = [NSFileManager defaultManager];
-   
-   NSString *nsource = [manager stringWithFileSystemRepresentation:source length:dStrlen(source)];
-   NSString *ndest   = [manager stringWithFileSystemRepresentation:dest length:dStrlen(dest)];
-   
-   if(! [manager fileExistsAtPath:nsource])
-   {
-      Con::errorf("dFileRename: no file exists at %s",source);
-      return false;
+   @autoreleasepool {
+      NSFileManager *manager = [NSFileManager defaultManager];
+      
+      NSString *nsource = [manager stringWithFileSystemRepresentation:source length:dStrlen(source)];
+      NSString *ndest   = [manager stringWithFileSystemRepresentation:dest length:dStrlen(dest)];
+      
+      if(! [manager fileExistsAtPath:nsource])
+      {
+         Con::errorf("dFileRename: no file exists at %s",source);
+         return false;
+      }
+      
+      if( [manager fileExistsAtPath:ndest] )
+      {
+         Con::warnf("dFileRename: Deleting files at path: %s", dest);
+      }
+      
+      bool ret = [manager moveItemAtPath:nsource toPath:ndest error:nil];
+      // n.b.: The "success" semantics don't guarantee a move actually took place, so we'll verify
+      // because this is surprising behavior for a method called rename.
+      
+      if( ![manager fileExistsAtPath:ndest] )
+      {
+         Con::warnf("The filemanager returned success, but the file was not moved. Something strange is happening");
+         ret = false;
+      }
+      
+      return ret;
    }
-   
-   if( [manager fileExistsAtPath:ndest] )
-   {
-      Con::warnf("dFileRename: Deleting files at path: %s", dest);
-   }
-   
-   bool ret = [manager movePath:nsource toPath:ndest handler:nil];
-   
-   return ret;
 }
 
 //-----------------------------------------------------------------------------
@@ -722,9 +740,9 @@ bool Platform::isSubDirectory(const char *pathParent, const char *pathSub)
 inline bool isGoodDirectory(dirent* entry)
 {
    return (entry->d_type == DT_DIR                          // is a dir
-           && dStrcmp(entry->d_name,".") != 0                 // not here
-           && dStrcmp(entry->d_name,"..") != 0                // not parent
-           && !Platform::isExcludedDirectory(entry->d_name)); // not excluded
+         && dStrcmp(entry->d_name,".") != 0                 // not here
+         && dStrcmp(entry->d_name,"..") != 0                // not parent
+         && !Platform::isExcludedDirectory(entry->d_name)); // not excluded
 }
 
 //-----------------------------------------------------------------------------
@@ -839,7 +857,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
    
    while (d = readdir(dip))
    {
-      bool	isDir;
+      bool  isDir;
       isDir = false;
       if (d->d_type == DT_UNKNOWN)
       {
@@ -856,7 +874,7 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
       if ( isDir )
       {
          if (dStrcmp(d->d_name, ".") == 0 ||
-             dStrcmp(d->d_name, "..") == 0)
+            dStrcmp(d->d_name, "..") == 0)
             continue;
          if (Platform::isExcludedDirectory(d->d_name))
             continue;
@@ -869,8 +887,8 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
                dSprintf(child, 1024, "%s/%s", subPath, d->d_name);
             if (currentDepth < recurseDepth || recurseDepth == -1 )
                recurseDumpDirectories(basePath, child, directoryVector,
-                                      currentDepth + 1, recurseDepth,
-                                      noBasePath);
+                                 currentDepth + 1, recurseDepth,
+                                 noBasePath);
          }
          else
          {
@@ -881,8 +899,8 @@ static bool recurseDumpDirectories(const char *basePath, const char *subPath, Ve
                dSprintf(child, 1024, "/%s", d->d_name);
             if (currentDepth < recurseDepth || recurseDepth == -1)
                recurseDumpDirectories(basePath, child, directoryVector,
-                                      currentDepth + 1, recurseDepth,
-                                      noBasePath);
+                                 currentDepth + 1, recurseDepth,
+                                 noBasePath);
          }
       }
    }

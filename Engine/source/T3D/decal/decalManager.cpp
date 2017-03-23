@@ -632,9 +632,9 @@ DecalInstance* DecalManager::getClosestDecal( const Point3F &pos )
       }
    }
 
-   if (  !collectedInsts.empty() && 
+   if (  (!collectedInsts.empty() && 
          collectedInsts[closestIndex] && 
-         closestDistance < 1.0f || 
+         closestDistance < 1.0f) ||
          worldInstSphere.isContained( pos ) )
       return collectedInsts[closestIndex];
    else

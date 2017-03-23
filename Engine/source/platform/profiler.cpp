@@ -27,7 +27,7 @@
 #endif
 
 #if defined(TORQUE_OS_MAC)
-#include <CoreServices/CoreServices.h> // For high resolution timer
+#include <mach/mach_time.h>
 #endif
 
 #include "core/stream/fileStream.h"
@@ -48,15 +48,15 @@ Profiler *gProfiler = NULL;
 //#define TORQUE_PROFILER_DEBUG
 
 // Machinery to record the stack of node names, as a debugging aid to find
-// mismatched PROFILE_START and PROFILE_END blocks. We profile from the 
+// mismatched PROFILE_START and PROFILE_END blocks. We profile from the
 // beginning to catch profile block errors that occur when torque is starting up.
 #ifdef TORQUE_PROFILER_DEBUG
 Vector<StringTableEntry> gProfilerNodeStack;
 #define TORQUE_PROFILE_AT_ENGINE_START true
 #define PROFILER_DEBUG_PUSH_NODE( nodename ) \
-   gProfilerNodeStack.push_back( nodename );
+gProfilerNodeStack.push_back( nodename );
 #define PROFILER_DEBUG_POP_NODE() \
-   gProfilerNodeStack.pop_back();
+gProfilerNodeStack.pop_back();
 #else
 #define TORQUE_PROFILE_AT_ENGINE_START false
 #define PROFILER_DEBUG_PUSH_NODE( nodename ) ;
@@ -68,7 +68,7 @@ Vector<StringTableEntry> gProfilerNodeStack;
 void startHighResolutionTimer(U32 time[2])
 {
    //time[0] = Platform::getRealMilliseconds();
-
+   
    __asm
    {
       push eax
@@ -89,7 +89,7 @@ U32 endHighResolutionTimer(U32 time[2])
    U32 ticks;
    //ticks = Platform::getRealMilliseconds() - time[0];
    //return ticks;
-
+   
    __asm
    {
       push  eax
@@ -135,20 +135,26 @@ U32 endHighResolutionTimer(U32 time[2])
 
 
 void startHighResolutionTimer(U32 time[2]) {
-    UnsignedWide t;
-    Microseconds(&t);
-    time[0] = t.lo;
-    time[1] = t.hi;
+   U64 now = mach_absolute_time();
+   AssertFatal(sizeof(U32[2]) == sizeof(U64), "Can't pack mach_absolute_time into U32[2]");
+   memcpy(time, &now, sizeof(U64));
 }
 
 U32 endHighResolutionTimer(U32 time[2])  {
-   UnsignedWide t;
-   Microseconds(&t);
-   return t.lo - time[0]; 
-   // given that we're returning a 32 bit integer, and this is unsigned subtraction... 
-   // it will just wrap around, we don't need the upper word of the time.
-   // NOTE: the code assumes that more than 3 hrs will not go by between calls to startHighResolutionTimer() and endHighResolutionTimer().
-   // I mean... that damn well better not happen anyway.
+   static mach_timebase_info_data_t    sTimebaseInfo = {0, 0};
+   
+   U64 now = mach_absolute_time();
+   AssertFatal(sizeof(U32[2]) == sizeof(U64), "Can't pack mach_absolute_time into U32[2]");
+   U64 then;
+   memcpy(&then, time, sizeof(U64));
+   
+   if(sTimebaseInfo.denom == 0){
+      mach_timebase_info(&sTimebaseInfo);
+   }
+   // Handle the micros/nanos conversion first, because shedding a few bits is better than overflowing.
+   U64 elapsedMicros = ((now - then) / 1000) * sTimebaseInfo.numer / sTimebaseInfo.denom;
+   
+   return (U32)elapsedMicros; // Just truncate, and hope we didn't overflow
 }
 
 #else
@@ -170,7 +176,7 @@ Profiler::Profiler()
 {
    mMaxStackDepth = MaxStackDepth;
    mCurrentHash = 0;
-
+   
    mCurrentProfilerData = (ProfilerData *) malloc(sizeof(ProfilerData));
    mCurrentProfilerData->mRoot = NULL;
    mCurrentProfilerData->mNextForRoot = NULL;
@@ -185,17 +191,17 @@ Profiler::Profiler()
    mCurrentProfilerData->mInvokeCount = 0;
    mCurrentProfilerData->mTotalTime = 0;
    mCurrentProfilerData->mSubTime = 0;
-#ifdef TORQUE_ENABLE_PROFILE_PATH   
+#ifdef TORQUE_ENABLE_PROFILE_PATH
    mCurrentProfilerData->mPath = "";
 #endif
    mRootProfilerData = mCurrentProfilerData;
-
+   
    for(U32 i = 0; i < ProfilerData::HashTableSize; i++)
       mCurrentProfilerData->mChildHash[i] = 0;
-
+   
    mProfileList = NULL;
-
-   mEnabled = TORQUE_PROFILE_AT_ENGINE_START;   
+   
+   mEnabled = TORQUE_PROFILE_AT_ENGINE_START;
    mNextEnable = TORQUE_PROFILE_AT_ENGINE_START;
    mStackDepth = 0;
    gProfiler = this;
@@ -216,20 +222,20 @@ void Profiler::reset()
    mEnabled = false; // in case we're in a profiler call.
    ProfilerData * head = mProfileList;
    ProfilerData * curr = head;
-
+   
    while ( curr )
    {
       head = curr->mNextProfilerData;
       free( curr );
-
+      
       if ( head )
          curr = head;
       else
          curr = NULL;
    }
-
+   
    mProfileList = NULL;
-
+   
    for(ProfilerRootData *walk = ProfilerRootData::sRootList; walk; walk = walk->mNextRoot)
    {
       walk->mFirstProfilerData = 0;
@@ -256,7 +262,7 @@ ProfilerRootData::ProfilerRootData(const char *name)
    for(ProfilerRootData *walk = sRootList; walk; walk = walk->mNextRoot)
       if(!dStrcmp(walk->mName, name))
          AssertFatal( false, avar( "Duplicate profile name: %s", name ) );
-
+   
    mName = name;
    mNameHash = _StringTable::hashString(name);
    mNextRoot = sRootList;
@@ -283,7 +289,7 @@ void Profiler::validate()
          if(!wk)
             Platform::debugBreak();
          for(wk = dp->mParent->mChildHash[walk->mNameHash & (ProfilerData::HashTableSize - 1)] ;
-               wk; wk = wk->mNextHash)
+            wk; wk = wk->mNextHash)
             if(wk == dp)
                break;
          if(!wk)
@@ -300,7 +306,7 @@ const char * Profiler::getProfilePath()
    if( !ThreadManager::isMainThread() )
       return "[non-main thread]";
 #endif
-
+   
    return (mEnabled && mCurrentProfilerData) ? mCurrentProfilerData->mPath : "na";
 }
 #endif
@@ -312,14 +318,14 @@ const char * Profiler::constructProfilePath(ProfilerData * pd)
    {
       const bool saveEnable = gProfiler->mEnabled;
       gProfiler->mEnabled = false;
-
+      
       const char * connector = " -> ";
       U32 len = dStrlen(pd->mParent->mPath);
       if (!len)
          connector = "";
       len += dStrlen(connector);
       len += dStrlen(pd->mRoot->mName);
-
+      
       U32 mark = FrameAllocator::getWaterMark();
       char * buf = (char*)FrameAllocator::alloc(len+1);
       dStrcpy(buf,pd->mParent->mPath);
@@ -342,25 +348,25 @@ void Profiler::hashPush(ProfilerRootData *root)
    if( !ThreadManager::isMainThread() )
       return;
 #endif
-
+   
    mStackDepth++;
    PROFILER_DEBUG_PUSH_NODE(root->mName);
    AssertFatal(mStackDepth <= mMaxStackDepth,
-                  "Stack overflow in profiler.  You may have mismatched PROFILE_START and PROFILE_ENDs");
+            "Stack overflow in profiler.  You may have mismatched PROFILE_START and PROFILE_ENDs");
    if(!mEnabled)
       return;
-
+   
    ProfilerData *nextProfiler = NULL;
    if(!root->mEnabled || mCurrentProfilerData->mRoot == root)
    {
       mCurrentProfilerData->mSubDepth++;
       return;
    }
-
+   
    if(mCurrentProfilerData->mLastSeenProfiler &&
-            mCurrentProfilerData->mLastSeenProfiler->mRoot == root)
+      mCurrentProfilerData->mLastSeenProfiler->mRoot == root)
       nextProfiler = mCurrentProfilerData->mLastSeenProfiler;
-
+   
    if(!nextProfiler)
    {
       // first see if it's in the hash table...
@@ -377,17 +383,17 @@ void Profiler::hashPush(ProfilerRootData *root)
          nextProfiler = (ProfilerData *) malloc(sizeof(ProfilerData));
          for(U32 i = 0; i < ProfilerData::HashTableSize; i++)
             nextProfiler->mChildHash[i] = 0;
-
+         
          nextProfiler->mRoot = root;
          nextProfiler->mNextForRoot = root->mFirstProfilerData;
          root->mFirstProfilerData = nextProfiler;
-
+         
          nextProfiler->mNextProfilerData = mProfileList;
          mProfileList = nextProfiler;
-
+         
          nextProfiler->mNextHash = mCurrentProfilerData->mChildHash[index];
          mCurrentProfilerData->mChildHash[index] = nextProfiler;
-
+         
          nextProfiler->mParent = mCurrentProfilerData;
          nextProfiler->mNextSibling = mCurrentProfilerData->mFirstChild;
          mCurrentProfilerData->mFirstChild = nextProfiler;
@@ -437,7 +443,7 @@ void Profiler::hashPop(ProfilerRootData *expected)
    if( !ThreadManager::isMainThread() )
       return;
 #endif
-
+   
    mStackDepth--;
    PROFILER_DEBUG_POP_NODE();
    AssertFatal(mStackDepth >= 0, "Stack underflow in profiler.  You may have mismatched PROFILE_START and PROFILE_ENDs");
@@ -453,15 +459,15 @@ void Profiler::hashPop(ProfilerRootData *expected)
       {
          AssertISV(expected == mCurrentProfilerData->mRoot, "Profiler::hashPop - didn't get expected ProfilerRoot!");
       }
-
+      
       F64 fElapsed = endHighResolutionTimer(mCurrentProfilerData->mStartTime);
-
+      
       mCurrentProfilerData->mTotalTime += fElapsed;
       mCurrentProfilerData->mParent->mSubTime += fElapsed; // mark it in the parent as well...
       mCurrentProfilerData->mRoot->mTotalTime += fElapsed;
       if(mCurrentProfilerData->mParent->mRoot)
          mCurrentProfilerData->mParent->mRoot->mSubTime += fElapsed; // mark it in the parent as well...
-
+      
       mCurrentProfilerData = mCurrentProfilerData->mParent;
    }
    if(mStackDepth == 0)
@@ -474,13 +480,13 @@ void Profiler::hashPop(ProfilerRootData *expected)
       }
       if(!mEnabled && mNextEnable)
          startHighResolutionTimer(mCurrentProfilerData->mStartTime);
-
+      
 #if defined(TORQUE_OS_WIN)
       // The high performance counters under win32 are unreliable when running on multiple
       // processors. When the profiler is enabled, we restrict Torque to a single processor.
       if(mNextEnable != mEnabled)
       {
-
+         
          if(mNextEnable)
          {
             Con::warnf("Warning: forcing the Torque profiler thread to run only on cpu 1.");
@@ -496,7 +502,7 @@ void Profiler::hashPop(ProfilerRootData *expected)
          }
       }
 #endif
-
+      
       mEnabled = mNextEnable;
    }
 }
@@ -514,15 +520,15 @@ static void profilerDataDumpRecurse(ProfilerData *data, char *buffer, U32 buffer
 {
    // dump out this one:
    Con::printf("%7.3f %7.3f %8d %s%s",
-         100 * data->mTotalTime / totalTime,
-         100 * (data->mTotalTime - data->mSubTime) / totalTime,
-         data->mInvokeCount,
-         buffer,
-         data->mRoot ? data->mRoot->mName : "ROOT" );
+            100 * data->mTotalTime / totalTime,
+            100 * (data->mTotalTime - data->mSubTime) / totalTime,
+            data->mInvokeCount,
+            buffer,
+            data->mRoot ? data->mRoot->mName : "ROOT" );
    data->mTotalTime = 0;
    data->mSubTime = 0;
    data->mInvokeCount = 0;
-
+   
    buffer[bufferLen] = ' ';
    buffer[bufferLen+1] = ' ';
    buffer[bufferLen+2] = 0;
@@ -552,16 +558,16 @@ static void profilerDataDumpRecurseFile(ProfilerData *data, char *buffer, U32 bu
 {
    char pbuffer[256];
    dSprintf(pbuffer, 255, "%7.3f %7.3f %8d %s%s\n",
-         100 * data->mTotalTime / totalTime,
-         100 * (data->mTotalTime - data->mSubTime) / totalTime,
-         data->mInvokeCount,
-         buffer,
-         data->mRoot ? data->mRoot->mName : "ROOT" );
+          100 * data->mTotalTime / totalTime,
+          100 * (data->mTotalTime - data->mSubTime) / totalTime,
+          data->mInvokeCount,
+          buffer,
+          data->mRoot ? data->mRoot->mName : "ROOT" );
    fws.write(dStrlen(pbuffer), pbuffer);
    data->mTotalTime = 0;
    data->mSubTime = 0;
    data->mInvokeCount = 0;
-
+   
    buffer[bufferLen] = ' ';
    buffer[bufferLen+1] = ' ';
    buffer[bufferLen+2] = 0;
@@ -593,7 +599,7 @@ void Profiler::dump()
    mEnabled = false;
    mStackDepth++;
    // may have some profiled calls... gotta turn em off.
-
+   
    Vector<ProfilerRootData *> rootVector;
    F64 totalTime = 0;
    for(ProfilerRootData *walk = ProfilerRootData::sRootList; walk; walk = walk->mNextRoot)
@@ -602,8 +608,8 @@ void Profiler::dump()
       rootVector.push_back(walk);
    }
    dQsort((void *) &rootVector[0], rootVector.size(), sizeof(ProfilerRootData *), rootDataCompare);
-
-
+   
+   
    if (mDumpToConsole == true)
    {
       Con::printf("Profiler Data Dump:");
@@ -612,10 +618,10 @@ void Profiler::dump()
       for(U32 i = 0; i < rootVector.size(); i++)
       {
          Con::printf("%7.3f %7.3f %8d %s",
-                     100 * (rootVector[i]->mTotalTime - rootVector[i]->mSubTime) / totalTime,
-                     100 * rootVector[i]->mTotalTime / totalTime,
-                     rootVector[i]->mTotalInvokeCount,
-                     rootVector[i]->mName);
+                  100 * (rootVector[i]->mTotalTime - rootVector[i]->mSubTime) / totalTime,
+                  100 * rootVector[i]->mTotalTime / totalTime,
+                  rootVector[i]->mTotalInvokeCount,
+                  rootVector[i]->mName);
          rootVector[i]->mTotalInvokeCount = 0;
          rootVector[i]->mTotalTime = 0;
          rootVector[i]->mSubTime = 0;
@@ -623,9 +629,9 @@ void Profiler::dump()
       Con::printf("");
       Con::printf("Ordered by stack trace total time -");
       Con::printf("%% Time  %% NSTime  Invoke #  Name");
-
+      
       mCurrentProfilerData->mTotalTime = endHighResolutionTimer(mCurrentProfilerData->mStartTime);
-
+      
       char depthBuffer[MaxStackDepth * 2 + 1];
       depthBuffer[0] = 0;
       profilerDataDumpRecurse(mCurrentProfilerData, depthBuffer, 0, totalTime);
@@ -637,44 +643,44 @@ void Profiler::dump()
       FileStream fws;
       bool success = fws.open(mDumpFileName, Torque::FS::File::Write);
       AssertFatal(success, "Cannot write profile dump to specified file!");
-         char buffer[1024];
-
-         dStrcpy(buffer, "Profiler Data Dump:\n");
+      char buffer[1024];
+      
+      dStrcpy(buffer, "Profiler Data Dump:\n");
+      fws.write(dStrlen(buffer), buffer);
+      dStrcpy(buffer, "Ordered by non-sub total time -\n");
+      fws.write(dStrlen(buffer), buffer);
+      dStrcpy(buffer, "%%NSTime  %% Time  Invoke #  Name\n");
+      fws.write(dStrlen(buffer), buffer);
+      
+      for(U32 i = 0; i < rootVector.size(); i++)
+      {
+         dSprintf(buffer, 1023, "%7.3f %7.3f %8d %s\n",
+                100 * (rootVector[i]->mTotalTime - rootVector[i]->mSubTime) / totalTime,
+                100 * rootVector[i]->mTotalTime / totalTime,
+                rootVector[i]->mTotalInvokeCount,
+                rootVector[i]->mName);
          fws.write(dStrlen(buffer), buffer);
-         dStrcpy(buffer, "Ordered by non-sub total time -\n");
-         fws.write(dStrlen(buffer), buffer);
-         dStrcpy(buffer, "%%NSTime  %% Time  Invoke #  Name\n");
-         fws.write(dStrlen(buffer), buffer);
-
-         for(U32 i = 0; i < rootVector.size(); i++)
-         {
-            dSprintf(buffer, 1023, "%7.3f %7.3f %8d %s\n",
-                     100 * (rootVector[i]->mTotalTime - rootVector[i]->mSubTime) / totalTime,
-                     100 * rootVector[i]->mTotalTime / totalTime,
-                     rootVector[i]->mTotalInvokeCount,
-                     rootVector[i]->mName);
-            fws.write(dStrlen(buffer), buffer);
-
-            rootVector[i]->mTotalInvokeCount = 0;
-            rootVector[i]->mTotalTime = 0;
-            rootVector[i]->mSubTime = 0;
-         }
-         dStrcpy(buffer, "\nOrdered by non-sub total time -\n");
-         fws.write(dStrlen(buffer), buffer);
-         dStrcpy(buffer, "%%NSTime  %% Time  Invoke #  Name\n");
-         fws.write(dStrlen(buffer), buffer);
-
+         
+         rootVector[i]->mTotalInvokeCount = 0;
+         rootVector[i]->mTotalTime = 0;
+         rootVector[i]->mSubTime = 0;
+      }
+      dStrcpy(buffer, "\nOrdered by non-sub total time -\n");
+      fws.write(dStrlen(buffer), buffer);
+      dStrcpy(buffer, "%%NSTime  %% Time  Invoke #  Name\n");
+      fws.write(dStrlen(buffer), buffer);
+      
       mCurrentProfilerData->mTotalTime = endHighResolutionTimer(mCurrentProfilerData->mStartTime);
-
+      
       char depthBuffer[MaxStackDepth * 2 + 1];
       depthBuffer[0] = 0;
       profilerDataDumpRecurseFile(mCurrentProfilerData, depthBuffer, 0, totalTime, fws);
       mEnabled = enableSave;
       mStackDepth--;
-
+      
       fws.close();
    }
-
+   
    mDumpToConsole = false;
    mDumpToFile    = false;
    mDumpFileName[0] = '\0';
@@ -709,13 +715,13 @@ void Profiler::enableMarker(const char *marker, bool enable)
 
 //-----------------------------------------------------------------------------
 
-DefineEngineFunction( profilerMarkerEnable, void, ( const char* markerName, bool enable ), ( true ),   
-   "@brief Enable or disable a specific profile.\n\n"
-   "@param enable     Optional paramater to enable or disable the profile.\n"
-   "@param markerName Name of a specific marker to enable or disable.\n"
-   "@note Calling this function will first call profilerReset(), clearing all data from profiler. "
-   "All profile markers are enabled by default.\n\n"
-   "@ingroup Debugging")
+DefineEngineFunction( profilerMarkerEnable, void, ( const char* markerName, bool enable ), ( true ),
+                "@brief Enable or disable a specific profile.\n\n"
+                "@param enable     Optional paramater to enable or disable the profile.\n"
+                "@param markerName Name of a specific marker to enable or disable.\n"
+                "@note Calling this function will first call profilerReset(), clearing all data from profiler. "
+                "All profile markers are enabled by default.\n\n"
+                "@ingroup Debugging")
 {
    if( gProfiler )
       gProfiler->enableMarker( markerName, enable );
@@ -724,37 +730,37 @@ DefineEngineFunction( profilerMarkerEnable, void, ( const char* markerName, bool
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction( profilerEnable, void, ( bool enable ),,
-				"@brief Enables or disables the profiler.\n\n"
-				"Data is only gathered while the profiler is enabled.\n\n"
-				"@note Profiler is not available in shipping builds.\n"
-				"T3D has predefined profiling areas surrounded by markers, "
-				"but you may need to define additional markers (in C++) around areas you wish to profile,"
-				" by using the PROFILE_START( markerName ); and PROFILE_END(); macros.\n\n"
-				"@ingroup Debugging\n" )
+                "@brief Enables or disables the profiler.\n\n"
+                "Data is only gathered while the profiler is enabled.\n\n"
+                "@note Profiler is not available in shipping builds.\n"
+                "T3D has predefined profiling areas surrounded by markers, "
+                "but you may need to define additional markers (in C++) around areas you wish to profile,"
+                " by using the PROFILE_START( markerName ); and PROFILE_END(); macros.\n\n"
+                "@ingroup Debugging\n" )
 {
    if(gProfiler)
       gProfiler->enable(enable);
 }
 
 DefineEngineFunction(profilerDump, void, (),,
-				"@brief Dumps current profiling stats to the console window.\n\n"
-				"@note Markers disabled with profilerMarkerEnable() will be skipped over. "
-				"If the profiler is currently running, it will be disabled.\n"
-				"@ingroup Debugging")
+                "@brief Dumps current profiling stats to the console window.\n\n"
+                "@note Markers disabled with profilerMarkerEnable() will be skipped over. "
+                "If the profiler is currently running, it will be disabled.\n"
+                "@ingroup Debugging")
 {
    if(gProfiler)
       gProfiler->dumpToConsole();
 }
 
 DefineEngineFunction( profilerDumpToFile, void, ( const char* fileName ),,
-				"@brief Dumps current profiling stats to a file.\n\n"
-				"@note If the profiler is currently running, it will be disabled.\n"
-				"@param fileName Name and path of file to save profiling stats to. Must use forward slashes (/). "
-				"Will attempt to create the file if it does not already exist.\n"
-				"@tsexample\n"
-				"profilerDumpToFile( \"C:/Torque/log1.txt\" );\n"
-				"@endtsexample\n\n"
-				"@ingroup Debugging" )
+                "@brief Dumps current profiling stats to a file.\n\n"
+                "@note If the profiler is currently running, it will be disabled.\n"
+                "@param fileName Name and path of file to save profiling stats to. Must use forward slashes (/). "
+                "Will attempt to create the file if it does not already exist.\n"
+                "@tsexample\n"
+                "profilerDumpToFile( \"C:/Torque/log1.txt\" );\n"
+                "@endtsexample\n\n"
+                "@ingroup Debugging" )
 {
    if(gProfiler)
       gProfiler->dumpToFile(fileName);
@@ -762,9 +768,9 @@ DefineEngineFunction( profilerDumpToFile, void, ( const char* fileName ),,
 
 DefineEngineFunction( profilerReset, void, (),,
                 "@brief Resets the profiler, clearing it of all its data.\n\n"
-				"If the profiler is currently running, it will first be disabled. "
-				"All markers will retain their current enabled/disabled status.\n\n"
-				"@ingroup Debugging" )
+                "If the profiler is currently running, it will first be disabled. "
+                "All markers will retain their current enabled/disabled status.\n\n"
+                "@ingroup Debugging" )
 {
    if(gProfiler)
       gProfiler->reset();

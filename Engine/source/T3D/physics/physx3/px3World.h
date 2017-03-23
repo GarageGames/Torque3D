@@ -61,6 +61,7 @@ protected:
 	ProcessList *mProcessList;
 	F32 mEditorTimeScale;
 	bool mErrorReport;
+   physx::PxRenderBuffer *mRenderBuffer;
 	physx::PxControllerManager* mControllerManager;
 	static Px3ConsoleStream *smErrorCallback;
 	static physx::PxDefaultAllocator smMemoryAlloc;
@@ -69,8 +70,6 @@ protected:
 	static physx::PxProfileZoneManager* smProfileZoneManager;
 	static physx::PxDefaultCpuDispatcher* smCpuDispatcher;
 	static physx::PxVisualDebuggerConnection* smPvdConnection;
-   static F32 smPhysicsStepTime;
-   static U32 smPhysicsMaxIterations;
 	F32 mAccumulator;
 	bool _simulate(const F32 dt);
 
@@ -103,7 +102,6 @@ public:
 	static bool restartSDK( bool destroyOnly = false, Px3World *clientWorld = NULL, Px3World *serverWorld = NULL );
 	static void releaseWriteLocks();
 	static physx::PxCooking *getCooking();
-   static void setTiming(F32 stepTime,U32 maxIterations);
    static void lockScenes();
    static void unlockScenes();
 };

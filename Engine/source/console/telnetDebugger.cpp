@@ -115,8 +115,8 @@ MODULE_END;
 
 DefineConsoleFunction( dbgSetParameters, void, (S32 port, const char * password, bool waitForClient ), (false), "( int port, string password, bool waitForClient )"
                 "Open a debug server port on the specified port, requiring the specified password, "
-				"and optionally waiting for the debug client to connect.\n"
-				"@internal Primarily used for Torsion and other debugging tools")
+            "and optionally waiting for the debug client to connect.\n"
+            "@internal Primarily used for Torsion and other debugging tools")
 {
    if (TelDebugger)
    {
@@ -126,17 +126,17 @@ DefineConsoleFunction( dbgSetParameters, void, (S32 port, const char * password,
 
 DefineConsoleFunction( dbgIsConnected, bool, (), , "()"
                 "Returns true if a script debugging client is connected else return false.\n"
-				"@internal Primarily used for Torsion and other debugging tools")
+            "@internal Primarily used for Torsion and other debugging tools")
 {
    return TelDebugger && TelDebugger->isConnected();
 }
 
 DefineConsoleFunction( dbgDisconnect, void, (), , "()"
                 "Forcibly disconnects any attached script debugging client.\n"
-				"@internal Primarily used for Torsion and other debugging tools")
+            "@internal Primarily used for Torsion and other debugging tools")
 {
    if (TelDebugger)
-	   TelDebugger->disconnect();
+      TelDebugger->disconnect();
 }
 
 static void debuggerConsumer(U32 level, const char *line)
@@ -244,9 +244,9 @@ void TelnetDebugger::setDebugParameters(S32 port, const char *password, bool wai
    mAcceptPort = port;
    if(mAcceptPort != -1 && mAcceptPort != 0)
    {
-	  NetAddress address;
-	  Net::getIdealListenAddress(&address);
-	  address.port = mAcceptPort;
+     NetAddress address;
+     Net::getIdealListenAddress(&address);
+     address.port = mAcceptPort;
 
       mAcceptSocket = Net::openSocket();
       Net::bindAddress(address, mAcceptSocket);
@@ -588,7 +588,7 @@ void TelnetDebugger::addAllBreakpoints(CodeBlock *code)
       // TODO: This assumes that the OS file names are case 
       // insensitive... Torque needs a dFilenameCmp() function.
       if( dStricmp( cur->fileName, code->name ) == 0 )
-	   {
+      {
          cur->code = code;
 
          // Find the fist breakline starting from and
@@ -741,7 +741,7 @@ void TelnetDebugger::removeBreakpoint(const char *fileName, S32 line)
    {
       Breakpoint *brk = *bp;
       *bp = brk->next;
-	  if ( brk->code )
+     if ( brk->code )
           brk->code->clearBreakpoint(brk->lineNumber);
       dFree(brk->testExpression);
       delete brk;
@@ -754,7 +754,7 @@ void TelnetDebugger::removeAllBreakpoints()
    while(walk)
    {
       Breakpoint *temp = walk->next;
-	  if ( walk->code )
+     if ( walk->code )
           walk->code->clearBreakpoint(walk->lineNumber);
       dFree(walk->testExpression);
       delete walk;
@@ -792,10 +792,10 @@ void TelnetDebugger::setBreakOnNextStatement( bool enabled )
       for(CodeBlock *walk = CodeBlock::getCodeBlockList(); walk; walk = walk->nextFile)
          walk->clearAllBreaks();
       for(Breakpoint *w = mBreakpoints; w; w = w->next)
-	  {
-		  if ( w->code )
+     {
+        if ( w->code )
               w->code->setBreakpoint(w->lineNumber);
-	  }
+     }
       mBreakOnNextStatement = false;
    }
 }
@@ -848,7 +848,7 @@ void TelnetDebugger::debugStepOut()
    setBreakOnNextStatement( false );
    mStackPopBreakIndex = gEvalState.getStackDepth() - 1;
    if ( mStackPopBreakIndex == 0 )
-	   mStackPopBreakIndex = -1;
+      mStackPopBreakIndex = -1;
    mProgramPaused = false;
    send("RUNNING\r\n");
 }

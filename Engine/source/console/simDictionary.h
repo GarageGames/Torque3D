@@ -61,7 +61,7 @@ struct StringTableEntryEq
    }
 };
 
-typedef std::unordered_map<StringTableEntry, SimObject*, StringTableEntryHash, StringTableEntryEq> StringDictDef;	
+typedef std::unordered_map<StringTableEntry, SimObject*, StringTableEntryHash, StringTableEntryEq> StringDictDef; 
 typedef std::unordered_map<SimObjectId, SimObject*> SimObjectIdDictDef;
 #endif
 

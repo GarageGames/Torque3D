@@ -307,7 +307,7 @@ void SceneContainer::insertIntoBins(SceneObject* obj,
    // For huge objects, dump them into the overflow bin.  Otherwise, everything
    //  goes into the grid...
    //
-   if ((maxX - minX + 1) < csmNumBins || (maxY - minY + 1) < csmNumBins && !obj->isGlobalBounds())
+   if ((maxX - minX + 1) < csmNumBins || ((maxY - minY + 1) < csmNumBins && !obj->isGlobalBounds()))
    {
       SceneObjectRef** pCurrInsert = &obj->mBinRefHead;
 
@@ -892,7 +892,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
                   *info = ri;
                   info->point.interpolate(start, end, info->t);
                   currentT = ri.t;
-						info->distance = (start - info->point).len();
+                  info->distance = (start - info->point).len();
                }
             }
          }
@@ -991,7 +991,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
                            *info = ri;
                            info->point.interpolate(start, end, info->t);
                            currentT = ri.t;
-						         info->distance = (start - info->point).len();
+                           info->distance = (start - info->point).len();
                         }
                      }
                   }
@@ -1088,7 +1088,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
                                  *info = ri;
                                  info->point.interpolate(start, end, info->t);
                                  currentT = ri.t;
-								         info->distance = (start - info->point).len();
+                                 info->distance = (start - info->point).len();
                               }
                            }
                         }
@@ -1602,7 +1602,7 @@ DefineEngineFunction( containerSearchCurrRadiusDist, F32, ( bool useClientContai
 
 //TODO: make RayInfo an API type
 DefineEngineFunction( containerRayCast, const char*,
-   ( Point3F start, Point3F end, U32 mask, SceneObject *pExempt, bool useClientContainer ), ( NULL, false ),
+   ( Point3F start, Point3F end, U32 mask, SceneObject *pExempt, bool useClientContainer ), ( nullAsType<SceneObject*>(), false ),
    "@brief Cast a ray from start to end, checking for collision against items matching mask.\n\n"
 
    "If pExempt is specified, then it is temporarily excluded from collision checks (For "

@@ -121,7 +121,7 @@ bool ConsoleValueStack::reserveValues(U32 count, ConsoleValueRef *outValues)
    //Con::printf("[%i]CSTK reserveValues %i", mStackPos, count);
    for (U32 i=0; i<count; i++)
    {
-	   outValues[i].value = &mStack[mStackPos+i];
+      outValues[i].value = &mStack[mStackPos+i];
    }
    mStackPos += count;
    return true;

@@ -210,7 +210,7 @@ DefineEngineFunction( findNextFile, String, ( const char* pattern ), ( "" ),
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction( getFileCount, S32, ( const char* pattern, bool recurse ), ( "", true ),
-	"@brief Returns the number of files in the directory tree that match the given patterns\n\n"
+   "@brief Returns the number of files in the directory tree that match the given patterns\n\n"
 
    "This function differs from getFileCountMultiExpr() in that it supports a single search "
    "pattern being passed in.\n\n"
@@ -246,7 +246,7 @@ DefineEngineFunction( getFileCount, S32, ( const char* pattern, bool recurse ), 
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction(findFirstFileMultiExpr, String, ( const char* pattern, bool recurse ), ( "", true),
-	"@brief Returns the first file in the directory system matching the given patterns.\n\n"
+   "@brief Returns the first file in the directory system matching the given patterns.\n\n"
 
    "Use the corresponding findNextFileMultiExpr() to step through "
    "the results.  If you're only interested in the number of files returned by the "
@@ -259,10 +259,10 @@ DefineEngineFunction(findFirstFileMultiExpr, String, ( const char* pattern, bool
    "call to findFirstFile() and findFirstFileMultiExpr() initiates a new search and renders "
    "a previous search invalid.\n\n"
 
-	"@param pattern The path and file name pattern to match against, such as *.cs.  Separate "
+   "@param pattern The path and file name pattern to match against, such as *.cs.  Separate "
    "multiple patterns with TABs.  For example: \"*.cs\" TAB \"*.dso\"\n"
-	"@param recurse If true, the search will exhaustively recurse into subdirectories "
-	"of the given path and match the given filename patterns.\n"
+   "@param recurse If true, the search will exhaustively recurse into subdirectories "
+   "of the given path and match the given filename patterns.\n"
    "@return String of the first matching file path, or an empty string if no matching "
    "files were found.\n\n"
 
@@ -280,7 +280,7 @@ DefineEngineFunction(findFirstFileMultiExpr, String, ( const char* pattern, bool
    "@see findNextFileMultiExpr()"
    "@see getFileCountMultiExpr()"
    "@see findFirstFile()"
-	"@ingroup FileSearches")
+   "@ingroup FileSearches")
 {
    S32 numResults = buildFileList(pattern, recurse, true);
 
@@ -302,7 +302,7 @@ DefineEngineFunction(findFirstFileMultiExpr, String, ( const char* pattern, bool
 DefineEngineFunction(findNextFileMultiExpr, String, ( const char* pattern ), (""),
    "@brief Returns the next file matching a search begun in findFirstFileMultiExpr().\n\n"
 
-	"@param pattern The path and file name pattern to match against.  This is optional "
+   "@param pattern The path and file name pattern to match against.  This is optional "
    "and may be left out as it is not used by the code.  It is here for legacy reasons.\n"
    "@return String of the next matching file path, or an empty string if no matching "
    "files were found.\n\n"
@@ -319,7 +319,7 @@ DefineEngineFunction(findNextFileMultiExpr, String, ( const char* pattern ), (""
    "@endtsexample\n\n"
 
    "@see findFirstFileMultiExpr()"
-	"@ingroup FileSearches")
+   "@ingroup FileSearches")
 {
    if ( sgFindFilesPos + 1 > sgFindFilesResults.size() )
       return String();
@@ -328,16 +328,16 @@ DefineEngineFunction(findNextFileMultiExpr, String, ( const char* pattern ), (""
 }
 
 DefineEngineFunction(getFileCountMultiExpr, S32, ( const char* pattern, bool recurse ), ( "", true),
-	"@brief Returns the number of files in the directory tree that match the given patterns\n\n"
+   "@brief Returns the number of files in the directory tree that match the given patterns\n\n"
 
    "If you're interested in a list of files that match the given patterns and not just "
    "the number of files, use findFirstFileMultiExpr() and findNextFileMultiExpr().\n\n"
 
-	"@param pattern The path and file name pattern to match against, such as *.cs.  Separate "
+   "@param pattern The path and file name pattern to match against, such as *.cs.  Separate "
    "multiple patterns with TABs.  For example: \"*.cs\" TAB \"*.dso\"\n"
-	"@param recurse If true, the search will exhaustively recurse into subdirectories "
-	"of the given path and match the given filename pattern.\n"
-	"@return Number of files located using the patterns\n\n"
+   "@param recurse If true, the search will exhaustively recurse into subdirectories "
+   "of the given path and match the given filename pattern.\n"
+   "@return Number of files located using the patterns\n\n"
 
    "@tsexample\n"
       "// Count all DTS or Collada models\n"
@@ -347,7 +347,7 @@ DefineEngineFunction(getFileCountMultiExpr, S32, ( const char* pattern, bool rec
 
    "@see findFirstFileMultiExpr()"
    "@see findNextFileMultiExpr()"
-	"@ingroup FileSearches")
+   "@ingroup FileSearches")
 {
    S32 numResults = buildFileList(pattern, recurse, true);
 
@@ -399,14 +399,14 @@ DefineEngineFunction(isFile, bool, ( const char* fileName ),,
 }
 
 DefineEngineFunction( IsDirectory, bool, ( const char* directory ),,
-	"@brief Determines if a specified directory exists or not\n\n"
+   "@brief Determines if a specified directory exists or not\n\n"
 
-	"@param directory String containing path in the form of \"foo/bar\"\n"
+   "@param directory String containing path in the form of \"foo/bar\"\n"
    "@return Returns true if the directory was found.\n"
 
-	"@note Do not include a trailing slash '/'.\n"
+   "@note Do not include a trailing slash '/'.\n"
 
-	"@ingroup FileSystem")
+   "@ingroup FileSystem")
 {
    String dir(Torque::Path::CleanSeparators(directory));
    Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), dir.c_str());
@@ -416,12 +416,12 @@ DefineEngineFunction( IsDirectory, bool, ( const char* directory ),,
 }
 
 DefineEngineFunction(isWriteableFileName, bool, ( const char* fileName ),,
-	"@brief Determines if a file name can be written to using File I/O\n\n"
+   "@brief Determines if a file name can be written to using File I/O\n\n"
 
-	"@param fileName Name and path of file to check\n"
-	"@return Returns true if the file can be written to.\n"
+   "@param fileName Name and path of file to check\n"
+   "@return Returns true if the file can be written to.\n"
 
-	"@ingroup FileSystem")
+   "@ingroup FileSystem")
 {
    String filename(Torque::Path::CleanSeparators(fileName));
    Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), filename.c_str());
@@ -434,32 +434,32 @@ DefineEngineFunction(isWriteableFileName, bool, ( const char* fileName ),,
 }
 
 DefineEngineFunction(startFileChangeNotifications, void, (),,
-	"@brief Start watching resources for file changes\n\n"
+   "@brief Start watching resources for file changes\n\n"
    "Typically this is called during initializeCore().\n\n"
    "@see stopFileChangeNotifications()\n"
-	"@ingroup FileSystem")
+   "@ingroup FileSystem")
 {
    Torque::FS::StartFileChangeNotifications();
 }
 
 DefineEngineFunction(stopFileChangeNotifications, void, (),,
-	"@brief Stop watching resources for file changes\n\n"
+   "@brief Stop watching resources for file changes\n\n"
    "Typically this is called during shutdownCore().\n\n"
    "@see startFileChangeNotifications()\n"
-	"@ingroup FileSystem")
+   "@ingroup FileSystem")
 {
    Torque::FS::StopFileChangeNotifications();
 }
 
 
 DefineEngineFunction(getDirectoryList, String, ( const char* path, S32 depth ), ( "", 0 ),
-	"@brief Gathers a list of directories starting at the given path.\n\n"
+   "@brief Gathers a list of directories starting at the given path.\n\n"
 
-	"@param path String containing the path of the directory\n"
-	"@param depth Depth of search, as in how many subdirectories to parse through\n"
-	"@return Tab delimited string containing list of directories found during search, \"\" if no files were found\n"
+   "@param path String containing the path of the directory\n"
+   "@param depth Depth of search, as in how many subdirectories to parse through\n"
+   "@return Tab delimited string containing list of directories found during search, \"\" if no files were found\n"
 
-	"@ingroup FileSystem")
+   "@ingroup FileSystem")
 {
    // Grab the full path.
    char fullpath[1024];
@@ -508,23 +508,23 @@ DefineEngineFunction(getDirectoryList, String, ( const char* path, S32 depth ), 
 }
 
 DefineEngineFunction(fileSize, S32, ( const char* fileName ),,
-	"@brief Determines the size of a file on disk\n\n"
+   "@brief Determines the size of a file on disk\n\n"
 
-	"@param fileName Name and path of the file to check\n"
-	"@return Returns filesize in bytes, or -1 if no file\n"
+   "@param fileName Name and path of the file to check\n"
+   "@return Returns filesize in bytes, or -1 if no file\n"
 
-	"@ingroup FileSystem")
+   "@ingroup FileSystem")
 {
    Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
    return Platform::getFileSize( sgScriptFilenameBuffer );
 }
 
 DefineEngineFunction( fileModifiedTime, String, ( const char* fileName ),,
-	"@brief Returns a platform specific formatted string with the last modified time for the file.\n\n"
+   "@brief Returns a platform specific formatted string with the last modified time for the file.\n\n"
 
-	"@param fileName Name and path of file to check\n"
-	"@return Formatted string (OS specific) containing modified time, \"9/3/2010 12:33:47 PM\" for example\n"
-	"@ingroup FileSystem")
+   "@param fileName Name and path of file to check\n"
+   "@return Formatted string (OS specific) containing modified time, \"9/3/2010 12:33:47 PM\" for example\n"
+   "@ingroup FileSystem")
 {
    Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
 
@@ -566,12 +566,12 @@ DefineEngineFunction( fileCreatedTime, String, ( const char* fileName ),,
 }
 
 DefineEngineFunction(fileDelete, bool, ( const char* path ),,
-	"@brief Delete a file from the hard drive\n\n"
+   "@brief Delete a file from the hard drive\n\n"
 
-	"@param path Name and path of the file to delete\n"
-	"@note THERE IS NO RECOVERY FROM THIS. Deleted file is gone for good.\n"
-	"@return True if file was successfully deleted\n"
-	"@ingroup FileSystem")
+   "@param path Name and path of the file to delete\n"
+   "@note THERE IS NO RECOVERY FROM THIS. Deleted file is gone for good.\n"
+   "@return True if file was successfully deleted\n"
+   "@ingroup FileSystem")
 {
    static char fileName[1024];
    static char sandboxFileName[1024];
@@ -586,11 +586,11 @@ DefineEngineFunction(fileDelete, bool, ( const char* path ),,
 //----------------------------------------------------------------
 
 DefineEngineFunction(fileExt, String, ( const char* fileName ),,
-	"@brief Get the extension of a file\n\n"
+   "@brief Get the extension of a file\n\n"
 
-	"@param fileName Name and path of file\n"
-	"@return String containing the extension, such as \".exe\" or \".cs\"\n"
-	"@ingroup FileSystem")
+   "@param fileName Name and path of file\n"
+   "@return String containing the extension, such as \".exe\" or \".cs\"\n"
+   "@ingroup FileSystem")
 {
    const char *ret = dStrrchr(fileName, '.');
    if(ret)
@@ -626,11 +626,11 @@ DefineEngineFunction(fileBase, String, ( const char* fileName ),,
 }
 
 DefineEngineFunction(fileName, String, ( const char* fileName ),,
-	"@brief Get only the file name of a path and file name string (removes path)\n\n"
+   "@brief Get only the file name of a path and file name string (removes path)\n\n"
 
-	"@param fileName Name and path of file to check\n"
-	"@return String containing the file name, minus the path\n"
-	"@ingroup FileSystem")
+   "@param fileName Name and path of file to check\n"
+   "@return String containing the file name, minus the path\n"
+   "@ingroup FileSystem")
 {
    S32 pathLen = dStrlen( fileName );
    FrameTemp<char> szPathCopy( pathLen + 1);
@@ -649,11 +649,11 @@ DefineEngineFunction(fileName, String, ( const char* fileName ),,
 }
 
 DefineEngineFunction(filePath, String, ( const char* fileName ),,
-	"@brief Get the path of a file (removes name and extension)\n\n"
+   "@brief Get the path of a file (removes name and extension)\n\n"
 
-	"@param fileName Name and path of file to check\n"
-	"@return String containing the path, minus name and extension\n"
-	"@ingroup FileSystem")
+   "@param fileName Name and path of file to check\n"
+   "@return String containing the path, minus name and extension\n"
+   "@ingroup FileSystem")
 {
    S32 pathLen = dStrlen( fileName );
    FrameTemp<char> szPathCopy( pathLen + 1);
@@ -672,10 +672,10 @@ DefineEngineFunction(filePath, String, ( const char* fileName ),,
 }
 
 DefineEngineFunction(getWorkingDirectory, String, (),,
-	"@brief Reports the current directory\n\n"
+   "@brief Reports the current directory\n\n"
 
-	"@return String containing full file path of working directory\n"
-	"@ingroup FileSystem")
+   "@return String containing full file path of working directory\n"
+   "@ingroup FileSystem")
 {
    return Platform::getCurrentDirectory();
 }
@@ -687,13 +687,13 @@ DefineEngineFunction(getWorkingDirectory, String, (),,
 // are not currently built with TORQUE_TOOLS defined.
 
 DefineEngineFunction(makeFullPath, String, ( const char* path, const char* cwd ), ( "", ""),
-	"@brief Converts a relative file path to a full path\n\n"
+   "@brief Converts a relative file path to a full path\n\n"
 
-	"For example, \"./console.log\" becomes \"C:/Torque/t3d/examples/FPS Example/game/console.log\"\n"
-	"@param path Name of file or path to check\n"
+   "For example, \"./console.log\" becomes \"C:/Torque/t3d/examples/FPS Example/game/console.log\"\n"
+   "@param path Name of file or path to check\n"
    "@param cwd Optional current working directory from which to build the full path.\n"
-	"@return String containing non-relative directory of path\n"
-	"@ingroup FileSystem")
+   "@return String containing non-relative directory of path\n"
+   "@ingroup FileSystem")
 {
    static const U32 bufSize = 512;
    char *buf = Con::getReturnBuffer(bufSize);
@@ -702,25 +702,25 @@ DefineEngineFunction(makeFullPath, String, ( const char* path, const char* cwd )
 }
 
 DefineEngineFunction(makeRelativePath, String, ( const char* path, const char* to ), ( "", ""),
-	"@brief Turns a full or local path to a relative one\n\n"
+   "@brief Turns a full or local path to a relative one\n\n"
 
    "For example, \"./game/art\" becomes \"game/art\"\n"
    "@param path Full path (may include a file) to convert\n"
    "@param to Optional base path used for the conversion.  If not supplied the current "
    "working directory is used.\n"
-	"@returns String containing relative path\n"
-	"@ingroup FileSystem")
+   "@returns String containing relative path\n"
+   "@ingroup FileSystem")
 {
    return Platform::makeRelativePathName( path, dStrlen(to) > 1 ? to : NULL );
 }
 
 DefineEngineFunction(pathConcat, String, ( const char* path, const char* file), ( "", ""),
-	"@brief Combines two separate strings containing a file path and file name together into a single string\n\n"
+   "@brief Combines two separate strings containing a file path and file name together into a single string\n\n"
 
-	"@param path String containing file path\n"
-	"@param file String containing file name\n"
-	"@return String containing concatenated file name and path\n"
-	"@ingroup FileSystem")
+   "@param path String containing file path\n"
+   "@param file String containing file name\n"
+   "@return String containing concatenated file name and path\n"
+   "@ingroup FileSystem")
 {
    static const U32 bufSize = 1024;
    char *buf = Con::getReturnBuffer(bufSize);
@@ -731,10 +731,10 @@ DefineEngineFunction(pathConcat, String, ( const char* path, const char* file), 
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction(getExecutableName, String, (),,
-	"@brief Gets the name of the game's executable\n\n"
+   "@brief Gets the name of the game's executable\n\n"
 
-	"@return String containing this game's executable name\n"
-	"@ingroup FileSystem")
+   "@return String containing this game's executable name\n"
+   "@ingroup FileSystem")
 {
    return Platform::getExecutableName();
 }

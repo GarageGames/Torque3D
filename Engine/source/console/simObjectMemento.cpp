@@ -30,7 +30,7 @@
 
 SimObjectMemento::SimObjectMemento()
    : mState( NULL ),
-		mIsDatablock( false )
+      mIsDatablock( false )
 {
 }
 
@@ -45,16 +45,16 @@ void SimObjectMemento::save( SimObject *object )
    dFree( mState );
    mObjectName = String::EmptyString;
 
-	// Use a stream to save the state.
+   // Use a stream to save the state.
    MemStream stream( 256 );
 
    U32 writeFlags = 0;
-	SimDataBlock* db = dynamic_cast<SimDataBlock*>(object);
-	if( !db )
-		stream.write( sizeof( "return " ) - 1, "return " );
-	else
+   SimDataBlock* db = dynamic_cast<SimDataBlock*>(object);
+   if( !db )
+      stream.write( sizeof( "return " ) - 1, "return " );
+   else
    {
-		mIsDatablock = true;
+      mIsDatablock = true;
 
       // Cull the datablock name from the output so that
       // we can easily replace it in case the datablock's name
@@ -64,7 +64,7 @@ void SimObjectMemento::save( SimObject *object )
 
       writeFlags |= SimObject::NoName;
    }
-	
+   
    object->write( stream, 0, writeFlags );
    stream.write( (UTF8)0 );
 
@@ -82,9 +82,9 @@ SimObject *SimObjectMemento::restore() const
    // TODO: We could potentially make this faster by
    // caching the CodeBlock generated from the string
 
-	SimObject* object;
-	if( !mIsDatablock )
-	{
+   SimObject* object;
+   if( !mIsDatablock )
+   {
       // Set the redefine behavior to automatically giving
       // the new objects unique names.  This will restore the
       // old names if they are still available or give reasonable
@@ -95,22 +95,22 @@ SimObject *SimObjectMemento::restore() const
 
       // Read the object.
 
-		const UTF8* result = Con::evaluate( mState );
+      const UTF8* result = Con::evaluate( mState );
 
       // Restore the redefine behavior.
 
       Con::setVariable( "$Con::redefineBehavior", oldRedefineBehavior );
 
-		if ( !result || !result[ 0 ] )
-			return NULL;
+      if ( !result || !result[ 0 ] )
+         return NULL;
 
       // Look up the object.
 
-		U32 objectId = dAtoi( result );
-		object = Sim::findObject( objectId );
-	}
-	else
-	{
+      U32 objectId = dAtoi( result );
+      object = Sim::findObject( objectId );
+   }
+   else
+   {
       String objectName = mObjectName;
 
       // For datablocks, it's getting a little complicated.  Datablock definitions cannot be used
@@ -140,16 +140,16 @@ SimObject *SimObjectMemento::restore() const
          dStrcpy( &tempBuffer[ numCharsToLeftParen + uniqueNameLen ], &mState[ numCharsToLeftParen ] );
       }
 
-		Con::evaluate( tempBuffer );
+      Con::evaluate( tempBuffer );
 
       if( tempBuffer != mState )
          dFree( tempBuffer );
 
       if( objectName == String::EmptyString )
-			return NULL;
+         return NULL;
 
-		object = Sim::findObject( objectName );
-	}
+      object = Sim::findObject( objectName );
+   }
 
    return object;
 }

@@ -34,22 +34,22 @@
 IMPLEMENT_CONOBJECT(PersistenceManager);
 
 ConsoleDocClass( PersistenceManager,
-				"@brief this class manages updating SimObjects in the file they were "
-				"created in non-destructively (mostly aimed at datablocks and materials).\n\n"
+            "@brief this class manages updating SimObjects in the file they were "
+            "created in non-destructively (mostly aimed at datablocks and materials).\n\n"
 
-				"Basic scripting interface:\n\n"
-				"	- Creation: new PersistenceManager(FooManager);\n"
-				"	- Flag objects as dirty: FooManager.setDirty(<object name or id>);\n"
-				"	- Remove objects from dirty list: FooManager.removeDirty(<object name or id>);\n"
-				"	- List all currently dirty objects: FooManager.listDirty();\n"
-				"	- Check to see if an object is dirty: FooManager.isDirty(<object name or id>);\n"
-				"	- Save dirty objects to their files: FooManager.saveDirty();\n\n"
-				"@note Dirty objects don't update their files until saveDirty() is "
-				"called so you can change their properties after you flag them as dirty\n\n"
-				"@note Currently only used by editors, not intended for actual game development\n\n"
-				"@ingroup Console\n"
-				"@ingroup Editors\n"
-				"@internal");
+            "Basic scripting interface:\n\n"
+            "  - Creation: new PersistenceManager(FooManager);\n"
+            "  - Flag objects as dirty: FooManager.setDirty(<object name or id>);\n"
+            "  - Remove objects from dirty list: FooManager.removeDirty(<object name or id>);\n"
+            "  - List all currently dirty objects: FooManager.listDirty();\n"
+            "  - Check to see if an object is dirty: FooManager.isDirty(<object name or id>);\n"
+            "  - Save dirty objects to their files: FooManager.saveDirty();\n\n"
+            "@note Dirty objects don't update their files until saveDirty() is "
+            "called so you can change their properties after you flag them as dirty\n\n"
+            "@note Currently only used by editors, not intended for actual game development\n\n"
+            "@ingroup Console\n"
+            "@ingroup Editors\n"
+            "@internal");
 
 PersistenceManager::PersistenceManager()
 {
@@ -328,7 +328,7 @@ void PersistenceManager::parseObject()
 
    if (mParser.tokenICmp(")"))
    {
-      mCurrentObject->name = StringTable->insert("");
+      mCurrentObject->name = StringTable->EmptyString();
 
       mCurrentObject->nameLine = mParser.getCurrentLine();
       mCurrentObject->namePosition = mParser.getTokenLineOffset();
@@ -890,7 +890,7 @@ PersistenceManager::ParsedObject* PersistenceManager::findParsedObject(SimObject
          {
             const ParsedProperty &prop = testObj->properties[j];
 
-            if (	dStrcmp( prop.name, "internalName" ) == 0 && 
+            if (  dStrcmp( prop.name, "internalName" ) == 0 && 
                dStrcmp( prop.value, object->getInternalName() ) == 0 )
                return testObj;
             else if ( dStrcmp(prop.name, "internalName") == 0)
@@ -2037,24 +2037,24 @@ bool PersistenceManager::saveDirtyObject(SimObject* object)
             const char *name = object->getName();
             if (name)
             {
-			      Con::errorf("PersistenceManager::saveDirtyObject(): Unable to open %s to save %s %s (%d)",
-				      dirtyObject.fileName, object->getClassName(), name, object->getId());
-		      }
-		      else
-		      {
-			      Con::errorf("PersistenceManager::saveDirtyObject(): Unable to open %s to save %s (%d)",
-				      dirtyObject.fileName, object->getClassName(), object->getId());
-		      }
+               Con::errorf("PersistenceManager::saveDirtyObject(): Unable to open %s to save %s %s (%d)",
+                  dirtyObject.fileName, object->getClassName(), name, object->getId());
+            }
+            else
+            {
+               Con::errorf("PersistenceManager::saveDirtyObject(): Unable to open %s to save %s (%d)",
+                  dirtyObject.fileName, object->getClassName(), object->getId());
+            }
 
-		      return false;
-		   }
+            return false;
+         }
 
          // if the file exists then lets update and save
-		   if(mCurrentFile)
-		   {
-		      updateObject(object);
+         if(mCurrentFile)
+         {
+            updateObject(object);
             saveDirtyFile();
-		   }
+         }
          
          break;
       }
@@ -2230,7 +2230,7 @@ DefineConsoleMethod( PersistenceManager, removeDirty, void, ( const char * objNa
               "Remove a SimObject from the dirty list.")
 {
    SimObject *dirtyObject = NULL;
-	if (dStrcmp(  objName,"")!=0)
+   if (dStrcmp(  objName,"")!=0)
    {
       if (!Sim::findObject(objName, dirtyObject))
       {

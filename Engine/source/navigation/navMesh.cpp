@@ -181,7 +181,7 @@ DefineConsoleFunction(NavMeshUpdateOne, void, (S32 meshid, S32 objid, bool remov
 NavMesh::NavMesh()
 {
    mTypeMask |= StaticShapeObjectType | MarkerObjectType;
-   mFileName = StringTable->insert("");
+   mFileName = StringTable->EmptyString();
    mNetFlags.clear(Ghostable);
 
    mSaveIntermediates = false;
@@ -211,7 +211,7 @@ NavMesh::NavMesh()
    mLargeCharacters = false;
    mVehicles = false;
 
-   mCoverSet = StringTable->insert("");
+   mCoverSet = StringTable->EmptyString();
    mInnerCover = false;
    mCoverDist = 1.0f;
    mPeekDist = 0.7f;
@@ -1143,9 +1143,10 @@ void NavMesh::buildLinks()
       // Iterate over links
       for(U32 j = 0; j < mLinkIDs.size(); j++)
       {
+         if (mLinksUnsynced[j])
+         {
          if(tile.box.isContained(getLinkStart(j)) ||
-            tile.box.isContained(getLinkEnd(j)) &&
-            mLinksUnsynced[j])
+               tile.box.isContained(getLinkEnd(j)))
          {
             // Mark tile for build.
             mDirtyTiles.push_back_unique(i);
@@ -1159,6 +1160,7 @@ void NavMesh::buildLinks()
                mLinksUnsynced[j] = false;
          }
       }
+   }
    }
    if(mDirtyTiles.size())
       ctx->startTimer(RC_TIMER_TOTAL);

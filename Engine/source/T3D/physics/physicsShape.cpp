@@ -857,6 +857,18 @@ void PhysicsShape::applyImpulse( const Point3F &pos, const VectorF &vec )
       mPhysicsRep->applyImpulse( pos, vec );
 }
 
+void PhysicsShape::applyTorque( const Point3F &torque )
+{
+   if (mPhysicsRep && mPhysicsRep->isDynamic())
+      mPhysicsRep->applyTorque( torque );
+}
+
+void PhysicsShape::applyForce( const Point3F &force )
+{
+   if (mPhysicsRep && mPhysicsRep->isDynamic())
+      mPhysicsRep->applyForce( force );
+}
+
 void PhysicsShape::applyRadialImpulse( const Point3F &origin, F32 radius, F32 magnitude )
 {
    if ( !mPhysicsRep || !mPhysicsRep->isDynamic() )
@@ -1179,4 +1191,20 @@ DefineEngineMethod( PhysicsShape, restore, void, (),,
    "Has no effect if the shape is not destroyed.\n\n")
 {
    object->restore();
+}
+
+DefineEngineMethod( PhysicsShape, applyTorque, void, (Point3F torque), ,
+   "@brief Add a torque to a dynamic physics shape.\n\n"
+   "@param torque to apply to the dynamic physics shape\n"
+   "@note This value is ignored on physics shapes that are not dynamic. Wakes up the dynamic physics shape if it is sleeping.\n")
+{
+   object->applyTorque( torque );
+}
+
+DefineEngineMethod(PhysicsShape, applyForce, void, (Point3F force), ,
+   "@brief Add a force to a dynamic physics shape.\n\n"
+   "@param force to apply to the dynamic physics shape\n"
+   "@note This value is ignored on physics shapes that are not dynamic. Wakes up the dynamic physics shape if it is sleeping.\n")
+{
+   object->applyForce( force );
 }

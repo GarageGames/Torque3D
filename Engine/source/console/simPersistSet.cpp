@@ -29,13 +29,13 @@
 IMPLEMENT_CONOBJECT( SimPersistSet );
 
 ConsoleDocClass( SimPersistSet,
-				"@brief A SimSet that can be safely persisted.\n\n"
-				"Uses SimPersistIDs to reference objects in the set "
-				"while persisted on disk.  This allows the set to resolve "
-				"its references no matter whether they are loaded before or "
-				"after the set is created.\n\n"
-				"Not intended for game development, for editors or internal use only.\n\n "
-				"@internal");
+            "@brief A SimSet that can be safely persisted.\n\n"
+            "Uses SimPersistIDs to reference objects in the set "
+            "while persisted on disk.  This allows the set to resolve "
+            "its references no matter whether they are loaded before or "
+            "after the set is created.\n\n"
+            "Not intended for game development, for editors or internal use only.\n\n "
+            "@internal");
 
 //-----------------------------------------------------------------------------
 

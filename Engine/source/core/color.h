@@ -34,6 +34,9 @@
 #include "console/engineAPI.h"
 #endif
 
+const F32 gGamma = 2.2f;
+const F32 gOneOverGamma = 1.f / 2.2f;
+
 class ColorI;
 
 
@@ -104,8 +107,10 @@ class ColorF
                                       (alpha >= 0.0f && alpha <= 1.0f); }
    void clamp();
 
-   ColorF toLinear() const;
-   ColorF toGamma() const;
+   ColorF toLinear();
+   ColorF toGamma();
+   //calculate luminance, make sure color is linear first
+   F32 luminance();
 
    static const ColorF ZERO;
    static const ColorF ONE;
@@ -208,6 +213,9 @@ class ColorI
    operator ColorF() const;
 
    operator const U8*() const { return &red; }
+
+   ColorI toLinear();
+   ColorI toGamma();
 
    static const ColorI ZERO;
    static const ColorI ONE;
@@ -465,14 +473,32 @@ inline void ColorF::clamp()
       alpha = 0.0f;
 }
 
-inline ColorF ColorF::toLinear() const
+inline ColorF ColorF::toGamma()
 {
-   return ColorF(mPow(red, 2.2f), mPow(green, 2.2f), mPow(blue, 2.2f), alpha);
+   ColorF color;
+   color.red = mPow(red,gOneOverGamma);
+   color.green = mPow(green, gOneOverGamma);
+   color.blue = mPow(blue, gOneOverGamma);
+   color.alpha = alpha;
+   return color;
 }
 
-inline ColorF ColorF::toGamma() const
+inline ColorF ColorF::toLinear()
 {
-   return ColorF(mPow(red, 1.0f / 2.2f), mPow(green, 1.0f / 2.2f), mPow(blue, 1.0f / 2.2f), alpha);
+   ColorF color;
+   color.red = mPow(red,gGamma);
+   color.green = mPow(green, gGamma);
+   color.blue = mPow(blue, gGamma);
+   color.alpha = alpha;
+   return color;
+}
+
+inline F32 ColorF::luminance()
+{
+   // ITU BT.709
+   //return red * 0.2126f + green * 0.7152f + blue * 0.0722f;
+   // ITU BT.601
+   return red * 0.3f + green * 0.59f + blue * 0.11f;
 }
 
 //------------------------------------------------------------------------------
@@ -943,6 +969,18 @@ inline String ColorI::getHex() const
 	result += b;
 
 	return result;
+}
+
+inline ColorI ColorI::toGamma()
+{
+   ColorF color = (ColorF)*this;
+   return (ColorI)color.toGamma();
+}
+
+inline ColorI ColorI::toLinear()
+{
+   ColorF color = (ColorF)*this;
+   return (ColorI)color.toLinear();
 }
 
 //-------------------------------------- INLINE CONVERSION OPERATORS

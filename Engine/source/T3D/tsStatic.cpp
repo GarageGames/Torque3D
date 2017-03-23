@@ -1256,7 +1256,7 @@ DefineEngineMethod( TSStatic, getTargetCount, S32,(),,
 // This method is able to change materials per map to with others. The material that is being replaced is being mapped to
 // unmapped_mat as a part of this transition
 
-DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Material* oldMat, Material* newMat ),("",NULL,NULL),
+DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Material* oldMat, Material* newMat ),("",nullAsType<Material*>(),nullAsType<Material*>()),
    "@brief Change one of the materials on the shape.\n\n"
 
    "This method changes materials per mapTo with others. The material that "
