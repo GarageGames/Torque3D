@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-function CameraComponent::onAdd(%this) 
+function CameraComponent::onAdd(%this)
 {
    %this.addComponentField(clientOwner, "The client that views this camera", "int", "1", "");
 
@@ -36,7 +36,7 @@ function CameraComponent::onAdd(%this)
 
       %clientID.setCameraObject(%this.owner);
       %clientID.setControlCameraFov(%this.FOV);
-      
+
       %clientID.camera = %this.owner;
    }
 
@@ -65,7 +65,7 @@ function CameraComponent::getClientID(%this)
 function CameraComponent::isClientCamera(%this, %client)
 {
 	%clientID = ClientGroup.getObject(%this.clientOwner-1);
-	
+
 	if(%client.getID() == %clientID)
 		return true;
 	else
@@ -78,10 +78,10 @@ function CameraComponent::onClientConnect(%this, %client)
    //{
       %this.scopeToClient(%client);
       %this.setDirty();
-      
+
       %client.setCameraObject(%this.owner);
       %client.setControlCameraFov(%this.FOV);
-      
+
       %client.camera = %this.owner;
    //}
    //else
@@ -93,7 +93,7 @@ function CameraComponent::onClientConnect(%this, %client)
 function CameraComponent::onClientDisconnect(%this, %client)
 {
    Parent::onClientDisconnect(%this, %client);
-   
+
    if(isClientCamera(%client)){
       %this.clearScopeToClient(%client);
       %client.clearCameraObject();
@@ -101,28 +101,28 @@ function CameraComponent::onClientDisconnect(%this, %client)
 }
 
 //move to the editor later
-GlobalActionMap.bind("keyboard", "alt c", "toggleEditorCam");
+//GlobalActionMap.bind("keyboard", "alt c", "toggleEditorCam");
 
 function switchCamera(%client, %newCamEntity)
 {
 	if(!isObject(%client) || !isObject(%newCamEntity))
 		return error("SwitchCamera: No client or target camera!");
-		
+
 	%cam = %newCamEntity.getComponent(CameraComponent);
-		
+
 	if(!isObject(%cam))
 		return error("SwitchCamera: Target camera doesn't have a camera behavior!");
-		
+
 	//TODO: Cleanup clientOwner for previous camera!
 	if(%cam.clientOwner == 0 || %cam.clientOwner $= "")
 		%cam.clientOwner = 0;
-		
+
 	%cam.scopeToClient(%client);
 	%cam.setDirty();
-	
+
 	%client.setCameraObject(%newCamEntity);
 	%client.setControlCameraFov(%cam.FOV);
-	
+
 	%client.camera = %newCamEntity;
 }
 
@@ -130,17 +130,17 @@ function buildEditorCamera()
 {
 	if(isObject("EditorCamera"))
 		return EditorCamera;
-		
+
     %camObj = SGOManager.spawn("SpectatorObject", false);
-	
+
 	%camObj.name = "EditorCamera";
-	
+
 	%client = ClientGroup.getObject(0);
-	
+
 	%camObj.getComponent(SpectatorControls).setupControls(%client);
-	
+
 	MissionCleanup.add(%camObj);
-	
+
 	return %camObj;
 }
 
@@ -149,12 +149,12 @@ function toggleEditorCam(%val)
 {
    if(!%val)
       return;
-      
+
    %client = ClientGroup.getObject(0);
 
    if(!isObject(%client.camera))
       return error("ToggleEditorCam: no existing camera!");
-   
+
    %editorCam = buildEditorCamera();
 
    //if this is our first switch, just go to the editor camera
@@ -166,16 +166,16 @@ function toggleEditorCam(%val)
 		  %editorCam.position = %client.camera.position;
 		  %editorCam.rotation = %client.camera.rotation;
 	   }
-	
+
 	   %client.lastCam = %client.camera;
 	   %client.lastController = %client.getControlObject();
-	   switchCamera(%client, %editorCam); 
+	   switchCamera(%client, %editorCam);
 	   switchControlObject(%client, %editorCam);
    }
-   else  
+   else
    {
-       switchCamera(%client, %client.lastCam); 
-	   switchControlObject(%client, %client.lastController); 
+       switchCamera(%client, %client.lastCam);
+	   switchControlObject(%client, %client.lastController);
        %client.lastCam = %editorCam;
 	   %client.lastController = %editorCam;
    }
@@ -186,10 +186,10 @@ function serverCmdSetClientAspectRatio(%client, %width, %height)
    echo("Client: " @ %client SPC "changing screen res to: " @ %width SPC %height);
    %client.screenExtent = %width SPC %height;
    %cam = %client.getCameraObject();
-   
+
    if(!isObject(%cam))
       return;
-      
+
    %cameraComp = %cam.getComponent(CameraComponent);
 
    %cameraComp.ScreenAspect = %width SPC %height;
