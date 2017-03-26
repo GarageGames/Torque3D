@@ -20,6 +20,7 @@ function FPSGameplay::create( %this )
    exec("./scripts/server/chat.cs");
    exec("./scripts/server/cheetah.cs");
    exec("./scripts/server/commands.cs");
+   exec("./scripts/server/centerPrint.cs");
    exec("./scripts/server/deathMatchGame.cs");
    exec("./scripts/server/health.cs");
    exec("./scripts/server/inventory.cs");
@@ -96,6 +97,8 @@ function FPSGameplay::create( %this )
       exec("data/FPSGameplay/scripts/client/clientCommands.cs");
       exec("data/FPSGameplay/scripts/client/messageHud.cs");
       exec("data/FPSGameplay/scripts/client/playerList.cs");
+      exec("data/FPSGameplay/scripts/client/centerPrint.cs");
+      exec("data/FPSGameplay/scripts/client/recordings.cs");
    }
 }
 

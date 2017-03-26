@@ -83,8 +83,14 @@ exec("./gfxData/water.cs");
 exec("./gfxData/scatterSky.cs");
 exec("./gfxData/clouds.cs");
 
+exec("./screenshot.cs");
+
 // Initialize all core post effects.   
 exec("./postFx.cs");
+
+//VR stuff
+exec("./oculusVROverlay.gui");
+exec("./oculusVR.cs");
 
 // Seed the random number generator.
 setRandomSeed();

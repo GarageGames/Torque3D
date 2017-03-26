@@ -39,6 +39,8 @@ function UI::create( %this )
    
    exec("./scripts/guis/profiler.gui");
    exec("./scripts/guis/netGraphGui.gui");
+   exec("./scripts/guis/FilDialog.gui");
+   exec("./scripts/guis/guiMusicPlayer.gui");
    
    //Load gui companion scripts
    exec("./scripts/chooseLevelDlg.cs");
@@ -51,6 +53,12 @@ function UI::create( %this )
    exec("./scripts/joinServerMenu.cs");
    exec("./scripts/pauseMenu.cs");
    exec("./scripts/messageBoxes.cs");
+   exec("./scripts/help.cs");
+   exec("./scripts/cursors.cs");
+   exec("./scripts/profiler.cs");
+   exec("./scripts/FileDialog.cs");
+   exec("./scripts/GuiTreeViewCtrl.cs");
+   exec("./scripts/guiMusicPlayer.cs");
    
    %dbList = new ArrayObject(LevelFilesList);
    
