@@ -38,6 +38,7 @@ function FPSGameplay::create( %this )
    exec("./scripts/server/vehicleWheeled.cs");
    exec("./scripts/server/VolumetricFog.cs");
    exec("./scripts/server/weapon.cs");
+   exec("./scripts/server/physicsShape.cs");
    
    //add DBs
    if(isObject(DatablockFilesList))
@@ -89,8 +90,10 @@ function FPSGameplay::create( %this )
       exec("./scripts/gui/chatHud.gui");
       exec("./scripts/gui/playerList.gui");
       exec("./scripts/gui/playGui.gui");
+      exec("./scripts/gui/hudlessGui.gui");
       
-      exec("./scripts/gui/playGui.cs");
+      exec("data/FPSGameplay/scripts/client/playGui.cs");
+      exec("data/FPSGameplay/scripts/client/hudlessGui.cs");
       
       exec("data/FPSGameplay/scripts/client/message.cs");
       exec("data/FPSGameplay/scripts/client/chatHud.cs");
@@ -99,6 +102,8 @@ function FPSGameplay::create( %this )
       exec("data/FPSGameplay/scripts/client/playerList.cs");
       exec("data/FPSGameplay/scripts/client/centerPrint.cs");
       exec("data/FPSGameplay/scripts/client/recordings.cs");
+      
+      exec("data/FPSGameplay/scripts/client/screenshot.cs");
    }
 }
 

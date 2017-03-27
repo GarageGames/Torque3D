@@ -1,5 +1,3 @@
-exec("./FileDialog.gui");
-
 function PlatformFileDialog::buildFilters(%this)
 {
    %str = strreplace( %this.data.filters, "|", "\t");
