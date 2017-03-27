@@ -46,7 +46,7 @@ singleton ShaderData( MLAA_EdgeDetectionShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/offsetV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/edgeDetectionP.hlsl";
-
+   
    OGLVertexShaderFile  = "shaders/common/postFx/mlaa/gl/offsetV.glsl";
    OGLPixelShaderFile   = "shaders/common/postFx/mlaa/gl/edgeDetectionP.glsl";
 
@@ -75,7 +75,7 @@ singleton ShaderData( MLAA_BlendWeightCalculationShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/passthruV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/blendWeightCalculationP.hlsl";
-
+   
    OGLVertexShaderFile  = "shaders/common/postFx/mlaa/gl/passthruV.glsl";
    OGLPixelShaderFile   = "shaders/common/postFx/mlaa/gl/blendWeightCalculationP.glsl";
 
@@ -162,7 +162,7 @@ singleton PostEffect( MLAAFx )
 
       texture[0] = "$inTex"; // Edges mask    
       texture[1] = "$inTex"; // Edges mask 
-      texture[2] = "AreaMap33.dds";
+      texture[2] = "./AreaMap33.dds";
    };
 
    new PostEffect()

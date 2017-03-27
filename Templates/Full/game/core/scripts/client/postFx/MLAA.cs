@@ -162,7 +162,7 @@ singleton PostEffect( MLAAFx )
 
       texture[0] = "$inTex"; // Edges mask    
       texture[1] = "$inTex"; // Edges mask 
-      texture[2] = "AreaMap33.dds";
+      texture[2] = "./AreaMap33.dds";
    };
 
    new PostEffect()

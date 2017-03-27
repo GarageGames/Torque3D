@@ -429,7 +429,22 @@ bool ModuleManager::loadModuleGroup( const char* pModuleGroup )
                 if ( pScopeSet->isMethod( pLoadReadyModuleDefinition->getCreateFunction() ) )
                 {
                     // Yes, so call the create method.
-                    Con::executef( pScopeSet, pLoadReadyModuleDefinition->getCreateFunction() );
+
+                     //But first, check if we're overriding objects, and if so, set our console var to make that happen while we exec our create function
+                     if (pLoadReadyModuleDefinition->getOverrideExistingObjects())
+                     {
+                        String redefineBehaviorPrev = Con::getVariable("$Con::redefineBehavior");
+                        Con::setVariable("$Con::redefineBehavior", "replaceExisting");
+                        Con::executef(pScopeSet, pLoadReadyModuleDefinition->getCreateFunction());
+                        
+                        //And now that we've executed, switch back to the prior behavior
+                        Con::setVariable("$Con::redefineBehavior", redefineBehaviorPrev.c_str());
+                     }
+                     else
+                     {
+                        //Nothing to do, just run the create function
+                        Con::executef(pScopeSet, pLoadReadyModuleDefinition->getCreateFunction());
+                     }
                 }
             }
             else

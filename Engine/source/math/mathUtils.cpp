@@ -371,6 +371,18 @@ F32 getAngleBetweenVectors(VectorF vecA, VectorF vecB)
    return angle;
 }
 
+F32 getSignedAngleBetweenVectors(VectorF vecA, VectorF vecB, VectorF norm)
+{
+   // angle in 0-180
+   F32 angle = getAngleBetweenVectors(vecA, vecB);
+   F32 sign = mSign(mDot(norm, mCross(vecA, vecB)));
+
+   // angle in -179-180
+   F32 signed_angle = angle * sign;
+
+   return signed_angle;
+}
+
 //-----------------------------------------------------------------------------
 
 void transformBoundingBox(const Box3F &sbox, const MatrixF &mat, const Point3F scale, Box3F &dbox)

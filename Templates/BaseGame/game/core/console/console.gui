@@ -1,0 +1,51 @@
+new GuiControl(ConsoleDlg) {
+   profile = "GuiDefaultProfile";
+   horizSizing = "right";
+   vertSizing = "bottom";
+   position = "0 0";
+   extent = "640 480";
+   minExtent = "8 8";
+   visible = "1";
+   helpTag = "0";
+
+   new GuiConsoleEditCtrl(ConsoleEntry) {
+      profile = "ConsoleTextEditProfile";
+      horizSizing = "width";
+      vertSizing = "top";
+      position = "0 462";
+      extent = "640 18";
+      minExtent = "8 8";
+      visible = "1";
+      altCommand = "ConsoleEntry::eval();";
+      helpTag = "0";
+      maxLength = "255";
+      historySize = "40";
+      password = "0";
+      tabComplete = "0";
+      sinkAllKeyEvents = "1";
+      useSiblingScroller = "1";
+   };
+   new GuiScrollCtrl() {
+      internalName = "Scroll";
+      profile = "ConsoleScrollProfile";
+      horizSizing = "width";
+      vertSizing = "height";
+      position = "0 0";
+      extent = "640 462";
+      minExtent = "8 8";
+      visible = "1";
+      helpTag = "0";
+      willFirstRespond = "1";
+      hScrollBar = "alwaysOn";
+      vScrollBar = "alwaysOn";
+      lockHorizScroll = "false";
+      lockVertScroll = "false";
+      constantThumbHeight = "0";
+      childMargin = "0 0";
+
+         new GuiConsole( ConsoleMessageLogView ) {
+            profile = "GuiConsoleProfile";
+            position = "0 0";
+         };
+      };
+};

@@ -1,0 +1,9 @@
+<ModuleDefinition
+	ModuleId="UI"
+	VersionId="1"
+	Description="Module that implements the menus for the game."
+	ScriptFile="UI.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Game">
+</ModuleDefinition>
