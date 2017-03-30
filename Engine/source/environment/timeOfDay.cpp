@@ -61,14 +61,14 @@ ConsoleDocClass( TimeOfDay,
 );
 
 TimeOfDay::TimeOfDay() 
-   :  mElevation( 0.0f ),
-      mAzimuth( 0.0f ),
-      mAxisTilt( 23.44f ),       // 35 degree tilt
+   :  mStartTimeOfDay( 0.5f ),   // High noon
       mDayLen( 120.0f ),         // 2 minutes
-      mStartTimeOfDay( 0.5f ),   // High noon
+      mAxisTilt( 23.44f ),       // 35 degree tilt
+      mAzimuth( 0.0f ),
+      mElevation( 0.0f ),
       mTimeOfDay( 0.0f ),        // initialized to StartTimeOfDay in onAdd
-      mPlay( true ),
       mDayScale( 1.0f ),
+      mPlay( true ),
       mNightScale( 1.5f ),
       mAnimateTime( 0.0f ),
       mAnimateSpeed( 0.0f ),
