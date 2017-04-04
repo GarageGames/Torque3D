@@ -2609,6 +2609,8 @@ void Player::updateMove(const Move* move)
 
                if (mHead.z > mDataBlock->maxFreelookAngle)
                   mHead.z = mDataBlock->maxFreelookAngle;
+
+               mHead.x = mClampF(mHead.x, mDataBlock->minLookAngle, mDataBlock->maxLookAngle);
             }
             else
             {
