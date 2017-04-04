@@ -2606,6 +2606,9 @@ void Player::updateMove(const Move* move)
                   mHead.z += M_2PI_F;
                while (mHead.z > M_2PI_F)
                   mHead.z -= M_2PI_F;
+
+               if (mHead.z > mDataBlock->maxFreelookAngle)
+                  mHead.z = mDataBlock->maxFreelookAngle;
             }
             else
             {
