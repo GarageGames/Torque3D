@@ -1273,7 +1273,8 @@ void Camera::unpackUpdate(NetConnection *con, BitStream *bstream)
       bstream->read(&pos.x);
       bstream->read(&pos.y);
       bstream->read(&pos.z);
-      bstream->read(&rot.x);
+      bstream->read(&rot.x); 
+      rot.y = 0;
       bstream->read(&rot.z);
       _setPosition(pos,rot);
 
