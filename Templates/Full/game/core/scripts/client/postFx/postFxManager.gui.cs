@@ -430,7 +430,7 @@ function ppOptionsVignetteEnableVignette::onAction(%this)
 
 function ppColorCorrection_selectFile()
 {
-   %filter = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng. *.tga)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga|All Files (*.*)|*.*|";   
+   %filter = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng, *.tga, *.psd)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga;*.psd|All Files (*.*)|*.*|";
    getLoadFilename( %filter, "ppColorCorrection_selectFileHandler");
 }
 

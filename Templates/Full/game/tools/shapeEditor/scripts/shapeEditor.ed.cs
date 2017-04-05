@@ -559,7 +559,7 @@ function ShapeEdSelectWindow::addShapeIcon( %this, %fullPath )
    %ctrl.groupNum = "-1";
 
    // Check if a shape specific icon is available
-   %formats = ".png .jpg .dds .bmp .gif .jng .tga";
+   %formats = ".png .jpg .dds .bmp .gif .jng .tga .psd";
    %count = getWordCount( %formats );
    for ( %i = 0; %i < %count; %i++ )
    {

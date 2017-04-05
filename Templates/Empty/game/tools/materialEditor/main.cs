@@ -88,7 +88,7 @@ function MaterialEditorPlugin::onWorldEditorStartup( %this )
    MaterialEditorPlugin.map = %map; 
    
    MaterialEditorGui.fileSpec = "Torque Material Files (materials.cs)|materials.cs|All Files (*.*)|*.*|";
-   MaterialEditorGui.textureFormats = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng. *.tga)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga|All Files (*.*)|*.*|";
+   MaterialEditorGui.textureFormats = "Image Files (*.png, *.jpg, *.dds, *.bmp, *.gif, *.jng, *.tga, *.psd)|*.png;*.jpg;*.dds;*.bmp;*.gif;*.jng;*.tga;*.psd|All Files (*.*)|*.*|";
    MaterialEditorGui.modelFormats = "DTS Files (*.dts)|*.dts";
    MaterialEditorGui.lastTexturePath = "";   
    MaterialEditorGui.lastTextureFile = "";
