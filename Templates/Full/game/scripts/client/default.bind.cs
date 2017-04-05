@@ -687,6 +687,23 @@ function doProfile(%val)
    else
    {
       // key up -- finish off profile
+      endProfile(true);
+   }
+}
+
+function startProfile(%val)
+{
+   if (%val)
+   {
+      doProfile(true);
+      schedule(2000, 0, endProfile, true);
+   }
+}
+
+function endProfile(%val)
+{
+   if (%val)
+   {
       echo("Ending profile session...");
 
       profilerDumpToFile("profilerDumpToFile" @ getSimTime() @ ".txt");
@@ -695,6 +712,7 @@ function doProfile(%val)
 }
 
 GlobalActionMap.bind(keyboard, "ctrl F3", doProfile);
+GlobalActionMap.bind(keyboard, "alt F3", startProfile);
 
 //------------------------------------------------------------------------------
 // Misc.
