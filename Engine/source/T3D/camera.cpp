@@ -1275,6 +1275,7 @@ void Camera::unpackUpdate(NetConnection *con, BitStream *bstream)
       bstream->read(&pos.z);
       bstream->read(&rot.x);
       bstream->read(&rot.z);
+      rot.y = 0.0f;
       _setPosition(pos,rot);
 
       // NewtonMode
