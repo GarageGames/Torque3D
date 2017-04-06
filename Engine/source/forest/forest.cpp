@@ -81,8 +81,8 @@ ConsoleDocClass( Forest,
 
 Forest::Forest()
    :  mDataFileName( NULL ),
-      mReflectionLodScalar( 2.0f ),
       mConvexList( new Convex() ),
+      mReflectionLodScalar( 2.0f ),
       mZoningDirty( false )
 {
    mTypeMask |= EnvironmentObjectType | StaticShapeObjectType | StaticObjectType;

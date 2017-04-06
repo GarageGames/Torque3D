@@ -240,8 +240,8 @@ void GenericConstBufferLayout::clear()
 
 
 GenericConstBuffer::GenericConstBuffer(GenericConstBufferLayout* layout)
-   :  mBuffer( NULL ),
-      mLayout( layout ),
+   :  mLayout( layout ),
+      mBuffer( NULL ),
       mDirtyStart( U32_MAX ),
       mDirtyEnd( 0 )
 {

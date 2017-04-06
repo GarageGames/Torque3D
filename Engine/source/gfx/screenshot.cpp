@@ -47,8 +47,8 @@ inline void sBlendPixelRGB888( U8* src, U8* dst, F32 factor )
 ScreenShot::ScreenShot()
    :  mPending( false ),
       mWriteJPG( false ),
-      mCurrTile( 0, 0 ),
-      mTiles( 1 )
+      mTiles( 1 ),
+      mCurrTile( 0, 0 )
 {
    mFilename[0] = 0;
 }
