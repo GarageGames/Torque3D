@@ -95,12 +95,12 @@ GuiEditCtrl::GuiEditCtrl()
      mDragBeginPoint( -1, -1 ),
      mSnapToControls( true ),
      mSnapToEdges( true ),
-     mSnapToCenters( true ),
      mSnapToGuides( true ),
+     mSnapToCenters( true ),
      mSnapToCanvas( true ),
-     mSnapSensitivity( 2 ),
-     mFullBoxSelection( false ),
      mDrawBorderLines( true ),
+     mFullBoxSelection( false ),
+     mSnapSensitivity( 2 ),
      mDrawGuides( true )
 {
    VECTOR_SET_ASSOCIATION( mSelectedControls );

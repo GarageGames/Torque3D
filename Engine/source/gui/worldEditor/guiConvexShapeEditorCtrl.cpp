@@ -58,8 +58,8 @@ ConsoleDocClass( GuiConvexEditorCtrl,
 
 GuiConvexEditorCtrl::GuiConvexEditorCtrl()
  : mIsDirty( false ),
-   mFaceHL( -1 ),
    mFaceSEL( -1 ),
+   mFaceHL( -1 ),
    mFaceSavedXfm( true ),
    mSavedUndo( false ),
    mDragging( false ),
@@ -68,12 +68,12 @@ GuiConvexEditorCtrl::GuiConvexEditorCtrl()
    mUsingPivot( false ),
    mSettingPivot( false ),
    mActiveTool( NULL ),
-   mCreateTool( NULL ),
    mMouseDown( false ),
-   mUndoManager( NULL ),
-   mLastUndo( NULL ),
-   mHasCopied( false ),
+   mCreateTool( NULL ),
    mSavedGizmoFlags( -1 ),
+   mHasCopied( false ),
+   mLastUndo( NULL ),
+   mUndoManager( NULL ),
    mCtrlDown( false )
 {   
 	mMaterialName = StringTable->insert("Grid512_OrangeLines_Mat");

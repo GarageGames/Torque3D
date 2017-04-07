@@ -42,8 +42,8 @@ CreatorTree::Node::Node() :
    mFlags(0),
    mParent(0),
    mName(0),
-   mValue(0),
    mId(0),
+   mValue(0),
    mTab(0)
 {
    VECTOR_SET_ASSOCIATION(mChildren);

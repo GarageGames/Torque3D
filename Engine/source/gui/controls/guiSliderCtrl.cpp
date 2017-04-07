@@ -97,8 +97,8 @@ GuiSliderCtrl::GuiSliderCtrl()
      mIncAmount( 0.f ),
      mDisplayValue( false ),
      mMouseOver( false ),
-     mMouseDragged( false ),
-     mDepressed( false )
+     mDepressed( false ),
+     mMouseDragged( false )
 {
 }
 
