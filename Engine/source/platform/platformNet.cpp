@@ -854,14 +854,14 @@ NetSocket Net::openConnectTo(const char *addressString)
       NetAddressToIPSocket6(&address, &ipAddr6);
       SOCKET socketFd = PlatformNetState::smReservedSocketList.activate(handleFd, AF_INET6, false, true);
       if (::connect(socketFd, (struct sockaddr *)&ipAddr6, sizeof(ipAddr6)) == -1 &&
-   errno != EINPROGRESS)
-{
-   setBlocking(handleFd, false);
-   Con::errorf("Error connecting %s: %s",
-      addressString, strerror(errno));
-   closeSocket(handleFd);
-   handleFd = NetSocket::INVALID;
-}
+        errno != EINPROGRESS)
+      {
+         setBlocking(handleFd, false);
+         Con::errorf("Error connecting %s: %s",
+            addressString, strerror(errno));
+         closeSocket(handleFd);
+         handleFd = NetSocket::INVALID;
+      }
       else
       {
          PlatformNetState::smReservedSocketList.remove(handleFd);
