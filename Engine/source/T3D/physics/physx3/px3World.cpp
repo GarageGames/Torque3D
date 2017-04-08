@@ -71,113 +71,113 @@ Px3World::~Px3World()
 
 physx::PxCooking *Px3World::getCooking()
 {
-	return smCooking;
+   return smCooking;
 }
 
 bool Px3World::restartSDK( bool destroyOnly, Px3World *clientWorld, Px3World *serverWorld)
 {
-	// If either the client or the server still exist
-	// then we cannot reset the SDK.
-	if ( clientWorld || serverWorld )
-		return false;
+   // If either the client or the server still exist
+   // then we cannot reset the SDK.
+   if ( clientWorld || serverWorld )
+      return false;
 
-	if(smPvdConnection)
-		smPvdConnection->release();
+   if(smPvdConnection)
+      smPvdConnection->release();
 
-	if(smCooking)
-		smCooking->release();
+   if(smCooking)
+      smCooking->release();
 
-	if(smCpuDispatcher)
-		smCpuDispatcher->release();
+   if(smCpuDispatcher)
+      smCpuDispatcher->release();
 
    // Destroy the existing SDK.
-	if ( gPhysics3SDK )
-	{
-		PxCloseExtensions();
-		gPhysics3SDK->release();
-	}
+   if ( gPhysics3SDK )
+   {
+      PxCloseExtensions();
+      gPhysics3SDK->release();
+   }
 
    if(smErrorCallback)
    {
       SAFE_DELETE(smErrorCallback);
    }
 
-	if(smFoundation)
-	{
-		smFoundation->release();
-		SAFE_DELETE(smErrorCallback);
-	}
+   if(smFoundation)
+   {
+      smFoundation->release();
+      SAFE_DELETE(smErrorCallback);
+   }
 
-	// If we're not supposed to restart... return.
-	if ( destroyOnly )
+   // If we're not supposed to restart... return.
+   if ( destroyOnly )
       return true;
 
-	bool memTrack = false;
+   bool memTrack = false;
  #ifdef TORQUE_DEBUG
-	memTrack = true;
+   memTrack = true;
  #endif
 
-	smErrorCallback  = new Px3ConsoleStream;
-	smFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, smMemoryAlloc, *smErrorCallback);
-	smProfileZoneManager = &physx::PxProfileZoneManager::createProfileZoneManager(smFoundation);
-	gPhysics3SDK = PxCreatePhysics(PX_PHYSICS_VERSION, *smFoundation, physx::PxTolerancesScale(),memTrack,smProfileZoneManager);
+   smErrorCallback  = new Px3ConsoleStream;
+   smFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, smMemoryAlloc, *smErrorCallback);
+   smProfileZoneManager = &physx::PxProfileZoneManager::createProfileZoneManager(smFoundation);
+   gPhysics3SDK = PxCreatePhysics(PX_PHYSICS_VERSION, *smFoundation, physx::PxTolerancesScale(),memTrack,smProfileZoneManager);
 
-	if ( !gPhysics3SDK )
-	{
-		Con::errorf( "PhysX3 failed to initialize!" );
-		Platform::messageBox(   Con::getVariable( "$appName" ),
+   if ( !gPhysics3SDK )
+   {
+      Con::errorf( "PhysX3 failed to initialize!" );
+      Platform::messageBox(   Con::getVariable( "$appName" ),
                               avar("PhysX3 could not be started!\r\n"),
                               MBOk, MIStop );
-		Platform::forceShutdown( -1 );
+      Platform::forceShutdown( -1 );
       
-		// We shouldn't get here, but this shuts up
-		// source diagnostic tools.
-		return false;
-	}
+      // We shouldn't get here, but this shuts up
+      // source diagnostic tools.
+      return false;
+   }
 
-	if(!PxInitExtensions(*gPhysics3SDK))
-	{
-		Con::errorf( "PhysX3 failed to initialize extensions!" );
-		Platform::messageBox(   Con::getVariable( "$appName" ),
+   if(!PxInitExtensions(*gPhysics3SDK))
+   {
+      Con::errorf( "PhysX3 failed to initialize extensions!" );
+      Platform::messageBox(   Con::getVariable( "$appName" ),
                               avar("PhysX3 could not be started!\r\n"),
                               MBOk, MIStop );
-		Platform::forceShutdown( -1 );
-		return false;
-	}
+      Platform::forceShutdown( -1 );
+      return false;
+   }
 
-	smCooking = PxCreateCooking(PX_PHYSICS_VERSION, *smFoundation, physx::PxCookingParams(physx::PxTolerancesScale()));
-	if(!smCooking)
-	{
-		Con::errorf( "PhysX3 failed to initialize cooking!" );
-		Platform::messageBox(   Con::getVariable( "$appName" ),
+   smCooking = PxCreateCooking(PX_PHYSICS_VERSION, *smFoundation, physx::PxCookingParams(physx::PxTolerancesScale()));
+   if(!smCooking)
+   {
+      Con::errorf( "PhysX3 failed to initialize cooking!" );
+      Platform::messageBox(   Con::getVariable( "$appName" ),
                               avar("PhysX3 could not be started!\r\n"),
                               MBOk, MIStop );
-		Platform::forceShutdown( -1 );      
-		return false;
-	}
+      Platform::forceShutdown( -1 );      
+      return false;
+   }
 
 #ifdef TORQUE_DEBUG
-	physx::PxVisualDebuggerConnectionFlags connectionFlags(physx::PxVisualDebuggerExt::getAllConnectionFlags());
-	smPvdConnection = physx::PxVisualDebuggerExt::createConnection(gPhysics3SDK->getPvdConnectionManager(), 
-				"localhost", 5425, 100, connectionFlags);	
+   physx::PxVisualDebuggerConnectionFlags connectionFlags(physx::PxVisualDebuggerExt::getAllConnectionFlags());
+   smPvdConnection = physx::PxVisualDebuggerExt::createConnection(gPhysics3SDK->getPvdConnectionManager(), 
+            "localhost", 5425, 100, connectionFlags); 
 #endif
 
-	return true;
+   return true;
 }
 
 void Px3World::destroyWorld()
 {
-	getPhysicsResults();
+   getPhysicsResults();
 
    mRenderBuffer = NULL;
 
-	// Release the tick processing signals.
-	if ( mProcessList )
-	{
-		mProcessList->preTickSignal().remove( this, &Px3World::getPhysicsResults );
-		mProcessList->postTickSignal().remove( this, &Px3World::tickPhysics );
-		mProcessList = NULL;
-	}
+   // Release the tick processing signals.
+   if ( mProcessList )
+   {
+      mProcessList->preTickSignal().remove( this, &Px3World::getPhysicsResults );
+      mProcessList->postTickSignal().remove( this, &Px3World::tickPhysics );
+      mProcessList = NULL;
+   }
 
    if(mControllerManager)
    {
@@ -185,13 +185,13 @@ void Px3World::destroyWorld()
       mControllerManager = NULL;
    }
    
-	// Destroy the scene.
-	if ( mScene )
-	{
-		// Release the scene.
-		mScene->release();
-		mScene = NULL;
-	}
+   // Destroy the scene.
+   if ( mScene )
+   {
+      // Release the scene.
+      mScene->release();
+      mScene = NULL;
+   }
 }
 
 bool Px3World::initWorld( bool isServer, ProcessList *processList )
@@ -203,7 +203,7 @@ bool Px3World::initWorld( bool isServer, ProcessList *processList )
    }
 
    mIsServer = isServer;
-	
+   
    physx::PxSceneDesc sceneDesc(gPhysics3SDK->getTolerancesScale());
 
    sceneDesc.gravity = px3Cast<physx::PxVec3>(mGravity);
@@ -217,26 +217,26 @@ bool Px3World::initWorld( bool isServer, ProcessList *processList )
       sceneDesc.cpuDispatcher = smCpuDispatcher;
       Con::printf("PhysX3 using Cpu: %d workers", smCpuDispatcher->getWorkerCount());
    }
- 	
+   
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_CCD;
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
    sceneDesc.filterShader  = physx::PxDefaultSimulationFilterShader;
 
-	mScene = gPhysics3SDK->createScene(sceneDesc);
+   mScene = gPhysics3SDK->createScene(sceneDesc);
    //cache renderbuffer for use with debug drawing
    mRenderBuffer = const_cast<physx::PxRenderBuffer*>(&mScene->getRenderBuffer());
 
-	physx::PxDominanceGroupPair debrisDominance( 0.0f, 1.0f );
-	mScene->setDominanceGroupPair(0,31,debrisDominance);
+   physx::PxDominanceGroupPair debrisDominance( 0.0f, 1.0f );
+   mScene->setDominanceGroupPair(0,31,debrisDominance);
 
    mControllerManager = PxCreateControllerManager(*mScene);
 
-	AssertFatal( processList, "Px3World::init() - We need a process list to create the world!" );
-	mProcessList = processList;
-	mProcessList->preTickSignal().notify( this, &Px3World::getPhysicsResults );
-	mProcessList->postTickSignal().notify( this, &Px3World::tickPhysics, 1000.0f );
+   AssertFatal( processList, "Px3World::init() - We need a process list to create the world!" );
+   mProcessList = processList;
+   mProcessList->preTickSignal().notify( this, &Px3World::getPhysicsResults );
+   mProcessList->postTickSignal().notify( this, &Px3World::tickPhysics, 1000.0f );
 
-	return true;
+   return true;
 }
 // Most of this borrowed from bullet physics library, see btDiscreteDynamicsWorld.cpp
 bool Px3World::_simulate(const F32 dt)
@@ -249,21 +249,21 @@ bool Px3World::_simulate(const F32 dt)
       numSimulationSubSteps = S32(mAccumulator / smPhysicsStepTime);
       mAccumulator -= numSimulationSubSteps * smPhysicsStepTime;
    }
-	if (numSimulationSubSteps)
-	{
-		//clamp the number of substeps, to prevent simulation grinding spiralling down to a halt
-		S32 clampedSimulationSteps = (numSimulationSubSteps > smPhysicsMaxSubSteps)? smPhysicsMaxSubSteps : numSimulationSubSteps;
-		
-		for (S32 i=0;i<clampedSimulationSteps;i++)
-		{
-			mScene->fetchResults(true);
-			mScene->simulate(smPhysicsStepTime);
-		}
-	}
-	
-	mIsSimulating = true;
+   if (numSimulationSubSteps)
+   {
+      //clamp the number of substeps, to prevent simulation grinding spiralling down to a halt
+      S32 clampedSimulationSteps = (numSimulationSubSteps > smPhysicsMaxSubSteps)? smPhysicsMaxSubSteps : numSimulationSubSteps;
+      
+      for (S32 i=0;i<clampedSimulationSteps;i++)
+      {
+         mScene->fetchResults(true);
+         mScene->simulate(smPhysicsStepTime);
+      }
+   }
+   
+   mIsSimulating = true;
 
-	return true;
+   return true;
 }
 
 void Px3World::tickPhysics( U32 elapsedMs )
@@ -290,45 +290,45 @@ void Px3World::tickPhysics( U32 elapsedMs )
 
 void Px3World::getPhysicsResults()
 {
-	if ( !mScene || !mIsSimulating ) 
-		return;
+   if ( !mScene || !mIsSimulating ) 
+      return;
 
-	PROFILE_SCOPE(Px3World_GetPhysicsResults);
+   PROFILE_SCOPE(Px3World_GetPhysicsResults);
 
-	// Get results from scene.
-	mScene->fetchResults(true);
-	mIsSimulating = false;
-	mTickCount++;
+   // Get results from scene.
+   mScene->fetchResults(true);
+   mIsSimulating = false;
+   mTickCount++;
 
   // Con::printf( "%s PhysXWorld::getPhysicsResults!", this == smClientWorld ? "Client" : "Server" );
 }
 
 void Px3World::releaseWriteLocks()
 {
-	Px3World *world = dynamic_cast<Px3World*>( PHYSICSMGR->getWorld( "server" ) );
+   Px3World *world = dynamic_cast<Px3World*>( PHYSICSMGR->getWorld( "server" ) );
 
-	if ( world )
-		world->releaseWriteLock();
+   if ( world )
+      world->releaseWriteLock();
 
-	world = dynamic_cast<Px3World*>( PHYSICSMGR->getWorld( "client" ) );
+   world = dynamic_cast<Px3World*>( PHYSICSMGR->getWorld( "client" ) );
 
-	if ( world )
-		world->releaseWriteLock();
+   if ( world )
+      world->releaseWriteLock();
 }
 
 void Px3World::releaseWriteLock()
 {
-	if ( !mScene || !mIsSimulating ) 
-		return;
+   if ( !mScene || !mIsSimulating ) 
+      return;
 
-	PROFILE_SCOPE(PxWorld_ReleaseWriteLock);
+   PROFILE_SCOPE(PxWorld_ReleaseWriteLock);
 
-	// We use checkResults here to release the write lock
-	// but we do not change the simulation flag or increment
-	// the tick count... we may have gotten results, but the
-	// simulation hasn't really ticked!
-	mScene->checkResults( true );
-	//AssertFatal( mScene->isWritable(), "PhysX3World::releaseWriteLock() - We should have been writable now!" );
+   // We use checkResults here to release the write lock
+   // but we do not change the simulation flag or increment
+   // the tick count... we may have gotten results, but the
+   // simulation hasn't really ticked!
+   mScene->checkResults( true );
+   //AssertFatal( mScene->isWritable(), "PhysX3World::releaseWriteLock() - We should have been writable now!" );
 }
 
 void Px3World::lockScenes()
@@ -390,7 +390,7 @@ void Px3World::unlockScene()
 bool Px3World::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *ri, const Point3F &impulse )
 {
     
-	physx::PxVec3 orig = px3Cast<physx::PxVec3>( startPnt );
+   physx::PxVec3 orig = px3Cast<physx::PxVec3>( startPnt );
    physx::PxVec3 dir = px3Cast<physx::PxVec3>( endPnt - startPnt );
    physx::PxF32 maxDist = dir.magnitude();
    dir.normalize();
@@ -404,11 +404,11 @@ bool Px3World::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo 
    physx::PxRaycastBuffer buf;
 
    if(!mScene->raycast(orig,dir,maxDist,buf,outFlags,filterData))
-	  return false;
+     return false;
    if(!buf.hasBlock)
-	 return false;
+    return false;
 
-	const physx::PxRaycastHit hit = buf.block;
+   const physx::PxRaycastHit hit = buf.block;
    physx::PxRigidActor *actor = hit.actor;
    PhysicsUserData *userData = PhysicsUserData::cast( actor->userData );
 
@@ -456,15 +456,15 @@ PhysicsBody* Px3World::castRay( const Point3F &start, const Point3F &end, U32 bo
    physx::PxHitFlags outFlags(physx::PxHitFlag::eDISTANCE | physx::PxHitFlag::eIMPACT | physx::PxHitFlag::eNORMAL);
    physx::PxQueryFilterData filterData;
    if(bodyTypes & BT_Static)
-	   filterData.flags |= physx::PxQueryFlag::eSTATIC;
+      filterData.flags |= physx::PxQueryFlag::eSTATIC;
    if(bodyTypes & BT_Dynamic)
-	   filterData.flags |= physx::PxQueryFlag::eDYNAMIC;
+      filterData.flags |= physx::PxQueryFlag::eDYNAMIC;
 
    filterData.data.word0 = groups;
    physx::PxRaycastBuffer buf;  
 
    if( !mScene->raycast(orig,dir,maxDist,buf,outFlags,filterData) )
-	   return NULL;
+      return NULL;
    if(!buf.hasBlock)
       return NULL;
 
@@ -478,7 +478,7 @@ PhysicsBody* Px3World::castRay( const Point3F &start, const Point3F &end, U32 bo
 
 void Px3World::explosion( const Point3F &pos, F32 radius, F32 forceMagnitude )
 {
-	physx::PxVec3 nxPos = px3Cast<physx::PxVec3>( pos );
+   physx::PxVec3 nxPos = px3Cast<physx::PxVec3>( pos );
    const physx::PxU32 bufferSize = 10;
    physx::PxSphereGeometry worldSphere(radius);
    physx::PxTransform pose(nxPos);
@@ -520,14 +520,14 @@ void Px3World::setEnabled( bool enabled )
 
 physx::PxController* Px3World::createController( physx::PxControllerDesc &desc )
 {
-	if ( !mScene )
-		return NULL;
+   if ( !mScene )
+      return NULL;
 
-	// We need the writelock!
-	releaseWriteLock();
-	physx::PxController* pController = mControllerManager->createController(desc);
-	AssertFatal( pController, "Px3World::createController - Got a null!" );
-	return pController;
+   // We need the writelock!
+   releaseWriteLock();
+   physx::PxController* pController = mControllerManager->createController(desc);
+   AssertFatal( pController, "Px3World::createController - Got a null!" );
+   return pController;
 }
 
 static ColorI getDebugColor( physx::PxU32 packed )

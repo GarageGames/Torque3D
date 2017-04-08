@@ -99,7 +99,7 @@ U32 postEvent(SimObject *destObject, SimEvent* event,U32 time)
 
    Mutex::lockMutex(gEventQueueMutex);
 
-   if( time == -1 )
+   if( time == -1 ) // FIXME: a smart compiler will remove this check. - see http://garagegames.com/community/resources/view/19785 for a fix
       time = gCurrentTime;
 
    event->time = time;

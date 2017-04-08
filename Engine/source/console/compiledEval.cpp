@@ -242,7 +242,7 @@ inline void ExprEvalState::setCurVarName(StringTableEntry name)
    else if( getStackDepth() > 0 )
       currentVariable = getCurrentFrame().lookup(name);
    if(!currentVariable && gWarnUndefinedScriptVariables)
-	   Con::warnf(ConsoleLogEntry::Script, "Variable referenced before assignment: %s", name);
+      Con::warnf(ConsoleLogEntry::Script, "Variable referenced before assignment: %s", name);
 }
 
 inline void ExprEvalState::setCurVarNameCreate(StringTableEntry name)
@@ -316,7 +316,7 @@ inline void ExprEvalState::setCopyVariable()
          default:
             currentVariable->setStringValue(copyVariable->getStringValue());
          break;
-	   }
+      }
    }
 }
 
@@ -398,7 +398,7 @@ static void setFieldComponent( SimObject* object, StringTableEntry field, const 
 
    // Ensure that the variable has a value
    if (!prevVal)
-	   return;
+      return;
 
    static const StringTableEntry xyzw[] = 
    {
@@ -419,7 +419,7 @@ static void setFieldComponent( SimObject* object, StringTableEntry field, const 
    // Insert the value into the specified 
    // component of the string.
    if ( subField == xyzw[0] || subField == rgba[0] )
-	  dStrcpy( val, StringUnit::setUnit( prevVal, 0, strValue, " \t\n") );
+     dStrcpy( val, StringUnit::setUnit( prevVal, 0, strValue, " \t\n") );
 
    else if ( subField == xyzw[1] || subField == rgba[1] )
       dStrcpy( val, StringUnit::setUnit( prevVal, 1, strValue, " \t\n") );
@@ -1020,7 +1020,7 @@ breakContinue:
                dataBlock->deleteObject();
                currentNewObject = NULL;
                ip = failJump;
-			   
+            
                // Prevent stack value corruption
                CSTK.popFrame();
                STR.popFrame();
@@ -1164,8 +1164,8 @@ breakContinue:
             
          // This fixes a bug when not explicitly returning a value.
          case OP_RETURN_VOID:
-      		STR.setStringValue("");
-      		// We're falling thru here on purpose.
+            STR.setStringValue("");
+            // We're falling thru here on purpose.
             
          case OP_RETURN:
             retValue = STR.getStringValuePtr();
@@ -1437,7 +1437,7 @@ breakContinue:
          case OP_SAVEVAR_STR:
             gEvalState.setStringVariable(STR.getStringValue());
             break;
-		    
+          
          case OP_SAVEVAR_VAR:
             // this basically handles %var1 = %var2
             gEvalState.setCopyVariable();

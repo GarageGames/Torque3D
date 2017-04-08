@@ -98,7 +98,7 @@ bool Platform::displaySplashWindow( String path )
       SDL_RenderPresent(gSplashRenderer);
    }
 
-	return true;
+   return true;
 }
 
 bool Platform::closeSplashWindow()

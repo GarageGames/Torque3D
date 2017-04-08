@@ -611,31 +611,31 @@ bool GBitmap::checkForTransparency()
 //------------------------------------------------------------------------------
 ColorF GBitmap::sampleTexel(F32 u, F32 v) const
 {
-	ColorF col(0.5f, 0.5f, 0.5f);
-	// normally sampling wraps all the way around at 1.0,
-	// but locking doesn't support this, and we seem to calc
-	// the uv based on a clamped 0 - 1...
-	Point2F max((F32)(getWidth()-1), (F32)(getHeight()-1));
-	Point2F posf;
-	posf.x = mClampF(((u) * max.x), 0.0f, max.x);
-	posf.y = mClampF(((v) * max.y), 0.0f, max.y);
-	Point2I posi((S32)posf.x, (S32)posf.y);
+   ColorF col(0.5f, 0.5f, 0.5f);
+   // normally sampling wraps all the way around at 1.0,
+   // but locking doesn't support this, and we seem to calc
+   // the uv based on a clamped 0 - 1...
+   Point2F max((F32)(getWidth()-1), (F32)(getHeight()-1));
+   Point2F posf;
+   posf.x = mClampF(((u) * max.x), 0.0f, max.x);
+   posf.y = mClampF(((v) * max.y), 0.0f, max.y);
+   Point2I posi((S32)posf.x, (S32)posf.y);
 
-	const U8 *buffer = getBits();
-	U32 lexelindex = ((posi.y * getWidth()) + posi.x) * mBytesPerPixel;
+   const U8 *buffer = getBits();
+   U32 lexelindex = ((posi.y * getWidth()) + posi.x) * mBytesPerPixel;
 
-	if(mBytesPerPixel == 2)
-	{
-		//U16 *buffer = (U16 *)lockrect->pBits;
-	}
-	else if(mBytesPerPixel > 2)
-	{		
-		col.red = F32(buffer[lexelindex + 0]) / 255.0f;
+   if(mBytesPerPixel == 2)
+   {
+      //U16 *buffer = (U16 *)lockrect->pBits;
+   }
+   else if(mBytesPerPixel > 2)
+   {     
+      col.red = F32(buffer[lexelindex + 0]) / 255.0f;
       col.green = F32(buffer[lexelindex + 1]) / 255.0f;
-		col.blue = F32(buffer[lexelindex + 2]) / 255.0f;
-	}
+      col.blue = F32(buffer[lexelindex + 2]) / 255.0f;
+   }
 
-	return col;
+   return col;
 }
 
 //--------------------------------------------------------------------------

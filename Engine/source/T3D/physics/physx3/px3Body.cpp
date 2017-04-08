@@ -80,7 +80,7 @@ bool Px3Body::init(   PhysicsCollision *shape,
    AssertFatal( shape, "Px3Body::init - Got a null collision shape!" );
    AssertFatal( dynamic_cast<Px3Collision*>( shape ), "Px3Body::init - The collision shape is the wrong type!" );
    AssertFatal( !((Px3Collision*)shape)->getShapes().empty(), "Px3Body::init - Got empty collision shape!" );
-	 
+    
    // Cleanup any previous actor.
    _releaseActor();
 
@@ -94,10 +94,10 @@ bool Px3Body::init(   PhysicsCollision *shape,
 
    if ( isKinematic )
    {
-		mActor = gPhysics3SDK->createRigidDynamic(physx::PxTransform(physx::PxIDENTITY()));
-		physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
-		actor->setRigidDynamicFlag(physx::PxRigidDynamicFlag::eKINEMATIC, true);
-		actor->setMass(getMax( mass, 1.0f ));
+      mActor = gPhysics3SDK->createRigidDynamic(physx::PxTransform(physx::PxIDENTITY()));
+      physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
+      actor->setRigidDynamicFlag(physx::PxRigidDynamicFlag::eKINEMATIC, true);
+      actor->setMass(getMax( mass, 1.0f ));
    }
    else if ( mass > 0.0f )
    {
@@ -107,7 +107,7 @@ bool Px3Body::init(   PhysicsCollision *shape,
    {
       mActor = gPhysics3SDK->createRigidStatic(physx::PxTransform(physx::PxIDENTITY()));
       mIsStatic = true;
-	}
+   }
 
    mMaterial = gPhysics3SDK->createMaterial(0.6f,0.4f,0.1f);
   
@@ -115,22 +115,22 @@ bool Px3Body::init(   PhysicsCollision *shape,
    const Vector<Px3CollisionDesc*> &shapes = mColShape->getShapes();
    for ( U32 i=0; i < shapes.size(); i++ )
    {
-	   Px3CollisionDesc* desc = shapes[i];
-	   if( mass > 0.0f )
-	   {
-			if(desc->pGeometry->getType() == physx::PxGeometryType::eTRIANGLEMESH)
-			{
-				Con::errorf("PhysX3 Dynamic Triangle Mesh is not supported.");
-			}
-	   }
-	   physx::PxShape * pShape = mActor->createShape(*desc->pGeometry,*mMaterial);
-	   physx::PxFilterData colData;
-	   if(isDebris)
-			colData.word0 = PX3_DEBRIS;
-	   else if(isTrigger)
+      Px3CollisionDesc* desc = shapes[i];
+      if( mass > 0.0f )
+      {
+         if(desc->pGeometry->getType() == physx::PxGeometryType::eTRIANGLEMESH)
+         {
+            Con::errorf("PhysX3 Dynamic Triangle Mesh is not supported.");
+         }
+      }
+      physx::PxShape * pShape = mActor->createShape(*desc->pGeometry,*mMaterial);
+      physx::PxFilterData colData;
+      if(isDebris)
+         colData.word0 = PX3_DEBRIS;
+      else if(isTrigger)
         colData.word0 = PX3_TRIGGER;
-	   else
-		   colData.word0 = PX3_DEFAULT;
+      else
+         colData.word0 = PX3_DEFAULT;
 
       //set local pose - actor->createShape with a local pose is deprecated in physx 3.3
       pShape->setLocalPose(desc->pose);
@@ -145,8 +145,8 @@ bool Px3Body::init(   PhysicsCollision *shape,
    //mass & intertia has to be set after creating the shape
    if ( mass > 0.0f )
    {
-		physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
-		physx::PxRigidBodyExt::setMassAndUpdateInertia(*actor,mass);
+      physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
+      physx::PxRigidBodyExt::setMassAndUpdateInertia(*actor,mass);
    }
 
     // This sucks, but it has to happen if we want
@@ -178,9 +178,9 @@ void Px3Body::setMaterial(  F32 restitution,
       actor->wakeUp();
    }
 
-	 mMaterial->setRestitution(restitution);
-	 mMaterial->setStaticFriction(staticFriction);
-	 mMaterial->setDynamicFriction(friction);
+    mMaterial->setRestitution(restitution);
+    mMaterial->setStaticFriction(staticFriction);
+    mMaterial->setDynamicFriction(friction);
 
 }
 
@@ -189,7 +189,7 @@ void Px3Body::setSleepThreshold( F32 linear, F32 angular )
    AssertFatal( mActor, "Px3Body::setSleepThreshold - The actor is null!" );
 
    if(mIsStatic)
-	   return;
+      return;
 
    physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
    physx::PxF32 massNormalized= (linear*linear+angular*angular)/2.0f;
@@ -200,7 +200,7 @@ void Px3Body::setDamping( F32 linear, F32 angular )
 {
    AssertFatal( mActor, "Px3Body::setDamping - The actor is null!" );
    if(mIsStatic)
-	   return;
+      return;
 
    physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
    actor->setLinearDamping( linear );
@@ -227,7 +227,7 @@ F32 Px3Body::getMass() const
 {
    AssertFatal( mActor, "PxBody::getCMassPosition - The actor is null!" );
    if(mIsStatic)
-	   return 0;
+      return 0;
 
    const physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
    return actor->getMass();
@@ -237,7 +237,7 @@ Point3F Px3Body::getCMassPosition() const
 {
    AssertFatal( mActor, "Px3Body::getCMassPosition - The actor is null!" );
    if(mIsStatic)
-	   return px3Cast<Point3F>(mActor->getGlobalPose().p);
+      return px3Cast<Point3F>(mActor->getGlobalPose().p);
 
    physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
    physx::PxTransform pose = actor->getGlobalPose() * actor->getCMassLocalPose();
@@ -326,11 +326,11 @@ Box3F Px3Body::getWorldBounds()
  
   
    U32 shapeCount = mActor->getNbShapes();
-	physx::PxShape **shapes = new physx::PxShape*[shapeCount];
-	mActor->getShapes(shapes, shapeCount);
+   physx::PxShape **shapes = new physx::PxShape*[shapeCount];
+   mActor->getShapes(shapes, shapeCount);
    for ( U32 i = 0; i < shapeCount; i++ )
    {
-      // Get the shape's bounds.	   
+      // Get the shape's bounds.    
       shapeBounds = physx::PxShapeExt::getWorldBounds(*shapes[i],*mActor);
       // Combine them into the total bounds.
       bounds.include( shapeBounds ); 
@@ -355,11 +355,11 @@ void Px3Body::setSimulationEnabled( bool enabled )
    mWorld->releaseWriteLock();
 
    U32 shapeCount = mActor->getNbShapes();
-	physx::PxShape **shapes = new physx::PxShape*[shapeCount];
-	mActor->getShapes(shapes, shapeCount);
+   physx::PxShape **shapes = new physx::PxShape*[shapeCount];
+   mActor->getShapes(shapes, shapeCount);
    for ( S32 i = 0; i < mActor->getNbShapes(); i++ )
    {
-	   shapes[i]->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE,!mIsEnabled);//?????
+      shapes[i]->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE,!mIsEnabled);//?????
    }
 
    delete [] shapes;
@@ -377,10 +377,10 @@ void Px3Body::setTransform( const MatrixF &transform )
    mActor->setGlobalPose(px3Cast<physx::PxTransform>(transform),false);
 
    if(mIsStatic)
-	   return;
+      return;
 
-	physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
-	bool kinematic = actor->getRigidDynamicFlags() & physx::PxRigidDynamicFlag::eKINEMATIC;
+   physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
+   bool kinematic = actor->getRigidDynamicFlags() & physx::PxRigidDynamicFlag::eKINEMATIC;
    // If its dynamic we have more to do.
    if ( isDynamic() && !kinematic )
    {
@@ -412,8 +412,8 @@ void Px3Body::applyImpulse( const Point3F &origin, const Point3F &force )
    physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
    if ( mIsEnabled && isDynamic() )
    physx::PxRigidBodyExt::addForceAtPos(*actor,px3Cast<physx::PxVec3>(force),
-												px3Cast<physx::PxVec3>(origin),
-												physx::PxForceMode::eIMPULSE);
+                                    px3Cast<physx::PxVec3>(origin),
+                                    physx::PxForceMode::eIMPULSE);
 
 }
 
