@@ -329,9 +329,9 @@ template<class T> inline U32 Vector<T>::setSize(U32 size)
 template<class T> inline void Vector<T>::increment()
 {
    if(mElementCount == mArraySize)
-      resize(mElementCount + 1);
-   else
-      mElementCount++;
+      reserve( (mElementCount+1)*2 );
+   
+   mElementCount++;
    constructInPlace(&mArray[mElementCount - 1]);
 }
 
@@ -344,9 +344,13 @@ template<class T> inline void Vector<T>::decrement()
 
 template<class T> inline void Vector<T>::increment(U32 delta)
 {
-   U32 count = mElementCount;
-   if ((mElementCount += delta) > mArraySize)
-      resize(mElementCount);
+   const U32 count = mElementCount;
+   const U32 newCount = mElementCount + delta;
+
+   if ( newCount > mArraySize)
+      reserve( newCount*2 );
+   
+   mElementCount = newCount;
    construct(count, mElementCount);
 }
 
