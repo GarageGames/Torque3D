@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<EditorSettings>
+    <Group name="AxisGizmo">
+        <Setting name="axisGizmoMaxScreenLen">100</Setting>
+        <Setting name="snapRotations">0</Setting>
+        <Setting name="mouseScaleScalar">0.8</Setting>
+        <Setting name="renderInfoText">1</Setting>
+        <Setting name="rotationSnap">15</Setting>
+        <Setting name="mouseRotateScalar">0.8</Setting>
+        <Setting name="renderWhenUsed">0</Setting>
+        <Group name="Grid">
+            <Setting name="planeDim">500</Setting>
+            <Setting name="gridColor">255 255 255 20</Setting>
+            <Setting name="snapToGrid">0</Setting>
+            <Setting name="renderPlaneHashes">0</Setting>
+            <Setting name="gridSize">10 10 10</Setting>
+            <Setting name="renderPlane">0</Setting>
+        </Group>
+    </Group>
+    <Group name="WorldEditor">
+        <Setting name="dropType">screenCenter</Setting>
+        <Setting name="forceLoadDAE">0</Setting>
+        <Setting name="orthoFOV">50</Setting>
+        <Setting name="currentEditor">WorldEditorInspectorPlugin</Setting>
+        <Setting name="undoLimit">40</Setting>
+        <Setting name="displayType">6</Setting>
+        <Setting name="orthoShowGrid">1</Setting>
+        <Group name="Tools">
+            <Setting name="snapSoft">0</Setting>
+            <Setting name="boundingBoxCollision">0</Setting>
+            <Setting name="snapGround">0</Setting>
+            <Setting name="dropAtScreenCenterMax">100</Setting>
+            <Setting name="snapSoftSize">2</Setting>
+            <Setting name="dropAtScreenCenterScalar">1</Setting>
+            <Setting name="objectsUseBoxCenter">1</Setting>
+        </Group>
+        <Group name="Docs">
+            <Setting name="documentationURL">http://www.garagegames.com/products/torque-3d/documentation/user</Setting>
+            <Setting name="documentationLocal">../../../Documentation/Official Documentation.html</Setting>
+            <Setting name="forumURL">http://www.garagegames.com/products/torque-3d/forums</Setting>
+            <Setting name="documentationReference">../../../Documentation/Torque 3D - Script Manual.chm</Setting>
+        </Group>
+        <Group name="Grid">
+            <Setting name="gridOriginColor">255 255 255 100</Setting>
+            <Setting name="gridSize">1</Setting>
+            <Setting name="gridColor">102 102 102 100</Setting>
+            <Setting name="gridMinorColor">51 51 51 100</Setting>
+            <Setting name="gridSnap">0</Setting>
+        </Group>
+        <Group name="Images">
+            <Setting name="lockedHandle">tools/worldEditor/images/LockedHandle</Setting>
+            <Setting name="defaultHandle">tools/worldEditor/images/DefaultHandle</Setting>
+            <Setting name="selectHandle">tools/worldEditor/images/SelectHandle</Setting>
+        </Group>
+        <Group name="Render">
+            <Setting name="showMousePopupInfo">1</Setting>
+            <Setting name="renderObjHandle">1</Setting>
+            <Setting name="renderSelectionBox">1</Setting>
+            <Setting name="renderPopupBackground">1</Setting>
+            <Setting name="renderObjText">1</Setting>
+        </Group>
+        <Group name="Color">
+            <Setting name="objMouseOverColor">0 255 0 255</Setting>
+            <Setting name="popupBackgroundColor">100 100 100 255</Setting>
+            <Setting name="objectTextColor">255 255 255 255</Setting>
+            <Setting name="objSelectColor">255 0 0 255</Setting>
+            <Setting name="selectionBoxColor">255 255 0 255</Setting>
+            <Setting name="objMouseOverSelectColor">0 0 255 255</Setting>
+            <Setting name="dragRectColor">255 255 0 255</Setting>
+        </Group>
+        <Group name="ObjectIcons">
+            <Setting name="fadeIconsStartDist">8</Setting>
+            <Setting name="fadeIcons">1</Setting>
+            <Setting name="fadeIconsEndAlpha">0</Setting>
+            <Setting name="fadeIconsStartAlpha">255</Setting>
+            <Setting name="fadeIconsEndDist">20</Setting>
+        </Group>
+    </Group>
+    <Group name="LevelInformation">
+        <Setting name="levelsDirectory">data/FPSGameplay/levels</Setting>
+        <Group name="levels">
+            <Group name="BlankRoom.mis">
+                <Setting name="cameraSpeed">25</Setting>
+            </Group>
+        </Group>
+    </Group>
+    <Group name="NavEditor">
+        <Setting name="SpawnClass">AIPlayer</Setting>
+    </Group>
+</EditorSettings>

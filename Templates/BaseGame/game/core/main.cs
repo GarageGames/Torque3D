@@ -86,5 +86,8 @@ exec("./gfxData/clouds.cs");
 // Initialize all core post effects.   
 exec("./postFx.cs");
 
+//VR stuff
+exec("./oculusVR.cs");
+
 // Seed the random number generator.
 setRandomSeed();

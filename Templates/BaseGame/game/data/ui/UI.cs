@@ -39,6 +39,9 @@ function UI::create( %this )
    
    exec("./scripts/guis/profiler.gui");
    exec("./scripts/guis/netGraphGui.gui");
+   exec("./scripts/guis/FileDialog.gui");
+   exec("./scripts/guis/guiMusicPlayer.gui");
+   exec("./scripts/guis/startupGui.gui");
    
    //Load gui companion scripts
    exec("./scripts/chooseLevelDlg.cs");
@@ -51,10 +54,18 @@ function UI::create( %this )
    exec("./scripts/joinServerMenu.cs");
    exec("./scripts/pauseMenu.cs");
    exec("./scripts/messageBoxes.cs");
+   exec("./scripts/help.cs");
+   exec("./scripts/cursors.cs");
+   exec("./scripts/profiler.cs");
+   exec("./scripts/FileDialog.cs");
+   exec("./scripts/GuiTreeViewCtrl.cs");
+   exec("./scripts/guiMusicPlayer.cs");
+   exec("./scripts/startupGui.cs");
    
    %dbList = new ArrayObject(LevelFilesList);
    
-   Canvas.pushDialog(MainMenuGui);
+   loadStartup();
+   //Canvas.pushDialog(MainMenuGui);
 }
 
 function Game::destroy( %this )

@@ -470,51 +470,9 @@ function AggregateControl::callMethod(%this, %method, %args)
 
 }
 
-// A function used in order to easily parse the MissionGroup for classes . I'm pretty 
-// sure at this point the function can be easily modified to search the any group as well.
-function parseMissionGroup( %className, %childGroup )
-{
-   if( getWordCount( %childGroup ) == 0)
-      %currentGroup = "MissionGroup";
-   else
-      %currentGroup = %childGroup;
-      
-   for(%i = 0; %i < (%currentGroup).getCount(); %i++)
-   {      
-      if( (%currentGroup).getObject(%i).getClassName() $= %className )
-         return true;
-      
-      if( (%currentGroup).getObject(%i).getClassName() $= "SimGroup" )
-      {
-         if( parseMissionGroup( %className, (%currentGroup).getObject(%i).getId() ) )
-            return true;         
-      }
-   } 
-}
-
-// A variation of the above used to grab ids from the mission group based on classnames
-function parseMissionGroupForIds( %className, %childGroup )
-{
-   if( getWordCount( %childGroup ) == 0)
-      %currentGroup = "MissionGroup";
-   else
-      %currentGroup = %childGroup;
-      
-   for(%i = 0; %i < (%currentGroup).getCount(); %i++)
-   {      
-      if( (%currentGroup).getObject(%i).getClassName() $= %className )
-         %classIds = %classIds @ (%currentGroup).getObject(%i).getId() @ " ";
-      
-      if( (%currentGroup).getObject(%i).getClassName() $= "SimGroup" )
-         %classIds = %classIds @ parseMissionGroupForIds( %className, (%currentGroup).getObject(%i).getId());
-   } 
-   return trim( %classIds );
-}
-
 //------------------------------------------------------------------------------
 // Altered Version of TGB's QuickEditDropDownTextEditCtrl
 //------------------------------------------------------------------------------
-
 function QuickEditDropDownTextEditCtrl::onRenameItem( %this )
 {
 }
@@ -532,3 +490,465 @@ function QuickEditDropDownTextEditCtrl::updateFromChild( %this, %ctrl )
       %this.onRenameItem();
    }
 }
+
+// Writes out all script functions to a file.
+function writeOutFunctions()
+{
+   new ConsoleLogger(logger, "scriptFunctions.txt", false);
+   dumpConsoleFunctions();
+   logger.delete();
+}
+
+// Writes out all script classes to a file.
+function writeOutClasses()
+{
+   new ConsoleLogger(logger, "scriptClasses.txt", false);
+   dumpConsoleClasses();
+   logger.delete();
+}
+
+//
+function compileFiles(%pattern)
+{  
+   %path = filePath(%pattern);
+
+   %saveDSO    = $Scripts::OverrideDSOPath;
+   %saveIgnore = $Scripts::ignoreDSOs;
+   
+   $Scripts::OverrideDSOPath  = %path;
+   $Scripts::ignoreDSOs       = false;
+   %mainCsFile = makeFullPath("main.cs");
+
+   for (%file = findFirstFileMultiExpr(%pattern); %file !$= ""; %file = findNextFileMultiExpr(%pattern))
+   {
+      // we don't want to try and compile the primary main.cs
+      if(%mainCsFile !$= %file)      
+         compile(%file, true);
+   }
+
+   $Scripts::OverrideDSOPath  = %saveDSO;
+   $Scripts::ignoreDSOs       = %saveIgnore;
+   
+}
+
+function displayHelp() 
+{
+   // Notes on logmode: console logging is written to console.log.
+   // -log 0 disables console logging.
+   // -log 1 appends to existing logfile; it also closes the file
+   // (flushing the write buffer) after every write.
+   // -log 2 overwrites any existing logfile; it also only closes
+   // the logfile when the application shuts down.  (default)
+
+   error(
+      "Torque Demo command line options:\n"@
+      "  -log <logmode>         Logging behavior; see main.cs comments for details\n"@
+      "  -game <game_name>      Reset list of mods to only contain <game_name>\n"@
+      "  <game_name>            Works like the -game argument\n"@
+      "  -dir <dir_name>        Add <dir_name> to list of directories\n"@
+      "  -console               Open a separate console\n"@
+      "  -jSave  <file_name>    Record a journal\n"@
+      "  -jPlay  <file_name>    Play back a journal\n"@
+      "  -help                  Display this help message\n"
+   );
+}
+
+// Execute startup scripts for each mod, starting at base and working up
+function loadDir(%dir)
+{
+   pushback($userDirs, %dir, ";");
+
+   if (isScriptFile(%dir @ "/main.cs"))
+   exec(%dir @ "/main.cs");
+}
+
+function loadDirs(%dirPath)
+{
+   %dirPath = nextToken(%dirPath, token, ";");
+   if (%dirPath !$= "")
+      loadDirs(%dirPath);
+
+   if(exec(%token @ "/main.cs") != true)
+   {
+      error("Error: Unable to find specified directory: " @ %token );
+      $dirCount--;
+   }
+}
+
+//------------------------------------------------------------------------------
+// Utility remap functions:
+//------------------------------------------------------------------------------
+
+function ActionMap::copyBind( %this, %otherMap, %command )
+{
+   if ( !isObject( %otherMap ) )
+   {
+      error( "ActionMap::copyBind - \"" @ %otherMap @ "\" is not an object!" );
+      return;
+   }
+
+   %bind = %otherMap.getBinding( %command );
+   if ( %bind !$= "" )
+   {
+      %device = getField( %bind, 0 );
+      %action = getField( %bind, 1 );
+      %flags = %otherMap.isInverted( %device, %action ) ? "SDI" : "SD";
+      %deadZone = %otherMap.getDeadZone( %device, %action );
+      %scale = %otherMap.getScale( %device, %action );
+      %this.bind( %device, %action, %flags, %deadZone, %scale, %command );
+   }
+}
+
+//------------------------------------------------------------------------------
+function ActionMap::blockBind( %this, %otherMap, %command )
+{
+   if ( !isObject( %otherMap ) )
+   {
+      error( "ActionMap::blockBind - \"" @ %otherMap @ "\" is not an object!" );
+      return;
+   }
+
+   %bind = %otherMap.getBinding( %command );
+   if ( %bind !$= "" )
+      %this.bind( getField( %bind, 0 ), getField( %bind, 1 ), "" );
+}
+
+//Dev helpers
+/// Shortcut for typing dbgSetParameters with the default values torsion uses.
+function dbgTorsion()
+{
+   dbgSetParameters( 6060, "password", false );
+}
+
+/// Reset the input state to a default of all-keys-up.
+/// A helpful remedy for when Torque misses a button up event do to your breakpoints
+/// and can't stop shooting / jumping / strafing.
+function mvReset()
+{
+   for ( %i = 0; %i < 6; %i++ )
+      setVariable( "mvTriggerCount" @ %i, 0 );
+      
+   $mvUpAction = 0;
+   $mvDownAction = 0;
+   $mvLeftAction = 0;
+   $mvRightAction = 0;
+   
+   // There are others.
+}
+
+//Persistance Manager tests
+
+new PersistenceManager(TestPManager);
+
+function runPManTest(%test)
+{
+   if (!isObject(TestPManager))
+      return;
+
+   if (%test $= "")
+      %test = 100;
+
+   switch(%test)
+   {
+      case 0:
+         TestPManager.testFieldUpdates();
+      case 1:
+         TestPManager.testObjectRename();
+      case 2:
+         TestPManager.testNewObject();
+      case 3:
+         TestPManager.testNewGroup();
+      case 4:
+         TestPManager.testMoveObject();
+      case 5:
+         TestPManager.testObjectRemove();
+      case 100:
+         TestPManager.testFieldUpdates();
+         TestPManager.testObjectRename();
+         TestPManager.testNewObject();
+         TestPManager.testNewGroup();
+         TestPManager.testMoveObject();
+         TestPManager.testObjectRemove();
+   }
+}
+
+function TestPManager::testFieldUpdates(%doNotSave)
+{
+   // Set some objects as dirty
+   TestPManager.setDirty(AudioGui);
+   TestPManager.setDirty(AudioSim);
+   TestPManager.setDirty(AudioMessage);
+
+   // Alter some of the existing fields
+   AudioEffect.isLooping         = true;
+   AudioMessage.isLooping     = true;
+   AudioEffect.is3D              = true;
+
+   // Test removing a field
+   TestPManager.removeField(AudioGui, "isLooping");
+
+   // Alter some of the persistent fields
+   AudioGui.referenceDistance     = 0.8;
+   AudioMessage.referenceDistance = 0.8;
+
+   // Add some new dynamic fields
+   AudioGui.foo = "bar";
+   AudioEffect.foo = "bar";
+
+   // Remove an object from the dirty list
+   // It shouldn't get updated in the file
+   TestPManager.removeDirty(AudioEffect);
+
+   // Dirty an object in another file as well
+   TestPManager.setDirty(WarningMaterial);
+
+   // Update a field that doesn't exist
+   WarningMaterial.glow[0] = true;
+
+   // Drity another object to test for crashes
+   // when a dirty object is deleted
+   TestPManager.setDirty(SFXPausedSet);
+
+   // Delete the object
+   SFXPausedSet.delete();
+
+   // Unless %doNotSave is set (by a batch/combo test)
+   // then go ahead and save now
+   if (!%doNotSave)
+      TestPManager.saveDirty();
+}
+
+function TestPManager::testObjectRename(%doNotSave)
+{
+   // Flag an object as dirty
+   if (isObject(AudioGui))
+      TestPManager.setDirty(AudioGui);
+   else if (isObject(AudioGuiFoo))
+      TestPManager.setDirty(AudioGuiFoo);
+
+   // Rename it
+   if (isObject(AudioGui))
+      AudioGui.setName(AudioGuiFoo);
+   else if (isObject(AudioGuiFoo))
+      AudioGuiFoo.setName(AudioGui);
+
+   // Unless %doNotSave is set (by a batch/combo test)
+   // then go ahead and save now
+   if (!%doNotSave)
+      TestPManager.saveDirty();
+}
+
+function TestPManager::testNewObject(%doNotSave)
+{
+   // Test adding a new named object
+   new SFXDescription(AudioNew)
+   {
+      volume = 0.5;
+      isLooping = true;
+      channel  = $GuiAudioType;
+      foo = 2;
+   };
+
+   // Flag it as dirty
+   TestPManager.setDirty(AudioNew, "core/scripts/client/audio.cs");
+
+   // Test adding a new unnamed object
+   %obj = new SFXDescription()
+   {
+      volume = 0.75;
+      isLooping = true;
+      bar = 3;
+   };
+
+   // Flag it as dirty
+   TestPManager.setDirty(%obj, "core/scripts/client/audio.cs");
+
+   // Test adding an "empty" object
+   new SFXDescription(AudioEmpty);
+
+   TestPManager.setDirty(AudioEmpty, "core/scripts/client/audio.cs");
+
+   // Unless %doNotSave is set (by a batch/combo test)
+   // then go ahead and save now
+   if (!%doNotSave)
+      TestPManager.saveDirty();
+}
+
+function TestPManager::testNewGroup(%doNotSave)
+{
+   // Test adding a new named SimGroup
+   new SimGroup(TestGroup)
+   {
+      foo = "bar";
+
+      new SFXDescription(TestObject)
+      {
+         volume = 0.5;
+         isLooping = true;
+         channel  = $GuiAudioType;
+         foo = 1;
+      };
+      new SimGroup(SubGroup)
+      {
+         foo = 2;
+
+         new SFXDescription(SubObject)
+         {
+            volume = 0.5;
+            isLooping = true;
+            channel  = $GuiAudioType;
+            foo = 3;
+         };
+      };
+   };
+
+   // Flag this as dirty
+   TestPManager.setDirty(TestGroup, "core/scripts/client/audio.cs");
+
+   // Test adding a new unnamed SimGroup
+   %group = new SimGroup()
+   {
+      foo = "bar";
+
+      new SFXDescription()
+      {
+         volume = 0.75;
+         channel  = $GuiAudioType;
+         foo = 4;
+      };
+      new SimGroup()
+      {
+         foo = 5;
+
+         new SFXDescription()
+         {
+            volume = 0.75;
+            isLooping = true;
+            channel  = $GuiAudioType;
+            foo = 6;
+         };
+      };
+   };
+
+   // Flag this as dirty
+   TestPManager.setDirty(%group, "core/scripts/client/audio.cs");
+
+   // Test adding a new unnamed SimSet
+   %set = new SimSet()
+   {
+      foo = "bar";
+
+      new SFXDescription()
+      {
+         volume = 0.75;
+         channel  = $GuiAudioType;
+         foo = 7;
+      };
+      new SimGroup()
+      {
+         foo = 8;
+
+         new SFXDescription()
+         {
+            volume = 0.75;
+            isLooping = true;
+            channel  = $GuiAudioType;
+            foo = 9;
+         };
+      };
+   };
+
+   // Flag this as dirty
+   TestPManager.setDirty(%set, "core/scripts/client/audio.cs");
+
+   // Unless %doNotSave is set (by a batch/combo test)
+   // then go ahead and save now
+   if (!%doNotSave)
+      TestPManager.saveDirty();
+}
+
+function TestPManager::testMoveObject(%doNotSave)
+{
+   // First add a couple of groups to the file
+   new SimGroup(MoveGroup1)
+   {
+      foo = "bar";
+
+      new SFXDescription(MoveObject1)
+      {
+         volume = 0.5;
+         isLooping = true;
+         channel  = $GuiAudioType;
+         foo = 1;
+      };
+
+      new SimSet(SubGroup1)
+      {
+         new SFXDescription(SubObject1)
+         {
+            volume = 0.75;
+            isLooping = true;
+            channel  = $GuiAudioType;
+            foo = 2;
+         };
+      };
+   };
+
+   // Flag this as dirty
+   TestPManager.setDirty(MoveGroup1, "core/scripts/client/audio.cs");
+
+   new SimGroup(MoveGroup2)
+   {
+      foo = "bar";
+
+      new SFXDescription(MoveObject2)
+      {
+         volume = 0.5;
+         isLooping = true;
+         channel  = $GuiAudioType;
+         foo = 3;
+      };
+   };
+
+   // Flag this as dirty
+   TestPManager.setDirty(MoveGroup2, "core/scripts/client/audio.cs");
+
+   // Unless %doNotSave is set (by a batch/combo test)
+   // then go ahead and save now
+   if (!%doNotSave)
+      TestPManager.saveDirty();
+
+   // Set them as dirty again
+   TestPManager.setDirty(MoveGroup1);
+   TestPManager.setDirty(MoveGroup2);
+
+   // Give the subobject an new value
+   MoveObject1.foo = 4;
+
+   // Move it into the other group
+   MoveGroup1.add(MoveObject2);
+
+   // Switch the other subobject
+   MoveGroup2.add(MoveObject1);
+
+   // Also add a new unnamed object to one of the groups
+   %obj = new SFXDescription()
+   {
+      volume = 0.75;
+      isLooping = true;
+      bar = 5;
+   };
+
+   MoveGroup1.add(%obj);
+
+   // Unless %doNotSave is set (by a batch/combo test)
+   // then go ahead and save now
+   if (!%doNotSave)
+      TestPManager.saveDirty();
+}
+
+function TestPManager::testObjectRemove(%doNotSave)
+{
+   TestPManager.removeObjectFromFile(AudioSim);
+}
+

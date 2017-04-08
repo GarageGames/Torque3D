@@ -33,6 +33,7 @@ function initServer()
    
    exec( "data/clientServer/scripts/server/audio.cs" );
    exec( "data/clientServer/scripts/server/commands.cs" );
+   exec( "data/clientServer/scripts/server/kickban.cs" );
    exec( "data/clientServer/scripts/server/message.cs" );
    exec( "data/clientServer/scripts/server/levelDownload.cs" );
    exec( "data/clientServer/scripts/server/levelLoad.cs" );
@@ -219,8 +220,11 @@ function destroyServer()
    deleteDataBlocks();
    
    // Save any server settings
+   %prefPath = getPrefpath();
    echo( "Exporting server prefs..." );
-   export( "$Pref::Server::*", "data/clientServer/scripts/server/prefs.cs", false );
+   export( "$Pref::Server::*", %prefPath@"/serverPrefs.cs", false );
+   
+   BanList::Export(%prefPath@"/banlist.cs");
 
    // Increase the server session number.  This is used to make sure we're
    // working with the server session we think we are.

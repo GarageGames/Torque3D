@@ -20,6 +20,7 @@ function FPSGameplay::create( %this )
    exec("./scripts/server/chat.cs");
    exec("./scripts/server/cheetah.cs");
    exec("./scripts/server/commands.cs");
+   exec("./scripts/server/centerPrint.cs");
    exec("./scripts/server/deathMatchGame.cs");
    exec("./scripts/server/health.cs");
    exec("./scripts/server/inventory.cs");
@@ -37,6 +38,7 @@ function FPSGameplay::create( %this )
    exec("./scripts/server/vehicleWheeled.cs");
    exec("./scripts/server/VolumetricFog.cs");
    exec("./scripts/server/weapon.cs");
+   exec("./scripts/server/physicsShape.cs");
    
    //add DBs
    if(isObject(DatablockFilesList))
@@ -88,14 +90,20 @@ function FPSGameplay::create( %this )
       exec("./scripts/gui/chatHud.gui");
       exec("./scripts/gui/playerList.gui");
       exec("./scripts/gui/playGui.gui");
+      exec("./scripts/gui/hudlessGui.gui");
       
-      exec("./scripts/gui/playGui.cs");
+      exec("data/FPSGameplay/scripts/client/playGui.cs");
+      exec("data/FPSGameplay/scripts/client/hudlessGui.cs");
       
       exec("data/FPSGameplay/scripts/client/message.cs");
       exec("data/FPSGameplay/scripts/client/chatHud.cs");
       exec("data/FPSGameplay/scripts/client/clientCommands.cs");
       exec("data/FPSGameplay/scripts/client/messageHud.cs");
       exec("data/FPSGameplay/scripts/client/playerList.cs");
+      exec("data/FPSGameplay/scripts/client/centerPrint.cs");
+      exec("data/FPSGameplay/scripts/client/recordings.cs");
+      
+      exec("data/FPSGameplay/scripts/client/screenshot.cs");
    }
 }
 
