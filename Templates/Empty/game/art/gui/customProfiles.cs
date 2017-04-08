@@ -24,3 +24,8 @@
 // This is the default save location for any GuiProfiles created in the
 // Gui Editor
 // ----------------------------------------------------------------------------
+
+singleton GuiControlProfile(TitleThing)
+{
+   fontSize = "38";
+};
