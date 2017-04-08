@@ -608,8 +608,8 @@ IMPLEMENT_CO_NETOBJECT_V1(MeshRoad);
 MeshRoad::MeshRoad()
 : mTextureLength( 5.0f ),
   mBreakAngle( 3.0f ),
-  mPhysicsRep( NULL ),
-  mWidthSubdivisions( 0 )
+  mWidthSubdivisions( 0 ),
+  mPhysicsRep( NULL )
 {
    mConvexList = new Convex;
 

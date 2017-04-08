@@ -73,8 +73,8 @@ U32 GFXVertexElement::getSizeInBytes() const
 
 GFXVertexFormat::GFXVertexFormat()
    :  mDirty( true ),
-      mHasColor( false ),
       mHasNormal( false ),
+      mHasColor( false ),
       mHasTangent( false ),
       mHasInstancing( false ),
       mTexCoordCount( 0 ),

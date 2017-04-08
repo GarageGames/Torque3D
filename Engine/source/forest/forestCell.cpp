@@ -38,8 +38,8 @@
 ForestCell::ForestCell( const RectF &rect ) :
    mRect( rect ),
    mBounds( Box3F::Invalid ),
-   mLargestItem( ForestItem::Invalid ),
    mIsDirty( false ),
+   mLargestItem( ForestItem::Invalid ),
    mIsInteriorOnly( false )
 {
    dMemset( mSubCells, 0, sizeof( mSubCells ) );
