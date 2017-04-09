@@ -30,7 +30,7 @@
 #include "platform/platform.h"
 #include "platform/platformCPUCount.h"
 
-#if defined(TORQUE_OS_LINUX) || defined(TORQUE_OS_MAC)
+#if defined(TORQUE_OS_LINUX) || defined(TORQUE_OS_OSX)
 
 #ifdef TORQUE_OS_LINUX
 // 	The Linux source code listing can be compiled using Linux kernel verison 2.6 
@@ -652,8 +652,6 @@ next:
       }
 
 } // namespace CPUInfo
-#endif
-
 #endif
 
 #endif

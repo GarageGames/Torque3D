@@ -27,6 +27,10 @@
 
 //#define TORQUE_LOCBUILD
 
+#if !defined(TORQUE_DEBUG) && !defined(TORQUE_LOCBUILD)
+   #define DISABLE_DEBUG_SPEW
+#endif
+
 #include "console/console.h"
 
 namespace DebugOutputConsumer
