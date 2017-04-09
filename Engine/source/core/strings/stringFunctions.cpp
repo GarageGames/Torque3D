@@ -27,7 +27,7 @@
 #include "platform/platform.h"
 
 
-#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN)
 // This standard function is not defined when compiling with VC7...
 #define vsnprintf	_vsnprintf
 #endif
@@ -330,7 +330,7 @@ char* dStrcpyl(char *dst, dsize_t dstSize, ...)
 
 S32 dStrcmp( const UTF16 *str1, const UTF16 *str2)
 {
-#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN)
    return wcscmp( reinterpret_cast<const wchar_t *>( str1 ), reinterpret_cast<const wchar_t *>( str2 ) );
 #else
    S32 ret;
@@ -347,7 +347,7 @@ S32 dStrcmp( const UTF16 *str1, const UTF16 *str2)
 
 char* dStrupr(char *str)
 {
-#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN)
    return _strupr(str);
 #else
    if (str == NULL)
@@ -365,7 +365,7 @@ char* dStrupr(char *str)
 
 char* dStrlwr(char *str)
 {
-#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN)
    return _strlwr(str);
 #else
    if (str == NULL)
@@ -423,7 +423,7 @@ S32 dVsprintf(char *buffer, U32 bufferSize, const char *format, va_list arglist)
 
 S32 dSscanf(const char *buffer, const char *format, ...)
 {
-#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN)
    va_list args;
    va_start(args, format);
 

@@ -1427,7 +1427,7 @@ void String::copy(StringChar* dst, const StringChar *src, U32 len)
 
 //-----------------------------------------------------------------------------
 
-#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN)
 // This standard function is not defined when compiling with VC7...
 #define vsnprintf	_vsnprintf
 #endif

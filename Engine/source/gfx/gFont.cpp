@@ -100,7 +100,6 @@ GFont* GFont::load( const Torque::Path& path )
    }
    else
    {
-#ifndef TORQUE_OS_XENON
       PlatformFont   *platFont = createPlatformFont(ret->getFontFaceName(), ret->getFontSize(), ret->getFontCharSet());
 
       if ( platFont == NULL )
@@ -110,7 +109,6 @@ GFont* GFont::load( const Torque::Path& path )
       }
       else
          ret->setPlatformFont(platFont);
-#endif
    }
    
    return ret;

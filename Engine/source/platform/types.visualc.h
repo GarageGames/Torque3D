@@ -59,17 +59,7 @@ typedef unsigned _int64 U64;
 
 //--------------------------------------
 // Identify the Operating System
-#if _XBOX_VER >= 200 
-#  define TORQUE_OS_STRING "Xenon"
-#  ifndef TORQUE_OS_XENON
-#     define TORQUE_OS_XENON
-#  endif
-#  include "platform/types.xenon.h"
-#elif defined( _XBOX_VER )
-#  define TORQUE_OS_STRING "Xbox"
-#  define TORQUE_OS_XBOX
-#  include "platform/types.win.h"
-#elif defined( _WIN32 ) && !defined ( _WIN64 )
+#if defined( _WIN32 ) && !defined ( _WIN64 )
 #  define TORQUE_OS_STRING "Win32"
 #  define TORQUE_OS_WIN
 #  define TORQUE_OS_WIN32
@@ -98,10 +88,6 @@ typedef unsigned _int64 U64;
 #  define TORQUE_SUPPORTS_NASM
 #  define TORQUE_SUPPORTS_VC_INLINE_X86_ASM
 #endif
-#elif defined( TORQUE_OS_XENON )
-#  define TORQUE_CPU_STRING "ppc"
-#  define TORQUE_CPU_PPC
-#  define TORQUE_BIG_ENDIAN
 #else
 #  error "VC: Unsupported Target CPU"
 #endif

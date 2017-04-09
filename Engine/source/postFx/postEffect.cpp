@@ -1180,19 +1180,6 @@ void PostEffect::process(  const SceneRenderState *state,
 
    if ( mTargetTex || mTargetDepthStencil )
    {
-
-#ifdef TORQUE_OS_XENON
-      // You may want to disable this functionality for speed reasons as it does
-      // add some overhead. The upside is it makes things "just work". If you
-      // re-work your post-effects properly, this is not needed.
-      //
-      // If this post effect doesn't alpha blend to the back-buffer, than preserve
-      // the active render target contents so they are still around the next time
-      // that render target activates
-      if(!mStateBlockData->getState().blendEnable)
-         GFX->getActiveRenderTarget()->preserve();
-#endif
-
       const RectI &oldViewport = GFX->getViewport();
       GFXTarget *oldTarget = GFX->getActiveRenderTarget();
 

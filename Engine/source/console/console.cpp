@@ -1200,10 +1200,8 @@ bool executeFile(const char* fileName, bool noCalls, bool journalScript)
          isEditorScript = true;
    }
 
-
    StringTableEntry scriptFileName = StringTable->insert(scriptFilenameBuffer);
 
-#ifndef TORQUE_OS_XENON
    // Is this a file we should compile? (anything in the prefs path should not be compiled)
    StringTableEntry prefsPath = Platform::getPrefsPath();
    bool compiled = dStricmp(ext, ".mis") && !journal && !Con::getBoolVariable("Scripts::ignoreDSOs");
@@ -1219,13 +1217,9 @@ bool executeFile(const char* fileName, bool noCalls, bool journalScript)
    // the dso along with the script to avoid name clashes with tools/game dsos.
    if ((dsoPath && *dsoPath == 0) || (prefsPath && prefsPath[0] && dStrnicmp(scriptFileName, prefsPath, dStrlen(prefsPath)) == 0))
       compiled = false;
-#else
-   bool compiled = false;  // Don't try to compile things on the 360, ignore DSO's when debugging
-                           // because PC prefs will screw up stuff like SFX.
-#endif
 
-                           // If we're in a journaling mode, then we will read the script
-                           // from the journal file.
+   // If we're in a journaling mode, then we will read the script
+   // from the journal file.
    if (journal && Journal::IsPlaying())
    {
       char fileNameBuf[256];

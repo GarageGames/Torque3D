@@ -54,10 +54,6 @@
 
 #include "opcode/Opcode.h"
 
-#if defined(TORQUE_OS_XENON)
-#  include "platformXbox/platformXbox.h"
-#endif
-
 GFXPrimitiveType drawTypes[] = { GFXTriangleList, GFXTriangleStrip };
 #define getDrawType(a) (drawTypes[a])
 

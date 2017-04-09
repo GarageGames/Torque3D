@@ -248,10 +248,6 @@ Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const Str
 
       meta->addStatement( new GenOp( "   // Sampler g-buffer\r\n" ) );
 
-#ifdef TORQUE_OS_XENON
-      meta->addStatement( new GenOp( "   @;\r\n", bufferSampleDecl ) );
-      meta->addStatement( new GenOp( "   asm { tfetch2D @, @, @, MagFilter = point, MinFilter = point, MipFilter = point };\r\n", bufferSample, screenUV, prepassSampler ) );
-#else
       // The gbuffer has no mipmaps, so use tex2dlod when 
       // possible so that the shader compiler can optimize.
       meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
@@ -259,7 +255,6 @@ Var* GBufferConditionerGLSL::printMethodHeader( MethodType methodType, const Str
       meta->addStatement( new GenOp( "   #else\r\n" ) );
       meta->addStatement( new GenOp( "      @ = tex2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
       meta->addStatement( new GenOp( "   #endif\r\n\r\n" ) );
-#endif
 
       // We don't use this way of passing var's around, so this should cause a crash
       // if something uses this improperly
