@@ -66,12 +66,6 @@ MODULE_BEGIN( TSMeshIntrinsics )
             zero_vert_normal_bulk = zero_vert_normal_bulk_SSE;
          #endif
       }
-      else if(Platform::SystemInfo.processor.properties & CPU_PROP_ALTIVEC)
-      {
-         #if defined(TORQUE_CPU_PPC)
-            zero_vert_normal_bulk = zero_vert_normal_bulk_gccvec;
-         #endif
-      }
    }
 
 MODULE_END;

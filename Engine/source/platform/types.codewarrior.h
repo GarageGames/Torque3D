@@ -89,12 +89,6 @@ typedef unsigned long long U64;     ///< Compiler independent Unsigned 64-bit in
 #  elif __ide_target("Torque-W32-Release")
 #     undef TORQUE_SUPPORTS_NASM
 #  endif
-
-#elif defined(__POWERPC__)
-#  define TORQUE_CPU_STRING "PowerPC"
-#  define TORQUE_CPU_PPC
-#  define TORQUE_BIG_ENDIAN
-
 #else
 #  error "CW: Unsupported Target CPU"
 #endif
