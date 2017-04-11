@@ -119,7 +119,7 @@ new GFXStateBlockData( AL_DefaultVisualizeState )
    zWriteEnable = false;
 
    samplersDefined = true;
-   samplerStates[0] = SamplerClampPoint;   // #prepass
+   samplerStates[0] = SamplerClampPoint;   // #deferred
    samplerStates[1] = SamplerClampLinear;  // depthviz
 };
 
@@ -131,7 +131,7 @@ new ShaderData( AL_DepthVisualizeShader )
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile  = "./shaders/dbgDepthVisualizeP.glsl";
 
-   samplerNames[0] = "prepassTex";
+   samplerNames[0] = "deferredTex";
    samplerNames[1] = "depthViz";
 
    pixVersion = 2.0;
@@ -141,7 +141,7 @@ singleton PostEffect( AL_DepthVisualize )
 {   
    shader = AL_DepthVisualizeShader;
    stateBlock = AL_DefaultVisualizeState;
-   texture[0] = "#prepass";
+   texture[0] = "#deferred";
    texture[1] = "tools/worldEditor/images/depthviz";   
    target = "$backBuffer";
    renderPriority = 9999;
@@ -188,7 +188,7 @@ new ShaderData( AL_NormalsVisualizeShader )
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile  = "./shaders/dbgNormalVisualizeP.glsl";
    
-   samplerNames[0] = "prepassTex";
+   samplerNames[0] = "deferredTex";
    
    pixVersion = 2.0;
 };
@@ -197,7 +197,7 @@ singleton PostEffect( AL_NormalsVisualize )
 {   
    shader = AL_NormalsVisualizeShader;
    stateBlock = AL_DefaultVisualizeState;
-   texture[0] = "#prepass";
+   texture[0] = "#deferred";
    target = "$backBuffer";
    renderPriority = 9999;
 };
@@ -224,7 +224,7 @@ new ShaderData( AL_LightColorVisualizeShader )
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile  = "./shaders/dbgLightColorVisualizeP.glsl";
    
-   samplerNames[0] = "lightPrePassTex";
+   samplerNames[0] = "lightDeferredTex";
    
    pixVersion = 2.0;
 };
@@ -259,7 +259,7 @@ new ShaderData( AL_LightSpecularVisualizeShader )
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile  = "./shaders/dbgLightSpecularVisualizeP.glsl";
    
-   samplerNames[0] = "lightPrePassTex";
+   samplerNames[0] = "lightDeferredTex";
    
    pixVersion = 2.0;
 };

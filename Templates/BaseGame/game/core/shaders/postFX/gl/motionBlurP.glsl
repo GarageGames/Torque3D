@@ -35,7 +35,7 @@ uniform mat4 matWorldToScreen;
 uniform float velocityMultiplier;
 
 uniform sampler2D backBuffer;
-uniform sampler2D prepassTex;
+uniform sampler2D deferredTex;
 
 out vec4 OUT_col;
 
@@ -44,11 +44,11 @@ void main()
    vec2 IN_uv0 = _IN_uv0;
    float samples = 5;
    
-   // First get the prepass texture for uv channel 0
-   vec4 prepass = prepassUncondition( prepassTex, IN_uv0 );
+   // First get the deferred texture for uv channel 0
+   vec4 deferred = deferredUncondition( deferredTex, IN_uv0 );
    
    // Next extract the depth
-   float depth = prepass.a;
+   float depth = deferred.a;
    
    // Create the screen position
    vec4 screenPos = vec4(IN_uv0.x*2-1, IN_uv0.y*2-1, depth*2-1, 1);

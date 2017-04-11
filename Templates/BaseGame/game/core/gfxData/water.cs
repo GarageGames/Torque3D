@@ -35,7 +35,7 @@ singleton ShaderData( WaterShader )
    OGLPixelShaderFile = $Core::CommonShaderPath @ "/water/gl/waterP.glsl";
    
    samplerNames[0] = "$bumpMap";  // noise
-   samplerNames[1] = "$prepassTex";  // #prepass
+   samplerNames[1] = "$deferredTex";  // #deferred
    samplerNames[2] = "$reflectMap"; // $reflectbuff
    samplerNames[3] = "$refractBuff";  // $backbuff
    samplerNames[4] = "$skyMap";  // $cubemap   
@@ -61,7 +61,7 @@ singleton GFXStateBlockData( WaterStateBlock )
 {
    samplersDefined = true;
    samplerStates[0] = WaterSampler;  // noise
-   samplerStates[1] = SamplerClampPoint;  // #prepass
+   samplerStates[1] = SamplerClampPoint;  // #deferred
    samplerStates[2] = SamplerClampLinear; // $reflectbuff
    samplerStates[3] = SamplerClampPoint;  // $backbuff
    samplerStates[4] = SamplerWrapLinear;  // $cubemap   
@@ -78,7 +78,7 @@ singleton GFXStateBlockData( UnderWaterStateBlock : WaterStateBlock )
 
 singleton CustomMaterial( WaterMat )
 {   
-   sampler["prepassTex"] = "#prepass";
+   sampler["deferredTex"] = "#deferred";
    sampler["reflectMap"] = "$reflectbuff";
    sampler["refractBuff"] = "$backbuff";
    // These samplers are set in code not here.
@@ -115,7 +115,7 @@ singleton CustomMaterial( UnderwaterMat )
    //sampler["bumpMap"] = "core/art/water/noise02";
    //sampler["foamMap"] = "core/art/water/foam";
 
-   sampler["prepassTex"] = "#prepass";
+   sampler["deferredTex"] = "#deferred";
    sampler["refractBuff"] = "$backbuff";   
    
    shader = UnderWaterShader;
@@ -171,7 +171,7 @@ singleton CustomMaterial( WaterBasicMat )
    //sampler["bumpMap"] = "core/art/water/noise02";
    //sampler["skyMap"] = "$cubemap";   
    
-   //sampler["prepassTex"] = "#prepass";
+   //sampler["deferredTex"] = "#deferred";
    sampler["reflectMap"] = "$reflectbuff";
    sampler["refractBuff"] = "$backbuff";
     
@@ -199,7 +199,7 @@ singleton CustomMaterial( UnderwaterBasicMat )
    //sampler["bumpMap"] = "core/art/water/noise02";
    //samplers["skyMap"] = "$cubemap";  
 
-   //sampler["prepassTex"] = "#prepass";
+   //sampler["deferredTex"] = "#deferred";
    sampler["refractBuff"] = "$backbuff";
    
    shader = UnderWaterBasicShader;

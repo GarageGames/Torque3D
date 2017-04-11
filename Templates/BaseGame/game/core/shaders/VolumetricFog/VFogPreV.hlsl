@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// Volumetric Fog prepass vertex shader V1.00
+// Volumetric Fog deferred vertex shader V1.00
 
 #include "../shaderModel.hlsl"
 #include "../hlslStructs.hlsl"

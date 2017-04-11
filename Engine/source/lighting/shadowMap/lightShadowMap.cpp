@@ -519,7 +519,7 @@ void LightingShaderConstants::init(GFXShader* shader)
    mLightSpotParamsSC = shader->getShaderConstHandle("$lightSpotParams");
 
    // NOTE: These are the shader constants used for doing lighting 
-   // during the forward pass.  Do not confuse these for the prepass
+   // during the forward pass.  Do not confuse these for the deferred
    // lighting constants which are used from AdvancedLightBinManager.
    mLightPositionSC = shader->getShaderConstHandle( ShaderGenVars::lightPosition );
    mLightDiffuseSC = shader->getShaderConstHandle( ShaderGenVars::lightDiffuse );

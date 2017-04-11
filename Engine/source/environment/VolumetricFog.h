@@ -80,7 +80,7 @@ class VolumetricFog : public SceneObject
    protected:
       // Rendertargets;
       GFXTextureTargetRef z_buf;
-      NamedTexTargetRef mPrepassTarget;
+      NamedTexTargetRef mDeferredTarget;
       NamedTexTargetRef mDepthBufferTarget;
       NamedTexTargetRef mFrontBufferTarget;
    
@@ -89,7 +89,7 @@ class VolumetricFog : public SceneObject
    
       // Shaders
       GFXShaderRef mShader;
-      GFXShaderRef mPrePassShader;
+      GFXShaderRef mDeferredShader;
       GFXShaderRef mReflectionShader;
    
       // Stateblocks

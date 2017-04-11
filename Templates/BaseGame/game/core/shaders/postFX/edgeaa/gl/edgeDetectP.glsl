@@ -24,7 +24,7 @@
 #include "shadergen:/autogenConditioners.h"
 
 // GPU Gems 3, pg 443-444
-float GetEdgeWeight(vec2 uv0, in sampler2D prepassBuffer, in vec2 targetSize)
+float GetEdgeWeight(vec2 uv0, in sampler2D deferredBuffer, in vec2 targetSize)
 {
    vec2 offsets[9] = vec2[](
       vec2( 0.0,  0.0),
@@ -47,7 +47,7 @@ float GetEdgeWeight(vec2 uv0, in sampler2D prepassBuffer, in vec2 targetSize)
    for(int i = 0; i < 9; i++)
    {
       vec2 uv = uv0 + offsets[i] * PixelSize;
-      vec4 gbSample = prepassUncondition( prepassBuffer, uv );
+      vec4 gbSample = deferredUncondition( deferredBuffer, uv );
       Depth[i] = gbSample.a;
       Normal[i] = gbSample.rgb;
    }
@@ -85,12 +85,12 @@ float GetEdgeWeight(vec2 uv0, in sampler2D prepassBuffer, in vec2 targetSize)
 in vec2 uv0;
 #define IN_uv0 uv0
 
-uniform sampler2D prepassBuffer;
+uniform sampler2D deferredBuffer;
 uniform vec2 targetSize;
 
 out vec4 OUT_col;
 
 void main()
 {
-   OUT_col = vec4( GetEdgeWeight(IN_uv0, prepassBuffer, targetSize ) );//rtWidthHeightInvWidthNegHeight.zw);
+   OUT_col = vec4( GetEdgeWeight(IN_uv0, deferredBuffer, targetSize ) );//rtWidthHeightInvWidthNegHeight.zw);
 }

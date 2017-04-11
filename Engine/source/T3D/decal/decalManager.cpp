@@ -1214,7 +1214,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
 
    // Make it the sort distance the max distance so that 
    // it renders after all the other opaque geometry in 
-   // the prepass bin.
+   // the deferred bin.
    baseRenderInst.sortDistSq = F32_MAX;
 
    Vector<DecalBatch> batches;

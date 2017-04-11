@@ -47,7 +47,7 @@
 #include "materials/sceneData.h"
 #include "materials/materialFeatureTypes.h"
 #include "materials/matInstance.h"
-#include "renderInstance/renderPrePassMgr.h"
+#include "renderInstance/renderDeferredMgr.h"
 #include "console/engineAPI.h"
 
 /// This is used for rendering ground cover billboards.

@@ -159,9 +159,9 @@ void main()
 	}
 	
    // Sample/unpack the normal/z data
-   vec4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
-   vec3 normal = prepassSample.rgb;
-   float depth = prepassSample.a;
+   vec4 deferredSample = deferredUncondition( prePassBuffer, uvScene );
+   vec3 normal = deferredSample.rgb;
+   float depth = deferredSample.a;
    
    // Eye ray - Eye -> Pixel
    vec3 eyeRay = getDistanceVectorToPlane( -vsFarPlane.w, vsEyeDir.xyz, vsFarPlane );

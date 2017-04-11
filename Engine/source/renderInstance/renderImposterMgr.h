@@ -38,7 +38,7 @@
 
 class TSLastDetail;
 class GFXTextureObject;
-class RenderPrePassMgr;
+class RenderDeferredMgr;
 struct ImposterRenderInst;
 
 
@@ -74,9 +74,9 @@ protected:
    GFXPrimitiveBufferHandle mIB;
    //GFXVertexBufferHandle<ImposterCorner> mCornerVB;   
 
-   void _innerRender( const SceneRenderState *state, RenderPrePassMgr *prePassBin );
+   void _innerRender( const SceneRenderState *state, RenderDeferredMgr *prePassBin );
 
-   void _renderPrePass( const SceneRenderState *state, RenderPrePassMgr *prePassBin, bool startPrePass );
+   void _renderDeferred( const SceneRenderState *state, RenderDeferredMgr *prePassBin, bool startDeferred );
 
    static bool _clearStats( GFXDevice::GFXDeviceEventType type );
 

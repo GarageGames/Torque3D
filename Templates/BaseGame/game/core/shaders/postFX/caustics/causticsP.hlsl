@@ -28,7 +28,7 @@ uniform float3    eyePosWorld;
 uniform float4    rtParams0;
 uniform float4    waterFogPlane;
 
-TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(deferredTex, 0);
 TORQUE_UNIFORM_SAMPLER2D(causticsTex0, 1);
 TORQUE_UNIFORM_SAMPLER2D(causticsTex1, 2);
 
@@ -40,7 +40,7 @@ float distanceToPlane(float4 plane, float3 pos)
 float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {   
    //Sample the pre-pass
-   float4 prePass = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 );
+   float4 prePass = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 );
    
    //Get depth
    float depth = prePass.w;   

@@ -30,7 +30,7 @@
 #include "lighting/common/sceneLighting.h"
 #include "lighting/common/lightMapParams.h"
 #include "core/util/safeDelete.h"
-#include "renderInstance/renderPrePassMgr.h"
+#include "renderInstance/renderDeferredMgr.h"
 #include "materials/materialManager.h"
 #include "math/util/sphereMesh.h"
 #include "console/consoleTypes.h"
@@ -115,27 +115,27 @@ void AdvancedLightManager::activate( SceneManager *sceneManager )
    mLightBinManager = new AdvancedLightBinManager( this, SHADOWMGR, blendTargetFormat );
    mLightBinManager->assignName( "AL_LightBinMgr" );
 
-   // First look for the prepass bin...
-   RenderPrePassMgr *prePassBin = _findPrePassRenderBin();
+   // First look for the deferred bin...
+   RenderDeferredMgr *prePassBin = _findDeferredRenderBin();
 
-   // If we didn't find the prepass bin then add one.
+   // If we didn't find the deferred bin then add one.
    if ( !prePassBin )
    {
-      prePassBin = new RenderPrePassMgr( true, blendTargetFormat );
-      prePassBin->assignName( "AL_PrePassBin" );
+      prePassBin = new RenderDeferredMgr( true, blendTargetFormat );
+      prePassBin->assignName( "AL_DeferredBin" );
       prePassBin->registerObject();
       getSceneManager()->getDefaultRenderPass()->addManager( prePassBin );
-      mPrePassRenderBin = prePassBin;
+      mDeferredRenderBin = prePassBin;
    }
 
-   // Tell the material manager that prepass is enabled.
-   MATMGR->setPrePassEnabled( true );
+   // Tell the material manager that deferred is enabled.
+   MATMGR->setDeferredEnabled( true );
 
    // Insert our light bin manager.
    mLightBinManager->setRenderOrder( prePassBin->getRenderOrder() + 0.01f );
    getSceneManager()->getDefaultRenderPass()->addManager( mLightBinManager );
 
-   AdvancedLightingFeatures::registerFeatures(mPrePassRenderBin->getTargetFormat(), mLightBinManager->getTargetFormat());
+   AdvancedLightingFeatures::registerFeatures(mDeferredRenderBin->getTargetFormat(), mLightBinManager->getTargetFormat());
 
    // Last thing... let everyone know we're active.
    smActivateSignal.trigger( getId(), true );
@@ -151,14 +151,14 @@ void AdvancedLightManager::deactivate()
    // removing itself from the render passes.
    if( mLightBinManager )
    {
-      mLightBinManager->MRTLightmapsDuringPrePass(false);
+      mLightBinManager->MRTLightmapsDuringDeferred(false);
       mLightBinManager->deleteObject();
    }
    mLightBinManager = NULL;
 
-   if ( mPrePassRenderBin )
-      mPrePassRenderBin->deleteObject();
-   mPrePassRenderBin = NULL;
+   if ( mDeferredRenderBin )
+      mDeferredRenderBin->deleteObject();
+   mDeferredRenderBin = NULL;
 
    SHADOWMGR->deactivate();
 
@@ -348,8 +348,8 @@ void AdvancedLightManager::setLightInfo(  ProcessedMaterial *pmat,
                                           U32 pass, 
                                           GFXShaderConstBuffer *shaderConsts)
 {
-   // Skip this if we're rendering from the prepass bin.
-   if ( sgData.binType == SceneData::PrePassBin )
+   // Skip this if we're rendering from the deferred bin.
+   if ( sgData.binType == SceneData::DeferredBin )
       return;
 
    PROFILE_SCOPE(AdvancedLightManager_setLightInfo);

@@ -26,7 +26,7 @@
 #define DOSMALL
 #define DOLARGE
 
-TORQUE_UNIFORM_SAMPLER2D(prepassMap,0);
+TORQUE_UNIFORM_SAMPLER2D(deferredMap,0);
 TORQUE_UNIFORM_SAMPLER2D(randNormalTex,1);
 TORQUE_UNIFORM_SAMPLER1D(powTable,2);
 
@@ -143,9 +143,9 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
    float3 reflectNormal = normalize( TORQUE_TEX2DLOD( randNormalTex, noiseMapUV ).xyz * 2.0 - 1.0 );   
    //return float4( reflectNormal, 1 );
    
-   float4 prepass = TORQUE_PREPASS_UNCONDITION( prepassMap, IN.uv0 );
-   float3 normal = prepass.xyz;
-   float depth = prepass.a;
+   float4 deferred = TORQUE_PREPASS_UNCONDITION( deferredMap, IN.uv0 );
+   float3 normal = deferred.xyz;
+   float depth = deferred.a;
    //return float4( ( depth ).xxx, 1 );
       
    // Early out if too far away.
@@ -197,7 +197,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
        
       se = ep + ray;
             
-      occluderFragment = TORQUE_PREPASS_UNCONDITION( prepassMap, se.xy );                  
+      occluderFragment = TORQUE_PREPASS_UNCONDITION( deferredMap, se.xy );                  
       
       depthDiff = se.z - occluderFragment.a; 
       
@@ -246,7 +246,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
        
       se = ep + ray;
             
-      occluderFragment = TORQUE_PREPASS_UNCONDITION( prepassMap, se.xy );                  
+      occluderFragment = TORQUE_PREPASS_UNCONDITION( deferredMap, se.xy );                  
       
       depthDiff = se.z - occluderFragment.a;       
       

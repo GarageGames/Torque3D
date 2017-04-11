@@ -24,7 +24,7 @@
 #include "../postFx.hlsl"
 
 TORQUE_UNIFORM_SAMPLER2D(backBuffer, 0);
-TORQUE_UNIFORM_SAMPLER2D(prepassTex, 1);
+TORQUE_UNIFORM_SAMPLER2D(deferredTex, 1);
 
 uniform float brightScalar;
 
@@ -36,7 +36,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
     float4 col = float4( 0, 0, 0, 1 );
     
     // Get the depth at this pixel.
-    float depth = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 ).w;
+    float depth = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 ).w;
     
     // If the depth is equal to 1.0, read from the backbuffer
     // and perform the exposure calculation on the result.

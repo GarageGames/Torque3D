@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platform.h"
-#include "renderInstance/renderPrePassMgr.h"
+#include "renderInstance/renderDeferredMgr.h"
 
 #include "gfx/gfxTransformSaver.h"
 #include "materials/sceneData.h"
@@ -51,40 +51,40 @@
 #include "materials/shaderData.h"
 #include "gfx/sim/cubemapData.h"
 
-const MatInstanceHookType PrePassMatInstanceHook::Type( "PrePass" );
-const String RenderPrePassMgr::BufferName("prepass");
-const RenderInstType RenderPrePassMgr::RIT_PrePass("PrePass");
-const String RenderPrePassMgr::ColorBufferName("color");
-const String RenderPrePassMgr::MatInfoBufferName("matinfo");
+const MatInstanceHookType DeferredMatInstanceHook::Type( "Deferred" );
+const String RenderDeferredMgr::BufferName("deferred");
+const RenderInstType RenderDeferredMgr::RIT_Deferred("Deferred");
+const String RenderDeferredMgr::ColorBufferName("color");
+const String RenderDeferredMgr::MatInfoBufferName("matinfo");
 
-IMPLEMENT_CONOBJECT(RenderPrePassMgr);
+IMPLEMENT_CONOBJECT(RenderDeferredMgr);
 
-ConsoleDocClass( RenderPrePassMgr, 
-   "@brief The render bin which performs a z+normals prepass used in Advanced Lighting.\n\n"
+ConsoleDocClass( RenderDeferredMgr, 
+   "@brief The render bin which performs a z+normals deferred used in Advanced Lighting.\n\n"
    "This render bin is used in Advanced Lighting to gather all opaque mesh render instances "
    "and render them to the g-buffer for use in lighting the scene and doing effects.\n\n"
-   "PostEffect and other shaders can access the output of this bin by using the #prepass "
+   "PostEffect and other shaders can access the output of this bin by using the #deferred "
    "texture target name.  See the edge anti-aliasing post effect for an example.\n\n"
    "@see game/core/scripts/client/postFx/edgeAA.cs\n"
    "@ingroup RenderBin\n" );
 
 
-RenderPrePassMgr::RenderSignal& RenderPrePassMgr::getRenderSignal()
+RenderDeferredMgr::RenderSignal& RenderDeferredMgr::getRenderSignal()
 {
    static RenderSignal theSignal;
    return theSignal;
 }
 
 
-RenderPrePassMgr::RenderPrePassMgr( bool gatherDepth,
+RenderDeferredMgr::RenderDeferredMgr( bool gatherDepth,
                                     GFXFormat format )
-   :  Parent(  RIT_PrePass,
+   :  Parent(  RIT_Deferred,
                0.01f,
                0.01f,
                format,
                Point2I( Parent::DefaultTargetSize, Parent::DefaultTargetSize),
                gatherDepth ? Parent::DefaultTargetChainLength : 0 ),
-      mPrePassMatInstance( NULL )
+      mDeferredMatInstance( NULL )
 {
    notifyType( RenderPassManager::RIT_Decal );
    notifyType( RenderPassManager::RIT_DecalRoad );
@@ -107,30 +107,30 @@ RenderPrePassMgr::RenderPrePassMgr( bool gatherDepth,
    _registerFeatures();
 }
 
-RenderPrePassMgr::~RenderPrePassMgr()
+RenderDeferredMgr::~RenderDeferredMgr()
 {
    GFXShader::removeGlobalMacro( "TORQUE_LINEAR_DEPTH" );
 
    mColorTarget.release();
    mMatInfoTarget.release();
    _unregisterFeatures();
-   SAFE_DELETE( mPrePassMatInstance );
+   SAFE_DELETE( mDeferredMatInstance );
 }
 
-void RenderPrePassMgr::_registerFeatures()
+void RenderDeferredMgr::_registerFeatures()
 {
    ConditionerFeature *cond = new LinearEyeDepthConditioner( getTargetFormat() );
-   FEATUREMGR->registerFeature( MFT_PrePassConditioner, cond );
+   FEATUREMGR->registerFeature( MFT_DeferredConditioner, cond );
    mNamedTarget.setConditioner( cond );
 }
 
-void RenderPrePassMgr::_unregisterFeatures()
+void RenderDeferredMgr::_unregisterFeatures()
 {
    mNamedTarget.setConditioner( NULL );
-   FEATUREMGR->unregisterFeature(MFT_PrePassConditioner);
+   FEATUREMGR->unregisterFeature(MFT_DeferredConditioner);
 }
 
-bool RenderPrePassMgr::setTargetSize(const Point2I &newTargetSize)
+bool RenderDeferredMgr::setTargetSize(const Point2I &newTargetSize)
 {
    bool ret = Parent::setTargetSize( newTargetSize );
    mNamedTarget.setViewport( GFX->getViewport() );
@@ -139,14 +139,14 @@ bool RenderPrePassMgr::setTargetSize(const Point2I &newTargetSize)
    return ret;
 }
 
-bool RenderPrePassMgr::_updateTargets()
+bool RenderDeferredMgr::_updateTargets()
 {
-   PROFILE_SCOPE(RenderPrePassMgr_updateTargets);
+   PROFILE_SCOPE(RenderDeferredMgr_updateTargets);
 
    bool ret = Parent::_updateTargets();
 
    // check for an output conditioner, and update it's format
-   ConditionerFeature *outputConditioner = dynamic_cast<ConditionerFeature *>(FEATUREMGR->getByType(MFT_PrePassConditioner));
+   ConditionerFeature *outputConditioner = dynamic_cast<ConditionerFeature *>(FEATUREMGR->getByType(MFT_DeferredConditioner));
    if( outputConditioner && outputConditioner->setBufferFormat(mTargetFormat) )
    {
       // reload materials, the conditioner needs to alter the generated shaders
@@ -193,7 +193,7 @@ bool RenderPrePassMgr::_updateTargets()
    // lightmapped geometry in the scene.
    AdvancedLightBinManager *lightBin;
    if (  Sim::findObject( "AL_LightBinMgr", lightBin ) &&
-         lightBin->MRTLightmapsDuringPrePass() &&
+         lightBin->MRTLightmapsDuringDeferred() &&
          lightBin->isProperlyAdded() )
    {
       // Update the size of the light bin target here. This will call _updateTargets
@@ -218,28 +218,28 @@ bool RenderPrePassMgr::_updateTargets()
    return ret;
 }
 
-void RenderPrePassMgr::_createPrePassMaterial()
+void RenderDeferredMgr::_createDeferredMaterial()
 {
-   SAFE_DELETE(mPrePassMatInstance);
+   SAFE_DELETE(mDeferredMatInstance);
 
    const GFXVertexFormat *vertexFormat = getGFXVertexFormat<GFXVertexPNTTB>();
 
-   MatInstance* prepassMat = static_cast<MatInstance*>(MATMGR->createMatInstance("AL_DefaultPrePassMaterial", vertexFormat));
-   AssertFatal( prepassMat, "TODO: Handle this better." );
-   mPrePassMatInstance = new PrePassMatInstance(prepassMat, this);
-   mPrePassMatInstance->init( MATMGR->getDefaultFeatures(), vertexFormat);
-   delete prepassMat;
+   MatInstance* deferredMat = static_cast<MatInstance*>(MATMGR->createMatInstance("AL_DefaultDeferredMaterial", vertexFormat));
+   AssertFatal( deferredMat, "TODO: Handle this better." );
+   mDeferredMatInstance = new DeferredMatInstance(deferredMat, this);
+   mDeferredMatInstance->init( MATMGR->getDefaultFeatures(), vertexFormat);
+   delete deferredMat;
 }
 
-void RenderPrePassMgr::setPrePassMaterial( PrePassMatInstance *mat )
+void RenderDeferredMgr::setDeferredMaterial( DeferredMatInstance *mat )
 {
-   SAFE_DELETE(mPrePassMatInstance);
-   mPrePassMatInstance = mat;
+   SAFE_DELETE(mDeferredMatInstance);
+   mDeferredMatInstance = mat;
 }
 
-void RenderPrePassMgr::addElement( RenderInst *inst )
+void RenderDeferredMgr::addElement( RenderInst *inst )
 {
-   PROFILE_SCOPE( RenderPrePassMgr_addElement )
+   PROFILE_SCOPE( RenderDeferredMgr_addElement )
 
    // Skip out if this bin is disabled.
    if (  gClientSceneGraph->getCurrentRenderState() &&
@@ -269,8 +269,8 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
          static_cast<CustomMaterial*>(matInst->getMaterial())->mRefract)
          return;
 
-      // Make sure we got a prepass material.
-      matInst = getPrePassMaterial(matInst);
+      // Make sure we got a deferred material.
+      matInst = getDeferredMaterial(matInst);
       if (!matInst || !matInst->isValid())
          return;
    }
@@ -302,36 +302,36 @@ void RenderPrePassMgr::addElement( RenderInst *inst )
       elem.key2 = originalKey;
 }
 
-void RenderPrePassMgr::sort()
+void RenderDeferredMgr::sort()
 {
-   PROFILE_SCOPE( RenderPrePassMgr_sort );
+   PROFILE_SCOPE( RenderDeferredMgr_sort );
    Parent::sort();
    dQsort( mTerrainElementList.address(), mTerrainElementList.size(), sizeof(MainSortElem), cmpKeyFunc);
    dQsort( mObjectElementList.address(), mObjectElementList.size(), sizeof(MainSortElem), cmpKeyFunc);
 }
 
-void RenderPrePassMgr::clear()
+void RenderDeferredMgr::clear()
 {
    Parent::clear();
    mTerrainElementList.clear();
    mObjectElementList.clear();
 }
 
-void RenderPrePassMgr::render( SceneRenderState *state )
+void RenderDeferredMgr::render( SceneRenderState *state )
 {
-   PROFILE_SCOPE(RenderPrePassMgr_render);
+   PROFILE_SCOPE(RenderDeferredMgr_render);
 
    // Take a look at the SceneRenderState and see if we should skip drawing the pre-pass
    if ( state->disableAdvancedLightingBins() )
       return;
 
    // NOTE: We don't early out here when the element list is
-   // zero because we need the prepass to be cleared.
+   // zero because we need the deferred to be cleared.
 
    // Automagically save & restore our viewport and transforms.
    GFXTransformSaver saver;
 
-   GFXDEBUGEVENT_SCOPE( RenderPrePassMgr_Render, ColorI::RED );
+   GFXDEBUGEVENT_SCOPE( RenderDeferredMgr_Render, ColorI::RED );
 
    // Tell the superclass we're about to render
    const bool isRenderingToTarget = _onPreRender(state);
@@ -344,13 +344,13 @@ void RenderPrePassMgr::render( SceneRenderState *state )
    matrixSet.restoreSceneViewProjection();
    const MatrixF worldViewXfm = GFX->getWorldMatrix();
 
-   // Setup the default prepass material for object instances.
-   if ( !mPrePassMatInstance )
-      _createPrePassMaterial();
-   if ( mPrePassMatInstance )
+   // Setup the default deferred material for object instances.
+   if ( !mDeferredMatInstance )
+      _createDeferredMaterial();
+   if ( mDeferredMatInstance )
    {
       matrixSet.setWorld(MatrixF::Identity);
-      mPrePassMatInstance->setTransforms(matrixSet, state);
+      mDeferredMatInstance->setTransforms(matrixSet, state);
    }
 
    // Signal start of pre-pass
@@ -361,16 +361,16 @@ void RenderPrePassMgr::render( SceneRenderState *state )
    // on the smaller meshes and objects.
 
    // The terrain doesn't need any scene graph data
-   // in the the prepass... so just clear it.
+   // in the the deferred... so just clear it.
    SceneData sgData;
-   sgData.init( state, SceneData::PrePassBin );
+   sgData.init( state, SceneData::DeferredBin );
 
    Vector< MainSortElem >::const_iterator itr = mTerrainElementList.begin();
    for ( ; itr != mTerrainElementList.end(); itr++ )
    {
       TerrainRenderInst *ri = static_cast<TerrainRenderInst*>( itr->inst );
 
-      TerrainCellMaterial *mat = ri->cellMat->getPrePassMat();
+      TerrainCellMaterial *mat = ri->cellMat->getDeferredMat();
 
       GFX->setPrimitiveBuffer( ri->primBuff );
       GFX->setVertexBuffer( ri->vertBuff );
@@ -396,8 +396,8 @@ void RenderPrePassMgr::render( SceneRenderState *state )
    {
       MeshRenderInst *ri = static_cast<MeshRenderInst*>( itr->inst );
 
-      // Get the prepass material.
-      BaseMatInstance *mat = getPrePassMaterial( ri->matInst );
+      // Get the deferred material.
+      BaseMatInstance *mat = getDeferredMaterial( ri->matInst );
 
       // Set up SG data proper like and flag it 
       // as a pre-pass render
@@ -414,9 +414,9 @@ void RenderPrePassMgr::render( SceneRenderState *state )
 
             // Check to see if we need to break this batch.
             //
-            // NOTE: We're comparing the non-prepass materials 
+            // NOTE: We're comparing the non-deferred materials 
             // here so we don't incur the cost of looking up the 
-            // prepass hook on each inst.
+            // deferred hook on each inst.
             //
             if ( newPassNeeded( ri, passRI ) )
                break;
@@ -523,7 +523,7 @@ void RenderPrePassMgr::render( SceneRenderState *state )
    {
       ObjectRenderInst *ri = static_cast<ObjectRenderInst*>( itr->inst );
       if ( ri->renderDelegate )
-         ri->renderDelegate( ri, state, mPrePassMatInstance );
+         ri->renderDelegate( ri, state, mDeferredMatInstance );
    }
 
    // Signal end of pre-pass
@@ -533,7 +533,7 @@ void RenderPrePassMgr::render( SceneRenderState *state )
       _onPostRender();
 }
 
-const GFXStateBlockDesc & RenderPrePassMgr::getOpaqueStenciWriteDesc( bool lightmappedGeometry /*= true*/ )
+const GFXStateBlockDesc & RenderDeferredMgr::getOpaqueStenciWriteDesc( bool lightmappedGeometry /*= true*/ )
 {
    static bool sbInit = false;
    static GFXStateBlockDesc sOpaqueStaticLitStencilWriteDesc;
@@ -548,7 +548,7 @@ const GFXStateBlockDesc & RenderPrePassMgr::getOpaqueStenciWriteDesc( bool light
       sOpaqueStaticLitStencilWriteDesc.stencilEnable = true;
       sOpaqueStaticLitStencilWriteDesc.stencilWriteMask = 0x03;
       sOpaqueStaticLitStencilWriteDesc.stencilMask = 0x03;
-      sOpaqueStaticLitStencilWriteDesc.stencilRef = RenderPrePassMgr::OpaqueStaticLitMask;
+      sOpaqueStaticLitStencilWriteDesc.stencilRef = RenderDeferredMgr::OpaqueStaticLitMask;
       sOpaqueStaticLitStencilWriteDesc.stencilPassOp = GFXStencilOpReplace;
       sOpaqueStaticLitStencilWriteDesc.stencilFailOp = GFXStencilOpKeep;
       sOpaqueStaticLitStencilWriteDesc.stencilZFailOp = GFXStencilOpKeep;
@@ -556,13 +556,13 @@ const GFXStateBlockDesc & RenderPrePassMgr::getOpaqueStenciWriteDesc( bool light
 
       // Same only dynamic
       sOpaqueDynamicLitStencilWriteDesc = sOpaqueStaticLitStencilWriteDesc;
-      sOpaqueDynamicLitStencilWriteDesc.stencilRef = RenderPrePassMgr::OpaqueDynamicLitMask;
+      sOpaqueDynamicLitStencilWriteDesc.stencilRef = RenderDeferredMgr::OpaqueDynamicLitMask;
    }
 
    return (lightmappedGeometry ? sOpaqueStaticLitStencilWriteDesc : sOpaqueDynamicLitStencilWriteDesc);
 }
 
-const GFXStateBlockDesc & RenderPrePassMgr::getOpaqueStencilTestDesc()
+const GFXStateBlockDesc & RenderDeferredMgr::getOpaqueStencilTestDesc()
 {
    static bool sbInit = false;
    static GFXStateBlockDesc sOpaqueStencilTestDesc;
@@ -589,13 +589,13 @@ const GFXStateBlockDesc & RenderPrePassMgr::getOpaqueStencilTestDesc()
 //------------------------------------------------------------------------------
 
 
-ProcessedPrePassMaterial::ProcessedPrePassMaterial( Material& mat, const RenderPrePassMgr *prePassMgr )
-: Parent(mat), mPrePassMgr(prePassMgr)
+ProcessedDeferredMaterial::ProcessedDeferredMaterial( Material& mat, const RenderDeferredMgr *prePassMgr )
+: Parent(mat), mDeferredMgr(prePassMgr)
 {
 
 }
 
-void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
+void ProcessedDeferredMaterial::_determineFeatures( U32 stageNum,
                                                    MaterialFeatureData &fd,
                                                    const FeatureSet &features )
 {
@@ -605,7 +605,7 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
    bool bEnableMRTLightmap = false;
    AdvancedLightBinManager *lightBin;
    if ( Sim::findObject( "AL_LightBinMgr", lightBin ) )
-      bEnableMRTLightmap = lightBin->MRTLightmapsDuringPrePass();
+      bEnableMRTLightmap = lightBin->MRTLightmapsDuringDeferred();
 
    // If this material has a lightmap or tonemap (texture or baked vertex color),
    // it must be static. Otherwise it is dynamic.
@@ -617,17 +617,17 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
                                                       fd.features.hasFeature( MFT_IsTranslucentZWrite) ) ) );
 
    // Integrate proper opaque stencil write state
-   mUserDefined.addDesc( mPrePassMgr->getOpaqueStenciWriteDesc( mIsLightmappedGeometry ) );
+   mUserDefined.addDesc( mDeferredMgr->getOpaqueStenciWriteDesc( mIsLightmappedGeometry ) );
 
    FeatureSet newFeatures;
 
-   // These are always on for prepass.
+   // These are always on for deferred.
    newFeatures.addFeature( MFT_EyeSpaceDepthOut );
-   newFeatures.addFeature( MFT_PrePassConditioner );
+   newFeatures.addFeature( MFT_DeferredConditioner );
 
 #ifndef TORQUE_DEDICATED
 
-   //tag all materials running through prepass as deferred
+   //tag all materials running through deferred as deferred
    newFeatures.addFeature(MFT_isDeferred);
 
    // Deferred Shading : Diffuse
@@ -677,7 +677,7 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
                   type == MFT_DetailNormalMap ||
                   type == MFT_AlphaTest ||
                   type == MFT_Parallax ||
-                  type == MFT_InterlacedPrePass ||
+                  type == MFT_InterlacedDeferred ||
                   type == MFT_Visibility ||
                   type == MFT_UseInstancing ||
                   type == MFT_DiffuseVertColor ||
@@ -764,7 +764,7 @@ void ProcessedPrePassMaterial::_determineFeatures( U32 stageNum,
    fd.features = newFeatures;
 }
 
-U32 ProcessedPrePassMaterial::getNumStages()
+U32 ProcessedDeferredMaterial::getNumStages()
 {
    // Loops through all stages to determine how many 
    // stages we actually use.  
@@ -816,12 +816,12 @@ U32 ProcessedPrePassMaterial::getNumStages()
    return numStages;
 }
 
-void ProcessedPrePassMaterial::addStateBlockDesc(const GFXStateBlockDesc& desc)
+void ProcessedDeferredMaterial::addStateBlockDesc(const GFXStateBlockDesc& desc)
 {
    GFXStateBlockDesc prePassStateBlock = desc;
 
    // Adjust color writes if this is a pure z-fill pass
-   const bool pixelOutEnabled = mPrePassMgr->getTargetChainLength() > 0;
+   const bool pixelOutEnabled = mDeferredMgr->getTargetChainLength() > 0;
    if ( !pixelOutEnabled )
    {
       prePassStateBlock.colorWriteDefined = true;
@@ -832,12 +832,12 @@ void ProcessedPrePassMaterial::addStateBlockDesc(const GFXStateBlockDesc& desc)
    }
 
    // Never allow the alpha test state when rendering
-   // the prepass as we use the alpha channel for the
+   // the deferred as we use the alpha channel for the
    // depth information... MFT_AlphaTest will handle it.
    prePassStateBlock.alphaDefined = true;
    prePassStateBlock.alphaTestEnable = false;
 
-   // If we're translucent then we're doing prepass blending
+   // If we're translucent then we're doing deferred blending
    // which never writes to the depth channels.
    const bool isTranslucent = getMaterial()->isTranslucent();
    if ( isTranslucent )
@@ -853,24 +853,24 @@ void ProcessedPrePassMaterial::addStateBlockDesc(const GFXStateBlockDesc& desc)
    Parent::addStateBlockDesc(prePassStateBlock);
 }
 
-PrePassMatInstance::PrePassMatInstance(MatInstance* root, const RenderPrePassMgr *prePassMgr)
-: Parent(*root->getMaterial()), mPrePassMgr(prePassMgr)
+DeferredMatInstance::DeferredMatInstance(MatInstance* root, const RenderDeferredMgr *prePassMgr)
+: Parent(*root->getMaterial()), mDeferredMgr(prePassMgr)
 {
    mFeatureList = root->getRequestedFeatures();
    mVertexFormat = root->getVertexFormat();
    mUserObject = root->getUserObject();
 }
 
-PrePassMatInstance::~PrePassMatInstance()
+DeferredMatInstance::~DeferredMatInstance()
 {
 }
 
-ProcessedMaterial* PrePassMatInstance::getShaderMaterial()
+ProcessedMaterial* DeferredMatInstance::getShaderMaterial()
 {
-   return new ProcessedPrePassMaterial(*mMaterial, mPrePassMgr);
+   return new ProcessedDeferredMaterial(*mMaterial, mDeferredMgr);
 }
 
-bool PrePassMatInstance::init( const FeatureSet &features,
+bool DeferredMatInstance::init( const FeatureSet &features,
                                const GFXVertexFormat *vertexFormat )
 {
    bool vaild = Parent::init(features, vertexFormat);
@@ -891,27 +891,27 @@ bool PrePassMatInstance::init( const FeatureSet &features,
    return vaild;
 }
 
-PrePassMatInstanceHook::PrePassMatInstanceHook( MatInstance *baseMatInst,
-                                                const RenderPrePassMgr *prePassMgr )
-   : mHookedPrePassMatInst(NULL), mPrePassManager(prePassMgr)
+DeferredMatInstanceHook::DeferredMatInstanceHook( MatInstance *baseMatInst,
+                                                const RenderDeferredMgr *prePassMgr )
+   : mHookedDeferredMatInst(NULL), mDeferredManager(prePassMgr)
 {
    // If the material is a custom material then
-   // hope that using DefaultPrePassMaterial gives
-   // them a good prepass.
+   // hope that using DefaultDeferredMaterial gives
+   // them a good deferred.
    if ( baseMatInst->isCustomMaterial() )
    {
-      MatInstance* dummyInst = static_cast<MatInstance*>( MATMGR->createMatInstance( "AL_DefaultPrePassMaterial", baseMatInst->getVertexFormat() ) );
+      MatInstance* dummyInst = static_cast<MatInstance*>( MATMGR->createMatInstance( "AL_DefaultDeferredMaterial", baseMatInst->getVertexFormat() ) );
 
-      mHookedPrePassMatInst = new PrePassMatInstance( dummyInst, prePassMgr );
-      mHookedPrePassMatInst->init( dummyInst->getRequestedFeatures(), baseMatInst->getVertexFormat());
+      mHookedDeferredMatInst = new DeferredMatInstance( dummyInst, prePassMgr );
+      mHookedDeferredMatInst->init( dummyInst->getRequestedFeatures(), baseMatInst->getVertexFormat());
 
       delete dummyInst;
       return;
    }
 
-   // Create the prepass material instance.
-   mHookedPrePassMatInst = new PrePassMatInstance(baseMatInst, prePassMgr);
-   mHookedPrePassMatInst->getFeaturesDelegate() = baseMatInst->getFeaturesDelegate();
+   // Create the deferred material instance.
+   mHookedDeferredMatInst = new DeferredMatInstance(baseMatInst, prePassMgr);
+   mHookedDeferredMatInst->getFeaturesDelegate() = baseMatInst->getFeaturesDelegate();
 
    // Get the features, but remove the instancing feature if the
    // original material didn't end up using it.
@@ -920,12 +920,12 @@ PrePassMatInstanceHook::PrePassMatInstanceHook( MatInstance *baseMatInst,
       features.removeFeature( MFT_UseInstancing );
 
    // Initialize the material.
-   mHookedPrePassMatInst->init(features, baseMatInst->getVertexFormat());
+   mHookedDeferredMatInst->init(features, baseMatInst->getVertexFormat());
 }
 
-PrePassMatInstanceHook::~PrePassMatInstanceHook()
+DeferredMatInstanceHook::~DeferredMatInstanceHook()
 {
-   SAFE_DELETE(mHookedPrePassMatInst);
+   SAFE_DELETE(mHookedDeferredMatInst);
 }
 
 //------------------------------------------------------------------------------
@@ -1027,10 +1027,10 @@ Var* LinearEyeDepthConditioner::printMethodHeader( MethodType methodType, const 
          methodVar->setType("inline float4");
       DecOp *methodDecl = new DecOp(methodVar);
 
-      Var *prepassSampler = new Var;
-      prepassSampler->setName("prepassSamplerVar");
-      prepassSampler->setType("sampler2D");
-      DecOp *prepassSamplerDecl = new DecOp(prepassSampler);
+      Var *deferredSampler = new Var;
+      deferredSampler->setName("deferredSamplerVar");
+      deferredSampler->setType("sampler2D");
+      DecOp *deferredSamplerDecl = new DecOp(deferredSampler);
 
       Var *screenUV = new Var;
       screenUV->setName("screenUVVar");
@@ -1048,7 +1048,7 @@ Var* LinearEyeDepthConditioner::printMethodHeader( MethodType methodType, const 
          bufferSample->setType("float4");
       DecOp *bufferSampleDecl = new DecOp(bufferSample);
 
-      meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, prepassSamplerDecl, screenUVDecl ) );
+      meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, deferredSamplerDecl, screenUVDecl ) );
 
       meta->addStatement( new GenOp( "{\r\n" ) );
 
@@ -1058,14 +1058,14 @@ Var* LinearEyeDepthConditioner::printMethodHeader( MethodType methodType, const 
       // possible so that the shader compiler can optimize.
       meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
       if (GFX->getAdapterType() == OpenGL)
-         meta->addStatement( new GenOp( "    @ = textureLod(@, @, 0); \r\n", bufferSampleDecl, prepassSampler, screenUV) );
+         meta->addStatement( new GenOp( "    @ = textureLod(@, @, 0); \r\n", bufferSampleDecl, deferredSampler, screenUV) );
       else
-         meta->addStatement( new GenOp( "      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
+         meta->addStatement( new GenOp( "      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, deferredSampler, screenUV ) );
       meta->addStatement( new GenOp( "   #else\r\n" ) );
       if (GFX->getAdapterType() == OpenGL)
-         meta->addStatement( new GenOp( "    @ = texture(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV) );
+         meta->addStatement( new GenOp( "    @ = texture(@, @);\r\n", bufferSampleDecl, deferredSampler, screenUV) );
       else
-         meta->addStatement( new GenOp( "      @ = tex2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV ) );
+         meta->addStatement( new GenOp( "      @ = tex2D(@, @);\r\n", bufferSampleDecl, deferredSampler, screenUV ) );
       meta->addStatement( new GenOp( "   #endif\r\n\r\n" ) );
 
       // We don't use this way of passing var's around, so this should cause a crash
@@ -1076,7 +1076,7 @@ Var* LinearEyeDepthConditioner::printMethodHeader( MethodType methodType, const 
    return retVal;
 }
 
-void RenderPrePassMgr::_initShaders()
+void RenderDeferredMgr::_initShaders()
 {
    if ( mClearGBufferShader ) return;
 
@@ -1084,7 +1084,7 @@ void RenderPrePassMgr::_initShaders()
    ShaderData *shaderData;
    mClearGBufferShader = Sim::findObject( "ClearGBufferShader", shaderData ) ? shaderData->getShader() : NULL;
    if ( !mClearGBufferShader )
-      Con::errorf( "RenderPrePassMgr::_initShaders - could not find ClearGBufferShader" );
+      Con::errorf( "RenderDeferredMgr::_initShaders - could not find ClearGBufferShader" );
 
    // Create StateBlocks
    GFXStateBlockDesc desc;
@@ -1108,7 +1108,7 @@ void RenderPrePassMgr::_initShaders()
    mSpecularPowerSC = mClearGBufferShader->getShaderConstHandle( "$specularPower" );
 }
 
-void RenderPrePassMgr::clearBuffers()
+void RenderDeferredMgr::clearBuffers()
 {
    // Clear z-buffer.
    GFX->clear( GFXClearTarget | GFXClearZBuffer | GFXClearStencil, ColorI::ZERO, 1.0f, 0);

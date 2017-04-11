@@ -83,7 +83,7 @@ new CustomMaterial( AL_VectorLightMaterial )
    shader = AL_VectorLightShader;
    stateBlock = AL_VectorLightState;
    
-   sampler["prePassBuffer"] = "#prepass";
+   sampler["prePassBuffer"] = "#deferred";
    sampler["shadowMap"] = "$dynamiclight";
    sampler["dynamicShadowMap"] = "$dynamicShadowMap";
    sampler["ssaoMask"] = "#ssaoMask";  
@@ -160,7 +160,7 @@ new CustomMaterial( AL_PointLightMaterial )
    shader = AL_PointLightShader;
    stateBlock = AL_ConvexLightState;
    
-   sampler["prePassBuffer"] = "#prepass";
+   sampler["prePassBuffer"] = "#deferred";
    sampler["shadowMap"] = "$dynamiclight";
    sampler["dynamicShadowMap"] = "$dynamicShadowMap";
    sampler["cookieMap"] = "$dynamiclightmask";
@@ -199,7 +199,7 @@ new CustomMaterial( AL_SpotLightMaterial )
    shader = AL_SpotLightShader;
    stateBlock = AL_ConvexLightState;
    
-   sampler["prePassBuffer"] = "#prepass";
+   sampler["prePassBuffer"] = "#deferred";
    sampler["shadowMap"] = "$dynamiclight";
    sampler["dynamicShadowMap"] = "$dynamicShadowMap";
    sampler["cookieMap"] = "$dynamiclightmask";
@@ -212,9 +212,9 @@ new CustomMaterial( AL_SpotLightMaterial )
    pixVersion = 3.0;
 };
 
-/// This material is used for generating prepass 
+/// This material is used for generating deferred 
 /// materials for objects that do not have materials.
-new Material( AL_DefaultPrePassMaterial )
+new Material( AL_DefaultDeferredMaterial )
 {
    // We need something in the first pass else it 
    // won't create a proper material instance.  
@@ -269,7 +269,7 @@ new CustomMaterial( AL_ParticlePointLightMaterial )
    shader = AL_ParticlePointLightShader;
    stateBlock = AL_ConvexLightState;
    
-   sampler["prePassBuffer"] = "#prepass";
+   sampler["prePassBuffer"] = "#deferred";
    target = "lightinfo";
    
    pixVersion = 3.0;

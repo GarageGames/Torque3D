@@ -353,7 +353,7 @@ void LevelInfo::_onLMActivate(const char *lm, bool enable)
    {
       AssertFatal(dynamic_cast<AdvancedLightManager *>(LIGHTMGR), "Bad light manager type!");
       AdvancedLightManager *lightMgr = static_cast<AdvancedLightManager *>(LIGHTMGR);
-      lightMgr->getLightBinManager()->MRTLightmapsDuringPrePass(mAdvancedLightmapSupport);
+      lightMgr->getLightBinManager()->MRTLightmapsDuringDeferred(mAdvancedLightmapSupport);
    }
 #endif
 }

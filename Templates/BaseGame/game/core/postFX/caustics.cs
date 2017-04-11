@@ -41,7 +41,7 @@ singleton ShaderData( PFX_CausticsShader )
    OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/caustics/gl/causticsP.glsl";
       
-   samplerNames[0] = "$prepassTex";
+   samplerNames[0] = "$deferredTex";
    samplerNames[1] = "$causticsTex0";
    samplerNames[2] = "$causticsTex1";
    
@@ -57,7 +57,7 @@ singleton PostEffect( CausticsPFX )
       
    shader = PFX_CausticsShader;
    stateBlock = PFX_CausticsStateBlock;
-   texture[0] = "#prepass";
+   texture[0] = "#deferred";
    texture[1] = "core/images/caustics_1";
    texture[2] = "core/images/caustics_2";
    target = "$backBuffer";

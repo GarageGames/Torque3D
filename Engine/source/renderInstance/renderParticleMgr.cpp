@@ -22,7 +22,7 @@
 
 #include "platform/platform.h"
 #include "renderInstance/renderParticleMgr.h"
-#include "renderInstance/renderPrePassMgr.h"
+#include "renderInstance/renderDeferredMgr.h"
 #include "scene/sceneManager.h"
 #include "scene/sceneObject.h"
 #include "scene/sceneRenderState.h"
@@ -512,17 +512,17 @@ void RenderParticleMgr::renderParticle(ParticleRenderInst* ri, SceneRenderState*
 
       GFX->setTexture( mParticleShaderConsts.mSamplerDiffuse->getSamplerRegister(), ri->diffuseTex );
 
-   // Set up the prepass texture.
-   if ( mParticleShaderConsts.mPrePassTargetParamsSC->isValid() )
+   // Set up the deferred texture.
+   if ( mParticleShaderConsts.mDeferredTargetParamsSC->isValid() )
    {
-      GFXTextureObject *texObject = mPrepassTarget ? mPrepassTarget->getTexture(0) : NULL;
-         GFX->setTexture( mParticleShaderConsts.mSamplerPrePassTex->getSamplerRegister(), texObject );
+      GFXTextureObject *texObject = mDeferredTarget ? mDeferredTarget->getTexture(0) : NULL;
+         GFX->setTexture( mParticleShaderConsts.mSamplerDeferredTex->getSamplerRegister(), texObject );
 
       Point4F rtParams( 0.0f, 0.0f, 1.0f, 1.0f );
       if ( texObject )
-         ScreenSpace::RenderTargetParameters(texObject->getSize(), mPrepassTarget->getViewport(), rtParams);
+         ScreenSpace::RenderTargetParameters(texObject->getSize(), mDeferredTarget->getViewport(), rtParams);
 
-      mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mPrePassTargetParamsSC, rtParams );
+      mParticleShaderConsts.mShaderConsts->set( mParticleShaderConsts.mDeferredTargetParamsSC, rtParams );
    }
 
    GFX->setPrimitiveBuffer( *ri->primBuff );
@@ -538,8 +538,8 @@ bool RenderParticleMgr::_initShader()
 
    // Need depth from pre-pass, so get the macros
    Vector<GFXShaderMacro> macros;
-   if ( mPrepassTarget )
-      mPrepassTarget->getShaderMacros( &macros );
+   if ( mDeferredTarget )
+      mDeferredTarget->getShaderMacros( &macros );
 
    // Create particle shader
    if ( !Sim::findObject( "ParticlesShaderData", shaderData ) || !shaderData )
@@ -557,11 +557,11 @@ bool RenderParticleMgr::_initShader()
       mParticleShaderConsts.mAlphaFactorSC = mParticleShader->getShaderConstHandle( "$alphaFactor" );
       mParticleShaderConsts.mAlphaScaleSC = mParticleShader->getShaderConstHandle( "$alphaScale" );
       mParticleShaderConsts.mFSModelViewProjSC = mParticleShader->getShaderConstHandle( "$fsModelViewProj" );
-      mParticleShaderConsts.mPrePassTargetParamsSC = mParticleShader->getShaderConstHandle( "$prePassTargetParams" );
+      mParticleShaderConsts.mDeferredTargetParamsSC = mParticleShader->getShaderConstHandle( "$prePassTargetParams" );
 
       //samplers
       mParticleShaderConsts.mSamplerDiffuse = mParticleShader->getShaderConstHandle("$diffuseMap");
-      mParticleShaderConsts.mSamplerPrePassTex = mParticleShader->getShaderConstHandle("$prepassTex");
+      mParticleShaderConsts.mSamplerDeferredTex = mParticleShader->getShaderConstHandle("$deferredTex");
       mParticleShaderConsts.mSamplerParaboloidLightMap = mParticleShader->getShaderConstHandle("$paraboloidLightMap");
    }
 
@@ -596,18 +596,18 @@ void RenderParticleMgr::_onLMActivate( const char*, bool activate )
          return;
 
       // Hunt for the pre-pass manager/target
-      RenderPrePassMgr *prePassBin = NULL;
+      RenderDeferredMgr *prePassBin = NULL;
       for( U32 i = 0; i < rpm->getManagerCount(); i++ )
       {
          RenderBinManager *bin = rpm->getManager(i);
-         if( bin->getRenderInstType() == RenderPrePassMgr::RIT_PrePass )
+         if( bin->getRenderInstType() == RenderDeferredMgr::RIT_Deferred )
          {
-            prePassBin = (RenderPrePassMgr*)bin;
+            prePassBin = (RenderDeferredMgr*)bin;
             break;
          }
       }
 
-      // If we found the prepass bin, set this bin to render very shortly afterwards
+      // If we found the deferred bin, set this bin to render very shortly afterwards
       // and re-add this render-manager. If there is no pre-pass bin, or it doesn't
       // have a depth-texture, we can't render offscreen.
       mOffscreenRenderEnabled = prePassBin && (prePassBin->getTargetChainLength() > 0);
@@ -619,7 +619,7 @@ void RenderParticleMgr::_onLMActivate( const char*, bool activate )
       }
 
       // Find the targets we use
-      mPrepassTarget = NamedTexTarget::find( "prepass" );
+      mDeferredTarget = NamedTexTarget::find( "deferred" );
       mEdgeTarget = NamedTexTarget::find( "edge" );
 
       // Setup the shader
@@ -668,7 +668,7 @@ GFXStateBlockRef RenderParticleMgr::_getOffscreenStateBlock(ParticleRenderInst *
    d.samplers[0].alphaArg1 = GFXTATexture;
    d.samplers[0].alphaArg2 = GFXTADiffuse;
 
-   // Prepass sampler
+   // Deferred sampler
    d.samplers[1] = GFXSamplerStateDesc::getClampPoint();
 
    mOffscreenBlocks[blendStyle] = GFX->createStateBlock(d);
@@ -701,7 +701,7 @@ GFXStateBlockRef RenderParticleMgr::_getHighResStateBlock(ParticleRenderInst *ri
    d.samplers[0].alphaArg1 = GFXTATexture;
    d.samplers[0].alphaArg2 = GFXTADiffuse;
 
-   // Prepass sampler
+   // Deferred sampler
    d.samplers[1] = GFXSamplerStateDesc::getClampPoint();
 
    mHighResBlocks[blendStyle] = GFX->createStateBlock(d);
@@ -773,7 +773,7 @@ GFXStateBlockRef RenderParticleMgr::_getMixedResStateBlock(ParticleRenderInst *r
    d.samplers[0].alphaArg1 = GFXTATexture;
    d.samplers[0].alphaArg2 = GFXTADiffuse;
 
-   // Prepass sampler
+   // Deferred sampler
    d.samplers[1] = GFXSamplerStateDesc::getClampPoint();
 
    mMixedResBlocks[blendStyle] = GFX->createStateBlock(d);
