@@ -809,7 +809,7 @@ NetSocket Net::openConnectTo(const char *addressString)
       error = Net::WrongProtocolType;
    }
 
-   if (error != NoError || error == NeedHostLookup)
+   if (error == NoError || error == NeedHostLookup) // Open socket
    {
       handleFd = openSocket();
    }
@@ -826,10 +826,15 @@ NetSocket Net::openConnectTo(const char *addressString)
          if (::connect(socketFd, (struct sockaddr *)&ipAddr, sizeof(ipAddr)) == -1 &&
             errno != EINPROGRESS)
          {
-            Con::errorf("Error connecting %s: %s",
-               addressString, strerror(errno));
-            closeSocket(handleFd);
-            handleFd = NetSocket::INVALID;
+            error = PlatformNetState::getLastError(); // Output this error if not 10035 then close
+
+            if (error != Net::WouldBlock) // Resource temporarily unavailable.
+            {
+              Con::errorf("Error connecting %s: %s",
+                 addressString, strerror(errno));
+              closeSocket(handleFd);
+              handleFd = NetSocket::INVALID;
+            }
          }
       }
       else
