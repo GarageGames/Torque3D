@@ -95,8 +95,8 @@ GuiAutoScrollCtrl::GuiAutoScrollCtrl()
      mStartDelay( 3.f ),
      mResetDelay( 5.f ),
      mChildBorder( 10 ),
-     mScrollSpeed( 1.f ),
-     mScrollOutOfSight( false )
+     mScrollOutOfSight( false ),
+     mScrollSpeed( 1.f )
 {
    mIsContainer = true;
 }

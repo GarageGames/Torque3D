@@ -42,8 +42,8 @@ ConsoleDocClass( TSForestItemData,
 );
 
 TSForestItemData::TSForestItemData()
-   :  mShapeInstance( NULL ),
-      mIsClientObject( false )
+   :  mIsClientObject( false ),
+      mShapeInstance( NULL )
 {
 }
 

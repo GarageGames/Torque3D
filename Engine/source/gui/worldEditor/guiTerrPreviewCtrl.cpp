@@ -36,7 +36,7 @@ ConsoleDocClass( GuiTerrPreviewCtrl,
    "@internal"
 );
 
-GuiTerrPreviewCtrl::GuiTerrPreviewCtrl(void) : mTerrainEditor(NULL), mTerrainSize(2048.0f)
+GuiTerrPreviewCtrl::GuiTerrPreviewCtrl(void) : mTerrainSize(2048.0f), mTerrainEditor(NULL)
 {
    mRoot.set( 0, 0 );
    mOrigin.set( 0, 0 );

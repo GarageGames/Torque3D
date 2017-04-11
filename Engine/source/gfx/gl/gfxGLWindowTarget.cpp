@@ -36,8 +36,8 @@ GFX_ImplementTextureProfile( BackBufferDepthProfile,
                              GFXTextureProfile::NONE );
 
 GFXGLWindowTarget::GFXGLWindowTarget(PlatformWindow *win, GFXDevice *d)
-      : GFXWindowTarget(win), mDevice(d), mContext(NULL), mFullscreenContext(NULL)
-      , mCopyFBO(0), mBackBufferFBO(0), mSecondaryWindow(false)
+      : GFXWindowTarget(win), mDevice(d), mContext(NULL), mCopyFBO(0)
+      , mFullscreenContext(NULL), mBackBufferFBO(0), mSecondaryWindow(false)
 {      
    win->appEvent.notify(this, &GFXGLWindowTarget::_onAppSignal);
 }

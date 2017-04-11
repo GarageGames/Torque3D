@@ -158,8 +158,8 @@ public:
 blTerrainProxy::blTerrainProxy( SceneObject *obj ) :
    Parent( obj ),
    mLightMapSize( getObject()->getLightMapSize() ),
-   mTerrainBlockSize( getObject()->getBlockSize() ),
    mShadowVolume( NULL ),
+   mTerrainBlockSize( getObject()->getBlockSize() ),
    mLightmap( NULL ),
    sgBakedLightmap( NULL )
 {

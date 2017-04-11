@@ -217,8 +217,8 @@ EndImplementEnumType;
 SFXPlayList::SFXPlayList()
    : mRandomMode( RANDOM_NotRandom ),
      mLoopMode( LOOP_All ),
-     mNumSlotsToPlay( NUM_SLOTS ),
-     mTrace( false )
+     mTrace( false ),
+     mNumSlotsToPlay( NUM_SLOTS )
 {
 }
 

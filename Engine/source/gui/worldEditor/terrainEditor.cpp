@@ -668,11 +668,11 @@ TerrainEditor::TerrainEditor() :
    mMousePos(0,0,0),
    mMouseBrush(0),
    mInAction(false),
-   mUndoSel(0),
    mGridUpdateMin( S32_MAX, S32_MAX ),
+   mUndoSel(0),
    mGridUpdateMax( 0, 0 ),
-   mMaxBrushSize(256,256),
    mNeedsGridUpdate( false ),
+   mMaxBrushSize(256,256),
    mNeedsMaterialUpdate( false ),
    mMouseDown( false )
 {

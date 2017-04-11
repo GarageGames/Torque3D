@@ -66,8 +66,8 @@ mModuleId(StringTable->EmptyString()),
     mModuleScriptFilePath(StringTable->EmptyString()),
     mSignature(StringTable->EmptyString()),
     mLoadCount( 0 ),
-    mLocked( false ),
     mScopeSet( 0 ),
+    mLocked( false ),
     mpModuleManager( NULL )
 {
     // Set Vector Associations.

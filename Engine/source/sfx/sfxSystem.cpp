@@ -198,8 +198,8 @@ SFXSystem::SFXSystem()
       mStatNumVoices( 0 ),
       mStatSourceUpdateTime( 0 ),
       mStatParameterUpdateTime( 0 ),
-      mStatAmbientUpdateTime( 0 ),
       mDistanceModel( SFXDistanceModelLinear ),
+      mStatAmbientUpdateTime( 0 ),
       mDopplerFactor( 0.5 ),
       mRolloffFactor( 1.0 ),
       mSoundscapeMgr( NULL )

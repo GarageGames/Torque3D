@@ -159,8 +159,8 @@ ConsoleDocClass( ForestSelectionTool,
 
 ForestSelectionTool::ForestSelectionTool()
    :  Parent(),
-      mCurrAction( NULL ),
       mGizmo( NULL ),
+      mCurrAction( NULL ),
       mGizmoProfile( NULL )
 {
    mBounds = Box3F::Invalid;

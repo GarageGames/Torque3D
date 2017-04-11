@@ -38,8 +38,8 @@ ConsoleDocClass( WorldEditorSelection,
 WorldEditorSelection::WorldEditorSelection()
    :  mCentroidValid(false),
       mAutoSelect(false),
-      mPrevCentroid(0.0f, 0.0f, 0.0f),
-      mContainsGlobalBounds(false)
+      mContainsGlobalBounds(false),
+      mPrevCentroid(0.0f, 0.0f, 0.0f)
 {
    // Selections are transient by default.
    setCanSave( false );
