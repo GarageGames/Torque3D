@@ -1057,6 +1057,7 @@ bool GBitmap::write(Stream& io_rStream) const
 
 bool  GBitmap::readBitmap( const String &bmType, Stream &ioStream )
 {
+   PROFILE_SCOPE(ResourceGBitmap_readBitmap);
    const GBitmap::Registration   *regInfo = GBitmap::sFindRegInfo( bmType );
 
    if ( regInfo == NULL )

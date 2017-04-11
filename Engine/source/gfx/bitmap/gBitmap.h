@@ -39,6 +39,9 @@
 #include "gfx/gfxEnums.h" // For the format
 #endif
 
+#ifndef _PROFILER_H_
+#include "platform/profiler.h"
+#endif
 //-------------------------------------- Forward decls.
 class Stream;
 class RectI;
