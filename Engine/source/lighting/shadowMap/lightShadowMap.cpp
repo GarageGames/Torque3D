@@ -83,12 +83,12 @@ GFX_ImplementTextureProfile( ShadowMapZProfile,
 
 LightShadowMap::LightShadowMap( LightInfo *light )
    :  mWorldToLightProj( true ),
-      mLight( light ),
       mTexSize( 0 ),
-      mLastShader( NULL ),
+      mLight( light ),
       mLastUpdate( 0 ),
-      mLastCull( 0 ),
+      mLastShader( NULL ),
       mIsViewDependent( false ),
+      mLastCull( 0 ),
       mLastScreenSize( 0.0f ),
       mLastPriority( 0.0f ),
       mIsDynamic( false )
@@ -580,8 +580,8 @@ MODULE_END;
 LightInfoExType ShadowMapParams::Type( "" );
 
 ShadowMapParams::ShadowMapParams( LightInfo *light ) 
-   :  mLight( light ),
-      mShadowMap( NULL ),
+   :  mShadowMap( NULL ),
+      mLight( light ),
       mDynamicShadowMap ( NULL ),
       isDynamic ( true )
 {

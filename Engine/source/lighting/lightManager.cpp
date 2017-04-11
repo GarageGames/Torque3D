@@ -46,11 +46,11 @@ LightManager *LightManager::smActiveLM = NULL;
 LightManager::LightManager( const char *name, const char *id )
    :  mName( name ),
       mId( id ),
-      mIsActive( false ),      
-      mSceneManager( NULL ),
+      mIsActive( false ),
       mDefaultLight( NULL ),
-      mAvailableSLInterfaces( NULL ),
-      mCullPos( Point3F::Zero )
+      mSceneManager( NULL ),
+      mCullPos( Point3F::Zero ),
+      mAvailableSLInterfaces( NULL )
 { 
    _getLightManagers().insert( mName, this );
 

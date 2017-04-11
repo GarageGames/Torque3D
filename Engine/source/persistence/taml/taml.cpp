@@ -142,9 +142,9 @@ Taml::Taml() :
     mJSONStrict( true ),
     mBinaryCompression(true),
     mWriteDefaults(false),
-    mProgenitorUpdate(true),    
+    mAutoFormatXmlExtension("taml"),
     mAutoFormat(true),
-    mAutoFormatXmlExtension("taml"),    
+    mProgenitorUpdate(true),
     mAutoFormatBinaryExtension("baml"),
     mAutoFormatJSONExtension("json")
 {

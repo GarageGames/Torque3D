@@ -245,8 +245,8 @@ AsyncPacketBufferedInputStream< Stream, Packet >::AsyncPacketBufferedInputStream
             ThreadContext* threadContext )
    : Parent( stream, numSourceElementsToRead, numReadAhead, isLooping, threadPool, threadContext ),
      mPacketSize( packetSize ),
-     mNumTotalSourceElements( numSourceElementsToRead ),
-     mNextPacketIndex( 0 )
+     mNextPacketIndex( 0 ),
+     mNumTotalSourceElements( numSourceElementsToRead )
 {
    AssertFatal( mPacketSize > 0,
       "AsyncPacketStream::AsyncPacketStream() - packet size cannot be zero" );
