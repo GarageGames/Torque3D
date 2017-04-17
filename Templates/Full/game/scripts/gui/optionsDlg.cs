@@ -23,6 +23,9 @@
 
 /// Returns true if the current quality settings equal
 /// this graphics quality level.
+
+// boolean flag for vehicle control remappings
+$vehicleMapped = false;
 function GraphicsQualityLevel::isCurrent( %this )
 {
    // Test each pref to see if the current value
@@ -231,6 +234,8 @@ function OptionsDlg::onSleep(%this)
 {
    // write out the control config into the rw/config.cs file
    moveMap.save( "scripts/client/config.cs" );
+   // saving vehicle mappings into separate config file
+   vehicleMap.save("scripts/client/config_vehicle.cs"); 
 }
 
 function OptGraphicsDriverMenu::onSelect( %this, %id, %text )
@@ -518,11 +523,31 @@ $RemapCount++;
 $RemapName[$RemapCount] = "Bring up Options Dialog";
 $RemapCmd[$RemapCount] = "bringUpOptions";
 $RemapCount++;
+// adding manageable vehicle mappings to options gui screen
+$RemapName[$RemapCount] = "Vehicle Move Forward";
+$RemapCmd[$RemapCount] = "moveforward";
+$RemapCount++;
+$RemapName[$RemapCount] = "Vehicle Move Backward";
+$RemapCmd[$RemapCount] = "moveBackward";
+$RemapCount++;
+$RemapName[$RemapCount] = "Vehicle brake";
+$RemapCmd[$RemapCount] = "brake";
+$RemapCount++;
+$RemapName[$RemapCount] = "Vehicle free look";
+$RemapCmd[$RemapCount] = "toggleFreeLook";
+$RemapCount++;
+$RemapName[$RemapCount] = "Vehicle mouseFire";
+$RemapCmd[$RemapCount] = "mouseFire";
+$RemapCount++;
+$RemapName[$RemapCount] = "Vehicle alt trigger";
+$RemapCmd[$RemapCount] = "altTrigger";
+$RemapCount++;
 
 
 function restoreDefaultMappings()
 {
    moveMap.delete();
+   vehicleMap.delete();  
    exec( "scripts/client/default.bind.cs" );
    optionsDlg.fillRemapList();
 }
@@ -591,6 +616,12 @@ function buildFullMapString( %index )
    %name       = $RemapName[%index];
    %cmd        = $RemapCmd[%index];
 
+   // getting exact type of binding based on Remap name
+   if(getSubStr(%name,0,7) $= "Vehicle" )     
+   {
+       %temp = vehicleMap.getBinding( %cmd );
+   }
+   else
    %temp = moveMap.getBinding( %cmd );
    if ( %temp $= "" )
       return %name TAB "";
@@ -624,19 +655,27 @@ function OptionsDlg::doRemap( %this )
 {
    %remapList = %this-->OptRemapList;
    
-	%selId = %remapList.getSelectedId();
+   %selId = %remapList.getSelectedId();
    %name = $RemapName[%selId];
 
-	RemapDlg-->OptRemapText.setValue( "Re-bind \"" @ %name @ "\" to..." );
-	OptRemapInputCtrl.index = %selId;
-	Canvas.pushDialog( RemapDlg );
+    //turning on the vehicle mapping flag if selected item is vehicle remapping
+    if(getSubStr(%name,0,7) $= "Vehicle") 
+       $vehicleMapped = true;
+        
+    RemapDlg-->OptRemapText.setValue( "Re-bind \"" @ %name @ "\" to..." );
+    OptRemapInputCtrl.index = %selId;
+    Canvas.pushDialog( RemapDlg );
 }
 
 function redoMapping( %device, %action, %cmd, %oldIndex, %newIndex )
 {
 	//%actionMap.bind( %device, %action, $RemapCmd[%newIndex] );
+	//performing desired remapping based on flag
+    if(!$vehicleMapped)
 	moveMap.bind( %device, %action, %cmd );
-	
+    else
+	vehicleMap.bind( %device, %action, %cmd );
+    
    %remapList = %this-->OptRemapList;
 	%remapList.setRowById( %oldIndex, buildFullMapString( %oldIndex ) );
 	%remapList.setRowById( %newIndex, buildFullMapString( %newIndex ) );
@@ -656,7 +695,13 @@ function findRemapCmdIndex( %command )
 /// particular moveMap %commmand.
 function unbindExtraActions( %command, %count )
 {
-   %temp = moveMap.getBinding( %command );
+   //get current key binding (checking for vehicle mapping)
+   if(!$vehicleMapped)
+    %temp = moveMap.getBinding( %command );
+   else
+    %temp = vehicleMap.getBinding( %command );
+   
+    
    if ( %temp $= "" )
       return;
 
@@ -665,14 +710,17 @@ function unbindExtraActions( %command, %count )
    {
       %device = getField( %temp, %i + 0 );
       %action = getField( %temp, %i + 1 );
-      
-      moveMap.unbind( %device, %action );
-   }
+      //performing desired unbinding of mapped key
+      if(!$vehicleMapped)
+       moveMap.unbind( %device, %action );
+      else
+       vehicleMap.unbind( %device, %action );
+  
+    }
 }
 
 function OptRemapInputCtrl::onInputEvent( %this, %device, %action )
 {
-   //error( "** onInputEvent called - device = " @ %device @ ", action = " @ %action @ " **" );
    Canvas.popDialog( RemapDlg );
 
    // Test for the reserved keystrokes:
@@ -693,15 +741,22 @@ function OptRemapInputCtrl::onInputEvent( %this, %device, %action )
    // which we'll use when prompting the user below.
    %mapName = getMapDisplayName( %device, %action );
    
-   // Get the current command this action is mapped to.
-   %prevMap = moveMap.getCommand( %device, %action );
-
+   // Get the current command this action is mapped to
+   if(!$vehicleMapped)
+    %prevMap = moveMap.getCommand( %device, %action );
+   else
+    %prevMap = vehicleMap.getCommand( %device, %action );
+    
    // If nothing was mapped to the previous command 
    // mapping then it's easy... just bind it.
    if ( %prevMap $= "" )
    {
       unbindExtraActions( %cmd, 1 );
-      moveMap.bind( %device, %action, %cmd );
+      // performing desired binding (vehicleMap or moveMap)
+      if(!$vehicleMapped)
+       moveMap.bind( %device, %action, %cmd );
+      else
+       vehicleMap.bind( %device, %action, %cmd );
       optionsDlg-->OptRemapList.setRowById( %this.index, buildFullMapString( %this.index ) );
       return;
    }
@@ -712,10 +767,15 @@ function OptRemapInputCtrl::onInputEvent( %this, %device, %action )
    if ( %prevMap $= %cmd )
    {
       unbindExtraActions( %cmd, 0 );
+     //performing desired binding (vehicleMap or moveMap)
+     if(!$vehicleMapped)
       moveMap.bind( %device, %action, %cmd );
-      optionsDlg-->OptRemapList.setRowById( %this.index, buildFullMapString( %this.index ) );
-      return;   
+     else
+      vehicleMap.bind( %device, %action, %cmd );
+     optionsDlg-->OptRemapList.setRowById( %this.index, buildFullMapString( %this.index ) );
+     return;   
    }
+    $vehicleMapped = false;
 
    // Look for the index of the previous mapping.
    %prevMapIndex = findRemapCmdIndex( %prevMap );
