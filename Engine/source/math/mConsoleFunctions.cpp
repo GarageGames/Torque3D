@@ -373,3 +373,20 @@ DefineConsoleFunction( mGetAngleBetweenVectors, F32, (VectorF vecA, VectorF vecB
 {
    return MathUtils::getAngleBetweenVectors(vecA, vecB);
 }
+
+DefineConsoleFunction(mGetSignedAngleBetweenVectors, F32, (VectorF vecA, VectorF vecB, VectorF norm), (VectorF::Zero, VectorF::Zero, VectorF::Zero),
+   "Returns signed angle between two vectors, using a normal for orientation.\n"
+   "@param vecA First input vector."
+   "@param vecB Second input vector."
+   "@param norm Normal/Cross Product vector."
+   "@returns Angle between both vectors in radians."
+   "@ingroup Math")
+{
+   if (vecA.isZero() || vecB.isZero() || norm.isZero())
+   {
+      Con::errorf("mGetSignedAngleBetweenVectors - Error! Requires all 3 vectors used to be non-zero!");
+      return 0;
+   }
+
+   return MathUtils::getSignedAngleBetweenVectors(vecA, vecB, norm);
+}

@@ -546,7 +546,7 @@ void DecalManager::removeDecal( DecalInstance *inst )
 
    // Remove the decal from the instance vector.
    
-	if( inst->mId != -1 && inst->mId < mDecalInstanceVec.size() )
+   if( inst->mId != -1 && inst->mId < mDecalInstanceVec.size() )
       mDecalInstanceVec[ inst->mId ] = NULL;
    
    // Release its geometry (if it has any).
@@ -674,23 +674,23 @@ DecalInstance* DecalManager::raycast( const Point3F &start, const Point3F &end, 
 
          if ( !worldSphere.intersectsRay( start, end ) )
             continue;
-			
-			RayInfo ri;
-			bool containsPoint = false;
-			if ( gServerContainer.castRayRendered( start, end, STATIC_COLLISION_TYPEMASK, &ri ) )
-			{        
-				Point2F poly[4];
-				poly[0].set( inst->mPosition.x - (inst->mSize / 2), inst->mPosition.y + (inst->mSize / 2));
-				poly[1].set( inst->mPosition.x - (inst->mSize / 2), inst->mPosition.y - (inst->mSize / 2));
-				poly[2].set( inst->mPosition.x + (inst->mSize / 2), inst->mPosition.y - (inst->mSize / 2));
-				poly[3].set( inst->mPosition.x + (inst->mSize / 2), inst->mPosition.y + (inst->mSize / 2));
-				
-				if ( MathUtils::pointInPolygon( poly, 4, Point2F(ri.point.x, ri.point.y) ) )
-					containsPoint = true;
-			}
+         
+         RayInfo ri;
+         bool containsPoint = false;
+         if ( gServerContainer.castRayRendered( start, end, STATIC_COLLISION_TYPEMASK, &ri ) )
+         {        
+            Point2F poly[4];
+            poly[0].set( inst->mPosition.x - (inst->mSize / 2), inst->mPosition.y + (inst->mSize / 2));
+            poly[1].set( inst->mPosition.x - (inst->mSize / 2), inst->mPosition.y - (inst->mSize / 2));
+            poly[2].set( inst->mPosition.x + (inst->mSize / 2), inst->mPosition.y - (inst->mSize / 2));
+            poly[3].set( inst->mPosition.x + (inst->mSize / 2), inst->mPosition.y + (inst->mSize / 2));
+            
+            if ( MathUtils::pointInPolygon( poly, 4, Point2F(ri.point.x, ri.point.y) ) )
+               containsPoint = true;
+         }
 
-			if( !containsPoint )
-				continue;
+         if( !containsPoint )
+            continue;
 
          hitDecals.push_back( inst );
       }
@@ -1406,7 +1406,7 @@ void DecalManager::prepRenderImage( SceneRenderState* state )
          query.init( rootFrustum.getPosition(),
                      rootFrustum.getTransform().getForwardVector(),
                      rootFrustum.getFarDist() );
-		   query.getLights( baseRenderInst.lights, 8 );
+         query.getLights( baseRenderInst.lights, 8 );
       }
 
       // Submit render inst...
@@ -1575,7 +1575,7 @@ void DecalManager::clearData()
    }
    
    mData = NULL;
-	mDecalInstanceVec.clear();
+   mDecalInstanceVec.clear();
 
    _freePools();   
 }
@@ -1758,7 +1758,7 @@ DefineEngineFunction( decalManagerEditDecal, bool, ( S32 decalID, Point3F pos, P
 {
    DecalInstance *decalInstance = gDecalManager->getDecal( decalID );
    if( !decalInstance )
-		return false;
+      return false;
 
    //Internally we need Point3F tangent instead of the user friendly F32 rotAroundNormal
    MatrixF mat( true );

@@ -57,15 +57,15 @@ typedef void (*fnSetScanBuffer)(const char *sb, const char *fn);
 //-----------------------------------------------------------------------------
 struct ConsoleParser
 {
-	struct ConsoleParser *next;       //!< Next object in list or NULL
+   struct ConsoleParser *next;       //!< Next object in list or NULL
 
-	char *ext;                        //!< Filename extension handled by this parser
-	
-	fnGetCurrentFile getCurrentFile;  //!< GetCurrentFile lexer function
-	fnGetCurrentLine getCurrentLine;  //!< GetCurrentLine lexer function
-	fnParse          parse;           //!< Parse lexer function
-	fnRestart        restart;         //!< Restart lexer function
-	fnSetScanBuffer  setScanBuffer;   //!< SetScanBuffer lexer function
+   char *ext;                        //!< Filename extension handled by this parser
+   
+   fnGetCurrentFile getCurrentFile;  //!< GetCurrentFile lexer function
+   fnGetCurrentLine getCurrentLine;  //!< GetCurrentLine lexer function
+   fnParse          parse;           //!< Parse lexer function
+   fnRestart        restart;         //!< Restart lexer function
+   fnSetScanBuffer  setScanBuffer;   //!< SetScanBuffer lexer function
 };
 
 // Macros
@@ -74,18 +74,18 @@ struct ConsoleParser
 /// \brief Declare a parser's function prototypes
 //-----------------------------------------------------------------------------
 #define CON_DECLARE_PARSER(prefix) \
-	const char * prefix##GetCurrentFile(); \
-	S32 prefix##GetCurrentLine(); \
-	void prefix##SetScanBuffer(const char *sb, const char *fn); \
-	S32 prefix##parse(); \
-	void prefix##restart(FILE *input_file)
+   const char * prefix##GetCurrentFile(); \
+   S32 prefix##GetCurrentLine(); \
+   void prefix##SetScanBuffer(const char *sb, const char *fn); \
+   S32 prefix##parse(); \
+   void prefix##restart(FILE *input_file)
 
 //-----------------------------------------------------------------------------
 /// \brief Helper macro to add console parsers
 //-----------------------------------------------------------------------------
 #define CON_ADD_PARSER(prefix, ext, def) \
-	Compiler::addConsoleParser(ext, prefix##GetCurrentFile, prefix##GetCurrentLine, prefix##parse, \
-						  prefix##restart, prefix##SetScanBuffer, def)
+   Compiler::addConsoleParser(ext, prefix##GetCurrentFile, prefix##GetCurrentLine, prefix##parse, \
+                    prefix##restart, prefix##SetScanBuffer, def)
 
 //-----------------------------------------------------------------------------
 /// \brief Free the console parser list

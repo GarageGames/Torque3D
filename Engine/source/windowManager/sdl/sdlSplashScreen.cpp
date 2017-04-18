@@ -98,15 +98,31 @@ bool Platform::displaySplashWindow( String path )
       SDL_RenderPresent(gSplashRenderer);
    }
 
-	return true;
+   return true;
 }
 
 bool Platform::closeSplashWindow()
 {
-   SDL_DestroyTexture(gSplashTexture);
-   SDL_FreeSurface(gSplashImage);
-   SDL_DestroyRenderer(gSplashRenderer);
-   SDL_DestroyWindow(gSplashWindow);
+   if (gSplashTexture != nullptr)
+   {
+      SDL_DestroyTexture(gSplashTexture);
+      gSplashTexture = nullptr;
+   }
+   if (gSplashImage != nullptr)
+   {
+      SDL_FreeSurface(gSplashImage);
+      gSplashImage = nullptr;
+   }
+   if (gSplashRenderer != nullptr)
+   {
+      SDL_DestroyRenderer(gSplashRenderer);
+      gSplashRenderer = nullptr;
+   }
+   if (gSplashWindow != nullptr)
+   {
+      SDL_DestroyWindow(gSplashWindow);
+      gSplashWindow = nullptr;
+   }
 
    return true;
 }

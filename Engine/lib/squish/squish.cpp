@@ -23,7 +23,7 @@
 	
    -------------------------------------------------------------------------- */
    
-#include <squish.h>
+#include "squish.h"
 #include "colourset.h"
 #include "maths.h"
 #include "rangefit.h"
@@ -37,37 +37,58 @@ namespace squish {
 static int FixFlags( int flags )
 {
 	// grab the flag bits
-	int method = flags & ( kDxt1 | kDxt3 | kDxt5 );
+	int method = flags & ( kDxt1 | kDxt3 | kDxt5 | kBc4 | kBc5 );
 	int fit = flags & ( kColourIterativeClusterFit | kColourClusterFit | kColourRangeFit );
-	int metric = flags & ( kColourMetricPerceptual | kColourMetricUniform );
 	int extra = flags & kWeightColourByAlpha;
 	
 	// set defaults
-	if( method != kDxt3 && method != kDxt5 )
+	if ( method != kDxt3
+	&&   method != kDxt5
+	&&   method != kBc4
+	&&   method != kBc5 )
+	{
 		method = kDxt1;
-	if( fit != kColourRangeFit )
+	}
+	if( fit != kColourRangeFit && fit != kColourIterativeClusterFit )
 		fit = kColourClusterFit;
-	if( metric != kColourMetricUniform )
-		metric = kColourMetricPerceptual;
 		
 	// done
-	return method | fit | metric | extra;
+	return method | fit | extra;
 }
 
-void Compress( u8 const* rgba, void* block, int flags )
-{
-	// compress with full mask
-	CompressMasked( rgba, 0xffff, block, flags );
-}
-
-void CompressMasked( u8 const* rgba, int mask, void* block, int flags )
+void CompressMasked( u8 const* rgba, int mask, void* block, int flags, float* metric )
 {
 	// fix any bad flags
 	flags = FixFlags( flags );
 
+	if ( ( flags & ( kBc4 | kBc5 ) ) != 0 )
+	{
+		u8 alpha[16*4];
+		for( int i = 0; i < 16; ++i )
+		{
+			alpha[i*4 + 3] = rgba[i*4 + 0]; // copy R to A
+		}
+
+		u8* rBlock = reinterpret_cast< u8* >( block );
+		CompressAlphaDxt5( alpha, mask, rBlock );
+
+		if ( ( flags & ( kBc5 ) ) != 0 )
+		{
+			for( int i = 0; i < 16; ++i )
+			{
+				alpha[i*4 + 3] = rgba[i*4 + 1]; // copy G to A
+			}
+
+			u8* gBlock = reinterpret_cast< u8* >( block ) + 8;
+			CompressAlphaDxt5( alpha, mask, gBlock );
+		}
+
+		return;
+	}
+
 	// get the block locations
 	void* colourBlock = block;
-	void* alphaBock = block;
+	void* alphaBlock = block;
 	if( ( flags & ( kDxt3 | kDxt5 ) ) != 0 )
 		colourBlock = reinterpret_cast< u8* >( block ) + 8;
 
@@ -84,21 +105,21 @@ void CompressMasked( u8 const* rgba, int mask, void* block, int flags )
 	else if( ( flags & kColourRangeFit ) != 0 || colours.GetCount() == 0 )
 	{
 		// do a range fit
-		RangeFit fit( &colours, flags );
+		RangeFit fit( &colours, flags, metric );
 		fit.Compress( colourBlock );
 	}
 	else
 	{
 		// default to a cluster fit (could be iterative or not)
-		ClusterFit fit( &colours, flags );
+		ClusterFit fit( &colours, flags, metric );
 		fit.Compress( colourBlock );
 	}
 	
 	// compress alpha separately if necessary
 	if( ( flags & kDxt3 ) != 0 )
-		CompressAlphaDxt3( rgba, mask, alphaBock );
+		CompressAlphaDxt3( rgba, mask, alphaBlock );
 	else if( ( flags & kDxt5 ) != 0 )
-		CompressAlphaDxt5( rgba, mask, alphaBock );
+		CompressAlphaDxt5( rgba, mask, alphaBlock );
 }
 
 void Decompress( u8* rgba, void const* block, int flags )
@@ -129,18 +150,18 @@ int GetStorageRequirements( int width, int height, int flags )
 	
 	// compute the storage requirements
 	int blockcount = ( ( width + 3 )/4 ) * ( ( height + 3 )/4 );
-	int blocksize = ( ( flags & kDxt1 ) != 0 ) ? 8 : 16;
-	return blockcount*blocksize;	
+	int blocksize = ( ( flags & ( kDxt1 | kBc4 ) ) != 0 ) ? 8 : 16;
+	return blockcount*blocksize;
 }
 
-void CompressImage( u8 const* rgba, int width, int height, void* blocks, int flags )
+void CompressImage( u8 const* rgba, int width, int height, void* blocks, int flags, float* metric )
 {
 	// fix any bad flags
 	flags = FixFlags( flags );
 
 	// initialise the block output
 	u8* targetBlock = reinterpret_cast< u8* >( blocks );
-	int bytesPerBlock = ( ( flags & kDxt1 ) != 0 ) ? 8 : 16;
+	int bytesPerBlock = ( ( flags & ( kDxt1 | kBc4 ) ) != 0 ) ? 8 : 16;
 
 	// loop over blocks
 	for( int y = 0; y < height; y += 4 )
@@ -179,7 +200,7 @@ void CompressImage( u8 const* rgba, int width, int height, void* blocks, int fla
 			}
 			
 			// compress it into the output
-			CompressMasked( sourceRgba, mask, targetBlock, flags );
+			CompressMasked( sourceRgba, mask, targetBlock, flags, metric );
 			
 			// advance
 			targetBlock += bytesPerBlock;
@@ -194,7 +215,7 @@ void DecompressImage( u8* rgba, int width, int height, void const* blocks, int f
 
 	// initialise the block input
 	u8 const* sourceBlock = reinterpret_cast< u8 const* >( blocks );
-	int bytesPerBlock = ( ( flags & kDxt1 ) != 0 ) ? 8 : 16;
+	int bytesPerBlock = ( ( flags & ( kDxt1 | kBc4 ) ) != 0 ) ? 8 : 16;
 
 	// loop over blocks
 	for( int y = 0; y < height; y += 4 )

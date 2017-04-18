@@ -45,7 +45,7 @@ class SimXMLDocument: public SimObject
 {
    // This typedef is required for tie ins with the script language.
    // --------------------------------------------------------------------------
-	protected:
+   protected:
       typedef SimObject Parent;
    // --------------------------------------------------------------------------
 
@@ -85,8 +85,8 @@ class SimXMLDocument: public SimObject
       bool nextSiblingElement(const char* rName);
       // push child element at index onto stack.
       bool pushChildElement(S32 index);
-	  // Get element value
-	  const char* elementValue();
+     // Get element value
+     const char* elementValue();
       
       // Pop last element off of stack.
       void popElement(void);
@@ -94,16 +94,16 @@ class SimXMLDocument: public SimObject
       // Get attribute from top element on element stack.
       const char* attribute(const char* rAttribute);
 
-	  // Does the attribute exist in the current element
+     // Does the attribute exist in the current element
       bool attributeExists(const char* rAttribute);
 
-	  // Obtain the name of the current element's first or last attribute
-	  const char* firstAttribute();
-	  const char* lastAttribute();
+     // Obtain the name of the current element's first or last attribute
+     const char* firstAttribute();
+     const char* lastAttribute();
 
-	  // Move through the current element's attributes to obtain their names
-	  const char* nextAttribute();
-	  const char* prevAttribute();
+     // Move through the current element's attributes to obtain their names
+     const char* nextAttribute();
+     const char* prevAttribute();
 
       // Set attribute of top element on element stack.
       void setAttribute(const char* rAttribute, const char* rVal);
@@ -139,8 +139,8 @@ class SimXMLDocument: public SimObject
       TiXmlDocument* m_qDocument;
       // Stack of nodes.
       Vector<TiXmlElement*> m_paNode;
-	  // The current attribute
-	  TiXmlAttribute* m_CurrentAttribute;
+     // The current attribute
+     TiXmlAttribute* m_CurrentAttribute;
 
    public:
       DECLARE_CONOBJECT(SimXMLDocument);

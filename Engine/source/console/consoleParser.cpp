@@ -35,21 +35,21 @@ static ConsoleParser *gDefaultParser = NULL;
 
 void freeConsoleParserList(void)
 {
-	while(gParserList)
-	{
+   while(gParserList)
+   {
       ConsoleParser * pParser = gParserList;
-		gParserList = pParser->next;
-		delete pParser;
-	}
+      gParserList = pParser->next;
+      delete pParser;
+   }
 
-	gDefaultParser = NULL;
+   gDefaultParser = NULL;
 }
 
 bool addConsoleParser(char *ext, fnGetCurrentFile gcf, fnGetCurrentLine gcl, fnParse p, fnRestart r, fnSetScanBuffer ssb, bool def)
 {
-	AssertFatal(ext && gcf && gcl && p && r, "AddConsoleParser called with one or more NULL arguments");
+   AssertFatal(ext && gcf && gcl && p && r, "AddConsoleParser called with one or more NULL arguments");
 
-	ConsoleParser * pParser = new ConsoleParser;
+   ConsoleParser * pParser = new ConsoleParser;
 
    pParser->ext = ext;
    pParser->getCurrentFile = gcf;
@@ -69,23 +69,23 @@ bool addConsoleParser(char *ext, fnGetCurrentFile gcf, fnGetCurrentLine gcl, fnP
 
 ConsoleParser * getParserForFile(const char *filename)
 {
-	if(filename == NULL)
-		return gDefaultParser;
+   if(filename == NULL)
+      return gDefaultParser;
 
-	char *ptr = dStrrchr((char *)filename, '.');
-	if(ptr != NULL)
-	{
-		ptr++;
+   char *ptr = dStrrchr((char *)filename, '.');
+   if(ptr != NULL)
+   {
+      ptr++;
 
-		ConsoleParser *p;
-		for(p = gParserList; p; p = p->next)
-		{
-			if(dStricmp(ptr, p->ext) == 0)
-				return p;
-		}
-	}
+      ConsoleParser *p;
+      for(p = gParserList; p; p = p->next)
+      {
+         if(dStricmp(ptr, p->ext) == 0)
+            return p;
+      }
+   }
 
-	return gDefaultParser;
+   return gDefaultParser;
 }
 
 } // end namespace Con

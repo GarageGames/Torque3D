@@ -463,12 +463,12 @@ DefineConsoleFunction( strposr, S32, ( const char* haystack, const char* needle,
    U32 sublen = dStrlen( needle );
    U32 strlen = dStrlen( haystack );
    S32 start = strlen - offset;
-   	
+      
    if(start < 0 || start > strlen)
       return -1;
    
    if (start + sublen > strlen)
-	  start = strlen - sublen;
+     start = strlen - sublen;
    for(; start >= 0; start--)
       if(!dStrncmp(haystack + start, needle, sublen))
          return start;
@@ -1022,15 +1022,15 @@ DefineConsoleFunction( strrchrpos, S32, ( const char* str, const char* chr, S32 
 //----------------------------------------------------------------
 
 DefineConsoleFunction(ColorFloatToInt, ColorI, (ColorF color), ,
-	"Convert from a float color to an integer color (0.0 - 1.0 to 0 to 255).\n"
-	"@param color Float color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha.\n"
-	"@return Converted color value (0 - 255)\n\n"
-	"@tsexample\n"
-	"ColorFloatToInt( \"0 0 1 0.5\" ) // Returns \"0 0 255 128\".\n"
-	"@endtsexample\n"
-	"@ingroup Strings")
+   "Convert from a float color to an integer color (0.0 - 1.0 to 0 to 255).\n"
+   "@param color Float color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha.\n"
+   "@return Converted color value (0 - 255)\n\n"
+   "@tsexample\n"
+   "ColorFloatToInt( \"0 0 1 0.5\" ) // Returns \"0 0 255 128\".\n"
+   "@endtsexample\n"
+   "@ingroup Strings")
 {
-	return (ColorI)color;
+   return (ColorI)color;
 }
 
 DefineConsoleFunction(ColorIntToFloat, ColorF, (ColorI color), ,
@@ -1201,8 +1201,8 @@ DefineConsoleFunction( isValidIP, bool, ( const char* str),,
 ConsoleFunction(addCaseSensitiveStrings,void,2,0,"[string1, string2, ...]"
                 "Adds case sensitive strings to the StringTable.")
 {
-	for(int i = 1; i < argc; i++)
-		StringTable->insert(argv[i], true);
+   for(int i = 1; i < argc; i++)
+      StringTable->insert(argv[i], true);
 }
 
 //=============================================================================
@@ -1645,7 +1645,7 @@ DefineConsoleFunction( nextToken, const char*, ( const char* str1, const char* t
    "@endtsexample\n\n"
    "@ingroup Strings" )
 {
-	char buffer[4096];
+   char buffer[4096];
    dStrncpy(buffer, str1, 4096);
    char *str = buffer;
 
@@ -1812,7 +1812,7 @@ DefineEngineFunction( detag, const char*, ( const char* str ),,
       "{\n"
       "   onChatMessage(detag(%msgString), %voice, %pitch);\n"
       "}\n"
-	"@endtsexample\n\n"
+   "@endtsexample\n\n"
 
    "@see \\ref syntaxDataTypes under Tagged %Strings\n"
    "@see getTag()\n"
@@ -2017,8 +2017,8 @@ DefineConsoleFunction( collapseEscape, const char*, ( const char* text ),,
 //-----------------------------------------------------------------------------
 
 DefineEngineFunction( setLogMode, void, ( S32 mode ),,
-	"@brief Determines how log files are written.\n\n"
-	"Sets the operational mode of the console logging system.\n\n"
+   "@brief Determines how log files are written.\n\n"
+   "Sets the operational mode of the console logging system.\n\n"
    "@param mode Parameter specifying the logging mode.  This can be:\n"
       "- 1: Open and close the console log file for each seperate string of output.  This will ensure that all "
          "parts get written out to disk and that no parts remain in intermediate buffers even if the process crashes.\n"
@@ -2030,8 +2030,8 @@ DefineEngineFunction( setLogMode, void, ( S32 mode ),,
       "combined by binary OR with 0x4 to cause the logging system to flush all console log messages that had already been "
       "issued to the console system into the newly created log file.\n\n"
 
-	"@note Xbox 360 does not support logging to a file. Use Platform::OutputDebugStr in C++ instead."
-	"@ingroup Logging" )
+   "@note Xbox 360 does not support logging to a file. Use Platform::OutputDebugStr in C++ instead."
+   "@ingroup Logging" )
 {
    Con::setLogMode( mode );
 }
@@ -2144,7 +2144,7 @@ DefineEngineFunction( gotoWebPage, void, ( const char* address ),,
 DefineEngineFunction( displaySplashWindow, bool, (const char* path), (""),
    "Display a startup splash window suitable for showing while the engine still starts up.\n\n"
    "@note This is currently only implemented on Windows.\n\n"
-   "@param path	relative path to splash screen image to display.\n"
+   "@param path   relative path to splash screen image to display.\n"
    "@return True if the splash window could be successfully initialized.\n\n"
    "@ingroup Platform" )
 {
@@ -2395,19 +2395,19 @@ DefineConsoleFunction( setVariable, void, ( const char* varName, const char* val
 }
 
 DefineConsoleFunction( isFunction, bool, ( const char* funcName ), , "(string funcName)" 
-	"@brief Determines if a function exists or not\n\n"
-	"@param funcName String containing name of the function\n"
-	"@return True if the function exists, false if not\n"
-	"@ingroup Scripting")
+   "@brief Determines if a function exists or not\n\n"
+   "@param funcName String containing name of the function\n"
+   "@return True if the function exists, false if not\n"
+   "@ingroup Scripting")
 {
    return Con::isFunction(funcName);
 }
 
 DefineConsoleFunction( getFunctionPackage, const char*, ( const char* funcName ), , "(string funcName)" 
-	"@brief Provides the name of the package the function belongs to\n\n"
-	"@param funcName String containing name of the function\n"
-	"@return The name of the function's package\n"
-	"@ingroup Packages")
+   "@brief Provides the name of the package the function belongs to\n\n"
+   "@param funcName String containing name of the function\n"
+   "@return The name of the function's package\n"
+   "@ingroup Packages")
 {
    Namespace::Entry* nse = Namespace::global()->lookup( StringTable->insert( funcName ) );
    if( !nse )
@@ -2417,11 +2417,11 @@ DefineConsoleFunction( getFunctionPackage, const char*, ( const char* funcName )
 }
 
 DefineConsoleFunction( isMethod, bool, ( const char* nameSpace, const char* method ), , "(string namespace, string method)" 
-	"@brief Determines if a class/namespace method exists\n\n"
-	"@param namespace Class or namespace, such as Player\n"
-	"@param method Name of the function to search for\n"
-	"@return True if the method exists, false if not\n"
-	"@ingroup Scripting\n")
+   "@brief Determines if a class/namespace method exists\n\n"
+   "@param namespace Class or namespace, such as Player\n"
+   "@param method Name of the function to search for\n"
+   "@return True if the method exists, false if not\n"
+   "@ingroup Scripting\n")
 {
    Namespace* ns = Namespace::find( StringTable->insert( nameSpace ) );
    Namespace::Entry* nse = ns->lookup( StringTable->insert( method ) );
@@ -2432,11 +2432,11 @@ DefineConsoleFunction( isMethod, bool, ( const char* nameSpace, const char* meth
 }
 
 DefineConsoleFunction( getMethodPackage, const char*, ( const char* nameSpace, const char* method ), , "(string namespace, string method)" 
-	"@brief Provides the name of the package the method belongs to\n\n"
-	"@param namespace Class or namespace, such as Player\n"
-	"@param method Name of the funciton to search for\n"
-	"@return The name of the method's package\n"
-	"@ingroup Packages")
+   "@brief Provides the name of the package the method belongs to\n\n"
+   "@param namespace Class or namespace, such as Player\n"
+   "@param method Name of the funciton to search for\n"
+   "@return The name of the method's package\n"
+   "@ingroup Packages")
 {
    Namespace* ns = Namespace::find( StringTable->insert( nameSpace ) );
    if( !ns )
@@ -2450,13 +2450,13 @@ DefineConsoleFunction( getMethodPackage, const char*, ( const char* nameSpace, c
 }
 
 DefineConsoleFunction( isDefined, bool, ( const char* varName, const char* varValue ), ("") , "(string varName)" 
-	"@brief Determines if a variable exists and contains a value\n"
-	"@param varName Name of the variable to search for\n"
-	"@return True if the variable was defined in script, false if not\n"
+   "@brief Determines if a variable exists and contains a value\n"
+   "@param varName Name of the variable to search for\n"
+   "@return True if the variable was defined in script, false if not\n"
    "@tsexample\n"
       "isDefined( \"$myVar\" );\n"
    "@endtsexample\n\n"
-	"@ingroup Scripting")
+   "@ingroup Scripting")
 {
    if(String::isEmpty(varName))
    {
@@ -2595,10 +2595,10 @@ DefineConsoleFunction( isCurrentScriptToolScript, bool, (), , "()"
 }
 
 DefineConsoleFunction( getModNameFromPath, const char *, ( const char* path ), , "(string path)" 
-				"@brief Attempts to extract a mod directory from path. Returns empty string on failure.\n\n"
-				"@param File path of mod folder\n"
-				"@note This is no longer relevant in Torque 3D (which does not use mod folders), should be deprecated\n"
-				"@internal")
+            "@brief Attempts to extract a mod directory from path. Returns empty string on failure.\n\n"
+            "@param File path of mod folder\n"
+            "@note This is no longer relevant in Torque 3D (which does not use mod folders), should be deprecated\n"
+            "@internal")
 {
    StringTableEntry modPath = Con::getModNameFromPath(path);
    return modPath ? modPath : "";
@@ -2607,11 +2607,11 @@ DefineConsoleFunction( getModNameFromPath, const char *, ( const char* path ), ,
 //-----------------------------------------------------------------------------
 
 DefineConsoleFunction( pushInstantGroup, void, ( String group ),("") , "([group])" 
-				"@brief Pushes the current $instantGroup on a stack "
-				"and sets it to the given value (or clears it).\n\n"
-				"@note Currently only used for editors\n"
-				"@ingroup Editors\n"
-				"@internal")
+            "@brief Pushes the current $instantGroup on a stack "
+            "and sets it to the given value (or clears it).\n\n"
+            "@note Currently only used for editors\n"
+            "@ingroup Editors\n"
+            "@internal")
 {
    if( group.size() > 0 )
       Con::pushInstantGroup( group );
@@ -2620,10 +2620,10 @@ DefineConsoleFunction( pushInstantGroup, void, ( String group ),("") , "([group]
 }
 
 DefineConsoleFunction( popInstantGroup, void, (), , "()" 
-				"@brief Pop and restore the last setting of $instantGroup off the stack.\n\n"
-				"@note Currently only used for editors\n\n"
-				"@ingroup Editors\n"
-				"@internal")
+            "@brief Pop and restore the last setting of $instantGroup off the stack.\n\n"
+            "@note Currently only used for editors\n\n"
+            "@ingroup Editors\n"
+            "@internal")
 {
    Con::popInstantGroup();
 }
@@ -2631,8 +2631,8 @@ DefineConsoleFunction( popInstantGroup, void, (), , "()"
 //-----------------------------------------------------------------------------
 
 DefineConsoleFunction( getPrefsPath, const char *, ( const char* relativeFileName ), (""), "([relativeFileName])" 
-				"@note Appears to be useless in Torque 3D, should be deprecated\n"
-				"@internal")
+            "@note Appears to be useless in Torque 3D, should be deprecated\n"
+            "@internal")
 {
    const char *filename = Platform::getPrefsPath(relativeFileName);
    if(filename == NULL || *filename == 0)
@@ -2644,13 +2644,13 @@ DefineConsoleFunction( getPrefsPath, const char *, ( const char* relativeFileNam
 //-----------------------------------------------------------------------------
 
 ConsoleFunction( execPrefs, bool, 2, 4, "( string relativeFileName, bool noCalls=false, bool journalScript=false )"
-				"@brief Manually execute a special script file that contains game or editor preferences\n\n"
-				"@param relativeFileName Name and path to file from project folder\n"
-				"@param noCalls Deprecated\n"
-				"@param journalScript Deprecated\n"
-				"@return True if script was successfully executed\n"
-				"@note Appears to be useless in Torque 3D, should be deprecated\n"
-				"@ingroup Scripting")
+            "@brief Manually execute a special script file that contains game or editor preferences\n\n"
+            "@param relativeFileName Name and path to file from project folder\n"
+            "@param noCalls Deprecated\n"
+            "@param journalScript Deprecated\n"
+            "@return True if script was successfully executed\n"
+            "@note Appears to be useless in Torque 3D, should be deprecated\n"
+            "@ingroup Scripting")
 {
    const char *filename = Platform::getPrefsPath(argv[1]);
    if(filename == NULL || *filename == 0)
@@ -2791,8 +2791,8 @@ DefineEngineFunction( isToolBuild, bool, (),,
 }
 
 DefineEngineFunction( getMaxDynamicVerts, S32, (),,
-	"Get max number of allowable dynamic vertices in a single vertex buffer.\n\n"
-	"@return the max number of allowable dynamic vertices in a single vertex buffer" )
+   "Get max number of allowable dynamic vertices in a single vertex buffer.\n\n"
+   "@return the max number of allowable dynamic vertices in a single vertex buffer" )
 {
    return MAX_DYNAMIC_VERTS / 2;
 }

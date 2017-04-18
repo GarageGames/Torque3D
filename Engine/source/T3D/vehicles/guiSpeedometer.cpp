@@ -156,7 +156,7 @@ void GuiSpeedometerHud::onRender(Point2I offset, const RectI &updateRect)
    if (!conn)
       return;
 
-   // Requires either a vehicle control object or a vehicle-mounted player		
+   // Requires either a vehicle control object or a vehicle-mounted player    
    Vehicle* vehicle = dynamic_cast<Vehicle*>(conn->getControlObject());
    if(!vehicle){
       Player * player = dynamic_cast<Player*>(conn->getControlObject());
@@ -183,20 +183,20 @@ void GuiSpeedometerHud::onRender(Point2I offset, const RectI &updateRect)
    F32 fillOffset = GFX->getFillConventionOffset(); // Find the fill offset
    Point2F viewCenter(offset.x + fillOffset + center.x, offset.y + fillOffset + center.y);
 
-   // Handle rotation calculations	
+   // Handle rotation calculations  
    F32 rotation, spinAngle;
    rotation = mMinAngle + (mMaxAngle - mMinAngle) * (mSpeed / mMaxSpeed);
    spinAngle = mDegToRad(rotation);
    MatrixF rotMatrix(EulerF(0.0, 0.0, spinAngle));
 
-	// Set up the needle vertex list
-	Point3F vertList[5];
-	vertList[0].set(+mNeedleLength,-mNeedleWidth,0);
-	vertList[1].set(+mNeedleLength,+mNeedleWidth,0);
-	vertList[2].set(-mTailLength  ,+mNeedleWidth,0);
-	vertList[3].set(-mTailLength  ,-mNeedleWidth,0);   
-	vertList[4].set(+mNeedleLength,-mNeedleWidth,0); //// Get back to the start!
-	
+   // Set up the needle vertex list
+   Point3F vertList[5];
+   vertList[0].set(+mNeedleLength,-mNeedleWidth,0);
+   vertList[1].set(+mNeedleLength,+mNeedleWidth,0);
+   vertList[2].set(-mTailLength  ,+mNeedleWidth,0);
+   vertList[3].set(-mTailLength  ,-mNeedleWidth,0);   
+   vertList[4].set(+mNeedleLength,-mNeedleWidth,0); //// Get back to the start!
+   
    // Create a GFXStateBlock description if one has not been set.
    if (mBlendSB.isNull())
    {

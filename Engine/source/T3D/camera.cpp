@@ -1351,7 +1351,7 @@ void Camera::consoleInit()
    // ExtendedMove support
    Con::addVariable("$camera::extendedMovePosRotIndex", TypeS32, &smExtendedMovePosRotIndex, 
       "@brief The ExtendedMove position/rotation index used for camera movements.\n\n"
-	   "@ingroup BaseCamera\n");
+      "@ingroup BaseCamera\n");
 }
 
 //-----------------------------------------------------------------------------

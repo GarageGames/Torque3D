@@ -540,8 +540,8 @@ void Lightning::renderObject(ObjectRenderInst *ri, SceneRenderState *state, Base
    }
 
    //GFX->setZWriteEnable(true);
-	//GFX->setAlphaTestEnable(false);
-	//GFX->setAlphaBlendEnable(false);
+   //GFX->setAlphaTestEnable(false);
+   //GFX->setAlphaBlendEnable(false);
 }
 
 void Lightning::scheduleThunder(Strike* newStrike)
@@ -743,9 +743,9 @@ void Lightning::warningFlashes()
       {
          LightningStrikeEvent* pEvent = new LightningStrikeEvent;
          pEvent->mLightning = this;
-		 
-		 pEvent->mStart.x = strikePoint.x;
-		 pEvent->mStart.y = strikePoint.y;
+       
+       pEvent->mStart.x = strikePoint.x;
+       pEvent->mStart.y = strikePoint.y;
 
          nc->postNetEvent(pEvent);
       }
@@ -905,7 +905,7 @@ void Lightning::strikeObject(ShapeBase* targetObj)
       {
          LightningStrikeEvent* pEvent = new LightningStrikeEvent;
          pEvent->mLightning = this;
-		 
+       
          pEvent->mStart.x = strikePoint.x;
          pEvent->mStart.y = strikePoint.y;
          pEvent->mTarget = targetObj;
@@ -1100,7 +1100,7 @@ void LightningBolt::render( const Point3F &camPos )
          renderSegment(mMinorNodes[i], camPos, false);
    }
 
-	PrimBuild::end();
+   PrimBuild::end();
 
    for(LightingBoltList::Iterator i = splitList.begin(); i != splitList.end(); ++i)
    {
@@ -1230,7 +1230,7 @@ void LightningBolt::createSplit( const Point3F &startingPoint, const Point3F &en
 {
    if( depth == 0 )
       return;
-	  
+     
    F32 chanceToEnd = gRandGen.randF();
    if( chanceToEnd > 0.70f )
       return;
@@ -1275,7 +1275,7 @@ void LightningBolt::startSplits()
    for( U32 i=0; i<mMajorNodes.numNodes-1; i++ )
    {
       if( gRandGen.randF() > 0.3f )
-	     continue;
+        continue;
 
       Node node = mMajorNodes.nodeList[i];
       Node node2 = mMajorNodes.nodeList[i+1];

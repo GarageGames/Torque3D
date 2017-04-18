@@ -53,7 +53,7 @@ bool BtWorld::initWorld( bool isServer, ProcessList *processList )
 {
    // Collision configuration contains default setup for memory, collision setup.
    mCollisionConfiguration = new btDefaultCollisionConfiguration();
-   mDispatcher = new	btCollisionDispatcher( mCollisionConfiguration );
+   mDispatcher = new btCollisionDispatcher( mCollisionConfiguration );
   
    btVector3 worldMin( -2000, -2000, -1000 );
    btVector3 worldMax( 2000, 2000, 1000 );

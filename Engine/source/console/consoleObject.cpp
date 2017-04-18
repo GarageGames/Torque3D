@@ -334,15 +334,15 @@ AbstractClassRep *AbstractClassRep::getCommonParent( const AbstractClassRep *oth
 static char replacebuf[1024];
 static char* suppressSpaces(const char* in_pname)
 {
-	U32 i = 0;
-	char chr;
-	do
-	{
-		chr = in_pname[i];
-		replacebuf[i++] = (chr != 32) ? chr : '_';
-	} while(chr);
+   U32 i = 0;
+   char chr;
+   do
+   {
+      chr = in_pname[i];
+      replacebuf[i++] = (chr != 32) ? chr : '_';
+   } while(chr);
 
-	return replacebuf;
+   return replacebuf;
 }
 
 void ConsoleObject::addGroup(const char* in_pGroupname, const char* in_pGroupDocs)
@@ -740,8 +740,8 @@ static const char* returnClassList( Vector< AbstractClassRep* >& classes, U32 bu
 //------------------------------------------------------------------------------
 
 DefineEngineFunction( isClass, bool,  ( const char* identifier ),,
-				"@brief Returns true if the passed identifier is the name of a declared class.\n\n"
-				"@ingroup Console")
+            "@brief Returns true if the passed identifier is the name of a declared class.\n\n"
+            "@ingroup Console")
 {
    AbstractClassRep* rep = AbstractClassRep::findClassRep( identifier );
    return rep != NULL;
@@ -765,10 +765,10 @@ DefineEngineFunction( isMemberOfClass, bool, ( const char* className, const char
 }
 
 DefineEngineFunction( getDescriptionOfClass, const char*, ( const char* className ),,
-				"@brief Returns the description string for the named class.\n\n"
-				"@param className The name of the class.\n"
-				"@return The class description in string format.\n"
-				"@ingroup Console")
+            "@brief Returns the description string for the named class.\n\n"
+            "@param className The name of the class.\n"
+            "@return The class description in string format.\n"
+            "@ingroup Console")
 {
    AbstractClassRep* rep = AbstractClassRep::findClassRep( className );
    if( rep )
@@ -779,9 +779,9 @@ DefineEngineFunction( getDescriptionOfClass, const char*, ( const char* classNam
 }
 
 DefineEngineFunction( getCategoryOfClass, const char*,  ( const char* className ),,
-				"@brief Returns the category of the given class.\n\n"
-				"@param className The name of the class.\n"
-				"@ingroup Console")
+            "@brief Returns the category of the given class.\n\n"
+            "@param className The name of the class.\n"
+            "@ingroup Console")
 {
    AbstractClassRep* rep = AbstractClassRep::findClassRep( className );
    if( rep )
@@ -792,12 +792,12 @@ DefineEngineFunction( getCategoryOfClass, const char*,  ( const char* className 
 }
 
 DefineEngineFunction( enumerateConsoleClasses, const char*, ( const char* className ), ( "" ),
-				"@brief Returns a list of classes that derive from the named class.\n\n"
+            "@brief Returns a list of classes that derive from the named class.\n\n"
             "If the named class is omitted this dumps all the classes.\n"
             "@param className The optional base class name.\n"
-				"@return A tab delimited list of classes.\n"
+            "@return A tab delimited list of classes.\n"
             "@ingroup Editors\n"
-				"@internal")
+            "@internal")
 {
    AbstractClassRep *base = NULL;    
    if(className && *className)
@@ -822,11 +822,11 @@ DefineEngineFunction( enumerateConsoleClasses, const char*, ( const char* classN
 }
 
 DefineEngineFunction( enumerateConsoleClassesByCategory, const char*, ( String category ),,
-				"@brief Provide a list of classes that belong to the given category.\n\n"
-				"@param category The category name.\n"
-				"@return A tab delimited list of classes.\n"
-				"@ingroup Editors\n"
-				"@internal")
+            "@brief Provide a list of classes that belong to the given category.\n\n"
+            "@param category The category name.\n"
+            "@return A tab delimited list of classes.\n"
+            "@ingroup Editors\n"
+            "@internal")
 {
    U32 categoryLength = category.length();
    
@@ -914,10 +914,10 @@ DefineEngineFunction( dumpNetStats, void, (),,
 }
 
 DefineEngineFunction( sizeof, S32, ( const char *objectOrClass ),,
-				"@brief Determines the memory consumption of a class or object.\n\n"
-				"@param objectOrClass The object or class being measured.\n"
-				"@return Returns the total size of an object in bytes.\n"
-				"@ingroup Debugging\n")
+            "@brief Determines the memory consumption of a class or object.\n\n"
+            "@param objectOrClass The object or class being measured.\n"
+            "@return Returns the total size of an object in bytes.\n"
+            "@ingroup Debugging\n")
 {
    AbstractClassRep *acr = NULL;
    SimObject *obj = Sim::findObject(objectOrClass);

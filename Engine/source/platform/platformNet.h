@@ -214,6 +214,12 @@ struct Net
    static bool smMulticastEnabled;
    static bool smIpv4Enabled;
    static bool smIpv6Enabled;
+   
+   static ConnectionNotifyEvent*   smConnectionNotify;
+   static ConnectionAcceptedEvent* smConnectionAccept;
+   static ConnectionReceiveEvent*  smConnectionReceive;
+   static PacketReceiveEvent*      smPacketReceive;
+
 
    static bool init();
    static void shutdown();

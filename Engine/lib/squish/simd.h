@@ -27,14 +27,6 @@
 #define SQUISH_SIMD_H
 
 #include "maths.h"
-
-#if SQUISH_USE_ALTIVEC
-#include "simd_ve.h"
-#elif SQUISH_USE_SSE
-#include "simd_sse.h"
-#else
 #include "simd_float.h"
-#endif
-
 
 #endif // ndef SQUISH_SIMD_H

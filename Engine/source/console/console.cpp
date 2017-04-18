@@ -278,8 +278,8 @@ bool useTimestamp = false;
 ConsoleFunctionGroupBegin( Clipboard, "Miscellaneous functions to control the clipboard and clear the console.");
 
 DefineConsoleFunction( cls, void, (), , "()"
-				"@brief Clears the console output.\n\n"
-				"@ingroup Console")
+            "@brief Clears the console output.\n\n"
+            "@ingroup Console")
 {
    if(consoleLogLocked)
       return;
@@ -288,17 +288,17 @@ DefineConsoleFunction( cls, void, (), , "()"
 };
 
 DefineConsoleFunction( getClipboard, const char*, (), , "()"
-				"@brief Get text from the clipboard.\n\n"
-				"@internal")
+            "@brief Get text from the clipboard.\n\n"
+            "@internal")
 {
-	return Platform::getClipboard();
+   return Platform::getClipboard();
 };
 
 DefineConsoleFunction( setClipboard, bool, (const char* text), , "(string text)"
                "@brief Set the system clipboard.\n\n"
-			   "@internal")
+            "@internal")
 {
-	return Platform::setClipboard(text);
+   return Platform::setClipboard(text);
 };
 
 ConsoleFunctionGroupEnd( Clipboard );
@@ -332,25 +332,25 @@ void init()
    // Variables
    setVariable("Con::prompt", "% ");
    addVariable("Con::logBufferEnabled", TypeBool, &logBufferEnabled, "If true, the log buffer will be enabled.\n"
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
    addVariable("Con::printLevel", TypeS32, &printLevel, 
       "@brief This is deprecated.\n\n"
       "It is no longer in use and does nothing.\n"      
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
    addVariable("Con::warnUndefinedVariables", TypeBool, &gWarnUndefinedScriptVariables, "If true, a warning will be displayed in the console whenever a undefined variable is used in script.\n"
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
    addVariable( "instantGroup", TypeRealString, &gInstantGroup, "The group that objects will be added to when they are created.\n"
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
 
    addVariable("Con::objectCopyFailures", TypeS32, &gObjectCopyFailures, "If greater than zero then it counts the number of object creation "
       "failures based on a missing copy object and does not report an error..\n"
-	   "@ingroup Console\n");   
+      "@ingroup Console\n");   
 
    // Current script file name and root
    addVariable( "Con::File", TypeString, &gCurrentFile, "The currently executing script file.\n"
-	   "@ingroup FileSystem\n");
+      "@ingroup FileSystem\n");
    addVariable( "Con::Root", TypeString, &gCurrentRoot, "The mod folder for the currently executing script file.\n"
-	   "@ingroup FileSystem\n" );
+      "@ingroup FileSystem\n" );
 
    // alwaysUseDebugOutput determines whether to send output to the platform's 
    // "debug" system.  see winConsole for an example.  
@@ -364,14 +364,14 @@ void init()
    addVariable("Con::alwaysUseDebugOutput", TypeBool, &alwaysUseDebugOutput, 
       "@brief Determines whether to send output to the platform's \"debug\" system.\n\n" 
       "@note This is disabled in shipping builds.\n"
-	   "@ingroup Console");
+      "@ingroup Console");
 #else
    alwaysUseDebugOutput = false;
 #endif
 
    // controls whether a timestamp is prepended to every console message
    addVariable("Con::useTimestamp", TypeBool, &useTimestamp, "If true a timestamp is prepended to every console message.\n"
-	   "@ingroup Console\n");
+      "@ingroup Console\n");
 
    // Plug us into the journaled console input signal.
    smConsoleInput.notify(postConsoleInput);
@@ -599,7 +599,7 @@ static void log(const char *string)
 static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, const char* fmt, va_list argptr)
 {
    if (!active)
-	   return;
+      return;
    Con::active = false; 
 
    char buffer[8192];
@@ -781,7 +781,7 @@ Dictionary::Entry *getAddVariableEntry(const char *name)
    StringTableEntry stName = StringTable->insert(name);
    Dictionary::Entry *entry = gEvalState.globalVars.lookup(stName);
    if (!entry)
-	   entry = gEvalState.globalVars.add(stName);
+      entry = gEvalState.globalVars.add(stName);
    return entry;
 }
 
@@ -791,7 +791,7 @@ Dictionary::Entry *getAddLocalVariableEntry(const char *name)
    StringTableEntry stName = StringTable->insert(name);
    Dictionary::Entry *entry = gEvalState.getCurrentFrame().lookup(stName);
    if (!entry)
-	   entry = gEvalState.getCurrentFrame().add(stName);
+      entry = gEvalState.getCurrentFrame().add(stName);
    return entry;
 }
 
@@ -802,7 +802,7 @@ void setVariable(const char *name, const char *value)
 
    if (getVariableObjectField(name, &obj, &objField))
    {
-	   obj->setDataField(StringTable->insert(objField), 0, value);
+      obj->setDataField(StringTable->insert(objField), 0, value);
    }
    else 
    {
@@ -824,13 +824,13 @@ void setBoolVariable(const char *varName, bool value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-	   obj->setDataField(StringTable->insert(objField), 0, value ? "1" : "0");
+      obj->setDataField(StringTable->insert(objField), 0, value ? "1" : "0");
    }
    else
    {
       varName = prependDollar(varName);
       Dictionary::Entry *entry = getAddVariableEntry(varName);
-	  entry->setStringValue(value ? "1" : "0");
+     entry->setStringValue(value ? "1" : "0");
    }
 }
 
@@ -841,9 +841,9 @@ void setIntVariable(const char *varName, S32 value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-	   char scratchBuffer[32];
-	   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%d", value);
-	   obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+      char scratchBuffer[32];
+      dSprintf(scratchBuffer, sizeof(scratchBuffer), "%d", value);
+      obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
    }
    else
    {
@@ -860,15 +860,15 @@ void setFloatVariable(const char *varName, F32 value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-	   char scratchBuffer[32];
-	   dSprintf(scratchBuffer, sizeof(scratchBuffer), "%g", value);
-	   obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+      char scratchBuffer[32];
+      dSprintf(scratchBuffer, sizeof(scratchBuffer), "%g", value);
+      obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
    }
    else
    {
       varName = prependDollar(varName);
       Dictionary::Entry *entry = getAddVariableEntry(varName);
-	  entry->setFloatValue(value);
+     entry->setFloatValue(value);
    }
 }
 
@@ -1020,7 +1020,7 @@ F32 getFloatVariable(const char *varName, F32 def)
    else
    {
       Dictionary::Entry *entry = getVariableEntry(varName);
-	   return entry ? entry->getFloatValue() : def;
+      return entry ? entry->getFloatValue() : def;
    }
 }
 
@@ -1308,8 +1308,8 @@ bool executeFile(const char* fileName, bool noCalls, bool journalScript)
 
    // Let's do a sanity check to complain about DSOs in the future.
    //
-   // MM:	This doesn't seem to be working correctly for now so let's just not issue
-   //		the warning until someone knows how to resolve it.
+   // MM:   This doesn't seem to be working correctly for now so let's just not issue
+   //    the warning until someone knows how to resolve it.
    //
    //if(compiled && rCom && rScr && Platform::compareFileTimes(comModifyTime, scrModifyTime) < 0)
    //{
@@ -1515,7 +1515,7 @@ ConsoleValueRef execute(S32 argc, ConsoleValueRef argv[])
 #endif
       ConsoleStackFrameSaver stackSaver;
       stackSaver.save();
-	   return _internalExecute(argc, argv);
+      return _internalExecute(argc, argv);
 #ifdef TORQUE_MULTITHREAD
    }
    else
@@ -2616,7 +2616,7 @@ const char *ConsoleValue::getStringValue()
 
       U32 stringLen = dStrlen(internalValue);
       U32 newLen = ((stringLen + 1) + 15) & ~15; // pad upto next cache line
-	   
+      
       if (bufferLen == 0)
          sval = (char *) dMalloc(newLen);
       else if(newLen > bufferLen)
