@@ -824,17 +824,15 @@ NetSocket Net::openConnectTo(const char *addressString)
       if (socketFd != InvalidSocketHandle)
       {
          setBlocking(handleFd, false);
-         if (::connect(socketFd, (struct sockaddr *)&ipAddr, sizeof(ipAddr)) == -1 &&
-            errno != EINPROGRESS)
+         if (::connect(socketFd, (struct sockaddr *)&ipAddr, sizeof(ipAddr)) == -1)
          {
-            error = PlatformNetState::getLastError();
-
-            if (error != Net::WouldBlock)
+            Net::Error err = PlatformNetState::getLastError();
+            if (err != Net::WouldBlock)
             {
-              Con::errorf("Error connecting %s: %s",
-                 addressString, strerror(errno));
-              closeSocket(handleFd);
-              handleFd = NetSocket::INVALID;
+               Con::errorf("Error connecting to %s: %u",
+                  addressString, err);
+               closeSocket(handleFd);
+               handleFd = NetSocket::INVALID;
             }
          }
       }
@@ -855,14 +853,20 @@ NetSocket Net::openConnectTo(const char *addressString)
       sockaddr_in6 ipAddr6;
       NetAddressToIPSocket6(&address, &ipAddr6);
       SOCKET socketFd = PlatformNetState::smReservedSocketList.activate(handleFd, AF_INET6, false, true);
-      if (::connect(socketFd, (struct sockaddr *)&ipAddr6, sizeof(ipAddr6)) == -1 &&
-         errno != EINPROGRESS)
+      if (socketFd != InvalidSocketHandle)
       {
          setBlocking(handleFd, false);
-         Con::errorf("Error connecting %s: %s",
-            addressString, strerror(errno));
-         closeSocket(handleFd);
-         handleFd = NetSocket::INVALID;
+         if (::connect(socketFd, (struct sockaddr *)&ipAddr6, sizeof(ipAddr6)) == -1)
+         {
+            Net::Error err = PlatformNetState::getLastError();
+            if (err != Net::WouldBlock)
+            {
+               Con::errorf("Error connecting to %s: %u",
+                  addressString, err);
+               closeSocket(handleFd);
+               handleFd = NetSocket::INVALID;
+            }
+         }
       }
       else
       {
