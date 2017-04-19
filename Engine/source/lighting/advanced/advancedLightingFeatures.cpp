@@ -31,7 +31,7 @@
 #include "gfx/gfxDevice.h"
 #include "core/util/safeDelete.h"
 
-#if defined( TORQUE_OS_WIN ) || defined( TORQUE_OS_XBOX )
+#if defined( TORQUE_OS_WIN )
 #  include "lighting/advanced/hlsl/gBufferConditionerHLSL.h"
 #  include "lighting/advanced/hlsl/advancedLightingFeaturesHLSL.h"
 #endif

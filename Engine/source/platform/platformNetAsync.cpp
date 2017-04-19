@@ -27,8 +27,6 @@
 
 #if defined(TORQUE_OS_WIN)
 #  include <winsock.h>
-#elif defined(TORQUE_OS_XENON)
-#  include <Xtl.h>
 #else
 #  include <netdb.h>
 #  include <unistd.h>
@@ -80,8 +78,6 @@ struct NetAsync::NameLookupWorkItem : public ThreadPool::WorkItem
 protected:
    virtual void execute()
    {
-#ifndef TORQUE_OS_XENON
-
 	  NetAddress address;
 	  Net::Error error = Net::stringToAddress(mRequest.remoteAddr, &address, true);
 
@@ -102,28 +98,6 @@ protected:
 		 mRequest.out_h_length = sizeof(address);
          mRequest.complete = true;
       }
-#else
-      XNDNS *pxndns = NULL;
-      HANDLE hEvent = CreateEvent(NULL, false, false, NULL);
-      XNetDnsLookup(mRequest.remoteAddr, hEvent, &pxndns);
-
-      while(pxndns->iStatus == WSAEINPROGRESS) 
-         WaitForSingleObject(hEvent, INFINITE);
-
-      if(pxndns->iStatus == 0 && pxndns->cina > 0)
-      {
-         dMemset(mRequest.out_h_addr, 0, sizeof(mRequest.out_h_addr));
-
-         // This is a suspect section. I need to revisit. [2/22/2010 Pat]
-         dMemcpy(mRequest.out_h_addr, pxndns->aina, sizeof(IN_ADDR)); 
-         mRequest.out_h_length = sizeof(IN_ADDR);
-      }
-
-      mRequest.complete = true;
-
-      XNetDnsRelease(pxndns);
-      CloseHandle(hEvent);
-#endif
    }
 
 private:

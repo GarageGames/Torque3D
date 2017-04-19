@@ -44,10 +44,6 @@ WindowInputGenerator::WindowInputGenerator( PlatformWindow *window ) :
 {
    AssertFatal(mWindow, "NULL PlatformWindow on WindowInputGenerator creation");
 
-#ifdef TORQUE_OS_XENON
-   mFocused = true;
-#endif
-
    if (mWindow->getOffscreenRender())
       mFocused = true;
 

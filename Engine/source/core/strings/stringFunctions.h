@@ -32,7 +32,7 @@
 #include "platform/types.h"
 #endif
 
-#if defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#if defined(TORQUE_OS_WIN)
 // These standard functions are not defined on Win32 and other Microsoft platforms...
 #define strcasecmp   _stricmp
 #define strncasecmp  _strnicmp
@@ -41,7 +41,7 @@
 #define strtof       (float)strtod
 #endif // _MSC_VER < 1800
 
-#endif // defined(TORQUE_OS_WIN) || defined(TORQUE_OS_XBOX) || defined(TORQUE_OS_XENON)
+#endif // defined(TORQUE_OS_WIN)
 
 
 //------------------------------------------------------------------------------

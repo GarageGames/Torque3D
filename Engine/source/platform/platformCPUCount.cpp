@@ -30,24 +30,7 @@
 #include "platform/platform.h"
 #include "platform/platformCPUCount.h"
 
-#if defined(TORQUE_OS_LINUX) || defined(TORQUE_OS_OSX) || defined(TORQUE_OS_XENON) || defined(TORQUE_OS_PS3)
-
-// Consoles don't need this
-#if defined(TORQUE_OS_XENON) || defined(TORQUE_OS_PS3)
-namespace CPUInfo 
-{
-
-EConfig CPUCount(U32& TotAvailLogical, U32& TotAvailCore, U32& PhysicalNum)
-{
-   TotAvailLogical = 6;
-   TotAvailCore = 6;
-   PhysicalNum = 3;
-
-   return CONFIG_MultiCoreAndHTEnabled;
-}
-
-}; // namespace
-#else
+#if defined(TORQUE_OS_LINUX) || defined(TORQUE_OS_OSX)
 
 #ifdef TORQUE_OS_LINUX
 // 	The Linux source code listing can be compiled using Linux kernel verison 2.6 
@@ -669,8 +652,6 @@ next:
       }
 
 } // namespace CPUInfo
-#endif
-
 #endif
 
 #endif

@@ -39,10 +39,6 @@
 #include "T3D/fx/particle.h"
 #endif
 
-#if defined(TORQUE_OS_XENON)
-#include "gfx/D3D9/360/gfx360MemVertexBuffer.h"
-#endif
-
 class RenderPassManager;
 class ParticleData;
 
@@ -128,11 +124,7 @@ class ParticleEmitter : public GameBase
 
   public:
 
-#if defined(TORQUE_OS_XENON)
-     typedef GFXVertexPCTT ParticleVertexType;
-#else
-     typedef GFXVertexPCT ParticleVertexType;
-#endif
+   typedef GFXVertexPCT ParticleVertexType;
 
    ParticleEmitter();
    ~ParticleEmitter();
@@ -264,11 +256,7 @@ class ParticleEmitter : public GameBase
    F32       sizes[ ParticleData::PDC_NUM_KEYS ];
    ColorF    colors[ ParticleData::PDC_NUM_KEYS ];
 
-#if defined(TORQUE_OS_XENON)
-   GFX360MemVertexBufferHandle<ParticleVertexType> mVertBuff;
-#else
    GFXVertexBufferHandle<ParticleVertexType> mVertBuff;
-#endif
 
    //   These members are for implementing a link-list of the active emitter 
    //   particles. Member part_store contains blocks of particles that can be

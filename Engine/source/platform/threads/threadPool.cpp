@@ -240,17 +240,6 @@ void ThreadPool::WorkerThread::run( void* arg )
    }
    #endif
 
-#if defined(TORQUE_OS_XENON)
-   // On Xbox 360 you must explicitly assign software threads to hardware threads.
-
-   // This will distribute job threads across the secondary CPUs leaving both
-   // primary CPU cores available to the "main" thread. This will help prevent
-   // more L2 thrashing of the main thread/core.
-   static U32 sCoreAssignment = 2;
-   XSetThreadProcessor( GetCurrentThread(), sCoreAssignment );
-   sCoreAssignment = sCoreAssignment < 6 ? sCoreAssignment + 1 : 2;
-#endif
-      
    while( 1 )
    {
       if( checkForStop() )

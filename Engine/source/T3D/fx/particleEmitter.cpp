@@ -38,10 +38,6 @@
 #include "lighting/lightInfo.h"
 #include "console/engineAPI.h"
 
-#if defined(TORQUE_OS_XENON)
-#  include "gfx/D3D9/360/gfx360MemVertexBuffer.h"
-#endif
-
 Point3F ParticleEmitter::mWindVelocity( 0.0, 0.0, 0.0 );
 const F32 ParticleEmitter::AgedSpinToRadians = (1.0f/1000.0f) * (1.0f/360.0f) * M_PI_F * 2.0f;
 
@@ -701,11 +697,6 @@ void ParticleEmitterData::allocPrimBuffer( S32 overrideSize )
    U16 *ibIndices;
    GFXBufferType bufferType = GFXBufferTypeStatic;
 
-#ifdef TORQUE_OS_XENON
-   // Because of the way the volatile buffers work on Xenon this is the only
-   // way to do this.
-   bufferType = GFXBufferTypeVolatile;
-#endif
    primBuff.set( GFX, indexListSize, 0, bufferType );
    primBuff.lock( &ibIndices );
    dMemcpy( ibIndices, indices, indexListSize * sizeof(U16) );
@@ -1504,22 +1495,9 @@ void ParticleEmitter::copyToVB( const Point3F &camPos, const ColorF &ambientColo
    }
    PROFILE_END();
 
-#if defined(TORQUE_OS_XENON)
-   // Allocate writecombined since we don't read back from this buffer (yay!)
-   if(mVertBuff.isNull())
-      mVertBuff = new GFX360MemVertexBuffer(GFX, 1, getGFXVertexFormat<ParticleVertexType>(), sizeof(ParticleVertexType), GFXBufferTypeDynamic, PAGE_WRITECOMBINE);
-   if( n_parts > mCurBuffSize )
-   {
-      mCurBuffSize = n_parts;
-      mVertBuff.resize(n_parts * 4);
-   }
-
-   ParticleVertexType *buffPtr = mVertBuff.lock();
-#else
    static Vector<ParticleVertexType> tempBuff(2048);
    tempBuff.reserve( n_parts*4 + 64); // make sure tempBuff is big enough
    ParticleVertexType *buffPtr = tempBuff.address(); // use direct pointer (faster)
-#endif
    
    if (mDataBlock->orientParticles)
    {
@@ -1653,9 +1631,6 @@ void ParticleEmitter::copyToVB( const Point3F &camPos, const ColorF &ambientColo
       PROFILE_END();
    }
 
-#if defined(TORQUE_OS_XENON)
-   mVertBuff.unlock();
-#else
    PROFILE_START(ParticleEmitter_copyToVB_LockCopy);
    // create new VB if emitter size grows
    if( !mVertBuff || n_parts > mCurBuffSize )
@@ -1668,7 +1643,6 @@ void ParticleEmitter::copyToVB( const Point3F &camPos, const ColorF &ambientColo
    dMemcpy( verts, tempBuff.address(), n_parts * 4 * sizeof(ParticleVertexType) );
    mVertBuff.unlock();
    PROFILE_END();
-#endif
 
    PROFILE_END();
 }

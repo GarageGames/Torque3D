@@ -93,26 +93,6 @@ typedef int SOCKET;
 
 #define closesocket close
 
-#elif defined( TORQUE_OS_XENON )
-
-#include <Xtl.h>
-#include <string>
-
-#define TORQUE_USE_WINSOCK
-#define EINPROGRESS WSAEINPROGRESS
-#define ioctl ioctlsocket
-typedef S32 socklen_t;
-
-DWORD _getLastErrorAndClear()
-{
-   DWORD err = WSAGetLastError();
-   WSASetLastError( 0 );
-
-   return err;
-}
-
-#else
-
 #endif
 
 #if defined(TORQUE_USE_WINSOCK)
@@ -596,20 +576,6 @@ bool Net::init()
 #if defined(TORQUE_USE_WINSOCK)
    if(!PlatformNetState::initCount)
    {
-#ifdef TORQUE_OS_XENON
-      // Configure startup parameters
-      XNetStartupParams xnsp;
-      memset( &xnsp, 0, sizeof( xnsp ) );
-      xnsp.cfgSizeOfStruct = sizeof( XNetStartupParams );
-
-#ifndef TORQUE_DISABLE_PC_CONNECTIVITY
-      xnsp.cfgFlags = XNET_STARTUP_BYPASS_SECURITY;
-      Con::warnf("XNET_STARTUP_BYPASS_SECURITY enabled! This build can talk to PCs!");
-#endif
-
-      AssertISV( !XNetStartup( &xnsp ), "Net::init - failed to init XNet" );
-#endif
-
       WSADATA stWSAData;
       AssertISV( !WSAStartup( 0x0101, &stWSAData ), "Net::init - failed to init WinSock!" );
 
@@ -654,10 +620,6 @@ void Net::shutdown()
    if(!PlatformNetState::initCount)
    {
       WSACleanup();
-
-#ifdef TORQUE_OS_XENON
-      XNetCleanup();
-#endif
    }
 #endif
 }
@@ -1206,14 +1168,8 @@ void Net::process()
          break;
       case PolledSocket::ConnectionPending:
          // see if it is now connected
-#ifdef TORQUE_OS_XENON
-         // WSASetLastError has no return value, however part of the SO_ERROR behavior
-         // is to clear the last error, so this needs to be done here.
-         if( ( optval = _getLastErrorAndClear() ) == -1 ) 
-#else
          if (getsockopt(currentSock->fd, SOL_SOCKET, SO_ERROR,
             (char*)&optval, &optlen) == -1)
-#endif
          {
             Con::errorf("Error getting socket options: %s",  strerror(errno));
             
