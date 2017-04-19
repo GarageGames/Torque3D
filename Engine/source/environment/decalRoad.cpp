@@ -739,7 +739,7 @@ void DecalRoad::prepRenderImage( SceneRenderState* state )
 
    // Make it the sort distance the max distance so that 
    // it renders after all the other opaque geometry in 
-   // the prepass bin.
+   // the deferred bin.
    coreRI.sortDistSq = F32_MAX;
 
 	// If we need lights then set them up.

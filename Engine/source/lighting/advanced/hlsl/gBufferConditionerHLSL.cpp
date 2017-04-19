@@ -163,7 +163,7 @@ void GBufferConditionerHLSL::processPix(  Vector<ShaderComponent*> &componentLis
 
    LangElement *outputDecl = new DecOp( unconditionedOut );
 
-   // If we're doing prepass blending then we need 
+   // If we're doing deferred blending then we need 
    // to steal away the alpha channel before the 
    // conditioner stomps on it.
    Var *alphaVal = NULL;
@@ -174,7 +174,7 @@ void GBufferConditionerHLSL::processPix(  Vector<ShaderComponent*> &componentLis
    }
 
    // If using interlaced normals, invert the normal
-   if(fd.features[MFT_InterlacedPrePass])
+   if(fd.features[MFT_InterlacedDeferred])
    {
       // NOTE: Its safe to not call ShaderFeatureHLSL::addOutVpos() in the vertex
       // shader as for SM 3.0 nothing is needed there.
@@ -190,7 +190,7 @@ void GBufferConditionerHLSL::processPix(  Vector<ShaderComponent*> &componentLis
    meta->addStatement( new GenOp("   @ = @;", outputDecl, new GenOp( "float4(normalize(@), @)", gbNormal, depth ) ) );
    meta->addStatement( assignOutput( unconditionedOut ) );
 
-   // If we have an alpha var then we're doing prepass lerp blending.
+   // If we have an alpha var then we're doing deferred lerp blending.
    if ( alphaVal )
    {
       Var *outColor = (Var*)LangElement::find( getOutputTargetVarName( DefaultTarget ) );
@@ -228,27 +228,27 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
       methodVar->setType("inline float4");
       DecOp *methodDecl = new DecOp(methodVar);
 
-      Var *prepassSampler = new Var;
-      prepassSampler->setName("prepassSamplerVar");
-      prepassSampler->setType("sampler2D");
-      DecOp *prepassSamplerDecl = new DecOp(prepassSampler);
+      Var *deferredSampler = new Var;
+      deferredSampler->setName("deferredSamplerVar");
+      deferredSampler->setType("sampler2D");
+      DecOp *deferredSamplerDecl = new DecOp(deferredSampler);
 
       Var *screenUV = new Var;
       screenUV->setName("screenUVVar");
       screenUV->setType("float2");
       DecOp *screenUVDecl = new DecOp(screenUV);
 
-      Var *prepassTex = NULL;
-      DecOp *prepassTexDecl = NULL;
+      Var *deferredTex = NULL;
+      DecOp *deferredTexDecl = NULL;
       if (isDirect3D11)
       {
-         prepassSampler->setType("SamplerState");
-         prepassTex = new Var;
-         prepassTex->setName("prepassTexVar");
-         prepassTex->setType("Texture2D");
-         prepassTex->texture = true;
-         prepassTex->constNum = prepassSampler->constNum;
-         prepassTexDecl = new DecOp(prepassTex);
+         deferredSampler->setType("SamplerState");
+         deferredTex = new Var;
+         deferredTex->setName("deferredTexVar");
+         deferredTex->setType("Texture2D");
+         deferredTex->texture = true;
+         deferredTex->constNum = deferredSampler->constNum;
+         deferredTexDecl = new DecOp(deferredTex);
       }
 
       Var *bufferSample = new Var;
@@ -257,9 +257,9 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
       DecOp *bufferSampleDecl = new DecOp(bufferSample); 
 
       if (isDirect3D11)
-         meta->addStatement(new GenOp("@(@, @, @)\r\n", methodDecl, prepassSamplerDecl, prepassTexDecl, screenUVDecl));
+         meta->addStatement(new GenOp("@(@, @, @)\r\n", methodDecl, deferredSamplerDecl, deferredTexDecl, screenUVDecl));
       else
-         meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, prepassSamplerDecl, screenUVDecl ) );
+         meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, deferredSamplerDecl, screenUVDecl ) );
 
       meta->addStatement( new GenOp( "{\r\n" ) );
 
@@ -269,12 +269,12 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
       // possible so that the shader compiler can optimize.
       meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
       if (isDirect3D11)
-         meta->addStatement(new GenOp("      @ = @.SampleLevel(@, @,0);\r\n", bufferSampleDecl, prepassTex, prepassSampler, screenUV));
+         meta->addStatement(new GenOp("      @ = @.SampleLevel(@, @,0);\r\n", bufferSampleDecl, deferredTex, deferredSampler, screenUV));
       else
-         meta->addStatement(new GenOp("      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, prepassSampler, screenUV));
+         meta->addStatement(new GenOp("      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, deferredSampler, screenUV));
 
       meta->addStatement(new GenOp("   #else\r\n"));
-      meta->addStatement(new GenOp("      @ = tex2D(@, @);\r\n", bufferSampleDecl, prepassSampler, screenUV));
+      meta->addStatement(new GenOp("      @ = tex2D(@, @);\r\n", bufferSampleDecl, deferredSampler, screenUV));
       meta->addStatement(new GenOp("   #endif\r\n\r\n"));
 
       // We don't use this way of passing var's around, so this should cause a crash

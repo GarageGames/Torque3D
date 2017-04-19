@@ -25,7 +25,7 @@
 #include "../shaderModelAutoGen.hlsl"
 #include "../torque.hlsl"
 
-TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(deferredTex, 0);
 TORQUE_UNIFORM_SAMPLER2D(depthBuffer, 1);
 TORQUE_UNIFORM_SAMPLER2D(frontBuffer, 2);
 TORQUE_UNIFORM_SAMPLER2D(density, 3);
@@ -56,7 +56,7 @@ float4 main( ConnectData IN ) : TORQUE_TARGET0
 	float2 uvscreen=((IN.htpos.xy/IN.htpos.w) + 1.0 ) / 2.0;
 	uvscreen.y = 1.0 - uvscreen.y;
 	
-   float obj_test = TORQUE_PREPASS_UNCONDITION(prepassTex, uvscreen).w * preBias;
+   float obj_test = TORQUE_PREPASS_UNCONDITION(deferredTex, uvscreen).w * preBias;
    float depth = TORQUE_TEX2D(depthBuffer, uvscreen).r;
    float front = TORQUE_TEX2D(frontBuffer, uvscreen).r;
 

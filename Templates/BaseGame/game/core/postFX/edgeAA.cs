@@ -40,7 +40,7 @@ singleton ShaderData( PFX_EdgeAADetectShader )
    OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/edgeaa/gl/edgeDetectP.glsl";
       
-   samplerNames[0] = "$prepassBuffer";
+   samplerNames[0] = "$deferredBuffer";
    
    pixVersion = 3.0;
 };
@@ -81,7 +81,7 @@ singleton PostEffect( EdgeDetectPostEffect )
       
    shader = PFX_EdgeAADetectShader;
    stateBlock = PFX_DefaultEdgeAAStateBlock;
-   texture[0] = "#prepass";
+   texture[0] = "#deferred";
    target = "#edge";
    
    isEnabled = true;

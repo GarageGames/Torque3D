@@ -79,11 +79,11 @@ public:
    /// Gets the global warning material instance, callers should not free this copy
    BaseMatInstance * getWarningMatInstance();
 
-   /// Set the prepass enabled state.
-   void setPrePassEnabled( bool enabled ) { mUsingPrePass = enabled; }
+   /// Set the deferred enabled state.
+   void setDeferredEnabled( bool enabled ) { mUsingDeferred = enabled; }
 
-   /// Get the prepass enabled state.
-   bool getPrePassEnabled() const { return mUsingPrePass; }
+   /// Get the deferred enabled state.
+   bool getDeferredEnabled() const { return mUsingDeferred; }
 
 #ifndef TORQUE_SHIPPING
 
@@ -153,7 +153,7 @@ protected:
    typedef Map<String, String> MaterialMap;
    MaterialMap mMaterialMap;
 
-   bool mUsingPrePass;
+   bool mUsingDeferred;
 
    // time tracking
    F32 mDt;

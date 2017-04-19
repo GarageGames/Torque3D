@@ -156,7 +156,7 @@ singleton ShaderData( SSAOShader )
    OGLVertexShaderFile  = $Core::CommonShaderPath @ "/postFX/gl/postFxV.glsl";
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/ssao/gl/SSAO_P.glsl";
 
-   samplerNames[0] = "$prepassMap";
+   samplerNames[0] = "$deferredMap";
    samplerNames[1] = "$randNormalTex";
    samplerNames[2] = "$powTable";
    
@@ -172,7 +172,7 @@ singleton ShaderData( SSAOBlurYShader )
    OGLPixelShaderFile   = $Core::CommonShaderPath @ "/postFX/ssao/gl/SSAO_Blur_P.glsl";
    
    samplerNames[0] = "$occludeMap";
-   samplerNames[1] = "$prepassMap";
+   samplerNames[1] = "$deferredMap";
 
    pixVersion = 3.0;      
    
@@ -199,7 +199,7 @@ singleton PostEffect( SSAOPostFx )
    shader = SSAOShader;
    stateBlock = SSAOStateBlock;
          
-   texture[0] = "#prepass";         
+   texture[0] = "#deferred";         
    texture[1] = "core/images/noise.png";
    texture[2] = "#ssao_pow_table";
    
@@ -215,7 +215,7 @@ singleton PostEffect( SSAOPostFx )
       stateBlock = SSAOBlurStateBlock;
       
       texture[0] = "$inTex";
-      texture[1] = "#prepass";
+      texture[1] = "#deferred";
       
       target = "$outTex"; 
    };
@@ -228,7 +228,7 @@ singleton PostEffect( SSAOPostFx )
       stateBlock = SSAOBlurStateBlock;
       
       texture[0] = "$inTex";
-      texture[1] = "#prepass";
+      texture[1] = "#deferred";
       
       target = "$outTex"; 
    };   
@@ -241,7 +241,7 @@ singleton PostEffect( SSAOPostFx )
       stateBlock = SSAOBlurStateBlock;
             
       texture[0] = "$inTex";
-      texture[1] = "#prepass";
+      texture[1] = "#deferred";
       
       target = "$outTex"; 
    };
@@ -254,7 +254,7 @@ singleton PostEffect( SSAOPostFx )
       stateBlock = SSAOBlurStateBlock;
             
       texture[0] = "$inTex";
-      texture[1] = "#prepass";
+      texture[1] = "#deferred";
             
       // We write to a mask texture which is then
       // read by the lighting shaders to mask ambient.

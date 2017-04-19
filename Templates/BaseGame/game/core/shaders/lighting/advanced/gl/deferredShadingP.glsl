@@ -26,21 +26,21 @@
 #include "../../../gl/torque.glsl"
 
 uniform sampler2D colorBufferTex;
-uniform sampler2D lightPrePassTex;
+uniform sampler2D lightDeferredTex;
 uniform sampler2D matInfoTex;
-uniform sampler2D prepassTex;
+uniform sampler2D deferredTex;
 
 out vec4 OUT_col;
 
 void main()
 {
-   float depth = prepassUncondition( prepassTex, uv0 ).w;
+   float depth = deferredUncondition( deferredTex, uv0 ).w;
    if (depth>0.9999)
    {
       OUT_col = vec4(0.0);
       return;
    }
-   vec4 lightBuffer = texture( lightPrePassTex, uv0 );
+   vec4 lightBuffer = texture( lightDeferredTex, uv0 );
    vec4 colorBuffer = texture( colorBufferTex, uv0 );
    vec4 matInfo = texture( matInfoTex, uv0 );
    float specular = clamp(lightBuffer.a,0.0,1.0);

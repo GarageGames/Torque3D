@@ -68,7 +68,7 @@ MaterialManager::MaterialManager()
 
    mMaterialSet = NULL;
 
-   mUsingPrePass = false;
+   mUsingDeferred = false;
 
    mFlushAndReInit = false;
 

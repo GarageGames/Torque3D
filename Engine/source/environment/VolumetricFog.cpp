@@ -100,7 +100,7 @@ VolumetricFog::VolumetricFog()
 
    mTypeMask |= EnvironmentObjectType | StaticObjectType;
 
-   mPrepassTarget = NULL;
+   mDeferredTarget = NULL;
    mDepthBufferTarget = NULL;
    mFrontBufferTarget = NULL;
 
@@ -771,17 +771,17 @@ void VolumetricFog::_leaveFog(ShapeBase *control)
 
 bool VolumetricFog::setupRenderer()
 {
-   // Search for the prepass rendertarget and shadermacros.
-   mPrepassTarget = NamedTexTarget::find("prepass");
-   if (!mPrepassTarget.isValid())
+   // Search for the deferred rendertarget and shadermacros.
+   mDeferredTarget = NamedTexTarget::find("deferred");
+   if (!mDeferredTarget.isValid())
    {
-      Con::errorf("VolumetricFog::setupRenderer - could not find PrepassTarget");
+      Con::errorf("VolumetricFog::setupRenderer - could not find DeferredTarget");
       return false;
    }
 
    Vector<GFXShaderMacro> macros;
-   if (mPrepassTarget)
-      mPrepassTarget->getShaderMacros(&macros);
+   if (mDeferredTarget)
+      mDeferredTarget->getShaderMacros(&macros);
 
    // Search the depth and frontbuffers which are created by the VolumetricFogRTManager
 
@@ -799,27 +799,27 @@ bool VolumetricFog::setupRenderer()
       return false;
    }
 
-   // Find and setup the prepass Shader
+   // Find and setup the deferred Shader
 
    ShaderData *shaderData;
-   mPrePassShader = Sim::findObject("VolumetricFogPrePassShader", shaderData) ?
+   mDeferredShader = Sim::findObject("VolumetricFogDeferredShader", shaderData) ?
    shaderData->getShader() : NULL;
-   if (!mPrePassShader)
+   if (!mDeferredShader)
    {
-      Con::errorf("VolumetricFog::setupRenderer - could not find VolumetricFogPrePassShader");
+      Con::errorf("VolumetricFog::setupRenderer - could not find VolumetricFogDeferredShader");
       return false;
    }
 
    // Create ShaderConstBuffer and Handles
 
-   mPPShaderConsts = mPrePassShader->allocConstBuffer();
+   mPPShaderConsts = mDeferredShader->allocConstBuffer();
    if (mPPShaderConsts.isNull())
    {
       Con::errorf("VolumetricFog::setupRenderer - could not allocate ShaderConstants 1.");
       return false;
    }
 
-   mPPModelViewProjSC = mPrePassShader->getShaderConstHandle("$modelView");
+   mPPModelViewProjSC = mDeferredShader->getShaderConstHandle("$modelView");
 
    // Find and setup the VolumetricFog Shader
 
@@ -878,7 +878,7 @@ bool VolumetricFog::setupRenderer()
    mReflFogDensitySC = mReflectionShader->getShaderConstHandle("$fogDensity");
    mReflFogStrengthSC = mReflectionShader->getShaderConstHandle("$reflStrength");
 
-   // Create the prepass StateBlock
+   // Create the deferred StateBlock
 
    desc_preD.setCullMode(GFXCullCW);
    desc_preD.setBlend(true);
@@ -895,7 +895,7 @@ bool VolumetricFog::setupRenderer()
    descD.setBlend(true);
    descD.setZReadWrite(false, false);// desc.setZReadWrite(true, false);
 
-   // prepassBuffer sampler
+   // deferredBuffer sampler
    descD.samplersDefined = true;
    descD.samplers[0].addressModeU = GFXAddressClamp;
    descD.samplers[0].addressModeV = GFXAddressClamp;
@@ -1063,7 +1063,7 @@ void VolumetricFog::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    mat.scale(mObjScale);
    GFX->multWorld(mat);
 
-   GFX->setShader(mPrePassShader);
+   GFX->setShader(mDeferredShader);
    GFX->setShaderConstBuffer(mPPShaderConsts);
    GFX->setStateBlock(mStateblock_preD);
 
@@ -1127,9 +1127,9 @@ void VolumetricFog::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    mShaderConsts->setSafe(mTexScaleSC, mTexScale * mFOV);
    mShaderConsts->setSafe(mTexTilesSC, mTexTiles);
 
-   GFXTextureObject *prepasstex = mPrepassTarget ? mPrepassTarget->getTexture(0) : NULL;
+   GFXTextureObject *deferredtex = mDeferredTarget ? mDeferredTarget->getTexture(0) : NULL;
 
-   GFX->setTexture(0, prepasstex);
+   GFX->setTexture(0, deferredtex);
    GFX->setTexture(1, mDepthBuffer);
    GFX->setTexture(2, mFrontBuffer);
 

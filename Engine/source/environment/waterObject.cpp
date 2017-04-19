@@ -161,7 +161,7 @@ ConsoleDocClass( WaterObject,
    "\t- Paramable water fog and color shift.\n\n"
 
    "It will, however, look significantly different depending on the LightingManager "
-   "that is active. With Basic Lighting, we do not have a prepass texture to "
+   "that is active. With Basic Lighting, we do not have a deferred texture to "
    "lookup per-pixel depth and therefore cannot use our rendering techniques that depend on it.\n\n"   
 
    "In particular, the following field groups are not used under Basic Lighting:\n"

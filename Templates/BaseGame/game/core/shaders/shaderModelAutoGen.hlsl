@@ -27,9 +27,9 @@
 
 // Portability helpers for autogenConditioners
 #if (TORQUE_SM >= 10 && TORQUE_SM <=30)
-   #define TORQUE_PREPASS_UNCONDITION(tex, coords) prepassUncondition(tex, coords)
+   #define TORQUE_PREPASS_UNCONDITION(tex, coords) deferredUncondition(tex, coords)
 #elif TORQUE_SM >= 40
-   #define TORQUE_PREPASS_UNCONDITION(tex, coords) prepassUncondition(tex, texture_##tex, coords)
+   #define TORQUE_PREPASS_UNCONDITION(tex, coords) deferredUncondition(tex, texture_##tex, coords)
 #endif
 
 #endif //_TORQUE_SHADERMODEL_AUTOGEN_

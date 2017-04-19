@@ -108,7 +108,7 @@ void EyeSpaceDepthOutGLSL::processPix( Vector<ShaderComponent*> &componentList,
 
    // If there isn't an output conditioner for the pre-pass, than just write
    // out the depth to rgba and return.
-   if( !fd.features[MFT_PrePassConditioner] )
+   if( !fd.features[MFT_DeferredConditioner] )
       meta->addStatement( new GenOp( "   @;\r\n", assignColor( new GenOp( "float4(float3(@),1)", depthOut ), Material::None ) ) );
    
    output = meta;

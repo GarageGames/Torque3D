@@ -147,7 +147,7 @@ void RenderMeshMgr::render(SceneRenderState * state)
       // Check if bin is disabled in advanced lighting.
       // Allow forward rendering pass on custom materials.
 
-      if ( ( MATMGR->getPrePassEnabled() && mBasicOnly && !mat->isCustomMaterial() ) )
+      if ( ( MATMGR->getDeferredEnabled() && mBasicOnly && !mat->isCustomMaterial() ) )
       {
          j++;
          continue;

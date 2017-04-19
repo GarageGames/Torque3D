@@ -301,7 +301,7 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
 
    if ( mMaterial->isTranslucent() )
    {
-      // Note: This is for decal blending into the prepass
+      // Note: This is for decal blending into the deferred
       // for AL... it probably needs to be made clearer.
       if (  mMaterial->mTranslucentBlendOp == Material::LerpAlpha &&
             mMaterial->mTranslucentZWrite )
@@ -318,11 +318,11 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
    if ( dStrcmp( LIGHTMGR->getId(), "BLM" ) == 0 )
       fd.features.addFeature( MFT_ForwardShading );
 
-   // Disabling the InterlacedPrePass feature for now. It is not ready for prime-time
+   // Disabling the InterlacedDeferred feature for now. It is not ready for prime-time
    // and it should not be triggered off of the DoubleSided parameter. [2/5/2010 Pat]
    /*if ( mMaterial->isDoubleSided() )
    {
-      fd.features.addFeature( MFT_InterlacedPrePass );
+      fd.features.addFeature( MFT_InterlacedDeferred );
    }*/
 
    // Allow instancing if it was requested and the card supports

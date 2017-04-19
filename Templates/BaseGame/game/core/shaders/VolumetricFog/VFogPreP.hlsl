@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// Volumetric Fog prepass pixel shader V1.00
+// Volumetric Fog deferred pixel shader V1.00
 #include "../shaderModel.hlsl"
 
 struct ConnectData

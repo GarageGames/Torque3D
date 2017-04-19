@@ -37,7 +37,7 @@ ConsoleDocClass( RenderTexTargetBinManager,
    "@brief An abstract base class for render bin managers that render to a named textue target.\n\n"
    "This bin itself doesn't do any rendering work.  It offers functionality to manage "
    "a texture render target which derived render bin classes can render into.\n\n"
-   "@see RenderPrePassMgr\n"
+   "@see RenderDeferredMgr\n"
    "@ingroup RenderBin\n" );
 
 
