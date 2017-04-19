@@ -77,7 +77,7 @@ protected:
    /// It is up to the derived class to set this variable appropriately.
    bool mIsValid;
 
-   /// This is set by initialization and used by the prepass.
+   /// This is set by initialization and used by the deferred.
    bool mHasNormalMaps;
 
    /// This material makes use of bone transforms

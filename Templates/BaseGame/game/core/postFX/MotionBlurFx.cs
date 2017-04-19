@@ -29,7 +29,7 @@ singleton ShaderData( PFX_MotionBlurShader )
    OGLPixelShaderFile    = $Core::CommonShaderPath @ "/postFX/gl/motionBlurP.glsl";
    
    samplerNames[0] = "$backBuffer";
-   samplerNames[1] = "$prepassTex";
+   samplerNames[1] = "$deferredTex";
    
    pixVersion = 3.0;  
 };  
@@ -43,7 +43,7 @@ singleton PostEffect(MotionBlurFX)
    shader = PFX_MotionBlurShader;  
    stateBlock = PFX_DefaultStateBlock;  
    texture[0] = "$backbuffer";
-   texture[1] = "#prepass";
+   texture[1] = "#deferred";
    target = "$backBuffer";
 };
 

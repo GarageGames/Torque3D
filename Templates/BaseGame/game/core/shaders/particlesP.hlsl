@@ -33,7 +33,7 @@
    
    uniform float oneOverSoftness;
    uniform float oneOverFar;
-   TORQUE_UNIFORM_SAMPLER2D(prepassTex, 1);
+   TORQUE_UNIFORM_SAMPLER2D(deferredTex, 1);
    //uniform float3 vEye;
    uniform float4 prePassTargetParams;
 #endif
@@ -84,7 +84,7 @@ float4 main( Conn IN ) : TORQUE_TARGET0
       float2 tc = IN.pos.xy * float2(1.0, -1.0) / IN.pos.w;
       tc = viewportCoordToRenderTarget(saturate( ( tc + 1.0 ) * 0.5 ), prePassTargetParams); 
    
-      float sceneDepth = TORQUE_PREPASS_UNCONDITION(prepassTex, tc).w;
+      float sceneDepth = TORQUE_PREPASS_UNCONDITION(deferredTex, tc).w;
    	float depth = IN.pos.w * oneOverFar;   	
 	float diff = sceneDepth - depth;
 	#ifdef CLIP_Z

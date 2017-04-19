@@ -31,7 +31,7 @@ class AdvancedLightingFeatures
 {
 public:
 
-   static void registerFeatures( const GFXFormat &prepassTargetFormat, const GFXFormat &lightInfoTargetFormat );
+   static void registerFeatures( const GFXFormat &deferredTargetFormat, const GFXFormat &lightInfoTargetFormat );
    static void unregisterFeatures();
 
 private:

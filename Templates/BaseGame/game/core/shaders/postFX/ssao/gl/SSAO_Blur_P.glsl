@@ -42,7 +42,7 @@ in vec2 uv7;
 #define IN_uv7 uv7
 
 uniform sampler2D occludeMap ;
-uniform sampler2D prepassMap ;
+uniform sampler2D deferredMap ;
 uniform float blurDepthTol;
 uniform float blurNormalTol;
 
@@ -51,7 +51,7 @@ out vec4 OUT_col;
 void _sample( vec2 uv, float weight, vec4 centerTap, inout int usedCount, inout float occlusion, inout float total )
 {
    //return;
-   vec4 tap = prepassUncondition( prepassMap, uv );   
+   vec4 tap = deferredUncondition( deferredMap, uv );   
    
    if ( abs( tap.a - centerTap.a ) < blurDepthTol )
    {
@@ -67,7 +67,7 @@ void _sample( vec2 uv, float weight, vec4 centerTap, inout int usedCount, inout 
 void main()
 {   
    //vec4 centerTap;
-   vec4 centerTap = prepassUncondition( prepassMap, IN_uv0.zw );
+   vec4 centerTap = deferredUncondition( deferredMap, IN_uv0.zw );
    
    //return centerTap;
    

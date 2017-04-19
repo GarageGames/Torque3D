@@ -94,7 +94,7 @@ void _initShaderGenHLSL( ShaderGen *shaderGen )
 
    FEATUREMGR->registerFeature( MFT_ParticleNormal, new ParticleNormalFeatureHLSL );
 
-   FEATUREMGR->registerFeature( MFT_InterlacedPrePass, new NamedFeatureHLSL( "Interlaced Pre Pass" ) );
+   FEATUREMGR->registerFeature( MFT_InterlacedDeferred, new NamedFeatureHLSL( "Interlaced Pre Pass" ) );
 
    FEATUREMGR->registerFeature( MFT_ForwardShading, new NamedFeatureHLSL( "Forward Shaded Material" ) );
 

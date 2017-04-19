@@ -41,7 +41,7 @@ Fragout main( Conn IN )
 {
    Fragout OUT;
    
-   // Clear Prepass Buffer ( Normals/Depth );
+   // Clear Deferred Buffer ( Normals/Depth );
    OUT.col =  float4(1.0, 1.0, 1.0, 1.0);
 
    // Clear Color Buffer.

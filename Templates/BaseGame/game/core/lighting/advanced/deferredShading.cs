@@ -46,9 +46,9 @@ new ShaderData( AL_DeferredShader )
    OGLPixelShaderFile  = $Core::CommonShaderPath @ "/lighting/advanced/gl/deferredShadingP.glsl";
 
    samplerNames[0] = "colorBufferTex";
-   samplerNames[1] = "lightPrePassTex";
+   samplerNames[1] = "lightDeferredTex";
    samplerNames[2] = "matInfoTex";
-   samplerNames[3] = "prepassTex";
+   samplerNames[3] = "deferredTex";
    
    pixVersion = 2.0;
 };
@@ -62,7 +62,7 @@ singleton PostEffect( AL_DeferredShading )
    texture[0] = "#color";
    texture[1] = "#lightinfo";
    texture[2] = "#matinfo";
-   texture[3] = "#prepass";
+   texture[3] = "#deferred";
    
    target = "$backBuffer";
    renderPriority = 10000;

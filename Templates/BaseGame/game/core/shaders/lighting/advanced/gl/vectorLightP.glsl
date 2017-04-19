@@ -214,9 +214,9 @@ void main()
 	}
 	
    // Sample/unpack the normal/z data
-   vec4 prepassSample = prepassUncondition( prePassBuffer, uv0 );
-   vec3 normal = prepassSample.rgb;
-   float depth = prepassSample.a;
+   vec4 deferredSample = deferredUncondition( prePassBuffer, uv0 );
+   vec3 normal = deferredSample.rgb;
+   float depth = deferredSample.a;
 
    // Use eye ray to get ws pos
    vec4 worldPos = vec4(eyePosWorld + wsEyeRay * depth, 1.0f);

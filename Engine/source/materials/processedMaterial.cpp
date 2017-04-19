@@ -288,9 +288,9 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
       }
    }
 
-   // The prepass will take care of writing to the 
+   // The deferred will take care of writing to the 
    // zbuffer, so we don't have to by default.
-   if (  MATMGR->getPrePassEnabled() && 
+   if (  MATMGR->getDeferredEnabled() && 
          !mFeatures.hasFeature(MFT_ForwardShading))
       result.setZReadWrite( result.zEnable, false );
 
@@ -350,7 +350,7 @@ U32 ProcessedMaterial::_getRenderStateIndex( const SceneRenderState *sceneState,
    if ( sceneState && sceneState->isReflectPass() )
       currState |= RenderPassData::STATE_REFLECT;
 
-   if ( sgData.binType != SceneData::PrePassBin &&
+   if ( sgData.binType != SceneData::DeferredBin &&
         mMaterial->isTranslucent() )
       currState |= RenderPassData::STATE_TRANSLUCENT;
 

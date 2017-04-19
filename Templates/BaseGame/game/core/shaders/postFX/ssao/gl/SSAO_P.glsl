@@ -27,7 +27,7 @@
 #define DOSMALL
 #define DOLARGE
 
-uniform sampler2D prepassMap ;
+uniform sampler2D deferredMap ;
 uniform sampler2D randNormalTex ;
 uniform sampler1D powTable ;
 
@@ -146,9 +146,9 @@ void main()
    vec3 reflectNormal = normalize( tex2Dlod( randNormalTex, noiseMapUV ).xyz * 2.0 - 1.0 );   
    //return vec4( reflectNormal, 1 );
    
-   vec4 prepass = prepassUncondition( prepassMap, IN_uv0 );
-   vec3 normal = prepass.xyz;
-   float depth = prepass.a;
+   vec4 deferred = deferredUncondition( deferredMap, IN_uv0 );
+   vec3 normal = deferred.xyz;
+   float depth = deferred.a;
    //return vec4( ( depth ).xxx, 1 );
       
    // Early out if too far away.
@@ -203,7 +203,7 @@ void main()
        
       se = ep + ray;
             
-      occluderFragment = prepassUncondition( prepassMap, se.xy );                  
+      occluderFragment = deferredUncondition( deferredMap, se.xy );                  
       
       depthDiff = se.z - occluderFragment.a; 
       
@@ -252,7 +252,7 @@ void main()
        
       se = ep + ray;
             
-      occluderFragment = prepassUncondition( prepassMap, se.xy );                  
+      occluderFragment = deferredUncondition( deferredMap, se.xy );                  
       
       depthDiff = se.z - occluderFragment.a;       
       

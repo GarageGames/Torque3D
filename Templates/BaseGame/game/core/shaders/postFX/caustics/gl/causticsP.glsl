@@ -29,7 +29,7 @@ uniform vec4    rtParams0;
 uniform vec4    waterFogPlane;
 uniform float     accumTime;
 
-uniform sampler2D prepassTex;
+uniform sampler2D deferredTex;
 uniform sampler2D causticsTex0;
 uniform sampler2D causticsTex1;
 uniform vec2 targetSize;
@@ -44,7 +44,7 @@ float distanceToPlane(vec4 plane, vec3 pos)
 void main()             
 {   
    //Sample the pre-pass
-   vec4 prePass = prepassUncondition( prepassTex, IN_uv0 );
+   vec4 prePass = deferredUncondition( deferredTex, IN_uv0 );
    
    //Get depth
    float depth = prePass.w;   

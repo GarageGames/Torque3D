@@ -34,7 +34,7 @@
    
    uniform float oneOverSoftness;
    uniform float oneOverFar;
-   uniform sampler2D prepassTex;   
+   uniform sampler2D deferredTex;   
    //uniform vec3 vEye;
    uniform vec4 prePassTargetParams;
 #endif
@@ -88,7 +88,7 @@ void main()
       vec2 tc = IN_pos.xy * vec2(1.0, -1.0) / IN_pos.w;
       tc = viewportCoordToRenderTarget(saturate( ( tc + 1.0 ) * 0.5 ), prePassTargetParams); 
    
-   	float sceneDepth = prepassUncondition( prepassTex, tc ).w;   	   	   			
+   	float sceneDepth = deferredUncondition( deferredTex, tc ).w;   	   	   			
    	float depth = IN_pos.w * oneOverFar;   	
 	float diff = sceneDepth - depth;
 	#ifdef CLIP_Z

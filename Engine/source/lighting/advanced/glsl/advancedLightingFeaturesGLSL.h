@@ -30,13 +30,13 @@
 class ConditionerMethodDependency;
 
 
-/// Lights the pixel by sampling from the light prepass 
+/// Lights the pixel by sampling from the light deferred 
 /// buffer.  It will fall back to forward lighting 
 /// functionality for non-deferred rendered surfaces.
 ///
 /// Also note that this feature is only used in the
 /// forward rendering pass.  It is not used during the
-/// prepass step.
+/// deferred step.
 ///
 class DeferredRTLightingFeatGLSL : public RTLightingFeatGLSL
 {
@@ -103,7 +103,7 @@ public:
 
 
 /// Generates specular highlights in the forward pass 
-/// from the light prepass buffer.
+/// from the light deferred buffer.
 class DeferredPixelSpecularGLSL : public PixelSpecularGLSL
 {
    typedef PixelSpecularGLSL Parent;
