@@ -43,6 +43,7 @@ class Point2I
    Point2I();                               ///< Create an uninitialized point.
    Point2I(const Point2I&);                 ///< Copy constructor
    Point2I(S32 in_x, S32 in_y);             ///< Create point from two co-ordinates.
+   explicit Point2I(S32 xy);                ///< Initializes all elements to the same value.
 
    //-------------------------------------- Non-math mutators and misc functions
    void set(S32 in_x, S32 in_y);            ///< Set (x,y) position
@@ -109,6 +110,7 @@ class Point2F
    Point2F();                           ///< Create uninitialized point.
    Point2F(const Point2F&);             ///< Copy constructor
    Point2F(F32 _x, F32 _y);             ///< Create point from co-ordinates.
+   explicit Point2F(F32 xy);            ///< Initializes all elements to the same value.
 
    //-------------------------------------- Non-math mutators and misc functions
   public:
@@ -201,6 +203,7 @@ class Point2D
    Point2D();                           ///< Create uninitialized point.
    Point2D(const Point2D&);             ///< Copy constructor
    Point2D(F64 _x, F64 _y);             ///< Create point from coordinates.
+   explicit Point2D(F64 xy);            ///< Initializes all elements to the same value.
 
    //-------------------------------------- Non-math mutators and misc functions
   public:
@@ -280,6 +283,13 @@ inline Point2I::Point2I(const Point2I& _copy)
 
 inline Point2I::Point2I(S32 _x, S32 _y)
  : x(_x), y(_y)
+{
+   //
+}
+
+
+inline Point2I::Point2I(S32 xy)
+   : x(xy), y(xy)
 {
    //
 }
@@ -463,6 +473,13 @@ inline Point2F::Point2F(const Point2F& _copy)
 inline Point2F::Point2F(F32 _x, F32 _y)
  : x(_x), y(_y)
 {
+}
+
+
+inline Point2F::Point2F(F32 xy)
+   : x(xy), y(xy)
+{
+   //
 }
 
 
@@ -707,6 +724,13 @@ inline Point2D::Point2D(const Point2D& _copy)
 inline Point2D::Point2D(F64 _x, F64 _y)
  : x(_x), y(_y)
 {
+}
+
+
+inline Point2D::Point2D(F64 xy)
+   : x(xy), y(xy)
+{
+   //
 }
 
 
