@@ -619,7 +619,7 @@ function buildFullMapString( %index )
    // getting exact type of binding based on Remap name
    if(getSubStr(%name,0,7) $= "Vehicle" )     
    {
-   %temp = vehicleMap.getBinding( %cmd );
+       %temp = vehicleMap.getBinding( %cmd );
    }
    else
    %temp = moveMap.getBinding( %cmd );
@@ -660,7 +660,7 @@ function OptionsDlg::doRemap( %this )
 
     //turning on the vehicle mapping flag if selected item is vehicle remapping
     if(getSubStr(%name,0,7) $= "Vehicle") 
-        $vehicleMapped = true;
+       $vehicleMapped = true;
         
     RemapDlg-->OptRemapText.setValue( "Re-bind \"" @ %name @ "\" to..." );
     OptRemapInputCtrl.index = %selId;
@@ -744,7 +744,7 @@ function OptRemapInputCtrl::onInputEvent( %this, %device, %action )
    // Get the current command this action is mapped to
    if(!$vehicleMapped)
     %prevMap = moveMap.getCommand( %device, %action );
-    else
+   else
     %prevMap = vehicleMap.getCommand( %device, %action );
     
    // If nothing was mapped to the previous command 
@@ -754,9 +754,9 @@ function OptRemapInputCtrl::onInputEvent( %this, %device, %action )
       unbindExtraActions( %cmd, 1 );
       // performing desired binding (vehicleMap or moveMap)
       if(!$vehicleMapped)
-      moveMap.bind( %device, %action, %cmd );
+       moveMap.bind( %device, %action, %cmd );
       else
-      vehicleMap.bind( %device, %action, %cmd );
+       vehicleMap.bind( %device, %action, %cmd );
       optionsDlg-->OptRemapList.setRowById( %this.index, buildFullMapString( %this.index ) );
       return;
    }
