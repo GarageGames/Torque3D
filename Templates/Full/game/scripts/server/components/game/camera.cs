@@ -100,9 +100,6 @@ function CameraComponent::onClientDisconnect(%this, %client)
    }
 }
 
-//move to the editor later
-GlobalActionMap.bind("keyboard", "alt c", "toggleEditorCam");
-
 function switchCamera(%client, %newCamEntity)
 {
 	if(!isObject(%client) || !isObject(%newCamEntity))
