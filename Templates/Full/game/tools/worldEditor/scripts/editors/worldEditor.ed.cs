@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+GlobalActionMap.bind("keyboard", "alt c", "toggleEditorCam");
+
 function WorldEditor::onSelect( %this, %obj )
 {
    EditorTree.addSelection( %obj );
