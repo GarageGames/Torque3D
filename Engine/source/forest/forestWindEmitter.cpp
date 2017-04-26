@@ -84,12 +84,12 @@ ForestWind::ForestWind(  ForestWindEmitter *emitter )
       mDirection( 1.0f, 0, 0 ),
       mLastGustTime( 0 ),
       mLastYawTime( 0 ),
-      mCurrentTarget( 0, 0 ),
-      mCurrentInterp( 0 ),
       mTargetYawAngle( 0 ),
+      mCurrentInterp( 0 ),
+      mCurrentTarget( 0, 0 ),
       mParent( emitter ),
-      mIsDirty( false ),
-      mRandom( Platform::getRealMilliseconds() + 1 )
+      mRandom( Platform::getRealMilliseconds() + 1 ),
+      mIsDirty( false )
 {
 }
 
@@ -204,8 +204,9 @@ void ForestWind::setDirection( const VectorF &direction )
 IMPLEMENT_CO_NETOBJECT_V1(ForestWindEmitter);
 
 ForestWindEmitter::ForestWindEmitter( bool makeClientObject )
-   :  mEnabled( true ),
-      mAddedToScene( false ),      
+   :  
+      mAddedToScene( false ),
+      mEnabled( true ),
       mWind( NULL ),
       mWindStrength( 1 ),
       mWindDirection( 1, 0, 0 ),

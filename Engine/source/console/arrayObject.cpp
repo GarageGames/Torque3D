@@ -122,8 +122,8 @@ S32 QSORT_CALLBACK ArrayObject::_valueFunctionCompare( const void* a, const void
 //-----------------------------------------------------------------------------
 
 ArrayObject::ArrayObject()
-   : mCurrentIndex( NULL ),
-     mCaseSensitive( false )
+   : mCaseSensitive( false ),
+     mCurrentIndex( NULL )
 {
 }
 

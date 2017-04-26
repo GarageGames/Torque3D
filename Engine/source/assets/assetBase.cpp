@@ -54,8 +54,8 @@ StringTableEntry assetPrivateField = StringTable->insert("AssetPrivate");
 //-----------------------------------------------------------------------------
 
 AssetBase::AssetBase() :
-mAcquireReferenceCount(0),
 mpOwningAssetManager(NULL),
+mAcquireReferenceCount(0),
 mAssetInitialized(false)
 {
    // Generate an asset definition.

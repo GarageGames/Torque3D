@@ -47,8 +47,8 @@ SimPersistID::SimPersistID( SimObject* object )
 //-----------------------------------------------------------------------------
 
 SimPersistID::SimPersistID( const Torque::UUID& uuid )
-   : mUUID( uuid ),
-     mObject( NULL )
+   : mObject( NULL ),
+     mUUID( uuid )
 {
    AssertFatal( !uuid.isNull(), "SimPersistID::SimPersistID - invalid UUID!" );
    smLookupTable->insertUnique( mUUID, this );

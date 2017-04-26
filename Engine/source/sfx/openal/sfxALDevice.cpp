@@ -34,8 +34,8 @@ SFXALDevice::SFXALDevice(  SFXProvider *provider,
                            S32 maxBuffers )
    :  Parent( name, provider, useHardware, maxBuffers ),
       mOpenAL( openal ), 
-      mDevice( NULL ), 
       mContext( NULL ),
+      mDevice( NULL ), 
       mRolloffFactor( 1.0f )
 {
    mMaxBuffers = getMax( maxBuffers, 8 );

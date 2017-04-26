@@ -54,15 +54,15 @@ MODULE_END;
 
 VideoCapture::VideoCapture() : 
    mEncoder(NULL),
-   mIsRecording(false),
-   mCanvas(NULL),
    mFrameGrabber(NULL),
-   mWaitingForCanvas(false),
-   mResolution(0,0),
+   mCanvas(NULL),
+   mIsRecording(false),
    mFrameRate(30.0f),
+   mResolution(0,0),
+   mWaitingForCanvas(false),
    mEncoderName("THEORA"),
-   mFileName(""),
-   mMsPerFrameError(0)
+   mMsPerFrameError(0),
+   mFileName("")
 {     
 }
 

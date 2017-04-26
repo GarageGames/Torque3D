@@ -54,9 +54,9 @@ SFXALBuffer::SFXALBuffer(  const OPENALFNTABLE &oalft,
                            SFXDescription* description,
                            bool useHardware )
    :  Parent( stream, description ),
-      mOpenAL( oalft ),
+      mIs3d( description->mIs3D ),
       mUseHardware( useHardware ),
-      mIs3d( description->mIs3D )
+      mOpenAL( oalft )
 {
    // Set up device buffers.
 
