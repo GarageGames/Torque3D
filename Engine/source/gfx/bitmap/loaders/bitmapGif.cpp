@@ -86,6 +86,7 @@ static S32 gifWriteDataFn(GifFileType *gifinfo, GifByteType *data, S32 length)
 //--------------------------------------
 static bool sReadGIF( Stream &stream, GBitmap *bitmap )
 {
+   PROFILE_SCOPE(sReadGIF);
    GifFileType *gifinfo = DGifOpen( (void*)&stream, gifReadDataFn);
    if (!gifinfo)
       return false;

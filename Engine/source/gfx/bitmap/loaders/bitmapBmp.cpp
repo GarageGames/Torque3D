@@ -92,6 +92,7 @@ struct BITMAPINFOHEADER
 
 static bool sReadBMP(Stream &stream, GBitmap *bitmap)
 {
+   PROFILE_SCOPE(sReadBMP);
    BITMAPINFOHEADER  bi;
    BITMAPFILEHEADER  bf;
    RGBQUAD           rgb[256];
