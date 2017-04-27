@@ -257,6 +257,7 @@ public:
 
    void addToIgnoreList(ShapeBase* obj);
    void removeFromIgnoreList(ShapeBase* obj);
+   void clearIgnoreList();
    S32  ignoreListCount();
    SimObject* getIgnoreListObject(S32 index);  
 

@@ -564,6 +564,11 @@ void AITurretShape::removeFromIgnoreList(ShapeBase* obj)
    mIgnoreObjects.removeObject(obj);
 }
 
+void AITurretShape::clearIgnoreList()
+{
+   mIgnoreObjects.clear();
+}
+
 S32 AITurretShape::ignoreListCount()
 {
    return mIgnoreObjects.size();
@@ -1252,6 +1257,13 @@ DefineEngineMethod( AITurretShape, removeFromIgnoreList, void, (ShapeBase* obj),
    "@param obj The ShapeBase object to once again allow for targeting.\n")
 {
    object->removeFromIgnoreList(obj);
+}
+
+DefineEngineMethod( AITurretShape, clearIgnoreList, void, (),,
+   "@brief Removes all objects from the turret's ignore list.\n\n"
+   "All objects in this list will be ignored by the turret's targeting.\n")
+{
+   object->clearIgnoreList();
 }
 
 DefineEngineMethod( AITurretShape, ignoreListCount, S32, (),,
