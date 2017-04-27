@@ -469,7 +469,7 @@ U32 oneUTF32toUTF8(const UTF32 codepoint, UTF8 *threeByteCodeunitBuf)
 
    //-----------------
    U8  mask = sgByteMask8LUT[0];            // 0011 1111
-   U8  marker = ( ~mask << 1);            // 1000 0000
+   U8  marker = ( ~static_cast<U32>(mask) << 1u);            // 1000 0000
    
    // Process the low order bytes, shifting the codepoint down 6 each pass.
    for( S32 i = bytecount-1; i > 0; i--)
