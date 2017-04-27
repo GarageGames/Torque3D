@@ -39,16 +39,16 @@ SceneRenderState::SceneRenderState( SceneManager* sceneManager,
                                     RenderPassManager* renderPass /* = NULL */,
                                     bool usePostEffects /* = true */ )
    :  mSceneManager( sceneManager ),
-      mCullingState( sceneManager, view ),
-      mRenderPass( renderPass ? renderPass : sceneManager->getDefaultRenderPass() ),
       mScenePassType( passType ),
-      mRenderNonLightmappedMeshes( true ),
-      mRenderLightmappedMeshes( true ),
+      mRenderPass( renderPass ? renderPass : sceneManager->getDefaultRenderPass() ),
+      mCullingState( sceneManager, view ),
       mUsePostEffects( usePostEffects ),
-      mDisableAdvancedLightingBins( false ),
+      mRenderLightmappedMeshes( true ),
+      mRenderNonLightmappedMeshes( true ),
       mRenderArea( view.getFrustum().getBounds() ),
-      mAmbientLightColor( sceneManager->getAmbientLightColor() ),
-      mSceneRenderStyle( SRS_Standard )
+      mDisableAdvancedLightingBins( false ),
+      mSceneRenderStyle( SRS_Standard ),
+      mAmbientLightColor( sceneManager->getAmbientLightColor() )
 {
    // Setup the default parameters for the screen metrics methods.
    mDiffuseCameraTransform = view.getHeadWorldViewMatrix();

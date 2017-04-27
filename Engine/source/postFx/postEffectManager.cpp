@@ -52,8 +52,8 @@ MODULE_END;
 bool PostEffectManager::smRenderEffects = true;
 
 PostEffectManager::PostEffectManager() : 
-      mFrameStateSwitch( false ),
-      mLastBackBufferTarget( NULL )
+      mLastBackBufferTarget( NULL ),
+      mFrameStateSwitch( false )
 {
    GFXDevice::getDeviceEventSignal().notify( this, &PostEffectManager::_handleDeviceEvent );
    RenderPassManager::getRenderBinSignal().notify( this, &PostEffectManager::_handleBinEvent );

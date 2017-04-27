@@ -569,6 +569,16 @@ void AITurretShape::clearIgnoreList()
    mIgnoreObjects.clear();
 }
 
+S32 AITurretShape::ignoreListCount()
+{
+   return mIgnoreObjects.size();
+}
+
+SimObject* AITurretShape::getIgnoreListObject(S32 index)
+{
+   return mIgnoreObjects.at(index);
+}
+
 //----------------------------------------------------------------------------
 
 void AITurretShape::_initState()
@@ -1254,6 +1264,21 @@ DefineEngineMethod( AITurretShape, clearIgnoreList, void, (),,
    "All objects in this list will be ignored by the turret's targeting.\n")
 {
    object->clearIgnoreList();
+}
+
+DefineEngineMethod( AITurretShape, ignoreListCount, S32, (),,
+   "@brief Returns the number of objects in the turrets ignore list.\n\n"
+   "All objects in this list will be ignored by the turret's targeting.\n")
+{
+   return object->ignoreListCount();
+}
+
+DefineEngineMethod( AITurretShape, getIgnoreListObject, SimObject*, (S32 index),,
+   "@brief Returns the object in the ignore list at index.\n\n"
+   "All objects in this list will be ignored by the turret's targeting.\n"
+   "@param index The index of the object in the ignore list being retrieved.\n")
+{
+   return object->getIgnoreListObject(index);
 }
 
 DefineEngineMethod( AITurretShape, setTurretState, void, (const char* newState, bool force), (false),

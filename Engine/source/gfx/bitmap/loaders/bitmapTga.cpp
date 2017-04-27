@@ -228,6 +228,7 @@ is_15_bit_in_disguise:
 
 static bool sReadTGA(Stream &stream, GBitmap *bitmap)
 {
+   PROFILE_SCOPE(sReadTGA);
    struct Header
    {
       U8    idLength;         // length of the image_id string below.

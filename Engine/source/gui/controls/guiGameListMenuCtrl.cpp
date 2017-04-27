@@ -32,8 +32,8 @@
 
 GuiGameListMenuCtrl::GuiGameListMenuCtrl()
  : mSelected(NO_ROW),
-   mHighlighted(NO_ROW),
-   mDebugRender(false)
+   mDebugRender(false),
+   mHighlighted(NO_ROW)
 {
    VECTOR_SET_ASSOCIATION(mRows);
 

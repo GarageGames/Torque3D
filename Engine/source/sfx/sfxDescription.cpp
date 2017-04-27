@@ -134,8 +134,8 @@ SFXDescription::SFXDescription()
       mFadeLoops( false ),
       mStreamPacketSize( SFXInternal::SFXAsyncStream::DEFAULT_STREAM_PACKET_LENGTH ),
       mStreamReadAhead( SFXInternal::SFXAsyncStream::DEFAULT_STREAM_LOOKAHEAD ),
-      mPriority( 1.0f ),
       mScatterDistance( 0.f, 0.f, 0.f ),
+      mPriority( 1.0f ),
       mSourceGroup( NULL )
 {
    dMemset( mParameters, 0, sizeof( mParameters ) );
@@ -164,11 +164,11 @@ SFXDescription::SFXDescription( const SFXDescription& desc )
       mFadeOutEase( desc.mFadeOutEase ),
       mFadeLoops( desc.mFadeLoops ),
       mStreamPacketSize( desc.mStreamPacketSize ),
-      mStreamReadAhead( desc.mStreamReadAhead ),
       mUseReverb( desc.mUseReverb ),
+      mStreamReadAhead( desc.mStreamReadAhead ),
       mReverb( desc.mReverb ),
-      mPriority( desc.mPriority ),
-      mScatterDistance( desc.mScatterDistance )
+      mScatterDistance( desc.mScatterDistance ),
+      mPriority( desc.mPriority )
 {
    for( U32 i = 0; i < MaxNumParameters; ++ i )
       mParameters[ i ] = desc.mParameters[ i ];

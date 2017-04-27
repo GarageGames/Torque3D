@@ -55,25 +55,25 @@ IMPLEMENT_CALLBACK( GuiScrollCtrl, onScroll, void, (), (),
 //-----------------------------------------------------------------------------
 
 GuiScrollCtrl::GuiScrollCtrl()
- : mChildMargin( 0, 0 ),
-   mBorderThickness( 1 ),
+ : mBorderThickness( 1 ),
+   mChildMargin( 0, 0 ),
    mScrollBarThickness( 16 ),
    mScrollBarArrowBtnLength( 16 ),
    mScrollBarDragTolerance( 130 ),
    mStateDepressed( false ),
    mHitRegion( None ),
-   mWillFirstRespond( true ),
-   mUseConstantHeightThumb( false ),
    mForceVScrollBar( ScrollBarAlwaysOn ),
+   mUseConstantHeightThumb( false ),
+   mWillFirstRespond( true ),
    mForceHScrollBar( ScrollBarAlwaysOn ),
    mLockHorizScroll( false ),
    mLockVertScroll( false ),
    mIgnoreChildResized( false ),
    mAnimating( false ),
    mScrollAnimSpeed( -1 ),
-   mScrollTargetPos( -1, -1 ),
-   mChildExt(0, 0),
    mChildPos(0, 0),
+   mChildExt(0, 0),
+   mScrollTargetPos( -1, -1 ),
    mBaseThumbSize(0)
 {
    mIsContainer = true;

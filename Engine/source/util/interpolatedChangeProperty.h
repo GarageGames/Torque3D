@@ -98,8 +98,8 @@ class InterpolatedChangeProperty
       ///
       InterpolatedChangeProperty( const T& initialValue = T() )
          :  mCurrentValue( initialValue ),
-            mTargetValue( initialValue ),
             mBlendPhaseTime( DEFAULT_TRANSITION_TIME ),
+            mTargetValue( initialValue ),
             mTransitionStartTime( 0 )
       {
          // By default, start time source right away.

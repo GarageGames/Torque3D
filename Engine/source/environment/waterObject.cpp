@@ -196,15 +196,15 @@ WaterObject::WaterObject()
    mUndulateMaxDist(50.0f),
    mMiscParamW( 0.0f ),
    mUnderwaterPostFx( NULL ),
-   mBasicLighting( false ),
-   mOverallWaveMagnitude( 1.0f ),
    mOverallRippleMagnitude( 0.1f ),
-   mCubemap( NULL ),
-   mSoundAmbience( NULL ),
+   mOverallWaveMagnitude( 1.0f ),
+   mBasicLighting( false ),
    mSpecularPower( 48.0f ),
+   mSoundAmbience( NULL ),
+   mCubemap( NULL ),
    mSpecularColor( 1.0f, 1.0f, 1.0f, 1.0f ),
-   mDepthGradientMax( 50.0f ),
-   mEmissive( false )
+   mEmissive( false ),
+   mDepthGradientMax( 50.0f )
 {
    mTypeMask = WaterObjectType;
 

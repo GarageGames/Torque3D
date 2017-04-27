@@ -1620,7 +1620,7 @@ String String::GetTrailingNumber(const char* str, S32& number)
    if ((*p == '-') || (*p == '_'))
       number = -dAtoi(p + 1);
    else
-      number = (isdigit(*p) && (p == base.c_str()) ? dAtoi(p) : dAtoi(++p));
+      number = (isdigit(*p) ? dAtoi(p) : dAtoi(++p));
 
    // Remove space between the name and the number
    while ((p > base.c_str()) && dIsspace(*(p-1)))

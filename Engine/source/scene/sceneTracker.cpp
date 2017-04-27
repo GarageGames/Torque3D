@@ -30,8 +30,8 @@
 //-----------------------------------------------------------------------------
 
 SceneObjectLink::SceneObjectLink( SceneTracker* tracker, SceneObject* object )
-   : mTracker( tracker ),
-     mObject( object ),
+   : mObject( object ),
+     mTracker( tracker ),
      mNextLink( NULL ),
      mPrevLink( NULL )
 {
