@@ -161,8 +161,8 @@ protected:
    SignalSig *mSignal;
 
 private:
-   SignalSlot( const SignalSlot&) {}
-   SignalSlot& operator=( const SignalSlot&) {}
+   SignalSlot( const SignalSlot&);
+   SignalSlot& operator=( const SignalSlot&);
 };
 
 template<typename Signature> class SignalBaseT : public SignalBase
