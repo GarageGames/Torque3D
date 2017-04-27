@@ -2148,7 +2148,7 @@ DefineEngineFunction( displaySplashWindow, bool, (const char* path), (""),
    "@return True if the splash window could be successfully initialized.\n\n"
    "@ingroup Platform" )
 {
-   if (path == "")
+   if (path == NULL || *path == '\0')
    {
       path = Con::getVariable("$Core::splashWindowImage");
    }
