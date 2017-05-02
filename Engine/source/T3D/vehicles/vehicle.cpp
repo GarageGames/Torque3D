@@ -1009,92 +1009,94 @@ void Vehicle::getCameraParameters(F32 *min,F32* max,Point3F* off,MatrixF* rot)
 
 //----------------------------------------------------------------------------
 
-void Vehicle::getCameraTransform(F32* pos,MatrixF* mat)
+void Vehicle::getCameraTransform(F32* pos, MatrixF* mat)
 {
    // Returns camera to world space transform
    // Handles first person / third person camera position
    if (isServerObject() && mShapeInstance)
       mShapeInstance->animateNodeSubtrees(true);
 
-   if (*pos == 0) {
+   if (*pos == 0) 
+   {
       getRenderEyeTransform(mat);
-      return;
-   }
-
-   // Get the shape's camera parameters.
-   F32 min,max;
-   MatrixF rot;
-   Point3F offset;
-   getCameraParameters(&min,&max,&offset,&rot);
-
-   // Start with the current eye position
-   MatrixF eye;
-   getRenderEyeTransform(&eye);
-
-   // Build a transform that points along the eye axis
-   // but where the Z axis is always up.
-   if (mDataBlock->cameraRoll)
-      mat->mul(eye,rot);
-   else 
-   {
-      MatrixF cam(1);
-      VectorF x,y,z(0,0,1);
-      eye.getColumn(1, &y);
-      mCross(y, z, &x);
-      x.normalize();
-      mCross(x, y, &z);
-      z.normalize();
-      cam.setColumn(0,x);
-      cam.setColumn(1,y);
-      cam.setColumn(2,z);
-      mat->mul(cam,rot);
-   }
-
-   // Camera is positioned straight back along the eye's -Y axis.
-   // A ray is cast to make sure the camera doesn't go through
-   // anything solid.
-   VectorF vp,vec;
-   vp.x = vp.z = 0;
-   vp.y = -(max - min) * *pos;
-   eye.mulV(vp,&vec);
-
-   // Use the camera node as the starting position if it exists.
-   Point3F osp,sp;
-   if (mDataBlock->cameraNode != -1) 
-   {
-      mShapeInstance->mNodeTransforms[mDataBlock->cameraNode].getColumn(3,&osp);
-      getRenderTransform().mulP(osp,&sp);
    }
    else
-      eye.getColumn(3,&sp);
+   {
+      // Get the shape's camera parameters.
+      F32 min, max;
+      MatrixF rot;
+      Point3F offset;
+      getCameraParameters(&min, &max, &offset, &rot);
 
-   // Make sure we don't hit ourself...
-   disableCollision();
-   if (isMounted())
-      getObjectMount()->disableCollision();
+      // Start with the current eye position
+      MatrixF eye;
+      getRenderEyeTransform(&eye);
 
-   // Cast the ray into the container database to see if we're going
-   // to hit anything.
-   RayInfo collision;
-   Point3F ep = sp + vec + offset + mCameraOffset;
-   if (mContainer->castRay(sp, ep,
+      // Build a transform that points along the eye axis
+      // but where the Z axis is always up.
+      if (mDataBlock->cameraRoll)
+         mat->mul(eye, rot);
+      else
+      {
+         MatrixF cam(1);
+         VectorF x, y, z(0, 0, 1);
+         eye.getColumn(1, &y);
+         mCross(y, z, &x);
+         x.normalize();
+         mCross(x, y, &z);
+         z.normalize();
+         cam.setColumn(0, x);
+         cam.setColumn(1, y);
+         cam.setColumn(2, z);
+         mat->mul(cam, rot);
+      }
+
+      // Camera is positioned straight back along the eye's -Y axis.
+      // A ray is cast to make sure the camera doesn't go through
+      // anything solid.
+      VectorF vp, vec;
+      vp.x = vp.z = 0;
+      vp.y = -(max - min) * *pos;
+      eye.mulV(vp, &vec);
+
+      // Use the camera node as the starting position if it exists.
+      Point3F osp, sp;
+      if (mDataBlock->cameraNode != -1)
+      {
+         mShapeInstance->mNodeTransforms[mDataBlock->cameraNode].getColumn(3, &osp);
+         getRenderTransform().mulP(osp, &sp);
+      }
+      else
+         eye.getColumn(3, &sp);
+
+      // Make sure we don't hit ourself...
+      disableCollision();
+      if (isMounted())
+         getObjectMount()->disableCollision();
+
+      // Cast the ray into the container database to see if we're going
+      // to hit anything.
+      RayInfo collision;
+      Point3F ep = sp + vec + offset + mCameraOffset;
+      if (mContainer->castRay(sp, ep,
          ~(WaterObjectType | GameBaseObjectType | DefaultObjectType | sTriggerMask),
          &collision) == true) {
 
-      // Shift the collision point back a little to try and
-      // avoid clipping against the front camera plane.
-      F32 t = collision.t - (-mDot(vec, collision.normal) / vec.len()) * 0.1;
-      if (t > 0.0f)
-         ep = sp + offset + mCameraOffset + (vec * t);
-      else
-         eye.getColumn(3,&ep);
-   }
-   mat->setColumn(3,ep);
+         // Shift the collision point back a little to try and
+         // avoid clipping against the front camera plane.
+         F32 t = collision.t - (-mDot(vec, collision.normal) / vec.len()) * 0.1;
+         if (t > 0.0f)
+            ep = sp + offset + mCameraOffset + (vec * t);
+         else
+            eye.getColumn(3, &ep);
+      }
+      mat->setColumn(3, ep);
 
-   // Re-enable our collision.
-   if (isMounted())
-      getObjectMount()->enableCollision();
-   enableCollision();
+      // Re-enable our collision.
+      if (isMounted())
+         getObjectMount()->enableCollision();
+      enableCollision();
+   }
 
    // Apply Camera FX.
    mat->mul( gCamFXMgr.getTrans() );
