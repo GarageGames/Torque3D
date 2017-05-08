@@ -37,7 +37,7 @@
 // Uniforms                                                                  
 //-----------------------------------------------------------------------------
 
-TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(deferredTex, 0);
 TORQUE_UNIFORM_SAMPLER2D(backbuffer, 1);
 TORQUE_UNIFORM_SAMPLER1D(waterDepthGradMap, 2);
 
@@ -53,9 +53,9 @@ uniform float4    rtParams0;
 
 float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {    
-   //float2 prepassCoord = IN.uv0;
+   //float2 deferredCoord = IN.uv0;
    //IN.uv0 = ( IN.uv0.xy * rtParams0.zw ) + rtParams0.xy;
-   float depth = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 ).w;
+   float depth = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 ).w;
    //return float4( depth.rrr, 1 );
    
    // Skip fogging the extreme far plane so that 

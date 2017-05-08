@@ -29,7 +29,7 @@ out vec4 OUT_col2;
 //-----------------------------------------------------------------------------
 void main()
 {    
-   // Clear Prepass Buffer ( Normals/Depth );
+   // Clear Deferred Buffer ( Normals/Depth );
    OUT_col =  vec4(1.0, 1.0, 1.0, 1.0);
 
    // Clear Color Buffer.

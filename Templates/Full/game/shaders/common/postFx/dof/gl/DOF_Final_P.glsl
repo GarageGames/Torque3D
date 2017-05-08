@@ -117,7 +117,7 @@ void main()
    //med.rgb = large;
    
    //nearCoc = 0;
-   depth = prepassUncondition( depthSampler, IN_uv3 ).w;  
+   depth = deferredUncondition( depthSampler, IN_uv3 ).w;  
    //return half4(depth.rrr,1);
    //return half4(nearCoc.rrr,1.0);
    

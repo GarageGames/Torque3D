@@ -42,7 +42,7 @@ uniform sampler2D ssaoMask ;
 uniform vec4 rtParams3;
 #endif
 
-uniform sampler2D prePassBuffer;
+uniform sampler2D deferredBuffer;
 uniform sampler2D lightBuffer;
 uniform sampler2D colorBuffer;
 uniform sampler2D matInfoBuffer;             
@@ -214,9 +214,9 @@ void main()
 	}
 	
    // Sample/unpack the normal/z data
-   vec4 prepassSample = prepassUncondition( prePassBuffer, uv0 );
-   vec3 normal = prepassSample.rgb;
-   float depth = prepassSample.a;
+   vec4 deferredSample = deferredUncondition( deferredBuffer, uv0 );
+   vec3 normal = deferredSample.rgb;
+   float depth = deferredSample.a;
 
    // Use eye ray to get ws pos
    vec4 worldPos = vec4(eyePosWorld + wsEyeRay * depth, 1.0f);

@@ -93,7 +93,7 @@ float fresnel(float NdotV, float bias, float power)
 // Uniforms                                                                  
 //-----------------------------------------------------------------------------
 TORQUE_UNIFORM_SAMPLER2D(bumpMap,0);
-//uniform sampler2D    prepassTex  : register( S1 );
+//uniform sampler2D    deferredTex  : register( S1 );
 TORQUE_UNIFORM_SAMPLER2D(reflectMap,2);
 TORQUE_UNIFORM_SAMPLER2D(refractBuff,3);
 TORQUE_UNIFORM_SAMPLERCUBE(skyMap,4);

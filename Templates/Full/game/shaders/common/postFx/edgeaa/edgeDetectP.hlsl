@@ -23,7 +23,7 @@
 #include "../postFx.hlsl"
 #include "../../shaderModelAutoGen.hlsl"
 
-TORQUE_UNIFORM_SAMPLER2D(prepassBuffer,0);
+TORQUE_UNIFORM_SAMPLER2D(deferredBuffer,0);
 
 // GPU Gems 3, pg 443-444
 float GetEdgeWeight(float2 uv0, in float2 targetSize)
@@ -50,7 +50,7 @@ float GetEdgeWeight(float2 uv0, in float2 targetSize)
    for(int i = 0; i < 9; i++)
    {
       float2 uv = uv0 + offsets[i] * PixelSize;
-      float4 gbSample = TORQUE_PREPASS_UNCONDITION( prepassBuffer, uv );
+      float4 gbSample = TORQUE_PREPASS_UNCONDITION( deferredBuffer, uv );
       Depth[i] = gbSample.a;
       Normal[i] = gbSample.rgb;
    }

@@ -39,7 +39,7 @@
 // Uniforms                                                                  
 //-----------------------------------------------------------------------------
 
-uniform sampler2D prepassTex ; 
+uniform sampler2D deferredTex ; 
 uniform sampler2D backbuffer ;
 uniform sampler1D waterDepthGradMap;
 uniform vec3    eyePosWorld;
@@ -55,9 +55,9 @@ out vec4 OUT_col;
 
 void main() 
 {    
-   //vec2 prepassCoord = IN_uv0;
+   //vec2 deferredCoord = IN_uv0;
    //IN_uv0 = ( IN_uv0.xy * rtParams0.zw ) + rtParams0.xy;
-   float depth = prepassUncondition( prepassTex, IN_uv0 ).w;
+   float depth = deferredUncondition( deferredTex, IN_uv0 ).w;
    //return vec4( depth.rrr, 1 );
    
    // Skip fogging the extreme far plane so that 
