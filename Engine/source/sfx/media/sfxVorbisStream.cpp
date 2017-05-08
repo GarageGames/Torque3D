@@ -198,7 +198,7 @@ S32 SFXVorbisStream::read( U8 *buffer,
    // requests longer than this.
    const U32 MAXREAD = 4096;
 
-   U32 bytesRead = 0;
+   S64 bytesRead = 0;
    U32 offset = 0;
    U32 bytesToRead = 0;
 
