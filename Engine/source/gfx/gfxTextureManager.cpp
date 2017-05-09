@@ -34,6 +34,7 @@
 #include "core/util/dxt5nmSwizzle.h"
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
+#include "platform/types.h"
 
 using namespace Torque;
 
@@ -267,9 +268,14 @@ GFXTextureObject *GFXTextureManager::_lookupTexture( const DDSFile *ddsFile, con
    return NULL;
 }
 
+
+
 GFXTextureObject *GFXTextureManager::createTexture( GBitmap *bmp, const String &resourceName, GFXTextureProfile *profile, bool deleteBmp )
 {
    AssertFatal(bmp, "GFXTextureManager::createTexture() - Got NULL bitmap!");
+
+   if( (!isPow2(bmp->getWidth())) || (!isPow2(bmp->getHeight())) )
+      Con::printf("WARNING: (%s) texture size = %dx%d", resourceName.c_str(), bmp->getWidth(), bmp->getHeight());
 
    GFXTextureObject *cacheHit = _lookupTexture( resourceName, profile );
    if( cacheHit != NULL)
