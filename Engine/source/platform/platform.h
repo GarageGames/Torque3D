@@ -23,6 +23,7 @@
 #ifndef _PLATFORM_H_
 #define _PLATFORM_H_
 
+#include <cstdio>
 #include <stdlib.h>
 
 #ifndef _TORQUECONFIG_H_
@@ -97,7 +98,7 @@ enum ProcessorType
    CPU_PowerPC_G4,
    CPU_PowerPC_G4_7450,
    CPU_PowerPC_G4_7455,
-   CPU_PowerPC_G4_7447, 
+   CPU_PowerPC_G4_7447,
    CPU_PowerPC_G5,
 
    // Xenon
@@ -107,7 +108,7 @@ enum ProcessorType
 
 /// Properties for CPU.
 enum ProcessorProperties
-{ 
+{
    CPU_PROP_C         = (1<<0),  ///< We should use C fallback math functions.
    CPU_PROP_FPU       = (1<<1),  ///< Has an FPU. (It better!)
    CPU_PROP_MMX       = (1<<2),  ///< Supports MMX instruction set extension.
@@ -115,16 +116,16 @@ enum ProcessorProperties
    CPU_PROP_SSE       = (1<<4),  ///< Supports SSE instruction set extension.
    CPU_PROP_RDTSC     = (1<<5),  ///< Supports Read Time Stamp Counter op.
    CPU_PROP_SSE2      = (1<<6),  ///< Supports SSE2 instruction set extension.
-   CPU_PROP_SSE3      = (1<<7),  ///< Supports SSE3 instruction set extension.  
-   CPU_PROP_SSE3xt    = (1<<8),  ///< Supports extended SSE3 instruction set  
-   CPU_PROP_SSE4_1    = (1<<9),  ///< Supports SSE4_1 instruction set extension.  
-   CPU_PROP_SSE4_2    = (1<<10), ///< Supports SSE4_2 instruction set extension.  
+   CPU_PROP_SSE3      = (1<<7),  ///< Supports SSE3 instruction set extension.
+   CPU_PROP_SSE3xt    = (1<<8),  ///< Supports extended SSE3 instruction set
+   CPU_PROP_SSE4_1    = (1<<9),  ///< Supports SSE4_1 instruction set extension.
+   CPU_PROP_SSE4_2    = (1<<10), ///< Supports SSE4_2 instruction set extension.
    CPU_PROP_MP        = (1<<11), ///< This is a multi-processor system.
-   CPU_PROP_LE        = (1<<12), ///< This processor is LITTLE ENDIAN.  
+   CPU_PROP_LE        = (1<<12), ///< This processor is LITTLE ENDIAN.
    CPU_PROP_64bit     = (1<<13), ///< This processor is 64-bit capable
 };
 
-/// Processor info manager. 
+/// Processor info manager.
 struct Processor
 {
    /// Gather processor state information.
@@ -134,7 +135,7 @@ struct Processor
 #if defined(TORQUE_SUPPORTS_GCC_INLINE_X86_ASM)
 #define TORQUE_DEBUGBREAK() { asm ( "int 3"); }
 #elif defined (TORQUE_SUPPORTS_VC_INLINE_X86_ASM) // put this test second so that the __asm syntax doesn't break the Visual Studio Intellisense parser
-#define TORQUE_DEBUGBREAK() { __asm { int 3 }; } 
+#define TORQUE_DEBUGBREAK() { __asm { int 3 }; }
 #else
 /// Macro to do in-line debug breaks, used for asserts.  Does inline assembly when possible.
 #define TORQUE_DEBUGBREAK() Platform::debugBreak();
@@ -183,11 +184,11 @@ namespace Platform
 
 
    void getLocalTime(LocalTime &);
-   
+
    /// Converts the local time to a formatted string appropriate
    /// for the current platform.
    String localTimeToString( const LocalTime &lt );
-   
+
    U32  getTime();
    U32  getVirtualMilliseconds();
 
@@ -209,7 +210,7 @@ namespace Platform
    U32 getMathControlState();
    void setMathControlState(U32 state);
    void setMathControlStateKnown();
-   
+
    // Process control
    void sleep(U32 ms);
    bool excludeOtherInstances(const char *string);
@@ -221,10 +222,10 @@ namespace Platform
    // Debug
    void outputDebugString(const char *string, ...);
    void debugBreak();
-   
+
    // Random
    F32 getRandom();
-   
+
    // Window state
    void setWindowLocked(bool locked);
    void minimizeWindow();
@@ -257,7 +258,7 @@ namespace Platform
 
    // Directory functions.  Dump path returns false iff the directory cannot be
    //  opened.
-   
+
    StringTableEntry getCurrentDirectory();
    bool             setCurrentDirectory(StringTableEntry newDir);
 
@@ -270,7 +271,7 @@ namespace Platform
    StringTableEntry getExecutableName();
    /// Returns full pathname of the torque executable without filename
    StringTableEntry getExecutablePath();
-   
+
    /// Returns the full path to the directory that contains main.cs.
    /// Tools scripts are validated as such if they are in this directory or a
    /// subdirectory of this directory.
@@ -371,10 +372,10 @@ namespace Platform
    StringTableEntry getUserHomeDirectory();
    StringTableEntry getUserDataDirectory();
    bool getUserIsAdministrator();
-   
+
    // Displays a fancy platform specific message box
    S32 messageBox(const UTF8 *title, const UTF8 *message, MBButtons buttons = MBOkCancel, MBIcons icon = MIInformation);
-   
+
    /// Description of a keyboard input we want to ignore.
    struct KeyboardInputExclusion
    {
@@ -404,18 +405,18 @@ namespace Platform
 
    /// Reset the keyboard input exclusion list.
    void clearKeyboardInputExclusion();
-   
+
    /// Add a new keyboard exclusion.
    void addKeyboardInputExclusion(const KeyboardInputExclusion &kie);
 
    /// Check if a given input event should be excluded.
    const bool checkKeyboardInputExclusion(const InputEventInfo *info);
-	
-   
-   /// Set/Get whether this is a web deployment 
+
+
+   /// Set/Get whether this is a web deployment
 	bool getWebDeployment();
    void setWebDeployment(bool v);
-   
+
 };
 
 //------------------------------------------------------------------------------
@@ -604,5 +605,3 @@ struct Math
 /// @}
 
 #endif
-
-
