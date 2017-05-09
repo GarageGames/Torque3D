@@ -38,7 +38,7 @@ struct ConvexConnectP
    float4 vsEyeDir : TEXCOORD2;
 };
 
-TORQUE_UNIFORM_SAMPLER2D(prePassBuffer, 0);
+TORQUE_UNIFORM_SAMPLER2D(deferredBuffer, 0);
 TORQUE_UNIFORM_SAMPLER2D(shadowMap, 1);
 TORQUE_UNIFORM_SAMPLER2D(dynamicShadowMap,2);
 
@@ -99,9 +99,9 @@ float4 main(   ConvexConnectP IN ) : TORQUE_TARGET0
 	}
 	
    // Sample/unpack the normal/z data
-   float4 prepassSample = TORQUE_PREPASS_UNCONDITION( prePassBuffer, uvScene );
-   float3 normal = prepassSample.rgb;
-   float depth = prepassSample.a;
+   float4 deferredSample = TORQUE_PREPASS_UNCONDITION( deferredBuffer, uvScene );
+   float3 normal = deferredSample.rgb;
+   float depth = deferredSample.a;
    
    // Eye ray - Eye -> Pixel
    float3 eyeRay = getDistanceVectorToPlane( -vsFarPlane.w, IN.vsEyeDir.xyz, vsFarPlane );

@@ -34,7 +34,7 @@ singleton ShaderData( ParticlesShaderData )
    OGLPixelShaderFile      = "shaders/common/gl/particlesP.glsl";
    
    samplerNames[0] = "$diffuseMap";
-   samplerNames[1] = "$prepassTex";
+   samplerNames[1] = "$deferredTex";
    samplerNames[2] = "$paraboloidLightMap";
    
    pixVersion = 2.0;
@@ -103,7 +103,7 @@ new ShaderData( fxFoliageReplicatorShader )
    pixVersion = 1.4;
 };
 
-singleton ShaderData( VolumetricFogPrePassShader )
+singleton ShaderData( VolumetricFogDeferredShader )
 {
    DXVertexShaderFile = "shaders/common/VolumetricFog/VFogPreV.hlsl";
    DXPixelShaderFile = "shaders/common/VolumetricFog/VFogPreP.hlsl";
@@ -121,7 +121,7 @@ singleton ShaderData( VolumetricFogShader )
    OGLVertexShaderFile  = "shaders/common/VolumetricFog/gl/VFogV.glsl";
    OGLPixelShaderFile   = "shaders/common/VolumetricFog/gl/VFogP.glsl";	
 	
-   samplerNames[0] = "$prepassTex";
+   samplerNames[0] = "$deferredTex";
    samplerNames[1] = "$depthBuffer";
    samplerNames[2] = "$frontBuffer";
    samplerNames[3] = "$density";

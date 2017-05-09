@@ -24,7 +24,7 @@
 #include "shadergen:/autogenConditioners.h"
 #include "../../gl/torque.glsl"
 
-uniform sampler2D prepassTex;
+uniform sampler2D deferredTex;
 uniform sampler2D depthBuffer;
 uniform sampler2D frontBuffer;
 uniform sampler2D density;
@@ -52,7 +52,7 @@ void main()
 	vec2 uvscreen=((IN_hpos.xy/IN_hpos.w) + 1.0 ) / 2.0;
 	uvscreen.y = 1.0 - uvscreen.y;
 	
-	float obj_test = prepassUncondition( prepassTex, uvscreen).w * preBias;
+	float obj_test = deferredUncondition( deferredTex, uvscreen).w * preBias;
 	float depth = tex2D(depthBuffer,uvscreen).r;
 	float front = tex2D(frontBuffer,uvscreen).r;
 

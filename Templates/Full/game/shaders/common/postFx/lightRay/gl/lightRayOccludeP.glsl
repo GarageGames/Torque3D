@@ -25,7 +25,7 @@
 #include "../../gl/postFX.glsl"
 
 uniform sampler2D backBuffer;   // The original backbuffer.
-uniform sampler2D prepassTex;   // The pre-pass depth and normals.
+uniform sampler2D deferredTex;   // The pre-pass depth and normals.
 
 uniform float brightScalar;
 
@@ -38,7 +38,7 @@ void main()
     vec4 col = vec4( 0, 0, 0, 1 );
     
     // Get the depth at this pixel.
-    float depth = prepassUncondition( prepassTex, IN_uv0 ).w;
+    float depth = deferredUncondition( deferredTex, IN_uv0 ).w;
     
     // If the depth is equal to 1.0, read from the backbuffer
     // and perform the exposure calculation on the result.

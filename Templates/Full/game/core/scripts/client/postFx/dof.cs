@@ -430,7 +430,7 @@ singleton PostEffect( DOFPostEffect )
    shader = PFX_DOFDownSampleShader;
    stateBlock = PFX_DOFDownSampleStateBlock;
    texture[0] = "$backBuffer";
-   texture[1] = "#prepass";
+   texture[1] = "#deferred";
    target = "#shrunk";
    targetScale = "0.25 0.25";   
    
@@ -485,7 +485,7 @@ singleton PostEffect( DOFFinalPFX )
    texture[0] = "$backBuffer";
    texture[1] = "$inTex";
    texture[2] = "#largeBlur";   
-   texture[3] = "#prepass";   
+   texture[3] = "#deferred";   
    target = "$backBuffer";
 };
 

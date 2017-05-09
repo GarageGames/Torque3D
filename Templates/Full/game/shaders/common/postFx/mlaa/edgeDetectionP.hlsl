@@ -29,7 +29,7 @@
 #include "shadergen:/autogenConditioners.h"
 
 uniform sampler2D colorMapG  : register(S0);
-uniform sampler2D prepassMap : register(S1);
+uniform sampler2D deferredMap : register(S1);
 
 uniform float3 lumaCoefficients;
 uniform float threshold;
@@ -43,7 +43,7 @@ float4 main(   float2 texcoord : TEXCOORD0,
    //
    // Note that there is a lot of overlapped luma calculations; performance
    // can be improved if this luma calculation is performed in the main pass,
-   // which may give you an edge if used in conjunction with a z prepass.
+   // which may give you an edge if used in conjunction with a z deferred.
 
    float L = dot(tex2D(colorMapG, texcoord).rgb, lumaCoefficients);
 
@@ -56,11 +56,11 @@ float4 main(   float2 texcoord : TEXCOORD0,
    float4 edges = step(threshold, delta);
 
    // Add depth edges to color edges
-   float D = prepassUncondition(prepassMap, texcoord).w;
-   float Dleft = prepassUncondition(prepassMap, offset[0].xy).w;
-   float Dtop  = prepassUncondition(prepassMap, offset[0].zw).w;
-   float Dright = prepassUncondition(prepassMap, offset[1].xy).w;
-   float Dbottom = prepassUncondition(prepassMap, offset[1].zw).w;
+   float D = deferredUncondition(deferredMap, texcoord).w;
+   float Dleft = deferredUncondition(deferredMap, offset[0].xy).w;
+   float Dtop  = deferredUncondition(deferredMap, offset[0].zw).w;
+   float Dright = deferredUncondition(deferredMap, offset[1].xy).w;
+   float Dbottom = deferredUncondition(deferredMap, offset[1].zw).w;
 
    delta = abs(D.xxxx - float4(Dleft, Dtop, Dright, Dbottom));
    edges += step(depthThreshold, delta);

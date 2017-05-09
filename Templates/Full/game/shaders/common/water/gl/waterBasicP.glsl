@@ -94,7 +94,7 @@ float fresnel(float NdotV, float bias, float power)
 // Uniforms                                                                  
 //-----------------------------------------------------------------------------
 uniform sampler2D      bumpMap;
-//uniform sampler2D    prepassTex;
+//uniform sampler2D    deferredTex;
 uniform sampler2D    reflectMap;
 uniform sampler2D      refractBuff;
 uniform samplerCube  skyMap;

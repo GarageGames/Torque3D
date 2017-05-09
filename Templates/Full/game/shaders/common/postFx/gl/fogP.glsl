@@ -25,7 +25,7 @@
 #include "shadergen:/autogenConditioners.h"
 #include "../../gl/torque.glsl"
 
-uniform sampler2D prepassTex ;
+uniform sampler2D deferredTex ;
 uniform vec3    eyePosWorld;
 uniform vec4    fogColor;
 uniform vec3    fogData;
@@ -38,8 +38,8 @@ out vec4 OUT_col;
 
 void main()
 {   
-   //vec2 prepassCoord = ( uv0.xy * rtParams0.zw ) + rtParams0.xy;   
-   float depth = prepassUncondition( prepassTex, uv0 ).w;
+   //vec2 deferredCoord = ( uv0.xy * rtParams0.zw ) + rtParams0.xy;   
+   float depth = deferredUncondition( deferredTex, uv0 ).w;
    //return vec4( depth, 0, 0, 0.7 );
    
    float factor = computeSceneFog( eyePosWorld,

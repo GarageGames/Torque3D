@@ -51,7 +51,7 @@ singleton ShaderData( MLAA_EdgeDetectionShader )
    OGLPixelShaderFile   = "shaders/common/postFx/mlaa/gl/edgeDetectionP.glsl";
 
    samplerNames[0] = "$colorMapG";
-   samplerNames[1] = "$prepassMap";
+   samplerNames[1] = "$deferredMap";
 
    pixVersion = 3.0;
 };
@@ -125,7 +125,7 @@ singleton PostEffect( MLAAFx )
    renderTime = "PFXAfterDiffuse";
 
    texture[0] = "$backBuffer"; //colorMapG      
-   texture[1] = "#prepass"; // Used for depth detection
+   texture[1] = "#deferred"; // Used for depth detection
 
    target = "$outTex";
    targetClear = PFXTargetClear_OnDraw;

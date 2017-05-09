@@ -25,7 +25,7 @@
 #include "./../torque.hlsl"
 #include "./../shaderModelAutoGen.hlsl"
 
-TORQUE_UNIFORM_SAMPLER2D(prepassTex, 0);
+TORQUE_UNIFORM_SAMPLER2D(deferredTex, 0);
 uniform float3    eyePosWorld;
 uniform float4    fogColor;
 uniform float3    fogData;
@@ -33,8 +33,8 @@ uniform float4    rtParams0;
 
 float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {   
-   //float2 prepassCoord = ( IN.uv0.xy * rtParams0.zw ) + rtParams0.xy;   
-   float depth = TORQUE_PREPASS_UNCONDITION( prepassTex, IN.uv0 ).w;
+   //float2 deferredCoord = ( IN.uv0.xy * rtParams0.zw ) + rtParams0.xy;   
+   float depth = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 ).w;
    //return float4( depth, 0, 0, 0.7 );
    
    float factor = computeSceneFog( eyePosWorld,

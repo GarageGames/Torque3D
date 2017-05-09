@@ -87,10 +87,10 @@ void main()
    coc = half4(0);
    for ( int i = 0; i < 4; i++ )
    {
-      depth[0] = prepassUncondition( depthSampler, ( IN_tcDepth0.xy + rowOfs[i] ) ).w;
-      depth[1] = prepassUncondition( depthSampler, ( IN_tcDepth1.xy + rowOfs[i] ) ).w;
-      depth[2] = prepassUncondition( depthSampler, ( IN_tcDepth2.xy + rowOfs[i] ) ).w;
-      depth[3] = prepassUncondition( depthSampler, ( IN_tcDepth3.xy + rowOfs[i] ) ).w;
+      depth[0] = deferredUncondition( depthSampler, ( IN_tcDepth0.xy + rowOfs[i] ) ).w;
+      depth[1] = deferredUncondition( depthSampler, ( IN_tcDepth1.xy + rowOfs[i] ) ).w;
+      depth[2] = deferredUncondition( depthSampler, ( IN_tcDepth2.xy + rowOfs[i] ) ).w;
+      depth[3] = deferredUncondition( depthSampler, ( IN_tcDepth3.xy + rowOfs[i] ) ).w;
       
       // @todo OPENGL INTEL need review
       coc = max( coc, clamp( half4(dofEqWorld.x) * depth + half4(dofEqWorld.y), half4(0.0), half4(maxWorldCoC) ) );  

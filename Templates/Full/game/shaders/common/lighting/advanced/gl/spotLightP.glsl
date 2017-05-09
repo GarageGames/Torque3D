@@ -46,7 +46,7 @@ uniform sampler2D cookieMap;
 
 #endif
 
-uniform sampler2D prePassBuffer;
+uniform sampler2D deferredBuffer;
 uniform sampler2D shadowMap;
 uniform sampler2D dynamicShadowMap;
 
@@ -101,9 +101,9 @@ void main()
 	}
 	
    // Sample/unpack the normal/z data
-   vec4 prepassSample = prepassUncondition( prePassBuffer, uvScene );
-   vec3 normal = prepassSample.rgb;
-   float depth = prepassSample.a;
+   vec4 deferredSample = deferredUncondition( deferredBuffer, uvScene );
+   vec3 normal = deferredSample.rgb;
+   float depth = deferredSample.a;
    
    // Eye ray - Eye -> Pixel
    vec3 eyeRay = getDistanceVectorToPlane( -vsFarPlane.w, IN_vsEyeDir.xyz, vsFarPlane );
