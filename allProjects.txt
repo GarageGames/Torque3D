@@ -1,2 +1,0 @@
-Templates\Full\
-Templates\Empty\
