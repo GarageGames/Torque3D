@@ -51,6 +51,7 @@
 #include "T3D/fx/cameraFXMgr.h"
 #include "T3D/fx/splash.h"
 #include "T3D/tsStatic.h"
+#include "T3D/physics/physicsWorld.h"
 #include "T3D/physics/physicsPlugin.h"
 #include "T3D/physics/physicsPlayer.h"
 #include "T3D/decal/decalManager.h"
@@ -2115,7 +2116,7 @@ void Player::processTick(const Move* move)
       PROFILE_START(Player_PhysicsSection);
       if ( isServerObject() || didRenderLastRender() || getControllingClient() )
       {
-         if ( !mPhysicsRep )
+         if ( !_physicsEnabled() )
          {
             if ( isMounted() )
             {
@@ -2828,7 +2829,7 @@ void Player::updateMove(const Move* move)
       // the player to "rest" on the ground.
       // However, no need to do that if we're using a physics library.
       // It will take care of itself.
-      if (!mPhysicsRep)
+      if (!_physicsEnabled())
       {
          F32 vd = -mDot(acc,contactNormal);
          if (vd > 0.0f) {
@@ -2872,7 +2873,7 @@ void Player::updateMove(const Move* move)
             pvl = pv.len();
          }
       }
-      else if (!mPhysicsRep)
+      else if (!_physicsEnabled())
       {
          // We only do this if we're not using a physics library.  The
          // library will take care of itself.
@@ -3340,7 +3341,7 @@ bool Player::canCrouch()
       return true;
 
    // Do standard Torque physics test here!
-   if ( !mPhysicsRep )
+   if ( !_physicsEnabled() )
    {
       F32 radius;
 
@@ -3391,7 +3392,7 @@ bool Player::canStand()
       return true;
 
    // Do standard Torque physics test here!
-   if ( !mPhysicsRep )
+   if ( !_physicsEnabled() )
    {
       F32 radius;
 
@@ -3448,7 +3449,7 @@ bool Player::canProne()
       return false;
 
    // Do standard Torque physics test here!
-   if ( !mPhysicsRep )
+   if ( !_physicsEnabled() )
       return true;
 
    // We are already in this pose, so don't test it again...
@@ -4994,6 +4995,18 @@ void Player::_handleCollision( const Collision &collision )
       queueCollision( collision.object, mVelocity - collision.object->getVelocity() );
 }
 
+bool Player::_physicsEnabled()
+{
+   if (PHYSICSMGR)
+   {
+      PhysicsWorld *world = PHYSICSMGR->getWorld(isServerObject() ? "server" : "client");
+      if (mPhysicsRep && world->isEnabled())
+         return true;
+   }
+
+   return false;
+}
+
 bool Player::updatePos(const F32 travelTime)
 {
    PROFILE_SCOPE(Player_UpdatePos);
@@ -5014,8 +5027,7 @@ bool Player::updatePos(const F32 travelTime)
 
    // DEBUG:
    //Point3F savedVelocity = mVelocity;
-
-   if ( mPhysicsRep )
+   if ( _physicsEnabled() )
    {
       static CollisionList collisionList;
       collisionList.clear();
@@ -5218,7 +5230,7 @@ void Player::findContact( bool *run, bool *jump, VectorF *contactNormal )
    SceneObject *contactObject = NULL;
 
    Vector<SceneObject*> overlapObjects;
-   if ( mPhysicsRep )
+   if ( _physicsEnabled() )
       mPhysicsRep->findContact( &contactObject, contactNormal, &overlapObjects );
    else
       _findContact( &contactObject, contactNormal, &overlapObjects );
