@@ -148,9 +148,8 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF8 *in_s
       return ptDraw.x;
 
    // Convert to UTF16 temporarily.
-   n++; // space for null terminator
-   FrameTemp<UTF16> ubuf( n );
-   convertUTF8toUTF16N(in_string, ubuf, n);
+   FrameTemp<UTF16> ubuf( n + 1 ); // (n+1) to add space for null terminator
+   convertUTF8toUTF16N(in_string, ubuf, n + 1);
 
    return drawTextN( font, ptDraw, ubuf, n, colorTable, maxColorIndex, rot );
 }
