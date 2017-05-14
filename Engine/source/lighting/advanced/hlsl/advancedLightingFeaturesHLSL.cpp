@@ -748,16 +748,16 @@ void DeferredMinnaertHLSL::processPix( Vector<ShaderComponent*> &componentList,
    deferredBuffer->sampler = true;
    deferredBuffer->constNum = Var::getTexUnitNum();     // used as texture unit num here
 
-   Var* prePassTex = NULL;
+   Var* deferredTex = NULL;
    if (mIsDirect3D11)
    {
       deferredBuffer->setType("SamplerState");
-      prePassTex = new Var;
-      prePassTex->setName("prePassTex");
-      prePassTex->setType("Texture2D");
-      prePassTex->uniform = true;
-      prePassTex->texture = true;
-      prePassTex->constNum = deferredBuffer->constNum;
+      deferredTex = new Var;
+      deferredTex->setName("deferredTex");
+      deferredTex->setType("Texture2D");
+      deferredTex->uniform = true;
+      deferredTex->texture = true;
+      deferredTex->constNum = deferredBuffer->constNum;
    }
 
    // Texture coord
@@ -774,7 +774,7 @@ void DeferredMinnaertHLSL::processPix( Vector<ShaderComponent*> &componentList,
    Var *d_NL_Att = (Var*)LangElement::find( "d_NL_Att" );
 
    if (mIsDirect3D11)
-      meta->addStatement(new GenOp(avar("   float4 normalDepth = %s(@, ,@, @);\r\n", unconditionDeferredMethod.c_str()), deferredBuffer, prePassTex, uvScene));
+      meta->addStatement(new GenOp(avar("   float4 normalDepth = %s(@, ,@, @);\r\n", unconditionDeferredMethod.c_str()), deferredBuffer, deferredTex, uvScene));
    else
       meta->addStatement(new GenOp(avar("   float4 normalDepth = %s(@, @);\r\n", unconditionDeferredMethod.c_str()), deferredBuffer, uvScene));
 

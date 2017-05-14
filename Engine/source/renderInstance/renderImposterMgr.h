@@ -74,9 +74,9 @@ protected:
    GFXPrimitiveBufferHandle mIB;
    //GFXVertexBufferHandle<ImposterCorner> mCornerVB;   
 
-   void _innerRender( const SceneRenderState *state, RenderDeferredMgr *prePassBin );
+   void _innerRender( const SceneRenderState *state, RenderDeferredMgr *deferredBin );
 
-   void _renderDeferred( const SceneRenderState *state, RenderDeferredMgr *prePassBin, bool startDeferred );
+   void _renderDeferred( const SceneRenderState *state, RenderDeferredMgr *deferredBin, bool startDeferred );
 
    static bool _clearStats( GFXDevice::GFXDeviceEventType type );
 

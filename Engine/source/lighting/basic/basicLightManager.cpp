@@ -185,12 +185,12 @@ void BasicLightManager::activate( SceneManager *sceneManager )
    FEATUREMGR->unregisterFeature( MFT_SubSurface );
 
    // First look for the deferred bin...
-   RenderDeferredMgr *prePassBin = _findDeferredRenderBin();
+   RenderDeferredMgr *deferredBin = _findDeferredRenderBin();
 
    /*
    // If you would like to use forward shading, and have a linear depth pre-pass
    // than un-comment this code block.
-   if ( !prePassBin )
+   if ( !deferredBin )
    {
       Vector<GFXFormat> formats;
       formats.push_back( GFXFormatR32F );
@@ -204,12 +204,12 @@ void BasicLightManager::activate( SceneManager *sceneManager )
       // Uncomment this for a no-color-write z-fill pass. 
       //linearDepthFormat = GFXFormat_COUNT;
 
-      prePassBin = new RenderDeferredMgr( linearDepthFormat != GFXFormat_COUNT, linearDepthFormat );
-      prePassBin->registerObject();
-      rpm->addManager( prePassBin );
+      deferredBin = new RenderDeferredMgr( linearDepthFormat != GFXFormat_COUNT, linearDepthFormat );
+      deferredBin->registerObject();
+      rpm->addManager( deferredBin );
    }
    */
-   mDeferredRenderBin = prePassBin;
+   mDeferredRenderBin = deferredBin;
 
    // If there is a deferred bin
    MATMGR->setDeferredEnabled( mDeferredRenderBin.isValid() );

@@ -165,7 +165,7 @@ protected:
    bool _createPass( Vector<MaterialInfo*> *materials, 
                      Pass *pass, 
                      bool firstPass,
-                     bool prePassMat,
+                     bool deferredMat,
                      bool reflectMat,
                      bool baseOnly );
 
@@ -178,7 +178,7 @@ public:
 
    void init(  TerrainBlock *block, 
                U64 activeMaterials,
-               bool prePassMat = false,
+               bool deferredMat = false,
                bool reflectMat = false,
                bool baseOnly = false );
 

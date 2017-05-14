@@ -589,8 +589,8 @@ const GFXStateBlockDesc & RenderDeferredMgr::getOpaqueStencilTestDesc()
 //------------------------------------------------------------------------------
 
 
-ProcessedDeferredMaterial::ProcessedDeferredMaterial( Material& mat, const RenderDeferredMgr *prePassMgr )
-: Parent(mat), mDeferredMgr(prePassMgr)
+ProcessedDeferredMaterial::ProcessedDeferredMaterial( Material& mat, const RenderDeferredMgr *deferredMgr )
+: Parent(mat), mDeferredMgr(deferredMgr)
 {
 
 }
@@ -818,43 +818,43 @@ U32 ProcessedDeferredMaterial::getNumStages()
 
 void ProcessedDeferredMaterial::addStateBlockDesc(const GFXStateBlockDesc& desc)
 {
-   GFXStateBlockDesc prePassStateBlock = desc;
+   GFXStateBlockDesc deferredStateBlock = desc;
 
    // Adjust color writes if this is a pure z-fill pass
    const bool pixelOutEnabled = mDeferredMgr->getTargetChainLength() > 0;
    if ( !pixelOutEnabled )
    {
-      prePassStateBlock.colorWriteDefined = true;
-      prePassStateBlock.colorWriteRed = pixelOutEnabled;
-      prePassStateBlock.colorWriteGreen = pixelOutEnabled;
-      prePassStateBlock.colorWriteBlue = pixelOutEnabled;
-      prePassStateBlock.colorWriteAlpha = pixelOutEnabled;
+      deferredStateBlock.colorWriteDefined = true;
+      deferredStateBlock.colorWriteRed = pixelOutEnabled;
+      deferredStateBlock.colorWriteGreen = pixelOutEnabled;
+      deferredStateBlock.colorWriteBlue = pixelOutEnabled;
+      deferredStateBlock.colorWriteAlpha = pixelOutEnabled;
    }
 
    // Never allow the alpha test state when rendering
    // the deferred as we use the alpha channel for the
    // depth information... MFT_AlphaTest will handle it.
-   prePassStateBlock.alphaDefined = true;
-   prePassStateBlock.alphaTestEnable = false;
+   deferredStateBlock.alphaDefined = true;
+   deferredStateBlock.alphaTestEnable = false;
 
    // If we're translucent then we're doing deferred blending
    // which never writes to the depth channels.
    const bool isTranslucent = getMaterial()->isTranslucent();
    if ( isTranslucent )
    {
-      prePassStateBlock.setBlend( true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha );
-      prePassStateBlock.setColorWrites(false, false, false, true);
+      deferredStateBlock.setBlend( true, GFXBlendSrcAlpha, GFXBlendInvSrcAlpha );
+      deferredStateBlock.setColorWrites(false, false, false, true);
    }
 
    // Enable z reads, but only enable zwrites if we're not translucent.
-   prePassStateBlock.setZReadWrite( true, isTranslucent ? false : true );
+   deferredStateBlock.setZReadWrite( true, isTranslucent ? false : true );
 
    // Pass to parent
-   Parent::addStateBlockDesc(prePassStateBlock);
+   Parent::addStateBlockDesc(deferredStateBlock);
 }
 
-DeferredMatInstance::DeferredMatInstance(MatInstance* root, const RenderDeferredMgr *prePassMgr)
-: Parent(*root->getMaterial()), mDeferredMgr(prePassMgr)
+DeferredMatInstance::DeferredMatInstance(MatInstance* root, const RenderDeferredMgr *deferredMgr)
+: Parent(*root->getMaterial()), mDeferredMgr(deferredMgr)
 {
    mFeatureList = root->getRequestedFeatures();
    mVertexFormat = root->getVertexFormat();
@@ -892,8 +892,8 @@ bool DeferredMatInstance::init( const FeatureSet &features,
 }
 
 DeferredMatInstanceHook::DeferredMatInstanceHook( MatInstance *baseMatInst,
-                                                const RenderDeferredMgr *prePassMgr )
-   : mHookedDeferredMatInst(NULL), mDeferredManager(prePassMgr)
+                                                const RenderDeferredMgr *deferredMgr )
+   : mHookedDeferredMatInst(NULL), mDeferredManager(deferredMgr)
 {
    // If the material is a custom material then
    // hope that using DefaultDeferredMaterial gives
@@ -902,7 +902,7 @@ DeferredMatInstanceHook::DeferredMatInstanceHook( MatInstance *baseMatInst,
    {
       MatInstance* dummyInst = static_cast<MatInstance*>( MATMGR->createMatInstance( "AL_DefaultDeferredMaterial", baseMatInst->getVertexFormat() ) );
 
-      mHookedDeferredMatInst = new DeferredMatInstance( dummyInst, prePassMgr );
+      mHookedDeferredMatInst = new DeferredMatInstance( dummyInst, deferredMgr );
       mHookedDeferredMatInst->init( dummyInst->getRequestedFeatures(), baseMatInst->getVertexFormat());
 
       delete dummyInst;
@@ -910,7 +910,7 @@ DeferredMatInstanceHook::DeferredMatInstanceHook( MatInstance *baseMatInst,
    }
 
    // Create the deferred material instance.
-   mHookedDeferredMatInst = new DeferredMatInstance(baseMatInst, prePassMgr);
+   mHookedDeferredMatInst = new DeferredMatInstance(baseMatInst, deferredMgr);
    mHookedDeferredMatInst->getFeaturesDelegate() = baseMatInst->getFeaturesDelegate();
 
    // Get the features, but remove the instancing feature if the

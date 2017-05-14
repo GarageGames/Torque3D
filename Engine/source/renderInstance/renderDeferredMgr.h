@@ -19,8 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#ifndef _PREPASS_MGR_H_
-#define _PREPASS_MGR_H_
+#ifndef _DEFERRED_MGR_H_
+#define _DEFERRED_MGR_H_
 
 #include "renderInstance/renderTexTargetBinManager.h"
 #include "materials/matInstance.h"
@@ -122,7 +122,7 @@ class ProcessedDeferredMaterial : public ProcessedShaderMaterial
    typedef ProcessedShaderMaterial Parent;
    
 public:   
-   ProcessedDeferredMaterial(Material& mat, const RenderDeferredMgr *prePassMgr);
+   ProcessedDeferredMaterial(Material& mat, const RenderDeferredMgr *deferredMgr);
 
    virtual U32 getNumStages();
 
@@ -142,7 +142,7 @@ class DeferredMatInstance : public MatInstance
    typedef MatInstance Parent;
 
 public:   
-   DeferredMatInstance(MatInstance* root, const RenderDeferredMgr *prePassMgr);
+   DeferredMatInstance(MatInstance* root, const RenderDeferredMgr *deferredMgr);
    virtual ~DeferredMatInstance();
 
    bool init()
@@ -165,7 +165,7 @@ protected:
 class DeferredMatInstanceHook : public MatInstanceHook
 {
 public:
-   DeferredMatInstanceHook(MatInstance *baseMatInst, const RenderDeferredMgr *prePassMgr);
+   DeferredMatInstanceHook(MatInstance *baseMatInst, const RenderDeferredMgr *deferredMgr);
    virtual ~DeferredMatInstanceHook();
 
    virtual DeferredMatInstance *getDeferredMatInstance() { return mHookedDeferredMatInst; }
@@ -220,5 +220,5 @@ inline BaseMatInstance* RenderDeferredMgr::getDeferredMaterial( BaseMatInstance 
    return hook->getDeferredMatInstance();
 }
 
-#endif // _PREPASS_MGR_H_
+#endif // _DEFERRED_MGR_H_
 

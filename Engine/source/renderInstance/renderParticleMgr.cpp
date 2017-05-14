@@ -557,7 +557,7 @@ bool RenderParticleMgr::_initShader()
       mParticleShaderConsts.mAlphaFactorSC = mParticleShader->getShaderConstHandle( "$alphaFactor" );
       mParticleShaderConsts.mAlphaScaleSC = mParticleShader->getShaderConstHandle( "$alphaScale" );
       mParticleShaderConsts.mFSModelViewProjSC = mParticleShader->getShaderConstHandle( "$fsModelViewProj" );
-      mParticleShaderConsts.mDeferredTargetParamsSC = mParticleShader->getShaderConstHandle( "$prePassTargetParams" );
+      mParticleShaderConsts.mDeferredTargetParamsSC = mParticleShader->getShaderConstHandle( "$deferredTargetParams" );
 
       //samplers
       mParticleShaderConsts.mSamplerDiffuse = mParticleShader->getShaderConstHandle("$diffuseMap");
@@ -596,13 +596,13 @@ void RenderParticleMgr::_onLMActivate( const char*, bool activate )
          return;
 
       // Hunt for the pre-pass manager/target
-      RenderDeferredMgr *prePassBin = NULL;
+      RenderDeferredMgr *deferredBin = NULL;
       for( U32 i = 0; i < rpm->getManagerCount(); i++ )
       {
          RenderBinManager *bin = rpm->getManager(i);
          if( bin->getRenderInstType() == RenderDeferredMgr::RIT_Deferred )
          {
-            prePassBin = (RenderDeferredMgr*)bin;
+            deferredBin = (RenderDeferredMgr*)bin;
             break;
          }
       }
@@ -610,11 +610,11 @@ void RenderParticleMgr::_onLMActivate( const char*, bool activate )
       // If we found the deferred bin, set this bin to render very shortly afterwards
       // and re-add this render-manager. If there is no pre-pass bin, or it doesn't
       // have a depth-texture, we can't render offscreen.
-      mOffscreenRenderEnabled = prePassBin && (prePassBin->getTargetChainLength() > 0);
+      mOffscreenRenderEnabled = deferredBin && (deferredBin->getTargetChainLength() > 0);
       if(mOffscreenRenderEnabled)
       {
          rpm->removeManager(this);
-         setRenderOrder( prePassBin->getRenderOrder() + 0.011f );
+         setRenderOrder( deferredBin->getRenderOrder() + 0.011f );
          rpm->addManager(this);
       }
 
