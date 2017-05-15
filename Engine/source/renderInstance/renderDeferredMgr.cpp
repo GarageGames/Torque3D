@@ -682,7 +682,6 @@ void ProcessedDeferredMaterial::_determineFeatures( U32 stageNum,
                   type == MFT_UseInstancing ||
                   type == MFT_DiffuseVertColor ||
                   type == MFT_DetailMap ||
-                  type == MFT_DetailNormalMap ||
                   type == MFT_DiffuseMapAtlas)
          newFeatures.addFeature( type );
 
