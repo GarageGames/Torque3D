@@ -89,7 +89,7 @@ Point2I Win32WindowManager::getDesktopResolution()
    dMemset( &devMode, 0, sizeof( devMode ) );
    devMode.dmSize = sizeof( devMode );
 
-   if (!::EnumDisplaySettings(NULL, ENUM_REGISTRY_SETTINGS, &devMode))
+   if (!::EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devMode))
       return Point2I(-1,-1);
 
    // Return Resolution
@@ -102,7 +102,7 @@ S32 Win32WindowManager::getDesktopBitDepth()
    dMemset( &devMode, 0, sizeof( devMode ) );
    devMode.dmSize = sizeof( devMode );
 
-   if (!::EnumDisplaySettings(NULL, ENUM_REGISTRY_SETTINGS, &devMode))
+   if (!::EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &devMode))
       return -1;
 
    // Return Bits per Pixel
