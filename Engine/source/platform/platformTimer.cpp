@@ -22,6 +22,7 @@
 
 #include "platform/platformTimer.h"
 #include "core/util/journal/process.h"
+#include "console/engineAPI.h"
 
 void TimeManager::_updateTime()
 {
@@ -85,15 +86,6 @@ const S32 TimeManager::getBackgroundThreshold() const
 }
 
 //----------------------------------------------------------------------------------
-
-#pragma message("Mac/Lunix will need to implement this or get unresolved externals.")
-#pragma message(" It was previously defined here with a Win32 ifdef which goes against")
-#pragma message(" how torque implements its platform agnostic systems - JDD")
-//PlatformTimer *PlatformTimer::create()
-//{
-//   return new DefaultPlatformTimer();
-//}
-
 PlatformTimer::PlatformTimer()
 {
 }
@@ -168,12 +160,12 @@ S32 ScriptTimerMan::stopTimer( S32 id )
 
 ScriptTimerMan gScriptTimerMan;
 
-ConsoleFunction( startPrecisionTimer, S32, 1, 1, "startPrecisionTimer() - Create and start a high resolution platform timer. Returns the timer id." )
+DefineConsoleFunction( startPrecisionTimer, S32, (), , "startPrecisionTimer() - Create and start a high resolution platform timer. Returns the timer id." )
 {
    return gScriptTimerMan.startTimer();
 }
 
-ConsoleFunction( stopPrecisionTimer, S32, 2, 2, "stopPrecisionTimer( S32 id ) - Stop and destroy timer with the passed id.  Returns the elapsed milliseconds." )
+DefineConsoleFunction( stopPrecisionTimer, S32, ( S32 id), , "stopPrecisionTimer( S32 id ) - Stop and destroy timer with the passed id.  Returns the elapsed milliseconds." )
 {
-   return gScriptTimerMan.stopTimer( dAtoi( argv[1] ) );
+   return gScriptTimerMan.stopTimer( id );
 }

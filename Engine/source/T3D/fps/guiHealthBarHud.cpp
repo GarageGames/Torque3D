@@ -43,6 +43,7 @@ class GuiHealthBarHud : public GuiControl
    bool     mShowFrame;
    bool     mShowFill;
    bool     mDisplayEnergy;
+   bool     mFlip;
 
    ColorF   mFillColor;
    ColorF   mFrameColor;
@@ -105,6 +106,8 @@ GuiHealthBarHud::GuiHealthBarHud()
    mPulseRate = 0;
    mPulseThreshold = 0.3f;
    mValue = 0.2f;
+
+   mFlip = false;
 }
 
 void GuiHealthBarHud::initPersistFields()
@@ -124,6 +127,7 @@ void GuiHealthBarHud::initPersistFields()
    addField( "showFill", TypeBool, Offset( mShowFill, GuiHealthBarHud ), "If true, we draw the background color of the control." );
    addField( "showFrame", TypeBool, Offset( mShowFrame, GuiHealthBarHud ), "If true, we draw the frame of the control." );
    addField( "displayEnergy", TypeBool, Offset( mDisplayEnergy, GuiHealthBarHud ), "If true, display the energy value rather than the damage value." );
+   addField(  "flip", TypeBool, Offset( mFlip, GuiHealthBarHud), "If true, will fill bar in opposite direction.");
    endGroup("Misc");
 
    Parent::initPersistFields();
@@ -163,6 +167,7 @@ void GuiHealthBarHud::onRender(Point2I offset, const RectI &updateRect)
 
    // Pulse the damage fill if it's below the threshold
    if (mPulseRate != 0)
+   {
       if (mValue < mPulseThreshold) 
       {
          U32 time = Platform::getVirtualMilliseconds();
@@ -171,16 +176,25 @@ void GuiHealthBarHud::onRender(Point2I offset, const RectI &updateRect)
       }
       else
          mDamageFillColor.alpha = 1;
-
+   }
    // Render damage fill %
    RectI rect(updateRect);
    if(getWidth() > getHeight())
+   {
       rect.extent.x = (S32)(rect.extent.x * mValue);
+
+      if(mFlip)
+         rect.point.x = (S32)(updateRect.point.x + (updateRect.extent.x - rect.extent.x));
+   }
    else
    {
       S32 bottomY = rect.point.y + rect.extent.y;
       rect.extent.y = (S32)(rect.extent.y * mValue);
-      rect.point.y = bottomY - rect.extent.y;
+
+      if(mFlip)
+         rect.extent.y = (S32)(updateRect.extent.y - (updateRect.extent.y - rect.extent.y));
+      else
+         rect.point.y = bottomY - rect.extent.y;
    }
    GFX->getDrawUtil()->drawRectFill(rect, mDamageFillColor);
 

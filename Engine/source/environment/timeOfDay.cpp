@@ -61,14 +61,14 @@ ConsoleDocClass( TimeOfDay,
 );
 
 TimeOfDay::TimeOfDay() 
-   :  mElevation( 0.0f ),
-      mAzimuth( 0.0f ),
-      mAxisTilt( 23.44f ),       // 35 degree tilt
+   :  mStartTimeOfDay( 0.5f ),   // High noon
       mDayLen( 120.0f ),         // 2 minutes
-      mStartTimeOfDay( 0.5f ),   // High noon
+      mAxisTilt( 23.44f ),       // 35 degree tilt
+      mAzimuth( 0.0f ),
+      mElevation( 0.0f ),
       mTimeOfDay( 0.0f ),        // initialized to StartTimeOfDay in onAdd
-      mPlay( true ),
       mDayScale( 1.0f ),
+      mPlay( true ),
       mNightScale( 1.5f ),
       mAnimateTime( 0.0f ),
       mAnimateSpeed( 0.0f ),
@@ -402,7 +402,7 @@ void TimeOfDay::_getSunColor( ColorF *outColor ) const
    //simple check
    if ( mColorTargets[0].elevation != 0.0f )
    {
-      AssertFatal(0, "TimeOfDay::GetColor() - First elevation must be 0.0 radians")
+      AssertFatal(0, "TimeOfDay::GetColor() - First elevation must be 0.0 radians");
       outColor->set(1.0f, 1.0f, 1.0f);
       //mBandMod = 1.0f;
       //mCurrentBandColor = color;
@@ -411,7 +411,7 @@ void TimeOfDay::_getSunColor( ColorF *outColor ) const
 
    if ( mColorTargets[mColorTargets.size()-1].elevation != M_PI_F )
    {
-      AssertFatal(0, "Celestails::GetColor() - Last elevation must be PI")
+      AssertFatal(0, "Celestails::GetColor() - Last elevation must be PI");
       outColor->set(1.0f, 1.0f, 1.0f);
       //mBandMod = 1.0f;
       //mCurrentBandColor = color;

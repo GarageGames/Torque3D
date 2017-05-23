@@ -59,21 +59,21 @@ ConsoleDocClass( GuiIconButtonCtrl,
    "has been clicked.\n\n"
 
    "@tsexample\n"
-	"new GuiIconButtonCtrl(TestIconButton)\n"
-	"{\n"
-    "	buttonMargin = \"4 4\";\n"
-    "	iconBitmap = \"art/gui/lagIcon.png\";\n"
-    "	iconLocation = \"Center\";\n"
-    "	sizeIconToButton = \"0\";\n"
-    "	makeIconSquare = \"1\";\n"
-    "	textLocation = \"Bottom\";\n"
-    "	textMargin = \"-2\";\n"
-	"	autoSize = \"0\";\n"
-	"	text = \"Lag Icon\";\n"
-	"	textID = \"\"STR_LAG\"\";\n"
-	"	buttonType = \"PushButton\";\n"
-	"	profile = \"GuiIconButtonProfile\";\n"
-	"};\n"
+   "new GuiIconButtonCtrl(TestIconButton)\n"
+   "{\n"
+    " buttonMargin = \"4 4\";\n"
+    " iconBitmap = \"art/gui/lagIcon.png\";\n"
+    " iconLocation = \"Center\";\n"
+    " sizeIconToButton = \"0\";\n"
+    " makeIconSquare = \"1\";\n"
+    " textLocation = \"Bottom\";\n"
+    " textMargin = \"-2\";\n"
+   "  autoSize = \"0\";\n"
+   "  text = \"Lag Icon\";\n"
+   "  textID = \"\"STR_LAG\"\";\n"
+   "  buttonType = \"PushButton\";\n"
+   "  profile = \"GuiIconButtonProfile\";\n"
+   "};\n"
    "@endtsexample\n\n"
 
    "@see GuiControl\n"
@@ -85,7 +85,7 @@ ConsoleDocClass( GuiIconButtonCtrl,
 
 GuiIconButtonCtrl::GuiIconButtonCtrl()
 {
-   mBitmapName = StringTable->insert("");
+   mBitmapName = StringTable->EmptyString();
    mTextLocation = TextLocLeft;
    mIconLocation = IconLocLeft;
    mTextMargin = 4;
@@ -94,7 +94,7 @@ GuiIconButtonCtrl::GuiIconButtonCtrl()
    mFitBitmapToButton = false;
    mMakeIconSquare = false;
 
-   mErrorBitmapName = StringTable->insert("");
+   mErrorBitmapName = StringTable->EmptyString();
    mErrorTextureHandle = NULL;
 
    mAutoSize = false;
@@ -130,7 +130,7 @@ void GuiIconButtonCtrl::initPersistFields()
    addField( "sizeIconToButton", TypeBool,      Offset( mFitBitmapToButton, GuiIconButtonCtrl ),"If true, the icon will be scaled to be the same size as the button.\n");
    addField( "makeIconSquare",   TypeBool,      Offset( mMakeIconSquare, GuiIconButtonCtrl ),"If true, will make sure the icon is square.\n");
    addField( "textLocation",     TYPEID< TextLocation >(),      Offset( mTextLocation, GuiIconButtonCtrl ),"Where to place the text on the control.\n"
-																										   "Options are 0 (None), 1 (Bottom), 2 (Right), 3 (Top), 4 (Left), 5 (Center).\n");
+                                                                                 "Options are 0 (None), 1 (Bottom), 2 (Right), 3 (Top), 4 (Left), 5 (Center).\n");
    addField( "textMargin",       TypeS32,       Offset( mTextMargin, GuiIconButtonCtrl ),"Margin between the icon and the text.\n");
    addField( "autoSize",         TypeBool,      Offset( mAutoSize, GuiIconButtonCtrl ),"If true, the text and icon will be automatically sized to the size of the control.\n");
    Parent::initPersistFields();
@@ -230,7 +230,7 @@ void GuiIconButtonCtrl::renderButton( Point2I &offset, const RectI& updateRect )
    bool highlight = mMouseOver;
    bool depressed = mDepressed;
    
-   ColorI fontColor   = mActive ? (highlight ? mProfile->mFontColor : mProfile->mFontColor) : mProfile->mFontColorNA;
+   ColorI fontColor   = mActive ? (highlight ? mProfile->mFontColorHL : mProfile->mFontColor) : mProfile->mFontColorNA;
    
    RectI boundsRect(offset, getExtent());
 

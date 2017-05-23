@@ -136,6 +136,7 @@ static void pngWarningFn(png_structp, png_const_charp /*pMessage*/)
 //--------------------------------------
 static bool sReadPNG(Stream &stream, GBitmap *bitmap)
 {
+   PROFILE_SCOPE(sReadPNG);
    static const U32 cs_headerBytesChecked = 8;
 
    U8 header[cs_headerBytesChecked];
@@ -328,13 +329,14 @@ static bool _writePNG(GBitmap *bitmap, Stream &stream, U32 compressionLevel, U32
                   format == GFXFormatR8G8B8A8 || 
                   format == GFXFormatR8G8B8X8 || 
                   format == GFXFormatA8 ||
-                  format == GFXFormatR5G6B5, "_writePNG: ONLY RGB bitmap writing supported at this time.");
+                  format == GFXFormatR5G6B5 ||
+                  format == GFXFormatR8G8B8A8_LINEAR_FORCE, "_writePNG: ONLY RGB bitmap writing supported at this time.");
 
    if (  format != GFXFormatR8G8B8 && 
          format != GFXFormatR8G8B8A8 && 
          format != GFXFormatR8G8B8X8 && 
          format != GFXFormatA8 &&
-         format != GFXFormatR5G6B5 )
+         format != GFXFormatR5G6B5 && format != GFXFormatR8G8B8A8_LINEAR_FORCE)
       return false;
 
    png_structp png_ptr = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
@@ -381,7 +383,7 @@ static bool _writePNG(GBitmap *bitmap, Stream &stream, U32 compressionLevel, U32
          NULL,                        // compression type
          NULL);                       // filter type
    }
-   else if (format == GFXFormatR8G8B8A8 || format == GFXFormatR8G8B8X8)
+   else if (format == GFXFormatR8G8B8A8 || format == GFXFormatR8G8B8X8 || format == GFXFormatR8G8B8A8_LINEAR_FORCE)
    {
       png_set_IHDR(png_ptr, info_ptr,
          width, height,               // the width & height

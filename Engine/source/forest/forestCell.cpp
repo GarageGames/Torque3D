@@ -38,8 +38,8 @@
 ForestCell::ForestCell( const RectF &rect ) :
    mRect( rect ),
    mBounds( Box3F::Invalid ),
-   mLargestItem( ForestItem::Invalid ),
    mIsDirty( false ),
+   mLargestItem( ForestItem::Invalid ),
    mIsInteriorOnly( false )
 {
    dMemset( mSubCells, 0, sizeof( mSubCells ) );
@@ -116,6 +116,9 @@ S32 ForestCell::renderBatches( SceneRenderState *state, Frustum *culler )
    {
       // Is this batch entirely culled?
       if ( culler && culler->isCulled( mBatches[i]->getWorldBox() ) )
+         continue;
+
+      if( state->getCullingState().isOccludedWithExtraPlanesCull( mBatches[i]->getWorldBox() ) )
          continue;
 
       mBatches[i]->render( state );

@@ -230,6 +230,11 @@ bool expandOldScriptFilename(char *filename, U32 size, const char *src)
    else if (dStrncmp(src, "./", 2) == 0)
       // dot path means load from current codeblock/mod path
       slash = dStrrchr(cbName, '/');
+   else if (dStrncmp(src, "^", 1) == 0)
+   {
+      Platform::makeFullPathName(src + 1, filename, size);
+      return true;
+   }
    else
    {
       // otherwise path must be fully specified
@@ -338,25 +343,27 @@ bool collapseScriptFilename(char *filename, U32 size, const char *src)
 //-----------------------------------------------------------------------------
 
 ConsoleFunction(expandFilename, const char*, 2, 2, "(string filename)"
-				"@brief Grabs the full path of a specified file\n\n"
-				"@param filename Name of the local file to locate\n"
-				"@return String containing the full filepath on disk\n"
-				"@ingroup FileSystem")
+            "@brief Grabs the full path of a specified file\n\n"
+            "@param filename Name of the local file to locate\n"
+            "@return String containing the full filepath on disk\n"
+            "@ingroup FileSystem")
 {
    TORQUE_UNUSED(argc);
-   char* ret = Con::getReturnBuffer( 1024 );
-   Con::expandScriptFilename(ret, 1024, argv[1]);
+   static const U32 bufSize = 1024;
+   char* ret = Con::getReturnBuffer( bufSize );
+   Con::expandScriptFilename(ret, bufSize, argv[1]);
    return ret;
 }
 
 ConsoleFunction(expandOldFilename, const char*, 2, 2, "(string filename)"
-				"@brief Retrofits a filepath that uses old Torque style\n\n"
-				"@return String containing filepath with new formatting\n"
-				"@ingroup FileSystem")
+            "@brief Retrofits a filepath that uses old Torque style\n\n"
+            "@return String containing filepath with new formatting\n"
+            "@ingroup FileSystem")
 {
    TORQUE_UNUSED(argc);
-   char* ret = Con::getReturnBuffer( 1024 );
-   Con::expandOldScriptFilename(ret, 1024, argv[1]);
+   static const U32 bufSize = 1024;
+   char* ret = Con::getReturnBuffer( bufSize );
+   Con::expandOldScriptFilename(ret, bufSize, argv[1]);
    return ret;
 }
 
@@ -365,16 +372,17 @@ ConsoleFunction(expandOldFilename, const char*, 2, 2, "(string filename)"
 //-----------------------------------------------------------------------------
 
 ConsoleToolFunction(collapseFilename, const char*, 2, 2, "(string filename)"
-					"@internal Editor use only")
+               "@internal Editor use only")
 {
    TORQUE_UNUSED(argc);
-   char* ret = Con::getReturnBuffer( 1024 );
-   Con::collapseScriptFilename(ret, 1024, argv[1]);
+   static const U32 bufSize = 1024;
+   char* ret = Con::getReturnBuffer( bufSize );
+   Con::collapseScriptFilename(ret, bufSize, argv[1]);
    return ret;
 }
 
 ConsoleToolFunction(setScriptPathExpando, void, 3, 4, "(string expando, string path[, bool toolsOnly])"
-					"@internal Editor use only")
+               "@internal Editor use only")
 {
    if(argc == 4)
       Con::setScriptPathExpando(argv[1], argv[2], dAtob(argv[3]));
@@ -383,13 +391,13 @@ ConsoleToolFunction(setScriptPathExpando, void, 3, 4, "(string expando, string p
 }
 
 ConsoleToolFunction(removeScriptPathExpando, void, 2, 2, "(string expando)"
-					"@internal Editor use only")
+               "@internal Editor use only")
 {
    Con::removeScriptPathExpando(argv[1]);
 }
 
 ConsoleToolFunction(isScriptPathExpando, bool, 2, 2, "(string expando)"
-					"@internal Editor use only")
+               "@internal Editor use only")
 {
    return Con::isScriptPathExpando(argv[1]);
 }

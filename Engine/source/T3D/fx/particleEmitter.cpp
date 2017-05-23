@@ -38,10 +38,6 @@
 #include "lighting/lightInfo.h"
 #include "console/engineAPI.h"
 
-#if defined(TORQUE_OS_XENON)
-#  include "gfx/D3D9/360/gfx360MemVertexBuffer.h"
-#endif
-
 Point3F ParticleEmitter::mWindVelocity( 0.0, 0.0, 0.0 );
 const F32 ParticleEmitter::AgedSpinToRadians = (1.0f/1000.0f) * (1.0f/360.0f) * M_PI_F * 2.0f;
 
@@ -100,9 +96,9 @@ ConsoleDocClass( ParticleEmitterData,
    "@see ParticleEmitterNode\n"
 );
 
-static const float sgDefaultEjectionOffset = 0.f;
-static const float sgDefaultPhiReferenceVel = 0.f;
-static const float sgDefaultPhiVariance = 360.f;
+static const F32 sgDefaultEjectionOffset = 0.f;
+static const F32 sgDefaultPhiReferenceVel = 0.f;
+static const F32 sgDefaultPhiVariance = 360.f;
 
 //-----------------------------------------------------------------------------
 // ParticleEmitterData
@@ -145,6 +141,7 @@ ParticleEmitterData::ParticleEmitterData()
    blendStyle = ParticleRenderInst::BlendUndefined;
    sortParticles = false;
    renderReflection = true;
+   glow = false;
    reverseOrder = false;
    textureName = 0;
    textureHandle = 0;
@@ -289,6 +286,9 @@ void ParticleEmitterData::initPersistFields()
       addField( "renderReflection", TYPEID< bool >(), Offset(renderReflection, ParticleEmitterData),
          "Controls whether particles are rendered onto reflective surfaces like water." );
 
+      addField("glow", TYPEID< bool >(), Offset(glow, ParticleEmitterData),
+         "If true, the particles are rendered to the glow buffer as well.");
+
       //@}
 
    endGroup( "ParticleEmitterData" );
@@ -356,6 +356,7 @@ void ParticleEmitterData::packData(BitStream* stream)
    }
    stream->writeFlag(highResOnly);
    stream->writeFlag(renderReflection);
+   stream->writeFlag(glow);
    stream->writeInt( blendStyle, 4 );
 }
 
@@ -418,6 +419,7 @@ void ParticleEmitterData::unpackData(BitStream* stream)
    }
    highResOnly = stream->readFlag();
    renderReflection = stream->readFlag();
+   glow = stream->readFlag();
    blendStyle = stream->readInt( 4 );
 }
 
@@ -695,11 +697,6 @@ void ParticleEmitterData::allocPrimBuffer( S32 overrideSize )
    U16 *ibIndices;
    GFXBufferType bufferType = GFXBufferTypeStatic;
 
-#ifdef TORQUE_OS_XENON
-   // Because of the way the volatile buffers work on Xenon this is the only
-   // way to do this.
-   bufferType = GFXBufferTypeVolatile;
-#endif
    primBuff.set( GFX, indexListSize, 0, bufferType );
    primBuff.lock( &ibIndices );
    dMemcpy( ibIndices, indices, indexListSize * sizeof(U16) );
@@ -909,6 +906,8 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
 
    ri->blendStyle = mDataBlock->blendStyle;
 
+   ri->glow = mDataBlock->glow;
+
    // use first particle's texture unless there is an emitter texture to override it
    if (mDataBlock->textureHandle)
      ri->diffuseTex = &*(mDataBlock->textureHandle);
@@ -918,7 +917,7 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
    ri->softnessDistance = mDataBlock->softnessDistance; 
 
    // Sort by texture too.
-   ri->defaultKey = ri->diffuseTex ? (U32)ri->diffuseTex : (U32)ri->vertBuff;
+   ri->defaultKey = ri->diffuseTex ? (uintptr_t)ri->diffuseTex : (uintptr_t)ri->vertBuff;
 
    renderManager->addInst( ri );
 
@@ -929,7 +928,7 @@ void ParticleEmitter::prepRenderImage(SceneRenderState* state)
 //-----------------------------------------------------------------------------
 void ParticleEmitter::setSizes( F32 *sizeList )
 {
-   for( int i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
+   for( S32 i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
    {
       sizes[i] = sizeList[i];
    }
@@ -940,7 +939,7 @@ void ParticleEmitter::setSizes( F32 *sizeList )
 //-----------------------------------------------------------------------------
 void ParticleEmitter::setColors( ColorF *colorList )
 {
-   for( int i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
+   for( S32 i=0; i<ParticleData::PDC_NUM_KEYS; i++ )
    {
       colors[i] = colorList[i];
    }
@@ -1455,7 +1454,7 @@ struct SortParticle
 };
 
 // qsort callback function for particle sorting
-int QSORT_CALLBACK cmpSortParticles(const void* p1, const void* p2)
+S32 QSORT_CALLBACK cmpSortParticles(const void* p1, const void* p2)
 {
    const SortParticle* sp1 = (const SortParticle*)p1;
    const SortParticle* sp2 = (const SortParticle*)p2;
@@ -1496,22 +1495,9 @@ void ParticleEmitter::copyToVB( const Point3F &camPos, const ColorF &ambientColo
    }
    PROFILE_END();
 
-#if defined(TORQUE_OS_XENON)
-   // Allocate writecombined since we don't read back from this buffer (yay!)
-   if(mVertBuff.isNull())
-      mVertBuff = new GFX360MemVertexBuffer(GFX, 1, getGFXVertexFormat<ParticleVertexType>(), sizeof(ParticleVertexType), GFXBufferTypeDynamic, PAGE_WRITECOMBINE);
-   if( n_parts > mCurBuffSize )
-   {
-      mCurBuffSize = n_parts;
-      mVertBuff.resize(n_parts * 4);
-   }
-
-   ParticleVertexType *buffPtr = mVertBuff.lock();
-#else
    static Vector<ParticleVertexType> tempBuff(2048);
    tempBuff.reserve( n_parts*4 + 64); // make sure tempBuff is big enough
    ParticleVertexType *buffPtr = tempBuff.address(); // use direct pointer (faster)
-#endif
    
    if (mDataBlock->orientParticles)
    {
@@ -1645,9 +1631,6 @@ void ParticleEmitter::copyToVB( const Point3F &camPos, const ColorF &ambientColo
       PROFILE_END();
    }
 
-#if defined(TORQUE_OS_XENON)
-   mVertBuff.unlock();
-#else
    PROFILE_START(ParticleEmitter_copyToVB_LockCopy);
    // create new VB if emitter size grows
    if( !mVertBuff || n_parts > mCurBuffSize )
@@ -1660,7 +1643,6 @@ void ParticleEmitter::copyToVB( const Point3F &camPos, const ColorF &ambientColo
    dMemcpy( verts, tempBuff.address(), n_parts * 4 * sizeof(ParticleVertexType) );
    mVertBuff.unlock();
    PROFILE_END();
-#endif
 
    PROFILE_END();
 }
@@ -1694,7 +1676,7 @@ void ParticleEmitter::setupBillboard( Particle *part,
       lVerts->color = partCol; } \
 
    // Here we deal with UVs for animated particle (billboard)
-   if (part->dataBlock->animateTexture)
+   if (part->dataBlock->animateTexture && !part->dataBlock->animTexFrames.empty())
    { 
      S32 fm = (S32)(part->currentAge*(1.0/1000.0)*part->dataBlock->framesPerSec);
      U8 fm_tile = part->dataBlock->animTexFrames[fm % part->dataBlock->numFrames];
@@ -1825,22 +1807,22 @@ void ParticleEmitter::setupOriented( Particle *part,
    lVerts->point = start + crossDir;
    lVerts->color = partCol;
    // Here and below, we copy UVs from particle datablock's texCoords (oriented)
-   lVerts->texCoord = part->dataBlock->texCoords[0];
+   lVerts->texCoord = part->dataBlock->texCoords[1];
    ++lVerts;
 
    lVerts->point = start - crossDir;
    lVerts->color = partCol;
-   lVerts->texCoord = part->dataBlock->texCoords[1];
+   lVerts->texCoord = part->dataBlock->texCoords[2];
    ++lVerts;
 
    lVerts->point = end - crossDir;
    lVerts->color = partCol;
-   lVerts->texCoord = part->dataBlock->texCoords[2];
+   lVerts->texCoord = part->dataBlock->texCoords[3];
    ++lVerts;
 
    lVerts->point = end + crossDir;
    lVerts->color = partCol;
-   lVerts->texCoord = part->dataBlock->texCoords[3];
+   lVerts->texCoord = part->dataBlock->texCoords[0];
    ++lVerts;
 }
 

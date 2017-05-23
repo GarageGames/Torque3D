@@ -108,6 +108,7 @@ protected:
 
       GFXStateBlockRef stateBlock;
       GFXStateBlockRef wireframeStateBlock;
+      GFXStateBlockRef reflectionStateBlock;
 
       GFXShaderConstHandle *modelViewProjConst;
       GFXShaderConstHandle *worldViewOnly;
@@ -144,14 +145,16 @@ protected:
 
    U32 mCurrPass;
 
+   static const Vector<String> mSamplerNames;
+
    GFXTexHandle mBaseMapTexture;
 
    GFXTexHandle mLayerMapTexture;
 
    NamedTexTargetRef mLightInfoTarget;
 
-   /// The prepass material for this material.
-   TerrainCellMaterial *mPrePassMat;
+   /// The deferred material for this material.
+   TerrainCellMaterial *mDeferredMat;
 
    /// The reflection material for this material.
    TerrainCellMaterial *mReflectMat;
@@ -179,8 +182,8 @@ public:
                bool reflectMat = false,
                bool baseOnly = false );
 
-   /// Returns a prepass material from this material.
-   TerrainCellMaterial* getPrePassMat();
+   /// Returns a deferred material from this material.
+   TerrainCellMaterial* getDeferredMat();
 
    /// Returns the reflection material from this material.
    TerrainCellMaterial* getReflectMat();

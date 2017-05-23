@@ -63,21 +63,33 @@ void ShaderGenPrinterHLSL::printPixelShaderOutputStruct(Stream& stream, const Ma
    for( U32 i = 0; i < FEATUREMGR->getFeatureCount(); i++ )
    {
       const FeatureInfo &info = FEATUREMGR->getAt( i );
-      if( featureData.features.hasFeature( *info.type ) )
+      if ( featureData.features.hasFeature( *info.type ) )
          numMRTs |= info.feature->getOutputTargets( featureData );
    }
 
-   WRITESTR( "struct Fragout\r\n" );
-   WRITESTR( "{\r\n" );
-   WRITESTR( "   float4 col : COLOR0;\r\n" );
-   for( U32 i = 1; i < 4; i++ )
+   WRITESTR("struct Fragout\r\n");
+   WRITESTR("{\r\n");
+   if (GFX->getAdapterType() == Direct3D11)
    {
-      if( numMRTs & 1 << i )
-         WRITESTR( avar( "   float4 col%d : COLOR%d;\r\n", i, i ) );
+      WRITESTR("   float4 col : SV_Target0;\r\n");
+      for (U32 i = 1; i < 4; i++)
+      {
+         if (numMRTs & 1 << i)
+            WRITESTR(avar("   float4 col%d : SV_Target%d;\r\n", i, i));
+      }
    }
-   WRITESTR( "};\r\n" );
-   WRITESTR( "\r\n" );
-   WRITESTR( "\r\n" );
+   else
+   {
+      WRITESTR("   float4 col : COLOR0;\r\n");
+      for (U32 i = 1; i < 4; i++)
+      {
+         if (numMRTs & 1 << i)
+            WRITESTR(avar("   float4 col%d : COLOR%d;\r\n", i, i));
+      }
+   }
+   WRITESTR("};\r\n");
+   WRITESTR("\r\n");
+   WRITESTR("\r\n");
 }
 
 void ShaderGenPrinterHLSL::printPixelShaderCloser(Stream& stream)
@@ -109,6 +121,9 @@ const char* ShaderGenComponentFactoryHLSL::typeToString( GFXDeclType type )
       case GFXDeclType_Float4:
       case GFXDeclType_Color:
          return "float4";
+      
+	  case GFXDeclType_UByte4:
+         return "uint4";
    }
 }
 
@@ -141,8 +156,8 @@ ShaderComponent* ShaderGenComponentFactoryHLSL::createVertexInputConnector( cons
       }
       else if ( element.isSemantic( GFXSemantic::TANGENTW ) )
       {
-         var = vertComp->getIndexedElement( element.getSemanticIndex(), RT_TEXCOORD );
-         var->setName( "tangentW" );
+         var = vertComp->getIndexedElement(element.getSemanticIndex(), RT_TEXCOORD);
+         var->setName("tangentW");
       }
       else if ( element.isSemantic( GFXSemantic::BINORMAL ) )
       {
@@ -161,6 +176,22 @@ ShaderComponent* ShaderGenComponentFactoryHLSL::createVertexInputConnector( cons
             var->setName( "texCoord" );
          else
             var->setName( String::ToString( "texCoord%d", element.getSemanticIndex() + 1 ) );
+      }
+      else if ( element.isSemantic( GFXSemantic::BLENDINDICES ) )
+      {
+         var = vertComp->getIndexedElement( element.getSemanticIndex(), RT_BLENDINDICES );
+         var->setName( String::ToString( "blendIndices%d", element.getSemanticIndex() ) );
+      }
+      else if ( element.isSemantic( GFXSemantic::BLENDWEIGHT ) )
+      {
+         var = vertComp->getIndexedElement( element.getSemanticIndex(), RT_BLENDWEIGHT );
+         var->setName( String::ToString( "blendWeight%d", element.getSemanticIndex() ) );
+      }
+      else if ( element.isSemantic( GFXSemantic::PADDING ) )
+      {
+         var = NULL;
+         //var = vertComp->getIndexedElement( vertComp->getCurTexElem() + element.getSemanticIndex(), RT_TEXCOORD );
+         //var->setName( String::ToString( "pad%d", element.getSemanticIndex() + 1 ) );
       }
       else
       {

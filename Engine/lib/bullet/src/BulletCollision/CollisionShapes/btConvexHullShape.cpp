@@ -13,11 +13,17 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
+#if defined (_WIN32) || defined (__i386__)
+#define BT_USE_SSE_IN_API
+#endif
+
 #include "btConvexHullShape.h"
 #include "BulletCollision/CollisionShapes/btCollisionMargin.h"
 
 #include "LinearMath/btQuaternion.h"
 #include "LinearMath/btSerializer.h"
+#include "btConvexPolyhedron.h"
+#include "LinearMath/btConvexHullComputer.h"
 
 btConvexHullShape ::btConvexHullShape (const btScalar* points,int numPoints,int stride) : btPolyhedralConvexAabbCachingShape ()
 {
@@ -45,10 +51,11 @@ void btConvexHullShape::setLocalScaling(const btVector3& scaling)
 	recalcLocalAabb();
 }
 
-void btConvexHullShape::addPoint(const btVector3& point)
+void btConvexHullShape::addPoint(const btVector3& point, bool recalculateLocalAabb)
 {
 	m_unscaledPoints.push_back(point);
-	recalcLocalAabb();
+	if (recalculateLocalAabb)
+		recalcLocalAabb();
 
 }
 
@@ -116,10 +123,17 @@ btVector3	btConvexHullShape::localGetSupportingVertex(const btVector3& vec)const
 }
 
 
-
-
-
-
+void btConvexHullShape::optimizeConvexHull()
+{
+	btConvexHullComputer conv;
+	conv.compute(&m_unscaledPoints[0].getX(), sizeof(btVector3),m_unscaledPoints.size(),0.f,0.f);
+	int numVerts = conv.vertices.size();
+	m_unscaledPoints.resize(0);
+	for (int i=0;i<numVerts;i++)
+    {
+        m_unscaledPoints.push_back(conv.vertices[i]);
+    }
+}
 
 
 

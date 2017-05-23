@@ -52,9 +52,9 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseDragged, void, (),(),
    "@tsexample\n"
    "// Mouse is dragged across the control, causing the callback to occur.\n"
    "GuiListBoxCtrl::onMouseDragged(%this)\n"
-   "	{\n"
-   "		// Code to run whenever the mouse is dragged across the control\n"
-   "	}\n"
+   "  {\n"
+   "     // Code to run whenever the mouse is dragged across the control\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@see GuiControl\n\n"
 );
@@ -64,37 +64,37 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onClearSelection, void, (),(),
    "@tsexample\n"
    "// A selected item is cleared, causing the callback to occur.\n"
    "GuiListBoxCtrl::onClearSelection(%this)\n"
-   "	{\n"
-   "		// Code to run whenever a selected item is cleared\n"
-   "	}\n"
+   "  {\n"
+   "     // Code to run whenever a selected item is cleared\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onUnSelect, void, ( const char* index, const char* itemText),( index, itemText ),
+IMPLEMENT_CALLBACK( GuiListBoxCtrl, onUnSelect, void, ( S32 index, const char* itemText),( index, itemText ),
    "@brief Called whenever a selected item in the list has been unselected.\n\n"
    "@param index Index id of the item that was unselected\n"
    "@param itemText Text for the list entry at the index id that was unselected\n\n"
    "@tsexample\n"
    "// A selected item is unselected, causing the callback to occur\n"
    "GuiListBoxCtrl::onUnSelect(%this, %indexId, %itemText)\n"
-   "	{\n"
-   "		// Code to run whenever a selected list item is unselected\n"
-   "	}\n"
+   "  {\n"
+   "     // Code to run whenever a selected list item is unselected\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onSelect, void, ( const char* index , const char* itemText ),( index, itemText ),
+IMPLEMENT_CALLBACK( GuiListBoxCtrl, onSelect, void, ( S32 index , const char* itemText ),( index, itemText ),
    "@brief Called whenever an item in the list is selected.\n\n"
    "@param index Index id for the item in the list that was selected.\n"
    "@param itemText Text for the list item at the index that was selected.\n\n"
    "@tsexample\n"
    "// An item in the list is selected, causing the callback to occur\n"
    "GuiListBoxCtrl::onSelect(%this, %index, %itemText)\n"
-   "	{\n"
-   "		// Code to run whenever an item in the list is selected\n"
-   "	}\n"
+   "  {\n"
+   "     // Code to run whenever an item in the list is selected\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@see GuiControl\n\n"
 );
@@ -104,14 +104,14 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onDoubleClick, void, (),(),
    "@tsexample\n"
    "// An item in the list is double clicked, causing the callback to occur.\n"
    "GuiListBoxCtrl::onDoubleClick(%this)\n"
-   "	{\n"
-   "		// Code to run whenever an item in the control has been double clicked\n"
-   "	}\n"
+   "  {\n"
+   "     // Code to run whenever an item in the control has been double clicked\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@see GuiControl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseUp, void, (const char* itemHit, const char* mouseClickCount),( itemHit,mouseClickCount),
+IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseUp, void, ( S32 itemHit, S32 mouseClickCount ),( itemHit,mouseClickCount ),
    "@brief Called whenever the mouse has previously been clicked down (onMouseDown) and has now been raised on the control.\n"
    "If an item in the list was hit during the click cycle, then the index id of the clicked object along with how many clicks occured are passed\n"
    "into the callback.\n\n"
@@ -121,9 +121,9 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onMouseUp, void, (const char* itemHit, const
    "@tsexample\n"
    "// Mouse was previously clicked down, and now has been released, causing the callback to occur.\n"
    "GuiListBoxCtrl::onMouseUp(%this, %itemHit, %mouseClickCount)\n"
-   "	{\n"
-   "		// Code to call whenever the mouse has been clicked and released on the control\n"
-   "	}\n"
+   "  {\n"
+   "     // Code to call whenever the mouse has been clicked and released on the control\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@see GuiControl\n\n"
 );
@@ -133,9 +133,9 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, onDeleteKey, void, (),(),
    "@tsexample\n"
    "// The delete key on the keyboard has been pressed while this control is in focus, causing the callback to occur.\n"
    "GuiListBoxCtrl::onDeleteKey(%this)\n"
-   "	{\n"
-   "		// Code to call whenever the delete key is pressed\n"
-   "	}\n"
+   "  {\n"
+   "     // Code to call whenever the delete key is pressed\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@see GuiControl\n\n"
 );
@@ -146,10 +146,10 @@ IMPLEMENT_CALLBACK( GuiListBoxCtrl, isObjectMirrored, bool, ( const char* indexI
    "@tsexample\n"
    "// Engine has requested of the script level to determine if a list entry is mirrored or not.\n"
    "GuiListBoxCtrl::isObjectMirrored(%this, %indexIdString)\n"
-   "	{\n"
-   "		// Perform code required to check and see if the list item at the index id is mirrored or not.\n"
-   "		return %isMirrored;\n"
-   "	}\n"
+   "  {\n"
+   "     // Perform code required to check and see if the list item at the index id is mirrored or not.\n"
+   "     return %isMirrored;\n"
+   "  }\n"
    "@endtsexample\n\n"
    "@return A boolean value on if the list item is mirrored or not.\n\n"
    "@see GuiControl\n\n"
@@ -234,7 +234,7 @@ void GuiListBoxCtrl::clearItems()
    // Free our vector lists
    mItems.clear();
    mSelectedItems.clear();
-	mFilteredItems.clear();
+   mFilteredItems.clear();
 }
 
 DefineEngineMethod( GuiListBoxCtrl, clearSelection, void, (),,
@@ -309,7 +309,7 @@ void GuiListBoxCtrl::removeSelection( LBItem *item, S32 index )
       {
          mSelectedItems.erase( &mSelectedItems[i] );
          item->isSelected = false;
-         onUnSelect_callback(Con::getIntArg(index), item->itemText);
+         onUnSelect_callback(index, item->itemText);
          return;
       }
    }
@@ -355,7 +355,7 @@ void GuiListBoxCtrl::addSelection( LBItem *item, S32 index )
    item->isSelected = true;
    mSelectedItems.push_front( item );
 
-   onSelect_callback(Con::getIntArg( index ), item->itemText);
+   onSelect_callback(index, item->itemText);
 }
 
 S32 GuiListBoxCtrl::getItemIndex( LBItem *item )
@@ -450,8 +450,9 @@ DefineEngineMethod( GuiListBoxCtrl, getSelectedItems, const char*, (),,
    if( selItems.empty() )
       return StringTable->lookup("-1");
 
-   UTF8 *retBuffer = Con::getReturnBuffer( selItems.size() * 4 );
-   dMemset( retBuffer, 0, selItems.size() * 4 );
+   static const U32 bufSize = selItems.size() * 4;
+   UTF8 *retBuffer = Con::getReturnBuffer( bufSize );
+   dMemset( retBuffer, 0, bufSize );
    Vector<S32>::iterator i = selItems.begin();
    for( ; i != selItems.end(); i++ )
    {
@@ -676,7 +677,7 @@ DefineEngineMethod( GuiListBoxCtrl, setItemColor, void, (S32 index, ColorF color
    object->setItemColor( index, color );
 }
 
-void GuiListBoxCtrl::setItemColor( S32 index, ColorF color )
+void GuiListBoxCtrl::setItemColor(S32 index, const ColorF& color)
 {
    if ((index >= mItems.size()) || index < 0)
    {
@@ -747,11 +748,6 @@ S32 GuiListBoxCtrl::insertItem( S32 index, StringTableEntry text, void *itemData
    }
 
    LBItem *newItem = new LBItem;
-   if( !newItem )
-   {
-      Con::warnf("GuiListBoxCtrl::insertItem - error allocating item memory!" );
-      return -1;
-   }
 
    // Assign item data
    newItem->itemText    = StringTable->insert(text, true);
@@ -791,11 +787,6 @@ S32 GuiListBoxCtrl::insertItemWithColor( S32 index, StringTableEntry text, Color
    }
 
    LBItem *newItem = new LBItem;
-   if( !newItem )
-   {
-      Con::warnf("GuiListBoxCtrl::insertItem - error allocating item memory!" );
-      return -1;
-   }
 
    // Assign item data
    newItem->itemText    = StringTable->insert(text, true);
@@ -923,7 +914,7 @@ SimObject* GuiListBoxCtrl::getItemObject( S32 index )
    }
 
    SimObject *outObj;
-   Sim::findObject( (SimObjectId)(mItems[ index ]->itemData), outObj );
+   Sim::findObject( (SimObjectId)(uintptr_t)(mItems[ index ]->itemData), outObj );
 
    return outObj;   
 }
@@ -1089,7 +1080,7 @@ void GuiListBoxCtrl::onRender( Point2I offset, const RectI &updateRect )
    GFX->setClipRect( oldClipRect );
 }
 
-void GuiListBoxCtrl::onRenderItem( RectI itemRect, LBItem *item )
+void GuiListBoxCtrl::onRenderItem(const RectI& itemRect, LBItem *item)
 {
    if( item->isSelected )
       GFX->getDrawUtil()->drawRectFill( itemRect, mProfile->mFillColorSEL );
@@ -1223,7 +1214,7 @@ void GuiListBoxCtrl::onMouseUp( const GuiEvent& event )
 {
    S32 itemHit = -1;
    if( hitTest( event.mousePoint, itemHit ) )
-      onMouseUp_callback(Con::getIntArg( itemHit ), Con::getIntArg( event.mouseClickCount ) );
+      onMouseUp_callback( itemHit, event.mouseClickCount );
 
    // Execute console command
    execConsoleCallback();
@@ -1480,7 +1471,7 @@ void GuiListBoxCtrl::_mirror()
 
    for ( U32 i = 0; i < mItems.size(); i++ )
    {
-      curId = (SimObjectId)mItems[i]->itemData;
+      curId = (SimObjectId)(uintptr_t)mItems[i]->itemData;
 
       Sim::findObject( curId, curObj );
 
@@ -1514,16 +1505,16 @@ void GuiListBoxCtrl::_mirror()
 
       for ( U32 j = 0; j < mItems.size(); j++ )
       {
-         if ( (SimObjectId)(mItems[j]->itemData) == curId )
+         if ( (SimObjectId)(uintptr_t)(mItems[j]->itemData) == curId )
          {
             found = true;
             break;
          }
       }
-		
-		for ( U32 j = 0; j < mFilteredItems.size(); j++ )
+      
+      for ( U32 j = 0; j < mFilteredItems.size(); j++ )
       {
-         if ( (SimObjectId)(mFilteredItems[j]->itemData) == curId )
+         if ( (SimObjectId)(uintptr_t)(mFilteredItems[j]->itemData) == curId )
          {
             found = true;
             break;
@@ -1539,7 +1530,7 @@ void GuiListBoxCtrl::_mirror()
 
 StringTableEntry GuiListBoxCtrl::_makeMirrorItemName( SimObject *inObj )
 {
-   StringTableEntry outName = StringTable->insert("");
+   StringTableEntry outName = StringTable->EmptyString();
 
    if ( mMakeNameCallback.isNotEmpty() )
    {
@@ -1580,37 +1571,37 @@ DefineEngineMethod( GuiListBoxCtrl, addFilteredItem, void, (const char* newItem)
    "@endtsexample\n\n"
    "@see GuiControl")
 {
-	String item(newItem);
-	if( item == String::EmptyString )
-		return;
+   String item(newItem);
+   if( item == String::EmptyString )
+      return;
 
-	object->addFilteredItem( item );
+   object->addFilteredItem( item );
 }
 
 void GuiListBoxCtrl::addFilteredItem( String item )
 {
-	// Delete from selected items list
-	for ( S32 i = 0; i < mSelectedItems.size(); i++ ) 
-	{
-		String itemText = mSelectedItems[i]->itemText;
-		if ( dStrcmp( itemText.c_str(), item.c_str() ) == 0 ) 
-		{
-			mSelectedItems.erase_fast( i );
-			break;
-		}
-	}
+   // Delete from selected items list
+   for ( S32 i = 0; i < mSelectedItems.size(); i++ ) 
+   {
+      String itemText = mSelectedItems[i]->itemText;
+      if ( dStrcmp( itemText.c_str(), item.c_str() ) == 0 ) 
+      {
+         mSelectedItems.erase_fast( i );
+         break;
+      }
+   }
 
-	for ( S32 i = 0; i < mItems.size(); i++ ) 
-	{
-		String itemText = mItems[i]->itemText;
-		if( dStrcmp( itemText.c_str(), item.c_str() ) == 0 )
-		{	
-			mItems[i]->isSelected = false;		
-			mFilteredItems.push_front( mItems[i] );
-			mItems.erase( &mItems[i] );
-			break;
-		}
-	}
+   for ( S32 i = 0; i < mItems.size(); i++ ) 
+   {
+      String itemText = mItems[i]->itemText;
+      if( dStrcmp( itemText.c_str(), item.c_str() ) == 0 )
+      {  
+         mItems[i]->isSelected = false;      
+         mFilteredItems.push_front( mItems[i] );
+         mItems.erase( &mItems[i] );
+         break;
+      }
+   }
 }
 
 DefineEngineMethod( GuiListBoxCtrl, removeFilteredItem, void, ( const char* itemName ),,
@@ -1624,23 +1615,23 @@ DefineEngineMethod( GuiListBoxCtrl, removeFilteredItem, void, ( const char* item
    "@endtsexample\n\n"
    "@see GuiControl")
 {
-	String item(itemName);
-	if( item == String::EmptyString )
-		return;
+   String item(itemName);
+   if( item == String::EmptyString )
+      return;
 
-	object->removeFilteredItem( item );
+   object->removeFilteredItem( item );
 }
 
 void GuiListBoxCtrl::removeFilteredItem( String item )
 {
-	for ( S32 i = 0; i < mFilteredItems.size(); i++ ) 
-	{
-		String itemText = mFilteredItems[i]->itemText;
-		if( dStrcmp( itemText.c_str(), item.c_str() ) == 0 )
-		{			
-			mItems.push_front( mFilteredItems[i] );
-			mFilteredItems.erase( &mFilteredItems[i] );
-			break;
-		}
-	}
+   for ( S32 i = 0; i < mFilteredItems.size(); i++ ) 
+   {
+      String itemText = mFilteredItems[i]->itemText;
+      if( dStrcmp( itemText.c_str(), item.c_str() ) == 0 )
+      {        
+         mItems.push_front( mFilteredItems[i] );
+         mFilteredItems.erase( &mFilteredItems[i] );
+         break;
+      }
+   }
 }

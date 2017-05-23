@@ -32,6 +32,9 @@
 #ifndef _MODULE_H_
 #include "core/module.h"
 #endif
+#ifndef _CONSOLE_H_
+#include "console/console.h"
+#endif
 
 // Forward Refs
 class SimSet;
@@ -58,10 +61,10 @@ typedef U32 SimObjectId;
 /// The RootGroupId is assigned to gRootGroup, in which most SimObjects
 /// are addded as child members. See simManager.cc for details, particularly
 /// Sim::initRoot() and following.
-enum SimObjectsConstants
+enum SimObjectsConstants : U32
 {
    DataBlockObjectIdFirst = 3,
-   DataBlockObjectIdBitSize = 10,
+   DataBlockObjectIdBitSize = 14,
    DataBlockObjectIdLast = DataBlockObjectIdFirst + (1 << DataBlockObjectIdBitSize) - 1,
 
    MessageObjectIdFirst = DataBlockObjectIdLast + 1,
@@ -122,9 +125,15 @@ namespace Sim
    SimDataBlockGroup *getDataBlockGroup();
    SimGroup* getRootGroup();
 
+   SimObject* findObject(ConsoleValueRef&);
    SimObject* findObject(SimObjectId);
    SimObject* findObject(const char* name);
    SimObject* findObject(const char* fileName, S32 declarationLine);
+   template<class T> inline bool findObject(ConsoleValueRef &ref,T*&t)
+   {
+      t = dynamic_cast<T*>(findObject(ref));
+      return t != NULL;
+   }
    template<class T> inline bool findObject(SimObjectId iD,T*&t)
    {
       t = dynamic_cast<T*>(findObject(iD));
@@ -148,13 +157,13 @@ namespace Sim
    SimTime getTargetTime();
 
    /// a target time of 0 on an event means current event
-   U32 postEvent(SimObject*, SimEvent*, U32 targetTime);
+   U32 postEvent(SimObject*, SimEvent*, SimTime targetTime);
 
-   inline U32 postEvent(SimObjectId iD,SimEvent*evt, U32 targetTime)
+   inline U32 postEvent(SimObjectId iD,SimEvent*evt, SimTime targetTime)
    {
       return postEvent(findObject(iD), evt, targetTime);
    }
-   inline U32 postEvent(const char *objectName,SimEvent*evt, U32 targetTime)
+   inline U32 postEvent(const char *objectName,SimEvent*evt, SimTime targetTime)
    {
       return postEvent(findObject(objectName), evt, targetTime);
    }

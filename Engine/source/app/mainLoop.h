@@ -41,6 +41,9 @@ public:
    /// Shut down the core libraries and call registered shutdown fucntions.
    static void shutdown();
 
+   /// Gets the return status code of the current process.
+   static S32 getReturnStatus();
+
    static void setRestart( bool restart );
    static bool requiresRestart();
 

@@ -91,7 +91,7 @@ size_t SFXVorbisStream::_read_func( void *ptr, size_t size, size_t nmemb, void *
    return readItems;
 }
 
-int SFXVorbisStream::_seek_func( void *datasource, ogg_int64_t offset, int whence )
+S32 SFXVorbisStream::_seek_func( void *datasource, ogg_int64_t offset, S32 whence )
 {
    Stream *stream = reinterpret_cast<Stream*>( datasource );
 
@@ -114,13 +114,6 @@ long SFXVorbisStream::_tell_func( void *datasource )
 
 bool SFXVorbisStream::_openVorbis()
 {
-#if defined(TORQUE_OS_XENON)
-   // For some reason the datasource pointer passed to the callbacks is not the
-   // same as it is when passed in to ov_open_callbacks
-#pragma message("There is a strange bug in ov_open_callbacks as it compiles on the Xbox360. Use FMOD resource loading.")
-   AssertWarn(false, "There is a strange bug in ov_open_callbacks as it compiles on the Xbox360. Use FMOD resource loading.");
-   return false;
-#endif
    mVF = new OggVorbis_File;
    dMemset( mVF, 0, sizeof( OggVorbis_File ) );
 
@@ -133,7 +126,7 @@ bool SFXVorbisStream::_openVorbis()
    cb.tell_func = canSeek ? _tell_func : NULL;
 
    // Open it.
-   int ovResult = ov_open_callbacks( mStream, mVF, NULL, 0, cb );
+   S32 ovResult = ov_open_callbacks( mStream, mVF, NULL, 0, cb );
    if( ovResult != 0 )
       return false;
 
@@ -196,16 +189,16 @@ S32 SFXVorbisStream::read( U8 *buffer,
    mBitstream = *bitstream;
 
    #ifdef TORQUE_BIG_ENDIAN
-      static const int isBigEndian = 1;
+      static const S32 isBigEndian = 1;
    #else
-      static const int isBigEndian = 0;
+      static const S32 isBigEndian = 0;
    #endif
 
    // Vorbis doesn't seem to like reading 
    // requests longer than this.
    const U32 MAXREAD = 4096;
 
-   U32 bytesRead = 0;
+   S64 bytesRead = 0;
    U32 offset = 0;
    U32 bytesToRead = 0;
 

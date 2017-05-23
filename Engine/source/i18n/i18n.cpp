@@ -24,6 +24,7 @@
 #include "core/stream/stream.h"
 #include "core/stream/fileStream.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 
 #include "i18n/i18n.h"
 #include "i18n/lang.h"
@@ -57,7 +58,7 @@ const UTF8 *getCoreString(S32 id)
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction(getCoreLangTable, S32, 1, 1, "()"
+DefineConsoleFunction( getCoreLangTable, S32, (), , "()"
 				"@brief Gets the primary LangTable used by the game\n\n"
 				"@return ID of the core LangTable\n"
 				"@ingroup Localization")
@@ -68,17 +69,20 @@ ConsoleFunction(getCoreLangTable, S32, 1, 1, "()"
       return 0;
 }
 
-ConsoleFunction(setCoreLangTable, void, 2, 2, "(string LangTable)"
+DefineConsoleFunction( setCoreLangTable, void, (const char * lgTable), , "(string LangTable)"
 				"@brief Sets the primary LangTable used by the game\n\n"
 				"@param LangTable ID of the core LangTable\n"
 				"@ingroup Localization")
 {
-	LangTable *lt;
+	LangTable * lt;
    
-   if(Sim::findObject(argv[1], lt))
-		gCoreLangTable = lt;
+   if(Sim::findObject(lgTable, lt))
+   { gCoreLangTable = lt; }
    else
-      Con::errorf("setCoreLangTable - Unable to find LanTable '%s'", argv[1]);
+   {       
+      Con::errorf("setCoreLangTable - Unable to find LanTable '%s'", lgTable); 
+   }
+
 }
 
 //-----------------------------------------------------------------------------

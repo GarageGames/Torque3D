@@ -43,7 +43,8 @@ class ShaderComponent
 public:
    virtual ~ShaderComponent() {}
    
-   virtual void print( Stream &stream ){};
+   virtual void print( Stream &stream, bool isVerterShader ){};
+   virtual void printOnMain( Stream &stream, bool isVerterShader ){};
 };
 
 
@@ -70,12 +71,16 @@ protected:
    Vector <Var*> mElementList;
 
    U32 mCurTexElem;
+   U32 mCurBlendIndicesElem;
+   U32 mCurBlendWeightsElem;
    U8 mName[32];
 
 public:
 
    ShaderConnector();
    virtual ~ShaderConnector();
+
+   U32 getCurTexElem() { return mCurTexElem; }
 
    ///
    virtual Var* getElement(   RegisterType type, 
@@ -86,7 +91,7 @@ public:
    virtual void reset() = 0;
    virtual void sortVars() = 0;
 
-   virtual void print( Stream &stream ) = 0;
+   virtual void print( Stream &stream, bool isVerterShader ) = 0;
 };
 
 /// This is to provide common functionalty needed by vertex and pixel main defs

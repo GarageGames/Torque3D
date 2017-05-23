@@ -22,6 +22,7 @@
 
 #include "core/strings/stringFunctions.h"
 #include "core/stringTable.h"
+#include "platform/profiler.h"
 
 _StringTable *_gStringTable = NULL;
 const U32 _StringTable::csm_stInitSize = 29;
@@ -59,7 +60,7 @@ U32 _StringTable::hashString(const char* str)
    char c;
    while((c = *str++) != 0) {
       ret <<= 1;
-      ret ^= sgHashTable[static_cast<U32>(c)];
+      ret ^= sgHashTable[static_cast<U8>(c)];
    }
    return ret;
 }
@@ -73,7 +74,7 @@ U32 _StringTable::hashStringn(const char* str, S32 len)
    char c;
    while((c = *str++) != 0 && len--) {
       ret <<= 1;
-      ret ^= sgHashTable[static_cast<U32>(c)];
+      ret ^= sgHashTable[static_cast<U8>(c)];
    }
    return ret;
 }
@@ -121,6 +122,8 @@ void _StringTable::destroy()
 //--------------------------------------
 StringTableEntry _StringTable::insert(const char* _val, const bool caseSens)
 {
+   PROFILE_SCOPE(StringTableInsert);
+
    // Added 3/29/2007 -- If this is undesirable behavior, let me know -patw
    const char *val = _val;
    if( val == NULL )
@@ -165,6 +168,8 @@ StringTableEntry _StringTable::insertn(const char* src, S32 len, const bool  cas
 //--------------------------------------
 StringTableEntry _StringTable::lookup(const char* val, const bool  caseSens)
 {
+   PROFILE_SCOPE(StringTableLookup);
+
    Node **walk, *temp;
    U32 key = hashString(val);
    walk = &buckets[key % numBuckets];
@@ -181,6 +186,8 @@ StringTableEntry _StringTable::lookup(const char* val, const bool  caseSens)
 //--------------------------------------
 StringTableEntry _StringTable::lookupn(const char* val, S32 len, const bool  caseSens)
 {
+   PROFILE_SCOPE(StringTableLookupN);
+
    Node **walk, *temp;
    U32 key = hashStringn(val, len);
    walk = &buckets[key % numBuckets];
@@ -195,8 +202,11 @@ StringTableEntry _StringTable::lookupn(const char* val, S32 len, const bool  cas
 }
 
 //--------------------------------------
-void _StringTable::resize(const U32 newSize)
+void _StringTable::resize(const U32 _newSize)
 {
+   /// avoid a possible 0 division
+   const U32 newSize = _newSize ? _newSize : 1;
+
    Node *head = NULL, *walk, *temp;
    U32 i;
    // reverse individual bucket lists

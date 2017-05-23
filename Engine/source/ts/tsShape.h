@@ -50,6 +50,25 @@ struct CollisionShapeInfo
    PhysicsCollision *colShape;
 };
 
+/// Data storage helper for main shape buffer
+struct TSShapeVertexArray
+{
+   U8 *base;
+   U32 size;
+   bool vertexDataReady;
+
+   TSShapeVertexArray() : base(NULL), size(0), vertexDataReady(false) {}
+   virtual ~TSShapeVertexArray() { set(NULL, 0); }
+
+   virtual void set(void *b, U32 s, bool autoFree = true)
+   {
+      if (base && autoFree)
+         dFree_aligned(base);
+      base = reinterpret_cast<U8 *>(b);
+      size = s;
+   }
+};
+
 /// TSShape stores generic data for a 3space model.
 ///
 /// TSShape and TSShapeInstance act in conjunction to allow the rendering and
@@ -381,18 +400,21 @@ class TSShape
    /// The GFX vertex format for all detail meshes in the shape.
    /// @see initVertexFeatures()
    GFXVertexFormat mVertexFormat;
-
-   /// The GFX vertex size in bytes for all detail meshes in the shape.
-   /// @see initVertexFeatures()
-   U32 mVertSize;
-
-   /// Is true if this shape contains skin meshes.
-   bool mHasSkinMesh;
-
-   bool mSequencesConstructed;
+   TSBasicVertexFormat mBasicVertexFormat;
+   U32 mVertexSize;
 
    S8* mShapeData;
    U32 mShapeDataSize;
+
+
+   // Processed vertex data
+   TSShapeVertexArray mShapeVertexData;
+   TSVertexBufferHandle mShapeVertexBuffer;
+   GFXPrimitiveBufferHandle mShapeVertexIndices;
+
+   bool mSequencesConstructed;
+   bool mNeedReinit;
+
 
    // shape class has few methods --
    // just constructor/destructor, io, and lookup methods
@@ -402,13 +424,26 @@ class TSShape
    ~TSShape();
    void init();
    void initMaterialList();    ///< you can swap in a new material list, but call this if you do
+   void finalizeEditable();
    bool preloadMaterialList(const Torque::Path &path); ///< called to preload and validate the materials in the mat list
 
    void setupBillboardDetails( const String &cachePath );
 
+   /// Inits object list (no geometry buffers)
+   void initObjects();
+
+   /// Initializes the main vertex buffer
+   void initVertexBuffers();
+
+   /// Loads shape vertex data into specified buffer
+   void getVertexBuffer(TSVertexBufferHandle &vb, GFXBufferType bufferType);
+
    /// Called from init() to calcuate the GFX vertex features for
    /// all detail meshes in the shape.
    void initVertexFeatures();
+
+   /// Inits basic buffer pointers on load
+   void initVertexBufferPointers();
 
    bool getSequencesConstructed() const { return mSequencesConstructed; }
    void setSequencesConstructed(const bool c) { mSequencesConstructed = c; }
@@ -526,8 +561,6 @@ class TSShape
 
    const GFXVertexFormat* getVertexFormat() const { return &mVertexFormat; }
 
-   U32 getVertexSize() const { return mVertSize; }
-
    /// @}
 
    /// @name Alpha Transitions
@@ -547,6 +580,12 @@ class TSShape
 
    /// by default we initialize shape when we read...
    static bool smInitOnRead;
+
+   /// Enables hardware skinning features
+   static bool smUseHardwareSkinning;
+
+   /// Determines maximum number of bones to use in hardware skinning shaders
+   static U32 smMaxSkinBones;
 
    /// @name Version Info
    /// @{
@@ -597,7 +636,7 @@ class TSShape
    /// mem buffer transfer helper (indicate when we don't want to include a particular mesh/decal)
    bool checkSkip(S32 meshNum, S32 & curObject, S32 skipDL);
 
-   void fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * detailFirstSkin, S32 * detailNumSkins);
+   void fixupOldSkins(S32 numMeshes, S32 numSkins, S32 numDetails, S32 * detFirstSkin, S32 * detailNumSkins);
 
    /// @name Shape Editing
    /// @{
@@ -648,6 +687,10 @@ class TSShape
 
    bool setSequenceBlend(const String& seqName, bool blend, const String& blendRefSeqName, S32 blendRefFrame);
    bool setSequenceGroundSpeed(const String& seqName, const Point3F& trans, const Point3F& rot);
+
+   void makeEditable();
+   bool needsReinit();
+   bool needsBufferUpdate();
    /// @}
 };
 

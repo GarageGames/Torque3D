@@ -799,7 +799,7 @@ void BitRender::bitTo8Bit_3(U32 * bits, U32 * eightBits, S32 dim)
 #if defined(TORQUE_BIG_ENDIAN)
 #define MAX_SHADOW_TEXELS (256 + 4) //256 seems big enough, +4 so we can run off end of buffer.
 	// slow fake gaussian
-	int i, j, c;
+	S32 i, j, c;
 	U8 tmpLine[3][MAX_SHADOW_TEXELS];
 	U8 *src0, *src1, *src2;
 	U8 *s0, *s1, *s2;
@@ -809,7 +809,7 @@ void BitRender::bitTo8Bit_3(U32 * bits, U32 * eightBits, S32 dim)
 	U32 currVal;
 	U32 sampleVal;
 	U8 c00, c01, c02, c10, c11, c12, c20, c21, c22;
-	int openBuf;
+	S32 openBuf;
 
 	src0 = tmpLine[0];
 	src1 = tmpLine[1];
@@ -902,9 +902,9 @@ void BitRender::bitTo8Bit_3(U32 * bits, U32 * eightBits, S32 dim)
 					sampleVal = 0; //c12; // take end.
 				else // inner pixel
 				{
-					const int wXP = 3; // corners
-					const int wPP = 4; // plus/NSEW
-					const int wCP = 4; // center
+					const S32 wXP = 3; // corners
+					const S32 wPP = 4; // plus/NSEW
+					const S32 wCP = 4; // center
 					sampleVal = (c00+c02+c20+c22)*wXP + (c01+c10+c12+c21)*wPP + c11*wCP;
 					sampleVal >>= 5; // div by 32 subsamples
 				}

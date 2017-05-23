@@ -82,4 +82,71 @@ public:
    virtual const String describeSelf() const = 0;
 };
 
+/// Handle for GFXOcclusionQuery than store last valid state
+class GFXOcclusionQueryHandle
+{
+public:
+
+    GFXOcclusionQueryHandle() 
+        : mLastStatus(GFXOcclusionQuery::Unset), mLastData(0), mWaiting(false) , mQuery(NULL)
+    {}
+
+    ~GFXOcclusionQueryHandle()
+    {
+        SAFE_DELETE(mQuery);
+    }
+
+    bool getLastStatus( bool block, GFXOcclusionQuery::OcclusionQueryStatus *statusPtr = NULL, U32 *data = NULL );
+    GFXOcclusionQuery* getQuery() const { return mQuery; }
+
+    void clearLastStatus()
+    {
+        mLastStatus = GFXOcclusionQuery::Unset;
+        mLastData = 0;
+        mWaiting = false;
+
+        if( !mQuery )
+            return;
+
+        mQuery->begin();
+        mQuery->end();
+    }
+
+    bool isWaiting() const { return mWaiting; }
+protected:
+    GFXOcclusionQuery::OcclusionQueryStatus mLastStatus;
+    U32 mLastData;
+    bool mWaiting;
+    GFXOcclusionQuery *mQuery;
+};
+
+inline bool GFXOcclusionQueryHandle::getLastStatus( bool block, GFXOcclusionQuery::OcclusionQueryStatus *statusPtr, U32 *data )
+{
+    if( !mQuery )
+        mQuery = GFX->createOcclusionQuery();
+
+    GFXOcclusionQuery::OcclusionQueryStatus status = mQuery->getStatus( block, data );
+
+    if( status == GFXOcclusionQuery::Waiting )
+    {
+        mWaiting = true;
+        if( statusPtr )
+            *statusPtr = mLastStatus;
+        if( data )
+            *data = mLastData;
+
+        return true;
+    }
+
+    if( statusPtr )
+        *statusPtr = status;
+
+    mWaiting = false;
+    mLastStatus = status;
+    mLastData = *data;
+
+    return true;
+}
+
+
 #endif // _GFXOCCLUSIONQUERY_H_

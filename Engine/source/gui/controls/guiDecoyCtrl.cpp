@@ -25,6 +25,7 @@
 #include "gui/buttons/guiButtonBaseCtrl.h"
 
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gfx/primBuilder.h"
 
 //-----------------------------------------------------------------------------
@@ -51,8 +52,8 @@ ConsoleDocClass( GuiDecoyCtrl,
 				"Currently editor use only, no real application without extension.\n\n "
 				"@internal");
 
-GuiDecoyCtrl::GuiDecoyCtrl() : mIsDecoy(true),
-							   mMouseOver(false),
+GuiDecoyCtrl::GuiDecoyCtrl() : mMouseOver(false),
+							   mIsDecoy(true),
 							   mDecoyReference(NULL)
 {
 }

@@ -29,6 +29,8 @@
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 
+#include "materials/matTextureTarget.h"
+
 
 IMPLEMENT_CONOBJECT(GuiBitmapCtrl);
 
@@ -56,6 +58,7 @@ ConsoleDocClass( GuiBitmapCtrl,
 GuiBitmapCtrl::GuiBitmapCtrl(void)
  : mBitmapName(),
    mStartPoint( 0, 0 ),
+   mColor(ColorI::WHITE),
    mWrap( false )
 {	
 }
@@ -78,7 +81,8 @@ void GuiBitmapCtrl::initPersistFields()
    
       addProtectedField( "bitmap", TypeImageFilename, Offset( mBitmapName, GuiBitmapCtrl ),
          &setBitmapName, &defaultProtectedGetFn,
-         "The bitmap file to display in the control." );
+         "The bitmap file to display in the control.");
+      addField("color", TypeColorI, Offset(mColor, GuiBitmapCtrl),"color mul");
       addField( "wrap",   TypeBool,     Offset( mWrap, GuiBitmapCtrl ),
          "If true, the bitmap is tiled inside the control rather than stretched to fit." );
       
@@ -169,6 +173,7 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
    if (mTextureObject)
    {
       GFX->getDrawUtil()->clearBitmapModulation();
+      GFX->getDrawUtil()->setBitmapModulation(mColor);
 		if(mWrap)
 		{
          // We manually draw each repeat because non power of two textures will 
@@ -178,13 +183,13 @@ void GuiBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
  			GFXTextureObject* texture = mTextureObject;
 			RectI srcRegion;
 			RectI dstRegion;
-			float xdone = ((float)getExtent().x/(float)texture->mBitmapSize.x)+1;
-			float ydone = ((float)getExtent().y/(float)texture->mBitmapSize.y)+1;
+			F32 xdone = ((F32)getExtent().x/(F32)texture->mBitmapSize.x)+1;
+			F32 ydone = ((F32)getExtent().y/(F32)texture->mBitmapSize.y)+1;
 
-			int xshift = mStartPoint.x%texture->mBitmapSize.x;
-			int yshift = mStartPoint.y%texture->mBitmapSize.y;
-			for(int y = 0; y < ydone; ++y)
-				for(int x = 0; x < xdone; ++x)
+			S32 xshift = mStartPoint.x%texture->mBitmapSize.x;
+			S32 yshift = mStartPoint.y%texture->mBitmapSize.y;
+			for(S32 y = 0; y < ydone; ++y)
+				for(S32 x = 0; x < xdone; ++x)
 				{
 		 			srcRegion.set(0,0,texture->mBitmapSize.x,texture->mBitmapSize.y);
   					dstRegion.set( ((texture->mBitmapSize.x*x)+offset.x)-xshift,
@@ -256,11 +261,32 @@ static ConsoleDocFragment _sGuiBitmapCtrlSetBitmap2(
 
 
 //"Set the bitmap displayed in the control. Note that it is limited in size, to 256x256."
-ConsoleMethod( GuiBitmapCtrl, setBitmap, void, 3, 4,
+DefineConsoleMethod( GuiBitmapCtrl, setBitmap, void, ( const char * fileRoot, bool resize), ( false),
    "( String filename | String filename, bool resize ) Assign an image to the control.\n\n"
    "@hide" )
 {
    char filename[1024];
-   Con::expandScriptFilename(filename, sizeof(filename), argv[2]);
-   object->setBitmap(filename, argc > 3 ? dAtob( argv[3] ) : false );
+   Con::expandScriptFilename(filename, sizeof(filename), fileRoot);
+   object->setBitmap(filename, resize );
+}
+
+DefineEngineMethod( GuiBitmapCtrl, setNamedTexture, bool, (String namedtexture),,
+   "@brief Set a texture as the image.\n\n"
+   "@param namedtexture The name of the texture (NamedTexTarget).\n"
+   "@return true if the texture exists." )
+{
+   GFXTexHandle theTex;
+   NamedTexTarget *namedTarget = NULL;
+   namedTarget = NamedTexTarget::find(namedtexture.c_str());
+   if ( namedTarget )
+   {
+      theTex = namedTarget->getTexture( 0 );
+   }
+   
+   if ( theTex.isValid() )
+   {
+      object->setBitmapHandle( theTex , false );
+      return true; //a new texture was set correctly
+   }
+   return false; //we couldn't change the texture
 }

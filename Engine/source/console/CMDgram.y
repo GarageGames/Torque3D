@@ -456,6 +456,21 @@ expr
       { $$ = (ExprNode*)VarNode::alloc( $1.lineNumber, $1.value, NULL); }
    | VAR '[' aidx_expr ']'
       { $$ = (ExprNode*)VarNode::alloc( $1.lineNumber, $1.value, $3 ); }
+   | rwDEFINE '(' var_list_decl ')' '{' statement_list '}'
+      {
+         const U32 bufLen = 64;
+         UTF8 buffer[bufLen];
+         dSprintf(buffer, bufLen, "__anonymous_function%d", gAnonFunctionID++);
+         StringTableEntry fName = StringTable->insert(buffer);
+         StmtNode *fndef = FunctionDeclStmtNode::alloc($1.lineNumber, fName, NULL, $3, $6);
+
+         if(!gAnonFunctionList)
+            gAnonFunctionList = fndef;
+         else
+            gAnonFunctionList->append(fndef);
+
+         $$ = StrConstNode::alloc( $1.lineNumber, (UTF8*)fName, false );
+      }
    ;
 
 slot_acc

@@ -48,6 +48,7 @@
 #include "materials/materialFeatureData.h"
 #include "materials/materialFeatureTypes.h"
 #include "console/engineAPI.h"
+#include "T3D/accumulationVolume.h"
 
 using namespace Torque;
 
@@ -90,6 +91,9 @@ ConsoleDocClass( TSStatic,
 );
 
 TSStatic::TSStatic()
+:
+   cubeDescId( 0 ),
+   reflectorDesc( NULL )
 {
    mNetFlags.set(Ghostable | ScopeAlways);
 
@@ -101,7 +105,7 @@ TSStatic::TSStatic()
    mPlayAmbient      = true;
    mAmbientThread    = NULL;
 
-   mAllowPlayerStep = true;
+   mAllowPlayerStep = false;
 
    mConvexList = new Convex;
 
@@ -111,6 +115,11 @@ TSStatic::TSStatic()
    mMeshCulling = false;
    mUseOriginSort = false;
 
+   mUseAlphaFade     = false;
+   mAlphaFadeStart   = 100.0f;
+   mAlphaFadeEnd     = 150.0f;
+   mInvertAlphaFade  = false;
+   mAlphaFade = 1.0f;
    mPhysicsRep = NULL;
 
    mCollisionType = CollisionMesh;
@@ -180,6 +189,11 @@ void TSStatic::initPersistFields()
 
    endGroup("Rendering");
 
+   addGroup( "Reflection" );
+      addField( "cubeReflectorDesc", TypeRealString, Offset( cubeDescName, TSStatic ), 
+         "References a ReflectorDesc datablock that defines performance and quality properties for dynamic reflections.\n");
+   endGroup( "Reflection" );
+
    addGroup("Collision");
 
       addField( "collisionType",    TypeTSMeshType,   Offset( mCollisionType,   TSStatic ),
@@ -191,6 +205,13 @@ void TSStatic::initPersistFields()
          "When set to false, the slightest bump will stop the player from walking on top of the object.\n");
    
    endGroup("Collision");
+
+   addGroup( "AlphaFade" );  
+      addField( "alphaFadeEnable",   TypeBool,   Offset(mUseAlphaFade,    TSStatic), "Turn on/off Alpha Fade" );  
+      addField( "alphaFadeStart",    TypeF32,    Offset(mAlphaFadeStart,  TSStatic), "Distance of start Alpha Fade" );  
+      addField( "alphaFadeEnd",      TypeF32,    Offset(mAlphaFadeEnd,    TSStatic), "Distance of end Alpha Fade" );  
+      addField( "alphaFadeInverse", TypeBool,    Offset(mInvertAlphaFade, TSStatic), "Invert Alpha Fade's Start & End Distance" );  
+   endGroup( "AlphaFade" );
 
    addGroup("Debug");
 
@@ -279,7 +300,21 @@ bool TSStatic::onAdd()
 
    addToScene();
 
+   if ( isClientObject() )
+   {      
+      mCubeReflector.unregisterReflector();
+
+      if ( reflectorDesc )
+         mCubeReflector.registerReflector( this, reflectorDesc );      
+   }
+
    _updateShouldTick();
+
+   // Accumulation and environment mapping
+   if (isClientObject() && mShapeInstance)
+   {
+      AccumulationVolume::addObject(this);
+   }
 
    return true;
 }
@@ -337,6 +372,16 @@ bool TSStatic::_createShape()
    if ( mAmbientThread )
       mShapeInstance->setSequence( mAmbientThread, ambientSeq, 0);
 
+   // Resolve CubeReflectorDesc.
+   if ( cubeDescName.isNotEmpty() )
+   {
+      Sim::findObject( cubeDescName, reflectorDesc );
+   }
+   else if( cubeDescId > 0 )
+   {
+      Sim::findObject( cubeDescId, reflectorDesc );
+   }
+
    return true;
 }
 
@@ -391,6 +436,13 @@ void TSStatic::onRemove()
 {
    SAFE_DELETE( mPhysicsRep );
 
+   // Accumulation
+   if ( isClientObject() && mShapeInstance )
+   {
+      if ( mShapeInstance->hasAccumulation() ) 
+         AccumulationVolume::removeObject(this);
+   }
+
    mConvexList->nukeList();
 
    removeFromScene();
@@ -402,6 +454,8 @@ void TSStatic::onRemove()
    mShapeInstance = NULL;
 
    mAmbientThread = NULL;
+   if ( isClientObject() )
+       mCubeReflector.unregisterReflector();
 
    Parent::onRemove();
 }
@@ -442,7 +496,7 @@ void TSStatic::reSkin()
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
-      for (int i = 0; i < skins.size(); i++)
+      for (S32 i = 0; i < skins.size(); i++)
       {
          String oldSkin( mAppliedSkinName.c_str() );
          String newSkin( skins[i] );
@@ -465,10 +519,15 @@ void TSStatic::reSkin()
 
 void TSStatic::processTick( const Move *move )
 {
-   AssertFatal( mPlayAmbient && mAmbientThread, "TSSTatic::adanceTime called with nothing to play." );
-
-   if ( isServerObject() )
+   if ( isServerObject() && mPlayAmbient && mAmbientThread )
       mShapeInstance->advanceTime( TickSec, mAmbientThread );
+
+   if ( isMounted() )
+   {
+      MatrixF mat( true );
+      mMount.object->getMountTransform(mMount.node, mMount.xfm, &mat );
+      setTransform( mat );
+   }
 }
 
 void TSStatic::interpolateTick( F32 delta )
@@ -477,14 +536,20 @@ void TSStatic::interpolateTick( F32 delta )
 
 void TSStatic::advanceTime( F32 dt )
 {
-   AssertFatal( mPlayAmbient && mAmbientThread, "TSSTatic::advanceTime called with nothing to play." );
-   
-   mShapeInstance->advanceTime( dt, mAmbientThread );
+   if ( mPlayAmbient && mAmbientThread )
+      mShapeInstance->advanceTime( dt, mAmbientThread );
+
+   if ( isMounted() )
+   {
+      MatrixF mat( true );
+      mMount.object->getRenderMountTransform( dt, mMount.node, mMount.xfm, &mat );
+      setRenderTransform( mat );
+   }
 }
 
 void TSStatic::_updateShouldTick()
 {
-   bool shouldTick = mPlayAmbient && mAmbientThread;
+   bool shouldTick = (mPlayAmbient && mAmbientThread) || isMounted();
 
    if ( isTicking() != shouldTick )
       setProcessTick( shouldTick );
@@ -502,7 +567,43 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    if (dist < 0.01f)
       dist = 0.01f;
 
+   if (mUseAlphaFade)
+   {
+      mAlphaFade = 1.0f;
+      if ((mAlphaFadeStart < mAlphaFadeEnd) && mAlphaFadeStart > 0.1f)
+      {
+         if (mInvertAlphaFade)
+         {
+            if (dist <= mAlphaFadeStart)
+            {
+               return;
+            }
+            if (dist < mAlphaFadeEnd)
+            {
+               mAlphaFade = ((dist - mAlphaFadeStart) / (mAlphaFadeEnd - mAlphaFadeStart));
+            }
+         }
+         else
+         {
+            if (dist >= mAlphaFadeEnd)
+            {
+               return;
+            }
+            if (dist > mAlphaFadeStart)
+            {
+               mAlphaFade -= ((dist - mAlphaFadeStart) / (mAlphaFadeEnd - mAlphaFadeStart));
+            }
+         }
+      }
+   }
+
    F32 invScale = (1.0f/getMax(getMax(mObjScale.x,mObjScale.y),mObjScale.z));   
+
+   // If we're currently rendering our own reflection we
+   // don't want to render ourselves into it.
+   if ( mCubeReflector.isRendering() )
+      return;
+
 
    if ( mForceDetail == -1 )
       mShapeInstance->setDetailFromDistance( state, dist * invScale );
@@ -519,6 +620,12 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    rdata.setSceneState( state );
    rdata.setFadeOverride( 1.0f );
    rdata.setOriginSort( mUseOriginSort );
+
+   if ( mCubeReflector.isEnabled() )
+      rdata.setCubemap( mCubeReflector.getCubemap() );
+
+   // Acculumation
+   rdata.setAccuTex(mAccuTex);
 
    // If we have submesh culling enabled then prepare
    // the object space frustum to pass to the shape.
@@ -544,7 +651,34 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
    mat.scale( mObjScale );
    GFX->setWorldMatrix( mat );
 
+   if ( state->isDiffusePass() && mCubeReflector.isEnabled() && mCubeReflector.getOcclusionQuery() )
+   {
+       RenderPassManager *pass = state->getRenderPass();
+       OccluderRenderInst *ri = pass->allocInst<OccluderRenderInst>();  
+       
+       ri->type = RenderPassManager::RIT_Occluder;
+       ri->query = mCubeReflector.getOcclusionQuery();
+       mObjToWorld.mulP( mObjBox.getCenter(), &ri->position );
+       ri->scale.set( mObjBox.getExtents() );
+       ri->orientation = pass->allocUniqueXform( mObjToWorld ); 
+       ri->isSphere = false;
+       state->getRenderPass()->addInst( ri );
+   }
+
    mShapeInstance->animate();
+   if(mShapeInstance)
+   {
+      if (mUseAlphaFade)
+      {
+         mShapeInstance->setAlphaAlways(mAlphaFade);
+         S32 s = mShapeInstance->mMeshObjects.size();
+         
+         for(S32 x = 0; x < s; x++)
+         {
+            mShapeInstance->mMeshObjects[x].visible = mAlphaFade;
+         }
+      }
+   }
    mShapeInstance->render( rdata );
 
    if ( mRenderNormalScalar > 0 )
@@ -584,15 +718,25 @@ void TSStatic::onScaleChanged()
       else
          _updatePhysics();
    }
+
+   setMaskBits( ScaleMask );
 }
 
 void TSStatic::setTransform(const MatrixF & mat)
 {
    Parent::setTransform(mat);
-   setMaskBits( TransformMask );
+   if ( !isMounted() )
+      setMaskBits( TransformMask );
 
    if ( mPhysicsRep )
       mPhysicsRep->setTransform( mat );
+
+   // Accumulation
+   if ( isClientObject() && mShapeInstance )
+   {
+      if ( mShapeInstance->hasAccumulation() ) 
+         AccumulationVolume::updateObject(this);
+   }
 
    // Since this is a static it's render transform changes 1
    // to 1 with it's collision transform... no interpolation.
@@ -603,9 +747,15 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 {
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
-   mathWrite( *stream, getTransform() );
-   mathWrite( *stream, getScale() );
-   stream->writeString( mShapeName );
+   if ( stream->writeFlag( mask & TransformMask ) )  
+      mathWrite( *stream, getTransform() );
+
+   if ( stream->writeFlag( mask & ScaleMask ) )  
+   {
+      // Only write one bit if the scale is one.
+      if ( stream->writeFlag( mObjScale != Point3F::One ) )
+         mathWrite( *stream, mObjScale );   
+   }
 
    if ( stream->writeFlag( mask & UpdateCollisionMask ) )
       stream->write( (U32)mCollisionType );
@@ -613,21 +763,36 @@ U32 TSStatic::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if ( stream->writeFlag( mask & SkinMask ) )
       con->packNetStringHandleU( stream, mSkinNameHandle );
 
-   stream->write( (U32)mDecalType );
+   if (stream->writeFlag(mask & AdvancedStaticOptionsMask))
+   {
+      stream->writeString(mShapeName);
+      stream->write((U32)mDecalType);
 
-   stream->writeFlag( mAllowPlayerStep );
-   stream->writeFlag( mMeshCulling );
-   stream->writeFlag( mUseOriginSort );
+      stream->writeFlag(mAllowPlayerStep);
+      stream->writeFlag(mMeshCulling);
+      stream->writeFlag(mUseOriginSort);
 
-   stream->write( mRenderNormalScalar );
+      stream->write(mRenderNormalScalar);
 
-   stream->write( mForceDetail );
+      stream->write(mForceDetail);
 
-   stream->writeFlag( mPlayAmbient );
+      stream->writeFlag(mPlayAmbient);
+   }
+
+   if ( stream->writeFlag(mUseAlphaFade) )  
+   {  
+      stream->write(mAlphaFadeStart);  
+      stream->write(mAlphaFadeEnd);  
+      stream->write(mInvertAlphaFade);  
+   } 
 
    if ( mLightPlugin )
       retMask |= mLightPlugin->packUpdate(this, AdvancedStaticOptionsMask, con, mask, stream);
 
+   if( stream->writeFlag( reflectorDesc != NULL ) )
+   {
+      stream->writeRangedU32( reflectorDesc->getId(), DataBlockObjectIdFirst,  DataBlockObjectIdLast );
+   }
    return retMask;
 }
 
@@ -635,14 +800,25 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
 {
    Parent::unpackUpdate(con, stream);
 
-   MatrixF mat;
-   Point3F scale;
-   mathRead( *stream, &mat );
-   mathRead( *stream, &scale );
-   setScale( scale);
-   setTransform(mat);
+   if ( stream->readFlag() ) // TransformMask
+   {
+      MatrixF mat;
+      mathRead( *stream, &mat );
+      setTransform(mat);
+      setRenderTransform(mat);
+   }
 
-   mShapeName = stream->readSTString();
+   if ( stream->readFlag() ) // ScaleMask
+   {
+      if ( stream->readFlag() )
+      {
+         VectorF scale;
+         mathRead( *stream, &scale );
+         setScale( scale );
+      }
+      else
+         setScale( Point3F::One );
+   }
 
    if ( stream->readFlag() ) // UpdateCollisionMask
    {
@@ -670,21 +846,38 @@ void TSStatic::unpackUpdate(NetConnection *con, BitStream *stream)
       }
    }
 
-   stream->read( (U32*)&mDecalType );
+   if (stream->readFlag()) // AdvancedStaticOptionsMask
+   {
+      mShapeName = stream->readSTString();
 
-   mAllowPlayerStep = stream->readFlag();
-   mMeshCulling = stream->readFlag();   
-   mUseOriginSort = stream->readFlag();
+      stream->read((U32*)&mDecalType);
 
-   stream->read( &mRenderNormalScalar );
+      mAllowPlayerStep = stream->readFlag();
+      mMeshCulling = stream->readFlag();
+      mUseOriginSort = stream->readFlag();
 
-   stream->read( &mForceDetail );
+      stream->read(&mRenderNormalScalar);
 
-   mPlayAmbient = stream->readFlag();
+      stream->read(&mForceDetail);
+      mPlayAmbient = stream->readFlag();
+   }
+
+   mUseAlphaFade = stream->readFlag();  
+   if (mUseAlphaFade)
+   {
+      stream->read(&mAlphaFadeStart);  
+      stream->read(&mAlphaFadeEnd);  
+      stream->read(&mInvertAlphaFade);  
+   }
 
    if ( mLightPlugin )
    {
       mLightPlugin->unpackUpdate(this, con, stream);
+   }
+
+   if( stream->readFlag() )
+   {
+      cubeDescId = stream->readRangedU32( DataBlockObjectIdFirst, DataBlockObjectIdLast );
    }
 
    if ( isProperlyAdded() )
@@ -702,41 +895,9 @@ bool TSStatic::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 
    if ( mCollisionType == Bounds )
    {
-      F32 st, et, fst = 0.0f, fet = 1.0f;
-      F32 *bmin = &mObjBox.minExtents.x;
-      F32 *bmax = &mObjBox.maxExtents.x;
-      F32 const *si = &start.x;
-      F32 const *ei = &end.x;
-
-      for ( U32 i = 0; i < 3; i++ )
-      {
-         if (*si < *ei) 
-         {
-            if ( *si > *bmax || *ei < *bmin )
-               return false;
-            F32 di = *ei - *si;
-            st = ( *si < *bmin ) ? ( *bmin - *si ) / di : 0.0f;
-            et = ( *ei > *bmax ) ? ( *bmax - *si ) / di : 1.0f;
-         }
-         else 
-         {
-            if ( *ei > *bmax || *si < *bmin )
-               return false;
-            F32 di = *ei - *si;
-            st = ( *si > *bmax ) ? ( *bmax - *si ) / di : 0.0f;
-            et = ( *ei < *bmin ) ? ( *bmin - *si ) / di : 1.0f;
-         }
-         if ( st > fst ) fst = st;
-         if ( et < fet ) fet = et;
-         if ( fet < fst )
-            return false;
-         bmin++; bmax++;
-         si++; ei++;
-      }
-
-      info->normal = start - end;
-      info->normal.normalizeSafe();
-      getTransform().mulV( info->normal );
+      F32 fst;
+      if (!mObjBox.collideLine(start, end, &fst, &info->normal))
+         return false;
 
       info->t = fst;
       info->object = this;
@@ -956,7 +1117,7 @@ void TSStaticPolysoupConvex::getPolyList(AbstractPolyList *list)
                list->addPoint(verts[2]);
                list->addPoint(verts[1]);
 
-   list->begin(0, (U32)idx ^ (U32)mesh);
+   list->begin(0, (U32)idx ^ (uintptr_t)mesh);
    list->vertex(base + 2);
    list->vertex(base + 1);
    list->vertex(base + 0);
@@ -1037,6 +1198,19 @@ void TSStaticPolysoupConvex::getFeatures(const MatrixF& mat,const VectorF& n, Co
    // All done!
 }
 
+void TSStatic::onMount( SceneObject *obj, S32 node )
+{
+   Parent::onMount(obj, node);
+   _updateShouldTick();
+}
+
+void TSStatic::onUnmount( SceneObject *obj, S32 node )
+{
+   Parent::onUnmount( obj, node );
+   setMaskBits( TransformMask );
+   _updateShouldTick();
+}
+
 //------------------------------------------------------------------------
 //These functions are duplicated in tsStatic and shapeBase.
 //They each function a little differently; but achieve the same purpose of gathering
@@ -1048,17 +1222,17 @@ DefineEngineMethod( TSStatic, getTargetName, const char*, ( S32 index ),(0),
    "@return the name of the indexed material.\n"
    "@see getTargetCount()\n")
 {
-	TSStatic *obj = dynamic_cast< TSStatic* > ( object );
-	if(obj)
-	{
-		// Try to use the client object (so we get the reskinned targets in the Material Editor)
-		if ((TSStatic*)obj->getClientObject())
-			obj = (TSStatic*)obj->getClientObject();
+   TSStatic *obj = dynamic_cast< TSStatic* > ( object );
+   if(obj)
+   {
+      // Try to use the client object (so we get the reskinned targets in the Material Editor)
+      if ((TSStatic*)obj->getClientObject())
+         obj = (TSStatic*)obj->getClientObject();
 
-		return obj->getShapeInstance()->getTargetName(index);
-	}
+      return obj->getShapeInstance()->getTargetName(index);
+   }
 
-	return "";
+   return "";
 }
 
 DefineEngineMethod( TSStatic, getTargetCount, S32,(),,
@@ -1066,23 +1240,23 @@ DefineEngineMethod( TSStatic, getTargetCount, S32,(),,
    "@return the number of materials in the shape.\n"
    "@see getTargetName()\n")
 {
-	TSStatic *obj = dynamic_cast< TSStatic* > ( object );
-	if(obj)
-	{
-		// Try to use the client object (so we get the reskinned targets in the Material Editor)
-		if ((TSStatic*)obj->getClientObject())
-			obj = (TSStatic*)obj->getClientObject();
+   TSStatic *obj = dynamic_cast< TSStatic* > ( object );
+   if(obj)
+   {
+      // Try to use the client object (so we get the reskinned targets in the Material Editor)
+      if ((TSStatic*)obj->getClientObject())
+         obj = (TSStatic*)obj->getClientObject();
 
-		return obj->getShapeInstance()->getTargetCount();
-	}
+      return obj->getShapeInstance()->getTargetCount();
+   }
 
-	return -1;
+   return -1;
 }
 
 // This method is able to change materials per map to with others. The material that is being replaced is being mapped to
 // unmapped_mat as a part of this transition
 
-DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Material* oldMat, Material* newMat ),("",NULL,NULL),
+DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Material* oldMat, Material* newMat ),("",nullAsType<Material*>(),nullAsType<Material*>()),
    "@brief Change one of the materials on the shape.\n\n"
 
    "This method changes materials per mapTo with others. The material that "
@@ -1108,8 +1282,10 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
       return;
    }
 
+   TSMaterialList* shapeMaterialList = object->getShape()->materialList;
+
    // Check the mapTo name exists for this shape
-   S32 matIndex = object->getShape()->materialList->getMaterialNameList().find_next(String(mapTo));
+   S32 matIndex = shapeMaterialList->getMaterialNameList().find_next(String(mapTo));
    if (matIndex < 0)
    {
       Con::errorf("TSShape::changeMaterial failed: Invalid mapTo name '%s'", mapTo);
@@ -1127,13 +1303,13 @@ DefineEngineMethod( TSStatic, changeMaterial, void, ( const char* mapTo, Materia
 
    // Replace instances with the new material being traded in. Lets make sure that we only
    // target the specific targets per inst, this is actually doing more than we thought
-   delete object->getShape()->materialList->mMatInstList[matIndex];
-   object->getShape()->materialList->mMatInstList[matIndex] = newMat->createMatInstance();
+   delete shapeMaterialList->mMatInstList[matIndex];
+   shapeMaterialList->mMatInstList[matIndex] = newMat->createMatInstance();
 
    // Finish up preparing the material instances for rendering
    const GFXVertexFormat *flags = getGFXVertexFormat<GFXVertexPNTTB>();
    FeatureSet features = MATMGR->getDefaultFeatures();
-   object->getShape()->materialList->getMaterialInst(matIndex)->init( features, flags );
+   shapeMaterialList->getMaterialInst(matIndex)->init(features, flags);
 }
 
 DefineEngineMethod( TSStatic, getModelFile, const char *, (),,
@@ -1141,10 +1317,10 @@ DefineEngineMethod( TSStatic, getModelFile, const char *, (),,
 
    "@return the shape filename\n\n"
    "@tsexample\n"
-		"// Acquire the model filename used on this shape.\n"
-		"%modelFilename = %obj.getModelFile();\n"
+      "// Acquire the model filename used on this shape.\n"
+      "%modelFilename = %obj.getModelFile();\n"
    "@endtsexample\n"
    )
 {
-	return object->getShapeFileName();
+   return object->getShapeFileName();
 }

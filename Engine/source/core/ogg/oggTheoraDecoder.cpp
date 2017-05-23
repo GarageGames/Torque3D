@@ -95,12 +95,12 @@ static inline S32 sampleG( U8* pCb, U8* pCr )
 
 OggTheoraDecoder::OggTheoraDecoder( const ThreadSafeRef< OggInputStream >& stream )
    : Parent( stream ),
-#ifdef TORQUE_DEBUG
-     mLock( 0 ),
-#endif
      mTheoraSetup( NULL ),
      mTheoraDecoder( NULL ),
      mTranscoder( TRANSCODER_Auto )
+#ifdef TORQUE_DEBUG
+     ,mLock( 0 )
+#endif
 {
    // Initialize.
       
@@ -169,7 +169,7 @@ bool OggTheoraDecoder::_init()
          break;
       }
       
-      int result = th_decode_headerin( &mTheoraInfo, &mTheoraComment, &mTheoraSetup, &nextPacket );
+      S32 result = th_decode_headerin( &mTheoraInfo, &mTheoraComment, &mTheoraSetup, &nextPacket );
       if( result < 0 )
       {
          haveTheoraHeader = false;
@@ -285,8 +285,7 @@ U32 OggTheoraDecoder::read( OggTheoraFrame** buffer, U32 num )
       
       // Transcode the packet.
       
-      #if ( defined( TORQUE_COMPILER_GCC ) || defined( TORQUE_COMPILER_VISUALC ) ) && defined( TORQUE_CPU_X86 )
-      
+      #if ( defined( TORQUE_COMPILER_GCC ) || defined( TORQUE_COMPILER_VISUALC ) ) && (defined( TORQUE_CPU_X86 ) )      
       if(      ( mTranscoder == TRANSCODER_Auto || mTranscoder == TRANSCODER_SSE2420RGBA ) &&
                getDecoderPixelFormat() == PIXEL_FORMAT_420 &&
                Platform::SystemInfo.processor.properties & CPU_PROP_SSE2 &&
@@ -420,7 +419,7 @@ void OggTheoraDecoder::_transcode( th_ycbcr_buffer ycbcr, U8* buffer, const U32 
 }
 
 //-----------------------------------------------------------------------------
-
+#if defined( TORQUE_CPU_X86 )
 void OggTheoraDecoder::_transcode420toRGBA_SSE2( th_ycbcr_buffer ycbcr, U8* buffer, U32 width, U32 height, U32 pitch )
 {
    AssertFatal( width % 2 == 0, "OggTheoraDecoder::_transcode420toRGBA_SSE2() - width must be multiple of 2" );
@@ -560,7 +559,7 @@ void OggTheoraDecoder::_transcode420toRGBA_SSE2( th_ycbcr_buffer ycbcr, U8* buff
          jnz hloop
    };
    
-   #elif defined( TORQUE_COMPILER_GCC ) && defined( TORQUE_CPU_X86 )
+   #elif defined( TORQUE_COMPILER_GCC ) && defined( TORQUE_CPU_X86 ) 
 
    asm(  "pushal\n"                                // Save all general-purpose registers.
          
@@ -692,3 +691,4 @@ void OggTheoraDecoder::_transcode420toRGBA_SSE2( th_ycbcr_buffer ycbcr, U8* buff
    
    #endif
 }
+#endif

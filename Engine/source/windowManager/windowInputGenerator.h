@@ -51,6 +51,9 @@ class WindowInputGenerator
       /// (one unit of mouse movement is a mickey) to units in the GUI.
       F32             mPixelsPerMickey;
 
+      /// This tells us if the last key we pressed was used from the global action map.
+      bool mLastPressWasGlobalActionMap;
+
       // Event Handlers
       void handleMouseButton(WindowId did, U32 modifier,  U32 action, U16 button);
       void handleMouseWheel (WindowId did, U32 modifier,  S32 wheelDeltaX, S32 wheelDeltaY);
@@ -61,6 +64,16 @@ class WindowInputGenerator
       void handleInputEvent (U32 deviceInst, F32 fValue, F32 fValue2, F32 fValue3, F32 fValue4, S32 iValue, U16 deviceType, U16 objType, U16 ascii, U16 objInst, U8 action, U8 modifier);
 
       void generateInputEvent( InputEventInfo &inputEvent );
+
+      /// Accelerator key map
+       struct AccKeyMap
+       {
+          void *hnd;
+          String cmd;
+          U32 keyCode;
+          U32 modifier;
+       };
+       Vector <AccKeyMap> mAcceleratorMap;
       
    public:
    
@@ -72,6 +85,49 @@ class WindowInputGenerator
       /// Returns true if the given keypress event should be send as a raw keyboard
       /// event even if it maps to a character input event.
       bool wantAsKeyboardEvent( U32 modifiers, U32 key );
+
+      /// Tells us if the last key was used within the global action map.
+      /// @return true if the key was a global action map key, false otherwise.
+      /// @note Useful and currently used to tell if we just opened the console 
+      ///  by using the console key. Currently this is used to fix a bug in SDL
+      ///  but it is not limited to that use.
+      bool lastKeyWasGlobalActionMap() const { return mLastPressWasGlobalActionMap; }
+
+    void addAcceleratorKey( void *hnd, const String &cmd, U32 keycode, U32 modifier)
+    {
+        AccKeyMap acc;
+        acc.hnd = hnd;
+        acc.cmd = cmd;
+        acc.keyCode = keycode;
+        acc.modifier = modifier;
+        mAcceleratorMap.push_back(acc);
+    }
+
+    void removeAcceleratorKeys( void *hnd )
+    {
+         for( int i = 0; i < mAcceleratorMap.size(); )
+         {
+            if( mAcceleratorMap[i].hnd == hnd )
+            {
+                mAcceleratorMap.erase( i, 1 );
+                continue;
+            }
+
+             ++i;
+         }
+    }
+
+    void removeAcceleratorKey( void *hnd, U32 keycode, U32 modifier )
+    {
+         for( int i = 0; i < mAcceleratorMap.size(); ++i )
+         {
+            if( mAcceleratorMap[i].hnd == hnd && mAcceleratorMap[i].keyCode == keycode && mAcceleratorMap[i].modifier == modifier )
+            {
+                mAcceleratorMap.erase( i, 1 );
+                return;
+            }
+         }
+    }
 };
 
 #endif // _WINDOW_INPUTGENERATOR_H_

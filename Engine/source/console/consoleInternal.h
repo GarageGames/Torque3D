@@ -151,7 +151,7 @@ class Namespace
          void clear();
 
          ///
-         const char *execute( S32 argc, const char** argv, ExprEvalState* state );
+         ConsoleValueRef execute( S32 argc, ConsoleValueRef* argv, ExprEvalState* state );
          
          /// Return a one-line documentation text string for the function.
          String getBriefDescription( String* outRemainingDocText = NULL ) const;
@@ -275,7 +275,7 @@ class Namespace
 
 typedef VectorPtr<Namespace::Entry *>::iterator NamespaceEntryListIterator;
 
-extern char *typeValueEmpty;
+
 
 class Dictionary
 {
@@ -283,16 +283,9 @@ public:
 
    struct Entry
    {
-      enum
-      {
-         TypeInternalInt = -3,
-         TypeInternalFloat = -2,
-         TypeInternalString = -1,
-      };
-
       StringTableEntry name;
+      ConsoleValue value;
       Entry *nextEntry;
-      S32 type;
 
       typedef Signal<void()> NotifySignal;
 
@@ -306,72 +299,42 @@ public:
       /// Whether this is a constant that cannot be assigned to.
       bool mIsConstant;
 
-   protected:
-
-      // NOTE: This is protected to ensure no one outside
-      // of this structure is messing with it.
-
-      #pragma warning( push )
-      #pragma warning( disable : 4201 ) // warning C4201: nonstandard extension used : nameless struct/union
-
-      // An variable is either a real dynamic type or
-      // its one exposed from C++ using a data pointer.
-      //
-      // We use this nameless union and struct setup
-      // to optimize the memory usage.
-      union
-      {
-         struct
-         {
-            char *sval;
-            U32 ival;  // doubles as strlen when type is TypeInternalString
-            F32 fval;
-            U32 bufferLen;
-         };
-
-         struct
-         {
-            /// The real data pointer.
-            void *dataPtr;
-
-            /// The enum lookup table for enumerated types.
-            const EnumTable *enumTable;
-         };
-      };
-
-      #pragma warning( pop ) // C4201
-
    public:
 
+      Entry() {
+         name = NULL;
+         notify = NULL;
+         nextEntry = NULL;
+         mUsage = NULL;
+         mIsConstant = false;
+         value.init();
+      }
+      
       Entry(StringTableEntry name);
       ~Entry();
-
-      U32 getIntValue()
-      {
-         if(type <= TypeInternalString)
-            return ival;
-         else
-            return dAtoi(Con::getData(type, dataPtr, 0, enumTable));
+      
+      Entry *mNext;
+      
+      void reset() {
+         name = NULL;
+         value.cleanup();
+         if ( notify )
+            delete notify;
       }
 
-      F32 getFloatValue()
+      inline U32 getIntValue()
       {
-         if(type <= TypeInternalString)
-            return fval;
-         else
-            return dAtof(Con::getData(type, dataPtr, 0, enumTable));
+         return value.getIntValue();
       }
 
-      const char *getStringValue()
+      inline F32 getFloatValue()
       {
-         if(type == TypeInternalString)
-            return sval;
-         if(type == TypeInternalFloat)
-            return Con::getData(TypeF32, &fval, 0);
-         else if(type == TypeInternalInt)
-            return Con::getData(TypeS32, &ival, 0);
-         else
-            return Con::getData(type, dataPtr, 0, enumTable);
+         return value.getFloatValue();
+      }
+
+      inline const char *getStringValue()
+      {
+         return value.getStringValue();
       }
 
       void setIntValue(U32 val)
@@ -381,23 +344,8 @@ public:
             Con::errorf( "Cannot assign value to constant '%s'.", name );
             return;
          }
-            
-         if(type <= TypeInternalString)
-         {
-            fval = (F32)val;
-            ival = val;
-            if(sval != typeValueEmpty)
-            {
-               dFree(sval);
-               sval = typeValueEmpty;
-            }
-            type = TypeInternalInt;
-         }
-         else
-         {
-            const char *dptr = Con::getData(TypeS32, &val, 0);
-            Con::setData(type, dataPtr, 0, 1, &dptr, enumTable);
-         }
+         
+         value.setIntValue(val);
 
          // Fire off the notification if we have one.
          if ( notify )
@@ -411,159 +359,182 @@ public:
             Con::errorf( "Cannot assign value to constant '%s'.", name );
             return;
          }
-
-         if(type <= TypeInternalString)
-         {
-            fval = val;
-            ival = static_cast<U32>(val);
-            if(sval != typeValueEmpty)
-            {
-               dFree(sval);
-               sval = typeValueEmpty;
-            }
-            type = TypeInternalFloat;
-         }
-         else
-         {
-            const char *dptr = Con::getData(TypeF32, &val, 0);
-            Con::setData(type, dataPtr, 0, 1, &dptr, enumTable);
-         }
+         
+         value.setFloatValue(val);
 
          // Fire off the notification if we have one.
          if ( notify )
             notify->trigger();
       }
 
-      void setStringValue(const char *value);
+      void setStringStackPtrValue(StringStackPtr newValue)
+      {
+         if( mIsConstant )
+         {
+            Con::errorf( "Cannot assign value to constant '%s'.", name );
+            return;
+         }
+         
+         value.setStringStackPtrValue(newValue);
+         
+         
+         // Fire off the notification if we have one.
+         if ( notify )
+            notify->trigger();
+      }
+
+      void setStringValue(const char *newValue)
+      {
+         if( mIsConstant )
+         {
+            Con::errorf( "Cannot assign value to constant '%s'.", name );
+            return;
+         }
+         
+         value.setStringValue(newValue);
+         
+         
+         // Fire off the notification if we have one.
+         if ( notify )
+            notify->trigger();
+      }
    };
 
-    struct HashTableData
-    {
-        Dictionary* owner;
-        S32 size;
-        S32 count;
-        Entry **data;
-        FreeListChunker< Entry > mChunker;
-        
-        HashTableData( Dictionary* owner )
-           : owner( owner ), size( 0 ), count( 0 ), data( NULL ) {}
-    };
+   struct HashTableData
+   {
+      Dictionary* owner;
+      S32 size;
+      S32 count;
+      Entry **data;
+      FreeListChunker< Entry > mChunker;
+     
+      HashTableData( Dictionary* owner )
+         : owner( owner ), size( 0 ), count( 0 ), data( NULL ) {}
+   };
 
-    HashTableData* hashTable;
-    HashTableData ownHashTable;
-    ExprEvalState *exprState;
-    
-    StringTableEntry scopeName;
-    Namespace *scopeNamespace;
-    CodeBlock *code;
-    U32 ip;
+   HashTableData* hashTable;
+   HashTableData ownHashTable;
+   ExprEvalState *exprState;
 
-    Dictionary();
-    ~Dictionary();
+   StringTableEntry scopeName;
+   Namespace *scopeNamespace;
+   CodeBlock *code;
+   U32 ip;
 
-    Entry *lookup(StringTableEntry name);
-    Entry *add(StringTableEntry name);
-    void setState(ExprEvalState *state, Dictionary* ref=NULL);
-    void remove(Entry *);
-    void reset();
+   Dictionary();
+   ~Dictionary();
 
-    void exportVariables( const char *varString, const char *fileName, bool append );
-    void exportVariables( const char *varString, Vector<String> *names, Vector<String> *values );
-    void deleteVariables( const char *varString );
+   Entry *lookup(StringTableEntry name);
+   Entry *add(StringTableEntry name);
+   void setState(ExprEvalState *state, Dictionary* ref=NULL);
+   void remove(Entry *);
+   void reset();
 
-    void setVariable(StringTableEntry name, const char *value);
-    const char *getVariable(StringTableEntry name, bool *valid = NULL);
-    
-    U32 getCount() const
-    {
+   void exportVariables( const char *varString, const char *fileName, bool append );
+   void exportVariables( const char *varString, Vector<String> *names, Vector<String> *values );
+   void deleteVariables( const char *varString );
+
+   void setVariable(StringTableEntry name, const char *value);
+   const char *getVariable(StringTableEntry name, bool *valid = NULL);
+   S32 getIntVariable(StringTableEntry name, bool *valid = NULL);
+   F32 getFloatVariable(StringTableEntry name, bool *entValid = NULL);
+
+   U32 getCount() const
+   {
       return hashTable->count;
-    }
-    bool isOwner() const
-    {
+   }
+   bool isOwner() const
+   {
       return hashTable->owner;
-    }
+   }
 
-    /// @see Con::addVariable
-    Entry* addVariable(    const char *name, 
-                           S32 type, 
-                           void *dataPtr, 
-                           const char* usage );
+   /// @see Con::addVariable
+   Entry* addVariable(  const char *name, 
+                        S32 type, 
+                        void *dataPtr, 
+                        const char* usage );
 
-    /// @see Con::removeVariable
-    bool removeVariable(StringTableEntry name);
+   /// @see Con::removeVariable
+   bool removeVariable(StringTableEntry name);
 
-    /// @see Con::addVariableNotify
-    void addVariableNotify( const char *name, const Con::NotifyDelegate &callback );
+   /// @see Con::addVariableNotify
+   void addVariableNotify( const char *name, const Con::NotifyDelegate &callback );
 
-    /// @see Con::removeVariableNotify
-    void removeVariableNotify( const char *name, const Con::NotifyDelegate &callback );
+   /// @see Con::removeVariableNotify
+   void removeVariableNotify( const char *name, const Con::NotifyDelegate &callback );
 
-    /// Return the best tab completion for prevText, with the length
-    /// of the pre-tab string in baseLen.
-    const char *tabComplete(const char *prevText, S32 baseLen, bool);
-    
-    /// Run integrity checks for debugging.
-    void validate();
+   /// Return the best tab completion for prevText, with the length
+   /// of the pre-tab string in baseLen.
+   const char *tabComplete(const char *prevText, S32 baseLen, bool);
+
+   /// Run integrity checks for debugging.
+   void validate();
 };
 
 class ExprEvalState
 {
 public:
-    /// @name Expression Evaluation
-    /// @{
+   /// @name Expression Evaluation
+   /// @{
 
-    ///
-    SimObject *thisObject;
-    Dictionary::Entry *currentVariable;
-    bool traceOn;
-    
-    U32 mStackDepth;
+   ///
+   SimObject *thisObject;
+   Dictionary::Entry *currentVariable;
+   Dictionary::Entry *copyVariable;
+   bool traceOn;
 
-    ExprEvalState();
-    ~ExprEvalState();
+   U32 mStackDepth;
+   bool mShouldReset; ///< Designates if the value stack should be reset
+   bool mResetLocked; ///< mShouldReset will be set at the end
 
-    /// @}
+   ExprEvalState();
+   ~ExprEvalState();
 
-    /// @name Stack Management
-    /// @{
+   /// @}
 
-    /// The stack of callframes.  The extra redirection is necessary since Dictionary holds
-    /// an interior pointer that will become invalid when the object changes address.
-    Vector< Dictionary* > stack;
+   /// @name Stack Management
+   /// @{
 
-    ///
-    Dictionary globalVars;
-    
-    void setCurVarName(StringTableEntry name);
-    void setCurVarNameCreate(StringTableEntry name);
-    S32 getIntVariable();
-    F64 getFloatVariable();
-    const char *getStringVariable();
-    void setIntVariable(S32 val);
-    void setFloatVariable(F64 val);
-    void setStringVariable(const char *str);
+   /// The stack of callframes.  The extra redirection is necessary since Dictionary holds
+   /// an interior pointer that will become invalid when the object changes address.
+   Vector< Dictionary* > stack;
 
-    void pushFrame(StringTableEntry frameName, Namespace *ns);
-    void popFrame();
+   ///
+   Dictionary globalVars;
 
-    /// Puts a reference to an existing stack frame
-    /// on the top of the stack.
-    void pushFrameRef(S32 stackIndex);
-    
-    U32 getStackDepth() const
-    {
-       return mStackDepth;
-    }
-    
-    Dictionary& getCurrentFrame()
-    {
+   void setCurVarName(StringTableEntry name);
+   void setCurVarNameCreate(StringTableEntry name);
+
+   S32 getIntVariable();
+   F64 getFloatVariable();
+   const char *getStringVariable();
+   void setIntVariable(S32 val);
+   void setFloatVariable(F64 val);
+   void setStringVariable(const char *str);
+   void setStringStackPtrVariable(StringStackPtr str);
+   void setCopyVariable();
+
+   void pushFrame(StringTableEntry frameName, Namespace *ns);
+   void popFrame();
+
+   /// Puts a reference to an existing stack frame
+   /// on the top of the stack.
+   void pushFrameRef(S32 stackIndex);
+ 
+   U32 getStackDepth() const
+   {
+      return mStackDepth;
+   }
+ 
+   Dictionary& getCurrentFrame()
+   {
       return *( stack[ mStackDepth - 1 ] );
-    }
+   }
 
-    /// @}
-    
-    /// Run integrity checks for debugging.
-    void validate();
+   /// @}
+
+   /// Run integrity checks for debugging.
+   void validate();
 };
 
 namespace Con

@@ -114,7 +114,7 @@ class Item: public ShapeBase
 
   protected:
 	DECLARE_CALLBACK( void, onStickyCollision, ( const char* objID ));
-	DECLARE_CALLBACK( void, onEnterLiquid, ( const char* objID, const char* waterCoverage, const char* liquidType ));
+	DECLARE_CALLBACK( void, onEnterLiquid, ( const char* objID, F32 waterCoverage, const char* liquidType ));
 	DECLARE_CALLBACK( void, onLeaveLiquid, ( const char* objID, const char* liquidType ));
 
   public:

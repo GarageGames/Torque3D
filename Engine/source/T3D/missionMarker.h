@@ -92,17 +92,6 @@ class MissionMarker : public ShapeBase
 // Class: WayPoint
 //------------------------------------------------------------------------------
 class WayPoint;
-class WayPointTeam
-{
-   public:
-      WayPointTeam();
-
-      S32         mTeamId;
-      WayPoint *  mWayPoint;
-};
-
-DECLARE_STRUCT( WayPointTeam );
-DefineConsoleType( TypeWayPointTeam, WayPointTeam * );
 
 class WayPoint : public MissionMarker
 {
@@ -132,7 +121,6 @@ class WayPoint : public MissionMarker
 
       // field data
       StringTableEntry              mName;
-      WayPointTeam                  mTeam;
 
       static void initPersistFields();
 

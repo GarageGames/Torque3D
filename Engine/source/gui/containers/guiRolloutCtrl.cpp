@@ -56,6 +56,10 @@ IMPLEMENT_CALLBACK( GuiRolloutCtrl, onCollapsed, void, (), (),
 //-----------------------------------------------------------------------------
 
 GuiRolloutCtrl::GuiRolloutCtrl()
+ : mHeader(0,0,0,0),
+   mExpanded(0,0,0,0),
+   mChildRect(0,0,0,0),
+   mMargin(0,0,0,0)
 {
    mExpanded.set(0,0,200,60);
    mCaption             = StringTable->EmptyString();
@@ -70,6 +74,7 @@ GuiRolloutCtrl::GuiRolloutCtrl()
    mIsContainer = true;
    mCanCollapse = true;
    mAutoCollapseSiblings = false;
+   mHasTexture = false;
    // Make sure we receive our ticks.
    setProcessTicks();
 }
@@ -171,7 +176,6 @@ void GuiRolloutCtrl::removeObject( SimObject *obj )
 
 void GuiRolloutCtrl::onMouseDown( const GuiEvent &event )
 {
-   Point2I localPoint = globalToLocalCoord( event.mousePoint );
    mouseLock();
 }
 
@@ -184,7 +188,7 @@ bool GuiRolloutCtrl::_onMouseUp( const GuiEvent &event, bool lockedMouse )
    {
       // If Ctrl/Cmd-clicking a header, collapse all sibling GuiRolloutCtrls.
       
-      if(    ( mAutoCollapseSiblings && !mIsExpanded && !( event.modifier & SI_PRIMARY_CTRL )
+      if( (( mAutoCollapseSiblings && !mIsExpanded && !( event.modifier & SI_PRIMARY_CTRL ))
           || ( !mAutoCollapseSiblings && event.modifier & SI_PRIMARY_CTRL ) ) )
       {
          for( SimSet::iterator iter = getParent()->begin(); iter != getParent()->end(); ++ iter )
@@ -458,9 +462,9 @@ void GuiRolloutCtrl::processTick()
          newHeight -= mAnimateStep;
 
       if( !mIsAnimating )
-	  {
+     {
          mIsExpanded = false;
-	  }
+     }
    }
    else // We're expanding ourself (Showing our contents)
    {
@@ -555,13 +559,13 @@ void GuiRolloutCtrl::onRender( Point2I offset, const RectI &updateRect )
    if ( pChild )
    {
       if ( !mIsExpanded && !mIsAnimating && pChild->isVisible() )
-	  {
+     {
          pChild->setVisible( false );
-	  }
+     }
       else if ( (mIsExpanded || mIsAnimating) && !pChild->isVisible() )
-	  {
+     {
          pChild->setVisible( true );
-	  }
+     }
    }
    renderChildControls( offset, updateRect );
 
@@ -610,7 +614,7 @@ DefineEngineMethod( GuiRolloutCtrl, toggleCollapse, void, (),,
    if( object->isExpanded() )
       object->collapse();
    else
-	  object->expand();
+     object->expand();
 }
 
 //-----------------------------------------------------------------------------

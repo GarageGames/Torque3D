@@ -142,8 +142,8 @@ inline void CatmullRom<TYPE>::clear()
 template<typename TYPE>
 inline void CatmullRom<TYPE>::initialize( U32 count, const TYPE *positions, const F32 *times )
 {
-   AssertFatal( positions, "CatmullRom::initialize - Got null position!" )
-   AssertFatal( count > 1, "CatmullRom::initialize - Must have more than 2 points!" )
+   AssertFatal( positions, "CatmullRom::initialize - Got null position!" );
+   AssertFatal( count > 1, "CatmullRom::initialize - Must have more than 2 points!" );
 
    // Clean up any previous state.
    clear();

@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "torque.hlsl"
-   
+#include "shaderModel.hlsl"
 // With advanced lighting we get soft particles.
 #ifdef TORQUE_LINEAR_DEPTH
    #define SOFTPARTICLES  
@@ -29,27 +29,27 @@
 
 #ifdef SOFTPARTICLES
    
-   #include "shadergen:/autogenConditioners.h"
+   #include "shaderModelAutoGen.hlsl"
    
    uniform float oneOverSoftness;
    uniform float oneOverFar;
-   uniform sampler2D prepassTex : register(S1);   
+   TORQUE_UNIFORM_SAMPLER2D(deferredTex, 1);
    //uniform float3 vEye;
-   uniform float4 prePassTargetParams;
+   uniform float4 deferredTargetParams;
 #endif
 
 #define CLIP_Z // TODO: Make this a proper macro
 
 struct Conn
 {
+   float4 hpos : TORQUE_POSITION;
    float4 color : TEXCOORD0;
    float2 uv0 : TEXCOORD1;
-	float4 pos : TEXCOORD2;
+   float4 pos : TEXCOORD2;
 };
 
-uniform sampler2D diffuseMap : register(S0);
-
-uniform sampler2D paraboloidLightMap : register(S2);
+TORQUE_UNIFORM_SAMPLER2D(diffuseMap, 0);
+TORQUE_UNIFORM_SAMPLER2D(paraboloidLightMap, 2);
 
 float4 lmSample( float3 nrm )
 {
@@ -69,22 +69,22 @@ float4 lmSample( float3 nrm )
    // Atlasing front and back maps, so scale
    lmCoord.x *= 0.5;
 
-   return tex2D(paraboloidLightMap, lmCoord);
+   return TORQUE_TEX2D(paraboloidLightMap, lmCoord);
 }
 
 
 uniform float alphaFactor;
 uniform float alphaScale;
 
-float4 main( Conn IN ) : COLOR
+float4 main( Conn IN ) : TORQUE_TARGET0
 {
    float softBlend = 1;
    
    #ifdef SOFTPARTICLES
       float2 tc = IN.pos.xy * float2(1.0, -1.0) / IN.pos.w;
-      tc = viewportCoordToRenderTarget(saturate( ( tc + 1.0 ) * 0.5 ), prePassTargetParams); 
+      tc = viewportCoordToRenderTarget(saturate( ( tc + 1.0 ) * 0.5 ), deferredTargetParams); 
    
-   	float sceneDepth = prepassUncondition( prepassTex, tc ).w;   	   	   			
+      float sceneDepth = TORQUE_PREPASS_UNCONDITION(deferredTex, tc).w;
    	float depth = IN.pos.w * oneOverFar;   	
 	float diff = sceneDepth - depth;
 	#ifdef CLIP_Z
@@ -96,7 +96,7 @@ float4 main( Conn IN ) : COLOR
       softBlend = saturate( diff * oneOverSoftness );
    #endif
 	   
-   float4 diffuse = tex2D( diffuseMap, IN.uv0 );
+   float4 diffuse = TORQUE_TEX2D( diffuseMap, IN.uv0 );
    
    //return float4( lmSample(float3(0, 0, -1)).rgb, IN.color.a * diffuse.a * softBlend * alphaScale);
    

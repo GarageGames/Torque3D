@@ -444,7 +444,7 @@ bool GuiSplitContainer::layoutControls( RectI &clientRect )
 
 //-----------------------------------------------------------------------------
 
-void GuiSplitContainer::solvePanelConstraints( Point2I newDragPos, GuiContainer * firstPanel, GuiContainer * secondPanel, RectI clientRect )
+void GuiSplitContainer::solvePanelConstraints(Point2I newDragPos, GuiContainer * firstPanel, GuiContainer * secondPanel, const RectI& clientRect)
 {
    if( !firstPanel || !secondPanel )
       return;

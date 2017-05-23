@@ -65,7 +65,7 @@ class SceneZoneSpaceManager
       ///   of time.
       typedef Signal< void( SceneZoneSpaceManager* ) > ZoningChangedSignal;
 
-      enum
+      enum : U32
       {
          /// Zone ID of the exterior zone.
          RootZoneId = 0,
@@ -79,7 +79,7 @@ class SceneZoneSpaceManager
       {
          public:
 
-            ZoneContentIterator( SceneZoneSpaceManager* manager, int zoneId, bool upToDate = true )
+            ZoneContentIterator( SceneZoneSpaceManager* manager, S32 zoneId, bool upToDate = true )
             {
                AssertFatal( zoneId < manager->getNumZones(), "SceneZoneSpaceManager::ZoneContentIterator - Zone ID out of range" );
 

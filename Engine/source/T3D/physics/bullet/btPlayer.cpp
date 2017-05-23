@@ -71,6 +71,7 @@ void BtPlayer::init( const char *type,
    mObject = obj;
    mWorld = (BtWorld*)world;
 
+   mSlopeAngle = runSurfaceCos;
    mStepHeight = stepHeight;
 
    //if ( dStricmp( type, "Capsule" ) == 0 )
@@ -101,6 +102,17 @@ void BtPlayer::init( const char *type,
 Point3F BtPlayer::move( const VectorF &disp, CollisionList &outCol )
 {
    AssertFatal( mGhostObject, "BtPlayer::move - The controller is null!" );
+
+   if (!mWorld->isEnabled())
+   {
+      btTransform currentTrans = mGhostObject->getWorldTransform();
+      btVector3 currentPos = currentTrans.getOrigin();
+
+      Point3F returnPos = btCast<Point3F>(currentPos);
+     
+      returnPos.z -= mOriginOffset;
+      return returnPos;
+   }
 
    // First recover from any penetrations from the previous tick.
    U32 numPenetrationLoops = 0;
@@ -290,8 +302,9 @@ bool BtPlayer::_sweep( btVector3 *inOutCurrPos, const btVector3 &disp, Collision
    BtPlayerSweepCallback callback( mGhostObject, disp.normalized() );
 	callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
 	callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
-	
-	mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
+
+   if (disp.length()>0.0001)
+      mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
 
 	inOutCurrPos->setInterpolate3( start.getOrigin(), end.getOrigin(), callback.m_closestHitFraction );
    if ( callback.hasHit() )
@@ -304,16 +317,9 @@ bool BtPlayer::_sweep( btVector3 *inOutCurrPos, const btVector3 &disp, Collision
          col.normal = btCast<Point3F>( callback.m_hitNormalWorld );
          col.object = PhysicsUserData::getObject( callback.m_hitCollisionObject->getUserPointer() );
 
-         if (disp.z() < 0.0f)
-         {
-            // We're sweeping down as part of the stepping routine.    In this
-            // case we want to have the collision normal only point in the opposite direction.
-            // i.e. up  If we include the sideways part of the normal then the Player class
-            // velocity calculations using this normal will affect the player's forwards
-            // momentum.  This is especially noticable on stairs as the rounded bottom of
-            // the capsule slides up the corner of a stair.
-            col.normal.set(0.0f, 0.0f, 1.0f);
-         }
+         F32 vd = col.normal.z;
+         if (vd < mSlopeAngle)
+            return false;
       }
 
       return true;
@@ -336,11 +342,12 @@ void BtPlayer::_stepForward( btVector3 *inOutCurrPos, const btVector3 &displacem
 		start.setOrigin( *inOutCurrPos );
 		end.setOrigin( *inOutCurrPos + disp );
 
-      BtPlayerSweepCallback callback( mGhostObject, disp.length2() > 0.0f ? disp.normalized() : disp );
+      BtPlayerSweepCallback callback( mGhostObject, disp.length2() > SIMD_EPSILON ? disp.normalized() : disp );
 		callback.m_collisionFilterGroup = mGhostObject->getBroadphaseHandle()->m_collisionFilterGroup;
 		callback.m_collisionFilterMask = mGhostObject->getBroadphaseHandle()->m_collisionFilterMask;
 
-		mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
+      if (disp.length()>0.0001)
+         mGhostObject->convexSweepTest( mColShape, start, end, callback, 0.0f );
 
       // Subtract from the travel fraction.
       fraction -= callback.m_closestHitFraction;
@@ -434,9 +441,8 @@ void BtPlayer::findContact(   SceneObject **contactObject,
       if ( other == mGhostObject )
          other = (btCollisionObject*)pair.m_pProxy1->m_clientObject;
 
-      AssertFatal( !outOverlapObjects->contains( PhysicsUserData::getObject( other->getUserPointer() ) ),
-         "Got multiple pairs of the same object!" );
-      outOverlapObjects->push_back( PhysicsUserData::getObject( other->getUserPointer() ) );
+      if (!outOverlapObjects->contains(PhysicsUserData::getObject(other->getUserPointer())))
+         outOverlapObjects->push_back( PhysicsUserData::getObject( other->getUserPointer() ) );
 
       if ( other->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE )
          continue;

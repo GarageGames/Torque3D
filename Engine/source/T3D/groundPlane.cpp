@@ -69,9 +69,9 @@ GroundPlane::GroundPlane()
      mScaleU( 1.0f ),
      mScaleV( 1.0f ),
      mMaterial( NULL ),
+     mPhysicsRep( NULL ),
      mMin( 0.0f, 0.0f ),
-     mMax( 0.0f, 0.0f ),
-     mPhysicsRep( NULL )
+     mMax( 0.0f, 0.0f )
 {
    mTypeMask |= StaticObjectType | StaticShapeObjectType;
    mNetFlags.set( Ghostable | ScopeAlways );
@@ -444,19 +444,11 @@ void GroundPlane::createGeometry( const Frustum& frustum )
    // Only reallocate if the buffers are too small.
    if ( mVertexBuffer.isNull() || numVertices > mVertexBuffer->mNumVerts )
    {
-#if defined(TORQUE_OS_XENON)
-      mVertexBuffer.set( GFX, numVertices, GFXBufferTypeVolatile );
-#else
       mVertexBuffer.set( GFX, numVertices, GFXBufferTypeDynamic );
-#endif
    }
    if ( mPrimitiveBuffer.isNull() || numTriangles > mPrimitiveBuffer->mPrimitiveCount )
    {
-#if defined(TORQUE_OS_XENON)
-      mPrimitiveBuffer.set( GFX, numTriangles*3, numTriangles, GFXBufferTypeVolatile );
-#else
       mPrimitiveBuffer.set( GFX, numTriangles*3, numTriangles, GFXBufferTypeDynamic );
-#endif
    }
 
    // Generate the grid.

@@ -99,7 +99,7 @@ AITurretShapeData::AITurretShapeData()
 
    weaponLeadVelocity = 0;
 
-   for (int i = 0; i < MaxStates; i++) {
+   for (S32 i = 0; i < MaxStates; i++) {
       stateName[i] = 0;
       stateTransitionAtRest[i] = 0;
       stateTransitionNotAtRest[i] = 0;
@@ -564,6 +564,21 @@ void AITurretShape::removeFromIgnoreList(ShapeBase* obj)
    mIgnoreObjects.removeObject(obj);
 }
 
+void AITurretShape::clearIgnoreList()
+{
+   mIgnoreObjects.clear();
+}
+
+S32 AITurretShape::ignoreListCount()
+{
+   return mIgnoreObjects.size();
+}
+
+SimObject* AITurretShape::getIgnoreListObject(S32 index)
+{
+   return mIgnoreObjects.at(index);
+}
+
 //----------------------------------------------------------------------------
 
 void AITurretShape::_initState()
@@ -892,7 +907,7 @@ void AITurretShape::_trackTarget(F32 dt)
    //if (pitch > M_PI_F)
    //   pitch = -(pitch - M_2PI_F);
 
-   Point3F rot(pitch, 0.0f, -yaw);
+   Point3F rot(-pitch, 0.0f, yaw);
 
    // If we have a rotation rate make sure we follow it
    if (mHeadingRate > 0)
@@ -1157,7 +1172,7 @@ U32 AITurretShape::packUpdate(NetConnection *connection, U32 mask, BitStream *bs
    U32 retMask = Parent::packUpdate(connection,mask,bstream);
 
    // Indicate that the transform has changed to update the scan box
-   bstream->writeFlag(mask & PositionMask | ExtendedInfoMask);
+   bstream->writeFlag(mask & (PositionMask | ExtendedInfoMask));
 
    // Handle any state changes that need to be passed along
    if (bstream->writeFlag(mask & TurretStateMask))
@@ -1242,6 +1257,28 @@ DefineEngineMethod( AITurretShape, removeFromIgnoreList, void, (ShapeBase* obj),
    "@param obj The ShapeBase object to once again allow for targeting.\n")
 {
    object->removeFromIgnoreList(obj);
+}
+
+DefineEngineMethod( AITurretShape, clearIgnoreList, void, (),,
+   "@brief Removes all objects from the turret's ignore list.\n\n"
+   "All objects in this list will be ignored by the turret's targeting.\n")
+{
+   object->clearIgnoreList();
+}
+
+DefineEngineMethod( AITurretShape, ignoreListCount, S32, (),,
+   "@brief Returns the number of objects in the turrets ignore list.\n\n"
+   "All objects in this list will be ignored by the turret's targeting.\n")
+{
+   return object->ignoreListCount();
+}
+
+DefineEngineMethod( AITurretShape, getIgnoreListObject, SimObject*, (S32 index),,
+   "@brief Returns the object in the ignore list at index.\n\n"
+   "All objects in this list will be ignored by the turret's targeting.\n"
+   "@param index The index of the object in the ignore list being retrieved.\n")
+{
+   return object->getIgnoreListObject(index);
 }
 
 DefineEngineMethod( AITurretShape, setTurretState, void, (const char* newState, bool force), (false),

@@ -122,7 +122,7 @@ protected:
 		checkManifold(body0Wrap,body1Wrap);
 
 		btCollisionAlgorithm * convex_algorithm = m_dispatcher->findAlgorithm(
-				body0Wrap,body1Wrap,getLastManifold());
+				body0Wrap,body1Wrap,getLastManifold(), BT_CONTACT_POINT_ALGORITHMS);
 		return convex_algorithm ;
 	}
 
@@ -210,6 +210,10 @@ public:
 			manifoldArray.push_back(m_manifoldPtr);
 	}
 
+	btManifoldResult*	internalGetResultOut()
+	{
+		return m_resultOut;
+	}
 
 	struct CreateFunc :public 	btCollisionAlgorithmCreateFunc
 	{

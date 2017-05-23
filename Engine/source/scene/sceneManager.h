@@ -117,6 +117,10 @@ class SceneManager
       /// If true, render the AABBs of objects for debugging.
       static bool smRenderBoundingBoxes;
 
+      //A cache list of objects that made it through culling, so we don't have to attempt to re-test
+      //visibility of objects later.
+      Vector< SceneObject* > mRenderedObjectsList;
+
    protected:
 
       /// Whether this is the client-side scene.
@@ -141,6 +145,7 @@ class SceneManager
 
       F32 mVisibleDistance;
 
+      F32 mVisibleGhostDistance;
       F32 mNearClip;
 
       FogData mFogData;
@@ -316,6 +321,9 @@ class SceneManager
 
       /// Returns the default visible distance for the scene.
       F32 getVisibleDistance() { return mVisibleDistance; }
+
+      void setVisibleGhostDistance( F32 dist ) { mVisibleGhostDistance = dist; }
+      F32  getVisibleGhostDistance() { return mVisibleGhostDistance;}
 
       /// Used by LevelInfo to set the default near clip plane 
       /// for rendering the scene.

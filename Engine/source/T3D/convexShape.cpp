@@ -227,12 +227,12 @@ bool ConvexShape::protectedSetSurface( void *object, const char *index, const ch
 
 
 ConvexShape::ConvexShape()
- : mMaterialInst( NULL ),   
-   mNormalLength( 0.3f ),
+ : mMaterialName( "Grid512_OrangeLines_Mat" ),
+   mMaterialInst( NULL ),
    mVertCount( 0 ),
    mPrimCount( 0 ),
-   mMaterialName( "Grid512_OrangeLines_Mat" ),
-   mPhysicsRep( NULL )
+   mPhysicsRep( NULL ),
+   mNormalLength( 0.3f )
 {   
    mNetFlags.set( Ghostable | ScopeAlways );
    
@@ -502,7 +502,7 @@ void ConvexShape::prepRenderImage( SceneRenderState *state )
    }
    */
 
-   if ( mVertexBuffer.isNull() )
+   if ( mVertexBuffer.isNull() || !state)
       return;
 
    // If we don't have a material instance after the override then 
@@ -573,7 +573,7 @@ void ConvexShape::prepRenderImage( SceneRenderState *state )
 
    // We sort by the material then vertex buffer.
    ri->defaultKey = matInst->getStateHint();
-   ri->defaultKey2 = (U32)ri->vertBuff; // Not 64bit safe!
+   ri->defaultKey2 = (uintptr_t)ri->vertBuff; // Not 64bit safe!
 
    // Submit our RenderInst to the RenderPassManager
    state->getRenderPass()->addInst( ri );
@@ -1101,8 +1101,6 @@ void ConvexShape::_updateGeometry( bool updateCollision )
 		const Vector< U32 > &facePntMap = face.points;
 		const Vector< ConvexShape::Triangle > &triangles = face.triangles;
 		const ColorI &faceColor = sgConvexFaceColors[ i % sgConvexFaceColorCount ];
-
-		const Point3F binormal = mCross( face.normal, face.tangent );
 
 		for ( S32 j = 0; j < triangles.size(); j++ )
 		{

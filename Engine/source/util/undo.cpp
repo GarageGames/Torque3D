@@ -25,6 +25,7 @@
 
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 
 //-----------------------------------------------------------------------------
 // UndoAction
@@ -144,10 +145,10 @@ void CompoundUndoAction::onDeleteNotify( SimObject* object )
    Parent::onDeleteNotify( object );
 }
 
-ConsoleMethod( CompoundUndoAction, addAction, void, 3, 3, "addAction( UndoAction )" )
+DefineConsoleMethod( CompoundUndoAction, addAction, void, (const char * objName), , "addAction( UndoAction )" )
 {
    UndoAction *action;
-   if ( Sim::findObject( argv[2], action ) )
+   if ( Sim::findObject( objName, action ) )
       object->addAction( action );
 }
 
@@ -205,7 +206,7 @@ UndoManager& UndoManager::getDefaultManager()
    return *defaultMan;
 }
 
-ConsoleMethod(UndoManager, clearAll, void, 2, 2, "Clears the undo manager.")
+DefineConsoleMethod(UndoManager, clearAll, void, (),, "Clears the undo manager.")
 {
    object->clearAll();
 }
@@ -343,7 +344,7 @@ void UndoManager::redo()
    (*react).redo();
 }
 
-ConsoleMethod(UndoManager, getUndoCount, S32, 2, 2, "")
+DefineConsoleMethod(UndoManager, getUndoCount, S32, (),, "")
 {
    return object->getUndoCount();
 }
@@ -353,9 +354,9 @@ S32 UndoManager::getUndoCount()
    return mUndoStack.size();
 }
 
-ConsoleMethod(UndoManager, getUndoName, const char*, 3, 3, "(index)")
+DefineConsoleMethod(UndoManager, getUndoName, const char*, (S32 index), , "(index)")
 {
-   return object->getUndoName(dAtoi(argv[2]));
+   return object->getUndoName(index);
 }
 
 const char* UndoManager::getUndoName(S32 index)
@@ -366,9 +367,9 @@ const char* UndoManager::getUndoName(S32 index)
    return NULL;
 }
 
-ConsoleMethod(UndoManager, getUndoAction, S32, 3, 3, "(index)")
+DefineConsoleMethod(UndoManager, getUndoAction, S32, (S32 index), , "(index)")
 {
-   UndoAction * action = object->getUndoAction(dAtoi(argv[2]));
+   UndoAction * action = object->getUndoAction(index);
    if ( !action )
       return -1;
    
@@ -385,7 +386,7 @@ UndoAction* UndoManager::getUndoAction(S32 index)
    return NULL;
 }
 
-ConsoleMethod(UndoManager, getRedoCount, S32, 2, 2, "")
+DefineConsoleMethod(UndoManager, getRedoCount, S32, (),, "")
 {
    return object->getRedoCount();
 }
@@ -395,9 +396,9 @@ S32 UndoManager::getRedoCount()
    return mRedoStack.size();
 }
 
-ConsoleMethod(UndoManager, getRedoName, const char*, 3, 3, "(index)")
+DefineConsoleMethod(UndoManager, getRedoName, const char*, (S32 index), , "(index)")
 {
-   return object->getRedoName(dAtoi(argv[2]));
+   return object->getRedoName(index);
 }
 
 const char* UndoManager::getRedoName(S32 index)
@@ -408,9 +409,9 @@ const char* UndoManager::getRedoName(S32 index)
    return NULL;
 }
 
-ConsoleMethod(UndoManager, getRedoAction, S32, 3, 3, "(index)")
+DefineConsoleMethod(UndoManager, getRedoAction, S32, (S32 index), , "(index)")
 {
-   UndoAction * action = object->getRedoAction(dAtoi(argv[2]));
+   UndoAction * action = object->getRedoAction(index);
 
    if ( !action )
       return -1;
@@ -500,12 +501,12 @@ void UndoManager::popCompound( bool discard )
 }
 
 //-----------------------------------------------------------------------------
-ConsoleMethod(UndoAction, addToManager, void, 2, 3, "action.addToManager([undoManager])")
+DefineConsoleMethod(UndoAction, addToManager, void, (const char * undoManager), (""), "action.addToManager([undoManager])")
 {
    UndoManager *theMan = NULL;
-   if(argc == 3)
+   if (!String::isEmpty(undoManager))
    {
-      SimObject *obj = Sim::findObject(argv[2]);
+      SimObject *obj = Sim::findObject(undoManager);
       if(obj)
          theMan = dynamic_cast<UndoManager*> (obj);
    }
@@ -514,32 +515,32 @@ ConsoleMethod(UndoAction, addToManager, void, 2, 3, "action.addToManager([undoMa
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( UndoAction, undo, void, 2, 2, "() - Undo action contained in undo." )
+DefineConsoleMethod( UndoAction, undo, void, (),, "() - Undo action contained in undo." )
 {
    object->undo();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( UndoAction, redo, void, 2, 2, "() - Reo action contained in undo." )
+DefineConsoleMethod( UndoAction, redo, void, (),, "() - Reo action contained in undo." )
 {
    object->redo();
 }
 
 //-----------------------------------------------------------------------------
-ConsoleMethod(UndoManager, undo, void, 2, 2, "UndoManager.undo();")
+DefineConsoleMethod(UndoManager, undo, void, (),, "UndoManager.undo();")
 {
    object->undo();
 }
 
 //-----------------------------------------------------------------------------
-ConsoleMethod(UndoManager, redo, void, 2, 2, "UndoManager.redo();")
+DefineConsoleMethod(UndoManager, redo, void, (),, "UndoManager.redo();")
 {
    object->redo();
 }
 
 //-----------------------------------------------------------------------------
-ConsoleMethod(UndoManager, getNextUndoName, const char *, 2, 2, "UndoManager.getNextUndoName();")
+DefineConsoleMethod(UndoManager, getNextUndoName, const char *, (),, "UndoManager.getNextUndoName();")
 {
    const char *name = object->getNextUndoName();
    if(!name)
@@ -550,7 +551,7 @@ ConsoleMethod(UndoManager, getNextUndoName, const char *, 2, 2, "UndoManager.get
 }
 
 //-----------------------------------------------------------------------------
-ConsoleMethod(UndoManager, getNextRedoName, const char *, 2, 2, "UndoManager.getNextRedoName();")
+DefineConsoleMethod(UndoManager, getNextRedoName, const char *, (),, "UndoManager.getNextRedoName();")
 {
    const char *name = object->getNextRedoName();
    if(!name)
@@ -562,11 +563,8 @@ ConsoleMethod(UndoManager, getNextRedoName, const char *, 2, 2, "UndoManager.get
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( UndoManager, pushCompound, const char*, 2, 3, "( string name=\"\" ) - Push a CompoundUndoAction onto the compound stack for assembly." )
+DefineConsoleMethod( UndoManager, pushCompound, const char*, ( String name ), ("\"\""), "( string name=\"\" ) - Push a CompoundUndoAction onto the compound stack for assembly." )
 {
-   String name;
-   if( argc > 2 )
-      name = argv[ 2 ];
       
    CompoundUndoAction* action = object->pushCompound( name );
    if( !action )
@@ -580,17 +578,14 @@ ConsoleMethod( UndoManager, pushCompound, const char*, 2, 3, "( string name=\"\"
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( UndoManager, popCompound, void, 2, 3, "( bool discard=false ) - Pop the current CompoundUndoAction off the stack." )
+DefineConsoleMethod( UndoManager, popCompound, void, ( bool discard ), (false), "( bool discard=false ) - Pop the current CompoundUndoAction off the stack." )
 {
    if( !object->getCompoundStackDepth() )
    {
-      Con::errorf( "%s::popCompound - no compound on stack", argv[ 0 ] );
+	   Con::errorf( "UndoManager::popCompound - no compound on stack (%s) ",object->getName() );
       return;
    }
    
-   bool discard = false;
-   if( argc > 2 )
-      discard = dAtob( argv[ 2 ] );
    
    object->popCompound( discard );
 }

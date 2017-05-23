@@ -223,15 +223,9 @@ ConsoleDocClass( WayPoint,
    "@ingroup enviroMisc\n"
 );
 
-WayPointTeam::WayPointTeam()
-{
-   mTeamId = 0;
-   mWayPoint = 0;
-}
-
 WayPoint::WayPoint()
 {
-   mName = StringTable->insert("");
+   mName = StringTable->EmptyString();
 }
 
 void WayPoint::setHidden(bool hidden)
@@ -252,7 +246,6 @@ bool WayPoint::onAdd()
       Sim::getWayPointSet()->addObject(this);
    else
    {
-      mTeam.mWayPoint = this;
       setMaskBits(UpdateNameMask|UpdateTeamMask);
    }
 
@@ -263,7 +256,7 @@ void WayPoint::inspectPostApply()
 {
    Parent::inspectPostApply();
    if(!mName || !mName[0])
-      mName = StringTable->insert("");
+      mName = StringTable->EmptyString();
    setMaskBits(UpdateNameMask|UpdateTeamMask);
 }
 
@@ -272,8 +265,6 @@ U32 WayPoint::packUpdate(NetConnection * con, U32 mask, BitStream * stream)
    U32 retMask = Parent::packUpdate(con, mask, stream);
    if(stream->writeFlag(mask & UpdateNameMask))
       stream->writeString(mName);
-   if(stream->writeFlag(mask & UpdateTeamMask))
-      stream->write(mTeam.mTeamId);
    if(stream->writeFlag(mask & UpdateHiddenMask))
       stream->writeFlag(isHidden());
    return(retMask);
@@ -285,46 +276,14 @@ void WayPoint::unpackUpdate(NetConnection * con, BitStream * stream)
    if(stream->readFlag())
       mName = stream->readSTString(true);
    if(stream->readFlag())
-      stream->read(&mTeam.mTeamId);
-   if(stream->readFlag())
       setHidden(stream->readFlag());
-}
-
-//-----------------------------------------------------------------------------
-// TypeWayPointTeam
-//-----------------------------------------------------------------------------
-
-IMPLEMENT_STRUCT( WayPointTeam, WayPointTeam,,
-   "" )
-END_IMPLEMENT_STRUCT;
-
-//FIXME: this should work but does not; need to check the stripping down to base types within TYPE
-//ConsoleType( WayPointTeam, TypeWayPointTeam, WayPointTeam* )
-ConsoleType( WayPointTeam, TypeWayPointTeam, WayPointTeam )
-
-ConsoleGetType( TypeWayPointTeam )
-{
-   char * buf = Con::getReturnBuffer(32);
-   dSprintf(buf, 32, "%d", ((WayPointTeam*)dptr)->mTeamId);
-   return(buf);
-}
-
-ConsoleSetType( TypeWayPointTeam )
-{
-   WayPointTeam * pTeam = (WayPointTeam*)dptr;
-   pTeam->mTeamId = dAtoi(argv[0]);
-
-   if(pTeam->mWayPoint && pTeam->mWayPoint->isServerObject())
-      pTeam->mWayPoint->setMaskBits(WayPoint::UpdateTeamMask);
 }
 
 void WayPoint::initPersistFields()
 {
-   addGroup("Misc");	
+   addGroup("Misc"); 
    addField("markerName", TypeCaseString, Offset(mName, WayPoint), "Unique name representing this waypoint");
-   addField("team", TypeWayPointTeam, Offset(mTeam, WayPoint), "Unique numerical ID assigned to this waypoint, or set of waypoints");
    endGroup("Misc");
-   
    Parent::initPersistFields();
 }
 
@@ -404,7 +363,7 @@ bool SpawnSphere::onAdd()
 
    if (!isGhost())
    {
-	   onAdd_callback( getId());
+      onAdd_callback( getId());
 
       if (mAutoSpawn)
          spawnObject();
@@ -483,22 +442,12 @@ void SpawnSphere::unpackUpdate(NetConnection * con, BitStream * stream)
 
 void SpawnSphere::processTick( const Move *move )
 {
-   if ( isServerObject() && isMounted() )
-   {
-      MatrixF mat( true );
-      mMount.object->getRenderMountTransform( 0.f, mMount.node, mMount.xfm, &mat );
-      setTransform( mat );
-   }
+   Parent::processTick( move );
 }
 
 void SpawnSphere::advanceTime( F32 timeDelta )
 {
-   if ( isMounted() )
-   {
-      MatrixF mat( true );
-      mMount.object->getRenderMountTransform( 0.f, mMount.node, mMount.xfm, &mat );
-      setTransform( mat );
-   }
+   Parent::advanceTime( timeDelta );
 }
 
 void SpawnSphere::initPersistFields()
@@ -545,16 +494,16 @@ ConsoleDocFragment _SpawnSpherespawnObject1(
    "bool spawnObject(string additionalProps);"
 );
 
-ConsoleMethod(SpawnSphere, spawnObject, S32, 2, 3,
+DefineConsoleMethod(SpawnSphere, spawnObject, S32, (String additionalProps), ,
    "([string additionalProps]) Spawns the object based on the SpawnSphere's "
    "class, datablock, properties, and script settings. Allows you to pass in "
    "extra properties."
    "@hide" )
 {
-   String additionalProps;
+   //String additionalProps;
 
-   if (argc == 3)
-      additionalProps = String(argv[2]);
+   //if (argc == 3)
+   //   additionalProps = String(argv[2]);
 
    SimObject* obj = object->spawnObject(additionalProps);
 
@@ -578,7 +527,7 @@ ConsoleDocClass( CameraBookmark,
 
 CameraBookmark::CameraBookmark()
 {
-   mName = StringTable->insert("");
+   mName = StringTable->EmptyString();
 }
 
 bool CameraBookmark::onAdd()
@@ -622,7 +571,7 @@ void CameraBookmark::inspectPostApply()
 {
    Parent::inspectPostApply();
    if(!mName || !mName[0])
-      mName = StringTable->insert("");
+      mName = StringTable->EmptyString();
    setMaskBits(UpdateNameMask);
 
    if( isMethod("onInspectPostApply") )
@@ -646,7 +595,7 @@ void CameraBookmark::unpackUpdate(NetConnection * con, BitStream * stream)
 
 void CameraBookmark::initPersistFields()
 {
-   //addGroup("Misc");	
+   //addGroup("Misc");  
    //addField("name", TypeCaseString, Offset(mName, CameraBookmark));
    //endGroup("Misc");
 

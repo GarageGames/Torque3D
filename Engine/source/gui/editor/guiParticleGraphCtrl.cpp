@@ -25,6 +25,7 @@
 #include "gfx/gfxDrawUtil.h"
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiCanvas.h"
 
 #include "gui/editor/guiParticleGraphCtrl.h"
@@ -40,18 +41,18 @@ ConsoleDocClass( GuiParticleGraphCtrl,
 GuiParticleGraphCtrl::GuiParticleGraphCtrl()
 {
 
-   for(int i = 0; i < MaxPlots; i++)
+   for(S32 i = 0; i < MaxPlots; i++)
    {
-	   mPlots[i].mGraphColor = ColorF(1.0, 1.0, 1.0);
-	   VECTOR_SET_ASSOCIATION(mPlots[i].mGraphData);
-	   mPlots[i].mGraphMax.x = 1;
-	   mPlots[i].mGraphMax.y = 50;
-	   mPlots[i].mGraphMin.x = 0;
-	   mPlots[i].mGraphMin.y = 0;
-	   mPlots[i].mGraphType = Polyline;
-	   mPlots[i].mGraphName = StringTable->insert("");
-	   mPlots[i].mHidden = false;
-	   mPlots[i].mGraphScale = 0.05f;
+      mPlots[i].mGraphColor = ColorF(1.0, 1.0, 1.0);
+      VECTOR_SET_ASSOCIATION(mPlots[i].mGraphData);
+      mPlots[i].mGraphMax.x = 1;
+      mPlots[i].mGraphMax.y = 50;
+      mPlots[i].mGraphMin.x = 0;
+      mPlots[i].mGraphMin.y = 0;
+      mPlots[i].mGraphType = Polyline;
+      mPlots[i].mGraphName = StringTable->EmptyString();
+      mPlots[i].mHidden = false;
+      mPlots[i].mGraphScale = 0.05f;
    }
 
    mPlots[0].mGraphColor = ColorF(1.0f, 0.2f, 0.2f);
@@ -126,87 +127,87 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
    // Fetch Draw Utility.
    GFXDrawUtil* pDrawUtil = GFX->getDrawUtil();
 
-	if (mProfile->mBorder)
-	{
-		const RectI bounds = getBounds();
-		RectI rect(offset.x, offset.y, bounds.extent.x, bounds.extent.y);		
-		pDrawUtil->drawRect(rect, mProfile->mBorderColor);
-	}
+   if (mProfile->mBorder)
+   {
+      const RectI bounds = getBounds();
+      RectI rect(offset.x, offset.y, bounds.extent.x, bounds.extent.y);    
+      pDrawUtil->drawRect(rect, mProfile->mBorderColor);
+   }
 
     GuiControlProfile* profile = dynamic_cast<GuiControlProfile*>(Sim::findObject("GuiDefaultProfile"));
     Resource<GFont> font = profile->mFont;
-	GFXVideoMode videoMode = GFXInit::getDesktopResolution();
+   GFXVideoMode videoMode = GFXInit::getDesktopResolution();
 
-	ColorF color(1.0f, 1.0f, 1.0f, 0.5f);
-	pDrawUtil->drawRectFill(updateRect, color);
+   ColorF color(1.0f, 1.0f, 1.0f, 0.5f);
+   pDrawUtil->drawRectFill(updateRect, color);
 
-	for (int k = 0; k < MaxPlots; k++)
-	{
-		// Nothing to graph
-		if ((mPlots[k].mGraphData.size() == 0) || (mPlots[k].mHidden == true))
-			continue;
-	
+   for (S32 k = 0; k < MaxPlots; k++)
+   {
+      // Nothing to graph
+      if ((mPlots[k].mGraphData.size() == 0) || (mPlots[k].mHidden == true))
+         continue;
+   
         Point2F graphExtent = getGraphExtent(k);
 
-		// Adjust scale to max value + 5% so we can see high value
-		F32 ScaleX = (F32(getExtent().x) / (graphExtent.x*(1.00 + (mPlots[k].mGraphScale))));
-		F32 ScaleY = (F32(getExtent().y) / (graphExtent.y*(1.00 + (mPlots[k].mGraphScale))));
+      // Adjust scale to max value + 5% so we can see high value
+      F32 ScaleX = (F32(getExtent().x) / (graphExtent.x*(1.00 + (mPlots[k].mGraphScale))));
+      F32 ScaleY = (F32(getExtent().y) / (graphExtent.y*(1.00 + (mPlots[k].mGraphScale))));
 
-		if((mPlots[k].mGraphType == Point) || (mPlots[k].mGraphType == Polyline))
-		{
+      if((mPlots[k].mGraphType == Point) || (mPlots[k].mGraphType == Polyline))
+      {
          S32 posX;
-			S32 posY;
-			S32 lastPosX = 0;
-			S32 lastPosY = 0;
-			Point2F plotPoint;
+         S32 posY;
+         S32 lastPosX = 0;
+         S32 lastPosY = 0;
+         Point2F plotPoint;
 
-			S32 size = 32;
+         S32 size = 32;
 
-			for (S32 sample = 0; sample < mPlots[k].mGraphData.size(); sample++)
-			{
-				S32 temp;
+         for (S32 sample = 0; sample < mPlots[k].mGraphData.size(); sample++)
+         {
+            S32 temp;
 
-				temp = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)sample);
+            temp = (S32)(((F32)getExtent().x / (F32)mPlots[k].mGraphData.size()) * (F32)sample);
 
-				// calculate the point positions
+            // calculate the point positions
             plotPoint = getPlotPoint(k, sample);
 
-				posX = (S32)((plotPoint.x - mPlots[k].mGraphMin.x) * (ScaleX /(1.00 + mPlots[k].mGraphScale)));
-				posY = (getExtent().y) - (S32)((plotPoint.y  - mPlots[k].mGraphMin.y) * ScaleY);
+            posX = (S32)((plotPoint.x - mPlots[k].mGraphMin.x) * (ScaleX /(1.00 + mPlots[k].mGraphScale)));
+            posY = (getExtent().y) - (S32)((plotPoint.y  - mPlots[k].mGraphMin.y) * ScaleY);
 
             posX += getExtent().x * (mPlots[k].mGraphScale);
-				posY /= (1.00 + (mPlots[k].mGraphScale));
+            posY /= (1.00 + (mPlots[k].mGraphScale));
 
             posX = localToGlobalCoord(Point2I(posX, posY)).x;
-				posY = localToGlobalCoord(Point2I(posX, posY)).y;
+            posY = localToGlobalCoord(Point2I(posX, posY)).y;
 
-				// check if this isn't our first loop through, if it is we won't have starting points
+            // check if this isn't our first loop through, if it is we won't have starting points
             if(sample > 0)
-				{
-					pDrawUtil->drawLine( lastPosX, lastPosY , posX, posY , mPlots[k].mGraphColor );
-				} else
-				{
+            {
+               pDrawUtil->drawLine( lastPosX, lastPosY , posX, posY , mPlots[k].mGraphColor );
+            } else
+            {
                mPlots[k].mNutList.clear();
-				}
+            }
 
             mPlots[k].mNutList.push_back( Point2F(posX, posY) );
 
-				// store the last positions to be the starting points drawn into a line next loop
-				lastPosX = posX;
-				lastPosY = posY;
+            // store the last positions to be the starting points drawn into a line next loop
+            lastPosX = posX;
+            lastPosY = posY;
 
             //Con::printf("red %f green %f blue %f", mPlots[k].mGraphColor.red, mPlots[k].mGraphColor.green, mPlots[k].mGraphColor.blue);
 
 
 
-				if(mSelectedPoint != -1)
-				{
-				   mLastSelectedPoint = mSelectedPoint;
-				}
+            if(mSelectedPoint != -1)
+            {
+               mLastSelectedPoint = mSelectedPoint;
+            }
 
             ColorI nutColor (mPlots[k].mGraphColor);
 
-				if(k == mSelectedPlot && sample == mLastSelectedPoint)
+            if(k == mSelectedPlot && sample == mLastSelectedPoint)
             {
                // grab the colors for the nut
                F32 red = mPlots[k].mGraphColor.red;
@@ -223,51 +224,51 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
             } 
 
             // draw the seleciton nut
-				drawNut( Point2I(posX, posY), 3, mOutlineColor, nutColor );
+            drawNut( Point2I(posX, posY), 3, mOutlineColor, nutColor );
 
-				if((mLastSelectedPoint != -1) || (mRenderAllPoints == true))
-				{
+            if((mLastSelectedPoint != -1) || (mRenderAllPoints == true))
+            {
                if((k == mSelectedPlot && sample == mLastSelectedPoint) || (mRenderAllPoints == true))
-				   {
+               {
                   char number[32];
 
-					   Point2I comparePos = localToGlobalCoord(Point2I(getPosition().x, getPosition().y));
+                  Point2I comparePos = localToGlobalCoord(Point2I(getPosition().x, getPosition().y));
 
                   dSprintf(number, 32, "%4.3f %4.3f", plotPoint.x, plotPoint.y);
 
                   S32 textWidth = (S32)font->getStrWidth((const UTF8*)number);;
-				      textWidth /= 2;
+                  textWidth /= 2;
 
-				      if((((S32)posX - (textWidth/2)) < comparePos.x) || (((S32)posX - textWidth) <= 0))
-				      {
+                  if((((S32)posX - (textWidth/2)) < comparePos.x) || (((S32)posX - textWidth) <= 0))
+                  {
                       posX += (textWidth/1.5);
-					  } else if((posX + (textWidth * 1.8)) > (comparePos.x + getExtent().x) || ((posX + textWidth) >= videoMode.resolution.x))
-				      {
+                 } else if((posX + (textWidth * 1.8)) > (comparePos.x + getExtent().x) || ((posX + textWidth) >= videoMode.resolution.x))
+                  {
                       posX -= (textWidth * 1.5);
-				      }
+                  }
 
-				      if((((S32)posY) < comparePos.y) || (((S32)posY - textWidth) <= 0))
-				      {
+                  if((((S32)posY) < comparePos.y) || (((S32)posY - textWidth) <= 0))
+                  {
                       posY += 40;
-				      } 
-				
-					  pDrawUtil->setBitmapModulation( profile->mFontColor );
-					  pDrawUtil->drawText( font, Point2I(posX, posY + 5) - Point2I(size >> 1, size), number );
-					  pDrawUtil->clearBitmapModulation();
-				   }
-				}
-			}
-		}
-	}
+                  } 
+            
+                 pDrawUtil->setBitmapModulation( profile->mFontColor );
+                 pDrawUtil->drawText( font, Point2I(posX, posY + 5) - Point2I(size >> 1, size), number );
+                 pDrawUtil->clearBitmapModulation();
+               }
+            }
+         }
+      }
+   }
 
-	if(mRenderNextGraphTooltip == true && mRenderGraphTooltip == true)
-	{
+   if(mRenderNextGraphTooltip == true && mRenderGraphTooltip == true)
+   {
        char argBuffer[1][32];
    
        dSprintf(argBuffer[0], 32, "%s", getGraphName(mTooltipSelectedPlot));
 
-	   renderGraphTooltip(mCursorPos, argBuffer[0]);
-	}
+      renderGraphTooltip(mCursorPos, argBuffer[0]);
+   }
 }
 
 S32 GuiParticleGraphCtrl::addPlotPoint(S32 plotID, Point2F v, bool setAdded)
@@ -301,44 +302,44 @@ S32 GuiParticleGraphCtrl::addPlotPoint(S32 plotID, Point2F v, bool setAdded)
 
    for(S32 i = 0; i < mPlots[plotID].mGraphData.size(); i++)
    {         
-	   if(mFabs(v.x - mPlots[plotID].mGraphData[i].x) < 0.001)
-	   {
-	      if(mAutoRemove == true)
-		   {
+      if(mFabs(v.x - mPlots[plotID].mGraphData[i].x) < 0.001)
+      {
+         if(mAutoRemove == true)
+         {
             changePlotPoint(plotID, i, v);
-			   plotChanged = true;
-			   mPlotIndex = i;
-		   } else
-		   {
+            plotChanged = true;
+            mPlotIndex = i;
+         } else
+         {
             mPlotIndex = -1;
-		   }
-			
-		   plotAdded = true;
-		  
-		   break;
-	   } else if(v.x < mPlots[plotID].mGraphData[i].x)
-	   {
+         }
+         
+         plotAdded = true;
+        
+         break;
+      } else if(v.x < mPlots[plotID].mGraphData[i].x)
+      {
           insertPlotPoint(plotID, i, v); 
-		  plotAdded = true;
-		  mPlotIndex = i;
-		  break;
-	   }
+        plotAdded = true;
+        mPlotIndex = i;
+        break;
+      }
    }
 
    if(plotAdded == false)
    {
-	   mPlots[plotID].mGraphData.push_back( v );
-	   mPlotIndex = mPlots[plotID].mGraphData.size() - 1;
+      mPlots[plotID].mGraphData.push_back( v );
+      mPlotIndex = mPlots[plotID].mGraphData.size() - 1;
    }
 
    if(mAutoMax == true)
    {
       // Keep record of maximum data value for scaling purposes.
       if(v.y > mPlots[plotID].mGraphMax.y)
-	     mPlots[plotID].mGraphMax.y = v.y;
+        mPlots[plotID].mGraphMax.y = v.y;
 
       if(v.x > mPlots[plotID].mGraphMax.x)
-	     mPlots[plotID].mGraphMax.x = v.x;
+        mPlots[plotID].mGraphMax.x = v.x;
    }
 
    if(plotChanged == true)
@@ -347,8 +348,8 @@ S32 GuiParticleGraphCtrl::addPlotPoint(S32 plotID, Point2F v, bool setAdded)
    } else if(mPlotIndex != -1 && setAdded)
    {
       mPointWasAdded = true;
-	   mAddedPoint = v;
-	   mAddedPointIndex = mPlotIndex;
+      mAddedPoint = v;
+      mAddedPointIndex = mPlotIndex;
    }
 
    return mPlotIndex;
@@ -366,10 +367,10 @@ void GuiParticleGraphCtrl::insertPlotPoint(S32 plotID, S32 i, Point2F v)
    {
       // Keep record of maximum data value for scaling purposes.
       if(v.y > mPlots[plotID].mGraphMax.y)
-	     mPlots[plotID].mGraphMax.y = v.y;
+        mPlots[plotID].mGraphMax.y = v.y;
 
       if(v.x > mPlots[plotID].mGraphMax.x)
-	     mPlots[plotID].mGraphMax.x = v.x;
+        mPlots[plotID].mGraphMax.x = v.x;
    }
 
    // Argument Buffer.
@@ -476,7 +477,7 @@ S32 GuiParticleGraphCtrl::getPlotIndex(S32 plotID, F32 x, F32 y)
       compareY = mPlots[plotID].mGraphData[i].y;
 
       //
-	   //if((x == compareX) && (y == compareY))
+      //if((x == compareX) && (y == compareY))
       if((mFabs(x - compareX) < 0.001) && (mFabs(y - compareY) < 0.001))
          return i;
    }
@@ -486,16 +487,16 @@ S32 GuiParticleGraphCtrl::getPlotIndex(S32 plotID, F32 x, F32 y)
 
 void GuiParticleGraphCtrl::setGraphType(S32 plotID, const char *graphType)
 {
-	AssertFatal(plotID > -1 && plotID < MaxPlots, "Invalid plot specified!");
-	if(!dStricmp(graphType,"Bar"))
-		mPlots[plotID].mGraphType = Bar;
-	else if(!dStricmp(graphType,"Filled"))
-		mPlots[plotID].mGraphType = Filled;
-	else if(!dStricmp(graphType,"Point"))
-		mPlots[plotID].mGraphType = Point;
-	else if(!dStricmp(graphType,"Polyline"))
-		mPlots[plotID].mGraphType = Polyline;
-	else AssertWarn(true, "Invalid graph type!");
+   AssertFatal(plotID > -1 && plotID < MaxPlots, "Invalid plot specified!");
+   if(!dStricmp(graphType,"Bar"))
+      mPlots[plotID].mGraphType = Bar;
+   else if(!dStricmp(graphType,"Filled"))
+      mPlots[plotID].mGraphType = Filled;
+   else if(!dStricmp(graphType,"Point"))
+      mPlots[plotID].mGraphType = Point;
+   else if(!dStricmp(graphType,"Polyline"))
+      mPlots[plotID].mGraphType = Polyline;
+   else AssertWarn(true, "Invalid graph type!");
 }
 
 void GuiParticleGraphCtrl::setSelectedPlot(S32 plotID)
@@ -564,8 +565,8 @@ void GuiParticleGraphCtrl::setRenderGraphTooltip(bool renderGraphTooltip)
 
 void GuiParticleGraphCtrl::drawNut(const Point2I &nut, S32 size, ColorI &outlineColor, ColorI &nutColor)
 {
-	// Fetch Draw Utility.
-	GFXDrawUtil* pDrawUtil = GFX->getDrawUtil();
+   // Fetch Draw Utility.
+   GFXDrawUtil* pDrawUtil = GFX->getDrawUtil();
 
    //Con::printf("r %d g %d b %d", nutColor.red, nutColor.green, nutColor.blue);
    S32 NUT_SIZE = size;
@@ -587,17 +588,17 @@ Point2I GuiParticleGraphCtrl::findHitNut( Point2I hitPoint )
 {
    for(S32 i = 0; i < MaxPlots; i++)
    {
-	  if ( (mPlots[i].mGraphData.size() == 0) || (mPlots[i].mHidden == true))
+     if ( (mPlots[i].mGraphData.size() == 0) || (mPlots[i].mHidden == true))
          continue;
 
       for (S32 j = 0 ; j < mPlots[i].mNutList.size(); j++ )
       {
-	     if( inNut (Point2I( mPlots[i].mNutList[j].x, mPlots[i].mNutList[j].y), hitPoint.x, hitPoint.y) )
-		 {
+        if( inNut (Point2I( mPlots[i].mNutList[j].x, mPlots[i].mNutList[j].y), hitPoint.x, hitPoint.y) )
+       {
             mTooltipSelectedPlot = i; 
-			return Point2I(i,j);
-		 }
-	  }
+         return Point2I(i,j);
+       }
+     }
    }
 
    return Point2I(-1,-1);
@@ -717,7 +718,7 @@ StringTableEntry GuiParticleGraphCtrl::getGraphName(S32 plotID)
 void GuiParticleGraphCtrl::onMouseMove(const GuiEvent &event)
 {
    mCursorPos = event.mousePoint;
-	
+   
    Point2I hitNut = findHitNut(event.mousePoint);
 
    if( hitNut != Point2I(-1,-1) )
@@ -744,10 +745,9 @@ void GuiParticleGraphCtrl::onMouseDown(const GuiEvent &event)
 
    if( hitNut != Point2I(-1,-1) )
    {
-	  if(event.mouseClickCount == 2)
-	  {
+     if(event.mouseClickCount == 2)
+     {
         Point2F plotPoint = getPlotPoint(hitNut.x, hitNut.y);
-		  Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
         S32 point = removePlotPoint(hitNut.x, hitNut.y);
 
         // Argument Buffer.
@@ -755,31 +755,31 @@ void GuiParticleGraphCtrl::onMouseDown(const GuiEvent &event)
    
         dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
         dSprintf(argBuffer[1], 32, "%d", point);
-		  dSprintf(argBuffer[2], 32, "%f %f", plotPoint.x, plotPoint.y);
+        dSprintf(argBuffer[2], 32, "%f %f", plotPoint.x, plotPoint.y);
 
-		 
+       
 
          // Call Scripts.
          Con::executef(this, "onPlotPointRemoved", argBuffer[0], argBuffer[1], argBuffer[2]);
-	  } else
-	  {
-	     setSelectedPlot(hitNut.x);
+     } else
+     {
+        setSelectedPlot(hitNut.x);
         setSelectedPoint(hitNut.y);
-	     mOriginalSelectedPoint = hitNut.y;
+        mOriginalSelectedPoint = hitNut.y;
 
-		  char argBuffer[32];
+        char argBuffer[32];
 
         dSprintf(argBuffer, 32, "%d", hitNut.y);
 
         // Call Scripts.
         Con::executef(this, "onPlotPointSelectedMouseDown", argBuffer);
-	  }
+     }
    } else if( mSelectedPlot != -1 ) 
    {  
-	   Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
-	   mLastSelectedPoint = addPlotPoint(mSelectedPlot, mousePos);
+      Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
+      mLastSelectedPoint = addPlotPoint(mSelectedPlot, mousePos);
 
-	   // Argument Buffer.
+      // Argument Buffer.
       char argBuffer[32];
    
       dSprintf(argBuffer, 32, "%f %f", convertToGraphCoord(mSelectedPlot, event.mousePoint).x, convertToGraphCoord(mSelectedPlot, event.mousePoint).y);
@@ -787,41 +787,41 @@ void GuiParticleGraphCtrl::onMouseDown(const GuiEvent &event)
       // Call Scripts.
       Con::executef(this, "onMouseDragged", argBuffer);
 
-	   return;
+      return;
    }
 }
 
 void GuiParticleGraphCtrl::onMouseUp(const GuiEvent &event)
 {
    if(mSelectedPoint != -1)
-	  mLastSelectedPoint = mSelectedPoint;
+     mLastSelectedPoint = mSelectedPoint;
 
    if(mPointWasAdded == true)
    {
       if(mSelectedPoint == -1)
-	   {
-	     // Argument Buffer.
+      {
+        // Argument Buffer.
          char argBuffer[3][32];
    
          dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
          dSprintf(argBuffer[1], 32, "%f %f", mAddedPoint.x, mAddedPoint.y);
-		   dSprintf(argBuffer[2], 32, "%d", mAddedPointIndex);
+         dSprintf(argBuffer[2], 32, "%d", mAddedPointIndex);
          
          // Call Scripts.
          Con::executef(this, "onPlotPointAdded", argBuffer[0], argBuffer[1], argBuffer[2]);
-	   } else
-	   {
+      } else
+      {
          // Argument Buffer.
          char argBuffer[4][32];
    
          dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
          dSprintf(argBuffer[1], 32, "%f %f", mAddedPoint.x, mAddedPoint.y);
-		   dSprintf(argBuffer[2], 32, "%d", mOriginalSelectedPoint);
-		   dSprintf(argBuffer[3], 32, "%d", mAddedPointIndex);
+         dSprintf(argBuffer[2], 32, "%d", mOriginalSelectedPoint);
+         dSprintf(argBuffer[3], 32, "%d", mAddedPointIndex);
 
          // Call Scripts.
          Con::executef(this, "onPlotPointChangedUp", argBuffer[0], argBuffer[1], argBuffer[2], argBuffer[3]);
-	  }
+     }
    }
 
    mPointWasAdded = false;
@@ -835,37 +835,37 @@ void GuiParticleGraphCtrl::onMouseDragged(const GuiEvent &event)
 
    if(mSelectedPoint != -1)
    {
-	   Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
+      Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
 
       if(mPointXMovementClamped == true)
-	   {
+      {
          F32 prevXPos = getPlotPoint(mSelectedPlot, mSelectedPoint).x;
-		   if(mousePos.x != prevXPos)
-		   {
-		      mousePos.x = prevXPos;
-		   }
-	   }
+         if(mousePos.x != prevXPos)
+         {
+            mousePos.x = prevXPos;
+         }
+      }
 
-	   removePlotPoint(mSelectedPlot, mSelectedPoint);
-	   S32 point = addPlotPoint(mSelectedPlot, mousePos);
+      removePlotPoint(mSelectedPlot, mSelectedPoint);
+      S32 point = addPlotPoint(mSelectedPlot, mousePos);
       if(point != -1)
-	   {
+      {
          setSelectedPoint(point);
-		   mLastMousePos = mousePos;
+         mLastMousePos = mousePos;
 
          // Argument Buffer.
          char argBuffer[3][32];
    
          dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
          dSprintf(argBuffer[1], 32, "%f %f", mAddedPoint.x, mAddedPoint.y);
-	      dSprintf(argBuffer[2], 32, "%d", point);
+         dSprintf(argBuffer[2], 32, "%d", point);
 
          // Call Scripts.
          Con::executef(this, "onPlotPointChangedMove", argBuffer[0], argBuffer[1], argBuffer[2]);
-	   } else
-	   {
+      } else
+      {
          point = addPlotPoint(mSelectedPlot, mLastMousePos);
-	   }
+      }
    }
 
    // Argument Buffer.
@@ -884,8 +884,6 @@ void GuiParticleGraphCtrl::onRightMouseDown(const GuiEvent &event)
    if( hitNut != Point2I(-1,-1) )
    {
       Point2F plotPoint = getPlotPoint(hitNut.x, hitNut.y);
-
-      Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
       S32 point = removePlotPoint(hitNut.x, hitNut.y);
 
       // Argument Buffer.
@@ -893,7 +891,7 @@ void GuiParticleGraphCtrl::onRightMouseDown(const GuiEvent &event)
    
       dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
       dSprintf(argBuffer[1], 32, "%d", point);
-	   dSprintf(argBuffer[2], 32, "%f %f", plotPoint.x, plotPoint.y);
+      dSprintf(argBuffer[2], 32, "%f %f", plotPoint.x, plotPoint.y);
 
       // Call Scripts.
       Con::executef(this, "onPlotPointRemoved", argBuffer[0], argBuffer[1], argBuffer[2]);
@@ -912,16 +910,14 @@ void GuiParticleGraphCtrl::onRightMouseDragged(const GuiEvent &event)
    if( hitNut != Point2I(-1,-1) )
    {
       Point2F plotPoint = getPlotPoint(hitNut.x, hitNut.y);
-
-      Point2F mousePos = convertToGraphCoord(mSelectedPlot, event.mousePoint);
       S32 point = removePlotPoint(hitNut.x, hitNut.y);
 
-	   // Argument Buffer.
+      // Argument Buffer.
       char argBuffer[3][32];
    
       dSprintf(argBuffer[0], 32, "%d", mSelectedPlot);
       dSprintf(argBuffer[1], 32, "%d", point);
-	   dSprintf(argBuffer[2], 32, "%f %f", plotPoint.x, plotPoint.y);
+      dSprintf(argBuffer[2], 32, "%f %f", plotPoint.x, plotPoint.y);
 
       // Call Scripts.
       Con::executef(this, "onPlotPointRemoved", argBuffer[0], argBuffer[1], argBuffer[2]);
@@ -991,12 +987,12 @@ bool GuiParticleGraphCtrl::renderGraphTooltip(Point2I cursorPos, StringTableEntr
    RectI rect(offset, textBounds);
    GFX->setClipRect(rect);
 
-	// Fetch Draw Utility.
-	GFXDrawUtil* pDrawUtil = GFX->getDrawUtil();
+   // Fetch Draw Utility.
+   GFXDrawUtil* pDrawUtil = GFX->getDrawUtil();
 
    // Draw Filler bit, then border on top of that
-	pDrawUtil->drawRectFill(rect, ColorI(mTooltipProfile->mFillColor.red, mTooltipProfile->mFillColor.green, mTooltipProfile->mFillColor.blue, 200) );
-	pDrawUtil->drawRect( rect, mTooltipProfile->mBorderColor );
+   pDrawUtil->drawRectFill(rect, ColorI(mTooltipProfile->mFillColor.red, mTooltipProfile->mFillColor.green, mTooltipProfile->mFillColor.blue, 200) );
+   pDrawUtil->drawRect( rect, mTooltipProfile->mBorderColor );
 
    // Draw the text centered in the tool tip box
    pDrawUtil->setBitmapModulation( mTooltipProfile->mFontColor );
@@ -1008,446 +1004,374 @@ bool GuiParticleGraphCtrl::renderGraphTooltip(Point2I cursorPos, StringTableEntr
    return true;
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setSelectedPoint, void, 3, 3, "(int point)"
+DefineConsoleMethod(GuiParticleGraphCtrl, setSelectedPoint, void, (S32 point), , "(int point)"
               "Set the selected point on the graph.\n"
-			  "@return No return value")
+           "@return No return value")
 {
-   S32 point = dAtoi(argv[2]);
    if(point >= object->mPlots[object->mSelectedPlot].mGraphData.size() || point < 0)
    {
-	   Con::errorf("Invalid point to select.");
-	   return;
+      Con::errorf("Invalid point to select.");
+      return;
    }
    object->setSelectedPoint( point );
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setSelectedPlot, void, 3, 3, "(int plotID)"
+DefineConsoleMethod(GuiParticleGraphCtrl, setSelectedPlot, void, (S32 plotID), , "(int plotID)"
               "Set the selected plot (a.k.a. graph)."
-			  "@return No return value" )
+           "@return No return value" )
 {
-   S32 plotID = dAtoi(argv[2]);
    if(plotID > object->MaxPlots)
    {
-	   Con::errorf("Invalid plotID.");
-	   return;
+      Con::errorf("Invalid plotID.");
+      return;
    }
    object->setSelectedPlot( plotID );
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, clearGraph, void, 3, 3, "(int plotID)"
+DefineConsoleMethod(GuiParticleGraphCtrl, clearGraph, void, (S32 plotID), , "(int plotID)"
               "Clear the graph of the given plot."
-			  "@return No return value")
+           "@return No return value")
 {
-   S32 plotID = dAtoi(argv[2]);
    if(plotID > object->MaxPlots)
    {
-	   Con::errorf("Invalid plotID.");
-	   return;
+      Con::errorf("Invalid plotID.");
+      return;
    }
    object->clearGraph( plotID );
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, clearAllGraphs, void, 2, 2, "()"
+DefineConsoleMethod(GuiParticleGraphCtrl, clearAllGraphs, void, (), , "()"
               "Clear all of the graphs."
-			  "@return No return value")
+           "@return No return value")
 {
    object->clearAllGraphs();
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, addPlotPoint, const char*, 5, 6, "(int plotID, float x, float y, bool setAdded = true;)"
+DefineConsoleMethod(GuiParticleGraphCtrl, addPlotPoint, S32, (S32 plotID, F32 x, F32 y, bool setAdded), (true), "(int plotID, float x, float y, bool setAdded = true;)"
               "Add a data point to the given plot."
-			  "@return")
+           "@return")
 {
-   S32 plotID = dAtoi(argv[2]);
-   S32 pointAdded = 0;
-   char *retBuffer = Con::getReturnBuffer(32);
+  
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return -2;
+   }
+   return object->addPlotPoint( plotID, Point2F(x, y), setAdded);
+}
+
+DefineConsoleMethod(GuiParticleGraphCtrl, insertPlotPoint, void, (S32 plotID, S32 i, F32 x, F32 y), , "(int plotID, int i, float x, float y)\n"
+              "Insert a data point to the given plot and plot position.\n"
+           "@param plotID The plot you want to access\n"
+           "@param i The data point.\n"
+           "@param x,y The plot position.\n"
+           "@return No return value.")
+{
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return;
+   }
+   object->insertPlotPoint( plotID, i, Point2F(x, y));
+}
+
+DefineConsoleMethod(GuiParticleGraphCtrl, changePlotPoint, S32, (S32 plotID, S32 i, F32 x, F32 y), , "(int plotID, int i, float x, float y)"
+              "Change a data point to the given plot and plot position.\n"
+           "@param plotID The plot you want to access\n"
+           "@param i The data point.\n"
+           "@param x,y The plot position.\n"
+           "@return No return value.")
+{
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return -1;
+   }
+   return object->changePlotPoint( plotID, i, Point2F(x, y));
+}
+
+DefineConsoleMethod(GuiParticleGraphCtrl, getSelectedPlot, S32, (), , "() "
+              "Gets the selected Plot (a.k.a. graph).\n"
+           "@return The plot's ID.")
+{
+  return object->getSelectedPlot();
+}
+
+DefineConsoleMethod(GuiParticleGraphCtrl, getSelectedPoint, S32, (), , "()"
+              "Gets the selected Point on the Plot (a.k.a. graph)."
+           "@return The last selected point ID")
+{
+   return object->getSelectedPoint();
+}
+
+DefineConsoleMethod(GuiParticleGraphCtrl, isExistingPoint, bool, (S32 plotID, S32 samples), , "(int plotID, int samples)"
+              "@return Returns true or false whether or not the point in the plot passed is an existing point.")
+{
 
    if(plotID > object->MaxPlots)
    {
-	   Con::errorf("Invalid plotID.");
-	   dSprintf(retBuffer, 32, "%d", -2);
-      return retBuffer;
+      Con::errorf("Invalid plotID.");
    }
+   if(samples > object->MaxDataPoints)
+   {
+      Con::errorf("Invalid sample.");
+   }
+   return object->isExistingPoint(plotID, samples);
+}
 
-   if(argc == 5)
+DefineConsoleMethod(GuiParticleGraphCtrl, getPlotPoint, Point2F, (S32 plotID, S32 samples), , "(int plotID, int samples)"
+              "Get a data point from the plot specified, samples from the start of the graph."
+           "@return The data point ID")
+{
+
+   if(plotID > object->MaxPlots)
    {
-      pointAdded = object->addPlotPoint( plotID, Point2F(dAtof(argv[3]), dAtof(argv[4])));
-   } else if(argc == 6)
+      Con::errorf("Invalid plotID.");
+   }
+   if(samples > object->MaxDataPoints)
    {
-      pointAdded = object->addPlotPoint( plotID, Point2F(dAtof(argv[3]), dAtof(argv[4])), dAtob(argv[5]));
+      Con::errorf("Invalid sample.");
    }
 
    
-   dSprintf(retBuffer, 32, "%d", pointAdded);
-
-   return retBuffer;
+   return object->getPlotPoint(plotID, samples);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, insertPlotPoint, void, 6, 6, "(int plotID, int i, float x, float y)\n"
-              "Insert a data point to the given plot and plot position.\n"
-			  "@param plotID The plot you want to access\n"
-			  "@param i The data point.\n"
-			  "@param x,y The plot position.\n"
-			  "@return No return value.")
-{
-   S32 plotID = dAtoi(argv[2]);
-   if(plotID > object->MaxPlots)
-   {
-	   Con::errorf("Invalid plotID.");
-	   return;
-   }
-   object->insertPlotPoint( plotID, dAtoi(argv[3]), Point2F(dAtof(argv[4]), dAtof(argv[5])));
-}
-
-ConsoleMethod(GuiParticleGraphCtrl, changePlotPoint, const char*, 6, 6, "(int plotID, int i, float x, float y)"
-              "Change a data point to the given plot and plot position.\n"
-			  "@param plotID The plot you want to access\n"
-			  "@param i The data point.\n"
-			  "@param x,y The plot position.\n"
-			  "@return No return value.")
-{
-   S32 plotID = dAtoi(argv[2]);
-   if(plotID > object->MaxPlots)
-   {
-	   Con::errorf("Invalid plotID.");
-
-      char *retBuffer = Con::getReturnBuffer(64);
-      const S32 index = -1;
-      dSprintf(retBuffer, 64, "%d", index);
-      return retBuffer;
-   }
-
-   char *retBuffer = Con::getReturnBuffer(64);
-   const S32 index = object->changePlotPoint( plotID, dAtoi(argv[3]), Point2F(dAtof(argv[4]), dAtof(argv[5])));
-   dSprintf(retBuffer, 64, "%d", index);
-   return retBuffer;
-}
-
-ConsoleMethod(GuiParticleGraphCtrl, getSelectedPlot, const char*, 2, 2, "() "
-              "Gets the selected Plot (a.k.a. graph).\n"
-			  "@return The plot's ID.")
-{
-   char *retBuffer = Con::getReturnBuffer(32);
-   const S32 plot = object->getSelectedPlot();
-   dSprintf(retBuffer, 32, "%d", plot);
-   return retBuffer;
-}
-
-ConsoleMethod(GuiParticleGraphCtrl, getSelectedPoint, const char*, 2, 2, "()"
-              "Gets the selected Point on the Plot (a.k.a. graph)."
-			  "@return The last selected point ID")
-{
-   char *retBuffer = Con::getReturnBuffer(32);
-   const S32 point = object->getSelectedPoint();
-   dSprintf(retBuffer, 32, "%d", point);
-   return retBuffer;
-}
-
-ConsoleMethod(GuiParticleGraphCtrl, isExistingPoint, const char*, 4, 4, "(int plotID, int samples)"
-              "@return Returns true or false whether or not the point in the plot passed is an existing point.")
-{
-   S32 plotID = dAtoi(argv[2]);
-   S32 samples = dAtoi(argv[3]);
-
-   if(plotID > object->MaxPlots)
-   {
-	   Con::errorf("Invalid plotID.");
-   }
-   if(samples > object->MaxDataPoints)
-   {
-	   Con::errorf("Invalid sample.");
-   }
-
-   char *retBuffer = Con::getReturnBuffer(32);
-   const bool isPoint = object->isExistingPoint(plotID, samples);
-   dSprintf(retBuffer, 32, "%d", isPoint);
-   return retBuffer;
-}
-
-ConsoleMethod(GuiParticleGraphCtrl, getPlotPoint, const char*, 4, 4, "(int plotID, int samples)"
-              "Get a data point from the plot specified, samples from the start of the graph."
-			  "@return The data point ID")
-{
-   S32 plotID = dAtoi(argv[2]);
-   S32 samples = dAtoi(argv[3]);
-
-   if(plotID > object->MaxPlots)
-   {
-	   Con::errorf("Invalid plotID.");
-   }
-   if(samples > object->MaxDataPoints)
-   {
-	   Con::errorf("Invalid sample.");
-   }
-
-   char *retBuffer = Con::getReturnBuffer(64);
-   const Point2F &pos = object->getPlotPoint(plotID, samples);
-   dSprintf(retBuffer, 64, "%f %f", pos.x, pos.y);
-   return retBuffer;
-}
-
-ConsoleMethod(GuiParticleGraphCtrl, getPlotIndex, const char*, 5, 5, "(int plotID, float x, float y)\n"
+DefineConsoleMethod(GuiParticleGraphCtrl, getPlotIndex, S32, (S32 plotID, F32 x, F32 y), , "(int plotID, float x, float y)\n"
               "Gets the index of the point passed on the plotID passed (graph ID).\n"
-			  "@param plotID The plot you wish to check.\n"
-			  "@param x,y The coordinates of the point to get.\n"
-			  "@return Returns the index of the point.\n")
+           "@param plotID The plot you wish to check.\n"
+           "@param x,y The coordinates of the point to get.\n"
+           "@return Returns the index of the point.\n")
 {
-   S32 plotID = dAtoi(argv[2]);
-   F32 x = dAtof(argv[3]);
-   F32 y = dAtof(argv[4]);
 
    if(plotID > object->MaxPlots)
    {
-	   Con::errorf("Invalid plotID.");
+      Con::errorf("Invalid plotID.");
    }
-
-   char *retBuffer = Con::getReturnBuffer(32);
-   const S32 &index = object->getPlotIndex(plotID, x, y);
-   dSprintf(retBuffer, 32, "%d", index);
-   return retBuffer;
+   return object->getPlotIndex(plotID, x, y);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, getGraphColor, const char*, 3, 3, "(int plotID)"
+DefineConsoleMethod(GuiParticleGraphCtrl, getGraphColor, ColorF, (S32 plotID), , "(int plotID)"
               "Get the color of the graph passed."
-			  "@return Returns the color of the graph as a string of RGB values formatted as \"R G B\"")
+           "@return Returns the color of the graph as a string of RGB values formatted as \"R G B\"")
 {
-   S32 plotID = dAtoi(argv[2]);
 
    if(plotID > object->MaxPlots)
    {
-	   Con::errorf("Invalid plotID.");
+      Con::errorf("Invalid plotID.");
    }
-
-   char *retBuffer = Con::getReturnBuffer(64);
-   const ColorF &color = object->getGraphColor(plotID);
-   dSprintf(retBuffer, 64, "%f %f %f", color.red, color.green, color.blue);
-   return retBuffer;
+  
+   return object->getGraphColor(plotID);
+   
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, getGraphMin, const char*, 3, 3, "(int plotID) "
+DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMin, Point2F, (S32 plotID), , "(int plotID) "
               "Get the minimum values of the graph ranges.\n"
-			  "@return Returns the minimum of the range formatted as \"x-min y-min\"")
+           "@return Returns the minimum of the range formatted as \"x-min y-min\"")
 {
-   S32 plotID = dAtoi(argv[2]);
 
    if(plotID > object->MaxPlots)
    {
-	   Con::errorf("Invalid plotID.");
+      Con::errorf("Invalid plotID.");
    }
-
-   char *retBuffer = Con::getReturnBuffer(64);
-   const Point2F graphMin = object->getGraphMin(plotID);
-   dSprintf(retBuffer, 64, "%f %f", graphMin.x, graphMin.y);
-   return retBuffer;
+   return object->getGraphMin(plotID);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, getGraphMax, const char*, 3, 3, "(int plotID) "
-			  "Get the maximum values of the graph ranges.\n"
-			  "@return Returns the maximum of the range formatted as \"x-max y-max\"")
+DefineConsoleMethod(GuiParticleGraphCtrl, getGraphMax, Point2F, (S32 plotID), , "(int plotID) "
+           "Get the maximum values of the graph ranges.\n"
+           "@return Returns the maximum of the range formatted as \"x-max y-max\"")
 {
-   S32 plotID = dAtoi(argv[2]);
 
    if(plotID > object->MaxPlots)
    {
-	   Con::errorf("Invalid plotID.");
+      Con::errorf("Invalid plotID.");
    }
-
-   char *retBuffer = Con::getReturnBuffer(64);
-   const Point2F graphMax = object->getGraphMax(plotID);
-   dSprintf(retBuffer, 64, "%f %f", graphMax.x, graphMax.y);
-   return retBuffer;
+   return object->getGraphMax(plotID);
+    
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, getGraphName, const char*, 3, 3, "(int plotID) "
+DefineConsoleMethod(GuiParticleGraphCtrl, getGraphName, const char*, (S32 plotID), , "(int plotID) "
               "Get the name of the graph passed.\n"
-			  "@return Returns the name of the plot")
+           "@return Returns the name of the plot")
 {
-   S32 plotID = dAtoi(argv[2]);
 
    if(plotID > object->MaxPlots)
    {
-	   Con::errorf("Invalid plotID.");
+      Con::errorf("Invalid plotID.");
    }
 
-   char *retBuffer = Con::getReturnBuffer(64);
+   const U32 bufSize = 64;
+   char *retBuffer = Con::getReturnBuffer(bufSize);
    const StringTableEntry graphName = object->getGraphName(plotID);
-   dSprintf(retBuffer, 64, "%s", graphName);
+   dSprintf(retBuffer, bufSize, "%s", graphName);
    return retBuffer;
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setGraphMin, void, 5, 5, "(int plotID, float minX, float minY) "
-			  "Set the min values of the graph of plotID.\n"
-			  "@param plotID The plot to modify\n"
-			  "@param minX,minY The minimum bound of the value range.\n"
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMin, void, (S32 plotID, F32 minX, F32 minY), , "(int plotID, float minX, float minY) "
+           "Set the min values of the graph of plotID.\n"
+           "@param plotID The plot to modify\n"
+           "@param minX,minY The minimum bound of the value range.\n"
+           "@return No return value.")
 {
-	S32 plotID = dAtoi(argv[2]);
 
-	if(plotID > object->MaxPlots)
-	{
-		Con::errorf("Invalid plotID.");
-		return;
-	}
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return;
+   }
 
-	object->setGraphMin(dAtoi(argv[2]), Point2F(dAtof(argv[3]), dAtof(argv[4])));
+   object->setGraphMin(plotID, Point2F(minX, minY));
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setGraphMinX, void, 4, 4, "(int plotID, float minX) "
-			  "Set the min X value of the graph of plotID.\n"
-			  "@param plotID The plot to modify.\n"
-			  "@param minX The minimum x value.\n"
-			  "@return No return Value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMinX, void, (S32 plotID, F32 minX), , "(int plotID, float minX) "
+           "Set the min X value of the graph of plotID.\n"
+           "@param plotID The plot to modify.\n"
+           "@param minX The minimum x value.\n"
+           "@return No return Value.")
 {
-	S32 plotID = dAtoi(argv[2]);
 
-	if(plotID > object->MaxPlots)
-	{
-		Con::errorf("Invalid plotID.");
-		return;
-	}
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return;
+   }
 
-	object->setGraphMinX(dAtoi(argv[2]), dAtof(argv[3]));
+   object->setGraphMinX(plotID, minX);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setGraphMinY, void, 4, 4, "(int plotID, float minY) "
-			  "Set the min Y value of the graph of plotID."
-			  "@param plotID The plot to modify.\n"
-			  "@param minY The minimum y value.\n"
-			  "@return No return Value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMinY, void, (S32 plotID, F32 minX), , "(int plotID, float minY) "
+           "Set the min Y value of the graph of plotID."
+           "@param plotID The plot to modify.\n"
+           "@param minY The minimum y value.\n"
+           "@return No return Value.")
 {
-	S32 plotID = dAtoi(argv[2]);
 
-	if(plotID > object->MaxPlots)
-	{
-		Con::errorf("Invalid plotID.");
-		return;
-	}
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return;
+   }
 
-	object->setGraphMinY(dAtoi(argv[2]), dAtof(argv[3]));
+   object->setGraphMinY(plotID, minX);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setGraphMax, void, 5, 5, "(int plotID, float maxX, float maxY) "
-			  "Set the max values of the graph of plotID."
-			  "@param plotID The plot to modify\n"
-			  "@param maxX,maxY The maximum bound of the value range.\n"
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMax, void, (S32 plotID, F32 maxX, F32 maxY), , "(int plotID, float maxX, float maxY) "
+           "Set the max values of the graph of plotID."
+           "@param plotID The plot to modify\n"
+           "@param maxX,maxY The maximum bound of the value range.\n"
+           "@return No return value.")
 {
-	S32 plotID = dAtoi(argv[2]);
 
-	if(plotID > object->MaxPlots)
-	{
-		Con::errorf("Invalid plotID.");
-		return;
-	}
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return;
+   }
 
-	object->setGraphMax(dAtoi(argv[2]), Point2F(dAtof(argv[3]), dAtof(argv[4])));
+   object->setGraphMax(plotID, Point2F(maxX, maxY));
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setGraphMaxX, void, 4, 4, "(int plotID, float maxX)"
-			  "Set the max X value of the graph of plotID."
-			  "@param plotID The plot to modify.\n"
-			  "@param maxX The maximum x value.\n"
-			  "@return No return Value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMaxX, void, (S32 plotID, F32 maxX), , "(int plotID, float maxX)"
+           "Set the max X value of the graph of plotID."
+           "@param plotID The plot to modify.\n"
+           "@param maxX The maximum x value.\n"
+           "@return No return Value.")
 {
-	S32 plotID = dAtoi(argv[2]);
 
-	if(plotID > object->MaxPlots)
-	{
-		Con::errorf("Invalid plotID.");
-		return;
-	}
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return;
+   }
 
-	object->setGraphMaxX(dAtoi(argv[2]), dAtof(argv[3]));
+   object->setGraphMaxX(plotID, maxX);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setGraphMaxY, void, 4, 4, "(int plotID, float maxY)"
-			  "Set the max Y value of the graph of plotID."
-			  "@param plotID The plot to modify.\n"
-			  "@param maxY The maximum y value.\n"
-			  "@return No return Value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setGraphMaxY, void, (S32 plotID, F32 maxX), , "(int plotID, float maxY)"
+           "Set the max Y value of the graph of plotID."
+           "@param plotID The plot to modify.\n"
+           "@param maxY The maximum y value.\n"
+           "@return No return Value.")
 {
-	S32 plotID = dAtoi(argv[2]);
 
-	if(plotID > object->MaxPlots)
-	{
-		Con::errorf("Invalid plotID.");
-		return;
-	}
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return;
+   }
 
-	object->setGraphMaxY(dAtoi(argv[2]), dAtof(argv[3]));
+   object->setGraphMaxY(plotID, maxX);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setGraphHidden, void, 4, 4, "(int plotID, bool isHidden)"
-			  "Set whether the graph number passed is hidden or not."
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setGraphHidden, void, (S32 plotID, bool isHidden), , "(int plotID, bool isHidden)"
+           "Set whether the graph number passed is hidden or not."
+           "@return No return value.")
 {
-	S32 plotID = dAtoi(argv[2]);
 
-	if(plotID > object->MaxPlots)
-	{
-		Con::errorf("Invalid plotID.");
-		return;
-	}
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return;
+   }
 
-	object->setGraphHidden(dAtoi(argv[2]), dAtob(argv[3]));
+   object->setGraphHidden(plotID, isHidden);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setAutoGraphMax, void, 3, 3, "(bool autoMax) "
-			  "Set whether the max will automatically be set when adding points "
-			  "(ie if you add a value over the current max, the max is increased to that value).\n"
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setAutoGraphMax, void, (bool autoMax), , "(bool autoMax) "
+           "Set whether the max will automatically be set when adding points "
+           "(ie if you add a value over the current max, the max is increased to that value).\n"
+           "@return No return value.")
 {
-	object->setAutoGraphMax(dAtob(argv[2]));
+   object->setAutoGraphMax(autoMax);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setAutoRemove, void, 3, 3, "(bool autoRemove) "
-			  "Set whether or not a point should be deleted when you drag another one over it."
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setAutoRemove, void, (bool autoRemove), , "(bool autoRemove) "
+           "Set whether or not a point should be deleted when you drag another one over it."
+           "@return No return value.")
 {
-	object->setAutoRemove(dAtob(argv[2]));
+   object->setAutoRemove(autoRemove);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setRenderAll, void, 3, 3, "(bool renderAll)"
-			  "Set whether or not a position should be rendered on every point or just the last selected."
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setRenderAll, void, (bool autoRemove), , "(bool renderAll)"
+           "Set whether or not a position should be rendered on every point or just the last selected."
+           "@return No return value.")
 {
-	object->setRenderAll(dAtob(argv[2]));
+   object->setRenderAll(autoRemove);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setPointXMovementClamped, void, 3, 3, "(bool clamped)"
-			  "Set whether the x position of the selected graph point should be clamped"
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setPointXMovementClamped, void, (bool autoRemove), , "(bool clamped)"
+           "Set whether the x position of the selected graph point should be clamped"
+           "@return No return value.")
 {
-	object->setPointXMovementClamped(dAtob(argv[2]));
+   object->setPointXMovementClamped(autoRemove);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setRenderGraphTooltip, void, 3, 3, "(bool renderGraphTooltip)"
-			  "Set whether or not to render the graph tooltip."
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setRenderGraphTooltip, void, (bool autoRemove), , "(bool renderGraphTooltip)"
+           "Set whether or not to render the graph tooltip."
+           "@return No return value.")
 {
-	object->setRenderGraphTooltip(dAtob(argv[2]));
+   object->setRenderGraphTooltip(autoRemove);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, setGraphName, void, 4, 4, "(int plotID, string graphName) "
-			  "Set the name of the given plot.\n"
-			  "@param plotID The plot to modify.\n"
-			  "@param graphName The name to set on the plot.\n"
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, setGraphName, void, (S32 plotID, const char * graphName), , "(int plotID, string graphName) "
+           "Set the name of the given plot.\n"
+           "@param plotID The plot to modify.\n"
+           "@param graphName The name to set on the plot.\n"
+           "@return No return value.")
 {
-	S32 plotID = dAtoi(argv[2]);
 
-	if(plotID > object->MaxPlots)
-	{
-		Con::errorf("Invalid plotID.");
-		return;
-	}
+   if(plotID > object->MaxPlots)
+   {
+      Con::errorf("Invalid plotID.");
+      return;
+   }
 
-	object->setGraphName(dAtoi(argv[2]), argv[3]);
+   object->setGraphName(plotID, graphName);
 }
 
-ConsoleMethod(GuiParticleGraphCtrl, resetSelectedPoint, void, 2, 2, "()"
-			  "This will reset the currently selected point to nothing."
-			  "@return No return value.")
+DefineConsoleMethod(GuiParticleGraphCtrl, resetSelectedPoint, void, (), , "()"
+           "This will reset the currently selected point to nothing."
+           "@return No return value.")
 {
-	object->resetSelectedPoint();
+   object->resetSelectedPoint();
 }

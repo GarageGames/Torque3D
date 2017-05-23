@@ -93,13 +93,13 @@ static void shutdownEventQueue()
 
 U32 postEvent(SimObject *destObject, SimEvent* event,U32 time)
 {
-	AssertFatal(time == -1 || time >= getCurrentTime(),
+   AssertFatal(time == -1 || time >= getCurrentTime(),
       "Sim::postEvent() - Event time must be greater than or equal to the current time." );
    AssertFatal(destObject, "Sim::postEvent() - Destination object for event doesn't exist.");
 
    Mutex::lockMutex(gEventQueueMutex);
 
-   if( time == -1 )
+   if( time == -1 ) // FIXME: a smart compiler will remove this check. - see http://garagegames.com/community/resources/view/19785 for a fix
       time = gCurrentTime;
 
    event->time = time;
@@ -256,7 +256,7 @@ void advanceToTime(SimTime targetTime)
          event->process(obj);
       delete event;
    }
-	gCurrentTime = targetTime;
+   gCurrentTime = targetTime;
 
    Mutex::unlockMutex(gEventQueueMutex);
 }
@@ -328,6 +328,11 @@ SimObject* findObject(const char* fileName, S32 declarationLine)
    return gRootGroup->findObjectByLineNumber(fileName, declarationLine, true);
 }
 
+SimObject* findObject(ConsoleValueRef &ref)
+{
+   return findObject((const char*)ref);
+}
+
 SimObject* findObject(const char* name)
 {
    PROFILE_SCOPE(SimFindObject);
@@ -367,6 +372,8 @@ SimObject* findObject(const char* name)
                return NULL;
             return obj->findObject(temp);
          }
+         else if (c < '0' || c > '9')
+            return NULL;
       }
    }
    S32 len;
@@ -386,7 +393,7 @@ SimObject* findObject(const char* name)
 
 SimObject* findObject(SimObjectId id)
 {
-	return gIdDictionary->find(id);
+   return gIdDictionary->find(id);
 }
 
 SimObject *spawnObject(String spawnClass, String spawnDataBlock, String spawnName,
@@ -593,7 +600,7 @@ SimDataBlockGroup::SimDataBlockGroup()
 
 S32 QSORT_CALLBACK SimDataBlockGroup::compareModifiedKey(const void* a,const void* b)
 {
-	const SimDataBlock* dba = *((const SimDataBlock**)a);
+   const SimDataBlock* dba = *((const SimDataBlock**)a);
    const SimDataBlock* dbb = *((const SimDataBlock**)b);
 
    return dba->getModifiedKey() - dbb->getModifiedKey();
@@ -605,6 +612,6 @@ void SimDataBlockGroup::sort()
    if(mLastModifiedKey != SimDataBlock::getNextModifiedKey())
    {
       mLastModifiedKey = SimDataBlock::getNextModifiedKey();
-    	dQsort(objectList.address(),objectList.size(),sizeof(SimObject *),compareModifiedKey);
+      dQsort(objectList.address(),objectList.size(),sizeof(SimObject *),compareModifiedKey);
    }
 }

@@ -38,9 +38,13 @@
 
 duDebugDrawTorque::duDebugDrawTorque()
 {
+   mPrimType = 0;
+   mQuadsMode = false;
+   mVertCount = 0;
+   mGroup = 0;
+   mCurrColor = 0;
    mOverrideColor = 0;
    mOverride = false;
-   mGroup = 0;
 }
 
 duDebugDrawTorque::~duDebugDrawTorque()

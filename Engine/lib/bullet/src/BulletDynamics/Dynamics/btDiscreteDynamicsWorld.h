@@ -30,6 +30,7 @@ class btIDebugDraw;
 struct InplaceSolverIslandCallback;
 
 #include "LinearMath/btAlignedObjectArray.h"
+#include "LinearMath/btThreads.h"
 
 
 ///btDiscreteDynamicsWorld provides discrete rigid body simulation
@@ -53,6 +54,7 @@ protected:
 
 	//for variable timesteps
 	btScalar	m_localTime;
+	btScalar	m_fixedTimeStep;
 	//for variable timesteps
 
 	bool	m_ownsIslandManager;
@@ -64,17 +66,21 @@ protected:
 	
 	int	m_profileTimings;
 
+	bool	m_latencyMotionStateInterpolation;
+
 	btAlignedObjectArray<btPersistentManifold*>	m_predictiveManifolds;
+    btSpinMutex m_predictiveManifoldsMutex;  // used to synchronize threads creating predictive contacts
 
 	virtual void	predictUnconstraintMotion(btScalar timeStep);
 	
+    void integrateTransformsInternal( btRigidBody** bodies, int numBodies, btScalar timeStep );  // can be called in parallel
 	virtual void	integrateTransforms(btScalar timeStep);
 		
 	virtual void	calculateSimulationIslands();
 
 	virtual void	solveConstraints(btContactSolverInfo& solverInfo);
 	
-	void	updateActivationState(btScalar timeStep);
+	virtual void	updateActivationState(btScalar timeStep);
 
 	void	updateActions(btScalar timeStep);
 
@@ -82,7 +88,9 @@ protected:
 
 	virtual void	internalSingleStepSimulation( btScalar timeStep);
 
-	void	createPredictiveContacts(btScalar timeStep);
+    void releasePredictiveContacts();
+    void createPredictiveContactsInternal( btRigidBody** bodies, int numBodies, btScalar timeStep );  // can be called in parallel
+	virtual void	createPredictiveContacts(btScalar timeStep);
 
 	virtual void	saveKinematicState(btScalar timeStep);
 
@@ -148,7 +156,7 @@ public:
 	virtual void	removeCollisionObject(btCollisionObject* collisionObject);
 
 
-	void	debugDrawConstraint(btTypedConstraint* constraint);
+	virtual void	debugDrawConstraint(btTypedConstraint* constraint);
 
 	virtual void	debugDrawWorld();
 
@@ -216,6 +224,16 @@ public:
 	///Preliminary serialization test for Bullet 2.76. Loading those files requires a separate parser (see Bullet/Demos/SerializeDemo)
 	virtual	void	serialize(btSerializer* serializer);
 
+	///Interpolate motion state between previous and current transform, instead of current and next transform.
+	///This can relieve discontinuities in the rendering, due to penetrations
+	void setLatencyMotionStateInterpolation(bool latencyInterpolation )
+	{
+		m_latencyMotionStateInterpolation = latencyInterpolation;
+	}
+	bool getLatencyMotionStateInterpolation() const
+	{
+		return m_latencyMotionStateInterpolation;
+	}
 };
 
 #endif //BT_DISCRETE_DYNAMICS_WORLD_H

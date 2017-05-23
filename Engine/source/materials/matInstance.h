@@ -65,16 +65,19 @@ public:
    virtual MaterialParameterHandle* getMaterialParameterHandle(const String& name);
    virtual bool setupPass(SceneRenderState *, const SceneData &sgData );
    virtual void setTransforms(const MatrixSet &matrixSet, SceneRenderState *state);
+   virtual void setNodeTransforms(const MatrixF *address, const U32 numTransforms);
    virtual void setSceneInfo(SceneRenderState *, const SceneData& sgData);
    virtual void setTextureStages(SceneRenderState * state, const SceneData &sgData );
    virtual void setBuffers(GFXVertexBufferHandleBase* vertBuffer, GFXPrimitiveBufferHandle* primBuffer);
    virtual bool isInstanced() const;
    virtual bool stepInstance();
    virtual bool isForwardLit() const { return mIsForwardLit; }
+   virtual bool isHardwareSkinned() const { return mIsHardwareSkinned; }
    virtual void setUserObject( SimObject *userObject ) { mUserObject = userObject; }
    virtual SimObject* getUserObject() const { return mUserObject; }
    virtual Material *getMaterial() { return mMaterial; }
    virtual bool hasGlow();
+   virtual bool hasAccumulation();
    virtual U32 getCurPass() { return getMax( mCurPass, 0 ); }
    virtual U32 getCurStageNum();
    virtual RenderPassData *getPass(U32 pass);   
@@ -111,6 +114,9 @@ protected:
 
    /// If the processed material requires forward lighting or not.
    bool mIsForwardLit;
+
+   /// If the processed material requires bone transforms
+   bool mIsHardwareSkinned;
 
    S32               mCurPass;
    U32               mMaxStages;

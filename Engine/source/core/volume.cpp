@@ -651,7 +651,7 @@ bool MountSystem::unmount(FileSystemRef fs)
    // also check that fs is not null each time since its a strong ref
    // so it could be nulled during removal.
    bool unmounted = false;
-   for (int i = mMountList.size() - 1; !fs.isNull() && i >= 0; --i)
+   for (S32 i = mMountList.size() - 1; !fs.isNull() && i >= 0; --i)
    {
       if (mMountList[i].fileSystem.getPointer() == fs.getPointer())
       {
@@ -944,12 +944,22 @@ bool ReadFile(const Path &inPath, void *&outData, U32 &outSize, bool inNullTermi
    if ( inNullTerminate )
    {
       outData = new char [outSize+1];
+      if( !outData )
+      {
+          // out of memory
+          return false;
+      }
       sizeRead = fileR->read(outData, outSize);
       static_cast<char *>(outData)[outSize] = '\0';
    }
    else
    {
       outData = new char [outSize];
+      if( !outData )
+      {
+          // out of memory
+          return false;
+      }
       sizeRead = fileR->read(outData, outSize);
    }
 

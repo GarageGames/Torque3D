@@ -30,8 +30,7 @@ namespace
   }
 }
 
-const btScalar btPolarDecomposition::DEFAULT_TOLERANCE = btScalar(0.0001);
-const unsigned int btPolarDecomposition::DEFAULT_MAX_ITERATIONS = 16;
+
 
 btPolarDecomposition::btPolarDecomposition(btScalar tolerance, unsigned int maxIterations)
 : m_tolerance(tolerance)
@@ -60,10 +59,10 @@ unsigned int btPolarDecomposition::decompose(const btMatrix3x3& a, btMatrix3x3& 
       break;
 
     const btScalar gamma = btPow(h_norm / u_norm, 0.25f);
-    const btScalar inv_gamma = 1.0 / gamma;
+    const btScalar inv_gamma = btScalar(1.0) / gamma;
 
     // Determine the delta to 'u'
-    const btMatrix3x3 delta = (u * (gamma - 2.0) + h.transpose() * inv_gamma) * 0.5;
+    const btMatrix3x3 delta = (u * (gamma - btScalar(2.0)) + h.transpose() * inv_gamma) * btScalar(0.5);
 
     // Update the matrices
     u += delta;

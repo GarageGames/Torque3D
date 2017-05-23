@@ -25,12 +25,47 @@
 #include "gfx/gl/gfxGLEnumTranslate.h"
 #include "gfx/gl/gfxGLUtils.h"
 #include "gfx/gl/gfxGLTextureObject.h"
+#include "core/crc.h"
 
+namespace DictHash
+{
+   inline U32 hash(const GFXSamplerStateDesc &data)
+   {
+      return CRC::calculateCRC(&data, sizeof(GFXSamplerStateDesc));;
+   }
+}
 
 GFXGLStateBlock::GFXGLStateBlock(const GFXStateBlockDesc& desc) :
    mDesc(desc),
    mCachedHashValue(desc.getHashValue())
 {
+    if( !GFXGL->mCapabilities.samplerObjects )
+      return;
+
+   static Map<GFXSamplerStateDesc, U32> mSamplersMap;
+
+   for(int i = 0; i < TEXTURE_STAGE_COUNT; ++i)
+   {
+      GLuint &id = mSamplerObjects[i];
+      GFXSamplerStateDesc &ssd = mDesc.samplers[i];
+      Map<GFXSamplerStateDesc, U32>::Iterator itr =  mSamplersMap.find(ssd);
+      if(itr == mSamplersMap.end())
+      {
+         glGenSamplers(1, &id);
+
+         glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, minificationFilter(ssd.minFilter, ssd.mipFilter, 1) );
+         glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GFXGLTextureFilter[ssd.magFilter]);
+         glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GFXGLTextureAddress[ssd.addressModeU]);
+         glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GFXGLTextureAddress[ssd.addressModeV]);
+         glSamplerParameteri(id, GL_TEXTURE_WRAP_R, GFXGLTextureAddress[ssd.addressModeW]);
+         if(static_cast< GFXGLDevice* >( GFX )->supportsAnisotropic() )
+            glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, ssd.maxAnisotropy);
+
+         mSamplersMap[ssd] = id;
+      }
+      else
+         id = itr->value;
+   }
 }
 
 GFXGLStateBlock::~GFXGLStateBlock()
@@ -53,6 +88,7 @@ const GFXStateBlockDesc& GFXGLStateBlock::getDesc() const
 /// @param oldState  The current state, used to make sure we don't set redundant states on the device.  Pass NULL to reset all states.
 void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
 {
+   PROFILE_SCOPE(GFXGLStateBlock_Activate);
    // Big scary warning copied from Apple docs 
    // http://developer.apple.com/documentation/GraphicsImaging/Conceptual/OpenGL-MacProgGuide/opengl_performance/chapter_13_section_2.html#//apple_ref/doc/uid/TP40001987-CH213-SW12
    // Don't set a state that's already set. Once a feature is enabled, it does not need to be enabled again.
@@ -63,7 +99,7 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
 
 #define STATE_CHANGE(state) (!oldState || oldState->mDesc.state != mDesc.state)
 #define TOGGLE_STATE(state, enum) if(mDesc.state) glEnable(enum); else glDisable(enum)
-#define CHECK_TOGGLE_STATE(state, enum) if(!oldState || oldState->mDesc.state != mDesc.state) if(mDesc.state) glEnable(enum); else glDisable(enum)
+#define CHECK_TOGGLE_STATE(state, enum) if(!oldState || oldState->mDesc.state != mDesc.state) {if(mDesc.state) glEnable(enum); else glDisable(enum);}
 
    // Blending
    CHECK_TOGGLE_STATE(blendEnable, GL_BLEND);
@@ -72,10 +108,13 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
    if(STATE_CHANGE(blendOp))
       glBlendEquation(GFXGLBlendOp[mDesc.blendOp]);
 
-   // Alpha testing
-   CHECK_TOGGLE_STATE(alphaTestEnable, GL_ALPHA_TEST);      
-   if(STATE_CHANGE(alphaTestFunc) || STATE_CHANGE(alphaTestRef))
-      glAlphaFunc(GFXGLCmpFunc[mDesc.alphaTestFunc], (F32) mDesc.alphaTestRef * 1.0f/255.0f);
+   if (mDesc.separateAlphaBlendEnable == true)
+   {
+       if (STATE_CHANGE(separateAlphaBlendSrc) || STATE_CHANGE(separateAlphaBlendDest))
+           glBlendFuncSeparate(GFXGLBlend[mDesc.blendSrc], GFXGLBlend[mDesc.blendDest], GFXGLBlend[mDesc.separateAlphaBlendSrc], GFXGLBlend[mDesc.separateAlphaBlendDest]);
+       if (STATE_CHANGE(separateAlphaBlendOp))
+           glBlendEquationSeparate(GFXGLBlendOp[mDesc.blendOp], GFXGLBlendOp[mDesc.separateAlphaBlendOp]);
+   }
 
    // Color write masks
    if(STATE_CHANGE(colorWriteRed) || STATE_CHANGE(colorWriteBlue) || STATE_CHANGE(colorWriteGreen) || STATE_CHANGE(colorWriteAlpha))
@@ -117,12 +156,7 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
       glStencilOp(GFXGLStencilOp[mDesc.stencilFailOp], GFXGLStencilOp[mDesc.stencilZFailOp], GFXGLStencilOp[mDesc.stencilPassOp]);
    if(STATE_CHANGE(stencilWriteMask))
       glStencilMask(mDesc.stencilWriteMask);
-
-   // "Misc"
-   CHECK_TOGGLE_STATE(ffLighting, GL_LIGHTING);
-
-   glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-   CHECK_TOGGLE_STATE(vertexColorEnable, GL_COLOR_MATERIAL);
+   
 
    if(STATE_CHANGE(fillMode))
       glPolygonMode(GL_FRONT_AND_BACK, GFXGLFillMode[mDesc.fillMode]);
@@ -131,57 +165,15 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
 #undef TOGGLE_STATE
 #undef CHECK_TOGGLE_STATE
 
-   // TODO: states added for detail blend
-
-   // Non per object texture mode states
-   for (U32 i = 0; i < getMin(getOwningDevice()->getNumSamplers(), (U32) TEXTURE_STAGE_COUNT); i++)
+   //sampler objects
+   if( GFXGL->mCapabilities.samplerObjects )
    {
-      GFXGLTextureObject* tex = static_cast<GFXGLTextureObject*>(getOwningDevice()->getCurrentTexture(i));
-      const GFXSamplerStateDesc &ssd = mDesc.samplers[i];
-      bool updateTexParam = true;
-      glActiveTexture(GL_TEXTURE0 + i);
-      switch (ssd.textureColorOp)
+      for (U32 i = 0; i < getMin(getOwningDevice()->getNumSamplers(), (U32) TEXTURE_STAGE_COUNT); i++)
       {
-      case GFXTOPDisable :
-         if(!tex)
-            break;
-         glDisable(GL_TEXTURE_2D);
-         updateTexParam = false;
-         break;
-      case GFXTOPModulate :
-         glEnable(GL_TEXTURE_2D);
-         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-         break;
-      case GFXTOPAdd :
-         glEnable(GL_TEXTURE_2D);
-         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD);
-         break;
-      default :
-         glEnable(GL_TEXTURE_2D);
-         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-         break;
+         if(!oldState || oldState->mSamplerObjects[i] != mSamplerObjects[i])
+            glBindSampler(i, mSamplerObjects[i] );
       }
+   }    
 
-#define SSF(state, enum, value, tex) if(!oldState || oldState->mDesc.samplers[i].state != mDesc.samplers[i].state) glTexParameteri(tex->getBinding(), enum, value)
-#define SSW(state, enum, value, tex) if(!oldState || oldState->mDesc.samplers[i].state != mDesc.samplers[i].state) glTexParameteri(tex->getBinding(), enum, !tex->mIsNPoT2 ? value : GL_CLAMP_TO_EDGE)
-      // Per object texture mode states. 
-      // TODO: Check dirty flag of samplers[i] and don't do this if it's dirty (it'll happen in the texture bind)
-      if (updateTexParam && tex)
-      {
-         SSF(minFilter, GL_TEXTURE_MIN_FILTER, minificationFilter(ssd.minFilter, ssd.mipFilter, tex->mMipLevels), tex);
-         SSF(mipFilter, GL_TEXTURE_MIN_FILTER, minificationFilter(ssd.minFilter, ssd.mipFilter, tex->mMipLevels), tex);
-         SSF(magFilter, GL_TEXTURE_MAG_FILTER, GFXGLTextureFilter[ssd.magFilter], tex);
-         SSW(addressModeU, GL_TEXTURE_WRAP_S, GFXGLTextureAddress[ssd.addressModeU], tex);
-         SSW(addressModeV, GL_TEXTURE_WRAP_T, GFXGLTextureAddress[ssd.addressModeV], tex);
-
-         if( ( !oldState || oldState->mDesc.samplers[i].maxAnisotropy != ssd.maxAnisotropy ) &&
-             static_cast< GFXGLDevice* >( GFX )->supportsAnisotropic() )
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, ssd.maxAnisotropy);
-
-         if( ( !oldState || oldState->mDesc.samplers[i].mipLODBias != ssd.mipLODBias ) )
-            glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, ssd.mipLODBias);
-      }     
-   }
-#undef SSF
-#undef SSW
+   // TODO: states added for detail blend   
 }

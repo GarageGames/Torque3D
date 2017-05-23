@@ -40,7 +40,7 @@ class dtLocalBoundary
 	dtPolyRef m_polys[MAX_LOCAL_POLYS];
 	int m_npolys;
 
-	void addSegment(const float dist, const float* seg);
+	void addSegment(const float dist, const float* s);
 	
 public:
 	dtLocalBoundary();
@@ -56,6 +56,11 @@ public:
 	inline const float* getCenter() const { return m_center; }
 	inline int getSegmentCount() const { return m_nsegs; }
 	inline const float* getSegment(int i) const { return m_segs[i].s; }
+
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	dtLocalBoundary(const dtLocalBoundary&);
+	dtLocalBoundary& operator=(const dtLocalBoundary&);
 };
 
 #endif // DETOURLOCALBOUNDARY_H

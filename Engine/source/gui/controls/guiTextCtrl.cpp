@@ -37,13 +37,13 @@ ConsoleDocClass( GuiTextCtrl,
    "@brief GUI control object this displays a single line of text, without TorqueML.\n\n"
 
    "@tsexample\n"
-   "	new GuiTextCtrl()\n"
-   "	{\n"
-   "		text = \"Hello World\";\n"
-   "		textID = \"\"STR_HELLO\"\";\n"
-   "		maxlength = \"1024\";\n"
-   "	    //Properties not specific to this control have been omitted from this example.\n"
-   "	};\n"
+   "  new GuiTextCtrl()\n"
+   "  {\n"
+   "     text = \"Hello World\";\n"
+   "     textID = \"\"STR_HELLO\"\";\n"
+   "     maxlength = \"1024\";\n"
+   "      //Properties not specific to this control have been omitted from this example.\n"
+   "  };\n"
    "@endtsexample\n\n"
 
    "@see GuiControl\n"
@@ -54,8 +54,8 @@ ConsoleDocClass( GuiTextCtrl,
 GuiTextCtrl::GuiTextCtrl()
 {
    //default fonts
-   mInitialText = StringTable->insert("");
-   mInitialTextID = StringTable->insert("");
+   mInitialText = StringTable->EmptyString();
+   mInitialTextID = StringTable->EmptyString();
    mText[0] = '\0';
    mMaxStrLen = GuiTextCtrl::MAX_STRING_LENGTH;
 }
@@ -84,7 +84,7 @@ DefineEngineMethod( GuiTextCtrl, setTextID, void, (const char* textID),,
    "@see GuiControl"
    "@see Localization")
 {
-	object->setTextID( textID );
+   object->setTextID( textID );
 }
 
 void GuiTextCtrl::initPersistFields()
@@ -117,7 +117,7 @@ void GuiTextCtrl::inspectPostApply()
 {
    Parent::inspectPostApply();
    if(mInitialTextID && *mInitialTextID != 0)
-	   setTextID(mInitialTextID);
+      setTextID(mInitialTextID);
    else if( mConsoleVariable[ 0 ] )
       setText( getVariable() );
    else
@@ -135,7 +135,7 @@ bool GuiTextCtrl::onWake()
       return false;
    }
    if(mInitialTextID && *mInitialTextID != 0)
-	   setTextID(mInitialTextID);
+      setTextID(mInitialTextID);
 
    if ( mConsoleVariable[0] )
    {
@@ -187,8 +187,10 @@ void GuiTextCtrl::setText(const char *txt)
    //make sure we don't call this before onAdd();
    if( !mProfile )
       return;
-   
-   if (txt)
+
+   // The txt pointer is sometimes the same as the mText pointer, so make sure
+   // we don't call strncpy with overlapping src and dest.
+   if (txt && txt != mText)
       dStrncpy(mText, (UTF8*)txt, MAX_STRING_LENGTH);
    mText[MAX_STRING_LENGTH] = '\0';
    
@@ -200,19 +202,19 @@ void GuiTextCtrl::setText(const char *txt)
 
 void GuiTextCtrl::setTextID(const char *id)
 {
-	S32 n = Con::getIntVariable(id, -1);
-	if(n != -1)
-	{
-		mInitialTextID = StringTable->insert(id);
-		setTextID(n);
-	}
+   S32 n = Con::getIntVariable(id, -1);
+   if(n != -1)
+   {
+      mInitialTextID = StringTable->insert(id);
+      setTextID(n);
+   }
 }
 void GuiTextCtrl::setTextID(S32 id)
 {
-	const UTF8 *str = getGUIString(id);
-	if(str)
-		setText((const char*)str);
-	//mInitialTextID = id;
+   const UTF8 *str = getGUIString(id);
+   if(str)
+      setText((const char*)str);
+   //mInitialTextID = id;
 }
 
 void GuiTextCtrl::onPreRender()

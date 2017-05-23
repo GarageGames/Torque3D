@@ -55,10 +55,6 @@ bool GameTSCtrl::onAdd()
    if ( !Parent::onAdd() )
       return false;
 
-#ifdef TORQUE_DEMO_WATERMARK
-   mWatermark.init();
-#endif
-
    return true;
 }
 
@@ -172,10 +168,6 @@ void GameTSCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    if(!skipRender || true)
       Parent::onRender(offset, updateRect);
-
-#ifdef TORQUE_DEMO_WATERMARK
-   mWatermark.render(getExtent());
-#endif
 }
 
 //--------------------------------------------------------------------------

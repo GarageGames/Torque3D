@@ -49,42 +49,42 @@ void TypeValidator::consoleError(SimObject *object, const char *format, ...)
 
 void FRangeValidator::validateType(SimObject *object, void *typePtr)
 {
-	F32 *v = (F32 *) typePtr;
-	if(*v < minV || *v > maxV)
-	{
-		consoleError(object, "Must be between %g and %g", minV, maxV);
-		if(*v < minV)
-			*v = minV;
-		else if(*v > maxV)
-			*v = maxV;
-	}
+   F32 *v = (F32 *) typePtr;
+   if(*v < minV || *v > maxV)
+   {
+      consoleError(object, "Must be between %g and %g", minV, maxV);
+      if(*v < minV)
+         *v = minV;
+      else if(*v > maxV)
+         *v = maxV;
+   }
 }
 
 void IRangeValidator::validateType(SimObject *object, void *typePtr)
 {
-	S32 *v = (S32 *) typePtr;
-	if(*v < minV || *v > maxV)
-	{
-		consoleError(object, "Must be between %d and %d", minV, maxV);
-		if(*v < minV)
-			*v = minV;
-		else if(*v > maxV)
-			*v = maxV;
-	}
+   S32 *v = (S32 *) typePtr;
+   if(*v < minV || *v > maxV)
+   {
+      consoleError(object, "Must be between %d and %d", minV, maxV);
+      if(*v < minV)
+         *v = minV;
+      else if(*v > maxV)
+         *v = maxV;
+   }
 }
 
 void IRangeValidatorScaled::validateType(SimObject *object, void *typePtr)
 {
-	S32 *v = (S32 *) typePtr;
-	*v /= factor;
-	if(*v < minV || *v > maxV)
-	{
-		consoleError(object, "Scaled value must be between %d and %d", minV, maxV);
-		if(*v < minV)
-			*v = minV;
-		else if(*v > maxV)
-			*v = maxV;
-	}
+   S32 *v = (S32 *) typePtr;
+   *v /= factor;
+   if(*v < minV || *v > maxV)
+   {
+      consoleError(object, "Scaled value must be between %d and %d", minV, maxV);
+      if(*v < minV)
+         *v = minV;
+      else if(*v > maxV)
+         *v = maxV;
+   }
 }
 
 void Point3NormalizeValidator::validateType(SimObject *object, void *typePtr)
@@ -101,7 +101,7 @@ void Point3NormalizeValidator::validateType(SimObject *object, void *typePtr)
 namespace CommonValidators
 {
    FRangeValidator PositiveFloat(0.0f, F32_MAX);
-   FRangeValidator PositiveNonZeroFloat(F32( POINT_EPSILON ) , F32_MAX);
+   FRangeValidator PositiveNonZeroFloat((F32)POINT_EPSILON, F32_MAX);
    FRangeValidator NormalizedFloat(0.0f, 1.0f);
    Point3NormalizeValidator NormalizedPoint3(1.0f);
 };

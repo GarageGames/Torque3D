@@ -70,7 +70,7 @@ ConsoleFunction( MathInit, void, 1, 10, "(detect|C|FPU|MMX|3DNOW|SSE|...)")
          properties |= CPU_PROP_SSE;
          continue;
       }
-      Con::printf("Error: MathInit(): ignoring unknown math extension '%s'", *argv);
+      Con::printf("Error: MathInit(): ignoring unknown math extension '%s'", (const char*)argv[0]);
    }
    Math::init(properties);
 }
@@ -130,17 +130,42 @@ F32 Platform::getRandom()
    return sgPlatRandom.randF();
 }
 
+
+#if defined(TORQUE_CPU_X86) || defined(__x86_64__)
+
+U32 Platform::getMathControlState()
+{
+   U16 cw;
+   asm("fstcw %0" : "=m" (cw) :);
+   return cw;
+}
+
+void Platform::setMathControlState(U32 state)
+{
+   U16 cw = state;
+   asm("fldcw %0" : : "m" (cw));
+}
+
+void Platform::setMathControlStateKnown()
+{
+   U16 cw = 0x27F;
+   asm("fldcw %0" : : "m" (cw));
+}
+
+#else
+
 U32 Platform::getMathControlState()
 {
    return 0;
 }
 
-void Platform::setMathControlStateKnown()
-{
-   
-}
-
 void Platform::setMathControlState(U32 state)
 {
-   
 }
+
+void Platform::setMathControlStateKnown()
+{
+}
+
+#endif
+

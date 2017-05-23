@@ -293,6 +293,7 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
       break;
      case GFXFormatR8G8B8:       mBytesPerPixel = 3;
       break;
+     case GFXFormatR8G8B8A8_LINEAR_FORCE:
      case GFXFormatR8G8B8X8:
      case GFXFormatR8G8B8A8:     mBytesPerPixel = 4;
       break;
@@ -327,6 +328,9 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
          mNumMipLevels++;
          allocPixels += currWidth * currHeight * mBytesPerPixel;
       } while (currWidth != 1 || currHeight != 1);
+
+      U32 expectedMips = mFloor(mLog2(mMax(in_width, in_height))) + 1;
+      AssertFatal(mNumMipLevels == expectedMips, "GBitmap::allocateBitmap: mipmap count wrong");
    }
    AssertFatal(mNumMipLevels <= c_maxMipLevels, "GBitmap::allocateBitmap: too many miplevels");
 
@@ -607,31 +611,31 @@ bool GBitmap::checkForTransparency()
 //------------------------------------------------------------------------------
 ColorF GBitmap::sampleTexel(F32 u, F32 v) const
 {
-	ColorF col(0.5f, 0.5f, 0.5f);
-	// normally sampling wraps all the way around at 1.0,
-	// but locking doesn't support this, and we seem to calc
-	// the uv based on a clamped 0 - 1...
-	Point2F max((F32)(getWidth()-1), (F32)(getHeight()-1));
-	Point2F posf;
-	posf.x = mClampF(((u) * max.x), 0.0f, max.x);
-	posf.y = mClampF(((v) * max.y), 0.0f, max.y);
-	Point2I posi((S32)posf.x, (S32)posf.y);
+   ColorF col(0.5f, 0.5f, 0.5f);
+   // normally sampling wraps all the way around at 1.0,
+   // but locking doesn't support this, and we seem to calc
+   // the uv based on a clamped 0 - 1...
+   Point2F max((F32)(getWidth()-1), (F32)(getHeight()-1));
+   Point2F posf;
+   posf.x = mClampF(((u) * max.x), 0.0f, max.x);
+   posf.y = mClampF(((v) * max.y), 0.0f, max.y);
+   Point2I posi((S32)posf.x, (S32)posf.y);
 
-	const U8 *buffer = getBits();
-	U32 lexelindex = ((posi.y * getWidth()) + posi.x) * mBytesPerPixel;
+   const U8 *buffer = getBits();
+   U32 lexelindex = ((posi.y * getWidth()) + posi.x) * mBytesPerPixel;
 
-	if(mBytesPerPixel == 2)
-	{
-		//U16 *buffer = (U16 *)lockrect->pBits;
-	}
-	else if(mBytesPerPixel > 2)
-	{		
-		col.red = F32(buffer[lexelindex + 0]) / 255.0f;
+   if(mBytesPerPixel == 2)
+   {
+      //U16 *buffer = (U16 *)lockrect->pBits;
+   }
+   else if(mBytesPerPixel > 2)
+   {     
+      col.red = F32(buffer[lexelindex + 0]) / 255.0f;
       col.green = F32(buffer[lexelindex + 1]) / 255.0f;
-		col.blue = F32(buffer[lexelindex + 2]) / 255.0f;
-	}
+      col.blue = F32(buffer[lexelindex + 2]) / 255.0f;
+   }
 
-	return col;
+   return col;
 }
 
 //--------------------------------------------------------------------------
@@ -796,11 +800,11 @@ bool GBitmap::combine( const GBitmap *bitmapA, const GBitmap *bitmapB, const GFX
    const U8 *aBits = bitmapA->getBits();
    const U8 *bBits = bitmapB->getBits();
 
-   for( int y = 0; y < getHeight(); y++ )
+   for( S32 y = 0; y < getHeight(); y++ )
    {
-      for( int x = 0; x < getWidth(); x++ )
+      for( S32 x = 0; x < getWidth(); x++ )
       {
-         for( int _byte = 0; _byte < mBytesPerPixel; _byte++ )
+         for( S32 _byte = 0; _byte < mBytesPerPixel; _byte++ )
          {
             U8 pxA = 0;
             U8 pxB = 0;
@@ -1053,6 +1057,7 @@ bool GBitmap::write(Stream& io_rStream) const
 
 bool  GBitmap::readBitmap( const String &bmType, Stream &ioStream )
 {
+   PROFILE_SCOPE(ResourceGBitmap_readBitmap);
    const GBitmap::Registration   *regInfo = GBitmap::sFindRegInfo( bmType );
 
    if ( regInfo == NULL )

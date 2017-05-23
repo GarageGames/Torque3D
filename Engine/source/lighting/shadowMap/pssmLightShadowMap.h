@@ -56,9 +56,10 @@ protected:
    void _setNumSplits( U32 numSplits, U32 texSize );
    void _calcSplitPos(const Frustum& currFrustum);
    Box3F _calcClipSpaceAABB(const Frustum& f, const MatrixF& transform, F32 farDist);
+   void _calcPlanesCullForShadowCasters(Vector< Vector<PlaneF> > &out, const Frustum &viewFrustum, const Point3F &_ligthDir);
    void _roundProjection(const MatrixF& lightMat, const MatrixF& cropMatrix, Point3F &offset, U32 splitNum);
 
-   static const int MAX_SPLITS = 4;
+   static const S32 MAX_SPLITS = 4;
    U32 mNumSplits;
    F32 mSplitDist[MAX_SPLITS+1];   // +1 because we store a cap
    RectI mViewports[MAX_SPLITS];

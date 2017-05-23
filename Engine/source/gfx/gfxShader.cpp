@@ -35,7 +35,8 @@ bool GFXShader::smLogWarnings = true;
 
 GFXShader::GFXShader()
    :  mPixVersion( 0.0f ),
-      mReloadKey( 0 )
+      mReloadKey( 0 ),
+      mInstancingFormat( NULL )
 {
 }
 
@@ -43,18 +44,41 @@ GFXShader::~GFXShader()
 {
    Torque::FS::RemoveChangeNotification( mVertexFile, this, &GFXShader::_onFileChanged );
    Torque::FS::RemoveChangeNotification( mPixelFile, this, &GFXShader::_onFileChanged );
+
+   SAFE_DELETE(mInstancingFormat);
 }
 
+#ifndef TORQUE_OPENGL
 bool GFXShader::init(   const Torque::Path &vertFile, 
                         const Torque::Path &pixFile, 
                         F32 pixVersion, 
                         const Vector<GFXShaderMacro> &macros )
 {
+   Vector<String> samplerNames;
+   return init( vertFile, pixFile, pixVersion, macros, samplerNames );
+}
+#endif
+
+bool GFXShader::init(   const Torque::Path &vertFile, 
+                        const Torque::Path &pixFile, 
+                        F32 pixVersion, 
+                        const Vector<GFXShaderMacro> &macros,
+                        const Vector<String> &samplerNames,
+                        GFXVertexFormat *instanceFormat)
+{
+   // Take care of instancing
+   if (instanceFormat)
+   {
+      mInstancingFormat = new GFXVertexFormat;
+      mInstancingFormat->copy(*instanceFormat);
+   }
+
    // Store the inputs for use in reloading.
    mVertexFile = vertFile;
    mPixelFile = pixFile;
    mPixVersion = pixVersion;
    mMacros = macros;
+   mSamplerNamesOrdered = samplerNames;
 
    // Before we compile the shader make sure the
    // conditioner features have been updated.
@@ -154,7 +178,7 @@ void GFXShader::_unlinkBuffer( GFXShaderConstBuffer *buf )
 
 
 DefineEngineFunction( addGlobalShaderMacro, void, 
-   ( const char *name, const char *value ), ( NULL ),
+   ( const char *name, const char *value ), ( nullAsType<const char*>() ),
    "Adds a global shader macro which will be merged with the script defined "
    "macros on every shader.  The macro will replace the value of an existing "
    "macro of the same name.  For the new macro to take effect all the shaders "

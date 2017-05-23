@@ -45,6 +45,7 @@ class RenderObjectMgr;
 class RenderTerrainMgr;
 class PlatformTimer;
 class ShadowRenderPassManager;
+class DynamicShadowRenderPassManager;
 
 /// ShadowMapPass, this is plugged into the SceneManager to generate 
 /// ShadowMaps for the scene.
@@ -83,6 +84,11 @@ public:
    static bool smDisableShadowsEditor;
    static bool smDisableShadowsPref;
 
+   /// distance moved per frame before forcing a shadow update
+   static F32 smShadowsTeleportDist;
+   /// angle turned per frame before forcing a shadow update
+   static F32 smShadowsTurnRate;
+
 private:
 
    static U32 smActiveShadowMaps;
@@ -103,8 +109,12 @@ private:
    LightInfoList mLights;
    U32 mActiveLights;
    SimObjectPtr<ShadowRenderPassManager> mShadowRPM;
+   SimObjectPtr<DynamicShadowRenderPassManager> mDynamicShadowRPM;
    LightManager* mLightManager;
    ShadowMapManager* mShadowManager;
+   Point3F mPrevCamPos;
+   Point3F mPrevCamRot;
+   F32 mPrevCamFov;
 };
 
 class ShadowRenderPassManager : public RenderPassManager
@@ -115,6 +125,16 @@ public:
 
    /// Add a RenderInstance to the list
    virtual void addInst( RenderInst *inst );
+};
+
+class DynamicShadowRenderPassManager : public RenderPassManager
+{
+	typedef RenderPassManager Parent;
+public:
+	DynamicShadowRenderPassManager() : Parent() {}
+
+	/// Add a RenderInstance to the list
+	virtual void addInst(RenderInst *inst);
 };
 
 #endif // _SHADOWMAPPASS_H_

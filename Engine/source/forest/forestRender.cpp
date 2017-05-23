@@ -197,6 +197,10 @@ void Forest::prepRenderImage( SceneRenderState *state )
          if ( smDisableImposters )
             continue;
 
+         // if cell are to far for largest item, then skip out.
+         if( TSShapeInstance::smLastPixelSize < TSShapeInstance::smSmallestVisiblePixelSize )
+            continue;
+
          PROFILE_SCOPE(Forest_RenderBatches);
 
          // Keep track of how many cells were batched.

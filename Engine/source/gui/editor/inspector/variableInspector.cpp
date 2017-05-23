@@ -22,6 +22,7 @@
 
 #include "gui/editor/inspector/variableInspector.h"
 #include "gui/editor/inspector/variableGroup.h"
+#include "console/engineAPI.h"
 
 GuiVariableInspector::GuiVariableInspector()
 {
@@ -51,17 +52,14 @@ void GuiVariableInspector::loadVars( String searchStr )
    group->setCaption( "Global Variables" );
    group->mSearchString = searchStr;
 
-   if( group != NULL )
-   {
-      group->registerObject();
-      mGroups.push_back( group );
-      addObject( group );
-   }   
-
+   group->registerObject();
+   mGroups.push_back( group );
+   addObject( group );
+ 
    //group->inspectGroup();
 }
 
-ConsoleMethod( GuiVariableInspector, loadVars, void, 3, 3, "loadVars( searchString )" )
+DefineConsoleMethod( GuiVariableInspector, loadVars, void, ( const char * searchString ), , "loadVars( searchString )" )
 {
-   object->loadVars( argv[2] );
+   object->loadVars( searchString );
 }

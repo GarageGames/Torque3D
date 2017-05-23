@@ -54,8 +54,8 @@ MemStream::MemStream( U32 bufferSize,
    mStreamSize( bufferSize ),
    mBufferBase( buffer ),
    mInstCaps( 0 ),
-   mCurrentPosition( 0 ),
-   mOwnsMemory( false )
+   mOwnsMemory( false ),
+   mCurrentPosition( 0 )
 {
    AssertFatal( bufferSize > 0,  "Invalid buffer size");
    AssertFatal( allowRead || allowWrite, "Either write or read must be allowed");

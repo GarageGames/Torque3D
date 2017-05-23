@@ -103,7 +103,7 @@ class TheoraTextureFrame
       F32 mFrameDuration;
       
       TheoraTextureFrame()
-         : mLockedRect( NULL )
+         : mLockedRect( NULL ), mFrameNumber(0), mFrameTime(0.0f), mFrameDuration(0.0f)
       {
       }
 };

@@ -65,6 +65,7 @@ GFXTextureObject *GFXGLTextureManager::_createTextureObject(   U32 height,
       AssertFatal( dynamic_cast<GFXGLTextureObject*>( inTex ), "GFXGLTextureManager::_createTexture() - Bad inTex type!" );
       retTex = static_cast<GFXGLTextureObject*>( inTex );
       retTex->release();
+      retTex->reInit();
    }      
    else
    {
@@ -98,23 +99,20 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
    retTex->mIsZombie = false;
    retTex->mIsNPoT2 = false;
    
-   GLenum binding = (depth == 0) ? GL_TEXTURE_2D : GL_TEXTURE_3D;
+   GLenum binding = ( (height == 1 || width == 1) && ( height != width ) ) ? GL_TEXTURE_1D : ( (depth == 0) ? GL_TEXTURE_2D : GL_TEXTURE_3D );
    if((profile->testFlag(GFXTextureProfile::RenderTarget) || profile->testFlag(GFXTextureProfile::ZTarget)) && (!isPow2(width) || !isPow2(height)) && !depth)
       retTex->mIsNPoT2 = true;
    retTex->mBinding = binding;
    
    // Bind it
-   glActiveTexture(GL_TEXTURE0);
-   PRESERVE_2D_TEXTURE();
-   PRESERVE_3D_TEXTURE();
-   glBindTexture(binding, retTex->getHandle());
+   PRESERVE_TEXTURE(binding);
+   glBindTexture(retTex->getBinding(), retTex->getHandle());
    
    // Create it
-   // TODO: Reenable mipmaps on render targets when Apple fixes their drivers
-   if(forceMips && !retTex->mIsNPoT2)
+   // @todo OPENGL - Creating mipmaps for compressed formats. Not supported on OpenGL ES and bugged on AMD. We use mipmaps present on file.
+   if( forceMips && !retTex->mIsNPoT2 && !isCompressedFormat(format) )
    {
-      glTexParameteri(binding, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-      retTex->mMipLevels = 0;
+      retTex->mMipLevels = numMipLevels > 1 ? numMipLevels : 0;
    }
    else if(profile->testFlag(GFXTextureProfile::NoMipmap) || profile->testFlag(GFXTextureProfile::RenderTarget) || numMipLevels == 1 || retTex->mIsNPoT2)
    {
@@ -122,10 +120,11 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
    }
    else
    {
-      glTexParameteri(binding, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
-      retTex->mMipLevels = 0;
+      retTex->mMipLevels = numMipLevels;
    }
 
+   // @todo OPENGL - OpenGL ES2 not support mipmaps on NPOT textures
+#if 0
    if(!retTex->mIsNPoT2)
    {
       if(!isPow2(width))
@@ -135,23 +134,82 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
       if(depth && !isPow2(depth))
          depth = getNextPow2(depth);
    }
+#endif
    
    AssertFatal(GFXGLTextureInternalFormat[format] != GL_ZERO, "GFXGLTextureManager::innerCreateTexture - invalid internal format");
    AssertFatal(GFXGLTextureFormat[format] != GL_ZERO, "GFXGLTextureManager::innerCreateTexture - invalid format");
    AssertFatal(GFXGLTextureType[format] != GL_ZERO, "GFXGLTextureManager::innerCreateTexture - invalid type");
-   
-   if(binding != GL_TEXTURE_3D)
-      glTexImage2D(binding, 0, GFXGLTextureInternalFormat[format], width, height, 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
-   else
-      glTexImage3D(GL_TEXTURE_3D, 0, GFXGLTextureInternalFormat[format], width, height, depth, 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
+
+   //calculate num mipmaps
+   if(retTex->mMipLevels == 0)
+      retTex->mMipLevels = getMaxMipmaps(width, height, 1);
+
+    glTexParameteri(binding, GL_TEXTURE_MAX_LEVEL, retTex->mMipLevels-1 );
+    
+    if( GFXGL->mCapabilities.textureStorage )
+    {
+        if(binding == GL_TEXTURE_2D)
+            glTexStorage2D( retTex->getBinding(), retTex->mMipLevels, GFXGLTextureInternalFormat[format], width, height );
+        else if(binding == GL_TEXTURE_1D)
+            glTexStorage1D( retTex->getBinding(), retTex->mMipLevels, GFXGLTextureInternalFormat[format], getMax(width, height) );
+        else
+            glTexStorage3D( retTex->getBinding(), retTex->mMipLevels, GFXGLTextureInternalFormat[format], width, height, depth );
+    }
+    else
+    {
+        //If it wasn't for problems on amd drivers this next part could be really simplified and we wouldn't need to go through manually creating our
+        //mipmap pyramid and instead just use glGenerateMipmap
+        if(isCompressedFormat(format))
+        {
+            AssertFatal(binding == GL_TEXTURE_2D, 
+            "GFXGLTextureManager::innerCreateTexture - Only compressed 2D textures are supported");
+
+            U32 tempWidth = width;
+            U32 tempHeight = height;
+            U32 size = getCompressedSurfaceSize(format,height,width);
+            //Fill compressed images with 0's
+            U8 *pTemp = (U8*)dMalloc(sizeof(U8)*size);
+            dMemset(pTemp,0,size);
+     
+            for(U32 i=0;i< retTex->mMipLevels;i++)
+            {
+                tempWidth = getMax( U32(1), width >> i );
+                tempHeight = getMax( U32(1), height >> i );
+                size = getCompressedSurfaceSize(format,width,height,i);
+                glCompressedTexImage2D(binding,i,GFXGLTextureInternalFormat[format],tempWidth,tempHeight,0,size,pTemp);
+            }
+
+            dFree(pTemp);
+        }
+        else
+        {   
+            if(binding == GL_TEXTURE_2D)
+                glTexImage2D(binding, 0, GFXGLTextureInternalFormat[format], width, height, 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
+            else if(binding == GL_TEXTURE_1D)
+                glTexImage1D(binding, 0, GFXGLTextureInternalFormat[format], (width > 1 ? width : height), 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
+            else
+                glTexImage3D(GL_TEXTURE_3D, 0, GFXGLTextureInternalFormat[format], width, height, depth, 0, GFXGLTextureFormat[format], GFXGLTextureType[format], NULL);
+
+            if(retTex->mMipLevels > 1)
+                glGenerateMipmap(binding);
+        }
+    }
    
    // Complete the texture
-   glTexParameteri(binding, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   // Complete the texture - this does get changed later but we need to complete the texture anyway
+
+   if(retTex->mMipLevels == 1)
+      glTexParameteri(binding, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+   else
+      glTexParameteri(binding, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
    glTexParameteri(binding, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
    glTexParameteri(binding, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
    glTexParameteri(binding, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
    if(binding == GL_TEXTURE_3D)
       glTexParameteri(binding, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+   if(GFXGLTextureSwizzle[format])         
+      glTexParameteriv(binding, GL_TEXTURE_SWIZZLE_RGBA, GFXGLTextureSwizzle[format]);   
    
    // Get the size from GL (you never know...)
    GLint texHeight, texWidth, texDepth = 0;
@@ -170,58 +228,74 @@ void GFXGLTextureManager::innerCreateTexture( GFXGLTextureObject *retTex,
 
 static void _fastTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
 {
-   glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, texture->getBuffer());
+   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, texture->getBuffer());
    U32 bufSize = pDL->getWidth(0) * pDL->getHeight(0) * pDL->getBytesPerPixel();
-   glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, bufSize, NULL, GL_STREAM_DRAW);
-   U8* pboMemory = (U8*)glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
+   glBufferData(GL_PIXEL_UNPACK_BUFFER, bufSize, NULL, GL_STREAM_DRAW);
    
    if(pDL->getFormat() == GFXFormatR8G8B8A8 || pDL->getFormat() == GFXFormatR8G8B8X8)
+   {
+      PROFILE_SCOPE(Swizzle32_Upload);
+      U8* pboMemory = (U8*)dMalloc(bufSize);
       GFX->getDeviceSwizzle32()->ToBuffer(pboMemory, pDL->getBits(0), bufSize);
+      glBufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, bufSize, pboMemory );
+      dFree(pboMemory);
+   }
    else
-      dMemcpy(pboMemory, pDL->getBits(0), bufSize);
+   {
+      PROFILE_SCOPE(SwizzleNull_Upload);
+      glBufferSubData(GL_PIXEL_UNPACK_BUFFER, 0, bufSize, pDL->getBits(0) );
+   }
    
-   glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB);
+   if(texture->getBinding() == GL_TEXTURE_2D)
+	   glTexSubImage2D(texture->getBinding(), 0, 0, 0, pDL->getWidth(0), pDL->getHeight(0), GFXGLTextureFormat[pDL->getFormat()], GFXGLTextureType[pDL->getFormat()], NULL);
+   else
+	   glTexSubImage1D(texture->getBinding(), 0, 0, (pDL->getWidth(0) > 1 ? pDL->getWidth(0) : pDL->getHeight(0)), GFXGLTextureFormat[pDL->getFormat()], GFXGLTextureType[pDL->getFormat()], NULL);
    
-   glTexSubImage2D(texture->getBinding(), 0, 0, 0, pDL->getWidth(0), pDL->getHeight(0), GFXGLTextureFormat[pDL->getFormat()], GFXGLTextureType[pDL->getFormat()], NULL);
-   
-   glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+   glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 
 static void _slowTextureLoad(GFXGLTextureObject* texture, GBitmap* pDL)
 {
-   glTexSubImage2D(texture->getBinding(), 0, 0, 0, pDL->getWidth(0), pDL->getHeight(0), GFXGLTextureFormat[pDL->getFormat()], GFXGLTextureType[pDL->getFormat()], pDL->getBits(0));
+	if(texture->getBinding() == GL_TEXTURE_2D)
+		glTexSubImage2D(texture->getBinding(), 0, 0, 0, pDL->getWidth(0), pDL->getHeight(0), GFXGLTextureFormat[pDL->getFormat()], GFXGLTextureType[pDL->getFormat()], pDL->getBits(0));
+	else
+		glTexSubImage1D(texture->getBinding(), 0, 0, (pDL->getWidth(0) > 1 ? pDL->getWidth(0) : pDL->getHeight(0)), GFXGLTextureFormat[pDL->getFormat()], GFXGLTextureType[pDL->getFormat()], pDL->getBits(0));
 }
 
 bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, GBitmap *pDL)
 {
+   PROFILE_SCOPE(GFXGLTextureManager_loadTexture);
    GFXGLTextureObject *texture = static_cast<GFXGLTextureObject*>(aTexture);
    
-   AssertFatal(texture->getBinding() == GL_TEXTURE_2D, 
-      "GFXGLTextureManager::_loadTexture(GBitmap) - This method can only be used with 2D textures");
+   AssertFatal(texture->getBinding() == GL_TEXTURE_1D || texture->getBinding() == GL_TEXTURE_2D, 
+      "GFXGLTextureManager::_loadTexture(GBitmap) - This method can only be used with 1D/2D textures");
       
-   if(texture->getBinding() != GL_TEXTURE_2D)
+   if(texture->getBinding() == GL_TEXTURE_3D)
       return false;
          
    // No 24bit formats.
    if(pDL->getFormat() == GFXFormatR8G8B8)
       pDL->setFormat(GFXFormatR8G8B8A8);
    // Bind to edit
-   glActiveTexture(GL_TEXTURE0);
-   PRESERVE_2D_TEXTURE();
+   PRESERVE_TEXTURE(texture->getBinding());
    glBindTexture(texture->getBinding(), texture->getHandle());
-   
+
+   texture->mFormat = pDL->getFormat();
    if(pDL->getFormat() == GFXFormatR8G8B8A8 || pDL->getFormat() == GFXFormatR8G8B8X8)
       _fastTextureLoad(texture, pDL);
    else
       _slowTextureLoad(texture, pDL);
-   
-   glBindTexture(texture->getBinding(), 0);
+
+   if(texture->getMipLevels() != 1)
+      glGenerateMipmap(texture->getBinding());
    
    return true;
 }
 
 bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
 {
+   PROFILE_SCOPE(GFXGLTextureManager_loadTextureDDS);
+
    AssertFatal(!(dds->mFormat == GFXFormatDXT2 || dds->mFormat == GFXFormatDXT4), "GFXGLTextureManager::_loadTexture - OpenGL does not support DXT2 or DXT4 compressed textures");
    GFXGLTextureObject* texture = static_cast<GFXGLTextureObject*>(aTexture);
    
@@ -231,17 +305,18 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
    if(texture->getBinding() != GL_TEXTURE_2D)
       return false;
    
-   glActiveTexture(GL_TEXTURE0);
-   PRESERVE_2D_TEXTURE();
+   PRESERVE_TEXTURE(texture->getBinding());
    glBindTexture(texture->getBinding(), texture->getHandle());
+   texture->mFormat = dds->mFormat;
    U32 numMips = dds->mSurfaces[0]->mMips.size();
-   if(GFX->getCardProfiler()->queryProfile("GL::Workaround::noManualMips"))
-      numMips = 1;
+
    for(U32 i = 0; i < numMips; i++)
    {
-      if(dds->mFormat == GFXFormatDXT1 || dds->mFormat == GFXFormatDXT3 || dds->mFormat == GFXFormatDXT5)
+      PROFILE_SCOPE(GFXGLTexMan_loadSurface);
+
+      if(isCompressedFormat(dds->mFormat))
       {
-         if((!isPow2(dds->getWidth()) || !isPow2(dds->getHeight())) && GFX->getCardProfiler()->queryProfile("GL::Workaround::noCompressedNPoTTextures"))
+         if((!isPow2(dds->getWidth()) || !isPow2(dds->getHeight())))
          {
             U32 squishFlag = squish::kDxt1;
             switch (dds->mFormat)
@@ -266,23 +341,24 @@ bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, DDSFile *dds)
       else
          glTexSubImage2D(texture->getBinding(), i, 0, 0, dds->getWidth(i), dds->getHeight(i), GFXGLTextureFormat[dds->mFormat], GFXGLTextureType[dds->mFormat], dds->mSurfaces[0]->mMips[i]);
    }
-   glBindTexture(texture->getBinding(), 0);
+
+   if(numMips !=1 && !isCompressedFormat(dds->mFormat))
+      glGenerateMipmap(texture->getBinding());
    
    return true;
 }
 
 bool GFXGLTextureManager::_loadTexture(GFXTextureObject *aTexture, void *raw)
 {
+   PROFILE_SCOPE(GFXGLTextureManager_loadTextureRaw);
    if(aTexture->getDepth() < 1)
       return false;
    
    GFXGLTextureObject* texture = static_cast<GFXGLTextureObject*>(aTexture);
    
-   glActiveTexture(GL_TEXTURE0);
    PRESERVE_3D_TEXTURE();
-   glBindTexture(GL_TEXTURE_3D, texture->getHandle());
+   glBindTexture(texture->getBinding(), texture->getHandle());
    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, texture->getWidth(), texture->getHeight(), texture->getDepth(), GFXGLTextureFormat[texture->mFormat], GFXGLTextureType[texture->mFormat], raw);
-   glBindTexture(GL_TEXTURE_3D, 0);
    
    return true;
 }

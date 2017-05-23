@@ -33,7 +33,7 @@ class PlatformCursorController
 {
 protected:
 
-   struct CursorShape
+   struct Cursor_Shape
    {
       enum Type
       {
@@ -46,7 +46,7 @@ protected:
       String mCursorFile; // Points to a custom cursor file
    };
 
-   Vector<CursorShape> mCursors;
+   Vector<Cursor_Shape> mCursors;
 
    /// The PlatformWindow that owns this Cursor Controller
    PlatformWindow *mOwner;
@@ -85,7 +85,7 @@ public:
    virtual void setCursorVisible( bool visible ) = 0;
    virtual bool isCursorVisible() = 0;
 
-   virtual void setCursorShape( const CursorShape &shape, bool reload );
+   virtual void setCursorShape( const Cursor_Shape &shape, bool reload );
    virtual void setCursorShape( U32 cursorID ) = 0;
    virtual void setCursorShape( const UTF8 *filename, bool reload ) = 0;
 

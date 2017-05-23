@@ -53,6 +53,7 @@ btConeTwistConstraint::btConeTwistConstraint(btRigidBody& rbA,const btTransform&
 											 m_useSolveConstraintObsolete(CONETWIST_USE_OBSOLETE_SOLVER)
 {
 	m_rbBFrame = m_rbAFrame;
+	m_rbBFrame.setOrigin(btVector3(0., 0., 0.));
 	init();	
 }
 
@@ -136,6 +137,9 @@ void btConeTwistConstraint::getInfo2NonVirtual (btConstraintInfo2* info,const bt
 		btVector3 a1neg = -a1;
 		a1neg.getSkewSymmetricMatrix(angular0,angular1,angular2);
 	}
+    info->m_J2linearAxis[0] = -1;
+    info->m_J2linearAxis[info->rowskip+1] = -1;
+    info->m_J2linearAxis[2*info->rowskip+2] = -1;
 	btVector3 a2 = transB.getBasis() * m_rbBFrame.getOrigin();
 	{
 		btVector3* angular0 = (btVector3*)(info->m_J2angularAxis);
@@ -210,7 +214,7 @@ void btConeTwistConstraint::getInfo2NonVirtual (btConstraintInfo2* info,const bt
 			}
 			// m_swingCorrection is always positive or 0
 			info->m_lowerLimit[srow] = 0;
-			info->m_upperLimit[srow] = SIMD_INFINITY;
+			info->m_upperLimit[srow] = (m_bMotorEnabled && m_maxMotorImpulse >= 0.0f) ? m_maxMotorImpulse : SIMD_INFINITY;
 			srow += info->rowskip;
 		}
 	}
@@ -536,8 +540,8 @@ void btConeTwistConstraint::calcAngleInfo()
 	m_solveTwistLimit = false;
 	m_solveSwingLimit = false;
 
-	btVector3 b1Axis1,b1Axis2,b1Axis3;
-	btVector3 b2Axis1,b2Axis2;
+	btVector3 b1Axis1(0,0,0),b1Axis2(0,0,0),b1Axis3(0,0,0);
+	btVector3 b2Axis1(0,0,0),b2Axis2(0,0,0);
 
 	b1Axis1 = getRigidBodyA().getCenterOfMassTransform().getBasis() * this->m_rbAFrame.getBasis().getColumn(0);
 	b2Axis1 = getRigidBodyB().getCenterOfMassTransform().getBasis() * this->m_rbBFrame.getBasis().getColumn(0);
@@ -725,7 +729,8 @@ void btConeTwistConstraint::calcAngleInfo2(const btTransform& transA, const btTr
 			{
 				if(m_swingSpan1 < m_fixThresh)
 				{ // hinge around Y axis
-					if(!(btFuzzyZero(y)))
+//					if(!(btFuzzyZero(y)))
+					if((!(btFuzzyZero(x))) || (!(btFuzzyZero(z))))
 					{
 						m_solveSwingLimit = true;
 						if(m_swingSpan2 >= m_fixThresh)
@@ -747,7 +752,8 @@ void btConeTwistConstraint::calcAngleInfo2(const btTransform& transA, const btTr
 				}
 				else
 				{ // hinge around Z axis
-					if(!btFuzzyZero(z))
+//					if(!btFuzzyZero(z))
+					if((!(btFuzzyZero(x))) || (!(btFuzzyZero(y))))
 					{
 						m_solveSwingLimit = true;
 						if(m_swingSpan1 >= m_fixThresh)
@@ -772,8 +778,10 @@ void btConeTwistConstraint::calcAngleInfo2(const btTransform& transA, const btTr
 				target[2] = x * ivA[2] + y * jvA[2] + z * kvA[2];
 				target.normalize();
 				m_swingAxis = -ivB.cross(target);
-				m_swingCorrection = m_swingAxis.length();
-				m_swingAxis.normalize();
+                                m_swingCorrection = m_swingAxis.length();
+
+                                if (!btFuzzyZero(m_swingCorrection))
+                                    m_swingAxis.normalize();
 			}
 		}
 
@@ -977,8 +985,8 @@ void btConeTwistConstraint::adjustSwingAxisToUseEllipseNormal(btVector3& vSwingA
 
 void btConeTwistConstraint::setMotorTarget(const btQuaternion &q)
 {
-	btTransform trACur = m_rbA.getCenterOfMassTransform();
-	btTransform trBCur = m_rbB.getCenterOfMassTransform();
+	//btTransform trACur = m_rbA.getCenterOfMassTransform();
+	//btTransform trBCur = m_rbB.getCenterOfMassTransform();
 //	btTransform trABCur = trBCur.inverse() * trACur;
 //	btQuaternion qABCur = trABCur.getRotation();
 //	btTransform trConstraintCur = (trBCur * m_rbBFrame).inverse() * (trACur * m_rbAFrame);

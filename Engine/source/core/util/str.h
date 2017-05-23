@@ -62,7 +62,7 @@ public:
    String();
    String(const String &str);
    String(const StringChar *str);
-   String(const StringChar *str, SizeType size);
+   String(const StringChar *str, SizeType size); ///< Copy from raw data
    String(const UTF16 *str);
    ~String();
 
@@ -74,6 +74,7 @@ public:
    SizeType size() const;     ///< Returns the length of the string in bytes including the NULL terminator.
    SizeType numChars() const; ///< Returns the length of the string in characters.
    bool     isEmpty() const;  ///< Is this an empty string [""]?
+   static bool isEmpty(const char*); // is the input empty?
    bool     isNotEmpty() const { return !isEmpty(); }  ///< Is this not an empty string [""]?
 
    /// Erases all characters in a string.
@@ -176,7 +177,7 @@ public:
    /// @{
 
    static String ToString(const char *format, ...);
-   static String VToString(const char* format, void* args);
+   static String VToString(const char* format, va_list args);
 
    static String ToString( bool v );
    static inline String ToString( U32 v ) { return ToString( "%u", v ); }
@@ -190,6 +191,7 @@ public:
    static String ToUpper(const String &string);
 
    static String GetTrailingNumber(const char* str, S32& number);
+   static String GetFirstNumber(const char* str, U32& startPos, U32& endPos);
 
    /// @}
 
@@ -245,7 +247,7 @@ public:
          _fixedBuffer[0] = '\0';
       }
 
-      StrFormat(const char *formatStr, void *args)
+      StrFormat(const char *formatStr, va_list args)
          :  _dynamicBuffer( NULL ),
             _dynamicSize( 0 ),
             _len( 0 )
@@ -255,8 +257,8 @@ public:
 
       ~StrFormat();
 
-      S32 format( const char *format, void *args );
-      S32 formatAppend( const char *format, void *args );
+      S32 format( const char *format, va_list args );
+      S32 formatAppend( const char *format, va_list args );
       S32 append(const char * str, S32 len);
       S32 append(const char * str);
 
@@ -292,10 +294,9 @@ private:
    // causes an ambiguous cast compile error.  Making it private is simply
    // more insurance that it isn't used on different compilers.
    // NOTE: disable on GCC since it causes hyper casting to U32 on gcc.
-#ifndef TORQUE_COMPILER_GCC
+#if !defined(TORQUE_COMPILER_GCC) && !defined(__clang__)
    operator const bool() const { return false; }
 #endif
-
 
    static void copy(StringChar *dst, const StringChar *src, U32 size);
 
@@ -357,7 +358,7 @@ class StringBuilder
       {
          va_list args;
          va_start(args, fmt);
-         return mFormat.formatAppend(fmt, &args);
+         return mFormat.formatAppend(fmt, args);
       }
 };
 

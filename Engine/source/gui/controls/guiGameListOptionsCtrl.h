@@ -41,7 +41,7 @@ protected:
       S32                        mSelectedOption;  ///< Index into mOptions pointing at the selected option
       bool                       mWrapOptions;     ///< Determines if options should "wrap around" at the ends
 
-      Row()
+      Row() : mSelectedOption(0), mWrapOptions(false)
       {
          VECTOR_SET_ASSOCIATION( mOptions );
       }

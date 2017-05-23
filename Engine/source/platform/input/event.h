@@ -429,7 +429,7 @@ struct InputEventInfo
    U16 ascii;
    
    /// Modifiers to action: SI_LSHIFT, SI_LCTRL, etc.
-   InputModifiers modifier;
+   U32 modifier;
 
    inline void postToSignal(InputEvent &ie)
    {
@@ -496,13 +496,16 @@ public:
    void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, S32 iValue);
 
    /// Build an input event based on a single fValue
-   void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, float fValue);
+   void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, F32 fValue);
 
    /// Build an input event based on a Point3F
    void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, Point3F& pValue);
 
    /// Build an input event based on a QuatF
    void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, QuatF& qValue);
+
+   /// Build an input event based on a AngAxisF
+   void buildInputEvent(U32 deviceType, U32 deviceInst, InputEventType objType, InputObjectInstances objInst, InputActionType action, AngAxisF& qValue);
 
 protected:
    U32 mNextDeviceTypeCode;

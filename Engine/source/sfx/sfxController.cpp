@@ -324,8 +324,8 @@ void SFXController::_printInsn( Insn& insn)
          Con::printf( "[SFXController] ip=%d: slot=%d: state=%s: Delay %f:%f:%f",
             mIp, insn.mSlotIndex, insn.mState ? insn.mState->getName() : "",
             insn.mArg.mDelayTime.mValue[ 0 ],
-            insn.mArg.mDelayTime.mVariance[ 0 ],
-            insn.mArg.mDelayTime.mVariance[ 1 ]
+            insn.mArg.mDelayTime.mVariance[ 0 ][ 0 ],
+            insn.mArg.mDelayTime.mVariance[ 0 ][ 1 ]
          );
          break;
          
@@ -689,6 +689,7 @@ void SFXController::_play()
    // Unpause sources, if we are paused.
    
    if( mStatus == SFXStatusPaused )
+   {
       for( U32 i = 0; i < mSources.size(); ++ i )
          if( mSources[ i ].mPtr != NULL )
             mSources[ i ].mPtr->play( 0.f ); // We want our fade values to take effect.
@@ -697,6 +698,7 @@ void SFXController::_play()
             mSources.erase( i );
             -- i;
          }
+   }
 }
 
 //-----------------------------------------------------------------------------

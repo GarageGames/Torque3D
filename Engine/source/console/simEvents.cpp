@@ -28,30 +28,31 @@
 // Stupid globals not declared in a header
 extern ExprEvalState gEvalState;
 
-SimConsoleEvent::SimConsoleEvent(S32 argc, const char **argv, bool onObject)
+SimConsoleEvent::SimConsoleEvent(S32 argc, ConsoleValueRef *argv, bool onObject)
 {
    mOnObject = onObject;
    mArgc = argc;
-   U32 totalSize = 0;
-   S32 i;
-   for(i = 0; i < argc; i++)
-      totalSize += dStrlen(argv[i]) + 1;
-   totalSize += sizeof(char *) * argc;
 
-   mArgv = (char **) dMalloc(totalSize);
-   char *argBase = (char *) &mArgv[argc];
-
-   for(i = 0; i < argc; i++)
+   mArgv = new ConsoleValueRef[argc];
+   for (int i=0; i<argc; i++)
    {
-      mArgv[i] = argBase;
-      dStrcpy(mArgv[i], argv[i]);
-      argBase += dStrlen(argv[i]) + 1;
+      mArgv[i].value = new ConsoleValue();
+      mArgv[i].value->type = ConsoleValue::TypeInternalString;
+      mArgv[i].value->init();
+     if (argv)
+     {
+      mArgv[i].value->setStringValue((const char*)argv[i]);
+     }
    }
 }
 
 SimConsoleEvent::~SimConsoleEvent()
 {
-   dFree(mArgv);
+   for (int i=0; i<mArgc; i++)
+   {
+      delete mArgv[i].value;
+   }
+   delete[] mArgv;
 }
 
 void SimConsoleEvent::process(SimObject* object)
@@ -60,12 +61,14 @@ void SimConsoleEvent::process(SimObject* object)
    //    Con::printf("Executing schedule: %d", sequenceCount);
    // #endif
    if(mOnObject)
-      Con::execute(object, mArgc, const_cast<const char**>( mArgv ));
+      Con::execute(object, mArgc, mArgv );
    else
    {
       // Grab the function name. If '::' doesn't exist, then the schedule is
       // on a global function.
-      char* func = dStrstr( mArgv[0], (char*)"::" );
+      char funcName[256];
+      dStrncpy(funcName, (const char*)mArgv[0], 256);
+      char* func = dStrstr( funcName, (char*)"::" );
       if( func )
       {
          // Set the first colon to NULL, so we can reference the namespace.
@@ -77,25 +80,34 @@ void SimConsoleEvent::process(SimObject* object)
          func += 2;
 
          // Lookup the namespace and function entry.
-         Namespace* ns = Namespace::find( StringTable->insert( mArgv[0] ) );
+         Namespace* ns = Namespace::find( StringTable->insert( funcName ) );
          if( ns )
          {
             Namespace::Entry* nse = ns->lookup( StringTable->insert( func ) );
             if( nse )
                // Execute.
-               nse->execute( mArgc, (const char**)mArgv, &gEvalState );
+               nse->execute( mArgc, mArgv, &gEvalState );
          }
       }
 
       else
-         Con::execute(mArgc, const_cast<const char**>( mArgv ));
+         Con::execute(mArgc, mArgv );
+   }
+}
+
+void SimConsoleEvent::populateArgs(ConsoleValueRef *argv)
+{
+   for (U32 i=0; i<mArgc; i++)
+   {
+      argv[i].value = mArgv[i].value;
    }
 }
 
 //-----------------------------------------------------------------------------
 
-SimConsoleThreadExecCallback::SimConsoleThreadExecCallback() : retVal(NULL)
+SimConsoleThreadExecCallback::SimConsoleThreadExecCallback()
 {
+   retVal.value = NULL;
    sem = new Semaphore(0);
 }
 
@@ -104,36 +116,36 @@ SimConsoleThreadExecCallback::~SimConsoleThreadExecCallback()
    delete sem;
 }
 
-void SimConsoleThreadExecCallback::handleCallback(const char *ret)
+void SimConsoleThreadExecCallback::handleCallback(ConsoleValueRef ret)
 {
    retVal = ret;
    sem->release();
 }
 
-const char *SimConsoleThreadExecCallback::waitForResult()
+ConsoleValueRef SimConsoleThreadExecCallback::waitForResult()
 {
    if(sem->acquire(true))
    {
       return retVal;
    }
 
-   return NULL;
+   return ConsoleValueRef();
 }
 
 //-----------------------------------------------------------------------------
 
-SimConsoleThreadExecEvent::SimConsoleThreadExecEvent(S32 argc, const char **argv, bool onObject, SimConsoleThreadExecCallback *callback) :
+SimConsoleThreadExecEvent::SimConsoleThreadExecEvent(S32 argc, ConsoleValueRef *argv, bool onObject, SimConsoleThreadExecCallback *callback) :
    SimConsoleEvent(argc, argv, onObject), cb(callback)
 {
 }
 
 void SimConsoleThreadExecEvent::process(SimObject* object)
 {
-   const char *retVal;
+   ConsoleValueRef retVal;
    if(mOnObject)
-      retVal = Con::execute(object, mArgc, const_cast<const char**>( mArgv ));
+      retVal = Con::execute(object, mArgc, mArgv);
    else
-      retVal = Con::execute(mArgc, const_cast<const char**>( mArgv ));
+      retVal = Con::execute(mArgc, mArgv);
 
    if(cb)
       cb->handleCallback(retVal);

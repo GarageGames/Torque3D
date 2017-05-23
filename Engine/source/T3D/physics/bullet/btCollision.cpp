@@ -28,6 +28,42 @@
 #include "T3D/physics/bullet/bt.h"
 #include "T3D/physics/bullet/btCasts.h"
 
+class btHeightfieldTerrainShapeCustom : public btHeightfieldTerrainShape
+{
+   bool* mHoles;
+
+public:
+   btHeightfieldTerrainShapeCustom(const bool *holes,
+      int heightStickWidth,
+      int heightStickLength,
+      const void* heightfieldData,
+      btScalar heightScale,
+      btScalar minHeight,
+      btScalar maxHeight,
+      int upAxis,
+      PHY_ScalarType heightDataType,
+      bool flipQuadEdges) : btHeightfieldTerrainShape(heightStickWidth,
+         heightStickLength,
+         heightfieldData,
+         heightScale,
+         minHeight,
+         maxHeight,
+         upAxis,
+         heightDataType,
+         flipQuadEdges)
+   {
+      mHoles = new bool[heightStickWidth * heightStickLength];
+      dMemcpy(mHoles, holes, heightStickWidth * heightStickLength * sizeof(bool));
+   }
+
+   virtual ~btHeightfieldTerrainShapeCustom()
+   {
+      delete[] mHoles;
+   }
+
+   virtual void processAllTriangles(btTriangleCallback* callback, const btVector3& aabbMin, const btVector3& aabbMax) const;
+};
+
 
 BtCollision::BtCollision() 
    :  mCompound( NULL ),
@@ -170,13 +206,15 @@ bool BtCollision::addHeightfield(   const U16 *heights,
    const F32 minHeight = 0;
    const F32 maxHeight = 65535 * heightScale;
 
-   btHeightfieldTerrainShape *shape = new btHeightfieldTerrainShape( blockSize, blockSize,
-                                                                     (void*)heights,
-                                                                     heightScale,
-                                                                     minHeight, maxHeight,
-                                                                     2, // Z up! 
-                                                                     PHY_SHORT, 
-                                                                     false );
+   btHeightfieldTerrainShapeCustom* shape = new btHeightfieldTerrainShapeCustom(holes,
+      blockSize, blockSize,
+      reinterpret_cast<const void*>(heights),
+      heightScale,
+      0, 0xFFFF * heightScale,
+      2, // Z up!
+      PHY_SHORT,
+      false);
+
    shape->setMargin( 0.01f );
    shape->setLocalScaling( btVector3( metersPerSample, metersPerSample, 1.0f ) );
    shape->setUseDiamondSubdivision( true );
@@ -202,4 +240,117 @@ bool BtCollision::addHeightfield(   const U16 *heights,
    _addShape( shape, offsetXfm );
 
    return true;
+}
+
+void btHeightfieldTerrainShapeCustom::processAllTriangles(btTriangleCallback* callback, const btVector3& aabbMin, const btVector3& aabbMax) const
+{
+   // scale down the input aabb's so they are in local (non-scaled) coordinates
+   btVector3 localAabbMin = aabbMin * btVector3(1.f / m_localScaling[0], 1.f / m_localScaling[1], 1.f / m_localScaling[2]);
+   btVector3 localAabbMax = aabbMax * btVector3(1.f / m_localScaling[0], 1.f / m_localScaling[1], 1.f / m_localScaling[2]);
+
+   // account for local origin
+   localAabbMin += m_localOrigin;
+   localAabbMax += m_localOrigin;
+
+   //quantize the aabbMin and aabbMax, and adjust the start/end ranges
+   int quantizedAabbMin[3];
+   int quantizedAabbMax[3];
+   quantizeWithClamp(quantizedAabbMin, localAabbMin, 0);
+   quantizeWithClamp(quantizedAabbMax, localAabbMax, 1);
+
+   // expand the min/max quantized values
+   // this is to catch the case where the input aabb falls between grid points!
+   for (int i = 0; i < 3; ++i) {
+      quantizedAabbMin[i]--;
+      quantizedAabbMax[i]++;
+   }
+
+   int startX = 0;
+   int endX = m_heightStickWidth - 1;
+   int startJ = 0;
+   int endJ = m_heightStickLength - 1;
+
+   switch (m_upAxis)
+   {
+   case 0:
+   {
+      if (quantizedAabbMin[1] > startX)
+         startX = quantizedAabbMin[1];
+      if (quantizedAabbMax[1] < endX)
+         endX = quantizedAabbMax[1];
+      if (quantizedAabbMin[2] > startJ)
+         startJ = quantizedAabbMin[2];
+      if (quantizedAabbMax[2] < endJ)
+         endJ = quantizedAabbMax[2];
+      break;
+   }
+   case 1:
+   {
+      if (quantizedAabbMin[0] > startX)
+         startX = quantizedAabbMin[0];
+      if (quantizedAabbMax[0] < endX)
+         endX = quantizedAabbMax[0];
+      if (quantizedAabbMin[2] > startJ)
+         startJ = quantizedAabbMin[2];
+      if (quantizedAabbMax[2] < endJ)
+         endJ = quantizedAabbMax[2];
+      break;
+   };
+   case 2:
+   {
+      if (quantizedAabbMin[0] > startX)
+         startX = quantizedAabbMin[0];
+      if (quantizedAabbMax[0] < endX)
+         endX = quantizedAabbMax[0];
+      if (quantizedAabbMin[1] > startJ)
+         startJ = quantizedAabbMin[1];
+      if (quantizedAabbMax[1] < endJ)
+         endJ = quantizedAabbMax[1];
+      break;
+   }
+   default:
+   {
+      //need to get valid m_upAxis
+      btAssert(0);
+   }
+   }
+
+   for (int j = startJ; j < endJ; j++)
+   {
+      for (int x = startX; x < endX; x++)
+      {
+         U32 index = (m_heightStickLength - (m_heightStickLength - x - 1)) + (j * m_heightStickWidth);
+
+         if (mHoles && mHoles[getMax((S32)index - 1, 0)])
+            continue;
+
+         btVector3 vertices[3];
+         if (m_flipQuadEdges || (m_useDiamondSubdivision && !((j + x) & 1)) || (m_useZigzagSubdivision && !(j & 1)))
+         {
+            //first triangle
+            getVertex(x, j, vertices[0]);
+            getVertex(x, j + 1, vertices[1]);
+            getVertex(x + 1, j + 1, vertices[2]);
+            callback->processTriangle(vertices, x, j);
+            //second triangle
+            //  getVertex(x,j,vertices[0]);//already got this vertex before, thanks to Danny Chapman
+            getVertex(x + 1, j + 1, vertices[1]);
+            getVertex(x + 1, j, vertices[2]);
+            callback->processTriangle(vertices, x, j);
+         }
+         else
+         {
+            //first triangle
+            getVertex(x, j, vertices[0]);
+            getVertex(x, j + 1, vertices[1]);
+            getVertex(x + 1, j, vertices[2]);
+            callback->processTriangle(vertices, x, j);
+            //second triangle
+            getVertex(x + 1, j, vertices[0]);
+            //getVertex(x,j+1,vertices[1]);
+            getVertex(x + 1, j + 1, vertices[2]);
+            callback->processTriangle(vertices, x, j);
+         }
+      }
+   }
 }

@@ -3,3 +3,16 @@
 
 # Set to always use Windows line endings
 *.cs text eol=crlf
+
+# Explicitly declare text files we want to always be normalized and converted 
+# to native line endings on checkout.
+*.c text
+*.h text
+*.cpp text
+*.hpp text
+*.ppm text
+*.nsh text
+*.nlf text
+*.command
+*.txt
+*.ini

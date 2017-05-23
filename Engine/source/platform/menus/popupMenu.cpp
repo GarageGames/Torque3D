@@ -22,6 +22,7 @@
 
 #include "platform/menus/popupMenu.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiCanvas.h"
 #include "core/util/safeDelete.h"
 
@@ -50,10 +51,10 @@ PopupMenu::PopupMenu() : mCanvas(NULL)
    mSubmenus = new SimSet;
    mSubmenus->registerObject();
 
-   mBarTitle = StringTable->insert("");
+   mBarTitle = StringTable->EmptyString();
    mIsPopup = false;
 
-	mPopupGUID = sMaxPopupGUID++;
+   mPopupGUID = sMaxPopupGUID++;
 }
 
 PopupMenu::~PopupMenu()
@@ -125,10 +126,10 @@ void PopupMenu::onMenuSelect()
 //-----------------------------------------------------------------------------
 
 void PopupMenu::handleSelectEvent(U32 popID, U32 command)
-{	
-	if (popID == mPopupGUID && canHandleID(command))	
-		if (handleSelect(command))
-			smSelectionEventHandled = true;
+{  
+   if (popID == mPopupGUID && canHandleID(command))   
+      if (handleSelect(command))
+         smSelectionEventHandled = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -137,8 +138,8 @@ void PopupMenu::onAttachToMenuBar(GuiCanvas *canvas, S32 pos, const char *title)
 {
    mCanvas = canvas;
 
-	// Attached menus must be notified of menu events
-	smPopupMenuEvent.notify(this, &PopupMenu::handleSelectEvent);
+   // Attached menus must be notified of menu events
+   smPopupMenuEvent.notify(this, &PopupMenu::handleSelectEvent);
    
    // Pass on to sub menus
    for(SimSet::iterator i = mSubmenus->begin();i != mSubmenus->end();++i)
@@ -159,8 +160,8 @@ void PopupMenu::onRemoveFromMenuBar(GuiCanvas *canvas)
 {
    mCanvas = NULL;
 
-	// We are no longer interested in select events, remove ourselves from the notification list in a safe way
-	Sim::postCurrentEvent(this, new PopUpNotifyRemoveEvent());
+   // We are no longer interested in select events, remove ourselves from the notification list in a safe way
+   Sim::postCurrentEvent(this, new PopUpNotifyRemoveEvent());
       
    // Pass on to sub menus
    for(SimSet::iterator i = mSubmenus->begin();i != mSubmenus->end();++i)
@@ -194,77 +195,75 @@ bool PopupMenu::onMessageObjectReceived(StringTableEntry queue, Message *msg )
 // Console Methods
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(PopupMenu, insertItem, S32, 3, 5, "(pos[, title][, accelerator])")
+DefineConsoleMethod(PopupMenu, insertItem, S32, (S32 pos, const char * title, const char * accelerator, const char* cmd), ("", "", ""), "(pos[, title][, accelerator][, cmd])")
 {
-   return object->insertItem(dAtoi(argv[2]), argc < 4 ? NULL : argv[3], argc < 5 ? "" : argv[4]);
+   return object->insertItem(pos, title, accelerator, cmd);
 }
 
-ConsoleMethod(PopupMenu, removeItem, void, 3, 3, "(pos)")
+DefineConsoleMethod(PopupMenu, removeItem, void, (S32 pos), , "(pos)")
 {
-   object->removeItem(dAtoi(argv[2]));
+   object->removeItem(pos);
 }
 
-ConsoleMethod(PopupMenu, insertSubMenu, S32, 5, 5, "(pos, title, subMenu)")
+DefineConsoleMethod(PopupMenu, insertSubMenu, S32, (S32 pos, String title, String subMenu), , "(pos, title, subMenu)")
 {
-   PopupMenu *mnu = dynamic_cast<PopupMenu *>(Sim::findObject(argv[4]));
+   PopupMenu *mnu = dynamic_cast<PopupMenu *>(Sim::findObject(subMenu));
    if(mnu == NULL)
    {
       Con::errorf("PopupMenu::insertSubMenu - Invalid PopupMenu object specified for submenu");
       return -1;
    }
-   return object->insertSubMenu(dAtoi(argv[2]), argv[3], mnu);
+   return object->insertSubMenu(pos, title, mnu);
 }
 
-ConsoleMethod(PopupMenu, setItem, bool, 4, 5, "(pos, title[, accelerator])")
+DefineConsoleMethod(PopupMenu, setItem, bool, (S32 pos, const char * title, const char * accelerator, const char *cmd), (""), "(pos, title[, accelerator][, cmd])")
 {
-   return object->setItem(dAtoi(argv[2]), argv[3], argc < 5 ? "" : argv[4]);
+   return object->setItem(pos, title, accelerator, cmd);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(PopupMenu, enableItem, void, 4, 4, "(pos, enabled)")
+DefineConsoleMethod(PopupMenu, enableItem, void, (S32 pos, bool enabled), , "(pos, enabled)")
 {
-   object->enableItem(dAtoi(argv[2]), dAtob(argv[3]));
+   object->enableItem(pos, enabled);
 }
 
-ConsoleMethod(PopupMenu, checkItem, void, 4, 4, "(pos, checked)")
+DefineConsoleMethod(PopupMenu, checkItem, void, (S32 pos, bool checked), , "(pos, checked)")
 {
-   object->checkItem(dAtoi(argv[2]), dAtob(argv[3]));
+   object->checkItem(pos, checked);
 }
 
-ConsoleMethod(PopupMenu, checkRadioItem, void, 5, 5, "(firstPos, lastPos, checkPos)")
+DefineConsoleMethod(PopupMenu, checkRadioItem, void, (S32 firstPos, S32 lastPos, S32 checkPos), , "(firstPos, lastPos, checkPos)")
 {
-   object->checkRadioItem(dAtoi(argv[2]), dAtoi(argv[3]), dAtoi(argv[4]));
+   object->checkRadioItem(firstPos, lastPos, checkPos);
 }
 
-ConsoleMethod(PopupMenu, isItemChecked, bool, 3, 3, "(pos)")
+DefineConsoleMethod(PopupMenu, isItemChecked, bool, (S32 pos), , "(pos)")
 {
-   return object->isItemChecked(dAtoi(argv[2]));
+   return object->isItemChecked(pos);
 }
 
-ConsoleMethod(PopupMenu, getItemCount, S32, 2, 2, "()")
+DefineConsoleMethod(PopupMenu, getItemCount, S32, (), , "()")
 {
    return object->getItemCount();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(PopupMenu, attachToMenuBar, void, 5, 5, "(GuiCanvas, pos, title)")
+DefineConsoleMethod(PopupMenu, attachToMenuBar, void, (const char * canvasName, S32 pos, const char * title), , "(GuiCanvas, pos, title)")
 {
-   object->attachToMenuBar(dynamic_cast<GuiCanvas*>(Sim::findObject(argv[2])),dAtoi(argv[3]), argv[4]);
+   object->attachToMenuBar(dynamic_cast<GuiCanvas*>(Sim::findObject(canvasName)), pos, title);
 }
 
-ConsoleMethod(PopupMenu, removeFromMenuBar, void, 2, 2, "()")
+DefineConsoleMethod(PopupMenu, removeFromMenuBar, void, (), , "()")
 {
    object->removeFromMenuBar();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod(PopupMenu, showPopup, void, 3, 5, "(Canvas,[x, y])")
+DefineConsoleMethod(PopupMenu, showPopup, void, (const char * canvasName, S32 x, S32 y), ( -1, -1), "(Canvas,[x, y])")
 {
-   GuiCanvas *pCanvas = dynamic_cast<GuiCanvas*>(Sim::findObject(argv[2]));
-   S32 x = argc >= 4 ? dAtoi(argv[3]) : -1;
-   S32 y = argc >= 5 ? dAtoi(argv[4]) : -1;
+   GuiCanvas *pCanvas = dynamic_cast<GuiCanvas*>(Sim::findObject(canvasName));
    object->showPopup(pCanvas, x, y);
 }

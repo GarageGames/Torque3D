@@ -35,6 +35,21 @@
 #include "console/console.h"
 #endif
 
+typedef U32 StringStackPtr;
+struct StringStack;
+
+/// Helper class which stores a relative pointer in the StringStack buffer
+class StringStackPtrRef
+{
+public:
+   StringStackPtrRef() : mOffset(0) {;}
+   StringStackPtrRef(StringStackPtr offset) : mOffset(offset) {;}
+
+   StringStackPtr mOffset;
+
+   /// Get pointer to string in stack stk
+   inline char *getPtr(StringStack *stk);
+};
 
 /// Core stack for interpreter operations.
 ///
@@ -72,6 +87,7 @@ struct StringStack
          mBuffer = (char *) dRealloc(mBuffer, mBufferSize);
       }
    }
+
    void validateArgBufferSize(U32 size)
    {
       if(size > mArgBufferSize)
@@ -80,6 +96,7 @@ struct StringStack
          mArgBuffer = (char *) dRealloc(mArgBuffer, mArgBufferSize);
       }
    }
+
    StringStack()
    {
       mBufferSize = 0;
@@ -93,6 +110,8 @@ struct StringStack
       mFunctionOffset = 0;
       validateBufferSize(8192);
       validateArgBufferSize(2048);
+      dMemset(mBuffer, '\0', mBufferSize);
+      dMemset(mArgBuffer, '\0', mArgBufferSize);
    }
    ~StringStack()
    {
@@ -121,6 +140,7 @@ struct StringStack
    /// Return a temporary buffer we can use to return data.
    char* getReturnBuffer(U32 size)
    {
+      AssertFatal(Con::isMainThread(), "Manipulating return buffer from a secondary thread!");
       validateArgBufferSize(size);
       return mArgBuffer;
    }
@@ -130,6 +150,7 @@ struct StringStack
    /// This updates the function offset.
    char *getArgBuffer(U32 size)
    {
+      AssertFatal(Con::isMainThread(), "Manipulating console arg buffer from a secondary thread!");
       validateBufferSize(mStart + mFunctionOffset + size);
       char *ret = mBuffer + mStart + mFunctionOffset;
       mFunctionOffset += size;
@@ -139,6 +160,7 @@ struct StringStack
    /// Clear the function offset.
    void clearFunctionOffset()
    {
+      //Con::printf("StringStack mFunctionOffset = 0 (from %i)", mFunctionOffset);
       mFunctionOffset = 0;
    }
 
@@ -183,6 +205,21 @@ struct StringStack
    inline const char *getStringValue()
    {
       return mBuffer + mStart;
+   }
+
+   inline const char *getPreviousStringValue()
+   {
+      return mBuffer + mStartOffsets[mStartStackSize-1];
+   }
+
+   inline StringStackPtr getStringValuePtr()
+   {
+      return (getStringValue() - mBuffer);
+   }
+
+   inline StringStackPtr getPreviousStringValuePtr()
+   {
+      return (getPreviousStringValue() - mBuffer);
    }
 
    /// Advance the start stack, placing a zero length string on the top.
@@ -255,9 +292,9 @@ struct StringStack
       return ret;
    }
 
-   
    void pushFrame()
    {
+      //Con::printf("StringStack pushFrame [frame=%i, start=%i]", mNumFrames, mStartStackSize);
       mFrameOffsets[mNumFrames++] = mStartStackSize;
       mStartOffsets[mStartStackSize++] = mStart;
       mStart += ReturnBufferSpace;
@@ -266,13 +303,72 @@ struct StringStack
 
    void popFrame()
    {
+      //Con::printf("StringStack popFrame [frame=%i, start=%i]", mNumFrames, mStartStackSize);
       mStartStackSize = mFrameOffsets[--mNumFrames];
       mStart = mStartOffsets[mStartStackSize];
       mLen = 0;
    }
 
+   void clearFrames()
+   {
+      //Con::printf("StringStack clearFrames");
+      mNumFrames = 0;
+      mStart = 0;
+      mLen = 0;
+      mStartStackSize = 0;
+      mFunctionOffset = 0;
+   }
+
    /// Get the arguments for a function call from the stack.
    void getArgcArgv(StringTableEntry name, U32 *argc, const char ***in_argv, bool popStackFrame = false);
 };
+
+
+// New console value stack
+class ConsoleValueStack
+{
+   enum {
+      MaxStackDepth = 1024,
+      MaxArgs = 20,
+      ReturnBufferSpace = 512
+   };
+
+public:
+   ConsoleValueStack();
+   ~ConsoleValueStack();
+
+   void pushVar(ConsoleValue *variable);
+   void pushValue(ConsoleValue &value);
+   ConsoleValue* reserveValues(U32 numValues);
+   bool reserveValues(U32 numValues, ConsoleValueRef *values);
+   ConsoleValue* pop();
+
+   ConsoleValue *pushString(const char *value);
+   ConsoleValue *pushStackString(const char *value);
+   ConsoleValue *pushStringStackPtr(StringStackPtr ptr);
+   ConsoleValue *pushUINT(U32 value);
+   ConsoleValue *pushFLT(float value);
+
+   void pushFrame();
+   void popFrame();
+
+   void resetFrame();
+   void clearFrames();
+
+   void getArgcArgv(StringTableEntry name, U32 *argc, ConsoleValueRef **in_argv, bool popStackFrame = false);
+
+   ConsoleValue mStack[MaxStackDepth];
+   U32 mStackFrames[MaxStackDepth];
+
+   U32 mFrame;
+   U32 mStackPos;
+
+   ConsoleValueRef mArgv[MaxArgs];
+};
+
+extern StringStack STR;
+extern ConsoleValueStack CSTK;
+
+inline char* StringStackPtrRef::getPtr(StringStack *stk) { return stk->mBuffer + mOffset; }
 
 #endif

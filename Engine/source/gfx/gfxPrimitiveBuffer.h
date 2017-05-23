@@ -43,7 +43,9 @@ public: //protected:
    U32 mPrimitiveCount;
    GFXBufferType mBufferType;
    GFXPrimitive *mPrimitiveArray;
-   GFXDevice *mDevice;  
+   GFXDevice *mDevice;
+
+   U32 mVolatileStart;
 
 #ifdef TORQUE_DEBUG
    // In debug builds we provide a TOC leak tracking system.
@@ -59,7 +61,8 @@ public: //protected:
    GFXPrimitiveBuffer(  GFXDevice *device, 
                         U32 indexCount, 
                         U32 primitiveCount, 
-                        GFXBufferType bufferType )
+                        GFXBufferType bufferType ) :
+   mVolatileStart(0)
    {
       mDevice = device;
       mIndexCount = indexCount;
@@ -122,7 +125,7 @@ public: //protected:
 
    // GFXResource interface
    /// The resource should put a description of itself (number of vertices, size/width of texture, etc.) in buffer
-   virtual const String describeSelf() const;   
+   virtual const String describeSelf() const; 
 };
 
 class GFXPrimitiveBufferHandle : public StrongRefPtr<GFXPrimitiveBuffer>
@@ -140,6 +143,8 @@ public:
    }
 
    void set(GFXDevice *theDevice, U32 indexCount, U32 primitiveCount, GFXBufferType bufferType, String desc = String::EmptyString );
+   
+   void immutable(GFXDevice *theDevice, U32 indexCount, U32 primitiveCount, void* data, String desc = String::EmptyString );
 
    void lock(U16 **indexBuffer, GFXPrimitive **primitiveBuffer = NULL, U32 indexStart = 0, U32 indexEnd = 0)
    {

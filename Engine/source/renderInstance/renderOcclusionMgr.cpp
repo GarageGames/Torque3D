@@ -56,12 +56,6 @@ RenderOcclusionMgr::RenderOcclusionMgr()
    mMatInstance = NULL;
 }
 
-RenderOcclusionMgr::RenderOcclusionMgr(RenderInstType riType, F32 renderOrder, F32 processAddOrder)
-: RenderBinManager(riType, renderOrder, processAddOrder)
-{  
-    delete mMatInstance;
-}
-
 static const Point3F cubePoints[8] = 
 {
    Point3F(-0.5, -0.5, -0.5), Point3F(-0.5, -0.5,  0.5), Point3F(-0.5,  0.5, -0.5), Point3F(-0.5,  0.5,  0.5),
@@ -106,7 +100,7 @@ void RenderOcclusionMgr::init()
 
    U32 vertexIndex = 0;
    U32 idx;
-   for(int i = 0; i < 6; i++)
+   for(S32 i = 0; i < 6; i++)
    {
       idx = cubeFaces[i][0];
       verts[vertexIndex].point = cubePoints[idx];

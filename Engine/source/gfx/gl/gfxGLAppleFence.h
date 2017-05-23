@@ -24,7 +24,7 @@
 #define _GFXGLAPPLEFENCE_H_
 
 #include "gfx/gfxFence.h"
-#include "gfx/gl/ggl/ggl.h"
+#include "gfx/gl/tGL/tGL.h"
 
 class GFXGLAppleFence : public GFXFence
 {

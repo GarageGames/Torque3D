@@ -307,7 +307,7 @@ void SceneContainer::insertIntoBins(SceneObject* obj,
    // For huge objects, dump them into the overflow bin.  Otherwise, everything
    //  goes into the grid...
    //
-   if ((maxX - minX + 1) < csmNumBins || (maxY - minY + 1) < csmNumBins && !obj->isGlobalBounds())
+   if ((maxX - minX + 1) < csmNumBins || ((maxY - minY + 1) < csmNumBins && !obj->isGlobalBounds()))
    {
       SceneObjectRef** pCurrInsert = &obj->mBinRefHead;
 
@@ -892,7 +892,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
                   *info = ri;
                   info->point.interpolate(start, end, info->t);
                   currentT = ri.t;
-						info->distance = (start - info->point).len();
+                  info->distance = (start - info->point).len();
                }
             }
          }
@@ -991,7 +991,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
                            *info = ri;
                            info->point.interpolate(start, end, info->t);
                            currentT = ri.t;
-						         info->distance = (start - info->point).len();
+                           info->distance = (start - info->point).len();
                         }
                      }
                   }
@@ -1012,6 +1012,11 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
       F32 currStartX = normalStart.x;
 
       AssertFatal(currStartX != normalEnd.x, "This is going to cause problems in SceneContainer::castRay");
+      if(mIsNaN_F(currStartX))
+      {
+         PROFILE_END();
+         return false;
+      }
       while (currStartX != normalEnd.x)
       {
          F32 currEndX   = getMin(currStartX + csmTotalBinSize, normalEnd.x);
@@ -1083,7 +1088,7 @@ bool SceneContainer::_castRay( U32 type, const Point3F& start, const Point3F& en
                                  *info = ri;
                                  info->point.interpolate(start, end, info->t);
                                  currentT = ri.t;
-								         info->distance = (start - info->point).len();
+                                 info->distance = (start - info->point).len();
                               }
                            }
                         }
@@ -1197,7 +1202,7 @@ void SceneContainer::cleanupSearchVectors()
 //-----------------------------------------------------------------------------
 
 static Point3F sgSortReferencePoint;
-static int QSORT_CALLBACK cmpSearchPointers(const void* inP1, const void* inP2)
+static S32 QSORT_CALLBACK cmpSearchPointers(const void* inP1, const void* inP2)
 {
    SimObjectPtr<SceneObject>** p1 = (SimObjectPtr<SceneObject>**)inP1;
    SimObjectPtr<SceneObject>** p2 = (SimObjectPtr<SceneObject>**)inP2;
@@ -1353,15 +1358,16 @@ F32 SceneContainer::containerSearchCurrRadiusDist()
       return 0.0;
 
    Point3F pos;
-   (*mSearchList[mCurrSearchPos])->getWorldBox().getCenter(&pos);
+   Box3F worldBox = (*mSearchList[mCurrSearchPos])->getWorldBox();
+   worldBox.getCenter(&pos);
 
    F32 dist = (pos - mSearchReferencePoint).len();
 
-   F32 min = (*mSearchList[mCurrSearchPos])->getWorldBox().len_x();
-   if ((*mSearchList[mCurrSearchPos])->getWorldBox().len_y() < min)
-      min = (*mSearchList[mCurrSearchPos])->getWorldBox().len_y();
-   if ((*mSearchList[mCurrSearchPos])->getWorldBox().len_z() < min)
-      min = (*mSearchList[mCurrSearchPos])->getWorldBox().len_z();
+   F32 min = worldBox.len_x();
+   if (worldBox.len_y() < min)
+      min = worldBox.len_y();
+   if (worldBox.len_z() < min)
+      min = worldBox.len_z();
 
    dist -= min;
    if (dist < 0)
@@ -1374,7 +1380,7 @@ F32 SceneContainer::containerSearchCurrRadiusDist()
 
 void SceneContainer::getBinRange( const F32 min, const F32 max, U32& minBin, U32& maxBin )
 {
-   AssertFatal(max >= min, "Error, bad range! in getBinRange");
+   AssertFatal(max >= min, avar("Error, bad range in getBinRange. min: %f, max: %f", min, max));
 
    if ((max - min) >= (SceneContainer::csmTotalBinSize - SceneContainer::csmBinSize))
    {
@@ -1596,7 +1602,7 @@ DefineEngineFunction( containerSearchCurrRadiusDist, F32, ( bool useClientContai
 
 //TODO: make RayInfo an API type
 DefineEngineFunction( containerRayCast, const char*,
-   ( Point3F start, Point3F end, U32 mask, SceneObject *pExempt, bool useClientContainer ), ( NULL, false ),
+   ( Point3F start, Point3F end, U32 mask, SceneObject *pExempt, bool useClientContainer ), ( nullAsType<SceneObject*>(), false ),
    "@brief Cast a ray from start to end, checking for collision against items matching mask.\n\n"
 
    "If pExempt is specified, then it is temporarily excluded from collision checks (For "
@@ -1631,10 +1637,11 @@ DefineEngineFunction( containerRayCast, const char*,
       pExempt->enableCollision();
 
    // add the hit position and normal?
-   char *returnBuffer = Con::getReturnBuffer(256);
+   static const U32 bufSize = 256;
+   char *returnBuffer = Con::getReturnBuffer(bufSize);
    if(ret)
    {
-      dSprintf(returnBuffer, 256, "%d %g %g %g %g %g %g %g",
+      dSprintf(returnBuffer, bufSize, "%d %g %g %g %g %g %g %g",
                ret, rinfo.point.x, rinfo.point.y, rinfo.point.z,
                rinfo.normal.x, rinfo.normal.y, rinfo.normal.z, rinfo.distance);
    }

@@ -260,7 +260,7 @@ bool RazerHydraDevice::enable()
 #endif
 
    const char* dllName;
-#ifdef TORQUE_OS_WIN32
+#ifdef TORQUE_OS_WIN
    #ifdef TORQUE_DEBUG
       dllName = "sixensed.dll";
    #else

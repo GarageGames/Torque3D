@@ -45,9 +45,9 @@ template<> ResourceBase::Signature Resource<TerrainFile>::signature()
 
 
 TerrainFile::TerrainFile()
-   : mNeedsResaving( false ),
+   : mSize( 256 ),
      mFileVersion( FILE_VERSION ),
-     mSize( 256 )
+     mNeedsResaving( false )
 {
    mLayerMap.setSize( mSize * mSize );
    dMemset( mLayerMap.address(), 0, mLayerMap.memSize() );

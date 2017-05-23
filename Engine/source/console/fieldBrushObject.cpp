@@ -22,6 +22,7 @@
 
 #include "core/strings/stringUnit.h"
 #include "console/fieldBrushObject.h"
+#include "console/engineAPI.h"
 
 // Prefix added to dynamic-fields when they're used to store any copied static-fields when peristing.
 #define INTERNAL_FIELD_PREFIX       "_fieldBrush_"
@@ -40,8 +41,8 @@ ConsoleDocClass( FieldBrushObject,
 FieldBrushObject::FieldBrushObject()
 {
     // Reset Description.
-    mDescription = StringTable->insert("");
-    mSortName    = StringTable->insert("");
+    mDescription = StringTable->EmptyString();
+    mSortName    = StringTable->EmptyString();
 }
 
 
@@ -108,26 +109,26 @@ void FieldBrushObject::destroyFields()
 static char replacebuf[1024];
 static char* suppressSpaces(const char* in_pname)
 {
-	U32 i = 0;
-	char chr;
-	do
-	{
-		chr = in_pname[i];
-		replacebuf[i++] = (chr != 32) ? chr : '_';
-	} while(chr);
+   U32 i = 0;
+   char chr;
+   do
+   {
+      chr = in_pname[i];
+      replacebuf[i++] = (chr != 32) ? chr : '_';
+   } while(chr);
 
-	return replacebuf;
+   return replacebuf;
 }
 
 //-----------------------------------------------------------------------------
 // Query Groups.
 //-----------------------------------------------------------------------------
-ConsoleMethod(FieldBrushObject, queryGroups, const char*, 3, 3, "(simObject) Query available static-field groups for selected object./\n"
+DefineConsoleMethod(FieldBrushObject, queryGroups, const char*, (const char* simObjName), , "(simObject) Query available static-field groups for selected object./\n"
                                                                 "@param simObject Object to query static-field groups on.\n"
-			                                                    "@return Space-seperated static-field group list.")
+                                                             "@return Space-seperated static-field group list.")
 {
     // Fetch selected object.
-    SimObject* pSimObject = dynamic_cast<SimObject*>( Sim::findObject( argv[2] ) );
+    SimObject* pSimObject = dynamic_cast<SimObject*>( Sim::findObject( simObjName ) );
 
     // Valid object?
     if ( pSimObject == NULL )
@@ -190,13 +191,13 @@ ConsoleMethod(FieldBrushObject, queryGroups, const char*, 3, 3, "(simObject) Que
 //-----------------------------------------------------------------------------
 // Query Fields.
 //-----------------------------------------------------------------------------
-ConsoleMethod(FieldBrushObject, queryFields, const char*, 3, 4, "(simObject, [groupList]) Query available static-fields for selected object./\n"
+DefineConsoleMethod(FieldBrushObject, queryFields, const char*, (const char* simObjName, const char* groupList), (""), "(simObject, [groupList]) Query available static-fields for selected object./\n"
                                                                 "@param simObject Object to query static-fields on.\n"
                                                                 "@param groupList groups to filter static-fields against.\n"
-			                                                    "@return Space-seperated static-field list.")
+                                                             "@return Space-seperated static-field list.")
 {
     // Fetch selected object.
-    SimObject* pSimObject = dynamic_cast<SimObject*>( Sim::findObject( argv[2] ) );
+    SimObject* pSimObject = dynamic_cast<SimObject*>( Sim::findObject( simObjName ) );
 
     // Valid object?
     if ( pSimObject == NULL )
@@ -215,7 +216,7 @@ ConsoleMethod(FieldBrushObject, queryFields, const char*, 3, 4, "(simObject, [gr
     const AbstractClassRep::FieldList& staticFields = pSimObject->getFieldList();
 
     // Did we specify a groups list?
-    if ( argc < 4 )
+    if ( String::isEmpty(groupList) )
     {
         // No, so return all fields...
 
@@ -263,7 +264,6 @@ ConsoleMethod(FieldBrushObject, queryFields, const char*, 3, 4, "(simObject, [gr
     // Group List.
     Vector<StringTableEntry> groups;
     // Yes, so fetch group list.
-    const char* groupList =  argv[3];
     // Yes, so calculate group Count.
     const U32 groupCount = StringUnit::getUnitCount( groupList, " \t\n" );
 
@@ -366,13 +366,13 @@ ConsoleMethod(FieldBrushObject, queryFields, const char*, 3, 4, "(simObject, [gr
 //-----------------------------------------------------------------------------
 // Copy Fields.
 //-----------------------------------------------------------------------------
-ConsoleMethod(FieldBrushObject, copyFields, void, 3, 4, "(simObject, [fieldList]) Copy selected static-fields for selected object./\n"
+DefineConsoleMethod(FieldBrushObject, copyFields, void, (const char* simObjName, const char* pFieldList), (""), "(simObject, [fieldList]) Copy selected static-fields for selected object./\n"
                                                         "@param simObject Object to copy static-fields from.\n"
                                                         "@param fieldList fields to filter static-fields against.\n"
-			                                            "@return No return value.")
+                                                     "@return No return value.")
 {
     // Fetch selected object.
-    SimObject* pSimObject = dynamic_cast<SimObject*>( Sim::findObject( argv[2] ) );
+    SimObject* pSimObject = dynamic_cast<SimObject*>( Sim::findObject( simObjName ) );
 
     // Valid object?
     if ( pSimObject == NULL )
@@ -383,7 +383,6 @@ ConsoleMethod(FieldBrushObject, copyFields, void, 3, 4, "(simObject, [fieldList]
     }
 
     // Fetch field list.
-    const char* pFieldList = (argc > 3 ) ? argv[3] : NULL;
     
     // Copy Fields.
     object->copyFields( pSimObject, pFieldList );
@@ -501,12 +500,12 @@ void FieldBrushObject::copyFields( SimObject* pSimObject, const char* fieldList 
 //-----------------------------------------------------------------------------
 // Paste Fields.
 //-----------------------------------------------------------------------------
-ConsoleMethod(FieldBrushObject, pasteFields, void, 3, 3, "(simObject) Paste copied static-fields to selected object./\n"
+DefineConsoleMethod(FieldBrushObject, pasteFields, void, (const char* simObjName), , "(simObject) Paste copied static-fields to selected object./\n"
                                                         "@param simObject Object to paste static-fields to.\n"
-			                                            "@return No return value.")
+                                                     "@return No return value.")
 {
     // Fetch selected object.
-    SimObject* pSimObject = dynamic_cast<SimObject*>( Sim::findObject( argv[2] ) );
+    SimObject* pSimObject = dynamic_cast<SimObject*>( Sim::findObject( simObjName ) );
 
     // Valid object?
     if ( pSimObject == NULL )

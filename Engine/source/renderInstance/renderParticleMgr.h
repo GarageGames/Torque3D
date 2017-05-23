@@ -42,7 +42,7 @@ class RenderParticleMgr : public RenderTexTargetBinManager
    friend class RenderTranslucentMgr;
 
 public:
-   // Generic PrePass Render Instance Type
+   // Generic Deferred Render Instance Type
    static const RenderInstType RIT_Particles;
 
    RenderParticleMgr();
@@ -77,12 +77,14 @@ protected:
    // Not only a helper method, but a method for the RenderTranslucentMgr to
    // request a particle system draw
    void renderInstance(ParticleRenderInst *ri, SceneRenderState *state);
-
+public:
+   void renderParticle(ParticleRenderInst *ri, SceneRenderState *state);
+protected:
    bool mOffscreenRenderEnabled;
 
-   /// The prepass render target used for the
+   /// The deferred render target used for the
    /// soft particle shader effect.
-   NamedTexTargetRef mPrepassTarget;
+   NamedTexTargetRef mDeferredTarget;
 
    /// The shader used for particle rendering.
    GFXShaderRef mParticleShader;
@@ -107,9 +109,12 @@ protected:
       GFXShaderConstHandle *mFSModelViewProjSC;
       GFXShaderConstHandle *mOneOverFarSC;
       GFXShaderConstHandle *mOneOverSoftnessSC;
-      GFXShaderConstHandle *mPrePassTargetParamsSC;
+      GFXShaderConstHandle *mDeferredTargetParamsSC;
       GFXShaderConstHandle *mAlphaFactorSC;
       GFXShaderConstHandle *mAlphaScaleSC;
+      GFXShaderConstHandle *mSamplerDiffuse;
+      GFXShaderConstHandle *mSamplerDeferredTex;
+      GFXShaderConstHandle *mSamplerParaboloidLightMap;
 
    } mParticleShaderConsts;
 
@@ -118,6 +123,8 @@ protected:
       GFXShaderConstBufferRef mShaderConsts;
       GFXShaderConstHandle *mSystemDepth;
       GFXShaderConstHandle *mScreenRect;
+      GFXShaderConstHandle *mSamplerColorSource;
+      GFXShaderConstHandle *mSamplerEdgeSource;
       GFXShaderConstHandle *mEdgeTargetParamsSC;
       GFXShaderConstHandle *mOffscreenTargetParamsSC;
    } mParticleCompositeShaderConsts;
@@ -130,11 +137,13 @@ protected:
    GFXStateBlockRef mOffscreenBlocks[ParticleRenderInst::BlendStyle_COUNT];
    GFXStateBlockRef mBackbufferBlocks[ParticleRenderInst::BlendStyle_COUNT];
    GFXStateBlockRef mMixedResBlocks[ParticleRenderInst::BlendStyle_COUNT];
-   
+
+public:
    GFXStateBlockRef _getHighResStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getMixedResStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getOffscreenStateBlock(ParticleRenderInst *ri);
    GFXStateBlockRef _getCompositeStateBlock(ParticleRenderInst *ri);
+   ShaderConsts &_getShaderConsts() { return mParticleShaderConsts; };
 };
 
 

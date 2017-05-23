@@ -54,7 +54,7 @@
 
 class AvailableSLInterfaces;
 class AdvancedLightBinManager;
-class RenderPrePassMgr;
+class RenderDeferredMgr;
 class BaseMatInstance;
 class MaterialParameters;
 class MaterialParameterHandle;
@@ -115,7 +115,7 @@ protected:
 
    SimObjectPtr<AdvancedLightBinManager> mLightBinManager;
 
-   SimObjectPtr<RenderPrePassMgr> mPrePassRenderBin;
+   SimObjectPtr<RenderDeferredMgr> mDeferredRenderBin;
 
    LightConstantMap mConstantLookup;
 

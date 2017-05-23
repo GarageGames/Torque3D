@@ -49,9 +49,9 @@ struct SceneData
       /// @see RenderGlowMgr
       GlowBin,
 
-      /// The prepass render bin.
-      /// @RenderPrePassMgr
-      PrePassBin,
+      /// The deferred render bin.
+      /// @RenderDeferredMgr
+      DeferredBin,
    };
 
    /// This defines when we're rendering a special bin 
@@ -64,6 +64,7 @@ struct SceneData
    GFXTextureObject *backBuffTex;
    GFXTextureObject *reflectTex;
    GFXTextureObject *miscTex;
+   GFXTextureObject *accuTex;
    
    /// The current lights to use in rendering
    /// in order of the light importance.

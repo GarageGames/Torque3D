@@ -588,7 +588,7 @@ const char* DInputDevice::getName()
 {
 #ifdef UNICODE
    static UTF8 buf[512];
-   convertUTF16toUTF8(mDeviceInstance.tszInstanceName, buf, sizeof(buf));
+   convertUTF16toUTF8(mDeviceInstance.tszInstanceName, buf);
    return (const char *)buf;
 #else
    return mDeviceInstance.tszInstanceName;
@@ -600,7 +600,7 @@ const char* DInputDevice::getProductName()
 {
 #ifdef UNICODE
    static UTF8 buf[512];
-   convertUTF16toUTF8(mDeviceInstance.tszProductName, buf, sizeof(buf));
+   convertUTF16toUTF8(mDeviceInstance.tszProductName, buf);
    return (const char *)buf;
 #else
    return mDeviceInstance.tszProductName;
@@ -896,8 +896,8 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
             // Scale to the range -1.0 to 1.0:
             if ( objInfo.mMin != DIPROPRANGE_NOMIN && objInfo.mMax != DIPROPRANGE_NOMAX )
             {
-               float range = float( objInfo.mMax - objInfo.mMin );
-               newEvent.fValue = float( ( 2 * newData ) - objInfo.mMax - objInfo.mMin ) / range;
+               F32 range = F32( objInfo.mMax - objInfo.mMin );
+               newEvent.fValue = F32( ( 2 * newData ) - objInfo.mMax - objInfo.mMin ) / range;
             }
             else
                newEvent.fValue = (F32)newData;
@@ -1041,7 +1041,7 @@ bool DInputDevice::buildEvent( DWORD offset, S32 newData, S32 oldData )
    return true;
 }
 
-void DInputDevice::rumble(float x, float y)
+void DInputDevice::rumble(F32 x, F32 y)
 {
    LONG            rglDirection[2] = { 0, 0 };
    DICONSTANTFORCE cf              = { 0 };

@@ -53,6 +53,14 @@
 
 class OrientedBox3F;
 
+/// Advanced fov specification for oculus
+struct FovPort
+{
+   float upTan;
+   float downTan;
+   float leftTan;
+   float rightTan;
+};
 
 /// Polyhedron data for use by frustums.  Uses fixed-size vectors
 /// and a static vector for the edge list as that never changes
@@ -110,7 +118,7 @@ struct FrustumData : public PolyhedronData
       };
 
       /// Used to mask out planes for testing.
-      enum 
+      enum : U32
       {
          PlaneMaskLeft     = ( 1 << PlaneLeft ),
          PlaneMaskRight    = ( 1 << PlaneRight ),

@@ -40,6 +40,10 @@ class SplashData;
 class PhysicsPlayer;
 class Player;
 
+#ifdef TORQUE_OPENVR
+class OpenVRTrackedObject;
+#endif
+
 //----------------------------------------------------------------------------
 
 struct PlayerData: public ShapeBaseData {
@@ -190,13 +194,15 @@ struct PlayerData: public ShapeBaseData {
       FootHard,
       FootMetal,
       FootSnow,
+      MaxSoundOffsets,
       FootShallowSplash,
       FootWading,
       FootUnderWater,
       FootBubbles,
       MoveBubbles,
       WaterBreath,
-      ImpactSoft,
+      ImpactStart,
+      ImpactSoft = ImpactStart,
       ImpactHard,
       ImpactMetal,
       ImpactSnow,
@@ -439,6 +445,7 @@ protected:
 
    F32 mLastAbsoluteYaw;            ///< Stores that last absolute yaw value as passed in by ExtendedMove
    F32 mLastAbsolutePitch;          ///< Stores that last absolute pitch value as passed in by ExtendedMove
+   F32 mLastAbsoluteRoll;           ///< Stores that last absolute roll value as passed in by ExtendedMove
 
    S32 mMountPending;               ///< mMountPending suppresses tickDelay countdown so players will sit until
                                     ///< their mount, or another animation, comes through (or 13 seconds elapses).
@@ -477,7 +484,7 @@ protected:
    /// @{
 
    struct ActionAnimation {
-      U32 action;
+      S32 action;
       TSThread* thread;
       S32 delayTicks;               // before picking another.
       bool forward;
@@ -514,6 +521,10 @@ protected:
 
    Point3F mLastPos;          ///< Holds the last position for physics updates
    Point3F mLastWaterPos;     ///< Same as mLastPos, but for water
+
+#ifdef TORQUE_OPENVR
+   SimObjectPtr<OpenVRTrackedObject> mControllers[2];
+#endif
 
    struct ContactInfo 
    {
@@ -574,11 +585,16 @@ protected:
 
    PhysicsPlayer* getPhysicsRep() const { return mPhysicsRep; }
 
+#ifdef TORQUE_OPENVR
+   void setControllers(Vector<OpenVRTrackedObject*> controllerList);
+#endif
+
   protected:
    virtual void reSkin();
 
    void setState(ActionState state, U32 ticks=0);
    void updateState();
+
 
    // Jetting
    bool mJetting;
@@ -612,7 +628,7 @@ protected:
 
    /// @name Mounted objects
    /// @{
-   virtual void onUnmount( ShapeBase *obj, S32 node );
+   virtual void onUnmount( SceneObject *obj, S32 node );
    virtual void unmount();
    /// @}
 

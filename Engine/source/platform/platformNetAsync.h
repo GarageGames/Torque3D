@@ -54,7 +54,7 @@ class NetAsync
       // out_h_length will be set appropriately.  if out_h_length is -1, then
       // name could not be resolved.  otherwise, it provides the number of
       // address bytes copied into out_h_addr.
-      bool checkLookup(NetSocket socket, char* out_h_addr, int* out_h_length, int out_h_addr_size);
+      bool checkLookup(NetSocket socket, void* out_h_addr, int* out_h_length, S32 out_h_addr_size);
 };
 
 // the global net async object

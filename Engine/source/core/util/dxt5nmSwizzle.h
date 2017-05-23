@@ -37,7 +37,7 @@ public:
 
       volatile U8 *u8Mem = reinterpret_cast<U8 *>( memory );
 
-      for( int i = 0; i < size >> 2; i++ )
+      for( S32 i = 0; i < size >> 2; i++ )
       {
          // g = garbage byte
          // Input: [X|Y|Z|g]     (rgba)
@@ -57,7 +57,7 @@ public:
       volatile const U8 *srcU8 = reinterpret_cast<const U8 *>( source );
       volatile U8 *dstU8 = reinterpret_cast<U8 *>( destination );
 
-      for( int i = 0; i < size >> 2; i++ )
+      for( S32 i = 0; i < size >> 2; i++ )
       {
          // g = garbage byte
          // Input: [X|Y|Z|g]     (rgba)
@@ -85,13 +85,13 @@ public:
    virtual void ToBuffer( void *destination, const void *source, const dsize_t size ) const
    {
       AssertFatal( size % 3 == 0, "Bad buffer size for DXT5nm Swizzle" );
-      const int pixels = size / 3;
+      const S32 pixels = size / 3;
 
       volatile const U8 *srcU8 = reinterpret_cast<const U8 *>( source );
       volatile U8 *dstU8 = reinterpret_cast<U8 *>( destination );
 
       // destination better damn well be the right size
-      for( int i = 0; i < pixels; i++ )
+      for( S32 i = 0; i < pixels; i++ )
       {
          // g = garbage byte
          // Input: [X|Y|Z|g]     (rgba)

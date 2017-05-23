@@ -57,11 +57,11 @@ ConsoleDocClass( TerrainMaterial,
 	"@ingroup enviroMisc\n");
 
 TerrainMaterial::TerrainMaterial()
-   :  mSideProjection( false ),
-      mDiffuseSize( 500.0f ),
+   :  mDiffuseSize( 500.0f ),
       mDetailSize( 5.0f ),
       mDetailStrength( 1.0f ),
       mDetailDistance( 50.0f ),
+      mSideProjection( false ),
       mMacroSize( 200.0f ),
       mMacroStrength( 0.7f ),
       mMacroDistance( 500.0f ),

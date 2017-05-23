@@ -68,11 +68,12 @@ public:
    } mTexSlot[Material::MAX_TEX_PER_PASS];
 
    U32 mTexType[Material::MAX_TEX_PER_PASS];
+   String mSamplerNames[Material::MAX_TEX_PER_PASS];
 
    /// The cubemap to use when the texture type is
    /// set to Material::Cube.
    /// @see mTexType
-   GFXCubemap *mCubeMap;
+   GFXCubemapHandle mCubeMap;
 
    U32 mNumTex;
 
@@ -141,6 +142,9 @@ public:
    /// Sets the transformation matrix, i.e. Model * View * Projection
    virtual void setTransforms(const MatrixSet &matrixSet, SceneRenderState *state, const U32 pass) = 0;
    
+   /// Sets the node transforms for HW Skinning
+   virtual void setNodeTransforms(const MatrixF *address, const U32 numTransforms, const U32 pass) = 0;
+   
    /// Sets the scene info like lights for the given pass.
    virtual void setSceneInfo(SceneRenderState *, const SceneData& sgData, U32 pass) = 0;
 
@@ -196,6 +200,9 @@ public:
    /// Returns true if any pass glows
    bool hasGlow() const { return mHasGlow; }
 
+   /// Returns true if any pass accumulates
+   bool hasAccumulation() const { return mHasAccumulation; }
+
    /// Gets the stage number for a pass
    U32 getStageFromPass(U32 pass) const
    {
@@ -242,6 +249,9 @@ protected:
 
    /// If we glow
    bool mHasGlow;
+
+   /// If we have accumulation.
+   bool mHasAccumulation;
 
    /// Number of stages (not to be confused with number of passes)
    U32 mMaxStages;

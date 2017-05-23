@@ -24,6 +24,7 @@
 #include "gui/editor/guiDebugger.h"
 
 #include "gui/core/guiCanvas.h"
+#include "console/engineAPI.h"
 #include "gfx/gfxDrawUtil.h"
 #include "core/volume.h"
 
@@ -65,13 +66,13 @@ DbgFileView::DbgFileView()
    mSize.set(1, 0);
 }
 
-ConsoleMethod(DbgFileView, setCurrentLine, void, 4, 4, "(int line, bool selected)"
+DefineConsoleMethod(DbgFileView, setCurrentLine, void, (S32 line, bool selected), , "(int line, bool selected)"
               "Set the current highlighted line.")
 {
-   object->setCurrentLine(dAtoi(argv[2]), dAtob(argv[3]));
+   object->setCurrentLine(line, selected);
 }
 
-ConsoleMethod(DbgFileView, getCurrentLine, const char *, 2, 2, "()"
+DefineConsoleMethod(DbgFileView, getCurrentLine, const char *, (), , "()"
               "Get the currently executing file and line, if any.\n\n"
               "@returns A string containing the file, a tab, and then the line number."
               " Use getField() with this.")
@@ -83,42 +84,42 @@ ConsoleMethod(DbgFileView, getCurrentLine, const char *, 2, 2, "()"
 	return ret;
 }
 
-ConsoleMethod(DbgFileView, open, bool, 3, 3, "(string filename)"
+DefineConsoleMethod(DbgFileView, open, bool, (const char * filename), , "(string filename)"
               "Open a file for viewing.\n\n"
               "@note This loads the file from the local system.")
 {
-   return object->openFile(argv[2]);
+   return object->openFile(filename);
 }
 
-ConsoleMethod(DbgFileView, clearBreakPositions, void, 2, 2, "()"
+DefineConsoleMethod(DbgFileView, clearBreakPositions, void, (), , "()"
               "Clear all break points in the current file.")
 {
    object->clearBreakPositions();
 }
 
-ConsoleMethod(DbgFileView, setBreakPosition, void, 3, 3, "(int line)"
+DefineConsoleMethod(DbgFileView, setBreakPosition, void, (U32 line), , "(int line)"
               "Set a breakpoint at the specified line.")
 {
-   object->setBreakPosition(dAtoi(argv[2]));
+   object->setBreakPosition(line);
 }
 
-ConsoleMethod(DbgFileView, setBreak, void, 3, 3, "(int line)"
+DefineConsoleMethod(DbgFileView, setBreak, void, (U32 line), , "(int line)"
               "Set a breakpoint at the specified line.")
 {
-   object->setBreakPointStatus(dAtoi(argv[2]), true);
+   object->setBreakPointStatus(line, true);
 }
 
-ConsoleMethod(DbgFileView, removeBreak, void, 3, 3, "(int line)"
+DefineConsoleMethod(DbgFileView, removeBreak, void, (U32 line), , "(int line)"
               "Remove a breakpoint from the specified line.")
 {
-   object->setBreakPointStatus(dAtoi(argv[2]), false);
+   object->setBreakPointStatus(line, false);
 }
 
-ConsoleMethod(DbgFileView, findString, bool, 3, 3, "(string findThis)"
+DefineConsoleMethod(DbgFileView, findString, bool, (const char * findThis), , "(string findThis)"
               "Find the specified string in the currently viewed file and "
               "scroll it into view.")
 {
-   return object->findString(argv[2]);
+   return object->findString(findThis);
 }
 
 //this value is the offset used in the ::onRender() method...

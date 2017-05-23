@@ -39,6 +39,11 @@
 #include "console/engineAPI.h"
 #include "math/mTransform.h"
 
+#ifdef TORQUE_EXPERIMENTAL_EC
+#include "T3D/entity.h"
+#include "T3D/components/coreInterfaces.h"
+#endif
+
 #ifdef TORQUE_HIFI_NET
    #include "T3D/gameBase/hifi/hifiMoveList.h"
 #elif defined TORQUE_EXTENDED_MOVE
@@ -208,6 +213,8 @@ GameConnection::GameConnection()
 
    mAIControlled = false;
 
+   mLastPacketTime = 0;
+
    mDisconnectReason[0] = 0;
 
    //blackout vars
@@ -226,11 +233,14 @@ GameConnection::GameConnection()
    mAddYawToAbsRot = false;
    mAddPitchToAbsRot = false;
 
+   mVisibleGhostDistance = 0.0f;
+
    clearDisplayDevice();
 }
 
 GameConnection::~GameConnection()
 {
+   setDisplayDevice(NULL);
    delete mAuthInfo;
    for(U32 i = 0; i < mConnectArgc; i++)
       dFree(mConnectArgv[i]);
@@ -239,6 +249,16 @@ GameConnection::~GameConnection()
 }
 
 //----------------------------------------------------------------------------
+
+void GameConnection::setVisibleGhostDistance(F32 dist)
+{
+   mVisibleGhostDistance = dist;
+}
+
+F32 GameConnection::getVisibleGhostDistance()
+{
+   return mVisibleGhostDistance;
+}
 
 bool GameConnection::canRemoteCreate()
 {
@@ -281,7 +301,8 @@ ConsoleMethod(GameConnection, setConnectArgs, void, 3, 17,
    
    "@see GameConnection::onConnect()\n\n")
 {
-   object->setConnectArgs(argc - 2, argv + 2);
+   StringStackWrapper args(argc - 2, argv + 2);
+   object->setConnectArgs(args.count(), args);
 }
 
 void GameConnection::onTimedOut()
@@ -323,6 +344,7 @@ void GameConnection::onConnectionEstablished(bool isInitiator)
 
       const char *argv[MaxConnectArgs + 2];
       argv[0] = "onConnect";
+      argv[1] = NULL; // Filled in later
       for(U32 i = 0; i < mConnectArgc; i++)
          argv[i + 2] = mConnectArgv[i];
       // NOTE: Need to fallback to Con::execute() as IMPLEMENT_CALLBACK does not 
@@ -385,7 +407,7 @@ bool GameConnection::readConnectAccept(BitStream *stream, const char **errorStri
 void GameConnection::writeConnectRequest(BitStream *stream)
 {
    Parent::writeConnectRequest(stream);
-   stream->writeString(GameString);
+   stream->writeString(TORQUE_APP_NAME);
    stream->write(CurrentProtocolVersion);
    stream->write(MinRequiredProtocolVersion);
    stream->writeString(mJoinPassword);
@@ -402,7 +424,7 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
    U32 currentProtocol, minProtocol;
    char gameString[256];
    stream->readString(gameString);
-   if(dStrcmp(gameString, GameString))
+   if(dStrcmp(gameString, TORQUE_APP_NAME))
    {
       *errorString = "CHR_GAME";
       return false;
@@ -442,7 +464,15 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
       *errorString = "CR_INVALID_ARGS";
       return false;
    }
-   const char *connectArgv[MaxConnectArgs + 3];
+   ConsoleValueRef connectArgv[MaxConnectArgs + 3];
+   ConsoleValue connectArgvValue[MaxConnectArgs + 3];
+
+   for(U32 i = 0; i < mConnectArgc+3; i++)
+   {
+      connectArgv[i].value = &connectArgvValue[i];
+      connectArgvValue[i].init();
+   }
+
    for(U32 i = 0; i < mConnectArgc; i++)
    {
       char argString[256];
@@ -450,10 +480,11 @@ bool GameConnection::readConnectRequest(BitStream *stream, const char **errorStr
       mConnectArgv[i] = dStrdup(argString);
       connectArgv[i + 3] = mConnectArgv[i];
    }
-   connectArgv[0] = "onConnectRequest";
+   connectArgvValue[0].setStackStringValue("onConnectRequest");
+   connectArgvValue[1].setIntValue(0);
    char buffer[256];
    Net::addressToString(getNetAddress(), buffer);
-   connectArgv[2] = buffer;
+   connectArgvValue[2].setStackStringValue(buffer);
 
    // NOTE: Cannot convert over to IMPLEMENT_CALLBACK as it has variable args.
    const char *ret = Con::execute(this, mConnectArgc + 3, connectArgv);
@@ -525,7 +556,9 @@ void GameConnection::setControlObject(GameBase *obj)
       obj->setControllingClient(this);
 
       // Update the camera's FOV to match the new control object
-      setControlCameraFov( obj->getCameraFov() );
+      //but only if we don't have a specific camera object
+      if (!mCameraObject)
+         setControlCameraFov(obj->getCameraFov());
    }
 
    // Okay, set our control object.
@@ -648,6 +681,48 @@ bool GameConnection::getControlCameraTransform(F32 dt, MatrixF* mat)
    return true;
 }
 
+bool GameConnection::getControlCameraHeadTransform(IDisplayDevice *display, MatrixF *transform)
+{
+   GameBase* obj = getCameraObject();
+   if (!obj)
+      return false;
+
+   GameBase* cObj = obj;
+   while ((cObj = cObj->getControlObject()) != 0)
+   {
+      if (cObj->useObjsEyePoint())
+         obj = cObj;
+   }
+
+   obj->getEyeCameraTransform(display, -1, transform);
+
+   return true;
+}
+
+bool GameConnection::getControlCameraEyeTransforms(IDisplayDevice *display, MatrixF *transforms)
+{
+   GameBase* obj = getCameraObject();
+   if(!obj)
+      return false;
+
+   GameBase* cObj = obj;
+   while((cObj = cObj->getControlObject()) != 0)
+   {
+      if(cObj->useObjsEyePoint())
+         obj = cObj;
+   }
+
+   // Perform operation on left & right eyes. For each we need to calculate the world space 
+   // of the rotated eye offset and add that onto the camera world space.
+   for (U32 i=0; i<2; i++)
+   {
+      obj->getEyeCameraTransform(display, i, &transforms[i]);
+   }
+
+   return true;
+}
+
+
 bool GameConnection::getControlCameraDefaultFov(F32 * fov)
 {
    //find the last control object in the chain (client->player->turret->whatever...)
@@ -679,7 +754,21 @@ bool GameConnection::getControlCameraFov(F32 * fov)
    }
    if (cObj)
    {
+#ifdef TORQUE_EXPERIMENTAL_EC
+      if (Entity* ent = dynamic_cast<Entity*>(cObj))
+      {
+         if (CameraInterface* camInterface = ent->getComponent<CameraInterface>())
+         {
+            *fov = camInterface->getCameraFov();
+         }
+      }
+      else
+      {
       *fov = cObj->getCameraFov();
+      }
+#else
+      *fov = cObj->getCameraFov();
+#endif
       return(true);
    }
 
@@ -697,7 +786,26 @@ bool GameConnection::isValidControlCameraFov(F32 fov)
       obj = obj->getControlObject();
    }
 
-   return cObj ? cObj->isValidCameraFov(fov) : NULL;
+   if (cObj)
+   {
+#ifdef TORQUE_EXPERIMENTAL_EC
+      if (Entity* ent = dynamic_cast<Entity*>(cObj))
+      {
+         if (CameraInterface* camInterface = ent->getComponent<CameraInterface>())
+         {
+            return camInterface->isValidCameraFov(fov);
+         }
+      }
+      else
+      {
+         return cObj->isValidCameraFov(fov);
+      }
+#else
+      return cObj->isValidCameraFov(fov);
+#endif
+   }
+
+   return NULL;
 }
 
 bool GameConnection::setControlCameraFov(F32 fov)
@@ -712,9 +820,32 @@ bool GameConnection::setControlCameraFov(F32 fov)
    }
    if (cObj)
    {
+
+#ifdef TORQUE_EXPERIMENTAL_EC
+      F32 newFov = 90.f;
+      if (Entity* ent = dynamic_cast<Entity*>(cObj))
+      {
+         if (CameraInterface* camInterface = ent->getComponent<CameraInterface>())
+         {
+            camInterface->setCameraFov(mClampF(fov, MinCameraFov, MaxCameraFov));
+            newFov = camInterface->getCameraFov();
+         }
+         else
+         {
+            Con::errorf("Attempted to setControlCameraFov, but we don't have a camera!");
+         }
+      }
+      else
+      {
+         // allow shapebase to clamp fov to its datablock values
+         cObj->setCameraFov(mClampF(fov, MinCameraFov, MaxCameraFov));
+         newFov = cObj->getCameraFov();
+      }
+#else
       // allow shapebase to clamp fov to its datablock values
       cObj->setCameraFov(mClampF(fov, MinCameraFov, MaxCameraFov));
       F32 newFov = cObj->getCameraFov();
+#endif
 
       // server fov of client has 1degree resolution
       if( S32(newFov) != S32(mCameraFov) || newFov != fov )
@@ -783,8 +914,8 @@ void GameConnection::onRemove()
       // clientgroup and what not (this is so that we can disconnect from a local server
       // without needing to destroy and recreate the server before we can connect to it 
       // again).
-	   // Safe-delete as we don't know whether the server connection is currently being
-	   // worked on.
+      // Safe-delete as we don't know whether the server connection is currently being
+      // worked on.
       getRemoteConnection()->safeDeleteObject();
       setRemoteConnectionObject(NULL);
    }
@@ -974,8 +1105,10 @@ bool GameConnection::readDemoStartBlock(BitStream *stream)
 
 void GameConnection::demoPlaybackComplete()
 {
-   static const char *demoPlaybackArgv[1] = { "demoPlaybackComplete" };
-   Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(1, demoPlaybackArgv, false));
+   static const char* demoPlaybackArgv[1] = { "demoPlaybackComplete" };
+   static StringStackConsoleWrapper demoPlaybackCmd(1, demoPlaybackArgv);
+
+   Sim::postCurrentEvent(Sim::getRootGroup(), new SimConsoleEvent(demoPlaybackCmd.argc, demoPlaybackCmd.argv, false));
    Parent::demoPlaybackComplete();
 }
 
@@ -1095,10 +1228,17 @@ void GameConnection::readPacket(BitStream *bstream)
 
       if (bstream->readFlag())
       {
+         bool callScript = false;
+         if (mCameraObject.isNull())
+            callScript = true;
+
          S32 gIndex = bstream->readInt(NetConnection::GhostIdBitSize);
          GameBase* obj = dynamic_cast<GameBase*>(resolveGhost(gIndex));
          setCameraObject(obj);
          obj->readPacketData(this, bstream);
+
+         if (callScript)
+            initialControlSet_callback();
       }
       else
          setCameraObject(0);
@@ -1675,6 +1815,13 @@ DefineEngineMethod( GameConnection, transmitDataBlocks, void, (S32 sequence),,
             // Ensure that the client knows that the datablock send is done...
             object->sendConnectionMessage(GameConnection::DataBlocksDone, object->getDataBlockSequence());
         }
+
+        if (iCount == 0)
+        {
+           //if we have no datablocks to send, we still need to be able to complete the level load process
+           //so fire off our callback anyways
+           object->sendConnectionMessage(GameConnection::DataBlocksDone, object->getDataBlockSequence());
+        }
     } 
     else
     {
@@ -2195,4 +2342,22 @@ DefineEngineMethod( GameConnection, getControlSchemeAbsoluteRotation, bool, (),,
    "@see GameConnection::setControlSchemeParameters()\n\n")
 {
    return object->getControlSchemeAbsoluteRotation();
+}
+
+DefineEngineMethod( GameConnection, setVisibleGhostDistance, void, (F32 dist),,
+   "@brief Sets the distance that objects around it will be ghosted. If set to 0, "
+   "it may be defined by the LevelInfo.\n\n"
+   "@dist - is the max distance\n\n"
+   )
+{
+   object->setVisibleGhostDistance(dist);
+}
+
+DefineEngineMethod( GameConnection, getVisibleGhostDistance, F32, (),,
+   "@brief Gets the distance that objects around the connection will be ghosted.\n\n"
+   
+   "@return S32 of distance.\n\n"
+   )
+{
+   return object->getVisibleGhostDistance();
 }

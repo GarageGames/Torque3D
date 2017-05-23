@@ -23,33 +23,34 @@
 #include "gui/core/guiCanvas.h"
 #include "gui/controls/guiPopUpCtrlEx.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiDefaultControlRender.h"
 #include "gfx/primBuilder.h"
 #include "gfx/gfxDrawUtil.h"
 #include "console/engineAPI.h"
 
 ConsoleDocClass( GuiPopUpMenuCtrlEx,
-	"@brief A control that allows to select a value from a drop-down list.\n\n"
+   "@brief A control that allows to select a value from a drop-down list.\n\n"
 
-	"This is essentially a GuiPopUpMenuCtrl, but with quite a few more features.\n\n"
+   "This is essentially a GuiPopUpMenuCtrl, but with quite a few more features.\n\n"
 
-	"@tsexample\n"
-	"new GuiPopUpMenuCtrlEx()\n"
-	"{\n"
-	"	maxPopupHeight = \"200\";\n"
-	"	sbUsesNAColor = \"0\";\n"
-	"	reverseTextList = \"0\";\n"
-	"	bitmapBounds = \"16 16\";\n"
-	"	hotTrackCallback = \"0\";\n"
-	"	extent = \"64 64\";\n"
-	"	profile = \"GuiDefaultProfile\";\n"
-	"	tooltipProfile = \"GuiToolTipProfile\";\n"
-	"};\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+   "new GuiPopUpMenuCtrlEx()\n"
+   "{\n"
+   "  maxPopupHeight = \"200\";\n"
+   "  sbUsesNAColor = \"0\";\n"
+   "  reverseTextList = \"0\";\n"
+   "  bitmapBounds = \"16 16\";\n"
+   "  hotTrackCallback = \"0\";\n"
+   "  extent = \"64 64\";\n"
+   "  profile = \"GuiDefaultProfile\";\n"
+   "  tooltipProfile = \"GuiToolTipProfile\";\n"
+   "};\n"
+   "@endtsexample\n\n"
 
-	"@see GuiPopUpMenuCtrl\n"
+   "@see GuiPopUpMenuCtrl\n"
 
-	"@ingroup GuiControls\n");
+   "@ingroup GuiControls\n");
 
 static ColorI colorWhite(255,255,255); //  Added
 
@@ -327,10 +328,10 @@ GuiPopUpMenuCtrlEx::GuiPopUpMenuCtrlEx(void)
    mRenderScrollInNA = false; //  Added
    mBackgroundCancel = false; //  Added
    mReverseTextList = false; //  Added - Don't reverse text list if displaying up
-   mBitmapName = StringTable->insert(""); //  Added
+   mBitmapName = StringTable->EmptyString(); //  Added
    mBitmapBounds.set(16, 16); //  Added
    mHotTrackItems = false;
-	mIdMax = -1;
+   mIdMax = -1;
 }
 
 //------------------------------------------------------------------------------
@@ -354,43 +355,38 @@ void GuiPopUpMenuCtrlEx::initPersistFields(void)
 
 //------------------------------------------------------------------------------
 ConsoleDocFragment _GuiPopUpMenuCtrlExAdd(
-	"@brief Adds an entry to the list\n\n"
-	"@param name String containing the name of the entry\n"
-	"@param idNum Numerical value assigned to the name\n"
-	"@param scheme Optional ID associated with a scheme "
-	"for font coloring, highlight coloring, and selection coloring\n\n",
-	"GuiPopUpMenuCtrlEx",
-	"void add(string name, S32 idNum, S32 scheme=0);"
+   "@brief Adds an entry to the list\n\n"
+   "@param name String containing the name of the entry\n"
+   "@param idNum Numerical value assigned to the name\n"
+   "@param scheme Optional ID associated with a scheme "
+   "for font coloring, highlight coloring, and selection coloring\n\n",
+   "GuiPopUpMenuCtrlEx",
+   "void add(string name, S32 idNum, S32 scheme=0);"
 );
 
-ConsoleMethod( GuiPopUpMenuCtrlEx, add, void, 3, 5, "(string name, int idNum, int scheme=0)")
+DefineConsoleMethod( GuiPopUpMenuCtrlEx, add, void, (const char * name, S32 idNum, U32 scheme), ("", -1, 0), "(string name, int idNum, int scheme=0)")
 {
-	if ( argc == 4 )
-		object->addEntry(argv[2],dAtoi(argv[3]));
-   if ( argc == 5 )
-      object->addEntry(argv[2],dAtoi(argv[3]),dAtoi(argv[4]));
-   else
-      object->addEntry(argv[2]);
+   object->addEntry(name, idNum, scheme);
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, addCategory, void, (const char* text),,
-				   "@brief Add a category to the list.\n\n"
+               "@brief Add a category to the list.\n\n"
 
-				   "Acts as a separator between entries, allowing for sub-lists\n\n"
+               "Acts as a separator between entries, allowing for sub-lists\n\n"
 
-				   "@param text Name of the new category\n\n")
+               "@param text Name of the new category\n\n")
 {
-	object->addEntry(text, -1, 0);
+   object->addEntry(text, -1, 0);
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontColor, ColorI fontColorHL, ColorI fontColorSEL),,
-				   "@brief Create a new scheme and add it to the list of choices for when a new text entry is added.\n\n"
-				   "@param id Numerical id associated with this scheme\n"
-				   "@param fontColor The base text font color. Formatted as \"Red Green Blue\", each a numerical between 0 and 255.\n"
-				   "@param fontColorHL Color of text when being highlighted. Formatted as \"Red Green Blue\", each a numerical between 0 and 255.\n"
-				   "@param fontColorSel Color of text when being selected. Formatted as \"Red Green Blue\", each a numerical between 0 and 255.\n")
+               "@brief Create a new scheme and add it to the list of choices for when a new text entry is added.\n\n"
+               "@param id Numerical id associated with this scheme\n"
+               "@param fontColor The base text font color. Formatted as \"Red Green Blue\", each a numerical between 0 and 255.\n"
+               "@param fontColorHL Color of text when being highlighted. Formatted as \"Red Green Blue\", each a numerical between 0 and 255.\n"
+               "@param fontColorSel Color of text when being selected. Formatted as \"Red Green Blue\", each a numerical between 0 and 255.\n")
 {
-	/*ColorI fontColor, fontColorHL, fontColorSEL;
+   /*ColorI fontColor, fontColorHL, fontColorSEL;
    U32 r, g, b;
    char buf[64];
 
@@ -461,142 +457,134 @@ DefineEngineMethod( GuiPopUpMenuCtrlEx, addScheme, void, (S32 id, ColorI fontCol
 //}
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, setText, void, ( const char* text),,
-				   "@brief Set the current text to a specified value.\n\n"
-				   "@param text String containing new text to set\n\n")
+               "@brief Set the current text to a specified value.\n\n"
+               "@param text String containing new text to set\n\n")
 {
-	object->setText(text);
+   object->setText(text);
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, getText, const char*, (),,
-				   "@brief Get the.\n\n"
+               "@brief Get the.\n\n"
 
-				   "Detailed description\n\n"
+               "Detailed description\n\n"
 
-				   "@param param Description\n\n"
+               "@param param Description\n\n"
 
-				   "@tsexample\n"
-				   "// Comment\n"
-				   "code();\n"
-				   "@endtsexample\n\n"
+               "@tsexample\n"
+               "// Comment\n"
+               "code();\n"
+               "@endtsexample\n\n"
 
-				   "@return Returns current text in string format")
+               "@return Returns current text in string format")
 {
-	return object->getText();
+   return object->getText();
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, clear, void, (),,
-				   "@brief Clear the popup list.\n\n")
+               "@brief Clear the popup list.\n\n")
 {
-	object->clear();
+   object->clear();
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, sort, void, (),,
-				   "@brief Sort the list alphabetically.\n\n")
+               "@brief Sort the list alphabetically.\n\n")
 {
-	object->sort();
+   object->sort();
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, sortID, void, (),,
-				   "@brief Sort the list by ID.\n\n")
+               "@brief Sort the list by ID.\n\n")
 {
-	object->sortID();
+   object->sortID();
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, forceOnAction, void, (),,
-				   "@brief Manually for the onAction function, which updates everything in this control.\n\n")
+               "@brief Manually for the onAction function, which updates everything in this control.\n\n")
 {
-	object->onAction();
+   object->onAction();
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, forceClose, void, (),,
-				   "@brief Manually force this control to collapse and close.\n\n")
+               "@brief Manually force this control to collapse and close.\n\n")
 {
-	object->closePopUp();
+   object->closePopUp();
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, getSelected, S32, (),,
-				   "@brief Get the current selection of the menu.\n\n"
-				   "@return Returns the ID of the currently selected entry")
+               "@brief Get the current selection of the menu.\n\n"
+               "@return Returns the ID of the currently selected entry")
 {
-	return object->getSelected();
+   return object->getSelected();
 }
 
 ConsoleDocFragment _GuiPopUpMenuCtrlExsetSelected(
-	"brief Manually set an entry as selected int his control\n\n"
-	"@param id The ID of the entry to select\n"
-	"@param scripCallback Optional boolean that forces the script callback if true\n",
-	"GuiPopUpMenuCtrlEx",
-	"setSelected(int id, bool scriptCallback=true);"
+   "brief Manually set an entry as selected int his control\n\n"
+   "@param id The ID of the entry to select\n"
+   "@param scripCallback Optional boolean that forces the script callback if true\n",
+   "GuiPopUpMenuCtrlEx",
+   "setSelected(int id, bool scriptCallback=true);"
 );
 
-ConsoleMethod( GuiPopUpMenuCtrlEx, setSelected, void, 3, 4, "(int id, [scriptCallback=true])"
-			  "@hide")
+DefineConsoleMethod( GuiPopUpMenuCtrlEx, setSelected, void, (S32 id, bool scriptCallback), (true), "(int id, [scriptCallback=true])"
+           "@hide")
 {
-   if( argc > 3 )
-      object->setSelected( dAtoi( argv[2] ), dAtob( argv[3] ) );
-   else
-      object->setSelected( dAtoi( argv[2] ) );
+   object->setSelected( id, scriptCallback );
 }
 
 ConsoleDocFragment _GuiPopUpMenuCtrlExsetFirstSelected(
-	"brief Manually set the selection to the first entry\n\n"
-	"@param scripCallback Optional boolean that forces the script callback if true\n",
-	"GuiPopUpMenuCtrlEx",
-	"setSelected(bool scriptCallback=true);"
+   "brief Manually set the selection to the first entry\n\n"
+   "@param scripCallback Optional boolean that forces the script callback if true\n",
+   "GuiPopUpMenuCtrlEx",
+   "setSelected(bool scriptCallback=true);"
 );
 
 
-ConsoleMethod( GuiPopUpMenuCtrlEx, setFirstSelected, void, 2, 3, "([scriptCallback=true])"
-			  "@hide")
+DefineConsoleMethod( GuiPopUpMenuCtrlEx, setFirstSelected, void, (bool scriptCallback), (true), "([scriptCallback=true])"
+           "@hide")
 {
-   if( argc > 2 )
-      object->setFirstSelected( dAtob( argv[2] ) );
-   else
-      object->setFirstSelected();
+   object->setFirstSelected( scriptCallback );
 }
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, setNoneSelected, void, ( S32 param),,
-				   "@brief Clears selection in the menu.\n\n")
+               "@brief Clears selection in the menu.\n\n")
 {
-	object->setNoneSelected();
+   object->setNoneSelected();
 }
 
 
 DefineEngineMethod( GuiPopUpMenuCtrlEx, getTextById, const char*, (S32 id),,
-				   "@brief Get the text of an entry based on an ID.\n\n"
-				   "@param id The ID assigned to the entry being queried\n\n"
-				   "@return String contained by the specified entry, NULL if empty or bad ID")
+               "@brief Get the text of an entry based on an ID.\n\n"
+               "@param id The ID assigned to the entry being queried\n\n"
+               "@return String contained by the specified entry, NULL if empty or bad ID")
 {
-	return(object->getTextById(id));
+   return(object->getTextById(id));
 }
 
 
-ConsoleMethod( GuiPopUpMenuCtrlEx, getColorById, const char*, 3, 3,  
-			  "@brief Get color of an entry's box\n\n"
-			  "@param id ID number of entry to query\n\n"
-			  "@return ColorI in the format of \"Red Green Blue Alpha\", each of with is a value between 0 - 255")
+DefineConsoleMethod( GuiPopUpMenuCtrlEx, getColorById,  ColorI, (S32 id), ,  
+           "@brief Get color of an entry's box\n\n"
+           "@param id ID number of entry to query\n\n"
+           "@return ColorI in the format of \"Red Green Blue Alpha\", each of with is a value between 0 - 255")
 {
    ColorI color;
-   object->getColoredBox(color, dAtoi(argv[2]));
+   object->getColoredBox(color, id);
+   return color;
 
-   char *strBuffer = Con::getReturnBuffer(512);
-   dSprintf(strBuffer, 512, "%d %d %d %d", color.red, color.green, color.blue, color.alpha);
-   return strBuffer;
 }
 
-ConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, 4, 4,
-			  "@brief This fills the popup with a classrep's field enumeration type info.\n\n"
+DefineConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, ( const char * className, const char * enumName ), ,
+           "@brief This fills the popup with a classrep's field enumeration type info.\n\n"
               "More of a helper function than anything.   If console access to the field list is added, "
               "at least for the enumerated types, then this should go away.\n\n"
-			  "@param class Name of the class containing the enum\n"
-			  "@param enum Name of the enum value to acces\n")
+           "@param class Name of the class containing the enum\n"
+           "@param enum Name of the enum value to acces\n")
 {
    AbstractClassRep * classRep = AbstractClassRep::getClassList();
 
    // walk the class list to get our class
    while(classRep)
    {
-      if(!dStricmp(classRep->getClassName(), argv[2]))
+      if(!dStricmp(classRep->getClassName(), className))
          break;
       classRep = classRep->getNextClass();
    }
@@ -604,20 +592,20 @@ ConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, 4, 4,
    // get it?
    if(!classRep)
    {
-      Con::warnf(ConsoleLogEntry::General, "failed to locate class rep for '%s'", argv[2]);
+      Con::warnf(ConsoleLogEntry::General, "failed to locate class rep for '%s'", className);
       return;
    }
 
    // walk the fields to check for this one (findField checks StringTableEntry ptrs...)
    U32 i;
    for(i = 0; i < classRep->mFieldList.size(); i++)
-      if(!dStricmp(classRep->mFieldList[i].pFieldname, argv[3]))
+      if(!dStricmp(classRep->mFieldList[i].pFieldname, enumName))
          break;
 
    // found it?   
    if(i == classRep->mFieldList.size())
    {   
-      Con::warnf(ConsoleLogEntry::General, "failed to locate field '%s' for class '%s'", argv[3], argv[2]);
+      Con::warnf(ConsoleLogEntry::General, "failed to locate field '%s' for class '%s'", enumName, className);
       return;
    }
 
@@ -627,7 +615,7 @@ ConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, 4, 4,
    // check the type
    if( !conType->getEnumTable() )
    {
-      Con::warnf(ConsoleLogEntry::General, "field '%s' is not an enumeration for class '%s'", argv[3], argv[2]);
+      Con::warnf(ConsoleLogEntry::General, "field '%s' is not an enumeration for class '%s'", enumName, className);
       return;
    }
 
@@ -640,28 +628,28 @@ ConsoleMethod( GuiPopUpMenuCtrlEx, setEnumContent, void, 4, 4,
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrlEx, findText, S32, 3, 3, "(string text)"
+DefineConsoleMethod( GuiPopUpMenuCtrlEx, findText, S32, (const char * text), , "(string text)"
               "Returns the id of the first entry containing the specified text or -1 if not found."
-			  "@param text String value used for the query\n\n"
-			  "@return Numerical ID of entry containing the text.")
+           "@param text String value used for the query\n\n"
+           "@return Numerical ID of entry containing the text.")
 {
-   return( object->findText( argv[2] ) );   
+   return( object->findText( text ) );
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrlEx, size, S32, 2, 2, 
-			  "@brief Get the size of the menu\n\n"
-			  "@return Number of entries in the menu\n")
+DefineConsoleMethod( GuiPopUpMenuCtrlEx, size, S32, (), , 
+           "@brief Get the size of the menu\n\n"
+           "@return Number of entries in the menu\n")
 {
    return( object->getNumEntries() ); 
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrlEx, replaceText, void, 3, 3, 
-			  "@brief Flag that causes each new text addition to replace the current entry\n\n"
-			  "@param True to turn on replacing, false to disable it")
+DefineConsoleMethod( GuiPopUpMenuCtrlEx, replaceText, void, (S32 boolVal), , 
+           "@brief Flag that causes each new text addition to replace the current entry\n\n"
+           "@param True to turn on replacing, false to disable it")
 {
-   object->replaceText(dAtoi(argv[2]));  
+   object->replaceText(boolVal);
 }
 
 //------------------------------------------------------------------------------
@@ -709,49 +697,49 @@ void GuiPopUpMenuCtrlEx::clear()
    setText("");
    mSelIndex = -1;
    mRevNum = 0;
-	mIdMax = -1;
+   mIdMax = -1;
 }
 
 //------------------------------------------------------------------------------
 void GuiPopUpMenuCtrlEx::clearEntry( S32 entry )
 {
-	if( entry == -1 )
-		return;
+   if( entry == -1 )
+      return;
 
-	U32 i = 0;
-	for ( ; i < mEntries.size(); i++ )
+   U32 i = 0;
+   for ( ; i < mEntries.size(); i++ )
    {
       if ( mEntries[i].id == entry )
          break;
    }
 
-	mEntries.erase( i );
+   mEntries.erase( i );
 
-	if( mEntries.size() <= 0 )
-	{
-		mEntries.setSize(0);
-		setText("");
-		mSelIndex = -1;
-		mRevNum = 0;
-	}
-	else
-	{
-		if( entry == mSelIndex )
-		{
-			setText("");
-			mSelIndex = -1;
-		}
-		else
-		{
-			mSelIndex--;
-		}
-	}
+   if( mEntries.size() <= 0 )
+   {
+      mEntries.setSize(0);
+      setText("");
+      mSelIndex = -1;
+      mRevNum = 0;
+   }
+   else
+   {
+      if( entry == mSelIndex )
+      {
+         setText("");
+         mSelIndex = -1;
+      }
+      else
+      {
+         mSelIndex--;
+      }
+   }
 }
 
 //------------------------------------------------------------------------------
-ConsoleMethod( GuiPopUpMenuCtrlEx, clearEntry, void, 3, 3, "(S32 entry)")
+DefineConsoleMethod( GuiPopUpMenuCtrlEx, clearEntry, void, (S32 entry), , "(S32 entry)")
 {
-   object->clearEntry(dAtoi(argv[2]));  
+   object->clearEntry(entry);
 }
 
 //------------------------------------------------------------------------------
@@ -809,9 +797,9 @@ void GuiPopUpMenuCtrlEx::sort()
    if( size > 0 )
       dQsort( mEntries.address(), size, sizeof(Entry), textCompare);
 
-	// Entries need to re-Id themselves
-	for( U32 i = 0; i < mEntries.size(); i++ )
-		mEntries[i].id = i;
+   // Entries need to re-Id themselves
+   for( U32 i = 0; i < mEntries.size(); i++ )
+      mEntries[i].id = i;
 }
 
 //  Added to sort by entry ID
@@ -822,9 +810,9 @@ void GuiPopUpMenuCtrlEx::sortID()
    if( size > 0 )
       dQsort( mEntries.address(), size, sizeof(Entry), idCompare);
 
-	// Entries need to re-Id themselves
-	for( U32 i = 0; i < mEntries.size(); i++ )
-		mEntries[i].id = i;
+   // Entries need to re-Id themselves
+   for( U32 i = 0; i < mEntries.size(); i++ )
+      mEntries[i].id = i;
 }
 
 //------------------------------------------------------------------------------
@@ -835,21 +823,21 @@ void GuiPopUpMenuCtrlEx::addEntry(const char *buf, S32 id, U32 scheme)
       //Con::printf( "GuiPopupMenuCtrlEx::addEntry - Invalid buffer!" );
       return;
    }
-	
-	// Ensure that there are no other entries with exactly the same name
-	for ( U32 i = 0; i < mEntries.size(); i++ )
+   
+   // Ensure that there are no other entries with exactly the same name
+   for ( U32 i = 0; i < mEntries.size(); i++ )
    {
       if ( dStrcmp( mEntries[i].buf, buf ) == 0 )
          return;
    }
 
-	// If we don't give an id, create one from mIdMax
-	if( id == -1 )
-		id = mIdMax + 1;
-	
-	// Increase mIdMax when an id is greater than it
-	if( id > mIdMax )
-		mIdMax = id;
+   // If we don't give an id, create one from mIdMax
+   if( id == -1 )
+      id = mIdMax + 1;
+   
+   // Increase mIdMax when an id is greater than it
+   if( id > mIdMax )
+      mIdMax = id;
 
    Entry e;
    dStrcpy( e.buf, buf );
@@ -1004,20 +992,20 @@ void GuiPopUpMenuCtrlEx::setFirstSelected( bool bNotifyScript )
       if ( isMethod( "onSelect" ) )
          Con::executef( this, "onSelect", idval, mEntries[mSelIndex].buf );
       
-		// Execute the popup console command:
-		if ( bNotifyScript )
-			execConsoleCallback();
+      // Execute the popup console command:
+      if ( bNotifyScript )
+         execConsoleCallback();
    }
-	else
-	{
-		if ( mReplaceText ) //  Only change the displayed text if appropriate.
-			setText("");
-		
-		mSelIndex = -1;
+   else
+   {
+      if ( mReplaceText ) //  Only change the displayed text if appropriate.
+         setText("");
+      
+      mSelIndex = -1;
 
-		if ( bNotifyScript )
-			Con::executef( this, "onCancel" );
-	}
+      if ( bNotifyScript )
+         Con::executef( this, "onCancel" );
+   }
 }
 
 //------------------------------------------------------------------------------
@@ -1046,6 +1034,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
    if ( mScrollDir != GuiScrollCtrl::None )
       autoScroll();
 
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
+
    RectI r( offset, getExtent() );
    if ( mInAction )
    {
@@ -1062,30 +1052,30 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
       else
       {
          //renderSlightlyLoweredBox(r, mProfile);
-         GFX->getDrawUtil()->drawRectFill( r, mProfile->mFillColor );
+         drawUtil->drawRectFill( r, mProfile->mFillColor );
       }
 
       //  Draw a bitmap over the background?
       if ( mTextureDepressed )
       {
          RectI rect(offset, mBitmapBounds);
-         GFX->getDrawUtil()->clearBitmapModulation();
-         GFX->getDrawUtil()->drawBitmapStretch( mTextureDepressed, rect );
+         drawUtil->clearBitmapModulation();
+         drawUtil->drawBitmapStretch( mTextureDepressed, rect );
       } 
       else if ( mTextureNormal )
       {
          RectI rect(offset, mBitmapBounds);
-         GFX->getDrawUtil()->clearBitmapModulation();
-         GFX->getDrawUtil()->drawBitmapStretch( mTextureNormal, rect );
+         drawUtil->clearBitmapModulation();
+         drawUtil->drawBitmapStretch( mTextureNormal, rect );
       }
 
       // Do we render a bitmap border or lines?
       if ( !( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() ) )
       {
-         GFX->getDrawUtil()->drawLine( l, t, l, b, colorWhite );
-         GFX->getDrawUtil()->drawLine( l, t, r2, t, colorWhite );
-         GFX->getDrawUtil()->drawLine( l + 1, b, r2, b, mProfile->mBorderColor );
-         GFX->getDrawUtil()->drawLine( r2, t + 1, r2, b - 1, mProfile->mBorderColor );
+         drawUtil->drawLine( l, t, l, b, colorWhite );
+         drawUtil->drawLine( l, t, r2, t, colorWhite );
+         drawUtil->drawLine( l + 1, b, r2, b, mProfile->mBorderColor );
+         drawUtil->drawLine( r2, t + 1, r2, b - 1, mProfile->mBorderColor );
       }
 
    }
@@ -1106,24 +1096,24 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          } 
          else
          {
-            GFX->getDrawUtil()->drawRectFill( r, mProfile->mFillColorHL );
+            drawUtil->drawRectFill( r, mProfile->mFillColorHL );
          }
 
          //  Draw a bitmap over the background?
          if ( mTextureNormal )
          {
             RectI rect( offset, mBitmapBounds );
-            GFX->getDrawUtil()->clearBitmapModulation();
-            GFX->getDrawUtil()->drawBitmapStretch( mTextureNormal, rect );
+            drawUtil->clearBitmapModulation();
+            drawUtil->drawBitmapStretch( mTextureNormal, rect );
          }
 
          // Do we render a bitmap border or lines?
          if ( !( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() ) )
          {
-            GFX->getDrawUtil()->drawLine( l, t, l, b, colorWhite );
-            GFX->getDrawUtil()->drawLine( l, t, r2, t, colorWhite );
-            GFX->getDrawUtil()->drawLine( l + 1, b, r2, b, mProfile->mBorderColor );
-            GFX->getDrawUtil()->drawLine( r2, t + 1, r2, b - 1, mProfile->mBorderColor );
+            drawUtil->drawLine( l, t, l, b, colorWhite );
+            drawUtil->drawLine( l, t, r2, t, colorWhite );
+            drawUtil->drawLine( l + 1, b, r2, b, mProfile->mBorderColor );
+            drawUtil->drawLine( r2, t + 1, r2, b - 1, mProfile->mBorderColor );
          }
       }
       else
@@ -1136,21 +1126,21 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          } 
          else
          {
-            GFX->getDrawUtil()->drawRectFill( r, mProfile->mFillColorNA );
+            drawUtil->drawRectFill( r, mProfile->mFillColorNA );
          }
 
          //  Draw a bitmap over the background?
          if ( mTextureNormal )
          {
             RectI rect(offset, mBitmapBounds);
-            GFX->getDrawUtil()->clearBitmapModulation();
-            GFX->getDrawUtil()->drawBitmapStretch( mTextureNormal, rect );
+            drawUtil->clearBitmapModulation();
+            drawUtil->drawBitmapStretch( mTextureNormal, rect );
          }
 
          // Do we render a bitmap border or lines?
          if ( !( mProfile->getChildrenProfile() && mProfile->mBitmapArrayRects.size() ) )
          {
-            GFX->getDrawUtil()->drawRect( r, mProfile->mBorderColorNA );
+            drawUtil->drawRect( r, mProfile->mBorderColorNA );
          }
       }
       //      renderSlightlyRaisedBox(r, mProfile); //  Used to be the only 'else' condition to mInAction above.
@@ -1167,8 +1157,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
-            RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-            localStart.x = getWidth() - mBitmapBounds[2].extent.x - txt_w;
+            RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+            localStart.x = getWidth() - bitmapBounds[2].extent.x - txt_w;
          } 
          else
          {
@@ -1180,8 +1170,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
-            RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-            localStart.x = (getWidth() - mBitmapBounds[2].extent.x - txt_w) / 2;
+            RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+            localStart.x = (getWidth() - bitmapBounds[2].extent.x - txt_w) / 2;
 
          } else
          {
@@ -1199,8 +1189,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
             {
                // We're making use of a bitmap border, so take into account the
                // right cap of the border.
-               RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-               localStart.x = getWidth() - mBitmapBounds[2].extent.x - txt_w;
+               RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+               localStart.x = getWidth() - bitmapBounds[2].extent.x - txt_w;
             } 
             else
             {
@@ -1221,8 +1211,8 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
       {
          Point2I coloredboxsize( 15, 10 );
          RectI r( offset.x + mProfile->mTextOffset.x, offset.y + ( (getHeight() - coloredboxsize.y ) / 2 ), coloredboxsize.x, coloredboxsize.y );
-         GFX->getDrawUtil()->drawRectFill( r, boxColor);
-         GFX->getDrawUtil()->drawRect( r, ColorI(0,0,0));
+         drawUtil->drawRectFill( r, boxColor);
+         drawUtil->drawRect( r, ColorI(0,0,0));
 
          localStart.x += coloredboxsize.x + mProfile->mTextOffset.x;
       }
@@ -1230,7 +1220,7 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
       // Draw the text
       Point2I globalStart = localToGlobalCoord( localStart );
       ColorI fontColor   = mActive ? ( mInAction ? mProfile->mFontColor : mProfile->mFontColorNA ) : mProfile->mFontColorNA;
-      GFX->getDrawUtil()->setBitmapModulation( fontColor ); //  was: (mProfile->mFontColor);
+      drawUtil->setBitmapModulation( fontColor ); //  was: (mProfile->mFontColor);
 
       //  Get the number of columns in the text
       S32 colcount = getColumnCount( mText, "\t" );
@@ -1242,7 +1232,7 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
 
          // Draw the first column
          getColumn( mText, buff, 0, "\t" );
-         GFX->getDrawUtil()->drawText( mProfile->mFont, globalStart, buff, mProfile->mFontColors );
+         drawUtil->drawText( mProfile->mFont, globalStart, buff, mProfile->mFontColors );
 
          // Draw the second column to the right
          getColumn( mText, buff, 1, "\t" );
@@ -1251,19 +1241,19 @@ void GuiPopUpMenuCtrlEx::onRender(Point2I offset, const RectI &updateRect)
          {
             // We're making use of a bitmap border, so take into account the
             // right cap of the border.
-            RectI* mBitmapBounds = mProfile->mBitmapArrayRects.address();
-            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - mBitmapBounds[2].extent.x, localStart.y ) );
-            GFX->getDrawUtil()->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
+            RectI* bitmapBounds = mProfile->mBitmapArrayRects.address();
+            Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - bitmapBounds[2].extent.x, localStart.y ) );
+            drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
 
          } else
          {
             Point2I textpos = localToGlobalCoord( Point2I( getWidth() - txt_w - 12, localStart.y ) );
-            GFX->getDrawUtil()->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
+            drawUtil->drawText( mProfile->mFont, textpos, buff, mProfile->mFontColors );
          }
 
       } else
       {
-         GFX->getDrawUtil()->drawText( mProfile->mFont, globalStart, mText, mProfile->mFontColors );
+         drawUtil->drawText( mProfile->mFont, globalStart, mText, mProfile->mFontColors );
       }
 
       // If we're rendering a bitmap border, then it will take care of the arrow.
@@ -1510,11 +1500,11 @@ void GuiPopUpMenuCtrlEx::onAction()
    if ( setScroll )
    {
       // Resize the text list
-	  Point2I cellSize;
-	  mTl->getCellSize( cellSize );
-	  cellSize.x = width - mSc->scrollBarThickness() - sbBorder;
-	  mTl->setCellSize( cellSize );
-	  mTl->setWidth( cellSize.x );
+     Point2I cellSize;
+     mTl->getCellSize( cellSize );
+     cellSize.x = width - mSc->scrollBarThickness() - sbBorder;
+     mTl->setCellSize( cellSize );
+     mTl->setWidth( cellSize.x );
 
       if ( mSelIndex )
          mTl->scrollCellVisible( Point2I( 0, mSelIndex ) );
@@ -1546,7 +1536,7 @@ void GuiPopUpMenuCtrlEx::addChildren()
    else
    {
       // Use the children's profile rather than the parent's profile, if it exists.
-	  mSc->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile );
+     mSc->setControlProfile( mProfile->getChildrenProfile() ? mProfile->getChildrenProfile() : mProfile );
    }
    mSc->setField( "hScrollBar", "AlwaysOff" );
    mSc->setField( "vScrollBar", "dynamic" );

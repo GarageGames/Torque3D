@@ -35,6 +35,14 @@ class btRigidBody;
 
 
 
+#ifdef BT_USE_DOUBLE_PRECISION
+#define btGeneric6DofConstraintData2		btGeneric6DofConstraintDoubleData2
+#define btGeneric6DofConstraintDataName	"btGeneric6DofConstraintDoubleData2"
+#else
+#define btGeneric6DofConstraintData2		btGeneric6DofConstraintData
+#define btGeneric6DofConstraintDataName	"btGeneric6DofConstraintData"
+#endif //BT_USE_DOUBLE_PRECISION
+
 
 //! Rotation Limit structure for generic joints
 class btRotationalLimitMotor
@@ -103,14 +111,14 @@ public:
 
 
 	//! Is limited
-    bool isLimited()
+    bool isLimited() const
     {
     	if(m_loLimit > m_hiLimit) return false;
     	return true;
     }
 
 	//! Need apply correction
-    bool needApplyTorques()
+    bool needApplyTorques() const
     {
     	if(m_currentLimit == 0 && m_enableMotor == false) return false;
     	return true;
@@ -199,11 +207,11 @@ public:
     - limited means upper > lower
     - limitIndex: first 3 are linear, next 3 are angular
     */
-    inline bool	isLimited(int limitIndex)
+    inline bool	isLimited(int limitIndex) const
     {
        return (m_upperLimit[limitIndex] >= m_lowerLimit[limitIndex]);
     }
-    inline bool needApplyForce(int limitIndex)
+    inline bool needApplyForce(int limitIndex) const
     {
     	if(m_currentLimit[limitIndex] == 0 && m_enableMotor[limitIndex] == false) return false;
     	return true;
@@ -449,7 +457,7 @@ public:
     	m_linearLimits.m_lowerLimit = linearLower;
     }
 
-	void	getLinearLowerLimit(btVector3& linearLower)
+	void	getLinearLowerLimit(btVector3& linearLower) const
 	{
 		linearLower = m_linearLimits.m_lowerLimit;
 	}
@@ -459,7 +467,7 @@ public:
 		m_linearLimits.m_upperLimit = linearUpper;
 	}
 
-	void	getLinearUpperLimit(btVector3& linearUpper)
+	void	getLinearUpperLimit(btVector3& linearUpper) const
 	{
 		linearUpper = m_linearLimits.m_upperLimit;
 	}
@@ -470,7 +478,7 @@ public:
 			m_angularLimits[i].m_loLimit = btNormalizeAngle(angularLower[i]);
     }
 
-	void	getAngularLowerLimit(btVector3& angularLower)
+	void	getAngularLowerLimit(btVector3& angularLower) const
 	{
 		for(int i = 0; i < 3; i++) 
 			angularLower[i] = m_angularLimits[i].m_loLimit;
@@ -482,7 +490,7 @@ public:
 			m_angularLimits[i].m_hiLimit = btNormalizeAngle(angularUpper[i]);
     }
 
-	void	getAngularUpperLimit(btVector3& angularUpper)
+	void	getAngularUpperLimit(btVector3& angularUpper) const
 	{
 		for(int i = 0; i < 3; i++)
 			angularUpper[i] = m_angularLimits[i].m_hiLimit;
@@ -524,7 +532,7 @@ public:
     - limited means upper > lower
     - limitIndex: first 3 are linear, next 3 are angular
     */
-    bool	isLimited(int limitIndex)
+    bool	isLimited(int limitIndex) const
     {
     	if(limitIndex<3)
     	{
@@ -541,8 +549,11 @@ public:
 								btConstraintInfo2 *info, int row, btVector3& ax1, int rotational, int rotAllowed = false);
 
 	// access for UseFrameOffset
-	bool getUseFrameOffset() { return m_useOffsetForConstraintFrame; }
+	bool getUseFrameOffset() const { return m_useOffsetForConstraintFrame; }
 	void setUseFrameOffset(bool frameOffsetOnOff) { m_useOffsetForConstraintFrame = frameOffsetOnOff; }
+	
+	bool getUseLinearReferenceFrameA() const { return m_useLinearReferenceFrameA; }
+	void setUseLinearReferenceFrameA(bool linearReferenceFrameA) { m_useLinearReferenceFrameA = linearReferenceFrameA; }
 
 	///override the default global value of a parameter (such as ERP or CFM), optionally provide the axis (0..5). 
 	///If no axis is provided, it uses the default axis for this constraint.
@@ -552,6 +563,10 @@ public:
 
 	void setAxis( const btVector3& axis1, const btVector3& axis2);
 
+    	virtual	int getFlags() const
+    	{
+        	return m_flags;
+	}
 
 	virtual	int	calculateSerializeBufferSize() const;
 
@@ -561,7 +576,7 @@ public:
 	
 };
 
-///do not change those serialization structures, it requires an updated sBulletDNAstr/sBulletDNAstr64
+
 struct btGeneric6DofConstraintData
 {
 	btTypedConstraintData	m_typeConstraintData;
@@ -578,35 +593,51 @@ struct btGeneric6DofConstraintData
 	int m_useOffsetForConstraintFrame;
 };
 
+struct btGeneric6DofConstraintDoubleData2
+{
+	btTypedConstraintDoubleData	m_typeConstraintData;
+	btTransformDoubleData m_rbAFrame; // constraint axii. Assumes z is hinge axis.
+	btTransformDoubleData m_rbBFrame;
+	
+	btVector3DoubleData	m_linearUpperLimit;
+	btVector3DoubleData	m_linearLowerLimit;
+
+	btVector3DoubleData	m_angularUpperLimit;
+	btVector3DoubleData	m_angularLowerLimit;
+	
+	int	m_useLinearReferenceFrameA;
+	int m_useOffsetForConstraintFrame;
+};
+
 SIMD_FORCE_INLINE	int	btGeneric6DofConstraint::calculateSerializeBufferSize() const
 {
-	return sizeof(btGeneric6DofConstraintData);
+	return sizeof(btGeneric6DofConstraintData2);
 }
 
 	///fills the dataBuffer and returns the struct name (and 0 on failure)
 SIMD_FORCE_INLINE	const char*	btGeneric6DofConstraint::serialize(void* dataBuffer, btSerializer* serializer) const
 {
 
-	btGeneric6DofConstraintData* dof = (btGeneric6DofConstraintData*)dataBuffer;
+	btGeneric6DofConstraintData2* dof = (btGeneric6DofConstraintData2*)dataBuffer;
 	btTypedConstraint::serialize(&dof->m_typeConstraintData,serializer);
 
-	m_frameInA.serializeFloat(dof->m_rbAFrame);
-	m_frameInB.serializeFloat(dof->m_rbBFrame);
+	m_frameInA.serialize(dof->m_rbAFrame);
+	m_frameInB.serialize(dof->m_rbBFrame);
 
 		
 	int i;
 	for (i=0;i<3;i++)
 	{
-		dof->m_angularLowerLimit.m_floats[i] =  float(m_angularLimits[i].m_loLimit);
-		dof->m_angularUpperLimit.m_floats[i] =  float(m_angularLimits[i].m_hiLimit);
-		dof->m_linearLowerLimit.m_floats[i] = float(m_linearLimits.m_lowerLimit[i]);
-		dof->m_linearUpperLimit.m_floats[i] = float(m_linearLimits.m_upperLimit[i]);
+		dof->m_angularLowerLimit.m_floats[i] =  m_angularLimits[i].m_loLimit;
+		dof->m_angularUpperLimit.m_floats[i] =  m_angularLimits[i].m_hiLimit;
+		dof->m_linearLowerLimit.m_floats[i] = m_linearLimits.m_lowerLimit[i];
+		dof->m_linearUpperLimit.m_floats[i] = m_linearLimits.m_upperLimit[i];
 	}
 	
 	dof->m_useLinearReferenceFrameA = m_useLinearReferenceFrameA? 1 : 0;
 	dof->m_useOffsetForConstraintFrame = m_useOffsetForConstraintFrame ? 1 : 0;
 
-	return "btGeneric6DofConstraintData";
+	return btGeneric6DofConstraintDataName;
 }
 
 

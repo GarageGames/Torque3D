@@ -22,9 +22,7 @@
 
 // For VS2005.
 #define _WIN32_WINNT 0x501
-#ifndef TORQUE_OS_XENON
 #include "platformWin32/platformWin32.h"
-#endif
 #include "platform/async/asyncUpdate.h"
 
 

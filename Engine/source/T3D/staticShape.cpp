@@ -28,6 +28,7 @@
 #include "console/simBase.h"
 #include "console/console.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "T3D/gameBase/moveManager.h"
 #include "ts/tsShapeInstance.h"
 #include "T3D/staticShape.h"
@@ -44,48 +45,48 @@ static const U32 sgAllowedDynamicTypes = 0xffffff;
 IMPLEMENT_CO_DATABLOCK_V1(StaticShapeData);
 
 ConsoleDocClass( StaticShapeData,
-	"@brief The most basic ShapeBaseData derrived shape datablock available in Torque 3D.\n\n"
+   "@brief The most basic ShapeBaseData derrived shape datablock available in Torque 3D.\n\n"
 
-	"When it comes to placing 3D objects in the scene, you effectively have two options:\n\n"
-	"1. TSStatic objects\n\n"
-	"2. ShapeBase derived objects\n\n"
+   "When it comes to placing 3D objects in the scene, you effectively have two options:\n\n"
+   "1. TSStatic objects\n\n"
+   "2. ShapeBase derived objects\n\n"
 
-	"Since ShapeBase and ShapeBaseData are not meant to be instantiated in script, you "
-	"will use one of its child classes instead. Several game related objects are derived "
-	"from ShapeBase: Player, Vehicle, Item, and so on.\n\n"
+   "Since ShapeBase and ShapeBaseData are not meant to be instantiated in script, you "
+   "will use one of its child classes instead. Several game related objects are derived "
+   "from ShapeBase: Player, Vehicle, Item, and so on.\n\n"
 
-	"When you need a 3D object with datablock capabilities, you will use an object derived "
-	"from ShapeBase. When you need an object with extremely low overhead, and with no other "
-	"purpose than to be a 3D object in the scene, you will use TSStatic.\n\n"
+   "When you need a 3D object with datablock capabilities, you will use an object derived "
+   "from ShapeBase. When you need an object with extremely low overhead, and with no other "
+   "purpose than to be a 3D object in the scene, you will use TSStatic.\n\n"
 
-	"The most basic child of ShapeBase is StaticShape. It does not introduce any of the "
-	"additional functionality you see in Player, Item, Vehicle or the other game play "
-	"heavy classes. At its core, it is comparable to a TSStatic, but with a datbalock.  Having "
+   "The most basic child of ShapeBase is StaticShape. It does not introduce any of the "
+   "additional functionality you see in Player, Item, Vehicle or the other game play "
+   "heavy classes. At its core, it is comparable to a TSStatic, but with a datbalock.  Having "
    "a datablock provides a location for common variables as well as having access to "
    "various ShapeBaseData, GameBaseData and SimDataBlock callbacks.\n\n"
 
-	"@tsexample\n"
-	   "// Create a StaticShape using a datablock\n"
-	   "datablock StaticShapeData(BasicShapeData)\n" 
-	   "{\n"
-	   "	shapeFile = \"art/shapes/items/kit/healthkit.dts\";\n"
-	   "	testVar = \"Simple string, not a stock variable\";\n"
-	   "};\n\n"
-	   "new StaticShape()\n"
-	   "{\n"
-	   "	dataBlock = \"BasicShapeData\";\n"
-	   "	position = \"0.0 0.0 0.0\";\n"
-	   "	rotation = \"1 0 0 0\";\n"
-	   "	scale = \"1 1 1\";\n"
-	   "};\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+      "// Create a StaticShape using a datablock\n"
+      "datablock StaticShapeData(BasicShapeData)\n" 
+      "{\n"
+      "  shapeFile = \"art/shapes/items/kit/healthkit.dts\";\n"
+      "  testVar = \"Simple string, not a stock variable\";\n"
+      "};\n\n"
+      "new StaticShape()\n"
+      "{\n"
+      "  dataBlock = \"BasicShapeData\";\n"
+      "  position = \"0.0 0.0 0.0\";\n"
+      "  rotation = \"1 0 0 0\";\n"
+      "  scale = \"1 1 1\";\n"
+      "};\n"
+   "@endtsexample\n\n"
 
-	"@see StaticShape\n"
+   "@see StaticShape\n"
    "@see ShapeBaseData\n"
-	"@see TSStatic\n\n"
+   "@see TSStatic\n\n"
 
-	"@ingroup gameObjects\n"
-	"@ingroup Datablocks");
+   "@ingroup gameObjects\n"
+   "@ingroup Datablocks");
 
 StaticShapeData::StaticShapeData()
 {
@@ -127,47 +128,47 @@ void StaticShapeData::unpackData(BitStream* stream)
 IMPLEMENT_CO_NETOBJECT_V1(StaticShape);
 
 ConsoleDocClass( StaticShape,
-	"@brief The most basic 3D shape with a datablock available in Torque 3D.\n\n"
+   "@brief The most basic 3D shape with a datablock available in Torque 3D.\n\n"
 
-	"When it comes to placing 3D objects in the scene, you technically have two options:\n\n"
-	"1. TSStatic objects\n\n"
-	"2. ShapeBase derived objects\n\n"
+   "When it comes to placing 3D objects in the scene, you technically have two options:\n\n"
+   "1. TSStatic objects\n\n"
+   "2. ShapeBase derived objects\n\n"
 
-	"Since ShapeBase and ShapeBaseData are not meant to be instantiated in script, you "
-	"will use one of its child classes instead. Several game related objects are derived "
-	"from ShapeBase: Player, Vehicle, Item, and so on.\n\n"
+   "Since ShapeBase and ShapeBaseData are not meant to be instantiated in script, you "
+   "will use one of its child classes instead. Several game related objects are derived "
+   "from ShapeBase: Player, Vehicle, Item, and so on.\n\n"
 
-	"When you need a 3D object with datablock capabilities, you will use an object derived "
-	"from ShapeBase. When you need an object with extremely low overhead, and with no other "
-	"purpose than to be a 3D object in the scene, you will use TSStatic.\n\n"
+   "When you need a 3D object with datablock capabilities, you will use an object derived "
+   "from ShapeBase. When you need an object with extremely low overhead, and with no other "
+   "purpose than to be a 3D object in the scene, you will use TSStatic.\n\n"
 
-	"The most basic child of ShapeBase is StaticShape. It does not introduce any of the "
-	"additional functionality you see in Player, Item, Vehicle or the other game play "
-	"heavy classes. At its core, it is comparable to a TSStatic, but with a datbalock.  Having "
+   "The most basic child of ShapeBase is StaticShape. It does not introduce any of the "
+   "additional functionality you see in Player, Item, Vehicle or the other game play "
+   "heavy classes. At its core, it is comparable to a TSStatic, but with a datbalock.  Having "
    "a datablock provides a location for common variables as well as having access to "
    "various ShapeBaseData, GameBaseData and SimDataBlock callbacks.\n\n"
 
-	"@tsexample\n"
-	   "// Create a StaticShape using a datablock\n"
-	   "datablock StaticShapeData(BasicShapeData)\n" 
-	   "{\n"
-	   "	shapeFile = \"art/shapes/items/kit/healthkit.dts\";\n"
-	   "	testVar = \"Simple string, not a stock variable\";\n"
-	   "};\n\n"
-	   "new StaticShape()\n"
-	   "{\n"
-	   "	dataBlock = \"BasicShapeData\";\n"
-	   "	position = \"0.0 0.0 0.0\";\n"
-	   "	rotation = \"1 0 0 0\";\n"
-	   "	scale = \"1 1 1\";\n"
-	   "};\n"
-	"@endtsexample\n\n"
+   "@tsexample\n"
+      "// Create a StaticShape using a datablock\n"
+      "datablock StaticShapeData(BasicShapeData)\n" 
+      "{\n"
+      "  shapeFile = \"art/shapes/items/kit/healthkit.dts\";\n"
+      "  testVar = \"Simple string, not a stock variable\";\n"
+      "};\n\n"
+      "new StaticShape()\n"
+      "{\n"
+      "  dataBlock = \"BasicShapeData\";\n"
+      "  position = \"0.0 0.0 0.0\";\n"
+      "  rotation = \"1 0 0 0\";\n"
+      "  scale = \"1 1 1\";\n"
+      "};\n"
+   "@endtsexample\n\n"
 
-	"@see StaticShapeData\n"
-	"@see ShapeBase\n"
-	"@see TSStatic\n\n"
+   "@see StaticShapeData\n"
+   "@see ShapeBase\n"
+   "@see TSStatic\n\n"
 
-	"@ingroup gameObjects\n");
+   "@ingroup gameObjects\n");
 
 StaticShape::StaticShape()
 {
@@ -231,22 +232,6 @@ void StaticShape::processTick(const Move* move)
       setImageTriggerState(0,move->trigger[0]);
       setImageTriggerState(1,move->trigger[1]);
    }
-
-   if (isMounted()) {
-      MatrixF mat;
-      mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
-      Parent::setTransform(mat);
-      Parent::setRenderTransform(mat);
-   }
-}
-
-void StaticShape::interpolateTick(F32 delta)
-{
-   if (isMounted()) {
-      MatrixF mat;
-      mMount.object->getRenderMountTransform( delta, mMount.node, mMount.xfm, &mat );
-      Parent::setRenderTransform(mat);
-   }
 }
 
 void StaticShape::setTransform(const MatrixF& mat)
@@ -255,7 +240,7 @@ void StaticShape::setTransform(const MatrixF& mat)
    setMaskBits(PositionMask);
 }
 
-void StaticShape::onUnmount(ShapeBase*,S32)
+void StaticShape::onUnmount(SceneObject*,S32)
 {
    // Make sure the client get's the final server pos.
    setMaskBits(PositionMask);
@@ -267,7 +252,7 @@ void StaticShape::onUnmount(ShapeBase*,S32)
 U32 StaticShape::packUpdate(NetConnection *connection, U32 mask, BitStream *bstream)
 {
    U32 retMask = Parent::packUpdate(connection,mask,bstream);
-   if (bstream->writeFlag(mask & PositionMask | ExtendedInfoMask))
+   if (bstream->writeFlag(mask & (PositionMask | ExtendedInfoMask)))
    {
 
       // Write the transform (do _not_ use writeAffineTransform.  Since this is a static
@@ -317,15 +302,15 @@ void StaticShape::unpackUpdate(NetConnection *connection, BitStream *bstream)
 // This appears to be legacy T2 stuff
 // Marked internal, as this is flagged to be deleted
 // [8/1/2010 mperry]
-ConsoleMethod( StaticShape, setPoweredState, void, 3, 3, "(bool isPowered)"
-			  "@internal")
+DefineConsoleMethod( StaticShape, setPoweredState, void, (bool isPowered), , "(bool isPowered)"
+           "@internal")
 {
    if(!object->isServerObject())
       return;
-   object->setPowered(dAtob(argv[2]));
+   object->setPowered(isPowered);
 }
 
-ConsoleMethod( StaticShape, getPoweredState, bool, 2, 2, "@internal")
+DefineConsoleMethod( StaticShape, getPoweredState, bool, (), , "@internal")
 {
    if(!object->isServerObject())
       return(false);

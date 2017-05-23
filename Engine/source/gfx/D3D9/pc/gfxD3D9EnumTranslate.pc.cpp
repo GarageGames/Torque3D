@@ -46,14 +46,14 @@ _D3DDECLTYPE GFXD3D9DeclType[GFXDeclType_COUNT];
 //------------------------------------------------------------------------------
 
 #define INIT_LOOKUPTABLE( tablearray, enumprefix, type ) \
-   for( int i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
-      tablearray##[i] = (##type##)GFX_UNINIT_VAL;
+   for( S32 i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
+      tablearray[i] = (type)GFX_UNINIT_VAL;
 
 #define VALIDATE_LOOKUPTABLE( tablearray, enumprefix ) \
-   for( int i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
-      if( (int)tablearray##[i] == GFX_UNINIT_VAL ) \
+   for( S32 i = enumprefix##_FIRST; i < enumprefix##_COUNT; i++ ) \
+      if( (S32)tablearray[i] == GFX_UNINIT_VAL ) \
          Con::warnf( "GFXD3D9EnumTranslate: Unassigned value in " #tablearray ": %i", i ); \
-      else if( (int)tablearray##[i] == GFX_UNSUPPORTED_VAL ) \
+      else if( (S32)tablearray[i] == GFX_UNSUPPORTED_VAL ) \
          Con::warnf( "GFXD3D9EnumTranslate: Unsupported value in " #tablearray ": %i", i );
 
 //------------------------------------------------------------------------------
@@ -87,6 +87,7 @@ void GFXD3D9EnumTranslate::init()
    GFXD3D9TextureFormat[GFXFormatR8G8B8] = D3DFMT_R8G8B8;
    GFXD3D9TextureFormat[GFXFormatR8G8B8A8] = D3DFMT_A8R8G8B8;
    GFXD3D9TextureFormat[GFXFormatR8G8B8X8] = D3DFMT_X8R8G8B8;
+   GFXD3D9TextureFormat[GFXFormatB8G8R8A8] = D3DFMT_A8R8G8B8;
    GFXD3D9TextureFormat[GFXFormatR5G6B5] = D3DFMT_R5G6B5;
    GFXD3D9TextureFormat[GFXFormatR5G5B5A1] = D3DFMT_A1R5G5B5;
    GFXD3D9TextureFormat[GFXFormatR5G5B5X1] = D3DFMT_X1R5G5B5;
@@ -113,6 +114,9 @@ void GFXD3D9EnumTranslate::init()
    GFXD3D9TextureFormat[GFXFormatD24S8] = D3DFMT_D24S8;
    GFXD3D9TextureFormat[GFXFormatD24FS8] = D3DFMT_D24FS8;
    GFXD3D9TextureFormat[GFXFormatD16] = D3DFMT_D16;
+   GFXD3D9TextureFormat[GFXFormatR8G8B8A8_SRGB] = D3DFMT_UNKNOWN;
+
+   GFXD3D9TextureFormat[GFXFormatR8G8B8A8_LINEAR_FORCE] = D3DFMT_A8R8G8B8;
    VALIDATE_LOOKUPTABLE( GFXD3D9TextureFormat, GFXFormat);
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -301,7 +305,6 @@ void GFXD3D9EnumTranslate::init()
    GFXD3D9PrimType[GFXLineStrip] = D3DPT_LINESTRIP;
    GFXD3D9PrimType[GFXTriangleList] = D3DPT_TRIANGLELIST;
    GFXD3D9PrimType[GFXTriangleStrip] = D3DPT_TRIANGLESTRIP;
-   GFXD3D9PrimType[GFXTriangleFan] = D3DPT_TRIANGLEFAN;
    VALIDATE_LOOKUPTABLE( GFXD3D9PrimType, GFXPT );
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -371,6 +374,7 @@ void GFXD3D9EnumTranslate::init()
    GFXD3D9DeclType[GFXDeclType_Float3] = D3DDECLTYPE_FLOAT3;
    GFXD3D9DeclType[GFXDeclType_Float4] = D3DDECLTYPE_FLOAT4;
    GFXD3D9DeclType[GFXDeclType_Color] = D3DDECLTYPE_D3DCOLOR;
+   GFXD3D9DeclType[GFXDeclType_UByte4] = D3DDECLTYPE_UBYTE4;
    VALIDATE_LOOKUPTABLE( GFXD3D9DeclType, GFXDeclType );
 }
 

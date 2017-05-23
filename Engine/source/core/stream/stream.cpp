@@ -91,7 +91,7 @@ Stream::Stream()
 {
 }
 
-const char* Stream::getStatusString(const Status in_status)
+const char* Stream::getStatusString(const StreamStatus in_status)
 {
    switch (in_status) {
       case Ok:
@@ -123,6 +123,19 @@ void Stream::writeString(const char *string, S32 maxLen)
       write(len, string);
 }
 
+bool Stream::writeFormattedBuffer(const char *format, ...)
+{
+   char buffer[4096];
+   va_list args;
+   va_start(args, format);
+   const S32 length = dVsprintf(buffer, sizeof(buffer), format, args);
+
+   // Sanity!
+   AssertFatal(length <= sizeof(buffer), "writeFormattedBuffer - String format exceeded buffer size.  This will cause corruption.");
+
+   return write(length, buffer);
+}
+
 void Stream::readString(char buf[256])
 {
    U8 len;
@@ -142,7 +155,7 @@ void Stream::readLongString(U32 maxStringLen, char *stringBuf)
 {
    U32 len;
    read(&len);
-   if(len > maxStringLen)
+   if(len >= maxStringLen)
    {
       m_streamStatus = IOError;
       return;
@@ -287,16 +300,7 @@ bool Stream::write(const NetAddress &na)
 {
    bool success = write(na.type);
    success &= write(na.port);
-   success &= write(na.netNum[0]);
-   success &= write(na.netNum[1]);
-   success &= write(na.netNum[2]);
-   success &= write(na.netNum[3]);
-   success &= write(na.nodeNum[0]);
-   success &= write(na.nodeNum[1]);
-   success &= write(na.nodeNum[2]);
-   success &= write(na.nodeNum[3]);
-   success &= write(na.nodeNum[4]);
-   success &= write(na.nodeNum[5]);
+   success &= write(sizeof(na.address), &na.address);
    return success;
 }
 
@@ -304,16 +308,20 @@ bool Stream::read(NetAddress *na)
 {
    bool success = read(&na->type);
    success &= read(&na->port);
-   success &= read(&na->netNum[0]);
-   success &= read(&na->netNum[1]);
-   success &= read(&na->netNum[2]);
-   success &= read(&na->netNum[3]);
-   success &= read(&na->nodeNum[0]);
-   success &= read(&na->nodeNum[1]);
-   success &= read(&na->nodeNum[2]);
-   success &= read(&na->nodeNum[3]);
-   success &= read(&na->nodeNum[4]);
-   success &= read(&na->nodeNum[5]);
+   success &= read(sizeof(na->address), &na->address);
+   return success;
+}
+
+bool Stream::write(const NetSocket &so)
+{
+   return write(so.getHandle());
+}
+
+bool Stream::read(NetSocket* so)
+{
+   S32 handle = -1;
+   bool success = read(&handle);
+   *so = NetSocket::fromHandle(handle);
    return success;
 }
 

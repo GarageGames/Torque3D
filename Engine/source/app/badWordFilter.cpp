@@ -23,9 +23,10 @@
 #include "core/strings/stringFunctions.h"
 
 #include "console/consoleTypes.h"
+#include "console/simBase.h"
+#include "console/engineAPI.h"
 #include "app/badWordFilter.h"
 #include "core/module.h"
-#include "console/engineAPI.h"
 
 MODULE_BEGIN( BadWordFilter )
 
@@ -64,7 +65,7 @@ void BadWordFilter::create()
 {
    Con::addVariable("pref::enableBadWordFilter", TypeBool, &filteringEnabled, 
       "@brief If true, the bad word filter will be enabled.\n\n"
-	   "@ingroup Game");
+      "@ingroup Game");
    gBadWordFilter = new BadWordFilter;
    gBadWordFilter->addBadWord("shit");
    gBadWordFilter->addBadWord("fuck");
@@ -250,10 +251,10 @@ DefineEngineFunction(addBadWord, bool, (const char* badWord),,
 
    "@ingroup Game")
 {
-	return gBadWordFilter->addBadWord(badWord);
+   return gBadWordFilter->addBadWord(badWord);
 }
 
-DefineEngineFunction(filterString, const char *, (const char* baseString, const char* replacementChars), (NULL, NULL),
+DefineEngineFunction(filterString, const char *, (const char* baseString, const char* replacementChars), (nullAsType<const char*>(), nullAsType<const char*>()),
    "@brief Replaces the characters in a string with designated text\n\n"
 
    "Uses the bad word filter to determine which characters within the string will be replaced.\n\n"
@@ -278,17 +279,17 @@ DefineEngineFunction(filterString, const char *, (const char* baseString, const 
 
    "@ingroup Game")
 {
-	const char *replaceStr = NULL;
+   const char *replaceStr = NULL;
 
-	if(replacementChars)
-		replaceStr = replacementChars;
-	else
-		replaceStr = gBadWordFilter->getDefaultReplaceStr();
+   if(replacementChars)
+      replaceStr = replacementChars;
+   else
+      replaceStr = gBadWordFilter->getDefaultReplaceStr();
 
-	char *ret = Con::getReturnBuffer(dStrlen(baseString) + 1);
-	dStrcpy(ret, baseString);
-	gBadWordFilter->filterString(ret, replaceStr);
-	return ret;
+   char *ret = Con::getReturnBuffer(dStrlen(baseString) + 1);
+   dStrcpy(ret, baseString);
+   gBadWordFilter->filterString(ret, replaceStr);
+   return ret;
 }
 
 DefineEngineFunction(containsBadWords, bool, (const char* text),,
@@ -315,17 +316,17 @@ DefineEngineFunction(containsBadWords, bool, (const char* text),,
       "// Otherwise print the original text\n"
       "if(containsBadWords(%userText))\n"
       "{\n"
-      "	// Filter the string\n"
-      "	%filteredText = filterString(%userText, %replacementChars);\n\n"
-      "	// Print filtered text\n"
-      "	echo(%filteredText);\n"
+      "  // Filter the string\n"
+      "  %filteredText = filterString(%userText, %replacementChars);\n\n"
+      "  // Print filtered text\n"
+      "  echo(%filteredText);\n"
       "}\n"
       "else\n"
-      "	echo(%userText);\n\n"
+      "  echo(%userText);\n\n"
    "@endtsexample\n"
 
    "@ingroup Game")
 {
-	return gBadWordFilter->containsBadWords(text);
+   return gBadWordFilter->containsBadWords(text);
 }
 

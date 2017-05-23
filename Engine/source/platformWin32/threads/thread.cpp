@@ -53,6 +53,7 @@ public:
       mRunArg     = 0;
       mThread     = 0;
       mThreadHnd  = 0;
+      mThreadID   = 0;
       mDead       = false;
    };
 };
@@ -68,7 +69,7 @@ public:
 //               Neccesary because Thread::run() is provided as a non-threaded
 //               way to execute the thread's run function. So we have to keep
 //               track of the thread's lock here.
-static unsigned int __stdcall ThreadRunHandler(void * arg)
+static U32 __stdcall ThreadRunHandler(void * arg)
 {
    PlatformThreadData* mData = reinterpret_cast<PlatformThreadData*>(arg);
    mData->mThreadID = GetCurrentThreadId();
@@ -164,7 +165,7 @@ U32 Thread::getId()
 
 void Thread::_setName( const char* name )
 {
-#if defined( TORQUE_DEBUG ) && defined( TORQUE_COMPILER_VISUALC ) && defined( TORQUE_OS_WIN32 )
+#if defined( TORQUE_DEBUG ) && defined( TORQUE_COMPILER_VISUALC ) && defined( TORQUE_OS_WIN )
 
    // See http://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx
 

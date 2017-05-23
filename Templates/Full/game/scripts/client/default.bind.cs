@@ -583,6 +583,49 @@ function stopRecordingDemo( %val )
 moveMap.bind( keyboard, F3, startRecordingDemo );
 moveMap.bind( keyboard, F4, stopRecordingDemo );
 
+//------------------------------------------------------------------------------
+// Theora Video Capture (Records a movie file)  
+//------------------------------------------------------------------------------
+
+function toggleMovieRecording(%val)
+{
+   if (!%val)
+      return;
+
+   %movieEncodingType = "THEORA";  // Valid encoder values are "PNG" and "THEORA" (default). 
+   %movieFPS = 30;  // video capture frame rate.
+   
+   if (!$RecordingMovie)
+   {
+       // locate a non-existent filename to use
+       for(%i = 0; %i < 1000; %i++)
+       {
+          %num = %i;
+          if(%num < 10)
+             %num = "0" @ %num;
+          if(%num < 100)
+             %num = "0" @ %num;
+       
+          %filePath = "movies/movie" @ %num;
+          if(!isfile(%filePath))
+             break;
+       }
+       if(%i == 1000)
+          return;
+
+      // Start the movie recording
+      recordMovie(%filePath, %movieFPS, %movieEncodingType);
+      
+   }
+   else
+   {
+      // Stop the current recording
+      stopMovie();
+   }
+}
+
+// Key binding works at any time and not just while in a game.
+GlobalActionMap.bind(keyboard, "alt m", toggleMovieRecording);
 
 //------------------------------------------------------------------------------
 // Helper Functions
@@ -615,7 +658,17 @@ GlobalActionMap.bind(keyboard, "ctrl o", bringUpOptions);
 //------------------------------------------------------------------------------
 // Debugging Functions
 //------------------------------------------------------------------------------
-
+function showMetrics(%val)
+{
+   if(%val)
+   {
+      if(!Canvas.isMember(FrameOverlayGui))
+         metrics("fps gfx shadow sfx terrain groundcover forest net");
+      else
+         metrics("");
+   }
+}
+GlobalActionMap.bind(keyboard, "ctrl F2", showMetrics);
 
 //------------------------------------------------------------------------------
 //
@@ -734,3 +787,29 @@ vehicleMap.bindCmd(keyboard, "escape", "", "handleEscape();");
 vehicleMap.bind( keyboard, v, toggleFreeLook ); // v for vanity
 //vehicleMap.bind(keyboard, tab, toggleFirstPerson );
 vehicleMap.bind(keyboard, "alt c", toggleCamera);
+// bind the left thumbstick for steering
+vehicleMap.bind( gamepad, thumblx, "D", "-0.23 0.23", gamepadYaw );
+// bind the gas, break, and reverse buttons
+vehicleMap.bind( gamepad, btn_a, moveforward );
+vehicleMap.bind( gamepad, btn_b, brake );
+vehicleMap.bind( gamepad, btn_x, movebackward );
+// bind exiting the vehicle to a button
+vehicleMap.bindCmd(gamepad, btn_y,"getout();","");
+
+
+// ----------------------------------------------------------------------------
+// Oculus Rift
+// ----------------------------------------------------------------------------
+
+function OVRSensorRotEuler(%pitch, %roll, %yaw)
+{
+   //echo("Sensor euler: " @ %pitch SPC %roll SPC %yaw);
+   $mvRotZ0 = %yaw;
+   $mvRotX0 = %pitch;
+   $mvRotY0 = %roll;
+}
+
+$mvRotIsEuler0 = true;
+$OculusVR::GenerateAngleAxisRotationEvents = false;
+$OculusVR::GenerateEulerRotationEvents = true;
+moveMap.bind( oculusvr, ovr_sensorrotang0, OVRSensorRotEuler );

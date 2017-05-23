@@ -49,7 +49,8 @@ class Path : public SimGroup
    typedef SimGroup Parent;
 
   public:
-   enum {
+   enum : U32
+   {
       NoPathIndex = 0xFFFFFFFF
    };
 
@@ -132,7 +133,7 @@ class Marker : public SceneObject
    static void initGFXResources();
 
    static GFXStateBlockRef smStateBlock;
-   static GFXVertexBufferHandle<GFXVertexPC> smVertexBuffer;
+   static GFXVertexBufferHandle<GFXVertexPCT> smVertexBuffer;
    static GFXPrimitiveBufferHandle smPrimitiveBuffer;
 
   public:

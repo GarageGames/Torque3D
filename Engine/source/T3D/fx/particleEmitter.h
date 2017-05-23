@@ -39,10 +39,6 @@
 #include "T3D/fx/particle.h"
 #endif
 
-#if defined(TORQUE_OS_XENON)
-#include "gfx/D3D9/360/gfx360MemVertexBuffer.h"
-#endif
-
 class RenderPassManager;
 class ParticleData;
 
@@ -87,7 +83,7 @@ class ParticleEmitterData : public GameBaseData
    /// of the ambient color on the particle.
    F32 ambientFactor;
 
-   U32   lifetimeMS;                         ///< Lifetime of particles
+   S32   lifetimeMS;                         ///< Lifetime of particles
    U32   lifetimeVarianceMS;                 ///< Varience in lifetime from 0 to n
 
    bool  overrideAdvance;                    ///<
@@ -114,6 +110,7 @@ class ParticleEmitterData : public GameBaseData
    GFXTexHandle          textureHandle;      ///< Emitter texture handle from txrName
    bool                  highResOnly;        ///< This particle system should not use the mixed-resolution particle rendering
    bool                  renderReflection;   ///< Enables this emitter to render into reflection passes.
+   bool glow;                                ///< Renders this emitter into the glow buffer.
 
    bool reload();
 };
@@ -127,11 +124,7 @@ class ParticleEmitter : public GameBase
 
   public:
 
-#if defined(TORQUE_OS_XENON)
-     typedef GFXVertexPCTT ParticleVertexType;
-#else
-     typedef GFXVertexPCT ParticleVertexType;
-#endif
+   typedef GFXVertexPCT ParticleVertexType;
 
    ParticleEmitter();
    ~ParticleEmitter();
@@ -263,11 +256,7 @@ class ParticleEmitter : public GameBase
    F32       sizes[ ParticleData::PDC_NUM_KEYS ];
    ColorF    colors[ ParticleData::PDC_NUM_KEYS ];
 
-#if defined(TORQUE_OS_XENON)
-   GFX360MemVertexBufferHandle<ParticleVertexType> mVertBuff;
-#else
    GFXVertexBufferHandle<ParticleVertexType> mVertBuff;
-#endif
 
    //   These members are for implementing a link-list of the active emitter 
    //   particles. Member part_store contains blocks of particles that can be

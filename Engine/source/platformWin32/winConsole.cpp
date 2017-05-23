@@ -27,6 +27,7 @@
 #include "platformWin32/platformWin32.h"
 #include "platformWin32/winConsole.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "core/util/journal/process.h"
 
 
@@ -37,10 +38,9 @@ namespace Con
    extern bool alwaysUseDebugOutput;
 }
 
-ConsoleFunction(enableWinConsole, void, 2, 2, "enableWinConsole(bool);")
+DefineConsoleFunction( enableWinConsole, void, (bool flag), , "enableWinConsole(bool);")
 {
-   argc;
-   WindowsConsole->enable(dAtob(argv[1]));
+   WindowsConsole->enable(flag);
 }
 
 void WinConsole::create()
@@ -67,7 +67,7 @@ void WinConsole::enable(bool enabled)
       {
 #ifdef UNICODE
          UTF16 buf[512];
-         convertUTF8toUTF16((UTF8 *)title, buf, sizeof(buf));
+         convertUTF8toUTF16((UTF8 *)title, buf);
          SetConsoleTitle(buf);
 #else
          SetConsoleTitle(title);
@@ -130,7 +130,7 @@ WinConsole::~WinConsole()
 void WinConsole::printf(const char *s, ...)
 {
    // Get the line into a buffer.
-   static const int BufSize = 4096;
+   static const S32 BufSize = 4096;
    static char buffer[4096];
    DWORD bytes;
    va_list args;

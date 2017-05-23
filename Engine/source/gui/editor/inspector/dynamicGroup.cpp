@@ -24,6 +24,11 @@
 #include "gui/editor/guiInspector.h"
 #include "gui/editor/inspector/dynamicGroup.h"
 #include "gui/editor/inspector/dynamicField.h"
+#include "console/engineAPI.h"
+
+#ifdef TORQUE_EXPERIMENTAL_EC
+#include "T3D/components/component.h"
+#endif
 
 IMPLEMENT_CONOBJECT(GuiInspectorDynamicGroup);
 
@@ -98,6 +103,9 @@ static S32 QSORT_CALLBACK compareEntries(const void* a,const void* b)
 //-----------------------------------------------------------------------------
 bool GuiInspectorDynamicGroup::inspectGroup()
 {
+   if( !mParent )
+      return false;
+
    // clear the first responder if it's set
    mStack->clearFirstResponder();
 
@@ -118,6 +126,16 @@ bool GuiInspectorDynamicGroup::inspectGroup()
       SimFieldDictionary * fieldDictionary = target->getFieldDictionary();
       for(SimFieldDictionaryIterator ditr(fieldDictionary); *ditr; ++ditr)
       {
+#ifdef TORQUE_EXPERIMENTAL_EC
+         if (target->getClassRep()->isSubclassOf("Component"))
+         {
+            Component* compTarget = dynamic_cast<Component*>(target);
+
+            ComponentField* compField = compTarget->getComponentField((*ditr)->slotName);
+            if (compField)
+               continue;
+         }
+#endif
          if( i == 0 )
          {
             flist.increment();
@@ -173,7 +191,7 @@ void GuiInspectorDynamicGroup::updateAllFields()
    inspectGroup();
 }
 
-ConsoleMethod(GuiInspectorDynamicGroup, inspectGroup, bool, 2, 2, "Refreshes the dynamic fields in the inspector.")
+DefineConsoleMethod(GuiInspectorDynamicGroup, inspectGroup, bool, (), , "Refreshes the dynamic fields in the inspector.")
 {
    return object->inspectGroup();
 }
@@ -248,11 +266,11 @@ void GuiInspectorDynamicGroup::addDynamicField()
    instantExpand();
 }
 
-ConsoleMethod( GuiInspectorDynamicGroup, addDynamicField, void, 2, 2, "obj.addDynamicField();" )
+DefineConsoleMethod( GuiInspectorDynamicGroup, addDynamicField, void, (), , "obj.addDynamicField();" )
 {
    object->addDynamicField();
 }
 
-ConsoleMethod( GuiInspectorDynamicGroup, removeDynamicField, void, 3, 3, "" )
+DefineConsoleMethod( GuiInspectorDynamicGroup, removeDynamicField, void, (), , "" )
 {
 }

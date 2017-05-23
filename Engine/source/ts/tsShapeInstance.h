@@ -126,7 +126,11 @@ class TSShapeInstance
      /// @{
 
      /// Render!  This draws the base-textured object.
-      virtual void render( S32 objectDetail, TSMaterialList *, const TSRenderState &rdata, F32 alpha );      
+      virtual void render( S32 objectDetail, TSVertexBufferHandle &vb, TSMaterialList *, TSRenderState &rdata, F32 alpha, const char *meshName );
+
+     /// Updates the vertex buffer data for this mesh (used for software skinning)
+      virtual void updateVertexBuffer( S32 objectDetail, U8 *buffer );
+      virtual bool bufferNeedsUpdate( S32 objectDetail );
      /// @}
 
      /// @name Collision Routines
@@ -157,18 +161,21 @@ class TSShapeInstance
       /// If true this mesh is forced to be hidden
       /// regardless of the animation state.
       bool forceHidden;
-
-      TSVertexBufferHandle mVertexBuffer;
-      GFXPrimitiveBufferHandle mPrimitiveBuffer;
       
       /// The time at which this mesh 
       /// was last rendered.
       U32 mLastTime;
 
+      Vector<MatrixF> mActiveTransforms;
+
       MeshObjectInstance();
       virtual ~MeshObjectInstance() {}
 
-      void render( S32 objectDetail, TSMaterialList *, const TSRenderState &rdata, F32 alpha );
+      void render( S32 objectDetail, TSVertexBufferHandle &vb, TSMaterialList *, TSRenderState &rdata, F32 alpha, const char *meshName );
+
+      void updateVertexBuffer( S32 objectDetail, U8 *buffer );
+
+      bool bufferNeedsUpdate(S32 objectDetail);
 
       /// Gets the mesh with specified detail level
       TSMesh * getMesh(S32 num) const { return num<object->numMeshes ? *(meshList+num) : NULL; }
@@ -268,8 +275,11 @@ protected:
    /// equal mShapeResource if it was created from a resource.
    TSShape *mShape;
 
-   
+   /// Vertex buffer used for software skinning this instance
+   TSVertexBufferHandle mSoftwareVertexBuffer;
+
    bool            mOwnMaterialList; ///< Does this own the material list pointer?
+   bool            mUseOwnBuffer; ///< Force using our own copy of the vertex buffer
 
    bool           mAlphaAlways;
    F32            mAlphaAlwaysValue;
@@ -332,6 +342,7 @@ protected:
    /// an optional feature set.
    void initMaterialList(  const FeatureSet *features = NULL );
 
+   void setUseOwnBuffer();
    bool ownMaterialList() const { return mOwnMaterialList; }
 
    /// Get the number of material targets in this shape instance
@@ -485,8 +496,10 @@ protected:
 
    /// @}
 
-   virtual void render( const TSRenderState &rdata );
-   virtual void render( const TSRenderState &rdata, S32 dl, F32 intraDL = 0.0f );
+   void render( const TSRenderState &rdata );
+   void render( const TSRenderState &rdata, S32 dl, F32 intraDL = 0.0f );
+
+   bool bufferNeedsUpdate(S32 objectDetail, S32 start, S32 end);
 
    void animate() { animate( mCurrentDetailLevel ); }
    void animate(S32 dl);
@@ -671,6 +684,12 @@ protected:
    void *mData; ///< available for use by app...initialized to 0
 
    void prepCollision();
+
+//-------------------------------------------------------------------------------------
+// accumulation
+//-------------------------------------------------------------------------------------
+
+   bool hasAccumulation();
 };
 
 

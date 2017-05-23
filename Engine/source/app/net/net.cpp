@@ -251,7 +251,8 @@ ConsoleFunction( commandToServer, void, 2, RemoteCommandEvent::MaxRemoteCommandA
    NetConnection *conn = NetConnection::getConnectionToServer();
    if(!conn)
       return;
-   RemoteCommandEvent::sendRemoteCommand(conn, argc - 1, argv + 1);
+   StringStackWrapper args(argc - 1, argv + 1);
+   RemoteCommandEvent::sendRemoteCommand(conn, args.count(), args);
 }
 
 ConsoleFunction( commandToClient, void, 3, RemoteCommandEvent::MaxRemoteCommandArgs + 2, "(NetConnection client, string func, ...)"
@@ -288,7 +289,8 @@ ConsoleFunction( commandToClient, void, 3, RemoteCommandEvent::MaxRemoteCommandA
    NetConnection *conn;
    if(!Sim::findObject(argv[1], conn))
       return;
-   RemoteCommandEvent::sendRemoteCommand(conn, argc - 2, argv + 2);
+   StringStackWrapper args(argc - 2, argv + 2);
+   RemoteCommandEvent::sendRemoteCommand(conn, args.count(), args);
 }
 
 
@@ -304,9 +306,10 @@ DefineEngineFunction(removeTaggedString, void, (S32 tag), (-1),
    "@see addTaggedString()\n"
    "@see getTaggedString()\n"
    "@ingroup Networking\n")
-	{
-	RemoteCommandEvent::removeTaggedString(tag);
-	}
+   {
+   RemoteCommandEvent::removeTaggedString(tag);
+   }
+
 
 DefineEngineFunction(addTaggedString, const char* , (const char* str), (""),
    "@brief Use the addTaggedString function to tag a new string and add it to the NetStringTable\n\n"
@@ -320,10 +323,9 @@ DefineEngineFunction(addTaggedString, const char* , (const char* str), (""),
    "@see removeTaggedString()\n"
    "@see getTaggedString()\n"
    "@ingroup Networking\n")
-	{
-	return RemoteCommandEvent::addTaggedString(str);
-	}
-
+   {
+   return RemoteCommandEvent::addTaggedString(str);
+   }
 
 
 DefineEngineFunction(getTaggedString, const char* , (const char *tag), (""),
@@ -382,10 +384,11 @@ ConsoleFunction( buildTaggedString, const char*, 2, 11, "(string format, ...)"
    if (*indexPtr == StringTagPrefixByte)
       indexPtr++;
    const char *fmtString = gNetStringTable->lookupString(dAtoi(indexPtr));
-   char *strBuffer = Con::getReturnBuffer(512);
+   static const U32 bufSize = 512;
+   char *strBuffer = Con::getReturnBuffer(bufSize);
    const char *fmtStrPtr = fmtString;
    char *strBufPtr = strBuffer;
-   S32 strMaxLength = 511;
+   S32 strMaxLength = bufSize - 1;
    if (!fmtString)
       goto done;
 

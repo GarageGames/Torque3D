@@ -152,6 +152,14 @@ singleton ShaderData( SSAOShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/postFxV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/ssao/SSAO_P.hlsl";            
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/gl/postFxV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/ssao/gl/SSAO_P.glsl";
+
+   samplerNames[0] = "$deferredMap";
+   samplerNames[1] = "$randNormalTex";
+   samplerNames[2] = "$powTable";
+   
    pixVersion = 3.0;
 };
 
@@ -159,6 +167,13 @@ singleton ShaderData( SSAOBlurYShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/ssao/SSAO_Blur_V.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/ssao/SSAO_Blur_P.hlsl";   
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/ssao/gl/SSAO_Blur_V.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/ssao/gl/SSAO_Blur_P.glsl";
+   
+   samplerNames[0] = "$occludeMap";
+   samplerNames[1] = "$deferredMap";
+
    pixVersion = 3.0;      
    
    defines = "BLUR_DIR=float2(0.0,1.0)";         
@@ -184,8 +199,8 @@ singleton PostEffect( SSAOPostFx )
    shader = SSAOShader;
    stateBlock = SSAOStateBlock;
          
-   texture[0] = "#prepass";         
-   texture[1] = "noise.png";
+   texture[0] = "#deferred";         
+   texture[1] = "./noise.png";
    texture[2] = "#ssao_pow_table";
    
    target = "$outTex";
@@ -200,7 +215,7 @@ singleton PostEffect( SSAOPostFx )
       stateBlock = SSAOBlurStateBlock;
       
       texture[0] = "$inTex";
-      texture[1] = "#prepass";
+      texture[1] = "#deferred";
       
       target = "$outTex"; 
    };
@@ -213,7 +228,7 @@ singleton PostEffect( SSAOPostFx )
       stateBlock = SSAOBlurStateBlock;
       
       texture[0] = "$inTex";
-      texture[1] = "#prepass";
+      texture[1] = "#deferred";
       
       target = "$outTex"; 
    };   
@@ -226,7 +241,7 @@ singleton PostEffect( SSAOPostFx )
       stateBlock = SSAOBlurStateBlock;
             
       texture[0] = "$inTex";
-      texture[1] = "#prepass";
+      texture[1] = "#deferred";
       
       target = "$outTex"; 
    };
@@ -239,7 +254,7 @@ singleton PostEffect( SSAOPostFx )
       stateBlock = SSAOBlurStateBlock;
             
       texture[0] = "$inTex";
-      texture[1] = "#prepass";
+      texture[1] = "#deferred";
             
       // We write to a mask texture which is then
       // read by the lighting shaders to mask ambient.
@@ -266,6 +281,10 @@ singleton ShaderData( SSAOPowTableShader )
 {
    DXVertexShaderFile 	= "shaders/common/postFx/ssao/SSAO_PowerTable_V.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/ssao/SSAO_PowerTable_P.hlsl";            
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/ssao/gl/SSAO_PowerTable_V.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/ssao/gl/SSAO_PowerTable_P.glsl";   
+   
    pixVersion = 2.0;
 };
 

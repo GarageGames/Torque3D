@@ -41,7 +41,9 @@ void *DataChunker::alloc(S32 size)
 {
    if (size > mChunkSize)
    {
-      DataBlock * temp = new DataBlock(size);
+      DataBlock * temp = (DataBlock*)dMalloc(DataChunker::PaddDBSize + size);
+      AssertFatal(temp, "Malloc failed");
+      constructInPlace(temp);
       if (mCurBlock)
       {
          temp->next = mCurBlock->next;
@@ -52,30 +54,32 @@ void *DataChunker::alloc(S32 size)
          mCurBlock = temp;
          temp->curIndex = mChunkSize;
       }
-      return temp->data;
+      return temp->getData();
    }
 
    if(!mCurBlock || size + mCurBlock->curIndex > mChunkSize)
    {
-      DataBlock *temp = new DataBlock(mChunkSize);
+      const U32 paddDBSize = (sizeof(DataBlock) + 3) & ~3;
+      DataBlock *temp = (DataBlock*)dMalloc(paddDBSize+ mChunkSize);
+      AssertFatal(temp, "Malloc failed");
+      constructInPlace(temp);
       temp->next = mCurBlock;
-      temp->curIndex = 0;
       mCurBlock = temp;
    }
-
-   void *ret = mCurBlock->data + mCurBlock->curIndex;
+   
+   void *ret = mCurBlock->getData() + mCurBlock->curIndex;
    mCurBlock->curIndex += (size + 3) & ~3; // dword align
    return ret;
 }
 
-DataChunker::DataBlock::DataBlock(S32 size)
+DataChunker::DataBlock::DataBlock()
 {
-   data = new U8[size];
+   curIndex = 0;
+   next = NULL;
 }
 
 DataChunker::DataBlock::~DataBlock()
 {
-   delete[] data;
 }
 
 void DataChunker::freeBlocks(bool keepOne)
@@ -83,15 +87,17 @@ void DataChunker::freeBlocks(bool keepOne)
    while(mCurBlock && mCurBlock->next)
    {
       DataBlock *temp = mCurBlock->next;
-      delete mCurBlock;
+      dFree(mCurBlock);
       mCurBlock = temp;
    }
    if (!keepOne)
    {
-      delete mCurBlock;
+      if (mCurBlock) dFree(mCurBlock);
       mCurBlock = NULL;
    }
    else if (mCurBlock)
+   {
       mCurBlock->curIndex = 0;
+      mCurBlock->next = NULL;
+   }
 }
-

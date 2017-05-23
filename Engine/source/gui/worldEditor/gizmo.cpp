@@ -292,10 +292,10 @@ F32 Gizmo::smProjectDistance = 20000.0f;
 
 Gizmo::Gizmo()
 : mProfile( NULL ),
-  mSelectionIdx( -1 ),
-  mCameraMat( true ),
-  mTransform( true ),
   mObjectMat( true ),
+  mTransform( true ),
+  mCameraMat( true ),
+  mSelectionIdx( -1 ),
   mObjectMatInv( true ),
   mCurrentTransform( true ),
   mSavedTransform( true ),
@@ -303,23 +303,23 @@ Gizmo::Gizmo()
   mDeltaScale( 0,0,0 ),
   mDeltaRot( 0,0,0 ),
   mDeltaPos( 0,0,0 ),
-  mDeltaTotalPos( 0,0,0 ),
-  mDeltaTotalRot( 0,0,0 ),
-  mDeltaTotalScale( 0,0,0 ),
   mCurrentAlignment( World ),
+  mDeltaTotalScale( 0,0,0 ),
+  mDeltaTotalRot( 0,0,0 ),
+  mDeltaTotalPos( 0,0,0 ),
   mCurrentMode( MoveMode ),
-  mDirty( false ),
   mMouseDownPos( -1,-1 ),
+  mDirty( false ),
   mMouseDown( false ),
   mLastWorldMat( true ),
   mLastProjMat( true ),
   mLastViewport( 0, 0, 10, 10 ),
   mLastCameraFOV( 1.f ),
-  mElipseCursorCollideVecSS( 1.0f, 0.0f, 0.0f ),
-  mElipseCursorCollidePntSS( 0.0f, 0.0f, 0.0f ),
   mHighlightCentroidHandle( false ),
-  mHighlightAll( false ),
+  mElipseCursorCollidePntSS( 0.0f, 0.0f, 0.0f ),
+  mElipseCursorCollideVecSS( 1.0f, 0.0f, 0.0f ),
   mGridPlaneEnabled( true ),
+  mHighlightAll( false ),
   mMoveGridEnabled( true ),
   mMoveGridSize( 20.f ),
   mMoveGridSpacing( 1.f )
@@ -811,8 +811,6 @@ void Gizmo::on3DMouseDown( const Gui3DMouseEvent & event )
          camPos = event.pos;
       else
          camPos = mCameraPos;
-         
-      Point3F end = camPos + event.vec * smProjectDistance;
 
       if ( 0 <= mSelectionIdx && mSelectionIdx <= 2 )
       {       
@@ -1403,7 +1401,7 @@ void Gizmo::renderGizmo(const MatrixF &cameraTransform, F32 cameraFOV )
 
       for(U32 j = 0; j < 6; j++)
       {
-         PrimBuild::begin( GFXTriangleFan, 4 );
+         PrimBuild::begin( GFXTriangleStrip, 4 );
 
          PrimBuild::vertex3fv( sgCenterBoxPnts[sgBoxVerts[j][0]] * tipScale);
          PrimBuild::vertex3fv( sgCenterBoxPnts[sgBoxVerts[j][1]] * tipScale);
@@ -1599,7 +1597,7 @@ void Gizmo::_renderAxisBoxes()
 
       for(U32 j = 0; j < 6; j++)
       {
-         PrimBuild::begin( GFXTriangleFan, 4 );
+         PrimBuild::begin( GFXTriangleStrip, 4 );
 
          PrimBuild::vertex3fv( sgCenterBoxPnts[sgBoxVerts[j][0]] * tipScale + sgAxisVectors[axisIdx] * pos );
          PrimBuild::vertex3fv( sgCenterBoxPnts[sgBoxVerts[j][1]] * tipScale + sgAxisVectors[axisIdx] * pos );
@@ -1663,7 +1661,7 @@ void Gizmo::_renderAxisCircles()
          ColorI color = mProfile->inActiveColor;
          color.alpha = 100;
          PrimBuild::color( color );
-         PrimBuild::begin( GFXTriangleFan, segments+2 );
+         PrimBuild::begin( GFXTriangleStrip, segments+2 );
          
          PrimBuild::vertex3fv( Point3F(0,0,0) );
 

@@ -86,6 +86,9 @@ class ForestEditorCtrl : public EditTSCtrl
       /// Causes the editor to reselect the active forest.
       bool updateActiveForest( bool createNew );
 
+      /// Sets the active Forest
+      void setActiveForest(Forest* forestObject) { mForest = forestObject; }
+
       /// Returns the active Forest.
       Forest *getActiveForest() const { return mForest; }
 

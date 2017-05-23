@@ -100,13 +100,16 @@ public:
       /// of a target texture after presentation or deactivated.
       ///
       /// This is mainly a depth buffer optimization.
-      NoDiscard = BIT(10)
+      NoDiscard = BIT(10),
+
+      /// Texture is managed by another process, thus should not be modified
+      NoModify = BIT(11)
 
    };
 
    enum Compression
    {
-      None,
+      NONE,
       DXT1,
       DXT2,
       DXT3,
@@ -114,7 +117,7 @@ public:
       DXT5,
    };
 
-   GFXTextureProfile(const String &name, Types type, U32 flags, Compression compression = None);
+   GFXTextureProfile(const String &name, Types type, U32 flags, Compression compression = NONE);
 
    // Accessors
    String getName() const { return mName; };
@@ -164,6 +167,7 @@ public:
    inline bool noMip() const { return testFlag(NoMipmap); }
    inline bool isPooled() const { return testFlag(Pooled); }
    inline bool canDiscard() const { return !testFlag(NoDiscard); }
+   inline bool canModify() const { return !testFlag(NoModify); }
 
 private:
    /// These constants control the packing for the profile; if you add flags, types, or
@@ -215,5 +219,7 @@ GFX_DeclareTextureProfile(GFXDefaultStaticDXT5nmProfile);
 GFX_DeclareTextureProfile(GFXSystemMemProfile);
 // Depth buffer texture
 GFX_DeclareTextureProfile(GFXDefaultZTargetProfile);
+// Dynamic Texure
+GFX_DeclareTextureProfile(GFXDynamicTextureProfile);
 
 #endif

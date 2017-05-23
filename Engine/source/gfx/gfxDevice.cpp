@@ -103,7 +103,7 @@ GFXDevice::GFXDevice()
    mViewMatrix.identity();
    mProjectionMatrix.identity();
    
-   for( int i = 0; i < WORLD_STACK_MAX; i++ )
+   for( S32 i = 0; i < WORLD_STACK_MAX; i++ )
       mWorldMatrix[i].identity();
    
    AssertFatal(smGFXDevice == NULL, "Already a GFXDevice created! Bad!");
@@ -148,7 +148,7 @@ GFXDevice::GFXDevice()
    mGlobalAmbientColor = ColorF(0.0f, 0.0f, 0.0f, 1.0f);
 
    mLightMaterialDirty = false;
-   dMemset(&mCurrentLightMaterial, NULL, sizeof(GFXLightMaterial));
+   dMemset(&mCurrentLightMaterial, 0, sizeof(GFXLightMaterial));
 
    // State block 
    mStateBlockDirty = false;
@@ -160,8 +160,8 @@ GFXDevice::GFXDevice()
    // misc
    mAllowRender = true;
    mCurrentRenderStyle = RS_Standard;
-   mCurrentProjectionOffset = Point2F::Zero;
-   mStereoEyeOffset = Point3F::Zero;
+   mCurrentStereoTarget = -1;
+   mStereoHeadTransform = MatrixF(1);
    mCanCurrentlyRender = false;
    mInitialized = false;
    
@@ -180,23 +180,20 @@ GFXDevice::GFXDevice()
 
    // Initialize our drawing utility.
    mDrawer = NULL;
-
+   mFrameTime = PlatformTimer::create();
    // Add a few system wide shader macros.
    GFXShader::addGlobalMacro( "TORQUE", "1" );
    GFXShader::addGlobalMacro( "TORQUE_VERSION", String::ToString(getVersionNumber()) );
-   #if defined TORQUE_OS_WIN32
-      GFXShader::addGlobalMacro( "TORQUE_OS_WIN32" );
+   #if defined TORQUE_OS_WIN
+      GFXShader::addGlobalMacro( "TORQUE_OS_WIN" );
    #elif defined TORQUE_OS_MAC
       GFXShader::addGlobalMacro( "TORQUE_OS_MAC" );
    #elif defined TORQUE_OS_LINUX
       GFXShader::addGlobalMacro( "TORQUE_OS_LINUX" );      
-   #elif defined TORQUE_OS_XENON
-      GFXShader::addGlobalMacro( "TORQUE_OS_XENON" );
-   #elif defined TORQUE_OS_XBOX
-      GFXShader::addGlobalMacro( "TORQUE_OS_XBOX" );      
-   #elif defined TORQUE_OS_PS3
-      GFXShader::addGlobalMacro( "TORQUE_OS_PS3" );            
    #endif
+
+   mStereoTargets[0] = NULL;
+   mStereoTargets[1] = NULL;
 }
 
 GFXDrawUtil* GFXDevice::getDrawUtil()
@@ -267,6 +264,8 @@ GFXDevice::~GFXDevice()
       mNewCubemap[i] = NULL;
    }
 
+   mCurrentRT = NULL;
+
    // Release all the unreferenced textures in the cache.
    mTextureManager->cleanupCache();
 
@@ -277,6 +276,7 @@ GFXDevice::~GFXDevice()
 #endif
 
    SAFE_DELETE( mTextureManager );
+   SAFE_DELETE( mFrameTime );
 
    // Clear out our state block references
    mCurrentStateBlocks.clear();
@@ -451,7 +451,7 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
 
    if( mTextureMatrixCheckDirty )
    {
-      for( int i = 0; i < getNumSamplers(); i++ )
+      for( S32 i = 0; i < getNumSamplers(); i++ )
       {
          if( mTextureMatrixDirty[i] )
          {
@@ -508,6 +508,8 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
       mCurrentStateBlock = mNewStateBlock;
       mStateBlockDirty = false;
    }
+
+   _updateRenderTargets();
 
    if( mTexturesDirty )
    {
@@ -730,14 +732,14 @@ void GFXDevice::setLight(U32 stage, GFXLightInfo* light)
 //-----------------------------------------------------------------------------
 // Set Light Material
 //-----------------------------------------------------------------------------
-void GFXDevice::setLightMaterial(GFXLightMaterial mat)
+void GFXDevice::setLightMaterial(const GFXLightMaterial& mat)
 {
    mCurrentLightMaterial = mat;
    mLightMaterialDirty = true;
    mStateDirty = true;
 }
 
-void GFXDevice::setGlobalAmbientColor(ColorF color)
+void GFXDevice::setGlobalAmbientColor(const ColorF& color)
 {
    if(mGlobalAmbientColor != color)
    {
@@ -804,7 +806,7 @@ inline bool GFXDevice::beginScene()
 
    // Send the start of frame signal.
    getDeviceEventSignal().trigger( GFXDevice::deStartOfFrame );
-
+   mFrameTime->reset();
    return beginSceneInternal();
 }
 
@@ -1279,7 +1281,7 @@ DefineEngineFunction( getPixelShaderVersion, F32, (),,
    return GFX->getPixelShaderVersion();
 }   
 
-DefineEngineFunction( setPixelShaderVersion, void, ( float version ),,
+DefineEngineFunction( setPixelShaderVersion, void, ( F32 version ),,
    "@brief Sets the pixel shader version for the active device.\n"
    "This can be used to force a lower pixel shader version than is supported by "
    "the device for testing or performance optimization.\n"
@@ -1313,7 +1315,7 @@ DefineEngineFunction( getBestHDRFormat, GFXFormat, (),,
    // Figure out the best HDR format.  This is the smallest
    // format which supports blending and filtering.
    Vector<GFXFormat> formats;
-   formats.push_back( GFXFormatR10G10B10A2 );
+   //formats.push_back( GFXFormatR10G10B10A2 ); TODO: replace with SRGB format once DX9 is gone - BJR
    formats.push_back( GFXFormatR16G16B16A16F );
    formats.push_back( GFXFormatR16G16B16A16 );    
    GFXFormat format = GFX->selectSupportedFormat(  &GFXDefaultRenderTargetProfile,
@@ -1323,4 +1325,9 @@ DefineEngineFunction( getBestHDRFormat, GFXFormat, (),,
                                                    true );
 
    return format;
+}
+
+DefineConsoleFunction(ResetGFX, void, (), , "forces the gbuffer to be reinitialized in cases of improper/lack of buffer clears.")
+{
+   GFX->beginReset();
 }

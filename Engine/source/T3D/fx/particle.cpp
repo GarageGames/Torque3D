@@ -66,11 +66,11 @@ ConsoleDocClass( ParticleData,
    "@see ParticleEmitterNode\n"
 );
 
-static const float sgDefaultWindCoefficient = 0.0f;
-static const float sgDefaultConstantAcceleration = 0.f;
-static const float sgDefaultSpinSpeed = 1.f;
-static const float sgDefaultSpinRandomMin = 0.f;
-static const float sgDefaultSpinRandomMax = 0.f;
+static const F32 sgDefaultWindCoefficient = 0.0f;
+static const F32 sgDefaultConstantAcceleration = 0.f;
+static const F32 sgDefaultSpinSpeed = 1.f;
+static const F32 sgDefaultSpinRandomMin = 0.f;
+static const F32 sgDefaultSpinRandomMax = 0.f;
 
 
 //-----------------------------------------------------------------------------
@@ -355,7 +355,7 @@ bool ParticleData::protectedSetSizes( void *object, const char *index, const cha
    U32 i;
 
    if (!index)
-      i = 0;
+      return (val >= 0.f && val <= MaxParticleSize);
    else
       i = dAtoui(index);
 
@@ -371,7 +371,7 @@ bool ParticleData::protectedSetTimes( void *object, const char *index, const cha
    U32 i;
 
    if (!index)
-      i = 0;
+      return (val >= 0.f && val <= 1.f);
    else
       i = dAtoui(index);
 
@@ -622,7 +622,7 @@ bool ParticleData::reload(char errorBuffer[256])
 	}
    /*
    numFrames = 0;
-   for( int i=0; i<PDC_MAX_TEX; i++ )
+   for( S32 i=0; i<PDC_MAX_TEX; i++ )
    {
       if( textureNameList[i] && textureNameList[i][0] )
       {

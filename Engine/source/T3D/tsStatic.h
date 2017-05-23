@@ -39,6 +39,10 @@
 #include "ts/tsShape.h"
 #endif
 
+#ifndef _REFLECTOR_H_
+   #include "scene/reflector.h"
+#endif
+
 class TSShapeInstance;
 class TSThread;
 class TSStatic;
@@ -97,6 +101,13 @@ class TSStatic : public SceneObject
    };
 
 public:
+   void setAlphaFade(bool enable, F32 start, F32 end, bool inverse)
+   {
+      mUseAlphaFade     = enable;
+      mAlphaFadeStart   = start;
+      mAlphaFadeEnd     = end;
+      mInvertAlphaFade  = inverse;
+   }
    
    /// The different types of mesh data types
    enum MeshType
@@ -108,6 +119,11 @@ public:
    };
    
 protected:
+   bool mUseAlphaFade;
+   F32  mAlphaFadeStart;
+   F32  mAlphaFadeEnd;
+   F32  mAlphaFade;
+   bool mInvertAlphaFade;
 
    bool onAdd();
    void onRemove();
@@ -134,6 +150,11 @@ protected:
 
    /// Start or stop processing ticks depending on our state.
    void _updateShouldTick();
+
+   String cubeDescName;
+   U32 cubeDescId;
+   ReflectorDesc *reflectorDesc;
+   CubeReflector mCubeReflector;
 
 protected:
 
@@ -197,6 +218,8 @@ public:
    void onScaleChanged();
    void prepRenderImage( SceneRenderState *state );
    void inspectPostApply();
+   virtual void onMount( SceneObject *obj, S32 node );
+   virtual void onUnmount( SceneObject *obj, S32 node );
 
    /// The type of mesh data use for collision queries.
    MeshType getCollisionType() const { return mCollisionType; }
@@ -205,6 +228,7 @@ public:
 
    Resource<TSShape> getShape() const { return mShape; }
 	StringTableEntry getShapeFileName() { return mShapeName; }
+   void setShapeFileName(StringTableEntry shapeName) { mShapeName = shapeName; }
   
    TSShapeInstance* getShapeInstance() const { return mShapeInstance; }
 

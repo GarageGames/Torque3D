@@ -70,16 +70,16 @@ IMPLEMENT_CALLBACK( GuiWindowCtrl, onRestore, void, (), (),
 //-----------------------------------------------------------------------------
 
 GuiWindowCtrl::GuiWindowCtrl()
-   :  mResizeEdge(edgeNone),
-      mResizeWidth(true),
+   :  mResizeWidth(true),
+      mResizeEdge(edgeNone),
       mResizeHeight(true),
-      mResizeMargin(2.f),
       mCanMove(true),
+      mResizeMargin(2.f),
       mCanClose(true),
       mCanMinimize(true),
       mCanMaximize(true),
-      mCanDock(false),
       mCanCollapse(false),
+      mCanDock(false),
       mEdgeSnap(true),
       mCollapseGroup(-1),
       mCollapseGroupNum(-1),
@@ -98,10 +98,10 @@ GuiWindowCtrl::GuiWindowCtrl()
    mMouseMovingWin = false;
    mMouseResizeWidth = false;
    mMouseResizeHeight = false;
-   setExtent(100, 200);
    mMinimizeIndex = -1;
    mTabIndex = -1;
    mBitmapBounds = NULL;
+   setExtent(100, 200);
 
    RectI closeRect(80, 2, 16, 16);
    mCloseButton = closeRect;
@@ -231,7 +231,7 @@ void GuiWindowCtrl::moveFromCollapseGroup()
          parent->mCollapseGroupVec[groupVec].first()->mCollapseGroupNum = -1;
          parent->mCollapseGroupVec[groupVec].erase(U32(0));
          parent->mCollapseGroupVec[groupVec].setSize(groupVecCount - 1);
-         parent->mCollapseGroupVec.erase(groupVec);	
+         parent->mCollapseGroupVec.erase(groupVec);   
       }
    }
    
@@ -381,7 +381,7 @@ void GuiWindowCtrl::refreshCollapseGroups()
    if( !parent )
       return;
    
-   CollapseGroupNumVec	collapseGroupNumVec;
+   CollapseGroupNumVec  collapseGroupNumVec;
 
    // iterate through the collided array, renumbering the windows pointers
    S32 assignGroupNum = 0;
@@ -463,7 +463,7 @@ void GuiWindowCtrl::handleCollapseGroup()
    if( !parent )
       return;
 
-   CollapseGroupNumVec	collapseGroupNumVec;
+   CollapseGroupNumVec  collapseGroupNumVec;
 
    if( mIsCollapsed ) // minimize window up to its header bar
    {
@@ -529,7 +529,7 @@ void GuiWindowCtrl::handleCollapseGroup()
             if((*iter)->mCollapseGroupNum > mCollapseGroupNum)
             {
                Point2I newChildPosition =  (*iter)->getPosition();
-               newChildPosition.y += moveChildYBy;					
+               newChildPosition.y += moveChildYBy;             
                (*iter)->resize(newChildPosition, (*iter)->getExtent());
             }
          }
@@ -547,7 +547,7 @@ bool GuiWindowCtrl::resizeCollapseGroup(bool resizeX, bool resizeY, Point2I resi
    if( !parent )
       return false;
 
-   CollapseGroupNumVec	collapseGroupNumVec;
+   CollapseGroupNumVec  collapseGroupNumVec;
 
    bool canResize = true;
    CollapseGroupNumVec::iterator iter = parent->mCollapseGroupVec[mCollapseGroup].begin();
@@ -980,7 +980,7 @@ void GuiWindowCtrl::onMouseDragged(const GuiEvent &event)
       moveWithCollapseGroup(newPosition);
 
    if(mCanCollapse && mCollapseGroup >= 0 && mResizeWindow == true )
-   {	
+   {  
       // Resize the window if allowed
       if( newExtent.y >= getMinExtent().y && newExtent.x >= getMinExtent().x)
       {
@@ -1212,7 +1212,7 @@ void GuiWindowCtrl::onMouseUp(const GuiEvent &event)
       // We're either moving out of a collapse group or moving to another one
       // Not valid for windows not previously in a group
       if( mCollapseGroup >= 0 && 
-         ( snapType == -1 || ( snapType >= 0 && mCollapseGroup != hitWindow->mCollapseGroup) ) )
+        (snapType == -1 || (hitWindow && snapType >= 0 && mCollapseGroup != hitWindow->mCollapseGroup)))
          moveFromCollapseGroup();
       
       // No window to connect to
@@ -1294,11 +1294,13 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    
    winRect.extent.x += 1;
 
-   GFX->getDrawUtil()->drawRectFill(winRect, mProfile->mFillColor);
+   GFXDrawUtil* drawUtil = GFX->getDrawUtil();
 
-   GFX->getDrawUtil()->clearBitmapModulation();
-   GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset, mBitmapBounds[topBase]);
-   GFX->getDrawUtil()->drawBitmapSR(mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[topBase+1].extent.x, offset.y),
+   drawUtil->drawRectFill(winRect, mProfile->mFillColor);
+
+   drawUtil->clearBitmapModulation();
+   drawUtil->drawBitmapSR(mTextureObject, offset, mBitmapBounds[topBase]);
+   drawUtil->drawBitmapSR(mTextureObject, Point2I(offset.x + getWidth() - mBitmapBounds[topBase+1].extent.x, offset.y),
                    mBitmapBounds[topBase + 1]);
 
    RectI destRect;
@@ -1308,7 +1310,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    destRect.extent.y = mBitmapBounds[topBase + 2].extent.y;
    RectI stretchRect = mBitmapBounds[topBase + 2];
    stretchRect.inset(1,0);
-   GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+   drawUtil->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
 
    destRect.point.x = offset.x;
    destRect.point.y = offset.y + mBitmapBounds[topBase].extent.y;
@@ -1316,7 +1318,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    destRect.extent.y = getHeight() - mBitmapBounds[topBase].extent.y - mBitmapBounds[BorderBottomLeft].extent.y;
    stretchRect = mBitmapBounds[BorderLeft];
    stretchRect.inset(0,1);
-   GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+   drawUtil->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
 
    destRect.point.x = offset.x + getWidth() - mBitmapBounds[BorderRight].extent.x;
    destRect.extent.x = mBitmapBounds[BorderRight].extent.x;
@@ -1325,10 +1327,10 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
 
    stretchRect = mBitmapBounds[BorderRight];
    stretchRect.inset(0,1);
-   GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+   drawUtil->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
 
-   GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset + Point2I(0, getHeight() - mBitmapBounds[BorderBottomLeft].extent.y), mBitmapBounds[BorderBottomLeft]);
-   GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset + getExtent() - mBitmapBounds[BorderBottomRight].extent, mBitmapBounds[BorderBottomRight]);
+   drawUtil->drawBitmapSR(mTextureObject, offset + Point2I(0, getHeight() - mBitmapBounds[BorderBottomLeft].extent.y), mBitmapBounds[BorderBottomLeft]);
+   drawUtil->drawBitmapSR(mTextureObject, offset + getExtent() - mBitmapBounds[BorderBottomRight].extent, mBitmapBounds[BorderBottomRight]);
 
    destRect.point.x = offset.x + mBitmapBounds[BorderBottomLeft].extent.x;
    destRect.extent.x = getWidth() - mBitmapBounds[BorderBottomLeft].extent.x - mBitmapBounds[BorderBottomRight].extent.x;
@@ -1338,13 +1340,13 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    stretchRect = mBitmapBounds[BorderBottom];
    stretchRect.inset(1,0);
 
-   GFX->getDrawUtil()->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
+   drawUtil->drawBitmapStretchSR(mTextureObject, destRect, stretchRect);
 
    // Draw the title
    // dhc addition: copied/modded from renderJustifiedText, since we enforce a
    // different color usage here. NOTE: it currently CAN overdraw the controls
    // if mis-positioned or 'scrunched' in a small width.
-   GFX->getDrawUtil()->setBitmapModulation(mProfile->mFontColor);
+   drawUtil->setBitmapModulation(mProfile->mFontColor);
    S32 textWidth = mProfile->mFont->getStrWidth((const UTF8 *)mText);
    Point2I start(0,0);
 
@@ -1359,7 +1361,7 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
    if( textWidth > winRect.extent.x ) start.set( 0, 0 );
    // center the vertical
 //   start.y = ( winRect.extent.y - ( font->getHeight() - 2 ) ) / 2;
-   GFX->getDrawUtil()->drawText( mProfile->mFont, start + offset + mProfile->mTextOffset, mText );
+   drawUtil->drawText( mProfile->mFont, start + offset + mProfile->mTextOffset, mText );
 
    // Deal with rendering the titlebar controls
    AssertFatal(root, "Unable to get the root GuiCanvas.");
@@ -1378,8 +1380,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
             bmp += BmpHilite;
       }
 
-      GFX->getDrawUtil()->clearBitmapModulation();
-      GFX->getDrawUtil()->drawBitmapSR(mTextureObject, offset + mCloseButton.point, mBitmapBounds[bmp]);
+      drawUtil->clearBitmapModulation();
+      drawUtil->drawBitmapSR(mTextureObject, offset + mCloseButton.point, mBitmapBounds[bmp]);
    }
 
    // Draw the maximize button
@@ -1397,8 +1399,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
             bmp += BmpHilite;
       }
 
-      GFX->getDrawUtil()->clearBitmapModulation();
-      GFX->getDrawUtil()->drawBitmapSR( mTextureObject, offset + mMaximizeButton.point, mBitmapBounds[bmp] );
+      drawUtil->clearBitmapModulation();
+      drawUtil->drawBitmapSR( mTextureObject, offset + mMaximizeButton.point, mBitmapBounds[bmp] );
    }
 
    // Draw the minimize button
@@ -1416,8 +1418,8 @@ void GuiWindowCtrl::onRender(Point2I offset, const RectI &updateRect)
             bmp += BmpHilite;
       }
 
-      GFX->getDrawUtil()->clearBitmapModulation();
-      GFX->getDrawUtil()->drawBitmapSR( mTextureObject, offset + mMinimizeButton.point, mBitmapBounds[bmp] );
+      drawUtil->clearBitmapModulation();
+      drawUtil->drawBitmapSR( mTextureObject, offset + mMinimizeButton.point, mBitmapBounds[bmp] );
    }
 
    if( !mMinimized )
@@ -1478,7 +1480,7 @@ void GuiWindowCtrl::positionButtons(void)
 
    // Until a pref, if alignment is LEFT, put buttons RIGHT justified.
    // ELSE, put buttons LEFT justified.
-   int closeLeft = mainOff.x, closeTop = mainOff.y, closeOff = buttonWidth + 2;
+   S32 closeLeft = mainOff.x, closeTop = mainOff.y, closeOff = buttonWidth + 2;
    if ( mProfile->mAlignment == GuiControlProfile::LeftJustify )
    {
       closeOff = -closeOff;
@@ -1510,7 +1512,7 @@ void GuiWindowCtrl::setCloseCommand(const char *newCmd)
    if (newCmd)
       mCloseCommand = StringTable->insert(newCmd);
    else
-      mCloseCommand = StringTable->insert("");
+      mCloseCommand = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -1828,7 +1830,7 @@ void GuiWindowCtrl::parentResized(const RectI &oldParentRect, const RectI &newPa
 
       // Only for collpasing groups, if were not, then do it like normal windows
       if( mCanCollapse && mCollapseGroup >= 0 )
-      {	
+      {  
          bool resizeMe = false;
          
          // Only the group window should control positioning

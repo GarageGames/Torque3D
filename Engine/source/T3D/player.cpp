@@ -56,9 +56,16 @@
 #include "T3D/decal/decalManager.h"
 #include "T3D/decal/decalData.h"
 #include "materials/baseMatInstance.h"
+#include "math/mathUtils.h"
+#include "gfx/sim/debugDraw.h"
 
 #ifdef TORQUE_EXTENDED_MOVE
    #include "T3D/gameBase/extended/extendedMove.h"
+#endif
+
+#ifdef TORQUE_OPENVR
+#include "platform/input/openVR/openVRProvider.h"
+#include "platform/input/openVR/openVRTrackedObject.h"
 #endif
 
 // Amount of time if takes to transition to a new action sequence.
@@ -102,8 +109,6 @@ static S32 sMaxPredictionTicks = 30;   // Number of ticks to predict
 
 S32 Player::smExtendedMoveHeadPosRotIndex = 0;  // The ExtendedMove position/rotation index used for head movements
 
-// Anchor point compression
-const F32 sAnchorMaxDistance = 32.0f;
 
 //
 static U32 sCollisionMoveMask =  TerrainObjectType       |
@@ -252,15 +257,15 @@ PlayerData::PlayerData()
    firstPersonShadows = false;
 
    // Used for third person image rendering
-   imageAnimPrefix = StringTable->insert("");
+   imageAnimPrefix = StringTable->EmptyString();
 
    allowImageStateAnimation = false;
 
    // Used for first person image rendering
-   imageAnimPrefixFP = StringTable->insert("");
+   imageAnimPrefixFP = StringTable->EmptyString();
    for (U32 i=0; i<ShapeBase::MaxMountedImages; ++i)
    {
-      shapeNameFP[i] = StringTable->insert("");
+      shapeNameFP[i] = StringTable->EmptyString();
       mCRCFP[i] = 0;
       mValidShapeFP[i] = false;
    }
@@ -356,6 +361,7 @@ PlayerData::PlayerData()
    decalID        = 0;
    decalOffset      = 0.0f;
 
+   actionCount = 0;
    lookAction = 0;
 
    // size of bounding box
@@ -412,7 +418,7 @@ PlayerData::PlayerData()
 
    jumpTowardsNormal = true;
 
-   physicsPlayerType = StringTable->insert("");
+   physicsPlayerType = StringTable->EmptyString();
 
    dMemset( actionList, 0, sizeof(actionList) );
 }
@@ -427,9 +433,9 @@ bool PlayerData::preload(bool server, String &errorStr)
    {
       for( U32 i = 0; i < MaxSounds; ++ i )
       {
-         String errorStr;
-         if( !sfxResolve( &sound[ i ], errorStr ) )
-            Con::errorf( "PlayerData::preload: %s", errorStr.c_str() );
+         String sfxErrorStr;
+         if( !sfxResolve( &sound[ i ], sfxErrorStr ) )
+            Con::errorf( "PlayerData::preload: %s", sfxErrorStr.c_str() );
       }
    }
 
@@ -467,7 +473,7 @@ bool PlayerData::preload(bool server, String &errorStr)
       // Extract ground transform velocity from animations
       // Get the named ones first so they can be indexed directly.
       ActionAnimation *dp = &actionList[0];
-      for (int i = 0; i < NumTableActionAnims; i++,dp++)
+      for (S32 i = 0; i < NumTableActionAnims; i++,dp++)
       {
          ActionAnimationDef *sp = &ActionAnimationList[i];
          dp->name          = sp->name;
@@ -487,12 +493,8 @@ bool PlayerData::preload(bool server, String &errorStr)
          dp->death         = false;
          if (dp->sequence != -1)
             getGroundInfo(si,thread,dp);
-
-         // No real reason to spam the console about a missing jet animation
-         if (dStricmp(sp->name, "jet") != 0)
-            AssertWarn(dp->sequence != -1, avar("PlayerData::preload - Unable to find named animation sequence '%s'!", sp->name));
       }
-      for (int b = 0; b < mShape->sequences.size(); b++)
+      for (S32 b = 0; b < mShape->sequences.size(); b++)
       {
          if (!isTableSequence(b))
          {
@@ -509,7 +511,7 @@ bool PlayerData::preload(bool server, String &errorStr)
       // Resolve lookAction index
       dp = &actionList[0];
       String lookName("look");
-      for (int c = 0; c < actionCount; c++,dp++)
+      for (S32 c = 0; c < actionCount; c++,dp++)
          if( dStricmp( dp->name, lookName ) == 0 )
             lookAction = c;
 
@@ -557,7 +559,7 @@ bool PlayerData::preload(bool server, String &errorStr)
       if (!Sim::findObject(dustID, dustEmitter))
          Con::errorf(ConsoleLogEntry::General, "PlayerData::preload - Invalid packet, bad datablockId(dustEmitter): 0x%x", dustID);
 
-   for (int i=0; i<NUM_SPLASH_EMITTERS; i++)
+   for (S32 i=0; i<NUM_SPLASH_EMITTERS; i++)
       if( !splashEmitterList[i] && splashEmitterIDList[i] != 0 )
          if( Sim::findObject( splashEmitterIDList[i], splashEmitterList[i] ) == false)
             Con::errorf(ConsoleLogEntry::General, "PlayerData::onAdd - Invalid packet, bad datablockId(particle emitter): 0x%x", splashEmitterIDList[i]);
@@ -586,7 +588,10 @@ bool PlayerData::preload(bool server, String &errorStr)
             Torque::FS::FileNodeRef    fileRef = Torque::FS::GetFileNode(mShapeFP[i].getPath());
 
             if (!fileRef)
+            {
+               errorStr = String::ToString("PlayerData: Mounted image %d loading failed, shape \"%s\" is not found.",i,mShapeFP[i].getPath().getFullPath().c_str());
                return false;
+            }
 
             if(server)
                mCRCFP[i] = fileRef->getChecksum();
@@ -647,7 +652,7 @@ bool PlayerData::isTableSequence(S32 seq)
 {
    // The sequences from the table must already have
    // been loaded for this to work.
-   for (int i = 0; i < NumTableActionAnims; i++)
+   for (S32 i = 0; i < NumTableActionAnims; i++)
       if (actionList[i].sequence == seq)
          return true;
    return false;
@@ -1650,6 +1655,7 @@ Player::Player()
 
    mLastAbsoluteYaw = 0.0f;
    mLastAbsolutePitch = 0.0f;
+   mLastAbsoluteRoll = 0.0f;
 }
 
 Player::~Player()
@@ -1775,7 +1781,7 @@ void Player::onRemove()
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBox.maxExtents.set(-1e9f, -1e9f, -1e9f);
 
-   SAFE_DELETE( mPhysicsRep );		
+   SAFE_DELETE( mPhysicsRep );
 
    Parent::onRemove();
 }
@@ -1944,7 +1950,7 @@ void Player::reSkin()
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
-      for ( int i = 0; i < skins.size(); i++ )
+      for ( S32 i = 0; i < skins.size(); i++ )
       {
          String oldSkin( mAppliedSkinName.c_str() );
          String newSkin( skins[i] );
@@ -1961,7 +1967,7 @@ void Player::reSkin()
 
          // Apply skin to both 3rd person and 1st person shape instances
          mShapeInstance->reSkin( newSkin, oldSkin );
-         for ( int j = 0; j < ShapeBase::MaxMountedImages; j++ )
+         for ( S32 j = 0; j < ShapeBase::MaxMountedImages; j++ )
          {
             if (mShapeFPInstance[j])
                mShapeFPInstance[j]->reSkin( newSkin, oldSkin );
@@ -2488,9 +2494,24 @@ void Player::allowAllPoses()
    mAllowSwimming = true;
 }
 
+AngAxisF gPlayerMoveRot;
+
 void Player::updateMove(const Move* move)
 {
    delta.move = *move;
+
+#ifdef TORQUE_OPENVR
+   if (mControllers[0])
+   {
+      mControllers[0]->processTick(move);
+   }
+
+   if (mControllers[1])
+   {
+      mControllers[1]->processTick(move);
+   }
+
+#endif
 
    // Is waterCoverage high enough to be 'swimming'?
    {
@@ -2530,6 +2551,7 @@ void Player::updateMove(const Move* move)
       delta.headVec = mHead;
 
       bool doStandardMove = true;
+      bool absoluteDelta = false;
       GameConnection* con = getControllingClient();
 
 #ifdef TORQUE_EXTENDED_MOVE
@@ -2608,6 +2630,7 @@ void Player::updateMove(const Move* move)
             }
             mLastAbsoluteYaw = emove->rotZ[emoveIndex];
             mLastAbsolutePitch = emove->rotX[emoveIndex];
+            mLastAbsoluteRoll = emove->rotY[emoveIndex];
 
             // Head bank
             mHead.y = emove->rotY[emoveIndex];
@@ -2615,6 +2638,38 @@ void Player::updateMove(const Move* move)
             // Constrain the range of mHead.y
             while (mHead.y > M_PI_F) 
                mHead.y -= M_2PI_F;
+         }
+         else
+         {
+            // Orient the player so we are looking towards the required position, ignoring any banking
+            AngAxisF moveRot(Point3F(emove->rotX[emoveIndex], emove->rotY[emoveIndex], emove->rotZ[emoveIndex]), emove->rotW[emoveIndex]);
+            MatrixF trans(1);
+            moveRot.setMatrix(&trans);
+            trans.inverse();
+
+            Point3F vecForward(0, 10, 0);
+            Point3F viewAngle;
+            Point3F orient;
+            EulerF rot;
+            trans.mulV(vecForward);
+            viewAngle = vecForward;
+            vecForward.z = 0; // flatten
+            vecForward.normalizeSafe();
+
+            F32 yawAng;
+            F32 pitchAng;
+            MathUtils::getAnglesFromVector(vecForward, yawAng, pitchAng);
+
+            mRot = EulerF(0);
+            mRot.z = yawAng;
+            mHead = EulerF(0);
+
+            while (mRot.z < 0.0f)
+               mRot.z += M_2PI_F;
+            while (mRot.z > M_2PI_F)
+               mRot.z -= M_2PI_F;
+
+            absoluteDelta = true;
          }
       }
 #endif
@@ -2664,6 +2719,13 @@ void Player::updateMove(const Move* move)
 
       delta.head = mHead;
       delta.headVec -= mHead;
+
+      if (absoluteDelta)
+      {
+         delta.headVec = Point3F(0, 0, 0);
+         delta.rotVec = Point3F(0, 0, 0);
+      }
+
       for(U32 i=0; i<3; ++i)
       {
          if (delta.headVec[i] > M_PI_F)
@@ -2952,7 +3014,7 @@ void Player::updateMove(const Move* move)
 
       // Clamp acceleration.
       F32 maxAcc = (mDataBlock->swimForce / getMass()) * TickSec;
-      if ( false && swimSpeed > maxAcc )
+      if ( swimSpeed > maxAcc )
          swimAcc *= maxAcc / swimSpeed;      
 
       acc += swimAcc;
@@ -3171,18 +3233,21 @@ void Player::updateMove(const Move* move)
    // Update the PlayerPose
    Pose desiredPose = mPose;
 
-   if ( mSwimming )
-      desiredPose = SwimPose; 
-   else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
-      desiredPose = CrouchPose;
-   else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
-      desiredPose = PronePose;
-   else if ( move->trigger[sSprintTrigger] && canSprint() )
-      desiredPose = SprintPose;
-   else if ( canStand() )
-      desiredPose = StandPose;
+   if ( !mIsAiControlled )
+   {
+      if ( mSwimming )
+         desiredPose = SwimPose; 
+      else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
+         desiredPose = CrouchPose;
+      else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
+         desiredPose = PronePose;
+      else if ( move->trigger[sSprintTrigger] && canSprint() )
+         desiredPose = SprintPose;
+      else if ( canStand() )
+         desiredPose = StandPose;
 
-   setPose( desiredPose );
+      setPose( desiredPose );
+   }
 }
 
 
@@ -3270,9 +3335,9 @@ bool Player::canCrouch()
    if ( mDataBlock->actionList[PlayerData::CrouchRootAnim].sequence == -1 )
       return false;       
 
-	// We are already in this pose, so don't test it again...
-	if ( mPose == CrouchPose )
-		return true;
+   // We are already in this pose, so don't test it again...
+   if ( mPose == CrouchPose )
+      return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3322,8 +3387,8 @@ bool Player::canStand()
       return false;
 
    // We are already in this pose, so don't test it again...
-	if ( mPose == StandPose )
-		return true;
+   if ( mPose == StandPose )
+      return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3386,9 +3451,9 @@ bool Player::canProne()
    if ( !mPhysicsRep )
       return true;
 
-	// We are already in this pose, so don't test it again...
-	if ( mPose == PronePose )
-		return true;
+   // We are already in this pose, so don't test it again...
+   if ( mPose == PronePose )
+      return true;
 
    return mPhysicsRep->testSpacials( getPosition(), mDataBlock->proneBoxSize );
 }
@@ -3585,7 +3650,7 @@ MatrixF * Player::Death::fallToGround(F32 dt, const Point3F& loc, F32 curZ, F32 
          normal.normalize();
          mat.set(EulerF (0.0f, 0.0f, curZ));
          mat.mulV(upY, & ahead);
-	      mCross(ahead, normal, &sideVec);
+         mCross(ahead, normal, &sideVec);
          sideVec.normalize();
          mCross(normal, sideVec, &ahead);
 
@@ -3692,7 +3757,7 @@ bool Player::setActionThread(const char* sequence,bool hold,bool wait,bool fsp)
 
 void Player::setActionThread(U32 action,bool forward,bool hold,bool wait,bool fsp, bool forceSet)
 {
-   if (!mDataBlock || (mActionAnimation.action == action && mActionAnimation.forward == forward && !forceSet))
+   if (!mDataBlock || !mDataBlock->actionCount || (mActionAnimation.action == action && mActionAnimation.forward == forward && !forceSet))
       return;
 
    if (action >= PlayerData::NumActionAnims)
@@ -3768,11 +3833,13 @@ void Player::updateActionThread()
    // Select an action animation sequence, this assumes that
    // this function is called once per tick.
    if(mActionAnimation.action != PlayerData::NullAnimation)
+   {
       if (mActionAnimation.forward)
          mActionAnimation.atEnd = mShapeInstance->getPos(mActionAnimation.thread) == 1;
       else
          mActionAnimation.atEnd = mShapeInstance->getPos(mActionAnimation.thread) == 0;
-
+   }
+    
    // Only need to deal with triggers on the client
    if( isGhost() )
    {
@@ -3863,9 +3930,9 @@ void Player::updateActionThread()
    if (mMountPending)
       mMountPending = (isMounted() ? 0 : (mMountPending - 1));
 
-   if (mActionAnimation.action == PlayerData::NullAnimation ||
-       ((!mActionAnimation.waitForEnd || mActionAnimation.atEnd)) &&
-       !mActionAnimation.holdAtEnd && (mActionAnimation.delayTicks -= !mMountPending) <= 0)
+   if ((mActionAnimation.action == PlayerData::NullAnimation) ||
+       ((!mActionAnimation.waitForEnd || mActionAnimation.atEnd) &&
+       (!mActionAnimation.holdAtEnd && (mActionAnimation.delayTicks -= !mMountPending) <= 0)))
    {
       //The scripting language will get a call back when a script animation has finished...
       //  example: When the chat menu animations are done playing...
@@ -4447,7 +4514,7 @@ void Player::onImageAnimThreadUpdate(U32 imageSlot, S32 imageShapeIndex, F32 dt)
    }
 }
 
-void Player::onUnmount( ShapeBase *obj, S32 node )
+void Player::onUnmount( SceneObject *obj, S32 node )
 {
    // Reset back to root position during dismount.
    setActionThread(PlayerData::RootAnim,true,false,false);
@@ -4514,6 +4581,7 @@ void Player::updateAnimationTree(bool firstPerson)
 {
    S32 mode = 0;
    if (firstPerson)
+   {
       if (mActionAnimation.firstPerson)
          mode = 0;
 //            TSShapeInstance::MaskNodeRotation;
@@ -4521,7 +4589,7 @@ void Player::updateAnimationTree(bool firstPerson)
 //            TSShapeInstance::MaskNodePosY;
       else
          mode = TSShapeInstance::MaskNodeAllButBlend;
-
+   }
    for (U32 i = 0; i < PlayerData::NumSpineNodes; i++)
       if (mDataBlock->spineNode[i] != -1)
          mShapeInstance->setNodeAnimationState(mDataBlock->spineNode[i],mode);
@@ -4657,9 +4725,9 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
       }
       Point3F distance = end - start;
 
-      if (mFabs(distance.x) < mObjBox.len_x() &&
-          mFabs(distance.y) < mObjBox.len_y() &&
-          mFabs(distance.z) < mObjBox.len_z())
+      if (mFabs(distance.x) < mScaledBox.len_x() &&
+          mFabs(distance.y) < mScaledBox.len_y() &&
+          mFabs(distance.z) < mScaledBox.len_z())
       {
          // We can potentially early out of this.  If there are no polys in the clipped polylist at our
          //  end position, then we can bail, and just set start = end;
@@ -5311,10 +5379,10 @@ void Player::setPosition(const Point3F& pos,const Point3F& rot)
    MatrixF mat;
    if (isMounted()) {
       // Use transform from mounted object
-      MatrixF nmat,zrot;
-      mMount.object->getMountTransform( mMount.node, mMount.xfm, &nmat );
-      zrot.set(EulerF(0.0f, 0.0f, rot.z));
-      mat.mul(nmat,zrot);
+      //MatrixF nmat,zrot;
+      mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
+      //zrot.set(EulerF(0.0f, 0.0f, rot.z));
+      //mat.mul(nmat,zrot);
    }
    else {
       mat.set(EulerF(0.0f, 0.0f, rot.z));
@@ -5333,10 +5401,10 @@ void Player::setRenderPosition(const Point3F& pos, const Point3F& rot, F32 dt)
    MatrixF mat;
    if (isMounted()) {
       // Use transform from mounted object
-      MatrixF nmat,zrot;
-      mMount.object->getRenderMountTransform( dt, mMount.node, mMount.xfm, &nmat );
-      zrot.set(EulerF(0.0f, 0.0f, rot.z));
-      mat.mul(nmat,zrot);
+      //MatrixF nmat,zrot;
+      mMount.object->getRenderMountTransform( dt, mMount.node, mMount.xfm, &mat );
+      //zrot.set(EulerF(0.0f, 0.0f, rot.z));
+      //mat.mul(nmat,zrot);
    }
    else {
       EulerF   orient(0.0f, 0.0f, rot.z);
@@ -5584,7 +5652,6 @@ void Player::getMuzzleTransform(U32 imageSlot,MatrixF* mat)
    *mat = nmat;
 }
 
-
 void Player::getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat)
 {
    disableHeadZCalc();
@@ -5780,7 +5847,7 @@ F32 Player::getSpeed() const
 
 void Player::setVelocity(const VectorF& vel)
 {
-	AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
+   AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
 
    mVelocity = vel;
    setMaskBits(MoveMask);
@@ -5788,7 +5855,7 @@ void Player::setVelocity(const VectorF& vel)
 
 void Player::applyImpulse(const Point3F&,const VectorF& vec)
 {
-	AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
+   AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
 
    // Players ignore angular velocity
    VectorF vel;
@@ -5822,7 +5889,7 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
    F32 const *si = &start.x;
    F32 const *ei = &end.x;
 
-   for (int i = 0; i < 3; i++) {
+   for (S32 i = 0; i < 3; i++) {
       if (*si < *ei) {
          if (*si > *bmax || *ei < *bmin)
             return false;
@@ -6133,6 +6200,10 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    {
       stream->writeFlag(mFalling);
 
+      stream->writeFlag(mSwimming);
+      stream->writeFlag(mJetting);  
+      stream->writeInt(mPose, NumPoseBits);
+     
       stream->writeInt(mState,NumStateBits);
       if (stream->writeFlag(mState == RecoverState))
          stream->writeInt(mRecoverTicks,PlayerData::RecoverDelayBits);
@@ -6152,13 +6223,16 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          stream->writeInt((S32)len, 13);
       }
       stream->writeFloat(mRot.z / M_2PI_F, 7);
-      stream->writeSignedFloat(mHead.x / mDataBlock->maxLookAngle, 6);
+      stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
       stream->writeSignedFloat(mHead.z / mDataBlock->maxFreelookAngle, 6);
       delta.move.pack(stream);
       stream->writeFlag(!(mask & NoWarpMask));
    }
    // Ghost need energy to predict reliably
-   stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy,EnergyLevelBits);
+   if (mDataBlock->maxEnergy > 0.f)
+      stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy, EnergyLevelBits);
+   else
+      stream->writeFloat(0.f, EnergyLevelBits);
    return retMask;
 }
 
@@ -6226,7 +6300,11 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
    if (stream->readFlag()) {
       mPredictionCount = sMaxPredictionTicks;
       mFalling = stream->readFlag();
-
+ 
+      mSwimming = stream->readFlag();
+      mJetting = stream->readFlag();  
+      mPose = (Pose)(stream->readInt(NumPoseBits)); 
+     
       ActionState actionState = (ActionState)stream->readInt(NumStateBits);
       if (stream->readFlag()) {
          mRecoverTicks = stream->readInt(PlayerData::RecoverDelayBits);
@@ -6250,7 +6328,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
       
       rot.y = rot.x = 0.0f;
       rot.z = stream->readFloat(7) * M_2PI_F;
-      mHead.x = stream->readSignedFloat(6) * mDataBlock->maxLookAngle;
+      mHead.x = stream->readSignedFloat(6) * (mDataBlock->maxLookAngle - mDataBlock->minLookAngle);
       mHead.z = stream->readSignedFloat(6) * mDataBlock->maxFreelookAngle;
       delta.move.unpack(stream);
 
@@ -6507,8 +6585,9 @@ DefineEngineMethod( Player, getDamageLocation, const char*, ( Point3F pos ),,
 
    object->getDamageLocation(pos, buffer1, buffer2);
 
-   char *buff = Con::getReturnBuffer(128);
-   dSprintf(buff, 128, "%s %s", buffer1, buffer2);
+   static const U32 bufSize = 128;
+   char *buff = Con::getReturnBuffer(bufSize);
+   dSprintf(buff, bufSize, "%s %s", buffer1, buffer2);
    return buff;
 }
 
@@ -6573,7 +6652,7 @@ DefineEngineMethod( Player, setActionThread, bool, ( const char* name, bool hold
    "@tsexample\n"
       "// Place the player in a sitting position after being mounted\n"
       "%player.setActionThread( \"sitting\", true, true );\n"
-	"@endtsexample\n")
+   "@endtsexample\n")
 {
    return object->setActionThread( name, hold, true, fsp);
 }
@@ -6621,11 +6700,11 @@ DefineEngineMethod( Player, clearControlObject, void, (),,
    "Returns control to the player. This internally calls "
    "Player::setControlObject(0).\n"
    "@tsexample\n"
-		"%player.clearControlObject();\n"
+      "%player.clearControlObject();\n"
       "echo(%player.getControlObject()); //<-- Returns 0, player assumes control\n"
       "%player.setControlObject(%vehicle);\n"
       "echo(%player.getControlObject()); //<-- Returns %vehicle, player controls the vehicle now.\n"
-	"@endtsexample\n"
+   "@endtsexample\n"
    "@note If the player does not have a control object, the player will receive all moves "
    "from its GameConnection.  If you're looking to remove control from the player itself "
    "(i.e. stop sending moves to the player) use GameConnection::setControlObject() to transfer "
@@ -6683,63 +6762,63 @@ void Player::consoleInit()
       "@brief Determines if the player is rendered or not.\n\n"
       "Used on the client side to disable the rendering of all Player objects.  This is "
       "mainly for the tools or debugging.\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::renderMyItems",TypeBool, &sRenderMyItems,
       "@brief Determines if mounted shapes are rendered or not.\n\n"
       "Used on the client side to disable the rendering of all Player mounted objects.  This is "
       "mainly used for the tools or debugging.\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::renderCollision", TypeBool, &sRenderPlayerCollision, 
       "@brief Determines if the player's collision mesh should be rendered.\n\n"
       "This is mainly used for the tools and debugging.\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 
    Con::addVariable("$player::minWarpTicks",TypeF32,&sMinWarpTicks, 
       "@brief Fraction of tick at which instant warp occures on the client.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::maxWarpTicks",TypeS32,&sMaxWarpTicks, 
       "@brief When a warp needs to occur due to the client being too far off from the server, this is the "
       "maximum number of ticks we'll allow the client to warp to catch up.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::maxPredictionTicks",TypeS32,&sMaxPredictionTicks, 
       "@brief Maximum number of ticks to predict on the client from the last known move obtained from the server.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 
    Con::addVariable("$player::maxImpulseVelocity", TypeF32, &sMaxImpulseVelocity, 
       "@brief The maximum velocity allowed due to a single impulse.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 
    // Move triggers
    Con::addVariable("$player::jumpTrigger", TypeS32, &sJumpTrigger, 
       "@brief The move trigger index used for player jumping.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::crouchTrigger", TypeS32, &sCrouchTrigger, 
       "@brief The move trigger index used for player crouching.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::proneTrigger", TypeS32, &sProneTrigger, 
       "@brief The move trigger index used for player prone pose.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::sprintTrigger", TypeS32, &sSprintTrigger, 
       "@brief The move trigger index used for player sprinting.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::imageTrigger0", TypeS32, &sImageTrigger0, 
       "@brief The move trigger index used to trigger mounted image 0.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::imageTrigger1", TypeS32, &sImageTrigger1, 
       "@brief The move trigger index used to trigger mounted image 1 or alternate fire "
       "on mounted image 0.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::jumpJetTrigger", TypeS32, &sJumpJetTrigger, 
       "@brief The move trigger index used for player jump jetting.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
    Con::addVariable("$player::vehicleDismountTrigger", TypeS32, &sVehicleDismountTrigger, 
       "@brief The move trigger index used to dismount player.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 
    // ExtendedMove support
    Con::addVariable("$player::extendedMoveHeadPosRotIndex", TypeS32, &smExtendedMoveHeadPosRotIndex, 
       "@brief The ExtendedMove position/rotation index used for head movements.\n\n"
-	   "@ingroup GameObjects\n");
+      "@ingroup GameObjects\n");
 }
 
 //--------------------------------------------------------------------------
@@ -6816,31 +6895,13 @@ void Player::playFootstepSound( bool triggeredLeft, Material* contactMaterial, S
       // Play default sound.
 
       S32 sound = -1;
-      if( contactMaterial && contactMaterial->mFootstepSoundId != -1 )
+      if (contactMaterial && (contactMaterial->mFootstepSoundId>-1 && contactMaterial->mFootstepSoundId<PlayerData::MaxSoundOffsets))
          sound = contactMaterial->mFootstepSoundId;
       else if( contactObject && contactObject->getTypeMask() & VehicleObjectType )
          sound = 2;
 
-      switch ( sound )
-      {
-      case 0: // Soft
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootSoft], &footMat );
-         break;
-      case 1: // Hard
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootHard], &footMat );
-         break;
-      case 2: // Metal
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootMetal], &footMat );
-         break;
-      case 3: // Snow
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootSnow], &footMat );
-         break;
-      /*
-      default: //Hard
-         SFX->playOnce( mDataBlock->sound[PlayerData::FootHard], &footMat );
-         break;
-      */
-      }
+      if (sound>=0)
+         SFX->playOnce(mDataBlock->sound[sound], &footMat);
    }
 }
 
@@ -6865,36 +6926,13 @@ void Player:: playImpactSound()
          else
          {
             S32 sound = -1;
-            if( material && material->mImpactSoundId )
+            if (material && (material->mImpactSoundId>-1 && material->mImpactSoundId<PlayerData::MaxSoundOffsets))
                sound = material->mImpactSoundId;
             else if( rInfo.object->getTypeMask() & VehicleObjectType )
                sound = 2; // Play metal;
 
-            switch( sound )
-            {
-            case 0:
-               //Soft
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactSoft ], &getTransform() );
-               break;
-            case 1:
-               //Hard
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactHard ], &getTransform() );
-               break;
-            case 2:
-               //Metal
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactMetal ], &getTransform() );
-               break;
-            case 3:
-               //Snow
-               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactSnow ], &getTransform() );
-               break;
-               /*
-            default:
-               //Hard
-               alxPlay(mDataBlock->sound[PlayerData::ImpactHard], &getTransform());
-               break;
-               */
-            }
+            if (sound >= 0)
+               SFX->playOnce(mDataBlock->sound[PlayerData::ImpactStart + sound], &getTransform());
          }
       }
    }
@@ -7133,3 +7171,38 @@ void Player::renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    mConvex.renderWorkingList();
    GFX->leaveDebugEvent();
 }
+
+#ifdef TORQUE_OPENVR
+void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
+{
+   mControllers[0] = controllerList.size() > 0 ? controllerList[0] : NULL;
+   mControllers[1] = controllerList.size() > 1 ? controllerList[1] : NULL;
+}
+
+ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
+{
+   OpenVRTrackedObject *controllerL, *controllerR;
+   Vector<OpenVRTrackedObject*> list;
+
+   if (Sim::findObject(argv[2], controllerL))
+   {
+      list.push_back(controllerL);
+   }
+   else
+   {
+      list.push_back(NULL);
+   }
+
+   if (Sim::findObject(argv[3], controllerR))
+   {
+      list.push_back(controllerR);
+   }
+   else
+   {
+      list.push_back(NULL);
+   }
+
+   object->setControllers(list);
+}
+
+#endif

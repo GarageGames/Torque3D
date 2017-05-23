@@ -121,8 +121,8 @@ public:
    // ConsoleObject interface
    DECLARE_CONOBJECT(AdvancedLightBinManager);
 
-   bool MRTLightmapsDuringPrePass() const { return mMRTLightmapsDuringPrePass; }
-   void MRTLightmapsDuringPrePass(bool val);
+   bool MRTLightmapsDuringDeferred() const { return mMRTLightmapsDuringDeferred; }
+   void MRTLightmapsDuringDeferred(bool val);
 
 
    typedef Signal<void(SceneRenderState *, AdvancedLightBinManager *)> RenderSignal;
@@ -185,6 +185,7 @@ protected:
    {
       LightInfo* lightInfo;
       LightShadowMap* shadowMap;
+      LightShadowMap* dynamicShadowMap;
       LightMaterialInfo* lightMaterial;
       GFXPrimitiveBuffer* primBuffer;
       GFXVertexBuffer* vertBuffer;
@@ -194,7 +195,7 @@ protected:
    Vector<LightBinEntry> mLightBin;
    typedef Vector<LightBinEntry>::iterator LightBinIterator;
 
-   bool mMRTLightmapsDuringPrePass;
+   bool mMRTLightmapsDuringDeferred;
 
    /// Used in setupSGData to set the object transform.
    MatrixF mLightMat;

@@ -156,7 +156,7 @@ bool Rigid::resolveCollision(const Point3F& p, const Point3F &normal, Rigid* rig
       return false;
 
    // Compute impulse
-   F32 d, n = -nv * (1.0f + restitution * rigid->restitution);
+   F32 d, n = -nv * (2.0f + restitution * rigid->restitution);
    Point3F a1,b1,c1;
    mCross(r1,normal,&a1);
    invWorldInertia.mulV(a1,&b1);
@@ -173,7 +173,7 @@ bool Rigid::resolveCollision(const Point3F& p, const Point3F &normal, Rigid* rig
 
    applyImpulse(r1,impulse);
    impulse.neg();
-   applyImpulse(r2,impulse);
+   rigid->applyImpulse(r2, impulse);
    return true;
 }
 
@@ -265,8 +265,8 @@ void Rigid::translateCenterOfMass(const Point3F &oldPos,const Point3F &newPos)
    MatrixF oldx,newx;
    oldx.setCrossProduct(oldPos);
    newx.setCrossProduct(newPos);
-   for (int row = 0; row < 3; row++)
-      for (int col = 0; col < 3; col++) {
+   for (S32 row = 0; row < 3; row++)
+      for (S32 col = 0; col < 3; col++) {
          F32 n = newx(row,col), o = oldx(row,col);
          objectInertia(row,col) += mass * ((o * o) - (n * n));
       }

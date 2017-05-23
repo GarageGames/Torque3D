@@ -206,7 +206,7 @@ bool PosixFileSystem::rename(const Path& from,const Path& to)
    String fa = buildFileName(_volume,from);
    String fb = buildFileName(_volume,to);
    
-   if (!rename(fa.c_str(),fb.c_str()))
+   if (!::rename(fa.c_str(),fb.c_str()))
       return true;
       
    return false;
@@ -251,7 +251,7 @@ Path PosixFile::getName() const
    return _path;
 }
 
-FileNode::Status PosixFile::getStatus() const
+FileNode::NodeStatus PosixFile::getStatus() const
 {
    return _status;
 }
@@ -536,7 +536,7 @@ bool PosixDirectory::getAttributes(Attributes* attr)
    return true;
 }
 
-FileNode::Status PosixDirectory::getStatus() const
+FileNode::NodeStatus PosixDirectory::getStatus() const
 {
    return _status;
 }

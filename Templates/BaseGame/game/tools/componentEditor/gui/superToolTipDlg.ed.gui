@@ -1,0 +1,45 @@
+%guiContent = new GuiControl(SuperTooltipDlg) {
+   canSaveDynamicFields = "0";
+   Profile = "GuiTransparentProfileModeless";
+   class = "SuperTooltip";
+   HorizSizing = "right";
+   VertSizing = "bottom";
+   position = "0 0";
+   Extent = "640 480";
+   MinExtent = "8 2";
+   canSave = "1";
+   Visible = "1";
+   hovertime = "1000";
+
+   new GuiControl(SuperTooltipWindow) {
+      canSaveDynamicFields = "0";
+      Profile = "EditorTextEditBoldModeless";
+      HorizSizing = "right";
+      VertSizing = "bottom";
+      position = "216 160";
+      Extent = "221 134";
+      MinExtent = "8 2";
+      canSave = "1";
+      Visible = "1";
+      hovertime = "1000";
+      internalName = "tooltipWindow";
+
+      new GuiMLTextCtrl(SuperTooltipMLText) {
+         canSaveDynamicFields = "0";
+         Profile = "EditorMLTextProfileModeless";
+         HorizSizing = "right";
+         VertSizing = "bottom";
+         position = "5 5";
+         Extent = "210 14";
+         MinExtent = "8 2";
+         canSave = "1";
+         Visible = "1";
+         hovertime = "1000";
+         lineSpacing = "2";
+         allowColorChars = "0";
+         maxChars = "-1";
+         internalName = "tooltipMLText";
+      };
+   };
+};
+

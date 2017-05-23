@@ -606,8 +606,6 @@ bool DDSFile::read(Stream &s, U32 dropMipCount)
          mPitchOrLinearSize = getSurfaceSize( dropMipCount );
       else if ( mFlags.test( PitchSizeFlag ) )
          mPitchOrLinearSize = getSurfacePitch( dropMipCount );
-      else
-         mPitchOrLinearSize = mPitchOrLinearSize; // Do nothing?
 
       // Now fix up the rest of the 
       mMipMapCount = getMax( (U32)1, mMipMapCount - dropMipCount );
@@ -883,7 +881,7 @@ DDSFile *DDSFile::createDDSFileFromGBitmap( const GBitmap *gbmp )
    ret->mSurfaces.push_back( new SurfaceData() );
 
    // Load the mips
-   for( int i = 0; i < ret->mMipMapCount; i++ )
+   for( S32 i = 0; i < ret->mMipMapCount; i++ )
    {
       const U32 mipSz = ret->getSurfaceSize(i);
       ret->mSurfaces.last()->mMips.push_back( new U8[mipSz] );
@@ -898,7 +896,7 @@ DDSFile *DDSFile::createDDSFileFromGBitmap( const GBitmap *gbmp )
          // Assumption:
          AssertFatal( gbmp->getBytesPerPixel() + 1 == ret->mBytesPerPixel, "Assumption failed, not 24->32 bit straight convert." );
 
-         for( int pxl = 0; pxl < gbmp->getWidth(i) * gbmp->getHeight(i); pxl++ )
+         for( S32 pxl = 0; pxl < gbmp->getWidth(i) * gbmp->getHeight(i); pxl++ )
          {
             U8 *dst = &mipMem[pxl * ret->mBytesPerPixel];
             const U8 *src = &gbmp->getBits(i)[pxl * gbmp->getBytesPerPixel()];

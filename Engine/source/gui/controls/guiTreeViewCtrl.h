@@ -75,7 +75,10 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
                ShowClassName     = BIT( 11 ),
                ShowObjectName    = BIT( 12 ),
                ShowInternalName  = BIT( 13 ),
-               ShowClassNameForUnnamed = BIT( 14 )
+               ShowClassNameForUnnamed = BIT( 14 ),
+               ForceItemName = BIT(15),
+               ForceDragTarget = BIT(16),
+               DenyDrag = BIT(17),
             };
 
             GuiTreeViewCtrl* mParentControl;
@@ -168,6 +171,14 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
             /// Returns true if an item is inspector data
             /// or false if it's just an item.
             bool isInspectorData() const { return mState.test(InspectorData); };
+
+            /// Returns true if we've been manually set to allow dragging overrides.
+            /// As it's a manually set flag, by default it is false.
+            bool isDragTargetAllowed() const { return mState.test(ForceDragTarget); };
+
+            /// Returns true if we've been manually set to allow dragging overrides.
+            /// As it's a manually set flag, by default it is false.
+            bool isDragAllowed() const { return !mState.test(DenyDrag); };
 
             /// Returns true if we should show the expand art
             /// and make the item interact with the mouse as if
@@ -454,6 +465,9 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       GuiTreeViewCtrl();
       virtual ~GuiTreeViewCtrl();
 
+		//WLE Vince, Moving this into a function so I don't have to bounce off the console.  12/05/2013
+		const char* getSelectedObjectList();
+
       /// Used for syncing the mSelected and mSelectedItems lists.
       void syncSelection();
 
@@ -592,6 +606,7 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       static void initPersistFields();
 
       void inspectObject(SimObject * obj, bool okToEdit);
+	  S32 insertObject(S32 parentId, SimObject * obj, bool okToEdit);
       void buildVisibleTree(bool bForceFullUpdate = false);
 
       void cancelRename();

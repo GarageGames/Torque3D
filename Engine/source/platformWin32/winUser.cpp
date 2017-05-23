@@ -25,7 +25,10 @@
 #include "core/stringTable.h"
 #include "core/strings/unicode.h"
 
+#ifndef TORQUE_OS_WIN64
 typedef long SHANDLE_PTR;
+#endif
+
 #include <shlobj.h>
 #include <windows.h>
 #include <lmcons.h>
@@ -49,7 +52,7 @@ const char *Platform::getUserDataDirectory()
 
 #ifdef UNICODE
    char path[ MAX_PATH * 3 + 1 ];
-   convertUTF16toUTF8( szBuffer, path, sizeof( path ) );
+   convertUTF16toUTF8( szBuffer, path );
 #else
    char* path = szBuffer;
 #endif
@@ -75,7 +78,7 @@ const char *Platform::getUserHomeDirectory()
 
 #ifdef UNICODE
    char path[ MAX_PATH * 3 + 1 ];
-   convertUTF16toUTF8( szBuffer, path, sizeof( path ) );
+   convertUTF16toUTF8( szBuffer, path );
 #else
    char* path = szBuffer;
 #endif

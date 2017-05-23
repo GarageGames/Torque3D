@@ -52,8 +52,8 @@ MODULE_END;
 bool PostEffectManager::smRenderEffects = true;
 
 PostEffectManager::PostEffectManager() : 
-      mFrameStateSwitch( false ),
-      mLastBackBufferTarget( NULL )
+      mLastBackBufferTarget( NULL ),
+      mFrameStateSwitch( false )
 {
    GFXDevice::getDeviceEventSignal().notify( this, &PostEffectManager::_handleDeviceEvent );
    RenderPassManager::getRenderBinSignal().notify( this, &PostEffectManager::_handleBinEvent );
@@ -245,11 +245,6 @@ void PostEffectManager::renderEffects( const SceneRenderState *state,
                                        const PFXRenderTime effectTiming, 
                                        const String &binName )
 {
-   // MACHAX - The proper fix is to ensure that PostFX do not get rendered if 
-   // their shader failed to load.
-#ifdef TORQUE_OS_MAC
-   return;
-#endif
 
    // Check the global render effect state as 
    // well as the 

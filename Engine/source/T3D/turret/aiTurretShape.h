@@ -257,6 +257,9 @@ public:
 
    void addToIgnoreList(ShapeBase* obj);
    void removeFromIgnoreList(ShapeBase* obj);
+   void clearIgnoreList();
+   S32  ignoreListCount();
+   SimObject* getIgnoreListObject(S32 index);  
 
    void setTurretStateName(const char* newState, bool force=false);
    void setTurretState(U32 newState, bool force=false);

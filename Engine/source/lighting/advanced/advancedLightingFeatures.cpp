@@ -31,10 +31,11 @@
 #include "gfx/gfxDevice.h"
 #include "core/util/safeDelete.h"
 
-#if !defined( TORQUE_OS_MAC ) && !defined( TORQUE_OS_LINUX )
+#if defined( TORQUE_OS_WIN )
 #  include "lighting/advanced/hlsl/gBufferConditionerHLSL.h"
 #  include "lighting/advanced/hlsl/advancedLightingFeaturesHLSL.h"
-#else
+#endif
+#if defined( TORQUE_OPENGL )
 #  include "lighting/advanced/glsl/gBufferConditionerGLSL.h"
 #  include "lighting/advanced/glsl/advancedLightingFeaturesGLSL.h"
 #endif
@@ -43,7 +44,7 @@
 
 bool AdvancedLightingFeatures::smFeaturesRegistered = false;
 
-void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetFormat, const GFXFormat &lightInfoTargetFormat )
+void AdvancedLightingFeatures::registerFeatures( const GFXFormat &deferredTargetFormat, const GFXFormat &lightInfoTargetFormat )
 {
    AssertFatal( !smFeaturesRegistered, "AdvancedLightingFeatures::registerFeatures() - Features already registered. Bad!" );
 
@@ -54,9 +55,9 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
 
    if(GFX->getAdapterType() == OpenGL)
    {
-#if defined( TORQUE_OS_MAC ) || defined( TORQUE_OS_LINUX )
-      cond = new GBufferConditionerGLSL( prepassTargetFormat );
-      FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
+#if defined( TORQUE_OPENGL ) 
+      cond = new GBufferConditionerGLSL( deferredTargetFormat, GBufferConditionerGLSL::ViewSpace );
+      FEATUREMGR->registerFeature(MFT_DeferredConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatGLSL());
       FEATUREMGR->registerFeature(MFT_NormalMap, new DeferredBumpFeatGLSL());
       FEATUREMGR->registerFeature(MFT_PixSpecular, new DeferredPixelSpecularGLSL());
@@ -66,9 +67,9 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
    }
    else
    {
-#if !defined( TORQUE_OS_MAC ) && !defined( TORQUE_OS_LINUX )
-      cond = new GBufferConditionerHLSL( prepassTargetFormat, GBufferConditionerHLSL::ViewSpace );
-      FEATUREMGR->registerFeature(MFT_PrePassConditioner, cond);
+#if defined( TORQUE_OS_WIN )
+      cond = new GBufferConditionerHLSL( deferredTargetFormat, GBufferConditionerHLSL::ViewSpace );
+      FEATUREMGR->registerFeature(MFT_DeferredConditioner, cond);
       FEATUREMGR->registerFeature(MFT_RTLighting, new DeferredRTLightingFeatHLSL());
       FEATUREMGR->registerFeature(MFT_NormalMap, new DeferredBumpFeatHLSL());
       FEATUREMGR->registerFeature(MFT_PixSpecular, new DeferredPixelSpecularHLSL());
@@ -77,7 +78,7 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
 #endif
    }
 
-   NamedTexTarget *target = NamedTexTarget::find( "prepass" );
+   NamedTexTarget *target = NamedTexTarget::find( "deferred" );
    if ( target )
       target->setConditioner( cond );
 
@@ -86,11 +87,11 @@ void AdvancedLightingFeatures::registerFeatures( const GFXFormat &prepassTargetF
 
 void AdvancedLightingFeatures::unregisterFeatures()
 {
-   NamedTexTarget *target = NamedTexTarget::find( "prepass" );
+   NamedTexTarget *target = NamedTexTarget::find( "deferred" );
    if ( target )
       target->setConditioner( NULL );
 
-   FEATUREMGR->unregisterFeature(MFT_PrePassConditioner);
+   FEATUREMGR->unregisterFeature(MFT_DeferredConditioner);
    FEATUREMGR->unregisterFeature(MFT_RTLighting);
    FEATUREMGR->unregisterFeature(MFT_NormalMap);
    FEATUREMGR->unregisterFeature(MFT_PixSpecular);

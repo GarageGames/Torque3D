@@ -78,7 +78,10 @@ public:
    String mValue;
    bool mIsGroup;
 
-   SettingSaveNode(){};
+   SettingSaveNode()
+   {
+      mIsGroup = false;
+   }
    SettingSaveNode(const String &name, bool isGroup = false)
    {
       mName = name;

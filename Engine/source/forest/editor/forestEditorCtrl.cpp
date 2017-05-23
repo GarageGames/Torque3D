@@ -25,6 +25,7 @@
 
 #include "forest/editor/forestBrushTool.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 #include "gui/core/guiCanvas.h"
 #include "windowManager/platformCursorController.h"
 #include "forest/editor/forestUndo.h"
@@ -96,7 +97,6 @@ void ForestEditorCtrl::onSleep()
 
 bool ForestEditorCtrl::updateActiveForest( bool createNew )
 {
-   mForest = dynamic_cast<Forest*>( Sim::findObject( "theForest" ) );
    Con::executef( this, "onActiveForestUpdated", mForest ? mForest->getIdString() : "", createNew ? "1" : "0" );  
 
    if ( mTool )
@@ -370,33 +370,42 @@ bool ForestEditorCtrl::isDirty()
    return foundDirty;   
 }
 
-ConsoleMethod( ForestEditorCtrl, updateActiveForest, void, 2, 2, "()" )
+DefineConsoleMethod( ForestEditorCtrl, updateActiveForest, void, (), , "()" )
 {
    object->updateActiveForest( true );
 }
 
-ConsoleMethod( ForestEditorCtrl, setActiveTool, void, 3, 3, "( ForestTool tool )" )
+DefineConsoleMethod( ForestEditorCtrl, setActiveTool, void, ( const char * toolName ), , "( ForestTool tool )" )
 {
-   ForestTool *tool = dynamic_cast<ForestTool*>( Sim::findObject( argv[2] ) );
+   ForestTool *tool = dynamic_cast<ForestTool*>( Sim::findObject( toolName ) );
    object->setActiveTool( tool );
 }
 
-ConsoleMethod( ForestEditorCtrl, getActiveTool, S32, 2, 2, "()" )
+DefineConsoleMethod( ForestEditorCtrl, getActiveTool, S32, (), , "()" )
 {
    ForestTool *tool = object->getActiveTool();
    return tool ? tool->getId() : 0;
 }
 
-ConsoleMethod( ForestEditorCtrl, deleteMeshSafe, void, 3, 3, "( ForestItemData obj )" )
+DefineConsoleMethod( ForestEditorCtrl, deleteMeshSafe, void, ( const char * obj ), , "( ForestItemData obj )" )
 {
    ForestItemData *db;
-   if ( !Sim::findObject( argv[2], db ) )
+   if ( !Sim::findObject( obj, db ) )
       return;
 
    object->deleteMeshSafe( db );   
 }
 
-ConsoleMethod( ForestEditorCtrl, isDirty, bool, 2, 2, "" )
+DefineConsoleMethod( ForestEditorCtrl, isDirty, bool, (), , "" )
 {
    return object->isDirty();
+}
+
+DefineConsoleMethod(ForestEditorCtrl, setActiveForest, void, (const char * obj), , "( Forest obj )")
+{
+   Forest *forestObject;
+   if (!Sim::findObject(obj, forestObject))
+      return;
+
+   object->setActiveForest(forestObject);
 }

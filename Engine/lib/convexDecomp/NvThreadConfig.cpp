@@ -133,6 +133,8 @@ void tc_spinloop()
       asm ( "pause" );
    #elif defined( _XBOX )
       // Pause would do nothing on the Xbox. Threads are not scheduled.
+   #elif defined( _WIN64 )
+      YieldProcessor( );
    #else
       __asm { pause };
    #endif
@@ -144,7 +146,7 @@ void tc_interlockedExchange(void *dest, const int64_t exchange)
 	  // not working
 	  assert(false);
 	  //__sync_lock_test_and_set((int64_t*)dest, exchange);
-   #elif defined( _XBOX )
+#elif defined( _XBOX ) || defined( _WIN64 )
    InterlockedExchange((volatile LONG *)dest, exchange);
    #else
       __asm
@@ -172,7 +174,7 @@ NxI32 tc_interlockedCompareExchange(void *dest, NxI32 exchange, NxI32 compare)
 	  return 0;
 	  //return __sync_val_compare_and_swap((uintptr_t*)dest, exchange, compare);
 	  //return __sync_bool_compare_and_swap((uintptr_t*)dest, exchange, compare);
-   #elif defined( _XBOX )
+   #elif defined( _XBOX ) || defined( _WIN64 )
      return InterlockedCompareExchange((volatile LONG *)dest, exchange, compare);
    #else
       char _ret;
@@ -202,7 +204,7 @@ NxI32 tc_interlockedCompareExchange(void *dest, const NxI32 exchange1, const NxI
 	  //uint64_t exchange = ((uint64_t)exchange1 << 32) | (uint64_t)exchange2;
 	  //uint64_t compare = ((uint64_t)compare1 << 32) | (uint64_t)compare2;
 	  //return __sync_bool_compare_and_swap((int64_t*)dest, exchange, compare);
-   #elif defined( _XBOX )
+   #elif defined( _XBOX ) || defined( _WIN64 )
      assert(false);
      return 0;
    #else

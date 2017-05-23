@@ -325,7 +325,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
     if (modType == TOUCH)
        return(utime(prefPathName, 0) != -1);
     else if (modType == DELETE)
-       return (remove(prefPathName) != -1);
+       return (remove(prefPathName) == 0);
     else
        AssertFatal(false, "Unknown File Mod type");
     return false;
@@ -469,7 +469,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  // Sets capability appropriate to the openMode.
  // Returns the currentStatus of the file.
  //-----------------------------------------------------------------------------
- File::Status File::open(const char *filename, const AccessMode openMode)
+ File::FileStatus File::open(const char *filename, const AccessMode openMode)
  {
     AssertFatal(NULL != filename, "File::open: NULL filename");
     AssertWarn(NULL == handle, "File::open: handle already valid");
@@ -584,7 +584,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  //
  // Returns the currentStatus of the file.
  //-----------------------------------------------------------------------------
- File::Status File::setPosition(S32 position, bool absolutePos)
+ File::FileStatus File::setPosition(S32 position, bool absolutePos)
  {
      AssertFatal(Closed != currentStatus, "File::setPosition: file closed");
      AssertFatal(NULL != handle, "File::setPosition: invalid file handle");
@@ -645,7 +645,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  // It is an error to flush a read-only file.
  // Returns the currentStatus of the file.
  //-----------------------------------------------------------------------------
- File::Status File::flush()
+ File::FileStatus File::flush()
  {
      AssertFatal(Closed != currentStatus, "File::flush: file closed");
      AssertFatal(NULL != handle, "File::flush: invalid file handle");
@@ -662,7 +662,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  //
  // Returns the currentStatus
  //-----------------------------------------------------------------------------
- File::Status File::close()
+ File::FileStatus File::close()
  {
     // if the handle is non-NULL, close it if necessary and free it
     if (NULL != handle)
@@ -684,7 +684,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  //-----------------------------------------------------------------------------
  // Self-explanatory.
  //-----------------------------------------------------------------------------
- File::Status File::getStatus() const
+ File::FileStatus File::getStatus() const
  {
      return currentStatus;
  }
@@ -692,7 +692,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  //-----------------------------------------------------------------------------
  // Sets and returns the currentStatus when an error has been encountered.
  //-----------------------------------------------------------------------------
- File::Status File::setStatus()
+ File::FileStatus File::setStatus()
  {
     Con::printf("File IO error: %s", strerror(errno));
     return currentStatus = IOError;
@@ -701,7 +701,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  //-----------------------------------------------------------------------------
  // Sets and returns the currentStatus to status.
  //-----------------------------------------------------------------------------
- File::Status File::setStatus(File::Status status)
+ File::FileStatus File::setStatus(File::FileStatus status)
  {
      return currentStatus = status;
  }
@@ -712,7 +712,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  // The number of bytes read is available in bytesRead if a non-Null pointer is
  // provided.
  //-----------------------------------------------------------------------------
- File::Status File::read(U32 size, char *dst, U32 *bytesRead)
+ File::FileStatus File::read(U32 size, char *dst, U32 *bytesRead)
  {
  #ifdef DEBUG
  //   fprintf(stdout,"reading %d bytes\n",size);fflush(stdout);
@@ -770,7 +770,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
  // The number of bytes written is available in bytesWritten if a non-Null
  // pointer is provided.
  //-----------------------------------------------------------------------------
- File::Status File::write(U32 size, const char *src, U32 *bytesWritten)
+ File::FileStatus File::write(U32 size, const char *src, U32 *bytesWritten)
  {
     // JMQ: despite the U32 parameters, the maximum filesize supported by this
     // function is probably the max value of S32, due to the unix syscall
@@ -1140,51 +1140,90 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
    return false;
  }
 
+ bool Platform::fileDelete(const char * name)
+ {
+   return ModifyFile(name, DELETE);
+ }
+
  static bool recurseDumpDirectories(const char *basePath, const char *subPath, Vector<StringTableEntry> &directoryVector, S32 currentDepth, S32 recurseDepth, bool noBasePath)
  {
    char Path[1024];
    DIR *dip;
    struct dirent *d;
 
-   if (subPath && (dStrncmp(subPath, "", 1) != 0))
-     {
-       if ((basePath[dStrlen(basePath) - 1]) == '/')
- 	dSprintf(Path, 1024, "%s%s", basePath, subPath);
-       else
- 	dSprintf(Path, 1024, "%s/%s", basePath, subPath);
-     }
+   dsize_t trLen = basePath ? dStrlen(basePath) : 0;
+   dsize_t subtrLen = subPath ? dStrlen(subPath) : 0;
+   char trail = trLen > 0 ? basePath[trLen - 1] : '\0';
+   char subTrail = subtrLen > 0 ? subPath[subtrLen - 1] : '\0';
+   char subLead = subtrLen > 0 ? subPath[0] : '\0';
+
+   if (trail == '/')
+   {
+      if (subPath && (dStrncmp(subPath, "", 1) != 0))
+      {
+         if (subTrail == '/')
+            dSprintf(Path, 1024, "%s%s", basePath, subPath);
+         else
+            dSprintf(Path, 1024, "%s%s/", basePath, subPath);
+      }
+      else
+         dSprintf(Path, 1024, "%s", basePath);
+   }
    else
-     dSprintf(Path, 1024, "%s", basePath);
+   {
+      if (subPath && (dStrncmp(subPath, "", 1) != 0))
+      {
+         if (subTrail == '/')
+            dSprintf(Path, 1024, "%s%s", basePath, subPath);
+         else
+            dSprintf(Path, 1024, "%s%s/", basePath, subPath);
+      }
+      else
+         dSprintf(Path, 1024, "%s/", basePath);
+   }
+
    dip = opendir(Path);
    if (dip == NULL)
      return false;
+
    //////////////////////////////////////////////////////////////////////////
    // add path to our return list ( provided it is valid )
    //////////////////////////////////////////////////////////////////////////
    if (!Platform::isExcludedDirectory(subPath))
-     {
-       if (noBasePath)
- 	{
- 	  // We have a path and it's not an empty string or an excluded directory
- 	  if ( (subPath && (dStrncmp (subPath, "", 1) != 0)) )
- 	    directoryVector.push_back(StringTable->insert(subPath));
- 	}
-       else
- 	{
- 	  if ( (subPath && (dStrncmp(subPath, "", 1) != 0)) )
- 	    {
- 	      char szPath[1024];
- 	      dMemset(szPath, 0, 1024);
- 	      if ( (basePath[dStrlen(basePath) - 1]) != '/')
- 		dSprintf(szPath, 1024, "%s%s", basePath, subPath);
- 	      else
- 		dSprintf(szPath, 1024, "%s%s", basePath, &subPath[1]);
- 	      directoryVector.push_back(StringTable->insert(szPath));
- 	    }
- 	  else
- 	    directoryVector.push_back(StringTable->insert(basePath));
- 	}
-     }
+   {
+      if (noBasePath)
+      {
+         // We have a path and it's not an empty string or an excluded directory
+         if ( (subPath && (dStrncmp (subPath, "", 1) != 0)) )
+            directoryVector.push_back(StringTable->insert(subPath));
+      }
+      else
+      {
+         if ( (subPath && (dStrncmp(subPath, "", 1) != 0)) )
+         {
+            char szPath[1024];
+            dMemset(szPath, 0, 1024);
+            if (trail == '/')
+            {
+               if ((basePath[dStrlen(basePath) - 1]) != '/')
+                  dSprintf(szPath, 1024, "%s%s", basePath, &subPath[1]);
+               else
+                  dSprintf(szPath, 1024, "%s%s", basePath, subPath);
+            }
+            else
+            {
+               if ((basePath[dStrlen(basePath) - 1]) != '/')
+                  dSprintf(szPath, 1024, "%s%s", basePath, subPath);
+               else
+                  dSprintf(szPath, 1024, "%s/%s", basePath, subPath);
+            }
+
+            directoryVector.push_back(StringTable->insert(szPath));
+         }
+         else
+            directoryVector.push_back(StringTable->insert(basePath));
+      }
+   }
    //////////////////////////////////////////////////////////////////////////
    // Iterate through and grab valid directories
    //////////////////////////////////////////////////////////////////////////

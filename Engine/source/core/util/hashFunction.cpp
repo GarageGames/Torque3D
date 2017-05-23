@@ -104,9 +104,9 @@ acceptable.  Do NOT use for cryptographic purposes.
 --------------------------------------------------------------------
 */
 
-U32 hash(register const U8 *k, register U32 length, register U32 initval)
+U32 hash(const U8 *k, U32 length, U32 initval)
 {
-   register U32 a,b,c,len;
+   U32 a,b,c,len;
 
    /* Set up the internal state */
    len = length;
@@ -211,9 +211,9 @@ is acceptable.  Do NOT use for cryptographic purposes.
 --------------------------------------------------------------------
 */
 
-U64 hash64( register const U8 *k, register U32 length, register U64 initval )
+U64 hash64( const U8 *k, U32 length, U64 initval )
 {
-  register U64 a,b,c,len;
+  U64 a,b,c,len;
 
   /* Set up the internal state */
   len = length;

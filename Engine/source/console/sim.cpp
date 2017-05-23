@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "console/console.h"
-
+#include "console/engineAPI.h"
 #include "console/sim.h"
 #include "console/simEvents.h"
 #include "console/simObject.h"
@@ -86,23 +86,21 @@ namespace Sim
 
 ConsoleFunctionGroupBegin ( SimFunctions, "Functions relating to Sim.");
 
-ConsoleFunction(nameToID, S32, 2, 2, "nameToID(object)")
+DefineConsoleFunction( nameToID, S32, (const char * objectName), ,"nameToID(object)")
 {
-   TORQUE_UNUSED(argc);
-   SimObject *obj = Sim::findObject(argv[1]);
+   SimObject *obj = Sim::findObject(objectName);
    if(obj)
       return obj->getId();
    else
       return -1;
 }
 
-ConsoleFunction(isObject, bool, 2, 2, "isObject(object)")
+DefineConsoleFunction( isObject, bool, (const char * objectName), ,"isObject(object)")
 {
-   TORQUE_UNUSED(argc);
-   if (!dStrcmp(argv[1], "0") || !dStrcmp(argv[1], ""))
+   if (!dStrcmp(objectName, "0") || !dStrcmp(objectName, ""))
       return false;
    else
-      return (Sim::findObject(argv[1]) != NULL);
+      return (Sim::findObject(objectName) != NULL);
 }
 
 ConsoleDocFragment _spawnObject1(
@@ -135,24 +133,14 @@ ConsoleDocFragment _spawnObject1(
    "bool spawnObject(class [, dataBlock, name, properties, script]);"
 );
 
-ConsoleFunction(spawnObject, S32, 3, 6, "spawnObject(class [, dataBlock, name, properties, script])"
-				"@hide")
+DefineConsoleFunction( spawnObject, S32, (   const char * spawnClass
+                                         ,   const char * spawnDataBlock
+                                         ,   const char * spawnName
+                                         ,   const char * spawnProperties
+                                         ,   const char * spawnScript 
+                                         ),("","","","") ,"spawnObject(class [, dataBlock, name, properties, script])"
+            "@hide")
 {
-   String spawnClass(argv[1]);
-   String spawnDataBlock;
-   String spawnName;
-   String spawnProperties;
-   String spawnScript;
-
-   if (argc >= 3)
-      spawnDataBlock = argv[2];
-   if (argc >= 4)
-      spawnName = argv[3];
-   if (argc >= 5)
-      spawnProperties = argv[4];
-   if (argc >= 6)
-      spawnScript = argv[5];
-
    SimObject* spawnObject = Sim::spawnObject(spawnClass, spawnDataBlock, spawnName, spawnProperties, spawnScript);
 
    if (spawnObject)
@@ -161,35 +149,35 @@ ConsoleFunction(spawnObject, S32, 3, 6, "spawnObject(class [, dataBlock, name, p
       return -1;
 }
 
-ConsoleFunction(cancel,void,2,2,"cancel(eventId)")
+DefineConsoleFunction( cancel, void, (S32 eventId), ,"cancel(eventId)")
 {
-   Sim::cancelEvent(dAtoi(argv[1]));
+   Sim::cancelEvent(eventId);
 }
 
-ConsoleFunction(cancelAll,void,2,2,"cancelAll(objectId): cancel pending events on the specified object.  Events will be automatically cancelled if object is deleted.")
+DefineConsoleFunction( cancelAll, void, (const char * objectId), ,"cancelAll(objectId): cancel pending events on the specified object.  Events will be automatically cancelled if object is deleted.")
 {
-   Sim::cancelPendingEvents(Sim::findObject(argv[1]));
+   Sim::cancelPendingEvents(Sim::findObject(objectId));
 }
 
-ConsoleFunction(isEventPending, bool, 2, 2, "isEventPending(%scheduleId);")
+DefineConsoleFunction( isEventPending, bool, (S32 scheduleId), ,"isEventPending(%scheduleId);")
 {
-   return Sim::isEventPending(dAtoi(argv[1]));
+   return Sim::isEventPending(scheduleId);
 }
 
-ConsoleFunction(getEventTimeLeft, S32, 2, 2, "getEventTimeLeft(scheduleId) Get the time left in ms until this event will trigger.")
+DefineConsoleFunction( getEventTimeLeft, S32, (S32 scheduleId), ,"getEventTimeLeft(scheduleId) Get the time left in ms until this event will trigger.")
 {
-   return Sim::getEventTimeLeft(dAtoi(argv[1]));
+   return Sim::getEventTimeLeft(scheduleId);
 }
 
-ConsoleFunction(getScheduleDuration, S32, 2, 2, "getScheduleDuration(%scheduleId);")
+DefineConsoleFunction( getScheduleDuration, S32, (S32 scheduleId), ,"getScheduleDuration(%scheduleId);" )
 {
-   TORQUE_UNUSED(argc);   S32 ret = Sim::getScheduleDuration(dAtoi(argv[1]));
+   S32 ret = Sim::getScheduleDuration(scheduleId);
    return ret;
 }
 
-ConsoleFunction(getTimeSinceStart, S32, 2, 2, "getTimeSinceStart(%scheduleId);")
+DefineConsoleFunction( getTimeSinceStart, S32, (S32 scheduleId), ,"getTimeSinceStart(%scheduleId);" )
 {
-   TORQUE_UNUSED(argc);   S32 ret = Sim::getTimeSinceStart(dAtoi(argv[1]));
+   S32 ret = Sim::getTimeSinceStart(scheduleId);
    return ret;
 }
 
@@ -214,15 +202,15 @@ ConsoleFunction(schedule, S32, 4, 0, "schedule(time, refobject|0, command, <arg1
    return ret;
 }
 
-ConsoleFunction(getUniqueName, const char*, 2, 2, 
-	"( String baseName )\n"
-	"@brief Returns a unique unused SimObject name based on a given base name.\n\n"
-	"@baseName Name to conver to a unique string if another instance exists\n"
-	"@note Currently only used by editors\n"
-	"@ingroup Editors\n"
-	"@internal")
+DefineConsoleFunction( getUniqueName, const char*, (const char * baseName), ,
+   "( String baseName )\n"
+   "@brief Returns a unique unused SimObject name based on a given base name.\n\n"
+   "@baseName Name to conver to a unique string if another instance exists\n"
+   "@note Currently only used by editors\n"
+   "@ingroup Editors\n"
+   "@internal")
 {
-   String outName = Sim::getUniqueName( argv[1] );
+   String outName = Sim::getUniqueName( baseName );
    
    if ( outName.isEmpty() )
       return NULL;
@@ -233,7 +221,7 @@ ConsoleFunction(getUniqueName, const char*, 2, 2,
    return buffer;
 }
 
-ConsoleFunction(getUniqueInternalName, const char*, 4, 4,
+DefineConsoleFunction( getUniqueInternalName, const char*, (const char * baseName, const char * setString, bool searchChildren), ,
    "( String baseName, SimSet set, bool searchChildren )\n"
    "@brief Returns a unique unused internal name within the SimSet/Group based on a given base name.\n\n"
    "@note Currently only used by editors\n"
@@ -241,13 +229,13 @@ ConsoleFunction(getUniqueInternalName, const char*, 4, 4,
    "@internal")
 {
    SimSet *set;
-   if ( !Sim::findObject( argv[2], set ) )
+   if ( !Sim::findObject( setString, set ) )
    {
       Con::errorf( "getUniqueInternalName() - invalid parameter for SimSet." );
       return NULL;
    }
 
-   String outName = Sim::getUniqueInternalName( argv[1], set, dAtob(argv[3]) );
+   String outName = Sim::getUniqueInternalName( baseName, set, searchChildren );
 
    if ( outName.isEmpty() )
       return NULL;
@@ -258,13 +246,12 @@ ConsoleFunction(getUniqueInternalName, const char*, 4, 4,
    return buffer;
 }
 
-ConsoleFunction( isValidObjectName, bool, 2, 2, "( string name )"
-				"@brief Return true if the given name makes for a valid object name.\n\n"
-				"@param name Name of object\n"
-				"@return True if name is allowed, false if denied (usually because it starts with a number, _, or invalid character"
-				"@ingroup Console")
+DefineConsoleFunction( isValidObjectName, bool, (const char * name), , "( string name )"
+            "@brief Return true if the given name makes for a valid object name.\n\n"
+            "@param name Name of object\n"
+            "@return True if name is allowed, false if denied (usually because it starts with a number, _, or invalid character"
+            "@ingroup Console")
 {
-   const char* name = argv[ 1 ];
    return Sim::isValidObjectName( name );
 }
 

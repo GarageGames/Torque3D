@@ -16,15 +16,10 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-#include <math.h>
 #include "DetourCommon.h"
+#include "DetourMath.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////
-
-float dtSqrt(float x)
-{
-	return sqrtf(x);
-}
 
 void dtClosestPtPointTriangle(float* closest, const float* p,
 							  const float* a, const float* b, const float* c)
@@ -360,7 +355,7 @@ void dtRandomPointInConvexPoly(const float* pts, const int npts, float* areas,
 		acc += dacc;
 	}
 	
-	float v = dtSqrt(t);
+	float v = dtMathSqrtf(t);
 	
 	const float a = 1 - v;
 	const float b = (1 - u) * v;
@@ -372,5 +367,22 @@ void dtRandomPointInConvexPoly(const float* pts, const int npts, float* areas,
 	out[0] = a*pa[0] + b*pb[0] + c*pc[0];
 	out[1] = a*pa[1] + b*pb[1] + c*pc[1];
 	out[2] = a*pa[2] + b*pb[2] + c*pc[2];
+}
+
+inline float vperpXZ(const float* a, const float* b) { return a[0]*b[2] - a[2]*b[0]; }
+
+bool dtIntersectSegSeg2D(const float* ap, const float* aq,
+						 const float* bp, const float* bq,
+						 float& s, float& t)
+{
+	float u[3], v[3], w[3];
+	dtVsub(u,aq,ap);
+	dtVsub(v,bq,bp);
+	dtVsub(w,ap,bp);
+	float d = vperpXZ(u,v);
+	if (fabsf(d) < 1e-6f) return false;
+	s = vperpXZ(v,w) / d;
+	t = vperpXZ(u,w) / d;
+	return true;
 }
 

@@ -140,7 +140,7 @@ bool FindMatch::isMatch( const char *exp, const char *str, bool caseSensitive )
 bool FindMatch::isMatchMultipleExprs( const char *exps, const char *str, bool caseSensitive )
 {
    char *tok = 0;
-   int len = dStrlen(exps);
+   S32 len = dStrlen(exps);
 
    char *e = new char[len+1];
    dStrcpy(e,exps);

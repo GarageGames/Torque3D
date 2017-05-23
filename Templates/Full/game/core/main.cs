@@ -28,6 +28,12 @@ $WORD::BITDEPTH = 3;
 $WORD::REFRESH = 4;
 $WORD::AA = 5;
 
+//We need to hook the missing/warn material stuff early, so do it here
+$Core::MissingTexturePath = "core/art/missingTexture";
+$Core::UnAvailableTexturePath = "core/art/unavailable";
+$Core::WarningTexturePath = "core/art/warnMat";
+$Core::CommonShaderPath = "shaders/common";
+
 //---------------------------------------------------------------------------------------------
 // CorePackage
 // Adds functionality for this mod to some standard functions.
@@ -68,8 +74,8 @@ function onStart()
 
    if ($platform $= "macos")
       $pref::Video::displayDevice = "OpenGL";
-   else
-      $pref::Video::displayDevice = "D3D9";
+   //else
+      //$pref::Video::displayDevice = "D3D9";
    
    // Initialise stuff.
    exec("./scripts/client/core.cs");
@@ -141,11 +147,11 @@ function parseArgs()
       switch$ (%arg)
       {
          case "-fullscreen":
-            setFullScreen(true);
+            $cliFullscreen = true;
             $argUsed[%i]++;
 
          case "-windowed":
-            setFullScreen(false);
+            $cliFullscreen = false;
             $argUsed[%i]++;
 
          case "-openGL":

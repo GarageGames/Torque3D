@@ -22,6 +22,7 @@
 
 #include "platformWin32/platformWin32.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "console/simBase.h"
 #include "core/strings/unicode.h"
 #include "platform/threads/thread.h"
@@ -87,15 +88,15 @@ ExecuteThread::ExecuteThread(const char *executable, const char *args /* = NULL 
 
 #ifdef UNICODE
    WCHAR exe[ 1024 ];
-   convertUTF8toUTF16( exeBuf, exe, sizeof( exe ) / sizeof( exe[ 0 ] ) );
+   convertUTF8toUTF16( exeBuf, exe );
 
    TempAlloc< WCHAR > argsBuf( ( args ? dStrlen( args ) : 0 ) + 1 );
    argsBuf[ argsBuf.size - 1 ] = 0;
 
    if( args )
-      convertUTF8toUTF16( args, argsBuf, argsBuf.size );
+      convertUTF8toUTF16N( args, argsBuf, argsBuf.size );
    if( directory )
-      convertUTF8toUTF16( directory, dirBuf, dirBuf.size );
+      convertUTF8toUTF16N( directory, dirBuf, dirBuf.size );
 #else
    char* exe = exeBuf;
    char* argsBuf = args;
@@ -135,14 +136,15 @@ void ExecuteThread::run(void *arg /* = 0 */)
 // Console Functions
 //-----------------------------------------------------------------------------
 
-ConsoleFunction(shellExecute, bool, 2, 4, "(string executable, string args, string directory)"
+DefineConsoleFunction( shellExecute, bool, (const char * executable, const char * args, const char * directory), ("", ""), "(string executable, string args, string directory)"
 				"@brief Launches an outside executable or batch file\n\n"
 				"@param executable Name of the executable or batch file\n"
 				"@param args Optional list of arguments, in string format, to pass to the executable\n"
 				"@param directory Optional string containing path to output or shell\n"
+				"@return true if executed, false if not\n"
 				"@ingroup Platform")
 {
-   ExecuteThread *et = new ExecuteThread(argv[1], argc > 2 ? argv[2] : NULL, argc > 3 ? argv[3] : NULL);
+   ExecuteThread *et = new ExecuteThread( executable, args, directory );
    if(! et->isAlive())
    {
       delete et;
@@ -152,6 +154,8 @@ ConsoleFunction(shellExecute, bool, 2, 4, "(string executable, string args, stri
    return true;
 }
 
+#ifndef TORQUE_SDL
+
 void Platform::openFolder(const char* path )
 {
    char filePath[1024];
@@ -159,7 +163,7 @@ void Platform::openFolder(const char* path )
 
 #ifdef UNICODE
    WCHAR p[ 1024 ];
-   convertUTF8toUTF16( filePath, p, sizeof( p ) / sizeof( p[ 0 ] ) );
+   convertUTF8toUTF16( filePath, p );
 #else
    char* p = filePath;
 #endif
@@ -176,7 +180,7 @@ void Platform::openFile(const char* path )
 
 #ifdef UNICODE
    WCHAR p[ 1024 ];
-   convertUTF8toUTF16( filePath, p, sizeof( p ) / sizeof( p[ 0 ] ) );
+   convertUTF8toUTF16( filePath, p );
 #else
    char* p = filePath;
 #endif
@@ -185,4 +189,6 @@ void Platform::openFile(const char* path )
 
    ::ShellExecute( NULL,TEXT("open"),p, NULL, NULL, SW_SHOWNORMAL);
 }
+
+#endif // !TORQUE_SDL
 

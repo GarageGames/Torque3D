@@ -96,6 +96,8 @@ public:
    /// which is added to the MissionGroup and returned to the caller.
    SimGroup* explode();
 
+   bool buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF& sphere);
+
 protected:
 
    void _closeFile( bool removeFileNotify );

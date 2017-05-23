@@ -30,6 +30,13 @@
 #include "math/mPoint4.h" 
 #endif
 
+#ifndef _ENGINEAPI_H_
+#include "console/engineAPI.h"
+#endif
+
+const F32 gGamma = 2.2f;
+const F32 gOneOverGamma = 1.f / 2.2f;
+
 class ColorI;
 
 
@@ -49,10 +56,17 @@ class ColorF
           const F32 in_b,
           const F32 in_a = 1.0f);
 
+   ColorF( const char* pStockColorName );
+
    void set(const F32 in_r,
             const F32 in_g,
             const F32 in_b,
             const F32 in_a = 1.0f);
+
+   void set( const char* pStockColorName );
+
+   static const ColorF& StockColor( const char* pStockColorName );
+   StringTableEntry StockColor( void );
 
    ColorF& operator*=(const ColorF& in_mul);       // Can be useful for lighting
    ColorF  operator*(const ColorF& in_mul) const;
@@ -93,6 +107,11 @@ class ColorF
                                       (alpha >= 0.0f && alpha <= 1.0f); }
    void clamp();
 
+   ColorF toLinear();
+   ColorF toGamma();
+   //calculate luminance, make sure color is linear first
+   F32 luminance();
+
    static const ColorF ZERO;
    static const ColorF ONE;
    static const ColorF WHITE;
@@ -114,14 +133,33 @@ class ColorI
    U8 blue;
    U8 alpha;
 
+   struct Hsb
+   {
+      Hsb() :hue(0), sat(0), brightness(0){};
+      Hsb(U32 h, U32 s, U32 b) :hue(h), sat(s), brightness(b){};
+
+      U32 hue;   ///Hue
+      U32 sat;   ///Saturation
+      U32 brightness;   //Brightness/Value/Lightness
+   };
+
   public:
    ColorI() { }
    ColorI(const ColorI& in_rCopy);
+   ColorI(const Hsb& color);
    ColorI(const U8 in_r,
           const U8 in_g,
           const U8 in_b,
           const U8 in_a = U8(255));
    ColorI(const ColorI& in_rCopy, const U8 in_a);
+
+   ColorI( const char* pStockColorName );
+
+   void set(const Hsb& color);
+
+   void HSLtoRGB_Subfunction(U32& c, const F64& temp1, const F64& temp2, const F64& temp3);
+
+   void set(const String& hex);
 
    void set(const U8 in_r,
             const U8 in_g,
@@ -130,6 +168,11 @@ class ColorI
 
    void set(const ColorI& in_rCopy,
             const U8 in_a);
+
+   void set( const char* pStockColorName );
+
+   static const ColorI& StockColor( const char* pStockColorName );
+   StringTableEntry StockColor( void );
 
    ColorI& operator*=(const F32 in_mul);
    ColorI  operator*(const F32 in_mul) const;
@@ -162,9 +205,17 @@ class ColorI
    U16 get565()  const;
    U16 get4444() const;
 
+   Hsb getHSB() const;
+
+   String getHex() const;
+   S32 convertFromHex(const String& hex) const;
+
    operator ColorF() const;
 
    operator const U8*() const { return &red; }
+
+   ColorI toLinear();
+   ColorI toGamma();
 
    static const ColorI ZERO;
    static const ColorI ONE;
@@ -173,6 +224,53 @@ class ColorI
    static const ColorI RED;
    static const ColorI GREEN;
    static const ColorI BLUE;
+};
+
+//-----------------------------------------------------------------------------
+
+class StockColorItem
+{
+private:
+   StockColorItem() {}
+
+public:
+   StockColorItem( const char* pName, const U8 red, const U8 green, const U8 blue, const U8 alpha = 255 )
+   {
+      // Sanity!
+      AssertFatal( pName != NULL, "Stock color name cannot be NULL." );
+
+      // Set stock color.
+      // NOTE:-   We'll use the char pointer here.  We can yet use the string-table unfortunately.
+      mColorName = pName;
+      mColorI.set( red, green, blue, alpha );
+      mColorF = mColorI;
+   }
+
+   inline const char*      getColorName( void ) const { return mColorName; }
+   inline const ColorF&    getColorF( void ) const { return mColorF; }
+   inline const ColorI&    getColorI( void ) const { return mColorI; }
+
+   const char*         mColorName;
+   ColorF              mColorF;
+   ColorI              mColorI;
+};
+
+//-----------------------------------------------------------------------------
+
+class StockColor
+{
+public:
+   static bool isColor( const char* pStockColorName );
+   static const ColorF& colorF( const char* pStockColorName );
+   static const ColorI& colorI( const char* pStockColorName );
+   static StringTableEntry name( const ColorF& color );
+   static StringTableEntry name( const ColorI& color );
+
+   static S32 getCount( void );
+   static const StockColorItem* getColorItem( const S32 index );
+
+   static void create( void );
+   static void destroy( void );
 };
 
 //------------------------------------------------------------------------------
@@ -375,6 +473,34 @@ inline void ColorF::clamp()
       alpha = 0.0f;
 }
 
+inline ColorF ColorF::toGamma()
+{
+   ColorF color;
+   color.red = mPow(red,gOneOverGamma);
+   color.green = mPow(green, gOneOverGamma);
+   color.blue = mPow(blue, gOneOverGamma);
+   color.alpha = alpha;
+   return color;
+}
+
+inline ColorF ColorF::toLinear()
+{
+   ColorF color;
+   color.red = mPow(red,gGamma);
+   color.green = mPow(green, gGamma);
+   color.blue = mPow(blue, gGamma);
+   color.alpha = alpha;
+   return color;
+}
+
+inline F32 ColorF::luminance()
+{
+   // ITU BT.709
+   //return red * 0.2126f + green * 0.7152f + blue * 0.0722f;
+   // ITU BT.601
+   return red * 0.3f + green * 0.59f + blue * 0.11f;
+}
+
 //------------------------------------------------------------------------------
 //-------------------------------------- INLINES (ColorI)
 //
@@ -398,12 +524,185 @@ inline void ColorI::set(const ColorI& in_rCopy,
    alpha = in_a;
 }
 
+inline void ColorI::set(const Hsb& color)
+{
+	U32 r = 0;
+	U32 g = 0;
+	U32 b = 0;
+
+	F64 L = ((F64)color.brightness) / 100.0;
+	F64 S = ((F64)color.sat) / 100.0;
+	F64 H = ((F64)color.hue) / 360.0;
+
+	if (color.sat == 0)
+	{
+		r = color.brightness;
+		g = color.brightness;
+		b = color.brightness;
+	}
+	else
+	{
+		F64 temp1 = 0;
+		if (L < 0.50)
+		{
+			temp1 = L*(1 + S);
+		}
+		else
+		{
+			temp1 = L + S - (L*S);
+		}
+
+		F64 temp2 = 2.0*L - temp1;
+
+		F64 temp3 = 0;
+		for (S32 i = 0; i < 3; i++)
+		{
+			switch (i)
+			{
+			case 0: // red
+			{
+				temp3 = H + 0.33333;
+				if (temp3 > 1.0)
+					temp3 -= 1.0;
+				HSLtoRGB_Subfunction(r, temp1, temp2, temp3);
+				break;
+			}
+			case 1: // green
+			{
+				temp3 = H;
+				HSLtoRGB_Subfunction(g, temp1, temp2, temp3);
+				break;
+			}
+			case 2: // blue
+			{
+				temp3 = H - 0.33333;
+				if (temp3 < 0)
+					temp3 += 1;
+				HSLtoRGB_Subfunction(b, temp1, temp2, temp3);
+				break;
+			}
+			default:
+			{
+
+			}
+			}
+		}
+	}
+	red = (U32)((((F64)r) / 100) * 255);
+	green = (U32)((((F64)g) / 100) * 255);
+	blue = (U32)((((F64)b) / 100) * 255);
+}
+
+// This is a subfunction of HSLtoRGB
+inline void ColorI::HSLtoRGB_Subfunction(U32& c, const F64& temp1, const F64& temp2, const F64& temp3)
+{
+	if ((temp3 * 6.0) < 1.0)
+		c = (U32)((temp2 + (temp1 - temp2)*6.0*temp3)*100.0);
+	else
+		if ((temp3 * 2.0) < 1.0)
+			c = (U32)(temp1*100.0);
+		else
+			if ((temp3 * 3.0) < 2.0)
+				c = (U32)((temp2 + (temp1 - temp2)*(0.66666 - temp3)*6.0)*100.0);
+			else
+				c = (U32)(temp2*100.0);
+	return;
+}
+
+inline void ColorI::set(const String& hex)
+{
+	String redString;
+	String greenString;
+	String blueString;
+
+	//if the prefix # was attached to hex
+	if (hex[0] == '#')
+	{
+		redString = hex.substr(1, 2);
+		greenString = hex.substr(3, 2);
+		blueString = hex.substr(5, 2);
+	}
+	else
+	{
+		// since there is no prefix attached to hex
+		redString = hex.substr(0, 2);
+		greenString = hex.substr(2, 2);
+		blueString = hex.substr(4, 2);
+	}
+
+	red = (U8)(convertFromHex(redString));
+	green = (U8)(convertFromHex(greenString));
+	blue = (U8)(convertFromHex(blueString));
+}
+
+inline S32 ColorI::convertFromHex(const String& hex) const
+{
+	S32 hexValue = 0;
+
+	S32 a = 0;
+	S32 b = hex.length() - 1;
+
+	for (; b >= 0; a++, b--)
+	{
+		if (hex[b] >= '0' && hex[b] <= '9')
+		{
+			hexValue += (hex[b] - '0') * (1 << (a * 4));
+		}
+		else
+		{
+			switch (hex[b])
+			{
+			case 'A':
+			case 'a':
+				hexValue += 10 * (1 << (a * 4));
+				break;
+
+			case 'B':
+			case 'b':
+				hexValue += 11 * (1 << (a * 4));
+				break;
+
+			case 'C':
+			case 'c':
+				hexValue += 12 * (1 << (a * 4));
+				break;
+
+			case 'D':
+			case 'd':
+				hexValue += 13 * (1 << (a * 4));
+				break;
+
+			case 'E':
+			case 'e':
+				hexValue += 14 * (1 << (a * 4));
+				break;
+
+			case 'F':
+			case 'f':
+				hexValue += 15 * (1 << (a * 4));
+				break;
+
+			default:
+				Con::errorf("Error, invalid character '%c' in hex number", hex[a]);
+				break;
+			}
+		}
+	}
+
+	return hexValue;
+}
+
 inline ColorI::ColorI(const ColorI& in_rCopy)
 {
    red   = in_rCopy.red;
    green = in_rCopy.green;
    blue  = in_rCopy.blue;
    alpha = in_rCopy.alpha;
+}
+
+inline ColorI::ColorI(const Hsb& color)
+{
+	set(color);
 }
 
 inline ColorI::ColorI(const U8 in_r,
@@ -442,6 +741,7 @@ inline ColorI& ColorI::operator*=(const S32 in_mul)
 
 inline ColorI& ColorI::operator/=(const S32 in_mul)
 {
+   AssertFatal(in_mul != 0.0f, "Error, div by zero...");
    red   = red    / in_mul;
    green = green  / in_mul;
    blue  = blue   / in_mul;
@@ -584,6 +884,103 @@ inline U16 ColorI::get4444() const
               U16(U16(red   >> 4) <<  8) |
               U16(U16(green >> 4) <<  4) |
               U16(U16(blue  >> 4) <<  0));
+}
+
+inline ColorI::Hsb ColorI::getHSB() const
+{
+	F64 rPercent = ((F64)red) / 255;
+	F64 gPercent = ((F64)green) / 255;
+	F64 bPercent = ((F64)blue) / 255;
+
+	F64 maxColor = 0.0;
+	if ((rPercent >= gPercent) && (rPercent >= bPercent))
+		maxColor = rPercent;
+	if ((gPercent >= rPercent) && (gPercent >= bPercent))
+		maxColor = gPercent;
+	if ((bPercent >= rPercent) && (bPercent >= gPercent))
+		maxColor = bPercent;
+
+	F64 minColor = 0.0;
+	if ((rPercent <= gPercent) && (rPercent <= bPercent))
+		minColor = rPercent;
+	if ((gPercent <= rPercent) && (gPercent <= bPercent))
+		minColor = gPercent;
+	if ((bPercent <= rPercent) && (bPercent <= gPercent))
+		minColor = bPercent;
+
+	F64 H = 0.0;
+	F64 S = 0.0;
+	F64 B = 0.0;
+
+	B = (maxColor + minColor) / 2.0;
+
+	if (maxColor == minColor)
+	{
+		H = 0.0;
+		S = 0.0;
+	}
+	else
+	{
+		if (B < 0.50)
+		{
+			S = (maxColor - minColor) / (maxColor + minColor);
+		}
+		else
+		{
+			S = (maxColor - minColor) / (2.0 - maxColor - minColor);
+		}
+		if (maxColor == rPercent)
+		{
+			H = (gPercent - bPercent) / (maxColor - minColor);
+		}
+		if (maxColor == gPercent)
+		{
+			H = 2.0 + (bPercent - rPercent) / (maxColor - minColor);
+		}
+		if (maxColor == bPercent)
+		{
+			H = 4.0 + (rPercent - gPercent) / (maxColor - minColor);
+		}
+	}
+
+	ColorI::Hsb val;
+	val.sat = (U32)(S * 100);
+	val.brightness = (U32)(B * 100);
+	H = H*60.0;
+	if (H < 0.0)
+		H += 360.0;
+	val.hue = (U32)H;
+
+	return val;
+}
+
+inline String ColorI::getHex() const
+{
+	char r[255];
+	dSprintf(r, sizeof(r), "%.2X", red);
+	String result(r);
+
+	char g[255];
+	dSprintf(g, sizeof(g), "%.2X", green);
+	result += g;
+
+	char b[255];
+	dSprintf(b, sizeof(b), "%.2X", blue);
+	result += b;
+
+	return result;
+}
+
+inline ColorI ColorI::toGamma()
+{
+   ColorF color = (ColorF)*this;
+   return (ColorI)color.toGamma();
+}
+
+inline ColorI ColorI::toLinear()
+{
+   ColorF color = (ColorF)*this;
+   return (ColorI)color.toLinear();
 }
 
 //-------------------------------------- INLINE CONVERSION OPERATORS

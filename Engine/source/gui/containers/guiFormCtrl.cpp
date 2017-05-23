@@ -50,8 +50,8 @@ GuiFormCtrl::GuiFormCtrl()
    mCaption       = "[none]";
    mUseSmallCaption = false;
 
-   mContentLibrary = StringTable->insert("");
-   mContent = StringTable->insert("");
+   mContentLibrary = StringTable->EmptyString();
+   mContent = StringTable->EmptyString();
 
    mCanSaveFieldDictionary = true;
    mIsContainer = true;
@@ -158,7 +158,7 @@ void GuiFormCtrl::addObject(SimObject *newObj )
       
       GuiControl* parent = getParent();
       if ( parent )
-   	   parent->addObject( newObj );
+         parent->addObject( newObj );
 
       return;
    }
@@ -213,7 +213,7 @@ bool GuiFormCtrl::resize(const Point2I &newPosition, const Point2I &newExtent)
       static char buf[256];
 
       mUseSmallCaption = true;
-      mSmallCaption = StringTable->insert("");
+      mSmallCaption = StringTable->EmptyString();
 
       S32 strlen = dStrlen((const char*)mCaption);
       for(S32 i=strlen; i>=0; --i)
@@ -383,8 +383,6 @@ void GuiFormCtrl::onMouseUp(const GuiEvent &event)
 
    mouseUnlock();
    setUpdate();
-
-   Point2I localClick = globalToLocalCoord(event.mousePoint);
 
    // If we're clicking in the header then resize
    //if(localClick.y < mThumbSize.y && mDepressed)

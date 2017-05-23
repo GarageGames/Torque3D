@@ -165,8 +165,8 @@ AsyncBufferedInputStream< T, Stream >::AsyncBufferedInputStream
             ThreadPool* threadPool,
             ThreadContext* threadContext )
    : Parent( stream ),
-     mIsStopped( false ),
      mIsLooping( isLooping ),
+     mIsStopped( false ),
      mNumRemainingSourceElements( numSourceElementsToRead ),
      mNumBufferedElements( 0 ),
      mMaxBufferedElements( numReadAhead ),

@@ -106,18 +106,31 @@ ConsoleDocClass( Explosion,
    "   lightEndBrightness = 0.0;\n"
    "   lightNormalOffset = 2.0;\n"
    "};\n\n"
-   "function createExplosion()\n"
+   "function ServerPlayExplosion(%position, %datablock)\n"
    "{\n"
-   "   // Create a new explosion - it will explode automatically\n"
-   "   %pos = \"0 0 100\";\n"
-   "   %obj = new Explosion()\n"
+   "   // Play the given explosion on every client.\n"
+   "   // The explosion will be transmitted as an event, not attached to any object.\n"
+   "   for(%idx = 0; %idx < ClientGroup.getCount(); %idx++)\n"
    "   {\n"
-   "      position = %pos;\n"
-   "      dataBlock = GrenadeLauncherExplosion;\n"
-   "   };\n"
+   "      %client = ClientGroup.getObject(%idx);\n"
+   "      commandToClient(%client, 'PlayExplosion', %position, %datablock.getId());\n"
+   "   }\n"
+   "}\n\n"
+   "function clientCmdPlayExplosion(%position, %effectDataBlock)\n"
+   "{\n"
+   "   // Play an explosion sent by the server. Make sure this function is defined\n"
+   "   // on the client.\n"
+   "   if (isObject(%effectDataBlock))\n"
+   "   {\n"
+   "      new Explosion()\n"
+   "      {\n"
+   "         position = %position;\n"
+   "         dataBlock = %effectDataBlock;\n"
+   "      };\n"
+   "   }\n"
    "}\n\n"
    "// schedule an explosion\n"
-   "schedule(1000, 0, createExplosion);\n"
+   "schedule(1000, 0, ServerPlayExplosion, \"0 0 0\", GrenadeLauncherExplosion);\n"
    "@endtsexample"
 );
 
@@ -125,8 +138,17 @@ ConsoleDocClass( Explosion,
 
 MRandomLCG sgRandom(0xdeadbeef);
 
+//WLE - Vince - The defaults are bad, the whole point of calling this function\
+//is to determine the explosion coverage on a object.  Why would you want them
+//To call this with a null for the ID?  In fact, it just returns a 1f if
+//it can't find the object.  Seems useless to me.  Cause how can I apply
+//damage to a object that doesn't exist?
 
-DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMask),(Point3F(0.0f,0.0f,0.0f), NULL, NULL),
+//I could possible see a use with passing in a null covMask, but even that
+//sounds flaky because it will be 100 percent if your saying not to take
+//any thing in consideration for coverage.  So I'm removing these defaults they are just bad.
+
+DefineEngineFunction(calcExplosionCoverage, F32, (Point3F pos, S32 id, U32 covMask),,
    "@brief Calculates how much an explosion effects a specific object.\n\n"
    "Use this to determine how much damage to apply to objects based on their "
    "distance from the explosion's center point, and whether the explosion is "
@@ -232,10 +254,6 @@ ExplosionData::ExplosionData()
    lifetimeVariance = 0;
    offset = 0.0f;
 
-   shockwave = NULL;
-   shockwaveID = 0;
-   shockwaveOnTerrain = false;
-
    shakeCamera = false;
    camShakeFreq.set( 10.0f, 10.0f, 10.0f );
    camShakeAmp.set( 1.0f, 1.0f, 1.0f );
@@ -298,9 +316,6 @@ void ExplosionData::initPersistFields()
       "@brief List of additional ParticleEmitterData objects to spawn with this "
       "explosion.\n\n"
       "@see particleEmitter" );
-
-//   addField( "shockwave", TypeShockwaveDataPtr, Offset(shockwave, ExplosionData) );
-//   addField( "shockwaveOnTerrain", TypeBool, Offset(shockwaveOnTerrain, ExplosionData) );
 
    addField( "debris", TYPEID< DebrisData >(), Offset(debrisList, ExplosionData), EC_NUM_DEBRIS_TYPES,
       "List of DebrisData objects to spawn with this explosion." );
@@ -593,7 +608,7 @@ void ExplosionData::packData(BitStream* stream)
    }
    U32 count;
    for(count = 0; count < EC_NUM_TIME_KEYS; count++)
-      if(times[i] >= 1)
+      if(times[count] >= 1)
          break;
    count++;
    if(count > EC_NUM_TIME_KEYS)
@@ -736,9 +751,9 @@ bool ExplosionData::preload(bool server, String &errorStr)
       
    if( !server )
    {
-      String errorStr;
-      if( !sfxResolve( &soundProfile, errorStr ) )
-         Con::errorf(ConsoleLogEntry::General, "Error, unable to load sound profile for explosion datablock: %s", errorStr.c_str());
+      String sfxErrorStr;
+      if( !sfxResolve( &soundProfile, sfxErrorStr ) )
+         Con::errorf(ConsoleLogEntry::General, "Error, unable to load sound profile for explosion datablock: %s", sfxErrorStr.c_str());
       if (!particleEmitter && particleEmitterId != 0)
          if (Sim::findObject(particleEmitterId, particleEmitter) == false)
             Con::errorf(ConsoleLogEntry::General, "Error, unable to load particle emitter for explosion datablock");
@@ -771,6 +786,7 @@ bool ExplosionData::preload(bool server, String &errorStr)
 //--------------------------------------
 //
 Explosion::Explosion()
+   : mDataBlock( NULL )
 {
    mTypeMask |= ExplosionObjectType | LightObjectType;
 
@@ -830,6 +846,12 @@ bool Explosion::onAdd()
    GameConnection *conn = GameConnection::getConnectionToServer();
    if ( !conn || !Parent::onAdd() )
       return false;
+
+   if( !mDataBlock )
+   {
+      Con::errorf("Explosion::onAdd - Fail - No datablok");
+      return false;
+   }
 
    mDelayMS = mDataBlock->delayMS + sgRandom.randI( -mDataBlock->delayVariance, mDataBlock->delayVariance );
    mEndingMS = mDataBlock->lifetimeMS + sgRandom.randI( -mDataBlock->lifetimeVariance, mDataBlock->lifetimeVariance );
@@ -929,7 +951,7 @@ bool Explosion::onAdd()
 
 void Explosion::onRemove()
 {
-   for( int i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
+   for( S32 i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
    {
       if( mEmitterList[i] )
       {
@@ -944,10 +966,7 @@ void Explosion::onRemove()
       mMainEmitter = NULL;
    }
 
-   if (getSceneManager() != NULL)
-      getSceneManager()->removeObjectFromScene(this);
-   if (getContainer() != NULL)
-      getContainer()->removeObject(this);
+   removeFromScene();
 
    Parent::onRemove();
 }
@@ -1114,7 +1133,7 @@ void Explosion::updateEmitters( F32 dt )
 {
    Point3F pos = getPosition();
 
-   for( int i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
+   for( S32 i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
    {
       if( mEmitterList[i] )
       {
@@ -1134,7 +1153,7 @@ void Explosion::launchDebris( Point3F &axis )
       return;
 
    bool hasDebris = false;
-   for( int j=0; j<ExplosionData::EC_NUM_DEBRIS_TYPES; j++ )
+   for( S32 j=0; j<ExplosionData::EC_NUM_DEBRIS_TYPES; j++ )
    {
       if( mDataBlock->debrisList[j] )
       {
@@ -1160,7 +1179,7 @@ void Explosion::launchDebris( Point3F &axis )
 
    U32 numDebris = mDataBlock->debrisNum + sgRandom.randI( -mDataBlock->debrisNumVariance, mDataBlock->debrisNumVariance );
 
-   for( int i=0; i<numDebris; i++ )
+   for( S32 i=0; i<numDebris; i++ )
    {
 
       Point3F launchDir = MathUtils::randomDir( axis, mDataBlock->debrisThetaMin, mDataBlock->debrisThetaMax,
@@ -1249,7 +1268,7 @@ bool Explosion::explode()
          Point3F::Zero, U32(mDataBlock->particleDensity * mFade));
    }
 
-   for( int i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
+   for( S32 i=0; i<ExplosionData::EC_NUM_EMITTERS; i++ )
    {
       if( mDataBlock->emitterList[i] != NULL )
       {

@@ -103,13 +103,17 @@ struct UTF16Cache
       dMemcpy(mString, other.mString, mLength * sizeof(UTF16));
    }
 
-   void operator =(const UTF16Cache &other)
+   UTF16Cache & operator =(const UTF16Cache &other)
    {
-      delete [] mString;
+      if (&other != this)
+      {
+         delete [] mString;
 
-      mLength = other.mLength;
-      mString = new UTF16[mLength];
-      dMemcpy(mString, other.mString, mLength * sizeof(UTF16));
+         mLength = other.mLength;
+         mString = new UTF16[mLength];
+         dMemcpy(mString, other.mString, mLength * sizeof(UTF16));
+      }
+      return *this;
    }
 
    ~UTF16Cache()
@@ -146,7 +150,7 @@ inline bool isAboveBMP(U32 codepoint)
 }
 
 //-----------------------------------------------------------------------------
-U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
+U32 convertUTF8toUTF16N(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
 {
    AssertFatal(len >= 1, "Buffer for unicode conversion must be large enough to hold at least the null terminator.");
    PROFILE_SCOPE(convertUTF8toUTF16);
@@ -159,7 +163,6 @@ U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
    {
       const UTF16Cache &cache = (*cacheItr).value;
       cache.copyToBuffer(outbuffer, len);
-      outbuffer[len-1] = '\0';
       return getMin(cache.mLength,len - 1);
    }
 #endif
@@ -191,7 +194,7 @@ U32 convertUTF8toUTF16(const UTF8 *unistring, UTF16 *outbuffer, U32 len)
 }
 
 //-----------------------------------------------------------------------------
-U32 convertUTF16toUTF8( const UTF16 *unistring, UTF8  *outbuffer, U32 len)
+U32 convertUTF16toUTF8N( const UTF16 *unistring, UTF8  *outbuffer, U32 len)
 {
    AssertFatal(len >= 1, "Buffer for unicode conversion must be large enough to hold at least the null terminator.");
    PROFILE_START(convertUTF16toUTF8);
@@ -243,16 +246,16 @@ U32 convertUTF16toUTF8DoubleNULL( const UTF16 *unistring, UTF8  *outbuffer, U32 
 //-----------------------------------------------------------------------------
 // Functions that convert buffers of unicode code points
 //-----------------------------------------------------------------------------
-UTF16* convertUTF8toUTF16( const UTF8* unistring)
+UTF16* createUTF16string( const UTF8* unistring)
 {
-   PROFILE_SCOPE(convertUTF8toUTF16_create);
+   PROFILE_SCOPE(createUTF16string);
    
    // allocate plenty of memory.
    U32 nCodepoints, len = dStrlen(unistring) + 1;
    FrameTemp<UTF16> buf(len);
    
    // perform conversion
-   nCodepoints = convertUTF8toUTF16( unistring, buf, len);
+   nCodepoints = convertUTF8toUTF16N( unistring, buf, len);
    
    // add 1 for the NULL terminator the converter promises it included.
    nCodepoints++;
@@ -265,16 +268,16 @@ UTF16* convertUTF8toUTF16( const UTF8* unistring)
 }
 
 //-----------------------------------------------------------------------------
-UTF8*  convertUTF16toUTF8( const UTF16* unistring)
+UTF8*  createUTF8string( const UTF16* unistring)
 {
-   PROFILE_SCOPE(convertUTF16toUTF8_create);
+   PROFILE_SCOPE(createUTF8string);
 
    // allocate plenty of memory.
    U32 nCodeunits, len = dStrlen(unistring) * 3 + 1;
    FrameTemp<UTF8> buf(len);
       
    // perform conversion
-   nCodeunits = convertUTF16toUTF8( unistring, buf, len);
+   nCodeunits = convertUTF16toUTF8N( unistring, buf, len);
    
    // add 1 for the NULL terminator the converter promises it included.
    nCodeunits++;
@@ -311,7 +314,7 @@ UTF32 oneUTF8toUTF32( const UTF8* codepoint, U32 *unitsWalked)
    U8 codeunit;
    
    // check the first byte ( a.k.a. codeunit ) .
-   unsigned char c = codepoint[0];
+   U8 c = codepoint[0];
    c = c >> 1;
    expectedByteCount = sgFirstByteLUT[c];
    if(expectedByteCount > 0) // 0 or negative is illegal to start with
@@ -466,10 +469,10 @@ U32 oneUTF32toUTF8(const UTF32 codepoint, UTF8 *threeByteCodeunitBuf)
 
    //-----------------
    U8  mask = sgByteMask8LUT[0];            // 0011 1111
-   U8  marker = ( ~mask << 1);            // 1000 0000
+   U8  marker = ( ~static_cast<U32>(mask) << 1u);            // 1000 0000
    
    // Process the low order bytes, shifting the codepoint down 6 each pass.
-   for( int i = bytecount-1; i > 0; i--)
+   for( S32 i = bytecount-1; i > 0; i--)
    {
       threeByteCodeunitBuf[i] = marker | (working & mask); 
       working >>= 6;
@@ -478,7 +481,7 @@ U32 oneUTF32toUTF8(const UTF32 codepoint, UTF8 *threeByteCodeunitBuf)
    // Process the 1st byte. filter based on the # of expected bytes.
    mask = sgByteMask8LUT[bytecount];
    marker = ( ~mask << 1 );
-   threeByteCodeunitBuf[0] = marker | working & mask;
+   threeByteCodeunitBuf[0] = marker | (working & mask);
    
    PROFILE_END();
    return bytecount;
@@ -507,21 +510,6 @@ U32 dStrlen(const UTF32 *unistring)
       i++;
       
    return i;
-}
-
-//-----------------------------------------------------------------------------
-U32 dStrncmp(const UTF16* unistring1, const UTF16* unistring2, U32 len)
-{
-   UTF16 c1, c2;
-   for(U32 i = 0; i<len; i++)
-   {
-      c1 = *unistring1++;
-      c2 = *unistring2++;
-      if(c1 < c2) return -1;
-      if(c1 > c2) return 1;
-      if(!c1) return 0;
-   }
-   return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -601,10 +589,13 @@ bool chompUTF8BOM( const char *inString, char **outStringPtr )
 {
    *outStringPtr = const_cast<char *>( inString );
 
-   U8 bom[4];
-   dMemcpy( bom, inString, 4 );
-
-   bool valid = isValidUTF8BOM( bom );
+   bool valid = false;
+   if (inString[0] && inString[1] && inString[2])
+   {
+      U8 bom[4];
+      dMemcpy(bom, inString, 4);
+      valid = isValidUTF8BOM(bom);
+   }
 
    // This is hackey, but I am not sure the best way to do it at the present.
    // The only valid BOM is a UTF8 BOM, which is 3 bytes, even though we read

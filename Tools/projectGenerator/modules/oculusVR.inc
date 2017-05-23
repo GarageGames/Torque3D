@@ -61,7 +61,7 @@ beginModule( 'oculusVR' );
    }
 
    // Only Windows is supported at this time
-   if ( Generator::$platform == "win32" )
+   if ( T3D_Generator::$platform == "win32" )
    {
       // Source
       addEngineSrcDir( "platform/input/oculusVR" );
@@ -71,8 +71,8 @@ beginModule( 'oculusVR' );
       addIncludePath( $OCULUSVR_SDK_PATH . "/LibOVR/Src" );
 
       // Libs
-      addProjectLibDir( $OCULUSVR_SDK_PATH . "/LibOVR/Lib/Win32" );
-      addProjectLibInput( "libovr.lib", "libovrd.lib" );
+      addProjectLibDir( $OCULUSVR_SDK_PATH . "/LibOVR/Lib/Windows/Win32/Release/VS2010" );
+      addProjectLibInput( "libovr.lib", "libovr.lib" );
    }
 
 endModule();

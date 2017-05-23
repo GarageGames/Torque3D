@@ -31,35 +31,8 @@
 #include "gfx/gfxDrawUtil.h"
 #include "console/engineAPI.h"
 
+#include "guiChunkedBitmapCtrl.h"
 
-class GuiChunkedBitmapCtrl : public GuiControl
-{
-private:
-   typedef GuiControl Parent;
-   void renderRegion(const Point2I &offset, const Point2I &extent);
-
-protected:
-   StringTableEntry mBitmapName;
-   GFXTexHandle mTexHandle;
-   bool  mUseVariable;
-   bool  mTile;
-
-public:
-   //creation methods
-   DECLARE_CONOBJECT(GuiChunkedBitmapCtrl);
-   DECLARE_CATEGORY( "Gui Images" );
-   
-   GuiChunkedBitmapCtrl();
-   static void initPersistFields();
-
-   //Parental methods
-   bool onWake();
-   void onSleep();
-
-   void setBitmap(const char *name);
-
-   void onRender(Point2I offset, const RectI &updateRect);
-};
 
 IMPLEMENT_CONOBJECT(GuiChunkedBitmapCtrl);
 
@@ -92,10 +65,10 @@ ConsoleDocClass( GuiChunkedBitmapCtrl,
 
 void GuiChunkedBitmapCtrl::initPersistFields()
 {
-   addGroup("GuiChunkedBitmapCtrl");		
+   addGroup("GuiChunkedBitmapCtrl");      
    addField( "bitmap",        TypeFilename,  Offset( mBitmapName, GuiChunkedBitmapCtrl ), "This is the bitmap to render to the control." );
    addField( "useVariable",   TypeBool,      Offset( mUseVariable, GuiChunkedBitmapCtrl ), "This decides whether to use the \"bitmap\" file "
-	                                                                                      "or a bitmap stored in \"variable\"");
+                                                                                         "or a bitmap stored in \"variable\"");
    addField( "tile",          TypeBool,      Offset( mTile, GuiChunkedBitmapCtrl ), "This is no longer in use");
    endGroup("GuiChunkedBitmapCtrl");
    Parent::initPersistFields();
@@ -113,7 +86,7 @@ DefineEngineMethod( GuiChunkedBitmapCtrl, setBitmap, void, (const char* filename
 
 GuiChunkedBitmapCtrl::GuiChunkedBitmapCtrl()
 {
-   mBitmapName = StringTable->insert("");
+   mBitmapName = StringTable->EmptyString();
    mUseVariable = false;
    mTile = false;
 }

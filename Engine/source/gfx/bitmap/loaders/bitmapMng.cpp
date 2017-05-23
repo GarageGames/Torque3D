@@ -206,6 +206,7 @@ static mng_bool mngFatalErrorFn(mng_handle mng, mng_int32 code, mng_int8 severit
 
 static bool sReadMNG(Stream &stream, GBitmap *bitmap)
 {
+   PROFILE_SCOPE(sReadMNG);
    mngstuff mnginfo;
    dMemset(&mnginfo, 0, sizeof(mngstuff));
 

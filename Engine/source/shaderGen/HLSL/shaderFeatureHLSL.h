@@ -33,6 +33,8 @@ struct RenderPassData;
 
 class ShaderFeatureHLSL : public ShaderFeature
 {
+protected:
+   bool mIsDirect3D11;
 public:
    ShaderFeatureHLSL();
 
@@ -188,6 +190,9 @@ class VertPositionHLSL : public ShaderFeatureHLSL
 public:
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
+
+   virtual void processPix( Vector<ShaderComponent*> &componentList,
+                            const MaterialFeatureData &fd);
                              
    virtual String getName()
    {
@@ -236,12 +241,19 @@ public:
 /// Base texture
 class DiffuseMapFeatHLSL : public ShaderFeatureHLSL
 {
+protected:
+
+   ShaderIncludeDependency mTorqueDep;
+
 public:
+   DiffuseMapFeatHLSL();
    virtual void processVert( Vector<ShaderComponent*> &componentList,
                              const MaterialFeatureData &fd );
 
    virtual void processPix( Vector<ShaderComponent*> &componentList, 
                             const MaterialFeatureData &fd );
+
+   virtual U32 getOutputTargets(const MaterialFeatureData &fd) const;
 
    virtual Material::BlendOp getBlendOp(){ return Material::LerpAlpha; }
 
@@ -296,6 +308,7 @@ public:
 
    virtual Material::BlendOp getBlendOp(){ return Material::None; }
 
+   virtual U32 getOutputTargets(const MaterialFeatureData &fd) const;
    virtual String getName()
    {
       return "Diffuse Color";
@@ -650,5 +663,17 @@ public:
                                   MaterialFeatureData *outFeatureData );
 };
 
+/// Hardware Skinning
+class HardwareSkinningFeatureHLSL : public ShaderFeatureHLSL
+{
+protected:
+
+public:
+
+   virtual void processVert(  Vector<ShaderComponent*> &componentList,
+                              const MaterialFeatureData &fd );
+
+   virtual String getName() { return "Hardware Skinning"; }
+};
 
 #endif // _SHADERGEN_HLSL_SHADERFEATUREHLSL_H_

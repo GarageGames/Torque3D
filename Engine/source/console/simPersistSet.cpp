@@ -23,18 +23,19 @@
 #include "console/simPersistSet.h"
 #include "console/simPersistID.h"
 #include "console/consoleTypes.h"
+#include "console/engineAPI.h"
 
 
 IMPLEMENT_CONOBJECT( SimPersistSet );
 
 ConsoleDocClass( SimPersistSet,
-				"@brief A SimSet that can be safely persisted.\n\n"
-				"Uses SimPersistIDs to reference objects in the set "
-				"while persisted on disk.  This allows the set to resolve "
-				"its references no matter whether they are loaded before or "
-				"after the set is created.\n\n"
-				"Not intended for game development, for editors or internal use only.\n\n "
-				"@internal");
+            "@brief A SimSet that can be safely persisted.\n\n"
+            "Uses SimPersistIDs to reference objects in the set "
+            "while persisted on disk.  This allows the set to resolve "
+            "its references no matter whether they are loaded before or "
+            "after the set is created.\n\n"
+            "Not intended for game development, for editors or internal use only.\n\n "
+            "@internal");
 
 //-----------------------------------------------------------------------------
 
@@ -46,7 +47,7 @@ SimPersistSet::SimPersistSet()
 
 //-----------------------------------------------------------------------------
 
-bool SimPersistSet::processArguments( S32 argc, const char** argv )
+bool SimPersistSet::processArguments( S32 argc, ConsoleValueRef *argv )
 {
    for( U32 i = 0; i < argc; ++ i )
    {
@@ -54,7 +55,7 @@ bool SimPersistSet::processArguments( S32 argc, const char** argv )
       Torque::UUID uuid;
       if( !uuid.fromString( argv[ i ] ) )
       {
-         Con::errorf( "SimPersistSet::processArguments - could not read UUID at index %i: %s", i, argv[ i ] );
+         Con::errorf( "SimPersistSet::processArguments - could not read UUID at index %i: %s", i, (const char*)argv[ i ] );
          continue;
       }
 
@@ -186,7 +187,7 @@ void SimPersistSet::addObject( SimObject* object )
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( SimPersistSet, resolvePersistentIds, void, 2, 2, "() - Try to bind unresolved persistent IDs in the set." )
+DefineConsoleMethod( SimPersistSet, resolvePersistentIds, void, (), , "() - Try to bind unresolved persistent IDs in the set." )
 {
    object->resolvePIDs();
 }

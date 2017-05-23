@@ -113,6 +113,21 @@ public:
 
    ///
    virtual void applyImpulse( const Point3F &origin, const Point3F &force ) = 0;
+
+   ///
+   virtual void applyTorque( const Point3F &torque ) = 0;
+
+   ///
+   virtual void applyForce( const Point3F &force ) = 0;
+
+
+   virtual void findContact(SceneObject **contactObject,
+      VectorF *contactNormal,
+      Vector<SceneObject*> *outOverlapObjects) const = 0;
+
+   ///
+   virtual void moveKinematicTo(const MatrixF &xfm) = 0;
+
 };
 
 

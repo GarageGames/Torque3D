@@ -47,9 +47,16 @@ bool NamedTexTarget::registerWithName( const String &name )
    }
 
    // Make sure the target name isn't empty or already taken.
-   if ( name.isEmpty() || smTargets.contains( name ) )
+   if ( name.isEmpty())
+   {
+       Con::errorf("NamedTexTarget::registerWithName( const String &name ) No name given!");
+       return false;
+   }
+   if (smTargets.contains( name ) )
+   {
+       Con::errorf("NamedTexTarget::registerWithName( %s ) Already used!", name.c_str());
       return false;
-
+   }
    mName = name;
    mIsRegistered = true;
    smTargets.insert( mName, this );
@@ -84,8 +91,8 @@ NamedTexTarget* NamedTexTarget::find( const String &name )
 }
 
 NamedTexTarget::NamedTexTarget()
-   :  mViewport( RectI::One ),
-      mIsRegistered( false ),
+   :  mIsRegistered( false ),
+      mViewport( RectI::One ),
       mConditioner( NULL )
 {   
 }

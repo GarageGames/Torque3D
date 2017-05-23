@@ -55,6 +55,7 @@ void GFXD3D9VertexBuffer::lock(U32 vertexStart, U32 vertexEnd, void **vertexPtr)
 
    switch( mBufferType )
    {
+   case GFXBufferTypeImmutable:
    case GFXBufferTypeStatic:
       break;
 
@@ -203,7 +204,7 @@ void GFXD3D9VertexBuffer::zombify()
 {
    AssertFatal(lockedVertexStart == 0 && lockedVertexEnd == 0, "GFXD3D9VertexBuffer::zombify - Cannot zombify a locked buffer!");
    // Static buffers are managed by D3D9 so we don't deal with them.
-   if(mBufferType == GFXBufferTypeDynamic)
+   if(mBufferType == GFXBufferTypeDynamic || mBufferType == GFXBufferTypeImmutable)
    {
       SAFE_RELEASE(vb);
    }
@@ -227,4 +228,3 @@ void GFXD3D9VertexBuffer::resurrect()
          "GFXD3D9VertexBuffer::resurrect - Failed to allocate VB" );
    }
 }
-

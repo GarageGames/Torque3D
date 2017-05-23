@@ -90,7 +90,7 @@ void ShadowMaterialHook::init( BaseMatInstance *inMat )
    forced.setBlend( false );
    forced.setAlphaTest( false );
 
-   // We should force on zwrite as the prepass
+   // We should force on zwrite as the deferred
    // will disable it by default.
    forced.setZReadWrite( true, true );
    

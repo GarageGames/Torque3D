@@ -39,10 +39,10 @@ ThreadPool::Context ThreadPool::Context::smRootContext( "ROOT", NULL, 1.0 );
 //--------------------------------------------------------------------------
 
 ThreadPool::Context::Context( const char* name, ThreadPool::Context* parent, F32 priorityBias )
-   : mName( name ),
-     mParent( parent ),
-     mSibling( 0 ),
+   : mParent( parent ),
+     mName( name ),
      mChildren( 0 ),
+     mSibling( 0 ),
      mPriorityBias( priorityBias ),
      mAccumulatedPriorityBias( 0.0 )
 {
@@ -120,6 +120,7 @@ void ThreadPool::Context::updateAccumulatedPriorityBiases()
 void ThreadPool::WorkItem::process()
 {
    execute();
+   mExecuted = true;
 }
 
 //--------------------------------------------------------------------------
@@ -214,8 +215,8 @@ private:
 };
 
 ThreadPool::WorkerThread::WorkerThread( ThreadPool* pool, U32 index )
-   : mPool( pool ),
-     mIndex( index )
+   : mIndex( index ),
+     mPool( pool )
 {
    // Link us to the pool's thread list.
 
@@ -239,17 +240,6 @@ void ThreadPool::WorkerThread::run( void* arg )
    }
    #endif
 
-#if defined(TORQUE_OS_XENON)
-   // On Xbox 360 you must explicitly assign software threads to hardware threads.
-
-   // This will distribute job threads across the secondary CPUs leaving both
-   // primary CPU cores available to the "main" thread. This will help prevent
-   // more L2 thrashing of the main thread/core.
-   static U32 sCoreAssignment = 2;
-   XSetThreadProcessor( GetCurrentThread(), sCoreAssignment );
-   sCoreAssignment = sCoreAssignment < 6 ? sCoreAssignment + 1 : 2;
-#endif
-      
    while( 1 )
    {
       if( checkForStop() )
@@ -281,6 +271,8 @@ void ThreadPool::WorkerThread::run( void* arg )
             Platform::outputDebugString( "[ThreadPool::WorkerThread] thread '%i' takes item '0x%x'", getId(), *workItem );
 #endif
             workItem->process();
+
+            dFetchAndAdd( mPool->mNumPendingItems, ( U32 ) -1 );
          }
          else
             waitForSignal = true;
@@ -318,8 +310,9 @@ ThreadPool::ThreadPool( const char* name, U32 numThreads )
    : mName( name ),
      mNumThreads( numThreads ),
      mNumThreadsAwake( 0 ),
-     mThreads( 0 ),
-     mSemaphore( 0 )
+     mNumPendingItems( 0 ),
+     mSemaphore( 0 ),
+     mThreads( 0 )
 {
    // Number of worker threads to create.
 
@@ -328,17 +321,14 @@ ThreadPool::ThreadPool( const char* name, U32 numThreads )
       // Use platformCPUInfo directly as in the case of the global pool,
       // Platform::SystemInfo will not yet have been initialized.
       
-      U32 numLogical;
-      U32 numPhysical;
-      U32 numCores;
+      U32 numLogical = 0;
+      U32 numPhysical = 0;
+      U32 numCores = 0;
 
       CPUInfo::CPUCount( numLogical, numCores, numPhysical );
       
       const U32 baseCount = getMax( numLogical, numCores );
-      if( baseCount )
-         mNumThreads = baseCount;
-      else
-         mNumThreads = 2;
+      mNumThreads = (baseCount > 0) ? baseCount : 2;
    }
    
    #ifdef DEBUG_SPEW
@@ -412,18 +402,10 @@ void ThreadPool::queueWorkItem( WorkItem* item )
    else
    {
       // Put the item in the queue.
-
+      dFetchAndAdd( mNumPendingItems, 1 );
       mWorkItemQueue.insert( item->getPriority(), item );
 
-      // Wake up some thread, if we need to.
-      // Use the ready count here as the wake count does
-      // not correctly protect the critical section in the
-      // thread's run function.  This may lead us to release
-      // the semaphore more often than necessary, but it avoids
-      // a race condition.
-
-      if( !dCompareAndSwap( mNumThreadsReady, mNumThreads, mNumThreads ) )
-         mSemaphore.release();
+      mSemaphore.release();
    }
 }
 
@@ -440,6 +422,26 @@ void ThreadPool::flushWorkItems( S32 timeOut )
    // Spinlock until the queue is empty.
 
    while( !mWorkItemQueue.isEmpty() )
+   {
+      Platform::sleep( 25 );
+
+      // Stop if we have exceeded our processing time budget.
+
+      if( timeOut != -1
+          && Platform::getRealMilliseconds() >= endTime )
+          break;
+   }
+}
+
+void ThreadPool::waitForAllItems( S32 timeOut )
+{
+   U32 endTime = 0;
+   if( timeOut != -1 )
+      endTime = Platform::getRealMilliseconds() + timeOut;
+
+   // Spinlock until there are no items that have not been processed.
+
+   while( dAtomicRead( mNumPendingItems ) )
    {
       Platform::sleep( 25 );
 

@@ -46,8 +46,12 @@ singleton ShaderData( MLAA_EdgeDetectionShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/offsetV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/edgeDetectionP.hlsl";
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/mlaa/gl/offsetV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/mlaa/gl/edgeDetectionP.glsl";
 
    samplerNames[0] = "$colorMapG";
+   samplerNames[1] = "$deferredMap";
 
    pixVersion = 3.0;
 };
@@ -71,6 +75,9 @@ singleton ShaderData( MLAA_BlendWeightCalculationShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/passthruV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/blendWeightCalculationP.hlsl";
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/mlaa/gl/passthruV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/mlaa/gl/blendWeightCalculationP.glsl";
 
    samplerNames[0] = "$edgesMap";
    samplerNames[1] = "$edgesMapL";
@@ -98,6 +105,9 @@ singleton ShaderData( MLAA_NeighborhoodBlendingShader )
 {   
    DXVertexShaderFile 	= "shaders/common/postFx/mlaa/offsetV.hlsl";
    DXPixelShaderFile 	= "shaders/common/postFx/mlaa/neighborhoodBlendingP.hlsl";
+   
+   OGLVertexShaderFile  = "shaders/common/postFx/mlaa/gl/offsetV.glsl";
+   OGLPixelShaderFile   = "shaders/common/postFx/mlaa/gl/neighborhoodBlendingP.glsl";
 
    samplerNames[0] = "$blendMap";
    samplerNames[1] = "$colorMapL";
@@ -115,7 +125,7 @@ singleton PostEffect( MLAAFx )
    renderTime = "PFXAfterDiffuse";
 
    texture[0] = "$backBuffer"; //colorMapG      
-   texture[1] = "#prepass"; // Used for depth detection
+   texture[1] = "#deferred"; // Used for depth detection
 
    target = "$outTex";
    targetClear = PFXTargetClear_OnDraw;
@@ -152,7 +162,7 @@ singleton PostEffect( MLAAFx )
 
       texture[0] = "$inTex"; // Edges mask    
       texture[1] = "$inTex"; // Edges mask 
-      texture[2] = "AreaMap33.dds";
+      texture[2] = "./AreaMap33.dds";
    };
 
    new PostEffect()

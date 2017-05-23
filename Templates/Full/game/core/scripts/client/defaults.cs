@@ -41,6 +41,7 @@ $pref::Input::KeyboardEnabled = 1;
 $pref::Input::MouseEnabled = 1;
 $pref::Input::JoystickEnabled = 0;
 $pref::Input::KeyboardTurnSpeed = 0.1;
+$pref::Input::MouseWheelSpeed = 120;
 
 $sceneLighting::cacheSize = 20000;
 $sceneLighting::purgeMethod = "lastCreated";
@@ -72,7 +73,9 @@ $pref::Video::disableCubemapping = false;
 ///
 $pref::Video::disableParallaxMapping = false;
 
-$pref::Video::Gamma = 1.0;
+$pref::Video::Gamma = 2.2;
+$pref::Video::Contrast = 1.0;
+$pref::Video::Brightness = 0;
 
 // Console-friendly defaults
 if($platform $= "xenon")

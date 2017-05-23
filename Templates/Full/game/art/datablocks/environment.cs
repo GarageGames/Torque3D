@@ -83,4 +83,18 @@ datablock LightningData(DefaultStorm)
    thunderSounds[1] = ThunderCrash2Sound;
    thunderSounds[2] = ThunderCrash3Sound;
    thunderSounds[3] = ThunderCrash4Sound;
+
+   strikeTextures[0] = "art/environment/lightning";
+};
+
+datablock ReflectorDesc( DefaultCubeDesc )
+{  
+   texSize = 256;
+   nearDist = 0.1;
+   farDist = 1000.0;
+   objectTypeMask = 0xFFFFFFFF;
+   detailAdjust = 1.0;
+   priority = 1.0;
+   maxRateMs = 15;
+   useOcclusionQuery = true;
 };

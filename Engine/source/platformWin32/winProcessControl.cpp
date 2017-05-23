@@ -22,11 +22,12 @@
 
 #include "platformWin32/platformWin32.h"
 #include "core/strings/stringFunctions.h"
+#include "core/util/journal/process.h"
 
-void Platform::postQuitMessage(const U32 in_quitVal)
+void Platform::postQuitMessage(const S32 in_quitVal)
 {
    if (!Platform::getWebDeployment())
-      PostQuitMessage(in_quitVal);
+      Process::requestShutdown();
 }
 
 void Platform::debugBreak()

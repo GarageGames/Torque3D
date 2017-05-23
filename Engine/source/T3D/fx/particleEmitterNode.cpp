@@ -393,8 +393,9 @@ void ParticleEmitterNode::setEmitterDataBlock(ParticleEmitterData* data)
 
    mEmitterDatablock = data;
 }
- 
-DefineEngineMethod(ParticleEmitterNode, setEmitterDataBlock, void, (ParticleEmitterData* emitterDatablock), (0),
+
+
+DefineEngineMethod(ParticleEmitterNode, setEmitterDataBlock, void, (ParticleEmitterData* emitterDatablock), (nullAsType<ParticleEmitterData*>()),
    "Assigns the datablock for this emitter node.\n"
    "@param emitterDatablock ParticleEmitterData datablock to assign\n"
    "@tsexample\n"

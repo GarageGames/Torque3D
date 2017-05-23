@@ -36,6 +36,8 @@ public:
 
 	DECLARE_CALLBACK(void, onConnectionRequest, (const char* address, const char* ID));
 	DECLARE_CALLBACK(void, onLine, (const char* line));
+	DECLARE_CALLBACK(bool, onPacket, (const char* data));
+	DECLARE_CALLBACK(void, onEndReceive, ());
 	DECLARE_CALLBACK(void, onDNSResolved,());
 	DECLARE_CALLBACK(void, onDNSFailed, ());
 	DECLARE_CALLBACK(void, onConnected, ());
@@ -60,7 +62,9 @@ public:
    virtual ~TCPObject();
 
    void parseLine(U8 *buffer, U32 *start, U32 bufferLen);
-   void finishLastLine();
+   bool finishLastLine();
+   bool isBufferEmpty();
+   void emptyBuffer();
 
    static TCPObject *find(NetSocket tag);
 
@@ -79,8 +83,14 @@ public:
    void disconnect();
    State getState() { return mState; }
 
-   bool processArguments(S32 argc, const char **argv);
+   bool processArguments(S32 argc, ConsoleValueRef *argv);
    void send(const U8 *buffer, U32 bufferLen);
+
+   ///Send an entire file over tcp
+   ///@arg fileName Full path to file you want to send
+   ///@return true if file was sent, false if not (file doesn't exist)
+   bool sendFile(const char* fileName);
+
    void addToTable(NetSocket newTag);
    void removeFromTable();
 

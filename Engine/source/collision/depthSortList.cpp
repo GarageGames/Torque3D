@@ -181,25 +181,19 @@ void DepthSortList::set(const MatrixF & mat, Point3F & extents)
    mPlaneList.clear();
 
    mPlaneList.increment();
-   mPlaneList.last().set(-1.0f, 0.0f, 0.0f);
-   mPlaneList.last().d = -mExtent.x;
+   mPlaneList.last().set(-1.0f, 0.0f, 0.0f, -mExtent.x);
    mPlaneList.increment();
-   mPlaneList.last().set( 1.0f, 0.0f, 0.0f);
-   mPlaneList.last().d = -mExtent.x;
+   mPlaneList.last().set( 1.0f, 0.0f, 0.0f, -mExtent.x);
 
    mPlaneList.increment();
-   mPlaneList.last().set( 0.0f,-1.0f, 0.0f);
-   mPlaneList.last().d = 0;
+   mPlaneList.last().set( 0.0f,-1.0f, 0.0f, 0);
    mPlaneList.increment();
-   mPlaneList.last().set( 0.0f, 1.0f, 0.0f);
-   mPlaneList.last().d = -2.0f * mExtent.y;
+   mPlaneList.last().set( 0.0f, 1.0f, 0.0f, -2.0f * mExtent.y);
 
    mPlaneList.increment();
-   mPlaneList.last().set( 0.0f, 0.0f,-1.0f);
-   mPlaneList.last().d = -mExtent.z;
+   mPlaneList.last().set( 0.0f, 0.0f,-1.0f, -mExtent.z);
    mPlaneList.increment();
-   mPlaneList.last().set( 0.0f, 0.0f, 1.0f);
-   mPlaneList.last().d = -mExtent.z;
+   mPlaneList.last().set( 0.0f, 0.0f, 1.0f, -mExtent.z);
 }
 
 //----------------------------------------------------------------------------

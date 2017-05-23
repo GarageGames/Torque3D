@@ -22,10 +22,6 @@
 #ifndef _MISCSHDRDAT_H_
 #define _MISCSHDRDAT_H_
 
-#ifndef _PLATFORM_H_
-#include "platform/platform.h"
-#endif
-
 //**************************************************************************
 // This file is an attempt to keep certain classes from having to know about
 //   the ShaderGen class
@@ -41,9 +37,13 @@ enum RegisterType
    RT_NORMAL,
    RT_BINORMAL,
    RT_TANGENT,
+   RT_TANGENTW,
    RT_COLOR,
    RT_TEXCOORD,
    RT_VPOS,
+   RT_SVPOSITION,
+   RT_BLENDINDICES,
+   RT_BLENDWEIGHT
 };
 
 enum Components
@@ -51,7 +51,7 @@ enum Components
    C_VERT_STRUCT = 0,
    C_CONNECTOR,
    C_VERT_MAIN,
-   C_PIX_MAIN,
+   C_PIX_MAIN
 };
 
 #endif // _MISCSHDRDAT_H_

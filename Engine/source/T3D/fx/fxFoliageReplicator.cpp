@@ -132,7 +132,6 @@ ConsoleDocClass( fxFoliageReplicator,
 // Trig Table Lookups.
 //
 //------------------------------------------------------------------------------
-const F32 PeriodLen = (F32) 2.0f * (F32) M_PI;
 const F32 PeriodLenMinus = (F32) (2.0f * M_PI) - 0.01f;
 
 //------------------------------------------------------------------------------
@@ -248,7 +247,7 @@ fxFoliageCulledList::fxFoliageCulledList(Box3F SearchBox, fxFoliageCulledList* I
 
 //------------------------------------------------------------------------------
 
-void fxFoliageCulledList::FindCandidates(Box3F SearchBox, fxFoliageCulledList* InVec)
+void fxFoliageCulledList::FindCandidates(const Box3F& SearchBox, fxFoliageCulledList* InVec)
 {
    // Search the Culled List.
    for (U32 i = 0; i < InVec->GetListCount(); i++)
@@ -426,7 +425,7 @@ void fxFoliageReplicator::CreateFoliage(void)
    Point3F	MaxPoint(  0.5,  0.5,  0.5 );
 
    // Check Host.
-   AssertFatal(isClientObject(), "Trying to create Foliage on Server, this is bad!")
+   AssertFatal(isClientObject(), "Trying to create Foliage on Server, this is bad!");
 
       // Cannot continue without Foliage Texture!
       if (dStrlen(mFieldData.mFoliageFile) == 0) 
@@ -1028,7 +1027,7 @@ void fxFoliageReplicator::SetupBuffers()
 
 //------------------------------------------------------------------------------
 
-Box3F fxFoliageReplicator::FetchQuadrant(Box3F Box, U32 Quadrant)
+Box3F fxFoliageReplicator::FetchQuadrant(const Box3F& Box, U32 Quadrant)
 {
    Box3F QuadrantBox;
 
@@ -1134,7 +1133,7 @@ void fxFoliageReplicator::ProcessQuadrant(fxFoliageQuadrantNode* pParentNode, fx
 void fxFoliageReplicator::SyncFoliageReplicators(void)
 {
    // Check Host.
-   AssertFatal(isServerObject(), "We *MUST* be on server when Synchronising Foliage!")
+   AssertFatal(isServerObject(), "We *MUST* be on server when Synchronising Foliage!");
 
       // Find the Replicator Set.
    SimSet *fxFoliageSet = dynamic_cast<SimSet*>(Sim::findObject("fxFoliageSet"));
@@ -1196,7 +1195,7 @@ void fxFoliageReplicator::DestroyFoliageItems()
 void fxFoliageReplicator::DestroyFoliage(void)
 {
    // Check Host.
-   AssertFatal(isClientObject(), "Trying to destroy Foliage on Server, this is bad!")
+   AssertFatal(isClientObject(), "Trying to destroy Foliage on Server, this is bad!");
 
       // Destroy Quad-tree.
       mPotentialFoliageNodes = 0;

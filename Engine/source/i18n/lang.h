@@ -27,6 +27,10 @@
 
 #include "console/simBase.h"
 #include "core/util/tVector.h"
+//lang_ localization
+#include "core/fileObject.h"
+#include "core/util/str.h"
+#include "core/strings/unicode.h"
 
 #ifndef _LANG_H_
 #define _LANG_H_

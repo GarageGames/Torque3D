@@ -22,6 +22,7 @@
 
 #include "core/strings/stringFunctions.h"
 #include "console/console.h"
+#include "console/engineAPI.h"
 
 #include "math/mMath.h"
 
@@ -78,7 +79,7 @@ ConsoleFunction( mathInit, void, 1, 10, "( ... )"
          properties |= CPU_PROP_SSE;
          continue;
       }
-      Con::printf("Error: MathInit(): ignoring unknown math extension '%s'", *argv);
+      Con::printf("Error: MathInit(): ignoring unknown math extension '%s'", argv->getStringValue());
    }
    Math::init(properties);
 }

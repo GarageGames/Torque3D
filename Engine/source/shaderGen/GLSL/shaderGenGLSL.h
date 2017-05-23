@@ -30,8 +30,11 @@
 
 class ShaderGenPrinterGLSL : public ShaderGenPrinter
 {
+        bool extraRTs[3];
+ 
 public:
-
+        ShaderGenPrinterGLSL() { for (int i = 0; i < 3; i++) extraRTs[i] = false; }
+ 
    // ShaderGenPrinter
    virtual void printShaderHeader(Stream& stream);
    virtual void printMainComment(Stream& stream);

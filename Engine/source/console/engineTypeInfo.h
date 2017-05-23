@@ -44,7 +44,7 @@ enum EngineTypeKind
    EngineTypeKindClass           ///< Pointer to opaque EngineObject.
 };
 
-DECLARE_ENUM( EngineTypeKind );
+DECLARE_ENUM_R( EngineTypeKind );
 
 /// Flags for an EngineTypeInfo.
 enum EngineTypeFlags
@@ -173,8 +173,8 @@ class EngineFieldTable
       /// Construct a field table from a NULL-terminated array of Field
       /// records.
       EngineFieldTable( const Field* fields )
-         : mFields( fields ),
-           mNumFields( 0 )
+         : mNumFields( 0 ),
+           mFields( fields )
       {
          while( fields[ mNumFields ].getName() )
             mNumFields ++;
@@ -362,7 +362,7 @@ class EngineTypeInfo : public EngineExportScope
       // them to retroactively install property tables.  Will be removed
       // when the console interop is removed and all classes are migrated
       // to the new system.
-      template< typename T > friend class ConcreteClassRep;
+      template< typename T > friend class ConcreteAbstractClassRep;
       
    protected:
       
@@ -648,395 +648,33 @@ template< typename T > const EngineFunctionTypeInfo< T > _EngineFunctionTypeTrai
 //    Function Argument Type Infos.
 //--------------------------------------------------------------------------
 
-template< typename R >
-struct _EngineArgumentTypeTable< R() > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 0;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-#ifdef TORQUE_COMPILER_GCC
-   static const EngineTypeInfo* const ARGS[ 0 ];
+
+#ifdef TORQUE_COMILER_GCC
+#define ARGS_SIZE_SAFE(wanted) (wanted)
 #else
-   static const EngineTypeInfo* const ARGS[ 1 ];
+#define ARGS_SIZE_SAFE(wanted) (((wanted) < 1) ? 1 : (wanted))
 #endif
 
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R > const EngineTypeInfo* const _EngineArgumentTypeTable< R() >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-#ifdef TORQUE_COMPILER_GCC
-template< typename R > const EngineTypeInfo* const _EngineArgumentTypeTable< R() >::ARGS[ 0 ] = {};
-#else
-template< typename R > const EngineTypeInfo* const _EngineArgumentTypeTable< R() >::ARGS[ 1 ] = {};
-#endif
-template< typename R >
-struct _EngineArgumentTypeTable< R( ... ) > : public _EngineArgumentTypeTable< R() >
+template< typename R, typename ...ArgTs >
+struct _EngineArgumentTypeTable< R( ArgTs ... ) > : public EngineArgumentTypeTable
 {
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A >
-struct _EngineArgumentTypeTable< R( A ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 1;
+   static const U32 NUM_ARGUMENTS = sizeof...(ArgTs);
    static const bool VARIADIC = false;
    static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 1 ];
+   static const EngineTypeInfo* const ARGS[ ARGS_SIZE_SAFE(sizeof...(ArgTs)) ];
 
    _EngineArgumentTypeTable()
       : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
 };
-template< typename R, typename A >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A ) >::ARGS[ 1 ] =
+template< typename R, typename ...ArgTs >
+const EngineTypeInfo* const _EngineArgumentTypeTable< R( ArgTs ... ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
+template< typename R, typename ...ArgTs >
+const EngineTypeInfo* const _EngineArgumentTypeTable< R( ArgTs ... ) >::ARGS[ ARGS_SIZE_SAFE(sizeof...(ArgTs)) ] =
 {
-   TYPE< typename EngineTypeTraits< A >::Type >()
+   TYPE< typename EngineTypeTraits< ArgTs >::Type >() ...
 };
-template< typename R, typename A >
-struct _EngineArgumentTypeTable< R( A, ... ) > : public _EngineArgumentTypeTable< R( A ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B >
-struct _EngineArgumentTypeTable< R( A, B ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 2;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 2 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B ) >::ARGS[ 2 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >()
-};
-template< typename R, typename A, typename B >
-struct _EngineArgumentTypeTable< R( A, B, ... ) > : public _EngineArgumentTypeTable< R( A, B ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C >
-struct _EngineArgumentTypeTable< R( A, B, C ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 3;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 3 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C ) >::ARGS[ 3 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >()
-};
-template< typename R, typename A, typename B, typename C >
-struct _EngineArgumentTypeTable< R( A, B, C, ... ) > : public _EngineArgumentTypeTable< R( A, B, C ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C, typename D >
-struct _EngineArgumentTypeTable< R( A, B, C, D ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 4;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 4 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C, typename D >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C, typename D >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D ) >::ARGS[ 4 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >(),
-   TYPE< typename EngineTypeTraits< D >::Type >()
-};
-template< typename R, typename A, typename B, typename C, typename D >
-struct _EngineArgumentTypeTable< R( A, B, C, D, ... ) > : public _EngineArgumentTypeTable< R( A, B, C, D ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C, typename D, typename E >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 5;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 5 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C, typename D, typename E >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E ) >::ARGS[ 5 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >(),
-   TYPE< typename EngineTypeTraits< D >::Type >(),
-   TYPE< typename EngineTypeTraits< E >::Type >()
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, ... ) > : public _EngineArgumentTypeTable< R( A, B, C, D, E ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 6;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 6 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F ) >::ARGS[ 6 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >(),
-   TYPE< typename EngineTypeTraits< D >::Type >(),
-   TYPE< typename EngineTypeTraits< E >::Type >(),
-   TYPE< typename EngineTypeTraits< F >::Type >()
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, ... ) > : public _EngineArgumentTypeTable< R( A, B, C, D, E, F ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 7;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 7 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G ) >::ARGS[ 7 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >(),
-   TYPE< typename EngineTypeTraits< D >::Type >(),
-   TYPE< typename EngineTypeTraits< E >::Type >(),
-   TYPE< typename EngineTypeTraits< F >::Type >(),
-   TYPE< typename EngineTypeTraits< G >::Type >()
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, ... ) > : public _EngineArgumentTypeTable< R( A, B, C, D, E, F, G ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 8;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 8 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H ) >::ARGS[ 8 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >(),
-   TYPE< typename EngineTypeTraits< D >::Type >(),
-   TYPE< typename EngineTypeTraits< E >::Type >(),
-   TYPE< typename EngineTypeTraits< F >::Type >(),
-   TYPE< typename EngineTypeTraits< G >::Type >(),
-   TYPE< typename EngineTypeTraits< H >::Type >()
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, ... ) > : public _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 9;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 9 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I ) >::ARGS[ 9 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >(),
-   TYPE< typename EngineTypeTraits< D >::Type >(),
-   TYPE< typename EngineTypeTraits< E >::Type >(),
-   TYPE< typename EngineTypeTraits< F >::Type >(),
-   TYPE< typename EngineTypeTraits< G >::Type >(),
-   TYPE< typename EngineTypeTraits< H >::Type >(),
-   TYPE< typename EngineTypeTraits< I >::Type >()
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, ... ) > : public _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 10;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 10 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J ) >::ARGS[ 10 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >(),
-   TYPE< typename EngineTypeTraits< D >::Type >(),
-   TYPE< typename EngineTypeTraits< E >::Type >(),
-   TYPE< typename EngineTypeTraits< F >::Type >(),
-   TYPE< typename EngineTypeTraits< G >::Type >(),
-   TYPE< typename EngineTypeTraits< H >::Type >(),
-   TYPE< typename EngineTypeTraits< I >::Type >(),
-   TYPE< typename EngineTypeTraits< J >::Type >()
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, ... ) > : public _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 11;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 11 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K ) >::ARGS[ 11 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >(),
-   TYPE< typename EngineTypeTraits< D >::Type >(),
-   TYPE< typename EngineTypeTraits< E >::Type >(),
-   TYPE< typename EngineTypeTraits< F >::Type >(),
-   TYPE< typename EngineTypeTraits< G >::Type >(),
-   TYPE< typename EngineTypeTraits< H >::Type >(),
-   TYPE< typename EngineTypeTraits< I >::Type >(),
-   TYPE< typename EngineTypeTraits< J >::Type >(),
-   TYPE< typename EngineTypeTraits< K >::Type >()
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K, ... ) > : public _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K ) >
-{
-   static const bool VARIADIC = true;
-   _EngineArgumentTypeTable() {}
-};
-
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K, L ) > : public EngineArgumentTypeTable
-{
-   static const U32 NUM_ARGUMENTS = 12;
-   static const bool VARIADIC = false;
-   static const EngineTypeInfo* const RETURN;
-   static const EngineTypeInfo* const ARGS[ 12 ];
-
-   _EngineArgumentTypeTable()
-      : EngineArgumentTypeTable( TYPE< typename EngineTypeTraits< R >::Type >(), NUM_ARGUMENTS, ARGS ) {}
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K, L ) >::RETURN = TYPE< typename EngineTypeTraits< R >::Type >();
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-const EngineTypeInfo* const _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K, L ) >::ARGS[ 12 ] =
-{
-   TYPE< typename EngineTypeTraits< A >::Type >(),
-   TYPE< typename EngineTypeTraits< B >::Type >(),
-   TYPE< typename EngineTypeTraits< C >::Type >(),
-   TYPE< typename EngineTypeTraits< D >::Type >(),
-   TYPE< typename EngineTypeTraits< E >::Type >(),
-   TYPE< typename EngineTypeTraits< F >::Type >(),
-   TYPE< typename EngineTypeTraits< G >::Type >(),
-   TYPE< typename EngineTypeTraits< H >::Type >(),
-   TYPE< typename EngineTypeTraits< I >::Type >(),
-   TYPE< typename EngineTypeTraits< J >::Type >(),
-   TYPE< typename EngineTypeTraits< K >::Type >(),
-   TYPE< typename EngineTypeTraits< L >::Type >()
-};
-template< typename R, typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I, typename J, typename K, typename L >
-struct _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K, L, ... ) > : public _EngineArgumentTypeTable< R( A, B, C, D, E, F, G, H, I, J, K, L ) >
+template< typename R, typename ... ArgTs >
+struct _EngineArgumentTypeTable< R( ArgTs ..., ... ) > : public _EngineArgumentTypeTable< R( ArgTs ... ) >
 {
    static const bool VARIADIC = true;
    _EngineArgumentTypeTable() {}

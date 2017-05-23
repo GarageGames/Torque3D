@@ -122,10 +122,6 @@ public:
    static void log( const char* format, ... );
 #endif
 
-#ifdef TORQUE_OS_XENON
-   static S32 getLockedController();
-#endif
-
    /// Global input routing JournaledSignal; post input events here for
    /// processing.
    static InputEvent smInputEvent;

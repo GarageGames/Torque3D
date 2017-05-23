@@ -1459,10 +1459,17 @@ void TSMesh::prepOpcodeCollision()
    AssertFatal( (curIts - its) == mi->GetNbTriangles(), "Triangle count mismatch!" );
 
    for( S32 i = 0; i < mi->GetNbVertices(); i++ )
+   {
       if( mVertexData.isReady() )
-         pts[i].Set( mVertexData[i].vert().x, mVertexData[i].vert().y, mVertexData[i].vert().z );
+      {
+         const __TSMeshVertexBase &vertData = mVertexData.getBase(i);
+         pts[i].Set( vertData.vert().x, vertData.vert().y, vertData.vert().z );
+      }
       else
+      {
          pts[i].Set( verts[i].x, verts[i].y, verts[i].z );
+      }
+   }
 
    mi->SetPointers( its, pts );
 
@@ -1630,7 +1637,12 @@ bool TSMesh::castRayOpcode( const Point3F &s, const Point3F &e, RayInfo *info, T
          }
 
          // slerp
-         Point3F s = ( (max - min) - (facePoint - min) ) / (max - min);
+         Point3F divSafe = (max - min);
+         if (divSafe.x == 0.0f) divSafe.x = POINT_EPSILON;
+         if (divSafe.y == 0.0f) divSafe.y = POINT_EPSILON;
+         if (divSafe.z == 0.0f) divSafe.z = POINT_EPSILON;
+
+         Point3F s = ( (max - min) - (facePoint - min) ) / divSafe;
 
          // compute axis
          S32		bestAxis = 0;

@@ -39,6 +39,7 @@
 #include "console/engineStructs.h"
 #endif
 
+template<typename T> inline const T nullAsType(){ return nullptr; }
 
 /// @file
 /// Legacy TS-based console type definitions.
@@ -48,11 +49,7 @@
 /// @{
 
 #ifndef Offset
-#if defined(TORQUE_COMPILER_GCC) && (__GNUC__ > 3) || ((__GNUC__ == 3) && (__GNUC_MINOR__ >= 1))
-#define Offset(m,T) ((int)(&((T *)1)->m) - 1)
-#else
-#define Offset(x, cls) ((dsize_t)((const char *)&(((cls *)0)->x)-(const char *)0))
-#endif
+#define Offset(x, cls) offsetof(cls, x)
 #endif
 
 class GFXShader;
@@ -77,6 +74,8 @@ DefineConsoleType( TypeRealString, String )
 DefineConsoleType( TypeCommand, String )
 DefineConsoleType( TypeFilename, const char * )
 DefineConsoleType( TypeStringFilename, String )
+
+DefineConsoleType(TypeRotationF, RotationF)
 
 /// A universally unique identifier.
 DefineConsoleType( TypeUUID, Torque::UUID )
@@ -126,6 +125,8 @@ DefineConsoleType( TypeColorI, ColorI )
 DefineConsoleType( TypeColorF, ColorF )
 DefineConsoleType( TypeSimObjectName, SimObject* )
 DefineConsoleType( TypeShader, GFXShader * )
+
+DefineConsoleType(TypeSimObjectPtr, SimObject*)
 
 /// A persistent reference to an object.  This reference indirectly goes
 /// through the referenced object's persistent ID.

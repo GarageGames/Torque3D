@@ -191,9 +191,7 @@ SFXSource::SFXSource()
    : mStatus( SFXStatusStopped ),
      mSavedStatus( SFXStatusNull ),
      mStatusCallback( NULL ),
-     mPitch( 1.f ),
-     mModulativePitch( 1.f ),
-     mEffectivePitch( 1.f ),
+     mDescription( NULL ),
      mVolume( 1.f ),
      mPreFadeVolume( 1.f ),
      mFadedVolume( 1.f ),
@@ -203,26 +201,28 @@ SFXSource::SFXSource()
      mPriority( 0 ),
      mModulativePriority( 1.f ),
      mEffectivePriority( 0 ),
-     mVelocity( 0, 0, 0 ),
+     mPitch( 1.f ),
+     mModulativePitch( 1.f ),
+     mEffectivePitch( 1.f ),
      mTransform( true ),
+     mVelocity( 0, 0, 0 ),
      mMinDistance( 1 ),
      mMaxDistance( 100 ),
      mConeInsideAngle( 360 ),
      mConeOutsideAngle( 360 ),
      mConeOutsideVolume( 1 ),
-     mDescription( NULL ),
+     mDistToListener( 0.f ),
      mTransformScattered( false ),
-     mPlayStartTick( 0 ),
-     mFadeSegmentEase( NULL ),
      mFadeInTime( 0.f ),
      mFadeOutTime( 0.f ),
      mFadeInPoint( -1.f ),
      mFadeOutPoint( -1.f ),
      mFadeSegmentType( FadeSegmentNone ),
+     mFadeSegmentEase( NULL ),
      mFadeSegmentStartPoint( 0.f ),
      mFadeSegmentEndPoint( 0.f ),
      mSavedFadeTime( -1.f ),
-     mDistToListener( 0.f )
+     mPlayStartTick( 0 )
 {
    VECTOR_SET_ASSOCIATION( mParameters );
 }
@@ -232,12 +232,9 @@ SFXSource::SFXSource()
 SFXSource::SFXSource( SFXTrack* track, SFXDescription* description )
    : mStatus( SFXStatusStopped ),
      mSavedStatus( SFXStatusNull ),
+     mStatusCallback( NULL ),
      mTrack( track ),
      mDescription( description ),
-     mStatusCallback( NULL ),
-     mPitch( 1.f ),
-     mModulativePitch( 1.f ),
-     mEffectivePitch( 1.f ),
      mVolume( 1.f ),
      mPreFadeVolume( 1.f ),
      mFadedVolume( 1.f ),
@@ -247,25 +244,28 @@ SFXSource::SFXSource( SFXTrack* track, SFXDescription* description )
      mPriority( 0 ),
      mModulativePriority( 1.f ),
      mEffectivePriority( 0 ),
-     mVelocity( 0, 0, 0 ),
+     mPitch( 1.f ),
+     mModulativePitch( 1.f ),
+     mEffectivePitch( 1.f ),
      mTransform( true ),
+     mVelocity( 0, 0, 0 ),
      mMinDistance( 1 ),
      mMaxDistance( 100 ),
      mConeInsideAngle( 360 ),
      mConeOutsideAngle( 360 ),
      mConeOutsideVolume( 1 ),
+     mDistToListener( 0.f ),
      mTransformScattered( false ),
-     mPlayStartTick( 0 ),
      mFadeInTime( 0.f ),
      mFadeOutTime( 0.f ),
-     mFadeSegmentEase( NULL ),
      mFadeInPoint( -1.f ),
      mFadeOutPoint( -1.f ),
      mFadeSegmentType( FadeSegmentNone ),
+     mFadeSegmentEase( NULL ),
      mFadeSegmentStartPoint( 0.f ),
      mFadeSegmentEndPoint( 0.f ),
      mSavedFadeTime( -1.f ),
-     mDistToListener( 0.f )
+     mPlayStartTick( 0 )
 {
    VECTOR_SET_ASSOCIATION( mParameters );
    
@@ -316,7 +316,7 @@ void SFXSource::initPersistFields()
 
 //-----------------------------------------------------------------------------
 
-bool SFXSource::processArguments( S32 argc, const char **argv )
+bool SFXSource::processArguments( S32 argc, ConsoleValueRef *argv )
 {
    // Don't allow subclasses of this to be created via script.  Force
    // usage of the SFXSystem functions.
@@ -1345,7 +1345,7 @@ void SFXSource::_scatterTransform()
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( SFXSource, play, void, ( F32 fadeInTime ), ( -1.f ),
+DefineEngineMethod( SFXSource, play, void, ( F32 fadeInTime ), ( -1.0f ),
    "Start playback of the source.\n"
    "If the sound data for the source has not yet been fully loaded, there will be a delay after calling "
    "play and playback will start after the data has become available.\n\n"
@@ -1358,7 +1358,7 @@ DefineEngineMethod( SFXSource, play, void, ( F32 fadeInTime ), ( -1.f ),
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( SFXSource, stop, void, ( F32 fadeOutTime ), ( -1.f ),
+DefineEngineMethod( SFXSource, stop, void, ( F32 fadeOutTime ), ( -1.0f ),
    "Stop playback of the source.\n"
    "@param fadeOutTime Seconds for the sound to fade down to zero volume.  If -1, the SFXDescription::fadeOutTime "
       "set in the source's associated description is used.  Pass 0 to disable a fade-out effect that may be "
@@ -1371,7 +1371,7 @@ DefineEngineMethod( SFXSource, stop, void, ( F32 fadeOutTime ), ( -1.f ),
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( SFXSource, pause, void, ( F32 fadeOutTime ), ( -1.f ),
+DefineEngineMethod( SFXSource, pause, void, ( F32 fadeOutTime ), ( -1.0f ),
    "Pause playback of the source.\n"
    "@param fadeOutTime Seconds for the sound to fade down to zero volume.  If -1, the SFXDescription::fadeOutTime "
       "set in the source's associated description is used.  Pass 0 to disable a fade-out effect that may be "
@@ -1569,21 +1569,24 @@ static ConsoleDocFragment _sSetTransform2(
    "void setTransform( Point3F position, Point3F direction )"
 );
 
-ConsoleMethod( SFXSource, setTransform, void, 3, 4,
+DefineConsoleMethod( SFXSource, setTransform, void, ( const char * position, const char * direction ), ( "" ),
    "( vector position [, vector direction ] ) "
    "Set the position and orientation of a 3D sound source.\n"
    "@hide" )
 {
    MatrixF mat = object->getTransform();
 
-   Point3F pos;
-   dSscanf( argv[2], "%g %g %g", &pos.x, &pos.y, &pos.z );
-   mat.setPosition( pos );
+   if(dStrcmp( position , "")!=0 )
+   {
+      Point3F pos;
+      dSscanf( position, "%g %g %g", &pos.x, &pos.y, &pos.z );
+      mat.setPosition( pos );
+   }
    
-   if( argc > 3 )
+   if(dStrcmp( direction ,"")!=0 )
    {
       Point3F dir;
-      dSscanf( argv[ 3 ], "%g %g %g", &dir.x, &dir.y, &dir.z );
+      dSscanf( direction, "%g %g %g", &dir.x, &dir.y, &dir.z );
       mat.setColumn( 1, dir );
    }
    

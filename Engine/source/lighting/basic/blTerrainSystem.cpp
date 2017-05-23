@@ -158,8 +158,10 @@ public:
 blTerrainProxy::blTerrainProxy( SceneObject *obj ) :
    Parent( obj ),
    mLightMapSize( getObject()->getLightMapSize() ),
+   mShadowVolume( NULL ),
    mTerrainBlockSize( getObject()->getBlockSize() ),
-   mLightmap( NULL )
+   mLightmap( NULL ),
+   sgBakedLightmap( NULL )
 {
 }
 
@@ -522,9 +524,6 @@ void blTerrainProxy::lightVector(LightInfo * light)
    // Get the ratio between the light map pixel and world space (used below)   
    F32 lmTerrRatio = (F32)mTerrainBlockSize / (F32) mLightMapSize;
    lmTerrRatio *= terrain->getSquareSize();
-
-   // Get the terrain position
-   Point3F terrPos( terrain->getTransform().getPosition() );
 
    U32 i = 0;
    for (U32 y = 0; y < mLightMapSize; y++)

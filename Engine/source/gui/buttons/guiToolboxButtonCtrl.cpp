@@ -24,6 +24,7 @@
 #include "gui/buttons/guiToolboxButtonCtrl.h"
 
 #include "console/console.h"
+#include "console/engineAPI.h"
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxDrawUtil.h"
 #include "console/consoleTypes.h"
@@ -42,7 +43,7 @@ ConsoleDocClass( GuiToolboxButtonCtrl,
 //-------------------------------------
 GuiToolboxButtonCtrl::GuiToolboxButtonCtrl()
 {
-   mNormalBitmapName = StringTable->insert("");
+   mNormalBitmapName = StringTable->EmptyString();
    mLoweredBitmapName = StringTable->insert("sceneeditor/client/images/buttondown");
    mHoverBitmapName = StringTable->insert("sceneeditor/client/images/buttonup");
    setMinExtent(Point2I(16,16));
@@ -91,19 +92,19 @@ void GuiToolboxButtonCtrl::onSleep()
 
 //-------------------------------------
 
-ConsoleMethod( GuiToolboxButtonCtrl, setNormalBitmap, void, 3, 3, "( filepath name ) sets the bitmap that shows when the button is active")
+DefineConsoleMethod( GuiToolboxButtonCtrl, setNormalBitmap, void, ( const char * name ), , "( filepath name ) sets the bitmap that shows when the button is active")
 {
-   object->setNormalBitmap(argv[2]);
+   object->setNormalBitmap(name);
 }
 
-ConsoleMethod( GuiToolboxButtonCtrl, setLoweredBitmap, void, 3, 3, "( filepath name ) sets the bitmap that shows when the button is disabled")
+DefineConsoleMethod( GuiToolboxButtonCtrl, setLoweredBitmap, void, ( const char * name ), , "( filepath name ) sets the bitmap that shows when the button is disabled")
 {
-   object->setLoweredBitmap(argv[2]);
+   object->setLoweredBitmap(name);
 }
 
-ConsoleMethod( GuiToolboxButtonCtrl, setHoverBitmap, void, 3, 3, "( filepath name ) sets the bitmap that shows when the button is disabled")
+DefineConsoleMethod( GuiToolboxButtonCtrl, setHoverBitmap, void, ( const char * name ), , "( filepath name ) sets the bitmap that shows when the button is disabled")
 {
-   object->setHoverBitmap(argv[2]);
+   object->setHoverBitmap(name);
 }
 
 //-------------------------------------

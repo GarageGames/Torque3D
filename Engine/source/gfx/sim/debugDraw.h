@@ -105,7 +105,9 @@ public:
    static void init();
 
    /// Called globally to render debug draw state. Also does state updates.
-   void render();
+   void render(bool clear=true);
+
+   bool willDraw() { return isDrawing && mHead; }
 
    void toggleFreeze()  { shouldToggleFreeze = true; };
    void toggleDrawing() 
@@ -120,11 +122,17 @@ public:
    ///
    /// @{
 
+   void drawBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
+   void drawTransformedBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color, const MatrixF& transform);
+
    void drawBox(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
-   void drawLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));	
+   void drawLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
    void drawTri(const Point3F &a, const Point3F &b, const Point3F &c, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
    void drawText(const Point3F& pos, const String& text, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
-
+   void drawCapsule(const Point3F &a, const F32 &radius, const F32 &height, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
+   void drawDirectionLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
+   void drawOutlinedText(const Point3F& pos, const String& text, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f), const ColorF &colorOutline = ColorF(0.0f, 0.0f, 0.0f));
+   
    /// Render a wireframe view of the given polyhedron.
    void drawPolyhedron( const AnyPolyhedron& polyhedron, const ColorF& color = ColorF( 1.f, 1.f, 1.f ) );
 
@@ -140,7 +148,8 @@ public:
    /// Set the TTL for the last item we entered...
    ///
    /// Primitives default to lasting one frame (ie, ttl=0)
-   enum {
+   enum : U32
+   {
       DD_INFINITE = U32_MAX
    };
    // How long should this primitive be draw for, 0 = one frame, DD_INFINITE = draw forever
@@ -161,6 +170,7 @@ private:
    {
       /// Color used for this primitive.
       ColorF color;
+      ColorF color2;
 
       /// Points used to store positional data. Exact semantics determined by type.
       Point3F a, b, c;
@@ -168,8 +178,11 @@ private:
          Tri,
          Box,
          Line,
-         Text
-      } type;	   ///< Type of the primitive. The meanings of a,b,c are determined by this.
+         Text,
+         DirectionLine,
+         OutlinedText,
+         Capsule,
+      } type;      ///< Type of the primitive. The meanings of a,b,c are determined by this.
 
       SimTime dieTime;   ///< Time at which we should remove this from the list.
       bool useZ; ///< If true, do z-checks for this primitive.      
@@ -188,6 +201,7 @@ private:
 
    GFXStateBlockRef mRenderZOffSB;
    GFXStateBlockRef mRenderZOnSB;
+   GFXStateBlockRef mRenderAlpha;
 
    Resource<GFont> mFont;
 

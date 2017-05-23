@@ -24,7 +24,7 @@
 #define _COLLADA_APPMESH_H_
 
 #ifndef _TDICTIONARY_H_
-#include "core/tDictionary.h"
+#include "core/util/tDictionary.h"
 #endif
 #ifndef _APPMESH_H_
 #include "ts/loader/appMesh.h"
@@ -109,11 +109,11 @@ protected:
    bool checkGeometryType(const daeElement* element);
    void getPrimitives(const domGeometry* geometry);
 
-   void getVertexData(  const domGeometry* geometry, F32 time, const MatrixF& objectOffset,
+   void getVertexData(  const domGeometry* geometry, F32 time, const MatrixF& objOffset,
                         Vector<Point3F>& points, Vector<Point3F>& norms, Vector<ColorI>& colors, 
                         Vector<Point2F>& uvs, Vector<Point2F>& uv2s, bool appendValues);
 
-   void getMorphVertexData(   const domMorph* morph, F32 time, const MatrixF& objectOffset,
+   void getMorphVertexData(   const domMorph* morph, F32 time, const MatrixF& objOffset,
                               Vector<Point3F>& points, Vector<Point3F>& norms, Vector<ColorI>& colors,
                               Vector<Point2F>& uvs, Vector<Point2F>& uv2s );
 
@@ -211,8 +211,8 @@ public:
    /// Generate the vertex, normal and triangle data for the mesh.
    ///
    /// @param time           Time at which to generate the mesh data
-   /// @param objectOffset   Transform to apply to the generated data (bounds transform)
-   void lockMesh(F32 time, const MatrixF& objectOffset);
+   /// @param objOffset      Transform to apply to the generated data (bounds transform)
+   void lockMesh(F32 time, const MatrixF& objOffset);
 
    /// Get the transform of this mesh at a certain time
    ///

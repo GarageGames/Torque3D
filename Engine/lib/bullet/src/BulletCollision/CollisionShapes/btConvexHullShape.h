@@ -36,7 +36,7 @@ public:
 	///btConvexHullShape make an internal copy of the points.
 	btConvexHullShape(const btScalar* points=0,int numPoints=0, int stride=sizeof(btVector3));
 
-	void addPoint(const btVector3& point);
+	void addPoint(const btVector3& point, bool recalculateLocalAabb = true);
 
 	
 	btVector3* getUnscaledPoints()
@@ -55,9 +55,8 @@ public:
 		return getUnscaledPoints();
 	}
 
-	
-
-
+    void optimizeConvexHull();
+    
 	SIMD_FORCE_INLINE	btVector3 getScaledPoint(int i) const
 	{
 		return m_unscaledPoints[i] * m_localScaling;

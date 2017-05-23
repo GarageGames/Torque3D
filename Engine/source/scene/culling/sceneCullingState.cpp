@@ -49,8 +49,8 @@ F32 SceneCullingState::smOccluderMinHeightPercentage = 0.1f;
 SceneCullingState::SceneCullingState( SceneManager* sceneManager, const SceneCameraState& viewState )
    : mSceneManager( sceneManager ),
      mCameraState( viewState ),
-     mDisableZoneCulling( smDisableZoneCulling ),
-     mDisableTerrainOcclusion( smDisableTerrainOcclusion )
+     mDisableTerrainOcclusion( smDisableTerrainOcclusion ),
+     mDisableZoneCulling( smDisableZoneCulling )
 {
    AssertFatal( sceneManager->getZoneManager(), "SceneCullingState::SceneCullingState - SceneManager must have a zone manager!" );
 
@@ -88,6 +88,8 @@ SceneCullingState::SceneCullingState( SceneManager* sceneManager, const SceneCam
       SceneCullingVolume::Includer,
       PlaneSetF( planes, 4 )
    );
+
+   clearExtraPlanesCull();
 }
 
 //-----------------------------------------------------------------------------
@@ -382,11 +384,6 @@ bool SceneCullingState::createCullingVolume( const Point3F* vertices, U32 numVer
 
          if( cosAngle > 0.1f )
             continue;
-
-         //TODO
-
-         const Point3F addNormals = currentPlane + lastPlane;
-         const Point3F crossNormals = mCross( currentPlane, lastPlane );
 
          Point3F newNormal = currentPlane + lastPlane;//addNormals - mDot( addNormals, crossNormals ) * crossNormals;
 
@@ -790,6 +787,9 @@ U32 SceneCullingState::cullObjects( SceneObject** objects, U32 numObjects, U32 c
       }
 
       if( !isCulled )
+         isCulled = isOccludedWithExtraPlanesCull( object->getWorldBox() );
+
+      if( !isCulled )
          objects[ numRemainingObjects ++ ] = object;
    }
 
@@ -815,8 +815,10 @@ bool SceneCullingState::isOccludedByTerrain( SceneObject* object ) const
       if( !terrain )
          continue;
 
+      MatrixF terrWorldTransform = terrain->getWorldTransform();
+
       Point3F localCamPos = getCameraState().getViewPosition();
-      terrain->getWorldTransform().mulP( localCamPos );
+      terrWorldTransform.mulP(localCamPos);
       F32 height;
       terrain->getHeight( Point2F( localCamPos.x, localCamPos.y ), &height );
       bool aboveTerrain = ( height <= localCamPos.z );
@@ -837,10 +839,10 @@ bool SceneCullingState::isOccludedByTerrain( SceneObject* object ) const
       Point3F ll(rBox.maxExtents.x, rBox.minExtents.y, rBox.maxExtents.z);
       Point3F lr(rBox.maxExtents.x, rBox.maxExtents.y, rBox.maxExtents.z);
 
-      terrain->getWorldTransform().mulP(ul);
-      terrain->getWorldTransform().mulP(ur);
-      terrain->getWorldTransform().mulP(ll);
-      terrain->getWorldTransform().mulP(lr);
+      terrWorldTransform.mulP(ul);
+      terrWorldTransform.mulP(ur);
+      terrWorldTransform.mulP(ll);
+      terrWorldTransform.mulP(lr);
 
       Point3F xBaseL0_s = ul - localCamPos;
       Point3F xBaseL0_e = lr - localCamPos;

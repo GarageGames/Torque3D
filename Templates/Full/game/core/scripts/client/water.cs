@@ -34,6 +34,14 @@ singleton ShaderData( WaterShader )
    OGLVertexShaderFile = "shaders/common/water/gl/waterV.glsl";
    OGLPixelShaderFile = "shaders/common/water/gl/waterP.glsl";
    
+   samplerNames[0] = "$bumpMap";  // noise
+   samplerNames[1] = "$deferredTex";  // #deferred
+   samplerNames[2] = "$reflectMap"; // $reflectbuff
+   samplerNames[3] = "$refractBuff";  // $backbuff
+   samplerNames[4] = "$skyMap";  // $cubemap   
+   samplerNames[5] = "$foamMap";  // foam     
+   samplerNames[6] = "$depthGradMap"; // depthMap ( color gradient ) 
+   
    pixVersion = 3.0;
 };
 
@@ -53,7 +61,7 @@ singleton GFXStateBlockData( WaterStateBlock )
 {
    samplersDefined = true;
    samplerStates[0] = WaterSampler;  // noise
-   samplerStates[1] = SamplerClampPoint;  // #prepass
+   samplerStates[1] = SamplerClampPoint;  // #deferred
    samplerStates[2] = SamplerClampLinear; // $reflectbuff
    samplerStates[3] = SamplerClampPoint;  // $backbuff
    samplerStates[4] = SamplerWrapLinear;  // $cubemap   
@@ -70,9 +78,17 @@ singleton GFXStateBlockData( UnderWaterStateBlock : WaterStateBlock )
 
 singleton CustomMaterial( WaterMat )
 {   
-   sampler["prepassTex"] = "#prepass";
+   sampler["deferredTex"] = "#deferred";
    sampler["reflectMap"] = "$reflectbuff";
    sampler["refractBuff"] = "$backbuff";
+   // These samplers are set in code not here.
+   // This is to allow different WaterObject instances
+   // to use this same material but override these textures
+   // per instance.
+   //sampler["bumpMap"] = "";    
+   //sampler["skyMap"] = "";
+   //sampler["foamMap"] = "";  
+   //sampler["depthGradMap"] = "";
    
    shader = WaterShader;
    stateBlock = WaterStateBlock;
@@ -85,16 +101,9 @@ singleton CustomMaterial( WaterMat )
 // Underwater
 //-----------------------------------------------------------------------------
 
-singleton ShaderData( UnderWaterShader )
+singleton ShaderData( UnderWaterShader : WaterShader )
 {
-   DXVertexShaderFile 	= "shaders/common/water/waterV.hlsl";
-   DXPixelShaderFile 	= "shaders/common/water/waterP.hlsl";   
-   
-   OGLVertexShaderFile 	= "shaders/common/water/gl/waterV.glsl";
-   OGLPixelShaderFile 	= "shaders/common/water/gl/waterP.glsl"; 
-   
    defines = "UNDERWATER";   
-   pixVersion = 3.0;
 };
 
 singleton CustomMaterial( UnderwaterMat )
@@ -106,7 +115,7 @@ singleton CustomMaterial( UnderwaterMat )
    //sampler["bumpMap"] = "core/art/water/noise02";
    //sampler["foamMap"] = "core/art/water/foam";
 
-   sampler["prepassTex"] = "#prepass";
+   sampler["deferredTex"] = "#deferred";
    sampler["refractBuff"] = "$backbuff";   
    
    shader = UnderWaterShader;
@@ -125,8 +134,14 @@ singleton ShaderData( WaterBasicShader )
    DXVertexShaderFile 	= "shaders/common/water/waterBasicV.hlsl";
    DXPixelShaderFile 	= "shaders/common/water/waterBasicP.hlsl";
    
-   OGLVertexShaderFile 	= "shaders/common/water/gl/waterBasicV.glsl";
-   OGLPixelShaderFile 	= "shaders/common/water/gl/waterBasicP.glsl"; 
+   OGLVertexShaderFile  = "shaders/common/water/gl/waterBasicV.glsl";
+   OGLPixelShaderFile   = "shaders/common/water/gl/waterBasicP.glsl"; 
+   
+   samplerNames[0] = "$bumpMap";
+   samplerNames[2] = "$reflectMap";
+   samplerNames[3] = "$refractBuff";
+   samplerNames[4] = "$skyMap";
+   samplerNames[5] = "$depthGradMap";
    
    pixVersion = 2.0;
 };
@@ -156,7 +171,7 @@ singleton CustomMaterial( WaterBasicMat )
    //sampler["bumpMap"] = "core/art/water/noise02";
    //sampler["skyMap"] = "$cubemap";   
    
-   //sampler["prepassTex"] = "#prepass";
+   //sampler["deferredTex"] = "#deferred";
    sampler["reflectMap"] = "$reflectbuff";
    sampler["refractBuff"] = "$backbuff";
     
@@ -170,16 +185,9 @@ singleton CustomMaterial( WaterBasicMat )
 // Basic UnderWater
 //-----------------------------------------------------------------------------
 
-singleton ShaderData( UnderWaterBasicShader )
+singleton ShaderData( UnderWaterBasicShader : WaterBasicShader)
 {
-   DXVertexShaderFile 	= "shaders/common/water/waterBasicV.hlsl";
-   DXPixelShaderFile 	= "shaders/common/water/waterBasicP.hlsl";   
-   
-   OGLVertexShaderFile 	= "shaders/common/water/gl/waterBasicV.glsl";
-   OGLPixelShaderFile 	= "shaders/common/water/gl/waterBasicP.glsl";
-   
    defines = "UNDERWATER";   
-   pixVersion = 2.0;
 };
 
 singleton CustomMaterial( UnderwaterBasicMat )
@@ -191,7 +199,7 @@ singleton CustomMaterial( UnderwaterBasicMat )
    //sampler["bumpMap"] = "core/art/water/noise02";
    //samplers["skyMap"] = "$cubemap";  
 
-   //sampler["prepassTex"] = "#prepass";
+   //sampler["deferredTex"] = "#deferred";
    sampler["refractBuff"] = "$backbuff";
    
    shader = UnderWaterBasicShader;
