@@ -1195,6 +1195,9 @@ NetObject *NetConnection::resolveObjectFromGhostIndex(S32 id)
 
 S32 NetConnection::getGhostIndex(NetObject *obj)
 {
+   if (!obj)
+      return -1;
+
    if(!isGhostingFrom())
       return obj->mNetIndex;
    S32 index = obj->getId() & (GhostLookupTableSize - 1);
