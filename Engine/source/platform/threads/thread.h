@@ -40,6 +40,11 @@
 // Forward ref used by platform code
 class PlatformThreadData;
 
+#if defined(_WIN64)
+typedef U64 ThreadIdent;
+#else
+typedef U32 ThreadIdent;
+#endif 
 
 // Typedefs
 typedef void (*ThreadRunFunction)(void *data);
@@ -110,7 +115,7 @@ public:
    bool isAlive();
 
    /// Returns the platform specific thread id for this thread.
-   U32 getId();
+   ThreadIdent getId();
 };
 
 
@@ -152,18 +157,18 @@ public:
    static bool isMainThread();
 
    /// Returns true if threadId is the same as the calling thread's id.
-   static bool isCurrentThread(U32 threadId);
+   static bool isCurrentThread(ThreadIdent threadId);
 
    /// Returns true if the 2 thread ids represent the same thread. Some thread
    /// APIs return an opaque object as a thread id, so the == operator cannot
    /// reliably compare thread ids.
    // this comparator is needed by pthreads and ThreadManager.
-   static bool compare(U32 threadId_1, U32 threadId_2);
+   static bool compare(ThreadIdent threadId_1, ThreadIdent threadId_2);
       
    /// Returns the platform specific thread id of the calling thread. Some 
    /// platforms do not guarantee that this ID stays the same over the life of 
    /// the thread, so use ThreadManager::compare() to compare thread ids.
-   static U32 getCurrentThreadId();
+   static ThreadIdent getCurrentThreadId();
 
    /// Returns the platform specific thread id ot the main thread.
    static U32 getMainThreadId() { return smMainThreadId.get(); }
@@ -236,9 +241,9 @@ inline bool ThreadManager::isMainThread()
    return compare( ThreadManager::getCurrentThreadId(), smMainThreadId.get() );
 }
 
-inline bool ThreadManager::isCurrentThread(U32 threadId)
+inline bool ThreadManager::isCurrentThread(ThreadIdent threadId)
 {
-   U32 current = getCurrentThreadId();
+   ThreadIdent current = getCurrentThreadId();
    return compare(current, threadId);
 }
 

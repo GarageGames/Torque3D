@@ -44,7 +44,7 @@ public:
    Thread*                 mThread;
    HANDLE                  mThreadHnd;
    Semaphore               mGateway;
-   U32                     mThreadID;
+   ThreadIdent             mThreadID;
    U32                     mDead;
 
    PlatformThreadData()
@@ -158,7 +158,7 @@ bool Thread::isAlive()
    return ( !mData->mDead );
 }
 
-U32 Thread::getId()
+ThreadIdent Thread::getId()
 {
    return mData->mThreadID;
 }
@@ -198,12 +198,12 @@ void Thread::_setName( const char* name )
 #endif
 }
 
-U32 ThreadManager::getCurrentThreadId()
+ThreadIdent ThreadManager::getCurrentThreadId()
 {
    return GetCurrentThreadId();
 }
 
-bool ThreadManager::compare(U32 threadId_1, U32 threadId_2)
+bool ThreadManager::compare(ThreadIdent threadId_1, ThreadIdent threadId_2)
 {
    return (threadId_1 == threadId_2);
 }
