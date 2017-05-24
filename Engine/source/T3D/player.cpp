@@ -2498,6 +2498,9 @@ AngAxisF gPlayerMoveRot;
 
 void Player::updateMove(const Move* move)
 {
+   if ( !getControllingClient() && isGhost() )
+      return;
+      
    delta.move = *move;
 
 #ifdef TORQUE_OPENVR
