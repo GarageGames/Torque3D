@@ -1873,7 +1873,6 @@ void Vehicle::updateDamageSmoke( F32 dt )
                }
             }
          }
-         break;
       }
    }
 
