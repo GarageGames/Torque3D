@@ -42,7 +42,6 @@ void BumpFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList,
    // Output the texture coord.
    getOutTexCoord(   "texCoord", 
                      "vec2", 
-                     true, 
                      useTexAnim, 
                      meta, 
                      componentList );
@@ -64,7 +63,7 @@ void BumpFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
 	output = meta;
 
    // Get the texture coord.
-   Var *texCoord = getInTexCoord( "texCoord", "vec2", true, componentList );
+   Var *texCoord = getInTexCoord( "texCoord", "vec2", componentList );
 
    // Sample the bumpmap.
    Var *bumpMap = getNormalMapTex();
@@ -156,7 +155,7 @@ void BumpFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
       bumpMap->sampler = true;
       bumpMap->constNum = Var::getTexUnitNum();
 		
-      texCoord = getInTexCoord( "detCoord", "vec2", true, componentList );
+      texCoord = getInTexCoord( "detCoord", "vec2", componentList );
       texOp = new GenOp( "tex2D(@, @)", bumpMap, texCoord );
 		
       Var *detailBump = new Var;
@@ -267,7 +266,6 @@ void ParallaxFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
    // Add the texture coords.
    getOutTexCoord(   "texCoord", 
                      "vec2", 
-						true, 
 						fd.features[MFT_TexAnim], 
 						meta, 
 						componentList );
@@ -312,7 +310,7 @@ void ParallaxFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
 	
    // Order matters... get this first!
-   Var *texCoord = getInTexCoord( "texCoord", "vec2", true, componentList );
+   Var *texCoord = getInTexCoord( "texCoord", "vec2", componentList );
 	
    ShaderConnector *connectComp = dynamic_cast<ShaderConnector *>( componentList[C_CONNECTOR] );
 	
@@ -408,7 +406,6 @@ void NormalsOutFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList,
    outNormal->setName( "wsNormal" );
    outNormal->setStructName( "OUT" );
    outNormal->setType( "vec3" );
-   outNormal->mapsToSampler = false;
 	
    // Find the incoming vertex normal.
    Var *inNormal = (Var*)LangElement::find( "normal" );   

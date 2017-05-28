@@ -37,7 +37,6 @@
 #include "windowManager/platformWindow.h"
 #include "gfx/D3D11/screenshotD3D11.h"
 #include "materials/shaderData.h"
-#include <d3d9.h> //ok now stressing out folks, this is just for debug events(D3DPER) :)
 
 #ifdef TORQUE_DEBUG
 #include "d3d11sdklayers.h"
@@ -89,6 +88,7 @@ GFXD3D11Device::GFXD3D11Device(U32 index)
 
    mAdapterIndex = index;
    mD3DDevice = NULL;
+   mUserAnnotation = NULL;
    mVolatileVB = NULL;
 
    mCurrentPB = NULL;
@@ -161,6 +161,7 @@ GFXD3D11Device::~GFXD3D11Device()
    SAFE_RELEASE(mDeviceBackBufferView);
    SAFE_RELEASE(mDeviceDepthStencil);
    SAFE_RELEASE(mDeviceBackbuffer);
+   SAFE_RELEASE(mUserAnnotation);
    SAFE_RELEASE(mD3DDeviceContext);
 
    SAFE_DELETE(mCardProfiler);
@@ -1685,30 +1686,32 @@ GFXCubemap * GFXD3D11Device::createCubemap()
    return cube;
 }
 
+// Debug events
 //------------------------------------------------------------------------------
 void GFXD3D11Device::enterDebugEvent(ColorI color, const char *name)
 {
-   // BJGFIX
-   WCHAR  eventName[260];
-   MultiByteToWideChar(CP_ACP, 0, name, -1, eventName, 260);
-
-   D3DPERF_BeginEvent(D3DCOLOR_ARGB(color.alpha, color.red, color.green, color.blue),
-      (LPCWSTR)&eventName);
+   if (mUserAnnotation)
+   {
+      WCHAR  eventName[260];
+      MultiByteToWideChar(CP_ACP, 0, name, -1, eventName, 260);
+      mUserAnnotation->BeginEvent(eventName);
+   }
 }
 
 //------------------------------------------------------------------------------
 void GFXD3D11Device::leaveDebugEvent()
 {
-   D3DPERF_EndEvent();
+   if (mUserAnnotation)
+      mUserAnnotation->EndEvent();
 }
 
 //------------------------------------------------------------------------------
 void GFXD3D11Device::setDebugMarker(ColorI color, const char *name)
 {
-   // BJGFIX
-   WCHAR  eventName[260];
-   MultiByteToWideChar(CP_ACP, 0, name, -1, eventName, 260);
-
-   D3DPERF_SetMarker(D3DCOLOR_ARGB(color.alpha, color.red, color.green, color.blue),
-      (LPCWSTR)&eventName);
+   if (mUserAnnotation)
+   {
+      WCHAR  eventName[260];
+      MultiByteToWideChar(CP_ACP, 0, name, -1, eventName, 260);
+      mUserAnnotation->SetMarker(eventName);
+   }
 }

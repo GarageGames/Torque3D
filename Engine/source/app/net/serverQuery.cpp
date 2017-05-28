@@ -2113,12 +2113,6 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
          return;
       }
 
-      if ( sActiveFilter.filterFlags & ServerFilter::NotXenon && si->isXenon() )
-      {
-         Con::printf( "Server %s filtered out by no-xenon flag.", addrString );
-         removeServerInfo( address );
-         return;
-      }
    }
    si->status.set( ServerInfo::Status_Responded );
 

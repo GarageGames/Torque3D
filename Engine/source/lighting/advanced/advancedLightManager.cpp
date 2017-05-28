@@ -116,23 +116,23 @@ void AdvancedLightManager::activate( SceneManager *sceneManager )
    mLightBinManager->assignName( "AL_LightBinMgr" );
 
    // First look for the deferred bin...
-   RenderDeferredMgr *prePassBin = _findDeferredRenderBin();
+   RenderDeferredMgr *deferredBin = _findDeferredRenderBin();
 
    // If we didn't find the deferred bin then add one.
-   if ( !prePassBin )
+   if ( !deferredBin )
    {
-      prePassBin = new RenderDeferredMgr( true, blendTargetFormat );
-      prePassBin->assignName( "AL_DeferredBin" );
-      prePassBin->registerObject();
-      getSceneManager()->getDefaultRenderPass()->addManager( prePassBin );
-      mDeferredRenderBin = prePassBin;
+      deferredBin = new RenderDeferredMgr( true, blendTargetFormat );
+      deferredBin->assignName( "AL_DeferredBin" );
+      deferredBin->registerObject();
+      getSceneManager()->getDefaultRenderPass()->addManager( deferredBin );
+      mDeferredRenderBin = deferredBin;
    }
 
    // Tell the material manager that deferred is enabled.
    MATMGR->setDeferredEnabled( true );
 
    // Insert our light bin manager.
-   mLightBinManager->setRenderOrder( prePassBin->getRenderOrder() + 0.01f );
+   mLightBinManager->setRenderOrder( deferredBin->getRenderOrder() + 0.01f );
    getSceneManager()->getDefaultRenderPass()->addManager( mLightBinManager );
 
    AdvancedLightingFeatures::registerFeatures(mDeferredRenderBin->getTargetFormat(), mLightBinManager->getTargetFormat());

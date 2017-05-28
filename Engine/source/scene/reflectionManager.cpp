@@ -282,18 +282,10 @@ GFXTextureObject* ReflectionManager::getRefractTex( bool forceUpdate )
    GFXFormat targetFormat = target->getFormat();
    const Point2I &targetSize = target->getSize();
 
-   U32 desWidth, desHeight;
    // D3D11 needs to be the same size as the active target
-   if (GFX->getAdapterType() == Direct3D11)
-   {
-      desWidth = targetSize.x;
-      desHeight = targetSize.y;
-   }
-   else
-   {
-      desWidth = mFloor((F32)targetSize.x * smRefractTexScale);
-      desHeight = mFloor((F32)targetSize.y * smRefractTexScale);
-   }
+   U32 desWidth = targetSize.x;
+   U32 desHeight = targetSize.y;
+
 
    if ( mRefractTex.isNull() || 
         mRefractTex->getWidth() != desWidth ||

@@ -1029,7 +1029,21 @@ Var* LinearEyeDepthConditioner::printMethodHeader( MethodType methodType, const 
       Var *deferredSampler = new Var;
       deferredSampler->setName("deferredSamplerVar");
       deferredSampler->setType("sampler2D");
-      DecOp *deferredSamplerDecl = new DecOp(deferredSampler);
+      DecOp *deferredSamplerDecl = NULL;
+
+      Var *deferredTex = NULL;
+      DecOp *deferredTexDecl = NULL;
+      if (GFX->getAdapterType() == Direct3D11)
+      {
+         deferredSampler->setType("SamplerState");
+
+         deferredTex = new Var;
+         deferredTex->setName("deferredTexVar");
+         deferredTex->setType("Texture2D");
+         deferredTexDecl = new DecOp(deferredTex);
+      }
+
+      deferredSamplerDecl = new DecOp(deferredSampler);
 
       Var *screenUV = new Var;
       screenUV->setName("screenUVVar");

@@ -23,7 +23,7 @@
 #ifndef _GFXD3D11DEVICE_H_
 #define _GFXD3D11DEVICE_H_
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 
 #include "platform/tmm_off.h"
 #include "platformWin32/platformWin32.h"
@@ -126,6 +126,7 @@ protected:
    IDXGISwapChain *mSwapChain;
    ID3D11Device* mD3DDevice;
    ID3D11DeviceContext* mD3DDeviceContext;
+   ID3DUserDefinedAnnotation* mUserAnnotation;
 
    GFXShader* mCurrentShader;
    GFXShaderRef mGenericShader[GS_COUNT];

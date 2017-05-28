@@ -333,7 +333,6 @@ Var* ShaderFeatureGLSL::getOutViewToTangent( Vector<ShaderComponent*> &component
 
 Var* ShaderFeatureGLSL::getOutTexCoord(   const char *name,
                                           const char *type,
-                                          bool mapsToSampler,
                                           bool useTexAnim,
                                           MultiLine *meta,
                                           Vector<ShaderComponent*> &componentList )
@@ -351,7 +350,6 @@ Var* ShaderFeatureGLSL::getOutTexCoord(   const char *name,
       texCoord->setName( outTexName );
       texCoord->setStructName( "OUT" );
       texCoord->setType( type );
-      texCoord->mapsToSampler = mapsToSampler;
 
       if( useTexAnim )
       {
@@ -386,7 +384,6 @@ Var* ShaderFeatureGLSL::getOutTexCoord(   const char *name,
 
 Var* ShaderFeatureGLSL::getInTexCoord( const char *name,
                                        const char *type,
-                                       bool mapsToSampler,
                                        Vector<ShaderComponent*> &componentList )
 {
    Var* texCoord = (Var*)LangElement::find( name );
@@ -397,7 +394,6 @@ Var* ShaderFeatureGLSL::getInTexCoord( const char *name,
       texCoord->setName( name );
       texCoord->setStructName( "IN" );
       texCoord->setType( type );
-      texCoord->mapsToSampler = mapsToSampler;
    }
 
    AssertFatal( dStrcmp( type, (const char*)texCoord->type ) == 0, 
@@ -447,7 +443,6 @@ Var* ShaderFeatureGLSL::addOutVpos( MultiLine *meta,
       outVpos->setName( "outVpos" );
       outVpos->setStructName( "OUT" );
       outVpos->setType( "vec4" );
-      outVpos->mapsToSampler = false;
 
       Var *outPosition = (Var*) LangElement::find( "gl_Position" );
       AssertFatal( outPosition, "ShaderFeatureGLSL::addOutVpos - Didn't find the output position." );
@@ -725,7 +720,6 @@ Var* ShaderFeatureGLSL::addOutWsPosition( Vector<ShaderComponent*> &componentLis
       outWsPosition->setName( "outWsPosition" );
       outWsPosition->setStructName( "OUT" );
       outWsPosition->setType( "vec3" );
-      outWsPosition->mapsToSampler = false;
 		
       getWsPosition( componentList, useInstancing, meta, outWsPosition );
    }
@@ -797,7 +791,6 @@ Var* ShaderFeatureGLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
 	outTex->setName( "detCoord" );
    outTex->setStructName( "OUT" );
    outTex->setType( "vec2" );
-	outTex->mapsToSampler = true;
 	
 	if ( useTexAnim )
 	{
@@ -841,7 +834,6 @@ void DiffuseMapFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
    getOutTexCoord(   "texCoord", 
                      "vec2", 
-                     true, 
                      fd.features[MFT_TexAnim], 
                      meta, 
                      componentList );
@@ -857,7 +849,7 @@ void DiffuseMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
                                        const MaterialFeatureData &fd )
 {
    // grab connector texcoord register
-   Var *inTex = getInTexCoord( "texCoord", "vec2", true, componentList );
+   Var *inTex = getInTexCoord( "texCoord", "vec2", componentList );
 
    //determine output target
    ShaderFeature::OutputTarget targ = ShaderFeature::DefaultTarget;
@@ -1023,7 +1015,6 @@ void OverlayTexFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList,
    outTex->setName( "outTexCoord2" );
    outTex->setStructName( "OUT" );
    outTex->setType( "vec2" );
-   outTex->mapsToSampler = true;
 
    if( fd.features[MFT_TexAnim] )
    {
@@ -1058,7 +1049,6 @@ void OverlayTexFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    inTex->setName( "texCoord2" );
    inTex->setStructName( "IN" );
    inTex->setType( "vec2" );
-   inTex->mapsToSampler = true;
 
    // create texture var
    Var *diffuseMap = new Var;
@@ -1219,7 +1209,6 @@ void LightmapFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
    outTex->setName( "texCoord2" );
    outTex->setStructName( "OUT" );
    outTex->setType( "vec2" );
-   outTex->mapsToSampler = true;
 
    // setup language elements to output incoming tex coords to output
    output = new GenOp( "   @ = @;\r\n", outTex, inTex );
@@ -1234,7 +1223,6 @@ void LightmapFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    inTex->setName( "texCoord2" );
    inTex->setStructName( "IN" );
    inTex->setType( "vec2" );
-   inTex->mapsToSampler = true;
 
    // create texture var
    Var *lightMap = new Var;
@@ -1343,7 +1331,6 @@ void TonemapFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
       outTex2->setName( "texCoord2" );
       outTex2->setStructName( "OUT" );
       outTex2->setType( "vec2" );
-      outTex2->mapsToSampler = true;
 
       output = new GenOp( "   @ = @;\r\n", outTex2, inTex2 );
    }
@@ -1359,7 +1346,6 @@ void TonemapFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    inTex2->setName( "texCoord2" );
    inTex2->setStructName( "IN" );
    inTex2->setType( "vec2" );
-   inTex2->mapsToSampler = true;
 
    // create texture var
    Var *toneMap = new Var;
@@ -1596,7 +1582,7 @@ void DetailFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
                                  const MaterialFeatureData &fd )
 {
    // Get the detail texture coord.
-   Var *inTex = getInTexCoord( "detCoord", "vec2", true, componentList );
+   Var *inTex = getInTexCoord( "detCoord", "vec2", componentList );
 
    // create texture var
    Var *detailMap = new Var;
@@ -1715,7 +1701,6 @@ void ReflectCubeFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
          outTex->setName( "texCoord" );
          outTex->setStructName( "OUT" );
          outTex->setType( "vec2" );
-         outTex->mapsToSampler = true;
 
          // setup language elements to output incoming tex coords to output
          meta->addStatement( new GenOp( "   @ = @;\r\n", outTex, inTex ) );
@@ -1771,7 +1756,6 @@ void ReflectCubeFeatGLSL::processVert( Vector<ShaderComponent*> &componentList,
    reflectVec->setName( "reflectVec" );
     reflectVec->setStructName( "OUT" );
     reflectVec->setType( "vec3" );
-   reflectVec->mapsToSampler = true;
 
    meta->addStatement( new GenOp( "   @ = reflect(@, @);\r\n", reflectVec, eyeToVert, cubeNormal ) );
 
@@ -1794,7 +1778,7 @@ void ReflectCubeFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
           fd.materialFeatures[MFT_NormalMap] )
       {
          // grab connector texcoord register
-         Var *inTex = getInTexCoord( "texCoord", "vec2", true, componentList );
+         Var *inTex = getInTexCoord( "texCoord", "vec2", componentList );
       
          // create texture var
          Var *newMap = new Var;
@@ -1833,7 +1817,6 @@ void ReflectCubeFeatGLSL::processPix(  Vector<ShaderComponent*> &componentList,
    reflectVec->setName( "reflectVec" );
    reflectVec->setStructName( "IN" );
    reflectVec->setType( "vec3" );
-   reflectVec->mapsToSampler = true;
 
    // create cubemap var
    Var *cubeMap = new Var;
@@ -2007,7 +1990,6 @@ void RTLightingFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList,
          outNormal->setName( "wsNormal" );
          outNormal->setStructName( "OUT" );
          outNormal->setType( "vec3" );
-         outNormal->mapsToSampler = false;
 			
          // Transform the normal to world space.
          meta->addStatement( new GenOp( "   @ = normalize( @ - @.xyz );\r\n", outNormal, eyePos, inPosition ) );
@@ -2039,7 +2021,6 @@ void RTLightingFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList,
       outNormal->setName( "wsNormal" );
       outNormal->setStructName( "OUT" );
       outNormal->setType( "vec3" );
-      outNormal->mapsToSampler = false;
 
       // Get the transform to world space.
       Var *objTrans = getObjTrans( componentList, fd.features[MFT_UseInstancing], meta );
@@ -2228,7 +2209,6 @@ void FogFeatGLSL::processVert(   Vector<ShaderComponent*> &componentList,
       fogAmount->setName( "fogAmount" );
       fogAmount->setStructName( "OUT" );
       fogAmount->setType( "float" );
-      fogAmount->mapsToSampler = false;
 		
       meta->addStatement( new GenOp( "   @ = saturate( computeSceneFog( @, @, @.r, @.g, @.b ) );\r\n", 
 												fogAmount, eyePos, wsPosition, fogData, fogData, fogData ) );
@@ -2368,7 +2348,7 @@ void VisibilityFeatGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    // Get the visibility constant.
    Var *visibility = NULL;
    if ( fd.features[ MFT_UseInstancing ] )
-      visibility = getInTexCoord( "visibility", "float", false, componentList );
+      visibility = getInTexCoord( "visibility", "float", componentList );
    else
    {
       visibility = (Var*)LangElement::find( "visibility" );
