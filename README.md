@@ -8,14 +8,6 @@ MIT Licensed Open Source version of [Torque 3D](http://torque3d.org) from [Garag
 
 [![IRC](https://img.shields.io/badge/irc-%23garagegames-green.svg)](https://kiwiirc.com/client/irc.maxgaming.net/?nick=wiki_user|?#garagegames)
 
-## More Information
-
-* [Homepage](http://torque3d.org)
-* [Torque 3D wiki](http://wiki.torque3d.org)
-* [Community forum](http://forums.torque3d.org)
-* [GarageGames forum](http://www.garagegames.com/community/forums)
-* [GarageGames professional services](http://services.garagegames.com/)
-
 ## Pre-compiled Version
 
 In addition to GitHub we also have a couple of pre-packaged files for you to download if you would prefer to not compile the code yourself.
