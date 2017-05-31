@@ -243,12 +243,12 @@ TerrainCellMaterial* TerrainCellMaterial::getReflectMat()
 
 void TerrainCellMaterial::init(  TerrainBlock *block,
                                  U64 activeMaterials, 
-                                 bool prePassMat,
+                                 bool deferredMat,
                                  bool reflectMat,
                                  bool baseOnly )
 {
    // This isn't allowed for now.
-   AssertFatal( !( prePassMat && reflectMat ), "TerrainCellMaterial::init - We shouldn't get deferred and reflection in the same material!" );
+   AssertFatal( !( deferredMat && reflectMat ), "TerrainCellMaterial::init - We shouldn't get deferred and reflection in the same material!" );
 
    mTerrain = block;
    mMaterials = activeMaterials;
@@ -280,7 +280,7 @@ void TerrainCellMaterial::init(  TerrainBlock *block,
       if ( !_createPass(   &materials, 
                            &mPasses.last(), 
                            mPasses.size() == 1, 
-                           prePassMat,
+                           deferredMat,
                            reflectMat,
                            baseOnly ) )
       {
@@ -310,7 +310,7 @@ void TerrainCellMaterial::init(  TerrainBlock *block,
 bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials, 
                                        Pass *pass, 
                                        bool firstPass,
-                                       bool prePassMat,
+                                       bool deferredMat,
                                        bool reflectMat,
                                        bool baseOnly )
 {
@@ -343,7 +343,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
 
    // Has advanced lightmap support been enabled for deferred.
    bool advancedLightmapSupport = false;
-   if ( prePassMat )
+   if ( deferredMat )
    {
       // This sucks... but it works.
       AdvancedLightBinManager *lightBin;
@@ -357,7 +357,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
       FeatureSet features;
       features.addFeature( MFT_VertTransform );
 
-      if ( prePassMat )
+      if ( deferredMat )
       {
          features.addFeature( MFT_EyeSpaceDepthOut );
          features.addFeature( MFT_DeferredConditioner );
@@ -416,13 +416,13 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
 		 // check for macro detail texture
          if (  !(mat->getMacroSize() <= 0 || mat->getMacroDistance() <= 0 || mat->getMacroMap().isEmpty() ) )
          {
-            if(prePassMat)
+            if(deferredMat)
                features.addFeature( MFT_DeferredTerrainMacroMap, featureIndex );
             else
 	         features.addFeature( MFT_TerrainMacroMap, featureIndex );
          }
 
-         if(prePassMat)
+         if(deferredMat)
              features.addFeature( MFT_DeferredTerrainDetailMap, featureIndex );
          else
          features.addFeature( MFT_TerrainDetailMap, featureIndex );
@@ -554,14 +554,14 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
       // MFT_TerrainAdditive feature to lerp the
       // output normal with the previous pass.
       //
-      if ( prePassMat )
+      if ( deferredMat )
          desc.setColorWrites( true, true, true, false );
    }
 
    // We write to the zbuffer if this is a deferred
    // material or if the deferred is disabled.
    desc.setZReadWrite( true,  !MATMGR->getDeferredEnabled() || 
-                              prePassMat ||
+                              deferredMat ||
                               reflectMat );
 
    desc.samplersDefined = true;
@@ -671,7 +671,7 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
 
    // If we're doing deferred it requires some 
    // special stencil settings for it to work.
-   if ( prePassMat )
+   if ( deferredMat )
       desc.addDesc( RenderDeferredMgr::getOpaqueStenciWriteDesc( false ) );
 
    desc.setCullMode( GFXCullCCW );

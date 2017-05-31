@@ -119,7 +119,7 @@ bool RenderImposterMgr::_clearStats( GFXDevice::GFXDeviceEventType type )
    return true;
 }
 
-void RenderImposterMgr::_renderDeferred( const SceneRenderState *state, RenderDeferredMgr *prePassBin, bool startDeferred )
+void RenderImposterMgr::_renderDeferred( const SceneRenderState *state, RenderDeferredMgr *deferredBin, bool startDeferred )
 {
    PROFILE_SCOPE( RenderImposterMgr_RenderDeferred );
 
@@ -128,10 +128,10 @@ void RenderImposterMgr::_renderDeferred( const SceneRenderState *state, RenderDe
 
    GFXDEBUGEVENT_SCOPE( RenderImposterMgr_RenderDeferred, ColorI::RED );
 
-   _innerRender( state, prePassBin );
+   _innerRender( state, deferredBin );
 }
 
-void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderDeferredMgr *prePassBin )
+void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderDeferredMgr *deferredBin )
 {
    PROFILE_SCOPE( RenderImposterMgr_InnerRender );
 
@@ -219,7 +219,7 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderDefer
    // list changes.
 
    SceneData sgData;
-   sgData.init( state, prePassBin ? SceneData::DeferredBin : SceneData::RegularBin );
+   sgData.init( state, deferredBin ? SceneData::DeferredBin : SceneData::RegularBin );
    sgData.lights[0] = LIGHTMGR->getDefaultLight();
 
    // TODO: I should rework this loop to generate the VB first then
@@ -232,7 +232,7 @@ void RenderImposterMgr::_innerRender( const SceneRenderState *state, RenderDefer
    for ( U32 i=0; i < binSize; )
    {
       currMat = static_cast<ImposterBaseRenderInst*>( mElementList[i].inst )->mat;      
-      setupMat = prePassBin ? prePassBin->getDeferredMaterial( currMat ) : currMat;
+      setupMat = deferredBin ? deferredBin->getDeferredMaterial( currMat ) : currMat;
 
       // TODO: Fix MatInstance to take a const SceneRenderState!
       while ( setupMat->setupPass( (SceneRenderState*)state, sgData ) )
