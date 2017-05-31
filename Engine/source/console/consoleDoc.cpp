@@ -85,7 +85,7 @@ void printClassHeader(const char* usage, const char * className, const char * su
       Con::printf("///       information was available for this class.");
    }
 
-   if( usage != NULL )
+   if((usage != NULL) && strlen(usage))
    {
       // Copy Usage Document
       S32 usageLen = dStrlen( usage );
