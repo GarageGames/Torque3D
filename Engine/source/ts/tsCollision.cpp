@@ -249,6 +249,59 @@ bool TSShapeInstance::castRay(const Point3F & a, const Point3F & b, RayInfo * ra
    return found;
 }
 
+bool TSShapeInstance::castRayEA(const Point3F & a, const Point3F & b, RayInfo * rayInfo, S32 dl, S32 _hitMeshID)
+{
+   // if dl==-1, or there is no hitbox list, nothing to do
+   if ((dl == -1)||(_hitMeshID == -1))
+      return false;
+
+   AssertFatal(dl >= 0 && dl<mShape->details.size(), "TSShapeInstance::castRay");
+
+   // get subshape and object detail
+   const TSDetail * detail = &mShape->details[dl];
+   S32 ss = detail->subShapeNum;
+   S32 od = detail->objectDetailNum;
+
+   S32 start = mShape->subShapeFirstObject[ss];
+   S32 end = mShape->subShapeNumObjects[ss] + start;
+
+   bool found = false;
+   MatrixF mat;
+   if (start<end)
+   {
+      Point3F ta, tb;
+
+      // set up for first object's node
+      MeshObjectInstance * mesh = &mMeshObjects[_hitMeshID];
+      mat = mesh->getTransform();
+      mat.inverse();
+      mat.mulP(a, &ta);
+      mat.mulP(b, &tb);
+
+      // collide...
+      if (mesh->castRayEA(od, ta, tb, rayInfo, mMaterialList))
+      {
+         if (!rayInfo)
+            return true;
+
+         found = true;
+      }
+   }
+
+   // collide with any skins for this detail level...
+   // TODO: if ever...
+
+   // finalize the deal...
+   if (found)
+   {
+      mat.mulV(rayInfo->normal);
+      rayInfo->point = b - a;
+      rayInfo->point *= rayInfo->t;
+      rayInfo->point += a;
+   }
+   return found;
+}
+
 bool TSShapeInstance::castRayRendered(const Point3F & a, const Point3F & b, RayInfo * rayInfo, S32 dl)
 {
    // if dl==-1, nothing to do
@@ -513,6 +566,15 @@ bool TSShapeInstance::MeshObjectInstance::castRay( S32 objectDetail, const Point
    TSMesh* mesh = getMesh( objectDetail );
    if( mesh && !forceHidden && visible > 0.01f )
       return mesh->castRay( frame, start, end, rayInfo, materials );
+   return false;
+}
+
+bool TSShapeInstance::MeshObjectInstance::castRayEA(S32 objectDetail, const Point3F & start, const Point3F & end, RayInfo * rayInfo, TSMaterialList* materials)
+{
+   TSMesh * mesh = getMesh(objectDetail);
+
+   if (mesh)
+      return mesh->castRay(frame, start, end, rayInfo, materials);
    return false;
 }
 

@@ -114,17 +114,18 @@ IMPLEMENT_CALLBACK( ProjectileData, onExplode, void, ( Projectile* proj, Point3F
 				   "@see Projectile\n"
 				  );
 
-IMPLEMENT_CALLBACK( ProjectileData, onCollision, void, ( Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal ),
-                   ( proj, col, fade, pos, normal ),
-				   "@brief Called when a projectile collides with another object.\n\n"
-                   "This function is only called on server objects."
-				   "@param proj The projectile colliding with SceneObject col.\n"
-				   "@param col The SceneObject hit by the projectile.\n"
-				   "@param fade The current fadeValue of the projectile, affects its visibility.\n"
-				   "@param pos The position of the collision.\n"
-                   "@param normal The normal of the collision.\n"
-				   "@see Projectile\n"
-				  );
+IMPLEMENT_CALLBACK(ProjectileData, onCollision, void, (Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal, S32 hitArea),
+                  (proj, col, fade, pos, normal, hitArea),
+                  "@brief Called when a projectile collides with another object.\n\n"
+                  "This function is only called on server objects."
+                  "@param proj The projectile colliding with SceneObject col.\n"
+                  "@param col The SceneObject hit by the projectile.\n"
+                  "@param fade The current fadeValue of the projectile, affects its visibility.\n"
+                  "@param pos The position of the collision.\n"
+                  "@param normal The normal of the collision.\n"
+                  "@param hitArea the struck hitArea suffix.\n"
+                  "@see Projectile\n"
+   );
 
 const U32 Projectile::csmStaticCollisionMask =  TerrainObjectType | StaticShapeObjectType;
 
@@ -1144,7 +1145,7 @@ void Projectile::simulate( F32 dt )
       // during the next packet update, due to the ExplosionMask network bit being set.
       // onCollision will remain uncalled on the client however, therefore no client
       // specific code should be placed inside the function!
-      onCollision( rInfo.point, rInfo.normal, rInfo.object );
+      onCollision(rInfo.point, rInfo.normal, rInfo.object, rInfo.hitArea);
       // Next order of business: do we explode on this hit?
       if ( mCurrTick > mDataBlock->armingDelay || mDataBlock->armingDelay == 0 )
       {
@@ -1263,7 +1264,7 @@ void Projectile::interpolateTick(F32 delta)
 
 
 //--------------------------------------------------------------------------
-void Projectile::onCollision(const Point3F& hitPosition, const Point3F& hitNormal, SceneObject* hitObject)
+void Projectile::onCollision(const Point3F& hitPosition, const Point3F& hitNormal, SceneObject* hitObject, S32 collisionBox)
 {
    // No client specific code should be placed or branched from this function
    if(isClientObject())
@@ -1271,7 +1272,7 @@ void Projectile::onCollision(const Point3F& hitPosition, const Point3F& hitNorma
 
    if (hitObject != NULL && isServerObject())
    {
-	   mDataBlock->onCollision_callback( this, hitObject, mFadeValue, hitPosition, hitNormal );
+      mDataBlock->onCollision_callback(this, hitObject, mFadeValue, hitPosition, hitNormal, collisionBox);
    }
 }
 

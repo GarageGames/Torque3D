@@ -5914,12 +5914,52 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 
    info->normal = start - end;
    info->normal.normalizeSafe();
-   getTransform().mulV( info->normal );
+   getTransform().mulV(info->normal);
 
    info->t = fst;
    info->object = this;
-   info->point.interpolate(start,end,fst);
+   info->point.interpolate(start, end, fst);
    info->material = 0;
+
+   if (mDataBlock->mHitMeshID[0] == -1) return true;
+   //if we are here means that the ray has hit the bounding box, now check if an hit box was hit
+   //if it hit a collision box the hitArea
+   //in the info struct is filled with the number of the box otherwise it remains -1
+   if (mShapeInstance)
+   {
+      RayInfo shortest;
+      shortest.t = 1e8;
+      if (isServerObject())
+      {
+         mShapeInstance->animate(0);	//Animate the model on the server
+      }
+
+      for (U32 i = 0; i < ShapeBaseData::MaxHitboxes; i++)
+      {
+         if (mDataBlock->mHitMeshID[i] != -1)
+         {
+            for (U32 j = 0; j < mDataBlock->mShape->details.size(); j++)
+            {
+                if (mShapeInstance->castRayEA(start, end, info, j, mDataBlock->mHitMeshID[i]))
+                {
+                    info->object = this;
+                    if (info->t < shortest.t)
+                    {
+                        shortest = *info;
+                        shortest.hitArea = i + 1;		//  +1 because the meshes HB## begin from 1
+                    }
+                }
+            }
+         }
+      }
+      if (info->object == this)
+      {
+         // Copy out the shortest time...
+         *info = shortest;
+      }
+      if (info->hitArea == -1) return false;
+      info->point.interpolate(start, end, info->t);
+   }
    return true;
 }
 
