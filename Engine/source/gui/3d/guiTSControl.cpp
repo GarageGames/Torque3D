@@ -360,9 +360,6 @@ void GuiTSCtrl::_internalRender(RectI guiViewport, RectI renderViewport, Frustum
    GFXTarget *origTarget = GFX->getActiveRenderTarget();
    S32 origStereoTarget = GFX->getCurrentStereoTarget();
 
-   if (mForceFOV != 0)
-      mLastCameraQuery.fov = mDegToRad(mForceFOV);
-
    if (mCameraZRot)
    {
       MatrixF rotMat(EulerF(0, 0, mDegToRad(mCameraZRot)));
@@ -677,6 +674,9 @@ void GuiTSCtrl::onRender(Point2I offset, const RectI &updateRect)
       F32 renderWidth = F32(renderSize.x);
       F32 renderHeight = F32(renderSize.y);
       F32 aspectRatio = renderWidth / renderHeight;
+
+      if (mForceFOV != 0)
+         mLastCameraQuery.fov = mDegToRad(mForceFOV);
 
       // Use the FOV to calculate the viewport height scale
       // then generate the width scale from the aspect ratio.
