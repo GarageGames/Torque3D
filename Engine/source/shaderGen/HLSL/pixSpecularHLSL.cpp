@@ -123,9 +123,9 @@ void SpecularMapHLSL::processVert(Vector<ShaderComponent*> &componentList, const
    getOutTexCoord("texCoord",
      "float2",
       true,
-      fd.features[MFT_TexAnim],
       meta,
-      componentList);
+      componentList,
+      fd );
 
    output = meta;
 }

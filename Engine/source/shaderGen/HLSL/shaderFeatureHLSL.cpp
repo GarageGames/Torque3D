@@ -335,10 +335,11 @@ Var* ShaderFeatureHLSL::getOutViewToTangent( Vector<ShaderComponent*> &component
 Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
                                           const char *type,
                                           bool mapsToSampler,
-                                          bool useTexAnim,
                                           MultiLine *meta,
-                                          Vector<ShaderComponent*> &componentList )
+                                          Vector<ShaderComponent*> &componentList,
+                                          const MaterialFeatureData &fd )
 {
+   const bool useTexAnim = fd.features[MFT_TexAnim];
    String outTexName = String::ToString( "out_%s", name );
    Var *texCoord = (Var*)LangElement::find( outTexName );
    if ( !texCoord )
@@ -356,7 +357,11 @@ Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
 
       if ( useTexAnim )
       {
-         inTex->setType( "float2" );
+         const bool foliage = fd.features[MFT_Foliage];
+         if(foliage)
+            inTex->setType("float4");
+         else
+            inTex->setType( "float2" );
          
          // create texture mat var
          Var *texMat = new Var;
@@ -367,8 +372,14 @@ Var* ShaderFeatureHLSL::getOutTexCoord(   const char *name,
          
          // Statement allows for casting of different types which
 		   // eliminates vector truncation problems.
-         String statement = String::ToString("   @ = (%s)mul(@, float4(@,1,1));\r\n", type);
-         meta->addStatement( new GenOp( statement, texCoord, texMat, inTex ) );
+         String statement;
+         if (foliage)
+            statement = String::ToString("   @ = (%s)mul(@, @);\r\n", type);
+         else
+            statement = String::ToString("   @ = (%s)mul(@, float4(@,1,1));\r\n", type);
+
+         meta->addStatement(new GenOp(statement, texCoord, texMat, inTex));
+
       }
       else
       {
@@ -798,16 +809,22 @@ Var* ShaderFeatureHLSL::getWsView( Var *wsPosition, MultiLine *meta )
 
 Var* ShaderFeatureHLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &componentList, 
                                                 MultiLine *meta,
-                                                bool useTexAnim )
+                                                const MaterialFeatureData &fd )
 {
    // Check if its already added.
    Var *outTex = (Var*)LangElement::find( "detCoord" );
    if ( outTex )
       return outTex;
 
+   const bool useTexAnim = fd.features[MFT_TexAnim];
+   // This will most likely kill any blending with the foliage, sahder will compile though
+   const bool foliage = fd.features[MFT_Foliage];
    // Grab incoming texture coords.
    Var *inTex = getVertTexCoord( "texCoord" );
-   inTex->setType("float2");
+   if (foliage)
+      inTex->setType("float4");
+   else
+      inTex->setType("float2");
 
    // create detail variable
    Var *detScale = new Var;
@@ -837,12 +854,12 @@ Var* ShaderFeatureHLSL::addOutDetailTexCoord(   Vector<ShaderComponent*> &compon
          texMat->constSortPos = cspPass;   
       }
 
-      meta->addStatement(new GenOp("   @ = mul(@, float4(@,1,1)).xy * @;\r\n", outTex, texMat, inTex, detScale));
+      meta->addStatement(new GenOp("   @ = mul(@, float4(@.xy,1,1)).xy * @;\r\n", outTex, texMat, inTex, detScale));
    }
    else
    {
       // setup output to mul texCoord by detail scale
-      meta->addStatement( new GenOp( "   @ = @ * @;\r\n", outTex, inTex, detScale ) );
+      meta->addStatement( new GenOp( "   @ = @.xy * @;\r\n", outTex, inTex, detScale ) );
    }
 
    return outTex;
@@ -865,9 +882,9 @@ void DiffuseMapFeatHLSL::processVert( Vector<ShaderComponent*> &componentList,
    getOutTexCoord(   "texCoord", 
                      "float2", 
                      true, 
-                     fd.features[MFT_TexAnim], 
                      meta, 
-                     componentList );
+                     componentList,
+                     fd );
    output = meta;
 }
 
@@ -1691,7 +1708,7 @@ void DetailFeatHLSL::processVert(   Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
    addOutDetailTexCoord( componentList, 
                          meta,
-                         fd.features[MFT_TexAnim] );
+                         fd );
    output = meta;
 }
 

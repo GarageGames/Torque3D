@@ -38,9 +38,9 @@ void AccuTexFeatHLSL::processVert(  Vector<ShaderComponent*> &componentList,
    getOutTexCoord(   "texCoord", 
                      "float2", 
                      true, 
-                     false, 
                      meta, 
-                     componentList );
+                     componentList,
+                     fd );
    
    getOutObjToTangentSpace( componentList, meta, fd );
    addOutAccuVec( componentList, meta );

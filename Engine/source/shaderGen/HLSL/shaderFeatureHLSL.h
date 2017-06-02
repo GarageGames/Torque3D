@@ -42,9 +42,9 @@ public:
    Var* getOutTexCoord( const char *name,
                         const char *type,
                         bool mapsToSampler,
-                        bool useTexAnim,
                         MultiLine *meta,
-                        Vector<ShaderComponent*> &componentList );
+                        Vector<ShaderComponent*> &componentList,
+                        const MaterialFeatureData &fd );
 
    /// Returns an input texture coord by name adding it
    /// to the input connector if it doesn't exist.
@@ -117,7 +117,7 @@ public:
    ///
    Var* addOutDetailTexCoord( Vector<ShaderComponent*> &componentList, 
                               MultiLine *meta,
-                              bool useTexAnim );
+                              const MaterialFeatureData &fd );
 
    ///
    Var* getObjTrans( Vector<ShaderComponent*> &componentList,                                       
