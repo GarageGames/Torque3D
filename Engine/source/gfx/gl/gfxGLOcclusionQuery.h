@@ -27,6 +27,10 @@
 #include "gfx/gfxOcclusionQuery.h"
 #endif
 
+#ifndef T_GL_H
+#include "gfx/gl/tGL/tGL.h"
+#endif
+
 class GFXGLOcclusionQuery : public GFXOcclusionQuery
 {
 public:
@@ -41,9 +45,9 @@ public:
    virtual void zombify(); 
    virtual void resurrect();
    virtual const String describeSelf() const;
-   
 private:
    U32 mQuery;
+   bool mTesting;
 };
 
 #endif // _GFX_GL_OCCLUSIONQUERY_H_
