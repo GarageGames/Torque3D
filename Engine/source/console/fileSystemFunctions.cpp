@@ -28,6 +28,9 @@
 #include "core/stream/fileStream.h"
 #include "console/compiler.h"
 #include "platform/platformInput.h"
+
+#include "versinfo/VERSINFO.h"
+
 #include "torqueConfig.h"
 #include "core/frameAllocator.h"
 
@@ -359,6 +362,38 @@ DefineEngineFunction(getFileCountMultiExpr, S32, ( const char* pattern, bool rec
    return numResults;
 }
 
+/*!
+	Get the version number of a given file. Does checking for files existance.
+	@param filePath Executable file to get version number from.
+	@return "majorVersion.minorVersion.build.subBuild"
+*/
+const char* getFileVersionNumber(const char* filePath)
+{
+	if(Platform::isFile(filePath))
+	{
+		VersionInfo anInfo(filePath);
+
+		if(anInfo.hasInfo())
+		{
+			char* vBuffer = Con::getReturnBuffer( 512 );
+			dSprintf( vBuffer, 512, "%i.%i.%i.%i",anInfo.majorVersion(),anInfo.minorVersion(),anInfo.build(),anInfo.subBuild());
+			return vBuffer;
+		}
+	}
+
+	return "";
+}
+
+DefineEngineFunction(getFileVersionNumber, String, ( const char* filePath ),,
+				"Get the version number of a given file, as a string\n"
+				"@param filePath Executable file to get version number from.\n"
+				"@return \"majorVersion.minorVersion.build.subBuild\"\n"
+				"@ingroup FileSystem")
+{
+	Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), filePath);
+	return getFileVersionNumber(sgScriptFilenameBuffer);
+}
+
 DefineEngineFunction(getFileCRC, S32, ( const char* fileName ),,
    "@brief Provides the CRC checksum of the given file.\n\n"
    
@@ -563,6 +598,29 @@ DefineEngineFunction( fileCreatedTime, String, ( const char* fileName ),,
    dStrcpy( buffer, fileStr );  
 
    return buffer;
+}
+
+DefineEngineFunction( fileTime, String, ( const char* fileName, bool useModified ), (true),
+   "@brief Returns file time and date or \"\" if no file. \"dayOfWeek month day year hour second Milliseconds\""
+   "@return file time and date or \"\" if no file. \"dayOfWeek month day year hour second Milliseconds\""
+   "@ingroup FileSystem")
+{
+   Con::expandScriptFilename(sgScriptFilenameBuffer, sizeof(sgScriptFilenameBuffer), fileName);
+	FileTime createTime;
+	FileTime modifyTime;
+	char* buffer = Con::getReturnBuffer( 512 );
+	if(Platform::getFileTimes( sgScriptFilenameBuffer, &createTime, &modifyTime))
+	{
+		FileTime* ft = useModified ? &modifyTime : &createTime;
+		if(Platform::fileTimeToString(ft,buffer,512))
+		{
+			return buffer;
+		}
+		else
+			return "";
+	}
+	else
+		return "";
 }
 
 DefineEngineFunction(fileDelete, bool, ( const char* path ),,
