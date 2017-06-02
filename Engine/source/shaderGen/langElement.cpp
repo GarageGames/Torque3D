@@ -97,7 +97,6 @@ Var::Var()
    vertData = false;
    connector = false;
    sampler = false;
-   mapsToSampler = false;
    arraySize = 1;
    texture = false;
    rank = 0;
@@ -111,7 +110,6 @@ Var::Var( const char *inName, const char *inType )
    vertData = false;
    connector = false;
    sampler = false;
-   mapsToSampler = false;
    texCoordNum = 0;
    constSortPos = cspUninit;
    arraySize = 1;

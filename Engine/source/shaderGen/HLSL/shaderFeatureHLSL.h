@@ -33,15 +33,12 @@ struct RenderPassData;
 
 class ShaderFeatureHLSL : public ShaderFeature
 {
-protected:
-   bool mIsDirect3D11;
 public:
    ShaderFeatureHLSL();
 
    ///
    Var* getOutTexCoord( const char *name,
                         const char *type,
-                        bool mapsToSampler,
                         bool useTexAnim,
                         MultiLine *meta,
                         Vector<ShaderComponent*> &componentList );
@@ -50,7 +47,6 @@ public:
    /// to the input connector if it doesn't exist.
    static Var* getInTexCoord( const char *name,
                               const char *type,
-                              bool mapsToSampler,
                               Vector<ShaderComponent*> &componentList );
 
    static Var* getInColor( const char *name,

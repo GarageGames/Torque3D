@@ -145,7 +145,6 @@ void GBufferConditionerGLSL::processPix(  Vector<ShaderComponent*> &componentLis
       gbNormal->setName( "gbNormal" );
       gbNormal->setStructName( "IN" );
       gbNormal->setType( "float3" );
-      gbNormal->mapsToSampler = false;
       gbNormal->uniform = false;
    }
 

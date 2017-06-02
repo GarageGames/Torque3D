@@ -43,7 +43,6 @@ struct ServerInfo
       Status_Dedicated  = BIT(0),
       Status_Passworded = BIT(1),
       Status_Linux      = BIT(2),
-      Status_Xenon      = BIT(6),
 
       // Status flags:
       Status_New         = 0,
@@ -97,7 +96,7 @@ struct ServerInfo
    bool isDedicated()      { return( status.test( Status_Dedicated ) ); }
    bool isPassworded()     { return( status.test( Status_Passworded ) ); }
    bool isLinux()          { return( status.test( Status_Linux ) ); }
-   bool isXenon()          { return( status.test( Status_Xenon ) ); }
+
 };
 
 

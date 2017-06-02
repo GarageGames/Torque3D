@@ -145,7 +145,6 @@ void GBufferConditionerHLSL::processPix(  Vector<ShaderComponent*> &componentLis
       gbNormal->setName( "gbNormal" );
       gbNormal->setStructName( "IN" );
       gbNormal->setType( "float3" );
-      gbNormal->mapsToSampler = false;
       gbNormal->uniform = false;
    }
 
@@ -222,7 +221,6 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
       retVal = Parent::printMethodHeader( methodType, methodName, stream, meta );
    else
    {
-      const bool isDirect3D11 = GFX->getAdapterType() == Direct3D11;
       Var *methodVar = new Var;
       methodVar->setName(methodName);
       methodVar->setType("inline float4");
@@ -230,7 +228,7 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
 
       Var *deferredSampler = new Var;
       deferredSampler->setName("deferredSamplerVar");
-      deferredSampler->setType("sampler2D");
+      deferredSampler->setType("SamplerState");
       DecOp *deferredSamplerDecl = new DecOp(deferredSampler);
 
       Var *screenUV = new Var;
@@ -238,28 +236,21 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
       screenUV->setType("float2");
       DecOp *screenUVDecl = new DecOp(screenUV);
 
-      Var *deferredTex = NULL;
       DecOp *deferredTexDecl = NULL;
-      if (isDirect3D11)
-      {
-         deferredSampler->setType("SamplerState");
-         deferredTex = new Var;
-         deferredTex->setName("deferredTexVar");
-         deferredTex->setType("Texture2D");
-         deferredTex->texture = true;
-         deferredTex->constNum = deferredSampler->constNum;
-         deferredTexDecl = new DecOp(deferredTex);
-      }
+
+      Var *deferredTex = new Var;
+      deferredTex->setName("deferredTexVar");
+      deferredTex->setType("Texture2D");
+      deferredTex->texture = true;
+      deferredTex->constNum = deferredSampler->constNum;
+      deferredTexDecl = new DecOp(deferredTex);
 
       Var *bufferSample = new Var;
       bufferSample->setName("bufferSample");
       bufferSample->setType("float4");
       DecOp *bufferSampleDecl = new DecOp(bufferSample); 
 
-      if (isDirect3D11)
-         meta->addStatement(new GenOp("@(@, @, @)\r\n", methodDecl, deferredSamplerDecl, deferredTexDecl, screenUVDecl));
-      else
-         meta->addStatement( new GenOp( "@(@, @)\r\n", methodDecl, deferredSamplerDecl, screenUVDecl ) );
+      meta->addStatement(new GenOp("@(@, @, @)\r\n", methodDecl, deferredSamplerDecl, deferredTexDecl, screenUVDecl));
 
       meta->addStatement( new GenOp( "{\r\n" ) );
 
@@ -267,15 +258,7 @@ Var* GBufferConditionerHLSL::printMethodHeader( MethodType methodType, const Str
 
       // The gbuffer has no mipmaps, so use tex2dlod when 
       // possible so that the shader compiler can optimize.
-      meta->addStatement( new GenOp( "   #if TORQUE_SM >= 30\r\n" ) );
-      if (isDirect3D11)
-         meta->addStatement(new GenOp("      @ = @.SampleLevel(@, @,0);\r\n", bufferSampleDecl, deferredTex, deferredSampler, screenUV));
-      else
-         meta->addStatement(new GenOp("      @ = tex2Dlod(@, float4(@,0,0));\r\n", bufferSampleDecl, deferredSampler, screenUV));
-
-      meta->addStatement(new GenOp("   #else\r\n"));
-      meta->addStatement(new GenOp("      @ = tex2D(@, @);\r\n", bufferSampleDecl, deferredSampler, screenUV));
-      meta->addStatement(new GenOp("   #endif\r\n\r\n"));
+      meta->addStatement(new GenOp("      @ = @.SampleLevel(@, @,0);\r\n", bufferSampleDecl, deferredTex, deferredSampler, screenUV));
 
       // We don't use this way of passing var's around, so this should cause a crash
       // if something uses this improperly

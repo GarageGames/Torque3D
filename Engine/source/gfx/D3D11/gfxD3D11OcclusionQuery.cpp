@@ -166,7 +166,7 @@ void GFXD3D11OcclusionQuery::resurrect()
 
       HRESULT hRes = D3D11DEVICE->CreateQuery(&queryDesc, &mQuery); 
 	
-      AssertISV( hRes != E_OUTOFMEMORY, "GFXD3D9QueryFence::resurrect - Out of memory" ); 
+      AssertISV( hRes != E_OUTOFMEMORY, "GFXD3D11QueryFence::resurrect - Out of memory" ); 
    } 
 }
 

@@ -41,7 +41,7 @@
 void DeferredSpecMapHLSL::processPix( Vector<ShaderComponent*> &componentList, const MaterialFeatureData &fd )
 {
    // Get the texture coord.
-   Var *texCoord = getInTexCoord( "texCoord", "float2", true, componentList );
+   Var *texCoord = getInTexCoord( "texCoord", "float2", componentList );
 
    // search for color var
    Var *material = (Var*) LangElement::find( getOutputTargetVarName(ShaderFeature::RenderTarget2) );
@@ -57,23 +57,18 @@ void DeferredSpecMapHLSL::processPix( Vector<ShaderComponent*> &componentList, c
 
    // create texture var
    Var *specularMap = new Var;
-   specularMap->setType( "sampler2D" );
+   specularMap->setType( "SamplerState" );
    specularMap->setName( "specularMap" );
    specularMap->uniform = true;
    specularMap->sampler = true;
    specularMap->constNum = Var::getTexUnitNum();
 
-   Var* specularMapTex = NULL;
-   if (mIsDirect3D11)
-   {
-      specularMap->setType("SamplerState");
-      specularMapTex = new Var;
-      specularMapTex->setName("specularMapTex");
-      specularMapTex->setType("Texture2D");
-      specularMapTex->uniform = true;
-      specularMapTex->texture = true;
-      specularMapTex->constNum = specularMap->constNum;
-   }
+   Var* specularMapTex = new Var;
+   specularMapTex->setName("specularMapTex");
+   specularMapTex->setType("Texture2D");
+   specularMapTex->uniform = true;
+   specularMapTex->texture = true;
+   specularMapTex->constNum = specularMap->constNum;
 
    //matinfo.g slot reserved for AO later
    Var* specColor = new Var;
@@ -83,10 +78,7 @@ void DeferredSpecMapHLSL::processPix( Vector<ShaderComponent*> &componentList, c
 
    meta->addStatement(new GenOp("   @.g = 1.0;\r\n", material));
    //sample specular map
-   if (mIsDirect3D11)
-      meta->addStatement(new GenOp("   @ = @.Sample(@, @);\r\n", specColorElem, specularMapTex, specularMap, texCoord));
-   else
-      meta->addStatement(new GenOp("   @ = tex2D(@, @);\r\n", specColorElem, specularMap, texCoord));
+   meta->addStatement(new GenOp("   @ = @.Sample(@, @);\r\n", specColorElem, specularMapTex, specularMap, texCoord));
    
    meta->addStatement(new GenOp("   @.b = dot(@.rgb, float3(0.3, 0.59, 0.11));\r\n", material, specColor));
    meta->addStatement(new GenOp("   @.a = @.a;\r\n", material, specColor));
@@ -123,7 +115,6 @@ void DeferredSpecMapHLSL::processVert( Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
    getOutTexCoord(   "texCoord", 
                      "float2", 
-                     true, 
                      fd.features[MFT_TexAnim], 
                      meta, 
                      componentList );

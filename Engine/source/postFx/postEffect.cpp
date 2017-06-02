@@ -666,15 +666,11 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
       Point2F offset((F32)viewport.point.x / (F32)targetSize.x, (F32)viewport.point.y / (F32)targetSize.y );
       Point2F scale((F32)viewport.extent.x / (F32)targetSize.x, (F32)viewport.extent.y / (F32)targetSize.y );
 
-      const bool hasTexelPixelOffset = GFX->getAdapterType() == Direct3D9;
-      const Point2F halfPixel(  hasTexelPixelOffset ? (0.5f / targetSize.x) : 0.0f, 
-                                hasTexelPixelOffset ? (0.5f / targetSize.y) : 0.0f );
-
       Point4F targetParams;
-      targetParams.x = offset.x + halfPixel.x;
-      targetParams.y = offset.y + halfPixel.y;
-      targetParams.z = offset.x + scale.x - halfPixel.x;
-      targetParams.w = offset.y + scale.y - halfPixel.y;
+      targetParams.x = offset.x;
+      targetParams.y = offset.y;
+      targetParams.z = offset.x + scale.x;
+      targetParams.w = offset.y + scale.y;
 
       mShaderConsts->set( mTargetViewportSC, targetParams );
    }

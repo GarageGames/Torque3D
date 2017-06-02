@@ -69,24 +69,14 @@ void ShaderGenPrinterHLSL::printPixelShaderOutputStruct(Stream& stream, const Ma
 
    WRITESTR("struct Fragout\r\n");
    WRITESTR("{\r\n");
-   if (GFX->getAdapterType() == Direct3D11)
+
+   WRITESTR("   float4 col : SV_Target0;\r\n");
+   for (U32 i = 1; i < 4; i++)
    {
-      WRITESTR("   float4 col : SV_Target0;\r\n");
-      for (U32 i = 1; i < 4; i++)
-      {
-         if (numMRTs & 1 << i)
-            WRITESTR(avar("   float4 col%d : SV_Target%d;\r\n", i, i));
-      }
+      if (numMRTs & 1 << i)
+         WRITESTR(avar("   float4 col%d : SV_Target%d;\r\n", i, i));
    }
-   else
-   {
-      WRITESTR("   float4 col : COLOR0;\r\n");
-      for (U32 i = 1; i < 4; i++)
-      {
-         if (numMRTs & 1 << i)
-            WRITESTR(avar("   float4 col%d : COLOR%d;\r\n", i, i));
-      }
-   }
+   
    WRITESTR("};\r\n");
    WRITESTR("\r\n");
    WRITESTR("\r\n");
