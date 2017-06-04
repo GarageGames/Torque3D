@@ -21,12 +21,12 @@
  * @link http://smarty.php.net/
  * @author Monte Ohrt <monte at ohrt dot com>
  * @author Andrei Zmievski <andrei@php.net>
- * @version 2.6.18
+ * @version 2.6.25-dev
  * @copyright 2001-2005 New Digital Group, Inc.
  * @package Smarty
  */
 
-/* $Id: Smarty_Compiler.class.php,v 1.395 2007/03/06 10:40:06 messju Exp $ */
+/* $Id: Smarty_Compiler.class.php 4779 2013-09-30 19:14:32Z Uwe.Tews@googlemail.com $ */
 
 /**
  * Template compiling class
@@ -262,11 +262,11 @@ class Smarty_Compiler extends Smarty {
         reset($this->_folded_blocks);
 
         /* replace special blocks by "{php}" */
-        $source_content = preg_replace($search.'e', "'"
+        $source_content = preg_replace_callback($search, create_function ('$matches', "return '"
                                        . $this->_quote_replace($this->left_delimiter) . 'php'
-                                       . "' . str_repeat(\"\n\", substr_count('\\0', \"\n\")) .'"
+                                       . "' . str_repeat(\"\n\", substr_count('\$matches[1]', \"\n\")) .'"
                                        . $this->_quote_replace($this->right_delimiter)
-                                       . "'"
+                                       . "';")
                                        , $source_content);
 
         /* Gather all template tags. */
@@ -397,7 +397,6 @@ class Smarty_Compiler extends Smarty {
         }
 
         // put header at the top of the compiled template
-        date_default_timezone_set('America/Los_Angeles');
         $template_header = "<?php /* Smarty version ".$this->_version.", created on ".strftime("%Y-%m-%d %H:%M:%S")."\n";
         $template_header .= "         compiled from ".strtr(urlencode($resource_name), array('%2F'=>'/', '%3A'=>':'))." */ ?>\n";
 
@@ -870,7 +869,7 @@ class Smarty_Compiler extends Smarty {
             // traditional argument format
             $args = implode(',', array_values($attrs));
             if (empty($args)) {
-                $args = 'null';
+                $args = '';
             }
         }
 
@@ -1172,7 +1171,7 @@ class Smarty_Compiler extends Smarty {
         }
         $item = $this->_dequote($attrs['item']);
         if (!preg_match('~^\w+$~', $item)) {
-            return $this->_syntax_error("'foreach: 'item' must be a variable name (literal string)", E_USER_ERROR, __FILE__, __LINE__);
+            return $this->_syntax_error("foreach: 'item' must be a variable name (literal string)", E_USER_ERROR, __FILE__, __LINE__);
         }
 
         if (isset($attrs['key'])) {
@@ -1223,22 +1222,20 @@ class Smarty_Compiler extends Smarty {
         $attrs = $this->_parse_attrs($tag_args);
 
         if ($start) {
-            if (isset($attrs['name']))
-                $buffer = $attrs['name'];
-            else
-                $buffer = "'default'";
-
-            if (isset($attrs['assign']))
-                $assign = $attrs['assign'];
-            else
-                $assign = null;
+            $buffer = isset($attrs['name']) ? $attrs['name'] : "'default'";
+            $assign = isset($attrs['assign']) ? $attrs['assign'] : null;
+            $append = isset($attrs['append']) ? $attrs['append'] : null;
+            
             $output = "<?php ob_start(); ?>";
-            $this->_capture_stack[] = array($buffer, $assign);
+            $this->_capture_stack[] = array($buffer, $assign, $append);
         } else {
-            list($buffer, $assign) = array_pop($this->_capture_stack);
+            list($buffer, $assign, $append) = array_pop($this->_capture_stack);
             $output = "<?php \$this->_smarty_vars['capture'][$buffer] = ob_get_contents(); ";
             if (isset($assign)) {
                 $output .= " \$this->assign($assign, ob_get_contents());";
+            }
+            if (isset($append)) {
+                $output .= " \$this->append($append, ob_get_contents());";
             }
             $output .= "ob_end_clean(); ?>";
         }
@@ -1366,9 +1363,14 @@ class Smarty_Compiler extends Smarty {
                     /* If last token was a ')', we operate on the parenthesized
                        expression. The start of the expression is on the stack.
                        Otherwise, we operate on the last encountered token. */
-                    if ($tokens[$i-1] == ')')
+                    if ($tokens[$i-1] == ')') {
                         $is_arg_start = array_pop($is_arg_stack);
-                    else
+                        if ($is_arg_start != 0) {
+                            if (preg_match('~^' . $this->_func_regexp . '$~', $tokens[$is_arg_start-1])) {
+                                $is_arg_start--;
+                            } 
+                        } 
+                    } else
                         $is_arg_start = $i-1;
                     /* Construct the argument for 'is' expression, so it knows
                        what to operate on. */
@@ -2045,27 +2047,57 @@ class Smarty_Compiler extends Smarty {
                 break;
 
             case 'get':
-                $compiled_ref = ($this->request_use_auto_globals) ? '$_GET' : "\$GLOBALS['HTTP_GET_VARS']";
+                if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
+                    $this->_syntax_error("(secure mode) super global access not permitted",
+                                         E_USER_WARNING, __FILE__, __LINE__);
+                    return;
+                }
+                $compiled_ref = "\$_GET";
                 break;
 
             case 'post':
-                $compiled_ref = ($this->request_use_auto_globals) ? '$_POST' : "\$GLOBALS['HTTP_POST_VARS']";
+                if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
+                    $this->_syntax_error("(secure mode) super global access not permitted",
+                                         E_USER_WARNING, __FILE__, __LINE__);
+                    return;
+                }
+                $compiled_ref = "\$_POST";
                 break;
 
             case 'cookies':
-                $compiled_ref = ($this->request_use_auto_globals) ? '$_COOKIE' : "\$GLOBALS['HTTP_COOKIE_VARS']";
+                if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
+                    $this->_syntax_error("(secure mode) super global access not permitted",
+                                         E_USER_WARNING, __FILE__, __LINE__);
+                    return;
+                }
+                $compiled_ref = "\$_COOKIE";
                 break;
 
             case 'env':
-                $compiled_ref = ($this->request_use_auto_globals) ? '$_ENV' : "\$GLOBALS['HTTP_ENV_VARS']";
+                if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
+                    $this->_syntax_error("(secure mode) super global access not permitted",
+                                         E_USER_WARNING, __FILE__, __LINE__);
+                    return;
+                }
+                $compiled_ref = "\$_ENV";
                 break;
 
             case 'server':
-                $compiled_ref = ($this->request_use_auto_globals) ? '$_SERVER' : "\$GLOBALS['HTTP_SERVER_VARS']";
+                if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
+                    $this->_syntax_error("(secure mode) super global access not permitted",
+                                         E_USER_WARNING, __FILE__, __LINE__);
+                    return;
+                }
+                $compiled_ref = "\$_SERVER";
                 break;
 
             case 'session':
-                $compiled_ref = ($this->request_use_auto_globals) ? '$_SESSION' : "\$GLOBALS['HTTP_SESSION_VARS']";
+                if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
+                    $this->_syntax_error("(secure mode) super global access not permitted",
+                                         E_USER_WARNING, __FILE__, __LINE__);
+                    return;
+                }
+                $compiled_ref = "\$_SESSION";
                 break;
 
             /*
@@ -2073,8 +2105,13 @@ class Smarty_Compiler extends Smarty {
              * compiler.
              */
             case 'request':
+                if ($this->security && !$this->security_settings['ALLOW_SUPER_GLOBALS']) {
+                    $this->_syntax_error("(secure mode) super global access not permitted",
+                                         E_USER_WARNING, __FILE__, __LINE__);
+                    return;
+                }
                 if ($this->request_use_auto_globals) {
-                    $compiled_ref = '$_REQUEST';
+                    $compiled_ref = "\$_REQUEST";
                     break;
                 } else {
                     $this->_init_smarty_vars = true;
@@ -2085,7 +2122,7 @@ class Smarty_Compiler extends Smarty {
                 return null;
 
             case 'template':
-                $compiled_ref = "'$this->_current_file'";
+                $compiled_ref = "'" . addslashes($this->_current_file) . "'";
                 $_max_index = 1;
                 break;
 
