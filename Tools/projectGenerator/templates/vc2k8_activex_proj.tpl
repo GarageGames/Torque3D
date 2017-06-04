@@ -9,14 +9,14 @@
 	>
 	<Platforms>
 		<Platform
-			Name="Win32"
+			Name="x64"
 		/>
 	</Platforms>
 	<ToolFiles>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
-			Name="Debug|Win32"
+			Name="Debug|x64"
 			OutputDirectory="{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName)"
 			IntermediateDirectory="$(OutDir)/$(ProjectName)"
 			ConfigurationType="2"
@@ -109,7 +109,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release|Win32"
+			Name="Release|x64"
 			OutputDirectory="{$projectOffset}../Link/VC2k8.$(ConfigurationName).$(PlatformName)"
 			IntermediateDirectory="$(OutDir)/$(ProjectName)"
 			ConfigurationType="2"
@@ -212,7 +212,7 @@
 				RelativePath="..\..\..\web\source\activex\dllmain.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -221,7 +221,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -254,7 +254,7 @@
 				RelativePath="..\..\..\web\source\common\webCommon.cpp"
 				>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -262,7 +262,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -274,7 +274,7 @@
 				RelativePath="..\..\..\web\source\activex\stdafx.cpp"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -282,7 +282,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -357,7 +357,7 @@
 				RelativePath="..\..\..\web\source\activex\IEWebGamePlugin_i.c"
 				>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="Debug|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -366,7 +366,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|Win32"
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
