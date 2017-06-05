@@ -290,6 +290,10 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
    if (shapeName && shapeName[0]) {
       S32 i;
 
+      collisionDetails.clear();
+      collisionBounds.clear();
+      LOSDetails.clear();
+
       // Resolve shapename
       mShape = ResourceManager::get().load(shapeName);
       if (bool(mShape) == false)
