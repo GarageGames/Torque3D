@@ -1839,9 +1839,9 @@ bool WorldEditor::onAdd()
    // create the default class entry
    mDefaultClassEntry.mName = 0;
    mDefaultClassEntry.mIgnoreCollision = false;
-   mDefaultClassEntry.mDefaultHandle   = GFXTexHandle(mDefaultHandle,   &GFXDefaultStaticDiffuseProfile, avar("%s() - mDefaultClassEntry.mDefaultHandle (line %d)", __FUNCTION__, __LINE__));
-   mDefaultClassEntry.mSelectHandle    = GFXTexHandle(mSelectHandle,    &GFXDefaultStaticDiffuseProfile, avar("%s() - mDefaultClassEntry.mSelectHandle (line %d)", __FUNCTION__, __LINE__));
-   mDefaultClassEntry.mLockedHandle    = GFXTexHandle(mLockedHandle,    &GFXDefaultStaticDiffuseProfile, avar("%s() - mDefaultClassEntry.mLockedHandle (line %d)", __FUNCTION__, __LINE__));
+   mDefaultClassEntry.mDefaultHandle   = GFXTexHandle(mDefaultHandle,   &GFXStaticTextureSRGBProfile, avar("%s() - mDefaultClassEntry.mDefaultHandle (line %d)", __FUNCTION__, __LINE__));
+   mDefaultClassEntry.mSelectHandle    = GFXTexHandle(mSelectHandle,    &GFXStaticTextureSRGBProfile, avar("%s() - mDefaultClassEntry.mSelectHandle (line %d)", __FUNCTION__, __LINE__));
+   mDefaultClassEntry.mLockedHandle    = GFXTexHandle(mLockedHandle,    &GFXStaticTextureSRGBProfile, avar("%s() - mDefaultClassEntry.mLockedHandle (line %d)", __FUNCTION__, __LINE__));
 
    if(!(mDefaultClassEntry.mDefaultHandle && mDefaultClassEntry.mSelectHandle && mDefaultClassEntry.mLockedHandle))
       return false;

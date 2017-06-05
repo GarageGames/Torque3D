@@ -62,7 +62,9 @@ public:
    void getColor( ColorI *color ) const
    {
       mDeviceSwizzle->ToBuffer( color, &packedColorData, sizeof( packedColorData ) );
-   }      
+   }
+
+   GFXVertexColor toLinear();
 };
 
 #endif

@@ -78,7 +78,7 @@ public:
 
    enum BaseTexFormat
    {
-      NONE, DDS, PNG, JPG
+      NONE, DDS, PNG
    };
 
    static const char* formatToExtension(BaseTexFormat format)
@@ -89,8 +89,6 @@ public:
          return "dds";
       case PNG:
          return "png";
-      case JPG:
-         return "jpg";
       default:
          return "";
       }

@@ -48,7 +48,7 @@
 #include "gfx/gfxTransformSaver.h"
 #include "gfx/bitmap/gBitmap.h"
 #include "gfx/bitmap/ddsFile.h"
-#include "gfx/bitmap/ddsUtils.h"
+#include "gfx/bitmap/imageUtils.h"
 #include "terrain/terrMaterial.h"
 #include "gfx/gfxDebugEvent.h"
 #include "gfx/gfxCardProfile.h"
@@ -83,10 +83,11 @@ void TerrainBlock::_updateMaterials()
    {
       TerrainMaterial *mat = mFile->mMaterials[i];
 
-      if( !mat->getDiffuseMap().isEmpty() )
-         mBaseTextures[i].set( mat->getDiffuseMap(),  
-            &GFXDefaultStaticDiffuseProfile, 
-            "TerrainBlock::_updateMaterials() - DiffuseMap" );
+      if (!mat->getDiffuseMap().isEmpty())
+      {
+         mBaseTextures[i].set(mat->getDiffuseMap(), &GFXStaticTextureSRGBProfile,
+            "TerrainBlock::_updateMaterials() - DiffuseMap");
+      }
       else
          mBaseTextures[ i ] = GFXTexHandle();
 
@@ -113,7 +114,7 @@ void TerrainBlock::_updateLayerTexture()
    if (  mLayerTex.isNull() ||
          mLayerTex.getWidth() != layerSize ||
          mLayerTex.getHeight() != layerSize )
-      mLayerTex.set( layerSize, layerSize, GFXFormatB8G8R8A8, &TerrainLayerTexProfile, "" );
+      mLayerTex.set( layerSize, layerSize, GFXFormatR8G8B8A8, &TerrainLayerTexProfile, "" );
 
    AssertFatal(   mLayerTex.getWidth() == layerSize &&
                   mLayerTex.getHeight() == layerSize,
@@ -232,12 +233,12 @@ void TerrainBlock::_updateBaseTexture(bool writeToCache)
    // use it to render to else we create one.
    if (  mBaseTex.isValid() && 
          mBaseTex->isRenderTarget() &&
-         mBaseTex->getFormat() == GFXFormatR8G8B8A8 &&
+         mBaseTex->getFormat() == GFXFormatR8G8B8A8_SRGB &&
          mBaseTex->getWidth() == destSize.x &&
          mBaseTex->getHeight() == destSize.y )
       blendTex = mBaseTex;
    else
-      blendTex.set( destSize.x, destSize.y, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, "" );
+      blendTex.set( destSize.x, destSize.y, GFXFormatR8G8B8A8_SRGB, &GFXRenderTargetSRGBProfile, "" );
 
    GFX->pushActiveRenderTarget();   
 
@@ -324,7 +325,7 @@ void TerrainBlock::_updateBaseTexture(bool writeToCache)
          blendBmp.extrudeMipLevels();
 
          DDSFile *blendDDS = DDSFile::createDDSFileFromGBitmap( &blendBmp );
-         DDSUtil::squishDDS( blendDDS, GFXFormatDXT1 );
+         ImageUtil::ddsCompress( blendDDS, GFXFormatBC1 );
 
          // Write result to file stream
          blendDDS->write( fs );
@@ -342,7 +343,7 @@ void TerrainBlock::_updateBaseTexture(bool writeToCache)
          return;
       }
 
-      GBitmap bitmap(blendTex->getWidth(), blendTex->getHeight(), false, GFXFormatR8G8B8);
+      GBitmap bitmap(blendTex->getWidth(), blendTex->getHeight(), false, GFXFormatR8G8B8A8);
       blendTex->copyToBmp(&bitmap);
       bitmap.writeBitmap(formatToExtension(mBaseTexFormat), stream);
    }

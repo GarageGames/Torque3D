@@ -1260,7 +1260,7 @@ bool fxFoliageReplicator::onAdd()
    {
       // Yes, so load foliage texture.
       if( mFieldData.mFoliageFile != NULL && dStrlen(mFieldData.mFoliageFile) > 0 )
-         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXDefaultStaticDiffuseProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
+         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXStaticTextureSRGBProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
 
       if ((GFXTextureObject*) mFieldData.mFoliageTexture == NULL)
          Con::printf("fxFoliageReplicator:  %s is an invalid or missing foliage texture file.", mFieldData.mFoliageFile);
@@ -1407,7 +1407,7 @@ void fxFoliageReplicator::computeAlphaTex()
       ColorI c((U8) (255.0f * ItemAlpha), 0, 0);
       mAlphaLookup->setColor(i, 0, c);
    }
-   mAlphaTexture.set(mAlphaLookup, &GFXDefaultStaticDiffuseProfile, false, String("fxFoliage Replicator Alpha Texture") );
+   mAlphaTexture.set(mAlphaLookup, &GFXStaticTextureSRGBProfile, false, String("fxFoliage Replicator Alpha Texture") );
 }
 
 // Renders a triangle stripped oval
@@ -1791,7 +1791,7 @@ void fxFoliageReplicator::unpackUpdate(NetConnection * con, BitStream * stream)
 
       // Load Foliage Texture on the client.
       if( mFieldData.mFoliageFile != NULL && dStrlen(mFieldData.mFoliageFile) > 0 )
-         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXDefaultStaticDiffuseProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
+         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXStaticTextureSRGBProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
 
       if ((GFXTextureObject*) mFieldData.mFoliageTexture == NULL)
          Con::printf("fxFoliageReplicator:  %s is an invalid or missing foliage texture file.", mFieldData.mFoliageFile);

@@ -115,6 +115,7 @@ Material::Material()
    for( U32 i=0; i<MAX_STAGES; i++ )
    {
       mDiffuse[i].set( 1.0f, 1.0f, 1.0f, 1.0f );
+      mDiffuseMapSRGB[i] = true;
       mSpecular[i].set( 1.0f, 1.0f, 1.0f, 1.0f );
 
       mSpecularPower[i] = 8.0f;
@@ -225,6 +226,9 @@ void Material::initPersistFields()
 
       addField("diffuseMap", TypeImageFilename, Offset(mDiffuseMapFilename, Material), MAX_STAGES,
          "The diffuse color texture map." );
+
+      addField("diffuseMapSRGB", TypeBool, Offset(mDiffuseMapSRGB, Material), MAX_STAGES,
+         "Enable sRGB for the diffuse color texture map.");
 
       addField("overlayMap", TypeImageFilename, Offset(mOverlayMapFilename, Material), MAX_STAGES,
          "A secondary diffuse color texture map which will use the second texcoord of a mesh." );

@@ -49,7 +49,7 @@ void GFXGeneralFence::_init()
    mInitialized = true;
 
    // Allocate resources
-   mInitialized &= mRTTexHandle.set( 2, 2, GFXFormatR8G8B8X8, &GFXDefaultRenderTargetProfile, avar("%s() - mInitialized (line %d)", __FUNCTION__, __LINE__) );
+   mInitialized &= mRTTexHandle.set( 2, 2, GFXFormatR8G8B8X8, &GFXRenderTargetProfile, avar("%s() - mInitialized (line %d)", __FUNCTION__, __LINE__) );
    mRenderTarget = GFX->allocRenderToTextureTarget();
    mInitialized &= ( mRenderTarget != NULL );
 
@@ -120,7 +120,7 @@ void GFXGeneralFence::_onTextureEvent( GFXTexCallbackCode code )
       break;
 
    case GFXResurrect:
-      mRTTexHandle.set( 2, 2, GFXFormatR8G8B8X8, &GFXDefaultRenderTargetProfile, avar("%s() - GFXGeneralFence->mRTTexHandle (line %d)", __FUNCTION__, __LINE__) );
+      mRTTexHandle.set( 2, 2, GFXFormatR8G8B8X8, &GFXRenderTargetProfile, avar("%s() - GFXGeneralFence->mRTTexHandle (line %d)", __FUNCTION__, __LINE__) );
       break;
    }
 }
@@ -132,7 +132,7 @@ void GFXGeneralFence::zombify()
 
 void GFXGeneralFence::resurrect()
 {
-   mRTTexHandle.set( 2, 2, GFXFormatR8G8B8X8, &GFXDefaultRenderTargetProfile, avar("%s() - mRTTexHandle (line %d)", __FUNCTION__, __LINE__) );
+   mRTTexHandle.set( 2, 2, GFXFormatR8G8B8X8, &GFXRenderTargetProfile, avar("%s() - mRTTexHandle (line %d)", __FUNCTION__, __LINE__) );
 }
 
 const String GFXGeneralFence::describeSelf() const

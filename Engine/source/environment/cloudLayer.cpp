@@ -398,10 +398,10 @@ void CloudLayer::_initTexture()
    }
 
    if ( mTextureName.isNotEmpty() )
-      mTexture.set( mTextureName, &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
+      mTexture.set( mTextureName, &GFXStaticTextureSRGBProfile, "CloudLayer" );
 
    if ( mTexture.isNull() )
-      mTexture.set( GFXTextureManager::getWarningTexturePath(), &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
+      mTexture.set( GFXTextureManager::getWarningTexturePath(), &GFXStaticTextureSRGBProfile, "CloudLayer" );
 }
 
 void CloudLayer::_initBuffers()

@@ -135,7 +135,6 @@ void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, Col
    }
 
    //A couple of checks to determine if color blend
-   //A couple of checks to determine if color blend
    if (c1 == colorWhite && c3 == colorAlpha && c4 == colorBlack)
    {
       //Color
@@ -232,7 +231,7 @@ void GuiColorPickerCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, U8 numC
    else
    {
       for (U16 i = 0; i < numColors - 1; i++)
-         col[i] = colors[i].toGamma();
+         col[i] = ColorF(colors[i]).toGamma();
    }
 
 
@@ -404,7 +403,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
          U32 buf_x = offset.x + mSelectorPos.x + 1;
          U32 buf_y = resolution.y - (extent.y - (offset.y + mSelectorPos.y + 1));
 
-         GFXTexHandle bb( resolution.x, resolution.y, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__) );
+         GFXTexHandle bb(resolution.x, resolution.y, GFXFormatR8G8B8A8_SRGB, &GFXRenderTargetSRGBProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__));
 
          Point2I tmpPt(buf_x, buf_y);
 
@@ -417,7 +416,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
             mBitmap = NULL;
          }
 
-         mBitmap = new GBitmap(bb.getWidth(), bb.getHeight());
+         mBitmap = new GBitmap(bb.getWidth(), bb.getHeight(),false,GFXFormatR8G8B8A8);
 
          bb.copyToBmp(mBitmap);
 

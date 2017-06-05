@@ -633,7 +633,7 @@ bool LightFlareData::_preload( bool server, String &errorStr )
    if ( !server )
    {
       if ( mFlareTextureName.isNotEmpty() )      
-         mFlareTexture.set( mFlareTextureName, &GFXDefaultStaticDiffuseProfile, "FlareTexture" );  
+         mFlareTexture.set( mFlareTextureName, &GFXStaticTextureSRGBProfile, "FlareTexture" );
    }
 
    return true;

@@ -371,7 +371,7 @@ void LevelInfo::setLevelAccuTexture(const String& name)
    mAccuTextureName = name;
    if (isClientObject() && mAccuTextureName.isNotEmpty())
    {
-      mAccuTexture.set(mAccuTextureName, &GFXDefaultStaticDiffuseProfile, "AccumulationVolume::mAccuTexture");
+      mAccuTexture.set(mAccuTextureName, &GFXStaticTextureSRGBProfile, "AccumulationVolume::mAccuTexture");
       if (mAccuTexture.isNull())
          Con::warnf("AccumulationVolume::setTexture - Unable to load texture: %s", mAccuTextureName.c_str());
       else

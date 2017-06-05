@@ -49,7 +49,7 @@ uniform float blurNormalTol;
 void sample( float2 uv, float weight, float4 centerTap, inout int usedCount, inout float occlusion, inout float total )
 {
    //return;
-   float4 tap = TORQUE_PREPASS_UNCONDITION( deferredMap, uv );   
+   float4 tap = TORQUE_DEFERRED_UNCONDITION( deferredMap, uv );   
    
    if ( abs( tap.a - centerTap.a ) < blurDepthTol )
    {
@@ -65,7 +65,7 @@ void sample( float2 uv, float weight, float4 centerTap, inout int usedCount, ino
 float4 main( VertToPix IN ) : TORQUE_TARGET0
 {   
    //float4 centerTap;
-   float4 centerTap = TORQUE_PREPASS_UNCONDITION( deferredMap, IN.uv0.zw );
+   float4 centerTap = TORQUE_DEFERRED_UNCONDITION( deferredMap, IN.uv0.zw );
    
    //return centerTap;
    

@@ -170,7 +170,7 @@ bool RenderTexTargetBinManager::_updateTargets()
             || mTargetChainTextures[i][j].getFormat() != mTargetFormat)
          {
          ret &= mTargetChainTextures[i][j].set( mTargetSize.x, mTargetSize.y, mTargetFormat,
-            &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
+            &GFXRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ),
             1, GFXTextureManager::AA_MATCH_BACKBUFFER );
 
          mTargetChain[i]->attachTexture( GFXTextureTarget::RenderSlot(GFXTextureTarget::Color0 + j), mTargetChainTextures[i][j] );

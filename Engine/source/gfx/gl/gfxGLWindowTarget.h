@@ -39,7 +39,7 @@ public:
    virtual GFXFormat getFormat()
    {
       // TODO: Fix me!
-      return GFXFormatR8G8B8A8;
+      return GFXFormatR8G8B8A8_SRGB;
    }
    void makeActive();
    virtual bool present();
@@ -50,9 +50,6 @@ public:
    virtual void resolveTo(GFXTextureObject* obj);
    
    void _onAppSignal(WindowId wnd, S32 event);
-
-   // create pixel format for the window
-   void createPixelFormat();
    
 private:
    friend class GFXGLDevice;
@@ -61,8 +58,6 @@ private:
    GFXTexHandle mBackBufferColorTex, mBackBufferDepthTex;
    Point2I size;   
    GFXDevice* mDevice;
-   /// Is this a secondary window
-   bool mSecondaryWindow;
    void* mContext;
    void* mFullscreenContext;
    void _teardownCurrentMode();

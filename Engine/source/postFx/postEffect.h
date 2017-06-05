@@ -86,6 +86,7 @@ public:
 protected:
 
    FileName mTexFilename[NumTextures];
+   bool mTexSRGB[NumTextures];
 
    GFXTexHandle mTextures[NumTextures];
 

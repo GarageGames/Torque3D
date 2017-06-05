@@ -118,7 +118,7 @@ void ImposterCaptureMaterialHook::init( BaseMatInstance *inMat )
    mDiffuseMatInst->getFeaturesDelegate().bind( &ImposterCaptureMaterialHook::_overrideFeatures );
    mDiffuseMatInst->init( features, inMat->getVertexFormat() );
    
-   features.addFeature( MFT_IsDXTnm );
+   features.addFeature( MFT_IsBC3nm );
    features.addFeature( MFT_NormalMap );
    features.addFeature( MFT_NormalsOut );
    features.addFeature( MFT_AccuMap );
@@ -372,10 +372,10 @@ void ImposterCapture::begin(  TSShapeInstance *shapeInst,
    mRadius = radius;
    mCenter = center;
 
-   mBlackTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
-   mWhiteTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
-   mNormalTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
-   mDepthBuffer.set( mDim, mDim, GFXFormatD24S8, &GFXDefaultZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) ); 
+   mBlackTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+   mWhiteTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+   mNormalTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+   mDepthBuffer.set( mDim, mDim, GFXFormatD24S8, &GFXZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
 
    // copy the black render target data into a bitmap
    mBlackBmp = new GBitmap;

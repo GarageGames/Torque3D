@@ -55,7 +55,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {    
    //float2 deferredCoord = IN.uv0;
    //IN.uv0 = ( IN.uv0.xy * rtParams0.zw ) + rtParams0.xy;
-   float depth = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 ).w;
+   float depth = TORQUE_DEFERRED_UNCONDITION( deferredTex, IN.uv0 ).w;
    //return float4( depth.rrr, 1 );
    
    // Skip fogging the extreme far plane so that 

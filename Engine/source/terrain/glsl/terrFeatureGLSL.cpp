@@ -266,7 +266,6 @@ void TerrainBaseMapFeatGLSL::processPix(  Vector<ShaderComponent*> &componentLis
    baseColor->setType( "vec4" );
    baseColor->setName( "baseColor" );
    meta->addStatement( new GenOp( "   @ = tex2D( @, @.xy );\r\n", new DecOp( baseColor ), diffuseMap, texCoord ) );
-   meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", baseColor, baseColor));
 
   ShaderFeature::OutputTarget target = ShaderFeature::DefaultTarget;
 
@@ -574,7 +573,7 @@ void TerrainDetailMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
       Var *normalMap = _getNormalMapTex();
 
       // Call the library function to do the rest.
-      if (fd.features.hasFeature(MFT_IsDXTnm, detailIndex))
+      if (fd.features.hasFeature(MFT_IsBC3nm, detailIndex))
       {
          meta->addStatement(new GenOp("   @.xy += parallaxOffsetDxtnm( @, @.xy, @, @.z * @ );\r\n",
          inDet, normalMap, inDet, negViewTS, detailInfo, detailBlend));

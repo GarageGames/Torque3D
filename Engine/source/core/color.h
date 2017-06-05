@@ -173,25 +173,10 @@ class ColorI
 
    static const ColorI& StockColor( const char* pStockColorName );
    StringTableEntry StockColor( void );
-
-   ColorI& operator*=(const F32 in_mul);
-   ColorI  operator*(const F32 in_mul) const;
-
-   ColorI  operator+(const ColorI& in_rAdd) const;
-   ColorI&  operator+=(const ColorI& in_rAdd);
-
-   ColorI& operator*=(const S32 in_mul);
-   ColorI& operator/=(const S32 in_mul);
-   ColorI  operator*(const S32 in_mul) const;
-   ColorI  operator/(const S32 in_mul) const;
-
+   
    bool operator==(const ColorI&) const;
    bool operator!=(const ColorI&) const;
-
-   void interpolate(const ColorI& in_rC1,
-                    const ColorI& in_rC2,
-                    const F32  in_factor);
-
+   
    U32 getARGBPack() const;
    U32 getRGBAPack() const;
    U32 getABGRPack() const;
@@ -213,10 +198,7 @@ class ColorI
    operator ColorF() const;
 
    operator const U8*() const { return &red; }
-
-   ColorI toLinear();
-   ColorI toGamma();
-
+   
    static const ColorI ZERO;
    static const ColorI ONE;
    static const ColorI WHITE;
@@ -315,46 +297,41 @@ inline ColorF& ColorF::operator*=(const ColorF& in_mul)
 
 inline ColorF ColorF::operator*(const ColorF& in_mul) const
 {
-   return ColorF(red   * in_mul.red,
-                 green * in_mul.green,
-                 blue  * in_mul.blue,
-                 alpha * in_mul.alpha);
+   ColorF tmp(*this);
+   tmp *= in_mul;
+   return tmp;
 }
 
 inline ColorF& ColorF::operator+=(const ColorF& in_rAdd)
 {
-   red   += in_rAdd.red;
+   red += in_rAdd.red;
    green += in_rAdd.green;
-   blue  += in_rAdd.blue;
+   blue += in_rAdd.blue;
    alpha += in_rAdd.alpha;
-
    return *this;
 }
 
 inline ColorF ColorF::operator+(const ColorF& in_rAdd) const
 {
-   return ColorF(red   + in_rAdd.red,
-                  green + in_rAdd.green,
-                  blue  + in_rAdd.blue,
-                  alpha + in_rAdd.alpha);
+   ColorF temp(*this);
+   temp += in_rAdd;
+   return temp;
 }
 
 inline ColorF& ColorF::operator-=(const ColorF& in_rSub)
 {
-   red   -= in_rSub.red;
+   red -= in_rSub.red;
    green -= in_rSub.green;
-   blue  -= in_rSub.blue;
+   blue -= in_rSub.blue;
    alpha -= in_rSub.alpha;
-
    return *this;
 }
 
 inline ColorF ColorF::operator-(const ColorF& in_rSub) const
 {
-   return ColorF(red   - in_rSub.red,
-                 green - in_rSub.green,
-                 blue  - in_rSub.blue,
-                 alpha - in_rSub.alpha);
+   ColorF tmp(*this);
+   tmp -= in_rSub;
+   return tmp;
 }
 
 inline ColorF& ColorF::operator*=(const F32 in_mul)
@@ -363,16 +340,14 @@ inline ColorF& ColorF::operator*=(const F32 in_mul)
    green *= in_mul;
    blue  *= in_mul;
    alpha *= in_mul;
-
    return *this;
 }
 
 inline ColorF ColorF::operator*(const F32 in_mul) const
 {
-   return ColorF(red   * in_mul,
-                  green * in_mul,
-                  blue  * in_mul,
-                  alpha * in_mul);
+   ColorF tmp(*this);
+   tmp *= in_mul;
+   return tmp;
 }
 
 inline ColorF& ColorF::operator/=(const F32 in_div)
@@ -380,11 +355,10 @@ inline ColorF& ColorF::operator/=(const F32 in_div)
    AssertFatal(in_div != 0.0f, "Error, div by zero...");
    F32 inv = 1.0f / in_div;
 
-   red   *= inv;
+   red *= inv;
    green *= inv;
-   blue  *= inv;
+   blue *= inv;
    alpha *= inv;
-
    return *this;
 }
 
@@ -392,11 +366,9 @@ inline ColorF ColorF::operator/(const F32 in_div) const
 {
    AssertFatal(in_div != 0.0f, "Error, div by zero...");
    F32 inv = 1.0f / in_div;
-
-   return ColorF(red * inv,
-                  green * inv,
-                  blue  * inv,
-                  alpha * inv);
+   ColorF tmp(*this);
+   tmp /= inv;
+   return tmp;
 }
 
 inline ColorF ColorF::operator-() const
@@ -443,10 +415,27 @@ inline void ColorF::interpolate(const ColorF& in_rC1,
                     const ColorF& in_rC2,
                     const F32  in_factor)
 {
+   if (in_factor <= 0 || in_rC1 == in_rC2)
+   {
+      red = in_rC1.red;
+      green = in_rC1.green;
+      blue =in_rC1.blue;
+      alpha = in_rC1.alpha;
+      return;
+   }
+   else if (in_factor >= 1)
+   {
+      red = in_rC2.red;
+      green = in_rC2.green;
+      blue = in_rC2.blue;
+      alpha = in_rC2.alpha;
+      return;
+   }
+
    F32 f2 = 1.0f - in_factor;
-   red   = (in_rC1.red   * f2) + (in_rC2.red   * in_factor);
+   red = (in_rC1.red   * f2) + (in_rC2.red   * in_factor);
    green = (in_rC1.green * f2) + (in_rC2.green * in_factor);
-   blue  = (in_rC1.blue  * f2) + (in_rC2.blue  * in_factor);
+   blue = (in_rC1.blue  * f2) + (in_rC2.blue  * in_factor);
    alpha = (in_rC1.alpha * f2) + (in_rC2.alpha * in_factor);
 }
 
@@ -498,7 +487,8 @@ inline F32 ColorF::luminance()
    // ITU BT.709
    //return red * 0.2126f + green * 0.7152f + blue * 0.0722f;
    // ITU BT.601
-   return red * 0.3f + green * 0.59f + blue * 0.11f;
+   ColorF tmp = toLinear();
+   return tmp.red * 0.3f + tmp.green * 0.59f + tmp.blue * 0.11f;
 }
 
 //------------------------------------------------------------------------------
@@ -719,70 +709,6 @@ inline ColorI::ColorI(const ColorI& in_rCopy,
    set(in_rCopy, in_a);
 }
 
-inline ColorI& ColorI::operator*=(const F32 in_mul)
-{
-   red   = U8((F32(red)   * in_mul) + 0.5f);
-   green = U8((F32(green) * in_mul) + 0.5f);
-   blue  = U8((F32(blue)  * in_mul) + 0.5f);
-   alpha = U8((F32(alpha) * in_mul) + 0.5f);
-
-   return *this;
-}
-
-inline ColorI& ColorI::operator*=(const S32 in_mul)
-{
-   red   = red    * in_mul;
-   green = green  * in_mul;
-   blue  = blue   * in_mul;
-   alpha = alpha  * in_mul;
-
-   return *this;
-}
-
-inline ColorI& ColorI::operator/=(const S32 in_mul)
-{
-   AssertFatal(in_mul != 0.0f, "Error, div by zero...");
-   red   = red    / in_mul;
-   green = green  / in_mul;
-   blue  = blue   / in_mul;
-   alpha = alpha  / in_mul;
-
-   return *this;
-}
-
-inline ColorI ColorI::operator+(const ColorI &in_add) const
-{
-   ColorI tmp;
-
-   tmp.red   = red   + in_add.red;
-   tmp.green = green + in_add.green;
-   tmp.blue  = blue  + in_add.blue;
-   tmp.alpha = alpha + in_add.alpha;
-
-   return tmp;
-}
-
-inline ColorI ColorI::operator*(const F32 in_mul) const
-{
-   ColorI temp(*this);
-   temp *= in_mul;
-   return temp;
-}
-
-inline ColorI ColorI::operator*(const S32 in_mul) const
-{
-   ColorI temp(*this);
-   temp *= in_mul;
-   return temp;
-}
-
-inline ColorI ColorI::operator/(const S32 in_mul) const
-{
-   ColorI temp(*this);
-   temp /= in_mul;
-   return temp;
-}
-
 inline bool ColorI::operator==(const ColorI& in_Cmp) const
 {
 	return (red == in_Cmp.red && green == in_Cmp.green && blue == in_Cmp.blue && alpha == in_Cmp.alpha);
@@ -791,27 +717,6 @@ inline bool ColorI::operator==(const ColorI& in_Cmp) const
 inline bool ColorI::operator!=(const ColorI& in_Cmp) const
 {
 	return (red != in_Cmp.red || green != in_Cmp.green || blue != in_Cmp.blue || alpha != in_Cmp.alpha);
-}
-
-inline ColorI& ColorI::operator+=(const ColorI& in_rAdd)
-{
-   red   += in_rAdd.red;
-   green += in_rAdd.green;
-   blue  += in_rAdd.blue;
-   alpha += in_rAdd.alpha;
-
-   return *this;
-}
-
-inline void ColorI::interpolate(const ColorI& in_rC1,
-                    const ColorI& in_rC2,
-                    const F32  in_factor)
-{
-   F32 f2= 1.0f - in_factor;
-   red   = U8(((F32(in_rC1.red)   * f2) + (F32(in_rC2.red)   * in_factor)) + 0.5f);
-   green = U8(((F32(in_rC1.green) * f2) + (F32(in_rC2.green) * in_factor)) + 0.5f);
-   blue  = U8(((F32(in_rC1.blue)  * f2) + (F32(in_rC2.blue)  * in_factor)) + 0.5f);
-   alpha = U8(((F32(in_rC1.alpha) * f2) + (F32(in_rC2.alpha) * in_factor)) + 0.5f);
 }
 
 inline U32 ColorI::getARGBPack() const
@@ -971,25 +876,14 @@ inline String ColorI::getHex() const
 	return result;
 }
 
-inline ColorI ColorI::toGamma()
-{
-   ColorF color = (ColorF)*this;
-   return (ColorI)color.toGamma();
-}
-
-inline ColorI ColorI::toLinear()
-{
-   ColorF color = (ColorF)*this;
-   return (ColorI)color.toLinear();
-}
-
 //-------------------------------------- INLINE CONVERSION OPERATORS
 inline ColorF::operator ColorI() const
 {
-   return ColorI(U8(red   * 255.0f + 0.5),
-                  U8(green * 255.0f + 0.5),
-                  U8(blue  * 255.0f + 0.5),
-                  U8(alpha * 255.0f + 0.5));
+   ColorF t = ColorF(red, green, blue, alpha).toGamma();
+   return ColorI(U8(t.red   * 255.0f + 0.5),
+                  U8(t.green * 255.0f + 0.5),
+                  U8(t.blue  * 255.0f + 0.5),
+                  U8(t.alpha * 255.0f + 0.5));
 }
 
 inline ColorI::operator ColorF() const
@@ -999,7 +893,7 @@ inline ColorI::operator ColorF() const
    return ColorF(F32(red)   * inv255,
                  F32(green) * inv255,
                  F32(blue)  * inv255,
-                 F32(alpha) * inv255);
+                 F32(alpha) * inv255).toLinear();
 }
 
 #endif //_COLOR_H_

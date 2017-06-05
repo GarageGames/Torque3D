@@ -31,7 +31,7 @@
 #include "renderInstance/renderImposterMgr.h"
 #include "gfx/gfxTransformSaver.h"
 #include "gfx/bitmap/ddsFile.h"
-#include "gfx/bitmap/ddsUtils.h"
+#include "gfx/bitmap/imageUtils.h"
 #include "gfx/gfxTextureManager.h"
 #include "math/mRandom.h"
 #include "core/stream/fileStream.h"
@@ -240,12 +240,12 @@ void TSLastDetail::update( bool forceUpdate )
 
    // Get the diffuse texture and from its size and
    // the imposter dimensions we can generate the UVs.
-   GFXTexHandle diffuseTex( diffuseMapPath, &GFXDefaultStaticDiffuseProfile, String::EmptyString );
+   GFXTexHandle diffuseTex( diffuseMapPath, &GFXStaticTextureSRGBProfile, String::EmptyString );
    Point2I texSize( diffuseTex->getWidth(), diffuseTex->getHeight() );
 
    _validateDim();
 
-   S32 downscaledDim = mDim >> GFXTextureManager::getTextureDownscalePower(&GFXDefaultStaticDiffuseProfile);
+   S32 downscaledDim = mDim >> GFXTextureManager::getTextureDownscalePower(&GFXStaticTextureSRGBProfile);
 
    // Ok... pack in bitmaps till we run out.
    Vector<RectF> imposterUVs;
@@ -482,14 +482,14 @@ void TSLastDetail::_update()
    // DEBUG: Some code to force usage of a test image.
    //GBitmap* tempMap = GBitmap::load( "./forest/data/test1234.png" );
    //tempMap->extrudeMipLevels();
-   //mTexture.set( tempMap, &GFXDefaultStaticDiffuseProfile, false );
+   //mTexture.set( tempMap, &GFXStaticTextureSRGBProfile, false );
    //delete tempMap;
 
    DDSFile *ddsDest = DDSFile::createDDSFileFromGBitmap( &destBmp );
-   DDSUtil::squishDDS( ddsDest, GFXFormatDXT3 );
+   ImageUtil::ddsCompress( ddsDest, GFXFormatBC2 );
 
    DDSFile *ddsNormals = DDSFile::createDDSFileFromGBitmap( &destNormal );
-   DDSUtil::squishDDS( ddsNormals, GFXFormatDXT5 );
+   ImageUtil::ddsCompress( ddsNormals, GFXFormatBC3 );
 
    // Finally save the imposters to disk.
    FileStream fs;
