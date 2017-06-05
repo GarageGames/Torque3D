@@ -1156,7 +1156,8 @@ void Projectile::simulate( F32 dt )
       {
          // Otherwise, this represents a bounce.  First, reflect our velocity
          //  around the normal...
-         Point3F bounceVel = mCurrVelocity - rInfo.normal * (mDot( mCurrVelocity, rInfo.normal ) * 2.0);
+         Point3F bounceVel = -mCurrVelocity;
+         if(!(rInfo.normal.isZero())) bounceVel = mCurrVelocity - rInfo.normal * (mDot( mCurrVelocity, rInfo.normal ) * 2.0);
          mCurrVelocity = bounceVel;
 
          // Add in surface friction...
