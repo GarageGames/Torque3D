@@ -41,9 +41,9 @@ class Px3Collision;
 struct Px3CollisionDesc;
 
 namespace physx{
-   class PxRigidActor;
-   class PxMaterial;
-   class PxShape;
+	class PxRigidActor;
+	class PxMaterial;
+	class PxShape;
 }
 
 
@@ -117,8 +117,8 @@ public:
                               F32 staticFriction );
    virtual void applyCorrection( const MatrixF &xfm );
    virtual void applyImpulse( const Point3F &origin, const Point3F &force );
-   virtual void applyTorque( const Point3F &torque );
-   virtual void applyForce( const Point3F &force );
+   virtual void applyTorque( const Point3F &torque);
+   virtual void applyForce( const Point3F &force);
    virtual void findContact(SceneObject **contactObject, VectorF *contactNormal,
       Vector<SceneObject*> *outOverlapObjects) const;
    virtual void moveKinematicTo(const MatrixF &xfm);

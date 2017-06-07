@@ -94,7 +94,7 @@ bool Px3Collision::addConvex(  const Point3F *points,
 	convexDesc.points.data = points;
 	convexDesc.points.stride = sizeof(Point3F);
 	convexDesc.points.count = count;
-	convexDesc.flags = physx::PxConvexFlag::eFLIPNORMALS|physx::PxConvexFlag::eCOMPUTE_CONVEX | physx::PxConvexFlag::eINFLATE_CONVEX;
+	convexDesc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX | physx::PxConvexFlag::eCHECK_ZERO_AREA_TRIANGLES;
 
 	Px3MemOutStream stream;
 	if(!cooking->cookConvexMesh(convexDesc,stream))
@@ -199,7 +199,8 @@ bool Px3Collision::addHeightfield(   const U16 *heights,
       }
    }
 
-	physx::PxHeightField * hf = gPhysics3SDK->createHeightField(heightFieldDesc);
+   physx::PxCooking *cooking = Px3World::getCooking();
+	physx::PxHeightField * hf = cooking->createHeightField(heightFieldDesc,gPhysics3SDK->getPhysicsInsertionCallback());
 	physx::PxHeightFieldGeometry *geom = new physx::PxHeightFieldGeometry(hf,physx::PxMeshGeometryFlags(),heightScale,metersPerSample,metersPerSample);
 		
 	physx::PxTransform pose= physx::PxTransform(physx::PxQuat(Float_HalfPi, physx::PxVec3(1, 0, 0 )));
