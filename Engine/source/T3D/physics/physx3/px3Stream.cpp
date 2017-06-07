@@ -83,7 +83,7 @@ Px3ConsoleStream::~Px3ConsoleStream()
 {
 }
 
-void Px3ConsoleStream::reportError( physx::PxErrorCode code, const char *message, const char* file, int line )
+void Px3ConsoleStream::reportError(physx::PxErrorCode::Enum code, const char* message, const char* file, int line)
 {
 	UTF8 info[1024];
 	dSprintf( info, 1024, "File: %s\nLine: %d\n%s", file, line, message );
