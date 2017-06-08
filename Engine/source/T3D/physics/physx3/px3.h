@@ -33,19 +33,43 @@
    #define WIN32
 #endif
 
+// macOS _DEBUG & NDEBUG
+#if defined(TORQUE_OS_MAC) && defined(TORQUE_DEBUG) && !defined(_DEBUG)
+   #define _DEBUG
+#elif defined(TORQUE_OS_MAC) && defined(TORQUE_RELEASE) && !defined(NDEBUG)
+   #define NDEBUG
+#endif
+
+// Linux _DEBUG & NDEBUG
+#if defined(TORQUE_OS_LINUX) && defined(TORQUE_DEBUG) && !defined(_DEBUG)
+#define _DEBUG
+#elif defined(TORQUE_OS_LINUX) && defined(TORQUE_RELEASE) && !defined(NDEBUG)
+#define NDEBUG
+#endif
+
 //-------------------------------------------------------------------------
 
+//safe release template
+template <class T> void SafeReleasePhysx(T* a)
+{
+   if (a)
+   {
+      a->release();
+      a = NULL;
+   }
+}
+
 #include <PxPhysicsAPI.h>
-#include <PxExtensionsAPI.h>
-#include <PxDefaultErrorCallback.h>
-#include <PxDefaultAllocator.h>
-#include <PxDefaultSimulationFilterShader.h>
-#include <PxDefaultCpuDispatcher.h>
-#include <PxShapeExt.h>
-#include <PxSimpleFactory.h>
-#include <PxFoundation.h>
-#include <PxController.h>
-#include <PxIO.h> 
+#include <extensions/PxExtensionsAPI.h>
+#include <extensions/PxDefaultErrorCallback.h>
+#include <extensions/PxDefaultAllocator.h>
+#include <extensions/PxDefaultSimulationFilterShader.h>
+#include <extensions/PxDefaultCpuDispatcher.h>
+#include <extensions/PxShapeExt.h>
+#include <extensions/PxSimpleFactory.h>
+#include <foundation/PxFoundation.h>
+#include <characterkinematic/PxController.h>
+#include <pvd/PxPvd.h>
 
 
 extern physx::PxPhysics* gPhysics3SDK;

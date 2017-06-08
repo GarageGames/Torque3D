@@ -96,6 +96,10 @@ public:
    /// @see PHYSICSPLUGIN
    static PhysicsPlugin* getSingleton() { return smSingleton; }
 
+   /// Allow gpu acceleration if supported
+   static bool smGpuAccelerationAllowed;
+   static bool gpuAccelerationAllowed() { return smGpuAccelerationAllowed; }
+
    ///
    static bool activate( const char *library );
 

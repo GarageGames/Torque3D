@@ -49,6 +49,9 @@ protected:
    /// The current gravity force.
    Point3F mGravity;
 
+   /// Gpu acceleration
+   static bool smGpuEnabled;
+
 public:
 
    /// The constructor.
@@ -115,6 +118,9 @@ public:
    /// Physics timing
    static F32 smPhysicsStepTime;
    static U32 smPhysicsMaxSubSteps;
+
+   /// Gpu acceleration
+   static bool isGpuEnabled() { return smGpuEnabled; }
 };
 
 
