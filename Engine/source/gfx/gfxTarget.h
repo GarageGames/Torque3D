@@ -52,8 +52,6 @@ class GFXTextureObject;
 /// tied to a window, or a set of surfaces or textures.
 class GFXTarget : public StrongRefBase, public GFXResource
 {
-   friend class GFXD3D9Device;
-   friend class GFX360Device;
 
 private:
    S32 mChangeToken;

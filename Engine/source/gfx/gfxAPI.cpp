@@ -42,9 +42,7 @@ ImplementEnumType( GFXAdapterType,
    "@ingroup GFX" )
    { OpenGL, "OpenGL", "OpenGL." },
    { Direct3D11, "D3D11", "Direct3D 11." },
-   { Direct3D9, "D3D9", "Direct3D 9." },
-   { NullDevice, "NullDevice", "Null device for dedicated servers." },
-   { Direct3D9_360, "Xenon", "Direct3D 9 on Xbox 360." }
+   { NullDevice, "NullDevice", "Null device for dedicated servers." }
 EndImplementEnumType;
 
 ImplementEnumType( GFXBlend,

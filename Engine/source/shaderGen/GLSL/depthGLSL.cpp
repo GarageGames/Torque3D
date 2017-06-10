@@ -67,7 +67,6 @@ void EyeSpaceDepthOutGLSL::processPix( Vector<ShaderComponent*> &componentList,
    wsEyeVec->setName( "wsEyeVec" );
    wsEyeVec->setStructName( "IN" );
    wsEyeVec->setType( "float4" );
-   wsEyeVec->mapsToSampler = false;
    wsEyeVec->uniform = false;
 
    // get shader constants
@@ -153,7 +152,6 @@ void DepthOutGLSL::processPix(   Vector<ShaderComponent*> &componentList,
    depthVar->setName( "depth" );
    depthVar->setStructName( "IN" );
    depthVar->setType( "float" );
-   depthVar->mapsToSampler = false;
    depthVar->uniform = false;
 
    /*

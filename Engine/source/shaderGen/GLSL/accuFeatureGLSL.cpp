@@ -37,7 +37,6 @@ void AccuTexFeatGLSL::processVert(Vector<ShaderComponent*> &componentList,
    MultiLine *meta = new MultiLine;
    getOutTexCoord(   "texCoord", 
                      "vec2", 
-                     true, 
                      false, 
                      meta, 
                      componentList );
@@ -130,8 +129,8 @@ void AccuTexFeatGLSL::processPix(Vector<ShaderComponent*> &componentList,
       accuSpecular->constSortPos = cspPotentialPrimitive;
    }
 
-   Var *inTex = getInTexCoord( "texCoord", "vec2", true, componentList );
-   Var *accuVec = getInTexCoord( "accuVec", "vec3", true, componentList );
+   Var *inTex = getInTexCoord( "texCoord", "vec2", componentList );
+   Var *accuVec = getInTexCoord( "accuVec", "vec3", componentList );
    Var *bumpNorm = (Var *)LangElement::find( "bumpSample" );
    if( bumpNorm == NULL ) {
       bumpNorm = (Var *)LangElement::find( "bumpNormal" );
@@ -232,7 +231,6 @@ Var* AccuTexFeatGLSL::addOutAccuVec(Vector<ShaderComponent*> &componentList, Mul
       outAccuVec->setName( "accuVec" );
       outAccuVec->setStructName( "OUT" );
       outAccuVec->setType( "float3" );
-      outAccuVec->mapsToSampler = false;
 
       getAccuVec( meta, outAccuVec );
    }
