@@ -80,7 +80,7 @@ struct EngineFunctionDefaultArguments
 
 // Need byte-aligned packing for the default argument structures.
 #ifdef _WIN64
-#pragma pack( push, 4 )
+#pragma pack( push, 8 )
 #else
 #pragma pack( push, 1 )
 #endif
