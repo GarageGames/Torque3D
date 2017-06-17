@@ -616,8 +616,8 @@ void GFXDrawUtil::drawLine( F32 x1, F32 y1, F32 z1, F32 x2, F32 y2, F32 z2, cons
    verts[0].point.set( x1, y1, z1 );
    verts[1].point.set( x2, y2, z2 );
    ColorF vertColor = ColorF(color).toLinear();
-   verts[0].color = color;
-   verts[1].color = color;
+   verts[0].color = vertColor;
+   verts[1].color = vertColor;
 
    verts.unlock();
 
@@ -1224,6 +1224,8 @@ void GFXDrawUtil::_drawWireCapsule( const GFXStateBlockDesc &desc, const Point3F
    mDevice->pushWorldMatrix();
    mDevice->multWorld(mat);
 
+   ColorF vertColor = ColorF(color).toLinear();
+
    S32 numPoints = sizeof(circlePoints)/sizeof(Point2F);
    GFXVertexBufferHandle<GFXVertexPCT> verts(mDevice, numPoints, GFXBufferTypeVolatile);
    verts.lock();
@@ -1232,7 +1234,7 @@ void GFXDrawUtil::_drawWireCapsule( const GFXStateBlockDesc &desc, const Point3F
       S32 idx = i & (~1); // just draw the even ones
       F32 z = i & 1 ? 1.0f : -1.0f;
       verts[i].point = Point3F(circlePoints[idx].x,circlePoints[idx].y, z);
-      verts[i].color = color;
+      verts[i].color = vertColor;
    }
    verts.unlock();
 
@@ -1616,15 +1618,15 @@ void GFXDrawUtil::drawTransform( const GFXStateBlockDesc &desc, const MatrixF &m
    verts[0].point = Point3F::Zero;
    verts[0].color = ColorF(colArray[0]).toLinear();
    verts[1].point = Point3F( 1, 0, 0 );
-   verts[1].color = ColorF(colArray[0]).toLinear();;
+   verts[1].color = ColorF(colArray[0]).toLinear();
    verts[2].point = Point3F::Zero;
-   verts[2].color = ColorF(colArray[1]).toLinear();;
+   verts[2].color = ColorF(colArray[1]).toLinear();
    verts[3].point = Point3F( 0, 1, 0 );
-   verts[3].color = ColorF(colArray[1]).toLinear();;
+   verts[3].color = ColorF(colArray[1]).toLinear();
    verts[4].point = Point3F::Zero;
-   verts[4].color = ColorF(colArray[2]).toLinear();;
+   verts[4].color = ColorF(colArray[2]).toLinear();
    verts[5].point = Point3F( 0, 0, 1 );
-   verts[5].color = ColorF(colArray[2]).toLinear();;
+   verts[5].color = ColorF(colArray[2]).toLinear();
 
    if ( scale )
    {
