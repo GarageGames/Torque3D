@@ -26,10 +26,7 @@
 #ifndef _SWIZZLE_H_
 #include "core/util/swizzle.h"
 #endif
-
-
-class ColorI;
-
+#include "core/color.h"
 
 class GFXVertexColor 
 {
@@ -66,5 +63,14 @@ public:
 
    GFXVertexColor toLinear();
 };
+
+inline GFXVertexColor GFXVertexColor::toLinear()
+{
+   GFXVertexColor vertColor;
+   ColorI color;
+   getColor(&color);
+   vertColor.set(ColorF(color).toLinear());
+   return vertColor;
+}
 
 #endif

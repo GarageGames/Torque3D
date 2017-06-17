@@ -197,7 +197,8 @@ bool GFXD3D11TextureObject::copyToBmp(GBitmap* bmp)
    const U32 sourceBytesPerPixel = 4;
    U32 destBytesPerPixel = 0;
 
-   if (bmp->getFormat() == GFXFormatR8G8B8A8 || bmp->getFormat() == GFXFormatR8G8B8A8_LINEAR_FORCE || mFormat == GFXFormatR8G8B8A8_SRGB)
+   const GFXFormat fmt = bmp->getFormat();
+   if (fmt == GFXFormatR8G8B8A8 || fmt == GFXFormatR8G8B8A8_LINEAR_FORCE || fmt == GFXFormatR8G8B8A8_SRGB)
       destBytesPerPixel = 4;
    else if(bmp->getFormat() == GFXFormatR8G8B8)
       destBytesPerPixel = 3;

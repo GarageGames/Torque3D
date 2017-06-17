@@ -24,12 +24,3 @@
 #include "core/color.h"
 
 Swizzle<U8, 4> *GFXVertexColor::mDeviceSwizzle = &Swizzles::null;
-
-GFXVertexColor GFXVertexColor::toLinear()
-{
-   GFXVertexColor vertColor;
-   ColorI color;
-   getColor(&color);
-   vertColor.set(color);
-   return vertColor;
-}

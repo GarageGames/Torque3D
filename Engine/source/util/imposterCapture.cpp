@@ -372,8 +372,8 @@ void ImposterCapture::begin(  TSShapeInstance *shapeInst,
    mRadius = radius;
    mCenter = center;
 
-   mBlackTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
-   mWhiteTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+   mBlackTex.set( mDim, mDim, GFXFormatR8G8B8A8_SRGB, &GFXRenderTargetSRGBProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+   mWhiteTex.set( mDim, mDim, GFXFormatR8G8B8A8_SRGB, &GFXRenderTargetSRGBProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
    mNormalTex.set( mDim, mDim, GFXFormatR8G8B8A8, &GFXRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
    mDepthBuffer.set( mDim, mDim, GFXFormatD24S8, &GFXZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
 
