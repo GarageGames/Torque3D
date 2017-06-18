@@ -879,7 +879,7 @@ void GFXD3D11Device::clear(U32 flags, ColorI color, F32 z, U32 stencil)
    ID3D11DepthStencilView* dsView = NULL;
 
    mD3DDeviceContext->OMGetRenderTargets(1, &rtView, &dsView);
-   const ColorF colorf = color;
+   const ColorF colorf = ColorF(color).toLinear();
 
    const FLOAT clearColor[4] = {
       static_cast<F32>(colorf.red),

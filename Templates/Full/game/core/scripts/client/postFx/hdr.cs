@@ -285,18 +285,17 @@ function HDRPostFX::onEnabled( %this )
    
    // HDR does it's own gamma calculation so 
    // disable this postFx.
-   GammaPostFX.disable();
+   //GammaPostFX.disable();
    
    // Set the right global shader define for HDR.
    if ( %format $= "GFXFormatR10G10B10A2" )
       addGlobalShaderMacro( "TORQUE_HDR_RGB10" );
-   else if ( %format $= "GFXFormatR16G16B16A16" )
-      addGlobalShaderMacro( "TORQUE_HDR_RGB16" );
                         
    echo( "HDR FORMAT: " @ %format );
    
    // Change the format of the offscreen surface
    // to an HDR compatible format.
+   %this.previousFormat = AL_FormatToken.format;
    AL_FormatToken.format = %format;
    setReflectFormat( %format );
    
@@ -311,15 +310,14 @@ function HDRPostFX::onEnabled( %this )
 function HDRPostFX::onDisabled( %this )
 {
    // Enable a special GammaCorrection PostFX when this is disabled.
-   GammaPostFX.enable();
+   //GammaPostFX.enable();
    
    // Restore the non-HDR offscreen surface format.
-   %format = getBestHDRFormat();
+   %format = %this.previousFormat;
    AL_FormatToken.format = %format;
    setReflectFormat( %format );
    
    removeGlobalShaderMacro( "TORQUE_HDR_RGB10" );
-   removeGlobalShaderMacro( "TORQUE_HDR_RGB16" );
             
    // Reset the light manager which will ensure the new
    // hdr encoding takes effect in all the shaders.
@@ -335,7 +333,7 @@ singleton PostEffect( HDRPostFX )
    // and before we resolve the scene to the backbuffer.
    renderTime = "PFXBeforeBin";
    renderBin = "EditorBin";
-   renderPriority = 9999;
+   renderPriority = 9998;
       
    // The bright pass generates a bloomed version of 
    // the scene for pixels which are brighter than a 
@@ -502,7 +500,7 @@ singleton PostEffect( LuminanceVisPostFX )
    // Render before we do any editor rendering.  
    renderTime = "PFXBeforeBin";
    renderBin = "EditorBin";
-   renderPriority = 9999;
+   renderPriority = 9998;
    
    shader = LuminanceVisShader;
    stateBlock = LuminanceVisStateBlock;

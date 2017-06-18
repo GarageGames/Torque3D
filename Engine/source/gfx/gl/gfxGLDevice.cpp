@@ -475,8 +475,8 @@ void GFXGLDevice::clear(U32 flags, ColorI color, F32 z, U32 stencil)
    glStencilMask(0xFFFFFFFF);
    
 
-   ColorF c = color;   
-   glClearColor(c.red, c.green, c.blue, c.alpha);
+   const ColorF colorf = ColorF(color).toLinear();
+   glClearColor(colorf.red, colorf.green, colorf.blue, colorf.alpha);
    glClearDepth(z);
    glClearStencil(stencil);
 
