@@ -342,7 +342,7 @@ void ParallaxFeatHLSL::processPix(  Vector<ShaderComponent*> &componentList,
    Var *bumpMapTexture = (Var*)LangElement::find("bumpMapTex");
 
    // Call the library function to do the rest.
-   if (fd.features.hasFeature(MFT_IsDXTnm, getProcessIndex()))
+   if (fd.features.hasFeature(MFT_IsBC3nm, getProcessIndex()))
    {
       meta->addStatement(new GenOp("   @.xy += parallaxOffsetDxtnm( @, @, @.xy, @, @ );\r\n",
          texCoord, bumpMapTexture, normalMap, texCoord, negViewTS, parallaxInfo));

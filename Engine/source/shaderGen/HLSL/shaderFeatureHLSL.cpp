@@ -146,8 +146,9 @@ LangElement *ShaderFeatureHLSL::expandNormalMap(   LangElement *sampleNormalOp,
                                                    const MaterialFeatureData &fd )
 {
    MultiLine *meta = new MultiLine;
-
-   if ( fd.features.hasFeature( MFT_IsDXTnm, getProcessIndex() ) )
+   const bool hasBc3 = fd.features.hasFeature(MFT_IsBC3nm, getProcessIndex() );
+   const bool hasBc5 = fd.features.hasFeature(MFT_IsBC5nm, getProcessIndex() );
+   if ( hasBc3 || hasBc5 )
    {
       if ( fd.features[MFT_ImposterVert] )
       {
@@ -155,11 +156,17 @@ LangElement *ShaderFeatureHLSL::expandNormalMap(   LangElement *sampleNormalOp,
          // encodes them with the z axis in the alpha component.
          meta->addStatement( new GenOp( "   @ = float4( normalize( @.xyw * 2.0 - 1.0 ), 0.0 ); // Obj DXTnm\r\n", normalDecl, sampleNormalOp ) );
       }
-      else
+      else if( hasBc3 )
       {
-         // DXT Swizzle trick
+         // BC3 Swizzle trick
          meta->addStatement( new GenOp( "   @ = float4( @.ag * 2.0 - 1.0, 0.0, 0.0 ); // DXTnm\r\n", normalDecl, sampleNormalOp ) );
          meta->addStatement( new GenOp( "   @.z = sqrt( 1.0 - dot( @.xy, @.xy ) ); // DXTnm\r\n", normalVar, normalVar, normalVar ) );
+      }
+      else if (hasBc5)
+      {
+         // BC5
+         meta->addStatement(new GenOp("   @ = float4( @.gr * 2.0 - 1.0, 0.0, 0.0 ); // bc5nm\r\n", normalDecl, sampleNormalOp ) );
+         meta->addStatement(new GenOp("   @.z = sqrt( 1.0 - dot( @.xy, @.xy ) ); // bc5nm\r\n", normalVar, normalVar, normalVar )) ;
       }
    }
    else
@@ -874,10 +881,6 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    if (  fd.features[MFT_CubeMap] )
    {
       meta->addStatement(new GenOp("   @ = @.Sample(@, @);\r\n", colorDecl, diffuseMapTex, diffuseMap, inTex));
-
-      if (!fd.features[MFT_Imposter])
-         meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor));
-
       meta->addStatement(new GenOp("   @;\r\n", assignColor(diffColor, Material::Mul, NULL, targ)));
    }
    else if(fd.features[MFT_DiffuseMapAtlas])
@@ -951,9 +954,6 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
 #endif
       meta->addStatement(new GenOp("   @ = @.SampleLevel(@,@,mipLod);\r\n",
          new DecOp(diffColor), diffuseMapTex, diffuseMap, inTex));
-      
-      if (!fd.features[MFT_Imposter])
-         meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor));
 
       meta->addStatement(new GenOp("   @;\r\n", assignColor(diffColor, Material::Mul, NULL, targ) ) );
    }
@@ -961,8 +961,6 @@ void DiffuseMapFeatHLSL::processPix(   Vector<ShaderComponent*> &componentList,
    {
        meta->addStatement(new GenOp("@ = @.Sample(@, @);\r\n", colorDecl, diffuseMapTex, diffuseMap, inTex));
 
-      if (!fd.features[MFT_Imposter])
-         meta->addStatement(new GenOp("   @ = toLinear(@);\r\n", diffColor, diffColor));
       meta->addStatement(new GenOp("   @;\r\n", assignColor(diffColor, Material::Mul, NULL, targ)));
    }   
 }

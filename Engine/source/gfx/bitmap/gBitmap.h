@@ -151,7 +151,13 @@ public:
                        const bool in_extrudeMipLevels = false,
                        const GFXFormat in_format = GFXFormatR8G8B8 );
 
+   void allocateBitmapWithMips(const U32  in_width,
+      const U32  in_height,
+      const U32  in_numMips,
+      const GFXFormat in_format = GFXFormatR8G8B8);
+
    void extrudeMipLevels(bool clearBorders = false);
+   void chopTopMips(U32 mipsToChop);
    void extrudeMipLevelsDetail();
 
    U32   getNumMipLevels() const { return mNumMipLevels; }
@@ -182,6 +188,8 @@ public:
    U32         getByteSize() const { return mByteSize; }
    U32         getBytesPerPixel() const { return mBytesPerPixel; }
 
+   U32         getSurfaceSize(const U32 mipLevel) const;
+
    /// Use these functions to set and get the mHasTransparency value
    /// This is used to indicate that this bitmap has pixels that have
    /// an alpha value less than 255 (used by the auto-Material mapper)
@@ -197,6 +205,7 @@ public:
    ColorF      sampleTexel(F32 u, F32 v) const;
    bool        getColor(const U32 x, const U32 y, ColorI& rColor) const;
    bool        setColor(const U32 x, const U32 y, const ColorI& rColor);
+   U8          getChanelValueAt(U32 x, U32 y, U32 chan);
 
    /// This method will combine bitmapA and bitmapB using the operation specified
    /// by combineOp. The result will be stored in the bitmap that this method is

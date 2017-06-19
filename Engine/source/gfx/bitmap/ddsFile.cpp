@@ -22,7 +22,9 @@
 
 #include "platform/platform.h"
 #include "gfx/bitmap/ddsFile.h"
-
+#include "gfx/bitmap/ddsData.h"
+#include "gfx/bitmap/bitmapUtils.h"
+#include "gfx/bitmap/imageUtils.h"
 #include "gfx/gfxDevice.h"
 #include "core/util/fourcc.h"
 #include "console/console.h"
@@ -31,55 +33,10 @@
 #include "gfx/bitmap/gBitmap.h"
 #include "console/engineAPI.h"
 
-
+#include <squish.h>
 
 S32 DDSFile::smActiveCopies = 0;
 U32 DDSFile::smDropMipCount = 0;
-
-// These were copied from the DX9 docs. The names are changed
-// from the "real" defines since not all platforms have them.
-enum DDSSurfaceDescFlags
-{
-   DDSDCaps         = 0x00000001l,
-   DDSDHeight       = 0x00000002l,
-   DDSDWidth        = 0x00000004l,
-   DDSDPitch        = 0x00000008l,
-   DDSDPixelFormat  = 0x00001000l,
-   DDSDMipMapCount  = 0x00020000l,
-   DDSDLinearSize   = 0x00080000l,
-   DDSDDepth        = 0x00800000l,
-};
-
-enum DDSPixelFormatFlags
-{
-   DDPFAlphaPixels   = 0x00000001,
-   DDPFFourCC        = 0x00000004,
-   DDPFRGB           = 0x00000040,
-   DDPFLUMINANCE     = 0x00020000
-};
-
-
-enum DDSCapFlags
-{
-   DDSCAPSComplex = 0x00000008,
-   DDSCAPSTexture = 0x00001000,
-   DDSCAPSMipMap  = 0x00400000,
-
-   DDSCAPS2Cubemap = 0x00000200,
-   DDSCAPS2Cubemap_POSITIVEX = 0x00000400,
-   DDSCAPS2Cubemap_NEGATIVEX = 0x00000800,
-   DDSCAPS2Cubemap_POSITIVEY = 0x00001000,
-   DDSCAPS2Cubemap_NEGATIVEY = 0x00002000,
-   DDSCAPS2Cubemap_POSITIVEZ = 0x00004000,
-   DDSCAPS2Cubemap_NEGATIVEZ = 0x00008000,
-   DDSCAPS2Volume = 0x00200000,
-};
-
-#define FOURCC_DXT1  (MakeFourCC('D','X','T','1'))
-#define FOURCC_DXT2  (MakeFourCC('D','X','T','2'))
-#define FOURCC_DXT3  (MakeFourCC('D','X','T','3'))
-#define FOURCC_DXT4  (MakeFourCC('D','X','T','4'))
-#define FOURCC_DXT5  (MakeFourCC('D','X','T','5'))
 
 DDSFile::DDSFile( const DDSFile &dds )
    :  mFlags( dds.mFlags ),
@@ -133,13 +90,13 @@ U32 DDSFile::getSurfacePitch( U32 mipLevel ) const
 
       switch(mFormat)
       {
-      case GFXFormatDXT1:
+      case GFXFormatBC1:
+      case GFXFormatBC4:
          sizeMultiple = 8;
          break;
-      case GFXFormatDXT2:
-      case GFXFormatDXT3:
-      case GFXFormatDXT4:
-      case GFXFormatDXT5:
+      case GFXFormatBC2:
+      case GFXFormatBC3:      
+      case GFXFormatBC5:
          sizeMultiple = 16;
          break;
       default:
@@ -172,13 +129,13 @@ U32 DDSFile::getSurfaceSize( U32 height, U32 width, U32 mipLevel ) const
 
       switch(mFormat)
       {
-      case GFXFormatDXT1:
+      case GFXFormatBC1:
+      case GFXFormatBC4:
          sizeMultiple = 8;
          break;
-      case GFXFormatDXT2:
-      case GFXFormatDXT3:
-      case GFXFormatDXT4:
-      case GFXFormatDXT5:
+      case GFXFormatBC2:
+      case GFXFormatBC3:      
+      case GFXFormatBC5:
          sizeMultiple = 16;
          break;
       default:
@@ -197,25 +154,34 @@ U32 DDSFile::getSurfaceSize( U32 height, U32 width, U32 mipLevel ) const
 U32 DDSFile::getSizeInBytes() const
 {
    // TODO: This doesn't take mDepth into account, so
-   // it doesn't work right for volume or cubemap textures!
+   // it doesn't work right for volume textures!
 
    U32 bytes = 0;
-   for ( U32 i=0; i < mMipMapCount; i++ )
-      bytes += getSurfaceSize( mHeight, mWidth, i );
+   if (mFlags.test(CubeMapFlag))
+   {
+      for(U32 cubeFace=0;cubeFace < Cubemap_Surface_Count;cubeFace++)
+         for (U32 i = 0; i < mMipMapCount; i++)
+            bytes += getSurfaceSize(mHeight, mWidth, i);
+   }
+   else
+   {
+      for (U32 i = 0; i < mMipMapCount; i++)
+         bytes += getSurfaceSize(mHeight, mWidth, i);
+   }
 
    return bytes;
 }
 
 U32 DDSFile::getSizeInBytes( GFXFormat format, U32 height, U32 width, U32 mipLevels )
 {
-   AssertFatal( format >= GFXFormatDXT1 && format <= GFXFormatDXT5, 
-      "DDSFile::getSizeInBytes - Must be a DXT format!" );
+   AssertFatal( ImageUtil::isCompressedFormat(format), 
+      "DDSFile::getSizeInBytes - Must be a Block Compression format!" );
 
    // From the directX docs:
    // max(1, width ÷ 4) x max(1, height ÷ 4) x 8(DXT1) or 16(DXT2-5)
 
    U32 sizeMultiple = 0;
-   if ( format == GFXFormatDXT1 )
+   if ( format == GFXFormatBC1 || format == GFXFormatBC1_SRGB || format == GFXFormatBC4)
       sizeMultiple = 8;
    else
       sizeMultiple = 16;
@@ -236,317 +202,146 @@ U32 DDSFile::getSizeInBytes( GFXFormat format, U32 height, U32 width, U32 mipLev
 
 bool DDSFile::readHeader(Stream &s)
 {
-   U32 tmp;
-
+   U32 fourcc;
    // Read the FOURCC
-   s.read(&tmp);
+   s.read(&fourcc);
 
-   if(tmp != MakeFourCC('D', 'D', 'S', ' '))
+   if(fourcc != DDS_MAGIC)
    {
       Con::errorf("DDSFile::readHeader - unexpected magic number, wanted 'DDS '!");
       return false;
    }
 
-   // Read the size of the header.
-   s.read(&tmp);
+   //dds headers
+   dds::DDS_HEADER header = {};
+   dds::DDS_HEADER_DXT10 dx10header = {};
+   //todo DX10 formats
+   bool hasDx10Header = false;
 
-   if(tmp != 124)
+   //read in header
+   s.read(DDS_HEADER_SIZE, &header);
+   //check for dx10 header support
+   if ((header.ddspf.flags & DDS_FOURCC) && (header.ddspf.fourCC == dds::D3DFMT_DX10))
    {
-      Con::errorf("DDSFile::readHeader - incorrect header size. Expected 124 bytes.");
+      //read in dx10 header
+      s.read(DDS_HEADER_DX10_SIZE, &dx10header);
+      if (!dds::validateHeaderDx10(dx10header))
+         return false;
+
+      hasDx10Header = true;
+   }
+
+   //make sure our dds header is valid
+   if (!dds::validateHeader(header))
       return false;
+
+   // store details
+   mPitchOrLinearSize = header.pitchOrLinearSize;
+   mMipMapCount = header.mipMapCount ? header.mipMapCount : 1;
+   mHeight = header.height;
+   mWidth = header.width;
+   mDepth = header.depth;
+   mFourCC = header.ddspf.fourCC;
+
+   //process dx10 header
+   if (hasDx10Header)
+   {
+      if (dx10header.arraySize > 1)
+      {
+         Con::errorf("DDSFile::readHeader - DX10 arrays not supported");
+         return false;
+      }
+
+      mFormat = dds::getGFXFormat(dx10header.dxgiFormat);
+      //make sure getGFXFormat gave us a valid format
+      if (mFormat == GFXFormat_FIRST)
+         return false;
+      //cubemap
+      if (dx10header.miscFlag & dds::D3D10_RESOURCE_MISC_TEXTURECUBE)
+      {
+         mFlags.set(CubeMap_All_Flags | ComplexFlag);
+      }
+
+      mHasTransparency = ImageUtil::isAlphaFormat(mFormat);
+
+      //mip map flag
+      if (mMipMapCount > 1)
+         mFlags.set(MipMapsFlag | ComplexFlag);
+
+      if (ImageUtil::isCompressedFormat(mFormat))
+         mFlags.set(CompressedData);
+      else
+      {
+         mBytesPerPixel = header.ddspf.bpp / 8;
+         mFlags.set(RGBData);
+      }
+
+      // we finished now
+      return true;
    }
 
-   // Read some flags...
-   U32 ddsdFlags;
-   s.read(&ddsdFlags);
+   //process regular header
 
-   // "Always include DDSD_CAPS, DDSD_PIXELFORMAT, DDSD_WIDTH, DDSD_HEIGHT."
-   if(!(ddsdFlags & (DDSDCaps | DDSDPixelFormat | DDSDWidth | DDSDHeight)))
+   //D3DFMT_DX10 is caught above, no need to check now
+   if (header.ddspf.flags & DDS_FOURCC)
    {
-      Con::errorf("DDSFile::readHeader - incorrect surface description flags.");
-      return false;
-   }
+      mFormat = dds::getGFXFormat(mFourCC);
+      //make sure getGFXFormat gave us a valid format
+      if (mFormat == GFXFormat_FIRST)
+         return false;
 
-   // Read height and width (always present)
-   s.read(&mHeight);
-   s.read(&mWidth);
-
-   // Read pitch or linear size.
-
-   // First make sure we have valid flags (either linear size or pitch).
-   if((ddsdFlags & (DDSDLinearSize | DDSDPitch)) == (DDSDLinearSize | DDSDPitch))
-   {
-      // Both are invalid!
-      Con::errorf("DDSFile::readHeader - encountered both DDSD_LINEARSIZE and DDSD_PITCH!");
-      return false;
-   }
-
-   // Ok, some flags are set, so let's do some reading.
-   s.read(&mPitchOrLinearSize);
-
-   if(ddsdFlags & DDSDLinearSize)
-   {
-      mFlags.set(LinearSizeFlag); // ( mHeight / 4 ) * ( mWidth / 4 ) * DDSSIZE
-   }
-   else if (ddsdFlags & DDSDPitch)
-   {
-      mFlags.set(PitchSizeFlag); // ( mWidth / 4 ) * DDSSIZE ???
+      if (ImageUtil::isCompressedFormat(mFormat))
+         mFlags.set(CompressedData);
+      else
+      {
+         mBytesPerPixel = header.ddspf.bpp / 8;
+         mFlags.set(RGBData);
+      }
    }
    else
    {
-      // Neither set! This appears to be depressingly common.
-      // Con::warnf("DDSFile::readHeader - encountered neither DDSD_LINEARSIZE nor DDSD_PITCH!");
-   }
+      mFormat = dds::getGFXFormat(header.ddspf);
+      //make sure getGFXFormat gave us a valid format
+      if (mFormat == GFXFormat_FIRST)
+         return false;
 
-   // Do we need to read depth? If so, we are a volume texture!
-   s.read(&mDepth);
-
-   if(ddsdFlags & DDSDDepth)
-   {
-      mFlags.set(VolumeFlag);
-   }
-   else
-   {
-      // Wipe it if the flag wasn't set!
-      mDepth = 0;
-   }
-
-   // Deal with mips!
-   s.read(&mMipMapCount);
-
-   if(ddsdFlags & DDSDMipMapCount)
-   {
-      mFlags.set(MipMapsFlag);
-   }
-   else
-   {
-      // Wipe it if the flag wasn't set!
-      mMipMapCount = 1;
-   }
-
-   // Deal with 11 DWORDS of reserved space (this reserved space brought to
-   // you by DirectDraw and the letters F and U).
-   for(U32 i=0; i<11; i++)
-      s.read(&tmp);
-
-   // Now we're onto the pixel format!
-   s.read(&tmp);
-
-   if(tmp != 32)
-   {
-      Con::errorf("DDSFile::readHeader - pixel format chunk has unexpected size!");
-      return false;
-   }
-
-   U32 ddpfFlags;
-
-   s.read(&ddpfFlags);
-
-   // Read the next few values so we can deal with them all in one go.
-   U32 pfFourCC, pfBitCount, pfRMask, pfGMask, pfBMask, pfAlphaMask;
-
-   s.read(&pfFourCC);
-   s.read(&pfBitCount);
-   s.read(&pfRMask);
-   s.read(&pfGMask);
-   s.read(&pfBMask);
-   s.read(&pfAlphaMask);
-
-   // Sanity check flags...
-   if(!(ddpfFlags & (DDPFRGB | DDPFFourCC | DDPFLUMINANCE)))
-   {
-      Con::errorf("DDSFile::readHeader - incoherent pixel flags, neither RGB, FourCC, or Luminance!");
-      return false;
-   }
-
-   // For now let's just dump the header info.
-   if(ddpfFlags & DDPFLUMINANCE)
-   {
+      mBytesPerPixel = header.ddspf.bpp / 8;
       mFlags.set(RGBData);
-
-      mBytesPerPixel = pfBitCount / 8;      
-
-      bool hasAlpha = ddpfFlags & DDPFAlphaPixels;
-
-      mHasTransparency = hasAlpha;
-
-      // Try to match a format.
-      if(hasAlpha)
-      {
-         // If it has alpha it is one of...
-         // GFXFormatA8L8
-         // GFXFormatA4L4
-
-         if(pfBitCount == 16)
-            mFormat = GFXFormatA8L8;
-         else if(pfBitCount == 8)
-            mFormat = GFXFormatA4L4;
-         else
-         {
-            Con::errorf("DDSFile::readHeader - unable to match alpha Luminance format!");
-            return false;
-         }
-      }
-      else
-      {
-         // Otherwise it is one of...
-         // GFXFormatL16
-         // GFXFormatL8
-
-         if(pfBitCount == 16)
-            mFormat = GFXFormatL16;
-         else if(pfBitCount == 8)
-            mFormat = GFXFormatL8;
-         else
-         {
-            Con::errorf("DDSFile::readHeader - unable to match non-alpha Luminance format!");
-            return false;
-         }
-      }
-   }
-   else if(ddpfFlags & DDPFRGB)
-   {
-      mFlags.set(RGBData);
-
-      //Con::printf("RGB Pixel format of DDS:");
-      //Con::printf("   bitcount = %d (16, 24, 32)", pfBitCount);
-      mBytesPerPixel = pfBitCount / 8;
-      //Con::printf("   red   mask = %x", pfRMask);
-      //Con::printf("   green mask = %x", pfGMask);
-      //Con::printf("   blue  mask = %x", pfBMask);
-
-      bool hasAlpha = false;
-
-      if(ddpfFlags & DDPFAlphaPixels)
-      {
-         hasAlpha = true;
-         //Con::printf("   alpha mask = %x", pfAlphaMask);
-      }
-      else
-      {
-         //Con::printf("   no alpha.");
-      }
-
-      mHasTransparency = hasAlpha;
-
-      // Try to match a format.
-      if(hasAlpha)
-      {
-         // If it has alpha it is one of...
-         // GFXFormatR8G8B8A8
-         // GFXFormatR5G5B5A1
-         // GFXFormatA8
-
-         if(pfBitCount == 32)
-            mFormat = GFXFormatR8G8B8A8;
-         else if(pfBitCount == 16)
-            mFormat = GFXFormatR5G5B5A1;
-         else if(pfBitCount == 8)
-            mFormat = GFXFormatA8;
-         else
-         {
-            Con::errorf("DDSFile::readHeader - unable to match alpha RGB format!");
-            return false;
-         }
-      }
-      else
-      {
-         // Otherwise it is one of...
-         // GFXFormatR8G8B8
-         // GFXFormatR8G8B8X8
-         // GFXFormatR5G6B5
-         // GFXFormatL8
-
-         if(pfBitCount == 24)
-            mFormat = GFXFormatR8G8B8;
-         else if(pfBitCount == 32)
-            mFormat = GFXFormatR8G8B8X8;
-         else if(pfBitCount == 16)
-            mFormat = GFXFormatR5G6B5;
-         else if(pfBitCount == 8)
-         {
-            // luminance
-            mFormat = GFXFormatL8;
-         }
-         else
-         {
-            Con::errorf("DDSFile::readHeader - unable to match non-alpha RGB format!");
-            return false;
-         }
-      }
-
-
-      // Sweet, all done.
-   }
-   else if (ddpfFlags & DDPFFourCC)
-   {
-      mHasTransparency = (ddpfFlags & DDPFAlphaPixels);
-      mFlags.set(CompressedData);
-
-/*      Con::printf("FourCC Pixel format of DDS:");
-      Con::printf("   fourcc = '%c%c%c%c'", ((U8*)&pfFourCC)[0], ((U8*)&pfFourCC)[1], ((U8*)&pfFourCC)[2], ((U8*)&pfFourCC)[3]); */
-
-      // Ok, make a format determination.
-      switch(pfFourCC)
-      {
-      case FOURCC_DXT1:
-         mFormat = GFXFormatDXT1;
-         break;
-      case FOURCC_DXT2:
-         mFormat = GFXFormatDXT2;
-         break;
-      case FOURCC_DXT3:
-         mFormat = GFXFormatDXT3;
-         break;
-      case FOURCC_DXT4:
-         mFormat = GFXFormatDXT4;
-         break;
-      case FOURCC_DXT5:
-         mFormat = GFXFormatDXT5;
-         break;
-      default:
-         Con::errorf("DDSFile::readHeader - unknown fourcc = '%c%c%c%c'", ((U8*)&pfFourCC)[0], ((U8*)&pfFourCC)[1], ((U8*)&pfFourCC)[2], ((U8*)&pfFourCC)[3]);
-         break;
-      }
-
    }
 
-   // Deal with final caps bits... Is this really necessary?
+   //mip map flag
+   if (mMipMapCount > 1)
+      mFlags.set(MipMapsFlag | ComplexFlag);
 
-   U32 caps1, caps2;
-   s.read(&caps1);
-   s.read(&caps2);
-   s.read(&tmp);
-   s.read(&tmp); // More icky reserved space.
+   //set transparency flag
+   mHasTransparency = (header.ddspf.flags & DDS_ALPHAPIXELS);
 
-   // Screw caps1.
-   // if(!(caps1 & DDSCAPS_TEXTURE)))
-   // {
-   // }
+   if (header.flags & DDS_HEADER_FLAGS_LINEARSIZE)
+      mFlags.set(LinearSizeFlag);
+   else if (header.flags & DDS_HEADER_FLAGS_PITCH)
+      mFlags.set(PitchSizeFlag);
 
-   // Caps2 has cubemap/volume info. Care about that.
-   if(caps2 & DDSCAPS2Cubemap)
+   //set cubemap flags
+   if (header.cubemapFlags & DDS_CUBEMAP)
    {
-      mFlags.set(CubeMapFlag);
-
+      mFlags.set(CubeMapFlag | ComplexFlag);
       // Store the face flags too.
-      if ( caps2 & DDSCAPS2Cubemap_POSITIVEX ) mFlags.set( CubeMap_PosX_Flag );
-      if ( caps2 & DDSCAPS2Cubemap_NEGATIVEX ) mFlags.set( CubeMap_NegX_Flag );
-      if ( caps2 & DDSCAPS2Cubemap_POSITIVEY ) mFlags.set( CubeMap_PosY_Flag );
-      if ( caps2 & DDSCAPS2Cubemap_NEGATIVEY ) mFlags.set( CubeMap_NegY_Flag );
-      if ( caps2 & DDSCAPS2Cubemap_POSITIVEZ ) mFlags.set( CubeMap_PosZ_Flag );
-      if ( caps2 & DDSCAPS2Cubemap_NEGATIVEZ ) mFlags.set( CubeMap_NegZ_Flag );
+      if (header.cubemapFlags & DDS_CUBEMAP_POSITIVEX) mFlags.set(CubeMap_PosX_Flag);
+      if (header.cubemapFlags & DDS_CUBEMAP_NEGATIVEX) mFlags.set(CubeMap_NegX_Flag);
+      if (header.cubemapFlags & DDS_CUBEMAP_POSITIVEY) mFlags.set(CubeMap_PosY_Flag);
+      if (header.cubemapFlags & DDS_CUBEMAP_NEGATIVEY) mFlags.set(CubeMap_NegY_Flag);
+      if (header.cubemapFlags & DDS_CUBEMAP_POSITIVEZ) mFlags.set(CubeMap_PosZ_Flag);
+      if (header.cubemapFlags & DDS_CUBEMAP_NEGATIVEZ) mFlags.set(CubeMap_NegZ_Flag);
    }
 
-   // MS has ANOTHER reserved word here. This one particularly sucks.
-   s.read(&tmp);
+
 
    return true;
 }
 
 bool DDSFile::read(Stream &s, U32 dropMipCount)
 {
-   if( !readHeader(s) || mMipMapCount == 0 )
+   if( !readHeader(s) )
    {
       Con::errorf("DDSFile::read - error reading header!");
       return false;
@@ -618,96 +413,82 @@ bool DDSFile::read(Stream &s, U32 dropMipCount)
 
 bool DDSFile::writeHeader( Stream &s )
 {
-   // Read the FOURCC
-   s.write( 4, "DDS " );
+   // write DDS magic
+   U32 magic = DDS_MAGIC;
+   s.write(magic);
 
-   U32 tmp = 0;
+   dds::DDS_HEADER header = {};
+   dds::DDS_HEADER_DXT10 dx10header = {};
 
-   // Read the size of the header.
-   s.write( 124 );
+   bool hasDx10Header = false;
+   //flags
+   U32 surfaceFlags = DDS_SURFACE_FLAGS_TEXTURE;
+   U32 cubemapFlags = 0;
+   U32 headerFlags = DDS_HEADER_FLAGS_TEXTURE;
 
-   // Read some flags...
-   U32 ddsdFlags = DDSDCaps | DDSDPixelFormat | DDSDWidth | DDSDHeight;
-   
-   if ( mFlags.test( CompressedData ) )
-      ddsdFlags |= DDSDLinearSize;
-   else
-      ddsdFlags |= DDSDPitch;
+   //pixel format
+   const dds::DDS_PIXELFORMAT &format = dds::getDDSFormat(mFormat);
 
-   if ( mMipMapCount > 0 )
-      ddsdFlags |= DDSDMipMapCount;
-
-   s.write( ddsdFlags );
-
-   // Read height and width (always present)
-   s.write( mHeight );
-   s.write( mWidth );
-
-   // Ok, some flags are set, so let's do some reading.
-   s.write( mPitchOrLinearSize );
-
-   // Do we need to read depth? If so, we are a volume texture!
-   s.write( mDepth );
-
-   // Deal with mips!
-   s.write( mMipMapCount );
-
-   // Deal with 11 DWORDS of reserved space (this reserved space brought to
-   // you by DirectDraw and the letters F and U).
-   for(U32 i=0; i<11; i++)
-      s.write( tmp ); // is this right?
-
-   // Now we're onto the pixel format!
-
-   // This is the size, in bits,
-   // of the pixel format data.
-   tmp = 32;
-   s.write( tmp );
-
-   U32 ddpfFlags;
-
-   U32 fourCC = 0;
-
-   if ( mFlags.test( CompressedData ) )
+   // todo better dx10 support
+   if (format.fourCC == dds::D3DFMT_DX10)
    {
-      ddpfFlags = DDPFFourCC;
-      if (mFormat == GFXFormatDXT1)
-         fourCC = FOURCC_DXT1;
-      if (mFormat == GFXFormatDXT3)
-         fourCC = FOURCC_DXT3;
-      if (mFormat == GFXFormatDXT5)
-         fourCC = FOURCC_DXT5;
+      dx10header.dxgiFormat = dds::getDXGIFormat(mFormat);
+      dx10header.arraySize = 1;
+      dx10header.resourceDimension = dds::D3D10_RESOURCE_DIMENSION_TEXTURE2D;
+      dx10header.miscFlag = 0;
+      dx10header.miscFlags2 = 0;
+      hasDx10Header = true;
    }
+
+   if (mFlags.test(CompressedData))
+      headerFlags |= DDS_HEADER_FLAGS_LINEARSIZE;
    else
-      ddpfFlags = mBytesPerPixel == 4 ? DDPFRGB | DDPFAlphaPixels : DDPFRGB;
+      headerFlags |= DDS_HEADER_FLAGS_PITCH;
 
-   s.write( ddpfFlags );
+   if (mMipMapCount > 1)
+   {
+      surfaceFlags |= DDS_SURFACE_FLAGS_MIPMAP;
+      headerFlags |= DDS_HEADER_FLAGS_MIPMAP;
+   }   
 
-   // Read the next few values so we can deal with them all in one go.
-   //U32 pfFourCC, pfBitCount, pfRMask, pfGMask, pfBMask, pfAlphaMask;
+   //cubemap flags
+   if (mFlags.test(CubeMapFlag))
+   {
+      surfaceFlags |= DDS_SURFACE_FLAGS_CUBEMAP;
+      cubemapFlags |= DDS_CUBEMAP_ALLFACES;
+   }
 
-   s.write( fourCC );
-   s.write( mBytesPerPixel * 8 );
-   s.write( 0x000000FF );
-   s.write( 0x00FF0000 );
-   s.write( 0x0000FF00 );
-   s.write( 0xFF000000 );
+   //volume texture
+   if (mDepth > 0)
+   {
+      headerFlags |= DDS_HEADER_FLAGS_VOLUME;
+      dx10header.resourceDimension = dds::D3D10_RESOURCE_DIMENSION_TEXTURE3D;
+   }
 
-   // Deal with final caps bits... Is this really necessary?
- 
-   U32 caps1 = DDSCAPSTexture;
-   if ( mMipMapCount > 0 )
-      caps1 |= DDSCAPSComplex | DDSCAPSMipMap;
+   //main dds header
+   header.size = sizeof(dds::DDS_HEADER);
+   header.flags = headerFlags;
+   header.height = mHeight;
+   header.width = mWidth;
+   header.pitchOrLinearSize = mPitchOrLinearSize;
+   header.depth = mDepth;
+   header.ddspf = format;
+   header.mipMapCount = mMipMapCount;
+   header.surfaceFlags = surfaceFlags;   
+   header.cubemapFlags = cubemapFlags;   
+   memset(header.reserved1, 0, sizeof(header.reserved1));
+   memset(header.reserved2, 0, sizeof(header.reserved2));
 
-   tmp = 0;
+   //check our header is ok
+   if (!dds::validateHeader(header))
+      return false;
 
-   s.write( caps1 );
-   s.write( tmp );
-   s.write( tmp );
-   s.write( tmp );// More icky reserved space.
-
-   // MS has ANOTHER reserved word here. This one particularly sucks.
-   s.write( tmp );
+   //Write out the header
+   s.write(DDS_HEADER_SIZE, &header);
+   
+   //Write out dx10 header
+   if (hasDx10Header)
+      s.write(DDS_HEADER_DX10_SIZE, &dx10header);
 
    return true;
 }
@@ -720,13 +501,16 @@ bool DDSFile::write( Stream &s )
       return false;
    }
 
-   // At this point we know what sort of image we contain. So we should
-   // allocate some buffers, and read it in.
-
    // How many surfaces are we talking about?
    if(mFlags.test(CubeMapFlag))
    {
       // Do something with cubemaps.
+      for (U32 cubeFace = 0; cubeFace < Cubemap_Surface_Count; cubeFace++)
+      {
+         // write the mips
+         for (S32 i = 0; i < mMipMapCount; i++)
+            mSurfaces[cubeFace]->writeNextMip(this, s, mHeight, mWidth, i);
+      }
    }
    else if (mFlags.test(VolumeFlag))
    {
@@ -910,6 +694,82 @@ DDSFile *DDSFile::createDDSFileFromGBitmap( const GBitmap *gbmp )
    }
 
    return ret;
+}
+
+DDSFile *DDSFile::createDDSCubemapFileFromGBitmaps(GBitmap **gbmps)
+{
+   if (gbmps == NULL)
+      return NULL;
+
+   AssertFatal(gbmps[0], "createDDSCubemapFileFromGBitmaps bitmap 0 is null");
+   AssertFatal(gbmps[1], "createDDSCubemapFileFromGBitmaps bitmap 1 is null");
+   AssertFatal(gbmps[2], "createDDSCubemapFileFromGBitmaps bitmap 2 is null");
+   AssertFatal(gbmps[3], "createDDSCubemapFileFromGBitmaps bitmap 3 is null");
+   AssertFatal(gbmps[4], "createDDSCubemapFileFromGBitmaps bitmap 4 is null");
+   AssertFatal(gbmps[5], "createDDSCubemapFileFromGBitmaps bitmap 5 is null");
+
+   DDSFile *ret = new DDSFile;
+   //all cubemaps have the same dimensions and formats
+   GBitmap *pBitmap = gbmps[0];
+
+   if (pBitmap->getFormat() != GFXFormatR8G8B8A8)
+   {
+      Con::errorf("createDDSCubemapFileFromGBitmaps: Only GFXFormatR8G8B8A8 supported for now");
+      return NULL;
+   }
+
+   // Set up the DDSFile properties that matter. Since this is a GBitmap, there
+   // are assumptions that can be made
+   ret->mHeight = pBitmap->getHeight();
+   ret->mWidth = pBitmap->getWidth();
+   ret->mDepth = 0;
+   ret->mFormat = pBitmap->getFormat();
+   ret->mFlags.set( RGBData | CubeMapFlag | CubeMap_PosX_Flag | CubeMap_NegX_Flag | CubeMap_PosY_Flag |
+      CubeMap_NegY_Flag | CubeMap_PosZ_Flag | CubeMap_NegZ_Flag);
+   ret->mBytesPerPixel = pBitmap->getBytesPerPixel();
+   //todo implement mip mapping
+   ret->mMipMapCount = pBitmap->getNumMipLevels();
+   ret->mHasTransparency = pBitmap->getHasTransparency();
+
+   for (U32 cubeFace = 0; cubeFace < Cubemap_Surface_Count; cubeFace++)
+   {
+      ret->mSurfaces.push_back(new SurfaceData());
+      // Load the mips
+      for (S32 i = 0; i < ret->mMipMapCount; i++)
+      {
+         const U32 mipSz = ret->getSurfaceSize(i);
+         ret->mSurfaces.last()->mMips.push_back(new U8[mipSz]);
+
+         U8 *mipMem = ret->mSurfaces.last()->mMips.last();
+         //straight copy
+         dMemcpy(mipMem, gbmps[cubeFace]->getBits(i), mipSz);
+      }
+   }
+
+   return ret;
+}
+
+bool DDSFile::decompressToGBitmap(GBitmap *dest)
+{
+   // TBD: do we support other formats?
+   if (mFormat != GFXFormatBC1 && mFormat != GFXFormatBC2 && mFormat != GFXFormatBC3)
+      return false;
+
+   dest->allocateBitmapWithMips(getWidth(), getHeight(), getMipLevels(), GFXFormatR8G8B8A8);
+
+   // Decompress and copy mips...
+
+   U32 numMips = getMipLevels();
+
+   for (U32 i = 0; i < numMips; i++)
+   {
+      U8 *addr = dest->getAddress(0, 0, i);
+      const U8 *mipBuffer = mSurfaces[0]->mMips[i];
+      ImageUtil::decompress(mipBuffer, addr, getWidth(i), getHeight(i), mFormat);
+
+   }
+
+   return true;
 }
 
 DefineEngineFunction( getActiveDDSFiles, S32, (),,

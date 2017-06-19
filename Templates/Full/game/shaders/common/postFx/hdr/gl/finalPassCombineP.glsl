@@ -94,13 +94,13 @@ void main()
    _sample.b = texture( colorCorrectionTex, _sample.b ).b;
 
    // Apply gamma correction
-   _sample.rgb = pow( _sample.rgb, vec3(g_fOneOverGamma) );
+   //_sample.rgb = pow( _sample.rgb, vec3(g_fOneOverGamma) );
    
    // Apply contrast
-   _sample.rgb = ((_sample.rgb - 0.5f) * Contrast) + 0.5f;
+   //_sample.rgb = ((_sample.rgb - 0.5f) * Contrast) + 0.5f;
  
    // Apply brightness
-   _sample.rgb += Brightness;
+   //_sample.rgb += Brightness;
 
    OUT_col = _sample;
 }

@@ -21,5 +21,6 @@
 //-----------------------------------------------------------------------------
 
 #include "gfx/gfxVertexColor.h"
+#include "core/color.h"
 
 Swizzle<U8, 4> *GFXVertexColor::mDeviceSwizzle = &Swizzles::null;

@@ -47,6 +47,8 @@ struct GFXSamplerStateDesc
    GFXTextureFilterType minFilter;
    GFXTextureFilterType mipFilter;
 
+   GFXCmpFunc samplerFunc;
+
    /// The maximum anisotropy used when one of the filter types
    /// is set to anisotropic.
    ///

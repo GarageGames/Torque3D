@@ -63,12 +63,12 @@ ConsoleDocClass( GuiCursor,
 GFX_ImplementTextureProfile(GFXGuiCursorProfile,
                             GFXTextureProfile::DiffuseMap, 
                             GFXTextureProfile::PreserveSize |
-                            GFXTextureProfile::Static, 
+                            GFXTextureProfile::Static | GFXTextureProfile::SRGB,
                             GFXTextureProfile::NONE);
 GFX_ImplementTextureProfile(GFXDefaultGUIProfile,
                             GFXTextureProfile::DiffuseMap, 
                             GFXTextureProfile::PreserveSize |
-                            GFXTextureProfile::Static |
+                            GFXTextureProfile::Static | GFXTextureProfile::SRGB |
                             GFXTextureProfile::NoPadding, 
                             GFXTextureProfile::NONE);
 
@@ -200,7 +200,7 @@ bool GuiControlProfile::protectedSetBitmap( void *object, const char *index, con
 
       //verify the bitmap
       if (profile->mBitmapName && profile->mBitmapName[0] && dStricmp(profile->mBitmapName, "texhandle") != 0 &&
-         !profile->mTextureObject.set( profile->mBitmapName, &GFXDefaultPersistentProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__) ))
+         !profile->mTextureObject.set( profile->mBitmapName, &GFXTexturePersistentProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__) ))
          Con::errorf("Failed to load profile bitmap (%s)",profile->mBitmapName);
 
       // If we've got a special border, make sure it's usable.
@@ -566,7 +566,7 @@ S32 GuiControlProfile::constructBitmapArray()
 
    if( mTextureObject.isNull() )
    {   
-      if ( !mBitmapName || !mBitmapName[0] || !mTextureObject.set( mBitmapName, &GFXDefaultPersistentProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__) ))
+      if ( !mBitmapName || !mBitmapName[0] || !mTextureObject.set( mBitmapName, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__) ))
          return 0;
    }
 
@@ -655,7 +655,7 @@ void GuiControlProfile::incLoadCount()
       //
 
       if (mBitmapName && mBitmapName[0] && dStricmp(mBitmapName, "texhandle") != 0 &&
-         !mTextureObject.set( mBitmapName, &GFXDefaultPersistentProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__) ))
+         !mTextureObject.set( mBitmapName, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__) ))
          Con::errorf("Failed to load profile bitmap (%s)",mBitmapName);
 
       constructBitmapArray();

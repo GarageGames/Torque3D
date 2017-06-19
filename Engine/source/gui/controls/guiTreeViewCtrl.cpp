@@ -1871,7 +1871,7 @@ bool GuiTreeViewCtrl::buildIconTable(const char * icons)
          dStrncpy( buf, start, getMin( sizeof( buf ) / sizeof( buf[ 0 ] ) - 1, len ) );
          buf[ len ] = '\0';
                   
-         mIconTable[ numIcons ] = GFXTexHandle( buf, &GFXDefaultPersistentProfile, avar( "%s() - mIconTable[%d] (line %d)", __FUNCTION__, numIcons, __LINE__ ) );
+         mIconTable[ numIcons ] = GFXTexHandle( buf, &GFXTexturePersistentProfile, avar( "%s() - mIconTable[%d] (line %d)", __FUNCTION__, numIcons, __LINE__ ) );
       }
       else
          mIconTable[ numIcons ] = GFXTexHandle();

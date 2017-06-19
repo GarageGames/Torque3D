@@ -161,7 +161,7 @@ float4 main( ConvexConnectP IN ) : TORQUE_TARGET0
 	}
    
    // Sample/unpack the normal/z data
-   float4 deferredSample = TORQUE_PREPASS_UNCONDITION( deferredBuffer, uvScene );
+   float4 deferredSample = TORQUE_DEFERRED_UNCONDITION( deferredBuffer, uvScene );
    float3 normal = deferredSample.rgb;
    float depth = deferredSample.a;
    

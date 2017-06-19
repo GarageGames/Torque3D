@@ -84,7 +84,7 @@ float4 main( Conn IN ) : TORQUE_TARGET0
       float2 tc = IN.pos.xy * float2(1.0, -1.0) / IN.pos.w;
       tc = viewportCoordToRenderTarget(saturate( ( tc + 1.0 ) * 0.5 ), deferredTargetParams); 
    
-      float sceneDepth = TORQUE_PREPASS_UNCONDITION(deferredTex, tc).w;
+      float sceneDepth = TORQUE_DEFERRED_UNCONDITION(deferredTex, tc).w;
    	float depth = IN.pos.w * oneOverFar;   	
 	float diff = sceneDepth - depth;
 	#ifdef CLIP_Z

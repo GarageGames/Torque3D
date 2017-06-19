@@ -662,7 +662,7 @@ bool GuiInspectorTypeImageFileName::renderTooltip( const Point2I &hoverPos, cons
    if ( !filename || !filename[0] )
       return false;
 
-   GFXTexHandle texture( filename, &GFXDefaultStaticDiffuseProfile, avar("%s() - tooltip texture (line %d)", __FUNCTION__, __LINE__) );
+   GFXTexHandle texture( filename, &GFXStaticTextureSRGBProfile, avar("%s() - tooltip texture (line %d)", __FUNCTION__, __LINE__) );
    if ( texture.isNull() )
       return false;
 

@@ -410,7 +410,7 @@ void GuiGradientCtrl::onMouseDown(const GuiEvent &event)
    Point2I resolution = getRoot()->getExtent();
    GFXTexHandle bb( resolution.x, 
                     resolution.y, 
-                    GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__) );
+                    GFXFormatR8G8B8A8, &GFXRenderTargetSRGBProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__) );
    
    Point2I tmpPt( event.mousePoint.x, event.mousePoint.y );
    GFXTarget *targ = GFX->getActiveRenderTarget();

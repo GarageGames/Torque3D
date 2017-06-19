@@ -719,7 +719,7 @@ GFXTextureObject* ShadowMapParams::getCookieTex()
             cookie != mCookieTex->getPath() ) )
    {
       mCookieTex.set(   cookie, 
-                        &GFXDefaultStaticDiffuseProfile, 
+                        &GFXStaticTextureSRGBProfile, 
                         "ShadowMapParams::getCookieTex()" );
    }
    else if ( cookie.isEmpty() )

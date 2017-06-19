@@ -88,10 +88,10 @@ half4 main( Pixel IN ) : TORQUE_TARGET0
    [unroll]  //  coc[i] causes this anyway
    for (int i = 0; i < 4; i++)
    {
-      depth[0] = TORQUE_PREPASS_UNCONDITION(depthSampler, (IN.tcDepth0.xy + rowOfs[i])).w;
-      depth[1] = TORQUE_PREPASS_UNCONDITION(depthSampler, (IN.tcDepth1.xy + rowOfs[i])).w;
-      depth[2] = TORQUE_PREPASS_UNCONDITION(depthSampler, (IN.tcDepth2.xy + rowOfs[i])).w;
-      depth[3] = TORQUE_PREPASS_UNCONDITION(depthSampler, (IN.tcDepth3.xy + rowOfs[i])).w;
+      depth[0] = TORQUE_DEFERRED_UNCONDITION(depthSampler, (IN.tcDepth0.xy + rowOfs[i])).w;
+      depth[1] = TORQUE_DEFERRED_UNCONDITION(depthSampler, (IN.tcDepth1.xy + rowOfs[i])).w;
+      depth[2] = TORQUE_DEFERRED_UNCONDITION(depthSampler, (IN.tcDepth2.xy + rowOfs[i])).w;
+      depth[3] = TORQUE_DEFERRED_UNCONDITION(depthSampler, (IN.tcDepth3.xy + rowOfs[i])).w;
 
       coc = max(coc, clamp(dofEqWorld4X * half4(depth)+dofEqWorld4Y, zero4, maxWorldCoC4));
    }

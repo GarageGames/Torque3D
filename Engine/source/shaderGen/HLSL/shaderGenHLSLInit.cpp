@@ -46,7 +46,8 @@ void _initShaderGenHLSL( ShaderGen *shaderGen )
 
    FEATUREMGR->registerFeature( MFT_VertTransform, new VertPositionHLSL );
    FEATUREMGR->registerFeature( MFT_RTLighting, new RTLightingFeatHLSL );
-   FEATUREMGR->registerFeature( MFT_IsDXTnm, new NamedFeatureHLSL( "DXTnm" ) );
+   FEATUREMGR->registerFeature( MFT_IsBC3nm, new NamedFeatureHLSL( "BC3nm" ) );
+   FEATUREMGR->registerFeature( MFT_IsBC5nm, new NamedFeatureHLSL( "BC5nm" ) );
    FEATUREMGR->registerFeature( MFT_TexAnim, new TexAnimHLSL );
    FEATUREMGR->registerFeature( MFT_DiffuseMap, new DiffuseMapFeatHLSL );
    FEATUREMGR->registerFeature( MFT_OverlayMap, new OverlayTexFeatHLSL );

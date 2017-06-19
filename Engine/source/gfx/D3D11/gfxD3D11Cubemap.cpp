@@ -24,6 +24,7 @@
 #include "gfx/gfxCardProfile.h"
 #include "gfx/gfxTextureManager.h"
 #include "gfx/D3D11/gfxD3D11EnumTranslate.h"
+#include "gfx/bitmap/imageUtils.h"
 
 GFXD3D11Cubemap::GFXD3D11Cubemap() : mTexture(NULL), mSRView(NULL), mDSView(NULL)
 {
@@ -65,14 +66,6 @@ void GFXD3D11Cubemap::_onTextureEvent(GFXTexCallbackCode code)
       initDynamic(mTexSize);
 }
 
-bool GFXD3D11Cubemap::isCompressed(GFXFormat format)
-{
-   if (format >= GFXFormatDXT1 && format <= GFXFormatDXT5)
-      return true;
-
-   return false;
-}
-
 void GFXD3D11Cubemap::initStatic(GFXTexHandle *faces)
 {
    AssertFatal( faces, "GFXD3D11Cubemap::initStatic - Got null GFXTexHandle!" );
@@ -81,7 +74,7 @@ void GFXD3D11Cubemap::initStatic(GFXTexHandle *faces)
 	// NOTE - check tex sizes on all faces - they MUST be all same size
 	mTexSize = faces->getWidth();
 	mFaceFormat = faces->getFormat();
-   bool compressed = isCompressed(mFaceFormat);
+   bool compressed = ImageUtil::isCompressedFormat(mFaceFormat);
 
    UINT bindFlags = D3D11_BIND_SHADER_RESOURCE;
    UINT miscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
@@ -91,15 +84,15 @@ void GFXD3D11Cubemap::initStatic(GFXTexHandle *faces)
       miscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
    }
 
-   U32 mipLevels = faces->getPointer()->getMipLevels();
-   if (mipLevels > 1 && !compressed)
+   mMipMapLevels = faces->getPointer()->getMipLevels();
+   if (mMipMapLevels < 1 && !compressed)
       mAutoGenMips = true;
 
 	D3D11_TEXTURE2D_DESC desc;
 	ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
 	desc.Width = mTexSize;
 	desc.Height = mTexSize;
-   desc.MipLevels = mAutoGenMips ? 0 : mipLevels;
+   desc.MipLevels = mAutoGenMips ? 0 : mMipMapLevels;
 	desc.ArraySize = 6;
 	desc.Format = GFXD3D11TextureFormat[mFaceFormat];
 	desc.SampleDesc.Count = 1;
@@ -113,15 +106,15 @@ void GFXD3D11Cubemap::initStatic(GFXTexHandle *faces)
 
 	if (FAILED(hr))
 	{
-		AssertFatal(false, "GFXD3D11Cubemap:initStatic(GFXTexhandle *faces) - failed to create texcube texture");
+		AssertFatal(false, "GFXD3D11Cubemap:initStatic(GFXTexhandle *faces) - CreateTexture2D failure");
 	}
    
    for (U32 i = 0; i < CubeFaces; i++)
    {
       GFXD3D11TextureObject *texObj = static_cast<GFXD3D11TextureObject*>((GFXTextureObject*)faces[i]);
-      for (U32 currentMip = 0; currentMip < mipLevels; currentMip++)
+      for (U32 currentMip = 0; currentMip < mMipMapLevels; currentMip++)
       {
-         U32 subResource = D3D11CalcSubresource(currentMip, i, mipLevels);
+         U32 subResource = D3D11CalcSubresource(currentMip, i, mMipMapLevels);
          D3D11DEVICECONTEXT->CopySubresourceRegion(mTexture, subResource, 0, 0, 0, texObj->get2DTex(), currentMip, NULL);
       }
    }
@@ -129,7 +122,7 @@ void GFXD3D11Cubemap::initStatic(GFXTexHandle *faces)
 	D3D11_SHADER_RESOURCE_VIEW_DESC SMViewDesc;
 	SMViewDesc.Format = GFXD3D11TextureFormat[mFaceFormat];
 	SMViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-   SMViewDesc.TextureCube.MipLevels = mAutoGenMips ? -1 : mipLevels;
+   SMViewDesc.TextureCube.MipLevels = mAutoGenMips ? -1 : mMipMapLevels;
 	SMViewDesc.TextureCube.MostDetailedMip = 0;
 
 	hr = D3D11DEVICE->CreateShaderResourceView(mTexture, &SMViewDesc, &mSRView);
@@ -138,8 +131,16 @@ void GFXD3D11Cubemap::initStatic(GFXTexHandle *faces)
 		AssertFatal(false, "GFXD3D11Cubemap::initStatic(GFXTexHandle *faces) - texcube shader resource view  creation failure");
 	} 
 
+   //Generate mips
    if (mAutoGenMips && !compressed)
+   {
       D3D11DEVICECONTEXT->GenerateMips(mSRView);
+      //get mip level count
+      D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+      mSRView->GetDesc(&viewDesc);
+      mMipMapLevels = viewDesc.TextureCube.MipLevels;
+   }
+
 }
 
 void GFXD3D11Cubemap::initStatic(DDSFile *dds)
@@ -151,45 +152,53 @@ void GFXD3D11Cubemap::initStatic(DDSFile *dds)
    // NOTE - check tex sizes on all faces - they MUST be all same size
    mTexSize = dds->getWidth();
    mFaceFormat = dds->getFormat();
-   U32 levels = dds->getMipLevels();
+   mMipMapLevels = dds->getMipLevels();
 
 	D3D11_TEXTURE2D_DESC desc;
 
 	desc.Width = mTexSize;
 	desc.Height = mTexSize;
-	desc.MipLevels = levels;
-	desc.ArraySize = 6;
+   desc.MipLevels = mMipMapLevels;
+	desc.ArraySize = CubeFaces;
 	desc.Format = GFXD3D11TextureFormat[mFaceFormat];
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
 	desc.Usage = D3D11_USAGE_IMMUTABLE;
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE | D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
 
-	D3D11_SUBRESOURCE_DATA* pData = new D3D11_SUBRESOURCE_DATA[6 + levels];
-
-   for (U32 i = 0; i<CubeFaces; i++)
+	D3D11_SUBRESOURCE_DATA* pData = new D3D11_SUBRESOURCE_DATA[CubeFaces * mMipMapLevels];
+   for (U32 currentFace = 0; currentFace < CubeFaces; currentFace++)
 	{
-		if (!dds->mSurfaces[i])
+		if (!dds->mSurfaces[currentFace])
 			continue;
 
-		for(U32 j = 0; j < levels; j++)
+      // convert to Z up
+      const U32 faceIndex = _zUpFaceIndex(currentFace);
+
+		for(U32 currentMip = 0; currentMip < mMipMapLevels; currentMip++)
 		{
-			pData[i + j].pSysMem = dds->mSurfaces[i]->mMips[j];
-			pData[i + j].SysMemPitch = dds->getSurfacePitch(j);
-			pData[i + j].SysMemSlicePitch = dds->getSurfaceSize(j);
+         const U32 dataIndex = faceIndex * mMipMapLevels + currentMip;
+			pData[dataIndex].pSysMem = dds->mSurfaces[currentFace]->mMips[currentMip];
+			pData[dataIndex].SysMemPitch = dds->getSurfacePitch(currentMip);
+         pData[dataIndex].SysMemSlicePitch = 0;
 		}
+
 	}
 
-	HRESULT hr = D3D11DEVICE->CreateTexture2D(&desc, pData, &mTexture);
+   HRESULT hr = D3D11DEVICE->CreateTexture2D(&desc, pData, &mTexture);
+   if (FAILED(hr))
+   {
+      AssertFatal(false, "GFXD3D11Cubemap::initStatic(DDSFile *dds) - CreateTexture2D failure");
+   }
 
 	delete [] pData;
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC SMViewDesc;
 	SMViewDesc.Format = GFXD3D11TextureFormat[mFaceFormat];
 	SMViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-	SMViewDesc.TextureCube.MipLevels =  levels;
+	SMViewDesc.TextureCube.MipLevels = mMipMapLevels;
 	SMViewDesc.TextureCube.MostDetailedMip = 0;
 
 	hr = D3D11DEVICE->CreateShaderResourceView(mTexture, &SMViewDesc, &mSRView);
@@ -209,7 +218,8 @@ void GFXD3D11Cubemap::initDynamic(U32 texSize, GFXFormat faceFormat)
    mAutoGenMips = true;
 	mTexSize = texSize;
 	mFaceFormat = faceFormat;
-   bool compressed = isCompressed(mFaceFormat);
+   mMipMapLevels = 0;
+   bool compressed = ImageUtil::isCompressedFormat(mFaceFormat);
 
    UINT bindFlags = D3D11_BIND_SHADER_RESOURCE;
    UINT miscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
@@ -249,6 +259,16 @@ void GFXD3D11Cubemap::initDynamic(U32 texSize, GFXFormat faceFormat)
 	{
 		AssertFatal(false, "GFXD3D11Cubemap::initDynamic - CreateTexture2D call failure");
 	}
+
+   //Generate mips
+   if (mAutoGenMips && !compressed)
+   {
+      D3D11DEVICECONTEXT->GenerateMips(mSRView);
+      //get mip level count
+      D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+      mSRView->GetDesc(&viewDesc);
+      mMipMapLevels = viewDesc.TextureCube.MipLevels;
+   }
 
    D3D11_RENDER_TARGET_VIEW_DESC viewDesc;
 	viewDesc.Format = desc.Format;

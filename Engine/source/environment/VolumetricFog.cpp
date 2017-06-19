@@ -1204,7 +1204,7 @@ void VolumetricFog::InitTexture()
    mIsTextured = false;
 
    if (mTextureName.isNotEmpty())
-      mTexture.set(mTextureName, &GFXDefaultStaticDiffuseProfile, "VolumetricFogMod");
+      mTexture.set(mTextureName, &GFXStaticTextureSRGBProfile, "VolumetricFogMod");
 
    if (!mTexture.isNull())
    {

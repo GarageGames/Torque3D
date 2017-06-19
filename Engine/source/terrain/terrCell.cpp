@@ -1040,7 +1040,7 @@ void TerrCell::getRenderPrimitive(  GFXPrimitive *prim,
 
 void TerrCell::renderBounds() const
 {
-   ColorI color;
+   ColorF color;
    color.interpolate( ColorI::RED, ColorI::GREEN, (F32)mLevel / 3.0f );
 
    GFXStateBlockDesc desc;

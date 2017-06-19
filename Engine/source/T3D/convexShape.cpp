@@ -1226,7 +1226,7 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
 
          PrimBuild::begin( GFXLineList, edgeList.size() * 2 );
          
-         PrimBuild::color( ColorI::WHITE * 0.8f );
+         PrimBuild::color( ColorF(ColorI::WHITE) * 0.8f );
 
          for ( S32 j = 0; j < edgeList.size(); j++ )         
          {
@@ -1260,11 +1260,13 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
       for ( S32 i = 0; i < faceList.size(); i++ )
       {
          ColorI color = faceColorsx[ i % 4 ];
+         ColorF tCol = ColorF(color);
          S32 div = ( i / 4 ) * 4;
          if ( div > 0 )
-            color /= div;
-         color.alpha = 255;
-         
+            tCol /= div;
+         tCol.alpha = 1;
+         color = tCol;
+
          Point3F pnt;
          objToWorld.mulP( faceList[i].centroid, &pnt );
          drawer->drawCube( desc, size, pnt, color, NULL );
@@ -1295,11 +1297,13 @@ void ConvexShape::_renderDebug( ObjectRenderInst *ri, SceneRenderState *state, B
             objToWorld.mulP( p0 );
             objToWorld.mulP( p1 );
 
-            ColorI color = faceColorsx[ j % 4 ];
-            S32 div = ( j / 4 ) * 4;
-            if ( div > 0 )
-               color /= div;
-            color.alpha = 255;
+            ColorI color = faceColorsx[j % 4];
+            ColorF tCol = ColorF(color);
+            S32 div = (j / 4) * 4;
+            if (div > 0)
+               tCol /= div;
+            tCol.alpha = 1;
+            color = tCol;
             
             PrimBuild::color( color );
             PrimBuild::vertex3fv( p0 );            

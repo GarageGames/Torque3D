@@ -1035,7 +1035,7 @@ void GuiConvexEditorCtrl::drawFacePlane( ConvexShape *shape, S32 faceId )
 
    GFX->setVertexBuffer( vb );
 
-   GFXTexHandle tex( "core/art/grids/512_transp", &GFXDefaultStaticDiffuseProfile, "ConvexEditor_grid" );
+   GFXTexHandle tex( "core/art/grids/512_transp", &GFXStaticTextureSRGBProfile, "ConvexEditor_grid" );
    GFX->setTexture( 0, tex );
    GFX->setupGenericShaders();
    GFX->drawPrimitive( GFXTriangleList, 0, points.size() / 3 );

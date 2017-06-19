@@ -297,6 +297,8 @@ public:
 class GFXD3D11ShaderConstBuffer : public GFXShaderConstBuffer
 {
    friend class GFXD3D11Shader;
+   // Cache device context
+   ID3D11DeviceContext* mDeviceContext;
 
 public:
 
@@ -434,7 +436,7 @@ protected:
                                 GenericConstBufferLayout *bufferLayout, 
                                 Vector<GFXShaderConstDesc> &samplerDescriptions );
 
-   void _getShaderConstants( ID3D11ShaderReflection* pTable, 
+   void _getShaderConstants( ID3D11ShaderReflection* refTable, 
 	                         GenericConstBufferLayout *bufferLayout,
                              Vector<GFXShaderConstDesc> &samplerDescriptions );
 

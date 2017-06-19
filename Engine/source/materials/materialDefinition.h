@@ -200,6 +200,7 @@ public:
    // Data
    //-----------------------------------------------------------------------
    FileName mDiffuseMapFilename[MAX_STAGES];
+   bool     mDiffuseMapSRGB[MAX_STAGES];   // SRGB diffuse
    bool     mAccuEnabled[MAX_STAGES];
    F32      mAccuScale[MAX_STAGES];
    F32      mAccuDirection[MAX_STAGES];

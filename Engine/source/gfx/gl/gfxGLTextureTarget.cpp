@@ -103,7 +103,7 @@ public:
    virtual U32 getWidth() { return mTex->getWidth(); }
    virtual U32 getHeight() { return mTex->getHeight(); }
    virtual U32 getDepth() { return 0; }
-   virtual bool hasMips() { return mTex->getNumMipLevels() != 1; }
+   virtual bool hasMips() { return mTex->getMipMapLevels() != 1; }
    virtual GLenum getBinding() { return GFXGLCubemap::getEnumForFaceNumber(mFace); }
    virtual GFXFormat getFormat() { return mTex->getFormat(); }
    virtual bool isCompatible(const GFXGLTextureObject* tex)
@@ -162,7 +162,7 @@ void _GFXGLTextureTargetFBOImpl::applyState()
    
    PRESERVE_FRAMEBUFFER();
    glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer);
-
+   glEnable(GL_FRAMEBUFFER_SRGB);
    bool drawbufs[16];
    int bufsize = 0;
    for (int i = 0; i < 16; i++)

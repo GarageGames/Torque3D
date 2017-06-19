@@ -603,7 +603,7 @@ bool ParticleEmitterData::preload(bool server, String &errorStr)
      // load emitter texture if specified
      if (textureName && textureName[0])
      {
-       textureHandle = GFXTexHandle(textureName, &GFXDefaultStaticDiffuseProfile, avar("%s() - textureHandle (line %d)", __FUNCTION__, __LINE__));
+       textureHandle = GFXTexHandle(textureName, &GFXStaticTextureSRGBProfile, avar("%s() - textureHandle (line %d)", __FUNCTION__, __LINE__));
        if (!textureHandle)
        {
          errorStr = String::ToString("Missing particle emitter texture: %s", textureName);

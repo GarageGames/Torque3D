@@ -40,7 +40,7 @@ float distanceToPlane(float4 plane, float3 pos)
 float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
 {   
    //Sample the pre-pass
-   float4 deferred = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 );
+   float4 deferred = TORQUE_DEFERRED_UNCONDITION( deferredTex, IN.uv0 );
    
    //Get depth
    float depth = deferred.w;   

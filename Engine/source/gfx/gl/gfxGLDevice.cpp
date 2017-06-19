@@ -180,6 +180,9 @@ void GFXGLDevice::initGLState()
    GLuint vao;
    glGenVertexArrays(1, &vao);
    glBindVertexArray(vao);
+
+   //enable sRGB
+   glEnable(GL_FRAMEBUFFER_SRGB);
 }
 
 void GFXGLDevice::vsyncCallback()
@@ -472,8 +475,8 @@ void GFXGLDevice::clear(U32 flags, ColorI color, F32 z, U32 stencil)
    glStencilMask(0xFFFFFFFF);
    
 
-   ColorF c = color;   
-   glClearColor(c.red, c.green, c.blue, c.alpha);
+   const ColorF colorf = ColorF(color).toLinear();
+   glClearColor(colorf.red, colorf.green, colorf.blue, colorf.alpha);
    glClearDepth(z);
    glClearStencil(stencil);
 
@@ -581,7 +584,8 @@ void GFXGLDevice::drawPrimitive( GFXPrimitiveType primType, U32 vertexStart, U32
 {
    preDrawPrimitive();
   
-   vertexStart += mCurrentVB[0]->mBufferVertexOffset;
+   if(mCurrentVB[0])
+      vertexStart += mCurrentVB[0]->mBufferVertexOffset;
 
    if(mDrawInstancesCount)
       glDrawArraysInstanced(GFXGLPrimType[primType], vertexStart, primCountToIndexCount(primType, primitiveCount), mDrawInstancesCount);

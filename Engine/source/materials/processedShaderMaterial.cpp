@@ -76,6 +76,7 @@ void ShaderConstHandles::init( GFXShader *shader, CustomMaterial* mat /*=NULL*/ 
    mWorldToObjSC = shader->getShaderConstHandle(ShaderGenVars::worldToObj);
    mViewToObjSC = shader->getShaderConstHandle(ShaderGenVars::viewToObj);
    mCubeTransSC = shader->getShaderConstHandle(ShaderGenVars::cubeTrans);
+   mCubeMipsSC = shader->getShaderConstHandle(ShaderGenVars::cubeMips);
    mObjTransSC = shader->getShaderConstHandle(ShaderGenVars::objTrans);
    mCubeEyePosSC = shader->getShaderConstHandle(ShaderGenVars::cubeEyePos);
    mEyePosSC = shader->getShaderConstHandle(ShaderGenVars::eyePos);
@@ -394,9 +395,12 @@ void ProcessedShaderMaterial::_determineFeatures(  U32 stageNum,
    
    if ( fd.features[ MFT_NormalMap ] )   
    {   
-      if (  mStages[stageNum].getTex( MFT_NormalMap )->mFormat == GFXFormatDXT5 &&   
+      if (  mStages[stageNum].getTex( MFT_NormalMap )->mFormat == GFXFormatBC3 &&   
            !mStages[stageNum].getTex( MFT_NormalMap )->mHasTransparency )   
-         fd.features.addFeature( MFT_IsDXTnm );   
+         fd.features.addFeature( MFT_IsBC3nm );
+      else if ( mStages[stageNum].getTex(MFT_NormalMap)->mFormat == GFXFormatBC5 &&
+            !mStages[stageNum].getTex(MFT_NormalMap)->mHasTransparency )
+         fd.features.addFeature( MFT_IsBC5nm );
    }
 
    // Now for some more advanced features that we 

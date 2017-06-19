@@ -26,10 +26,7 @@
 #ifndef _SWIZZLE_H_
 #include "core/util/swizzle.h"
 #endif
-
-
-class ColorI;
-
+#include "core/color.h"
 
 class GFXVertexColor 
 {
@@ -62,7 +59,18 @@ public:
    void getColor( ColorI *color ) const
    {
       mDeviceSwizzle->ToBuffer( color, &packedColorData, sizeof( packedColorData ) );
-   }      
+   }
+
+   GFXVertexColor toLinear();
 };
+
+inline GFXVertexColor GFXVertexColor::toLinear()
+{
+   GFXVertexColor vertColor;
+   ColorI color;
+   getColor(&color);
+   vertColor.set(ColorF(color).toLinear());
+   return vertColor;
+}
 
 #endif
