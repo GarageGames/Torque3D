@@ -57,7 +57,7 @@ ConsoleDocClass( LightBase,
 
 LightBase::LightBase()
    :  mIsEnabled( true ),
-      mColor( ColorF::WHITE ),
+      mColor( LinearColorF::WHITE ),
       mBrightness( 1.0f ),
       mCastShadows( false ),
       mStaticRefreshFreq( 250 ),

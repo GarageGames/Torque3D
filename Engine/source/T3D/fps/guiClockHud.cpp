@@ -42,9 +42,9 @@ class GuiClockHud : public GuiControl
    bool     mShowFill;
    bool     mTimeReversed;
 
-   ColorF   mFillColor;
-   ColorF   mFrameColor;
-   ColorF   mTextColor;
+   LinearColorF   mFillColor;
+   LinearColorF   mFrameColor;
+   LinearColorF   mTextColor;
 
    S32      mTimeOffset;
 
@@ -117,7 +117,7 @@ void GuiClockHud::onRender(Point2I offset, const RectI &updateRect)
 
    // Background first
    if (mShowFill)
-      drawUtil->drawRectFill(updateRect, mFillColor);
+      drawUtil->drawRectFill(updateRect, mFillColor.toColorI());
 
    // Convert ms time into hours, minutes and seconds.
    S32 time = S32(getTime());
@@ -131,13 +131,13 @@ void GuiClockHud::onRender(Point2I offset, const RectI &updateRect)
    // Center the text
    offset.x += (getWidth() - mProfile->mFont->getStrWidth((const UTF8 *)buf)) / 2;
    offset.y += (getHeight() - mProfile->mFont->getHeight()) / 2;
-   drawUtil->setBitmapModulation(mTextColor);
+   drawUtil->setBitmapModulation(mTextColor.toColorI());
    drawUtil->drawText(mProfile->mFont, offset, buf);
    drawUtil->clearBitmapModulation();
 
    // Border last
    if (mShowFrame)
-      drawUtil->drawRect(updateRect, mFrameColor);
+      drawUtil->drawRect(updateRect, mFrameColor.toColorI());
 }
 
 

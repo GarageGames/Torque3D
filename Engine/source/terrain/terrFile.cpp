@@ -457,7 +457,7 @@ void TerrainFile::_loadLegacy(  FileStream &stream )
          if ( materials[i].isEmpty() )
             continue;
             
-         terrainMat.set( materials[i], &GFXDefaultPersistentProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+         terrainMat.set( materials[i], &GFXTexturePersistentSRGBProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
          if ( terrainMat )
             continue;
 
@@ -470,7 +470,7 @@ void TerrainFile::_loadLegacy(  FileStream &stream )
          {
             matRelPath.setPath( String(Con::getVariable( "$defaultGame" )) + path.substr( n, path.length() - n ) );
 
-            terrainMat.set( matRelPath, &GFXDefaultPersistentProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
+            terrainMat.set( matRelPath, &GFXTexturePersistentSRGBProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
             if ( terrainMat )
             {
                materials[i] = matRelPath.getFullPath();

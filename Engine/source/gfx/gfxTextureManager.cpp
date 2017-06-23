@@ -26,7 +26,7 @@
 #include "gfx/gfxDevice.h"
 #include "gfx/gfxCardProfile.h"
 #include "gfx/gfxStringEnumTranslate.h"
-#include "gfx/bitmap/ddsUtils.h"
+#include "gfx/bitmap/imageUtils.h"
 #include "core/strings/stringFunctions.h"
 #include "core/util/safeDelete.h"
 #include "core/resourceManager.h"
@@ -251,9 +251,11 @@ GFXTextureObject *GFXTextureManager::_lookupTexture( const char *hashName, const
 {
    GFXTextureObject *ret = hashFind( hashName );
 
-   // TODO: Profile checking HERE
+   //compare just the profile flags and not the entire profile, names could be different but otherwise identical flags
+   if (ret && (ret->mProfile->compareFlags(*profile)))
+      return ret;
 
-   return ret;
+   return NULL;
 }
 
 GFXTextureObject *GFXTextureManager::_lookupTexture( const DDSFile *ddsFile, const GFXTextureProfile *profile )
@@ -370,9 +372,9 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
    }
 
    // If _validateTexParams kicked back a different format, than there needs to be
-   // a conversion
+   // a conversion unless it's a sRGB format
    DDSFile *bmpDDS = NULL;
-   if( realBmp->getFormat() != realFmt )
+   if( realBmp->getFormat() != realFmt && !profile->isSRGB() )
    {
       const GFXFormat oldFmt = realBmp->getFormat();
 
@@ -390,22 +392,20 @@ GFXTextureObject *GFXTextureManager::_createTexture(  GBitmap *bmp,
             // This shouldn't live here, I don't think
             switch( realFmt )
             {
-               case GFXFormatDXT1:
-               case GFXFormatDXT2:
-               case GFXFormatDXT3:
-               case GFXFormatDXT4:
-               case GFXFormatDXT5:
+               case GFXFormatBC1:
+               case GFXFormatBC2:
+               case GFXFormatBC3:
                   // If this is a Normal Map profile, than the data needs to be conditioned
                   // to use the swizzle trick
                   if( ret->mProfile->getType() == GFXTextureProfile::NormalMap )
                   {
                      PROFILE_START(DXT_DXTNMSwizzle);
                      static DXT5nmSwizzle sDXT5nmSwizzle;
-                     DDSUtil::swizzleDDS( bmpDDS, sDXT5nmSwizzle );
+                     ImageUtil::swizzleDDS( bmpDDS, sDXT5nmSwizzle );
                      PROFILE_END();
                   }
 
-                  convSuccess = DDSUtil::squishDDS( bmpDDS, realFmt );
+                  convSuccess = ImageUtil::ddsCompress( bmpDDS, realFmt );
                   break;
                default:
                   AssertFatal(false, "Attempting to convert to a non-DXT format");
@@ -534,7 +534,7 @@ GFXTextureObject *GFXTextureManager::_createTexture(  DDSFile *dds,
    GFXFormat fmt = dds->mFormat;
    _validateTexParams( dds->getHeight(), dds->getWidth(), profile, numMips, fmt );
 
-   if( fmt != dds->mFormat )
+   if( fmt != dds->mFormat && !profile->isSRGB())
    {
       Con::errorf( "GFXTextureManager - failed to validate texture parameters for DDS file '%s'", fileName );
       return NULL;
@@ -629,50 +629,7 @@ GFXTextureObject *GFXTextureManager::createTexture( const Torque::Path &path, GF
    
    // We need to handle path's that have had "incorrect"
    // extensions parsed out of the file name
-   Torque::Path correctPath = path;
-
-   bool textureExt = false;
-
-   // Easiest case to handle is when there isn't an extension
-   if (path.getExtension().isEmpty())
-      textureExt = true;
-
-   // Since "dds" isn't registered with GBitmap currently we
-   // have to test it separately
-   if (sDDSExt.equal( path.getExtension(), String::NoCase ) )
-      textureExt = true;
-
-   // Now loop through the rest of the GBitmap extensions
-   // to see if we have any matches
-   for ( U32 i = 0; i < GBitmap::sRegistrations.size(); i++ )
-   {
-      // If we have gotten a match (either in this loop or before)
-      // then we can exit
-      if (textureExt)
-         break;
-
-      const GBitmap::Registration   &reg = GBitmap::sRegistrations[i];
-      const Vector<String>          &extensions = reg.extensions;
-
-      for ( U32 j = 0; j < extensions.size(); ++j )
-      {    
-         if ( extensions[j].equal( path.getExtension(), String::NoCase ) )
-         {
-            // Found a valid texture extension
-            textureExt = true;
-            break;
-         }
-      }
-   }
-
-   // If we didn't find a valid texture extension then assume that
-   // the parsed out "extension" was actually intended to be part of
-   // the texture name so add it back
-   if (!textureExt)
-   {
-      correctPath.setFileName( Torque::Path::Join( path.getFileName(), '.', path.getExtension() ) );
-      correctPath.setExtension( String::EmptyString );
-   }
+   Torque::Path correctPath = validatePath(path);
 
    // Check the cache first...
    String pathNoExt = Torque::Path::Join( correctPath.getRoot(), ':', correctPath.getPath() );
@@ -786,7 +743,7 @@ GFXTextureObject *GFXTextureManager::createTexture( U32 width, U32 height, GFXFo
    GFXFormat checkFmt = format;
    _validateTexParams( localWidth, localHeight, profile, numMips, checkFmt );
 
-   AssertFatal( checkFmt == format, "Anonymous texture didn't get the format it wanted." );
+//   AssertFatal( checkFmt == format, "Anonymous texture didn't get the format it wanted." );
 
    GFXTextureObject *outTex = NULL;
 
@@ -836,12 +793,13 @@ GFXTextureObject *GFXTextureManager::createTexture(   U32 width,
                                                       U32 depth,
                                                       void *pixels,
                                                       GFXFormat format,
-                                                      GFXTextureProfile *profile )
+                                                      GFXTextureProfile *profile,
+                                                      U32 numMipLevels)
 {
    PROFILE_SCOPE( GFXTextureManager_CreateTexture_3D );
 
    // Create texture...
-   GFXTextureObject *ret = _createTextureObject( height, width, depth, format, profile, 1 );
+   GFXTextureObject *ret = _createTextureObject( height, width, depth, format, profile, numMipLevels );
 
    if(!ret)
    {
@@ -866,6 +824,339 @@ GFXTextureObject *GFXTextureManager::createTexture(   U32 width,
 
    // Return the new texture!
    return ret;
+}
+
+Torque::Path GFXTextureManager::validatePath(const Torque::Path &path)
+{
+   // We need to handle path's that have had "incorrect"
+   // extensions parsed out of the file name
+   Torque::Path correctPath = path;
+
+   bool textureExt = false;
+
+   // Easiest case to handle is when there isn't an extension
+   if (path.getExtension().isEmpty())
+      textureExt = true;
+
+   // Since "dds" isn't registered with GBitmap currently we
+   // have to test it separately
+   if (sDDSExt.equal(path.getExtension(), String::NoCase))
+      textureExt = true;
+
+   // Now loop through the rest of the GBitmap extensions
+   // to see if we have any matches
+   for (U32 i = 0; i < GBitmap::sRegistrations.size(); i++)
+   {
+      // If we have gotten a match (either in this loop or before)
+      // then we can exit
+      if (textureExt)
+         break;
+
+      const GBitmap::Registration   &reg = GBitmap::sRegistrations[i];
+      const Vector<String>          &extensions = reg.extensions;
+
+      for (U32 j = 0; j < extensions.size(); ++j)
+      {
+         if (extensions[j].equal(path.getExtension(), String::NoCase))
+         {
+            // Found a valid texture extension
+            textureExt = true;
+            break;
+         }
+      }
+   }
+
+   // If we didn't find a valid texture extension then assume that
+   // the parsed out "extension" was actually intended to be part of
+   // the texture name so add it back
+   if (!textureExt)
+   {
+      correctPath.setFileName(Torque::Path::Join(path.getFileName(), '.', path.getExtension()));
+      correctPath.setExtension(String::EmptyString);
+   }
+   return correctPath;
+}
+
+GBitmap *GFXTextureManager::loadUncompressedTexture(const Torque::Path &path, GFXTextureProfile *profile)
+{
+   PROFILE_SCOPE(GFXTextureManager_loadUncompressedTexture);
+
+   GBitmap *retBitmap = NULL;
+
+   // Resource handles used for loading.  Hold on to them
+   // throughout this function so that change notifications
+   // don't get added, then removed, and then re-added.
+
+   Resource< DDSFile > dds;
+   Resource< GBitmap > bitmap;
+
+   // We need to handle path's that have had "incorrect"
+   // extensions parsed out of the file name
+   Torque::Path correctPath = validatePath(path);
+
+   U32 scalePower = profile ? getTextureDownscalePower(profile) : 0;
+
+   // Check the cache first...
+   String pathNoExt = Torque::Path::Join(correctPath.getRoot(), ':', correctPath.getPath());
+   pathNoExt = Torque::Path::Join(pathNoExt, '/', correctPath.getFileName());
+
+   // If this is a valid file (has an extension) than load it
+   Path realPath;
+   if (Torque::FS::IsFile(correctPath))
+   {
+      PROFILE_SCOPE(GFXTextureManager_loadUncompressedTexture_INNNER1)
+         // Check for DDS
+         if (sDDSExt.equal(correctPath.getExtension(), String::NoCase))
+         {
+            dds = DDSFile::load(correctPath, scalePower);
+            if (dds != NULL)
+            {
+               realPath = dds.getPath();
+               retBitmap = new GBitmap();
+               if (!dds->decompressToGBitmap(retBitmap))
+               {
+                  delete retBitmap;
+                  retBitmap = NULL;
+               }
+            }
+         }
+         else // Let GBitmap take care of it
+         {
+            bitmap = GBitmap::load(correctPath);
+            if (bitmap != NULL)
+            {
+               realPath = bitmap.getPath();
+               retBitmap = new GBitmap(*bitmap);
+
+               if (scalePower &&
+                  isPow2(retBitmap->getWidth()) &&
+                  isPow2(retBitmap->getHeight()) &&
+                  profile->canDownscale())
+               {
+                  retBitmap->extrudeMipLevels();
+                  retBitmap->chopTopMips(scalePower);
+               }
+            }
+         }
+   }
+   else
+   {
+      PROFILE_SCOPE(GFXTextureManager_loadUncompressedTexture_INNNER2)
+         // NOTE -- We should probably remove the code from GBitmap that tries different
+         // extensions for things GBitmap loads, and move it here. I think it should
+         // be a bit more involved than just a list of extensions. Some kind of
+         // extension registration thing, maybe.
+
+         // Check to see if there is a .DDS file with this name (if no extension is provided)
+         Torque::Path tryDDSPath = pathNoExt;
+      if (tryDDSPath.getExtension().isNotEmpty())
+         tryDDSPath.setFileName(tryDDSPath.getFullFileName());
+      tryDDSPath.setExtension(sDDSExt);
+
+      if (Torque::FS::IsFile(tryDDSPath))
+      {
+         dds = DDSFile::load(tryDDSPath, scalePower);
+         if (dds != NULL)
+         {
+            realPath = dds.getPath();
+            // Decompress dds into the GBitmap
+            retBitmap = new GBitmap();
+            if (!dds->decompressToGBitmap(retBitmap))
+            {
+               delete retBitmap;
+               retBitmap = NULL;
+            }
+         }
+      }
+
+      // Otherwise, retTexObj stays NULL, and fall through to the generic GBitmap
+      // load.
+   }
+
+   // If we still don't have a texture object yet, feed the correctPath to GBitmap and
+   // it will try a bunch of extensions
+   if (retBitmap == NULL)
+   {
+      PROFILE_SCOPE(GFXTextureManager_loadUncompressedTexture_INNNER3)
+         // Find and load the texture.
+         bitmap = GBitmap::load(correctPath);
+
+      if (bitmap != NULL)
+      {
+         retBitmap = new GBitmap(*bitmap);
+
+         if (scalePower &&
+            isPow2(retBitmap->getWidth()) &&
+            isPow2(retBitmap->getHeight()) &&
+            profile->canDownscale())
+         {
+            retBitmap->extrudeMipLevels();
+            retBitmap->chopTopMips(scalePower);
+         }
+      }
+   }
+
+   return retBitmap;
+}
+
+GFXTextureObject *GFXTextureManager::createCompositeTexture(const Torque::Path &pathR, const Torque::Path &pathG, const Torque::Path &pathB, const Torque::Path &pathA, U32 inputKey[4],
+   GFXTextureProfile *profile)
+{
+   PROFILE_SCOPE(GFXTextureManager_createCompositeTexture);
+   
+   String inputKeyStr = String::ToString("%d%d%d%d", inputKey[0], inputKey[1], inputKey[2], inputKey[3]);
+
+   String resourceTag = pathR.getFileName() + pathG.getFileName() + pathB.getFileName() + pathA.getFileName() + inputKeyStr; //associate texture object with a key combo
+
+   GFXTextureObject *cacheHit = _lookupTexture(resourceTag, profile);
+   if (cacheHit != NULL) return cacheHit;
+
+   GBitmap*bitmap[4];
+   bitmap[0] = loadUncompressedTexture(pathR, profile);
+   if (!pathG.isEmpty())
+      bitmap[1] = loadUncompressedTexture(pathG, profile);
+   else
+      bitmap[1] = NULL;
+
+   if (!pathB.isEmpty())
+      bitmap[2] = loadUncompressedTexture(pathB, profile);
+   else
+      bitmap[2] = NULL;
+   if (!pathA.isEmpty())
+      bitmap[3] = loadUncompressedTexture(pathA, profile);
+   else
+      bitmap[3] = NULL;
+   
+
+   Path realPath;
+   GFXTextureObject *retTexObj = NULL;
+   realPath = validatePath(pathR); //associate path with r channel texture in.
+
+   retTexObj = createCompositeTexture(bitmap, inputKey, resourceTag, profile, false);
+
+   if (retTexObj)
+   {
+      // Store the path for later use.
+      retTexObj->mPath = resourceTag;
+
+      // Register the texture file for change notifications.
+      FS::AddChangeNotification(retTexObj->getPath(), this, &GFXTextureManager::_onFileChanged);
+   }
+
+   // Could put in a final check for 'retTexObj == NULL' here as an error message.
+   for (U32 i = 0; i < 4; i++)
+   {
+      if (bitmap[i])
+      {
+         bitmap[i]->deleteImage();
+         delete bitmap[i];
+      }
+   }
+   return retTexObj;
+}
+
+void GFXTextureManager::saveCompositeTexture(const Torque::Path &pathR, const Torque::Path &pathG, const Torque::Path &pathB, const Torque::Path &pathA, U32 inputKey[4],
+   const Torque::Path &saveAs,GFXTextureProfile *profile)
+{
+   PROFILE_SCOPE(GFXTextureManager_saveCompositeTexture);
+
+   String inputKeyStr = String::ToString("%d%d%d%d", inputKey[0], inputKey[1], inputKey[2], inputKey[3]);
+
+   String resourceTag = pathR.getFileName() + pathG.getFileName() + pathB.getFileName() + pathA.getFileName() + inputKeyStr; //associate texture object with a key combo
+
+   GFXTextureObject *cacheHit = _lookupTexture(resourceTag, profile);
+   if (cacheHit != NULL)
+   {
+      cacheHit->dumpToDisk("png", saveAs.getFullPath());
+      return;
+   }
+   GBitmap*bitmap[4];
+   bitmap[0] = loadUncompressedTexture(pathR, profile);
+   if (!pathG.isEmpty())
+      bitmap[1] = loadUncompressedTexture(pathG, profile);
+   else
+      bitmap[1] = NULL;
+
+   if (!pathB.isEmpty())
+      bitmap[2] = loadUncompressedTexture(pathB, profile);
+   else
+      bitmap[2] = NULL;
+   if (!pathA.isEmpty())
+      bitmap[3] = loadUncompressedTexture(pathA, profile);
+   else
+      bitmap[3] = NULL;
+
+
+   Path realPath;
+   GFXTextureObject *retTexObj = NULL;
+   realPath = validatePath(pathR); //associate path with r channel texture in.
+
+   retTexObj = createCompositeTexture(bitmap, inputKey, resourceTag, profile, false);
+   if (retTexObj != NULL)
+      retTexObj->dumpToDisk("png", saveAs.getFullPath());
+   return;
+}
+
+DefineEngineFunction(saveCompositeTexture, void, (const char* pathR, const char* pathG, const char* pathB, const char* pathA,
+                                                  const char * inputKeyString, const char* saveAs),
+                                                  ("", "", "", "", "", ""), "File1,file2,file3,file4,[chanels for r g b and a locations],saveAs")
+{
+   U32 inputKey[4] = {0,0,0,0};
+
+   if (dStrcmp(inputKeyString, "") != 0)
+   {
+      dSscanf(inputKeyString, "%i %i %i %i", &inputKey[0], &inputKey[1], &inputKey[2], &inputKey[3]);
+   }
+   GFX->getTextureManager()->saveCompositeTexture(pathR, pathG, pathB, pathA, inputKey, saveAs, &GFXTexturePersistentProfile);
+}
+
+GFXTextureObject *GFXTextureManager::createCompositeTexture(GBitmap*bmp[4], U32 inputKey[4],
+   const String &resourceName, GFXTextureProfile *profile, bool deleteBmp)
+{
+   if (!bmp[0])
+   {
+      Con::errorf(ConsoleLogEntry::General, "GFXTextureManager::createCompositeTexture() - Got NULL bitmap(R)!");
+      return NULL;
+   }
+
+   U8 rChan, gChan, bChan, aChan;
+   
+   //pack additional bitmaps into the origional
+   for (U32 x = 0; x < bmp[0]->getWidth(); x++)
+   {
+      for (U32 y = 0; y < bmp[0]->getHeight(); y++)
+      {
+         rChan = bmp[0]->getChanelValueAt(x, y, inputKey[0]);
+
+         if (bmp[1])
+            gChan = bmp[1]->getChanelValueAt(x, y, inputKey[1]);
+         else
+            gChan = 255;
+
+         if (bmp[2])
+            bChan = bmp[2]->getChanelValueAt(x, y, inputKey[2]);
+         else
+            bChan = 255;
+
+         if (bmp[3])
+            aChan = bmp[3]->getChanelValueAt(x, y, inputKey[3]);
+         else
+            aChan = 255;
+
+         bmp[0]->setColor(x, y, ColorI(rChan, gChan, bChan, aChan));
+      }
+   }
+
+   GFXTextureObject *cacheHit = _lookupTexture(resourceName, profile);
+   if (cacheHit != NULL)
+   {
+      // Con::errorf("Cached texture '%s'", (resourceName.isNotEmpty() ? resourceName.c_str() : "unknown"));
+      if (deleteBmp)
+         delete bmp[0];
+      return cacheHit;
+   }
+
+   return _createTexture(bmp[0], resourceName, profile, deleteBmp, NULL);
 }
 
 GFXTextureObject* GFXTextureManager::_findPooledTexure(  U32 width, 
@@ -1033,12 +1324,15 @@ void GFXTextureManager::_validateTexParams( const U32 width, const U32 height,
    GFXFormat testingFormat = inOutFormat;
    if( profile->getCompression() != GFXTextureProfile::NONE )
    {
-      const S32 offset = profile->getCompression() - GFXTextureProfile::DXT1;
-      testingFormat = GFXFormat( GFXFormatDXT1 + offset );
+      const S32 offset = profile->getCompression() - GFXTextureProfile::BC1;
+      testingFormat = GFXFormat( GFXFormatBC1 + offset );
 
       // No auto-gen mips on compressed textures
       autoGenSupp = false;
    }
+
+   if (profile->isSRGB())
+      testingFormat = ImageUtil::toSRGBFormat(testingFormat);
 
    // inOutFormat is not modified by this method
    GFXCardProfiler* cardProfiler = GFX->getCardProfiler();

@@ -144,6 +144,11 @@ GFX_ImplementTextureProfile( PostFxTextureProfile,
                             GFXTextureProfile::Static | GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap,
                             GFXTextureProfile::NONE );
 
+GFX_ImplementTextureProfile( PostFxTextureSRGBProfile,
+                             GFXTextureProfile::DiffuseMap,
+                             GFXTextureProfile::Static | GFXTextureProfile::PreserveSize | GFXTextureProfile::NoMipmap | GFXTextureProfile::SRGB,
+                             GFXTextureProfile::NONE);
+
 GFX_ImplementTextureProfile( VRTextureProfile,
                             GFXTextureProfile::DiffuseMap,
                             GFXTextureProfile::PreserveSize |
@@ -275,7 +280,7 @@ PostEffect::PostEffect()
       mTargetViewport( PFXTargetViewport_TargetSize ),
       mTargetSize( Point2I::Zero ),
       mTargetFormat( GFXFormatR8G8B8A8 ),
-      mTargetClearColor( ColorF::BLACK ),
+      mTargetClearColor( LinearColorF::BLACK ),
       mOneFrameOnly( false ),
       mOnThisFrame( true ),
       mRTSizeSC( NULL ),
@@ -306,6 +311,7 @@ PostEffect::PostEffect()
       mDeltaTimeSC( NULL ),
       mInvCameraMatSC( NULL )
 {
+   dMemset( mTexSRGB, 0, sizeof(bool) * NumTextures);
    dMemset( mActiveTextures, 0, sizeof( GFXTextureObject* ) * NumTextures );
    dMemset( mActiveNamedTarget, 0, sizeof( NamedTexTarget* ) * NumTextures );
    dMemset( mActiveTextureViewport, 0, sizeof( RectI ) * NumTextures );
@@ -357,6 +363,9 @@ void PostEffect::initPersistFields()
    addField( "texture", TypeImageFilename, Offset( mTexFilename, PostEffect ), NumTextures,
       "Input textures to this effect ( samplers ).\n"
       "@see PFXTextureIdentifiers" );
+
+   addField("textureSRGB", TypeBool, Offset(mTexSRGB, PostEffect), NumTextures,
+      "Set input texture to be sRGB");
 
    addField( "renderTime", TYPEID< PFXRenderTime >(), Offset( mRenderTime, PostEffect ),
       "When to process this effect during the frame." );
@@ -410,6 +419,10 @@ bool PostEffect::onAdd()
             texFilename[0] == '$' ||
             texFilename[0] == '#' )
          continue;
+
+      GFXTextureProfile *profile = &PostFxTextureProfile;
+      if (mTexSRGB[i])
+         profile = &PostFxTextureSRGBProfile;
 
       // Try to load the texture.
       bool success = mTextures[i].set( texFilename, &PostFxTextureProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ) );
@@ -730,7 +743,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
 
    if (mAmbientColorSC->isValid() && state)
    {
-      const ColorF &sunlight = state->getAmbientLightColor();
+      const LinearColorF &sunlight = state->getAmbientLightColor();
       Point3F ambientColor( sunlight.red, sunlight.green, sunlight.blue );
 
       mShaderConsts->set( mAmbientColorSC, ambientColor );
@@ -751,7 +764,7 @@ void PostEffect::_setupConstants( const SceneRenderState *state )
 
       if ( mWaterColorSC->isValid() )
       {
-         ColorF color( state->getSceneManager()->getWaterFogData().color );
+         LinearColorF color( state->getSceneManager()->getWaterFogData().color );
          mShaderConsts->set( mWaterColorSC, color );
       }
 
@@ -1067,7 +1080,7 @@ void PostEffect::_setupTarget( const SceneRenderState *state, bool *outClearTarg
             mTargetDepthStencil.getWidthHeight() != targetSize )
       {         
          mTargetDepthStencil.set( targetSize.x, targetSize.y, GFXFormatD24S8,
-                     &GFXDefaultZTargetProfile, "PostEffect::_setupTarget" );
+                     &GFXZTargetProfile, "PostEffect::_setupTarget" );
 
          if ( mTargetClear == PFXTargetClear_OnCreate )
             *outClearTarget = true;
@@ -1696,7 +1709,7 @@ DefineEngineFunction( dumpRandomNormalMap, void, (),,
 {
    GFXTexHandle tex;
 
-   tex.set( 64, 64, GFXFormatR8G8B8A8, &GFXDefaultPersistentProfile, "" );
+   tex.set( 64, 64, GFXFormatR8G8B8A8, &GFXTexturePersistentProfile, "" );
 
    GFXLockedRect *rect = tex.lock();
    U8 *f = rect->bits;

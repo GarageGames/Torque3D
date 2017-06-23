@@ -297,6 +297,8 @@ public:
 class GFXD3D11ShaderConstBuffer : public GFXShaderConstBuffer
 {
    friend class GFXD3D11Shader;
+   // Cache device context
+   ID3D11DeviceContext* mDeviceContext;
 
 public:
 
@@ -324,7 +326,7 @@ public:
    virtual void set(GFXShaderConstHandle* handle, const Point3F& fv);
    virtual void set(GFXShaderConstHandle* handle, const Point4F& fv);
    virtual void set(GFXShaderConstHandle* handle, const PlaneF& fv);
-   virtual void set(GFXShaderConstHandle* handle, const ColorF& fv);
+   virtual void set(GFXShaderConstHandle* handle, const LinearColorF& fv);
    virtual void set(GFXShaderConstHandle* handle, const S32 f);
    virtual void set(GFXShaderConstHandle* handle, const Point2I& fv);
    virtual void set(GFXShaderConstHandle* handle, const Point3I& fv);
@@ -434,7 +436,7 @@ protected:
                                 GenericConstBufferLayout *bufferLayout, 
                                 Vector<GFXShaderConstDesc> &samplerDescriptions );
 
-   void _getShaderConstants( ID3D11ShaderReflection* pTable, 
+   void _getShaderConstants( ID3D11ShaderReflection* refTable, 
 	                         GenericConstBufferLayout *bufferLayout,
                              Vector<GFXShaderConstDesc> &samplerDescriptions );
 

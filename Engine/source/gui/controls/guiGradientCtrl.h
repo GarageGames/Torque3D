@@ -74,7 +74,7 @@ public:
 	{
 		GuiGradientSwatchCtrl* swatch;
 		S32 pos;
-		ColorF color;
+		LinearColorF color;
 	};
 
 	Vector<ColorRange> mColorRange;
@@ -93,8 +93,8 @@ private:
 
    /// @name Core Variables
    /// @{
-   ColorF mPickColor;		///< Color that has been picked from control
-   ColorF mBaseColor;		///< Colour we display (in case of pallet and blend mode)
+   LinearColorF mPickColor;		///< Color that has been picked from control
+   LinearColorF mBaseColor;		///< Colour we display (in case of pallet and blend mode)
    PickMode mDisplayMode;	///< Current color display mode of the selector
 	PickMode mSaveDisplayMode;
 
@@ -105,11 +105,11 @@ private:
 
    GFXStateBlockRef mStateBlock;
 	
-	ColorF colorWhite;
-	ColorF colorWhiteBlend;
-	ColorF colorBlack;
-	ColorF colorAlpha;
-	ColorF colorAlphaW;
+	LinearColorF colorWhite;
+	LinearColorF colorWhiteBlend;
+	LinearColorF colorBlack;
+	LinearColorF colorAlpha;
+	LinearColorF colorAlphaW;
    /// @}
 	String mColorFunction;
 	
@@ -126,9 +126,9 @@ public:
    /// @name Color Value Functions
    /// @{
    /// NOTE: setValue only sets baseColor, since setting pickColor wouldn't be useful
-   void setValue(ColorF &value) {mBaseColor = value;}
+   void setValue(LinearColorF &value) {mBaseColor = value;}
    /// NOTE: getValue() returns baseColor if pallet (since pallet controls can't "pick" colours themselves)
-   ColorF getValue() {return mPickColor;}
+   LinearColorF getValue() {return mPickColor;}
    void updateColor() {mPositionChanged = true;}
    /// @}
    
@@ -148,7 +148,7 @@ public:
 	void inspectPreApply();
 	void inspectPostApply();
 	void reInitSwatches( GuiGradientCtrl::PickMode );
-   void addColorRange(Point2I pos, const ColorF& color);
+   void addColorRange(Point2I pos, const LinearColorF& color);
 	void removeColorRange( GuiGradientSwatchCtrl* swatch );
 	void sortColorRange();
 

@@ -34,9 +34,9 @@ class TimeOfDay;
 struct COLOR_TARGET
 {
 	F32		elevation; // maximum target elevation
-	ColorF	color; //normalized 0 = 1.0 ... 
+	LinearColorF	color; //normalized 0 = 1.0 ... 
 	F32		bandMod;  //6 is max
-	ColorF	bandColor;
+	LinearColorF	bandColor;
 };
 
 typedef Vector<COLOR_TARGET> COLOR_TARGETS;
@@ -108,7 +108,7 @@ public:
 	{ return (mCurrentColor.blue + mCurrentColor.green + mCurrentColor.red) / 3; }
    */
    static TimeOfDayUpdateSignal& getTimeOfDayUpdateSignal() { return smTimeOfDayUpdateSignal; } 
-   void getSunColor( ColorF *outColor ) const { _getSunColor( outColor ); }
+   void getSunColor( LinearColorF *outColor ) const { _getSunColor( outColor ); }
 
    void addTimeEvent( F32 triggerElevation, const UTF8 *identifier );
 
@@ -150,10 +150,10 @@ protected:
    /// @param color [in] target color.
    /// @param bandMod [in]
    /// @param bandColor [in]
-   void _addColorTarget( F32 ele, const ColorF &color, F32 bandMod, const ColorF &bandColor );
+   void _addColorTarget( F32 ele, const LinearColorF &color, F32 bandMod, const LinearColorF &bandColor );
 
 	  // Grab our sun and sky colors based upon sun elevation.
-   void _getSunColor( ColorF *outColor ) const;
+   void _getSunColor( LinearColorF *outColor ) const;
 
    static bool setTimeOfDay( void *object, const char *index, const char *data );
    static bool setPlay( void *object, const char *index, const char *data );
@@ -196,9 +196,9 @@ protected:
    bool mAnimate;
 
    /*
-	ColorF mCurrentColor;
+	LinearColorF mCurrentColor;
 	F32 mBandMod;
-	ColorF mCurrentBandColor;
+	LinearColorF mCurrentBandColor;
 
 	// PersistFields preparation
 	bool mConvertedToRads;	

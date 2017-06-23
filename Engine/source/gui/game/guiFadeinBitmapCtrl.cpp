@@ -194,7 +194,7 @@ void GuiFadeinBitmapCtrl::onRender(Point2I offset, const RectI &updateRect)
    
    // Render overlay on top of bitmap.
    
-   ColorI color = mFadeColor;
+   ColorI color = mFadeColor.toColorI();
    color.alpha = alpha;
    
    GFX->getDrawUtil()->drawRectFill( offset, getExtent() + offset, color );

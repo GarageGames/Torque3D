@@ -151,29 +151,32 @@ GFXD3D11StateBlock::GFXD3D11StateBlock(const GFXStateBlockDesc& desc)
          mSamplerDesc[i].MinLOD = 0;
          mSamplerDesc[i].MaxLOD = FLT_MAX;
 
+         const bool comparison = gfxSamplerState.samplerFunc != GFXCmpNever;
+
          if (gfxSamplerState.magFilter == GFXTextureFilterPoint && gfxSamplerState.minFilter == GFXTextureFilterPoint && gfxSamplerState.mipFilter == GFXTextureFilterPoint)
-            mSamplerDesc[i].Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+            mSamplerDesc[i].Filter = comparison ? D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT : D3D11_FILTER_MIN_MAG_MIP_POINT;
          else if (gfxSamplerState.magFilter == GFXTextureFilterPoint && gfxSamplerState.minFilter == GFXTextureFilterPoint && gfxSamplerState.mipFilter == GFXTextureFilterLinear)
-            mSamplerDesc[i].Filter = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+            mSamplerDesc[i].Filter = comparison ? D3D11_FILTER_COMPARISON_MIN_MAG_POINT_MIP_LINEAR : D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR;
          else if (gfxSamplerState.magFilter == GFXTextureFilterLinear && gfxSamplerState.minFilter == GFXTextureFilterPoint && gfxSamplerState.mipFilter == GFXTextureFilterPoint)
-            mSamplerDesc[i].Filter = D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
+            mSamplerDesc[i].Filter = comparison ? D3D11_FILTER_COMPARISON_MIN_POINT_MAG_LINEAR_MIP_POINT : D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT;
          else if (gfxSamplerState.magFilter == GFXTextureFilterLinear && gfxSamplerState.minFilter == GFXTextureFilterPoint && gfxSamplerState.mipFilter == GFXTextureFilterLinear)
-            mSamplerDesc[i].Filter = D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
+            mSamplerDesc[i].Filter = comparison ? D3D11_FILTER_COMPARISON_MIN_POINT_MAG_MIP_LINEAR : D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR;
          else if (gfxSamplerState.magFilter == GFXTextureFilterPoint && gfxSamplerState.minFilter == GFXTextureFilterLinear && gfxSamplerState.mipFilter == GFXTextureFilterPoint)
-            mSamplerDesc[i].Filter = D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
+            mSamplerDesc[i].Filter = comparison ? D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_MIP_POINT : D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT;
          else if (gfxSamplerState.magFilter == GFXTextureFilterPoint && gfxSamplerState.minFilter == GFXTextureFilterLinear && gfxSamplerState.mipFilter == GFXTextureFilterLinear)
-            mSamplerDesc[i].Filter = D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
+            mSamplerDesc[i].Filter = comparison ? D3D11_FILTER_COMPARISON_MIN_LINEAR_MAG_POINT_MIP_LINEAR : D3D11_FILTER_MIN_LINEAR_MAG_POINT_MIP_LINEAR;
          else if (gfxSamplerState.magFilter == GFXTextureFilterLinear && gfxSamplerState.minFilter == GFXTextureFilterLinear && gfxSamplerState.mipFilter == GFXTextureFilterPoint)
-            mSamplerDesc[i].Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+            mSamplerDesc[i].Filter = comparison ? D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT : D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
          else if (gfxSamplerState.magFilter == GFXTextureFilterLinear && gfxSamplerState.minFilter == GFXTextureFilterLinear && mDesc.samplers[i].mipFilter == GFXTextureFilterLinear)
-            mSamplerDesc[i].Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+            mSamplerDesc[i].Filter = comparison ? D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR : D3D11_FILTER_MIN_MAG_MIP_LINEAR;
          else
-            mSamplerDesc[i].Filter = D3D11_FILTER_ANISOTROPIC;
+            mSamplerDesc[i].Filter = comparison ? D3D11_FILTER_COMPARISON_ANISOTROPIC : D3D11_FILTER_ANISOTROPIC;
 
          mSamplerDesc[i].BorderColor[0] = 1.0f;
          mSamplerDesc[i].BorderColor[1] = 1.0f;
          mSamplerDesc[i].BorderColor[2] = 1.0f;
          mSamplerDesc[i].BorderColor[3] = 1.0f;
+         mSamplerDesc[i].ComparisonFunc = GFXD3D11CmpFunc[gfxSamplerState.samplerFunc];
 
          hr = D3D11DEVICE->CreateSamplerState(&mSamplerDesc[i], &mSamplerStates[i]);
          if (FAILED(hr))

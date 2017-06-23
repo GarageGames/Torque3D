@@ -331,14 +331,14 @@ void MaterialList::mapMaterial( U32 i )
          GFXTexHandle texHandle;
          if (mLookupPath.isEmpty())
          {
-            texHandle.set( mMaterialNames[i], &GFXDefaultStaticDiffuseProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
+            texHandle.set( mMaterialNames[i], &GFXStaticTextureSRGBProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
          }
          else
          {
             // Should we strip off the extension of the path here before trying
             // to load the texture?
             String fullPath = String::ToString( "%s/%s", mLookupPath.c_str(), mMaterialNames[i].c_str() );
-            texHandle.set( fullPath, &GFXDefaultStaticDiffuseProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
+            texHandle.set( fullPath, &GFXStaticTextureSRGBProfile, avar("%s() - handle (line %d)", __FUNCTION__, __LINE__) );
          }
 
          if ( texHandle.isValid() )

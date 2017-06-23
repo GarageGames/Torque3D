@@ -173,7 +173,7 @@ public:
 
    const char *getType() const { return "selection"; }
    void rebuild();
-   void render(Vector<GFXVertexPCT> & vertexBuffer, S32 & verts, S32 & elems, S32 & prims, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone) const;
+   void render(Vector<GFXVertexPCT> & vertexBuffer, S32 & verts, S32 & elems, S32 & prims, const LinearColorF & inColorFull, const LinearColorF & inColorNone, const LinearColorF & outColorFull, const LinearColorF & outColorNone) const;
    void setSize(const Point2I &){}
 
 protected:
@@ -416,8 +416,8 @@ class TerrainEditor : public EditTSCtrl
       void updateBrush(Brush & brush, const Point2I & gPos);      
 
       //
-      void renderSelection(const Selection & sel, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone, bool renderFill, bool renderFrame);
-      void renderBrush(const Brush & brush, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone, bool renderFill, bool renderFrame);
+      void renderSelection(const Selection & sel, const LinearColorF & inColorFull, const LinearColorF & inColorNone, const LinearColorF & outColorFull, const LinearColorF & outColorNone, bool renderFill, bool renderFrame);
+      void renderBrush(const Brush & brush, const LinearColorF & inColorFull, const LinearColorF & inColorNone, const LinearColorF & outColorFull, const LinearColorF & outColorNone, bool renderFill, bool renderFrame);
       void renderBorder();
 
    public:

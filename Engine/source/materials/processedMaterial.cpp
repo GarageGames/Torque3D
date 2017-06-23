@@ -275,6 +275,8 @@ void ProcessedMaterial::_initPassStateBlock( RenderPassData *rpd, GFXStateBlockD
             result.samplers[i].addressModeU = GFXAddressClamp;
             result.samplers[i].addressModeV = GFXAddressClamp;
             result.samplers[i].addressModeW = GFXAddressClamp;
+            result.samplers[i].minFilter = GFXTextureFilterLinear;
+            result.samplers[i].magFilter = GFXTextureFilterLinear;
             break;
          }
 
@@ -389,7 +391,7 @@ void ProcessedMaterial::_setStageData()
       // DiffuseMap
       if( mMaterial->mDiffuseMapFilename[i].isNotEmpty() )
       {
-         mStages[i].setTex( MFT_DiffuseMap, _createTexture( mMaterial->mDiffuseMapFilename[i], &GFXDefaultStaticDiffuseProfile ) );
+         mStages[i].setTex( MFT_DiffuseMap, _createTexture( mMaterial->mDiffuseMapFilename[i], &GFXStaticTextureSRGBProfile) );
          if (!mStages[i].getTex( MFT_DiffuseMap ))
          {
             //If we start with a #, we're probably actually attempting to hit a named target and it may not get a hit on the first pass. So we'll
@@ -399,14 +401,14 @@ void ProcessedMaterial::_setStageData()
             
             // Load a debug texture to make it clear to the user 
             // that the texture for this stage was missing.
-            mStages[i].setTex( MFT_DiffuseMap, _createTexture( GFXTextureManager::getMissingTexturePath().c_str(), &GFXDefaultStaticDiffuseProfile ) );
+            mStages[i].setTex( MFT_DiffuseMap, _createTexture( GFXTextureManager::getMissingTexturePath().c_str(), &GFXStaticTextureSRGBProfile) );
          }
       }
 
       // OverlayMap
       if( mMaterial->mOverlayMapFilename[i].isNotEmpty() )
       {
-         mStages[i].setTex( MFT_OverlayMap, _createTexture( mMaterial->mOverlayMapFilename[i], &GFXDefaultStaticDiffuseProfile ) );
+         mStages[i].setTex( MFT_OverlayMap, _createTexture( mMaterial->mOverlayMapFilename[i], &GFXStaticTextureSRGBProfile ) );
          if(!mStages[i].getTex( MFT_OverlayMap ))
             mMaterial->logError("Failed to load overlay map %s for stage %i", _getTexturePath(mMaterial->mOverlayMapFilename[i]).c_str(), i);
       }
@@ -414,7 +416,7 @@ void ProcessedMaterial::_setStageData()
       // LightMap
       if( mMaterial->mLightMapFilename[i].isNotEmpty() )
       {
-         mStages[i].setTex( MFT_LightMap, _createTexture( mMaterial->mLightMapFilename[i], &GFXDefaultStaticDiffuseProfile ) );
+         mStages[i].setTex( MFT_LightMap, _createTexture( mMaterial->mLightMapFilename[i], &GFXStaticTextureSRGBProfile ) );
          if(!mStages[i].getTex( MFT_LightMap ))
             mMaterial->logError("Failed to load light map %s for stage %i", _getTexturePath(mMaterial->mLightMapFilename[i]).c_str(), i);
       }
@@ -422,7 +424,7 @@ void ProcessedMaterial::_setStageData()
       // ToneMap
       if( mMaterial->mToneMapFilename[i].isNotEmpty() )
       {
-         mStages[i].setTex( MFT_ToneMap, _createTexture( mMaterial->mToneMapFilename[i], &GFXDefaultStaticDiffuseProfile ) );
+         mStages[i].setTex( MFT_ToneMap, _createTexture( mMaterial->mToneMapFilename[i], &GFXStaticTextureProfile) );
          if(!mStages[i].getTex( MFT_ToneMap ))
             mMaterial->logError("Failed to load tone map %s for stage %i", _getTexturePath(mMaterial->mToneMapFilename[i]).c_str(), i);
       }
@@ -430,7 +432,7 @@ void ProcessedMaterial::_setStageData()
       // DetailMap
       if( mMaterial->mDetailMapFilename[i].isNotEmpty() )
       {
-         mStages[i].setTex( MFT_DetailMap, _createTexture( mMaterial->mDetailMapFilename[i], &GFXDefaultStaticDiffuseProfile ) );
+         mStages[i].setTex( MFT_DetailMap, _createTexture( mMaterial->mDetailMapFilename[i], &GFXStaticTextureProfile) );
          if(!mStages[i].getTex( MFT_DetailMap ))
             mMaterial->logError("Failed to load detail map %s for stage %i", _getTexturePath(mMaterial->mDetailMapFilename[i]).c_str(), i);
       }
@@ -438,7 +440,7 @@ void ProcessedMaterial::_setStageData()
       // NormalMap
       if( mMaterial->mNormalMapFilename[i].isNotEmpty() )
       {
-         mStages[i].setTex( MFT_NormalMap, _createTexture( mMaterial->mNormalMapFilename[i], &GFXDefaultStaticNormalMapProfile ) );
+         mStages[i].setTex( MFT_NormalMap, _createTexture( mMaterial->mNormalMapFilename[i], &GFXNormalMapProfile) );
          if(!mStages[i].getTex( MFT_NormalMap ))
             mMaterial->logError("Failed to load normal map %s for stage %i", _getTexturePath(mMaterial->mNormalMapFilename[i]).c_str(), i);
       }
@@ -446,7 +448,7 @@ void ProcessedMaterial::_setStageData()
       // Detail Normal Map
       if( mMaterial->mDetailNormalMapFilename[i].isNotEmpty() )
       {
-         mStages[i].setTex( MFT_DetailNormalMap, _createTexture( mMaterial->mDetailNormalMapFilename[i], &GFXDefaultStaticNormalMapProfile ) );
+         mStages[i].setTex( MFT_DetailNormalMap, _createTexture( mMaterial->mDetailNormalMapFilename[i], &GFXNormalMapProfile) );
          if(!mStages[i].getTex( MFT_DetailNormalMap ))
             mMaterial->logError("Failed to load normal map %s for stage %i", _getTexturePath(mMaterial->mDetailNormalMapFilename[i]).c_str(), i);
       }
@@ -454,7 +456,7 @@ void ProcessedMaterial::_setStageData()
       // SpecularMap
       if( mMaterial->mSpecularMapFilename[i].isNotEmpty() )
       {
-         mStages[i].setTex( MFT_SpecularMap, _createTexture( mMaterial->mSpecularMapFilename[i], &GFXDefaultStaticDiffuseProfile ) );
+         mStages[i].setTex( MFT_SpecularMap, _createTexture( mMaterial->mSpecularMapFilename[i], &GFXStaticTextureProfile) );
          if(!mStages[i].getTex( MFT_SpecularMap ))
             mMaterial->logError("Failed to load specular map %s for stage %i", _getTexturePath(mMaterial->mSpecularMapFilename[i]).c_str(), i);
       }

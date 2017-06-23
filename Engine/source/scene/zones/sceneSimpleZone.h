@@ -61,7 +61,7 @@ class SceneSimpleZone : public SceneZoneSpace
       bool mUseAmbientLightColor;
 
       /// Ambient light color in this zone.
-      ColorF mAmbientLightColor;
+      LinearColorF mAmbientLightColor;
 
       /// @}
 
@@ -102,12 +102,12 @@ class SceneSimpleZone : public SceneZoneSpace
       void setUseAmbientLightColor( bool value );
 
       /// Return the ambient light color for this zone.
-      ColorF getAmbientLightColor() const { return mAmbientLightColor; }
+      LinearColorF getAmbientLightColor() const { return mAmbientLightColor; }
 
       /// Set the ambient light color for the zone.
       /// @note This only takes effect if useAmbientLightColor() return true.
       /// @see setUseAmbientLightColor
-      void setAmbientLightColor( const ColorF& color );
+      void setAmbientLightColor( const LinearColorF& color );
 
       /// @}
 
@@ -131,7 +131,7 @@ class SceneSimpleZone : public SceneZoneSpace
       virtual U32 getPointZone( const Point3F &p );
       virtual bool getOverlappingZones( const Box3F& aabb, U32* outZones, U32& outNumZones );
       virtual void traverseZones( SceneTraversalState* state );
-      virtual bool getZoneAmbientLightColor( U32 zone, ColorF& outColor ) const;
+      virtual bool getZoneAmbientLightColor( U32 zone, LinearColorF& outColor ) const;
       virtual void traverseZones( SceneTraversalState* state, U32 startZoneId );
 
       /// @}

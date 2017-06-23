@@ -278,7 +278,8 @@ U32 GFXDrawUtil::drawTextN( GFont *font, const Point2I &ptDraw, const UTF16 *in_
       }
 
       // Queue char for rendering..
-      mFontRenderBatcher->queueChar(c, ptX, mBitmapModulation);
+      GFXVertexColor color = mBitmapModulation;
+      mFontRenderBatcher->queueChar(c, ptX, color);
    }
 
 
@@ -474,7 +475,7 @@ void GFXDrawUtil::drawRect( const Point2F &upperLeft, const Point2F &lowerRight,
    verts[8].point.set( upperLeft.x + ulOffset + nw.x, upperLeft.y + ulOffset + nw.y, 0.0f ); // same as 0
    verts[9].point.set( upperLeft.x + ulOffset - nw.x, upperLeft.y + ulOffset - nw.y, 0.0f ); // same as 1
 
-   for (S32 i=0; i<10; i++)
+   for (S32 i = 0; i < 10; i++)
       verts[i].color = color;
 
    verts.unlock();
@@ -530,8 +531,7 @@ void GFXDrawUtil::drawRectFill( const Point2F &upperLeft, const Point2F &lowerRi
    verts[1].point.set( lowerRight.x + ne.x + ulOffset, upperLeft.y + ne.y + ulOffset, 0.0f);
    verts[2].point.set( upperLeft.x - ne.x + ulOffset, lowerRight.y - ne.y + ulOffset, 0.0f);
    verts[3].point.set( lowerRight.x - nw.x + ulOffset, lowerRight.y - nw.y + ulOffset, 0.0f);
-
-   for (S32 i=0; i<4; i++)
+   for (S32 i = 0; i < 4; i++)
       verts[i].color = color;
 
    verts.unlock();
@@ -613,7 +613,6 @@ void GFXDrawUtil::drawLine( F32 x1, F32 y1, F32 z1, F32 x2, F32 y2, F32 z2, cons
 
    verts[0].point.set( x1, y1, z1 );
    verts[1].point.set( x2, y2, z2 );
-
    verts[0].color = color;
    verts[1].color = color;
 
@@ -714,7 +713,6 @@ void GFXDrawUtil::_drawWireTriangle( const GFXStateBlockDesc &desc, const Point3
 {
    GFXVertexBufferHandle<GFXVertexPCT> verts(mDevice, 4, GFXBufferTypeVolatile);
    verts.lock();
-
    // Set up the line strip
    verts[0].point = p0;
    verts[0].color = color;
@@ -747,7 +745,6 @@ void GFXDrawUtil::_drawSolidTriangle( const GFXStateBlockDesc &desc, const Point
 {
    GFXVertexBufferHandle<GFXVertexPCT> verts(mDevice, 3, GFXBufferTypeVolatile);
    verts.lock();
-
    // Set up the line strip
    verts[0].point = p0;
    verts[0].color = color;
@@ -779,7 +776,6 @@ void GFXDrawUtil::drawPolygon( const GFXStateBlockDesc& desc, const Point3F* poi
    const bool isWireframe = ( desc.fillMode == GFXFillWireframe );
    const U32 numVerts = isWireframe ? numPoints + 1 : numPoints;
    GFXVertexBufferHandle< GFXVertexPCT > verts( mDevice, numVerts, GFXBufferTypeVolatile );
-
    verts.lock();
    for( U32 i = 0; i < numPoints; ++ i )
    {
@@ -831,7 +827,6 @@ void GFXDrawUtil::_drawWireCube( const GFXStateBlockDesc &desc, const Point3F &s
    verts.lock();
 
    Point3F halfSize = size * 0.5f;
-
    // setup 6 line loops
    U32 vertexIndex = 0;
    for(S32 i = 0; i < 6; i++)
@@ -874,7 +869,6 @@ void GFXDrawUtil::_drawSolidCube( const GFXStateBlockDesc &desc, const Point3F &
    verts.lock();
 
    Point3F halfSize = size * 0.5f;
-
    // setup 6 line loops
    U32 vertexIndex = 0;
    U32 idx;
@@ -953,7 +947,6 @@ void GFXDrawUtil::_drawWirePolyhedron( const GFXStateBlockDesc &desc, const AnyP
    GFXVertexBufferHandle< GFXVertexPCT > verts( mDevice, numEdges * 2, GFXBufferTypeVolatile);
 
    // Fill it with the vertices for the edges.
-   
    verts.lock();
    for( U32 i = 0; i < numEdges; ++ i )
    {
@@ -998,7 +991,6 @@ void GFXDrawUtil::_drawSolidPolyhedron( const GFXStateBlockDesc &desc, const Any
    // put all the polyhedron's points in there.
 
    GFXVertexBufferHandle< GFXVertexPCT > verts( mDevice, numPoints, GFXBufferTypeVolatile );
-   
    verts.lock();
    for( U32 i = 0; i < numPoints; ++ i )
    {
@@ -1087,7 +1079,7 @@ void GFXDrawUtil::drawObjectBox( const GFXStateBlockDesc &desc, const Point3F &s
 
    scaledObjMat.scale( size );
    scaledObjMat.setPosition( pos );
-
+   //to linear is done in primbuilder
    PrimBuild::color( color );
    PrimBuild::begin( GFXLineList, 48 );
 
@@ -1158,7 +1150,6 @@ void GFXDrawUtil::_drawSolidCapsule( const GFXStateBlockDesc &desc, const Point3
    S32 numPoints = sizeof(circlePoints)/sizeof(Point2F);
    GFXVertexBufferHandle<GFXVertexPCT> verts(mDevice, numPoints * 2 + 2, GFXBufferTypeVolatile);
    verts.lock();
-
    for (S32 i=0; i<numPoints + 1; i++)
    {
       S32 imod = i % numPoints;      
@@ -1270,7 +1261,6 @@ void GFXDrawUtil::drawCone( const GFXStateBlockDesc &desc, const Point3F &basePn
    S32 numPoints = sizeof(circlePoints)/sizeof(Point2F);
    GFXVertexBufferHandle<GFXVertexPCT> verts(mDevice, numPoints * 3 + 2, GFXBufferTypeVolatile);
    verts.lock();
-
    F32 sign = -1.f;
    S32 indexDown = 0; //counting down from numPoints
    S32 indexUp = 0; //counting up from 0
@@ -1340,7 +1330,6 @@ void GFXDrawUtil::drawCylinder( const GFXStateBlockDesc &desc, const Point3F &ba
    S32 numPoints = sizeof(circlePoints) / sizeof(Point2F);
    GFXVertexBufferHandle<GFXVertexPCT> verts(mDevice, numPoints *4 + 2, GFXBufferTypeVolatile);
    verts.lock();
-
    F32 sign = -1.f;
    S32 indexDown = 0; //counting down from numPoints
    S32 indexUp = 0; //counting up from 0
@@ -1378,7 +1367,6 @@ void GFXDrawUtil::drawCylinder( const GFXStateBlockDesc &desc, const Point3F &ba
       verts[vertindex + 1].point = Point3F(circlePoints[imod].x, circlePoints[imod].y, 0.5f);
       verts[vertindex + 1].color = color;
    }
-
 
    verts.unlock();
 
@@ -1452,7 +1440,6 @@ void GFXDrawUtil::drawSolidPlane( const GFXStateBlockDesc &desc, const Point3F &
 {
    GFXVertexBufferHandle<GFXVertexPCT> verts(mDevice, 4, GFXBufferTypeVolatile);
    verts.lock();
-
    verts[0].point = pos + Point3F( -size.x / 2.0f, -size.y / 2.0f, 0 );
    verts[0].color = color;
    verts[1].point = pos + Point3F( -size.x / 2.0f, size.y / 2.0f, 0 );
@@ -1508,7 +1495,6 @@ void GFXDrawUtil::drawPlaneGrid( const GFXStateBlockDesc &desc, const Point3F &p
 
    GFXVertexBufferHandle<GFXVertexPCT> verts( mDevice, numVertices, GFXBufferTypeVolatile );
    verts.lock();
-
    U32 vertCount = 0;
 
    if( plane == PlaneXY || plane == PlaneXZ )

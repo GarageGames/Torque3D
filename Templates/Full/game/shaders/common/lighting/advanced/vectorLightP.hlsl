@@ -213,7 +213,7 @@ float4 main( FarFrustumQuadConnectP IN ) : TORQUE_TARGET0
          subsurface = float3(0.337255, 0.772549, 0.262745);
 	}
    // Sample/unpack the normal/z data
-   float4 deferredSample = TORQUE_PREPASS_UNCONDITION( deferredBuffer, IN.uv0 );
+   float4 deferredSample = TORQUE_DEFERRED_UNCONDITION( deferredBuffer, IN.uv0 );
    float3 normal = deferredSample.rgb;
    float depth = deferredSample.a;
 

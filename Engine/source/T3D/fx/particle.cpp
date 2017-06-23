@@ -200,7 +200,7 @@ void ParticleData::initPersistFields()
       "Deprecated. Use textureName instead." );
 
    // Interpolation variables
-   addField( "colors", TYPEID< ColorF >(), Offset(colors, ParticleData), PDC_NUM_KEYS,
+   addField( "colors", TYPEID< LinearColorF >(), Offset(colors, ParticleData), PDC_NUM_KEYS,
       "@brief Particle RGBA color keyframe values.\n\n"
       "The particle color will linearly interpolate between the color/time keys "
       "over the lifetime of the particle." );
@@ -488,7 +488,7 @@ bool ParticleData::preload(bool server, String &errorStr)
       // texture is *not* an error since the emitter may provide one.
       if (textureName && textureName[0])
       {
-        textureHandle = GFXTexHandle(textureName, &GFXDefaultStaticDiffuseProfile, avar("%s() - textureHandle (line %d)", __FUNCTION__, __LINE__));
+        textureHandle = GFXTexHandle(textureName, &GFXStaticTextureSRGBProfile, avar("%s() - textureHandle (line %d)", __FUNCTION__, __LINE__));
         if (!textureHandle)
         {
           errorStr = String::ToString("Missing particle texture: %s", textureName);
@@ -613,7 +613,7 @@ bool ParticleData::reload(char errorBuffer[256])
    bool error = false;
 	if (textureName && textureName[0])
    {
-        textureHandle = GFXTexHandle(textureName, &GFXDefaultStaticDiffuseProfile, avar("%s() - textureHandle (line %d)", __FUNCTION__, __LINE__));
+        textureHandle = GFXTexHandle(textureName, &GFXStaticTextureSRGBProfile, avar("%s() - textureHandle (line %d)", __FUNCTION__, __LINE__));
         if (!textureHandle)
         {
 				dSprintf(errorBuffer, 256, "Missing particle texture: %s", textureName);

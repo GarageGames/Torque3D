@@ -52,7 +52,7 @@ class GuiGraphCtrl : public GuiControl
       StringTableEntry mAutoPlot[ MaxPlots ];
       U32 mAutoPlotDelay[ MaxPlots ];
       SimTime mAutoPlotLastDisplay[ MaxPlots ];
-      ColorF mGraphColor[ MaxPlots ];
+      LinearColorF mGraphColor[ MaxPlots ];
       Vector< F32 > mGraphData[ MaxPlots ];
       F32 mGraphMax[ MaxPlots ];
       GraphType mGraphType[ MaxPlots ];

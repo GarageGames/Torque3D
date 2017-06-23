@@ -1021,7 +1021,7 @@ DefineConsoleFunction( strrchrpos, S32, ( const char* str, const char* chr, S32 
 
 //----------------------------------------------------------------
 
-DefineConsoleFunction(ColorFloatToInt, ColorI, (ColorF color), ,
+DefineConsoleFunction(ColorFloatToInt, ColorI, (LinearColorF color), ,
    "Convert from a float color to an integer color (0.0 - 1.0 to 0 to 255).\n"
    "@param color Float color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha.\n"
    "@return Converted color value (0 - 255)\n\n"
@@ -1030,10 +1030,10 @@ DefineConsoleFunction(ColorFloatToInt, ColorI, (ColorF color), ,
    "@endtsexample\n"
    "@ingroup Strings")
 {
-   return (ColorI)color;
+   return color.toColorI();
 }
 
-DefineConsoleFunction(ColorIntToFloat, ColorF, (ColorI color), ,
+DefineConsoleFunction(ColorIntToFloat, LinearColorF, (ColorI color), ,
    "Convert from a integer color to an float color (0 to 255 to 0.0 - 1.0).\n"
    "@param color Integer color value to be converted in the form \"R G B A\", where R is red, G is green, B is blue, and A is alpha.\n"
    "@return Converted color value (0.0 - 1.0)\n\n"
@@ -1042,7 +1042,7 @@ DefineConsoleFunction(ColorIntToFloat, ColorF, (ColorI color), ,
    "@endtsexample\n"
    "@ingroup Strings")
 {
-   return (ColorF)color;
+   return LinearColorF(color);
 }
 
 DefineConsoleFunction(ColorRGBToHEX, const char*, (ColorI color), ,
@@ -1080,10 +1080,8 @@ DefineConsoleFunction(ColorHEXToRGB, ColorI, (const char* hex), ,
    "@endtsexample\n"
    "@ingroup Strings")
 {
-   S32 rgb = dAtoui(hex, 16);
-
    ColorI color;
-   color.set(rgb & 0x000000FF, (rgb & 0x0000FF00) >> 8, (rgb & 0x00FF0000) >> 16);
+   color.set(String(hex));
    return color;
 }
 

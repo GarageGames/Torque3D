@@ -543,7 +543,7 @@ protected:
    bool          mLightDirty[LIGHT_STAGE_COUNT];
    bool          mLightsDirty;
 
-   ColorF        mGlobalAmbientColor;
+   LinearColorF        mGlobalAmbientColor;
    bool          mGlobalAmbientColorDirty;
 
    /// @}
@@ -615,7 +615,7 @@ protected:
    virtual void setTextureInternal(U32 textureUnit, const GFXTextureObject*texture) = 0;
 
    virtual void setLightInternal(U32 lightStage, const GFXLightInfo light, bool lightEnable) = 0;
-   virtual void setGlobalAmbientInternal(ColorF color) = 0;
+   virtual void setGlobalAmbientInternal(LinearColorF color) = 0;
    virtual void setLightMaterialInternal(const GFXLightMaterial mat) = 0;
 
    virtual bool beginSceneInternal() = 0;
@@ -827,7 +827,7 @@ public:
    /// @{
 
    ///
-   virtual void clear( U32 flags, ColorI color, F32 z, U32 stencil ) = 0;
+   virtual void clear( U32 flags, const LinearColorF& color, F32 z, U32 stencil ) = 0;
    virtual bool beginScene();
    virtual void endScene();
    virtual void beginField();
@@ -928,7 +928,7 @@ public:
    /// @{
    void setLight(U32 stage, GFXLightInfo* light);
    void setLightMaterial(const GFXLightMaterial& mat);
-   void setGlobalAmbientColor(const ColorF& color);
+   void setGlobalAmbientColor(const LinearColorF& color);
 
    /// @}
    

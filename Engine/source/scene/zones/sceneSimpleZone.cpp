@@ -143,7 +143,7 @@ void SceneSimpleZone::setUseAmbientLightColor( bool value )
 
 //-----------------------------------------------------------------------------
 
-void SceneSimpleZone::setAmbientLightColor( const ColorF& color )
+void SceneSimpleZone::setAmbientLightColor( const LinearColorF& color )
 {
    mAmbientLightColor = color;
    if( isServerObject() )
@@ -152,7 +152,7 @@ void SceneSimpleZone::setAmbientLightColor( const ColorF& color )
 
 //-----------------------------------------------------------------------------
 
-bool SceneSimpleZone::getZoneAmbientLightColor( U32 zone, ColorF& outColor ) const
+bool SceneSimpleZone::getZoneAmbientLightColor( U32 zone, LinearColorF& outColor ) const
 {
    AssertFatal( zone == getZoneRangeStart(), "SceneSimpleZone::getZoneAmbientLightColor - Invalid zone ID!" );
 
@@ -356,6 +356,6 @@ bool SceneSimpleZone::_setUseAmbientLightColor( void* object, const char* index,
 bool SceneSimpleZone::_setAmbientLightColor( void* object, const char* index, const char* data )
 {
    SceneSimpleZone* zone = reinterpret_cast< SceneSimpleZone* >( object );
-   zone->setAmbientLightColor( EngineUnmarshallData< ColorF >()( data ) );
+   zone->setAmbientLightColor( EngineUnmarshallData< LinearColorF >()( data ) );
    return false;
 }

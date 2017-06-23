@@ -35,7 +35,7 @@
 // Collada <light> elements are very similar, but are arranged as separate, unrelated
 // classes. These template functions are used to provide a simple way to access the
 // common elements.
-template<class T> static void resolveLightColor(T* light, ColorF& color)
+template<class T> static void resolveLightColor(T* light, LinearColorF& color)
 {
    if (light->getColor())
    {
@@ -80,7 +80,7 @@ static void processNodeLights(AppNode* appNode, const MatrixF& offset, SimGroup*
       }
 
       LightBase* pLight = 0;
-      ColorF color(ColorF::WHITE);
+      LinearColorF color(LinearColorF::WHITE);
       Point3F attenuation(0, 1, 1);
 
       if (technique->getAmbient()) {

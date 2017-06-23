@@ -1235,7 +1235,7 @@ void WheeledVehicle::updateWheelParticles(F32 dt)
 
             if( material)//&& material->mShowDust )
             {
-               ColorF colorList[ ParticleData::PDC_NUM_KEYS ];
+               LinearColorF colorList[ ParticleData::PDC_NUM_KEYS ];
 
                for( U32 x = 0; x < getMin( Material::NUM_EFFECT_COLOR_STAGES, ParticleData::PDC_NUM_KEYS ); ++ x )
                   colorList[ x ] = material->mEffectColor[ x ];

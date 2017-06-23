@@ -141,7 +141,7 @@ void MatInstParameters::set(MaterialParameterHandle* handle, const Point4F& fv)
    MATINSTPARAMSET(handle, fv);
 }
 
-void MatInstParameters::set(MaterialParameterHandle* handle, const ColorF& fv)
+void MatInstParameters::set(MaterialParameterHandle* handle, const LinearColorF& fv)
 {
    MATINSTPARAMSET(handle, fv);
 }

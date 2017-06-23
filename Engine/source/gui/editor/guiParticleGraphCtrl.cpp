@@ -43,7 +43,7 @@ GuiParticleGraphCtrl::GuiParticleGraphCtrl()
 
    for(S32 i = 0; i < MaxPlots; i++)
    {
-      mPlots[i].mGraphColor = ColorF(1.0, 1.0, 1.0);
+      mPlots[i].mGraphColor = LinearColorF(1.0, 1.0, 1.0);
       VECTOR_SET_ASSOCIATION(mPlots[i].mGraphData);
       mPlots[i].mGraphMax.x = 1;
       mPlots[i].mGraphMax.y = 50;
@@ -55,38 +55,38 @@ GuiParticleGraphCtrl::GuiParticleGraphCtrl()
       mPlots[i].mGraphScale = 0.05f;
    }
 
-   mPlots[0].mGraphColor = ColorF(1.0f, 0.2f, 0.2f);
-   mPlots[1].mGraphColor = ColorF(1.0f, 0.5f, 0.5f);
-   mPlots[2].mGraphColor = ColorF(0.0f, 1.0f, 0.0f);
-   mPlots[3].mGraphColor = ColorF(0.0f, 0.0f, 1.0f);
-   mPlots[4].mGraphColor = ColorF(0.0f, 1.0f, 1.0f);
-   mPlots[5].mGraphColor = ColorF(0.0f, 0.0f, 0.0f);
-   mPlots[6].mGraphColor = ColorF(0.5f, 0.5f, 0.5f);
-   mPlots[7].mGraphColor = ColorF(0.5f, 0.0f, 0.0f);
-   mPlots[8].mGraphColor = ColorF(0.0f, 0.5f, 0.0f);
-   mPlots[9].mGraphColor = ColorF(0.0f, 0.0f, 0.5f);
-   mPlots[10].mGraphColor = ColorF(0.0f, 0.5f, 0.5f);
-   mPlots[11].mGraphColor = ColorF(0.25f, 0.25f, 0.25f);
-   mPlots[12].mGraphColor = ColorF(0.5f, 0.5f, 0.5f);
-   mPlots[13].mGraphColor = ColorF(0.5f, 0.0f, 0.0f);
-   mPlots[14].mGraphColor = ColorF(0.0f, 0.5f, 0.0f);
-   mPlots[15].mGraphColor = ColorF(0.0f, 0.0f, 0.5f);
-   mPlots[16].mGraphColor = ColorF(0.0f, 0.5f, 0.5f);
-   mPlots[17].mGraphColor = ColorF(0.25f, 0.25f, 0.25f);
-   mPlots[18].mGraphColor = ColorF(1.0f, 0.2f, 0.2f);
-   mPlots[19].mGraphColor = ColorF(1.0f, 0.5f, 0.5f);
-   mPlots[20].mGraphColor = ColorF(0.0f, 1.0f, 0.0f);
-   mPlots[21].mGraphColor = ColorF(0.0f, 0.0f, 1.0f);
-   mPlots[22].mGraphColor = ColorF(0.0f, 1.0f, 1.0f);
-   mPlots[23].mGraphColor = ColorF(0.0f, 0.0f, 0.0f);
-   mPlots[24].mGraphColor = ColorF(0.5f, 0.5f, 0.5f);
-   mPlots[25].mGraphColor = ColorF(0.5f, 0.0f, 0.0f);
-   mPlots[26].mGraphColor = ColorF(0.0f, 0.5f, 0.0f);
-   mPlots[27].mGraphColor = ColorF(0.0f, 0.0f, 0.5f);
-   mPlots[28].mGraphColor = ColorF(1.0f, 0.0f, 0.0f);
-   mPlots[29].mGraphColor = ColorF(0.0f, 1.0f, 0.0f);
-   mPlots[30].mGraphColor = ColorF(0.0f, 0.0f, 1.0f);
-   mPlots[31].mGraphColor = ColorF(0.5f, 0.0f, 0.0f);
+   mPlots[0].mGraphColor = LinearColorF(1.0f, 0.2f, 0.2f);
+   mPlots[1].mGraphColor = LinearColorF(1.0f, 0.5f, 0.5f);
+   mPlots[2].mGraphColor = LinearColorF(0.0f, 1.0f, 0.0f);
+   mPlots[3].mGraphColor = LinearColorF(0.0f, 0.0f, 1.0f);
+   mPlots[4].mGraphColor = LinearColorF(0.0f, 1.0f, 1.0f);
+   mPlots[5].mGraphColor = LinearColorF(0.0f, 0.0f, 0.0f);
+   mPlots[6].mGraphColor = LinearColorF(0.5f, 0.5f, 0.5f);
+   mPlots[7].mGraphColor = LinearColorF(0.5f, 0.0f, 0.0f);
+   mPlots[8].mGraphColor = LinearColorF(0.0f, 0.5f, 0.0f);
+   mPlots[9].mGraphColor = LinearColorF(0.0f, 0.0f, 0.5f);
+   mPlots[10].mGraphColor = LinearColorF(0.0f, 0.5f, 0.5f);
+   mPlots[11].mGraphColor = LinearColorF(0.25f, 0.25f, 0.25f);
+   mPlots[12].mGraphColor = LinearColorF(0.5f, 0.5f, 0.5f);
+   mPlots[13].mGraphColor = LinearColorF(0.5f, 0.0f, 0.0f);
+   mPlots[14].mGraphColor = LinearColorF(0.0f, 0.5f, 0.0f);
+   mPlots[15].mGraphColor = LinearColorF(0.0f, 0.0f, 0.5f);
+   mPlots[16].mGraphColor = LinearColorF(0.0f, 0.5f, 0.5f);
+   mPlots[17].mGraphColor = LinearColorF(0.25f, 0.25f, 0.25f);
+   mPlots[18].mGraphColor = LinearColorF(1.0f, 0.2f, 0.2f);
+   mPlots[19].mGraphColor = LinearColorF(1.0f, 0.5f, 0.5f);
+   mPlots[20].mGraphColor = LinearColorF(0.0f, 1.0f, 0.0f);
+   mPlots[21].mGraphColor = LinearColorF(0.0f, 0.0f, 1.0f);
+   mPlots[22].mGraphColor = LinearColorF(0.0f, 1.0f, 1.0f);
+   mPlots[23].mGraphColor = LinearColorF(0.0f, 0.0f, 0.0f);
+   mPlots[24].mGraphColor = LinearColorF(0.5f, 0.5f, 0.5f);
+   mPlots[25].mGraphColor = LinearColorF(0.5f, 0.0f, 0.0f);
+   mPlots[26].mGraphColor = LinearColorF(0.0f, 0.5f, 0.0f);
+   mPlots[27].mGraphColor = LinearColorF(0.0f, 0.0f, 0.5f);
+   mPlots[28].mGraphColor = LinearColorF(1.0f, 0.0f, 0.0f);
+   mPlots[29].mGraphColor = LinearColorF(0.0f, 1.0f, 0.0f);
+   mPlots[30].mGraphColor = LinearColorF(0.0f, 0.0f, 1.0f);
+   mPlots[31].mGraphColor = LinearColorF(0.5f, 0.0f, 0.0f);
 
    mVertexClickSize = 6;
    mSelectedPlot = 0;
@@ -134,11 +134,11 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
       pDrawUtil->drawRect(rect, mProfile->mBorderColor);
    }
 
-    GuiControlProfile* profile = dynamic_cast<GuiControlProfile*>(Sim::findObject("GuiDefaultProfile"));
-    Resource<GFont> font = profile->mFont;
+   GuiControlProfile* profile = dynamic_cast<GuiControlProfile*>(Sim::findObject("GuiDefaultProfile"));
+   Resource<GFont> font = profile->mFont;
    GFXVideoMode videoMode = GFXInit::getDesktopResolution();
 
-   ColorF color(1.0f, 1.0f, 1.0f, 0.5f);
+   ColorI color(255, 255, 255, 128);
    pDrawUtil->drawRectFill(updateRect, color);
 
    for (S32 k = 0; k < MaxPlots; k++)
@@ -184,7 +184,7 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
             // check if this isn't our first loop through, if it is we won't have starting points
             if(sample > 0)
             {
-               pDrawUtil->drawLine( lastPosX, lastPosY , posX, posY , mPlots[k].mGraphColor );
+               pDrawUtil->drawLine( lastPosX, lastPosY , posX, posY , mPlots[k].mGraphColor.toColorI() );
             } else
             {
                mPlots[k].mNutList.clear();
@@ -205,7 +205,7 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
                mLastSelectedPoint = mSelectedPoint;
             }
 
-            ColorI nutColor (mPlots[k].mGraphColor);
+            ColorI nutColor (mPlots[k].mGraphColor.toColorI());
 
             if(k == mSelectedPlot && sample == mLastSelectedPoint)
             {
@@ -220,7 +220,7 @@ void GuiParticleGraphCtrl::onRender(Point2I offset, const RectI &updateRect)
                blue = 1.0 - blue;
                // nut color
 
-               nutColor = ColorI(ColorF(red, green, blue));
+               nutColor = LinearColorF(red, green, blue).toColorI();
             } 
 
             // draw the seleciton nut
@@ -660,7 +660,7 @@ Point2F GuiParticleGraphCtrl::getGraphExtent(S32 plotID)
    return resultV;
 }
 
-ColorF GuiParticleGraphCtrl::getGraphColor(S32 plotID)
+LinearColorF GuiParticleGraphCtrl::getGraphColor(S32 plotID)
 {
    return mPlots[plotID].mGraphColor;
 }
@@ -1151,7 +1151,7 @@ DefineConsoleMethod(GuiParticleGraphCtrl, getPlotIndex, S32, (S32 plotID, F32 x,
    return object->getPlotIndex(plotID, x, y);
 }
 
-DefineConsoleMethod(GuiParticleGraphCtrl, getGraphColor, ColorF, (S32 plotID), , "(int plotID)"
+DefineConsoleMethod(GuiParticleGraphCtrl, getGraphColor, LinearColorF, (S32 plotID), , "(int plotID)"
               "Get the color of the graph passed."
            "@return Returns the color of the graph as a string of RGB values formatted as \"R G B\"")
 {

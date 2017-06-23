@@ -122,19 +122,19 @@ public:
    ///
    /// @{
 
-   void drawBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
-   void drawTransformedBoxOutline(const Point3F &a, const Point3F &b, const ColorF &color, const MatrixF& transform);
+   void drawBoxOutline(const Point3F &a, const Point3F &b, const LinearColorF &color = LinearColorF(1.0f, 1.0f, 1.0f));
+   void drawTransformedBoxOutline(const Point3F &a, const Point3F &b, const LinearColorF &color, const MatrixF& transform);
 
-   void drawBox(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
-   void drawLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
-   void drawTri(const Point3F &a, const Point3F &b, const Point3F &c, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
-   void drawText(const Point3F& pos, const String& text, const ColorF &color = ColorF(1.0f,1.0f,1.0f));
-   void drawCapsule(const Point3F &a, const F32 &radius, const F32 &height, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
-   void drawDirectionLine(const Point3F &a, const Point3F &b, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f));
-   void drawOutlinedText(const Point3F& pos, const String& text, const ColorF &color = ColorF(1.0f, 1.0f, 1.0f), const ColorF &colorOutline = ColorF(0.0f, 0.0f, 0.0f));
+   void drawBox(const Point3F &a, const Point3F &b, const LinearColorF &color = LinearColorF(1.0f,1.0f,1.0f));
+   void drawLine(const Point3F &a, const Point3F &b, const LinearColorF &color = LinearColorF(1.0f,1.0f,1.0f));
+   void drawTri(const Point3F &a, const Point3F &b, const Point3F &c, const LinearColorF &color = LinearColorF(1.0f,1.0f,1.0f));
+   void drawText(const Point3F& pos, const String& text, const LinearColorF &color = LinearColorF(1.0f,1.0f,1.0f));
+   void drawCapsule(const Point3F &a, const F32 &radius, const F32 &height, const LinearColorF &color = LinearColorF(1.0f, 1.0f, 1.0f));
+   void drawDirectionLine(const Point3F &a, const Point3F &b, const LinearColorF &color = LinearColorF(1.0f, 1.0f, 1.0f));
+   void drawOutlinedText(const Point3F& pos, const String& text, const LinearColorF &color = LinearColorF(1.0f, 1.0f, 1.0f), const LinearColorF &colorOutline = LinearColorF(0.0f, 0.0f, 0.0f));
    
    /// Render a wireframe view of the given polyhedron.
-   void drawPolyhedron( const AnyPolyhedron& polyhedron, const ColorF& color = ColorF( 1.f, 1.f, 1.f ) );
+   void drawPolyhedron( const AnyPolyhedron& polyhedron, const LinearColorF& color = LinearColorF( 1.f, 1.f, 1.f ) );
 
    /// Render the plane indices, edge indices, edge direction indicators, and point coordinates
    /// of the given polyhedron for debugging.
@@ -169,8 +169,8 @@ private:
    struct DebugPrim
    {
       /// Color used for this primitive.
-      ColorF color;
-      ColorF color2;
+      LinearColorF color;
+      LinearColorF color2;
 
       /// Points used to store positional data. Exact semantics determined by type.
       Point3F a, b, c;

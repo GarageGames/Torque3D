@@ -265,7 +265,7 @@ void AccumulationVolume::setTexture( const String& name )
    mTextureName = name;
    if ( isClientObject() && mTextureName.isNotEmpty() )
    {
-      mAccuTexture.set(mTextureName, &GFXDefaultStaticDiffuseProfile, "AccumulationVolume::mAccuTexture");
+      mAccuTexture.set(mTextureName, &GFXStaticTextureSRGBProfile, "AccumulationVolume::mAccuTexture");
       if ( mAccuTexture.isNull() )
          Con::warnf( "AccumulationVolume::setTexture - Unable to load texture: %s", mTextureName.c_str() );
    }

@@ -30,7 +30,6 @@
 #include "math/mRandom.h"
 #include "core/stream/fileStream.h"
 #include "T3D/resource.h"
-#include <d3d9.h>
 #include "gfx/gfxInit.h"
 #include "gfx/gfxDevice.h"
 #include "core/strings/unicode.h"

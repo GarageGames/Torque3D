@@ -348,6 +348,77 @@ void GBitmap::allocateBitmap(const U32 in_width, const U32 in_height, const bool
 }
 
 //--------------------------------------------------------------------------
+void GBitmap::allocateBitmapWithMips(const U32 in_width, const U32 in_height, const U32 in_numMips, const GFXFormat in_format)
+{
+   //-------------------------------------- Some debug checks...
+   U32 svByteSize = mByteSize;
+   U8 *svBits = mBits;
+
+   AssertFatal(in_width != 0 && in_height != 0, "GBitmap::allocateBitmap: width or height is 0");
+
+   mInternalFormat = in_format;
+   mWidth = in_width;
+   mHeight = in_height;
+
+   mBytesPerPixel = 1;
+   switch (mInternalFormat)
+   {
+   case GFXFormatA8:
+   case GFXFormatL8:           mBytesPerPixel = 1;
+      break;
+   case GFXFormatR8G8B8:       mBytesPerPixel = 3;
+      break;
+   case GFXFormatR8G8B8X8:
+   case GFXFormatR8G8B8A8:     mBytesPerPixel = 4;
+      break;
+   case GFXFormatR5G6B5:
+   case GFXFormatR5G5B5A1:     mBytesPerPixel = 2;
+      break;
+   default:
+      AssertFatal(false, "GBitmap::GBitmap: misunderstood format specifier");
+      break;
+   }
+
+   // Set up the mip levels, if necessary...
+   mNumMipLevels = 1;
+   U32 allocPixels = in_width * in_height * mBytesPerPixel;
+   mMipLevelOffsets[0] = 0;
+
+
+   if (in_numMips != 0)
+   {
+      U32 currWidth = in_width;
+      U32 currHeight = in_height;
+
+      do
+      {
+         mMipLevelOffsets[mNumMipLevels] = mMipLevelOffsets[mNumMipLevels - 1] +
+            (currWidth * currHeight * mBytesPerPixel);
+         currWidth >>= 1;
+         currHeight >>= 1;
+         if (currWidth == 0) currWidth = 1;
+         if (currHeight == 0) currHeight = 1;
+
+         mNumMipLevels++;
+         allocPixels += currWidth * currHeight * mBytesPerPixel;
+      } while (currWidth != 1 || currHeight != 1 && mNumMipLevels != in_numMips);
+   }
+   AssertFatal(mNumMipLevels <= c_maxMipLevels, "GBitmap::allocateBitmap: too many miplevels");
+
+   // Set up the memory...
+   mByteSize = allocPixels;
+   mBits = new U8[mByteSize];
+
+   dMemset(mBits, 0xFF, mByteSize);
+
+   if (svBits != NULL)
+   {
+      dMemcpy(mBits, svBits, getMin(mByteSize, svByteSize));
+      delete[] svBits;
+   }
+}
+
+//--------------------------------------------------------------------------
 void GBitmap::extrudeMipLevels(bool clearBorders)
 {
    if(mNumMipLevels == 1)
@@ -408,6 +479,38 @@ void GBitmap::extrudeMipLevels(bool clearBorders)
          }
       }
    }
+}
+
+//--------------------------------------------------------------------------
+void GBitmap::chopTopMips(U32 mipsToChop)
+{
+   U32 scalePower = getMin(mipsToChop, getNumMipLevels() - 1);
+   U32 newMipCount = getNumMipLevels() - scalePower;
+
+   U32 realWidth = getMax((U32)1, getWidth() >> scalePower);
+   U32 realHeight = getMax((U32)1, getHeight() >> scalePower);
+
+   U8 *destBits = mBits;
+
+   U32 destOffsets[c_maxMipLevels];
+
+   for (U32 i = scalePower; i<mNumMipLevels; i++)
+   {
+      // Copy to the new bitmap...
+      dMemcpy(destBits,
+         getWritableBits(i),
+         getSurfaceSize(i));
+
+      destOffsets[i - scalePower] = destBits - mBits;
+      destBits += getSurfaceSize(i);
+   }
+
+   dMemcpy(mMipLevelOffsets, destOffsets, sizeof(destOffsets));
+
+   mWidth = realWidth;
+   mHeight = realHeight;
+   mByteSize = destBits - mBits;
+   mNumMipLevels = newMipCount;
 }
 
 //--------------------------------------------------------------------------
@@ -609,9 +712,9 @@ bool GBitmap::checkForTransparency()
 }
 
 //------------------------------------------------------------------------------
-ColorF GBitmap::sampleTexel(F32 u, F32 v) const
+LinearColorF GBitmap::sampleTexel(F32 u, F32 v) const
 {
-   ColorF col(0.5f, 0.5f, 0.5f);
+   LinearColorF col(0.5f, 0.5f, 0.5f);
    // normally sampling wraps all the way around at 1.0,
    // but locking doesn't support this, and we seem to calc
    // the uv based on a clamped 0 - 1...
@@ -731,6 +834,20 @@ bool GBitmap::setColor(const U32 x, const U32 y, const ColorI& rColor)
    }
 
    return true;
+}
+
+//--------------------------------------------------------------------------
+U8 GBitmap::getChanelValueAt(U32 x, U32 y, U32 chan)
+{
+   ColorI pixelColor = ColorI(255,255,255,255);
+   getColor(x, y, pixelColor);
+
+   switch (chan) {
+   case 0: return pixelColor.red;
+   case 1: return pixelColor.green;
+   case 2: return pixelColor.blue;
+   default: return pixelColor.alpha;
+   }
 }
 
 //-----------------------------------------------------------------------------
@@ -1173,6 +1290,41 @@ Resource<GBitmap> GBitmap::_search(const Torque::Path &path)
    }
 
    return Resource< GBitmap >( NULL );
+}
+
+U32 GBitmap::getSurfaceSize(const U32 mipLevel) const
+{
+   // Bump by the mip level.
+   U32 height = getMax(U32(1), mHeight >> mipLevel);
+   U32 width = getMax(U32(1), mWidth >> mipLevel);
+
+   if (mInternalFormat >= GFXFormatBC1 && mInternalFormat <= GFXFormatBC3)
+   {
+      // From the directX docs:
+      // max(1, width ÷ 4) x max(1, height ÷ 4) x 8(DXT1) or 16(DXT2-5)
+
+      U32 sizeMultiple = 0;
+
+      switch (mInternalFormat)
+      {
+      case GFXFormatBC1:
+         sizeMultiple = 8;
+         break;
+      case GFXFormatBC2:
+      case GFXFormatBC3:
+         sizeMultiple = 16;
+         break;
+      default:
+         AssertISV(false, "DDSFile::getSurfaceSize - invalid compressed texture format, we only support DXT1-5 right now.");
+         break;
+      }
+
+      return getMax(U32(1), width / 4) * getMax(U32(1), height / 4) * sizeMultiple;
+   }
+   else
+   {
+      return height * width* mBytesPerPixel;
+   }
 }
 
 DefineEngineFunction( getBitmapInfo, String, ( const char *filename ),,

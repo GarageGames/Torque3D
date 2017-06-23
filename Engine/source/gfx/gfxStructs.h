@@ -64,17 +64,17 @@ public:
 
    Point3F     mPos;
    VectorF     mDirection;
-   ColorF      mColor;
-   ColorF      mAmbient;
+   LinearColorF      mColor;
+   LinearColorF      mAmbient;
    F32         mRadius;
    F32         mInnerConeAngle;
    F32         mOuterConeAngle;
 
    /// @todo Revisit below (currently unused by fixed function lights)
 	Point3F position;
-	ColorF ambient;
-	ColorF diffuse;
-	ColorF specular;
+	LinearColorF ambient;
+	LinearColorF diffuse;
+	LinearColorF specular;
 	VectorF spotDirection;
 	F32 spotExponent;
 	F32 spotCutoff;
@@ -88,10 +88,10 @@ public:
 // Material definition for FF lighting
 struct GFXLightMaterial
 {
-   ColorF ambient;
-   ColorF diffuse;
-   ColorF specular;
-   ColorF emissive;
+   LinearColorF ambient;
+   LinearColorF diffuse;
+   LinearColorF specular;
+   LinearColorF emissive;
    F32 shininess;
 };
 

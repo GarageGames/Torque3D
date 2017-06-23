@@ -54,7 +54,7 @@ public:
    };
 
    F32 mSizes[NumFields];      ///< The radius for each keyframe.
-   ColorF mColours[NumFields]; ///< The colour of the ribbon for each keyframe.
+   LinearColorF mColours[NumFields]; ///< The colour of the ribbon for each keyframe.
    F32 mTimes[NumFields];      ///< The relative time for each keyframe.
 
    U32 mRibbonLength;      ///< The amount of segments that will make up the ribbon.

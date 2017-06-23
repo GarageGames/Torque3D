@@ -1074,7 +1074,7 @@ void VolumetricFog::render(ObjectRenderInst *ri, SceneRenderState *state, BaseMa
 
    mPPShaderConsts->setSafe(mPPModelViewProjSC, xform);
 
-   const ColorF &sunlight = state->getAmbientLightColor();
+   const LinearColorF &sunlight = state->getAmbientLightColor();
 
    Point3F ambientColor(sunlight.red, sunlight.green, sunlight.blue);
    mShaderConsts->setSafe(mAmbientColorSC, ambientColor);
@@ -1204,7 +1204,7 @@ void VolumetricFog::InitTexture()
    mIsTextured = false;
 
    if (mTextureName.isNotEmpty())
-      mTexture.set(mTextureName, &GFXDefaultStaticDiffuseProfile, "VolumetricFogMod");
+      mTexture.set(mTextureName, &GFXStaticTextureSRGBProfile, "VolumetricFogMod");
 
    if (!mTexture.isNull())
    {
@@ -1218,7 +1218,7 @@ void VolumetricFog::InitTexture()
    }
 }
 
-void VolumetricFog::setFogColor(ColorF color)
+void VolumetricFog::setFogColor(LinearColorF color)
 {
    mFogColor.set(255 * color.red,255 * color.green,255 * color.blue);
    setMaskBits(FogColorMask);
@@ -1266,7 +1266,7 @@ bool VolumetricFog::isInsideFog()
    return mCamInFog;
 }
 
-DefineEngineMethod(VolumetricFog, SetFogColorF, void, (ColorF new_color), ,
+DefineEngineMethod(VolumetricFog, SetFogColorF, void, (LinearColorF new_color), ,
 "@brief Changes the color of the fog\n\n."
 "@params new_color the new fog color (rgb 0.0 - 1.0, a is ignored.")
 {

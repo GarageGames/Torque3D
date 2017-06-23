@@ -166,7 +166,7 @@ void fxFoliageRenderList::SetupClipPlanes( SceneRenderState* state, const F32 fa
 //------------------------------------------------------------------------------
 
 
-inline void fxFoliageRenderList::DrawQuadBox(const Box3F& QuadBox, const ColorF Colour)
+inline void fxFoliageRenderList::DrawQuadBox(const Box3F& QuadBox, const LinearColorF Colour)
 {
    // Define our debug box.
    static Point3F BoxPnts[] = {
@@ -1260,7 +1260,7 @@ bool fxFoliageReplicator::onAdd()
    {
       // Yes, so load foliage texture.
       if( mFieldData.mFoliageFile != NULL && dStrlen(mFieldData.mFoliageFile) > 0 )
-         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXDefaultStaticDiffuseProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
+         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXStaticTextureSRGBProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
 
       if ((GFXTextureObject*) mFieldData.mFoliageTexture == NULL)
          Con::printf("fxFoliageReplicator:  %s is an invalid or missing foliage texture file.", mFieldData.mFoliageFile);
@@ -1407,7 +1407,7 @@ void fxFoliageReplicator::computeAlphaTex()
       ColorI c((U8) (255.0f * ItemAlpha), 0, 0);
       mAlphaLookup->setColor(i, 0, c);
    }
-   mAlphaTexture.set(mAlphaLookup, &GFXDefaultStaticDiffuseProfile, false, String("fxFoliage Replicator Alpha Texture") );
+   mAlphaTexture.set(mAlphaLookup, &GFXStaticTextureSRGBProfile, false, String("fxFoliage Replicator Alpha Texture") );
 }
 
 // Renders a triangle stripped oval
@@ -1619,7 +1619,7 @@ void fxFoliageReplicator::renderQuad(fxFoliageQuadrantNode* quadNode, const Matr
       {
          // Draw the Quad Box (Debug Only).
          if (UseDebug) 
-            mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, ColorF(0.0f, 1.0f, 0.1f, 1.0f));
+            mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, LinearColorF(0.0f, 1.0f, 0.1f, 1.0f));
          if (quadNode->Level != 0) {
             for (U32 i = 0; i < 4; i++)
                renderQuad(quadNode->QuadrantChildNode[i], RenderTransform, UseDebug);
@@ -1632,7 +1632,7 @@ void fxFoliageReplicator::renderQuad(fxFoliageQuadrantNode* quadNode, const Matr
       } else {
          // Use a different color to say "I think I'm not visible!"
          if (UseDebug) 
-            mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, ColorF(1.0f, 0.8f, 0.1f, 1.0f));
+            mFrustumRenderSet.DrawQuadBox(quadNode->QuadrantBox, LinearColorF(1.0f, 0.8f, 0.1f, 1.0f));
       }
    }
 }
@@ -1791,7 +1791,7 @@ void fxFoliageReplicator::unpackUpdate(NetConnection * con, BitStream * stream)
 
       // Load Foliage Texture on the client.
       if( mFieldData.mFoliageFile != NULL && dStrlen(mFieldData.mFoliageFile) > 0 )
-         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXDefaultStaticDiffuseProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
+         mFieldData.mFoliageTexture = GFXTexHandle( mFieldData.mFoliageFile, &GFXStaticTextureSRGBProfile, avar("%s() - mFieldData.mFoliageTexture (line %d)", __FUNCTION__, __LINE__) );
 
       if ((GFXTextureObject*) mFieldData.mFoliageTexture == NULL)
          Con::printf("fxFoliageReplicator:  %s is an invalid or missing foliage texture file.", mFieldData.mFoliageFile);

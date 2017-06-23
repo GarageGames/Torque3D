@@ -77,15 +77,6 @@ $pref::Video::Gamma = 2.2;
 $pref::Video::Contrast = 1.0;
 $pref::Video::Brightness = 0;
 
-// Console-friendly defaults
-if($platform $= "xenon")
-{
-   // Save some fillrate on the X360, and take advantage of the HW scaling
-   $pref::Video::Resolution = "1152 640";
-   $pref::Video::mode = $pref::Video::Resolution SPC "true 32 60 0";
-   $pref::Video::fullScreen = 1;
-}
-
 /// This is the path used by ShaderGen to cache procedural
 /// shaders.  If left blank ShaderGen will only cache shaders
 /// to memory and not to disk.
@@ -160,7 +151,7 @@ $pref::SFX::channelVolume6 = 1;
 $pref::SFX::channelVolume7 = 1;
 $pref::SFX::channelVolume8 = 1;
 
-$pref::PostEffect::PreferedHDRFormat = "GFXFormatR8G8B8A8";
+$pref::PostEffect::PreferedHDRFormat = "GFXFormatR16G16B16A16F";
 
 /// This is an scalar which can be used to reduce the 
 /// reflection textures on all objects to save fillrate.

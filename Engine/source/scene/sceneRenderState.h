@@ -94,7 +94,7 @@ class SceneRenderState
       Point3F mVectorEye;
 
       /// Global ambient light color.
-      ColorF mAmbientLightColor;
+      LinearColorF mAmbientLightColor;
 
       /// Forces bin based post effects to be disabled
       /// during rendering with this scene state.
@@ -183,10 +183,10 @@ class SceneRenderState
       /// light.
       ///
       /// @return The ambient light color for rendering.
-      ColorF getAmbientLightColor() const { return mAmbientLightColor; }
+      LinearColorF getAmbientLightColor() const { return mAmbientLightColor; }
 
       /// Set the global ambient light color to render with.
-      void setAmbientLightColor( const ColorF& color ) { mAmbientLightColor = color; }
+      void setAmbientLightColor( const LinearColorF& color ) { mAmbientLightColor = color; }
 
       /// If true then Advanced Lighting bin draws are disabled during rendering with
       /// this scene state.

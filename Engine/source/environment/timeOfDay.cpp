@@ -378,7 +378,7 @@ F32 TimeOfDay::_calcAzimuth( F32 lat, F32 dec, F32 mer )
 	  return mAtan2( mSin(mer), mCos(mer) * mSin(lat) - mTan(dec) * mCos(lat) ) + M_PI_F;
 }
 
-void TimeOfDay::_getSunColor( ColorF *outColor ) const
+void TimeOfDay::_getSunColor( LinearColorF *outColor ) const
 {
 	  const COLOR_TARGET *ct = NULL;
 
@@ -451,8 +451,8 @@ void TimeOfDay::_initColors()
    // NOTE: The elevation targets represent distances 
    // from PI/2 radians (strait up).
 
-   ColorF c;
-   ColorF bc;
+   LinearColorF c;
+   LinearColorF bc;
 
    // e is for elevation
    F32 e = M_PI_F / 13.0f; // (semicircle in radians)/(number of color target entries);
@@ -495,7 +495,7 @@ void TimeOfDay::_initColors()
    _addColorTarget(M_PI_F, c, 1.0f, c); // Midnight at equanox.
 }
 
-void TimeOfDay::_addColorTarget( F32 ele, const ColorF &color, F32 bandMod, const ColorF &bandColor )
+void TimeOfDay::_addColorTarget( F32 ele, const LinearColorF &color, F32 bandMod, const LinearColorF &bandColor )
 {
    COLOR_TARGET  newTarget;
 

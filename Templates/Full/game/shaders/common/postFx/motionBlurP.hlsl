@@ -37,7 +37,7 @@ float4 main(PFXVertToPix IN) : TORQUE_TARGET0
    float samples = 5;
    
    // First get the deferred texture for uv channel 0
-   float4 deferred = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 );
+   float4 deferred = TORQUE_DEFERRED_UNCONDITION( deferredTex, IN.uv0 );
    
    // Next extract the depth
    float depth = deferred.a;

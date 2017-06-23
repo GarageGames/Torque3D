@@ -567,13 +567,13 @@ ConsoleSetType( TypeFlag )
 //-----------------------------------------------------------------------------
 // TypeColorF
 //-----------------------------------------------------------------------------
-ConsoleType(ColorF, TypeColorF, ColorF, "")
-ImplementConsoleTypeCasters( TypeColorF, ColorF )
+ConsoleType(LinearColorF, TypeColorF, LinearColorF, "")
+ImplementConsoleTypeCasters( TypeColorF, LinearColorF )
 
 ConsoleGetType( TypeColorF )
 {
    // Fetch color.
-   const ColorF* color = (ColorF*)dptr;
+   const LinearColorF* color = (LinearColorF*)dptr;
 
    // Fetch stock color name.
    StringTableEntry colorName = StockColor::name( *color );
@@ -591,7 +591,7 @@ ConsoleGetType( TypeColorF )
 
 ConsoleSetType( TypeColorF )
 {
-   ColorF *tmpColor = (ColorF *) dptr;
+   LinearColorF *tmpColor = (LinearColorF *) dptr;
    if(argc == 1)
    {
       // Is only a single argument passed?

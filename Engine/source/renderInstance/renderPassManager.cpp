@@ -299,7 +299,7 @@ GFXTextureObject *RenderPassManager::getDepthTargetTexture()
 
       const Point2I rtSize = GFX->getActiveRenderTarget()->getSize();
       mDepthBuff.set(rtSize.x, rtSize.y, GFXFormatD24S8, 
-         &GFXDefaultZTargetProfile, avar("%s() - mDepthBuff (line %d)", __FUNCTION__, __LINE__));
+         &GFXZTargetProfile, avar("%s() - mDepthBuff (line %d)", __FUNCTION__, __LINE__));
       return mDepthBuff.getPointer();
    }
 

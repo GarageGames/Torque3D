@@ -173,7 +173,7 @@ void ProcessedCustomMaterial::_setStageData()
          continue;
       }
 
-      rpd->mTexSlot[i].texObject = _createTexture( filename, &GFXDefaultStaticDiffuseProfile );
+      rpd->mTexSlot[i].texObject = _createTexture( filename, &GFXStaticTextureSRGBProfile );
       if ( !rpd->mTexSlot[i].texObject )
       {
          mMaterial->logError("Failed to load texture %s", _getTexturePath(filename).c_str());

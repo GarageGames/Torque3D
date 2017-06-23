@@ -67,7 +67,7 @@ class ParticleData : public SimDataBlock
    U32   numFrames;
    U32   framesPerSec;
 
-   ColorF colors[ PDC_NUM_KEYS ];
+   LinearColorF colors[ PDC_NUM_KEYS ];
    F32    sizes[ PDC_NUM_KEYS ];
    F32    times[ PDC_NUM_KEYS ];
 
@@ -118,7 +118,7 @@ struct Particle
 
 
    // are these necessary to store here? - they are interpolated in real time
-   ColorF           color;
+   LinearColorF           color;
    F32              size;
 
    F32              spinSpeed;

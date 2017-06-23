@@ -353,12 +353,12 @@ void CloudLayer::renderObject( ObjectRenderInst *ri, SceneRenderState *state, Ba
    mShaderConsts->setSafe( mEyePosWorldSC, camPos );
 
    LightInfo *lightinfo = LIGHTMGR->getSpecialLight(LightManager::slSunLightType);
-   const ColorF &sunlight = state->getAmbientLightColor();
+   const LinearColorF &sunlight = state->getAmbientLightColor();
 
    Point3F ambientColor( sunlight.red, sunlight.green, sunlight.blue );
    mShaderConsts->setSafe( mAmbientColorSC, ambientColor );   
 
-   const ColorF &sunColor = lightinfo->getColor();
+   const LinearColorF &sunColor = lightinfo->getColor();
    Point3F data( sunColor.red, sunColor.green, sunColor.blue );
    mShaderConsts->setSafe( mSunColorSC, data );
 
@@ -398,10 +398,10 @@ void CloudLayer::_initTexture()
    }
 
    if ( mTextureName.isNotEmpty() )
-      mTexture.set( mTextureName, &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
+      mTexture.set( mTextureName, &GFXStaticTextureSRGBProfile, "CloudLayer" );
 
    if ( mTexture.isNull() )
-      mTexture.set( GFXTextureManager::getWarningTexturePath(), &GFXDefaultStaticDiffuseProfile, "CloudLayer" );
+      mTexture.set( GFXTextureManager::getWarningTexturePath(), &GFXStaticTextureSRGBProfile, "CloudLayer" );
 }
 
 void CloudLayer::_initBuffers()

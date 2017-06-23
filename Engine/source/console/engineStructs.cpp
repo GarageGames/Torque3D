@@ -63,8 +63,8 @@ IMPLEMENT_STRUCT( ColorI,
 END_IMPLEMENT_STRUCT;
 
 
-IMPLEMENT_STRUCT( ColorF,
-   ColorF,,
+IMPLEMENT_STRUCT( LinearColorF,
+   LinearColorF,,
    "RGBA color quadruple in 32bit floating-point precision per channel." )
 
    FIELD( red, red, 1, "Red channel value." )

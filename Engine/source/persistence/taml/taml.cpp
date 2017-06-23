@@ -1190,8 +1190,8 @@ bool Taml::generateTamlSchema()
         pColorEnumsRestrictionElement->LinkEndChild( pColorEnumsAttributeEnumerationElement );
     }
 
-    // ColorF.
-    TiXmlComment* pColorFValuesComment = new TiXmlComment( "ColorF Values" );
+    // LinearColorF.
+    TiXmlComment* pColorFValuesComment = new TiXmlComment( "LinearColorF Values" );
     pSchemaElement->LinkEndChild( pColorFValuesComment );
     TiXmlElement* pColorFValuesTypeElement = new TiXmlElement( "xs:simpleType" );
     pColorFValuesTypeElement->SetAttribute( "name", "ColorF_Values" );
@@ -1203,7 +1203,7 @@ bool Taml::generateTamlSchema()
     pColorFValuesElementB->SetAttribute( "value", "([-]?(\\b[0-9]+)?\\.)?[0-9]+\\b ([-]?(\\b[0-9]+)?\\.)?[0-9]+\\b ([-]?(\\b[0-9]+)?\\.)?[0-9]+\\b ([-]?(\\b[0-9]+)?\\.)?[0-9]+\\b" );
     pColorFValuesElementA->LinkEndChild( pColorFValuesElementB );
 
-    TiXmlComment* pColorFComment = new TiXmlComment( "ColorF Console Type" );
+    TiXmlComment* pColorFComment = new TiXmlComment( "LinearColorF Console Type" );
     pSchemaElement->LinkEndChild( pColorFComment );
     TiXmlElement* pColorFTypeElement = new TiXmlElement( "xs:simpleType" );
     pColorFTypeElement->SetAttribute( "name", "ColorF_ConsoleType" );

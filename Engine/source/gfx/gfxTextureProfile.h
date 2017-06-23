@@ -86,6 +86,7 @@ public:
       NoPadding      = BIT(6),  ///< Do not pad this texture if it's non pow2.
       KeepBitmap     = BIT(7),  ///< Always keep a copy of this texture's bitmap. (Potentially in addition to the API managed copy?)
       ZTarget        = BIT(8),  ///< This texture will be used as a Z target.
+      SRGB           = BIT(9),  ///< sRGB texture
 
       /// Track and pool textures of this type for reuse.
       ///
@@ -94,15 +95,15 @@ public:
       /// the pool to contain unused textures which will remain
       /// in memory until a flush occurs.
       ///
-      Pooled = BIT(9), 
+      Pooled = BIT(10), 
 
       /// A hint that the device is not allowed to discard the content
       /// of a target texture after presentation or deactivated.
       ///
       /// This is mainly a depth buffer optimization.
-      NoDiscard = BIT(10),
+      NoDiscard = BIT(11),
 
-      /// Texture is managed by another process, thus should not be modified
+      
       NoModify = BIT(11)
 
    };
@@ -110,14 +111,17 @@ public:
    enum Compression
    {
       NONE,
-      DXT1,
-      DXT2,
-      DXT3,
-      DXT4,
-      DXT5,
+      BC1,
+      BC2,
+      BC3,
+      BC4,
+      BC5,
    };
 
    GFXTextureProfile(const String &name, Types type, U32 flags, Compression compression = NONE);
+   // Equality operators
+   inline bool operator==(const GFXTextureProfile &in_Cmp) const { return (mName == in_Cmp.mName && mProfile == in_Cmp.mProfile); }
+   inline bool operator!=(const GFXTextureProfile &in_Cmp) const { return !(*this == in_Cmp); }
 
    // Accessors
    String getName() const { return mName; };
@@ -167,15 +171,16 @@ public:
    inline bool noMip() const { return testFlag(NoMipmap); }
    inline bool isPooled() const { return testFlag(Pooled); }
    inline bool canDiscard() const { return !testFlag(NoDiscard); }
-   inline bool canModify() const { return !testFlag(NoModify); }
-
+   inline bool isSRGB() const { return testFlag(SRGB); }
+   //compare profile flags for equality
+   inline bool compareFlags(const GFXTextureProfile& in_Cmp) const{ return (mProfile == in_Cmp.mProfile); }
 private:
    /// These constants control the packing for the profile; if you add flags, types, or
    /// compression info then make sure these are giving enough bits!
    enum Constants
    {
       TypeBits = 2,
-      FlagBits = 11,
+      FlagBits = 12,
       CompressionBits = 3,
    };
 
@@ -203,23 +208,26 @@ private:
 #define GFX_DeclareTextureProfile(name)  extern GFXTextureProfile name
 #define GFX_ImplementTextureProfile(name, type,  flags, compression) GFXTextureProfile name(#name, type, flags, compression)
 
-// Set up some defaults..
-
+// Default Texture profiles
 // Texture we can render to.
-GFX_DeclareTextureProfile(GFXDefaultRenderTargetProfile);
-// Standard diffuse texture that stays in system memory.
-GFX_DeclareTextureProfile(GFXDefaultPersistentProfile);
-// Generic diffusemap. This works in most cases.
-GFX_DeclareTextureProfile(GFXDefaultStaticDiffuseProfile);
-// Generic normal map.
-GFX_DeclareTextureProfile(GFXDefaultStaticNormalMapProfile);
-// DXT5 swizzled normal map
-GFX_DeclareTextureProfile(GFXDefaultStaticDXT5nmProfile);
+GFX_DeclareTextureProfile(GFXRenderTargetProfile);
+GFX_DeclareTextureProfile(GFXRenderTargetSRGBProfile);
+// Standard static diffuse textures
+GFX_DeclareTextureProfile(GFXStaticTextureProfile);
+GFX_DeclareTextureProfile(GFXStaticTextureSRGBProfile);
+// Standard static diffuse textures that are persistent in memory
+GFX_DeclareTextureProfile(GFXTexturePersistentProfile);
+GFX_DeclareTextureProfile(GFXTexturePersistentSRGBProfile);
 // Texture that resides in system memory - used to copy data to
-GFX_DeclareTextureProfile(GFXSystemMemProfile);
+GFX_DeclareTextureProfile(GFXSystemMemTextureProfile);
+// normal map profiles
+GFX_DeclareTextureProfile(GFXNormalMapProfile);
+GFX_DeclareTextureProfile(GFXNormalMapBC3Profile);
+GFX_DeclareTextureProfile(GFXNormalMapBC5Profile);
 // Depth buffer texture
-GFX_DeclareTextureProfile(GFXDefaultZTargetProfile);
+GFX_DeclareTextureProfile(GFXZTargetProfile);
 // Dynamic Texure
 GFX_DeclareTextureProfile(GFXDynamicTextureProfile);
+GFX_DeclareTextureProfile(GFXDynamicTextureSRGBProfile);
 
 #endif

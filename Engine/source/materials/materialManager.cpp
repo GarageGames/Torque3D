@@ -222,7 +222,7 @@ BaseMatInstance * MaterialManager::getWarningMatInstance()
 }
 
 #ifndef TORQUE_SHIPPING
-BaseMatInstance * MaterialManager::createMeshDebugMatInstance(const ColorF &meshColor)
+BaseMatInstance * MaterialManager::createMeshDebugMatInstance(const LinearColorF &meshColor)
 {
    String  meshDebugStr = String::ToString( "Torque_MeshDebug_%d", meshColor.getRGBAPack() );
 
@@ -256,7 +256,7 @@ BaseMatInstance * MaterialManager::createMeshDebugMatInstance(const ColorF &mesh
 }
 
 // Gets the global material instance for a given color, callers should not free this copy
-BaseMatInstance *MaterialManager::getMeshDebugMatInstance(const ColorF &meshColor)
+BaseMatInstance *MaterialManager::getMeshDebugMatInstance(const LinearColorF &meshColor)
 {
    DebugMaterialMap::Iterator itr = mMeshDebugMaterialInsts.find( meshColor.getRGBAPack() );
 

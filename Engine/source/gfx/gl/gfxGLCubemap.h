@@ -46,7 +46,6 @@ public:
    // Convenience methods for GFXGLTextureTarget
    U32 getWidth() { return mWidth; }
    U32 getHeight() { return mHeight; }
-   U32 getNumMipLevels() { return mMipLevels; }
    U32 getHandle() { return mCubemap; }
    
    // GFXResource interface
@@ -73,7 +72,6 @@ protected:
    // Self explanatory
    U32 mWidth;
    U32 mHeight;
-   U32 mMipLevels;
    GFXFormat mFaceFormat;
       
    GFXTexHandle mTextures[6]; ///< Keep refs to our textures for resurrection of static cubemaps

@@ -275,10 +275,6 @@ function HDRPostFX::preProcess( %this )
 
 function HDRPostFX::onEnabled( %this )
 {
-   // We don't allow hdr on OSX yet.
-   if ( $platform $= "macos" )
-      return false;
-      
    // See what HDR format would be best.
    %format = getBestHDRFormat();
    if ( %format $= "" || %format $= "GFXFormatR8G8B8A8" )

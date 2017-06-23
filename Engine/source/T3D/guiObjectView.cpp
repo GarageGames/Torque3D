@@ -590,7 +590,7 @@ void GuiObjectView::setCameraRotation( const EulerF& rotation )
 }
 
 //------------------------------------------------------------------------------
-void GuiObjectView::setLightColor( const ColorF& color )
+void GuiObjectView::setLightColor( const LinearColorF& color )
 {
    mLightColor = color;
    if( mLight )
@@ -599,7 +599,7 @@ void GuiObjectView::setLightColor( const ColorF& color )
 
 //------------------------------------------------------------------------------
 
-void GuiObjectView::setLightAmbient( const ColorF& color )
+void GuiObjectView::setLightAmbient( const LinearColorF& color )
 {
    mLightAmbient = color;
    if( mLight )
@@ -952,7 +952,7 @@ DefineEngineMethod( GuiObjectView, setCameraSpeed, void, (F32 factor),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( GuiObjectView, setLightColor, void, ( ColorF color),,
+DefineEngineMethod( GuiObjectView, setLightColor, void, ( LinearColorF color),,
    "@brief Set the light color on the sun object used to render the model.\n\n"
    "@param color Color of sunlight.\n"
    "@tsexample\n"
@@ -968,7 +968,7 @@ DefineEngineMethod( GuiObjectView, setLightColor, void, ( ColorF color),,
 
 //-----------------------------------------------------------------------------
 
-DefineEngineMethod( GuiObjectView, setLightAmbient, void, (ColorF color),,
+DefineEngineMethod( GuiObjectView, setLightAmbient, void, (LinearColorF color),,
    "@brief Set the light ambient color on the sun object used to render the model.\n\n"
    "@param color Ambient color of sunlight.\n"
    "@tsexample\n"

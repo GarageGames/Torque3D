@@ -211,7 +211,7 @@ class SceneZoneSpace : public SceneSpace
 
       /// Get the ambient light color of the given zone in this space or return false if the
       /// given zone does not have an ambient light color assigned to it.
-      virtual bool getZoneAmbientLightColor( U32 zone, ColorF& outColor ) const { return false; }
+      virtual bool getZoneAmbientLightColor( U32 zone, LinearColorF& outColor ) const { return false; }
 
       /// @name Containment Tests
       /// @{

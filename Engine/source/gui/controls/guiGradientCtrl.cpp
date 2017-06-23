@@ -115,7 +115,7 @@ void GuiGradientSwatchCtrl::onRender( Point2I offset, const RectI &updateRect )
       drawer->drawBitmapStretch( mGrid, renderRect );
 
    // Draw swatch color as fill...
-   drawer->drawRectFill( renderRect, mSwatchColor );
+   drawer->drawRectFill( renderRect, mSwatchColor.toColorI());
 
    // Draw any borders...
    drawer->drawRect( renderRect, borderColor );
@@ -218,14 +218,14 @@ GuiGradientCtrl::GuiGradientCtrl()
    setExtent(140, 30);
    mDisplayMode = pHorizColorRange;
 	mSaveDisplayMode = pHorizColorRange;
-   mBaseColor = ColorF(1.,.0,1.);
-   mPickColor = ColorF(.0,.0,.0);
+   mBaseColor = LinearColorF(1.,.0,1.);
+   mPickColor = LinearColorF(.0,.0,.0);
    mMouseDown = mMouseOver = false;
    mActive = true;
    mPositionChanged = false;
    mActionOnMove = false;
 	mShowReticle = true;
-	colorWhiteBlend = ColorF(1.,1.,1.,.75);
+	colorWhiteBlend = LinearColorF(1.,1.,1.,.75);
 	mSwatchFactor = 7;
 }
 
@@ -410,7 +410,7 @@ void GuiGradientCtrl::onMouseDown(const GuiEvent &event)
    Point2I resolution = getRoot()->getExtent();
    GFXTexHandle bb( resolution.x, 
                     resolution.y, 
-                    GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__) );
+                    GFXFormatR8G8B8A8, &GFXRenderTargetSRGBProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__) );
    
    Point2I tmpPt( event.mousePoint.x, event.mousePoint.y );
    GFXTarget *targ = GFX->getActiveRenderTarget();
@@ -420,7 +420,7 @@ void GuiGradientCtrl::onMouseDown(const GuiEvent &event)
    ColorI tmp;
    bmp.getColor( event.mousePoint.x, event.mousePoint.y, tmp );
 	
-	addColorRange( globalToLocalCoord(event.mousePoint), ColorF(tmp) );
+	addColorRange( globalToLocalCoord(event.mousePoint), LinearColorF(tmp) );
    
    mMouseDown = true;
 }
@@ -506,7 +506,7 @@ void GuiGradientCtrl::reInitSwatches( GuiGradientCtrl::PickMode )
 			mColorRange[i].swatch->registerObject();
 			addObject(mColorRange[i].swatch);
 			mColorRange[i].swatch->setPosition( Point2I( mColorRange[i].pos, b ) );// needs to be adjusted
-			mColorRange[i].swatch->setColor(ColorF(mColorRange[i].color));
+			mColorRange[i].swatch->setColor(LinearColorF(mColorRange[i].color));
 		}
 	}
 
@@ -518,12 +518,12 @@ void GuiGradientCtrl::reInitSwatches( GuiGradientCtrl::PickMode )
 			mAlphaRange[i].swatch->registerObject();
 			addObject(mAlphaRange[i].swatch);
 			mAlphaRange[i].swatch->setPosition( Point2I( mAlphaRange[i].pos, b ) );// needs to be adjusted
-			mAlphaRange[i].swatch->setColor(ColorF(mAlphaRange[i].color));
+			mAlphaRange[i].swatch->setColor(LinearColorF(mAlphaRange[i].color));
 		}
 	}
 }
 
-void GuiGradientCtrl::addColorRange(Point2I pos, const ColorF& color)
+void GuiGradientCtrl::addColorRange(Point2I pos, const LinearColorF& color)
 {
 	if( pos.x + mSwatchFactor < mBlendRangeBox.point.x &&
 		pos.x + mSwatchFactor > mBlendRangeBox.extent.x )
@@ -611,7 +611,7 @@ DefineConsoleMethod(GuiGradientCtrl, getColorCount, S32, (), , "Get color count"
 	return 0;
 }
 
-DefineConsoleMethod(GuiGradientCtrl, getColor, ColorF, (S32 idx), , "Get color value")
+DefineConsoleMethod(GuiGradientCtrl, getColor, LinearColorF, (S32 idx), , "Get color value")
 {
 
 	if( object->getDisplayMode() == GuiGradientCtrl::pHorizColorRange )
@@ -631,5 +631,5 @@ DefineConsoleMethod(GuiGradientCtrl, getColor, ColorF, (S32 idx), , "Get color v
 		}
 	}
 
-	return ColorF::ONE;
+	return LinearColorF::ONE;
 }

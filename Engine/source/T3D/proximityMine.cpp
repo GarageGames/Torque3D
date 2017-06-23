@@ -653,7 +653,7 @@ void ProximityMine::renderObject( ObjectRenderInst* ri,
    // Render the trigger area
    if ( mState == Armed || mState == Triggered )
    {
-      const ColorF drawColor(1, 0, 0, 0.05f);
+      const LinearColorF drawColor(1, 0, 0, 0.05f);
       if ( drawColor.alpha > 0 )
       {
          GFXStateBlockDesc desc;
