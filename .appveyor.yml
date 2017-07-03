@@ -1,0 +1,59 @@
+cache:
+  - C:\ProgramData\chocolatey\bin
+  - C:\ProgramData\chocolatey\lib
+
+image:
+  - Visual Studio 2013
+  - Visual Studio 2015
+#  - Visual Studio 2017
+
+environment:
+  github_token:
+    secure: 1Z6WAhrXFRCDiR9sDl9GLpd2yHaC4QxVwOuihLqfhn9oigDyFFlj6ek6+0VoEbGH
+  github_email:
+    secure: 83W6QhzZVYQ4Zca5GpbATA==
+  matrix:
+    - additional_cmake_args: "-DTORQUE_PHYSICS_BULLET=on -DTORQUE_TESTING=on"
+      bin_deployable_conf: "true"
+    - additional_cmake_args: "-DTORQUE_PHYSICS_BULLET=on -DTORQUE_OPENGL=on -DTORQUE_TESTING=on"
+      additional_build_args: "--config Release"
+      doxydoc_deployable_conf: "true"
+      testable_conf: "true"
+
+platform:
+  - i386
+  - amd64
+
+#init:
+  # enable RDP
+  #- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+
+install:
+  - ps: . .\Tools\appveyor\install.ps1
+
+build_script:
+  - ps: . .\Tools\appveyor\build.ps1
+
+test_script:
+  - ps: if ($env:testable_conf -eq "true") {. .\Tools\appveyor\test.ps1 }
+
+after_test:
+  - ps: . .\Tools\appveyor\prepareDeployment.ps1
+
+artifacts:
+  - path: $(bundle_name)
+
+deploy:
+  release: Torque3D
+  provider: GitHub
+  tag: $(appveyor_repo_tag_name)
+  auth_token:
+    secure: 1Z6WAhrXFRCDiR9sDl9GLpd2yHaC4QxVwOuihLqfhn9oigDyFFlj6ek6+0VoEbGH 
+  draft: false
+  force_update: true
+  on:
+    bin_deploy_condition: true
+
+on_finish:
+  - ps: get-childItem .\*.png | % { push-appveyorArtifact $_.fullName -fileName $_.name }
+  - ps: if ($env:doxydoc_deploy_condition -eq "true") { . .\Tools\appveyor\deployToGithubPages.ps1 }

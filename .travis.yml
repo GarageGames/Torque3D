@@ -1,0 +1,51 @@
+matrix:
+  include:
+  - os: linux
+    dist: trusty
+    sudo: required
+    services: docker
+    env: OS_ID="ubuntu-latest-lts" ADDITIONAL_CMAKE_ARGS="-DTORQUE_PHYSICS_BULLET=on -DTORQUE_TESTING=on" DEPLOYABLE_CONF=true
+    compiler: gcc
+  # - os: osx
+  #   env: ADDITIONAL_CMAKE_ARGS="-DTORQUE_TESTING=off -DTORQUE_PHYSICS_BULLET=off" DEPLOYABLE_CONF=true CXXFLAGS="-fgnu-inline-asm -fasm-blocks"
+  #   osx_image: xcode9
+  #   compiler: clang
+  # - os: osx
+  #   env: ADDITIONAL_CMAKE_ARGS="-DTORQUE_TESTING=off -DTORQUE_PHYSICS_BULLET=off" DEPLOYABLE_CONF=true CXXFLAGS="fgnu-inline-asm -fasm-blocks"
+  #   osx_image: xcode8.3
+  #   compiler: clang
+  - os: osx
+    env: ADDITIONAL_CMAKE_ARGS="-DTORQUE_TESTING=off -DTORQUE_PHYSICS_BULLET=on" DEPLOYABLE_CONF=true #CXXFLAGS="-fgnu-inline-asm -fasm-blocks"
+    osx_image: xcode8
+    compiler: clang
+  # - os: osx
+  #   env: ADDITIONAL_CMAKE_ARGS="-DTORQUE_TESTING=off -DTORQUE_PHYSICS_BULLET=on" DEPLOYABLE_CONF=true CXXFLAGS="-fgnu-inline-asm -fasm-blocks"
+  #   osx_image: xcode7.3
+  #   compiler: clang
+
+language: cpp
+
+install:
+- source ./Tools/travis/install.sh
+
+script:
+- |
+  if [[ $TRAVIS_OS_NAME = linux ]];then
+  docker_exec ./Tools/travis/script.sh
+  else
+  ./Tools/travis/script.sh
+  fi
+
+before_deploy:
+- source ./Tools/travis/beforeDeploy.sh
+
+deploy:
+  provider: releases
+  api_key:
+    secure: nA4UTb1jcypzxbRsioMc2LObsTd+DR6mjHdj1a4zGxrDe8o8cxE9NLwkIeJp2dPB5tuLXazghh4k3KyurwMKcg3IEfn7vGDMyd+PhD4p4SXQT/pEPNwaQiBGAKPmABqN7DSCeluEbM0VpOZVsXSnXQGFYy6jB1TlXYORDJ5vIMHj8tdc0YH1wY0LQw3QjEZeS9Oq1v2HdXGFGvoHV5FvOcy6TskbhTbUIUhalan9+iB/xS5zGmpNJwzI6G7i9HEdD4mfKdyQ4JAxHMB78ApcfNyqHfkYa/T3d7Hi7pxPS2xRzu1gZL6ux0oFuJbYHH83k9D+cBM0rQtW78aTl0qn4v1qw1L9TUIr/Ji2hu3XEKbTIfoOG+Rr0cC2m4ZaTJNh2RTUoA7gsK+/lor6rGEvoMPj7sfKhQcCzRuJ2kDUHjwJBqU11OrSQ13y3tJY0U7b0UBdYhSk3n7QqYVfH3WFMa57VfmsOHvD99FW/j6aRzPSavtK5os7FNtaIkpKYwoYQUe5Cw3nOy3TEh4D0QnANezUDmEXG3uq0fCwAzW+WrJ/GaegegiPuFKP72wwKJ0MmTbFQH6iH5VFJsWM6pBRiPegvnxIJd25YoYgtrqQoOoDRfZ0W2iIoWZbfXUoeLrFy2kuOA1yT4rI5pDIuMsz4XjxyXgAHZtxGjYsvPUPEhY=
+  file: "My Projects/Torque3D/game/${BUNDLE_NAME}"
+  skip_cleanup: true
+  overwrite: true
+  on:
+    all_branches: true
+    condition: $DEPLOY_CONDITION
