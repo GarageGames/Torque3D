@@ -94,8 +94,6 @@ mat4 mat4FromRow( float r0c0, float r0c1, float r0c2, float r0c3,
 
 #define tMul(a, b) (a*b)
 
-#define inversesqrt( n ) inversesqrt( n )
-
 #define correctSSP(vec) vec.y *= -1
 
 #ifdef TORQUE_PIXEL_SHADER
