@@ -112,16 +112,16 @@ public:
         set( pFieldName, pFieldValue );
     }
 
-    inline void setFieldValue( const char* pFieldName, const ColorF& fieldValue )
+    inline void setFieldValue( const char* pFieldName, const LinearColorF& fieldValue )
     {
         // Fetch the field value.
-        const char* pFieldValue = Con::getData( TypeColorF, &const_cast<ColorF&>(fieldValue), 0 );
+        const char* pFieldValue = Con::getData( TypeColorF, &const_cast<LinearColorF&>(fieldValue), 0 );
 
         // Did we get a field value?
         if ( pFieldValue == NULL )
         {
             // No, so warn.
-            Con::warnf( "Taml: Failed to add node field name '%s' with ColorF value.", pFieldName );
+            Con::warnf( "Taml: Failed to add node field name '%s' with LinearColorF value.", pFieldName );
             pFieldValue = StringTable->EmptyString();
         }
 
@@ -211,7 +211,7 @@ public:
         set( pFieldName, fieldValue );
     }
 
-    inline void getFieldValue( ColorF& fieldValue ) const
+    inline void getFieldValue( LinearColorF& fieldValue ) const
     {
         fieldValue.set( 1.0f, 1.0f, 1.0f, 1.0f );
 
@@ -476,7 +476,7 @@ public:
         return registerField( pNodeField );
     }
 
-    inline TamlCustomField* addField( const char* pFieldName, const ColorF& fieldValue )
+    inline TamlCustomField* addField( const char* pFieldName, const LinearColorF& fieldValue )
     {
         TamlCustomField* pNodeField = TamlCustomFieldFactory.createObject();
         pNodeField->setFieldValue( pFieldName, fieldValue );

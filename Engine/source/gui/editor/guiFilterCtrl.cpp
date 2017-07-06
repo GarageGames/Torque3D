@@ -192,7 +192,7 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
    {
       GFX->getDrawUtil()->drawLine( pos.x, pos.y + ( ext.y * ( 1.0f - mIdentity.x ) ), 
                                     pos.x + ext.x, pos.y + ( ext.y * ( 1.0f - mIdentity.y ) ), 
-                                    ColorF( 0.9f, 0.9f, 0.9f ) );
+                                    ColorI( 230, 230, 230 ) );
    }
 
    // draw the curv
@@ -207,7 +207,7 @@ void GuiFilterCtrl::onRender(Point2I offset, const RectI &updateRect)
       S32 y = (S32)(ext.y*(1.0f-mFilter.getValue(index)));
 
       verts[i].point.set( (F32)(pos.x + i), (F32)(pos.y + y), 0.0f );
-      verts[i].color = GFXVertexColor( ColorF( 0.4f, 0.4f, 0.4f ) );
+      verts[i].color = ColorI( 103, 103, 103 );
    }
 
    verts.unlock();

@@ -307,22 +307,22 @@ void GuiBitmapButtonCtrl::setBitmap( const String& name )
             if( mUseModifiers )
                baseName += modifiers[ i ];
 
-            mTextures[ i ].mTextureNormal = GFXTexHandle( baseName, &GFXDefaultPersistentProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__));
+            mTextures[ i ].mTextureNormal = GFXTexHandle( baseName, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__));
             
             if( mUseStates )
             {
                if( !mTextures[ i ].mTextureNormal )
-                  mTextures[ i ].mTextureNormal = GFXTexHandle( baseName + s_n, &GFXDefaultPersistentProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__));
+                  mTextures[ i ].mTextureNormal = GFXTexHandle( baseName + s_n, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__));
                
-               mTextures[ i ].mTextureHilight = GFXTexHandle( baseName + s_h, &GFXDefaultPersistentProfile, avar("%s() - mTextureHighlight (line %d)", __FUNCTION__, __LINE__));
+               mTextures[ i ].mTextureHilight = GFXTexHandle( baseName + s_h, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureHighlight (line %d)", __FUNCTION__, __LINE__));
                if( !mTextures[ i ].mTextureHilight )
                   mTextures[ i ].mTextureHilight = mTextures[ i ].mTextureNormal;
                   
-               mTextures[ i ].mTextureDepressed = GFXTexHandle( baseName + s_d, &GFXDefaultPersistentProfile, avar("%s() - mTextureDepressed (line %d)", __FUNCTION__, __LINE__));
+               mTextures[ i ].mTextureDepressed = GFXTexHandle( baseName + s_d, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureDepressed (line %d)", __FUNCTION__, __LINE__));
                if( !mTextures[ i ].mTextureDepressed )
                   mTextures[ i ].mTextureDepressed = mTextures[ i ].mTextureHilight;
 
-               mTextures[ i ].mTextureInactive = GFXTexHandle( baseName + s_i, &GFXDefaultPersistentProfile, avar("%s() - mTextureInactive (line %d)", __FUNCTION__, __LINE__));
+               mTextures[ i ].mTextureInactive = GFXTexHandle( baseName + s_i, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureInactive (line %d)", __FUNCTION__, __LINE__));
                if( !mTextures[ i ].mTextureInactive )
                   mTextures[ i ].mTextureInactive = mTextures[ i ].mTextureNormal;
             }

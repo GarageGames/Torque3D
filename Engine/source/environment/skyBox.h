@@ -111,7 +111,7 @@ protected:
    Material *mFogBandMat;
    BaseMatInstance *mFogBandMatInst;
 
-   ColorF mLastFogColor;
+   LinearColorF mLastFogColor;
 
    bool mDrawBottom;
    bool mIsVBDirty;

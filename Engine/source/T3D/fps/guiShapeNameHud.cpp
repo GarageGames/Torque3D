@@ -47,11 +47,11 @@ class GuiShapeNameHud : public GuiControl {
    typedef GuiControl Parent;
 
    // field data
-   ColorF   mFillColor;
-   ColorF   mFrameColor;
-   ColorF   mTextColor;
-   ColorF   mLabelFillColor;
-   ColorF   mLabelFrameColor;
+   LinearColorF   mFillColor;
+   LinearColorF   mFrameColor;
+   LinearColorF   mTextColor;
+   LinearColorF   mLabelFillColor;
+   LinearColorF   mLabelFrameColor;
 
    F32      mVerticalOffset;
    F32      mDistanceFade;
@@ -162,7 +162,7 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
 {
    // Background fill first
    if (mShowFill)
-      GFX->getDrawUtil()->drawRectFill(updateRect, mFillColor);
+      GFX->getDrawUtil()->drawRectFill(updateRect, mFillColor.toColorI());
 
    // Must be in a TS Control
    GuiTSCtrl *parent = dynamic_cast<GuiTSCtrl*>(getParent());
@@ -274,7 +274,7 @@ void GuiShapeNameHud::onRender( Point2I, const RectI &updateRect)
 
    // Border last
    if (mShowFrame)
-      GFX->getDrawUtil()->drawRect(updateRect, mFrameColor);
+      GFX->getDrawUtil()->drawRect(updateRect, mFrameColor.toColorI());
 }
 
 
@@ -302,16 +302,16 @@ void GuiShapeNameHud::drawName(Point2I offset, const char *name, F32 opacity)
 
    // Background fill first
    if (mShowLabelFill)
-      drawUtil->drawRectFill(RectI(offset, extent), mLabelFillColor);
+      drawUtil->drawRectFill(RectI(offset, extent), mLabelFillColor.toColorI());
 
    // Deal with opacity and draw.
    mTextColor.alpha = opacity;
-   drawUtil->setBitmapModulation(mTextColor);
+   drawUtil->setBitmapModulation(mTextColor.toColorI());
    drawUtil->drawText(mProfile->mFont, offset + mLabelPadding, name);
    drawUtil->clearBitmapModulation();
 
    // Border last
    if (mShowLabelFrame)
-      drawUtil->drawRect(RectI(offset, extent), mLabelFrameColor);
+      drawUtil->drawRect(RectI(offset, extent), mLabelFrameColor.toColorI());
 }
 

@@ -1871,7 +1871,7 @@ bool GuiTreeViewCtrl::buildIconTable(const char * icons)
          dStrncpy( buf, start, getMin( sizeof( buf ) / sizeof( buf[ 0 ] ) - 1, len ) );
          buf[ len ] = '\0';
                   
-         mIconTable[ numIcons ] = GFXTexHandle( buf, &GFXDefaultPersistentProfile, avar( "%s() - mIconTable[%d] (line %d)", __FUNCTION__, numIcons, __LINE__ ) );
+         mIconTable[ numIcons ] = GFXTexHandle( buf, &GFXTexturePersistentProfile, avar( "%s() - mIconTable[%d] (line %d)", __FUNCTION__, numIcons, __LINE__ ) );
       }
       else
          mIconTable[ numIcons ] = GFXTexHandle();
@@ -3942,7 +3942,7 @@ void GuiTreeViewCtrl::onRender(Point2I offset, const RectI &updateRect)
    if (mDragMidPoint == NomDragMidPoint || !mSupportMouseDragging )
       return;
 
-   ColorF greyLine(0.5,0.5,0.5,1);
+   ColorI greyLine(128,128,128);
    Point2F squarePt;
 
    // CodeReview: LineWidth is not supported in Direct3D. This is lame. [5/10/2007 Pat]
@@ -4257,7 +4257,6 @@ bool GuiTreeViewCtrl::renderTooltip( const Point2I &hoverPos, const Point2I& cur
 {
    Item* item;
    BitSet32 flags = 0;
-   char buf[ 2048 ];
    if( _hitTest( cursorPos, item, flags ) && (!item->mTooltip.isEmpty() || mUseInspectorTooltips) )
    {
       bool render = true;
@@ -4302,6 +4301,7 @@ bool GuiTreeViewCtrl::renderTooltip( const Point2I &hoverPos, const Point2I& cur
       {
          if( mUseInspectorTooltips )
          {
+            char buf[2048];
             item->getTooltipText( sizeof( buf ), buf );
             tipText = buf;
          }

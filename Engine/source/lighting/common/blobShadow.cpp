@@ -138,7 +138,7 @@ void BlobShadow::generateGenericShadowBitmap(S32 dim)
       }
    }
 
-   smGenericShadowTexture.set( bitmap, &GFXDefaultStaticDiffuseProfile, true, "BlobShadow" );
+   smGenericShadowTexture.set( bitmap, &GFXStaticTextureSRGBProfile, true, "BlobShadow" );
 }
 
 //--------------------------------------------------------------

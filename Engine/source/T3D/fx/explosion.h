@@ -113,8 +113,8 @@ class ExplosionData : public GameBaseData {
    // interpolated from start to end time.
    F32               lightStartRadius;
    F32               lightEndRadius;
-   ColorF            lightStartColor;
-   ColorF            lightEndColor;
+   LinearColorF            lightStartColor;
+   LinearColorF            lightEndColor;
    F32               lightStartBrightness;
    F32               lightEndBrightness;
    F32               lightNormalOffset;

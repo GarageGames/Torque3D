@@ -152,39 +152,34 @@ bool RenderDeferredMgr::_updateTargets()
       // reload materials, the conditioner needs to alter the generated shaders
    }
 
-   GFXFormat colorFormat = mTargetFormat;
-
-   /*
-   bool independentMrtBitDepth = GFX->getCardProfiler()->queryProfile("independentMrtBitDepth", false);
-   //If independent bit depth on a MRT is supported than just use 8bit channels for the albedo color.
-   if(independentMrtBitDepth)
-      colorFormat = GFXFormatR8G8B8A8;
-   */
+   // TODO: these formats should be passed in and not hard-coded
+   const GFXFormat colorFormat = GFXFormatR8G8B8A8_SRGB;
+   const GFXFormat matInfoFormat = GFXFormatR8G8B8A8;
 
    // andrewmac: Deferred Shading Color Buffer
    if (mColorTex.getFormat() != colorFormat || mColorTex.getWidthHeight() != mTargetSize || GFX->recentlyReset())
    {
-           mColorTarget.release();
-           mColorTex.set(mTargetSize.x, mTargetSize.y, colorFormat,
-                   &GFXDefaultRenderTargetProfile, avar("%s() - (line %d)", __FUNCTION__, __LINE__),
-                   1, GFXTextureManager::AA_MATCH_BACKBUFFER);
-           mColorTarget.setTexture(mColorTex);
+      mColorTarget.release();
+      mColorTex.set(mTargetSize.x, mTargetSize.y, colorFormat,
+         &GFXRenderTargetSRGBProfile, avar("%s() - (line %d)", __FUNCTION__, __LINE__),
+         1, GFXTextureManager::AA_MATCH_BACKBUFFER);
+      mColorTarget.setTexture(mColorTex);
  
-           for (U32 i = 0; i < mTargetChainLength; i++)
-                   mTargetChain[i]->attachTexture(GFXTextureTarget::Color1, mColorTarget.getTexture());
+      for (U32 i = 0; i < mTargetChainLength; i++)
+         mTargetChain[i]->attachTexture(GFXTextureTarget::Color1, mColorTarget.getTexture());
    }
  
    // andrewmac: Deferred Shading Material Info Buffer
-   if (mMatInfoTex.getFormat() != colorFormat || mMatInfoTex.getWidthHeight() != mTargetSize || GFX->recentlyReset())
+   if (mMatInfoTex.getFormat() != matInfoFormat || mMatInfoTex.getWidthHeight() != mTargetSize || GFX->recentlyReset())
    {
-                mMatInfoTarget.release();
-                mMatInfoTex.set(mTargetSize.x, mTargetSize.y, colorFormat,
-                        &GFXDefaultRenderTargetProfile, avar("%s() - (line %d)", __FUNCTION__, __LINE__),
-                        1, GFXTextureManager::AA_MATCH_BACKBUFFER);
-                mMatInfoTarget.setTexture(mMatInfoTex);
+      mMatInfoTarget.release();
+      mMatInfoTex.set(mTargetSize.x, mTargetSize.y, matInfoFormat,
+         &GFXRenderTargetProfile, avar("%s() - (line %d)", __FUNCTION__, __LINE__),
+         1, GFXTextureManager::AA_MATCH_BACKBUFFER);
+         mMatInfoTarget.setTexture(mMatInfoTex);
  
-                for (U32 i = 0; i < mTargetChainLength; i++)
-                        mTargetChain[i]->attachTexture(GFXTextureTarget::Color2, mMatInfoTarget.getTexture());
+      for (U32 i = 0; i < mTargetChainLength; i++)
+         mTargetChain[i]->attachTexture(GFXTextureTarget::Color2, mMatInfoTarget.getTexture());
    }
 
    GFX->finalizeReset();
@@ -671,7 +666,8 @@ void ProcessedDeferredMaterial::_determineFeatures( U32 stageNum,
       }
 
       // Always allow these.
-      else if (   type == MFT_IsDXTnm ||
+      else if (   type == MFT_IsBC3nm ||
+                  type == MFT_IsBC5nm ||
                   type == MFT_TexAnim ||
                   type == MFT_NormalMap ||
                   type == MFT_DetailNormalMap ||
@@ -800,7 +796,7 @@ U32 ProcessedDeferredMaterial::getNumStages()
 
       // If this stage has diffuse color, it's active
       if (  mMaterial->mDiffuse[i].alpha > 0 &&
-            mMaterial->mDiffuse[i] != ColorF::WHITE )
+            mMaterial->mDiffuse[i] != LinearColorF::WHITE )
          stageActive = true;
 
       // If we have a Material that is vertex lit
@@ -1102,16 +1098,19 @@ void RenderDeferredMgr::_initShaders()
    // Create StateBlocks
    GFXStateBlockDesc desc;
    desc.setCullMode( GFXCullNone );
-   desc.setBlend( true );
+   desc.setBlend( false );
    desc.setZReadWrite( false, false );
    desc.samplersDefined = true;
-   desc.samplers[0].addressModeU = GFXAddressWrap;
-   desc.samplers[0].addressModeV = GFXAddressWrap;
-   desc.samplers[0].addressModeW = GFXAddressWrap;
-   desc.samplers[0].magFilter = GFXTextureFilterLinear;
-   desc.samplers[0].minFilter = GFXTextureFilterLinear;
-   desc.samplers[0].mipFilter = GFXTextureFilterLinear;
-   desc.samplers[0].textureColorOp = GFXTOPModulate;
+   for (int i = 0; i < TEXTURE_STAGE_COUNT; i++)
+   {
+       desc.samplers[i].addressModeU = GFXAddressWrap;
+       desc.samplers[i].addressModeV = GFXAddressWrap;
+       desc.samplers[i].addressModeW = GFXAddressWrap;
+       desc.samplers[i].magFilter = GFXTextureFilterLinear;
+       desc.samplers[i].minFilter = GFXTextureFilterLinear;
+       desc.samplers[i].mipFilter = GFXTextureFilterLinear;
+       desc.samplers[i].textureColorOp = GFXTOPModulate;
+   }
 
    mStateblock = GFX->createStateBlock( desc );   
 

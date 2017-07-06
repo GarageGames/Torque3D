@@ -164,8 +164,8 @@ protected:
    // Rendering
    void renderGrid();
    void renderNodes() const;
-   void renderNodeAxes(S32 index, const ColorF& nodeColor) const;
-   void renderNodeName(S32 index, const ColorF& textColor) const;
+   void renderNodeAxes(S32 index, const LinearColorF& nodeColor) const;
+   void renderNodeName(S32 index, const LinearColorF& textColor) const;
    void renderSunDirection() const;
    void renderCollisionMeshes() const;
 

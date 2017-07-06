@@ -1040,14 +1040,14 @@ void TerrCell::getRenderPrimitive(  GFXPrimitive *prim,
 
 void TerrCell::renderBounds() const
 {
-   ColorI color;
+   LinearColorF color;
    color.interpolate( ColorI::RED, ColorI::GREEN, (F32)mLevel / 3.0f );
 
    GFXStateBlockDesc desc;
    desc.setZReadWrite( true, false );
    desc.fillMode = GFXFillWireframe;
    
-   GFX->getDrawUtil()->drawCube( desc, mBounds, color );
+   GFX->getDrawUtil()->drawCube( desc, mBounds, color.toColorI());
 }
 
 void TerrCell::preloadMaterials()

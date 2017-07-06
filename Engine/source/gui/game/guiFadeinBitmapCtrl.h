@@ -41,7 +41,7 @@ class GuiFadeinBitmapCtrl : public GuiBitmapCtrl
    protected:
    
       /// Color we fade in from and fade out to.
-      ColorF mFadeColor;
+      LinearColorF mFadeColor;
       
       /// Reference time on which to base all fade timings.
       U32 mStartTime;

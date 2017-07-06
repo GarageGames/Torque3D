@@ -41,7 +41,7 @@ class GuiSpeedometerHud : public GuiBitmapCtrl
    F32   mMaxAngle;     ///< Max pos of needle
    F32   mMinAngle;     ///< Min pos of needle
    Point2F mCenter;     ///< Center of needle rotation
-   ColorF mColor;       ///< Needle Color
+   LinearColorF mColor;       ///< Needle Color
    F32   mNeedleLength;
    F32   mNeedleWidth;
    F32   mTailLength;

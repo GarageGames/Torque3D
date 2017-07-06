@@ -77,8 +77,8 @@ bool GuiMaterialPreview::onWake()
    if (!mFakeSun)
       mFakeSun = LightManager::createLightInfo();
 
-   mFakeSun->setColor( ColorF( 1.0f, 1.0f, 1.0f ) );
-   mFakeSun->setAmbient( ColorF( 0.5f, 0.5f, 0.5f ) );
+   mFakeSun->setColor( LinearColorF( 1.0f, 1.0f, 1.0f ) );
+   mFakeSun->setAmbient( LinearColorF( 0.5f, 0.5f, 0.5f ) );
    mFakeSun->setDirection( VectorF( 0.0f, 0.707f, -0.707f ) );
 	mFakeSun->setPosition( mFakeSun->getDirection() * -10000.0f );
    mFakeSun->setRange( 2000000.0f );
@@ -89,7 +89,7 @@ bool GuiMaterialPreview::onWake()
 // This function allows the viewport's ambient color to be changed. This is exposed to script below.
 void GuiMaterialPreview::setAmbientLightColor( F32 r, F32 g, F32 b )
 {
-   ColorF temp(r, g, b);
+   LinearColorF temp(r, g, b);
    temp.clamp();
 	GuiMaterialPreview::mFakeSun->setAmbient( temp );
 }
@@ -97,7 +97,7 @@ void GuiMaterialPreview::setAmbientLightColor( F32 r, F32 g, F32 b )
 // This function allows the light's color to be changed. This is exposed to script below.
 void GuiMaterialPreview::setLightColor( F32 r, F32 g, F32 b )
 {
-   ColorF temp(r, g, b);
+   LinearColorF temp(r, g, b);
    temp.clamp();
 	GuiMaterialPreview::mFakeSun->setColor( temp );
 }
@@ -437,8 +437,8 @@ void GuiMaterialPreview::resetViewport()
    mOrbitPos = mModel->getShape()->center;
 
    // Reset the viewport's lighting.
-   GuiMaterialPreview::mFakeSun->setColor( ColorF( 1.0f, 1.0f, 1.0f ) );
-   GuiMaterialPreview::mFakeSun->setAmbient( ColorF( 0.5f, 0.5f, 0.5f ) );
+   GuiMaterialPreview::mFakeSun->setColor( LinearColorF( 1.0f, 1.0f, 1.0f ) );
+   GuiMaterialPreview::mFakeSun->setAmbient( LinearColorF( 0.5f, 0.5f, 0.5f ) );
    GuiMaterialPreview::mFakeSun->setDirection( VectorF( 0.0f, 0.707f, -0.707f ) );
 }
 
@@ -482,14 +482,14 @@ DefineEngineMethod(GuiMaterialPreview, reset, void, (),,
 }
 
 // This function allows the user to change the light's color.
-DefineEngineMethod(GuiMaterialPreview, setLightColor, void, ( ColorF color ),,
+DefineEngineMethod(GuiMaterialPreview, setLightColor, void, ( LinearColorF color ),,
    "Sets the color of the light in the scene.\n")
 {
    object->setLightColor( color.red, color.green, color.blue );
 }
 
 // This function allows the user to change the viewports's ambient color.
-DefineEngineMethod(GuiMaterialPreview, setAmbientLightColor, void, ( ColorF color ),,
+DefineEngineMethod(GuiMaterialPreview, setAmbientLightColor, void, ( LinearColorF color ),,
    "Sets the color of the ambient light in the scene.\n")
 {
    object->setAmbientLightColor( color.red, color.green, color.blue );

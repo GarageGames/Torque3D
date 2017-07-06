@@ -233,7 +233,7 @@ void PhysicalZone::renderObject( ObjectRenderInst *ri,
    drawer->drawPolyhedron( desc, mPolyhedron, ColorI( 0, 255, 0, 45 ) );
 
    desc.setFillModeWireframe();
-   drawer->drawPolyhedron( desc, mPolyhedron, ColorF::BLACK );
+   drawer->drawPolyhedron( desc, mPolyhedron, ColorI::BLACK );
 }
 
 //--------------------------------------------------------------------------

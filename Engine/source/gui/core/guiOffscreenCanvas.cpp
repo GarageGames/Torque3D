@@ -89,13 +89,13 @@ void GuiOffscreenCanvas::_setupTargets()
    // Update color
    if (!mTargetTexture.isValid() || mTargetSize != mTargetTexture.getWidthHeight())
    {
-      mTargetTexture.set( mTargetSize.x, mTargetSize.y, mTargetFormat, &GFXDefaultRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ), 1, 0 );
+      mTargetTexture.set( mTargetSize.x, mTargetSize.y, mTargetFormat, &GFXRenderTargetSRGBProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ), 1, 0 );
    }
 
    // Update depth if needed
    if (mUseDepth && (!mTargetDepth.isValid() || mTargetSize != mTargetDepth.getWidthHeight()))
    {
-      mTargetDepth.set( mTargetSize.x, mTargetSize.y, GFXFormatD24S8, &GFXDefaultZTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ), 1, 0 );
+      mTargetDepth.set( mTargetSize.x, mTargetSize.y, GFXFormatD24S8, &GFXRenderTargetProfile, avar( "%s() - (line %d)", __FUNCTION__, __LINE__ ), 1, 0 );
       mTarget->attachTexture( GFXTextureTarget::RenderSlot(GFXTextureTarget::DepthStencil), mTargetDepth );
    }
 
@@ -178,7 +178,7 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
 
    // Clear the current viewport area
    GFX->setViewport( screenRect );
-   GFX->clear( GFXClearTarget, ColorF(0,0,0,0), 1.0f, 0 );
+   GFX->clear( GFXClearTarget, LinearColorF(0,0,0,0), 1.0f, 0 );
 
    resetUpdateRegions();
 
@@ -204,7 +204,7 @@ void GuiOffscreenCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = tr
 
       // Fill Blue if no Dialogs
       if(this->size() == 0)
-         GFX->clear( GFXClearTarget, ColorF(0,0,0,1), 1.0f, 0 );
+         GFX->clear( GFXClearTarget, LinearColorF(0,0,0,1), 1.0f, 0 );
 
       GFX->setClipRect( contentRect );
 

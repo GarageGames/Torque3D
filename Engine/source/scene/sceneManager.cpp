@@ -117,7 +117,7 @@ SceneManager::SceneManager( bool isClient )
      mVisibleGhostDistance( 0 ),
      mNearClip( 0.1f ),
      mLightManager( NULL ),
-     mAmbientLightColor( ColorF( 0.1f, 0.1f, 0.1f, 1.0f ) ),
+     mAmbientLightColor( LinearColorF( 0.1f, 0.1f, 0.1f, 1.0f ) ),
      mDefaultRenderPass( NULL )
 {
    VECTOR_SET_ASSOCIATION( mBatchQueryList );
@@ -211,7 +211,7 @@ void SceneManager::renderScene( SceneRenderState* renderState, U32 objectMask, S
          AssertFatal( baseObject != NULL, "SceneManager::renderScene - findZone() did not return an object" );
       }
 
-      ColorF zoneAmbient;
+      LinearColorF zoneAmbient;
       if( baseObject && baseObject->getZoneAmbientLightColor( baseZone, zoneAmbient ) )
          mAmbientLightColor.setTargetValue( zoneAmbient );
       else

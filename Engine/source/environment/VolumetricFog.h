@@ -227,7 +227,7 @@ class VolumetricFog : public SceneObject
    
       // Methods for modifying & networking various fog elements
       // Used in script
-      void setFogColor(ColorF color);
+      void setFogColor(LinearColorF color);
       void setFogColor(ColorI color);
       void setFogDensity(F32 density);
       void setFogModulation(F32 strength, Point2F speed1, Point2F speed2);

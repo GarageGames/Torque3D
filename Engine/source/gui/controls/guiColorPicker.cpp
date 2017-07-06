@@ -32,11 +32,11 @@
 
 /// @name Common colors we use
 /// @{
-ColorF colorWhite(1.,1.,1.);
-ColorF colorWhiteBlend(1.,1.,1.,.75);
-ColorF colorBlack(.0,.0,.0);
-ColorF colorAlpha(0.0f, 0.0f, 0.0f, 0.0f);
-ColorF colorAlphaW(1.0f, 1.0f, 1.0f, 0.0f);
+LinearColorF colorWhite(1.,1.,1.);
+LinearColorF colorWhiteBlend(1.,1.,1.,.75);
+LinearColorF colorBlack(.0,.0,.0);
+LinearColorF colorAlpha(0.0f, 0.0f, 0.0f, 0.0f);
+LinearColorF colorAlphaW(1.0f, 1.0f, 1.0f, 0.0f);
 
 ColorI GuiColorPickerCtrl::mColorRange[7] = {
    ColorI(255,0,0),     // Red
@@ -52,7 +52,7 @@ ColorI GuiColorPickerCtrl::mColorRange[7] = {
 IMPLEMENT_CONOBJECT(GuiColorPickerCtrl);
 
 ConsoleDocClass( GuiColorPickerCtrl,
-   "@brief Editor GUI used for picking a ColorF from a palette.\n\n"
+   "@brief Editor GUI used for picking a LinearColorF from a palette.\n\n"
    "@note Editor use only.\n\n"
    "@internal"
 );
@@ -61,8 +61,8 @@ GuiColorPickerCtrl::GuiColorPickerCtrl()
 {
    setExtent(140, 30);
    mDisplayMode = pPallet;
-   mBaseColor = ColorF(1.,.0,1.);
-   mPickColor = ColorF(.0,.0,.0);
+   mBaseColor = LinearColorF(1.,.0,1.);
+   mPickColor = LinearColorF(.0,.0,.0);
    mSelectorPos = Point2I(0,0);
    mMouseDown = mMouseOver = false;
    mActive = true;
@@ -73,7 +73,6 @@ GuiColorPickerCtrl::GuiColorPickerCtrl()
    mSelectColor = false;
    mSetColor = mSetColor.BLACK;
    mBitmap = NULL;
-   mUseSRGB = false;
 }
 
 GuiColorPickerCtrl::~GuiColorPickerCtrl()
@@ -105,7 +104,6 @@ void GuiColorPickerCtrl::initPersistFields()
    addGroup("ColorPicker");
       addField("baseColor", TypeColorF, Offset(mBaseColor, GuiColorPickerCtrl));
       addField("pickColor", TypeColorF, Offset(mPickColor, GuiColorPickerCtrl));
-      addField("useSRGB", TypeBool, Offset(mUseSRGB, GuiColorPickerCtrl), "Render using sRGB scale");
       addField("selectorGap", TypeS32,  Offset(mSelectorGap, GuiColorPickerCtrl)); 
       addField("displayMode", TYPEID< PickMode >(), Offset(mDisplayMode, GuiColorPickerCtrl) );
       addField("actionOnMove", TypeBool,Offset(mActionOnMove, GuiColorPickerCtrl));
@@ -116,25 +114,19 @@ void GuiColorPickerCtrl::initPersistFields()
 }
 
 // Function to draw a box which can have 4 different colors in each corner blended together
-void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, ColorF &c1, ColorF &c2, ColorF &c3, ColorF &c4)
+void GuiColorPickerCtrl::drawBlendBox(RectI &bounds, LinearColorF &c1, LinearColorF &c2, LinearColorF &c3, LinearColorF &c4)
 {
    GFX->setStateBlock(mStateBlock);
 
    S32 l = bounds.point.x, r = bounds.point.x + bounds.extent.x;
    S32 t = bounds.point.y, b = bounds.point.y + bounds.extent.y;
 
-   ColorF col[4];
+   LinearColorF col[4];
    col[0] = c1;
    col[1] = c2;
    col[2] = c3;
    col[3] = c4;
-   if (!mUseSRGB)
-   {
-      for (U32 i = 0; i < 4; i++)
-         col[i] = col[i].toGamma();
-   }
 
-   //A couple of checks to determine if color blend
    //A couple of checks to determine if color blend
    if (c1 == colorWhite && c3 == colorAlpha && c4 == colorBlack)
    {
@@ -224,17 +216,8 @@ void GuiColorPickerCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, U8 numC
 
    ColorI *col = new ColorI[numColors];
    dMemcpy(col, colors, numColors * sizeof(ColorI));
-   if (mUseSRGB)
-   {
-      for (U16 i = 0; i < numColors - 1; i++)
+   for (U16 i = 0; i < numColors - 1; i++)
          col[i] = colors[i];
-   }
-   else
-   {
-      for (U16 i = 0; i < numColors - 1; i++)
-         col[i] = colors[i].toGamma();
-   }
-
 
    for (U16 i = 0; i < numColors - 1; i++)
    {
@@ -273,6 +256,8 @@ void GuiColorPickerCtrl::drawBlendRangeBox(RectI &bounds, bool vertical, U8 numC
       }
       PrimBuild::end();
    }
+
+   SAFE_DELETE_ARRAY(col);
 }
 
 void GuiColorPickerCtrl::drawSelector(RectI &bounds, Point2I &selectorPos, SelectorMode mode)
@@ -281,23 +266,24 @@ void GuiColorPickerCtrl::drawSelector(RectI &bounds, Point2I &selectorPos, Selec
       return; 
 
    U16 sMax = mSelectorGap*2;
+   const ColorI color = colorWhiteBlend.toColorI();
    switch (mode)
    {
       case sVertical:
          // Now draw the vertical selector Up -> Pos
          if (selectorPos.y != bounds.point.y+1)
-            GFX->getDrawUtil()->drawLine(selectorPos.x, bounds.point.y, selectorPos.x, selectorPos.y-sMax-1, colorWhiteBlend);
+            GFX->getDrawUtil()->drawLine(selectorPos.x, bounds.point.y, selectorPos.x, selectorPos.y-sMax-1, color);
          // Down -> Pos
          if (selectorPos.y != bounds.point.y+bounds.extent.y) 
-            GFX->getDrawUtil()->drawLine(selectorPos.x,	selectorPos.y + sMax, selectorPos.x, bounds.point.y + bounds.extent.y, colorWhiteBlend);
+            GFX->getDrawUtil()->drawLine(selectorPos.x,	selectorPos.y + sMax, selectorPos.x, bounds.point.y + bounds.extent.y, color);
       break;
       case sHorizontal:
          // Now draw the horizontal selector Left -> Pos
          if (selectorPos.x != bounds.point.x) 
-            GFX->getDrawUtil()->drawLine(bounds.point.x, selectorPos.y-1, selectorPos.x-sMax, selectorPos.y-1, colorWhiteBlend);
+            GFX->getDrawUtil()->drawLine(bounds.point.x, selectorPos.y-1, selectorPos.x-sMax, selectorPos.y-1, color);
          // Right -> Pos
          if (selectorPos.x != bounds.point.x) 
-            GFX->getDrawUtil()->drawLine(bounds.point.x+mSelectorPos.x+sMax, selectorPos.y-1, bounds.point.x + bounds.extent.x, selectorPos.y-1, colorWhiteBlend);
+            GFX->getDrawUtil()->drawLine(bounds.point.x+mSelectorPos.x+sMax, selectorPos.y-1, bounds.point.x + bounds.extent.x, selectorPos.y-1, color);
       break;
    }
 }
@@ -339,7 +325,7 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
       drawBlendBox( blendRect, colorAlpha, colorAlpha, colorBlack, colorBlack );
       blendRect.point.y += blendRect.extent.y - 1;
       blendRect.extent.y = 2;
-      GFX->getDrawUtil()->drawRect( blendRect, colorBlack);
+      GFX->getDrawUtil()->drawRect( blendRect, colorBlack.toColorI());
       drawSelector( pickerBounds, selectorPos, sHorizontal );
       drawSelector( pickerBounds, selectorPos, sVertical );
    break;
@@ -366,7 +352,7 @@ void GuiColorPickerCtrl::renderColorBox(RectI &bounds)
    break;
    case pPallet:
    default:
-      GFX->getDrawUtil()->drawRectFill( pickerBounds, mBaseColor );
+      GFX->getDrawUtil()->drawRectFill( pickerBounds, mBaseColor.toColorI());
    break;
    }
 }
@@ -404,7 +390,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
          U32 buf_x = offset.x + mSelectorPos.x + 1;
          U32 buf_y = resolution.y - (extent.y - (offset.y + mSelectorPos.y + 1));
 
-         GFXTexHandle bb( resolution.x, resolution.y, GFXFormatR8G8B8A8, &GFXDefaultRenderTargetProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__) );
+         GFXTexHandle bb(resolution.x, resolution.y, GFXFormatR8G8B8A8_SRGB, &GFXRenderTargetSRGBProfile, avar("%s() - bb (line %d)", __FUNCTION__, __LINE__));
 
          Point2I tmpPt(buf_x, buf_y);
 
@@ -417,7 +403,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
             mBitmap = NULL;
          }
 
-         mBitmap = new GBitmap(bb.getWidth(), bb.getHeight());
+         mBitmap = new GBitmap(bb.getWidth(), bb.getHeight(),false,GFXFormatR8G8B8A8);
 
          bb.copyToBmp(mBitmap);
 
@@ -435,7 +421,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
                ColorI tmp;
                mBitmap->getColor(buf_x, buf_y, tmp);
 
-               mPickColor = (ColorF)tmp;
+               mPickColor = (LinearColorF)tmp;
 
                // Now do onAction() if we are allowed
                if (mActionOnMove)
@@ -449,7 +435,7 @@ void GuiColorPickerCtrl::onRender(Point2I offset, const RectI& updateRect)
    renderChildControls(offset, updateRect);
 }
 
-void GuiColorPickerCtrl::setSelectorPos(const ColorF & color)
+void GuiColorPickerCtrl::setSelectorPos(const LinearColorF & color)
 {
    if (mBitmap && !mPositionChanged)
    {
@@ -469,7 +455,7 @@ void GuiColorPickerCtrl::setSelectorPos(const ColorF & color)
    }
 }
 
-Point2I GuiColorPickerCtrl::findColor(const ColorF & color, const Point2I& offset, const Point2I& resolution, GBitmap& bmp)
+Point2I GuiColorPickerCtrl::findColor(const LinearColorF & color, const Point2I& offset, const Point2I& resolution, GBitmap& bmp)
 {
    RectI rect;
    Point2I ext = getExtent();
@@ -506,7 +492,7 @@ Point2I GuiColorPickerCtrl::findColor(const ColorF & color, const Point2I& offse
    ColorI tmp;
    U32 buf_x;
    U32 buf_y;
-   ColorF curColor;
+   LinearColorF curColor;
    F32 val(10000.0f);
    F32 closestVal(10000.0f);
    bool closestSet = false;
@@ -521,7 +507,7 @@ Point2I GuiColorPickerCtrl::findColor(const ColorF & color, const Point2I& offse
 
          //Get the color at that position
          bmp.getColor(buf_x, buf_y, tmp);
-         curColor = (ColorF)tmp;
+         curColor = (LinearColorF)tmp;
 
          //Evaluate how close the color is to our desired color
          val = mFabs(color.red - curColor.red) + mFabs(color.green - curColor.green) + mFabs(color.blue - curColor.blue);
@@ -660,14 +646,14 @@ void GuiColorPickerCtrl::onMouseUp(const GuiEvent &)
 const char *GuiColorPickerCtrl::getScriptValue()
 {
    static char temp[256];
-   ColorF color = getValue();
+   LinearColorF color = getValue();
    dSprintf( temp, 256, "%f %f %f %f", color.red, color.green, color.blue, color.alpha );
    return temp;
 }
 
 void GuiColorPickerCtrl::setScriptValue(const char *value)
 {
-   ColorF newValue;
+   LinearColorF newValue;
    dSscanf(value, "%f %f %f %f", &newValue.red, &newValue.green, &newValue.blue, &newValue.alpha);
    setValue(newValue);
 }
@@ -687,7 +673,7 @@ DefineConsoleMethod(GuiColorPickerCtrl, updateColor, void, (), , "Forces update 
    object->updateColor();
 }
 
-DefineEngineMethod(GuiColorPickerCtrl, setSelectorColor, void, (ColorF color), ,
+DefineEngineMethod(GuiColorPickerCtrl, setSelectorColor, void, (LinearColorF color), ,
    "Sets the current position of the selector based on a color.n"
    "@param color Color to look for.n")
 {

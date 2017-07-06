@@ -69,7 +69,7 @@ namespace PrimBuild
    inline void vertex3i( S32 x, S32 y, S32 z ) { vertex3f((F32)x, (F32)y, (F32)z); }
 
    void color( const ColorI & );
-   void color( const ColorF & );
+   void color( const LinearColorF & );
    void color3i( U8 red, U8 green, U8 blue );
    void color4i( U8 red, U8 green, U8 blue, U8 alpha );
    void color3f( F32 red, F32 green, F32 blue );

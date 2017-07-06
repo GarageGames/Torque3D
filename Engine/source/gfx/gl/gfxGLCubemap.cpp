@@ -28,6 +28,7 @@
 #include "gfx/gfxTextureManager.h"
 #include "gfx/gfxCardProfile.h"
 #include "gfx/bitmap/ddsFile.h"
+#include "gfx/bitmap/imageUtils.h"
 
 
 GLenum GFXGLCubemap::faceList[6] = 
@@ -71,11 +72,11 @@ void GFXGLCubemap::fillCubeTextures(GFXTexHandle* faces)
    U32 reqWidth = faces[0]->getWidth();
    U32 reqHeight = faces[0]->getHeight();
    GFXFormat regFaceFormat = faces[0]->getFormat();
-   const bool isCompressed = isCompressedFormat(regFaceFormat);
+   const bool isCompressed = ImageUtil::isCompressedFormat(regFaceFormat);
    mWidth = reqWidth;
    mHeight = reqHeight;
    mFaceFormat = regFaceFormat;
-   mMipLevels = getMax( (U32)1, faces[0]->mMipLevels);
+   mMipMapLevels = getMax( (U32)1, faces[0]->mMipLevels);
    AssertFatal(reqWidth == reqHeight, "GFXGLCubemap::fillCubeTextures - Width and height must be equal!");
    
    for(U32 i = 0; i < 6; i++)
@@ -90,7 +91,7 @@ void GFXGLCubemap::fillCubeTextures(GFXTexHandle* faces)
         GFXGLTextureObject* glTex = static_cast<GFXGLTextureObject*>(faces[i].getPointer());
         if( isCompressed )
         {
-            for( U32 mip = 0; mip < mMipLevels; ++mip )
+            for( U32 mip = 0; mip < mMipMapLevels; ++mip )
             {
                 const U32 mipWidth  = getMax( U32(1), faces[i]->getWidth() >> mip );
                 const U32 mipHeight = getMax( U32(1), faces[i]->getHeight() >> mip );
@@ -136,26 +137,16 @@ void GFXGLCubemap::initStatic( DDSFile *dds )
    AssertFatal( dds->isCubemap(), "GFXGLCubemap::initStatic - Got non-cubemap DDS file!" );
    AssertFatal( dds->mSurfaces.size() == 6, "GFXGLCubemap::initStatic - DDS has less than 6 surfaces!" );
 
-   // HACK: I cannot put the genie back in the bottle and assign a
-   // DDSFile pointer back to a Resource<>.  
-   //
-   // So we do a second lookup which works out ok for now, but shows
-   // the weakness in the ResourceManager not having a common base 
-   // reference type.
-   //
-   mDDSFile = ResourceManager::get().load( dds->getSourcePath() );
-   AssertFatal( mDDSFile == dds, "GFXGLCubemap::initStatic - Couldn't find DDSFile resource!" );
-
    mWidth = dds->getWidth();
    mHeight = dds->getHeight();
    mFaceFormat = dds->getFormat();
-   mMipLevels = dds->getMipLevels();
-
+   mMipMapLevels = dds->getMipLevels();
+   const bool isCompressed = ImageUtil::isCompressedFormat(mFaceFormat);
    glGenTextures(1, &mCubemap);
 
    PRESERVE_CUBEMAP_TEXTURE();
    glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemap);
-   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, mMipLevels - 1);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, mMipMapLevels - 1);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -173,12 +164,19 @@ void GFXGLCubemap::initStatic( DDSFile *dds )
          continue;
       }
 
+      // convert to Z up
+      const U32 faceIndex = _zUpFaceIndex(i);
+
       // Now loop thru the mip levels!
-      for (U32 mip = 0; mip < mMipLevels; ++mip)
+      for (U32 mip = 0; mip < mMipMapLevels; ++mip)
       {
          const U32 mipWidth  = getMax( U32(1), mWidth >> mip );
          const U32 mipHeight = getMax( U32(1), mHeight >> mip );
-         glCompressedTexImage2D(faceList[i], mip, GFXGLTextureInternalFormat[mFaceFormat], mipWidth, mipHeight, 0, dds->getSurfaceSize(mip), dds->mSurfaces[i]->mMips[mip]);
+         if (isCompressed)
+            glCompressedTexImage2D(faceList[faceIndex], mip, GFXGLTextureInternalFormat[mFaceFormat], mipWidth, mipHeight, 0, dds->getSurfaceSize(mip), dds->mSurfaces[i]->mMips[mip]);
+         else
+            glTexImage2D(faceList[faceIndex], mip, GFXGLTextureInternalFormat[mFaceFormat], mipWidth, mipHeight, 0,
+               GFXGLTextureFormat[mFaceFormat], GFXGLTextureType[mFaceFormat], dds->mSurfaces[i]->mMips[mip]);
       }
    }
 }
@@ -187,13 +185,13 @@ void GFXGLCubemap::initDynamic(U32 texSize, GFXFormat faceFormat)
 {
    mDynamicTexSize = texSize;
    mFaceFormat = faceFormat;
-   const bool isCompressed = isCompressedFormat(faceFormat);
-   mMipLevels = getMax( (U32)1, getMaxMipmaps( texSize, texSize, 1 ) );
+   const bool isCompressed = ImageUtil::isCompressedFormat(faceFormat);
+   mMipMapLevels = getMax( (U32)1, getMaxMipmaps( texSize, texSize, 1 ) );
 
    glGenTextures(1, &mCubemap);
    PRESERVE_CUBEMAP_TEXTURE();
    glBindTexture(GL_TEXTURE_CUBE_MAP, mCubemap);
-   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, mMipLevels - 1);
+   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, mMipMapLevels - 1);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -204,9 +202,9 @@ void GFXGLCubemap::initDynamic(U32 texSize, GFXFormat faceFormat)
 
     for(U32 i = 0; i < 6; i++)
     {
-        if( isCompressedFormat(faceFormat) )
+        if( ImageUtil::isCompressedFormat(faceFormat) )
         {
-            for( U32 mip = 0; mip < mMipLevels; ++mip )
+            for( U32 mip = 0; mip < mMipMapLevels; ++mip )
             {
                 const U32 mipSize = getMax( U32(1), texSize >> mip );
                 const U32 mipDataSize = getCompressedSurfaceSize( mFaceFormat, texSize, texSize, mip );

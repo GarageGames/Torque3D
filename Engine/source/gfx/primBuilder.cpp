@@ -301,9 +301,9 @@ void color( const ColorI &inColor )
    mCurColor = inColor;
 }
 
-void color( const ColorF &inColor )
+void color( const LinearColorF &inColor )
 {
-   mCurColor = inColor;
+   mCurColor = LinearColorF(inColor).toColorI();
 }
 
 void color3i( U8 red, U8 green, U8 blue )

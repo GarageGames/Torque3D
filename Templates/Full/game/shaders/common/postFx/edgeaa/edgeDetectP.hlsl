@@ -50,7 +50,7 @@ float GetEdgeWeight(float2 uv0, in float2 targetSize)
    for(int i = 0; i < 9; i++)
    {
       float2 uv = uv0 + offsets[i] * PixelSize;
-      float4 gbSample = TORQUE_PREPASS_UNCONDITION( deferredBuffer, uv );
+      float4 gbSample = TORQUE_DEFERRED_UNCONDITION( deferredBuffer, uv );
       Depth[i] = gbSample.a;
       Normal[i] = gbSample.rgb;
    }

@@ -24,7 +24,7 @@
 #define _PROPERTYPARSING_H_
 
 class ColorI;
-class ColorF;
+class LinearColorF;
 class Point2I;
 class Point2F;
 class Point3F;
@@ -110,8 +110,8 @@ namespace PropertyInfo
    bool default_print( String & result, const MatrixF & data );
 
    // Colors
-   bool default_scan(const String &data, ColorF & result);
-   bool default_print(String & result, const ColorF & data);
+   bool default_scan(const String &data, LinearColorF & result);
+   bool default_print(String & result, const LinearColorF & data);
    bool default_scan(const String &data, ColorI & result);
    bool default_print(String & result, const ColorI & data);
 

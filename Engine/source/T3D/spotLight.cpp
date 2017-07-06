@@ -202,7 +202,7 @@ void SpotLight::_renderViz( SceneRenderState *state )
    desc.setBlend( true );
 
    // Base the color on the light color.
-   ColorI color( mColor );
+   ColorI color = mColor.toColorI();
    color.alpha = 16;
 
    F32 radius = mRange * mSin( mDegToRad( mOuterConeAngle * 0.5f ) );

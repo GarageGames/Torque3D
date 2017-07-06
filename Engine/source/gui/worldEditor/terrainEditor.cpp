@@ -658,7 +658,7 @@ void SelectionBrush::rebuild()
    //... move the selection
 }
 
-void SelectionBrush::render(Vector<GFXVertexPCT> & vertexBuffer, S32 & verts, S32 & elems, S32 & prims, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone) const
+void SelectionBrush::render(Vector<GFXVertexPCT> & vertexBuffer, S32 & verts, S32 & elems, S32 & prims, const LinearColorF & inColorFull, const LinearColorF & inColorNone, const LinearColorF & outColorFull, const LinearColorF & outColorNone) const
 {
    //... render the selection
 }
@@ -1296,10 +1296,10 @@ void TerrainEditor::renderScene(const RectI &)
       return;
 
    if(!mSelectionHidden)
-      renderSelection(mDefaultSel, ColorF::RED, ColorF::GREEN, ColorF::BLUE, ColorF::BLUE, true, false);
+      renderSelection(mDefaultSel, LinearColorF::RED, LinearColorF::GREEN, LinearColorF::BLUE, LinearColorF::BLUE, true, false);
 
    if(mRenderBrush && mMouseBrush->size())
-      renderBrush(*mMouseBrush, ColorF::GREEN, ColorF::RED, ColorF::BLUE, ColorF::BLUE, false, true);
+      renderBrush(*mMouseBrush, LinearColorF::GREEN, LinearColorF::RED, LinearColorF::BLUE, LinearColorF::BLUE, false, true);
 
    if(mRenderBorder)
       renderBorder();
@@ -1386,7 +1386,7 @@ void TerrainEditor::renderPoints( const Vector<GFXVertexPCT> &pointList )
 
 //------------------------------------------------------------------------------
 
-void TerrainEditor::renderSelection( const Selection & sel, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone, bool renderFill, bool renderFrame )
+void TerrainEditor::renderSelection( const Selection & sel, const LinearColorF & inColorFull, const LinearColorF & inColorNone, const LinearColorF & outColorFull, const LinearColorF & outColorNone, bool renderFill, bool renderFrame )
 {
    PROFILE_SCOPE( TerrainEditor_RenderSelection );
 
@@ -1395,7 +1395,7 @@ void TerrainEditor::renderSelection( const Selection & sel, const ColorF & inCol
       return;
 
    Vector<GFXVertexPCT> vertexBuffer;
-   ColorF color;
+   LinearColorF color;
    ColorI iColor;
 
    vertexBuffer.setSize(sel.size() * 5);
@@ -1428,7 +1428,7 @@ void TerrainEditor::renderSelection( const Selection & sel, const ColorF & inCol
                color.interpolate( outColorFull, outColorNone, weight );
          }
          //
-         iColor = color;
+         iColor = color.toColorI();
 
          GFXVertexPCT *verts = &(vertexBuffer[i * 5]);
 
@@ -1479,17 +1479,17 @@ void TerrainEditor::renderSelection( const Selection & sel, const ColorF & inCol
                   color.interpolate(outColorFull, outColorNone, weight );
             }
 
-            iColor = color;
+            iColor = color.toColorI();
          }
          else
          {
             if ( center )
             {
-               iColor = inColorNone;
+               iColor = LinearColorF(inColorNone).toColorI();
             }
             else
             {
-               iColor = outColorFull;
+               iColor = LinearColorF(outColorFull).toColorI();
             }
          }
 
@@ -1525,7 +1525,7 @@ void TerrainEditor::renderSelection( const Selection & sel, const ColorF & inCol
          GFX->drawPrimitive( GFXLineStrip , i*5, 4);
 }
 
-void TerrainEditor::renderBrush( const Brush & brush, const ColorF & inColorFull, const ColorF & inColorNone, const ColorF & outColorFull, const ColorF & outColorNone, bool renderFill, bool renderFrame )
+void TerrainEditor::renderBrush( const Brush & brush, const LinearColorF & inColorFull, const LinearColorF & inColorNone, const LinearColorF & outColorFull, const LinearColorF & outColorNone, bool renderFill, bool renderFrame )
 {  
 }
 

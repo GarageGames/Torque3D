@@ -44,8 +44,8 @@ public:
    String                     diffuseMap;
    String                     normalMap;
    String                     specularMap;
-   ColorF                     diffuseColor;
-   ColorF                     specularColor;
+   LinearColorF                     diffuseColor;
+   LinearColorF                     specularColor;
    F32                        specularPower;
    bool                       doubleSided;
 
@@ -56,7 +56,7 @@ public:
    String getName() const { return name; }
 
    void resolveFloat(const domCommon_float_or_param_type* value, F32* dst);
-   void resolveColor(const domCommon_color_or_texture_type* value, ColorF* dst);
+   void resolveColor(const domCommon_color_or_texture_type* value, LinearColorF* dst);
 
    // Determine the material transparency
    template<class T> void resolveTransparency(const T shader, F32* dst)
@@ -66,7 +66,7 @@ public:
       resolveFloat(shader->getTransparency(), dst);
 
       // Multiply the transparency by the transparent color
-      ColorF transColor(1.0f, 1.0f, 1.0f, 1.0f);
+      LinearColorF transColor(1.0f, 1.0f, 1.0f, 1.0f);
       if (shader->getTransparent() && shader->getTransparent()->getColor()) {
          const domCommon_color_or_texture_type::domColor* color = shader->getTransparent()->getColor();
          transColor.set(color->getValue()[0], color->getValue()[1], color->getValue()[2], color->getValue()[3]);

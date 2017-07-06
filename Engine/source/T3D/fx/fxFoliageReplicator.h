@@ -126,7 +126,7 @@ public:
 public:
    bool IsQuadrantVisible(const Box3F VisBox, const MatrixF& RenderTransform);
    void SetupClipPlanes(SceneRenderState* state, const F32 FarClipPlane);
-   void DrawQuadBox(const Box3F& QuadBox, const ColorF Colour);
+   void DrawQuadBox(const Box3F& QuadBox, const LinearColorF Colour);
 };
 
 
@@ -317,7 +317,7 @@ public:
       bool            mHideFoliage;
       bool            mShowPlacementArea;
       U32             mPlacementBandHeight;
-      ColorF          mPlaceAreaColour;
+      LinearColorF          mPlaceAreaColour;
 
       tagFieldData()
       {

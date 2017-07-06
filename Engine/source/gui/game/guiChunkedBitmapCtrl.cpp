@@ -137,7 +137,7 @@ void GuiChunkedBitmapCtrl::renderRegion(const Point2I &offset, const Point2I &ex
 
    F32 widthScale = F32(extent.x) / F32(mTexHandle.getWidth());
    F32 heightScale = F32(extent.y) / F32(mTexHandle.getHeight());
-   GFX->setBitmapModulation(ColorF(1,1,1));
+   GFX->setBitmapModulation(LinearColorF(1,1,1));
    for(U32 i = 0; i < widthCount; i++)
    {
       for(U32 j = 0; j < heightCount; j++)

@@ -47,6 +47,10 @@ protected:
    /// Sets the cubemap file path.
    void _setPath( const String &path ) { mPath = path; }
 
+   /// Get Z up face index of the cubemap. DDS files will be stored Y up
+   U32 _zUpFaceIndex(const U32 index);
+
+   U32 mMipMapLevels;
 public:
 
    /// Create a static cubemap from a list of 6 face textures.
@@ -74,6 +78,9 @@ public:
    // GFXResource interface
    /// The resource should put a description of itself (number of vertices, size/width of texture, etc.) in buffer
    virtual const String describeSelf() const;
+
+   /// Get the number of mip maps
+   const U32 getMipMapLevels() const { return mMipMapLevels; }
 };
 
 

@@ -145,7 +145,7 @@ bool GFXTexHandle::set( U32 width, U32 height, U32 depth, void *pixels, GFXForma
    free();
 
    // Create and set the new texture.
-   StrongObjectRef::set( TEXMGR->createTexture( width, height, depth, pixels, format, profile ) );
+   StrongObjectRef::set( TEXMGR->createTexture( width, height, depth, pixels, format, profile,numMipLevels ) );
 
    #ifdef TORQUE_DEBUG
       if ( getPointer() )

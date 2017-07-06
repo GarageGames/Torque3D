@@ -167,7 +167,7 @@ void PointLight::_renderViz( SceneRenderState *state )
    desc.setBlend( true );
 
    // Base the sphere color on the light color.
-   ColorI color( mColor );
+   ColorI color = mColor.toColorI();
    color.alpha = 16;
 
    draw->drawSphere( desc, mRadius, getPosition(), color );

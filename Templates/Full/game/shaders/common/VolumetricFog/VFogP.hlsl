@@ -56,7 +56,7 @@ float4 main( ConnectData IN ) : TORQUE_TARGET0
 	float2 uvscreen=((IN.htpos.xy/IN.htpos.w) + 1.0 ) / 2.0;
 	uvscreen.y = 1.0 - uvscreen.y;
 	
-   float obj_test = TORQUE_PREPASS_UNCONDITION(deferredTex, uvscreen).w * preBias;
+   float obj_test = TORQUE_DEFERRED_UNCONDITION(deferredTex, uvscreen).w * preBias;
    float depth = TORQUE_TEX2D(depthBuffer, uvscreen).r;
    float front = TORQUE_TEX2D(frontBuffer, uvscreen).r;
 

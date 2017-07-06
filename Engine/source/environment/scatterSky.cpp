@@ -122,10 +122,10 @@ ScatterSky::ScatterSky()
    mAmbientScale.set( 1.0f, 1.0f, 1.0f, 1.0f );
 
    mSunColor.set( 0, 0, 0, 1.0f );
-   mSunScale = ColorF::WHITE;
+   mSunScale = LinearColorF::WHITE;
 
    mFogColor.set( 0, 0, 0, 1.0f );
-   mFogScale = ColorF::WHITE;
+   mFogScale = LinearColorF::WHITE;
 
    mExposure = 1.0f;
    mNightInterpolant = 0;
@@ -548,7 +548,7 @@ void ScatterSky::unpackUpdate(NetConnection *con, BitStream *stream)
 
       stream->read( &mScale );
 
-      ColorF tmpColor( 0, 0, 0 );
+      LinearColorF tmpColor( 0, 0, 0 );
 
       stream->read( &tmpColor );
 
@@ -1093,7 +1093,7 @@ void ScatterSky::_renderMoon( ObjectRenderInst *ri, SceneRenderState *state, Bas
    }
 
    // Vertex color.
-   ColorF moonVertColor( 1.0f, 1.0f, 1.0f, mNightInterpolant );
+   LinearColorF moonVertColor( 1.0f, 1.0f, 1.0f, mNightInterpolant );
 
    // Copy points to buffer.
 
@@ -1104,7 +1104,7 @@ void ScatterSky::_renderMoon( ObjectRenderInst *ri, SceneRenderState *state, Bas
 
    for ( S32 i = 0; i < 4; i++ )
    {
-      pVert->color.set( moonVertColor );
+      pVert->color.set( moonVertColor.toColorI());
       pVert->point.set( points[i] );
       pVert->texCoord.set( sCoords[i].x, sCoords[i].y );
       pVert++;
@@ -1182,8 +1182,8 @@ void ScatterSky::_interpolateColors()
 
    mMieScattering = (mCurves[1].getVal( mTimeOfDay) * mSunSize ); //Scale the size of the sun's disk
 
-   ColorF moonTemp = mMoonTint;
-   ColorF nightTemp = mNightColor;
+   LinearColorF moonTemp = mMoonTint;
+   LinearColorF nightTemp = mNightColor;
 
    moonTemp.interpolate( mNightColor, mMoonTint, mCurves[4].getVal( mTimeOfDay ) );
    nightTemp.interpolate( mMoonTint, mNightColor, mCurves[4].getVal( mTimeOfDay ) );
@@ -1195,12 +1195,12 @@ void ScatterSky::_interpolateColors()
    mSunColor.interpolate( mSunColor, mMoonTint, mCurves[3].getVal( mTimeOfDay ) );//mNightInterpolant );
 }
 
-void ScatterSky::_getSunColor( ColorF *outColor )
+void ScatterSky::_getSunColor( LinearColorF *outColor )
 {
    PROFILE_SCOPE( ScatterSky_GetSunColor );
 
    U32 count = 0;
-   ColorF tmpColor( 0, 0, 0 );
+   LinearColorF tmpColor( 0, 0, 0 );
    VectorF tmpVec( 0, 0, 0 );
 
    tmpVec = mLightDir;
@@ -1221,11 +1221,11 @@ void ScatterSky::_getSunColor( ColorF *outColor )
       (*outColor) /= count;
 }
 
-void ScatterSky::_getAmbientColor( ColorF *outColor )
+void ScatterSky::_getAmbientColor( LinearColorF *outColor )
 {
    PROFILE_SCOPE( ScatterSky_GetAmbientColor );
 
-   ColorF tmpColor( 0, 0, 0, 0 );
+   LinearColorF tmpColor( 0, 0, 0, 0 );
    U32 count = 0;
 
    // Disable mieScattering for purposes of calculating the ambient color.
@@ -1246,7 +1246,7 @@ void ScatterSky::_getAmbientColor( ColorF *outColor )
    mMieScattering = oldMieScattering;
 }
 
-void ScatterSky::_getFogColor( ColorF *outColor )
+void ScatterSky::_getFogColor( LinearColorF *outColor )
 {
    PROFILE_SCOPE( ScatterSky_GetFogColor );
 
@@ -1261,7 +1261,7 @@ void ScatterSky::_getFogColor( ColorF *outColor )
    originalYaw = yaw;
    pitch = mDegToRad( 10.0f );
 
-   ColorF tmpColor( 0, 0, 0 );
+   LinearColorF tmpColor( 0, 0, 0 );
 
    U32 i = 0;
    for ( i = 0; i < 10; i++ )
@@ -1309,7 +1309,7 @@ F32 ScatterSky::_getRayleighPhase( F32 fCos2 )
    return 0.75 + 0.75 * fCos2;
 }
 
-void ScatterSky::_getColor( const Point3F &pos, ColorF *outColor )
+void ScatterSky::_getColor( const Point3F &pos, LinearColorF *outColor )
 {
    PROFILE_SCOPE( ScatterSky_GetColor );
 
@@ -1379,7 +1379,7 @@ void ScatterSky::_getColor( const Point3F &pos, ColorF *outColor )
    F32 miePhase = _getMiePhase( fCos, fCos2, g, g2 );
 
    Point3F color = rayleighColor + (miePhase * mieColor);
-   ColorF tmp( color.x, color.y, color.z, color.y );
+   LinearColorF tmp( color.x, color.y, color.z, color.y );
 
    Point3F expColor( 0, 0, 0 );
    expColor.x = 1.0f - exp(-mExposure * color.x);
@@ -1388,7 +1388,7 @@ void ScatterSky::_getColor( const Point3F &pos, ColorF *outColor )
 
    tmp.set( expColor.x, expColor.y, expColor.z, 1.0f );
 
-   if ( !tmp.isValidColor() )
+   if ( !tmp.isClamped() )
    {
       F32 len = expColor.len();
       if ( len > 0 )

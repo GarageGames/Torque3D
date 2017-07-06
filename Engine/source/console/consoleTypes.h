@@ -122,7 +122,7 @@ DefineConsoleType( TypeParticleParameterString, const char * )
 
 DefineConsoleType( TypeFlag, S32 )
 DefineConsoleType( TypeColorI, ColorI )
-DefineConsoleType( TypeColorF, ColorF )
+DefineConsoleType( TypeColorF, LinearColorF )
 DefineConsoleType( TypeSimObjectName, SimObject* )
 DefineConsoleType( TypeShader, GFXShader * )
 

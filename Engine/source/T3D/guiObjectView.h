@@ -145,10 +145,10 @@ class GuiObjectView : public GuiTSCtrl
       LightInfo* mLight;
       
       ///
-      ColorF mLightColor;
+      LinearColorF mLightColor;
       
       ///
-      ColorF mLightAmbient;
+      LinearColorF mLightAmbient;
       
       ///
       Point3F mLightDirection;
@@ -255,10 +255,10 @@ class GuiObjectView : public GuiTSCtrl
       /// @{
       
       ///
-      void setLightColor( const ColorF& color );
+      void setLightColor( const LinearColorF& color );
       
       ///
-      void setLightAmbient( const ColorF& color );
+      void setLightAmbient( const LinearColorF& color );
       
       ///
       void setLightDirection( const Point3F& direction );

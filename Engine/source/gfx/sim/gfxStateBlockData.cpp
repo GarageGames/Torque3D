@@ -353,6 +353,9 @@ void GFXSamplerStateData::initPersistFields()
 
    addField("resultArg", TypeGFXTextureArgument, Offset(mState.resultArg, GFXSamplerStateData),
       "The selection of the destination register for the result of this stage.  The default is GFXTACurrent." );
+
+   addField("samplerFunc", TypeGFXCmpFunc, Offset(mState.samplerFunc, GFXSamplerStateData),
+      "Compares sampled data against existing sampled data.  The default is GFXCmpNever.");
 }
 
 /// Copies the data of this object into desc

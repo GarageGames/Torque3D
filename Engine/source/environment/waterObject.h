@@ -212,7 +212,7 @@ protected:
    F32 mFresnelBias;
    F32 mFresnelPower;
    F32 mSpecularPower;
-   ColorF mSpecularColor;
+   LinearColorF mSpecularColor;
    bool mEmissive;
 
    // Reflection

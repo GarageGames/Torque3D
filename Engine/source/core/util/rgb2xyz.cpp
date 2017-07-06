@@ -46,20 +46,20 @@ static const F32 scXYZ2RGB[] =
    0.0f,     0.0f,      0.0f,     1.0f,
 };
 
-ColorF toXYZ( const ColorF &rgbColor )
+LinearColorF toXYZ( const LinearColorF &rgbColor )
 {
    const MatrixF &rgb2xyz = *((MatrixF *)scRGB2XYZ);
 
-   ColorF retColor = rgbColor;
+   LinearColorF retColor = rgbColor;
    rgb2xyz.mul( *(Point4F *)&retColor );
    return retColor;
 }
 
-ColorF fromXYZ( const ColorF &xyzColor )
+LinearColorF fromXYZ( const LinearColorF &xyzColor )
 {
    const MatrixF &xyz2rgb = *((MatrixF *)scXYZ2RGB);
 
-   ColorF retColor = xyzColor;
+   LinearColorF retColor = xyzColor;
    xyz2rgb.mul( *(Point4F *)&retColor );
    return retColor;
 }

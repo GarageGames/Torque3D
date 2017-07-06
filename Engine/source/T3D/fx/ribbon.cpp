@@ -562,16 +562,16 @@ void Ribbon::createBuffers(SceneRenderState *state, GFXVertexBufferHandle<GFXVer
       Point3F leftvert = mSegmentPoints[i];
       Point3F rightvert = mSegmentPoints[i];
       F32 tRadius = mDataBlock->mSizes[0];
-      ColorF tColor = mDataBlock->mColours[0];
+      LinearColorF tColor = mDataBlock->mColours[0];
 
       for (U8 j = 0; j < RibbonData::NumFields-1; j++) {
 
          F32 curPosition = mDataBlock->mTimes[j];
          F32 curRadius = mDataBlock->mSizes[j];
-         ColorF curColor = mDataBlock->mColours[j];
+         LinearColorF curColor = mDataBlock->mColours[j];
          F32 nextPosition = mDataBlock->mTimes[j+1];
          F32 nextRadius = mDataBlock->mSizes[j+1];
-         ColorF nextColor = mDataBlock->mColours[j+1];
+         LinearColorF nextColor = mDataBlock->mColours[j+1];
 
          if (  curPosition < 0
             || curPosition > interpol )
@@ -603,7 +603,7 @@ void Ribbon::createBuffers(SceneRenderState *state, GFXVertexBufferHandle<GFXVer
       perpendicular += mSegmentPoints[i];
 
       verts[count].point.set(perpendicular);
-      ColorF color = tColor;
+      LinearColorF color = tColor;
 
       if (mDataBlock->mUseFadeOut)
          color.alpha *= mFadeOut;
@@ -623,7 +623,7 @@ void Ribbon::createBuffers(SceneRenderState *state, GFXVertexBufferHandle<GFXVer
       else
          texCoords = (1.0f - interpol)*mDataBlock->mTileScale;
 
-      verts[count].color = color;
+      verts[count].color = color.toColorI();
       verts[count].texCoord[1] = Point2F(interpol, 0);
       verts[count].texCoord[0] = Point2F(0.0f, texCoords);
       verts[count].normal.set(diff);
@@ -651,7 +651,7 @@ void Ribbon::createBuffers(SceneRenderState *state, GFXVertexBufferHandle<GFXVer
       if (mDataBlock->mUseFadeOut)
          color.alpha *= mFadeOut;
 
-      verts[count].color = color;
+      verts[count].color = color.toColorI();
       verts[count].texCoord[1] = Point2F(interpol, 1);
       verts[count].texCoord[0] = Point2F(1.0f, texCoords);
       verts[count].normal.set(diff);

@@ -54,7 +54,7 @@ struct SplashRingPoint
 struct SplashRing
 {
    Vector <SplashRingPoint> points;
-   ColorF   color;
+   LinearColorF   color;
    F32      lifetime;
    F32      elapsedTime;
    F32      v;
@@ -114,7 +114,7 @@ public:
    F32               startRadius;
 
    F32               times[ NUM_TIME_KEYS ];
-   ColorF            colors[ NUM_TIME_KEYS ];
+   LinearColorF            colors[ NUM_TIME_KEYS ];
 
    StringTableEntry  textureName[NUM_TEX];
    GFXTexHandle      textureHandle[NUM_TEX];
@@ -152,7 +152,7 @@ private:
    F32         mRadius;
    F32         mVelocity;
    F32         mHeight;
-   ColorF      mColor;
+   LinearColorF      mColor;
    F32         mTimeSinceLastRing;
    bool        mDead;
    F32         mElapsedTime;

@@ -41,8 +41,8 @@ class GuiEaseViewCtrl : public GuiControl
    protected:
 
       EaseF mEase;         // ease we are visualizing
-      ColorF mAxisColor;   // color to draw axis in
-      ColorF mEaseColor;   // color to draw ease in
+      LinearColorF mAxisColor;   // color to draw axis in
+      LinearColorF mEaseColor;   // color to draw ease in
       F32 mEaseWidth;      // width of lines
    
    public:

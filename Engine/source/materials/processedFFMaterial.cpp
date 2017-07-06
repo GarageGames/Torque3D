@@ -248,7 +248,7 @@ void ProcessedFFMaterial::setSceneInfo(SceneRenderState * state, const SceneData
 void ProcessedFFMaterial::_setPrimaryLightInfo(const MatrixF &_objTrans, LightInfo* light, U32 pass)
 {
    // Just in case
-   GFX->setGlobalAmbientColor(ColorF(0.0f, 0.0f, 0.0f, 1.0f));
+   GFX->setGlobalAmbientColor(LinearColorF(0.0f, 0.0f, 0.0f, 1.0f));
    if ( light->getType() == LightInfo::Ambient )
    {
       // Ambient light
@@ -260,10 +260,10 @@ void ProcessedFFMaterial::_setPrimaryLightInfo(const MatrixF &_objTrans, LightIn
    GFX->setLight(1, NULL);
    // This is a quick hack that lets us use FF lights
    GFXLightMaterial lightMat;
-   lightMat.ambient = ColorF(1.0f, 1.0f, 1.0f, 1.0f);
-   lightMat.diffuse = ColorF(1.0f, 1.0f, 1.0f, 1.0f);
-   lightMat.emissive = ColorF(0.0f, 0.0f, 0.0f, 0.0f);
-   lightMat.specular = ColorF(0.0f, 0.0f, 0.0f, 0.0f);
+   lightMat.ambient = LinearColorF(1.0f, 1.0f, 1.0f, 1.0f);
+   lightMat.diffuse = LinearColorF(1.0f, 1.0f, 1.0f, 1.0f);
+   lightMat.emissive = LinearColorF(0.0f, 0.0f, 0.0f, 0.0f);
+   lightMat.specular = LinearColorF(0.0f, 0.0f, 0.0f, 0.0f);
    lightMat.shininess = 128.0f;
    GFX->setLightMaterial(lightMat);   
 

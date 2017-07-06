@@ -662,7 +662,7 @@ bool GuiInspectorTypeImageFileName::renderTooltip( const Point2I &hoverPos, cons
    if ( !filename || !filename[0] )
       return false;
 
-   GFXTexHandle texture( filename, &GFXDefaultStaticDiffuseProfile, avar("%s() - tooltip texture (line %d)", __FUNCTION__, __LINE__) );
+   GFXTexHandle texture( filename, &GFXStaticTextureSRGBProfile, avar("%s() - tooltip texture (line %d)", __FUNCTION__, __LINE__) );
    if ( texture.isNull() )
       return false;
 
@@ -1058,7 +1058,7 @@ bool GuiInspectorTypeEaseF::updateRects()
 }
 
 //-----------------------------------------------------------------------------
-// GuiInspectorTypeColor (Base for ColorI/ColorF) 
+// GuiInspectorTypeColor (Base for ColorI/LinearColorF) 
 //-----------------------------------------------------------------------------
 GuiInspectorTypeColor::GuiInspectorTypeColor()
  : mBrowseButton( NULL )
@@ -1209,7 +1209,7 @@ void GuiInspectorTypeColorI::setValue( StringTableEntry newValue )
 IMPLEMENT_CONOBJECT(GuiInspectorTypeColorF);
 
 ConsoleDocClass( GuiInspectorTypeColorF,
-   "@brief Inspector field type for ColorF\n\n"
+   "@brief Inspector field type for LinearColorF\n\n"
    "Editor use only.\n\n"
    "@internal"
 );
@@ -1234,7 +1234,7 @@ void GuiInspectorTypeColorF::setValue( StringTableEntry newValue )
    // Now we also set our color swatch button to the new color value.
    if ( mBrowseButton )
    {      
-      ColorF color(1,0,1,1);
+      LinearColorF color(1,0,1,1);
       dSscanf( newValue, "%f %f %f %f", &color.red, &color.green, &color.blue, &color.alpha );
       mBrowseButton->setColor( color );
    }

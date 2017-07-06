@@ -39,6 +39,9 @@
 #define D3D11 static_cast<GFXD3D11Device*>(GFX)
 #define D3D11DEVICE D3D11->getDevice()
 #define D3D11DEVICECONTEXT D3D11->getDeviceContext()
+// DX 11.1 - always check these are not NULL, dodgy support with win 7
+#define D3D11DEVICE1 D3D11->getDevice1()
+#define D3D11DEVICECONTEXT1 D3D11->getDeviceContext1()
 
 class PlatformWindow;
 class GFXD3D11ShaderConstBuffer;
@@ -126,6 +129,9 @@ protected:
    IDXGISwapChain *mSwapChain;
    ID3D11Device* mD3DDevice;
    ID3D11DeviceContext* mD3DDeviceContext;
+   // DX 11.1
+   ID3D11Device1* mD3DDevice1;
+   ID3D11DeviceContext1* mD3DDeviceContext1;
    ID3DUserDefinedAnnotation* mUserAnnotation;
 
    GFXShader* mCurrentShader;
@@ -143,12 +149,12 @@ protected:
    String mPixelShaderTarget;
    // String for use with shader macros in the form of shader model version * 10
    String mShaderModel;
-
    bool mDebugLayers;
 
    DXGI_SAMPLE_DESC mMultisampleDesc;
 
    bool mOcclusionQuerySupported;
+   bool mCbufferPartialSupported;
 
    U32 mDrawInstancesCount;   
 
@@ -181,7 +187,7 @@ protected:
    virtual void setMatrix( GFXMatrixType /*mtype*/, const MatrixF &/*mat*/ ) { };
    virtual void setLightInternal(U32 /*lightStage*/, const GFXLightInfo /*light*/, bool /*lightEnable*/) { };
    virtual void setLightMaterialInternal(const GFXLightMaterial /*mat*/) { };
-   virtual void setGlobalAmbientInternal(ColorF /*color*/) { };
+   virtual void setGlobalAmbientInternal(LinearColorF /*color*/) { };
 
    // }
 
@@ -243,7 +249,7 @@ public:
 
    // Misc rendering control
    // {
-   virtual void clear( U32 flags, ColorI color, F32 z, U32 stencil );
+   virtual void clear( U32 flags, const LinearColorF& color, F32 z, U32 stencil );
    virtual bool beginSceneInternal();
    virtual void endSceneInternal();
 
@@ -291,10 +297,13 @@ public:
 
    ID3D11DeviceContext* getDeviceContext(){ return mD3DDeviceContext; }
    ID3D11Device* getDevice(){ return mD3DDevice; }
+   IDXGISwapChain* getSwapChain() { return mSwapChain; }
+   //DX 11.1
+   ID3D11DeviceContext1* getDeviceContext1() { return mD3DDeviceContext1; }
+   ID3D11Device1* getDevice1() { return mD3DDevice1; }
 
    /// Reset
-   void beginReset();
-   void endReset(GFXD3D11WindowTarget *windowTarget);
+   void reset( DXGI_SWAP_CHAIN_DESC &d3dpp );
 
    virtual void setupGenericShaders( GenericShaderType type  = GSColor );
 

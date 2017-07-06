@@ -32,7 +32,7 @@
 
 
 LightDescription::LightDescription()
- : color( ColorF::WHITE ),
+ : color( LinearColorF::WHITE ),
    brightness( 1.0f ),
    range( 5.0f ),
    castShadows( false ),

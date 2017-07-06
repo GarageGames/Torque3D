@@ -626,7 +626,7 @@ DefineEngineMethod( GuiListBoxCtrl, addItem, S32, (const char* newItem, const ch
          green = dAtof(GuiListBoxCtrl::getStringElement( color, 1 ));
          blue = dAtof(GuiListBoxCtrl::getStringElement( color, 2 ));
 
-         return object->addItemWithColor( newItem, ColorF(red, green, blue) );
+         return object->addItemWithColor( newItem, LinearColorF(red, green, blue) );
      }
      else if(elementCount == 1)
      {
@@ -654,13 +654,13 @@ S32 GuiListBoxCtrl::addItem( StringTableEntry text, void *itemData )
    return insertItem( mItems.size(), text, itemData );
 }
 
-S32 GuiListBoxCtrl::addItemWithColor( StringTableEntry text, ColorF color, void *itemData )
+S32 GuiListBoxCtrl::addItemWithColor( StringTableEntry text, LinearColorF color, void *itemData )
 {
    // This just calls insert item at the end of the list
    return insertItemWithColor( mItems.size(), text, color, itemData );
 }
 
-DefineEngineMethod( GuiListBoxCtrl, setItemColor, void, (S32 index, ColorF color),,
+DefineEngineMethod( GuiListBoxCtrl, setItemColor, void, (S32 index, LinearColorF color),,
    "@brief Sets the color of a single list entry at the specified index id.\n\n"
    "@param index Index id to modify the color of in the list.\n"
    "@param color Color value to set the list entry to.\n"
@@ -677,7 +677,7 @@ DefineEngineMethod( GuiListBoxCtrl, setItemColor, void, (S32 index, ColorF color
    object->setItemColor( index, color );
 }
 
-void GuiListBoxCtrl::setItemColor(S32 index, const ColorF& color)
+void GuiListBoxCtrl::setItemColor(S32 index, const LinearColorF& color)
 {
    if ((index >= mItems.size()) || index < 0)
    {
@@ -767,7 +767,7 @@ S32 GuiListBoxCtrl::insertItem( S32 index, StringTableEntry text, void *itemData
 
 }
 
-S32 GuiListBoxCtrl::insertItemWithColor( S32 index, StringTableEntry text, ColorF color, void *itemData )
+S32 GuiListBoxCtrl::insertItemWithColor( S32 index, StringTableEntry text, LinearColorF color, void *itemData )
 {
    // If the index is greater than our list size, insert it at the end
    if( index >= mItems.size() )
@@ -780,7 +780,7 @@ S32 GuiListBoxCtrl::insertItemWithColor( S32 index, StringTableEntry text, Color
       return -1;
    }
 
-   if( color == ColorF(-1, -1, -1) )
+   if( color == LinearColorF(-1, -1, -1) )
    {
       Con::warnf("GuiListBoxCtrl::insertItem - cannot add NULL color" );
       return -1;
@@ -1065,7 +1065,7 @@ void GuiListBoxCtrl::onRender( Point2I offset, const RectI &updateRect )
       {
          // Set the size of the color box to be drawn next to the item text
          colorBoxSize = 3;
-         boxColor = ColorI(mItems[i]->color);
+         boxColor = ColorI(mItems[i]->color.toColorI());
          // Draw the box first
          ColorI black = ColorI(0, 0, 0);
          drawBox(  Point2I(offset.x + mProfile->mTextOffset.x + colorBoxSize, offset.y + ( i * mItemSize.y ) + 8), colorBoxSize, black, boxColor );
@@ -1085,7 +1085,7 @@ void GuiListBoxCtrl::onRenderItem(const RectI& itemRect, LBItem *item)
    if( item->isSelected )
       GFX->getDrawUtil()->drawRectFill( itemRect, mProfile->mFillColorSEL );
 
-   GFX->getDrawUtil()->setBitmapModulation( item->hasColor ? (ColorI)item->color : mProfile->mFontColor);
+   GFX->getDrawUtil()->setBitmapModulation( item->hasColor ? item->color.toColorI() : mProfile->mFontColor);
    renderJustifiedText(itemRect.point + Point2I( 2, 0 ), itemRect.extent, item->itemText);
 }
 

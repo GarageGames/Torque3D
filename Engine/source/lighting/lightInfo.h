@@ -115,11 +115,11 @@ protected:
    Type mType;
 
    /// The primary light color.
-   ColorF mColor;
+   LinearColorF mColor;
 
    F32 mBrightness;
 
-   ColorF mAmbient;
+   LinearColorF mAmbient;
 
    MatrixF mTransform;
 
@@ -172,14 +172,14 @@ public:
    VectorF getDirection() const { return mTransform.getForwardVector(); }
    void setDirection( const VectorF &val );
 
-   const ColorF& getColor() const { return mColor; }
-   void setColor( const ColorF &val ) { mColor = val; }
+   const LinearColorF& getColor() const { return mColor; }
+   void setColor( const LinearColorF &val ) { mColor = val; }
 
    F32 getBrightness() const { return mBrightness; }
    void setBrightness( F32 val ) { mBrightness = val; }
 
-   const ColorF& getAmbient() const { return mAmbient; }
-   void setAmbient( const ColorF &val ) { mAmbient = val; }
+   const LinearColorF& getAmbient() const { return mAmbient; }
+   void setAmbient( const LinearColorF &val ) { mAmbient = val; }
 
    const Point3F& getRange() const { return mRange; }
    void setRange( const Point3F &range ) { mRange = range; }

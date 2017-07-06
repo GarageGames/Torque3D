@@ -113,7 +113,7 @@ protected:
       U32         type;
       F32         windAmplitude;
       Box3F       worldBox;
-      ColorF      lmColor;
+      LinearColorF      lmColor;
    };
 
    /// This is the x,y index for this cell.
@@ -239,7 +239,7 @@ void GroundCoverCell::_rebuildVB()
          const S32 &type = (*iter).type;
          const Point3F &size = (*iter).size;
          const F32 &windAmplitude = (*iter).windAmplitude;
-         GFXVertexColor color = (ColorI)(*iter).lmColor;
+         color = LinearColorF((*iter).lmColor).toColorI();
          U8 *col = (U8 *)const_cast<U32 *>( (const U32 *)color );
 
          vertPtr->point = position;
@@ -944,7 +944,7 @@ void GroundCover::_initialize( U32 cellCount, U32 cellPlacementCount )
       Material* mat = dynamic_cast<Material*>(mMatInst->getMaterial());
       if(mat)
       {
-         GFXTexHandle tex(mat->mDiffuseMapFilename[0], &GFXDefaultStaticDiffuseProfile, "GroundCover texture aspect ratio check" );
+         GFXTexHandle tex(mat->mDiffuseMapFilename[0], &GFXStaticTextureSRGBProfile, "GroundCover texture aspect ratio check" );
          if(tex.isValid())
          {
             U32 w = tex.getWidth();

@@ -130,7 +130,7 @@ void GuiToolboxButtonCtrl::setNormalBitmap( StringTableEntry bitmapName )
       return;
 
    if ( *mNormalBitmapName )
-      mTextureNormal = GFXTexHandle( mNormalBitmapName, &GFXDefaultPersistentProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__) );
+      mTextureNormal = GFXTexHandle( mNormalBitmapName, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__) );
    else
       mTextureNormal = NULL;
    
@@ -145,7 +145,7 @@ void GuiToolboxButtonCtrl::setLoweredBitmap( StringTableEntry bitmapName )
       return;
 
    if ( *mLoweredBitmapName )
-      mTextureLowered = GFXTexHandle( mLoweredBitmapName, &GFXDefaultPersistentProfile, avar("%s() - mTextureLowered (line %d)", __FUNCTION__, __LINE__) );
+      mTextureLowered = GFXTexHandle( mLoweredBitmapName, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureLowered (line %d)", __FUNCTION__, __LINE__) );
    else
       mTextureLowered = NULL;
    
@@ -160,7 +160,7 @@ void GuiToolboxButtonCtrl::setHoverBitmap( StringTableEntry bitmapName )
       return;
 
    if ( *mHoverBitmapName )
-      mTextureHover = GFXTexHandle( mHoverBitmapName, &GFXDefaultPersistentProfile, avar("%s() - mTextureHover (line %d)", __FUNCTION__, __LINE__) );
+      mTextureHover = GFXTexHandle( mHoverBitmapName, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureHover (line %d)", __FUNCTION__, __LINE__) );
    else
       mTextureHover = NULL;
 

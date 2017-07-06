@@ -90,12 +90,12 @@ GuiGraphCtrl::GuiGraphCtrl()
 
    AssertWarn( MaxPlots == 6, "Only 6 plot colors initialized.  Update following code if you change MaxPlots." );
 
-   mGraphColor[ 0 ] = ColorF( 1.0, 1.0, 1.0 );
-   mGraphColor[ 1 ] = ColorF( 1.0, 0.0, 0.0 );
-   mGraphColor[ 2 ] = ColorF( 0.0, 1.0, 0.0 );
-   mGraphColor[ 3 ] = ColorF( 0.0, 0.0, 1.0 );
-   mGraphColor[ 4 ] = ColorF( 0.0, 1.0, 1.0 );
-   mGraphColor[ 5 ] = ColorF( 0.0, 0.0, 0.0 );
+   mGraphColor[ 0 ] = LinearColorF( 1.0, 1.0, 1.0 );
+   mGraphColor[ 1 ] = LinearColorF( 1.0, 0.0, 0.0 );
+   mGraphColor[ 2 ] = LinearColorF( 0.0, 1.0, 0.0 );
+   mGraphColor[ 3 ] = LinearColorF( 0.0, 0.0, 1.0 );
+   mGraphColor[ 4 ] = LinearColorF( 0.0, 1.0, 1.0 );
+   mGraphColor[ 5 ] = LinearColorF( 0.0, 0.0, 0.0 );
 }
 
 //-----------------------------------------------------------------------------

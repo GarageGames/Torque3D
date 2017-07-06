@@ -58,7 +58,7 @@ ConsoleDocClass( GuiSwatchButtonCtrl,
 //-----------------------------------------------------------------------------
 
 GuiSwatchButtonCtrl::GuiSwatchButtonCtrl()
-   : mSwatchColor(1, 1, 1, 1), mUseSRGB(false)
+   : mSwatchColor(1, 1, 1, 1)
 {
    mButtonText = StringTable->insert( "" );   
    setExtent(140, 30);
@@ -72,8 +72,6 @@ GuiSwatchButtonCtrl::GuiSwatchButtonCtrl()
 void GuiSwatchButtonCtrl::initPersistFields()
 {
    addField("color", TypeColorF, Offset(mSwatchColor, GuiSwatchButtonCtrl), "The foreground color of GuiSwatchButtonCtrl");
-   addField( "useSRGB", TypeBool, Offset( mUseSRGB, GuiSwatchButtonCtrl ), "Render using sRGB scale" );
-
    addField( "gridBitmap", TypeString, Offset( mGridBitmap, GuiSwatchButtonCtrl ), "The bitmap used for the transparent grid" );
    
    Parent::initPersistFields();
@@ -108,10 +106,7 @@ void GuiSwatchButtonCtrl::onRender( Point2I offset, const RectI &updateRect )
       drawer->drawBitmapStretch( mGrid, renderRect );
 
    // Draw swatch color as fill...
-   if (!mUseSRGB)
-      drawer->drawRectFill( renderRect, mSwatchColor.toGamma() );
-   else
-      drawer->drawRectFill(renderRect, mSwatchColor);
+   drawer->drawRectFill(renderRect, mSwatchColor.toColorI());
 
    // Draw any borders...
    drawer->drawRect( renderRect, borderColor );
