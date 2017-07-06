@@ -764,9 +764,8 @@ bool GFXD3D11Shader::_init()
       d3dMacros[i+smGlobalMacros.size()].Definition = mMacros[i].value.c_str();
    }
 
-   //TODO support D3D_FEATURE_LEVEL properly with shaders instead of hard coding at hlsl 5
    d3dMacros[macroCount - 2].Name = "TORQUE_SM";
-   d3dMacros[macroCount - 2].Definition = "50";
+   d3dMacros[macroCount - 2].Definition = D3D11->getShaderModel().c_str();
 
    memset(&d3dMacros[macroCount - 1], 0, sizeof(D3D_SHADER_MACRO));
 
@@ -784,18 +783,21 @@ bool GFXD3D11Shader::_init()
    mSamplerDescriptions.clear();
    mShaderConsts.clear();
 
+   String vertTarget = D3D11->getVertexShaderTarget();
+   String pixTarget = D3D11->getPixelShaderTarget();
+
    if ( !Con::getBoolVariable( "$shaders::forceLoadCSF", false ) )
    {
-      if (!mVertexFile.isEmpty() && !_compileShader( mVertexFile, "vs_5_0", d3dMacros, mVertexConstBufferLayout, mSamplerDescriptions ) )
+      if (!mVertexFile.isEmpty() && !_compileShader( mVertexFile, vertTarget, d3dMacros, mVertexConstBufferLayout, mSamplerDescriptions ) )
          return false;
 
-      if (!mPixelFile.isEmpty() && !_compileShader( mPixelFile, "ps_5_0", d3dMacros, mPixelConstBufferLayout, mSamplerDescriptions ) )
+      if (!mPixelFile.isEmpty() && !_compileShader( mPixelFile, pixTarget, d3dMacros, mPixelConstBufferLayout, mSamplerDescriptions ) )
          return false;
 
    } 
    else 
    {
-      if ( !_loadCompiledOutput( mVertexFile, "vs_5_0", mVertexConstBufferLayout, mSamplerDescriptions ) )
+      if ( !_loadCompiledOutput( mVertexFile, vertTarget, mVertexConstBufferLayout, mSamplerDescriptions ) )
       {
          if ( smLogErrors )
             Con::errorf( "GFXD3D11Shader::init - Unable to load precompiled vertex shader for '%s'.",  mVertexFile.getFullPath().c_str() );
@@ -803,7 +805,7 @@ bool GFXD3D11Shader::_init()
          return false;
       }
 
-      if ( !_loadCompiledOutput( mPixelFile, "ps_5_0", mPixelConstBufferLayout, mSamplerDescriptions ) )
+      if ( !_loadCompiledOutput( mPixelFile, pixTarget, mPixelConstBufferLayout, mSamplerDescriptions ) )
       {
          if ( smLogErrors )
             Con::errorf( "GFXD3D11Shader::init - Unable to load precompiled pixel shader for '%s'.",  mPixelFile.getFullPath().c_str() );

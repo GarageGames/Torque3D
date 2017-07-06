@@ -107,6 +107,10 @@ GFXD3D11Device::GFXD3D11Device(U32 index)
 
    mPixVersion = 0.0;
 
+   mVertexShaderTarget = String::EmptyString;
+   mPixelShaderTarget = String::EmptyString;
+   mShaderModel = String::EmptyString;
+
    mDrawInstancesCount = 0;
 
    mCardProfiler = NULL;
@@ -317,10 +321,47 @@ void GFXD3D11Device::enumerateAdapters(Vector<GFXAdapter*> &adapterList)
          toAdd->mAvailableModes.push_back(vmAdd);
       }
 
+      //Check adapater can handle feature level 10
+      D3D_FEATURE_LEVEL deviceFeature;
+      ID3D11Device *pTmpDevice = nullptr;
+      // Create temp Direct3D11 device.
+      bool suitable = true;
+      UINT createDeviceFlags = D3D11_CREATE_DEVICE_SINGLETHREADED | D3D11_CREATE_DEVICE_BGRA_SUPPORT;
+      hr = D3D11CreateDevice(EnumAdapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, createDeviceFlags, NULL, 0, D3D11_SDK_VERSION, &pTmpDevice, &deviceFeature, NULL);
+
+      if (FAILED(hr))
+         suitable = false;
+
+      if (deviceFeature < D3D_FEATURE_LEVEL_10_0)
+         suitable = false;
+
+      //double check we support required bgra format for LEVEL_10_0 & LEVEL_10_1
+      if (deviceFeature == D3D_FEATURE_LEVEL_10_0 || deviceFeature == D3D_FEATURE_LEVEL_10_1)
+      {
+         U32 formatSupported = 0;
+         pTmpDevice->CheckFormatSupport(DXGI_FORMAT_B8G8R8A8_UNORM, &formatSupported);
+         U32 flagsRequired = D3D11_FORMAT_SUPPORT_RENDER_TARGET | D3D11_FORMAT_SUPPORT_DISPLAY;
+         if (!(formatSupported && flagsRequired))
+         {
+            Con::printf("DXGI adapter: %s does not support BGRA", Description.c_str());
+            suitable = false;
+         }
+      }
+
       delete[] displayModes;
+      SAFE_RELEASE(pTmpDevice);
       SAFE_RELEASE(pOutput);
       SAFE_RELEASE(EnumAdapter);
-      adapterList.push_back(toAdd);
+
+      if (suitable)
+      {
+         adapterList.push_back(toAdd);
+      }
+      else
+      {
+         Con::printf("DXGI adapter: %s does not support D3D11 feature level 10 or better", Description.c_str());
+         delete toAdd;
+      }
    }
 
    SAFE_RELEASE(DXGIFactory);
@@ -406,9 +447,8 @@ void GFXD3D11Device::init(const GFXVideoMode &mode, PlatformWindow *window)
 
    DXGI_SWAP_CHAIN_DESC d3dpp = setupPresentParams(mode, winHwnd);
 
-   D3D_FEATURE_LEVEL deviceFeature;
    // TODO support at least feature level 10 to match GL
-   D3D_FEATURE_LEVEL pFeatureLevels[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0 };
+   D3D_FEATURE_LEVEL pFeatureLevels[] = { D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0 };
    U32 nFeatureCount = ARRAYSIZE(pFeatureLevels);
    D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE;// use D3D_DRIVER_TYPE_REFERENCE for reference device
    // create a device, device context and swap chain using the information in the d3dpp struct
@@ -422,7 +462,7 @@ void GFXD3D11Device::init(const GFXVideoMode &mode, PlatformWindow *window)
                                  &d3dpp,
                                  &mSwapChain,
                                  &mD3DDevice,
-                                 &deviceFeature,
+                                 &mFeatureLevel,
                                  &mD3DDeviceContext);
 
    if(FAILED(hres))
@@ -435,7 +475,7 @@ void GFXD3D11Device::init(const GFXVideoMode &mode, PlatformWindow *window)
          &d3dpp,
          &mSwapChain,
          &mD3DDevice,
-         &deviceFeature,
+         &mFeatureLevel,
          &mD3DDeviceContext);
       //if we failed again than we definitely have a problem
       if (FAILED(hres))
@@ -482,10 +522,31 @@ void GFXD3D11Device::init(const GFXVideoMode &mode, PlatformWindow *window)
 
    // Now reacquire all the resources we trashed earlier
    reacquireDefaultPoolResources();
-   if (deviceFeature >= D3D_FEATURE_LEVEL_11_0)
+   //set vert/pixel shader targets
+   switch (mFeatureLevel)
+   {
+   case D3D_FEATURE_LEVEL_11_1:
+   case D3D_FEATURE_LEVEL_11_0:
+      mVertexShaderTarget = "vs_5_0";
+      mPixelShaderTarget = "ps_5_0";
       mPixVersion = 5.0f;
-   else
-      AssertFatal(false, "GFXD3D11Device::init - We don't support anything below feature level 11.");
+      mShaderModel = "50";
+      break;
+   case D3D_FEATURE_LEVEL_10_1:
+      mVertexShaderTarget = "vs_4_1";
+      mPixelShaderTarget = "ps_4_1";
+      mPixVersion = 4.1f;
+      mShaderModel = "41";
+      break;
+   case D3D_FEATURE_LEVEL_10_0:
+      mVertexShaderTarget = "vs_4_0";
+      mPixelShaderTarget = "ps_4_0";
+      mPixVersion = 4.0f;
+      mShaderModel = "40";
+      break;
+   default:
+      AssertFatal(false, "GFXD3D11Device::init - We don't support this feature level");
+   }
 
    D3D11_QUERY_DESC queryDesc;
    queryDesc.Query = D3D11_QUERY_OCCLUSION;
@@ -774,11 +835,12 @@ void GFXD3D11Device::setupGenericShaders(GenericShaderType type)
    if(mGenericShader[GSColor] == NULL)
    {
       ShaderData *shaderData;
-
+      //shader model 4.0 is enough for the generic shaders
+      const char* shaderModel = "4.0";
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/colorV.hlsl"));
       shaderData->setField("DXPixelShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/colorP.hlsl"));
-      shaderData->setField("pixVersion", "5.0");
+      shaderData->setField("pixVersion", shaderModel);
       shaderData->registerObject();
       mGenericShader[GSColor] =  shaderData->getShader();
       mGenericShaderBuffer[GSColor] = mGenericShader[GSColor]->allocConstBuffer();
@@ -788,7 +850,7 @@ void GFXD3D11Device::setupGenericShaders(GenericShaderType type)
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/modColorTextureV.hlsl"));
       shaderData->setField("DXPixelShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/modColorTextureP.hlsl"));
-      shaderData->setField("pixVersion", "5.0");
+      shaderData->setField("pixVersion", shaderModel);
       shaderData->registerObject();
       mGenericShader[GSModColorTexture] = shaderData->getShader();
       mGenericShaderBuffer[GSModColorTexture] = mGenericShader[GSModColorTexture]->allocConstBuffer();
@@ -798,7 +860,7 @@ void GFXD3D11Device::setupGenericShaders(GenericShaderType type)
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/addColorTextureV.hlsl"));
       shaderData->setField("DXPixelShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/addColorTextureP.hlsl"));
-      shaderData->setField("pixVersion", "5.0");
+      shaderData->setField("pixVersion", shaderModel);
       shaderData->registerObject();
       mGenericShader[GSAddColorTexture] = shaderData->getShader();
       mGenericShaderBuffer[GSAddColorTexture] = mGenericShader[GSAddColorTexture]->allocConstBuffer();
@@ -808,7 +870,7 @@ void GFXD3D11Device::setupGenericShaders(GenericShaderType type)
       shaderData = new ShaderData();
       shaderData->setField("DXVertexShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/textureV.hlsl"));
       shaderData->setField("DXPixelShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/textureP.hlsl"));
-      shaderData->setField("pixVersion", "5.0");
+      shaderData->setField("pixVersion", shaderModel);
       shaderData->registerObject();
       mGenericShader[GSTexture] = shaderData->getShader();
       mGenericShaderBuffer[GSTexture] = mGenericShader[GSTexture]->allocConstBuffer();
