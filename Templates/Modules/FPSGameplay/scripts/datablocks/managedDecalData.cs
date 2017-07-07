@@ -39,8 +39,8 @@ datablock DecalData(ScorchRXDecal)
    texRows = "2";
    texCols = "2";
    clippingAngle = "80";
-   screenStartRadius = "200";
-   screenEndRadius = "100";
+   fadeStartPixelSize = "200";
+   fadeEndPixelSize = "100";
 };
 
 datablock DecalData(bulletHoleDecal)
@@ -51,7 +51,7 @@ datablock DecalData(bulletHoleDecal)
    randomize = "1";
    texRows = "2";
    texCols = "2";
-   screenStartRadius = "20";
-   screenEndRadius = "5";
+   fadeStartPixelSize = "20";
+   fadeEndPixelSize = "5";
    clippingAngle = "180";
 };
