@@ -155,7 +155,7 @@ float4 main( ConnectData IN ) : TORQUE_TARGET0
    
    float2 deferredCoord = viewportCoordToRenderTarget( IN.posPostWave, rtParams1 );
 
-   float startDepth = TORQUE_PREPASS_UNCONDITION( deferredTex, deferredCoord ).w;  
+   float startDepth = TORQUE_DEFERRED_UNCONDITION( deferredTex, deferredCoord ).w;  
    
    // The water depth in world units of the undistorted pixel.
    float startDelta = ( startDepth - pixelDepth );
@@ -180,7 +180,7 @@ float4 main( ConnectData IN ) : TORQUE_TARGET0
    deferredCoord = viewportCoordToRenderTarget( distortPos, rtParams1 );   
 
    // Get deferred depth at the position of this distorted pixel.
-   float deferredDepth = TORQUE_PREPASS_UNCONDITION( deferredTex, deferredCoord ).w;      
+   float deferredDepth = TORQUE_DEFERRED_UNCONDITION( deferredTex, deferredCoord ).w;      
    if ( deferredDepth > 0.99 )
      deferredDepth = 5.0;
     
@@ -212,7 +212,7 @@ float4 main( ConnectData IN ) : TORQUE_TARGET0
          deferredCoord = viewportCoordToRenderTarget( distortPos, rtParams1 );
 
          // Get deferred depth at the position of this distorted pixel.
-         deferredDepth = TORQUE_PREPASS_UNCONDITION( deferredTex, deferredCoord ).w;
+         deferredDepth = TORQUE_DEFERRED_UNCONDITION( deferredTex, deferredCoord ).w;
 	 if ( deferredDepth > 0.99 )
             deferredDepth = 5.0;
          delta = ( deferredDepth - pixelDepth ) * farPlaneDist;
@@ -311,7 +311,6 @@ float4 main( ConnectData IN ) : TORQUE_TARGET0
    
    // Calculate the water "base" color based on depth.
    float4 waterBaseColor = baseColor * TORQUE_TEX1D( depthGradMap, saturate( delta / depthGradMax ) );
-   waterBaseColor = toLinear(waterBaseColor);
       
    // Modulate baseColor by the ambientColor.
    waterBaseColor *= float4( ambientColor.rgb, 1 );     

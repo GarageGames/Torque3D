@@ -42,7 +42,7 @@ uniform sampler2D ssaoMask ;
 uniform vec4 rtParams3;
 #endif
 
-uniform sampler2D prePassBuffer;
+uniform sampler2D deferredBuffer;
 uniform sampler2D lightBuffer;
 uniform sampler2D colorBuffer;
 uniform sampler2D matInfoBuffer;             
@@ -214,7 +214,7 @@ void main()
 	}
 	
    // Sample/unpack the normal/z data
-   vec4 deferredSample = deferredUncondition( prePassBuffer, uv0 );
+   vec4 deferredSample = deferredUncondition( deferredBuffer, uv0 );
    vec3 normal = deferredSample.rgb;
    float depth = deferredSample.a;
 

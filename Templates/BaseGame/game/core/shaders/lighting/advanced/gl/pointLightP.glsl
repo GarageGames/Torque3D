@@ -103,7 +103,7 @@ uniform samplerCube cookieMap ;
 
 #endif
 
-uniform sampler2D prePassBuffer;
+uniform sampler2D deferredBuffer;
 
 #ifdef SHADOW_CUBE
 	uniform samplerCube shadowMap;
@@ -159,7 +159,7 @@ void main()
 	}
 	
    // Sample/unpack the normal/z data
-   vec4 deferredSample = deferredUncondition( prePassBuffer, uvScene );
+   vec4 deferredSample = deferredUncondition( deferredBuffer, uvScene );
    vec3 normal = deferredSample.rgb;
    float depth = deferredSample.a;
    

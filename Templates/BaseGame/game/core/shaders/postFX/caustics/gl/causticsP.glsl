@@ -44,10 +44,10 @@ float distanceToPlane(vec4 plane, vec3 pos)
 void main()             
 {   
    //Sample the pre-pass
-   vec4 prePass = deferredUncondition( deferredTex, IN_uv0 );
+   vec4 deferred = deferredUncondition( deferredTex, IN_uv0 );
    
    //Get depth
-   float depth = prePass.w;   
+   float depth = deferred.w;   
    if(depth > 0.9999)
    {
       OUT_col = vec4(0,0,0,0);
@@ -81,7 +81,7 @@ void main()
    
    //Use normal Z to modulate caustics  
    //float waterDepth = 1 - saturate(pos.z + waterFogPlane.w + 1);
-   caustics *= saturate(prePass.z) * pow(1-depth, 64) * waterDepth; 
+   caustics *= saturate(deferred.z) * pow(1-depth, 64) * waterDepth; 
       
    OUT_col = caustics;   
 }

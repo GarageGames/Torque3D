@@ -36,7 +36,7 @@ new GFXStateBlockData( AL_VectorLightState )
 
    samplersDefined = true;
    samplerStates[0] = SamplerClampPoint;  // G-buffer
-   mSamplerNames[0] = "prePassBuffer";
+   mSamplerNames[0] = "deferredBuffer";
    samplerStates[1] = SamplerClampPoint;  // Shadow Map (Do not change this to linear, as all cards can not filter equally.)
    mSamplerNames[1] = "shadowMap";
    samplerStates[2] = SamplerClampPoint;  // Shadow Map (Do not change this to linear, as all cards can not filter equally.)
@@ -66,7 +66,7 @@ new ShaderData( AL_VectorLightShader )
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/lighting/advanced/gl/farFrustumQuadV.glsl";
    OGLPixelShaderFile  = $Core::CommonShaderPath @ "/lighting/advanced/gl/vectorLightP.glsl";
    
-   samplerNames[0] = "$prePassBuffer";
+   samplerNames[0] = "$deferredBuffer";
    samplerNames[1] = "$shadowMap";
    samplerNames[2] = "$dynamicShadowMap";
    samplerNames[3] = "$ssaoMask";
@@ -83,7 +83,7 @@ new CustomMaterial( AL_VectorLightMaterial )
    shader = AL_VectorLightShader;
    stateBlock = AL_VectorLightState;
    
-   sampler["prePassBuffer"] = "#deferred";
+   sampler["deferredBuffer"] = "#deferred";
    sampler["shadowMap"] = "$dynamiclight";
    sampler["dynamicShadowMap"] = "$dynamicShadowMap";
    sampler["ssaoMask"] = "#ssaoMask";  
@@ -114,7 +114,7 @@ new GFXStateBlockData( AL_ConvexLightState )
 
    samplersDefined = true;
    samplerStates[0] = SamplerClampPoint;  // G-buffer
-   mSamplerNames[0] = "prePassBuffer";
+   mSamplerNames[0] = "deferredBuffer";
    samplerStates[1] = SamplerClampPoint;  // Shadow Map (Do not use linear, these are perspective projections)
    mSamplerNames[1] = "shadowMap";
    samplerStates[2] = SamplerClampPoint;  // Shadow Map (Do not use linear, these are perspective projections)
@@ -143,7 +143,7 @@ new ShaderData( AL_PointLightShader )
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/lighting/advanced/gl/convexGeometryV.glsl";
    OGLPixelShaderFile  = $Core::CommonShaderPath @ "/lighting/advanced/gl/pointLightP.glsl";
 
-   samplerNames[0] = "$prePassBuffer";
+   samplerNames[0] = "$deferredBuffer";
    samplerNames[1] = "$shadowMap";
    samplerNames[2] = "$dynamicShadowMap";
    samplerNames[3] = "$cookieMap";
@@ -160,7 +160,7 @@ new CustomMaterial( AL_PointLightMaterial )
    shader = AL_PointLightShader;
    stateBlock = AL_ConvexLightState;
    
-   sampler["prePassBuffer"] = "#deferred";
+   sampler["deferredBuffer"] = "#deferred";
    sampler["shadowMap"] = "$dynamiclight";
    sampler["dynamicShadowMap"] = "$dynamicShadowMap";
    sampler["cookieMap"] = "$dynamiclightmask";
@@ -182,7 +182,7 @@ new ShaderData( AL_SpotLightShader )
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/lighting/advanced/gl/convexGeometryV.glsl";
    OGLPixelShaderFile  = $Core::CommonShaderPath @ "/lighting/advanced/gl/spotLightP.glsl";
    
-   samplerNames[0] = "$prePassBuffer";
+   samplerNames[0] = "$deferredBuffer";
    samplerNames[1] = "$shadowMap";
    samplerNames[2] = "$dynamicShadowMap";
    samplerNames[3] = "$cookieMap";
@@ -199,7 +199,7 @@ new CustomMaterial( AL_SpotLightMaterial )
    shader = AL_SpotLightShader;
    stateBlock = AL_ConvexLightState;
    
-   sampler["prePassBuffer"] = "#deferred";
+   sampler["deferredBuffer"] = "#deferred";
    sampler["shadowMap"] = "$dynamiclight";
    sampler["dynamicShadowMap"] = "$dynamicShadowMap";
    sampler["cookieMap"] = "$dynamiclightmask";
@@ -259,7 +259,7 @@ new ShaderData( AL_ParticlePointLightShader )
    OGLVertexShaderFile = $Core::CommonShaderPath @ "/lighting/advanced/gl/convexGeometryV.glsl";
    OGLPixelShaderFile  = $Core::CommonShaderPath @ "/lighting/advanced/gl/pointLightP.glsl";
    
-   samplerNames[0] = "$prePassBuffer";   
+   samplerNames[0] = "$deferredBuffer";   
       
    pixVersion = 3.0;
 };
@@ -269,7 +269,7 @@ new CustomMaterial( AL_ParticlePointLightMaterial )
    shader = AL_ParticlePointLightShader;
    stateBlock = AL_ConvexLightState;
    
-   sampler["prePassBuffer"] = "#deferred";
+   sampler["deferredBuffer"] = "#deferred";
    target = "lightinfo";
    
    pixVersion = 3.0;
