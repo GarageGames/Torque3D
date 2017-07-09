@@ -106,7 +106,7 @@ TORQUE_UNIFORM_SAMPLERCUBE(cookieMap, 3);
 
 #endif
 
-TORQUE_UNIFORM_SAMPLER2D(prePassBuffer, 0);
+TORQUE_UNIFORM_SAMPLER2D(deferredBuffer, 0);
 
 #ifdef SHADOW_CUBE
 TORQUE_UNIFORM_SAMPLERCUBE(shadowMap, 1);
@@ -161,7 +161,7 @@ float4 main( ConvexConnectP IN ) : TORQUE_TARGET0
 	}
    
    // Sample/unpack the normal/z data
-   float4 deferredSample = TORQUE_PREPASS_UNCONDITION( prePassBuffer, uvScene );
+   float4 deferredSample = TORQUE_DEFERRED_UNCONDITION( deferredBuffer, uvScene );
    float3 normal = deferredSample.rgb;
    float depth = deferredSample.a;
    

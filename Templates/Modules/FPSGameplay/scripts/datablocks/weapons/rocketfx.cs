@@ -28,7 +28,7 @@ datablock SFXProfile(RocketLauncherExplosionSound)
 datablock ParticleData(RocketDebrisTrailParticle)
 {
    textureName = "data/FPSGameplay/art/particles/impact";
-   dragCoefficient = 0;
+   dragCoeffiecient = 0;
    inheritedVelFactor = 0.0;
    constantAcceleration = 0.0;
    lifetimeMS = 1200;//1000;
@@ -96,7 +96,7 @@ datablock DebrisData(RocketDebris)
 
 datablock ParticleData(RocketSplashMist)
 {
-   dragCoefficient = 1.0;
+   dragCoeffiecient = 1.0;
    windCoefficient = 2.0;
    gravityCoefficient = 0.3;
    inheritedVelFactor = 0.0;
@@ -137,7 +137,7 @@ datablock ParticleEmitterData(RocketSplashMistEmitter)
 
 datablock ParticleData(RocketSplashParticle)
 {
-   dragCoefficient = 1;
+   dragCoeffiecient = 1;
    windCoefficient = 0.9;
    gravityCoefficient = 0.3;
    inheritedVelFactor = 0.2;
@@ -177,7 +177,7 @@ datablock ParticleEmitterData(RocketSplashEmitter)
 datablock ParticleData(RocketSplashRingParticle)
 {
    textureName = "data/FPSGameplay/art/particles/wake";
-   dragCoefficient = 0.0;
+   dragCoeffiecient = 0.0;
    gravityCoefficient = 0.0;
    inheritedVelFactor = 0.0;
    lifetimeMS = 2500;

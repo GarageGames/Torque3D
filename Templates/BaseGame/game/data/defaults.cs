@@ -25,7 +25,7 @@ $sceneLighting::cacheSize = 20000;
 $sceneLighting::purgeMethod = "lastCreated";
 $sceneLighting::cacheLighting = 1;
 
-$pref::Video::displayDevice = "D3D9";
+$pref::Video::displayDevice = "D3D11";
 $pref::Video::disableVerticalSync = 1;
 $pref::Video::Resolution = "1024 768";
 $pref::Video::FullScreen = false;

@@ -143,7 +143,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
    float3 reflectNormal = normalize( TORQUE_TEX2DLOD( randNormalTex, noiseMapUV ).xyz * 2.0 - 1.0 );   
    //return float4( reflectNormal, 1 );
    
-   float4 deferred = TORQUE_PREPASS_UNCONDITION( deferredMap, IN.uv0 );
+   float4 deferred = TORQUE_DEFERRED_UNCONDITION( deferredMap, IN.uv0 );
    float3 normal = deferred.xyz;
    float depth = deferred.a;
    //return float4( ( depth ).xxx, 1 );
@@ -183,7 +183,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
    //if ( radiusDepth.x < 1.0 / targetSize.x )
    //   return color;      
    //radiusDepth.xyz = 0.0009;
-   
+   [unroll]
    for ( i = 0; i < sSampleCount; i++ )
    {
       baseRay = reflect( ptSphere[i], reflectNormal );
@@ -197,7 +197,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
        
       se = ep + ray;
             
-      occluderFragment = TORQUE_PREPASS_UNCONDITION( deferredMap, se.xy );                  
+      occluderFragment = TORQUE_DEFERRED_UNCONDITION( deferredMap, se.xy );                  
       
       depthDiff = se.z - occluderFragment.a; 
       
@@ -232,7 +232,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
    //if ( radiusDepth.x < 1.0 / targetSize.x )
    //   return color;      
    //radiusDepth.xyz = 0.0009;   
-   
+   [unroll]
    for ( i = sSampleCount; i < totalSampleCount; i++ )
    {
       baseRay = reflect( ptSphere[i], reflectNormal );
@@ -246,7 +246,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
        
       se = ep + ray;
             
-      occluderFragment = TORQUE_PREPASS_UNCONDITION( deferredMap, se.xy );                  
+      occluderFragment = TORQUE_DEFERRED_UNCONDITION( deferredMap, se.xy );                  
       
       depthDiff = se.z - occluderFragment.a;       
       

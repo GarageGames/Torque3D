@@ -36,7 +36,7 @@ float4 main( PFXVertToPix IN ) : TORQUE_TARGET0
     float4 col = float4( 0, 0, 0, 1 );
     
     // Get the depth at this pixel.
-    float depth = TORQUE_PREPASS_UNCONDITION( deferredTex, IN.uv0 ).w;
+    float depth = TORQUE_DEFERRED_UNCONDITION( deferredTex, IN.uv0 ).w;
     
     // If the depth is equal to 1.0, read from the backbuffer
     // and perform the exposure calculation on the result.
