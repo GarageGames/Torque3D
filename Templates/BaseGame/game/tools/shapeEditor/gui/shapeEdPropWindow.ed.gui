@@ -603,14 +603,46 @@
             MinExtent = "0 8";
          };
 
+        // Node Filter
+        new GuiTextEditCtrl(NodeTreeFilter) {  
+            position = "2 4";  
+            extent = "175 18";  
+            profile = "GuiTextEditProfile";  
+            horizSizing = "width";  
+            vertSizing = "bottom";  
+            class = "GuiTreeViewFilterText";  
+            treeView = ShapeEdNodeTreeView;  
+        };  
+        new GuiBitmapButtonCtrl() {  
+            bitmap = "tools/gui/images/clear-icon";  
+            groupNum = "-1";  
+            buttonType = "PushButton";  
+            useMouseEvents = "0";  
+            isContainer = "0";  
+            Profile = "GuiDefaultProfile";  
+            HorizSizing = "left";  
+            VertSizing = "bottom";  
+            position = "180 5";  
+            Extent = "17 17";  
+            MinExtent = "8 2";  
+            canSave = "1";  
+            Visible = "1";  
+            tooltipprofile = "GuiToolTipProfile";  
+            hovertime = "1000";  
+            canSaveDynamicFields = "0";  
+            class = "GuiTreeViewFilterClearButton";  
+            textCtrl = NodeTreeFilter;  
+        };  
+        // End Node Filter
+
          new GuiScrollCtrl() {
             canSaveDynamicFields = "0";
             isContainer = "1";
             Profile = "GuiEditorScrollProfile";
             HorizSizing = "width";
             VertSizing = "height";
-            Position = "0 0";
-            Extent = "202 288";
+            Position = "0 32";
+            Extent = "202 256";
             MinExtent = "8 0";
             canSave = "1";
             Visible = "1";
