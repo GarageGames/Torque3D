@@ -572,6 +572,13 @@ void GFXDevice::updateStates(bool forceSetAll /*=false*/)
 #endif
 }
 
+void GFXDevice::clearTextureStateImmediate(U32 stage)
+{
+   mCurrentTexture[stage] = NULL;
+   mCurrentCubemap[stage] = NULL;
+   setTextureInternal(stage, NULL);
+}
+
 void GFXDevice::setPrimitiveBuffer( GFXPrimitiveBuffer *buffer )
 {
    if( buffer == mCurrentPrimitiveBuffer )
