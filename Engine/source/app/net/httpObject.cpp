@@ -31,85 +31,85 @@
 IMPLEMENT_CONOBJECT(HTTPObject);
 
 ConsoleDocClass( HTTPObject,
-   "@brief Allows communications between the game and a server using HTTP.\n\n"
-   
-   "HTTPObject is derrived from TCPObject and makes use of the same callbacks for dealing with "
-   "connections and received data.  However, the way in which you use HTTPObject to connect "
-   "with a server is different than TCPObject.  Rather than opening a connection, sending data, "
-   "waiting to receive data, and then closing the connection, you issue a get() or post() and "
-   "handle the response.  The connection is automatically created and destroyed for you.\n\n"
-   
-   "@tsexample\n"
-      "// In this example we'll retrieve the weather in Las Vegas using\n"
-      "// Google's API.  The response is in XML which could be processed\n"
-      "// and used by the game using SimXMLDocument, but we'll just output\n"
-      "// the results to the console in this example.\n\n"
+                 "@brief Allows communications between the game and a server using HTTP.\n\n"
 
-      "// Define callbacks for our specific HTTPObject using our instance's\n"
-      "// name (WeatherFeed) as the namespace.\n\n"
+                 "HTTPObject is derrived from TCPObject and makes use of the same callbacks for dealing with "
+                 "connections and received data.  However, the way in which you use HTTPObject to connect "
+                 "with a server is different than TCPObject.  Rather than opening a connection, sending data, "
+                 "waiting to receive data, and then closing the connection, you issue a get() or post() and "
+                 "handle the response.  The connection is automatically created and destroyed for you.\n\n"
 
-      "// Handle an issue with resolving the server's name\n"
-      "function WeatherFeed::onDNSFailed(%this)\n"
-      "{\n"
-      "   // Store this state\n"
-      "   %this.lastState = \"DNSFailed\";\n\n"
+                 "@tsexample\n"
+                 "// In this example we'll retrieve the weather in Las Vegas using\n"
+                 "// Google's API.  The response is in XML which could be processed\n"
+                 "// and used by the game using SimXMLDocument, but we'll just output\n"
+                 "// the results to the console in this example.\n\n"
 
-      "   // Handle DNS failure\n"
-      "}\n\n"
+                 "// Define callbacks for our specific HTTPObject using our instance's\n"
+                 "// name (WeatherFeed) as the namespace.\n\n"
 
-      "function WeatherFeed::onConnectFailed(%this)\n"
-      "{\n"
-      "   // Store this state\n"
-      "   %this.lastState = \"ConnectFailed\";\n\n"
-      "   // Handle connection failure\n"
-      "}\n\n"
+                 "// Handle an issue with resolving the server's name\n"
+                 "function WeatherFeed::onDNSFailed(%this)\n"
+                 "{\n"
+                 "   // Store this state\n"
+                 "   %this.lastState = \"DNSFailed\";\n\n"
 
-      "function WeatherFeed::onDNSResolved(%this)\n"
-      "{\n"
-      "   // Store this state\n"
-      "   %this.lastState = \"DNSResolved\";\n\n"
-      "}\n\n"
+                 "   // Handle DNS failure\n"
+                 "}\n\n"
 
-      "function WeatherFeed::onConnected(%this)\n"
-      "{\n"
-      "   // Store this state\n"
-      "   %this.lastState = \"Connected\";\n\n"
+                 "function WeatherFeed::onConnectFailed(%this)\n"
+                 "{\n"
+                 "   // Store this state\n"
+                 "   %this.lastState = \"ConnectFailed\";\n\n"
+                 "   // Handle connection failure\n"
+                 "}\n\n"
 
-      "   // Clear our buffer\n"
-      "   %this.buffer = \"\";\n"
-      "}\n\n"
+                 "function WeatherFeed::onDNSResolved(%this)\n"
+                 "{\n"
+                 "   // Store this state\n"
+                 "   %this.lastState = \"DNSResolved\";\n\n"
+                 "}\n\n"
 
-      "function WeatherFeed::onDisconnect(%this)\n"
-      "{\n"
-      "   // Store this state\n"
-      "   %this.lastState = \"Disconnected\";\n\n"
+                 "function WeatherFeed::onConnected(%this)\n"
+                 "{\n"
+                 "   // Store this state\n"
+                 "   %this.lastState = \"Connected\";\n\n"
 
-      "   // Output the buffer to the console\n"
-      "   echo(\"Google Weather Results:\");\n"
-      "   echo(%this.buffer);\n"
-      "}\n\n"
+                 "   // Clear our buffer\n"
+                 "   %this.buffer = \"\";\n"
+                 "}\n\n"
 
-      "// Handle a line from the server\n"
-      "function WeatherFeed::onLine(%this, %line)\n"
-      "{\n"
-      "   // Store this line in out buffer\n"
-      "   %this.buffer = %this.buffer @ %line;\n"
-      "}\n\n"
+                 "function WeatherFeed::onDisconnect(%this)\n"
+                 "{\n"
+                 "   // Store this state\n"
+                 "   %this.lastState = \"Disconnected\";\n\n"
 
-      "// Create the HTTPObject\n"
-      "%feed = new HTTPObject(WeatherFeed);\n\n"
+                 "   // Output the buffer to the console\n"
+                 "   echo(\"Google Weather Results:\");\n"
+                 "   echo(%this.buffer);\n"
+                 "}\n\n"
 
-      "// Define a dynamic field to store the last connection state\n"
-      "%feed.lastState = \"None\";\n\n"
+                 "// Handle a line from the server\n"
+                 "function WeatherFeed::onLine(%this, %line)\n"
+                 "{\n"
+                 "   // Store this line in out buffer\n"
+                 "   %this.buffer = %this.buffer @ %line;\n"
+                 "}\n\n"
 
-      "// Send the GET command\n"
-      "%feed.get(\"www.google.com:80\", \"/ig/api\", \"weather=Las-Vegas,US\");\n"
-	"@endtsexample\n\n" 
-   
-   "@see TCPObject\n"
+                 "// Create the HTTPObject\n"
+                 "%feed = new HTTPObject(WeatherFeed);\n\n"
 
-   "@ingroup Networking\n"
-);
+                 "// Define a dynamic field to store the last connection state\n"
+                 "%feed.lastState = \"None\";\n\n"
+
+                 "// Send the GET command\n"
+                 "%feed.get(\"www.google.com:80\", \"/ig/api\", \"weather=Las-Vegas,US\");\n"
+                 "@endtsexample\n\n"
+
+                 "@see TCPObject\n"
+
+                 "@ingroup Networking\n"
+               );
 
 //--------------------------------------
 
@@ -215,9 +215,9 @@ void HTTPObject::expandPath(char *dest, const char *path, U32 destSize)
       U32 i;
       for(i = 0; i <= ' '; i++)
          asciiEscapeTable[i] = true;
-      for(;i <= 0x7F; i++)
+      for(; i <= 0x7F; i++)
          asciiEscapeTable[i] = false;
-      for(;i <= 0xFF; i++)
+      for(; i <= 0xFF; i++)
          asciiEscapeTable[i] = true;
       asciiEscapeTable[static_cast<U32>('\"')] = true;
       asciiEscapeTable[static_cast<U32>('_')] = true;
@@ -276,7 +276,7 @@ void HTTPObject::onConnected()
    else
    {
       dSprintf(buffer, sizeof(buffer), "POST %s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: %i\r\n\r\n%s\r\n\r\n",
-         expPath, mHostName, dStrlen(mPost), mPost);
+               expPath, mHostName, dStrlen(mPost), mPost);
    }
 
    if(pt)
@@ -409,56 +409,56 @@ U32 HTTPObject::onReceive(U8 *buffer, U32 bufferLen)
 
 //--------------------------------------
 DefineEngineMethod( HTTPObject, get, void, ( const char* Address, const char* requirstURI, const char* query ), ( "" ),
-   "@brief Send a GET command to a server to send or retrieve data.\n\n"
+                    "@brief Send a GET command to a server to send or retrieve data.\n\n"
 
-   "@param Address HTTP web address to send this get call to. Be sure to include the port at the end (IE: \"www.garagegames.com:80\").\n"
-   "@param requirstURI Specific location on the server to access (IE: \"index.php\".)\n"
-   "@param query Optional. Actual data to transmit to the server. Can be anything required providing it sticks with limitations of the HTTP protocol. "
-   "If you were building the URL manually, this is the text that follows the question mark.  For example: http://www.google.com/ig/api?<b>weather=Las-Vegas,US</b>\n"
-   
-   "@tsexample\n"
-	   "// Create an HTTP object for communications\n"
-	   "%httpObj = new HTTPObject();\n\n"
-	   "// Specify a URL to transmit to\n"
-      "%url = \"www.garagegames.com:80\";\n\n"
-	   "// Specify a URI to communicate with\n"
-	   "%URI = \"/index.php\";\n\n"
-	   "// Specify a query to send.\n"
-	   "%query = \"\";\n\n"
-	   "// Send the GET command to the server\n"
-	   "%httpObj.get(%url,%URI,%query);\n"
-   "@endtsexample\n\n"
-   )
+                    "@param Address HTTP web address to send this get call to. Be sure to include the port at the end (IE: \"www.garagegames.com:80\").\n"
+                    "@param requirstURI Specific location on the server to access (IE: \"index.php\".)\n"
+                    "@param query Optional. Actual data to transmit to the server. Can be anything required providing it sticks with limitations of the HTTP protocol. "
+                    "If you were building the URL manually, this is the text that follows the question mark.  For example: http://www.google.com/ig/api?<b>weather=Las-Vegas,US</b>\n"
+
+                    "@tsexample\n"
+                    "// Create an HTTP object for communications\n"
+                    "%httpObj = new HTTPObject();\n\n"
+                    "// Specify a URL to transmit to\n"
+                    "%url = \"www.garagegames.com:80\";\n\n"
+                    "// Specify a URI to communicate with\n"
+                    "%URI = \"/index.php\";\n\n"
+                    "// Specify a query to send.\n"
+                    "%query = \"\";\n\n"
+                    "// Send the GET command to the server\n"
+                    "%httpObj.get(%url,%URI,%query);\n"
+                    "@endtsexample\n\n"
+                  )
 {
    if( !query || !query[ 0 ] )
-		object->get(Address, requirstURI, NULL);
+      object->get(Address, requirstURI, NULL);
    else
-		object->get(Address, requirstURI, query);
+      object->get(Address, requirstURI, query);
 }
 
 DefineEngineMethod( HTTPObject, post, void, ( const char* Address, const char* requirstURI, const char* query, const char* post ),,
-   "@brief Send POST command to a server to send or retrieve data.\n\n"
+                    "@brief Send POST command to a server to send or retrieve data.\n\n"
 
-   "@param Address HTTP web address to send this get call to. Be sure to include the port at the end (IE: \"www.garagegames.com:80\").\n"
-   "@param requirstURI Specific location on the server to access (IE: \"index.php\".)\n"
-   "@param query Actual data to transmit to the server. Can be anything required providing it sticks with limitations of the HTTP protocol. \n"
-   "@param post Submission data to be processed.\n"
+                    "@param Address HTTP web address to send this get call to. Be sure to include the port at the end (IE: \"www.garagegames.com:80\").\n"
+                    "@param requirstURI Specific location on the server to access (IE: \"index.php\".)\n"
+                    "@param query Actual data to transmit to the server. Can be anything required providing it sticks with limitations of the HTTP protocol. \n"
+                    "@param post Submission data to be processed.\n"
 
-   "@tsexample\n"
-	   "// Create an HTTP object for communications\n"
-	   "%httpObj = new HTTPObject();\n\n"
-	   "// Specify a URL to transmit to\n"
-      "%url = \"www.garagegames.com:80\";\n\n"
-	   "// Specify a URI to communicate with\n"
-	   "%URI = \"/index.php\";\n\n"
-	   "// Specify a query to send.\n"
-	   "%query = \"\";\n\n"
-	   "// Specify the submission data.\n"
-	   "%post = \"\";\n\n"
-	   "// Send the POST command to the server\n"
-	   "%httpObj.POST(%url,%URI,%query,%post);\n"
-   "@endtsexample\n\n"
-   )
+                    "@tsexample\n"
+                    "// Create an HTTP object for communications\n"
+                    "%httpObj = new HTTPObject();\n\n"
+                    "// Specify a URL to transmit to\n"
+                    "%url = \"www.garagegames.com:80\";\n\n"
+                    "// Specify a URI to communicate with\n"
+                    "%URI = \"/index.php\";\n\n"
+                    "// Specify a query to send.\n"
+                    "%query = \"\";\n\n"
+                    "// Specify the submission data.\n"
+                    "%post = \"\";\n\n"
+                    "// Send the POST command to the server\n"
+                    "%httpObj.POST(%url,%URI,%query,%post);\n"
+                    "@endtsexample\n\n"
+                  )
 {
    object->post(Address, requirstURI, query, post);
 }

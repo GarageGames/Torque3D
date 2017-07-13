@@ -17,7 +17,8 @@ class RemoteCommandEvent : public NetEvent
 {
 public:
    typedef NetEvent Parent;
-   enum {
+   enum
+   {
       MaxRemoteCommandArgs = 20,
       CommandArgsBits = 5
    };
@@ -46,7 +47,7 @@ public:
    virtual void process(NetConnection *conn);
 
    static void sendRemoteCommand(NetConnection *conn, S32 argc, const char **argv);
-	 
+
    static void removeTaggedString(S32);
 
    static const char* addTaggedString(const char* str);

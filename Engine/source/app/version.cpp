@@ -76,8 +76,8 @@ const char* getEngineProductString()
       case 0006:
          return "Torque 3D";
       case 0007:
-	     return "Torque 3D MIT";
-		 
+         return "Torque 3D MIT";
+
       default:
          return "Torque Engine";
    };
@@ -92,45 +92,45 @@ const char* getCompileTimeString()
 
 ConsoleFunctionGroupBegin( CompileInformation, "Functions to get version information about the current executable." );
 
-DefineConsoleFunction( getVersionNumber, S32, (), , "Get the version of the engine build, as a string.\n\n" 
-				"@ingroup Debugging")
+DefineConsoleFunction( getVersionNumber, S32, (),, "Get the version of the engine build, as a string.\n\n"
+                       "@ingroup Debugging")
 {
    return getVersionNumber();
 }
 
-DefineConsoleFunction( getAppVersionNumber, S32, (), , "Get the version of the application build, as a string.\n\n" 
-            "@ingroup Debugging")
+DefineConsoleFunction( getAppVersionNumber, S32, (),, "Get the version of the application build, as a string.\n\n"
+                       "@ingroup Debugging")
 {
    return getAppVersionNumber();
 }
 
 
-DefineConsoleFunction( getVersionString, const char*, (), , "Get the version of the engine build, as a human readable string.\n\n" 
-				"@ingroup Debugging")
+DefineConsoleFunction( getVersionString, const char*, (),, "Get the version of the engine build, as a human readable string.\n\n"
+                       "@ingroup Debugging")
 {
    return getVersionString();
 }
 
-DefineConsoleFunction( getAppVersionString, const char*, (), , "Get the version of the aplication build, as a human readable string.\n\n" 
-            "@ingroup Debugging")
+DefineConsoleFunction( getAppVersionString, const char*, (),, "Get the version of the aplication build, as a human readable string.\n\n"
+                       "@ingroup Debugging")
 {
    return getAppVersionString();
 }
 
-DefineConsoleFunction( getEngineName, const char*, (), , "Get the name of the engine product that this is running from, as a string.\n\n" 
-				"@ingroup Debugging")
+DefineConsoleFunction( getEngineName, const char*, (),, "Get the name of the engine product that this is running from, as a string.\n\n"
+                       "@ingroup Debugging")
 {
    return getEngineProductString();
 }
 
-DefineConsoleFunction( getCompileTimeString, const char*, (), , "Get the time of compilation.\n\n" 
-				"@ingroup Debugging")
+DefineConsoleFunction( getCompileTimeString, const char*, (),, "Get the time of compilation.\n\n"
+                       "@ingroup Debugging")
 {
    return getCompileTimeString();
 }
 
-DefineConsoleFunction( getBuildString, const char*, (), , "Get the type of build, \"Debug\" or \"Release\".\n\n"
-				"@ingroup Debugging")
+DefineConsoleFunction( getBuildString, const char*, (),, "Get the type of build, \"Debug\" or \"Release\".\n\n"
+                       "@ingroup Debugging")
 {
 #ifdef TORQUE_DEBUG
    return "Debug";
