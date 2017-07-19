@@ -37,7 +37,7 @@
 #include "gfx/util/screenspace.h"
 #include "lighting/advanced/advancedLightBinManager.h"
 
-S32 sgMaxTerrainMaterialsPerPass = 3;
+S32 sgMaxTerrainMaterialsPerPass = 32;
 
 AFTER_MODULE_INIT( MaterialManager )
 {
@@ -55,12 +55,12 @@ Vector<String> _initSamplerNames()
    samplerNames.push_back("$macrolayerTex");   
    samplerNames.push_back("$lightMapTex");
    samplerNames.push_back("$lightInfoBuffer");
-   for(int i = 0; i < 3; ++i)
-   {
-      samplerNames.push_back(avar("$normalMap%d",i));
-      samplerNames.push_back(avar("$detailMap%d",i));
-      samplerNames.push_back(avar("$macroMap%d",i));
-   }   
+   //for(int i = 0; i < 3; ++i)
+   //{
+      samplerNames.push_back("$normalMap");
+      samplerNames.push_back("$detailMap");
+      samplerNames.push_back("$macroMap");
+   //}   
 
    return samplerNames;
 }
@@ -595,10 +595,10 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
       matInfo->detailInfoVConst = pass->shader->getShaderConstHandle( avar( "$detailScaleAndFade%d", i ) );
       matInfo->detailInfoPConst = pass->shader->getShaderConstHandle( avar( "$detailIdStrengthParallax%d", i ) );
 
-      matInfo->detailTexConst = pass->shader->getShaderConstHandle( avar( "$detailMap%d", i ) );
-      if ( matInfo->detailTexConst->isValid() )
+      matInfo->detailTexConst = pass->shader->getShaderConstHandle(avar("$detailTex%d", i));
+      if (matInfo->mat->getDetailMap().isNotEmpty() || matInfo->detailTexConst->isValid())
       {
-         const S32 sampler = matInfo->detailTexConst->getSamplerRegister();
+         const S32 sampler = pass->shader->getShaderConstHandle("$detailMap")->getSamplerRegister();
 
          desc.samplers[sampler] = GFXSamplerStateDesc::getWrapLinear();
          desc.samplers[sampler].magFilter = GFXTextureFilterLinear;
@@ -619,10 +619,10 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
       matInfo->macroInfoVConst = pass->shader->getShaderConstHandle( avar( "$macroScaleAndFade%d", i ) );
       matInfo->macroInfoPConst = pass->shader->getShaderConstHandle( avar( "$macroIdStrengthParallax%d", i ) );
 
-      matInfo->macroTexConst = pass->shader->getShaderConstHandle( avar( "$macroMap%d", i ) );
-      if ( matInfo->macroTexConst->isValid() )
+      matInfo->macroTexConst = pass->shader->getShaderConstHandle(avar("$macroMapTex%d", i));
+      if (matInfo->mat->getMacroMap().isNotEmpty() || matInfo->macroTexConst->isValid())
       {
-         const S32 sampler = matInfo->macroTexConst->getSamplerRegister();
+         const S32 sampler = pass->shader->getShaderConstHandle("$macroMap")->getSamplerRegister();
 
          desc.samplers[sampler] = GFXSamplerStateDesc::getWrapLinear();
          desc.samplers[sampler].magFilter = GFXTextureFilterLinear;
@@ -641,10 +641,10 @@ bool TerrainCellMaterial::_createPass( Vector<MaterialInfo*> *materials,
       }
 	  //end macro texture
 
-      matInfo->normalTexConst = pass->shader->getShaderConstHandle( avar( "$normalMap%d", i ) );
-      if ( matInfo->normalTexConst->isValid() )
+      matInfo->normalTexConst = pass->shader->getShaderConstHandle(avar("$normalMapTex%d", i));
+      if (matInfo->mat->getNormalMap().isNotEmpty() || matInfo->normalTexConst->isValid())
       {
-         const S32 sampler = matInfo->normalTexConst->getSamplerRegister();
+         const S32 sampler = pass->shader->getShaderConstHandle("$normalMap")->getSamplerRegister();
 
          desc.samplers[sampler] = GFXSamplerStateDesc::getWrapLinear();
          desc.samplers[sampler].magFilter = GFXTextureFilterLinear;
@@ -803,16 +803,17 @@ bool TerrainCellMaterial::setupPass(   const SceneRenderState *state,
                            mCurrPass,
                            pass.consts );
 
+   U32 samplerIndex = 4;
    for ( U32 i=0; i < pass.materials.size(); i++ )
    {
       MaterialInfo *matInfo = pass.materials[i];
 
-      if ( matInfo->detailTexConst->isValid() )
-         GFX->setTexture( matInfo->detailTexConst->getSamplerRegister(), matInfo->detailTex );
-      if ( matInfo->macroTexConst->isValid() )
-         GFX->setTexture( matInfo->macroTexConst->getSamplerRegister(), matInfo->macroTex );
-      if ( matInfo->normalTexConst->isValid() )
-         GFX->setTexture( matInfo->normalTexConst->getSamplerRegister(), matInfo->normalTex );
+      if (matInfo->mat->getDetailMap().isNotEmpty() || matInfo->detailTexConst->isValid())
+         GFX->setTexture(samplerIndex++, matInfo->detailTex);
+      if (matInfo->mat->getNormalMap().isNotEmpty() || matInfo->normalTexConst->isValid())
+          GFX->setTexture(samplerIndex++, matInfo->normalTex);
+      if (matInfo->mat->getMacroMap().isNotEmpty() || matInfo->macroTexConst->isValid())
+          GFX->setTexture(samplerIndex++, matInfo->macroTex);
    }
 
    pass.consts->setSafe( pass.layerSizeConst, (F32)mTerrain->mLayerTex.getWidth() );

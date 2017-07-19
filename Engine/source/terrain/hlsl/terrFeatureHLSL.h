@@ -41,9 +41,9 @@ protected:
 
 public:
    TerrainFeatHLSL();
-   Var* _getInDetailCoord(Vector<ShaderComponent*> &componentList );
+   Var* _computeAndGetInDetailCoord(MultiLine* meta, Vector<ShaderComponent*> &componentList );
 
-   Var* _getInMacroCoord(Vector<ShaderComponent*> &componentList );
+   Var* _computeAndGetInMacroCoord(MultiLine* meta, Vector<ShaderComponent*> &componentList );
 
    Var* _getNormalMapTex();
 
