@@ -198,6 +198,9 @@ protected:
 
    /// True if the zoning needs to be recalculated for the terrain.
    bool mZoningDirty;
+   
+   /// For disabling of Basetexture generation
+   bool mUpdateBasetex;
 
    String _getBaseTexCacheFileName() const;
 
