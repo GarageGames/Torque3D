@@ -620,8 +620,13 @@ void TerrainDetailMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
    meta->addStatement( new GenOp( "      @ *= @.y * @.w;\r\n",
                                     detailColor, detailInfo, inDet ) );
 
+
+   meta->addStatement(new GenOp("      @.rgb = toGamma(@.rgb);\r\n", outColor, outColor));
+
    meta->addStatement( new GenOp( "      @ += @ * @;\r\n",
                                     outColor, detailColor, detailBlend));
+
+   meta->addStatement(new GenOp("      @.rgb = toLinear(clamp(@.rgb, 0, 1));\r\n", outColor, outColor));
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 
@@ -873,8 +878,12 @@ void TerrainMacroMapFeatGLSL::processPix(   Vector<ShaderComponent*> &componentL
 
    Var *outColor = (Var*)LangElement::find( getOutputTargetVarName(target) );
 
+   meta->addStatement(new GenOp("      @.rgb = toGamma(@.rgb);\r\n", outColor, outColor));
+
    meta->addStatement(new GenOp("      @ += @ * @;\r\n",
                                     outColor, detailColor, detailBlend));
+
+   meta->addStatement(new GenOp("      @.rgb = toLinear(clamp(@.rgb, 0, 1));\r\n", outColor, outColor));
 
    meta->addStatement( new GenOp( "   }\r\n" ) );
 
