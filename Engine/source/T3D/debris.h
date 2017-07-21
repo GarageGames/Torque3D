@@ -20,6 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        datablock-temp-clone -- Implements creation of temporary datablock clones to
+//            allow late substitution of datablock fields.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _DEBRIS_H_
 #define _DEBRIS_H_
 
@@ -97,6 +106,14 @@ struct DebrisData : public GameBaseData
 
    DECLARE_CONOBJECT(DebrisData);
 
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+public:
+   /*C*/        DebrisData(const DebrisData&, bool = false);
+   /*D*/        ~DebrisData();
+   DebrisData*  cloneAndPerformSubstitutions(const SimObject*, S32 index=0);
+   virtual void onPerformSubstitutions();
+   virtual bool allowSubstitutions() const { return true; }
+   // AFX CODE BLOCK (datablock-temp-clone) >>
 };
 
 //**************************************************************************
@@ -165,6 +182,13 @@ public:
 
    DECLARE_CONOBJECT(Debris);
 
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+private:
+   SimObject*   ss_object;
+   S32          ss_index;
+public:
+   void         setSubstitutionData(SimObject* obj, S32 idx=0) { ss_object = obj; ss_index = idx; }
+   // AFX CODE BLOCK (datablock-temp-clone) >>
 };
 
 

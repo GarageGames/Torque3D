@@ -20,6 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        substitutions -- Implementation of special substitution statements on
+//            datablock fields.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _SIMDATABLOCK_H_
 #define _SIMDATABLOCK_H_
 
@@ -172,6 +181,35 @@ public:
    /// Used by the console system to automatically tell datablock classes apart
    /// from non-datablock classes.
    static const bool __smIsDatablock = true;
+
+   // AFX CODE BLOCK (substitutions) <<
+protected:
+   struct SubstitutionStatement
+   {
+      StringTableEntry  slot;
+      S32               idx;
+      char*             value;
+      SubstitutionStatement(StringTableEntry slot, S32 idx, const char* value);
+      ~SubstitutionStatement();
+      void replaceValue(const char* value);
+   };
+   Vector<SubstitutionStatement*> substitutions;
+   void    clear_substitutions();
+public:
+   /*C*/  SimDataBlock(const SimDataBlock&, bool = false);
+   /*D*/  ~SimDataBlock();
+
+   void   addSubstitution(StringTableEntry field, S32 idx, const char* subst);
+   const char* getSubstitution(StringTableEntry field, S32 idx);
+   S32    getSubstitutionCount() { return substitutions.size(); }
+   void   performSubstitutions(SimDataBlock*, const SimObject*, S32 index=0);
+   void   copySubstitutionsFrom(SimDataBlock* other);
+   void   printSubstitutions();
+   bool   fieldHasSubstitution(StringTableEntry slot);
+   virtual void onAddSubstitution(StringTableEntry, S32 idx, const char* subst) { }
+   virtual void onRemoveSubstitution(StringTableEntry, S32 idx) { }
+   virtual void onPerformSubstitutions() { }
+   // AFX CODE BLOCK (substitutions) >>
 };
 
 //---------------------------------------------------------------------------

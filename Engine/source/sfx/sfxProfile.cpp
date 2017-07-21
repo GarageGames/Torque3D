@@ -20,6 +20,17 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        datablock-temp-clone -- Implements creation of temporary datablock clones to
+//            allow late substitution of datablock fields.
+//        substitutions -- Types equating SFXDescription with legacy AudioDescription
+//            and SFXProfile with legacy AudioProfile. (deprecated)
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 
 #include "sfx/sfxProfile.h"
@@ -92,9 +103,13 @@ SFXProfile::SFXProfile( SFXDescription* desc, const String& filename, bool prelo
 
 //-----------------------------------------------------------------------------
 
+// AFX CODE BLOCK (datablock-temp-clone) <<
+/* ORIGINAL CODE
 SFXProfile::~SFXProfile()
 {
 }
+*/
+// AFX CODE BLOCK (datablock-temp-clone) >>
 
 //-----------------------------------------------------------------------------
 
@@ -114,6 +129,11 @@ void SFXProfile::initPersistFields()
       
    endGroup( "Sound" );
 
+   // AFX CODE BLOCK (substitutions) <<
+   // disallow some field substitutions
+   disableFieldSubstitutions("description");
+   // AFX CODE BLOCK (substitutions) >>
+   
    Parent::initPersistFields();
 }
 
@@ -373,3 +393,125 @@ DefineEngineMethod( SFXProfile, getSoundDuration, F32, (),,
 {
    return ( F32 ) object->getSoundDuration() * 0.001f;
 }
+
+// AFX CODE BLOCK (datablock-temp-clone) <<
+
+// enable this to help verify that temp-clones of AudioProfile are being deleted
+//#define TRACK_AUDIO_PROFILE_CLONES
+
+#ifdef TRACK_AUDIO_PROFILE_CLONES
+static int audio_prof_clones = 0;
+#endif
+
+SFXProfile::SFXProfile(const SFXProfile& other, bool temp_clone) : SFXTrack(other, temp_clone)
+{
+#ifdef TRACK_AUDIO_PROFILE_CLONES
+   audio_prof_clones++;
+   if (audio_prof_clones == 1)
+     Con::errorf("SFXProfile -- Clones are on the loose!");
+#endif
+   mResource = other.mResource;
+   mFilename = other.mFilename;
+   mPreload = other.mPreload;
+   mBuffer = other.mBuffer; // -- AudioBuffer loaded using mFilename
+   mChangedSignal = other.mChangedSignal;
+}
+
+SFXProfile::~SFXProfile()
+{
+  if (!isTempClone())
+    return;
+
+  // cleanup after a temp-clone
+
+  if (mDescription && mDescription->isTempClone())
+  {
+    delete mDescription;
+    mDescription = 0;
+  }
+
+#ifdef TRACK_AUDIO_PROFILE_CLONES
+  if (audio_prof_clones > 0)
+  {
+    audio_prof_clones--;
+    if (audio_prof_clones == 0)
+      Con::errorf("SFXProfile -- Clones eliminated!");
+  }
+  else
+    Con::errorf("SFXProfile -- Too many clones deleted!");
+#endif
+}
+
+//
+// Clone and perform substitutions on the SFXProfile and on any SFXDescription
+// it references.
+//
+SFXProfile* SFXProfile::cloneAndPerformSubstitutions(const SimObject* owner, S32 index)
+{
+  if (!owner)
+    return this;
+
+  SFXProfile* sub_profile_db = this;
+
+  // look for mDescriptionObject subs
+  SFXDescription* desc_db;
+  if (mDescription && mDescription->getSubstitutionCount() > 0)
+  {
+    SFXDescription* orig_db = mDescription;
+    desc_db = new SFXDescription(*orig_db, true);
+    orig_db->performSubstitutions(desc_db, owner, index);
+  }
+  else
+    desc_db = 0;
+
+  if (this->getSubstitutionCount() > 0 || desc_db)
+  {
+    sub_profile_db = new SFXProfile(*this, true);
+    performSubstitutions(sub_profile_db, owner, index);
+    if (desc_db)
+      sub_profile_db->mDescription = desc_db;
+  }
+
+  return sub_profile_db;
+}
+
+void SFXProfile::onPerformSubstitutions() 
+{ 
+   if ( SFX )
+   {
+      // If preload is enabled we load the resource
+      // and device buffer now to avoid a delay on
+      // first playback.
+      if ( mPreload && !_preloadBuffer() )
+         Con::errorf( "SFXProfile(%s)::onPerformSubstitutions: The preload failed!", getName() );
+
+      // We need to get device change notifications.
+      SFX->getEventSignal().notify( this, &SFXProfile::_onDeviceEvent );
+   }
+}
+// AFX CODE BLOCK (datablock-temp-clone) >>
+
+// AFX CODE BLOCK (sfx-legacy) <<
+// This allows legacy AudioProfile datablocks to be recognized as an alias
+// for SFXProfile. It is intended to ease the transition from older scripts
+// especially those that still need to support pre-1.7 applications.
+// (This maybe removed in future releases so treat as deprecated.)
+class AudioProfile : public SFXProfile
+{
+	typedef SFXProfile Parent;
+public:
+	DECLARE_CONOBJECT(AudioProfile);
+};
+
+IMPLEMENT_CO_DATABLOCK_V1(AudioProfile);
+
+ConsoleDocClass( AudioProfile,
+   "@brief Allows legacy AudioProfile datablocks to be treated as SFXProfile datablocks.\n\n"
+
+   "@ingroup afxMisc\n"
+   "@ingroup AFX\n"
+   "@ingroup Datablocks\n"
+);
+
+// AFX CODE BLOCK (sfx-legacy) >>
+

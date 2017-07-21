@@ -20,6 +20,18 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        enhanced-field-mgmt -- Enhancements to dynamic field handling that allow for
+//            name filtering and replacement limiting.
+//        datablock-temp-clone -- Implements creation of temporary datablock clones to
+//            allow late substitution of datablock fields.
+//        reload-reset -- adds virtual method that is called when a datablock is reloaded.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _SIMOBJECT_H_
 #define _SIMOBJECT_H_
 
@@ -970,6 +982,26 @@ class SimObject: public ConsoleObject, public TamlCallbacks
 
       // EngineObject.
       virtual void destroySelf();
+   
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+protected:
+   bool   is_temp_clone;
+public:
+   /*C*/  SimObject(const SimObject&, bool = false);
+   bool   isTempClone() const { return is_temp_clone; }
+   virtual bool allowSubstitutions() const { return false; }
+   // AFX CODE BLOCK (datablock-temp-clone) >>
+   
+   // AFX CODE BLOCK (enhanced-field-mgmt) <<
+public:
+   static bool preventNameChanging;
+   void   assignDynamicFieldsFrom(SimObject*, const char* filter, bool no_replace=false);
+   // AFX CODE BLOCK (enhanced-field-mgmt) >>
+   
+   // AFX CODE BLOCK (reload-reset) <<
+public:
+   virtual void reloadReset() { }
+   // AFX CODE BLOCK (reload-reset) >>
 };
 
 

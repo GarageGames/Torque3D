@@ -20,6 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        anim-clip -- sequence selection by afx effects
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/aiPlayer.h"
 
@@ -96,6 +104,12 @@ AIPlayer::AIPlayer()
    mMoveStuckTestCountdown = 0;
    mMoveSlowdown = true;
    mMoveState = ModeStop;
+
+   // AFX CODE BLOCK (anim-clip) <<
+   // This new member saves the movement state of the AI so that
+   // it can be restored after a substituted animation is finished.
+   mMoveState_saved = -1;
+   // AFX CODE BLOCK (anim-clip) >>
 
    mAimObject = 0;
    mAimLocationSet = false;
@@ -547,6 +561,12 @@ bool AIPlayer::getAIMove(Move *movePtr)
             mMoveState = ModeMove;
          }
 
+         // AFX CODE BLOCK (anim-clip) <<
+         // Don't check for ai stuckness if animation during
+         // an anim-clip effect override.
+         if (mDamageState == Enabled && !(anim_clip_flags & ANIM_OVERRIDDEN) && !isAnimationLocked()) {
+         // AFX CODE BLOCK (anim-clip) >>
+
          if (mMoveStuckTestCountdown > 0)
             --mMoveStuckTestCountdown;
          else
@@ -565,6 +585,9 @@ bool AIPlayer::getAIMove(Move *movePtr)
                }
             }
          }
+         // AFX CODE BLOCK (anim-clip) <<
+         }
+         // AFX CODE BLOCK (anim-clip) >>
       }
    }
 
@@ -626,6 +649,9 @@ bool AIPlayer::getAIMove(Move *movePtr)
    }
 #endif // TORQUE_NAVIGATION_ENABLED
 
+   // AFX CODE BLOCK (anim-clip) <<
+   if (!(anim_clip_flags & ANIM_OVERRIDDEN) && !isAnimationLocked())
+   // AFX CODE BLOCK (anim-clip) >>
    mLastLocation = location;
 
    return true;
@@ -1414,6 +1440,49 @@ DefineEngineMethod( AIPlayer, clearMoveTriggers, void, ( ),,
 {
    object->clearMoveTriggers();
 }
+
+// AFX CODE BLOCK (anim-clip) <<
+// These changes coordinate with anim-clip mods to parent class, Player.
+
+// New method, restartMove(), restores the AIPlayer to its normal move-state
+// following animation overrides from AFX. The tag argument is used to match
+// the latest override and prevents interruption of overlapping animation
+// overrides. See related anim-clip changes in Player.[h,cc].
+void AIPlayer::restartMove(U32 tag)
+{
+   if (tag != 0 && tag == last_anim_tag)
+   {
+      if (mMoveState_saved != -1)
+      {
+         mMoveState = (MoveState) mMoveState_saved;
+         mMoveState_saved = -1;
+      }
+
+      bool is_death_anim = ((anim_clip_flags & IS_DEATH_ANIM) != 0);
+
+      last_anim_tag = 0;
+      anim_clip_flags &= ~(ANIM_OVERRIDDEN | IS_DEATH_ANIM);
+
+      if (mDamageState != Enabled)
+      {
+         if (!is_death_anim)
+         {
+            // this is a bit hardwired and desperate,
+            // but if he's dead he needs to look like it.
+            setActionThread("death10", false, false, false);
+         }
+      }
+   }
+}
+
+// New method, saveMoveState(), stores the current movement state
+// so that it can be restored when restartMove() is called.
+void AIPlayer::saveMoveState()
+{
+   if (mMoveState_saved == -1)
+      mMoveState_saved = (S32) mMoveState;
+}
+// AFX CODE BLOCK (anim-clip) >>
 
 F32 AIPlayer::getTargetDistance(GameBase* target, bool _checkEnabled)
 {

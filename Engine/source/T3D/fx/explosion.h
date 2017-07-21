@@ -20,6 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        datablock-temp-clone -- Implements creation of temporary datablock clones to
+//            allow late substitution of datablock fields.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _EXPLOSION_H_
 #define _EXPLOSION_H_
 
@@ -41,6 +50,10 @@ class ParticleEmitterData;
 class TSThread;
 class SFXTrack;
 struct DebrisData;
+
+// AFX CODE BLOCK (datablock-temp-clone) <<
+class SFXProfile;
+// AFX CODE BLOCK (datablock-temp-clone) >>
 
 //--------------------------------------------------------------------------
 class ExplosionData : public GameBaseData {
@@ -126,6 +139,13 @@ class ExplosionData : public GameBaseData {
    static void  initPersistFields();
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+public:
+   /*C*/          ExplosionData(const ExplosionData&, bool = false);
+   /*D*/          ~ExplosionData();
+   ExplosionData* cloneAndPerformSubstitutions(const SimObject*, S32 index=0);
+   virtual bool   allowSubstitutions() const { return true; }
+   // AFX CODE BLOCK (datablock-temp-clone) >>
 };
 
 
@@ -188,6 +208,15 @@ class Explosion : public GameBase, public ISceneLight
 
    DECLARE_CONOBJECT(Explosion);
    static void initPersistFields();
+
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+private:
+   SimObject*     ss_object;
+   S32            ss_index;
+   SFXProfile*    soundProfile_clone;
+public:
+   void           setSubstitutionData(SimObject* obj, S32 idx=0) { ss_object = obj; ss_index = idx; }
+   // AFX CODE BLOCK (datablock-temp-clone) >>
 };
 
 #endif // _H_EXPLOSION

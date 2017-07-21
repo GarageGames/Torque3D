@@ -20,6 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        enhanced-physical-zone -- PhysicalZone object enhanced to allow orientation
+//            add radial forces.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/containerQuery.h"
 
@@ -91,7 +100,11 @@ void physicalZoneFind(SceneObject* obj, void *key)
 
    if (pz->isActive()) {
       info->gravityScale *= pz->getGravityMod();
-      info->appliedForce += pz->getForce();
+      // AFX CODE BLOCK (enhanced-physical-zone) <<
+      Point3F center; 
+      info->box.getCenter(&center);
+      info->appliedForce += pz->getForce(&center);
+      // AFX CODE BLOCK (enhanced-physical-zone) >>
    }
 }
 

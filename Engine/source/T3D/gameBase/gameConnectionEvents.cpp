@@ -20,6 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//          db-cache -- implementation of datablock caching system.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "core/dnet.h"
 #include "core/stream/bitStream.h"
@@ -136,6 +144,9 @@ void SimDataBlockEvent::notifyDelivered(NetConnection *conn, bool )
 
 void SimDataBlockEvent::pack(NetConnection *conn, BitStream *bstream)
 {
+#ifdef AFX_CAP_DATABLOCK_CACHE // AFX CODE BLOCK (db-cache) <<
+   ((GameConnection *)conn)->tempDisableStringBuffering(bstream);
+#endif // AFX CODE BLOCK (db-cache) >>
    SimDataBlock* obj;
    Sim::findObject(id,obj);
    GameConnection *gc = (GameConnection *) conn;
@@ -157,10 +168,18 @@ void SimDataBlockEvent::pack(NetConnection *conn, BitStream *bstream)
       bstream->writeInt(classId ^ DebugChecksum, 32);
 #endif
    }
+#ifdef AFX_CAP_DATABLOCK_CACHE // AFX CODE BLOCK (db-cache) <<
+   ((GameConnection *)conn)->restoreStringBuffering(bstream);
+#endif // AFX CODE BLOCK (db-cache) >>
 }
 
 void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream)
 {
+#ifdef AFX_CAP_DATABLOCK_CACHE // AFX CODE BLOCK (db-cache) <<
+   // stash the stream position prior to unpacking
+   S32 start_pos = bstream->getCurPos();
+   ((GameConnection *)cptr)->tempDisableStringBuffering(bstream);
+#endif // AFX CODE BLOCK (db-cache) >>
    if(bstream->readFlag())
    {
       mProcess = true;
@@ -215,6 +234,11 @@ void SimDataBlockEvent::unpack(NetConnection *cptr, BitStream *bstream)
 #endif
 
    }
+#ifdef AFX_CAP_DATABLOCK_CACHE // AFX CODE BLOCK (db-cache) <<
+   // rewind to stream position and then process raw bytes for caching
+   ((GameConnection *)cptr)->repackClientDatablock(bstream, start_pos);
+   ((GameConnection *)cptr)->restoreStringBuffering(bstream);
+#endif // AFX CODE BLOCK (db-cache) >>
 }
 
 void SimDataBlockEvent::write(NetConnection *cptr, BitStream *bstream)

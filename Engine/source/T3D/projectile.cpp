@@ -20,6 +20,17 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        enhanced-projectile -- ...
+//        substitutions -- ...
+//        datablock-temp-clone -- Implements creation of temporary datablock clones to
+//            allow late substitution of datablock fields.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/projectile.h"
 
@@ -190,6 +201,43 @@ ProjectileData::ProjectileData()
    lightDescId = 0;
 }
 
+// AFX CODE BLOCK (datablock-temp-clone) <<
+ProjectileData::ProjectileData(const ProjectileData& other, bool temp_clone) : GameBaseData(other, temp_clone)
+{
+   projectileShapeName = other.projectileShapeName;
+   faceViewer = other.faceViewer; // -- always set to false
+   scale = other.scale;
+   velInheritFactor = other.velInheritFactor;
+   muzzleVelocity = other.muzzleVelocity;
+   impactForce = other.impactForce;
+   isBallistic = other.isBallistic;
+   bounceElasticity = other.bounceElasticity;
+   bounceFriction = other.bounceFriction;
+   gravityMod = other.gravityMod;
+   lifetime = other.lifetime;
+   armingDelay = other.armingDelay;
+   fadeDelay = other.fadeDelay;
+   explosion = other.explosion;
+   explosionId = other.explosionId; // -- for pack/unpack of explosion ptr
+   waterExplosion = other.waterExplosion;
+   waterExplosionId = other.waterExplosionId; // -- for pack/unpack of waterExplosion ptr
+   splash = other.splash;
+   splashId = other.splashId; // -- for pack/unpack of splash ptr
+   decal = other.decal;
+   decalId = other.decalId; // -- for pack/unpack of decal ptr
+   sound = other.sound;
+   lightDesc = other.lightDesc;
+   lightDescId = other.lightDescId; // -- for pack/unpack of lightDesc ptr
+   projectileShape = other.projectileShape; // -- TSShape loads using projectileShapeName
+   activateSeq = other.activateSeq; // -- from projectileShape sequence "activate"
+   maintainSeq = other.maintainSeq; // -- from projectileShape sequence "maintain"
+   particleEmitter = other.particleEmitter;
+   particleEmitterId = other.particleEmitterId; // -- for pack/unpack of particleEmitter ptr
+   particleWaterEmitter = other.particleWaterEmitter;
+   particleWaterEmitterId = other.particleWaterEmitterId; // -- for pack/unpack of particleWaterEmitter ptr
+}
+// AFX CODE BLOCK (datablock-temp-clone) >>
+
 //--------------------------------------------------------------------------
 
 void ProjectileData::initPersistFields()
@@ -274,6 +322,16 @@ void ProjectileData::initPersistFields()
       "A value of 1.0 will assume \"normal\" influence upon it.\n"
       "The magnitude of gravity is assumed to be 9.81 m/s/s\n\n"
       "@note ProjectileData::isBallistic must be true for this to have any affect.");
+
+   // AFX CODE BLOCK (substitutions) <<
+   // disallow some field substitutions
+   onlyKeepClearSubstitutions("explosion");
+   onlyKeepClearSubstitutions("particleEmitter");
+   onlyKeepClearSubstitutions("particleWaterEmitter");
+   onlyKeepClearSubstitutions("sound");
+   onlyKeepClearSubstitutions("splash");
+   onlyKeepClearSubstitutions("waterExplosion");
+   // AFX CODE BLOCK (substitutions) >>
 
    Parent::initPersistFields();
 }
@@ -574,6 +632,16 @@ Projectile::Projectile()
 
    mLightState.clear();
    mLightState.setLightInfo( mLight );
+
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+   mDataBlock = 0;
+   // AFX CODE BLOCK (datablock-temp-clone) >>
+   
+   // AFX CODE BLOCK (enhanced-projectile) <<
+   ignoreSourceTimeout = false;
+   dynamicCollisionMask = csmDynamicCollisionMask;
+   staticCollisionMask = csmStaticCollisionMask;
+   // AFX CODE BLOCK (enhanced-projectile) >>
 }
 
 Projectile::~Projectile()
@@ -582,6 +650,14 @@ Projectile::~Projectile()
 
    delete mProjectileShape;
    mProjectileShape = NULL;
+
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+   if (mDataBlock && mDataBlock->isTempClone())
+   {
+      delete mDataBlock;
+      mDataBlock = 0;
+   }
+   // AFX CODE BLOCK (datablock-temp-clone) >>
 }
 
 //--------------------------------------------------------------------------
@@ -609,6 +685,9 @@ void Projectile::initPersistFields()
    addField("sourceSlot",       TypeS32,     Offset(mSourceObjectSlot, Projectile),
       "@brief The sourceObject's weapon slot that the projectile originates from.\n\n");
 
+   // AFX CODE BLOCK (enhanced-projectile) <<
+   addField("ignoreSourceTimeout",  TypeBool,   Offset(ignoreSourceTimeout, Projectile));
+   // AFX CODE BLOCK (enhanced-projectile) >>
    endGroup("Source");
 
 
@@ -1088,7 +1167,9 @@ void Projectile::simulate( F32 dt )
    // disable the source objects collision reponse for a short time while we
    // determine if the projectile is capable of moving from the old position
    // to the new position, otherwise we'll hit ourself
-   bool disableSourceObjCollision = (mSourceObject.isValid() && mCurrTick <= SourceIdTimeoutTicks);
+   // AFX CODE BLOCK (enhanced-projectile) <<
+   bool disableSourceObjCollision = (mSourceObject.isValid() && (ignoreSourceTimeout || mCurrTick <= SourceIdTimeoutTicks));
+   // AFX CODE BLOCK (enhanced-projectile) >>
    if ( disableSourceObjCollision )
       mSourceObject->disableCollision();
    disableCollision();
@@ -1105,12 +1186,16 @@ void Projectile::simulate( F32 dt )
    if ( mPhysicsWorld )
       hit = mPhysicsWorld->castRay( oldPosition, newPosition, &rInfo, Point3F( newPosition - oldPosition) * mDataBlock->impactForce );            
    else 
-      hit = getContainer()->castRay(oldPosition, newPosition, csmDynamicCollisionMask | csmStaticCollisionMask, &rInfo);
+      // AFX CODE BLOCK (enhanced-projectile) <<
+      hit = getContainer()->castRay(oldPosition, newPosition, dynamicCollisionMask | staticCollisionMask, &rInfo);
+      // AFX CODE BLOCK (enhanced-projectile) >>
 
    if ( hit )
    {
       // make sure the client knows to bounce
-      if ( isServerObject() && ( rInfo.object->getTypeMask() & csmStaticCollisionMask ) == 0 )
+      // AFX CODE BLOCK (enhanced-projectile) <<
+      if(isServerObject() && (rInfo.object->getTypeMask() & staticCollisionMask) == 0)
+      // AFX CODE BLOCK (enhanced-projectile) >>
          setMaskBits( BounceMask );
 
       MatrixF xform( true );
@@ -1301,6 +1386,9 @@ U32 Projectile::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
             stream->writeRangedU32( U32(mSourceObjectSlot),
                                     0, 
                                     ShapeBase::MaxMountedImages - 1 );
+            // AFX CODE BLOCK (enhanced-projectile) <<
+            stream->writeFlag(ignoreSourceTimeout);
+            // AFX CODE BLOCK (enhanced-projectile) >>
          }
          else 
             // have not recieved the ghost for the source object yet, try again later
@@ -1343,7 +1431,9 @@ void Projectile::unpackUpdate(NetConnection* con, BitStream* stream)
       {
          mSourceObjectId   = stream->readRangedU32( 0, NetConnection::MaxGhostCount );
          mSourceObjectSlot = stream->readRangedU32( 0, ShapeBase::MaxMountedImages - 1 );
-
+         // AFX CODE BLOCK (enhanced-projectile) <<
+         ignoreSourceTimeout = stream->readFlag();
+         // AFX CODE BLOCK (enhanced-projectile) >>
          NetObject* pObject = con->resolveGhost( mSourceObjectId );
          if ( pObject != NULL )
             mSourceObject = dynamic_cast<ShapeBase*>( pObject );

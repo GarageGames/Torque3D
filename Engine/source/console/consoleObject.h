@@ -20,6 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        substitutions -- Implementation of special substitution statements on
+//            datablock fields.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _CONSOLEOBJECT_H_
 #define _CONSOLEOBJECT_H_
 
@@ -492,6 +501,9 @@ public:
             setDataFn( NULL ),
             getDataFn( NULL )
       {
+         // AFX CODE BLOCK (substitutions) <<
+         doNotSubstitute = keepClearSubsOnly = false;
+         // AFX CODE BLOCK (substitutions) >>
       }
 
       StringTableEntry pFieldname;    ///< Name of the field.
@@ -509,6 +521,10 @@ public:
       TypeValidator *validator;     ///< Validator, if any.
       SetDataNotify  setDataFn;     ///< Set data notify Fn
       GetDataNotify  getDataFn;     ///< Get data notify Fn
+      // AFX CODE BLOCK (substitutions) <<
+      bool           doNotSubstitute;
+      bool           keepClearSubsOnly;
+      // AFX CODE BLOCK (substitutions) >>
       WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
    };
    typedef Vector<Field> FieldList;
@@ -1054,6 +1070,11 @@ public:
 
    static ConsoleObject* __findObject( const char* ) { return NULL; }
    static const char* __getObjectId( ConsoleObject* ) { return ""; }
+   // AFX CODE BLOCK (substitutions) <<
+protected:
+   static bool disableFieldSubstitutions(const char* in_pFieldname);
+   static bool onlyKeepClearSubstitutions(const char* in_pFieldname);
+   // AFX CODE BLOCK (substitutions) >>
 };
 
 #define addNamedField(fieldName,type,className) addField(#fieldName, type, Offset(fieldName,className))

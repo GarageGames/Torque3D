@@ -20,6 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        obj-select -- object selection functionality
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "scene/sceneObject.h"
 
@@ -145,6 +153,9 @@ SceneObject::SceneObject()
 
    mAccuTex = NULL;
    mPathfindingIgnore = false;
+   // AFX CODE BLOCK (obj-select) <<
+   mSelectionFlags = 0;
+   // AFX CODE BLOCK (obj-select) >>
 }
 
 //-----------------------------------------------------------------------------

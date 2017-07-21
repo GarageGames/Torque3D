@@ -20,6 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        enhanced-field-mgmt -- Enhancements to dynamic field handling that allow for
+//            name filtering and replacement limiting.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 
 #include "platform/platform.h"
 #include "console/simFieldDictionary.h"
@@ -362,3 +370,69 @@ SimFieldDictionary::Entry* SimFieldDictionaryIterator::operator*()
 {
    return(mEntry);
 }
+
+// AFX CODE BLOCK (enhanced-field-mgmt) <<
+//
+// A variation of the stock SimFieldDictionary::setFieldValue(), this method adds the
+// <no_replace> argument which, when true, prohibits the replacement of fields that
+// already have a value. 
+//
+// AFX uses this when an effects-choreographer (afxMagicSpell, afxEffectron) is created 
+// using the new operator. It prevents any in-line effect parameters from being overwritten
+// by default parameters that are copied over later.
+//
+void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *value, ConsoleBaseType *type, bool no_replace)
+{
+   if (!no_replace)
+   {
+      setFieldValue(slotName, value);
+      return;
+   }
+
+   if (!value || !*value)
+      return;
+
+   U32 bucket = getHashValue(slotName);
+   Entry **walk = &mHashTable[bucket];
+   while(*walk && (*walk)->slotName != slotName)
+      walk = &((*walk)->next);
+
+   Entry *field = *walk;
+   if (field)
+      return;
+
+   addEntry( bucket, slotName, type, dStrdup( value ) );
+}
+
+//
+// A variation of the stock SimFieldDictionary::assignFrom(), this method adds <no_replace>
+// and <filter> arguments. When true, <no_replace> prohibits the replacement of fields that already
+// have a value. When <filter> is specified, only fields with leading characters that exactly match
+// the characters in <filter> are copied.
+//
+void SimFieldDictionary::assignFrom(SimFieldDictionary *dict, const char* filter, bool no_replace)
+{
+   dsize_t filter_len = (filter) ? dStrlen(filter) : 0;
+   if (filter_len == 0 && !no_replace)
+   {
+      assignFrom(dict);
+      return;
+   }
+
+   mVersion++;
+
+   if (filter_len == 0)
+   {
+      for(U32 i = 0; i < HashTableSize; i++)
+         for(Entry *walk = dict->mHashTable[i];walk; walk = walk->next)
+            setFieldValue(walk->slotName, walk->value, walk->type, no_replace);
+   }
+   else
+   {
+      for(U32 i = 0; i < HashTableSize; i++)
+         for(Entry *walk = dict->mHashTable[i];walk; walk = walk->next)
+            if (dStrncmp(walk->slotName, filter, filter_len) == 0)
+               setFieldValue(walk->slotName, walk->value, walk->type, no_replace);
+   }
+}
+// AFX CODE BLOCK (enhanced-field-mgmt) >>

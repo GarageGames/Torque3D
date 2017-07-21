@@ -20,6 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        enhanced-projectile -- ...
+//        datablock-temp-clone -- Implements creation of temporary datablock clones to
+//            allow late substitution of datablock fields.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _PROJECTILE_H_
 #define _PROJECTILE_H_
 
@@ -144,6 +154,12 @@ public:
    
    DECLARE_CALLBACK( void, onExplode, ( Projectile* proj, Point3F pos, F32 fade ) );
    DECLARE_CALLBACK( void, onCollision, ( Projectile* proj, SceneObject* col, F32 fade, Point3F pos, Point3F normal ) );
+
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+public:
+   ProjectileData(const ProjectileData&, bool = false);
+   virtual bool allowSubstitutions() const { return true; }
+   // AFX CODE BLOCK (datablock-temp-clone) >>
 };
 
 
@@ -279,6 +295,13 @@ protected:
    Point3F mExplosionPosition;
    Point3F mExplosionNormal;
    U32     mCollideHitType;   
+
+   // AFX CODE BLOCK (enhanced-projectile) <<
+public:
+   bool   ignoreSourceTimeout;
+   U32    dynamicCollisionMask;
+   U32    staticCollisionMask;
+   // AFX CODE BLOCK (enhanced-projectile) >>
 };
 
 #endif // _PROJECTILE_H_

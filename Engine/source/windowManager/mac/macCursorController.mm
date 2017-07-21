@@ -127,6 +127,13 @@ void MacCursorController::setCursorShape(U32 cursorID)
       case PlatformCursorController::curResizeHorz:
          [[NSCursor resizeUpDownCursor] set];
       break;
+      // AFX CODE BLOCK (bug-fix) <<
+      // This sets an appropriate value for the standard hand cursor.
+      // In AFX this is used for rollover feedback.
+      case PlatformCursorController::curHand:
+         [[NSCursor pointingHandCursor] set];
+      break;
+      // AFX CODE BLOCK (bug-fix) >>
    }
 }
 

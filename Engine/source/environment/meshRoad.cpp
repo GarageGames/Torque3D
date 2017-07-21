@@ -20,6 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        meshroad-zodiacs -- MeshRoad customizations for rendering zodiacs on them.
+//        enhanced-meshroad -- adds option for building top-surface-only PolyList.
+//        special-types -- defines type bits for interior-like and terrain-like types.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "environment/meshRoad.h"
 
@@ -51,6 +61,10 @@
 #include "T3D/physics/physicsBody.h"
 #include "T3D/physics/physicsCollision.h"
 #include "environment/nodeListManager.h"
+
+// AFX CODE BLOCK (meshroad-zodiacs) <<
+#include "afx/ce/afxZodiacMgr.h"
+// AFX CODE BLOCK (meshroad-zodiacs) >>
 
 #define MIN_METERS_PER_SEGMENT 1.0f
 #define MIN_NODE_DEPTH 0.25f
@@ -620,6 +634,10 @@ MeshRoad::MeshRoad()
 	mMatInst[Top] = NULL;
    mMatInst[Bottom] = NULL;
    mMatInst[Side] = NULL;
+
+   // AFX CODE BLOCK (special-types) <<
+   mTypeMask |= TerrainLikeObjectType;
+   // AFX CODE BLOCK (special-types) >>
 }
 
 MeshRoad::~MeshRoad()
@@ -821,6 +839,10 @@ void MeshRoad::prepRenderImage( SceneRenderState* state )
    // otherwise obey the smShowRoad flag
    if ( smShowRoad || !smEditorOpen )
    {
+      // AFX CODE BLOCK (meshroad-zodiacs) <<
+      afxZodiacMgr::renderMeshRoadZodiacs(state, this);
+      // AFX CODE BLOCK (meshroad-zodiacs) >>
+
       MeshRenderInst coreRI;
       coreRI.clear();
       coreRI.objectToWorld = &MatrixF::Identity;
@@ -1378,6 +1400,14 @@ bool MeshRoad::buildSegmentPolyList( AbstractPolyList* polyList, U32 startSegIdx
          ddraw->drawTri( cpolyList->mVertexList[p00].point, cpolyList->mVertexList[p11].point, cpolyList->mVertexList[p10].point );
          ddraw->setLastTTL( 0 );
       }
+
+      // AFX CODE BLOCK (enhanced-meshroad) <<
+      if (buildPolyList_TopSurfaceOnly)
+      {
+         offset += 4;
+         continue;
+      }
+      // AFX CODE BLOCK (enhanced-meshroad) >>
 
       // Left Face
 
@@ -2454,3 +2484,18 @@ DefineEngineMethod( MeshRoad, postApply, void, (),,
 {
    object->inspectPostApply();
 }
+
+// AFX CODE BLOCK (enhanced-meshroad) <<
+bool MeshRoad::buildPolyList_TopSurfaceOnly = false;
+
+bool MeshRoad::buildTopPolyList(PolyListContext plc, AbstractPolyList* polyList)
+{
+   static Box3F box_prox; static SphereF ball_prox;
+
+   buildPolyList_TopSurfaceOnly = true;
+   bool result = buildPolyList(plc, polyList, box_prox, ball_prox);
+   buildPolyList_TopSurfaceOnly = false;
+
+   return result;
+}
+// AFX CODE BLOCK (enhanced-meshroad) >>

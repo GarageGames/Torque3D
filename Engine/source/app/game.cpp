@@ -20,6 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        core -- heartbeat call to arcaneFX::advanceTime() from within clientProcess().
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "platform/platformInput.h"
 
@@ -48,6 +56,11 @@
 #include "gfx/gfxCubemap.h"
 #include "gfx/gfxTextureManager.h"
 #include "sfx/sfxSystem.h"
+
+// AFX CODE BLOCK (core) <<
+// Including this header provides access to certain system-level AFX methods.
+#include "afx/arcaneFX.h"
+// AFX CODE BLOCK (core) >>
 
 #ifdef TORQUE_PLAYER
 // See matching #ifdef in editor/editor.cpp
@@ -235,6 +248,12 @@ ConsoleFunctionGroupEnd(Platform);
 
 bool clientProcess(U32 timeDelta)
 {
+   // AFX CODE BLOCK (core) <<
+   // Required heartbeat call on the client side which must come
+   // before the advanceTime() calls are made to the scene objects.
+   arcaneFX::advanceTime(timeDelta);
+   // AFX CODE BLOCK (core) >>
+
    bool ret = true;
 
 #ifndef TORQUE_TGB_ONLY

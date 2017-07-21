@@ -20,6 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        fade-gui-ctrl -- adds fading capability to GuiControl.          
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "gui/core/guiControl.h"
 
@@ -224,6 +232,10 @@ GuiControl::GuiControl() : mAddGroup( NULL ),
 
    mCanSaveFieldDictionary = false;
    mNotifyChildrenResized = true;
+
+   // AFX CODE BLOCK (fade-gui-ctrl) <<
+   fade_amt = 1.0f;
+   // AFX CODE BLOCK (fade-gui-ctrl) >>
 }
 
 //-----------------------------------------------------------------------------

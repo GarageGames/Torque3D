@@ -20,6 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        process-order -- code to help positioning of objects in the process lists. 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _PROCESSLIST_H_
 #define _PROCESSLIST_H_
 
@@ -188,6 +196,12 @@ protected:
 
    PreTickSignal mPreTick;
    PostTickSignal mPostTick;
+
+   // AFX CODE BLOCK (process-order) <<
+   // JTF: still needed?
+public:
+   ProcessObject* findNearestToEnd(Vector<ProcessObject*>& objs) const;
+   // AFX CODE BLOCK (process-order) >>
 };
 
 #endif // _PROCESSLIST_H_

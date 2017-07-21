@@ -20,6 +20,21 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        datablock-temp-clone -- Implements creation of temporary datablock clones to
+//            allow late substitution of datablock fields.
+//        collision-events -- detects object collisions for use with AFX collision event
+//            effects.
+//        remap-txr-tags -- runtime reassignment of texture tag names. (Useful for
+//            splitting up tags with the same name in order to map different materials
+//            to them.)
+//        bbox-check -- a change that allows disabling of a confusing error message.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _SHAPEBASE_H_
 #define _SHAPEBASE_H_
 
@@ -654,6 +669,26 @@ public:
    DECLARE_CALLBACK(void, onEndSequence, (ShapeBase* obj, S32 slot, const char* name));
    DECLARE_CALLBACK( void, onForceUncloak, ( ShapeBase* obj, const char* reason ) );
    /// @}
+
+   // AFX CODE BLOCK (remap-txr-tags) <<
+   struct TextureTagRemapping
+   {
+      char* old_tag;
+      char* new_tag;
+   };
+   StringTableEntry remap_txr_tags;
+   char* remap_buffer;
+   Vector<TextureTagRemapping> txr_tag_remappings;
+   // AFX CODE BLOCK (remap-txr-tags) >>
+
+   // AFX CODE BLOCK (bbox-check) <<
+   bool silent_bbox_check;
+   // AFX CODE BLOCK (bbox-check) >>
+
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+public:
+   ShapeBaseData(const ShapeBaseData&, bool = false);
+   // AFX CODE BLOCK (datablock-temp-clone) >>
 };
 
 
@@ -1845,7 +1880,65 @@ public:
 
 protected:
    DECLARE_CALLBACK( F32, validateCameraFov, (F32 fov) );
+   
+   // AFX CODE BLOCK (collision-events) <<
+public:
+   class CollisionEventCallback
+   {
+   public:
+      virtual void collisionNotify(SceneObject* shape0, SceneObject* shape1, const VectorF& vel)=0;
+   };
+private:
+   Vector<CollisionEventCallback*>  collision_callbacks;
+   void   notifyCollisionCallbacks(SceneObject*, const VectorF& vel);
+public:
+   void   registerCollisionCallback(CollisionEventCallback*);
+   void   unregisterCollisionCallback(CollisionEventCallback*);
+   // AFX CODE BLOCK (collision-events) >>
 
+   // AFX CODE BLOCK (anim-clip) <<
+protected:
+   enum { 
+      ANIM_OVERRIDDEN     = BIT(0),
+      BLOCK_USER_CONTROL  = BIT(1),
+      IS_DEATH_ANIM       = BIT(2),
+      BAD_ANIM_ID         = 999999999,
+      BLENDED_CLIP        = 0x80000000,
+   };
+   struct BlendThread
+   {
+      TSThread* thread;
+      U32       tag;
+   };
+   Vector<BlendThread> blend_clips;
+   static U32 unique_anim_tag_counter;
+   U8 anim_clip_flags;
+   S32 last_anim_id;
+   U32 last_anim_tag;
+   U32 last_anim_lock_tag;
+   S32 saved_seq_id;
+   F32 saved_pos;
+   F32 saved_rate;
+   U32 playBlendAnimation(S32 seq_id, F32 pos, F32 rate);
+   void restoreBlendAnimation(U32 tag);
+public:
+   U32 playAnimation(const char* name, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim);
+   F32 getAnimationDuration(const char* name);
+
+   virtual void restoreAnimation(U32 tag);
+   virtual U32 getAnimationID(const char* name);
+   virtual U32 playAnimationByID(U32 anim_id, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim);
+   virtual F32 getAnimationDurationByID(U32 anim_id);
+   virtual bool isBlendAnimation(const char* name);
+   virtual const char* getLastClipName(U32 clip_tag);
+   virtual void unlockAnimation(U32 tag, bool force=false) { }
+   virtual U32 lockAnimation() { return 0; }
+   virtual bool isAnimationLocked() const { return false; }
+   // AFX CODE BLOCK (anim-clip) >>
+
+   // AFX CODE BLOCK (selection-highlight) <<
+   virtual void setSelectionFlags(U8 flags);
+   // AFX CODE BLOCK (selection-highlight) >>
 };
 
 

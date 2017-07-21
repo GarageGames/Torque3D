@@ -20,6 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        localRenderViz -- Implements per-light renderViz setting.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/lightBase.h"
 
@@ -73,6 +81,10 @@ LightBase::LightBase()
    mLight = LightManager::createLightInfo();
 
    mFlareState.clear();
+
+   // AFX CODE BLOCK (localRenderViz) <<
+   mLocalRenderViz = false;
+   // AFX CODE BLOCK (localRenderViz) >>
 }
 
 LightBase::~LightBase()
@@ -206,7 +218,9 @@ void LightBase::prepRenderImage( SceneRenderState *state )
 
    // If the light is selected or light visualization
    // is enabled then register the callback.
-   if ( smRenderViz || isSelectedInEditor )
+   // AFX CODE BLOCK (localRenderViz) <<
+   if ( mLocalRenderViz || smRenderViz || isSelectedInEditor )
+   // AFX CODE BLOCK (localRenderViz) >>
    {
       ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
       ri->renderDelegate.bind( this, &LightBase::_onRenderViz );

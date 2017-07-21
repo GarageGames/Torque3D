@@ -20,6 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        remap-txr-tags -- runtime reassignment of texture tag names. (Useful for
+//            splitting up tags with the same name in order to map different materials
+//            to them.)
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "materials/materialList.h"
 
@@ -309,7 +319,14 @@ void MaterialList::mapMaterial( U32 i )
       return;
    }
 
-   String materialName = MATMGR->getMapEntry(matName);
+   // AFX CODE BLOCK (remap-txr-tags) <<
+   String materialName;
+   // Skip past a leading '#' marker.
+   if (matName.compare("#", 1) == 0)
+      materialName = MATMGR->getMapEntry(matName.substr(1, matName.length()-1));
+   else
+      materialName = MATMGR->getMapEntry(matName);
+   // AFX CODE BLOCK (remap-txr-tags) >>
 
    // IF we didn't find it, then look for a PolyStatic generated Material
    //  [a little cheesy, but we need to allow for user override of generated Materials]

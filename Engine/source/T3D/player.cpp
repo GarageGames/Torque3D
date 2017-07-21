@@ -20,6 +20,20 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        obj-select -- object selection functionality
+//        anim-clip -- sequence selection by afx effects
+//        player-look -- modified player head and arm control
+//        triggers -- implements effect triggers derived from player behaviors.
+//        player-movement -- mods allowing manipulation of player movement.
+//        player-puppet -- mods allowing manipulation of player via contraints.
+//        foot-switch -- mods for overriding built-in footstep sounds, decals, and dust.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/player.h"
 
@@ -1656,6 +1670,10 @@ Player::Player()
    mLastAbsoluteYaw = 0.0f;
    mLastAbsolutePitch = 0.0f;
    mLastAbsoluteRoll = 0.0f;
+   
+   // AFX CODE BLOCK (misc) <<
+   afx_init();
+   // AFX CODE BLOCK (misc) >>
 }
 
 Player::~Player()
@@ -2070,6 +2088,36 @@ void Player::processTick(const Move* move)
    }
 
    Parent::processTick(move);
+
+   // AFX CODE BLOCK (triggers) <<
+   // Check for state changes in the standard move triggers and
+   // set bits for any triggers that switched on this tick in
+   // the fx_s_triggers mask. Flag any changes to be packed to
+   // clients.
+   if (isServerObject())
+   {
+      fx_s_triggers = 0;
+      if (move)
+      {
+         U8 on_bits = 0;
+         for (S32 i = 0; i < MaxTriggerKeys; i++)
+            if (move->trigger[i])
+               on_bits |= BIT(i);
+
+         if (on_bits != move_trigger_states)
+         {
+            U8 switched_on_bits = (on_bits & ~move_trigger_states);
+            if (switched_on_bits)
+            {
+               fx_s_triggers |= (U32)switched_on_bits;
+               setMaskBits(TriggerMask);
+            }
+            move_trigger_states = on_bits;
+         }
+      }
+   }
+   // AFX CODE BLOCK (triggers) >>
+
    // Warp to catch up to server
    if (delta.warpTicks > 0) {
       delta.warpTicks--;
@@ -2085,7 +2133,12 @@ void Player::processTick(const Move* move)
       else if (delta.rot.z > M_PI_F)
          delta.rot.z -= M_2PI_F;
 
-      setPosition(delta.pos,delta.rot);
+      // AFX CODE BLOCK (player-puppet) <<
+      if (!ignore_updates)
+      {
+         setPosition(delta.pos,delta.rot);
+      }
+      // AFX CODE BLOCK (player-puppet) >>
       updateDeathOffsets();
       updateLookAnimation();
 
@@ -2183,7 +2236,10 @@ void Player::interpolateTick(F32 dt)
    Point3F pos = delta.pos + delta.posVec * dt;
    Point3F rot = delta.rot + delta.rotVec * dt;
 
-   setRenderPosition(pos,rot,dt);
+   // AFX CODE BLOCK (player-puppet) <<
+   if (!ignore_updates)
+      setRenderPosition(pos,rot,dt);
+   // AFX CODE BLOCK (player-puppet) >>
 
 /*
    // apply camera effects - is this the best place? - bramage
@@ -2208,6 +2264,13 @@ void Player::advanceTime(F32 dt)
 {
    // Client side animations
    Parent::advanceTime(dt);
+
+   // AFX CODE BLOCK (triggers) <<
+   // Increment timer for triggering idle events.
+   if (idle_timer >= 0.0f)
+      idle_timer += dt;
+   // AFX CODE BLOCK (triggers) >>
+
    updateActionThread();
    updateAnimation(dt);
    updateSplash();
@@ -2498,6 +2561,32 @@ AngAxisF gPlayerMoveRot;
 
 void Player::updateMove(const Move* move)
 {
+   // AFX CODE BLOCK (player-movement) <<
+   struct Move my_move;
+   if (override_movement && movement_op < 3)
+   {
+      my_move = *move;
+      switch (movement_op)
+      {
+      case 0: // add
+         my_move.x += movement_data.x;
+         my_move.y += movement_data.y;
+         my_move.z += movement_data.z;
+         break;
+      case 1: // mult
+         my_move.x *= movement_data.x;
+         my_move.y *= movement_data.y;
+         my_move.z *= movement_data.z;
+         break;
+      case 2: // replace
+         my_move.x = movement_data.x;
+         my_move.y = movement_data.y;
+         my_move.z = movement_data.z;
+         break;
+      }
+      move = &my_move;
+   }
+   // AFX CODE BLOCK (player-movement) >>
    delta.move = *move;
 
 #ifdef TORQUE_OPENVR
@@ -2740,7 +2829,14 @@ void Player::updateMove(const Move* move)
    // Desired move direction & speed
    VectorF moveVec;
    F32 moveSpeed;
-   if ((mState == MoveState || (mState == RecoverState && mDataBlock->recoverRunForceScale > 0.0f)) && mDamageState == Enabled)
+   // AFX CODE BLOCK (anim-clip) <<
+   // If BLOCK_USER_CONTROL is set in anim_clip_flags, the user won't be able to
+   // resume control over the player character. This generally happens for
+   // short periods of time synchronized with script driven animation at places
+   // where it makes sense that user motion is prohibited, such as when the 
+   // player is lifted off the ground or knocked down.
+   if ((mState == MoveState || (mState == RecoverState && mDataBlock->recoverRunForceScale > 0.0f)) && mDamageState == Enabled && !isAnimationLocked())
+   // AFX CODE BLOCK (anim-clip) >>
    {
       zRot.getColumn(0,&moveVec);
       moveVec *= (move->x * (mPose == SprintPose ? mDataBlock->sprintStrafeScale : 1.0f));
@@ -2798,6 +2894,12 @@ void Player::updateMove(const Move* move)
       moveVec.set(0.0f, 0.0f, 0.0f);
       moveSpeed = 0.0f;
    }
+
+   // AFX CODE BLOCK (player-movement) <<
+   // apply speed bias here.
+   speed_bias = speed_bias + (speed_bias_goal - speed_bias)*0.1f;
+   moveSpeed *= speed_bias;
+   // AFX CODE BLOCK (player-movement) >>
 
    // Acceleration due to gravity
    VectorF acc(0.0f, 0.0f, mGravity * mGravityMod * TickSec);
@@ -3025,7 +3127,11 @@ void Player::updateMove(const Move* move)
       mContactTimer++;   
 
    // Acceleration from Jumping
-   if (move->trigger[sJumpTrigger] && canJump())// !isMounted() && 
+   // AFX CODE BLOCK (anim-clip) <<
+   // While BLOCK_USER_CONTROL is set in anim_clip_flags, the user won't be able to
+   // make the player character jump.
+   if (move->trigger[sJumpTrigger] && canJump() && !isAnimationLocked())
+   // AFX CODE BLOCK (anim-clip) >>
    {
       // Scale the jump impulse base on maxJumpSpeed
       F32 zSpeedScale = mVelocity.z;
@@ -3076,6 +3182,12 @@ void Player::updateMove(const Move* move)
          setActionThread( seq, true, false, true );
 
          mJumpSurfaceLastContact = JumpSkipContactsMax;
+
+         // AFX CODE BLOCK (triggers) <<
+         // Flag the jump event trigger.
+         fx_s_triggers |= PLAYER_JUMP_S_TRIGGER;
+         setMaskBits(TriggerMask);
+         // AFX CODE BLOCK (triggers) >>
       }
    }
    else
@@ -3493,6 +3605,22 @@ void Player::updateDamageState()
 
 void Player::updateLookAnimation(F32 dt)
 {
+   // AFX CODE BLOCK (player-look) <<
+   // If the preference setting overrideLookAnimation is true, the player's
+   // arm and head no longer animate according to the view direction. They
+   // are instead given fixed positions.
+   if (overrideLookAnimation)
+   {
+      if (mArmAnimation.thread) 
+         mShapeInstance->setPos(mArmAnimation.thread, armLookOverridePos);
+      if (mHeadVThread) 
+         mShapeInstance->setPos(mHeadVThread, headVLookOverridePos);
+      if (mHeadHThread) 
+         mShapeInstance->setPos(mHeadHThread, headHLookOverridePos);
+      return;
+   }
+   // AFX CODE BLOCK (player-look) >>
+
    // Calculate our interpolated head position.
    Point3F renderHead = delta.head + delta.headVec * dt;
 
@@ -3533,6 +3661,11 @@ void Player::updateLookAnimation(F32 dt)
 
 bool Player::inDeathAnim()
 {
+   // AFX CODE BLOCK (anim-clip) <<
+   if ((anim_clip_flags & ANIM_OVERRIDDEN) != 0 && (anim_clip_flags & IS_DEATH_ANIM) == 0)
+      return false;
+   // AFX CODE BLOCK (anim-clip) >>
+
    if (mActionAnimation.thread && mActionAnimation.action >= 0)
       if (mActionAnimation.action < mDataBlock->actionCount)
          return mDataBlock->actionList[mActionAnimation.action].death;
@@ -3742,6 +3875,11 @@ bool Player::setArmThread(U32 action)
 
 bool Player::setActionThread(const char* sequence,bool hold,bool wait,bool fsp)
 {
+   // AFX CODE BLOCK (anim-clip) <<
+   if (anim_clip_flags & ANIM_OVERRIDDEN)
+      return false;
+   // AFX CODE BLOCK (anim-clip) >>
+
    for (U32 i = 1; i < mDataBlock->actionCount; i++)
    {
       PlayerData::ActionAnimation &anim = mDataBlock->actionList[i];
@@ -3765,6 +3903,14 @@ void Player::setActionThread(U32 action,bool forward,bool hold,bool wait,bool fs
       Con::errorf("Player::setActionThread(%d): Player action out of range", action);
       return;
    }
+
+   // AFX CODE BLOCK (triggers) <<
+   if (isClientObject())
+   {
+      mark_idle = (action == PlayerData::RootAnim);
+      idle_timer = (mark_idle) ? 0.0f : -1.0f;
+   }
+   // AFX CODE BLOCK (triggers) >>
 
    PlayerData::ActionAnimation &anim = mDataBlock->actionList[action];
    if (anim.sequence != -1)
@@ -3858,7 +4004,13 @@ void Player::updateActionThread()
          offset = mDataBlock->decalOffset * getScale().x;
       }
 
-      if( triggeredLeft || triggeredRight )
+      // AFX CODE BLOCK (triggers) <<
+      process_client_triggers(triggeredLeft, triggeredRight);
+      // AFX CODE BLOCK (triggers) >>
+
+      // AFX CODE BLOCK (triggers) <<
+      if ((triggeredLeft || triggeredRight) && !noFootfallFX)
+      // AFX CODE BLOCK (triggers) >>
       {
          Point3F rot, pos;
          RayInfo rInfo;
@@ -3874,8 +4026,10 @@ void Player::updateActionThread()
 
             // Put footprints on surface, if appropriate for material.
 
+            // AFX CODE BLOCK (foot-switch) <<
             if( material && material->mShowFootprints
-                && mDataBlock->decalData )
+                && mDataBlock->decalData && !footfallDecalOverride )
+            // AFX CODE BLOCK (foot-switch) >>
             {
                Point3F normal;
                Point3F tangent;
@@ -3886,8 +4040,10 @@ void Player::updateActionThread()
             
             // Emit footpuffs.
 
-            if( rInfo.t <= 0.5 && mWaterCoverage == 0.0
-                && material && material->mShowDust )
+            // AFX CODE BLOCK (foot-switch) <<
+            if (!footfallDustOverride && rInfo.t <= 0.5f && mWaterCoverage == 0.0f
+                                         && material && material->mShowDust )
+            // AFX CODE BLOCK (foot-switch) >>
             {
                // New emitter every time for visibility reasons
                ParticleEmitter * emitter = new ParticleEmitter;
@@ -3919,7 +4075,9 @@ void Player::updateActionThread()
             }
 
             // Play footstep sound.
-            
+            // AFX CODE BLOCK (foot-switch) <<
+            if (footfallSoundOverride <= 0)
+            // AFX CODE BLOCK (foot-switch) >>
             playFootstepSound( triggeredLeft, material, rInfo.object );
          }
       }
@@ -3941,8 +4099,12 @@ void Player::updateActionThread()
       pickActionAnimation();
    }
 
+   // AFX CODE BLOCK (anim-clip) <<
+   // prevent scaling of AFX picked actions
    if ( (mActionAnimation.action != PlayerData::LandAnim) &&
-        (mActionAnimation.action != PlayerData::NullAnimation) )
+        (mActionAnimation.action != PlayerData::NullAnimation) &&
+        !(anim_clip_flags & ANIM_OVERRIDDEN))
+   // AFX CODE BLOCK (anim-clip) >>
    {
       // Update action animation time scale to match ground velocity
       PlayerData::ActionAnimation &anim =
@@ -4560,6 +4722,13 @@ void Player::updateAnimation(F32 dt)
    if (mImageStateThread)
       mShapeInstance->advanceTime(dt,mImageStateThread);
 
+   // AFX CODE BLOCK (anim-clip) <<
+   // update any active blend clips
+   if (isGhost())
+      for (S32 i = 0; i < blend_clips.size(); i++)
+         mShapeInstance->advanceTime(dt, blend_clips[i].thread);
+   // AFX CODE BLOCK (anim-clip) >>
+
    // If we are the client's player on this machine, then we need
    // to make sure the transforms are up to date as they are used
    // to setup the camera.
@@ -4573,6 +4742,13 @@ void Player::updateAnimation(F32 dt)
       else
       {
          updateAnimationTree(false);
+         // AFX CODE BLOCK (anim-clip) <<
+         // This addition forces recently visible players to animate their
+         // skeleton now rather than in pre-render so that constrained effects
+         // get up-to-date node transforms.
+         if (didRenderLastRender())
+            mShapeInstance->animate();
+         // AFX CODE BLOCK (anim-clip) >>
       }
    }
 }
@@ -4878,6 +5054,14 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
          // we can use it to do impacts
          // and query collision.
          *outCol = *collision;
+         
+         // AFX CODE BLOCK (triggers) <<
+         if (isServerObject() && bd > 6.8f && collision->normal.z > 0.7f)
+         {
+            fx_s_triggers |= PLAYER_LANDING_S_TRIGGER;
+            setMaskBits(TriggerMask);
+         }
+         // AFX CODE BLOCK (triggers) >>
 
          // Subtract out velocity
          VectorF dv = collision->normal * (bd + sNormalElasticity);
@@ -5879,8 +6063,15 @@ void Player::applyImpulse(const Point3F&,const VectorF& vec)
 
 bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 {
-   if (getDamageState() != Enabled)
+   // AFX CODE BLOCK (obj-select) <<
+   // In standard Torque there's a rather brute force culling of all
+   // non-enabled players (corpses) from the ray cast. But, to
+   // demonstrate a resurrection spell, we need corpses to be
+   // selectable, so this code change allows consideration of corpses
+   // in the ray cast if corpsesHiddenFromRayCast is set to false.
+   if (sCorpsesHiddenFromRayCast && getDamageState() != Enabled)
       return false;
+   // AFX CODE BLOCK (obj-select) >>
 
    // Collide against bounding box. Need at least this for the editor.
    F32 st,et,fst = 0.0f,fet = 1.0f;
@@ -6146,7 +6337,10 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
    stream->read(&mHead.z);
    stream->read(&rot.z);
    rot.x = rot.y = 0;
-   setPosition(pos,rot);
+   // AFX CODE BLOCK (player-puppet) <<
+   if (!ignore_updates)
+      setPosition(pos,rot);
+   // AFX CODE BLOCK (player-puppet) >>
    delta.head = mHead;
    delta.rot = rot;
 
@@ -6188,6 +6382,10 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          mArmAnimation.action != mDataBlock->lookAction))) {
       stream->writeInt(mArmAnimation.action,PlayerData::ActionAnimBits);
    }
+
+   // AFX CODE BLOCK (misc) <<
+   retMask = afx_packUpdate(con, mask, stream, retMask);
+   // AFX CODE BLOCK (misc) >>
 
    // The rest of the data is part of the control object packet update.
    // If we're controlled by this client, we don't need to send it.
@@ -6292,6 +6490,10 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
          mArmAnimation.action = action;
    }
 
+   // AFX CODE BLOCK (misc) <<
+   afx_unpackUpdate(con, stream);
+   // AFX CODE BLOCK (misc) >>
+
    // Done if controlled by client ( and not initial update )
    if(stream->readFlag())
       return;
@@ -6391,7 +6593,10 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
             }
             delta.pos = pos;
             delta.rot = rot;
-            setPosition(pos,rot);
+            // AFX CODE BLOCK (player-puppet) <<
+            if (!ignore_updates)
+               setPosition(pos,rot);
+            // AFX CODE BLOCK (player-puppet) >>
          }
       }
       else 
@@ -6403,7 +6608,10 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
          delta.rotVec.set(0.0f, 0.0f, 0.0f);
          delta.warpTicks = 0;
          delta.dt = 0.0f;
-         setPosition(pos,rot);
+         // AFX CODE BLOCK (player-puppet) <<
+         if (!ignore_updates)
+            setPosition(pos,rot);
+         // AFX CODE BLOCK (player-puppet) >>
       }
    }
    F32 energy = stream->readFloat(EnergyLevelBits) * mDataBlock->maxEnergy;
@@ -6819,6 +7027,10 @@ void Player::consoleInit()
    Con::addVariable("$player::extendedMoveHeadPosRotIndex", TypeS32, &smExtendedMoveHeadPosRotIndex, 
       "@brief The ExtendedMove position/rotation index used for head movements.\n\n"
       "@ingroup GameObjects\n");
+     
+   // AFX CODE BLOCK (misc) <<
+   afx_consoleInit();
+   // AFX CODE BLOCK (misc) >>
 }
 
 //--------------------------------------------------------------------------
@@ -6863,6 +7075,11 @@ void Player::calcClassRenderData()
 
 void Player::playFootstepSound( bool triggeredLeft, Material* contactMaterial, SceneObject* contactObject )
 {
+   // AFX CODE BLOCK (foot-switch) <<
+   if (footfallSoundOverride > 0)
+      return;
+   // AFX CODE BLOCK (foot-switch) >>
+
    MatrixF footMat = getTransform();
    if( mWaterCoverage > 0.0 )
    {
@@ -7206,3 +7423,353 @@ ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
 }
 
 #endif
+// AFX CODE BLOCK (misc) <<
+// static 
+bool Player::sCorpsesHiddenFromRayCast = true; // this default matches stock Torque behavior.
+
+// static 
+void Player::afx_consoleInit()
+{
+   Con::addVariable("pref::Player::corpsesHiddenFromRayCast", TypeBool, &sCorpsesHiddenFromRayCast);
+}
+
+void Player::afx_init()
+{
+   overrideLookAnimation = false;
+   armLookOverridePos = 0.5f;
+   headVLookOverridePos = 0.5f;
+   headHLookOverridePos = 0.5f;
+   ignore_updates = false;
+   fx_c_triggers = 0;
+   mark_fx_c_triggers = 0;
+   fx_s_triggers = 0;
+   move_trigger_states = 0;
+   z_velocity = 0.0f;
+   mark_idle = false;
+   idle_timer = 0.0f;
+   mark_s_landing = false;
+   speed_bias = 1.0f;
+   speed_bias_goal = 1.0f;
+   override_movement = 0;
+   movement_data.zero();
+   movement_op = 1;
+   last_movement_tag = 0;
+   footfallDecalOverride = 0;
+   footfallSoundOverride = 0;
+   footfallDustOverride = 0;
+   noFootfallFX = false;
+}
+
+U32 Player::afx_packUpdate(NetConnection* con, U32 mask, BitStream* stream, U32 retMask)
+{
+#if 0
+   if (stream->writeFlag(mask & LookOverrideMask))
+#else
+   if (stream->writeFlag(mask & ActionMask))
+#endif
+      stream->writeFlag(overrideLookAnimation);
+
+   if (stream->writeFlag(mask & TriggerMask))
+      stream->write(fx_s_triggers);
+
+   return retMask;
+}
+
+void Player::afx_unpackUpdate(NetConnection* con, BitStream* stream)
+{
+   if (stream->readFlag()) // LookOverrideMask
+      overrideLookAnimation = stream->readFlag();
+
+   if (stream->readFlag()) // TriggerMask
+   {
+      U32 mask;
+      stream->read(&mask);
+      mark_fx_c_triggers = mask;
+   }
+}
+
+// AFX CODE BLOCK (misc) >>
+
+// AFX CODE BLOCK (anim-clip) <<
+//
+// Code for overriding player's animation with sequences selected by the
+// anim-clip component effect.
+//
+
+void Player::restoreAnimation(U32 tag)
+{
+   // check if this is a blended clip
+   if ((tag & BLENDED_CLIP) != 0)
+   {
+      restoreBlendAnimation(tag);
+      return;
+   }
+
+   if (tag != 0 && tag == last_anim_tag)
+   {
+      bool is_death_anim = ((anim_clip_flags & IS_DEATH_ANIM) != 0);
+
+      anim_clip_flags &= ~(ANIM_OVERRIDDEN | IS_DEATH_ANIM);
+
+      if (isClientObject())
+      {
+         if (mDamageState != Enabled)
+         {
+            if (!is_death_anim)
+            {
+               // this is a bit hardwired and desperate,
+               // but if he's dead he needs to look like it.
+               setActionThread("death10", false, false, false);
+            }
+         }
+         else if (mState != MoveState)
+         {
+            // not sure what happens here
+         }
+         else
+         {
+            pickActionAnimation();
+         }
+      }
+
+      last_anim_tag = 0;
+      last_anim_id = -1;
+   }
+}
+
+U32 Player::getAnimationID(const char* name)
+{
+   for (U32 i = 0; i < mDataBlock->actionCount; i++)
+   {
+      PlayerData::ActionAnimation &anim = mDataBlock->actionList[i];
+      if (dStricmp(anim.name, name) == 0)
+         return i;
+   }
+
+   Con::errorf("Player::getAnimationID() -- Player does not contain a sequence that matches the name, %s.", name);
+   return BAD_ANIM_ID;
+}
+
+U32 Player::playAnimationByID(U32 anim_id, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim)
+{
+   if (anim_id == BAD_ANIM_ID)
+      return 0;
+
+   S32 seq_id = mDataBlock->actionList[anim_id].sequence;
+   if (seq_id == -1)
+   {
+      Con::errorf("Player::playAnimation() problem. BAD_SEQ_ID");
+      return 0;
+   }
+
+   if (mShapeInstance->getShape()->sequences[seq_id].isBlend())
+      return playBlendAnimation(seq_id, pos, rate);
+
+   if (isClientObject())
+   {
+      PlayerData::ActionAnimation &anim = mDataBlock->actionList[anim_id];
+      if (anim.sequence != -1) 
+      {
+         mActionAnimation.action          = anim_id;
+         mActionAnimation.forward         = (rate >= 0);
+         mActionAnimation.firstPerson     = false;
+         mActionAnimation.holdAtEnd       = hold;
+         mActionAnimation.waitForEnd      = hold? true: wait;
+         mActionAnimation.animateOnServer = false;
+         mActionAnimation.atEnd           = false;
+         mActionAnimation.delayTicks      = (S32)sNewAnimationTickTime;
+
+         F32 transTime = (trans < 0) ? sAnimationTransitionTime : trans;  
+
+         mShapeInstance->setTimeScale(mActionAnimation.thread, rate);
+         mShapeInstance->transitionToSequence(mActionAnimation.thread,anim.sequence,
+            pos, transTime, true);
+      }
+   }
+
+   if (is_death_anim)
+      anim_clip_flags |= IS_DEATH_ANIM;
+   else
+      anim_clip_flags &= ~IS_DEATH_ANIM;
+
+   anim_clip_flags |= ANIM_OVERRIDDEN;
+   last_anim_tag = unique_anim_tag_counter++;
+   last_anim_id = anim_id;
+
+   return last_anim_tag;
+}
+
+F32 Player::getAnimationDurationByID(U32 anim_id)
+{
+   if (anim_id == BAD_ANIM_ID)
+      return 0.0f;
+   S32 seq_id = mDataBlock->actionList[anim_id].sequence;
+   if (seq_id >= 0 && seq_id < mDataBlock->mShape->sequences.size())
+      return mDataBlock->mShape->sequences[seq_id].duration;
+
+   return 0.0f;
+}
+
+bool Player::isBlendAnimation(const char* name)
+{
+   U32 anim_id = getAnimationID(name);
+   if (anim_id == BAD_ANIM_ID)
+      return false;
+
+   S32 seq_id = mDataBlock->actionList[anim_id].sequence;
+   if (seq_id >= 0 && seq_id < mDataBlock->mShape->sequences.size())
+      return mDataBlock->mShape->sequences[seq_id].isBlend();
+
+   return false;
+}
+
+const char* Player::getLastClipName(U32 clip_tag)
+{ 
+   if (clip_tag != last_anim_tag || last_anim_id >= PlayerData::NumActionAnims)
+      return "";
+
+   return mDataBlock->actionList[last_anim_id].name;
+}
+
+void Player::unlockAnimation(U32 tag, bool force)
+{
+   if ((tag != 0 && tag == last_anim_lock_tag) || force)
+      anim_clip_flags &= ~BLOCK_USER_CONTROL;
+}
+
+U32 Player::lockAnimation()
+{
+   anim_clip_flags |= BLOCK_USER_CONTROL;
+   last_anim_lock_tag = unique_anim_tag_counter++;
+
+   return last_anim_lock_tag;
+}
+
+ConsoleMethod(Player, isAnimationLocked, bool, 2, 2, "isAnimationLocked()")
+{
+   return object->isAnimationLocked();
+}
+// AFX CODE BLOCK (anim-clip) >>
+
+// AFX CODE BLOCK (player-look) <<
+void Player::setLookAnimationOverride(bool flag) 
+{ 
+   overrideLookAnimation = flag; 
+#if 0
+   setMaskBits(LookOverrideMask);
+#else
+   setMaskBits(ActionMask);
+#endif
+}
+
+ConsoleMethod(Player, setLookAnimationOverride, void, 3, 3, "setLookAnimationOverride(flag)")
+{
+   object->setLookAnimationOverride(dAtob(argv[2]));
+}
+
+ConsoleMethod(Player, copyHeadRotation, void, 3, 3, "copyHeadRotation(other_player)")
+{
+   Player* other_player = dynamic_cast<Player*>(Sim::findObject(argv[2]));
+   if (other_player)
+      object->copyHeadRotation(other_player);
+}
+// AFX CODE BLOCK (player-look) >>
+
+// AFX CODE BLOCK (triggers) <<
+void Player::process_client_triggers(bool triggeredLeft, bool triggeredRight)
+{
+   bool mark_landing = false;
+   Point3F my_vel = getVelocity();
+   if (my_vel.z > 5.0f)
+      z_velocity = 1;
+   else if (my_vel.z < -5.0f)
+      z_velocity = -1;
+   else
+   {
+      if (z_velocity < 0)
+         mark_landing = true;
+      z_velocity = 0.0f;
+   }
+
+   fx_c_triggers = mark_fx_c_triggers;
+   if (triggeredLeft)
+      fx_c_triggers |= PLAYER_LF_FOOT_C_TRIGGER;
+   if (triggeredRight)
+      fx_c_triggers |= PLAYER_RT_FOOT_C_TRIGGER;
+   if (mark_landing)
+      fx_c_triggers |= PLAYER_LANDING_C_TRIGGER;
+   if (idle_timer > 10.0f)
+   {
+      fx_c_triggers |= PLAYER_IDLE_C_TRIGGER;
+      idle_timer = 0.0f;
+   }
+   if (fx_c_triggers & PLAYER_LANDING_S_TRIGGER)
+   {
+      fx_c_triggers &= ~(PLAYER_LANDING_S_TRIGGER);
+   }
+}
+// AFX CODE BLOCK (triggers) >>
+
+// AFX CODE BLOCK (player-movement) <<
+U32 Player::unique_movement_tag_counter = 1;
+
+void Player::setMovementSpeedBias(F32 bias) 
+{ 
+   speed_bias_goal = bias; 
+}
+
+U32 Player::setMovementOverride(F32 bias, const Point3F* mov, U32 op) 
+{ 
+   if (mov)
+   {
+      movement_data = *mov;
+      override_movement = true;
+      movement_op = (U8)op;
+   }
+   else
+      override_movement = false;
+
+   speed_bias_goal = bias;
+
+   last_movement_tag = unique_movement_tag_counter++;
+   return last_movement_tag;
+}
+
+void Player::restoreMovement(U32 tag) 
+{ 
+   if (tag != 0 && tag == last_movement_tag)
+   {
+      speed_bias_goal = 1.0;
+      override_movement = false;
+   }
+}
+
+ConsoleMethod(Player, setMovementSpeedBias, void, 3, 3, "setMovementSpeedBias(F32 bias)")
+{
+   object->setMovementSpeedBias(dAtof(argv[2]));
+}
+// AFX CODE BLOCK (player-movement) >>
+
+// AFX CODE BLOCK (foot-switch) <<
+void Player::overrideFootfallFX(bool decals, bool sounds, bool dust) 
+{ 
+   if (decals)
+      footfallDecalOverride++; 
+   if (sounds)
+      footfallSoundOverride++; 
+   if (dust)
+      footfallDustOverride++; 
+   noFootfallFX = (footfallDecalOverride > 0 && footfallSoundOverride > 0 && footfallDustOverride > 0);
+}
+
+void Player::restoreFootfallFX(bool decals, bool sounds, bool dust) 
+{ 
+   if (decals && footfallDecalOverride) 
+      footfallDecalOverride--; 
+   if (sounds && footfallSoundOverride) 
+      footfallSoundOverride--; 
+   if (dust && footfallDustOverride) 
+      footfallDustOverride--; 
+   noFootfallFX = (footfallDecalOverride > 0 && footfallSoundOverride > 0 && footfallDustOverride > 0);
+}
+// AFX CODE BLOCK (foot-switch) >>

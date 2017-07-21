@@ -20,6 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        enhanced-physical-zone -- PhysicalZone object enhanced to allow orientation
+//            add radial forces.
+//        pz-opt -- PhysicalZone network optimizations.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _H_PHYSICALZONE
 #define _H_PHYSICALZONE
 
@@ -40,10 +50,17 @@ class PhysicalZone : public SceneObject
 {
    typedef SceneObject Parent;
 
-   enum UpdateMasks {      
+   // AFX CODE BLOCK (pz-opt) <<
+   enum UpdateMasks {
       ActiveMask        = Parent::NextFreeMask << 0,
-      NextFreeMask      = Parent::NextFreeMask << 1
+      SettingsMask      = Parent::NextFreeMask << 1,
+      FadeMask          = Parent::NextFreeMask << 2,
+      PolyhedronMask    = Parent::NextFreeMask << 3,
+      MoveMask          = Parent::NextFreeMask << 4,
+      ExclusionMask     = Parent::NextFreeMask << 5,
+      NextFreeMask      = Parent::NextFreeMask << 6
    };
+   // AFX CODE BLOCK (pz-opt) >>
 
   protected:
    static bool smRenderPZones;
@@ -83,7 +100,12 @@ class PhysicalZone : public SceneObject
 
    inline F32 getVelocityMod() const      { return mVelocityMod; }
    inline F32 getGravityMod()  const      { return mGravityMod;  }
-   inline const Point3F& getForce() const { return mAppliedForce; }
+   // AFX CODE BLOCK (enhanced-physical-zone) <<
+   // the scene object is now passed in to getForce() where
+   // it is needed to calculate the applied force when the
+   // force is radial.
+   const Point3F& getForce(const Point3F* center=0) const;
+   // AFX CODE BLOCK (enhanced-physical-zone) >>
 
    void setPolyhedron(const Polyhedron&);
    bool testObject(SceneObject*);
@@ -96,7 +118,30 @@ class PhysicalZone : public SceneObject
    void deactivate();
    inline bool isActive() const { return mActive; }
 
+   // AFX CODE BLOCK (enhanced-physical-zone)(pz-opt) <<
+protected:
+   friend class afxPhysicalZoneData;
+   friend class afxEA_PhysicalZone;
+   Vector<SceneObject*>  excluded_objects;
+   S32    force_type;
+   F32    force_mag;
+   bool   orient_force;
+   F32    fade_amt;
+   void   setFadeAmount(F32 amt) { fade_amt = amt; if (fade_amt < 1.0f) setMaskBits(FadeMask); }
+public:
+   enum ForceType { VECTOR, SPHERICAL, CYLINDRICAL };
+   enum { FORCE_TYPE_BITS = 2 };
+   virtual void onStaticModified(const char* slotName, const char*newValue = NULL);
+   bool   isExcludedObject(SceneObject*) const;
+   void   registerExcludedObject(SceneObject*);
+   void   unregisterExcludedObject(SceneObject*);
+   // AFX CODE BLOCK (enhanced-physical-zone)(pz-opt) >>
 };
+
+// AFX CODE BLOCK (enhanced-physical-zone) <<
+typedef PhysicalZone::ForceType PhysicalZone_ForceType;
+DefineEnumType( PhysicalZone_ForceType );
+// AFX CODE BLOCK (enhanced-physical-zone) >>
 
 #endif // _H_PHYSICALZONE
 

@@ -20,6 +20,17 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        substitutions -- Implementation of special substitution statements on
+//            datablock fields.
+//        copy-on-reload -- The datablock copy op, ":" is modified to copy on reload
+//            as well as on creation.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "console/console.h"
 
@@ -893,6 +904,16 @@ breakContinue:
 
                      currentNewObject->setCopySource( parent );
                      currentNewObject->assignFieldsFrom( parent );
+                     // AFX CODE BLOCK (substitutions) <<
+                     // copy any substitution statements
+                     SimDataBlock* parent_db = dynamic_cast<SimDataBlock*>(parent);
+                     if (parent_db)
+                     {
+                        SimDataBlock* currentNewObject_db = dynamic_cast<SimDataBlock*>(currentNewObject);
+                        if (currentNewObject_db)
+                           currentNewObject_db->copySubstitutionsFrom(parent_db);
+                     }
+                     // AFX CODE BLOCK (substitutions) >>
                   }
                   else
                   {
@@ -952,6 +973,40 @@ breakContinue:
                   currentNewObject->setModDynamicFields(true);
                }
             }
+            // AFX CODE BLOCK (copy-on-reload) <<
+            else
+            {
+               currentNewObject->reloadReset(); // AFX (reload-reset)
+               // Does it have a parent object? (ie, the copy constructor : syntax, not inheriance)
+               if(*objParent)
+               {
+                  // Find it!
+                  SimObject *parent;
+                  if(Sim::findObject(objParent, parent))
+                  {
+                     // Con::printf(" - Parent object found: %s", parent->getClassName());
+
+                     // temporarily block name change
+                     SimObject::preventNameChanging = true;
+                     currentNewObject->setCopySource( parent );
+                     currentNewObject->assignFieldsFrom(parent);
+                     // restore name changing
+                     SimObject::preventNameChanging = false;
+
+                     // copy any substitution statements
+                     SimDataBlock* parent_db = dynamic_cast<SimDataBlock*>(parent);
+                     if (parent_db)
+                     {
+                        SimDataBlock* currentNewObject_db = dynamic_cast<SimDataBlock*>(currentNewObject);
+                        if (currentNewObject_db)
+                           currentNewObject_db->copySubstitutionsFrom(parent_db);
+                     }
+                  }
+                  else
+                     Con::errorf(ConsoleLogEntry::General, "%d: Unable to find parent object %s for %s.", lineNumber, objParent, callArgv[1]);
+               }
+            }
+            // AFX CODE BLOCK (copy-on-reload) >>
 
             // Advance the IP past the create info...
             ip += 7;

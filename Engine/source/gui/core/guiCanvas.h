@@ -20,6 +20,19 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        canvas -- Added a way for a child control to handle an event but still have
+//            GuiCanvas::processInputEvent() return false, therefore allowing the event
+//            to also be handled by the ActionMap. (see DemoGame::processInputEvent()) 
+//            Also added methods for clearing "down" status of mouse buttons in cases
+//            where ActionMap grabs the mouse for dragging and masks the up events from
+//            GuiCanvas.           
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _GUICANVAS_H_
 #define _GUICANVAS_H_
 
@@ -446,6 +459,15 @@ public:
 
 private:
    static const U32 MAX_GAMEPADS = 4; ///< The maximum number of supported gamepads
+  // AFX CODE BLOCK (canvas) <<
+  protected:
+     bool   mConsumeLastInputEvent;
+  public:
+     void clearMouseRightButtonDown(void) { mMouseRightButtonDown = false; }
+     void clearMouseButtonDown(void) { mMouseButtonDown = false; }
+     void setConsumeLastInputEvent(bool flag) { mConsumeLastInputEvent = flag; }
+     bool getLastCursorPoint(Point2I& pt) const { pt = mLastCursorPt; return mLastCursorEnabled; }
+  // AFX CODE BLOCK (canvas) >>
 };
 
 #endif

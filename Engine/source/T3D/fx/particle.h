@@ -20,6 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        enhanced-particle -- increased keys to 8 and other mods.
+//        datablock-temp-clone -- Implements creation of temporary datablock clones to
+//            allow late substitution of datablock fields.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _PARTICLE_H_
 #define _PARTICLE_H_
 
@@ -44,7 +54,11 @@ class ParticleData : public SimDataBlock
   public:
    enum PDConst
    {
-      PDC_NUM_KEYS = 4,
+      // AFX CODE BLOCK (enhanced-particle) <<
+      // This increase the keyframes from 4 to 8. Especially useful for premult-alpha blended particles
+      // for which 4 keyframes is often not enough.
+      PDC_NUM_KEYS = 8,
+      // AFX CODE BLOCK (enhanced-particle) >>
    };
 
    F32   dragCoefficient;
@@ -95,8 +109,31 @@ class ParticleData : public SimDataBlock
    bool preload(bool server, String &errorStr);
    DECLARE_CONOBJECT(ParticleData);
    static void  initPersistFields();
+   // AFX CODE BLOCK (datablock-temp-clone) <<
+  public:
+   /*C*/  ParticleData(const ParticleData&, bool = false);
+   virtual void onPerformSubstitutions();
+   virtual bool allowSubstitutions() const { return true; }
+   // AFX CODE BLOCK (datablock-temp-clone) >>
+   
+   // AFX CODE BLOCK (enhanced-particle) <<
+  protected:
+   F32   spinBias;
+   bool  randomizeSpinDir;
+   StringTableEntry  textureExtName;
+  public:
+   GFXTexHandle      textureExtHandle;
+   bool   constrain_pos;
+   F32    start_angle;
+   F32    angle_variance;
+   F32    sizeBias; 
+   // AFX CODE BLOCK (enhanced-particle) >>
 
-   bool reload(char errorBuffer[256]);
+   // AFX CODE BLOCK (misc) >> 
+  public:
+   bool loadParameters();  
+   bool reload(String &errorStr);
+   // AFX CODE BLOCK (misc) >>
 };
 
 //*****************************************************************************
@@ -123,6 +160,13 @@ struct Particle
 
    F32              spinSpeed;
    Particle *       next;
+
+   // AFX CODE BLOCK (enhanced-particle) <<
+   Point3F  pos_local;
+   F32      t_last;
+   Point3F  radial_v;   // radial vector for concentric effects
+   // note -- for non-oriented particles, we use orientDir.x to store the billboard start angle.
+   // AFX CODE BLOCK (enhanced-particle) >>
 };
 
 

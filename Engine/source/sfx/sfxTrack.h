@@ -20,6 +20,15 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        datablock-temp-clone -- Implements creation of temporary datablock clones to
+//            allow late substitution of datablock fields.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _SFXTRACK_H_
 #define _SFXTRACK_H_
 
@@ -92,6 +101,11 @@ class SFXTrack : public SimDataBlock
       DECLARE_CONOBJECT( SFXTrack );
       DECLARE_CATEGORY( "SFX" );
       DECLARE_DESCRIPTION( "Abstract base class for any kind of data that can be turned into SFXSources." );
+
+      // AFX CODE BLOCK (datablock-temp-clone) <<
+   public:
+      /*C*/ SFXTrack(const SFXTrack&, bool = false);
+      // AFX CODE BLOCK (datablock-temp-clone) >>
 };
 
 #endif // !_SFXTRACK_H_

@@ -20,6 +20,17 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        ground-cover -- Adds an ambient modulation bias to control how much the foliage
+//            images are modulated by the sun's ambient light setting.
+//                full modulation -- 1.0 (default)
+//                no modulation -- 0.0
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _FOLIAGEREPLICATOR_H_
 #define _FOLIAGEREPLICATOR_H_
 
@@ -319,6 +330,10 @@ public:
       U32             mPlacementBandHeight;
       LinearColorF          mPlaceAreaColour;
 
+      // AFX CODE BLOCK (ground-cover) <<
+      F32             mAmbientModulationBias;
+      // AFX CODE BLOCK (ground-cover) >>
+
       tagFieldData()
       {
          // Set Defaults.
@@ -377,6 +392,10 @@ public:
          mShowPlacementArea    = true;
          mPlacementBandHeight  = 25;
          mPlaceAreaColour      .set(0.4f, 0, 0.8f);
+
+         // AFX CODE BLOCK (ground-cover) <<
+         mAmbientModulationBias = 1.0f;
+         // AFX CODE BLOCK (ground-cover) >>
       }
 
    } mFieldData;

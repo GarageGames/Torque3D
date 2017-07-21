@@ -20,6 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        packet-size-checking -- Methods for querying packet-size settings. Used for
+//            detecting when spells or effects overrun the packet buffer from networked
+//            dynamic field usage.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _NETCONNECTION_H_
 #define _NETCONNECTION_H_
 
@@ -1050,6 +1060,12 @@ public:
    virtual bool readDemoStartBlock(BitStream *stream);
    virtual void demoPlaybackComplete();
 /// @}
+
+   // AFX CODE BLOCK (packet-size-checking) <<
+public:
+   S32 getCurRatePacketSize() const { return mCurRate.packetSize; }
+   S32 getMaxRatePacketSize() const { return mMaxRate.packetSize; }
+   // AFX CODE BLOCK (packet-size-checking) >>
 };
 
 

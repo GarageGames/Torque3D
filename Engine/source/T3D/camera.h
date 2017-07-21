@@ -20,6 +20,14 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    Changes:
+//        cam-speed -- added method for getting the camera movement speed.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
@@ -246,6 +254,14 @@ class Camera: public ShapeBase
       DECLARE_CONOBJECT( Camera );
       DECLARE_CATEGORY( "Game" );
       DECLARE_DESCRIPTION( "Represents a position, direction and field of view to render a scene from." );
+
+      // AFX CODE BLOCK (cam-speed) <<
+      static F32 getMovementSpeed() { return smMovementSpeed; }
+      // AFX CODE BLOCK (cam-speed) >>
+
+      // AFX CODE BLOCK (is-camera) <<
+      bool isCamera() const { return true; }
+      // AFX CODE BLOCK (is-camera) >>
 };
 
 typedef Camera::CameraMotionMode CameraMotionMode;
