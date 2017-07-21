@@ -1146,7 +1146,7 @@ DefineEngineMethod(afxSelectron, stopSelectron, void, (),,
 }
 
 DefineEngineFunction(startSelectron, S32, (SceneObject* selectedObj, unsigned int subcode, SimObject* extra),
-                     (NULL, 0, NULL),
+                     (nullAsType<SceneObject*>(), 0, nullAsType<SimObject*>()),
                      "Instantiates a selectron.\n\n"
                      "@ingroup AFX")
 {

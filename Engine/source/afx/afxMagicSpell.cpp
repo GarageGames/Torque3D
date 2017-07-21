@@ -2681,7 +2681,7 @@ DefineEngineMethod(afxMagicSpell, activate, void, (),,
 }
 
 DefineEngineFunction(castSpell, S32, (afxMagicSpellData* datablock, ShapeBase* caster, SceneObject* target, SimObject* extra),
-                     (NULL, NULL),
+                     (NULL, nullAsType<SceneObject*>),
                      "Instantiates the magic spell defined by datablock and cast by caster.\n\n"
                      "@ingroup AFX")
 {
