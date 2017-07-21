@@ -329,7 +329,7 @@ DefineEngineMethod(afxTSCtrl, setSpellBook, void, (afxSpellBook* spellbook),,
   object->setSpellBook(spellbook);
 }
 
-DefineEngineMethod(afxTSCtrl, pushTargetingMode, void, (unsigned int mode, unsigned int checkMethod), (arcaneFX::TARGET_CHECK_POLL),
+DefineEngineMethod(afxTSCtrl, pushTargetingMode, void, (unsigned int mode, unsigned int checkMethod), ((U32)arcaneFX::TARGETING_OFF, (U32)arcaneFX::TARGET_CHECK_POLL),
                    "Push a new targeting-mode onto a statck of modes.\n\n"
                    "@ingroup AFX")
 {
