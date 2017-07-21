@@ -49,7 +49,7 @@ class afxEA_ZodiacPlane : public afxEffectWrapper
   AngAxisF          aa_rot;
 
   F32               live_color_factor;
-  ColorF            live_color;
+  LinearColorF            live_color;
 
   F32               calc_facing_angle();
   void              do_runtime_substitutions();
@@ -65,7 +65,7 @@ public:
   virtual void      ea_set_scope_status(bool flag);
   virtual void      onDeleteNotify(SimObject*);
   virtual void      getUpdatedBoxCenter(Point3F& pos);
-  virtual void      getBaseColor(ColorF& color) { color = zode_data->color; }
+  virtual void      getBaseColor(LinearColorF& color) { color = zode_data->color; }
 };
 
 F32 afxEA_ZodiacPlane::calc_facing_angle() 
@@ -173,8 +173,8 @@ bool afxEA_ZodiacPlane::ea_update(F32 dt)
 
   if (pzode)
   {
-    //ColorF zode_color = zode_data->color;
-    ColorF zode_color = updated_color;
+    //LinearColorF zode_color = zode_data->color;
+    LinearColorF zode_color = updated_color;
 
     if (live_color_factor > 0.0)
        zode_color.interpolate(zode_color, live_color, live_color_factor);

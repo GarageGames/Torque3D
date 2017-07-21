@@ -858,7 +858,7 @@ DefineEngineFunction(getColorFromHSV, const char*, (float hue, float sat, float 
                      "@param alpha The alpha of the color (0-1).\n"
                      "@ingroup AFX")
 {
-  ColorF rgb;
+  LinearColorF rgb;
   HSVtoRGB(hue, sat, val, rgb.red, rgb.green, rgb.blue);
   rgb.alpha = alpha;
 
@@ -868,7 +868,7 @@ DefineEngineFunction(getColorFromHSV, const char*, (float hue, float sat, float 
   return returnBuffer;
 }
 
-DefineEngineFunction(ColorScale, const char*, ( ColorF color, float scalar ),,
+DefineEngineFunction(ColorScale, const char*, ( LinearColorF color, float scalar ),,
                      "Returns color scaled by scalar (color*scalar).\n\n"
                      "@param color The color to be scaled.\n"
                      "@param scalar The amount to scale the color.\n"

@@ -48,7 +48,7 @@ ShaderData*                     afxZodiacMgr::atlas_zode_shader = 0;
 ShaderData*                     afxZodiacMgr::interior_zode_shader = 0;
 ShaderData*                     afxZodiacMgr::polysoup_zode_shader = 0;
 
-void afxZodiacMgr::addTerrainZodiac(Point3F& pos, F32 radius, ColorF& color, F32 angle, afxZodiacData* zode)
+void afxZodiacMgr::addTerrainZodiac(Point3F& pos, F32 radius, LinearColorF& color, F32 angle, afxZodiacData* zode)
 {
   if (radius < 0.001f)
     return;
@@ -71,7 +71,7 @@ void afxZodiacMgr::addTerrainZodiac(Point3F& pos, F32 radius, ColorF& color, F32
     terr_zodes.push_back(z);
 }
 
-void afxZodiacMgr::addInteriorZodiac(Point3F& pos, F32 radius, Point2F& vert_range, ColorF& color, F32 angle, afxZodiacData* zode)
+void afxZodiacMgr::addInteriorZodiac(Point3F& pos, F32 radius, Point2F& vert_range, LinearColorF& color, F32 angle, afxZodiacData* zode)
 {
   if (radius < 0.001f)
     return;

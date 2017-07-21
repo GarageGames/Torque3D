@@ -40,10 +40,10 @@ class afxSpellCastBar : public GuiControl, public afxProgressBase
   bool              want_border;
   bool              want_background;
   bool              use_alt_final_color;
-  ColorF            rgba_background;
-  ColorF            rgba_border;
-  ColorF            rgba_fill;
-  ColorF            rgba_fill_final;
+  LinearColorF            rgba_background;
+  LinearColorF            rgba_border;
+  LinearColorF            rgba_fill;
+  LinearColorF            rgba_fill_final;
 
   F32               fraction;
 
@@ -121,7 +121,7 @@ void afxSpellCastBar::initPersistFields()
 
 void afxSpellCastBar::onRender(Point2I offset, const RectI &updateRect)
 {
-  ColorF color;
+  LinearColorF color;
 
   // draw the background
   if (want_background)

@@ -73,7 +73,7 @@ afxModelData::afxModelData()
   useAdaptiveSelfIllumination = false;
   useCustomAmbientLighting = false;
   customAmbientForSelfIllumination = false;
-  customAmbientLighting = ColorF(0.0f, 0.0f, 0.0f);
+  customAmbientLighting = LinearColorF(0.0f, 0.0f, 0.0f);
   shadowEnable = false;
 
   shadowSize = 128;

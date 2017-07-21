@@ -273,7 +273,7 @@ public:
   virtual void interpolate(F32 t, afxXM_Params& params)
   {
     F32 scalar_at_t = lerp(t, a, b);
-    ColorF color_at_t(scalar_at_t, scalar_at_t, scalar_at_t, scalar_at_t);
+    LinearColorF color_at_t(scalar_at_t, scalar_at_t, scalar_at_t, scalar_at_t);
     params.color += color_at_t;
   }
 };

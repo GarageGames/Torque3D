@@ -39,7 +39,7 @@ void afxParticlePool::prepRenderImage(SceneRenderState* state)
   pool_prepBatchRender(state->getRenderPass(), state->getCameraPosition(), sunlight->getAmbient());
 };
 
-void afxParticlePool::pool_prepBatchRender(RenderPassManager *renderManager, const Point3F &camPos, const ColorF &ambientColor)
+void afxParticlePool::pool_prepBatchRender(RenderPassManager *renderManager, const Point3F &camPos, const LinearColorF &ambientColor)
 {
   if (emitters.empty()) 
     return;
@@ -55,7 +55,7 @@ void afxParticlePool::pool_prepBatchRender(RenderPassManager *renderManager, con
   }
 }
 
-void afxParticlePool::pool_renderObject_Normal(RenderPassManager *renderManager, const Point3F &camPos, const ColorF &ambientColor)
+void afxParticlePool::pool_renderObject_Normal(RenderPassManager *renderManager, const Point3F &camPos, const LinearColorF &ambientColor)
 {
   S32 n_parts = 0;
   for (S32 i = 0; i < emitters.size(); i++)
@@ -156,7 +156,7 @@ void afxParticlePool::pool_renderObject_Normal(RenderPassManager *renderManager,
   renderManager->addInst( ri );
 }
 
-void afxParticlePool::pool_renderObject_TwoPass(RenderPassManager *renderManager, const Point3F &camPos, const ColorF &ambientColor)
+void afxParticlePool::pool_renderObject_TwoPass(RenderPassManager *renderManager, const Point3F &camPos, const LinearColorF &ambientColor)
 {
   S32 n_parts = 0;
   for (S32 i = 0; i < emitters.size(); i++)
@@ -237,7 +237,7 @@ void afxParticlePool::pool_renderObject_TwoPass(RenderPassManager *renderManager
     Particle* particle = orderedVector[i].p;
     ParticleEmitter* emitter = orderedVector[i].emitter;
 
-    ColorF color_save = particle->color;
+    LinearColorF color_save = particle->color;
     particle->color.set(mDataBlock->base_color.red, mDataBlock->base_color.green, mDataBlock->base_color.blue, mDataBlock->base_color.alpha*particle->color.alpha);
     emitter->setupBillboard(particle, basePoints, camView, ambientColor, buffPtr);
     particle->color = color_save;
@@ -336,7 +336,7 @@ void afxParticlePool::pool_renderObject_TwoPass(RenderPassManager *renderManager
       // overall blend factor weight
       bf *= mDataBlock->blend_weight;
 
-      ColorF color_save = particle->color;
+      LinearColorF color_save = particle->color;
       particle->color = particle->color*bf;
       emitter->setupBillboard(particle, basePoints, camView, ambientColor, buffPtr);
       particle->color = color_save;
@@ -369,7 +369,7 @@ void afxParticlePool::pool_renderObject_TwoPass(RenderPassManager *renderManager
       // overall blend factor weight
       bf *= mDataBlock->blend_weight;
 
-      ColorF color_save = particle->color;
+      LinearColorF color_save = particle->color;
       particle->color = particle->color*bf;
       emitter->setupBillboard(particle, basePoints, camView, ambientColor, buffPtr);
       particle->color = color_save;
@@ -395,7 +395,7 @@ void afxParticlePool::pool_renderObject_TwoPass(RenderPassManager *renderManager
       // overall blend factor weight
       bf *= mDataBlock->blend_weight;
 
-      ColorF color_save = particle->color;
+      LinearColorF color_save = particle->color;
       particle->color = particle->color*bf;
       emitter->setupBillboard(particle, basePoints, camView, ambientColor, buffPtr);
       particle->color = color_save;
@@ -422,7 +422,7 @@ void afxParticlePool::pool_renderObject_TwoPass(RenderPassManager *renderManager
       // overall blend factor weight
       bf *= mDataBlock->blend_weight;
 
-      ColorF color_save = particle->color;
+      LinearColorF color_save = particle->color;
       particle->color = particle->color*bf;
       emitter->setupBillboard(particle, basePoints, camView, ambientColor, buffPtr);
       particle->color = color_save;
@@ -439,7 +439,7 @@ void afxParticlePool::pool_renderObject_TwoPass(RenderPassManager *renderManager
 
       F32 bf = mDataBlock->blend_weight;  // blend factor
 
-      ColorF color_save = particle->color;
+      LinearColorF color_save = particle->color;
       particle->color = particle->color*bf;
       emitter->setupBillboard(particle, basePoints, camView, ambientColor, buffPtr);
       particle->color = color_save;

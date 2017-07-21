@@ -54,7 +54,7 @@ public:
   virtual void      ea_set_scope_status(bool flag);
   virtual void      onDeleteNotify(SimObject*);
   virtual void      getUpdatedBoxCenter(Point3F& pos);
-  virtual void      getBaseColor(ColorF& color) { if (bb_data) color = bb_data->color; }
+  virtual void      getBaseColor(LinearColorF& color) { if (bb_data) color = bb_data->color; }
 };
 
 

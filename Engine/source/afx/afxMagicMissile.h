@@ -73,10 +73,10 @@ public:
 
   //bool                  hasLight;
   //F32                   lightRadius;
-  //ColorF                lightColor;
+  //LinearColorF                lightColor;
 
   //bool                  hasWaterLight;
-  //ColorF                waterLightColor;
+  //LinearColorF                waterLightColor;
 
   /*
   /// Set to true if it is a billboard and want it to always face the viewer, false otherwise

@@ -171,7 +171,7 @@ void afxResidueMgr::manage_residue(const Residue* r)
 
   if (r->type == ZODIAC)
   {
-    ColorF zode_color = ColorI(r->params.zodiac.r, r->params.zodiac.g, r->params.zodiac.b, r->params.zodiac.a);
+    LinearColorF zode_color = ColorI(r->params.zodiac.r, r->params.zodiac.g, r->params.zodiac.b, r->params.zodiac.a);
 
     afxZodiacData* zd = (afxZodiacData*) r->data.zodiac;
     if (zd->blend_flags == afxZodiacDefs::BLEND_SUBTRACTIVE)
@@ -396,20 +396,20 @@ void afxResidueMgr::residueAdvanceTime()
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//
 // add ZODIAC residue
 void afxResidueMgr::add_interior_zodiac(F32 dur, F32 fade_dur, afxZodiacData* zode, const Point3F& pos, 
-                                       F32 rad, const Point2F& vrange, const ColorF& col, F32 ang)
+                                       F32 rad, const Point2F& vrange, const LinearColorF& col, F32 ang)
 {
   add_zodiac(dur, fade_dur, zode, pos, rad, vrange, col, ang, false);
 }
 
 void afxResidueMgr::add_terrain_zodiac(F32 dur, F32 fade_dur, afxZodiacData* zode, const Point3F& pos, 
-                                       F32 rad, const ColorF& col, F32 ang)
+                                       F32 rad, const LinearColorF& col, F32 ang)
 {
   static Point2F vrange(0.0, 0.0);
   add_zodiac(dur, fade_dur, zode, pos, rad, vrange, col, ang, true);
 }
 
 void afxResidueMgr::add_zodiac(F32 dur, F32 fade_dur, afxZodiacData* zode, const Point3F& pos, 
-                               F32 rad, const Point2F& vrange, const ColorF& col, F32 ang, bool on_terrain)
+                               F32 rad, const Point2F& vrange, const LinearColorF& col, F32 ang, bool on_terrain)
 {
   if (m_max_residue_objs == 0 || dur <= 0 || the_mgr == NULL)
     return;

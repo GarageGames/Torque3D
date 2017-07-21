@@ -137,7 +137,7 @@ private:
   void              bump_residue();
   void              add_residue(Residue*);
   static void       add_zodiac(F32 dur, F32 fade_dur, afxZodiacData*, const Point3F& pos, F32 rad, 
-                               const Point2F& vrange, const ColorF& col, F32 ang, bool on_terrain);
+                               const Point2F& vrange, const LinearColorF& col, F32 ang, bool on_terrain);
  
 protected:
   void              deleteResidueObject(SimObject* obj, bool del_notify=false); 
@@ -160,9 +160,9 @@ public:
 
                     // ZODIAC
   static void       add_terrain_zodiac(F32 dur, F32 fade_dur, afxZodiacData*, const Point3F& pos, F32 rad,
-                                       const ColorF& col, F32 ang);
+                                       const LinearColorF& col, F32 ang);
   static void       add_interior_zodiac(F32 dur, F32 fade_dur, afxZodiacData*, const Point3F& pos, F32 rad,
-                                        const Point2F& vrange, const ColorF& col, F32 ang);
+                                        const Point2F& vrange, const LinearColorF& col, F32 ang);
 
                     // MODEL
   static void       add(F32 dur, F32 fade_dur, afxModel*);

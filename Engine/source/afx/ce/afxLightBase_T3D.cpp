@@ -55,7 +55,7 @@ ConsoleDocClass( afxT3DLightBaseData,
 
 afxT3DLightBaseData::afxT3DLightBaseData()
    :  mIsEnabled( true ),
-      mColor( ColorF::WHITE ),
+      mColor( LinearColorF::WHITE ),
       mBrightness( 1.0f ),
       mCastShadows( false ),
       mPriority( 1.0f ),
@@ -161,8 +161,8 @@ void afxT3DLightBaseData::packData(BitStream* stream)
 {
 	Parent::packData(stream);
 
-  // note: BitStream's overloaded write() for ColorF will convert
-  // to ColorI for transfer and then back to ColorF. This is fine
+  // note: BitStream's overloaded write() for LinearColorF will convert
+  // to ColorI for transfer and then back to LinearColorF. This is fine
   // for most color usage but for lighting colors we want to preserve
   // "pushed" color values which may be greater than 1.0 so the color
   // is instead sent as individual color primaries.

@@ -291,21 +291,21 @@ void afxGuiTextHud::onRender( Point2I, const RectI &updateRect)
 ///                  specified y position.)
 /// @param   name    String name to display.
 /// @param   opacity Opacity of name (a fraction).
-void afxGuiTextHud::drawName(Point2I offset, const char *name, F32 opacity, ColorF* color)
+void afxGuiTextHud::drawName(Point2I offset, const char *name, F32 opacity, LinearColorF* color)
 {
    // Center the name
    offset.x -= mProfile->mFont->getStrWidth((const UTF8 *)name) / 2;
    offset.y -= mProfile->mFont->getHeight();
 
    // Deal with opacity and draw.
-   ColorF draw_color = (color) ? *color : mTextColor;
+   LinearColorF draw_color = (color) ? *color : mTextColor;
    draw_color.alpha *= opacity;
    GFX->getDrawUtil()->setBitmapModulation(draw_color);
    GFX->getDrawUtil()->drawText(mProfile->mFont, offset, name);
    GFX->getDrawUtil()->clearBitmapModulation();
 }
 
-void afxGuiTextHud::addTextItem(const Point3F& pos, const char* text, ColorF& color, SceneObject* obj)
+void afxGuiTextHud::addTextItem(const Point3F& pos, const char* text, LinearColorF& color, SceneObject* obj)
 {
   if (!text || text[0] == '\0')
     return;

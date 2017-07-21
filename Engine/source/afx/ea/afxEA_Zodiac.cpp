@@ -46,12 +46,12 @@ class afxEA_Zodiac : public afxEffectWrapper
   Point3F           zode_pos;
   F32               zode_radius;
   Point2F           zode_vrange;
-  ColorF            zode_color;
+  LinearColorF            zode_color;
   F32               zode_angle;
   F32               zode_angle_offset;
 
   F32               live_color_factor;
-  ColorF            live_color;
+  LinearColorF            live_color;
   bool              became_residue;
   bool              do_altitude_bias;
   F32               altitude_falloff_range;
@@ -72,7 +72,7 @@ public:
 
   virtual bool      ea_is_enabled() { return true; }
 
-  virtual void      getBaseColor(ColorF& color) { color = zode_data->color; }
+  virtual void      getBaseColor(LinearColorF& color) { color = zode_data->color; }
 
   static void       initPersistFields();
 
@@ -273,7 +273,7 @@ bool afxEA_Zodiac::ea_update(F32 dt)
         F32 alt_rad = zode_radius;
         if (zode_data->altitude_shrinks)
           alt_rad *= alt_bias;
-        ColorF alt_clr(zode_color.red, zode_color.green, zode_color.blue, zode_color.alpha);
+        LinearColorF alt_clr(zode_color.red, zode_color.green, zode_color.blue, zode_color.alpha);
         if (zode_data->altitude_fades)
           alt_clr.alpha *= alt_bias;
         afxZodiacMgr::addTerrainZodiac(zode_pos, alt_rad, alt_clr, zode_angle, zode_data);
@@ -295,7 +295,7 @@ bool afxEA_Zodiac::ea_update(F32 dt)
         F32 alt_rad = zode_radius;
         if (zode_data->altitude_shrinks)
           alt_rad *= alt_bias;
-        ColorF alt_clr(zode_color.red, zode_color.green, zode_color.blue, zode_color.alpha);
+        LinearColorF alt_clr(zode_color.red, zode_color.green, zode_color.blue, zode_color.alpha);
         if (zode_data->altitude_fades)
           alt_clr.alpha *= alt_bias;
         afxZodiacMgr::addInteriorZodiac(zode_pos, alt_rad, zode_vrange, alt_clr, zode_angle, zode_data);
@@ -328,7 +328,7 @@ void afxEA_Zodiac::ea_finish(bool was_stopped)
           F32 alt_rad = zode_radius;
           if (zode_data->altitude_shrinks)
             alt_rad *= alt_bias;
-          ColorF alt_clr(zode_color.red, zode_color.green, zode_color.blue, zode_color.alpha);
+          LinearColorF alt_clr(zode_color.red, zode_color.green, zode_color.blue, zode_color.alpha);
           if (zode_data->altitude_fades)
             zode_color.alpha *= alt_bias;
           became_residue = true;
@@ -353,7 +353,7 @@ void afxEA_Zodiac::ea_finish(bool was_stopped)
           F32 alt_rad = zode_radius;
           if (zode_data->altitude_shrinks)
             alt_rad *= alt_bias;
-          ColorF alt_clr(zode_color.red, zode_color.green, zode_color.blue, zode_color.alpha);
+          LinearColorF alt_clr(zode_color.red, zode_color.green, zode_color.blue, zode_color.alpha);
           if (zode_data->altitude_fades)
             zode_color.alpha *= alt_bias;
 

@@ -275,7 +275,7 @@ void afxZodiacTerrainRenderer::render(SceneRenderState* state)
 
       // set the texture
       GFX->setTexture(0, *zode->txr);
-      ColorF zode_color = (ColorF)zode->color;
+      LinearColorF zode_color = (LinearColorF)zode->color;
       zode_color.alpha *= fadebias;
       shader_consts->set(color_sc, zode_color);
 

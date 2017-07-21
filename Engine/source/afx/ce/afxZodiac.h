@@ -64,7 +64,7 @@ public:
   F32               grow_in_time;
   F32               shrink_out_time;
   F32               growth_rate;
-  ColorF            color;
+  LinearColorF            color;
   U32               blend_flags;
   bool              terrain_ok;
   bool              interiors_ok;

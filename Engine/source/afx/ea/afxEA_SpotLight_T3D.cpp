@@ -57,7 +57,7 @@ public:
   virtual void      ea_finish(bool was_stopped);
   virtual void      ea_set_scope_status(bool flag);
   virtual void      onDeleteNotify(SimObject*);
-  virtual void      getBaseColor(ColorF& color);
+  virtual void      getBaseColor(LinearColorF& color);
 
   virtual bool      ea_is_enabled() { return true; }
 };
@@ -123,7 +123,7 @@ public:
     //_conformLights();
   }
 
-  void setLiveColor(const ColorF& live_color)
+  void setLiveColor(const LinearColorF& live_color)
   {
     mLight->setColor(live_color);
   }
@@ -244,7 +244,7 @@ void afxEA_T3DSpotLight::onDeleteNotify(SimObject* obj)
   Parent::onDeleteNotify(obj);
 }
 
-void afxEA_T3DSpotLight::getBaseColor(ColorF& color)
+void afxEA_T3DSpotLight::getBaseColor(LinearColorF& color)
 { 
   if (light_data) 
     color = light_data->mColor; 

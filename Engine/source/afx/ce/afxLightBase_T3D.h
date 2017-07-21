@@ -37,7 +37,7 @@ class afxT3DLightBaseData : public GameBaseData
 
 public:
    bool         mIsEnabled;
-   ColorF       mColor;
+   LinearColorF       mColor;
    F32          mBrightness;
    bool         mCastShadows;
    F32          mPriority;

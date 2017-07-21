@@ -39,7 +39,7 @@ class afxStatusBar : public GuiControl, public afxProgressBase
 {
   typedef GuiControl Parent;
 
-  ColorF            rgba_fill;
+  LinearColorF            rgba_fill;
 
   F32               fraction;
   ShapeBase*        shape;

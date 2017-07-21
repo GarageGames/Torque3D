@@ -73,13 +73,13 @@ void afxMooring::_renderAxisLines(ObjectRenderInst *ri, SceneRenderState* state,
   GFX->multWorld(getRenderTransform());
 
 	PrimBuild::begin(GFXLineList, 6);
-	PrimBuild::color(ColorF(1.0, 0.0, 0.0));
+	PrimBuild::color(LinearColorF(1.0, 0.0, 0.0));
 	PrimBuild::vertex3f(-0.5,  0.0,  0.0);
 	PrimBuild::vertex3f( 0.5,  0.0,  0.0);
-	PrimBuild::color(ColorF(0.0, 1.0, 0.0));
+	PrimBuild::color(LinearColorF(0.0, 1.0, 0.0));
 	PrimBuild::vertex3f( 0.0, -0.5,  0.0);
 	PrimBuild::vertex3f( 0.0,  0.5,  0.0);
-	PrimBuild::color(ColorF(0.0, 0.0, 1.0));
+	PrimBuild::color(LinearColorF(0.0, 0.0, 1.0));
 	PrimBuild::vertex3f( 0.0,  0.0, -0.5);
 	PrimBuild::vertex3f( 0.0,  0.0,  0.5);
 	PrimBuild::end();

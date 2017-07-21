@@ -118,8 +118,8 @@ private:
   static ShaderData*      interior_zode_shader;
   static ShaderData*      polysoup_zode_shader;
 public:
-  static void   addTerrainZodiac(Point3F& pos, F32 rad, ColorF&, F32 ang, afxZodiacData*);
-  static void   addInteriorZodiac(Point3F& pos, F32 rad, Point2F& vrange, ColorF&, F32 ang, afxZodiacData*);
+  static void   addTerrainZodiac(Point3F& pos, F32 rad, LinearColorF&, F32 ang, afxZodiacData*);
+  static void   addInteriorZodiac(Point3F& pos, F32 rad, Point2F& vrange, LinearColorF&, F32 ang, afxZodiacData*);
   static void   frameReset();
   static void   missionCleanup();
 

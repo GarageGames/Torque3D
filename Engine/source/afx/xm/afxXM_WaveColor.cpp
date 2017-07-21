@@ -35,15 +35,15 @@
 class afxXM_WaveInterp_Color : public afxXM_WaveInterp
 {
 protected:
-  ColorF   a_set, b_set;
-  ColorF   a_var, b_var;
-  ColorF   a, b;
+  LinearColorF   a_set, b_set;
+  LinearColorF   a_var, b_var;
+  LinearColorF   a, b;
   bool     sync_var;
 
 public:
   afxXM_WaveInterp_Color(); 
 
-  void set(ColorF& a, ColorF& b, ColorF& a_var, ColorF& b_var, bool sync_var);
+  void set(LinearColorF& a, LinearColorF& b, LinearColorF& a_var, LinearColorF& b_var, bool sync_var);
 
   virtual void interpolate(F32 t, afxXM_Params& params)=0;
   virtual void pulse();
@@ -60,7 +60,7 @@ afxXM_WaveInterp_Color::afxXM_WaveInterp_Color()
   b.set(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
-void afxXM_WaveInterp_Color::set(ColorF& a, ColorF& b, ColorF& a_var, ColorF& b_var, bool sync_var)
+void afxXM_WaveInterp_Color::set(LinearColorF& a, LinearColorF& b, LinearColorF& a_var, LinearColorF& b_var, bool sync_var)
 {
   a_set = a; 
   b_set = b;
@@ -73,7 +73,7 @@ void afxXM_WaveInterp_Color::set(ColorF& a, ColorF& b, ColorF& a_var, ColorF& b_
 
 inline void afxXM_WaveInterp_Color::pulse()
 {
-  ColorF temp_color;
+  LinearColorF temp_color;
   F32 rand_t = gRandGen.randF()*2.0f;
   temp_color.interpolate(-a_var, a_var, rand_t);
   a = a_set + temp_color;
@@ -90,7 +90,7 @@ class afxXM_WaveInterp_Color_Add : public afxXM_WaveInterp_Color
 public:
   virtual void interpolate(F32 t, afxXM_Params& params)
   {
-    ColorF temp_color;
+    LinearColorF temp_color;
     temp_color.interpolate(a, b, t);
     params.color += temp_color;
   }
@@ -103,7 +103,7 @@ class afxXM_WaveInterp_Color_Mul : public afxXM_WaveInterp_Color
 public:
   virtual void interpolate(F32 t, afxXM_Params& params)
   {
-    ColorF temp_color;
+    LinearColorF temp_color;
     temp_color.interpolate(a, b, t);
     params.color *= temp_color;
   }
@@ -163,8 +163,8 @@ class afxXM_WaveColorData : public afxXM_WaveBaseData, afxXM_WaveColorData_Commo
   typedef afxXM_WaveBaseData Parent;
 
 public:
-  ColorF        a, b;
-  ColorF        a_var, b_var;
+  LinearColorF        a, b;
+  LinearColorF        a_var, b_var;
   bool          sync_var;
 
 public:
@@ -278,8 +278,8 @@ class afxXM_WaveRiderColorData : public afxXM_WaveRiderBaseData, afxXM_WaveColor
   typedef afxXM_WaveRiderBaseData Parent;
 
 public:
-  ColorF        a, b;
-  ColorF        a_var, b_var;
+  LinearColorF        a, b;
+  LinearColorF        a_var, b_var;
   bool          sync_var;
 
 public:

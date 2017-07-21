@@ -61,7 +61,7 @@ struct afxXM_Params : public afxXM_Defs
   MatrixF   ori;
   Point3F   scale;
   Point3F   pos2;
-  ColorF    color;
+  LinearColorF    color;
   F32       vis;
 
   enum { BAD_OFFSET = S32_MAX };

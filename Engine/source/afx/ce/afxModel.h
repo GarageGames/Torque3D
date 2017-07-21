@@ -71,7 +71,7 @@ struct afxModelData : public GameBaseData
   bool                  useAdaptiveSelfIllumination;
   bool                  useCustomAmbientLighting;
   bool                  customAmbientForSelfIllumination;
-  ColorF                customAmbientLighting;
+  LinearColorF                customAmbientLighting;
   bool                  shadowEnable;
 
   U32                   shadowSize;

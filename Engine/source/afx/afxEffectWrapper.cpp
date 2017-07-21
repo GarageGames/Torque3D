@@ -985,7 +985,7 @@ bool afxEffectWrapper::update(F32 dt)
   MatrixF& CONS_XFM = params.ori;
   Point3F& CONS_AIM = params.pos2;
   Point3F& CONS_SCALE = params.scale;
-  ColorF& CONS_COLOR = params.color;
+  LinearColorF& CONS_COLOR = params.color;
 
   afxConstraint* pos_constraint = getPosConstraint();
   if (pos_constraint)

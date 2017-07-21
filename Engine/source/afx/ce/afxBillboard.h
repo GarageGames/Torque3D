@@ -56,7 +56,7 @@ public:
   StringTableEntry  txr_name;
   GFXTexHandle      txr;
 
-  ColorF            color;
+  LinearColorF            color;
   Point2F           texCoords[4];
   Point2F           dimensions;
   S32               blendStyle; 
@@ -101,7 +101,7 @@ private:
   F32               fade_amt;
   bool              is_visible;
   S8                sort_priority;
-  ColorF            live_color;
+  LinearColorF            live_color;
 
   GFXStateBlockRef  normal_sb;
   GFXStateBlockRef  reflected_sb;

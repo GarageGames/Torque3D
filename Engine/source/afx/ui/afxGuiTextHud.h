@@ -47,16 +47,16 @@ class afxGuiTextHud : public GuiControl
    {
      Point3F      pos;
      const char*  text;
-     ColorF       text_clr;
+     LinearColorF       text_clr;
      SceneObject* obj;
    };
 
    static Vector<HudTextSpec> text_items;
 
    // field data
-   ColorF   mFillColor;
-   ColorF   mFrameColor;
-   ColorF   mTextColor;
+   LinearColorF   mFillColor;
+   LinearColorF   mFrameColor;
+   LinearColorF   mTextColor;
 
    F32      mVerticalOffset;
    F32      mDistanceFade;
@@ -66,7 +66,7 @@ class afxGuiTextHud : public GuiControl
    bool     mEnableControlObjectOcclusion;
 
 protected:
-   void drawName( Point2I offset, const char *buf, F32 opacity, ColorF* color=0);
+   void drawName( Point2I offset, const char *buf, F32 opacity, LinearColorF* color=0);
 
 public:
    afxGuiTextHud();
@@ -75,7 +75,7 @@ public:
    virtual void onRender(Point2I offset, const RectI &updateRect);
 
    static void initPersistFields();
-   static void addTextItem(const Point3F& pos, const char* text, ColorF& color, SceneObject* obj=0);
+   static void addTextItem(const Point3F& pos, const char* text, LinearColorF& color, SceneObject* obj=0);
    static void reset();
 
    DECLARE_CONOBJECT( afxGuiTextHud );

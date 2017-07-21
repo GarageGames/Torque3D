@@ -288,7 +288,7 @@ protected:
   Point3F           updated_pos;
   Point3F           updated_aim;
   Point3F           updated_scale;
-  ColorF            updated_color;
+  LinearColorF            updated_color;
 
   F32               fade_value;
   F32               last_fade_value;
@@ -348,12 +348,12 @@ public:
   void              getUpdatedPosition(Point3F& pos) { pos = updated_pos;}
   void              getUpdatedTransform(MatrixF& xfm) { xfm = updated_xfm; }
   void              getUpdatedScale(Point3F& scale) { scale = updated_scale; }
-  void              getUpdatedColor(ColorF& color) { color = updated_color; }
+  void              getUpdatedColor(LinearColorF& color) { color = updated_color; }
   virtual void      getUpdatedBoxCenter(Point3F& pos) { pos = updated_pos;}
 
   virtual void      getUnconstrainedPosition(Point3F& pos) { pos.zero();}
   virtual void      getUnconstrainedTransform(MatrixF& xfm) { xfm.identity(); }
-  virtual void      getBaseColor(ColorF& color) { color.set(1.0f, 1.0f, 1.0f, 1.0f); }
+  virtual void      getBaseColor(LinearColorF& color) { color.set(1.0f, 1.0f, 1.0f, 1.0f); }
 
   SceneObject*      getSceneObject() const { return ea_get_scene_object(); }
   U32               getTriggers() const { return ea_get_triggers(); }

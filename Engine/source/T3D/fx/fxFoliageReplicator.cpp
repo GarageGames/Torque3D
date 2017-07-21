@@ -1583,8 +1583,8 @@ void fxFoliageReplicator::renderObject(ObjectRenderInst *ri, SceneRenderState *s
             if (mFoliageShaderAmbientColorSC->isValid())
             // AFX CODE BLOCK (ground-cover) <<
             {
-               ColorF ambient = state->getAmbientLightColor();
-               ColorF ambient_inv(1.0f-ambient.red, 1.0f-ambient.green, 1.0f-ambient.blue, 0.0f);
+               LinearColorF ambient = state->getAmbientLightColor();
+               LinearColorF ambient_inv(1.0f-ambient.red, 1.0f-ambient.green, 1.0f-ambient.blue, 0.0f);
                ambient += ambient_inv*(1.0f - mFieldData.mAmbientModulationBias);
                mFoliageShaderConsts->set(mFoliageShaderAmbientColorSC, ambient);
             }

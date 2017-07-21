@@ -46,7 +46,7 @@ class afxEA_GuiText : public afxEffectWrapper
 
   afxGuiTextData* text_data;
   S32             text_src;
-  ColorF          text_clr;
+  LinearColorF          text_clr;
 
   void            do_runtime_substitutions();
 
@@ -104,7 +104,7 @@ bool afxEA_GuiText::ea_update(F32 dt)
   {
   case USER_TEXT:
     {
-      ColorF temp_clr = text_clr;
+      LinearColorF temp_clr = text_clr;
       if (do_fades)
         temp_clr.alpha = fade_value;
       afxGuiTextHud::addTextItem(updated_pos, text_data->text_str, temp_clr);
@@ -126,7 +126,7 @@ bool afxEA_GuiText::ea_update(F32 dt)
       }
       if (name && name[0] != '\0')
       {
-        ColorF temp_clr = text_clr;
+        LinearColorF temp_clr = text_clr;
         if (do_fades)
           temp_clr.alpha = fade_value;
         afxGuiTextHud::addTextItem(updated_pos, name, temp_clr, cons_obj);

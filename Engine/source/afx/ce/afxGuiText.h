@@ -34,7 +34,7 @@ class afxGuiTextData : public GameBaseData, public afxEffectDefs
 
 public:
   StringTableEntry  text_str;
-  ColorF            text_clr;
+  LinearColorF            text_clr;
 
 public:
   /*C*/         afxGuiTextData();

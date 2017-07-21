@@ -34,8 +34,8 @@ class afxXM_OscillateZodiacColorData : public afxXM_WeightedBaseData
   typedef afxXM_WeightedBaseData Parent;
 
 public:
-  ColorF        color_a;
-  ColorF        color_b;
+  LinearColorF        color_a;
+  LinearColorF        color_b;
   F32           speed;
 
 public:
@@ -55,11 +55,11 @@ class afxXM_OscillateZodiacColor : public afxXM_WeightedBase
 {
   typedef afxXM_WeightedBase Parent;
 
-  ColorF        color_a;
-  ColorF        color_b;
+  LinearColorF        color_a;
+  LinearColorF        color_b;
   F32           speed;
 
-  ColorF*       liveColor_ptr;
+  LinearColorF*       liveColor_ptr;
   F32*          liveColorFactor_ptr;
 
 public:
@@ -133,7 +133,7 @@ afxXM_OscillateZodiacColor::afxXM_OscillateZodiacColor(afxXM_OscillateZodiacColo
   const AbstractClassRep::Field* field;
   field = fxw->getClassRep()->findField(StringTable->insert("liveColor"));
   if (field && field->type == TypeColorF)
-    liveColor_ptr = (ColorF*)(((const char *)(fxw)) + field->offset);
+    liveColor_ptr = (LinearColorF*)(((const char *)(fxw)) + field->offset);
   else
     liveColor_ptr = 0;
 

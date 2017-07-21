@@ -61,7 +61,7 @@ public:
   F32               grow_in_time;
   F32               shrink_out_time;
   F32               growth_rate;
-  ColorF            color;
+  LinearColorF            color;
   U32               blend_flags;
   bool              respect_ori_cons;
   bool              use_full_xfm;
@@ -107,7 +107,7 @@ class afxZodiacPlane : public GameBase, public afxZodiacDefs
 
 private:
   afxZodiacPlaneData*   mDataBlock;
-  ColorF                color;
+  LinearColorF                color;
   F32                   radius;
   bool                  is_visible;
 
@@ -127,7 +127,7 @@ public:
   virtual void          onRemove();
 
   void                  setRadius(F32 rad) { radius = rad; }
-  void                  setColor(const ColorF& clr) { color = clr; }
+  void                  setColor(const LinearColorF& clr) { color = clr; }
   void                  setVisibility(bool flag) { is_visible = flag; }
 
   virtual void          prepRenderImage(SceneRenderState*);

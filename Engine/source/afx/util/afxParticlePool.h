@@ -39,7 +39,7 @@ public:
   };
 
   U32             pool_type;
-  ColorF          base_color;
+  LinearColorF          base_color;
   F32             blend_weight;
 
 public:
@@ -105,9 +105,9 @@ private:
 protected:
   virtual void    prepRenderImage(SceneRenderState*);
 
-  void            pool_prepBatchRender(RenderPassManager*, const Point3F &camPos, const ColorF &ambientColor);
-  void            pool_renderObject_Normal(RenderPassManager*, const Point3F &camPos, const ColorF &ambientColor);
-  void            pool_renderObject_TwoPass(RenderPassManager*, const Point3F &camPos, const ColorF &ambientColor);
+  void            pool_prepBatchRender(RenderPassManager*, const Point3F &camPos, const LinearColorF &ambientColor);
+  void            pool_renderObject_Normal(RenderPassManager*, const Point3F &camPos, const LinearColorF &ambientColor);
+  void            pool_renderObject_TwoPass(RenderPassManager*, const Point3F &camPos, const LinearColorF &ambientColor);
 
   virtual bool    onAdd();
   virtual void    onRemove();
@@ -115,7 +115,7 @@ protected:
   void            renderBillboardParticle_blend(Particle&, const Point3F* basePnts, const MatrixF& camView, const F32 spinFactor,
                                                 const F32 blend_factor, ParticleEmitter*);
   void            renderBillboardParticle_color(Particle&, const Point3F* basePnts, const MatrixF& camView, const F32 spinFactor,
-                                                const ColorF& color, ParticleEmitter*);
+                                                const LinearColorF& color, ParticleEmitter*);
 
 public:
   /*C*/           afxParticlePool();

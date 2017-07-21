@@ -39,7 +39,7 @@ public:
   StringTableEntry  sequence;
   bool              ignore_scene_amb;
   bool              use_custom_scene_amb;
-  ColorF            custom_scene_amb;
+  LinearColorF            custom_scene_amb;
   bool              do_spawn;
 
 public:
