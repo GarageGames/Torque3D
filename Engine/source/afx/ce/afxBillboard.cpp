@@ -175,7 +175,7 @@ bool afxBillboardData::preload(bool server, String &errorStr)
   {
     if (txr_name && txr_name[0] != '\0')
     {
-      txr.set(txr_name, &GFXDefaultStaticDiffuseProfile, "Billboard Texture");
+      txr.set(txr_name, &GFXStaticTextureSRGBProfile, "Billboard Texture");
     }
   }
 

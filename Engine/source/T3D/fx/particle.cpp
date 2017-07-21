@@ -624,7 +624,7 @@ bool ParticleData::preload(bool server, String &errorStr)
       // AFX CODE BLOCK (enhanced-particle) <<
       if (textureExtName && textureExtName[0])
       {
-         textureExtHandle = GFXTexHandle(textureExtName, &GFXDefaultStaticDiffuseProfile, avar("%s() - textureExtHandle (line %d)", __FUNCTION__, __LINE__));
+         textureExtHandle = GFXTexHandle(textureExtName, &GFXStaticTextureSRGBProfile, avar("%s() - textureExtHandle (line %d)", __FUNCTION__, __LINE__));
          if (!textureExtHandle)
          {
             errorStr = String::ToString("Missing particle texture: %s", textureName);
