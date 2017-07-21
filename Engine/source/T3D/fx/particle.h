@@ -132,7 +132,7 @@ class ParticleData : public SimDataBlock
    // AFX CODE BLOCK (misc) >> 
   public:
    bool loadParameters();  
-   bool reload(String &errorStr);
+   bool reload(char errorBuffer[256]);
    // AFX CODE BLOCK (misc) >>
 };
 
