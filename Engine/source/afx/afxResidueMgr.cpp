@@ -414,7 +414,7 @@ void afxResidueMgr::add_zodiac(F32 dur, F32 fade_dur, afxZodiacData* zode, const
   if (m_max_residue_objs == 0 || dur <= 0 || the_mgr == NULL)
     return;
 
-  ColorI col_i = col;
+  ColorI col_i = ColorI(int(col.red), int(col.green), int(col.blue));
   U32 now = Platform::getVirtualMilliseconds();
 
   Residue* residue = the_mgr->alloc_residue();

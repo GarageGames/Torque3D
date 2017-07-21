@@ -58,7 +58,7 @@ void afxZodiacMgr::addTerrainZodiac(Point3F& pos, F32 radius, LinearColorF& colo
   z.radius_xy = radius;
   z.vert_range.set(0.0f, 0.0f);
   z.grade_range.set(0.0f, 1.0f);
-  z.color = color;
+  z.color = color.toColorI();
   z.angle = mDegToRad(angle);
   z.zflags = zode->zflags;
   z.txr = &zode->txr;
@@ -81,7 +81,7 @@ void afxZodiacMgr::addInteriorZodiac(Point3F& pos, F32 radius, Point2F& vert_ran
   z.radius_xy = radius;
   z.vert_range = vert_range;
   z.grade_range = zode->grade_range;
-  z.color = color;
+  z.color = color.toColorI();
   z.angle = mDegToRad(angle);
   z.zflags = zode->zflags;
   z.txr = &zode->txr;

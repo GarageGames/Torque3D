@@ -165,7 +165,7 @@ void afxStatusBar::onRender(Point2I offset, const RectI &updateRect)
   rect.extent.x = (S32)(rect.extent.x*fraction);
 
   // draw the filled part of bar
-  GFX->getDrawUtil()->drawRectFill(rect, rgba_fill);
+  GFX->getDrawUtil()->drawRectFill(rect, rgba_fill.toColorI());
 }
 
 void afxStatusBar::onMouseDown(const GuiEvent &event)

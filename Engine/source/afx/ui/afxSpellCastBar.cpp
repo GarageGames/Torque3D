@@ -127,7 +127,7 @@ void afxSpellCastBar::onRender(Point2I offset, const RectI &updateRect)
   if (want_background)
   {
     color.set(rgba_background.red, rgba_background.green, rgba_background.blue, rgba_background.alpha*fade_amt); 
-    GFX->getDrawUtil()->drawRectFill(updateRect, color);
+    GFX->getDrawUtil()->drawRectFill(updateRect, color.toColorI());
   }
 
   // calculate the rectangle dimensions
@@ -140,13 +140,13 @@ void afxSpellCastBar::onRender(Point2I offset, const RectI &updateRect)
   else
     color.set(rgba_fill.red, rgba_fill.green, rgba_fill.blue, rgba_fill.alpha*fade_amt);
 
-  GFX->getDrawUtil()->drawRectFill(rect, color);
+  GFX->getDrawUtil()->drawRectFill(rect, color.toColorI());
 
   // draw the border
   if (want_border)
   {
     color.set(rgba_border.red, rgba_border.green, rgba_border.blue, rgba_border.alpha*fade_amt);
-    GFX->getDrawUtil()->drawRect(updateRect, color);
+    GFX->getDrawUtil()->drawRect(updateRect, color.toColorI());
   }
 }
 

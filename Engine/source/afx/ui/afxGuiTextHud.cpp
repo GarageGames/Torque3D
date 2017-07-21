@@ -102,7 +102,7 @@ void afxGuiTextHud::onRender( Point2I, const RectI &updateRect)
 {
    // Background fill first
    if (mShowFill)
-      GFX->getDrawUtil()->drawRectFill(updateRect, mFillColor);
+      GFX->getDrawUtil()->drawRectFill(updateRect, mFillColor.toColorI());
 
    // Must be in a TS Control
    GuiTSCtrl *parent = dynamic_cast<GuiTSCtrl*>(getParent());
@@ -276,7 +276,7 @@ void afxGuiTextHud::onRender( Point2I, const RectI &updateRect)
 
    // Border last
    if (mShowFrame)
-      GFX->getDrawUtil()->drawRect(updateRect, mFrameColor);
+      GFX->getDrawUtil()->drawRect(updateRect, mFrameColor.toColorI());
 
    reset();
 }
@@ -300,7 +300,7 @@ void afxGuiTextHud::drawName(Point2I offset, const char *name, F32 opacity, Line
    // Deal with opacity and draw.
    LinearColorF draw_color = (color) ? *color : mTextColor;
    draw_color.alpha *= opacity;
-   GFX->getDrawUtil()->setBitmapModulation(draw_color);
+   GFX->getDrawUtil()->setBitmapModulation(draw_color.toColorI());
    GFX->getDrawUtil()->drawText(mProfile->mFont, offset, name);
    GFX->getDrawUtil()->clearBitmapModulation();
 }
