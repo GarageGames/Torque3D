@@ -60,7 +60,7 @@ MODULE_END;
 
 
 WindDeformationGLSL::WindDeformationGLSL()
-   : mDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/gl/wind.glsl" ))
+   : mDep(ShaderGen::smCommonShaderPath + String("/gl/wind.glsl" ))
 {
    addDependency( &mDep );
 }

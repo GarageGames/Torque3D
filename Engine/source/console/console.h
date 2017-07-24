@@ -620,7 +620,7 @@ namespace Con
    /// Retrieve the string value of a global console variable
    /// @param name   Global Console variable name to query
    /// @return       The string value of the variable or "" if the variable does not exist.
-   const char* getVariable(const char* name);
+   const char* getVariable(const char* name, const char* def = "");
 
    /// Retrieve the string value of an object field
    /// @param name   "object.field" string to query

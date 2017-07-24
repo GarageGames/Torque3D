@@ -27,10 +27,10 @@
 #include "shaderGen/shaderOp.h"
 #include "shaderGen/shaderGenVars.h"
 #include "gfx/gfxStructs.h"
-
+#include "shaderGen/shaderGen.h"
 
 PixelSpecularHLSL::PixelSpecularHLSL()
-   : mDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/lighting.hlsl" ))
+   : mDep(ShaderGen::smCommonShaderPath + String("/lighting.hlsl" ))
 {
    addDependency( &mDep );
 }
