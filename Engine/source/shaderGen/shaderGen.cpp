@@ -49,7 +49,7 @@ MODULE_BEGIN( ShaderGen )
 
 MODULE_END;
 
-String ShaderGen::smCommonShaderPath(Con::getVariable("$Core::CommonShaderPath", "shaders/common"));
+String ShaderGen::smCommonShaderPath("shaders/common");
 
 ShaderGen::ShaderGen()
 {
