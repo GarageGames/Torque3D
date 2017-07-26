@@ -24,6 +24,7 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _H_PARTICLE_EMITTER
 #define _H_PARTICLE_EMITTER
 
@@ -45,6 +46,12 @@
 
 class RenderPassManager;
 class ParticleData;
+
+#define AFX_CAP_PARTICLE_POOLS
+#if defined(AFX_CAP_PARTICLE_POOLS)
+class afxParticlePoolData;
+class afxParticlePool;
+#endif
 
 //*****************************************************************************
 // Particle Emitter Data
@@ -118,6 +125,21 @@ class ParticleEmitterData : public GameBaseData
 
    bool reload();
 public:
+   bool         fade_color;
+   bool         fade_size;
+   bool         fade_alpha;
+   bool         ejectionInvert;
+   U8           parts_per_eject;
+   bool         use_emitter_xfm;
+#if defined(AFX_CAP_PARTICLE_POOLS) 
+public:
+   afxParticlePoolData* pool_datablock;
+   U32          pool_index;
+   bool         pool_depth_fade;
+   bool         pool_radial_fade;
+   bool         do_pool_id_convert;
+#endif
+public:
    /*C*/ ParticleEmitterData(const ParticleEmitterData&, bool = false);
    /*D*/ ~ParticleEmitterData();
    virtual ParticleEmitterData* cloneAndPerformSubstitutions(const SimObject*, S32 index=0);
@@ -130,6 +152,9 @@ public:
 class ParticleEmitter : public GameBase
 {
    typedef GameBase Parent;
+#if defined(AFX_CAP_PARTICLE_POOLS) 
+   friend class afxParticlePool;
+#endif 
 
   public:
 
@@ -199,7 +224,7 @@ class ParticleEmitter : public GameBase
    /// @param   axis
    /// @param   vel   Initial velocity
    /// @param   axisx
-   void addParticle(const Point3F &pos, const Point3F &axis, const Point3F &vel, const Point3F &axisx);
+   void addParticle(const Point3F &pos, const Point3F &axis, const Point3F &vel, const Point3F &axisx, const U32 age_offset);
 
 
    inline void setupBillboard( Particle *part,
@@ -236,7 +261,12 @@ class ParticleEmitter : public GameBase
    // PEngine interface
   private:
 
+   // AFX subclasses to ParticleEmitter require access to some members and methods of
+   // ParticleEmitter which are normally declared with private scope. In this section,
+   // protected and private scope statements have been inserted inline with the original
+   // code to expose the necessary members and methods.
    void update( U32 ms );
+protected:
    inline void updateKeyData( Particle *part );
  
 
@@ -248,25 +278,30 @@ class ParticleEmitter : public GameBase
 
    ParticleEmitterData* mDataBlock;
 
+protected: 
    U32       mInternalClock;
 
    U32       mNextParticleTime;
 
    Point3F   mLastPosition;
    bool      mHasLastPosition;
+private:   
    MatrixF   mBBObjToWorld;
 
    bool      mDeleteWhenEmpty;
    bool      mDeleteOnTick;
 
+protected: 
    S32       mLifetimeMS;
    S32       mElapsedTimeMS;
 
+private:  
    F32       sizes[ ParticleData::PDC_NUM_KEYS ];
    LinearColorF    colors[ ParticleData::PDC_NUM_KEYS ];
 
    GFXVertexBufferHandle<ParticleVertexType> mVertBuff;
 
+protected:
    //   These members are for implementing a link-list of the active emitter 
    //   particles. Member part_store contains blocks of particles that can be
    //   chained in a link-list. Usually the first part_store block is large
@@ -277,8 +312,28 @@ class ParticleEmitter : public GameBase
    Particle   part_list_head;
    S32        n_part_capacity;
    S32        n_parts;
+private:    
    S32       mCurBuffSize;
 
+  protected:
+   F32 fade_amt;
+   bool forced_bbox;
+   bool db_temp_clone;
+   Point3F pos_pe;
+   S8 sort_priority;
+   virtual void sub_particleUpdate(Particle*) { }
+  public:
+   virtual void emitParticlesExt(const MatrixF& xfm, const Point3F& point, const Point3F& velocity, const U32 numMilliseconds);
+   void setFadeAmount(F32 amt) { fade_amt = amt; }  
+   void setForcedObjBox(Box3F& box);
+   void setSortPriority(S8 priority);
+#if defined(AFX_CAP_PARTICLE_POOLS)
+  protected:
+   afxParticlePool* pool;
+  public:
+   void clearPool() { pool = 0; }
+   void setPool(afxParticlePool* p) { pool = p; }
+#endif
 };
 
 #endif // _H_PARTICLE_EMITTER
