@@ -470,3 +470,24 @@ void SFXProfile::onPerformSubstitutions()
       SFX->getEventSignal().notify( this, &SFXProfile::_onDeviceEvent );
    }
 }
+// This allows legacy AudioProfile datablocks to be recognized as an alias
+// for SFXProfile. It is intended to ease the transition from older scripts
+// especially those that still need to support pre-1.7 applications.
+// (This maybe removed in future releases so treat as deprecated.)
+class AudioProfile : public SFXProfile
+{
+	typedef SFXProfile Parent;
+public:
+	DECLARE_CONOBJECT(AudioProfile);
+};
+
+IMPLEMENT_CO_DATABLOCK_V1(AudioProfile);
+
+ConsoleDocClass( AudioProfile,
+   "@brief Allows legacy AudioProfile datablocks to be treated as SFXProfile datablocks.\n\n"
+
+   "@ingroup afxMisc\n"
+   "@ingroup AFX\n"
+   "@ingroup Datablocks\n"
+);
+

@@ -687,3 +687,24 @@ void SFXDescription::inspectPostApply()
    if( SFX )
       SFX->notifyDescriptionChanged( this );
 }
+// This allows legacy AudioDescription datablocks to be recognized as an alias
+// for SFXDescription. It is intended to ease the transition from older scripts
+// especially those that still need to support pre-1.7 applications.
+// (This maybe removed in future releases so treat as deprecated.)
+class AudioDescription : public SFXDescription
+{
+	typedef SFXDescription Parent;
+public:
+	DECLARE_CONOBJECT(AudioDescription);
+};
+
+IMPLEMENT_CO_DATABLOCK_V1(AudioDescription);
+
+ConsoleDocClass( AudioDescription,
+   "@brief Allows legacy AudioDescription datablocks to be treated as SFXDescription datablocks.\n\n"
+
+   "@ingroup afxMisc\n"
+   "@ingroup AFX\n"
+   "@ingroup Datablocks\n"
+);
+

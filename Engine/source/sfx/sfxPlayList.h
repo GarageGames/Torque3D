@@ -81,7 +81,7 @@ class SFXPlayList : public SFXTrack
          ///
          /// @note To have longer playlists, simply cascade playlists and use
          ///   wait behaviors.
-         NUM_SLOTS = 16,
+         NUM_SLOTS = 12, // AFX (was 16)
          
          NUM_TRANSITION_MODE_BITS = 3,
          NUM_LOOP_MODE_BITS = 1,
