@@ -103,6 +103,10 @@ class ParticleData : public SimDataBlock
 
    bool reload(char errorBuffer[256]);
   public:
+   /*C*/  ParticleData(const ParticleData&, bool = false);
+   virtual void onPerformSubstitutions();
+   virtual bool allowSubstitutions() const { return true; }
+  public:
    bool loadParameters();  
    bool reload(String &errorStr);
 };

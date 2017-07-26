@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #ifndef _H_PARTICLE_EMITTER
 #define _H_PARTICLE_EMITTER
 
@@ -113,6 +117,11 @@ class ParticleEmitterData : public GameBaseData
    bool glow;                                ///< Renders this emitter into the glow buffer.
 
    bool reload();
+public:
+   /*C*/ ParticleEmitterData(const ParticleEmitterData&, bool = false);
+   /*D*/ ~ParticleEmitterData();
+   virtual ParticleEmitterData* cloneAndPerformSubstitutions(const SimObject*, S32 index=0);
+   virtual bool allowSubstitutions() const { return true; }
 };
 
 //*****************************************************************************

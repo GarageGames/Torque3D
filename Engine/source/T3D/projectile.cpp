@@ -194,6 +194,40 @@ ProjectileData::ProjectileData()
    lightDescId = 0;
 }
 
+ProjectileData::ProjectileData(const ProjectileData& other, bool temp_clone) : GameBaseData(other, temp_clone)
+{
+   projectileShapeName = other.projectileShapeName;
+   faceViewer = other.faceViewer; // -- always set to false
+   scale = other.scale;
+   velInheritFactor = other.velInheritFactor;
+   muzzleVelocity = other.muzzleVelocity;
+   impactForce = other.impactForce;
+   isBallistic = other.isBallistic;
+   bounceElasticity = other.bounceElasticity;
+   bounceFriction = other.bounceFriction;
+   gravityMod = other.gravityMod;
+   lifetime = other.lifetime;
+   armingDelay = other.armingDelay;
+   fadeDelay = other.fadeDelay;
+   explosion = other.explosion;
+   explosionId = other.explosionId; // -- for pack/unpack of explosion ptr
+   waterExplosion = other.waterExplosion;
+   waterExplosionId = other.waterExplosionId; // -- for pack/unpack of waterExplosion ptr
+   splash = other.splash;
+   splashId = other.splashId; // -- for pack/unpack of splash ptr
+   decal = other.decal;
+   decalId = other.decalId; // -- for pack/unpack of decal ptr
+   sound = other.sound;
+   lightDesc = other.lightDesc;
+   lightDescId = other.lightDescId; // -- for pack/unpack of lightDesc ptr
+   projectileShape = other.projectileShape; // -- TSShape loads using projectileShapeName
+   activateSeq = other.activateSeq; // -- from projectileShape sequence "activate"
+   maintainSeq = other.maintainSeq; // -- from projectileShape sequence "maintain"
+   particleEmitter = other.particleEmitter;
+   particleEmitterId = other.particleEmitterId; // -- for pack/unpack of particleEmitter ptr
+   particleWaterEmitter = other.particleWaterEmitter;
+   particleWaterEmitterId = other.particleWaterEmitterId; // -- for pack/unpack of particleWaterEmitter ptr
+}
 //--------------------------------------------------------------------------
 
 void ProjectileData::initPersistFields()
@@ -585,6 +619,8 @@ Projectile::Projectile()
 
    mLightState.clear();
    mLightState.setLightInfo( mLight );
+
+   mDataBlock = 0;
 }
 
 Projectile::~Projectile()
@@ -593,6 +629,11 @@ Projectile::~Projectile()
 
    delete mProjectileShape;
    mProjectileShape = NULL;
+   if (mDataBlock && mDataBlock->isTempClone())
+   {
+      delete mDataBlock;
+      mDataBlock = 0;
+   }
 }
 
 //--------------------------------------------------------------------------

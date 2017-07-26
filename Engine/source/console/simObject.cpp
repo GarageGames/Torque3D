@@ -92,12 +92,17 @@ SimObject::SimObject()
 
    mCopySource = NULL;
    mPersistentId = NULL;
+   is_temp_clone = false;
 }
 
 //-----------------------------------------------------------------------------
 
 SimObject::~SimObject()
 {
+   // if this is a temp-clone, we don't delete any members that were shallow-copied
+   // over from the source datablock.
+   if (is_temp_clone)
+      return;
    if( mFieldDictionary )
    {
       delete mFieldDictionary;
@@ -1327,6 +1332,43 @@ void SimObject::setDataFieldType(const char *typeName, StringTableEntry slotName
    }
 }
 
+// This is the copy-constructor used to create temporary datablock clones.
+// The <temp_clone> argument is added to distinguish this copy-constructor
+// from any general-purpose copy-constructor that might be needed in the
+// future. <temp_clone> should always be true when creating temporary 
+// datablock clones.
+//
+SimObject::SimObject(const SimObject& other, bool temp_clone)
+{
+   is_temp_clone = temp_clone;
+
+   objectName = other.objectName;
+   mOriginalName = other.mOriginalName;
+   nextNameObject = other.nextNameObject;
+   nextManagerNameObject = other.nextManagerNameObject;
+   nextIdObject = other.nextIdObject;
+   mGroup = other.mGroup;
+   mFlags = other.mFlags;
+   mCopySource = other.mCopySource;
+   mFieldDictionary = other.mFieldDictionary;
+   //mIdString = other.mIdString; // special treatment (see below)
+   mFilename = other.mFilename;
+   mDeclarationLine = other.mDeclarationLine;
+   mNotifyList = other.mNotifyList;
+   mId = other.mId;
+   mInternalName = other.mInternalName;
+   mCanSaveFieldDictionary = other.mCanSaveFieldDictionary;
+   mPersistentId = other.mPersistentId;
+   mNameSpace = other.mNameSpace;
+   mClassName = other.mClassName;
+   mSuperClassName = other.mSuperClassName;
+   preventNameChanging = other.preventNameChanging;
+
+   if (mId)
+      dSprintf( mIdString, sizeof( mIdString ), "%u", mId );
+   else
+      mIdString[ 0 ] = '\0';
+}
 //-----------------------------------------------------------------------------
 
 void SimObject::dumpClassHierarchy()

@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "T3D/gameBase/gameBase.h"
 #include "console/consoleTypes.h"
@@ -121,6 +125,12 @@ GameBaseData::GameBaseData()
 {
    category = "";
    packed = false;
+}
+GameBaseData::GameBaseData(const GameBaseData& other, bool temp_clone) : SimDataBlock(other, temp_clone)
+{
+   packed = other.packed;
+   category = other.category;
+   //mReloadSignal = other.mReloadSignal; // DO NOT copy the mReloadSignal member. 
 }
 
 void GameBaseData::inspectPostApply()
@@ -290,6 +300,9 @@ bool GameBase::onNewDataBlock( GameBaseData *dptr, bool reload )
 
    if ( !mDataBlock )
       return false;
+   // Don't set mask when new datablock is a temp-clone.
+   if (mDataBlock->isTempClone())
+      return true;
 
    setMaskBits(DataBlockMask);
    return true;

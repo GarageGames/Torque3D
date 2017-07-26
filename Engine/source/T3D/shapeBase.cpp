@@ -200,6 +200,66 @@ ShapeBaseData::ShapeBaseData()
    dMemset( mountPointNode, -1, sizeof( S32 ) * SceneObject::NumMountPoints );
 }
 
+ShapeBaseData::ShapeBaseData(const ShapeBaseData& other, bool temp_clone) : GameBaseData(other, temp_clone)
+{
+   shadowEnable = other.shadowEnable;
+   shadowSize = other.shadowSize;
+   shadowMaxVisibleDistance = other.shadowMaxVisibleDistance;
+   shadowProjectionDistance = other.shadowProjectionDistance;
+   shadowSphereAdjust = other.shadowSphereAdjust;
+   shapeName = other.shapeName;
+   cloakTexName = other.cloakTexName;
+   cubeDescName = other.cubeDescName;
+   cubeDescId = other.cubeDescId;
+   reflectorDesc = other.reflectorDesc;
+   debris = other.debris;
+   debrisID = other.debrisID; // -- for pack/unpack of debris ptr
+   debrisShapeName = other.debrisShapeName;
+   debrisShape = other.debrisShape; // -- TSShape loaded using debrisShapeName
+   explosion = other.explosion;
+   explosionID = other.explosionID; // -- for pack/unpack of explosion ptr
+   underwaterExplosion = other.underwaterExplosion;
+   underwaterExplosionID = other.underwaterExplosionID; // -- for pack/unpack of underwaterExplosion ptr
+   mass = other.mass;
+   drag = other.drag;
+   density = other.density;
+   maxEnergy = other.maxEnergy;
+   maxDamage = other.maxDamage;
+   repairRate = other.repairRate;
+   disabledLevel = other.disabledLevel;
+   destroyedLevel = other.destroyedLevel;
+   cameraMaxDist = other.cameraMaxDist;
+   cameraMinDist = other.cameraMinDist;
+   cameraDefaultFov = other.cameraDefaultFov;
+   cameraMinFov = other.cameraMinFov;
+   cameraMaxFov = other.cameraMaxFov;
+   cameraCanBank = other.cameraCanBank;
+   mountedImagesBank = other.mountedImagesBank;
+   mShape = other.mShape; // -- TSShape loaded using shapeName
+   mCRC = other.mCRC; // -- from shape, used to verify client shape 
+   computeCRC = other.computeCRC;
+   eyeNode = other.eyeNode; // -- from shape node "eye"
+   earNode = other.earNode; // -- from shape node "ear"
+   cameraNode = other.cameraNode; // -- from shape node "cam"
+   dMemcpy(mountPointNode, other.mountPointNode, sizeof(mountPointNode)); // -- from shape nodes "mount#" 0-31
+   debrisDetail = other.debrisDetail; // -- from shape detail "Debris-17"
+   damageSequence = other.damageSequence; // -- from shape sequence "Damage"
+   hulkSequence = other.hulkSequence; // -- from shape sequence "Visibility"
+   observeThroughObject = other.observeThroughObject;
+   collisionDetails = other.collisionDetails; // -- calc from shape (this is a Vector copy)
+   collisionBounds = other.collisionBounds; // -- calc from shape (this is a Vector copy)
+   LOSDetails = other.LOSDetails; // -- calc from shape (this is a Vector copy)
+   firstPersonOnly = other.firstPersonOnly;
+   useEyePoint = other.useEyePoint;
+   isInvincible = other.isInvincible;
+   renderWhenDestroyed = other.renderWhenDestroyed;
+   inheritEnergyFromMount = other.inheritEnergyFromMount;
+   remap_txr_tags = other.remap_txr_tags;
+   remap_buffer = other.remap_buffer;
+   txr_tag_remappings = other.txr_tag_remappings;
+   silent_bbox_check = other.silent_bbox_check;
+}
+
 struct ShapeBaseDataProto
 {
    F32 mass;

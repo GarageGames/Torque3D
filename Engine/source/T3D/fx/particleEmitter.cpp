@@ -712,6 +712,134 @@ void ParticleEmitterData::allocPrimBuffer( S32 overrideSize )
    delete [] indices;
 }
 
+//#define TRACK_PARTICLE_EMITTER_DATA_CLONES
+
+#ifdef TRACK_PARTICLE_EMITTER_DATA_CLONES
+static int emitter_data_clones = 0;
+#endif
+
+ParticleEmitterData::ParticleEmitterData(const ParticleEmitterData& other, bool temp_clone) : GameBaseData(other, temp_clone)
+{
+#ifdef TRACK_PARTICLE_EMITTER_DATA_CLONES
+   emitter_data_clones++;
+   if (emitter_data_clones == 1)
+     Con::errorf("ParticleEmitterData -- Clones are on the loose!");
+#endif
+
+   ejectionPeriodMS = other.ejectionPeriodMS;
+   periodVarianceMS = other.periodVarianceMS;
+   ejectionVelocity = other.ejectionVelocity;
+   velocityVariance = other.velocityVariance;
+   ejectionOffset = other.ejectionOffset;
+   ejectionOffsetVariance = other.ejectionOffsetVariance;
+   thetaMin = other.thetaMin;
+   thetaMax = other.thetaMax;
+   phiReferenceVel = other.phiReferenceVel;
+   phiVariance = other.phiVariance;
+   softnessDistance = other.softnessDistance;
+   ambientFactor = other.ambientFactor;
+   lifetimeMS = other.lifetimeMS;
+   lifetimeVarianceMS = other.lifetimeVarianceMS;
+   overrideAdvance = other.overrideAdvance;
+   orientParticles = other.orientParticles;
+   orientOnVelocity = other.orientOnVelocity;
+   useEmitterSizes = other.useEmitterSizes;
+   useEmitterColors = other.useEmitterColors;
+   alignParticles = other.alignParticles;
+   alignDirection = other.alignDirection;
+   particleString = other.particleString;
+   particleDataBlocks = other.particleDataBlocks; // -- derived from particleString
+   dataBlockIds = other.dataBlockIds; // -- derived from particleString
+   partListInitSize = other.partListInitSize; // -- approx calc from other fields
+   primBuff = other.primBuff;
+   blendStyle = other.blendStyle;
+   sortParticles = other.sortParticles;
+   reverseOrder = other.reverseOrder;
+   textureName = other.textureName;
+   textureHandle = other.textureHandle; // -- TextureHandle loads using textureName
+   highResOnly = other.highResOnly;
+   renderReflection = other.renderReflection;
+   fade_color = other.fade_color;
+   fade_size = other.fade_size;
+   fade_alpha = other.fade_alpha;
+   ejectionInvert = other.ejectionInvert;
+   parts_per_eject = other.parts_per_eject; // -- set to 1 (used by subclasses)
+   use_emitter_xfm = other.use_emitter_xfm;
+#if defined(AFX_CAP_PARTICLE_POOLS)
+   pool_datablock = other.pool_datablock;
+   pool_index = other.pool_index;
+   pool_depth_fade = other.pool_depth_fade;
+   pool_radial_fade = other.pool_radial_fade;
+   do_pool_id_convert = other.do_pool_id_convert; // -- flags pool id conversion need
+#endif
+}
+
+ParticleEmitterData::~ParticleEmitterData()
+{
+  if (!isTempClone())
+    return;
+
+  for (S32 i = 0; i < particleDataBlocks.size(); i++)
+  {
+    if (particleDataBlocks[i] && particleDataBlocks[i]->isTempClone())
+    {
+      delete particleDataBlocks[i];
+      particleDataBlocks[i] = 0;
+    }
+  }
+
+#ifdef TRACK_PARTICLE_EMITTER_DATA_CLONES
+  if (emitter_data_clones > 0)
+  {
+    emitter_data_clones--;
+    if (emitter_data_clones == 0)
+      Con::errorf("ParticleEmitterData -- Clones eliminated!");
+  }
+  else
+    Con::errorf("ParticleEmitterData -- Too many clones deleted!");
+#endif
+}
+
+ParticleEmitterData* ParticleEmitterData::cloneAndPerformSubstitutions(const SimObject* owner, S32 index)
+{
+  if (!owner)
+    return this;
+
+  bool clone_parts_db = false;
+
+  // note -- this could be checked when the particle blocks are evaluated
+  for (S32 i = 0; i < this->particleDataBlocks.size(); i++)
+  {
+    if (this->particleDataBlocks[i] && (this->particleDataBlocks[i]->getSubstitutionCount() > 0))
+    {
+      clone_parts_db = true;
+      break;
+    }
+  }
+
+  ParticleEmitterData* sub_emitter_db = this;
+
+  if (this->getSubstitutionCount() > 0 || clone_parts_db)
+  {
+    sub_emitter_db = new ParticleEmitterData(*this, true);
+    performSubstitutions(sub_emitter_db, owner, index);
+
+    if (clone_parts_db)
+    {
+      for (S32 i = 0; i < sub_emitter_db->particleDataBlocks.size(); i++)
+      {
+        if (sub_emitter_db->particleDataBlocks[i] && (sub_emitter_db->particleDataBlocks[i]->getSubstitutionCount() > 0))
+        {
+          ParticleData* orig_db = sub_emitter_db->particleDataBlocks[i];
+          sub_emitter_db->particleDataBlocks[i] = new ParticleData(*orig_db, true);
+          orig_db->performSubstitutions(sub_emitter_db->particleDataBlocks[i], owner, index);
+        }
+      }
+    }
+  }
+
+  return sub_emitter_db;
+}
 
 //-----------------------------------------------------------------------------
 // ParticleEmitter
@@ -743,6 +871,7 @@ ParticleEmitter::ParticleEmitter()
 
    // ParticleEmitter should be allocated on the client only.
    mNetFlags.set( IsGhost );
+   mDataBlock = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -753,6 +882,19 @@ ParticleEmitter::~ParticleEmitter()
    for( S32 i = 0; i < part_store.size(); i++ )
    {
       delete [] part_store[i];
+   }
+   if (db_temp_clone && mDataBlock && mDataBlock->isTempClone())
+   {
+     for (S32 i = 0; i < mDataBlock->particleDataBlocks.size(); i++)
+     {
+       if (mDataBlock->particleDataBlocks[i] && mDataBlock->particleDataBlocks[i]->isTempClone())
+       {
+         delete mDataBlock->particleDataBlocks[i];
+         mDataBlock->particleDataBlocks[i] = 0;
+       }
+     }
+     delete mDataBlock;
+     mDataBlock = 0;
    }
 }
 
@@ -831,6 +973,11 @@ bool ParticleEmitter::onNewDataBlock( GameBaseData *dptr, bool reload )
       store_block[n_part_capacity-1].next = NULL;
       part_list_head.next = NULL;
       n_parts = 0;
+   }
+   if (mDataBlock->isTempClone())
+   {
+     db_temp_clone = true;
+     return true;
    }
 
    scriptOnNewDataBlock();

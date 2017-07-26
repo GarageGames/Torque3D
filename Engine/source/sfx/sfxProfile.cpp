@@ -24,6 +24,7 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 
 #include "sfx/sfxProfile.h"
@@ -96,9 +97,6 @@ SFXProfile::SFXProfile( SFXDescription* desc, const String& filename, bool prelo
 
 //-----------------------------------------------------------------------------
 
-SFXProfile::~SFXProfile()
-{
-}
 
 //-----------------------------------------------------------------------------
 
@@ -379,4 +377,96 @@ DefineEngineMethod( SFXProfile, getSoundDuration, F32, (),,
    "@return The length of the sound data in seconds or 0 if the sound referenced by the profile could not be found." )
 {
    return ( F32 ) object->getSoundDuration() * 0.001f;
+}
+
+// enable this to help verify that temp-clones of AudioProfile are being deleted
+//#define TRACK_AUDIO_PROFILE_CLONES
+
+#ifdef TRACK_AUDIO_PROFILE_CLONES
+static int audio_prof_clones = 0;
+#endif
+
+SFXProfile::SFXProfile(const SFXProfile& other, bool temp_clone) : SFXTrack(other, temp_clone)
+{
+#ifdef TRACK_AUDIO_PROFILE_CLONES
+   audio_prof_clones++;
+   if (audio_prof_clones == 1)
+     Con::errorf("SFXProfile -- Clones are on the loose!");
+#endif
+   mResource = other.mResource;
+   mFilename = other.mFilename;
+   mPreload = other.mPreload;
+   mBuffer = other.mBuffer; // -- AudioBuffer loaded using mFilename
+   mChangedSignal = other.mChangedSignal;
+}
+
+SFXProfile::~SFXProfile()
+{
+  if (!isTempClone())
+    return;
+
+  // cleanup after a temp-clone
+
+  if (mDescription && mDescription->isTempClone())
+  {
+    delete mDescription;
+    mDescription = 0;
+  }
+
+#ifdef TRACK_AUDIO_PROFILE_CLONES
+  if (audio_prof_clones > 0)
+  {
+    audio_prof_clones--;
+    if (audio_prof_clones == 0)
+      Con::errorf("SFXProfile -- Clones eliminated!");
+  }
+  else
+    Con::errorf("SFXProfile -- Too many clones deleted!");
+#endif
+}
+
+// Clone and perform substitutions on the SFXProfile and on any SFXDescription
+// it references.
+SFXProfile* SFXProfile::cloneAndPerformSubstitutions(const SimObject* owner, S32 index)
+{
+  if (!owner)
+    return this;
+
+  SFXProfile* sub_profile_db = this;
+
+  // look for mDescriptionObject subs
+  SFXDescription* desc_db;
+  if (mDescription && mDescription->getSubstitutionCount() > 0)
+  {
+    SFXDescription* orig_db = mDescription;
+    desc_db = new SFXDescription(*orig_db, true);
+    orig_db->performSubstitutions(desc_db, owner, index);
+  }
+  else
+    desc_db = 0;
+
+  if (this->getSubstitutionCount() > 0 || desc_db)
+  {
+    sub_profile_db = new SFXProfile(*this, true);
+    performSubstitutions(sub_profile_db, owner, index);
+    if (desc_db)
+      sub_profile_db->mDescription = desc_db;
+  }
+
+  return sub_profile_db;
+}
+
+void SFXProfile::onPerformSubstitutions() 
+{ 
+   if ( SFX )
+   {
+      // If preload is enabled we load the resource
+      // and device buffer now to avoid a delay on
+      // first playback.
+      if ( mPreload && !_preloadBuffer() )
+         Con::errorf( "SFXProfile(%s)::onPerformSubstitutions: The preload failed!", getName() );
+
+      // We need to get device change notifications.
+      SFX->getEventSignal().notify( this, &SFXProfile::_onDeviceEvent );
+   }
 }

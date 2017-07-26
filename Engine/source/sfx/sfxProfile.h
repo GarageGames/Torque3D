@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _SFXPROFILE_H_
 #define _SFXPROFILE_H_
 
@@ -175,6 +180,11 @@ class SFXProfile : public SFXTrack
       
       ///
       ChangedSignal& getChangedSignal() { return mChangedSignal; }
+   public:
+      /*C*/          SFXProfile(const SFXProfile&, bool = false);
+      SFXProfile*    cloneAndPerformSubstitutions(const SimObject*, S32 index=0);
+      virtual void   onPerformSubstitutions();
+      virtual bool   allowSubstitutions() const { return true; }
 };
 
 

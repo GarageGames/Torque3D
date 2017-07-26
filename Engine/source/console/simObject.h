@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #ifndef _SIMOBJECT_H_
 #define _SIMOBJECT_H_
 
@@ -970,6 +974,12 @@ class SimObject: public ConsoleObject, public TamlCallbacks
 
       // EngineObject.
       virtual void destroySelf();
+protected:
+   bool   is_temp_clone;
+public:
+   /*C*/  SimObject(const SimObject&, bool = false);
+   bool   isTempClone() const { return is_temp_clone; }
+   virtual bool allowSubstitutions() const { return false; }
 };
 
 

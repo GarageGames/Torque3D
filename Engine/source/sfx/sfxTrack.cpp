@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "sfx/sfxTrack.h"
 #include "sfx/sfxTypes.h"
 #include "sfx/sfxDescription.h"
@@ -65,6 +69,11 @@ SFXTrack::SFXTrack( SFXDescription* description )
    dMemset( mParameters, 0, sizeof( mParameters ) );
 }
 
+SFXTrack::SFXTrack(const SFXTrack& other, bool temp_clone) : SimDataBlock(other, temp_clone)
+{
+   mDescription = other.mDescription;
+   dMemcpy(mParameters, other.mParameters, sizeof(mParameters));
+}
 //-----------------------------------------------------------------------------
 
 void SFXTrack::initPersistFields()

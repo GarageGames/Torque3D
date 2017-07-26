@@ -19,6 +19,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "particle.h"
 #include "console/consoleTypes.h"
 #include "console/typeValidators.h"
@@ -652,4 +657,79 @@ DefineEngineMethod(ParticleData, reload, void, (),,
 {
    char errorBuffer[256];
    object->reload(errorBuffer);
+}
+//#define TRACK_PARTICLE_DATA_CLONES
+
+#ifdef TRACK_PARTICLE_DATA_CLONES
+static int particle_data_clones = 0;
+#endif
+
+ParticleData::ParticleData(const ParticleData& other, bool temp_clone) : SimDataBlock(other, temp_clone)
+{
+#ifdef TRACK_PARTICLE_DATA_CLONES
+   particle_data_clones++;
+   if (particle_data_clones == 1)
+     Con::errorf("ParticleData -- Clones are on the loose!");
+#endif
+
+  dragCoefficient = other.dragCoefficient;
+  windCoefficient = other.windCoefficient;
+  gravityCoefficient = other.gravityCoefficient;
+  inheritedVelFactor = other.inheritedVelFactor;
+  constantAcceleration = other.constantAcceleration;
+  lifetimeMS = other.lifetimeMS;
+  lifetimeVarianceMS = other.lifetimeVarianceMS;
+  spinSpeed = other.spinSpeed;
+  spinRandomMin = other.spinRandomMin;
+  spinRandomMax = other.spinRandomMax;
+  useInvAlpha = other.useInvAlpha;
+  animateTexture = other.animateTexture;
+  numFrames = other.numFrames; // -- calc from other fields
+  framesPerSec = other.framesPerSec;
+  dMemcpy( colors, other.colors, sizeof( colors ) );
+  dMemcpy( sizes, other.sizes, sizeof( sizes ) );
+  dMemcpy( times, other.times, sizeof( times ) );
+  animTexUVs = other.animTexUVs; // -- calc from other fields
+  dMemcpy( texCoords, other.texCoords, sizeof( texCoords ) );
+  animTexTiling = other.animTexTiling;
+  animTexFramesString = other.animTexFramesString;
+  animTexFrames = other.animTexFrames; // -- parsed from animTexFramesString
+  textureName = other.textureName;
+  textureHandle = other.textureHandle;
+  spinBias = other.spinBias;
+  randomizeSpinDir = other.randomizeSpinDir;
+  textureExtName = other.textureExtName;
+  textureExtHandle = other.textureExtHandle;
+  constrain_pos = other.constrain_pos;
+  start_angle = other.start_angle;
+  angle_variance = other.angle_variance;
+  sizeBias = other.sizeBias;
+}
+
+ParticleData::~ParticleData()
+{
+   if (animTexUVs)
+   {
+      delete [] animTexUVs;
+   }
+
+  if (!isTempClone())
+    return;
+
+#ifdef TRACK_PARTICLE_DATA_CLONES
+  if (particle_data_clones > 0)
+  {
+    particle_data_clones--;
+    if (particle_data_clones == 0)
+      Con::errorf("ParticleData -- Clones eliminated!");
+  }
+  else
+    Con::errorf("ParticleData -- Too many clones deleted!");
+#endif
+}
+
+void ParticleData::onPerformSubstitutions() 
+{ 
+  char errorBuffer[256];
+  reload(errorBuffer);
 }

@@ -117,6 +117,85 @@ DebrisData::DebrisData()
    ignoreWater = true;
 }
 
+//#define TRACK_DEBRIS_DATA_CLONES
+
+#ifdef TRACK_DEBRIS_DATA_CLONES
+static int debris_data_clones = 0;
+#endif
+
+DebrisData::DebrisData(const DebrisData& other, bool temp_clone) : GameBaseData(other, temp_clone)
+{
+#ifdef TRACK_DEBRIS_DATA_CLONES
+   debris_data_clones++;
+   if (debris_data_clones == 1)
+      Con::errorf("DebrisData -- Clones are on the loose!");
+#endif
+   velocity = other.velocity;
+   velocityVariance = other.velocityVariance;
+   friction = other.friction;
+   elasticity = other.elasticity;
+   lifetime = other.lifetime;
+   lifetimeVariance = other.lifetimeVariance;
+   numBounces = other.numBounces;
+   bounceVariance = other.bounceVariance;
+   minSpinSpeed = other.minSpinSpeed;
+   maxSpinSpeed = other.maxSpinSpeed;
+   explodeOnMaxBounce = other.explodeOnMaxBounce;
+   staticOnMaxBounce = other.staticOnMaxBounce;
+   snapOnMaxBounce = other.snapOnMaxBounce;
+   fade = other.fade;
+   useRadiusMass = other.useRadiusMass;
+   baseRadius = other.baseRadius;
+   gravModifier = other.gravModifier;
+   terminalVelocity = other.terminalVelocity;
+   ignoreWater = other.ignoreWater;
+   shapeName = other.shapeName;
+   shape = other.shape; // -- TSShape loaded using shapeName
+   textureName = other.textureName;
+   explosionId = other.explosionId; // -- for pack/unpack of explosion ptr
+   explosion = other.explosion;
+   dMemcpy( emitterList, other.emitterList, sizeof( emitterList ) );
+   dMemcpy( emitterIDList, other.emitterIDList, sizeof( emitterIDList ) ); // -- for pack/unpack of emitterList ptrs
+}
+
+DebrisData::~DebrisData()
+{
+   if (!isTempClone())
+      return;
+
+#ifdef TRACK_DEBRIS_DATA_CLONES
+   if (debris_data_clones > 0)
+   {
+      debris_data_clones--;
+      if (debris_data_clones == 0)
+         Con::errorf("DebrisData -- Clones eliminated!");
+   }
+   else
+      Con::errorf("DebrisData -- Too many clones deleted!");
+#endif
+}
+
+DebrisData* DebrisData::cloneAndPerformSubstitutions(const SimObject* owner, S32 index)
+{
+   if (!owner || getSubstitutionCount() == 0)
+      return this;
+
+   DebrisData* sub_debris_db = new DebrisData(*this, true);
+   performSubstitutions(sub_debris_db, owner, index);
+
+   return sub_debris_db;
+}
+
+void DebrisData::onPerformSubstitutions() 
+{ 
+   if( shapeName && shapeName[0] != '\0')
+   {
+      shape = ResourceManager::get().load(shapeName);
+      if( bool(shape) == false )
+         Con::errorf("DebrisData::onPerformSubstitutions(): failed to load shape \"%s\"", shapeName);
+   }
+}
+
 bool DebrisData::onAdd()
 {
    if(!Parent::onAdd())
@@ -458,6 +537,8 @@ Debris::Debris()
 
    // Only allocated client side.
    mNetFlags.set( IsGhost );
+   ss_object = 0;
+   ss_index = 0;
 }
 
 Debris::~Debris()
@@ -472,6 +553,12 @@ Debris::~Debris()
    {
       delete mPart;
       mPart = NULL;
+   }
+   
+   if (mDataBlock && mDataBlock->isTempClone())
+   { 
+      delete mDataBlock;
+      mDataBlock = 0;
    }
 }
 
@@ -502,6 +589,8 @@ bool Debris::onNewDataBlock( GameBaseData *dptr, bool reload )
    if( !mDataBlock || !Parent::onNewDataBlock( dptr, reload ) )
       return false;
 
+   if (mDataBlock->isTempClone())
+      return true;
    scriptOnNewDataBlock();
    return true;
 
@@ -526,7 +615,7 @@ bool Debris::onAdd()
       if( mDataBlock->emitterList[i] != NULL )
       {
          ParticleEmitter * pEmitter = new ParticleEmitter;
-         pEmitter->onNewDataBlock( mDataBlock->emitterList[i], false );
+         pEmitter->onNewDataBlock(mDataBlock->emitterList[i]->cloneAndPerformSubstitutions(ss_object, ss_index), false);
          if( !pEmitter->registerObject() )
          {
             Con::warnf( ConsoleLogEntry::General, "Could not register emitter for particle of class: %s", mDataBlock->getName() );
@@ -805,7 +894,8 @@ void Debris::explode()
    Point3F explosionPos = getPosition();
 
    Explosion* pExplosion = new Explosion;
-   pExplosion->onNewDataBlock(mDataBlock->explosion, false);
+   pExplosion->setSubstitutionData(ss_object, ss_index);
+   pExplosion->onNewDataBlock(mDataBlock->explosion->cloneAndPerformSubstitutions(ss_object, ss_index), false);
 
    MatrixF trans( true );
    trans.setPosition( getPosition() );
