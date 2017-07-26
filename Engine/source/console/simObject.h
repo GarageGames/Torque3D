@@ -980,6 +980,11 @@ public:
    /*C*/  SimObject(const SimObject&, bool = false);
    bool   isTempClone() const { return is_temp_clone; }
    virtual bool allowSubstitutions() const { return false; }
+   
+public:
+   static bool preventNameChanging;
+   void   assignDynamicFieldsFrom(SimObject*, const char* filter, bool no_replace=false);
+   
 public:
    virtual void reloadReset() { }
 };

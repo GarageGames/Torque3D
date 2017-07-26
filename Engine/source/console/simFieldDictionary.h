@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _SIMFIELDDICTIONARY_H_
 #define _SIMFIELDDICTIONARY_H_
 
@@ -90,6 +95,8 @@ public:
    U32   getNumFields() const { return mNumFields; }
 
    Entry  *operator[](U32 index);
+   void setFieldValue(StringTableEntry slotName, const char *value, ConsoleBaseType *type, bool no_replace);
+   void assignFrom(SimFieldDictionary *dict, const char* filter, bool no_replace);
 };
 
 class SimFieldDictionaryIterator

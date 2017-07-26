@@ -24,6 +24,7 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "platform/platformMemory.h"
 #include "console/simObject.h"
@@ -52,6 +53,7 @@ ConsoleDocClass( SimObject,
 bool SimObject::smForceId = false;
 SimObjectId SimObject::smForcedId = 0;
 
+bool SimObject::preventNameChanging = false;
 
 namespace Sim
 {
@@ -221,6 +223,19 @@ String SimObject::describeSelf() const
    return desc;
 }
 
+// Copies dynamic fields from one object to another, optionally limited by the settings for
+// <filter> and <no_replace>. When true, <no_replace> prohibits the replacement of fields that
+// already have a value. When <filter> is specified, only fields with leading characters that
+// exactly match the characters in <filter> are copied. 
+void SimObject::assignDynamicFieldsFrom(SimObject* from, const char* filter, bool no_replace)
+{
+   if (from->mFieldDictionary)
+   {
+      if( mFieldDictionary == NULL )
+         mFieldDictionary = new SimFieldDictionary;
+      mFieldDictionary->assignFrom(from->mFieldDictionary, filter, no_replace);
+   }
+}
 //=============================================================================
 //    Persistence.
 //=============================================================================
@@ -2185,6 +2200,8 @@ bool SimObject::setProtectedParent( void *obj, const char *index, const char *da
 
 bool SimObject::setProtectedName(void *obj, const char *index, const char *data)
 {   
+   if (preventNameChanging)
+      return false;
    SimObject *object = static_cast<SimObject*>(obj);
    
    if ( object->isProperlyAdded() )
