@@ -1861,6 +1861,43 @@ public:
 protected:
    DECLARE_CALLBACK( F32, validateCameraFov, (F32 fov) );
 
+protected:
+   enum { 
+      ANIM_OVERRIDDEN     = BIT(0),
+      BLOCK_USER_CONTROL  = BIT(1),
+      IS_DEATH_ANIM       = BIT(2),
+      BAD_ANIM_ID         = 999999999,
+      BLENDED_CLIP        = 0x80000000,
+   };
+   struct BlendThread
+   {
+      TSThread* thread;
+      U32       tag;
+   };
+   Vector<BlendThread> blend_clips;
+   static U32 unique_anim_tag_counter;
+   U8 anim_clip_flags;
+   S32 last_anim_id;
+   U32 last_anim_tag;
+   U32 last_anim_lock_tag;
+   S32 saved_seq_id;
+   F32 saved_pos;
+   F32 saved_rate;
+   U32 playBlendAnimation(S32 seq_id, F32 pos, F32 rate);
+   void restoreBlendAnimation(U32 tag);
+public:
+   U32 playAnimation(const char* name, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim);
+   F32 getAnimationDuration(const char* name);
+
+   virtual void restoreAnimation(U32 tag);
+   virtual U32 getAnimationID(const char* name);
+   virtual U32 playAnimationByID(U32 anim_id, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim);
+   virtual F32 getAnimationDurationByID(U32 anim_id);
+   virtual bool isBlendAnimation(const char* name);
+   virtual const char* getLastClipName(U32 clip_tag);
+   virtual void unlockAnimation(U32 tag, bool force=false) { }
+   virtual U32 lockAnimation() { return 0; }
+   virtual bool isAnimationLocked() const { return false; }
 
    virtual void setSelectionFlags(U8 flags);
 };

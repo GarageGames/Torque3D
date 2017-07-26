@@ -1045,6 +1045,13 @@ ShapeBase::ShapeBase()
 
    for (i = 0; i < MaxTriggerKeys; i++)
       mTrigger[i] = false;
+   anim_clip_flags = 0;
+   last_anim_id = -1;
+   last_anim_tag = 0;         
+   last_anim_lock_tag = 0;
+   saved_seq_id = -1;
+   saved_pos = 0.0f;
+   saved_rate = 1.0f;
 }
 
 
@@ -1183,6 +1190,16 @@ void ShapeBase::onSceneRemove()
 
 bool ShapeBase::onNewDataBlock( GameBaseData *dptr, bool reload )
 {
+   // need to destroy blend-clips or we crash
+   if (isGhost())
+   {
+      for (S32 i = 0; i < blend_clips.size(); i++)
+      {
+         if (blend_clips[i].thread)
+            mShapeInstance->destroyThread(blend_clips[i].thread);
+         blend_clips.erase_fast(i);
+      }
+   }
    ShapeBaseData *prevDB = dynamic_cast<ShapeBaseData*>( mDataBlock );
 
    bool isInitialDataBlock = ( mDataBlock == 0 );
@@ -5099,6 +5116,186 @@ DefineEngineMethod( ShapeBase, getModelFile, const char *, (),,
 
    const char *fieldName = StringTable->insert( String("shapeFile") );
    return datablock->getDataField( fieldName, NULL );
+}
+
+
+U32 ShapeBase::unique_anim_tag_counter = 1;
+
+U32 ShapeBase::playBlendAnimation(S32 seq_id, F32 pos, F32 rate)
+{
+   BlendThread blend_clip; 
+   blend_clip.tag = ((unique_anim_tag_counter++) | BLENDED_CLIP);
+   blend_clip.thread = 0;
+
+   if (isClientObject())
+   {
+      blend_clip.thread = mShapeInstance->addThread();
+      mShapeInstance->setSequence(blend_clip.thread, seq_id, pos);
+      mShapeInstance->setTimeScale(blend_clip.thread, rate);
+   }
+
+   blend_clips.push_back(blend_clip);
+
+   return blend_clip.tag;
+}
+
+void ShapeBase::restoreBlendAnimation(U32 tag)
+{
+   for (S32 i = 0; i < blend_clips.size(); i++)
+   {
+      if (blend_clips[i].tag == tag)
+      {
+         if (blend_clips[i].thread)
+         {
+            mShapeInstance->destroyThread(blend_clips[i].thread);
+         }
+         blend_clips.erase_fast(i);
+         break;
+      }
+   }
+}
+
+//
+
+void ShapeBase::restoreAnimation(U32 tag)
+{
+   if (!isClientObject())
+      return;
+
+   // check if this is a blended clip
+   if ((tag & BLENDED_CLIP) != 0)
+   {
+      restoreBlendAnimation(tag);
+      return;
+   }
+
+   if (tag != 0 && tag == last_anim_tag)
+   {
+      anim_clip_flags &= ~(ANIM_OVERRIDDEN | IS_DEATH_ANIM);
+
+      stopThread(0);
+
+      if (saved_seq_id != -1)
+      {
+         setThreadSequence(0, saved_seq_id);
+         setThreadPosition(0, saved_pos);
+         setThreadTimeScale(0, saved_rate);
+         setThreadDir(0, (saved_rate >= 0));
+         playThread(0);
+
+         saved_seq_id = -1;
+         saved_pos = 0.0f;
+         saved_rate = 1.0f;
+      }
+
+      last_anim_tag = 0;
+      last_anim_id = -1;
+   }
+}
+
+U32 ShapeBase::getAnimationID(const char* name)
+{
+   const TSShape* ts_shape = getShape();
+   S32 seq_id = (ts_shape) ? ts_shape->findSequence(name) : -1;
+   return (seq_id >= 0) ? (U32) seq_id : BAD_ANIM_ID;
+}
+
+U32 ShapeBase::playAnimationByID(U32 anim_id, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim)
+{
+   if (!isClientObject())
+      return 0;
+
+   if (anim_id == BAD_ANIM_ID)
+      return 0;
+
+   const TSShape* ts_shape = getShape();
+   if (!ts_shape)
+      return 0;
+
+   S32 seq_id = (S32) anim_id;
+   if (mShapeInstance->getShape()->sequences[seq_id].isBlend())
+      return playBlendAnimation(seq_id, pos, rate);
+
+   if (last_anim_tag == 0)
+   {
+      // try to save state of playing animation
+      Thread& st = mScriptThread[0];
+      if (st.sequence != -1)
+      {
+         saved_seq_id = st.sequence;
+         saved_pos = st.position;
+         saved_rate = st.timescale;
+      }
+   }
+
+   // START OR TRANSITION TO SEQUENCE HERE
+   setThreadSequence(0, seq_id);
+   setThreadPosition(0, pos);
+   setThreadTimeScale(0, rate);
+   setThreadDir(0, (rate >= 0));
+   playThread(0);
+
+   if (is_death_anim)
+      anim_clip_flags |= IS_DEATH_ANIM;
+   else
+      anim_clip_flags &= ~IS_DEATH_ANIM;
+
+   anim_clip_flags |= ANIM_OVERRIDDEN;
+   last_anim_tag = unique_anim_tag_counter++;
+   last_anim_id = anim_id;
+
+   return last_anim_tag;
+}
+
+F32 ShapeBase::getAnimationDurationByID(U32 anim_id)
+{
+   if (anim_id == BAD_ANIM_ID)
+      return 0.0f;
+
+   S32 seq_id = (S32) anim_id;
+   if (seq_id >= 0 && seq_id < mDataBlock->mShape->sequences.size())
+      return mDataBlock->mShape->sequences[seq_id].duration;
+
+   return 0.0f;
+}
+
+bool ShapeBase::isBlendAnimation(const char* name)
+{
+   U32 anim_id = getAnimationID(name);
+   if (anim_id == BAD_ANIM_ID)
+      return false;
+
+   S32 seq_id = (S32) anim_id;
+   if (seq_id >= 0 && seq_id < mDataBlock->mShape->sequences.size())
+      return mDataBlock->mShape->sequences[seq_id].isBlend();
+
+   return false;
+}
+
+const char* ShapeBase::getLastClipName(U32 clip_tag)
+{ 
+   if (clip_tag != last_anim_tag)
+      return "";
+
+   S32 seq_id = (S32) last_anim_id;
+
+   S32 idx = mDataBlock->mShape->sequences[seq_id].nameIndex;
+   if (idx < 0 || idx >= mDataBlock->mShape->names.size())
+      return 0;
+
+   return mDataBlock->mShape->names[idx];
+}
+
+//
+
+U32 ShapeBase::playAnimation(const char* name, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim)
+{
+   return playAnimationByID(getAnimationID(name), pos, rate, trans, hold, wait, is_death_anim);
+}
+
+F32 ShapeBase::getAnimationDuration(const char* name)
+{
+   return getAnimationDurationByID(getAnimationID(name));
 }
 
 void ShapeBase::setSelectionFlags(U8 flags)

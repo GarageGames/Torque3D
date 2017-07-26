@@ -793,6 +793,17 @@ private:
 private:
    static bool  sCorpsesHiddenFromRayCast;
    
+public:
+   virtual void restoreAnimation(U32 tag);
+   virtual U32 getAnimationID(const char* name);
+   virtual U32 playAnimationByID(U32 anim_id, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim);
+   virtual F32 getAnimationDurationByID(U32 anim_id);
+   virtual bool isBlendAnimation(const char* name);
+   virtual const char* getLastClipName(U32 clip_tag);
+   virtual void unlockAnimation(U32 tag, bool force=false);
+   virtual U32 lockAnimation();
+   virtual bool isAnimationLocked() const { return ((anim_clip_flags & BLOCK_USER_CONTROL) != 0); }
+   
 };
 
 typedef Player::Pose PlayerPose;

@@ -2746,7 +2746,12 @@ void Player::updateMove(const Move* move)
    // Desired move direction & speed
    VectorF moveVec;
    F32 moveSpeed;
-   if ((mState == MoveState || (mState == RecoverState && mDataBlock->recoverRunForceScale > 0.0f)) && mDamageState == Enabled)
+   // If BLOCK_USER_CONTROL is set in anim_clip_flags, the user won't be able to
+   // resume control over the player character. This generally happens for
+   // short periods of time synchronized with script driven animation at places
+   // where it makes sense that user motion is prohibited, such as when the 
+   // player is lifted off the ground or knocked down.
+   if ((mState == MoveState || (mState == RecoverState && mDataBlock->recoverRunForceScale > 0.0f)) && mDamageState == Enabled && !isAnimationLocked())
    {
       zRot.getColumn(0,&moveVec);
       moveVec *= (move->x * (mPose == SprintPose ? mDataBlock->sprintStrafeScale : 1.0f));
@@ -3031,7 +3036,9 @@ void Player::updateMove(const Move* move)
       mContactTimer++;   
 
    // Acceleration from Jumping
-   if (move->trigger[sJumpTrigger] && canJump())// !isMounted() && 
+   // While BLOCK_USER_CONTROL is set in anim_clip_flags, the user won't be able to
+   // make the player character jump.
+   if (move->trigger[sJumpTrigger] && canJump() && !isAnimationLocked())
    {
       // Scale the jump impulse base on maxJumpSpeed
       F32 zSpeedScale = mVelocity.z;
@@ -3539,6 +3546,8 @@ void Player::updateLookAnimation(F32 dt)
 
 bool Player::inDeathAnim()
 {
+   if ((anim_clip_flags & ANIM_OVERRIDDEN) != 0 && (anim_clip_flags & IS_DEATH_ANIM) == 0)
+      return false;
    if (mActionAnimation.thread && mActionAnimation.action >= 0)
       if (mActionAnimation.action < mDataBlock->actionCount)
          return mDataBlock->actionList[mActionAnimation.action].death;
@@ -3748,6 +3757,8 @@ bool Player::setArmThread(U32 action)
 
 bool Player::setActionThread(const char* sequence,bool hold,bool wait,bool fsp)
 {
+   if (anim_clip_flags & ANIM_OVERRIDDEN)
+      return false;
    for (U32 i = 1; i < mDataBlock->actionCount; i++)
    {
       PlayerData::ActionAnimation &anim = mDataBlock->actionList[i];
@@ -3947,8 +3958,10 @@ void Player::updateActionThread()
       pickActionAnimation();
    }
 
+   // prevent scaling of AFX picked actions
    if ( (mActionAnimation.action != PlayerData::LandAnim) &&
-        (mActionAnimation.action != PlayerData::NullAnimation) )
+        (mActionAnimation.action != PlayerData::NullAnimation) &&
+        !(anim_clip_flags & ANIM_OVERRIDDEN))
    {
       // Update action animation time scale to match ground velocity
       PlayerData::ActionAnimation &anim =
@@ -4566,6 +4579,10 @@ void Player::updateAnimation(F32 dt)
    if (mImageStateThread)
       mShapeInstance->advanceTime(dt,mImageStateThread);
 
+   // update any active blend clips
+   if (isGhost())
+      for (S32 i = 0; i < blend_clips.size(); i++)
+         mShapeInstance->advanceTime(dt, blend_clips[i].thread);
    // If we are the client's player on this machine, then we need
    // to make sure the transforms are up to date as they are used
    // to setup the camera.
@@ -4579,6 +4596,11 @@ void Player::updateAnimation(F32 dt)
       else
       {
          updateAnimationTree(false);
+         // This addition forces recently visible players to animate their
+         // skeleton now rather than in pre-render so that constrained effects
+         // get up-to-date node transforms.
+         if (didRenderLastRender())
+            mShapeInstance->animate();
       }
    }
 }
@@ -7249,6 +7271,165 @@ void Player::afx_unpackUpdate(NetConnection* con, BitStream* stream)
       mark_fx_c_triggers = mask;
    }
 }
+
+// Code for overriding player's animation with sequences selected by the
+// anim-clip component effect.
+
+void Player::restoreAnimation(U32 tag)
+{
+   // check if this is a blended clip
+   if ((tag & BLENDED_CLIP) != 0)
+   {
+      restoreBlendAnimation(tag);
+      return;
+   }
+
+   if (tag != 0 && tag == last_anim_tag)
+   {
+      bool is_death_anim = ((anim_clip_flags & IS_DEATH_ANIM) != 0);
+
+      anim_clip_flags &= ~(ANIM_OVERRIDDEN | IS_DEATH_ANIM);
+
+      if (isClientObject())
+      {
+         if (mDamageState != Enabled)
+         {
+            if (!is_death_anim)
+            {
+               // this is a bit hardwired and desperate,
+               // but if he's dead he needs to look like it.
+               setActionThread("death10", false, false, false);
+            }
+         }
+         else if (mState != MoveState)
+         {
+            // not sure what happens here
+         }
+         else
+         {
+            pickActionAnimation();
+         }
+      }
+
+      last_anim_tag = 0;
+      last_anim_id = -1;
+   }
+}
+
+U32 Player::getAnimationID(const char* name)
+{
+   for (U32 i = 0; i < mDataBlock->actionCount; i++)
+   {
+      PlayerData::ActionAnimation &anim = mDataBlock->actionList[i];
+      if (dStricmp(anim.name, name) == 0)
+         return i;
+   }
+
+   Con::errorf("Player::getAnimationID() -- Player does not contain a sequence that matches the name, %s.", name);
+   return BAD_ANIM_ID;
+}
+
+U32 Player::playAnimationByID(U32 anim_id, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim)
+{
+   if (anim_id == BAD_ANIM_ID)
+      return 0;
+
+   S32 seq_id = mDataBlock->actionList[anim_id].sequence;
+   if (seq_id == -1)
+   {
+      Con::errorf("Player::playAnimation() problem. BAD_SEQ_ID");
+      return 0;
+   }
+
+   if (mShapeInstance->getShape()->sequences[seq_id].isBlend())
+      return playBlendAnimation(seq_id, pos, rate);
+
+   if (isClientObject())
+   {
+      PlayerData::ActionAnimation &anim = mDataBlock->actionList[anim_id];
+      if (anim.sequence != -1) 
+      {
+         mActionAnimation.action          = anim_id;
+         mActionAnimation.forward         = (rate >= 0);
+         mActionAnimation.firstPerson     = false;
+         mActionAnimation.holdAtEnd       = hold;
+         mActionAnimation.waitForEnd      = hold? true: wait;
+         mActionAnimation.animateOnServer = false;
+         mActionAnimation.atEnd           = false;
+         mActionAnimation.delayTicks      = (S32)sNewAnimationTickTime;
+
+         F32 transTime = (trans < 0) ? sAnimationTransitionTime : trans;  
+
+         mShapeInstance->setTimeScale(mActionAnimation.thread, rate);
+         mShapeInstance->transitionToSequence(mActionAnimation.thread,anim.sequence,
+            pos, transTime, true);
+      }
+   }
+
+   if (is_death_anim)
+      anim_clip_flags |= IS_DEATH_ANIM;
+   else
+      anim_clip_flags &= ~IS_DEATH_ANIM;
+
+   anim_clip_flags |= ANIM_OVERRIDDEN;
+   last_anim_tag = unique_anim_tag_counter++;
+   last_anim_id = anim_id;
+
+   return last_anim_tag;
+}
+
+F32 Player::getAnimationDurationByID(U32 anim_id)
+{
+   if (anim_id == BAD_ANIM_ID)
+      return 0.0f;
+   S32 seq_id = mDataBlock->actionList[anim_id].sequence;
+   if (seq_id >= 0 && seq_id < mDataBlock->mShape->sequences.size())
+      return mDataBlock->mShape->sequences[seq_id].duration;
+
+   return 0.0f;
+}
+
+bool Player::isBlendAnimation(const char* name)
+{
+   U32 anim_id = getAnimationID(name);
+   if (anim_id == BAD_ANIM_ID)
+      return false;
+
+   S32 seq_id = mDataBlock->actionList[anim_id].sequence;
+   if (seq_id >= 0 && seq_id < mDataBlock->mShape->sequences.size())
+      return mDataBlock->mShape->sequences[seq_id].isBlend();
+
+   return false;
+}
+
+const char* Player::getLastClipName(U32 clip_tag)
+{ 
+   if (clip_tag != last_anim_tag || last_anim_id >= PlayerData::NumActionAnims)
+      return "";
+
+   return mDataBlock->actionList[last_anim_id].name;
+}
+
+void Player::unlockAnimation(U32 tag, bool force)
+{
+   if ((tag != 0 && tag == last_anim_lock_tag) || force)
+      anim_clip_flags &= ~BLOCK_USER_CONTROL;
+}
+
+U32 Player::lockAnimation()
+{
+   anim_clip_flags |= BLOCK_USER_CONTROL;
+   last_anim_lock_tag = unique_anim_tag_counter++;
+
+   return last_anim_lock_tag;
+}
+
+ConsoleMethod(Player, isAnimationLocked, bool, 2, 2, "isAnimationLocked()")
+{
+   return object->isAnimationLocked();
+}
+
+
 #ifdef TORQUE_OPENVR
 void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
 {
