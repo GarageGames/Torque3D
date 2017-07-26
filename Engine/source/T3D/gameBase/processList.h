@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _PROCESSLIST_H_
 #define _PROCESSLIST_H_
 
@@ -188,6 +193,9 @@ protected:
 
    PreTickSignal mPreTick;
    PostTickSignal mPostTick;
+   // JTF: still needed?
+public:
+   ProcessObject* findNearestToEnd(Vector<ProcessObject*>& objs) const;
 };
 
 #endif // _PROCESSLIST_H_
