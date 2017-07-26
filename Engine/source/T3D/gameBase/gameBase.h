@@ -24,6 +24,7 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _GAMEBASE_H_
 #define _GAMEBASE_H_
 
@@ -235,7 +236,8 @@ public:
    enum GameBaseMasks {      
       DataBlockMask     = Parent::NextFreeMask << 0,
       ExtendedInfoMask  = Parent::NextFreeMask << 1,
-      NextFreeMask      = Parent::NextFreeMask << 2
+      ScopeIdMask       = Parent::NextFreeMask << 2,
+      NextFreeMask      = Parent::NextFreeMask << 3,
    };
 
    // net flags added by game base
@@ -459,6 +461,8 @@ private:
    /// within this callback.
    ///   
    void _onDatablockModified();
+protected:
+   void    onScopeIdChange() { setMaskBits(ScopeIdMask); }
 };
 
 

@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "console/simBase.h"
 #include "core/dnet.h"
@@ -27,6 +32,8 @@
 #include "sim/netObject.h"
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
+
+#include "afx/arcaneFX.h"
 
 IMPLEMENT_CONOBJECT(NetObject);
 
@@ -46,6 +53,9 @@ NetObject::NetObject()
    mPrevDirtyList = NULL;
    mNextDirtyList = NULL;
    mDirtyMaskBits = 0;
+   scope_id = 0;
+   scope_refs = 0;
+   scope_registered = false;
 }
 
 NetObject::~NetObject()
@@ -460,3 +470,26 @@ DefineEngineMethod( NetObject, isServerObject, bool, (),,
 //{
 //   return object->isServerObject();
 //}
+U16 NetObject::addScopeRef() 
+{ 
+   if (scope_refs == 0)
+   {
+      scope_id = arcaneFX::generateScopeId();
+      onScopeIdChange();
+   }
+   scope_refs++;
+   return scope_id; 
+}
+
+void NetObject::removeScopeRef() 
+{ 
+   if (scope_refs == 0)
+      return;
+   scope_refs--;
+   if (scope_refs == 0)
+   {
+      scope_id = 0;
+      onScopeIdChange();
+   }
+}
+
