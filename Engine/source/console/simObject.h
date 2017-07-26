@@ -980,6 +980,8 @@ public:
    /*C*/  SimObject(const SimObject&, bool = false);
    bool   isTempClone() const { return is_temp_clone; }
    virtual bool allowSubstitutions() const { return false; }
+public:
+   virtual void reloadReset() { }
 };
 
 
