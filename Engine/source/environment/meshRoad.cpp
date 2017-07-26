@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "environment/meshRoad.h"
 
@@ -51,6 +56,8 @@
 #include "T3D/physics/physicsBody.h"
 #include "T3D/physics/physicsCollision.h"
 #include "environment/nodeListManager.h"
+
+#include "afx/ce/afxZodiacMgr.h"
 
 #define MIN_METERS_PER_SEGMENT 1.0f
 #define MIN_NODE_DEPTH 0.25f
@@ -620,6 +627,7 @@ MeshRoad::MeshRoad()
 	mMatInst[Top] = NULL;
    mMatInst[Bottom] = NULL;
    mMatInst[Side] = NULL;
+   mTypeMask |= TerrainLikeObjectType;
 }
 
 MeshRoad::~MeshRoad()
@@ -821,6 +829,7 @@ void MeshRoad::prepRenderImage( SceneRenderState* state )
    // otherwise obey the smShowRoad flag
    if ( smShowRoad || !smEditorOpen )
    {
+      afxZodiacMgr::renderMeshRoadZodiacs(state, this);
       MeshRenderInst coreRI;
       coreRI.clear();
       coreRI.objectToWorld = &MatrixF::Identity;
@@ -1379,6 +1388,11 @@ bool MeshRoad::buildSegmentPolyList( AbstractPolyList* polyList, U32 startSegIdx
          ddraw->setLastTTL( 0 );
       }
 
+      if (buildPolyList_TopSurfaceOnly)
+      {
+         offset += 4;
+         continue;
+      }
       // Left Face
 
       polyList->begin( 0,0 );
@@ -2454,3 +2468,16 @@ DefineEngineMethod( MeshRoad, postApply, void, (),,
 {
    object->inspectPostApply();
 }
+bool MeshRoad::buildPolyList_TopSurfaceOnly = false;
+
+bool MeshRoad::buildTopPolyList(PolyListContext plc, AbstractPolyList* polyList)
+{
+   static Box3F box_prox; static SphereF ball_prox;
+
+   buildPolyList_TopSurfaceOnly = true;
+   bool result = buildPolyList(plc, polyList, box_prox, ball_prox);
+   buildPolyList_TopSurfaceOnly = false;
+
+   return result;
+}
+

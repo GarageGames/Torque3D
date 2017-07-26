@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #ifndef _OBJECTTYPES_H_
 #define _OBJECTTYPES_H_
 
@@ -149,6 +153,8 @@ enum SceneObjectTypes
 
    EntityObjectType = BIT(23),
    /// @}
+   InteriorLikeObjectType =  BIT(24),
+   TerrainLikeObjectType = BIT(25),
 };
 
 enum SceneObjectTypeMasks : U32
