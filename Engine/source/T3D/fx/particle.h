@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _PARTICLE_H_
 #define _PARTICLE_H_
 
@@ -97,6 +102,9 @@ class ParticleData : public SimDataBlock
    static void  initPersistFields();
 
    bool reload(char errorBuffer[256]);
+  public:
+   bool loadParameters();  
+   bool reload(String &errorStr);
 };
 
 //*****************************************************************************

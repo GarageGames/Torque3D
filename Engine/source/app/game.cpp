@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "platform/platformInput.h"
 
@@ -49,6 +54,8 @@
 #include "gfx/gfxTextureManager.h"
 #include "sfx/sfxSystem.h"
 
+// Including this header provides access to certain system-level AFX methods.
+#include "afx/arcaneFX.h"
 #ifdef TORQUE_PLAYER
 // See matching #ifdef in editor/editor.cpp
 bool gEditingMission = false;
@@ -235,6 +242,9 @@ ConsoleFunctionGroupEnd(Platform);
 
 bool clientProcess(U32 timeDelta)
 {
+   // Required heartbeat call on the client side which must come
+   // before the advanceTime() calls are made to the scene objects.
+   arcaneFX::advanceTime(timeDelta);
    bool ret = true;
 
 #ifndef TORQUE_TGB_ONLY

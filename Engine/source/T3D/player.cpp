@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "T3D/player.h"
 
@@ -1656,6 +1660,8 @@ Player::Player()
    mLastAbsoluteYaw = 0.0f;
    mLastAbsolutePitch = 0.0f;
    mLastAbsoluteRoll = 0.0f;
+   
+   afx_init();
 }
 
 Player::~Player()
@@ -6188,6 +6194,7 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          mArmAnimation.action != mDataBlock->lookAction))) {
       stream->writeInt(mArmAnimation.action,PlayerData::ActionAnimBits);
    }
+   retMask = afx_packUpdate(con, mask, stream, retMask);
 
    // The rest of the data is part of the control object packet update.
    // If we're controlled by this client, we don't need to send it.
@@ -6292,6 +6299,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
          mArmAnimation.action = action;
    }
 
+   afx_unpackUpdate(con, stream);
    // Done if controlled by client ( and not initial update )
    if(stream->readFlag())
       return;
@@ -6819,6 +6827,7 @@ void Player::consoleInit()
    Con::addVariable("$player::extendedMoveHeadPosRotIndex", TypeS32, &smExtendedMoveHeadPosRotIndex, 
       "@brief The ExtendedMove position/rotation index used for head movements.\n\n"
       "@ingroup GameObjects\n");
+   afx_consoleInit();
 }
 
 //--------------------------------------------------------------------------
@@ -7172,6 +7181,69 @@ void Player::renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    GFX->leaveDebugEvent();
 }
 
+// static 
+bool Player::sCorpsesHiddenFromRayCast = true; // this default matches stock Torque behavior.
+
+// static 
+void Player::afx_consoleInit()
+{
+   Con::addVariable("pref::Player::corpsesHiddenFromRayCast", TypeBool, &sCorpsesHiddenFromRayCast);
+}
+
+void Player::afx_init()
+{
+   overrideLookAnimation = false;
+   armLookOverridePos = 0.5f;
+   headVLookOverridePos = 0.5f;
+   headHLookOverridePos = 0.5f;
+   ignore_updates = false;
+   fx_c_triggers = 0;
+   mark_fx_c_triggers = 0;
+   fx_s_triggers = 0;
+   move_trigger_states = 0;
+   z_velocity = 0.0f;
+   mark_idle = false;
+   idle_timer = 0.0f;
+   mark_s_landing = false;
+   speed_bias = 1.0f;
+   speed_bias_goal = 1.0f;
+   override_movement = 0;
+   movement_data.zero();
+   movement_op = 1;
+   last_movement_tag = 0;
+   footfallDecalOverride = 0;
+   footfallSoundOverride = 0;
+   footfallDustOverride = 0;
+   noFootfallFX = false;
+}
+
+U32 Player::afx_packUpdate(NetConnection* con, U32 mask, BitStream* stream, U32 retMask)
+{
+#if 0
+   if (stream->writeFlag(mask & LookOverrideMask))
+#else
+   if (stream->writeFlag(mask & ActionMask))
+#endif
+      stream->writeFlag(overrideLookAnimation);
+
+   if (stream->writeFlag(mask & TriggerMask))
+      stream->write(fx_s_triggers);
+
+   return retMask;
+}
+
+void Player::afx_unpackUpdate(NetConnection* con, BitStream* stream)
+{
+   if (stream->readFlag()) // LookOverrideMask
+      overrideLookAnimation = stream->readFlag();
+
+   if (stream->readFlag()) // TriggerMask
+   {
+      U32 mask;
+      stream->read(&mask);
+      mark_fx_c_triggers = mask;
+   }
+}
 #ifdef TORQUE_OPENVR
 void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
 {
