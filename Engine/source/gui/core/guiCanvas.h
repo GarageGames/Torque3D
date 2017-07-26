@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _GUICANVAS_H_
 #define _GUICANVAS_H_
 
@@ -446,6 +451,13 @@ public:
 
 private:
    static const U32 MAX_GAMEPADS = 4; ///< The maximum number of supported gamepads
+  protected:
+     bool   mConsumeLastInputEvent;
+  public:
+     void clearMouseRightButtonDown(void) { mMouseRightButtonDown = false; }
+     void clearMouseButtonDown(void) { mMouseButtonDown = false; }
+     void setConsumeLastInputEvent(bool flag) { mConsumeLastInputEvent = flag; }
+     bool getLastCursorPoint(Point2I& pt) const { pt = mLastCursorPt; return mLastCursorEnabled; }
 };
 
 #endif
