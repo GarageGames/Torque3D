@@ -386,6 +386,36 @@ protected:
    DECLARE_CALLBACK( void, onDataBlocksDone, (U32 sequence) );
    DECLARE_CALLBACK( void, onFlash, (bool state) );
    
+   // GameConnection is modified to keep track of object selections which are used in
+   // spell targeting. This code stores the current object selection as well as the
+   // current rollover object beneath the cursor. The rollover object is treated as a
+   // pending object selection and actual object selection is usually made by promoting
+   // the rollover object to the current object selection.
+private:   
+   SimObjectPtr<SceneObject> mRolloverObj;  
+   SimObjectPtr<SceneObject> mPreSelectedObj;  
+   SimObjectPtr<SceneObject> mSelectedObj;  
+   bool          mChangedSelectedObj;
+   U32           mPreSelectTimestamp;
+protected:
+   virtual void  onDeleteNotify(SimObject*);
+public:   
+   void          setRolloverObj(SceneObject*);   
+   SceneObject*  getRolloverObj() { return  mRolloverObj; }   
+   void          setSelectedObj(SceneObject*, bool propagate_to_client=false);   
+   SceneObject*  getSelectedObj() { return  mSelectedObj; }  
+   void          setPreSelectedObjFromRollover();
+   void          clearPreSelectedObj();
+   void          setSelectedObjFromPreSelected();
+   // Flag is added to indicate when a client is fully connected or "zoned-in". 
+   // This information determines when AFX will startup active effects on a newly
+   // added client. 
+private:
+   bool          zoned_in;
+public:
+   bool          isZonedIn() const { return zoned_in; }
+   void          setZonedIn() { zoned_in = true; }
+   
 #ifdef AFX_CAP_DATABLOCK_CACHE
 private:
    static StringTableEntry  server_cache_filename;

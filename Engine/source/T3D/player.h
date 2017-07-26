@@ -790,6 +790,9 @@ private:
    void         afx_init();
    U32          afx_packUpdate(NetConnection*, U32 mask, BitStream*, U32 retMask);
    void         afx_unpackUpdate(NetConnection*, BitStream*);
+private:
+   static bool  sCorpsesHiddenFromRayCast;
+   
 };
 
 typedef Player::Pose PlayerPose;

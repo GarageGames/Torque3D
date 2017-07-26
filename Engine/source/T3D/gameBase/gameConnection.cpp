@@ -61,6 +61,7 @@
 #include "core/stream/fileStream.h"
 #endif 
 
+#include "afx/arcaneFX.h"
 //----------------------------------------------------------------------------
 #define MAX_MOVE_PACKET_SENDS 4
 
@@ -191,6 +192,12 @@ bool GameConnection::client_cache_on = false;
 //----------------------------------------------------------------------------
 GameConnection::GameConnection()
 {
+   mRolloverObj = NULL;
+   mPreSelectedObj = NULL;
+   mSelectedObj = NULL;
+   mChangedSelectedObj = false;
+   mPreSelectTimestamp = 0;
+   zoned_in = false;
    
 #ifdef AFX_CAP_DATABLOCK_CACHE 
    client_db_stream = new InfiniteBitStream;
@@ -1168,6 +1175,17 @@ void GameConnection::readPacket(BitStream *bstream)
    {
       mMoveList->clientReadMovePacket(bstream);
 
+      // selected object - do we have a change in status?
+      if (bstream->readFlag()) 
+      { 
+         if (bstream->readFlag()) 
+         { 
+            S32 gIndex = bstream->readInt(NetConnection::GhostIdBitSize);
+            setSelectedObj(static_cast<SceneObject*>(resolveGhost(gIndex)));
+         }
+         else
+            setSelectedObj(NULL);
+      }
       bool hadFlash = mDamageFlash > 0 || mWhiteOut > 0;
       mDamageFlash = 0;
       mWhiteOut = 0;
@@ -1411,6 +1429,35 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
       // all the damage flash & white out
 
       S32 gIndex = -1;
+      if (mChangedSelectedObj)
+      {
+         S32 gidx;
+         // send NULL player
+         if ((mSelectedObj == NULL) || mSelectedObj.isNull())
+         {
+            bstream->writeFlag(true);
+            bstream->writeFlag(false);
+            mChangedSelectedObj = false;
+         }
+         // send ghost-idx
+         else if ((gidx = getGhostIndex(mSelectedObj)) != -1)
+         {
+            Con::printf("SEND OBJECT SELECTION");
+            bstream->writeFlag(true);
+            bstream->writeFlag(true);
+            bstream->writeInt(gidx, NetConnection::GhostIdBitSize);
+            mChangedSelectedObj = false;
+         }
+         // not fully changed yet
+         else
+         {
+            bstream->writeFlag(false);
+            mChangedSelectedObj = true;
+         }
+      }
+      else
+         bstream->writeFlag(false);
+		 
       if (!mControlObject.isNull())
       {
          gIndex = getGhostIndex(mControlObject);
@@ -2403,6 +2450,135 @@ DefineEngineMethod( GameConnection, getVisibleGhostDistance, F32, (),,
    )
 {
    return object->getVisibleGhostDistance();
+}
+
+// The object selection code here is, in part, based, on functionality described
+// in the following resource:
+// Object Selection in Torque by Dave Myers 
+//   http://www.garagegames.com/index.php?sec=mg&mod=resource&page=view&qid=7335
+
+ConsoleMethod(GameConnection, setSelectedObj, bool, 3, 4, "(object, [propagate_to_client])")
+{
+   SceneObject* pending_selection;
+   if (!Sim::findObject(argv[2], pending_selection))
+      return false;
+
+   bool propagate_to_client = (argc > 3) ? dAtob(argv[3]) : false;
+   object->setSelectedObj(pending_selection, propagate_to_client);
+
+   return true;
+}
+
+ConsoleMethod(GameConnection, getSelectedObj, S32, 2, 2, "()")
+{
+   SimObject* selected = object->getSelectedObj();
+   return (selected) ? selected->getId(): -1;
+}
+
+ConsoleMethod(GameConnection, clearSelectedObj, void, 2, 3, "([propagate_to_client])")
+{
+   bool propagate_to_client = (argc > 2) ? dAtob(argv[2]) : false;
+   object->setSelectedObj(NULL, propagate_to_client);
+}
+
+ConsoleMethod(GameConnection, setPreSelectedObjFromRollover, void, 2, 2, "()")
+{
+   object->setPreSelectedObjFromRollover();
+}
+
+ConsoleMethod(GameConnection, clearPreSelectedObj, void, 2, 2, "()")
+{
+   object->clearPreSelectedObj();
+}
+
+ConsoleMethod(GameConnection, setSelectedObjFromPreSelected, void, 2, 2, "()")
+{
+   object->setSelectedObjFromPreSelected();
+}
+
+void GameConnection::setSelectedObj(SceneObject* so, bool propagate_to_client) 
+{ 
+   if (!isConnectionToServer())
+   {
+      // clear previously selected object
+      if (mSelectedObj)
+         clearNotify(mSelectedObj);
+
+      // save new selection
+      mSelectedObj = so; 
+
+      // mark selected object
+      if (mSelectedObj)
+         deleteNotify(mSelectedObj);
+
+      // mark selection dirty
+      if (propagate_to_client)
+         mChangedSelectedObj = true; 
+
+      return;
+   }
+
+   // clear previously selected object
+   if (mSelectedObj)
+   {
+      mSelectedObj->setSelectionFlags(mSelectedObj->getSelectionFlags() & ~SceneObject::SELECTED);
+      clearNotify(mSelectedObj);
+      Con::executef(this, "onObjectDeselected", mSelectedObj->getIdString());
+   }
+
+   // save new selection
+   mSelectedObj = so; 
+
+   // mark selected object
+   if (mSelectedObj)
+   {
+      mSelectedObj->setSelectionFlags(mSelectedObj->getSelectionFlags() | SceneObject::SELECTED);
+      deleteNotify(mSelectedObj);
+   }
+
+   // mark selection dirty
+   //mChangedSelectedObj = true; 
+
+   // notify appropriate script of the change
+   if (mSelectedObj)
+      Con::executef(this, "onObjectSelected", mSelectedObj->getIdString());
+}
+
+void GameConnection::setRolloverObj(SceneObject* so) 
+{ 
+   // save new selection
+   mRolloverObj = so;  
+
+   // notify appropriate script of the change
+   Con::executef(this, "onObjectRollover", (mRolloverObj) ? mRolloverObj->getIdString() : "");
+}
+
+void GameConnection::setPreSelectedObjFromRollover()
+{
+   mPreSelectedObj = mRolloverObj;
+   mPreSelectTimestamp = Platform::getRealMilliseconds();
+}
+
+void GameConnection::clearPreSelectedObj()
+{
+   mPreSelectedObj = 0;
+   mPreSelectTimestamp = 0;
+}
+
+void GameConnection::setSelectedObjFromPreSelected()
+{
+   U32 now = Platform::getRealMilliseconds();
+   if (now - mPreSelectTimestamp < arcaneFX::sTargetSelectionTimeoutMS)
+      setSelectedObj(mPreSelectedObj);
+   mPreSelectedObj = 0;
+}
+
+void GameConnection::onDeleteNotify(SimObject* obj)
+{
+   if (obj == mSelectedObj)
+      setSelectedObj(NULL);
+
+   Parent::onDeleteNotify(obj);
 }
 
 #ifdef AFX_CAP_DATABLOCK_CACHE 

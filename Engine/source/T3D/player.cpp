@@ -5885,7 +5885,12 @@ void Player::applyImpulse(const Point3F&,const VectorF& vec)
 
 bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
 {
-   if (getDamageState() != Enabled)
+   // In standard Torque there's a rather brute force culling of all
+   // non-enabled players (corpses) from the ray cast. But, to
+   // demonstrate a resurrection spell, we need corpses to be
+   // selectable, so this code change allows consideration of corpses
+   // in the ray cast if corpsesHiddenFromRayCast is set to false.
+   if (sCorpsesHiddenFromRayCast && getDamageState() != Enabled)
       return false;
 
    // Collide against bounding box. Need at least this for the editor.
