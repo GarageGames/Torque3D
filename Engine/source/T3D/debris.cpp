@@ -24,6 +24,7 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/debris.h"
 
@@ -633,7 +634,8 @@ bool Debris::onAdd()
    {
       sizeList[0] = mSize * 0.5;
       sizeList[1] = mSize;
-      sizeList[2] = mSize * 1.5;
+      for (U32 i = 2; i < ParticleData::PDC_NUM_KEYS; i++)
+         sizeList[i] = mSize * 1.5;
 
       mEmitterList[0]->setSizes( sizeList );
    }
@@ -642,7 +644,8 @@ bool Debris::onAdd()
    {
       sizeList[0] = 0.0;
       sizeList[1] = mSize * 0.5;
-      sizeList[2] = mSize;
+      for (U32 i = 2; i < ParticleData::PDC_NUM_KEYS; i++)
+         sizeList[i] = mSize;
 
       mEmitterList[1]->setSizes( sizeList );
    }
