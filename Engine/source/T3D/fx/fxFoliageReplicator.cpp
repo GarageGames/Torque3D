@@ -43,6 +43,11 @@
 // POTENTIAL TODO LIST:
 //   TODO: Clamp item alpha to fog alpha
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/fx/fxFoliageReplicator.h"
 
@@ -402,6 +407,9 @@ void fxFoliageReplicator::initPersistFields()
       addField( "AllowedTerrainSlope", TypeS32,       Offset( mFieldData.mAllowedTerrainSlope,  fxFoliageReplicator ), "Maximum surface angle allowed for foliage instances." );
    endGroup( "Restrictions" );	// MM: Added Group Footer.
 
+   addGroup( "AFX" );
+      addField( "AmbientModulationBias", TypeF32,     Offset( mFieldData.mAmbientModulationBias,fxFoliageReplicator ), "Multiplier controling amount foliage is modulated by sun's ambient." );
+   endGroup( "AFX" );
    // Initialise parents' persistent fields.
    Parent::initPersistFields();
 }
@@ -1564,7 +1572,12 @@ void fxFoliageReplicator::renderObject(ObjectRenderInst *ri, SceneRenderState *s
             mFoliageShaderConsts->setSafe(mFoliageShaderGroundAlphaSC, Point4F(mFieldData.mGroundAlpha, mFieldData.mGroundAlpha, mFieldData.mGroundAlpha, mFieldData.mGroundAlpha));
 
             if (mFoliageShaderAmbientColorSC->isValid())
-               mFoliageShaderConsts->set(mFoliageShaderAmbientColorSC, state->getAmbientLightColor());
+            {
+               LinearColorF ambient = state->getAmbientLightColor();
+               LinearColorF ambient_inv(1.0f-ambient.red, 1.0f-ambient.green, 1.0f-ambient.blue, 0.0f);
+               ambient += ambient_inv*(1.0f - mFieldData.mAmbientModulationBias);
+               mFoliageShaderConsts->set(mFoliageShaderAmbientColorSC, ambient);
+            }
 
             GFX->setShaderConstBuffer(mFoliageShaderConsts);
 
@@ -1705,6 +1718,7 @@ U32 fxFoliageReplicator::packUpdate(NetConnection * con, U32 mask, BitStream * s
       stream->writeFlag(mFieldData.mShowPlacementArea);				// Show Placement Area Flag.
       stream->write(mFieldData.mPlacementBandHeight);					// Placement Area Height.
       stream->write(mFieldData.mPlaceAreaColour);						// Placement Area Colour.
+      stream->write(mFieldData.mAmbientModulationBias);
    }
 
    // Were done ...
@@ -1782,6 +1796,7 @@ void fxFoliageReplicator::unpackUpdate(NetConnection * con, BitStream * stream)
       stream->read(&mFieldData.mPlacementBandHeight);					// Placement Area Height.
       stream->read(&mFieldData.mPlaceAreaColour);
 
+      stream->read(&mFieldData.mAmbientModulationBias);
       // Calculate Fade-In/Out Gradients.
       mFadeInGradient		= 1.0f / mFieldData.mFadeInRegion;
       mFadeOutGradient	= 1.0f / mFieldData.mFadeOutRegion;
