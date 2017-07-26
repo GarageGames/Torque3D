@@ -198,6 +198,9 @@ ShapeBaseData::ShapeBaseData()
    inheritEnergyFromMount( false )
 {      
    dMemset( mountPointNode, -1, sizeof( S32 ) * SceneObject::NumMountPoints );
+   remap_txr_tags = NULL;
+   remap_buffer = NULL;
+   silent_bbox_check = false;
 }
 
 ShapeBaseData::ShapeBaseData(const ShapeBaseData& other, bool temp_clone) : GameBaseData(other, temp_clone)
@@ -292,6 +295,8 @@ static ShapeBaseDataProto gShapeBaseDataProto;
 ShapeBaseData::~ShapeBaseData()
 {
 
+   if (remap_buffer && !isTempClone())
+      dFree(remap_buffer);
 }
 
 bool ShapeBaseData::preload(bool server, String &errorStr)
@@ -401,11 +406,13 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
 
             if (!mShape->bounds.isContained(collisionBounds.last()))
             {
+               if (!silent_bbox_check)
                Con::warnf("Warning: shape %s collision detail %d (Collision-%d) bounds exceed that of shape.", shapeName, collisionDetails.size() - 1, collisionDetails.last());
                collisionBounds.last() = mShape->bounds;
             }
             else if (collisionBounds.last().isValidBox() == false)
             {
+               if (!silent_bbox_check)
                Con::errorf("Error: shape %s-collision detail %d (Collision-%d) bounds box invalid!", shapeName, collisionDetails.size() - 1, collisionDetails.last());
                collisionBounds.last() = mShape->bounds;
             }
@@ -477,6 +484,29 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
       F32 w = mShape->bounds.len_y() / 2;
       if (cameraMaxDist < w)
          cameraMaxDist = w;
+      // just parse up the string and collect the remappings in txr_tag_remappings.
+      if (!server && remap_txr_tags != NULL && remap_txr_tags != StringTable->insert(""))
+      {
+         txr_tag_remappings.clear();
+         if (remap_buffer)
+            dFree(remap_buffer);
+
+         remap_buffer = dStrdup(remap_txr_tags);
+
+         char* remap_token = dStrtok(remap_buffer, " \t");
+         while (remap_token != NULL)
+         {
+            char* colon = dStrchr(remap_token, ':');
+            if (colon)
+            {
+               *colon = '\0';
+               txr_tag_remappings.increment();
+               txr_tag_remappings.last().old_tag = remap_token;
+               txr_tag_remappings.last().new_tag = colon+1;
+            }
+            remap_token = dStrtok(NULL, " \t");
+         }
+      }
    }
 
    if(!server)
@@ -650,6 +680,8 @@ void ShapeBaseData::initPersistFields()
 
    endGroup( "Reflection" );
 
+   addField("remapTextureTags",      TypeString,   Offset(remap_txr_tags, ShapeBaseData));
+   addField("silentBBoxValidation",  TypeBool,     Offset(silent_bbox_check, ShapeBaseData));
    // disallow some field substitutions
    onlyKeepClearSubstitutions("debris"); // subs resolving to "~~", or "~0" are OK
    onlyKeepClearSubstitutions("explosion");
@@ -806,6 +838,8 @@ void ShapeBaseData::packData(BitStream* stream)
    //stream->write(reflectMinDist);
    //stream->write(reflectMaxDist);
    //stream->write(reflectDetailAdjust);
+   stream->writeString(remap_txr_tags);
+   stream->writeFlag(silent_bbox_check);
 }
 
 void ShapeBaseData::unpackData(BitStream* stream)
@@ -907,6 +941,8 @@ void ShapeBaseData::unpackData(BitStream* stream)
    //stream->read(&reflectMinDist);
    //stream->read(&reflectMaxDist);
    //stream->read(&reflectDetailAdjust);
+   remap_txr_tags = stream->readSTString();
+   silent_bbox_check = stream->readFlag();
 }
 
 
@@ -1166,9 +1202,60 @@ bool ShapeBase::onNewDataBlock( GameBaseData *dptr, bool reload )
    // a shape assigned to this object.
    if (bool(mDataBlock->mShape)) {
       delete mShapeInstance;
+      if (isClientObject() && mDataBlock->txr_tag_remappings.size() > 0)
+      {
+         // temporarily substitute material tags with alternates
+         TSMaterialList* mat_list = mDataBlock->mShape->materialList;
+         if (mat_list)
+         {
+            for (S32 i = 0; i < mDataBlock->txr_tag_remappings.size(); i++)
+            {
+               ShapeBaseData::TextureTagRemapping* remap = &mDataBlock->txr_tag_remappings[i];
+               Vector<String> & mat_names = (Vector<String>&) mat_list->getMaterialNameList();
+               for (S32 j = 0; j < mat_names.size(); j++) 
+               {
+                  if (mat_names[j].compare(remap->old_tag, dStrlen(remap->old_tag), String::NoCase) == 0)
+                  {
+                     mat_names[j] = String(remap->new_tag);
+                     mat_names[j].insert(0,'#');
+                     break;
+                  }
+               }
+            }
+         }
+      }
       mShapeInstance = new TSShapeInstance(mDataBlock->mShape, isClientObject());
       if (isClientObject())
+      {
          mShapeInstance->cloneMaterialList();
+
+         // restore the material tags to original form
+         if (mDataBlock->txr_tag_remappings.size() > 0)
+         {
+            TSMaterialList* mat_list = mDataBlock->mShape->materialList;
+            if (mat_list)
+            {
+               for (S32 i = 0; i < mDataBlock->txr_tag_remappings.size(); i++)
+               {
+                  ShapeBaseData::TextureTagRemapping* remap = &mDataBlock->txr_tag_remappings[i];
+                  Vector<String> & mat_names = (Vector<String>&) mat_list->getMaterialNameList();
+                  for (S32 j = 0; j < mat_names.size(); j++) 
+                  {
+                     String::SizeType len = mat_names[j].length();
+                     if (len > 1)
+                     {
+                        String temp_name = mat_names[j].substr(1,len-1);
+                        if (temp_name.compare(remap->new_tag, dStrlen(remap->new_tag)) == 0)
+                        {
+                           mat_names[j] = String(remap->old_tag);
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
 
       mObjBox = mDataBlock->mShape->bounds;
       resetWorldBox();

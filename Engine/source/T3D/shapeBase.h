@@ -658,6 +658,15 @@ public:
    DECLARE_CALLBACK(void, onEndSequence, (ShapeBase* obj, S32 slot, const char* name));
    DECLARE_CALLBACK( void, onForceUncloak, ( ShapeBase* obj, const char* reason ) );
    /// @}
+   struct TextureTagRemapping
+   {
+      char* old_tag;
+      char* new_tag;
+   };
+   StringTableEntry remap_txr_tags;
+   char* remap_buffer;
+   Vector<TextureTagRemapping> txr_tag_remappings;
+   bool silent_bbox_check;
 public:
    ShapeBaseData(const ShapeBaseData&, bool = false);
 };
