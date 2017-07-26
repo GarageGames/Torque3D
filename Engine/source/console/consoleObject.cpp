@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "console/consoleObject.h"
 
@@ -681,6 +685,39 @@ AbstractClassRep* ConsoleObject::getClassRep() const
    return NULL;
 }
 
+bool ConsoleObject::disableFieldSubstitutions(const char* fieldname)
+{
+   StringTableEntry slotname = StringTable->insert(fieldname);
+
+   for (U32 i = 0; i < sg_tempFieldList.size(); i++)
+   {
+      if (sg_tempFieldList[i].pFieldname == slotname)
+      {
+         sg_tempFieldList[i].doNotSubstitute = true;
+         sg_tempFieldList[i].keepClearSubsOnly = false;
+         return true;
+      }
+   }
+
+   return false;
+}
+
+bool ConsoleObject::onlyKeepClearSubstitutions(const char* fieldname)
+{
+   StringTableEntry slotname = StringTable->insert(fieldname);
+
+   for (U32 i = 0; i < sg_tempFieldList.size(); i++)
+   {
+      if (sg_tempFieldList[i].pFieldname == slotname)
+      {
+         sg_tempFieldList[i].doNotSubstitute = false;
+         sg_tempFieldList[i].keepClearSubsOnly = true;
+         return true;
+      }
+   }
+
+   return false;
+}
 String ConsoleObject::_getLogMessage(const char* fmt, va_list args) const
 {
    String objClass = "UnknownClass";

@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "T3D/fx/particleEmitter.h"
 
@@ -293,6 +297,9 @@ void ParticleEmitterData::initPersistFields()
 
    endGroup( "ParticleEmitterData" );
 
+   // disallow some field substitutions
+   disableFieldSubstitutions("particles");
+   onlyKeepClearSubstitutions("poolData"); // subs resolving to "~~", or "~0" are OK
    Parent::initPersistFields();
 }
 

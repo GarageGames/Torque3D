@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "T3D/shapeBase.h"
 
@@ -586,6 +590,10 @@ void ShapeBaseData::initPersistFields()
 
    endGroup( "Reflection" );
 
+   // disallow some field substitutions
+   onlyKeepClearSubstitutions("debris"); // subs resolving to "~~", or "~0" are OK
+   onlyKeepClearSubstitutions("explosion");
+   onlyKeepClearSubstitutions("underwaterExplosion");
    Parent::initPersistFields();
 }
 

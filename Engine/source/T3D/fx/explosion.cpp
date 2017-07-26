@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "T3D/fx/explosion.h"
 
@@ -412,6 +416,12 @@ void ExplosionData::initPersistFields()
       "Distance (in the explosion normal direction) of the PointLight position "
       "from the explosion center." );
 
+   // disallow some field substitutions
+   onlyKeepClearSubstitutions("debris"); // subs resolving to "~~", or "~0" are OK
+   onlyKeepClearSubstitutions("emitter");
+   onlyKeepClearSubstitutions("particleEmitter");
+   onlyKeepClearSubstitutions("soundProfile");
+   onlyKeepClearSubstitutions("subExplosion");
    Parent::initPersistFields();
 }
 

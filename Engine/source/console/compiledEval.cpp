@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "console/console.h"
 
@@ -858,6 +862,7 @@ breakContinue:
                      Con::errorf(ConsoleLogEntry::General, "%s: Unable to instantiate non-datablock class %s.", getFileLine(ip), (const char*)callArgv[1]);
                      // Clean up...
                      delete object;
+                     currentNewObject = NULL;
                      ip = failJump;
                      break;
                   }
@@ -893,6 +898,14 @@ breakContinue:
 
                      currentNewObject->setCopySource( parent );
                      currentNewObject->assignFieldsFrom( parent );
+                     // copy any substitution statements
+                     SimDataBlock* parent_db = dynamic_cast<SimDataBlock*>(parent);
+                     if (parent_db)
+                     {
+                        SimDataBlock* currentNewObject_db = dynamic_cast<SimDataBlock*>(currentNewObject);
+                        if (currentNewObject_db)
+                           currentNewObject_db->copySubstitutionsFrom(parent_db);
+                     }
                   }
                   else
                   {

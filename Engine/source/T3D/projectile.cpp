@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "T3D/projectile.h"
 
@@ -274,6 +278,13 @@ void ProjectileData::initPersistFields()
       "A value of 1.0 will assume \"normal\" influence upon it.\n"
       "The magnitude of gravity is assumed to be 9.81 m/s/s\n\n"
       "@note ProjectileData::isBallistic must be true for this to have any affect.");
+   // disallow some field substitutions
+   onlyKeepClearSubstitutions("explosion");
+   onlyKeepClearSubstitutions("particleEmitter");
+   onlyKeepClearSubstitutions("particleWaterEmitter");
+   onlyKeepClearSubstitutions("sound");
+   onlyKeepClearSubstitutions("splash");
+   onlyKeepClearSubstitutions("waterExplosion");
 
    Parent::initPersistFields();
 }

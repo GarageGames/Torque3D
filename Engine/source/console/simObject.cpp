@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 #include "platform/platformMemory.h"
 #include "console/simObject.h"
@@ -915,6 +919,29 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
 
          S32 array1 = array ? dAtoi(array) : 0;
 
+         // Here we check to see if <this> is a datablock and if <value>
+         // starts with "$$". If both true than save value as a runtime substitution.
+         if (dynamic_cast<SimDataBlock*>(this) && value[0] == '$' && value[1] == '$')
+         {
+            if (!this->allowSubstitutions())
+            {
+               Con::errorf("Substitution Error: %s datablocks do not allow \"$$\" field substitutions. [%s]", 
+                  this->getClassName(), this->getName());
+               return;
+            }
+
+            if (fld->doNotSubstitute)
+            {
+               Con::errorf("Substitution Error: field \"%s\" of datablock %s prohibits \"$$\" field substitutions. [%s]", 
+                  slotName, this->getClassName(), this->getName());
+               return;
+            }
+
+            // add the substitution
+            ((SimDataBlock*)this)->addSubstitution(slotName, array1, value);
+            return;
+         }
+		 
          if(array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
          {
             // If the set data notify callback returns true, then go ahead and
@@ -2612,6 +2639,16 @@ DefineEngineMethod( SimObject, dump, void, ( bool detailed ), ( false ),
       }
    }
 
+   // If the object is a datablock with substitution statements,
+   // they get printed out as part of the dump.
+   if (dynamic_cast<SimDataBlock*>(object))
+   {
+      if (((SimDataBlock*)object)->getSubstitutionCount() > 0)
+      {
+         Con::printf("Substitution Fields:");
+         ((SimDataBlock*)object)->printSubstitutions();
+      }
+   }
    Con::printf( "Dynamic Fields:" );
    if(object->getFieldDictionary())
       object->getFieldDictionary()->printFields(object);

@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #include "platform/platform.h"
 
 #include "sfx/sfxProfile.h"
@@ -113,6 +117,9 @@ void SFXProfile::initPersistFields()
          "@ref SFXProfile_loading" );
       
    endGroup( "Sound" );
+
+   // disallow some field substitutions
+   disableFieldSubstitutions("description");
 
    Parent::initPersistFields();
 }

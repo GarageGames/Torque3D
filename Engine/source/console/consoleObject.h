@@ -20,6 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 #ifndef _CONSOLEOBJECT_H_
 #define _CONSOLEOBJECT_H_
 
@@ -492,6 +496,7 @@ public:
             setDataFn( NULL ),
             getDataFn( NULL )
       {
+         doNotSubstitute = keepClearSubsOnly = false;
       }
 
       StringTableEntry pFieldname;    ///< Name of the field.
@@ -509,6 +514,8 @@ public:
       TypeValidator *validator;     ///< Validator, if any.
       SetDataNotify  setDataFn;     ///< Set data notify Fn
       GetDataNotify  getDataFn;     ///< Get data notify Fn
+      bool           doNotSubstitute;
+      bool           keepClearSubsOnly;
       WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
    };
    typedef Vector<Field> FieldList;
@@ -1054,6 +1061,9 @@ public:
 
    static ConsoleObject* __findObject( const char* ) { return NULL; }
    static const char* __getObjectId( ConsoleObject* ) { return ""; }
+protected:
+   static bool disableFieldSubstitutions(const char* in_pFieldname);
+   static bool onlyKeepClearSubstitutions(const char* in_pFieldname);
 };
 
 #define addNamedField(fieldName,type,className) addField(#fieldName, type, Offset(fieldName,className))
