@@ -5013,3 +5013,22 @@ DefineEngineMethod( ShapeBase, getModelFile, const char *, (),,
    const char *fieldName = StringTable->insert( String("shapeFile") );
    return datablock->getDataField( fieldName, NULL );
 }
+
+void ShapeBase::setSelectionFlags(U8 flags)
+{
+   Parent::setSelectionFlags(flags);
+
+   if (!mShapeInstance || !isClientObject())  
+      return;  
+  
+   if (!mShapeInstance->ownMaterialList())  
+      return;  
+  
+   TSMaterialList* pMatList = mShapeInstance->getMaterialList();  
+   for (S32 j = 0; j < pMatList->size(); j++)   
+   {  
+      BaseMatInstance * bmi = pMatList->getMaterialInst(j);  
+      bmi->setSelectionHighlighting(needsSelectionHighlighting());  
+   }  
+}
+

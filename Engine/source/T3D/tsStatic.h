@@ -254,6 +254,7 @@ public:
    Point2F        mGradientRange;
 private:
    void           set_special_typing();
+   virtual void setSelectionFlags(U8 flags);
 };
 
 typedef TSStatic::MeshType TSMeshType;

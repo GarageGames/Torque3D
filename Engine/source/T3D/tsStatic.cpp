@@ -375,6 +375,8 @@ bool TSStatic::_createShape()
 
    mShapeInstance = new TSShapeInstance( mShape, isClientObject() );
 
+   if (isClientObject())
+      mShapeInstance->cloneMaterialList();
    if( isGhost() )
    {
       // Reapply the current skin
@@ -1405,3 +1407,22 @@ void TSStatic::onStaticModified(const char* slotName, const char*newValue)
 
    set_special_typing();
 }
+
+void TSStatic::setSelectionFlags(U8 flags)
+{
+   Parent::setSelectionFlags(flags);
+
+   if (!mShapeInstance || !isClientObject())  
+      return;  
+  
+   if (!mShapeInstance->ownMaterialList())  
+      return;  
+  
+   TSMaterialList* pMatList = mShapeInstance->getMaterialList();  
+   for (S32 j = 0; j < pMatList->size(); j++)   
+   {  
+      BaseMatInstance * bmi = pMatList->getMaterialInst(j);  
+      bmi->setSelectionHighlighting(needsSelectionHighlighting());  
+   }  
+}
+

@@ -52,6 +52,9 @@ struct SceneData
       /// The deferred render bin.
       /// @RenderDeferredMgr
       DeferredBin,
+      /// The selection-highlight render bin.  
+      /// @afxRenderHighlightMgr  
+      HighlightBin,
    };
 
    /// This defines when we're rendering a special bin 

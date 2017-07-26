@@ -1852,6 +1852,8 @@ public:
 protected:
    DECLARE_CALLBACK( F32, validateCameraFov, (F32 fov) );
 
+
+   virtual void setSelectionFlags(U8 flags);
 };
 
 

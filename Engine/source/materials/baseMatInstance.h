@@ -252,6 +252,11 @@ public:
 
    virtual const GFXStateBlockDesc &getUserStateBlock() const = 0;
 
+protected:
+   bool needsHighlighting;
+public:
+   bool needsSelectionHighlighting() { return needsHighlighting; };
+   void setSelectionHighlighting(bool flag) { needsHighlighting = flag; };
 };
 
 #endif /// _BASEMATINSTANCE_H_
