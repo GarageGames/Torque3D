@@ -24,6 +24,7 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/projectile.h"
 
@@ -621,6 +622,9 @@ Projectile::Projectile()
    mLightState.setLightInfo( mLight );
 
    mDataBlock = 0;
+   ignoreSourceTimeout = false;
+   dynamicCollisionMask = csmDynamicCollisionMask;
+   staticCollisionMask = csmStaticCollisionMask;
 }
 
 Projectile::~Projectile()
@@ -661,6 +665,7 @@ void Projectile::initPersistFields()
    addField("sourceSlot",       TypeS32,     Offset(mSourceObjectSlot, Projectile),
       "@brief The sourceObject's weapon slot that the projectile originates from.\n\n");
 
+   addField("ignoreSourceTimeout",  TypeBool,   Offset(ignoreSourceTimeout, Projectile));
    endGroup("Source");
 
 
@@ -1140,7 +1145,7 @@ void Projectile::simulate( F32 dt )
    // disable the source objects collision reponse for a short time while we
    // determine if the projectile is capable of moving from the old position
    // to the new position, otherwise we'll hit ourself
-   bool disableSourceObjCollision = (mSourceObject.isValid() && mCurrTick <= SourceIdTimeoutTicks);
+   bool disableSourceObjCollision = (mSourceObject.isValid() && (ignoreSourceTimeout || mCurrTick <= SourceIdTimeoutTicks));
    if ( disableSourceObjCollision )
       mSourceObject->disableCollision();
    disableCollision();
@@ -1157,12 +1162,12 @@ void Projectile::simulate( F32 dt )
    if ( mPhysicsWorld )
       hit = mPhysicsWorld->castRay( oldPosition, newPosition, &rInfo, Point3F( newPosition - oldPosition) * mDataBlock->impactForce );            
    else 
-      hit = getContainer()->castRay(oldPosition, newPosition, csmDynamicCollisionMask | csmStaticCollisionMask, &rInfo);
+      hit = getContainer()->castRay(oldPosition, newPosition, dynamicCollisionMask | staticCollisionMask, &rInfo);
 
    if ( hit )
    {
       // make sure the client knows to bounce
-      if ( isServerObject() && ( rInfo.object->getTypeMask() & csmStaticCollisionMask ) == 0 )
+      if(isServerObject() && (rInfo.object->getTypeMask() & staticCollisionMask) == 0)
          setMaskBits( BounceMask );
 
       MatrixF xform( true );
@@ -1353,6 +1358,7 @@ U32 Projectile::packUpdate( NetConnection *con, U32 mask, BitStream *stream )
             stream->writeRangedU32( U32(mSourceObjectSlot),
                                     0, 
                                     ShapeBase::MaxMountedImages - 1 );
+            stream->writeFlag(ignoreSourceTimeout);
          }
          else 
             // have not recieved the ghost for the source object yet, try again later
@@ -1396,6 +1402,7 @@ void Projectile::unpackUpdate(NetConnection* con, BitStream* stream)
          mSourceObjectId   = stream->readRangedU32( 0, NetConnection::MaxGhostCount );
          mSourceObjectSlot = stream->readRangedU32( 0, ShapeBase::MaxMountedImages - 1 );
 
+         ignoreSourceTimeout = stream->readFlag();
          NetObject* pObject = con->resolveGhost( mSourceObjectId );
          if ( pObject != NULL )
             mSourceObject = dynamic_cast<ShapeBase*>( pObject );
