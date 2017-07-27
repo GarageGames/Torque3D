@@ -406,7 +406,8 @@ protected:
       ActionMask   = Parent::NextFreeMask << 0,
       MoveMask     = Parent::NextFreeMask << 1,
       ImpactMask   = Parent::NextFreeMask << 2,
-      NextFreeMask = Parent::NextFreeMask << 3
+      TriggerMask      = Parent::NextFreeMask << 3,
+      NextFreeMask     = Parent::NextFreeMask << 4
    };
 
    SimObjectPtr<ParticleEmitter> mSplashEmitter[PlayerData::NUM_SPLASH_EMITTERS];
@@ -804,6 +805,17 @@ public:
    virtual U32 lockAnimation();
    virtual bool isAnimationLocked() const { return ((anim_clip_flags & BLOCK_USER_CONTROL) != 0); }
    
+protected:
+   bool         overrideLookAnimation;
+   F32          armLookOverridePos;
+   F32          headVLookOverridePos;
+   F32          headHLookOverridePos;
+public:
+   void         setLookAnimationOverride(bool flag);
+   void         copyHeadRotation(const Player* p) { mHead = p->mHead; }
+public:
+   bool ignore_updates;
+   void resetContactTimer() { mContactTimer = 0; }
 private:
    U8     move_trigger_states;
    U32    fx_s_triggers;
@@ -837,6 +849,26 @@ public:
    };
    U32  getClientEventTriggers() const { return fx_c_triggers; }
    U32  getServerEventTriggers() const { return fx_s_triggers; }
+private:
+   F32      speed_bias;
+   F32      speed_bias_goal;
+   bool     override_movement;
+   Point3F  movement_data;
+   U8       movement_op;
+   U32      last_movement_tag;
+   static U32   unique_movement_tag_counter;
+public:
+   void     setMovementSpeedBias(F32 bias);
+   U32      setMovementOverride(F32 bias, const Point3F* mov=0, U32 op=1);
+   void     restoreMovement(U32 tag);
+private:
+   S32      footfallDecalOverride;
+   S32      footfallSoundOverride;
+   S32      footfallDustOverride;
+   bool     noFootfallFX;
+public:
+   void     overrideFootfallFX(bool decals=true, bool sounds=true, bool dust=true);
+   void     restoreFootfallFX(bool decals=true, bool sounds=true, bool dust=true);
 };
 
 typedef Player::Pose PlayerPose;

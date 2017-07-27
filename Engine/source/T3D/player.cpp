@@ -2117,7 +2117,10 @@ void Player::processTick(const Move* move)
       else if (delta.rot.z > M_PI_F)
          delta.rot.z -= M_2PI_F;
 
-      setPosition(delta.pos,delta.rot);
+      if (!ignore_updates)
+      {
+         setPosition(delta.pos,delta.rot);
+      }
       updateDeathOffsets();
       updateLookAnimation();
 
@@ -2215,7 +2218,8 @@ void Player::interpolateTick(F32 dt)
    Point3F pos = delta.pos + delta.posVec * dt;
    Point3F rot = delta.rot + delta.rotVec * dt;
 
-   setRenderPosition(pos,rot,dt);
+   if (!ignore_updates)
+      setRenderPosition(pos,rot,dt);
 
 /*
    // apply camera effects - is this the best place? - bramage
@@ -2533,6 +2537,30 @@ AngAxisF gPlayerMoveRot;
 
 void Player::updateMove(const Move* move)
 {
+   struct Move my_move;
+   if (override_movement && movement_op < 3)
+   {
+      my_move = *move;
+      switch (movement_op)
+      {
+      case 0: // add
+         my_move.x += movement_data.x;
+         my_move.y += movement_data.y;
+         my_move.z += movement_data.z;
+         break;
+      case 1: // mult
+         my_move.x *= movement_data.x;
+         my_move.y *= movement_data.y;
+         my_move.z *= movement_data.z;
+         break;
+      case 2: // replace
+         my_move.x = movement_data.x;
+         my_move.y = movement_data.y;
+         my_move.z = movement_data.z;
+         break;
+      }
+      move = &my_move;
+   }
    delta.move = *move;
 
 #ifdef TORQUE_OPENVR
@@ -2839,6 +2867,9 @@ void Player::updateMove(const Move* move)
       moveSpeed = 0.0f;
    }
 
+   // apply speed bias here.
+   speed_bias = speed_bias + (speed_bias_goal - speed_bias)*0.1f;
+   moveSpeed *= speed_bias;
    // Acceleration due to gravity
    VectorF acc(0.0f, 0.0f, mGravity * mGravityMod * TickSec);
 
@@ -3538,6 +3569,19 @@ void Player::updateDamageState()
 
 void Player::updateLookAnimation(F32 dt)
 {
+   // If the preference setting overrideLookAnimation is true, the player's
+   // arm and head no longer animate according to the view direction. They
+   // are instead given fixed positions.
+   if (overrideLookAnimation)
+   {
+      if (mArmAnimation.thread) 
+         mShapeInstance->setPos(mArmAnimation.thread, armLookOverridePos);
+      if (mHeadVThread) 
+         mShapeInstance->setPos(mHeadVThread, headVLookOverridePos);
+      if (mHeadHThread) 
+         mShapeInstance->setPos(mHeadHThread, headHLookOverridePos);
+      return;
+   }
    // Calculate our interpolated head position.
    Point3F renderHead = delta.head + delta.headVec * dt;
 
@@ -3930,7 +3974,7 @@ void Player::updateActionThread()
             // Put footprints on surface, if appropriate for material.
 
             if( material && material->mShowFootprints
-                && mDataBlock->decalData )
+                && mDataBlock->decalData && !footfallDecalOverride )
             {
                Point3F normal;
                Point3F tangent;
@@ -3941,8 +3985,8 @@ void Player::updateActionThread()
             
             // Emit footpuffs.
 
-            if( rInfo.t <= 0.5 && mWaterCoverage == 0.0
-                && material && material->mShowDust )
+            if (!footfallDustOverride && rInfo.t <= 0.5f && mWaterCoverage == 0.0f
+                                         && material && material->mShowDust )
             {
                // New emitter every time for visibility reasons
                ParticleEmitter * emitter = new ParticleEmitter;
@@ -3975,6 +4019,7 @@ void Player::updateActionThread()
 
             // Play footstep sound.
             
+            if (footfallSoundOverride <= 0)
             playFootstepSound( triggeredLeft, material, rInfo.object );
          }
       }
@@ -6222,7 +6267,8 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
    stream->read(&mHead.z);
    stream->read(&rot.z);
    rot.x = rot.y = 0;
-   setPosition(pos,rot);
+   if (!ignore_updates)
+      setPosition(pos,rot);
    delta.head = mHead;
    delta.rot = rot;
 
@@ -6469,7 +6515,8 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
             }
             delta.pos = pos;
             delta.rot = rot;
-            setPosition(pos,rot);
+            if (!ignore_updates)
+               setPosition(pos,rot);
          }
       }
       else 
@@ -6481,7 +6528,8 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
          delta.rotVec.set(0.0f, 0.0f, 0.0f);
          delta.warpTicks = 0;
          delta.dt = 0.0f;
-         setPosition(pos,rot);
+         if (!ignore_updates)
+            setPosition(pos,rot);
       }
    }
    F32 energy = stream->readFloat(EnergyLevelBits) * mDataBlock->maxEnergy;
@@ -6942,6 +6990,8 @@ void Player::calcClassRenderData()
 
 void Player::playFootstepSound( bool triggeredLeft, Material* contactMaterial, SceneObject* contactObject )
 {
+   if (footfallSoundOverride > 0)
+      return;
    MatrixF footMat = getTransform();
    if( mWaterCoverage > 0.0 )
    {
@@ -7473,6 +7523,27 @@ ConsoleMethod(Player, isAnimationLocked, bool, 2, 2, "isAnimationLocked()")
 }
 
 
+void Player::setLookAnimationOverride(bool flag) 
+{ 
+   overrideLookAnimation = flag; 
+#if 0
+   setMaskBits(LookOverrideMask);
+#else
+   setMaskBits(ActionMask);
+#endif
+}
+
+ConsoleMethod(Player, setLookAnimationOverride, void, 3, 3, "setLookAnimationOverride(flag)")
+{
+   object->setLookAnimationOverride(dAtob(argv[2]));
+}
+
+ConsoleMethod(Player, copyHeadRotation, void, 3, 3, "copyHeadRotation(other_player)")
+{
+   Player* other_player = dynamic_cast<Player*>(Sim::findObject(argv[2]));
+   if (other_player)
+      object->copyHeadRotation(other_player);
+}
 void Player::process_client_triggers(bool triggeredLeft, bool triggeredRight)
 {
    bool mark_landing = false;
@@ -7504,6 +7575,65 @@ void Player::process_client_triggers(bool triggeredLeft, bool triggeredRight)
    {
       fx_c_triggers &= ~(PLAYER_LANDING_S_TRIGGER);
    }
+}
+U32 Player::unique_movement_tag_counter = 1;
+
+void Player::setMovementSpeedBias(F32 bias) 
+{ 
+   speed_bias_goal = bias; 
+}
+
+U32 Player::setMovementOverride(F32 bias, const Point3F* mov, U32 op) 
+{ 
+   if (mov)
+   {
+      movement_data = *mov;
+      override_movement = true;
+      movement_op = (U8)op;
+   }
+   else
+      override_movement = false;
+
+   speed_bias_goal = bias;
+
+   last_movement_tag = unique_movement_tag_counter++;
+   return last_movement_tag;
+}
+
+void Player::restoreMovement(U32 tag) 
+{ 
+   if (tag != 0 && tag == last_movement_tag)
+   {
+      speed_bias_goal = 1.0;
+      override_movement = false;
+   }
+}
+
+ConsoleMethod(Player, setMovementSpeedBias, void, 3, 3, "setMovementSpeedBias(F32 bias)")
+{
+   object->setMovementSpeedBias(dAtof(argv[2]));
+}
+
+void Player::overrideFootfallFX(bool decals, bool sounds, bool dust) 
+{ 
+   if (decals)
+      footfallDecalOverride++; 
+   if (sounds)
+      footfallSoundOverride++; 
+   if (dust)
+      footfallDustOverride++; 
+   noFootfallFX = (footfallDecalOverride > 0 && footfallSoundOverride > 0 && footfallDustOverride > 0);
+}
+
+void Player::restoreFootfallFX(bool decals, bool sounds, bool dust) 
+{ 
+   if (decals && footfallDecalOverride) 
+      footfallDecalOverride--; 
+   if (sounds && footfallSoundOverride) 
+      footfallSoundOverride--; 
+   if (dust && footfallDustOverride) 
+      footfallDustOverride--; 
+   noFootfallFX = (footfallDecalOverride > 0 && footfallSoundOverride > 0 && footfallDustOverride > 0);
 }
 #ifdef TORQUE_OPENVR
 void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
