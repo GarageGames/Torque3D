@@ -24,6 +24,7 @@
 // Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
 // Copyright (C) 2015 Faust Logic, Inc.
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/shapeBase.h"
 
@@ -3722,6 +3723,31 @@ void ShapeBase::setCurrentWaterObject( WaterObject *obj )
    mCurrentWaterObject = obj;
 }
 
+void ShapeBase::notifyCollisionCallbacks(SceneObject* obj, const VectorF& vel)
+{
+   for (S32 i = 0; i < collision_callbacks.size(); i++)
+      if (collision_callbacks[i])
+         collision_callbacks[i]->collisionNotify(this, obj, vel);
+}
+
+void ShapeBase::registerCollisionCallback(CollisionEventCallback* ce_cb)
+{
+   for (S32 i = 0; i < collision_callbacks.size(); i++)
+      if (collision_callbacks[i] == ce_cb)
+         return;
+
+   collision_callbacks.push_back(ce_cb);
+}
+
+void ShapeBase::unregisterCollisionCallback(CollisionEventCallback* ce_cb)
+{
+   for (S32 i = 0; i < collision_callbacks.size(); i++)
+      if (collision_callbacks[i] == ce_cb)
+      {
+         collision_callbacks.erase(i);
+         return;
+      }
+}
 //--------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 DefineEngineMethod( ShapeBase, setHidden, void, ( bool show ),,

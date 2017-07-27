@@ -1860,6 +1860,18 @@ public:
 
 protected:
    DECLARE_CALLBACK( F32, validateCameraFov, (F32 fov) );
+public:
+   class CollisionEventCallback
+   {
+   public:
+      virtual void collisionNotify(SceneObject* shape0, SceneObject* shape1, const VectorF& vel)=0;
+   };
+private:
+   Vector<CollisionEventCallback*>  collision_callbacks;
+   void   notifyCollisionCallbacks(SceneObject*, const VectorF& vel);
+public:
+   void   registerCollisionCallback(CollisionEventCallback*);
+   void   unregisterCollisionCallback(CollisionEventCallback*);
 
 protected:
    enum { 
