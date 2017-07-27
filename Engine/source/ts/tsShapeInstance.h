@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _TSSHAPEINSTANCE_H_
 #define _TSSHAPEINSTANCE_H_
 
@@ -690,6 +695,8 @@ protected:
 //-------------------------------------------------------------------------------------
 
    bool hasAccumulation();
+   // provides access to full mTriggerStates mask.
+   U32 getTriggerStateMask() const { return mTriggerStates; }
 };
 
 

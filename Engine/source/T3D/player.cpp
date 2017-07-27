@@ -2076,6 +2076,32 @@ void Player::processTick(const Move* move)
    }
 
    Parent::processTick(move);
+   // Check for state changes in the standard move triggers and
+   // set bits for any triggers that switched on this tick in
+   // the fx_s_triggers mask. Flag any changes to be packed to
+   // clients.
+   if (isServerObject())
+   {
+      fx_s_triggers = 0;
+      if (move)
+      {
+         U8 on_bits = 0;
+         for (S32 i = 0; i < MaxTriggerKeys; i++)
+            if (move->trigger[i])
+               on_bits |= BIT(i);
+
+         if (on_bits != move_trigger_states)
+         {
+            U8 switched_on_bits = (on_bits & ~move_trigger_states);
+            if (switched_on_bits)
+            {
+               fx_s_triggers |= (U32)switched_on_bits;
+               setMaskBits(TriggerMask);
+            }
+            move_trigger_states = on_bits;
+         }
+      }
+   }
    // Warp to catch up to server
    if (delta.warpTicks > 0) {
       delta.warpTicks--;
@@ -2214,6 +2240,9 @@ void Player::advanceTime(F32 dt)
 {
    // Client side animations
    Parent::advanceTime(dt);
+   // Increment timer for triggering idle events.
+   if (idle_timer >= 0.0f)
+      idle_timer += dt;
    updateActionThread();
    updateAnimation(dt);
    updateSplash();
@@ -3089,6 +3118,9 @@ void Player::updateMove(const Move* move)
          setActionThread( seq, true, false, true );
 
          mJumpSurfaceLastContact = JumpSkipContactsMax;
+         // Flag the jump event trigger.
+         fx_s_triggers |= PLAYER_JUMP_S_TRIGGER;
+         setMaskBits(TriggerMask);
       }
    }
    else
@@ -3783,6 +3815,11 @@ void Player::setActionThread(U32 action,bool forward,bool hold,bool wait,bool fs
       return;
    }
 
+   if (isClientObject())
+   {
+      mark_idle = (action == PlayerData::RootAnim);
+      idle_timer = (mark_idle) ? 0.0f : -1.0f;
+   }
    PlayerData::ActionAnimation &anim = mDataBlock->actionList[action];
    if (anim.sequence != -1)
    {
@@ -3875,7 +3912,8 @@ void Player::updateActionThread()
          offset = mDataBlock->decalOffset * getScale().x;
       }
 
-      if( triggeredLeft || triggeredRight )
+      process_client_triggers(triggeredLeft, triggeredRight);
+      if ((triggeredLeft || triggeredRight) && !noFootfallFX)
       {
          Point3F rot, pos;
          RayInfo rInfo;
@@ -4906,6 +4944,11 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
          // we can use it to do impacts
          // and query collision.
          *outCol = *collision;
+         if (isServerObject() && bd > 6.8f && collision->normal.z > 0.7f)
+         {
+            fx_s_triggers |= PLAYER_LANDING_S_TRIGGER;
+            setMaskBits(TriggerMask);
+         }
 
          // Subtract out velocity
          VectorF dv = collision->normal * (bd + sNormalElasticity);
@@ -7430,6 +7473,38 @@ ConsoleMethod(Player, isAnimationLocked, bool, 2, 2, "isAnimationLocked()")
 }
 
 
+void Player::process_client_triggers(bool triggeredLeft, bool triggeredRight)
+{
+   bool mark_landing = false;
+   Point3F my_vel = getVelocity();
+   if (my_vel.z > 5.0f)
+      z_velocity = 1;
+   else if (my_vel.z < -5.0f)
+      z_velocity = -1;
+   else
+   {
+      if (z_velocity < 0)
+         mark_landing = true;
+      z_velocity = 0.0f;
+   }
+
+   fx_c_triggers = mark_fx_c_triggers;
+   if (triggeredLeft)
+      fx_c_triggers |= PLAYER_LF_FOOT_C_TRIGGER;
+   if (triggeredRight)
+      fx_c_triggers |= PLAYER_RT_FOOT_C_TRIGGER;
+   if (mark_landing)
+      fx_c_triggers |= PLAYER_LANDING_C_TRIGGER;
+   if (idle_timer > 10.0f)
+   {
+      fx_c_triggers |= PLAYER_IDLE_C_TRIGGER;
+      idle_timer = 0.0f;
+   }
+   if (fx_c_triggers & PLAYER_LANDING_S_TRIGGER)
+   {
+      fx_c_triggers &= ~(PLAYER_LANDING_S_TRIGGER);
+   }
+}
 #ifdef TORQUE_OPENVR
 void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
 {
