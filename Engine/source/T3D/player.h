@@ -804,6 +804,39 @@ public:
    virtual U32 lockAnimation();
    virtual bool isAnimationLocked() const { return ((anim_clip_flags & BLOCK_USER_CONTROL) != 0); }
    
+private:
+   U8     move_trigger_states;
+   U32    fx_s_triggers;
+   U32    mark_fx_c_triggers;
+   U32    fx_c_triggers;
+   F32    z_velocity;
+   bool   mark_idle;
+   F32    idle_timer;
+   bool   mark_s_landing;
+   void   process_client_triggers(bool triggeredLeft, bool triggeredRight);
+public:
+   enum {
+     // server events
+     PLAYER_MOVE_TRIGGER_0        = BIT(0),
+     PLAYER_MOVE_TRIGGER_1        = BIT(1),
+     PLAYER_MOVE_TRIGGER_2        = BIT(2),
+     PLAYER_MOVE_TRIGGER_3        = BIT(3),
+     PLAYER_MOVE_TRIGGER_4        = BIT(4),
+     PLAYER_MOVE_TRIGGER_5        = BIT(5),
+     PLAYER_LANDING_S_TRIGGER     = BIT(6),
+
+     PLAYER_FIRE_S_TRIGGER        = PLAYER_MOVE_TRIGGER_0,
+     PLAYER_FIRE_ALT_S_TRIGGER    = PLAYER_MOVE_TRIGGER_1,
+     PLAYER_JUMP_S_TRIGGER        = BIT(7),
+
+     // client events
+     PLAYER_LF_FOOT_C_TRIGGER       = BIT(16),
+     PLAYER_RT_FOOT_C_TRIGGER       = BIT(17),
+     PLAYER_LANDING_C_TRIGGER       = BIT(18),
+     PLAYER_IDLE_C_TRIGGER          = BIT(19),
+   };
+   U32  getClientEventTriggers() const { return fx_c_triggers; }
+   U32  getServerEventTriggers() const { return fx_s_triggers; }
 };
 
 typedef Player::Pose PlayerPose;
