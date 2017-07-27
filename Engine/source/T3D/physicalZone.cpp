@@ -325,9 +325,7 @@ U32 PhysicalZone::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
 
    stream->writeFlag(mActive);
 
-   // AFX CODE BLOCK (enhanced-physical-zone)(pz-opt) >>
-
-   return retMask;
+     return retMask;
 }
 
 void PhysicalZone::unpackUpdate(NetConnection* con, BitStream* stream)
