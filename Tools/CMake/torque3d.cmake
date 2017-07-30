@@ -157,7 +157,7 @@ mark_as_advanced(TORQUE_DEDICATED)
 # options
 ###############################################################################
 if(NOT MSVC AND NOT APPLE) # handle single-configuration generator
-    set(TORQUE_BUILD_TYPE "Debug" CACHE STRING "Select one of Debug, Release and RelWithDebInfo")
+    set(TORQUE_BUILD_TYPE "Release" CACHE STRING "Select one of Debug, Release and RelWithDebInfo")
     set_property(CACHE TORQUE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "RelWithDebInfo")
 
     set(TORQUE_ADDITIONAL_LINKER_FLAGS "" CACHE STRING "Additional linker flags")
