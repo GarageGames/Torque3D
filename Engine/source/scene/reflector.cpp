@@ -406,7 +406,7 @@ void CubeReflector::updateFace( const ReflectParams &params, U32 faceidx )
    matView.inverse();
 
    GFX->setWorldMatrix(matView);
-
+   GFX->clearTextureStateImmediate(0);
    renderTarget->attachTexture( GFXTextureTarget::Color0, cubemap, faceidx );
    GFX->setActiveRenderTarget( renderTarget );
    GFX->clear( GFXClearStencil | GFXClearTarget | GFXClearZBuffer, gCanvasClearColor, 1.0f, 0 );

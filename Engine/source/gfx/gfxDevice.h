@@ -967,6 +967,7 @@ public:
    /// @{
    /// Sets the dirty Render/Texture/Sampler states from the caching system
    void updateStates(bool forceSetAll = false);
+   void clearTextureStateImmediate(U32 stage);
 
    /// Returns the forced global wireframe state.
    static bool getWireframe() { return smWireframe; }
