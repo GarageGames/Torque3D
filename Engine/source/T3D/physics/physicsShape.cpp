@@ -257,9 +257,9 @@ void PhysicsShapeData::_onResourceChanged( const Torque::Path &path )
    }
 
    // Reload the collision shape.
-   reloadcolShape = shape->buildColShape( false, Point3F::One );
+   reloadcolShape = reloadShape->buildColShape( false, Point3F::One );
 
-   if ( bool(reloadShape) &&  bool(colShape))
+   if ( bool(reloadShape) &&  bool(reloadcolShape))
    {
       shape = reloadShape;
       colShape = reloadcolShape;
