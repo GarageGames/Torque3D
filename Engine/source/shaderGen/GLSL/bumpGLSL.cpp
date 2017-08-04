@@ -29,7 +29,7 @@
 #include "materials/processedMaterial.h"
 #include "materials/materialFeatureTypes.h"
 #include "shaderGen/shaderGenVars.h"
-
+#include "shaderGen/shaderGen.h"
 
 void BumpFeatGLSL::processVert(  Vector<ShaderComponent*> &componentList, 
                                  const MaterialFeatureData &fd )
@@ -235,7 +235,7 @@ void BumpFeatGLSL::setTexData(   Material::StageData &stageDat,
 
 
 ParallaxFeatGLSL::ParallaxFeatGLSL()
-   : mIncludeDep(String(Con::getVariable("$Core::CommonShaderPath")) + String("/gl/torque.glsl" ))
+   : mIncludeDep(ShaderGen::smCommonShaderPath + String("/gl/torque.glsl" ))
 {
    addDependency( &mIncludeDep );
 }

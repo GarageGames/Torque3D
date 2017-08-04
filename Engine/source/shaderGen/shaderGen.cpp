@@ -49,6 +49,7 @@ MODULE_BEGIN( ShaderGen )
 
 MODULE_END;
 
+String ShaderGen::smCommonShaderPath("shaders/common");
 
 ShaderGen::ShaderGen()
 {
@@ -124,6 +125,8 @@ void ShaderGen::initShaderGen()
 
    // Delete the auto-generated conditioner include file.
    Torque::FS::Remove( "shadergen:/" + ConditionerFeature::ConditionerIncludeFileName );
+
+   smCommonShaderPath = String(Con::getVariable("$Core::CommonShaderPath", "shaders/common"));
 }
 
 void ShaderGen::generateShader( const MaterialFeatureData &featureData,

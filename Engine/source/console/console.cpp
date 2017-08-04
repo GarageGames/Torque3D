@@ -960,7 +960,7 @@ const char *getObjectTokenField(const char *name)
    return NULL;
 }
 
-const char *getVariable(const char *name)
+const char *getVariable(const char *name, const char* def)
 {
    const char *objField = getObjectTokenField(name);
    if (objField)
@@ -970,7 +970,7 @@ const char *getVariable(const char *name)
    else
    {
       Dictionary::Entry *entry = getVariableEntry(name);
-      return entry ? entry->getStringValue() : "";
+      return entry ? entry->getStringValue() : def;
    }
 }
 

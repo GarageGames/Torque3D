@@ -37,6 +37,7 @@
 #include "windowManager/platformWindow.h"
 #include "gfx/D3D11/screenshotD3D11.h"
 #include "materials/shaderData.h"
+#include "shaderGen/shaderGen.h"
 
 #ifdef TORQUE_DEBUG
 #include "d3d11sdklayers.h"
@@ -838,8 +839,8 @@ void GFXD3D11Device::setupGenericShaders(GenericShaderType type)
       //shader model 4.0 is enough for the generic shaders
       const char* shaderModel = "4.0";
       shaderData = new ShaderData();
-      shaderData->setField("DXVertexShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/colorV.hlsl"));
-      shaderData->setField("DXPixelShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/colorP.hlsl"));
+      shaderData->setField("DXVertexShaderFile", ShaderGen::smCommonShaderPath + String("/fixedFunction/colorV.hlsl"));
+      shaderData->setField("DXPixelShaderFile", ShaderGen::smCommonShaderPath + String("/fixedFunction/colorP.hlsl"));
       shaderData->setField("pixVersion", shaderModel);
       shaderData->registerObject();
       mGenericShader[GSColor] =  shaderData->getShader();
@@ -848,8 +849,8 @@ void GFXD3D11Device::setupGenericShaders(GenericShaderType type)
       Sim::getRootGroup()->addObject(shaderData);
 
       shaderData = new ShaderData();
-      shaderData->setField("DXVertexShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/modColorTextureV.hlsl"));
-      shaderData->setField("DXPixelShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/modColorTextureP.hlsl"));
+      shaderData->setField("DXVertexShaderFile", ShaderGen::smCommonShaderPath + String("/fixedFunction/modColorTextureV.hlsl"));
+      shaderData->setField("DXPixelShaderFile", ShaderGen::smCommonShaderPath + String("/fixedFunction/modColorTextureP.hlsl"));
       shaderData->setField("pixVersion", shaderModel);
       shaderData->registerObject();
       mGenericShader[GSModColorTexture] = shaderData->getShader();
@@ -858,8 +859,8 @@ void GFXD3D11Device::setupGenericShaders(GenericShaderType type)
       Sim::getRootGroup()->addObject(shaderData);
 
       shaderData = new ShaderData();
-      shaderData->setField("DXVertexShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/addColorTextureV.hlsl"));
-      shaderData->setField("DXPixelShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/addColorTextureP.hlsl"));
+      shaderData->setField("DXVertexShaderFile", ShaderGen::smCommonShaderPath + String("/fixedFunction/addColorTextureV.hlsl"));
+      shaderData->setField("DXPixelShaderFile", ShaderGen::smCommonShaderPath + String("/fixedFunction/addColorTextureP.hlsl"));
       shaderData->setField("pixVersion", shaderModel);
       shaderData->registerObject();
       mGenericShader[GSAddColorTexture] = shaderData->getShader();
@@ -868,8 +869,8 @@ void GFXD3D11Device::setupGenericShaders(GenericShaderType type)
       Sim::getRootGroup()->addObject(shaderData);
 
       shaderData = new ShaderData();
-      shaderData->setField("DXVertexShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/textureV.hlsl"));
-      shaderData->setField("DXPixelShaderFile", String(Con::getVariable("$Core::CommonShaderPath")) + String("/fixedFunction/textureP.hlsl"));
+      shaderData->setField("DXVertexShaderFile", ShaderGen::smCommonShaderPath + String("/fixedFunction/textureV.hlsl"));
+      shaderData->setField("DXPixelShaderFile", ShaderGen::smCommonShaderPath + String("/fixedFunction/textureP.hlsl"));
       shaderData->setField("pixVersion", shaderModel);
       shaderData->registerObject();
       mGenericShader[GSTexture] = shaderData->getShader();
