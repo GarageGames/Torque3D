@@ -29,6 +29,15 @@
 #ifndef _MMATRIX_H_
 #include "math/mMatrix.h"
 #endif
+#ifndef _GFXTARGET_H_
+#include "gfx/gfxTarget.h"
+#endif
+#ifndef _MATHUTIL_FRUSTUM_H_
+#include "math/util/frustum.h"
+#endif
+#ifndef _COLOR_H_
+#include "core/color.h"
+#endif
 
 struct CameraQuery;
 
@@ -36,6 +45,10 @@ struct CameraQuery;
 /// Actually renders the world.  This is the function that will render the
 /// scene ONLY - new guis, no damage flashes.
 void GameRenderWorld();
+
+/// Does a full, top-to-bottom call to render a frame. This does all the setup to make a render happen
+/// Allowing setting of a intended render target, a view transform, the view frustum, resolution, objects-to-render typemask, and the clear color
+void renderFrame(GFXTextureTargetRef* target, MatrixF transform, Frustum frustum, U32 typeMask, ColorI canvasClearColor);
 
 /// Renders overlays such as damage flashes, white outs, and water masks.  
 /// These are usually a color applied over the entire screen.
