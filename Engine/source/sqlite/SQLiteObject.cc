@@ -223,9 +223,6 @@ int SQLiteObject::ExecuteSQL(const char* sql)
 	int iResult;
 	sqlite_resultset* pResultSet;
 
-	if (dAtob(Con::getVariable("$pref::MegaMotion::SQLVerbose")))
-		Con::printf("SQLite QUERY: %s", sql);
-
 	// create a new resultset
 	pResultSet = new sqlite_resultset;
 
