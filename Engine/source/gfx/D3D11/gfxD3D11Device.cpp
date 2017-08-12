@@ -824,7 +824,9 @@ void GFXD3D11Device::reset(DXGI_SWAP_CHAIN_DESC &d3dpp)
 
    // Now re aquire all the resources we trashed earlier
    reacquireDefaultPoolResources();
-
+   //set last bound shaders
+   mD3DDeviceContext->PSSetShader(mLastPixShader, NULL, 0);
+   mD3DDeviceContext->VSSetShader(mLastVertShader, NULL, 0);
    // Mark everything dirty and flush to card, for sanity.
    updateStates(true);
 }
