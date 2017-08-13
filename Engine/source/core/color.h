@@ -884,10 +884,10 @@ inline ColorI LinearColorF::toColorI(const bool keepAsLinear)
 inline ColorI ColorI::fromLinear()
 {
    //manually create LinearColorF, otherwise it will try and convert to linear first
-   LinearColorF linearColor = LinearColorF(F32(red) * 255.0f + 0.5f,
-                                           F32(red) * 255.0f + 0.5f,
-                                           F32(red) * 255.0f + 0.5f,
-                                           F32(alpha) * 255.0f + 0.5f);
+   LinearColorF linearColor = LinearColorF(F32(red) * gOneOver255,
+                                           F32(green) * gOneOver255,
+                                           F32(blue) * gOneOver255,
+                                           F32(alpha) * gOneOver255);
    //convert back to srgb
    return linearColor.toColorI();
 }
