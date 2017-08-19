@@ -331,16 +331,15 @@ Point2F randomPointInCircle( F32 radius )
 
 void getAnglesFromVector( const VectorF &vec, F32 &yawAng, F32 &pitchAng )
 {
-   yawAng = mAtan2( vec.x, vec.y );
-   if( yawAng < 0.0f )
-      yawAng += M_2PI_F;
+	//Yaw
+	yawAng = mAtan2( vec.x, vec.y );
+	if( yawAng < 0.0f )
+		yawAng += M_2PI_F;
 
-   if( mFabs(vec.x) > mFabs(vec.y) )
-      pitchAng = mAtan2( mFabs(vec.z), mFabs(vec.x) );
-   else
-      pitchAng = mAtan2( mFabs(vec.z), mFabs(vec.y) );
-   if( vec.z < 0.0f )
-      pitchAng = -pitchAng;
+	//Pitch
+	F32 XYdist = mSqrt((vec.x * vec.x) + (vec.y * vec.y));
+	F32 vert = vec.z / XYdist;
+	pitchAng = mAtan2( vert, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
