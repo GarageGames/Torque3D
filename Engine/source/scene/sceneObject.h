@@ -778,6 +778,13 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
    // Note: This was placed in SceneObject to both ShapeBase and TSStatic could support it.
    public:
       GFXTextureObject* mAccuTex;
+
+
+   private:
+      bool mCameraIgnores;
+
+   public:
+      bool cameraIgnores() {return mCameraIgnores;}
 };
 
 #endif  // _SCENEOBJECT_H_

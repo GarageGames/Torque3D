@@ -145,6 +145,8 @@ SceneObject::SceneObject()
 
    mAccuTex = NULL;
    mPathfindingIgnore = false;
+
+   mCameraIgnores = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -584,6 +586,10 @@ void SceneObject::initPersistFields()
 
    endGroup( "Mounting" );
 
+   addGroup("Camera");
+   addField("cameraIgnores", TypeBool, Offset(mCameraIgnores, SceneObject));
+   endGroup("Camera");
+
    Parent::initPersistFields();
 }
 
@@ -781,6 +787,8 @@ U32 SceneObject::packUpdate( NetConnection* conn, U32 mask, BitStream* stream )
 {
    U32 retMask = Parent::packUpdate( conn, mask, stream );
 
+   stream->writeFlag(mCameraIgnores);
+
    if ( stream->writeFlag( mask & FlagMask ) )
       stream->writeRangedU32( (U32)mObjectFlags, 0, getObjectFlagMax() );
 
@@ -818,6 +826,8 @@ U32 SceneObject::packUpdate( NetConnection* conn, U32 mask, BitStream* stream )
 void SceneObject::unpackUpdate( NetConnection* conn, BitStream* stream )
 {
    Parent::unpackUpdate( conn, stream );
+
+   mCameraIgnores = stream->readFlag();
    
    // FlagMask
    if ( stream->readFlag() )      
