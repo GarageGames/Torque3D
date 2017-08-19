@@ -49,6 +49,7 @@ class PathManager
   private:
    struct PathEntry {
       U32             totalTime;
+      bool            looping;
 
       Vector<Point3F> positions;
       Vector<QuatF>   rotations;
@@ -84,6 +85,8 @@ class PathManager
    U32  getPathTotalTime(const U32 id) const;
    U32  getPathNumWaypoints(const U32 id) const;
    U32  getWaypointTime(const U32 id, const U32 wayPoint) const;
+   F64  getClosestTimeToPoint(const U32 id, const Point3F p);
+   F64  getClosestTimeToPoint(const U32 id, const Point3F p, const F64 tMin, const F64 tMax);
 
    U32 getPathTimeBits(const U32 id);
    U32 getPathWaypointBits(const U32 id);
@@ -96,7 +99,7 @@ class PathManager
    void transmitPath(U32);
 
    U32  allocatePathId();
-   void updatePath(const U32 id, const Vector<Point3F>&, const Vector<QuatF>&, const Vector<U32> &, const Vector<U32>&);
+   void updatePath(const U32 id, const Vector<Point3F>&, const Vector<QuatF>&, const Vector<U32> &, const Vector<U32>&, const bool looping);
 
    //-------------------------------------- State dumping/reading
   public:

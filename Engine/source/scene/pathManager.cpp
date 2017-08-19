@@ -102,6 +102,7 @@ void PathManagerEvent::pack(NetConnection*, BitStream* stream)
    stream->write(modifiedPath);
    stream->writeFlag(clearPaths);
    stream->write(path.totalTime);
+   stream->write(path.looping);
    stream->write(path.positions.size());
 
 
@@ -131,6 +132,7 @@ void PathManagerEvent::unpack(NetConnection*, BitStream* stream)
    stream->read(&modifiedPath);
    clearPaths = stream->readFlag();
    stream->read(&path.totalTime);
+   stream->read(&path.looping);
 
    U32 numPoints;
    stream->read(&numPoints);
@@ -231,7 +233,8 @@ void PathManager::updatePath(const U32              id,
                              const Vector<Point3F>& positions,
                              const Vector<QuatF>&   rotations,
                              const Vector<U32>&     times,
-                             const Vector<U32>&     smoothingTypes)
+                             const Vector<U32>&     smoothingTypes,
+                             const bool             looping)
 {
    AssertFatal(mIsServer == true, "PathManager::updatePath: Error, must be called on the server side");
    AssertFatal(id < mPaths.size(), "PathManager::updatePath: error, id out of range");
@@ -243,6 +246,7 @@ void PathManager::updatePath(const U32              id,
    rEntry.rotations = rotations;
    rEntry.msToNext  = times;
    rEntry.smoothingType = smoothingTypes;
+   rEntry.looping = looping;
 
    rEntry.totalTime = 0;
    for (S32 i = 0; i < S32(rEntry.msToNext.size()); i++)
@@ -299,15 +303,33 @@ void PathManager::getPathPosition(const U32 id,
 
    // Ok, query holds our path information...
    F64 ms = msPosition;
-   if (ms > mPaths[id]->totalTime)
-      ms = mPaths[id]->totalTime;
+
+   //Looping vs. non-looping splines
+   F32 msTotal;
+   if(mPaths[id]->looping)
+      msTotal = mPaths[id]->totalTime;
+   else
+      //total time minus last nodes time
+      msTotal = mPaths[id]->totalTime - mPaths[id]->msToNext[mPaths[id]->msToNext.size()-1];
+       
+   if(ms > msTotal)
+      ms = msTotal;
 
    S32 startNode = 0;
    while (ms > mPaths[id]->msToNext[startNode]) {
       ms -= mPaths[id]->msToNext[startNode];
       startNode++;
    }
-   S32 endNode = (startNode + 1) % mPaths[id]->positions.size();
+
+   S32 endNode;
+
+   //Looping splines
+   if(mPaths[id]->looping)
+       endNode = (startNode + 1) % mPaths[id]->positions.size();
+   
+   //Non-looping splines
+   else
+       endNode = getMin(startNode + 1, mPaths[id]->positions.size()-1);
 
    Point3F& rStart = mPaths[id]->positions[startNode];
    Point3F& rEnd   = mPaths[id]->positions[endNode];
@@ -326,10 +348,25 @@ void PathManager::getPathPosition(const U32 id,
    {
       S32 preStart = startNode - 1;
       S32 postEnd = endNode + 1;
+
+      //Looping splines
+      if(mPaths[id]->looping)
+      {
       if(postEnd >= mPaths[id]->positions.size())
          postEnd = 0;
       if(preStart < 0)
          preStart = mPaths[id]->positions.size() - 1;
+      }
+
+      //Non-looping splines
+      else
+      {
+          if(postEnd >= mPaths[id]->positions.size())
+              postEnd = mPaths[id]->positions.size() - 1;
+          if(preStart < 0)
+              preStart = 0;
+      }
+
       Point3F p0 = mPaths[id]->positions[preStart];
       Point3F p1 = rStart;
       Point3F p2 = rEnd;
@@ -430,5 +467,84 @@ bool PathManager::readState(BitStream* stream)
    return stream->getStatus() == Stream::Ok;
 }
 
+F64 PathManager::getClosestTimeToPoint(const U32 id, const Point3F p)
+{
+    //Ubiq: Ideally this algorithm would work directly by finding roots. However, it's a 5th order 
+    //polynomial (cannot be solved by radicals), so we're doing it iteratively instead!
+
+    //Steps:
+    //1) Termination condition: if the segment is shorter than L, return the midpoint
+    //2) Otherwise, divide the spline-segment into S sub-segments (S+1 points to test)
+    //2) Test these points against the given point and find the closest of them
+    //4) Recurse within the 2 segments surrounding the closest point
+
+    //NOTE: In a case where the spline comes near the point multiple times, the wrong local 
+    //minima of the spline may be chosen early on and then refined, like polishing a turd :)
+
+    PROFILE_START(PathManager_getClosestTimeToPoint);
+
+    F64 totalTime;
+    if(mPaths[id]->looping)
+        totalTime = mPaths[id]->totalTime;
+    else
+        totalTime = mPaths[id]->totalTime - mPaths[id]->msToNext[mPaths[id]->msToNext.size()-1];
+
+    F64 ret = getClosestTimeToPoint(id, p, 0.0f, totalTime);
+
+    PROFILE_END();
+
+    return ret;
+}
+
+F64 PathManager::getClosestTimeToPoint(const U32 id, const Point3F p, const F64 tMin, const F64 tMax)
+{
+    F64 totalSize = tMax - tMin;
+
+    //termination condition
+    if(totalSize <= 25.0f)
+        return (tMin + tMax)/2.0f;
+    
+    U32 steps = getMax((F32)totalSize / 500.0f, 8.0f);
+    F64 stepSize = totalSize / steps;
+
+    F64 distBest = F32_MAX;
+    F64 tBest = 0;
+
+    for(U32 i = 0; i <= steps; i++)
+    {
+        F64 tTest = tMin + (stepSize * i);
+        Point3F pTest; QuatF dummy;
+        getPathPosition(id, tTest, pTest, dummy);
+
+        F64 dist = (pTest - p).lenSquared();    //no need for square root
+        if(dist < distBest)
+        {
+            tBest = tTest;
+            distBest = dist;
+        }
+    }
+
+    F64 tMinNew = tBest - stepSize;
+    F64 tMaxNew = tBest + stepSize;
+    if(mPaths[id]->looping)
+    {
+        while(tMinNew < 0)
+        {
+            tMinNew += getPathTotalTime(id);
+            tMaxNew += getPathTotalTime(id);
+        }
+        while(tMaxNew > getPathTotalTime(id))
+        {
+            tMinNew -= getPathTotalTime(id);
+            tMaxNew -= getPathTotalTime(id);
+        }
+    }
+    else
+    {
+        tMinNew = getMax(tMin, tMinNew);
+        tMaxNew = getMin(tMax, tMaxNew);
+    }
+    return getClosestTimeToPoint(id, p, tMinNew, tMaxNew);
+}
 
 
