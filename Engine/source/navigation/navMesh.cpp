@@ -654,6 +654,7 @@ bool NavMesh::build(bool background, bool saveIntermediates)
    mCurLinkID = 0;
 
    mSaveIntermediates = saveIntermediates;
+   //mSaveIntermediates = saveIntermediates;
 
    updateTiles(true);
 
