@@ -653,7 +653,6 @@ bool NavMesh::build(bool background, bool saveIntermediates)
    mLinksUnsynced.fill(false);
    mCurLinkID = 0;
 
-   mSaveIntermediates = saveIntermediates;
    //mSaveIntermediates = saveIntermediates;
 
    updateTiles(true);
