@@ -53,7 +53,7 @@ public:
 
    GFXTexHandle mStagingTexture; ///< Texture used by openvr
 
-   ColorF mOverlayColor;
+   LinearColorF mOverlayColor;
 
    bool mOverlayTypeDirty; ///< Overlay type is dirty
    bool mOverlayDirty; ///< Overlay properties are dirty
