@@ -430,7 +430,7 @@ bool OpenVRRenderState::setupRenderTargets(GFXDevice::GFXDeviceRenderStyles mode
    }
 
    GFXTexHandle stereoTexture;
-   stereoTexture.set(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8, &VRTextureProfile, "OpenVR Stereo RT Color");
+   stereoTexture.set(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8_SRGB, &VRTextureProfile, "OpenVR Stereo RT Color");
    mStereoRenderTexture = stereoTexture;
 
    GFXTexHandle stereoDepthTexture;
@@ -441,7 +441,7 @@ bool OpenVRRenderState::setupRenderTargets(GFXDevice::GFXDeviceRenderStyles mode
    mStereoRT->attachTexture(GFXTextureTarget::Color0, stereoTexture);
    mStereoRT->attachTexture(GFXTextureTarget::DepthStencil, stereoDepthTexture);
 
-   mOutputEyeTextures.init(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8, &VRTextureProfile, "OpenVR Stereo RT Color OUTPUT");
+   mOutputEyeTextures.init(newRTSize.x, newRTSize.y, GFXFormatR8G8B8A8_SRGB, &VRTextureProfile, "OpenVR Stereo RT Color OUTPUT");
 
    return true;
 }
