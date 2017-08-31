@@ -51,11 +51,11 @@ struct sqlite_resultrow
 
 struct sqlite_resultset
 {
-   int                           iResultSet;
-   int                           iCurrentRow;
-   int                           iCurrentColumn;
-   int                           iNumRows;
-   int                           iNumCols;
+   S32                           iResultSet;
+   S32                           iCurrentRow;
+   S32                           iCurrentColumn;
+   S32                           iNumRows;
+   S32                           iNumCols;
    bool                          bValid;
    VectorPtr<sqlite_resultrow*>  vRows;
 };
@@ -92,20 +92,20 @@ class SQLiteObject : public SimObject
       // the onOpened() script callback.
       bool OpenDatabase(const char* filename);
       void CloseDatabase();
-	  int loadOrSaveDb(const char *zFilename, bool isSave);//This code courtesy of sqlite.org.
-      int ExecuteSQL(const char* sql);
-      void NextRow(int resultSet);
-      bool EndOfResult(int resultSet);
+	  S32 loadOrSaveDb(const char *zFilename, bool isSave);//This code courtesy of sqlite.org.
+      S32 ExecuteSQL(const char* sql);
+      void NextRow(S32 resultSet);
+      bool EndOfResult(S32 resultSet);
 	  void escapeSingleQuotes(const char* source, char *dest);
 
       // support functions
       void ClearErrorString();
-      void ClearResultSet(int index);
-      sqlite_resultset* GetResultSet(int iResultSet);
+      void ClearResultSet(S32 index);
+      sqlite_resultset* GetResultSet(S32 iResultSet);
       bool SaveResultSet(sqlite_resultset* pResultSet);
-      int GetResultSetIndex(int iResultSet);
-      int GetColumnIndex(int iResult, const char* columnName);
-	  int numResultSets();
+      S32 GetResultSetIndex(S32 iResultSet);
+      S32 GetColumnIndex(S32 iResult, const char* columnName);
+	  S32 numResultSets();
 
 	  //Prepared Statements! We need a way to make them and extend them to script.
 	  //void prepareStatement(sqlite3_stmt*,);
@@ -117,8 +117,8 @@ class SQLiteObject : public SimObject
    private:
       char*                         m_szErrorString;
       VectorPtr<sqlite_resultset*>  m_vResultSets;
-      int                           m_iLastResultSet;
-      int                           m_iNextResultSet;
+      S32                           m_iLastResultSet;
+      S32                           m_iNextResultSet;
 	  
 
    // This macro ties us into the script engine, and MUST MUST MUST be declared
@@ -127,7 +127,7 @@ class SQLiteObject : public SimObject
    //--------------------------------------------------------------------------
    public:
    DECLARE_CONOBJECT(SQLiteObject);
-	int getLastRowId() { return sqlite3_last_insert_rowid(m_pDatabase); };
+	S32 getLastRowId() { return sqlite3_last_insert_rowid(m_pDatabase); };
    //--------------------------------------------------------------------------
 };
 

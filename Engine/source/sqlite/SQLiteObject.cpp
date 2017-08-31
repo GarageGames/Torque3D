@@ -36,17 +36,17 @@
 #include "console/engineAPI.h"
 
 #include "console/consoleInternal.h"
-#include <STDLIB.H>
+#include <cstdlib>
 
 IMPLEMENT_CONOBJECT(SQLiteObject);
 
 
 SQLiteObject::SQLiteObject()
 {
-		m_pDatabase = NULL;
-		m_szErrorString = NULL;
-		m_iLastResultSet = 0;
-		m_iNextResultSet = 1;
+   m_pDatabase = NULL;
+   m_szErrorString = NULL;
+   m_iLastResultSet = 0;
+   m_iNextResultSet = 1;
 }
 
 SQLiteObject::~SQLiteObject()
@@ -63,8 +63,8 @@ SQLiteObject::~SQLiteObject()
 	// So (HACK HACK HACK) what i'm doing for now is making a temporary vector that
 	// contains a list of the result sets that the user hasn't cleaned up.
 	// Clean up all those result sets, then delete the temp vector.
-	Vector<int> vTemp;
-	Vector<int>::iterator iTemp;
+	Vector<S32> vTemp;
+	Vector<S32>::iterator iTemp;
 
 	VectorPtr<sqlite_resultset*>::iterator i;
 	for (i = m_vResultSets.begin(); i != m_vResultSets.end(); i++)
@@ -89,8 +89,6 @@ bool SQLiteObject::processArguments(S32 argc, const char **argv)
 		return true;
 	else
 		return true;
-
-	return false;
 }
 
 bool SQLiteObject::onAdd()
@@ -131,7 +129,7 @@ void SQLiteObject::initPersistFields()
 // These functions below are our custom functions that we will tie into
 // script.
 
-int Callback(void *pArg, int argc, char **argv, char **columnNames)
+S32 Callback(void *pArg, S32 argc, char **argv, char **columnNames)
 {
 	// basically this callback is called for each row in the SQL query result.
 	// for each row, argc indicates how many columns are returned.
@@ -142,7 +140,7 @@ int Callback(void *pArg, int argc, char **argv, char **columnNames)
 	sqlite_resultset* pResultSet;
 	char* name;
 	char* value;
-	int i;
+	S32 i;
 
 	if (argc == 0)
 		return 0;
@@ -196,7 +194,7 @@ bool SQLiteObject::OpenDatabase(const char* filename)
 	 // we need to clear what we have to avoid a memory leak.  
 	ClearErrorString();
 
-	int isOpen = sqlite3_open(filename, &m_pDatabase);
+	S32 isOpen = sqlite3_open(filename, &m_pDatabase);
 	if (isOpen == SQLITE_ERROR)
 	{
 		// there was an error and the database could not  
@@ -211,16 +209,16 @@ bool SQLiteObject::OpenDatabase(const char* filename)
 		Con::executef(this, "1", "onOpened()");
 
 		//Now, for OpenSimEarth, load spatialite dll, so we can have GIS functions.
-		//int canLoadExt = sqlite3_load_extension(m_pDatabase,"mod_spatialite.dll",0,0);
+		//S32 canLoadExt = sqlite3_load_extension(m_pDatabase,"mod_spatialite.dll",0,0);
 		//Con::printf("opened spatialite extension: %d",canLoadExt);
 		//Sigh, no luck yet. Cannot find function GeomFromText().
 	}
 	return true;
 }
 
-int SQLiteObject::ExecuteSQL(const char* sql)
+S32 SQLiteObject::ExecuteSQL(const char* sql)
 {
-	int iResult;
+	S32 iResult;
 	sqlite_resultset* pResultSet;
 
 	// create a new resultset
@@ -287,8 +285,9 @@ void SQLiteObject::CloseDatabase()
 ** If the operation is successful, SQLITE_OK is returned. Otherwise, if
 ** an error occurs, an SQLite error code is returned.
 */
-int SQLiteObject::loadOrSaveDb(const char *zFilename, bool isSave) {
-	int rc;                   /* Function return code */
+S32 SQLiteObject::loadOrSaveDb(const char *zFilename, bool isSave) 
+{
+	S32 rc;                   /* Function return code */
 	sqlite3 *pFile;           /* Database connection opened on zFilename */
 	sqlite3_backup *pBackup;  /* Backup object used to copy data */
 	sqlite3 *pTo;             /* Database to copy to (pFile or pInMemory) */
@@ -355,7 +354,7 @@ int SQLiteObject::loadOrSaveDb(const char *zFilename, bool isSave) {
 		return false;
 }
 
-void SQLiteObject::NextRow(int resultSet)
+void SQLiteObject::NextRow(S32 resultSet)
 {
 	sqlite_resultset* pResultSet;
 
@@ -366,7 +365,7 @@ void SQLiteObject::NextRow(int resultSet)
 	pResultSet->iCurrentRow++;
 }
 
-bool SQLiteObject::EndOfResult(int resultSet)
+bool SQLiteObject::EndOfResult(S32 resultSet)
 {
 	sqlite_resultset* pResultSet;
 
@@ -388,14 +387,13 @@ void SQLiteObject::ClearErrorString()
 	m_szErrorString = NULL;
 }
 
-void SQLiteObject::ClearResultSet(int index)
+void SQLiteObject::ClearResultSet(S32 index)
 {
 	if (index <= 0)
 		return;
 
 	sqlite_resultset* resultSet;
-	sqlite_resultrow* resultRow;
-	S32 rows, cols, iResultSet;
+	S32 iResultSet;
 
 	// Get the result set specified by index
 	resultSet = GetResultSet(index);
@@ -436,7 +434,7 @@ void SQLiteObject::ClearResultSet(int index)
 	m_vResultSets.erase_fast(iResultSet);
 }
 
-sqlite_resultset* SQLiteObject::GetResultSet(int iResultSet)
+sqlite_resultset* SQLiteObject::GetResultSet(S32 iResultSet)
 {
 	// Get the result set specified by iResultSet
 	VectorPtr<sqlite_resultset*>::iterator i;
@@ -449,9 +447,9 @@ sqlite_resultset* SQLiteObject::GetResultSet(int iResultSet)
 	return *i;
 }
 
-int SQLiteObject::GetResultSetIndex(int iResultSet)
+S32 SQLiteObject::GetResultSetIndex(S32 iResultSet)
 {
-	int iIndex;
+	S32 iIndex;
 	// Get the result set specified by iResultSet
 	VectorPtr<sqlite_resultset*>::iterator i;
 	iIndex = 0;
@@ -474,9 +472,9 @@ bool SQLiteObject::SaveResultSet(sqlite_resultset* pResultSet)
 	return true;
 }
 
-int SQLiteObject::GetColumnIndex(int iResult, const char* columnName)
+S32 SQLiteObject::GetColumnIndex(S32 iResult, const char* columnName)
 {
-	int iIndex;
+	S32 iIndex;
 	VectorPtr<char*>::iterator i;
 	sqlite_resultset* pResultSet;
 	sqlite_resultrow* pRow;
@@ -500,7 +498,7 @@ int SQLiteObject::GetColumnIndex(int iResult, const char* columnName)
 	return 0;
 }
 
-int SQLiteObject::numResultSets()
+S32 SQLiteObject::numResultSets()
 {
 	return m_vResultSets.size();
 }
@@ -535,7 +533,7 @@ ConsoleMethod(SQLiteObject, closeDatabase, void, 2, 2, "Closes the active databa
 	object->CloseDatabase();
 }
 
-ConsoleMethod(SQLiteObject, query, S32, 4, 0, "(const char* sql, int mode) Performs an SQL query on the open database and returns an identifier to a valid result set. mode is currently unused, and is reserved for future use.")
+ConsoleMethod(SQLiteObject, query, S32, 4, 0, "(const char* sql, S32 mode) Performs an SQL query on the open database and returns an identifier to a valid result set. mode is currently unused, and is reserved for future use.")
 {
 	S32 iCount;
 	S32 iIndex, iLen, iNewIndex, iArg, iArgLen, i;
@@ -614,12 +612,12 @@ ConsoleMethod(SQLiteObject, query, S32, 4, 0, "(const char* sql, int mode) Perfo
 	return 0;
 }
 
-ConsoleMethod(SQLiteObject, clearResult, void, 3, 3, "(int resultSet) Clears memory used by the specified result set, and deletes the result set.")
+ConsoleMethod(SQLiteObject, clearResult, void, 3, 3, "(S32 resultSet) Clears memory used by the specified result set, and deletes the result set.")
 {
 	object->ClearResultSet(dAtoi(argv[2]));
 }
 
-ConsoleMethod(SQLiteObject, nextRow, void, 3, 3, "(int resultSet) Moves the result set's row pointer to the next row.")
+ConsoleMethod(SQLiteObject, nextRow, void, 3, 3, "(S32 resultSet) Moves the result set's row pointer to the next row.")
 {
 	sqlite_resultset* pResultSet;
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -629,7 +627,7 @@ ConsoleMethod(SQLiteObject, nextRow, void, 3, 3, "(int resultSet) Moves the resu
 	}
 }
 
-ConsoleMethod(SQLiteObject, previousRow, void, 3, 3, "(int resultSet) Moves the result set's row pointer to the previous row")
+ConsoleMethod(SQLiteObject, previousRow, void, 3, 3, "(S32 resultSet) Moves the result set's row pointer to the previous row")
 {
 	sqlite_resultset* pResultSet;
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -639,7 +637,7 @@ ConsoleMethod(SQLiteObject, previousRow, void, 3, 3, "(int resultSet) Moves the 
 	}
 }
 
-ConsoleMethod(SQLiteObject, firstRow, void, 3, 3, "(int resultSet) Moves the result set's row pointer to the very first row in the result set.")
+ConsoleMethod(SQLiteObject, firstRow, void, 3, 3, "(S32 resultSet) Moves the result set's row pointer to the very first row in the result set.")
 {
 	sqlite_resultset* pResultSet;
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -649,7 +647,7 @@ ConsoleMethod(SQLiteObject, firstRow, void, 3, 3, "(int resultSet) Moves the res
 	}
 }
 
-ConsoleMethod(SQLiteObject, lastRow, void, 3, 3, "(int resultSet) Moves the result set's row pointer to the very last row in the result set.")
+ConsoleMethod(SQLiteObject, lastRow, void, 3, 3, "(S32 resultSet) Moves the result set's row pointer to the very last row in the result set.")
 {
 	sqlite_resultset* pResultSet;
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -659,7 +657,7 @@ ConsoleMethod(SQLiteObject, lastRow, void, 3, 3, "(int resultSet) Moves the resu
 	}
 }
 
-ConsoleMethod(SQLiteObject, setRow, void, 4, 4, "(int resultSet int row) Moves the result set's row pointer to the row specified.  Row indices start at 1 not 0.")
+ConsoleMethod(SQLiteObject, setRow, void, 4, 4, "(S32 resultSet S32 row) Moves the result set's row pointer to the row specified.  Row indices start at 1 not 0.")
 {
 	sqlite_resultset* pResultSet;
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -669,7 +667,7 @@ ConsoleMethod(SQLiteObject, setRow, void, 4, 4, "(int resultSet int row) Moves t
 	}
 }
 
-ConsoleMethod(SQLiteObject, getRow, S32, 3, 3, "(int resultSet) Returns what row the result set's row pointer is currently on.")
+ConsoleMethod(SQLiteObject, getRow, S32, 3, 3, "(S32 resultSet) Returns what row the result set's row pointer is currently on.")
 {
 	sqlite_resultset* pResultSet;
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -681,7 +679,7 @@ ConsoleMethod(SQLiteObject, getRow, S32, 3, 3, "(int resultSet) Returns what row
 		return 0;
 }
 
-ConsoleMethod(SQLiteObject, numRows, S32, 3, 3, "(int resultSet) Returns the number of rows in the result set.")
+ConsoleMethod(SQLiteObject, numRows, S32, 3, 3, "(S32 resultSet) Returns the number of rows in the result set.")
 {
 	sqlite_resultset* pResultSet;
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -693,7 +691,7 @@ ConsoleMethod(SQLiteObject, numRows, S32, 3, 3, "(int resultSet) Returns the num
 		return 0;
 }
 
-ConsoleMethod(SQLiteObject, numColumns, S32, 3, 3, "(int resultSet) Returns the number of columns in the result set.")
+ConsoleMethod(SQLiteObject, numColumns, S32, 3, 3, "(S32 resultSet) Returns the number of columns in the result set.")
 {
 	sqlite_resultset* pResultSet;
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -705,17 +703,17 @@ ConsoleMethod(SQLiteObject, numColumns, S32, 3, 3, "(int resultSet) Returns the 
 		return 0;
 }
 
-ConsoleMethod(SQLiteObject, endOfResult, bool, 3, 3, "(int resultSet) Checks to see if the internal pointer for the specified result set is at the end, indicating there are no more rows left to read.")
+ConsoleMethod(SQLiteObject, endOfResult, bool, 3, 3, "(S32 resultSet) Checks to see if the internal pointer for the specified result set is at the end, indicating there are no more rows left to read.")
 {
 	return object->EndOfResult(dAtoi(argv[2]));
 }
 
-ConsoleMethod(SQLiteObject, EOR, bool, 3, 3, "(int resultSet) Same as endOfResult().")
+ConsoleMethod(SQLiteObject, EOR, bool, 3, 3, "(S32 resultSet) Same as endOfResult().")
 {
 	return object->EndOfResult(dAtoi(argv[2]));
 }
 
-ConsoleMethod(SQLiteObject, EOF, bool, 3, 3, "(int resultSet) Same as endOfResult().")
+ConsoleMethod(SQLiteObject, EOF, bool, 3, 3, "(S32 resultSet) Same as endOfResult().")
 {
 	return object->EndOfResult(dAtoi(argv[2]));
 }
@@ -729,8 +727,6 @@ ConsoleMethod(SQLiteObject, getColumnName, const char *, 4, 4, "(resultSet colum
 {
 	sqlite_resultset* pResultSet;
 	sqlite_resultrow* pRow;
-	VectorPtr<char*>::iterator iName;
-	VectorPtr<char*>::iterator iValue;
 	S32 iColumn;
 
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -759,8 +755,6 @@ ConsoleMethod(SQLiteObject, getColumn, const char *, 4, 4, "(resultSet column) R
 {
 	sqlite_resultset* pResultSet;
 	sqlite_resultrow* pRow;
-	VectorPtr<char*>::iterator iName;
-	VectorPtr<char*>::iterator iValue;
 	S32 iColumn;
 
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
@@ -802,8 +796,6 @@ ConsoleMethod(SQLiteObject, getColumnNumeric, F32, 4, 4, "(resultSet column) Ret
 {
 	sqlite_resultset* pResultSet;
 	sqlite_resultrow* pRow;
-	VectorPtr<char*>::iterator iName;
-	VectorPtr<char*>::iterator iValue;
 	S32 iColumn;
 
 	pResultSet = object->GetResultSet(dAtoi(argv[2]));
