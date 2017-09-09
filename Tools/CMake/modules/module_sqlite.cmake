@@ -20,7 +20,7 @@
 # IN THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-option(TORQUE_SQLITE "Enable sqlite module" ON)
+option(TORQUE_SQLITE "Enable sqlite module" OFF)
 if(TORQUE_SQLITE)
    addPath( "${srcDir}/sqlite" )
    addLib( "sqlite" )
