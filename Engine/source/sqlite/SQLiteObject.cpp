@@ -605,7 +605,7 @@ ConsoleMethod(SQLiteObject, query, S32, 4, 0, "(const char* sql, S32 mode) Perfo
 		}
 		else
 			return 0; // incorrect number of question marks vs arguments
-		Con::printf("Old SQL: %s\nNew SQL: %s", argv[2], szNew);
+		Con::printf("Old SQL: %s\nNew SQL: %s", argv[2].getStringValue(), szNew);
 		return object->ExecuteSQL(szNew);
 	}
 
