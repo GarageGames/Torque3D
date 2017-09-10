@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Copyright (c) 2014 GarageGames, LLC
+# Copyright (c) 2015 GarageGames, LLC
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -20,9 +20,9 @@
 # IN THE SOFTWARE.
 # -----------------------------------------------------------------------------
 
-option(TORQUE_SQLITE "Enable sqlite module" OFF)
-if(TORQUE_SQLITE)
-   addPath( "${srcDir}/sqlite" )
-   addLib( "sqlite" )
-   addInclude( "${libDir}/sqlite" )
-endif()
+project(sqlite)
+
+addPath("${libDir}/sqlite")
+addInclude("${libDir}/sqlite")
+
+finishLibrary()
