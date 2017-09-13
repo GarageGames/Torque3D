@@ -113,9 +113,9 @@ bool GuiChunkedBitmapCtrl::onWake()
             || ( mUseVariable && mConsoleVariable && mConsoleVariable[ 0 ] ) ) )
    {
       if ( mUseVariable )
-         mTexHandle.set( Con::getVariable( mConsoleVariable ), &GFXDefaultGUIProfile, avar("%s() - mTexHandle (line %d)", __FUNCTION__, __LINE__) );
+         mTexHandle.set( Con::getVariable( mConsoleVariable ), &GFXTexturePersistentSRGBProfile, avar("%s() - mTexHandle (line %d)", __FUNCTION__, __LINE__) );
       else
-         mTexHandle.set( mBitmapName, &GFXDefaultGUIProfile, avar("%s() - mTexHandle (line %d)", __FUNCTION__, __LINE__) );
+         mTexHandle.set( mBitmapName, &GFXTexturePersistentSRGBProfile, avar("%s() - mTexHandle (line %d)", __FUNCTION__, __LINE__) );
    }
 
    return true;

@@ -518,7 +518,4 @@ DefineEnumType( GuiAlignmentType );
 typedef FontCharset GuiFontCharset;
 DefineEnumType( GuiFontCharset );
 
-GFX_DeclareTextureProfile(GFXGuiCursorProfile);
-GFX_DeclareTextureProfile(GFXDefaultGUIProfile);
-
 #endif //_GUITYPES_H
