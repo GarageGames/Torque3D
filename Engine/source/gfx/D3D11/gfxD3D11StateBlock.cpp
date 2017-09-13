@@ -110,7 +110,9 @@ GFXD3D11StateBlock::GFXD3D11StateBlock(const GFXStateBlockDesc& desc)
    ZeroMemory(&mRasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
    mRasterizerDesc.CullMode = GFXD3D11CullMode[mDesc.cullMode];
    mRasterizerDesc.FillMode = GFXD3D11FillMode[mDesc.fillMode];
-   mRasterizerDesc.DepthBias = mDesc.zBias;
+   //this assumes 24bit depth
+   const INT depthMul = INT((1 << 24) - 1);
+   mRasterizerDesc.DepthBias = mDesc.zBias * depthMul;
    mRasterizerDesc.SlopeScaledDepthBias = mDesc.zSlopeBias;
    mRasterizerDesc.AntialiasedLineEnable = FALSE;
    mRasterizerDesc.MultisampleEnable = FALSE;

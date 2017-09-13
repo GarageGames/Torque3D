@@ -139,16 +139,19 @@ void GFXGLStateBlock::activate(const GFXGLStateBlock* oldState)
    if(STATE_CHANGE(zFunc))
       glDepthFunc(GFXGLCmpFunc[mDesc.zFunc]);
    
-   if(STATE_CHANGE(zBias))
+   if (STATE_CHANGE(zBias))
    {
       if (mDesc.zBias == 0)
       {
          glDisable(GL_POLYGON_OFFSET_FILL);
-      } else {
-         F32 bias = mDesc.zBias * 10000.0f;
+      }
+      else 
+      {
+         //this assumes 24bit depth
+         const F32 depthMul = F32((1 << 24) - 1);
          glEnable(GL_POLYGON_OFFSET_FILL);
-         glPolygonOffset(bias, bias);
-      } 
+         glPolygonOffset(mDesc.zSlopeBias, mDesc.zBias * depthMul);
+      }
    }
    
    if(STATE_CHANGE(zWriteEnable))
