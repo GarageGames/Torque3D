@@ -811,7 +811,7 @@ void TSShapeInstance::MeshObjectInstance::render(  S32 objectDetail,
    // skin is dirty and needs to be updated.  This should result
    // in the skin only updating once per frame in most cases.
    const U32 currTime = Sim::getCurrentTime();
-   bool isSkinDirty = currTime != mLastTime;
+   bool isSkinDirty = (currTime != mLastTime) || (objectDetail != mLastObjectDetail);
 
    // Update active transform list for bones for GPU skinning
    if ( mesh->getMeshType() == TSMesh::SkinMeshType )
@@ -832,7 +832,7 @@ void TSShapeInstance::MeshObjectInstance::render(  S32 objectDetail,
 
    // Update the last render time.
    mLastTime = currTime;
-
+   mLastObjectDetail = objectDetail;
    GFX->popWorldMatrix();
 }
 
@@ -863,9 +863,9 @@ bool TSShapeInstance::MeshObjectInstance::bufferNeedsUpdate( S32 objectDetail )
    return mesh && mesh->getMeshType() == TSMesh::SkinMeshType && currTime != mLastTime;
 }
 
-TSShapeInstance::MeshObjectInstance::MeshObjectInstance() 
-   : meshList(0), object(0), frame(0), matFrame(0),
-     visible(1.0f), forceHidden(false), mLastTime( 0 )
+TSShapeInstance::MeshObjectInstance::MeshObjectInstance()
+	: meshList(0), object(0), frame(0), matFrame(0),
+	visible(1.0f), forceHidden(false), mLastTime(0), mLastObjectDetail(0)
 {
 }
 
