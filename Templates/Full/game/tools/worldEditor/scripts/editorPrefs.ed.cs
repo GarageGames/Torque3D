@@ -128,7 +128,7 @@ EditorSettings.setDefaultValue(  "renderInfoText",          "1"               );
 
 EditorSettings.beginGroup( "Grid" );
 EditorSettings.setDefaultValue(  "gridColor",               "255 255 255 20"  );
-EditorSettings.setDefaultValue(  "gridSize",                "10 10 10"        );
+EditorSettings.setDefaultValue(  "gridSize",                "1 1 1"        );
 EditorSettings.setDefaultValue(  "snapToGrid",              "0"               ); //<-- Not currently used
 EditorSettings.setDefaultValue(  "renderPlane",             "0"               );
 EditorSettings.setDefaultValue(  "renderPlaneHashes",       "0"               );
