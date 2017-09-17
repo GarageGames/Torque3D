@@ -96,6 +96,8 @@ void ShaderGen::initShaderGen()
    if (!mInitDelegates[adapterType])
       return;
 
+   smCommonShaderPath = String(Con::getVariable("$Core::CommonShaderPath", "shaders/common"));
+
    mInitDelegates[adapterType](this);
    mFeatureInitSignal.trigger( adapterType );
    mInit = true;
@@ -125,8 +127,6 @@ void ShaderGen::initShaderGen()
 
    // Delete the auto-generated conditioner include file.
    Torque::FS::Remove( "shadergen:/" + ConditionerFeature::ConditionerIncludeFileName );
-
-   smCommonShaderPath = String(Con::getVariable("$Core::CommonShaderPath", "shaders/common"));
 }
 
 void ShaderGen::generateShader( const MaterialFeatureData &featureData,
