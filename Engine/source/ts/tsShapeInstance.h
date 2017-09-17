@@ -157,7 +157,7 @@ class TSShapeInstance
       S32 frame;
       S32 matFrame;
       F32 visible;
-      
+      S32 mLastObjectDetail;
       /// If true this mesh is forced to be hidden
       /// regardless of the animation state.
       bool forceHidden;
