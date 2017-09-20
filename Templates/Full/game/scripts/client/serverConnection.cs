@@ -54,9 +54,7 @@ function GameConnection::initialControlSet(%this)
    if (!isToolBuild() || !Editor::checkActiveLoadDone())
    {
       if (Canvas.getContent() != PlayGui.getId())
-      {
-         Canvas.setContent(PlayGui);
-      }
+         Canvas.schedule(500, "setContent", "PlayGui");	//Ubiq: wait 1/2 second for cameras to finish ghosting
    }
 }
 
@@ -70,51 +68,12 @@ function GameConnection::onControlObjectChange(%this)
    turnOffZoom();
 }
 
-function GameConnection::setLagIcon(%this, %state)
-{
-   if (%this.getAddress() $= "local")
-      return;
-   LagIcon.setVisible(%state $= "true");
-}
-
-function GameConnection::onFlash(%this, %state)
-{
-   if (isObject(FlashFx))
-   {
-      if (%state)
-      {
-         FlashFx.enable();
-      }
-      else
-      {
-         FlashFx.disable();
-      }
-   }
-}
-
 // Called on the new connection object after connect() succeeds.
 function GameConnection::onConnectionAccepted(%this)
 {
-   // Called on the new connection object after connect() succeeds.
-   LagIcon.setVisible(false);
-   
-   // Startup the physics world on the client before any
+   // Startup the physX world on the client before any
    // datablocks and objects are ghosted over.
    physicsInitWorld( "client" );   
-}
-
-function GameConnection::onConnectionTimedOut(%this)
-{
-   // Called when an established connection times out
-   disconnectedCleanup();
-   MessageBoxOK( "TIMED OUT", "The server connection has timed out.");
-}
-
-function GameConnection::onConnectionDropped(%this, %msg)
-{
-   // Established connection was dropped by the server
-   disconnectedCleanup();
-   MessageBoxOK( "DISCONNECT", "The server has dropped the connection: " @ %msg);
 }
 
 function GameConnection::onConnectionError(%this, %msg)
@@ -125,52 +84,6 @@ function GameConnection::onConnectionError(%this, %msg)
    disconnectedCleanup();
    MessageBoxOK( "DISCONNECT", $ServerConnectionErrorMessage @ " (" @ %msg @ ")" );
 }
-
-
-//----------------------------------------------------------------------------
-// Connection Failed Events
-//----------------------------------------------------------------------------
-
-function GameConnection::onConnectRequestRejected( %this, %msg )
-{
-   switch$(%msg)
-   {
-      case "CR_INVALID_PROTOCOL_VERSION":
-         %error = "Incompatible protocol version: Your game version is not compatible with this server.";
-      case "CR_INVALID_CONNECT_PACKET":
-         %error = "Internal Error: badly formed network packet";
-      case "CR_YOUAREBANNED":
-         %error = "You are not allowed to play on this server.";
-      case "CR_SERVERFULL":
-         %error = "This server is full.";
-      case "CHR_PASSWORD":
-         // XXX Should put up a password-entry dialog.
-         if ($Client::Password $= "")
-            MessageBoxOK( "REJECTED", "That server requires a password.");
-         else {
-            $Client::Password = "";
-            MessageBoxOK( "REJECTED", "That password is incorrect.");
-         }
-         return;
-      case "CHR_PROTOCOL":
-         %error = "Incompatible protocol version: Your game version is not compatible with this server.";
-      case "CHR_CLASSCRC":
-         %error = "Incompatible game classes: Your game version is not compatible with this server.";
-      case "CHR_INVALID_CHALLENGE_PACKET":
-         %error = "Internal Error: Invalid server response packet";
-      default:
-         %error = "Connection error.  Please try another server.  Error code: (" @ %msg @ ")";
-   }
-   disconnectedCleanup();
-   MessageBoxOK( "REJECTED", %error);
-}
-
-function GameConnection::onConnectRequestTimedOut(%this)
-{
-   disconnectedCleanup();
-   MessageBoxOK( "TIMED OUT", "Your connection to the server timed out." );
-}
-
 
 //-----------------------------------------------------------------------------
 // Disconnect
@@ -204,17 +117,6 @@ function disconnectedCleanup()
    
    $lightingMission = false;
    $sceneLighting::terminateLighting = true;
-   
-   // Clear misc script stuff
-   HudMessageVector.clear();
-   
-   //
-   LagIcon.setVisible(false);
-   PlayerListGui.clear();
-   
-   // Clear all print messages
-   clientCmdclearBottomPrint();
-   clientCmdClearCenterPrint();
 
    // Back to the launch screen
    if (isObject( MainMenuGui ))

@@ -1,0 +1,317 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:02 AM</created>
+        <modified>15/05/2013 2:11:02 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_SQUARE-Diffuse" name="DESERT_BRICK_SQUARE-Diffuse">
+            <init_from>DESERT_BRICK_SQUARE.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+        <material id="DESERT_BRICK_SQUARE" name="DESERT_BRICK_SQUARE">
+            <instance_effect url="#DESERT_BRICK_SQUARE-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_SQUARE-fx" name="DESERT_BRICK_SQUARE-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_SQUARE-Surface"><surface type="2D"><init_from>DESERT_BRICK_SQUARE-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_SQUARE-Sampler"><sampler2D><source>DESERT_BRICK_SQUARE-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_SQUARE-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="bridge_structure_platform02-lib" name="bridge_structure_platform02Mesh">
+            <mesh>
+                <source id="bridge_structure_platform02-Position">
+                    <float_array count="108" id="bridge_structure_platform02-Position-array">
+                        110.8649 -31.7363 -16.4902
+                        111.6070 -31.7363 -16.4902
+                        110.8649 -31.7363 -15.7124
+                        111.6070 -31.7363 -15.7124
+                        110.8649 -39.1905 -15.7124
+                        111.6070 -39.1905 -15.7124
+                        110.8649 -39.1905 -16.4902
+                        111.6070 -39.1905 -16.4902
+                        104.3586 -32.4783 -16.4902
+                        104.3586 -31.7362 -16.4902
+                        104.3586 -32.4783 -15.7124
+                        104.3586 -31.7362 -15.7124
+                        110.8649 -32.4783 -15.7124
+                        110.8649 -32.4783 -16.4902
+                        90.5937 -39.1905 -15.7124
+                        90.5937 -38.4485 -15.7124
+                        110.8649 -38.4485 -15.7124
+                        90.5937 -39.1905 -16.4902
+                        90.5937 -38.4485 -16.4902
+                        110.8649 -38.4485 -16.4902
+                        97.1000 -32.4783 -15.7124
+                        97.1000 -32.4783 -16.4902
+                        97.1000 -38.4485 -15.7124
+                        97.1000 -38.4485 -16.4902
+                        97.1000 -26.3436 -15.7124
+                        97.1000 -27.0856 -15.7124
+                        90.5937 -26.3436 -15.7124
+                        90.5937 -27.0856 -15.7124
+                        90.5937 -27.0856 -16.4902
+                        97.1000 -27.0856 -16.4902
+                        90.5937 -26.3436 -16.4902
+                        97.1000 -26.3436 -16.4902
+                        89.8516 -26.3436 -16.4902
+                        89.8516 -26.3436 -15.7124
+                        89.8516 -39.1905 -15.7124
+                        89.8516 -39.1905 -16.4902
+                    </float_array>
+                    <technique_common>
+                        <accessor count="36" source="#bridge_structure_platform02-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_platform02-Normal">
+                    <float_array count="18" id="bridge_structure_platform02-Normal-array">
+                        0.0000 1.0000 0.0000
+                        0.0000 0.0000 1.0000
+                        0.0000 0.0000 -1.0000
+                        0.0000 -1.0000 0.0000
+                        1.0000 0.0000 0.0000
+                        -1.0000 -0.0000 -0.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="6" source="#bridge_structure_platform02-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_platform02-UV0">
+                    <float_array count="150" id="bridge_structure_platform02-UV0-array">
+                        0.3286 -1.7500
+                        0.5544 -1.7500
+                        0.3286 -2.0000
+                        0.5544 -2.0000
+                        -10.5542 -1.9978
+                        -10.5542 -2.2519
+                        -12.8850 -1.9978
+                        -12.8850 -2.2519
+                        -12.8854 -1.7494
+                        -12.8854 -1.5022
+                        -10.5546 -1.7489
+                        -10.5546 -1.5017
+                        0.3286 -1.2500
+                        0.5544 -1.2500
+                        0.3286 -1.5000
+                        0.5544 -1.5000
+                        -12.8853 -1.5022
+                        -12.8853 -1.2515
+                        -10.5544 -1.5013
+                        -10.5544 -1.2506
+                        0.3285 -1.7500
+                        0.5543 -1.7500
+                        0.3285 -2.0000
+                        0.5543 -2.0000
+                        -12.4489 -2.2517
+                        -12.4489 -1.9977
+                        -10.5545 -2.2517
+                        -10.5545 -1.9977
+                        -10.5544 -1.7490
+                        -12.4488 -1.7494
+                        -10.5544 -1.5017
+                        -12.4488 -1.5022
+                        -12.4488 -1.2515
+                        -7.9980 -1.9977
+                        -7.9980 -2.2518
+                        -14.1098 -1.9977
+                        -14.1098 -2.2518
+                        -7.9980 -1.7488
+                        -14.1097 -1.7494
+                        -14.1098 -1.9984
+                        -7.9979 -1.7489
+                        -7.9979 -1.5017
+                        -14.1097 -1.5022
+                        1.0012 -1.5187
+                        1.0012 -3.4963
+                        0.7512 -1.5187
+                        0.7512 -3.4963
+                        -1.2536 -2.9582
+                        -1.2536 -1.4945
+                        2.5067 -2.9582
+                        2.5067 -1.4945
+                        -1.2537 -1.4945
+                        -1.2537 -2.9582
+                        2.5065 -1.4945
+                        2.5065 -2.9582
+                        0.5543 -1.2500
+                        0.5543 -1.5000
+                        -14.5562 -2.2518
+                        -14.5562 -1.9978
+                        -14.5561 -1.9984
+                        -14.5561 -1.7494
+                        -10.5544 -1.7488
+                        -14.5562 -1.7493
+                        -10.5545 -1.5016
+                        -14.5562 -1.5021
+                        0.3285 -1.2500
+                        0.3285 -1.5000
+                        -0.4994 -4.4886
+                        -0.7494 -4.4886
+                        -0.4994 -3.0754
+                        -0.7494 -3.0754
+                        2.2537 -0.1561
+                        2.2537 -2.9582
+                        0.5014 -0.1561
+                        0.5014 -2.9582
+</float_array>
+                    <technique_common>
+                        <accessor count="75" source="#bridge_structure_platform02-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="bridge_structure_platform02-Vertex">
+                    <input semantic="POSITION" source="#bridge_structure_platform02-Position" />
+                </vertices>
+                <triangles count="42" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_platform02-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_platform02-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_platform02-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        5 1 7 3 1 5 2 1 4
+                        4 1 6 5 1 7 2 1 4
+                        1 2 11 7 2 9 6 2 8
+                        0 2 10 1 2 11 6 2 8
+                        7 3 15 5 3 13 4 3 12
+                        6 3 14 7 3 15 4 3 12
+                        3 4 19 5 4 17 7 4 16
+                        1 4 18 3 4 19 7 4 16
+                        11 5 23 9 5 21 8 5 20
+                        10 5 22 11 5 23 8 5 20
+                        10 1 27 12 1 25 2 1 24
+                        11 1 26 10 1 27 2 1 24
+                        0 2 31 13 2 29 8 2 28
+                        9 2 30 0 2 31 8 2 28
+                        2 0 32 0 0 31 9 0 18
+                        11 0 19 2 0 32 9 0 18
+                        16 1 36 15 1 34 14 1 33
+                        4 1 35 16 1 36 14 1 33
+                        4 3 39 14 3 33 17 3 37
+                        6 3 38 4 3 39 17 3 37
+                        19 2 42 6 2 38 17 2 40
+                        18 2 41 19 2 42 17 2 40
+                        27 1 27 25 1 25 24 1 24
+                        26 1 26 27 1 27 24 1 24
+                        31 2 31 29 2 29 28 2 28
+                        30 2 30 31 2 31 28 2 28
+                        31 4 56 24 4 55 25 4 12
+                        29 4 14 31 4 56 25 4 12
+                        24 0 32 31 0 31 30 0 18
+                        26 0 19 24 0 32 30 0 18
+                        26 0 23 30 0 21 32 0 20
+                        33 0 22 26 0 23 32 0 20
+                        33 1 27 34 1 58 14 1 57
+                        26 1 26 33 1 27 14 1 57
+                        32 5 61 35 5 60 34 5 59
+                        33 5 27 32 5 61 34 5 59
+                        17 2 64 35 2 62 32 2 61
+                        30 2 63 17 2 64 32 2 61
+                        17 3 56 14 3 55 34 3 65
+                        35 3 66 17 3 56 34 3 65
+                    </p>
+                </triangles>
+                <triangles count="12" material="DESERT_BRICK_SQUARE">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_platform02-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_platform02-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_platform02-UV0" />
+                    <p>
+                        21 0 46 20 0 44 10 0 43
+                        8 0 45 21 0 46 10 0 43
+                        12 1 50 20 1 48 22 1 47
+                        16 1 49 12 1 50 22 1 47
+                        19 2 54 23 2 52 21 2 51
+                        13 2 53 19 2 54 21 2 51
+                        21 4 70 29 4 68 25 4 67
+                        20 4 69 21 4 70 25 4 67
+                        15 1 74 22 1 72 25 1 71
+                        27 1 73 15 1 74 25 1 71
+                        28 2 73 29 2 71 23 2 72
+                        18 2 74 28 2 73 23 2 72
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="bridge_structure_platform02" name="bridge_structure_platform02">
+                <instance_geometry url="#bridge_structure_platform02-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                            <instance_material symbol="DESERT_BRICK_SQUARE" target="#DESERT_BRICK_SQUARE" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

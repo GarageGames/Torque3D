@@ -1,4 +1,10 @@
 //-----------------------------------------------------------------------------
+// 3D Action Adventure Kit for T3D
+// Copyright (C) 2008-2013 Ubiq Visuals, Inc. (http://www.ubiqvisuals.com/)
+//
+// This file also incorporates work covered by the following copyright and  
+// permission notice:
+//
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,72 +26,30 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+
+
 //----------------------------------------------------------------------------
 // Player Audio Profiles
 //----------------------------------------------------------------------------
 
 datablock SFXProfile(DeathCrySound)
 {
-   fileName = "art/sound/orc_death";
-   description = AudioClose3d;
+   fileName = "art/sound/player/player_death01.ogg";
+   description = AudioDefault3d;
    preload = true;
 };
 
 datablock SFXProfile(PainCrySound)
 {
-   fileName = "art/sound/orc_pain";
-   description = AudioClose3d;
+   fileName = "art/sound/player/player_pain.ogg";
+   description = AudioDefault3d;
    preload = true;
 };
 
-//----------------------------------------------------------------------------
-
-datablock SFXProfile(FootLightSoftSound)
+datablock SFXProfile(playerWaterSplash)
 {
-   filename    = "art/sound/lgtStep_mono_01";
-   description = AudioClosest3d;
-   preload = true;
-};
-
-datablock SFXProfile(FootLightHardSound)
-{
-   filename    = "art/sound/hvystep_ mono_01";
-   description = AudioClose3d;
-   preload = true;
-};
-
-datablock SFXProfile(FootLightMetalSound)
-{
-   filename    = "art/sound/metalstep_mono_01";
-   description = AudioClose3d;
-   preload = true;
-};
-
-datablock SFXProfile(FootLightSnowSound)
-{
-   filename    = "art/sound/snowstep_mono_01";
-   description = AudioClosest3d;
-   preload = true;
-};
-
-datablock SFXProfile(FootLightShallowSplashSound)
-{
-   filename    = "art/sound/waterstep_mono_01";
-   description = AudioClose3d;
-   preload = true;
-};
-
-datablock SFXProfile(FootLightWadingSound)
-{
-   filename    = "art/sound/waterstep_mono_01";
-   description = AudioClose3d;
-   preload = true;
-};
-
-datablock SFXProfile(FootLightUnderwaterSound)
-{
-   filename    = "art/sound/waterstep_mono_01";
-   description = AudioClosest3d;
+   filename    = "art/sound/player/player_water_splash01.ogg";
+   description = AudioDefault3d;
    preload = true;
 };
 
@@ -93,100 +57,24 @@ datablock SFXProfile(FootLightUnderwaterSound)
 // Splash
 //----------------------------------------------------------------------------
 
-datablock ParticleData(PlayerSplashMist)
-{
-   dragCoefficient      = 2.0;
-   gravityCoefficient   = -0.05;
-   inheritedVelFactor   = 0.0;
-   constantAcceleration = 0.0;
-   lifetimeMS           = 400;
-   lifetimeVarianceMS   = 100;
-   useInvAlpha          = false;
-   spinRandomMin        = -90.0;
-   spinRandomMax        = 500.0;
-   textureName          = "art/shapes/actors/common/splash";
-   colors[0]     = "0.7 0.8 1.0 1.0";
-   colors[1]     = "0.7 0.8 1.0 0.5";
-   colors[2]     = "0.7 0.8 1.0 0.0";
-   sizes[0]      = 0.5;
-   sizes[1]      = 0.5;
-   sizes[2]      = 0.8;
-   times[0]      = 0.0;
-   times[1]      = 0.5;
-   times[2]      = 1.0;
-};
-
-datablock ParticleEmitterData(PlayerSplashMistEmitter)
-{
-   ejectionPeriodMS = 5;
-   periodVarianceMS = 0;
-   ejectionVelocity = 3.0;
-   velocityVariance = 2.0;
-   ejectionOffset   = 0.0;
-   thetaMin         = 85;
-   thetaMax         = 85;
-   phiReferenceVel  = 0;
-   phiVariance      = 360;
-   overrideAdvance = false;
-   lifetimeMS       = 250;
-   particles = "PlayerSplashMist";
-};
-
-
-datablock ParticleData(PlayerBubbleParticle)
-{
-   dragCoefficient      = 0.0;
-   gravityCoefficient   = -0.50;
-   inheritedVelFactor   = 0.0;
-   constantAcceleration = 0.0;
-   lifetimeMS           = 400;
-   lifetimeVarianceMS   = 100;
-   useInvAlpha          = false;
-   textureName          = "art/shapes/actors/common/splash";
-   colors[0]     = "0.7 0.8 1.0 0.4";
-   colors[1]     = "0.7 0.8 1.0 0.4";
-   colors[2]     = "0.7 0.8 1.0 0.0";
-   sizes[0]      = 0.1;
-   sizes[1]      = 0.3;
-   sizes[2]      = 0.3;
-   times[0]      = 0.0;
-   times[1]      = 0.5;
-   times[2]      = 1.0;
-};
-
-datablock ParticleEmitterData(PlayerBubbleEmitter)
-{
-   ejectionPeriodMS = 1;
-   periodVarianceMS = 0;
-   ejectionVelocity = 2.0;
-   ejectionOffset   = 0.5;
-   velocityVariance = 0.5;
-   thetaMin         = 0;
-   thetaMax         = 80;
-   phiReferenceVel  = 0;
-   phiVariance      = 360;
-   overrideAdvance = false;
-   particles = "PlayerBubbleParticle";
-};
-
 datablock ParticleData(PlayerFoamParticle)
 {
    dragCoefficient      = 2.0;
-   gravityCoefficient   = -0.05;
+   gravityCoefficient   = 1.0;
    inheritedVelFactor   = 0.1;
    constantAcceleration = 0.0;
-   lifetimeMS           = 600;
+   lifetimeMS           = 300;
    lifetimeVarianceMS   = 100;
    useInvAlpha          = false;
    spinRandomMin        = -90.0;
-   spinRandomMax        = 500.0;
-   textureName          = "art/particles/millsplash01";
-   colors[0]     = "0.7 0.8 1.0 0.20";
-   colors[1]     = "0.7 0.8 1.0 0.20";
-   colors[2]     = "0.7 0.8 1.0 0.00";
-   sizes[0]      = 0.2;
-   sizes[1]      = 0.4;
-   sizes[2]      = 1.6;
+   spinRandomMax        =  90.0;
+   textureName          = "art/shapes/particles/millsplash01";
+   colors[0]     = "0.8 0.8 0.8 1.0";
+   colors[1]     = "0.8 0.8 0.8 1.0";
+   colors[2]     = "0.8 0.8 0.8 0.00";
+   sizes[0]      = 0.4;
+   sizes[1]      = 0.6;
+   sizes[2]      = 0.8;
    times[0]      = 0.0;
    times[1]      = 0.5;
    times[2]      = 1.0;
@@ -195,58 +83,21 @@ datablock ParticleData(PlayerFoamParticle)
 datablock ParticleEmitterData(PlayerFoamEmitter)
 {
    ejectionPeriodMS = 10;
-   periodVarianceMS = 0;
-   ejectionVelocity = 3.0;
+   periodVarianceMS = 5;
+   ejectionVelocity = 2.0;
    velocityVariance = 1.0;
-   ejectionOffset   = 0.0;
-   thetaMin         = 85;
-   thetaMax         = 85;
+   ejectionOffset   = 0.15;
+   thetaMin         = 15;
+   thetaMax         = 75;
    phiReferenceVel  = 0;
    phiVariance      = 360;
    overrideAdvance = false;
    particles = "PlayerFoamParticle";
 };
 
-
-datablock ParticleData( PlayerFoamDropletsParticle )
-{
-   dragCoefficient      = 1;
-   gravityCoefficient   = 0.2;
-   inheritedVelFactor   = 0.2;
-   constantAcceleration = -0.0;
-   lifetimeMS           = 600;
-   lifetimeVarianceMS   = 0;
-   textureName          = "art/shapes/actors/common/splash";
-   colors[0]     = "0.7 0.8 1.0 1.0";
-   colors[1]     = "0.7 0.8 1.0 0.5";
-   colors[2]     = "0.7 0.8 1.0 0.0";
-   sizes[0]      = 0.8;
-   sizes[1]      = 0.3;
-   sizes[2]      = 0.0;
-   times[0]      = 0.0;
-   times[1]      = 0.5;
-   times[2]      = 1.0;
-};
-
-datablock ParticleEmitterData( PlayerFoamDropletsEmitter )
-{
-   ejectionPeriodMS = 7;
-   periodVarianceMS = 0;
-   ejectionVelocity = 2;
-   velocityVariance = 1.0;
-   ejectionOffset   = 0.0;
-   thetaMin         = 60;
-   thetaMax         = 80;
-   phiReferenceVel  = 0;
-   phiVariance      = 360;
-   overrideAdvance = false;
-   orientParticles  = true;
-   particles = "PlayerFoamDropletsParticle";
-};
-
 datablock ParticleData( PlayerWakeParticle )
 {
-   textureName          = "art/particles/wake";
+   textureName          = "art/shapes/particles/wake";
    dragCoefficient     = "0.0";
    gravityCoefficient   = "0.0";
    inheritedVelFactor   = "0.0";
@@ -262,9 +113,9 @@ datablock ParticleData( PlayerWakeParticle )
    animTexTiling = "2 1";
    animTexFrames = "0 1";
 
-   colors[0]     = "1 1 1 0.1";
-   colors[1]     = "1 1 1 0.7";
-   colors[2]     = "1 1 1 0.3";
+   colors[0]     = "1 1 1 0.2";
+   colors[1]     = "1 1 1 0.8";
+   colors[2]     = "1 1 1 0.4";
    colors[3]     = "0.5 0.5 0.5 0";
 
    sizes[0]      = "1.0";
@@ -300,274 +151,213 @@ datablock ParticleEmitterData( PlayerWakeEmitter )
    particles = "PlayerWakeParticle";
 };
 
-datablock ParticleData( PlayerSplashParticle )
-{
-   dragCoefficient      = 1;
-   gravityCoefficient   = 0.2;
-   inheritedVelFactor   = 0.2;
-   constantAcceleration = -0.0;
-   lifetimeMS           = 600;
-   lifetimeVarianceMS   = 0;
-   colors[0]     = "0.7 0.8 1.0 1.0";
-   colors[1]     = "0.7 0.8 1.0 0.5";
-   colors[2]     = "0.7 0.8 1.0 0.0";
-   sizes[0]      = 0.5;
-   sizes[1]      = 0.5;
-   sizes[2]      = 0.5;
-   times[0]      = 0.0;
-   times[1]      = 0.5;
-   times[2]      = 1.0;
-};
-
-datablock ParticleEmitterData( PlayerSplashEmitter )
-{
-   ejectionPeriodMS = 1;
-   periodVarianceMS = 0;
-   ejectionVelocity = 3;
-   velocityVariance = 1.0;
-   ejectionOffset   = 0.0;
-   thetaMin         = 60;
-   thetaMax         = 80;
-   phiReferenceVel  = 0;
-   phiVariance      = 360;
-   overrideAdvance = false;
-   orientParticles  = true;
-   lifetimeMS       = 100;
-   particles = "PlayerSplashParticle";
-};
-
-datablock SplashData(PlayerSplash)
-{
-   numSegments = 15;
-   ejectionFreq = 15;
-   ejectionAngle = 40;
-   ringLifetime = 0.5;
-   lifetimeMS = 300;
-   velocity = 4.0;
-   startRadius = 0.0;
-   acceleration = -3.0;
-   texWrap = 5.0;
-
-   texture = "art/particles/millsplash01";
-
-   emitter[0] = PlayerSplashEmitter;
-   emitter[1] = PlayerSplashMistEmitter;
-
-   colors[0] = "0.7 0.8 1.0 0.0";
-   colors[1] = "0.7 0.8 1.0 0.3";
-   colors[2] = "0.7 0.8 1.0 0.7";
-   colors[3] = "0.7 0.8 1.0 0.0";
-   times[0] = 0.0;
-   times[1] = 0.4;
-   times[2] = 0.8;
-   times[3] = 1.0;
-};
-
 //----------------------------------------------------------------------------
 // Foot puffs
 //----------------------------------------------------------------------------
-
 datablock ParticleData(LightPuff)
 {
    dragCoefficient      = 2.0;
-   gravityCoefficient   = -0.01;
+   gravityCoefficient   = 0.4;
    inheritedVelFactor   = 0.6;
    constantAcceleration = 0.0;
-   lifetimeMS           = 800;
+   lifetimeMS           = 400;
    lifetimeVarianceMS   = 100;
    useInvAlpha          = true;
    spinRandomMin        = -35.0;
    spinRandomMax        = 35.0;
+   textureName   = "art/shapes/actors/Maco/footpuff.png";
    colors[0]     = "1.0 1.0 1.0 1.0";
    colors[1]     = "1.0 1.0 1.0 0.0";
    sizes[0]      = 0.1;
-   sizes[1]      = 0.8;
+   sizes[1]      = 0.6;
    times[0]      = 0.3;
    times[1]      = 1.0;
-   times[2] = 1.0;
-   textureName = "art/particles/dustParticle.png";
 };
 
 datablock ParticleEmitterData(LightPuffEmitter)
 {
    ejectionPeriodMS = 35;
    periodVarianceMS = 10;
-   ejectionVelocity = 0.2;
+   ejectionVelocity = 0.2; //0.2
    velocityVariance = 0.1;
    ejectionOffset   = 0.0;
    thetaMin         = 20;
-   thetaMax         = 60;
+   thetaMax         = 30;
    phiReferenceVel  = 0;
    phiVariance      = 360;
    overrideAdvance = false;
-   useEmitterColors = true;
    particles = "LightPuff";
 };
 
 //----------------------------------------------------------------------------
-// Liftoff dust
+// Foot prints
 //----------------------------------------------------------------------------
-
-datablock ParticleData(LiftoffDust)
-{
-   dragCoefficient      = 1.0;
-   gravityCoefficient   = -0.01;
-   inheritedVelFactor   = 0.0;
-   constantAcceleration = 0.0;
-   lifetimeMS           = 1000;
-   lifetimeVarianceMS   = 100;
-   useInvAlpha          = true;
-   spinRandomMin        = -90.0;
-   spinRandomMax        = 500.0;
-   colors[0]     = "1.0 1.0 1.0 1.0";
-   sizes[0]      = 1.0;
-   times[0]      = 1.0;
-   textureName = "art/particles/dustParticle";
-};
-
-datablock ParticleEmitterData(LiftoffDustEmitter)
-{
-   ejectionPeriodMS = 5;
-   periodVarianceMS = 0;
-   ejectionVelocity = 2.0;
-   velocityVariance = 0.0;
-   ejectionOffset   = 0.0;
-   thetaMin         = 90;
-   thetaMax         = 90;
-   phiReferenceVel  = 0;
-   phiVariance      = 360;
-   overrideAdvance = false;
-   useEmitterColors = true;
-   particles = "LiftoffDust";
-};
-
-//----------------------------------------------------------------------------
-
 datablock DecalData(PlayerFootprint)
 {
-   size = 0.4;
-   material = CommonPlayerFootprint;
+   Material = "DECAL_PlayerFootprint";
+   size = "0.5";
+   lifeSpan = "50000";
 };
 
-datablock DebrisData( PlayerDebris )
-{
-   explodeOnMaxBounce = false;
 
-   elasticity = 0.15;
-   friction = 0.5;
-
-   lifetime = 4.0;
-   lifetimeVariance = 0.0;
-
-   minSpinSpeed = 40;
-   maxSpinSpeed = 600;
-
-   numBounces = 5;
-   bounceVariance = 0;
-
-   staticOnMaxBounce = true;
-   gravModifier = 1.0;
-
-   useRadiusMass = true;
-   baseRadius = 1;
-
-   velocity = 20.0;
-   velocityVariance = 12.0;
-};
-
-// ----------------------------------------------------------------------------
-// This is our default player datablock that all others will derive from.
-// ----------------------------------------------------------------------------
-
+//----------------------------------------------------------------------------
+// PlayerData
+//----------------------------------------------------------------------------
 datablock PlayerData(DefaultPlayerData)
 {
    renderFirstPerson = false;
-   firstPersonShadows = true;
+
    computeCRC = false;
 
    // Third person shape
-   shapeFile = "art/shapes/actors/Soldier/soldier_rigged.DAE";
-   cameraMaxDist = 3;
+   shapeFile = "art/shapes/actors/Maco/player.dts";
+   cameraMaxDist = 11;
+   cameraMinDist = 3;
+   cameraOffset = "0 0 0.7"; //this offsets our "Cam" node position for easy tweaking
    allowImageStateAnimation = true;
 
    // First person arms
-   imageAnimPrefixFP = "soldier";
-   shapeNameFP[0] = "art/shapes/actors/Soldier/FP/FP_SoldierArms.DAE";
+   //imageAnimPrefixFP = "soldier";
+   //shapeNameFP[0] = "art/shapes/actors/Soldier/FP/FP_SoldierArms.DAE";
 
+   canObserve = 1;
    cmdCategory = "Clients";
 
    cameraDefaultFov = 55.0;
    cameraMinFov = 5.0;
    cameraMaxFov = 65.0;
 
-   debrisShapeName = "art/shapes/actors/common/debris_player.dts";
-   debris = playerDebris;
+   //debrisShapeName = "art/shapes/actors/common/debris_player.dts";
+   //debris = playerDebris;
    
    throwForce = 30;
 
-   minLookAngle = "-1.4";
-   maxLookAngle = "0.9";
-   maxFreelookAngle = 3.0;
+   aiAvoidThis = 1;
 
-   mass = 120;
-   drag = 1.3;
+   minLookAngle = "-1.5";
+   maxLookAngle = "1.5";
+   maxFreelookAngle = 1.5;
+
+   mass = 40;
+   drag = 0.1;  //wind friction applied
    maxdrag = 0.4;
+   groundFriction = 1.5;  //friction applied while on ground: 0 = no friction
    density = 1.1;
    maxDamage = 100;
    maxEnergy =  60;
    repairRate = 0.33;
+   energyPerDamagePoint = 75;
 
-   rechargeRate = 0.256;
+   rechargeRate = 1.0;
 
-   runForce = 4320;
+   runForce = 400;  //affects how fast player achieve max speed
    runEnergyDrain = 0;
    minRunEnergy = 0;
-   maxForwardSpeed = 8;
-   maxBackwardSpeed = 6;
-   maxSideSpeed = 6;
+   maxForwardSpeed = 5.2;
+   maxBackwardSpeed = 3.6;
+   maxSideSpeed = 3.6;
 
-   sprintForce = 4320;
+   sprintForce = 600;
    sprintEnergyDrain = 0;
    minSprintEnergy = 0;
-   maxSprintForwardSpeed = 14;
-   maxSprintBackwardSpeed = 8;
-   maxSprintSideSpeed = 6;
+   maxSprintForwardSpeed = 8.0;
+   maxSprintBackwardSpeed = 5.5;
+   maxSprintSideSpeed = 5.5;
    sprintStrafeScale = 0.25;
    sprintYawScale = 0.05;
    sprintPitchScale = 0.05;
    sprintCanJump = true;
 
-   crouchForce = 405;
-   maxCrouchForwardSpeed = 4.0;
-   maxCrouchBackwardSpeed = 2.0;
-   maxCrouchSideSpeed = 2.0;
+   crouchForce = 400;
+   maxCrouchForwardSpeed = 2.0;
+   maxCrouchBackwardSpeed = 1.4;
+   maxCrouchSideSpeed = 1.4;
+   
+   proneForce = 400;
+   maxProneForwardSpeed = 1.0;
+   maxProneBackwardSpeed = 0.69;
+   maxProneSideSpeed = 0.69;
+   
 
-   swimForce = 4320;
-   maxUnderwaterForwardSpeed = 8.4;
-   maxUnderwaterBackwardSpeed = 7.8;
-   maxUnderwaterSideSpeed = 4.0;
+   groundTurnRate = 6.25;          //bigger numbers = faster turn
+   airTurnRate = 3.125;
+   
+   maxStepHeight = 0.5;  
 
-   jumpForce = "747";
+   walkRunAnimVelocity = 2.5;    //velocity at which player switches between walk and run animations
+
+   maxUnderwaterForwardSpeed = 2.0;
+   maxUnderwaterBackwardSpeed = 2.0;
+   maxUnderwaterSideSpeed = 2.0;
+
+   //jump
+   jumpForce = 224;
    jumpEnergyDrain = 0;
    minJumpEnergy = 0;
-   jumpDelay = "15";
-   airControl = 0.3;
+   jumpDelay = 5;          //how long after landing before player can jump again (ticks), keep this low
+   airControl = 1.0;
+   standJumpCrouchDelay = 384;   //how long to delay a stand-jump while the crouch portion of the animation plays (ms)
+   runJumpCrouchDelay = 160;     //how long to delay a run-jump while the crouch portion of the animation plays (ms)
 
-   fallingSpeedThreshold = -6.0;
+   fallingSpeedThreshold = -7;     //if the players velocity is less than this, he is considered falling (plays fall animation)   landSequenceTime = 0.33;
 
-   landSequenceTime = 0.33;
-   transitionToLand = false;
-   recoverDelay = 0;
-   recoverRunForceScale = 0;
+   //landSequenceTime = 0;   //Ubiq: removing these - we use our own landing system
+   //transitionToLand = false;
+   //recoverDelay = 0;
+   //recoverRunForceScale = 0;
 
-   minImpactSpeed = 10;
+   minImpactSpeed = 20;    //if player collides (with ground or wall etc.) faster than this he may get hurt, camera may shake
    minLateralImpactSpeed = 20;
-   speedDamageScale = 0.4;
+   speedDamageScale = 1.0; //specifies how much impact damage the player receives based on impact speed. Not in C++, but used in player.cs server script.
 
-   boundingBox = "0.65 0.75 1.85";
-   crouchBoundingBox = "0.65 0.75 1.3";
-   swimBoundingBox = "1 2 2";
-   pickupRadius = 1;
+   boundingBox = "0.4 0.4 1.45";
+   crouchBoundingBox = "0.4 0.4 0.8";
+   swimBoundingBox = "0.4 0.4 1.45";
+   pickupRadius = 0.75;
+
+	//climb
+	climbHeightMin = 0.4;
+	climbHeightMax = 1.6;
+	climbSpeedUp = 0.35;     //how fast player moves up a climb surface
+	climbSpeedDown = 0.35;   //how fast player moves down a climb surface
+	climbSpeedSide = 0.35;   //how fast player moves sideways on a climb surface
+	climbScrapeSpeed = -3.0; //if player falling faster than this, he can't climb but will scrape (should be less than -climbSpeedDown)
+	climbScrapeFriction = 2.0;   //how much friction when trying to climb but falling too fast: 0 = slide forever, 1 = instant grab surface
+   
+	//ledge grab
+	grabHeightMin = 1.5;             //player will detect & grab nearby ledges in this height range (relative to players feet). If player is "missing" ledges when falling quickly, make the range larger.
+	grabHeightMax = 1.7;
+	grabHeight = 1.6;                //upon finding a ledge, player will snap up/down so the ledge is at this height (relative to players feet). Must be between (or equal) to min/max above. Adjust until grab animations look right.
+	grabSpeedSide = 0.48;             //how fast player moves sideways while ledge-grabbing
+	grabSpeedUp = 0.4;               //how fast player pulls himself up a ledge. Animation will speed up/slow down as necessary to match
+	grabUpForwardOffset = 0.55;      //applies a forward offset to the "teleport" that occurs at the end of the ledge up animation (match to animation)
+	grabUpUpwardOffset = 0.015;       //applies an upward offset to the "teleport" that occurs at the end of the ledge up animation (should be positive, near 0). Allows climb onto sloped surface
+	grabUpTestBox = "0.4 0.4 1.45";//box used to test if there is enough room above for player to pull himself up (adjust until animation has no penetrations)
+
+	//wall hug
+	wallHugSpeed = 0.5;			//how fast player moves sideways while wall hugging
+	wallHugHeightMin = 0.9;		//player will detect nearby walls in this height range (minimum, relative to players feet)
+	wallHugHeightMax = 1.1;		//player will detect nearby walls in this height range (maximum, relative to players feet)
+	
+   
+   //jet jump
+   jetTime = 320;       //how long after jumping the jet lasts (ms)
+   jetJumpForce = 812.5;
+   jetJumpEnergyDrain = 0;
+   jetMinJumpEnergy = 0;
+   jetJumpSurfaceAngle = 78;
+   jetMinJumpSpeed = 3;
+   jetMaxJumpSpeed = 100;
+
+   //Ground Snap
+   //a ray is cast down from player. If a sloped surface is found the player is moved down (visually) to
+   //stand on it. This helps on slopes where otherwise the player appears to float above the surface
+   groundSnapSpeed = 0.02;       //how fast to move player down (units/tick). Use 0 to turn this feature off
+   groundSnapRayLength = 0.6;    //length of ray (units down from player origin - his feet). Make sure it's long enough to work on steep slopes
+   groundSnapRayOffset = -0.05;   //forward offset for ray in case feet are forward or back of origin (units). Positive = forward, Negative = backward
+	
+   landDuration = 100;        //the land animation will play for at least this long (in ms). If not trying to move, it will play longer
+   landSpeedFactor = 0.5;     //during the land, the run force has this multiplier applied (0 = no force, 1 = regular force)
 
    // Damage location details
    boxHeadPercentage       = 0.83;
@@ -578,96 +368,80 @@ datablock PlayerData(DefaultPlayerData)
    boxHeadFrontPercentage        = 0.60;
 
    // Foot Prints
-   decalOffset = 0.25;
+   decalData   = PlayerFootprint;
+   decalOffset = 0.15;
 
    footPuffEmitter = "LightPuffEmitter";
    footPuffNumParts = 10;
    footPuffRadius = "0.25";
 
-   dustEmitter = "LightPuffEmitter";
+   //dustEmitter = LiftoffDustEmitter;
 
-   splash = PlayerSplash;
+   //splash = PlayerSplash;	//Ubiq: the Splash class doesn't seem to render anything (useless!) - removing this
    splashVelocity = 4.0;
    splashAngle = 67.0;
    splashFreqMod = 300.0;
    splashVelEpsilon = 0.60;
    bubbleEmitTime = 0.4;
-   splashEmitter[0] = PlayerWakeEmitter;
+   splashEmitter[0] = PlayerWakeEmitter;	//Ubiq: these are the only "splash" effects in use
    splashEmitter[1] = PlayerFoamEmitter;
-   splashEmitter[2] = PlayerBubbleEmitter;
+   //splashEmitter[2] = PlayerBubbleEmitter;
+   
+   impactWaterEasy = playerWaterSplash;
+   
    mediumSplashSoundVelocity = 10.0;
+   impactWaterMedium = playerWaterSplash;
+   
    hardSplashSoundVelocity = 20.0;
+   impactWaterHard = playerWaterSplash;
+   
    exitSplashSoundVelocity = 5.0;
+   exitingWater = playerWaterSplash;
+   
+   //waterBreathSound = playerWaterSplash;	//always plays when submerged
+   //movingBubblesSound = playerWaterSplash;	//plays when submerged and moving
+   FootShallowSound = playerWaterSplash;	//plays when walking in water and coverage is less than footSplashHeight
+   FootWadingSound = playerWaterSplash;	//plays when walking in water and coverage is less than 1 and > footSplashHeight
+   
+   footstepSplashHeight = 0.4;
 
    // Controls over slope of runnable/jumpable surfaces
-   runSurfaceAngle  = 38;
-   jumpSurfaceAngle = 80;
-   maxStepHeight = 0.35;  //two meters
-   minJumpSpeed = 20;
+   runSurfaceAngle  = 45;
+   jumpSurfaceAngle = 45;
+
+   minJumpSpeed = 0;
    maxJumpSpeed = 30;
 
-   horizMaxSpeed = 68;
-   horizResistSpeed = 33;
-   horizResistFactor = 0.35;
+   horizMaxSpeed = 50;
+   horizResistSpeed = 0;
+   horizResistFactor = 0.4;
 
-   upMaxSpeed = 80;
-   upResistSpeed = 25;
-   upResistFactor = 0.3;
+   upMaxSpeed = 50;
+   upResistSpeed = 0;
+   upResistFactor = 0.4;
 
-   footstepSplashHeight = 0.35;
-
-   //NOTE:  some sounds commented out until wav's are available
-
-   // Footstep Sounds
-   FootSoftSound        = FootLightSoftSound;
-   FootHardSound        = FootLightHardSound;
-   FootMetalSound       = FootLightMetalSound;
-   FootSnowSound        = FootLightSnowSound;
-   FootShallowSound     = FootLightShallowSplashSound;
-   FootWadingSound      = FootLightWadingSound;
-   FootUnderwaterSound  = FootLightUnderwaterSound;
-
-   //FootBubblesSound     = FootLightBubblesSound;
-   //movingBubblesSound   = ArmorMoveBubblesSound;
-   //waterBreathSound     = WaterBreathMaleSound;
-
-   //impactSoftSound      = ImpactLightSoftSound;
-   //impactHardSound      = ImpactLightHardSound;
-   //impactMetalSound     = ImpactLightMetalSound;
-   //impactSnowSound      = ImpactLightSnowSound;
-
-   //impactWaterEasy      = ImpactLightWaterEasySound;
-   //impactWaterMedium    = ImpactLightWaterMediumSound;
-   //impactWaterHard      = ImpactLightWaterHardSound;
-
-   groundImpactMinSpeed    = "45";
+   //Ubiq: Player Sounds
+   stopSound               = playerStop;
+   jumpCrouchSound         = playerJumpCrouch;
+   jumpSound               = playerJump;
+   landSound               = playerLand;
+   climbIdleSound          = playerClimbIdle;
+   climbUpSound            = playerClimbUp;
+   climbDownSound          = playerClimbDown;
+   climbLeftRightSound     = playerClimbLeftRight;
+   ledgeIdleSound          = playerLedgeIdle;
+   ledgeUpSound            = playerLedgeUp;
+   ledgeLeftRightSound     = playerLedgeLeftRight;
+   slideSound              = playerSlide;
+   
+   //camera shake
+   groundImpactMinSpeed    = 15.0;
    groundImpactShakeFreq   = "4.0 4.0 4.0";
    groundImpactShakeAmp    = "1.0 1.0 1.0";
-   groundImpactShakeDuration = 0.8;
+   groundImpactShakeDuration = 0.75;
    groundImpactShakeFalloff = 10.0;
 
-   //exitingWater         = ExitingWaterLightSound;
-
-
-   cameraMinDist = "0";
-   DecalData = "PlayerFootprint";
-
-   // Allowable Inventory Items
-   mainWeapon = Ryder;
-
-   maxInv[Lurker] = 1;
-   maxInv[LurkerClip] = 20;
-
-   maxInv[LurkerGrenadeLauncher] = 1;
-   maxInv[LurkerGrenadeAmmo] = 20;
-
-   maxInv[Ryder] = 1;
-   maxInv[RyderClip] = 10;
-
-   maxInv[ProxMine] = 5;
-
-   maxInv[DeployableTurret] = 5;
-
+   observeParameters = "0.5 4.5 4.5";
    // available skins (see materials.cs in model folder)
-   availableSkins =  "base	DarkBlue	DarkGreen	LightGreen	Orange	Red	Teal	Violet	Yellow";
+   availableSkins =  "base	blue";
 };

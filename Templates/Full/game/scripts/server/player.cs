@@ -20,15 +20,19 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-// Timeouts for corpse deletion.
-$CorpseTimeoutValue = 45 * 1000;
 
+// Damage Rate for entering Liquid
+$DamageLava       = 0.01;
+$DamageHotLava    = 0.01;
+$DamageCrustyLava = 0.01;
 
 //----------------------------------------------------------------------------
-// Player Datablock methods
+// DefaultPlayerData Datablock methods
 //----------------------------------------------------------------------------
 
-function PlayerData::onAdd(%this, %obj)
+//----------------------------------------------------------------------------
+
+function DefaultPlayerData::onAdd(%this,%obj)
 {
    // Vehicle timeout
    %obj.mountVehicle = true;
@@ -36,126 +40,102 @@ function PlayerData::onAdd(%this, %obj)
    // Default dynamic armor stats
    %obj.setRechargeRate(%this.rechargeRate);
    %obj.setRepairRate(0);
+   // Calling updateHealth() must be delayed now... for some reason
+   %obj.schedule(50, "updateHealth");
+  
 }
 
-function PlayerData::onRemove(%this, %obj)
+function DefaultPlayerData::onRemove(%this, %obj)
 {
    if (%obj.client.player == %obj)
       %obj.client.player = 0;
 }
 
-function PlayerData::onNewDataBlock(%this, %obj)
+function DefaultPlayerData::onNewDataBlock(%this,%obj)
 {
 }
+
 
 //----------------------------------------------------------------------------
 
-function PlayerData::onMount(%this, %obj, %vehicle, %node)
+function DefaultPlayerData::onMount(%this,%obj,%vehicle,%node)
 {
-   // Node 0 is the pilot's position, we need to dismount his weapon.
-   if (%node == 0)
-   {
+   if (%node == 0)  {
       %obj.setTransform("0 0 0 0 0 1 0");
-      %obj.setActionThread(%vehicle.getDatablock().mountPose[%node], true, true);
-
+      %obj.setActionThread(%vehicle.getDatablock().mountPose[%node],true,true);
       %obj.lastWeapon = %obj.getMountedImage($WeaponSlot);
-      %obj.unmountImage($WeaponSlot);
 
+      %obj.unmountImage($WeaponSlot);
       %obj.setControlObject(%vehicle);
-      
-      if(%obj.getClassName() $= "Player")
-         commandToClient(%obj.client, 'toggleVehicleMap', true);
-   }
-   else
-   {
-      if (%vehicle.getDataBlock().mountPose[%node] !$= "")
-         %obj.setActionThread(%vehicle.getDatablock().mountPose[%node]);
-      else
-         %obj.setActionThread("root", true);
+      %obj.client.setObjectActiveImage(%vehicle, 2);
    }
 }
 
-function PlayerData::onUnmount(%this, %obj, %vehicle, %node)
+function DefaultPlayerData::onUnmount( %this, %obj, %vehicle, %node )
 {
    if (%node == 0)
-   {
       %obj.mountImage(%obj.lastWeapon, $WeaponSlot);
-      %obj.setControlObject("");
-   }
 }
 
-function PlayerData::doDismount(%this, %obj, %forced)
+function DefaultPlayerData::doDismount(%this, %obj, %forced)
 {
-   //echo("\c4PlayerData::doDismount(" @ %this @", "@ %obj.client.nameBase @", "@ %forced @")");
-
    // This function is called by player.cc when the jump trigger
    // is true while mounted
-   %vehicle = %obj.mVehicle;
-   if (!%obj.isMounted() || !isObject(%vehicle))
+   if (!%obj.isMounted())
       return;
 
-   // Vehicle must be at rest!
-   if ((VectorLen(%vehicle.getVelocity()) <= %vehicle.getDataBlock().maxDismountSpeed ) || %forced)
-   {
-      // Position above dismount point
-      %pos = getWords(%obj.getTransform(), 0, 2);
-      %rot = getWords(%obj.getTransform(), 3, 6);
-      %oldPos = %pos;
-      %vec[0] = " -1 0 0";
-      %vec[1] = " 0 0 1";
-      %vec[2] = " 0 0 -1";
-      %vec[3] = " 1 0 0";
-      %vec[4] = "0 -1 0";
-      %impulseVec = "0 0 0";
-      %vec[0] = MatrixMulVector(%obj.getTransform(), %vec[0]);
+   // Position above dismount point
+   %pos    = getWords(%obj.getTransform(), 0, 2);
+   %oldPos = %pos;
+   %vec[0] = " 0  0  1";
+   %vec[1] = " 0  0  1";
+   %vec[2] = " 0  0 -1";
+   %vec[3] = " 1  0  0";
+   %vec[4] = "-1  0  0";
+   %impulseVec  = "0 0 0";
+   %vec[0] = MatrixMulVector( %obj.getTransform(), %vec[0]);
 
-      // Make sure the point is valid
-      %pos = "0 0 0";
-      %numAttempts = 5;
-      %success = -1;
-      for (%i = 0; %i < %numAttempts; %i++)
-      {
-         %pos = VectorAdd(%oldPos, VectorScale(%vec[%i], 3));
-         if (%obj.checkDismountPoint(%oldPos, %pos))
-         {
-            %success = %i;
-            %impulseVec = %vec[%i];
-            break;
-         }
+   // Make sure the point is valid
+   %pos = "0 0 0";
+   %numAttempts = 5;
+   %success     = -1;
+   for (%i = 0; %i < %numAttempts; %i++) {
+      %pos = VectorAdd(%oldPos, VectorScale(%vec[%i], 3));
+      if (%obj.checkDismountPoint(%oldPos, %pos)) {
+         %success = %i;
+         %impulseVec = %vec[%i];
+         break;
       }
-      if (%forced && %success == -1)
-         %pos = %oldPos;
-
-      %obj.mountVehicle = false;
-      %obj.schedule(4000, "mountVehicles", true);
-
-      // Position above dismount point
-      %obj.unmount();
-      %obj.setTransform(%pos SPC %rot);//%obj.setTransform(%pos);
-      //%obj.playAudio(0, UnmountVehicleSound);
-      %obj.applyImpulse(%pos, VectorScale(%impulseVec, %obj.getDataBlock().mass));
-
-      // Set player velocity when ejecting
-      %vel = %obj.getVelocity();
-      %vec = vectorDot( %vel, vectorNormalize(%vel));
-      if(%vec > 50)
-      {
-         %scale = 50 / %vec;
-         %obj.setVelocity(VectorScale(%vel, %scale));
-      }
-
-      //%obj.vehicleTurret = "";
    }
-   else
-      messageClient(%obj.client, 'msgUnmount', '\c2Cannot exit %1 while moving.', %vehicle.getDataBlock().nameTag);
+   if (%forced && %success == -1)
+      %pos = %oldPos;
+
+   %obj.mountVehicle = false;
+   %obj.schedule(4000, "mountVehicles", true);
+
+   // Position above dismount point
+   %obj.setTransform(%pos);
+   %obj.applyImpulse(%pos, VectorScale(%impulseVec, %obj.getDataBlock().mass));
+   %obj.setPilot(false);
+   %obj.vehicleTurret = "";
 }
+
 
 //----------------------------------------------------------------------------
 
-function PlayerData::onCollision(%this, %obj, %col)
+function DefaultPlayerData::onCollision(%this,%obj,%col)
 {
-   if (!isObject(%col) || %obj.getState() $= "Dead")
+   if (%obj.getState() $= "Dead")
       return;
+      
+   //Ubiq:
+   if(%obj.dieOnNextCollision)
+   {
+      //kill them immediately
+      %fullDamage = %this.maxDamage;
+      %this.Damage(%obj, 0, %obj.getPosition(), %fullDamage, "Impact");
+      return;
+   }
 
    // Try and pickup all items
    if (%col.getClassName() $= "Item")
@@ -171,16 +151,6 @@ function PlayerData::onCollision(%this, %obj, %col)
       if ((%db.getClassName() $= "WheeledVehicleData" ) && %obj.mountVehicle && %obj.getState() $= "Move" && %col.mountable)
       {
          // Only mount drivers for now.
-         ServerConnection.setFirstPerson(0);
-         
-         // For this specific example, only one person can fit
-         // into a vehicle
-         %mount = %col.getMountNodeObject(0);         
-         if(%mount)
-            return;
-         
-         // For this specific FPS Example, always mount the player
-         // to node 0
          %node = 0;
          %col.mountObject(%obj, %node);
          %obj.mVehicle = %col;
@@ -188,20 +158,29 @@ function PlayerData::onCollision(%this, %obj, %col)
    }
 }
 
-function PlayerData::onImpact(%this, %obj, %collidedObject, %vec, %vecLen)
+function DefaultPlayerData::onImpact(%this, %obj, %collidedObject, %vec, %vecLen)
 {
-   %obj.damage(0, VectorAdd(%obj.getPosition(), %vec), %vecLen * %this.speedDamageScale, "Impact");
+   //Ubiq:
+   if(%obj.dieOnNextCollision)
+   {
+      //kill them immediately
+      %fullDamage = %this.maxDamage;
+      %this.Damage(%obj, 0, %obj.getPosition(), %fullDamage, "Impact");
+   }
+   else
+   {
+      %this.Damage(%obj, 0, VectorAdd(%obj.getPosition(), %vec), %vecLen * %this.speedDamageScale, "Impact");
+   }
 }
+
 
 //----------------------------------------------------------------------------
 
-function PlayerData::damage(%this, %obj, %sourceObject, %position, %damage, %damageType)
+function DefaultPlayerData::Damage(%this, %obj, %sourceObject, %position, %damage, %damageType)
 {
-   if (!isObject(%obj) || %obj.getState() $= "Dead" || !%damage)
+   if (%obj.getState() $= "Dead")
       return;
-
    %obj.applyDamage(%damage);
-
    %location = "Body";
 
    // Deal with client callbacks here because we don't have this
@@ -209,25 +188,23 @@ function PlayerData::damage(%this, %obj, %sourceObject, %position, %damage, %dam
    %client = %obj.client;
    %sourceClient = %sourceObject ? %sourceObject.client : 0;
 
-   if (isObject(%client))
-   {
-      // Determine damage direction
-      if (%damageType !$= "Suicide")
-         %obj.setDamageDirection(%sourceObject, %position);
-
-      if (%obj.getState() $= "Dead")
-         %client.onDeath(%sourceObject, %sourceClient, %damageType, %location);
-   }
+   if (%obj.getState() $= "Dead" && isObject(%client))
+      %client.onDeath(%sourceObject, %sourceClient, %damageType, %location);
+      
+   //%obj.updateHealth();
 }
 
-function PlayerData::onDamage(%this, %obj, %delta)
+function DefaultPlayerData::onDamage(%this, %obj, %delta)
 {
-   // This method is invoked by the ShapeBase code whenever the
+   // This method is invoked by the ShapeBase code whenever the 
    // object's damage level changes.
-   if (%delta > 0 && %obj.getState() !$= "Dead")
-   {
-      // Apply a damage flash
-      %obj.setDamageFlash(1);
+   if (%delta > 0 && %obj.getState() !$= "Dead") {
+
+      // Increment the flash based on the amount.
+      %flash = %obj.getDamageFlash() + ((%delta / %this.maxDamage) * 2);
+      if (%flash > 0.75)
+         %flash = 0.75;
+      %obj.setDamageFlash(%flash);
 
       // If the pain is excessive, let's hear about it.
       if (%delta > 10)
@@ -235,108 +212,59 @@ function PlayerData::onDamage(%this, %obj, %delta)
    }
 }
 
-// ----------------------------------------------------------------------------
-// The player object sets the "disabled" state when damage exceeds it's
-// maxDamage value. This is method is invoked by ShapeBase state mangement code.
-
-// If we want to deal with the damage information that actually caused this
-// death, then we would have to move this code into the script "damage" method.
-
-function PlayerData::onDisabled(%this, %obj, %state)
+function DefaultPlayerData::onDisabled(%this,%obj,%state)
 {
-   // Release the main weapon trigger
-   %obj.setImageTrigger(0, false);
+   // The player object sets the "disabled" state when damage exceeds
+   // it's maxDamage value.  This is method is invoked by ShapeBase
+   // state mangement code.
 
-   // Toss current mounted weapon and ammo if any
-   %item = %obj.getMountedImage($WeaponSlot).item;
-   if (isObject(%item))
-   {
-      %amount = %obj.getInventory(%item.image.ammo);
-      
-      if (!%item.image.clip)
-         warn("No clip exists to throw for item ", %item);
-      if(%amount)
-         %obj.throw(%item.image.clip, 1);
-   }
-
-   // Toss out a health patch
-   %obj.tossPatch();
-
+   // If we want to deal with the damage information that actually
+   // caused this death, then we would have to move this code into
+   // the script "damage" method.
    %obj.playDeathCry();
-   %obj.playDeathAnimation();
-   //%obj.setDamageFlash(0.75);
+   %obj.setDamageFlash(0.75);
 
-   // Disable any vehicle map
-   commandToClient(%obj.client, 'toggleVehicleMap', false);
-
-   // Schedule corpse removal. Just keeping the place clean.
-   %obj.schedule($CorpseTimeoutValue - 1000, "startFade", 1000, 0, true);
-   %obj.schedule($CorpseTimeoutValue, "delete");
+   // Release the main weapon trigger
+   %obj.setImageTrigger(0,false);
 }
 
 //-----------------------------------------------------------------------------
 
-function PlayerData::onLeaveMissionArea(%this, %obj)
+function DefaultPlayerData::onLeaveMissionArea(%this, %obj)
 {
-   //echo("\c4Leaving Mission Area at POS:"@ %obj.getPosition());
-
    // Inform the client
    %obj.client.onLeaveMissionArea();
-
-   // Damage over time and kill the coward!
-   //%obj.setDamageDt(0.2, "MissionAreaDamage");
 }
 
-function PlayerData::onEnterMissionArea(%this, %obj)
+function DefaultPlayerData::onEnterMissionArea(%this, %obj)
 {
-   //echo("\c4Entering Mission Area at POS:"@ %obj.getPosition());
-
    // Inform the client
    %obj.client.onEnterMissionArea();
-
-   // Stop the punishment
-   //%obj.clearDamageDt();
 }
 
 //-----------------------------------------------------------------------------
 
-function PlayerData::onEnterLiquid(%this, %obj, %coverage, %type)
+function DefaultPlayerData::onEnterLiquid(%this, %obj, %coverage, %type)
 {
-   //echo("\c4this:"@ %this @" object:"@ %obj @" just entered water of type:"@ %type @" for "@ %coverage @"coverage");
+   switch(%type)
+   {
+      case 0: //Water
+      case 1: //Ocean Water
+      case 2: //River Water
+      case 3: //Stagnant Water
+      case 4: //Lava
+         %obj.setDamageDt(%this, $DamageLava, "Lava");
+      case 5: //Hot Lava
+         %obj.setDamageDt(%this, $DamageHotLava, "Lava");
+      case 6: //Crusty Lava
+         %obj.setDamageDt(%this, $DamageCrustyLava, "Lava");
+      case 7: //Quick Sand
+   }
 }
 
-function PlayerData::onLeaveLiquid(%this, %obj, %type)
+function DefaultPlayerData::onLeaveLiquid(%this, %obj, %type)
 {
-   //
-}
-
-//-----------------------------------------------------------------------------
-
-function PlayerData::onTrigger(%this, %obj, %triggerNum, %val)
-{
-   // This method is invoked when the player receives a trigger move event.
-   // The player automatically triggers slot 0 and slot one off of triggers #
-   // 0 & 1.  Trigger # 2 is also used as the jump key.
-}
-
-//-----------------------------------------------------------------------------
-
-function PlayerData::onPoseChange(%this, %obj, %oldPose, %newPose)
-{
-   // Set the script anim prefix to be that of the current pose
-   %obj.setImageScriptAnimPrefix( $WeaponSlot, addTaggedString(%newPose) );
-}
-
-//-----------------------------------------------------------------------------
-
-function PlayerData::onStartSprintMotion(%this, %obj)
-{
-   %obj.setImageGenericTrigger($WeaponSlot, 0, true);
-}
-
-function PlayerData::onStopSprintMotion(%this, %obj)
-{
-   %obj.setImageGenericTrigger($WeaponSlot, 0, false);
+   %obj.clearDamageDt();
 }
 
 //-----------------------------------------------------------------------------
@@ -350,9 +278,10 @@ function Player::kill(%this, %damageType)
    %this.damage(0, %this.getPosition(), 10000, %damageType);
 }
 
+
 //----------------------------------------------------------------------------
 
-function Player::mountVehicles(%this, %bool)
+function Player::mountVehicles(%this,%bool)
 {
    // If set to false, this variable disables vehicle mounting.
    %this.mountVehicle = %bool;
@@ -368,98 +297,47 @@ function Player::isPilot(%this)
    return false;
 }
 
-//----------------------------------------------------------------------------
-
-function Player::playDeathAnimation(%this)
-{
-   %numDeathAnimations = %this.getNumDeathAnimations();
-   if ( %numDeathAnimations > 0 )
-   {
-      if (isObject(%this.client))
-      {
-         if (%this.client.deathIdx++ > %numDeathAnimations)
-            %this.client.deathIdx = 1;
-         %this.setActionThread("Death" @ %this.client.deathIdx);
-      }
-      else
-      {
-         %rand = getRandom(1, %numDeathAnimations);
-         %this.setActionThread("Death" @ %rand);
-      }
-   }
-}
-
-function Player::playCelAnimation(%this, %anim)
-{
-   if (%this.getState() !$= "Dead")
-      %this.setActionThread("cel"@%anim);
-}
-
 
 //----------------------------------------------------------------------------
 
-function Player::playDeathCry(%this)
+
+function Player::playDeathCry( %this )
 {
-   %this.playAudio(0, DeathCrySound);
+   %this.playAudio(0,DeathCrySound);
 }
 
-function Player::playPain(%this)
+function Player::playPain( %this )
 {
-   %this.playAudio(0, PainCrySound);
+   %this.playAudio(0,PainCrySound);
 }
 
 // ----------------------------------------------------------------------------
-
-function Player::setDamageDirection(%player, %sourceObject, %damagePos)
+// Numerical Health Counter
+// ----------------------------------------------------------------------------
+function Player::setDamageLevel( %this, %damageLevel )
 {
-   if (isObject(%sourceObject))
-   {
-      if (%sourceObject.isField(initialPosition))
-      {
-         // Projectiles have this field set to the muzzle point of
-         // the firing weapon at the time the projectile was created.
-         // This gives a damage direction towards the firing player,
-         // turret, vehicle, etc.  Bullets and weapon fired grenades
-         // are examples of projectiles.
-         %damagePos = %sourceObject.initialPosition;
-      }
-      else
-      {
-         // Other objects that cause damage, such as mines, use their own
-         // location as the damage position.  This gives a damage direction
-         // towards the explosive origin rather than the person that lay the
-         // explosives.
-         %damagePos = %sourceObject.getPosition();
-      }
-   }
-
-   // Rotate damage vector into object space
-   %damageVec = VectorSub(%damagePos, %player.getWorldBoxCenter());
-   %damageVec = VectorNormalize(%damageVec);
-   %damageVec = MatrixMulVector(%player.client.getCameraObject().getInverseTransform(), %damageVec);
-
-   // Determine largest component of damage vector to get direction
-   %vecComponents = -%damageVec.x SPC %damageVec.x SPC -%damageVec.y SPC %damageVec.y SPC -%damageVec.z SPC %damageVec.z;
-   %vecDirections = "Left"        SPC "Right"      SPC "Bottom"      SPC "Front"      SPC "Bottom"      SPC "Top";
-
-   %max = -1;
-   for (%i = 0; %i < 6; %i++)
-   {
-      %value = getWord(%vecComponents, %i);
-      if (%value > %max)
-      {
-         %max = %value;
-         %damageDir = getWord(%vecDirections, %i);
-      }
-   }
-   commandToClient(%player.client, 'setDamageDirection', %damageDir);
+   Parent::setDamageLevel(%this,%damageLevel);
+   %this.updateHealth();
 }
 
-function Player::use(%player, %data)
+function Player::applyDamage( %this, %damage )
 {
-   // No mounting/using weapons when you're driving!
-   if (%player.isPilot())
-      return(false);
+   Parent::applyDamage(%this,%damage);
+   %this.updateHealth();
+}
 
-   Parent::use(%player, %data);
+
+function Player::updateHealth( %this )
+{
+   //echo("\c4Player::updateHealth() -> Player Health changed, updating HUD!");
+
+   // Calcualte player health
+   %maxDamage = %this.getDatablock().maxDamage;
+   %damageLevel = %this.getDamageLevel();
+   %curHealth = %maxDamage - %damageLevel;
+   %curHealth = mceil(%curHealth);
+
+   // Send the player object's current health level to the client, where it
+   // will Update the numericalHealth HUD.
+   commandToClient(%this.client, 'setNumericalHealthHUD', %curHealth);
 }

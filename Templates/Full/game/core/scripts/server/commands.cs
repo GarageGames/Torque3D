@@ -55,21 +55,22 @@ function serverCmdToggleCamera(%client)
    if (%client.getControlObject() == %client.player)
    {
       %client.camera.setVelocity("0 0 0");
-      %control = %client.camera;
+      %client.setControlObject(%client.camera);
+      %client.setCameraObject(%client.camera);
    }
    else
    {
-      %client.player.setVelocity("0 0 0");
-      %control = %client.player;
+      //%client.player.setVelocity("0 0 0");
+      %client.setCameraObject(%client.cameraGoalFollower);
+      %client.setControlObject(%client.player);
    }
-   %client.setControlObject(%control);
    clientCmdSyncEditorGui();
 }
 
 function serverCmdSetEditorCameraPlayer(%client)
 {
    // Switch to Player Mode
-   %client.player.setVelocity("0 0 0");
+   %client.setCameraObject(%client.cameraGoalFollower);
    %client.setControlObject(%client.player);
    ServerConnection.setFirstPerson(1);
    $isFirstPersonVar = 1;
@@ -79,8 +80,8 @@ function serverCmdSetEditorCameraPlayer(%client)
 
 function serverCmdSetEditorCameraPlayerThird(%client)
 {
-   // Swith to Player Mode
-   %client.player.setVelocity("0 0 0");
+   // Switch to Player Mode
+   %client.setCameraObject(%client.cameraGoalFollower);
    %client.setControlObject(%client.player);
    ServerConnection.setFirstPerson(0);
    $isFirstPersonVar = 0;
@@ -108,6 +109,7 @@ function serverCmdDropCameraAtPlayer(%client)
    %client.camera.setTransform(%client.player.getEyeTransform());
    %client.camera.setVelocity("0 0 0");
    %client.setControlObject(%client.camera);
+   %client.setCameraObject(%client.camera);
    clientCmdSyncEditorGui();
 }
 
@@ -136,6 +138,7 @@ function serverCmdCycleCameraFlyType(%client)
 			%client.camera.newtonRotation = "0";
 		}
 		%client.setControlObject(%client.camera);
+		%client.setCameraObject(%client.camera);
 		clientCmdSyncEditorGui();
 	}
 }
@@ -147,6 +150,7 @@ function serverCmdSetEditorCameraStandard(%client)
    %client.camera.newtonMode = "0";
    %client.camera.newtonRotation = "0";
    %client.setControlObject(%client.camera);
+   %client.setCameraObject(%client.camera);
    clientCmdSyncEditorGui();
 }
 
@@ -158,6 +162,7 @@ function serverCmdSetEditorCameraNewton(%client)
    %client.camera.newtonRotation = "0";
    %client.camera.setVelocity("0 0 0");
    %client.setControlObject(%client.camera);
+   %client.setCameraObject(%client.camera);
    clientCmdSyncEditorGui();
 }
 
@@ -169,6 +174,7 @@ function serverCmdSetEditorCameraNewtonDamped(%client)
    %client.camera.newtonRotation = "1";
    %client.camera.setAngularVelocity("0 0 0");
    %client.setControlObject(%client.camera);
+   %client.setCameraObject(%client.camera);
    clientCmdSyncEditorGui();
 }
 
@@ -176,6 +182,7 @@ function serverCmdSetEditorOrbitCamera(%client)
 {
    %client.camera.setEditOrbitMode();
    %client.setControlObject(%client.camera);
+   %client.setCameraObject(%client.camera);
    clientCmdSyncEditorGui();
 }
 
@@ -183,6 +190,7 @@ function serverCmdSetEditorFlyCamera(%client)
 {
    %client.camera.setFlyMode();
    %client.setControlObject(%client.camera);
+   %client.setCameraObject(%client.camera);
    clientCmdSyncEditorGui();
 }
 
@@ -203,6 +211,7 @@ function serverCmdEditorCameraAutoFit(%client, %radius)
 {
    %client.camera.autoFitRadius(%radius);
    %client.setControlObject(%client.camera);
+   %client.setCameraObject(%client.camera);
   clientCmdSyncEditorGui();
 }
 

@@ -1,0 +1,284 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:02 AM</created>
+        <modified>15/05/2013 2:11:02 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="tutorial_structure_ladder_frame-lib" name="tutorial_structure_ladder_frameMesh">
+            <mesh>
+                <source id="tutorial_structure_ladder_frame-Position">
+                    <float_array count="132" id="tutorial_structure_ladder_frame-Position-array">
+                        -1.3679 0.1635 -1.0228
+                        -1.3679 0.4175 -1.0228
+                        -1.2221 0.1635 -1.0228
+                        -1.2221 0.4175 -1.0228
+                        -1.2221 0.4175 -1.1941
+                        -1.2221 0.1635 -1.1941
+                        -1.3679 0.1635 -1.1941
+                        -1.3679 0.4175 -1.1941
+                        1.2221 0.1635 -1.0147
+                        1.2221 0.4175 -1.0147
+                        1.3679 0.1635 -1.0147
+                        1.3679 0.4175 -1.0147
+                        1.3679 0.4175 -1.1941
+                        1.3679 0.1635 -1.1941
+                        1.2221 0.1635 -1.1941
+                        1.2221 0.4175 -1.1941
+                        1.2221 -0.4175 4.6702
+                        1.2221 -0.1635 4.6702
+                        1.3679 -0.4175 4.6702
+                        1.3679 -0.1635 4.6702
+                        1.3679 -0.1635 4.4663
+                        1.3679 -0.4175 4.4663
+                        1.2221 -0.4175 4.4663
+                        1.2221 -0.1635 4.4663
+                        -1.3679 -0.4175 4.6702
+                        -1.3679 -0.1634 4.6702
+                        -1.2221 -0.4175 4.6702
+                        -1.2221 -0.1635 4.6702
+                        -1.2221 -0.1635 4.4663
+                        -1.2221 -0.4175 4.4663
+                        -1.3679 -0.4175 4.4663
+                        -1.3679 -0.1635 4.4663
+                        1.2221 -0.1660 4.6702
+                        1.2221 0.1635 4.6702
+                        1.3679 -0.1660 4.6702
+                        1.3679 0.1635 4.6702
+                        1.3679 -0.1660 -1.1941
+                        1.2221 -0.1660 -1.1941
+                        -1.3679 -0.1660 4.6702
+                        -1.3679 0.1635 4.6702
+                        -1.2221 -0.1660 4.6702
+                        -1.2221 0.1635 4.6702
+                        -1.2221 -0.1660 -1.1941
+                        -1.3679 -0.1660 -1.1941
+                    </float_array>
+                    <technique_common>
+                        <accessor count="44" source="#tutorial_structure_ladder_frame-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_ladder_frame-Normal">
+                    <float_array count="18" id="tutorial_structure_ladder_frame-Normal-array">
+                        0.0000 0.0000 1.0000
+                        1.0000 0.0000 0.0000
+                        -1.0000 0.0000 0.0000
+                        -0.0000 -0.0000 -1.0000
+                        0.0000 1.0000 -0.0000
+                        0.0000 -1.0000 0.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="6" source="#tutorial_structure_ladder_frame-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_ladder_frame-UV0">
+                    <float_array count="114" id="tutorial_structure_ladder_frame-UV0-array">
+                        0.4468 -1.2497
+                        0.4462 -1.5045
+                        0.3344 -1.2490
+                        0.3338 -1.5039
+                        1.4438 -2.2461
+                        1.4438 -2.0011
+                        1.6729 -2.2460
+                        1.6729 -2.0011
+                        1.6730 -1.7522
+                        1.4438 -1.7523
+                        1.6730 -1.5002
+                        1.4438 -1.5002
+                        0.4461 -1.0024
+                        0.4461 -1.2469
+                        0.3344 -1.0021
+                        0.3343 -1.2466
+                        1.6730 -1.5001
+                        1.6730 -1.2536
+                        1.4438 -1.2538
+                        0.2244 -0.7496
+                        0.2238 -0.9960
+                        0.1110 -0.7479
+                        0.1104 -0.9943
+                        1.4315 -2.2461
+                        1.4315 -1.9949
+                        1.6729 -1.9949
+                        1.4314 -1.9955
+                        1.4315 -1.7495
+                        1.6730 -1.7489
+                        1.6730 -1.7490
+                        1.6730 -1.5046
+                        1.4315 -1.5051
+                        0.4477 -0.7524
+                        0.4471 -0.9967
+                        0.3374 -0.7508
+                        0.3368 -0.9951
+                        0.4452 -1.7472
+                        0.4453 -1.9972
+                        0.3349 -1.7473
+                        0.3349 -1.9974
+                        -5.1116 -2.2510
+                        -5.1116 -1.9962
+                        1.6691 -2.2510
+                        1.6691 -1.9962
+                        -5.1117 -1.9968
+                        -5.1116 -1.7472
+                        1.6691 -1.7466
+                        1.6691 -1.7467
+                        1.6691 -1.4988
+                        -5.1116 -1.4993
+                        0.4453 -1.0015
+                        0.4454 -1.2471
+                        0.3344 -1.0019
+                        0.3345 -1.2475
+                        1.6692 -1.4984
+                        1.6692 -1.2469
+                        -5.1116 -1.2478
+</float_array>
+                    <technique_common>
+                        <accessor count="57" source="#tutorial_structure_ladder_frame-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="tutorial_structure_ladder_frame-Vertex">
+                    <input semantic="POSITION" source="#tutorial_structure_ladder_frame-Position" />
+                </vertices>
+                <triangles count="64" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_ladder_frame-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_ladder_frame-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_ladder_frame-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        2 1 7 5 1 5 4 1 4
+                        3 1 6 2 1 7 4 1 4
+                        7 2 11 6 2 9 0 2 8
+                        1 2 10 7 2 11 0 2 8
+                        7 3 15 4 3 13 5 3 12
+                        6 3 14 7 3 15 5 3 12
+                        4 4 18 7 4 11 1 4 16
+                        3 4 17 4 4 18 1 4 16
+                        11 0 3 9 0 1 8 0 0
+                        10 0 2 11 0 3 8 0 0
+                        10 1 7 13 1 5 12 1 4
+                        11 1 6 10 1 7 12 1 4
+                        15 2 11 14 2 9 8 2 8
+                        9 2 10 15 2 11 8 2 8
+                        15 3 15 12 3 13 13 3 12
+                        14 3 14 15 3 15 13 3 12
+                        12 4 18 15 4 11 9 4 16
+                        11 4 17 12 4 18 9 4 16
+                        19 0 22 17 0 20 16 0 19
+                        18 0 21 19 0 22 16 0 19
+                        18 1 25 21 1 24 20 1 23
+                        19 1 6 18 1 25 20 1 23
+                        16 5 28 22 5 27 21 5 26
+                        18 5 25 16 5 28 21 5 26
+                        23 2 31 22 2 27 16 2 29
+                        17 2 30 23 2 31 16 2 29
+                        23 3 35 20 3 33 21 3 32
+                        22 3 34 23 3 35 21 3 32
+                        27 0 22 25 0 20 24 0 19
+                        26 0 21 27 0 22 24 0 19
+                        26 1 25 29 1 24 28 1 23
+                        27 1 6 26 1 25 28 1 23
+                        24 5 28 30 5 27 29 5 26
+                        26 5 25 24 5 28 29 5 26
+                        31 2 31 30 2 27 24 2 29
+                        25 2 30 31 2 31 24 2 29
+                        31 3 35 28 3 33 29 3 32
+                        30 3 34 31 3 35 29 3 32
+                        35 0 39 33 0 37 32 0 36
+                        34 0 38 35 0 39 32 0 36
+                        34 1 43 36 1 41 13 1 40
+                        35 1 42 34 1 43 13 1 40
+                        32 5 46 37 5 45 36 5 44
+                        34 5 43 32 5 46 36 5 44
+                        14 2 49 37 2 45 32 2 47
+                        33 2 48 14 2 49 32 2 47
+                        14 3 53 13 3 51 36 3 50
+                        37 3 52 14 3 53 36 3 50
+                        13 4 56 14 4 49 33 4 54
+                        35 4 55 13 4 56 33 4 54
+                        41 0 39 39 0 37 38 0 36
+                        40 0 38 41 0 39 38 0 36
+                        40 1 43 42 1 41 5 1 40
+                        41 1 42 40 1 43 5 1 40
+                        38 5 46 43 5 45 42 5 44
+                        40 5 43 38 5 46 42 5 44
+                        6 2 49 43 2 45 38 2 47
+                        39 2 48 6 2 49 38 2 47
+                        6 3 53 5 3 51 42 3 50
+                        43 3 52 6 3 53 42 3 50
+                        5 4 56 6 4 49 39 4 54
+                        41 4 55 5 4 56 39 4 54
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="tutorial_structure_ladder_frame" name="tutorial_structure_ladder_frame">
+                <instance_geometry url="#tutorial_structure_ladder_frame-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

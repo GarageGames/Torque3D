@@ -59,6 +59,40 @@ bool MoveList::getNextMove(Move &curMove)
    curMove.y = MoveManager::mForwardAction - MoveManager::mBackwardAction + MoveManager::mYAxis_L;
    curMove.z = MoveManager::mUpAction - MoveManager::mDownAction;
 
+   //-----------------------------------------------------------------------
+   // Ubiq: Transform the move vector so it's relative to the camera
+   // Only the 3DAAK Player class expects this, so don't do it unless
+   // the control object is a Player. This used to happen right in
+   // Player::updateMove() but it caused some network sync issues
+   // because cameras aren't Ghosted so clients couldn't interpret Moves.
+   //-----------------------------------------------------------------------
+   if(mConnection)
+   {
+      GameBase* control = mConnection->getControlObject();
+      if (control && (control->getTypeMask() & PlayerObjectType))
+      {
+         //get the camera's transform
+         F32 pos = 0.0f; MatrixF camTrans;
+         if(mConnection->getControlCameraTransform(pos, &camTrans))
+         {
+            //flatten the transform to X&Y (so when the camera
+            //is facing up/down the move remains horizontal)
+            camTrans[9] = 0;
+            camTrans.normalize();
+
+            //create a move vector and multiply by the camera transform
+            VectorF temp(curMove.x, curMove.y, 0); 
+            VectorF moveVec;
+            camTrans.mulV(temp, &moveVec);
+
+            curMove.x = moveVec.x;
+            curMove.y = moveVec.y;
+            curMove.z = moveVec.z;
+         }
+      }
+   }
+   //-----------------------------------------------------------------------
+
    curMove.freeLook = MoveManager::mFreeLook;
    curMove.deviceIsKeyboardMouse = MoveManager::mDeviceIsKeyboardMouse;
 
@@ -66,7 +100,19 @@ bool MoveList::getNextMove(Move &curMove)
    {
       curMove.trigger[i] = false;
       if(MoveManager::mTriggerCount[i] & 1)
+      {
          curMove.trigger[i] = true;
+
+         //Ubiq: special case for jump trigger:
+         if(i == 2)
+         {
+            //reset trigger count here so that jump trigger
+            //is only "pulsed" for 1 tick when key pressed
+            //(player must release and press again to jump again)
+            //in script set it like this: $mvTriggerCount2 = %val;
+            MoveManager::mTriggerCount[i] = 0;
+         }
+      }
       else if(!(MoveManager::mPrevTriggerCount[i] & 1) && MoveManager::mPrevTriggerCount[i] != MoveManager::mTriggerCount[i])
          curMove.trigger[i] = true;
       MoveManager::mPrevTriggerCount[i] = MoveManager::mTriggerCount[i];

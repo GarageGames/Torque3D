@@ -1,0 +1,551 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>16/05/2013 10:44:14 PM</created>
+        <modified>16/05/2013 10:44:14 PM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_SQUARE_SANDY-Diffuse" name="DESERT_BRICK_SQUARE_SANDY-Diffuse">
+            <init_from>DESERT_BRICK_SQUARE_SANDY.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_SQUARE_SANDY" name="DESERT_BRICK_SQUARE_SANDY">
+            <instance_effect url="#DESERT_BRICK_SQUARE_SANDY-fx" />
+        </material>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_SQUARE_SANDY-fx" name="DESERT_BRICK_SQUARE_SANDY-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_SQUARE_SANDY-Surface"><surface type="2D"><init_from>DESERT_BRICK_SQUARE_SANDY-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_SQUARE_SANDY-Sampler"><sampler2D><source>DESERT_BRICK_SQUARE_SANDY-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_SQUARE_SANDY-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="desert_stairs_sm-lib" name="desert_stairs_smMesh">
+            <mesh>
+                <source id="desert_stairs_sm-Position">
+                    <float_array count="360" id="desert_stairs_sm-Position-array">
+                        -2.4340 -2.8924 2.7453
+                        -2.4340 -2.8924 -0.0000
+                        -3.1810 -2.8924 2.7453
+                        -3.1810 -2.8924 -0.0000
+                        -2.4340 2.8284 2.7453
+                        -3.1810 2.8284 2.7453
+                        -2.4340 2.8284 -0.0000
+                        -3.1810 2.8284 -0.0000
+                        -1.6870 -2.8924 2.4403
+                        -1.6870 -2.8924 -0.0000
+                        -2.4340 -2.8924 2.4403
+                        -1.6870 2.8284 2.4403
+                        -2.4340 2.8284 2.4403
+                        -1.6870 2.8284 -0.0000
+                        -0.9400 -2.8924 2.1352
+                        -0.9400 -2.8924 -0.0000
+                        -1.6870 -2.8924 2.1352
+                        -0.9400 2.8284 2.1352
+                        -1.6870 2.8284 2.1352
+                        -0.9400 2.8284 -0.0000
+                        -0.9400 -2.8924 1.8302
+                        -0.1930 -2.8924 1.8302
+                        -0.1930 -2.8924 -0.0000
+                        -0.1930 2.8284 1.8302
+                        -0.9400 2.8284 1.8302
+                        -0.1930 2.8284 -0.0000
+                        0.5541 -2.8924 1.5252
+                        0.5541 -2.8924 -0.0000
+                        -0.1930 -2.8924 1.5252
+                        0.5541 2.8284 1.5252
+                        -0.1930 2.8284 1.5252
+                        0.5541 2.8284 -0.0000
+                        0.5541 -2.8924 1.2201
+                        1.3011 -2.8924 1.2201
+                        1.3011 -2.8924 -0.0000
+                        0.5541 2.8284 1.2201
+                        1.3011 2.8284 1.2201
+                        1.3011 2.8284 -0.0000
+                        2.0481 -2.8924 0.9151
+                        2.0481 -2.8924 -0.0000
+                        1.3011 -2.8924 0.9151
+                        2.0481 2.8284 0.9151
+                        1.3011 2.8284 0.9151
+                        2.0481 2.8284 -0.0000
+                        2.7951 -2.8924 0.6101
+                        2.7951 -2.8924 -0.0000
+                        2.0481 -2.8924 0.6101
+                        2.7951 2.8284 0.6101
+                        2.0481 2.8284 0.6101
+                        2.7951 2.8284 -0.0000
+                        3.5421 -2.8924 0.3050
+                        3.5421 -2.8924 -0.0000
+                        2.7951 -2.8924 0.3050
+                        3.5421 2.8284 -0.0000
+                        3.5421 2.8284 0.3050
+                        2.7951 2.8284 0.3050
+                        -3.1810 -2.8924 3.0503
+                        -2.6276 -2.8924 3.0503
+                        -2.6276 -2.8924 2.7453
+                        -3.1810 2.8284 3.0503
+                        -2.6276 2.8284 3.0503
+                        -2.6276 2.8284 2.7453
+                        -2.4340 -2.8924 3.0503
+                        -2.4340 2.8284 3.0503
+                        -1.8806 -2.8924 2.7453
+                        -1.8806 -2.8924 2.4403
+                        -1.8806 2.8284 2.7453
+                        -1.8806 2.8284 2.4403
+                        -1.6870 -2.8924 2.7453
+                        -1.6870 2.8284 2.7453
+                        -1.1336 -2.8924 2.4403
+                        -1.1336 -2.8924 2.1352
+                        -1.1336 2.8284 2.4403
+                        -1.1336 2.8284 2.1352
+                        -0.9400 -2.8924 2.4403
+                        -0.9400 2.8284 2.4403
+                        -0.3865 -2.8924 2.1352
+                        -0.3865 -2.8924 1.8302
+                        -0.3865 2.8284 2.1352
+                        -0.3865 2.8284 1.8302
+                        -0.1930 -2.8924 2.1352
+                        -0.1930 2.8284 2.1352
+                        0.3605 -2.8924 1.8302
+                        0.3605 -2.8924 1.5252
+                        0.3605 2.8284 1.8302
+                        0.3605 2.8284 1.5252
+                        1.3011 -2.8924 1.5252
+                        1.3011 2.8284 1.5252
+                        1.1075 -2.8924 1.5252
+                        1.1075 -2.8924 1.2201
+                        1.1075 2.8284 1.5252
+                        1.1075 2.8284 1.2201
+                        0.5541 -2.8924 1.8302
+                        0.5541 2.8284 1.8302
+                        1.8545 -2.8924 1.2201
+                        1.8545 -2.8924 0.9151
+                        1.8545 2.8284 1.2201
+                        1.8545 2.8284 0.9151
+                        2.0481 -2.8924 1.2201
+                        2.0481 2.8284 1.2201
+                        2.6015 -2.8924 0.9151
+                        2.6015 -2.8924 0.6101
+                        2.6015 2.8284 0.9151
+                        2.6015 2.8284 0.6101
+                        2.7951 -2.8924 0.9151
+                        2.7951 2.8284 0.9151
+                        3.3485 -2.8924 0.6101
+                        3.3485 -2.8924 0.3050
+                        3.3485 2.8284 0.6101
+                        3.3485 2.8284 0.3050
+                        4.2891 -2.8924 0.3050
+                        4.2891 2.8284 0.3050
+                        4.2891 -2.8924 0.0000
+                        4.2891 2.8284 0.0000
+                        4.0955 -2.8924 0.3050
+                        4.0955 -2.8924 0.0000
+                        4.0955 2.8284 0.3050
+                        4.0955 2.8284 0.0000
+                        3.5421 -2.8924 0.6101
+                        3.5421 2.8284 0.6101
+                    </float_array>
+                    <technique_common>
+                        <accessor count="120" source="#desert_stairs_sm-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="desert_stairs_sm-Normal">
+                    <float_array count="18" id="desert_stairs_sm-Normal-array">
+                        0.0000 -1.0000 0.0000
+                        0.0000 1.0000 0.0000
+                        -0.0000 -0.0000 -1.0000
+                        -1.0000 0.0000 0.0000
+                        0.0000 0.0000 1.0000
+                        1.0000 0.0000 0.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="6" source="#desert_stairs_sm-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="desert_stairs_sm-UV0">
+                    <float_array count="154" id="desert_stairs_sm-UV0-array">
+                        -0.6314 -0.7226
+                        -0.6314 0.0665
+                        -0.8716 -0.7226
+                        -0.8716 0.0665
+                        0.3750 -1.0000
+                        0.5602 -1.0000
+                        0.3750 -1.2500
+                        0.5602 -1.2500
+                        0.1250 -1.7500
+                        0.3750 -1.7500
+                        0.1250 -2.0000
+                        0.3750 -2.0000
+                        -0.3912 -0.6349
+                        -0.3912 0.0665
+                        -0.6314 -0.6349
+                        -0.1510 -0.5472
+                        -0.1510 0.0665
+                        -0.3912 -0.5472
+                        -0.1510 -0.4595
+                        0.0892 -0.4595
+                        0.0892 0.0665
+                        0.3294 -0.3719
+                        0.3294 0.0665
+                        0.0892 -0.3719
+                        0.3294 -0.2842
+                        0.5696 -0.2842
+                        0.5696 0.0665
+                        0.8098 -0.1965
+                        0.8098 0.0665
+                        0.5696 -0.1965
+                        1.0500 -0.1088
+                        1.0500 0.0665
+                        0.8098 -0.1088
+                        1.2902 -0.0212
+                        1.2902 0.0665
+                        1.0500 -0.0212
+                        -0.8716 -0.8102
+                        -0.6937 -0.8102
+                        -0.6937 -0.7226
+                        2.9340 -1.2659
+                        2.9339 -1.4020
+                        1.3954 -1.2659
+                        1.3954 -1.4020
+                        1.1113 -1.4990
+                        4.7717 -1.4990
+                        1.1113 -1.7529
+                        4.7717 -1.7529
+                        1.2238 -1.9978
+                        1.2238 -2.2538
+                        1.1114 -1.9978
+                        1.1114 -2.2538
+                        4.7709 -1.2366
+                        1.1104 -1.2366
+                        0.6709 -1.2500
+                        0.6709 -1.4980
+                        0.5542 -1.2500
+                        0.5542 -1.4980
+                        -0.4535 -0.7226
+                        -0.4535 -0.6349
+                        -0.2132 -0.6349
+                        -0.2132 -0.5472
+                        0.0270 -0.5472
+                        0.0270 -0.4595
+                        0.2672 -0.4595
+                        0.2672 -0.3719
+                        0.5074 -0.3719
+                        0.5074 -0.2842
+                        0.7476 -0.2842
+                        0.7476 -0.1965
+                        0.9878 -0.1965
+                        0.9878 -0.1088
+                        1.2280 -0.1088
+                        1.2280 -0.0212
+                        0.6709 -1.0000
+                        0.5542 -1.0000
+                        1.4682 -0.0212
+                        1.4682 0.0665
+</float_array>
+                    <technique_common>
+                        <accessor count="77" source="#desert_stairs_sm-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="desert_stairs_sm-Vertex">
+                    <input semantic="POSITION" source="#desert_stairs_sm-Position" />
+                </vertices>
+                <triangles count="120" material="DESERT_BRICK_SQUARE_SANDY">
+                    <input offset="0" semantic="VERTEX" source="#desert_stairs_sm-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#desert_stairs_sm-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#desert_stairs_sm-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        7 1 3 5 1 2 4 1 0
+                        6 1 1 7 1 3 4 1 0
+                        6 2 7 1 2 5 3 2 4
+                        7 2 6 6 2 7 3 2 4
+                        3 3 11 2 3 9 5 3 8
+                        7 3 10 3 3 11 5 3 8
+                        1 0 1 9 0 13 8 0 12
+                        10 0 14 1 0 1 8 0 12
+                        6 1 1 12 1 14 11 1 12
+                        13 1 13 6 1 1 11 1 12
+                        13 2 7 9 2 5 1 2 4
+                        6 2 6 13 2 7 1 2 4
+                        9 0 13 15 0 16 14 0 15
+                        16 0 17 9 0 13 14 0 15
+                        13 1 13 18 1 17 17 1 15
+                        19 1 16 13 1 13 17 1 15
+                        19 2 7 15 2 5 9 2 4
+                        13 2 6 19 2 7 9 2 4
+                        22 0 20 21 0 19 20 0 18
+                        15 0 16 22 0 20 20 0 18
+                        19 1 16 24 1 18 23 1 19
+                        25 1 20 19 1 16 23 1 19
+                        25 2 7 22 2 5 15 2 4
+                        19 2 6 25 2 7 15 2 4
+                        22 0 20 27 0 22 26 0 21
+                        28 0 23 22 0 20 26 0 21
+                        25 1 20 30 1 23 29 1 21
+                        31 1 22 25 1 20 29 1 21
+                        25 2 6 31 2 7 27 2 5
+                        22 2 4 25 2 6 27 2 5
+                        34 0 26 33 0 25 32 0 24
+                        27 0 22 34 0 26 32 0 24
+                        37 1 26 31 1 22 35 1 24
+                        36 1 25 37 1 26 35 1 24
+                        37 2 7 34 2 5 27 2 4
+                        31 2 6 37 2 7 27 2 4
+                        34 0 26 39 0 28 38 0 27
+                        40 0 29 34 0 26 38 0 27
+                        37 1 26 42 1 29 41 1 27
+                        43 1 28 37 1 26 41 1 27
+                        37 2 6 43 2 7 39 2 5
+                        34 2 4 37 2 6 39 2 5
+                        39 0 28 45 0 31 44 0 30
+                        46 0 32 39 0 28 44 0 30
+                        43 1 28 48 1 32 47 1 30
+                        49 1 31 43 1 28 47 1 30
+                        43 2 6 49 2 7 45 2 5
+                        39 2 4 43 2 6 45 2 5
+                        45 0 31 51 0 34 50 0 33
+                        52 0 35 45 0 31 50 0 33
+                        55 1 35 54 1 33 53 1 34
+                        49 1 31 55 1 35 53 1 34
+                        49 2 31 53 2 34 51 2 34
+                        45 2 31 49 2 31 51 2 34
+                        58 0 38 57 0 37 56 0 36
+                        2 0 2 58 0 38 56 0 36
+                        57 4 42 60 4 40 59 4 39
+                        56 4 41 57 4 42 59 4 39
+                        60 1 37 61 1 38 5 1 2
+                        59 1 36 60 1 37 5 1 2
+                        2 3 11 56 3 9 59 3 8
+                        5 3 10 2 3 11 59 3 8
+                        65 0 58 64 0 57 0 0 0
+                        10 0 14 65 0 58 0 0 0
+                        64 4 42 66 4 40 4 4 39
+                        0 4 41 64 4 42 4 4 39
+                        66 1 57 67 1 58 12 1 14
+                        4 1 0 66 1 57 12 1 14
+                        71 0 60 70 0 59 8 0 12
+                        16 0 17 71 0 60 8 0 12
+                        70 4 42 72 4 40 11 4 39
+                        8 4 41 70 4 42 11 4 39
+                        72 1 59 73 1 60 18 1 17
+                        11 1 12 72 1 59 18 1 17
+                        77 0 62 76 0 61 14 0 15
+                        20 0 18 77 0 62 14 0 15
+                        76 4 42 78 4 40 17 4 39
+                        14 4 41 76 4 42 17 4 39
+                        78 1 61 79 1 62 24 1 18
+                        17 1 15 78 1 61 24 1 18
+                        83 0 64 82 0 63 21 0 19
+                        28 0 23 83 0 64 21 0 19
+                        82 4 42 84 4 40 23 4 39
+                        21 4 41 82 4 42 23 4 39
+                        84 1 63 85 1 64 30 1 23
+                        23 1 19 84 1 63 30 1 23
+                        89 0 66 88 0 65 26 0 21
+                        32 0 24 89 0 66 26 0 21
+                        88 4 42 90 4 40 29 4 39
+                        26 4 41 88 4 42 29 4 39
+                        90 1 65 91 1 66 35 1 24
+                        29 1 21 90 1 65 35 1 24
+                        95 0 68 94 0 67 33 0 25
+                        40 0 29 95 0 68 33 0 25
+                        94 4 42 96 4 40 36 4 39
+                        33 4 41 94 4 42 36 4 39
+                        96 1 67 97 1 68 42 1 29
+                        36 1 25 96 1 67 42 1 29
+                        101 0 70 100 0 69 38 0 27
+                        46 0 32 101 0 70 38 0 27
+                        100 4 42 102 4 40 41 4 39
+                        38 4 41 100 4 42 41 4 39
+                        102 1 69 103 1 70 48 1 32
+                        41 1 27 102 1 69 48 1 32
+                        107 0 72 106 0 71 44 0 30
+                        52 0 35 107 0 72 44 0 30
+                        106 4 42 108 4 40 47 4 39
+                        44 4 41 106 4 42 47 4 39
+                        108 1 71 109 1 72 55 1 35
+                        47 1 30 108 1 71 55 1 35
+                        115 0 76 114 0 75 50 0 33
+                        51 0 34 115 0 76 50 0 33
+                        114 4 42 116 4 40 54 4 39
+                        50 4 41 114 4 42 54 4 39
+                        116 1 75 117 1 76 53 1 34
+                        54 1 33 116 1 75 53 1 34
+                        117 2 7 115 2 5 51 2 4
+                        53 2 6 117 2 7 51 2 4
+                    </p>
+                </triangles>
+                <triangles count="82" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#desert_stairs_sm-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#desert_stairs_sm-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#desert_stairs_sm-UV0" />
+                    <p>
+                        4 5 46 63 5 44 62 5 43
+                        0 5 45 4 5 46 62 5 43
+                        58 0 50 0 0 48 62 0 47
+                        57 0 49 58 0 50 62 0 47
+                        57 4 52 62 4 43 63 4 44
+                        60 4 51 57 4 52 63 4 44
+                        60 1 56 63 1 54 4 1 53
+                        61 1 55 60 1 56 4 1 53
+                        11 5 46 69 5 44 68 5 43
+                        8 5 45 11 5 46 68 5 43
+                        65 0 50 8 0 48 68 0 47
+                        64 0 49 65 0 50 68 0 47
+                        64 4 52 68 4 43 69 4 44
+                        66 4 51 64 4 52 69 4 44
+                        66 1 56 69 1 54 11 1 53
+                        67 1 55 66 1 56 11 1 53
+                        17 5 46 75 5 44 74 5 43
+                        14 5 45 17 5 46 74 5 43
+                        71 0 50 14 0 48 74 0 47
+                        70 0 49 71 0 50 74 0 47
+                        70 4 52 74 4 43 75 4 44
+                        72 4 51 70 4 52 75 4 44
+                        72 1 56 75 1 54 17 1 53
+                        73 1 55 72 1 56 17 1 53
+                        23 5 46 81 5 44 80 5 43
+                        21 5 45 23 5 46 80 5 43
+                        77 0 50 21 0 48 80 0 47
+                        76 0 49 77 0 50 80 0 47
+                        76 4 52 80 4 43 81 4 44
+                        78 4 51 76 4 52 81 4 44
+                        78 1 56 81 1 54 23 1 53
+                        79 1 55 78 1 56 23 1 53
+                        36 5 46 87 5 44 86 5 43
+                        33 5 45 36 5 46 86 5 43
+                        89 0 50 33 0 48 86 0 47
+                        88 0 49 89 0 50 86 0 47
+                        88 4 52 86 4 43 87 4 44
+                        90 4 51 88 4 52 87 4 44
+                        90 1 56 87 1 54 36 1 53
+                        91 1 55 90 1 56 36 1 53
+                        29 5 46 93 5 44 92 5 43
+                        26 5 45 29 5 46 92 5 43
+                        83 0 50 26 0 48 92 0 47
+                        82 0 49 83 0 50 92 0 47
+                        82 4 52 92 4 43 93 4 44
+                        84 4 51 82 4 52 93 4 44
+                        84 1 56 93 1 54 29 1 53
+                        85 1 55 84 1 56 29 1 53
+                        41 5 46 99 5 44 98 5 43
+                        38 5 45 41 5 46 98 5 43
+                        95 0 50 38 0 48 98 0 47
+                        94 0 49 95 0 50 98 0 47
+                        94 4 52 98 4 43 99 4 44
+                        96 4 51 94 4 52 99 4 44
+                        96 1 56 99 1 54 41 1 53
+                        97 1 55 96 1 56 41 1 53
+                        47 5 46 105 5 44 104 5 43
+                        44 5 45 47 5 46 104 5 43
+                        101 0 50 44 0 48 104 0 47
+                        100 0 49 101 0 50 104 0 47
+                        100 4 52 104 4 43 105 4 44
+                        102 4 51 100 4 52 105 4 44
+                        102 1 56 105 1 54 47 1 53
+                        103 1 55 102 1 56 47 1 53
+                        113 5 46 111 5 44 110 5 43
+                        112 5 45 113 5 46 110 5 43
+                        115 0 50 112 0 48 110 0 47
+                        114 0 49 115 0 50 110 0 47
+                        114 4 52 110 4 43 111 4 44
+                        116 4 51 114 4 52 111 4 44
+                        116 1 56 111 1 54 113 1 53
+                        117 1 55 116 1 56 113 1 53
+                        117 2 55 113 2 53 112 2 73
+                        115 2 74 117 2 55 112 2 73
+                        54 5 46 119 5 44 118 5 43
+                        50 5 45 54 5 46 118 5 43
+                        107 0 50 50 0 48 118 0 47
+                        106 0 49 107 0 50 118 0 47
+                        106 4 52 118 4 43 119 4 44
+                        108 4 51 106 4 52 119 4 44
+                        108 1 56 119 1 54 54 1 53
+                        109 1 55 108 1 56 54 1 53
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="desert_stairs_sm" name="desert_stairs_sm">
+                <instance_geometry url="#desert_stairs_sm-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_SQUARE_SANDY" target="#DESERT_BRICK_SQUARE_SANDY" />
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

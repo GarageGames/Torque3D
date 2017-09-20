@@ -780,10 +780,19 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
       GFXTextureObject* mAccuTex;
 
 
+   // Ubiq:
    private:
+      bool mAllowPlayerClimb;
+      bool mAllowPlayerLedgeGrab;
+      bool mAllowPlayerWallHug;
+
       bool mCameraIgnores;
 
    public:
+      bool allowPlayerClimb() {return mAllowPlayerClimb;}
+      bool allowPlayerLedgeGrab() {return mAllowPlayerLedgeGrab;}
+      bool allowPlayerWallHug() {return mAllowPlayerWallHug;}
+
       bool cameraIgnores() {return mCameraIgnores;}
 };
 

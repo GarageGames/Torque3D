@@ -1,5 +1,9 @@
 //-----------------------------------------------------------------------------
-// Copyright (c) 2012 GarageGames, LLC
+// 3D Action Adventure Kit for T3D
+// Copyright (C) 2008-2013 Ubiq Visuals, Inc. (http://www.ubiqvisuals.com/)
+//
+// This file also incorporates work covered by the following copyright and  
+// permission notice:
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -30,6 +34,10 @@
 #include "collision/boxConvex.h"
 #endif
 
+#ifndef _CONCRETEPOLYLIST_H_
+#include "collision/concretePolyList.h"
+#endif
+
 #include "T3D/gameBase/gameProcess.h"
 
 class Material;
@@ -39,10 +47,6 @@ class DecalData;
 class SplashData;
 class PhysicsPlayer;
 class Player;
-
-#ifdef TORQUE_OPENVR
-class OpenVRTrackedObject;
-#endif
 
 //----------------------------------------------------------------------------
 
@@ -101,13 +105,14 @@ struct PlayerData: public ShapeBaseData {
 
    F32 fallingSpeedThreshold; ///< Downward speed at which we consider the player falling
 
-   S32 recoverDelay;          ///< # tick
+   //Ubiq: removing these - we use our own landing system
+   /*S32 recoverDelay;          ///< # tick
    F32 recoverRunForceScale;  ///< RunForce multiplier in recover state
    F32 landSequenceTime;      ///< If greater than 0 then the legacy fall recovery system will be bypassed
                               ///  in favour of just playing the player's land sequence.  The time to
                               ///  recover from a fall then becomes this parameter's time and the land
                               ///  sequence's playback will be scaled to match.
-   bool transitionToLand;     ///< When going from a fall to a land, should we transition between the two?
+   bool transitionToLand;     ///< When going from a fall to a land, should we transition between the two?*/
 
    // Running/Walking
    F32 runForce;              ///< Force used to accelerate player
@@ -190,19 +195,31 @@ struct PlayerData: public ShapeBaseData {
 
    /// Zounds!
    enum Sounds {
+      //Ubiq sounds:
+      stop,
+      jumpCrouch,
+      jump,
+      land,
+      climbIdle,
+      climbUp,
+      climbDown,
+      climbLeftRight,
+      ledgeIdle,
+      ledgeUp,
+      ledgeLeftRight,
+      slide,//
+
       FootSoft,
       FootHard,
       FootMetal,
       FootSnow,
-      MaxSoundOffsets,
       FootShallowSplash,
       FootWading,
       FootUnderWater,
       FootBubbles,
       MoveBubbles,
       WaterBreath,
-      ImpactStart,
-      ImpactSoft = ImpactStart,
+      ImpactSoft,
       ImpactHard,
       ImpactMetal,
       ImpactSnow,
@@ -244,6 +261,7 @@ struct PlayerData: public ShapeBaseData {
       BackBackwardAnim,
       SideLeftAnim,
       SideRightAnim,
+      WalkForwardAnim,
 
       SprintRootAnim,
       SprintForwardAnim,
@@ -271,12 +289,37 @@ struct PlayerData: public ShapeBaseData {
       FallAnim,
       JumpAnim,
       StandJumpAnim,
-      LandAnim,
+      StandingLandAnim,
+	  RunningLandAnim,
       JetAnim,
 
-      // 
-      NumTableActionAnims = JetAnim + 1,
+		//Ubiq:
+		//==========================================
+		Death1Anim,
 
+		StopAnim,
+
+		WallIdleAnim,
+		WallLeftAnim,
+		WallRightAnim,
+
+		LedgeIdleAnim,
+		LedgeLeftAnim,
+		LedgeRightAnim,
+		LedgeUpAnim,
+
+		ClimbIdleAnim,
+		ClimbUpAnim,
+		ClimbDownAnim,
+		ClimbLeftAnim,
+		ClimbRightAnim,
+
+		SlideFrontAnim,
+		SlideBackAnim,
+
+      //
+      NumMoveActionAnims = WalkForwardAnim + 1,
+      NumTableActionAnims = SlideBackAnim + 1,
       NumExtraActionAnims = 512 - NumTableActionAnims,
       NumActionAnims = NumTableActionAnims + NumExtraActionAnims,
       ActionAnimBits = 9,
@@ -353,10 +396,64 @@ struct PlayerData: public ShapeBaseData {
    void getGroundInfo(TSShapeInstance*,TSThread*,ActionAnimation*);
    bool isTableSequence(S32 seq);
    bool isJumpAction(U32 action);
+   bool isLedgeAction(U32 action);
+   bool isClimbAction(U32 action);
+   bool isLandAction(U32 action);
 
    static void initPersistFields();
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);
+
+
+   //Ubiq:
+	Point3F cameraOffset;			///< Offset from player origin camera looks at
+
+	F32 walkRunAnimVelocity;		///< Velocity at which player switches between walk and run animations
+
+	//Ubiq: Turn Rates
+	F32 airTurnRate;				///<
+	F32 groundTurnRate;				///<
+
+	F32 groundFriction;				///<
+
+	F32 jetTime;					///<
+
+	//Ubiq: climbing
+	F32 climbHeightMin;				///< Minimum height of climb detection range (relative to players feet)
+	F32 climbHeightMax;				///< Maximum height of climb detection range (relative to players feet)
+	F32 climbSpeedUp;				///<
+	F32 climbSpeedDown;				///<
+	F32 climbSpeedSide;				///<
+	F32 climbScrapeSpeed;			///<
+	F32 climbScrapeFriction;		///<
+
+	//Ubiq: ledge grabbing
+	F32 grabHeightMin;				///<
+	F32 grabHeightMax;				///<
+	F32 grabHeight;					///<
+	F32 grabSpeedSide;				///<
+	F32 grabSpeedUp;				///<
+	F32 grabUpForwardOffset;		///<
+	F32 grabUpUpwardOffset;			///<
+	Point3F grabUpTestBox;			///< Width, depth and height of box used to test if player has room above to pull himself up
+
+	//Ubiq: Wall hug
+	F32 wallHugSpeed;				///< How fast player moves left/right when wall hugging
+	F32 wallHugHeightMin;			///< Minimum height of wall detection range (relative to players feet)
+	F32 wallHugHeightMax;			///< Maximum height of wall detection range (relative to players feet)
+
+	//Ubiq: Jump delays
+	F32 runJumpCrouchDelay;			///<
+	F32 standJumpCrouchDelay;		///<
+
+	//Ubiq: ground snap
+	F32 groundSnapSpeed;			///<
+	F32 groundSnapRayOffset;		///<
+	F32 groundSnapRayLength;		///<
+	
+	//Ubiq: Land state
+    F32 landDuration;				///< the duration of the land in ms
+	F32 landSpeedFactor;			///< the speed reduction factor upon landing
 
    /// @name Callbacks
    /// @{
@@ -401,7 +498,8 @@ protected:
       ActionMask   = Parent::NextFreeMask << 0,
       MoveMask     = Parent::NextFreeMask << 1,
       ImpactMask   = Parent::NextFreeMask << 2,
-      NextFreeMask = Parent::NextFreeMask << 3
+	  LedgeUpMask  = Parent::NextFreeMask << 3,
+      NextFreeMask = Parent::NextFreeMask << 4
    };
 
    SimObjectPtr<ParticleEmitter> mSplashEmitter[PlayerData::NUM_SPLASH_EMITTERS];
@@ -445,7 +543,6 @@ protected:
 
    F32 mLastAbsoluteYaw;            ///< Stores that last absolute yaw value as passed in by ExtendedMove
    F32 mLastAbsolutePitch;          ///< Stores that last absolute pitch value as passed in by ExtendedMove
-   F32 mLastAbsoluteRoll;           ///< Stores that last absolute roll value as passed in by ExtendedMove
 
    S32 mMountPending;               ///< mMountPending suppresses tickDelay countdown so players will sit until
                                     ///< their mount, or another animation, comes through (or 13 seconds elapses).
@@ -477,6 +574,7 @@ protected:
 
    SFXSource* mMoveBubbleSound;   ///< Sound for moving bubbles
    SFXSource* mWaterBreathSound;  ///< Sound for underwater breath
+   SFXSource* mSlideSound;        ///< Ubiq: Sound for sliding down or scraping across surfaces
 
    SimObjectPtr<ShapeBase> mControlObject; ///< Controlling object
 
@@ -484,7 +582,7 @@ protected:
    /// @{
 
    struct ActionAnimation {
-      S32 action;
+      U32 action;
       TSThread* thread;
       S32 delayTicks;               // before picking another.
       bool forward;
@@ -493,6 +591,7 @@ protected:
       bool holdAtEnd;
       bool animateOnServer;
       bool atEnd;
+      bool useSynchedPos;			//transition to an identical position in the target sequence (instead of 0 or 1)
    } mActionAnimation;
 
    struct ArmAnimation {
@@ -522,13 +621,9 @@ protected:
    Point3F mLastPos;          ///< Holds the last position for physics updates
    Point3F mLastWaterPos;     ///< Same as mLastPos, but for water
 
-#ifdef TORQUE_OPENVR
-   SimObjectPtr<OpenVRTrackedObject> mControllers[2];
-#endif
-
    struct ContactInfo 
    {
-      bool contacted, jump, run;
+      bool contacted, jump, run, slide;
       SceneObject *contactObject;
       VectorF  contactNormal;
 
@@ -554,7 +649,7 @@ protected:
       bool     haveVelocity()    {return posAdd.x != 0 || posAdd.y != 0;}
       void     initFall()        {curNormal.set(0,0,1); curSink = 0;}
       Death()                    {clear();}
-      MatrixF* fallToGround(F32 adjust, const Point3F& pos, F32 zrot, F32 boxRad);
+      //MatrixF* fallToGround(F32 adjust, const Point3F& pos, F32 zrot, F32 boxRad);
    } mDeath;
 
    PhysicsPlayer *mPhysicsRep;
@@ -585,16 +680,11 @@ protected:
 
    PhysicsPlayer* getPhysicsRep() const { return mPhysicsRep; }
 
-#ifdef TORQUE_OPENVR
-   void setControllers(Vector<OpenVRTrackedObject*> controllerList);
-#endif
-
   protected:
    virtual void reSkin();
 
    void setState(ActionState state, U32 ticks=0);
    void updateState();
-
 
    // Jetting
    bool mJetting;
@@ -621,21 +711,21 @@ protected:
 
    virtual U32 getArmAction() const { return mArmAnimation.action; }
    virtual bool setArmThread(U32 action);
-   virtual void setActionThread(U32 action,bool forward,bool hold = false,bool wait = false,bool fsp = false, bool forceSet = false);
+   virtual void setActionThread(U32 action, bool forward = true, bool hold = false, bool wait = false, bool fsp = true, bool forceSet = false, bool useSynchedPos = false);
    virtual void updateActionThread();
    virtual void pickBestMoveAction(U32 startAnim, U32 endAnim, U32 * action, bool * forward) const;
    virtual void pickActionAnimation();
 
    /// @name Mounted objects
    /// @{
-   virtual void onUnmount( SceneObject *obj, S32 node );
+   virtual void onUnmount( ShapeBase *obj, S32 node );
    virtual void unmount();
    /// @}
 
    void setPosition(const Point3F& pos,const Point3F& viewRot);
    void setRenderPosition(const Point3F& pos,const Point3F& viewRot,F32 dt=-1);
    void _findContact( SceneObject **contactObject, VectorF *contactNormal, Vector<SceneObject*> *outOverlapObjects );
-   void findContact( bool *run, bool *jump, VectorF *contactNormal );
+   void findContact(bool* run,bool* jump,bool* slide,VectorF* contactNormal);
 
    void buildImagePrefixPaths(String* prefixPaths);
    S32 findPrefixSequence(String* prefixPaths, const String& baseSeq);
@@ -676,7 +766,7 @@ protected:
 
    void updateSplash();                             ///< Update the splash effect
    void updateFroth( F32 dt );                      ///< Update any froth
-   void updateWaterSounds( F32 dt );                ///< Update water sounds
+   //void updateWaterSounds( F32 dt );                ///< Update water sounds
    void createSplash( Point3F &pos, F32 speed );    ///< Creates a splash
    bool collidingWithWater( Point3F &waterHeight ); ///< Are we colliding with water?
    /// @}
@@ -753,7 +843,7 @@ public:
 
    // Animation
    const char* getStateName();
-   bool setActionThread(const char* sequence,bool hold,bool wait,bool fsp = false);
+   bool setActionThread(const char* sequence, bool forward, bool hold, bool wait, bool fsp, bool forceSet, bool useSynchedPos);
    const String& getArmThread() const;
    bool setArmThread(const char* sequence);
 
@@ -780,6 +870,144 @@ public:
    virtual void prepRenderImage( SceneRenderState* state );
    virtual void renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat );   
    virtual void renderMountedImage( U32 imageSlot, TSRenderState &rstate, SceneRenderState *state );
+
+   //----------------------------------------------------------------------------
+   // Ubiq custom
+   //----------------------------------------------------------------------------
+
+   bool mDieOnNextCollision;
+
+   bool mRunSurface, mJumpSurface, mSlideSurface;
+
+   Point3F getNodePosition(const char *nodeName);
+   void setObjectBox(Point3F size);
+   Box3F createObjectBox(Point3F size);
+   bool worldBoxIsClear(Box3F worldSpaceBox);
+   bool worldBoxIsClear(Box3F objSpaceBox, Point3F worldPosition);
+   Point3F snapToPlane(PlaneF plane);	//collides player with given plane and returns the new position
+   U32 getSurfaceType();
+   void updateSounds( F32 dt );                ///< Update sounds
+   
+
+   enum MoveDir
+   {
+	   MOVE_DIR_NONE,
+	   MOVE_DIR_UP,
+	   MOVE_DIR_DOWN,
+	   MOVE_DIR_LEFT,
+	   MOVE_DIR_RIGHT
+   };
+
+   //-------------------------------------------------------------------
+   // Snap to ground
+   //-------------------------------------------------------------------
+   F32 mGroundSnap;		//offset for render position (client only) on Z axis
+
+
+   //-------------------------------------------------------------------
+   // Slide state
+   //-------------------------------------------------------------------
+   struct SlideState
+   {
+	   bool active;
+	   Point3F surfaceNormal;
+   }
+   mSlideState;
+
+
+   //-------------------------------------------------------------------
+   // Jump state
+   //-------------------------------------------------------------------
+   bool mJumping;			//in the air from a jump?
+
+   enum JumpType
+   {
+	   JumpType_Run,
+	   JumpType_Stand
+   };
+
+   struct JumpState
+   {
+	   bool active;			//are we currently in the standJump state?
+	   bool isCrouching;	//are we currently in the "crouch" phase of the jump? (active will also be true)
+	   F32 crouchDelay;		//how long we're frozen in the "crouch" phase
+	   JumpType jumpType;	//run jump or stand jump?
+   } mJumpState;
+
+
+   //-------------------------------------------------------------------
+   // Climb state
+   //-------------------------------------------------------------------
+   struct ClimbState
+   {
+	   bool active;
+	   Point3F surfaceNormal;		//normal of surface we're currently on (which direction player should face)
+	   MoveDir direction;
+	   bool ignoreClimb;
+   } mClimbState;
+   S32 mClimbTriggerCount;
+
+   void findClimbContact(bool* climb, PlaneF* climbPlane);
+   bool canStartClimb();
+   bool canClimb();
+
+
+   //-------------------------------------------------------------------
+   // Wall Hug state
+   //-------------------------------------------------------------------
+   struct WallHugState
+   {
+	   bool active;
+	   Point3F surfaceNormal;		//normal of surface we're currently on (which direction player should face)
+	   MoveDir direction;
+   } mWallHugState;
+
+   void findWallContact(bool* wall, PlaneF* wallPlane);
+   bool canStartWallHug();
+   bool canWallHug();
+
+
+   //-------------------------------------------------------------------
+   // Ledge Grab state
+   //-------------------------------------------------------------------
+   struct LedgeState
+   {
+	   bool active;
+	   Point3F ledgeNormal;		//normal of ledge we're currently on (which direction player should face)
+	   Point3F ledgePoint;		//point on the ledge where player is grabbing
+	   MoveDir direction;
+	   bool ignoreLedge;
+
+	   bool climbingUp;		//are we pulling ourselves up?
+	   F32 animPos;			//what pos are we at in the climb up animation? (0 - 1)
+	   F32 deltaAnimPos;		//for interpolation, the last pos in the climb up animation (0 - 1)
+	   F32 deltaAnimPosVec;	//for interpolation, how fast are we playing climb up animation?
+   }
+   mLedgeState;
+   void findLedgeContact(bool* ledge, VectorF* ledgeNormal, Point3F* ledgePoint, bool* canMoveLeft, bool* canMoveRight);
+   bool findAdjacentPoly(ConcretePolyList* polyList, Point3F vertex1, Point3F vertex2, U32 polyIndex, U32* adjPolyIndex);
+   bool canStartLedgeGrab();
+   bool canLedgeGrab();
+   Point3F getLedgeUpPosition();
+   bool canStartLedgeUp();
+   void updateLedgeUpAnimation();
+
+
+   //-------------------------------------------------------------------
+   // Land state
+   //-------------------------------------------------------------------
+   struct LandState
+   {
+	   bool active;			//is the player landing from a fall or jump?
+	   S32 timer;			//timer to track how long before we leave LandState
+   }
+   mLandState;
+
+
+   //-------------------------------------------------------------------
+   // Stop state
+   //-------------------------------------------------------------------
+   S32 mStoppingTimer;		//how long we've been slowing down for (ms)
 };
 
 typedef Player::Pose PlayerPose;

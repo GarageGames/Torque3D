@@ -1,0 +1,346 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:02 AM</created>
+        <modified>15/05/2013 2:11:02 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_SQUARE_SANDY-Diffuse" name="DESERT_BRICK_SQUARE_SANDY-Diffuse">
+            <init_from>DESERT_BRICK_SQUARE_SANDY.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_SQUARE_SANDY" name="DESERT_BRICK_SQUARE_SANDY">
+            <instance_effect url="#DESERT_BRICK_SQUARE_SANDY-fx" />
+        </material>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_SQUARE_SANDY-fx" name="DESERT_BRICK_SQUARE_SANDY-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_SQUARE_SANDY-Surface"><surface type="2D"><init_from>DESERT_BRICK_SQUARE_SANDY-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_SQUARE_SANDY-Sampler"><sampler2D><source>DESERT_BRICK_SQUARE_SANDY-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_SQUARE_SANDY-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="tutorial_structure_jumpingbox_sml-lib" name="tutorial_structure_jumpingbox_smlMesh">
+            <mesh>
+                <source id="tutorial_structure_jumpingbox_sml-Position">
+                    <float_array count="168" id="tutorial_structure_jumpingbox_sml-Position-array">
+                        -0.6089 1.2590 -0.7994
+                        -0.6089 1.2590 0.7994
+                        0.6089 1.2590 -0.7994
+                        0.6089 1.2590 0.7994
+                        0.6089 2.0010 -0.7994
+                        0.6089 2.0010 0.7994
+                        -0.6089 2.0010 -0.7994
+                        -0.6089 2.0010 0.7994
+                        -1.3509 2.0010 1.5414
+                        -1.3509 1.2590 1.5414
+                        -1.3509 2.0010 0.7994
+                        -1.3509 1.2590 0.7994
+                        1.3509 2.0010 1.5414
+                        1.3509 1.2590 1.5414
+                        1.3509 2.0010 0.7994
+                        1.3509 1.2590 0.7994
+                        1.3509 2.0010 -0.7994
+                        1.3509 1.2590 -0.7994
+                        -1.3509 2.0010 -1.5414
+                        -1.3509 1.2590 -1.5414
+                        1.3509 2.0010 -1.5414
+                        1.3509 1.2590 -1.5414
+                        -1.3509 2.0010 -0.7994
+                        -1.3509 1.2590 -0.7994
+                        1.3509 -1.2590 1.5414
+                        1.3509 -1.2590 0.7994
+                        0.6089 -1.2590 1.5414
+                        0.6089 1.2590 1.5414
+                        1.3509 -1.2590 -0.7994
+                        1.3509 -1.2590 -1.5414
+                        0.6089 -1.2590 -1.5414
+                        0.6089 1.2590 -1.5414
+                        -1.3509 -1.2590 1.5414
+                        -1.3509 -1.2590 0.7994
+                        -0.6089 -1.2590 1.5414
+                        -0.6089 1.2590 1.5414
+                        -1.3509 -1.2590 -0.7994
+                        -1.3509 -1.2590 -1.5414
+                        -0.6089 -1.2590 -1.5414
+                        -0.6089 1.2590 -1.5414
+                        -0.6089 -2.0010 -0.7994
+                        -0.6089 -2.0010 0.7994
+                        0.6089 -2.0010 -0.7994
+                        0.6089 -2.0010 0.7994
+                        0.6089 -1.2590 -0.7994
+                        0.6089 -1.2590 0.7994
+                        -0.6089 -1.2590 -0.7994
+                        -0.6089 -1.2590 0.7994
+                        -1.3509 -2.0010 1.5414
+                        -1.3509 -2.0010 0.7994
+                        1.3509 -2.0010 1.5414
+                        1.3509 -2.0010 0.7994
+                        1.3509 -2.0010 -0.7994
+                        -1.3509 -2.0010 -0.7994
+                        -1.3509 -2.0010 -1.5414
+                        1.3509 -2.0010 -1.5414
+                    </float_array>
+                    <technique_common>
+                        <accessor count="56" source="#tutorial_structure_jumpingbox_sml-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_jumpingbox_sml-Normal">
+                    <float_array count="18" id="tutorial_structure_jumpingbox_sml-Normal-array">
+                        -0.0000 -1.0000 -0.0000
+                        0.0000 1.0000 0.0000
+                        -1.0000 0.0000 0.0000
+                        0.0000 0.0000 1.0000
+                        1.0000 0.0000 0.0000
+                        0.0000 0.0000 -1.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="6" source="#tutorial_structure_jumpingbox_sml-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_jumpingbox_sml-UV0">
+                    <float_array count="100" id="tutorial_structure_jumpingbox_sml-UV0-array">
+                        0.4655 -1.7360
+                        0.6494 -1.7360
+                        0.4655 -1.8678
+                        0.6494 -1.8678
+                        0.3353 -1.5000
+                        0.5563 -1.5000
+                        0.3353 -1.7500
+                        0.5563 -1.7500
+                        0.2192 -5.2517
+                        0.2192 -4.9970
+                        1.1095 -5.2516
+                        1.1096 -4.9969
+                        0.3337 -1.0000
+                        0.5565 -1.0000
+                        0.3337 -1.2500
+                        0.5565 -1.2500
+                        1.1097 -5.2513
+                        1.1095 -5.5032
+                        0.2191 -5.2514
+                        0.2189 -5.5033
+                        0.5548 -5.2517
+                        0.5548 -4.9970
+                        1.1095 -5.4958
+                        0.5547 -5.2514
+                        0.5545 -5.4959
+                        1.1097 -4.4967
+                        1.1096 -4.7480
+                        0.2195 -4.4965
+                        0.2193 -4.7478
+                        0.3340 -1.0000
+                        0.5561 -1.0000
+                        0.3340 -1.2500
+                        0.5561 -1.2500
+                        0.5550 -4.4965
+                        0.5549 -4.7478
+                        0.2237 -5.2517
+                        0.2237 -4.9970
+                        0.2236 -5.2514
+                        0.2234 -5.5033
+                        1.1097 -4.7477
+                        0.2238 -4.7478
+                        0.2239 -4.4965
+                        0.4655 -1.6023
+                        0.6494 -1.6023
+                        0.5327 -1.6023
+                        0.6664 -1.6023
+                        0.5327 -1.8678
+                        0.6664 -1.8678
+                        0.6638 -1.6023
+                        0.6638 -1.8678
+</float_array>
+                    <technique_common>
+                        <accessor count="50" source="#tutorial_structure_jumpingbox_sml-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="tutorial_structure_jumpingbox_sml-Vertex">
+                    <input semantic="POSITION" source="#tutorial_structure_jumpingbox_sml-Position" />
+                </vertices>
+                <triangles count="24" material="DESERT_BRICK_SQUARE_SANDY">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_jumpingbox_sml-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_jumpingbox_sml-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_jumpingbox_sml-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        7 1 3 5 1 1 4 1 0
+                        6 1 2 7 1 3 4 1 0
+                        43 0 3 41 0 1 40 0 0
+                        42 0 2 43 0 3 40 0 0
+                        47 1 3 45 1 1 44 1 0
+                        46 1 2 47 1 3 44 1 0
+                        15 4 3 25 4 43 28 4 42
+                        17 4 2 15 4 3 28 4 42
+                        45 2 3 3 2 43 2 2 42
+                        44 2 2 45 2 3 2 2 42
+                        1 4 3 47 4 43 46 4 42
+                        0 4 2 1 4 3 46 4 42
+                        33 2 3 11 2 43 23 2 42
+                        36 2 2 33 2 3 23 2 42
+                        31 5 47 30 5 45 38 5 44
+                        39 5 46 31 5 47 38 5 44
+                        44 3 47 2 3 45 0 3 44
+                        46 3 46 44 3 47 0 3 44
+                        3 5 49 45 5 48 47 5 44
+                        1 5 46 3 5 49 47 5 44
+                        26 3 49 27 3 48 35 3 44
+                        34 3 46 26 3 49 35 3 44
+                    </p>
+                </triangles>
+                <triangles count="64" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_jumpingbox_sml-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_jumpingbox_sml-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_jumpingbox_sml-UV0" />
+                    <p>
+                        11 2 7 9 2 5 8 2 4
+                        10 2 6 11 2 7 8 2 4
+                        9 3 11 13 3 9 12 3 8
+                        8 3 10 9 3 11 12 3 8
+                        13 4 15 15 4 13 14 4 12
+                        12 4 14 13 4 15 14 4 12
+                        14 1 19 10 1 17 8 1 16
+                        12 1 18 14 1 19 8 1 16
+                        15 4 11 17 4 21 16 4 20
+                        14 4 10 15 4 11 16 4 20
+                        4 1 24 5 1 22 14 1 16
+                        16 1 23 4 1 24 14 1 16
+                        21 5 28 19 5 26 18 5 25
+                        20 5 27 21 5 28 18 5 25
+                        19 2 7 23 2 5 22 2 4
+                        18 2 6 19 2 7 22 2 4
+                        17 4 32 21 4 30 20 4 29
+                        16 4 31 17 4 32 20 4 29
+                        20 1 19 18 1 17 22 1 16
+                        16 1 18 20 1 19 22 1 16
+                        23 2 34 11 2 26 10 2 25
+                        22 2 33 23 2 34 10 2 25
+                        22 1 24 10 1 22 7 1 16
+                        6 1 23 22 1 24 7 1 16
+                        25 4 11 15 4 36 13 4 35
+                        24 4 10 25 4 11 13 4 35
+                        27 3 38 26 3 17 24 3 16
+                        13 3 37 27 3 38 24 3 16
+                        29 4 11 21 4 36 17 4 35
+                        28 4 10 29 4 11 17 4 35
+                        21 5 36 29 5 11 30 5 39
+                        31 5 40 21 5 36 30 5 39
+                        11 2 40 33 2 26 32 2 25
+                        9 2 41 11 2 40 32 2 25
+                        9 3 38 32 3 17 34 3 16
+                        35 3 37 9 3 38 34 3 16
+                        19 2 40 37 2 26 36 2 25
+                        23 2 41 19 2 40 36 2 25
+                        39 5 36 38 5 11 37 5 39
+                        19 5 40 39 5 36 37 5 39
+                        49 2 7 48 2 5 32 2 4
+                        33 2 6 49 2 7 32 2 4
+                        48 3 11 50 3 9 24 3 8
+                        32 3 10 48 3 11 24 3 8
+                        50 4 15 51 4 13 25 4 12
+                        24 4 14 50 4 15 25 4 12
+                        50 0 9 48 0 11 49 0 39
+                        51 0 28 50 0 9 49 0 39
+                        51 4 11 52 4 21 28 4 20
+                        25 4 10 51 4 11 28 4 20
+                        52 0 21 51 0 11 43 0 39
+                        42 0 34 52 0 21 43 0 39
+                        53 2 34 49 2 26 33 2 25
+                        36 2 33 53 2 34 33 2 25
+                        40 0 21 41 0 11 49 0 39
+                        53 0 34 40 0 21 49 0 39
+                        55 5 28 54 5 26 37 5 25
+                        29 5 27 55 5 28 37 5 25
+                        54 2 7 53 2 5 36 2 4
+                        37 2 6 54 2 7 36 2 4
+                        52 4 32 55 4 30 29 4 29
+                        28 4 31 52 4 32 29 4 29
+                        52 0 9 53 0 11 54 0 39
+                        55 0 28 52 0 9 54 0 39
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="tutorial_structure_jumpingbox_sml" name="tutorial_structure_jumpingbox_sml">
+                <instance_geometry url="#tutorial_structure_jumpingbox_sml-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_SQUARE_SANDY" target="#DESERT_BRICK_SQUARE_SANDY" />
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

@@ -1,0 +1,289 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:03 AM</created>
+        <modified>15/05/2013 2:11:03 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_SQUARE-Diffuse" name="DESERT_BRICK_SQUARE-Diffuse">
+            <init_from>DESERT_BRICK_SQUARE.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_SQUARE" name="DESERT_BRICK_SQUARE">
+            <instance_effect url="#DESERT_BRICK_SQUARE-fx" />
+        </material>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_SQUARE-fx" name="DESERT_BRICK_SQUARE-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_SQUARE-Surface"><surface type="2D"><init_from>DESERT_BRICK_SQUARE-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_SQUARE-Sampler"><sampler2D><source>DESERT_BRICK_SQUARE-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_SQUARE-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="bridge_structure_final_gate_door-lib" name="bridge_structure_final_gate_doorMesh">
+            <mesh>
+                <source id="bridge_structure_final_gate_door-Position">
+                    <float_array count="96" id="bridge_structure_final_gate_door-Position-array">
+                        0.1065 -2.1880 4.5011
+                        0.1065 -2.1880 0.5916
+                        0.1065 2.2577 4.5011
+                        0.1065 2.2577 0.5916
+                        0.8828 2.2577 4.5011
+                        0.8828 2.2577 0.5916
+                        0.8827 -2.1880 4.5011
+                        0.8828 -2.1880 0.5916
+                        0.0000 -2.7797 0.5916
+                        0.0000 -2.7797 4.5011
+                        0.9892 -2.7797 0.5916
+                        0.9892 -2.7797 4.5011
+                        0.0000 -2.1880 4.5011
+                        0.0000 -2.1880 0.5916
+                        0.9892 -2.1880 0.5916
+                        0.9892 -2.1880 4.5011
+                        0.0000 2.8494 5.0928
+                        0.0000 2.8494 4.5011
+                        0.9892 2.8494 5.0928
+                        0.9892 2.8494 4.5011
+                        0.0000 -2.7797 5.0928
+                        0.9892 -2.7797 5.0928
+                        0.0000 2.2577 4.5011
+                        0.9892 2.2577 4.5011
+                        0.0000 2.8494 0.5917
+                        0.0000 2.8494 0.0000
+                        0.9892 2.8494 0.5917
+                        0.9892 2.8494 0.0000
+                        0.0000 2.2577 0.5917
+                        0.9892 2.2577 0.5917
+                        0.0000 -2.7797 0.0000
+                        0.9892 -2.7797 0.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="32" source="#bridge_structure_final_gate_door-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_final_gate_door-Normal">
+                    <float_array count="21" id="bridge_structure_final_gate_door-Normal-array">
+                        -1.0000 -0.0000 -0.0000
+                        1.0000 0.0000 0.0000
+                        0.0000 -1.0000 0.0000
+                        0.0000 1.0000 0.0000
+                        -0.0000 -0.0000 1.0000
+                        0.0000 0.0000 -1.0000
+                        0.0001 -0.0000 1.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="7" source="#bridge_structure_final_gate_door-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="bridge_structure_final_gate_door-UV0">
+                    <float_array count="104" id="bridge_structure_final_gate_door-UV0-array">
+                        1.7439 -1.5076
+                        3.4960 -1.5076
+                        1.7439 0.5073
+                        3.4960 0.5073
+                        2.4426 -2.2523
+                        1.2181 -2.2523
+                        2.4442 -2.0016
+                        1.2196 -2.0016
+                        1.2197 -1.7514
+                        2.4442 -1.7514
+                        -2.7760 -2.0986
+                        -2.7760 -2.0223
+                        -1.5599 -2.0987
+                        -1.5599 -2.0225
+                        -1.5597 -2.7307
+                        -2.7759 -2.7305
+                        -1.5597 -2.6545
+                        -2.7759 -2.6543
+                        -1.3274 -2.2481
+                        -1.3274 -1.9981
+                        -1.6685 -2.2481
+                        -1.6685 -1.9981
+                        2.7785 -1.7456
+                        0.5540 -1.7464
+                        2.7782 -1.5001
+                        0.5537 -1.5010
+                        2.7782 -2.0016
+                        2.7782 -1.7464
+                        0.5561 -2.0016
+                        0.5561 -1.7464
+                        2.5446 -1.7199
+                        2.5447 -1.7464
+                        0.7878 -1.7199
+                        0.7878 -1.7464
+                        0.7876 -1.5001
+                        2.5444 -1.5001
+                        0.7876 -1.5267
+                        2.5445 -1.5266
+                        3.0012 -1.5001
+                        3.0014 -1.7464
+                        2.7784 -1.7464
+                        2.5447 -1.7456
+                        2.5447 -1.7192
+                        0.7876 -1.5273
+                        0.7875 -1.5009
+                        0.5538 -1.5001
+                        1.2173 -2.0016
+                        2.4449 -2.2523
+                        -2.7760 -2.0226
+                        -2.7760 -2.0989
+                        -1.5597 -2.6542
+                        -1.5597 -2.7303
+</float_array>
+                    <technique_common>
+                        <accessor count="52" source="#bridge_structure_final_gate_door-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="bridge_structure_final_gate_door-Vertex">
+                    <input semantic="POSITION" source="#bridge_structure_final_gate_door-Position" />
+                </vertices>
+                <triangles count="4" material="DESERT_BRICK_SQUARE">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_final_gate_door-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_final_gate_door-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_final_gate_door-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        7 1 1 5 1 3 4 1 2
+                        6 1 0 7 1 1 4 1 2
+                    </p>
+                </triangles>
+                <triangles count="48" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#bridge_structure_final_gate_door-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#bridge_structure_final_gate_door-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#bridge_structure_final_gate_door-UV0" />
+                    <p>
+                        11 2 7 9 2 5 8 2 4
+                        10 2 6 11 2 7 8 2 4
+                        13 0 9 8 0 6 9 0 7
+                        12 0 8 13 0 9 9 0 7
+                        13 3 13 12 3 11 0 3 10
+                        1 3 12 13 3 13 0 3 10
+                        6 3 17 15 3 15 14 3 14
+                        7 3 16 6 3 17 14 3 14
+                        10 1 6 14 1 9 15 1 8
+                        11 1 7 10 1 6 15 1 8
+                        19 3 21 17 3 19 16 3 18
+                        18 3 20 19 3 21 16 3 18
+                        18 4 25 16 4 23 20 4 22
+                        21 4 24 18 4 25 20 4 22
+                        17 0 29 9 0 27 20 0 26
+                        16 0 28 17 0 29 20 0 26
+                        12 5 33 22 5 31 2 5 30
+                        0 5 32 12 5 33 2 5 30
+                        4 5 37 23 5 35 15 5 34
+                        6 5 36 4 5 37 15 5 34
+                        20 2 40 9 2 39 11 2 38
+                        21 2 24 20 2 40 11 2 38
+                        18 1 28 21 1 26 11 1 27
+                        19 1 29 18 1 28 11 1 27
+                        27 3 21 25 3 19 24 3 18
+                        26 3 20 27 3 21 24 3 18
+                        3 6 32 28 6 33 13 6 41
+                        1 6 42 3 6 32 13 6 41
+                        14 4 35 29 4 44 5 4 43
+                        7 4 37 14 4 35 5 4 43
+                        30 0 27 8 0 26 24 0 28
+                        25 0 29 30 0 27 24 0 28
+                        25 5 40 27 5 24 31 5 45
+                        30 5 23 25 5 40 31 5 45
+                        8 2 40 30 2 39 31 2 38
+                        10 2 24 8 2 40 31 2 38
+                        10 1 26 31 1 27 27 1 29
+                        26 1 28 10 1 26 27 1 29
+                        24 3 47 17 3 5 19 3 46
+                        26 3 6 24 3 47 19 3 46
+                        17 0 7 24 0 6 28 0 9
+                        22 0 8 17 0 7 28 0 9
+                        3 2 12 2 2 49 22 2 48
+                        28 2 13 3 2 12 22 2 48
+                        29 2 51 23 2 15 4 2 17
+                        5 2 50 29 2 51 4 2 17
+                        23 1 8 29 1 9 26 1 6
+                        19 1 7 23 1 8 26 1 6
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="bridge_structure_final_gate_door" name="bridge_structure_final_gate_door">
+                <instance_geometry url="#bridge_structure_final_gate_door-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_SQUARE" target="#DESERT_BRICK_SQUARE" />
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

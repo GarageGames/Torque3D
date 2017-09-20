@@ -518,12 +518,15 @@ bool AIPlayer::getAIMove(Move *movePtr)
 
          // Rotate the move into object space (this really only needs
          // a 2D matrix)
+         //Ubiq: don't do this - we want to keep the move in world space
+         /*
          Point3F newMove;
          MatrixF moveMatrix;
          moveMatrix.set(EulerF(0.0f, 0.0f, -(rotation.z + movePtr->yaw)));
          moveMatrix.mulV( Point3F( movePtr->x, movePtr->y, 0.0f ), &newMove );
          movePtr->x = newMove.x;
          movePtr->y = newMove.y;
+         */
 
          // Set movement speed.  We'll slow down once we get close
          // to try and stop on the spot...

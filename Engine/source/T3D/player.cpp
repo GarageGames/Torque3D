@@ -1,4 +1,10 @@
 //-----------------------------------------------------------------------------
+// 3D Action Adventure Kit for T3D
+// Copyright (C) 2008-2013 Ubiq Visuals, Inc. (http://www.ubiqvisuals.com/)
+//
+// This file also incorporates work covered by the following copyright and  
+// permission notice:
+//
 // Copyright (c) 2012 GarageGames, LLC
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,6 +32,7 @@
 #include "platform/profiler.h"
 #include "math/mMath.h"
 #include "math/mathIO.h"
+#include "math/mathUtils.h"
 #include "core/resourceManager.h"
 #include "core/stringTable.h"
 #include "core/volume.h"
@@ -34,6 +41,7 @@
 #include "console/engineAPI.h"
 #include "collision/extrudedPolyList.h"
 #include "collision/clippedPolyList.h"
+#include "collision/concretePolyList.h"
 #include "collision/earlyOutPolyList.h"
 #include "ts/tsShapeInstance.h"
 #include "sfx/sfxSystem.h"
@@ -56,39 +64,43 @@
 #include "T3D/decal/decalManager.h"
 #include "T3D/decal/decalData.h"
 #include "materials/baseMatInstance.h"
-#include "math/mathUtils.h"
+#include "terrain/terrData.h"
 #include "gfx/sim/debugDraw.h"
 
 #ifdef TORQUE_EXTENDED_MOVE
    #include "T3D/gameBase/extended/extendedMove.h"
 #endif
 
-#ifdef TORQUE_OPENVR
-#include "platform/input/openVR/openVRProvider.h"
-#include "platform/input/openVR/openVRTrackedObject.h"
-#endif
+// Amount we try to stay out of walls by...
+static F32 sWeaponPushBack = 0.03f;
 
 // Amount of time if takes to transition to a new action sequence.
 static F32 sAnimationTransitionTime = 0.25f;
 static bool sUseAnimationTransitions = true;
 static F32 sLandReverseScale = 0.25f;
+static F32 sStandingJumpSpeed = 2.0f;
+static F32 sJumpingThreshold = 4.0f;
 static F32 sSlowStandThreshSquared = 1.69f;
 static S32 sRenderMyPlayer = true;
 static S32 sRenderMyItems = true;
 static bool sRenderPlayerCollision = false;
 
 // Chooses new action animations every n ticks.
-static const F32 sNewAnimationTickTime = 4.0f;
+static const F32 sNewAnimationTickTime = 1.0f;
 static const F32 sMountPendingTickWait = 13.0f * F32(TickMs);
 
-// Number of ticks before we pick non-contact animations
-static const S32 sContactTickTime = 10;
+// Number of ms before we pick non-contact animations
+static const S32 sContactTickTime = 230;	//230 ms
+
+// Player is kept out of walls by this much during climb/wall/ledge 
+static const F32 sSurfaceDistance = 0.05f;
 
 // Movement constants
 static F32 sVerticalStepDot = 0.173f;   // 80
 static F32 sMinFaceDistance = 0.01f;
-static F32 sTractionDistance = 0.04f;
+static F32 sTractionDistance = 0.03f;
 static F32 sNormalElasticity = 0.01f;
+static F32 sAirElasticity = 0.35f;
 static U32 sMoveRetryCount = 5;
 static F32 sMaxImpulseVelocity = 200.0f;
 
@@ -109,6 +121,8 @@ static S32 sMaxPredictionTicks = 30;   // Number of ticks to predict
 
 S32 Player::smExtendedMoveHeadPosRotIndex = 0;  // The ExtendedMove position/rotation index used for head movements
 
+// Anchor point compression
+const F32 sAnchorMaxDistance = 32.0f;
 
 //
 static U32 sCollisionMoveMask =  TerrainObjectType       |
@@ -124,7 +138,8 @@ static U32 sServerCollisionContactMask = sCollisionMoveMask |
                                          CorpseObjectType;
 
 static U32 sClientCollisionContactMask = sCollisionMoveMask |
-                                         TriggerObjectType;
+                                         TriggerObjectType |
+                                         PhysicalZoneObjectType;
 
 enum PlayerConstants {
    JumpSkipContactsMax = 8
@@ -147,6 +162,7 @@ PlayerData::ActionAnimationDef PlayerData::ActionAnimationList[NumTableActionAni
    { "back",         { 0.0f,-1.0f, 0.0f } },       // BackBackwardAnim
    { "side",         {-1.0f, 0.0f, 0.0f } },       // SideLeftAnim,
    { "side_right",   { 1.0f, 0.0f, 0.0f } },       // SideRightAnim,
+   { "walk",         { 0.0f, 1.0f, 0.0f } },       // WalkForwardAnim,
 
    { "sprint_root" },
    { "sprint_forward",  { 0.0f, 1.0f, 0.0f } },
@@ -174,8 +190,32 @@ PlayerData::ActionAnimationDef PlayerData::ActionAnimationList[NumTableActionAni
    { "fall" },       // FallAnim
    { "jump" },       // JumpAnim
    { "standjump" },  // StandJumpAnim
-   { "land" },       // LandAnim
+   { "land" },       // StandingLandAnim
+   { "jumpland" },   // RunningLandAnim
    { "jet" },        // JetAnim
+
+	//Ubiq:
+	{"death1"},			//Death1Anim
+
+	{"stop"},		//StopAnim
+
+	{"wallidle"},		//WallIdleAnim
+	{"wallleft"},		//WallLeftAnim
+	{"wallright"},		//WallRightAnim
+
+	{ "ledgeidle" },	// LedgeIdleAnim
+	{ "ledgeleft" },	// LedgeLeftAnim
+	{ "ledgeright" },	// LedgeRightAnim
+	{ "ledgeup" },		// LedgeUpAnim
+
+	{ "climbidle" },	// ClimbIdleAnim
+	{ "climbup" },		// ClimbUpAnim
+	{ "climbdown" },	// ClimbDownAnim
+	{ "climbleft" },	// ClimbLeftAnim
+	{ "climbright" },	// ClimbRightAnim
+
+	{ "slidefront" },   // SlideFrontAnim
+	{ "slideback" },	// SlideBackAnim
 };
 
 
@@ -257,15 +297,15 @@ PlayerData::PlayerData()
    firstPersonShadows = false;
 
    // Used for third person image rendering
-   imageAnimPrefix = StringTable->EmptyString();
+   imageAnimPrefix = StringTable->insert("");
 
    allowImageStateAnimation = false;
 
    // Used for first person image rendering
-   imageAnimPrefixFP = StringTable->EmptyString();
+   imageAnimPrefixFP = StringTable->insert("");
    for (U32 i=0; i<ShapeBase::MaxMountedImages; ++i)
    {
-      shapeNameFP[i] = StringTable->EmptyString();
+      shapeNameFP[i] = StringTable->insert("");
       mCRCFP[i] = 0;
       mValidShapeFP[i] = false;
    }
@@ -279,17 +319,18 @@ PlayerData::PlayerData()
    mass = 9.0f;         // from ShapeBase
    maxEnergy = 60.0f;   // from ShapeBase
    drag = 0.3f;         // from ShapeBase
-   density = 1.1f;      // from ShapeBase
+   density = 10.0f;      // from ShapeBase
 
    maxStepHeight = 1.0f;
    runSurfaceAngle = 80.0f;
 
    fallingSpeedThreshold = -10.0f;
 
-   recoverDelay = 30;
+   //Ubiq: removing these - we use our own landing system
+   /*recoverDelay = 30;
    recoverRunForceScale = 1.0f;
    landSequenceTime = 0.0f;
-   transitionToLand = false;
+   transitionToLand = false;*/
 
    // Running/Walking
    runForce = 40.0f * 9.0f;
@@ -361,7 +402,6 @@ PlayerData::PlayerData()
    decalID        = 0;
    decalOffset      = 0.0f;
 
-   actionCount = 0;
    lookAction = 0;
 
    // size of bounding box
@@ -418,9 +458,61 @@ PlayerData::PlayerData()
 
    jumpTowardsNormal = true;
 
-   physicsPlayerType = StringTable->EmptyString();
+   physicsPlayerType = StringTable->insert("");
 
    dMemset( actionList, 0, sizeof(actionList) );
+
+	//Ubiq: 
+	cameraOffset = Point3F(0.0f, 0.0f, 0.0f);	
+
+	walkRunAnimVelocity = 2.0f;
+
+	groundTurnRate = 30.0f;
+	airTurnRate = 10.0f;
+	//maxAirTurn = 0.1f;
+
+	//Ubiq: ground friction
+	groundFriction = 0.01f;
+
+	//Ubiq: jet time
+	jetTime = 0.5f;
+
+	//Ubiq: climbing
+	climbHeightMin = 0.0f;
+	climbHeightMax = 1.0f;
+	climbSpeedUp = 1.0f;
+	climbSpeedDown = 1.0f;
+	climbSpeedSide = 1.0f;
+	climbScrapeSpeed = -1.0f;
+	climbScrapeFriction = 0.05f;
+
+	//Ubiq: grabbing
+	grabHeightMin = 1.4f;
+	grabHeightMax = 1.6f;
+	grabHeight = 1.5f;
+	grabSpeedSide = 1.0f;
+	grabSpeedUp = 1.0f;
+	grabUpForwardOffset = 0.5f;
+	grabUpUpwardOffset = 0.1f;
+	grabUpTestBox = Point3F(0.5f, 0.5f, 1.5f);
+
+	//Ubiq: Wall hug
+	wallHugSpeed = 1.0f;
+	wallHugHeightMin = 1.4f;
+	wallHugHeightMax = 1.6f;
+
+	//Ubiq: Jump delays
+	runJumpCrouchDelay = 150.0f;
+	standJumpCrouchDelay = 400.0f;
+
+	//Ubiq: Ground Snap
+	groundSnapSpeed = 0.05f;
+	groundSnapRayLength = 0.5f;
+	groundSnapRayOffset = 0.05f;
+
+	//Ubiq: Land state
+	landDuration = 100.0f;
+	landSpeedFactor = 0.5f;
 }
 
 bool PlayerData::preload(bool server, String &errorStr)
@@ -433,9 +525,9 @@ bool PlayerData::preload(bool server, String &errorStr)
    {
       for( U32 i = 0; i < MaxSounds; ++ i )
       {
-         String sfxErrorStr;
-         if( !sfxResolve( &sound[ i ], sfxErrorStr ) )
-            Con::errorf( "PlayerData::preload: %s", sfxErrorStr.c_str() );
+         String errorStr;
+         if( !sfxResolve( &sound[ i ], errorStr ) )
+            Con::errorf( "PlayerData::preload: %s", errorStr.c_str() );
       }
    }
 
@@ -453,10 +545,11 @@ bool PlayerData::preload(bool server, String &errorStr)
    if (fallingSpeedThreshold > 0.0f)
       Con::printf("PlayerData:: Falling speed threshold should be downwards (negative)");
 
-   if (recoverDelay > (1 << RecoverDelayBits) - 1) {
+   //Ubiq: removing these - we use our own landing system
+   /*if (recoverDelay > (1 << RecoverDelayBits) - 1) {
       recoverDelay = (1 << RecoverDelayBits) - 1;
       Con::printf("PlayerData:: Recover delay exceeds range (0-%d)",recoverDelay);
-   }
+   }*/
    if (jumpDelay > (1 << JumpDelayBits) - 1) {
       jumpDelay = (1 << JumpDelayBits) - 1;
       Con::printf("PlayerData:: Jump delay exceeds range (0-%d)",jumpDelay);
@@ -473,7 +566,7 @@ bool PlayerData::preload(bool server, String &errorStr)
       // Extract ground transform velocity from animations
       // Get the named ones first so they can be indexed directly.
       ActionAnimation *dp = &actionList[0];
-      for (S32 i = 0; i < NumTableActionAnims; i++,dp++)
+      for (int i = 0; i < NumTableActionAnims; i++,dp++)
       {
          ActionAnimationDef *sp = &ActionAnimationList[i];
          dp->name          = sp->name;
@@ -493,8 +586,12 @@ bool PlayerData::preload(bool server, String &errorStr)
          dp->death         = false;
          if (dp->sequence != -1)
             getGroundInfo(si,thread,dp);
+
+         // No real reason to spam the console about a missing jet animation
+         if (dStricmp(sp->name, "jet") != 0)
+            AssertWarn(dp->sequence != -1, avar("PlayerData::preload - Unable to find named animation sequence '%s'!", sp->name));
       }
-      for (S32 b = 0; b < mShape->sequences.size(); b++)
+      for (int b = 0; b < mShape->sequences.size(); b++)
       {
          if (!isTableSequence(b))
          {
@@ -511,7 +608,7 @@ bool PlayerData::preload(bool server, String &errorStr)
       // Resolve lookAction index
       dp = &actionList[0];
       String lookName("look");
-      for (S32 c = 0; c < actionCount; c++,dp++)
+      for (int c = 0; c < actionCount; c++,dp++)
          if( dStricmp( dp->name, lookName ) == 0 )
             lookAction = c;
 
@@ -559,7 +656,7 @@ bool PlayerData::preload(bool server, String &errorStr)
       if (!Sim::findObject(dustID, dustEmitter))
          Con::errorf(ConsoleLogEntry::General, "PlayerData::preload - Invalid packet, bad datablockId(dustEmitter): 0x%x", dustID);
 
-   for (S32 i=0; i<NUM_SPLASH_EMITTERS; i++)
+   for (int i=0; i<NUM_SPLASH_EMITTERS; i++)
       if( !splashEmitterList[i] && splashEmitterIDList[i] != 0 )
          if( Sim::findObject( splashEmitterIDList[i], splashEmitterList[i] ) == false)
             Con::errorf(ConsoleLogEntry::General, "PlayerData::onAdd - Invalid packet, bad datablockId(particle emitter): 0x%x", splashEmitterIDList[i]);
@@ -588,10 +685,7 @@ bool PlayerData::preload(bool server, String &errorStr)
             Torque::FS::FileNodeRef    fileRef = Torque::FS::GetFileNode(mShapeFP[i].getPath());
 
             if (!fileRef)
-            {
-               errorStr = String::ToString("PlayerData: Mounted image %d loading failed, shape \"%s\" is not found.",i,mShapeFP[i].getPath().getFullPath().c_str());
                return false;
-            }
 
             if(server)
                mCRCFP[i] = fileRef->getChecksum();
@@ -652,7 +746,7 @@ bool PlayerData::isTableSequence(S32 seq)
 {
    // The sequences from the table must already have
    // been loaded for this to work.
-   for (S32 i = 0; i < NumTableActionAnims; i++)
+   for (int i = 0; i < NumTableActionAnims; i++)
       if (actionList[i].sequence == seq)
          return true;
    return false;
@@ -662,6 +756,34 @@ bool PlayerData::isJumpAction(U32 action)
 {
    return (action == JumpAnim || action == StandJumpAnim);
 }
+
+//Ubiq:
+bool PlayerData::isLedgeAction(U32 action)
+{
+	return (action == LedgeIdleAnim
+		|| action == LedgeLeftAnim
+		|| action == LedgeRightAnim
+		|| action == LedgeUpAnim
+		);
+}
+
+bool PlayerData::isClimbAction(U32 action)
+{
+	return (action == ClimbIdleAnim
+		|| action == ClimbLeftAnim
+		|| action == ClimbRightAnim
+		|| action == ClimbUpAnim
+		|| action == ClimbDownAnim
+		);
+}
+
+bool PlayerData::isLandAction(U32 action)
+{
+	return (action == StandingLandAnim
+		|| action == RunningLandAnim
+		);
+}
+
 
 void PlayerData::initPersistFields()
 {
@@ -910,7 +1032,8 @@ void PlayerData::initPersistFields()
       addField( "fallingSpeedThreshold", TypeF32, Offset(fallingSpeedThreshold, PlayerData),
          "@brief Downward speed at which we consider the player falling.\n\n" );
 
-      addField( "recoverDelay", TypeS32, Offset(recoverDelay, PlayerData),
+      //Ubiq: removing these - we use our own landing system
+      /*addField( "recoverDelay", TypeS32, Offset(recoverDelay, PlayerData),
          "@brief Number of ticks for the player to recover from falling.\n\n" );
 
       addField( "recoverRunForceScale", TypeF32, Offset(recoverRunForceScale, PlayerData),
@@ -929,7 +1052,7 @@ void PlayerData::initPersistFields()
       addField( "transitionToLand", TypeBool, Offset(transitionToLand, PlayerData),
          "@brief When going from a fall to a land, should we transition between the two.\n\n"
          "@note Only takes affect when landSequenceTime is greater than 0.\n"
-         "@see landSequenceTime\n" );
+         "@see landSequenceTime\n" );*/
 
    endGroup( "Falling" );
 
@@ -1065,6 +1188,32 @@ void PlayerData::initPersistFields()
          "@brief Sound to play when exiting the water with velocity >= exitSplashSoundVelocity.\n\n"
          "@see exitSplashSoundVelocity\n");
 
+	  //Ubiq Player Sounds:
+	  addField("stopSound", TypeSFXTrackName, Offset(sound[stop], PlayerData),
+		  "@brief Sound to play when stopping suddenly.\n\n");
+	  addField("jumpCrouchSound", TypeSFXTrackName, Offset(sound[jumpCrouch], PlayerData),
+		  "@brief Sound to play when crouching before a jump.\n\n");
+	  addField("jumpSound", TypeSFXTrackName, Offset(sound[jump], PlayerData),
+		  "@brief Sound to play when leaving the ground for a jump.\n\n");
+	  addField("landSound", TypeSFXTrackName, Offset(sound[land], PlayerData),
+		  "@brief Sound to play when landing after a jump or fall.\n\n");
+	  addField("climbIdleSound", TypeSFXTrackName, Offset(sound[climbIdle],	PlayerData),
+		  "@brief Sound to play when Trigger 3 occurs during the climb idle animation.\n\n");
+	  addField("climbUpSound", TypeSFXTrackName, Offset(sound[climbUp],	PlayerData),
+		  "@brief Sound to play when Trigger 3 occurs during the climb up animation.\n\n");
+	  addField("climbDownSound", TypeSFXTrackName, Offset(sound[climbDown], PlayerData),
+		  "@brief Sound to play when Trigger 3 occurs during the climb down animation.\n\n");
+	  addField("climbLeftRightSound", TypeSFXTrackName, Offset(sound[climbLeftRight], PlayerData),
+		  "@brief Sound to play when Trigger 3 occurs during the climb left or right animations.\n\n");
+	  addField("ledgeIdleSound", TypeSFXTrackName, Offset(sound[ledgeIdle],	PlayerData),
+		  "@brief Sound to play when Trigger 3 occurs during the ledge idle animation.\n\n");
+	  addField("ledgeLeftRightSound", TypeSFXTrackName, Offset(sound[ledgeLeftRight], PlayerData),
+		  "@brief Sound to play when Trigger 3 occurs during the ledge left or right animations.\n\n");
+	  addField("ledgeUpSound", TypeSFXTrackName, Offset(sound[ledgeUp],	PlayerData),
+		  "@brief Sound to play when Trigger 3 occurs during the ledge up animation.\n\n");
+	  addField("slideSound", TypeSFXTrackName, Offset(sound[slide],	PlayerData),
+		  "@brief Sound to play when sliding down or scraping across a surface. Should be loopable.\n\n");
+
    endGroup( "Interaction: Sounds" );
 
    addGroup( "Interaction: Splashes" );
@@ -1178,6 +1327,60 @@ void PlayerData::initPersistFields()
 
    endGroup( "Third Person" );
 
+   //Ubiq: TODO: put these into groups that make more sense & add documentation strings
+   addGroup( "Ubiq" );
+
+      addField("cameraOffset", TypePoint3F, Offset(cameraOffset, PlayerData), "");
+
+      addField("walkRunAnimVelocity", TypeF32, Offset(walkRunAnimVelocity, PlayerData), "");
+
+      addField("groundTurnRate", TypeF32, Offset(groundTurnRate, PlayerData), "");
+      addField("airTurnRate", TypeF32, Offset(airTurnRate, PlayerData), "");
+      //addField("maxAirTurn", TypeF32, Offset(maxAirTurn, PlayerData), "");
+
+      addField("groundFriction", TypeF32, Offset(groundFriction, PlayerData), "");
+
+      addField("jetTime", TypeF32, Offset(jetTime, PlayerData), "");
+
+      //Ubiq: climbing
+      addField("climbHeightMin", TypeF32, Offset(climbHeightMin, PlayerData), "");
+      addField("climbHeightMax", TypeF32, Offset(climbHeightMax, PlayerData), "");
+      addField("climbSpeedUp", TypeF32, Offset(climbSpeedUp, PlayerData), "");
+      addField("climbSpeedDown", TypeF32, Offset(climbSpeedDown, PlayerData), "");
+      addField("climbSpeedSide", TypeF32, Offset(climbSpeedSide, PlayerData), "");
+      addField("climbScrapeSpeed", TypeF32, Offset(climbScrapeSpeed, PlayerData), "");
+      addField("climbScrapeFriction", TypeF32, Offset(climbScrapeFriction, PlayerData), "");
+
+      //Ubiq: grabbing
+      addField("grabHeightMin", TypeF32, Offset(grabHeightMin, PlayerData), "");
+      addField("grabHeightMax", TypeF32, Offset(grabHeightMax, PlayerData), "");
+      addField("grabHeight", TypeF32, Offset(grabHeight, PlayerData), "");
+      addField("grabSpeedSide", TypeF32, Offset(grabSpeedSide, PlayerData), "");
+      addField("grabSpeedUp", TypeF32, Offset(grabSpeedUp, PlayerData), "");
+      addField("grabUpForwardOffset", TypeF32, Offset(grabUpForwardOffset, PlayerData), "");
+      addField("grabUpUpwardOffset", TypeF32, Offset(grabUpUpwardOffset, PlayerData), "");
+      addField("grabUpTestBox", TypePoint3F, Offset(grabUpTestBox, PlayerData), "");
+
+      //Ubiq: Wall hug
+      addField("wallHugSpeed", TypeF32, Offset(wallHugSpeed, PlayerData), "");
+      addField("wallHugHeightMin", TypeF32, Offset(wallHugHeightMin, PlayerData), "");
+      addField("wallHugHeightMax", TypeF32, Offset(wallHugHeightMax, PlayerData), "");	
+
+      //Ubiq: Stand jump
+      addField("runJumpCrouchDelay", TypeF32, Offset(runJumpCrouchDelay, PlayerData), "");
+      addField("standJumpCrouchDelay", TypeF32, Offset(standJumpCrouchDelay, PlayerData), "");
+
+      //Ubiq: Ground Snap
+      addField("groundSnapSpeed", TypeF32, Offset(groundSnapSpeed, PlayerData), "");
+      addField("groundSnapRayLength", TypeF32, Offset(groundSnapRayLength, PlayerData), "");
+      addField("groundSnapRayOffset", TypeF32, Offset(groundSnapRayOffset, PlayerData), "");
+
+      //Ubiq: Land state
+      addField("landDuration", TypeF32, Offset(landDuration, PlayerData), "");
+      addField("landSpeedFactor", TypeF32, Offset(landSpeedFactor, PlayerData), "");
+
+   endGroup( "Ubiq" );
+
    Parent::initPersistFields();
 }
 
@@ -1210,10 +1413,11 @@ void PlayerData::packData(BitStream* stream)
 
    stream->write(fallingSpeedThreshold);
 
-   stream->write(recoverDelay);
+   //Ubiq: removing these - we use our own landing system
+   /*stream->write(recoverDelay);
    stream->write(recoverRunForceScale);
    stream->write(landSequenceTime);
-   stream->write(transitionToLand);
+   stream->write(transitionToLand);*/
 
    // Jumping
    stream->write(jumpForce);
@@ -1361,6 +1565,59 @@ void PlayerData::packData(BitStream* stream)
          stream->write(mCRCFP[i]);
       }
    }
+	//Ubiq:
+	stream->write(cameraOffset.x);
+	stream->write(cameraOffset.y);
+	stream->write(cameraOffset.z);
+
+	stream->write(walkRunAnimVelocity);
+
+	stream->write(groundTurnRate);
+	stream->write(airTurnRate);
+	//stream->write(maxAirTurn);
+
+	stream->write(groundFriction);
+
+	stream->write(jetTime);
+
+	//Ubiq: climb
+	stream->write(climbHeightMin);
+	stream->write(climbHeightMax);
+	stream->write(climbSpeedUp);
+	stream->write(climbSpeedDown);
+	stream->write(climbSpeedSide);
+	stream->write(climbScrapeSpeed);
+	stream->write(climbScrapeFriction);
+
+	//Ubiq: grab
+	stream->write(grabHeightMin);
+	stream->write(grabHeightMax);
+	stream->write(grabHeight);
+	stream->write(grabSpeedSide);
+	stream->write(grabSpeedUp);
+	stream->write(grabUpForwardOffset);
+	stream->write(grabUpUpwardOffset);
+	stream->write(grabUpTestBox.x);
+	stream->write(grabUpTestBox.y);
+	stream->write(grabUpTestBox.z);
+
+	//Ubiq: Wall hug
+	stream->write(wallHugSpeed);
+	stream->write(wallHugHeightMin);
+	stream->write(wallHugHeightMax);
+
+	//Ubiq: stand jump
+	stream->write(runJumpCrouchDelay);
+	stream->write(standJumpCrouchDelay);
+
+	//Ubiq: ground snap
+	stream->write(groundSnapSpeed);
+	stream->write(groundSnapRayLength);
+	stream->write(groundSnapRayOffset);
+	
+	//Ubiq: Land state
+	stream->write(landDuration);
+	stream->write(landSpeedFactor);
 }
 
 void PlayerData::unpackData(BitStream* stream)
@@ -1391,10 +1648,11 @@ void PlayerData::unpackData(BitStream* stream)
    stream->read(&runSurfaceAngle);
 
    stream->read(&fallingSpeedThreshold);
-   stream->read(&recoverDelay);
+   //Ubiq: removing these - we use our own landing system
+   /*stream->read(&recoverDelay);
    stream->read(&recoverRunForceScale);
    stream->read(&landSequenceTime);
-   stream->read(&transitionToLand);
+   stream->read(&transitionToLand);*/
 
    // Jumping
    stream->read(&jumpForce);
@@ -1541,6 +1799,59 @@ void PlayerData::unpackData(BitStream* stream)
          stream->read(&(mCRCFP[i]));
       }
    }
+	//Ubiq:
+	stream->read(&cameraOffset.x);
+	stream->read(&cameraOffset.y);
+	stream->read(&cameraOffset.z);
+
+	stream->read(&walkRunAnimVelocity);
+
+	stream->read(&groundTurnRate);
+	stream->read(&airTurnRate);
+	//stream->read(&maxAirTurn);
+
+	stream->read(&groundFriction);
+
+	stream->read(&jetTime);
+
+	//Ubiq: climb
+	stream->read(&climbHeightMin);
+	stream->read(&climbHeightMax);
+	stream->read(&climbSpeedUp);
+	stream->read(&climbSpeedDown);
+	stream->read(&climbSpeedSide);
+	stream->read(&climbScrapeSpeed);
+	stream->read(&climbScrapeFriction);
+
+	//Ubiq: grab
+	stream->read(&grabHeightMin);
+	stream->read(&grabHeightMax);
+	stream->read(&grabHeight);
+	stream->read(&grabSpeedSide);
+	stream->read(&grabSpeedUp);
+	stream->read(&grabUpForwardOffset);
+	stream->read(&grabUpUpwardOffset);	
+	stream->read(&grabUpTestBox.x);
+	stream->read(&grabUpTestBox.y);
+	stream->read(&grabUpTestBox.z);
+
+	//Ubiq: Wall hug
+	stream->read(&wallHugSpeed);
+	stream->read(&wallHugHeightMin);
+	stream->read(&wallHugHeightMax);
+
+	//Ubiq: stand jump
+	stream->read(&runJumpCrouchDelay);
+	stream->read(&standJumpCrouchDelay);
+
+	//Ubiq: ground snap
+	stream->read(&groundSnapSpeed);
+	stream->read(&groundSnapRayLength);
+	stream->read(&groundSnapRayOffset);
+	
+	//Ubiq: Land state
+	stream->read(&landDuration);
+	stream->read(&landSpeedFactor);
 }
 
 
@@ -1565,7 +1876,7 @@ ConsoleDocClass( Player,
    "@ingroup gameObjects\n"
 );
 
-F32 Player::mGravity = -20;
+F32 Player::mGravity = -25.0f; //Ubiq: default was -20
 
 //----------------------------------------------------------------------------
 
@@ -1626,7 +1937,8 @@ Player::Player()
    mLastPos.set( 0.0f, 0.0f, 0.0f );
 
    mMoveBubbleSound = 0;
-   mWaterBreathSound = 0;   
+   mWaterBreathSound = 0;
+   mSlideSound = 0;	//Ubiq
 
    mConvex.init(this);
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
@@ -1655,7 +1967,57 @@ Player::Player()
 
    mLastAbsoluteYaw = 0.0f;
    mLastAbsolutePitch = 0.0f;
-   mLastAbsoluteRoll = 0.0f;
+
+	//----------------------------------------------------------------------------
+	// Ubiq custom
+	//----------------------------------------------------------------------------
+
+	mDieOnNextCollision = false;
+
+	mRunSurface = false;
+	mJumpSurface = false;
+	mSlideSurface = false;
+
+	//Ubiq: Snap to ground
+	mGroundSnap = 0.0f;
+
+	//Ubiq: Slide state
+	mSlideState.active = false;
+	mSlideState.surfaceNormal.zero();
+
+	//Ubiq: Jump state
+	mJumpState.active = false;
+	mJumpState.isCrouching = false;
+	mJumpState.crouchDelay = 0;
+	mJumpState.jumpType = JumpType_Run;
+
+	//Ubiq: Climb state
+	mClimbTriggerCount = 0;
+	mClimbState.active = false;
+	mClimbState.direction = MOVE_DIR_NONE;
+	mClimbState.surfaceNormal.set(0,0,0);
+
+	//Ubiq: Wall Hug state
+	mWallHugState.active = false;
+	mWallHugState.direction = MOVE_DIR_NONE;
+	mWallHugState.surfaceNormal.set(0,0,0);
+
+	//Ubiq: Ledge Grab state
+	mLedgeState.active = false;
+	mLedgeState.ledgeNormal.zero();
+	mLedgeState.ledgePoint.zero();
+	mLedgeState.direction = MOVE_DIR_NONE;
+	mLedgeState.climbingUp = false;
+	mLedgeState.animPos = 0.0f;
+	mLedgeState.deltaAnimPos = 0.0f;
+	mLedgeState.deltaAnimPosVec = 0.0f;
+
+	//Ubiq: Land state
+	mLandState.active = false;
+	mLandState.timer = 0;
+
+	//Ubiq: Stop state
+	mStoppingTimer = 0;
 }
 
 Player::~Player()
@@ -1766,6 +2128,7 @@ void Player::onRemove()
    {
       SFX_DELETE( mMoveBubbleSound );
       SFX_DELETE( mWaterBreathSound );
+      SFX_DELETE( mSlideSound );
    }
 
    U32 i;
@@ -1781,7 +2144,7 @@ void Player::onRemove()
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBox.maxExtents.set(-1e9f, -1e9f, -1e9f);
 
-   SAFE_DELETE( mPhysicsRep );
+   SAFE_DELETE( mPhysicsRep );		
 
    Parent::onRemove();
 }
@@ -1912,12 +2275,16 @@ bool Player::onNewDataBlock( GameBaseData *dptr, bool reload )
 
       SFX_DELETE( mMoveBubbleSound );
       SFX_DELETE( mWaterBreathSound );
+      SFX_DELETE( mSlideSound );
 
       if ( mDataBlock->sound[PlayerData::MoveBubbles] )
          mMoveBubbleSound = SFX->createSource( mDataBlock->sound[PlayerData::MoveBubbles] );
 
       if ( mDataBlock->sound[PlayerData::WaterBreath] )
          mWaterBreathSound = SFX->createSource( mDataBlock->sound[PlayerData::WaterBreath] );
+
+      if ( mDataBlock->sound[PlayerData::slide] )
+         mSlideSound = SFX->createSource( mDataBlock->sound[PlayerData::slide] );
    }
 
    mObjBox.maxExtents.x = mDataBlock->boxSize.x * 0.5f;
@@ -1950,7 +2317,7 @@ void Player::reSkin()
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 
-      for ( S32 i = 0; i < skins.size(); i++ )
+      for ( int i = 0; i < skins.size(); i++ )
       {
          String oldSkin( mAppliedSkinName.c_str() );
          String newSkin( skins[i] );
@@ -1967,7 +2334,7 @@ void Player::reSkin()
 
          // Apply skin to both 3rd person and 1st person shape instances
          mShapeInstance->reSkin( newSkin, oldSkin );
-         for ( S32 j = 0; j < ShapeBase::MaxMountedImages; j++ )
+         for ( int j = 0; j < ShapeBase::MaxMountedImages; j++ )
          {
             if (mShapeFPInstance[j])
                mShapeFPInstance[j]->reSkin( newSkin, oldSkin );
@@ -2036,6 +2403,10 @@ void Player::processTick(const Move* move)
    bool prevMoveMotion = mMoveMotion;
    Pose prevPose = getPose();
 
+   //Ubiq:
+   if(mShapeInstance)
+      mShapeInstance->animate();
+
    // If we're not being controlled by a client, let the
    // AI sub-module get a chance at producing a move.
    Move aiMove;
@@ -2048,21 +2419,32 @@ void Player::processTick(const Move* move)
       if (!move)
          mControlObject->processTick(0);
       else {
-         pMove = NullMove;
-         cMove = *move;
-         //if (isMounted()) {
-            // Filter Jump trigger if mounted
-            //pMove.trigger[2] = move->trigger[2];
-            //cMove.trigger[2] = false;
-         //}
-         if (move->freeLook) {
-            // Filter yaw/picth/roll when freelooking.
-            pMove.yaw = move->yaw;
-            pMove.pitch = move->pitch;
-            pMove.roll = move->roll;
-            pMove.freeLook = true;
-            cMove.freeLook = false;
-            cMove.yaw = cMove.pitch = cMove.roll = 0.0f;
+         //Ubiq: if mounted, only vehicle will get the move
+         if (isMounted())
+         {
+            pMove = NullMove;
+            cMove = *move;
+            //if (isMounted()) {
+               // Filter Jump trigger if mounted
+               //pMove.trigger[sJumpTrigger] = move->trigger[sJumpTrigger];
+               //cMove.trigger[sJumpTrigger] = false;
+            //}
+            if (move->freeLook) {
+               // Filter yaw/picth/roll when freelooking.
+               pMove.yaw = move->yaw;
+               pMove.pitch = move->pitch;
+               pMove.roll = move->roll;
+               pMove.freeLook = true;
+               cMove.freeLook = false;
+               cMove.yaw = cMove.pitch = cMove.roll = 0.0f;
+            }
+         }
+         
+         //Ubiq: otherwise, both objects will get the move
+         else
+         {
+            pMove = *move;
+            cMove = *move;
          }
          mControlObject->processTick((mDamageState == Enabled)? &cMove: &NullMove);
          move = &pMove;
@@ -2086,8 +2468,12 @@ void Player::processTick(const Move* move)
          delta.rot.z -= M_2PI_F;
 
       setPosition(delta.pos,delta.rot);
+      setRenderPosition(delta.pos,delta.rot);
       updateDeathOffsets();
       updateLookAnimation();
+
+      //Ubiq:
+      updateLedgeUpAnimation();
 
       // Backstepping
       delta.posVec = -delta.warpOffset;
@@ -2137,6 +2523,9 @@ void Player::processTick(const Move* move)
       }
       PROFILE_END();
 
+      //Ubiq:
+      updateLedgeUpAnimation();
+
       if (!isGhost())
       {
          // Animations are advanced based on frame rate on the
@@ -2183,6 +2572,19 @@ void Player::interpolateTick(F32 dt)
    Point3F pos = delta.pos + delta.posVec * dt;
    Point3F rot = delta.rot + delta.rotVec * dt;
 
+   //Ubiq: ledge up animation
+   if(mLedgeState.climbingUp)
+   {
+      F32 animPos = mLedgeState.animPos + mLedgeState.deltaAnimPosVec * dt;
+
+      if (mActionAnimation.thread)
+      {
+         //ideally we wouldn't clearTransition, but it gets "stuck" otherwise
+         mShapeInstance->clearTransition(mActionAnimation.thread);
+         mShapeInstance->setPos(mActionAnimation.thread, animPos);
+      }
+   }
+
    setRenderPosition(pos,rot,dt);
 
 /*
@@ -2212,7 +2614,8 @@ void Player::advanceTime(F32 dt)
    updateAnimation(dt);
    updateSplash();
    updateFroth(dt);
-   updateWaterSounds(dt);
+   updateSounds(dt);
+   //updateWaterSounds(dt);	//Ubiq: functionality moved to updateSounds()
 
    mLastPos = getPosition();
 
@@ -2243,7 +2646,8 @@ void Player::setState(ActionState state, U32 recoverTicks)
       if (isProperlyAdded()) {
          switch (state) {
             case RecoverState: {
-               if (mDataBlock->landSequenceTime > 0.0f)
+               //Ubiq: removing these - we use our own landing system
+               /*if (mDataBlock->landSequenceTime > 0.0f)
                {
                   // Use the land sequence as the basis for the recovery
                   setActionThread(PlayerData::LandAnim, true, false, true, true);
@@ -2257,7 +2661,7 @@ void Player::setState(ActionState state, U32 recoverTicks)
                   mRecoverTicks = recoverTicks;
                   mReversePending = U32(F32(mRecoverTicks) / sLandReverseScale);
                   setActionThread(PlayerData::LandAnim, true, false, true, true);
-               }
+               }*/
                break;
             }
             
@@ -2275,7 +2679,8 @@ void Player::updateState()
    switch (mState)
    {
       case RecoverState:
-         if (mDataBlock->landSequenceTime > 0.0f)
+         //Ubiq: removing these - we use our own landing system
+         /*if (mDataBlock->landSequenceTime > 0.0f)
          {
             // Count down the land time
             mRecoverDelay -= TickSec;
@@ -2317,7 +2722,7 @@ void Player::updateState()
                mActionAnimation.waitForEnd = false;
                setState(MoveState);
             }
-         }
+         }*/
          break;
       
       default:
@@ -2494,24 +2899,9 @@ void Player::allowAllPoses()
    mAllowSwimming = true;
 }
 
-AngAxisF gPlayerMoveRot;
-
 void Player::updateMove(const Move* move)
 {
    delta.move = *move;
-
-#ifdef TORQUE_OPENVR
-   if (mControllers[0])
-   {
-      mControllers[0]->processTick(move);
-   }
-
-   if (mControllers[1])
-   {
-      mControllers[1]->processTick(move);
-   }
-
-#endif
 
    // Is waterCoverage high enough to be 'swimming'?
    {
@@ -2530,6 +2920,23 @@ void Player::updateMove(const Move* move)
          mSwimming = swimming;
       }
    }
+
+	VectorF moveVec(move->x,move->y,move->z);
+	GameConnection* con = getControllingClient();
+
+	//Ubiq: running diagonally shouldn't be faster
+	if(moveVec.len() > 1)
+		moveVec.normalizeSafe();
+
+	//draw the move vector for debugging
+	#ifdef ENABLE_DEBUGDRAW
+	DebugDrawer::get()->drawLine(getPosition(), getPosition() + moveVec, ColorI::RED);
+	DebugDrawer::get()->setLastTTL(TickMs);
+	#endif
+
+	//Ubiq: use this normalized moveVec for testing in dot products
+	VectorF moveVecNormalized(moveVec);
+	moveVecNormalized.normalizeSafe();
 
    // Trigger images
    if (mDamageState == Enabled) 
@@ -2550,164 +2957,127 @@ void Player::updateMove(const Move* move)
       F32 prevZRot = mRot.z;
       delta.headVec = mHead;
 
-      bool doStandardMove = true;
-      bool absoluteDelta = false;
+      if (!(mClimbState.active || mLedgeState.active || mWallHugState.active))
+         mRot.x = mRot.y = 0;
+
+      F32 p = move->pitch * (mPose == SprintPose ? mDataBlock->sprintPitchScale : 1.0f);
+      if (p > M_PI_F) 
+         p -= M_2PI_F;
+      mHead.x = mClampF(mHead.x + p,mDataBlock->minLookAngle,
+                        mDataBlock->maxLookAngle);
+
+      F32 y = move->yaw * (mPose == SprintPose ? mDataBlock->sprintYawScale : 1.0f);
+      if (y > M_PI_F)
+         y -= M_2PI_F;
+
       GameConnection* con = getControllingClient();
-
-#ifdef TORQUE_EXTENDED_MOVE
-      // Work with an absolute rotation from the ExtendedMove class?
-      if(con && con->getControlSchemeAbsoluteRotation())
+	  if (move->freeLook && ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson())))
       {
-         doStandardMove = false;
-         const ExtendedMove* emove = dynamic_cast<const ExtendedMove*>(move);
-         U32 emoveIndex = smExtendedMoveHeadPosRotIndex;
-         if(emoveIndex >= ExtendedMove::MaxPositionsRotations)
-            emoveIndex = 0;
-
-         if(emove->EulerBasedRotation[emoveIndex])
-         {
-            // Head pitch
-            mHead.x += (emove->rotX[emoveIndex] - mLastAbsolutePitch);
-
-            // Do we also include the relative yaw value?
-            if(con->getControlSchemeAddPitchToAbsRot())
-            {
-               F32 x = move->pitch;
-               if (x > M_PI_F)
-                  x -= M_2PI_F;
-
-               mHead.x += x;
-            }
-
-            // Constrain the range of mHead.x
-            while (mHead.x < -M_PI_F) 
-               mHead.x += M_2PI_F;
-            while (mHead.x > M_PI_F) 
-               mHead.x -= M_2PI_F;
-
-            // Rotate (heading) head or body?
-            if (move->freeLook && ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson())))
-            {
-               // Rotate head
-               mHead.z += (emove->rotZ[emoveIndex] - mLastAbsoluteYaw);
-
-               // Do we also include the relative yaw value?
-               if(con->getControlSchemeAddYawToAbsRot())
-               {
-                  F32 z = move->yaw;
-                  if (z > M_PI_F)
-                     z -= M_2PI_F;
-
-                  mHead.z += z;
-               }
-
-               // Constrain the range of mHead.z
-               while (mHead.z < 0.0f)
-                  mHead.z += M_2PI_F;
-               while (mHead.z > M_2PI_F)
-                  mHead.z -= M_2PI_F;
-            }
-            else
-            {
-               // Rotate body
-               mRot.z += (emove->rotZ[emoveIndex] - mLastAbsoluteYaw);
-
-               // Do we also include the relative yaw value?
-               if(con->getControlSchemeAddYawToAbsRot())
-               {
-                  F32 z = move->yaw;
-                  if (z > M_PI_F)
-                     z -= M_2PI_F;
-
-                  mRot.z += z;
-               }
-
-               // Constrain the range of mRot.z
-               while (mRot.z < 0.0f)
-                  mRot.z += M_2PI_F;
-               while (mRot.z > M_2PI_F)
-                  mRot.z -= M_2PI_F;
-            }
-            mLastAbsoluteYaw = emove->rotZ[emoveIndex];
-            mLastAbsolutePitch = emove->rotX[emoveIndex];
-            mLastAbsoluteRoll = emove->rotY[emoveIndex];
-
-            // Head bank
-            mHead.y = emove->rotY[emoveIndex];
-
-            // Constrain the range of mHead.y
-            while (mHead.y > M_PI_F) 
-               mHead.y -= M_2PI_F;
-         }
-         else
-         {
-            // Orient the player so we are looking towards the required position, ignoring any banking
-            AngAxisF moveRot(Point3F(emove->rotX[emoveIndex], emove->rotY[emoveIndex], emove->rotZ[emoveIndex]), emove->rotW[emoveIndex]);
-            MatrixF trans(1);
-            moveRot.setMatrix(&trans);
-            trans.inverse();
-
-            Point3F vecForward(0, 10, 0);
-            Point3F viewAngle;
-            Point3F orient;
-            EulerF rot;
-            trans.mulV(vecForward);
-            viewAngle = vecForward;
-            vecForward.z = 0; // flatten
-            vecForward.normalizeSafe();
-
-            F32 yawAng;
-            F32 pitchAng;
-            MathUtils::getAnglesFromVector(vecForward, yawAng, pitchAng);
-
-            mRot = EulerF(0);
-            mRot.z = yawAng;
-            mHead = EulerF(0);
-
-            while (mRot.z < 0.0f)
-               mRot.z += M_2PI_F;
-            while (mRot.z > M_2PI_F)
-               mRot.z -= M_2PI_F;
-
-            absoluteDelta = true;
-         }
+         mHead.z = mClampF(mHead.z + y,
+                           -mDataBlock->maxFreelookAngle,
+                           mDataBlock->maxFreelookAngle);
       }
-#endif
-
-      if(doStandardMove)
+      else if((con && con->isFirstPerson()) || !con)
       {
-         F32 p = move->pitch * (mPose == SprintPose ? mDataBlock->sprintPitchScale : 1.0f);
-         if (p > M_PI_F) 
-            p -= M_2PI_F;
-         mHead.x = mClampF(mHead.x + p,mDataBlock->minLookAngle,
-                           mDataBlock->maxLookAngle);
-
-         F32 y = move->yaw * (mPose == SprintPose ? mDataBlock->sprintYawScale : 1.0f);
-         if (y > M_PI_F)
-            y -= M_2PI_F;
-
-         if (move->freeLook && ((isMounted() && getMountNode() == 0) || (con && !con->isFirstPerson())))
-         {
-            mHead.z = mClampF(mHead.z + y,
-                              -mDataBlock->maxFreelookAngle,
-                              mDataBlock->maxFreelookAngle);
-         }
-         else
-         {
-            mRot.z += y;
-            // Rotate the head back to the front, center horizontal
-            // as well if we're controlling another object.
-            mHead.z *= 0.5f;
-            if (mControlObject)
-               mHead.x *= 0.5f;
-         }
-
-         // constrain the range of mRot.z
-         while (mRot.z < 0.0f)
-            mRot.z += M_2PI_F;
-         while (mRot.z > M_2PI_F)
-            mRot.z -= M_2PI_F;
+         mRot.z += y;
+         // Rotate the head back to the front, center horizontal
+         // as well if we're controlling another object.
+         //mHead.z *= 0.5f;
+         //if (mControlObject)
+            //mHead.x *= 0.5f;
       }
+
+		//Ubiq: Lorne: if ledge/climb/wall, just face the surface
+		if(mClimbState.active || mLedgeState.active || mWallHugState.active)
+		{
+			VectorF normal;
+			if(mLedgeState.active)
+				normal.set(-mLedgeState.ledgeNormal);
+			else if(mClimbState.active)
+				normal.set(-mClimbState.surfaceNormal);
+			else
+				normal.set(-mWallHugState.surfaceNormal);
+
+			//face the surface
+			Point3F goalRot = MathUtils::createOrientFromDir(normal).toEuler();
+			Point3F delta = goalRot - mRot;
+			
+			//fix it -PI to +PI
+			if (delta.z < -M_PI_F)
+				delta.z += M_2PI_F;
+			if (delta.z > M_PI_F)
+				delta.z -= M_2PI_F;
+
+			mRot += delta * 0.1f;
+		}
+
+		//Ubiq: Lorne: third-person behavior, rotate to face movement direction
+		else if((!mJumpState.isCrouching && moveVec.len() > 0) && (con && !con->isFirstPerson()))
+		{
+			F32 yaw, pitch;
+			MathUtils::getAnglesFromVector(moveVec, yaw, pitch);
+
+			F32 deltaYaw = yaw - mRot.z;
+			//fix it -PI to +PI
+			while (deltaYaw < -M_PI_F)
+				deltaYaw += M_2PI_F;
+			while (deltaYaw > M_PI_F)
+				deltaYaw -= M_2PI_F;
+
+			//choose our turn speed...
+			F32 speed;
+			if (mContactTimer == 0)
+			{
+				if(deltaYaw > 2.2 || deltaYaw < -2.2)
+					//on the ground, fast 180
+					speed = mDataBlock->groundTurnRate * 8.0f;
+
+				else
+					//on the ground, regular
+					speed = mDataBlock->groundTurnRate;
+			}
+			else
+				//in the air
+				speed = mDataBlock->airTurnRate;
+
+			speed *= TickSec;
+
+			F32 turn = 0;
+			if(mFabs(deltaYaw) < speed)
+				turn = deltaYaw;
+			else if(deltaYaw > 0)
+				turn = speed;
+			else if(deltaYaw < 0)
+				turn = -speed;
+			mRot.z += turn;
+
+			if(mContactTimer == 0 && !mJumpState.active)
+			{
+				//Ubiq: Lorne: we just rotated while on the ground
+				//let's rotate mVelocity by the same amount. This causes the player to 
+				//maintain his speed through sharp turns (instead of losing it by applying
+				//force in an opposing direction and then having to regain it)
+				AngAxisF rotation(Point3F(0,0,1), turn);
+				MatrixF xform;
+				rotation.setMatrix(&xform);
+				VectorF velocityTrans;
+				xform.mulV(mVelocity, &velocityTrans);
+				mVelocity.set(velocityTrans);
+			}
+
+         // Rotate the head back to the front, center horizontal
+         // as well if we're controlling another object.
+         //Ubiq: swimming seems to work better without these - removing
+         //mHead.z *= 0.5f;
+         //if (mControlObject)
+            //mHead.x *= 0.5f;
+      }
+
+      // constrain the range of mRot.z
+      while (mRot.z < 0.0f)
+         mRot.z += M_2PI_F;
+      while (mRot.z > M_2PI_F)
+         mRot.z -= M_2PI_F;
 
       delta.rot = mRot;
       delta.rotVec.x = delta.rotVec.y = 0.0f;
@@ -2719,78 +3089,28 @@ void Player::updateMove(const Move* move)
 
       delta.head = mHead;
       delta.headVec -= mHead;
-
-      if (absoluteDelta)
-      {
-         delta.headVec = Point3F(0, 0, 0);
-         delta.rotVec = Point3F(0, 0, 0);
-      }
-
-      for(U32 i=0; i<3; ++i)
-      {
-         if (delta.headVec[i] > M_PI_F)
-            delta.headVec[i] -= M_2PI_F;
-         else if (delta.headVec[i] < -M_PI_F)
-            delta.headVec[i] += M_2PI_F;
-      }
    }
    MatrixF zRot;
    zRot.set(EulerF(0.0f, 0.0f, mRot.z));
 
    // Desired move direction & speed
-   VectorF moveVec;
    F32 moveSpeed;
-   if ((mState == MoveState || (mState == RecoverState && mDataBlock->recoverRunForceScale > 0.0f)) && mDamageState == Enabled)
-   {
-      zRot.getColumn(0,&moveVec);
-      moveVec *= (move->x * (mPose == SprintPose ? mDataBlock->sprintStrafeScale : 1.0f));
-      VectorF tv;
-      zRot.getColumn(1,&tv);
-      moveVec += tv * move->y;
-
-      // Clamp water movement
-      if (move->y > 0.0f)
-      {
-         if ( mSwimming )
-            moveSpeed = getMax(mDataBlock->maxUnderwaterForwardSpeed * move->y,
-                               mDataBlock->maxUnderwaterSideSpeed * mFabs(move->x));
-         else if ( mPose == PronePose )
-            moveSpeed = getMax(mDataBlock->maxProneForwardSpeed * move->y,
-                               mDataBlock->maxProneSideSpeed * mFabs(move->x));
-         else if ( mPose == CrouchPose )
-            moveSpeed = getMax(mDataBlock->maxCrouchForwardSpeed * move->y,
-                               mDataBlock->maxCrouchSideSpeed * mFabs(move->x));
-         else if ( mPose == SprintPose )
-            moveSpeed = getMax(mDataBlock->maxSprintForwardSpeed * move->y,
-                               mDataBlock->maxSprintSideSpeed * mFabs(move->x));
-
-         else // StandPose
-            moveSpeed = getMax(mDataBlock->maxForwardSpeed * move->y,
-                               mDataBlock->maxSideSpeed * mFabs(move->x));
-      }
-      else
-      {
-         if ( mSwimming )
-            moveSpeed = getMax(mDataBlock->maxUnderwaterBackwardSpeed * mFabs(move->y),
-                               mDataBlock->maxUnderwaterSideSpeed * mFabs(move->x));
-         else if ( mPose == PronePose )
-            moveSpeed = getMax(mDataBlock->maxProneBackwardSpeed * mFabs(move->y),
-                               mDataBlock->maxProneSideSpeed * mFabs(move->x));
-         else if ( mPose == CrouchPose )
-            moveSpeed = getMax(mDataBlock->maxCrouchBackwardSpeed * mFabs(move->y),
-                               mDataBlock->maxCrouchSideSpeed * mFabs(move->x));         
-         else if ( mPose == SprintPose )
-            moveSpeed = getMax(mDataBlock->maxSprintBackwardSpeed * mFabs(move->y),
-                               mDataBlock->maxSprintSideSpeed * mFabs(move->x));         
-         else // StandPose
-            moveSpeed = getMax(mDataBlock->maxBackwardSpeed * mFabs(move->y),
-                               mDataBlock->maxSideSpeed * mFabs(move->x));
-      }
+   if ((mState == MoveState || (mState == RecoverState)) && mDamageState == Enabled)
+	{
+		if ( mSwimming )
+		   moveSpeed = mDataBlock->maxUnderwaterForwardSpeed * moveVec.len();
+		else if ( mPose == PronePose )
+		   moveSpeed = mDataBlock->maxProneForwardSpeed * moveVec.len();
+		else if ( mPose == CrouchPose )
+		   moveSpeed = mDataBlock->maxCrouchForwardSpeed * moveVec.len();
+		else if ( mPose == SprintPose )
+		   moveSpeed = mDataBlock->maxSprintForwardSpeed * moveVec.len();
+		else // StandPose
+		   moveSpeed = mDataBlock->maxForwardSpeed * moveVec.len();
 
       // Cancel any script driven animations if we are going to move.
-      if (moveVec.x + moveVec.y + moveVec.z != 0.0f &&
-          (mActionAnimation.action >= PlayerData::NumTableActionAnims
-               || mActionAnimation.action == PlayerData::LandAnim))
+      if (!moveVec.isZero() &&
+         (mActionAnimation.action >= PlayerData::NumTableActionAnims))
          mActionAnimation.action = PlayerData::NullAnimation;
    }
    else
@@ -2799,45 +3119,613 @@ void Player::updateMove(const Move* move)
       moveSpeed = 0.0f;
    }
 
-   // Acceleration due to gravity
-   VectorF acc(0.0f, 0.0f, mGravity * mGravityMod * TickSec);
+	VectorF acc(0,0,0);
 
    // Determine ground contact normal. Only look for contacts if
    // we can move and aren't mounted.
    VectorF contactNormal(0,0,0);
-   bool jumpSurface = false, runSurface = false;
-   if ( !isMounted() )
-      findContact( &runSurface, &jumpSurface, &contactNormal );
-   if ( jumpSurface )
+   mJumpSurface = mRunSurface = mSlideSurface = false;
+   if ( !isMounted() && !mSwimming )	//Ubiq: don't check for surfaces when swimming
+      findContact(&mRunSurface,&mJumpSurface,&mSlideSurface,&contactNormal);
+   if (mJumpSurface)
       mJumpSurfaceNormal = contactNormal;
-   
-   // If we don't have a runSurface but we do have a contactNormal,
-   // then we are standing on something that is too steep.
-   // Deflect the force of gravity by the normal so we slide.
-   // We could also try aligning it to the runSurface instead,
-   // but this seems to work well.
-   if ( !runSurface && !contactNormal.isZero() )  
-      acc = ( acc - 2 * contactNormal * mDot( acc, contactNormal ) );   
+	if (!mRunSurface)
+		acc += VectorF(0.0f, 0.0f, mGravity * mGravityMod * TickSec);
 
-   // Acceleration on run surface
-   if (runSurface && !mSwimming) {
-      mContactTimer = 0;
+	//Ubiq: Slide state
+	mSlideState.active = mSlideSurface && mVelocity.z < -1.0f;
+	if(mSlideState.active)
+	{
+		mContactTimer = 0;
+		mJumping = false;
+		mFalling = false;
+		mSlideState.surfaceNormal = contactNormal;
+	}
 
-      // Remove acc into contact surface (should only be gravity)
-      // Clear out floating point acc errors, this will allow
-      // the player to "rest" on the ground.
-      // However, no need to do that if we're using a physics library.
-      // It will take care of itself.
-      if (!mPhysicsRep)
-      {
-         F32 vd = -mDot(acc,contactNormal);
-         if (vd > 0.0f) {
-            VectorF dv = contactNormal * (vd + 0.002f);
-            acc += dv;
-            if (acc.len() < 0.0001f)
-               acc.set(0.0f, 0.0f, 0.0f);
-         }
-      }
+	//if we haven't been in contact for a while, but we just detected a runSurface above
+	if(mContactTimer >= sContactTickTime && mRunSurface && mDamageState == Enabled)
+	{
+		//we know we've *just* landed this tick
+		//play the land animation
+		if(mJumpState.active && mJumpState.jumpType == JumpType_Run)
+		{	
+			setActionThread(PlayerData::RunningLandAnim,true,false,true);
+			mLandState.active = true;
+			mLandState.timer = mDataBlock->landDuration;
+		}
+		else
+		{
+			setActionThread(PlayerData::StandingLandAnim,true,false,true);
+			mLandState.active = true;
+			mLandState.timer = mDataBlock->landDuration;
+		}
+
+		//play sound effects on client
+		if(isGhost()) SFX->playOnce( mDataBlock->sound[ PlayerData::land ], &getTransform() );
+	}
+
+	//Ubiq: Not wall hugging?
+	if(!mWallHugState.active)
+	{
+		//can we enter the wall hug state?
+		if(canStartWallHug())
+		{
+			//do we have a wall?
+			PlaneF wallPlane;
+			bool wall = false;
+			findWallContact(&wall, &wallPlane);
+			if(wall)
+			{
+				//is the player moving into the surface?
+				if(mDot(moveVecNormalized, wallPlane) < -0.95f)
+				{
+					Point3F snapPos = snapToPlane(wallPlane);
+
+					//apply some fudge factor to make sure we're out of the wall
+					//and to help deal with 2+ surfaces at once
+					Point3F fudge(wallPlane);
+					fudge.normalize(sSurfaceDistance);
+					snapPos += fudge;
+
+					//is the space clear? nothing in the way?
+					if(worldBoxIsClear(mObjBox, snapPos))
+					{
+						//enter wallHug state
+						mWallHugState.active = true;
+						mWallHugState.surfaceNormal = wallPlane;
+						mStoppingTimer = 0;
+					}
+				}
+			}
+		}
+	}
+
+	//Ubiq: wall hugging?
+	if(mWallHugState.active)
+	{
+		//do we have a wall?
+		PlaneF wallPlane;
+		bool wall = false;
+		findWallContact(&wall, &wallPlane);
+
+		//Check to make sure we should still be in the wall hug state
+		if(!canWallHug() || !wall || mDot(wallPlane, moveVecNormalized) > 0.95f)
+		{
+			mWallHugState.active = false;
+			mWallHugState.surfaceNormal.set(0,0,0);
+		}
+		else
+		{
+			//We're wall hugging...
+			mWallHugState.active = true;
+			mWallHugState.surfaceNormal = wallPlane;
+			mWallHugState.direction = MOVE_DIR_NONE;
+
+			//see if we can snap to the wall
+			Point3F snapPos = snapToPlane(wallPlane);
+
+			//apply some fudge factor to make sure we're out of the wall
+			//and to help deal with 2+ surfaces at once
+			Point3F fudge(wallPlane);
+			fudge.normalize(sSurfaceDistance);
+			snapPos += fudge;
+
+			//is the space clear? nothing in the way?
+			if(worldBoxIsClear(mObjBox, snapPos))
+			{
+				//cool, snap to the wall
+				mObjToWorld.setColumn(3, snapPos);
+			}
+
+			//is player is giving directional input?
+			if (moveVec.len())
+			{
+				VectorF pv;
+				pv = moveVec;
+
+				VectorF rotAxis;
+				mCross(mWallHugState.surfaceNormal, Point3F(0,0,1), &rotAxis);
+				rotAxis.normalize();
+
+				//snap direction and choose appropriate speed
+				F32 pvDotSurface = mDot(pv, mWallHugState.surfaceNormal);
+				if(pvDotSurface >= -0.5)
+				{
+					if(mDot(pv, rotAxis) > 0)
+					{
+						//left
+						mWallHugState.direction = MOVE_DIR_LEFT;
+						pv = rotAxis;
+						pv.normalize(mDataBlock->wallHugSpeed);
+					}
+					else
+					{
+						//right
+						mWallHugState.direction = MOVE_DIR_RIGHT;
+						pv = -rotAxis;
+						pv.normalize(mDataBlock->wallHugSpeed);
+					}
+				}
+				else
+				{
+					pv.zero();
+				}
+
+				mVelocity.x = pv.x;
+				mVelocity.y = pv.y;
+			}
+			else
+			{
+				//no player input, stop moving
+				mVelocity.x = 0;
+				mVelocity.y = 0;
+			}
+		}
+	}
+
+	//Ubiq: jump was released, we can climb
+	if(!move->trigger[sJumpJetTrigger])
+		mClimbState.ignoreClimb = false;
+
+	//Ubiq: Not climbing?
+	if(!mClimbState.active)
+	{
+		//can we enter the climb state?
+		if(canStartClimb())
+		{
+			//do we have a climb surface?
+			PlaneF climbPlane;
+			bool climbSurface = false;
+			findClimbContact(&climbSurface, &climbPlane);
+			if(climbSurface)
+			{
+				//is the player moving into the surface, or in the air?
+				if(mDot(moveVecNormalized, climbPlane) < -0.5f
+					|| !mRunSurface)
+				{
+					Point3F snapPos = snapToPlane(climbPlane);
+
+					//apply some fudge factor to make sure we're out of the surface
+					//and to help deal with 2+ surfaces at once
+					Point3F fudge(climbPlane);
+					fudge.normalize(sSurfaceDistance);
+					snapPos += fudge;
+
+					//is the space clear? nothing in the way?
+					if(worldBoxIsClear(mObjBox, snapPos))
+					{
+						//enter climb state
+						mClimbState.active = true;
+						mClimbState.surfaceNormal = climbPlane;
+						mClimbState.ignoreClimb = false;
+						mJumpState.active = false;
+						mJumping = false;
+						mStoppingTimer = 0;
+					}
+				}
+			}
+		}
+	}
+
+	//Ubiq: Climbing?
+	if(mClimbState.active)
+	{
+		//do we have a climb surface?
+		PlaneF climbPlane;
+		bool climbSurface = false;
+		findClimbContact(&climbSurface, &climbPlane);
+
+		//Check to make sure we should still be in the climb state
+		if(!canClimb() || !climbSurface || move->trigger[sJumpTrigger])
+		{
+			mClimbState.active = false;
+			mClimbState.surfaceNormal.set(0,0,0);
+			mClimbState.ignoreClimb = true;
+		}
+		else
+		{
+			//We're climbing...
+			mClimbState.surfaceNormal = climbPlane;
+			mClimbState.direction = MOVE_DIR_NONE;
+
+			//force states
+			mJumpSurface = false;
+			mJumpState.active = false;
+			mJumpState.isCrouching = false;
+			mJumpState.crouchDelay = 0;
+			//mRunSurface = false;
+			mContactTimer = 0;
+
+			acc.zero();
+
+			if(mVelocity.z < mDataBlock->climbScrapeSpeed)
+			{
+				//falling too fast to actually start climbing
+				//but we can scrape at the wall and deccelerate
+				mVelocity -= mVelocity * mDataBlock->climbScrapeFriction * TickSec;
+
+				//slight gravity into surface
+				acc.set(-mClimbState.surfaceNormal * 0.5f);
+			}
+			else
+			{
+				//see if we can snap to the surface
+				Point3F snapPos = snapToPlane(climbPlane);
+
+				//apply some fudge factor to make sure we're out of the surface
+				//and to help deal with 2+ surfaces at once
+				Point3F fudge(climbPlane);
+				fudge.normalize(sSurfaceDistance);
+				snapPos += fudge;
+
+				//is the space clear? nothing in the way?
+				if(worldBoxIsClear(mObjBox, snapPos))
+				{
+					//cool, snap to the wall
+					mObjToWorld.setColumn(3, snapPos);
+				}
+
+				//regular climb
+				if (moveVec.len())
+				{
+					//player is giving directional input
+
+					VectorF pv;
+					pv = moveVec;
+					//rotate pv around an axis perpendicular to: surface normal and up
+					//rotate by: PI/2 - surfacePitch
+
+					//find the axis to rotate around
+					VectorF rotAxis;
+					mCross(mClimbState.surfaceNormal, Point3F(0,0,1), &rotAxis);
+					rotAxis.normalize();
+
+					//snap direction and choose appropriate speed
+					F32 pvDotSurface = mDot(pv, mClimbState.surfaceNormal);
+					if(pvDotSurface < -0.5)
+					{
+						//up
+						mClimbState.direction = MOVE_DIR_UP;
+						pv = -mClimbState.surfaceNormal;
+						pv.normalize(mDataBlock->climbSpeedUp);
+					}
+					else if(pvDotSurface > 0.5)
+					{
+						if(mRunSurface)
+						{
+							//we're at the bottom, leave climb state
+							mClimbState.active = false;
+							mClimbState.ignoreClimb = true;
+						}
+						else
+						{
+							//down
+							mClimbState.direction = MOVE_DIR_DOWN;
+							pv = mClimbState.surfaceNormal;
+							pv.normalize(mDataBlock->climbSpeedDown);
+						}
+					}
+					else
+					{
+						if(mDot(pv, rotAxis) > 0)
+						{
+							//left
+							mClimbState.direction = MOVE_DIR_LEFT;
+							pv = rotAxis;
+							pv.normalize(mDataBlock->climbSpeedSide);
+						}
+						else
+						{
+							//right
+							mClimbState.direction = MOVE_DIR_RIGHT;
+							pv = -rotAxis;
+							pv.normalize(mDataBlock->climbSpeedSide);
+						}
+					}
+
+					//are we ledge-grabbing up (or trying to)?
+					if(mLedgeState.climbingUp || mLedgeState.direction == MOVE_DIR_UP)
+					{
+						//we are, can't move
+						pv.zero();
+					}
+
+					//get the pitch of the surface
+					F32 surfaceYaw, surfacePitch;
+					MathUtils::getAnglesFromVector(mClimbState.surfaceNormal, surfaceYaw, surfacePitch);
+
+					F32 desiredPitch = M_PI_F / 2.0f - surfacePitch;
+
+					//rotate pv
+					AngAxisF test(rotAxis, desiredPitch);
+					MatrixF xform;
+					test.setMatrix(&xform);
+					VectorF pvTrans;
+					xform.mulV(pv, &pvTrans);
+					pv = pvTrans;
+					mVelocity = pv;
+				}
+				else
+				{
+					//no player input, stop moving
+					mVelocity.zero();
+				}
+			}
+		}
+	}
+
+	//Ubiq: jump was released, we can ledge grab
+	if(!move->trigger[sJumpJetTrigger])
+		mLedgeState.ignoreLedge = false;
+
+	if(!mLedgeState.active)
+	{
+		//can we enter the grab state?
+		if(canStartLedgeGrab())
+		{
+			//do we have a ledge?
+			bool ledge = false;
+			VectorF ledgeNormal(0,0,0);
+			Point3F ledgePoint(0,0,0);
+			bool canMoveLeft = false;
+			bool canMoveRight = false;
+
+			findLedgeContact(&ledge, &ledgeNormal, &ledgePoint, &canMoveLeft, &canMoveRight);
+			if(ledge && canMoveLeft && canMoveRight
+				//on ground: don't grab unless specifically pushing into ledge
+				//in air: grab unless specifically pulling away
+				&& mDot(ledgeNormal, moveVecNormalized) <= (mContactTimer < sContactTickTime ? -0.5f : 0.75f))
+			{
+				//okay, we found a suitable ledge but we still need to determine the point the
+				//player should snap to and test that point to ensure there is nothing in the way
+				PlaneF ledgePlane (ledgePoint, ledgeNormal);
+				Point3F snapPos = snapToPlane(ledgePlane);
+
+				//apply some fudge factor to make sure we're out of the wall
+				//and to help deal with 2+ edges at once
+				Point3F fudge(ledgeNormal);
+				fudge.normalize(sSurfaceDistance);
+				snapPos += fudge;
+
+				//set height to the ledge height
+				snapPos.z = ledgePoint.z - mDataBlock->grabHeight;
+
+				//is the space clear? nothing in the way?
+				if(worldBoxIsClear(mObjBox, snapPos))
+				{
+					//ok, enter ledge state
+					mLedgeState.active = true;
+					mLedgeState.ledgeNormal = ledgeNormal;
+					mLedgeState.ledgePoint = ledgePoint;
+					mLedgeState.ignoreLedge = false;
+					mJumpState.active = false;
+					mJumping = false;
+					mStoppingTimer = 0;
+				}
+			}
+		}
+	}
+
+	if(mLedgeState.climbingUp)
+	{
+		//exit from bottom?
+		if(mLedgeState.animPos == 0.0f)
+		{
+			//might still be grabbing, just clear climbingUp state
+			mLedgeState.climbingUp = false; 
+			mLedgeState.animPos = 0.0f;
+			mLedgeState.deltaAnimPos = 0.0f;
+			mLedgeState.deltaAnimPosVec = 0.0f;
+			setMaskBits(LedgeUpMask);
+		}
+
+		//exit from top?
+		if(mLedgeState.animPos == 1.0f)
+		{
+			//snap up to top
+			Point3F pos = getLedgeUpPosition();
+			mObjToWorld.setColumn(3, pos);
+
+			setActionThread(PlayerData::RootAnim,true,false,false);
+			mShapeInstance->clearTransition(mActionAnimation.thread);
+			mShapeInstance->animate(); //why is this necessary?
+
+			//clear ledge grabbing
+			mLedgeState.active = false;
+			mLedgeState.ledgeNormal.zero();
+			mLedgeState.ledgePoint.zero();
+			mLedgeState.direction = MOVE_DIR_NONE;
+			mLedgeState.climbingUp = false;
+			mLedgeState.animPos = 0.0f;
+			mLedgeState.deltaAnimPos = 0.0f;
+			mLedgeState.deltaAnimPosVec = 0.0f;
+			setMaskBits(LedgeUpMask);
+
+			//clear climbing
+			mClimbState.active = false;
+			mClimbState.direction = MOVE_DIR_NONE;
+			mClimbState.surfaceNormal.zero();
+		}
+	}
+
+	if(mLedgeState.active)
+	{
+		//do we have a ledge?
+		bool ledge = false;
+		VectorF ledgeNormal(0,0,0);
+		Point3F ledgePoint(0,0,0);
+		bool canMoveLeft = false;
+		bool canMoveRight = false;
+
+		findLedgeContact(&ledge, &ledgeNormal, &ledgePoint, &canMoveLeft, &canMoveRight);
+
+		//Check to make sure we should still be in the grab state
+		if((!canLedgeGrab() || !ledge || mDot(ledgeNormal, moveVecNormalized) > 0.75f || move->trigger[sJumpTrigger])
+			&& !mLedgeState.climbingUp)	//can't leave if you're climbing up
+		{
+			mLedgeState.active = false;
+			mLedgeState.ledgeNormal.zero();
+			mLedgeState.ledgePoint.zero();
+			mLedgeState.direction = MOVE_DIR_NONE;
+			mLedgeState.ignoreLedge = true;
+
+			mLedgeState.climbingUp = false;
+			mLedgeState.animPos = 0.0f;
+			mLedgeState.deltaAnimPos = 0.0f;
+			mLedgeState.deltaAnimPosVec = 0.0f;
+			setMaskBits(LedgeUpMask);
+		}
+		else if(ledge)
+		{
+			AssertFatal(!ledgeNormal.isZero(), "ledgeNormal is 0!");
+
+			//okay, we found a suitable ledge but we still need to determine the point the
+			//player should snap to and test that point to ensure there is nothing in the way
+			PlaneF ledgePlane (ledgePoint, ledgeNormal);
+			Point3F snapPos = snapToPlane(ledgePlane);
+
+			//apply some fudge factor to make sure we're out of the wall
+			//and to help deal with 2+ edges at once
+			Point3F fudge(ledgeNormal);
+			fudge.normalize(sSurfaceDistance);
+			snapPos += fudge;
+
+			//set height to the ledge height
+			snapPos.z = ledgePoint.z - mDataBlock->grabHeight;
+
+			//is the space clear? nothing in the way?
+			if(worldBoxIsClear(mObjBox, snapPos))
+			{
+				//cool, snap to the ledge
+				mObjToWorld.setColumn(3, snapPos);
+			}
+
+			//We're grabbing / climbing up...
+			mLedgeState.active = true;
+			mLedgeState.ledgeNormal = ledgeNormal;
+			mLedgeState.ledgePoint = ledgePoint;
+
+			//force states
+			mJumpSurface = false;
+			mJumpState.active = false;
+			mJumpState.isCrouching = false;
+			mJumpState.crouchDelay = 0;
+			mRunSurface = false;
+			mContactTimer = 0;
+
+			//dead-stop
+			acc.zero();
+			mVelocity.zero();
+
+			mLedgeState.direction = MOVE_DIR_NONE;			
+
+
+			//if player is giving directional input
+			if (moveVec.len())
+			{
+				VectorF pv;
+				pv = moveVec;
+
+				//snap direction and choose appropriate speed
+				F32 pvDotSurface = mDot(pv, mLedgeState.ledgeNormal);
+				if(pvDotSurface < -0.5)
+				{
+					//up
+					pv.zero();
+
+					mLedgeState.direction = MOVE_DIR_UP;
+
+					if(canStartLedgeUp())
+					{
+						mLedgeState.climbingUp = true;
+						mLedgeState.animPos = F32_MIN;	//skip over 0 so we don't exit immediately
+					}
+				}
+				else if(pvDotSurface > 0.5)
+				{
+					//down, nothing to do!
+					pv.zero();
+				}
+				else
+				{
+					//now we find a vector perpendicular to: ledge normal and up
+					VectorF rotAxis;
+					mCross(mLedgeState.ledgeNormal, Point3F(0,0,1), &rotAxis);
+					rotAxis.normalize();
+
+					if(mDot(pv, rotAxis) > 0)
+					{
+						//left
+						if(canMoveLeft)
+						{
+							mLedgeState.direction = MOVE_DIR_LEFT;
+							pv = rotAxis;
+							pv.normalize(mDataBlock->grabSpeedSide);
+						}
+						else
+						{
+							//can't go left
+							pv.zero();
+						}
+					}
+					else
+					{
+						//right
+						if(canMoveRight)
+						{
+							mLedgeState.direction = MOVE_DIR_RIGHT;
+							pv = -rotAxis;
+							pv.normalize(mDataBlock->grabSpeedSide);
+						}
+						else
+						{
+							//can't go right
+							pv.zero();
+						}
+					}
+				}
+
+				//are we ledge-grabbing up (or trying to)?
+				if(mLedgeState.climbingUp || mLedgeState.direction == MOVE_DIR_UP)
+				{
+					//we are, can't move
+					pv.zero();
+				}
+
+				mVelocity = pv;
+			}
+		}
+	}
+
+	// Acceleration on run surface
+	if (mRunSurface
+			&& !mLedgeState.active	//these states handle
+			&& !mClimbState.active	//their own movement
+			&& !mWallHugState.active)
+	{
+		mContactTimer = 0;
+		mJumping = false;
+		mLedgeState.active = false;
 
       // Force a 0 move if there is no energy, and only drain
       // move energy if we're moving.
@@ -2850,10 +3738,45 @@ void Player::updateMove(const Move* move)
       else if (mEnergy >= mDataBlock->minRunEnergy) {
          if (moveSpeed)
             mEnergy -= mDataBlock->runEnergyDrain;
-         pv = moveVec;
-      }
+
+			//Ubiq: at low speeds (or in first-person) we want to move in the direction of input
+			//regardless of which direction the player is actually facing
+			if(mVelocity.len() < 1.0f || ((con && con->isFirstPerson()) || !con))
+				pv = moveVec;
+
+			//Ubiq: at higher speeds in third-person we only want to run forwards (no strafing)
+			else
+			{
+				getTransform().getColumn(1, &pv);
+				pv.normalize(moveVec.len());
+			}
+		}
       else
          pv.set(0.0f, 0.0f, 0.0f);
+
+		//Ubiq: Land state
+		if(mLandState.active)
+		{
+			if(!mDataBlock->isLandAction(mActionAnimation.action))
+			{
+				//exit land state
+				mLandState.active = false;
+			}
+			else if(mLandState.timer > 0)
+			{
+				//reduces the speed of the player upon landing
+				moveSpeed *= mDataBlock->landSpeedFactor;
+				mLandState.timer -= TickMs;
+			}
+			else if (!moveVec.isZero() || move->trigger[sJumpTrigger])
+			{
+				//exit land state
+				mLandState.active = false;
+
+				//cancel land animation
+				mActionAnimation.action = PlayerData::NullAnimation;
+			}
+		}
 
       // Adjust the player's requested dir. to be parallel
       // to the contact surface.
@@ -2894,8 +3817,7 @@ void Player::updateMove(const Move* move)
       VectorF runAcc = pv - (mVelocity + acc);
       F32 runSpeed = runAcc.len();
 
-      // Clamp acceleration, player also accelerates faster when
-      // in his hard landing recover state.
+      // Clamp acceleration
       F32 maxAcc;
       if (mPose == SprintPose)
       {
@@ -2905,17 +3827,42 @@ void Player::updateMove(const Move* move)
       {
          maxAcc = (mDataBlock->runForce / getMass()) * TickSec;
       }
-      if (mState == RecoverState)
-         maxAcc *= mDataBlock->recoverRunForceScale;
       if (runSpeed > maxAcc)
          runAcc *= maxAcc / runSpeed;
       acc += runAcc;
 
-      // If we are running on the ground, then we're not jumping
-      if (mDataBlock->isJumpAction(mActionAnimation.action))
-         mActionAnimation.action = PlayerData::NullAnimation;
-   }
-   else if (!mSwimming && mDataBlock->airControl > 0.0f)
+		//Ubiq: Stopping Timer
+		if(mVelocity.len() > 0.01f && mDot(mVelocity, runAcc) < -0.01f)
+			mStoppingTimer += TickMs; //deaccelerating, increment timer
+		else
+			mStoppingTimer = 0; //accelerating, reset timer
+
+		//if we're no-longer giving input, but still running, we're going to stop
+		if(mStoppingTimer > 64
+			&& mActionAnimation.action == PlayerData::RunForwardAnim
+			&& mVelocity.len() > mDataBlock->walkRunAnimVelocity)
+		{
+			//play stop animation
+			setActionThread(PlayerData::StopAnim,true,false,true);
+
+			//play sound effects on client
+			if(isGhost()) SFX->playOnce( mDataBlock->sound[ PlayerData::stop ], &getTransform() );
+		}
+
+		if(mActionAnimation.action == PlayerData::StopAnim
+			&& mStoppingTimer == 0)
+		{
+			//cancel stop animation, we're moving again
+			mActionAnimation.action = PlayerData::NullAnimation;	
+		}
+
+		if(!mJumpState.isCrouching)
+		{
+			mJumpState.active = false;
+		}
+	}
+   else if (!mSwimming && mDataBlock->airControl > 0.0f
+      && !mClimbState.active && !mLedgeState.active && !mWallHugState.active)
    {
       VectorF pv;
       pv = moveVec;
@@ -2924,7 +3871,7 @@ void Player::updateMove(const Move* move)
       if (pvl)
          pv *= moveSpeed / pvl;
 
-      VectorF runAcc = pv - (mVelocity + acc);
+      VectorF runAcc = pv - (mVelocity + acc); //Ubiq: Lorne: TODO: Is this okay?
       runAcc.z = 0;
       runAcc.x = runAcc.x * mDataBlock->airControl;
       runAcc.y = runAcc.y * mDataBlock->airControl;
@@ -2940,7 +3887,7 @@ void Player::updateMove(const Move* move)
       // There are no special air control animations 
       // so... increment this unless you really want to 
       // play the run anims in the air.
-      mContactTimer++;
+      mContactTimer += TickMs;	//Ubiq: mContactTimer is now in ms (not ticks)
    }
    else if (mSwimming)
    {
@@ -2962,14 +3909,14 @@ void Player::updateMove(const Move* move)
       zRot.set(EulerF(0, 0, mRot.z));
       MatrixF rot;
       rot.mul(zRot, xRot);
-      rot.getColumn(0,&moveVec);
+      rot.getColumn(1,&moveVec);
 
-      moveVec *= move->x;
+      /*moveVec *= move->x;
       VectorF tv;
       rot.getColumn(1,&tv);
       moveVec += tv * move->y;
       rot.getColumn(2,&tv);
-      moveVec += tv * move->z;
+      moveVec += tv * move->z;*/
 
       // Force a 0 move if there is no energy, and only drain
       // move energy if we're moving.
@@ -3014,19 +3961,75 @@ void Player::updateMove(const Move* move)
 
       // Clamp acceleration.
       F32 maxAcc = (mDataBlock->swimForce / getMass()) * TickSec;
-      if ( swimSpeed > maxAcc )
+      if ( false && swimSpeed > maxAcc )
          swimAcc *= maxAcc / swimSpeed;      
 
       acc += swimAcc;
 
-      mContactTimer++;
+     mContactTimer += TickMs;	//Ubiq: mContactTimer is now in ms (not ticks)
    }
-   else
-      mContactTimer++;   
+	
+	//Ubiq: Lorne: Enter the jump state?
+	if (move->trigger[sJumpTrigger] && !isMounted() && canJump())
+	{
+		//If we have directional input or if we're running, this will be a run-jump
+		if(moveVec.len() > 0 || mVelocity.len() > 3.0f)
+		{
+			//enter the jump state
+			mJumpState.active = true;
+			mJumpState.isCrouching = true;
+			mJumpState.crouchDelay = mDataBlock->runJumpCrouchDelay;
+			mJumpState.jumpType = JumpType_Run;
+		}
+
+		//If no directional input and we're at walking speed (or stopped), this will be a stand-jump
+		else
+		{
+			//enter the jump state
+			mJumpState.active = true;
+			mJumpState.isCrouching = true;
+			mJumpState.crouchDelay = mDataBlock->standJumpCrouchDelay;
+			mJumpState.jumpType = JumpType_Stand;
+		}
+
+		//play crouch sound for jump
+		if(isGhost()) SFX->playOnce( mDataBlock->sound[ PlayerData::jumpCrouch ], &getTransform() );
+
+		//cancel any playing animations
+		mActionAnimation.action = PlayerData::NullAnimation;
+	}
+	else
+	{
+		if (mJumpSurface) 
+		{
+			if (mJumpDelay > 0)
+				mJumpDelay--;
+			mJumpSurfaceLastContact = 0;
+		}
+		else
+			mJumpSurfaceLastContact++;
+	}
+
 
    // Acceleration from Jumping
-   if (move->trigger[sJumpTrigger] && canJump())// !isMounted() && 
-   {
+	if(mJumpState.active && mJumpState.isCrouching)
+	{
+		mJumpState.crouchDelay -= TickMs;
+
+		if(mJumpState.jumpType == JumpType_Stand)
+		{
+			//freeze the player
+			mVelocity.zero();
+			acc.zero();
+		}
+
+		//jump if the crouch timer expires or if we lose our
+		//jump-surface (meaning we've just gone off the edge!)
+		if(mJumpState.crouchDelay <= 0 || !mJumpSurface)
+		{
+			mJumpState.isCrouching = false;
+			mJumping = true;
+
       // Scale the jump impulse base on maxJumpSpeed
       F32 zSpeedScale = mVelocity.z;
       if (zSpeedScale <= mDataBlock->maxJumpSpeed)
@@ -3035,12 +4038,6 @@ void Player::updateMove(const Move* move)
             1 - (zSpeedScale - mDataBlock->minJumpSpeed) /
             (mDataBlock->maxJumpSpeed - mDataBlock->minJumpSpeed);
 
-         // Desired jump direction
-         VectorF pv = moveVec;
-         F32 len = pv.len();
-         if (len > 0)
-            pv *= 1 / len;
-
          // We want to scale the jump size by the player size, somewhat
          // in reduced ratio so a smaller player can jump higher in
          // proportion to his size, than a larger player.
@@ -3048,91 +4045,92 @@ void Player::updateMove(const Move* move)
 
          // Calculate our jump impulse
          F32 impulse = mDataBlock->jumpForce / getMass();
+			acc.z += scaleZ * impulse * zSpeedScale;
+			}
 
-         if (mDataBlock->jumpTowardsNormal)
-         {
-            // If we are facing into the surface jump up, otherwise
-            // jump away from surface.
-            F32 dot = mDot(pv,mJumpSurfaceNormal);
-            if (dot <= 0)
-               acc.z += mJumpSurfaceNormal.z * scaleZ * impulse * zSpeedScale;
-            else
-            {
-               acc.x += pv.x * impulse * dot;
-               acc.y += pv.y * impulse * dot;
-               acc.z += mJumpSurfaceNormal.z * scaleZ * impulse * zSpeedScale;
-            }
-         }
-         else
-            acc.z += scaleZ * impulse * zSpeedScale;
+			//if it's a run-jump...
+			if(mJumpState.jumpType == JumpType_Run)
+			{
+				VectorF jumpVec;
+				if(moveVec.len() > 0)
+				{
+					jumpVec.set(moveVec);
+
+					//also, in third-person snap rotation to the direction of the jump
+					//(in case the player changed their mind during the crouch)
+					if(con && !con->isFirstPerson())
+					{
+						F32 yaw, pitch;
+						MathUtils::getAnglesFromVector(moveVec, yaw, pitch);
+						mRot.z = yaw;
+					}
+				}
+				else
+					getTransform().getColumn(1, &jumpVec);
+				
+				//Force a specific velocity in the direction we're trying to move
+				//This gives the jump some serious "oomph" even if we're barely moving
+				if (mVelocity.len() < mDataBlock->maxForwardSpeed)
+					mVelocity.normalize(mDataBlock->maxForwardSpeed);
+
+				jumpVec.normalize(mVelocity.len());
+
+				mVelocity.x = 0;
+				mVelocity.y = 0;
+				acc.x = jumpVec.x;
+				acc.y = jumpVec.y;
+
+				//so each jump is more similar
+				//(specifically prevents weak jumps when running downhill)
+				if(mVelocity.z < 0)
+					mVelocity.z = 0;
+			}
 
          mJumpDelay = mDataBlock->jumpDelay;
          mEnergy -= mDataBlock->jumpEnergyDrain;
-
-         // If we don't have a StandJumpAnim, just play the JumpAnim...
-         S32 seq = (mVelocity.len() < 0.5) ? PlayerData::StandJumpAnim: PlayerData::JumpAnim; 
-         if ( mDataBlock->actionList[seq].sequence == -1 )
-            seq = PlayerData::JumpAnim;         
-         setActionThread( seq, true, false, true );
-
          mJumpSurfaceLastContact = JumpSkipContactsMax;
-      }
-   }
-   else
-   {
-      if (jumpSurface) 
-      {
-         if (mJumpDelay > 0)
-            mJumpDelay--;
-         mJumpSurfaceLastContact = 0;
-      }
-      else
-         mJumpSurfaceLastContact++;
-   }
+			
+			//play jump sound
+			if(isGhost()) SFX->playOnce( mDataBlock->sound[ PlayerData::jump ], &getTransform() );
+		}
+	}
 
    if (move->trigger[sJumpJetTrigger] && !isMounted() && canJetJump())
-   {
+	{
       mJetting = true;
 
-      // Scale the jump impulse base on maxJumpSpeed
-      F32 zSpeedScale = mVelocity.z;
-
-      if (zSpeedScale <= mDataBlock->jetMaxJumpSpeed)
-      {
-         zSpeedScale = (zSpeedScale <= mDataBlock->jetMinJumpSpeed)? 1:
-         1 - (zSpeedScale - mDataBlock->jetMinJumpSpeed) / (mDataBlock->jetMaxJumpSpeed - mDataBlock->jetMinJumpSpeed);
-
-         // Desired jump direction
-         VectorF pv = moveVec;
-         F32 len = pv.len();
-
-         if (len > 0.0f)
-            pv *= 1 / len;
-
-         // If we are facing into the surface jump up, otherwise
-         // jump away from surface.
-         F32 dot = mDot(pv,mJumpSurfaceNormal);
-         F32 impulse = mDataBlock->jetJumpForce / getMass();
-
-         if (dot <= 0)
-            acc.z += mJumpSurfaceNormal.z * impulse * zSpeedScale;
-         else
-         {
-            acc.x += pv.x * impulse * dot;
-            acc.y += pv.y * impulse * dot;
-            acc.z += mJumpSurfaceNormal.z * impulse * zSpeedScale;
-         }
-
+		//only apply jetting if our upward velocity is within range
+		if ((mVelocity.z <= mDataBlock->jetMaxJumpSpeed) && (mVelocity.z >= mDataBlock->jetMinJumpSpeed))
+		{
+			F32 impulse = mDataBlock->jetJumpForce / mMass;
+			acc.z += impulse * TickSec;
          mEnergy -= mDataBlock->jetJumpEnergyDrain;
-      }
-   }
-   else
-   {
+		}
+	}
+	else
+	{
       mJetting = false;
-   }
+	}
 
-   // Add in force from physical zones...
-   acc += (mAppliedForce / getMass()) * TickSec;
+	if (mJetting)
+	{
+		F32 newEnergy = mEnergy - mDataBlock->minJumpEnergy;
+
+		if (newEnergy < 0)
+		{
+			newEnergy = 0;
+			mJetting = false;
+		}
+
+		mEnergy = newEnergy;
+	}
+
+	//Ubiq: wall hug gives you immunity from physical zones
+	if(!mWallHugState.active)
+	{
+		// Add in force from physical zones...
+		acc += (mAppliedForce / getMass()) * TickSec;
+	}
 
    // Adjust velocity with all the move & gravity acceleration
    // TG: I forgot why doesn't the TickSec multiply happen here...
@@ -3159,13 +4157,16 @@ void Player::updateMove(const Move* move)
       mVelocity.z -= mDataBlock->upResistFactor * TickSec * (mVelocity.z - mDataBlock->upResistSpeed);
    }
 
+	//apply ground friction
+	if(mRunSurface || mSlideSurface)
+	{
+		mVelocity -= mVelocity * mDataBlock->groundFriction * TickSec;
+	}
    // Container buoyancy & drag
-/* Commented out until the buoyancy calculation can be reworked so that a container and
-** player with the same density will result in neutral buoyancy.
    if (mBuoyancy != 0)
    {     
       // Applying buoyancy when standing still causing some jitters-
-      if (mBuoyancy > 1.0 || !mVelocity.isZero() || !runSurface)
+      if (mBuoyancy > 1.0 || !mVelocity.isZero() || !mRunSurface)
       {
          // A little hackery to prevent oscillation
          // based on http://reinot.blogspot.com/2005/11/oh-yes-they-float-georgie-they-all.html
@@ -3178,10 +4179,9 @@ void Player::updateMove(const Move* move)
          if ( currHeight + mVelocity.z * TickSec * C > mLiquidHeight )
             buoyancyForce *= M;
                   
-         mVelocity.z -= buoyancyForce;
+         //mVelocity.z -= buoyancyForce;
       }
    }
-*/
 
    // Apply drag
    if ( mSwimming )
@@ -3195,7 +4195,7 @@ void Player::updateMove(const Move* move)
 
    // If we are not touching anything and have sufficient -z vel,
    // we are falling.
-   if (runSurface)
+   if (mContactTimer < sContactTickTime)	//Ubiq: Lorne: check the contactTimer instead of mRunSurface
       mFalling = false;
    else
    {
@@ -3233,21 +4233,18 @@ void Player::updateMove(const Move* move)
    // Update the PlayerPose
    Pose desiredPose = mPose;
 
-   if ( !mIsAiControlled )
-   {
-      if ( mSwimming )
-         desiredPose = SwimPose; 
-      else if ( runSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
-         desiredPose = CrouchPose;
-      else if ( runSurface && move->trigger[sProneTrigger] && canProne() )
-         desiredPose = PronePose;
-      else if ( move->trigger[sSprintTrigger] && canSprint() )
-         desiredPose = SprintPose;
-      else if ( canStand() )
-         desiredPose = StandPose;
+   if ( mSwimming )
+      desiredPose = SwimPose; 
+   else if ( mRunSurface && move->trigger[sCrouchTrigger] && canCrouch() )     
+      desiredPose = CrouchPose;
+   else if ( mRunSurface && move->trigger[sProneTrigger] && canProne() )
+      desiredPose = PronePose;
+   else if ( move->trigger[sSprintTrigger] && canSprint() )
+      desiredPose = SprintPose;
+   else if ( canStand() )
+      desiredPose = StandPose;
 
-      setPose( desiredPose );
-   }
+   setPose( desiredPose );
 }
 
 
@@ -3304,12 +4301,12 @@ bool Player::checkDismountPosition(const MatrixF& oldMat, const MatrixF& mat)
 
 bool Player::canJump()
 {
-   return mAllowJumping && mState == MoveState && mDamageState == Enabled && !isMounted() && !mJumpDelay && mEnergy >= mDataBlock->minJumpEnergy && mJumpSurfaceLastContact < JumpSkipContactsMax && !mSwimming && (mPose != SprintPose || mDataBlock->sprintCanJump);
+   return mAllowJumping && mState == MoveState && mDamageState == Enabled && !isMounted() && !mJumpDelay && mEnergy >= mDataBlock->minJumpEnergy && mJumpSurfaceLastContact < JumpSkipContactsMax && !mSwimming && (mPose != SprintPose || mDataBlock->sprintCanJump) && !mJumpState.active;
 }
 
 bool Player::canJetJump()
 {
-   return mAllowJetJumping && mState == MoveState && mDamageState == Enabled && !isMounted() && mEnergy >= mDataBlock->jetMinJumpEnergy && mDataBlock->jetJumpForce != 0.0f;
+   return mAllowJetJumping && mState == MoveState && mDamageState == Enabled && !isMounted() && mEnergy >= mDataBlock->jetMinJumpEnergy && mDataBlock->jetJumpForce != 0.0f && mJumping && mContactTimer < mDataBlock->jetTime;
 }
 
 bool Player::canSwim()
@@ -3335,9 +4332,9 @@ bool Player::canCrouch()
    if ( mDataBlock->actionList[PlayerData::CrouchRootAnim].sequence == -1 )
       return false;       
 
-   // We are already in this pose, so don't test it again...
-   if ( mPose == CrouchPose )
-      return true;
+	// We are already in this pose, so don't test it again...
+	if ( mPose == CrouchPose )
+		return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3387,8 +4384,8 @@ bool Player::canStand()
       return false;
 
    // We are already in this pose, so don't test it again...
-   if ( mPose == StandPose )
-      return true;
+	if ( mPose == StandPose )
+		return true;
 
    // Do standard Torque physics test here!
    if ( !mPhysicsRep )
@@ -3451,9 +4448,9 @@ bool Player::canProne()
    if ( !mPhysicsRep )
       return true;
 
-   // We are already in this pose, so don't test it again...
-   if ( mPose == PronePose )
-      return true;
+	// We are already in this pose, so don't test it again...
+	if ( mPose == PronePose )
+		return true;
 
    return mPhysicsRep->testSpacials( getPosition(), mDataBlock->proneBoxSize );
 }
@@ -3563,129 +4560,6 @@ void Player::updateDeathOffsets()
       mDeath.clear();
 }
 
-
-//----------------------------------------------------------------------------
-
-static const U32 sPlayerConformMask =  StaticShapeObjectType | StaticObjectType | TerrainObjectType;
-
-static void accel(F32& from, F32 to, F32 rate)
-{
-   if (from < to)
-      from = getMin(from += rate, to);
-   else
-      from = getMax(from -= rate, to);
-}
-
-// if (dt == -1)
-//    normal tick, so we advance.
-// else
-//    interpolate with dt as % of tick, don't advance
-//
-MatrixF * Player::Death::fallToGround(F32 dt, const Point3F& loc, F32 curZ, F32 boxRad)
-{
-   static const F32 sConformCheckDown = 4.0f;
-   RayInfo     coll;
-   bool        conformToStairs = false;
-   Point3F     pos(loc.x, loc.y, loc.z + 0.1f);
-   Point3F     below(pos.x, pos.y, loc.z - sConformCheckDown);
-   MatrixF  *  retVal = NULL;
-
-   PROFILE_SCOPE(ConformToGround);
-
-   if (gClientContainer.castRay(pos, below, sPlayerConformMask, &coll))
-   {
-      F32      adjust, height = (loc.z - coll.point.z), sink = curSink;
-      VectorF  desNormal = coll.normal;
-      VectorF  normal = curNormal;
-
-      // dt >= 0 means we're interpolating and don't accel the numbers
-      if (dt >= 0.0f)
-         adjust = dt * TickSec;
-      else
-         adjust = TickSec;
-
-      // Try to get them to conform to stairs by doing several LOS calls.  We do this if
-      // normal is within about 5 deg. of vertical.
-      if (desNormal.z > 0.995f)
-      {
-         Point3F  corners[3], downpts[3];
-         S32      c;
-
-         for (c = 0; c < 3; c++) {    // Build 3 corners to cast down from-
-            corners[c].set(loc.x - boxRad, loc.y - boxRad, loc.z + 1.0f);
-            if (c)      // add (0,boxWidth) and (boxWidth,0)
-               corners[c][c - 1] += (boxRad * 2.0f);
-            downpts[c].set(corners[c].x, corners[c].y, loc.z - sConformCheckDown);
-         }
-
-         // Do the three casts-
-         for (c = 0; c < 3; c++)
-            if (gClientContainer.castRay(corners[c], downpts[c], sPlayerConformMask, &coll))
-               downpts[c] = coll.point;
-            else
-               break;
-
-         // Do the math if everything hit below-
-         if (c == 3) {
-            mCross(downpts[1] - downpts[0], downpts[2] - downpts[1], &desNormal);
-            AssertFatal(desNormal.z > 0, "Abnormality in Player::Death::fallToGround()");
-            downpts[2] = downpts[2] - downpts[1];
-            downpts[1] = downpts[1] - downpts[0];
-            desNormal.normalize();
-            conformToStairs = true;
-         }
-      }
-
-      // Move normal in direction we want-
-      F32   * cur = normal, * des = desNormal;
-      for (S32 i = 0; i < 3; i++)
-         accel(*cur++, *des++, adjust * 0.25f);
-
-      if (mFabs(height) < 2.2f && !normal.isZero() && desNormal.z > 0.01f)
-      {
-         VectorF  upY(0.0f, 1.0f, 0.0f), ahead;
-         VectorF  sideVec;
-         MatrixF  mat(true);
-
-         normal.normalize();
-         mat.set(EulerF (0.0f, 0.0f, curZ));
-         mat.mulV(upY, & ahead);
-         mCross(ahead, normal, &sideVec);
-         sideVec.normalize();
-         mCross(normal, sideVec, &ahead);
-
-         static MatrixF resMat(true);
-         resMat.setColumn(0, sideVec);
-         resMat.setColumn(1, ahead);
-         resMat.setColumn(2, normal);
-
-         // Adjust Z down to account for box offset on slope.  Figure out how
-         // much we want to sink, and gradually accel to this amount.  Don't do if
-         // we're conforming to stairs though
-         F32   xy = mSqrt(desNormal.x * desNormal.x + desNormal.y * desNormal.y);
-         F32   desiredSink = (boxRad * xy / desNormal.z);
-         if (conformToStairs)
-            desiredSink *= 0.5f;
-
-         accel(sink, desiredSink, adjust * 0.15f);
-
-         Point3F  position(pos);
-         position.z -= sink;
-         resMat.setColumn(3, position);
-
-         if (dt < 0.0f)
-         {  // we're moving, so update normal and sink amount
-            curNormal = normal;
-            curSink = sink;
-         }
-
-         retVal = &resMat;
-      }
-   }
-   return retVal;
-}
-
-
 //-------------------------------------------------------------------------------------
 
 // This is called ::onAdd() to see if we're in a sitting animation.  These then
@@ -3740,14 +4614,14 @@ bool Player::setArmThread(U32 action)
 
 //----------------------------------------------------------------------------
 
-bool Player::setActionThread(const char* sequence,bool hold,bool wait,bool fsp)
+bool Player::setActionThread(const char* sequence, bool forward, bool hold, bool wait, bool fsp, bool forceSet, bool useSynchedPos)
 {
    for (U32 i = 1; i < mDataBlock->actionCount; i++)
    {
       PlayerData::ActionAnimation &anim = mDataBlock->actionList[i];
       if (!dStricmp(anim.name,sequence))
       {
-         setActionThread(i,true,hold,wait,fsp);
+         setActionThread(i,forward,hold,wait,fsp,forceSet,useSynchedPos);
          setMaskBits(ActionMask);
          return true;
       }
@@ -3755,22 +4629,28 @@ bool Player::setActionThread(const char* sequence,bool hold,bool wait,bool fsp)
    return false;
 }
 
-void Player::setActionThread(U32 action,bool forward,bool hold,bool wait,bool fsp, bool forceSet)
+void Player::setActionThread(U32 action, bool forward, bool hold, bool wait, bool fsp, bool forceSet, bool useSynchedPos)
 {
-   if (!mDataBlock || !mDataBlock->actionCount || (mActionAnimation.action == action && mActionAnimation.forward == forward && !forceSet))
+   //are we already playing this animation (in the same direction)?
+   if (mActionAnimation.action == action && mActionAnimation.forward == forward && !forceSet)
       return;
 
+   //is it a valid animation?
    if (action >= PlayerData::NumActionAnims)
    {
       Con::errorf("Player::setActionThread(%d): Player action out of range", action);
       return;
    }
 
+   //are we just reversing the timescale of the same animation?
+   bool reversingSameAnimation = mActionAnimation.action == action && mActionAnimation.forward != forward;
+
+   //do both animations (the one playing and the one we are switching to) use synched pos?
+   bool bothUseSynchedPos = mActionAnimation.useSynchedPos && useSynchedPos;	
+
    PlayerData::ActionAnimation &anim = mDataBlock->actionList[action];
    if (anim.sequence != -1)
    {
-      U32 lastAction = mActionAnimation.action;
-
       mActionAnimation.action          = action;
       mActionAnimation.forward         = forward;
       mActionAnimation.firstPerson     = fsp;
@@ -3779,39 +4659,37 @@ void Player::setActionThread(U32 action,bool forward,bool hold,bool wait,bool fs
       mActionAnimation.animateOnServer = fsp;
       mActionAnimation.atEnd           = false;
       mActionAnimation.delayTicks      = (S32)sNewAnimationTickTime;
-      mActionAnimation.atEnd           = false;
+      mActionAnimation.useSynchedPos   = useSynchedPos;
 
-      if (sUseAnimationTransitions && (action != PlayerData::LandAnim || !(mDataBlock->landSequenceTime > 0.0f && !mDataBlock->transitionToLand)) && (isGhost()/* || mActionAnimation.animateOnServer*/))
+      if (sUseAnimationTransitions && (isGhost() || mActionAnimation.animateOnServer))
       {
          // The transition code needs the timeScale to be set in the
          // right direction to know which way to go.
          F32   transTime = sAnimationTransitionTime;
-         if (mDataBlock && mDataBlock->isJumpAction(action))
-            transTime = 0.15f;
 
-         F32 timeScale = mActionAnimation.forward ? 1.0f : -1.0f;
-         if (mDataBlock && mDataBlock->isJumpAction(action))
-            timeScale *= 1.5f;
+			//Stop animation needs a fast blend to look right
+			if(action == PlayerData::StopAnim)
+				transTime = 0.15f;
 
-         mShapeInstance->setTimeScale(mActionAnimation.thread,timeScale);
+			//Jump, ledge and climb actions need a faster blend to look right
+			if (mDataBlock && mDataBlock->isJumpAction(action)
+				|| mDataBlock->isLedgeAction(action)
+				|| mDataBlock->isClimbAction(action))
+				transTime = 0.1f;
 
-         S32 seq = anim.sequence;
-         S32 imageBasedSeq = convertActionToImagePrefix(mActionAnimation.action);
-         if (imageBasedSeq != -1)
-            seq = imageBasedSeq;
+			//Land animations need a super-fast blend to look right
+			if(action == PlayerData::StandingLandAnim
+				|| action == PlayerData::RunningLandAnim)
+				transTime = 0.05f;
 
-         // If we're transitioning into the same sequence (an action may use the
-         // same sequence as a previous action) then we want to start at the same
-         // position.
-         F32 pos = mActionAnimation.forward ? 0.0f : 1.0f;
-         PlayerData::ActionAnimation &lastAnim = mDataBlock->actionList[lastAction];
-         if (lastAnim.sequence == anim.sequence)
-         {
-            pos = mShapeInstance->getPos(mActionAnimation.thread);
-         }
+			F32 pos;
+			if(reversingSameAnimation || bothUseSynchedPos)
+				pos = mShapeInstance->getPos(mActionAnimation.thread);
+			else
+				pos = mActionAnimation.forward ? 0.0f : 1.0f;
 
-         mShapeInstance->transitionToSequence(mActionAnimation.thread,seq,
-            pos, transTime, true);
+         mShapeInstance->setTimeScale(mActionAnimation.thread, mActionAnimation.forward ? 1.0f : -1.0f);
+         mShapeInstance->transitionToSequence(mActionAnimation.thread, anim.sequence, pos, transTime, true);
       }
       else
       {
@@ -3833,19 +4711,18 @@ void Player::updateActionThread()
    // Select an action animation sequence, this assumes that
    // this function is called once per tick.
    if(mActionAnimation.action != PlayerData::NullAnimation)
-   {
       if (mActionAnimation.forward)
          mActionAnimation.atEnd = mShapeInstance->getPos(mActionAnimation.thread) == 1;
       else
          mActionAnimation.atEnd = mShapeInstance->getPos(mActionAnimation.thread) == 0;
-   }
-    
+
    // Only need to deal with triggers on the client
    if( isGhost() )
    {
       bool triggeredLeft = false;
       bool triggeredRight = false;
-      
+      bool triggeredSound = false;
+
       F32 offset = 0.0f;
       if( mShapeInstance->getTriggerState( 1 ) )
       {
@@ -3857,7 +4734,12 @@ void Player::updateActionThread()
          triggeredRight = true;
          offset = mDataBlock->decalOffset * getScale().x;
       }
+      if(mShapeInstance->getTriggerState(3))
+      {
+         triggeredSound = true;
+      }
 
+      //deal with footstep puffs, prints and sounds
       if( triggeredLeft || triggeredRight )
       {
          Point3F rot, pos;
@@ -3866,7 +4748,7 @@ void Player::updateActionThread()
          mat.getColumn( 1, &rot );
          mat.mulP( Point3F( offset, 0.0f, 0.0f), &pos );
 
-         if( gClientContainer.castRay( Point3F( pos.x, pos.y, pos.z + 0.01f ),
+         if( gClientContainer.castRay( Point3F( pos.x, pos.y, pos.z + 0.07f ),
                Point3F( pos.x, pos.y, pos.z - 2.0f ),
                STATIC_COLLISION_TYPEMASK | VehicleObjectType, &rInfo ) )
          {
@@ -3923,16 +4805,63 @@ void Player::updateActionThread()
             playFootstepSound( triggeredLeft, material, rInfo.object );
          }
       }
-   }
+
+		//Ubiq: deal with "special" triggered sounds
+		//TODO: this could be handled in a more elegant way
+		if(triggeredSound)
+		{
+			//climb idle
+			if(mActionAnimation.action == PlayerData::ClimbIdleAnim)
+			{
+				SFX->playOnce( mDataBlock->sound[ PlayerData::climbIdle ], &getTransform() );
+			}
+
+			//climb up
+			if(mActionAnimation.action == PlayerData::ClimbUpAnim)
+			{
+				SFX->playOnce( mDataBlock->sound[ PlayerData::climbUp ], &getTransform() );
+			}
+
+			//climb left or right
+			if(mActionAnimation.action == PlayerData::ClimbLeftAnim || mActionAnimation.action == PlayerData::ClimbRightAnim)
+			{
+				SFX->playOnce( mDataBlock->sound[ PlayerData::climbLeftRight ], &getTransform() );
+			}
+
+			//climb down
+			if(mActionAnimation.action == PlayerData::ClimbDownAnim)
+			{
+				SFX->playOnce( mDataBlock->sound[ PlayerData::climbDown ], &getTransform() );
+			}
+
+			//ledge idle
+			if(mActionAnimation.action == PlayerData::LedgeIdleAnim)
+			{
+				SFX->playOnce( mDataBlock->sound[ PlayerData::ledgeIdle ], &getTransform() );
+			}
+
+			//ledge left or right
+			if(mActionAnimation.action == PlayerData::LedgeLeftAnim || mActionAnimation.action == PlayerData::LedgeRightAnim)
+			{
+				SFX->playOnce( mDataBlock->sound[ PlayerData::ledgeLeftRight ], &getTransform() );
+			}
+
+			//ledge up
+			if(mActionAnimation.action == PlayerData::LedgeUpAnim)
+			{
+				SFX->playOnce( mDataBlock->sound[ PlayerData::ledgeUp ], &getTransform() );
+			}
+		}
+	}
 
    // Mount pending variable puts a hold on the delayTicks below so players don't
    // inadvertently stand up because their mount has not come over yet.
    if (mMountPending)
       mMountPending = (isMounted() ? 0 : (mMountPending - 1));
 
-   if ((mActionAnimation.action == PlayerData::NullAnimation) ||
-       ((!mActionAnimation.waitForEnd || mActionAnimation.atEnd) &&
-       (!mActionAnimation.holdAtEnd && (mActionAnimation.delayTicks -= !mMountPending) <= 0)))
+   if (mActionAnimation.action == PlayerData::NullAnimation ||
+       ((!mActionAnimation.waitForEnd || mActionAnimation.atEnd)) &&
+       !mActionAnimation.holdAtEnd && (mActionAnimation.delayTicks -= !mMountPending) <= 0)
    {
       //The scripting language will get a call back when a script animation has finished...
       //  example: When the chat menu animations are done playing...
@@ -3941,8 +4870,9 @@ void Player::updateActionThread()
       pickActionAnimation();
    }
 
-   if ( (mActionAnimation.action != PlayerData::LandAnim) &&
-        (mActionAnimation.action != PlayerData::NullAnimation) )
+   if ( (mActionAnimation.action != PlayerData::StandingLandAnim) &&
+      (mActionAnimation.action != PlayerData::RunningLandAnim) &&
+      (mActionAnimation.action != PlayerData::NullAnimation) )
    {
       // Update action animation time scale to match ground velocity
       PlayerData::ActionAnimation &anim =
@@ -4013,7 +4943,8 @@ void Player::pickBestMoveAction(U32 startAnim, U32 endAnim, U32 * action, bool *
 void Player::pickActionAnimation()
 {
    // Only select animations in our normal move state.
-   if (mState != MoveState || mDamageState != Enabled)
+   //if (mState != MoveState || mDamageState != Enabled)	//Ubiq: we set the death animation in here, so don't return
+   if (mState != MoveState)
       return;
 
    if (isMounted() || mMountPending)
@@ -4027,25 +4958,146 @@ void Player::pickActionAnimation()
    }
 
    bool forward = true;
+   bool useSynchedPos = false;
+
    U32 action = PlayerData::RootAnim;
-   bool fsp = false;
-   
-   // Jetting overrides the fall animation condition
-   if (mJetting)
-   {
-      // Play the jetting animation
-      action = PlayerData::JetAnim;
-   }
+
+	//Ubiq: death overrides everything else
+	if(mDamageState != Enabled)
+	{
+		action = PlayerData::Death1Anim;
+	}
+
+	//Ubiq: climb down anim overrides ledge anims if animPos == 0
+	else if (mLedgeState.active && mLedgeState.animPos == 0.0f
+		&& mClimbState.active && mClimbState.direction == MOVE_DIR_DOWN)
+	{
+		action = PlayerData::ClimbDownAnim;
+	}
+
+	//Ubiq: ledge grabbing, climbing up
+	else if (mLedgeState.active && mLedgeState.climbingUp)
+	{
+		action = PlayerData::LedgeUpAnim;
+	}
+
+	//Ubiq: ledge grabbing, regular 
+	else if(mLedgeState.active)
+	{
+		//idle by default
+		action = PlayerData::LedgeIdleAnim;
+
+		//are we moving fast enough to warrant a move animation?
+		if(mVelocity.len() >= 0.1f)
+		{
+			//choose the appropriate animation
+			if(mLedgeState.direction == MOVE_DIR_LEFT)
+				action = PlayerData::LedgeLeftAnim;
+			if(mLedgeState.direction == MOVE_DIR_RIGHT)
+				action = PlayerData::LedgeRightAnim;
+		}
+	}
+
+	//Ubiq: climbing
+	else if(mClimbState.active)
+	{
+		//idle by default
+		action = PlayerData::ClimbIdleAnim;
+
+		//are we moving fast enough to warrant a move animation?
+		if(mVelocity.len() >= 0.1f)
+		{
+			//choose the appropriate animation
+			switch(mClimbState.direction)
+			{
+			case MOVE_DIR_UP:
+				action = PlayerData::ClimbUpAnim;
+				break;
+
+			case MOVE_DIR_DOWN:
+				action = PlayerData::ClimbDownAnim;
+				break;
+
+			case MOVE_DIR_LEFT:
+				action = PlayerData::ClimbLeftAnim;
+				break;
+
+			case MOVE_DIR_RIGHT:
+				action = PlayerData::ClimbRightAnim;
+				break;
+
+			default:
+				action = PlayerData::ClimbIdleAnim;
+			}
+		}
+	}
+
+	else if(mWallHugState.active)
+	{
+		//idle by default
+		action = PlayerData::WallIdleAnim;
+
+		//are we moving fast enough to warrant a move animation?
+		if(mVelocity.len() >= 0.1f)
+		{
+			//choose the appropriate animation
+			switch(mWallHugState.direction)
+			{
+			case MOVE_DIR_LEFT:
+				action = PlayerData::WallLeftAnim;
+				break;
+
+			case MOVE_DIR_RIGHT:
+				action = PlayerData::WallRightAnim;
+				break;
+
+			default:
+				action = PlayerData::WallIdleAnim;
+			}
+		}
+	}
+
+	// Jetting overrides the fall animation condition
+	/*else if (mJetting)
+	{
+		// Play the jetting animation
+		action = PlayerData::JetAnim;
+	}*/
+
+	//Ubiq: Sliding
+	else if (mSlideState.active)
+	{
+		Point3F forward;
+		getTransform().getColumn(1, &forward);
+
+		if(mDot(mSlideState.surfaceNormal, forward) < 0)
+			action = PlayerData::SlideBackAnim;
+		else
+			action = PlayerData::SlideFrontAnim;
+	}
+
    else if (mFalling)
    {
       // Not in contact with any surface and falling
       action = PlayerData::FallAnim;
    }
-   else if ( mSwimming )
-   {
-      pickBestMoveAction(PlayerData::SwimRootAnim, PlayerData::SwimRightAnim, &action, &forward);
-   }
-   else if ( mPose == StandPose )
+
+	//Ubiq: jump animations
+	else if(mJumpState.active)
+	{
+		switch(mJumpState.jumpType)
+		{
+		case JumpType_Run:
+			action = PlayerData::JumpAnim;
+			break;
+
+		case JumpType_Stand:
+			action = PlayerData::StandJumpAnim;
+			break;
+		}
+	}
+
+	else
    {
       if (mContactTimer >= sContactTickTime)
       {
@@ -4054,23 +5106,51 @@ void Player::pickActionAnimation()
       }
       else
       {
-         // Our feet are on something
-         pickBestMoveAction(PlayerData::RootAnim, PlayerData::SideRightAnim, &action, &forward);
-      }
-   }
-   else if ( mPose == CrouchPose )
-   {
-      pickBestMoveAction(PlayerData::CrouchRootAnim, PlayerData::CrouchRightAnim, &action, &forward);
-   }
-   else if ( mPose == PronePose )
-   {
-      pickBestMoveAction(PlayerData::ProneRootAnim, PlayerData::ProneBackwardAnim, &action, &forward);
-   }
-   else if ( mPose == SprintPose )
-   {
-      pickBestMoveAction(PlayerData::SprintRootAnim, PlayerData::SprintRightAnim, &action, &forward);
-   }
-   setActionThread(action,forward,false,false,fsp);
+			//Ubiq: Lorne:
+
+			//default
+			action = PlayerData::RootAnim;
+
+			//get velocity relative to player
+			VectorF vel;
+			mWorldToObj.mulV(mVelocity,&vel);
+
+			//are we moving?
+			if(vel.len() > 0.01f)
+			{
+				//forward
+				if(mDot(vel, Point3F(0,1,0)) > 0.5)
+				{
+					//run
+					if(mVelocity.len() > mDataBlock->walkRunAnimVelocity)
+					{
+						action = PlayerData::RunForwardAnim;
+						useSynchedPos = true;
+					}
+
+					//walk
+					else
+					{
+						action = PlayerData::WalkForwardAnim;
+						useSynchedPos = true;
+					}
+				}
+
+				//backward
+				//else if(mDot(vel, Point3F(0,-1,0)) > 0.5)
+				//	action = PlayerData::BackBackwardAnim;
+
+				//left
+				//else if(mDot(vel, Point3F(-1,0,0)) > 0.5)
+					//action = PlayerData::WallLeftAnim;
+
+				//right
+				//else if(mDot(vel, Point3F(1,0,0)) > 0.5)
+					//action = PlayerData::WallRightAnim;
+			}
+		}
+	}
+	setActionThread(action,forward,false,false,true,false,useSynchedPos);
 }
 
 void Player::onImage(U32 imageSlot, bool unmount)
@@ -4514,7 +5594,7 @@ void Player::onImageAnimThreadUpdate(U32 imageSlot, S32 imageShapeIndex, F32 dt)
    }
 }
 
-void Player::onUnmount( SceneObject *obj, S32 node )
+void Player::onUnmount( ShapeBase *obj, S32 node )
 {
    // Reset back to root position during dismount.
    setActionThread(PlayerData::RootAnim,true,false,false);
@@ -4581,7 +5661,6 @@ void Player::updateAnimationTree(bool firstPerson)
 {
    S32 mode = 0;
    if (firstPerson)
-   {
       if (mActionAnimation.firstPerson)
          mode = 0;
 //            TSShapeInstance::MaskNodeRotation;
@@ -4589,7 +5668,7 @@ void Player::updateAnimationTree(bool firstPerson)
 //            TSShapeInstance::MaskNodePosY;
       else
          mode = TSShapeInstance::MaskNodeAllButBlend;
-   }
+
    for (U32 i = 0; i < PlayerData::NumSpineNodes; i++)
       if (mDataBlock->spineNode[i] != -1)
          mShapeInstance->setNodeAnimationState(mDataBlock->spineNode[i],mode);
@@ -4598,72 +5677,132 @@ void Player::updateAnimationTree(bool firstPerson)
 
 //----------------------------------------------------------------------------
 
+//Ubiq: Lorne: modified to use ConcretePolyList instead of ClippedPolyList
+//the latter was allowing players to "step" up steep slopes even when no suitable
+//ground existed above. The new algorithm looks for suitable edges to step up,
+//similar to the way findLedgeContact works
 bool Player::step(Point3F *pos,F32 *maxStep,F32 time)
 {
    const Point3F& scale = getScale();
+
+	//Ubiq: Lorne: new way to calculate offset. The old way
+	//(mVelocity * time) caused issues when velocity was near 0
+	Point3F forward;
+	getTransform().getColumn(1, &forward);
+	Point3F offset(forward);
+	offset.normalize(0.2f);
    Box3F box;
-   VectorF offset = mVelocity * time;
    box.minExtents = mObjBox.minExtents + offset + *pos;
    box.maxExtents = mObjBox.maxExtents + offset + *pos;
    box.maxExtents.z += mDataBlock->maxStepHeight * scale.z + sMinFaceDistance;
 
-   SphereF sphere;
-   sphere.center = (box.minExtents + box.maxExtents) * 0.5f;
-   VectorF bv = box.maxExtents - sphere.center;
-   sphere.radius = bv.len();
+	ConcretePolyList polyList;
+	CollisionWorkingList& rList = mConvex.getWorkingList();
+	CollisionWorkingList* pList = rList.wLink.mNext;
+	while (pList != &rList)
+	{
+		Convex* pConvex = pList->mConvex;
 
-   ClippedPolyList polyList;
-   polyList.mPlaneList.clear();
-   polyList.mNormal.set(0.0f, 0.0f, 0.0f);
-   polyList.mPlaneList.setSize(6);
-   polyList.mPlaneList[0].set(box.minExtents,VectorF(-1.0f, 0.0f, 0.0f));
-   polyList.mPlaneList[1].set(box.maxExtents,VectorF(0.0f, 1.0f, 0.0f));
-   polyList.mPlaneList[2].set(box.maxExtents,VectorF(1.0f, 0.0f, 0.0f));
-   polyList.mPlaneList[3].set(box.minExtents,VectorF(0.0f, -1.0f, 0.0f));
-   polyList.mPlaneList[4].set(box.minExtents,VectorF(0.0f, 0.0f, -1.0f));
-   polyList.mPlaneList[5].set(box.maxExtents,VectorF(0.0f, 0.0f, 1.0f));
+		// Alright, here's the deal... a polysoup mesh really needs to be 
+		// designed with stepping in mind.  If there are too many smallish polygons
+		// the stepping system here gets confused and allows you to run up walls 
+		// or on the edges/seams of meshes.
 
-   CollisionWorkingList& rList = mConvex.getWorkingList();
-   CollisionWorkingList* pList = rList.wLink.mNext;
-   while (pList != &rList) {
-      Convex* pConvex = pList->mConvex;
-      
-      // Alright, here's the deal... a polysoup mesh really needs to be 
-      // designed with stepping in mind.  If there are too many smallish polygons
-      // the stepping system here gets confused and allows you to run up walls 
-      // or on the edges/seams of meshes.
+		TSStatic *st = dynamic_cast<TSStatic *> (pConvex->getObject());
+		bool skip = false;
+		if (st && !st->allowPlayerStep())
+			skip = true;
 
-      TSStatic *st = dynamic_cast<TSStatic *> (pConvex->getObject());
-      bool skip = false;
-      if (st && !st->allowPlayerStep())
-         skip = true;
+		if ((pConvex->getObject()->getTypeMask() & StaticObjectType) != 0 && !skip)
+		{
+			Box3F convexBox = pConvex->getBoundingBox();
+			if (box.isOverlapped(convexBox))
+				pConvex->getPolyList(&polyList);
+		}
+		pList = pList->wLink.mNext;
+	}
 
-      if ((pConvex->getObject()->getTypeMask() & StaticObjectType) != 0 && !skip)
-      {
-         Box3F convexBox = pConvex->getBoundingBox();
-         if (box.isOverlapped(convexBox))
-            pConvex->getPolyList(&polyList);
-      }
-      pList = pList->wLink.mNext;
-   }
+	ConcretePolyList::Poly* poly = polyList.mPolyList.begin();
+	ConcretePolyList::Poly* end = polyList.mPolyList.end();
 
-   // Find max step height
-   F32 stepHeight = pos->z - sMinFaceDistance;
-   U32* vp = polyList.mIndexList.begin();
-   U32* ep = polyList.mIndexList.end();
-   for (; vp != ep; vp++) {
-      F32 h = polyList.mVertexList[*vp].point.z + sMinFaceDistance;
-      if (h > stepHeight)
-         stepHeight = h;
-   }
+	for (; poly != end; poly++)
+	{
+		//upward-facing surface?
+		//if it's upward facing we could potentially stand on it
+		if(poly->plane.z > 0.5) 
+		{
+			//loop through all the verticies of this polygon
+			for (S32 i=poly->vertexStart; i < poly->vertexStart + poly->vertexCount; i++)
+			{
+				S32 vertex1Index = i;
+				S32 vertex2Index = i + 1;
 
-   F32 step = stepHeight - pos->z;
-   if (stepHeight > pos->z && step < *maxStep) {
-      // Go ahead and step
-      pos->z = stepHeight;
-      *maxStep -= step;
-      return true;
-   }
+				//the last vertex is connected to the first
+				if(i == poly->vertexStart + poly->vertexCount - 1) 
+					vertex2Index = poly->vertexStart;
+
+				//get the verticies
+				Point3F vertex1 = polyList.mVertexList[polyList.mIndexList[vertex1Index]];
+				Point3F vertex2 = polyList.mVertexList[polyList.mIndexList[vertex2Index]];
+
+				//Now we're going to collide the edge with our box. We'll do
+				//this from both directions and use the higher collision point.
+				//This is neccessary when one vertex is higher than the other. We want
+				//to make sure we step up enough to actually fit our collision box over the highest end
+				F32 t1; Point3F n1;
+				bool collided1 = box.collideLine(vertex1, vertex2, &t1, &n1);
+				Point3F collisionPoint1;
+				if(collided1)
+				{
+					//find the point of collision
+					collisionPoint1.interpolate(vertex1, vertex2, t1);
+				}
+
+				F32 t2; Point3F n2;
+				bool collided2 = box.collideLine(vertex2, vertex1, &t2, &n2);
+				Point3F collisionPoint2;
+				if(collided2)
+				{
+					//find the point of collision
+					collisionPoint2.interpolate(vertex2, vertex1, t2);
+				}
+
+				//does this edge pass through our box?
+				if(collided1 && collided2)
+				{
+					Point3F collisionPoint;
+
+					//choose the higher collision point to use
+					if(collisionPoint1.z > collisionPoint2.z)
+						collisionPoint = collisionPoint1;
+					else
+						collisionPoint = collisionPoint2;
+
+					F32 step = collisionPoint.z - pos->z;
+					if(collisionPoint.z > pos->z && step < *maxStep)
+					{
+#ifdef ENABLE_DEBUGDRAW
+						//draw the edge
+						DebugDrawer::get()->drawLine(vertex1, vertex2, LinearColorF(0.5f,0,0));
+						DebugDrawer::get()->setLastTTL(2000);
+
+						//calculate the "normal" of this edge
+						Point3F normal = mCross(Point3F(0,0,1), vertex2 - vertex1);
+						normal.normalizeSafe();
+
+						//draw the normal at the collisionPoint we used
+						DebugDrawer::get()->drawLine(collisionPoint, collisionPoint + normal, LinearColorF(0,0.5f,0));
+						DebugDrawer::get()->setLastTTL(2000);
+#endif
+
+						// Go ahead and step
+						pos->z = collisionPoint.z + sMinFaceDistance;
+						return true;
+					}
+				}
+			}
+		}
+	}
 
    return false;
 }
@@ -4725,9 +5864,9 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
       }
       Point3F distance = end - start;
 
-      if (mFabs(distance.x) < mScaledBox.len_x() &&
-          mFabs(distance.y) < mScaledBox.len_y() &&
-          mFabs(distance.z) < mScaledBox.len_z())
+      if (mFabs(distance.x) < mObjBox.len_x() &&
+          mFabs(distance.y) < mObjBox.len_y() &&
+          mFabs(distance.z) < mObjBox.len_z())
       {
          // We can potentially early out of this.  If there are no polys in the clipped polylist at our
          //  end position, then we can bail, and just set start = end;
@@ -4880,7 +6019,9 @@ Point3F Player::_move( const F32 travelTime, Collision *outCol )
          *outCol = *collision;
 
          // Subtract out velocity
-         VectorF dv = collision->normal * (bd + sNormalElasticity);
+		 //Ubiq: Lorne: use lower elasticity on ground than in air
+		 F32 elasticity = mContactTimer == 0 ? sNormalElasticity : sAirElasticity; 
+         VectorF dv = collision->normal * (bd + elasticity);
          mVelocity += dv;
          if (count == 0)
          {
@@ -4955,7 +6096,8 @@ F32 Player::_doCollisionImpact( const Collision *collision, bool fallingCollisio
       if (mDamageState == Enabled && mState != RecoverState) 
       {
          // Scale how long we're down for
-         if (mDataBlock->landSequenceTime > 0.0f)
+         //Ubiq: removing these - we use our own landing system
+         /*if (mDataBlock->landSequenceTime > 0.0f)
          {
             // Recover time is based on the land sequence
             setState(RecoverState);
@@ -4971,7 +6113,7 @@ F32 Player::_doCollisionImpact( const Collision *collision, bool fallingCollisio
             //Con::printf("Used %d recover ticks", recover);
             //Con::printf("  minImpact = %g, this one = %g", mDataBlock->minImpactSpeed, bd);
             setState(RecoverState, recover);
-         }
+         }*/
       }
    }
 
@@ -5149,7 +6291,10 @@ void Player::_findContact( SceneObject **contactObject,
    wBox.maxExtents.x = pos.x + mScaledBox.maxExtents.x;
    wBox.maxExtents.y = pos.y + mScaledBox.maxExtents.y;
    wBox.maxExtents.z = pos.z + mScaledBox.minExtents.z + sTractionDistance;
-
+#ifdef ENABLE_DEBUGDRAW
+	DebugDrawer::get()->drawBox(wBox.minExtents, wBox.maxExtents);
+	DebugDrawer::get()->setLastTTL(TickMs);
+#endif
    static ClippedPolyList polyList;
    polyList.clear();
    polyList.doConstruct();
@@ -5213,7 +6358,7 @@ void Player::_findContact( SceneObject **contactObject,
    }
 }
 
-void Player::findContact( bool *run, bool *jump, VectorF *contactNormal )
+void Player::findContact( bool *run, bool *jump, bool *slide, VectorF *contactNormal )
 {
    SceneObject *contactObject = NULL;
 
@@ -5260,9 +6405,12 @@ void Player::findContact( bool *run, bool *jump, VectorF *contactNormal )
       }
    }
 
+   if(contactObject != NULL) {		//Ubiq: this test is necessary or slide is always set true
    F32 vd = (*contactNormal).z;
    *run = vd > mDataBlock->runSurfaceCos;
    *jump = vd > mDataBlock->jumpSurfaceCos;
+   *slide = vd <= mDataBlock->runSurfaceCos;
+   }
 
    mContactInfo.clear();
   
@@ -5274,6 +6422,7 @@ void Player::findContact( bool *run, bool *jump, VectorF *contactNormal )
 
    mContactInfo.run = *run;
    mContactInfo.jump = *jump;
+   mContactInfo.slide = *slide;
 }
 
 //----------------------------------------------------------------------------
@@ -5379,13 +6528,13 @@ void Player::setPosition(const Point3F& pos,const Point3F& rot)
    MatrixF mat;
    if (isMounted()) {
       // Use transform from mounted object
-      //MatrixF nmat,zrot;
-      mMount.object->getMountTransform( mMount.node, mMount.xfm, &mat );
-      //zrot.set(EulerF(0.0f, 0.0f, rot.z));
-      //mat.mul(nmat,zrot);
+      MatrixF nmat,zrot;
+      mMount.object->getMountTransform( mMount.node, mMount.xfm, &nmat );
+      zrot.set(EulerF(0.0f, 0.0f, rot.z));
+      mat.mul(nmat,zrot);
    }
    else {
-      mat.set(EulerF(0.0f, 0.0f, rot.z));
+      mat.set(EulerF(rot.x, rot.y, rot.z));
       mat.setColumn(3,pos);
    }
    Parent::setTransform(mat);
@@ -5398,29 +6547,139 @@ void Player::setPosition(const Point3F& pos,const Point3F& rot)
 
 void Player::setRenderPosition(const Point3F& pos, const Point3F& rot, F32 dt)
 {
+   disableCollision();
+   
    MatrixF mat;
+   
+   //default
+   mat.set(EulerF(rot.x, rot.y, rot.z));
+   
    if (isMounted()) {
       // Use transform from mounted object
-      //MatrixF nmat,zrot;
-      mMount.object->getRenderMountTransform( dt, mMount.node, mMount.xfm, &mat );
-      //zrot.set(EulerF(0.0f, 0.0f, rot.z));
-      //mat.mul(nmat,zrot);
+      MatrixF nmat,zrot;
+      mMount.object->getRenderMountTransform( dt, mMount.node, mMount.xfm, &nmat );
+      zrot.set(EulerF(0.0f, 0.0f, rot.z));
+      mat.mul(nmat,zrot);
    }
-   else {
-      EulerF   orient(0.0f, 0.0f, rot.z);
 
-      mat.set(orient);
-      mat.setColumn(3, pos);
+	//-------------------------------------------------------------------
+	// Orient to ground
+	//-------------------------------------------------------------------
+	else if(inDeathAnim())
+	{
+		VectorF normal;
+		Point3F corner[3], hit[3]; S32 c;
+		corner[0] = Point3F(mObjBox.maxExtents.x - 0.01f, mObjBox.maxExtents.y - 0.01f, mObjBox.minExtents.z) + pos;
+		corner[1] = Point3F(mObjBox.minExtents.x + 0.01f, mObjBox.maxExtents.y - 0.01f, mObjBox.minExtents.z) + pos;
+		corner[2] = Point3F(mObjBox.maxExtents.x - 0.01f, mObjBox.minExtents.y + 0.01f, mObjBox.minExtents.z) + pos;
 
-      if (inDeathAnim()) {
-         F32   boxRad = (mDataBlock->boxSize.x * 0.5f);
-         if (MatrixF * fallMat = mDeath.fallToGround(dt, pos, rot.z, boxRad))
-            mat = * fallMat;
-      }
-      else
-         mDeath.initFall();
-   }
-   Parent::setRenderTransform(mat);
+		//do three casts
+		RayInfo rInfo;
+		for (c = 0; c < 3; c++)
+		{
+			Point3F rayStart = corner[c] + Point3F(0,0,0.3f);
+			Point3F rayEnd = corner[c] - Point3F(0,0,2.0f);
+			if (gClientContainer.castRay(rayStart, rayEnd, sCollisionMoveMask, &rInfo))
+			{
+				hit[c] = rInfo.point;
+
+				#ifdef ENABLE_DEBUGDRAW
+				DebugDrawer::get()->drawLine(rayStart, rInfo.point, ColorI::RED);
+				DebugDrawer::get()->setLastTTL(TickMs);
+				DebugDrawer::get()->drawLine(rInfo.point, rayEnd, ColorI::BLUE);
+				DebugDrawer::get()->setLastTTL(TickMs);
+				#endif
+			}
+			else
+				break;
+		}
+
+		//if all three hit
+		if(c == 3)
+		{
+			mCross(hit[1] - hit[0], hit[2] - hit[1], &normal);
+			normal.normalize();
+
+			#ifdef ENABLE_DEBUGDRAW
+			DebugDrawer::get()->drawLine(pos, pos + normal, ColorI::BLUE);
+			DebugDrawer::get()->setLastTTL(TickMs);
+			#endif
+
+			VectorF  upY(0.0f, 1.0f, 0.0f), ahead;
+			VectorF  sideVec;
+			mat.set(EulerF (0.0f, 0.0f, rot.z));
+			mat.mulV(upY, &ahead);
+			mCross(ahead, normal, &sideVec);
+			sideVec.normalize();
+			mCross(normal, sideVec, &ahead);
+
+			mat.setColumn(0, sideVec);
+			mat.setColumn(1, ahead);
+			mat.setColumn(2, normal);
+		}
+	}
+
+
+	//-------------------------------------------------------------------
+	// Ubiq: Snap to ground
+	//-------------------------------------------------------------------
+	if(mDataBlock->groundSnapSpeed > 0 && mDataBlock->groundSnapRayLength > 0)
+	{
+		F32 goal = 0.0f;
+
+		//if not jumping/climbing/grabbing
+		if(!mJumping && !mClimbState.active && !mLedgeState.active && !mSwimming)
+		{
+			//see if we should set our ground snap goal
+			Point3F forward;
+			getTransform().getColumn(1, &forward);
+			forward.normalize(mDataBlock->groundSnapRayOffset);
+
+			RayInfo rInfo;
+			Point3F rayStart = pos + forward;
+			Point3F rayEnd = rayStart + Point3F(0,0,-mDataBlock->groundSnapRayLength);
+			
+			if(getContainer()->castRay(rayStart, rayEnd, sCollisionMoveMask, &rInfo))
+			{
+				//if it's sloped, we need an offset
+				//(this won't help on stairs - we don't want it since the popping looks bad)
+				if(rInfo.normal.z != 1.0f)
+				{
+					//set the goal
+					goal = rInfo.point.z - rayStart.z;
+
+					#ifdef ENABLE_DEBUGDRAW
+						DebugDrawer::get()->drawLine(rayStart, rInfo.point, ColorI::RED);
+						DebugDrawer::get()->setLastTTL(TickMs);
+						DebugDrawer::get()->drawLine(rInfo.point, rayEnd, ColorI::BLUE);
+						DebugDrawer::get()->setLastTTL(TickMs);
+					#endif
+				}
+			}
+		}
+
+		//always move toward goal
+		if(dt > 0)
+		{
+			F32 diff = goal - mGroundSnap;
+			if(mFabs(diff) < mDataBlock->groundSnapSpeed * dt)
+				mGroundSnap = goal;		//as close as we're going to get, snap to it
+			else if(diff > 0)
+				mGroundSnap = goal;	//move player up instantly (we don't ever want him in the ground)
+			else if (diff < 0)
+				mGroundSnap -= mDataBlock->groundSnapSpeed * dt;	//move player down
+		}
+	}
+	//-------------------------------------------------------------------
+
+	//apply ground snap
+	Point3F tmp(pos);
+	tmp.z += mGroundSnap;
+	mat.setColumn(3, tmp);
+
+	Parent::setRenderTransform(mat);
+
+	enableCollision();
 }
 
 //----------------------------------------------------------------------------
@@ -5652,6 +6911,7 @@ void Player::getMuzzleTransform(U32 imageSlot,MatrixF* mat)
    *mat = nmat;
 }
 
+
 void Player::getRenderMuzzleTransform(U32 imageSlot,MatrixF* mat)
 {
    disableHeadZCalc();
@@ -5828,7 +7088,7 @@ void Player::getCameraParameters(F32 *min,F32* max,Point3F* off,MatrixF* rot)
    const Point3F& scale = getScale();
    *min = mDataBlock->cameraMinDist * scale.y;
    *max = mDataBlock->cameraMaxDist * scale.y;
-   off->set(0.0f, 0.0f, 0.0f);
+   *off = mDataBlock->cameraOffset * scale;  //Ubiq
    rot->identity();
 }
 
@@ -5847,7 +7107,7 @@ F32 Player::getSpeed() const
 
 void Player::setVelocity(const VectorF& vel)
 {
-   AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
+	AssertFatal( !mIsNaN( vel ), "Player::setVelocity() - The velocity is NaN!" );
 
    mVelocity = vel;
    setMaskBits(MoveMask);
@@ -5855,7 +7115,7 @@ void Player::setVelocity(const VectorF& vel)
 
 void Player::applyImpulse(const Point3F&,const VectorF& vec)
 {
-   AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
+	AssertFatal( !mIsNaN( vec ), "Player::applyImpulse() - The vector is NaN!" );
 
    // Players ignore angular velocity
    VectorF vel;
@@ -5889,7 +7149,7 @@ bool Player::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
    F32 const *si = &start.x;
    F32 const *ei = &end.x;
 
-   for (S32 i = 0; i < 3; i++) {
+   for (int i = 0; i < 3; i++) {
       if (*si < *ei) {
          if (*si > *bmax || *ei < *bmin)
             return false;
@@ -6077,6 +7337,8 @@ void Player::writePacketData(GameConnection *connection, BitStream *stream)
       stream->write(mHead.y);
    }
    stream->write(mHead.z);
+   stream->write(mRot.x);
+   stream->write(mRot.y);
    stream->write(mRot.z);
 
    if (mControlObject) {
@@ -6088,6 +7350,56 @@ void Player::writePacketData(GameConnection *connection, BitStream *stream)
    }
    else
       stream->writeFlag(false);
+
+	//----------------------------------------------------------------------------
+	// Ubiq custom
+	//----------------------------------------------------------------------------
+
+	//Ubiq: Slide state
+	stream->write(mSlideState.active);
+	stream->write(mSlideState.surfaceNormal.x);
+	stream->write(mSlideState.surfaceNormal.y);
+	stream->write(mSlideState.surfaceNormal.z);
+
+	//Ubiq: Jump state
+	stream->write(mJumpState.active);
+	stream->write(mJumpState.isCrouching);
+	stream->write(mJumpState.crouchDelay);
+	stream->write((U16)mJumpState.jumpType);
+
+	//Ubiq: Climb state
+	stream->write(mClimbState.active);
+	stream->write((U16)mClimbState.direction);
+	stream->write(mClimbState.surfaceNormal.x);
+	stream->write(mClimbState.surfaceNormal.y);
+	stream->write(mClimbState.surfaceNormal.z);
+	stream->write(mClimbTriggerCount);
+
+	//Ubiq: Wallhug state
+	stream->write(mWallHugState.active);
+	stream->write(mWallHugState.surfaceNormal.x);
+	stream->write(mWallHugState.surfaceNormal.y);
+	stream->write(mWallHugState.surfaceNormal.z);
+	stream->write((U16)mWallHugState.direction);
+
+	//Ubiq: Ledge state
+	stream->write(mLedgeState.active);
+	stream->write(mLedgeState.ledgeNormal.x);
+	stream->write(mLedgeState.ledgeNormal.y);
+	stream->write(mLedgeState.ledgeNormal.z);
+	stream->write(mLedgeState.ledgePoint.x);
+	stream->write(mLedgeState.ledgePoint.y);
+	stream->write(mLedgeState.ledgePoint.z);
+	stream->write((U16)mLedgeState.direction);
+	stream->write(mLedgeState.climbingUp);
+	stream->write(mLedgeState.animPos);	
+
+	//Ubiq: Land state
+	stream->write(mLandState.active);
+	stream->write(mLandState.timer);
+
+	//Ubiq: Stop state
+	stream->write(mStoppingTimer);
 }
 
 
@@ -6144,8 +7456,9 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
       stream->read(&mHead.y);
    }
    stream->read(&mHead.z);
+   stream->read(&rot.x);
+   stream->read(&rot.y);
    stream->read(&rot.z);
-   rot.x = rot.y = 0;
    setPosition(pos,rot);
    delta.head = mHead;
    delta.rot = rot;
@@ -6158,11 +7471,74 @@ void Player::readPacketData(GameConnection *connection, BitStream *stream)
    }
    else
       setControlObject(0);
+	//----------------------------------------------------------------------------
+	// Ubiq custom
+	//----------------------------------------------------------------------------
+
+	//Ubiq: Slide state
+	stream->read(&mSlideState.active);
+	stream->read(&mSlideState.surfaceNormal.x);
+	stream->read(&mSlideState.surfaceNormal.y);
+	stream->read(&mSlideState.surfaceNormal.z);
+
+	//Ubiq: Jump state
+	stream->read(&mJumpState.active);
+	stream->read(&mJumpState.isCrouching);
+	stream->read(&mJumpState.crouchDelay);
+	U16 jumpType;
+	stream->read(&jumpType);
+	mJumpState.jumpType = (JumpType)jumpType;
+
+	//Ubiq: Climb state
+	stream->read(&mClimbState.active);
+	U16 climbDirTemp;
+	stream->read(&climbDirTemp);
+	mClimbState.direction = (MoveDir)climbDirTemp;
+	stream->read(&mClimbState.surfaceNormal.x);
+	stream->read(&mClimbState.surfaceNormal.y);
+	stream->read(&mClimbState.surfaceNormal.z);
+	stream->read(&mClimbTriggerCount);
+
+	//Ubiq: Wallhug state
+	stream->read(&mWallHugState.active);
+	stream->read(&mWallHugState.surfaceNormal.x);
+	stream->read(&mWallHugState.surfaceNormal.y);
+	stream->read(&mWallHugState.surfaceNormal.z);
+	U16 wallDirTemp;
+	stream->read(&wallDirTemp);
+	mWallHugState.direction = (MoveDir)wallDirTemp;
+
+	//Ubiq: Ledge state
+	stream->read(&mLedgeState.active);
+	stream->read(&mLedgeState.ledgeNormal.x);
+	stream->read(&mLedgeState.ledgeNormal.y);
+	stream->read(&mLedgeState.ledgeNormal.z);
+	stream->read(&mLedgeState.ledgePoint.x);
+	stream->read(&mLedgeState.ledgePoint.y);
+	stream->read(&mLedgeState.ledgePoint.z);
+	U16 grabDirTemp;
+	stream->read(&grabDirTemp);
+	mLedgeState.direction = (MoveDir)grabDirTemp;
+	stream->read(&mLedgeState.climbingUp);
+	stream->read(&mLedgeState.animPos);
+
+	//Ubiq: Land state
+	stream->read(&mLandState.active);
+	stream->read(&mLandState.timer);
+
+	//Ubiq: Stop state
+	stream->read(&mStoppingTimer);
 }
 
 U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 {
    U32 retMask = Parent::packUpdate(con, mask, stream);
+
+   //LedgeUpMask
+   if (stream->writeFlag(mask & LedgeUpMask))
+   {
+      stream->write(mLedgeState.animPos);
+   }
 
    if (stream->writeFlag((mask & ImpactMask) && !(mask & InitialUpdateMask)))
       stream->writeInt(mImpactSound, PlayerData::ImpactBits);
@@ -6200,10 +7576,6 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    {
       stream->writeFlag(mFalling);
 
-      stream->writeFlag(mSwimming);
-      stream->writeFlag(mJetting);  
-      stream->writeInt(mPose, NumPoseBits);
-     
       stream->writeInt(mState,NumStateBits);
       if (stream->writeFlag(mState == RecoverState))
          stream->writeInt(mRecoverTicks,PlayerData::RecoverDelayBits);
@@ -6222,23 +7594,30 @@ U32 Player::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
             len = 8191;
          stream->writeInt((S32)len, 13);
       }
-      stream->writeFloat(mRot.z / M_2PI_F, 7);
-      stream->writeSignedFloat(mHead.x / (mDataBlock->maxLookAngle - mDataBlock->minLookAngle), 6);
+      stream->writeCompressedPoint(mRot);
+      stream->writeSignedFloat(mHead.x / mDataBlock->maxLookAngle, 6);
       stream->writeSignedFloat(mHead.z / mDataBlock->maxFreelookAngle, 6);
       delta.move.pack(stream);
       stream->writeFlag(!(mask & NoWarpMask));
    }
    // Ghost need energy to predict reliably
-   if (mDataBlock->maxEnergy > 0.f)
-      stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy, EnergyLevelBits);
-   else
-      stream->writeFloat(0.f, EnergyLevelBits);
+   stream->writeFloat(getEnergyLevel() / mDataBlock->maxEnergy,EnergyLevelBits);
    return retMask;
 }
 
 void Player::unpackUpdate(NetConnection *con, BitStream *stream)
 {
    Parent::unpackUpdate(con,stream);
+
+   //LedgeUpMask
+   if (stream->readFlag())
+   {
+      stream->read(&mLedgeState.animPos);
+
+      // New delta for client-side interpolation
+      mLedgeState.deltaAnimPos = mLedgeState.animPos;
+      mLedgeState.deltaAnimPosVec = 0.0f;
+   }
 
    if (stream->readFlag())
       mImpactSound = stream->readInt(PlayerData::ImpactBits);
@@ -6300,11 +7679,7 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
    if (stream->readFlag()) {
       mPredictionCount = sMaxPredictionTicks;
       mFalling = stream->readFlag();
- 
-      mSwimming = stream->readFlag();
-      mJetting = stream->readFlag();  
-      mPose = (Pose)(stream->readInt(NumPoseBits)); 
-     
+
       ActionState actionState = (ActionState)stream->readInt(NumStateBits);
       if (stream->readFlag()) {
          mRecoverTicks = stream->readInt(PlayerData::RecoverDelayBits);
@@ -6326,9 +7701,8 @@ void Player::unpackUpdate(NetConnection *con, BitStream *stream)
          mVelocity.set(0.0f, 0.0f, 0.0f);
       }
       
-      rot.y = rot.x = 0.0f;
-      rot.z = stream->readFloat(7) * M_2PI_F;
-      mHead.x = stream->readSignedFloat(6) * (mDataBlock->maxLookAngle - mDataBlock->minLookAngle);
+      stream->readCompressedPoint(&rot);
+      mHead.x = stream->readSignedFloat(6) * mDataBlock->maxLookAngle;
       mHead.z = stream->readSignedFloat(6) * mDataBlock->maxFreelookAngle;
       delta.move.unpack(stream);
 
@@ -6585,9 +7959,8 @@ DefineEngineMethod( Player, getDamageLocation, const char*, ( Point3F pos ),,
 
    object->getDamageLocation(pos, buffer1, buffer2);
 
-   static const U32 bufSize = 128;
-   char *buff = Con::getReturnBuffer(bufSize);
-   dSprintf(buff, bufSize, "%s %s", buffer1, buffer2);
+   char *buff = Con::getReturnBuffer(128);
+   dSprintf(buff, 128, "%s %s", buffer1, buffer2);
    return buff;
 }
 
@@ -6652,9 +8025,9 @@ DefineEngineMethod( Player, setActionThread, bool, ( const char* name, bool hold
    "@tsexample\n"
       "// Place the player in a sitting position after being mounted\n"
       "%player.setActionThread( \"sitting\", true, true );\n"
-   "@endtsexample\n")
+	"@endtsexample\n")
 {
-   return object->setActionThread( name, hold, true, fsp);
+   return object->setActionThread( name, true, hold, true, fsp, false, false);
 }
 
 DefineEngineMethod( Player, setControlObject, bool, ( ShapeBase* obj ),,
@@ -6700,11 +8073,11 @@ DefineEngineMethod( Player, clearControlObject, void, (),,
    "Returns control to the player. This internally calls "
    "Player::setControlObject(0).\n"
    "@tsexample\n"
-      "%player.clearControlObject();\n"
+		"%player.clearControlObject();\n"
       "echo(%player.getControlObject()); //<-- Returns 0, player assumes control\n"
       "%player.setControlObject(%vehicle);\n"
       "echo(%player.getControlObject()); //<-- Returns %vehicle, player controls the vehicle now.\n"
-   "@endtsexample\n"
+	"@endtsexample\n"
    "@note If the player does not have a control object, the player will receive all moves "
    "from its GameConnection.  If you're looking to remove control from the player itself "
    "(i.e. stop sending moves to the player) use GameConnection::setControlObject() to transfer "
@@ -6762,63 +8135,67 @@ void Player::consoleInit()
       "@brief Determines if the player is rendered or not.\n\n"
       "Used on the client side to disable the rendering of all Player objects.  This is "
       "mainly for the tools or debugging.\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::renderMyItems",TypeBool, &sRenderMyItems,
       "@brief Determines if mounted shapes are rendered or not.\n\n"
       "Used on the client side to disable the rendering of all Player mounted objects.  This is "
       "mainly used for the tools or debugging.\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::renderCollision", TypeBool, &sRenderPlayerCollision, 
       "@brief Determines if the player's collision mesh should be rendered.\n\n"
       "This is mainly used for the tools and debugging.\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
 
    Con::addVariable("$player::minWarpTicks",TypeF32,&sMinWarpTicks, 
       "@brief Fraction of tick at which instant warp occures on the client.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::maxWarpTicks",TypeS32,&sMaxWarpTicks, 
       "@brief When a warp needs to occur due to the client being too far off from the server, this is the "
       "maximum number of ticks we'll allow the client to warp to catch up.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::maxPredictionTicks",TypeS32,&sMaxPredictionTicks, 
       "@brief Maximum number of ticks to predict on the client from the last known move obtained from the server.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
 
    Con::addVariable("$player::maxImpulseVelocity", TypeF32, &sMaxImpulseVelocity, 
       "@brief The maximum velocity allowed due to a single impulse.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
 
    // Move triggers
    Con::addVariable("$player::jumpTrigger", TypeS32, &sJumpTrigger, 
       "@brief The move trigger index used for player jumping.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::crouchTrigger", TypeS32, &sCrouchTrigger, 
       "@brief The move trigger index used for player crouching.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::proneTrigger", TypeS32, &sProneTrigger, 
       "@brief The move trigger index used for player prone pose.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::sprintTrigger", TypeS32, &sSprintTrigger, 
       "@brief The move trigger index used for player sprinting.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::imageTrigger0", TypeS32, &sImageTrigger0, 
       "@brief The move trigger index used to trigger mounted image 0.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::imageTrigger1", TypeS32, &sImageTrigger1, 
       "@brief The move trigger index used to trigger mounted image 1 or alternate fire "
       "on mounted image 0.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::jumpJetTrigger", TypeS32, &sJumpJetTrigger, 
       "@brief The move trigger index used for player jump jetting.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
    Con::addVariable("$player::vehicleDismountTrigger", TypeS32, &sVehicleDismountTrigger, 
       "@brief The move trigger index used to dismount player.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
 
    // ExtendedMove support
    Con::addVariable("$player::extendedMoveHeadPosRotIndex", TypeS32, &smExtendedMoveHeadPosRotIndex, 
       "@brief The ExtendedMove position/rotation index used for head movements.\n\n"
-      "@ingroup GameObjects\n");
+	   "@ingroup GameObjects\n");
+
+   //Ubiq: TODO: add documentation strings
+   addField("climbTriggerCount", TypeS32, Offset(mClimbTriggerCount, Player), "");
+   addField("dieOnNextCollision", TypeBool, Offset(mDieOnNextCollision, Player), "");
 }
 
 //--------------------------------------------------------------------------
@@ -6864,44 +8241,67 @@ void Player::calcClassRenderData()
 void Player::playFootstepSound( bool triggeredLeft, Material* contactMaterial, SceneObject* contactObject )
 {
    MatrixF footMat = getTransform();
-   if( mWaterCoverage > 0.0 )
+   if( mWaterCoverage > 0.0 && mWaterCoverage < 1.0 )
    {
-      // Treading water.
-
       if ( mWaterCoverage < mDataBlock->footSplashHeight )
-         SFX->playOnce( mDataBlock->sound[ PlayerData::FootShallowSplash ], &footMat );
+		 SFX->playOnce( mDataBlock->sound[ PlayerData::FootShallowSplash ], &getTransform() );
       else
-      {
-         if ( mWaterCoverage < 1.0 )
-            SFX->playOnce( mDataBlock->sound[ PlayerData::FootWading ], &footMat );
-         else
-         {
-            if ( triggeredLeft )
-            {
-               SFX->playOnce( mDataBlock->sound[ PlayerData::FootUnderWater ], &footMat );
-               SFX->playOnce( mDataBlock->sound[ PlayerData::FootBubbles ], &footMat );
-            }
-         }
-      }
+		 SFX->playOnce( mDataBlock->sound[ PlayerData::FootWading ], &getTransform() );
    }
+
+   if (mWaterCoverage >= 1.0)
+   {
+	   if ( triggeredLeft )
+	   {
+		   SFX->playOnce( mDataBlock->sound[ PlayerData::FootUnderWater ], &getTransform() );
+		   SFX->playOnce( mDataBlock->sound[ PlayerData::FootBubbles ], &getTransform() );
+	   }
+   }
+
    else if( contactMaterial && contactMaterial->mFootstepSoundCustom )
    {
       // Footstep sound defined on material.
-
-      SFX->playOnce( contactMaterial->mFootstepSoundCustom, &footMat );
+      //Ubiq: set volume and pitch based on player velocity (landing is always max volume)
+      F32 speedFactor = mLandState.active ? 1.0f : mVelocity.len()/mDataBlock->maxForwardSpeed;
+      speedFactor = mClampF(speedFactor, 0.3f, 1.0f);
+      
+      F32 volume = speedFactor;
+      F32 pitch = (0.85f * (1.0f - speedFactor)) + (1.15f * speedFactor); //map (0 - 1) to (0.85 - 1.15)
+      
+      SFXSource* source = SFX->createSource(contactMaterial->mFootstepSoundCustom, &footMat);
+      source->setVolume(volume);
+      source->setPitch(pitch);
+      source->play();
+      SFX->deleteWhenStopped(source);
    }
    else
    {
-      // Play default sound.
-
       S32 sound = -1;
-      if (contactMaterial && (contactMaterial->mFootstepSoundId>-1 && contactMaterial->mFootstepSoundId<PlayerData::MaxSoundOffsets))
+      if( contactMaterial && contactMaterial->mFootstepSoundId != -1 )
          sound = contactMaterial->mFootstepSoundId;
       else if( contactObject && contactObject->getTypeMask() & VehicleObjectType )
          sound = 2;
 
-      if (sound>=0)
-         SFX->playOnce(mDataBlock->sound[sound], &footMat);
+      switch ( sound )
+      {
+      case 0: // Soft
+         SFX->playOnce( mDataBlock->sound[PlayerData::FootSoft], &footMat );
+         break;
+      case 1: // Hard
+         SFX->playOnce( mDataBlock->sound[PlayerData::FootHard], &footMat );
+         break;
+      case 2: // Metal
+         SFX->playOnce( mDataBlock->sound[PlayerData::FootMetal], &footMat );
+         break;
+      case 3: // Snow
+         SFX->playOnce( mDataBlock->sound[PlayerData::FootSnow], &footMat );
+         break;
+      /*
+      default: //Hard
+         SFX->playOnce( mDataBlock->sound[PlayerData::FootHard], &footMat );
+         break;
+      */
+      }
    }
 }
 
@@ -6926,13 +8326,36 @@ void Player:: playImpactSound()
          else
          {
             S32 sound = -1;
-            if (material && (material->mImpactSoundId>-1 && material->mImpactSoundId<PlayerData::MaxSoundOffsets))
+            if( material && material->mImpactSoundId )
                sound = material->mImpactSoundId;
             else if( rInfo.object->getTypeMask() & VehicleObjectType )
                sound = 2; // Play metal;
 
-            if (sound >= 0)
-               SFX->playOnce(mDataBlock->sound[PlayerData::ImpactStart + sound], &getTransform());
+            switch( sound )
+            {
+            case 0:
+               //Soft
+               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactSoft ], &getTransform() );
+               break;
+            case 1:
+               //Hard
+               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactHard ], &getTransform() );
+               break;
+            case 2:
+               //Metal
+               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactMetal ], &getTransform() );
+               break;
+            case 3:
+               //Snow
+               SFX->playOnce( mDataBlock->sound[ PlayerData::ImpactSnow ], &getTransform() );
+               break;
+               /*
+            default:
+               //Hard
+               alxPlay(mDataBlock->sound[PlayerData::ImpactHard], &getTransform());
+               break;
+               */
+            }
          }
       }
    }
@@ -7009,10 +8432,11 @@ void Player::updateFroth( F32 dt )
    // If we're in the water, swimming, but not
    // moving, then lets emit some particles because
    // we're treading water.  
-   if ( mSwimming && speed == 0.0 )
+   //Ubiq: actually it looks kinda silly - removing
+   /*if ( mSwimming && speed == 0.0 )
    {
       emitRate = (U32) (2.0f * mDataBlock->splashFreqMod * dt);
-   }   
+   }*/
 
    U32 i;
    for ( i=0; i<PlayerData::BUBBLE_EMITTER; i++ ) {
@@ -7024,40 +8448,41 @@ void Player::updateFroth( F32 dt )
    mLastWaterPos = contactPoint;
 }
 
-void Player::updateWaterSounds(F32 dt)
+////Ubiq: removed: functionality moved to updateSounds()
+/*void Player::updateWaterSounds(F32 dt)
 {
    if ( mWaterCoverage < 1.0f || mDamageState != Enabled )
    {
       // Stop everything
-      if ( mMoveBubbleSound )
-         mMoveBubbleSound->stop();
-      if ( mWaterBreathSound )
-         mWaterBreathSound->stop();
+      if ( mSFXSources[PlayerData::MoveBubbles] )
+         mSFXSources[PlayerData::MoveBubbles]->stop();
+      if ( mSFXSources[PlayerData::WaterBreath] )
+         mSFXSources[PlayerData::WaterBreath]->stop();
       return;
    }
 
-   if ( mMoveBubbleSound )
+   if ( mSFXSources[PlayerData::MoveBubbles] )
    {
       // We're under water and still alive, so let's play something
       if ( mVelocity.len() > 1.0f )
       {
-         if ( !mMoveBubbleSound->isPlaying() )
-            mMoveBubbleSound->play();
+         if ( !mSFXSources[PlayerData::MoveBubbles]->isPlaying() )
+            mSFXSources[PlayerData::MoveBubbles]->play();
 
-         mMoveBubbleSound->setTransform( getTransform() );
+         mSFXSources[PlayerData::MoveBubbles]->setTransform( getTransform() );
       }
       else
-         mMoveBubbleSound->stop();
+         mSFXSources[PlayerData::MoveBubbles]->stop();
    }
 
-   if ( mWaterBreathSound )
+   if ( mSFXSources[PlayerData::WaterBreath] )
    {
-      if ( !mWaterBreathSound->isPlaying() )
-         mWaterBreathSound->play();
+      if ( !mSFXSources[PlayerData::WaterBreath]->isPlaying() )
+         mSFXSources[PlayerData::WaterBreath]->play();
 
-      mWaterBreathSound->setTransform( getTransform() );
+      mSFXSources[PlayerData::WaterBreath]->setTransform( getTransform() );
    }
-}
+}*/
 
 
 //--------------------------------------------------------------------------
@@ -7172,37 +8597,969 @@ void Player::renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMa
    GFX->leaveDebugEvent();
 }
 
-#ifdef TORQUE_OPENVR
-void Player::setControllers(Vector<OpenVRTrackedObject*> controllerList)
+
+//----------------------------------------------------------------------------
+// Ubiq custom
+//----------------------------------------------------------------------------
+
+
+//-------------------------------------------------------------------
+// Player::getNodePosition
+//
+// Returns the current world coordinates of the named node
+//-------------------------------------------------------------------
+Point3F Player::getNodePosition(const char *nodeName)
 {
-   mControllers[0] = controllerList.size() > 0 ? controllerList[0] : NULL;
-   mControllers[1] = controllerList.size() > 1 ? controllerList[1] : NULL;
+	const MatrixF& mat = this->getTransform();
+	Point3F nodePoint;
+	MatrixF nodeMat;
+	S32 ni = mDataBlock->mShape->findNode(nodeName);
+	AssertFatal(ni >= 0, "ShapeBase::getNodePosition() - couldn't find node!");
+	nodeMat = mShapeInstance->mNodeTransforms[ni];
+	nodePoint = nodeMat.getPosition();
+	mat.mulP(nodePoint);
+	return nodePoint;
 }
 
-ConsoleMethod(Player, setVRControllers, void, 4, 4, "")
+//-------------------------------------------------------------------
+// Player::setObjectBox
+//
+// Sets the player object box / convex box from the one provided
+//-------------------------------------------------------------------
+void Player::setObjectBox(Point3F size)
 {
-   OpenVRTrackedObject *controllerL, *controllerR;
-   Vector<OpenVRTrackedObject*> list;
+	mObjBox = createObjectBox(size);
+	
+	// Setup the box for our convex object...
+	mObjBox.getCenter(&mConvex.mCenter);
+	mConvex.mSize.x = mObjBox.len_x() / 2.0f;
+	mConvex.mSize.y = mObjBox.len_y() / 2.0f;
+	mConvex.mSize.z = mObjBox.len_z() / 2.0f;
 
-   if (Sim::findObject(argv[2], controllerL))
-   {
-      list.push_back(controllerL);
-   }
-   else
-   {
-      list.push_back(NULL);
-   }
-
-   if (Sim::findObject(argv[3], controllerR))
-   {
-      list.push_back(controllerR);
-   }
-   else
-   {
-      list.push_back(NULL);
-   }
-
-   object->setControllers(list);
+	// Initialize our scaled attributes as well
+	onScaleChanged();
 }
 
+//-------------------------------------------------------------------
+// Player::createObjectBox
+//
+// Given a point (containing length, width & height) makes an object box
+//-------------------------------------------------------------------
+Box3F Player::createObjectBox(Point3F size)
+{
+	Box3F returnBox;
+	returnBox.maxExtents.x = size.x * 0.5f;
+	returnBox.maxExtents.y = size.y * 0.5f;
+	returnBox.maxExtents.z = size.z;
+	returnBox.minExtents.x = -returnBox.maxExtents.x;
+	returnBox.minExtents.y = -returnBox.maxExtents.y;
+	returnBox.minExtents.z = 0.0f;
+	return returnBox;
+}
+
+//-------------------------------------------------------------------
+// Player::getSurfaceType
+//
+// Returns the type mask of the object the player is standing on
+//-------------------------------------------------------------------
+U32 Player::getSurfaceType()
+{
+	Point3F pos = getPosition();
+	RayInfo rInfo;
+	disableCollision();
+	if (getContainer()->castRay(Point3F(pos.x, pos.y, pos.z + 0.2f), Point3F(pos.x, pos.y, pos.z - 0.2f ), 0xffffffff, &rInfo))
+	{
+		enableCollision();
+		return rInfo.object->getTypeMask();;
+	}
+	else
+	{
+		enableCollision();
+		return DefaultObjectType;
+	}
+}
+
+//-------------------------------------------------------------------
+// Player::worldBoxIsClear
+//
+// Returns true if there are no obstructions inside the given world space box
+//-------------------------------------------------------------------
+bool Player::worldBoxIsClear(Box3F objSpaceBox, Point3F worldOffset)
+{
+	//this overload takes a box in object space and a world space offset
+	//convert objSpaceBox to a world space box by adding the offset
+	objSpaceBox.minExtents += worldOffset;
+	objSpaceBox.maxExtents += worldOffset;
+
+	return worldBoxIsClear(objSpaceBox);
+}
+
+//-------------------------------------------------------------------
+// Player::worldBoxIsClear
+//
+// Returns true if there are no obstructions inside the given world space box
+//-------------------------------------------------------------------
+bool Player::worldBoxIsClear(Box3F worldSpaceBox)
+{
+	EarlyOutPolyList polyList;
+	polyList.mNormal.set(0.0f, 0.0f, 0.0f);
+	polyList.mPlaneList.clear();
+	polyList.mPlaneList.setSize(6);
+	polyList.mPlaneList[0].set(worldSpaceBox.minExtents,VectorF(-1.0f, 0.0f, 0.0f));
+	polyList.mPlaneList[1].set(worldSpaceBox.maxExtents,VectorF(0.0f, 1.0f, 0.0f));
+	polyList.mPlaneList[2].set(worldSpaceBox.maxExtents,VectorF(1.0f, 0.0f, 0.0f));
+	polyList.mPlaneList[3].set(worldSpaceBox.minExtents,VectorF(0.0f, -1.0f, 0.0f));
+	polyList.mPlaneList[4].set(worldSpaceBox.minExtents,VectorF(0.0f, 0.0f, -1.0f));
+	polyList.mPlaneList[5].set(worldSpaceBox.maxExtents,VectorF(0.0f, 0.0f, 1.0f));
+
+	//is there geometry in the way?
+	disableCollision();
+	bool isClear = !getContainer()->buildPolyList(PLC_Collision, worldSpaceBox, sCollisionMoveMask, &polyList);
+	enableCollision();
+
+#ifdef ENABLE_DEBUGDRAW
+	LinearColorF color;
+	if(isClear)
+		color = LinearColorF(0,1,0);
+	else
+		color = LinearColorF(1,0,0);
+
+	DebugDrawer::get()->drawBox(worldSpaceBox.minExtents, worldSpaceBox.maxExtents, color);
+	DebugDrawer::get()->setLastTTL(TickMs);
 #endif
+
+	return isClear;
+}
+
+//-------------------------------------------------------------------
+// Player::updateSounds
+//
+// Update all our player sound effects
+//-------------------------------------------------------------------
+void Player::updateSounds(F32 dt)
+{
+	//turn on/off slide sounds
+	if(mSlideSound)
+	{
+		if((mSlideState.active || mStoppingTimer > 16)
+			&& (mRunSurface || mSlideSurface)
+			&& mVelocity.len() > 0.01f )
+		{
+			if(!mSlideSound->isPlaying())
+   				mSlideSound->play();
+
+			//set volume and pitch based on speed
+			F32 speedFactor = mVelocity.len()/16.0f;
+			speedFactor = mClampF(speedFactor, 0, 1);
+
+			F32 volume = speedFactor;
+			F32 pitch = (0.75f * (1.0f - speedFactor)) + (1.25f * speedFactor); //map (0 - 1) to (0.75 - 1.25)
+
+			mSlideSound->setVolume(volume);
+			mSlideSound->setPitch(pitch);
+			mSlideSound->setTransform( getRenderTransform() );
+			mSlideSound->setVelocity( mVelocity );
+		}
+		else if (mSlideSound->isPlaying())
+			mSlideSound->pause();
+	}
+
+	//Ubiq: moved here from updateWaterSounds()
+	if ( mWaterCoverage < 1.0f || mDamageState != Enabled )
+   {
+      // Stop everything
+      if ( mMoveBubbleSound )
+         mMoveBubbleSound->stop();
+      if ( mWaterBreathSound )
+         mWaterBreathSound->stop();
+      return;
+   }
+
+   if ( mMoveBubbleSound )
+   {
+      // We're under water and still alive, so let's play something
+      if ( mVelocity.len() > 1.0f )
+      {
+         if ( !mMoveBubbleSound->isPlaying() )
+            mMoveBubbleSound->play();
+
+         mMoveBubbleSound->setTransform( getTransform() );
+      }
+      else
+         mMoveBubbleSound->stop();
+   }
+
+   if ( mWaterBreathSound )
+   {
+      if ( !mWaterBreathSound->isPlaying() )
+         mWaterBreathSound->play();
+
+      mWaterBreathSound->setTransform( getTransform() );
+   }
+}
+
+
+//-------------------------------------------------------------------
+// Player::findClimbContact
+//
+// Check to see if we have a suitable climb surface in front of us
+//-------------------------------------------------------------------
+void Player::findClimbContact(bool* climb, PlaneF* climbPlane)
+{
+	*climb = false;
+
+	Point3F pos;
+	getTransform().getColumn(3, &pos);
+
+	Point3F forward;
+	getTransform().getColumn(1, &forward);
+
+	Box3F wBox = mObjBox;
+	Point3F offset(forward);
+	offset.normalize(0.2f);
+	wBox.minExtents.z = mDataBlock->climbHeightMin;
+	wBox.maxExtents.z = mDataBlock->climbHeightMax;
+	wBox.minExtents += offset + pos;
+	wBox.maxExtents += offset + pos;
+
+
+#ifdef ENABLE_DEBUGDRAW
+	DebugDrawer::get()->drawBox(wBox.minExtents, wBox.maxExtents);
+	DebugDrawer::get()->setLastTTL(100);
+#endif
+
+	static ClippedPolyList polyList;
+	polyList.clear();
+	polyList.doConstruct();
+	polyList.mNormal.set(0.0f, 0.0f, 0.0f);
+
+	polyList.mPlaneList.setSize(6);
+	polyList.mPlaneList[0].setYZ(wBox.minExtents, -1.0f);
+	polyList.mPlaneList[1].setXZ(wBox.maxExtents, 1.0f);
+	polyList.mPlaneList[2].setYZ(wBox.maxExtents, 1.0f);
+	polyList.mPlaneList[3].setXZ(wBox.minExtents, -1.0f);
+	polyList.mPlaneList[4].setXY(wBox.minExtents, -1.0f);
+	polyList.mPlaneList[5].setXY(wBox.maxExtents, 1.0f);
+	Box3F plistBox = wBox;
+
+	// Build list from convex states here...
+	CollisionWorkingList& rList = mConvex.getWorkingList();
+	CollisionWorkingList* pList = rList.wLink.mNext;
+	while (pList != &rList)
+	{
+		Convex* pConvex = pList->mConvex;
+
+		if ((pConvex->getObject()->getTypeMask() & StaticObjectType) != 0)
+		{
+			bool skip = true;
+
+			TSStatic *st = dynamic_cast<TSStatic *> (pConvex->getObject());
+			if (st && st->allowPlayerClimb())
+				skip = false;
+
+			TerrainBlock *terrain = dynamic_cast<TerrainBlock *> (pConvex->getObject());
+			if (terrain && terrain->allowPlayerClimb())
+				skip = false;
+
+			if(!skip)
+			{
+				Box3F convexBox = pConvex->getBoundingBox();
+				if (plistBox.isOverlapped(convexBox))
+					pConvex->getPolyList(&polyList);
+			}
+		}
+		pList = pList->wLink.mNext;
+	}
+
+	if (!polyList.isEmpty())
+	{
+		// Average the normals of all vertical-ish polygons together
+		// This allows the player to climb around beveled corners
+		*climbPlane = PlaneF(0,0,0,0); F32 totalWeight = 0.0f;
+		for (U32 p = 0; p < polyList.mPolyList.size(); p++)
+		{
+			//nearly vertical surface?
+			if(mFabs(polyList.mPolyList[p].plane.z) < 0.2)
+			{
+				//facing the player?
+				if(mDot(polyList.mPolyList[p].plane, forward) < -0.5f)
+				{
+					//calculate area of polygon
+					//-------------------------------------
+					Point3F areaNorm(0,0,0);
+					for (S32 i=polyList.mPolyList[p].vertexStart; i < polyList.mPolyList[p].vertexStart + polyList.mPolyList[p].vertexCount; i++)
+					{
+						S32 vertex1Index = i;
+						S32 vertex2Index = i + 1;
+
+						//the last vertex is connected to the first
+						if(i == polyList.mPolyList[p].vertexStart + polyList.mPolyList[p].vertexCount - 1) 
+							vertex2Index = polyList.mPolyList[p].vertexStart;
+
+						//get the verticies
+						Point3F vertex1 = polyList.mVertexList[polyList.mIndexList[vertex1Index]].point;
+						Point3F vertex2 = polyList.mVertexList[polyList.mIndexList[vertex2Index]].point;
+
+						Point3F tmp;
+						mCross(vertex1, vertex2, &tmp);
+						areaNorm += tmp;
+					}
+					F32 area = mDot(polyList.mPolyList[p].plane, areaNorm);
+					area *= (area < 0 ? -0.5f : 0.5f);
+					//-------------------------------------
+
+					F32 weight = area;
+					totalWeight += weight;
+					*climbPlane += polyList.mPolyList[p].plane * weight;
+					climbPlane->d += polyList.mPolyList[p].plane.d * weight;
+				}
+			}
+		}
+		if(totalWeight > 0)
+		{
+			*climb = true;
+
+			//divide to finish the weighted averages
+			*climbPlane /= totalWeight;
+			climbPlane->d /= totalWeight;
+		}
+		else
+		{
+			//we failed to find a suitable climb surface
+			*climb = false;
+		}
+	}
+}
+
+//-------------------------------------------------------------------
+// Player::canStartClimb
+//
+// Returns true if the player is currently allowed to enter the climb state
+//-------------------------------------------------------------------
+bool Player::canStartClimb()
+{
+	return mState == MoveState && mDamageState == Enabled && !isMounted()
+		&& (mPose == StandPose || mPose == SprintPose)
+		&& !mDieOnNextCollision
+		&& mClimbTriggerCount > 0
+		&& mVelocity.z <= 0.1f
+		&& !mClimbState.ignoreClimb;
+}
+
+//-------------------------------------------------------------------
+// Player::canClimb
+//
+// Returns true if the player should continue in the climb state
+//-------------------------------------------------------------------
+bool Player::canClimb()
+{
+	return mState == MoveState && mDamageState == Enabled && !isMounted()
+		&& (mPose == StandPose || mPose == SprintPose)
+		&& !mDieOnNextCollision
+		&& mClimbTriggerCount > 0
+		&& !mClimbState.ignoreClimb;
+}
+
+//-------------------------------------------------------------------
+// Player::findWallContact
+//
+// Check to see if we have a suitable wall hug surface in front of us
+//-------------------------------------------------------------------
+void Player::findWallContact(bool* wall, PlaneF* wallPlane)
+{
+	*wall = false;
+
+	Point3F pos;
+	getTransform().getColumn(3, &pos);
+
+	Point3F forward;
+	getTransform().getColumn(1, &forward);
+
+	Box3F wBox = mObjBox;
+	Point3F offset(forward);
+	offset.normalize(0.2f);
+	wBox.minExtents.z = mDataBlock->wallHugHeightMin;
+	wBox.maxExtents.z = mDataBlock->wallHugHeightMax;
+	wBox.minExtents += offset + pos;
+	wBox.maxExtents += offset + pos;
+
+
+#ifdef ENABLE_DEBUGDRAW
+	DebugDrawer::get()->drawBox(wBox.minExtents, wBox.maxExtents);
+	DebugDrawer::get()->setLastTTL(TickMs);
+#endif
+
+	static ClippedPolyList polyList;
+	polyList.clear();
+	polyList.doConstruct();
+	polyList.mNormal.set(0.0f, 0.0f, 0.0f);
+
+	polyList.mPlaneList.setSize(6);
+	polyList.mPlaneList[0].setYZ(wBox.minExtents, -1.0f);
+	polyList.mPlaneList[1].setXZ(wBox.maxExtents, 1.0f);
+	polyList.mPlaneList[2].setYZ(wBox.maxExtents, 1.0f);
+	polyList.mPlaneList[3].setXZ(wBox.minExtents, -1.0f);
+	polyList.mPlaneList[4].setXY(wBox.minExtents, -1.0f);
+	polyList.mPlaneList[5].setXY(wBox.maxExtents, 1.0f);
+	Box3F plistBox = wBox;
+
+	// Build list from convex states here...
+	CollisionWorkingList& rList = mConvex.getWorkingList();
+	CollisionWorkingList* pList = rList.wLink.mNext;
+	while (pList != &rList)
+	{
+		Convex* pConvex = pList->mConvex;
+
+		if ((pConvex->getObject()->getTypeMask() & StaticObjectType) != 0)
+		{
+			bool skip = true;
+
+			TSStatic *st = dynamic_cast<TSStatic *> (pConvex->getObject());
+			if (st && st->allowPlayerWallHug())
+				skip = false;
+
+			TerrainBlock *terrain = dynamic_cast<TerrainBlock *> (pConvex->getObject());
+			if (terrain && terrain->allowPlayerClimb())
+				skip = false;
+
+			if(!skip)
+			{
+				Box3F convexBox = pConvex->getBoundingBox();
+				if (plistBox.isOverlapped(convexBox))
+					pConvex->getPolyList(&polyList);
+			}
+		}
+		pList = pList->wLink.mNext;
+	}
+
+	if (!polyList.isEmpty())
+	{
+		// Average the normals of all vertical polygons together
+		// This allows the player to wall hug around beveled corners
+		*wallPlane = PlaneF(0,0,0,0); F32 totalWeight = 0.0f;
+		for (U32 p = 0; p < polyList.mPolyList.size(); p++)
+		{
+			//nearly vertical surface?
+			if(mFabs(polyList.mPolyList[p].plane.z) < 0.2)
+			{
+				//facing the player?
+				if(mDot(polyList.mPolyList[p].plane, forward) < -0.5f)
+				{
+					//calculate area of polygon
+					//-------------------------------------
+					Point3F areaNorm(0,0,0);
+					for (S32 i=polyList.mPolyList[p].vertexStart; i < polyList.mPolyList[p].vertexStart + polyList.mPolyList[p].vertexCount; i++)
+					{
+						S32 vertex1Index = i;
+						S32 vertex2Index = i + 1;
+
+						//the last vertex is connected to the first
+						if(i == polyList.mPolyList[p].vertexStart + polyList.mPolyList[p].vertexCount - 1) 
+							vertex2Index = polyList.mPolyList[p].vertexStart;
+
+						//get the verticies
+						Point3F vertex1 = polyList.mVertexList[polyList.mIndexList[vertex1Index]].point;
+						Point3F vertex2 = polyList.mVertexList[polyList.mIndexList[vertex2Index]].point;
+
+						Point3F tmp;
+						mCross(vertex1, vertex2, &tmp);
+						areaNorm += tmp;
+					}
+					F32 area = mDot(polyList.mPolyList[p].plane, areaNorm);
+					area *= (area < 0 ? -0.5f : 0.5f);
+					//-------------------------------------
+
+					F32 weight = area;
+					totalWeight += weight;
+					*wallPlane += polyList.mPolyList[p].plane * weight;
+					wallPlane->d += polyList.mPolyList[p].plane.d * weight;
+				}
+			}
+		}
+		if(totalWeight > 0)
+		{
+			*wall = true;
+
+			//divide to finish the weighted averages
+			*wallPlane /= totalWeight;
+			wallPlane->d /= totalWeight;
+		}
+		else
+		{
+			//we failed to find a suitable wall hug surface
+			*wall = false;
+		}
+	}
+}
+
+//-------------------------------------------------------------------
+// Player::canStartWallHug
+//
+// Returns true if the player is currently allowed to enter the wall hug state
+//-------------------------------------------------------------------
+bool Player::canStartWallHug()
+{
+	return mState == MoveState && mDamageState == Enabled && !isMounted()
+		&& (mPose == StandPose || mPose == SprintPose)
+		&& !mDieOnNextCollision
+		&& mRunSurface
+		&& !mSlideState.active
+		&& !mJumpState.active
+		&& !mLandState.active
+		&& !mClimbState.active
+		&& !mLedgeState.active;
+}
+
+//-------------------------------------------------------------------
+// Player::canWallHug
+//
+// Returns true if the player should continue in the wall hug state
+//-------------------------------------------------------------------
+bool Player::canWallHug()
+{
+	return mState == MoveState && mDamageState == Enabled && !isMounted()
+		&& (mPose == StandPose || mPose == SprintPose)
+		&& !mDieOnNextCollision
+		&& mContactTimer < sContactTickTime	//similar to (but more tolerant than) checking mRunSurface
+		&& !mSlideState.active
+		&& !mJumpState.active
+		&& !mLandState.active
+		&& !mClimbState.active
+		&& !mLedgeState.active;
+}
+
+//-------------------------------------------------------------------
+// Player::findLedgeContact
+//
+// Check to see if we have a suitable ledge to grab in front of us
+//-------------------------------------------------------------------
+void Player::findLedgeContact(bool* ledge, VectorF* ledgeNormal, Point3F* ledgePoint, bool* canMoveLeft, bool* canMoveRight)
+{
+	*ledge = false;
+	ledgeNormal->zero();
+	ledgePoint->zero();
+	*canMoveLeft = false;
+	*canMoveRight = false;
+
+	F32 totalWeight = 0.0f;
+
+	Point3F pos;
+	getTransform().getColumn(3, &pos);
+
+	Point3F forward;
+	getTransform().getColumn(1, &forward);
+
+	Box3F wBox = mObjBox;
+	Point3F offset(forward);
+	offset.normalize(wBox.len_y());
+	wBox.minExtents.z = mDataBlock->grabHeightMin;
+	wBox.maxExtents.z = mDataBlock->grabHeightMax;
+
+	//if player is falling quickly he may miss a ledge between ticks
+	//thus we extend the box downward to ensure ledges are always found
+	wBox.minExtents.z += (mVelocity.z * TickSec) - wBox.len_z();
+
+	wBox.minExtents += offset + pos;
+	wBox.maxExtents += offset + pos;
+
+#ifdef ENABLE_DEBUGDRAW
+	DebugDrawer::get()->drawBox(wBox.minExtents, wBox.maxExtents);
+	DebugDrawer::get()->setLastTTL(TickMs);
+#endif
+
+	static ConcretePolyList polyList;
+	polyList.clear();
+	polyList.doConstruct();
+	Box3F plistBox = wBox;
+
+	// Build list from convex states here...
+	CollisionWorkingList& rList = mConvex.getWorkingList();
+	CollisionWorkingList* pList = rList.wLink.mNext;
+	while (pList != &rList)
+	{
+		Convex* pConvex = pList->mConvex;
+
+		if ((pConvex->getObject()->getTypeMask() & StaticObjectType) != 0)
+		{
+			bool skip = true;
+
+			TSStatic *st = dynamic_cast<TSStatic *> (pConvex->getObject());
+			if (st && st->allowPlayerLedgeGrab())
+ 				skip = false;
+
+			TerrainBlock *terrain = dynamic_cast<TerrainBlock *> (pConvex->getObject());
+			if (terrain && terrain->allowPlayerClimb())
+				skip = false;
+
+			if(!skip)
+			{
+				Box3F convexBox = pConvex->getBoundingBox();
+				if (plistBox.isOverlapped(convexBox))
+					pConvex->getObject()->buildPolyList(PLC_Collision,&polyList,plistBox,SphereF());
+			}
+		}
+		pList = pList->wLink.mNext;
+	}
+
+	if (!polyList.isEmpty())
+	{
+		for (U32 p = 0; p < polyList.mPolyList.size(); p++)
+		{
+			//upward-facing surface?
+			if(polyList.mPolyList[p].plane.z > 0.9f) 
+			{
+				//loop through all the verticies of this polygon
+				for (S32 i=polyList.mPolyList[p].vertexStart; i < polyList.mPolyList[p].vertexStart + polyList.mPolyList[p].vertexCount; i++)
+				{
+					S32 vertex1Index = i;
+					S32 vertex2Index = i + 1;
+
+					//the last vertex is connected to the first
+					if(i == polyList.mPolyList[p].vertexStart + polyList.mPolyList[p].vertexCount - 1) 
+						vertex2Index = polyList.mPolyList[p].vertexStart;
+
+					//get the verticies
+					Point3F vertex1 = polyList.mVertexList[polyList.mIndexList[vertex1Index]];
+					Point3F vertex2 = polyList.mVertexList[polyList.mIndexList[vertex2Index]];
+
+					//calculate the "normal" (only X&Y) of this edge
+					Point3F normal = mCross(Point3F(0,0,1), vertex2 - vertex1);
+					normal.normalizeSafe();
+
+					//quick test: is player facing this edge?
+					//we'll test the *real* normal more thoroughly later
+					if(mDot(forward, normal) <= 0)
+					{
+						//Now we're going to collide the edge with our box. We'll do
+						//this from both directions and use the average collision point.
+						//This is neccessary when one vertex is higher than the other.
+						F32 t1; Point3F n1;
+						bool collided1 = wBox.collideLine(vertex1, vertex2, &t1, &n1);
+						
+						F32 t2; Point3F n2;
+						bool collided2 = wBox.collideLine(vertex2, vertex1, &t2, &n2);
+
+						//does this edge pass through our box?
+						if(collided1 && collided2)
+						{
+							//Now we need to make sure that:
+							//1) this edge is "significant" (ie. large difference in normals of polygons on either side) and
+							//2) the edge normal actually faces the player (prevents grabbing the floor on the other side of a wall etc.)
+							//    __                         | |
+							//      \   0                  --+ |   0
+							//      |  /|\                     |  /|\
+							//      |  / \                     |  / \
+							//BAD, neither edge of         BAD, edge normal does
+							//bevel is significant         not face the player
+
+							//so let's go through the other polygons to find an adjacent polygon (a polygon that shares this edge)
+
+							U32 adjPolyIndex;
+							if(findAdjacentPoly(&polyList, vertex1, vertex2, p, &adjPolyIndex))
+							{
+								Point3F polyNormal = polyList.mPolyList[p].plane;
+								Point3F adjPolyNormal = polyList.mPolyList[adjPolyIndex].plane;
+
+								//find the *real* edge normal
+								Point3F edgeNormal = (polyNormal + adjPolyNormal) / 2.0f;
+
+								//does the edge normal face the player?
+								F32 edgeNormalDotForward = mDot(edgeNormal, forward);
+								if(edgeNormalDotForward <= -0.2f)
+								{
+									//is this a "significant edge"?
+									F32 polyNormalDotadjPolyNormal = mDot(polyNormal, adjPolyNormal);
+									if(polyNormalDotadjPolyNormal <= 0.1f)
+									{
+										//find the points of collision
+										Point3F collisionPoint1, collisionPoint2;
+										collisionPoint1.interpolate(vertex1, vertex2, t1);
+										collisionPoint2.interpolate(vertex2, vertex1, t2);
+
+										//calculate this edge's weight using length inside box
+										F32 lengthInBox = (collisionPoint1 - collisionPoint2).len();
+  										F32 weight = lengthInBox;
+
+										//we'll take the average of the two collision points
+										Point3F collisionPoint = (collisionPoint1 + collisionPoint2) / 2.0f;
+
+										totalWeight += weight;
+										*ledgeNormal += normal * weight;
+										*ledgePoint += collisionPoint * weight;
+										*canMoveLeft = *canMoveLeft || !wBox.isContained(vertex2);
+										*canMoveRight = *canMoveRight || !wBox.isContained(vertex1);
+
+										#ifdef ENABLE_DEBUGDRAW
+										//draw the edge
+										DebugDrawer::get()->drawLine(vertex1, vertex2, LinearColorF(1.0f,0.0f,0.5f));
+										DebugDrawer::get()->setLastTTL(TickMs);
+
+										//draw the edgeNormal at the midPoint
+										Point3F midPoint = (vertex1 + vertex2) / 2.0f;
+										DebugDrawer::get()->drawLine(midPoint, midPoint + edgeNormal, LinearColorF(0.0f,0.5f,0.5f));
+										DebugDrawer::get()->setLastTTL(TickMs);
+										#endif
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if(totalWeight > 0)
+		{
+			*ledge = true;
+
+			//divide to finish the weighted averages
+			*ledgePoint /= totalWeight;
+			*ledgeNormal /= totalWeight;
+
+			#ifdef ENABLE_DEBUGDRAW
+			//draw the ledge point
+			DebugDrawer::get()->drawLine(*ledgePoint, *ledgePoint + *ledgeNormal, ColorI::BLACK);
+			DebugDrawer::get()->setLastTTL(TickMs);
+			#endif
+		}
+		else
+		{
+			//we failed to find a suitable ledge
+			*ledge = false;
+		}
+	}
+}
+
+//-------------------------------------------------------------------
+// Player::findAdjacentPoly
+//
+// Given a polyList, an edge defined by 2 verticies, and a polygon index,
+// this method finds another polygon in the polylist that shares the edge.
+// Returns: true if polygon found (and sets adjPolyIndex), false otherwise.
+//-------------------------------------------------------------------
+bool Player::findAdjacentPoly(ConcretePolyList* polyList, Point3F vertex1, Point3F vertex2, U32 polyIndex, U32* adjPolyIndex)
+{
+	Point3F edgeUnitVec = vertex1 - vertex2;
+	edgeUnitVec.normalizeSafe();
+
+	for (U32 i = 0; i < polyList->mPolyList.size(); i++)
+	{
+		//don't find this polygon
+		if(i == polyIndex)
+			continue;
+
+		//loop through all the verticies of this polygon
+		for (S32 j = polyList->mPolyList[i].vertexStart; j < polyList->mPolyList[i].vertexStart + polyList->mPolyList[i].vertexCount; j++)
+		{
+			S32 vertex1Index = j;
+			S32 vertex2Index = j + 1;
+
+			//the last vertex is connected to the first
+			if(j == polyList->mPolyList[i].vertexStart + polyList->mPolyList[i].vertexCount - 1) 
+				vertex2Index = polyList->mPolyList[i].vertexStart;
+
+			//get the verticies
+			Point3F vertex1B = polyList->mVertexList[polyList->mIndexList[vertex1Index]];
+			Point3F vertex2B = polyList->mVertexList[polyList->mIndexList[vertex2Index]];
+
+			//Now we need to compare the edge defined by vertex1 and vertex2 to the edge defined by vertex1B
+			//and vertex2B. If they form the same line (and at least partially overlap), we've found a match.
+
+			//as a quick check, the vectors should be opposite
+			Point3F edgeBUnitVec = vertex1B - vertex2B;
+			edgeBUnitVec.normalizeSafe();
+			F32 dot = mDot(edgeUnitVec, edgeBUnitVec);
+			if(dot >= -0.99f)	//use a little fudge
+				continue;
+
+			//find the shortest distance from vertex1B (and then vertex2B) to the infinite line defined
+			//by vertex1 and vertex2, if the distances are both zero, we've found an identical edge
+			F32 dist1 = (mCross(edgeUnitVec, vertex1 - vertex1B)).len();
+			F32 dist2 = (mCross(edgeUnitVec, vertex1 - vertex2B)).len();
+
+			//we'll use a little fudge here since geometry is rarely perfect
+			F32 threshold = 0.001f;
+			if(dist1 <= threshold && dist2 <= threshold)
+			{
+				//The edges must at least partially overlap. If both vertex1B and
+				//vertex2B are "outside" and on the same side, they don't overlap
+				PlaneF plane1(vertex1, edgeUnitVec);
+				PlaneF plane2(vertex2, edgeUnitVec);
+				F32 p1v1B = plane1.distToPlane(vertex1B);
+				F32 p1v2B = plane1.distToPlane(vertex2B);
+				F32 p2v1B = plane2.distToPlane(vertex1B);
+				F32 p2v2B = plane2.distToPlane(vertex2B);
+
+				bool overlap = !(
+					(p1v1B < 0 && p1v2B < 0
+					&& p2v1B < 0 && p2v2B < 0)
+					||
+					(p1v1B > 0 && p1v2B > 0
+					&& p2v1B > 0 && p2v2B > 0)
+					);
+
+				if(overlap)
+				{
+					*adjPolyIndex = i;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+
+//-------------------------------------------------------------------
+// Player::canStartLedgeGrab
+//
+// Returns true if the player is currently allowed to enter the grab state
+//-------------------------------------------------------------------
+bool Player::canStartLedgeGrab()
+{
+	return mState == MoveState && mDamageState == Enabled && !isMounted()
+		&& (mPose == StandPose || mPose == SprintPose)
+		&& !mDieOnNextCollision
+		&& mVelocity.z <= mDataBlock->climbSpeedUp
+		&& !mLedgeState.ignoreLedge;
+}
+
+//-------------------------------------------------------------------
+// Player::canLedgeGrab
+//
+// Returns true if the player is currently allowed to be in the grab state
+//-------------------------------------------------------------------
+bool Player::canLedgeGrab()
+{
+	return mState == MoveState && mDamageState == Enabled && !isMounted()
+		&& (mPose == StandPose || mPose == SprintPose)
+		&& !mDieOnNextCollision
+  		&& !(mClimbState.active && mClimbState.direction == MOVE_DIR_DOWN)
+		&& !mLedgeState.ignoreLedge;
+}
+
+//-------------------------------------------------------------------
+// Player::getLedgeUpPosition
+//
+// Returns the point the player will teleport to at the end of the ledge up anim
+//-------------------------------------------------------------------
+Point3F Player::getLedgeUpPosition()
+{
+	Point3F pos = getPosition();
+	Point3F offset = mLedgeState.ledgeNormal;
+	offset.normalize(mDataBlock->grabUpForwardOffset);
+	pos -= offset;
+	pos.z = mLedgeState.ledgePoint.z + mDataBlock->grabUpUpwardOffset;
+	return pos;
+}
+
+
+//-------------------------------------------------------------------
+// Player::canStartLedgeUp
+//
+// Returns true if there is room above for the player to pull himself up
+//-------------------------------------------------------------------
+bool Player::canStartLedgeUp() 
+{
+	//can't start if we're already doing it
+	if(mLedgeState.climbingUp)
+		return false;
+
+	//make sure we're in ledge idle (and no blend in progress)
+	if(mActionAnimation.action != PlayerData::LedgeIdleAnim
+		|| mShapeInstance->inTransition())
+		return false;
+
+	//check that we have space above to stand
+	Point3F pos = getLedgeUpPosition();	
+	return worldBoxIsClear(createObjectBox(mDataBlock->grabUpTestBox), pos);
+}
+
+//-------------------------------------------------------------------
+// Player::updateLedgeUpAnimation
+//
+// If necessary, moves the ledge up animation forward / backward
+//-------------------------------------------------------------------
+void Player::updateLedgeUpAnimation()
+{
+	//Ubiq: integrate ledge climb up animation
+	if(mLedgeState.climbingUp && mActionAnimation.action == PlayerData::LedgeUpAnim)
+	{
+		//update delta
+		mLedgeState.deltaAnimPosVec = mLedgeState.animPos;
+
+		F32 vel = mDataBlock->grabSpeedUp * TickSec;
+
+		//play in reverse?
+		if(mLedgeState.direction != MOVE_DIR_UP && mLedgeState.animPos < 0.2)
+			vel *= -1;
+
+		//update the animation position
+		F32 pos = mLedgeState.animPos + vel;
+		mLedgeState.animPos = mClampF(pos, 0.0f, 1.0f);
+		if (mActionAnimation.thread)
+		{
+			mShapeInstance->clearTransition(mActionAnimation.thread);
+			mShapeInstance->setPos(mActionAnimation.thread, mLedgeState.animPos);
+		}
+
+		//tell the client it's changed
+		setMaskBits(LedgeUpMask);
+
+		if(isClientObject())
+		{
+			//calc delta for backstepping
+			mLedgeState.deltaAnimPos = mLedgeState.animPos;
+			mLedgeState.deltaAnimPosVec = mLedgeState.deltaAnimPosVec - mLedgeState.deltaAnimPos;
+		}
+	}
+} 
+
+//-------------------------------------------------------------------
+// Player::snapToPlane
+//
+// Collide player with given plane and return the new position
+// Note: the player is NOT actually moved here!
+//-------------------------------------------------------------------
+Point3F Player::snapToPlane(PlaneF plane)
+{
+	//get our collision box
+	Box3F boundingBox(mObjBox);
+	Point3F pos = getPosition();
+	boundingBox.minExtents += pos;
+	boundingBox.maxExtents += pos;
+	
+	//we'll test all 8 verticies of our collision box
+	Vector<Point3F> testPoints;
+	testPoints.push_back(Point3F(boundingBox.maxExtents.x, boundingBox.maxExtents.y, boundingBox.maxExtents.z));
+	testPoints.push_back(Point3F(boundingBox.minExtents.x, boundingBox.maxExtents.y, boundingBox.maxExtents.z));
+	testPoints.push_back(Point3F(boundingBox.maxExtents.x, boundingBox.minExtents.y, boundingBox.maxExtents.z));
+	testPoints.push_back(Point3F(boundingBox.minExtents.x, boundingBox.minExtents.y, boundingBox.maxExtents.z));
+	testPoints.push_back(Point3F(boundingBox.maxExtents.x, boundingBox.maxExtents.y, boundingBox.minExtents.z));
+	testPoints.push_back(Point3F(boundingBox.minExtents.x, boundingBox.maxExtents.y, boundingBox.minExtents.z));
+	testPoints.push_back(Point3F(boundingBox.maxExtents.x, boundingBox.minExtents.y, boundingBox.minExtents.z));
+	testPoints.push_back(Point3F(boundingBox.minExtents.x, boundingBox.minExtents.y, boundingBox.minExtents.z));
+
+	//find the point with the least distance to plane
+	//negative best distance = pull player out of the plane
+	//positive best distance = push player onto plane
+	F32 bestDist = F32_MAX;
+	Point3F bestPoint(0,0,0);
+	for(int i = 0; i < testPoints.size(); i++)
+	{
+		F32 dist = plane.distToPlane(testPoints[i]);
+		if(dist < bestDist)
+		{
+			bestDist = dist;
+			bestPoint = testPoints[i];
+		}
+	}
+	
+	//project the selected point onto the plane
+	Point3F projected = plane.project(bestPoint);
+
+	//find how much it moved
+	Point3F offset = projected - bestPoint;
+
+	return pos + offset;
+}

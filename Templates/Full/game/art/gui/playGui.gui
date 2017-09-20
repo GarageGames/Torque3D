@@ -1,14 +1,6 @@
 //--- OBJECT WRITE BEGIN ---
 %guiContent = new GameTSCtrl(PlayGui) {
-   cameraZRot = "0";
-   forceFOV = "0";
-   reflectPriority = "1";
-   Margin = "0 0 0 0";
-   Padding = "0 0 0 0";
-   AnchorTop = "1";
-   AnchorBottom = "0";
-   AnchorLeft = "1";
-   AnchorRight = "0";
+   canSaveDynamicFields = "1";
    isContainer = "1";
    Profile = "GuiContentProfile";
    HorizSizing = "right";
@@ -20,14 +12,20 @@
    Visible = "1";
    tooltipprofile = "GuiToolTipProfile";
    hovertime = "1000";
-   canSaveDynamicFields = "1";
+   Margin = "0 0 0 0";
+   Padding = "0 0 0 0";
+   AnchorTop = "1";
+   AnchorBottom = "0";
+   AnchorLeft = "1";
+   AnchorRight = "0";
+   cameraZRot = "0";
+   forceFOV = "0";
       Enabled = "1";
       helpTag = "0";
       noCursor = "1";
 
    new GuiBitmapCtrl(CenterPrintDlg) {
-      bitmap = "art/gui/hudfill.png";
-      wrap = "0";
+      canSaveDynamicFields = "0";
       isContainer = "0";
       Profile = "CenterPrintProfile";
       HorizSizing = "center";
@@ -39,13 +37,11 @@
       Visible = "0";
       tooltipprofile = "GuiToolTipProfile";
       hovertime = "1000";
-      canSaveDynamicFields = "0";
+      bitmap = "art/gui/hudfill.png";
+      wrap = "0";
 
       new GuiMLTextCtrl(CenterPrintText) {
-         lineSpacing = "2";
-         allowColorChars = "0";
-         maxChars = "-1";
-         useURLMouseCursor = "0";
+         canSaveDynamicFields = "0";
          isContainer = "0";
          Profile = "CenterPrintTextProfile";
          HorizSizing = "center";
@@ -57,12 +53,14 @@
          Visible = "1";
          tooltipprofile = "GuiToolTipProfile";
          hovertime = "1000";
-         canSaveDynamicFields = "0";
+         lineSpacing = "2";
+         allowColorChars = "0";
+         maxChars = "-1";
+         useURLMouseCursor = "0";
       };
    };
    new GuiBitmapCtrl(BottomPrintDlg) {
-      bitmap = "art/gui/hudfill.png";
-      wrap = "0";
+      canSaveDynamicFields = "0";
       isContainer = "0";
       Profile = "CenterPrintProfile";
       HorizSizing = "center";
@@ -74,13 +72,11 @@
       Visible = "0";
       tooltipprofile = "GuiToolTipProfile";
       hovertime = "1000";
-      canSaveDynamicFields = "0";
+      bitmap = "art/gui/hudfill.png";
+      wrap = "0";
 
       new GuiMLTextCtrl(BottomPrintText) {
-         lineSpacing = "2";
-         allowColorChars = "0";
-         maxChars = "-1";
-         useURLMouseCursor = "0";
+         canSaveDynamicFields = "0";
          isContainer = "0";
          Profile = "CenterPrintTextProfile";
          HorizSizing = "center";
@@ -92,7 +88,10 @@
          Visible = "1";
          tooltipprofile = "GuiToolTipProfile";
          hovertime = "1000";
-         canSaveDynamicFields = "0";
+         lineSpacing = "2";
+         allowColorChars = "0";
+         maxChars = "-1";
+         useURLMouseCursor = "0";
       };
    };
    new GuiBitmapCtrl(LagIcon) {
@@ -121,10 +120,10 @@
       distanceFade = "0.1";
       isContainer = "0";
       Profile = "GuiModelessDialogProfile";
-      HorizSizing = "width";
-      VertSizing = "height";
+      HorizSizing = "center";
+      VertSizing = "center";
       position = "0 0";
-      Extent = "1024 768";
+      Extent = "653 485";
       MinExtent = "8 8";
       canSave = "1";
       Visible = "1";
@@ -152,7 +151,7 @@
       hovertime = "1000";
       canSaveDynamicFields = "0";
    };
-   new GuiCrossHairHud(ZoomReticle) {
+   new GuiCrossHairHud(zoomReticle) {
       damageFillColor = "0 1 0 1";
       damageFrameColor = "1 0.6 0 1";
       damageRect = "50 4";
@@ -161,8 +160,8 @@
       wrap = "0";
       isContainer = "0";
       Profile = "GuiModelessDialogProfile";
-      HorizSizing = "width";
-      VertSizing = "height";
+      HorizSizing = "relative";
+      VertSizing = "relative";
       position = "0 0";
       Extent = "1024 768";
       MinExtent = "8 8";
@@ -172,13 +171,13 @@
       hovertime = "1000";
       canSaveDynamicFields = "0";
    };
-   new GuiBitmapBorderCtrl(WeaponHUD) {
+   new GuiBitmapBorderCtrl(HealthHUD) {
       isContainer = "0";
       Profile = "ChatHudBorderProfile";
       HorizSizing = "right";
       VertSizing = "top";
-      position = "78 693";
-      Extent = "124 72";
+      position = "6 693";
+      Extent = "72 72";
       MinExtent = "8 8";
       canSave = "1";
       Visible = "1";
@@ -194,7 +193,7 @@
          HorizSizing = "width";
          VertSizing = "height";
          position = "8 8";
-         Extent = "108 56";
+         Extent = "56 56";
          MinExtent = "8 8";
          canSave = "1";
          Visible = "1";
@@ -202,23 +201,7 @@
          hovertime = "1000";
          canSaveDynamicFields = "0";
       };
-      new GuiBitmapCtrl(PreviewImage) {
-         bitmap = "art/gui/weaponHud/blank.png";
-         wrap = "0";
-         isContainer = "0";
-         Profile = "GuiDefaultProfile";
-         HorizSizing = "width";
-         VertSizing = "height";
-         position = "8 8";
-         Extent = "108 56";
-         MinExtent = "8 2";
-         canSave = "1";
-         Visible = "1";
-         tooltipprofile = "GuiToolTipProfile";
-         hovertime = "1000";
-         canSaveDynamicFields = "0";
-      };
-      new GuiTextCtrl(AmmoAmount) {
+      new GuiTextCtrl(numericalHealthHUD) {
          maxLength = "255";
          Margin = "0 0 0 0";
          Padding = "0 0 0 0";
@@ -227,11 +210,11 @@
          AnchorLeft = "0";
          AnchorRight = "0";
          isContainer = "0";
-         Profile = "HudTextItalicProfile";
-         HorizSizing = "right";
-         VertSizing = "top";
-         position = "40 8";
-         Extent = "120 16";
+         Profile = "NumericHealthProfile";
+         HorizSizing = "center";
+         VertSizing = "center";
+         position = "0 22";
+         Extent = "72 32";
          MinExtent = "8 8";
          canSave = "1";
          Visible = "1";
@@ -240,142 +223,125 @@
          canSaveDynamicFields = "0";
       };
    };
-   new GuiHealthTextHud() {
-      fillColor = "0 0 0 0.65";
-      frameColor = "0 0 0 1";
-      textColor = "1 1 1 1";
-      warningColor = "1 0 0 1";
-      showFill = "1";
-      showFrame = "1";
-      showTrueValue = "0";
-      showEnergy = "0";
-      warnThreshold = "25";
-      pulseThreshold = "15";
-      pulseRate = "750";
-      position = "5 693";
-      extent = "72 72";
-      minExtent = "8 2";
-      horizSizing = "right";
-      vertSizing = "top";
-      profile = "GuiBigTextProfile";
-      visible = "1";
-      active = "1";
-      tooltipProfile = "GuiToolTipProfile";
-      hovertime = "1000";
+   new GuiBitmapCtrl(OOBSign) {
+      bitmap = "art/gui/playHud/missionAreaWarning.png";
+      wrap = "0";
       isContainer = "0";
+      Profile = "GuiDefaultProfile";
+      HorizSizing = "right";
+      VertSizing = "top";
+      position = "512 693";
+      Extent = "64 64";
+      MinExtent = "8 8";
       canSave = "1";
+      Visible = "0";
+      tooltipprofile = "GuiToolTipProfile";
+      hovertime = "1000";
       canSaveDynamicFields = "0";
    };
-   new GuiControl(DamageHUD) {
-      position = "384 256";
-      extent = "256 256";
-      minExtent = "8 2";
-      horizSizing = "center";
-      vertSizing = "center";
-      profile = "GuiDefaultProfile";
-      visible = "1";
-      active = "1";
-      tooltipProfile = "GuiToolTipProfile";
-      hovertime = "1000";
-      isContainer = "1";
-      canSave = "1";
+   
+   //Ubiq: tutorial/feature/credit notes
+   new GuiBitmapCtrl(tutorialHUD) {
       canSaveDynamicFields = "0";
-
-      new GuiBitmapCtrl() {
-         bitmap = "art/gui/damageFront.png";
-         wrap = "0";
-         position = "0 0";
-         extent = "256 32";
-         minExtent = "8 2";
-         horizSizing = "right";
-         vertSizing = "bottom";
-         profile = "GuiDefaultProfile";
-         visible = "0";
-         active = "1";
-         tooltipProfile = "GuiToolTipProfile";
-         hovertime = "1000";
-         isContainer = "0";
-         internalName = "Damage_Front";
-         hidden = "1";
-         canSave = "1";
-         canSaveDynamicFields = "0";
-      };
-      new GuiBitmapCtrl() {
-         bitmap = "art/gui/damageTop.png";
-         wrap = "0";
-         position = "0 0";
-         extent = "256 32";
-         minExtent = "8 2";
-         horizSizing = "right";
-         vertSizing = "bottom";
-         profile = "GuiDefaultProfile";
-         visible = "0";
-         active = "1";
-         tooltipProfile = "GuiToolTipProfile";
-         hovertime = "1000";
-         isContainer = "0";
-         internalName = "Damage_Top";
-         hidden = "1";
-         canSave = "1";
-         canSaveDynamicFields = "0";
-      };
-      new GuiBitmapCtrl() {
-         bitmap = "art/gui/damageBottom.png";
-         wrap = "0";
-         position = "0 224";
-         extent = "256 32";
-         minExtent = "8 2";
-         horizSizing = "right";
-         vertSizing = "bottom";
-         profile = "GuiDefaultProfile";
-         visible = "0";
-         active = "1";
-         tooltipProfile = "GuiToolTipProfile";
-         hovertime = "1000";
-         isContainer = "0";
-         internalName = "Damage_Bottom";
-         hidden = "1";
-         canSave = "1";
-         canSaveDynamicFields = "0";
-      };
-      new GuiBitmapCtrl() {
-         bitmap = "art/gui/damageLeft.png";
-         wrap = "0";
-         position = "0 0";
-         extent = "32 256";
-         minExtent = "8 2";
-         horizSizing = "right";
-         vertSizing = "bottom";
-         profile = "GuiDefaultProfile";
-         visible = "0";
-         active = "1";
-         tooltipProfile = "GuiToolTipProfile";
-         hovertime = "1000";
-         isContainer = "0";
-         internalName = "Damage_Left";
-         hidden = "1";
-         canSave = "1";
-         canSaveDynamicFields = "0";
-      };
-      new GuiBitmapCtrl() {
-         bitmap = "art/gui/damageRight.png";
-         wrap = "0";
-         position = "224 0";
-         extent = "32 256";
-         minExtent = "8 2";
-         horizSizing = "right";
-         vertSizing = "bottom";
-         profile = "GuiDefaultProfile";
-         visible = "0";
-         active = "1";
-         tooltipProfile = "GuiToolTipProfile";
-         hovertime = "1000";
-         isContainer = "0";
-         internalName = "Damage_Right";
-         hidden = "1";
-         canSave = "1";
-         canSaveDynamicFields = "0";
-      };
+      Enabled = "1";
+      isContainer = "0";
+      Profile = "GuiDefaultProfile";
+      HorizSizing = "center";
+      VertSizing = "top";
+      position = "256 654";
+      Extent = "512 64";
+      MinExtent = "8 2";
+      canSave = "0";
+      Visible = "0";
+      hovertime = "1000";
+      bitmap = "art/gui/tutorial/blank.png";
+      wrap = "0";
+   };
+   new GuiBitmapCtrl(welcomeHUD) {
+      canSaveDynamicFields = "0";
+      Enabled = "1";
+      isContainer = "0";
+      Profile = "GuiDefaultProfile";
+      HorizSizing = "center";
+      VertSizing = "bottom";
+      position = "256 47";
+      Extent = "512 128";
+      MinExtent = "512 128";
+      canSave = "0";
+      Visible = "0";
+      hovertime = "1000";
+      bitmap = "art/gui/tutorial/blank.png";
+      wrap = "0";
+   };
+   new GuiBitmapCtrl(featureHUD) {
+      canSaveDynamicFields = "0";
+      Enabled = "1";
+      isContainer = "0";
+      Profile = "GuiDefaultProfile";
+      HorizSizing = "left";
+      VertSizing = "bottom";
+      position = "477 48";
+      Extent = "512 128";
+      MinExtent = "512 128";
+      canSave = "0";
+      Visible = "1";
+      hovertime = "1000";
+      bitmap = "art/gui/tutorial/blank.png";
+      wrap = "0";
+   };
+   new GuiIdleCamFadeBitmapCtrl(creditsOverlayHUD) {
+      canSaveDynamicFields = "0";
+      Enabled = "1";
+      isContainer = "0";
+      Profile = "GuiDefaultProfile";
+      HorizSizing = "width";
+      VertSizing = "height";
+      position = "0 0";
+      Extent = "1680 1050";
+      MinExtent = "640 480";
+      canSave = "0";
+      Visible = "1";
+      hovertime = "1000";
+      bitmap = "art/gui/credits/credits_overlay100.png";
+	  fadeInTime = "1000";
+	  fadeOutTime = "1000";
+      wrap = "0";
+   };
+   new GuiIdleCamFadeBitmapCtrl(creditsTextHUD) {
+      canSaveDynamicFields = "0";
+      Enabled = "1";
+      isContainer = "0";
+      Profile = "GuiDefaultProfile";
+      HorizSizing = "center";
+      VertSizing = "center";
+      position = "209 161";
+      Extent = "605 445";
+      MinExtent = "605 445";
+      canSave = "0";
+      Visible = "1";
+      hovertime = "1000";
+      bitmap = "art/gui/credits/credits_text100.png";
+	  fadeInTime = "1000";
+	  fadeOutTime = "1000";
+      wrap = "0";
+   };
+   new GuiIdleCamFadeBitmapCtrl(creditsThxHUD) {
+      canSaveDynamicFields = "0";
+      Enabled = "1";
+      isContainer = "0";
+      Profile = "GuiDefaultProfile";
+      HorizSizing = "right";
+      VertSizing = "bottom";
+      position = "17 17";
+      Extent = "206 41";
+      MinExtent = "206 41";
+      canSave = "0";
+      Visible = "1";
+      hovertime = "1000";
+      bitmap = "art/gui/credits/credits_thx100.png";
+	  fadeInTime = "1000";
+	  fadeOutTime = "1000";
+      wrap = "0";
    };
 };
 //--- OBJECT WRITE END ---

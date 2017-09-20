@@ -35,14 +35,14 @@ singleton SFXDescription( AudioDefault3D : AudioEffect )
 {
    is3D              = true;
    ReferenceDistance = 20.0;
-   MaxDistance       = 100.0;
+   MaxDistance       = 100000.0;
 };
 
 singleton SFXDescription( AudioSoft3D : AudioEffect )
 {
    is3D              = true;
    ReferenceDistance = 20.0;
-   MaxDistance       = 100.0;
+   MaxDistance       = 100000.0;
    volume = 0.4;
 };
 
@@ -50,14 +50,14 @@ singleton SFXDescription( AudioClose3D : AudioEffect )
 {
    is3D              = true;
    ReferenceDistance = 10.0;
-   MaxDistance       = 60.0;
+   MaxDistance       = 100000.0;
 };
 
 singleton SFXDescription( AudioClosest3D : AudioEffect )
 {
    is3D              = true;
    ReferenceDistance = 5.0;
-   MaxDistance       = 10.0;
+   MaxDistance       = 100000.0;
 };
 
 //-----------------------------------------------------------------------------
@@ -69,15 +69,22 @@ singleton SFXDescription( AudioDefaultLoop3D : AudioEffect )
    isLooping         = true;
    is3D              = true;
    ReferenceDistance = 20.0;
-   MaxDistance       = 100.0;
+   MaxDistance       = 100000.0;
 };
 
 singleton SFXDescription( AudioCloseLoop3D : AudioEffect )
 {
    isLooping         = true;
    is3D              = true;
-   ReferenceDistance = 18.0;
-   MaxDistance       = 25.0;
+   ReferenceDistance = 10.0;
+   MaxDistance       = 100000.0;
+};
+
+//Ubiq:
+singleton SFXDescription( AudioCloseLoop3D_FadeIn : AudioCloseLoop3D )
+{
+   fadeInTime = 0.3;
+   fadeLoops = false;
 };
 
 singleton SFXDescription( AudioClosestLoop3D : AudioEffect )
@@ -85,7 +92,7 @@ singleton SFXDescription( AudioClosestLoop3D : AudioEffect )
    isLooping         = true;
    is3D              = true;
    ReferenceDistance = 5.0;
-   MaxDistance       = 10.0;
+   MaxDistance       = 100000.0;
 };
 
 //-----------------------------------------------------------------------------

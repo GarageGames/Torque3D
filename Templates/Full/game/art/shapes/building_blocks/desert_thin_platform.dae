@@ -1,0 +1,315 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>16/05/2013 10:44:14 PM</created>
+        <modified>16/05/2013 10:44:14 PM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_SQUARE-Diffuse" name="DESERT_BRICK_SQUARE-Diffuse">
+            <init_from>DESERT_BRICK_SQUARE.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+        <material id="DESERT_BRICK_SQUARE" name="DESERT_BRICK_SQUARE">
+            <instance_effect url="#DESERT_BRICK_SQUARE-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_SQUARE-fx" name="DESERT_BRICK_SQUARE-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_SQUARE-Surface"><surface type="2D"><init_from>DESERT_BRICK_SQUARE-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_SQUARE-Sampler"><sampler2D><source>DESERT_BRICK_SQUARE-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_SQUARE-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="desert_thin_platform-lib" name="desert_thin_platformMesh">
+            <mesh>
+                <source id="desert_thin_platform-Position">
+                    <float_array count="78" id="desert_thin_platform-Position-array">
+                        1.0007 -0.8792 0.0416
+                        1.0007 -0.8792 -0.1212
+                        1.0007 -0.8817 0.0416
+                        1.0007 -0.8817 -0.1212
+                        0.9469 -1.0179 0.0416
+                        0.9469 -1.0179 -0.1212
+                        0.8178 -1.0821 0.0416
+                        0.8178 -1.0821 -0.1212
+                        0.8178 -0.8792 0.0416
+                        0.8178 -0.8792 -0.1212
+                        1.0007 0.8980 0.0416
+                        1.0007 0.8980 -0.1212
+                        0.8178 0.8980 -0.1212
+                        0.8178 0.8980 0.0416
+                        0.9496 1.0309 -0.1212
+                        0.9496 1.0309 0.0416
+                        0.8178 1.0821 -0.1212
+                        0.8178 1.0821 0.0416
+                        -0.8418 0.8980 0.0416
+                        -0.8418 -0.8792 0.0416
+                        -0.8418 -0.8792 -0.1212
+                        -0.8418 0.8980 -0.1212
+                        -0.8419 -1.0821 0.0416
+                        -0.8419 -1.0821 -0.1212
+                        -0.8419 1.0821 -0.1212
+                        -0.8419 1.0821 0.0416
+                    </float_array>
+                    <technique_common>
+                        <accessor count="26" source="#desert_thin_platform-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="desert_thin_platform-Normal">
+                    <float_array count="33" id="desert_thin_platform-Normal-array">
+                        1.0000 0.0000 0.0000
+                        0.8500 -0.5268 -0.0000
+                        0.2285 -0.9735 -0.0000
+                        0.0000 0.0000 1.0000
+                        0.0000 0.0000 -1.0000
+                        0.9832 0.1823 0.0000
+                        0.7084 0.7058 0.0000
+                        0.1841 0.9829 -0.0000
+                        -1.0000 0.0000 0.0000
+                        -0.0000 -1.0000 -0.0000
+                        0.0000 1.0000 0.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="11" source="#desert_thin_platform-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="desert_thin_platform-UV0">
+                    <float_array count="168" id="desert_thin_platform-UV0-array">
+                        -1.3424 -0.7490
+                        -1.3424 -1.0008
+                        -1.3450 -0.7490
+                        -1.3450 -1.0008
+                        -1.5083 -0.7490
+                        -1.5083 -1.0008
+                        -1.6805 -0.7490
+                        -1.6805 -1.0009
+                        1.2272 -1.0124
+                        1.1101 -1.0119
+                        1.2270 -0.7593
+                        1.3273 -1.0122
+                        1.3288 -1.0108
+                        1.2187 -1.0113
+                        1.2287 -0.7603
+                        1.1126 -1.0112
+                        1.3343 -1.0106
+                        1.3330 -1.0119
+                        1.0137 -0.7580
+                        1.0136 -0.9925
+                        -1.2306 -0.7580
+                        -1.2306 -0.9925
+                        -1.8923 -0.9887
+                        0.3401 -0.9899
+                        -1.8918 -0.7581
+                        0.3406 -0.7592
+                        -1.8959 -0.9913
+                        -1.8957 -0.7527
+                        0.3479 -0.9918
+                        0.3481 -0.7532
+                        1.2819 -1.0008
+                        1.2819 -0.7459
+                        1.4465 -1.0008
+                        1.4464 -0.7459
+                        1.1119 -1.0123
+                        1.2265 -0.7567
+                        1.2242 -1.0124
+                        1.1257 -0.7459
+                        1.1257 -1.0008
+                        1.3285 -1.0106
+                        1.2265 -0.7570
+                        1.2164 -1.0108
+                        1.3335 -1.0125
+                        1.1113 -1.0097
+                        -0.6415 -0.2437
+                        1.7507 -0.2437
+                        -0.6415 -2.7563
+                        1.7507 -2.7563
+                        2.2418 0.2424
+                        2.2417 0.5023
+                        -0.2471 0.2424
+                        -0.2472 0.5022
+                        -3.7779 -0.7562
+                        -1.6805 -0.7562
+                        -3.7780 -0.9987
+                        -1.6805 -0.9987
+                        -1.6775 -0.7507
+                        0.4437 -0.7507
+                        -1.6775 -0.9976
+                        0.4437 -0.9976
+                        -1.8957 -0.9973
+                        0.2241 -0.9973
+                        -1.8956 -0.7565
+                        0.2241 -0.7565
+                        1.9000 -1.2495
+                        1.8968 -1.0034
+                        1.5493 -1.2489
+                        1.5462 -1.0027
+                        3.5439 -0.9931
+                        1.4465 -0.9932
+                        3.5439 -0.7540
+                        1.4464 -0.7540
+                        -1.8809 -0.9890
+                        0.2241 -0.9890
+                        -1.8809 -0.7537
+                        0.2241 -0.7537
+                        -0.9999 -1.2591
+                        -0.6589 -1.2598
+                        -1.0031 -1.0018
+                        -0.6620 -1.0025
+                        -1.8907 -0.7490
+                        0.2265 -0.7490
+                        -1.8906 -0.9905
+                        0.2265 -0.9905
+</float_array>
+                    <technique_common>
+                        <accessor count="84" source="#desert_thin_platform-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="desert_thin_platform-Vertex">
+                    <input semantic="POSITION" source="#desert_thin_platform-Position" />
+                </vertices>
+                <triangles count="42" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#desert_thin_platform-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#desert_thin_platform-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#desert_thin_platform-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        5 1 5 3 0 3 0 0 0
+                        4 1 4 5 1 5 0 0 0
+                        2 0 2 4 1 4 0 0 0
+                        7 2 7 5 1 5 4 1 4
+                        6 2 6 7 2 7 4 1 4
+                        8 3 10 6 3 9 4 3 8
+                        9 4 14 1 4 12 3 4 11
+                        5 4 13 9 4 14 3 4 11
+                        7 4 15 9 4 14 5 4 13
+                        4 3 8 2 3 17 0 3 16
+                        8 3 10 4 3 8 0 3 16
+                        1 0 21 11 5 19 10 5 18
+                        0 0 20 1 0 21 10 5 18
+                        12 4 25 11 4 23 1 4 22
+                        9 4 24 12 4 25 1 4 22
+                        13 3 29 8 3 27 0 3 26
+                        10 3 28 13 3 29 0 3 26
+                        17 7 33 15 6 31 14 6 30
+                        16 7 32 17 7 33 14 6 30
+                        15 3 36 13 3 35 10 3 34
+                        11 5 38 14 6 30 15 6 31
+                        10 5 37 11 5 38 15 6 31
+                        14 4 41 12 4 40 16 4 39
+                        17 3 42 13 3 35 15 3 36
+                        11 4 43 12 4 40 14 4 41
+                        7 2 55 6 2 53 22 9 52
+                        23 9 54 7 2 55 22 9 52
+                        6 3 59 8 3 57 19 3 56
+                        22 3 58 6 3 59 19 3 56
+                        9 4 63 7 4 61 23 4 60
+                        20 4 62 9 4 63 23 4 60
+                        20 8 67 23 8 65 22 8 64
+                        19 8 66 20 8 67 22 8 64
+                        17 7 71 16 7 69 24 10 68
+                        25 10 70 17 7 71 24 10 68
+                        16 4 75 12 4 73 21 4 72
+                        24 4 74 16 4 75 21 4 72
+                        21 8 79 18 8 77 25 8 76
+                        24 8 78 21 8 79 25 8 76
+                        13 3 83 17 3 81 25 3 80
+                        18 3 82 13 3 83 25 3 80
+                    </p>
+                </triangles>
+                <triangles count="6" material="DESERT_BRICK_SQUARE">
+                    <input offset="0" semantic="VERTEX" source="#desert_thin_platform-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#desert_thin_platform-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#desert_thin_platform-UV0" />
+                    <p>
+                        8 3 47 13 3 45 18 3 44
+                        19 3 46 8 3 47 18 3 44
+                        12 4 45 9 4 47 20 4 46
+                        21 4 44 12 4 45 20 4 46
+                        21 8 51 20 8 49 19 8 48
+                        18 8 50 21 8 51 19 8 48
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="desert_thin_platform" name="desert_thin_platform">
+                <instance_geometry url="#desert_thin_platform-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                            <instance_material symbol="DESERT_BRICK_SQUARE" target="#DESERT_BRICK_SQUARE" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

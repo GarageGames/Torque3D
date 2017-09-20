@@ -73,14 +73,9 @@ function initClient()
 
    // Load up the Game GUIs
    exec("art/gui/playGui.gui");
-   exec("art/gui/chatHud.gui");
-   exec("art/gui/playerList.gui");
-   exec("art/gui/hudlessGui.gui");
 
    // Load up the shell GUIs
    exec("art/gui/mainMenuGui.gui");
-   exec("art/gui/joinServerDlg.gui");
-   exec("art/gui/endGameGui.gui");
    exec("art/gui/StartupGui.gui");
    exec("art/gui/chooseLevelDlg.gui");
    exec("art/gui/loadingGui.gui");
@@ -88,9 +83,6 @@ function initClient()
    exec("art/gui/remapDlg.gui");
    
    // Gui scripts
-   exec("./playerList.cs");
-   exec("./chatHud.cs");
-   exec("./messageHud.cs");
    exec("scripts/gui/playGui.cs");
    exec("scripts/gui/startupGui.cs");
    exec("scripts/gui/chooseLevelDlg.cs");
@@ -99,12 +91,14 @@ function initClient()
 
    // Client scripts
    exec("./client.cs");
-   exec("./game.cs");
    exec("./missionDownload.cs");
    exec("./serverConnection.cs");
 
    // Load useful Materials
    exec("./shaders.cs");
+
+   // Ubiq: Load sound profiles
+   exec("art/sound/player/sounds.cs");
 
    // Default player key bindings
    exec("./default.bind.cs");

@@ -105,7 +105,7 @@ TSStatic::TSStatic()
    mPlayAmbient      = true;
    mAmbientThread    = NULL;
 
-   mAllowPlayerStep = false;
+   mAllowPlayerStep = true;	//Ubiq: default on
 
    mConvexList = new Convex;
 

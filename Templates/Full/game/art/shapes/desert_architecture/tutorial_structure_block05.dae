@@ -1,0 +1,586 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:03 AM</created>
+        <modified>15/05/2013 2:11:03 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_SQUARE_SANDY-Diffuse" name="DESERT_BRICK_SQUARE_SANDY-Diffuse">
+            <init_from>DESERT_BRICK_SQUARE_SANDY.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_BEVEL_TRIM-Diffuse" name="DESERT_BRICK_BEVEL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_BEVEL_TRIM.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+        <material id="DESERT_BRICK_SQUARE_SANDY" name="DESERT_BRICK_SQUARE_SANDY">
+            <instance_effect url="#DESERT_BRICK_SQUARE_SANDY-fx" />
+        </material>
+        <material id="DESERT_BRICK_BEVEL_TRIM" name="DESERT_BRICK_BEVEL_TRIM">
+            <instance_effect url="#DESERT_BRICK_BEVEL_TRIM-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_SQUARE_SANDY-fx" name="DESERT_BRICK_SQUARE_SANDY-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_SQUARE_SANDY-Surface"><surface type="2D"><init_from>DESERT_BRICK_SQUARE_SANDY-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_SQUARE_SANDY-Sampler"><sampler2D><source>DESERT_BRICK_SQUARE_SANDY-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_SQUARE_SANDY-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_BEVEL_TRIM-fx" name="DESERT_BRICK_BEVEL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_BEVEL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_BEVEL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_BEVEL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_BEVEL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_BEVEL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="tutorial_structure_block05-lib" name="tutorial_structure_block05Mesh">
+            <mesh>
+                <source id="tutorial_structure_block05-Position">
+                    <float_array count="288" id="tutorial_structure_block05-Position-array">
+                        -39.0635 -65.8867 22.1312
+                        -39.0635 -65.1446 22.1312
+                        -49.8411 -65.8867 22.1312
+                        -49.8411 -65.1446 22.1312
+                        -49.8411 -65.8867 22.9090
+                        -39.0635 -65.8867 22.9090
+                        -50.5833 -65.8867 22.9090
+                        -50.5833 -65.1446 22.9090
+                        -50.5833 -65.8867 25.0138
+                        -50.5833 -65.1446 25.0138
+                        -49.8411 -65.8867 25.0138
+                        -44.5069 -65.8867 22.9090
+                        -44.5069 -65.8867 25.0138
+                        -39.0635 -65.8867 25.7916
+                        -39.0635 -65.8867 25.0138
+                        -49.8411 -65.8867 25.7916
+                        -43.7648 -65.8867 25.0138
+                        -43.7648 -65.8867 22.9090
+                        -38.3215 -65.8867 25.0138
+                        -38.3215 -65.1446 25.0138
+                        -38.3215 -65.8867 22.9090
+                        -38.3215 -65.1446 22.9090
+                        -38.3215 -59.1360 22.9090
+                        -39.0635 -59.1360 22.9090
+                        -38.3215 -59.1360 22.1312
+                        -39.0635 -59.1360 22.1312
+                        -38.3215 -65.8867 22.1312
+                        -38.3215 -59.8781 25.0138
+                        -38.3215 -59.1360 25.0138
+                        -38.3215 -59.8781 22.9090
+                        -39.0635 -59.1360 25.0138
+                        -38.3215 -59.1360 25.7916
+                        -39.0635 -59.1360 25.7916
+                        -38.3215 -65.8867 25.7916
+                        -50.5833 -59.8781 22.9090
+                        -50.5833 -59.8781 25.0138
+                        -38.0615 -59.8781 25.7916
+                        -38.0615 -65.8867 25.7916
+                        -38.0615 -59.5454 25.7916
+                        -38.0615 -65.8867 26.0231
+                        -38.0615 -59.5454 26.0231
+                        -38.3215 -59.8781 25.7916
+                        -38.0615 -65.1446 25.7916
+                        -38.3215 -59.5454 25.7916
+                        -38.0615 -59.8781 26.0231
+                        -38.7426 -65.8867 26.0231
+                        -38.7426 -59.5454 26.0231
+                        -38.7426 -65.8867 25.7916
+                        -38.7426 -59.8781 26.0231
+                        -50.1699 -65.8867 26.0231
+                        -50.1699 -59.5454 26.0231
+                        -50.1699 -65.8867 25.7916
+                        -38.7426 -59.1360 25.7916
+                        -38.7426 -58.8690 25.7916
+                        -50.1699 -59.1352 25.7916
+                        -50.1699 -58.8690 25.7916
+                        -50.1699 -58.8690 26.0231
+                        -38.7426 -58.8690 26.0231
+                        -50.8510 -59.8781 25.7916
+                        -50.8510 -65.8867 25.7916
+                        -50.8510 -59.5454 25.7916
+                        -50.5833 -65.8867 25.7916
+                        -50.5833 -59.5454 25.7916
+                        -50.8510 -65.8867 26.0231
+                        -50.8510 -59.5454 26.0231
+                        -50.1699 -59.8781 26.0231
+                        -50.8510 -59.8781 26.0231
+                        -49.8411 -59.1360 25.0138
+                        -49.8411 -59.1360 25.7916
+                        -39.0635 -59.8781 22.1312
+                        -49.8411 -59.8781 22.1312
+                        -49.8411 -59.1360 22.1312
+                        -49.8411 -59.1360 22.9090
+                        -43.7648 -59.1360 22.9090
+                        -43.7648 -59.1360 25.0138
+                        -44.5069 -59.1360 25.0138
+                        -44.5069 -59.1360 22.9090
+                        -50.5833 -59.1360 25.0138
+                        -50.5833 -59.1360 22.9090
+                        -50.5833 -59.1360 25.7916
+                        -50.5833 -65.8867 22.1312
+                        -50.5833 -59.1360 22.1312
+                        -50.8092 -59.2982 25.7916
+                        -50.8092 -59.2982 26.0231
+                        -50.4522 -58.9171 26.0231
+                        -50.6616 -59.0576 26.0231
+                        -50.6616 -59.0576 25.7916
+                        -50.4522 -58.9171 25.7916
+                        -50.1699 -59.5454 25.7916
+                        -38.4954 -58.9061 25.7916
+                        -38.4954 -58.9061 26.0231
+                        -38.1141 -59.2631 26.0231
+                        -38.2549 -59.0537 26.0231
+                        -38.2549 -59.0537 25.7916
+                        -38.1141 -59.2631 25.7916
+                        -38.7426 -59.5454 25.7916
+                    </float_array>
+                    <technique_common>
+                        <accessor count="96" source="#tutorial_structure_block05-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_block05-Normal">
+                    <float_array count="48" id="tutorial_structure_block05-Normal-array">
+                        -0.0000 -0.0000 -1.0000
+                        -0.0000 -1.0000 -0.0000
+                        -1.0000 -0.0000 -0.0000
+                        1.0000 -0.0000 0.0000
+                        0.0000 1.0000 0.0000
+                        0.0000 0.0000 1.0000
+                        -0.9363 0.3512 0.0000
+                        -0.9861 0.1664 0.0000
+                        -0.7213 0.6926 0.0000
+                        -0.3707 0.9287 0.0000
+                        -0.1678 0.9858 0.0000
+                        0.3425 0.9395 0.0000
+                        0.1481 0.9890 0.0000
+                        0.6923 0.7216 0.0000
+                        0.9257 0.3784 0.0000
+                        0.9831 0.1832 0.0000
+                    </float_array>
+                    <technique_common>
+                        <accessor count="16" source="#tutorial_structure_block05-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_block05-UV0">
+                    <float_array count="310" id="tutorial_structure_block05-UV0-array">
+                        -4.0028 -2.2518
+                        -4.0028 -1.9977
+                        -0.8880 -2.2518
+                        -0.8881 -1.9977
+                        -0.8880 -1.5014
+                        -4.0028 -1.5023
+                        -0.8880 -1.2506
+                        -4.0028 -1.2515
+                        0.4377 -5.2517
+                        0.4377 -4.9970
+                        1.1096 -5.2516
+                        1.1096 -4.9968
+                        1.1097 -5.2512
+                        1.1095 -5.5032
+                        0.4375 -5.2513
+                        0.4374 -5.5032
+                        0.3988 -0.3997
+                        0.6371 -0.3997
+                        0.3988 -1.0038
+                        0.6371 -1.0038
+                        -0.8942 -1.5013
+                        -0.8942 -1.2506
+                        1.1097 -4.4967
+                        1.1095 -4.7481
+                        0.4379 -4.4966
+                        0.4378 -4.7479
+                        1.1097 -5.2513
+                        0.4375 -5.2514
+                        0.3988 -0.4669
+                        0.6371 -0.4669
+                        0.3286 -1.7500
+                        0.5543 -1.7500
+                        0.3286 -2.0000
+                        0.5543 -2.0000
+                        -3.0083 -1.9977
+                        -3.0083 -2.2517
+                        -0.8879 -1.7488
+                        -3.0083 -1.7494
+                        -3.0083 -1.9984
+                        0.3286 -1.2500
+                        0.5543 -1.2500
+                        0.3286 -1.5000
+                        0.5543 -1.5000
+                        1.1097 -4.7476
+                        3.4338 -0.9931
+                        1.4464 -0.9931
+                        3.5438 -0.9931
+                        1.4463 -0.7540
+                        3.5438 -0.7540
+                        0.2240 -0.8435
+                        0.2240 -0.7537
+                        -1.7705 -0.8435
+                        -0.0223 -0.7537
+                        -1.8810 -0.8435
+                        -1.8810 -0.7537
+                        -1.7797 -0.7490
+                        0.2264 -0.7490
+                        -1.8908 -0.7490
+                        0.2264 -0.9905
+                        -1.8908 -0.9905
+                        0.5521 -1.5024
+                        0.5524 -1.7501
+                        0.4476 -1.5027
+                        0.4479 -1.7503
+                        -1.9392 -4.4344
+                        -1.9390 -3.8017
+                        -1.9392 -4.4694
+                        -0.7320 -3.8017
+                        -0.7322 -4.4694
+                        -1.9389 -3.7743
+                        -0.7319 -3.7743
+                        -1.0086 0.9088
+                        -1.0086 1.0110
+                        1.9975 0.9091
+                        1.9975 1.0110
+                        1.9974 0.2496
+                        -1.0087 0.2496
+                        1.9974 0.5012
+                        -1.0087 0.5012
+                        1.9974 0.0056
+                        -1.0087 0.0056
+                        -1.7705 -0.9890
+                        0.2241 -0.9890
+                        -1.8809 -0.9890
+                        0.2241 -0.8965
+                        -1.8809 -0.8965
+                        0.5551 -1.7520
+                        0.4451 -1.7524
+                        0.5549 -1.5002
+                        0.4449 -1.5007
+                        -1.8911 -0.5047
+                        0.2271 -0.5047
+                        -1.8911 -0.7659
+                        0.2271 -0.7659
+                        0.1160 -0.7659
+                        -4.0083 -1.9984
+                        -4.0083 -1.7494
+                        -0.8942 -1.9978
+                        -0.8942 -1.7488
+                        -3.5564 -2.2518
+                        -3.5564 -1.9977
+                        -3.5565 -1.9984
+                        -3.5565 -1.7495
+                        -0.8881 -1.7489
+                        -3.0028 -1.7494
+                        -3.0028 -1.9984
+                        -3.0029 -1.9977
+                        -3.0029 -2.2518
+                        -0.8879 -1.9978
+                        0.2684 -0.1466
+                        0.7971 -0.1466
+                        0.2684 -1.2569
+                        0.7971 -1.2569
+                        1.4451 -1.0009
+                        1.4451 -0.7483
+                        1.5586 -1.0009
+                        1.5586 -0.7483
+                        0.8647 -1.5858
+                        0.0229 -1.9649
+                        0.6852 -1.3263
+                        1.3339 -0.7483
+                        1.3340 -1.0009
+                        1.2212 -0.7483
+                        1.2212 -1.0009
+                        0.0368 -1.0453
+                        0.0233 -1.9648
+                        0.3709 -1.1075
+                        0.9669 -1.9552
+                        1.1107 -0.7483
+                        1.1107 -1.0008
+                        0.6855 -1.3262
+                        0.3708 -1.1075
+                        0.0232 -1.9647
+                        1.4451 -1.0007
+                        1.4450 -0.7482
+                        1.5586 -1.0007
+                        1.5585 -0.7482
+                        0.8650 -1.5862
+                        0.0230 -1.9654
+                        0.6852 -1.3268
+                        1.2211 -0.7483
+                        1.2211 -1.0009
+                        0.0365 -1.0463
+                        0.0231 -1.9657
+                        0.3706 -1.1084
+                        0.9672 -1.9557
+                        1.2210 -0.7481
+                        1.2210 -1.0007
+                        1.1105 -0.7481
+                        1.1105 -1.0007
+                        0.6853 -1.3265
+                        0.0230 -1.9651
+                        0.3706 -1.1078
+                        1.3339 -1.0008
+                        1.3339 -0.7482
+</float_array>
+                    <technique_common>
+                        <accessor count="155" source="#tutorial_structure_block05-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="tutorial_structure_block05-Vertex">
+                    <input semantic="POSITION" source="#tutorial_structure_block05-Position" />
+                </vertices>
+                <triangles count="105" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_block05-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_block05-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_block05-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        0 1 7 5 1 5 4 1 4
+                        2 1 6 0 1 7 4 1 4
+                        9 2 11 7 2 9 6 2 8
+                        8 2 10 9 2 11 6 2 8
+                        4 1 15 10 1 13 8 1 12
+                        6 1 14 4 1 15 8 1 12
+                        10 1 21 14 1 7 13 1 5
+                        15 1 20 10 1 21 13 1 5
+                        17 1 15 16 1 13 12 1 12
+                        11 1 14 17 1 15 12 1 12
+                        21 3 25 19 3 23 18 3 22
+                        20 3 24 21 3 25 18 3 22
+                        20 1 15 18 1 13 14 1 26
+                        5 1 27 20 1 15 14 1 26
+                        25 4 33 23 4 31 22 4 30
+                        24 4 32 25 4 33 22 4 30
+                        0 0 35 25 0 2 24 0 3
+                        26 0 34 0 0 35 24 0 3
+                        26 3 38 24 3 3 22 3 36
+                        20 3 37 26 3 38 22 3 36
+                        5 1 42 0 1 40 26 1 39
+                        20 1 41 5 1 42 26 1 39
+                        22 3 25 28 3 23 27 3 22
+                        29 3 24 22 3 25 27 3 22
+                        23 4 9 30 4 11 28 4 43
+                        22 4 25 23 4 9 28 4 43
+                        30 4 33 32 4 31 31 4 30
+                        28 4 32 30 4 33 31 4 30
+                        18 3 38 28 3 3 31 3 36
+                        33 3 37 18 3 38 31 3 36
+                        13 1 42 14 1 40 18 1 39
+                        33 1 41 13 1 42 18 1 39
+                        39 3 47 37 3 45 36 3 44
+                        40 3 48 39 3 47 36 3 44
+                        38 3 46 40 3 48 36 3 44
+                        42 0 52 37 0 50 33 0 49
+                        38 0 54 42 0 52 33 0 49
+                        43 0 53 38 0 54 33 0 49
+                        41 0 51 43 0 53 33 0 49
+                        45 5 58 39 5 56 44 5 55
+                        46 5 59 45 5 58 44 5 55
+                        40 5 57 46 5 59 44 5 55
+                        45 1 63 47 1 61 37 1 60
+                        39 1 62 45 1 63 37 1 60
+                        55 0 74 53 0 72 52 0 71
+                        54 0 73 55 0 74 52 0 71
+                        46 5 78 57 5 76 56 5 75
+                        50 5 77 46 5 78 56 5 75
+                        57 4 76 53 4 80 55 4 79
+                        56 4 75 57 4 76 55 4 79
+                        61 0 84 59 0 82 58 0 81
+                        62 0 85 61 0 84 58 0 81
+                        60 0 83 62 0 85 58 0 81
+                        50 5 57 64 5 59 63 5 58
+                        65 5 55 50 5 57 63 5 58
+                        49 5 56 65 5 55 63 5 58
+                        49 1 89 63 1 87 59 1 86
+                        51 1 88 49 1 89 59 1 86
+                        64 2 93 60 2 91 59 2 90
+                        66 2 94 64 2 93 59 2 90
+                        63 2 92 66 2 94 59 2 90
+                        68 4 98 32 4 96 30 4 95
+                        67 4 97 68 4 98 30 4 95
+                        71 0 3 25 0 100 69 0 99
+                        70 0 2 71 0 3 69 0 99
+                        72 4 103 23 4 102 25 4 101
+                        71 4 3 72 4 103 25 4 101
+                        76 4 15 75 4 13 74 4 12
+                        73 4 14 76 4 15 74 4 12
+                        34 2 25 35 2 23 77 2 22
+                        78 2 24 34 2 25 77 2 22
+                        78 4 15 77 4 13 67 4 12
+                        72 4 14 78 4 15 67 4 12
+                        10 1 33 15 1 31 61 1 30
+                        8 1 32 10 1 33 61 1 30
+                        77 2 105 8 2 3 61 2 36
+                        79 2 104 77 2 105 61 2 36
+                        68 4 42 67 4 40 77 4 39
+                        79 4 41 68 4 42 77 4 39
+                        2 1 33 4 1 31 6 1 30
+                        80 1 32 2 1 33 6 1 30
+                        71 0 107 2 0 2 80 0 3
+                        81 0 106 71 0 107 80 0 3
+                        81 2 105 80 2 108 6 2 36
+                        78 2 104 81 2 105 6 2 36
+                        72 4 42 71 4 40 81 4 39
+                        78 4 41 72 4 42 81 4 39
+                        64 7 116 83 6 114 82 6 113
+                        60 7 115 64 7 116 82 6 113
+                        87 9 123 86 8 121 85 8 120
+                        84 9 122 87 9 123 85 8 120
+                        55 10 129 87 9 123 84 9 122
+                        56 10 128 55 10 129 84 9 122
+                        83 6 114 85 8 120 86 8 121
+                        82 6 113 83 6 114 86 8 121
+                        57 12 136 90 11 134 89 11 133
+                        53 12 135 57 12 136 89 11 133
+                        94 14 141 93 13 121 92 13 120
+                        91 14 140 94 14 141 92 13 120
+                        38 15 149 94 14 147 91 14 146
+                        40 15 148 38 15 149 91 14 146
+                        90 11 134 92 13 154 93 13 153
+                        89 11 133 90 11 134 93 13 153
+                    </p>
+                </triangles>
+                <triangles count="19" material="DESERT_BRICK_SQUARE_SANDY">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_block05-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_block05-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_block05-UV0" />
+                    <p>
+                        12 1 19 10 1 17 4 1 16
+                        11 1 18 12 1 19 4 1 16
+                        14 1 19 16 1 29 17 1 28
+                        5 1 18 14 1 19 17 1 28
+                        9 2 19 35 2 17 34 2 16
+                        7 2 18 9 2 19 34 2 16
+                        49 5 67 45 5 65 48 5 64
+                        50 5 68 49 5 67 48 5 64
+                        46 5 66 50 5 68 48 5 64
+                        49 1 67 51 1 70 47 1 69
+                        45 1 65 49 1 67 47 1 69
+                        74 4 19 30 4 29 23 4 28
+                        73 4 18 74 4 19 23 4 28
+                        67 4 19 75 4 17 76 4 16
+                        72 4 18 67 4 19 76 4 16
+                        27 3 19 19 3 17 21 3 16
+                        29 3 18 27 3 19 21 3 16
+                        70 0 112 69 0 110 1 0 109
+                        3 0 111 70 0 112 1 0 109
+                    </p>
+                </triangles>
+                <triangles count="16" material="DESERT_BRICK_BEVEL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_block05-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_block05-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_block05-UV0" />
+                    <p>
+                        85 5 119 50 5 118 84 5 117
+                        82 0 126 88 0 125 60 0 124
+                        64 5 124 50 5 125 83 5 126
+                        87 0 117 88 0 118 86 0 119
+                        84 5 117 50 5 118 56 5 127
+                        55 0 127 88 0 118 87 0 117
+                        83 5 131 50 5 125 85 5 130
+                        86 0 130 88 0 132 82 0 131
+                        92 5 139 46 5 138 91 5 137
+                        89 0 144 95 0 143 53 0 142
+                        57 5 142 46 5 143 90 5 144
+                        94 0 137 95 0 138 93 0 139
+                        91 5 137 46 5 138 40 5 145
+                        38 0 145 95 0 138 94 0 137
+                        90 5 152 46 5 151 92 5 150
+                        93 0 150 95 0 151 89 0 152
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="tutorial_structure_block05" name="tutorial_structure_block05">
+                <instance_geometry url="#tutorial_structure_block05-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                            <instance_material symbol="DESERT_BRICK_SQUARE_SANDY" target="#DESERT_BRICK_SQUARE_SANDY" />
+                            <instance_material symbol="DESERT_BRICK_BEVEL_TRIM" target="#DESERT_BRICK_BEVEL_TRIM" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

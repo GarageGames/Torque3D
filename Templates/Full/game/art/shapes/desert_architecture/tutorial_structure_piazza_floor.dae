@@ -1,0 +1,570 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:03 AM</created>
+        <modified>15/05/2013 2:11:03 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_BRICK_SQUARE_SANDY-Diffuse" name="DESERT_BRICK_SQUARE_SANDY-Diffuse">
+            <init_from>DESERT_BRICK_SQUARE_SANDY.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_BRICK_SQUARE_SANDY" name="DESERT_BRICK_SQUARE_SANDY">
+            <instance_effect url="#DESERT_BRICK_SQUARE_SANDY-fx" />
+        </material>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_BRICK_SQUARE_SANDY-fx" name="DESERT_BRICK_SQUARE_SANDY-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_SQUARE_SANDY-Surface"><surface type="2D"><init_from>DESERT_BRICK_SQUARE_SANDY-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_SQUARE_SANDY-Sampler"><sampler2D><source>DESERT_BRICK_SQUARE_SANDY-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_SQUARE_SANDY-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="tutorial_structure_piazza_floor-lib" name="tutorial_structure_piazza_floorMesh">
+            <mesh>
+                <source id="tutorial_structure_piazza_floor-Position">
+                    <float_array count="375" id="tutorial_structure_piazza_floor-Position-array">
+                        -92.5035 -23.6697 -2.8918
+                        8.6627 -23.3323 -2.8918
+                        -92.5035 -23.6697 -3.2838
+                        8.6627 -23.3323 -3.2838
+                        -92.5035 15.0753 -2.8918
+                        8.6627 15.0753 -2.8918
+                        -94.2260 -22.6892 -4.0678
+                        -93.2457 -22.6846 -4.0678
+                        -94.2260 16.7978 -4.0678
+                        -93.2457 16.7978 -4.0678
+                        10.3852 16.7978 -4.0678
+                        10.3852 -22.1989 -4.0678
+                        -93.2457 15.0753 -4.0678
+                        -92.5036 -22.6811 -4.0678
+                        9.4047 -23.3323 -3.2838
+                        9.4047 -23.3323 -4.0678
+                        -92.5036 -23.6673 -3.2838
+                        8.6627 -23.3348 -4.0678
+                        -93.2457 -23.6697 -3.2838
+                        -93.2457 -23.6697 -4.0678
+                        9.4047 -22.1989 -4.0678
+                        -92.5036 -23.6673 -4.0678
+                        8.6627 -22.2025 -4.0678
+                        -93.2457 -22.6892 -4.0678
+                        9.4047 -22.1989 -3.2838
+                        -93.2457 -22.6892 -3.2838
+                        9.4044 15.0753 -2.8918
+                        9.4044 15.8173 -2.8918
+                        9.4044 15.0753 -3.2838
+                        9.4044 15.8173 -3.2838
+                        -93.2459 15.0753 -2.8918
+                        -93.2459 15.8173 -2.8918
+                        -93.2459 15.0753 -3.2838
+                        -93.2459 15.8173 -3.2838
+                        8.6624 -23.3323 -2.8918
+                        9.4044 -23.3323 -2.8918
+                        8.6624 -23.3323 -3.2838
+                        9.4044 -23.3323 -3.2838
+                        8.6624 15.0753 -2.8918
+                        -93.2457 -23.6698 -2.8918
+                        -93.2457 15.0753 -3.2838
+                        -93.2457 15.0753 -2.8918
+                        10.3850 16.5399 -3.2838
+                        10.3850 16.7979 -3.2838
+                        10.3850 16.5399 -3.6758
+                        10.3850 16.7979 -3.6758
+                        -94.2262 16.5399 -3.2838
+                        -94.2262 16.7979 -3.2838
+                        -94.2262 16.5399 -3.6758
+                        -94.2262 16.7979 -3.6758
+                        10.1270 15.8173 -3.2838
+                        -93.9683 15.8173 -3.2838
+                        10.1270 16.5399 -3.2838
+                        -93.9683 16.5399 -3.2838
+                        11.3655 17.5204 -3.6758
+                        11.3655 17.7784 -3.6758
+                        11.3655 17.5204 -4.0678
+                        11.3655 17.7784 -4.0678
+                        -95.2069 17.7784 -4.0678
+                        -95.2069 17.5204 -4.0678
+                        -95.2069 17.5204 -3.6758
+                        -95.2069 17.7784 -3.6758
+                        -94.9487 17.5204 -4.0678
+                        -94.9487 16.7979 -4.0678
+                        11.1075 17.5204 -4.0678
+                        11.1075 16.7979 -4.0678
+                        11.1075 16.7979 -3.6758
+                        -94.9487 16.7979 -3.6758
+                        11.1075 17.5204 -3.6758
+                        -94.9487 17.5204 -3.6758
+                        10.1270 -22.6892 -3.2838
+                        10.3850 -22.6892 -3.2838
+                        10.1270 -22.6892 -3.6758
+                        10.3850 -22.6892 -3.6758
+                        9.4044 -22.4312 -3.2838
+                        10.1270 -22.4312 -3.2838
+                        11.1075 -23.3323 -3.6758
+                        11.3655 -23.3323 -3.6758
+                        11.1075 -23.3323 -4.0678
+                        11.3655 -23.3323 -4.0678
+                        10.3850 -23.0744 -3.6758
+                        11.1075 -23.0743 -3.6758
+                        10.3850 -23.0744 -4.0678
+                        11.1075 -23.0743 -4.0678
+                        10.3850 16.7979 -4.0678
+                        10.3850 -22.1989 -3.6758
+                        9.4044 -22.1989 -3.6758
+                        9.4044 -23.0743 -3.6758
+                        9.4044 -22.1989 -4.0678
+                        9.4044 -23.0743 -4.0678
+                        10.3850 -22.1989 -4.0678
+                        9.4044 -23.3323 -4.0678
+                        9.4044 -23.3323 -3.6758
+                        9.4044 -22.6892 -3.2838
+                        9.4044 -22.6892 -3.6758
+                        -94.2260 -22.6892 -3.2838
+                        -93.9681 -22.6892 -3.2838
+                        -94.2260 -22.6892 -3.6758
+                        -93.9681 -22.6892 -3.6758
+                        -94.2260 16.5398 -3.6758
+                        -94.2260 16.5398 -3.2838
+                        -93.9681 16.5398 -3.2838
+                        -93.9681 15.8173 -3.2838
+                        -93.2457 15.8173 -3.2838
+                        -93.9681 -22.4312 -3.2838
+                        -93.2457 -22.4312 -3.2838
+                        -95.2067 -23.6698 -3.6758
+                        -94.9484 -23.6698 -3.6758
+                        -95.2067 -23.6698 -4.0678
+                        -94.9484 -23.6698 -4.0678
+                        -94.9484 17.5203 -4.0678
+                        -95.2067 17.5203 -4.0678
+                        -95.2067 17.5203 -3.6758
+                        -94.9484 17.5203 -3.6758
+                        -94.9484 16.7978 -3.6758
+                        -94.2260 16.7978 -3.6758
+                        -94.9484 -23.4118 -3.6758
+                        -94.2260 -23.4118 -3.6758
+                        -94.9484 -23.4118 -4.0678
+                        -94.2260 -23.4118 -4.0678
+                        -94.9484 16.7978 -4.0678
+                        -93.2457 -23.4117 -4.0678
+                        -93.2457 -23.4117 -3.6758
+                        -93.2457 -23.6697 -3.6758
+                        -93.2457 -22.6892 -3.6758
+                    </float_array>
+                    <technique_common>
+                        <accessor count="125" source="#tutorial_structure_piazza_floor-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_piazza_floor-Normal">
+                    <float_array count="27" id="tutorial_structure_piazza_floor-Normal-array">
+                        0.0033 -1.0000 0.0000
+                        0.0000 0.0000 1.0000
+                        0.0000 0.0000 -1.0000
+                        1.0000 0.0000 0.0000
+                        -1.0000 0.0000 0.0000
+                        0.0000 1.0000 0.0000
+                        0.0000 -1.0000 0.0000
+                        0.0001 -1.0000 0.0000
+                        0.0001 -1.0000 0.0001
+                    </float_array>
+                    <technique_common>
+                        <accessor count="9" source="#tutorial_structure_piazza_floor-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_piazza_floor-UV0">
+                    <float_array count="312" id="tutorial_structure_piazza_floor-UV0-array">
+                        -4.9189 -1.6675
+                        5.8499 -1.6675
+                        -4.9189 -1.6258
+                        5.8499 -1.6258
+                        5.8008 -3.3655
+                        -4.8710 -3.3333
+                        5.8008 0.3316
+                        -4.8710 0.3316
+                        -5.2628 -2.3254
+                        -5.1548 -2.3249
+                        -5.2628 2.0251
+                        -5.1548 2.0251
+                        6.2628 2.0251
+                        6.2628 -2.2714
+                        -5.1548 1.8353
+                        -5.0730 -2.3246
+                        5.9289 -1.6258
+                        5.9289 -1.5423
+                        5.8499 -1.5423
+                        -4.9979 -1.6258
+                        -4.9979 -1.5423
+                        6.1548 -2.3963
+                        6.1548 -2.2714
+                        -5.0731 -2.4332
+                        6.0730 -2.2718
+                        -5.1548 -2.4335
+                        -5.1548 -2.3254
+                        0.7440 -1.8766
+                        0.9262 -1.8766
+                        0.7440 -2.0056
+                        0.9262 -2.0056
+                        0.1934 -1.8184
+                        0.3066 -1.8184
+                        0.1934 -1.9316
+                        0.3066 -1.9316
+                        0.3285 -1.7500
+                        0.5543 -1.7500
+                        0.3285 -2.0000
+                        0.5543 -2.0000
+                        -0.8880 -1.7490
+                        -30.9992 -1.7494
+                        -0.8880 -1.5018
+                        -30.9992 -1.5022
+                        0.3285 -1.2500
+                        0.5543 -1.2500
+                        0.3285 -1.5000
+                        0.5543 -1.5000
+                        -0.8880 -1.5013
+                        -0.8880 -1.2506
+                        -30.9992 -1.2515
+                        0.5558 -1.7526
+                        0.5556 -1.9953
+                        0.4467 -1.7527
+                        0.4464 -1.9954
+                        -14.3329 -1.7494
+                        -14.3329 -1.5022
+                        -14.3328 -1.2515
+                        0.4462 -1.7512
+                        0.4459 -1.9995
+                        0.3321 -1.7503
+                        0.3317 -1.9986
+                        -14.3329 -1.9984
+                        -0.8881 -1.9978
+                        -0.8880 -1.7488
+                        0.3322 -1.7500
+                        0.4484 -1.7500
+                        0.3322 -2.0000
+                        0.4484 -2.0000
+                        -0.8878 -1.7490
+                        -30.9988 -1.7494
+                        -0.8878 -1.5018
+                        -30.9988 -1.5022
+                        0.4425 -1.2500
+                        0.4425 -1.5000
+                        2.6651 -1.7995
+                        -7.6025 -1.7995
+                        2.6651 -1.7358
+                        -7.6025 -1.7358
+                        -30.9992 -2.2518
+                        -30.9992 -1.9978
+                        -0.8880 -2.2518
+                        -0.8879 -1.7490
+                        -0.8879 -1.5018
+                        -5.3424 2.1047
+                        -5.3424 2.0251
+                        6.3424 2.1047
+                        6.3424 2.0251
+                        2.6641 -1.8648
+                        -7.6012 -1.8648
+                        2.6641 -1.8011
+                        -7.6012 -1.8011
+                        0.4483 -1.7500
+                        0.4483 -2.0000
+                        -12.6630 -1.7494
+                        -12.6630 -1.5022
+                        -12.6631 -1.2515
+                        -2.4045 -3.2664
+                        -2.4647 -3.2664
+                        -2.4045 0.2904
+                        -2.4647 0.2904
+                        -12.6631 -2.2518
+                        -12.6631 -1.9978
+                        -2.0084 -3.2664
+                        -2.0686 -3.2664
+                        -2.0084 0.3302
+                        -2.0686 0.3302
+                        6.2628 -2.3679
+                        6.3424 -2.3679
+                        -2.5324 -1.6012
+                        -2.6038 -1.6012
+                        -2.5324 -1.5348
+                        -2.6038 -1.5348
+                        6.1548 -2.3679
+                        6.3424 -2.3963
+                        -1.4416 -1.7494
+                        -0.8880 -1.5016
+                        -1.4416 -1.5021
+                        -1.4416 -1.5022
+                        -1.4416 -1.2515
+                        -1.1122 -1.7495
+                        -1.1122 -1.5023
+                        -1.1122 -1.2515
+                        0.4464 -1.7500
+                        0.4464 -2.0000
+                        -12.6631 -1.9984
+                        -0.8883 -1.7489
+                        -12.6634 -1.7494
+                        -0.8883 -1.5018
+                        -12.6634 -1.5023
+                        -0.8897 -4.4996
+                        -0.7737 -4.4996
+                        -0.8897 -4.7453
+                        -0.7737 -4.7453
+                        -12.6631 -2.2519
+                        -12.6631 -1.9976
+                        -0.8881 -2.2519
+                        -0.8881 -1.9976
+                        -0.8886 -1.7492
+                        -12.6637 -1.7497
+                        -0.8886 -1.5018
+                        -12.6637 -1.5022
+                        -2.2719 -3.2664
+                        -2.3321 -3.2664
+                        -2.2719 0.3302
+                        -2.3321 0.3302
+                        -5.3425 -2.4050
+                        -5.2629 -2.4050
+                        -5.1548 -2.4051
+                        -5.3424 -2.4335
+                        -1.4415 -1.7495
+                        -1.4415 -1.5023
+                        -0.8879 -1.5013
+                        -0.8879 -1.2506
+                        -1.4414 -1.2515
+                        -1.1120 -1.5022
+                        -1.1120 -1.2515
+</float_array>
+                    <technique_common>
+                        <accessor count="156" source="#tutorial_structure_piazza_floor-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="tutorial_structure_piazza_floor-Vertex">
+                    <input semantic="POSITION" source="#tutorial_structure_piazza_floor-Position" />
+                </vertices>
+                <triangles count="52" material="DESERT_BRICK_SQUARE_SANDY">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_piazza_floor-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_piazza_floor-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_piazza_floor-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        1 1 7 5 1 5 4 1 4
+                        0 1 6 1 1 7 4 1 4
+                        9 2 11 7 2 9 6 2 8
+                        8 2 10 9 2 11 6 2 8
+                        12 2 14 9 2 11 10 2 12
+                        7 2 9 12 2 14 10 2 12
+                        13 2 15 7 2 9 10 2 12
+                        11 2 13 13 2 15 10 2 12
+                        17 0 18 15 0 17 14 0 16
+                        19 0 20 17 0 18 14 0 16
+                        18 0 19 19 0 20 14 0 16
+                        16 0 2 18 0 19 14 0 16
+                        22 2 24 20 2 22 15 2 21
+                        23 2 26 22 2 24 15 2 21
+                        19 2 25 23 2 26 15 2 21
+                        21 2 23 19 2 25 15 2 21
+                        20 3 30 24 3 28 14 3 27
+                        15 3 29 20 3 30 14 3 27
+                        19 4 34 18 4 32 25 4 31
+                        23 4 33 19 4 34 25 4 31
+                        53 1 77 51 1 75 50 1 74
+                        52 1 76 53 1 77 50 1 74
+                        65 2 86 63 2 84 62 2 83
+                        64 2 85 65 2 86 62 2 83
+                        69 1 90 67 1 88 66 1 87
+                        68 1 89 69 1 90 66 1 87
+                        75 1 99 50 1 97 29 1 96
+                        74 1 98 75 1 99 29 1 96
+                        81 1 105 66 1 103 45 1 102
+                        80 1 104 81 1 105 45 1 102
+                        65 2 86 83 2 107 82 2 106
+                        84 2 12 65 2 86 82 2 106
+                        87 1 111 80 1 109 85 1 108
+                        86 1 110 87 1 111 85 1 108
+                        82 2 106 89 2 112 88 2 22
+                        90 2 13 82 2 106 88 2 22
+                        89 2 112 83 2 107 78 2 113
+                        91 2 21 89 2 112 78 2 113
+                        105 1 99 103 1 97 102 1 96
+                        104 1 98 105 1 99 102 1 96
+                        117 1 144 115 1 142 114 1 141
+                        116 1 143 117 1 144 114 1 141
+                        8 2 10 119 2 146 118 2 145
+                        120 2 84 8 2 10 118 2 145
+                        118 2 145 121 2 147 19 2 25
+                        109 2 148 118 2 145 19 2 25
+                        117 1 111 122 1 109 124 1 108
+                        97 1 110 117 1 111 124 1 108
+                        121 2 147 119 2 146 6 2 8
+                        23 2 26 121 2 147 6 2 8
+                    </p>
+                </triangles>
+                <triangles count="82" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_piazza_floor-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_piazza_floor-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_piazza_floor-UV0" />
+                    <p>
+                        29 3 38 27 3 36 26 3 35
+                        28 3 37 29 3 38 26 3 35
+                        31 1 42 30 1 40 26 1 39
+                        27 1 41 31 1 42 26 1 39
+                        31 4 46 33 4 44 32 4 43
+                        30 4 45 31 4 46 32 4 43
+                        33 5 49 31 5 42 27 5 47
+                        29 5 48 33 5 49 27 5 47
+                        37 6 53 35 6 51 34 6 50
+                        36 6 52 37 6 53 34 6 50
+                        26 1 55 38 1 54 34 1 39
+                        35 1 41 26 1 55 34 1 39
+                        28 3 56 26 3 55 35 3 47
+                        37 3 48 28 3 56 35 3 47
+                        2 7 60 0 7 58 39 7 57
+                        18 7 59 2 7 60 39 7 57
+                        39 4 63 41 4 54 40 4 61
+                        18 4 62 39 4 63 40 4 61
+                        4 1 55 41 1 54 39 1 39
+                        0 1 41 4 1 55 39 1 39
+                        45 3 67 43 3 65 42 3 64
+                        44 3 66 45 3 67 42 3 64
+                        47 1 71 46 1 69 42 1 68
+                        43 1 70 47 1 71 42 1 68
+                        47 4 46 49 4 44 48 4 72
+                        46 4 73 47 4 46 48 4 72
+                        49 5 49 47 5 42 43 5 47
+                        45 5 48 49 5 49 43 5 47
+                        57 3 67 55 3 65 54 3 64
+                        56 3 66 57 3 67 54 3 64
+                        56 2 62 59 2 79 58 2 78
+                        57 2 80 56 2 62 58 2 78
+                        61 1 42 60 1 40 54 1 81
+                        55 1 82 61 1 42 54 1 81
+                        61 4 46 58 4 44 59 4 72
+                        60 4 73 61 4 46 59 4 72
+                        58 5 49 61 5 42 55 5 47
+                        57 5 48 58 5 49 55 5 47
+                        73 6 38 71 6 36 70 6 91
+                        72 6 92 73 6 38 70 6 91
+                        42 1 94 52 1 93 70 1 39
+                        71 1 41 42 1 94 70 1 39
+                        44 3 95 42 3 94 71 3 47
+                        73 3 48 44 3 95 71 3 47
+                        79 6 38 77 6 36 76 6 65
+                        78 6 67 79 6 38 76 6 65
+                        78 2 62 64 2 101 56 2 100
+                        79 2 80 78 2 62 56 2 100
+                        54 1 94 68 1 93 76 1 39
+                        77 1 41 54 1 94 76 1 39
+                        56 3 95 54 3 94 77 3 47
+                        79 3 48 56 3 95 77 3 47
+                        76 1 116 81 1 114 87 1 39
+                        92 1 115 76 1 116 87 1 39
+                        78 6 118 76 6 117 92 6 47
+                        91 6 48 78 6 118 92 6 47
+                        70 1 120 75 1 119 74 1 39
+                        93 1 41 70 1 120 74 1 39
+                        72 6 121 70 6 120 93 6 47
+                        94 6 48 72 6 121 93 6 47
+                        98 6 123 96 6 122 95 6 35
+                        97 6 37 98 6 123 95 6 35
+                        95 4 63 100 4 93 99 4 124
+                        97 4 62 95 4 63 99 4 124
+                        101 1 128 100 1 126 95 1 125
+                        96 1 127 101 1 128 95 1 125
+                        109 6 132 107 6 130 106 6 129
+                        108 6 131 109 6 132 106 6 129
+                        108 2 136 111 2 134 110 2 133
+                        109 2 135 108 2 136 110 2 133
+                        106 4 63 112 4 93 111 4 124
+                        108 4 62 106 4 63 111 4 124
+                        113 1 140 112 1 138 106 1 137
+                        107 1 139 113 1 140 106 1 137
+                        123 1 150 122 1 149 116 1 39
+                        107 1 41 123 1 150 116 1 39
+                        19 8 153 123 8 150 107 8 151
+                        109 8 152 19 8 153 107 8 151
+                        25 1 120 105 1 119 104 1 39
+                        96 1 41 25 1 120 104 1 39
+                        124 7 155 25 7 154 96 7 151
+                        98 7 152 124 7 155 96 7 151
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="tutorial_structure_piazza_floor" name="tutorial_structure_piazza_floor">
+                <instance_geometry url="#tutorial_structure_piazza_floor-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_BRICK_SQUARE_SANDY" target="#DESERT_BRICK_SQUARE_SANDY" />
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>

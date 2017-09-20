@@ -25,8 +25,8 @@
 // is not loaded on a client, then the master must be defined. 
 // $pref::Master[0] = "2:master.garagegames.com:28002";
 
-$pref::Player::Name = "Visitor";
-$pref::Player::defaultFov = 65;
+$pref::Player::Name = "Maco";    //Ubiq
+$pref::Player::defaultFov = 55;  //Ubiq
 $pref::Player::zoomSpeed = 0;
 
 $pref::Net::LagThreshold = 400;

@@ -39,7 +39,13 @@ function Observer::onTrigger(%this,%obj,%trigger,%state)
 
       case "Corpse":
          // Viewing dead corpse, so we probably want to respawn.
-         %client.spawnPlayer();
+         
+         //Ubiq: delete the existing corpse immediately
+         %client.player.schedule(0, "delete");
+         %client.player = 0;
+         
+         %playerSpawnPoint = pickPlayerSpawnPoint($Game::DefaultPlayerSpawnGroups);
+         %client.spawnPlayer(%playerSpawnPoint);
 
          // Set the camera back into observer mode, since in
          // debug mode we like to switch to it.

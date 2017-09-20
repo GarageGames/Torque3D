@@ -1,0 +1,471 @@
+<?xml version='1.0' encoding='utf-8'?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.0">
+    <asset>
+        <contributor>
+            <author />
+            <authoring_tool>Torque 3D 2011 Interior Exporter</authoring_tool>
+            <comments />
+        </contributor>
+        <created>15/05/2013 2:11:02 AM</created>
+        <modified>15/05/2013 2:11:02 AM</modified>
+        <revision />
+        <title />
+        <subject />
+        <keywords />
+        <unit meter="1.000000" />
+        <up_axis>Z_UP</up_axis>
+    </asset>
+    <library_images>
+        <image id="DESERT_PILLAR_BODY-Diffuse" name="DESERT_PILLAR_BODY-Diffuse">
+            <init_from>DESERT_PILLAR_BODY.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_ORNAMENT_ZAG-Diffuse" name="DESERT_BRICK_ORNAMENT_ZAG-Diffuse">
+            <init_from>DESERT_BRICK_ORNAMENT_ZAG.jpg</init_from>
+        </image>
+        <image id="DESERT_PILLAR_BASE-Diffuse" name="DESERT_PILLAR_BASE-Diffuse">
+            <init_from>DESERT_PILLAR_BASE.jpg</init_from>
+        </image>
+        <image id="DESERT_BRICK_VERTICAL_TRIM-Diffuse" name="DESERT_BRICK_VERTICAL_TRIM-Diffuse">
+            <init_from>DESERT_BRICK_VERTICAL_TRIM.jpg</init_from>
+        </image>
+    </library_images>
+    <library_materials>
+        <material id="DESERT_PILLAR_BODY" name="DESERT_PILLAR_BODY">
+            <instance_effect url="#DESERT_PILLAR_BODY-fx" />
+        </material>
+        <material id="DESERT_BRICK_ORNAMENT_ZAG" name="DESERT_BRICK_ORNAMENT_ZAG">
+            <instance_effect url="#DESERT_BRICK_ORNAMENT_ZAG-fx" />
+        </material>
+        <material id="DESERT_PILLAR_BASE" name="DESERT_PILLAR_BASE">
+            <instance_effect url="#DESERT_PILLAR_BASE-fx" />
+        </material>
+        <material id="DESERT_BRICK_VERTICAL_TRIM" name="DESERT_BRICK_VERTICAL_TRIM">
+            <instance_effect url="#DESERT_BRICK_VERTICAL_TRIM-fx" />
+        </material>
+    </library_materials>
+    <library_effects>
+        <effect id="DESERT_PILLAR_BODY-fx" name="DESERT_PILLAR_BODY-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_PILLAR_BODY-Surface"><surface type="2D"><init_from>DESERT_PILLAR_BODY-Diffuse</init_from></surface></newparam><newparam sid="DESERT_PILLAR_BODY-Sampler"><sampler2D><source>DESERT_PILLAR_BODY-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_PILLAR_BODY-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_ORNAMENT_ZAG-fx" name="DESERT_BRICK_ORNAMENT_ZAG-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_ORNAMENT_ZAG-Surface"><surface type="2D"><init_from>DESERT_BRICK_ORNAMENT_ZAG-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_ORNAMENT_ZAG-Sampler"><sampler2D><source>DESERT_BRICK_ORNAMENT_ZAG-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_ORNAMENT_ZAG-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_PILLAR_BASE-fx" name="DESERT_PILLAR_BASE-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_PILLAR_BASE-Surface"><surface type="2D"><init_from>DESERT_PILLAR_BASE-Diffuse</init_from></surface></newparam><newparam sid="DESERT_PILLAR_BASE-Sampler"><sampler2D><source>DESERT_PILLAR_BASE-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_PILLAR_BASE-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+        <effect id="DESERT_BRICK_VERTICAL_TRIM-fx" name="DESERT_BRICK_VERTICAL_TRIM-fx">
+            <profile_COMMON>
+                <newparam sid="DESERT_BRICK_VERTICAL_TRIM-Surface"><surface type="2D"><init_from>DESERT_BRICK_VERTICAL_TRIM-Diffuse</init_from></surface></newparam><newparam sid="DESERT_BRICK_VERTICAL_TRIM-Sampler"><sampler2D><source>DESERT_BRICK_VERTICAL_TRIM-Surface</source></sampler2D></newparam><technique sid="standard">
+                    <phong>
+                        <diffuse>
+                            <texture texcoord="CHANNEL0" texture="DESERT_BRICK_VERTICAL_TRIM-Sampler">
+                                <extra>
+                                    <technique profile="MAYA">
+                                        <wrapU sid="wrapU0">TRUE</wrapU>
+                                        <wrapV sid="wrapV0">TRUE</wrapV>
+                                        <blend_mode>ADD</blend_mode>
+                                    </technique>
+                                </extra>
+                            </texture>
+                        </diffuse>
+                    </phong>
+                </technique>
+            </profile_COMMON>
+        </effect>
+    </library_effects>
+    <library_geometries>
+        <geometry id="tutorial_structure_support_pillar_lrg-lib" name="tutorial_structure_support_pillar_lrgMesh">
+            <mesh>
+                <source id="tutorial_structure_support_pillar_lrg-Position">
+                    <float_array count="186" id="tutorial_structure_support_pillar_lrg-Position-array">
+                        0.7976 1.0802 -1.3159
+                        0.7622 1.0802 -1.3159
+                        0.7976 -0.6694 -1.3159
+                        0.7622 -0.6694 -1.3159
+                        0.7622 1.0802 -1.2681
+                        0.7622 -0.6694 -1.2681
+                        0.8935 -0.8006 0.1851
+                        -1.1185 -0.8006 0.1851
+                        0.8935 1.2114 0.1851
+                        -1.1185 1.2114 0.1851
+                        0.8935 1.2114 -0.0204
+                        -1.1185 1.2114 -0.0204
+                        -1.1185 -0.8006 -0.0204
+                        0.8935 -0.8006 -0.0204
+                        0.8935 -0.8006 1.9844
+                        -1.1185 -0.8006 1.9844
+                        0.8935 1.2114 1.9844
+                        -1.1185 1.2114 1.9844
+                        0.8935 1.2114 1.7789
+                        -1.1185 1.2114 1.7789
+                        -1.1185 -0.8006 1.7789
+                        0.8935 -0.8006 1.7789
+                        0.8935 -0.8006 -14.5784
+                        -1.1185 -0.8006 -14.5784
+                        0.8935 1.2114 -14.5784
+                        -1.1185 1.2114 -14.5784
+                        0.8935 1.2114 -14.7840
+                        -1.1185 1.2114 -14.7840
+                        -1.1185 -0.8006 -14.7840
+                        0.8935 -0.8006 -14.7840
+                        0.7622 1.0802 -0.0204
+                        -0.9873 1.0802 -0.0204
+                        0.7623 1.0802 -14.5785
+                        -0.9873 1.0802 -14.5785
+                        -0.9873 -0.6694 -0.0204
+                        -0.9873 -0.6694 -14.5785
+                        0.7622 -0.6694 -0.0204
+                        0.7623 -0.6694 -14.5785
+                        0.7622 1.0802 1.7789
+                        -0.9873 1.0802 1.7789
+                        0.7622 1.0802 0.1851
+                        -0.9873 1.0802 0.1851
+                        -0.9873 -0.6694 1.7789
+                        -0.9873 -0.6694 0.1851
+                        0.7622 -0.6694 1.7789
+                        0.7622 -0.6694 0.1851
+                        1.0905 1.4084 -14.7840
+                        -1.3155 1.4084 -14.7840
+                        1.0905 1.4084 -15.1403
+                        -1.3155 1.4084 -15.1403
+                        1.0905 -0.9976 -14.7840
+                        -1.3155 -0.9976 -14.7840
+                        1.0905 -0.9976 -15.1403
+                        -1.3155 -0.9976 -15.1403
+                        0.7622 -1.0382 2.4261
+                        -0.9873 -1.0382 2.4261
+                        0.7622 1.4490 2.4261
+                        -0.9873 1.4490 2.4261
+                        0.7622 1.0802 1.9844
+                        -0.9873 1.0802 1.9844
+                        -0.9873 -0.6694 1.9844
+                        0.7622 -0.6694 1.9844
+                    </float_array>
+                    <technique_common>
+                        <accessor count="62" source="#tutorial_structure_support_pillar_lrg-Position-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_support_pillar_lrg-Normal">
+                    <float_array count="36" id="tutorial_structure_support_pillar_lrg-Normal-array">
+                        0.0000 0.0000 -1.0000
+                        0.8038 0.0000 0.5949
+                        -1.0000 0.0000 0.0000
+                        0.0000 -0.0000 0.0000
+                        0.0001 0.0000 1.0000
+                        0.0000 1.0000 0.0000
+                        -0.0000 -1.0000 -0.0000
+                        1.0000 0.0000 -0.0000
+                        -0.0000 0.7676 -0.6409
+                        -0.0000 0.4237 -0.9058
+                        -0.0000 -0.7676 -0.6409
+                        -0.0000 -0.4237 -0.9058
+                    </float_array>
+                    <technique_common>
+                        <accessor count="12" source="#tutorial_structure_support_pillar_lrg-Normal-array" stride="3">
+                            <param name="X" type="float" />
+                            <param name="Y" type="float" />
+                            <param name="Z" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <source id="tutorial_structure_support_pillar_lrg-UV0">
+                    <float_array count="208" id="tutorial_structure_support_pillar_lrg-UV0-array">
+                        0.3750 -1.0055
+                        0.3802 -1.0055
+                        0.3750 -1.2449
+                        0.3802 -1.2449
+                        1.1558 -1.3208
+                        1.1661 -1.3206
+                        1.1558 -1.6983
+                        1.1661 -1.6981
+                        -0.0000 -1.9727
+                        1.0000 -1.9727
+                        -0.0000 -2.0000
+                        1.0000 -2.0000
+                        0.3541 -1.5217
+                        1.0001 -2.0000
+                        0.4980 -1.9980
+                        0.0019 -1.9980
+                        0.4980 -1.5019
+                        0.0019 -1.5019
+                        0.3836 -1.4981
+                        0.3836 -1.0020
+                        0.4343 -1.4981
+                        0.4343 -1.0020
+                        0.5555 -1.5019
+                        0.5555 -1.9980
+                        0.5048 -1.5019
+                        0.5048 -1.9980
+                        0.3779 -1.0020
+                        0.3779 -1.4981
+                        0.3272 -1.0020
+                        0.3272 -1.4981
+                        0.5615 -1.9980
+                        0.5615 -1.5019
+                        0.6121 -1.9980
+                        0.6121 -1.5019
+                        0.4400 -1.0020
+                        0.9362 -1.0020
+                        0.4400 -1.4981
+                        0.9362 -1.4981
+                        -1.6378 -1.8604
+                        -1.2899 -1.8604
+                        -1.6378 -0.1613
+                        -1.2899 -0.1613
+                        -1.2902 -1.8604
+                        -0.9422 -1.8604
+                        -1.2902 -0.1613
+                        -0.9422 -0.1613
+                        -0.5943 -1.8604
+                        -0.5943 -0.1613
+                        -1.9855 -1.8605
+                        -1.9855 -0.1614
+                        -2.2512 -0.9989
+                        -1.7475 -0.9989
+                        -2.2512 -2.0037
+                        -1.7475 -2.0037
+                        -1.2438 -0.9990
+                        -1.2438 -2.0037
+                        -0.7401 -0.9990
+                        -0.7401 -2.0037
+                        -2.7548 -0.9989
+                        -2.7548 -2.0036
+                        -2.5392 -3.2476
+                        -1.5650 -3.2476
+                        -2.5392 -3.4983
+                        -1.5650 -3.4983
+                        -3.3338 0.7520
+                        -2.3413 0.7520
+                        -3.3338 -0.2576
+                        -2.3413 -0.2576
+                        -1.5674 -3.4995
+                        -2.5421 -3.4995
+                        -1.5674 -3.2488
+                        -2.5421 -3.2488
+                        -4.8949 -0.7452
+                        -4.0028 -0.7452
+                        -4.8949 -1.7393
+                        -4.0028 -1.7393
+                        -2.4434 -2.7422
+                        -1.5506 -2.7422
+                        -2.4434 -3.0024
+                        -1.5506 -3.0024
+                        -2.4442 -2.9923
+                        -1.5558 -2.9923
+                        -2.4442 -3.2509
+                        -1.5558 -3.2509
+                        1.3787 -2.4712
+                        0.7701 -2.4712
+                        1.3787 -1.8626
+                        0.7701 -1.8626
+                        1.1766 -1.8580
+                        1.1766 -1.2494
+                        1.3624 -1.8580
+                        1.3624 -1.2494
+                        1.4671 -1.8551
+                        1.4671 -2.4712
+                        1.3692 -1.9502
+                        1.3692 -2.3836
+                        1.2850 -1.2494
+                        1.2850 -1.8580
+                        1.1155 -1.2494
+                        1.1155 -1.8580
+                        1.6175 -2.4897
+                        1.6175 -1.8626
+                        1.7545 -2.3875
+                        1.7545 -1.9464
+</float_array>
+                    <technique_common>
+                        <accessor count="104" source="#tutorial_structure_support_pillar_lrg-UV0-array" stride="2">
+                            <param name="S" type="float" />
+                            <param name="T" type="float" />
+                        </accessor>
+                    </technique_common>
+                </source>
+                <vertices id="tutorial_structure_support_pillar_lrg-Vertex">
+                    <input semantic="POSITION" source="#tutorial_structure_support_pillar_lrg-Position" />
+                </vertices>
+                <triangles count="61" material="DESERT_PILLAR_BODY">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_support_pillar_lrg-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_support_pillar_lrg-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_support_pillar_lrg-UV0" />
+                    <p>
+                        3 0 3 1 0 1 0 0 0
+                        2 0 2 3 0 3 0 0 0
+                        2 1 7 0 1 5 4 1 4
+                        5 1 6 2 1 7 4 1 4
+                        4 2 11 1 2 9 3 2 8
+                        5 2 10 4 2 11 3 2 8
+                        2 3 10 5 3 13 3 3 12
+                        9 4 17 7 4 15 6 4 14
+                        8 4 16 9 4 17 6 4 14
+                        11 5 21 9 5 19 8 5 18
+                        10 5 20 11 5 21 8 5 18
+                        12 2 25 7 2 23 9 2 22
+                        11 2 24 12 2 25 9 2 22
+                        13 6 29 6 6 27 7 6 26
+                        12 6 28 13 6 29 7 6 26
+                        10 7 33 8 7 31 6 7 30
+                        13 7 32 10 7 33 6 7 30
+                        10 0 37 13 0 35 12 0 34
+                        11 0 36 10 0 37 12 0 34
+                        17 4 17 15 4 15 14 4 14
+                        16 4 16 17 4 17 14 4 14
+                        19 5 21 17 5 19 16 5 18
+                        18 5 20 19 5 21 16 5 18
+                        20 2 25 15 2 23 17 2 22
+                        19 2 24 20 2 25 17 2 22
+                        21 6 29 14 6 27 15 6 26
+                        20 6 28 21 6 29 15 6 26
+                        18 7 33 16 7 31 14 7 30
+                        21 7 32 18 7 33 14 7 30
+                        20 0 34 19 0 36 18 0 37
+                        21 0 35 20 0 34 18 0 37
+                        25 4 17 23 4 15 22 4 14
+                        24 4 16 25 4 17 22 4 14
+                        27 5 21 25 5 19 24 5 18
+                        26 5 20 27 5 21 24 5 18
+                        28 2 25 23 2 23 25 2 22
+                        27 2 24 28 2 25 25 2 22
+                        29 6 29 22 6 27 23 6 26
+                        28 6 28 29 6 29 23 6 26
+                        26 7 33 24 7 31 22 7 30
+                        29 7 32 26 7 33 22 7 30
+                        28 0 34 27 0 36 26 0 37
+                        29 0 35 28 0 34 26 0 37
+                        33 5 41 31 5 39 30 5 38
+                        32 5 40 33 5 41 30 5 38
+                        35 2 45 34 2 43 31 2 42
+                        33 2 44 35 2 45 31 2 42
+                        37 6 47 36 6 46 34 6 43
+                        35 6 45 37 6 47 34 6 43
+                        32 7 40 30 7 38 36 7 48
+                        37 7 49 32 7 40 36 7 48
+                        57 4 87 55 4 85 54 4 84
+                        56 4 86 57 4 87 54 4 84
+                        59 9 91 57 8 89 56 8 88
+                        58 9 90 59 9 91 56 8 88
+                        60 2 95 55 2 93 57 2 92
+                        59 2 94 60 2 95 57 2 92
+                        61 11 99 54 10 97 55 10 96
+                        60 11 98 61 11 99 55 10 96
+                        58 7 103 56 7 101 54 7 100
+                        61 7 102 58 7 103 54 7 100
+                    </p>
+                </triangles>
+                <triangles count="8" material="DESERT_BRICK_ORNAMENT_ZAG">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_support_pillar_lrg-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_support_pillar_lrg-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_support_pillar_lrg-UV0" />
+                    <p>
+                        41 5 53 39 5 51 38 5 50
+                        40 5 52 41 5 53 38 5 50
+                        43 2 55 42 2 54 39 2 51
+                        41 2 53 43 2 55 39 2 51
+                        45 6 57 44 6 56 42 6 54
+                        43 6 55 45 6 57 42 6 54
+                        40 7 52 38 7 50 44 7 58
+                        45 7 59 40 7 52 44 7 58
+                    </p>
+                </triangles>
+                <triangles count="10" material="DESERT_PILLAR_BASE">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_support_pillar_lrg-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_support_pillar_lrg-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_support_pillar_lrg-UV0" />
+                    <p>
+                        49 5 63 47 5 61 46 5 60
+                        48 5 62 49 5 63 46 5 60
+                        51 6 71 53 6 69 52 6 68
+                        50 6 70 51 6 71 52 6 68
+                        53 0 75 49 0 73 48 0 72
+                        52 0 74 53 0 75 48 0 72
+                        53 2 79 51 2 77 47 2 76
+                        49 2 78 53 2 79 47 2 76
+                        48 7 83 46 7 81 50 7 80
+                        52 7 82 48 7 83 50 7 80
+                    </p>
+                </triangles>
+                <triangles count="2" material="DESERT_BRICK_VERTICAL_TRIM">
+                    <input offset="0" semantic="VERTEX" source="#tutorial_structure_support_pillar_lrg-Vertex" />
+                    <input offset="1" semantic="NORMAL" source="#tutorial_structure_support_pillar_lrg-Normal" />
+                    <input offset="2" semantic="TEXCOORD" set="0" source="#tutorial_structure_support_pillar_lrg-UV0" />
+                    <p>
+                        47 4 67 51 4 65 50 4 64
+                        46 4 66 47 4 67 50 4 64
+                    </p>
+                </triangles>
+            </mesh>
+        </geometry>
+    </library_geometries>
+    <library_visual_scenes>
+        <visual_scene id="RootNode" name="RootNode">
+            <node id="tutorial_structure_support_pillar_lrg" name="tutorial_structure_support_pillar_lrg">
+                <instance_geometry url="#tutorial_structure_support_pillar_lrg-lib">
+                    <bind_material>
+                        <technique_common>
+                            <instance_material symbol="DESERT_PILLAR_BODY" target="#DESERT_PILLAR_BODY" />
+                            <instance_material symbol="DESERT_BRICK_ORNAMENT_ZAG" target="#DESERT_BRICK_ORNAMENT_ZAG" />
+                            <instance_material symbol="DESERT_PILLAR_BASE" target="#DESERT_PILLAR_BASE" />
+                            <instance_material symbol="DESERT_BRICK_VERTICAL_TRIM" target="#DESERT_BRICK_VERTICAL_TRIM" />
+                        </technique_common>
+                    </bind_material>
+                </instance_geometry>
+            </node>
+        </visual_scene>
+    </library_visual_scenes>
+    <scene>
+        <instance_visual_scene url="#RootNode" />
+    </scene>
+</COLLADA>
