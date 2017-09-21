@@ -83,7 +83,7 @@ bool GuiSwatchButtonCtrl::onWake()
       return false;
 
    if ( mGrid.isNull() )
-      mGrid.set( mGridBitmap, &GFXDefaultGUIProfile, avar("%s() - mGrid (line %d)", __FUNCTION__, __LINE__) );
+      mGrid.set( mGridBitmap, &GFXTexturePersistentSRGBProfile, avar("%s() - mGrid (line %d)", __FUNCTION__, __LINE__) );
 
    return true;
 }

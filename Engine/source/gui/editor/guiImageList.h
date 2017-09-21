@@ -60,7 +60,7 @@ class GuiImageList : public SimObject
    // Image managing functions
    bool Clear();
    inline U32 Count() { return (U32)mTextures.size(); };
-   U32 Insert( const char* texturePath , GFXTextureProfile *Type = &GFXDefaultGUIProfile  );
+   U32 Insert( const char* texturePath , GFXTextureProfile *Type = &GFXTexturePersistentSRGBProfile  );
 
    bool FreeTextureEntry( U32 Index );
    bool FreeTextureEntry( PTextureEntry Entry );

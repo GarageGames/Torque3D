@@ -345,7 +345,7 @@ void GuiMissionAreaCtrl::updateTerrainBitmap()
 {
    GBitmap * bitmap = createTerrainBitmap();
    if( bitmap )
-      setBitmapHandle( GFXTexHandle( bitmap, &GFXDefaultGUIProfile, true, String("Terrain Bitmap Update") ) );
+      setBitmapHandle( GFXTexHandle( bitmap, &GFXTexturePersistentSRGBProfile, true, String("Terrain Bitmap Update") ) );
    else
       setBitmap( "" );
 }

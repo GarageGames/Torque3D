@@ -130,7 +130,7 @@ void GuiBitmapCtrl::setBitmap( const char *name, bool resize )
    if ( mBitmapName.isNotEmpty() )
 	{
       if ( !mBitmapName.equal("texhandle", String::NoCase) )
-		   mTextureObject.set( mBitmapName, &GFXDefaultGUIProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__) );
+		   mTextureObject.set( mBitmapName, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__) );
 
       // Resize the control to fit the bitmap
       if ( mTextureObject && resize )

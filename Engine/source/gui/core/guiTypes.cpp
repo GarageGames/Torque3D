@@ -60,18 +60,6 @@ ConsoleDocClass( GuiCursor,
    "@ingroup GuiCore\n"
 );
 
-GFX_ImplementTextureProfile(GFXGuiCursorProfile,
-                            GFXTextureProfile::DiffuseMap, 
-                            GFXTextureProfile::PreserveSize |
-                            GFXTextureProfile::Static | GFXTextureProfile::SRGB,
-                            GFXTextureProfile::NONE);
-GFX_ImplementTextureProfile(GFXDefaultGUIProfile,
-                            GFXTextureProfile::DiffuseMap, 
-                            GFXTextureProfile::PreserveSize |
-                            GFXTextureProfile::Static | GFXTextureProfile::SRGB |
-                            GFXTextureProfile::NoPadding, 
-                            GFXTextureProfile::NONE);
-
 
 GuiCursor::GuiCursor()
 {
@@ -112,7 +100,7 @@ void GuiCursor::render(const Point2I &pos)
 {
    if (!mTextureObject && mBitmapName && mBitmapName[0])
    {
-      mTextureObject.set( mBitmapName, &GFXGuiCursorProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__));
+      mTextureObject.set( mBitmapName, &GFXTexturePersistentSRGBProfile, avar("%s() - mTextureObject (line %d)", __FUNCTION__, __LINE__));
       if(!mTextureObject)
          return;
       mExtent.set(mTextureObject->getWidth(), mTextureObject->getHeight());
