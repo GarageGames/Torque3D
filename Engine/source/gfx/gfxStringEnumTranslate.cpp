@@ -164,6 +164,12 @@ void GFXStringEnumTranslate::init()
    GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR16F );
    GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR16G16F );
    GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR10G10B10A2 );
+
+   GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR8G8B8_SRGB );
+   GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatR8G8B8A8_LINEAR_FORCE );
+   GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatBC1_SRGB );
+   GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatBC2_SRGB );
+   GFX_STRING_ASSIGN_MACRO( GFXStringTextureFormat, GFXFormatBC3_SRGB );
    VALIDATE_LOOKUPTABLE( GFXStringTextureFormat, GFXFormat);
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
