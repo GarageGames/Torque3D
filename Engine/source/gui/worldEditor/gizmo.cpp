@@ -182,7 +182,7 @@ GizmoProfile::GizmoProfile()
    gridColor.set(255,255,255,20);
    planeDim = 500.0f;   
 
-   gridSize.set(10,10,10);
+   gridSize.set(1,1,1);
    snapToGrid = false;
    allowSnapRotations = true;
    rotationSnap = 15.0f;
