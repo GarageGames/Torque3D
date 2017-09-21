@@ -56,7 +56,8 @@ public:
    virtual void updateData() {};
 
 protected:
-
+   StringTableEntry mVariableName;
+   SimObject* mOwnerObject;
 };
 
 #endif // _GUI_INSPECTOR_VARIABLEFIELD_H_

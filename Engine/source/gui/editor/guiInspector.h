@@ -82,7 +82,13 @@ public:
    virtual void clearInspectObjects();
 
    /// Get the currently inspected object
-   SimObject* getInspectObject( U32 index = 0 ) { return mTargets[ index ]; }
+   SimObject* getInspectObject(U32 index = 0)
+   {
+      if (!mTargets.empty())
+         return mTargets[index];
+      else
+         return nullptr;
+   }
    
    /// Return the number of objects being inspected by this GuiInspector.
    U32 getNumInspectObjects() const { return mTargets.size(); }
