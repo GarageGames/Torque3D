@@ -93,10 +93,25 @@ bool GuiInspectorVariableField::onAdd()
 
 void GuiInspectorVariableField::setData( const char* data, bool callbacks )
 {   
-   if ( !mCaption || mCaption[0] == 0 )
-      return;
+   if (mOwnerObject == nullptr && mVariableName == StringTable->EmptyString())
+   {
+      if (!mCaption || mCaption[0] == 0)
+         return;
 
-   Con::setVariable( mCaption, data );   
+      Con::setVariable(mCaption, data);
+   }
+   else
+   {
+      if (mOwnerObject != nullptr)
+      {
+         mOwnerObject->setDataField(mVariableName, NULL, data);
+      }
+      else
+      {
+         //probably a global var if we have no object attached, so just let it set
+         Con::setVariable(mVariableName, data);
+      }
+   }
 
    // Force our edit to update
    updateValue();
