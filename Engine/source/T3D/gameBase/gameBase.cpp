@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "T3D/gameBase/gameBase.h"
 #include "console/consoleTypes.h"
@@ -36,6 +41,7 @@
 #include "T3D/aiConnection.h"
 #endif
 
+#include "afx/arcaneFX.h"
 //----------------------------------------------------------------------------
 // Ghost update relative priority values
 
@@ -121,6 +127,12 @@ GameBaseData::GameBaseData()
 {
    category = "";
    packed = false;
+}
+GameBaseData::GameBaseData(const GameBaseData& other, bool temp_clone) : SimDataBlock(other, temp_clone)
+{
+   packed = other.packed;
+   category = other.category;
+   //mReloadSignal = other.mReloadSignal; // DO NOT copy the mReloadSignal member. 
 }
 
 void GameBaseData::inspectPostApply()
@@ -244,6 +256,8 @@ GameBase::GameBase()
 
 GameBase::~GameBase()
 {
+   if (scope_registered)
+      arcaneFX::unregisterScopedObject(this);
 }
 
 
@@ -256,8 +270,16 @@ bool GameBase::onAdd()
 
    // Datablock must be initialized on the server.
    // Client datablock are initialized by the initial update.
-   if ( isServerObject() && mDataBlock && !onNewDataBlock( mDataBlock, false ) )
-      return false;
+   if (isClientObject())
+   {
+      if (scope_id > 0 && !scope_registered)
+         arcaneFX::registerScopedObject(this);
+   }
+   else
+   {
+      if ( mDataBlock && !onNewDataBlock( mDataBlock, false ) )
+         return false;
+   }
 
    setProcessTick( true );
 
@@ -266,6 +288,8 @@ bool GameBase::onAdd()
 
 void GameBase::onRemove()
 {
+   if (scope_registered)
+      arcaneFX::unregisterScopedObject(this);
    // EDITOR FEATURE: Remove us from the reload signal of our datablock.
    if ( mDataBlock )
       mDataBlock->mReloadSignal.remove( this, &GameBase::_onDatablockModified );
@@ -290,6 +314,9 @@ bool GameBase::onNewDataBlock( GameBaseData *dptr, bool reload )
 
    if ( !mDataBlock )
       return false;
+   // Don't set mask when new datablock is a temp-clone.
+   if (mDataBlock->isTempClone())
+      return true;
 
    setMaskBits(DataBlockMask);
    return true;
@@ -543,6 +570,11 @@ U32 GameBase::packUpdate( NetConnection *connection, U32 mask, BitStream *stream
    stream->writeFlag(mIsAiControlled);
 #endif
 
+   if (stream->writeFlag(mask & ScopeIdMask))
+   {
+      if (stream->writeFlag(scope_refs > 0))
+         stream->writeInt(scope_id, SCOPE_ID_BITS);
+   }
    return retMask;
 }
 
@@ -581,6 +613,11 @@ void GameBase::unpackUpdate(NetConnection *con, BitStream *stream)
    mTicksSinceLastMove = 0;
    mIsAiControlled = stream->readFlag();
 #endif
+   if (stream->readFlag())
+   {
+      scope_id = (stream->readFlag()) ? (U16) stream->readInt(SCOPE_ID_BITS) : 0;
+      scope_refs = 0;
+   }
 }
 
 void GameBase::onMount( SceneObject *obj, S32 node )

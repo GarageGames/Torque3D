@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
@@ -401,7 +406,8 @@ protected:
       ActionMask   = Parent::NextFreeMask << 0,
       MoveMask     = Parent::NextFreeMask << 1,
       ImpactMask   = Parent::NextFreeMask << 2,
-      NextFreeMask = Parent::NextFreeMask << 3
+      TriggerMask      = Parent::NextFreeMask << 3,
+      NextFreeMask     = Parent::NextFreeMask << 4
    };
 
    SimObjectPtr<ParticleEmitter> mSplashEmitter[PlayerData::NUM_SPLASH_EMITTERS];
@@ -780,6 +786,89 @@ public:
    virtual void prepRenderImage( SceneRenderState* state );
    virtual void renderConvex( ObjectRenderInst *ri, SceneRenderState *state, BaseMatInstance *overrideMat );   
    virtual void renderMountedImage( U32 imageSlot, TSRenderState &rstate, SceneRenderState *state );
+private:
+   static void  afx_consoleInit();
+   void         afx_init();
+   U32          afx_packUpdate(NetConnection*, U32 mask, BitStream*, U32 retMask);
+   void         afx_unpackUpdate(NetConnection*, BitStream*);
+private:
+   static bool  sCorpsesHiddenFromRayCast;
+   
+public:
+   virtual void restoreAnimation(U32 tag);
+   virtual U32 getAnimationID(const char* name);
+   virtual U32 playAnimationByID(U32 anim_id, F32 pos, F32 rate, F32 trans, bool hold, bool wait, bool is_death_anim);
+   virtual F32 getAnimationDurationByID(U32 anim_id);
+   virtual bool isBlendAnimation(const char* name);
+   virtual const char* getLastClipName(U32 clip_tag);
+   virtual void unlockAnimation(U32 tag, bool force=false);
+   virtual U32 lockAnimation();
+   virtual bool isAnimationLocked() const { return ((anim_clip_flags & BLOCK_USER_CONTROL) != 0); }
+   
+protected:
+   bool         overrideLookAnimation;
+   F32          armLookOverridePos;
+   F32          headVLookOverridePos;
+   F32          headHLookOverridePos;
+public:
+   void         setLookAnimationOverride(bool flag);
+   void         copyHeadRotation(const Player* p) { mHead = p->mHead; }
+public:
+   bool ignore_updates;
+   void resetContactTimer() { mContactTimer = 0; }
+private:
+   U8     move_trigger_states;
+   U32    fx_s_triggers;
+   U32    mark_fx_c_triggers;
+   U32    fx_c_triggers;
+   F32    z_velocity;
+   bool   mark_idle;
+   F32    idle_timer;
+   bool   mark_s_landing;
+   void   process_client_triggers(bool triggeredLeft, bool triggeredRight);
+public:
+   enum {
+     // server events
+     PLAYER_MOVE_TRIGGER_0        = BIT(0),
+     PLAYER_MOVE_TRIGGER_1        = BIT(1),
+     PLAYER_MOVE_TRIGGER_2        = BIT(2),
+     PLAYER_MOVE_TRIGGER_3        = BIT(3),
+     PLAYER_MOVE_TRIGGER_4        = BIT(4),
+     PLAYER_MOVE_TRIGGER_5        = BIT(5),
+     PLAYER_LANDING_S_TRIGGER     = BIT(6),
+
+     PLAYER_FIRE_S_TRIGGER        = PLAYER_MOVE_TRIGGER_0,
+     PLAYER_FIRE_ALT_S_TRIGGER    = PLAYER_MOVE_TRIGGER_1,
+     PLAYER_JUMP_S_TRIGGER        = BIT(7),
+
+     // client events
+     PLAYER_LF_FOOT_C_TRIGGER       = BIT(16),
+     PLAYER_RT_FOOT_C_TRIGGER       = BIT(17),
+     PLAYER_LANDING_C_TRIGGER       = BIT(18),
+     PLAYER_IDLE_C_TRIGGER          = BIT(19),
+   };
+   U32  getClientEventTriggers() const { return fx_c_triggers; }
+   U32  getServerEventTriggers() const { return fx_s_triggers; }
+private:
+   F32      speed_bias;
+   F32      speed_bias_goal;
+   bool     override_movement;
+   Point3F  movement_data;
+   U8       movement_op;
+   U32      last_movement_tag;
+   static U32   unique_movement_tag_counter;
+public:
+   void     setMovementSpeedBias(F32 bias);
+   U32      setMovementOverride(F32 bias, const Point3F* mov=0, U32 op=1);
+   void     restoreMovement(U32 tag);
+private:
+   S32      footfallDecalOverride;
+   S32      footfallSoundOverride;
+   S32      footfallDustOverride;
+   bool     noFootfallFX;
+public:
+   void     overrideFootfallFX(bool decals=true, bool sounds=true, bool dust=true);
+   void     restoreFootfallFX(bool decals=true, bool sounds=true, bool dust=true);
 };
 
 typedef Player::Pose PlayerPose;

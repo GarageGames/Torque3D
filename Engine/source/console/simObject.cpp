@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "platform/platformMemory.h"
 #include "console/simObject.h"
@@ -48,6 +53,7 @@ ConsoleDocClass( SimObject,
 bool SimObject::smForceId = false;
 SimObjectId SimObject::smForcedId = 0;
 
+bool SimObject::preventNameChanging = false;
 
 namespace Sim
 {
@@ -88,12 +94,17 @@ SimObject::SimObject()
 
    mCopySource = NULL;
    mPersistentId = NULL;
+   is_temp_clone = false;
 }
 
 //-----------------------------------------------------------------------------
 
 SimObject::~SimObject()
 {
+   // if this is a temp-clone, we don't delete any members that were shallow-copied
+   // over from the source datablock.
+   if (is_temp_clone)
+      return;
    if( mFieldDictionary )
    {
       delete mFieldDictionary;
@@ -212,6 +223,19 @@ String SimObject::describeSelf() const
    return desc;
 }
 
+// Copies dynamic fields from one object to another, optionally limited by the settings for
+// <filter> and <no_replace>. When true, <no_replace> prohibits the replacement of fields that
+// already have a value. When <filter> is specified, only fields with leading characters that
+// exactly match the characters in <filter> are copied. 
+void SimObject::assignDynamicFieldsFrom(SimObject* from, const char* filter, bool no_replace)
+{
+   if (from->mFieldDictionary)
+   {
+      if( mFieldDictionary == NULL )
+         mFieldDictionary = new SimFieldDictionary;
+      mFieldDictionary->assignFrom(from->mFieldDictionary, filter, no_replace);
+   }
+}
 //=============================================================================
 //    Persistence.
 //=============================================================================
@@ -915,6 +939,29 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
 
          S32 array1 = array ? dAtoi(array) : 0;
 
+         // Here we check to see if <this> is a datablock and if <value>
+         // starts with "$$". If both true than save value as a runtime substitution.
+         if (dynamic_cast<SimDataBlock*>(this) && value[0] == '$' && value[1] == '$')
+         {
+            if (!this->allowSubstitutions())
+            {
+               Con::errorf("Substitution Error: %s datablocks do not allow \"$$\" field substitutions. [%s]", 
+                  this->getClassName(), this->getName());
+               return;
+            }
+
+            if (fld->doNotSubstitute)
+            {
+               Con::errorf("Substitution Error: field \"%s\" of datablock %s prohibits \"$$\" field substitutions. [%s]", 
+                  slotName, this->getClassName(), this->getName());
+               return;
+            }
+
+            // add the substitution
+            ((SimDataBlock*)this)->addSubstitution(slotName, array1, value);
+            return;
+         }
+		 
          if(array1 >= 0 && array1 < fld->elementCount && fld->elementCount >= 1)
          {
             // If the set data notify callback returns true, then go ahead and
@@ -1300,6 +1347,43 @@ void SimObject::setDataFieldType(const char *typeName, StringTableEntry slotName
    }
 }
 
+// This is the copy-constructor used to create temporary datablock clones.
+// The <temp_clone> argument is added to distinguish this copy-constructor
+// from any general-purpose copy-constructor that might be needed in the
+// future. <temp_clone> should always be true when creating temporary 
+// datablock clones.
+//
+SimObject::SimObject(const SimObject& other, bool temp_clone)
+{
+   is_temp_clone = temp_clone;
+
+   objectName = other.objectName;
+   mOriginalName = other.mOriginalName;
+   nextNameObject = other.nextNameObject;
+   nextManagerNameObject = other.nextManagerNameObject;
+   nextIdObject = other.nextIdObject;
+   mGroup = other.mGroup;
+   mFlags = other.mFlags;
+   mCopySource = other.mCopySource;
+   mFieldDictionary = other.mFieldDictionary;
+   //mIdString = other.mIdString; // special treatment (see below)
+   mFilename = other.mFilename;
+   mDeclarationLine = other.mDeclarationLine;
+   mNotifyList = other.mNotifyList;
+   mId = other.mId;
+   mInternalName = other.mInternalName;
+   mCanSaveFieldDictionary = other.mCanSaveFieldDictionary;
+   mPersistentId = other.mPersistentId;
+   mNameSpace = other.mNameSpace;
+   mClassName = other.mClassName;
+   mSuperClassName = other.mSuperClassName;
+   preventNameChanging = other.preventNameChanging;
+
+   if (mId)
+      dSprintf( mIdString, sizeof( mIdString ), "%u", mId );
+   else
+      mIdString[ 0 ] = '\0';
+}
 //-----------------------------------------------------------------------------
 
 void SimObject::dumpClassHierarchy()
@@ -2116,6 +2200,8 @@ bool SimObject::setProtectedParent( void *obj, const char *index, const char *da
 
 bool SimObject::setProtectedName(void *obj, const char *index, const char *data)
 {   
+   if (preventNameChanging)
+      return false;
    SimObject *object = static_cast<SimObject*>(obj);
    
    if ( object->isProperlyAdded() )
@@ -2612,6 +2698,16 @@ DefineEngineMethod( SimObject, dump, void, ( bool detailed ), ( false ),
       }
    }
 
+   // If the object is a datablock with substitution statements,
+   // they get printed out as part of the dump.
+   if (dynamic_cast<SimDataBlock*>(object))
+   {
+      if (((SimDataBlock*)object)->getSubstitutionCount() > 0)
+      {
+         Con::printf("Substitution Fields:");
+         ((SimDataBlock*)object)->printSubstitutions();
+      }
+   }
    Con::printf( "Dynamic Fields:" );
    if(object->getFieldDictionary())
       object->getFieldDictionary()->printFields(object);

@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "gui/core/guiCanvas.h"
 
@@ -605,10 +610,11 @@ bool GuiCanvas::tabPrev(void)
 
 bool GuiCanvas::processInputEvent(InputEventInfo &inputEvent)
 {
+   mConsumeLastInputEvent = true;
    // First call the general input handler (on the extremely off-chance that it will be handled):
    if (mFirstResponder &&  mFirstResponder->onInputEvent(inputEvent))
    {
-      return(true);
+		return mConsumeLastInputEvent;  
    }
 
    switch (inputEvent.deviceType)
@@ -664,7 +670,7 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
       if (mFirstResponder)
       {
          if(mFirstResponder->onKeyDown(mLastEvent))
-            return true;
+            return mConsumeLastInputEvent;
       }
 
       //see if we should tab next/prev
@@ -675,12 +681,12 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
             if (inputEvent.modifier & SI_SHIFT)
             {
                if(tabPrev())
-                  return true;
+                  return mConsumeLastInputEvent;
             }
             else if (inputEvent.modifier == 0)
             {
                if(tabNext())
-                  return true;
+                  return mConsumeLastInputEvent;
             }
          }
       }
@@ -691,14 +697,14 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
          if ((U32)mAcceleratorMap[i].keyCode == (U32)inputEvent.objInst && (U32)mAcceleratorMap[i].modifier == eventModifier)
          {
             mAcceleratorMap[i].ctrl->acceleratorKeyPress(mAcceleratorMap[i].index);
-            return true;
+            return mConsumeLastInputEvent;
          }
       }
    }
    else if(inputEvent.action == SI_BREAK)
    {
       if(mFirstResponder && mFirstResponder->onKeyUp(mLastEvent))
-         return true;
+         return mConsumeLastInputEvent;
 
       //see if there's an accelerator
       for (U32 i = 0; i < mAcceleratorMap.size(); i++)
@@ -706,7 +712,7 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
          if ((U32)mAcceleratorMap[i].keyCode == (U32)inputEvent.objInst && (U32)mAcceleratorMap[i].modifier == eventModifier)
          {
             mAcceleratorMap[i].ctrl->acceleratorKeyRelease(mAcceleratorMap[i].index);
-            return true;
+            return mConsumeLastInputEvent;
          }
       }
    }
@@ -718,13 +724,14 @@ bool GuiCanvas::processKeyboardEvent(InputEventInfo &inputEvent)
          if ((U32)mAcceleratorMap[i].keyCode == (U32)inputEvent.objInst && (U32)mAcceleratorMap[i].modifier == eventModifier)
          {
             mAcceleratorMap[i].ctrl->acceleratorKeyPress(mAcceleratorMap[i].index);
-            return true;
+            return mConsumeLastInputEvent;
          }
       }
 
       if(mFirstResponder)
       {
-         return mFirstResponder->onKeyRepeat(mLastEvent);
+         bool ret = mFirstResponder->onKeyRepeat(mLastEvent);
+         return ret && mConsumeLastInputEvent;
       }
    }
    return false;
@@ -801,7 +808,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
          rootMiddleMouseDragged(mLastEvent);
       else
          rootMouseMove(mLastEvent);
-      return true;
+      return mConsumeLastInputEvent;
    }
    else if ( inputEvent.objInst == SI_ZAXIS
              || inputEvent.objInst == SI_RZAXIS )
@@ -860,7 +867,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
             rootMouseUp(mLastEvent);
          }
 
-         return true;
+         return mConsumeLastInputEvent;
       }
       else if(inputEvent.objInst == KEY_BUTTON1) // right button
       {
@@ -891,7 +898,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
          else // it was a mouse up
             rootRightMouseUp(mLastEvent);
 
-         return true;
+         return mConsumeLastInputEvent;
       }
       else if(inputEvent.objInst == KEY_BUTTON2) // middle button
       {
@@ -922,7 +929,7 @@ bool GuiCanvas::processMouseEvent(InputEventInfo &inputEvent)
          else // it was a mouse up
             rootMiddleMouseUp(mLastEvent);
 
-         return true;
+         return mConsumeLastInputEvent;  
       }
    }
    return false;
@@ -1801,7 +1808,7 @@ void GuiCanvas::renderFrame(bool preRenderOnly, bool bufferSwap /* = true */)
    if (GuiOffscreenCanvas::sList.size() != 0)
    {
       // Reset the entire state since oculus shit will have barfed it.
-      GFX->disableShaders(true);
+      //GFX->disableShaders(true);
       GFX->updateStates(true);
 
       for (Vector<GuiOffscreenCanvas*>::iterator itr = GuiOffscreenCanvas::sList.begin(); itr != GuiOffscreenCanvas::sList.end(); itr++)
@@ -2815,3 +2822,23 @@ ConsoleMethod( GuiCanvas, cursorNudge, void, 4, 4, "x, y" )
 {
    object->cursorNudge(dAtof(argv[2]), dAtof(argv[3]));
 }
+// This function allows resetting of the video-mode from script. It was motivated by
+// the need to temporarily disable vsync during datablock cache load to avoid a 
+// significant slowdown.
+bool AFX_forceVideoReset = false;
+
+ConsoleMethod( GuiCanvas, resetVideoMode, void, 2,2, "()")
+{
+   PlatformWindow* window = object->getPlatformWindow();
+   if( window )
+   {
+      GFXWindowTarget* gfx_target =  window->getGFXTarget();
+      if ( gfx_target )
+      {
+         AFX_forceVideoReset = true;
+         gfx_target->resetMode();
+         AFX_forceVideoReset = false;
+      }
+   }
+}
+

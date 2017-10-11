@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #include "platform/platform.h"
 #include "terrain/terrRender.h"
 
@@ -45,6 +50,8 @@
 
 #include "gfx/gfxDrawUtil.h"
 
+#include "afx/arcaneFX.h"
+#include "afx/ce/afxZodiacMgr.h"
 #include "gfx/gfxTransformSaver.h"
 #include "gfx/bitmap/gBitmap.h"
 #include "gfx/bitmap/ddsFile.h"
@@ -421,6 +428,7 @@ void TerrainBlock::_renderBlock( SceneRenderState *state )
    if ( isColorDrawPass )
       lm = LIGHTMGR;
 
+   bool has_zodiacs = afxZodiacMgr::doesBlockContainZodiacs(state, this);
    for ( U32 i=0; i < renderCells.size(); i++ )
    {
       TerrCell *cell = renderCells[i];
@@ -483,6 +491,8 @@ void TerrainBlock::_renderBlock( SceneRenderState *state )
 
       inst->defaultKey = (U32)cell->getMaterials();
 
+      if (has_zodiacs)
+         afxZodiacMgr::renderTerrainZodiacs(state, this, cell);
       // Submit it for rendering.
       renderPass->addInst( inst );
    }

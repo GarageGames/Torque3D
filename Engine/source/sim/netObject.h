@@ -20,6 +20,11 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _NETOBJECT_H_
 #define _NETOBJECT_H_
 
@@ -405,6 +410,18 @@ public:
    static T* getClientObject( T *netObj ) { return static_cast<T*>( netObj->getClientObject() ); }
 
    /// @}
+protected:
+   U16           scope_id;
+   U16           scope_refs;
+   bool          scope_registered;
+   virtual void  onScopeIdChange() { }
+public:
+   enum { SCOPE_ID_BITS = 14 };
+   U16           getScopeId() const { return scope_id; }
+   U16           addScopeRef();
+   void          removeScopeRef();
+   void          setScopeRegistered(bool flag) { scope_registered = flag; }
+   bool          getScopeRegistered() const { return scope_registered; }
 };
 
 //-----------------------------------------------------------------------------

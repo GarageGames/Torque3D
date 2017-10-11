@@ -20,6 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+// Arcane-FX for MIT Licensed Open Source version of Torque 3D from GarageGames
+// Copyright (C) 2015 Faust Logic, Inc.
+//
+//    The terrain implementation of zodiacs is largely contained in
+//    afxZodiac.[h,cpp], however, some changes are required to the terrain
+//    code. Structures EmitChunk and SquareStackNode now contain an
+//    afxZodiacBitmask for keeping track of zodiac intersections.
+//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
+
 #ifndef _TERRRENDER_H_
 #define _TERRRENDER_H_
 
@@ -27,6 +37,7 @@
 #include "terrain/terrData.h"
 #endif
 
+#include "afx/ce/afxZodiacDefs.h"
 enum TerrConstants : U32
 {
    MaxClipPlanes       = 8, ///< left, right, top, bottom - don't need far tho...
