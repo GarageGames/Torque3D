@@ -114,6 +114,8 @@ public:
    void dropSelectionAtScreenCenter();
    void splitSelectedFace();
 
+   SceneObject* createPolyhedralObject(const char* className, SceneObject* geometryProvider);
+   ConvexShape* createConvexShapeFrom(SceneObject* polyObject);
    /// Interface with Tools.
    /// @{ 
 
@@ -191,6 +193,16 @@ protected:
 
    UndoAction *mLastUndo;
    UndoManager *mUndoManager;
+
+   struct ConvexShapeProxy
+   {
+      ConvexShape* shapeProxy;
+      SceneObject* targetObject;
+      String targetObjectClass;
+      bool dirty;
+   };
+
+   Vector<ConvexShapeProxy> mProxyObjects;
 
    ConvexEditorTool *mActiveTool;
    ConvexEditorCreateTool *mCreateTool;   
