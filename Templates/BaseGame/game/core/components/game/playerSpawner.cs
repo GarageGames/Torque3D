@@ -29,32 +29,40 @@ function PlayerSpawner::onAdd(%this)
 	%this.friendlyName = "Player Spawner";
 	%this.componentType = "Spawner";
 	
-	%this.addComponentField("GameObjectName", "The name of the game object we spawn for the players", string, "PlayerObject");
+	%this.addComponentField("GameObjectName", "The name of the game object we spawn for the players", "gameObject", "PlayerObject");
 }
 
 function PlayerSpawner::onClientConnect(%this, %client)
 {
-	%playerObj = SGOManager.spawn(%this.GameObjectName);
+	%playerObj = spawnGameObject(%this.GameObjectName, false);
 	
 	if(!isObject(%playerObj))
 		return;
 
 	%playerObj.position = %this.owner.position;
 	
-	MissionCleanup.add(%playerObj);
-	
-	for(%b = 0; %b < %playerObj.getComponentCount(); %b++)
-    {
-       %comp = %playerObj.getComponentByIndex(%b);
-
-	   if(%comp.isMethod("onClientConnect"))
-         %comp.onClientConnect(%client);
-    }
+	%playerObj.notify("onClientConnect", %client);
 	
 	switchControlObject(%client, %playerObj);
 	switchCamera(%client, %playerObj);
 	
-	//%playerObj.getComponent(FPSControls).setupControls(%client);
+	%client.player = %playerObj;
+	%client.camera = %playerObj;
+	
+	%inventory = %playerObj.getComponent(InventoryController);
+	
+	if(isObject(%inventory))
+	{
+      for(%i=0; %i<5; %i++)
+      {
+         %arrow = spawnGameObject(ArrowProjectile, false);
+         
+         %inventory.addItem(%arrow);
+      }
+	}
+	
+	%playerObj.position = %this.owner.position;
+	%playerObj.rotation = "0 0 0";
 	
 	%this.clientCount++;
 }

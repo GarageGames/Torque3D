@@ -1,0 +1,10 @@
+<ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="PlayerSpawnerComponentAsset"
+    componentName="PlayerSpawner"
+    componentClass="Component"
+    friendlyName="Player Spawner"
+    componentType="Game"
+    scriptFile="core/components/game/playerSpawner.cs"
+    description="When a client connects, it spawns a player object for them and attaches them to it." />

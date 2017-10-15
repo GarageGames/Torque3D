@@ -1,7 +1,8 @@
 <ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
     AssetName="CollisionComponentAsset"
-    componentName=""
     componentClass="CollisionComponent"
     friendlyName="Collision"
     componentType="Collision"
-    description="Enables an entity to collide with things."/>
+    description="Enables an entity to collide with things." />

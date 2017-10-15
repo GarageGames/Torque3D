@@ -36,9 +36,7 @@
    #include "gui/editor/editorFunctions.h"
 #endif
 #include "console/engineAPI.h"
-#ifdef TORQUE_EXPERIMENTAL_EC
 #include "T3D/entity.h"
-#endif
 
 IMPLEMENT_CONOBJECT(GuiTreeViewCtrl);
 
@@ -647,7 +645,6 @@ void GuiTreeViewCtrl::Item::getTooltipText(U32 bufLen, char *buf)
 
 bool GuiTreeViewCtrl::Item::isParent() const
 {
-#ifdef TORQUE_EXPERIMENTAL_EC
    //We might have a special case with entities
    //So if our entity either has children, or has some component with the EditorInspect interface, we return true
    if (mInspectorInfo.mObject)
@@ -659,7 +656,6 @@ bool GuiTreeViewCtrl::Item::isParent() const
             return true;
       }
    }
-#endif
 
    if(mState.test(VirtualParent))
    {
@@ -3790,7 +3786,6 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
       if( !item->isInspectorData() && item->mState.test(Item::VirtualParent) )
          onVirtualParentExpand(item);
       
-#ifdef TORQUE_EXPERIMENTAL_EC
       //Slightly hacky, but I'm not sure of a better setup until we get major update to the editors
       //We check if our object is an entity, and if it is, we call a 'onInspect' function.
       //This function is pretty much a special notifier to the entity so if it has any behaviors that do special
@@ -3810,7 +3805,6 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
             }
          }
       }
-#endif
       
       mFlags.set( RebuildVisible );
       scrollVisible(item);
@@ -4558,12 +4552,10 @@ bool GuiTreeViewCtrl::objectSearch( const SimObject *object, Item **item )
       if ( !pItem )
          continue;
 
-#ifdef TORQUE_EXPERIMENTAL_EC
       //A bit hackish, but we make a special exception here for items that are named 'Components', as they're merely
       //virtual parents to act as a container to an Entity's components
       if (pItem->mScriptInfo.mText == StringTable->insert("Components"))
          continue;
-#endif
 
       SimObject *pObj = pItem->getObject();
 
@@ -4628,11 +4620,10 @@ bool GuiTreeViewCtrl::onVirtualParentBuild(Item *item, bool bForceFullUpdate)
    
    // Go through our items and purge those that have disappeared from
    // the set.
-#ifdef TORQUE_EXPERIMENTAL_EC
+
    //Entities will be a special case here, if we're an entity, skip this step
    if (dynamic_cast<Entity*>(srcObj))
       return true;
-#endif
    
    for( Item* ptr = item->mChild; ptr != NULL; )
    {

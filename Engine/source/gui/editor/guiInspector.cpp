@@ -29,11 +29,9 @@
 #include "gui/containers/guiScrollCtrl.h"
 #include "gui/editor/inspector/customField.h"
 
-#ifdef TORQUE_EXPERIMENTAL_EC
 #include "gui/editor/inspector/entityGroup.h"
 #include "gui/editor/inspector/mountingGroup.h"
 #include "gui/editor/inspector/componentGroup.h"
-#endif
 
 IMPLEMENT_CONOBJECT(GuiInspector);
 
@@ -589,7 +587,6 @@ void GuiInspector::refresh()
    mGroups.push_back(general);
    addObject(general);
 
-#ifdef TORQUE_EXPERIMENTAL_EC
    //Entity inspector group
    if (mTargets.first()->getClassRep()->isSubclassOf("Entity"))
    {
@@ -624,7 +621,6 @@ void GuiInspector::refresh()
          addObject(compGroup);
       }
    }
-#endif
 
    // Create the inspector groups for static fields.
 
