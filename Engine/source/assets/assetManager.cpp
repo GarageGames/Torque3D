@@ -34,6 +34,10 @@
 #include "assets/declaredAssets.h"
 #endif
 
+#ifndef _AUTOLOAD_ASSETS_H_
+#include "assets/autoloadAssets.h"
+#endif
+
 #ifndef _TAML_ASSET_REFERENCED_VISITOR_H_
 #include "tamlAssetReferencedVisitor.h"
 #endif
@@ -200,6 +204,70 @@ bool AssetManager::addModuleDeclaredAssets( ModuleDefinition* pModuleDefinition 
     }  
 
     return true;
+}
+
+bool AssetManager::loadModuleAutoLoadAssets(ModuleDefinition* pModuleDefinition)
+{
+   // Debug Profiling.
+   PROFILE_SCOPE(AssetManager_loadModuleAutoLoadAssets);
+
+   // Sanity!
+   AssertFatal(pModuleDefinition != NULL, "Cannot auto load assets using a NULL module definition");
+
+   // Does the module have any assets associated with it?
+   if (pModuleDefinition->getModuleAssets().empty())
+   {
+      // Yes, so warn.
+      Con::warnf("Asset Manager: Cannot auto load assets to module '%s' as it has no existing assets.", pModuleDefinition->getSignature());
+      return false;
+   }
+
+   U32 assetCount = pModuleDefinition->getModuleAssets().size();
+
+   // Iterate the module definition children.
+   for (SimSet::iterator itr = pModuleDefinition->begin(); itr != pModuleDefinition->end(); ++itr)
+   {
+      // Fetch the declared assets.
+      AutoloadAssets* pAutoloadAssets = dynamic_cast<AutoloadAssets*>(*itr);
+
+      // Skip if it's not a declared assets location.
+      if (pAutoloadAssets == NULL)
+         continue;
+
+      for (U32 i = 0; i < assetCount; ++i)
+      {
+         AssetDefinition* assetDef = pModuleDefinition->getModuleAssets()[i];
+
+         if (assetDef->mAssetType == pAutoloadAssets->getAssetType())
+         {
+            //TODO: this is stupid and ugly, need to properly automagically parse the class for registration
+            AssetBase* assetBase = nullptr;
+
+            if (assetDef->mAssetType == StringTable->insert("GUIAsset"))
+            {
+               assetBase = mTaml.read<GUIAsset>(assetDef->mAssetBaseFilePath);
+            }
+            else if (assetDef->mAssetType == StringTable->insert("ComponentAsset"))
+            {
+               assetBase = mTaml.read<ComponentAsset>(assetDef->mAssetBaseFilePath);
+            }
+            else if (assetDef->mAssetType == StringTable->insert("ScriptAsset"))
+            {
+               assetBase = mTaml.read<ScriptAsset>(assetDef->mAssetBaseFilePath);
+            }
+            else if (assetDef->mAssetType == StringTable->insert("MaterialAsset"))
+            {
+               assetBase = mTaml.read<MaterialAsset>(assetDef->mAssetBaseFilePath);
+            }
+
+            //load the asset now if valid
+            if (assetBase)
+               addPrivateAsset(assetBase);
+         }
+      }
+   }
+
+   return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -2973,6 +3041,9 @@ void AssetManager::onModulePreLoad( ModuleDefinition* pModuleDefinition )
 
     // Add module declared assets.
     addModuleDeclaredAssets( pModuleDefinition );
+
+    // Load autoloaded assets
+    loadModuleAutoLoadAssets(pModuleDefinition);
 
     // Is an asset tags manifest specified?
     if ( pModuleDefinition->getAssetTagsManifest() != StringTable->EmptyString() )
