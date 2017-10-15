@@ -252,14 +252,29 @@ MatrixF RotationF::asMatrixF() const
    MatrixF returnMat;
    if (mRotationType == Euler)
    {
-      returnMat.set(EulerF(x, y, z));
+      MatrixF imat, xmat, ymat, zmat;
+      xmat.set(EulerF(x, 0, 0));
+      ymat.set(EulerF(0.0f, y, 0.0f));
+      zmat.set(EulerF(0, 0, z));
+      imat.mul(zmat, xmat);
+      returnMat.mul(imat, ymat);
    }
    else
    {
       AngAxisF aa;
       aa.set(Point3F(x, y, z), w);
 
-      aa.setMatrix(&returnMat);
+      MatrixF tempMat;
+      aa.setMatrix(&tempMat);
+
+      EulerF eul = tempMat.toEuler();
+
+      MatrixF imat, xmat, ymat, zmat;
+      xmat.set(EulerF(eul.x, 0, 0));
+      ymat.set(EulerF(0.0f, eul.y, 0.0f));
+      zmat.set(EulerF(0, 0, eul.z));
+      imat.mul(zmat, xmat);
+      returnMat.mul(imat, ymat);
    }
 
    return returnMat;
@@ -355,6 +370,58 @@ DefineConsoleStaticMethod(rotation, LookAt, RotationF, (Point3F origin, Point3F 
    RotationF result;
    result.lookAt(origin, target, up);
    return result;
+}
+
+DefineConsoleStaticMethod(rotation, setRightVector, RotationF, (RotationF a, VectorF rightVec), ,
+   "Subtracts two rotations.\n"
+   "@param a Rotation one."
+   "@param b Rotation two."
+   "@returns v difference of both rotations."
+   "@ingroup Math")
+{
+   a.asMatrixF().setColumn(0, rightVec);
+   return a;
+}
+
+DefineConsoleStaticMethod(rotation, setUpVector, RotationF, (RotationF a, VectorF upVec), ,
+   "Subtracts two rotations.\n"
+   "@param a Rotation one."
+   "@param b Rotation two."
+   "@returns v difference of both rotations."
+   "@ingroup Math")
+{
+   a.asMatrixF().setColumn(2, upVec);
+   return a;
+}
+
+DefineConsoleStaticMethod(rotation, getForwardVector, VectorF, (RotationF a), ,
+   "Subtracts two rotations.\n"
+   "@param a Rotation one."
+   "@param b Rotation two."
+   "@returns v difference of both rotations."
+   "@ingroup Math")
+{
+   return a.asMatrixF().getForwardVector();
+}
+
+DefineConsoleStaticMethod(rotation, getRightVector, VectorF, (RotationF a), ,
+   "Subtracts two rotations.\n"
+   "@param a Rotation one."
+   "@param b Rotation two."
+   "@returns v difference of both rotations."
+   "@ingroup Math")
+{
+   return a.asMatrixF().getRightVector();
+}
+
+DefineConsoleStaticMethod(rotation, getUpVector, VectorF, (RotationF a), ,
+   "Subtracts two rotations.\n"
+   "@param a Rotation one."
+   "@param b Rotation two."
+   "@returns v difference of both rotations."
+   "@ingroup Math")
+{
+   return a.asMatrixF().getUpVector();
 }
 
 DefineConsoleStaticMethod(rotation, getDirection, Point3F, (RotationF rot),,
