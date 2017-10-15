@@ -34,7 +34,6 @@
 #include "lighting/lightQuery.h"
 #include "scene/sceneManager.h"
 #include "gfx/bitmap/ddsFile.h"
-#include "gfx/bitmap/ddsUtils.h"
 #include "gfx/gfxTextureManager.h"
 #include "materials/materialFeatureTypes.h"
 #include "renderInstance/renderImposterMgr.h"

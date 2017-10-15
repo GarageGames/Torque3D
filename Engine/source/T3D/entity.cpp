@@ -51,6 +51,7 @@
 //
 #include "gfx/sim/debugDraw.h"
 //
+#include "T3D/sfx/sfx3DWorld.h"
 
 extern bool gEditingMission;
 
@@ -117,6 +118,8 @@ Entity::Entity()
 
    mInitialized = false;
 
+   mGameObjectAssetId = StringTable->insert("");
+
 }
 
 Entity::~Entity()
@@ -143,6 +146,11 @@ void Entity::initPersistFields()
    addField("LocalRotation", TypeMatrixRotation, Offset(mMount.xfm, Entity), "Rotation we are mounted at ( object space of our mount object ).");
 
    endGroup("Transform");
+
+   addGroup("GameObject");
+   addProtectedField("gameObjectName", TypeGameObjectAssetPtr, Offset(mGameObjectAsset, Entity), &_setGameObject, &defaultProtectedGetFn,
+      "The asset Id used for the game object this entity is based on.");
+   endGroup("GameObject");
 }
 
 //
@@ -215,8 +223,8 @@ bool Entity::onAdd()
    if (!Parent::onAdd())
       return false;
 
-   mObjBox = Box3F(Point3F(-1, -1, -1), Point3F(1, 1, 1));
-
+   mObjBox = Box3F(Point3F(-0.5, -0.5, -0.5), Point3F(0.5, 0.5, 0.5));
+   
    resetWorldBox();
    setObjectBox(mObjBox);
 
@@ -224,6 +232,7 @@ bool Entity::onAdd()
 
    //Make sure we get positioned
    setMaskBits(TransformMask);
+   setMaskBits(NamespaceMask);
 
    return true;
 }
@@ -251,6 +260,16 @@ void Entity::onPostAdd()
 
    if (isMethod("onAdd"))
       Con::executef(this, "onAdd");
+}
+
+bool Entity::_setGameObject(void *object, const char *index, const char *data)
+{
+   Entity *e = static_cast<Entity*>(object);
+
+   // Sanity!
+   AssertFatal(data != NULL, "Cannot use a NULL asset Id.");
+
+   return true; //rbI->setMeshAsset(data);
 }
 
 void Entity::setDataField(StringTableEntry slotName, const char *array, const char *value)
@@ -363,8 +382,20 @@ void Entity::processTick(const Move* move)
          }
       }
 
-      if (isMethod("processTick"))
+      // Save current rigid state interpolation
+      mDelta.posVec = getPosition();
+      mDelta.rot[0] = mRot.asQuatF();
+
+      //Handle any script updates, which can include physics stuff
+      if (isServerObject() && isMethod("processTick"))
          Con::executef(this, "processTick");
+
+      // Wrap up interpolation info
+      mDelta.pos = getPosition();
+      mDelta.posVec -= getPosition();
+      mDelta.rot[1] = mRot.asQuatF();
+
+      setTransform(getPosition(), mRot);
    }
 }
 
@@ -402,11 +433,6 @@ U32 Entity::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    if (stream->writeFlag(mask & TransformMask))
    {
-      //mathWrite( *stream, getScale() );
-      //stream->writeAffineTransform(mObjToWorld);
-      //mathWrite(*stream, getPosition());
-      //mathWrite(*stream, mPos);
-
       stream->writeCompressedPoint(mPos);
       mathWrite(*stream, getRotation());
 
@@ -414,12 +440,6 @@ U32 Entity::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
       stream->writeFlag(!(mask & NoWarpMask));
    }
-
-   /*if (stream->writeFlag(mask & MountedMask))
-   {
-      mathWrite(*stream, mMount.xfm.getPosition());
-      mathWrite(*stream, mMount.xfm.toEuler());
-   }*/
 
    if (stream->writeFlag(mask & BoundsMask))
    {
@@ -483,6 +503,19 @@ U32 Entity::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    else
       stream->writeFlag(false);
 
+   /*if (stream->writeFlag(mask & NamespaceMask))
+   {
+      const char* name = getName();
+      if (stream->writeFlag(name && name[0]))
+         stream->writeString(String(name));
+
+      if (stream->writeFlag(mSuperClassName && mSuperClassName[0]))
+         stream->writeString(String(mSuperClassName));
+
+      if (stream->writeFlag(mClassName && mClassName[0]))
+         stream->writeString(String(mClassName));
+   }*/
+
    return retMask;
 }
 
@@ -492,20 +525,10 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
 
    if (stream->readFlag())
    {
-      /*Point3F scale;
-      mathRead( *stream, &scale );
-      setScale( scale);*/
-
-      //MatrixF objToWorld;
-      //stream->readAffineTransform(&objToWorld);
-
       Point3F pos;
-
       stream->readCompressedPoint(&pos);
-      //mathRead(*stream, &pos);
 
       RotationF rot;
-
       mathRead(*stream, &rot);
 
       mDelta.move.unpack(stream);
@@ -514,72 +537,6 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
       {
          // Determine number of ticks to warp based on the average
          // of the client and server velocities.
-         /*mDelta.warpOffset = pos - mDelta.pos;
-
-         F32 dt = mDelta.warpOffset.len() / (0.5f * TickSec);
-
-         mDelta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
-
-         //F32 as = (speed + mVelocity.len()) * 0.5f * TickSec;
-         //F32 dt = (as > 0.00001f) ? mDelta.warpOffset.len() / as : sMaxWarpTicks;
-         //mDelta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
-
-         //mDelta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
-
-         //mDelta.warpTicks = sMaxWarpTicks;
-
-         mDelta.warpTicks = 0;
-
-         if (mDelta.warpTicks)
-         {
-            // Setup the warp to start on the next tick.
-            if (mDelta.warpTicks > sMaxWarpTicks)
-               mDelta.warpTicks = sMaxWarpTicks;
-            mDelta.warpOffset /= (F32)mDelta.warpTicks;
-
-            mDelta.rot[0] = rot.asQuatF();
-            mDelta.rot[1] = rot.asQuatF();
-
-            mDelta.rotOffset = rot.asEulerF() - mDelta.rot.asEulerF();
-
-            // Ignore small rotation differences
-            if (mFabs(mDelta.rotOffset.x) < 0.001f)
-               mDelta.rotOffset.x = 0;
-
-            if (mFabs(mDelta.rotOffset.y) < 0.001f)
-               mDelta.rotOffset.y = 0;
-
-            if (mFabs(mDelta.rotOffset.z) < 0.001f)
-               mDelta.rotOffset.z = 0;
-
-            mDelta.rotOffset /= (F32)mDelta.warpTicks;
-         }
-         else
-         {
-            // Going to skip the warp, server and client are real close.
-            // Adjust the frame interpolation to move smoothly to the
-            // new position within the current tick.
-            Point3F cp = mDelta.pos + mDelta.posVec * mDelta.dt;
-            if (mDelta.dt == 0)
-            {
-               mDelta.posVec.set(0.0f, 0.0f, 0.0f);
-               mDelta.rotVec.set(0.0f, 0.0f, 0.0f);
-            }
-            else
-            {
-               F32 dti = 1.0f / mDelta.dt;
-               mDelta.posVec = (cp - pos) * dti;
-               mDelta.rotVec.z = mRot.z - rot.z;
-
-               mDelta.rotVec.z *= dti;
-            }
-
-            mDelta.pos = pos;
-            mDelta.rot = rot;
-
-            setTransform(pos, rot);
-         }*/
-
          Point3F cp = mDelta.pos + mDelta.posVec * mDelta.dt;
          mDelta.warpOffset = pos - cp;
 
@@ -631,20 +588,6 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
       }
    }
 
-   /*if (stream->readFlag())
-   {
-      Point3F mountOffset;
-      EulerF mountRot;
-      mathRead(*stream, &mountOffset);
-      mathRead(*stream, &mountRot);
-
-      RotationF rot = RotationF(mountRot);
-      mountRot = rot.asEulerF(RotationF::Degrees);
-
-      setMountOffset(mountOffset);
-      setMountRotation(mountRot);
-   }*/
-
    if (stream->readFlag())
    {
       mathRead(*stream, &mObjBox);
@@ -669,13 +612,38 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
          }
       }
    }
+
+   /*if (stream->readFlag())
+   {
+      if (stream->readFlag())
+      {
+         char name[256];
+         stream->readString(name);
+         assignName(name);
+      }
+
+      if (stream->readFlag())
+      {
+         char superClassname[256];
+         stream->readString(superClassname);
+         mSuperClassName = superClassname;
+      }
+
+      if (stream->readFlag())
+      {
+         char classname[256];
+         stream->readString(classname);
+         mClassName = classname;
+      }
+
+      linkNamespaces();
+   }*/
 }
 
 //Manipulation
 void Entity::setTransform(const MatrixF &mat)
 {
-   //setMaskBits(TransformMask);
-   setMaskBits(TransformMask | NoWarpMask);
+   MatrixF oldTransform = getTransform();
 
    if (isMounted())
    {
@@ -687,25 +655,20 @@ void Entity::setTransform(const MatrixF &mat)
 
       if (!newOffset.isZero())
       {
-         //setMountOffset(newOffset);
          mPos = newOffset;
       }
 
       Point3F matEul = mat.toEuler();
-
-      //mRot = Point3F(mRadToDeg(matEul.x), mRadToDeg(matEul.y), mRadToDeg(matEul.z));
 
       if (matEul != Point3F(0, 0, 0))
       {
          Point3F mountEul = mMount.object->getTransform().toEuler();
          Point3F diff = matEul - mountEul;
 
-         //setMountRotation(Point3F(mRadToDeg(diff.x), mRadToDeg(diff.y), mRadToDeg(diff.z)));
          mRot = diff;
       }
       else
       {
-         //setMountRotation(Point3F(0, 0, 0));
          mRot = Point3F(0, 0, 0);
       }
 
@@ -714,6 +677,9 @@ void Entity::setTransform(const MatrixF &mat)
       transf.setPosition(mPos + mMount.object->getPosition());
 
       Parent::setTransform(transf);
+
+      if (transf != oldTransform)
+         setMaskBits(TransformMask);
    }
    else
    {
@@ -744,6 +710,8 @@ void Entity::setTransform(const MatrixF &mat)
 
 void Entity::setTransform(Point3F position, RotationF rotation)
 {
+   MatrixF oldTransform = getTransform();
+
    if (isMounted())
    {
       mPos = position;
@@ -755,7 +723,8 @@ void Entity::setTransform(Point3F position, RotationF rotation)
 
       Parent::setTransform(transf);
 
-      setMaskBits(TransformMask);
+      if (transf != oldTransform)
+         setMaskBits(TransformMask);
    }
    else
    {
@@ -774,7 +743,6 @@ void Entity::setTransform(Point3F position, RotationF rotation)
       mPos = position;
       mRot = rotation;
 
-      setMaskBits(TransformMask);
       //if (isServerObject())
       //   setMaskBits(TransformMask);
 
@@ -788,19 +756,18 @@ void Entity::setTransform(Point3F position, RotationF rotation)
       //PROFILE_SCOPE(Entity_setTransform);
 
       // Update the transforms.
-
       Parent::setTransform(newMat);
 
       onTransformSet.trigger(&newMat);
 
-      /*mObjToWorld = mWorldToObj = newMat;
-      mWorldToObj.affineInverse();
-      // Update the world-space AABB.
-      resetWorldBox();
-      // If we're in a SceneManager, sync our scene state.
-      if (mSceneManager != NULL)
-      mSceneManager->notifyObjectDirty(this);
-      setRenderTransform(newMat);*/
+      Point3F newPos = newMat.getPosition();
+      RotationF newRot = newMat;
+
+      Point3F oldPos = oldTransform.getPosition();
+      RotationF oldRot = oldTransform;
+
+      if (newPos != oldPos || newRot != oldRot)
+         setMaskBits(TransformMask);
    }
 }
 
@@ -887,7 +854,7 @@ void Entity::setMountRotation(EulerF rotOffset)
       temp.setColumn(3, mMount.xfm.getPosition());
 
       mMount.xfm = temp;
-      //mRot = RotationF(temp);
+
       setMaskBits(MountedMask);
    }
 }
@@ -964,63 +931,6 @@ void Entity::getRenderMountTransform(F32 delta, S32 index, const MatrixF &xfm, M
    Parent::getMountTransform(index, xfm, outMat);
 }
 
-void Entity::setForwardVector(VectorF newForward, VectorF upVector)
-{
-   MatrixF mat = getTransform();
-
-   VectorF up(0.0f, 0.0f, 1.0f);
-   VectorF axisX;
-   VectorF axisY = newForward;
-   VectorF axisZ;
-
-   if (upVector != VectorF::Zero)
-      up = upVector;
-
-   // Validate and normalize input:  
-   F32 lenSq;
-   lenSq = axisY.lenSquared();
-   if (lenSq < 0.000001f)
-   {
-      axisY.set(0.0f, 1.0f, 0.0f);
-      Con::errorf("Entity::setForwardVector() - degenerate forward vector");
-   }
-   else
-   {
-      axisY /= mSqrt(lenSq);
-   }
-
-
-   lenSq = up.lenSquared();
-   if (lenSq < 0.000001f)
-   {
-      up.set(0.0f, 0.0f, 1.0f);
-      Con::errorf("SceneObject::setForwardVector() - degenerate up vector - too small");
-   }
-   else
-   {
-      up /= mSqrt(lenSq);
-   }
-
-   if (fabsf(mDot(up, axisY)) > 0.9999f)
-   {
-      Con::errorf("SceneObject::setForwardVector() - degenerate up vector - same as forward");
-      // i haven't really tested this, but i think it generates something which should be not parallel to the previous vector:  
-      F32 tmp = up.x;
-      up.x = -up.y;
-      up.y = up.z;
-      up.z = tmp;
-   }
-
-   // construct the remaining axes:  
-   mCross(axisY, up, &axisX);
-   mCross(axisX, axisY, &axisZ);
-
-   mat.setColumn(0, axisX);
-   mat.setColumn(1, axisY);
-   mat.setColumn(2, axisZ);
-
-   setTransform(mat);
-}
 //
 //These basically just redirect to any collision behaviors we have
 bool Entity::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
@@ -1115,6 +1025,28 @@ void Entity::onUnmount(SceneObject *obj, S32 node)
       //TODO implement this callback
       //onUnmount_callback( this, obj, node );
    }
+}
+
+void Entity::setControllingClient(GameConnection* client)
+{
+   if (isGhost() && gSFX3DWorld)
+   {
+      if (gSFX3DWorld->getListener() == this && !client && getControllingClient() && getControllingClient()->isConnectionToServer())
+      {
+         // We are the current listener and are no longer a controller object on the
+         // connection, so clear our listener status.
+
+         gSFX3DWorld->setListener(NULL);
+      }
+      else if (client && client->isConnectionToServer() && !getControllingObject())
+      {
+         // We're on the local client and not controlled by another object, so make
+         // us the current SFX listener.
+
+         gSFX3DWorld->setListener(this);
+      }
+   }
+   Parent::setControllingClient(client);
 }
 
 //Heirarchy stuff
@@ -1261,9 +1193,8 @@ bool Entity::removeComponent(Component *comp, bool deleteComponent)
 
       onComponentRemoved.trigger(comp);
 
-      comp->setOwner(NULL);
-
       comp->onComponentRemove(); //in case the behavior needs to do cleanup on the owner
+      comp->setOwner(NULL);
 
       if (deleteComponent)
          comp->safeDeleteObject();
@@ -1364,72 +1295,6 @@ void Entity::onInspect()
    {
       (*it)->onInspect();
    }
-
-   GuiTreeViewCtrl *editorTree = dynamic_cast<GuiTreeViewCtrl*>(Sim::findObject("EditorTree"));
-   if (!editorTree)
-      return;
-
-   GuiTreeViewCtrl::Item *newItem, *parentItem;
-
-   parentItem = editorTree->getItem(editorTree->findItemByObjectId(getId()));
-
-   S32 componentID = editorTree->insertItem(parentItem->getID(), "Components");
-
-   newItem = editorTree->getItem(componentID);
-   newItem->mState.set(GuiTreeViewCtrl::Item::VirtualParent);
-   newItem->mState.set(GuiTreeViewCtrl::Item::DenyDrag);
-   //newItem->mState.set(GuiTreeViewCtrl::Item::InspectorData);
-   newItem->mState.set(GuiTreeViewCtrl::Item::ForceItemName);
-   //newItem->mInspectorInfo.mObject = this;
-
-   AssetManager *assetDB = dynamic_cast<AssetManager*>(Sim::findObject("AssetDatabase"));
-   if (!assetDB)
-      return;
-
-   //This is used in the event of script-created assets, which likely only have
-   //the name and other 'friendly' properties stored in a ComponentAsset.
-   //So we'll do a query for those assets and find the asset based on the component's
-   //class name
-   AssetQuery* qry = new AssetQuery();
-   qry->registerObject();
-
-   assetDB->findAssetType(qry, "ComponentAsset");
-
-   for (U32 i = 0; i < mComponents.size(); ++i)
-   {
-      String compName = mComponents[i]->getFriendlyName();
-
-      if (compName == String(""))
-      {
-         String componentClass = mComponents[i]->getClassNamespace();
-
-         //Means that it's a script-derived component and we should consult the asset to try
-         //to get the info for it
-         S32 compAssetCount = qry->mAssetList.size();
-         for (U32 c = 0; c < compAssetCount; ++c)
-         {
-            StringTableEntry assetID = qry->mAssetList[c];
-
-            ComponentAsset* compAsset = assetDB->acquireAsset<ComponentAsset>(assetID);
-
-            String compAssetClass = compAsset->getComponentName();
-            if (componentClass == compAssetClass)
-            {
-               compName = compAsset->getFriendlyName();
-               break;
-            }
-         }
-      }
-
-      S32 compID = editorTree->insertItem(componentID, compName);
-      newItem = editorTree->getItem(compID);
-      newItem->mInspectorInfo.mObject = mComponents[i];
-      newItem->mState.set(GuiTreeViewCtrl::Item::ForceItemName);
-      newItem->mState.set(GuiTreeViewCtrl::Item::DenyDrag);
-      newItem->mState.set(GuiTreeViewCtrl::Item::InspectorData);
-   }
-
-   editorTree->buildVisibleTree(true);
 }
 
 void Entity::onEndInspect()
@@ -1614,6 +1479,21 @@ void Entity::updateContainer()
    mGravityMod = info.gravityScale;*/
 }
 //
+
+void Entity::notifyComponents(String signalFunction, String argA, String argB, String argC, String argD, String argE)
+{
+   for (U32 i = 0; i < mComponents.size(); i++)
+   {
+      // We can do this because both are in the string table
+      Component *comp = mComponents[i];
+
+      if (comp->isActive())
+      {
+         if (comp->isMethod(signalFunction))
+            Con::executef(comp, signalFunction, argA, argB, argC, argD, argE);
+      }
+   }
+}
 
 void Entity::setComponentsDirty()
 {
@@ -1833,7 +1713,6 @@ DefineConsoleMethod(Entity, getComponent, S32, (String componentName), (""),
    Component *comp = object->getComponent(componentName);
 
    return (comp != NULL) ? comp->getId() : 0;
-   return 0;
 }
 
 /*ConsoleMethod(Entity, getBehaviorByType, S32, 3, 3, "(string BehaviorTemplateName) - gets a behavior\n"
@@ -1917,6 +1796,15 @@ DefineConsoleMethod(Entity, getMoveTrigger, bool, (S32 triggerNum), (0),
    return false;
 }
 
+DefineEngineMethod(Entity, getForwardVector, VectorF, (), ,
+   "Get the direction this object is facing.\n"
+   "@return a vector indicating the direction this object is facing.\n"
+   "@note This is the object's y axis.")
+{
+   VectorF forVec = object->getTransform().getForwardVector();
+   return forVec;
+}
+
 DefineConsoleMethod(Entity, setForwardVector, void, (VectorF newForward), (VectorF(0,0,0)),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
@@ -1936,4 +1824,14 @@ DefineConsoleMethod(Entity, rotateTo, void, (Point3F lookPosition, F32 degreePer
    "@return The number of static fields defined on the object.")
 {
    //object->setForwardVector(newForward);
+}
+
+DefineConsoleMethod(Entity, notify, void, (String signalFunction, String argA, String argB, String argC, String argD, String argE),
+("", "", "", "", "", ""),
+"Triggers a signal call to all components for a certain function.")
+{
+   if (signalFunction == String(""))
+      return;
+
+   object->notifyComponents(signalFunction, argA, argB, argC, argD, argE);
 }

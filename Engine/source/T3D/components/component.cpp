@@ -42,13 +42,13 @@
 
 Component::Component()
 {
-   mFriendlyName = StringTable->lookup("");
-   mFromResource = StringTable->lookup("");
-   mComponentType = StringTable->lookup("");
-   mComponentGroup = StringTable->lookup("");
-   mNetworkType = StringTable->lookup("");
-   mTemplateName = StringTable->lookup("");
-   //mDependency = StringTable->lookup("");
+   mFriendlyName = StringTable->EmptyString();
+   mFromResource = StringTable->EmptyString();
+   mComponentType = StringTable->EmptyString();
+   mComponentGroup = StringTable->EmptyString();
+   mNetworkType = StringTable->EmptyString();
+   mTemplateName = StringTable->EmptyString();
+   //mDependency = StringTable->EmptyString();
 
    mNetworked = false;
 
@@ -63,6 +63,8 @@ Component::Component()
    mOwner = NULL;
 
    mCanSaveFieldDictionary = false;
+
+   mOriginatingAssetId = StringTable->EmptyString();
 
    mNetFlags.set(Ghostable);
 }
@@ -97,6 +99,10 @@ void Component::initPersistFields()
 
       //addField("hidden", TypeBool, Offset(mHidden, Component), "Flags if this behavior is shown in the editor or not", AbstractClassRep::FieldFlags::FIELD_HideInInspectors);
       addProtectedField("enabled", TypeBool, Offset(mEnabled, Component), &_setEnabled, &defaultProtectedGetFn, "");
+
+      addField("originatingAsset", TypeComponentAssetPtr, Offset(mOriginatingAsset, Component),
+         "Asset that spawned this component, used for tracking/housekeeping", AbstractClassRep::FieldFlags::FIELD_HideInInspectors);
+
    endGroup("Component");
 
    Parent::initPersistFields();
@@ -149,6 +155,7 @@ bool Component::onAdd()
       return false;
 
    setMaskBits(UpdateMask);
+   setMaskBits(NamespaceMask);
 
    return true;
 }
@@ -274,6 +281,19 @@ U32 Component::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->writeFlag(mEnabled);
    }
 
+   /*if (stream->writeFlag(mask & NamespaceMask))
+   {
+      const char* name = getName();
+      if (stream->writeFlag(name && name[0]))
+         stream->writeString(String(name));
+
+      if (stream->writeFlag(mSuperClassName && mSuperClassName[0]))
+         stream->writeString(String(mSuperClassName));
+
+      if (stream->writeFlag(mClassName && mClassName[0]))
+         stream->writeString(String(mClassName));
+   }*/
+
    return retMask;
 }
 
@@ -303,6 +323,32 @@ void Component::unpackUpdate(NetConnection *con, BitStream *stream)
    {
       mEnabled = stream->readFlag();
    }
+
+   /*if (stream->readFlag())
+   {
+      if (stream->readFlag())
+      {
+         char name[256];
+         stream->readString(name);
+         assignName(name);
+      }
+
+      if (stream->readFlag())
+      {
+         char superClassname[256];
+         stream->readString(superClassname);
+       mSuperClassName = superClassname;
+      }
+
+      if (stream->readFlag())
+      {
+         char classname[256];
+         stream->readString(classname);
+         mClassName = classname;
+      }
+
+      linkNamespaces();
+   }*/
 }
 
 void Component::packToStream(Stream &stream, U32 tabStop, S32 behaviorID, U32 flags /* = 0  */)
@@ -346,6 +392,10 @@ void Component::setDataField(StringTableEntry slotName, const char *array, const
    onDataSet.trigger(this, slotName, value);
 }
 
+StringTableEntry Component::getComponentName()
+{
+   return getNamespace()->getName();
+}
 
 //catch any behavior field updates
 void Component::onStaticModified(const char* slotName, const char* newValue)
@@ -426,6 +476,16 @@ void Component::addComponentField(const char *fieldName, const char *desc, const
       fieldTypeMask = TypeBool;
    else if (fieldType == StringTable->insert("object"))
       fieldTypeMask = TypeSimObjectPtr;
+   else if (fieldType == StringTable->insert("string"))
+      fieldTypeMask = TypeString;
+   else if (fieldType == StringTable->insert("colorI"))
+      fieldTypeMask = TypeColorI;
+   else if (fieldType == StringTable->insert("colorF"))
+      fieldTypeMask = TypeColorF;
+   else if (fieldType == StringTable->insert("ease"))
+      fieldTypeMask = TypeEaseF;
+   else if (fieldType == StringTable->insert("gameObject"))
+      fieldTypeMask = TypeGameObjectAssetPtr;
    else
       fieldTypeMask = TypeString;
 
@@ -601,6 +661,17 @@ ConsoleMethod(Component, setComponentield, const char *, 3, 3, "(int index) - Ge
    dSprintf(buf, 1024, "%s\t%s\t%s", field->mFieldName, field->mFieldType, field->mDefaultValue);
 
    return buf;
+}
+
+DefineConsoleMethod(Component, getComponentFieldType, const char *, (String fieldName), ,
+   "Get the number of static fields on the object.\n"
+   "@return The number of static fields defined on the object.")
+{
+   ComponentField *field = object->getComponentField(fieldName);
+   if (field == NULL)
+      return "";
+
+   return field->mFieldTypeName;;
 }
 
 ConsoleMethod(Component, getBehaviorFieldUserData, const char *, 3, 3, "(int index) - Gets the UserData associated with a field by index in the field list\n"

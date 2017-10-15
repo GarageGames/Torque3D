@@ -35,6 +35,12 @@
 #ifndef _CONTAINERQUERY_H_
 #include "T3D/containerQuery.h"
 #endif
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
+#endif 
+#ifndef GAME_OBJECT_ASSET_H
+#include "T3D/assets/GameObjectAsset.h"
+#endif
 
 class Component;
 
@@ -55,6 +61,9 @@ private:
    Vector<Component*>         mToLoadComponents;
 
    bool                       mStartComponentUpdate;
+
+   StringTableEntry		      mGameObjectAssetId;
+   AssetPtr<GameObjectAsset>  mGameObjectAsset;
 
    ContainerQueryInfo containerInfo;
 
@@ -98,7 +107,8 @@ public:
       BoundsMask = Parent::NextFreeMask << 1,
       ComponentsMask = Parent::NextFreeMask << 2,
       NoWarpMask = Parent::NextFreeMask << 3,
-      NextFreeMask = Parent::NextFreeMask << 4
+      NamespaceMask = Parent::NextFreeMask << 4,
+      NextFreeMask = Parent::NextFreeMask << 5
    };
 
    StateDelta mDelta;
@@ -123,15 +133,13 @@ public:
    virtual MatrixF getTransform();
    virtual Point3F getPosition() const { return mPos; }
 
-   //void setTransform(Point3F position, RotationF rot);
-
-   //void setRotation(RotationF rotation);
-
    void setRotation(RotationF rotation) {
       mRot = rotation;
       setMaskBits(TransformMask);
    };
    RotationF getRotation() { return mRot; }
+
+   static bool _setGameObject(void *object, const char *index, const char *data);
 
    void setMountOffset(Point3F posOffset);
    void setMountRotation(EulerF rotOffset);
@@ -146,12 +154,14 @@ public:
    virtual void getMountTransform(S32 index, const MatrixF &xfm, MatrixF *outMat);
    virtual void getRenderMountTransform(F32 delta, S32 index, const MatrixF &xfm, MatrixF *outMat);
 
-   void setForwardVector(VectorF newForward, VectorF upVector = VectorF::Zero);
-
    virtual void mountObject(SceneObject *obj, S32 node, const MatrixF &xfm = MatrixF::Identity);
    void mountObject(SceneObject* objB, MatrixF txfm);
    void onMount(SceneObject *obj, S32 node);
    void onUnmount(SceneObject *obj, S32 node);
+
+   /// Sets the client controlling this object
+   /// @param  client   Client that is now controlling this object
+   virtual void setControllingClient(GameConnection *client);
 
    // NetObject
    U32 packUpdate(NetConnection *conn, U32 mask, BitStream *stream);
@@ -162,6 +172,8 @@ public:
 
    //Components
    virtual bool deferAddingComponents() const { return true; }
+
+   void notifyComponents(String signalFunction, String argA, String argB, String argC, String argD, String argE);
 
    template <class T>
    T* getComponent();
