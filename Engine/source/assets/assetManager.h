@@ -142,6 +142,8 @@ public:
     bool doesAssetDependOn( const char* pAssetId, const char* pDependsOnAssetId );
     bool isAssetDependedOn( const char* pAssetId, const char* pDependedOnByAssetId );
 
+    bool loadModuleAutoLoadAssets(ModuleDefinition* pModuleDefinition);
+
     /// Referenced assets.
     bool compileReferencedAssets( ModuleDefinition* pModuleDefinition );
     bool isReferencedAsset( const char* pAssetId );
