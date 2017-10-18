@@ -645,18 +645,6 @@ void GuiTreeViewCtrl::Item::getTooltipText(U32 bufLen, char *buf)
 
 bool GuiTreeViewCtrl::Item::isParent() const
 {
-   //We might have a special case with entities
-   //So if our entity either has children, or has some component with the EditorInspect interface, we return true
-   if (mInspectorInfo.mObject)
-   {
-      Entity* e = dynamic_cast<Entity*>(mInspectorInfo.mObject.getObject());
-      if (e)
-      {
-         if (e->size() > 0 || e->getComponentCount() != 0)
-            return true;
-      }
-   }
-
    if(mState.test(VirtualParent))
    {
       if( !isInspectorData() )
