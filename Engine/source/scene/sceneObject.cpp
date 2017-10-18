@@ -1518,8 +1518,9 @@ DefineEngineMethod( SceneObject, isGlobalBounds, bool, (),,
 }
 
 DefineConsoleMethod(SceneObject, setForwardVector, void, (VectorF newForward, VectorF upVector), (VectorF(0, 0, 0), VectorF(0, 0, 1)),
-   "Get the number of static fields on the object.\n"
-   "@return The number of static fields defined on the object.")
+   "Sets the forward vector of a scene object, making it face Y+ along the new vector.\n"
+   "@param The new forward vector to set.\n"
+   "@param (Optional) The up vector to use to help orient the rotation.")
 {
    object->setForwardVector(newForward, upVector);
 }
