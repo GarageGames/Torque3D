@@ -1044,6 +1044,9 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
          // We need the default mesh transform.
          MatrixF localXfm;
          getNodeWorldTransform( object.nodeIndex, &localXfm );
+         Point3F t = localXfm.getPosition();
+         t.convolve(scale);
+         localXfm.setPosition(t);
 
          // We have some sort of collision shape... so allocate it.
          if ( !colShape )
@@ -1053,12 +1056,14 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
          if ( dStrStartsWith( meshName, "Colbox" ) )
          {
             // The bounds define the box extents directly.
-            Point3F halfWidth = mesh->getBounds().getExtents() * 0.5f;
+            Point3F halfWidth = mesh->getBounds().getExtents() * scale * 0.5f;
 
             // Add the offset to the center of the bounds 
             // into the local space transform.
             MatrixF centerXfm( true );
-            centerXfm.setPosition( mesh->getBounds().getCenter() );
+            Point3F t = mesh->getBounds().getCenter();
+            t.convolve(scale);
+            centerXfm.setPosition(t);
             localXfm.mul( centerXfm );
 
             colShape->addBox( halfWidth, localXfm );
@@ -1066,12 +1071,15 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
          else if ( dStrStartsWith( meshName, "Colsphere" ) )
          {
             // Get a sphere inscribed to the bounds.
-            F32 radius = mesh->getBounds().len_min() * 0.5f;
+            Point3F extents = mesh->getBounds().getExtents() * scale;
+            F32 radius = extents.least() * 0.5f;
 
-            // Add the offset to the center of the bounds 
+            // Add the offset to the center of the bounds
             // into the local space transform.
             MatrixF primXfm( true );
-            primXfm.setPosition( mesh->getBounds().getCenter() );
+            Point3F t = mesh->getBounds().getCenter();
+            t.convolve(scale);
+            primXfm.setPosition(t);
             localXfm.mul( primXfm );
 
             colShape->addSphere( radius, localXfm );
@@ -1079,12 +1087,14 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
          else if ( dStrStartsWith( meshName, "Colcapsule" ) )
          {
             // Use the smallest extent as the radius for the capsule.
-            Point3F extents = mesh->getBounds().getExtents();
+            Point3F extents = mesh->getBounds().getExtents() * scale;
             F32 radius = extents.least() * 0.5f;
 
             // We need to center the capsule and align it to the Y axis.
             MatrixF primXfm( true );
-            primXfm.setPosition( mesh->getBounds().getCenter() );
+            Point3F t = mesh->getBounds().getCenter();
+            t.convolve(scale);
+            primXfm.setPosition(t);
 
             // Use the longest axis as the capsule height.
             F32 height = -radius * 2.0f;
@@ -1138,10 +1148,6 @@ PhysicsCollision* TSShape::_buildColShapes( bool useVisibleMesh, const Point3F &
             //
             VertexPolyList polyList;
             MatrixF meshMat( localXfm );
-
-            Point3F t = meshMat.getPosition();
-            t.convolve( scale );
-            meshMat.setPosition( t );            
 
             polyList.setTransform( &MatrixF::Identity, scale );
             mesh->buildPolyList( 0, &polyList, surfaceKey, NULL );
