@@ -1672,7 +1672,7 @@ Net::Error Net::send(NetSocket handleFd, const U8 *buffer, S32 bufferSize, S32 *
 
    if (outBytesWritten)
    {
-      *outBytesWritten = outBytesWritten < 0 ? 0 : bytesWritten;
+      *outBytesWritten = *outBytesWritten < 0 ? 0 : bytesWritten;
    }
 
    return PlatformNetState::getLastError();
