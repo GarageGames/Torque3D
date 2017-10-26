@@ -32,14 +32,22 @@
 #ifndef CORE_INTERFACES_H
 #include "T3D/components/coreInterfaces.h"
 #endif
+#ifndef _ASSET_PTR_H_
+#include "assets/assetPtr.h"
+#endif 
+#ifndef COMPONENT_ASSET_H
+#include "T3D/assets/ComponentAsset.h"
+#endif
 
 class Entity;
+class Namespace;
 
 struct ComponentField
 {
    StringTableEntry mFieldName;
    StringTableEntry mFieldDescription;
 
+   StringTableEntry mFieldTypeName;
    S32 mFieldType;
    StringTableEntry mUserData;
 
@@ -80,6 +88,9 @@ protected:
    Entity*              mOwner;
    bool					   mHidden;
    bool					   mEnabled;
+
+   StringTableEntry		      mOriginatingAssetId;
+   AssetPtr<ComponentAsset>  mOriginatingAsset;
 
 public:
    Component();
@@ -175,7 +186,8 @@ public:
       OwnerMask = BIT(1),
       UpdateMask = BIT(2),
       EnableMask = BIT(3),
-      NextFreeMask = BIT(4)
+      NamespaceMask = BIT(4),
+      NextFreeMask = BIT(5)
    };
 
    virtual U32 packUpdate(NetConnection *con, U32 mask, BitStream *stream);
@@ -192,6 +204,8 @@ public:
    void checkComponentFieldModified(const char* slotName, const char* newValue);
 
    virtual void checkDependencies(){}
+
+   StringTableEntry getComponentName();
 };
 
 #endif // COMPONENT_H
