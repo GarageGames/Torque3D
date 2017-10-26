@@ -127,6 +127,7 @@ public:
     bool removeDeclaredAssets( ModuleDefinition* pModuleDefinition );
     bool removeDeclaredAsset( const char* pAssetId );
     bool renameDeclaredAsset( const char* pAssetIdFrom, const char* pAssetIdTo );
+    bool loadModuleAutoLoadAssets(ModuleDefinition* pModuleDefinition);
     StringTableEntry getAssetName( const char* pAssetId );
     StringTableEntry getAssetDescription( const char* pAssetId );
     StringTableEntry getAssetCategory( const char* pAssetId );
