@@ -143,9 +143,6 @@ if(WIN32)
 	option(TORQUE_D3D11 "Allow Direct3D 11 render" ON)
 endif()
 
-option(TORQUE_EXPERIMENTAL_EC "Experimental Entity/Component systems" OFF)
-mark_as_advanced(TORQUE_EXPERIMENTAL_EC)
-
 option(TORQUE_DEDICATED "Torque dedicated" OFF)
 mark_as_advanced(TORQUE_DEDICATED)
 
@@ -316,9 +313,6 @@ addPath("${srcDir}/physics")
 addPath("${srcDir}/gui/3d")
 addPath("${srcDir}/postFx")
 
-if(NOT TORQUE_EXPERIMENTAL_EC)
-   set(BLACKLIST "entity.cpp;entity.h" )
-endif()
 addPath("${srcDir}/T3D")
 set(BLACKLIST "" )
 
@@ -331,16 +325,13 @@ addPath("${srcDir}/T3D/decal")
 addPath("${srcDir}/T3D/sfx")
 addPath("${srcDir}/T3D/gameBase")
 addPath("${srcDir}/T3D/turret")
-
-if( TORQUE_EXPERIMENTAL_EC )
-	addPath("${srcDir}/T3D/components/")
-	addPath("${srcDir}/T3D/components/animation")
-	addPath("${srcDir}/T3D/components/camera")
-	addPath("${srcDir}/T3D/components/collision")
-	addPath("${srcDir}/T3D/components/game")
-	addPath("${srcDir}/T3D/components/physics")
-	addPath("${srcDir}/T3D/components/render")
-endif()
+addPath("${srcDir}/T3D/components/")
+addPath("${srcDir}/T3D/components/animation")
+addPath("${srcDir}/T3D/components/camera")
+addPath("${srcDir}/T3D/components/collision")
+addPath("${srcDir}/T3D/components/game")
+addPath("${srcDir}/T3D/components/physics")
+addPath("${srcDir}/T3D/components/render")
 
 addPath("${srcDir}/main/")
 addPath("${srcDir}/assets")
@@ -422,9 +413,6 @@ if(TORQUE_TOOLS)
     addPath("${srcDir}/environment/editors")
     addPath("${srcDir}/forest/editor")
     addPath("${srcDir}/gui/editor")
-    if(NOT TORQUE_EXPERIMENTAL_EC)
-        set(BLACKLIST "entityGroup.cpp;entityGroup.h;mountingGroup.cpp;mountingGroup.h;componentGroup.cpp;componentGroup.h" )
-    endif()
     addPath("${srcDir}/gui/editor/inspector")
     set(BLACKLIST "" )
 endif()
@@ -500,10 +488,6 @@ endif()
 
 if(TORQUE_DEDICATED)
     addDef(TORQUE_DEDICATED)
-endif()
-
-if(TORQUE_EXPERIMENTAL_EC)
-	addDef(TORQUE_EXPERIMENTAL_EC)
 endif()
 
 #modules dir
@@ -854,26 +838,6 @@ include(${TORQUE_APP_DIR}/${PROJECT_NAME}.cmake OPTIONAL)
 if(TORQUE_TEMPLATE)
     message("Prepare Template(${TORQUE_TEMPLATE}) install...")
     file(GLOB_RECURSE INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/*")
-
-    IF( NOT TORQUE_EXPERIMENTAL_EC)
-        list(REMOVE_ITEM INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/art/art.module.taml")
-        list(REMOVE_ITEM INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/art/shapes/actors/Soldier/soldier.asset.taml")
-        list(REMOVE_ITEM INSTALL_FILES_AND_DIRS "${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/scripts.module.taml")
-
-        foreach(ITEM ${INSTALL_FILES_AND_DIRS})
-            get_filename_component( dir ${ITEM} DIRECTORY )
-            get_filename_component( fileName ${ITEM} NAME )
-            if( ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/components
-                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/components/game
-                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/components/input
-                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/scripts/server/gameObjects
-                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/tools/componentEditor
-                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/tools/componentEditor/gui
-                OR ${dir} STREQUAL ${CMAKE_SOURCE_DIR}/Templates/${TORQUE_TEMPLATE}/game/tools/componentEditor/scripts )
-                list(REMOVE_ITEM INSTALL_FILES_AND_DIRS ${dir}/${fileName})
-            ENDIF()
-        endforeach()
-    ENDIF()
 
     foreach(ITEM ${INSTALL_FILES_AND_DIRS})
         get_filename_component( dir ${ITEM} DIRECTORY )
