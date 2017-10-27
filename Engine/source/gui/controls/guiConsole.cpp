@@ -68,6 +68,7 @@ GuiConsole::GuiConsole()
    mDisplayErrors = true;
    mDisplayWarnings = true;
    mDisplayNormalMessages = true;
+   mFiltersDirty = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -108,7 +109,7 @@ void GuiConsole::refreshLogText()
 
    Con::getLockLog(log, size);
 
-   if (mFilteredLog.size() != size)
+   if (mFilteredLog.size() != size || mFiltersDirty)
    {
       mFilteredLog.clear();
 
@@ -221,6 +222,7 @@ void GuiConsole::setDisplayFilters(bool errors, bool warns, bool normal)
    mDisplayErrors = errors;
    mDisplayWarnings = warns;
    mDisplayNormalMessages = normal;
+   mFiltersDirty = true;
 
    refreshLogText();
 
@@ -235,6 +237,8 @@ void GuiConsole::setDisplayFilters(bool errors, bool warns, bool normal)
    setExtent(Point2I(mCellSize.x, mCellSize.y * mFilteredLog.size()));
 
    scrollCellVisible(Point2I(0, mSize.y - 1));
+
+   mFiltersDirty = false;
 }
 
 DefineEngineMethod(GuiConsole, setDisplayFilters, void, (bool errors, bool warns, bool normal), (true, true, true),

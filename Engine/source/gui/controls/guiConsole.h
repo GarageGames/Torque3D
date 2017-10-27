@@ -42,6 +42,7 @@ class GuiConsole : public GuiArrayCtrl
       bool mDisplayErrors;
       bool mDisplayWarnings;
       bool mDisplayNormalMessages;
+      bool mFiltersDirty;
 
       S32 getMaxWidth(S32 startIndex, S32 endIndex);
 
