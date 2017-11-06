@@ -496,9 +496,9 @@ class_name_expr
 
 assign_op_struct
    : opPLUSPLUS
-      { $$.lineNumber = $1.lineNumber; $$.token = '+'; $$.expr = FloatNode::alloc( $1.lineNumber, 1 ); }
+      { $$.lineNumber = $1.lineNumber; $$.token = opPLUSPLUS; $$.expr = FloatNode::alloc( $1.lineNumber, 1 ); }
    | opMINUSMINUS
-      { $$.lineNumber = $1.lineNumber; $$.token = '-'; $$.expr = FloatNode::alloc( $1.lineNumber, 1 ); }
+      { $$.lineNumber = $1.lineNumber; $$.token = opMINUSMINUS; $$.expr = FloatNode::alloc( $1.lineNumber, 1 ); }
    | opPLASN expr
       { $$.lineNumber = $1.lineNumber; $$.token = '+'; $$.expr = $2; }
    | opMIASN expr
@@ -551,6 +551,8 @@ funcall_expr
      { $$ = FuncCallExprNode::alloc( $1.lineNumber, $3.value, $1.value, $5, false); }
    | expr '.' IDENT '(' expr_list_decl ')'
       { $1->append($5); $$ = FuncCallExprNode::alloc( $1->dbgLineNumber, $3.value, NULL, $1, true); }
+   | expr '(' expr_list_decl ')'
+      { $$ = FuncPointerCallExprNode::alloc( $1->dbgLineNumber, $1, $3); }
    ;
 
 assert_expr

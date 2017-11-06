@@ -24,21 +24,20 @@
 #define _CONSOLEINTERNAL_H_
 
 #ifndef _STRINGFUNCTIONS_H_
-   #include "core/strings/stringFunctions.h"
+#include "core/strings/stringFunctions.h"
 #endif
 #ifndef _STRINGTABLE_H_
-   #include "core/stringTable.h"
+#include "core/stringTable.h"
 #endif
 #ifndef _CONSOLETYPES_H
-   #include "console/consoleTypes.h"
+#include "console/consoleTypes.h"
 #endif
 #ifndef _CONSOLEOBJECT_H_
-   #include "console/simObject.h"
+#include "console/simObject.h"
 #endif
 #ifndef _DATACHUNKER_H_
-   #include "core/dataChunker.h"
+#include "core/dataChunker.h"
 #endif
-
 
 /// @ingroup console_system Console System
 /// @{
@@ -55,222 +54,222 @@ class AbstractClassRep;
 /// Namespaces are used for dispatching calls in the console system.
 class Namespace
 {
-      enum {
-        MaxActivePackages = 512,
+   enum {
+      MaxActivePackages = 512,
+   };
+
+   static U32 mNumActivePackages;
+   static U32 mOldNumActivePackages;
+   static StringTableEntry mActivePackages[MaxActivePackages];
+
+public:
+   StringTableEntry mName;
+   StringTableEntry mPackage;
+
+   Namespace *mParent;
+   Namespace *mNext;
+   AbstractClassRep *mClassRep;
+   U32 mRefCountToParent;
+
+   const char* mUsage;
+
+   /// Script defined usage strings need to be cleaned up. This
+   /// field indicates whether or not the usage was set from script.
+   bool mCleanUpUsage;
+
+   /// A function entry in the namespace.
+   struct Entry
+   {
+      enum
+      {
+         ScriptCallbackType = -3,
+         GroupMarker = -2,
+         InvalidFunctionType = -1,
+         ConsoleFunctionType,
+         StringCallbackType,
+         IntCallbackType,
+         FloatCallbackType,
+         VoidCallbackType,
+         BoolCallbackType
       };
 
-      static U32 mNumActivePackages;
-      static U32 mOldNumActivePackages;
-      static StringTableEntry mActivePackages[MaxActivePackages];
+      /// Link back to the namespace to which the entry belongs.
+      Namespace* mNamespace;
 
-   public:
-      StringTableEntry mName;
+      /// Next function entry in the hashtable link chain of the namespace.
+      Entry* mNext;
+
+      /// Name of this function.
+      StringTableEntry mFunctionName;
+
+      ///
+      S32 mType;
+
+      /// Min number of arguments expected by this function.
+      S32 mMinArgs;
+
+      /// Max number of arguments expected by this function.  If zero,
+      /// function takes an arbitrary number of arguments.
+      S32 mMaxArgs;
+
+      /// Name of the package to which this function belongs.
       StringTableEntry mPackage;
 
-      Namespace *mParent;
-      Namespace *mNext;
-      AbstractClassRep *mClassRep;
-      U32 mRefCountToParent;
-      
+      /// Whether this function is included only in TORQUE_TOOLS builds.
+      bool mToolOnly;
+
+      /// Usage string for documentation.
       const char* mUsage;
-      
-      /// Script defined usage strings need to be cleaned up. This
-      /// field indicates whether or not the usage was set from script.
-      bool mCleanUpUsage;
 
-      /// A function entry in the namespace.
-      struct Entry
-      {
-         enum 
-         {
-            ScriptCallbackType           = -3,
-            GroupMarker                  = -2,
-            InvalidFunctionType          = -1,
-            ConsoleFunctionType,
-            StringCallbackType,
-            IntCallbackType,
-            FloatCallbackType,
-            VoidCallbackType,
-            BoolCallbackType
-         };
+      /// Extended console function information.
+      ConsoleFunctionHeader* mHeader;
 
-         /// Link back to the namespace to which the entry belongs.
-         Namespace* mNamespace;
-         
-         /// Next function entry in the hashtable link chain of the namespace.
-         Entry* mNext;
-         
-         /// Name of this function.
-         StringTableEntry mFunctionName;
-         
-         ///
-         S32 mType;
-         
-         /// Min number of arguments expected by this function.
-         S32 mMinArgs;
-         
-         /// Max number of arguments expected by this function.  If zero,
-         /// function takes an arbitrary number of arguments.
-         S32 mMaxArgs;
-         
-         /// Name of the package to which this function belongs.
-         StringTableEntry mPackage;
-         
-         /// Whether this function is included only in TORQUE_TOOLS builds.
-         bool mToolOnly;
+      /// The compiled script code if this is a script function.
+      CodeBlock* mCode;
 
-         /// Usage string for documentation.
-         const char* mUsage;
-         
-         /// Extended console function information.
-         ConsoleFunctionHeader* mHeader;
+      /// The offset in the compiled script code at which this function begins.
+      U32 mFunctionOffset;
 
-         /// The compiled script code if this is a script function.
-         CodeBlock* mCode;
-         
-         /// The offset in the compiled script code at which this function begins.
-         U32 mFunctionOffset;
+      /// If it's a script function, this is the line of the declaration in code.
+      /// @note 0 for functions read from legacy DSOs that have no line number information.
+      U32 mFunctionLineNumber;
 
-         /// If it's a script function, this is the line of the declaration in code.
-         /// @note 0 for functions read from legacy DSOs that have no line number information.
-         U32 mFunctionLineNumber;
-         
-         union CallbackUnion {
-            StringCallback mStringCallbackFunc;
-            IntCallback mIntCallbackFunc;
-            VoidCallback mVoidCallbackFunc;
-            FloatCallback mFloatCallbackFunc;
-            BoolCallback mBoolCallbackFunc;
-            const char *mGroupName;
-            const char *mCallbackName;
-         } cb;
-         
-         Entry();
-         
-         ///
-         void clear();
+      union CallbackUnion {
+         StringCallback mStringCallbackFunc;
+         IntCallback mIntCallbackFunc;
+         VoidCallback mVoidCallbackFunc;
+         FloatCallback mFloatCallbackFunc;
+         BoolCallback mBoolCallbackFunc;
+         const char *mGroupName;
+         const char *mCallbackName;
+      } cb;
 
-         ///
-         ConsoleValueRef execute( S32 argc, ConsoleValueRef* argv, ExprEvalState* state );
-         
-         /// Return a one-line documentation text string for the function.
-         String getBriefDescription( String* outRemainingDocText = NULL ) const;
-         
-         /// Get the auto-doc string for this function.  This string does not included prototype information.
-         String getDocString() const;
-         
-         /// Return a string describing the arguments the function takes including default argument values.
-         String getArgumentsString() const;
+      Entry();
 
-         /// Return a full prototype string for the function including return type, function name,
-         /// and arguments.
-         String getPrototypeString() const;
-      };
-      
-      Entry* mEntryList;
+      ///
+      void clear();
 
-      Entry** mHashTable;
-      
-      U32 mHashSize;
-      U32 mHashSequence;   ///< @note The hash sequence is used by the autodoc console facility
-                           ///        as a means of testing reference state.
+      ///
+      ConsoleValueRef execute(S32 argc, ConsoleValueRef* argv, ExprEvalState* state);
 
-      Namespace();
-      ~Namespace();
+      /// Return a one-line documentation text string for the function.
+      String getBriefDescription(String* outRemainingDocText = NULL) const;
 
-      void addFunction( StringTableEntry name, CodeBlock* cb, U32 functionOffset, const char* usage = NULL, U32 lineNumber = 0 );
-      void addCommand( StringTableEntry name, StringCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
-      void addCommand( StringTableEntry name, IntCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
-      void addCommand( StringTableEntry name, FloatCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
-      void addCommand( StringTableEntry name, VoidCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
-      void addCommand( StringTableEntry name, BoolCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
+      /// Get the auto-doc string for this function.  This string does not included prototype information.
+      String getDocString() const;
 
-      void addScriptCallback( const char *funcName, const char *usage, ConsoleFunctionHeader* header = NULL );
+      /// Return a string describing the arguments the function takes including default argument values.
+      String getArgumentsString() const;
 
-      void markGroup(const char* name, const char* usage);
-      char * lastUsage;
+      /// Return a full prototype string for the function including return type, function name,
+      /// and arguments.
+      String getPrototypeString() const;
+   };
 
-      /// Returns true if this namespace represents an engine defined
-      /// class and is not just a script defined class namespace.
-      bool isClass() const { return mClassRep && mClassRep->getNameSpace() == this; }
+   Entry* mEntryList;
 
-      void getEntryList(VectorPtr<Entry *> *);
+   Entry** mHashTable;
 
-      /// Return the name of this namespace.
-      StringTableEntry getName() const { return mName; }
+   U32 mHashSize;
+   U32 mHashSequence;   ///< @note The hash sequence is used by the autodoc console facility
+                        ///        as a means of testing reference state.
 
-      /// Return the superordinate namespace to this namespace. Symbols are inherited from
-      /// this namespace.
-      Namespace* getParent() const { return mParent; }
+   Namespace();
+   ~Namespace();
 
-      /// Return the topmost package in the parent hierarchy of this namespace
-      /// that still refers to the same namespace.  If packages are active and
-      /// adding to this namespace, then they will be linked in-between the namespace
-      /// they are adding to and its real parent namespace.
-      Namespace* getPackageRoot()
-      {
-         Namespace* walk = this;
-         while( walk->mParent && walk->mParent->mName == mName )
-            walk = walk->mParent;
+   void addFunction(StringTableEntry name, CodeBlock* cb, U32 functionOffset, const char* usage = NULL, U32 lineNumber = 0);
+   void addCommand(StringTableEntry name, StringCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+   void addCommand(StringTableEntry name, IntCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+   void addCommand(StringTableEntry name, FloatCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+   void addCommand(StringTableEntry name, VoidCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+   void addCommand(StringTableEntry name, BoolCallback, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 
-         return walk;
-      }
+   void addScriptCallback(const char *funcName, const char *usage, ConsoleFunctionHeader* header = NULL);
 
-      /// Return the package in which this namespace is defined.
-      StringTableEntry getPackage() const { return mPackage; }
+   void markGroup(const char* name, const char* usage);
+   char * lastUsage;
 
-      /// Increase the count on the reference that this namespace
-      /// holds to its parent.
-      /// @note Must not be called on namespaces coming from packages.
-      void incRefCountToParent()
-      {
-         AssertFatal( mPackage == NULL, "Namespace::incRefCountToParent - Must not be called on a namespace coming from a package!" );
-         mRefCountToParent ++;
-      }
+   /// Returns true if this namespace represents an engine defined
+   /// class and is not just a script defined class namespace.
+   bool isClass() const { return mClassRep && mClassRep->getNameSpace() == this; }
 
-      /// Decrease the count on the reference that this namespace
-      /// holds to its parent.
-      /// @note Must not be called on namespaces coming from packages.
-      void decRefCountToParent()
-      {
-         unlinkClass( NULL );
-      }
+   void getEntryList(VectorPtr<Entry *> *);
 
-      Entry *lookup(StringTableEntry name);
-      Entry *lookupRecursive(StringTableEntry name);
-      Entry *createLocalEntry(StringTableEntry name);
-      void buildHashTable();
-      void clearEntries();
-      bool classLinkTo(Namespace *parent);
-      bool unlinkClass(Namespace *parent);
-      void getUniqueEntryLists( Namespace *other, VectorPtr<Entry *> *outThisList, VectorPtr<Entry *> *outOtherList );
+   /// Return the name of this namespace.
+   StringTableEntry getName() const { return mName; }
 
-      const char *tabComplete(const char *prevText, S32 baseLen, bool fForward);
+   /// Return the superordinate namespace to this namespace. Symbols are inherited from
+   /// this namespace.
+   Namespace* getParent() const { return mParent; }
 
-      static U32 mCacheSequence;
-      static DataChunker mCacheAllocator;
-      static DataChunker mAllocator;
-      static void trashCache();
-      static Namespace *mNamespaceList;
-      static Namespace *mGlobalNamespace;
+   /// Return the topmost package in the parent hierarchy of this namespace
+   /// that still refers to the same namespace.  If packages are active and
+   /// adding to this namespace, then they will be linked in-between the namespace
+   /// they are adding to and its real parent namespace.
+   Namespace* getPackageRoot()
+   {
+      Namespace* walk = this;
+      while (walk->mParent && walk->mParent->mName == mName)
+         walk = walk->mParent;
 
-      static void init();
-      static void shutdown();
-      static Namespace *global();
+      return walk;
+   }
 
-      static Namespace *find(StringTableEntry name, StringTableEntry package=NULL);
+   /// Return the package in which this namespace is defined.
+   StringTableEntry getPackage() const { return mPackage; }
 
-      static void activatePackage(StringTableEntry name);
-      static void deactivatePackage(StringTableEntry name);
-      static void deactivatePackageStack(StringTableEntry name);
-      static void dumpClasses( bool dumpScript = true, bool dumpEngine = true );
-      static void dumpFunctions( bool dumpScript = true, bool dumpEngine = true );
-      static void printNamespaceEntries(Namespace * g, bool dumpScript = true, bool dumpEngine = true);
-      static void unlinkPackages();
-      static void relinkPackages();
-      static bool isPackage(StringTableEntry name);
-      static U32 getActivePackagesCount();
-      static StringTableEntry getActivePackage(U32 index);
+   /// Increase the count on the reference that this namespace
+   /// holds to its parent.
+   /// @note Must not be called on namespaces coming from packages.
+   void incRefCountToParent()
+   {
+      AssertFatal(mPackage == NULL, "Namespace::incRefCountToParent - Must not be called on a namespace coming from a package!");
+      mRefCountToParent++;
+   }
+
+   /// Decrease the count on the reference that this namespace
+   /// holds to its parent.
+   /// @note Must not be called on namespaces coming from packages.
+   void decRefCountToParent()
+   {
+      unlinkClass(NULL);
+   }
+
+   Entry *lookup(StringTableEntry name);
+   Entry *lookupRecursive(StringTableEntry name);
+   Entry *createLocalEntry(StringTableEntry name);
+   void buildHashTable();
+   void clearEntries();
+   bool classLinkTo(Namespace *parent);
+   bool unlinkClass(Namespace *parent);
+   void getUniqueEntryLists(Namespace *other, VectorPtr<Entry *> *outThisList, VectorPtr<Entry *> *outOtherList);
+
+   const char *tabComplete(const char *prevText, S32 baseLen, bool fForward);
+
+   static U32 mCacheSequence;
+   static DataChunker mCacheAllocator;
+   static DataChunker mAllocator;
+   static void trashCache();
+   static Namespace *mNamespaceList;
+   static Namespace *mGlobalNamespace;
+
+   static void init();
+   static void shutdown();
+   static Namespace *global();
+
+   static Namespace *find(StringTableEntry name, StringTableEntry package = NULL);
+
+   static void activatePackage(StringTableEntry name);
+   static void deactivatePackage(StringTableEntry name);
+   static void deactivatePackageStack(StringTableEntry name);
+   static void dumpClasses(bool dumpScript = true, bool dumpEngine = true);
+   static void dumpFunctions(bool dumpScript = true, bool dumpEngine = true);
+   static void printNamespaceEntries(Namespace * g, bool dumpScript = true, bool dumpEngine = true);
+   static void unlinkPackages();
+   static void relinkPackages();
+   static bool isPackage(StringTableEntry name);
+   static U32 getActivePackagesCount();
+   static StringTableEntry getActivePackage(U32 index);
 };
 
 typedef VectorPtr<Namespace::Entry *>::iterator NamespaceEntryListIterator;
@@ -292,10 +291,10 @@ public:
       /// The optional notification signal called when
       /// a value is assigned to this variable.
       NotifySignal *notify;
-      
+
       /// Usage doc string.
       const char* mUsage;
-      
+
       /// Whether this is a constant that cannot be assigned to.
       bool mIsConstant;
 
@@ -309,16 +308,16 @@ public:
          mIsConstant = false;
          value.init();
       }
-      
+
       Entry(StringTableEntry name);
       ~Entry();
-      
+
       Entry *mNext;
-      
+
       void reset() {
          name = NULL;
          value.cleanup();
-         if ( notify )
+         if (notify)
             delete notify;
       }
 
@@ -339,63 +338,63 @@ public:
 
       void setIntValue(U32 val)
       {
-         if( mIsConstant )
+         if (mIsConstant)
          {
-            Con::errorf( "Cannot assign value to constant '%s'.", name );
+            Con::errorf("Cannot assign value to constant '%s'.", name);
             return;
          }
-         
+
          value.setIntValue(val);
 
          // Fire off the notification if we have one.
-         if ( notify )
+         if (notify)
             notify->trigger();
       }
 
       void setFloatValue(F32 val)
       {
-         if( mIsConstant )
+         if (mIsConstant)
          {
-            Con::errorf( "Cannot assign value to constant '%s'.", name );
+            Con::errorf("Cannot assign value to constant '%s'.", name);
             return;
          }
-         
+
          value.setFloatValue(val);
 
          // Fire off the notification if we have one.
-         if ( notify )
+         if (notify)
             notify->trigger();
       }
 
       void setStringStackPtrValue(StringStackPtr newValue)
       {
-         if( mIsConstant )
+         if (mIsConstant)
          {
-            Con::errorf( "Cannot assign value to constant '%s'.", name );
+            Con::errorf("Cannot assign value to constant '%s'.", name);
             return;
          }
-         
+
          value.setStringStackPtrValue(newValue);
-         
-         
+
+
          // Fire off the notification if we have one.
-         if ( notify )
+         if (notify)
             notify->trigger();
       }
 
       void setStringValue(const char *newValue)
       {
-         if( mIsConstant )
+         if (mIsConstant)
          {
-            Con::errorf( "Cannot assign value to constant '%s'.", name );
+            Con::errorf("Cannot assign value to constant '%s'.", name);
             return;
          }
-         
+
          value.setStringValue(newValue);
-         
-         
+
+
          // Fire off the notification if we have one.
-         if ( notify )
+         if (notify)
             notify->trigger();
       }
    };
@@ -407,9 +406,9 @@ public:
       S32 count;
       Entry **data;
       FreeListChunker< Entry > mChunker;
-     
-      HashTableData( Dictionary* owner )
-         : owner( owner ), size( 0 ), count( 0 ), data( NULL ) {}
+
+      HashTableData(Dictionary* owner)
+         : owner(owner), size(0), count(0), data(NULL) {}
    };
 
    HashTableData* hashTable;
@@ -426,13 +425,13 @@ public:
 
    Entry *lookup(StringTableEntry name);
    Entry *add(StringTableEntry name);
-   void setState(ExprEvalState *state, Dictionary* ref=NULL);
+   void setState(ExprEvalState *state, Dictionary* ref = NULL);
    void remove(Entry *);
    void reset();
 
-   void exportVariables( const char *varString, const char *fileName, bool append );
-   void exportVariables( const char *varString, Vector<String> *names, Vector<String> *values );
-   void deleteVariables( const char *varString );
+   void exportVariables(const char *varString, const char *fileName, bool append);
+   void exportVariables(const char *varString, Vector<String> *names, Vector<String> *values);
+   void deleteVariables(const char *varString);
 
    void setVariable(StringTableEntry name, const char *value);
    const char *getVariable(StringTableEntry name, bool *valid = NULL);
@@ -449,19 +448,19 @@ public:
    }
 
    /// @see Con::addVariable
-   Entry* addVariable(  const char *name, 
-                        S32 type, 
-                        void *dataPtr, 
-                        const char* usage );
+   Entry* addVariable(const char *name,
+      S32 type,
+      void *dataPtr,
+      const char* usage);
 
    /// @see Con::removeVariable
    bool removeVariable(StringTableEntry name);
 
    /// @see Con::addVariableNotify
-   void addVariableNotify( const char *name, const Con::NotifyDelegate &callback );
+   void addVariableNotify(const char *name, const Con::NotifyDelegate &callback);
 
    /// @see Con::removeVariableNotify
-   void removeVariableNotify( const char *name, const Con::NotifyDelegate &callback );
+   void removeVariableNotify(const char *name, const Con::NotifyDelegate &callback);
 
    /// Return the best tab completion for prevText, with the length
    /// of the pre-tab string in baseLen.
@@ -520,15 +519,15 @@ public:
    /// Puts a reference to an existing stack frame
    /// on the top of the stack.
    void pushFrameRef(S32 stackIndex);
- 
+
    U32 getStackDepth() const
    {
       return mStackDepth;
    }
- 
+
    Dictionary& getCurrentFrame()
    {
-      return *( stack[ mStackDepth - 1 ] );
+      return *(stack[mStackDepth - 1]);
    }
 
    /// @}

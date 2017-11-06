@@ -774,18 +774,18 @@ void Taml::compileDynamicFields( TamlWriteNode* pTamlWriteNode )
     // Fetch field count.
     const U32 fieldCount = fieldList.size();
 
-    Vector<SimFieldDictionary::Entry*> dynamicFieldList(__FILE__, __LINE__);
+    Vector<SimFieldDictionary::Entry> dynamicFieldList(__FILE__, __LINE__);
 
     // Ensure the dynamic field doesn't conflict with static field.
     for( U32 hashIndex = 0; hashIndex < SimFieldDictionary::HashTableSize; ++hashIndex )
     {
-        for( SimFieldDictionary::Entry* pEntry = pFieldDictionary->mHashTable[hashIndex]; pEntry; pEntry = pEntry->next )
-        {
+       for (const SimFieldDictionary::Entry &pEntry : pFieldDictionary->mHashTable[hashIndex])
+       {
             // Iterate static fields.
             U32 fieldIndex;
             for( fieldIndex = 0; fieldIndex < fieldCount; ++fieldIndex )
             {
-                if( fieldList[fieldIndex].pFieldname == pEntry->slotName)
+               if (fieldList[fieldIndex].pFieldname == pEntry.slotName)
                     break;
             }
 
@@ -794,7 +794,7 @@ void Taml::compileDynamicFields( TamlWriteNode* pTamlWriteNode )
                 continue;
 
             // Skip if not writing field.
-            if ( !pSimObject->writeField( pEntry->slotName, pEntry->value) )
+            if (!pSimObject->writeField(pEntry.slotName, pEntry.value))
                 continue;
 
             dynamicFieldList.push_back( pEntry );
@@ -803,17 +803,14 @@ void Taml::compileDynamicFields( TamlWriteNode* pTamlWriteNode )
 
     // Sort Entries to prevent version control conflicts
     if ( dynamicFieldList.size() > 1 )
-        dQsort(dynamicFieldList.address(), dynamicFieldList.size(), sizeof(SimFieldDictionary::Entry*), compareFieldEntries);
+       dQsort(dynamicFieldList.address(), dynamicFieldList.size(), sizeof(SimFieldDictionary::Entry), compareFieldEntries);
 
     // Save the fields.
-    for( Vector<SimFieldDictionary::Entry*>::iterator entryItr = dynamicFieldList.begin(); entryItr != dynamicFieldList.end(); ++entryItr )
+    for (const SimFieldDictionary::Entry &pEntry : dynamicFieldList)
     {
-        // Fetch entry.
-        SimFieldDictionary::Entry* pEntry = *entryItr;
-
-        // Save field/value.
-        TamlWriteNode::FieldValuePair*  pFieldValuePair = new TamlWriteNode::FieldValuePair( pEntry->slotName, pEntry->value );
-        pTamlWriteNode->mFields.push_back( pFieldValuePair );
+       // Save field/value.
+       TamlWriteNode::FieldValuePair*  pFieldValuePair = new TamlWriteNode::FieldValuePair(pEntry.slotName, pEntry.value);
+       pTamlWriteNode->mFields.push_back(pFieldValuePair);
     }
 }
 

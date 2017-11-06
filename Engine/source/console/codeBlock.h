@@ -35,10 +35,11 @@ class ConsoleValueRef;
 /// This class represents a block of code, usually mapped directly to a file.
 class CodeBlock
 {
+   friend class CodeInterpreter;
 private:
    static CodeBlock* smCodeBlockList;
    static CodeBlock* smCurrentCodeBlock;
-   
+
 public:
    static bool                      smInFunction;
    static Compiler::ConsoleParser * smCurrentParser;
@@ -89,7 +90,7 @@ public:
    void calcBreakList();
    void clearAllBreaks();
    void setAllBreaks();
-   void dumpInstructions( U32 startIp = 0, bool upToReturn = false );
+   void dumpInstructions(U32 startIp = 0, bool upToReturn = false);
 
    /// Returns the first breakable line or 0 if none was found.
    /// @param lineNumber The one based line number.
@@ -106,7 +107,7 @@ public:
    const char *getFileLine(U32 ip);
 
    /// 
-   String getFunctionArgs( U32 offset );
+   String getFunctionArgs(U32 offset);
 
    bool read(StringTableEntry fileName, Stream &st);
    bool compile(const char *dsoName, StringTableEntry fileName, const char *script, bool overrideNoDso = false);
@@ -129,8 +130,8 @@ public:
    /// with, zero being the top of the stack. If the the index is
    /// -1 a new frame is created. If the index is out of range the
    /// top stack frame is used.
-   ConsoleValueRef compileExec(StringTableEntry fileName, const char *script, 
-      bool noCalls, S32 setFrame = -1 );
+   ConsoleValueRef compileExec(StringTableEntry fileName, const char *script,
+      bool noCalls, S32 setFrame = -1);
 
    /// Executes the existing code in the CodeBlock. The return string is any 
    /// result of the code executed, if any, or an empty string.
@@ -147,7 +148,7 @@ public:
    /// -1 a new frame is created. If the index is out of range the
    /// top stack frame is used.
    /// @param packageName The code package name or null.
-   ConsoleValueRef exec(U32 offset, const char *fnName, Namespace *ns, U32 argc, 
+   ConsoleValueRef exec(U32 offset, const char *fnName, Namespace *ns, U32 argc,
       ConsoleValueRef *argv, bool noCalls, StringTableEntry packageName,
       S32 setFrame = -1);
 };
