@@ -210,6 +210,7 @@ public:
    virtual void onRemove();
 
    void setMenuBar(SimObject *obj);
+   SimObject* getMenuBar() { return mMenuBarCtrl; }
 
    static void initPersistFields();
 

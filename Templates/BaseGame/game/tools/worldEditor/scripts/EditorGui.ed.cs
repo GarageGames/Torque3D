@@ -2017,7 +2017,7 @@ function EWorldEditor::syncGui( %this )
    %this.syncToolPalette();
    
    EditorTree.update();
-   Editor.getUndoManager().updateUndoMenu( EditorGui.menuBar-->EditMenu );
+   Editor.getUndoManager().updateUndoMenu( EditorGui.findMenu("Edit") );
    EditorGuiStatusBar.setSelectionObjectsByCount( %this.getSelectionSize() );
    
    EWTreeWindow-->LockSelection.setStateOn( %this.getSelectionLockCount() > 0 );

@@ -19,17 +19,43 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
+#ifndef _POPUPMENU_H_
+#define _POPUPMENU_H_
+
 #include "console/simBase.h"
 #include "core/util/tVector.h"
 #include "util/messaging/dispatcher.h"
 #include "gui/core/guiCanvas.h"
 
-#ifndef _POPUPMENU_H_
-#define _POPUPMENU_H_
+class PopupMenu;
+class GuiMenuBar;
+class GuiPopupMenuTextListCtrl;
+class GuiPopupMenuBackgroundCtrl;
 
-// Forward ref used by the platform code
-struct PlatformPopupMenuData;
-class MenuBar;
+struct MenuItem   // an individual item in a pull-down menu
+{
+   String text;    // the text of the menu item
+   U32 id;        // a script-assigned identifier
+   char *accelerator; // the keyboard accelerator shortcut for the menu item
+   U32 acceleratorIndex; // index of this accelerator
+   bool enabled;        // true if the menu item is selectable
+   bool visible;        // true if the menu item is visible
+   S32 bitmapIndex;     // index of the bitmap in the bitmap array
+   S32 checkGroup;      // the group index of the item visa vi check marks - 
+                        // only one item in the group can be checked.
+
+   bool isSubmenu;				//  This menu item has a submenu that will be displayed
+
+   bool isChecked;
+
+   bool isSpacer;
+
+   bool isMenubarEntry;
+
+   PopupMenu* subMenuParentMenu; //  For a submenu, this is the parent menu
+   PopupMenu* subMenu;
+   String cmd;
+};
 
 // PopupMenu represents a menu.
 // You can add menu items to the menu, but there is no torque object associated
@@ -37,30 +63,32 @@ class MenuBar;
 class PopupMenu : public SimObject, public virtual Dispatcher::IMessageListener
 {
    typedef SimObject Parent;
-
-   friend class MenuBar;
-
-private:
-   /// Used by MenuBar to attach the menu to the menu bar. Do not use anywhere else.
-   void attachToMenuBar(GuiCanvas *owner, S32 pos);
+   friend class GuiMenuBar;
+   friend class GuiPopupMenuTextListCtrl;
+   friend class GuiPopupMenuBackgroundCtrl;
 
 protected:
-   PlatformPopupMenuData *mData;
-   
-   SimSet *mSubmenus;
-   SimObjectPtr<GuiCanvas> mCanvas;
+   Vector<MenuItem> mMenuItems;
 
-   StringTableEntry mBarTitle;
+   GuiMenuBar* mMenuBarCtrl;
 
-	U32 mPopupGUID;
-   
-   bool mIsPopup;
+   StringTableEntry barTitle;
+
+   RectI bounds;
+   bool visible;
+
+   S32 bitmapIndex;		// Index of the bitmap in the bitmap array (-1 = no bitmap)
+   bool drawBitmapOnly;	// Draw only the bitmap and not the text
+   bool drawBorder;		// Should a border be drawn around this menu (usually if we only have a bitmap, we don't want a border)
+
+   bool isSubmenu;
+
+   //This is the gui control that renders our popup
+   GuiPopupMenuTextListCtrl *mTextList;
 
 public:
    PopupMenu();
    virtual ~PopupMenu();
-   void createPlatformPopupMenuData();
-   void deletePlatformPopupMenuData();
    
    DECLARE_CONOBJECT(PopupMenu);
 
@@ -71,15 +99,6 @@ public:
 
 	static PopupMenuEvent smPopupMenuEvent;
 	static bool smSelectionEventHandled; /// Set to true if any menu or submenu handles a selection event
-   
-   /// Creates the platform specific menu object, a peer to this object.
-   /// The platform menu *must* exist before calling any method that manipulates
-   /// menu items or displays the menu.
-   /// implementd on a per-platform basis.
-   void createPlatformMenu();
-
-   void setBarTitle(const char * val) { mBarTitle = StringTable->insert(val, true); }	
-   StringTableEntry getBarTitle() const { return mBarTitle; }
    
    /// pass NULL for @p title to insert a separator
    /// returns the menu item's ID, or -1 on failure.
@@ -118,39 +137,7 @@ public:
    /// Returns the number of items in the menu.
    U32 getItemCount();
 
-	/// Returns the popup GUID
-	U32 getPopupGUID() { return mPopupGUID; }
-
    //-----------------------------------------------------------------------------
-   // New code should not use these methods directly, use the menu bar instead.
-   //
-   // They remain for compatibility with old code and will be changing/going away
-   // once the existing code is moved over to the menu bar.
-   //-----------------------------------------------------------------------------
-
-   /// Places this menu in the menu bar of the application's main window.
-   /// @param owner The GuiCanvas that owns the PlatformWindow that this call is associated with
-   /// @param pos The relative position at which to place the menu.
-   /// @param title The name of the menu
-   void attachToMenuBar(GuiCanvas *owner, S32 pos, const char *title);
-   
-   /// Removes this menu from the menu bar.
-   void removeFromMenuBar();
-
-   //-----------------------------------------------------------------------------
-
-   /// Called when the menu has been attached to the menu bar
-   void onAttachToMenuBar(GuiCanvas *canvas, S32 pos, const char *title);
-   
-   /// Called when the menu has been removed from the menu bar
-   void onRemoveFromMenuBar(GuiCanvas *canvas);
-
-   /// Returns the position index of this menu on the bar.
-   S32 getPosOnMenuBar();
-
-   /// Returns true if this menu is attached to the menu bar
-   bool isAttachedToMenuBar()       { return mCanvas != NULL; }
-
    /// Displays this menu as a popup menu and blocks until the user has selected
    /// an item.
    /// @param canvas the owner to show this popup associated with
@@ -158,6 +145,9 @@ public:
    /// @param y window local y coordinate at which to display the popup menu
    /// implemented on a per-platform basis.
    void showPopup(GuiCanvas *owner, S32 x = -1, S32 y = -1);
+
+   void hidePopup();
+   void hidePopupSubmenus();
 
    /// Returns true iff this menu contains an item that matches @p iD.
    /// implemented on a per-platform basis.
@@ -184,6 +174,11 @@ public:
 
    virtual bool onMessageReceived(StringTableEntry queue, const char* event, const char* data );
    virtual bool onMessageObjectReceived(StringTableEntry queue, Message *msg );
+
+   bool isVisible() { return visible; }
+   void setVisible(bool isVis) { visible = isVis; }
+
+   GuiMenuBar* getMenuBarCtrl();
 };
 
 #endif // _POPUPMENU_H_
