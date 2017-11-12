@@ -32,9 +32,6 @@
 class ConsoleBaseType;
 class SimObject;
 
-#include <array>
-#include <vector>
-
 #include "core/stringTable.h"
 #include "core/stream/stream.h"
 
@@ -54,17 +51,18 @@ public:
 
       StringTableEntry slotName;
       char *value;
+      Entry *next;
       ConsoleBaseType *type;
    };
    enum
    {
       HashTableSize = 19
    };
-   //Entry *mHashTable[HashTableSize];
-
-   std::vector<Entry> mHashTable[HashTableSize];
+   Entry *mHashTable[HashTableSize];
 
 private:
+   static Entry   *smFreeList;
+
    void           freeEntry(Entry *entry);
    Entry*         addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value = 0);
 
@@ -105,7 +103,6 @@ class SimFieldDictionaryIterator
 {
    SimFieldDictionary *          mDictionary;
    S32                           mHashIndex;
-   S32                           mVecIndex;
    SimFieldDictionary::Entry *   mEntry;
 
 public:
