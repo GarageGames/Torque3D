@@ -1402,6 +1402,8 @@ U32 FuncCallExprNode::compile(CodeStream &codeStream, U32 ip, TypeReq type)
 
    bool isThisCall = false;
 
+   ExprNode *walk = args;
+
    // Try to optimize the this pointer call if it is a variable
    // that we are loading.
    if (callType == MethodCall)
@@ -1420,11 +1422,11 @@ U32 FuncCallExprNode::compile(CodeStream &codeStream, U32 ip, TypeReq type)
          codeStream.emitSTE(var->varName);
 
          // inc args since we took care of first arg.
-         args = static_cast<ExprNode*>(args->getNext());
+         walk = (ExprNode*)walk ->getNext();
       }
    }
 
-   for (ExprNode *walk = args; walk; walk = (ExprNode *)walk->getNext())
+   for (; walk; walk = (ExprNode *)walk->getNext())
    {
       TypeReq walkType = walk->getPreferredType();
       if (walkType == TypeReqNone) walkType = TypeReqString;
