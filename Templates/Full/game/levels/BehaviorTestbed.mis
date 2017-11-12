@@ -1,0 +1,226 @@
+//--- OBJECT WRITE BEGIN ---
+new SimGroup(MissionGroup) {
+   canSave = "1";
+   canSaveDynamicFields = "1";
+      enabled = "1";
+
+   new LevelInfo(theLevelInfo) {
+      nearClip = "0.1";
+      visibleDistance = "1000";
+      decalBias = "0.0015";
+      fogColor = "0.6 0.6 0.7 1";
+      fogDensity = "0";
+      fogDensityOffset = "700";
+      fogAtmosphereHeight = "0";
+      canvasClearColor = "0 0 0 255";
+      ambientLightBlendPhase = "1";
+      ambientLightBlendCurve = "0 0 -1 -1";
+      advancedLightmapSupport = "0";
+      soundAmbience = "AudioAmbienceDefault";
+      soundDistanceModel = "Linear";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+         desc0 = "Somewhere to play with behavior trees";
+         enabled = "1";
+         levelName = "Behavior Testbed";
+   };
+   new SkyBox(theSky) {
+      Material = "BlackSkyMat";
+      drawBottom = "0";
+      fogBandHeight = "0";
+      position = "0 0 0";
+      rotation = "1 0 0 0";
+      scale = "1 1 1";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+   };
+   new Sun(theSun) {
+      azimuth = "230.396";
+      elevation = "45";
+      color = "0.996078 0.996078 0.996078 1";
+      ambient = "0.560784 0.564706 0.572549 1";
+      brightness = "1";
+      castShadows = "1";
+      coronaEnabled = "1";
+      coronaScale = "0.5";
+      coronaTint = "1 1 1 1";
+      coronaUseLightColor = "1";
+      flareScale = "1";
+      attenuationRatio = "0 1 1";
+      shadowType = "PSSM";
+      texSize = "1024";
+      overDarkFactor = "3000 2000 1000 250";
+      shadowDistance = "400";
+      shadowSoftness = "0.25";
+      numSplits = "4";
+      logWeight = "0.96";
+      fadeStartDistance = "325";
+      lastSplitTerrainOnly = "0";
+      representedInLightmap = "0";
+      shadowDarkenColor = "0 0 0 -1";
+      includeLightmappedGeometryInShadow = "0";
+      position = "0 0 0";
+      rotation = "1 0 0 0";
+      scale = "1 1 1";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+   };
+   new SimGroup(PlayerDropPoints) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+         enabled = "1";
+
+      new SpawnSphere() {
+         autoSpawn = "0";
+         spawnTransform = "0";
+         radius = "5";
+         sphereWeight = "1";
+         indoorWeight = "1";
+         outdoorWeight = "1";
+         isAIControlled = "0";
+         dataBlock = "SpawnSphereMarker";
+         position = "0 0 2";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+            enabled = "1";
+            homingCount = "0";
+            lockCount = "0";
+      };
+   };
+   new GroundPlane() {
+      squareSize = "100";
+      scaleU = "5";
+      scaleV = "5";
+      Material = "Grid512_ForestGreenLines_Mat";
+      canSave = "1";
+      canSaveDynamicFields = "1";
+         enabled = "1";
+         position = "0 0 0";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+   };
+   new SimGroup(podia) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      new ConvexShape() {
+         Material = "Grid512_OrangeLines_Mat";
+         position = "10 -10 0.500001";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         surface = "0 0 0 1 4.05839e-010 1.44067e-009 0.112745";
+         surface = "0 1 0 0 5.05789e-009 -4.56528e-009 -0.5";
+         surface = "0.311251 0 0 0.950328 1.59573e-009 1.39021 -0.163826";
+         surface = "0 -0.311251 0.950328 -0 4.85838e-010 -1.39021 -0.163826";
+         surface = "0.220088 0.220088 -0.671983 0.671983 -1.39021 -3.2702e-008 -0.163826";
+         surface = "0.220088 -0.220088 0.671983 0.671983 1.39021 -2.28065e-008 -0.163826";
+      };
+      new ConvexShape() {
+         Material = "Grid512_OrangeLines_Mat";
+         position = "-10 -10 0.500001";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         surface = "0 0 0 1 4.05839e-010 1.44067e-009 0.112745";
+         surface = "0 1 0 0 5.05789e-009 -4.56528e-009 -0.5";
+         surface = "0.311251 0 0 0.950328 1.59573e-009 1.39021 -0.163826";
+         surface = "0 -0.311251 0.950328 -0 4.85838e-010 -1.39021 -0.163826";
+         surface = "0.220088 0.220088 -0.671983 0.671983 -1.39021 -3.2702e-008 -0.163826";
+         surface = "0.220088 -0.220088 0.671983 0.671983 1.39021 -2.28065e-008 -0.163826";
+      };
+      new ConvexShape() {
+         Material = "Grid512_OrangeLines_Mat";
+         position = "-10 10 0.500001";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         surface = "0 0 0 1 4.05839e-010 1.44067e-009 0.112745";
+         surface = "0 1 0 0 5.05789e-009 -4.56528e-009 -0.5";
+         surface = "0.311251 0 0 0.950328 1.59573e-009 1.39021 -0.163826";
+         surface = "0 -0.311251 0.950328 -0 4.85838e-010 -1.39021 -0.163826";
+         surface = "0.220088 0.220088 -0.671983 0.671983 -1.39021 -3.2702e-008 -0.163826";
+         surface = "0.220088 -0.220088 0.671983 0.671983 1.39021 -2.28065e-008 -0.163826";
+      };
+      new ConvexShape() {
+         Material = "Grid512_OrangeLines_Mat";
+         position = "10 10 0.500001";
+         rotation = "1 0 0 0";
+         scale = "1 1 1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         surface = "0 0 0 1 4.05839e-010 1.44067e-009 0.112745";
+         surface = "0 1 0 0 5.05789e-009 -4.56528e-009 -0.5";
+         surface = "0.311251 0 0 0.950328 1.59573e-009 1.39021 -0.163826";
+         surface = "0 -0.311251 0.950328 -0 4.85838e-010 -1.39021 -0.163826";
+         surface = "0.220088 0.220088 -0.671983 0.671983 -1.39021 -3.2702e-008 -0.163826";
+         surface = "0.220088 -0.220088 0.671983 0.671983 1.39021 -2.28065e-008 -0.163826";
+      };
+   };
+   new SimGroup(Paths) {
+      canSave = "1";
+      canSaveDynamicFields = "1";
+
+      new Path(PatrolPath) {
+         isLooping = "1";
+         canSave = "1";
+         canSaveDynamicFields = "1";
+
+         new Marker() {
+            seqNum = "0";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "-10 10 0.928092";
+            rotation = "0 0 -1 48.0534";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "1";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "10 10 0.928092";
+            rotation = "0 0 1 46.6231";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "2";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "10 -10 0.928092";
+            rotation = "0 0 1 137.031";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+         new Marker() {
+            seqNum = "3";
+            type = "Normal";
+            msToNext = "1000";
+            smoothingType = "Spline";
+            position = "-10 -10 0.928092";
+            rotation = "0 0 1 225.424";
+            scale = "1 1 1";
+            canSave = "1";
+            canSaveDynamicFields = "1";
+         };
+      };
+   };
+};
+//--- OBJECT WRITE END ---
+
