@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "BadBehavior\core\Runner.h"
+#include "BadBehavior/core/Runner.h"
 #include "Ticker.h"
 
 using namespace BadBehavior;

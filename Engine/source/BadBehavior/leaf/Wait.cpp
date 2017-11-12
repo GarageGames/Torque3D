@@ -22,7 +22,7 @@
 
 #include "math/mMathFn.h"
 
-#include "BadBehavior\core\Runner.h"
+#include "BadBehavior/core/Runner.h"
 #include "Wait.h"
 
 using namespace BadBehavior;

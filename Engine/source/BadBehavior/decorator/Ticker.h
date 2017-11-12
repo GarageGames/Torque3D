@@ -27,7 +27,7 @@
 #include "BadBehavior/core/Decorator.h"
 #endif
 #ifndef _BB_BRANCH_H_
-#include "BadBehavior\core\Branch.h"
+#include "BadBehavior/core/Branch.h"
 #endif
 
 namespace BadBehavior

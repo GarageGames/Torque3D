@@ -24,7 +24,7 @@
 #define _BB_ROOT_H_
 
 #ifndef _BB_BRANCH_H_
-#include "BadBehavior\core\Branch.h"
+#include "BadBehavior/core/Branch.h"
 #endif
 #ifndef _BB_DECORATOR_H_
 #include "BadBehavior/core/Decorator.h"
