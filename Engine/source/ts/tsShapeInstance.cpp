@@ -307,13 +307,19 @@ void TSShapeInstance::reSkin( String newBaseName, String oldBaseName )
    {
       // Try changing base
       const String &pName = materialNames[i];
-	  String newName( pName );
-	  newName.replace( oldBaseName, newBaseName );
+	  String newName( String::ToLower(pName) );
+	  newName.replace( String::ToLower(oldBaseName), String::ToLower(newBaseName) );
 	  pMatList->renameMaterial( i, newName );
    }
 
    // Initialize the material instances
    initMaterialList();
+}
+
+void TSShapeInstance::resetMaterialList()
+{
+	TSMaterialList* oMatlist = mShape->materialList;
+	setMaterialList(oMatlist);
 }
 
 //-------------------------------------------------------------------------------------
