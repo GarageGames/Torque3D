@@ -395,6 +395,11 @@ GFXVideoMode GFXInit::getDesktopResolution()
    return resVm;
 }
 
+RectI GFXInit::getPrimaryDesktopArea()
+{
+   return WindowManager->getPrimaryDesktopArea();
+}
+
 void GFXInit::enumerateAdapters() 
 {
    // Call each device class and have it report any adapters it supports.
@@ -434,6 +439,13 @@ DefineEngineFunction( getDesktopResolution, Point3F, (),,
 {
    GFXVideoMode res = GFXInit::getDesktopResolution();
    return Point3F( res.resolution.x, res.resolution.y, res.bitDepth );
+}
+
+DefineEngineFunction( getPrimaryDesktopArea, RectI, (),,
+   "Return the rect of the available desktop area.\n\n@ingroup GFX" )
+{
+   RectI rect = GFXInit::getPrimaryDesktopArea();
+   return rect;
 }
 
 DefineEngineStaticMethod( GFXInit, getAdapterCount, S32, (),,
