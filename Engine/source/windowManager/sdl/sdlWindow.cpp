@@ -266,6 +266,13 @@ const Point2I PlatformWindowSDL::getClientExtent()
    return size;
 }
 
+const Point2I PlatformWindowSDL::getWindowBorders()
+{
+   int top, right, bottom, left = 0;
+   SDL_GetWindowBordersSize(mWindowHandle, &top, &right, &bottom, &left);
+   return Point2I( left+right, top+bottom );
+}
+
 void PlatformWindowSDL::setBounds( const RectI &newBounds )
 {
    // TODO SDL

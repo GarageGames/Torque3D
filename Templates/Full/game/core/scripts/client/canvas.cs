@@ -97,9 +97,8 @@ function configureCanvas()
          //If it should change resolution but doesn't, use available desktop area
          if(!%switched)
          {
-            //HACK need 30 padding to fix canvas offset when menu is added
-            %resX   = %deskResX - 30;
-            %resY   = %deskResY - 30;
+            if(%resX > %deskResX) %resX   = %deskResX - 10;
+            if(%resY > %deskResY) %resY   = %deskResY - 10;
             warn("Warning: Switching to \"" @ %resX SPC %resY SPC %bpp @ "\"");
          }
       }

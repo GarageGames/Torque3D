@@ -127,6 +127,8 @@ public:
    // Window Client Area Extent
    virtual void setClientExtent( const Point2I newExtent );
    virtual const Point2I getClientExtent();
+
+   virtual const Point2I getWindowBorders();
   
    // Window Bounds
    virtual void setBounds(const RectI &newBounds);

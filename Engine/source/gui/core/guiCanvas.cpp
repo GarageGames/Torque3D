@@ -2675,6 +2675,21 @@ DefineConsoleMethod( GuiCanvas, restoreWindow, void, (), , "() - restore this ca
       window->restore();
 }
 
+DefineConsoleMethod( GuiCanvas, setSize, void, (U32 w, U32 h), , "() - set the size of this canvas' window." )
+{
+   PlatformWindow* window = object->getPlatformWindow();
+   if( window )
+      window->setSize(Point2I(w,h));
+}
+
+DefineConsoleMethod( GuiCanvas, getWindowBorders, Point2I, (), , "() - get the border sizes of this canvas' window." )
+{
+   PlatformWindow* window = object->getPlatformWindow();
+   if( window )
+      return window->getWindowBorders();
+   return Point2I(0,0);
+}
+
 DefineConsoleMethod( GuiCanvas, setFocus, void, (), , "() - Claim OS input focus for this canvas' window.")
 {
    PlatformWindow* window = object->getPlatformWindow();
