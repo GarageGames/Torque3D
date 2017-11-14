@@ -97,6 +97,11 @@ function configureCanvas()
          //If it should change resolution but doesn't, use available desktop area
          if(!%switched)
          {
+            %padding = 0;
+            
+            //need padding for linux (macOS?)
+            if($platform !$= "windows") %padding = 10;
+
             if(%resX > %deskResX) %resX   = %deskResX - 10;
             if(%resY > %deskResY) %resY   = %deskResY - 10;
             warn("Warning: Switching to \"" @ %resX SPC %resY SPC %bpp @ "\"");
@@ -121,6 +126,15 @@ function configureCanvas()
 
    // Actually set the new video mode
    Canvas.setVideoMode(%resX, %resY, %fs, %bpp, %rate, %fsaa);
+
+   //If maximized then restore and set the size to prevent
+   //linux canvas offseting issue
+   if(Canvas.isMaximized() && $platform !$= "windows")
+   {
+      Canvas.restoreWindow();
+      Canvas.setSize(%resX, %resY);
+   }
+
    
    // FXAA piggybacks on the FSAA setting in $pref::Video::mode.
    if ( isObject( FXAA_PostEffect ) )
