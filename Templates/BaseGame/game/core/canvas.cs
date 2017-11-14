@@ -114,8 +114,9 @@ function configureCanvas()
             %testResY = getWord(%testRes, $WORD::RES_Y);
             %testBPP  = getWord(%testRes, $WORD::BITDEPTH);
 
-            if (%testBPP != %bpp)
-               continue;
+            //TODO Canvas.getMode does not return bpp reliably
+            //if (%testBPP != %bpp)
+            //   continue;
             
             if ((%testResX <= %deskResX) && (%testResY <= %deskResY))
             {
