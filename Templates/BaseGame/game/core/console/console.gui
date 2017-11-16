@@ -83,7 +83,7 @@
          canSave = "1";
          canSaveDynamicFields = "0";
       };
-      new GuiToggleButtonCtrl(ConsoleDlgErrorFilterBtn) {
+      new GuiCheckBoxCtrl(ConsoleDlgErrorFilterBtn) {
          text = "Errors";
          groupNum = "-1";
          buttonType = "ToggleButton";
@@ -93,7 +93,7 @@
          minExtent = "8 2";
          horizSizing = "right";
          vertSizing = "bottom";
-         profile = "GuiButtonProfile";
+         profile = "GuiCheckBoxProfile";
          visible = "1";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
@@ -102,7 +102,7 @@
          canSave = "1";
          canSaveDynamicFields = "0";
       };
-      new GuiToggleButtonCtrl(ConsoleDlgWarnFilterBtn) {
+      new GuiCheckBoxCtrl(ConsoleDlgWarnFilterBtn) {
          text = "Warnings";
          groupNum = "-1";
          buttonType = "ToggleButton";
@@ -112,7 +112,7 @@
          minExtent = "8 2";
          horizSizing = "right";
          vertSizing = "bottom";
-         profile = "GuiButtonProfile";
+         profile = "GuiCheckBoxProfile";
          visible = "1";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
@@ -121,7 +121,7 @@
          canSave = "1";
          canSaveDynamicFields = "0";
       };
-      new GuiToggleButtonCtrl(ConsoleDlgNormalFilterBtn) {
+      new GuiCheckBoxCtrl(ConsoleDlgNormalFilterBtn) {
          text = "Normal Messages";
          groupNum = "-1";
          buttonType = "ToggleButton";
@@ -131,7 +131,7 @@
          minExtent = "8 2";
          horizSizing = "right";
          vertSizing = "bottom";
-         profile = "GuiButtonProfile";
+         profile = "GuiCheckBoxProfile";
          visible = "1";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
