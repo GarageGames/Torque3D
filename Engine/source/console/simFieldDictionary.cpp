@@ -36,20 +36,20 @@ SimFieldDictionary::Entry *SimFieldDictionary::smFreeList = NULL;
 
 static Chunker<SimFieldDictionary::Entry> fieldChunker;
 
-U32 SimFieldDictionary::getHashValue( StringTableEntry slotName )
+U32 SimFieldDictionary::getHashValue(StringTableEntry slotName)
 {
-   return HashPointer( slotName ) % HashTableSize;
+   return HashPointer(slotName) % HashTableSize;
 }
 
-U32 SimFieldDictionary::getHashValue( const String& fieldName )
+U32 SimFieldDictionary::getHashValue(const String& fieldName)
 {
-   return getHashValue( StringTable->insert( fieldName ) );
+   return getHashValue(StringTable->insert(fieldName));
 }
 
-SimFieldDictionary::Entry *SimFieldDictionary::addEntry( U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value )
+SimFieldDictionary::Entry *SimFieldDictionary::addEntry(U32 bucket, StringTableEntry slotName, ConsoleBaseType* type, char* value)
 {
    Entry* ret;
-   if(smFreeList)
+   if (smFreeList)
    {
       ret = smFreeList;
       smFreeList = ret->next;
@@ -57,14 +57,14 @@ SimFieldDictionary::Entry *SimFieldDictionary::addEntry( U32 bucket, StringTable
    else
       ret = fieldChunker.alloc();
 
-   ret->next      = mHashTable[ bucket ];
-   ret->slotName  = slotName;
-   ret->type      = type;
-   ret->value     = value;
+   ret->next = mHashTable[bucket];
+   ret->slotName = slotName;
+   ret->type = type;
+   ret->value = value;
 
-   mHashTable[ bucket ] = ret;
-   mNumFields ++;
-   mVersion ++;
+   mHashTable[bucket] = ret;
+   mNumFields++;
+   mVersion++;
 
    return ret;
 }
@@ -74,37 +74,37 @@ void SimFieldDictionary::freeEntry(SimFieldDictionary::Entry *ent)
    ent->next = smFreeList;
    smFreeList = ent;
 
-   mNumFields --;
+   mNumFields--;
 }
 
 SimFieldDictionary::SimFieldDictionary()
-:  mNumFields( 0 ),
-   mVersion( 0 )
+   : mNumFields(0),
+   mVersion(0)
 {
-   dMemset( mHashTable, 0, sizeof( mHashTable ) );
+   dMemset(mHashTable, 0, sizeof(mHashTable));
 }
 
 SimFieldDictionary::~SimFieldDictionary()
 {
-   for(U32 i = 0; i < HashTableSize; i++)
+   for (U32 i = 0; i < HashTableSize; i++)
    {
-      for(Entry *walk = mHashTable[i]; walk;)
+      for (Entry *walk = mHashTable[i]; walk;)
       {
          Entry *temp = walk;
          walk = temp->next;
 
-         if( temp->value )
+         if (temp->value)
             dFree(temp->value);
          freeEntry(temp);
       }
    }
 
-   AssertFatal( mNumFields == 0, "Incorrect count on field dictionary" );
+   AssertFatal(mNumFields == 0, "Incorrect count on field dictionary");
 }
 
 void SimFieldDictionary::setFieldType(StringTableEntry slotName, const char *typeString)
 {
-   ConsoleBaseType *cbt = ConsoleBaseType::getTypeByName( typeString );
+   ConsoleBaseType *cbt = ConsoleBaseType::getTypeByName(typeString);
    setFieldType(slotName, cbt);
 }
 
@@ -117,11 +117,11 @@ void SimFieldDictionary::setFieldType(StringTableEntry slotName, const U32 typeI
 void SimFieldDictionary::setFieldType(StringTableEntry slotName, ConsoleBaseType *type)
 {
    // If the field exists on the object, set the type
-   U32 bucket = getHashValue( slotName );
+   U32 bucket = getHashValue(slotName);
 
-   for( Entry *walk = mHashTable[bucket]; walk; walk = walk->next )
+   for (Entry *walk = mHashTable[bucket]; walk; walk = walk->next)
    {
-      if( walk->slotName == slotName )
+      if (walk->slotName == slotName)
       {
          // Found and type assigned, let's bail
          walk->type = type;
@@ -130,15 +130,15 @@ void SimFieldDictionary::setFieldType(StringTableEntry slotName, ConsoleBaseType
    }
 
    // Otherwise create the field, and set the type. Assign a null value.
-   addEntry( bucket, slotName, type );
+   addEntry(bucket, slotName, type);
 }
 
 U32 SimFieldDictionary::getFieldType(StringTableEntry slotName) const
 {
-   U32 bucket = getHashValue( slotName );
+   U32 bucket = getHashValue(slotName);
 
-   for( Entry *walk = mHashTable[bucket]; walk; walk = walk->next )
-      if( walk->slotName == slotName )
+   for (Entry *walk = mHashTable[bucket]; walk; walk = walk->next)
+      if (walk->slotName == slotName)
          return walk->type ? walk->type->getTypeID() : TypeString;
 
    return TypeString;
@@ -146,27 +146,27 @@ U32 SimFieldDictionary::getFieldType(StringTableEntry slotName) const
 
 SimFieldDictionary::Entry  *SimFieldDictionary::findDynamicField(const String &fieldName) const
 {
-   U32 bucket = getHashValue( fieldName );
+   U32 bucket = getHashValue(fieldName);
 
-   for( Entry *walk = mHashTable[bucket]; walk; walk = walk->next )
+   for (Entry *walk = mHashTable[bucket]; walk; walk = walk->next)
    {
-      if( fieldName.equal(walk->slotName, String::NoCase) )
+      if (fieldName.equal(walk->slotName, String::NoCase))
          return walk;
    }
 
    return NULL;
 }
 
-SimFieldDictionary::Entry *SimFieldDictionary::findDynamicField( StringTableEntry fieldName) const
+SimFieldDictionary::Entry *SimFieldDictionary::findDynamicField(StringTableEntry fieldName) const
 {
-   U32 bucket = getHashValue( fieldName );
+   U32 bucket = getHashValue(fieldName);
 
-   for( Entry *walk = mHashTable[bucket]; walk; walk = walk->next )
+   for (Entry *walk = mHashTable[bucket]; walk; walk = walk->next)
    {
-       if( walk->slotName == fieldName )
-       {
-        return walk;
-       }
+      if (walk->slotName == fieldName)
+      {
+         return walk;
+      }
    }
 
    return NULL;
@@ -177,17 +177,17 @@ void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *va
 {
    U32 bucket = getHashValue(slotName);
    Entry **walk = &mHashTable[bucket];
-   while(*walk && (*walk)->slotName != slotName)
+   while (*walk && (*walk)->slotName != slotName)
       walk = &((*walk)->next);
 
    Entry *field = *walk;
-   if( !value || !*value )
+   if (!value || !*value)
    {
-      if(field)
+      if (field)
       {
          mVersion++;
 
-         if( field->value )
+         if (field->value)
             dFree(field->value);
 
          *walk = field->next;
@@ -196,15 +196,15 @@ void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *va
    }
    else
    {
-      if(field)
+      if (field)
       {
-         if( field->value )
+         if (field->value)
             dFree(field->value);
 
          field->value = dStrdup(value);
       }
       else
-         addEntry( bucket, slotName, 0, dStrdup( value ) );
+         addEntry(bucket, slotName, 0, dStrdup(value));
    }
 }
 
@@ -212,8 +212,8 @@ const char *SimFieldDictionary::getFieldValue(StringTableEntry slotName)
 {
    U32 bucket = getHashValue(slotName);
 
-   for(Entry *walk = mHashTable[bucket];walk;walk = walk->next)
-      if(walk->slotName == slotName)
+   for (Entry *walk = mHashTable[bucket]; walk; walk = walk->next)
+      if (walk->slotName == slotName)
          return walk->value;
 
    return NULL;
@@ -223,9 +223,9 @@ void SimFieldDictionary::assignFrom(SimFieldDictionary *dict)
 {
    mVersion++;
 
-   for(U32 i = 0; i < HashTableSize; i++)
+   for (U32 i = 0; i < HashTableSize; i++)
    {
-      for(Entry *walk = dict->mHashTable[i];walk; walk = walk->next)
+      for (Entry *walk = dict->mHashTable[i]; walk; walk = walk->next)
       {
          setFieldValue(walk->slotName, walk->value);
          setFieldType(walk->slotName, walk->type);
@@ -233,7 +233,7 @@ void SimFieldDictionary::assignFrom(SimFieldDictionary *dict)
    }
 }
 
-static S32 QSORT_CALLBACK compareEntries(const void* a,const void* b)
+static S32 QSORT_CALLBACK compareEntries(const void* a, const void* b)
 {
    SimFieldDictionary::Entry *fa = *((SimFieldDictionary::Entry **)a);
    SimFieldDictionary::Entry *fb = *((SimFieldDictionary::Entry **)b);
@@ -245,17 +245,17 @@ void SimFieldDictionary::writeFields(SimObject *obj, Stream &stream, U32 tabStop
    const AbstractClassRep::FieldList &list = obj->getFieldList();
    Vector<Entry *> flist(__FILE__, __LINE__);
 
-   for(U32 i = 0; i < HashTableSize; i++)
+   for (U32 i = 0; i < HashTableSize; i++)
    {
-      for(Entry *walk = mHashTable[i];walk; walk = walk->next)
+      for (Entry *walk = mHashTable[i]; walk; walk = walk->next)
       {
          // make sure we haven't written this out yet:
          U32 i;
-         for(i = 0; i < list.size(); i++)
-            if(list[i].pFieldname == walk->slotName)
+         for (i = 0; i < list.size(); i++)
+            if (list[i].pFieldname == walk->slotName)
                break;
 
-         if(i != list.size())
+         if (i != list.size())
             continue;
 
 
@@ -267,23 +267,23 @@ void SimFieldDictionary::writeFields(SimObject *obj, Stream &stream, U32 tabStop
    }
 
    // Sort Entries to prevent version control conflicts
-   dQsort(flist.address(),flist.size(),sizeof(Entry *),compareEntries);
+   dQsort(flist.address(), flist.size(), sizeof(Entry *), compareEntries);
 
    // Save them out
-   for(Vector<Entry *>::iterator itr = flist.begin(); itr != flist.end(); itr++)
+   for (Vector<Entry *>::iterator itr = flist.begin(); itr != flist.end(); itr++)
    {
-      U32 nBufferSize = (dStrlen( (*itr)->value ) * 2) + dStrlen( (*itr)->slotName ) + 16;
-      FrameTemp<char> expandedBuffer( nBufferSize );
+      U32 nBufferSize = (dStrlen((*itr)->value) * 2) + dStrlen((*itr)->slotName) + 16;
+      FrameTemp<char> expandedBuffer(nBufferSize);
 
-      stream.writeTabs(tabStop+1);
+      stream.writeTabs(tabStop + 1);
 
       const char *typeName = (*itr)->type && (*itr)->type->getTypeID() != TypeString ? (*itr)->type->getTypeName() : "";
       dSprintf(expandedBuffer, nBufferSize, "%s%s%s = \"", typeName, *typeName ? " " : "", (*itr)->slotName);
-      if ( (*itr)->value )
+      if ((*itr)->value)
          expandEscape((char*)expandedBuffer + dStrlen(expandedBuffer), (*itr)->value);
       dStrcat(expandedBuffer, "\";\r\n");
 
-      stream.write(dStrlen(expandedBuffer),expandedBuffer);
+      stream.write(dStrlen(expandedBuffer), expandedBuffer);
    }
 
 }
@@ -293,32 +293,32 @@ void SimFieldDictionary::printFields(SimObject *obj)
    char expandedBuffer[4096];
    Vector<Entry *> flist(__FILE__, __LINE__);
 
-   for(U32 i = 0; i < HashTableSize; i++)
+   for (U32 i = 0; i < HashTableSize; i++)
    {
-      for(Entry *walk = mHashTable[i];walk; walk = walk->next)
+      for (Entry *walk = mHashTable[i]; walk; walk = walk->next)
       {
          // make sure we haven't written this out yet:
          U32 i;
-         for(i = 0; i < list.size(); i++)
-            if(list[i].pFieldname == walk->slotName)
+         for (i = 0; i < list.size(); i++)
+            if (list[i].pFieldname == walk->slotName)
                break;
 
-         if(i != list.size())
+         if (i != list.size())
             continue;
 
          flist.push_back(walk);
       }
    }
-   dQsort(flist.address(),flist.size(),sizeof(Entry *),compareEntries);
+   dQsort(flist.address(), flist.size(), sizeof(Entry *), compareEntries);
 
-   for(Vector<Entry *>::iterator itr = flist.begin(); itr != flist.end(); itr++)
+   for (Vector<Entry *>::iterator itr = flist.begin(); itr != flist.end(); itr++)
    {
       const char* type = "string";
-      if( ( *itr )->type )
-         type = ( *itr )->type->getTypeClassName();
-         
-      dSprintf( expandedBuffer, sizeof( expandedBuffer ), "  %s %s = \"", type, ( *itr )->slotName );
-      if ( (*itr)->value )
+      if ((*itr)->type)
+         type = (*itr)->type->getTypeClassName();
+
+      dSprintf(expandedBuffer, sizeof(expandedBuffer), "  %s %s = \"", type, (*itr)->slotName);
+      if ((*itr)->value)
          expandEscape(expandedBuffer + dStrlen(expandedBuffer), (*itr)->value);
       Con::printf("%s\"", expandedBuffer);
    }
@@ -326,9 +326,9 @@ void SimFieldDictionary::printFields(SimObject *obj)
 
 SimFieldDictionary::Entry  *SimFieldDictionary::operator[](U32 index)
 {
-   AssertFatal ( index < mNumFields, "out of range" );
+   AssertFatal(index < mNumFields, "out of range");
 
-   if ( index > mNumFields )
+   if (index > mNumFields)
       return NULL;
 
    SimFieldDictionaryIterator itr(this);
@@ -350,13 +350,13 @@ SimFieldDictionaryIterator::SimFieldDictionaryIterator(SimFieldDictionary * dict
 
 SimFieldDictionary::Entry* SimFieldDictionaryIterator::operator++()
 {
-   if(!mDictionary)
+   if (!mDictionary)
       return(mEntry);
 
-   if(mEntry)
+   if (mEntry)
       mEntry = mEntry->next;
 
-   while(!mEntry && (mHashIndex < (SimFieldDictionary::HashTableSize-1)))
+   while (!mEntry && (mHashIndex < (SimFieldDictionary::HashTableSize - 1)))
       mEntry = mDictionary->mHashTable[++mHashIndex];
 
    return(mEntry);
@@ -386,14 +386,14 @@ void SimFieldDictionary::setFieldValue(StringTableEntry slotName, const char *va
 
    U32 bucket = getHashValue(slotName);
    Entry **walk = &mHashTable[bucket];
-   while(*walk && (*walk)->slotName != slotName)
+   while (*walk && (*walk)->slotName != slotName)
       walk = &((*walk)->next);
 
    Entry *field = *walk;
    if (field)
       return;
 
-   addEntry( bucket, slotName, type, dStrdup( value ) );
+   addEntry(bucket, slotName, type, dStrdup(value));
 }
 // A variation of the stock SimFieldDictionary::assignFrom(), this method adds <no_replace>
 // and <filter> arguments. When true, <no_replace> prohibits the replacement of fields that already
@@ -412,14 +412,14 @@ void SimFieldDictionary::assignFrom(SimFieldDictionary *dict, const char* filter
 
    if (filter_len == 0)
    {
-      for(U32 i = 0; i < HashTableSize; i++)
-         for(Entry *walk = dict->mHashTable[i];walk; walk = walk->next)
+      for (U32 i = 0; i < HashTableSize; i++)
+         for (Entry *walk = dict->mHashTable[i]; walk; walk = walk->next)
             setFieldValue(walk->slotName, walk->value, walk->type, no_replace);
    }
    else
    {
-      for(U32 i = 0; i < HashTableSize; i++)
-         for(Entry *walk = dict->mHashTable[i];walk; walk = walk->next)
+      for (U32 i = 0; i < HashTableSize; i++)
+         for (Entry *walk = dict->mHashTable[i]; walk; walk = walk->next)
             if (dStrncmp(walk->slotName, filter, filter_len) == 0)
                setFieldValue(walk->slotName, walk->value, walk->type, no_replace);
    }
