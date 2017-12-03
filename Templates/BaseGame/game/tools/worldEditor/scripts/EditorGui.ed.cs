@@ -1302,6 +1302,7 @@ function VisibilityDropdownToggle()
    {
       EVisibility.setVisible(true);
       visibilityToggleBtn.setStateOn(1);
+      EVisibility.setExtent("200 540");
    }
 }
 
@@ -1641,6 +1642,31 @@ function EditorTree::onRightMouseUp( %this, %itemId, %mouse, %obj )
 
             object = -1;
          };
+         
+      if(%obj.isMemberOfClass("Entity"))
+      {
+         if( !isObject( GameObjectPopup ) )
+            %popup = new PopupMenu( GameObjectPopup : ETSimGroupContextPopup )
+            {
+               //item[ 12 ] = "-";
+               item[ 12 ] = "Convert to Game Object" TAB "" TAB "EWorldEditor.createGameObject( %this.object );";
+               item[ 13 ] = "Duplicate Game Object" TAB "" TAB "EWorldEditor.duplicateGameObject( %this.object );";
+               item[ 14 ] = "Show in Asset Browser" TAB "" TAB "EWorldEditor.showGameObjectInAssetBrowser( %this.object );";
+            };
+            
+         if(!isObject(AssetDatabase.acquireAsset(%obj.gameObjectAsset)))
+         {
+            GameObjectPopup.enableItem(12, true);
+            GameObjectPopup.enableItem(13, false);
+            GameObjectPopup.enableItem(14, false);
+         }
+         else
+         {
+            GameObjectPopup.enableItem(12, false);
+            GameObjectPopup.enableItem(13, true);
+            GameObjectPopup.enableItem(14, true);
+         }
+      }
 
       %popup.object = %obj;
       
