@@ -682,7 +682,7 @@ public:
 /// @endcode
 #define DefineEngineFunction( name, returnType, args, defaultArgs, usage )                                                       \
    static inline returnType _fn ## name ## impl args;                                                                            \
-   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## name                                                         \
+   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn_ ## name                                                         \
       ( _EngineFunctionTrampoline< returnType args >::Args a )                                                                   \
    {                                                                                                                             \
       _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
@@ -699,7 +699,7 @@ public:
       "fn" #name,                                                                                                                \
       TYPE< returnType args >(),                                                                                                 \
       &_fn ## name ## DefaultArgs,                                                                                               \
-      ( void* ) &fn ## name,                                                                                                     \
+      ( void* ) &fn_ ## name,                                                                                                     \
       0                                                                                                                          \
    );                                                                                                                            \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## name ## caster( SimObject*, S32 argc, ConsoleValueRef *argv )       \
@@ -737,7 +737,7 @@ public:
 
 #define _DefineMethodTrampoline( className, name, returnType, args ) \
    TORQUE_API EngineTypeTraits< returnType >::ReturnValueType \
-      fn ## className ## _ ## name ( className* object, _EngineMethodTrampoline< _ ## className ## name ## frame, returnType args >::Args a )   \
+      fn_ ## className ## _ ## name ( className* object, _EngineMethodTrampoline< _ ## className ## name ## frame, returnType args >::Args a )   \
    {                                                                                                                                            \
       _CHECK_ENGINE_INITIALIZED( className::name, returnType );                                                                                 \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                                       \
@@ -779,7 +779,7 @@ public:
       "fn" #className "_" #name,                                                                                                                \
       TYPE< _EngineMethodTrampoline< _ ## className ## name ## frame, returnType args >::FunctionType >(),                                      \
       &_fn ## className ## name ## DefaultArgs,                                                                                                 \
-      ( void* ) &fn ## className ## _ ## name,                                                                                                  \
+      ( void* ) &fn_ ## className ## _ ## name,                                                                                                  \
       0                                                                                                                                         \
    );                                                                                                                                           \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## className ## name ## caster( SimObject* object, S32 argc, ConsoleValueRef *argv )  \
@@ -819,7 +819,7 @@ public:
 /// @endcode
 #define DefineEngineStaticMethod( className, name, returnType, args, defaultArgs, usage )                                              \
    static inline returnType _fn ## className ## name ## impl args;                                                                     \
-   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## className ## _ ## name                                             \
+   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn_ ## className ## _ ## name                                             \
       ( _EngineFunctionTrampoline< returnType args >::Args a )                                                                         \
    {                                                                                                                                   \
       _CHECK_ENGINE_INITIALIZED( className::name, returnType );                                                                        \
@@ -836,7 +836,7 @@ public:
       "fn" #className "_" #name,                                                                                                       \
       TYPE< returnType args >(),                                                                                                       \
       &_fn ## className ## name ## DefaultArgs,                                                                                        \
-      ( void* ) &fn ## className ## _ ## name,                                                                                         \
+      ( void* ) &fn_ ## className ## _ ## name,                                                                                         \
       0                                                                                                                                \
    );                                                                                                                                  \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## className ## name ## caster( SimObject*, S32 argc, ConsoleValueRef *argv )\
@@ -862,6 +862,14 @@ public:
 // as well.
 #define DefineConsoleFunction( name, returnType, args, defaultArgs, usage )                                                      \
    static inline returnType _fn ## name ## impl args;                                                                            \
+   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn_ ## name                                                        \
+      ( _EngineFunctionTrampoline< returnType args >::Args a )                                                                   \
+   {                                                                                                                             \
+      _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
+      return EngineTypeTraits< returnType >::ReturnValue(                                                                        \
+         _EngineFunctionTrampoline< returnType args >::jmp( _fn ## name ## impl, a )                                            \
+      );                                                                                                                         \
+   }                                                                                                                             \
    static _EngineFunctionDefaultArguments< void args > _fn ## name ## DefaultArgs defaultArgs;                                   \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## name ## caster( SimObject*, S32 argc, ConsoleValueRef *argv )       \
    {                                                                                                                             \
@@ -886,6 +894,7 @@ public:
       className* object;                                                                                                                        \
       inline returnType _exec args const;                                                                                                       \
    };                                                                                                                                           \
+   _DefineMethodTrampoline( className, name, returnType, args );                                                                                \
    static _EngineFunctionDefaultArguments< _EngineMethodTrampoline< _ ## className ## name ## frame, void args >::FunctionType >                \
       _fn ## className ## name ## DefaultArgs defaultArgs;                                                                                      \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## className ## name ## caster( SimObject* object, S32 argc, ConsoleValueRef *argv )  \
@@ -933,7 +942,7 @@ public:
 // for the console (e.g. DefineNewEngineFunction should become DefineEngineFunction).
 #define DefineNewEngineFunction( name, returnType, args, defaultArgs, usage )                                                    \
    static inline returnType _fn ## name ## impl args;                                                                            \
-   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## name                                                         \
+   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn_ ## name                                                         \
       ( _EngineFunctionTrampoline< returnType args >::Args a )                                                                   \
    {                                                                                                                             \
       _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
@@ -950,7 +959,7 @@ public:
       "fn" #name,                                                                                                                \
       TYPE< returnType args >(),                                                                                                 \
       &_fn ## name ## DefaultArgs,                                                                                               \
-      ( void* ) &fn ## name,                                                                                                     \
+      ( void* ) &fn_ ## name,                                                                                                     \
       0                                                                                                                          \
    );                                                                                                                            \
    static inline returnType _fn ## name ## impl args
@@ -973,14 +982,14 @@ public:
       "fn" #className "_" #name,                                                                                                                \
       TYPE< _EngineMethodTrampoline< _ ## className ## name ## frame, returnType args >::FunctionType >(),                                      \
       &_fn ## className ## name ## DefaultArgs,                                                                                                 \
-      ( void* ) &fn ## className ## _ ## name,                                                                                                  \
+      ( void* ) &fn_ ## className ## _ ## name,                                                                                                  \
       0                                                                                                                                         \
    );                                                                                                                                           \
    returnType _ ## className ## name ## frame::_exec args const
 
 #define DefineNewEngineStaticMethod( className, name, returnType, args, defaultArgs, usage )                                           \
    static inline returnType _fn ## className ## name ## impl args;                                                                     \
-   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## className ## _ ## name                                             \
+   TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn_ ## className ## _ ## name                                             \
       ( _EngineFunctionTrampoline< returnType args >::Args a )                                                                         \
    {                                                                                                                                   \
       _CHECK_ENGINE_INITIALIZED( className::name, returnType );                                                                        \
@@ -997,7 +1006,7 @@ public:
       "fn" #className "_" #name,                                                                                                       \
       TYPE< returnType args >(),                                                                                                       \
       &_fn ## className ## name ## DefaultArgs,                                                                                        \
-      ( void* ) &fn ## className ## _ ## name,                                                                                         \
+      ( void* ) &fn_ ## className ## _ ## name,                                                                                         \
       0                                                                                                                                \
    );                                                                                                                                  \
    static inline returnType _fn ## className ## name ## impl args
