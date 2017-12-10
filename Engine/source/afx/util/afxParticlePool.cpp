@@ -60,6 +60,8 @@ afxParticlePoolData::afxParticlePoolData(const afxParticlePoolData& other, bool 
 ImplementEnumType( afxParticlePool_PoolType, "Possible particle pool types.\n" "@ingroup afxParticlePool\n\n" )
   { afxParticlePoolData::POOL_NORMAL,  "normal",      "..." },
   { afxParticlePoolData::POOL_TWOPASS, "two-pass",    "..." },
+// Alias...
+  { afxParticlePoolData::POOL_TWOPASS, "twopass",    "..." },
 EndImplementEnumType;
 
 afxParticlePoolData::~afxParticlePoolData()

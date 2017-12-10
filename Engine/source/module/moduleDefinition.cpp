@@ -82,8 +82,6 @@ void ModuleDefinition::initPersistFields()
     // Call parent.
     Parent::initPersistFields();
 
-    addProtectedField("ModuleId", TypeString, Offset(mModuleId, ModuleDefinition), &defaultProtectedSetFn, &defaultProtectedGetFn, "");
-
     /// Module configuration.
     addProtectedField( "ModuleId", TypeString, Offset(mModuleId, ModuleDefinition), &setModuleId, &defaultProtectedGetFn, "A unique string Id for the module.  It can contain any characters except a comma or semi-colon (the asset scope character)." );
     addProtectedField( "VersionId", TypeS32, Offset(mVersionId, ModuleDefinition), &setVersionId, &defaultProtectedGetFn, "The version Id.  Breaking changes to a module should use a higher version Id." );

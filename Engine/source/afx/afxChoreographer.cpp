@@ -848,13 +848,13 @@ void afxChoreographer::unregisterParticlePool(afxParticlePool* pool)
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 
-DefineEngineMethod( afxChoreographer, setRanking, void, ( unsigned int ranking ),,
+DefineEngineMethod( afxChoreographer, setRanking, void, ( U32 ranking ),,
    "Set a ranking value (0-255) for the choreographer.\n" )
 {
   object->setRanking((U8)ranking);
 }
 
-DefineEngineMethod( afxChoreographer, setLevelOfDetail, void, ( unsigned int lod ),,
+DefineEngineMethod( afxChoreographer, setLevelOfDetail, void, ( U32 lod ),,
    "Set a level-of-detail value (0-255) for the choreographer.\n" )
 {
   object->setLevelOfDetail((U8)lod);

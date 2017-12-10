@@ -1654,7 +1654,7 @@ ConsoleMethod(Entity, addComponents, void, 2, 2, "() - Add all fielded behaviors
    object->addComponents();
 }*/
 
-ConsoleMethod(Entity, addComponent, bool, 3, 3, "(ComponentInstance bi) - Add a behavior to the object\n"
+ConsoleMethod(Entity, addComponent, bool, 3, 3, "(Component* bi) - Add a behavior to the object\n"
    "@param bi The behavior instance to add"
    "@return (bool success) Whether or not the behavior was successfully added")
 {
@@ -1679,7 +1679,7 @@ ConsoleMethod(Entity, addComponent, bool, 3, 3, "(ComponentInstance bi) - Add a 
    return false;
 }
 
-ConsoleMethod(Entity, removeComponent, bool, 3, 4, "(ComponentInstance bi, [bool deleteBehavior = true])\n"
+ConsoleMethod(Entity, removeComponent, bool, 3, 4, "(Component* bi, [bool deleteBehavior = true])\n"
    "@param bi The behavior instance to remove\n"
    "@param deleteBehavior Whether or not to delete the behavior\n"
    "@return (bool success) Whether the behavior was successfully removed")
