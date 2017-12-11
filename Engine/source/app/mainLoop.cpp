@@ -59,6 +59,8 @@
 #include "util/sampler.h"
 #include "platform/threads/threadPool.h"
 
+#include "cinterface/cinterface.h"
+
 // For the TickMs define... fix this for T2D...
 #include "T3D/gameBase/processList.h"
 
@@ -267,6 +269,9 @@ void StandardMainLoop::init()
    
    ThreadPool::GlobalThreadPool::createSingleton();
 
+   // Set engineAPI initialized to true
+   engineAPI::gIsInitialized = true;
+
    // Initialize modules.
    
    EngineModuleManager::initializeSystem();
@@ -439,6 +444,11 @@ bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
    // or otherwise, is not compiled and is loaded here
    // directly because the resource system restricts
    // access to the "root" directory.
+
+   bool foundExternalMain = false;
+   CInterface::CallMain(&foundExternalMain);
+   if (foundExternalMain)
+      return true;
 
 #ifdef TORQUE_ENABLE_VFS
    Zip::ZipArchive *vfs = openEmbeddedVFSArchive();

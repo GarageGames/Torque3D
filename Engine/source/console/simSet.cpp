@@ -895,14 +895,6 @@ DefineEngineMethod( SimSet, listObjects, void, (),,
 
 //-----------------------------------------------------------------------------
 
-DEFINE_CALLIN( fnSimSet_add, add, SimSet, void, ( SimSet* set, SimObject* object ),,,
-   "Add the given object to the set.\n"
-   "@param object An object." )
-{
-   if( object )
-      set->addObject( object );
-}
-
 ConsoleMethod( SimSet, add, void, 3, 0,
    "( SimObject objects... ) Add the given objects to the set.\n"
    "@param objects The objects to add to the set." )
@@ -918,14 +910,6 @@ ConsoleMethod( SimSet, add, void, 3, 0,
 }
 
 //-----------------------------------------------------------------------------
-
-DEFINE_CALLIN( fnSimSet_remove, remove, SimSet, void, ( SimSet* set, SimObject* object ),,,
-   "Remove the given object from the set.\n"
-   "@param object An object." )
-{
-   if( object )
-      set->removeObject( object );
-}
 
 ConsoleMethod( SimSet, remove, void, 3, 0,
    "( SimObject objects... ) Remove the given objects from the set.\n"

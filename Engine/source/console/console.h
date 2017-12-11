@@ -34,6 +34,8 @@
 #endif
 #include <stdarg.h>
 
+#include "engineFunctions.h"
+
 #include "core/util/str.h"
 #include "core/util/journal/journaledSignal.h"
 
@@ -1193,11 +1195,19 @@ public:
 
 #  define ConsoleFunction(name,returnType,minArgs,maxArgs,usage1) \
    returnType cf_##name(SimObject *, S32, ConsoleValueRef *argv); \
+   TORQUE_API returnType fn##name##(S32 argc, const char** argv) { \
+      StringStackConsoleWrapper args(argc, argv); \
+      return cf_##name(NULL, args.count(), args); \
+   } \
    ConsoleConstructor cc_##name##_obj(NULL,#name,cf_##name,usage1,minArgs,maxArgs); \
       returnType cf_##name(SimObject *, S32 argc, ConsoleValueRef *argv)
 
 #  define ConsoleToolFunction(name,returnType,minArgs,maxArgs,usage1) \
    returnType ctf_##name(SimObject *, S32, ConsoleValueRef *argv); \
+   TORQUE_API returnType fn##name##(S32 argc, const char** argv) { \
+      StringStackConsoleWrapper args(argc, argv); \
+      return ctf_##name(NULL, args.count(), args); \
+   } \
    ConsoleConstructor cc_##name##_obj(NULL,#name,ctf_##name,usage1,minArgs,maxArgs, true); \
    returnType ctf_##name(SimObject *, S32 argc, ConsoleValueRef *argv)
 
@@ -1218,6 +1228,10 @@ public:
          conmethod_return_##returnType ) cm_##className##_##name(static_cast<className*>(object),argc,argv); \
       };                                                                                              \
       ConsoleConstructor cc_##className##_##name##_obj(#className,#name,cm_##className##_##name##_caster,usage1,minArgs,maxArgs); \
+      TORQUE_API returnType fn##className##_##name##(className* object, S32 argc, const char** argv) { \
+         StringStackConsoleWrapper args(argc, argv); \
+         return cm_##className##_##name(object, args.count(), args); \
+      } \
       inline returnType cm_##className##_##name(className *object, S32 argc, ConsoleValueRef *argv)
 
 #  define ConsoleStaticMethod(className,name,returnType,minArgs,maxArgs,usage1) \
@@ -1227,6 +1241,10 @@ public:
    }; \
    ConsoleConstructor \
    cc_##className##_##name##_obj(#className,#name,cm_##className##_##name##_caster,usage1,minArgs,maxArgs); \
+   TORQUE_API returnType fn##className##_##name##(S32 argc, const char** argv) { \
+      StringStackConsoleWrapper args(argc, argv); \
+      return cm_##className##_##name(args.count(), args); \
+   } \
    inline returnType cm_##className##_##name(S32 argc, ConsoleValueRef *argv)
 
 #  define ConsoleMethodGroupEnd(className, groupName) \
@@ -1252,11 +1270,19 @@ public:
 #  define ConsoleFunction(name,returnType,minArgs,maxArgs,usage1)                   \
       static returnType c##name(SimObject *, S32, ConsoleValueRef*);                   \
       static ConsoleConstructor g##name##obj(NULL,#name,c##name,"",minArgs,maxArgs);\
+      TORQUE_API returnType fn##name##(S32 argc, const char** argv) { \
+         StringStackConsoleWrapper args(argc, argv); \
+         return c##name(NULL, args.count(), args); \
+      } \
       static returnType c##name(SimObject *, S32 argc, ConsoleValueRef *argv)
 
 #  define ConsoleToolFunction(name,returnType,minArgs,maxArgs,usage1)                   \
    static returnType c##name(SimObject *, S32, ConsoleValueRef*);                   \
    static ConsoleConstructor g##name##obj(NULL,#name,c##name,"",minArgs,maxArgs, true);\
+   TORQUE_API returnType fn##name##(S32 argc, const char** argv) { \
+      StringStackConsoleWrapper args(argc, argv); \
+      return c##name(NULL, args.count(), args); \
+   } \
    static returnType c##name(SimObject *, S32 argc, ConsoleValueRef *argv)
 
 #  define ConsoleMethod(className,name,returnType,minArgs,maxArgs,usage1)                             \
@@ -1266,6 +1292,10 @@ public:
       };                                                                                              \
       static ConsoleConstructor                                                                       \
          className##name##obj(#className,#name,c##className##name##caster,"",minArgs,maxArgs);        \
+      TORQUE_API returnType fn##className##_##name##(className* object, S32 argc, const char** argv) { \
+         StringStackConsoleWrapper args(argc, argv); \
+         return c##className##name(object, args.count(), args); \
+      } \
       static inline returnType c##className##name(className *object, S32 argc, ConsoleValueRef *argv)
 
 #  define ConsoleStaticMethod(className,name,returnType,minArgs,maxArgs,usage1)                       \
@@ -1275,6 +1305,10 @@ public:
       };                                                                                              \
       static ConsoleConstructor                                                                       \
          className##name##obj(#className,#name,c##className##name##caster,"",minArgs,maxArgs);        \
+      TORQUE_API returnType fn##className##_##name##(S32 argc, const char** argv) { \
+         StringStackConsoleWrapper args(argc, argv); \
+         return c##className##name(NULL, args.count(), args); \
+      } \
       static inline returnType c##className##name(S32 argc, ConsoleValueRef *argv)
 
 #define ConsoleDoc( text )
