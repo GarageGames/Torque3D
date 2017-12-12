@@ -31,12 +31,12 @@ endif(POLICY CMP0054)
 
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
 
-project(libpng C)
+project(libpng ASM C)
 enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 32)
+set(PNGLIB_RELEASE 34)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -262,7 +262,7 @@ find_program(AWK NAMES gawk awk)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-if(NOT AWK)
+if(NOT AWK OR ANDROID)
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
@@ -441,7 +441,7 @@ else()
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk"
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out")
-endif(NOT AWK)
+endif(NOT AWK OR ANDROID)
 
 # OUR SOURCES
 set(libpng_public_hdrs
@@ -455,7 +455,7 @@ set(libpng_private_hdrs
   pnginfo.h
   pngstruct.h
 )
-if(AWK)
+if(AWK AND NOT ANDROID)
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
 endif()
 set(libpng_sources
@@ -844,7 +844,7 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(png PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.32
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.34
     VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
