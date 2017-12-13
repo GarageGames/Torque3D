@@ -279,9 +279,10 @@ function ppOptionsHDRToneMapping::onAction(%this)
    //$HDRPostFX::enableToneMapping =  %this.getValue();
 }
 
-function ppOptionsHDREffectsBlueShift::onAction(%this)
+function ppOptionsHDREffectsBlueShift::onMouseDragged(%this)
 {
    $HDRPostFX::enableBlueShift = %this.getValue();
+   %this.ToolTip = "Value : " @ %this.value;
 }
 
 
