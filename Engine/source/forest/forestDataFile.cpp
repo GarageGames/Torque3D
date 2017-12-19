@@ -213,7 +213,7 @@ bool ForestData::write( const char *path )
    Vector<ForestItem>::const_iterator iter = items.begin();
    for ( ; iter != items.end(); iter++ )
    {
-      U8 dataIndex = find( allDatablocks.begin(), allDatablocks.end(), iter->getData() ) - allDatablocks.begin();
+      U8 dataIndex = T3D::find( allDatablocks.begin(), allDatablocks.end(), iter->getData() ) - allDatablocks.begin();
 
       stream.write( dataIndex );
 
@@ -770,7 +770,7 @@ U32 ForestData::getDatablocks( Vector<ForestItemData*> *outVector ) const
       {
          ForestItemData *data = item->getData();
 
-         if ( find( outVector->begin(), outVector->end(), data ) != outVector->end() )
+         if (T3D::find( outVector->begin(), outVector->end(), data ) != outVector->end() )
             continue;
 
          count++;

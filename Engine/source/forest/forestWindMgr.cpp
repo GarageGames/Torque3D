@@ -85,7 +85,7 @@ void ForestWindMgr::addEmitter( ForestWindEmitter *emitter )
 
 void ForestWindMgr::removeEmitter( ForestWindEmitter *emitter )
 {
-   ForestWindEmitterList::iterator iter = find( mEmitters.begin(), 
+   ForestWindEmitterList::iterator iter = T3D::find( mEmitters.begin(),
                                                 mEmitters.end(), 
                                                 emitter );
 
@@ -161,7 +161,7 @@ void ForestWindMgr::processTick()
       PROFILE_SCOPE( ForestWindMgr_AdvanceTime_SwapSources );
       AssertFatal( mPrevSources->isEmpty(), "prev sources not empty!" );
       
-      swap( mSources, mPrevSources );      
+	  T3D::swap( mSources, mPrevSources );
 
       AssertFatal( mSources->isEmpty(), "swap failed!" );
    }

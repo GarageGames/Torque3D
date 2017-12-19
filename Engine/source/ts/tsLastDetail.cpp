@@ -101,7 +101,7 @@ TSLastDetail::~TSLastDetail()
       mMaterial->deleteObject();
 
    // Remove ourselves from the list.
-   Vector<TSLastDetail*>::iterator iter = find( smLastDetails.begin(), smLastDetails.end(), this );
+   Vector<TSLastDetail*>::iterator iter = T3D::find( smLastDetails.begin(), smLastDetails.end(), this );
    smLastDetails.erase( iter );
 }
 

@@ -198,7 +198,7 @@ bool PostEffectManager::_addEffect( PostEffect *effect )
 bool PostEffectManager::_removeEffect( PostEffect *effect )
 {
    // Check the end of frame list.
-   EffectVector::iterator iter = find( mEndOfFrameList.begin(), mEndOfFrameList.end(), effect );
+   EffectVector::iterator iter = T3D::find( mEndOfFrameList.begin(), mEndOfFrameList.end(), effect );
    if ( iter != mEndOfFrameList.end() )
    {
       mEndOfFrameList.erase( iter );
@@ -206,7 +206,7 @@ bool PostEffectManager::_removeEffect( PostEffect *effect )
    }
 
    // Check the diffuse list.
-   iter = find( mAfterDiffuseList.begin(), mAfterDiffuseList.end(), effect );
+   iter = T3D::find( mAfterDiffuseList.begin(), mAfterDiffuseList.end(), effect );
    if ( iter != mAfterDiffuseList.end() )
    {
       mAfterDiffuseList.erase( iter );
@@ -218,7 +218,7 @@ bool PostEffectManager::_removeEffect( PostEffect *effect )
    for( ; mapIter != mAfterBinMap.end(); mapIter++ )
    {
       EffectVector &effects = mapIter->value;
-      iter = find( effects.begin(), effects.end(), effect );
+      iter = T3D::find( effects.begin(), effects.end(), effect );
       if ( iter != effects.end() )
       {
          effects.erase( iter );
@@ -230,7 +230,7 @@ bool PostEffectManager::_removeEffect( PostEffect *effect )
    for( ; mapIter != mBeforeBinMap.end(); mapIter++ )
    {
       EffectVector &effects = mapIter->value;
-      iter = find( effects.begin(), effects.end(), effect );
+      iter = T3D::find( effects.begin(), effects.end(), effect );
       if ( iter != effects.end() )
       {
          effects.erase( iter );

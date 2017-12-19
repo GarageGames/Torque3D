@@ -183,7 +183,7 @@ bool SceneContainer::removeObject(SceneObject* obj)
    // Remove water and physical zone types from the special vector.
    if ( obj->getTypeMask() & ( WaterObjectType | PhysicalZoneObjectType ) )
    {
-      Vector<SceneObject*>::iterator iter = find( mWaterAndZones.begin(), mWaterAndZones.end(), obj );
+      Vector<SceneObject*>::iterator iter = T3D::find( mWaterAndZones.begin(), mWaterAndZones.end(), obj );
       if( iter != mTerrains.end() )
          mWaterAndZones.erase_fast(iter);
    }
@@ -191,7 +191,7 @@ bool SceneContainer::removeObject(SceneObject* obj)
    // Remove terrain objects from special vector.
    if( obj->getTypeMask() & TerrainObjectType )
    {
-      Vector< SceneObject* >::iterator iter = find( mTerrains.begin(), mTerrains.end(), obj );
+      Vector< SceneObject* >::iterator iter = T3D::find( mTerrains.begin(), mTerrains.end(), obj );
       if( iter != mTerrains.end() )
          mTerrains.erase_fast(iter);
    }

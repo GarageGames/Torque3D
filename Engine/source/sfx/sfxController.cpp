@@ -142,7 +142,7 @@ void SFXController::_compileList( SFXPlayList* playList )
          {
             // Randomly exchange slots in the list.
             for( U32 i = 0; i < SFXPlayList::NUM_SLOTS; ++ i )
-               swap( slotList[ gRandGen.randI( 0, SFXPlayList::NUM_SLOTS - 1 ) ], slotList[ i ] );
+				T3D::swap( slotList[ gRandGen.randI( 0, SFXPlayList::NUM_SLOTS - 1 ) ], slotList[ i ] );
          }
          break;
          

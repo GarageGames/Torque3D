@@ -1015,7 +1015,7 @@ void GuiEditCtrl::removeSelection( GuiControl* ctrl )
 {
    if( selectionContains( ctrl ) )
    {
-      Vector< GuiControl* >::iterator i = ::find( mSelectedControls.begin(), mSelectedControls.end(), ctrl );
+      Vector< GuiControl* >::iterator i = T3D::find( mSelectedControls.begin(), mSelectedControls.end(), ctrl );
       if ( i != mSelectedControls.end() )
          mSelectedControls.erase( i );
 

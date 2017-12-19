@@ -228,7 +228,7 @@ void PolyhedronBoxIntersector< Polyhedron >::_preprocess( const MatrixF& objToWo
          Point2F p = _project( i, v2 ); // Second point on line.
 
          if( frontFace != 0 )
-            swap( p, q );
+			 T3D::swap( p, q );
 
          Point2F normal( - ( p.y - q.y ), p.x - q.x );
          normal.normalize();

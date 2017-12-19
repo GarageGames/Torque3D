@@ -131,7 +131,7 @@ bool DecalDataFile::write( Stream& stream )
    {
       DecalInstance *inst = allDecals[i];
 
-      dataIter = find( allDatablocks.begin(), allDatablocks.end(), inst->mDataBlock );
+      dataIter = T3D::find( allDatablocks.begin(), allDatablocks.end(), inst->mDataBlock );
       U8 dataIndex = dataIter - allDatablocks.begin();
       
       stream.write( dataIndex );

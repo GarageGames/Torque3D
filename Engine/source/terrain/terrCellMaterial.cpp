@@ -289,7 +289,7 @@ void TerrainCellMaterial::init(  TerrainBlock *block,
          // The pass failed to be generated... give up.
          mPasses.last().materials.clear();
          mPasses.clear();
-         for_each( materials.begin(), materials.end(), delete_pointer() );
+		 T3D::for_each( materials.begin(), materials.end(), T3D::delete_pointer() );
          return;
       }
 
@@ -298,7 +298,7 @@ void TerrainCellMaterial::init(  TerrainBlock *block,
    }
 
    // Cleanup any remaining matinfo.
-   for_each( materials.begin(), materials.end(), delete_pointer() );
+   T3D::for_each( materials.begin(), materials.end(), T3D::delete_pointer() );
 
    // If we have attached mats then update them too.
    if ( mDeferredMat )
