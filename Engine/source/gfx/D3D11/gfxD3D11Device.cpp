@@ -238,7 +238,7 @@ DXGI_SWAP_CHAIN_DESC GFXD3D11Device::setupPresentParams(const GFXVideoMode &mode
 
    if (mode.fullScreen)
    {
-      d3dpp.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+      d3dpp.BufferDesc.Scaling = DXGI_MODE_SCALING_CENTERED;
       d3dpp.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
       d3dpp.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
    }
