@@ -763,8 +763,7 @@ void SceneObject::onCameraScopeQuery( NetConnection* connection, CameraScopeQuer
 
 bool SceneObject::isRenderEnabled() const
 {
-   AbstractClassRep *classRep = getClassRep();
-   return ( mObjectFlags.test( RenderEnabledFlag ) && classRep->isRenderEnabled() );
+   return mObjectFlags.test( RenderEnabledFlag );
 }
 
 //-----------------------------------------------------------------------------
