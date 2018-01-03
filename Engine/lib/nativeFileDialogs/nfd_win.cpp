@@ -9,13 +9,17 @@
 #define UNICODE
 #endif
 
+#ifdef __MINGW32__
+// Explicitly setting NTDDI version, this is necessary for the MinGW compiler
+#define NTDDI_VERSION NTDDI_VISTA
+#define _WIN32_WINNT _WIN32_WINNT_VISTA
+#endif
 
 #include <wchar.h>
 #include <stdio.h>
 #include <assert.h>
 #include <windows.h>
 #include <ShObjIdl.h>
-
 #include "nfd_common.h"
 
 
@@ -359,13 +363,14 @@ nfdresult_t NFD_OpenDialog( const char *filterList,
     HRESULT result = ::CoInitializeEx(NULL,
                                       ::COINIT_APARTMENTTHREADED |
                                       ::COINIT_DISABLE_OLE1DDE );
+
+    ::IFileOpenDialog *fileOpenDialog(NULL);
+
     if ( !SUCCEEDED(result))
     {
         NFDi_SetError("Could not initialize COM.");
         goto end;
     }
-
-    ::IFileOpenDialog *fileOpenDialog(NULL);
 
     // Create dialog
     result = ::CoCreateInstance(::CLSID_FileOpenDialog, NULL,
@@ -615,4 +620,134 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
     ::CoUninitialize();
         
     return nfdResult;
+}
+
+class AutoCoInit
+{
+public:
+    AutoCoInit()
+    {
+        mResult = ::CoInitializeEx(NULL,
+            ::COINIT_APARTMENTTHREADED |
+            ::COINIT_DISABLE_OLE1DDE);
+    }
+
+    ~AutoCoInit()
+    {
+        if (SUCCEEDED(mResult))
+        {
+            ::CoUninitialize();
+        }
+    }
+
+    HRESULT Result() const { return mResult; }
+private:
+    HRESULT mResult;
+};
+
+// VS2010 hasn't got a copy of CComPtr - this was first added in the 2003 SDK, so we make our own small CComPtr instead
+template<class T>
+class ComPtr
+{
+public:
+    ComPtr() : mPtr(NULL) { }
+    ~ComPtr()
+    {
+        if (mPtr)
+        {
+            mPtr->Release();
+        }
+    }
+
+    T* Ptr() const { return mPtr; }
+    T** operator&() { return &mPtr; }
+    T* operator->() const { return mPtr; }
+private:
+    // Don't allow copy or assignment
+    ComPtr(const ComPtr&);
+    ComPtr& operator = (const ComPtr&) const;
+    T* mPtr;
+};
+
+nfdresult_t NFD_PickFolder(const nfdchar_t *defaultPath,
+    nfdchar_t **outPath)
+{
+    // Init COM
+    AutoCoInit autoCoInit;
+    if (!SUCCEEDED(autoCoInit.Result()))
+    {
+        NFDi_SetError("CoInitializeEx failed.");
+        return NFD_ERROR;
+    }
+
+    // Create the file dialog COM object
+    ComPtr<IFileDialog> pFileDialog;
+    if (!SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog,
+                                    NULL,
+                                    CLSCTX_ALL,
+                                    IID_PPV_ARGS(&pFileDialog))))
+    {
+        NFDi_SetError("CoCreateInstance for CLSID_FileOpenDialog failed.");
+        return NFD_ERROR;
+    }
+
+    // Set the default path
+    if (SetDefaultPath(pFileDialog.Ptr(), defaultPath) != NFD_OKAY)
+    {
+        NFDi_SetError("SetDefaultPath failed.");
+        return NFD_ERROR;
+    }
+
+    // Get the dialogs options
+    DWORD dwOptions = 0;
+    if (!SUCCEEDED(pFileDialog->GetOptions(&dwOptions)))
+    {
+        NFDi_SetError("GetOptions for IFileDialog failed.");
+        return NFD_ERROR;
+    }
+
+    // Add in FOS_PICKFOLDERS which hides files and only allows selection of folders
+    if (!SUCCEEDED(pFileDialog->SetOptions(dwOptions | FOS_PICKFOLDERS)))
+    {
+        NFDi_SetError("SetOptions for IFileDialog failed.");
+        return NFD_ERROR;
+    }
+
+    // Show the dialog to the user
+    const HRESULT result = pFileDialog->Show(NULL);
+    if (result == HRESULT_FROM_WIN32(ERROR_CANCELLED))
+    {
+        return NFD_CANCEL;
+    }
+    else if (!SUCCEEDED(result))
+    {
+        NFDi_SetError("Show for IFileDialog failed.");
+        return NFD_ERROR;
+    }
+
+    // Get the shell item result
+    ComPtr<IShellItem> pShellItem;
+    if (!SUCCEEDED(pFileDialog->GetResult(&pShellItem)))
+    {
+        return NFD_OKAY;
+    }
+
+    // Finally get the path
+    wchar_t *path = NULL;
+    if (!SUCCEEDED(pShellItem->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &path)))
+    {
+        NFDi_SetError("GetDisplayName for IShellItem failed.");
+        return NFD_ERROR;
+    }
+
+    // Convert string
+    CopyWCharToNFDChar(path, outPath);
+    CoTaskMemFree(path);
+    if (!*outPath)
+    {
+        // error is malloc-based, error message would be redundant
+        return NFD_ERROR;
+    }
+
+    return NFD_OKAY;
 }
