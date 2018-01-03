@@ -95,8 +95,9 @@ function NavEditorPlugin::onWorldEditorStartup(%this)
    // Add items to World Editor Creator
    EWCreatorWindow.beginGroup("Navigation");
 
+      EWCreatorWindow.registerMissionObject("NavMesh", "Navigation mesh");
+      EWCreatorWindow.registerMissionObject("NavPath", "Path");
       EWCreatorWindow.registerMissionObject("CoverPoint", "Cover point");
-      EWCreatorWindow.registerMissionObject("NavPath", "Nav Path");
 
    EWCreatorWindow.endGroup();
 }
