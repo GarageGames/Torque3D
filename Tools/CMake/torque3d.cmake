@@ -621,9 +621,7 @@ endif()
 ###############################################################################
 # Common Libraries
 ###############################################################################
-addLib(lmng)
 addLib(lpng)
-addLib(lungif)
 addLib(ljpeg)
 addLib(zlib)
 addLib(tinyxml)
