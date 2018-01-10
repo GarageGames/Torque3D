@@ -1265,7 +1265,7 @@ DefineEngineMethod( SceneObject, getType, S32, (),,
 //-----------------------------------------------------------------------------
 
 DefineEngineMethod( SceneObject, mountObject, bool,
-   ( SceneObject* objB, S32 slot, TransformF txfm ), ( MatrixF::Identity ),
+   ( SceneObject* objB, S32 slot, TransformF txfm ), ( TransformF::Identity ),
    "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
 
    "@param objB  Object to mount onto us\n"

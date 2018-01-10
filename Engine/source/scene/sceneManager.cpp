@@ -740,7 +740,7 @@ DefineConsoleFunction( sceneDumpZoneStates, void, ( bool updateFirst ), ( true )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( sceneGetZoneOwner, SceneObject*, ( U32 zoneId ), ( true ),
+DefineConsoleFunction( sceneGetZoneOwner, SceneObject*, ( U32 zoneId ),,
    "Return the SceneObject that contains the given zone.\n\n"
    "@param zoneId ID of zone.\n"
    "@return A SceneObject or NULL if the given @a zoneId is invalid.\n\n"

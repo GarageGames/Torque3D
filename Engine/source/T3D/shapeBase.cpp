@@ -4405,7 +4405,7 @@ DefineEngineMethod( ShapeBase, getEyeTransform, TransformF, (),,
    return mat;
 }
 
-DefineEngineMethod( ShapeBase, getLookAtPoint, const char*, ( F32 distance, S32 typeMask ), ( 2000, 0xFFFFFFFF ),
+DefineEngineMethod( ShapeBase, getLookAtPoint, const char*, ( F32 distance, U32 typeMask ), ( 2000, 0xFFFFFFFF ),
    "@brief Get the world position this object is looking at.\n\n"
 
    "Casts a ray from the eye and returns information about what the ray hits.\n"
