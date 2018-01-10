@@ -132,6 +132,23 @@ function isNameUnique(%name)
 //
 function GameConnection::onDrop(%client, %reason)
 {
+   %entityIds = parseMissionGroupForIds("Entity", "");
+   %entityCount = getWordCount(%entityIds);
+   
+   for(%i=0; %i < %entityCount; %i++)
+   {
+      %entity = getWord(%entityIds, %i);
+      
+      for(%e=0; %e < %entity.getCount(); %e++)
+      {
+         %child = %entity.getObject(%e);
+         if(%child.getClassName() $= "Entity")
+            %entityIds = %entityIds SPC %child.getID();  
+      }
+      
+      %entity.notify("onClientDisconnect", %client);
+   }
+   
    if($missionRunning)
       theLevelInfo.onClientLeaveGame();
    

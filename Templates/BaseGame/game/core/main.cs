@@ -41,6 +41,12 @@ $Core::UnAvailableTexturePath = "core/images/unavailable";
 $Core::WarningTexturePath = "core/images/warnMat";
 $Core::CommonShaderPath = "core/shaders";
 
+ModuleDatabase.setModuleExtension("module");
+
+//Core components
+ModuleDatabase.scanModules( "core", false );
+ModuleDatabase.LoadExplicit( "CoreComponentsModule" );
+
 exec("./helperFunctions.cs");
 
 // We need some of the default GUI profiles in order to get the canvas and

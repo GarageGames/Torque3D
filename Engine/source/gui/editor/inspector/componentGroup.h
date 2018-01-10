@@ -34,12 +34,14 @@ private:
    typedef GuiInspectorGroup Parent;
    GuiControl* mAddCtrl;
 
+   Component* mTargetComponent;
+
    Vector<AbstractClassRep::Field> tempFields;
 
 public:
    DECLARE_CONOBJECT(GuiInspectorComponentGroup);
    GuiInspectorComponentGroup() { /*mNeedScroll=false;*/ };
-   GuiInspectorComponentGroup(StringTableEntry groupName, SimObjectPtr<GuiInspector> parent);
+   GuiInspectorComponentGroup(StringTableEntry groupName, SimObjectPtr<GuiInspector> parent, Component* targetComponent);
 
    //-----------------------------------------------------------------------------
    // inspectGroup is overridden in GuiInspectorComponentGroup to inspect an 
@@ -50,6 +52,7 @@ public:
    virtual void updateAllFields();
 
    void onMouseMove(const GuiEvent &event);
+   virtual void onRightMouseUp(const GuiEvent &event);
 
    // For scriptable dynamic field additions
    void addDynamicField();
@@ -61,6 +64,9 @@ public:
    virtual SimFieldDictionary::Entry* findDynamicFieldInDictionary(StringTableEntry fieldName);
 
    AbstractClassRep::Field* findObjectBehaviorField(Component* target, String fieldName);
+
+   Component* getComponent() { return mTargetComponent; }
+
 protected:
    // create our inner controls when we add
    virtual bool createContent();
