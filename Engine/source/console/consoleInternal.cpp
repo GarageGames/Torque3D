@@ -1607,8 +1607,10 @@ namespace {
 
       if (dStrcmp(nativeType, "char*") == 0 || dStrcmp(nativeType, "char *") == 0)
          return "string";
-      else if (dStrcmp(nativeType, "S32") == 0 || dStrcmp(nativeType, "U32") == 0)
+      else if (dStrcmp(nativeType, "S32") == 0)
          return "int";
+      else if (dStrcmp(nativeType, "U32") == 0)
+         return "uint";
       else if (dStrcmp(nativeType, "F32") == 0)
          return "float";
 
