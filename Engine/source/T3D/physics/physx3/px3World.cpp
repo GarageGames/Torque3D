@@ -41,27 +41,31 @@
 #include "gfx/sim/debugDraw.h"
 #include "gfx/primBuilder.h"
 
-
 physx::PxPhysics* gPhysics3SDK = NULL;
 physx::PxCooking* Px3World::smCooking = NULL;
 physx::PxFoundation* Px3World::smFoundation = NULL;
-physx::PxProfileZoneManager* Px3World::smProfileZoneManager = NULL;
-physx::PxDefaultCpuDispatcher* Px3World::smCpuDispatcher=NULL;
+physx::PxDefaultCpuDispatcher* Px3World::smCpuDispatcher = NULL;
+#ifndef TORQUE_OS_MAC
+physx::PxCudaContextManager* Px3World::smCudaContextManager = NULL;
+#endif
 Px3ConsoleStream* Px3World::smErrorCallback = NULL;
-physx::PxVisualDebuggerConnection* Px3World::smPvdConnection=NULL;
+physx::PxPvd* Px3World::smPvdConnection = NULL;
+physx::PxPvdTransport* Px3World::smPvdTransport = NULL;
 physx::PxDefaultAllocator Px3World::smMemoryAlloc;
 
-Px3World::Px3World(): mScene( NULL ),
-   mProcessList( NULL ),
-   mIsSimulating( false ),
-   mErrorReport( false ),
-   mTickCount( 0 ),
+Px3World::Px3World() :
+   mScene( NULL ),
    mIsEnabled( false ),
+   mIsSimulating( false ),
+   mIsServer( false ),
+   mIsSceneLocked( false ),
+   mTickCount( 0 ),
+   mProcessList( NULL ),
    mEditorTimeScale( 1.0f ),
-   mAccumulator( 0 ),
+   mErrorReport( false ),
    mControllerManager(NULL),
-   mIsSceneLocked(false),
-   mRenderBuffer(NULL)
+   mRenderBuffer(NULL),
+   mAccumulator( 0 )
 {
 }
 
@@ -80,33 +84,25 @@ bool Px3World::restartSDK( bool destroyOnly, Px3World *clientWorld, Px3World *se
    // then we cannot reset the SDK.
    if ( clientWorld || serverWorld )
       return false;
-
-   if(smPvdConnection)
-      smPvdConnection->release();
-
-   if(smCooking)
-      smCooking->release();
-
-   if(smCpuDispatcher)
-      smCpuDispatcher->release();
+#ifndef TORQUE_OS_MAC
+   SafeReleasePhysx(smCudaContextManager);
+#endif
+   SafeReleasePhysx(smCpuDispatcher);
+   SafeReleasePhysx(smCooking);
+   smGpuEnabled = false;
 
    // Destroy the existing SDK.
    if ( gPhysics3SDK )
    {
       PxCloseExtensions();
-      gPhysics3SDK->release();
+      SafeReleasePhysx(gPhysics3SDK);
    }
 
-   if(smErrorCallback)
-   {
-      SAFE_DELETE(smErrorCallback);
-   }
+   SafeReleasePhysx(smPvdConnection);
+   SafeReleasePhysx(smPvdTransport);
 
-   if(smFoundation)
-   {
-      smFoundation->release();
-      SAFE_DELETE(smErrorCallback);
-   }
+   SAFE_DELETE(smErrorCallback);
+   SafeReleasePhysx(smFoundation);
 
    // If we're not supposed to restart... return.
    if ( destroyOnly )
@@ -114,20 +110,18 @@ bool Px3World::restartSDK( bool destroyOnly, Px3World *clientWorld, Px3World *se
 
    bool memTrack = false;
  #ifdef TORQUE_DEBUG
-   memTrack = true;
+   memTrack = false;
  #endif
-
+   
    smErrorCallback  = new Px3ConsoleStream;
-   smFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, smMemoryAlloc, *smErrorCallback);
-   smProfileZoneManager = &physx::PxProfileZoneManager::createProfileZoneManager(smFoundation);
-   gPhysics3SDK = PxCreatePhysics(PX_PHYSICS_VERSION, *smFoundation, physx::PxTolerancesScale(),memTrack,smProfileZoneManager);
+   smFoundation = PxCreateFoundation(PX_FOUNDATION_VERSION, smMemoryAlloc, *smErrorCallback);
+   smPvdConnection = PxCreatePvd(*smFoundation);
+   gPhysics3SDK = PxCreatePhysics(PX_PHYSICS_VERSION, *smFoundation, physx::PxTolerancesScale(),memTrack, smPvdConnection);
 
    if ( !gPhysics3SDK )
    {
       Con::errorf( "PhysX3 failed to initialize!" );
-      Platform::messageBox(   Con::getVariable( "$appName" ),
-                              avar("PhysX3 could not be started!\r\n"),
-                              MBOk, MIStop );
+      Platform::messageBox( Con::getVariable( "$appName" ), avar("PhysX3 could not be started!\r\n"), MBOk, MIStop );
       Platform::forceShutdown( -1 );
       
       // We shouldn't get here, but this shuts up
@@ -135,32 +129,66 @@ bool Px3World::restartSDK( bool destroyOnly, Px3World *clientWorld, Px3World *se
       return false;
    }
 
-   if(!PxInitExtensions(*gPhysics3SDK))
+   if(!PxInitExtensions(*gPhysics3SDK, smPvdConnection))
    {
       Con::errorf( "PhysX3 failed to initialize extensions!" );
-      Platform::messageBox(   Con::getVariable( "$appName" ),
-                              avar("PhysX3 could not be started!\r\n"),
-                              MBOk, MIStop );
+      Platform::messageBox(   Con::getVariable( "$appName" ), avar("PhysX3 could not be started!\r\n"), MBOk, MIStop );
       Platform::forceShutdown( -1 );
       return false;
    }
+//no gpu support on macOS
+#ifndef TORQUE_OS_MAC
+   //check if we are allowed to use gpu acceleration
+   if (PhysicsPlugin::gpuAccelerationAllowed())
+   {
+      // attempt to create a cuda context manager - only works on nvidia gpu (SM 3.0+ i.e kepler or better)
+      if (!smCpuDispatcher)
+      {
+         //check we have capable gpu, -1 means none found
+         S32 suggestedGpu = PxGetSuggestedCudaDeviceOrdinal(*smErrorCallback);
+         if (suggestedGpu != -1)
+         {
+            physx::PxCudaContextManagerDesc cudaContextManagerDesc;
+            smCudaContextManager = PxCreateCudaContextManager(*smFoundation, cudaContextManagerDesc);
+            if (smCudaContextManager)
+               smGpuEnabled = true;
+         }
+      }
+   }
+#endif
 
-   smCooking = PxCreateCooking(PX_PHYSICS_VERSION, *smFoundation, physx::PxCookingParams(physx::PxTolerancesScale()));
+   //cpu dispatcher
+   if (!smCpuDispatcher)
+      smCpuDispatcher = physx::PxDefaultCpuDispatcherCreate(PHYSICSMGR->getThreadCount());
+
+   physx::PxCookingParams params = physx::PxCookingParams(physx::PxTolerancesScale());
+   params.meshWeldTolerance = 0.001f;
+   params.meshPreprocessParams = physx::PxMeshPreprocessingFlags(physx::PxMeshPreprocessingFlag::eWELD_VERTICES);
+#ifndef TORQUE_OS_MAC
+   if(smGpuEnabled)
+      params.buildGPUData = true;
+#endif
+
+   smCooking = PxCreateCooking(PX_PHYSICS_VERSION, *smFoundation, params);
    if(!smCooking)
    {
       Con::errorf( "PhysX3 failed to initialize cooking!" );
-      Platform::messageBox(   Con::getVariable( "$appName" ),
-                              avar("PhysX3 could not be started!\r\n"),
-                              MBOk, MIStop );
+      Platform::messageBox( Con::getVariable( "$appName" ), avar("PhysX3 could not be started!\r\n"), MBOk, MIStop );
       Platform::forceShutdown( -1 );      
       return false;
    }
 
+   //TODO: enable/disable this from script
 #ifdef TORQUE_DEBUG
-   physx::PxVisualDebuggerConnectionFlags connectionFlags(physx::PxVisualDebuggerExt::getAllConnectionFlags());
-   smPvdConnection = physx::PxVisualDebuggerExt::createConnection(gPhysics3SDK->getPvdConnectionManager(), 
-            "localhost", 5425, 100, connectionFlags); 
+   if(!smPvdTransport)
+      smPvdTransport = physx::PxDefaultPvdSocketTransportCreate("localhost", 5425, 100);
+
+   smPvdConnection->connect(*smPvdTransport, physx::PxPvdInstrumentationFlag::eALL);
 #endif
+
+   //use legacy heightfield
+   //TODO: new method causing crashes on collision in debug build (unified HeightFields)
+   PxRegisterLegacyHeightFields(*gPhysics3SDK);
 
    return true;
 }
@@ -168,8 +196,6 @@ bool Px3World::restartSDK( bool destroyOnly, Px3World *clientWorld, Px3World *se
 void Px3World::destroyWorld()
 {
    getPhysicsResults();
-
-   mRenderBuffer = NULL;
 
    // Release the tick processing signals.
    if ( mProcessList )
@@ -179,19 +205,9 @@ void Px3World::destroyWorld()
       mProcessList = NULL;
    }
 
-   if(mControllerManager)
-   {
-      mControllerManager->release();
-      mControllerManager = NULL;
-   }
-   
+   SafeReleasePhysx(mControllerManager);
    // Destroy the scene.
-   if ( mScene )
-   {
-      // Release the scene.
-      mScene->release();
-      mScene = NULL;
-   }
+   SafeReleasePhysx(mScene);
 }
 
 bool Px3World::initWorld( bool isServer, ProcessList *processList )
@@ -203,27 +219,32 @@ bool Px3World::initWorld( bool isServer, ProcessList *processList )
    }
 
    mIsServer = isServer;
-   
+	
    physx::PxSceneDesc sceneDesc(gPhysics3SDK->getTolerancesScale());
 
    sceneDesc.gravity = px3Cast<physx::PxVec3>(mGravity);
    sceneDesc.userData = this;
-   if(!sceneDesc.cpuDispatcher)
-   {
-      //Create shared cpu dispatcher
-      if(!smCpuDispatcher)
-         smCpuDispatcher = physx::PxDefaultCpuDispatcherCreate(PHYSICSMGR->getThreadCount());
  
-      sceneDesc.cpuDispatcher = smCpuDispatcher;
-      Con::printf("PhysX3 using Cpu: %d workers", smCpuDispatcher->getWorkerCount());
+   sceneDesc.cpuDispatcher = smCpuDispatcher;
+   Con::printf("PhysX3 using Cpu: %d workers", smCpuDispatcher->getWorkerCount());
+
+#ifndef TORQUE_OS_MAC
+   if (smGpuEnabled)
+   {
+      sceneDesc.flags |= physx::PxSceneFlag::eENABLE_GPU_DYNAMICS;
+      sceneDesc.flags |= physx::PxSceneFlag::eENABLE_PCM;
+      sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eGPU;
+      sceneDesc.gpuDispatcher = smCudaContextManager->getGpuDispatcher();
+      Con::printf("PhysX3 using Gpu: %s", smCudaContextManager->getDeviceName());
    }
-   
+#endif
+
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_CCD;
    sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
    sceneDesc.filterShader  = physx::PxDefaultSimulationFilterShader;
 
-   mScene = gPhysics3SDK->createScene(sceneDesc);
-   //cache renderbuffer for use with debug drawing
+	mScene = gPhysics3SDK->createScene(sceneDesc);
+
    mRenderBuffer = const_cast<physx::PxRenderBuffer*>(&mScene->getRenderBuffer());
 
    physx::PxDominanceGroupPair debrisDominance( 0.0f, 1.0f );
@@ -252,15 +273,16 @@ bool Px3World::_simulate(const F32 dt)
    if (numSimulationSubSteps)
    {
       //clamp the number of substeps, to prevent simulation grinding spiralling down to a halt
-      S32 clampedSimulationSteps = (numSimulationSubSteps > smPhysicsMaxSubSteps)? smPhysicsMaxSubSteps : numSimulationSubSteps;
-      
+      S32 clampedSimulationSteps = (numSimulationSubSteps > smPhysicsMaxSubSteps) ? smPhysicsMaxSubSteps : numSimulationSubSteps;
+		
       for (S32 i=0;i<clampedSimulationSteps;i++)
       {
-         mScene->fetchResults(true);
+         if(i > 0)
+            mScene->fetchResults(true);
          mScene->simulate(smPhysicsStepTime);
       }
    }
-   
+	
    mIsSimulating = true;
 
    return true;
@@ -299,36 +321,6 @@ void Px3World::getPhysicsResults()
    mScene->fetchResults(true);
    mIsSimulating = false;
    mTickCount++;
-
-  // Con::printf( "%s PhysXWorld::getPhysicsResults!", this == smClientWorld ? "Client" : "Server" );
-}
-
-void Px3World::releaseWriteLocks()
-{
-   Px3World *world = dynamic_cast<Px3World*>( PHYSICSMGR->getWorld( "server" ) );
-
-   if ( world )
-      world->releaseWriteLock();
-
-   world = dynamic_cast<Px3World*>( PHYSICSMGR->getWorld( "client" ) );
-
-   if ( world )
-      world->releaseWriteLock();
-}
-
-void Px3World::releaseWriteLock()
-{
-   if ( !mScene || !mIsSimulating ) 
-      return;
-
-   PROFILE_SCOPE(PxWorld_ReleaseWriteLock);
-
-   // We use checkResults here to release the write lock
-   // but we do not change the simulation flag or increment
-   // the tick count... we may have gotten results, but the
-   // simulation hasn't really ticked!
-   mScene->checkResults( true );
-   //AssertFatal( mScene->isWritable(), "PhysX3World::releaseWriteLock() - We should have been writable now!" );
 }
 
 void Px3World::lockScenes()
@@ -388,8 +380,7 @@ void Px3World::unlockScene()
 }
 
 bool Px3World::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo *ri, const Point3F &impulse )
-{
-    
+{    
    physx::PxVec3 orig = px3Cast<physx::PxVec3>( startPnt );
    physx::PxVec3 dir = px3Cast<physx::PxVec3>( endPnt - startPnt );
    physx::PxF32 maxDist = dir.magnitude();
@@ -398,15 +389,15 @@ bool Px3World::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo 
    U32 groups = 0xffffffff;
    groups &= ~( PX3_TRIGGER ); // No trigger shapes!
 
-   physx::PxHitFlags outFlags(physx::PxHitFlag::eDISTANCE | physx::PxHitFlag::eIMPACT | physx::PxHitFlag::eNORMAL);
+   physx::PxHitFlags outFlags(physx::PxHitFlag::eDISTANCE | physx::PxHitFlag::ePOSITION | physx::PxHitFlag::eNORMAL);
    physx::PxQueryFilterData filterData(physx::PxQueryFlag::eSTATIC|physx::PxQueryFlag::eDYNAMIC);
    filterData.data.word0 = groups;
    physx::PxRaycastBuffer buf;
 
    if(!mScene->raycast(orig,dir,maxDist,buf,outFlags,filterData))
-     return false;
+      return false;
    if(!buf.hasBlock)
-    return false;
+      return false;
 
    const physx::PxRaycastHit hit = buf.block;
    physx::PxRigidActor *actor = hit.actor;
@@ -425,8 +416,8 @@ bool Px3World::castRay( const Point3F &startPnt, const Point3F &endPnt, RayInfo 
    }
 
    if ( impulse.isZero() ||
-        !actor->isRigidDynamic() ||
-        actor->is<physx::PxRigidDynamic>()->getRigidDynamicFlags() & physx::PxRigidDynamicFlag::eKINEMATIC )
+        !actor->is<physx::PxRigidDynamic>() ||
+        actor->is<physx::PxRigidDynamic>()->getRigidBodyFlags() & physx::PxRigidBodyFlag::eKINEMATIC )
       return true;
   
    physx::PxRigidBody *body = actor->is<physx::PxRigidBody>();
@@ -453,7 +444,7 @@ PhysicsBody* Px3World::castRay( const Point3F &start, const Point3F &end, U32 bo
    groups &= ~( PX3_TRIGGER ); // triggers
    groups &= ~( PX3_DEBRIS ); // debris
 
-   physx::PxHitFlags outFlags(physx::PxHitFlag::eDISTANCE | physx::PxHitFlag::eIMPACT | physx::PxHitFlag::eNORMAL);
+   physx::PxHitFlags outFlags(physx::PxHitFlag::eDISTANCE | physx::PxHitFlag::ePOSITION | physx::PxHitFlag::eNORMAL);
    physx::PxQueryFilterData filterData;
    if(bodyTypes & BT_Static)
       filterData.flags |= physx::PxQueryFlag::eSTATIC;
@@ -491,12 +482,12 @@ void Px3World::explosion( const Point3F &pos, F32 radius, F32 forceMagnitude )
    {
       physx::PxRigidActor *actor = buffer.touches[i].actor;
       
-      bool dynamic = actor->isRigidDynamic();
+      bool dynamic = actor->is<physx::PxRigidDynamic>();
       
       if ( !dynamic )
          continue;
 
-      bool kinematic = actor->is<physx::PxRigidDynamic>()->getRigidDynamicFlags() & physx::PxRigidDynamicFlag::eKINEMATIC;
+      bool kinematic = actor->is<physx::PxRigidDynamic>()->getRigidBodyFlags() & physx::PxRigidBodyFlag::eKINEMATIC;
       
       if ( kinematic )
          continue;
@@ -523,8 +514,6 @@ physx::PxController* Px3World::createController( physx::PxControllerDesc &desc )
    if ( !mScene )
       return NULL;
 
-   // We need the writelock!
-   releaseWriteLock();
    physx::PxController* pController = mControllerManager->createController(desc);
    AssertFatal( pController, "Px3World::createController - Got a null!" );
    return pController;
@@ -543,7 +532,7 @@ static ColorI getDebugColor( physx::PxU32 packed )
 
 void Px3World::onDebugDraw( const SceneRenderState *state )
 {
-   if ( !mScene || !mRenderBuffer )
+   if ( !mScene || !mRenderBuffer)
       return;
 
    mScene->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE,1.0f);
