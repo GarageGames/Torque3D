@@ -288,6 +288,29 @@ DefineConsoleFunction( mSaturate, F32, ( F32 v ),,
    return mClampF( v, 0.0f, 1.0f );
 }
 
+DefineConsoleFunction(mWrapF, F32, (F32 v, F32 min, F32 max), ,
+	"Wrap the specified value between two bounds.\n"
+	"@param v Input value."
+	"@param min Minimum Bound."
+	"@param max Maximum Bound."
+	"@returns The specified value wrapped to the specified bounds."
+	"@ingroup Math")
+{
+	return mWrapF(v, min, max);
+}
+
+DefineConsoleFunction(mWrap, S32, (S32 v, S32 min, S32 max), ,
+	"Wrap the specified value between two bounds.\n"
+	"@param v Input value."
+	"@param min Minimum Bound."
+	"@param max Maximum Bound."
+	"@returns The specified value wrapped to the specified bounds."
+	"@ingroup Math")
+{
+	return mWrap(v, min, max);
+}
+
+
 DefineConsoleFunction( getMax, F32, ( F32 v1, F32 v2 ),,
     "Calculate the greater of two specified numbers.\n"
     "@param v1 Input value."
