@@ -41,6 +41,8 @@
 #include "core/fileObject.h"
 #include "persistence/taml/tamlCustom.h"
 
+#include "sim/netObject.h"
+
 IMPLEMENT_CONOBJECT( SimObject );
 
 // See full description in the new CHM manual
@@ -912,6 +914,12 @@ void SimObject::assignFieldsFrom(SimObject *parent)
 
             if((*f->setDataFn)( this, NULL, bufferSecure ) )
                Con::setData(f->type, (void *) (((const char *)this) + f->offset), j, 1, &fieldVal, f->table);
+
+            if (f->networkMask != 0)
+            {
+               NetObject* netObj = static_cast<NetObject*>(this);
+               netObj->setMaskBits(f->networkMask);
+            }
          }
       }
    }
@@ -987,6 +995,12 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
 
             if(fld->validator)
                fld->validator->validateType(this, (void *) (((const char *)this) + fld->offset));
+
+            if (fld->networkMask != 0)
+            {
+               NetObject* netObj = static_cast<NetObject*>(this);
+               netObj->setMaskBits(fld->networkMask);
+            }
 
             onStaticModified( slotName, value );
 

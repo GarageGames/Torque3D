@@ -422,6 +422,57 @@ public:
    void          removeScopeRef();
    void          setScopeRegistered(bool flag) { scope_registered = flag; }
    bool          getScopeRegistered() const { return scope_registered; }
+
+protected:
+   /// Add a networked field
+   ///
+   /// A networked field is a regular field but with a bitmask flag associated to it.
+   /// When the field is set, it automatically triggers a call to setMaskBits with the mask associated to the field
+   /// in order to streamline simple networking code
+   /// Register a complex field.
+   ///
+   /// @param  in_pFieldname     Name of the field.
+   /// @param  in_fieldType      Type of the field. @see ConsoleDynamicTypes
+   /// @param  in_fieldOffset    Offset to  the field from the start of the class; calculated using the Offset() macro.
+   /// @param  in_elementCount   Number of elements in this field. Arrays of elements are assumed to be contiguous in memory.
+   /// @param  in_pFieldDocs     Usage string for this field. @see console_autodoc
+   static void addNetworkedField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      const U32     in_elementCount = 1,
+      const char*   in_pFieldDocs = NULL,
+      U32 flags = 0,
+      U32 networkMask = 0);
+
+   static void addNetworkedField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      AbstractClassRep::WriteDataNotify in_writeDataFn,
+      const U32     in_elementCount = 1,
+      const char*   in_pFieldDocs = NULL,
+      U32 flags = 0,
+      U32 networkMask = 0);
+
+   /// Register a simple field.
+   ///
+   /// @param  in_pFieldname  Name of the field.
+   /// @param  in_fieldType   Type of the field. @see ConsoleDynamicTypes
+   /// @param  in_fieldOffset Offset to  the field from the start of the class; calculated using the Offset() macro.
+   /// @param  in_pFieldDocs  Usage string for this field. @see console_autodoc
+   static void addNetworkedField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      const char*   in_pFieldDocs,
+      U32 flags = 0,
+      U32 networkMask = 0);
+
+   static void addNetworkedField(const char*   in_pFieldname,
+      const U32     in_fieldType,
+      const dsize_t in_fieldOffset,
+      AbstractClassRep::WriteDataNotify in_writeDataFn,
+      const char*   in_pFieldDocs,
+      U32 flags = 0,
+      U32 networkMask = 0);
 };
 
 //-----------------------------------------------------------------------------
