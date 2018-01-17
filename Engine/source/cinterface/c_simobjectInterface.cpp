@@ -20,63 +20,51 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "console/consoleInternal.h"
-#include "console/simSet.h"
+#include "console/simObject.h"
 
 extern "C" {
-
-   // Con C interface
-   void Con_AddConsumer(ConsumerCallback cb)
+   bool fnSimObject_registerObject(SimObject* pObject)
    {
-      Con::addConsumer(cb);
+      return pObject->registerObject();
    }
 
-   void Con_RemoveConsumer(ConsumerCallback cb)
+   void fnSimObject_GetField(SimObject* obj, const char* fieldName, const char* arrayIndex)
    {
-      Con::removeConsumer(cb);
+      obj->getDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex));
    }
 
-   // StringTable->insert?
-
-   const char* Con_getConsoleString(const char* name)
+   void fnSimObject_SetField(SimObject* obj, const char* fieldName, const char* arrayIndex, const char* value)
    {
-      return Con::getVariable(StringTable->insert(name));
+      obj->setDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex), StringTable->insert(value));
    }
 
-   void Con_setConsoleString(const char* name, const char* value)
+   void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent)
    {
-      Con::setVariable(StringTable->insert(name), StringTable->insert(value));
+      if (parent)
+      {
+         obj->setCopySource(parent);
+         obj->assignFieldsFrom(parent);
+      }
    }
 
-   S32 Con_getConsoleInt(const char* name)
+   void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields)
    {
-      return Con::getIntVariable(StringTable->insert(name));
+      obj->setModStaticFields(modStaticFields);
+      obj->setModDynamicFields(modDynamicFields);
    }
 
-   void Con_setConsoleInt(const char* name, S32 value)
+   bool fnSimObject_IsLocked(SimObject *so)
    {
-      Con::setIntVariable(StringTable->insert(name), value);
+      return so->isLocked();
    }
 
-   F32 Con_getConsoleFloat(const char* name)
+   void fnSimObject_InspectPreApply(SimObject *so)
    {
-      return Con::getFloatVariable(StringTable->insert(name));
+      so->inspectPreApply();
    }
 
-   void Con_setConsoleFloat(const char* name, F32 value)
+   void fnSimObject_InspectPostApply(SimObject *so)
    {
-      Con::setFloatVariable(StringTable->insert(name), value);
+      so->inspectPostApply();
    }
-
-   bool Con_getConsoleBool(const char* name)
-   {
-      return Con::getBoolVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleBool(const char* name, bool value)
-   {
-      Con::setBoolVariable(StringTable->insert(name), value);
-   }
-};
-
-
+}

@@ -21,62 +21,36 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleInternal.h"
+#include "console/simDatablock.h"
 #include "console/simSet.h"
+
+// External scripting cinterface, suitable for import into any scripting system which support "C" interfaces (C#, Python, Lua, Java, etc)
+
 
 extern "C" {
 
-   // Con C interface
-   void Con_AddConsumer(ConsumerCallback cb)
+   SimObject* Sim_FindObjectById(U32 pId)
    {
-      Con::addConsumer(cb);
+      return Sim::findObject(pId);
    }
 
-   void Con_RemoveConsumer(ConsumerCallback cb)
+   SimObject* Sim_FindObjectByName(const char* pName)
    {
-      Con::removeConsumer(cb);
+      return Sim::findObject(StringTable->insert(pName));
    }
 
-   // StringTable->insert?
-
-   const char* Con_getConsoleString(const char* name)
+   SimObject* Sim_FindDataBlockByName(const char* pName)
    {
-      return Con::getVariable(StringTable->insert(name));
+      return Sim::getDataBlockGroup()->findObject(StringTable->insert(pName));
    }
 
-   void Con_setConsoleString(const char* name, const char* value)
+   SimObjectPtr<SimObject>* Sim_WrapObject(SimObject* pObject)
    {
-      Con::setVariable(StringTable->insert(name), StringTable->insert(value));
+      return new SimObjectPtr<SimObject>(pObject);
    }
 
-   S32 Con_getConsoleInt(const char* name)
+   void Sim_DeleteObjectPtr(SimObjectPtr<SimObject>* pObjectPtr)
    {
-      return Con::getIntVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleInt(const char* name, S32 value)
-   {
-      Con::setIntVariable(StringTable->insert(name), value);
-   }
-
-   F32 Con_getConsoleFloat(const char* name)
-   {
-      return Con::getFloatVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleFloat(const char* name, F32 value)
-   {
-      Con::setFloatVariable(StringTable->insert(name), value);
-   }
-
-   bool Con_getConsoleBool(const char* name)
-   {
-      return Con::getBoolVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleBool(const char* name, bool value)
-   {
-      Con::setBoolVariable(StringTable->insert(name), value);
+      delete pObjectPtr;
    }
 };
-
-
