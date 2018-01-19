@@ -23,6 +23,9 @@
 #ifndef _PX3COLLISION_H_
 #define _PX3COLLISION_H_
 
+#ifndef _PHYSX3_H_
+#include "T3D/physics/physx3/px3.h"
+#endif
 #ifndef _T3D_PHYSICS_PHYSICSCOLLISION_H_
 #include "T3D/physics/physicsCollision.h"
 #endif

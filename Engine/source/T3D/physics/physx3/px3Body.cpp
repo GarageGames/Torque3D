@@ -52,12 +52,9 @@ void Px3Body::_releaseActor()
    if ( !mActor )
       return;
 
-   mWorld->releaseWriteLock();
-
    mActor->userData = NULL;
 
-   mActor->release();
-   mActor = NULL;
+   SafeReleasePhysx(mActor);
    mBodyFlags = 0;
 
    if ( mMaterial )
@@ -80,7 +77,7 @@ bool Px3Body::init(   PhysicsCollision *shape,
    AssertFatal( shape, "Px3Body::init - Got a null collision shape!" );
    AssertFatal( dynamic_cast<Px3Collision*>( shape ), "Px3Body::init - The collision shape is the wrong type!" );
    AssertFatal( !((Px3Collision*)shape)->getShapes().empty(), "Px3Body::init - Got empty collision shape!" );
-    
+	 
    // Cleanup any previous actor.
    _releaseActor();
 
@@ -96,18 +93,20 @@ bool Px3Body::init(   PhysicsCollision *shape,
    {
       mActor = gPhysics3SDK->createRigidDynamic(physx::PxTransform(physx::PxIDENTITY()));
       physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
-      actor->setRigidDynamicFlag(physx::PxRigidDynamicFlag::eKINEMATIC, true);
+      actor->setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
       actor->setMass(getMax( mass, 1.0f ));
    }
    else if ( mass > 0.0f )
    {
       mActor = gPhysics3SDK->createRigidDynamic(physx::PxTransform(physx::PxIDENTITY()));
+      physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
+      actor->setMaxAngularVelocity(80.f);
    }
    else
    {
       mActor = gPhysics3SDK->createRigidStatic(physx::PxTransform(physx::PxIDENTITY()));
       mIsStatic = true;
-   }
+	}
 
    mMaterial = gPhysics3SDK->createMaterial(0.6f,0.4f,0.1f);
   
@@ -123,12 +122,13 @@ bool Px3Body::init(   PhysicsCollision *shape,
             Con::errorf("PhysX3 Dynamic Triangle Mesh is not supported.");
          }
       }
-      physx::PxShape * pShape = mActor->createShape(*desc->pGeometry,*mMaterial);
+      
+      physx::PxShape * pShape = physx::PxRigidActorExt::createExclusiveShape(*mActor, *desc->pGeometry, *mMaterial);
       physx::PxFilterData colData;
       if(isDebris)
          colData.word0 = PX3_DEBRIS;
       else if(isTrigger)
-        colData.word0 = PX3_TRIGGER;
+         colData.word0 = PX3_TRIGGER;
       else
          colData.word0 = PX3_DEFAULT;
 
@@ -148,10 +148,6 @@ bool Px3Body::init(   PhysicsCollision *shape,
       physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
       physx::PxRigidBodyExt::setMassAndUpdateInertia(*actor,mass);
    }
-
-    // This sucks, but it has to happen if we want
-   // to avoid write lock errors from PhysX right now.
-   mWorld->releaseWriteLock();
 
    mWorld->getScene()->addActor(*mActor);
    mIsEnabled = true;
@@ -178,9 +174,9 @@ void Px3Body::setMaterial(  F32 restitution,
       actor->wakeUp();
    }
 
-    mMaterial->setRestitution(restitution);
-    mMaterial->setStaticFriction(staticFriction);
-    mMaterial->setDynamicFriction(friction);
+   mMaterial->setRestitution(restitution);
+   mMaterial->setStaticFriction(staticFriction);
+   mMaterial->setDynamicFriction(friction);
 
 }
 
@@ -322,15 +318,14 @@ Box3F Px3Body::getWorldBounds()
    
    physx::PxBounds3 bounds;
    bounds.setEmpty();   
-   physx::PxBounds3 shapeBounds;
- 
+   physx::PxBounds3 shapeBounds; 
   
    U32 shapeCount = mActor->getNbShapes();
    physx::PxShape **shapes = new physx::PxShape*[shapeCount];
    mActor->getShapes(shapes, shapeCount);
    for ( U32 i = 0; i < shapeCount; i++ )
    {
-      // Get the shape's bounds.    
+      // Get the shape's bounds.	   
       shapeBounds = physx::PxShapeExt::getWorldBounds(*shapes[i],*mActor);
       // Combine them into the total bounds.
       bounds.include( shapeBounds ); 
@@ -350,10 +345,6 @@ void Px3Body::setSimulationEnabled( bool enabled )
    if(mBodyFlags & BF_TRIGGER)
       return;
   
-   // This sucks, but it has to happen if we want
-   // to avoid write lock errors from PhysX right now.
-   mWorld->releaseWriteLock();
-
    U32 shapeCount = mActor->getNbShapes();
    physx::PxShape **shapes = new physx::PxShape*[shapeCount];
    mActor->getShapes(shapes, shapeCount);
@@ -367,12 +358,6 @@ void Px3Body::setSimulationEnabled( bool enabled )
 void Px3Body::setTransform( const MatrixF &transform )
 {
    AssertFatal( mActor, "Px3Body::setTransform - The actor is null!" );
-
-
-   // This sucks, but it has to happen if we want
-   // to avoid write lock errors from PhysX right now.
-   mWorld->releaseWriteLock();
-
    
    mActor->setGlobalPose(px3Cast<physx::PxTransform>(transform),false);
 
@@ -380,7 +365,7 @@ void Px3Body::setTransform( const MatrixF &transform )
       return;
 
    physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
-   bool kinematic = actor->getRigidDynamicFlags() & physx::PxRigidDynamicFlag::eKINEMATIC;
+   bool kinematic = actor->getRigidBodyFlags() & physx::PxRigidBodyFlag::eKINEMATIC;
    // If its dynamic we have more to do.
    if ( isDynamic() && !kinematic )
    {
@@ -395,10 +380,6 @@ void Px3Body::applyCorrection( const MatrixF &transform )
    AssertFatal( mActor, "Px3Body::applyCorrection - The actor is null!" );
    AssertFatal( isDynamic(), "Px3Body::applyCorrection - This call is only for dynamics!" );
 
-   // This sucks, but it has to happen if we want
-   // to avoid write lock errors from PhysX right now.
-   mWorld->releaseWriteLock();
-
    mActor->setGlobalPose( px3Cast<physx::PxTransform>(transform) ); 
 }
 
@@ -406,35 +387,27 @@ void Px3Body::applyImpulse( const Point3F &origin, const Point3F &force )
 {
    AssertFatal( mActor, "Px3Body::applyImpulse - The actor is null!" );
 
-   // This sucks, but it has to happen if we want
-   // to avoid write lock errors from PhysX right now.
-   mWorld->releaseWriteLock();
    physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
    if ( mIsEnabled && isDynamic() )
-   physx::PxRigidBodyExt::addForceAtPos(*actor,px3Cast<physx::PxVec3>(force),
-                                    px3Cast<physx::PxVec3>(origin),
-                                    physx::PxForceMode::eIMPULSE);
-
+   physx::PxRigidBodyExt::addForceAtPos( *actor,px3Cast<physx::PxVec3>(force), px3Cast<physx::PxVec3>(origin), physx::PxForceMode::eIMPULSE );
 }
 
-void Px3Body::applyTorque( const Point3F &torque )
+void Px3Body::applyTorque(const Point3F &torque)
 {
    AssertFatal(mActor, "Px3Body::applyImpulse - The actor is null!");
 
-   mWorld->releaseWriteLock();
    physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
    if (mIsEnabled && isDynamic())
-      actor->addTorque( px3Cast<physx::PxVec3>(torque), physx::PxForceMode::eFORCE, true);
+      actor->addTorque(px3Cast<physx::PxVec3>(torque), physx::PxForceMode::eFORCE, true);
 }
 
-void Px3Body::applyForce( const Point3F &force )
+void Px3Body::applyForce(const Point3F &force)
 {
    AssertFatal(mActor, "Px3Body::applyTorque - The actor is null!");
 
-   mWorld->releaseWriteLock();
    physx::PxRigidDynamic *actor = mActor->is<physx::PxRigidDynamic>();
    if (mIsEnabled && isDynamic())
-      actor->addForce( px3Cast<physx::PxVec3>(force), physx::PxForceMode::eFORCE, true);
+      actor->addForce(px3Cast<physx::PxVec3>(force), physx::PxForceMode::eFORCE, true);
 }
 
 void Px3Body::findContact(SceneObject **contactObject,
