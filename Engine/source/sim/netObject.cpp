@@ -33,7 +33,9 @@
 #include "console/consoleTypes.h"
 #include "console/engineAPI.h"
 
+#ifdef TORQUE_AFX_ENABLED
 #include "afx/arcaneFX.h"
+#endif
 
 IMPLEMENT_CONOBJECT(NetObject);
 
@@ -53,9 +55,11 @@ NetObject::NetObject()
    mPrevDirtyList = NULL;
    mNextDirtyList = NULL;
    mDirtyMaskBits = 0;
+#ifdef TORQUE_AFX_ENABLED
    scope_id = 0;
    scope_refs = 0;
    scope_registered = false;
+#endif
 }
 
 NetObject::~NetObject()
@@ -470,6 +474,8 @@ DefineEngineMethod( NetObject, isServerObject, bool, (),,
 //{
 //   return object->isServerObject();
 //}
+
+#ifdef TORQUE_AFX_ENABLED
 U16 NetObject::addScopeRef() 
 { 
    if (scope_refs == 0)
@@ -492,4 +498,4 @@ void NetObject::removeScopeRef()
       onScopeIdChange();
    }
 }
-
+#endif

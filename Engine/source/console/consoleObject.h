@@ -515,9 +515,9 @@ public:
       TypeValidator *validator;     ///< Validator, if any.
       SetDataNotify  setDataFn;     ///< Set data notify Fn
       GetDataNotify  getDataFn;     ///< Get data notify Fn
+	  WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
       bool           doNotSubstitute;
       bool           keepClearSubsOnly;
-      WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
    };
    typedef Vector<Field> FieldList;
 

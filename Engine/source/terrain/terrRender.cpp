@@ -50,7 +50,9 @@
 
 #include "gfx/gfxDrawUtil.h"
 
+#ifdef TORQUE_AFX_ENABLED
 #include "afx/arcaneFX.h"
+#endif
 #include "afx/ce/afxZodiacMgr.h"
 #include "gfx/gfxTransformSaver.h"
 #include "gfx/bitmap/gBitmap.h"

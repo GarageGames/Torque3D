@@ -54,8 +54,10 @@
 #include "gfx/gfxTextureManager.h"
 #include "sfx/sfxSystem.h"
 
-// Including this header provides access to certain system-level AFX methods.
+#ifdef TORQUE_AFX_ENABLED
 #include "afx/arcaneFX.h"
+#endif
+
 #ifdef TORQUE_PLAYER
 // See matching #ifdef in editor/editor.cpp
 bool gEditingMission = false;
@@ -242,9 +244,11 @@ ConsoleFunctionGroupEnd(Platform);
 
 bool clientProcess(U32 timeDelta)
 {
+#ifdef TORQUE_AFX_ENABLED
    // Required heartbeat call on the client side which must come
    // before the advanceTime() calls are made to the scene objects.
    arcaneFX::advanceTime(timeDelta);
+#endif
    bool ret = true;
 
 #ifndef TORQUE_TGB_ONLY

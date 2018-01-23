@@ -61,7 +61,9 @@
 #include "core/stream/fileStream.h"
 #endif 
 
+#ifdef TORQUE_AFX_ENABLED
 #include "afx/arcaneFX.h"
+#endif
 //----------------------------------------------------------------------------
 #define MAX_MOVE_PACKET_SENDS 4
 
@@ -2452,6 +2454,7 @@ DefineEngineMethod( GameConnection, getVisibleGhostDistance, F32, (),,
    return object->getVisibleGhostDistance();
 }
 
+#ifdef TORQUE_AFX_ENABLED 
 // The object selection code here is, in part, based, on functionality described
 // in the following resource:
 // Object Selection in Torque by Dave Myers 
@@ -2580,6 +2583,7 @@ void GameConnection::onDeleteNotify(SimObject* obj)
 
    Parent::onDeleteNotify(obj);
 }
+#endif
 
 #ifdef AFX_CAP_DATABLOCK_CACHE 
 
