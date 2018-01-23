@@ -41,6 +41,9 @@
 /// Human readable application version string.
 #define TORQUE_APP_VERSION_STRING  "@TORQUE_APP_VERSION_STRING@"
 
+/// Define me if you want to enable Arcane FX support.
+#cmakedefine TORQUE_AFX_ENABLED
+
 /// Define me if you want to enable multithreading support.
 #cmakedefine TORQUE_MULTITHREAD
 
