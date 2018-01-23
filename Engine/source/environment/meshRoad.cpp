@@ -56,8 +56,9 @@
 #include "T3D/physics/physicsBody.h"
 #include "T3D/physics/physicsCollision.h"
 #include "environment/nodeListManager.h"
-
+#ifdef TORQUE_AFX_ENABLED
 #include "afx/ce/afxZodiacMgr.h"
+#endif
 
 #define MIN_METERS_PER_SEGMENT 1.0f
 #define MIN_NODE_DEPTH 0.25f
@@ -829,7 +830,9 @@ void MeshRoad::prepRenderImage( SceneRenderState* state )
    // otherwise obey the smShowRoad flag
    if ( smShowRoad || !smEditorOpen )
    {
+#ifdef TORQUE_AFX_ENABLED
       afxZodiacMgr::renderMeshRoadZodiacs(state, this);
+#endif
       MeshRenderInst coreRI;
       coreRI.clear();
       coreRI.objectToWorld = &MatrixF::Identity;

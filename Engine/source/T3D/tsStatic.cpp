@@ -58,8 +58,9 @@
 using namespace Torque;
 
 extern bool gEditingMission;
-
+#ifdef TORQUE_AFX_ENABLED
 #include "afx/ce/afxZodiacMgr.h"
+#endif
 
 IMPLEMENT_CO_NETOBJECT_V1(TSStatic);
 
@@ -136,7 +137,9 @@ TSStatic::TSStatic()
    mHasGradients = false;
    mInvertGradientRange = false;
    mGradientRangeUser.set(0.0f, 180.0f);
+#ifdef TORQUE_AFX_ENABLED
    afxZodiacData::convertGradientRangeFromDegrees(mGradientRange, mGradientRangeUser);
+#endif
 }
 
 TSStatic::~TSStatic()
@@ -721,9 +724,10 @@ void TSStatic::prepRenderImage( SceneRenderState* state )
       }
    }
    mShapeInstance->render( rdata );
-
+#ifdef TORQUE_AFX_ENABLED
    if (!mIgnoreZodiacs && mDecalDetailsPtr != 0)
       afxZodiacMgr::renderPolysoupZodiacs(state, this);
+#endif
    if ( mRenderNormalScalar > 0 )
    {
       ObjectRenderInst *ri = state->getRenderPass()->allocInst<ObjectRenderInst>();
@@ -1399,11 +1403,13 @@ void TSStatic::set_special_typing()
 
 void TSStatic::onStaticModified(const char* slotName, const char*newValue)
 {
+#ifdef TORQUE_AFX_ENABLED
    if (slotName == afxZodiacData::GradientRangeSlot)
    {
       afxZodiacData::convertGradientRangeFromDegrees(mGradientRange, mGradientRangeUser);
       return;
    }
+#endif
 
    set_special_typing();
 }

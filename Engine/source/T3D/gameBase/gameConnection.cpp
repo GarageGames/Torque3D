@@ -194,12 +194,14 @@ bool GameConnection::client_cache_on = false;
 //----------------------------------------------------------------------------
 GameConnection::GameConnection()
 {
+#ifdef TORQUE_AFX_ENABLED
    mRolloverObj = NULL;
    mPreSelectedObj = NULL;
    mSelectedObj = NULL;
    mChangedSelectedObj = false;
    mPreSelectTimestamp = 0;
    zoned_in = false;
+#endif
    
 #ifdef AFX_CAP_DATABLOCK_CACHE 
    client_db_stream = new InfiniteBitStream;
@@ -1177,6 +1179,7 @@ void GameConnection::readPacket(BitStream *bstream)
    {
       mMoveList->clientReadMovePacket(bstream);
 
+#ifdef TORQUE_AFX_ENABLED
       // selected object - do we have a change in status?
       if (bstream->readFlag()) 
       { 
@@ -1188,6 +1191,8 @@ void GameConnection::readPacket(BitStream *bstream)
          else
             setSelectedObj(NULL);
       }
+#endif
+
       bool hadFlash = mDamageFlash > 0 || mWhiteOut > 0;
       mDamageFlash = 0;
       mWhiteOut = 0;
@@ -1431,6 +1436,7 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
       // all the damage flash & white out
 
       S32 gIndex = -1;
+#ifdef TORQUE_AFX_ENABLED
       if (mChangedSelectedObj)
       {
          S32 gidx;
@@ -1459,6 +1465,7 @@ void GameConnection::writePacket(BitStream *bstream, PacketNotify *note)
       }
       else
          bstream->writeFlag(false);
+#endif
 		 
       if (!mControlObject.isNull())
       {

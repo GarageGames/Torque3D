@@ -385,7 +385,8 @@ protected:
    DECLARE_CALLBACK( void, setLagIcon, (bool state) );
    DECLARE_CALLBACK( void, onDataBlocksDone, (U32 sequence) );
    DECLARE_CALLBACK( void, onFlash, (bool state) );
-   
+
+#ifdef TORQUE_AFX_ENABLED
    // GameConnection is modified to keep track of object selections which are used in
    // spell targeting. This code stores the current object selection as well as the
    // current rollover object beneath the cursor. The rollover object is treated as a
@@ -415,7 +416,7 @@ private:
 public:
    bool          isZonedIn() const { return zoned_in; }
    void          setZonedIn() { zoned_in = true; }
-   
+#endif
 #ifdef AFX_CAP_DATABLOCK_CACHE
 private:
    static StringTableEntry  server_cache_filename;
