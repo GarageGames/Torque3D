@@ -41,6 +41,9 @@ GFX_ImplementTextureProfile(ShadowMapTexProfile,
 
 
 MODULE_BEGIN( ShadowMapManager )
+#ifndef TORQUE_BASIC_LIGHTING
+   MODULE_SHUTDOWN_AFTER(Scene)
+#endif
 
    MODULE_INIT
    {
