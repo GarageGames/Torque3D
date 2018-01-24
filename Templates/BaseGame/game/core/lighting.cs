@@ -40,16 +40,26 @@ function initLightingSystems(%manager)
       exec( %file );
       %file = findNextFile( %pattern );
    }
-
-   // Try the perfered one first.
-   %success = setLightManager(%manager);
-
-   // Did we completely fail to initialize a light manager?   
-   if (!%success)
+   
+   // Try to initialize the selected light manager directly
+   // If this fails, try to initialize the light managers in order from most to least preferable
+   if (setLightManager(%manager))
    {
+      return true;
+   }
+   else
+   {
+      for(%i = 0; %i < getFieldCount($lightManager::defaults); %i++)
+      {
+         %success = setLightManager(getField($lightManager::defaults, %i));
+         
+         if (%success)
+            return true;
+      } 
+
       // If we completely failed to initialize a light 
       // manager then the 3d scene cannot be rendered.
-      quitWithErrorMessage( "Failed to set a light manager!" );
+      quitWithErrorMessage( "Failed to set a light manager!" );      
    }
 }
 
