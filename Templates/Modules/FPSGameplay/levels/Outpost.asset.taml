@@ -1,0 +1,7 @@
+<LevelAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="Outpost"
+    LevelFile="data/FPSGameplay/levels/Outpost.mis"
+    LevelDescription="Outpost level"
+    VersionId="1" />

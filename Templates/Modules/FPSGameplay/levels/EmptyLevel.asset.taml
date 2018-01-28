@@ -1,0 +1,7 @@
+<LevelAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="EmptyLevel"
+    LevelFile="data/FPSGameplay/levels/EmptyLevel.mis"
+    LevelDescription="An empty room"
+    VersionId="1" />

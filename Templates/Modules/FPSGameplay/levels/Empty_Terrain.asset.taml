@@ -1,0 +1,7 @@
+<LevelAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="Empty_Terrain"
+    LevelFile="data/FPSGameplay/levels/Empty_Terrain.mis"
+    LevelDescription="A Empty level with terrain."
+    VersionId="1" />
