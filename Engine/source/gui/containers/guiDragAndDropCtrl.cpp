@@ -152,14 +152,24 @@ ConsoleDocClass( GuiDragAndDropControl,
    "@ingroup GuiUtil"
 );
 
+IMPLEMENT_CALLBACK(GuiDragAndDropControl, onControlDragCancelled, void, (), (),
+   "Called when the we cancel out of the drag and drop action.\n"
+   "@see GuiDragAndDropControl::onControlDragCancelled");
 
 //-----------------------------------------------------------------------------
+GuiDragAndDropControl::GuiDragAndDropControl() : mDeleteOnMouseUp(true), mUseWholeCanvas(false)
+{
+
+}
 
 void GuiDragAndDropControl::initPersistFields()
 {
    addField( "deleteOnMouseUp", TypeBool, Offset( mDeleteOnMouseUp, GuiDragAndDropControl ),
       "If true, the control deletes itself when the left mouse button is released.\n\n"
       "If at this point, the drag&drop control still contains its payload, it will be deleted along with the control." );
+
+   addField("useWholeCanvas", TypeBool, Offset(mUseWholeCanvas, GuiDragAndDropControl),
+      "If true, the control can be tested against ANY control active on the canvas instead of just the direct parent.\n\n");
    
    Parent::initPersistFields();
 }
@@ -226,8 +236,10 @@ void GuiDragAndDropControl::onMouseUp(const GuiEvent& event)
    mouseUnlock();
 
    GuiControl* target = findDragTarget( event.mousePoint, "onControlDropped" );
-   if( target )
-      target->onControlDropped_callback( dynamic_cast< GuiControl* >( at( 0 ) ), getDropPoint() );
+   if (target)
+      target->onControlDropped_callback(dynamic_cast<GuiControl*>(at(0)), getDropPoint());
+   else
+      onControlDragCancelled_callback();
 
    if( mDeleteOnMouseUp )
       deleteObject();
@@ -239,6 +251,13 @@ GuiControl* GuiDragAndDropControl::findDragTarget( Point2I mousePoint, const cha
 {
    // If there are any children and we have a parent.
    GuiControl* parent = getParent();
+
+   if (mUseWholeCanvas)
+   {
+      parent->setVisible(false);
+      parent = getRoot();
+   }
+
    if (size() && parent)
    {
       mVisible = false;
@@ -252,6 +271,10 @@ GuiControl* GuiDragAndDropControl::findDragTarget( Point2I mousePoint, const cha
             dropControl = dropControl->getParent();
       }
    }
+
+   if(mUseWholeCanvas)
+      parent->setVisible(true);
+
    return NULL;
 }
 
