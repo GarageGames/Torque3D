@@ -106,17 +106,6 @@ void SceneRenderState::renderObjects( SceneObject** objects, U32 numObjects )
       object->prepRenderImage( this );
    }
 
-   U32 interfaceCount = RenderComponentInterface::all.size();
-   for (U32 i = 0; i < RenderComponentInterface::all.size(); i++)
-   {
-      Component* comp = dynamic_cast<Component*>(RenderComponentInterface::all[i]);
-
-      if (comp->isClientObject() && comp->isActive())
-      {
-         RenderComponentInterface::all[i]->prepRenderImage(this);
-      }
-   }
-
    PROFILE_END();
 
    // Render what the objects have batched.

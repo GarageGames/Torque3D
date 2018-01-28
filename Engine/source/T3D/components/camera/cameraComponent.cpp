@@ -79,6 +79,7 @@ CameraComponent::CameraComponent() : Component()
    mTargetNode = "";
 
    mUseParentTransform = true;
+   mNetworked = true;
 
    mFriendlyName = "Camera(Component)";
 }
@@ -202,7 +203,7 @@ void CameraComponent::setCameraFov(F32 fov)
 void CameraComponent::onCameraScopeQuery(NetConnection *cr, CameraScopeQuery * query)
 {
    // update the camera query
-   query->camera = this;
+   query->camera = mOwner;//this;
 
    if(GameConnection * con = dynamic_cast<GameConnection*>(cr))
    {
@@ -357,7 +358,8 @@ U32 CameraComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          mTargetNodeIdx = nodeIndex;
       }
 
-      stream->writeInt(mTargetNodeIdx, 32);
+      if(stream->writeFlag(mTargetNodeIdx > -1))
+         stream->writeInt(mTargetNodeIdx, 32);
       //send offsets here
 
       stream->writeCompressedPoint(mPosOffset);
@@ -382,7 +384,10 @@ void CameraComponent::unpackUpdate(NetConnection *con, BitStream *stream)
 
    if(stream->readFlag())
    {
-      mTargetNodeIdx = stream->readInt(32);
+      if (stream->readFlag())
+         mTargetNodeIdx = stream->readInt(32);
+      else
+         mTargetNodeIdx = -1;
 
       stream->readCompressedPoint(&mPosOffset);
 

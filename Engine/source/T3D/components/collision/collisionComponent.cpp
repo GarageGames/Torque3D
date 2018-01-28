@@ -125,8 +125,6 @@ EndImplementEnumType;
 //
 CollisionComponent::CollisionComponent() : Component()
 {
-   mNetFlags.set(Ghostable | ScopeAlways);
-
    mFriendlyName = "Collision(Component)";
 
    mOwnerRenderInterface = NULL;

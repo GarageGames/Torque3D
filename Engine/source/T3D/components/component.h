@@ -64,9 +64,9 @@ struct ComponentField
 /// 
 /// 
 //////////////////////////////////////////////////////////////////////////
-class Component : public NetObject, public UpdateInterface
+class Component : public SimObject, public UpdateInterface
 {
-   typedef NetObject Parent;
+   typedef SimObject Parent;
 
 protected:
    StringTableEntry mFriendlyName;
@@ -92,6 +92,10 @@ protected:
    StringTableEntry		      mOriginatingAssetId;
    AssetPtr<ComponentAsset>  mOriginatingAsset;
 
+   U32                        mDirtyMaskBits;
+
+   bool                 mIsServerObject;
+
 public:
    Component();
    virtual ~Component();
@@ -113,7 +117,8 @@ public:
    //This is called when a different component is removed from our owner entity
    virtual void componentRemovedFromOwner(Component *comp);  
 
-   virtual void ownerTransformSet(MatrixF *mat);
+   //Overridden by components that actually care
+   virtual void ownerTransformSet(MatrixF *mat) {}
 
    void setOwner(Entity* pOwner);
    inline Entity *getOwner() { return mOwner ? mOwner : NULL; }
@@ -189,6 +194,16 @@ public:
       NamespaceMask = BIT(4),
       NextFreeMask = BIT(5)
    };
+
+   virtual void setMaskBits(U32 orMask);
+   virtual void clearMaskBits() {
+      mDirtyMaskBits = 0;
+   }
+
+   bool isServerObject() { return mIsServerObject; }
+   bool isClientObject() { return !mIsServerObject; }
+
+   void setIsServerObject(bool isServerObj) { mIsServerObject = isServerObj; }
 
    virtual U32 packUpdate(NetConnection *con, U32 mask, BitStream *stream);
    virtual void unpackUpdate(NetConnection *con, BitStream *stream);

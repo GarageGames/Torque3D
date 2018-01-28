@@ -72,7 +72,6 @@ IMPLEMENT_CALLBACK(AnimationComponent, onAnimationTrigger, void, (Component* obj
 AnimationComponent::AnimationComponent() : Component()
 {
    mNetworked = true;
-   mNetFlags.set(Ghostable | ScopeAlways);
 
    mFriendlyName = "Animation(Component)";
    mComponentType = "Render";
@@ -223,31 +222,19 @@ U32 AnimationComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stre
 {
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
-   //early test if we lack an owner, ghost-wise
-   //no point in trying, just re-queue the mask and go
-   if (!mOwner || con->getGhostIndex(mOwner) == -1)
+   /*for (int i = 0; i < MaxScriptThreads; i++)
    {
-      stream->writeFlag(false);
-      return retMask |= ThreadMask;
-   }
-   else
-   {
-      stream->writeFlag(true);
-
-      for (int i = 0; i < MaxScriptThreads; i++) 
+      Thread& st = mAnimationThreads[i];
+      if (stream->writeFlag((st.sequence != -1 || st.state == Thread::Destroy) && (mask & (ThreadMaskN << i))))
       {
-         Thread& st = mAnimationThreads[i];
-         if (stream->writeFlag( (st.sequence != -1 || st.state == Thread::Destroy) && (mask & (ThreadMaskN << i)) ) ) 
-         {
-            stream->writeInt(st.sequence,ThreadSequenceBits);
-            stream->writeInt(st.state,2);
-            stream->write(st.timescale);
-            stream->write(st.position);
-            stream->writeFlag(st.atEnd);
-            stream->writeFlag(st.transition);
-         }
+         stream->writeInt(st.sequence, ThreadSequenceBits);
+         stream->writeInt(st.state, 2);
+         stream->write(st.timescale);
+         stream->write(st.position);
+         stream->writeFlag(st.atEnd);
+         stream->writeFlag(st.transition);
       }
-   }
+   }*/
 
    return retMask;
 }
@@ -256,29 +243,26 @@ void AnimationComponent::unpackUpdate(NetConnection *con, BitStream *stream)
 {
    Parent::unpackUpdate(con, stream);
 
-   if (stream->readFlag()) 
+   /*for (S32 i = 0; i < MaxScriptThreads; i++) 
    {
-      for (S32 i = 0; i < MaxScriptThreads; i++) 
+      if (stream->readFlag()) 
       {
-         if (stream->readFlag()) 
-         {
-            Thread& st = mAnimationThreads[i];
-            U32 seq = stream->readInt(ThreadSequenceBits);
-            st.state = stream->readInt(2);
-            stream->read( &st.timescale );
-            stream->read( &st.position );
-            st.atEnd = stream->readFlag();
-            bool transition = stream->readFlag();
+         Thread& st = mAnimationThreads[i];
+         U32 seq = stream->readInt(ThreadSequenceBits);
+         st.state = stream->readInt(2);
+         stream->read( &st.timescale );
+         stream->read( &st.position );
+         st.atEnd = stream->readFlag();
+         bool transition = stream->readFlag();
 
-            if (!st.thread || st.sequence != seq && st.state != Thread::Destroy)
-               setThreadSequence(i, seq, false, transition);
-            else
-               updateThread(st);
-
-         }
+         if (!st.thread || st.sequence != seq && st.state != Thread::Destroy)
+            setThreadSequence(i, seq, false, transition);
+         else
+            updateThread(st);
       }
-   }
+   }*/
 }
+
 void AnimationComponent::processTick()
 {
    Parent::processTick();
@@ -327,9 +311,6 @@ const char *AnimationComponent::getThreadSequenceName(U32 slot)
 
 bool AnimationComponent::setThreadSequence(U32 slot, S32 seq, bool reset, bool transition, F32 transTime)
 {
-   if (!mOwnerShapeInstance)
-      return false;
-
    Thread& st = mAnimationThreads[slot];
    if (st.thread && st.sequence == seq && st.state == Thread::Play && !reset)
       return true;
@@ -340,7 +321,6 @@ bool AnimationComponent::setThreadSequence(U32 slot, S32 seq, bool reset, bool t
 
    if (seq < MaxSequenceIndex)
    {
-      setMaskBits(-1);
       setMaskBits(ThreadMaskN << slot);
       st.sequence = seq;
       st.transition = transition;
@@ -647,7 +627,7 @@ void AnimationComponent::advanceThreads(F32 dt)
             st.atEnd = true;
             updateThread(st);
 
-            if (!isGhost())
+            if (!isClientObject())
             {
                Con::executef(this, "onAnimationEnd", st.thread->getSequenceName());
             }
@@ -660,7 +640,7 @@ void AnimationComponent::advanceThreads(F32 dt)
             mOwnerShapeInstance->advanceTime(dt, st.thread);
          }
 
-         if (mOwnerShapeInstance && !isGhost())
+         if (mOwnerShapeInstance && !isClientObject())
          {
             for (U32 i = 1; i < 32; i++)
             {
@@ -672,8 +652,16 @@ void AnimationComponent::advanceThreads(F32 dt)
             }
          }
 
-         if (isGhost())
+         if (isClientObject())
+         {
             mOwnerShapeInstance->animate();
+            /*mOwnerShapeInstance->animateGround();
+            MatrixF groundTransform = mOwnerShapeInstance->getGroundTransform();
+            if (groundTransform != MatrixF::Identity)
+            {
+               mOwner->setPosition(groundTransform.getPosition());
+            }*/
+         }
       }
    }
 }
