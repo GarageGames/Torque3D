@@ -25,20 +25,32 @@
 #include "gfx/primBuilder.h"
 #include "gui/core/guiCanvas.h"
 
-GuiPopupMenuBackgroundCtrl::GuiPopupMenuBackgroundCtrl(GuiPopupMenuTextListCtrl *textList)
+GuiPopupMenuBackgroundCtrl::GuiPopupMenuBackgroundCtrl()
 {
-   mTextList = textList;
-   mTextList->mBackground = this;
+   mMenuBarCtrl = nullptr;
 }
 
 void GuiPopupMenuBackgroundCtrl::onMouseDown(const GuiEvent &event)
 {
-   mTextList->setSelectedCell(Point2I(-1, -1));
+   
+}
+
+void GuiPopupMenuBackgroundCtrl::onMouseUp(const GuiEvent &event)
+{
+   clearPopups();
+
+   //Pass along the event just in case we clicked over a menu item. We don't want to eat the input for it.
+   if (mMenuBarCtrl)
+      mMenuBarCtrl->onMouseUp(event);
+
    close();
 }
 
 void GuiPopupMenuBackgroundCtrl::onMouseMove(const GuiEvent &event)
 {
+   //It's possible we're trying to pan through a menubar while a popup is displayed. Pass along our event to the menubar for good measure
+   if (mMenuBarCtrl)
+      mMenuBarCtrl->onMouseMove(event);
 }
 
 void GuiPopupMenuBackgroundCtrl::onMouseDragged(const GuiEvent &event)
@@ -48,26 +60,64 @@ void GuiPopupMenuBackgroundCtrl::onMouseDragged(const GuiEvent &event)
 void GuiPopupMenuBackgroundCtrl::close()
 {
    getRoot()->removeObject(this);
+
+   mMenuBarCtrl = nullptr;
+}
+
+S32 GuiPopupMenuBackgroundCtrl::findPopupMenu(PopupMenu* menu)
+{
+   S32 menuId = -1;
+
+   for (U32 i = 0; i < mPopups.size(); i++)
+   {
+      if (mPopups[i]->getId() == menu->getId())
+         return i;
+   }
+
+   return menuId;
+}
+
+void GuiPopupMenuBackgroundCtrl::clearPopups()
+{
+   for (U32 i = 0; i < mPopups.size(); i++)
+   {
+      mPopups[i]->mTextList->setSelectedCell(Point2I(-1, -1));
+      mPopups[i]->mTextList->mPopup->hidePopup();
+   }
 }
 
 GuiPopupMenuTextListCtrl::GuiPopupMenuTextListCtrl()
 {
    isSubMenu = false; //  Added
-   mMenu = NULL;
-   mMenuBar = NULL;
-   mPopup = NULL;
+
+   mMenuBar = nullptr;
+   mPopup = nullptr;
+
+   mLastHighlightedMenuIdx = -1;
 }
 
 void GuiPopupMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selected, bool mouseOver)
 {
-   if (dStrcmp(mList[cell.y].text + 3, "-\t")) //  Was: dStrcmp(mList[cell.y].text + 2, "-\t")) but has been changed to take into account the submenu flag
-      Parent::onRenderCell(offset, cell, selected, mouseOver);
-   else
+   //check if we're a real entry, or if it's a divider
+   if (mPopup->mMenuItems[cell.y].isSpacer)
    {
       S32 yp = offset.y + mCellSize.y / 2;
-      GFX->getDrawUtil()->drawLine(offset.x, yp, offset.x + mCellSize.x, yp, ColorI(128, 128, 128));
-      GFX->getDrawUtil()->drawLine(offset.x, yp + 1, offset.x + mCellSize.x, yp + 1, ColorI(255, 255, 255));
+      GFX->getDrawUtil()->drawLine(offset.x + 5, yp, offset.x + mCellSize.x - 5, yp, ColorI(128, 128, 128));
    }
+   else
+   {
+      if (dStrcmp(mList[cell.y].text + 3, "-\t")) //  Was: dStrcmp(mList[cell.y].text + 2, "-\t")) but has been changed to take into account the submenu flag
+      {
+         Parent::onRenderCell(offset, cell, selected, mouseOver);
+      }
+      else
+      {
+         S32 yp = offset.y + mCellSize.y / 2;
+         GFX->getDrawUtil()->drawLine(offset.x, yp, offset.x + mCellSize.x, yp, ColorI(128, 128, 128));
+         GFX->getDrawUtil()->drawLine(offset.x, yp + 1, offset.x + mCellSize.x, yp + 1, ColorI(255, 255, 255));
+      }
+   }
+
    // now see if there's a bitmap...
    U8 idx = mList[cell.y].text[0];
    if (idx != 1)
@@ -153,17 +203,12 @@ void GuiPopupMenuTextListCtrl::onMouseUp(const GuiEvent &event)
 
    if (selectionIndex != -1)
    {
-      GuiMenuBar::MenuItem *list = mMenu->firstMenuItem;
+      MenuItem *item = &mPopup->mMenuItems[selectionIndex];
 
-      while (selectionIndex && list)
+      if (item)
       {
-         list = list->nextMenuItem;
-         selectionIndex--;
-      }
-      if (list)
-      {
-         if (list->enabled)
-            dAtob(Con::executef(mPopup, "onSelectItem", Con::getIntArg(getSelectedCell().y), list->text ? list->text : ""));
+         if (item->enabled)
+            dAtob(Con::executef(mPopup, "onSelectItem", Con::getIntArg(getSelectedCell().y), item->text.isNotEmpty() ? item->text : ""));
       }
    }
 
@@ -180,5 +225,24 @@ void GuiPopupMenuTextListCtrl::onCellHighlighted(Point2I cell)
       RectI globalbounds(getBounds());
       Point2I globalpoint = localToGlobalCoord(globalbounds.point);
       globalbounds.point = globalpoint;
+   }
+
+   S32 selectionIndex = cell.y;
+
+   if (selectionIndex != -1 && mLastHighlightedMenuIdx != selectionIndex)
+   {
+      mLastHighlightedMenuIdx = selectionIndex;
+
+      mPopup->hidePopupSubmenus();
+   }
+
+   if (selectionIndex != -1)
+   {
+      MenuItem *list = &mPopup->mMenuItems[selectionIndex];
+
+      if (list->isSubmenu && list->subMenu != nullptr)
+      {
+         list->subMenu->showPopup(getRoot(), getPosition().x + mCellSize.x, getPosition().y + (selectionIndex * mCellSize.y));
+      }
    }
 }

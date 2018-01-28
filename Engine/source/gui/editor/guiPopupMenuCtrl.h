@@ -42,6 +42,7 @@ class GuiPopupMenuBackgroundCtrl;
 class GuiPopupMenuTextListCtrl : public GuiTextListCtrl
 {
    friend class GuiPopupMenuBackgroundCtrl;
+   friend class PopupMenu;
 
 private:
    typedef GuiTextListCtrl Parent;
@@ -51,9 +52,11 @@ private:
 public:
    bool isSubMenu; //  Indicates that this text list is in a submenu
    Point2I maxBitmapSize;
-   GuiMenuBar::Menu* mMenu;
+
    GuiMenuBar* mMenuBar;
    PopupMenu* mPopup;
+
+   S32 mLastHighlightedMenuIdx;
 
    GuiPopupMenuTextListCtrl();
 
@@ -70,16 +73,21 @@ class GuiPopupMenuBackgroundCtrl : public GuiControl
 {
    typedef GuiControl Parent;
 
-protected:
-   GuiPopupMenuTextListCtrl *mTextList;
-
 public:
-   GuiPopupMenuBackgroundCtrl(GuiPopupMenuTextListCtrl* textList);
+   GuiPopupMenuBackgroundCtrl();
    void onMouseDown(const GuiEvent &event);
+   void onMouseUp(const GuiEvent &event);
    void onMouseMove(const GuiEvent &event);
    void onMouseDragged(const GuiEvent &event);
 
    void close();
+
+   void clearPopups();
+
+   S32 findPopupMenu(PopupMenu* menu);
+
+   Vector<PopupMenu*> mPopups;
+   GuiMenuBar* mMenuBarCtrl;
 };
 
 #endif

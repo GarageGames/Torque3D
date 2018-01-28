@@ -35,5 +35,4 @@ exec("./GuiEaseEditDlg.ed.cs");
 exec("./guiObjectInspector.ed.cs");
 exec("./uvEditor.ed.gui");
 exec("./objectSelection.ed.cs");
-exec("./guiPlatformGenericMenubar.ed.cs");
 exec("./postFxManager.gui");
