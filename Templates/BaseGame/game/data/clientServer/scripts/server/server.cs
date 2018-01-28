@@ -25,11 +25,14 @@ function initServer()
    echo("\n--------- Initializing " @ $appName @ ": Server Scripts ---------");
    
    //load prefs
+
+   //Force-load the defaults just so we don't have any mistakes
+   exec( "data/clientServer/scripts/server/defaults.cs" );   
+   
+   //Then, if the user has saved preferences, we load those over-top the defaults
    %prefPath = getPrefpath();
    if ( isFile( %prefPath @ "/serverPrefs.cs" ) )
       exec( %prefPath @ "/serverPrefs.cs" );
-   else
-      exec( "data/clientServer/scripts/server/defaults.cs" );
    
    exec( "data/clientServer/scripts/server/audio.cs" );
    exec( "data/clientServer/scripts/server/commands.cs" );
@@ -99,6 +102,11 @@ function createAndConnectToLocalServer( %serverType, %level )
    {
       %conn.delete();
       destroyServer();
+         
+      MessageBoxOK("Error starting local server!", "There was an error when trying to connect to the local server.");
+      
+      if(isObject(MainMenuGui))
+         Canvas.setContent(MainMenuGui);
       
       return false;
    }
@@ -201,7 +209,7 @@ function destroyServer()
    // End any running levels and shut down the physics sim
    onServerDestroyed();
 
-   physicsDestroy();
+   //physicsDestroy();
 
    // Delete all the server objects
    if (isObject(ServerGroup))
