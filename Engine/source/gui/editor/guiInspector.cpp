@@ -54,7 +54,8 @@ GuiInspector::GuiInspector()
    mOverDivider( false ),
    mMovingDivider( false ),
    mHLField( NULL ),
-   mShowCustomFields( true )
+   mShowCustomFields( true ),
+   mComponentGroupTargetId(-1)
 {
    mPadding = 1;
 }
@@ -620,7 +621,10 @@ void GuiInspector::refresh()
          else
             compName = comp->getComponentName();
 
-         GuiInspectorGroup *compGroup = new GuiInspectorComponentGroup(compName, this, comp);
+         StringBuilder captionString;
+         captionString.format("%s [%i]", compName.c_str(), comp->getId());
+
+         GuiInspectorGroup *compGroup = new GuiInspectorComponentGroup(captionString.data(), this, comp);
          if (compGroup != NULL)
          {
             compGroup->registerObject();
