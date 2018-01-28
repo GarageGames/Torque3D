@@ -1472,6 +1472,17 @@ PopupMenu* GuiMenuBar::getMenu(U32 index)
    return mMenuList[index].popupMenu;
 }
 
+PopupMenu* GuiMenuBar::findMenu(StringTableEntry barTitle)
+{
+   for (U32 i = 0; i < mMenuList.size(); i++)
+   {
+      if (mMenuList[i].text == barTitle)
+         return mMenuList[i].popupMenu;
+   }
+
+   return nullptr;
+}
+
 //-----------------------------------------------------------------------------
 // Console Methods
 //-----------------------------------------------------------------------------
@@ -1506,4 +1517,14 @@ DefineConsoleMethod(GuiMenuBar, getMenu, S32, (S32 index), (0), "(Index)")
 DefineConsoleMethod(GuiMenuBar, insert, void, (SimObject* pObject, S32 pos), (nullAsType<SimObject*>(), -1), "(object, pos) insert object at position")
 {
    object->insert(pObject, pos);
+}
+
+DefineConsoleMethod(GuiMenuBar, findMenu, S32, (StringTableEntry barTitle), (""), "(barTitle)")
+{
+   PopupMenu* menu = object->findMenu(barTitle);
+
+   if (menu)
+      return menu->getId();
+   else
+      return 0;
 }
