@@ -24,9 +24,9 @@ new SimGroup(MissionGroup) {
       soundDistanceModel = "Linear";
       canSave = "1";
       canSaveDynamicFields = "1";
-         desc0 = "A blank room ready to be populated with Torque objects. Guns, anyone?";
+         desc0 = "A blank room template that acts as a starting point.";
          enabled = "1";
-         levelName = "Blank Room";
+         levelName = "Blank Room Template";
    };
    new SkyBox(theSky) {
       Material = "BlankSkyMat";
