@@ -587,6 +587,13 @@ function makeSelectedAMesh()
    EditorTree.buildVisibleTree( true );  
 }
 
+function EditorTakeControlOfEntity()
+{
+   %object = EWorldEditor.getSelectedObject(0);
+   switchCamera(localClientConnection, %object);
+   switchControlObject(localClientConnection, %object);  
+}
+
 function EditorMount()
 {
    echo( "EditorMount" );
