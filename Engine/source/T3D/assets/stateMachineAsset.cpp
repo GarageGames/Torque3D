@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef GAME_OBJECT_ASSET_H
-#include "GameObjectAsset.h"
+#ifndef STATE_MACHINE_ASSET_H
+#include "stateMachineAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -45,21 +45,21 @@
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(GameObjectAsset);
+IMPLEMENT_CONOBJECT(StateMachineAsset);
 
-ConsoleType(GameObjectAssetPtr, TypeGameObjectAssetPtr, GameObjectAsset, ASSET_ID_FIELD_PREFIX)
+ConsoleType(StateMachineAssetPtr, TypeStateMachineAssetPtr, StateMachineAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType(TypeGameObjectAssetPtr)
+ConsoleGetType(TypeStateMachineAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<GameObjectAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<StateMachineAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeGameObjectAssetPtr)
+ConsoleSetType(TypeStateMachineAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +68,13 @@ ConsoleSetType(TypeGameObjectAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<GameObjectAsset>* pAssetPtr = dynamic_cast<AssetPtr<GameObjectAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<StateMachineAsset>* pAssetPtr = dynamic_cast<AssetPtr<StateMachineAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeGameObjectAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeStateMachineAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,21 +85,19 @@ ConsoleSetType(TypeGameObjectAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeGameObjectAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeStateMachineAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-GameObjectAsset::GameObjectAsset()
+StateMachineAsset::StateMachineAsset()
 {
-   mGameObjectName = StringTable->lookup("");
-   mScriptFilePath = StringTable->lookup("");
-   mTAMLFilePath = StringTable->lookup("");
+   mStateMachineFileName = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
 
-GameObjectAsset::~GameObjectAsset()
+StateMachineAsset::~StateMachineAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -109,56 +107,47 @@ GameObjectAsset::~GameObjectAsset()
 
 //-----------------------------------------------------------------------------
 
-void GameObjectAsset::initPersistFields()
+void StateMachineAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("gameObjectName", TypeString, Offset(mGameObjectName, GameObjectAsset), "Name of the game object. Defines the created object's class.");
-   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, GameObjectAsset), "Path to the script file for the GameObject's script code.");
-   addField("TAMLFilePath", TypeString, Offset(mTAMLFilePath, GameObjectAsset), "Path to the taml file for the GameObject's heirarchy.");
+   addField("stateMachineFile", TypeString, Offset(mStateMachineFileName, StateMachineAsset), "Path to the state machine file.");
 }
 
 //------------------------------------------------------------------------------
 
-void GameObjectAsset::copyTo(SimObject* object)
+void StateMachineAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
 }
 
-void GameObjectAsset::initializeAsset()
+DefineEngineMethod(StateMachineAsset, notifyAssetChanged, void, (),,"")
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
-}
-
-void GameObjectAsset::onAssetRefresh()
-{
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   ResourceManager::get().getChangedSignal().trigger(object->getStateMachineFileName());
 }
 
 //-----------------------------------------------------------------------------
 // GuiInspectorTypeAssetId
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(GuiInspectorTypeGameObjectAssetPtr);
+IMPLEMENT_CONOBJECT(GuiInspectorTypeStateMachineAssetPtr);
 
-ConsoleDocClass(GuiInspectorTypeGameObjectAssetPtr,
-   "@brief Inspector field type for Game Objects\n\n"
+ConsoleDocClass(GuiInspectorTypeStateMachineAssetPtr,
+   "@brief Inspector field type for State Machines\n\n"
    "Editor use only.\n\n"
    "@internal"
 );
 
-void GuiInspectorTypeGameObjectAssetPtr::consoleInit()
+void GuiInspectorTypeStateMachineAssetPtr::consoleInit()
 {
    Parent::consoleInit();
 
-   ConsoleBaseType::getType(TypeGameObjectAssetPtr)->setInspectorFieldType("GuiInspectorTypeGameObjectAssetPtr");
+   ConsoleBaseType::getType(TypeStateMachineAssetPtr)->setInspectorFieldType("GuiInspectorTypeStateMachineAssetPtr");
 }
 
-GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
+GuiControl* GuiInspectorTypeStateMachineAssetPtr::constructEditControl()
 {
    // Create base filename edit controls
    GuiControl *retCtrl = Parent::constructEditControl();
@@ -167,14 +156,14 @@ GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
 
    // Change filespec
    char szBuffer[512];
-   dSprintf(szBuffer, sizeof(szBuffer), "AssetBrowser.showDialog(\"GameObjectAsset\", \"AssetBrowser.changeAsset\", %d, %s);",
+   dSprintf(szBuffer, sizeof(szBuffer), "AssetBrowser.showDialog(\"StateMachineAsset\", \"AssetBrowser.changeAsset\", %d, %s);",
       mInspector->getComponentGroupTargetId(), mCaption);
    mBrowseButton->setField("Command", szBuffer);
 
    // Create "Open in ShapeEditor" button
    mSMEdButton = new GuiBitmapButtonCtrl();
 
-   dSprintf(szBuffer, sizeof(szBuffer), "echo(\"Game Object Editor not implemented yet!\");", retCtrl->getId());
+   dSprintf(szBuffer, sizeof(szBuffer), "StateMachineEditor.loadStateMachineAsset(%d.getText()); Canvas.pushDialog(StateMachineEditor);", retCtrl->getId());
    mSMEdButton->setField("Command", szBuffer);
 
    char bitmapName[512] = "tools/worldEditor/images/toolbar/shape-editor";
@@ -191,7 +180,7 @@ GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
    return retCtrl;
 }
 
-bool GuiInspectorTypeGameObjectAssetPtr::updateRects()
+bool GuiInspectorTypeStateMachineAssetPtr::updateRects()
 {
    S32 dividerPos, dividerMargin;
    mInspector->getDivider(dividerPos, dividerMargin);

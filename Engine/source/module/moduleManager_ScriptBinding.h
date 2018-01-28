@@ -46,6 +46,16 @@ DefineEngineMethod(ModuleManager, scanModules, bool, (const char* pRootPath, boo
 
 //-----------------------------------------------------------------------------
 
+DefineEngineMethod(ModuleManager, registerModule, bool, (const char* pModulePath, const char* pModuleFile), ("", ""),
+   "Register the specified module.\n"
+   "@param moduleId The module Id to register.\n"
+   "@param versionId The version Id to register.\n"
+   "@return Whether the module was registered or not.\n")
+{
+   // Unregister the module.
+   return object->registerModule(pModulePath, pModuleFile);
+}
+
 DefineEngineMethod(ModuleManager, unregisterModule, bool, (const char* pModuleId, bool versionId), ("", false),
    "Unregister the specified module.\n"
    "@param moduleId The module Id to unregister.\n"
@@ -246,6 +256,30 @@ DefineEngineMethod(ModuleManager, copyModule, String, (const char* sourceModuleD
 
 //-----------------------------------------------------------------------------
 
+DefineEngineMethod(ModuleManager, renameModule, bool, (const char* sourceModuleDefinition, const char* pNewModuleName),
+("", ""),
+"Rename a module.\n"
+"@param sourceModuleDefinition The module definition to rename.\n"
+"@param pNewModuleName The new name the module should have.\n"
+"@return Weither the rename was successful or not.\n")
+{
+   // Find the source module definition.
+   ModuleDefinition* pSourceModuleDefinition = dynamic_cast<ModuleDefinition*>(Sim::findObject(sourceModuleDefinition));
+
+   // Was the module definition found?
+   if (pSourceModuleDefinition == NULL)
+   {
+      // No, so warn.
+      Con::warnf("ModuleManager::renameModule() - Could not find source module definition '%s'.", sourceModuleDefinition);
+      return "";
+   }
+
+   // Copy module.
+   return object->renameModule(pSourceModuleDefinition, pNewModuleName);
+}
+
+//-----------------------------------------------------------------------------
+
 DefineEngineMethod(ModuleManager, synchronizeDependencies, bool, (const char* rootModuleDefinition, const char* pTargetDependencyFolder), ("", ""),
    "Synchronize the module dependencies of a module definition to a target dependency folder.\n"
    "@param rootModuleDefinition The module definition used to determine dependencies.\n"
@@ -341,4 +375,15 @@ DefineEngineMethod(ModuleManager, removeListener, void, (const char* listenerObj
     }
 
     object->removeListener( pListener );
+}
+
+//-----------------------------------------------------------------------------
+
+DefineEngineMethod(ModuleManager, ignoreLoadedGroups, void, (bool doIgnore), (false),
+   "Sets if the Module Manager should ingore laoded groups.\n"
+   "@param doIgnore Whether we should or should not ignore loaded groups.\n"
+   "@return No return value.\n")
+{
+   // Check whether the merge modules can current happen or not.
+   return object->setIgnoreLoadedGroups(doIgnore);
 }

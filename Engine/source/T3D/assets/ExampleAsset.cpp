@@ -74,7 +74,7 @@ ConsoleSetType(TypeExampleAssetPtr)
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeTextureAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeExampleAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,18 +85,13 @@ ConsoleSetType(TypeExampleAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeTextureAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeExampleAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-ExampleAsset::ExampleAsset() :
-mpOwningAssetManager(NULL),
-mAssetInitialized(false),
-mAcquireReferenceCount(0)
+ExampleAsset::ExampleAsset()
 {
-   // Generate an asset definition.
-   mpAssetDefinition = new AssetDefinition();
 }
 
 //-----------------------------------------------------------------------------

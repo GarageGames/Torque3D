@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef COMPONENT_ASSET_H
-#include "ComponentAsset.h"
+#ifndef SOUND_ASSET_H
+#include "SoundAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -45,21 +45,21 @@
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(ComponentAsset);
+IMPLEMENT_CONOBJECT(SoundAsset);
 
-ConsoleType(ComponentAssetPtr, TypeComponentAssetPtr, ComponentAsset, ASSET_ID_FIELD_PREFIX)
+ConsoleType(SoundAssetPtr, TypeSoundAssetPtr, SoundAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType(TypeComponentAssetPtr)
+ConsoleGetType(TypeSoundAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<ComponentAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<SoundAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeComponentAssetPtr)
+ConsoleSetType(TypeSoundAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +68,13 @@ ConsoleSetType(TypeComponentAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<ComponentAsset>* pAssetPtr = dynamic_cast<AssetPtr<ComponentAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<SoundAsset>* pAssetPtr = dynamic_cast<AssetPtr<SoundAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeComponentAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeSoundAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,25 +85,24 @@ ConsoleSetType(TypeComponentAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeComponentAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeSoundAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::ComponentAsset()
+SoundAsset::SoundAsset()
 {
-   mComponentName = StringTable->EmptyString();
-   mComponentClass = StringTable->EmptyString();
-   mFriendlyName = StringTable->EmptyString();
-   mComponentType = StringTable->EmptyString();
-   mDescription = StringTable->EmptyString();
+   mSoundFilePath = StringTable->EmptyString();
 
-   mScriptFile = StringTable->EmptyString();
+   mPitchAdjust = 0;
+   mVolumeAdjust = 0;
+
+   //mSound = nullptr;
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::~ComponentAsset()
+SoundAsset::~SoundAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -113,36 +112,30 @@ ComponentAsset::~ComponentAsset()
 
 //-----------------------------------------------------------------------------
 
-void ComponentAsset::initPersistFields()
+void SoundAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("componentName", TypeString, Offset(mComponentName, ComponentAsset), "Unique Name of the component. Defines the namespace of the scripts for the component.");
-   addField("componentClass", TypeString, Offset(mComponentClass, ComponentAsset), "Class of object this component uses.");
-   addField("friendlyName", TypeString, Offset(mFriendlyName, ComponentAsset), "The human-readble name for the component.");
-   addField("componentType", TypeString, Offset(mComponentType, ComponentAsset), "The category of the component for organizing in the editor.");
-   addField("description", TypeString, Offset(mDescription, ComponentAsset), "Simple description of the component.");
+   addField("soundFilePath", TypeFilename, Offset(mSoundFilePath, SoundAsset), "Path to the sound file.");
 
-   addField("scriptFile", TypeString, Offset(mScriptFile, ComponentAsset), "A script file with additional scripted functionality for this component.");
+   addField("pitchAdjust", TypeF32, Offset(mPitchAdjust, SoundAsset), "Adjustment of the pitch value");
+   addField("volumeAdjust", TypeF32, Offset(mVolumeAdjust, SoundAsset), "Adjustment to the volume.");
 }
 
 //------------------------------------------------------------------------------
 
-void ComponentAsset::copyTo(SimObject* object)
+void SoundAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
 }
 
-void ComponentAsset::initializeAsset()
+void SoundAsset::initializeAsset(void)
 {
-   if(Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
 }
 
-void ComponentAsset::onAssetRefresh()
+void SoundAsset::onAssetRefresh(void)
 {
-   if (Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
+
 }

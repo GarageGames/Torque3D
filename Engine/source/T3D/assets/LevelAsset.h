@@ -20,8 +20,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#ifndef GAME_OBJECT_ASSET_H
-#define GAME_OBJECT_ASSET_H
+#ifndef LEVEL_ASSET_H
+#define LEVEL_ASSET_H
 
 #ifndef _ASSET_BASE_H_
 #include "assets/assetBase.h"
@@ -38,54 +38,35 @@
 #ifndef _ASSET_FIELD_TYPES_H_
 #include "assets/assetFieldTypes.h"
 #endif
-#ifndef _GUI_INSPECTOR_TYPES_H_
-#include "gui/editor/guiInspectorTypes.h"
-#endif
 
 //-----------------------------------------------------------------------------
-class GameObjectAsset : public AssetBase
+class LevelAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-   StringTableEntry mGameObjectName;
-   StringTableEntry mScriptFilePath;
-   StringTableEntry mTAMLFilePath;
+   StringTableEntry        mLevelFile;
+   StringTableEntry        mPreviewImage;
+
+   bool                    mIsSubLevel;
+   StringTableEntry        mMainLevelAsset;
 
 public:
-   GameObjectAsset();
-   virtual ~GameObjectAsset();
+   LevelAsset();
+   virtual ~LevelAsset();
 
    /// Engine.
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
 
    /// Declare Console Object.
-   DECLARE_CONOBJECT(GameObjectAsset);
+   DECLARE_CONOBJECT(LevelAsset);
 
 protected:
-   virtual void            initializeAsset(void);
-   virtual void            onAssetRefresh(void);
+   virtual void            initializeAsset(void) {}
+   virtual void            onAssetRefresh(void) {}
 };
 
-DefineConsoleType(TypeGameObjectAssetPtr, GameObjectAsset)
-
-
-//-----------------------------------------------------------------------------
-// TypeAssetId GuiInspectorField Class
-//-----------------------------------------------------------------------------
-class GuiInspectorTypeGameObjectAssetPtr : public GuiInspectorTypeFileName
-{
-   typedef GuiInspectorTypeFileName Parent;
-public:
-
-   GuiBitmapButtonCtrl  *mSMEdButton;
-
-   DECLARE_CONOBJECT(GuiInspectorTypeGameObjectAssetPtr);
-   static void consoleInit();
-
-   virtual GuiControl* constructEditControl();
-   virtual bool updateRects();
-};
+DefineConsoleType(TypeLevelAssetPtr, LevelAsset)
 
 #endif // _ASSET_BASE_H_
 

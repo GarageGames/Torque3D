@@ -6,5 +6,5 @@
     componentClass="Component"
     friendlyName="Player Spawner"
     componentType="Game"
-    scriptFile="core/components/game/playerSpawner.cs"
-    description="When a client connects, it spawns a player object for them and attaches them to it." />
+    description="When a client connects, it spawns a player object for them and attaches them to it."
+    scriptFile="core/components/game/playerSpawner.cs" />

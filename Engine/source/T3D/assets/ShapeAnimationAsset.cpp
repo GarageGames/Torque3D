@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef COMPONENT_ASSET_H
-#include "ComponentAsset.h"
+#ifndef SHAPE_ANIMATION_ASSET_H
+#include "ShapeAnimationAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -40,26 +40,28 @@
 #include "assets/assetPtr.h"
 #endif
 
+#include "core/resourceManager.h"
+
 // Debug Profiling.
 #include "platform/profiler.h"
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(ComponentAsset);
+IMPLEMENT_CONOBJECT(ShapeAnimationAsset);
 
-ConsoleType(ComponentAssetPtr, TypeComponentAssetPtr, ComponentAsset, ASSET_ID_FIELD_PREFIX)
+ConsoleType(ShapeAnimationAssetPtr, TypeShapeAnimationAssetPtr, ShapeAnimationAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType(TypeComponentAssetPtr)
+ConsoleGetType(TypeShapeAnimationAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<ComponentAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<ShapeAnimationAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeComponentAssetPtr)
+ConsoleSetType(TypeShapeAnimationAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +70,13 @@ ConsoleSetType(TypeComponentAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<ComponentAsset>* pAssetPtr = dynamic_cast<AssetPtr<ComponentAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<ShapeAnimationAsset>* pAssetPtr = dynamic_cast<AssetPtr<ShapeAnimationAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeComponentAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeShapeAnimationAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,25 +87,18 @@ ConsoleSetType(TypeComponentAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeComponentAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeShapeAnimationAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::ComponentAsset()
+ShapeAnimationAsset::ShapeAnimationAsset()
 {
-   mComponentName = StringTable->EmptyString();
-   mComponentClass = StringTable->EmptyString();
-   mFriendlyName = StringTable->EmptyString();
-   mComponentType = StringTable->EmptyString();
-   mDescription = StringTable->EmptyString();
-
-   mScriptFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::~ComponentAsset()
+ShapeAnimationAsset::~ShapeAnimationAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -113,36 +108,24 @@ ComponentAsset::~ComponentAsset()
 
 //-----------------------------------------------------------------------------
 
-void ComponentAsset::initPersistFields()
+void ShapeAnimationAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("componentName", TypeString, Offset(mComponentName, ComponentAsset), "Unique Name of the component. Defines the namespace of the scripts for the component.");
-   addField("componentClass", TypeString, Offset(mComponentClass, ComponentAsset), "Class of object this component uses.");
-   addField("friendlyName", TypeString, Offset(mFriendlyName, ComponentAsset), "The human-readble name for the component.");
-   addField("componentType", TypeString, Offset(mComponentType, ComponentAsset), "The category of the component for organizing in the editor.");
-   addField("description", TypeString, Offset(mDescription, ComponentAsset), "Simple description of the component.");
+   addField("animationFile", TypeFilename, Offset(mFileName, ShapeAnimationAsset), "Path to the file name containing the animation");
+   addField("animationName", TypeString, Offset(mAnimationName, ShapeAnimationAsset), "Name of the animation");
 
-   addField("scriptFile", TypeString, Offset(mScriptFile, ComponentAsset), "A script file with additional scripted functionality for this component.");
+   addField("startFrame", TypeS32, Offset(mStartFrame, ShapeAnimationAsset), "What frame does this animation clip start on");
+   addField("endFrame", TypeS32, Offset(mEndFrame, ShapeAnimationAsset), "What fram does this animation clip end on");
+   addField("padRotation", TypeBool, Offset(mPadRotation, ShapeAnimationAsset), "Are the rotation values padded");
+   addField("padTransforms", TypeBool, Offset(mPadTransforms, ShapeAnimationAsset), "Are the transform values padded");
 }
 
 //------------------------------------------------------------------------------
 
-void ComponentAsset::copyTo(SimObject* object)
+void ShapeAnimationAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
-}
-
-void ComponentAsset::initializeAsset()
-{
-   if(Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
-}
-
-void ComponentAsset::onAssetRefresh()
-{
-   if (Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
 }

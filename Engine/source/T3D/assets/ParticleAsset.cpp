@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef GAME_OBJECT_ASSET_H
-#include "GameObjectAsset.h"
+#ifndef PARTICLE_ASSET_H
+#include "ParticleAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -45,21 +45,21 @@
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(GameObjectAsset);
+IMPLEMENT_CONOBJECT(ParticleAsset);
 
-ConsoleType(GameObjectAssetPtr, TypeGameObjectAssetPtr, GameObjectAsset, ASSET_ID_FIELD_PREFIX)
+ConsoleType(ParticleAssetPtr, TypeParticleAssetPtr, ParticleAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType(TypeGameObjectAssetPtr)
+ConsoleGetType(TypeParticleAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<GameObjectAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<ParticleAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeGameObjectAssetPtr)
+ConsoleSetType(TypeParticleAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +68,13 @@ ConsoleSetType(TypeGameObjectAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<GameObjectAsset>* pAssetPtr = dynamic_cast<AssetPtr<GameObjectAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<ParticleAsset>* pAssetPtr = dynamic_cast<AssetPtr<ParticleAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeGameObjectAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeParticleAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,21 +85,20 @@ ConsoleSetType(TypeGameObjectAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeGameObjectAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeParticleAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-GameObjectAsset::GameObjectAsset()
+ParticleAsset::ParticleAsset()
 {
-   mGameObjectName = StringTable->lookup("");
-   mScriptFilePath = StringTable->lookup("");
-   mTAMLFilePath = StringTable->lookup("");
+   mScriptFilePath = StringTable->EmptyString();
+   mDatablockFilePath = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
 
-GameObjectAsset::~GameObjectAsset()
+ParticleAsset::~ParticleAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -109,56 +108,44 @@ GameObjectAsset::~GameObjectAsset()
 
 //-----------------------------------------------------------------------------
 
-void GameObjectAsset::initPersistFields()
+void ParticleAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("gameObjectName", TypeString, Offset(mGameObjectName, GameObjectAsset), "Name of the game object. Defines the created object's class.");
-   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, GameObjectAsset), "Path to the script file for the GameObject's script code.");
-   addField("TAMLFilePath", TypeString, Offset(mTAMLFilePath, GameObjectAsset), "Path to the taml file for the GameObject's heirarchy.");
+   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, ParticleAsset), "Path to the script file for the particle effect");
+   addField("DatablockFilePath", TypeString, Offset(mDatablockFilePath, ParticleAsset), "Path to the datablock file");
 }
 
 //------------------------------------------------------------------------------
 
-void GameObjectAsset::copyTo(SimObject* object)
+void ParticleAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
 }
 
-void GameObjectAsset::initializeAsset()
-{
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
-}
-
-void GameObjectAsset::onAssetRefresh()
-{
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
-}
 
 //-----------------------------------------------------------------------------
 // GuiInspectorTypeAssetId
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(GuiInspectorTypeGameObjectAssetPtr);
+IMPLEMENT_CONOBJECT(GuiInspectorTypeParticleAssetPtr);
 
-ConsoleDocClass(GuiInspectorTypeGameObjectAssetPtr,
-   "@brief Inspector field type for Game Objects\n\n"
+ConsoleDocClass(GuiInspectorTypeParticleAssetPtr,
+   "@brief Inspector field type for Partial Asset Objects\n\n"
    "Editor use only.\n\n"
    "@internal"
 );
 
-void GuiInspectorTypeGameObjectAssetPtr::consoleInit()
+void GuiInspectorTypeParticleAssetPtr::consoleInit()
 {
    Parent::consoleInit();
 
-   ConsoleBaseType::getType(TypeGameObjectAssetPtr)->setInspectorFieldType("GuiInspectorTypeGameObjectAssetPtr");
+   ConsoleBaseType::getType(TypeParticleAssetPtr)->setInspectorFieldType("GuiInspectorTypeParticleAssetPtr");
 }
 
-GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
+GuiControl* GuiInspectorTypeParticleAssetPtr::constructEditControl()
 {
    // Create base filename edit controls
    GuiControl *retCtrl = Parent::constructEditControl();
@@ -167,7 +154,7 @@ GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
 
    // Change filespec
    char szBuffer[512];
-   dSprintf(szBuffer, sizeof(szBuffer), "AssetBrowser.showDialog(\"GameObjectAsset\", \"AssetBrowser.changeAsset\", %d, %s);",
+   dSprintf(szBuffer, sizeof(szBuffer), "AssetBrowser.showDialog(\"ParticleAsset\", \"AssetBrowser.changeAsset\", %d, %s);",
       mInspector->getComponentGroupTargetId(), mCaption);
    mBrowseButton->setField("Command", szBuffer);
 
@@ -191,7 +178,7 @@ GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
    return retCtrl;
 }
 
-bool GuiInspectorTypeGameObjectAssetPtr::updateRects()
+bool GuiInspectorTypeParticleAssetPtr::updateRects()
 {
    S32 dividerPos, dividerMargin;
    mInspector->getDivider(dividerPos, dividerMargin);

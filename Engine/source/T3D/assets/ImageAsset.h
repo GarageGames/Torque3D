@@ -20,8 +20,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#ifndef GAME_OBJECT_ASSET_H
-#define GAME_OBJECT_ASSET_H
+#ifndef IMAGE_ASSET_H
+#define IMAGE_ASSET_H
 
 #ifndef _ASSET_BASE_H_
 #include "assets/assetBase.h"
@@ -38,54 +38,53 @@
 #ifndef _ASSET_FIELD_TYPES_H_
 #include "assets/assetFieldTypes.h"
 #endif
-#ifndef _GUI_INSPECTOR_TYPES_H_
-#include "gui/editor/guiInspectorTypes.h"
-#endif
+
+#include "gfx/bitmap/gBitmap.h"
+#include "gfx/gfxTextureHandle.h"
 
 //-----------------------------------------------------------------------------
-class GameObjectAsset : public AssetBase
+class ImageAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-   StringTableEntry mGameObjectName;
-   StringTableEntry mScriptFilePath;
-   StringTableEntry mTAMLFilePath;
+   AssetManager*           mpOwningAssetManager;
+   bool                    mAssetInitialized;
+   AssetDefinition*        mpAssetDefinition;
+   U32                     mAcquireReferenceCount;
+
+   StringTableEntry mImageFileName;
+
+   GFXTexHandle mImage;
+
+   bool mIsValidImage;
+   bool mUseMips;
+   bool mIsHDRImage;
 
 public:
-   GameObjectAsset();
-   virtual ~GameObjectAsset();
+   ImageAsset();
+   virtual ~ImageAsset();
 
    /// Engine.
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
 
    /// Declare Console Object.
-   DECLARE_CONOBJECT(GameObjectAsset);
+   DECLARE_CONOBJECT(ImageAsset);
+
+   StringTableEntry getImageFileName() { return mImageFileName; }
+
+   bool isValid() { return mIsValidImage; }
+
+   GFXTexHandle* getImage() { return &mImage; }
 
 protected:
    virtual void            initializeAsset(void);
    virtual void            onAssetRefresh(void);
+
+   void loadImage();
 };
 
-DefineConsoleType(TypeGameObjectAssetPtr, GameObjectAsset)
+DefineConsoleType(TypeImageAssetPtr, ImageAsset)
 
-
-//-----------------------------------------------------------------------------
-// TypeAssetId GuiInspectorField Class
-//-----------------------------------------------------------------------------
-class GuiInspectorTypeGameObjectAssetPtr : public GuiInspectorTypeFileName
-{
-   typedef GuiInspectorTypeFileName Parent;
-public:
-
-   GuiBitmapButtonCtrl  *mSMEdButton;
-
-   DECLARE_CONOBJECT(GuiInspectorTypeGameObjectAssetPtr);
-   static void consoleInit();
-
-   virtual GuiControl* constructEditControl();
-   virtual bool updateRects();
-};
-
-#endif // _ASSET_BASE_H_
+#endif
 

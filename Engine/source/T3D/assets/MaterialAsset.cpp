@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef GAME_OBJECT_ASSET_H
-#include "GameObjectAsset.h"
+#ifndef MATERIALASSET_H
+#include "MaterialAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -40,26 +40,23 @@
 #include "assets/assetPtr.h"
 #endif
 
-// Debug Profiling.
-#include "platform/profiler.h"
+//-----------------------------------------------------------------------------
+
+IMPLEMENT_CONOBJECT(MaterialAsset);
+
+ConsoleType(MaterialAssetPtr, TypeMaterialAssetPtr, MaterialAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(GameObjectAsset);
-
-ConsoleType(GameObjectAssetPtr, TypeGameObjectAssetPtr, GameObjectAsset, ASSET_ID_FIELD_PREFIX)
-
-//-----------------------------------------------------------------------------
-
-ConsoleGetType(TypeGameObjectAssetPtr)
+ConsoleGetType(TypeMaterialAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<GameObjectAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<MaterialAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeGameObjectAssetPtr)
+ConsoleSetType(TypeMaterialAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +65,13 @@ ConsoleSetType(TypeGameObjectAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<GameObjectAsset>* pAssetPtr = dynamic_cast<AssetPtr<GameObjectAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<MaterialAsset>* pAssetPtr = dynamic_cast<AssetPtr<MaterialAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeGameObjectAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeMaterialAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,21 +82,21 @@ ConsoleSetType(TypeGameObjectAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeGameObjectAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeMaterialAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-GameObjectAsset::GameObjectAsset()
+MaterialAsset::MaterialAsset()
 {
-   mGameObjectName = StringTable->lookup("");
-   mScriptFilePath = StringTable->lookup("");
-   mTAMLFilePath = StringTable->lookup("");
+   mShaderGraphFile = "";
+   mScriptFile = "";
+   mMatDefinitionName = "";
 }
 
 //-----------------------------------------------------------------------------
 
-GameObjectAsset::~GameObjectAsset()
+MaterialAsset::~MaterialAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -109,56 +106,82 @@ GameObjectAsset::~GameObjectAsset()
 
 //-----------------------------------------------------------------------------
 
-void GameObjectAsset::initPersistFields()
+void MaterialAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("gameObjectName", TypeString, Offset(mGameObjectName, GameObjectAsset), "Name of the game object. Defines the created object's class.");
-   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, GameObjectAsset), "Path to the script file for the GameObject's script code.");
-   addField("TAMLFilePath", TypeString, Offset(mTAMLFilePath, GameObjectAsset), "Path to the taml file for the GameObject's heirarchy.");
+   //addField("shaderGraph", TypeRealString, Offset(mShaderGraphFile, MaterialAsset), "");
+   addField("scriptFile", TypeRealString, Offset(mScriptFile, MaterialAsset), "Path to the file containing the material definition.");
+   addField("materialDefinitionName", TypeRealString, Offset(mMatDefinitionName, MaterialAsset), "Name of the material definition this asset is for.");
+}
+
+void MaterialAsset::initializeAsset()
+{
+   // Call parent.
+   Parent::initializeAsset();
+
+   compileShader();
+
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
+}
+
+void MaterialAsset::onAssetRefresh()
+{
+   if (Platform::isFile(mScriptFile))
+      Con::executeFile(mScriptFile, false, false);
+
+   if (!mMatDefinitionName.isEmpty())
+   {
+      Material* matDef;
+      if (!Sim::findObject(mMatDefinitionName.c_str(), matDef))
+      {
+         Con::errorf("MaterialAsset: Unable to find the Material %s", mMatDefinitionName.c_str());
+         return;
+      }
+
+      matDef->reload();
+   }
 }
 
 //------------------------------------------------------------------------------
 
-void GameObjectAsset::copyTo(SimObject* object)
+void MaterialAsset::compileShader()
+{
+}
+
+void MaterialAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
 }
 
-void GameObjectAsset::initializeAsset()
+ConsoleMethod(MaterialAsset, compileShader, void, 2, 2, "() - Compiles the material's generated shader, if any. Not yet implemented\n")
 {
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
-}
-
-void GameObjectAsset::onAssetRefresh()
-{
-   if (Platform::isFile(mScriptFilePath))
-      Con::executeFile(mScriptFilePath, false, false);
+   object->compileShader();
 }
 
 //-----------------------------------------------------------------------------
 // GuiInspectorTypeAssetId
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(GuiInspectorTypeGameObjectAssetPtr);
+IMPLEMENT_CONOBJECT(GuiInspectorTypeMaterialAssetPtr);
 
-ConsoleDocClass(GuiInspectorTypeGameObjectAssetPtr,
-   "@brief Inspector field type for Game Objects\n\n"
+ConsoleDocClass(GuiInspectorTypeMaterialAssetPtr,
+   "@brief Inspector field type for Material Asset Objects\n\n"
    "Editor use only.\n\n"
    "@internal"
 );
 
-void GuiInspectorTypeGameObjectAssetPtr::consoleInit()
+void GuiInspectorTypeMaterialAssetPtr::consoleInit()
 {
    Parent::consoleInit();
 
-   ConsoleBaseType::getType(TypeGameObjectAssetPtr)->setInspectorFieldType("GuiInspectorTypeGameObjectAssetPtr");
+   ConsoleBaseType::getType(TypeMaterialAssetPtr)->setInspectorFieldType("GuiInspectorTypeMaterialAssetPtr");
 }
 
-GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
+GuiControl* GuiInspectorTypeMaterialAssetPtr::constructEditControl()
 {
    // Create base filename edit controls
    GuiControl *retCtrl = Parent::constructEditControl();
@@ -167,7 +190,7 @@ GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
 
    // Change filespec
    char szBuffer[512];
-   dSprintf(szBuffer, sizeof(szBuffer), "AssetBrowser.showDialog(\"GameObjectAsset\", \"AssetBrowser.changeAsset\", %d, %s);",
+   dSprintf(szBuffer, sizeof(szBuffer), "AssetBrowser.showDialog(\"MaterialAsset\", \"AssetBrowser.changeAsset\", %d, %s);",
       mInspector->getComponentGroupTargetId(), mCaption);
    mBrowseButton->setField("Command", szBuffer);
 
@@ -183,7 +206,7 @@ GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
    mSMEdButton->setDataField(StringTable->insert("Profile"), NULL, "GuiButtonProfile");
    mSMEdButton->setDataField(StringTable->insert("tooltipprofile"), NULL, "GuiToolTipProfile");
    mSMEdButton->setDataField(StringTable->insert("hovertime"), NULL, "1000");
-   mSMEdButton->setDataField(StringTable->insert("tooltip"), NULL, "Open this file in the State Machine Editor");
+   mSMEdButton->setDataField(StringTable->insert("tooltip"), NULL, "Open this file in the Material Editor");
 
    mSMEdButton->registerObject();
    addObject(mSMEdButton);
@@ -191,7 +214,7 @@ GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
    return retCtrl;
 }
 
-bool GuiInspectorTypeGameObjectAssetPtr::updateRects()
+bool GuiInspectorTypeMaterialAssetPtr::updateRects()
 {
    S32 dividerPos, dividerMargin;
    mInspector->getDivider(dividerPos, dividerMargin);

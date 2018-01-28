@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef COMPONENT_ASSET_H
-#include "ComponentAsset.h"
+#ifndef POSTEFFECT_ASSET_H
+#include "PostEffectAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -45,21 +45,21 @@
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(ComponentAsset);
+IMPLEMENT_CONOBJECT(PostEffectAsset);
 
-ConsoleType(ComponentAssetPtr, TypeComponentAssetPtr, ComponentAsset, ASSET_ID_FIELD_PREFIX)
+ConsoleType(PostEffectAssetPtr, TypePostEffectAssetPtr, PostEffectAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType(TypeComponentAssetPtr)
+ConsoleGetType(TypePostEffectAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<ComponentAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<PostEffectAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeComponentAssetPtr)
+ConsoleSetType(TypePostEffectAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +68,13 @@ ConsoleSetType(TypeComponentAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<ComponentAsset>* pAssetPtr = dynamic_cast<AssetPtr<ComponentAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<PostEffectAsset>* pAssetPtr = dynamic_cast<AssetPtr<PostEffectAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeComponentAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypePostEffectAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,25 +85,19 @@ ConsoleSetType(TypeComponentAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeComponentAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypePostEffectAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::ComponentAsset()
+PostEffectAsset::PostEffectAsset()
 {
-   mComponentName = StringTable->EmptyString();
-   mComponentClass = StringTable->EmptyString();
-   mFriendlyName = StringTable->EmptyString();
-   mComponentType = StringTable->EmptyString();
-   mDescription = StringTable->EmptyString();
-
    mScriptFile = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::~ComponentAsset()
+PostEffectAsset::~PostEffectAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -113,36 +107,23 @@ ComponentAsset::~ComponentAsset()
 
 //-----------------------------------------------------------------------------
 
-void ComponentAsset::initPersistFields()
+void PostEffectAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("componentName", TypeString, Offset(mComponentName, ComponentAsset), "Unique Name of the component. Defines the namespace of the scripts for the component.");
-   addField("componentClass", TypeString, Offset(mComponentClass, ComponentAsset), "Class of object this component uses.");
-   addField("friendlyName", TypeString, Offset(mFriendlyName, ComponentAsset), "The human-readble name for the component.");
-   addField("componentType", TypeString, Offset(mComponentType, ComponentAsset), "The category of the component for organizing in the editor.");
-   addField("description", TypeString, Offset(mDescription, ComponentAsset), "Simple description of the component.");
-
-   addField("scriptFile", TypeString, Offset(mScriptFile, ComponentAsset), "A script file with additional scripted functionality for this component.");
+   addField("scriptFile", TypeString, Offset(mScriptFile, PostEffectAsset), "Path to the script file.");
 }
 
 //------------------------------------------------------------------------------
 
-void ComponentAsset::copyTo(SimObject* object)
+void PostEffectAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
 }
 
-void ComponentAsset::initializeAsset()
+void PostEffectAsset::initializeAsset()
 {
-   if(Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
-}
-
-void ComponentAsset::onAssetRefresh()
-{
-   if (Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
+   //mPostEffect = new PostEffect();
 }

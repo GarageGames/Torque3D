@@ -19,9 +19,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-
-#ifndef COMPONENT_ASSET_H
-#include "ComponentAsset.h"
+#ifndef SCRIPT_ASSET_H
+#include "ScriptAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -45,21 +44,21 @@
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(ComponentAsset);
+IMPLEMENT_CONOBJECT(ScriptAsset);
 
-ConsoleType(ComponentAssetPtr, TypeComponentAssetPtr, ComponentAsset, ASSET_ID_FIELD_PREFIX)
+ConsoleType(ScriptAssetPtr, TypeScriptAssetPtr, ScriptAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType(TypeComponentAssetPtr)
+ConsoleGetType(TypeScriptAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<ComponentAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<ScriptAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeComponentAssetPtr)
+ConsoleSetType(TypeScriptAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +67,13 @@ ConsoleSetType(TypeComponentAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<ComponentAsset>* pAssetPtr = dynamic_cast<AssetPtr<ComponentAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<ScriptAsset>* pAssetPtr = dynamic_cast<AssetPtr<ScriptAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeComponentAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeScriptAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,25 +84,19 @@ ConsoleSetType(TypeComponentAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeComponentAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeScriptAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::ComponentAsset()
+ScriptAsset::ScriptAsset()
 {
-   mComponentName = StringTable->EmptyString();
-   mComponentClass = StringTable->EmptyString();
-   mFriendlyName = StringTable->EmptyString();
-   mComponentType = StringTable->EmptyString();
-   mDescription = StringTable->EmptyString();
-
-   mScriptFile = StringTable->EmptyString();
+   mScriptFilePath = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::~ComponentAsset()
+ScriptAsset::~ScriptAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -113,36 +106,32 @@ ComponentAsset::~ComponentAsset()
 
 //-----------------------------------------------------------------------------
 
-void ComponentAsset::initPersistFields()
+void ScriptAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("componentName", TypeString, Offset(mComponentName, ComponentAsset), "Unique Name of the component. Defines the namespace of the scripts for the component.");
-   addField("componentClass", TypeString, Offset(mComponentClass, ComponentAsset), "Class of object this component uses.");
-   addField("friendlyName", TypeString, Offset(mFriendlyName, ComponentAsset), "The human-readble name for the component.");
-   addField("componentType", TypeString, Offset(mComponentType, ComponentAsset), "The category of the component for organizing in the editor.");
-   addField("description", TypeString, Offset(mDescription, ComponentAsset), "Simple description of the component.");
+   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, ScriptAsset), "Path to the script file.");
+   addField("isServerSide", TypeBool, Offset(mIsServerSide, ScriptAsset), "Is this script file to be run on the server side?");
 
-   addField("scriptFile", TypeString, Offset(mScriptFile, ComponentAsset), "A script file with additional scripted functionality for this component.");
 }
 
 //------------------------------------------------------------------------------
 
-void ComponentAsset::copyTo(SimObject* object)
+void ScriptAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
 }
 
-void ComponentAsset::initializeAsset()
+void ScriptAsset::initializeAsset()
 {
-   if(Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
+   if (Platform::isFile(mScriptFilePath))
+      Con::executeFile(mScriptFilePath, false, false);
 }
 
-void ComponentAsset::onAssetRefresh()
+void ScriptAsset::onAssetRefresh()
 {
-   if (Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
+   if (Platform::isFile(mScriptFilePath))
+      Con::executeFile(mScriptFilePath, false, false);
 }

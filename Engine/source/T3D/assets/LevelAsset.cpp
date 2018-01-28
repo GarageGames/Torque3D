@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef COMPONENT_ASSET_H
-#include "ComponentAsset.h"
+#ifndef LEVEL_ASSET_H
+#include "LevelAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -45,21 +45,21 @@
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(ComponentAsset);
+IMPLEMENT_CONOBJECT(LevelAsset);
 
-ConsoleType(ComponentAssetPtr, TypeComponentAssetPtr, ComponentAsset, ASSET_ID_FIELD_PREFIX)
+ConsoleType(LevelAssetPtr, TypeLevelAssetPtr, LevelAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType(TypeComponentAssetPtr)
+ConsoleGetType(TypeLevelAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<ComponentAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<LevelAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeComponentAssetPtr)
+ConsoleSetType(TypeLevelAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +68,13 @@ ConsoleSetType(TypeComponentAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<ComponentAsset>* pAssetPtr = dynamic_cast<AssetPtr<ComponentAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<LevelAsset>* pAssetPtr = dynamic_cast<AssetPtr<LevelAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeComponentAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeLevelAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,25 +85,20 @@ ConsoleSetType(TypeComponentAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeComponentAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeLevelAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::ComponentAsset()
+LevelAsset::LevelAsset()
 {
-   mComponentName = StringTable->EmptyString();
-   mComponentClass = StringTable->EmptyString();
-   mFriendlyName = StringTable->EmptyString();
-   mComponentType = StringTable->EmptyString();
-   mDescription = StringTable->EmptyString();
-
-   mScriptFile = StringTable->EmptyString();
+   mLevelFile = StringTable->EmptyString();
+   mPreviewImage = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
 
-ComponentAsset::~ComponentAsset()
+LevelAsset::~LevelAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -113,36 +108,19 @@ ComponentAsset::~ComponentAsset()
 
 //-----------------------------------------------------------------------------
 
-void ComponentAsset::initPersistFields()
+void LevelAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("componentName", TypeString, Offset(mComponentName, ComponentAsset), "Unique Name of the component. Defines the namespace of the scripts for the component.");
-   addField("componentClass", TypeString, Offset(mComponentClass, ComponentAsset), "Class of object this component uses.");
-   addField("friendlyName", TypeString, Offset(mFriendlyName, ComponentAsset), "The human-readble name for the component.");
-   addField("componentType", TypeString, Offset(mComponentType, ComponentAsset), "The category of the component for organizing in the editor.");
-   addField("description", TypeString, Offset(mDescription, ComponentAsset), "Simple description of the component.");
-
-   addField("scriptFile", TypeString, Offset(mScriptFile, ComponentAsset), "A script file with additional scripted functionality for this component.");
+   addField("LevelFile", TypeString, Offset(mLevelFile, LevelAsset), "Path to the actual level file.");
+   addField("PreviewImage", TypeString, Offset(mPreviewImage, LevelAsset), "Path to the image used for selection preview.");
 }
 
 //------------------------------------------------------------------------------
 
-void ComponentAsset::copyTo(SimObject* object)
+void LevelAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
-}
-
-void ComponentAsset::initializeAsset()
-{
-   if(Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
-}
-
-void ComponentAsset::onAssetRefresh()
-{
-   if (Platform::isFile(mScriptFile))
-      Con::executeFile(mScriptFile, false, false);
 }

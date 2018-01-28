@@ -1,3 +1,4 @@
+#pragma once
 //-----------------------------------------------------------------------------
 // Copyright (c) 2013 GarageGames, LLC
 //
@@ -19,8 +20,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-#ifndef SHAPE_ASSET_H
-#define SHAPE_ASSET_H
+#ifndef STATE_MACHINE_ASSET_H
+#define STATE_MACHINE_ASSET_H
 
 #ifndef _ASSET_BASE_H_
 #include "assets/assetBase.h"
@@ -38,88 +39,46 @@
 #include "assets/assetFieldTypes.h"
 #endif
 
-#ifndef _TSSHAPE_H_
-#include "ts/tsShape.h"
-#endif
-#ifndef __RESOURCE_H__
-#include "core/resource.h"
-#endif
-#ifndef _ASSET_PTR_H_
-#include "assets/assetPtr.h"
-#endif 
-#ifndef MATERIALASSET_H
-#include "MaterialAsset.h"
-#endif
-#ifndef SHAPE_ANIMATION_ASSET_H
-#include "ShapeAnimationAsset.h"
-#endif
-
 #include "gui/editor/guiInspectorTypes.h"
 
 //-----------------------------------------------------------------------------
-class ShapeAsset : public AssetBase
+class StateMachineAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-protected:
-   StringTableEntry   mFileName;
-   Resource<TSShape>	 mShape;
-
-   //Material assets we're dependent on and use
-   Vector<StringTableEntry> mMaterialAssetIds;
-   Vector<AssetPtr<MaterialAsset>> mMaterialAssets;
-
-   //Animation assets we're dependent on and use
-   Vector<StringTableEntry> mAnimationAssetIds;
-   Vector<AssetPtr<ShapeAnimationAsset>> mAnimationAssets;
+   StringTableEntry mStateMachineFileName;
 
 public:
-   ShapeAsset();
-   virtual ~ShapeAsset();
+   StateMachineAsset();
+   virtual ~StateMachineAsset();
 
    /// Engine.
    static void initPersistFields();
    virtual void copyTo(SimObject* object);
 
-   virtual void setDataField(StringTableEntry slotName, const char *array, const char *value);
-
-   virtual void initializeAsset();
-
    /// Declare Console Object.
-   DECLARE_CONOBJECT(ShapeAsset);
+   DECLARE_CONOBJECT(StateMachineAsset);
 
-   bool loadShape();
-
-   TSShape* getShape() { return mShape; }
-
-   Resource<TSShape> getShapeResource() { return mShape; }
-
-   void SplitSequencePathAndName(String& srcPath, String& srcName);
-   String getShapeFilename() { return mFileName; }
-   
-   U32 getShapeFilenameHash() { return _StringTable::hashString(mFileName); }
-
-   S32 getMaterialCount() { return mMaterialAssets.size(); }
-   S32 getAnimationCount() { return mAnimationAssets.size(); }
-   ShapeAnimationAsset* getAnimation(S32 index);
+   StringTableEntry getStateMachineFileName() { return mStateMachineFileName; }
 
 protected:
-   virtual void            onAssetRefresh(void);
+   virtual void            initializeAsset(void) {}
+   virtual void            onAssetRefresh(void) {}
 };
 
-DefineConsoleType(TypeShapeAssetPtr, S32)
+DefineConsoleType(TypeStateMachineAssetPtr, StateMachineAsset)
 
 //-----------------------------------------------------------------------------
 // TypeAssetId GuiInspectorField Class
 //-----------------------------------------------------------------------------
-class GuiInspectorTypeShapeAssetPtr : public GuiInspectorTypeFileName
+class GuiInspectorTypeStateMachineAssetPtr : public GuiInspectorTypeFileName
 {
    typedef GuiInspectorTypeFileName Parent;
 public:
 
-   GuiBitmapButtonCtrl  *mShapeEdButton;
+   GuiBitmapButtonCtrl  *mSMEdButton;
 
-   DECLARE_CONOBJECT(GuiInspectorTypeShapeAssetPtr);
+   DECLARE_CONOBJECT(GuiInspectorTypeStateMachineAssetPtr);
    static void consoleInit();
 
    virtual GuiControl* constructEditControl();

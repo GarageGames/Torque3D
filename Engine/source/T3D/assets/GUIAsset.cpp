@@ -20,8 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#ifndef GAME_OBJECT_ASSET_H
-#include "GameObjectAsset.h"
+#ifndef GUI_ASSET_H
+#include "GUIAsset.h"
 #endif
 
 #ifndef _ASSET_MANAGER_H_
@@ -45,21 +45,21 @@
 
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(GameObjectAsset);
+IMPLEMENT_CONOBJECT(GUIAsset);
 
-ConsoleType(GameObjectAssetPtr, TypeGameObjectAssetPtr, GameObjectAsset, ASSET_ID_FIELD_PREFIX)
+ConsoleType(GUIAssetPtr, TypeGUIAssetPtr, GUIAsset, ASSET_ID_FIELD_PREFIX)
 
 //-----------------------------------------------------------------------------
 
-ConsoleGetType(TypeGameObjectAssetPtr)
+ConsoleGetType(TypeGUIAssetPtr)
 {
    // Fetch asset Id.
-   return (*((AssetPtr<GameObjectAsset>*)dptr)).getAssetId();
+   return (*((AssetPtr<GUIAsset>*)dptr)).getAssetId();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleSetType(TypeGameObjectAssetPtr)
+ConsoleSetType(TypeGUIAssetPtr)
 {
    // Was a single argument specified?
    if (argc == 1)
@@ -68,13 +68,13 @@ ConsoleSetType(TypeGameObjectAssetPtr)
       const char* pFieldValue = argv[0];
 
       // Fetch asset pointer.
-      AssetPtr<GameObjectAsset>* pAssetPtr = dynamic_cast<AssetPtr<GameObjectAsset>*>((AssetPtrBase*)(dptr));
+      AssetPtr<GUIAsset>* pAssetPtr = dynamic_cast<AssetPtr<GUIAsset>*>((AssetPtrBase*)(dptr));
 
       // Is the asset pointer the correct type?
       if (pAssetPtr == NULL)
       {
          // No, so fail.
-         //Con::warnf("(TypeGameObjectAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
+         //Con::warnf("(TypeGUIAssetPtr) - Failed to set asset Id '%d'.", pFieldValue);
          return;
       }
 
@@ -85,21 +85,20 @@ ConsoleSetType(TypeGameObjectAssetPtr)
    }
 
    // Warn.
-   Con::warnf("(TypeGameObjectAssetPtr) - Cannot set multiple args to a single asset.");
+   Con::warnf("(TypeGUIAssetPtr) - Cannot set multiple args to a single asset.");
 }
 
 //-----------------------------------------------------------------------------
 
-GameObjectAsset::GameObjectAsset()
+GUIAsset::GUIAsset()
 {
-   mGameObjectName = StringTable->lookup("");
-   mScriptFilePath = StringTable->lookup("");
-   mTAMLFilePath = StringTable->lookup("");
+   mScriptFilePath = StringTable->EmptyString();
+   mGUIFilePath = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
 
-GameObjectAsset::~GameObjectAsset()
+GUIAsset::~GUIAsset()
 {
    // If the asset manager does not own the asset then we own the
    // asset definition so delete it.
@@ -109,32 +108,37 @@ GameObjectAsset::~GameObjectAsset()
 
 //-----------------------------------------------------------------------------
 
-void GameObjectAsset::initPersistFields()
+void GUIAsset::initPersistFields()
 {
    // Call parent.
    Parent::initPersistFields();
 
-   addField("gameObjectName", TypeString, Offset(mGameObjectName, GameObjectAsset), "Name of the game object. Defines the created object's class.");
-   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, GameObjectAsset), "Path to the script file for the GameObject's script code.");
-   addField("TAMLFilePath", TypeString, Offset(mTAMLFilePath, GameObjectAsset), "Path to the taml file for the GameObject's heirarchy.");
+   addField("scriptFilePath", TypeString, Offset(mScriptFilePath, GUIAsset), "Path to the script file for the gui");
+   addField("GUIFilePath", TypeString, Offset(mGUIFilePath, GUIAsset), "Path to the gui file");
 }
 
 //------------------------------------------------------------------------------
 
-void GameObjectAsset::copyTo(SimObject* object)
+void GUIAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
 }
 
-void GameObjectAsset::initializeAsset()
+void GUIAsset::initializeAsset()
 {
+   if (Platform::isFile(mGUIFilePath))
+      Con::executeFile(mGUIFilePath, false, false);
+
    if (Platform::isFile(mScriptFilePath))
       Con::executeFile(mScriptFilePath, false, false);
 }
 
-void GameObjectAsset::onAssetRefresh()
+void GUIAsset::onAssetRefresh()
 {
+   if (Platform::isFile(mGUIFilePath))
+      Con::executeFile(mGUIFilePath, false, false);
+
    if (Platform::isFile(mScriptFilePath))
       Con::executeFile(mScriptFilePath, false, false);
 }
@@ -143,22 +147,22 @@ void GameObjectAsset::onAssetRefresh()
 // GuiInspectorTypeAssetId
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_CONOBJECT(GuiInspectorTypeGameObjectAssetPtr);
+IMPLEMENT_CONOBJECT(GuiInspectorTypeGUIAssetPtr);
 
-ConsoleDocClass(GuiInspectorTypeGameObjectAssetPtr,
-   "@brief Inspector field type for Game Objects\n\n"
+ConsoleDocClass(GuiInspectorTypeGUIAssetPtr,
+   "@brief Inspector field type for GUI Asset Objects\n\n"
    "Editor use only.\n\n"
    "@internal"
 );
 
-void GuiInspectorTypeGameObjectAssetPtr::consoleInit()
+void GuiInspectorTypeGUIAssetPtr::consoleInit()
 {
    Parent::consoleInit();
 
-   ConsoleBaseType::getType(TypeGameObjectAssetPtr)->setInspectorFieldType("GuiInspectorTypeGameObjectAssetPtr");
+   ConsoleBaseType::getType(TypeGUIAssetPtr)->setInspectorFieldType("GuiInspectorTypeGUIAssetPtr");
 }
 
-GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
+GuiControl* GuiInspectorTypeGUIAssetPtr::constructEditControl()
 {
    // Create base filename edit controls
    GuiControl *retCtrl = Parent::constructEditControl();
@@ -167,7 +171,7 @@ GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
 
    // Change filespec
    char szBuffer[512];
-   dSprintf(szBuffer, sizeof(szBuffer), "AssetBrowser.showDialog(\"GameObjectAsset\", \"AssetBrowser.changeAsset\", %d, %s);",
+   dSprintf(szBuffer, sizeof(szBuffer), "AssetBrowser.showDialog(\"GUIAsset\", \"AssetBrowser.changeAsset\", %d, %s);",
       mInspector->getComponentGroupTargetId(), mCaption);
    mBrowseButton->setField("Command", szBuffer);
 
@@ -191,7 +195,7 @@ GuiControl* GuiInspectorTypeGameObjectAssetPtr::constructEditControl()
    return retCtrl;
 }
 
-bool GuiInspectorTypeGameObjectAssetPtr::updateRects()
+bool GuiInspectorTypeGUIAssetPtr::updateRects()
 {
    S32 dividerPos, dividerMargin;
    mInspector->getDivider(dividerPos, dividerMargin);

@@ -44,16 +44,13 @@ class ComponentAsset : public AssetBase
 {
    typedef AssetBase Parent;
 
-   AssetManager*           mpOwningAssetManager;
-   bool                    mAssetInitialized;
-   AssetDefinition*        mpAssetDefinition;
-   U32                     mAcquireReferenceCount;
-
    StringTableEntry mComponentName;
    StringTableEntry mComponentClass;
    StringTableEntry mFriendlyName;
    StringTableEntry mComponentType;
    StringTableEntry mDescription;
+
+   StringTableEntry mScriptFile;
 
 public:
    ComponentAsset();
@@ -69,12 +66,20 @@ public:
    StringTableEntry getComponentName() { return mComponentName; }
    StringTableEntry getComponentClass() { return mComponentClass; }
    StringTableEntry getFriendlyName() { return mFriendlyName; }
-   StringTableEntry getFriendlyType() { return mComponentType; }
+   StringTableEntry getComponentType() { return mComponentType; }
    StringTableEntry getDescription() { return mDescription; }
 
+   void setComponentName(StringTableEntry name) { mComponentName = name; }
+   void setComponentClass(StringTableEntry name) { mComponentClass = name; }
+   void setFriendlyName(StringTableEntry name) { mFriendlyName = name; }
+   void setComponentType(StringTableEntry typeName) { mComponentType = typeName; }
+   void setDescription(StringTableEntry description) { mDescription = description; }
+
+   AssetDefinition* getAssetDefinition() { return mpAssetDefinition; }
+
 protected:
-   virtual void            initializeAsset(void) {}
-   virtual void            onAssetRefresh(void) {}
+   virtual void            initializeAsset(void);
+   virtual void            onAssetRefresh(void);
 };
 
 DefineConsoleType(TypeComponentAssetPtr, ComponentAsset)
