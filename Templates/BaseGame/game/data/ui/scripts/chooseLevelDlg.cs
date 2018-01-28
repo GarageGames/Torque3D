@@ -32,26 +32,16 @@ function ChooseLevelDlg::onWake( %this )
    %this->LevelDescription.visible = false;
    
    %assetQuery = new AssetQuery();
-   if(!AssetDatabase.findAssetType(%assetQuery, "LevelAsset"))
-      return; //if we didn't find ANY, just exit
+   AssetDatabase.findAssetType(%assetQuery, "LevelAsset");
       
    %count = %assetQuery.getCount();
    
-   if(%count == 0)
+   if(%count == 0 && !IsDirectory("tools"))
    {
       //We have no levels found. Prompt the user to open the editor to the default level if the tools are present
-      if(IsDirectory("tools"))
-      {
-         MessageBoxYesNo("Error", "No levels were found in any modules. Do you want to load the editor and start a new level?", 
-            "EditorOpenMission();", 
-            "Canvas.popDialog(ChooseLevelDlg); if(isObject(ChooseLevelDlg.returnGui) && ChooseLevelDlg.returnGui.isMethod(\"onReturnTo\")) ChooseLevelDlg.returnGui.onReturnTo();");  
-      }
-      else
-      {
-         MessageBoxOK("Error", "No levels were found in any modules. Please ensure you have modules loaded that contain gameplay code and level files.", 
-            "Canvas.popDialog(ChooseLevelDlg); if(isObject(ChooseLevelDlg.returnGui) && ChooseLevelDlg.returnGui.isMethod(\"onReturnTo\")) ChooseLevelDlg.returnGui.onReturnTo();");
-      }
-      
+      MessageBoxOK("Error", "No levels were found in any modules. Please ensure you have modules loaded that contain gameplay code and level files.", 
+         "Canvas.popDialog(ChooseLevelDlg); if(isObject(ChooseLevelDlg.returnGui) && ChooseLevelDlg.returnGui.isMethod(\"onReturnTo\")) ChooseLevelDlg.returnGui.onReturnTo();");
+         
       %assetQuery.delete();
       return;
    }
