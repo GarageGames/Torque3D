@@ -223,7 +223,7 @@ function GuiEditor::switchToWorldEditor( %this )
 
 function GuiEditor::enableMenuItems(%this, %val)
 {
-   %menu = GuiEditCanvas.menuBar->EditMenu.getID();
+   %menu = GuiEditCanvas.menuBar.findMenu("Edit").getID();
    
    %menu.enableItem( 3, %val ); // cut
    %menu.enableItem( 4, %val ); // copy
@@ -239,8 +239,8 @@ function GuiEditor::enableMenuItems(%this, %val)
    %menu.enableItem( 18, %val ); // group
    %menu.enableItem( 19, %val ); // ungroup
    
-   GuiEditCanvas.menuBar->LayoutMenu.enableAllItems( %val );
-   GuiEditCanvas.menuBar->MoveMenu.enableAllItems( %val );
+   GuiEditCanvas.menuBar.findMenu("Layout").enableAllItems( %val );
+   GuiEditCanvas.menuBar.findMenu("Move").enableAllItems( %val );
 }
 
 //---------------------------------------------------------------------------------------------
@@ -294,7 +294,7 @@ function GuiEditor::updateUndoMenu(%this)
    %nextUndo = %uman.getNextUndoName();
    %nextRedo = %uman.getNextRedoName();
    
-   %editMenu = GuiEditCanvas.menuBar->editMenu;
+   %editMenu = GuiEditCanvas.menuBar.findMenu("Edit");
    
    %editMenu.setItemName( 0, "Undo " @ %nextUndo );
    %editMenu.setItemName( 1, "Redo " @ %nextRedo );
@@ -443,7 +443,7 @@ function GuiEditor::setPreviewResolution( %this, %width, %height )
 function GuiEditor::toggleEdgeSnap( %this )
 {
    %this.snapToEdges = !%this.snapToEdges;
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_EDGESNAP_INDEX, %this.snapToEdges );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_EDGESNAP_INDEX, %this.snapToEdges );
    GuiEditorEdgeSnapping_btn.setStateOn( %this.snapToEdges );
 }
 
@@ -452,7 +452,7 @@ function GuiEditor::toggleEdgeSnap( %this )
 function GuiEditor::toggleCenterSnap( %this )
 {
    %this.snapToCenters = !%this.snapToCenters;
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_CENTERSNAP_INDEX, %this.snapToCenters );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_CENTERSNAP_INDEX, %this.snapToCenters );
    GuiEditorCenterSnapping_btn.setStateOn( %this.snapToCenters );
 }
 
@@ -461,7 +461,7 @@ function GuiEditor::toggleCenterSnap( %this )
 function GuiEditor::toggleFullBoxSelection( %this )
 {
    %this.fullBoxSelection = !%this.fullBoxSelection;
-   GuiEditCanvas.menuBar->EditMenu.checkItem( $GUI_EDITOR_MENU_FULLBOXSELECT_INDEX, %this.fullBoxSelection );
+   GuiEditCanvas.menuBar.findMenu("Edit").checkItem( $GUI_EDITOR_MENU_FULLBOXSELECT_INDEX, %this.fullBoxSelection );
 }
 
 //---------------------------------------------------------------------------------------------
@@ -469,7 +469,7 @@ function GuiEditor::toggleFullBoxSelection( %this )
 function GuiEditor::toggleDrawGuides( %this )
 {
    %this.drawGuides= !%this.drawGuides;
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_DRAWGUIDES_INDEX, %this.drawGuides );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_DRAWGUIDES_INDEX, %this.drawGuides );
 }
 
 //---------------------------------------------------------------------------------------------
@@ -477,7 +477,7 @@ function GuiEditor::toggleDrawGuides( %this )
 function GuiEditor::toggleGuideSnap( %this )
 {
    %this.snapToGuides = !%this.snapToGuides;
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_GUIDESNAP_INDEX, %this.snapToGuides );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_GUIDESNAP_INDEX, %this.snapToGuides );
 }
 
 //---------------------------------------------------------------------------------------------
@@ -485,7 +485,7 @@ function GuiEditor::toggleGuideSnap( %this )
 function GuiEditor::toggleControlSnap( %this )
 {
    %this.snapToControls = !%this.snapToControls;
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_CONTROLSNAP_INDEX, %this.snapToControls );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_CONTROLSNAP_INDEX, %this.snapToControls );
 }
 
 //---------------------------------------------------------------------------------------------
@@ -493,7 +493,7 @@ function GuiEditor::toggleControlSnap( %this )
 function GuiEditor::toggleCanvasSnap( %this )
 {
    %this.snapToCanvas = !%this.snapToCanvas;
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_CANVASSNAP_INDEX, %this.snapToCanvas );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_CANVASSNAP_INDEX, %this.snapToCanvas );
 }
 
 //---------------------------------------------------------------------------------------------
@@ -506,7 +506,7 @@ function GuiEditor::toggleGridSnap( %this )
    else
       %this.setSnapToGrid( %this.snap2GridSize );
 
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_GRIDSNAP_INDEX, %this.snap2Grid );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_GRIDSNAP_INDEX, %this.snap2Grid );
    GuiEditorSnapCheckBox.setStateOn( %this.snap2Grid );
 }
 
@@ -993,14 +993,14 @@ function GuiEditorGui::onWake( %this )
 
    // Set up initial menu toggle states.
    
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_EDGESNAP_INDEX, GuiEditor.snapToEdges );
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_CENTERSNAP_INDEX, GuiEditor.snapToCenters );
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_GUIDESNAP_INDEX, GuiEditor.snapToGuides );
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_CONTROLSNAP_INDEX, GuiEditor.snapToControls );
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_CANVASSNAP_INDEX, GuiEditor.snapToCanvas );
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_GRIDSNAP_INDEX, GuiEditor.snap2Grid );
-   GuiEditCanvas.menuBar->SnapMenu.checkItem( $GUI_EDITOR_MENU_DRAWGUIDES_INDEX, GuiEditor.drawGuides );
-   GuiEditCanvas.menuBar->EditMenu.checkItem( $GUI_EDITOR_MENU_FULLBOXSELECT_INDEX, GuiEditor.fullBoxSelection );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_EDGESNAP_INDEX, GuiEditor.snapToEdges );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_CENTERSNAP_INDEX, GuiEditor.snapToCenters );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_GUIDESNAP_INDEX, GuiEditor.snapToGuides );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_CONTROLSNAP_INDEX, GuiEditor.snapToControls );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_CANVASSNAP_INDEX, GuiEditor.snapToCanvas );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_GRIDSNAP_INDEX, GuiEditor.snap2Grid );
+   GuiEditCanvas.menuBar.findMenu("Snap").checkItem( $GUI_EDITOR_MENU_DRAWGUIDES_INDEX, GuiEditor.drawGuides );
+   GuiEditCanvas.menuBar.findMenu("Edit").checkItem( $GUI_EDITOR_MENU_FULLBOXSELECT_INDEX, GuiEditor.fullBoxSelection );
 
    // Sync toolbar buttons.
    
