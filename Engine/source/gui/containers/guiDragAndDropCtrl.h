@@ -67,7 +67,7 @@ class GuiDragAndDropControl : public GuiControl
 
    public:
    
-      GuiDragAndDropControl() {}
+      GuiDragAndDropControl();
 
       void startDragging(Point2I offset = Point2I(0, 0));
 
