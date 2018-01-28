@@ -122,6 +122,17 @@ package Tools
          if( isFunction( %initializeFunction ) )
             call( %initializeFunction );
       }
+      
+      //Now, go through and load any tool-group modules
+      ModuleDatabase.setModuleExtension("module");
+      
+      //Any common tool modules
+      ModuleDatabase.scanModules( "tools", false );
+      ModuleDatabase.LoadGroup( "Tool" );
+      
+      //Do any tools that come in with a gameplay package. These are usually specialized tools
+      //ModuleDatabase.scanModules( "data", false );
+      //ModuleDatabase.LoadGroup( "Tool" );
 
       // Popuplate the default SimObject icons that 
       // are used by the various editors.
@@ -214,6 +225,29 @@ package Tools
    }
 };
 
+function EditorCreateFakeGameSession(%fileName)
+{
+   // Create a local game server and connect to it.
+   if(isObject(ServerGroup))
+      ServerGroup.delete();
+      
+   new SimGroup(ServerGroup);
+   
+   if(isObject(ServerConnection))
+      ServerConnection.delete();
+      
+   new GameConnection(ServerConnection);
+
+   // This calls GameConnection::onConnect.
+   ServerConnection.connectLocal();
+
+   $instantGroup = ServerGroup;
+   
+   $Game::MissionGroup = "MissionGroup";
+
+   exec(%file);
+}
+
 function fastLoadWorldEdit(%val)
 {
    if(%val)
@@ -222,37 +256,64 @@ function fastLoadWorldEdit(%val)
       {
          onStart();
       }
-
-      if(!$Game::running)
+      
+      %timerId = startPrecisionTimer();
+      
+      if( GuiEditorIsActive() )
+         toggleGuiEditor(1);
+         
+      if( !$missionRunning )
       {
-         //startGame();
-         activatePackage( "BootEditor" );
-         ChooseLevelDlg.launchInEditor = false; 
-         StartGame("tools/levels/BlankRoom.mis", "SinglePlayer");
-         
-         if(!isObject(Observer))
-         {
-            datablock CameraData(Observer) {};
-         }
-         
-         %cam = new Camera()
-         {
-            datablock = Observer;
-         };
-         
-         %cam.scopeToClient(LocalClientConnection);
-         
-         LocalClientConnection.setCameraObject(%cam);
-         LocalClientConnection.setControlObject(%cam);
-         
-         LocalClientConnection.camera = %cam;
-         
-         %cam.setPosition("0 0 0");
+         // Flag saying, when level is chosen, launch it with the editor open.
+         ChooseLevelDlg.launchInEditor = true;
+         Canvas.pushDialog( ChooseLevelDlg );         
       }
       else
-      {        
-         toggleEditor(true);
+      {
+         pushInstantGroup();
+         
+         if ( !isObject( Editor ) )
+         {
+            Editor::create();
+            MissionCleanup.add( Editor );
+            MissionCleanup.add( Editor.getUndoManager() );
+         }
+         
+         if( EditorIsActive() )
+         {
+            if (theLevelInfo.type $= "DemoScene") 
+            {
+               commandToServer('dropPlayerAtCamera');
+               Editor.close("SceneGui");   
+            } 
+            else 
+            {
+               Editor.close("PlayGui");
+            }
+         }
+         else
+         {
+            canvas.pushDialog( EditorLoadingGui );
+            canvas.repaint();
+            
+            Editor.open();
+			
+            // Cancel the scheduled event to prevent
+            // the level from cycling after it's duration
+            // has elapsed.
+            cancel($Game::Schedule);
+            
+            if (theLevelInfo.type $= "DemoScene")
+               commandToServer('dropCameraAtPlayer', true);
+               
+            canvas.popDialog(EditorLoadingGui);
+         }
+         
+         popInstantGroup();
       }
+      
+      %elapsed = stopPrecisionTimer( %timerId );
+      warn( "Time spent in toggleEditor() : " @ %elapsed / 1000.0 @ " s" );
    }
 }
 
