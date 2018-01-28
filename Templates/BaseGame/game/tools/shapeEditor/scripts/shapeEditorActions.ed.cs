@@ -299,6 +299,12 @@ function ActionEditNodeTransform::undo( %this )
 
 //------------------------------------------------------------------------------
 // Add sequence
+function onAddAnimationAssetShapeEditor(%selectedAnimation)
+{
+   echo("SELECTED MUH ASSET");
+   ShapeEditor.doAddSequence(%selectedAnimation, 0, 0, 0);
+}
+
 function ShapeEditor::doAddSequence( %this, %seqName, %from, %start, %end )
 {
    %action = %this.createAction( ActionAddSequence, "Add sequence" );
@@ -313,23 +319,44 @@ function ShapeEditor::doAddSequence( %this, %seqName, %from, %start, %end )
 
 function ActionAddSequence::doit( %this )
 {
-   // If adding this sequence from an existing sequence, make a backup copy of
-   // the existing sequence first, so we can edit the start/end frames later
-   // without having to worry if the original source sequence has changed.
-   if ( ShapeEditor.shape.getSequenceIndex( %this.from ) >= 0 )
+   if(ShapeEditorPlugin.selectedAssetId $= "")
    {
-      %this.from = ShapeEditor.getUniqueName( "sequence", "__backup__" @ %this.origFrom @ "_" );
-      ShapeEditor.shape.addSequence( %this.origFrom, %this.from );
+      // If adding this sequence from an existing sequence, make a backup copy of
+      // the existing sequence first, so we can edit the start/end frames later
+      // without having to worry if the original source sequence has changed.
+      if ( ShapeEditor.shape.getSequenceIndex( %this.from ) >= 0 )
+      {
+         %this.from = ShapeEditor.getUniqueName( "sequence", "__backup__" @ %this.origFrom @ "_" );
+         ShapeEditor.shape.addSequence( %this.origFrom, %this.from );
+      }
+
+      // Add the sequence
+      $collada::forceLoadDAE = EditorSettings.value( "forceLoadDAE" );
+      %success = ShapeEditor.shape.addSequence( %this.from, %this.seqName, %this.start, %this.end );
+      $collada::forceLoadDAE = false;
+
+      if ( %success )
+      {
+         ShapeEdPropWindow.update_onSequenceAdded( %this.seqName, -1 );
+         return true;
+      }
    }
-
-   // Add the sequence
-   $collada::forceLoadDAE = EditorSettings.value( "forceLoadDAE" );
-   %success = ShapeEditor.shape.addSequence( %this.from, %this.seqName, %this.start, %this.end );
-   $collada::forceLoadDAE = false;
-
-   if ( %success )
+   else
    {
-      ShapeEdPropWindow.update_onSequenceAdded( %this.seqName, -1 );
+      %assetDef = AssetDatabase.acquireAsset(%this.seqName);
+      %moduleName = getWord(getToken(%this.seqName, ":", 0),0);
+      
+      %idx = ShapeEdSequenceList.rowCount();
+      
+      %matSet = "ShapeEditorPlugin.selectedAssetDef.animationSequence"@%idx@"=\"@Asset="@%moduleName@":"@%this.seqName.assetName@"\";";
+      eval(%matSet);
+      
+      %assetPath = AssetDatabase.getAssetFilePath(ShapeEditorPlugin.selectedAssetId);
+      
+      %assetImportSuccessful = TAMLWrite(ShapeEditorPlugin.selectedAssetDef, %assetPath); 
+      
+      AssetDatabase.refreshAsset(ShapeEditorPlugin.selectedAssetId);
+      
       return true;
    }
    return false;
