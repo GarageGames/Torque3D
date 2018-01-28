@@ -513,6 +513,8 @@ class GuiTreeViewCtrl : public GuiArrayCtrl
       bool editItem( S32 itemId, const char* newText, const char* newValue );
 
       bool markItem( S32 itemId, bool mark );
+
+      S32 getItemAtPosition(Point2I position);
       
       bool isItemSelected( S32 itemId );
 
