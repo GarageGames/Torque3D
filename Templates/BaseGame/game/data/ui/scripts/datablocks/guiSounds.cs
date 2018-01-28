@@ -19,14 +19,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
-singleton SFXProfile(menuButtonPressed)
+datablock SFXProfile(menuButtonPressed)
 {
    preload = true;
    description = AudioGui;
    fileName = "data/ui/sound/buttonClick";
 };
 
-singleton SFXProfile(menuButtonHover)
+datablock SFXProfile(menuButtonHover)
 {
    preload = true;
    description = AudioGui;
