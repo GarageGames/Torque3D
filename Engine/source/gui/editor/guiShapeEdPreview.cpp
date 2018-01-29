@@ -1167,15 +1167,15 @@ void GuiShapeEdPreview::computeSceneBounds(Box3F& bounds)
 
    if (bounds.getExtents().x < POINT_EPSILON || bounds.getExtents().y < POINT_EPSILON || bounds.getExtents().z < POINT_EPSILON)
    {
-	   bounds.set(Point3F::Zero);
+      bounds.set(Point3F::Zero);
 
-	   //We probably don't have any actual meshes in this model, so compute using the bones if we have them
-	   for (S32 i = 0; i < mModel->getShape()->nodes.size(); i++)
-	   {
-		   Point3F nodePos = mModel->mNodeTransforms[i].getPosition();
+      //We probably don't have any actual meshes in this model, so compute using the bones if we have them
+      for (S32 i = 0; i < mModel->getShape()->nodes.size(); i++)
+      {
+         Point3F nodePos = mModel->mNodeTransforms[i].getPosition();
 
-		   bounds.extend(nodePos);
-	   }
+         bounds.extend(nodePos);
+      }
    }
 }
 
