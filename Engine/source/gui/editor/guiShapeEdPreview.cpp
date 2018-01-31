@@ -926,8 +926,8 @@ void GuiShapeEdPreview::handleMouseDown(const GuiEvent& event, GizmoMode mode)
       }
    }
 
-   if ( mode == RotateMode )
-      mRenderCameraAxes = true;
+   //if ( mode == RotateMode )
+   //   mRenderCameraAxes = true;
 }
 
 void GuiShapeEdPreview::handleMouseUp(const GuiEvent& event, GizmoMode mode)
@@ -941,8 +941,8 @@ void GuiShapeEdPreview::handleMouseUp(const GuiEvent& event, GizmoMode mode)
       mGizmo->on3DMouseUp( mLastEvent );
    }
 
-   if ( mode == RotateMode )
-      mRenderCameraAxes = false;
+   //if ( mode == RotateMode )
+   //   mRenderCameraAxes = false;
 }
 
 void GuiShapeEdPreview::handleMouseMove(const GuiEvent& event, GizmoMode mode)
@@ -1164,6 +1164,19 @@ void GuiShapeEdPreview::computeSceneBounds(Box3F& bounds)
 {
    if ( mModel )
       mModel->computeBounds( mCurrentDL, bounds );
+
+   if (bounds.getExtents().x < POINT_EPSILON || bounds.getExtents().y < POINT_EPSILON || bounds.getExtents().z < POINT_EPSILON)
+   {
+      bounds.set(Point3F::Zero);
+
+      //We probably don't have any actual meshes in this model, so compute using the bones if we have them
+      for (S32 i = 0; i < mModel->getShape()->nodes.size(); i++)
+      {
+         Point3F nodePos = mModel->mNodeTransforms[i].getPosition();
+
+         bounds.extend(nodePos);
+      }
+   }
 }
 
 void GuiShapeEdPreview::updateDetailLevel(const SceneRenderState* state)
