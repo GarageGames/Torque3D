@@ -643,13 +643,6 @@ if(WIN32)
    if(TORQUE_OPENGL)
       addLib(OpenGL32.lib)
    endif()
-
-   # JTH: DXSDK is compiled with older runtime, and MSVC 2015+ is when __vsnprintf is undefined.
-   # This is a workaround by linking with the older legacy library functions.
-   # See this for more info: http://stackoverflow.com/a/34230122
-   if (MSVC14)
-      addLib(legacy_stdio_definitions.lib)
-   endif()
 endif()
 
 if (APPLE)
