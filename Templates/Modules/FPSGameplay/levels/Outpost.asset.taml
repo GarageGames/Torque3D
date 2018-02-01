@@ -2,6 +2,7 @@
     canSave="true"
     canSaveDynamicFields="true"
     AssetName="Outpost"
+    FriendlyName="Outpost"
     LevelFile="data/FPSGameplay/levels/Outpost.mis"
-    LevelDescription="Outpost level"
+    Description="Outpost level"
     VersionId="1" />

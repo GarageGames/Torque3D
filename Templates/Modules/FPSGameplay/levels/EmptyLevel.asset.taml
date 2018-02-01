@@ -2,6 +2,7 @@
     canSave="true"
     canSaveDynamicFields="true"
     AssetName="EmptyLevel"
+    FriendlyName="EmptyLevel"
     LevelFile="data/FPSGameplay/levels/EmptyLevel.mis"
-    LevelDescription="An empty room"
+    Description="An empty room"
     VersionId="1" />
