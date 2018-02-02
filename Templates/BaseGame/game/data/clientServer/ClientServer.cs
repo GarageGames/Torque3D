@@ -46,7 +46,7 @@ function ClientServer::destroy( %this )
       disconnect();
    
    // Destroy the physics plugin.
-   physicsDestroy();
+   //physicsDestroy();
    
    sfxShutdown();
       

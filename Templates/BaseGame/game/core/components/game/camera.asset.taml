@@ -5,5 +5,5 @@
     componentClass="CameraComponent"
     friendlyName="Camera"
     componentType="Game"
-    scriptFile="core/components/game/camera.cs"
-    description="Allows the component owner to operate as a camera." />
+    description="Allows the component owner to operate as a camera."
+    scriptFile="core/components/game/camera.cs" />

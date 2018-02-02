@@ -57,6 +57,7 @@ public:
 
 protected:
    StringTableEntry mVariableName;
+   StringTableEntry mSetCallbackName;
    SimObject* mOwnerObject;
 };
 

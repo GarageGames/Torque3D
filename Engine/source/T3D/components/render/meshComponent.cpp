@@ -45,52 +45,49 @@
 #include "core/strings/findMatch.h"
 #include "T3D/components/render/meshComponent_ScriptBinding.h"
 
+ImplementEnumType(BatchingMode,
+   "Type of mesh data available in a shape.\n"
+   "@ingroup gameObjects")
+{
+   MeshComponent::Individual, "Individual", "This mesh is rendered indivudally, wthout batching or instancing."
+},
+   { MeshComponent::StaticBatch, "Static Batching", "Statically batches this mesh together with others to reduce drawcalls." },
+   //{ MeshComponent::DynamicBatch, "Dynamic Batching", "Dynamical batches this mesh together with others to reduce drawcalls each frame." },
+  // { MeshComponent::Instanced, "Instanced", "This mesh is rendered as an instance, reducing draw overhead with others that share the same mesh and material." },
+      EndImplementEnumType;
+
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor
 //////////////////////////////////////////////////////////////////////////
 MeshComponent::MeshComponent() : Component()
 {
-   mShapeName = StringTable->insert("");
-   mShapeAsset = StringTable->insert("");
-   mShapeInstance = NULL;
-
-   mChangingMaterials.clear();
-
-   mMaterials.clear();
-
    mFriendlyName = "Mesh Component";
    mComponentType = "Render";
 
    mDescription = getDescriptionText("Causes the object to render a non-animating 3d shape using the file provided.");
 
    mNetworked = true;
-   mNetFlags.set(Ghostable | ScopeAlways);
+
+   mShapeName = StringTable->EmptyString();
+   mShapeAsset = StringTable->EmptyString();
+
+   mMeshAsset = StringTable->EmptyString();
+   mMeshAssetId = StringTable->EmptyString();
+
+   mInterfaceData = new MeshRenderSystemInterface();
+
+   mRenderMode = Individual;
 }
 
-MeshComponent::~MeshComponent(){}
+MeshComponent::~MeshComponent()
+{
+   if (mInterfaceData)
+      SAFE_DELETE(mInterfaceData);
+}
 
 IMPLEMENT_CO_NETOBJECT_V1(MeshComponent);
 
 //==========================================================================================
-void MeshComponent::boneObject::addObject(SimObject* object)
-{
-   SceneObject* sc = dynamic_cast<SceneObject*>(object);
-
-   if(sc && mOwner)
-   {
-      if(TSShape* shape = mOwner->getShape())
-      {
-         S32 nodeID = shape->findNode(mBoneName);
-
-         //we may have a offset on the shape's center
-         //so make sure we accomodate for that when setting up the mount offsets
-         MatrixF mat = mOwner->getNodeTransform(nodeID);
-
-         mOwner->getOwner()->mountObject(sc, nodeID, mat);
-      }
-   }
-}
-
 bool MeshComponent::onAdd()
 {
    if(! Parent::onAdd())
@@ -106,6 +103,12 @@ void MeshComponent::onComponentAdd()
 {
    Parent::onComponentAdd();
 
+   if (isClientObject())
+      mInterfaceData->mIsClient = true;
+
+  // if (mInterfaceData != nullptr)
+  //   mInterfaceData->mIsClient = isClientObject();
+
    //get the default shape, if any
    updateShape();
 }
@@ -113,10 +116,6 @@ void MeshComponent::onComponentAdd()
 void MeshComponent::onRemove()
 {
    Parent::onRemove();
-
-   mMeshAsset.clear();
-
-   SAFE_DELETE(mShapeInstance);
 }
 
 void MeshComponent::onComponentRemove()
@@ -135,9 +134,14 @@ void MeshComponent::initPersistFields()
 {
    Parent::initPersistFields();
 
+   addGroup("Rendering");
+   addField("BatchingMode", TypeBatchingMode, Offset(mRenderMode, MeshComponent),
+      "The mode of batching this shape should be rendered with.");
+   endGroup("Rendering");
+
    //create a hook to our internal variables
    addGroup("Model");
-   addProtectedField("MeshAsset", TypeAssetId, Offset(mShapeAsset, MeshComponent), &_setMesh, &defaultProtectedGetFn, 
+   addProtectedField("MeshAsset", TypeShapeAssetPtr, Offset(mShapeAsset, MeshComponent), &_setMesh, &defaultProtectedGetFn,
       "The asset Id used for the mesh.", AbstractClassRep::FieldFlags::FIELD_ComponentInspectors);
    endGroup("Model");
 }
@@ -165,6 +169,9 @@ bool MeshComponent::_setShape( void *object, const char *index, const char *data
 bool MeshComponent::setMeshAsset(const char* assetName)
 {
    // Fetch the asset Id.
+   if (mInterfaceData == nullptr)
+      return false;
+
    mMeshAssetId = StringTable->insert(assetName);
 
    mMeshAsset = mMeshAssetId;
@@ -183,9 +190,129 @@ bool MeshComponent::setMeshAsset(const char* assetName)
    return true;
 }
 
+void MeshComponent::updateShape()
+{
+   if (mInterfaceData == nullptr)
+      return;
+
+   //if ((mShapeName && mShapeName[0] != '\0') || (mShapeAsset && mShapeAsset[0] != '\0'))
+   if ((mShapeName && mShapeName[0] != '\0') || (mMeshAssetId && mMeshAssetId[0] != '\0'))
+
+   {
+      if (mMeshAsset == NULL)
+         return;
+
+      mShape = mMeshAsset->getShape();
+
+      if (!mMeshAsset->getShape())
+         return;
+
+      setupShape();
+
+      //Do this on both the server and client
+      S32 materialCount = mMeshAsset->getShape()->materialList->getMaterialNameList().size();
+
+      if (isServerObject())
+      {
+         //we need to update the editor
+         for (U32 i = 0; i < mFields.size(); i++)
+         {
+            //find any with the materialslot title and clear them out
+            if (FindMatch::isMatch("MaterialSlot*", mFields[i].mFieldName, false))
+            {
+               setDataField(mFields[i].mFieldName, NULL, "");
+               mFields.erase(i);
+               continue;
+            }
+         }
+
+         //next, get a listing of our materials in the shape, and build our field list for them
+         char matFieldName[128];
+
+         if (materialCount > 0)
+            mComponentGroup = StringTable->insert("Materials");
+
+         for (U32 i = 0; i < materialCount; i++)
+         {
+            String materialname = mMeshAsset->getShape()->materialList->getMaterialName(i);
+            if (materialname == String("ShapeBounds"))
+               continue;
+
+            dSprintf(matFieldName, 128, "MaterialSlot%d", i);
+
+            addComponentField(matFieldName, "A material used in the shape file", "Material", materialname, "");
+         }
+
+         if (materialCount > 0)
+            mComponentGroup = "";
+      }
+
+      if (mOwner != NULL)
+      {
+         Point3F min, max, pos;
+         pos = mOwner->getPosition();
+
+         mOwner->getWorldToObj().mulP(pos);
+
+         min = mMeshAsset->getShape()->bounds.minExtents;
+         max = mMeshAsset->getShape()->bounds.maxExtents;
+
+         if (mInterfaceData)
+         {
+            mInterfaceData->mBounds.set(min, max);
+            mInterfaceData->mScale = mOwner->getScale();
+            mInterfaceData->mTransform = mOwner->getRenderTransform();
+         }
+
+         mOwner->setObjectBox(Box3F(min, max));
+
+         mOwner->resetWorldBox();
+
+         if (mOwner->getSceneManager() != NULL)
+            mOwner->getSceneManager()->notifyObjectDirty(mOwner);
+      }
+
+      if (isClientObject() && mInterfaceData)
+      {
+         if (mRenderMode == StaticBatch)
+         {
+            mInterfaceData->mStatic = true;
+
+            OptimizedPolyList geom;
+            MatrixF transform = mInterfaceData->mTransform;
+            mInterfaceData->mGeometry.setTransform(&transform, mInterfaceData->mScale);
+            mInterfaceData->mGeometry.setObject(mOwner);
+
+            mInterfaceData->mShapeInstance->buildPolyList(&mInterfaceData->mGeometry, 0);
+         }
+         else
+         {
+            mInterfaceData->mStatic = false;
+         }
+
+         MeshRenderSystem::rebuildBuffers();
+      }
+
+      //finally, notify that our shape was changed
+      onShapeInstanceChanged.trigger(this);
+   }
+}
+
+void MeshComponent::setupShape()
+{
+   mInterfaceData->mShapeInstance = new TSShapeInstance(mMeshAsset->getShape(), true);
+}
+
 void MeshComponent::_onResourceChanged( const Torque::Path &path )
 {
-   if ( path != Torque::Path( mShapeName ) )
+   if (mInterfaceData == nullptr)
+      return;
+
+   String filePath;
+   if (mMeshAsset)
+      filePath = Torque::Path(mMeshAsset->getShapeFilename());
+
+   if (!mMeshAsset || path != Torque::Path(mMeshAsset->getShapeFilename()) )
       return;
 
    updateShape();
@@ -216,6 +343,8 @@ U32 MeshComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
    if (stream->writeFlag(mask & ShapeMask))
    {
       stream->writeString(mShapeName);
+
+      stream->writeInt(mRenderMode, 8);
    }
 
    if (stream->writeFlag( mask & MaterialMask ))
@@ -226,7 +355,7 @@ U32 MeshComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       {
          stream->writeInt(mChangingMaterials[i].slot, 16);
 
-         NetStringHandle matNameStr = mChangingMaterials[i].matName.c_str();
+         NetStringHandle matNameStr = mChangingMaterials[i].assetId.c_str();
          con->packNetStringHandleU(stream, matNameStr);
       }
 
@@ -243,6 +372,8 @@ void MeshComponent::unpackUpdate(NetConnection *con, BitStream *stream)
    if(stream->readFlag())
    {
       mShapeName = stream->readSTString();
+
+      mRenderMode = (RenderMode)stream->readInt(8);
       setMeshAsset(mShapeName);
       updateShape();
    }
@@ -256,7 +387,10 @@ void MeshComponent::unpackUpdate(NetConnection *con, BitStream *stream)
       {
          matMap newMatMap;
          newMatMap.slot = stream->readInt(16);
-         newMatMap.matName = String(con->unpackNetStringHandleU(stream).getString());
+         newMatMap.assetId = String(con->unpackNetStringHandleU(stream).getString());
+
+         //do the lookup, now
+         newMatMap.matAsset = AssetDatabase.acquireAsset<MaterialAsset>(newMatMap.assetId);
 
          mChangingMaterials.push_back(newMatMap);
       }
@@ -267,7 +401,7 @@ void MeshComponent::unpackUpdate(NetConnection *con, BitStream *stream)
 
 void MeshComponent::prepRenderImage( SceneRenderState *state )
 {
-   if (!mEnabled || !mOwner || !mShapeInstance)
+   /*if (!mEnabled || !mOwner || !mShapeInstance)
       return;
 
    Point3F cameraOffset;
@@ -300,114 +434,41 @@ void MeshComponent::prepRenderImage( SceneRenderState *state )
    rdata.setLightQuery(&query);
 
    MatrixF mat = mOwner->getRenderTransform();
-   Point3F renderPos = mat.getPosition();
-   EulerF renderRot = mat.toEuler();
+
+   if (mOwner->isMounted())
+   {
+      MatrixF wrldPos = mOwner->getWorldTransform();
+      Point3F wrldPosPos = wrldPos.getPosition();
+
+      Point3F mntPs = mat.getPosition();
+      EulerF mntRt = RotationF(mat).asEulerF();
+
+      bool tr = true;
+   }
+
    mat.scale(objScale);
    GFX->setWorldMatrix(mat);
 
-   mShapeInstance->render(rdata);
-}
-
-void MeshComponent::updateShape()
-{
-   bool isServer = isServerObject();
-
-   if ((mShapeName && mShapeName[0] != '\0') || (mShapeAsset && mShapeAsset[0] != '\0'))
-   {
-      if (mMeshAsset == NULL)
-         return;
-
-      mShape = mMeshAsset->getShape();
-
-      if (!mShape)
-         return;
-
-      setupShape();
-
-      //Do this on both the server and client
-      S32 materialCount = mShape->materialList->getMaterialNameList().size();
-
-      if(isServerObject())
-      {
-         //we need to update the editor
-         for (U32 i = 0; i < mFields.size(); i++)
-         {
-            //find any with the materialslot title and clear them out
-            if (FindMatch::isMatch("MaterialSlot*", mFields[i].mFieldName, false))
-            {
-               setDataField(mFields[i].mFieldName, NULL, "");
-               mFields.erase(i);
-               continue;
-            }
-         }
-
-         //next, get a listing of our materials in the shape, and build our field list for them
-         char matFieldName[128];
-
-         if(materialCount > 0)
-            mComponentGroup = StringTable->insert("Materials");
-
-         for(U32 i=0; i < materialCount; i++)
-         {
-            String materialname = mShape->materialList->getMaterialName(i);
-            if(materialname == String("ShapeBounds"))
-               continue;
-
-            dSprintf(matFieldName, 128, "MaterialSlot%d", i);
-            
-            addComponentField(matFieldName, "A material used in the shape file", "TypeAssetId", materialname, "");
-         }
-
-         if(materialCount > 0)
-            mComponentGroup = "";
-      }
-
-      if(mOwner != NULL)
-      {
-         Point3F min, max, pos;
-         pos = mOwner->getPosition();
-
-         mOwner->getWorldToObj().mulP(pos);
-
-         min = mShape->bounds.minExtents;
-         max = mShape->bounds.maxExtents;
-
-         mShapeBounds.set(min, max);
-
-         mOwner->setObjectBox(Box3F(min, max));
-
-         if( mOwner->getSceneManager() != NULL )
-            mOwner->getSceneManager()->notifyObjectDirty( mOwner );
-      }
-
-      //finally, notify that our shape was changed
-      onShapeInstanceChanged.trigger(this);
-   }
-}
-
-void MeshComponent::setupShape()
-{
-   mShapeInstance = new TSShapeInstance(mShape, true);
+   mShapeInstance->render(rdata);*/
 }
 
 void MeshComponent::updateMaterials()
 {
-   if (mChangingMaterials.empty() || !mShape)
+   if (mChangingMaterials.empty() || !mMeshAsset->getShape())
       return;
 
-   TSMaterialList* pMatList = mShapeInstance->getMaterialList();
+   TSMaterialList* pMatList = mInterfaceData->mShapeInstance->getMaterialList();
    pMatList->setTextureLookupPath(getShapeResource().getPath().getPath());
 
    const Vector<String> &materialNames = pMatList->getMaterialNameList();
    for ( S32 i = 0; i < materialNames.size(); i++ )
    {
-      const String &pName = materialNames[i];
-
       for(U32 m=0; m < mChangingMaterials.size(); m++)
       {
          if(mChangingMaterials[m].slot == i)
          {
-            pMatList->renameMaterial( i, mChangingMaterials[m].matName );
+            //Fetch the actual material asset
+            pMatList->renameMaterial( i, mChangingMaterials[m].matAsset->getMaterialDefinitionName());
          }
       }
 
@@ -415,22 +476,31 @@ void MeshComponent::updateMaterials()
    }
 
    // Initialize the material instances
-   mShapeInstance->initMaterialList();
+   mInterfaceData->mShapeInstance->initMaterialList();
 }
 
 MatrixF MeshComponent::getNodeTransform(S32 nodeIdx)
 {
-   if (mShape)
+   if (mInterfaceData != nullptr && mMeshAsset->getShape())
    {
       S32 nodeCount = getShape()->nodes.size();
 
       if(nodeIdx >= 0 && nodeIdx < nodeCount)
       {
          //animate();
-         MatrixF mountTransform = mShapeInstance->mNodeTransforms[nodeIdx];
-         mountTransform.mul(mOwner->getRenderTransform());
+         MatrixF nodeTransform = mInterfaceData->mShapeInstance->mNodeTransforms[nodeIdx];
+         const Point3F& scale = mOwner->getScale();
 
-         return mountTransform;
+         // The position of the node needs to be scaled.
+         Point3F position = nodeTransform.getPosition();
+         position.convolve(scale);
+         nodeTransform.setPosition(position);
+
+         MatrixF finalTransform = MatrixF::Identity;
+
+         finalTransform.mul(mOwner->getRenderTransform(), nodeTransform);
+
+         return finalTransform;
       }
    }
 
@@ -439,7 +509,7 @@ MatrixF MeshComponent::getNodeTransform(S32 nodeIdx)
 
 S32 MeshComponent::getNodeByName(String nodeName)
 {
-   if (mShape)
+   if (mMeshAsset->getShape())
    {
       S32 nodeIdx = getShape()->findNode(nodeName);
 
@@ -485,12 +555,18 @@ void MeshComponent::onDynamicModified(const char* slotName, const char* newValue
       if(slot == -1)
          return;
 
+      //Safe to assume the inbound value for the material will be a MaterialAsset, so lets do a lookup on the name
+      MaterialAsset* matAsset = AssetDatabase.acquireAsset<MaterialAsset>(newValue);
+      if (!matAsset)
+         return;
+
       bool found = false;
       for(U32 i=0; i < mChangingMaterials.size(); i++)
       {
          if(mChangingMaterials[i].slot == slot)
          {
-            mChangingMaterials[i].matName = String(newValue);
+            mChangingMaterials[i].matAsset = matAsset;
+            mChangingMaterials[i].assetId = newValue;
             found = true;
          }
       }
@@ -499,7 +575,8 @@ void MeshComponent::onDynamicModified(const char* slotName, const char* newValue
       {
          matMap newMatMap;
          newMatMap.slot = slot;
-         newMatMap.matName = String(newValue);
+         newMatMap.matAsset = matAsset;
+         newMatMap.assetId = newValue;
 
          mChangingMaterials.push_back(newMatMap);
       }
@@ -510,14 +587,31 @@ void MeshComponent::onDynamicModified(const char* slotName, const char* newValue
    Parent::onDynamicModified(slotName, newValue);
 }
 
-void MeshComponent::changeMaterial(U32 slot, const char* newMat)
+void MeshComponent::changeMaterial(U32 slot, MaterialAsset* newMat)
 {
    
    char fieldName[512];
 
    //update our respective field
    dSprintf(fieldName, 512, "materialSlot%d", slot);
-   setDataField(fieldName, NULL, newMat);
+   setDataField(fieldName, NULL, newMat->getAssetId());
+}
+
+bool MeshComponent::setMatInstField(U32 slot, const char* field, const char* value)
+{
+   TSMaterialList* pMatList = mInterfaceData->mShapeInstance->getMaterialList();
+   pMatList->setTextureLookupPath(getShapeResource().getPath().getPath());
+
+   MaterialParameters* params = pMatList->getMaterialInst(slot)->getMaterialParameters();
+
+   if (pMatList->getMaterialInst(slot)->getFeatures().hasFeature(MFT_DiffuseColor))
+   {
+      MaterialParameterHandle* handle = pMatList->getMaterialInst(slot)->getMaterialParameterHandle("DiffuseColor");
+
+      params->set(handle, LinearColorF(0, 0, 0));
+   }
+
+   return true;
 }
 
 void MeshComponent::onInspect()
@@ -526,4 +620,13 @@ void MeshComponent::onInspect()
 
 void MeshComponent::onEndInspect()
 {
+}
+
+void MeshComponent::ownerTransformSet(MatrixF *mat)
+{
+   if (mInterfaceData != nullptr)
+   {
+      MatrixF newTransform = *mat;
+      mInterfaceData->mTransform = newTransform;
+   }
 }

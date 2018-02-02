@@ -62,6 +62,7 @@ class AssetBase : public SimObject
 
    typedef SimObject Parent;
 
+protected:
    AssetManager*           mpOwningAssetManager;
    bool                    mAssetInitialized;
    AssetDefinition*        mpAssetDefinition;

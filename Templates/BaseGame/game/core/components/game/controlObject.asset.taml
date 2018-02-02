@@ -6,5 +6,5 @@
     componentClass="Component"
     friendlyName="Control Object"
     componentType="Game"
-    scriptFile="core/components/game/controlObject.cs"
-    description="Allows the component owner to be controlled by a client." />
+    description="Allows the component owner to be controlled by a client."
+    scriptFile="core/components/game/controlObject.cs" />

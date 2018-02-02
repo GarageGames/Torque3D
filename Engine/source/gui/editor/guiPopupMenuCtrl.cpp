@@ -59,7 +59,8 @@ void GuiPopupMenuBackgroundCtrl::onMouseDragged(const GuiEvent &event)
 
 void GuiPopupMenuBackgroundCtrl::close()
 {
-   getRoot()->removeObject(this);
+   if(getRoot())
+      getRoot()->removeObject(this);
 
    mMenuBarCtrl = nullptr;
 }
@@ -151,16 +152,22 @@ void GuiPopupMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool s
       S32 bottom = top + 8;
       S32 middle = top + 4;
 
-      PrimBuild::begin(GFXTriangleList, 3);
-      if (selected || mouseOver)
-         PrimBuild::color(mProfile->mFontColorHL);
-      else
-         PrimBuild::color(mProfile->mFontColor);
+      //PrimBuild::begin(GFXTriangleList, 3);
 
-      PrimBuild::vertex2i(left, top);
+      ColorI color = ColorI::BLACK;
+      if (selected || mouseOver)
+         color = mProfile->mFontColorHL;
+      else
+         color = mProfile->mFontColor;
+
+      GFX->getDrawUtil()->drawLine(Point2I(left, top), Point2I(right, middle), color);
+      GFX->getDrawUtil()->drawLine(Point2I(right, middle), Point2I(left, bottom), color);
+      GFX->getDrawUtil()->drawLine(Point2I(left, bottom), Point2I(left, top), color);
+
+      /*PrimBuild::vertex2i(left, top);
       PrimBuild::vertex2i(right, middle);
       PrimBuild::vertex2i(left, bottom);
-      PrimBuild::end();
+      PrimBuild::end();*/
    }
 }
 

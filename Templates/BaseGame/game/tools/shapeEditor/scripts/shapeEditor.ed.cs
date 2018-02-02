@@ -611,6 +611,19 @@ function ShapeEdPropWindow::update_onShapeSelectionChanged( %this )
          ShapeEdSequenceList.addItem( %name );
    }
    ShapeEdThreadWindow.onAddThread();        // add thread 0
+   
+   //Now, fetch any animation assets if we're utilizing a shape asset
+   if(ShapeEditorPlugin.selectedAssetId !$= "")
+   {
+      %animationAssetCount = ShapeEditorPlugin.selectedAssetDef.getAnimationCount();
+      
+      for(%animIdx = 0; %animIdx < %animationAssetCount; %animIdx++)
+      {
+         %animAsset = ShapeEditorPlugin.selectedAssetDef.getAnimation(%animIdx);
+         
+         //ShapeEdSequenceList.addItem( %animAsset.assetName );
+      }
+   }
 
    // --- DETAILS TAB ---
    // Add detail levels and meshes to tree
@@ -789,7 +802,8 @@ function ShapeEdSeqNodeTabBook::onTabSelected( %this, %name, %index )
    {
       case "Seq":
          ShapeEdPropWindow-->newBtn.ToolTip = "Add new sequence";
-         ShapeEdPropWindow-->newBtn.Command = "ShapeEdSequences.onAddSequence();";
+         //ShapeEdPropWindow-->newBtn.Command = "ShapeEdSequences.onAddSequence();"; 
+         ShapeEdPropWindow-->newBtn.Command = "AssetBrowser.showDialog(\"ShapeAnimationAsset\", \"onAddAnimationAssetShapeEditor\", \"\", \"\", \"\");"; 
          ShapeEdPropWindow-->newBtn.setActive( true );
          ShapeEdPropWindow-->deleteBtn.ToolTip = "Delete selected sequence (cannot be undone)";
          ShapeEdPropWindow-->deleteBtn.Command = "ShapeEdSequences.onDeleteSequence();";
