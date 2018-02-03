@@ -409,6 +409,8 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
    U32 totSize = codeLength + lineBreakPairCount * 2;
    code = new U32[totSize];
 
+   // 0xFF is used as a flag to help compress the bytecode.
+   // If detected, the bytecode is only a U8.
    for (i = 0; i < codeLength; i++)
    {
       U8 b;
@@ -442,7 +444,11 @@ bool CodeBlock::read(StringTableEntry fileName, Stream &st)
       {
          U32 ip;
          st.read(&ip);
+#ifdef TORQUE_CPU_X64
+         *(U64*)(code + ip) = (U64)ste;
+#else
          code[ip] = *((U32 *)&ste);
+#endif
       }
    }
 
