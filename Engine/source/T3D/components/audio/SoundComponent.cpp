@@ -359,7 +359,8 @@ void SoundComponent::updateAudioState(Sound& st)
       {
          //if (Sim::findObject(SimObjectId((uintptr_t)st.profile), st.profile))
         // {
-            st.sound = SFX->createSource(st.profile, &mOwner->getTransform());
+            MatrixF transform = mOwner->getTransform();
+            st.sound = SFX->createSource(st.profile, &transform);
             if (st.sound)
                st.sound->play();
          //}

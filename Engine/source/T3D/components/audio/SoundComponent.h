@@ -67,7 +67,7 @@ public:
       SimTime timeout;              ///< Time until we stop playing this sound.
       SFXTrack* profile;            ///< Profile on server
       SFXSource* sound;             ///< Sound on client
-      Sound::Sound()
+      Sound()
       {
          play = false;
          timeout = 0;
