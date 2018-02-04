@@ -182,17 +182,49 @@ bool ShapeAsset::loadShape()
       return false; //if it failed to load, bail out
    }
 
+   bool hasBlends = false;
+
    //Now that we've successfully loaded our shape and have any materials and animations loaded
    //we need to set up the animations we're using on our shape
-   for (U32 i = 0; i < mAnimationAssets.size(); i++)
+   for (S32 i = mAnimationAssets.size()-1; i >= 0; --i)
    {
-      String srcName;
+      String srcName = mAnimationAssets[i]->getAnimationName();
       String srcPath(mAnimationAssets[i]->getAnimationFilename());
-      SplitSequencePathAndName(srcPath, srcName);
+      //SplitSequencePathAndName(srcPath, srcName);
 
-      if (!mShape->addSequence(srcPath, srcName, mAnimationAssets[i]->getAnimationName(), 
+      if (!mShape->addSequence(srcPath, srcName, srcName,
          mAnimationAssets[i]->getStartFrame(), mAnimationAssets[i]->getEndFrame(), mAnimationAssets[i]->getPadRotation(), mAnimationAssets[i]->getPadTransforms()))
          return false;
+
+      if (mAnimationAssets[i]->isBlend())
+         hasBlends = true;
+   }
+
+   //if any of our animations are blends, set those up now
+   if (hasBlends)
+   {
+      for (U32 i=0; i < mAnimationAssets.size(); ++i)
+      {
+         if (mAnimationAssets[i]->isBlend() && mAnimationAssets[i]->getBlendAnimationName() != StringTable->EmptyString())
+         {
+            //gotta do a bit of logic here.
+            //First, we need to make sure the anim asset we depend on for our blend is loaded
+            AssetPtr<ShapeAnimationAsset> blendAnimAsset = mAnimationAssets[i]->getBlendAnimationName();
+
+            if (blendAnimAsset.isNull())
+            {
+               Con::errorf("ShapeAsset::initializeAsset - Unable to acquire reference animation asset %s for asset %s to blend!", mAnimationAssets[i]->getBlendAnimationName(), mAnimationAssets[i]->getAssetName());
+               return false;
+            }
+
+            String refAnimName = blendAnimAsset->getAnimationName();
+            if (!mShape->setSequenceBlend(mAnimationAssets[i]->getAnimationName(), true, blendAnimAsset->getAnimationName(), mAnimationAssets[i]->getBlendFrame()))
+            {
+               Con::errorf("ShapeAnimationAsset::initializeAsset - Unable to set animation clip %s for asset %s to blend!", mAnimationAssets[i]->getAnimationName(), mAnimationAssets[i]->getAssetName());
+               return false;
+            }
+         }
+      }
    }
 
    return true;
