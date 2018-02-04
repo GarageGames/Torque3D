@@ -70,7 +70,8 @@ bool GuiInspectorEntityGroup::inspectGroup()
    {
       Entity* target = dynamic_cast<Entity*>(mParent->getInspectObject(0));
 
-      Con::executef(this, "inspectObject", target->getIdString());
+      if(target)
+         Con::executef(this, "inspectObject", target->getIdString());
    }
 
    return true;

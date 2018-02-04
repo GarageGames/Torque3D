@@ -119,8 +119,11 @@ PlayerControllerComponent::PlayerControllerComponent() : Component()
 
    mInputVelocity = Point3F(0, 0, 0);
 
-   mPhysicsRep = NULL;
-   mPhysicsWorld = NULL;
+   mPhysicsRep = nullptr;
+   mPhysicsWorld = nullptr;
+
+   mOwnerCollisionInterface = nullptr;
+   mIntegrationCount = 0;
 }
 
 PlayerControllerComponent::~PlayerControllerComponent()

@@ -67,6 +67,13 @@ Component::Component()
    mOriginatingAssetId = StringTable->EmptyString();
 
    mIsServerObject = true;
+
+   componentIdx = 0;
+
+   mHidden = false;
+   mEnabled = true;
+
+   mDirtyMaskBits = 0;
 }
 
 Component::~Component()
@@ -535,7 +542,7 @@ const char * Component::getDescriptionText(const char *desc)
    if (desc == NULL)
       return NULL;
 
-   char *newDesc;
+   char *newDesc = "";
 
    // [tom, 1/12/2007] If it isn't a file, just do it the easy way
    if (!Platform::isFile(desc))
@@ -568,7 +575,7 @@ const char * Component::getDescriptionText(const char *desc)
    }
 
    str.close();
-   delete stream;
+   //delete stream;
 
    return newDesc;
 }
