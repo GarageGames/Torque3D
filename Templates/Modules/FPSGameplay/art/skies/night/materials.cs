@@ -34,7 +34,6 @@ singleton Material( NightSkyMat )
 {
    cubemap = NightCubemap;
    materialTag0 = "Skies";
-   isSky = true;
 };
 
 singleton Material( Moon_Glow_Mat )
