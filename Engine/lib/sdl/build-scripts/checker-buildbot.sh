@@ -11,7 +11,7 @@
 
 FINALDIR="$1"
 
-CHECKERDIR="/usr/local/checker-276"
+CHECKERDIR="/usr/local/checker-279"
 if [ ! -d "$CHECKERDIR" ]; then
     echo "$CHECKERDIR not found. Trying /usr/share/clang ..." 1>&2
     CHECKERDIR="/usr/share/clang/scan-build"
@@ -46,6 +46,10 @@ fi
 
 echo "\$MAKE is '$MAKE'"
 
+# Unset $MAKE so submakes don't use it.
+MAKECOMMAND="$MAKE"
+unset MAKE
+
 set -x
 set -e
 
@@ -60,17 +64,23 @@ fi
 mkdir checker-buildbot
 cd checker-buildbot
 
+# We turn off deprecated declarations, because we don't care about these warnings during static analysis.
+# The -Wno-liblto is new since our checker-279 upgrade, I think; checker otherwise warns "libLTO.dylib relative to clang installed dir not found"
+
 # You might want to do this for CMake-backed builds instead...
-PATH="$CHECKERDIR:$PATH" scan-build -o analysis cmake -DCMAKE_BUILD_TYPE=Debug -DASSERTIONS=enabled ..
+PATH="$CHECKERDIR/bin:$PATH" scan-build -o analysis cmake -Wno-dev -DSDL_STATIC=OFF -DCMAKE_BUILD_TYPE=Debug -DASSERTIONS=enabled -DCMAKE_C_FLAGS="-Wno-deprecated-declarations" -DCMAKE_SHARED_LINKER_FLAGS="-Wno-liblto" ..
 
 # ...or run configure without the scan-build wrapper...
-#CC="$CHECKERDIR/libexec/ccc-analyzer" CFLAGS="-O0" ../configure --enable-assertions=enabled
-
-# ...but this works for our buildbots just fine (EXCEPT ON LATEST MAC OS X).
-#CFLAGS="-O0" PATH="$CHECKERDIR:$PATH" scan-build -o analysis ../configure --enable-assertions=enabled
+#CC="$CHECKERDIR/libexec/ccc-analyzer" CFLAGS="-O0 -Wno-deprecated-declarations" LDFLAGS="-Wno-liblto" ../configure --enable-assertions=enabled
 
 rm -rf analysis
-PATH="$CHECKERDIR:$PATH" scan-build -o analysis $MAKE
+PATH="$CHECKERDIR/bin:$PATH" scan-build -o analysis $MAKECOMMAND
+
+if [ `ls -A analysis |wc -l` == 0 ] ; then
+    mkdir analysis/zarro
+    echo '<html><head><title>Zarro boogs</title></head><body>Static analysis: no issues to report.</body></html>' >analysis/zarro/index.html
+fi
+
 mv analysis/* ../analysis
 rmdir analysis   # Make sure this is empty.
 cd ..
