@@ -1,0 +1,8 @@
+<ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="StateMachineComponentAsset"
+    componentClass="StateMachineComponent"
+    friendlyName="State Machine"
+    componentType="Game"
+    description="Enables a state machine on the entity." />

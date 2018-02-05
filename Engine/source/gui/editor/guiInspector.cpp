@@ -29,11 +29,10 @@
 #include "gui/containers/guiScrollCtrl.h"
 #include "gui/editor/inspector/customField.h"
 
-#ifdef TORQUE_EXPERIMENTAL_EC
 #include "gui/editor/inspector/entityGroup.h"
 #include "gui/editor/inspector/mountingGroup.h"
 #include "gui/editor/inspector/componentGroup.h"
-#endif
+#include "T3D/components/component.h"
 
 IMPLEMENT_CONOBJECT(GuiInspector);
 
@@ -55,7 +54,8 @@ GuiInspector::GuiInspector()
    mOverDivider( false ),
    mMovingDivider( false ),
    mHLField( NULL ),
-   mShowCustomFields( true )
+   mShowCustomFields( true ),
+   mComponentGroupTargetId(-1)
 {
    mPadding = 1;
 }
@@ -589,16 +589,48 @@ void GuiInspector::refresh()
    mGroups.push_back(general);
    addObject(general);
 
-#ifdef TORQUE_EXPERIMENTAL_EC
    //Entity inspector group
    if (mTargets.first()->getClassRep()->isSubclassOf("Entity"))
    {
+      //Put the GameObject group before everything that'd be gameobject-effecting, for orginazational purposes
+      GuiInspectorGroup *gameObject = new GuiInspectorGroup("GameObject", this);
+
+      gameObject->registerObject();
+      mGroups.push_back(gameObject);
+      addObject(gameObject);
+
       GuiInspectorEntityGroup *components = new GuiInspectorEntityGroup("Components", this);
       if (components != NULL)
       {
          components->registerObject();
          mGroups.push_back(components);
          addObject(components);
+      }
+
+      Entity* selectedEntity = dynamic_cast<Entity*>(mTargets.first().getObject());
+
+      U32 compCount = selectedEntity->getComponentCount();
+      //Now, add the component groups
+      for (U32 c = 0; c < compCount; ++c)
+      {
+         Component* comp = selectedEntity->getComponent(c);
+         
+         String compName;
+         if (comp->getFriendlyName() != StringTable->EmptyString())
+            compName = comp->getFriendlyName();
+         else
+            compName = comp->getComponentName();
+
+         StringBuilder captionString;
+         captionString.format("%s [%i]", compName.c_str(), comp->getId());
+
+         GuiInspectorGroup *compGroup = new GuiInspectorComponentGroup(captionString.data(), this, comp);
+         if (compGroup != NULL)
+         {
+            compGroup->registerObject();
+            mGroups.push_back(compGroup);
+            addObject(compGroup);
+         }
       }
 
       //Mounting group override
@@ -610,21 +642,6 @@ void GuiInspector::refresh()
          addObject(mounting);
       }
    }
-
-   if (mTargets.first()->getClassRep()->isSubclassOf("Component"))
-   {
-      //Build the component field groups as the component describes it
-      Component* comp = dynamic_cast<Component*>(mTargets.first().getPointer());
-
-      if (comp->getComponentFieldCount() > 0)
-      {
-         GuiInspectorComponentGroup *compGroup = new GuiInspectorComponentGroup("Component Fields", this);
-         compGroup->registerObject();
-         mGroups.push_back(compGroup);
-         addObject(compGroup);
-      }
-   }
-#endif
 
    // Create the inspector groups for static fields.
 

@@ -24,13 +24,13 @@
 #define _CONSOLE_H_
 
 #ifndef _PLATFORM_H_
-   #include "platform/platform.h"
+#include "platform/platform.h"
 #endif
 #ifndef _BITSET_H_
-   #include "core/bitSet.h"
+#include "core/bitSet.h"
 #endif
 #ifndef _REFBASE_H_
-   #include "core/util/refBase.h"
+#include "core/util/refBase.h"
 #endif
 #include <stdarg.h>
 
@@ -95,8 +95,8 @@ struct ConsoleLogEntry
       Script,
       GUI,
       Network,
-     GGConnect,
-     NUM_TYPE
+      GGConnect,
+      NUM_TYPE
    } mType;
 
    /// Indicates the actual log entry.
@@ -120,7 +120,7 @@ extern char *typeValueEmpty;
 class ConsoleValue
 {
 public:
-   
+
    enum
    {
       TypeInternalInt = -5,
@@ -129,17 +129,17 @@ public:
       TypeInternalStackString = -2,
       TypeInternalString = -1,
    };
-   
+
    S32 type;
-   
+
 public:
-   
+
    // NOTE: This is protected to ensure no one outside
    // of this structure is messing with it.
-   
+
 #pragma warning( push )
 #pragma warning( disable : 4201 ) // warning C4201: nonstandard extension used : nameless struct/union
-   
+
    // An variable is either a real dynamic type or
    // its one exposed from C++ using a data pointer.
    //
@@ -154,24 +154,24 @@ public:
          F32 fval;
          U32 bufferLen;
       };
-      
+
       struct
       {
          /// The real data pointer.
          void *dataPtr;
-         
+
          /// The enum lookup table for enumerated types.
          const EnumTable *enumTable;
       };
    };
-   
+
    U32 getIntValue();
    S32 getSignedIntValue();
    F32 getFloatValue();
    const char *getStringValue();
    StringStackPtr getStringStackPtr();
    bool getBoolValue();
-   
+
    void setIntValue(U32 val);
    void setIntValue(S32 val);
    void setFloatValue(F32 val);
@@ -179,7 +179,7 @@ public:
    void setStackStringValue(const char *value);
    void setStringStackPtrValue(StringStackPtr ptr);
    void setBoolValue(bool val);
-   
+
    void init()
    {
       ival = 0;
@@ -188,7 +188,7 @@ public:
       bufferLen = 0;
       type = TypeInternalString;
    }
-   
+
    void cleanup()
    {
       if ((type <= TypeInternalString) && (bufferLen > 0))
@@ -201,8 +201,8 @@ public:
       ival = 0;
       fval = 0;
    }
-   ConsoleValue(){ init(); };
-   ~ConsoleValue(){ cleanup(); };
+   ConsoleValue() { init(); };
+   ~ConsoleValue() { cleanup(); };
 };
 
 // Proxy class for console variables
@@ -234,7 +234,7 @@ public:
    inline operator S32() { return getSignedIntValue(); }
    inline operator F32() { return getFloatValue(); }
    inline operator bool() { return getBoolValue(); }
-   
+
    inline bool isStringStackPtr() { return value ? value->type == ConsoleValue::TypeInternalStringStackPtr : false; }
    inline bool isString() { return value ? value->type >= ConsoleValue::TypeInternalStringStackPtr : true; }
    inline bool isInt() { return value ? value->type == ConsoleValue::TypeInternalInt : false; }
@@ -320,12 +320,12 @@ public:
 
 ///
 typedef const char * (*StringCallback)(SimObject *obj, S32 argc, ConsoleValueRef argv[]);
-typedef S32             (*IntCallback)(SimObject *obj, S32 argc, ConsoleValueRef argv[]);
-typedef F32           (*FloatCallback)(SimObject *obj, S32 argc, ConsoleValueRef argv[]);
-typedef void           (*VoidCallback)(SimObject *obj, S32 argc, ConsoleValueRef argv[]); // We have it return a value so things don't break..
-typedef bool           (*BoolCallback)(SimObject *obj, S32 argc, ConsoleValueRef argv[]);
+typedef S32(*IntCallback)(SimObject *obj, S32 argc, ConsoleValueRef argv[]);
+typedef F32(*FloatCallback)(SimObject *obj, S32 argc, ConsoleValueRef argv[]);
+typedef void(*VoidCallback)(SimObject *obj, S32 argc, ConsoleValueRef argv[]); // We have it return a value so things don't break..
+typedef bool(*BoolCallback)(SimObject *obj, S32 argc, ConsoleValueRef argv[]);
 
-typedef void (*ConsumerCallback)(U32 level, const char *consoleLine);
+typedef void(*ConsumerCallback)(U32 level, const char *consoleLine);
 /// @}
 
 /// @defgroup console_types Scripting Engine Type Functions
@@ -333,7 +333,7 @@ typedef void (*ConsumerCallback)(U32 level, const char *consoleLine);
 /// @see Con::registerType
 /// @{
 typedef const char* (*GetDataFunction)(void *dptr, EnumTable *tbl, BitSet32 flag);
-typedef void        (*SetDataFunction)(void *dptr, S32 argc, const char **argv, EnumTable *tbl, BitSet32 flag);
+typedef void(*SetDataFunction)(void *dptr, S32 argc, const char **argv, EnumTable *tbl, BitSet32 flag);
 /// @}
 
 /// This namespace contains the core of the console functionality.
@@ -347,7 +347,7 @@ typedef void        (*SetDataFunction)(void *dptr, S32 argc, const char **argv, 
 namespace Con
 {
    /// Various configuration constants.
-   enum Constants 
+   enum Constants
    {
       /// This is the version number associated with DSO files.
       ///
@@ -361,20 +361,22 @@ namespace Con
       /// 12/29/04 - BJG - 33->34 Removed some opcodes, part of namespace upgrade.
       /// 12/30/04 - BJG - 34->35 Reordered some things, further general shuffling.
       /// 11/03/05 - BJG - 35->36 Integrated new debugger code.
-      //  09/08/06 - THB - 36->37 New opcode for internal names
-      //  09/15/06 - THB - 37->38 Added unit conversions
-      //  11/23/06 - THB - 38->39 Added recursive internal name operator
-      //  02/15/07 - THB - 39->40 Bumping to 40 for TGB since the console has been
-      //                          majorly hacked without the version number being bumped
-      //  02/16/07 - THB - 40->41 newmsg operator
-      //  06/15/07 - THB - 41->42 script types
+      /// 09/08/06 - THB - 36->37 New opcode for internal names
+      /// 09/15/06 - THB - 37->38 Added unit conversions
+      /// 11/23/06 - THB - 38->39 Added recursive internal name operator
+      /// 02/15/07 - THB - 39->40 Bumping to 40 for TGB since the console has been
+      ///                         majorly hacked without the version number being bumped
+      /// 02/16/07 - THB - 40->41 newmsg operator
+      /// 06/15/07 - THB - 41->42 script types
       /// 07/31/07 - THB - 42->43 Patch from Andreas Kirsch: Added opcode to support nested new declarations.
       /// 09/12/07 - CAF - 43->44 remove newmsg operator
       /// 09/27/07 - RDB - 44->45 Patch from Andreas Kirsch: Added opcode to support correct void return
       /// 01/13/09 - TMS - 45->46 Added script assert
       /// 09/07/14 - jamesu - 46->47 64bit support
       /// 10/14/14 - jamesu - 47->48 Added opcodes to reduce reliance on strings in function calls
-      DSOVersion = 48,
+      /// 10/07/17 - JTH - 48->49 Added opcode for function pointers and revamp of interpreter 
+      ///                         from switch to function calls.
+      DSOVersion = 49,
 
       MaxLineLength = 512,  ///< Maximum length of a line of console input.
       MaxDataTypes = 256    ///< Maximum number of registered data types.
@@ -552,11 +554,11 @@ namespace Con
    /// @param usage     Documentation string.
    ///
    /// @see ConsoleDynamicTypes
-   void addVariable( const char *name, 
-                     S32 type, 
-                     void *pointer, 
-                     const char* usage = NULL );
-                     
+   void addVariable(const char *name,
+      S32 type,
+      void *pointer,
+      const char* usage = NULL);
+
    /// Add a console constant that references the value of a constant in C++ code.
    ///
    /// @param name      Global console constant name to create.
@@ -565,11 +567,11 @@ namespace Con
    /// @param usage     Documentation string.
    ///
    /// @see ConsoleDynamicTypes
-   void addConstant( const char *name, 
-                     S32 type, 
-                     const void *pointer, 
-                     const char* usage = NULL );
-                     
+   void addConstant(const char *name,
+      S32 type,
+      const void *pointer,
+      const char* usage = NULL);
+
    /// Remove a console variable.
    ///
    /// @param name   Global console variable name to remove
@@ -582,14 +584,14 @@ namespace Con
    /// @param name      An existing global console variable name.
    /// @param callback  The notification delegate function.
    ///
-   void addVariableNotify( const char *name, const NotifyDelegate &callback );
+   void addVariableNotify(const char *name, const NotifyDelegate &callback);
 
    /// Remove an existing variable assignment notification callback.
    ///
    /// @param name      An existing global console variable name.
    /// @param callback  The notification delegate function.
    ///
-   void removeVariableNotify( const char *name, const NotifyDelegate &callback );
+   void removeVariableNotify(const char *name, const NotifyDelegate &callback);
 
    /// Assign a string value to a locally scoped console variable
    ///
@@ -628,31 +630,31 @@ namespace Con
    const char* getObjectField(const char* name);
 
    /// Same as setVariable(), but for bools.
-   void setBoolVariable (const char* name,bool var);
+   void setBoolVariable(const char* name, bool var);
 
    /// Same as getVariable(), but for bools.
    ///
    /// @param  name  Name of the variable.
    /// @param  def   Default value to supply if no matching variable is found.
-   bool getBoolVariable (const char* name,bool def = false);
+   bool getBoolVariable(const char* name, bool def = false);
 
    /// Same as setVariable(), but for ints.
-   void setIntVariable  (const char* name,S32 var);
+   void setIntVariable(const char* name, S32 var);
 
    /// Same as getVariable(), but for ints.
    ///
    /// @param  name  Name of the variable.
    /// @param  def   Default value to supply if no matching variable is found.
-   S32  getIntVariable  (const char* name,S32 def = 0);
+   S32  getIntVariable(const char* name, S32 def = 0);
 
    /// Same as setVariable(), but for floats.
-   void setFloatVariable(const char* name,F32 var);
+   void setFloatVariable(const char* name, F32 var);
 
    /// Same as getVariable(), but for floats.
    ///
    /// @param  name  Name of the variable.
    /// @param  def   Default value to supply if no matching variable is found.
-   F32  getFloatVariable(const char* name,F32 def = .0f);
+   F32  getFloatVariable(const char* name, F32 def = .0f);
 
    /// @}
 
@@ -668,52 +670,52 @@ namespace Con
    /// @param maxArgs   Maximum number of arguments this function accepts
    /// @param toolOnly  Wether this is a TORQUE_TOOLS only function.
    /// @param header    The extended function header.
-   void addCommand( const char* name, StringCallback cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
+   void addCommand(const char* name, StringCallback cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 
-   void addCommand( const char* name, IntCallback    cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL ); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-   void addCommand( const char* name, FloatCallback  cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL ); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-   void addCommand( const char* name, VoidCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL ); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-   void addCommand( const char* name, BoolCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL ); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-   
-   /// @}
+   void addCommand(const char* name, IntCallback    cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+   void addCommand(const char* name, FloatCallback  cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+   void addCommand(const char* name, VoidCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+   void addCommand(const char* name, BoolCallback   cb, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 
-   /// @name Namespace Function Registration
-   /// @{
+                                                                                                                                                                   /// @}
 
-   /// Register a C++ function with the console making it callable
-   /// as a method of the given namespace from the scripting engine.
-   ///
-   /// @param nameSpace Name of the namespace to associate the new function with; this is usually the name of a class.
-   /// @param name      Name of the new function.
-   /// @param cb        Pointer to the function implementing the scripting call; a console callback function returning a specific type value.
-   /// @param usage     Documentation for this function. @ref console_autodoc
-   /// @param minArgs   Minimum number of arguments this function accepts
-   /// @param maxArgs   Maximum number of arguments this function accepts
-   /// @param toolOnly  Wether this is a TORQUE_TOOLS only function.
-   /// @param header    The extended function header.
-   void addCommand(const char *nameSpace, const char *name,StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
+                                                                                                                                                                   /// @name Namespace Function Registration
+                                                                                                                                                                   /// @{
 
-   void addCommand(const char *nameSpace, const char *name,IntCallback cb,    const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL ); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-   void addCommand(const char *nameSpace, const char *name,FloatCallback cb,  const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL ); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-   void addCommand(const char *nameSpace, const char *name,VoidCallback cb,   const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL ); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
-   void addCommand(const char *nameSpace, const char *name,BoolCallback cb,   const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL ); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+                                                                                                                                                                   /// Register a C++ function with the console making it callable
+                                                                                                                                                                   /// as a method of the given namespace from the scripting engine.
+                                                                                                                                                                   ///
+                                                                                                                                                                   /// @param nameSpace Name of the namespace to associate the new function with; this is usually the name of a class.
+                                                                                                                                                                   /// @param name      Name of the new function.
+                                                                                                                                                                   /// @param cb        Pointer to the function implementing the scripting call; a console callback function returning a specific type value.
+                                                                                                                                                                   /// @param usage     Documentation for this function. @ref console_autodoc
+                                                                                                                                                                   /// @param minArgs   Minimum number of arguments this function accepts
+                                                                                                                                                                   /// @param maxArgs   Maximum number of arguments this function accepts
+                                                                                                                                                                   /// @param toolOnly  Wether this is a TORQUE_TOOLS only function.
+                                                                                                                                                                   /// @param header    The extended function header.
+   void addCommand(const char *nameSpace, const char *name, StringCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 
-   /// @}
+   void addCommand(const char *nameSpace, const char *name, IntCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+   void addCommand(const char *nameSpace, const char *name, FloatCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+   void addCommand(const char *nameSpace, const char *name, VoidCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
+   void addCommand(const char *nameSpace, const char *name, BoolCallback cb, const char *usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL); ///< @copydoc addCommand( const char*, const char *, StringCallback, const char *, S32, S32, bool, ConsoleFunctionHeader* )
 
-   /// @name Special Purpose Registration
-   ///
-   /// These are special-purpose functions that exist to allow commands to be grouped, so
-   /// that when we generate console docs, they can be more meaningfully presented.
-   ///
-   /// @ref console_autodoc "Click here for more information about console docs and grouping."
-   ///
-   /// @{
+                                                                                                                                                                                        /// @}
 
-   void markCommandGroup (const char * nsName, const char *name, const char* usage=NULL);
+                                                                                                                                                                                        /// @name Special Purpose Registration
+                                                                                                                                                                                        ///
+                                                                                                                                                                                        /// These are special-purpose functions that exist to allow commands to be grouped, so
+                                                                                                                                                                                        /// that when we generate console docs, they can be more meaningfully presented.
+                                                                                                                                                                                        ///
+                                                                                                                                                                                        /// @ref console_autodoc "Click here for more information about console docs and grouping."
+                                                                                                                                                                                        ///
+                                                                                                                                                                                        /// @{
+
+   void markCommandGroup(const char * nsName, const char *name, const char* usage = NULL);
    void beginCommandGroup(const char * nsName, const char *name, const char* usage);
-   void endCommandGroup  (const char * nsName, const char *name);
+   void endCommandGroup(const char * nsName, const char *name);
 
-   void noteScriptCallback( const char *className, const char *funcName, const char *usage, ConsoleFunctionHeader* header = NULL );
+   void noteScriptCallback(const char *className, const char *funcName, const char *usage, ConsoleFunctionHeader* header = NULL);
 
    /// @}
 
@@ -841,15 +843,15 @@ namespace Con
    ///
    char* getReturnBuffer(U32 bufferSize);
    char* getReturnBuffer(const char *stringToCopy);
-   char* getReturnBuffer( const String& str );
-   char* getReturnBuffer( const StringBuilder& str );
+   char* getReturnBuffer(const String& str);
+   char* getReturnBuffer(const StringBuilder& str);
 
    char* getArgBuffer(U32 bufferSize);
    char* getFloatArg(F64 arg);
-   char* getIntArg  (S32 arg);
+   char* getIntArg(S32 arg);
    char* getBoolArg(bool arg);
-   char* getStringArg( const char* arg );
-   char* getStringArg( const String& arg );
+   char* getStringArg(const char* arg);
+   char* getStringArg(const String& arg);
    /// @}
 
    /// @name Namespaces
@@ -877,7 +879,7 @@ namespace Con
    /// @name Instant Group
    /// @{
 
-   void pushInstantGroup( String name = String() );
+   void pushInstantGroup(String name = String());
    void popInstantGroup();
 
    /// @}
@@ -915,7 +917,7 @@ namespace Con
    template<typename R, typename ...ArgTs>
    ConsoleValueRef executef(R r, ArgTs ...argTs)
    {
-      _EngineConsoleExecCallbackHelper<R> callback( r );
+      _EngineConsoleExecCallbackHelper<R> callback(r);
       return callback.template call<ConsoleValueRef>(argTs...);
    }
    /// }
@@ -931,25 +933,25 @@ struct ConsoleFunctionHeader
 {
    /// Return type string.
    const char* mReturnString;
-   
+
    /// List of arguments taken by the function.  Used for documentation.
    const char* mArgString;
-   
+
    /// List of default argument values.  Used for documentation.
    const char* mDefaultArgString;
-   
+
    /// Whether this is a static method in a class.
    bool mIsStatic;
-   
+
    ConsoleFunctionHeader(
       const char* returnString,
       const char* argString,
       const char* defaultArgString,
-      bool isStatic = false )
-      : mReturnString( returnString ),
-        mArgString( argString ),
-        mDefaultArgString( defaultArgString ),
-        mIsStatic( isStatic ) {}
+      bool isStatic = false)
+      : mReturnString(returnString),
+      mArgString(argString),
+      mDefaultArgString(defaultArgString),
+      mIsStatic(isStatic) {}
 };
 
 
@@ -969,7 +971,7 @@ public:
    ///
    /// @ref console_autodoc
    /// @{
-   
+
    StringCallback sc;   ///< A function/method that returns a string.
    IntCallback ic;      ///< A function/method that returns an int.
    FloatCallback fc;    ///< A function/method that returns a float.
@@ -979,18 +981,18 @@ public:
    bool ns;             ///< Indicates that this is a namespace marker.
                         ///  @deprecated Unused.
    bool callback;       ///< Is this a callback into script?
-   
-   /// @}
 
-   /// Minimum number of arguments expected by the function.
+                        /// @}
+
+                        /// Minimum number of arguments expected by the function.
    S32 mina;
-   
+
    /// Maximum number of arguments accepted by the funtion.  Zero for varargs.
    S32 maxa;
-      
+
    /// Name of the function/method.
    const char* funcName;
-   
+
    /// Name of the class namespace to which to add the method.
    const char* className;
 
@@ -999,10 +1001,10 @@ public:
 
    /// Whether this is a TORQUE_TOOLS only function.
    bool toolOnly;
-   
+
    /// The extended function header.
    ConsoleFunctionHeader* header;
-   
+
    /// @name ConsoleConstructor Innards
    ///
    /// The ConsoleConstructor class is used as the backend for the ConsoleFunction() and
@@ -1067,7 +1069,7 @@ public:
    ConsoleConstructor *next;
    static ConsoleConstructor *first;
 
-   void init( const char* cName, const char* fName, const char *usg, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
+   void init(const char* cName, const char* fName, const char *usg, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
 
    static void setup();
 
@@ -1079,12 +1081,12 @@ public:
    /// @name Basic Console Constructors
    /// @{
 
-   ConsoleConstructor( const char* className, const char* funcName, StringCallback sfunc, const char* usage,  S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
-   ConsoleConstructor( const char* className, const char* funcName, IntCallback    ifunc, const char* usage,  S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
-   ConsoleConstructor( const char* className, const char* funcName, FloatCallback  ffunc, const char* usage,  S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
-   ConsoleConstructor( const char* className, const char* funcName, VoidCallback   vfunc, const char* usage,  S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
-   ConsoleConstructor( const char* className, const char* funcName, BoolCallback   bfunc, const char* usage,  S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL );
-   
+   ConsoleConstructor(const char* className, const char* funcName, StringCallback sfunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+   ConsoleConstructor(const char* className, const char* funcName, IntCallback    ifunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+   ConsoleConstructor(const char* className, const char* funcName, FloatCallback  ffunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+   ConsoleConstructor(const char* className, const char* funcName, VoidCallback   vfunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+   ConsoleConstructor(const char* className, const char* funcName, BoolCallback   bfunc, const char* usage, S32 minArgs, S32 maxArgs, bool toolOnly = false, ConsoleFunctionHeader* header = NULL);
+
    /// @}
 
    /// @name Magic Console Constructors
@@ -1097,10 +1099,10 @@ public:
    ///
    /// @see Con::markCommandGroup
    /// @ref console_autodoc
-   ConsoleConstructor( const char *className, const char *groupName, const char* usage );
+   ConsoleConstructor(const char *className, const char *groupName, const char* usage);
 
    /// Indicates a callback declared with the DECLARE_SCRIPT_CALLBACK macro and friends.
-   ConsoleConstructor( const char *className, const char *callbackName, const char *usage, ConsoleFunctionHeader* header );
+   ConsoleConstructor(const char *className, const char *callbackName, const char *usage, ConsoleFunctionHeader* header);
 
    /// @}
 };
@@ -1112,25 +1114,25 @@ struct ConsoleDocFragment
    /// The class in which to put the fragment.  If NULL, the fragment
    /// will be placed globally.
    const char* mClass;
-   
+
    /// The definition to output for this fragment.  NULL for fragments
    /// not associated with a definition.
    const char* mDefinition;
-   
+
    /// The documentation text.
    const char* mText;
-   
+
    /// Next fragment in the global link chain.
    ConsoleDocFragment* mNext;
-   
+
    /// First fragment in the global link chain.
    static ConsoleDocFragment* smFirst;
-   
-   ConsoleDocFragment( const char* text, const char* inClass = NULL, const char* definition = NULL )
-      : mClass( inClass ),
-        mDefinition( definition ),
-        mText( text ),
-        mNext( smFirst )
+
+   ConsoleDocFragment(const char* text, const char* inClass = NULL, const char* definition = NULL)
+      : mClass(inClass),
+      mDefinition(definition),
+      mText(text),
+      mNext(smFirst)
    {
       smFirst = this;
    }
@@ -1229,7 +1231,7 @@ public:
 
 #  define ConsoleMethodGroupEnd(className, groupName) \
    static ConsoleConstructor cc_##className##_##groupName##_GroupEnd(#className,#groupName,NULL)
-   
+
 /// Add a fragment of auto-doc text to the console API reference.
 /// @note There can only be one ConsoleDoc per source file.
 #  define ConsoleDoc( text )                                \

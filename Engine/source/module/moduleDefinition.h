@@ -166,6 +166,8 @@ public:
     inline void             setAssetTagsManifest( const char* pTagsAssetManifest ) { if ( checkUnlocked() ) { mAssetTagsManifest = StringTable->insert(pTagsAssetManifest); } }
     inline StringTableEntry getAssetTagsManifest( void ) const                  { return mAssetTagsManifest; }
     inline typeModuleAssetsVector& getModuleAssets( void )                      { return mModuleAssets; }
+    void                    addDeclaredAsset(AssetDefinition* asset)            { mModuleAssets.push_back(asset); }
+
 
     /// Module location.
     inline void             setModulePath( const char* pModulePath )            { if ( checkUnlocked() ) { mModulePath = StringTable->insert(pModulePath); } }

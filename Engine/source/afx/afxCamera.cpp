@@ -453,7 +453,7 @@ const char* afxCamera::getMode()
 static char buffer[100];
 
 ConsoleMethod(afxCamera, setOrbitMode, void, 7, 8, 
-  "(GameBase orbitObject, transform mat, float minDistance, float maxDistance, float curDistance, bool ownClientObject)"
+  "(GameBase orbitObject, TransformF mat, float minDistance, float maxDistance, float curDistance, bool ownClientObject)"
   "Set the camera to orbit around some given object.\n\n"
   "@param   orbitObject  Object we want to orbit.\n"
   "@param   mat          A set of fields: posX posY posZ aaX aaY aaZ aaTheta\n"
@@ -541,7 +541,7 @@ ConsoleMethod(afxCamera, getThirdPersonAngle, F32, 2, 2, "")
    return object->getThirdPersonAngle();
 }
 
-ConsoleMethod(afxCamera, setThirdPersonOffset, void, 3, 4, "(Point3F offset [, Point3f coi_offset])") 
+ConsoleMethod(afxCamera, setThirdPersonOffset, void, 3, 4, "(Point3F offset [, Point3F coi_offset])") 
 {
   Point3F offset; 
   dSscanf(argv[2], "%f %f %f", &offset.x, &offset.y, &offset.z);

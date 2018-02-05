@@ -49,6 +49,7 @@
 #include "math/mEase.h"
 #include "T3D/tsStatic.h"
 
+#include "tools/editorTool.h"
 
 IMPLEMENT_CONOBJECT( WorldEditor );
 
@@ -1823,6 +1824,8 @@ WorldEditor::WorldEditor()
    mUseGroupCenter = true;
    mFadeIcons = true;
    mFadeIconsDist = 8.f;
+
+   mActiveEditorTool = nullptr;
 }
 
 WorldEditor::~WorldEditor()
@@ -1915,6 +1918,10 @@ void WorldEditor::on3DMouseMove(const Gui3DMouseEvent & event)
    setCursor(PlatformCursorController::curArrow);
    mHitObject = NULL;
 
+   //If we have an active tool and it's intercepted our input, bail out
+   if (mActiveEditorTool != nullptr && mActiveEditorTool->onMouseMove(event))
+      return;
+
    //
    mUsingAxisGizmo = false;
 
@@ -1943,6 +1950,10 @@ void WorldEditor::on3DMouseMove(const Gui3DMouseEvent & event)
 
 void WorldEditor::on3DMouseDown(const Gui3DMouseEvent & event)
 {
+   //If we have an active tool and it's intercepted our input, bail out
+   if (mActiveEditorTool != nullptr && mActiveEditorTool->onMouseDown(event))
+      return;
+
    mMouseDown = true;
    mMouseDragged = false;
    mPerformedDragCopy = false;
@@ -2010,6 +2021,10 @@ void WorldEditor::on3DMouseDown(const Gui3DMouseEvent & event)
 
 void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
 {
+   //If we have an active tool and it's intercepted our input, bail out
+   if (mActiveEditorTool != nullptr && mActiveEditorTool->onMouseUp(event))
+      return;
+
    const bool wasUsingAxisGizmo = mUsingAxisGizmo;
    
    mMouseDown = false;
@@ -2165,6 +2180,10 @@ void WorldEditor::on3DMouseUp( const Gui3DMouseEvent &event )
 
 void WorldEditor::on3DMouseDragged(const Gui3DMouseEvent & event)
 {
+   //If we have an active tool and it's intercepted our input, bail out
+   if (mActiveEditorTool != nullptr && mActiveEditorTool->onMouseDragged(event))
+      return;
+
    if ( !mMouseDown )
       return;
 
@@ -2400,6 +2419,9 @@ void WorldEditor::renderScene( const RectI &updateRect )
    GFXDEBUGEVENT_SCOPE( Editor_renderScene, ColorI::RED );
 
    smRenderSceneSignal.trigger(this);
+
+   if (mActiveEditorTool != nullptr)
+      mActiveEditorTool->render();
 	
    // Grab this before anything here changes it.
    Frustum frustum;
@@ -3186,6 +3208,19 @@ void WorldEditor::resetSelectedScale()
       if( object )
          object->setScale(Point3F(1,1,1));
    }
+}
+
+//------------------------------------------------------------------------------
+
+void WorldEditor::setEditorTool(EditorTool* newTool)
+{
+   if (mActiveEditorTool)
+      mActiveEditorTool->onDeactivated();
+
+   mActiveEditorTool = newTool;
+
+   if (mActiveEditorTool)
+      mActiveEditorTool->onActivated(this);
 }
 
 //------------------------------------------------------------------------------
@@ -4174,4 +4209,16 @@ DefineEngineMethod( WorldEditor, createConvexShapeFrom, ConvexShape*, ( SceneObj
    }
 
    return shape;
+}
+
+DefineEngineMethod(WorldEditor, setEditorTool, void, (EditorTool* newEditorTool), (nullAsType<EditorTool*>()),
+   "Sets the active Editor Tool for the world editor.")
+{
+   object->setEditorTool(newEditorTool);
+}
+
+DefineEngineMethod(WorldEditor, getActiveEditorTool, EditorTool*, (),,
+   "Gets the active Editor Tool for the world editor.")
+{
+   return object->getActiveEditorTool();
 }

@@ -142,24 +142,11 @@ IMPLEMENT_CALLBACK( GuiMenuBar, onMenuItemSelect, void, ( S32 menuId, const char
    "@see GuiTickCtrl\n\n"
 );
 
-IMPLEMENT_CALLBACK( GuiMenuBar, onSubmenuSelect, void, ( S32 submenuId, const char* submenuText ),( submenuId, submenuText ),
-   "@brief Called whenever a submenu is selected.\n\n"
-   "@param submenuId Id of the selected submenu\n"
-   "@param submenuText Text of the selected submenu\n\n"
-   "@tsexample\n"
-   "GuiMenuBar::onSubmenuSelect(%this,%submenuId,%submenuText)\n"
-   "{\n"
-   "  // Code to run when the callback occurs\n"
-   "}\n"
-   "@endtsexample\n\n"
-   "@see GuiTickCtrl\n\n"
-);
-
 //------------------------------------------------------------------------------
 // console methods
 //------------------------------------------------------------------------------
 
-DefineEngineMethod( GuiMenuBar, clearMenus, void, (),,
+/*DefineEngineMethod( GuiMenuBar, clearMenus, void, (),,
    "@brief Clears all the menus from the menu bar.\n\n"
    "@tsexample\n"
    "// Inform the GuiMenuBar control to clear all menus from itself.\n"
@@ -818,14 +805,14 @@ GuiMenuBar::Menu *GuiMenuBar::findMenu(const char *menu)
    {
       U32 id = dAtoi(menu);
       for (U32 i = 0; i < mMenuList.size(); ++i)
-         if (id == mMenuList[i]->id)
+         if (id == mMenuList[i].id)
             return mMenuList[i];
       return NULL;
    }
    else
    {
       for (U32 i = 0; i < mMenuList.size(); ++i)
-         if (!dStricmp(menu, mMenuList[i]->text))
+         if (!dStricmp(menu, mMenuList[i].text))
             return mMenuList[i];
       return NULL;
    }
@@ -1093,19 +1080,18 @@ void GuiMenuBar::clearSubmenuItems(MenuItem *menuitem)
    while(menuitem->submenu->firstMenuItem)
       removeSubmenuItem(menuitem, menuitem->submenu->firstMenuItem);
 }
-
+*/
 //------------------------------------------------------------------------------
 // initialization, input and render methods
 //------------------------------------------------------------------------------
 
 GuiMenuBar::GuiMenuBar()
 {
-   mMenuList.clear();
+   //mMenuList.clear();
    menuBarDirty = true;
    mouseDownMenu = NULL;
    mouseOverMenu = NULL;
    mCurAcceleratorIndex = 0;
-   mBackground = NULL;
    mPadding = 0;
 
    mCheckmarkBitmapIndex = 0; // Default to the first image in the bitmap array for the check mark
@@ -1114,20 +1100,27 @@ GuiMenuBar::GuiMenuBar()
    mVerticalMargin = 1;   // Default number of pixels on the top and bottom of a menu's text
    mBitmapMargin = 2;     // Default number of pixels between a menu's bitmap and text
 
+   mMenubarHeight = 20;
+
    //  Added:
    mouseDownSubmenu = NULL;
    mouseOverSubmenu = NULL;
-   mSubmenuBackground = NULL;
-   mSubmenuTextList = NULL;
-   mMouseOverCounter = 0;
-   mCountMouseOver = false;
-   mMouseHoverAmount = 30;
+
+   mMouseInMenu = false;
+
    setProcessTicks(false);
+}
+
+void GuiMenuBar::onRemove()
+{
+   Parent::onRemove();
 }
 
 void GuiMenuBar::initPersistFields()
 {
    addField("padding", TypeS32, Offset( mPadding, GuiMenuBar ),"Extra padding to add to the bounds of the control.\n");
+
+   addField("menubarHeight", TypeS32, Offset(mMenubarHeight, GuiMenuBar), "Sets the height of the menubar when attached to the canvas.\n");
 
    Parent::initPersistFields();
 }
@@ -1153,52 +1146,75 @@ bool GuiMenuBar::onWake()
    return true;
 }
 
-GuiMenuBar::Menu *GuiMenuBar::findHitMenu(Point2I mousePoint)
+void GuiMenuBar::addObject(SimObject* object)
+{
+   PopupMenu* popup = dynamic_cast<PopupMenu*>(object);
+
+   if (!popup)
+   {
+      //if it's not a popup, handle it normally
+      Parent::addObject(object);
+   }
+   else
+   {
+      //otherwise, if it IS a popup, don't add it as a child object, but instead just insert it as a menu entry
+      insert(object, -1);
+   }
+}
+
+GuiMenuBar::MenuEntry *GuiMenuBar::findHitMenu(Point2I mousePoint)
 {
    Point2I pos = globalToLocalCoord(mousePoint);
 
    for (U32 i = 0; i < mMenuList.size(); ++i)
-      if (mMenuList[i]->visible && mMenuList[i]->bounds.pointInRect(pos))
-         return mMenuList[i];
+   {
+      if (mMenuList[i].visible && mMenuList[i].bounds.pointInRect(pos))
+         return &mMenuList[i];
+   }
+
    return NULL;
 }
 
 void GuiMenuBar::onPreRender()
 {
+   setHeight(mMenubarHeight);
+
    Parent::onPreRender();
-   if(menuBarDirty)
+   if (menuBarDirty)
    {
       menuBarDirty = false;
       U32 curX = mPadding;
       for (U32 i = 0; i < mMenuList.size(); ++i)
       {
-         if (!mMenuList[i]->visible)
+         if (!mMenuList[i].visible)
             continue;
 
-       // Bounds depends on if there is a bitmap to be drawn or not
-         if (mMenuList[i]->bitmapIndex == -1)
-       {
-            // Text only
-            mMenuList[i]->bounds.set(curX, 0, mProfile->mFont->getStrWidth(mMenuList[i]->text) + (mHorizontalMargin * 2), getHeight() - (mVerticalMargin * 2));
-
-         } else
-       {
-            // Will the bitmap and text be draw?
-          if (!mMenuList[i]->drawBitmapOnly)
+         // Bounds depends on if there is a bitmap to be drawn or not
+         if (mMenuList[i].bitmapIndex == -1)
          {
+            // Text only
+            mMenuList[i].bounds.set(curX, 0, mProfile->mFont->getStrWidth(mMenuList[i].text) + (mHorizontalMargin * 2), getHeight() - (mVerticalMargin * 2));
+
+         }
+         else
+         {
+            // Will the bitmap and text be draw?
+            if (!mMenuList[i].drawBitmapOnly)
+            {
                // Draw the bitmap and the text
                RectI *bitmapBounds = mProfile->mBitmapArrayRects.address();
-               mMenuList[i]->bounds.set(curX, 0, bitmapBounds[mMenuList[i]->bitmapIndex].extent.x + mProfile->mFont->getStrWidth(mMenuList[i]->text) + (mHorizontalMargin * 2), getHeight() + (mVerticalMargin * 2));
+               mMenuList[i].bounds.set(curX, 0, bitmapBounds[mMenuList[i].bitmapIndex].extent.x + mProfile->mFont->getStrWidth(mMenuList[i].text) + (mHorizontalMargin * 2), getHeight() + (mVerticalMargin * 2));
 
-         } else
-         {
+            }
+            else
+            {
                // Only the bitmap will be drawn
                RectI *bitmapBounds = mProfile->mBitmapArrayRects.address();
-               mMenuList[i]->bounds.set(curX, 0, bitmapBounds[mMenuList[i]->bitmapIndex].extent.x + mBitmapMargin + (mHorizontalMargin * 2), getHeight() + (mVerticalMargin * 2));
+               mMenuList[i].bounds.set(curX, 0, bitmapBounds[mMenuList[i].bitmapIndex].extent.x + mBitmapMargin + (mHorizontalMargin * 2), getHeight() + (mVerticalMargin * 2));
+            }
          }
-       }
 
-         curX += mMenuList[i]->bounds.extent.x;
+         curX += mMenuList[i].bounds.extent.x;
       }
       mouseOverMenu = NULL;
       mouseDownMenu = NULL;
@@ -1207,12 +1223,12 @@ void GuiMenuBar::onPreRender()
 
 void GuiMenuBar::checkMenuMouseMove(const GuiEvent &event)
 {
-   Menu *hit = findHitMenu(event.mousePoint);
+   MenuEntry *hit = findHitMenu(event.mousePoint);
    if(hit && hit != mouseDownMenu)
    {
       // gotta close out the current menu...
-      mTextList->setSelectedCell(Point2I(-1, -1));
-      closeMenu();
+      mouseDownMenu->popupMenu->hidePopup();
+      
       mouseOverMenu = mouseDownMenu = hit;
       setUpdate();
       onAction();
@@ -1221,87 +1237,63 @@ void GuiMenuBar::checkMenuMouseMove(const GuiEvent &event)
 
 void GuiMenuBar::onMouseMove(const GuiEvent &event)
 {
-   Menu *hit = findHitMenu(event.mousePoint);
-   if(hit != mouseOverMenu)
-   {
-      //  If we need to, reset the mouse over menu counter and indicate
-      // that we should track it.
-      if(hit)
-           mMouseOverCounter = 0;
-      if(!mCountMouseOver)
-      {
-           //  We've never started the counter, so start it.
-           if(hit)
-              mCountMouseOver = true;
-      }
+   MenuEntry *hit = findHitMenu(event.mousePoint);
 
-      mouseOverMenu = hit;
+   if (mouseDownMenu != nullptr && hit != nullptr)
+   {
+      //we have a standing click, so just update and go
+      mouseDownMenu = mouseOverMenu = hit;
       setUpdate();
+      onAction();
+
+      return;
    }
+
+   mouseOverMenu = hit;
+   setUpdate();
+}
+
+void GuiMenuBar::onMouseEnter(const GuiEvent &event)
+{
+   onMouseInMenu_callback(true);
+   mMouseInMenu = true;
 }
 
 void GuiMenuBar::onMouseLeave(const GuiEvent &event)
 {
    if(mouseOverMenu)
       setUpdate();
-   mouseOverMenu = NULL;
 
-   //  As we've left the control, don't track how long the mouse has been
-   // within it.
-   if(mCountMouseOver && mMouseOverCounter >= mMouseHoverAmount)
-   {
-     onMouseInMenu_callback(false); // Last parameter indicates if we've entered or left the menu
-   }
-   mCountMouseOver = false;
-   mMouseOverCounter = 0;
+   mouseOverMenu = NULL;
+   mMouseInMenu = false;
 }
 
 void GuiMenuBar::onMouseDragged(const GuiEvent &event)
 {
-   Menu *hit = findHitMenu(event.mousePoint);
-   
-   if(hit != mouseOverMenu)
-   {
-      //  If we need to, reset the mouse over menu counter and indicate
-      // that we should track it.
-      if(hit)
-           mMouseOverCounter = 0;
-      if(!mCountMouseOver)
-      {
-           //  We've never started the counter, so start it.
-           if(hit)
-              mCountMouseOver = true;
-      }
-
-      mouseOverMenu = hit;
-      mouseDownMenu = hit;
-      setUpdate();
-      onAction();
-   }
 }
 
 void GuiMenuBar::onMouseDown(const GuiEvent &event)
+{
+}
+
+void GuiMenuBar::onMouseUp(const GuiEvent &event)
 {
    mouseDownMenu = mouseOverMenu = findHitMenu(event.mousePoint);
    setUpdate();
    onAction();
 }
 
-void GuiMenuBar::onMouseUp(const GuiEvent &event)
-{
-   mouseDownMenu = NULL;
-   setUpdate();
-}
-
 void GuiMenuBar::onRender(Point2I offset, const RectI &updateRect)
 {
-   RectI ctrlRect(offset, getExtent());
+   Point2I extent = getExtent();
+
+   RectI ctrlRect(offset, extent);
 
    GFXDrawUtil* drawUtil = GFX->getDrawUtil();
 
    //if opaque, fill the update rect with the fill color
    if (mProfile->mOpaque)
-      drawUtil->drawRectFill(RectI(offset, getExtent()), mProfile->mFillColor);
+      drawUtil->drawRectFill(RectI(offset, extent), mProfile->mFillColor);
 
    //if there's a border, draw the border
    if (mProfile->mBorder)
@@ -1309,63 +1301,65 @@ void GuiMenuBar::onRender(Point2I offset, const RectI &updateRect)
 
    for (U32 i = 0; i < mMenuList.size(); ++i)
    {
-      if (!mMenuList[i]->visible)
+      if (!mMenuList[i].visible)
          continue;
+
       ColorI fontColor = mProfile->mFontColor;
-      RectI bounds = mMenuList[i]->bounds;
+      RectI bounds = mMenuList[i].bounds;
       bounds.point += offset;
-      
+
       Point2I start;
 
-      start.x = mMenuList[i]->bounds.point.x + mHorizontalMargin;
-      start.y = mMenuList[i]->bounds.point.y + (mMenuList[i]->bounds.extent.y - mProfile->mFont->getHeight()) / 2;
+      start.x = mMenuList[i].bounds.point.x + mHorizontalMargin;
+      start.y = mMenuList[i].bounds.point.y + (mMenuList[i].bounds.extent.y - mProfile->mFont->getHeight()) / 2;
 
-     // Draw the border
-      if (mMenuList[i]->drawBorder)
-     {
-        RectI highlightBounds = bounds;
-        highlightBounds.inset(1,1);
-        if (mMenuList[i] == mouseDownMenu)
-            renderFilledBorder(highlightBounds, mProfile->mBorderColorHL, mProfile->mFillColorHL );
-        else if (mMenuList[i] == mouseOverMenu && mouseDownMenu == NULL)
-           renderFilledBorder(highlightBounds, mProfile->mBorderColorHL, mProfile->mFillColorHL);
-     }
+      // Draw the border
+      if (mMenuList[i].drawBorder)
+      {
+         RectI highlightBounds = bounds;
+         highlightBounds.inset(1, 1);
+         if (&mMenuList[i] == mouseDownMenu)
+            renderFilledBorder(highlightBounds, mProfile->mBorderColorHL, mProfile->mFillColorHL);
+         else if (&mMenuList[i] == mouseOverMenu && mouseDownMenu == NULL)
+            renderFilledBorder(highlightBounds, mProfile->mBorderColorHL, mProfile->mFillColorHL);
+      }
 
-     // Do we draw a bitmap?
-      if (mMenuList[i]->bitmapIndex != -1)
-     {
-        S32 index = mMenuList[i]->bitmapIndex * 3;
-        if (mMenuList[i] == mouseDownMenu)
+      // Do we draw a bitmap?
+      if (mMenuList[i].bitmapIndex != -1)
+      {
+         S32 index = mMenuList[i].bitmapIndex * 3;
+         if (&mMenuList[i] == mouseDownMenu)
             ++index;
-        else if (mMenuList[i] == mouseOverMenu && mouseDownMenu == NULL)
+         else if (&mMenuList[i] == mouseOverMenu && mouseDownMenu == NULL)
             index += 2;
 
          RectI rect = mProfile->mBitmapArrayRects[index];
 
-       Point2I bitmapstart(start);
-       bitmapstart.y = mMenuList[i]->bounds.point.y + (mMenuList[i]->bounds.extent.y - rect.extent.y) / 2;
+         Point2I bitmapstart(start);
+         bitmapstart.y = mMenuList[i].bounds.point.y + (mMenuList[i].bounds.extent.y - rect.extent.y) / 2;
 
          drawUtil->clearBitmapModulation();
-         drawUtil->drawBitmapSR( mProfile->mTextureObject, offset + bitmapstart, rect);
+         drawUtil->drawBitmapSR(mProfile->mTextureObject, offset + bitmapstart, rect);
 
-       // Should we also draw the text?
-         if (!mMenuList[i]->drawBitmapOnly)
-       {
+         // Should we also draw the text?
+         if (!mMenuList[i].drawBitmapOnly)
+         {
             start.x += mBitmapMargin;
-      drawUtil->setBitmapModulation( fontColor );
-      drawUtil->drawText(mProfile->mFont, start + offset, mMenuList[i]->text, mProfile->mFontColors);
-       }
-     } else
-     {
-      drawUtil->setBitmapModulation( fontColor );
-      drawUtil->drawText(mProfile->mFont, start + offset, mMenuList[i]->text, mProfile->mFontColors);
-     }
+            drawUtil->setBitmapModulation(fontColor);
+            drawUtil->drawText(mProfile->mFont, start + offset, mMenuList[i].text, mProfile->mFontColors);
+         }
+      }
+      else
+      {
+         drawUtil->setBitmapModulation(fontColor);
+         drawUtil->drawText(mProfile->mFont, start + offset, mMenuList[i].text, mProfile->mFontColors);
+      }
    }
 
-   renderChildControls( offset, updateRect );
+   renderChildControls(offset, updateRect);
 }
 
-void GuiMenuBar::buildWindowAcceleratorMap( WindowInputGenerator &inputGenerator )
+void GuiMenuBar::buildWindowAcceleratorMap(WindowInputGenerator &inputGenerator)
 {
    // ok, accelerator map is cleared...
    // add all our keys:
@@ -1373,20 +1367,21 @@ void GuiMenuBar::buildWindowAcceleratorMap( WindowInputGenerator &inputGenerator
 
    for (U32 i = 0; i < mMenuList.size(); ++i)
    {
-      for (MenuItem *item = mMenuList[i]->firstMenuItem; item; item = item->nextMenuItem)
+      for (U32 item = 0; item < mMenuList[i].popupMenu->mMenuItems.size(); item++)
       {
-         if(!item->accelerator)
+         if (!mMenuList[i].popupMenu->mMenuItems[item].accelerator)
          {
-            item->accelerator = 0;
+            mMenuList[i].popupMenu->mMenuItems[item].accelerator = 0;
             continue;
          }
-         EventDescriptor accelEvent;
-       ActionMap::createEventDescriptor(item->accelerator, &accelEvent);
-   
-         //now we have a modifier, and a key, add them to the canvas
-         inputGenerator.addAcceleratorKey( this, item->cmd, accelEvent.eventCode, accelEvent.flags);
 
-         item->acceleratorIndex = mCurAcceleratorIndex;
+         EventDescriptor accelEvent;
+         ActionMap::createEventDescriptor(mMenuList[i].popupMenu->mMenuItems[item].accelerator, &accelEvent);
+
+         //now we have a modifier, and a key, add them to the canvas
+         inputGenerator.addAcceleratorKey(this, mMenuList[i].popupMenu->mMenuItems[item].cmd, accelEvent.eventCode, accelEvent.flags);
+
+         mMenuList[i].popupMenu->mMenuItems[item].acceleratorIndex = mCurAcceleratorIndex;
          mCurAcceleratorIndex++;
       }
    }
@@ -1403,280 +1398,24 @@ void GuiMenuBar::acceleratorKeyPress(U32 index)
    // and find the item that corresponds to the accelerator index
    for (U32 i = 0; i < mMenuList.size(); ++i)
    {
-      if (!mMenuList[i]->visible)
+      if (!mMenuList[i].visible)
          continue;
 
-      for (MenuItem *item = mMenuList[i]->firstMenuItem; item; item = item->nextMenuItem)
+      for(U32 item = 0; item < mMenuList[i].popupMenu->mMenuItems.size(); item++)
       {
-         if(item->acceleratorIndex == index)
+         if(mMenuList[i].popupMenu->mMenuItems[item].acceleratorIndex == index)
          {
             // first, call the script callback for menu selection:
-            onMenuSelect_callback(mMenuList[i]->id, mMenuList[i]->text);
-         
-            if(item->visible)
-               menuItemSelected(mMenuList[i], item);
+            onMenuSelect_callback(mMenuList[i].popupMenu->getId(), mMenuList[i].text);
             return;
          }
       }
    }
 }
 
-//------------------------------------------------------------------------------
-// Menu display class methods
-//------------------------------------------------------------------------------
-
-GuiMenuBackgroundCtrl::GuiMenuBackgroundCtrl(GuiMenuBar *ctrl, GuiMenuTextListCtrl *textList)
-{
-   mMenuBarCtrl = ctrl;
-   mTextList = textList;
-}
-
-void GuiMenuBackgroundCtrl::onMouseDown(const GuiEvent &event)
-{
-   mTextList->setSelectedCell(Point2I(-1,-1));
-   mMenuBarCtrl->closeMenu();
-}
-
-void GuiMenuBackgroundCtrl::onMouseMove(const GuiEvent &event)
-{
-   GuiCanvas *root = getRoot();
-   GuiControl *ctrlHit = root->findHitControl(event.mousePoint, mLayer - 1);
-   if(ctrlHit == mMenuBarCtrl)  // see if the current mouse over menu is right...
-      mMenuBarCtrl->checkMenuMouseMove(event);
-}
-
-void GuiMenuBackgroundCtrl::onMouseDragged(const GuiEvent &event)
-{
-   GuiCanvas *root = getRoot();
-   GuiControl *ctrlHit = root->findHitControl(event.mousePoint, mLayer - 1);
-   if(ctrlHit == mMenuBarCtrl)  // see if the current mouse over menu is right...
-      mMenuBarCtrl->checkMenuMouseMove(event);
-}
-
-GuiMenuTextListCtrl::GuiMenuTextListCtrl(GuiMenuBar *ctrl)
-{
-   mMenuBarCtrl = ctrl;
-   isSubMenu = false; //  Added
-}
-
-void GuiMenuTextListCtrl::onRenderCell(Point2I offset, Point2I cell, bool selected, bool mouseOver)
-{
-   if(dStrcmp(mList[cell.y].text + 3, "-\t")) //  Was: dStrcmp(mList[cell.y].text + 2, "-\t")) but has been changed to take into account the submenu flag
-      Parent::onRenderCell(offset, cell, selected, mouseOver);
-   else
-   {
-      S32 yp = offset.y + mCellSize.y / 2;
-      GFX->getDrawUtil()->drawLine(offset.x, yp, offset.x + mCellSize.x, yp, ColorI(128,128,128));
-      GFX->getDrawUtil()->drawLine(offset.x, yp+1, offset.x + mCellSize.x, yp+1, ColorI(255,255,255));
-   }
-   // now see if there's a bitmap...
-   U8 idx = mList[cell.y].text[0];
-   if(idx != 1)
-   {
-      // there's a bitmap...
-      U32 index = U32(idx - 2) * 3;
-      if(!mList[cell.y].active)
-         index += 2;
-      else if(selected || mouseOver)
-         index ++;
-
-      RectI rect = mProfile->mBitmapArrayRects[index];
-      Point2I off = mMenuBarCtrl->maxBitmapSize - rect.extent;
-      off /= 2;
-
-      GFX->getDrawUtil()->clearBitmapModulation();
-      GFX->getDrawUtil()->drawBitmapSR(mProfile->mTextureObject, offset + off, rect);
-   } 
-
-   //  Check if this is a submenu
-   idx = mList[cell.y].text[1];
-   if(idx != 1)
-   {
-      // This is a submenu, so draw an arrow
-      S32 left = offset.x + mCellSize.x - 12;
-      S32 right = left + 8;
-      S32 top = mCellSize.y / 2 + offset.y - 4;
-      S32 bottom = top + 8;
-      S32 middle = top + 4;
-
-      PrimBuild::begin( GFXTriangleList, 3 );
-         if( selected || mouseOver )
-            PrimBuild::color( mProfile->mFontColorHL );
-         else
-            PrimBuild::color( mProfile->mFontColor );
-
-         PrimBuild::vertex2i( left,  top );
-         PrimBuild::vertex2i( right, middle );
-         PrimBuild::vertex2i( left, bottom );
-      PrimBuild::end();
-   }
-}
-
-bool GuiMenuTextListCtrl::onKeyDown(const GuiEvent &event)
-{
-   //if the control is a dead end, don't process the input:
-   if ( !mVisible || !mActive || !mAwake )
-      return false;
-   
-   //see if the key down is a <return> or not
-   if ( event.modifier == 0 )
-   {
-      if ( event.keyCode == KEY_RETURN )
-      {
-         mMenuBarCtrl->closeMenu();
-         return true;
-      }
-      else if ( event.keyCode == KEY_ESCAPE )
-      {
-         mSelectedCell.set( -1, -1 );
-         mMenuBarCtrl->closeMenu();
-         return true;
-      }
-   }
-   
-   //otherwise, pass the event to it's parent
-   return Parent::onKeyDown(event);
-}
-
-void GuiMenuTextListCtrl::onMouseDown(const GuiEvent &event)
-{
-   Parent::onMouseDown(event);
-}
-
-void GuiMenuTextListCtrl::onMouseUp(const GuiEvent &event)
-{
-   Parent::onMouseUp(event);
-   mMenuBarCtrl->closeMenu();
-}
-
-void GuiMenuTextListCtrl::onCellHighlighted(Point2I cell)
-{
-   // If this text list control is part of a submenu, then don't worry about
-   // passing this along
-   if(!isSubMenu)
-   {
-      RectI globalbounds(getBounds());
-      Point2I globalpoint = localToGlobalCoord(globalbounds.point);
-      globalbounds.point = globalpoint;
-      mMenuBarCtrl->highlightedMenuItem(cell.y, globalbounds, mCellSize);
-   }
-}
-
-//------------------------------------------------------------------------------
-// Submenu display class methods
-//------------------------------------------------------------------------------
-
-GuiSubmenuBackgroundCtrl::GuiSubmenuBackgroundCtrl(GuiMenuBar *ctrl, GuiMenuTextListCtrl *textList) : GuiMenuBackgroundCtrl(ctrl, textList)
-{
-}
-
-void GuiSubmenuBackgroundCtrl::onMouseDown(const GuiEvent &event)
-{
-   mTextList->setSelectedCell(Point2I(-1,-1));
-   mMenuBarCtrl->closeMenu();
-}
-
-bool GuiSubmenuBackgroundCtrl::pointInControl(const Point2I& parentCoordPoint)
-{
-   S32 xt = parentCoordPoint.x - getLeft();
-   S32 yt = parentCoordPoint.y - getTop();
-
-   if(findHitControl(Point2I(xt,yt)) == this)
-      return false;
-   else
-      return true;
-//   return xt >= 0 && yt >= 0 && xt < getWidth() && yt < getHeight();
-}
-
-//------------------------------------------------------------------------------
-
-void GuiMenuBar::menuItemSelected(GuiMenuBar::Menu *menu, GuiMenuBar::MenuItem *item)
-{
-   if(item->enabled)
-      onMenuItemSelect_callback(menu->id, menu->text, item->id, item->text);
-}
-
 void GuiMenuBar::onSleep()
 {
-   if(mBackground) // a menu is up?
-   {
-      mTextList->setSelectedCell(Point2I(-1, -1));
-      closeMenu();
-   }
    Parent::onSleep();
-}
-
-void GuiMenuBar::closeMenu()
-{
-   //  First close any open submenu
-   closeSubmenu();
-
-   // Get the selection from the text list:
-   S32 selectionIndex = mTextList->getSelectedCell().y;
-
-   // Pop the background:
-   if( getRoot() )
-      getRoot()->popDialogControl(mBackground);
-   else
-      return;
-   
-   // Kill the popup:
-   mBackground->deleteObject();
-   mBackground = NULL;
-   
-   // Now perform the popup action:
-   if ( selectionIndex != -1 )
-   {
-      MenuItem *list = mouseDownMenu->firstMenuItem;
-
-      while(selectionIndex && list)
-      {
-         list = list->nextMenuItem;
-         selectionIndex--;
-      }
-      if(list)
-         menuItemSelected(mouseDownMenu, list);
-   }
-   mouseDownMenu = NULL;
-}
-
-//  Called when a menu item is highlighted by the mouse
-void GuiMenuBar::highlightedMenuItem(S32 selectionIndex, const RectI& bounds, Point2I cellSize)
-{
-   S32 selstore = selectionIndex;
-
-   // Now perform the popup action:
-   if ( selectionIndex != -1 )
-   {
-      MenuItem *list = mouseDownMenu->firstMenuItem;
-
-      while(selectionIndex && list)
-      {
-         list = list->nextMenuItem;
-         selectionIndex--;
-      }
-
-      if(list)
-     {
-         // If the highlighted item has changed...
-         if(mouseOverSubmenu != list)
-       {
-            closeSubmenu();
-            mouseOverSubmenu = NULL;
-
-            // Check if this is a submenu.  If so, open the submenu.
-            if(list->isSubmenu)
-          {
-            // If there are submenu items, then open the submenu
-             if(list->submenu->firstMenuItem)
-            {
-               mouseOverSubmenu = list;
-               onSubmenuAction(selstore, bounds, cellSize);
-            }
-         }
-       }
-     }
-   }
 }
 
 //------------------------------------------------------------------------------
@@ -1685,309 +1424,107 @@ void GuiMenuBar::onAction()
    if(!mouseDownMenu)
       return;
 
-   // first, call the script callback for menu selection:
-   onMenuSelect_callback(mouseDownMenu->id, mouseDownMenu->text);
-
-   MenuItem *visWalk = mouseDownMenu->firstMenuItem;
-   while(visWalk)
-   {
-      if(visWalk->visible)
-         break;
-      visWalk = visWalk->nextMenuItem;
-   }
-   if(!visWalk)
-   {
-      mouseDownMenu = NULL;
-      return;
-   }
-
-   mTextList = new GuiMenuTextListCtrl(this);
-   mTextList->setControlProfile(mProfile);
-
-   mBackground = new GuiMenuBackgroundCtrl(this, mTextList);
-
-   GuiCanvas *root = getRoot();
-   Point2I windowExt = root->getExtent();
-
-   mBackground->resize( Point2I(0,0), root->getExtent());
-   S32 textWidth = 0, width = 0;
-   S32 acceleratorWidth = 0;
-
-   GFont *font = mProfile->mFont;
-
-   for(MenuItem *walk = mouseDownMenu->firstMenuItem; walk; walk = walk->nextMenuItem)
-   {
-      if(!walk->visible)
-         continue;
-
-      S32 iTextWidth = font->getStrWidth(walk->text);
-      S32 iAcceleratorWidth = walk->accelerator ? font->getStrWidth(walk->accelerator) : 0;
-
-      if(iTextWidth > textWidth)
-         textWidth = iTextWidth;
-      if(iAcceleratorWidth > acceleratorWidth)
-         acceleratorWidth = iAcceleratorWidth;
-   }
-   width = textWidth + acceleratorWidth + maxBitmapSize.x * 2 + 2 + 4;
-
-   mTextList->setCellSize(Point2I(width, font->getHeight()+2));
-   mTextList->clearColumnOffsets();
-   mTextList->addColumnOffset(-1); // add an empty column in for the bitmap index.
-   mTextList->addColumnOffset(maxBitmapSize.x + 1);
-   mTextList->addColumnOffset(maxBitmapSize.x + 1 + textWidth + 4);
-
-   U32 entryCount = 0;
-
-   for(MenuItem *walk = mouseDownMenu->firstMenuItem; walk; walk = walk->nextMenuItem)
-   {
-      if(!walk->visible)
-         continue;
-
-      char buf[512];
-
-     //  If this menu item is a submenu, then set the isSubmenu to 2 to indicate
-     // an arrow should be drawn.  Otherwise set the isSubmenu normally.
-     char isSubmenu = 1;
-     if(walk->isSubmenu)
-        isSubmenu = 2;
-
-      char bitmapIndex = 1;
-      if(walk->bitmapIndex >= 0 && (walk->bitmapIndex * 3 <= mProfile->mBitmapArrayRects.size()))
-         bitmapIndex = walk->bitmapIndex + 2;
-      dSprintf(buf, sizeof(buf), "%c%c\t%s\t%s", bitmapIndex, isSubmenu, walk->text, walk->accelerator ? walk->accelerator : "");
-      mTextList->addEntry(entryCount, buf);
-
-      if(!walk->enabled)
-         mTextList->setEntryActive(entryCount, false);
-
-      entryCount++;
-   }
-   Point2I menuPoint = localToGlobalCoord(mouseDownMenu->bounds.point);
-   menuPoint.y += mouseDownMenu->bounds.extent.y; //  Used to have this at the end: + 2;
-
-   GuiControl *ctrl = new GuiControl;
-   RectI ctrlBounds(  menuPoint, mTextList->getExtent() + Point2I(6, 6));
-   
-   ctrl->setControlProfile(mProfile);
-   mTextList->setPosition( mTextList->getPosition() + Point2I(3,3) );
-   
-   //  Make sure the menu doesn't go beyond the Canvas' bottom edge.
-   if((ctrlBounds.point.y + ctrlBounds.extent.y) > windowExt.y)
-   {
-      //  Pop the menu above the menu bar
-      Point2I menuBar = localToGlobalCoord(mouseDownMenu->bounds.point);
-      ctrlBounds.point.y = menuBar.y - ctrl->getHeight();
-   }
-
-   ctrl->resize(ctrlBounds.point, ctrlBounds.extent);
-   //mTextList->setPosition(Point2I(3,3));
-
-   mTextList->registerObject();
-   mBackground->registerObject();
-   ctrl->registerObject();
-
-   mBackground->addObject( ctrl );
-   ctrl->addObject( mTextList );
-
-   root->pushDialogControl(mBackground, mLayer + 1);
-   mTextList->setFirstResponder();
-}
-
-//------------------------------------------------------------------------------
-//  Performs an action when a menu item that is a submenu is selected/highlighted
-void GuiMenuBar::onSubmenuAction(S32 selectionIndex, const RectI& bounds, Point2I cellSize)
-{
-   if(!mouseOverSubmenu)
-      return;
+   mouseDownMenu->popupMenu->hidePopup();
 
    // first, call the script callback for menu selection:
-   onSubmenuSelect_callback(mouseOverSubmenu->id, mouseOverSubmenu->text);
+   onMenuSelect_callback(mouseDownMenu->popupMenu->getId(), mouseDownMenu->text);
 
-   MenuItem *visWalk = mouseOverSubmenu->submenu->firstMenuItem;
-   while(visWalk)
-   {
-      if(visWalk->visible)
-         break;
-      visWalk = visWalk->nextMenuItem;
-   }
-   if(!visWalk)
-   {
-      mouseOverSubmenu = NULL;
-      return;
-   }
-
-   mSubmenuTextList = new GuiMenuTextListCtrl(this);
-   mSubmenuTextList->setControlProfile(mProfile);
-   mSubmenuTextList->isSubMenu = true; // Indicate that this text list is part of a submenu
-
-   mSubmenuBackground = new GuiSubmenuBackgroundCtrl(this, mSubmenuTextList);
+   mouseDownMenu->popupMenu->mMenuBarCtrl = this;
 
    GuiCanvas *root = getRoot();
-   Point2I windowExt = root->getExtent();
-
-   mSubmenuBackground->resize( Point2I(0,0), root->getExtent());
-   S32 textWidth = 0, width = 0;
-   S32 acceleratorWidth = 0;
-
-   GFont *font = mProfile->mFont;
-
-   for(MenuItem *walk = mouseOverSubmenu->submenu->firstMenuItem; walk; walk = walk->nextMenuItem)
-   {
-      if(!walk->visible)
-         continue;
-
-      S32 iTextWidth = font->getStrWidth(walk->text);
-      S32 iAcceleratorWidth = walk->accelerator ? font->getStrWidth(walk->accelerator) : 0;
-
-      if(iTextWidth > textWidth)
-         textWidth = iTextWidth;
-      if(iAcceleratorWidth > acceleratorWidth)
-         acceleratorWidth = iAcceleratorWidth;
-   }
-   width = textWidth + acceleratorWidth + maxBitmapSize.x * 2 + 2 + 4;
-
-   mSubmenuTextList->setCellSize(Point2I(width, font->getHeight()+3));
-   mSubmenuTextList->clearColumnOffsets();
-   mSubmenuTextList->addColumnOffset(-1); // add an empty column in for the bitmap index.
-   mSubmenuTextList->addColumnOffset(maxBitmapSize.x + 1);
-   mSubmenuTextList->addColumnOffset(maxBitmapSize.x + 1 + textWidth + 4);
-
-   U32 entryCount = 0;
-
-   for(MenuItem *walk = mouseOverSubmenu->submenu->firstMenuItem; walk; walk = walk->nextMenuItem)
-   {
-      if(!walk->visible)
-         continue;
-
-      char buf[512];
-
-     //  Can't have submenus within submenus.
-     char isSubmenu = 1;
-
-      char bitmapIndex = 1;
-      if(walk->bitmapIndex >= 0 && (walk->bitmapIndex * 3 <= mProfile->mBitmapArrayRects.size()))
-         bitmapIndex = walk->bitmapIndex + 2;
-      dSprintf(buf, sizeof(buf), "%c%c\t%s\t%s", bitmapIndex, isSubmenu, walk->text, walk->accelerator ? walk->accelerator : "");
-      mSubmenuTextList->addEntry(entryCount, buf);
-
-      if(!walk->enabled)
-         mSubmenuTextList->setEntryActive(entryCount, false);
-
-      entryCount++;
-   }
-   Point2I menuPoint = bounds.point; //localToGlobalCoord(bounds.point);
-   menuPoint.x += bounds.extent.x;
-   menuPoint.y += cellSize.y * selectionIndex - 6;
-
-   GuiControl *ctrl = new GuiControl;
-   RectI ctrlBounds(menuPoint, mSubmenuTextList->getExtent() + Point2I(6, 6));
-   ctrl->setControlProfile(mProfile);
-   mSubmenuTextList->setPosition( getPosition() + Point2I(3,3));
-
-   //  Make sure the menu doesn't go beyond the Canvas' bottom edge.
-   if((ctrlBounds.point.y + ctrlBounds.extent.y ) > windowExt.y)
-   {
-      //  Pop the menu above the menu bar
-      ctrlBounds.point.y -= mSubmenuTextList->getHeight() - cellSize.y - 6 - 3;
-   }
-
-   //  And the same for the right edge
-   if((ctrlBounds.point.x + ctrlBounds.extent.x) > windowExt.x)
-   {
-      //  Pop the submenu to the left of the menu
-      ctrlBounds.point.x -= mSubmenuTextList->getWidth() + cellSize.x + 6;
-   }
-   ctrl->resize(ctrlBounds.point, ctrlBounds.extent);
-
-   //mSubmenuTextList->setPosition(Point2I(3,3));
-
-   mSubmenuTextList->registerObject();
-   mSubmenuBackground->registerObject();
-   ctrl->registerObject();
-
-   mSubmenuBackground->addObject( ctrl );
-   ctrl->addObject( mSubmenuTextList );
-
-   root->pushDialogControl(mSubmenuBackground, mLayer + 1);
-   mSubmenuTextList->setFirstResponder();
-}
-
-//  Close down the submenu controls
-void GuiMenuBar::closeSubmenu()
-{
-   if(!mSubmenuBackground || !mSubmenuTextList)
-      return;
-
-   // Get the selection from the text list:
-   S32 selectionIndex = mSubmenuTextList->getSelectedCell().y;
-
-   // Pop the background:
-   if( getRoot() )
-      getRoot()->popDialogControl(mSubmenuBackground);
-   
-   // Kill the popup:
-   mSubmenuBackground->deleteObject();
-   mSubmenuBackground = NULL;
-   mSubmenuTextList = NULL;
-   
-   // Now perform the popup action:
-   if ( selectionIndex != -1 )
-   {
-      MenuItem *list = NULL;
-     if(mouseOverSubmenu)
-     {
-         list = mouseOverSubmenu->submenu->firstMenuItem;
-
-         while(selectionIndex && list)
-         {
-            list = list->nextMenuItem;
-            selectionIndex--;
-         }
-     }
-      if(list)
-         menuItemSelected(list->submenuParentMenu, list);
-   }
-   mouseOverSubmenu = NULL;
-}
-
-//  Find if the mouse pointer is within a menu item
-GuiMenuBar::MenuItem *GuiMenuBar::findHitMenuItem(Point2I mousePoint)
-{
-
-//   for(Menu *walk = menuList; walk; walk = walk->nextMenu)
-//      if(walk->visible && walk->bounds.pointInRect(pos))
-//         return walk;
-   return NULL;
-}
-
-//  Checks if the mouse has been moved to a new menu item
-void GuiMenuBar::checkSubmenuMouseMove(const GuiEvent &event)
-{
-   MenuItem *hit = findHitMenuItem(event.mousePoint);
-   if(hit && hit != mouseOverSubmenu)
-   {
-      // gotta close out the current menu...
-      mSubmenuTextList->setSelectedCell(Point2I(-1, -1));
-//      closeSubmenu();
-      setUpdate();
-   }
+   Point2I pos = Point2I(mouseDownMenu->bounds.point.x, mouseDownMenu->bounds.point.y + mouseDownMenu->bounds.extent.y);
+   mouseDownMenu->popupMenu->showPopup(root, pos.x, pos.y);
 }
 
 //  Process a tick
 void GuiMenuBar::processTick()
 {
-   // If we are to track a tick, then do so.
-   if(mCountMouseOver)
-   {
-      //  If we're at a particular number of ticks, notify the script function
-      if(mMouseOverCounter < mMouseHoverAmount)
-     {
-         ++mMouseOverCounter;
+   if(mMouseInMenu)
+      onMouseInMenu_callback(true);
+}
 
-     } else if(mMouseOverCounter == mMouseHoverAmount)
-     {
-         ++mMouseOverCounter;
-       onMouseInMenu_callback(true); // Last parameter indicates if we've entered or left the menu
-     }
+void GuiMenuBar::insert(SimObject* pObject, S32 pos)
+{
+   PopupMenu* menu = dynamic_cast<PopupMenu*>(pObject);
+   if (menu == nullptr)
+      return;
+
+   MenuEntry newMenu;
+   newMenu.pos = pos >= mMenuList.size() || pos == -1 ? pos = mMenuList.size() : pos;
+   newMenu.drawBitmapOnly = false;
+   newMenu.drawBorder = true;
+   newMenu.bitmapIndex = -1;
+   newMenu.text = menu->barTitle;
+   newMenu.visible = true;
+   newMenu.popupMenu = menu;
+
+   if (pos >= mMenuList.size() || pos == -1)
+      mMenuList.push_back(newMenu);
+   else
+      mMenuList.insert(pos, newMenu);
+}
+
+PopupMenu* GuiMenuBar::getMenu(U32 index)
+{
+   if (index >= mMenuList.size())
+      return nullptr;
+
+   return mMenuList[index].popupMenu;
+}
+
+PopupMenu* GuiMenuBar::findMenu(StringTableEntry barTitle)
+{
+   for (U32 i = 0; i < mMenuList.size(); i++)
+   {
+      if (mMenuList[i].text == barTitle)
+         return mMenuList[i].popupMenu;
    }
+
+   return nullptr;
+}
+
+//-----------------------------------------------------------------------------
+// Console Methods
+//-----------------------------------------------------------------------------
+DefineConsoleMethod(GuiMenuBar, attachToCanvas, void, (const char *canvas, S32 pos), , "(GuiCanvas, pos)")
+{
+   GuiCanvas* canv = dynamic_cast<GuiCanvas*>(Sim::findObject(canvas));
+   if (canv)
+   {
+      canv->setMenuBar(object);
+   }
+}
+
+DefineConsoleMethod(GuiMenuBar, removeFromCanvas, void, (), , "()")
+{
+   GuiCanvas* canvas = object->getRoot();
+
+   if(canvas)
+      canvas->setMenuBar(nullptr);
+}
+
+DefineConsoleMethod(GuiMenuBar, getMenuCount, S32, (), , "()")
+{
+   return object->getMenuListCount();
+}
+
+DefineConsoleMethod(GuiMenuBar, getMenu, S32, (S32 index), (0), "(Index)")
+{
+   return object->getMenu(index)->getId();
+}
+
+//-----------------------------------------------------------------------------
+DefineConsoleMethod(GuiMenuBar, insert, void, (SimObject* pObject, S32 pos), (nullAsType<SimObject*>(), -1), "(object, pos) insert object at position")
+{
+   object->insert(pObject, pos);
+}
+
+DefineConsoleMethod(GuiMenuBar, findMenu, S32, (StringTableEntry barTitle), (""), "(barTitle)")
+{
+   PopupMenu* menu = object->findMenu(barTitle);
+
+   if (menu)
+      return menu->getId();
+   else
+      return 0;
 }

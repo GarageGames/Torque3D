@@ -27,7 +27,6 @@
 #include "windowManager/sdl/sdlWindowMgr.h"
 #include "windowManager/sdl/sdlCursorController.h"
 #include "platformSDL/sdlInput.h"
-#include "platform/menus/popupMenu.h"
 #include "platform/platformInput.h"
 
 #include "gfx/gfxDevice.h"

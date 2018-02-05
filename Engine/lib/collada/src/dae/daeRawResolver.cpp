@@ -57,8 +57,11 @@ daeElement* daeRawResolver::resolveElement(const daeURI& uri) {
 	daeElement *accessor;
 	
 	accessor = uri.getContainer();
-	if ( accessor == NULL )
-		return NULL;
+     if (accessor == NULL)
+     {
+          fclose(rawFile);
+          return NULL;
+     }
 	src = accessor->getParentElement()->getParentElement();
 	daeElementRefArray children;
 	accessor->getChildren( children );

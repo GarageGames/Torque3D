@@ -47,10 +47,13 @@
 #include "T3D/gameBase/std/stdMoveList.h"
 
 #include "T3D/prefab.h"
+#include "T3D/gameBase/gameConnection.h"
 
+#include <thread>
 //
 #include "gfx/sim/debugDraw.h"
 //
+#include "T3D/sfx/sfx3DWorld.h"
 
 extern bool gEditingMission;
 
@@ -117,6 +120,10 @@ Entity::Entity()
 
    mInitialized = false;
 
+   mLifetimeMS = 0;
+
+   mGameObjectAssetId = StringTable->insert("");
+
 }
 
 Entity::~Entity()
@@ -143,6 +150,15 @@ void Entity::initPersistFields()
    addField("LocalRotation", TypeMatrixRotation, Offset(mMount.xfm, Entity), "Rotation we are mounted at ( object space of our mount object ).");
 
    endGroup("Transform");
+
+   addGroup("Misc");
+   addField("LifetimeMS", TypeS32, Offset(mLifetimeMS, Entity), "Object world orientation.");
+   endGroup("Misc");
+
+   addGroup("GameObject");
+   addProtectedField("gameObjectName", TypeGameObjectAssetPtr, Offset(mGameObjectAsset, Entity), &_setGameObject, &defaultProtectedGetFn,
+      "The asset Id used for the game object this entity is based on.");
+   endGroup("GameObject");
 }
 
 //
@@ -215,15 +231,27 @@ bool Entity::onAdd()
    if (!Parent::onAdd())
       return false;
 
-   mObjBox = Box3F(Point3F(-1, -1, -1), Point3F(1, 1, 1));
-
+   mObjBox = Box3F(Point3F(-0.5, -0.5, -0.5), Point3F(0.5, 0.5, 0.5));
+   
    resetWorldBox();
    setObjectBox(mObjBox);
 
    addToScene();
 
    //Make sure we get positioned
-   setMaskBits(TransformMask);
+   if (isServerObject())
+   {
+      setMaskBits(TransformMask);
+      setMaskBits(NamespaceMask);
+   }
+   else
+   {
+      //We can shortcut the initialization here because stuff generally ghosts down in order, and onPostAdd isn't called on ghosts.
+      onPostAdd();
+   }
+
+   if (mLifetimeMS != 0)
+      mStartTimeMS = Platform::getRealMilliseconds();
 
    return true;
 }
@@ -235,6 +263,8 @@ void Entity::onRemove()
    removeFromScene();
 
    onDataSet.removeAll();
+
+   mGameObjectAsset.clear();
 
    Parent::onRemove();
 }
@@ -249,8 +279,39 @@ void Entity::onPostAdd()
       mComponents[i]->onComponentAdd();
    }
 
+   //Set up the networked components
+   mNetworkedComponents.clear();
+   for (U32 i = 0; i < mComponents.size(); i++)
+   {
+      if (mComponents[i]->isNetworked())
+      {
+         NetworkedComponent netComp;
+         netComp.componentIndex = i;
+         netComp.updateState = NetworkedComponent::Adding;
+         netComp.updateMaskBits = -1;
+
+         mNetworkedComponents.push_back(netComp);
+      }
+   }
+
+   if (!mNetworkedComponents.empty())
+   {
+      setMaskBits(AddComponentsMask);
+      setMaskBits(ComponentsUpdateMask);
+   }
+
    if (isMethod("onAdd"))
       Con::executef(this, "onAdd");
+}
+
+bool Entity::_setGameObject(void *object, const char *index, const char *data)
+{
+   Entity *e = static_cast<Entity*>(object);
+
+   // Sanity!
+   AssertFatal(data != NULL, "Cannot use a NULL asset Id.");
+
+   return true; //rbI->setMeshAsset(data);
 }
 
 void Entity::setDataField(StringTableEntry slotName, const char *array, const char *value)
@@ -363,8 +424,28 @@ void Entity::processTick(const Move* move)
          }
       }
 
-      if (isMethod("processTick"))
+      // Save current rigid state interpolation
+      mDelta.posVec = getPosition();
+      mDelta.rot[0] = mRot.asQuatF();
+
+      //Handle any script updates, which can include physics stuff
+      if (isServerObject() && isMethod("processTick"))
          Con::executef(this, "processTick");
+
+      // Wrap up interpolation info
+      mDelta.pos = getPosition();
+      mDelta.posVec -= getPosition();
+      mDelta.rot[1] = mRot.asQuatF();
+
+      setTransform(getPosition(), mRot);
+
+      //Lifetime test
+      if (mLifetimeMS != 0)
+      {
+         S32 currentTime = Platform::getRealMilliseconds();
+         if (currentTime - mStartTimeMS >= mLifetimeMS)
+            deleteObject();
+      }
    }
 }
 
@@ -402,11 +483,6 @@ U32 Entity::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    if (stream->writeFlag(mask & TransformMask))
    {
-      //mathWrite( *stream, getScale() );
-      //stream->writeAffineTransform(mObjToWorld);
-      //mathWrite(*stream, getPosition());
-      //mathWrite(*stream, mPos);
-
       stream->writeCompressedPoint(mPos);
       mathWrite(*stream, getRotation());
 
@@ -415,73 +491,125 @@ U32 Entity::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       stream->writeFlag(!(mask & NoWarpMask));
    }
 
-   /*if (stream->writeFlag(mask & MountedMask))
-   {
-      mathWrite(*stream, mMount.xfm.getPosition());
-      mathWrite(*stream, mMount.xfm.toEuler());
-   }*/
-
    if (stream->writeFlag(mask & BoundsMask))
    {
       mathWrite(*stream, mObjBox);
    }
 
-   //pass our behaviors around
-   if (mask & ComponentsMask || mask & InitialUpdateMask)
+   if (stream->writeFlag(mask & AddComponentsMask))
    {
-      stream->writeFlag(true);
-      //now, we run through a list of our to-be-sent behaviors and begin sending them
-      //if any fail, we keep our list and re-queue the mask
-      S32 componentCount = mToLoadComponents.size();
+      U32 toAddComponentCount = 0;
 
-      //build our 'ready' list
-      //This requires both the instance and the instances' template to be prepped(if the template hasn't been ghosted,
-      //then we know we shouldn't be passing the instance's ghosts around yet)
-      U32 ghostedCompCnt = 0;
-      for (U32 i = 0; i < componentCount; i++)
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
       {
-         if (con->getGhostIndex(mToLoadComponents[i]) != -1)
-            ghostedCompCnt++;
-      }
-
-      if (ghostedCompCnt != 0)
-      {
-         stream->writeFlag(true);
-
-         stream->writeFlag(mStartComponentUpdate);
-
-         //if not all the behaviors have been ghosted, we'll need another pass
-         if (ghostedCompCnt != componentCount)
-            retMask |= ComponentsMask;
-
-         //write the currently ghosted behavior count
-         stream->writeInt(ghostedCompCnt, 16);
-
-         for (U32 i = 0; i < mToLoadComponents.size(); i++)
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Adding)
          {
-            //now fetch them and pass the ghost
-            S32 ghostIndex = con->getGhostIndex(mToLoadComponents[i]);
-            if (ghostIndex != -1)
-            {
-               stream->writeInt(ghostIndex, NetConnection::GhostIdBitSize);
-               mToLoadComponents.erase(i);
-               i--;
-
-               mStartComponentUpdate = false;
-            }
+            toAddComponentCount++;
          }
       }
-      else if (componentCount)
+
+      //you reaaaaally shouldn't have >255 networked components on a single entity
+      stream->writeInt(toAddComponentCount, 8);
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
       {
-         //on the odd chance we have behaviors to ghost, but NONE of them have been yet, just set the flag now
-         stream->writeFlag(false);
-         retMask |= ComponentsMask;
+         NetworkedComponent::UpdateState state = mNetworkedComponents[i].updateState;
+
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Adding)
+         {
+            const char* className = mComponents[mNetworkedComponents[i].componentIndex]->getClassName();
+            stream->writeString(className, strlen(className));
+
+            mNetworkedComponents[i].updateState = NetworkedComponent::Updating;
+         }
       }
-      else
-         stream->writeFlag(false);
    }
-   else
-      stream->writeFlag(false);
+
+   if (stream->writeFlag(mask & RemoveComponentsMask))
+   {
+      /*U32 toRemoveComponentCount = 0;
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Adding)
+         {
+            toRemoveComponentCount++;
+         }
+      }
+
+      //you reaaaaally shouldn't have >255 networked components on a single entity
+      stream->writeInt(toRemoveComponentCount, 8);
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Removing)
+         {
+            stream->writeInt(i, 16);
+         }
+      }*/
+
+      /*for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::UpdateState::Removing)
+         {
+            removeComponent(mComponents[mNetworkedComponents[i].componentIndex], true);
+            mNetworkedComponents.erase(i);
+            i--;
+
+         }
+      }*/
+   }
+
+   //Update our components
+   if (stream->writeFlag(mask & ComponentsUpdateMask))
+   {
+      U32 toUpdateComponentCount = 0;
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Updating)
+         {
+            toUpdateComponentCount++;
+         }
+      }
+
+      //you reaaaaally shouldn't have >255 networked components on a single entity
+      stream->writeInt(toUpdateComponentCount, 8);
+
+      bool forceUpdate = false;
+
+      for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+      {
+         if (mNetworkedComponents[i].updateState == NetworkedComponent::Updating)
+         {
+            stream->writeInt(i, 8);
+
+            mNetworkedComponents[i].updateMaskBits = mComponents[mNetworkedComponents[i].componentIndex]->packUpdate(con, mNetworkedComponents[i].updateMaskBits, stream);
+
+            if (mNetworkedComponents[i].updateMaskBits != 0)
+               forceUpdate = true;
+            else
+               mNetworkedComponents[i].updateState = NetworkedComponent::None;
+         }
+      }
+
+      //If we have leftover, we need to re-iterate our packing
+      if (forceUpdate)
+         setMaskBits(ComponentsUpdateMask);
+   }
+
+   /*if (stream->writeFlag(mask & NamespaceMask))
+   {
+      const char* name = getName();
+      if (stream->writeFlag(name && name[0]))
+         stream->writeString(String(name));
+
+      if (stream->writeFlag(mSuperClassName && mSuperClassName[0]))
+         stream->writeString(String(mSuperClassName));
+
+      if (stream->writeFlag(mClassName && mClassName[0]))
+         stream->writeString(String(mClassName));
+   }*/
 
    return retMask;
 }
@@ -492,20 +620,10 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
 
    if (stream->readFlag())
    {
-      /*Point3F scale;
-      mathRead( *stream, &scale );
-      setScale( scale);*/
-
-      //MatrixF objToWorld;
-      //stream->readAffineTransform(&objToWorld);
-
       Point3F pos;
-
       stream->readCompressedPoint(&pos);
-      //mathRead(*stream, &pos);
 
       RotationF rot;
-
       mathRead(*stream, &rot);
 
       mDelta.move.unpack(stream);
@@ -514,72 +632,6 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
       {
          // Determine number of ticks to warp based on the average
          // of the client and server velocities.
-         /*mDelta.warpOffset = pos - mDelta.pos;
-
-         F32 dt = mDelta.warpOffset.len() / (0.5f * TickSec);
-
-         mDelta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
-
-         //F32 as = (speed + mVelocity.len()) * 0.5f * TickSec;
-         //F32 dt = (as > 0.00001f) ? mDelta.warpOffset.len() / as : sMaxWarpTicks;
-         //mDelta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
-
-         //mDelta.warpTicks = (S32)((dt > sMinWarpTicks) ? getMax(mFloor(dt + 0.5f), 1.0f) : 0.0f);
-
-         //mDelta.warpTicks = sMaxWarpTicks;
-
-         mDelta.warpTicks = 0;
-
-         if (mDelta.warpTicks)
-         {
-            // Setup the warp to start on the next tick.
-            if (mDelta.warpTicks > sMaxWarpTicks)
-               mDelta.warpTicks = sMaxWarpTicks;
-            mDelta.warpOffset /= (F32)mDelta.warpTicks;
-
-            mDelta.rot[0] = rot.asQuatF();
-            mDelta.rot[1] = rot.asQuatF();
-
-            mDelta.rotOffset = rot.asEulerF() - mDelta.rot.asEulerF();
-
-            // Ignore small rotation differences
-            if (mFabs(mDelta.rotOffset.x) < 0.001f)
-               mDelta.rotOffset.x = 0;
-
-            if (mFabs(mDelta.rotOffset.y) < 0.001f)
-               mDelta.rotOffset.y = 0;
-
-            if (mFabs(mDelta.rotOffset.z) < 0.001f)
-               mDelta.rotOffset.z = 0;
-
-            mDelta.rotOffset /= (F32)mDelta.warpTicks;
-         }
-         else
-         {
-            // Going to skip the warp, server and client are real close.
-            // Adjust the frame interpolation to move smoothly to the
-            // new position within the current tick.
-            Point3F cp = mDelta.pos + mDelta.posVec * mDelta.dt;
-            if (mDelta.dt == 0)
-            {
-               mDelta.posVec.set(0.0f, 0.0f, 0.0f);
-               mDelta.rotVec.set(0.0f, 0.0f, 0.0f);
-            }
-            else
-            {
-               F32 dti = 1.0f / mDelta.dt;
-               mDelta.posVec = (cp - pos) * dti;
-               mDelta.rotVec.z = mRot.z - rot.z;
-
-               mDelta.rotVec.z *= dti;
-            }
-
-            mDelta.pos = pos;
-            mDelta.rot = rot;
-
-            setTransform(pos, rot);
-         }*/
-
          Point3F cp = mDelta.pos + mDelta.posVec * mDelta.dt;
          mDelta.warpOffset = pos - cp;
 
@@ -631,42 +683,101 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
       }
    }
 
-   /*if (stream->readFlag())
-   {
-      Point3F mountOffset;
-      EulerF mountRot;
-      mathRead(*stream, &mountOffset);
-      mathRead(*stream, &mountRot);
-
-      RotationF rot = RotationF(mountRot);
-      mountRot = rot.asEulerF(RotationF::Degrees);
-
-      setMountOffset(mountOffset);
-      setMountRotation(mountRot);
-   }*/
-
    if (stream->readFlag())
    {
       mathRead(*stream, &mObjBox);
       resetWorldBox();
    }
 
+   //AddComponentMask
    if (stream->readFlag())
    {
-      //are we passing any behaviors currently?
+      U32 addedComponentCount = stream->readInt(8);
+
+      for (U32 i = 0; i < addedComponentCount; i++)
+      {
+         char className[256] = "";
+         stream->readString(className);
+
+         //Change to components, so iterate our list and create any new components
+         // Well, looks like we have to create a new object.
+         const char* componentType = className;
+
+         ConsoleObject *object = ConsoleObject::create(componentType);
+
+         // Finally, set currentNewObject to point to the new one.
+         Component* newComponent = dynamic_cast<Component *>(object);
+
+         if (newComponent)
+         {
+            addComponent(newComponent);
+         }
+      }
+   }
+
+   //RemoveComponentMask
+   if (stream->readFlag())
+   {
+      
+   }
+
+   //ComponentUpdateMask
+   if (stream->readFlag())
+   {
+      U32 updatingComponents = stream->readInt(8);
+
+      for (U32 i = 0; i < updatingComponents; i++)
+      {
+         U32 updateComponentIndex = stream->readInt(8);
+
+         Component* comp = mComponents[updateComponentIndex];
+         comp->unpackUpdate(con, stream);
+      }
+   }
+
+   /*if (stream->readFlag())
+   {
       if (stream->readFlag())
       {
-         //if we've just started the update, clear our behaviors
-         if (stream->readFlag())
-            clearComponents(false);
+         char name[256];
+         stream->readString(name);
+         assignName(name);
+      }
 
-         S32 componentCount = stream->readInt(16);
+      if (stream->readFlag())
+      {
+         char superClassname[256];
+         stream->readString(superClassname);
+         mSuperClassName = superClassname;
+      }
 
-         for (U32 i = 0; i < componentCount; i++)
-         {
-            S32 gIndex = stream->readInt(NetConnection::GhostIdBitSize);
-            addComponent(dynamic_cast<Component*>(con->resolveGhost(gIndex)));
-         }
+      if (stream->readFlag())
+      {
+         char classname[256];
+         stream->readString(classname);
+         mClassName = classname;
+      }
+
+      linkNamespaces();
+   }*/
+}
+
+void Entity::setComponentNetMask(Component* comp, U32 mask)
+{
+   setMaskBits(Entity::ComponentsUpdateMask);
+
+   for (U32 i = 0; i < mNetworkedComponents.size(); i++)
+   {
+      U32 netCompId = mComponents[mNetworkedComponents[i].componentIndex]->getId();
+      U32 compId = comp->getId();
+
+      if (netCompId == compId && 
+         (mNetworkedComponents[i].updateState == NetworkedComponent::None || mNetworkedComponents[i].updateState == NetworkedComponent::Updating))
+      {
+         mNetworkedComponents[i].updateState = NetworkedComponent::Updating;
+         mNetworkedComponents[i].updateMaskBits |= mask;
+
+         break;
       }
    }
 }
@@ -674,8 +785,7 @@ void Entity::unpackUpdate(NetConnection *con, BitStream *stream)
 //Manipulation
 void Entity::setTransform(const MatrixF &mat)
 {
-   //setMaskBits(TransformMask);
-   setMaskBits(TransformMask | NoWarpMask);
+   MatrixF oldTransform = getTransform();
 
    if (isMounted())
    {
@@ -687,25 +797,20 @@ void Entity::setTransform(const MatrixF &mat)
 
       if (!newOffset.isZero())
       {
-         //setMountOffset(newOffset);
          mPos = newOffset;
       }
 
       Point3F matEul = mat.toEuler();
-
-      //mRot = Point3F(mRadToDeg(matEul.x), mRadToDeg(matEul.y), mRadToDeg(matEul.z));
 
       if (matEul != Point3F(0, 0, 0))
       {
          Point3F mountEul = mMount.object->getTransform().toEuler();
          Point3F diff = matEul - mountEul;
 
-         //setMountRotation(Point3F(mRadToDeg(diff.x), mRadToDeg(diff.y), mRadToDeg(diff.z)));
          mRot = diff;
       }
       else
       {
-         //setMountRotation(Point3F(0, 0, 0));
          mRot = Point3F(0, 0, 0);
       }
 
@@ -714,6 +819,9 @@ void Entity::setTransform(const MatrixF &mat)
       transf.setPosition(mPos + mMount.object->getPosition());
 
       Parent::setTransform(transf);
+
+      if (transf != oldTransform)
+         setMaskBits(TransformMask);
    }
    else
    {
@@ -744,6 +852,8 @@ void Entity::setTransform(const MatrixF &mat)
 
 void Entity::setTransform(Point3F position, RotationF rotation)
 {
+   MatrixF oldTransform = getTransform();
+
    if (isMounted())
    {
       mPos = position;
@@ -755,7 +865,8 @@ void Entity::setTransform(Point3F position, RotationF rotation)
 
       Parent::setTransform(transf);
 
-      setMaskBits(TransformMask);
+      if (transf != oldTransform)
+         setMaskBits(TransformMask);
    }
    else
    {
@@ -774,7 +885,6 @@ void Entity::setTransform(Point3F position, RotationF rotation)
       mPos = position;
       mRot = rotation;
 
-      setMaskBits(TransformMask);
       //if (isServerObject())
       //   setMaskBits(TransformMask);
 
@@ -788,19 +898,22 @@ void Entity::setTransform(Point3F position, RotationF rotation)
       //PROFILE_SCOPE(Entity_setTransform);
 
       // Update the transforms.
-
       Parent::setTransform(newMat);
 
-      onTransformSet.trigger(&newMat);
+      U32 compCount = mComponents.size();
+      for (U32 i = 0; i < compCount; ++i)
+      {
+         mComponents[i]->ownerTransformSet(&newMat);
+      }
 
-      /*mObjToWorld = mWorldToObj = newMat;
-      mWorldToObj.affineInverse();
-      // Update the world-space AABB.
-      resetWorldBox();
-      // If we're in a SceneManager, sync our scene state.
-      if (mSceneManager != NULL)
-      mSceneManager->notifyObjectDirty(this);
-      setRenderTransform(newMat);*/
+      Point3F newPos = newMat.getPosition();
+      RotationF newRot = newMat;
+
+      Point3F oldPos = oldTransform.getPosition();
+      RotationF oldRot = oldTransform;
+
+      if (newPos != oldPos || newRot != oldRot)
+         setMaskBits(TransformMask);
    }
 }
 
@@ -833,7 +946,11 @@ void Entity::setRenderTransform(Point3F position, RotationF rotation)
 
       Parent::setRenderTransform(newMat);
 
-      onTransformSet.trigger(&newMat);
+      U32 compCount = mComponents.size();
+      for (U32 i = 0; i < compCount; ++i)
+      {
+         mComponents[i]->ownerTransformSet(&newMat);
+      }
    }
 }
 
@@ -887,7 +1004,7 @@ void Entity::setMountRotation(EulerF rotOffset)
       temp.setColumn(3, mMount.xfm.getPosition());
 
       mMount.xfm = temp;
-      //mRot = RotationF(temp);
+
       setMaskBits(MountedMask);
    }
 }
@@ -964,63 +1081,6 @@ void Entity::getRenderMountTransform(F32 delta, S32 index, const MatrixF &xfm, M
    Parent::getMountTransform(index, xfm, outMat);
 }
 
-void Entity::setForwardVector(VectorF newForward, VectorF upVector)
-{
-   MatrixF mat = getTransform();
-
-   VectorF up(0.0f, 0.0f, 1.0f);
-   VectorF axisX;
-   VectorF axisY = newForward;
-   VectorF axisZ;
-
-   if (upVector != VectorF::Zero)
-      up = upVector;
-
-   // Validate and normalize input:  
-   F32 lenSq;
-   lenSq = axisY.lenSquared();
-   if (lenSq < 0.000001f)
-   {
-      axisY.set(0.0f, 1.0f, 0.0f);
-      Con::errorf("Entity::setForwardVector() - degenerate forward vector");
-   }
-   else
-   {
-      axisY /= mSqrt(lenSq);
-   }
-
-
-   lenSq = up.lenSquared();
-   if (lenSq < 0.000001f)
-   {
-      up.set(0.0f, 0.0f, 1.0f);
-      Con::errorf("SceneObject::setForwardVector() - degenerate up vector - too small");
-   }
-   else
-   {
-      up /= mSqrt(lenSq);
-   }
-
-   if (fabsf(mDot(up, axisY)) > 0.9999f)
-   {
-      Con::errorf("SceneObject::setForwardVector() - degenerate up vector - same as forward");
-      // i haven't really tested this, but i think it generates something which should be not parallel to the previous vector:  
-      F32 tmp = up.x;
-      up.x = -up.y;
-      up.y = up.z;
-      up.z = tmp;
-   }
-
-   // construct the remaining axes:  
-   mCross(axisY, up, &axisX);
-   mCross(axisX, axisY, &axisZ);
-
-   mat.setColumn(0, axisX);
-   mat.setColumn(1, axisY);
-   mat.setColumn(2, axisZ);
-
-   setTransform(mat);
-}
 //
 //These basically just redirect to any collision behaviors we have
 bool Entity::castRay(const Point3F &start, const Point3F &end, RayInfo* info)
@@ -1115,6 +1175,28 @@ void Entity::onUnmount(SceneObject *obj, S32 node)
       //TODO implement this callback
       //onUnmount_callback( this, obj, node );
    }
+}
+
+void Entity::setControllingClient(GameConnection* client)
+{
+   if (isGhost() && gSFX3DWorld)
+   {
+      if (gSFX3DWorld->getListener() == this && !client && getControllingClient() && getControllingClient()->isConnectionToServer())
+      {
+         // We are the current listener and are no longer a controller object on the
+         // connection, so clear our listener status.
+
+         gSFX3DWorld->setListener(NULL);
+      }
+      else if (client && client->isConnectionToServer() && !getControllingObject())
+      {
+         // We're on the local client and not controlled by another object, so make
+         // us the current SFX listener.
+
+         gSFX3DWorld->setListener(this);
+      }
+   }
+   Parent::setControllingClient(client);
 }
 
 //Heirarchy stuff
@@ -1223,10 +1305,27 @@ bool Entity::addComponent(Component *comp)
    // Register the component with this owner.
    comp->setOwner(this);
 
+   comp->setIsServerObject(isServerObject());
+
    //if we've already been added and this is being added after the fact(at runtime), 
    //then just go ahead and call it's onComponentAdd so it can get to work
-   if (mInitialized)
+   //if (mInitialized)
+   {
       comp->onComponentAdd();
+
+      if (comp->isNetworked())
+      {
+         NetworkedComponent netComp;
+         netComp.componentIndex = mComponents.size() - 1;
+         netComp.updateState = NetworkedComponent::Adding;
+         netComp.updateMaskBits = -1;
+
+         mNetworkedComponents.push_back(netComp);
+
+         setMaskBits(AddComponentsMask);
+         setMaskBits(ComponentsUpdateMask);
+      }
+   }
 
    onComponentAdded.trigger(comp);
 
@@ -1261,9 +1360,8 @@ bool Entity::removeComponent(Component *comp, bool deleteComponent)
 
       onComponentRemoved.trigger(comp);
 
-      comp->setOwner(NULL);
-
       comp->onComponentRemove(); //in case the behavior needs to do cleanup on the owner
+      comp->setOwner(NULL);
 
       if (deleteComponent)
          comp->safeDeleteObject();
@@ -1338,7 +1436,7 @@ Component *Entity::getComponent(String componentType)
          Namespace *NS = comp->getNamespace();
 
          //we shouldn't ever go past Component into net object, as we're no longer dealing with component classes
-         while (dStrcmp(NS->getName(), "NetObject"))
+         while (dStrcmp(NS->getName(), "SimObject"))
          {
             String namespaceName = NS->getName();
 
@@ -1364,72 +1462,6 @@ void Entity::onInspect()
    {
       (*it)->onInspect();
    }
-
-   GuiTreeViewCtrl *editorTree = dynamic_cast<GuiTreeViewCtrl*>(Sim::findObject("EditorTree"));
-   if (!editorTree)
-      return;
-
-   GuiTreeViewCtrl::Item *newItem, *parentItem;
-
-   parentItem = editorTree->getItem(editorTree->findItemByObjectId(getId()));
-
-   S32 componentID = editorTree->insertItem(parentItem->getID(), "Components");
-
-   newItem = editorTree->getItem(componentID);
-   newItem->mState.set(GuiTreeViewCtrl::Item::VirtualParent);
-   newItem->mState.set(GuiTreeViewCtrl::Item::DenyDrag);
-   //newItem->mState.set(GuiTreeViewCtrl::Item::InspectorData);
-   newItem->mState.set(GuiTreeViewCtrl::Item::ForceItemName);
-   //newItem->mInspectorInfo.mObject = this;
-
-   AssetManager *assetDB = dynamic_cast<AssetManager*>(Sim::findObject("AssetDatabase"));
-   if (!assetDB)
-      return;
-
-   //This is used in the event of script-created assets, which likely only have
-   //the name and other 'friendly' properties stored in a ComponentAsset.
-   //So we'll do a query for those assets and find the asset based on the component's
-   //class name
-   AssetQuery* qry = new AssetQuery();
-   qry->registerObject();
-
-   assetDB->findAssetType(qry, "ComponentAsset");
-
-   for (U32 i = 0; i < mComponents.size(); ++i)
-   {
-      String compName = mComponents[i]->getFriendlyName();
-
-      if (compName == String(""))
-      {
-         String componentClass = mComponents[i]->getClassNamespace();
-
-         //Means that it's a script-derived component and we should consult the asset to try
-         //to get the info for it
-         S32 compAssetCount = qry->mAssetList.size();
-         for (U32 c = 0; c < compAssetCount; ++c)
-         {
-            StringTableEntry assetID = qry->mAssetList[c];
-
-            ComponentAsset* compAsset = assetDB->acquireAsset<ComponentAsset>(assetID);
-
-            String compAssetClass = compAsset->getComponentName();
-            if (componentClass == compAssetClass)
-            {
-               compName = compAsset->getFriendlyName();
-               break;
-            }
-         }
-      }
-
-      S32 compID = editorTree->insertItem(componentID, compName);
-      newItem = editorTree->getItem(compID);
-      newItem->mInspectorInfo.mObject = mComponents[i];
-      newItem->mState.set(GuiTreeViewCtrl::Item::ForceItemName);
-      newItem->mState.set(GuiTreeViewCtrl::Item::DenyDrag);
-      newItem->mState.set(GuiTreeViewCtrl::Item::InspectorData);
-   }
-
-   editorTree->buildVisibleTree(true);
 }
 
 void Entity::onEndInspect()
@@ -1615,9 +1647,25 @@ void Entity::updateContainer()
 }
 //
 
+void Entity::notifyComponents(String signalFunction, String argA, String argB, String argC, String argD, String argE)
+{
+   for (U32 i = 0; i < mComponents.size(); i++)
+   {
+      // We can do this because both are in the string table
+      Component *comp = mComponents[i];
+
+      if (comp->isActive())
+      {
+         if (comp->isMethod(signalFunction))
+            Con::executef(comp, signalFunction, argA, argB, argC, argD, argE);
+      }
+   }
+}
+
 void Entity::setComponentsDirty()
 {
-   if (mToLoadComponents.empty())
+   bool tmp = true;
+   /*if (mToLoadComponents.empty())
       mStartComponentUpdate = true;
 
    //we need to build a list of behaviors that need to be pushed across the network
@@ -1642,7 +1690,7 @@ void Entity::setComponentsDirty()
       }
    }
 
-   setMaskBits(ComponentsMask);
+   setMaskBits(ComponentsMask);*/
 }
 
 void Entity::setComponentDirty(Component *comp, bool forceUpdate)
@@ -1833,7 +1881,6 @@ DefineConsoleMethod(Entity, getComponent, S32, (String componentName), (""),
    Component *comp = object->getComponent(componentName);
 
    return (comp != NULL) ? comp->getId() : 0;
-   return 0;
 }
 
 /*ConsoleMethod(Entity, getBehaviorByType, S32, 3, 3, "(string BehaviorTemplateName) - gets a behavior\n"
@@ -1917,6 +1964,15 @@ DefineConsoleMethod(Entity, getMoveTrigger, bool, (S32 triggerNum), (0),
    return false;
 }
 
+DefineEngineMethod(Entity, getForwardVector, VectorF, (), ,
+   "Get the direction this object is facing.\n"
+   "@return a vector indicating the direction this object is facing.\n"
+   "@note This is the object's y axis.")
+{
+   VectorF forVec = object->getTransform().getForwardVector();
+   return forVec;
+}
+
 DefineConsoleMethod(Entity, setForwardVector, void, (VectorF newForward), (VectorF(0,0,0)),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
@@ -1936,4 +1992,53 @@ DefineConsoleMethod(Entity, rotateTo, void, (Point3F lookPosition, F32 degreePer
    "@return The number of static fields defined on the object.")
 {
    //object->setForwardVector(newForward);
+}
+
+DefineConsoleMethod(Entity, notify, void, (String signalFunction, String argA, String argB, String argC, String argD, String argE),
+("", "", "", "", "", ""),
+"Triggers a signal call to all components for a certain function.")
+{
+   if (signalFunction == String(""))
+      return;
+
+   object->notifyComponents(signalFunction, argA, argB, argC, argD, argE);
+}
+
+DefineConsoleFunction(findEntitiesByTag, const char*, (SimGroup* searchingGroup, String tags), (nullAsType<SimGroup*>(), ""),
+"Finds all entities that have the provided tags.\n"
+"@param searchingGroup The SimGroup to search inside. If null, we'll search the entire dictionary(this can be slow!).\n"
+"@param tags Word delimited list of tags to search for. If multiple tags are included, the list is eclusively parsed, requiring all tags provided to be found on an entity for a match.\n"
+"@return A word list of IDs of entities that match the tag search terms.")
+{
+   //if (tags.isEmpty())
+      return "";
+
+   /*if (searchingGroup == nullptr)
+   {
+      searchingGroup = Sim::getRootGroup();
+   }
+
+   StringTableEntry entityStr = StringTable->insert("Entity");
+
+   std::thread threadBob;
+
+   std::thread::id a = threadBob.get_id();
+   std::thread::id b = std::this_thread::get_id().;
+
+   if (a == b)
+   {
+      //do
+   }
+
+   for (SimGroup::iterator itr = searchingGroup->begin(); itr != searchingGroup->end(); itr++)
+   {
+      Entity* ent = dynamic_cast<Entity*>((*itr));
+
+      if (ent != nullptr)
+      {
+         ent->mTags.
+      }
+   }
+
+   object->notifyComponents(signalFunction, argA, argB, argC, argD, argE);*/
 }

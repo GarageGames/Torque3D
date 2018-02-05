@@ -122,6 +122,7 @@ FileDialog::FileDialog() : mData()
    // Default to File Must Exist Open Dialog style
    mData.mStyle = FileDialogData::FDS_OPEN | FileDialogData::FDS_MUSTEXIST;
    mChangePath = false;
+   mForceRelativePath = true;
 }
 
 FileDialog::~FileDialog()
@@ -150,6 +151,8 @@ void FileDialog::initPersistFields()
 
    addProtectedField("changePath", TypeBool, Offset(mChangePath, FileDialog), &setChangePath, &getChangePath,
       "True/False whether to set the working directory to the directory returned by the dialog.");
+
+   addField("forceRelativePath", TypeBool, Offset(mForceRelativePath, FileDialog), "True/False whether to the path returned is always made to be relative.");
 
    Parent::initPersistFields();
 }
@@ -252,12 +255,14 @@ bool FileDialog::Execute()
    rootDir.replace("/", "\\");
 #endif
 
-   if (mData.mStyle & FileDialogData::FDS_OPEN)
+   if (mData.mStyle & FileDialogData::FDS_OPEN && !(mData.mStyle & FileDialogData::FDS_BROWSEFOLDER))
       result = NFD_OpenDialog(strippedFilters.c_str(), defaultPath.c_str(), &outPath);
-   else if (mData.mStyle & FileDialogData::FDS_SAVE)
+   else if (mData.mStyle & FileDialogData::FDS_SAVE && !(mData.mStyle & FileDialogData::FDS_BROWSEFOLDER))
       result = NFD_SaveDialog(strippedFilters.c_str(), defaultPath.c_str(), &outPath);
    else if (mData.mStyle & FileDialogData::FDS_MULTIPLEFILES)
       result = NFD_OpenDialogMultiple(strippedFilters.c_str(), defaultPath.c_str(), &pathSet);
+   else if (mData.mStyle & FileDialogData::FDS_BROWSEFOLDER)
+	   result = NFD_PickFolder(defaultPath.c_str(), &outPath);
 
    if (result == NFD_CANCEL)
    {
@@ -265,7 +270,8 @@ bool FileDialog::Execute()
    }
 
    String resultPath = String(outPath).replace(rootDir, String(""));
-   resultPath = resultPath.replace(0, 1, String("")).c_str(); //kill '\\' prefix
+   if(resultPath[0] == '\\')
+      resultPath = resultPath.replace(0, 1, String("")).c_str(); //kill '\\' prefix
    resultPath = resultPath.replace(String("\\"), String("/"));
 
    // Did we select a file?
@@ -278,7 +284,10 @@ bool FileDialog::Execute()
    if (mData.mStyle & FileDialogData::FDS_OPEN || mData.mStyle & FileDialogData::FDS_SAVE)
    {
       // Single file selection, do it the easy way
-      mData.mFile = Platform::makeRelativePathName(resultPath.c_str(), NULL);
+      if(mForceRelativePath)
+         mData.mFile = Platform::makeRelativePathName(resultPath.c_str(), NULL);
+      else
+         mData.mFile = resultPath.c_str();
    }
    else if (mData.mStyle & FileDialogData::FDS_MULTIPLEFILES)
    {
@@ -298,7 +307,11 @@ bool FileDialog::Execute()
       else
       {
          //nope, just one file, so set it as normal
-         setDataField(StringTable->insert("files"), "0", Platform::makeRelativePathName(resultPath.c_str(), NULL));
+         if (mForceRelativePath)
+            setDataField(StringTable->insert("files"), "0", Platform::makeRelativePathName(resultPath.c_str(), NULL));
+         else
+            setDataField(StringTable->insert("files"), "0", resultPath.c_str());
+
          setDataField(StringTable->insert("fileCount"), NULL, "1");
       }
    }

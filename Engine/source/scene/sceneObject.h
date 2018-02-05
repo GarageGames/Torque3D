@@ -504,6 +504,9 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
       /// @param   scale   Scaling values
       virtual void setScale( const VectorF &scale );
 
+      /// Sets the forward vector of the object
+      void setForwardVector(VectorF newForward, VectorF upVector = VectorF(0, 0, 1));
+
       /// This sets the render transform for this object
       /// @param   mat   New render transform
       virtual void setRenderTransform(const MatrixF &mat);

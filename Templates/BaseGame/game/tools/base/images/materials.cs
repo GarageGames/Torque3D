@@ -16,7 +16,6 @@ singleton CubemapData( BlankSkyCubemap )
 singleton Material( BlankSkyMat )
 {
    cubemap = BlankSkyCubemap;
-   isSky = true;
 };
 
 singleton Material(White)

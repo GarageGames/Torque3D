@@ -185,7 +185,7 @@ void printGroupStart(const char * aName, const char * aDocs)
    Con::printf("   /*! */");
 }
 
-void printClassMember(const bool isDeprec, const char * aType, const char * aName, const char * aDocs)
+void printClassMember(const bool isDeprec, const char * aType, const char * aName, const char * aDocs, S32 aElementCount)
 {
    Con::printf("   /*!");
 
@@ -200,7 +200,14 @@ void printClassMember(const bool isDeprec, const char * aType, const char * aNam
 
    Con::printf("    */");
 
-   Con::printf("   %s %s;", isDeprec ? "deprecated" : aType, aName);
+   if (aElementCount == 1)
+   {
+      Con::printf("   %s %s;", isDeprec ? "deprecated" : aType, aName);
+   }
+   else
+   {
+      Con::printf("   %s %s[%i];", isDeprec ? "deprecated" : aType, aName, aElementCount);
+   }
 }
 
 void printGroupEnd()
@@ -235,8 +242,17 @@ void Namespace::printNamespaceEntries(Namespace * g, bool dumpScript, bool dumpE
       // If it's a function
       if( eType >= Entry::ConsoleFunctionType )
       {
-         printClassMethod(true, typeNames[eType], funcName, ewalk->getArgumentsString().c_str(),
-            ewalk->getDocString().c_str());
+         if (ewalk->mHeader != NULL)
+         {
+            // The function was defined with types, so we can print out the actual return type
+            printClassMethod(true, ewalk->mHeader->mReturnString, funcName, ewalk->getArgumentsString().c_str(),
+               ewalk->getDocString().c_str());
+         }
+         else
+         {
+            printClassMethod(true, typeNames[eType], funcName, (ewalk->getArgumentsString() + "...").c_str(),
+               ewalk->getDocString().c_str());
+         }
       }
       else if(ewalk->mType == Entry::GroupMarker)
       {
@@ -416,7 +432,8 @@ void Namespace::dumpClasses( bool dumpScript, bool dumpEngine )
                         true,
                         "<deprecated>",
                         (*fieldList)[j].pFieldname,
-                        (*fieldList)[j].pFieldDocs
+                        (*fieldList)[j].pFieldDocs,
+                        (*fieldList)[j].elementCount
                         );
                   }
                   else
@@ -427,7 +444,8 @@ void Namespace::dumpClasses( bool dumpScript, bool dumpEngine )
                         false,
                         cbt ? cbt->getTypeClassName() : "<unknown>",
                         (*fieldList)[j].pFieldname,
-                        (*fieldList)[j].pFieldDocs
+                        (*fieldList)[j].pFieldDocs,
+                        (*fieldList)[j].elementCount
                         );
                   }
                }

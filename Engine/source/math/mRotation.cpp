@@ -252,14 +252,29 @@ MatrixF RotationF::asMatrixF() const
    MatrixF returnMat;
    if (mRotationType == Euler)
    {
-      returnMat.set(EulerF(x, y, z));
+      MatrixF imat, xmat, ymat, zmat;
+      xmat.set(EulerF(x, 0, 0));
+      ymat.set(EulerF(0.0f, y, 0.0f));
+      zmat.set(EulerF(0, 0, z));
+      imat.mul(zmat, xmat);
+      returnMat.mul(imat, ymat);
    }
    else
    {
       AngAxisF aa;
       aa.set(Point3F(x, y, z), w);
 
-      aa.setMatrix(&returnMat);
+      MatrixF tempMat;
+      aa.setMatrix(&tempMat);
+
+      EulerF eul = tempMat.toEuler();
+
+      MatrixF imat, xmat, ymat, zmat;
+      xmat.set(EulerF(eul.x, 0, 0));
+      ymat.set(EulerF(0.0f, eul.y, 0.0f));
+      zmat.set(EulerF(0, 0, eul.z));
+      imat.mul(zmat, xmat);
+      returnMat.mul(imat, ymat);
    }
 
    return returnMat;
@@ -310,7 +325,7 @@ TEST(Maths, RotationF_Calculations)
 };
 #endif
 
-DefineConsoleStaticMethod(rotation, Add, RotationF, (RotationF a, RotationF b), ,
+DefineConsoleFunction(AddRotation, RotationF, (RotationF a, RotationF b), ,
    "Adds two rotations together.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -320,7 +335,7 @@ DefineConsoleStaticMethod(rotation, Add, RotationF, (RotationF a, RotationF b), 
    return a + b;
 }
  
-DefineConsoleStaticMethod(rotation, Subtract, RotationF, (RotationF a, RotationF b), ,
+DefineConsoleFunction(SubtractRotation, RotationF, (RotationF a, RotationF b), ,
    "Subtracts two rotations.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -330,7 +345,7 @@ DefineConsoleStaticMethod(rotation, Subtract, RotationF, (RotationF a, RotationF
    return a - b;
 }
  
-DefineConsoleStaticMethod(rotation, Interpolate, RotationF, (RotationF a, RotationF b, F32 factor), ,
+DefineConsoleFunction(InterpolateRotation, RotationF, (RotationF a, RotationF b, F32 factor), ,
    "Interpolates between two rotations.\n"
    "@param a Rotation one."
    "@param b Rotation two."
@@ -343,7 +358,7 @@ DefineConsoleStaticMethod(rotation, Interpolate, RotationF, (RotationF a, Rotati
    return result;
 }
  
-DefineConsoleStaticMethod(rotation, LookAt, RotationF, (Point3F origin, Point3F target, Point3F up),
+DefineConsoleFunction(RotationLookAt, RotationF, (Point3F origin, Point3F target, Point3F up),
    (Point3F(0, 0, 0), Point3F(0, 0, 0), Point3F(0, 0, 1)),
    "Provides a rotation orientation to look at a target from a given position.\n"
    "@param origin Position of the object doing the looking."
@@ -357,11 +372,55 @@ DefineConsoleStaticMethod(rotation, LookAt, RotationF, (Point3F origin, Point3F 
    return result;
 }
 
-DefineConsoleStaticMethod(rotation, getDirection, Point3F, (RotationF rot),,
-"Takes the angles of the provided rotation and returns a direction vector.\n"
-"@param rot Our rotation."
-"@returns v Direction vector result."
-"@ingroup Math")
+DefineConsoleFunction(setRotationRightVector, RotationF, (RotationF rot, VectorF rightVec), ,
+   "Sets the right vector of the rotation.\n"
+   "@param Starting rotation."
+   "@param New up vector."
+   "@returns New rotation with the set right vector."
+   "@ingroup Math")
+{
+   rot.asMatrixF().setColumn(0, rightVec);
+   return rot;
+}
+
+DefineConsoleFunction(setRotationUpVector, RotationF, (RotationF rot, VectorF upVec), ,
+   "Sets the up vector of the rotation.\n"
+   "@param Starting rotation."
+   "@param New up vector."
+   "@returns New rotation with the set up vector."
+   "@ingroup Math")
+{
+   rot.asMatrixF().setColumn(2, upVec);
+   return rot;
+}
+
+DefineConsoleFunction(getRotationForwardVector, VectorF, (RotationF rot), ,
+   "Get the forward vector of a rotation.\n"
+   "@ingroup Math")
+{
+   return rot.asMatrixF().getForwardVector();
+}
+
+DefineConsoleFunction(getRotationRightVector, VectorF, (RotationF rot), ,
+   "Gets the right vector of a rotation.\n"
+   "@param Our rotation."
+   "@ingroup Math")
+{
+   return rot.asMatrixF().getRightVector();
+}
+
+DefineConsoleFunction(getRotationUpVector, VectorF, (RotationF rot), ,
+   "Gets the up vector of a rotation.\n"
+   "@param Our rotation."
+   "@ingroup Math")
+{
+   return rot.asMatrixF().getUpVector();
+}
+
+DefineConsoleFunction(getRotationDirection, Point3F, (RotationF rot),,
+   "Gets the direction from the rotation's angles.\n"
+   "@param Our rotation."
+   "@ingroup Math")
 {
    return rot.getDirection();
 }

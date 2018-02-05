@@ -60,6 +60,8 @@
 #include "gfx/gfxVertexFormat.h"
 #endif
 
+#include "T3D/systems/render/meshRenderSystem.h"
+
 class TSShapeInstance;
 class SceneRenderState;
 //////////////////////////////////////////////////////////////////////////
@@ -84,37 +86,38 @@ protected:
    StringTableEntry		mShapeName;
    StringTableEntry		mShapeAsset;
    TSShape*		         mShape;
-   Box3F						mShapeBounds;
+   //Box3F						mShapeBounds;
    Point3F					mCenterOffset;
+
+   MeshRenderSystemInterface*  mInterfaceData;
 
    struct matMap
    {
-      String matName;
+      MaterialAsset* matAsset;
+      String assetId;
       U32 slot;
    };
 
    Vector<matMap>  mChangingMaterials;
    Vector<matMap>  mMaterials;
 
-   class boneObject : public SimGroup
+public:
+   enum RenderMode
    {
-      MeshComponent *mOwner;
-   public:
-      boneObject(MeshComponent *owner){ mOwner = owner; }
-
-      StringTableEntry mBoneName;
-      S32 mItemID;
-
-      virtual void addObject(SimObject *obj);
+      Individual = 0,
+      DynamicBatch,
+      StaticBatch,
+      Instanced
    };
 
-   Vector<boneObject*> mNodesList;
+protected:
+   RenderMode           mRenderMode;
 
 public:
    StringTableEntry       mMeshAssetId;
    AssetPtr<ShapeAsset>   mMeshAsset;
 
-   TSShapeInstance*       mShapeInstance;
+   //TSShapeInstance*       mShapeInstance;
 
 public:
    MeshComponent();
@@ -132,7 +135,7 @@ public:
    virtual U32 packUpdate(NetConnection *con, U32 mask, BitStream *stream);
    virtual void unpackUpdate(NetConnection *con, BitStream *stream);
 
-   Box3F getShapeBounds() { return mShapeBounds; }
+   Box3F getShapeBounds() { return mInterfaceData->mBounds; }
 
    virtual MatrixF getNodeTransform(S32 nodeIdx);
    S32 getNodeByName(String nodeName);
@@ -144,6 +147,8 @@ public:
    virtual void onComponentRemove();
    virtual void onComponentAdd();
 
+   virtual void ownerTransformSet(MatrixF *mat);
+
    static bool _setMesh(void *object, const char *index, const char *data);
    static bool _setShape(void *object, const char *index, const char *data);
    const char* _getShape(void *object, const char *data);
@@ -151,7 +156,7 @@ public:
    bool setMeshAsset(const char* assetName);
 
    virtual TSShape* getShape() { if (mMeshAsset)  return mMeshAsset->getShape(); else return NULL; }
-   virtual TSShapeInstance* getShapeInstance() { return mShapeInstance; }
+   virtual TSShapeInstance* getShapeInstance() { return mInterfaceData->mShapeInstance; }
 
    Resource<TSShape> getShapeResource() { return mMeshAsset->getShapeResource(); }
 
@@ -163,7 +168,8 @@ public:
 
    virtual void onDynamicModified(const char* slotName, const char* newValue);
 
-   void changeMaterial(U32 slot, const char* newMat);
+   void changeMaterial(U32 slot, MaterialAsset* newMat);
+   bool setMatInstField(U32 slot, const char* field, const char* value);
 
    virtual void onInspect();
    virtual void onEndInspect();
@@ -179,5 +185,8 @@ public:
       return;
    }
 };
+
+typedef MeshComponent::RenderMode BatchingMode;
+DefineEnumType(BatchingMode);
 
 #endif

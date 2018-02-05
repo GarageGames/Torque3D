@@ -126,6 +126,28 @@ DefineEngineMethod(MeshComponent, getNodePosition, Point3F,
    return Point3F(0, 0, 0);
 }
 
+DefineEngineMethod(MeshComponent, getNodeRotation, EulerF,
+   (S32 node), (-1),
+   "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
+
+   "@param objB  Object to mount onto us\n"
+   "@param slot  Mount slot ID\n"
+   "@param txfm (optional) mount offset transform\n"
+   "@return true if successful, false if failed (objB is not valid)")
+{
+   if (node != -1)
+   {
+      //BUG: Unsure how it broke, but atm the default transform passed in here is rotated 180 degrees. This doesn't happen
+      //for the SceneObject mountobject method. Hackish, but for now, just default to a clean MatrixF::Identity
+      //object->mountObjectToNode( objB, node, /*MatrixF::Identity*/txfm.getMatrix() );
+      RotationF mat = object->getNodeTransform(node);
+
+      return mat.asEulerF(RotationF::Degrees);
+   }
+
+   return EulerF(0, 0, 0);
+}
+
 DefineEngineMethod(MeshComponent, getNodeByName, S32,
    (String nodeName), ,
    "@brief Mount objB to this object at the desired slot with optional transform.\n\n"
@@ -148,8 +170,14 @@ DefineEngineMethod(MeshComponent, getNodeByName, S32,
    return -1;
 }
 
-DefineEngineMethod(MeshComponent, changeMaterial, void, (U32 slot, const char* newMat), (0, ""),
+DefineEngineMethod(MeshComponent, changeMaterial, void, (U32 slot, MaterialAsset* newMat), (0, nullAsType<MaterialAsset*>()),
    "@brief Change one of the materials on the shape.\n\n")
 {
    object->changeMaterial(slot, newMat);
+}
+
+DefineEngineMethod(MeshComponent, setMatInstField, bool, (U32 slot, const char* field, const char* value), (0, "", ""),
+   "@brief Change one of the materials on the shape.\n\n")
+{
+   return object->setMatInstField(slot, field, value);
 }

@@ -1,0 +1,8 @@
+<ComponentAsset
+    canSave="true"
+    canSaveDynamicFields="true"
+    AssetName="RigidBodyComponentAsset"
+    componentClass="RigidBodyComponent"
+    friendlyName="Rigid Body"
+    componentType="Physics"
+    description="Allows an entity to have rigid body physics." />

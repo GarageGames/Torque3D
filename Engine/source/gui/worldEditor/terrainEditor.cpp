@@ -2857,14 +2857,21 @@ DefineConsoleMethod( TerrainEditor, setSlopeLimitMaxAngle, F32, (F32 angle), , "
 //------------------------------------------------------------------------------  
 void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinSlope, F32 mMaxSlope, F32 mCoverage )  
 {  
-   if (!mActiveTerrain)  
+
+#define AUTOPAINT_UNDO 
+	
+	if (!mActiveTerrain)  
       return;  
   
    S32 mat = getPaintMaterialIndex();  
    if (mat == -1)  
       return;  
-  
-   mUndoSel = new Selection;  
+
+
+	  #ifndef AUTOPAINT_UNDO
+	  mUndoSel = new Selection;  
+	  #endif
+
           
    U32 terrBlocks = mActiveTerrain->getBlockSize();  
    for (U32 y = 0; y < terrBlocks; y++) 
@@ -2906,19 +2913,23 @@ void TerrainEditor::autoMaterialLayer( F32 mMinHeight, F32 mMaxHeight, F32 mMinS
             if (norm.z < mSin(mDegToRad(90.0f - mMaxSlope)))  
                continue;  
   
-         gi.mMaterialChanged = true;  
-         mUndoSel->add(gi);  
+         gi.mMaterialChanged = true; 
+         #ifndef AUTOPAINT_UNDO
+         mUndoSel->add(gi);
+         #endif
          gi.mMaterial = mat;  
          setGridInfo(gi);  
       }  
    }  
   
+   #ifndef AUTOPAINT_UNDO
    if(mUndoSel->size())  
       submitUndo( mUndoSel );  
    else  
       delete mUndoSel;  
-  
    mUndoSel = 0;  
+   #endif
+
   
    scheduleMaterialUpdate();     
 }

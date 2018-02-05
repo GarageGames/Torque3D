@@ -47,14 +47,10 @@ static void AddFiltersToDialog( GtkWidget *dialog, const char *filterList )
         if ( NFDi_IsFilterSegmentChar(*p_filterList) )
         {
             char typebufWildcard[NFD_MAX_STRLEN];
-            
             /* add another type to the filter */
-            if (strlen(typebuf) <= 0 || strlen(typebuf) > NFD_MAX_STRLEN-1) 
-            {
-              p_filterList++;
-              continue;
-            }
-
+            assert( strlen(typebuf) > 0 );
+            assert( strlen(typebuf) < NFD_MAX_STRLEN-1 );
+            
             snprintf( typebufWildcard, NFD_MAX_STRLEN, "*.%s", typebuf );
             AddTypeToFilterName( typebuf, filterName, NFD_MAX_STRLEN );
             
@@ -296,6 +292,59 @@ nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
 
     /* Build the filter list */    
     AddFiltersToDialog(dialog, filterList);
+
+    /* Set the default path */
+    SetDefaultPath(dialog, defaultPath);
+    
+    result = NFD_CANCEL;    
+    if ( gtk_dialog_run( GTK_DIALOG(dialog) ) == GTK_RESPONSE_ACCEPT )
+    {
+        char *filename;
+        filename = gtk_file_chooser_get_filename( GTK_FILE_CHOOSER(dialog) );
+        
+        {
+            size_t len = strlen(filename);
+            *outPath = NFDi_Malloc( len + 1 );
+            memcpy( *outPath, filename, len + 1 );
+            if ( !*outPath )
+            {
+                g_free( filename );
+                gtk_widget_destroy(dialog);
+                return NFD_ERROR;
+            }
+        }
+        g_free(filename);
+
+        result = NFD_OKAY;
+    }
+
+    WaitForCleanup();
+    gtk_widget_destroy(dialog);
+    WaitForCleanup();
+    
+    return result;
+}
+
+nfdresult_t NFD_PickFolder(const nfdchar_t *defaultPath,
+    nfdchar_t **outPath)
+{
+    GtkWidget *dialog;
+    nfdresult_t result;
+
+    if (!gtk_init_check(NULL, NULL))
+    {
+        NFDi_SetError(INIT_FAIL_MSG);
+        return NFD_ERROR;
+    }
+
+    dialog = gtk_file_chooser_dialog_new( "Select folder",
+                                          NULL,
+                                          GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                          "_Cancel", GTK_RESPONSE_CANCEL,
+                                          "_Select", GTK_RESPONSE_ACCEPT,
+                                          NULL ); 
+    gtk_file_chooser_set_do_overwrite_confirmation( GTK_FILE_CHOOSER(dialog), TRUE );
+
 
     /* Set the default path */
     SetDefaultPath(dialog, defaultPath);

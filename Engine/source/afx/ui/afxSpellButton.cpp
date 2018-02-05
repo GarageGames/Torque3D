@@ -343,13 +343,13 @@ afxRPGMagicSpellData* afxSpellButton::getSpellRPGDataBlock() const
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 
-DefineEngineMethod( afxSpellButton, onSpellbookChange, void, ( afxSpellBook* spellbook, unsigned int page ),,
+DefineEngineMethod( afxSpellButton, onSpellbookChange, void, ( afxSpellBook* spellbook, U32 page ),,
    "Notify an afxSpellButton when its associated spellbook has changed.\n" )
 {
   object->setSpellBook(spellbook, (U8)page);
 }
 
-DefineEngineMethod( afxSpellButton, onTurnPage, void, ( unsigned int page ),,
+DefineEngineMethod( afxSpellButton, onTurnPage, void, (U32 page ),,
    "Notify an afxSpellButton when the spellbook turns to a new page.\n" )
 {
   object->setPage((U8)page);

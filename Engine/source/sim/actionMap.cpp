@@ -1868,7 +1868,7 @@ static ConsoleDocFragment _ActionMapbind2(
    "ActionMap",
    "bool bind( string device, string action, string flag, string deadZone, string scale, string command );");
 
-ConsoleMethod( ActionMap, bind, bool, 5, 10, "actionMap.bind( device, action, [modifier spec, mod...], command )" 
+ConsoleMethod( ActionMap, bind, bool, 5, 10, "actionMap.bind( device, action, [modifier, spec, mod...], command )" 
            "@hide")
 {
    StringStackWrapper args(argc - 2, argv + 2);
@@ -1917,7 +1917,7 @@ static ConsoleDocFragment _ActionMapbindObj2(
    "ActionMap",
    "bool bindObj( string device, string action, string flag, string deadZone, string scale, string command, SimObjectID object );");
 
-ConsoleMethod( ActionMap, bindObj, bool, 6, 11, "(device, action, [modifier spec, mod...], command, object)"
+ConsoleMethod( ActionMap, bindObj, bool, 6, 11, "(device, action, [modifier, spec, mod...], command, object)"
            "@hide")
 {
    SimObject* simObject = Sim::findObject(argv[argc - 1]);
