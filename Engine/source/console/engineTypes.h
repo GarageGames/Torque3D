@@ -576,7 +576,7 @@ namespace _Private {
    uintptr_t( ( ( const char* ) &( ( ( ThisType* ) 16 )->fieldName ) ) - 16 ) // Artificial offset to avoid compiler warnings.
    
 ///
-#define CLASSDOC( className, doc ) \
+#define ConsoleDocClass( className, doc ) \
    template<> const char* EngineClassTypeInfo< className, className::_ClassBase >::smDocString = doc;
    
 
