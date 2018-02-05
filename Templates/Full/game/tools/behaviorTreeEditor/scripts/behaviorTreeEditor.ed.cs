@@ -52,13 +52,16 @@ function toggleBehaviorTreeEditor( %make )
    }
 }
 
-GlobalActionMap.bind( keyboard, "f9", toggleBehaviorTreeEditor );
+GlobalActionMap.bind( keyboard, "Shift F9", toggleBehaviorTreeEditor );
 
 
 function BTEditor::startUp(%this, %content)
 {
    %this.lastContent=%content;
    Canvas.setContent( BTEditor );
+   //Canavs.pushDialog(BTEditor);
+   
+   BadBehaviorMenubar.attachToCanvas(Canvas,0);
    
    if(!isObject(BehaviorTreeManager))
       // This isn't pretty, but we need to load up existing trees
@@ -271,7 +274,7 @@ function BTEditor::saveTree(%this, %tree, %prompt)
    
       if(%dlg.execute())
       {
-         %file = %dlg.fileName;         
+         %file = %dlg.fileNamfe;         
          %dlg.delete();
       }
       else
@@ -351,7 +354,7 @@ function BTEditor::updateUndoMenu(%this)
    %nextUndo = %uman.getNextUndoName();
    %nextRedo = %uman.getNextRedoName();
    
-   %editMenu = BTEditCanvas.menuBar->editMenu;
+   %editMenu = BTEditCanvas.menuBar.findMenu("Edit");
    
    %editMenu.setItemName( 0, "Undo " @ %nextUndo );
    %editMenu.setItemName( 1, "Redo " @ %nextRedo );
@@ -362,7 +365,7 @@ function BTEditor::updateUndoMenu(%this)
 
 function BTEditor::ResetUndoMenu(%this)
 {
-   %editMenu = BTEditCanvas.menuBar->editMenu;
+   %editMenu = BTEditCanvas.menuBar.findMenu("Edit");
    %editMenu.setItemName( 0, "Undo" );
    %editMenu.setItemName( 1, "Redo" );
    %editMenu.enableItem( 0, false );

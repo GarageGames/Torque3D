@@ -1960,6 +1960,7 @@ GuiMenuBar::MenuItem *GuiMenuBar::findHitMenuItem(Point2I mousePoint)
    return NULL;
 }
 
+
 //  Checks if the mouse has been moved to a new menu item
 void GuiMenuBar::checkSubmenuMouseMove(const GuiEvent &event)
 {
@@ -1971,6 +1972,12 @@ void GuiMenuBar::checkSubmenuMouseMove(const GuiEvent &event)
 //      closeSubmenu();
       setUpdate();
    }
+}
+
+DefineConsoleMethod(GuiMenuBar, findMenu, S32, (const char* barTitle), (""), "(barTitle)")
+{
+   StringTableEntry barTitleStr = StringTable->insert(barTitle);
+   PopupMenu* menu = object->findMenu(barTitleStr);
 }
 
 //  Process a tick

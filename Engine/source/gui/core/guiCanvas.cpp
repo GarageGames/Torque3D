@@ -133,7 +133,8 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mLastRenderMs(0),
                         mPlatformWindow(NULL),
                         mDisplayWindow(true),
-                        mMenuBarCtrl(NULL)
+                        mMenuBarCtrl(nullptr),
+						mMenuBackground(nullptr)
 {
    setBounds(0, 0, 640, 480);
    mAwake = true;
@@ -298,12 +299,37 @@ void GuiCanvas::setMenuBar(SimObject *obj)
     mMenuBarCtrl = dynamic_cast<GuiControl*>(obj);
 
     //remove old menubar
-    if( oldMenuBar )
-        Parent::removeObject( oldMenuBar );
+	if (oldMenuBar)
+	{
+		Parent::removeObject(oldMenuBar);
+		Parent::removeObject(mMenuBackground); //also remove the modeless wrapper
+	}
 
     // set new menubar    
-    if( mMenuBarCtrl )
-        Parent::addObject(mMenuBarCtrl);
+    if (mMenuBarCtrl)
+    {
+       //Add a wrapper control so that the menubar sizes correctly
+       GuiControlProfile* profile;
+       Sim::findObject("GuiModelessDialogProfile", profile);
+
+       if (!profile)
+       {
+          Con::errorf("GuiCanvas::setMenuBar: Unable to find the GuiModelessDialogProfile profile!");
+          return;
+       }
+
+	   if (mMenuBackground == nullptr)
+	   {
+		   mMenuBackground = new GuiControl();
+		   mMenuBackground->registerObject();
+
+		   mMenuBackground->setControlProfile(profile);
+	   }
+
+	   mMenuBackground->addObject(mMenuBarCtrl);
+
+       Parent::addObject(mMenuBackground);
+    }
 
     // update window accelerator keys
     if( oldMenuBar != mMenuBarCtrl )

@@ -44,9 +44,6 @@ function BTEditCanvas::onRemove( %this )
 {
    if( isObject( BehaviorTreeEditorGui.menuGroup ) )
       BehaviorTreeEditorGui.delete();
-
-   // cleanup
-   %this.onDestroyMenu();
    
    //BTEditorTabBook.deleteAllObjects();
 }
@@ -59,6 +56,12 @@ function BTEditCanvas::quit( %this )
    Canvas.setContent(BTEditor.lastContent);
    $InBehaviorTreeEditor = false;
    BehaviorTreeManager.onBehaviorTreeEditor(false);
+   
+   // cleanup
+   %this.onDestroyMenu();
+   
+   //Re-establish the main editor's menubar
+   EditorGui.attachMenus();
 }
 
 //==============================================================================
@@ -82,9 +85,13 @@ function BTEditCanvas::onCreateMenu(%this)
    }
    
    // Menu bar
-   %this.menuBar = new MenuBar()
+   %this.menuBar = new GuiMenuBar(BadBehaviorMenubar)
    {
       dynamicItemInsertPos = 3;
+      extent = "1024 20";
+      minExtent = "320 20";
+      horizSizing = "width";
+      profile = "GuiMenuBarProfile";
       
       new PopupMenu()
       {
