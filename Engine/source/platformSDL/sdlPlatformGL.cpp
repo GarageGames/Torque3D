@@ -1,3 +1,5 @@
+#if defined(TORQUE_OPENGL) && defined(TORQUE_SDL)
+
 #include <SDL.h>
 #include "windowManager/sdl/sdlWindow.h"
 #include "console/console.h"
@@ -88,3 +90,4 @@ namespace PlatformGL
    }
 
 }
+#endif
