@@ -10,23 +10,31 @@ extern "C" {
 struct ALeffect;
 
 enum {
-    EAXREVERB = 0,
-    REVERB,
-    CHORUS,
-    COMPRESSOR,
-    DISTORTION,
-    ECHO,
-    EQUALIZER,
-    FLANGER,
-    MODULATOR,
-    DEDICATED,
+    EAXREVERB_EFFECT = 0,
+    REVERB_EFFECT,
+    CHORUS_EFFECT,
+    COMPRESSOR_EFFECT,
+    DISTORTION_EFFECT,
+    ECHO_EFFECT,
+    EQUALIZER_EFFECT,
+    FLANGER_EFFECT,
+    MODULATOR_EFFECT,
+    DEDICATED_EFFECT,
 
     MAX_EFFECTS
 };
 extern ALboolean DisabledEffects[MAX_EFFECTS];
 
 extern ALfloat ReverbBoost;
-extern ALboolean EmulateEAXReverb;
+
+struct EffectList {
+    const char name[16];
+    int type;
+    ALenum val;
+};
+#define EFFECTLIST_SIZE 11
+extern const struct EffectList EffectList[EFFECTLIST_SIZE];
+
 
 struct ALeffectVtable {
     void (*const setParami)(struct ALeffect *effect, ALCcontext *context, ALenum param, ALint val);
@@ -98,7 +106,7 @@ typedef union ALeffectProps {
         ALfloat Depth;
         ALfloat Feedback;
         ALfloat Delay;
-    } Chorus;
+    } Chorus; /* Also Flanger */
 
     struct {
         ALboolean OnOff;
@@ -136,15 +144,6 @@ typedef union ALeffectProps {
     } Equalizer;
 
     struct {
-        ALint Waveform;
-        ALint Phase;
-        ALfloat Rate;
-        ALfloat Depth;
-        ALfloat Feedback;
-        ALfloat Delay;
-    } Flanger;
-
-    struct {
         ALfloat Frequency;
         ALfloat HighPassCutoff;
         ALint Waveform;
@@ -167,27 +166,13 @@ typedef struct ALeffect {
     ALuint id;
 } ALeffect;
 
-inline void LockEffectsRead(ALCdevice *device)
-{ LockUIntMapRead(&device->EffectMap); }
-inline void UnlockEffectsRead(ALCdevice *device)
-{ UnlockUIntMapRead(&device->EffectMap); }
-inline void LockEffectsWrite(ALCdevice *device)
-{ LockUIntMapWrite(&device->EffectMap); }
-inline void UnlockEffectsWrite(ALCdevice *device)
-{ UnlockUIntMapWrite(&device->EffectMap); }
-
-inline struct ALeffect *LookupEffect(ALCdevice *device, ALuint id)
-{ return (struct ALeffect*)LookupUIntMapKeyNoLock(&device->EffectMap, id); }
-inline struct ALeffect *RemoveEffect(ALCdevice *device, ALuint id)
-{ return (struct ALeffect*)RemoveUIntMapKeyNoLock(&device->EffectMap, id); }
-
 inline ALboolean IsReverbEffect(ALenum type)
 { return type == AL_EFFECT_REVERB || type == AL_EFFECT_EAXREVERB; }
 
-ALenum InitEffect(ALeffect *effect);
-ALvoid ReleaseALEffects(ALCdevice *device);
+void InitEffect(ALeffect *effect);
+void ReleaseALEffects(ALCdevice *device);
 
-ALvoid LoadReverbPreset(const char *name, ALeffect *effect);
+void LoadReverbPreset(const char *name, ALeffect *effect);
 
 #ifdef __cplusplus
 }

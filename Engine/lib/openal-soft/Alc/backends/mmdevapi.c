@@ -41,9 +41,11 @@
 
 #include "alMain.h"
 #include "alu.h"
+#include "ringbuffer.h"
 #include "threads.h"
 #include "compat.h"
 #include "alstring.h"
+#include "converter.h"
 
 #include "backends/base.h"
 
@@ -64,7 +66,16 @@ DEFINE_PROPERTYKEY(PKEY_AudioEndpoint_GUID, 0x1da5d803, 0xd492, 0x4edd, 0x8c, 0x
 #define X7DOT1 (SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_SIDE_LEFT|SPEAKER_SIDE_RIGHT)
 #define X7DOT1_WIDE (SPEAKER_FRONT_LEFT|SPEAKER_FRONT_RIGHT|SPEAKER_FRONT_CENTER|SPEAKER_LOW_FREQUENCY|SPEAKER_BACK_LEFT|SPEAKER_BACK_RIGHT|SPEAKER_FRONT_LEFT_OF_CENTER|SPEAKER_FRONT_RIGHT_OF_CENTER)
 
+#define REFTIME_PER_SEC ((REFERENCE_TIME)10000000)
+
 #define DEVNAME_HEAD "OpenAL Soft on "
+
+
+/* Scales the given value using 64-bit integer math, ceiling the result. */
+static inline ALuint64 ScaleCeil(ALuint64 val, ALuint64 new_scale, ALuint64 old_scale)
+{
+    return (val*new_scale + old_scale-1) / old_scale;
+}
 
 
 typedef struct {
@@ -108,6 +119,15 @@ typedef struct {
 #define WM_USER_Enumerate   (WM_USER+5)
 #define WM_USER_Last        (WM_USER+5)
 
+static const char MessageStr[WM_USER_Last+1-WM_USER][20] = {
+    "Open Device",
+    "Reset Device",
+    "Start Device",
+    "Stop Device",
+    "Close Device",
+    "Enumerate Devices",
+};
+
 static inline void ReturnMsgResponse(ThreadRequest *req, HRESULT res)
 {
     req->result = res;
@@ -130,14 +150,14 @@ static void get_device_name_and_guid(IMMDevice *device, al_string *name, al_stri
     PROPVARIANT pvguid;
     HRESULT hr;
 
-    al_string_copy_cstr(name, DEVNAME_HEAD);
+    alstr_copy_cstr(name, DEVNAME_HEAD);
 
     hr = IMMDevice_OpenPropertyStore(device, STGM_READ, &ps);
     if(FAILED(hr))
     {
         WARN("OpenPropertyStore failed: 0x%08lx\n", hr);
-        al_string_append_cstr(name, "Unknown Device Name");
-        if(guid!=NULL)al_string_copy_cstr(guid, "Unknown Device GUID");
+        alstr_append_cstr(name, "Unknown Device Name");
+        if(guid!=NULL)alstr_copy_cstr(guid, "Unknown Device GUID");
         return;
     }
 
@@ -147,14 +167,14 @@ static void get_device_name_and_guid(IMMDevice *device, al_string *name, al_stri
     if(FAILED(hr))
     {
         WARN("GetValue Device_FriendlyName failed: 0x%08lx\n", hr);
-        al_string_append_cstr(name, "Unknown Device Name");
+        alstr_append_cstr(name, "Unknown Device Name");
     }
     else if(pvname.vt == VT_LPWSTR)
-        al_string_append_wcstr(name, pvname.pwszVal);
+        alstr_append_wcstr(name, pvname.pwszVal);
     else
     {
         WARN("Unexpected PROPVARIANT type: 0x%04x\n", pvname.vt);
-        al_string_append_cstr(name, "Unknown Device Name");
+        alstr_append_cstr(name, "Unknown Device Name");
     }
     PropVariantClear(&pvname);
 
@@ -165,14 +185,14 @@ static void get_device_name_and_guid(IMMDevice *device, al_string *name, al_stri
         if(FAILED(hr))
         {
             WARN("GetValue AudioEndpoint_GUID failed: 0x%08lx\n", hr);
-            al_string_copy_cstr(guid, "Unknown Device GUID");
+            alstr_copy_cstr(guid, "Unknown Device GUID");
         }
         else if(pvguid.vt == VT_LPWSTR)
-            al_string_copy_wcstr(guid, pvguid.pwszVal);
+            alstr_copy_wcstr(guid, pvguid.pwszVal);
         else
         {
             WARN("Unexpected PROPVARIANT type: 0x%04x\n", pvguid.vt);
-            al_string_copy_cstr(guid, "Unknown Device GUID");
+            alstr_copy_cstr(guid, "Unknown Device GUID");
         }
 
         PropVariantClear(&pvguid);
@@ -211,7 +231,7 @@ static void get_device_formfactor(IMMDevice *device, EndpointFormFactor *formfac
 }
 
 
-static void add_device(IMMDevice *device, LPCWSTR devid, vector_DevMap *list)
+static void add_device(IMMDevice *device, const WCHAR *devid, vector_DevMap *list)
 {
     int count = 0;
     al_string tmpname;
@@ -228,30 +248,30 @@ static void add_device(IMMDevice *device, LPCWSTR devid, vector_DevMap *list)
     {
         const DevMap *iter;
 
-        al_string_copy(&entry.name, tmpname);
+        alstr_copy(&entry.name, tmpname);
         if(count != 0)
         {
             char str[64];
             snprintf(str, sizeof(str), " #%d", count+1);
-            al_string_append_cstr(&entry.name, str);
+            alstr_append_cstr(&entry.name, str);
         }
 
-#define MATCH_ENTRY(i) (al_string_cmp(entry.name, (i)->name) == 0)
+#define MATCH_ENTRY(i) (alstr_cmp(entry.name, (i)->name) == 0)
         VECTOR_FIND_IF(iter, const DevMap, *list, MATCH_ENTRY);
         if(iter == VECTOR_END(*list)) break;
 #undef MATCH_ENTRY
         count++;
     }
 
-    TRACE("Got device \"%s\", \"%s\", \"%ls\"\n", al_string_get_cstr(entry.name), al_string_get_cstr(entry.endpoint_guid), entry.devid);
+    TRACE("Got device \"%s\", \"%s\", \"%ls\"\n", alstr_get_cstr(entry.name), alstr_get_cstr(entry.endpoint_guid), entry.devid);
     VECTOR_PUSH_BACK(*list, entry);
 
     AL_STRING_DEINIT(tmpname);
 }
 
-static LPWSTR get_device_id(IMMDevice *device)
+static WCHAR *get_device_id(IMMDevice *device)
 {
-    LPWSTR devid;
+    WCHAR *devid;
     HRESULT hr;
 
     hr = IMMDevice_GetId(device, &devid);
@@ -268,7 +288,7 @@ static HRESULT probe_devices(IMMDeviceEnumerator *devenum, EDataFlow flowdir, ve
 {
     IMMDeviceCollection *coll;
     IMMDevice *defdev = NULL;
-    LPWSTR defdevid = NULL;
+    WCHAR *defdevid = NULL;
     HRESULT hr;
     UINT count;
     UINT i;
@@ -300,7 +320,7 @@ static HRESULT probe_devices(IMMDeviceEnumerator *devenum, EDataFlow flowdir, ve
     for(i = 0;i < count;++i)
     {
         IMMDevice *device;
-        LPWSTR devid;
+        WCHAR *devid;
 
         hr = IMMDeviceCollection_Item(coll, i, &device);
         if(FAILED(hr)) continue;
@@ -402,7 +422,11 @@ static DWORD CALLBACK ALCmmdevProxy_messageHandler(void *ptr)
     TRACE("Starting message loop\n");
     while(GetMessage(&msg, NULL, WM_USER_First, WM_USER_Last))
     {
-        TRACE("Got message %u (lparam=%p, wparam=%p)\n", msg.message, (void*)msg.lParam, (void*)msg.wParam);
+        TRACE("Got message \"%s\" (0x%04x, lparam=%p, wparam=%p)\n",
+            (msg.message >= WM_USER && msg.message <= WM_USER_Last) ?
+            MessageStr[msg.message-WM_USER] : "Unknown",
+            msg.message, (void*)msg.lParam, (void*)msg.wParam
+        );
         switch(msg.message)
         {
         case WM_USER_OpenDevice:
@@ -509,9 +533,9 @@ typedef struct ALCmmdevPlayback {
 
     HANDLE MsgEvent;
 
-    volatile UINT32 Padding;
+    ATOMIC(UINT32) Padding;
 
-    volatile int killNow;
+    ATOMIC(int) killNow;
     althrd_t thread;
 } ALCmmdevPlayback;
 
@@ -521,7 +545,6 @@ static void ALCmmdevPlayback_Construct(ALCmmdevPlayback *self, ALCdevice *device
 static void ALCmmdevPlayback_Destruct(ALCmmdevPlayback *self);
 static ALCenum ALCmmdevPlayback_open(ALCmmdevPlayback *self, const ALCchar *name);
 static HRESULT ALCmmdevPlayback_openProxy(ALCmmdevPlayback *self);
-static void ALCmmdevPlayback_close(ALCmmdevPlayback *self);
 static void ALCmmdevPlayback_closeProxy(ALCmmdevPlayback *self);
 static ALCboolean ALCmmdevPlayback_reset(ALCmmdevPlayback *self);
 static HRESULT ALCmmdevPlayback_resetProxy(ALCmmdevPlayback *self);
@@ -556,13 +579,30 @@ static void ALCmmdevPlayback_Construct(ALCmmdevPlayback *self, ALCdevice *device
 
     self->MsgEvent = NULL;
 
-    self->Padding = 0;
+    ATOMIC_INIT(&self->Padding, 0);
 
-    self->killNow = 0;
+    ATOMIC_INIT(&self->killNow, 0);
 }
 
 static void ALCmmdevPlayback_Destruct(ALCmmdevPlayback *self)
 {
+    if(self->MsgEvent)
+    {
+        ThreadRequest req = { self->MsgEvent, 0 };
+        if(PostThreadMessage(ThreadID, WM_USER_CloseDevice, (WPARAM)&req, (LPARAM)STATIC_CAST(ALCmmdevProxy, self)))
+            (void)WaitForResponse(&req);
+
+        CloseHandle(self->MsgEvent);
+        self->MsgEvent = NULL;
+    }
+
+    if(self->NotifyEvent)
+        CloseHandle(self->NotifyEvent);
+    self->NotifyEvent = NULL;
+
+    free(self->devid);
+    self->devid = NULL;
+
     if(self->NotifyEvent != NULL)
         CloseHandle(self->NotifyEvent);
     self->NotifyEvent = NULL;
@@ -592,7 +632,7 @@ FORCE_ALIGN static int ALCmmdevPlayback_mixerProc(void *arg)
     {
         ERR("CoInitialize(NULL) failed: 0x%08lx\n", hr);
         V0(device->Backend,lock)();
-        aluHandleDisconnect(device);
+        aluHandleDisconnect(device, "COM init failed: 0x%08lx", hr);
         V0(device->Backend,unlock)();
         return 1;
     }
@@ -602,18 +642,18 @@ FORCE_ALIGN static int ALCmmdevPlayback_mixerProc(void *arg)
 
     update_size = device->UpdateSize;
     buffer_len = update_size * device->NumUpdates;
-    while(!self->killNow)
+    while(!ATOMIC_LOAD(&self->killNow, almemory_order_relaxed))
     {
         hr = IAudioClient_GetCurrentPadding(self->client, &written);
         if(FAILED(hr))
         {
             ERR("Failed to get padding: 0x%08lx\n", hr);
             V0(device->Backend,lock)();
-            aluHandleDisconnect(device);
+            aluHandleDisconnect(device, "Failed to retrieve buffer padding: 0x%08lx", hr);
             V0(device->Backend,unlock)();
             break;
         }
-        self->Padding = written;
+        ATOMIC_STORE(&self->Padding, written, almemory_order_relaxed);
 
         len = buffer_len - written;
         if(len < update_size)
@@ -629,22 +669,22 @@ FORCE_ALIGN static int ALCmmdevPlayback_mixerProc(void *arg)
         hr = IAudioRenderClient_GetBuffer(self->render, len, &buffer);
         if(SUCCEEDED(hr))
         {
-            V0(device->Backend,lock)();
+            ALCmmdevPlayback_lock(self);
             aluMixData(device, buffer, len);
-            self->Padding = written + len;
-            V0(device->Backend,unlock)();
+            ATOMIC_STORE(&self->Padding, written + len, almemory_order_relaxed);
+            ALCmmdevPlayback_unlock(self);
             hr = IAudioRenderClient_ReleaseBuffer(self->render, len, 0);
         }
         if(FAILED(hr))
         {
             ERR("Failed to buffer data: 0x%08lx\n", hr);
             V0(device->Backend,lock)();
-            aluHandleDisconnect(device);
+            aluHandleDisconnect(device, "Failed to send playback samples: 0x%08lx", hr);
             V0(device->Backend,unlock)();
             break;
         }
     }
-    self->Padding = 0;
+    ATOMIC_STORE(&self->Padding, 0, almemory_order_release);
 
     CoUninitialize();
     return 0;
@@ -716,8 +756,8 @@ static ALCenum ALCmmdevPlayback_open(ALCmmdevPlayback *self, const ALCchar *devi
             }
 
             hr = E_FAIL;
-#define MATCH_NAME(i) (al_string_cmp_cstr((i)->name, deviceName) == 0 ||        \
-                       al_string_cmp_cstr((i)->endpoint_guid, deviceName) == 0)
+#define MATCH_NAME(i) (alstr_cmp_cstr((i)->name, deviceName) == 0 ||        \
+                       alstr_cmp_cstr((i)->endpoint_guid, deviceName) == 0)
             VECTOR_FIND_IF(iter, const DevMap, PlaybackDevices, MATCH_NAME);
 #undef MATCH_NAME
             if(iter == VECTOR_END(PlaybackDevices))
@@ -739,7 +779,7 @@ static ALCenum ALCmmdevPlayback_open(ALCmmdevPlayback *self, const ALCchar *devi
             {
                 ALCdevice *device = STATIC_CAST(ALCbackend,self)->mDevice;
                 self->devid = strdupW(iter->devid);
-                al_string_copy(&device->DeviceName, iter->name);
+                alstr_copy(&device->DeviceName, iter->name);
                 hr = S_OK;
             }
         }
@@ -797,7 +837,7 @@ static HRESULT ALCmmdevPlayback_openProxy(ALCmmdevPlayback *self)
     if(SUCCEEDED(hr))
     {
         self->client = ptr;
-        if(al_string_empty(device->DeviceName))
+        if(alstr_empty(device->DeviceName))
             get_device_name_and_guid(self->mmdev, &device->DeviceName, NULL);
     }
 
@@ -811,23 +851,6 @@ static HRESULT ALCmmdevPlayback_openProxy(ALCmmdevPlayback *self)
     return hr;
 }
 
-
-static void ALCmmdevPlayback_close(ALCmmdevPlayback *self)
-{
-    ThreadRequest req = { self->MsgEvent, 0 };
-
-    if(PostThreadMessage(ThreadID, WM_USER_CloseDevice, (WPARAM)&req, (LPARAM)STATIC_CAST(ALCmmdevProxy, self)))
-        (void)WaitForResponse(&req);
-
-    CloseHandle(self->MsgEvent);
-    self->MsgEvent = NULL;
-
-    CloseHandle(self->NotifyEvent);
-    self->NotifyEvent = NULL;
-
-    free(self->devid);
-    self->devid = NULL;
-}
 
 static void ALCmmdevPlayback_closeProxy(ALCmmdevPlayback *self)
 {
@@ -890,8 +913,8 @@ static HRESULT ALCmmdevPlayback_resetProxy(ALCmmdevPlayback *self)
     CoTaskMemFree(wfx);
     wfx = NULL;
 
-    buf_time = ((REFERENCE_TIME)device->UpdateSize*device->NumUpdates*10000000 +
-                                device->Frequency-1) / device->Frequency;
+    buf_time = ScaleCeil(device->UpdateSize*device->NumUpdates, REFTIME_PER_SEC,
+                         device->Frequency);
 
     if(!(device->Flags&DEVICE_FREQUENCY_REQUEST))
         device->Frequency = OutputType.Format.nSamplesPerSec;
@@ -921,9 +944,7 @@ static HRESULT ALCmmdevPlayback_resetProxy(ALCmmdevPlayback *self)
             OutputType.Format.nChannels = 1;
             OutputType.dwChannelMask = MONO;
             break;
-        case DevFmtAmbi1:
-        case DevFmtAmbi2:
-        case DevFmtAmbi3:
+        case DevFmtAmbi3D:
             device->FmtChans = DevFmtStereo;
             /*fall-through*/
         case DevFmtStereo:
@@ -1082,7 +1103,7 @@ static HRESULT ALCmmdevPlayback_resetProxy(ALCmmdevPlayback *self)
     hr = IAudioClient_GetDevicePeriod(self->client, &min_per, NULL);
     if(SUCCEEDED(hr))
     {
-        min_len = (UINT32)((min_per*device->Frequency + 10000000-1) / 10000000);
+        min_len = (UINT32)ScaleCeil(min_per, device->Frequency, REFTIME_PER_SEC);
         /* Find the nearest multiple of the period size to the update size */
         if(min_len < device->UpdateSize)
             min_len *= (device->UpdateSize + min_len/2)/min_len;
@@ -1140,7 +1161,7 @@ static HRESULT ALCmmdevPlayback_startProxy(ALCmmdevPlayback *self)
     if(SUCCEEDED(hr))
     {
         self->render = ptr;
-        self->killNow = 0;
+        ATOMIC_STORE(&self->killNow, 0, almemory_order_release);
         if(althrd_create(&self->thread, ALCmmdevPlayback_mixerProc, self) != althrd_success)
         {
             if(self->render)
@@ -1170,7 +1191,7 @@ static void ALCmmdevPlayback_stopProxy(ALCmmdevPlayback *self)
     if(!self->render)
         return;
 
-    self->killNow = 1;
+    ATOMIC_STORE_SEQ(&self->killNow, 1);
     althrd_join(self->thread, &res);
 
     IAudioRenderClient_Release(self->render);
@@ -1186,7 +1207,8 @@ static ClockLatency ALCmmdevPlayback_getClockLatency(ALCmmdevPlayback *self)
 
     ALCmmdevPlayback_lock(self);
     ret.ClockTime = GetDeviceClockTime(device);
-    ret.Latency = self->Padding * DEVICE_CLOCK_RES / device->Frequency;
+    ret.Latency = ATOMIC_LOAD(&self->Padding, almemory_order_relaxed) * DEVICE_CLOCK_RES /
+                  device->Frequency;
     ALCmmdevPlayback_unlock(self);
 
     return ret;
@@ -1206,9 +1228,11 @@ typedef struct ALCmmdevCapture {
 
     HANDLE MsgEvent;
 
+    ChannelConverter *ChannelConv;
+    SampleConverter *SampleConv;
     ll_ringbuffer_t *Ring;
 
-    volatile int killNow;
+    ATOMIC(int) killNow;
     althrd_t thread;
 } ALCmmdevCapture;
 
@@ -1218,7 +1242,6 @@ static void ALCmmdevCapture_Construct(ALCmmdevCapture *self, ALCdevice *device);
 static void ALCmmdevCapture_Destruct(ALCmmdevCapture *self);
 static ALCenum ALCmmdevCapture_open(ALCmmdevCapture *self, const ALCchar *name);
 static HRESULT ALCmmdevCapture_openProxy(ALCmmdevCapture *self);
-static void ALCmmdevCapture_close(ALCmmdevCapture *self);
 static void ALCmmdevCapture_closeProxy(ALCmmdevCapture *self);
 static DECLARE_FORWARD(ALCmmdevCapture, ALCbackend, ALCboolean, reset)
 static HRESULT ALCmmdevCapture_resetProxy(ALCmmdevCapture *self);
@@ -1253,22 +1276,34 @@ static void ALCmmdevCapture_Construct(ALCmmdevCapture *self, ALCdevice *device)
 
     self->MsgEvent = NULL;
 
+    self->ChannelConv = NULL;
+    self->SampleConv = NULL;
     self->Ring = NULL;
 
-    self->killNow = 0;
+    ATOMIC_INIT(&self->killNow, 0);
 }
 
 static void ALCmmdevCapture_Destruct(ALCmmdevCapture *self)
 {
-    ll_ringbuffer_free(self->Ring);
-    self->Ring = NULL;
+    if(self->MsgEvent)
+    {
+        ThreadRequest req = { self->MsgEvent, 0 };
+        if(PostThreadMessage(ThreadID, WM_USER_CloseDevice, (WPARAM)&req, (LPARAM)STATIC_CAST(ALCmmdevProxy, self)))
+            (void)WaitForResponse(&req);
+
+        CloseHandle(self->MsgEvent);
+        self->MsgEvent = NULL;
+    }
 
     if(self->NotifyEvent != NULL)
         CloseHandle(self->NotifyEvent);
     self->NotifyEvent = NULL;
-    if(self->MsgEvent != NULL)
-        CloseHandle(self->MsgEvent);
-    self->MsgEvent = NULL;
+
+    ll_ringbuffer_free(self->Ring);
+    self->Ring = NULL;
+
+    DestroySampleConverter(&self->SampleConv);
+    DestroyChannelConverter(&self->ChannelConv);
 
     free(self->devid);
     self->devid = NULL;
@@ -1282,6 +1317,8 @@ FORCE_ALIGN int ALCmmdevCapture_recordProc(void *arg)
 {
     ALCmmdevCapture *self = arg;
     ALCdevice *device = STATIC_CAST(ALCbackend, self)->mDevice;
+    ALfloat *samples = NULL;
+    size_t samplesmax = 0;
     HRESULT hr;
 
     hr = CoInitialize(NULL);
@@ -1289,14 +1326,14 @@ FORCE_ALIGN int ALCmmdevCapture_recordProc(void *arg)
     {
         ERR("CoInitialize(NULL) failed: 0x%08lx\n", hr);
         V0(device->Backend,lock)();
-        aluHandleDisconnect(device);
+        aluHandleDisconnect(device, "COM init failed: 0x%08lx", hr);
         V0(device->Backend,unlock)();
         return 1;
     }
 
     althrd_setname(althrd_current(), RECORD_THREAD_NAME);
 
-    while(!self->killNow)
+    while(!ATOMIC_LOAD(&self->killNow, almemory_order_relaxed))
     {
         UINT32 avail;
         DWORD res;
@@ -1304,39 +1341,81 @@ FORCE_ALIGN int ALCmmdevCapture_recordProc(void *arg)
         hr = IAudioCaptureClient_GetNextPacketSize(self->capture, &avail);
         if(FAILED(hr))
             ERR("Failed to get next packet size: 0x%08lx\n", hr);
-        else while(avail > 0 && SUCCEEDED(hr))
+        else if(avail > 0)
         {
             UINT32 numsamples;
             DWORD flags;
-            BYTE *data;
+            BYTE *rdata;
 
             hr = IAudioCaptureClient_GetBuffer(self->capture,
-                &data, &numsamples, &flags, NULL, NULL
+                &rdata, &numsamples, &flags, NULL, NULL
             );
             if(FAILED(hr))
-            {
                 ERR("Failed to get capture buffer: 0x%08lx\n", hr);
-                break;
-            }
-
-            ll_ringbuffer_write(self->Ring, (char*)data, numsamples);
-
-            hr = IAudioCaptureClient_ReleaseBuffer(self->capture, numsamples);
-            if(FAILED(hr))
+            else
             {
-                ERR("Failed to release capture buffer: 0x%08lx\n", hr);
-                break;
-            }
+                ll_ringbuffer_data_t data[2];
+                size_t dstframes = 0;
 
-            hr = IAudioCaptureClient_GetNextPacketSize(self->capture, &avail);
-            if(FAILED(hr))
-                ERR("Failed to get next packet size: 0x%08lx\n", hr);
+                if(self->ChannelConv)
+                {
+                    if(samplesmax < numsamples)
+                    {
+                        size_t newmax = RoundUp(numsamples, 4096);
+                        ALfloat *tmp = al_calloc(DEF_ALIGN, newmax*2*sizeof(ALfloat));
+                        al_free(samples);
+                        samples = tmp;
+                        samplesmax = newmax;
+                    }
+                    ChannelConverterInput(self->ChannelConv, rdata, samples, numsamples);
+                    rdata = (BYTE*)samples;
+                }
+
+                ll_ringbuffer_get_write_vector(self->Ring, data);
+
+                if(self->SampleConv)
+                {
+                    const ALvoid *srcdata = rdata;
+                    ALsizei srcframes = numsamples;
+
+                    dstframes = SampleConverterInput(self->SampleConv,
+                        &srcdata, &srcframes, data[0].buf, (ALsizei)minz(data[0].len, INT_MAX)
+                    );
+                    if(srcframes > 0 && dstframes == data[0].len && data[1].len > 0)
+                    {
+                        /* If some source samples remain, all of the first dest
+                         * block was filled, and there's space in the second
+                         * dest block, do another run for the second block.
+                         */
+                        dstframes += SampleConverterInput(self->SampleConv,
+                            &srcdata, &srcframes, data[1].buf, (ALsizei)minz(data[1].len, INT_MAX)
+                        );
+                    }
+                }
+                else
+                {
+                    ALuint framesize = FrameSizeFromDevFmt(device->FmtChans, device->FmtType,
+                                                           device->AmbiOrder);
+                    size_t len1 = minz(data[0].len, numsamples);
+                    size_t len2 = minz(data[1].len, numsamples-len1);
+
+                    memcpy(data[0].buf, rdata, len1*framesize);
+                    if(len2 > 0)
+                        memcpy(data[1].buf, rdata+len1*framesize, len2*framesize);
+                    dstframes = len1 + len2;
+                }
+
+                ll_ringbuffer_write_advance(self->Ring, dstframes);
+
+                hr = IAudioCaptureClient_ReleaseBuffer(self->capture, numsamples);
+                if(FAILED(hr)) ERR("Failed to release capture buffer: 0x%08lx\n", hr);
+            }
         }
 
         if(FAILED(hr))
         {
             V0(device->Backend,lock)();
-            aluHandleDisconnect(device);
+            aluHandleDisconnect(device, "Failed to capture samples: 0x%08lx", hr);
             V0(device->Backend,unlock)();
             break;
         }
@@ -1345,6 +1424,10 @@ FORCE_ALIGN int ALCmmdevCapture_recordProc(void *arg)
         if(res != WAIT_OBJECT_0)
             ERR("WaitForSingleObjectEx error: 0x%lx\n", res);
     }
+
+    al_free(samples);
+    samples = NULL;
+    samplesmax = 0;
 
     CoUninitialize();
     return 0;
@@ -1377,8 +1460,8 @@ static ALCenum ALCmmdevCapture_open(ALCmmdevCapture *self, const ALCchar *device
             }
 
             hr = E_FAIL;
-#define MATCH_NAME(i) (al_string_cmp_cstr((i)->name, deviceName) == 0 ||        \
-                       al_string_cmp_cstr((i)->endpoint_guid, deviceName) == 0)
+#define MATCH_NAME(i) (alstr_cmp_cstr((i)->name, deviceName) == 0 ||        \
+                       alstr_cmp_cstr((i)->endpoint_guid, deviceName) == 0)
             VECTOR_FIND_IF(iter, const DevMap, CaptureDevices, MATCH_NAME);
 #undef MATCH_NAME
             if(iter == VECTOR_END(CaptureDevices))
@@ -1400,7 +1483,7 @@ static ALCenum ALCmmdevCapture_open(ALCmmdevCapture *self, const ALCchar *device
             {
                 ALCdevice *device = STATIC_CAST(ALCbackend,self)->mDevice;
                 self->devid = strdupW(iter->devid);
-                al_string_copy(&device->DeviceName, iter->name);
+                alstr_copy(&device->DeviceName, iter->name);
                 hr = S_OK;
             }
         }
@@ -1444,7 +1527,6 @@ static ALCenum ALCmmdevCapture_open(ALCmmdevCapture *self, const ALCchar *device
 
         if(FAILED(hr))
         {
-            ALCmmdevCapture_close(self);
             if(hr == E_OUTOFMEMORY)
                return ALC_OUT_OF_MEMORY;
             return ALC_INVALID_VALUE;
@@ -1476,7 +1558,7 @@ static HRESULT ALCmmdevCapture_openProxy(ALCmmdevCapture *self)
     if(SUCCEEDED(hr))
     {
         self->client = ptr;
-        if(al_string_empty(device->DeviceName))
+        if(alstr_empty(device->DeviceName))
             get_device_name_and_guid(self->mmdev, &device->DeviceName, NULL);
     }
 
@@ -1490,26 +1572,6 @@ static HRESULT ALCmmdevCapture_openProxy(ALCmmdevCapture *self)
     return hr;
 }
 
-
-static void ALCmmdevCapture_close(ALCmmdevCapture *self)
-{
-    ThreadRequest req = { self->MsgEvent, 0 };
-
-    if(PostThreadMessage(ThreadID, WM_USER_CloseDevice, (WPARAM)&req, (LPARAM)STATIC_CAST(ALCmmdevProxy, self)))
-        (void)WaitForResponse(&req);
-
-    ll_ringbuffer_free(self->Ring);
-    self->Ring = NULL;
-
-    CloseHandle(self->MsgEvent);
-    self->MsgEvent = NULL;
-
-    CloseHandle(self->NotifyEvent);
-    self->NotifyEvent = NULL;
-
-    free(self->devid);
-    self->devid = NULL;
-}
 
 static void ALCmmdevCapture_closeProxy(ALCmmdevCapture *self)
 {
@@ -1528,6 +1590,7 @@ static HRESULT ALCmmdevCapture_resetProxy(ALCmmdevCapture *self)
     ALCdevice *device = STATIC_CAST(ALCbackend, self)->mDevice;
     WAVEFORMATEXTENSIBLE OutputType;
     WAVEFORMATEX *wfx = NULL;
+    enum DevFmtType srcType;
     REFERENCE_TIME buf_time;
     UINT32 buffer_len;
     void *ptr = NULL;
@@ -1545,8 +1608,12 @@ static HRESULT ALCmmdevCapture_resetProxy(ALCmmdevCapture *self)
     }
     self->client = ptr;
 
-    buf_time = ((REFERENCE_TIME)device->UpdateSize*device->NumUpdates*10000000 +
-                                device->Frequency-1) / device->Frequency;
+    buf_time = ScaleCeil(device->UpdateSize*device->NumUpdates, REFTIME_PER_SEC,
+                         device->Frequency);
+    // Make sure buffer is at least 100ms in size
+    buf_time = maxu64(buf_time, REFTIME_PER_SEC/10);
+    device->UpdateSize = (ALuint)ScaleCeil(buf_time, device->Frequency, REFTIME_PER_SEC) /
+                         device->NumUpdates;
 
     OutputType.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
     switch(device->FmtChans)
@@ -1580,40 +1647,33 @@ static HRESULT ALCmmdevCapture_resetProxy(ALCmmdevCapture *self)
             OutputType.dwChannelMask = X7DOT1;
             break;
 
-        case DevFmtAmbi1:
-        case DevFmtAmbi2:
-        case DevFmtAmbi3:
+        case DevFmtAmbi3D:
             return E_FAIL;
     }
     switch(device->FmtType)
     {
+        /* NOTE: Signedness doesn't matter, the converter will handle it. */
+        case DevFmtByte:
         case DevFmtUByte:
             OutputType.Format.wBitsPerSample = 8;
-            OutputType.Samples.wValidBitsPerSample = 8;
             OutputType.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
             break;
         case DevFmtShort:
+        case DevFmtUShort:
             OutputType.Format.wBitsPerSample = 16;
-            OutputType.Samples.wValidBitsPerSample = 16;
             OutputType.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
             break;
         case DevFmtInt:
+        case DevFmtUInt:
             OutputType.Format.wBitsPerSample = 32;
-            OutputType.Samples.wValidBitsPerSample = 32;
             OutputType.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
             break;
         case DevFmtFloat:
             OutputType.Format.wBitsPerSample = 32;
-            OutputType.Samples.wValidBitsPerSample = 32;
             OutputType.SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
             break;
-
-        case DevFmtByte:
-        case DevFmtUShort:
-        case DevFmtUInt:
-            WARN("%s capture samples not supported\n", DevFmtTypeString(device->FmtType));
-            return E_FAIL;
     }
+    OutputType.Samples.wValidBitsPerSample = OutputType.Format.wBitsPerSample;
     OutputType.Format.nSamplesPerSec = device->Frequency;
 
     OutputType.Format.nBlockAlign = OutputType.Format.nChannels *
@@ -1631,27 +1691,107 @@ static HRESULT ALCmmdevCapture_resetProxy(ALCmmdevCapture *self)
         return hr;
     }
 
-    /* FIXME: We should do conversion/resampling if we didn't get a matching format. */
-    if(wfx->nSamplesPerSec != OutputType.Format.nSamplesPerSec ||
-       wfx->wBitsPerSample != OutputType.Format.wBitsPerSample ||
-       wfx->nChannels != OutputType.Format.nChannels ||
-       wfx->nBlockAlign != OutputType.Format.nBlockAlign)
+    DestroySampleConverter(&self->SampleConv);
+    DestroyChannelConverter(&self->ChannelConv);
+
+    if(wfx != NULL)
     {
-        ERR("Failed to get matching format, wanted: %s %s %uhz, got: %d channel%s %d-bit %luhz\n",
-            DevFmtChannelsString(device->FmtChans), DevFmtTypeString(device->FmtType),
-            device->Frequency, wfx->nChannels, (wfx->nChannels==1)?"":"s", wfx->wBitsPerSample,
-            wfx->nSamplesPerSec);
+        if(!(wfx->nChannels == OutputType.Format.nChannels ||
+             (wfx->nChannels == 1 && OutputType.Format.nChannels == 2) ||
+             (wfx->nChannels == 2 && OutputType.Format.nChannels == 1)))
+        {
+            ERR("Failed to get matching format, wanted: %s %s %uhz, got: %d channel%s %d-bit %luhz\n",
+                DevFmtChannelsString(device->FmtChans), DevFmtTypeString(device->FmtType),
+                device->Frequency, wfx->nChannels, (wfx->nChannels==1)?"":"s", wfx->wBitsPerSample,
+                wfx->nSamplesPerSec);
+            CoTaskMemFree(wfx);
+            return E_FAIL;
+        }
+
+        if(!MakeExtensible(&OutputType, wfx))
+        {
+            CoTaskMemFree(wfx);
+            return E_FAIL;
+        }
         CoTaskMemFree(wfx);
+        wfx = NULL;
+    }
+
+    if(IsEqualGUID(&OutputType.SubFormat, &KSDATAFORMAT_SUBTYPE_PCM))
+    {
+        if(OutputType.Format.wBitsPerSample == 8)
+            srcType = DevFmtUByte;
+        else if(OutputType.Format.wBitsPerSample == 16)
+            srcType = DevFmtShort;
+        else if(OutputType.Format.wBitsPerSample == 32)
+            srcType = DevFmtInt;
+        else
+        {
+            ERR("Unhandled integer bit depth: %d\n", OutputType.Format.wBitsPerSample);
+            return E_FAIL;
+        }
+    }
+    else if(IsEqualGUID(&OutputType.SubFormat, &KSDATAFORMAT_SUBTYPE_IEEE_FLOAT))
+    {
+        if(OutputType.Format.wBitsPerSample == 32)
+            srcType = DevFmtFloat;
+        else
+        {
+            ERR("Unhandled float bit depth: %d\n", OutputType.Format.wBitsPerSample);
+            return E_FAIL;
+        }
+    }
+    else
+    {
+        ERR("Unhandled format sub-type\n");
         return E_FAIL;
     }
 
-    if(!MakeExtensible(&OutputType, wfx))
+    if(device->FmtChans == DevFmtMono && OutputType.Format.nChannels == 2)
     {
-        CoTaskMemFree(wfx);
-        return E_FAIL;
+        self->ChannelConv = CreateChannelConverter(srcType, DevFmtStereo,
+                                                   device->FmtChans);
+        if(!self->ChannelConv)
+        {
+            ERR("Failed to create %s stereo-to-mono converter\n", DevFmtTypeString(srcType));
+            return E_FAIL;
+        }
+        TRACE("Created %s stereo-to-mono converter\n", DevFmtTypeString(srcType));
+        /* The channel converter always outputs float, so change the input type
+         * for the resampler/type-converter.
+         */
+        srcType = DevFmtFloat;
     }
-    CoTaskMemFree(wfx);
-    wfx = NULL;
+    else if(device->FmtChans == DevFmtStereo && OutputType.Format.nChannels == 1)
+    {
+        self->ChannelConv = CreateChannelConverter(srcType, DevFmtMono,
+                                                   device->FmtChans);
+        if(!self->ChannelConv)
+        {
+            ERR("Failed to create %s mono-to-stereo converter\n", DevFmtTypeString(srcType));
+            return E_FAIL;
+        }
+        TRACE("Created %s mono-to-stereo converter\n", DevFmtTypeString(srcType));
+        srcType = DevFmtFloat;
+    }
+
+    if(device->Frequency != OutputType.Format.nSamplesPerSec || device->FmtType != srcType)
+    {
+        self->SampleConv = CreateSampleConverter(
+            srcType, device->FmtType, ChannelsFromDevFmt(device->FmtChans, device->AmbiOrder),
+            OutputType.Format.nSamplesPerSec, device->Frequency
+        );
+        if(!self->SampleConv)
+        {
+            ERR("Failed to create converter for %s format, dst: %s %uhz, src: %s %luhz\n",
+                DevFmtChannelsString(device->FmtChans), DevFmtTypeString(device->FmtType),
+                device->Frequency, DevFmtTypeString(srcType), OutputType.Format.nSamplesPerSec);
+            return E_FAIL;
+        }
+        TRACE("Created converter for %s format, dst: %s %uhz, src: %s %luhz\n",
+              DevFmtChannelsString(device->FmtChans), DevFmtTypeString(device->FmtType),
+              device->Frequency, DevFmtTypeString(srcType), OutputType.Format.nSamplesPerSec);
+    }
 
     hr = IAudioClient_Initialize(self->client,
         AUDCLNT_SHAREMODE_SHARED, AUDCLNT_STREAMFLAGS_EVENTCALLBACK,
@@ -1672,7 +1812,9 @@ static HRESULT ALCmmdevCapture_resetProxy(ALCmmdevCapture *self)
 
     buffer_len = maxu(device->UpdateSize*device->NumUpdates + 1, buffer_len);
     ll_ringbuffer_free(self->Ring);
-    self->Ring = ll_ringbuffer_create(buffer_len, OutputType.Format.nBlockAlign);
+    self->Ring = ll_ringbuffer_create(buffer_len,
+        FrameSizeFromDevFmt(device->FmtChans, device->FmtType, device->AmbiOrder)
+    );
     if(!self->Ring)
     {
         ERR("Failed to allocate capture ring buffer\n");
@@ -1718,7 +1860,7 @@ static HRESULT ALCmmdevCapture_startProxy(ALCmmdevCapture *self)
     if(SUCCEEDED(hr))
     {
         self->capture = ptr;
-        self->killNow = 0;
+        ATOMIC_STORE(&self->killNow, 0, almemory_order_release);
         if(althrd_create(&self->thread, ALCmmdevCapture_recordProc, self) != althrd_success)
         {
             ERR("Failed to start thread\n");
@@ -1752,7 +1894,7 @@ static void ALCmmdevCapture_stopProxy(ALCmmdevCapture *self)
     if(!self->capture)
         return;
 
-    self->killNow = 1;
+    ATOMIC_STORE_SEQ(&self->killNow, 1);
     althrd_join(self->thread, &res);
 
     IAudioCaptureClient_Release(self->capture);
@@ -1777,9 +1919,9 @@ ALCenum ALCmmdevCapture_captureSamples(ALCmmdevCapture *self, ALCvoid *buffer, A
 
 
 static inline void AppendAllDevicesList2(const DevMap *entry)
-{ AppendAllDevicesList(al_string_get_cstr(entry->name)); }
+{ AppendAllDevicesList(alstr_get_cstr(entry->name)); }
 static inline void AppendCaptureDeviceList2(const DevMap *entry)
-{ AppendCaptureDeviceList(al_string_get_cstr(entry->name)); }
+{ AppendCaptureDeviceList(alstr_get_cstr(entry->name)); }
 
 typedef struct ALCmmdevBackendFactory {
     DERIVE_FROM_TYPE(ALCbackendFactory);
@@ -1851,7 +1993,7 @@ static ALCboolean ALCmmdevBackendFactory_querySupport(ALCmmdevBackendFactory* UN
      * stereo input, for example, and the app asks for 22050hz mono,
      * initialization will fail.
      */
-    if(type == ALCbackend_Playback /*|| type == ALCbackend_Capture*/)
+    if(type == ALCbackend_Playback || type == ALCbackend_Capture)
         return ALC_TRUE;
     return ALC_FALSE;
 }

@@ -436,6 +436,44 @@ ALC_API ALCboolean ALC_APIENTRY alcResetDeviceSOFT(ALCdevice *device, const ALCi
 #define AL_GAIN_LIMIT_SOFT                       0x200E
 #endif
 
+#ifndef AL_SOFT_source_resampler
+#define AL_SOFT_source_resampler
+#define AL_NUM_RESAMPLERS_SOFT                   0x1210
+#define AL_DEFAULT_RESAMPLER_SOFT                0x1211
+#define AL_SOURCE_RESAMPLER_SOFT                 0x1212
+#define AL_RESAMPLER_NAME_SOFT                   0x1213
+typedef const ALchar* (AL_APIENTRY*LPALGETSTRINGISOFT)(ALenum pname, ALsizei index);
+#ifdef AL_ALEXT_PROTOTYPES
+AL_API const ALchar* AL_APIENTRY alGetStringiSOFT(ALenum pname, ALsizei index);
+#endif
+#endif
+
+#ifndef AL_SOFT_source_spatialize
+#define AL_SOFT_source_spatialize
+#define AL_SOURCE_SPATIALIZE_SOFT                0x1214
+#define AL_AUTO_SOFT                             0x0002
+#endif
+
+#ifndef ALC_SOFT_output_limiter
+#define ALC_SOFT_output_limiter
+#define ALC_OUTPUT_LIMITER_SOFT                  0x199A
+#endif
+
+#ifndef ALC_SOFT_device_clock
+#define ALC_SOFT_device_clock 1
+typedef int64_t ALCint64SOFT;
+typedef uint64_t ALCuint64SOFT;
+#define ALC_DEVICE_CLOCK_SOFT                    0x1600
+#define ALC_DEVICE_LATENCY_SOFT                  0x1601
+#define ALC_DEVICE_CLOCK_LATENCY_SOFT            0x1602
+#define AL_SAMPLE_OFFSET_CLOCK_SOFT              0x1202
+#define AL_SEC_OFFSET_CLOCK_SOFT                 0x1203
+typedef void (ALC_APIENTRY*LPALCGETINTEGER64VSOFT)(ALCdevice *device, ALCenum pname, ALsizei size, ALCint64SOFT *values);
+#ifdef AL_ALEXT_PROTOTYPES
+ALC_API void ALC_APIENTRY alcGetInteger64vSOFT(ALCdevice *device, ALCenum pname, ALsizei size, ALCint64SOFT *values);
+#endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif

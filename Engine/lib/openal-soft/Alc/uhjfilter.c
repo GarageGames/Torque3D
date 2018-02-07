@@ -16,11 +16,11 @@ static const ALfloat Filter2Coeff[4] = {
     0.4021921162426f, 0.8561710882420f, 0.9722909545651f, 0.9952884791278f
 };
 
-static void allpass_process(AllPassState *state, ALfloat *restrict dst, const ALfloat *restrict src, const ALfloat aa, ALuint todo)
+static void allpass_process(AllPassState *state, ALfloat *restrict dst, const ALfloat *restrict src, const ALfloat aa, ALsizei todo)
 {
-    ALuint i;
+    ALsizei i;
 
-    if(todo > 1)
+    if(LIKELY(todo > 1))
     {
         dst[0] = aa*(src[0] + state->y[1]) - state->x[1];
         dst[1] = aa*(src[1] + state->y[0]) - state->x[0];
@@ -62,15 +62,15 @@ static void allpass_process(AllPassState *state, ALfloat *restrict dst, const AL
  * know which is the intended result.
  */
 
-void EncodeUhj2(Uhj2Encoder *enc, ALfloat *restrict LeftOut, ALfloat *restrict RightOut, ALfloat (*restrict InSamples)[BUFFERSIZE], ALuint SamplesToDo)
+void EncodeUhj2(Uhj2Encoder *enc, ALfloat *restrict LeftOut, ALfloat *restrict RightOut, ALfloat (*restrict InSamples)[BUFFERSIZE], ALsizei SamplesToDo)
 {
     ALfloat D[MAX_UPDATE_SAMPLES], S[MAX_UPDATE_SAMPLES];
     ALfloat temp[2][MAX_UPDATE_SAMPLES];
-    ALuint base, i;
+    ALsizei base, i;
 
     for(base = 0;base < SamplesToDo;)
     {
-        ALuint todo = minu(SamplesToDo - base, MAX_UPDATE_SAMPLES);
+        ALsizei todo = mini(SamplesToDo - base, MAX_UPDATE_SAMPLES);
 
         /* D = 0.6554516*Y */
         for(i = 0;i < todo;i++)

@@ -78,6 +78,7 @@ endif()
 
 if(TORQUE_SFX_OPENAL)
     #Hide some unnecessary fields as advanced
+    mark_as_advanced(ALSOFT_BUILD_ROUTER)
     mark_as_advanced(ALSOFT_AMBDEC_PRESETS)
     mark_as_advanced(ALSOFT_BACKEND_DSOUND)
     mark_as_advanced(ALSOFT_BACKEND_MMDEVAPI)

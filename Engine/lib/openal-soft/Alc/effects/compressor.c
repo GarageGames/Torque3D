@@ -42,8 +42,8 @@ typedef struct ALcompressorState {
 
 static ALvoid ALcompressorState_Destruct(ALcompressorState *state);
 static ALboolean ALcompressorState_deviceUpdate(ALcompressorState *state, ALCdevice *device);
-static ALvoid ALcompressorState_update(ALcompressorState *state, const ALCdevice *device, const ALeffectslot *slot, const ALeffectProps *props);
-static ALvoid ALcompressorState_process(ALcompressorState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels);
+static ALvoid ALcompressorState_update(ALcompressorState *state, const ALCcontext *context, const ALeffectslot *slot, const ALeffectProps *props);
+static ALvoid ALcompressorState_process(ALcompressorState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels);
 DECLARE_DEFAULT_ALLOCATORS(ALcompressorState)
 
 DEFINE_ALEFFECTSTATE_VTABLE(ALcompressorState);
@@ -76,8 +76,9 @@ static ALboolean ALcompressorState_deviceUpdate(ALcompressorState *state, ALCdev
     return AL_TRUE;
 }
 
-static ALvoid ALcompressorState_update(ALcompressorState *state, const ALCdevice *device, const ALeffectslot *slot, const ALeffectProps *props)
+static ALvoid ALcompressorState_update(ALcompressorState *state, const ALCcontext *context, const ALeffectslot *slot, const ALeffectProps *props)
 {
+    const ALCdevice *device = context->Device;
     ALuint i;
 
     state->Enabled = props->Compressor.OnOff;
@@ -85,19 +86,19 @@ static ALvoid ALcompressorState_update(ALcompressorState *state, const ALCdevice
     STATIC_CAST(ALeffectState,state)->OutBuffer = device->FOAOut.Buffer;
     STATIC_CAST(ALeffectState,state)->OutChannels = device->FOAOut.NumChannels;
     for(i = 0;i < 4;i++)
-        ComputeFirstOrderGains(device->FOAOut, IdentityMatrixf.m[i],
+        ComputeFirstOrderGains(&device->FOAOut, IdentityMatrixf.m[i],
                                slot->Params.Gain, state->Gain[i]);
 }
 
-static ALvoid ALcompressorState_process(ALcompressorState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels)
+static ALvoid ALcompressorState_process(ALcompressorState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels)
 {
-    ALuint i, j, k;
-    ALuint base;
+    ALsizei i, j, k;
+    ALsizei base;
 
     for(base = 0;base < SamplesToDo;)
     {
         ALfloat temps[64][4];
-        ALuint td = minu(64, SamplesToDo-base);
+        ALsizei td = mini(64, SamplesToDo-base);
 
         /* Load samples into the temp buffer first. */
         for(j = 0;j < 4;j++)
@@ -209,24 +210,21 @@ void ALcompressor_setParami(ALeffect *effect, ALCcontext *context, ALenum param,
     {
         case AL_COMPRESSOR_ONOFF:
             if(!(val >= AL_COMPRESSOR_MIN_ONOFF && val <= AL_COMPRESSOR_MAX_ONOFF))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Compressor state out of range");
             props->Compressor.OnOff = val;
             break;
 
-    default:
-        SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+        default:
+            alSetError(context, AL_INVALID_ENUM, "Invalid compressor integer property 0x%04x",
+                       param);
     }
 }
 void ALcompressor_setParamiv(ALeffect *effect, ALCcontext *context, ALenum param, const ALint *vals)
-{
-    ALcompressor_setParami(effect, context, param, vals[0]);
-}
-void ALcompressor_setParamf(ALeffect *UNUSED(effect), ALCcontext *context, ALenum UNUSED(param), ALfloat UNUSED(val))
-{ SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM); }
-void ALcompressor_setParamfv(ALeffect *effect, ALCcontext *context, ALenum param, const ALfloat *vals)
-{
-    ALcompressor_setParamf(effect, context, param, vals[0]);
-}
+{ ALcompressor_setParami(effect, context, param, vals[0]); }
+void ALcompressor_setParamf(ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALfloat UNUSED(val))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid compressor float property 0x%04x", param); }
+void ALcompressor_setParamfv(ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, const ALfloat *UNUSED(vals))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid compressor float-vector property 0x%04x", param); }
 
 void ALcompressor_getParami(const ALeffect *effect, ALCcontext *context, ALenum param, ALint *val)
 { 
@@ -236,19 +234,17 @@ void ALcompressor_getParami(const ALeffect *effect, ALCcontext *context, ALenum 
         case AL_COMPRESSOR_ONOFF:
             *val = props->Compressor.OnOff;
             break;
+
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid compressor integer property 0x%04x",
+                       param);
     }
 }
 void ALcompressor_getParamiv(const ALeffect *effect, ALCcontext *context, ALenum param, ALint *vals)
-{
-    ALcompressor_getParami(effect, context, param, vals);
-}
-void ALcompressor_getParamf(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum UNUSED(param), ALfloat *UNUSED(val))
-{ SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM); }
-void ALcompressor_getParamfv(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *vals)
-{
-    ALcompressor_getParamf(effect, context, param, vals);
-}
+{ ALcompressor_getParami(effect, context, param, vals); }
+void ALcompressor_getParamf(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALfloat *UNUSED(val))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid compressor float property 0x%04x", param); }
+void ALcompressor_getParamfv(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALfloat *UNUSED(vals))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid compressor float-vector property 0x%04x", param); }
 
 DEFINE_ALEFFECT_VTABLE(ALcompressor);

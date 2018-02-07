@@ -34,16 +34,20 @@ typedef struct ALechoState {
     DERIVE_FROM_TYPE(ALeffectState);
 
     ALfloat *SampleBuffer;
-    ALuint BufferLength;
+    ALsizei BufferLength;
 
     // The echo is two tap. The delay is the number of samples from before the
     // current offset
     struct {
-        ALuint delay;
+        ALsizei delay;
     } Tap[2];
-    ALuint Offset;
+    ALsizei Offset;
+
     /* The panning gains for the two taps */
-    ALfloat Gain[2][MAX_OUTPUT_CHANNELS];
+    struct {
+        ALfloat Current[MAX_OUTPUT_CHANNELS];
+        ALfloat Target[MAX_OUTPUT_CHANNELS];
+    } Gains[2];
 
     ALfloat FeedGain;
 
@@ -52,8 +56,8 @@ typedef struct ALechoState {
 
 static ALvoid ALechoState_Destruct(ALechoState *state);
 static ALboolean ALechoState_deviceUpdate(ALechoState *state, ALCdevice *Device);
-static ALvoid ALechoState_update(ALechoState *state, const ALCdevice *Device, const ALeffectslot *Slot, const ALeffectProps *props);
-static ALvoid ALechoState_process(ALechoState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels);
+static ALvoid ALechoState_update(ALechoState *state, const ALCcontext *context, const ALeffectslot *slot, const ALeffectProps *props);
+static ALvoid ALechoState_process(ALechoState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels);
 DECLARE_DEFAULT_ALLOCATORS(ALechoState)
 
 DEFINE_ALEFFECTSTATE_VTABLE(ALechoState);
@@ -83,13 +87,14 @@ static ALvoid ALechoState_Destruct(ALechoState *state)
 
 static ALboolean ALechoState_deviceUpdate(ALechoState *state, ALCdevice *Device)
 {
-    ALuint maxlen, i;
+    ALsizei maxlen;
 
     // Use the next power of 2 for the buffer length, so the tap offsets can be
     // wrapped using a mask instead of a modulo
-    maxlen  = fastf2u(AL_ECHO_MAX_DELAY * Device->Frequency) + 1;
-    maxlen += fastf2u(AL_ECHO_MAX_LRDELAY * Device->Frequency) + 1;
-    maxlen  = NextPowerOf2(maxlen);
+    maxlen = fastf2i(AL_ECHO_MAX_DELAY*Device->Frequency + 0.5f) +
+             fastf2i(AL_ECHO_MAX_LRDELAY*Device->Frequency + 0.5f);
+    maxlen = NextPowerOf2(maxlen);
+    if(maxlen <= 0) return AL_FALSE;
 
     if(maxlen != state->BufferLength)
     {
@@ -100,20 +105,22 @@ static ALboolean ALechoState_deviceUpdate(ALechoState *state, ALCdevice *Device)
         state->SampleBuffer = temp;
         state->BufferLength = maxlen;
     }
-    for(i = 0;i < state->BufferLength;i++)
-        state->SampleBuffer[i] = 0.0f;
+
+    memset(state->SampleBuffer, 0, state->BufferLength*sizeof(ALfloat));
+    memset(state->Gains, 0, sizeof(state->Gains));
 
     return AL_TRUE;
 }
 
-static ALvoid ALechoState_update(ALechoState *state, const ALCdevice *Device, const ALeffectslot *Slot, const ALeffectProps *props)
+static ALvoid ALechoState_update(ALechoState *state, const ALCcontext *context, const ALeffectslot *slot, const ALeffectProps *props)
 {
-    ALuint frequency = Device->Frequency;
+    const ALCdevice *device = context->Device;
+    ALuint frequency = device->Frequency;
     ALfloat coeffs[MAX_AMBI_COEFFS];
-    ALfloat gain, lrpan, spread;
+    ALfloat gainhf, lrpan, spread;
 
-    state->Tap[0].delay = fastf2u(props->Echo.Delay * frequency) + 1;
-    state->Tap[1].delay = fastf2u(props->Echo.LRDelay * frequency);
+    state->Tap[0].delay = maxi(fastf2i(props->Echo.Delay*frequency + 0.5f), 1);
+    state->Tap[1].delay = fastf2i(props->Echo.LRDelay*frequency + 0.5f);
     state->Tap[1].delay += state->Tap[0].delay;
 
     spread = props->Echo.Spread;
@@ -126,31 +133,30 @@ static ALvoid ALechoState_update(ALechoState *state, const ALCdevice *Device, co
 
     state->FeedGain = props->Echo.Feedback;
 
-    gain = minf(1.0f - props->Echo.Damping, 0.01f);
+    gainhf = maxf(1.0f - props->Echo.Damping, 0.0625f); /* Limit -24dB */
     ALfilterState_setParams(&state->Filter, ALfilterType_HighShelf,
-                            gain, LOWPASSFREQREF/frequency,
-                            calc_rcpQ_from_slope(gain, 0.75f));
-
-    gain = Slot->Params.Gain;
+                            gainhf, LOWPASSFREQREF/frequency,
+                            calc_rcpQ_from_slope(gainhf, 1.0f));
 
     /* First tap panning */
-    CalcXYZCoeffs(-lrpan, 0.0f, 0.0f, spread, coeffs);
-    ComputePanningGains(Device->Dry, coeffs, gain, state->Gain[0]);
+    CalcAngleCoeffs(-F_PI_2*lrpan, 0.0f, spread, coeffs);
+    ComputeDryPanGains(&device->Dry, coeffs, slot->Params.Gain, state->Gains[0].Target);
 
     /* Second tap panning */
-    CalcXYZCoeffs( lrpan, 0.0f, 0.0f, spread, coeffs);
-    ComputePanningGains(Device->Dry, coeffs, gain, state->Gain[1]);
+    CalcAngleCoeffs( F_PI_2*lrpan, 0.0f, spread, coeffs);
+    ComputeDryPanGains(&device->Dry, coeffs, slot->Params.Gain, state->Gains[1].Target);
 }
 
-static ALvoid ALechoState_process(ALechoState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels)
+static ALvoid ALechoState_process(ALechoState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels)
 {
-    const ALuint mask = state->BufferLength-1;
-    const ALuint tap1 = state->Tap[0].delay;
-    const ALuint tap2 = state->Tap[1].delay;
-    ALuint offset = state->Offset;
+    const ALsizei mask = state->BufferLength-1;
+    const ALsizei tap1 = state->Tap[0].delay;
+    const ALsizei tap2 = state->Tap[1].delay;
+    ALfloat *restrict delaybuf = state->SampleBuffer;
+    ALsizei offset = state->Offset;
     ALfloat x[2], y[2], in, out;
-    ALuint base;
-    ALuint i, k;
+    ALsizei base;
+    ALsizei c, i;
 
     x[0] = state->Filter.x[0];
     x[1] = state->Filter.x[1];
@@ -158,45 +164,36 @@ static ALvoid ALechoState_process(ALechoState *state, ALuint SamplesToDo, const 
     y[1] = state->Filter.y[1];
     for(base = 0;base < SamplesToDo;)
     {
-        ALfloat temps[128][2];
-        ALuint td = minu(128, SamplesToDo-base);
+        ALfloat temps[2][128];
+        ALsizei td = mini(128, SamplesToDo-base);
 
         for(i = 0;i < td;i++)
         {
-            /* First tap */
-            temps[i][0] = state->SampleBuffer[(offset-tap1) & mask];
-            /* Second tap */
-            temps[i][1] = state->SampleBuffer[(offset-tap2) & mask];
+            /* Feed the delay buffer's input first. */
+            delaybuf[offset&mask] = SamplesIn[0][i+base];
 
-            // Apply damping and feedback gain to the second tap, and mix in the
-            // new sample
-            in = temps[i][1] + SamplesIn[0][i+base];
+            /* First tap */
+            temps[0][i] = delaybuf[(offset-tap1) & mask];
+            /* Second tap */
+            temps[1][i] = delaybuf[(offset-tap2) & mask];
+
+            /* Apply damping to the second tap, then add it to the buffer with
+             * feedback attenuation.
+             */
+            in = temps[1][i];
             out = in*state->Filter.b0 +
                   x[0]*state->Filter.b1 + x[1]*state->Filter.b2 -
                   y[0]*state->Filter.a1 - y[1]*state->Filter.a2;
             x[1] = x[0]; x[0] = in;
             y[1] = y[0]; y[0] = out;
 
-            state->SampleBuffer[offset&mask] = out * state->FeedGain;
+            delaybuf[offset&mask] += out * state->FeedGain;
             offset++;
         }
 
-        for(k = 0;k < NumChannels;k++)
-        {
-            ALfloat gain = state->Gain[0][k];
-            if(fabsf(gain) > GAIN_SILENCE_THRESHOLD)
-            {
-                for(i = 0;i < td;i++)
-                    SamplesOut[k][i+base] += temps[i][0] * gain;
-            }
-
-            gain = state->Gain[1][k];
-            if(fabsf(gain) > GAIN_SILENCE_THRESHOLD)
-            {
-                for(i = 0;i < td;i++)
-                    SamplesOut[k][i+base] += temps[i][1] * gain;
-            }
-        }
+        for(c = 0;c < 2;c++)
+            MixSamples(temps[c], NumChannels, SamplesOut, state->Gains[c].Current,
+                       state->Gains[c].Target, SamplesToDo-base, base, td);
 
         base += td;
     }
@@ -233,12 +230,10 @@ ALeffectStateFactory *ALechoStateFactory_getFactory(void)
 }
 
 
-void ALecho_setParami(ALeffect *UNUSED(effect), ALCcontext *context, ALenum UNUSED(param), ALint UNUSED(val))
-{ SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM); }
-void ALecho_setParamiv(ALeffect *effect, ALCcontext *context, ALenum param, const ALint *vals)
-{
-    ALecho_setParami(effect, context, param, vals[0]);
-}
+void ALecho_setParami(ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALint UNUSED(val))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid echo integer property 0x%04x", param); }
+void ALecho_setParamiv(ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, const ALint *UNUSED(vals))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid echo integer-vector property 0x%04x", param); }
 void ALecho_setParamf(ALeffect *effect, ALCcontext *context, ALenum param, ALfloat val)
 {
     ALeffectProps *props = &effect->Props;
@@ -246,49 +241,45 @@ void ALecho_setParamf(ALeffect *effect, ALCcontext *context, ALenum param, ALflo
     {
         case AL_ECHO_DELAY:
             if(!(val >= AL_ECHO_MIN_DELAY && val <= AL_ECHO_MAX_DELAY))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Echo delay out of range");
             props->Echo.Delay = val;
             break;
 
         case AL_ECHO_LRDELAY:
             if(!(val >= AL_ECHO_MIN_LRDELAY && val <= AL_ECHO_MAX_LRDELAY))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Echo LR delay out of range");
             props->Echo.LRDelay = val;
             break;
 
         case AL_ECHO_DAMPING:
             if(!(val >= AL_ECHO_MIN_DAMPING && val <= AL_ECHO_MAX_DAMPING))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Echo damping out of range");
             props->Echo.Damping = val;
             break;
 
         case AL_ECHO_FEEDBACK:
             if(!(val >= AL_ECHO_MIN_FEEDBACK && val <= AL_ECHO_MAX_FEEDBACK))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Echo feedback out of range");
             props->Echo.Feedback = val;
             break;
 
         case AL_ECHO_SPREAD:
             if(!(val >= AL_ECHO_MIN_SPREAD && val <= AL_ECHO_MAX_SPREAD))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Echo spread out of range");
             props->Echo.Spread = val;
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid echo float property 0x%04x", param);
     }
 }
 void ALecho_setParamfv(ALeffect *effect, ALCcontext *context, ALenum param, const ALfloat *vals)
-{
-    ALecho_setParamf(effect, context, param, vals[0]);
-}
+{ ALecho_setParamf(effect, context, param, vals[0]); }
 
-void ALecho_getParami(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum UNUSED(param), ALint *UNUSED(val))
-{ SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM); }
-void ALecho_getParamiv(const ALeffect *effect, ALCcontext *context, ALenum param, ALint *vals)
-{
-    ALecho_getParami(effect, context, param, vals);
-}
+void ALecho_getParami(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALint *UNUSED(val))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid echo integer property 0x%04x", param); }
+void ALecho_getParamiv(const ALeffect *UNUSED(effect), ALCcontext *context, ALenum param, ALint *UNUSED(vals))
+{ alSetError(context, AL_INVALID_ENUM, "Invalid echo integer-vector property 0x%04x", param); }
 void ALecho_getParamf(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *val)
 {
     const ALeffectProps *props = &effect->Props;
@@ -315,12 +306,10 @@ void ALecho_getParamf(const ALeffect *effect, ALCcontext *context, ALenum param,
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid echo float property 0x%04x", param);
     }
 }
 void ALecho_getParamfv(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *vals)
-{
-    ALecho_getParamf(effect, context, param, vals);
-}
+{ ALecho_getParamf(effect, context, param, vals); }
 
 DEFINE_ALEFFECT_VTABLE(ALecho);

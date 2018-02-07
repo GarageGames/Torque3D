@@ -38,6 +38,7 @@
 #endif
 
 #include "alMain.h"
+#include "alconfig.h"
 #include "compat.h"
 #include "bool.h"
 
@@ -233,7 +234,61 @@ static void LoadConfigFromFile(FILE *f)
                 curSection[0] = 0;
             else
             {
-                strncpy(curSection, section, sizeof(curSection)-1);
+                size_t len, p = 0;
+                do {
+                    char *nextp = strchr(section, '%');
+                    if(!nextp)
+                    {
+                        strncpy(curSection+p, section, sizeof(curSection)-1-p);
+                        break;
+                    }
+
+                    len = nextp - section;
+                    if(len > sizeof(curSection)-1-p)
+                        len = sizeof(curSection)-1-p;
+                    strncpy(curSection+p, section, len);
+                    p += len;
+                    section = nextp;
+
+                    if(((section[1] >= '0' && section[1] <= '9') ||
+                        (section[1] >= 'a' && section[1] <= 'f') ||
+                        (section[1] >= 'A' && section[1] <= 'F')) &&
+                       ((section[2] >= '0' && section[2] <= '9') ||
+                        (section[2] >= 'a' && section[2] <= 'f') ||
+                        (section[2] >= 'A' && section[2] <= 'F')))
+                    {
+                        unsigned char b = 0;
+                        if(section[1] >= '0' && section[1] <= '9')
+                            b = (section[1]-'0') << 4;
+                        else if(section[1] >= 'a' && section[1] <= 'f')
+                            b = (section[1]-'a'+0xa) << 4;
+                        else if(section[1] >= 'A' && section[1] <= 'F')
+                            b = (section[1]-'A'+0x0a) << 4;
+                        if(section[2] >= '0' && section[2] <= '9')
+                            b |= (section[2]-'0');
+                        else if(section[2] >= 'a' && section[2] <= 'f')
+                            b |= (section[2]-'a'+0xa);
+                        else if(section[2] >= 'A' && section[2] <= 'F')
+                            b |= (section[2]-'A'+0x0a);
+                        if(p < sizeof(curSection)-1)
+                            curSection[p++] = b;
+                        section += 3;
+                    }
+                    else if(section[1] == '%')
+                    {
+                        if(p < sizeof(curSection)-1)
+                            curSection[p++] = '%';
+                        section += 2;
+                    }
+                    else
+                    {
+                        if(p < sizeof(curSection)-1)
+                            curSection[p++] = '%';
+                        section += 1;
+                    }
+                    if(p < sizeof(curSection)-1)
+                        curSection[p] = 0;
+                } while(p < sizeof(curSection)-1 && *section != 0);
                 curSection[sizeof(curSection)-1] = 0;
             }
 
@@ -311,33 +366,33 @@ static void LoadConfigFromFile(FILE *f)
 #ifdef _WIN32
 void ReadALConfig(void)
 {
-    WCHAR buffer[PATH_MAX];
+    al_string ppath = AL_STRING_INIT_STATIC();
+    WCHAR buffer[MAX_PATH];
     const WCHAR *str;
-    al_string ppath;
     FILE *f;
 
     if(SHGetSpecialFolderPathW(NULL, buffer, CSIDL_APPDATA, FALSE) != FALSE)
     {
         al_string filepath = AL_STRING_INIT_STATIC();
-        al_string_copy_wcstr(&filepath, buffer);
-        al_string_append_cstr(&filepath, "\\alsoft.ini");
+        alstr_copy_wcstr(&filepath, buffer);
+        alstr_append_cstr(&filepath, "\\alsoft.ini");
 
-        TRACE("Loading config %s...\n", al_string_get_cstr(filepath));
-        f = al_fopen(al_string_get_cstr(filepath), "rt");
+        TRACE("Loading config %s...\n", alstr_get_cstr(filepath));
+        f = al_fopen(alstr_get_cstr(filepath), "rt");
         if(f)
         {
             LoadConfigFromFile(f);
             fclose(f);
         }
-        al_string_deinit(&filepath);
+        alstr_reset(&filepath);
     }
 
-    ppath = GetProcPath();
-    if(!al_string_empty(ppath))
+    GetProcBinary(&ppath, NULL);
+    if(!alstr_empty(ppath))
     {
-        al_string_append_cstr(&ppath, "\\alsoft.ini");
-        TRACE("Loading config %s...\n", al_string_get_cstr(ppath));
-        f = al_fopen(al_string_get_cstr(ppath), "r");
+        alstr_append_cstr(&ppath, "\\alsoft.ini");
+        TRACE("Loading config %s...\n", alstr_get_cstr(ppath));
+        f = al_fopen(alstr_get_cstr(ppath), "r");
         if(f)
         {
             LoadConfigFromFile(f);
@@ -348,26 +403,26 @@ void ReadALConfig(void)
     if((str=_wgetenv(L"ALSOFT_CONF")) != NULL && *str)
     {
         al_string filepath = AL_STRING_INIT_STATIC();
-        al_string_copy_wcstr(&filepath, str);
+        alstr_copy_wcstr(&filepath, str);
 
-        TRACE("Loading config %s...\n", al_string_get_cstr(filepath));
-        f = al_fopen(al_string_get_cstr(filepath), "rt");
+        TRACE("Loading config %s...\n", alstr_get_cstr(filepath));
+        f = al_fopen(alstr_get_cstr(filepath), "rt");
         if(f)
         {
             LoadConfigFromFile(f);
             fclose(f);
         }
-        al_string_deinit(&filepath);
+        alstr_reset(&filepath);
     }
 
-    al_string_deinit(&ppath);
+    alstr_reset(&ppath);
 }
 #else
 void ReadALConfig(void)
 {
-    char buffer[PATH_MAX];
+    al_string confpaths = AL_STRING_INIT_STATIC();
+    al_string fname = AL_STRING_INIT_STATIC();
     const char *str;
-    al_string ppath;
     FILE *f;
 
     str = "/etc/openal/alsoft.conf";
@@ -382,45 +437,55 @@ void ReadALConfig(void)
 
     if(!(str=getenv("XDG_CONFIG_DIRS")) || str[0] == 0)
         str = "/etc/xdg";
-    strncpy(buffer, str, sizeof(buffer)-1);
-    buffer[sizeof(buffer)-1] = 0;
+    alstr_copy_cstr(&confpaths, str);
     /* Go through the list in reverse, since "the order of base directories
      * denotes their importance; the first directory listed is the most
      * important". Ergo, we need to load the settings from the later dirs
      * first so that the settings in the earlier dirs override them.
      */
-    while(1)
+    while(!alstr_empty(confpaths))
     {
-        char *next = strrchr(buffer, ':');
-        if(next) *(next++) = 0;
-        else next = buffer;
-
-        if(next[0] != '/')
-            WARN("Ignoring XDG config dir: %s\n", next);
+        char *next = strrchr(alstr_get_cstr(confpaths), ':');
+        if(next)
+        {
+            size_t len = next - alstr_get_cstr(confpaths);
+            alstr_copy_cstr(&fname, next+1);
+            VECTOR_RESIZE(confpaths, len, len+1);
+            VECTOR_ELEM(confpaths, len) = 0;
+        }
         else
         {
-            size_t len = strlen(next);
-            strncpy(next+len, "/alsoft.conf", buffer+sizeof(buffer)-next-len);
-            buffer[sizeof(buffer)-1] = 0;
+            alstr_reset(&fname);
+            fname = confpaths;
+            AL_STRING_INIT(confpaths);
+        }
 
-            TRACE("Loading config %s...\n", next);
-            f = al_fopen(next, "r");
+        if(alstr_empty(fname) || VECTOR_FRONT(fname) != '/')
+            WARN("Ignoring XDG config dir: %s\n", alstr_get_cstr(fname));
+        else
+        {
+            if(VECTOR_BACK(fname) != '/') alstr_append_cstr(&fname, "/alsoft.conf");
+            else alstr_append_cstr(&fname, "alsoft.conf");
+
+            TRACE("Loading config %s...\n", alstr_get_cstr(fname));
+            f = al_fopen(alstr_get_cstr(fname), "r");
             if(f)
             {
                 LoadConfigFromFile(f);
                 fclose(f);
             }
         }
-        if(next == buffer)
-            break;
+        alstr_clear(&fname);
     }
 
     if((str=getenv("HOME")) != NULL && *str)
     {
-        snprintf(buffer, sizeof(buffer), "%s/.alsoftrc", str);
+        alstr_copy_cstr(&fname, str);
+        if(VECTOR_BACK(fname) != '/') alstr_append_cstr(&fname, "/.alsoftrc");
+        else alstr_append_cstr(&fname, ".alsoftrc");
 
-        TRACE("Loading config %s...\n", buffer);
-        f = al_fopen(buffer, "r");
+        TRACE("Loading config %s...\n", alstr_get_cstr(fname));
+        f = al_fopen(alstr_get_cstr(fname), "r");
         if(f)
         {
             LoadConfigFromFile(f);
@@ -429,17 +494,25 @@ void ReadALConfig(void)
     }
 
     if((str=getenv("XDG_CONFIG_HOME")) != NULL && str[0] != 0)
-        snprintf(buffer, sizeof(buffer), "%s/%s", str, "alsoft.conf");
+    {
+        alstr_copy_cstr(&fname, str);
+        if(VECTOR_BACK(fname) != '/') alstr_append_cstr(&fname, "/alsoft.conf");
+        else alstr_append_cstr(&fname, "alsoft.conf");
+    }
     else
     {
-        buffer[0] = 0;
+        alstr_clear(&fname);
         if((str=getenv("HOME")) != NULL && str[0] != 0)
-            snprintf(buffer, sizeof(buffer), "%s/.config/%s", str, "alsoft.conf");
+        {
+            alstr_copy_cstr(&fname, str);
+            if(VECTOR_BACK(fname) != '/') alstr_append_cstr(&fname, "/.config/alsoft.conf");
+            else alstr_append_cstr(&fname, ".config/alsoft.conf");
+        }
     }
-    if(buffer[0] != 0)
+    if(!alstr_empty(fname))
     {
-        TRACE("Loading config %s...\n", buffer);
-        f = al_fopen(buffer, "r");
+        TRACE("Loading config %s...\n", alstr_get_cstr(fname));
+        f = al_fopen(alstr_get_cstr(fname), "r");
         if(f)
         {
             LoadConfigFromFile(f);
@@ -447,12 +520,15 @@ void ReadALConfig(void)
         }
     }
 
-    ppath = GetProcPath();
-    if(!al_string_empty(ppath))
+    alstr_clear(&fname);
+    GetProcBinary(&fname, NULL);
+    if(!alstr_empty(fname))
     {
-        al_string_append_cstr(&ppath, "/alsoft.conf");
-        TRACE("Loading config %s...\n", al_string_get_cstr(ppath));
-        f = al_fopen(al_string_get_cstr(ppath), "r");
+        if(VECTOR_BACK(fname) != '/') alstr_append_cstr(&fname, "/alsoft.conf");
+        else alstr_append_cstr(&fname, "alsoft.conf");
+
+        TRACE("Loading config %s...\n", alstr_get_cstr(fname));
+        f = al_fopen(alstr_get_cstr(fname), "r");
         if(f)
         {
             LoadConfigFromFile(f);
@@ -471,7 +547,8 @@ void ReadALConfig(void)
         }
     }
 
-    al_string_deinit(&ppath);
+    alstr_reset(&fname);
+    alstr_reset(&confpaths);
 }
 #endif
 

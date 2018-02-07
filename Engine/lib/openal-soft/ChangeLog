@@ -1,3 +1,120 @@
+openal-soft-1.18.2:
+
+    Fixed resetting the FPU rounding mode after certain function calls on
+    Windows.
+
+    Fixed use of SSE intrinsics when building with Clang on Windows.
+
+    Fixed a crash with the JACK backend when using JACK1.
+
+    Fixed use of pthread_setnane_np on NetBSD.
+
+    Fixed building on FreeBSD with an older freebsd-lib.
+
+    OSS now links with libossaudio if found at build time (for NetBSD).
+
+openal-soft-1.18.1:
+
+    Fixed an issue where resuming a source might not restart playing it.
+
+    Fixed PulseAudio playback when the configured stream length is much less
+    than the requested length.
+
+    Fixed MMDevAPI capture with sample rates not matching the backing device.
+
+    Fixed int32 output for the Wave Writer.
+
+    Fixed enumeration of OSS devices that are missing device files.
+
+    Added correct retrieval of the executable's path on FreeBSD.
+
+    Added a config option to specify the dithering depth.
+
+    Added a 5.1 decoder preset that excludes front-center output.
+
+openal-soft-1.18.0:
+
+    Implemented the AL_EXT_STEREO_ANGLES and AL_EXT_SOURCE_RADIUS extensions.
+
+    Implemented the AL_SOFT_gain_clamp_ex, AL_SOFT_source_resampler,
+    AL_SOFT_source_spatialize, and ALC_SOFT_output_limiter extensions.
+
+    Implemented 3D processing for some effects. Currently implemented for
+    Reverb, Compressor, Equalizer, and Ring Modulator.
+
+    Implemented 2-channel UHJ output encoding. This needs to be enabled with a
+    config option to be used.
+
+    Implemented dual-band processing for high-quality ambisonic decoding.
+
+    Implemented distance-compensation for surround sound output.
+
+    Implemented near-field emulation and compensation with ambisonic rendering.
+    Currently only applies when using the high-quality ambisonic decoder or
+    ambisonic output, with appropriate config options.
+
+    Implemented an output limiter to reduce the amount of distortion from
+    clipping.
+
+    Implemented dithering for 8-bit and 16-bit output.
+
+    Implemented a config option to select a preferred HRTF.
+
+    Implemented a run-time check for NEON extensions using /proc/cpuinfo.
+
+    Implemented experimental capture support for the OpenSL backend.
+
+    Fixed building on compilers with NEON support but don't default to having
+    NEON enabled.
+
+    Fixed support for JACK on Windows.
+
+    Fixed starting a source while alcSuspendContext is in effect.
+
+    Fixed detection of headsets as headphones, with MMDevAPI.
+
+    Added support for AmbDec config files, for custom ambisonic decoder
+    configurations. Version 3 files only.
+
+    Added backend-specific options to alsoft-config.
+
+    Added first-, second-, and third-order ambisonic output formats. Currently
+    only works with backends that don't rely on channel labels, like JACK,
+    ALSA, and OSS.
+
+    Added a build option to embed the default HRTFs into the lib.
+
+    Added AmbDec presets to enable high-quality ambisonic decoding.
+
+    Added an AmbDec preset for 3D7.1 speaker setups.
+
+    Added documentation regarding Ambisonics, 3D7.1, AmbDec config files, and
+    the provided ambdec presets.
+
+    Added the ability for MMDevAPI to open devices given a Device ID or GUID
+    string.
+
+    Added an option to the example apps to open a specific device.
+
+    Increased the maximum auxiliary send limit to 16 (up from 4). Requires
+    requesting them with the ALC_MAX_AUXILIARY_SENDS context creation
+    attribute.
+
+    Increased the default auxiliary effect slot count to 64 (up from 4).
+
+    Reduced the default period count to 3 (down from 4).
+
+    Slightly improved automatic naming for enumerated HRTFs.
+
+    Improved B-Format decoding with HRTF output.
+
+    Improved internal property handling for better batching behavior.
+
+    Improved performance of certain filter uses.
+
+    Removed support for the AL_SOFT_buffer_samples and AL_SOFT_buffer_sub_data
+    extensions. Due to conflicts with AL_EXT_SOURCE_RADIUS.
+
 openal-soft-1.17.2:
 
     Implemented device enumeration for OSSv4.

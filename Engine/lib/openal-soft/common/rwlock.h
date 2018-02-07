@@ -11,13 +11,12 @@ extern "C" {
 typedef struct {
     RefCount read_count;
     RefCount write_count;
-    ATOMIC(int) read_lock;
-    ATOMIC(int) read_entry_lock;
-    ATOMIC(int) write_lock;
+    ATOMIC_FLAG read_lock;
+    ATOMIC_FLAG read_entry_lock;
+    ATOMIC_FLAG write_lock;
 } RWLock;
 #define RWLOCK_STATIC_INITIALIZE { ATOMIC_INIT_STATIC(0), ATOMIC_INIT_STATIC(0),         \
-                                   ATOMIC_INIT_STATIC(false), ATOMIC_INIT_STATIC(false), \
-                                   ATOMIC_INIT_STATIC(false) }
+                                   ATOMIC_FLAG_INIT, ATOMIC_FLAG_INIT, ATOMIC_FLAG_INIT }
 
 void RWLockInit(RWLock *lock);
 void ReadLock(RWLock *lock);

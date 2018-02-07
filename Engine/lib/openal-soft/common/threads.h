@@ -3,6 +3,16 @@
 
 #include <time.h>
 
+#if defined(__GNUC__) && defined(__i386__)
+/* force_align_arg_pointer is required for proper function arguments aligning
+ * when SSE code is used. Some systems (Windows, QNX) do not guarantee our
+ * thread functions will be properly aligned on the stack, even though GCC may
+ * generate code with the assumption that it is. */
+#define FORCE_ALIGN __attribute__((force_align_arg_pointer))
+#else
+#define FORCE_ALIGN
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,7 +28,6 @@ enum {
 enum {
     almtx_plain = 0,
     almtx_recursive = 1,
-    almtx_timed = 2
 };
 
 typedef int (*althrd_start_t)(void*);
@@ -47,6 +56,7 @@ typedef CONDITION_VARIABLE alcnd_t;
 #else
 typedef struct { void *Ptr; } alcnd_t;
 #endif
+typedef HANDLE alsem_t;
 typedef DWORD altss_t;
 typedef LONG alonce_flag;
 
@@ -117,11 +127,13 @@ inline int altss_set(altss_t tss_id, void *val)
 #include <stdint.h>
 #include <errno.h>
 #include <pthread.h>
+#include <semaphore.h>
 
 
 typedef pthread_t althrd_t;
 typedef pthread_mutex_t almtx_t;
 typedef pthread_cond_t alcnd_t;
+typedef sem_t alsem_t;
 typedef pthread_key_t altss_t;
 typedef pthread_once_t alonce_flag;
 
@@ -214,14 +226,17 @@ void althrd_setname(althrd_t thr, const char *name);
 
 int almtx_init(almtx_t *mtx, int type);
 void almtx_destroy(almtx_t *mtx);
-int almtx_timedlock(almtx_t *mtx, const struct timespec *ts);
 
 int alcnd_init(alcnd_t *cond);
 int alcnd_signal(alcnd_t *cond);
 int alcnd_broadcast(alcnd_t *cond);
 int alcnd_wait(alcnd_t *cond, almtx_t *mtx);
-int alcnd_timedwait(alcnd_t *cond, almtx_t *mtx, const struct timespec *time_point);
 void alcnd_destroy(alcnd_t *cond);
+
+int alsem_init(alsem_t *sem, unsigned int initial);
+void alsem_destroy(alsem_t *sem);
+int alsem_post(alsem_t *sem);
+int alsem_wait(alsem_t *sem);
 
 int altss_create(altss_t *tss_id, altss_dtor_t callback);
 void altss_delete(altss_t tss_id);
