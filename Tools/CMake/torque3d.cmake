@@ -469,14 +469,9 @@ if(TORQUE_SDL)
   endif()
 
     #override and hide SDL2 cache variables
-    #set apple to sue sdl static lib, other platforms use dynamic
-    if(APPLE)
-      set(SDL_SHARED OFF CACHE BOOL "Build a shared version of the library" FORCE)
-      set(SDL_STATIC ON CACHE BOOL "Build a static version of the library" FORCE)
-    else()
-      set(SDL_SHARED ON CACHE BOOL "Build a shared version of the library" FORCE)
-      set(SDL_STATIC OFF CACHE BOOL "Build a static version of the library" FORCE)
-    endif()
+    set(SDL_SHARED ON CACHE BOOL "Build a shared version of the library" FORCE)
+    set(SDL_STATIC OFF CACHE BOOL "Build a static version of the library" FORCE)
+    
     add_subdirectory( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
     link_directories( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
 endif()
