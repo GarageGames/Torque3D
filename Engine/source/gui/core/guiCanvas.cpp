@@ -134,7 +134,7 @@ GuiCanvas::GuiCanvas(): GuiControl(),
                         mPlatformWindow(NULL),
                         mDisplayWindow(true),
                         mMenuBarCtrl(nullptr),
-						mMenuBackground(nullptr)
+                        mMenuBackground(nullptr)
 {
    setBounds(0, 0, 640, 480);
    mAwake = true;
@@ -297,11 +297,11 @@ void GuiCanvas::setMenuBar(SimObject *obj)
     mMenuBarCtrl = dynamic_cast<GuiControl*>(obj);
 
     //remove old menubar
-	if (oldMenuBar)
-	{
-		Parent::removeObject(oldMenuBar);
-		Parent::removeObject(mMenuBackground); //also remove the modeless wrapper
-	}
+    if (oldMenuBar)
+    {
+        Parent::removeObject(oldMenuBar);
+        Parent::removeObject(mMenuBackground); //also remove the modeless wrapper
+    }
 
     // set new menubar    
     if (mMenuBarCtrl)
@@ -316,15 +316,15 @@ void GuiCanvas::setMenuBar(SimObject *obj)
           return;
        }
 
-	   if (mMenuBackground == nullptr)
-	   {
-		   mMenuBackground = new GuiControl();
-		   mMenuBackground->registerObject();
+       if (mMenuBackground == nullptr)
+       {
+           mMenuBackground = new GuiControl();
+           mMenuBackground->registerObject();
 
-		   mMenuBackground->setControlProfile(profile);
-	   }
+           mMenuBackground->setControlProfile(profile);
+       }
 
-	   mMenuBackground->addObject(mMenuBarCtrl);
+       mMenuBackground->addObject(mMenuBarCtrl);
 
        Parent::addObject(mMenuBackground);
     }
