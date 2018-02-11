@@ -20,7 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "../../ShaderModelAutoGen.hlsl"
+#include "../../shaderModelAutoGen.hlsl"
 #include "./../postFx.hlsl"
 
 TORQUE_UNIFORM_SAMPLER2D(occludeMap, 0);
