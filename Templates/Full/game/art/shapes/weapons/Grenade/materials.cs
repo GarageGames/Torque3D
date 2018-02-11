@@ -49,11 +49,11 @@ singleton Material(debri_debris)
 {
    mapTo = "debris";
    diffuseColor[0] = "0.7 0.7 0.7 1";
-   diffuseMap[0] = "rock_diffuse.dds";
-   normalMap[0] = "rock_normals.dds";
+   diffuseMap[0] = "rock_diffuse";
+   normalMap[0] = "rock_normals";
    specular[0] = "1 1 1 0";
    specularPower[0] = "50";
-   specularMap[0] = "rock_specular.dds";
+   specularMap[0] = "rock_specular";
    castShadows = "0";
    translucentBlendOp = "None";
    materialTag0 = "Weapon";
