@@ -198,6 +198,7 @@ protected:
 	static CanvasSizeChangeSignal smCanvasSizeChangeSignal;
 
    GuiControl *mMenuBarCtrl;
+   GuiControl* mMenuBackground;
 
 public:
    DECLARE_CONOBJECT(GuiCanvas);

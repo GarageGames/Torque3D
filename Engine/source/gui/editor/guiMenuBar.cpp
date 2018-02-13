@@ -1519,9 +1519,10 @@ DefineConsoleMethod(GuiMenuBar, insert, void, (SimObject* pObject, S32 pos), (nu
    object->insert(pObject, pos);
 }
 
-DefineConsoleMethod(GuiMenuBar, findMenu, S32, (StringTableEntry barTitle), (""), "(barTitle)")
+DefineConsoleMethod(GuiMenuBar, findMenu, S32, (const char* barTitle), (""), "(barTitle)")
 {
-   PopupMenu* menu = object->findMenu(barTitle);
+   StringTableEntry barTitleStr = StringTable->insert(barTitle);
+   PopupMenu* menu = object->findMenu(barTitleStr);
 
    if (menu)
       return menu->getId();
