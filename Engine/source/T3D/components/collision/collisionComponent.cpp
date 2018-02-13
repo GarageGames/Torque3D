@@ -142,10 +142,12 @@ CollisionComponent::CollisionComponent() : Component()
       StaticShapeObjectType | VehicleObjectType |
       VehicleBlockerObjectType | DynamicShapeObjectType | StaticObjectType | EntityObjectType | TriggerObjectType);
 
-   mPhysicsRep = NULL;
-   mPhysicsWorld = NULL;
+   mPhysicsRep = nullptr;
+   mPhysicsWorld = nullptr;
 
-   mTimeoutList = NULL;
+   mTimeoutList = nullptr;
+
+   mAnimated = false;
 }
 
 CollisionComponent::~CollisionComponent()

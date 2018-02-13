@@ -613,6 +613,9 @@ void AnimationComponent::advanceThreads(F32 dt)
    if (!mOwnerRenderInst)
       return;
 
+   if (mOwnerShapeInstance == nullptr || !getShape())
+      return;
+
    for (U32 i = 0; i < MaxScriptThreads; i++)
    {
       Thread& st = mAnimationThreads[i];

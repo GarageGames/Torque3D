@@ -152,14 +152,14 @@ public:
    virtual void setTransform(const MatrixF &mat);
    virtual void setRenderTransform(const MatrixF &mat);
 
-   void setTransform(Point3F position, RotationF rotation);
+   void setTransform(const Point3F& position, const RotationF& rotation);
 
-   void setRenderTransform(Point3F position, RotationF rotation);
+   void setRenderTransform(const Point3F& position, const RotationF& rotation);
 
    virtual MatrixF getTransform();
    virtual Point3F getPosition() const { return mPos; }
 
-   void setRotation(RotationF rotation) {
+   void setRotation(const RotationF& rotation) {
       mRot = rotation;
       setMaskBits(TransformMask);
    };
@@ -167,8 +167,8 @@ public:
 
    static bool _setGameObject(void *object, const char *index, const char *data);
 
-   void setMountOffset(Point3F posOffset);
-   void setMountRotation(EulerF rotOffset);
+   void setMountOffset(const Point3F& posOffset);
+   void setMountRotation(const EulerF& rotOffset);
 
    //static bool _setEulerRotation( void *object, const char *index, const char *data );
    static bool _setPosition(void *object, const char *index, const char *data);
@@ -181,7 +181,7 @@ public:
    virtual void getRenderMountTransform(F32 delta, S32 index, const MatrixF &xfm, MatrixF *outMat);
 
    virtual void mountObject(SceneObject *obj, S32 node, const MatrixF &xfm = MatrixF::Identity);
-   void mountObject(SceneObject* objB, MatrixF txfm);
+   void mountObject(SceneObject* objB, const MatrixF& txfm);
    void onMount(SceneObject *obj, S32 node);
    void onUnmount(SceneObject *obj, S32 node);
 
@@ -218,7 +218,7 @@ public:
       return mComponents.size(); 
    }
 
-   virtual void setObjectBox(Box3F objBox);
+   virtual void setObjectBox(const Box3F& objBox);
 
    void resetWorldBox() { Parent::resetWorldBox(); }
    void resetObjectBox() { Parent::resetObjectBox(); }

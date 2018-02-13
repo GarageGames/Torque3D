@@ -90,14 +90,9 @@ ConsoleSetType(TypeImageAssetPtr)
 
 //-----------------------------------------------------------------------------
 
-ImageAsset::ImageAsset()
+ImageAsset::ImageAsset() : AssetBase(), mImage(nullptr), mUseMips(true), mIsHDRImage(false), mIsValidImage(false)
 {
    mImageFileName = StringTable->EmptyString();
-
-   mImage = NULL;
-   mUseMips = true;
-   mIsHDRImage = false;
-   mIsValidImage = false;
 }
 
 //-----------------------------------------------------------------------------
