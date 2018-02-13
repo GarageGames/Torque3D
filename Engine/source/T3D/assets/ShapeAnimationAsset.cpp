@@ -92,8 +92,13 @@ ConsoleSetType(TypeShapeAnimationAssetPtr)
 
 //-----------------------------------------------------------------------------
 
-ShapeAnimationAsset::ShapeAnimationAsset()
+ShapeAnimationAsset::ShapeAnimationAsset() : 
+   mIsEmbedded(false), mIsCyclical(true), mIsBlend(false), mBlendFrame(0), mStartFrame(0), mEndFrame(-1), mPadRotation(true), mPadTransforms(false)
 {
+   mFileName = StringTable->EmptyString();
+   mAnimationName = StringTable->EmptyString();
+
+   mBlendAnimAssetName = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------
@@ -116,6 +121,14 @@ void ShapeAnimationAsset::initPersistFields()
    addField("animationFile", TypeFilename, Offset(mFileName, ShapeAnimationAsset), "Path to the file name containing the animation");
    addField("animationName", TypeString, Offset(mAnimationName, ShapeAnimationAsset), "Name of the animation");
 
+   addField("isEmbedded", TypeBool, Offset(mIsEmbedded, ShapeAnimationAsset), "If true, this animation asset just referrs to an embedded animation of a regular shape mesh. If false, it is a self-contained animation file");
+
+   addField("isCyclic", TypeBool, Offset(mIsCyclical, ShapeAnimationAsset), "Is this animation looping?");
+
+   addField("isBlend", TypeBool, Offset(mIsBlend, ShapeAnimationAsset), "Is this animation blended with another?");
+   addField("blendRefAnimation", TypeString, Offset(mBlendAnimAssetName, ShapeAnimationAsset), "AssetID of the animation to reference for our blending");
+   addField("blendFrame", TypeS32, Offset(mBlendFrame, ShapeAnimationAsset), "Which frame of the reference animation do we use for our blending");
+
    addField("startFrame", TypeS32, Offset(mStartFrame, ShapeAnimationAsset), "What frame does this animation clip start on");
    addField("endFrame", TypeS32, Offset(mEndFrame, ShapeAnimationAsset), "What fram does this animation clip end on");
    addField("padRotation", TypeBool, Offset(mPadRotation, ShapeAnimationAsset), "Are the rotation values padded");
@@ -128,4 +141,35 @@ void ShapeAnimationAsset::copyTo(SimObject* object)
 {
    // Call to parent.
    Parent::copyTo(object);
+}
+
+void ShapeAnimationAsset::initializeAsset(void)
+{
+   if (!mIsEmbedded)
+   {
+      //If we're not embedded, we need to load in our initial shape and do some prepwork
+
+      char filenameBuf[1024];
+      Con::expandScriptFilename(filenameBuf, sizeof(filenameBuf), mFileName);
+
+      mSourceShape = ResourceManager::get().load(filenameBuf);
+
+      if (!mSourceShape->addSequence("ambient", "", mAnimationName, mStartFrame, mEndFrame, mPadRotation, mPadTransforms))
+      {
+         Con::errorf("ShapeAnimationAsset::initializeAsset - Unable to do initial setup of the animation clip named %s for asset %s", mAnimationName, getAssetName());
+         return;
+      }
+
+      S32 sequenceId = mSourceShape->findSequence(mAnimationName);
+
+      if(mIsCyclical)
+         mSourceShape->sequences[sequenceId].flags |= TSShape::Cyclic;
+      else
+         mSourceShape->sequences[sequenceId].flags &= (~(TSShape::Cyclic));
+   }
+}
+
+void ShapeAnimationAsset::onAssetRefresh(void)
+{
+
 }

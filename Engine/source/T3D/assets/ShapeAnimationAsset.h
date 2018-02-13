@@ -37,6 +37,12 @@
 #ifndef _ASSET_FIELD_TYPES_H_
 #include "assets/assetFieldTypes.h"
 #endif
+#ifndef _TSSHAPE_H_
+#include "ts/tsShape.h"
+#endif
+#ifndef __RESOURCE_H__
+#include "core/resource.h"
+#endif
 
 //-----------------------------------------------------------------------------
 class ShapeAnimationAsset : public AssetBase
@@ -46,12 +52,23 @@ class ShapeAnimationAsset : public AssetBase
 protected:
    StringTableEntry   mFileName;
 
+   bool            mIsEmbedded;
+   bool            mIsCyclical;
+
+   bool            mIsBlend;
+
+   StringTableEntry mBlendAnimAssetName;
+
+   S32 mBlendFrame;
+
    //
    StringTableEntry mAnimationName;
    S32 mStartFrame;
    S32 mEndFrame;
    bool mPadRotation;
    bool mPadTransforms;
+
+   Resource<TSShape> mSourceShape;
 
 public:
    ShapeAnimationAsset();
@@ -65,18 +82,25 @@ public:
    DECLARE_CONOBJECT(ShapeAnimationAsset);
 
 protected:
-   virtual void            initializeAsset(void) {}
-   virtual void            onAssetRefresh(void) {}
+   virtual void            initializeAsset(void);
+   virtual void            onAssetRefresh(void);
 
 public:
    StringTableEntry getAnimationFilename() { return mFileName; }
    StringTableEntry getAnimationName() { return mAnimationName; }
+   StringTableEntry getBlendAnimationName() { return mBlendAnimAssetName; }
 
    S32 getStartFrame() { return mStartFrame; }
    S32 getEndFrame() { return mEndFrame; }
 
    bool getPadRotation() { return mPadRotation; }
    bool getPadTransforms() { return mPadTransforms; }
+
+   bool isEmbedded() { return mIsEmbedded; }
+   bool isCyclic() { return mIsCyclical; }
+   bool isBlend() { return mIsBlend; }
+
+   S32 getBlendFrame() { return mBlendFrame; }
 };
 
 DefineConsoleType(TypeShapeAnimationAssetPtr, ShapeAnimationAsset)
