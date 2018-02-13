@@ -269,7 +269,13 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
             if (getKeyString(rNode.action, objectbuffer) == false)
                continue;
 
-            const char* command = (rNode.flags & Node::BindCmd) ? "bindCmd" : "bind";
+            const char* command;
+            if (rNode.flags & Node::BindCmd)
+               command = "bindCmd";
+            else if (rNode.flags & Node::Held)
+               command = "held";
+            else
+               command = "bind";
 
             dSprintf(lineBuffer, 1023, "%s.%s(%s, \"%s%s\"",
                                         getName(),
@@ -324,7 +330,16 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
                }
                else
                   dStrcat(lineBuffer, ", \"\"");
-            } else {
+            }
+            else if (rNode.flags & Node::Held) 
+            {
+               dStrcat(lineBuffer, ", ");
+               dStrcat(lineBuffer, rNode.consoleFunction);
+
+               dStrcat(lineBuffer, ", ");
+               dStrcat(lineBuffer, rNode.contextEvent->mConsoleFunctionHeld);
+            } 
+            else {
                dStrcat(lineBuffer, ", ");
                dStrcat(lineBuffer, rNode.consoleFunction);
             }
@@ -353,7 +368,13 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
             if (getKeyString(rNode.action, keybuffer) == false)
                continue;
 
-            const char* command = (rNode.flags & Node::BindCmd) ? "bindCmd" : "bind";
+            const char* command;
+            if (rNode.flags & Node::BindCmd)
+               command = "bindCmd";
+            else if (rNode.flags & Node::Held)
+               command = "held";
+            else
+               command = "bind";
 
             char finalBuffer[1024];
             dSprintf(finalBuffer, 1023, "%s.%s(%s, \"%s%s\"",
@@ -407,7 +428,16 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
                }
                else
                   dStrcat(finalBuffer, ", \"\"");
-            } else {
+            }
+            else if (rNode.flags & Node::Held)
+            {
+               dStrcat(finalBuffer, ", ");
+               dStrcat(finalBuffer, rNode.consoleFunction);
+
+               dStrcat(finalBuffer, ", ");
+               dStrcat(finalBuffer, rNode.contextEvent->mConsoleFunctionHeld);
+            } 
+            else {
                dStrcat(finalBuffer, ", ");
                dStrcat(finalBuffer, rNode.consoleFunction);
             }
@@ -794,6 +824,17 @@ const char* ActionMap::getCommand( const char* device, const char* action )
                      ( mapNode->breakConsoleCommand ? mapNode->breakConsoleCommand : "" ) );             
                return( returnString );
             }              
+            if (mapNode->flags & Node::Held)
+            {
+               S32 bufferLen = dStrlen(mapNode->consoleFunction) + dStrlen(mapNode->contextEvent->mConsoleFunctionHeld) + 2;
+               char* returnString = Con::getReturnBuffer(bufferLen);
+
+               dSprintf(returnString, bufferLen, "%st%s",
+                  (mapNode->consoleFunction ? mapNode->consoleFunction : ""),
+                  (mapNode->contextEvent->mConsoleFunctionHeld ? mapNode->contextEvent->mConsoleFunctionHeld : ""));
+
+               return(returnString);
+            }
             else
                return( mapNode->consoleFunction );             
          }
@@ -1311,6 +1352,76 @@ bool ActionMap::processBind(const U32 argc, const char** argv, SimObject* object
 }
 
 //------------------------------------------------------------------------------
+bool ActionMap::processHoldBind(const char *device, const char *action, const char *holdFunc, const char *tapFunc, const U32 holdTime, const bool holdOnly, const bool retHoldTime)
+{
+   U32 deviceType;
+   U32 deviceInst;
+
+   if (!getDeviceTypeAndInstance(device, deviceType, deviceInst))
+   {
+      Con::printf("processBindCmd: unknown device: %s", device);
+      return false;
+   }
+
+   // Ok, we now have the deviceType and instance.  Create an event descriptor  
+   //  for the bind...  
+   //  
+   EventDescriptor eventDescriptor;
+   if (createEventDescriptor(action, &eventDescriptor) == false) {
+      Con::printf("Could not create a description for binding: %s", action);
+      return false;
+   }
+
+   // SI_POV == SI_MOVE, and the POV works fine with bindCmd, so we have to add these manually.  
+   if ((eventDescriptor.eventCode == SI_XAXIS) ||
+      (eventDescriptor.eventCode == SI_YAXIS) ||
+      (eventDescriptor.eventCode == SI_ZAXIS) ||
+      (eventDescriptor.eventCode == SI_RXAXIS) ||
+      (eventDescriptor.eventCode == SI_RYAXIS) ||
+      (eventDescriptor.eventCode == SI_RZAXIS) ||
+      (eventDescriptor.eventCode == SI_SLIDER) ||
+      (eventDescriptor.eventCode == SI_XPOV) ||
+      (eventDescriptor.eventCode == SI_YPOV) ||
+      (eventDescriptor.eventCode == SI_XPOV2) ||
+      (eventDescriptor.eventCode == SI_YPOV2))
+   {
+      Con::warnf("ActionMap::processBindCmd - Cannot use 'bindCmd' with a move event type. Use 'bind' instead.");
+      return false;
+   }
+
+   // Event has now been described, and device determined.  we need now to extract  
+   //  any modifiers that the action map will apply to incoming events before  
+   //  calling the bound function...  
+   //  
+   // DMMTODO  
+   F32 deadZoneBegin = 0.0f;
+   F32 deadZoneEnd = 0.0f;
+   F32 scaleFactor = 1.0f;
+
+   // Ensure that the console function is properly specified?  
+   //  
+   // DMMTODO  
+
+   // Create the full bind entry, and place it in the map  
+   //  
+   // DMMTODO  
+   Node* pBindNode = getNode(deviceType, deviceInst,
+      eventDescriptor.flags,
+      eventDescriptor.eventCode);
+
+   pBindNode->flags = Node::Held;
+   pBindNode->deadZoneBegin = deadZoneBegin;
+   pBindNode->deadZoneEnd = deadZoneEnd;
+   pBindNode->scaleFactor = scaleFactor;
+   pBindNode->consoleFunction = StringTable->insert(dStrdup(tapFunc));
+
+   pBindNode->contextEvent = new ContextAction(StringTable->insert(dStrdup(holdFunc)), holdTime, pBindNode, holdOnly);
+   pBindNode->contextEvent->mReturnHoldTime = retHoldTime;
+
+   return true;
+}
+
+//------------------------------------------------------------------------------
 bool ActionMap::processAction(const InputEventInfo* pEvent)
 {
    // Suppress excluded input events, like alt-tab.
@@ -1328,7 +1439,9 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
       // Enter the break into the table if this is a make event...
       // Do this now rather than after command is processed because
       // command might add a binding which can move the vector of nodes.
-      enterBreakEvent(pEvent, pNode);
+      // Filter to prevent Hold buttons from being eaten  
+      if (!(pNode->flags & Node::Held))
+         enterBreakEvent(pEvent, pNode);
 
       // Whadda ya know, we have this bound.  Set up, and call the console
       //  function associated with it...
@@ -1368,6 +1481,15 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
          // it's a bind command
          if(pNode->makeConsoleCommand)
             Con::evaluate(pNode->makeConsoleCommand);
+      }
+      else if (pNode->flags & Node::Held)
+      {
+         //check if we're already holding, if not, start our timer  
+         if (!pNode->contextEvent->mActive) {
+            pNode->contextEvent->mActive = true;
+            pNode->contextEvent->mStartTime = Sim::getCurrentTime();
+            pNode->contextEvent->mEventValue = value;
+         }
       }
       else if ( pNode->consoleFunction[0] )
       {
@@ -1529,6 +1651,20 @@ bool ActionMap::processAction(const InputEventInfo* pEvent)
    }
    else if (pEvent->action == SI_BREAK)
    {
+      const Node* button = findNode(pEvent->deviceType, pEvent->deviceInst,
+         pEvent->modifier, pEvent->objInst);
+
+      if (button != NULL) 
+      {
+         if (button->flags == Node::Held)
+         {
+            if (!button->contextEvent->mBreakEvent)
+               button->contextEvent->mBreakEvent = true;
+
+            return true;
+         }
+      }
+
       return checkBreakTable(pEvent);
    }
    else if (pEvent->action == SI_VALUE)
@@ -1809,6 +1945,78 @@ void ActionMap::fireBreakEvent( U32 i, F32 fValue )
 }
 
 //------------------------------------------------------------------------------
+//Context actions
+ContextAction::ContextAction(StringTableEntry func, F32 minHoldTime, ActionMap::Node* button, bool holdOnly)
+   : mStartTime(0), mEventValue(1.0f), mBreakEvent(false), mDidHold(false), mActive(false), mReturnHoldTime(false)
+{
+   mButton = button;
+   mMinHoldTime = minHoldTime;
+   mConsoleFunctionHeld = func;
+
+   mHoldOnly = holdOnly;
+}
+
+void ContextAction::processTick()
+{
+   if (mActive)
+   {
+      F32 currTime = Sim::getCurrentTime();
+      static const char *argv[2];
+
+      //see if this key even is still active  
+      if (!mBreakEvent)
+      {
+         //are we only checking if it's holding?  
+         if (mHoldOnly)
+         {
+            //yes, we are, and since it's held, we fire off our function  
+            if (mReturnHoldTime)
+            {
+               argv[0] = mConsoleFunctionHeld;
+               argv[1] = Con::getFloatArg(mEventValue);
+               argv[2] = Con::getFloatArg((currTime - mStartTime));
+               Con::execute(3, argv);
+            }
+            else
+            {
+               argv[0] = mConsoleFunctionHeld;
+               argv[1] = Con::getFloatArg(mEventValue);
+               Con::execute(2, argv);
+            }
+         }
+         //if we don't care if we're just holding, check our time  
+         //have we passed our min limit?  
+         else if ((currTime - mStartTime) >= mMinHoldTime)
+         {
+            //holy crap, we have, fire off our hold function   
+            mDidHold = true;
+            argv[0] = mConsoleFunctionHeld;
+            argv[1] = Con::getFloatArg(mEventValue);
+            Con::execute(2, argv);
+         }
+         //otherwise we haven't yet, so keep our active status  
+         return;
+      }
+      //hmm, apparently not, so see if we tapped the key instead  
+      else
+      {
+         if (!mHoldOnly && !mDidHold)
+         {
+            //yes, we tapped and we care, so fire off the tap function.  
+            argv[0] = mButton->consoleFunction;
+            argv[1] = Con::getFloatArg(mEventValue);
+            Con::execute(2, argv);
+         }
+         //otherwise we don't care and we're done, so reset everything  
+         mActive = false;
+         mStartTime = 0;
+         mBreakEvent = false;
+         mDidHold = false;
+      }
+   }
+}
+
+//------------------------------------------------------------------------------
 
 // Console interop version.
 
@@ -1957,6 +2165,18 @@ DefineEngineMethod( ActionMap, bindCmd, bool, ( const char* device, const char* 
    "@endtsexample\n\n")
 {
    return object->processBindCmd( device, action, makeCmd, breakCmd );
+}
+
+DefineEngineMethod(ActionMap, bindContext, void, (const char* device, const char* action, const char* holdFunction, const char* tapFunction, U32 holdTime),
+   ("", "", "", "", 0), "actionMap.bindCmd( device, action, holdFunction, tapFunction, holdTime)")
+{
+   object->processHoldBind(device, action, holdFunction, tapFunction, holdTime, false);
+}
+
+DefineEngineMethod(ActionMap, bindHold, void, (const char* device, const char* action, const char* holdFunction, bool returnHoldTime),
+   ("", "", "", false), "actionMap.bindCmd( device, action, holdFunction, returnHoldTime)")
+{
+   object->processHoldBind(device, action, holdFunction, "", 0, true, returnHoldTime);
 }
 
 DefineEngineMethod( ActionMap, unbind, bool, ( const char* device, const char* action ),,
