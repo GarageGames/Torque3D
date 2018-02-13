@@ -1263,10 +1263,6 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
       EnginePropertyTable _propTable( sizeof( _props ) / sizeof( _props[ 0 ] ) - 1, _props );            \
    } }
 
-/// Add an auto-doc for a class.
-#define ConsoleDocClass( className, docString ) \
-   CLASSDOC( className, docString )
-
 /// @}
 
 //------------------------------------------------------------------------------
