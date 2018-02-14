@@ -158,6 +158,8 @@ public:
    {
       if (index <= mFields.size())
          return mFields[index];
+
+      return StateField(); //return a blank one
    }
 
    Signal< void(StateMachine*, S32 stateIdx) > onStateChanged;

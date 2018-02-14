@@ -222,7 +222,7 @@ U32 AnimationComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stre
 {
    U32 retMask = Parent::packUpdate(con, mask, stream);
 
-   /*for (int i = 0; i < MaxScriptThreads; i++)
+   for (int i = 0; i < MaxScriptThreads; i++)
    {
       Thread& st = mAnimationThreads[i];
       if (stream->writeFlag((st.sequence != -1 || st.state == Thread::Destroy) && (mask & (ThreadMaskN << i))))
@@ -234,7 +234,7 @@ U32 AnimationComponent::packUpdate(NetConnection *con, U32 mask, BitStream *stre
          stream->writeFlag(st.atEnd);
          stream->writeFlag(st.transition);
       }
-   }*/
+   }
 
    return retMask;
 }
@@ -243,7 +243,7 @@ void AnimationComponent::unpackUpdate(NetConnection *con, BitStream *stream)
 {
    Parent::unpackUpdate(con, stream);
 
-   /*for (S32 i = 0; i < MaxScriptThreads; i++) 
+   for (S32 i = 0; i < MaxScriptThreads; i++) 
    {
       if (stream->readFlag()) 
       {
@@ -260,7 +260,7 @@ void AnimationComponent::unpackUpdate(NetConnection *con, BitStream *stream)
          else
             updateThread(st);
       }
-   }*/
+   }
 }
 
 void AnimationComponent::processTick()
@@ -611,6 +611,9 @@ void AnimationComponent::startSequenceSound(Thread& thread)
 void AnimationComponent::advanceThreads(F32 dt)
 {
    if (!mOwnerRenderInst)
+      return;
+
+   if (mOwnerShapeInstance == nullptr || !getShape())
       return;
 
    for (U32 i = 0; i < MaxScriptThreads; i++)

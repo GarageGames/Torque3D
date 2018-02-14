@@ -89,7 +89,7 @@ ConsoleSetType(TypeScriptAssetPtr)
 
 //-----------------------------------------------------------------------------
 
-ScriptAsset::ScriptAsset()
+ScriptAsset::ScriptAsset() : AssetBase(), mIsServerSide(true)
 {
    mScriptFilePath = StringTable->EmptyString();
 }

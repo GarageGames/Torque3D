@@ -37,6 +37,7 @@
 #include "console/engineTypes.h"
 #include "console/engineAPI.h"
 
+#include "sim/netObject.h"
 
 IMPLEMENT_SCOPE( ConsoleAPI, Console,,
    "Functionality related to the legacy TorqueScript console system." );
@@ -372,6 +373,7 @@ void ConsoleObject::addGroup(const char* in_pGroupname, const char* in_pGroupDoc
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
+   f.networkMask  = 0;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -396,6 +398,7 @@ void ConsoleObject::endGroup(const char*  in_pGroupname)
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
    f.elementCount = 0;
+   f.networkMask  = 0;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -418,6 +421,7 @@ void ConsoleObject::addArray( const char *arrayName, S32 count )
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
+   f.networkMask = 0;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -439,6 +443,7 @@ void ConsoleObject::endArray( const char *arrayName )
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
    f.elementCount = 0;
+   f.networkMask = 0;
 
    // Add to field list.
    sg_tempFieldList.push_back(f);
@@ -515,6 +520,7 @@ void ConsoleObject::addField(const char*  in_pFieldname,
    f.setDataFn = &defaultProtectedSetFn;
    f.getDataFn = &defaultProtectedGetFn;
    f.writeDataFn = in_writeDataFn;
+   f.networkMask = 0;
 
    ConsoleBaseType* conType = ConsoleBaseType::getType(in_fieldType);
    AssertFatal(conType, "ConsoleObject::addField - invalid console type");
@@ -609,6 +615,7 @@ void ConsoleObject::addProtectedField(const char*  in_pFieldname,
    f.setDataFn = in_setDataFn;
    f.getDataFn = in_getDataFn;
    f.writeDataFn = in_writeDataFn;
+   f.networkMask = 0;
 
    ConsoleBaseType* conType = ConsoleBaseType::getType(in_fieldType);
    AssertFatal(conType, "ConsoleObject::addProtectedField - invalid console type");
@@ -635,6 +642,7 @@ void ConsoleObject::addFieldV(const char*  in_pFieldname,
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
    f.validator    = v;
+   f.networkMask = 0;
    v->fieldIndex  = sg_tempFieldList.size();
 
    sg_tempFieldList.push_back(f);
@@ -652,11 +660,12 @@ void ConsoleObject::addDeprecatedField(const char *fieldName)
    f.setDataFn    = &defaultProtectedSetFn;
    f.getDataFn    = &defaultProtectedGetFn;
    f.writeDataFn = &defaultProtectedWriteFn;
+   f.networkMask = 0;
 
    sg_tempFieldList.push_back(f);
 }
 
-
+//------------------------------------------------------------------
 bool ConsoleObject::removeField(const char* in_pFieldname)
 {
    for (U32 i = 0; i < sg_tempFieldList.size(); i++) {

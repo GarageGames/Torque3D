@@ -850,7 +850,7 @@ void Entity::setTransform(const MatrixF &mat)
    }
 }
 
-void Entity::setTransform(Point3F position, RotationF rotation)
+void Entity::setTransform(const Point3F& position, const RotationF& rotation)
 {
    MatrixF oldTransform = getTransform();
 
@@ -922,7 +922,7 @@ void Entity::setRenderTransform(const MatrixF &mat)
    Parent::setRenderTransform(mat);
 }
 
-void Entity::setRenderTransform(Point3F position, RotationF rotation)
+void Entity::setRenderTransform(const Point3F& position, const RotationF& rotation)
 {
    if (isMounted())
    {
@@ -977,7 +977,7 @@ MatrixF Entity::getTransform()
    }
 }
 
-void Entity::setMountOffset(Point3F posOffset)
+void Entity::setMountOffset(const Point3F& posOffset)
 {
    if (isMounted())
    {
@@ -987,7 +987,7 @@ void Entity::setMountOffset(Point3F posOffset)
    }
 }
 
-void Entity::setMountRotation(EulerF rotOffset)
+void Entity::setMountRotation(const EulerF& rotOffset)
 {
    if (isMounted())
    {
@@ -1111,11 +1111,12 @@ bool Entity::castRayRendered(const Point3F &start, const Point3F &end, RayInfo *
 
 bool Entity::buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF &sphere)
 {
-   Vector<BuildPolyListInterface*> updaters = getComponents<BuildPolyListInterface>();
+   Con::errorf("Build Poly List not yet implemented as a passthrough for Entity");
+   /*Vector<BuildPolyListInterface*> updaters = getComponents<BuildPolyListInterface>();
    for (Vector<BuildPolyListInterface*>::iterator it = updaters.begin(); it != updaters.end(); it++)
    {
       return (*it)->buildPolyList(context, polyList, box, sphere);
-   }
+   }*/
 
    return false;
 }
@@ -1131,7 +1132,7 @@ void Entity::buildConvex(const Box3F& box, Convex* convex)
 
 //
 // Mounting and heirarchy manipulation
-void Entity::mountObject(SceneObject* objB, MatrixF txfm)
+void Entity::mountObject(SceneObject* objB, const MatrixF& txfm)
 {
    Parent::mountObject(objB, -1, txfm);
    Parent::addObject(objB);
@@ -1604,7 +1605,7 @@ void Entity::onCameraScopeQuery(NetConnection* connection, CameraScopeQuery* que
    }
 }
 //
-void Entity::setObjectBox(Box3F objBox)
+void Entity::setObjectBox(const Box3F& objBox)
 {
    mObjBox = objBox;
    resetWorldBox();
@@ -1705,8 +1706,8 @@ void Entity::setComponentDirty(Component *comp, bool forceUpdate)
       }
    }
 
-   if (!found)
-      return;
+   //if (!found)
+   //   return;
 
    //if(mToLoadComponents.empty())
    //	mStartComponentUpdate = true;

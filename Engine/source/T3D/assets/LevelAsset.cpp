@@ -90,10 +90,12 @@ ConsoleSetType(TypeLevelAssetPtr)
 
 //-----------------------------------------------------------------------------
 
-LevelAsset::LevelAsset()
+LevelAsset::LevelAsset() : AssetBase(), mIsSubLevel(false)
 {
    mLevelFile = StringTable->EmptyString();
    mPreviewImage = StringTable->EmptyString();
+
+   mMainLevelAsset = StringTable->EmptyString();
 }
 
 //-----------------------------------------------------------------------------

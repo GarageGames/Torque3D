@@ -59,7 +59,7 @@ ImplementEnumType(BatchingMode,
 //////////////////////////////////////////////////////////////////////////
 // Constructor/Destructor
 //////////////////////////////////////////////////////////////////////////
-MeshComponent::MeshComponent() : Component()
+MeshComponent::MeshComponent() : Component(), mShape(nullptr), mRenderMode(Individual)
 {
    mFriendlyName = "Mesh Component";
    mComponentType = "Render";
