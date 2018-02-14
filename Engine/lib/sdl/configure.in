@@ -3144,7 +3144,7 @@ AC_HELP_STRING([--enable-render-d3d], [enable the Direct3D render driver [[defau
                 fi
                 if test x$have_dinput = xyes; then
                     AC_DEFINE(SDL_JOYSTICK_DINPUT, 1, [ ])
-                    EXTRA_LDFLAGS="$EXTRA_LDFLAGS -ldinput8 -ldxguid -ldxerr8"
+                    EXTRA_LDFLAGS="$EXTRA_LDFLAGS -ldinput8 -ldxguid"
                 fi
             else
                 AC_DEFINE(SDL_JOYSTICK_WINMM, 1, [ ])

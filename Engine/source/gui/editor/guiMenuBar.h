@@ -23,119 +23,43 @@
 #ifndef _GUIMENUBAR_H_
 #define _GUIMENUBAR_H_
 
-#ifndef _GUITEXTLISTCTRL_H_
-#include "gui/controls/guiTextListCtrl.h"
-#endif
 #ifndef _GUITICKCTRL_H_
 #include "gui/shiny/guiTickCtrl.h"
 #endif
 
+#ifndef _POPUPMENU_H_
+#include "gui/editor/popupMenu.h"
+#endif
+
 class GuiMenuBar;
-class GuiMenuTextListCtrl;
 class WindowInputGenerator;
 
-class GuiMenuBackgroundCtrl : public GuiControl
-{
-   typedef GuiControl Parent;
-
-protected:
-   GuiMenuBar *mMenuBarCtrl;
-   GuiMenuTextListCtrl *mTextList; 
-public:
-   GuiMenuBackgroundCtrl(GuiMenuBar *ctrl, GuiMenuTextListCtrl* textList);
-   void onMouseDown(const GuiEvent &event);
-   void onMouseMove(const GuiEvent &event);
-   void onMouseDragged(const GuiEvent &event);
-};
-
-class GuiSubmenuBackgroundCtrl : public GuiMenuBackgroundCtrl
-{
-   typedef GuiMenuBackgroundCtrl Parent;
-
-public:
-   GuiSubmenuBackgroundCtrl(GuiMenuBar *ctrl, GuiMenuTextListCtrl* textList);
-   bool pointInControl(const Point2I & parentCoordPoint);
-   void onMouseDown(const GuiEvent &event);
-};
-
 //------------------------------------------------------------------------------
-
-class GuiMenuTextListCtrl : public GuiTextListCtrl
-{
-   private:
-      typedef GuiTextListCtrl Parent;
-
-   protected:
-      GuiMenuBar *mMenuBarCtrl;
-
-   public:
-	  bool isSubMenu; //  Indicates that this text list is in a submenu
-
-      GuiMenuTextListCtrl(); // for inheritance
-      GuiMenuTextListCtrl(GuiMenuBar *ctrl);
-
-      // GuiControl overloads:
-      bool onKeyDown(const GuiEvent &event);
-		void onMouseDown(const GuiEvent &event);
-      void onMouseUp(const GuiEvent &event);
-      void onRenderCell(Point2I offset, Point2I cell, bool selected, bool mouseOver);
-
-      virtual void onCellHighlighted(Point2I cell); //  Added
-};
-
-//------------------------------------------------------------------------------
-
 class GuiMenuBar : public GuiTickCtrl //  Was: GuiControl
 {
    typedef GuiTickCtrl Parent; //  Was: GuiControl Parent;
 public:
 
-	struct Menu;
+   struct MenuEntry
+   {
+      U32 pos;
+      RectI bounds;
 
-	struct MenuItem   // an individual item in a pull-down menu
-	{
-		char *text;    // the text of the menu item
-		U32 id;        // a script-assigned identifier
-		char *accelerator; // the keyboard accelerator shortcut for the menu item
-      U32 acceleratorIndex; // index of this accelerator
-		bool enabled;        // true if the menu item is selectable
-      bool visible;        // true if the menu item is visible
-      S32 bitmapIndex;     // index of the bitmap in the bitmap array
-      S32 checkGroup;      // the group index of the item visa vi check marks - 
-                           // only one item in the group can be checked.
-		MenuItem *nextMenuItem; // next menu item in the linked list
-
-		bool isSubmenu;				//  This menu item has a submenu that will be displayed
-
-		Menu* submenuParentMenu; //  For a submenu, this is the parent menu
-      Menu* submenu;
-      String cmd;
-	};
-
-	struct Menu
-	{
-		char *text;
-		U32 id;
-		RectI bounds;
       bool visible;
 
-		S32 bitmapIndex;		// Index of the bitmap in the bitmap array (-1 = no bitmap)
-		bool drawBitmapOnly;	// Draw only the bitmap and not the text
-		bool drawBorder;		// Should a border be drawn around this menu (usually if we only have a bitmap, we don't want a border)
+      S32 bitmapIndex;
+      bool drawBitmapOnly;
 
-		Menu *nextMenu;
-		MenuItem *firstMenuItem;
-	};
-	
-	GuiMenuBackgroundCtrl *mBackground;
-	GuiMenuTextListCtrl *mTextList;
-	
-	GuiSubmenuBackgroundCtrl *mSubmenuBackground; //  Background for a submenu
-	GuiMenuTextListCtrl *mSubmenuTextList;     //  Text list for a submenu
+      bool drawBorder;
 
-   Vector<Menu*> mMenuList;
-   Menu *mouseDownMenu;
-   Menu *mouseOverMenu;
+      StringTableEntry text;
+      PopupMenu* popupMenu;
+   };
+
+   Vector<MenuEntry> mMenuList;
+
+   MenuEntry *mouseDownMenu;
+   MenuEntry *mouseOverMenu;
 
    MenuItem* mouseDownSubmenu; //  Stores the menu item that is a submenu that has been selected
    MenuItem* mouseOverSubmenu; //  Stores the menu item that is a submenu that has been highlighted
@@ -151,59 +75,26 @@ public:
    S32 mVerticalMargin;   // Top and bottom margin around the text of each menu
    S32 mBitmapMargin;     // Margin between a menu's bitmap and text
 
-   //  Used to keep track of the amount of ticks that the mouse is hovering
-   // over a menu.
-   S32 mMouseOverCounter;
-   bool mCountMouseOver;
-   S32 mMouseHoverAmount;
+   U32 mMenubarHeight;
+
+   bool mMouseInMenu;
 	
 	GuiMenuBar();
+
+   void onRemove();
    bool onWake();
    void onSleep();
 
-	// internal menu handling functions
-	// these are used by the script manipulation functions to add/remove/change menu items
-   static Menu* sCreateMenu(const char *menuText, U32 menuId);
-   void addMenu(Menu *menu, S32 pos = -1);
-   void addMenu(const char *menuText, U32 menuId);
-	Menu *findMenu(const char *menu);  // takes either a menu text or a string id
-	static MenuItem *findMenuItem(Menu *menu, const char *menuItem); // takes either a menu text or a string id
-	void removeMenu(Menu *menu);
-	static void removeMenuItem(Menu *menu, MenuItem *menuItem);
-	static MenuItem* addMenuItem(Menu *menu, const char *text, U32 id, const char *accelerator, S32 checkGroup, const char *cmd);
-   static MenuItem* addMenuItem(Menu *menu, MenuItem *menuItem);
-	static void clearMenuItems(Menu *menu);
-   void clearMenus();
+   virtual void addObject(SimObject* object);
 
-   void attachToMenuBar(Menu* menu, S32 pos = -1);
-   void removeFromMenuBar(Menu* menu);
-
-   //  Methods to deal with submenus
-   static MenuItem* findSubmenuItem(Menu *menu, const char *menuItem, const char *submenuItem);
-   static MenuItem* findSubmenuItem(MenuItem *menuItem, const char *submenuItem);
-   static void addSubmenuItem(Menu *menu, MenuItem *submenu, const char *text, U32 id, const char *accelerator, S32 checkGroup);
-   static void addSubmenuItem(Menu *menu, MenuItem *submenu, MenuItem *newMenuItem );
-   static void removeSubmenuItem(MenuItem *menuItem, MenuItem *submenuItem);
-   static void clearSubmenuItems(MenuItem *menuitem);
-   void onSubmenuAction(S32 selectionIndex, const RectI& bounds, Point2I cellSize);
-   void closeSubmenu();
-   void checkSubmenuMouseMove(const GuiEvent &event);
-   MenuItem *findHitMenuItem(Point2I mousePoint);
-
-   void highlightedMenuItem(S32 selectionIndex, const RectI& bounds, Point2I cellSize); //  Called whenever a menu item is highlighted by the mouse
-
-	// display/mouse functions
-
-	Menu *findHitMenu(Point2I mousePoint);
-
-   //  Called when the GUI theme changes and a bitmap arrary may need updating
-  // void onThemeChange();
+	MenuEntry *findHitMenu(Point2I mousePoint);
 
    void onPreRender();
 	void onRender(Point2I offset, const RectI &updateRect);
 
    void checkMenuMouseMove(const GuiEvent &event);
    void onMouseMove(const GuiEvent &event);
+   void onMouseEnter(const GuiEvent &event);
    void onMouseLeave(const GuiEvent &event);
    void onMouseDown(const GuiEvent &event);
    void onMouseDragged(const GuiEvent &event);
@@ -215,18 +106,22 @@ public:
    void removeWindowAcceleratorMap( WindowInputGenerator &inputGenerator );
    void acceleratorKeyPress(U32 index);
 
-   virtual void menuItemSelected(Menu *menu, MenuItem *item);
-
    //  Added to support 'ticks'
    void processTick();
 
+   void insert(SimObject* pObject, S32 pos);
+
    static void initPersistFields();
+
+   U32 getMenuListCount() { return mMenuList.size(); }
+
+   PopupMenu* getMenu(U32 index);
+   PopupMenu* findMenu(StringTableEntry barTitle);
 
    DECLARE_CONOBJECT(GuiMenuBar);
    DECLARE_CALLBACK( void, onMouseInMenu, ( bool hasLeftMenu ));
    DECLARE_CALLBACK( void, onMenuSelect, ( S32 menuId, const char* menuText ));
    DECLARE_CALLBACK( void, onMenuItemSelect, ( S32 menuId, const char* menuText, S32 menuItemId, const char* menuItemText  ));
-   DECLARE_CALLBACK( void, onSubmenuSelect, ( S32 submenuId, const char* submenuText ));
 };
 
 #endif

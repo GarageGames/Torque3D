@@ -70,7 +70,8 @@ S32 QSORT_CALLBACK moduleDefinitionVersionIdSort( const void* a, const void* b )
 ModuleManager::ModuleManager() :
     mEnforceDependencies(true),
     mEchoInfo(true),
-    mDatabaseLocks( 0 )
+    mDatabaseLocks( 0 ),
+    mIgnoreLoadedGroups(false)
 {
     // Set module extension.
     dStrcpy( mModuleExtension, MODULE_MANAGER_MODULE_DEFINITION_EXTENSION );
@@ -1300,6 +1301,106 @@ StringTableEntry ModuleManager::copyModule( ModuleDefinition* pSourceModuleDefin
 
 //-----------------------------------------------------------------------------
 
+bool ModuleManager::renameModule(ModuleDefinition* pSourceModuleDefinition, const char* pNewModuleName)
+{
+   // Sanity!
+   AssertFatal(pSourceModuleDefinition != NULL, "Cannot copy module using a NULL source module definition.");
+   AssertFatal(pNewModuleName != NULL, "Cannot rename a module using a NULL module name.");
+
+   // Fetch the source module Id.
+   StringTableEntry sourceModuleId = pSourceModuleDefinition->getModuleId();
+
+   // Is the source module definition registered with this module manager?
+   if (pSourceModuleDefinition->getModuleManager() != this)
+   {
+      // No, so warn.
+      Con::warnf("Module Manager: Cannot rename module Id '%s' as it is not registered with this module manager.", sourceModuleId);
+      return StringTable->EmptyString();
+   }
+
+   TamlModuleIdUpdateVisitor moduleIdUpdateVisitor;
+   moduleIdUpdateVisitor.setModuleIdFrom(sourceModuleId);
+   moduleIdUpdateVisitor.setModuleIdTo(pNewModuleName);
+
+   Vector<Platform::FileInfo> files;
+
+   const char* pExtension = (const char*)"Taml";
+   const U32 extensionLength = dStrlen(pExtension);
+
+   Vector<StringTableEntry> directories;
+
+   StringTableEntry modulePath = pSourceModuleDefinition->getModulePath();
+
+   // Find directories.
+   if (!Platform::dumpDirectories(modulePath, directories, -1))
+   {
+      // Warn.
+      Con::warnf("Module Manager: Cannot rename module Id '%s' in directory '%s' as sub-folder scanning/renaming failed.",
+         sourceModuleId, modulePath);
+      return false;
+   }
+
+   // Iterate directories.
+   for (Vector<StringTableEntry>::iterator basePathItr = directories.begin(); basePathItr != directories.end(); ++basePathItr)
+   {
+      // Fetch base path.
+      StringTableEntry basePath = *basePathItr;
+
+      // Find files.
+      files.clear();
+      if (!Platform::dumpPath(basePath, files, 0))
+      {
+         // Warn.
+         Con::warnf("Module Manager: Cannot rename module Id '%s' in directory '%s' as sub-folder scanning/renaming failed.",
+            sourceModuleId, modulePath);
+         return false;
+      }
+
+      // Iterate files.
+      for (Vector<Platform::FileInfo>::iterator fileItr = files.begin(); fileItr != files.end(); ++fileItr)
+      {
+         // Fetch file info.
+         Platform::FileInfo* pFileInfo = fileItr;
+
+         // Fetch filename.
+         const char* pFilename = pFileInfo->pFileName;
+
+         // Find filename length.
+         const U32 filenameLength = dStrlen(pFilename);
+
+         // Skip if extension is longer than filename.
+         if (extensionLength >= filenameLength)
+            continue;
+
+         // Skip if extension not found.
+         if (dStricmp(pFilename + filenameLength - extensionLength, pExtension) != 0)
+            continue;
+
+         char parseFileBuffer[1024];
+         dSprintf(parseFileBuffer, sizeof(parseFileBuffer), "%s/%s", pFileInfo->pFullPath, pFilename);
+
+         // Parse file.            
+         if (!mTaml.parse(parseFileBuffer, moduleIdUpdateVisitor))
+         {
+            // Warn.
+            Con::warnf("Module Manager: Failed to parse file '%s' whilst renaming module Id '%s' in directory '%s'.",
+               parseFileBuffer, sourceModuleId, modulePath);
+            return false;
+         }
+      }
+   }
+
+   // Info.
+   if (mEchoInfo)
+   {
+      Con::printf("Module Manager: Finished renaming module Id '%s' to '%s'.", sourceModuleId, pNewModuleName);
+   }
+
+   return true;
+}
+
+//-----------------------------------------------------------------------------
+
 bool ModuleManager::synchronizeDependencies( ModuleDefinition* pRootModuleDefinition, const char* pTargetDependencyPath )
 {
     // Sanity!
@@ -1986,7 +2087,7 @@ bool ModuleManager::registerModule( const char* pModulePath, const char* pModule
     }
 
     // Is the module group already loaded?
-    if ( findGroupLoaded( moduleGroup ) != NULL )
+    if ( findGroupLoaded( moduleGroup ) != NULL && !mIgnoreLoadedGroups)
     {
         // Yes, so warn.
         Con::warnf( "Module Manager: Found module: '%s' but it is in a module group '%s' which has already been loaded.",

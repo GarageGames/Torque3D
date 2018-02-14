@@ -582,3 +582,9 @@ void NetObject::addNetworkedField(const char*  in_pFieldname,
 
    sg_tempFieldList.push_back(f);
 }
+
+DefineEngineMethod(NetObject, clearScopeAlways, void, (), ,
+   "@brief Clears the scope always flag on this object.\n\n")
+{
+   object->clearScopeAlways();
+}

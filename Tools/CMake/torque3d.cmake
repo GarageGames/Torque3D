@@ -325,18 +325,13 @@ addPath("${srcDir}/T3D/decal")
 addPath("${srcDir}/T3D/sfx")
 addPath("${srcDir}/T3D/gameBase")
 addPath("${srcDir}/T3D/turret")
-addPath("${srcDir}/T3D/components/")
-addPath("${srcDir}/T3D/components/animation")
-addPath("${srcDir}/T3D/components/camera")
-addPath("${srcDir}/T3D/components/collision")
-addPath("${srcDir}/T3D/components/game")
-addPath("${srcDir}/T3D/components/physics")
-addPath("${srcDir}/T3D/components/render")
+addPathRec("${srcDir}/T3D/components/")
+addPathRec("${srcDir}/T3D/systems")
 
 addPath("${srcDir}/main/")
 addPath("${srcDir}/assets")
 addPath("${srcDir}/module")
-addPath("${srcDir}/T3D/assets")
+addPathRec("${srcDir}/T3D/assets")
 addPathRec("${srcDir}/persistence")
 addPathRec("${srcDir}/ts/collada")
 addPathRec("${srcDir}/ts/loader")
@@ -642,13 +637,6 @@ if(WIN32)
 
    if(TORQUE_OPENGL)
       addLib(OpenGL32.lib)
-   endif()
-
-   # JTH: DXSDK is compiled with older runtime, and MSVC 2015+ is when __vsnprintf is undefined.
-   # This is a workaround by linking with the older legacy library functions.
-   # See this for more info: http://stackoverflow.com/a/34230122
-   if (MSVC14)
-      addLib(legacy_stdio_definitions.lib)
    endif()
 endif()
 

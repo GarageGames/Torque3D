@@ -31,29 +31,29 @@ function ChooseLevelDlg::onWake( %this )
    %this->LevelDescriptionLabel.visible = false;
    %this->LevelDescription.visible = false;
    
-   %count = LevelFilesList.count();
+   %assetQuery = new AssetQuery();
+   AssetDatabase.findAssetType(%assetQuery, "LevelAsset");
+      
+   %count = %assetQuery.getCount();
    
-   if(%count == 0)
+   if(%count == 0 && !IsDirectory("tools"))
    {
       //We have no levels found. Prompt the user to open the editor to the default level if the tools are present
-      if(IsDirectory("tools"))
-      {
-         MessageBoxYesNo("Error", "No levels were found in any modules. Do you want to load the editor and start a new level?", 
-            "fastLoadWorldEdit(1);", 
-            "Canvas.popDialog(ChooseLevelDlg); if(isObject(ChooseLevelDlg.returnGui) && ChooseLevelDlg.returnGui.isMethod(\"onReturnTo\")) ChooseLevelDlg.returnGui.onReturnTo();");  
-      }
-      else
-      {
-         MessageBoxOK("Error", "No levels were found in any modules. Please ensure you have modules loaded that contain gameplay code and level files.", 
-            "Canvas.popDialog(ChooseLevelDlg); if(isObject(ChooseLevelDlg.returnGui) && ChooseLevelDlg.returnGui.isMethod(\"onReturnTo\")) ChooseLevelDlg.returnGui.onReturnTo();");
-      }
-      
+      MessageBoxOK("Error", "No levels were found in any modules. Please ensure you have modules loaded that contain gameplay code and level files.", 
+         "Canvas.popDialog(ChooseLevelDlg); if(isObject(ChooseLevelDlg.returnGui) && ChooseLevelDlg.returnGui.isMethod(\"onReturnTo\")) ChooseLevelDlg.returnGui.onReturnTo();");
+         
+      %assetQuery.delete();
       return;
    }
    
-   for ( %i=0; %i < %count; %i++ )
-   {
-      %file = LevelFilesList.getKey( %i );
+   for(%i=0; %i < %count; %i++)
+	{
+	   %assetId = %assetQuery.getAsset(%i);
+      
+      %levelAsset = AssetDatabase.acquireAsset(%assetId);
+      
+      %file = %levelAsset.LevelFile;
+      
       if ( !isFile(%file @ ".mis") && !isFile(%file) )
          continue;
          
@@ -66,7 +66,7 @@ function ChooseLevelDlg::onWake( %this )
             continue;      
       }
                   
-      %this.addMissionFile( %file );
+      %this.addLevelAsset( %levelAsset );
    }
    
    // Also add the new level mission as defined in the world editor settings
@@ -215,6 +215,38 @@ function ChooseLevelDlg::addMissionFile( %this, %file )
       %LevelInfoObject.delete();
    }
 
+   CL_levelList.addRow( CL_levelList.rowCount(), %levelName TAB %file TAB %levelDesc TAB %levelPreview );
+}
+
+function ChooseLevelDlg::addLevelAsset( %this, %levelAsset )
+{
+   %file = %levelAsset.LevelFile;
+   
+   /*%levelName = fileBase(%file);
+   %levelDesc = "A Torque level";
+
+   %LevelInfoObject = getLevelInfo(%file);
+
+   if (%LevelInfoObject != 0)
+   {
+      if(%LevelInfoObject.levelName !$= "")
+         %levelName = %LevelInfoObject.levelName;
+      else if(%LevelInfoObject.name !$= "")
+         %levelName = %LevelInfoObject.name;
+
+      if (%LevelInfoObject.desc0 !$= "")
+         %levelDesc = %LevelInfoObject.desc0;
+         
+      if (%LevelInfoObject.preview !$= "")
+         %levelPreview = %LevelInfoObject.preview;
+         
+      %LevelInfoObject.delete();
+   }*/
+   
+   %levelName = %levelAsset.friendlyName;
+   %levelDesc = %levelAsset.description;
+   %levelPreview = %levelAsset.levelPreviewImage;
+   
    CL_levelList.addRow( CL_levelList.rowCount(), %levelName TAB %file TAB %levelDesc TAB %levelPreview );
 }
 

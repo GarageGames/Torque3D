@@ -30,6 +30,10 @@ StateMachine::StateMachine()
    mStartingState = "";
 
    mCurCreateState = NULL;
+
+   mStateMachineFile = StringTable->EmptyString();
+
+   mCurCreateState = nullptr;
 }
 
 StateMachine::~StateMachine()
