@@ -495,7 +495,8 @@ public:
             table( NULL ),
             validator( NULL ),
             setDataFn( NULL ),
-            getDataFn( NULL )
+            getDataFn( NULL ),
+            networkMask(0)
       {
          doNotSubstitute = keepClearSubsOnly = false;
       }
@@ -518,6 +519,7 @@ public:
       bool           doNotSubstitute;
       bool           keepClearSubsOnly;
       WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
+      U32            networkMask;
    };
    typedef Vector<Field> FieldList;
 
