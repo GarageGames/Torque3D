@@ -304,36 +304,6 @@ function EWCreatorWindow::navigate( %this, %address )
                %this.addShapeIcon( %obj );
          }
       }
-      
-      //Add a separate folder for Game Objects
-      if(isClass("Entity"))
-      {
-          if(%address $= "")
-          {
-              %this.addFolderIcon("GameObjects");
-          }
-          else
-          {
-              //find all GameObjectAssets
-              %assetQuery = new AssetQuery();
-              if(!AssetDatabase.findAssetType(%assetQuery, "GameObjectAsset"))
-                 return 0; //if we didn't find ANY, just exit
-
-              %count = %assetQuery.getCount();
-
-              for(%i=0; %i < %count; %i++)
-              {
-                 %assetId = %assetQuery.getAsset(%i);
-
-                 %gameObjectAsset = AssetDatabase.acquireAsset(%assetId);
-
-                 if(isFile(%gameObjectAsset.TAMLFilePath))
-                 {
-                    %this.addGameObjectIcon( %gameObjectAsset.gameObjectName );
-                 }
-              }
-          }
-      }
    }
    
    if ( %this.tab $= "Meshes" )
@@ -761,22 +731,6 @@ function EWCreatorWindow::addPrefabIcon( %this, %fullPath )
    %ctrl.text = %file;
    %ctrl.class = "CreatorPrefabIconBtn";
    %ctrl.tooltip = %tip;
-   
-   %ctrl.buttonType = "radioButton";
-   %ctrl.groupNum = "-1";   
-   
-   %this.contentCtrl.addGuiControl( %ctrl );   
-}
-
-function EWCreatorWindow::addGameObjectIcon( %this, %gameObjectName )
-{
-   %ctrl = %this.createIcon();
-
-   %ctrl.altCommand = "spawnGameObject( \"" @ %gameObjectName @ "\", true );";
-   %ctrl.iconBitmap = EditorIconRegistry::findIconByClassName( "Prefab" );
-   %ctrl.text = %gameObjectName;
-   %ctrl.class = "CreatorGameObjectIconBtn";
-   %ctrl.tooltip = "Spawn the " @ %gameObjectName @ " GameObject";
    
    %ctrl.buttonType = "radioButton";
    %ctrl.groupNum = "-1";   
