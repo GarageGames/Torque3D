@@ -29,7 +29,8 @@ enum	btSolverMode
 	SOLVER_CACHE_FRIENDLY = 128,
 	SOLVER_SIMD = 256,
 	SOLVER_INTERLEAVE_CONTACT_AND_FRICTION_CONSTRAINTS = 512,
-	SOLVER_ALLOW_ZERO_LENGTH_FRICTION_DIRECTIONS = 1024
+	SOLVER_ALLOW_ZERO_LENGTH_FRICTION_DIRECTIONS = 1024,
+	SOLVER_DISABLE_IMPLICIT_CONE_FRICTION = 2048
 };
 
 struct btContactSolverInfoData
@@ -43,10 +44,13 @@ struct btContactSolverInfoData
 	btScalar	m_restitution;
 	int		m_numIterations;
 	btScalar	m_maxErrorReduction;
-	btScalar	m_sor;
-	btScalar	m_erp;//used as Baumgarte factor
-	btScalar	m_erp2;//used in Split Impulse
-	btScalar	m_globalCfm;//constraint force mixing
+	btScalar	m_sor;//successive over-relaxation term
+	btScalar	m_erp;//error reduction for non-contact constraints
+	btScalar	m_erp2;//error reduction for contact constraints
+	btScalar	m_globalCfm;//constraint force mixing for contacts and non-contacts
+	btScalar	m_frictionERP;//error reduction for friction constraints
+	btScalar	m_frictionCFM;//constraint force mixing for friction constraints
+
 	int			m_splitImpulse;
 	btScalar	m_splitImpulsePenetrationThreshold;
 	btScalar	m_splitImpulseTurnErp;
@@ -59,6 +63,7 @@ struct btContactSolverInfoData
 	btScalar	m_maxGyroscopicForce;
 	btScalar	m_singleAxisRollingFrictionThreshold;
 	btScalar	m_leastSquaresResidualThreshold;
+	btScalar	m_restitutionVelocityThreshold;
 
 };
 
@@ -79,6 +84,8 @@ struct btContactSolverInfo : public btContactSolverInfoData
 		m_erp = btScalar(0.2);
 		m_erp2 = btScalar(0.2);
 		m_globalCfm = btScalar(0.);
+		m_frictionERP = btScalar(0.2);//positional friction 'anchors' are disabled by default
+		m_frictionCFM = btScalar(0.);
 		m_sor = btScalar(1.);
 		m_splitImpulse = true;
 		m_splitImpulsePenetrationThreshold = -.04f;
@@ -92,6 +99,7 @@ struct btContactSolverInfo : public btContactSolverInfoData
 		m_maxGyroscopicForce = 100.f; ///it is only used for 'explicit' version of gyroscopic force
 		m_singleAxisRollingFrictionThreshold = 1e30f;///if the velocity is above this threshold, it will use a single constraint row (axis), otherwise 3 rows.
 		m_leastSquaresResidualThreshold = 0.f;
+		m_restitutionVelocityThreshold = 0.2f;//if the relative velocity is below this threshold, there is zero restitution
 	}
 };
 

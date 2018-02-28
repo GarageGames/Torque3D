@@ -16,11 +16,14 @@ subject to the following restrictions:
 
 #include "btCollisionObject.h"
 #include "LinearMath/btSerializer.h"
+#include "BulletCollision/BroadphaseCollision/btBroadphaseProxy.h"
 
 btCollisionObject::btCollisionObject()
-	:	m_anisotropicFriction(1.f,1.f,1.f),
-	m_hasAnisotropicFriction(false),
-	m_contactProcessingThreshold(BT_LARGE_FLOAT),
+	:	m_interpolationLinearVelocity(0.f, 0.f, 0.f),
+		m_interpolationAngularVelocity(0.f, 0.f, 0.f),
+		m_anisotropicFriction(1.f,1.f,1.f),
+		m_hasAnisotropicFriction(false),
+		m_contactProcessingThreshold(BT_LARGE_FLOAT),
 		m_broadphaseHandle(0),
 		m_collisionShape(0),
 		m_extensionPointer(0),
@@ -48,6 +51,7 @@ btCollisionObject::btCollisionObject()
 		m_updateRevision(0)
 {
 	m_worldTransform.setIdentity();
+	m_interpolationWorldTransform.setIdentity();
 }
 
 btCollisionObject::~btCollisionObject()
@@ -111,7 +115,18 @@ const char* btCollisionObject::serialize(void* dataBuffer, btSerializer* seriali
 	dataOut->m_ccdSweptSphereRadius = m_ccdSweptSphereRadius;
 	dataOut->m_ccdMotionThreshold = m_ccdMotionThreshold;
 	dataOut->m_checkCollideWith = m_checkCollideWith;
-
+	if (m_broadphaseHandle)
+	{
+		dataOut->m_collisionFilterGroup = m_broadphaseHandle->m_collisionFilterGroup;
+		dataOut->m_collisionFilterMask = m_broadphaseHandle->m_collisionFilterMask;
+		dataOut->m_uniqueId = m_broadphaseHandle->m_uniqueId;
+	}
+	else
+	{
+		dataOut->m_collisionFilterGroup = 0;
+		dataOut->m_collisionFilterMask = 0;
+		dataOut->m_uniqueId = -1;
+	}
 	return btCollisionObjectDataName;
 }
 

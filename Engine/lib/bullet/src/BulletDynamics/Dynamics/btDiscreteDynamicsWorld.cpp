@@ -374,7 +374,7 @@ void	btDiscreteDynamicsWorld::synchronizeSingleMotionState(btRigidBody* body)
 
 void	btDiscreteDynamicsWorld::synchronizeMotionStates()
 {
-	BT_PROFILE("synchronizeMotionStates");
+//	BT_PROFILE("synchronizeMotionStates");
 	if (m_synchronizeAllMotionStates)
 	{
 		//iterate  over all collision objects
@@ -402,7 +402,6 @@ int	btDiscreteDynamicsWorld::stepSimulation( btScalar timeStep,int maxSubSteps, 
 {
 	startProfiling(timeStep);
 
-	BT_PROFILE("stepSimulation");
 
 	int numSimulationSubSteps = 0;
 
@@ -539,7 +538,7 @@ btVector3 btDiscreteDynamicsWorld::getGravity () const
 	return m_gravity;
 }
 
-void	btDiscreteDynamicsWorld::addCollisionObject(btCollisionObject* collisionObject,short int collisionFilterGroup,short int collisionFilterMask)
+void	btDiscreteDynamicsWorld::addCollisionObject(btCollisionObject* collisionObject, int collisionFilterGroup, int collisionFilterMask)
 {
 	btCollisionWorld::addCollisionObject(collisionObject,collisionFilterGroup,collisionFilterMask);
 }
@@ -578,14 +577,14 @@ void	btDiscreteDynamicsWorld::addRigidBody(btRigidBody* body)
 		}
 
 		bool isDynamic = !(body->isStaticObject() || body->isKinematicObject());
-		short collisionFilterGroup = isDynamic? short(btBroadphaseProxy::DefaultFilter) : short(btBroadphaseProxy::StaticFilter);
-		short collisionFilterMask = isDynamic? 	short(btBroadphaseProxy::AllFilter) : 	short(btBroadphaseProxy::AllFilter ^ btBroadphaseProxy::StaticFilter);
+		int collisionFilterGroup = isDynamic? int(btBroadphaseProxy::DefaultFilter) : int(btBroadphaseProxy::StaticFilter);
+		int collisionFilterMask = isDynamic? 	int(btBroadphaseProxy::AllFilter) : 	int(btBroadphaseProxy::AllFilter ^ btBroadphaseProxy::StaticFilter);
 
 		addCollisionObject(body,collisionFilterGroup,collisionFilterMask);
 	}
 }
 
-void	btDiscreteDynamicsWorld::addRigidBody(btRigidBody* body, short group, short mask)
+void	btDiscreteDynamicsWorld::addRigidBody(btRigidBody* body, int group, int mask)
 {
 	if (!body->isStaticOrKinematicObject() && !(body->getFlags() &BT_DISABLE_WORLD_GRAVITY))
 	{
@@ -953,7 +952,7 @@ void btDiscreteDynamicsWorld::createPredictiveContactsInternal( btRigidBody** bo
 						int index = manifold->addManifoldPoint(newPoint, isPredictive);
 						btManifoldPoint& pt = manifold->getContactPoint(index);
 						pt.m_combinedRestitution = 0;
-						pt.m_combinedFriction = btManifoldResult::calculateCombinedFriction(body,sweepResults.m_hitCollisionObject);
+						pt.m_combinedFriction = gCalculateCombinedFrictionCallback(body,sweepResults.m_hitCollisionObject);
 						pt.m_positionWorldOnA = body->getWorldTransform().getOrigin();
 						pt.m_positionWorldOnB = worldPointB;
 
@@ -1114,7 +1113,7 @@ void btDiscreteDynamicsWorld::integrateTransforms(btScalar timeStep)
 			for (int p=0;p<manifold->getNumContacts();p++)
 			{
 				const btManifoldPoint& pt = manifold->getContactPoint(p);
-				btScalar combinedRestitution = btManifoldResult::calculateCombinedRestitution(body0, body1);
+				btScalar combinedRestitution = gCalculateCombinedRestitutionCallback(body0, body1);
 
 				if (combinedRestitution>0 && pt.m_appliedImpulse != 0.f)
 				//if (pt.getDistance()>0 && combinedRestitution>0 && pt.m_appliedImpulse != 0.f)
@@ -1512,6 +1511,9 @@ void	btDiscreteDynamicsWorld::serializeDynamicsWorldInfo(btSerializer* serialize
 
 		worldInfo->m_solverInfo.m_splitImpulse = getSolverInfo().m_splitImpulse;
 
+		// Fill padding with zeros to appease msan.
+		memset(worldInfo->m_solverInfo.m_padding, 0, sizeof(worldInfo->m_solverInfo.m_padding));
+
 #ifdef BT_USE_DOUBLE_PRECISION
 		const char* structType = "btDynamicsWorldDoubleData";
 #else//BT_USE_DOUBLE_PRECISION
@@ -1530,6 +1532,8 @@ void	btDiscreteDynamicsWorld::serialize(btSerializer* serializer)
 	serializeCollisionObjects(serializer);
 
 	serializeRigidBodies(serializer);
+
+	serializeContactManifolds(serializer);
 
 	serializer->finishSerialization();
 }
