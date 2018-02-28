@@ -24,7 +24,7 @@ subject to the following restrictions:
 #include "LinearMath/btSerializer.h"
 
 
-void	btMultiBodyDynamicsWorld::addMultiBody(btMultiBody* body, short group, short mask)
+void	btMultiBodyDynamicsWorld::addMultiBody(btMultiBody* body, int group, int mask)
 {
 	m_multiBodies.push_back(body);
 
@@ -332,10 +332,10 @@ struct MultiBodyInplaceSolverIslandCallback : public btSimulationIslandManager::
 				}
 			}
 
-			if (m_solverInfo->m_minimumSolverBatchSize<=1)
-			{
-				m_solver->solveGroup( bodies,numBodies,manifolds, numManifolds,startConstraint,numCurConstraints,*m_solverInfo,m_debugDrawer,m_dispatcher);
-			} else
+			//if (m_solverInfo->m_minimumSolverBatchSize<=1)
+			//{
+			//	m_solver->solveGroup( bodies,numBodies,manifolds, numManifolds,startConstraint,numCurConstraints,*m_solverInfo,m_debugDrawer,m_dispatcher);
+			//} else
 			{
 				
 				for (i=0;i<numBodies;i++)
@@ -411,6 +411,8 @@ void	btMultiBodyDynamicsWorld::solveConstraints(btContactSolverInfo& solverInfo)
 
 	BT_PROFILE("solveConstraints");
 	
+	clearMultiBodyConstraintForces();
+
 	m_sortedConstraints.resize( m_constraints.size());
 	int i; 
 	for (i=0;i<getNumConstraints();i++)
@@ -669,7 +671,7 @@ void	btMultiBodyDynamicsWorld::solveConstraints(btContactSolverInfo& solverInfo)
 		}
 	}
 
-	clearMultiBodyConstraintForces();
+	
 
 	m_solverMultiBodyIslandCallback->processConstraints();
 	
@@ -798,6 +800,8 @@ void	btMultiBodyDynamicsWorld::debugDrawWorld()
 {
 	BT_PROFILE("btMultiBodyDynamicsWorld debugDrawWorld");
 
+	btDiscreteDynamicsWorld::debugDrawWorld();
+
 	bool drawConstraints = false;
 	if (getDebugDrawer())
 	{
@@ -867,7 +871,7 @@ void	btMultiBodyDynamicsWorld::debugDrawWorld()
 		}
 	}
 
-	btDiscreteDynamicsWorld::debugDrawWorld();
+	
 }
 
 
@@ -917,7 +921,7 @@ void btMultiBodyDynamicsWorld::clearMultiBodyConstraintForces()
 void btMultiBodyDynamicsWorld::clearMultiBodyForces()
 {
               {
-                BT_PROFILE("clearMultiBodyForces");
+               // BT_PROFILE("clearMultiBodyForces");
                 for (int i=0;i<this->m_multiBodies.size();i++)
                 {
                         btMultiBody* bod = m_multiBodies[i];
@@ -968,6 +972,8 @@ void	btMultiBodyDynamicsWorld::serialize(btSerializer* serializer)
 
 	serializeCollisionObjects(serializer);
 
+	serializeContactManifolds(serializer);
+
 	serializer->finishSerialization();
 }
 
@@ -983,6 +989,19 @@ void	btMultiBodyDynamicsWorld::serializeMultiBodies(btSerializer* serializer)
 			btChunk* chunk = serializer->allocate(len,1);
 			const char* structType = mb->serialize(chunk->m_oldPtr, serializer);
 			serializer->finalizeChunk(chunk,structType,BT_MULTIBODY_CODE,mb);
+		}
+	}
+
+	//serialize all multibody links (collision objects)
+	for (i=0;i<m_collisionObjects.size();i++)
+	{
+		btCollisionObject* colObj = m_collisionObjects[i];
+		if (colObj->getInternalType() == btCollisionObject::CO_FEATHERSTONE_LINK)
+		{
+			int len = colObj->calculateSerializeBufferSize();
+			btChunk* chunk = serializer->allocate(len,1);
+			const char* structType = colObj->serialize(chunk->m_oldPtr, serializer);
+			serializer->finalizeChunk(chunk,structType,BT_MB_LINKCOLLIDER_CODE,colObj);
 		}
 	}
 
