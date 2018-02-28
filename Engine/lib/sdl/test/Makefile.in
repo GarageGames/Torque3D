@@ -66,8 +66,9 @@ TARGETS = \
 	testdisplayinfo$(EXE) \
 	testqsort$(EXE) \
 	controllermap$(EXE) \
+	testvulkan$(EXE) \
 	
-all: Makefile $(TARGETS)
+all: Makefile $(TARGETS) copydatafiles
 
 Makefile: $(srcdir)/Makefile.in
 	$(SHELL) config.status $@
@@ -289,6 +290,9 @@ testcustomcursor$(EXE): $(srcdir)/testcustomcursor.c
 controllermap$(EXE): $(srcdir)/controllermap.c
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
+testvulkan$(EXE): $(srcdir)/testvulkan.c
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
 
 clean:
 	rm -f $(TARGETS)
@@ -297,3 +301,20 @@ distclean: clean
 	rm -f Makefile
 	rm -f config.status config.cache config.log
 	rm -rf $(srcdir)/autom4te*
+
+
+%.bmp: $(srcdir)/%.bmp
+	cp $< $@
+
+%.wav: $(srcdir)/%.wav
+	cp $< $@
+
+copydatafiles: copybmpfiles copywavfiles
+.PHONY : copydatafiles
+
+copybmpfiles: $(foreach bmp,$(wildcard $(srcdir)/*.bmp),$(notdir $(bmp)))
+.PHONY : copybmpfiles
+
+copywavfiles: $(foreach wav,$(wildcard $(srcdir)/*.wav),$(notdir $(wav)))
+.PHONY : copywavfiles
+

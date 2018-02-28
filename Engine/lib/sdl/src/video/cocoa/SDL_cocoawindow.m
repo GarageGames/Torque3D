@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2017 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -38,6 +38,7 @@
 #include "SDL_cocoavideo.h"
 #include "SDL_cocoashape.h"
 #include "SDL_cocoamouse.h"
+#include "SDL_cocoamousetap.h"
 #include "SDL_cocoaopengl.h"
 #include "SDL_assert.h"
 
@@ -64,9 +65,30 @@
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender;
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 - (BOOL)wantsPeriodicDraggingUpdates;
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem;
+
+- (SDL_Window*)findSDLWindow;
 @end
 
 @implementation SDLWindow
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem
+{
+    /* Only allow using the macOS native fullscreen toggle menubar item if the
+     * window is resizable and not in a SDL fullscreen mode.
+     */
+    if ([menuItem action] == @selector(toggleFullScreen:)) {
+        SDL_Window *window = [self findSDLWindow];
+        if (window == NULL) {
+            return NO;
+        } else if ((window->flags & (SDL_WINDOW_FULLSCREEN|SDL_WINDOW_FULLSCREEN_DESKTOP)) != 0) {
+            return NO;
+        } else if ((window->flags & SDL_WINDOW_RESIZABLE) == 0) {
+            return NO;
+        }
+    }
+    return [super validateMenuItem:menuItem];
+}
 
 - (BOOL)canBecomeKeyWindow
 {
@@ -82,7 +104,7 @@
 {
     [super sendEvent:event];
 
-    if ([event type] != NSLeftMouseUp) {
+    if ([event type] != NSEventTypeLeftMouseUp) {
         return;
     }
 
@@ -116,11 +138,10 @@
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 { @autoreleasepool
 {
-    SDL_VideoDevice *_this = SDL_GetVideoDevice();
     NSPasteboard *pasteboard = [sender draggingPasteboard];
     NSArray *types = [NSArray arrayWithObject:NSFilenamesPboardType];
     NSString *desiredType = [pasteboard availableTypeFromArray:types];
-    SDL_Window *sdlwindow = nil;
+    SDL_Window *sdlwindow = [self findSDLWindow];
 
     if (desiredType == nil) {
         return NO;  /* can't accept anything that's being dropped here. */
@@ -157,16 +178,6 @@
             }
         }
 
-        /* !!! FIXME: is there a better way to do this? */
-        if (_this) {
-            for (sdlwindow = _this->windows; sdlwindow; sdlwindow = sdlwindow->next) {
-                NSWindow *nswindow = ((SDL_WindowData *) sdlwindow->driverdata)->nswindow;
-                if (nswindow == self) {
-                    break;
-                }
-            }
-        }
-
         if (!SDL_SendDropFile(sdlwindow, [[fileURL path] UTF8String])) {
             return NO;
         }
@@ -179,6 +190,24 @@
 - (BOOL)wantsPeriodicDraggingUpdates
 {
     return NO;
+}
+
+- (SDL_Window*)findSDLWindow
+{
+    SDL_Window *sdlwindow = NULL;
+    SDL_VideoDevice *_this = SDL_GetVideoDevice();
+
+    /* !!! FIXME: is there a better way to do this? */
+    if (_this) {
+        for (sdlwindow = _this->windows; sdlwindow; sdlwindow = sdlwindow->next) {
+            NSWindow *nswindow = ((SDL_WindowData *) sdlwindow->driverdata)->nswindow;
+            if (nswindow == self) {
+                break;
+            }
+        }
+    }
+
+    return sdlwindow;
 }
 
 @end
@@ -220,15 +249,15 @@ GetWindowStyle(SDL_Window * window)
     NSUInteger style = 0;
 
     if (window->flags & SDL_WINDOW_FULLSCREEN) {
-        style = NSBorderlessWindowMask;
+        style = NSWindowStyleMaskBorderless;
     } else {
         if (window->flags & SDL_WINDOW_BORDERLESS) {
-            style = NSBorderlessWindowMask;
+            style = NSWindowStyleMaskBorderless;
         } else {
-            style = (NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask);
+            style = (NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable);
         }
         if (window->flags & SDL_WINDOW_RESIZABLE) {
-            style |= NSResizableWindowMask;
+            style |= NSWindowStyleMaskResizable;
         }
     }
     return style;
@@ -491,6 +520,11 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
     NSRect rect = [nswindow contentRectForFrameRect:[nswindow frame]];
     ConvertNSRect([nswindow screen], fullscreen, &rect);
 
+    if (inFullscreenTransition) {
+        /* We'll take care of this at the end of the transition */
+        return;
+    }
+
     if (s_moveHack) {
         SDL_bool blockMove = ((SDL_GetTicks() - s_moveHack) < 500);
 
@@ -594,8 +628,8 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
         [NSMenu setMenuBarVisible:NO];
     }
 
-    const unsigned int newflags = [NSEvent modifierFlags] & NSAlphaShiftKeyMask;
-    _data->videodata->modifierFlags = (_data->videodata->modifierFlags & ~NSAlphaShiftKeyMask) | newflags;
+    const unsigned int newflags = [NSEvent modifierFlags] & NSEventModifierFlagCapsLock;
+    _data->videodata->modifierFlags = (_data->videodata->modifierFlags & ~NSEventModifierFlagCapsLock) | newflags;
     SDL_ToggleModState(KMOD_CAPS, newflags != 0);
 }
 
@@ -641,7 +675,7 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 {
     SDL_Window *window = _data->window;
 
-    SetWindowStyle(window, (NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask));
+    SetWindowStyle(window, (NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskResizable));
 
     isFullscreenSpace = YES;
     inFullscreenTransition = YES;
@@ -666,6 +700,8 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 - (void)windowDidEnterFullScreen:(NSNotification *)aNotification
 {
     SDL_Window *window = _data->window;
+    SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+    NSWindow *nswindow = data->nswindow;
 
     inFullscreenTransition = NO;
 
@@ -673,6 +709,11 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
         pendingWindowOperation = PENDING_OPERATION_NONE;
         [self setFullscreenSpace:NO];
     } else {
+        /* Unset the resizable flag. 
+           This is a workaround for https://bugzilla.libsdl.org/show_bug.cgi?id=3697
+         */
+        SetWindowStyle(window, [nswindow styleMask] & (~NSWindowStyleMaskResizable));
+
         if ((window->flags & SDL_WINDOW_FULLSCREEN_DESKTOP) == SDL_WINDOW_FULLSCREEN_DESKTOP) {
             [NSMenu setMenuBarVisible:NO];
         }
@@ -683,6 +724,7 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
          */
         window->w = 0;
         window->h = 0;
+        [self windowDidMove:aNotification];
         [self windowDidResize:aNotification];
     }
 }
@@ -691,13 +733,13 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 {
     SDL_Window *window = _data->window;
 
+    isFullscreenSpace = NO;
+    inFullscreenTransition = YES;
+
     /* As of OS X 10.11, the window seems to need to be resizable when exiting
        a Space, in order for it to resize back to its windowed-mode size.
      */
-    SetWindowStyle(window, GetWindowStyle(window) | NSResizableWindowMask);
-
-    isFullscreenSpace = NO;
-    inFullscreenTransition = YES;
+    SetWindowStyle(window, GetWindowStyle(window) | NSWindowStyleMaskResizable);
 }
 
 - (void)windowDidFailToExitFullScreen:(NSNotification *)aNotification
@@ -708,7 +750,7 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
         return;
     }
 
-    SetWindowStyle(window, (NSTitledWindowMask|NSClosableWindowMask|NSMiniaturizableWindowMask|NSResizableWindowMask));
+    SetWindowStyle(window, (NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable|NSWindowStyleMaskResizable));
     
     isFullscreenSpace = YES;
     inFullscreenTransition = NO;
@@ -744,11 +786,36 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
         [NSMenu setMenuBarVisible:YES];
 
         pendingWindowOperation = PENDING_OPERATION_NONE;
+
+#if 0
+/* This fixed bug 3719, which is that changing window size while fullscreen
+   doesn't take effect when leaving fullscreen, but introduces bug 3809,
+   which is that a maximized window doesn't go back to normal size when
+   restored, so this code is disabled until we can properly handle the
+   beginning and end of maximize and restore.
+ */
+        /* Restore windowed size and position in case it changed while fullscreen */
+        {
+            NSRect rect;
+            rect.origin.x = window->windowed.x;
+            rect.origin.y = window->windowed.y;
+            rect.size.width = window->windowed.w;
+            rect.size.height = window->windowed.h;
+            ConvertNSRect([nswindow screen], NO, &rect);
+
+            s_moveHack = 0;
+            [nswindow setContentSize:rect.size];
+            [nswindow setFrameOrigin:rect.origin];
+            s_moveHack = SDL_GetTicks();
+        }
+#endif /* 0 */
+
         /* Force the size change event in case it was delivered earlier
            while the window was still animating into place.
          */
         window->w = 0;
         window->h = 0;
+        [self windowDidMove:aNotification];
         [self windowDidResize:aNotification];
 
         /* FIXME: Why does the window get hidden? */
@@ -839,7 +906,7 @@ SetWindowStyle(SDL_Window * window, NSUInteger style)
 
     switch ([theEvent buttonNumber]) {
     case 0:
-        if (([theEvent modifierFlags] & NSControlKeyMask) &&
+        if (([theEvent modifierFlags] & NSEventModifierFlagControl) &&
 		    GetHintCtrlClickEmulateRightClick()) {
             wasCtrlLeft = YES;
             button = SDL_BUTTON_RIGHT;
@@ -1168,12 +1235,12 @@ SetupWindowData(_THIS, SDL_Window * window, NSWindow *nswindow, SDL_bool created
     {
         unsigned long style = [nswindow styleMask];
 
-        if (style == NSBorderlessWindowMask) {
+        if (style == NSWindowStyleMaskBorderless) {
             window->flags |= SDL_WINDOW_BORDERLESS;
         } else {
             window->flags &= ~SDL_WINDOW_BORDERLESS;
         }
-        if (style & NSResizableWindowMask) {
+        if (style & NSWindowStyleMaskResizable) {
             window->flags |= SDL_WINDOW_RESIZABLE;
         } else {
             window->flags &= ~SDL_WINDOW_RESIZABLE;
@@ -1534,7 +1601,7 @@ Cocoa_SetWindowFullscreen(_THIS, SDL_Window * window, SDL_VideoDisplay * display
             rect.origin.y += (screenRect.size.height - rect.size.height);
         }
 
-        [nswindow setStyleMask:NSBorderlessWindowMask];
+        [nswindow setStyleMask:NSWindowStyleMaskBorderless];
     } else {
         rect.origin.x = window->windowed.x;
         rect.origin.y = window->windowed.y;
@@ -1634,8 +1701,13 @@ Cocoa_GetWindowGammaRamp(_THIS, SDL_Window * window, Uint16 * ramp)
 void
 Cocoa_SetWindowGrab(_THIS, SDL_Window * window, SDL_bool grabbed)
 {
-    /* Move the cursor to the nearest point in the window */
+    SDL_Mouse *mouse = SDL_GetMouse();
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
+
+    /* Enable or disable the event tap as necessary */
+    Cocoa_EnableMouseEventTap(mouse->driverdata, grabbed);
+
+    /* Move the cursor to the nearest point in the window */
     if (grabbed && data && ![data->listener isMoving]) {
         int x, y;
         CGPoint cgpoint;
@@ -1700,7 +1772,7 @@ Cocoa_GetWindowWMInfo(_THIS, SDL_Window * window, SDL_SysWMinfo * info)
         info->info.cocoa.window = nswindow;
         return SDL_TRUE;
     } else {
-        SDL_SetError("Application not compiled with SDL %d.%d\n",
+        SDL_SetError("Application not compiled with SDL %d.%d",
                      SDL_MAJOR_VERSION, SDL_MINOR_VERSION);
         return SDL_FALSE;
     }

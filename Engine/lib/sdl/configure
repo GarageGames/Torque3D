@@ -658,10 +658,10 @@ X_PRE_LIBS
 X_CFLAGS
 XMKMF
 ARTSCONFIG
-PKG_CONFIG
 ESD_LIBS
 ESD_CFLAGS
 ESD_CONFIG
+PKG_CONFIG
 ALSA_LIBS
 ALSA_CFLAGS
 POW_LIB
@@ -798,6 +798,7 @@ enable_mmx
 enable_3dnow
 enable_sse
 enable_sse2
+enable_sse3
 enable_altivec
 enable_oss
 enable_alsa
@@ -805,6 +806,8 @@ with_alsa_prefix
 with_alsa_inc_prefix
 enable_alsatest
 enable_alsa_shared
+enable_jack
+enable_jack_shared
 enable_esd
 with_esd_prefix
 with_esd_exec_prefix
@@ -818,13 +821,18 @@ enable_nas
 enable_nas_shared
 enable_sndio
 enable_sndio_shared
+enable_fusionsound
+enable_fusionsound_shared
 enable_diskaudio
 enable_dummyaudio
+enable_libsamplerate
+enable_libsamplerate_shared
 enable_video_wayland
 enable_video_wayland_qt_touch
 enable_wayland_shared
 enable_video_mir
 enable_mir_shared
+enable_video_rpi
 enable_video_x11
 with_x
 enable_x11_shared
@@ -840,13 +848,14 @@ enable_video_vivante
 enable_video_cocoa
 enable_video_directfb
 enable_directfb_shared
-enable_fusionsound
-enable_fusionsound_shared
+enable_video_kmsdrm
+enable_kmsdrm_shared
 enable_video_dummy
 enable_video_opengl
 enable_video_opengles
 enable_video_opengles1
 enable_video_opengles2
+enable_video_vulkan
 enable_libudev
 enable_dbus
 enable_ime
@@ -1521,16 +1530,19 @@ Optional Features:
   --enable-cpuinfo        Enable the cpuinfo subsystem [[default=yes]]
   --enable-assembly       Enable assembly routines [[default=yes]]
   --enable-ssemath        Allow GCC to use SSE floating point math
-                          [[default=no]]
+                          [[default=maybe]]
   --enable-mmx            use MMX assembly routines [[default=yes]]
   --enable-3dnow          use 3DNow! assembly routines [[default=yes]]
   --enable-sse            use SSE assembly routines [[default=yes]]
-  --enable-sse2           use SSE2 assembly routines [[default=no]]
+  --enable-sse2           use SSE2 assembly routines [[default=maybe]]
+  --enable-sse3           use SSE3 assembly routines [[default=maybe]]
   --enable-altivec        use Altivec assembly routines [[default=yes]]
   --enable-oss            support the OSS audio API [[default=maybe]]
   --enable-alsa           support the ALSA audio API [[default=yes]]
   --disable-alsatest      Do not try to compile and run a test Alsa program
   --enable-alsa-shared    dynamically load ALSA audio support [[default=yes]]
+  --enable-jack           use JACK audio [[default=yes]]
+  --enable-jack-shared    dynamically load JACK audio support [[default=yes]]
   --enable-esd            support the Enlightened Sound Daemon [[default=yes]]
   --disable-esdtest       Do not try to compile and run a test ESD program
   --enable-esd-shared     dynamically load ESD audio support [[default=yes]]
@@ -1544,8 +1556,16 @@ Optional Features:
   --enable-nas-shared     dynamically load NAS audio support [[default=yes]]
   --enable-sndio          support the sndio audio API [[default=yes]]
   --enable-sndio-shared   dynamically load sndio audio support [[default=yes]]
+  --enable-fusionsound    use FusionSound audio driver [[default=no]]
+  --enable-fusionsound-shared
+                          dynamically load fusionsound audio support
+                          [[default=yes]]
   --enable-diskaudio      support the disk writer audio driver [[default=yes]]
   --enable-dummyaudio     support the dummy audio driver [[default=yes]]
+  --enable-libsamplerate  use libsamplerate for audio rate conversion
+                          [[default=yes]]
+  --enable-libsamplerate-shared
+                          dynamically load libsamplerate [[default=yes]]
   --enable-video-wayland  use Wayland video driver [[default=yes]]
   --enable-video-wayland-qt-touch
                           QtWayland server support for Wayland video driver
@@ -1553,6 +1573,7 @@ Optional Features:
   --enable-wayland-shared dynamically load Wayland support [[default=maybe]]
   --enable-video-mir      use Mir video driver [[default=yes]]
   --enable-mir-shared     dynamically load Mir support [[default=maybe]]
+  --enable-video-rpi      use Raspberry Pi video driver [[default=yes]]
   --enable-video-x11      use X11 video driver [[default=yes]]
   --enable-x11-shared     dynamically load X11 support [[default=maybe]]
   --enable-video-x11-xcursor
@@ -1576,10 +1597,8 @@ Optional Features:
   --enable-video-directfb use DirectFB video driver [[default=no]]
   --enable-directfb-shared
                           dynamically load directfb support [[default=yes]]
-  --enable-fusionsound    use FusionSound audio driver [[default=no]]
-  --enable-fusionsound-shared
-                          dynamically load fusionsound audio support
-                          [[default=yes]]
+  --enable-video-kmsdrm   use KMSDRM video driver [[default=no]]
+  --enable-kmsdrm-shared  dynamically load kmsdrm support [[default=yes]]
   --enable-video-dummy    use dummy video driver [[default=yes]]
   --enable-video-opengl   include OpenGL support [[default=yes]]
   --enable-video-opengles include OpenGL ES support [[default=yes]]
@@ -1587,6 +1606,7 @@ Optional Features:
                           include OpenGL ES 1.1 support [[default=yes]]
   --enable-video-opengles2
                           include OpenGL ES 2.0 support [[default=yes]]
+  --enable-video-vulkan   include Vulkan support [[default=yes]]
   --enable-libudev        enable libudev support [[default=yes]]
   --enable-dbus           enable D-Bus support [[default=yes]]
   --enable-ime            enable IME support [[default=yes]]
@@ -2690,9 +2710,9 @@ orig_CFLAGS="$CFLAGS"
 #
 SDL_MAJOR_VERSION=2
 SDL_MINOR_VERSION=0
-SDL_MICRO_VERSION=5
-SDL_INTERFACE_AGE=1
-SDL_BINARY_AGE=5
+SDL_MICRO_VERSION=7
+SDL_INTERFACE_AGE=0
+SDL_BINARY_AGE=7
 SDL_VERSION=$SDL_MAJOR_VERSION.$SDL_MINOR_VERSION.$SDL_MICRO_VERSION
 
 
@@ -5977,7 +5997,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  x86_64-*linux*)
 	    LD="${LD-ld} -m elf_x86_64"
 	    ;;
-	  ppc*-*linux*|powerpc*-*linux*)
+	  powerpc64le-*linux*)
+	    LD="${LD-ld} -m elf64lppc"
+	    ;;
+	  powerpc64-*linux*)
 	    LD="${LD-ld} -m elf64ppc"
 	    ;;
 	  s390*-*linux*|s390*-*tpf*)
@@ -15656,7 +15679,7 @@ case "$host" in
         ;;
 esac
 
-INCLUDE="-I$srcdir/include"
+INCLUDE="-I$srcdir/include -idirafter $srcdir/src/video/khronos"
 if test x$srcdir != x.; then
     INCLUDE="-Iinclude $INCLUDE"
 elif test -d .hg; then
@@ -16148,7 +16171,7 @@ $as_echo "#define STDC_HEADERS 1" >>confdefs.h
 
 fi
 
-    for ac_header in sys/types.h stdio.h stdlib.h stddef.h stdarg.h malloc.h memory.h string.h strings.h inttypes.h stdint.h ctype.h math.h iconv.h signal.h
+    for ac_header in sys/types.h stdio.h stdlib.h stddef.h stdarg.h malloc.h memory.h string.h strings.h wchar.h inttypes.h stdint.h limits.h ctype.h math.h float.h iconv.h signal.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_c_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -16612,7 +16635,7 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 fi
 
-    for ac_func in malloc calloc realloc free getenv setenv putenv unsetenv qsort abs bcopy memset memcpy memmove strlen strlcpy strlcat strdup _strrev _strupr _strlwr strchr strrchr strstr itoa _ltoa _uitoa _ultoa strtol strtoul _i64toa _ui64toa strtoll strtoull atoi atof strcmp strncmp _stricmp strcasecmp _strnicmp strncasecmp vsscanf vsnprintf fseeko fseeko64 sigaction setjmp nanosleep sysconf sysctlbyname
+    for ac_func in malloc calloc realloc free getenv setenv putenv unsetenv qsort abs bcopy memset memcpy memmove wcslen wcscmp strlen strlcpy strlcat _strrev _strupr _strlwr strchr strrchr strstr itoa _ltoa _uitoa _ultoa strtol strtoul _i64toa _ui64toa strtoll strtoull atoi atof strcmp strncmp _stricmp strcasecmp _strnicmp strncasecmp vsscanf vsnprintf fopen64 fseeko fseeko64 sigaction setjmp nanosleep sysconf sysctlbyname getauxval poll
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -16733,9 +16756,23 @@ done
     ac_fn_c_check_member "$LINENO" "struct sigaction" "sa_sigaction" "ac_cv_member_struct_sigaction_sa_sigaction" "#include <signal.h>
 "
 if test "x$ac_cv_member_struct_sigaction_sa_sigaction" = xyes; then :
-  $as_echo "#define HAVE_SA_SIGACTION 1" >>confdefs.h
+
+$as_echo "#define HAVE_SA_SIGACTION 1" >>confdefs.h
 
 fi
+
+
+	    for ac_header in libunwind.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "libunwind.h" "ac_cv_header_libunwind_h" "$ac_includes_default"
+if test "x$ac_cv_header_libunwind_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBUNWIND_H 1
+_ACEOF
+
+fi
+
+done
 
 fi
 
@@ -17072,7 +17109,7 @@ else
 fi
 
     if test x$enable_ssemath = xno; then
-        if test x$have_gcc_sse = xyes -o x$have_gcc_sse2 = xyes; then
+        if test x$have_gcc_sse = xyes -o x$have_gcc_sse2 = xyes -o x$have_gcc_sse3 = xyes; then
             EXTRA_CFLAGS="$EXTRA_CFLAGS -mfpmath=387"
         fi
     fi
@@ -17296,6 +17333,63 @@ $as_echo "$have_gcc_sse2" >&6; }
         if test x$have_gcc_sse2 = xyes; then
             EXTRA_CFLAGS="$EXTRA_CFLAGS $sse2_CFLAGS"
             SUMMARY_math="${SUMMARY_math} sse2"
+        fi
+    fi
+
+    # Check whether --enable-sse3 was given.
+if test "${enable_sse3+set}" = set; then :
+  enableval=$enable_sse3;
+else
+  enable_sse3=$default_ssemath
+fi
+
+    if test x$enable_sse3 = xyes; then
+        save_CFLAGS="$CFLAGS"
+        have_gcc_sse3=no
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GCC -msse3 option" >&5
+$as_echo_n "checking for GCC -msse3 option... " >&6; }
+        sse3_CFLAGS="-msse3"
+        CFLAGS="$save_CFLAGS $sse3_CFLAGS"
+
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+        #ifdef __MINGW32__
+        #include <_mingw.h>
+        #ifdef __MINGW64_VERSION_MAJOR
+        #include <intrin.h>
+        #else
+        #include <pmmintrin.h>
+        #endif
+        #else
+        #include <pmmintrin.h>
+        #endif
+        #ifndef __SSE2__
+        #error Assembler CPP flag not enabled
+        #endif
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+        have_gcc_sse3=yes
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_gcc_sse3" >&5
+$as_echo "$have_gcc_sse3" >&6; }
+        CFLAGS="$save_CFLAGS"
+
+        if test x$have_gcc_sse3 = xyes; then
+            EXTRA_CFLAGS="$EXTRA_CFLAGS $sse3_CFLAGS"
+            SUMMARY_math="${SUMMARY_math} sse3"
         fi
     fi
 
@@ -17795,6 +17889,119 @@ _ACEOF
             else
                 EXTRA_LDFLAGS="$EXTRA_LDFLAGS $ALSA_LIBS"
                 SUMMARY_audio="${SUMMARY_audio} alsa"
+            fi
+            have_audio=yes
+        fi
+    fi
+}
+
+CheckJACK()
+{
+    # Check whether --enable-jack was given.
+if test "${enable_jack+set}" = set; then :
+  enableval=$enable_jack;
+else
+  enable_jack=yes
+fi
+
+    if test x$enable_audio = xyes -a x$enable_jack = xyes; then
+        audio_jack=no
+
+        JACK_REQUIRED_VERSION=0.125
+
+        # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PKG_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
+  ;;
+esac
+fi
+PKG_CONFIG=$ac_cv_path_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKG_CONFIG" >&5
+$as_echo "$PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for JACK $JACK_REQUIRED_VERSION support" >&5
+$as_echo_n "checking for JACK $JACK_REQUIRED_VERSION support... " >&6; }
+        if test x$PKG_CONFIG != xno; then
+        if $PKG_CONFIG --atleast-pkgconfig-version 0.7 && $PKG_CONFIG --atleast-version $JACK_REQUIRED_VERSION jack; then
+                JACK_CFLAGS=`$PKG_CONFIG --cflags jack`
+                JACK_LIBS=`$PKG_CONFIG --libs jack`
+                audio_jack=yes
+            fi
+        fi
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $audio_jack" >&5
+$as_echo "$audio_jack" >&6; }
+
+        if test x$audio_jack = xyes; then
+            # Check whether --enable-jack-shared was given.
+if test "${enable_jack_shared+set}" = set; then :
+  enableval=$enable_jack_shared;
+else
+  enable_jack_shared=yes
+fi
+
+            jack_lib=`find_lib "libjack.so.*" "$JACK_LIBS" | sed 's/.*\/\(.*\)/\1/; q'`
+
+
+$as_echo "#define SDL_AUDIO_DRIVER_JACK 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/audio/jack/*.c"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS $JACK_CFLAGS"
+            if test x$have_loadso != xyes && \
+               test x$enable_jack_shared = xyes; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You must have SDL_LoadObject() support for dynamic JACK audio loading" >&5
+$as_echo "$as_me: WARNING: You must have SDL_LoadObject() support for dynamic JACK audio loading" >&2;}
+            fi
+            if test x$have_loadso = xyes && \
+               test x$enable_jack_shared = xyes && test x$jack_lib != x; then
+                echo "-- dynamic libjack -> $jack_lib"
+
+cat >>confdefs.h <<_ACEOF
+#define SDL_AUDIO_DRIVER_JACK_DYNAMIC "$jack_lib"
+_ACEOF
+
+                SUMMARY_audio="${SUMMARY_audio} jack(dynamic)"
+
+                case "$host" in
+                    # On Solaris, jack must be linked deferred explicitly
+                    # to prevent undefined symbol failures.
+                    *-*-solaris*)
+                        JACK_LIBS=`echo $JACK_LIBS | sed 's/\-l/-Wl,-l/g'`
+                        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-zdeferred $JACK_LIBS -Wl,-znodeferred"
+                esac
+            else
+                EXTRA_LDFLAGS="$EXTRA_LDFLAGS $JACK_LIBS"
+                SUMMARY_audio="${SUMMARY_audio} jack"
             fi
             have_audio=yes
         fi
@@ -18544,6 +18751,116 @@ $as_echo "#define SDL_AUDIO_DRIVER_SNDIO 1" >>confdefs.h
     fi
 }
 
+CheckFusionSound()
+{
+    # Check whether --enable-fusionsound was given.
+if test "${enable_fusionsound+set}" = set; then :
+  enableval=$enable_fusionsound;
+else
+  enable_fusionsound=no
+fi
+
+    if test x$enable_audio = xyes -a x$enable_fusionsound = xyes; then
+        fusionsound=no
+
+        FUSIONSOUND_REQUIRED_VERSION=1.1.1
+
+        # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PKG_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
+  ;;
+esac
+fi
+PKG_CONFIG=$ac_cv_path_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKG_CONFIG" >&5
+$as_echo "$PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for FusionSound $FUSIONSOUND_REQUIRED_VERSION support" >&5
+$as_echo_n "checking for FusionSound $FUSIONSOUND_REQUIRED_VERSION support... " >&6; }
+        if test x$PKG_CONFIG != xno; then
+            if $PKG_CONFIG --atleast-pkgconfig-version 0.7 && $PKG_CONFIG --atleast-version $FUSIONSOUND_REQUIRED_VERSION fusionsound; then
+                FUSIONSOUND_CFLAGS=`$PKG_CONFIG --cflags fusionsound`
+                FUSIONSOUND_LIBS=`$PKG_CONFIG --libs fusionsound`
+                fusionsound=yes
+            fi
+        fi
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $fusionsound" >&5
+$as_echo "$fusionsound" >&6; }
+
+        if test x$fusionsound = xyes; then
+
+$as_echo "#define SDL_AUDIO_DRIVER_FUSIONSOUND 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/audio/fusionsound/*.c"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS $FUSIONSOUND_CFLAGS"
+
+            # Check whether --enable-fusionsound-shared was given.
+if test "${enable_fusionsound_shared+set}" = set; then :
+  enableval=$enable_fusionsound_shared;
+else
+  enable_fusionsound_shared=yes
+fi
+
+            fusionsound_shared=no
+            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for FusionSound dynamic loading support" >&5
+$as_echo_n "checking for FusionSound dynamic loading support... " >&6; }
+            if test x$have_loadso != xyes && \
+               test x$enable_fusionsound_shared = xyes; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You must have SDL_LoadObject() support for dynamic fusionsound loading" >&5
+$as_echo "$as_me: WARNING: You must have SDL_LoadObject() support for dynamic fusionsound loading" >&2;}
+            fi
+            if test x$have_loadso = xyes && \
+               test x$enable_fusionsound_shared = xyes; then
+
+cat >>confdefs.h <<_ACEOF
+#define SDL_AUDIO_DRIVER_FUSIONSOUND_DYNAMIC "libfusionsound.so"
+_ACEOF
+
+                fusionsound_shared=yes
+                SUMMARY_audio="${SUMMARY_audio} fusionsound(dynamic)"
+            else
+                EXTRA_LDFLAGS="$EXTRA_LDFLAGS $FUSIONSOUND_LIBS"
+                SUMMARY_audio="${SUMMARY_audio} fusionsound"
+            fi
+            { $as_echo "$as_me:${as_lineno-$LINENO}: result: $fusionsound_shared" >&5
+$as_echo "$fusionsound_shared" >&6; }
+
+            have_audio=yes
+        fi
+    fi
+}
+
 CheckDiskAudio()
 {
     # Check whether --enable-diskaudio was given.
@@ -18577,6 +18894,59 @@ $as_echo "#define SDL_AUDIO_DRIVER_DUMMY 1" >>confdefs.h
 
         SOURCES="$SOURCES $srcdir/src/audio/dummy/*.c"
         SUMMARY_audio="${SUMMARY_audio} dummy"
+    fi
+}
+
+CheckLibSampleRate()
+{
+    # Check whether --enable-libsamplerate was given.
+if test "${enable_libsamplerate+set}" = set; then :
+  enableval=$enable_libsamplerate;
+else
+  enable_libsamplerate=yes
+fi
+
+    if test x$enable_libsamplerate = xyes; then
+        ac_fn_c_check_header_mongrel "$LINENO" "samplerate.h" "ac_cv_header_samplerate_h" "$ac_includes_default"
+if test "x$ac_cv_header_samplerate_h" = xyes; then :
+  have_samplerate_h_hdr=yes
+else
+  have_samplerate_h_hdr=no
+fi
+
+
+        if test x$have_samplerate_h_hdr = xyes; then
+
+$as_echo "#define HAVE_LIBSAMPLERATE_H 1" >>confdefs.h
+
+
+            # Check whether --enable-libsamplerate-shared was given.
+if test "${enable_libsamplerate_shared+set}" = set; then :
+  enableval=$enable_libsamplerate_shared;
+else
+  enable_libsamplerate_shared=yes
+fi
+
+
+            samplerate_lib=`find_lib "libsamplerate.so.*" "" | sed 's/.*\/\(.*\)/\1/; q'`
+
+            if test x$have_loadso != xyes && \
+               test x$enable_libsamplerate_shared = xyes; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You must have SDL_LoadObject() support for dynamic libsamplerate loading" >&5
+$as_echo "$as_me: WARNING: You must have SDL_LoadObject() support for dynamic libsamplerate loading" >&2;}
+            fi
+            if test x$have_loadso = xyes && \
+               test x$enable_libsamplerate_shared = xyes && test x$samplerate_lib != x; then
+                echo "-- dynamic libsamplerate -> $samplerate_lib"
+
+cat >>confdefs.h <<_ACEOF
+#define SDL_LIBSAMPLERATE_DYNAMIC "$samplerate_lib"
+_ACEOF
+
+            else
+                EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lsamplerate"
+            fi
+        fi
     fi
 }
 
@@ -18978,7 +19348,7 @@ int
 main ()
 {
 
-                    MirTouchAction actions = mir_touch_actions
+                    MirWindowAttrib attrib = mir_window_attrib_state
 
   ;
   return 0;
@@ -19073,9 +19443,11 @@ main ()
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
-        $as_echo "#define SDL_VIDEO_DRIVER_NACL 1" >>confdefs.h
 
-        $as_echo "#define SDL_AUDIO_DRIVER_NACL 1" >>confdefs.h
+$as_echo "#define SDL_VIDEO_DRIVER_NACL 1" >>confdefs.h
+
+
+$as_echo "#define SDL_AUDIO_DRIVER_NACL 1" >>confdefs.h
 
 
 $as_echo "#define HAVE_POW 1" >>confdefs.h
@@ -19103,10 +19475,77 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 }
 
 
-CheckX11()
+CheckRPI()
+{
+    # Check whether --enable-video-rpi was given.
+if test "${enable_video_rpi+set}" = set; then :
+  enableval=$enable_video_rpi;
+else
+  enable_video_rpi=yes
+fi
+
+    if test x$enable_video = xyes -a x$enable_video_rpi = xyes; then
+        if test x$ARCH = xnetbsd; then
+            RPI_CFLAGS="-I/usr/pkg/include -I/usr/pkg/include/interface/vcos/pthreads -I/usr/pkg/include/interface/vmcs_host/linux"
+            RPI_LDFLAGS="-Wl,-R/usr/pkg/lib -L/usr/pkg/lib -lbcm_host"
+        else
+            RPI_CFLAGS="-I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux"
+            RPI_LDFLAGS="-L/opt/vc/lib -lbcm_host"
+        fi
+
+        # Save the original compiler flags and libraries
+        ac_save_cflags="$CFLAGS"; ac_save_libs="$LIBS"
+
+        # Add the Raspberry Pi compiler flags and libraries
+        CFLAGS="$CFLAGS $RPI_CFLAGS"; LIBS="$LIBS $RPI_LDFLAGS"
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Raspberry Pi" >&5
+$as_echo_n "checking for Raspberry Pi... " >&6; }
+        have_video_rpi=no
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+          #include <bcm_host.h>
+
+int
+main ()
 {
 
+          bcm_host_init();
 
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+        have_video_rpi=yes
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_video_rpi" >&5
+$as_echo "$have_video_rpi" >&6; }
+
+        # Restore the compiler flags and libraries
+        CFLAGS="$ac_save_cflags"; LIBS="$ac_save_libs"
+
+        if test x$have_video_rpi = xyes; then
+            CFLAGS="$CFLAGS $RPI_CFLAGS"
+            SDL_CFLAGS="$SDL_CFLAGS $RPI_CFLAGS"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS $RPI_CFLAGS"
+            EXTRA_LDFLAGS="$EXTRA_LDFLAGS $RPI_LDFLAGS"
+            SOURCES="$SOURCES $srcdir/src/video/raspberry/*.c"
+
+$as_echo "#define SDL_VIDEO_DRIVER_RPI 1" >>confdefs.h
+
+            SUMMARY_video="${SUMMARY_video} rpi"
+        fi
+    fi
+}
+
+CheckX11()
+{
     # Check whether --enable-video-x11 was given.
 if test "${enable_video_x11+set}" = set; then :
   enableval=$enable_video_x11;
@@ -19942,7 +20381,8 @@ _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
             have_const_param_XextAddDisplay=yes
-            $as_echo "#define SDL_VIDEO_DRIVER_X11_CONST_PARAM_XEXTADDDISPLAY 1" >>confdefs.h
+
+$as_echo "#define SDL_VIDEO_DRIVER_X11_CONST_PARAM_XEXTADDDISPLAY 1" >>confdefs.h
 
 
 fi
@@ -19976,7 +20416,8 @@ _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
                 have_XGenericEvent=yes
-                $as_echo "#define SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS 1" >>confdefs.h
+
+$as_echo "#define SDL_VIDEO_DRIVER_X11_SUPPORTS_GENERIC_EVENTS 1" >>confdefs.h
 
 
 fi
@@ -20925,7 +21366,7 @@ $as_echo "#define SDL_VIDEO_RENDER_DIRECTFB 1" >>confdefs.h
             { $as_echo "$as_me:${as_lineno-$LINENO}: checking for directfb dynamic loading support" >&5
 $as_echo_n "checking for directfb dynamic loading support... " >&6; }
             directfb_shared=no
-            directfb_lib=`find_lib "libdirectfb.so.*" "$DIRECTFB_LIBS"`
+            directfb_lib=`find_lib "libdirectfb*.so.*" "$DIRECTFB_LIBS"`
             # | sed 's/.*\/\(.*\)/\1/; q'`]
 { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: \"directfb $directfb_lib\"" >&5
 $as_echo "$as_me: WARNING: \"directfb $directfb_lib\"" >&2;}
@@ -20956,19 +21397,23 @@ $as_echo "$directfb_shared" >&6; }
     fi
 }
 
-CheckFusionSound()
+CheckKMSDRM()
 {
-    # Check whether --enable-fusionsound was given.
-if test "${enable_fusionsound+set}" = set; then :
-  enableval=$enable_fusionsound;
+    # Check whether --enable-video-kmsdrm was given.
+if test "${enable_video_kmsdrm+set}" = set; then :
+  enableval=$enable_video_kmsdrm;
 else
-  enable_fusionsound=no
+  enable_video_kmsdrm=no
 fi
 
-    if test x$enable_audio = xyes -a x$enable_fusionsound = xyes; then
-        fusionsound=no
 
-        FUSIONSOUND_REQUIRED_VERSION=1.1.1
+    if test x$enable_video = xyes -a x$enable_video_kmsdrm = xyes; then
+        video_kmsdrm=no
+        libdrm_avail=no
+        libgbm_avail=no
+
+        LIBDRM_REQUIRED_VERSION=2.4.46
+        LIBGBM_REQUIRED_VERSION=9.0.0
 
         # Extract the first word of "pkg-config", so it can be a program name with args.
 set dummy pkg-config; ac_word=$2
@@ -21011,57 +21456,86 @@ $as_echo "no" >&6; }
 fi
 
 
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for FusionSound $FUSIONSOUND_REQUIRED_VERSION support" >&5
-$as_echo_n "checking for FusionSound $FUSIONSOUND_REQUIRED_VERSION support... " >&6; }
         if test x$PKG_CONFIG != xno; then
-            if $PKG_CONFIG --atleast-pkgconfig-version 0.7 && $PKG_CONFIG --atleast-version $FUSIONSOUND_REQUIRED_VERSION fusionsound; then
-                FUSIONSOUND_CFLAGS=`$PKG_CONFIG --cflags fusionsound`
-                FUSIONSOUND_LIBS=`$PKG_CONFIG --libs fusionsound`
-                fusionsound=yes
-            fi
-        fi
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $fusionsound" >&5
-$as_echo "$fusionsound" >&6; }
+            if $PKG_CONFIG --atleast-pkgconfig-version 0.7; then
+                if $PKG_CONFIG --atleast-version $LIBDRM_REQUIRED_VERSION libdrm; then
+                    LIBDRM_CFLAGS=`$PKG_CONFIG --cflags libdrm`
+                    LIBDRM_LIBS=`$PKG_CONFIG --libs libdrm`
+                    LIBDRM_PREFIX=`$PKG_CONFIG --variable=prefix libdrm`
+                    libdrm_avail=yes
+                fi
+                if $PKG_CONFIG --atleast-version $LIBGBM_REQUIRED_VERSION gbm; then
+                    LIBGBM_CFLAGS=`$PKG_CONFIG --cflags gbm`
+                    LIBGBM_LIBS=`$PKG_CONFIG --libs gbm`
+                    LIBGBM_PREFIX=`$PKG_CONFIG --variable=prefix gbm`
+                    libgbm_avail=yes
+                fi
+                if test x$libdrm_avail = xyes -a x$libgbm_avail = xyes; then
+                    video_kmsdrm=yes
+                fi
 
-        if test x$fusionsound = xyes; then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libdrm $LIBDRM_REQUIRED_VERSION library for kmsdrm support" >&5
+$as_echo_n "checking for libdrm $LIBDRM_REQUIRED_VERSION library for kmsdrm support... " >&6; }
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libdrm_avail" >&5
+$as_echo "$libdrm_avail" >&6; }
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libgbm $LIBGBM_REQUIRED_VERSION library for kmsdrm support" >&5
+$as_echo_n "checking for libgbm $LIBGBM_REQUIRED_VERSION library for kmsdrm support... " >&6; }
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libgbm_avail" >&5
+$as_echo "$libgbm_avail" >&6; }
 
-$as_echo "#define SDL_AUDIO_DRIVER_FUSIONSOUND 1" >>confdefs.h
-
-            SOURCES="$SOURCES $srcdir/src/audio/fusionsound/*.c"
-            EXTRA_CFLAGS="$EXTRA_CFLAGS $FUSIONSOUND_CFLAGS"
-
-            # Check whether --enable-fusionsound-shared was given.
-if test "${enable_fusionsound_shared+set}" = set; then :
-  enableval=$enable_fusionsound_shared;
+                if test x$video_kmsdrm = xyes; then
+                    # Check whether --enable-kmsdrm-shared was given.
+if test "${enable_kmsdrm_shared+set}" = set; then :
+  enableval=$enable_kmsdrm_shared;
 else
-  enable_fusionsound_shared=yes
+  enable_kmsdrm_shared=yes
 fi
 
-            fusionsound_shared=no
-            { $as_echo "$as_me:${as_lineno-$LINENO}: checking for FusionSound dynamic loading support" >&5
-$as_echo_n "checking for FusionSound dynamic loading support... " >&6; }
-            if test x$have_loadso != xyes && \
-               test x$enable_fusionsound_shared = xyes; then
-                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You must have SDL_LoadObject() support for dynamic fusionsound loading" >&5
-$as_echo "$as_me: WARNING: You must have SDL_LoadObject() support for dynamic fusionsound loading" >&2;}
-            fi
-            if test x$have_loadso = xyes && \
-               test x$enable_fusionsound_shared = xyes; then
+
+
+$as_echo "#define SDL_VIDEO_DRIVER_KMSDRM 1" >>confdefs.h
+
+                    SOURCES="$SOURCES $srcdir/src/video/kmsdrm/*.c"
+                    EXTRA_CFLAGS="$EXTRA_CFLAGS $LIBDRM_CFLAGS $LIBGBM_CFLAGS"
+
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for kmsdrm dynamic loading support" >&5
+$as_echo_n "checking for kmsdrm dynamic loading support... " >&6; }
+                    kmsdrm_shared=no
+                    drm_lib=`find_lib "libdrm.so.*" "$DRM_LIBS"`
+                    gbm_lib=`find_lib "libgbm.so.*" "$DRM_LIBS"`
+                    if test x$have_loadso != xyes && \
+                       test x$enable_kmsdrm_shared = xyes; then
+                        { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You must have SDL_LoadObject() support for dynamic kmsdrm loading" >&5
+$as_echo "$as_me: WARNING: You must have SDL_LoadObject() support for dynamic kmsdrm loading" >&2;}
+                    fi
+                    if test x$have_loadso = xyes && \
+                       test x$enable_kmsdrm_shared = xyes && test x$drm_lib != x && test x$gbm_lib != x; then
+                        kmsdrm_shared=yes
 
 cat >>confdefs.h <<_ACEOF
-#define SDL_AUDIO_DRIVER_FUSIONSOUND_DYNAMIC "libfusionsound.so"
+#define SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC "$drm_lib"
 _ACEOF
 
-                fusionsound_shared=yes
-                SUMMARY_audio="${SUMMARY_audio} fusionsound(dynamic)"
-            else
-                EXTRA_LDFLAGS="$EXTRA_LDFLAGS $FUSIONSOUND_LIBS"
-                SUMMARY_audio="${SUMMARY_audio} fusionsound"
-            fi
-            { $as_echo "$as_me:${as_lineno-$LINENO}: result: $fusionsound_shared" >&5
-$as_echo "$fusionsound_shared" >&6; }
 
-            have_audio=yes
+cat >>confdefs.h <<_ACEOF
+#define SDL_VIDEO_DRIVER_KMSDRM_DYNAMIC_GBM "$gbm_lib"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_KMSDRM_SHARED "TRUE"
+_ACEOF
+
+                        SUMMARY_video="${SUMMARY_video} kmsdrm(dynamic)"
+                    else
+                        EXTRA_LDFLAGS="$EXTRA_LDFLAGS $LIBDRM_LIBS $LIBGBM_LIBS"
+                        SUMMARY_video="${SUMMARY_video} kmsdrm"
+                    fi
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $kmsdrm_shared" >&5
+$as_echo "$kmsdrm_shared" >&6; }
+                    have_video=yes
+                fi
+            fi
         fi
     fi
 }
@@ -21082,6 +21556,32 @@ $as_echo "#define SDL_VIDEO_DRIVER_DUMMY 1" >>confdefs.h
         SOURCES="$SOURCES $srcdir/src/video/dummy/*.c"
         have_video=yes
         SUMMARY_video="${SUMMARY_video} dummy"
+    fi
+}
+
+CheckQNXVideo()
+{
+    if test x$enable_video = xyes; then
+
+$as_echo "#define SDL_VIDEO_DRIVER_QNX 1" >>confdefs.h
+
+        SOURCES="$SOURCES $srcdir/src/video/qnx/*.c"
+        have_video=yes
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lscreen -lEGL -lGLESv2"
+        SUMMARY_video="${SUMMARY_video} qnx"
+    fi
+}
+
+CheckQNXAudio()
+{
+    if test x$enable_audio = xyes; then
+
+$as_echo "#define SDL_AUDIO_DRIVER_QSA 1" >>confdefs.h
+
+        SOURCES="$SOURCES $srcdir/src/audio/qsa/*.c"
+        have_audio=yes
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lasound"
+        SUMMARY_audio="${SUMMARY_audio} qsa"
     fi
 }
 
@@ -21475,6 +21975,97 @@ $as_echo "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
     fi
 }
 
+# Check whether --enable-video-vulkan was given.
+if test "${enable_video_vulkan+set}" = set; then :
+  enableval=$enable_video_vulkan;
+else
+  enable_video_vulkan=yes
+fi
+
+
+CheckVulkan()
+{
+    if test x$enable_video = xyes -a x$enable_video_vulkan = xyes; then
+        case "$host" in
+            *-*-androideabi*)
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                  #if defined(__ARM_ARCH) && __ARM_ARCH < 7
+                  #error Vulkan doesn't work on this configuration
+                  #endif
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+
+else
+
+                    enable_video_vulkan=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+                ;;
+            *-*-darwin*)
+                save_CFLAGS="$CFLAGS"
+                                CFLAGS="$CFLAGS -x objective-c"
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                  #include <Cocoa/Cocoa.h>
+                  #include <Metal/Metal.h>
+                  #include <QuartzCore/CAMetalLayer.h>
+
+                  #if !TARGET_CPU_X86_64
+                  #error Vulkan doesn't work on this configuration
+                  #endif
+
+int
+main ()
+{
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+
+
+else
+
+                    enable_video_vulkan=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+                CFLAGS="$save_CFLAGS"
+                ;;
+            *)
+                ;;
+        esac
+        if test x$enable_video_vulkan = xno; then
+            # For reasons I am totally unable to see, I get an undefined macro error if
+            # I put this in the AC_TRY_COMPILE.
+            { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Vulkan does not work on this configuration." >&5
+$as_echo "$as_me: WARNING: Vulkan does not work on this configuration." >&2;}
+        fi
+    fi
+    if test x$enable_video_vulkan = xyes; then
+
+$as_echo "#define SDL_VIDEO_VULKAN 1" >>confdefs.h
+
+        SUMMARY_video="${SUMMARY_video} vulkan"
+    fi
+}
+
 CheckInputEvents()
 {
             { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Linux 2.4 unified input interface" >&5
@@ -21575,6 +22166,16 @@ fi
 
 $as_echo "#define HAVE_LIBUDEV_H 1" >>confdefs.h
 
+
+            udev_lib=`find_lib "libudev.so.*" "" | sed 's/.*\/\(.*\)/\1/; q'`
+            if test x$udev_lib != x; then
+                echo "-- dynamic udev -> $udev_lib"
+
+cat >>confdefs.h <<_ACEOF
+#define SDL_UDEV_DYNAMIC "$udev_lib"
+_ACEOF
+
+            fi
         fi
     fi
 }
@@ -21974,6 +22575,10 @@ fi
             pthread_cflags="-D_REENTRANT"
             pthread_lib=""
             ;;
+        *-*-nto*)
+            pthread_cflags="-D_REENTRANT"
+            pthread_lib=""
+            ;;
         *)
             pthread_cflags="-D_REENTRANT"
             pthread_lib="-lpthread"
@@ -22147,7 +22752,8 @@ _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
 
                 have_sem_timedwait=yes
-                $as_echo "#define HAVE_SEM_TIMEDWAIT 1" >>confdefs.h
+
+$as_echo "#define HAVE_SEM_TIMEDWAIT 1" >>confdefs.h
 
 
 fi
@@ -22403,6 +23009,58 @@ if test "x$ac_cv_header_xinput_h" = xyes; then :
 fi
 
 
+        ac_fn_c_check_header_mongrel "$LINENO" "mmdeviceapi.h" "ac_cv_header_mmdeviceapi_h" "$ac_includes_default"
+if test "x$ac_cv_header_mmdeviceapi_h" = xyes; then :
+  have_wasapi=yes
+fi
+
+
+        ac_fn_c_check_header_mongrel "$LINENO" "audioclient.h" "ac_cv_header_audioclient_h" "$ac_includes_default"
+if test "x$ac_cv_header_audioclient_h" = xyes; then :
+
+else
+  have_wasapi=no
+fi
+
+
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <windows.h>
+#include <xinput.h>
+XINPUT_GAMEPAD_EX x1;
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  have_xinput_gamepadex=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <windows.h>
+#include <xinput.h>
+XINPUT_STATE_EX s1;
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"; then :
+  have_xinput_stateex=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
         if test x$have_ddraw = xyes; then
 
@@ -22427,6 +23085,16 @@ $as_echo "#define HAVE_DXGI_H 1" >>confdefs.h
         if test x$have_xinput = xyes; then
 
 $as_echo "#define HAVE_XINPUT_H 1" >>confdefs.h
+
+        fi
+        if test x$have_xinput_gamepadex = xyes; then
+
+$as_echo "#define HAVE_XINPUT_GAMEPAD_EX 1" >>confdefs.h
+
+        fi
+        if test x$have_xinput_stateex = xyes; then
+
+$as_echo "#define HAVE_XINPUT_STATE_EX 1" >>confdefs.h
 
         fi
 
@@ -23052,24 +23720,8 @@ fi
 CheckWarnAll
 
 case "$host" in
-    *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*)
+    *-*-linux*|*-*-uclinux*|*-*-gnu*|*-*-k*bsd*-gnu|*-*-bsdi*|*-*-freebsd*|*-*-dragonfly*|*-*-netbsd*|*-*-openbsd*|*-*-sysv5*|*-*-solaris*|*-*-hpux*|*-*-aix*|*-*-minix*|*-*-nto*)
         case "$host" in
-            *-raspberry-linux*)
-                # Raspberry Pi
-                ARCH=linux
-                RPI_CFLAGS="-I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux"
-                CFLAGS="$CFLAGS $RPI_CFLAGS"
-                SDL_CFLAGS="$SDL_CFLAGS $RPI_CFLAGS"
-                EXTRA_CFLAGS="$EXTRA_CFLAGS $RPI_CFLAGS"
-                EXTRA_LDFLAGS="$EXTRA_LDFLAGS -L/opt/vc/lib -lbcm_host -ldl"
-
-                if test x$enable_video = xyes; then
-                    SOURCES="$SOURCES $srcdir/src/video/raspberry/*.c"
-                    # FIXME: confdefs? Not AC_DEFINE?
-                    $as_echo "#define SDL_VIDEO_DRIVER_RPI 1" >>confdefs.h
-                    SUMMARY_video="${SUMMARY_video} rpi"
-                fi
-                ;;
             *-*-androideabi*)
                 # Android
                 ARCH=android
@@ -23078,6 +23730,7 @@ case "$host" in
                 SDL_CFLAGS="$SDL_CFLAGS $ANDROID_CFLAGS"
                 EXTRA_CFLAGS="$EXTRA_CFLAGS $ANDROID_CFLAGS"
                 EXTRA_LDFLAGS="$EXTRA_LDFLAGS -ldl -lGLESv1_CM -lGLESv2 -llog -landroid"
+                SDLMAIN_SOURCES="$srcdir/src/main/android/*.c"
 
                 if test x$enable_video = xyes; then
                     SOURCES="$SOURCES $srcdir/src/core/android/*.c $srcdir/src/video/android/*.c"
@@ -23095,21 +23748,6 @@ case "$host" in
             *-*-bsdi*)          ARCH=bsdi ;;
             *-*-freebsd*)       ARCH=freebsd ;;
             *-*-dragonfly*)     ARCH=freebsd ;;
-            *-raspberry-netbsd*)
-                # Raspberry Pi
-                ARCH=netbsd
-                RPI_CFLAGS="-I/usr/pkg/include -I/usr/pkg/include/interface/vcos/pthreads -I/usr/pkg/include/interface/vmcs_host/linux"
-                CFLAGS="$CFLAGS $RPI_CFLAGS"
-                SDL_CFLAGS="$SDL_CFLAGS $RPI_CFLAGS"
-                EXTRA_CFLAGS="$EXTRA_CFLAGS $RPI_CFLAGS"
-                EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-R/usr/pkg/lib -L/usr/pkg/lib -lbcm_host -ldl"
-
-                if test x$enable_video = xyes; then
-                    SOURCES="$SOURCES $srcdir/src/video/raspberry/*.c"
-                    $as_echo "#define SDL_VIDEO_DRIVER_RPI 1" >>confdefs.h
-                    SUMMARY_video="${SUMMARY_video} raspberry"
-                fi
-                ;;
             *-*-netbsd*)        ARCH=netbsd ;;
             *-*-openbsd*)       ARCH=openbsd ;;
             *-*-sysv5*)         ARCH=sysv5 ;;
@@ -23117,6 +23755,9 @@ case "$host" in
             *-*-hpux*)          ARCH=hpux ;;
             *-*-aix*)           ARCH=aix ;;
             *-*-minix*)         ARCH=minix ;;
+            *-*-nto*)           ARCH=nto
+                CheckQNXVideo
+                ;;
         esac
         CheckVisibilityHidden
         CheckDeclarationAfterStatement
@@ -23127,15 +23768,21 @@ case "$host" in
         CheckOSS
         CheckALSA
         CheckPulseAudio
+        CheckJACK
         CheckARTSC
         CheckESD
         CheckNAS
         CheckSNDIO
+        CheckFusionSound
+        CheckLibSampleRate
+        # Need to check for Raspberry PI first and add platform specific compiler flags, otherwise the test for GLES fails!
+        CheckRPI
         CheckX11
         CheckDirectFB
-        CheckFusionSound
+        CheckKMSDRM
         CheckOpenGLX11
         CheckOpenGLESX11
+        CheckVulkan
         CheckMir
         CheckWayland
         CheckLibUDev
@@ -23156,6 +23803,7 @@ case "$host" in
         CheckLinuxVersion
         CheckRPATH
         CheckVivanteVideo
+
         # Set up files for the audio library
         if test x$enable_audio = xyes; then
           case $ARCH in
@@ -23164,13 +23812,15 @@ case "$host" in
 $as_echo "#define SDL_AUDIO_DRIVER_SUNAUDIO 1" >>confdefs.h
 
                 SOURCES="$SOURCES $srcdir/src/audio/sun/*.c"
+                SUMMARY_audio="${SUMMARY_audio} sun"
                 have_audio=yes
             ;;
             netbsd)  # Don't use this on OpenBSD, it's busted.
 
-$as_echo "#define SDL_AUDIO_DRIVER_BSD 1" >>confdefs.h
+$as_echo "#define SDL_AUDIO_DRIVER_NETBSD 1" >>confdefs.h
 
-                SOURCES="$SOURCES $srcdir/src/audio/bsd/*.c"
+                SOURCES="$SOURCES $srcdir/src/audio/netbsd/*.c"
+                SUMMARY_audio="${SUMMARY_audio} netbsd"
                 have_audio=yes
             ;;
             aix)
@@ -23178,6 +23828,7 @@ $as_echo "#define SDL_AUDIO_DRIVER_BSD 1" >>confdefs.h
 $as_echo "#define SDL_AUDIO_DRIVER_PAUDIO 1" >>confdefs.h
 
                 SOURCES="$SOURCES $srcdir/src/audio/paudio/*.c"
+                SUMMARY_audio="${SUMMARY_audio} paudio"
                 have_audio=yes
             ;;
             android)
@@ -23187,6 +23838,9 @@ $as_echo "#define SDL_AUDIO_DRIVER_ANDROID 1" >>confdefs.h
                 SOURCES="$SOURCES $srcdir/src/audio/android/*.c"
                 SUMMARY_audio="${SUMMARY_audio} android"
                 have_audio=yes
+            ;;
+            nto)
+                CheckQNXAudio
             ;;
           esac
         fi
@@ -23198,6 +23852,7 @@ $as_echo "#define SDL_AUDIO_DRIVER_ANDROID 1" >>confdefs.h
 $as_echo "#define SDL_JOYSTICK_LINUX 1" >>confdefs.h
 
                 SOURCES="$SOURCES $srcdir/src/joystick/linux/*.c"
+                SOURCES="$SOURCES $srcdir/src/joystick/steam/*.c"
                 have_joystick=yes
             ;;
             android)
@@ -23205,6 +23860,7 @@ $as_echo "#define SDL_JOYSTICK_LINUX 1" >>confdefs.h
 $as_echo "#define SDL_JOYSTICK_ANDROID 1" >>confdefs.h
 
                 SOURCES="$SOURCES $srcdir/src/joystick/android/*.c"
+                SOURCES="$SOURCES $srcdir/src/joystick/steam/*.c"
                 have_joystick=yes
             ;;
           esac
@@ -23275,8 +23931,10 @@ $as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
         fi
         # Set up files for evdev input
         if test x$use_input_events = xyes; then
-            SOURCES="$SOURCES $srcdir/src/core/linux/SDL_evdev.c"
+            SOURCES="$SOURCES $srcdir/src/core/linux/SDL_evdev*.c"
         fi
+        # Set up other core UNIX files
+        SOURCES="$SOURCES $srcdir/src/core/unix/*.c"
         ;;
     *-*-cygwin* | *-*-mingw32*)
         ARCH=win32
@@ -23289,12 +23947,14 @@ $as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
                 ac_default_prefix=$BUILD_PREFIX
             fi
         fi
+        CheckDeclarationAfterStatement
         CheckDummyVideo
         CheckDiskAudio
         CheckDummyAudio
         CheckWINDOWS
         CheckWINDOWSGL
         CheckWINDOWSGLES
+        CheckVulkan
         CheckDIRECTX
 
         # Set up the core platform files
@@ -23342,6 +24002,12 @@ $as_echo "#define SDL_AUDIO_DRIVER_DSOUND 1" >>confdefs.h
 $as_echo "#define SDL_AUDIO_DRIVER_XAUDIO2 1" >>confdefs.h
 
                 SOURCES="$SOURCES $srcdir/src/audio/xaudio2/*.c"
+            fi
+            if test x$have_wasapi = xyes; then
+
+$as_echo "#define SDL_AUDIO_DRIVER_WASAPI 1" >>confdefs.h
+
+                SOURCES="$SOURCES $srcdir/src/audio/wasapi/*.c"
             fi
             have_audio=yes
         fi
@@ -23490,6 +24156,7 @@ fi
         CheckDummyVideo
         CheckDiskAudio
         CheckDummyAudio
+        CheckDLOPEN
         CheckHaikuVideo
         CheckHaikuGL
         CheckPTHREAD
@@ -23500,6 +24167,7 @@ fi
 $as_echo "#define SDL_AUDIO_DRIVER_HAIKU 1" >>confdefs.h
 
             SOURCES="$SOURCES $srcdir/src/audio/haiku/*.cc"
+            SUMMARY_audio="${SUMMARY_audio} haiku"
             have_audio=yes
         fi
         # Set up files for the joystick library
@@ -23517,14 +24185,6 @@ $as_echo "#define SDL_TIMER_HAIKU 1" >>confdefs.h
 
             SOURCES="$SOURCES $srcdir/src/timer/haiku/*.c"
             have_timers=yes
-        fi
-        # Set up files for the shared object loading library
-        if test x$enable_loadso = xyes; then
-
-$as_echo "#define SDL_LOADSO_HAIKU 1" >>confdefs.h
-
-            SOURCES="$SOURCES $srcdir/src/loadso/haiku/*.c"
-            have_loadso=yes
         fi
         # Set up files for the system power library
         if test x$enable_power = xyes; then
@@ -23545,10 +24205,33 @@ $as_echo "#define SDL_FILESYSTEM_HAIKU 1" >>confdefs.h
         # The Haiku platform requires special setup.
         SOURCES="$srcdir/src/main/haiku/*.cc $SOURCES"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lroot -lbe -lmedia -lgame -ldevice -ltextencoding"
+        # Haiku's x86 spins use libstdc++.r4.so (for binary compat?), but
+        #  other spins, like x86-64, use a more standard "libstdc++.so.*"
+        as_ac_File=`$as_echo "ac_cv_file_"/boot/system/lib/libstdc++.r4.so"" | $as_tr_sh`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for \"/boot/system/lib/libstdc++.r4.so\"" >&5
+$as_echo_n "checking for \"/boot/system/lib/libstdc++.r4.so\"... " >&6; }
+if eval \${$as_ac_File+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r ""/boot/system/lib/libstdc++.r4.so""; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+eval ac_res=\$$as_ac_File
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+if eval test \"x\$"$as_ac_File"\" = x"yes"; then :
+  EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lstdc++.r4"
+else
+  EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lstdc++"
+fi
+
         ;;
-    arm*-apple-darwin*)
-        # iOS - We are not writing anything to confdefs.h because you have to replace
-        # SDL_config.h for SDL_config_iphoneos.h anyway
+    arm*-apple-darwin*|*-ios-*)
         ARCH=ios
 
         CheckVisibilityHidden
@@ -23557,19 +24240,25 @@ $as_echo "#define SDL_FILESYSTEM_HAIKU 1" >>confdefs.h
         CheckDiskAudio
         CheckDummyAudio
         CheckDLOPEN
-        CheckCOCOA
         CheckPTHREAD
-
+        CheckVulkan
 
         # Set up files for the audio library
         if test x$enable_audio = xyes; then
+
+$as_echo "#define SDL_AUDIO_DRIVER_COREAUDIO 1" >>confdefs.h
+
             SOURCES="$SOURCES $srcdir/src/audio/coreaudio/*.m"
             SUMMARY_audio="${SUMMARY_audio} coreaudio"
             have_audio=yes
         fi
         # Set up files for the joystick library
         if test x$enable_joystick = xyes; then
+
+$as_echo "#define SDL_JOYSTICK_MFI 1" >>confdefs.h
+
             SOURCES="$SOURCES $srcdir/src/joystick/iphoneos/*.m"
+            SOURCES="$SOURCES $srcdir/src/joystick/steam/*.c"
             have_joystick=yes
         fi
         # Set up files for the haptic library
@@ -23580,6 +24269,9 @@ $as_echo "#define SDL_FILESYSTEM_HAIKU 1" >>confdefs.h
         #fi
         # Set up files for the power library
         if test x$enable_power = xyes; then
+
+$as_echo "#define SDL_POWER_UIKIT 1" >>confdefs.h
+
             SOURCES="$SOURCES $srcdir/src/power/uikit/*.m"
             have_power=yes
         fi
@@ -23588,28 +24280,51 @@ $as_echo "#define SDL_FILESYSTEM_HAIKU 1" >>confdefs.h
             SOURCES="$SOURCES $srcdir/src/filesystem/cocoa/*.m"
             have_filesystem=yes
         fi
+        # Set up additional files for the file library
+        if test x$enable_file = xyes; then
+
+$as_echo "#define SDL_FILESYSTEM_COCOA 1" >>confdefs.h
+
+            SOURCES="$SOURCES $srcdir/src/file/cocoa/*.m"
+        fi
         # Set up files for the timer library
         if test x$enable_timers = xyes; then
+
+$as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
+
             SOURCES="$SOURCES $srcdir/src/timer/unix/*.c"
             have_timers=yes
         fi
-        # Set up additional files for the file library
-        if test x$enable_file = xyes; then
-            SOURCES="$SOURCES $srcdir/src/file/cocoa/*.m"
-        fi
+        # Set up other core UNIX files
+        SOURCES="$SOURCES $srcdir/src/core/unix/*.c"
         # The iOS platform requires special setup.
+
+$as_echo "#define SDL_VIDEO_DRIVER_UIKIT 1" >>confdefs.h
+
+
+$as_echo "#define SDL_VIDEO_OPENGL_ES2 1" >>confdefs.h
+
+
+$as_echo "#define SDL_VIDEO_OPENGL_ES 1" >>confdefs.h
+
+
+$as_echo "#define SDL_VIDEO_RENDER_OGL_ES 1" >>confdefs.h
+
+
+$as_echo "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
+
         SOURCES="$SOURCES $srcdir/src/video/uikit/*.m"
-        EXTRA_CFLAGS="$EXTRA_CFLAGS -fpascal-strings"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lm -liconv -lobjc"
-        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,Foundation"
-        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,UIKit"
-        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,OpenGLES"
-        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,QuartzCore"
-        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreAudio"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,AVFoundation"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,AudioToolbox"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreAudio"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreGraphics"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreMotion"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,Foundation"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,GameController"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,OpenGLES"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,QuartzCore"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,UIKit"
         ;;
     *-*-darwin* )
         # This could be either full "Mac OS X", or plain "Darwin" which is
@@ -23631,6 +24346,7 @@ $as_echo "#define SDL_FILESYSTEM_HAIKU 1" >>confdefs.h
         CheckX11
         CheckMacGL
         CheckOpenGLX11
+        CheckVulkan
         CheckPTHREAD
 
         # Set up files for the audio library
@@ -23688,8 +24404,9 @@ $as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
         if test x$enable_file = xyes; then
             SOURCES="$SOURCES $srcdir/src/file/cocoa/*.m"
         fi
+        # Set up other core UNIX files
+        SOURCES="$SOURCES $srcdir/src/core/unix/*.c"
         # The Mac OS X platform requires special setup.
-        EXTRA_CFLAGS="$EXTRA_CFLAGS -fpascal-strings"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lobjc"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,CoreVideo"
         EXTRA_LDFLAGS="$EXTRA_LDFLAGS -Wl,-framework,Cocoa"
@@ -23706,7 +24423,8 @@ $as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
 
         # Set up files for the timer library
         if test x$enable_timers = xyes; then
-            $as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
+
+$as_echo "#define SDL_TIMER_UNIX 1" >>confdefs.h
 
             SOURCES="$SOURCES $srcdir/src/timer/unix/*.c"
             have_timers=yes
@@ -23916,16 +24634,16 @@ VERSION_DEPENDS=`echo "$VERSION_DEPENDS" | sed "s,\\([^ ]*\\)/\\([^ ]*\\)\\.rc,\
 
 SDLMAIN_OBJECTS=`echo $SDLMAIN_SOURCES`
 SDLMAIN_DEPENDS=`echo $SDLMAIN_SOURCES`
-SDLMAIN_OBJECTS=`echo "$SDLMAIN_OBJECTS" | sed 's,[^ ]*/\([^ ]*\)\.c,$(objects)/\1.o,g'`
+SDLMAIN_OBJECTS=`echo "$SDLMAIN_OBJECTS" | sed 's,[^ ]*/\([^ ]*\)\.c,$(objects)/\1.lo,g'`
 SDLMAIN_DEPENDS=`echo "$SDLMAIN_DEPENDS" | sed "s,\\([^ ]*\\)/\\([^ ]*\\)\\.c,\\\\
-\\$(objects)/\\2.o: \\1/\\2.c\\\\
+\\$(objects)/\\2.lo: \\1/\\2.c\\\\
 	\\$(RUN_CMD_CC)\\$(LIBTOOL) --tag=CC --mode=compile \\$(CC) \\$(CFLAGS) \\$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \\$< -o \\$@,g"`
 
 SDLTEST_OBJECTS=`echo $SDLTEST_SOURCES`
 SDLTEST_DEPENDS=`echo $SDLTEST_SOURCES`
-SDLTEST_OBJECTS=`echo "$SDLTEST_OBJECTS" | sed 's,[^ ]*/\([^ ]*\)\.c,$(objects)/\1.o,g'`
+SDLTEST_OBJECTS=`echo "$SDLTEST_OBJECTS" | sed 's,[^ ]*/\([^ ]*\)\.c,$(objects)/\1.lo,g'`
 SDLTEST_DEPENDS=`echo "$SDLTEST_DEPENDS" | sed "s,\\([^ ]*\\)/\\([^ ]*\\)\\.c,\\\\
-\\$(objects)/\\2.o: \\1/\\2.c\\\\
+\\$(objects)/\\2.lo: \\1/\\2.c\\\\
 	\\$(RUN_CMD_CC)\\$(LIBTOOL) --tag=CC --mode=compile \\$(CC) \\$(CFLAGS) \\$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \\$< -o \\$@,g"`
 
 # Set runtime shared library paths as needed
@@ -24045,30 +24763,35 @@ if test x$have_x = xyes; then
     SUMMARY="${SUMMARY}X11 libraries   :${SUMMARY_video_x11}\n"
 fi
 SUMMARY="${SUMMARY}Input drivers   :${SUMMARY_input}\n"
-if test x$enable_libudev = xyes; then
-    SUMMARY="${SUMMARY}Using libudev   : YES\n"
+if test x$have_samplerate_h_hdr = xyes; then
+    SUMMARY="${SUMMARY}Using libsamplerate : YES\n"
 else
-    SUMMARY="${SUMMARY}Using libudev   : NO\n"
+    SUMMARY="${SUMMARY}Using libsamplerate : NO\n"
+fi
+if test x$have_libudev_h_hdr = xyes; then
+    SUMMARY="${SUMMARY}Using libudev       : YES\n"
+else
+    SUMMARY="${SUMMARY}Using libudev       : NO\n"
 fi
 if test x$have_dbus_dbus_h_hdr = xyes; then
-    SUMMARY="${SUMMARY}Using dbus      : YES\n"
+    SUMMARY="${SUMMARY}Using dbus          : YES\n"
 else
-    SUMMARY="${SUMMARY}Using dbus      : NO\n"
+    SUMMARY="${SUMMARY}Using dbus          : NO\n"
 fi
 if test x$enable_ime = xyes; then
-    SUMMARY="${SUMMARY}Using ime       : YES\n"
+    SUMMARY="${SUMMARY}Using ime           : YES\n"
 else
-    SUMMARY="${SUMMARY}Using ime       : NO\n"
+    SUMMARY="${SUMMARY}Using ime           : NO\n"
 fi
 if test x$have_ibus_ibus_h_hdr = xyes; then
-    SUMMARY="${SUMMARY}Using ibus      : YES\n"
+    SUMMARY="${SUMMARY}Using ibus          : YES\n"
 else
-    SUMMARY="${SUMMARY}Using ibus      : NO\n"
+    SUMMARY="${SUMMARY}Using ibus          : NO\n"
 fi
 if test x$have_fcitx_frontend_h_hdr = xyes; then
-    SUMMARY="${SUMMARY}Using fcitx     : YES\n"
+    SUMMARY="${SUMMARY}Using fcitx         : YES\n"
 else
-    SUMMARY="${SUMMARY}Using fcitx     : NO\n"
+    SUMMARY="${SUMMARY}Using fcitx         : NO\n"
 fi
 ac_config_commands="$ac_config_commands summary"
 

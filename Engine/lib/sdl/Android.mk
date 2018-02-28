@@ -20,7 +20,7 @@ LOCAL_SRC_FILES := \
 	$(wildcard $(LOCAL_PATH)/src/audio/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/audio/android/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/audio/dummy/*.c) \
-	$(LOCAL_PATH)/src/atomic/SDL_atomic.c \
+	$(LOCAL_PATH)/src/atomic/SDL_atomic.c.arm \
 	$(LOCAL_PATH)/src/atomic/SDL_spinlock.c.arm \
 	$(wildcard $(LOCAL_PATH)/src/core/android/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/cpuinfo/*.c) \
@@ -28,9 +28,10 @@ LOCAL_SRC_FILES := \
 	$(wildcard $(LOCAL_PATH)/src/events/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/file/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/haptic/*.c) \
-	$(wildcard $(LOCAL_PATH)/src/haptic/dummy/*.c) \
+	$(wildcard $(LOCAL_PATH)/src/haptic/android/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/joystick/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/joystick/android/*.c) \
+	$(LOCAL_PATH)/src/joystick/steam/SDL_steamcontroller.c \
 	$(wildcard $(LOCAL_PATH)/src/loadso/dlopen/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/power/*.c) \
 	$(wildcard $(LOCAL_PATH)/src/power/android/*.c) \
@@ -61,9 +62,25 @@ LOCAL_MODULE := SDL2_static
 
 LOCAL_MODULE_FILENAME := libSDL2
 
-LOCAL_SRC_FILES += $(subst $(LOCAL_PATH)/,,$(LOCAL_PATH)/src/main/android/SDL_android_main.c)
-
 LOCAL_LDLIBS := 
-LOCAL_EXPORT_LDLIBS := -Wl,--undefined=Java_org_libsdl_app_SDLActivity_nativeInit -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
+LOCAL_EXPORT_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 
 include $(BUILD_STATIC_LIBRARY)
+
+###########################
+#
+# SDL main static library
+#
+###########################
+
+include $(CLEAR_VARS)
+
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/include
+
+LOCAL_MODULE := SDL2_main
+
+LOCAL_MODULE_FILENAME := libSDL2main
+
+include $(BUILD_STATIC_LIBRARY)
+
+
