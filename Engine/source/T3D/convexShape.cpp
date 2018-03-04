@@ -697,7 +697,7 @@ bool ConvexShape::buildPolyList( PolyListContext context, AbstractPolyList *plis
    return true;
 }
 
-bool ConvexShape::buildExportPolyList(PolyListContext context, ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &)
+bool ConvexShape::buildExportPolyList(ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &)
 {
    if (mGeometry.points.empty())
       return false;
@@ -740,9 +740,7 @@ bool ConvexShape::buildExportPolyList(PolyListContext context, ColladaUtils::Exp
       ColladaUtils::ExportData::detailLevel* curDetail = &meshData->meshDetailLevels.last();
 
       //Make sure we denote the size this detail level has
-      curDetail->size = getNextPow2(getObjBox().len());
-
-      bool t = true;
+      curDetail->size = 512;
    }
 
    return true;

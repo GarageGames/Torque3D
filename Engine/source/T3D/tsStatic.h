@@ -138,7 +138,7 @@ protected:
    bool castRay(const Point3F &start, const Point3F &end, RayInfo* info);
    bool castRayRendered(const Point3F &start, const Point3F &end, RayInfo* info);
    bool buildPolyList(PolyListContext context, AbstractPolyList* polyList, const Box3F &box, const SphereF& sphere);
-   bool buildExportPolyList(PolyListContext context, ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &);
+   bool buildExportPolyList(ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &);
    void buildConvex(const Box3F& box, Convex* convex);
    
    bool _createShape();

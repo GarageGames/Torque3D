@@ -564,8 +564,7 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
       /// @param   box        Box bounding volume
       /// @param   sphere     Sphere bounding volume
       ///
-      virtual bool buildExportPolyList(PolyListContext context,
-         ColladaUtils::ExportData *exportData,
+      virtual bool buildExportPolyList(ColladaUtils::ExportData *exportData,
          const Box3F& box,
          const SphereF& sphere) {
          return false;

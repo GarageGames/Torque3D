@@ -1073,7 +1073,7 @@ bool TSStatic::buildPolyList(PolyListContext context, AbstractPolyList* polyList
    return true;
 }
 
-bool TSStatic::buildExportPolyList(PolyListContext context, ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &)
+bool TSStatic::buildExportPolyList(ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &)
 {
    if (!mShapeInstance)
       return false;

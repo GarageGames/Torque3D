@@ -140,8 +140,6 @@ namespace ColladaUtils
 
          Point3F scale;
 
-         bool fillWithSingleDetail;
-
          S32 hasDetailLevel(S32 size)
          {
             for (U32 i = 0; i < meshDetailLevels.size(); ++i)
@@ -155,7 +153,7 @@ namespace ColladaUtils
             return -1;
          }
 
-         meshLODData() : shapeInst(nullptr), meshTransform(true), originatingObject(nullptr), scale(0), fillWithSingleDetail(false)
+         meshLODData() : shapeInst(nullptr), meshTransform(true), originatingObject(nullptr), scale(0)
          {}
       };
 

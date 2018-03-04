@@ -3932,7 +3932,7 @@ void WorldEditor::makeSelectionAMesh(const char *filename)
    for (S32 i = 0; i < objectList.size(); i++)
    {
       SceneObject *pObj = objectList[i];
-      if (!pObj->buildExportPolyList(PLC_Export, &exportData, pObj->getWorldBox(), pObj->getWorldSphere()))
+      if (!pObj->buildExportPolyList(&exportData, pObj->getWorldBox(), pObj->getWorldSphere()))
          Con::warnf("colladaExportObjectList() - object %i returned no geometry.", pObj->getId());
    }
 
