@@ -26,6 +26,9 @@
 #include "ts/collada/colladaUtils.h"
 #include "materials/matInstance.h"
 
+//special handling for export classes
+#include "T3D/convexShape.h"
+
 using namespace ColladaUtils;
 
 #define MAX_PATH_LENGTH 256
@@ -2994,10 +2997,27 @@ void ColladaUtils::ExportData::processData()
             curDetail->mesh.setTransform(&meshData[m].meshTransform, meshData[m].scale);
             curDetail->mesh.setObject(meshData[m].originatingObject);
 
-            if (!meshData[m].shapeInst->buildPolyList(&curDetail->mesh, detailLevelIdx))
+            if (meshData[m].shapeInst != nullptr)
             {
-               Con::errorf("TSStatic::buildExportPolyList - failed to build polylist for LOD %i", i);
-               continue;
+
+               if (!meshData[m].shapeInst->buildPolyList(&curDetail->mesh, detailLevelIdx))
+               {
+                  Con::errorf("TSStatic::buildExportPolyList - failed to build polylist for LOD %i", i);
+                  continue;
+               }
+            }
+            else
+            {
+               //special handling classes
+               ConvexShape* convexShp = dynamic_cast<ConvexShape*>(meshData[m].originatingObject);
+               if (convexShp != nullptr)
+               {
+                  if (!convexShp->buildPolyList(PLC_Export, &curDetail->mesh, meshData[m].originatingObject->getWorldBox(), meshData[m].originatingObject->getWorldSphere()))
+                  {
+                     Con::errorf("TSStatic::buildExportPolyList - failed to build ConvexShape polylist for LOD %i", i);
+                     continue;
+                  }
+               }
             }
 
             //lastly, get material

@@ -697,6 +697,57 @@ bool ConvexShape::buildPolyList( PolyListContext context, AbstractPolyList *plis
    return true;
 }
 
+bool ConvexShape::buildExportPolyList(PolyListContext context, ColladaUtils::ExportData* exportData, const Box3F &box, const SphereF &)
+{
+   if (mGeometry.points.empty())
+      return false;
+
+   //Get the collision mesh geometry
+   {
+      ColladaUtils::ExportData::colMesh* colMesh;
+      exportData->colMeshes.increment();
+      colMesh = &exportData->colMeshes.last();
+
+      colMesh->mesh.setTransform(&mObjToWorld, mObjScale);
+      colMesh->mesh.setObject(this);
+
+      //Just get the visible
+      buildPolyList(PLC_Export, &colMesh->mesh, getWorldBox(), getWorldSphere());
+
+      colMesh->colMeshName = String::ToString("ColMesh%d-1", exportData->colMeshes.size());
+   }
+
+   //Next, process the geometry and materials.
+   //Convex shapes only have the one 'level', so we'll just rely on the export post-process to back-fill
+   if (isServerObject() && getClientObject())
+   {
+      ConvexShape* clientShape = dynamic_cast<ConvexShape*>(getClientObject());
+
+      exportData->meshData.increment();
+
+      //Prep a meshData for this shape in particular
+      ColladaUtils::ExportData::meshLODData* meshData = &exportData->meshData.last();
+
+      //Fill out the info we'll need later to actually append our mesh data for the detail levels during the processing phase
+      meshData->shapeInst = nullptr;
+      meshData->originatingObject = this;
+      meshData->meshTransform = mObjToWorld;
+      meshData->scale = mObjScale;
+      meshData->fillWithSingleDetail = true;
+
+      meshData->meshDetailLevels.increment();
+
+      ColladaUtils::ExportData::detailLevel* curDetail = &meshData->meshDetailLevels.last();
+
+      //Make sure we denote the size this detail level has
+      curDetail->size = getNextPow2(getObjBox().len());
+
+      bool t = true;
+   }
+
+   return true;
+}
+
 void ConvexShape::_export( OptimizedPolyList *plist, const Box3F &box, const SphereF &sphere )
 {
    BaseMatInstance *matInst = mMaterialInst;
