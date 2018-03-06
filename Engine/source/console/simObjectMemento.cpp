@@ -137,7 +137,7 @@ SimObject *SimObjectMemento::restore() const
          tempBuffer = ( char* ) dMalloc( dStrlen( mState ) + uniqueNameLen + 1 );
          dMemcpy( tempBuffer, mState, numCharsToLeftParen );
          dMemcpy( &tempBuffer[ numCharsToLeftParen ], uniqueName, uniqueNameLen );
-         dStrcpy( &tempBuffer[ numCharsToLeftParen + uniqueNameLen ], &mState[ numCharsToLeftParen ] );
+         dStrcpy( &tempBuffer[ numCharsToLeftParen + uniqueNameLen ], &mState[ numCharsToLeftParen ], dStrlen(mState) - numCharsToLeftParen + 1 );
       }
 
       Con::evaluate( tempBuffer );

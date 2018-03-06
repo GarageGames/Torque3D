@@ -87,7 +87,7 @@ U32 Var::texUnitCount = 0;
 
 Var::Var()
 {
-   dStrcpy( (char*)type, "float4" );
+   dStrcpy( (char*)type, "float4", 32 );
    structName[0] = '\0';
    connectName[0] = '\0';
    constSortPos = cspUninit;

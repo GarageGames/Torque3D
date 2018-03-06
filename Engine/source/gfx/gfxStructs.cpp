@@ -40,7 +40,7 @@ void GFXVideoMode::parseFromString( const char *str )
 
    // Copy the string, as dStrtok is destructive
    char *tempBuf = new char[dStrlen( str ) + 1];
-   dStrcpy( tempBuf, str );
+   dStrcpy( tempBuf, str, dStrlen(str) + 1 );
 
 #define PARSE_ELEM(type, var, func, tokParam, sep) \
    if(const char *ptr = dStrtok( tokParam, sep)) \

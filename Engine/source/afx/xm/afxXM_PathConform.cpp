@@ -195,7 +195,7 @@ bool afxXM_PathConformData::onAdd()
   {
     Vector<char*> dataBlocks(__FILE__, __LINE__);
     char* tokCopy = new char[dStrlen(paths_string) + 1];
-    dStrcpy(tokCopy, paths_string);
+    dStrcpy(tokCopy, paths_string, dStrlen(paths_string) + 1);
     
     char* currTok = dStrtok(tokCopy, " \t");
     while (currTok != NULL) 

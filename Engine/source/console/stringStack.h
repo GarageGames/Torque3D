@@ -176,7 +176,7 @@ struct StringStack
       mLen = dStrlen(s);
 
       validateBufferSize(mStart + mLen + 2);
-      dStrcpy(mBuffer + mStart, s);
+      dStrcpy(mBuffer + mStart, s, mBufferSize - mStart);
    }
 
    /// Get the top of the stack, as a StringTableEntry.

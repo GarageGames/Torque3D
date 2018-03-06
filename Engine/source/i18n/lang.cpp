@@ -43,7 +43,7 @@ LangFile::LangFile(const UTF8 *langName /* = NULL */)
 	if(langName)
 	{
 		mLangName = new UTF8 [dStrlen(langName) + 1];
-		dStrcpy(mLangName, langName);
+		dStrcpy(mLangName, langName, dStrlen(langName) + 1);
 	}
 	else
 		mLangName = NULL;
@@ -137,7 +137,7 @@ const UTF8 * LangFile::getString(U32 id)
 U32 LangFile::addString(const UTF8 *str)
 {
 	UTF8 *newstr = new UTF8 [dStrlen(str) + 1];
-	dStrcpy(newstr, str);
+	dStrcpy(newstr, str, dStrlen(str) + 1);
 	mStringTable.push_back(newstr);
 	return mStringTable.size() - 1;
 }
@@ -157,7 +157,7 @@ void LangFile::setString(U32 id, const UTF8 *str)
    SAFE_DELETE_ARRAY(mStringTable[id]);
 
 	UTF8 *newstr = new UTF8 [dStrlen(str) + 1];
-	dStrcpy(newstr, str);
+	dStrcpy(newstr, str, dStrlen(str) + 1);
 	mStringTable[id] = newstr;
 }
 
@@ -167,7 +167,7 @@ void LangFile::setLangName(const UTF8 *newName)
 		delete [] mLangName;
 	
 	mLangName = new UTF8 [dStrlen(newName) + 1];
-	dStrcpy(mLangName, newName);
+	dStrcpy(mLangName, newName, dStrlen(newName) + 1);
 }
 
 void LangFile::setLangFile(const UTF8 *langFile)
@@ -176,7 +176,7 @@ void LangFile::setLangFile(const UTF8 *langFile)
 		delete [] mLangFile;
 	
 	mLangFile = new UTF8 [dStrlen(langFile) + 1];
-	dStrcpy(mLangFile, langFile);
+	dStrcpy(mLangFile, langFile, dStrlen(langFile) + 1);
 }
 
 bool LangFile::activateLanguage()
@@ -350,7 +350,7 @@ DefineConsoleMethod(LangTable, getString, const char *, (U32 id), ,
 	if(str != NULL)
 	{
 		char * ret = Con::getReturnBuffer(dStrlen(str) + 1);
-		dStrcpy(ret, str);
+		dStrcpy(ret, str, dStrlen(str) + 1);
 		return ret;
 	}
 	
@@ -388,7 +388,7 @@ DefineConsoleMethod(LangTable, getLangName, const char *, (S32 langId), , "(int 
 	if(str != NULL)
 	{
 		char * ret = Con::getReturnBuffer(dStrlen(str) + 1);
-		dStrcpy(ret, str);
+		dStrcpy(ret, str, dStrlen(str) + 1);
 		return ret;
 	}
 	
@@ -414,7 +414,7 @@ UTF8 *sanitiseVarName(const UTF8 *varName, UTF8 *buffer, U32 bufsize)
 		return NULL;
 	}
 	
-	dStrcpy(buffer, (const UTF8*)"I18N::");
+	dStrcpy(buffer, (const UTF8*)"I18N::", bufsize);
 	
 	UTF8 *dptr = buffer + 6;
 	const UTF8 *sptr = varName;

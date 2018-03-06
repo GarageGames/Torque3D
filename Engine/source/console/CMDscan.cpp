@@ -2341,7 +2341,7 @@ static int Sc_ScanString(int ret)
       return -1;
 
    char* buffer = (char*)consoleAlloc(dStrlen(CMDtext));
-   dStrcpy(buffer, CMDtext + 1);
+   dStrcpy(buffer, CMDtext + 1, dStrlen(CMDtext));
 
    CMDlval.str = MakeToken< char* >(buffer, lineIndex);
    return ret;

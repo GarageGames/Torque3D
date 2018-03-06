@@ -178,7 +178,7 @@ void CentralDir::setFileComment(const char *comment)
 {
    SAFE_DELETE_ARRAY(mFileComment);
    mFileComment = new char [dStrlen(comment)+1];
-   dStrcpy(mFileComment, comment);
+   dStrcpy(mFileComment, comment, dStrlen(comment)+1);
 }
 
 //-----------------------------------------------------------------------------

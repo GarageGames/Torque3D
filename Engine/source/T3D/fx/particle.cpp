@@ -595,7 +595,7 @@ bool ParticleData::preload(bool server, String &errorStr)
         animTexFrames.clear();
 
         char* tokCopy = new char[dStrlen(animTexFramesString) + 1];
-        dStrcpy(tokCopy, animTexFramesString);
+        dStrcpy(tokCopy, animTexFramesString, dStrlen(animTexFramesString) + 1);
 
         char* currTok = dStrtok(tokCopy, " \t");
         while (currTok != NULL) 

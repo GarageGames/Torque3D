@@ -245,7 +245,7 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
       else
       {
          // IMPORTANT -- do NOT change the following line, it identifies the file as an input map file
-         dStrcpy( lineBuffer, "// Torque Input Map File\n" );
+         dStrcpy( lineBuffer, "// Torque Input Map File\n", 1024 );
          iostrm->write( dStrlen( lineBuffer ), lineBuffer );
       }
 
@@ -453,7 +453,7 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
 bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor* pDescriptor)
 {
    char copyBuffer[256];
-   dStrcpy(copyBuffer, pEventString);
+   dStrcpy(copyBuffer, pEventString, 256);
 
    // Do we have modifiers?
    char* pSpace = dStrchr(copyBuffer, ' ');
@@ -909,7 +909,7 @@ const char* ActionMap::getDeadZone( const char* device, const char* action )
                char buf[64];
                dSprintf( buf, sizeof( buf ), "%g %g", mapNode->deadZoneBegin, mapNode->deadZoneEnd );
                char* returnString = Con::getReturnBuffer( dStrlen( buf ) + 1 );
-               dStrcpy( returnString, buf );
+               dStrcpy( returnString, buf, dStrlen(buf) + 1 );
                return( returnString );
             }
             else
@@ -995,7 +995,7 @@ bool ActionMap::getDeviceName(const U32 deviceType, const U32 deviceInstance, ch
 {
    switch (deviceType) {
      case KeyboardDeviceType:
-      dStrcpy(buffer, "keyboard");
+      dStrcpy(buffer, "keyboard", 16);
       break;
 
      case MouseDeviceType:
@@ -1135,7 +1135,7 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
       for (U32 i = 0; gAsciiMap[i].asciiCode != 0xFFFF; i++) {
          if (gAsciiMap[i].asciiCode == asciiCode)
          {
-            dStrcpy(buffer, gAsciiMap[i].pDescription);
+            dStrcpy(buffer, gAsciiMap[i].pDescription, 16);
             return true;
          }
       }
@@ -1166,7 +1166,7 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
       const char* desc = INPUTMGR->findVirtualMapDescFromCode(action);
       if(desc)
       {
-         dStrcpy(buffer, desc);
+         dStrcpy(buffer, desc, 16);
          return true;
       }
    }

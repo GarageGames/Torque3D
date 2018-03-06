@@ -950,7 +950,7 @@ void PersistenceManager::updateToken( const U32 lineNumber, const U32 linePositi
    char* postString = ( char* ) dMalloc( postStringLen + 1 );
    if( needQuotes )
       postString[ 0 ] = '"';
-   dStrcpy( &postString[ needQuotes ? 1 : 0 ], postStringSrc );
+   dStrcpy( &postString[ needQuotes ? 1 : 0 ], postStringSrc, postStringLen + (needQuotes ? 0 : 1) );
    postString[ postStringLen ] = 0;
 
    // Calculate the length of our new line

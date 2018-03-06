@@ -198,10 +198,10 @@ void SimDataBlock::performSubstitutions(SimDataBlock* dblock, const SimObject* o
    }
 
    char obj_str[32];
-   dStrcpy(obj_str, Con::getIntArg(obj->getId()));
+   dStrcpy(obj_str, Con::getIntArg(obj->getId()), 32);
 
    char index_str[32];
-   dStrcpy(index_str, Con::getIntArg(index));
+   dStrcpy(index_str, Con::getIntArg(index), 32);
 
    for (S32 i = 0; i < substitutions.size(); i++)
    {

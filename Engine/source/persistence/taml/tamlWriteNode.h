@@ -54,7 +54,7 @@ public:
 
             // Allocate and copy the value.
             mpValue = new char[ dStrlen(pValue)+1 ];
-            dStrcpy( (char *)mpValue, pValue );
+            dStrcpy( (char *)mpValue, pValue, dStrlen(pValue) + 1 );
         }
         
 

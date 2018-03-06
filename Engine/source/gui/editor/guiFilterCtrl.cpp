@@ -239,7 +239,7 @@ void Filter::set(S32 argc, const char *argv[])
    if (argc == 1)
    {  // in the form of one string "1.0 1.0 1.0"
       char list[1024];
-      dStrcpy(list, *argv);    // strtok modifies the string so we need to copy it
+      dStrcpy(list, *argv, 1024);    // strtok modifies the string so we need to copy it
       char *value = dStrtok(list, " ");
       while (value)
       {

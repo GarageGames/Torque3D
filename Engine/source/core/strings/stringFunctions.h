@@ -47,6 +47,7 @@
 
 #endif // defined(TORQUE_OS_WIN)
 
+#define DEBUG_CHECK_OVERFLOW 1
 
 //------------------------------------------------------------------------------
 // standard string functions [defined in platformString.cpp]
@@ -60,12 +61,16 @@ inline char *dStrcat(char *dst, const char *src)
 
 inline char *dStrcat(char *dst, const char *src, dsize_t len)
 {
+#ifdef DEBUG_CHECK_OVERFLOW
+   if (strlen(src) >= len) {
+      AssertWarn(false, "dStrcat out of range");
+   }
+#endif
    return strncat(dst,src,len - 1); //Safety because strncat copies at most len+1 characters
 }
 
 inline char *dStrncat(char *dst, const char *src, dsize_t len)
 {
-   AssertFatal(false, "Use dStrcat with length");
    return dStrcat(dst, src, len);
 }
 
@@ -94,9 +99,21 @@ inline S32  dStrnicmp(const char *str1, const char *str2, dsize_t len)
    return strncasecmp( str1, str2, len );
 }
 
+/// @deprecated Use strcpy(char *, const char *, dsize_t) instead
 inline char *dStrcpy(char *dst, const char *src)
 {
+   AssertFatal(false, "dStrcpy without length is deprecated");
    return strcpy(dst,src);
+}
+
+inline char *dStrcpy(char *dst, const char *src, dsize_t len)
+{
+#ifdef DEBUG_CHECK_OVERFLOW
+   if (strlen(src) >= len) {
+      AssertWarn(false, "dStrcpy out of range");
+   }
+#endif
+   return strncpy(dst,src,len);
 }   
 
 inline char *dStrncpy(char *dst, const char *src, dsize_t len)

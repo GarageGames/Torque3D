@@ -394,12 +394,12 @@ void queryLanServers(U32 port, U8 flags, const char* gameType, const char* missi
       if ( !sActiveFilter.gameType || dStricmp( sActiveFilter.gameType, "Any" ) != 0 )
       {
          sActiveFilter.gameType = (char*) dRealloc( sActiveFilter.gameType, 4 );
-         dStrcpy( sActiveFilter.gameType, "Any" );
+         dStrcpy( sActiveFilter.gameType, "Any", 4 );
       }
       if ( !sActiveFilter.missionType || dStricmp( sActiveFilter.missionType, "Any" ) != 0 )
       {
          sActiveFilter.missionType = (char*) dRealloc( sActiveFilter.missionType, 4 );
-         dStrcpy( sActiveFilter.missionType, "Any" );
+         dStrcpy( sActiveFilter.missionType, "Any", 4 );
       }
       sActiveFilter.queryFlags   = 0;
    sActiveFilter.minPlayers   = minPlayers;
@@ -511,13 +511,13 @@ void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
       if ( !sActiveFilter.gameType || dStrcmp( sActiveFilter.gameType, gameType ) != 0 )
       {
          sActiveFilter.gameType = (char*) dRealloc( sActiveFilter.gameType, dStrlen( gameType ) + 1 );
-         dStrcpy( sActiveFilter.gameType, gameType );
+         dStrcpy( sActiveFilter.gameType, gameType, dStrlen(gameType) + 1 );
       }
 
       if ( !sActiveFilter.missionType || dStrcmp( sActiveFilter.missionType, missionType ) != 0 )
       {
          sActiveFilter.missionType = (char*) dRealloc( sActiveFilter.missionType, dStrlen( missionType ) + 1 );
-         dStrcpy( sActiveFilter.missionType, missionType );
+         dStrcpy( sActiveFilter.missionType, missionType, dStrlen(missionType) + 1 );
       }
 
       sActiveFilter.queryFlags   = flags | ServerFilter::NewStyleResponse;
@@ -970,7 +970,7 @@ static void pushServerFavorites()
             ServerInfo* si = findOrCreateServerInfo( &addr );
             AssertFatal(si, "pushServerFavorites - failed to create Server Info!" );
             si->name = (char*) dRealloc( (void*) si->name, dStrlen( serverName ) + 1 );
-            dStrcpy( si->name, serverName );
+            dStrcpy( si->name, serverName, dStrlen(serverName) + 1 );
             si->isFavorite = true;
             pushPingRequest( &addr );
          }
@@ -1054,13 +1054,13 @@ void addFakeServers( S32 howMany )
       char buf[256];
       dSprintf( buf, 255, "Fake server #%d", sNumFakeServers );
       newServer.name = (char*) dMalloc( dStrlen( buf ) + 1 );
-      dStrcpy( newServer.name, buf );
+      dStrcpy( newServer.name, buf, strlen(buf) + 1 );
       newServer.gameType = (char*) dMalloc( 5 );
-      dStrcpy( newServer.gameType, "Fake" );
-      newServer.missionType = (char*) dMalloc( 4 );
-      dStrcpy( newServer.missionType, "FakeMissionType" );
+      dStrcpy( newServer.gameType, "Fake", 5 );
+      newServer.missionType = (char*) dMalloc( 16 );
+      dStrcpy( newServer.missionType, "FakeMissionType", 16 );
       newServer.missionName = (char*) dMalloc( 14 );
-      dStrcpy( newServer.missionName, "FakeMapName" );
+      dStrcpy( newServer.missionName, "FakeMapName", 14 );
       Net::stringToAddress( "IP:198.74.33.35:28000", &newServer.address );
       newServer.ping = (U32)( Platform::getRandom() * 200.0f );
       newServer.cpuSpeed = 470;
@@ -1353,9 +1353,9 @@ static void processPingsAndQueries( U32 session, bool schedule )
       char msg[64];
       U32 foundCount = gServerList.size();
       if ( foundCount == 0 )
-         dStrcpy( msg, "No servers found." );
+         dStrcpy( msg, "No servers found.", 64 );
       else if ( foundCount == 1 )
-         dStrcpy( msg, "One server found." );
+         dStrcpy( msg, "One server found.", 64 );
       else
          dSprintf( msg, sizeof( msg ), "%d servers found.", foundCount );
 
@@ -1754,7 +1754,7 @@ static void handleGameMasterInfoRequest( const NetAddress* address, U32 key, U8 
 
       const char* guidList = Con::getVariable( "Server::GuidList" );
       char* buf = new char[dStrlen( guidList ) + 1];
-      dStrcpy( buf, guidList );
+      dStrcpy( buf, guidList, dStrlen(guidList) + 1 );
       char* temp = dStrtok( buf, "\t" );
       temp8 = 0;
       for ( ; temp && temp8 < playerCount; temp8++ )
@@ -1949,7 +1949,7 @@ static void handleGamePingResponse( const NetAddress* address, BitStream* stream
    if ( !si->name )
    {
       si->name = (char*) dMalloc( dStrlen( buf ) + 1 );
-      dStrcpy( si->name, buf );
+      dStrcpy( si->name, buf, dStrlen(buf) + 1 );
    }
 
    // Set the server up to be queried:
@@ -2051,7 +2051,7 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
    if ( !si->gameType || dStricmp( si->gameType, stringBuf ) != 0 )
    {
       si->gameType = (char*) dRealloc( (void*) si->gameType, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->gameType, stringBuf );
+      dStrcpy( si->gameType, stringBuf, dStrlen(stringBuf) + 1 );
 
       // Test against the active filter:
       if ( applyFilter && dStricmp( sActiveFilter.gameType, "any" ) != 0
@@ -2068,7 +2068,7 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
    if ( !si->missionType || dStrcmp( si->missionType, stringBuf ) != 0 )
    {
       si->missionType = (char*) dRealloc( (void*) si->missionType, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->missionType, stringBuf );
+      dStrcpy( si->missionType, stringBuf, dStrlen(stringBuf) + 1 );
 
       // Test against the active filter:
       if ( applyFilter && dStricmp( sActiveFilter.missionType, "any" ) != 0
@@ -2089,7 +2089,7 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
    if ( !si->missionName || dStrcmp( si->missionName, stringBuf ) != 0 )
    {
       si->missionName = (char*) dRealloc( (void*) si->missionName, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->missionName, stringBuf );
+      dStrcpy( si->missionName, stringBuf, dStrlen(stringBuf) + 1 );
    }
 
    // Get the server status:
@@ -2158,7 +2158,7 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
    if ( !si->statusString || ( isUpdate && dStrcmp( si->statusString, stringBuf ) != 0 ) )
    {
       si->infoString = (char*) dRealloc( (void*) si->infoString, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->infoString, stringBuf );
+      dStrcpy( si->infoString, stringBuf, dStrlen(stringBuf) + 1 );
    }
 
    // Get the content string:
@@ -2166,7 +2166,7 @@ static void handleGameInfoResponse( const NetAddress* address, BitStream* stream
    if ( !si->statusString || ( isUpdate && dStrcmp( si->statusString, stringBuf ) != 0 ) )
    {
       si->statusString = (char*) dRealloc( (void*) si->statusString, dStrlen( stringBuf ) + 1 );
-      dStrcpy( si->statusString, stringBuf );
+      dStrcpy( si->statusString, stringBuf, dStrlen(stringBuf) + 1 );
    }
 
    // Update the server browser gui!

@@ -773,7 +773,7 @@ static const char* returnClassList( Vector< AbstractClassRep* >& classes, U32 bu
    dQsort( classes.address(), classes.size(), sizeof( AbstractClassRep* ), ACRCompare );
 
    char* ret = Con::getReturnBuffer( bufSize );
-   dStrcpy( ret, classes[ 0 ]->getClassName() );
+   dStrcpy( ret, classes[ 0 ]->getClassName(), bufSize );
    for( U32 i = 1; i < classes.size(); i ++ )
    {
       dStrcat( ret, "\t", bufSize );

@@ -548,7 +548,7 @@ const char * Component::getDescriptionText(const char *desc)
    if (!Platform::isFile(desc))
    {
       newDesc = new char[dStrlen(desc) + 1];
-      dStrcpy(newDesc, desc);
+      dStrcpy(newDesc, desc, dStrlen(desc) + 1);
 
       return newDesc;
    }

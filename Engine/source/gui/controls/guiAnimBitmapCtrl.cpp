@@ -168,7 +168,7 @@ bool guiAnimBitmapCtrl::ptSetFrameRanges(void *object, const char *index, const 
       return true;
    }
    char* tokCopy = new char[dStrlen(data) + 1];
-   dStrcpy(tokCopy, data);
+   dStrcpy(tokCopy, data, dStrlen(data) + 1);
 
    char* currTok = dStrtok(tokCopy, " \t");
    while (currTok != NULL)

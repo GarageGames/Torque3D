@@ -142,7 +142,7 @@ bool afxParticleEmitterData::onAdd()
   {
     Vector<char*> dataBlocks(__FILE__, __LINE__);
     char* tokCopy = new char[dStrlen(tpaths_string) + 1];
-    dStrcpy(tokCopy, tpaths_string);
+    dStrcpy(tokCopy, tpaths_string, dStrlen(tpaths_string) + 1);
     
     char* currTok = dStrtok(tokCopy, " \t");
     while (currTok != NULL) 
@@ -468,7 +468,7 @@ bool afxParticleEmitterPathData::onAdd()
   {
     Vector<char*> dataBlocks(__FILE__, __LINE__);
     char* tokCopy = new char[dStrlen(epaths_string) + 1];
-    dStrcpy(tokCopy, epaths_string);
+    dStrcpy(tokCopy, epaths_string, dStrlen(epaths_string) + 1);
 
     char* currTok = dStrtok(tokCopy, " \t");
     while (currTok != NULL) 
@@ -553,7 +553,7 @@ void afxParticleEmitterPathData::onPerformSubstitutions()
   {
     Vector<char*> dataBlocks(__FILE__, __LINE__);
     char* tokCopy = new char[dStrlen(epaths_string) + 1];
-    dStrcpy(tokCopy, epaths_string);
+    dStrcpy(tokCopy, epaths_string, dStrlen(epaths_string) + 1);
 
     char* currTok = dStrtok(tokCopy, " \t");
     while (currTok != NULL) 

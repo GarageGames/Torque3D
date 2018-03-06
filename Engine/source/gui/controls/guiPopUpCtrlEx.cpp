@@ -771,13 +771,14 @@ void GuiPopUpMenuCtrlEx::setBitmap(const char *name)
    {
       char buffer[1024];
       char *p;
-      dStrcpy(buffer, name);
+      dStrcpy(buffer, name, 1024);
       p = buffer + dStrlen(buffer);
+      S32 pLen = 1024 - dStrlen(buffer);
 
-      dStrcpy(p, "_n");
+      dStrcpy(p, "_n", pLen);
       mTextureNormal = GFXTexHandle( (StringTableEntry)buffer, &GFXDefaultGUIProfile, avar("%s() - mTextureNormal (line %d)", __FUNCTION__, __LINE__) );
 
-      dStrcpy(p, "_d");
+      dStrcpy(p, "_d", pLen);
       mTextureDepressed = GFXTexHandle( (StringTableEntry)buffer, &GFXDefaultGUIProfile, avar("%s() - mTextureDepressed (line %d)", __FUNCTION__, __LINE__) );
       if ( !mTextureDepressed )
          mTextureDepressed = mTextureNormal;
@@ -840,7 +841,7 @@ void GuiPopUpMenuCtrlEx::addEntry(const char *buf, S32 id, U32 scheme)
       mIdMax = id;
 
    Entry e;
-   dStrcpy( e.buf, buf );
+   dStrcpy( e.buf, buf, 256 );
    e.id = id;
    e.scheme = scheme;
 

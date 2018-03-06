@@ -125,7 +125,7 @@ StringValue & StringValue::operator=(const char *string)
    {
       S32 len = dStrlen(string);
       if (len < size)
-         dStrcpy(val, string);
+         dStrcpy(val, string, size);
       else
       {
          size = len;
@@ -569,7 +569,7 @@ void ConsoleValue::setStringValue(const char * value)
       type = TypeInternalString;
 
       bufferLen = newLen;
-      dStrcpy(sval, value);
+      dStrcpy(sval, value, newLen);
    }
    else
       Con::setData(type, dataPtr, 0, 1, &value, enumTable);
@@ -702,7 +702,7 @@ Dictionary::Entry* Dictionary::addVariable(const char *name,
    if (name[0] != '$')
    {
       scratchBuffer[0] = '$';
-      dStrcpy(scratchBuffer + 1, name);
+      dStrcpy(scratchBuffer + 1, name, 1023);
       name = scratchBuffer;
    }
 
@@ -1360,7 +1360,7 @@ void Namespace::addScriptCallback(const char *funcName, const char *usage, Conso
    static U32 uid = 0;
    char buffer[1024];
    char lilBuffer[32];
-   dStrcpy(buffer, funcName);
+   dStrcpy(buffer, funcName, 1024);
    dSprintf(lilBuffer, 32, "_%d_cb", uid++);
    dStrcat(buffer, lilBuffer, 1024);
 
@@ -1381,7 +1381,7 @@ void Namespace::markGroup(const char* name, const char* usage)
    static U32 uid = 0;
    char buffer[1024];
    char lilBuffer[32];
-   dStrcpy(buffer, name);
+   dStrcpy(buffer, name, 1024);
    dSprintf(lilBuffer, 32, "_%d", uid++);
    dStrcat(buffer, lilBuffer, 1024);
 

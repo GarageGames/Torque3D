@@ -50,7 +50,7 @@ BadWordFilter::BadWordFilter()
 {
    VECTOR_SET_ASSOCIATION( filterTables );
 
-   dStrcpy(defaultReplaceStr, "knqwrtlzs");
+   dStrcpy(defaultReplaceStr, "knqwrtlzs", 32);
    filterTables.push_back(new FilterTable);
    curOffset = 0;
 }
@@ -147,7 +147,7 @@ bool BadWordFilter::setDefaultReplaceStr(const char *str)
    U32 len = dStrlen(str);
    if(len < 2 || len >= sizeof(defaultReplaceStr))
       return false;
-   dStrcpy(defaultReplaceStr, str);
+   dStrcpy(defaultReplaceStr, str, 32);
    return true;
 }
 
@@ -287,7 +287,7 @@ DefineEngineFunction(filterString, const char *, (const char* baseString, const 
       replaceStr = gBadWordFilter->getDefaultReplaceStr();
 
    char *ret = Con::getReturnBuffer(dStrlen(baseString) + 1);
-   dStrcpy(ret, baseString);
+   dStrcpy(ret, baseString, dStrlen(baseString));
    gBadWordFilter->filterString(ret, replaceStr);
    return ret;
 }

@@ -431,7 +431,7 @@ bool DbgFileView::findMouseOverVariable()
    {
       S32 stringPosition = pt.x - gFileXOffset;
       char tempBuf[256], *varNamePtr = &tempBuf[1];
-      dStrcpy(tempBuf, mFileView[cell.y].text);
+      dStrcpy(tempBuf, mFileView[cell.y].text, 256);
 
       //find the current mouse over char
       S32 charNum = findMouseOverChar(mFileView[cell.y].text, stringPosition);
@@ -526,7 +526,7 @@ void DbgFileView::onPreRender()
 {
 	setUpdate();
    char oldVar[256];
-   dStrcpy(oldVar, mMouseOverVariable);
+   dStrcpy(oldVar, mMouseOverVariable, 256);
    bool found = findMouseOverVariable();
    if (found && mPCCurrentLine >= 0)
    {
@@ -685,7 +685,7 @@ void DbgFileView::onRenderCell(Point2I offset, Point2I cell, bool selected, bool
       {
          S32 startPos, endPos;
          char tempBuf[256];
-         dStrcpy(tempBuf, mFileView[cell.y].text);
+         dStrcpy(tempBuf, mFileView[cell.y].text, 256);
 
          //get the end coord
          tempBuf[mBlockEnd] = '\0';

@@ -1303,7 +1303,7 @@ DefineEngineMethod( TerrainBlock, save, bool, ( const char* fileName),,
 				   "@return True if file save was successful, false otherwise")
 {
 	char filename[256];
-	dStrcpy(filename,fileName);
+	dStrcpy(filename,fileName,256);
    char *ext = dStrrchr(filename, '.');
    if (!ext || dStricmp(ext, ".ter") != 0)
       dStrcat(filename, ".ter", 256);
@@ -1313,7 +1313,7 @@ DefineEngineMethod( TerrainBlock, save, bool, ( const char* fileName),,
 //ConsoleMethod(TerrainBlock, save, bool, 3, 3, "(string fileName) - saves the terrain block's terrain file to the specified file name.")
 //{
 //   char filename[256];
-//   dStrcpy(filename,argv[2]);
+//   dStrcpy(filename,argv[2],256);
 //   char *ext = dStrrchr(filename, '.');
 //   if (!ext || dStricmp(ext, ".ter") != 0)
 //      dStrcat(filename, ".ter", 256);

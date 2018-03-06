@@ -2626,7 +2626,7 @@ DefineConsoleMethod( GuiEditCtrl, getSelectionGlobalBounds, const char*, (), , "
    String str = String::ToString( "%i %i %i %i", bounds.point.x, bounds.point.y, bounds.extent.x, bounds.extent.y );
    
    char* buffer = Con::getReturnBuffer( str.length() );
-   dStrcpy( buffer, str.c_str() );
+   dStrcpy( buffer, str.c_str(), str.length() );
    
    return buffer;
 }

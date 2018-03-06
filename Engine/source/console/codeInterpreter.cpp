@@ -95,19 +95,17 @@ static void getFieldComponent(SimObject* object, StringTableEntry field, const c
 
       // Translate xyzw and rgba into the indexed component 
       // of the variable or field.
-      //
-      // Review: Should we use strncpy to prevent a buffer overflow?
       if (subField == xyzw[0] || subField == rgba[0])
-         dStrcpy(val, StringUnit::getUnit(prevVal, 0, " \t\n"));
+         dStrcpy(val, StringUnit::getUnit(prevVal, 0, " \t\n"), 128);
 
       else if (subField == xyzw[1] || subField == rgba[1])
-         dStrcpy(val, StringUnit::getUnit(prevVal, 1, " \t\n"));
+         dStrcpy(val, StringUnit::getUnit(prevVal, 1, " \t\n"), 128);
 
       else if (subField == xyzw[2] || subField == rgba[2])
-         dStrcpy(val, StringUnit::getUnit(prevVal, 2, " \t\n"));
+         dStrcpy(val, StringUnit::getUnit(prevVal, 2, " \t\n"), 128);
 
       else if (subField == xyzw[3] || subField == rgba[3])
-         dStrcpy(val, StringUnit::getUnit(prevVal, 3, " \t\n"));
+         dStrcpy(val, StringUnit::getUnit(prevVal, 3, " \t\n"), 128);
 
       else
          val[0] = 0;
@@ -157,19 +155,17 @@ static void setFieldComponent(SimObject* object, StringTableEntry field, const c
 
    // Insert the value into the specified 
    // component of the string.
-   //
-   // Review: Should we use strncpy to prevent a buffer overflow?
    if (subField == xyzw[0] || subField == rgba[0])
-      dStrcpy(val, StringUnit::setUnit(prevVal, 0, strValue, " \t\n"));
+      dStrcpy(val, StringUnit::setUnit(prevVal, 0, strValue, " \t\n"), 128);
 
    else if (subField == xyzw[1] || subField == rgba[1])
-      dStrcpy(val, StringUnit::setUnit(prevVal, 1, strValue, " \t\n"));
+      dStrcpy(val, StringUnit::setUnit(prevVal, 1, strValue, " \t\n"), 128);
 
    else if (subField == xyzw[2] || subField == rgba[2])
-      dStrcpy(val, StringUnit::setUnit(prevVal, 2, strValue, " \t\n"));
+      dStrcpy(val, StringUnit::setUnit(prevVal, 2, strValue, " \t\n"), 128);
 
    else if (subField == xyzw[3] || subField == rgba[3])
-      dStrcpy(val, StringUnit::setUnit(prevVal, 3, strValue, " \t\n"));
+      dStrcpy(val, StringUnit::setUnit(prevVal, 3, strValue, " \t\n"), 128);
 
    if (val[0] != 0)
    {
@@ -1729,7 +1725,7 @@ OPCodeReturn CodeInterpreter::op_setcurfield(U32 &ip)
 {
    // Save the previous field for parsing vector fields.
    mPrevField = mCurField;
-   dStrcpy(prevFieldArray, curFieldArray);
+   dStrcpy(prevFieldArray, curFieldArray, 256);
    mCurField = CodeToSTE(mCodeBlock->code, ip);
    curFieldArray[0] = 0;
    ip += 2;
@@ -1738,7 +1734,7 @@ OPCodeReturn CodeInterpreter::op_setcurfield(U32 &ip)
 
 OPCodeReturn CodeInterpreter::op_setcurfield_array(U32 &ip)
 {
-   dStrcpy(curFieldArray, STR.getStringValue());
+   dStrcpy(curFieldArray, STR.getStringValue(), 256);
    return OPCodeReturn::success;
 }
 
@@ -1771,7 +1767,7 @@ OPCodeReturn CodeInterpreter::op_setcurfield_this(U32 &ip)
    mCurObject = mThisObject;
 
    mPrevField = mCurField;
-   dStrcpy(prevFieldArray, curFieldArray);
+   dStrcpy(prevFieldArray, curFieldArray, 256);
    mCurField = CodeToSTE(mCodeBlock->code, ip);
    curFieldArray[0] = 0;
    ip += 2;

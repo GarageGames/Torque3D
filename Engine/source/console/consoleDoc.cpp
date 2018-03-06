@@ -90,7 +90,7 @@ void printClassHeader(const char* usage, const char * className, const char * su
       // Copy Usage Document
       S32 usageLen = dStrlen( usage );
       FrameTemp<char> usageStr( usageLen );
-      dStrcpy( usageStr, usage );
+      dStrcpy( usageStr, usage, usageLen );
 
       // Print Header
       Con::printf( "/*!" );
@@ -117,7 +117,7 @@ void printClassHeader(const char* usage, const char * className, const char * su
          }
          
          // Copy line and update usagePtr
-         dStrcpy( lineStr, usagePtr );
+         dStrcpy( lineStr, usagePtr, 2048 );
          usagePtr = (newLine != NULL ) ? newLine : usagePtr;
          lineLen = dStrlen( lineStr );
 

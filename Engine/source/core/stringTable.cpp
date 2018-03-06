@@ -145,7 +145,7 @@ StringTableEntry _StringTable::insert(const char* _val, const bool caseSens)
       *walk = (Node *) mempool.alloc(sizeof(Node));
       (*walk)->next = 0;
       (*walk)->val = (char *) mempool.alloc(dStrlen(val) + 1);
-      dStrcpy((*walk)->val, val);
+      dStrcpy((*walk)->val, val, dStrlen(val) + 1);
       ret = (*walk)->val;
       itemCount ++;
    }

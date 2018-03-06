@@ -74,7 +74,7 @@ ModuleManager::ModuleManager() :
     mIgnoreLoadedGroups(false)
 {
     // Set module extension.
-    dStrcpy( mModuleExtension, MODULE_MANAGER_MODULE_DEFINITION_EXTENSION );
+    dStrcpy( mModuleExtension, MODULE_MANAGER_MODULE_DEFINITION_EXTENSION, 256 );
 }
 
 //-----------------------------------------------------------------------------
@@ -155,7 +155,7 @@ bool ModuleManager::setModuleExtension( const char* pExtension )
     }
 
     // Set module extension.
-    dStrcpy( mModuleExtension, pExtension );
+    dStrcpy( mModuleExtension, pExtension, 256 );
 
     return true;
 }

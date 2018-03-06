@@ -440,7 +440,7 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
    {
       // If not...
       // Save it for checking next time.
-      dStrcpy(tabBuffer, inputBuffer);
+      dStrcpy(tabBuffer, inputBuffer, MaxCompletionBufferSize);
       // Scan backward from the cursor position to find the base to complete from.
       S32 p = cursorPos;
       while ((p > 0) && (inputBuffer[p - 1] != ' ') && (inputBuffer[p - 1] != '.') && (inputBuffer[p - 1] != '('))
@@ -527,7 +527,7 @@ U32 tabComplete(char* inputBuffer, U32 cursorPos, U32 maxResultLength, bool forw
    }
 
    // Save the modified input buffer for checking next time.
-   dStrcpy(tabBuffer, inputBuffer);
+   dStrcpy(tabBuffer, inputBuffer, MaxCompletionBufferSize);
 
    // Return the new (maybe) cursor position.
    return cursorPos;
@@ -647,7 +647,7 @@ static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, co
             entry.mType   = type;
 #ifndef TORQUE_SHIPPING // this is equivalent to a memory leak, turn it off in ship build            
             entry.mString = (const char *)consoleLogChunker.alloc(dStrlen(pos) + 1);
-            dStrcpy(const_cast<char*>(entry.mString), pos);
+            dStrcpy(const_cast<char*>(entry.mString), pos, dStrlen(pos) + 1);
             
             // This prevents infinite recursion if the console itself needs to
             // re-allocate memory to accommodate the new console log entry, and 
@@ -1271,7 +1271,7 @@ bool executeFile(const char* fileName, bool noCalls, bool journalScript)
       scriptFile = NULL;
 
       dsoModifiedTime = dsoFile->getModifiedTime();
-      dStrcpy(nameBuffer, scriptFileName);
+      dStrcpy(nameBuffer, scriptFileName, 512);
    }
 
    // If we're supposed to be compiling this file, check to see if there's a DSO
@@ -2097,12 +2097,12 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
          if (ensureTrailingSlash)
          {
             // Yes, so ensure it.
-            Con::ensureTrailingSlash(pDstPath, pSrcPath);
+            Con::ensureTrailingSlash(pDstPath, pSrcPath, size);
          }
          else
          {
             // No, so just use the source path.
-            dStrcpy(pDstPath, pSrcPath);
+            dStrcpy(pDstPath, pSrcPath, size);
          }
 
          return false;
@@ -2118,7 +2118,7 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
       if (ensureTrailingSlash)
       {
          // Yes, so ensure it.
-         Con::ensureTrailingSlash(pathBuffer, pathBuffer);
+         Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
       }
 
       // Strip repeat slashes.
@@ -2143,12 +2143,12 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
          if (ensureTrailingSlash)
          {
             // Yes, so ensure it.
-            Con::ensureTrailingSlash(pDstPath, pSrcPath);
+            Con::ensureTrailingSlash(pDstPath, pSrcPath, size);
          }
          else
          {
             // No, so just use the source path.
-            dStrcpy(pDstPath, pSrcPath);
+            dStrcpy(pDstPath, pSrcPath, size);
          }
 
          return false;
@@ -2183,7 +2183,7 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
       if (ensureTrailingSlash)
       {
          // Yes, so ensure it.
-         Con::ensureTrailingSlash(pathBuffer, pathBuffer);
+         Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
       }
 
       // Strip repeat slashes.
@@ -2208,7 +2208,7 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
    if (ensureTrailingSlash)
    {
       // Yes, so ensure it.
-      Con::ensureTrailingSlash(pathBuffer, pathBuffer);
+      Con::ensureTrailingSlash(pathBuffer, pathBuffer, size);
    }
 
    // Strip repeat slashes.
@@ -2300,10 +2300,10 @@ void collapsePath(char* pDstPath, U32 size, const char* pSrcPath, const char* pW
 }
 
 
-void ensureTrailingSlash(char* pDstPath, const char* pSrcPath)
+void ensureTrailingSlash(char* pDstPath, const char* pSrcPath, S32 dstSize)
 {
    // Copy to target.
-   dStrcpy(pDstPath, pSrcPath);
+   dStrcpy(pDstPath, pSrcPath, dstSize);
 
    // Find trailing character index.
    S32 trailIndex = dStrlen(pDstPath);
@@ -2353,7 +2353,7 @@ StringTableEntry getDSOPath(const char *scriptPath)
    else
    {
       StringTableEntry strippedPath = Platform::stripBasePath(scriptPath);
-      dStrcpy(relPath, strippedPath);
+      dStrcpy(relPath, strippedPath, 1024);
 
       char *slash = dStrrchr(relPath, '/');
       if (slash)
@@ -2616,7 +2616,7 @@ const char *ConsoleValue::getStringValue()
       else if(newLen > bufferLen)
          sval = (char *) dRealloc(sval, newLen);
 
-      dStrcpy(sval, internalValue);
+      dStrcpy(sval, internalValue, newLen);
       bufferLen = newLen;
 
       return sval;

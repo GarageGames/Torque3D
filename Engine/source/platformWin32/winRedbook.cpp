@@ -84,7 +84,7 @@ void installRedBookDevices()
       {
          Win32RedBookDevice * device = new Win32RedBookDevice;
          device->mDeviceName = new char[dStrlen(str) + 1];
-         dStrcpy(device->mDeviceName, str);
+         dStrcpy(device->mDeviceName, str, dStrlen(str) + 1);
 
          RedBook::installDevice(device);
       }

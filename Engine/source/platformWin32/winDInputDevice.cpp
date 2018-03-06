@@ -1576,7 +1576,7 @@ const char* DInputDevice::getJoystickAxesString()
    }
 
    char* returnString = Con::getReturnBuffer( dStrlen( buf ) + 1 );
-   dStrcpy( returnString, buf );
+   dStrcpy( returnString, buf, dStrlen(buf) + 1 );
    return( returnString );
 }
 

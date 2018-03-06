@@ -218,7 +218,7 @@ bool GuiFormCtrl::resize(const Point2I &newPosition, const Point2I &newExtent)
       S32 strlen = dStrlen((const char*)mCaption);
       for(S32 i=strlen; i>=0; --i)
       {
-         dStrcpy(buf, "");
+         dStrcpy(buf, "", i);
          dStrcat(buf, (const char*)mCaption, i);
          dStrcat(buf, "...", i);
 
