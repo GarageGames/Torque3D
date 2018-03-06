@@ -32,6 +32,10 @@
 #include "platform/types.h"
 #endif
 
+#ifndef _PLATFORMASSERT_H_
+#include "platform/platformAssert.h"
+#endif
+
 #if defined(TORQUE_OS_WIN)
 // These standard functions are not defined on Win32 and other Microsoft platforms...
 #define strcasecmp   _stricmp
@@ -47,14 +51,22 @@
 //------------------------------------------------------------------------------
 // standard string functions [defined in platformString.cpp]
 
+/// @deprecated Use dStrcat(char *, const char *, dsize_t) instead
 inline char *dStrcat(char *dst, const char *src)
 {
+   AssertFatal(false, "dStrcat without length is deprecated");
    return strcat(dst,src);
 }   
 
+inline char *dStrcat(char *dst, const char *src, dsize_t len)
+{
+   return strncat(dst,src,len - 1); //Safety because strncat copies at most len+1 characters
+}
+
 inline char *dStrncat(char *dst, const char *src, dsize_t len)
 {
-   return strncat(dst,src,len);
+   AssertFatal(false, "Use dStrcat with length");
+   return dStrcat(dst, src, len);
 }
 
 inline S32  dStrcmp(const char *str1, const char *str2)

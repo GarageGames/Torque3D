@@ -661,28 +661,28 @@ DefineConsoleMethod( Material, getAnimFlags, const char*, (U32 id), , "" )
 	   if(dStrcmp( animFlags, "" ) == 0)
 	      dStrcpy( animFlags, "$Rotate" );
 	   else
-			dStrcat( animFlags, " | $Rotate");
+			dStrcat( animFlags, " | $Rotate", 512);
    }
    if(object->mAnimFlags[ id ] & Material::Wave)
    {
 	   if(dStrcmp( animFlags, "" ) == 0)
 	      dStrcpy( animFlags, "$Wave" );
 	   else
-			dStrcat( animFlags, " | $Wave");
+			dStrcat( animFlags, " | $Wave", 512);
    }
    if(object->mAnimFlags[ id ] & Material::Scale)
    {
 	   if(dStrcmp( animFlags, "" ) == 0)
 	      dStrcpy( animFlags, "$Scale" );
 	   else
-			dStrcat( animFlags, " | $Scale");
+			dStrcat( animFlags, " | $Scale", 512);
    }
    if(object->mAnimFlags[ id ] & Material::Sequence)
    {
 	   if(dStrcmp( animFlags, "" ) == 0)
 	      dStrcpy( animFlags, "$Sequence" );
 	   else
-			dStrcat( animFlags, " | $Sequence");
+			dStrcat( animFlags, " | $Sequence", 512);
    }
 
 	return animFlags;

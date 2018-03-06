@@ -1306,7 +1306,7 @@ DefineEngineMethod( TerrainBlock, save, bool, ( const char* fileName),,
 	dStrcpy(filename,fileName);
    char *ext = dStrrchr(filename, '.');
    if (!ext || dStricmp(ext, ".ter") != 0)
-      dStrcat(filename, ".ter");
+      dStrcat(filename, ".ter", 256);
    return static_cast<TerrainBlock*>(object)->save(filename);
 }
 
@@ -1316,7 +1316,7 @@ DefineEngineMethod( TerrainBlock, save, bool, ( const char* fileName),,
 //   dStrcpy(filename,argv[2]);
 //   char *ext = dStrrchr(filename, '.');
 //   if (!ext || dStricmp(ext, ".ter") != 0)
-//      dStrcat(filename, ".ter");
+//      dStrcat(filename, ".ter", 256);
 //   return static_cast<TerrainBlock*>(object)->save(filename);
 //}
 

@@ -329,8 +329,8 @@ const char * Profiler::constructProfilePath(ProfilerData * pd)
       U32 mark = FrameAllocator::getWaterMark();
       char * buf = (char*)FrameAllocator::alloc(len+1);
       dStrcpy(buf,pd->mParent->mPath);
-      dStrcat(buf,connector);
-      dStrcat(buf,pd->mRoot->mName);
+      dStrcat(buf,connector,len);
+      dStrcat(buf,pd->mRoot->mName,len);
       const char * ret = StringTable->insert(buf);
       FrameAllocator::setWaterMark(mark);
       

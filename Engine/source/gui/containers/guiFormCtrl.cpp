@@ -219,8 +219,8 @@ bool GuiFormCtrl::resize(const Point2I &newPosition, const Point2I &newExtent)
       for(S32 i=strlen; i>=0; --i)
       {
          dStrcpy(buf, "");
-         dStrncat(buf, (const char*)mCaption, i);
-         dStrcat(buf, "...");
+         dStrcat(buf, (const char*)mCaption, i);
+         dStrcat(buf, "...", i);
 
          textWidth = mProfile->mFont->getStrWidth(buf);
 

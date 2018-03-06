@@ -2495,8 +2495,8 @@ DefineConsoleMethod(TerrainEditor, getTerrainBlocksMaterialList, const char *, (
    ret[0] = 0;
    for(U32 i = 0; i < list.size(); ++i)
    {
-      dStrcat( ret, list[i] );
-      dStrcat( ret, "\n" );
+      dStrcat( ret, list[i], size );
+      dStrcat( ret, "\n", size );
    }
 
    return ret;
@@ -2709,8 +2709,8 @@ DefineConsoleMethod(TerrainEditor, getMaterials, const char *, (), , "() gets th
    ret[0] = 0;
    for(U32 i = 0; i < terr->getMaterialCount(); i++)
    {
-      dStrcat( ret, terr->getMaterialName(i) );
-      dStrcat( ret, "\n" );
+      dStrcat( ret, terr->getMaterialName(i), 4096 );
+      dStrcat( ret, "\n", 4096 );
    }
 
    return ret;

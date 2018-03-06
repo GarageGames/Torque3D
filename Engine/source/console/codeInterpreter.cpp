@@ -420,13 +420,13 @@ exitLabel:
       if (gEvalState.traceOn)
       {
          sTraceBuffer[0] = 0;
-         dStrcat(sTraceBuffer, "Leaving ");
+         dStrcat(sTraceBuffer, "Leaving ", 1024);
 
          if (packageName)
          {
-            dStrcat(sTraceBuffer, "[");
-            dStrcat(sTraceBuffer, packageName);
-            dStrcat(sTraceBuffer, "]");
+            dStrcat(sTraceBuffer, "[", 1024);
+            dStrcat(sTraceBuffer, packageName, 1024);
+            dStrcat(sTraceBuffer, "]", 1024);
          }
          if (thisNamespace && thisNamespace->mName)
          {
@@ -471,13 +471,13 @@ void CodeInterpreter::parseArgs(U32 &ip)
       if (gEvalState.traceOn)
       {
          sTraceBuffer[0] = 0;
-         dStrcat(sTraceBuffer, "Entering ");
+         dStrcat(sTraceBuffer, "Entering ", 1024);
 
          if (mExec.packageName)
          {
-            dStrcat(sTraceBuffer, "[");
-            dStrcat(sTraceBuffer, mExec.packageName);
-            dStrcat(sTraceBuffer, "]");
+            dStrcat(sTraceBuffer, "[", 1024);
+            dStrcat(sTraceBuffer, mExec.packageName, 1024);
+            dStrcat(sTraceBuffer, "]", 1024);
          }
          if (mExec.thisNamespace && mExec.thisNamespace->mName)
          {
@@ -491,11 +491,11 @@ void CodeInterpreter::parseArgs(U32 &ip)
          }
          for (S32 i = 0; i < wantedArgc; i++)
          {
-            dStrcat(sTraceBuffer, mExec.argv[i + 1]);
+            dStrcat(sTraceBuffer, mExec.argv[i + 1], 1024);
             if (i != wantedArgc - 1)
-               dStrcat(sTraceBuffer, ", ");
+               dStrcat(sTraceBuffer, ", ", 1024);
          }
-         dStrcat(sTraceBuffer, ")");
+         dStrcat(sTraceBuffer, ")", 1024);
          Con::printf("%s", sTraceBuffer);
       }
 

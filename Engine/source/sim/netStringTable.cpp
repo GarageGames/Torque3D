@@ -239,7 +239,7 @@ void NetStringTable::expandString(NetStringHandle &inString, char *buf, U32 bufS
       }
       buf[bufSize - 1] = 0;
    } else {
-      dStrcat(buf, "<NULL>");
+      dStrcat(buf, "<NULL>", bufSize);
    }
 }
 

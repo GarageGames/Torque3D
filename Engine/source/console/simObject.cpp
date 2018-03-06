@@ -347,7 +347,7 @@ void SimObject::writeFields(Stream &stream, U32 tabStop)
          }
 
          expandEscape((char*)expandedBuffer + dStrlen(expandedBuffer), val);
-         dStrcat(expandedBuffer, "\";\r\n");
+         dStrcat(expandedBuffer, "\";\r\n", expandedBufferSize);
 
          stream.writeTabs(tabStop);
          stream.write(dStrlen(expandedBuffer),expandedBuffer);
@@ -1029,7 +1029,7 @@ void SimObject::setDataField(StringTableEntry slotName, const char *array, const
       {
          char buf[256];
          dStrcpy(buf, slotName);
-         dStrcat(buf, array);
+         dStrcat(buf, array, 256);
          StringTableEntry permanentSlotName = StringTable->insert(buf);
          mFieldDictionary->setFieldValue(permanentSlotName, value);
          onDynamicModified( permanentSlotName, value );
@@ -1070,7 +1070,7 @@ const char *SimObject::getDataField(StringTableEntry slotName, const char *array
       {
          static char buf[256];
          dStrcpy(buf, slotName);
-         dStrcat(buf, array);
+         dStrcat(buf, array, 256);
          if (const char* val = mFieldDictionary->getFieldValue(StringTable->insert(buf)))
             return val;
       }
@@ -1311,7 +1311,7 @@ U32 SimObject::getDataFieldType( StringTableEntry slotName, const char* array )
    {
       static char buf[256];
       dStrcpy( buf, slotName );
-      dStrcat( buf, array );
+      dStrcat( buf, array, 256 );
 
       return mFieldDictionary->getFieldType( StringTable->insert( buf ) );
    }
@@ -1334,7 +1334,7 @@ void SimObject::setDataFieldType(const U32 fieldTypeId, StringTableEntry slotNam
    {
       static char buf[256];
       dStrcpy( buf, slotName );
-      dStrcat( buf, array );
+      dStrcat( buf, array, 256 );
 
       mFieldDictionary->setFieldType( StringTable->insert( buf ), fieldTypeId );
       onDynamicModified( slotName, mFieldDictionary->getFieldValue(slotName) );
@@ -1355,7 +1355,7 @@ void SimObject::setDataFieldType(const char *typeName, StringTableEntry slotName
    {
       static char buf[256];
       dStrcpy( buf, slotName );
-      dStrcat( buf, array );
+      dStrcat( buf, array, 256 );
       StringTableEntry permanentSlotName = StringTable->insert(buf);
 
       mFieldDictionary->setFieldType( permanentSlotName, typeName );

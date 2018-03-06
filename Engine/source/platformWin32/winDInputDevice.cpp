@@ -1552,25 +1552,25 @@ const char* DInputDevice::getJoystickAxesString()
       switch ( mObjInfo[i].mInst )
       {
          case SI_XAXIS:
-            dStrcat( buf, "\tX" );
+            dStrcat( buf, "\tX", 64 );
             break;
          case SI_YAXIS:
-            dStrcat( buf, "\tY" );
+            dStrcat( buf, "\tY", 64 );
             break;
          case SI_ZAXIS:
-            dStrcat( buf, "\tZ" );
+            dStrcat( buf, "\tZ", 64 );
             break;
          case SI_RXAXIS:
-            dStrcat( buf, "\tR" );
+            dStrcat( buf, "\tR", 64 );
             break;
          case SI_RYAXIS:
-            dStrcat( buf, "\tU" );
+            dStrcat( buf, "\tU", 64 );
             break;
          case SI_RZAXIS:
-            dStrcat( buf, "\tV" );
+            dStrcat( buf, "\tV", 64 );
             break;
          case SI_SLIDER:
-            dStrcat( buf, "\tS" );
+            dStrcat( buf, "\tS", 64 );
             break;
       }
    }

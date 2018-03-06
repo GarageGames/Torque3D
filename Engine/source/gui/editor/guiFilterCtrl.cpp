@@ -70,8 +70,8 @@ DefineConsoleMethod( GuiFilterCtrl, getValue, const char*, (), , "Return a tuple
    for (U32 i=0; i < filter->size(); i++)
    {
       char value[32];
-      dSprintf(value, 31, "%1.5f ", *(filter->begin()+i) );
-      dStrcat(buffer, value);
+      dSprintf(value, 32, "%1.5f ", *(filter->begin()+i) );
+      dStrcat(buffer, value, 32);
    }
 
    return buffer;

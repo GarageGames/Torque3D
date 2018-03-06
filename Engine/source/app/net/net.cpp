@@ -129,7 +129,7 @@
       if(conn->isConnectionToServer())
       {
          dStrcpy(mBuf, "clientCmd");
-         dStrcat(mBuf, rmtCommandName);
+         dStrcat(mBuf, rmtCommandName, 1024);
 
          char *temp = mArgv[1];
          mArgv[1] = mBuf;
@@ -140,7 +140,7 @@
       else
       {
          dStrcpy(mBuf, "serverCmd");
-         dStrcat(mBuf, rmtCommandName);
+         dStrcat(mBuf, rmtCommandName, 1024);
          char *temp = mArgv[1];
 
          dSprintf(idBuf, sizeof(idBuf), "%d", conn->getId());

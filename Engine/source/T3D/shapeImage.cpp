@@ -522,7 +522,7 @@ bool ShapeBaseImageData::preload(bool server, String &errorStr)
             if (stateSequence[j] && stateSequence[j][0] && stateSequenceRandomFlash[j]) {
                char bufferVis[128];
                dStrncpy(bufferVis, stateSequence[j], 100);
-               dStrcat(bufferVis, "_vis");
+               dStrcat(bufferVis, "_vis", 128);
                s.sequenceVis[i] = shape[i]->findSequence(bufferVis);
             }
             if (s.sequenceVis[i] != -1)

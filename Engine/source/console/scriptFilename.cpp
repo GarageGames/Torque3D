@@ -325,7 +325,7 @@ bool collapseScriptFilename(char *filename, U32 size, const char *src)
       *filename = 0;
       if(*test[i].replace)
          dSprintf(filename, size, "%s/", test[i].replace);
-      dStrcat(filename, rel);
+      dStrcat(filename, rel, size);
       return true;
    }
 

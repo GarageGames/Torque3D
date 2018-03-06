@@ -129,7 +129,7 @@ void GFXGLDevice::enumerateAdapters( Vector<GFXAdapter*> &adapterList )
    if (renderer)
    {
       dStrcpy(toAdd->mName, renderer);
-      dStrncat(toAdd->mName, " OpenGL", GFXAdapter::MaxAdapterNameLen);
+      dStrcat(toAdd->mName, " OpenGL", GFXAdapter::MaxAdapterNameLen);
    }
    else
       dStrcpy(toAdd->mName, "OpenGL");

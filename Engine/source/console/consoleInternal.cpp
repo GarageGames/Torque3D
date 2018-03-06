@@ -900,21 +900,21 @@ DefineEngineFunction(backtrace, void, (), ,
    buf[0] = 0;
    for (U32 i = 0; i < gEvalState.getStackDepth(); i++)
    {
-      dStrcat(buf, "->");
+      dStrcat(buf, "->", totalSize);
 
       if (gEvalState.stack[i]->scopeNamespace && gEvalState.stack[i]->scopeNamespace->mEntryList->mPackage)
       {
-         dStrcat(buf, "[");
-         dStrcat(buf, gEvalState.stack[i]->scopeNamespace->mEntryList->mPackage);
-         dStrcat(buf, "]");
+         dStrcat(buf, "[", totalSize);
+         dStrcat(buf, gEvalState.stack[i]->scopeNamespace->mEntryList->mPackage, totalSize);
+         dStrcat(buf, "]", totalSize);
       }
       if (gEvalState.stack[i]->scopeNamespace && gEvalState.stack[i]->scopeNamespace->mName)
       {
-         dStrcat(buf, gEvalState.stack[i]->scopeNamespace->mName);
-         dStrcat(buf, "::");
+         dStrcat(buf, gEvalState.stack[i]->scopeNamespace->mName, totalSize);
+         dStrcat(buf, "::", totalSize);
       }
       if (gEvalState.stack[i]->scopeName)
-         dStrcat(buf, gEvalState.stack[i]->scopeName);
+         dStrcat(buf, gEvalState.stack[i]->scopeName, totalSize);
    }
 
    Con::printf("BackTrace: %s", buf);
@@ -1362,7 +1362,7 @@ void Namespace::addScriptCallback(const char *funcName, const char *usage, Conso
    char lilBuffer[32];
    dStrcpy(buffer, funcName);
    dSprintf(lilBuffer, 32, "_%d_cb", uid++);
-   dStrcat(buffer, lilBuffer);
+   dStrcat(buffer, lilBuffer, 1024);
 
    Entry *ent = createLocalEntry(StringTable->insert(buffer));
    trashCache();
@@ -1383,7 +1383,7 @@ void Namespace::markGroup(const char* name, const char* usage)
    char lilBuffer[32];
    dStrcpy(buffer, name);
    dSprintf(lilBuffer, 32, "_%d", uid++);
-   dStrcat(buffer, lilBuffer);
+   dStrcat(buffer, lilBuffer, 1024);
 
    Entry *ent = createLocalEntry(StringTable->insert(buffer));
    trashCache();

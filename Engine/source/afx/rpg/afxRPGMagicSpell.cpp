@@ -227,7 +227,7 @@ char* afxRPGMagicSpellData::formatDesc(char* buffer, int len) const
       {
         dStrcpy(target_str, _afxRPGMagicSpell_TargetType::_sEnumTable[i].mName);
         if (spell_target != TARGET_FREE && target_optional)
-          dStrcat(target_str, " (opt)");
+          dStrcat(target_str, " (opt)", 32);
       }
       break;
     }

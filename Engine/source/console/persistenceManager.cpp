@@ -967,10 +967,10 @@ void PersistenceManager::updateToken( const U32 lineNumber, const U32 linePositi
 
    // Build the new line with the
    // preString + newValue + postString
-   dStrcat(newLine, preString);
+   dStrcat(newLine, preString, newLineLen);
    if ( newValue )
-      dStrcat(newLine, newValue);
-   dStrcat(newLine, postString);
+      dStrcat(newLine, newValue, newLineLen);
+   dStrcat(newLine, postString, newLineLen);
 
    // Clear our existing line
    if (mLineBuffer[lineNumber])
@@ -1243,7 +1243,7 @@ PersistenceManager::ParsedObject* PersistenceManager::writeNewObject(SimObject* 
    char* indent = getObjectIndent(parentObject);
 
    if (parentObject)
-      dStrcat(indent, "   \0");
+      dStrcat(indent, "   \0", 2048);
 
    // Write out the beginning of the object declaration
    const char* dclToken = "new";

@@ -1889,7 +1889,7 @@ ConsoleFunction( echo, void, 2, 0, "( string message... ) "
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 1; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len);
 
    Con::printf("%s", ret);
    ret[0] = 0;
@@ -1913,7 +1913,7 @@ ConsoleFunction( warn, void, 2, 0, "( string message... ) "
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 1; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len);
 
    Con::warnf(ConsoleLogEntry::General, "%s", ret);
    ret[0] = 0;
@@ -1937,7 +1937,7 @@ ConsoleFunction( error, void, 2, 0, "( string message... ) "
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
    for(i = 1; i < argc; i++)
-      dStrcat(ret, argv[i]);
+      dStrcat(ret, argv[i], len);
 
    Con::errorf(ConsoleLogEntry::General, "%s", ret);
    ret[0] = 0;

@@ -275,7 +275,7 @@ DefineConsoleMethod(FieldBrushObject, queryFields, const char*, (const char* sim
         // Copy string element.
         dStrcpy( tempBuf, StringUnit::getUnit( groupList, groupIndex, " \t\n" ) );
         // Append internal name.
-        dStrcat( tempBuf, "_begingroup" );
+        dStrcat( tempBuf, "_begingroup", 256 );
         // Store Group.
         groups.push_back( StringTable->insert( tempBuf ) );
     }
