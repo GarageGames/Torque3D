@@ -30,15 +30,15 @@
 
 MODULE_BEGIN( BadWordFilter )
 
-   MODULE_INIT
-   {
-      BadWordFilter::create();
-   }
-   
-   MODULE_SHUTDOWN
-   {
-      BadWordFilter::destroy();
-   }
+MODULE_INIT
+{
+   BadWordFilter::create();
+}
+
+MODULE_SHUTDOWN
+{
+   BadWordFilter::destroy();
+}
 
 MODULE_END;
 
@@ -63,9 +63,9 @@ BadWordFilter::~BadWordFilter()
 
 void BadWordFilter::create()
 {
-   Con::addVariable("pref::enableBadWordFilter", TypeBool, &filteringEnabled, 
-      "@brief If true, the bad word filter will be enabled.\n\n"
-      "@ingroup Game");
+   Con::addVariable("pref::enableBadWordFilter", TypeBool, &filteringEnabled,
+                    "@brief If true, the bad word filter will be enabled.\n\n"
+                    "@ingroup Game");
    gBadWordFilter = new BadWordFilter;
    gBadWordFilter->addBadWord("shit");
    gBadWordFilter->addBadWord("fuck");
@@ -229,55 +229,55 @@ bool BadWordFilter::containsBadWords(const char *cstring)
 }
 
 DefineEngineFunction(addBadWord, bool, (const char* badWord),,
-   "@brief Add a string to the bad word filter\n\n"
+                     "@brief Add a string to the bad word filter\n\n"
 
-   "The bad word filter is a table containing words which will not be "
-   "displayed in chat windows. Instead, a designated replacement string will be displayed.  "
-   "There are already a number of bad words automatically defined.\n\n"
+                     "The bad word filter is a table containing words which will not be "
+                     "displayed in chat windows. Instead, a designated replacement string will be displayed.  "
+                     "There are already a number of bad words automatically defined.\n\n"
 
-   "@param badWord Exact text of the word to restrict.\n"
-   "@return True if word was successfully added, false if the word or a subset of it already exists in the table\n"
+                     "@param badWord Exact text of the word to restrict.\n"
+                     "@return True if word was successfully added, false if the word or a subset of it already exists in the table\n"
 
-   "@see filterString()\n\n"
+                     "@see filterString()\n\n"
 
-   "@tsexample\n"
-      "// In this game, \"Foobar\" is banned\n"
-      "%badWord = \"Foobar\";\n\n"
-      "// Returns true, word was successfully added\n"
-      "addBadWord(%badWord);\n\n"
-      "// Returns false, word has already been added\n"
-      "addBadWord(\"Foobar\");"
-   "@endtsexample\n"
+                     "@tsexample\n"
+                     "// In this game, \"Foobar\" is banned\n"
+                     "%badWord = \"Foobar\";\n\n"
+                     "// Returns true, word was successfully added\n"
+                     "addBadWord(%badWord);\n\n"
+                     "// Returns false, word has already been added\n"
+                     "addBadWord(\"Foobar\");"
+                     "@endtsexample\n"
 
-   "@ingroup Game")
+                     "@ingroup Game")
 {
    return gBadWordFilter->addBadWord(badWord);
 }
 
 DefineEngineFunction(filterString, const char *, (const char* baseString, const char* replacementChars), (nullAsType<const char*>(), nullAsType<const char*>()),
-   "@brief Replaces the characters in a string with designated text\n\n"
+                     "@brief Replaces the characters in a string with designated text\n\n"
 
-   "Uses the bad word filter to determine which characters within the string will be replaced.\n\n"
+                     "Uses the bad word filter to determine which characters within the string will be replaced.\n\n"
 
-   "@param baseString  The original string to filter.\n"
-   "@param replacementChars A string containing letters you wish to swap in the baseString.\n"
-   "@return The new scrambled string \n"
+                     "@param baseString  The original string to filter.\n"
+                     "@param replacementChars A string containing letters you wish to swap in the baseString.\n"
+                     "@return The new scrambled string \n"
 
-   "@see addBadWord()\n"
-   "@see containsBadWords()\n"
+                     "@see addBadWord()\n"
+                     "@see containsBadWords()\n"
 
-   "@tsexample\n"
-      "// Create the base string, can come from anywhere\n"
-      "%baseString = \"Foobar\";\n\n"
-      "// Create a string of random letters\n"
-      "%replacementChars = \"knqwrtlzs\";\n\n"
-      "// Filter the string\n"
-      "%newString = filterString(%baseString, %replacementChars);\n\n"
-      "// Print the new string to console\n"
-      "echo(%newString);"
-   "@endtsexample\n"
+                     "@tsexample\n"
+                     "// Create the base string, can come from anywhere\n"
+                     "%baseString = \"Foobar\";\n\n"
+                     "// Create a string of random letters\n"
+                     "%replacementChars = \"knqwrtlzs\";\n\n"
+                     "// Filter the string\n"
+                     "%newString = filterString(%baseString, %replacementChars);\n\n"
+                     "// Print the new string to console\n"
+                     "echo(%newString);"
+                     "@endtsexample\n"
 
-   "@ingroup Game")
+                     "@ingroup Game")
 {
    const char *replaceStr = NULL;
 
@@ -293,39 +293,39 @@ DefineEngineFunction(filterString, const char *, (const char* baseString, const 
 }
 
 DefineEngineFunction(containsBadWords, bool, (const char* text),,
-   "@brief Checks to see if text is a bad word\n\n"
+                     "@brief Checks to see if text is a bad word\n\n"
 
-   "The text is considered to be a bad word if it has been added to the bad word filter.\n\n"
+                     "The text is considered to be a bad word if it has been added to the bad word filter.\n\n"
 
-   "@param text Text to scan for bad words\n"
-   "@return True if the text has bad word(s), false if it is clean\n"
+                     "@param text Text to scan for bad words\n"
+                     "@return True if the text has bad word(s), false if it is clean\n"
 
-   "@see addBadWord()\n"
-   "@see filterString()\n"
+                     "@see addBadWord()\n"
+                     "@see filterString()\n"
 
-   "@tsexample\n"
-      "// In this game, \"Foobar\" is banned\n"
-      "%badWord = \"Foobar\";\n\n"
-      "// Add a banned word to the bad word filter\n"
-      "addBadWord(%badWord);\n\n"
-      "// Create the base string, can come from anywhere like user chat\n"
-      "%userText = \"Foobar\";\n\n"
-      "// Create a string of random letters\n"
-      "%replacementChars = \"knqwrtlzs\";\n\n"
-      "// If the text contains a bad word, filter it before printing\n"
-      "// Otherwise print the original text\n"
-      "if(containsBadWords(%userText))\n"
-      "{\n"
-      "  // Filter the string\n"
-      "  %filteredText = filterString(%userText, %replacementChars);\n\n"
-      "  // Print filtered text\n"
-      "  echo(%filteredText);\n"
-      "}\n"
-      "else\n"
-      "  echo(%userText);\n\n"
-   "@endtsexample\n"
+                     "@tsexample\n"
+                     "// In this game, \"Foobar\" is banned\n"
+                     "%badWord = \"Foobar\";\n\n"
+                     "// Add a banned word to the bad word filter\n"
+                     "addBadWord(%badWord);\n\n"
+                     "// Create the base string, can come from anywhere like user chat\n"
+                     "%userText = \"Foobar\";\n\n"
+                     "// Create a string of random letters\n"
+                     "%replacementChars = \"knqwrtlzs\";\n\n"
+                     "// If the text contains a bad word, filter it before printing\n"
+                     "// Otherwise print the original text\n"
+                     "if(containsBadWords(%userText))\n"
+                     "{\n"
+                     "  // Filter the string\n"
+                     "  %filteredText = filterString(%userText, %replacementChars);\n\n"
+                     "  // Print filtered text\n"
+                     "  echo(%filteredText);\n"
+                     "}\n"
+                     "else\n"
+                     "  echo(%userText);\n\n"
+                     "@endtsexample\n"
 
-   "@ingroup Game")
+                     "@ingroup Game")
 {
    return gBadWordFilter->containsBadWords(text);
 }

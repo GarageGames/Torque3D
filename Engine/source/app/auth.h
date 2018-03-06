@@ -32,7 +32,8 @@ class Auth2Certificate
 /// Formerly contained data indicating whether a user is valid.
 struct AuthInfo
 {
-   enum {
+   enum
+   {
       MaxNameLen = 31,
    };
 

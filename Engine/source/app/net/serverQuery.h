@@ -87,15 +87,39 @@ struct ServerInfo
    }
    ~ServerInfo();
 
-   bool isNew()            { return( status == Status_New ); }
-   bool isQuerying()       { return( status.test( Status_Querying ) ); }
-   bool isUpdating()       { return( status.test( Status_Updating ) ); }
-   bool hasResponded()     { return( status.test( Status_Responded ) ); }
-   bool isTimedOut()       { return( status.test( Status_TimedOut ) ); }
+   bool isNew()
+   {
+      return( status == Status_New );
+   }
+   bool isQuerying()
+   {
+      return( status.test( Status_Querying ) );
+   }
+   bool isUpdating()
+   {
+      return( status.test( Status_Updating ) );
+   }
+   bool hasResponded()
+   {
+      return( status.test( Status_Responded ) );
+   }
+   bool isTimedOut()
+   {
+      return( status.test( Status_TimedOut ) );
+   }
 
-   bool isDedicated()      { return( status.test( Status_Dedicated ) ); }
-   bool isPassworded()     { return( status.test( Status_Passworded ) ); }
-   bool isLinux()          { return( status.test( Status_Linux ) ); }
+   bool isDedicated()
+   {
+      return( status.test( Status_Dedicated ) );
+   }
+   bool isPassworded()
+   {
+      return( status.test( Status_Passworded ) );
+   }
+   bool isLinux()
+   {
+      return( status.test( Status_Linux ) );
+   }
 
 };
 
@@ -106,12 +130,12 @@ extern Vector<ServerInfo> gServerList;
 extern bool gServerBrowserDirty;
 extern void clearServerList();
 extern void queryLanServers(U32 port, U8 flags, const char* gameType, const char* missionType,
-      U8 minPlayers, U8 maxPlayers, U8 maxBots, U32 regionMask, U32 maxPing, U16 minCPU,
-      U8 filterFlags);
+                            U8 minPlayers, U8 maxPlayers, U8 maxBots, U32 regionMask, U32 maxPing, U16 minCPU,
+                            U8 filterFlags);
 extern void queryMasterGameTypes();
 extern void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
-      U8 minPlayers, U8 maxPlayers, U8 maxBots, U32 regionMask, U32 maxPing, U16 minCPU,
-      U8 filterFlags, U8 buddyCount, U32* buddyList );
+                              U8 minPlayers, U8 maxPlayers, U8 maxBots, U32 regionMask, U32 maxPing, U16 minCPU,
+                              U8 filterFlags, U8 buddyCount, U32* buddyList );
 extern void queryFavoriteServers( U8 flags );
 extern void querySingleServer(const NetAddress* addr, U8 flags);
 extern void startHeartbeat();

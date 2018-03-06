@@ -35,7 +35,8 @@ class HTTPObject : public TCPObject
 private:
    typedef TCPObject Parent;
 protected:
-   enum ParseState {
+   enum ParseState
+   {
       ParsingStatusLine,
       ParsingHeader,
       ParsingChunkHeader,
@@ -45,7 +46,7 @@ protected:
    ParseState mParseState;
    U32 mTotalBytes;
    U32 mBytesRemaining;
- public:
+public:
    U32 mStatus;
    F32 mVersion;
    U32 mContentLength;

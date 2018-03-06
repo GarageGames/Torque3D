@@ -44,14 +44,14 @@ ConsoleDoc(
 BanList* BanList::smInstance;
 
 MODULE_BEGIN( BanList )
-   MODULE_INIT
-   {
-      new BanList;
-   }
-   MODULE_SHUTDOWN
-   {
-      delete BanList::instance();
-   }
+MODULE_INIT
+{
+   new BanList;
+}
+MODULE_SHUTDOWN
+{
+   delete BanList::instance();
+}
 MODULE_END;
 
 
@@ -61,7 +61,7 @@ BanList::BanList()
 {
    AssertFatal( !smInstance, "BanList::BanList - already instantiated" );
    VECTOR_SET_ASSOCIATION( list );
-   
+
    smInstance = this;
 }
 
@@ -76,7 +76,7 @@ void BanList::addBan(S32 uniqueId, const char *TA, S32 banTime)
 
    // make sure this bastard isn't already banned on this server
    Vector<BanInfo>::iterator i;
-   for(i = list.begin();i != list.end();i++)
+   for(i = list.begin(); i != list.end(); i++)
    {
       if(uniqueId == i->uniqueId)
       {
@@ -120,7 +120,7 @@ void BanList::addBanRelative(S32 uniqueId, const char *TA, S32 numSeconds)
 void BanList::removeBan(S32 uniqueId, const char *)
 {
    Vector<BanInfo>::iterator i;
-   for(i = list.begin();i != list.end();i++)
+   for(i = list.begin(); i != list.end(); i++)
    {
       if(uniqueId == i->uniqueId)
       {
@@ -137,7 +137,7 @@ bool BanList::isBanned(S32 uniqueId, const char *)
    S32 curTime = Platform::getTime();
 
    Vector<BanInfo>::iterator i;
-   for(i = list.begin();i != list.end();)
+   for(i = list.begin(); i != list.end();)
    {
       if(i->bannedUntil != 0 && i->bannedUntil < curTime)
       {
@@ -199,24 +199,24 @@ void BanList::exportToFile(const char *name)
 //-----------------------------------------------------------------------------
 
 DefineEngineStaticMethod( BanList, addAbsolute, void, ( S32 uniqueId, const char* transportAddress, S32 banTime ),,
-              "Ban a user until a given time.\n\n"
-              "@param uniqueId Unique ID of the player.\n"
-              "@param transportAddress Address from which the player connected.\n"
-              "@param banTime Time at which they will be allowed back in."
-			  "@tsexample\n"
-			  "// Kick someone off the server\n"
-			  "// %client - This is the connection to the person we are kicking\n"
-			  "function kick(%client)\n"
-			  "{\n"
-			  "		// Let the server know what happened\n"
-			  "		messageAll( 'MsgAdminForce', '\\c2The Admin has kicked %1.', %client.playerName);\n\n"
-			  "		// If it is not an AI Player, execute the ban.\n"
-			  "		if (!%client.isAIControlled())\n"
-			  "			BanList::addAbsolute(%client.guid, %client.getAddress(), $pref::Server::KickBanTime);\n\n"				   
-			  "		// Let the player know they messed up\n"
-			  "		%client.delete(\"You have been kicked from this server\");\n"
-			  "}\n"
-			  "@endtsexample\n\n")
+                          "Ban a user until a given time.\n\n"
+                          "@param uniqueId Unique ID of the player.\n"
+                          "@param transportAddress Address from which the player connected.\n"
+                          "@param banTime Time at which they will be allowed back in."
+                          "@tsexample\n"
+                          "// Kick someone off the server\n"
+                          "// %client - This is the connection to the person we are kicking\n"
+                          "function kick(%client)\n"
+                          "{\n"
+                          "		// Let the server know what happened\n"
+                          "		messageAll( 'MsgAdminForce', '\\c2The Admin has kicked %1.', %client.playerName);\n\n"
+                          "		// If it is not an AI Player, execute the ban.\n"
+                          "		if (!%client.isAIControlled())\n"
+                          "			BanList::addAbsolute(%client.guid, %client.getAddress(), $pref::Server::KickBanTime);\n\n"
+                          "		// Let the player know they messed up\n"
+                          "		%client.delete(\"You have been kicked from this server\");\n"
+                          "}\n"
+                          "@endtsexample\n\n")
 {
    BanList::instance()->addBan( uniqueId, transportAddress, banTime );
 }
@@ -224,24 +224,24 @@ DefineEngineStaticMethod( BanList, addAbsolute, void, ( S32 uniqueId, const char
 //-----------------------------------------------------------------------------
 
 DefineEngineStaticMethod( BanList, add, void, ( S32 uniqueId, const char* transportAddress, S32 banLength ),,
-              "Ban a user for banLength seconds.\n\n"
-              "@param uniqueId Unique ID of the player.\n"
-              "@param transportAddress Address from which the player connected.\n"
-              "@param banLength Time period over which to ban the player."
-			  "@tsexample\n"
-			  "// Kick someone off the server\n"
-			  "// %client - This is the connection to the person we are kicking\n"
-			  "function kick(%client)\n"
-			  "{\n"
-			  "		// Let the server know what happened\n"
-			  "		messageAll( 'MsgAdminForce', '\\c2The Admin has kicked %1.', %client.playerName);\n\n"
-			  "		// If it is not an AI Player, execute the ban.\n"
-			  "		if (!%client.isAIControlled())\n"
-			  "			BanList::add(%client.guid, %client.getAddress(), $pref::Server::KickBanTime);\n\n"				   
-			  "		// Let the player know they messed up\n"
-			  "		%client.delete(\"You have been kicked from this server\");\n"
-			  "}\n"
-			  "@endtsexample\n\n")
+                          "Ban a user for banLength seconds.\n\n"
+                          "@param uniqueId Unique ID of the player.\n"
+                          "@param transportAddress Address from which the player connected.\n"
+                          "@param banLength Time period over which to ban the player."
+                          "@tsexample\n"
+                          "// Kick someone off the server\n"
+                          "// %client - This is the connection to the person we are kicking\n"
+                          "function kick(%client)\n"
+                          "{\n"
+                          "		// Let the server know what happened\n"
+                          "		messageAll( 'MsgAdminForce', '\\c2The Admin has kicked %1.', %client.playerName);\n\n"
+                          "		// If it is not an AI Player, execute the ban.\n"
+                          "		if (!%client.isAIControlled())\n"
+                          "			BanList::add(%client.guid, %client.getAddress(), $pref::Server::KickBanTime);\n\n"
+                          "		// Let the player know they messed up\n"
+                          "		%client.delete(\"You have been kicked from this server\");\n"
+                          "}\n"
+                          "@endtsexample\n\n")
 {
    BanList::instance()->addBanRelative( uniqueId, transportAddress, banLength );
 }
@@ -249,12 +249,12 @@ DefineEngineStaticMethod( BanList, add, void, ( S32 uniqueId, const char* transp
 //-----------------------------------------------------------------------------
 
 DefineEngineStaticMethod( BanList, removeBan, void, ( S32 uniqueId, const char* transportAddress ),,
-              "Unban someone.\n\n"
-              "@param uniqueId Unique ID of the player.\n"
-              "@param transportAddress Address from which the player connected.\n" 
-			  "@tsexample\n"
-			  "BanList::removeBan(%userID, %ipAddress);\n"
-			  "@endtsexample\n\n")
+                          "Unban someone.\n\n"
+                          "@param uniqueId Unique ID of the player.\n"
+                          "@param transportAddress Address from which the player connected.\n"
+                          "@tsexample\n"
+                          "BanList::removeBan(%userID, %ipAddress);\n"
+                          "@endtsexample\n\n")
 {
    BanList::instance()->removeBan( uniqueId, transportAddress );
 }
@@ -262,28 +262,28 @@ DefineEngineStaticMethod( BanList, removeBan, void, ( S32 uniqueId, const char* 
 //-----------------------------------------------------------------------------
 
 DefineEngineStaticMethod( BanList, isBanned, bool, ( S32 uniqueId, const char* transportAddress ),,
-              "Is someone banned?\n\n"
-              "@param uniqueId Unique ID of the player.\n"
-              "@param transportAddress Address from which the player connected.\n\n"
-			  "@tsexample\n"
-			  "//-----------------------------------------------------------------------------\n"
-			  "// This script function is called before a client connection\n"
-			  "// is accepted.  Returning "" will accept the connection,\n"
-			  "// anything else will be sent back as an error to the client.\n"
-			  "// All the connect args are passed also to onConnectRequest\n"
-			  "function GameConnection::onConnectRequest( %client, %netAddress, %name )\n"
-			  "{\n"
-			  "	  // Find out who is trying to connect\n"
-			  "	  echo(\"Connect request from: \" @ %netAddress);\n\n"
-			  "	  // Are they allowed in?\n"
-			  "	  if(BanList::isBanned(%client.guid, %netAddress))\n"
-			  "		  return \"CR_YOUAREBANNED\";\n\n"
-			  "	  // Is there room for an unbanned player?\n"
-			  "	  if($Server::PlayerCount >= $pref::Server::MaxPlayers)\n"
-			  "		  return \"CR_SERVERFULL\";\n"
-			  "	  return "";\n"
-			  "}\n"
-			  "@endtsexample\n\n")
+                          "Is someone banned?\n\n"
+                          "@param uniqueId Unique ID of the player.\n"
+                          "@param transportAddress Address from which the player connected.\n\n"
+                          "@tsexample\n"
+                          "//-----------------------------------------------------------------------------\n"
+                          "// This script function is called before a client connection\n"
+                          "// is accepted.  Returning "" will accept the connection,\n"
+                          "// anything else will be sent back as an error to the client.\n"
+                          "// All the connect args are passed also to onConnectRequest\n"
+                          "function GameConnection::onConnectRequest( %client, %netAddress, %name )\n"
+                          "{\n"
+                          "	  // Find out who is trying to connect\n"
+                          "	  echo(\"Connect request from: \" @ %netAddress);\n\n"
+                          "	  // Are they allowed in?\n"
+                          "	  if(BanList::isBanned(%client.guid, %netAddress))\n"
+                          "		  return \"CR_YOUAREBANNED\";\n\n"
+                          "	  // Is there room for an unbanned player?\n"
+                          "	  if($Server::PlayerCount >= $pref::Server::MaxPlayers)\n"
+                          "		  return \"CR_SERVERFULL\";\n"
+                          "	  return "";\n"
+                          "}\n"
+                          "@endtsexample\n\n")
 {
    return BanList::instance()->isBanned( uniqueId, transportAddress );
 }
@@ -291,11 +291,11 @@ DefineEngineStaticMethod( BanList, isBanned, bool, ( S32 uniqueId, const char* t
 //-----------------------------------------------------------------------------
 
 DefineEngineStaticMethod( BanList, export, void, ( const char* filename ),,
-              "Dump the banlist to a file.\n\n"
-              "@param filename Path of the file to write the list to.\n\n"
-			  "@tsexample\n"
-			  "BanList::Export(\"./server/banlist.cs\");\n"
-			  "@endtsexample\n\n")
+                          "Dump the banlist to a file.\n\n"
+                          "@param filename Path of the file to write the list to.\n\n"
+                          "@tsexample\n"
+                          "BanList::Export(\"./server/banlist.cs\");\n"
+                          "@endtsexample\n\n")
 {
    BanList::instance()->exportToFile( filename );
 }

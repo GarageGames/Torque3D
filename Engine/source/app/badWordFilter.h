@@ -35,7 +35,8 @@ private:
    friend struct FilterTable;
    Vector<FilterTable*> filterTables;
 
-   enum {
+   enum
+   {
       TerminateNotFound = 0xFFFE,
       TerminateFound = 0xFFFF,
       MaxBadwordLength = 32,
@@ -52,12 +53,21 @@ private:
 public:
    bool addBadWord(const char *word);
    bool setDefaultReplaceStr(const char *str);
-   const char* getDefaultReplaceStr(){ return defaultReplaceStr; }
+   const char* getDefaultReplaceStr()
+   {
+      return defaultReplaceStr;
+   }
    void filterString(char *string, const char *replaceStr = NULL);
    bool containsBadWords(const char *string);
 
-   static bool isEnabled() { return filteringEnabled; }
-   static void setEnabled(bool enable) { filteringEnabled = enable; }
+   static bool isEnabled()
+   {
+      return filteringEnabled;
+   }
+   static void setEnabled(bool enable)
+   {
+      filteringEnabled = enable;
+   }
    static void create();
    static void destroy();
 };

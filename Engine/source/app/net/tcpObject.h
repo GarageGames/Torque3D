@@ -34,15 +34,15 @@ class TCPObject : public SimObject
 public:
    enum State {Disconnected, DNSResolved, Connected, Listening };
 
-	DECLARE_CALLBACK(void, onConnectionRequest, (const char* address, const char* ID));
-	DECLARE_CALLBACK(void, onLine, (const char* line));
-	DECLARE_CALLBACK(bool, onPacket, (const char* data));
-	DECLARE_CALLBACK(void, onEndReceive, ());
-	DECLARE_CALLBACK(void, onDNSResolved,());
-	DECLARE_CALLBACK(void, onDNSFailed, ());
-	DECLARE_CALLBACK(void, onConnected, ());
-	DECLARE_CALLBACK(void, onConnectFailed, ());
-	DECLARE_CALLBACK(void, onDisconnect, ());
+   DECLARE_CALLBACK(void, onConnectionRequest, (const char* address, const char* ID));
+   DECLARE_CALLBACK(void, onLine, (const char* line));
+   DECLARE_CALLBACK(bool, onPacket, (const char* data));
+   DECLARE_CALLBACK(void, onEndReceive, ());
+   DECLARE_CALLBACK(void, onDNSResolved,());
+   DECLARE_CALLBACK(void, onDNSFailed, ());
+   DECLARE_CALLBACK(void, onConnected, ());
+   DECLARE_CALLBACK(void, onConnectFailed, ());
+   DECLARE_CALLBACK(void, onDisconnect, ());
 
 private:
    NetSocket mTag;
@@ -81,7 +81,10 @@ public:
    void connect(const char *address);
    void listen(U16 port);
    void disconnect();
-   State getState() { return mState; }
+   State getState()
+   {
+      return mState;
+   }
 
    bool processArguments(S32 argc, ConsoleValueRef *argv);
    void send(const U8 *buffer, U32 bufferLen);
@@ -94,7 +97,10 @@ public:
    void addToTable(NetSocket newTag);
    void removeFromTable();
 
-   void setPort(U16 port) { mPort = port; }
+   void setPort(U16 port)
+   {
+      mPort = port;
+   }
 
    bool onAdd();
 
