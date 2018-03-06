@@ -643,8 +643,8 @@ DefineEngineFunction(fileName, String, ( const char* fileName ),,
       name = szPathCopy;
    else
       name++;
-   char *ret = Con::getReturnBuffer(dStrlen(name));
-   dStrcpy(ret, name, dStrlen(name));
+   char *ret = Con::getReturnBuffer(dStrlen(name) + 1);
+   dStrcpy(ret, name, dStrlen(name) + 1);
    return ret;
 }
 
