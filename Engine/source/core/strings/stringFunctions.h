@@ -47,21 +47,23 @@
 
 #endif // defined(TORQUE_OS_WIN)
 
-#define DEBUG_CHECK_OVERFLOW 1
+#define DEBUG_CHECK_STRING_OVERFLOW
 
 //------------------------------------------------------------------------------
 // standard string functions [defined in platformString.cpp]
 
+#ifdef UNSAFE_STRING_FUNCTIONS
 /// @deprecated Use dStrcat(char *, const char *, dsize_t) instead
 inline char *dStrcat(char *dst, const char *src)
 {
    AssertFatal(false, "dStrcat without length is deprecated");
    return strcat(dst,src);
 }   
+#endif
 
 inline char *dStrcat(char *dst, const char *src, dsize_t len)
 {
-#ifdef DEBUG_CHECK_OVERFLOW
+#ifdef DEBUG_CHECK_STRING_OVERFLOW
    if (strlen(src) >= len) {
       AssertWarn(false, "dStrcat out of range");
    }
@@ -99,16 +101,18 @@ inline S32  dStrnicmp(const char *str1, const char *str2, dsize_t len)
    return strncasecmp( str1, str2, len );
 }
 
+#ifdef UNSAFE_STRING_FUNCTIONS
 /// @deprecated Use strcpy(char *, const char *, dsize_t) instead
 inline char *dStrcpy(char *dst, const char *src)
 {
    AssertFatal(false, "dStrcpy without length is deprecated");
    return strcpy(dst,src);
 }
+#endif
 
 inline char *dStrcpy(char *dst, const char *src, dsize_t len)
 {
-#ifdef DEBUG_CHECK_OVERFLOW
+#ifdef DEBUG_CHECK_STRING_OVERFLOW
    if (strlen(src) >= len) {
       AssertWarn(false, "dStrcpy out of range");
    }
