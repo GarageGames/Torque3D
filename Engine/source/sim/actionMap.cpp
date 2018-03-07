@@ -1159,7 +1159,7 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
       }
       //for (U32 i = 0; gVirtualMap[i].code != 0xFFFFFFFF; i++) {
       //   if (gVirtualMap[i].code == action) {
-      //      dStrcpy(buffer, gVirtualMap[i].pDescription);
+      //      dStrcpy(buffer, gVirtualMap[i].pDescription, 16);
       //      return true;
       //   }
       //}

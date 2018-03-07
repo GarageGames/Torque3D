@@ -158,18 +158,18 @@ S32 Callback(void *pArg, S32 argc, char **argv, char **columnNames)
 		// DBEUG CODE
   //      Con::printf("%s = %s\n", columnNames[i], argv[i] ? argv[i] : "NULL");
 		name = new char[dStrlen(columnNames[i]) + 1];
-		dStrcpy(name, columnNames[i]);
+		dStrcpy(name, columnNames[i], dStrlen(columnNames[i]) + 1);
 		pRow->vColumnNames.push_back(name);
 		if (argv[i])
 		{
 			value = new char[dStrlen(argv[i]) + 1];
-			dStrcpy(value, argv[i]);
+			dStrcpy(value, argv[i], dStrlen(argv[i]) + 1);
 			pRow->vColumnValues.push_back(value);
 		}
 		else
 		{
 			value = new char[10];
-			dStrcpy(value, "NULL");
+			dStrcpy(value, "NULL", 10);
 			pRow->vColumnValues.push_back(value);
 		}
 	}
