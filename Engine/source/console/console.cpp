@@ -2176,8 +2176,8 @@ bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWor
       }
 
       // Format the output path.
-      dStrcat(pathBuffer, "/", sizeof(pathBuffer) - 1 - strlen(pathBuffer));
-      dStrcat(pathBuffer, pSrc, sizeof(pathBuffer) - 1 - strlen(pathBuffer));
+      dStrncat(pathBuffer, "/", sizeof(pathBuffer) - 1 - strlen(pathBuffer));
+      dStrncat(pathBuffer, pSrc, sizeof(pathBuffer) - 1 - strlen(pathBuffer));
 
       // Are we ensuring the trailing slash?
       if (ensureTrailingSlash)

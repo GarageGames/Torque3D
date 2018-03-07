@@ -158,8 +158,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
 
       Platform::clearExcludedDirectories();
 
-      S32 tempBufSize = to.size * 3 + MAX_PATH * 3;
-      TempAlloc< char > tempBuf( tempBufSize );
+      TempAlloc< char > tempBuf( to.size * 3 + MAX_PATH * 3 );
 
       // Create all the directories.
       for (S32 i = 0; i < directoryInfo.size(); i++)
@@ -169,7 +168,7 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
          char* toDir = tempBuf;
          Platform::makeFullPathName(fromDir + dStrlen(fromName) + (dStricmp(fromDir, fromName) ? 1 : 0), tempBuf, tempBuf.size, toName);
          if(*(toDir + dStrlen(toDir) - 1) != '/')
-            dStrcat(toDir, "/", tempBufSize);
+            dStrcat(toDir, "/", tempBuf.size);
          forwardslash(toDir);
 
          if (!Platform::createPath(toDir))
@@ -192,8 +191,8 @@ bool dPathCopy(const char *fromName, const char *toName, bool nooverwrite)
 
          char* toFile = tempBuf;
          Platform::makeFullPathName(fileInfo[i].pFullPath + dStrlen(fromName) + (dStricmp(fileInfo[i].pFullPath, fromName) ? 1 : 0), tempBuf, tempBuf.size, toName);
-         dStrcat(toFile, "/", tempBufSize);
-         dStrcat(toFile, fileInfo[i].pFileName, tempBufSize);
+         dStrcat(toFile, "/", tempBuf.size);
+         dStrcat(toFile, fileInfo[i].pFileName, tempBuf.size);
 
          backslash(fromFile);
          backslash(toFile);

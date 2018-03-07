@@ -967,10 +967,10 @@ void PersistenceManager::updateToken( const U32 lineNumber, const U32 linePositi
 
    // Build the new line with the
    // preString + newValue + postString
-   dStrcat(newLine, preString, newLineLen);
+   dStrcat(newLine, preString, newLineLen + 1);
    if ( newValue )
-      dStrcat(newLine, newValue, newLineLen);
-   dStrcat(newLine, postString, newLineLen);
+      dStrcat(newLine, newValue, newLineLen + 1);
+   dStrcat(newLine, postString, newLineLen + 1);
 
    // Clear our existing line
    if (mLineBuffer[lineNumber])
