@@ -33,7 +33,7 @@ bool fsTiXmlDocument::LoadFile( const char * pFilename, TiXmlEncoding encoding )
 
 #ifdef TORQUE_OS_ANDROID
    if (strlen(pFilename) > strlen(filenameBuffer)) {
-      strcpy(filenameBuffer, pFilename);
+      dStrcpy(filenameBuffer, pFilename, 1024);
    }
 #endif
 
