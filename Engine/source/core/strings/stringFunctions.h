@@ -73,7 +73,7 @@ inline char *dStrcat(char *dst, const char *src, dsize_t len)
 
 inline char *dStrncat(char *dst, const char *src, dsize_t len)
 {
-   return dStrcat(dst, src, len);
+   return strncat(dst, src, len);
 }
 
 inline S32  dStrcmp(const char *str1, const char *str2)
