@@ -733,7 +733,6 @@ bool ConvexShape::buildExportPolyList(ColladaUtils::ExportData* exportData, cons
       meshData->originatingObject = this;
       meshData->meshTransform = mObjToWorld;
       meshData->scale = mObjScale;
-      meshData->fillWithSingleDetail = true;
 
       meshData->meshDetailLevels.increment();
 
