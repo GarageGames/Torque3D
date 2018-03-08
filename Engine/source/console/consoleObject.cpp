@@ -888,7 +888,7 @@ DefineEngineFunction( enumerateConsoleClassesByCategory, const char*, ( String c
           && ( repCategory[ categoryLength ] == ' ' || repCategory[ categoryLength ] == '\0' ) )
       {
          classes.push_back( rep );
-         bufSize += dStrlen( rep->getClassName() + 1 );
+         bufSize += dStrlen( rep->getClassName() ) + 1;
       }
    }
 
