@@ -47,10 +47,13 @@
 
 #endif // defined(TORQUE_OS_WIN)
 
-#define DEBUG_CHECK_STRING_OVERFLOW
-
 //------------------------------------------------------------------------------
 // standard string functions [defined in platformString.cpp]
+
+// Buffer size bounds checking "safe" versions of strcat and strcpy. Ideally you
+// should use these and check if they return >= dstSize and throw an error if so.
+extern S32  dStrlcat(char *dst, const char *src, dsize_t dstSize);
+extern S32  dStrlcpy(char *dst, const char *src, dsize_t dstSize);
 
 #ifdef UNSAFE_STRING_FUNCTIONS
 /// @deprecated Use dStrcat(char *, const char *, dsize_t) instead
@@ -61,14 +64,15 @@ inline char *dStrcat(char *dst, const char *src)
 }   
 #endif
 
-inline char *dStrcat(char *dst, const char *src, dsize_t len)
+/// Concatenate strings.
+/// @note The third parameter is the size of the destination buffer like strlcat
+///       instead of the number of characters to copy like strncat. This is done
+///       under the assumption that being easier to use will make this safer.
+///       If you want the original behavior use dStrncat.
+inline char *dStrcat(char *dst, const char *src, dsize_t dstSize)
 {
-#ifdef DEBUG_CHECK_STRING_OVERFLOW
-   if (strlen(src) >= len) {
-      AssertWarn(false, "dStrcat out of range");
-   }
-#endif
-   return strncat(dst,src,len - 1); //Safety because strncat copies at most len+1 characters
+   dStrlcat(dst, src, dstSize);
+   return dst;
 }
 
 inline char *dStrncat(char *dst, const char *src, dsize_t len)
@@ -110,14 +114,10 @@ inline char *dStrcpy(char *dst, const char *src)
 }
 #endif
 
-inline char *dStrcpy(char *dst, const char *src, dsize_t len)
+inline char *dStrcpy(char *dst, const char *src, dsize_t dstSize)
 {
-#ifdef DEBUG_CHECK_STRING_OVERFLOW
-   if (strlen(src) >= len) {
-      AssertWarn(false, "dStrcpy out of range");
-   }
-#endif
-   return strncpy(dst,src,len);
+   dStrlcpy(dst, src, dstSize);
+   return dst;
 }   
 
 inline char *dStrncpy(char *dst, const char *src, dsize_t len)
