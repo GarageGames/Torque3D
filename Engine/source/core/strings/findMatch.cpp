@@ -71,8 +71,9 @@ void FindMatch::setExpression( const char *_expression )
 {
    delete [] expression;
 
-   expression = new char[dStrlen(_expression) + 1];
-   dStrcpy(expression, _expression, dStrlen(_expression) + 1);
+   dsize_t expressionLen = dStrlen(_expression) + 1;
+   expression = new char[expressionLen];
+   dStrcpy(expression, _expression, expressionLen);
    dStrupr(expression);
 }
 

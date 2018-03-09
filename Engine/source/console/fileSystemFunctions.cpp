@@ -617,8 +617,9 @@ DefineEngineFunction(fileBase, String, ( const char* fileName ),,
       path = szPathCopy;
    else
       path++;
-   char *ret = Con::getReturnBuffer(dStrlen(path) + 1);
-   dStrcpy(ret, path, dStrlen(path) + 1);
+   dsize_t retLen = dStrlen(path) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, path, retLen);
    char *ext = dStrrchr(ret, '.');
    if(ext)
       *ext = 0;
@@ -643,8 +644,9 @@ DefineEngineFunction(fileName, String, ( const char* fileName ),,
       name = szPathCopy;
    else
       name++;
-   char *ret = Con::getReturnBuffer(dStrlen(name) + 1);
-   dStrcpy(ret, name, dStrlen(name) + 1);
+   dsize_t retLen = dStrlen(name) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, name, retLen);
    return ret;
 }
 

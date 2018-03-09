@@ -585,8 +585,9 @@ DefineConsoleFunction( strlwr, const char*, ( const char* str ),,
    "@see strupr\n"
    "@ingroup Strings" )
 {
-   char *ret = Con::getReturnBuffer(dStrlen(str) + 1);
-   dStrcpy(ret, str, dStrlen(str) + 1);
+   dsize_t retLen = dStrlen(str) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, str, retLen);
    return dStrlwr(ret);
 }
 
@@ -602,8 +603,9 @@ DefineConsoleFunction( strupr, const char*, ( const char* str ),,
    "@see strlwr\n"
    "@ingroup Strings" )
 {
-   char *ret = Con::getReturnBuffer(dStrlen(str) + 1);
-   dStrcpy(ret, str, dStrlen(str) + 1);
+   dsize_t retLen = dStrlen(str) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, str, retLen);
    return dStrupr(ret);
 }
 
@@ -1826,8 +1828,9 @@ DefineEngineFunction( detag, const char*, ( const char* str ),,
       if( word == NULL )
          return "";
          
-      char* ret = Con::getReturnBuffer( dStrlen( word + 1 ) + 1 );
-      dStrcpy( ret, word + 1, dStrlen(word + 1) + 1 );
+      dsize_t retLen = dStrlen(word + 1) + 1;
+      char* ret = Con::getReturnBuffer(retLen);
+      dStrcpy( ret, word + 1, retLen );
       return ret;
    }
    else

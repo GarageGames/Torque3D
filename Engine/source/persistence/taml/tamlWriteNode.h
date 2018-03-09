@@ -53,8 +53,9 @@ public:
             mName = name;
 
             // Allocate and copy the value.
-            mpValue = new char[ dStrlen(pValue)+1 ];
-            dStrcpy( (char *)mpValue, pValue, dStrlen(pValue) + 1 );
+            dsize_t valueLen = dStrlen(pValue) + 1;
+            mpValue = new char[ valueLen ];
+            dStrcpy( (char *)mpValue, pValue, valueLen );
         }
         
 

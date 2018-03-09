@@ -182,8 +182,9 @@ extern "C" {
 
 	void torque_setexecutablepath(const char* directory)
 	{
-		gExecutablePath = new char[dStrlen(directory)+1];
-		dStrcpy(gExecutablePath, directory, dStrlen(directory)+1);
+		dsize_t pathLen = dStrlen(directory) + 1;
+		gExecutablePath = new char[pathLen];
+		dStrcpy(gExecutablePath, directory, pathLen);
 	} 
 
    // set Torque 3D into web deployment mode (disable fullscreen exlusive mode, etc)

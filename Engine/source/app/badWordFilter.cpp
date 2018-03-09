@@ -286,8 +286,9 @@ DefineEngineFunction(filterString, const char *, (const char* baseString, const 
    else
       replaceStr = gBadWordFilter->getDefaultReplaceStr();
 
-   char *ret = Con::getReturnBuffer(dStrlen(baseString) + 1);
-   dStrcpy(ret, baseString, dStrlen(baseString) + 1);
+   dsize_t retLen = dStrlen(baseString) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, baseString, retLen);
    gBadWordFilter->filterString(ret, replaceStr);
    return ret;
 }

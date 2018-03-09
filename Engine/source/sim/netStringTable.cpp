@@ -96,8 +96,9 @@ U32 NetStringTable::addString(const char *string)
       size = newSize;
    }
    table[e].refCount++;
-   table[e].string = (char *) allocator->alloc(dStrlen(string) + 1);
-   dStrcpy(table[e].string, string, dStrlen(string) + 1);
+   dsize_t stringLen = dStrlen(string) + 1;
+   table[e].string = (char *) allocator->alloc(stringLen);
+   dStrcpy(table[e].string, string, stringLen);
    table[e].next = hashTable[bucket];
    hashTable[bucket] = e;
    table[e].link = firstValid;
@@ -178,8 +179,9 @@ void NetStringTable::repack()
       const char *prevStr = table[walk].string;
 
 
-      table[walk].string = (char *) newAllocator->alloc(dStrlen(prevStr) + 1);
-      dStrcpy(table[walk].string, prevStr, dStrlen(prevStr) + 1);
+      dsize_t prevStrLen = dStrlen(prevStr) + 1;
+      table[walk].string = (char *) newAllocator->alloc(prevStrLen);
+      dStrcpy(table[walk].string, prevStr, prevStrLen);
    }
    delete allocator;
    allocator = newAllocator;

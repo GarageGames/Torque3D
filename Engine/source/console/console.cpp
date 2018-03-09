@@ -646,8 +646,9 @@ static void _printf(ConsoleLogEntry::Level level, ConsoleLogEntry::Type type, co
             entry.mLevel  = level;
             entry.mType   = type;
 #ifndef TORQUE_SHIPPING // this is equivalent to a memory leak, turn it off in ship build            
-            entry.mString = (const char *)consoleLogChunker.alloc(dStrlen(pos) + 1);
-            dStrcpy(const_cast<char*>(entry.mString), pos, dStrlen(pos) + 1);
+            dsize_t logStringLen = dStrlen(pos) + 1;
+            entry.mString = (const char *)consoleLogChunker.alloc(logStringLen);
+            dStrcpy(const_cast<char*>(entry.mString), pos, logStringLen);
             
             // This prevents infinite recursion if the console itself needs to
             // re-allocate memory to accommodate the new console log entry, and 
