@@ -693,8 +693,9 @@ DefineEngineMethod( SFXSound, setPosition, void, ( F32 position ),,
    "playback will resume at the given position when play() is called.\n\n"
    "@param position The new position of the play cursor (in seconds).\n" )
 {
-   if( position >= 0 && position <= object->getDuration() )
-      object->setPosition( position * 1000.0f );
+   position *= 1000.0f;
+   if( position >= 0 && position < object->getDuration() )
+      object->setPosition( position );
 }
 
 //-----------------------------------------------------------------------------
