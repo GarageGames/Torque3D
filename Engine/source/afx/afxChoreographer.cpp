@@ -142,7 +142,7 @@ afxChoreographer::afxChoreographer()
   lod = 0;
   exec_conds_mask = 0;
   choreographer_id = 0;
-  extra = 0;
+  mExtra = 0;
   started_with_newop = false;
   postpone_activation = false;
   remapped_cons_sent = false; // CONSTRAINT REMAPPING
@@ -179,7 +179,7 @@ afxChoreographer::~afxChoreographer()
 void afxChoreographer::initPersistFields()
 {
   // conditionals
-  addField("extra",              TYPEID<SimObject>(), Offset(extra, afxChoreographer),
+  addField("extra",              TYPEID<SimObject>(), Offset(mExtra, afxChoreographer),
     "...");
   addField("postponeActivation", TypeBool,            Offset(postpone_activation, afxChoreographer),
     "...");

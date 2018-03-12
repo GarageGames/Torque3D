@@ -121,7 +121,7 @@ protected:
   U8                ranking;
   U8                lod;
   U32               exec_conds_mask;
-  SimObject*        extra;
+  SimObject*        mExtra;
   Vector<NetConnection*> explicit_clients;
   bool              started_with_newop;
   bool              postpone_activation;
@@ -182,7 +182,7 @@ public:
   void              clearChoreographerId() { choreographer_id = 0; }
   U32               getChoreographerId() { return choreographer_id; }
   void              setGhostConstraintObject(SceneObject*, StringTableEntry cons_name);
-  void              setExtra(SimObject* extra) { this->extra = extra; }
+  void              setExtra(SimObject* extra) { mExtra = extra; }
   void              addExplicitClient(NetConnection* conn);
   void              removeExplicitClient(NetConnection* conn);
   U32               getExplicitClientCount() { return explicit_clients.size(); }
