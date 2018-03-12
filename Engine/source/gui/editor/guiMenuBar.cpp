@@ -1369,19 +1369,19 @@ void GuiMenuBar::buildWindowAcceleratorMap(WindowInputGenerator &inputGenerator)
    {
       for (U32 item = 0; item < mMenuList[i].popupMenu->mMenuItems.size(); item++)
       {
-         if (!mMenuList[i].popupMenu->mMenuItems[item].accelerator)
+         if (!mMenuList[i].popupMenu->mMenuItems[item].mAccelerator)
          {
-            mMenuList[i].popupMenu->mMenuItems[item].accelerator = 0;
+            mMenuList[i].popupMenu->mMenuItems[item].mAccelerator = 0;
             continue;
          }
 
          EventDescriptor accelEvent;
-         ActionMap::createEventDescriptor(mMenuList[i].popupMenu->mMenuItems[item].accelerator, &accelEvent);
+         ActionMap::createEventDescriptor(mMenuList[i].popupMenu->mMenuItems[item].mAccelerator, &accelEvent);
 
          //now we have a modifier, and a key, add them to the canvas
-         inputGenerator.addAcceleratorKey(this, mMenuList[i].popupMenu->mMenuItems[item].cmd, accelEvent.eventCode, accelEvent.flags);
+         inputGenerator.addAcceleratorKey(this, mMenuList[i].popupMenu->mMenuItems[item].mCMD, accelEvent.eventCode, accelEvent.flags);
 
-         mMenuList[i].popupMenu->mMenuItems[item].acceleratorIndex = mCurAcceleratorIndex;
+         mMenuList[i].popupMenu->mMenuItems[item].mAcceleratorIndex = mCurAcceleratorIndex;
          mCurAcceleratorIndex++;
       }
    }
@@ -1403,7 +1403,7 @@ void GuiMenuBar::acceleratorKeyPress(U32 index)
 
       for(U32 item = 0; item < mMenuList[i].popupMenu->mMenuItems.size(); item++)
       {
-         if(mMenuList[i].popupMenu->mMenuItems[item].acceleratorIndex == index)
+         if(mMenuList[i].popupMenu->mMenuItems[item].mAcceleratorIndex == index)
          {
             // first, call the script callback for menu selection:
             onMenuSelect_callback(mMenuList[i].popupMenu->getId(), mMenuList[i].text);
@@ -1454,7 +1454,7 @@ void GuiMenuBar::insert(SimObject* pObject, S32 pos)
    newMenu.drawBitmapOnly = false;
    newMenu.drawBorder = true;
    newMenu.bitmapIndex = -1;
-   newMenu.text = menu->barTitle;
+   newMenu.text = menu->mBarTitle;
    newMenu.visible = true;
    newMenu.popupMenu = menu;
 
