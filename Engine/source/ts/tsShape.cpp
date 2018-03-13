@@ -566,8 +566,8 @@ void TSShape::initObjects()
          if (accel != NULL) {
             delete[] accel->vertexList;
             delete[] accel->normalList;
-            for (S32 j = 0; j < accel->numVerts; j++)
-               delete[] accel->emitStrings[j];
+            for (S32 vertID = 0; vertID < accel->numVerts; vertID++)
+               delete[] accel->emitStrings[vertID];
             delete[] accel->emitStrings;
             delete accel;
          }
@@ -683,9 +683,9 @@ void TSShape::initVertexBuffers()
       U32 vertsInBuffer = mShapeVertexData.size / mVertexSize;
       U32 indsInBuffer = ibIndices - indicesStart;
 
-      for (U32 i = 0; i < primStart; i++)
+      for (U32 primID = 0; primID < primStart; primID++)
       {
-         GFXPrimitive &prim = mShapeVertexIndices->mPrimitiveArray[i];
+         GFXPrimitive &prim = mShapeVertexIndices->mPrimitiveArray[primID];
 
          if (prim.type != GFXTriangleList && prim.type != GFXTriangleStrip)
          {
@@ -1303,10 +1303,10 @@ void TSShape::assembleShape()
          S32 oldSz = groundTranslations.size();
          groundTranslations.setSize(oldSz+seq.numGroundFrames);
          groundRotations.setSize(oldSz+seq.numGroundFrames);
-         for (S32 j=0;j<seq.numGroundFrames;j++)
+         for (S32 groundFrm =0; groundFrm<seq.numGroundFrames; groundFrm++)
          {
-            groundTranslations[j+oldSz] = nodeTranslations[seq.firstGroundFrame+j-numNodes];
-            groundRotations[j+oldSz] = nodeRotations[seq.firstGroundFrame+j-numNodes];
+            groundTranslations[groundFrm +oldSz] = nodeTranslations[seq.firstGroundFrame+ groundFrm -numNodes];
+            groundRotations[groundFrm +oldSz] = nodeRotations[seq.firstGroundFrame+ groundFrm -numNodes];
          }
          seq.firstGroundFrame = oldSz;
          seq.baseTranslation -= numNodes;
@@ -1378,9 +1378,9 @@ void TSShape::assembleShape()
       ptr32 = tsalloc.copyToShape32( numDetails * 7, true );
 
       details.setSize( numDetails );
-      for ( U32 i = 0; i < details.size(); i++, ptr32 += 7 )
+      for ( U32 detID = 0; detID < details.size(); detID++, ptr32 += 7 )
       {
-         Detail *det = &(details[i]);
+         Detail *det = &(details[detID]);
 
          // Clear the struct... we don't want to leave 
          // garbage in the parts that are unfilled.
@@ -1408,12 +1408,12 @@ void TSShape::assembleShape()
    // Some DTS exporters (MAX - I'm looking at you!) write garbage into the
    // averageError and maxError values which stops LOD from working correctly.
    // Try to detect and fix it
-   for ( U32 i = 0; i < details.size(); i++ )
+   for ( U32 erID = 0; erID < details.size(); erID++ )
    {
-      if ( ( details[i].averageError == 0 ) || ( details[i].averageError > 10000 ) ||
-           ( details[i].maxError == 0 ) || ( details[i].maxError > 10000 ) )
+      if ( ( details[erID].averageError == 0 ) || ( details[erID].averageError > 10000 ) ||
+           ( details[erID].maxError == 0 ) || ( details[erID].maxError > 10000 ) )
       {
-         details[i].averageError = details[i].maxError = -1.0f;
+         details[erID].averageError = details[erID].maxError = -1.0f;
       }
    }
 
@@ -1740,8 +1740,8 @@ void TSShape::disassembleShape()
    {
       // Legacy details => no explicit autobillboard parameters
       U32 legacyDetailSize32 = 7;   // only store the first 7 4-byte values of each detail
-      for ( S32 i = 0; i < details.size(); i++ )
-         tsalloc.copyToBuffer32( (S32*)&details[i], legacyDetailSize32 );
+      for ( S32 bbID = 0; bbID < details.size(); bbID++ )
+         tsalloc.copyToBuffer32( (S32*)&details[bbID], legacyDetailSize32 );
    }
    tsalloc.setGuard();
 
