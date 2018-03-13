@@ -1364,9 +1364,9 @@ void TSMesh::prepOpcodeCollision()
    // Figure out how many triangles we have...
    U32 triCount = 0;
    const U32 base = 0;
-   for ( U32 i = 0; i < primitives.size(); i++ )
+   for ( U32 i = 0; i < mPrimitives.size(); i++ )
    {
-      TSDrawPrimitive & draw = primitives[i];
+      TSDrawPrimitive & draw = mPrimitives[i];
       const U32 start = draw.start;
 
       AssertFatal( draw.matIndex & TSDrawPrimitive::Indexed,"TSMesh::buildPolyList (1)" );
@@ -1396,7 +1396,7 @@ void TSMesh::prepOpcodeCollision()
    }
 
    // Just do the first trilist for now.
-   mi->SetNbVertices( mVertexData.isReady() ? mNumVerts : verts.size() );
+   mi->SetNbVertices( mVertexData.isReady() ? mNumVerts : mVerts.size() );
    mi->SetNbTriangles( triCount );
 
    // Stuff everything into appropriate arrays.
@@ -1407,9 +1407,9 @@ void TSMesh::prepOpcodeCollision()
    mOpPoints = pts;
 
    // add the polys...
-   for ( U32 i = 0; i < primitives.size(); i++ )
+   for ( U32 i = 0; i < mPrimitives.size(); i++ )
    {
-      TSDrawPrimitive & draw = primitives[i];
+      TSDrawPrimitive & draw = mPrimitives[i];
       const U32 start = draw.start;
 
       AssertFatal( draw.matIndex & TSDrawPrimitive::Indexed,"TSMesh::buildPolyList (1)" );
@@ -1467,7 +1467,7 @@ void TSMesh::prepOpcodeCollision()
       }
       else
       {
-         pts[i].Set( verts[i].x, verts[i].y, verts[i].z );
+         pts[i].Set( mVerts[i].x, mVerts[i].y, mVerts[i].z );
       }
    }
 

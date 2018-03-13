@@ -1172,7 +1172,7 @@ void TSShapeLoader::install()
       {
          TSMesh *mesh = shape->meshes[obj.startMeshIndex + iMesh];
 
-         if (mesh && !mesh->primitives.size())
+         if (mesh && !mesh->mPrimitives.size())
          {
             S32 oldMeshCount = obj.numMeshes;
             destructInPlace(mesh);

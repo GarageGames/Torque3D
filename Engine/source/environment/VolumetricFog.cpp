@@ -424,10 +424,10 @@ bool VolumetricFog::LoadShape()
                for (U32 k = 0; k < mesh->mIndices.size(); k++)
                   det_size[i].indices->push_back(mesh->mIndices[k]);
 
-               U32 primitivesSize = mesh->primitives.size();
+               U32 primitivesSize = mesh->mPrimitives.size();
                for (U32 k = 0; k < primitivesSize; k++)
                {
-                  const TSDrawPrimitive & draw = mesh->primitives[k];
+                  const TSDrawPrimitive & draw = mesh->mPrimitives[k];
                   GFXPrimitiveType drawType = GFXdrawTypes[draw.matIndex >> 30];
                   switch (drawType)
                   {

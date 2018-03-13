@@ -1340,7 +1340,7 @@ DefineTSShapeConstructorMethod( getMeshMaterial, const char*, ( const char* name
    GET_MESH( getMeshMaterial, mesh, name, "" );
 
    // Return the name of the first material attached to this mesh
-   S32 matIndex = mesh->primitives[0].matIndex & TSDrawPrimitive::MaterialMask;
+   S32 matIndex = mesh->mPrimitives[0].matIndex & TSDrawPrimitive::MaterialMask;
    if ((matIndex >= 0) && (matIndex < mShape->materialList->size()))
       return mShape->materialList->getMaterialName( matIndex );
    else
@@ -1377,10 +1377,10 @@ DefineTSShapeConstructorMethod( setMeshMaterial, bool, ( const char* meshName, c
    }
 
    // Set this material for all primitives in the mesh
-   for ( S32 i = 0; i < mesh->primitives.size(); i++ )
+   for ( S32 i = 0; i < mesh->mPrimitives.size(); i++ )
    {
-      U32 matType = mesh->primitives[i].matIndex & ( TSDrawPrimitive::TypeMask | TSDrawPrimitive::Indexed );
-      mesh->primitives[i].matIndex = ( matType | matIndex );
+      U32 matType = mesh->mPrimitives[i].matIndex & ( TSDrawPrimitive::TypeMask | TSDrawPrimitive::Indexed );
+      mesh->mPrimitives[i].matIndex = ( matType | matIndex );
    }
 
    ADD_TO_CHANGE_SET();

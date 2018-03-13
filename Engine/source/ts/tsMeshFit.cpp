@@ -246,9 +246,9 @@ void MeshFit::addSourceMesh( const TSShape::Object& obj, const TSMesh* mesh )
 {
    // Add indices
    S32 indicesBase = mIndices.size();
-   for ( S32 i = 0; i < mesh->primitives.size(); i++ )
+   for ( S32 i = 0; i < mesh->mPrimitives.size(); i++ )
    {
-      const TSDrawPrimitive& draw = mesh->primitives[i];
+      const TSDrawPrimitive& draw = mesh->mPrimitives[i];
       if ( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Triangles )
       {
          mIndices.merge( &mesh->mIndices[draw.start], draw.numElements );
@@ -282,7 +282,7 @@ void MeshFit::addSourceMesh( const TSShape::Object& obj, const TSMesh* mesh )
    S32 count, stride;
    U8* pVert;
 
-   if ( mesh->mVertexData.isReady() && mesh->verts.size() == 0 )
+   if ( mesh->mVertexData.isReady() && mesh->mVerts.size() == 0 )
    {
       count = mesh->mVertexData.size();
       stride = mesh->mVertexData.vertSize();
@@ -290,9 +290,9 @@ void MeshFit::addSourceMesh( const TSShape::Object& obj, const TSMesh* mesh )
    }
    else
    {
-      count = mesh->verts.size();
+      count = mesh->mVerts.size();
       stride = sizeof(Point3F);
-      pVert = (U8*)mesh->verts.address();
+      pVert = (U8*)mesh->mVerts.address();
    }
 
    MatrixF objMat;
@@ -337,12 +337,12 @@ TSMesh* MeshFit::createTriMesh( F32* verts, S32 numVerts, U32* indices, S32 numT
       mesh->mIndices.push_back( indices[i*3 + 1] );
    }
 
-   mesh->verts.set( verts, numVerts );
+   mesh->mVerts.set( verts, numVerts );
 
    // Compute mesh normals
-   mesh->norms.setSize( mesh->verts.size() );
-   for (S32 iNorm = 0; iNorm < mesh->norms.size(); iNorm++)
-      mesh->norms[iNorm] = Point3F::Zero;
+   mesh->mNorms.setSize( mesh->mVerts.size() );
+   for (S32 iNorm = 0; iNorm < mesh->mNorms.size(); iNorm++)
+      mesh->mNorms[iNorm] = Point3F::Zero;
 
    // Sum triangle normals for each vertex
    for (S32 iInd = 0; iInd < mesh->mIndices.size(); iInd += 3)
@@ -352,38 +352,38 @@ TSMesh* MeshFit::createTriMesh( F32* verts, S32 numVerts, U32* indices, S32 numT
       S32 idx1 = mesh->mIndices[iInd + 1];
       S32 idx2 = mesh->mIndices[iInd + 2];
 
-      const Point3F& v0 = mesh->verts[idx0];
-      const Point3F& v1 = mesh->verts[idx1];
-      const Point3F& v2 = mesh->verts[idx2];
+      const Point3F& v0 = mesh->mVerts[idx0];
+      const Point3F& v1 = mesh->mVerts[idx1];
+      const Point3F& v2 = mesh->mVerts[idx2];
 
       Point3F n;
       mCross(v2 - v0, v1 - v0, &n);
       n.normalize();    // remove this to use 'weighted' normals (large triangles will have more effect)
 
-      mesh->norms[idx0] += n;
-      mesh->norms[idx1] += n;
-      mesh->norms[idx2] += n;
+      mesh->mNorms[idx0] += n;
+      mesh->mNorms[idx1] += n;
+      mesh->mNorms[idx2] += n;
    }
 
    // Normalize the vertex normals (this takes care of averaging the triangle normals)
-   for (S32 iNorm = 0; iNorm < mesh->norms.size(); iNorm++)
-      mesh->norms[iNorm].normalize();
+   for (S32 iNorm = 0; iNorm < mesh->mNorms.size(); iNorm++)
+      mesh->mNorms[iNorm].normalize();
 
    // Set some dummy UVs
-   mesh->tverts.setSize( numVerts );
-   for ( S32 j = 0; j < mesh->tverts.size(); j++ )
-      mesh->tverts[j].set( 0, 0 );
+   mesh->mTverts.setSize( numVerts );
+   for ( S32 j = 0; j < mesh->mTverts.size(); j++ )
+      mesh->mTverts[j].set( 0, 0 );
 
    // Add a single triangle-list primitive
-   mesh->primitives.increment();
-   mesh->primitives.last().start = 0;
-   mesh->primitives.last().numElements = mesh->mIndices.size();
-   mesh->primitives.last().matIndex =  TSDrawPrimitive::Triangles |
+   mesh->mPrimitives.increment();
+   mesh->mPrimitives.last().start = 0;
+   mesh->mPrimitives.last().numElements = mesh->mIndices.size();
+   mesh->mPrimitives.last().matIndex =  TSDrawPrimitive::Triangles |
                                        TSDrawPrimitive::Indexed |
                                        TSDrawPrimitive::NoMaterial;
 
-   mesh->createTangents( mesh->verts, mesh->norms );
-   mesh->encodedNorms.set( NULL,0 );
+   mesh->createTangents( mesh->mVerts, mesh->mNorms);
+   mesh->mEncodedNorms.set( NULL,0 );
 
    return mesh;
 }
@@ -404,13 +404,13 @@ void MeshFit::addBox( const Point3F& sides, const MatrixF& mat )
    if ( !mesh )
       return;
 
-   if (mesh->verts.size() > 0)
+   if (mesh->mVerts.size() > 0)
    {
-      for (S32 i = 0; i < mesh->verts.size(); i++)
+      for (S32 i = 0; i < mesh->mVerts.size(); i++)
       {
-         Point3F v = mesh->verts[i];
+         Point3F v = mesh->mVerts[i];
          v.convolve(sides);
-         mesh->verts[i] = v;
+         mesh->mVerts[i] = v;
       }
 
       mesh->mVertexData.setReady(false);
@@ -799,7 +799,7 @@ DefineTSShapeConstructorMethod( addPrimitive, bool, ( const char* meshName, cons
    MatrixF mat( txfm.getMatrix() );
 
    // Transform the mesh vertices
-   if ( mesh->mVertexData.isReady() && mesh->verts.size() == 0 )
+   if ( mesh->mVertexData.isReady() && mesh->mVerts.size() == 0 )
    {
       for (S32 i = 0; i < mesh->mVertexData.size(); i++)
       {
@@ -811,10 +811,10 @@ DefineTSShapeConstructorMethod( addPrimitive, bool, ( const char* meshName, cons
    }
    else
    {
-      for (S32 i = 0; i < mesh->verts.size(); i++)
+      for (S32 i = 0; i < mesh->mVerts.size(); i++)
       {
-         Point3F v(mesh->verts[i]);
-         mat.mulP( v, &mesh->verts[i] );
+         Point3F v(mesh->mVerts[i]);
+         mat.mulP( v, &mesh->mVerts[i] );
       }
    }
 

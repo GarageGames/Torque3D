@@ -1244,9 +1244,9 @@ void GuiShapeEdPreview::updateDetailLevel(const SceneRenderState* state)
             continue;
 
          // Count the number of draw calls and materials
-         mNumDrawCalls += mesh->primitives.size();
-         for ( S32 iPrim = 0; iPrim < mesh->primitives.size(); iPrim++ )
-            usedMaterials.push_back_unique( mesh->primitives[iPrim].matIndex & TSDrawPrimitive::MaterialMask );
+         mNumDrawCalls += mesh->mPrimitives.size();
+         for ( S32 iPrim = 0; iPrim < mesh->mPrimitives.size(); iPrim++ )
+            usedMaterials.push_back_unique( mesh->mPrimitives[iPrim].matIndex & TSDrawPrimitive::MaterialMask );
 
          // For skinned meshes, count the number of bones and weights
          if ( mesh->getMeshType() == TSMesh::SkinMeshType )
