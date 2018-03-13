@@ -1499,14 +1499,14 @@ static Point3F	texGenAxis[18] =
 };
 
 
-bool TSMesh::castRayOpcode( const Point3F &s, const Point3F &e, RayInfo *info, TSMaterialList *materials )
+bool TSMesh::castRayOpcode( const Point3F &start, const Point3F &end, RayInfo *info, TSMaterialList *materials )
 {
    Opcode::RayCollider ray;
    Opcode::CollisionFaces cfs;
 
-   IceMaths::Point dir( e.x - s.x, e.y - s.y, e.z - s.z );
+   IceMaths::Point dir(end.x - start.x, end.y - start.y, end.z - start.z );
    const F32 rayLen = dir.Magnitude();
-   IceMaths::Ray vec( Point(s.x, s.y, s.z), dir.Normalize() );
+   IceMaths::Ray vec( Point(start.x, start.y, start.z), dir.Normalize() );
 
    ray.SetDestination( &cfs);
    ray.SetFirstContact( false );
