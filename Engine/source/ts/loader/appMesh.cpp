@@ -151,7 +151,7 @@ TSMesh* AppMesh::constructTSMesh()
    tsmesh->norms = normals;
    tsmesh->tverts = uvs;
    tsmesh->primitives = primitives;
-   tsmesh->indices = indices;
+   tsmesh->mIndices = indices;
    tsmesh->colors = colors;
    tsmesh->tverts2 = uv2s;
 

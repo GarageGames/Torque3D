@@ -421,8 +421,8 @@ bool VolumetricFog::LoadShape()
 
                det_size[i].indices = new Vector<U32>();
 
-               for (U32 k = 0; k < mesh->indices.size(); k++)
-                  det_size[i].indices->push_back(mesh->indices[k]);
+               for (U32 k = 0; k < mesh->mIndices.size(); k++)
+                  det_size[i].indices->push_back(mesh->mIndices[k]);
 
                U32 primitivesSize = mesh->primitives.size();
                for (U32 k = 0; k < primitivesSize; k++)
@@ -436,7 +436,7 @@ bool VolumetricFog::LoadShape()
                         pInfo.numPrimitives = draw.numElements / 3;
                         pInfo.startIndex = draw.start;
                         // Use the first index to determine which 16-bit address space we are operating in
-                        pInfo.startVertex = mesh->indices[draw.start] & 0xFFFF0000;
+                        pInfo.startVertex = mesh->mIndices[draw.start] & 0xFFFF0000;
                         pInfo.minIndex = pInfo.startVertex;
                         pInfo.numVertices = getMin((U32)0x10000, mesh->mNumVerts - pInfo.startVertex);
                         break;
@@ -445,7 +445,7 @@ bool VolumetricFog::LoadShape()
                         pInfo.numPrimitives = draw.numElements - 2;
                         pInfo.startIndex = draw.start;
                         // Use the first index to determine which 16-bit address space we are operating in
-                        pInfo.startVertex = mesh->indices[draw.start] & 0xFFFF0000;
+                        pInfo.startVertex = mesh->mIndices[draw.start] & 0xFFFF0000;
                         pInfo.minIndex = pInfo.startVertex;
                         pInfo.numVertices = getMin((U32)0x10000, mesh->mNumVerts - pInfo.startVertex);
                         break;

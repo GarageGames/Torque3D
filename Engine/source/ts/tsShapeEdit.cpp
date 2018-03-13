@@ -756,13 +756,13 @@ void TSShape::removeMeshFromObject(S32 objIndex, S32 meshIndex)
                if (meshes[k] == NULL)
                   continue;
 
-               if (meshes[k]->parentMesh == idxToRemove)
+               if (meshes[k]->mParentMesh == idxToRemove)
                {
-                  meshes[k]->parentMesh = -1;
+                  meshes[k]->mParentMesh = -1;
                }
-               else if (meshes[k]->parentMesh > idxToRemove)
+               else if (meshes[k]->mParentMesh > idxToRemove)
                {
-                  meshes[k]->parentMesh--;
+                  meshes[k]->mParentMesh--;
                }
             }
 
@@ -800,13 +800,13 @@ void TSShape::removeMeshFromObject(S32 objIndex, S32 meshIndex)
          if (meshes[k] == NULL)
             continue;
 
-         if (meshes[k]->parentMesh == idxToRemove)
+         if (meshes[k]->mParentMesh == idxToRemove)
          {
-            meshes[k]->parentMesh = -1;
+            meshes[k]->mParentMesh = -1;
          }
-         else if (meshes[k]->parentMesh > idxToRemove)
+         else if (meshes[k]->mParentMesh > idxToRemove)
          {
-            meshes[k]->parentMesh--;
+            meshes[k]->mParentMesh--;
          }
       }
 
@@ -937,7 +937,7 @@ TSMesh* TSShape::copyMesh( const TSMesh* srcMesh ) const
       return mesh;      // return an empty mesh
 
    // Copy mesh elements
-   mesh->indices = srcMesh->indices;
+   mesh->mIndices = srcMesh->mIndices;
    mesh->primitives = srcMesh->primitives;
    mesh->numFrames = srcMesh->numFrames;
    mesh->numMatFrames = srcMesh->numMatFrames;

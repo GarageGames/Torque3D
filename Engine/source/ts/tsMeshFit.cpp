@@ -251,19 +251,19 @@ void MeshFit::addSourceMesh( const TSShape::Object& obj, const TSMesh* mesh )
       const TSDrawPrimitive& draw = mesh->primitives[i];
       if ( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Triangles )
       {
-         mIndices.merge( &mesh->indices[draw.start], draw.numElements );
+         mIndices.merge( &mesh->mIndices[draw.start], draw.numElements );
       }
       else
       {
-         U32 idx0 = mesh->indices[draw.start + 0];
+         U32 idx0 = mesh->mIndices[draw.start + 0];
          U32 idx1;
-         U32 idx2 = mesh->indices[draw.start + 1];
+         U32 idx2 = mesh->mIndices[draw.start + 1];
          U32 *nextIdx = &idx1;
          for ( S32 j = 2; j < draw.numElements; j++ )
          {
             *nextIdx = idx2;
             nextIdx = (U32*) ( (dsize_t)nextIdx ^ (dsize_t)&idx0 ^ (dsize_t)&idx1);
-            idx2 = mesh->indices[draw.start + j];
+            idx2 = mesh->mIndices[draw.start + j];
             if ( idx0 == idx1 || idx0 == idx2 || idx1 == idx2 )
                continue;
 
@@ -329,12 +329,12 @@ TSMesh* MeshFit::createTriMesh( F32* verts, S32 numVerts, U32* indices, S32 numT
    mesh->setFlags(0);
    mesh->mNumVerts = numVerts;
 
-   mesh->indices.reserve( numTris * 3 );
+   mesh->mIndices.reserve( numTris * 3 );
    for ( S32 i = 0; i < numTris; i++ )
    {
-      mesh->indices.push_back( indices[i*3 + 0] );
-      mesh->indices.push_back( indices[i*3 + 2] );
-      mesh->indices.push_back( indices[i*3 + 1] );
+      mesh->mIndices.push_back( indices[i*3 + 0] );
+      mesh->mIndices.push_back( indices[i*3 + 2] );
+      mesh->mIndices.push_back( indices[i*3 + 1] );
    }
 
    mesh->verts.set( verts, numVerts );
@@ -345,12 +345,12 @@ TSMesh* MeshFit::createTriMesh( F32* verts, S32 numVerts, U32* indices, S32 numT
       mesh->norms[iNorm] = Point3F::Zero;
 
    // Sum triangle normals for each vertex
-   for (S32 iInd = 0; iInd < mesh->indices.size(); iInd += 3)
+   for (S32 iInd = 0; iInd < mesh->mIndices.size(); iInd += 3)
    {
       // Compute the normal for this triangle
-      S32 idx0 = mesh->indices[iInd + 0];
-      S32 idx1 = mesh->indices[iInd + 1];
-      S32 idx2 = mesh->indices[iInd + 2];
+      S32 idx0 = mesh->mIndices[iInd + 0];
+      S32 idx1 = mesh->mIndices[iInd + 1];
+      S32 idx2 = mesh->mIndices[iInd + 2];
 
       const Point3F& v0 = mesh->verts[idx0];
       const Point3F& v1 = mesh->verts[idx1];
@@ -377,7 +377,7 @@ TSMesh* MeshFit::createTriMesh( F32* verts, S32 numVerts, U32* indices, S32 numT
    // Add a single triangle-list primitive
    mesh->primitives.increment();
    mesh->primitives.last().start = 0;
-   mesh->primitives.last().numElements = mesh->indices.size();
+   mesh->primitives.last().numElements = mesh->mIndices.size();
    mesh->primitives.last().matIndex =  TSDrawPrimitive::Triangles |
                                        TSDrawPrimitive::Indexed |
                                        TSDrawPrimitive::NoMaterial;

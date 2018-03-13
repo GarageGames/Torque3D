@@ -268,7 +268,7 @@ protected:
 
 public:
 
-   S32 parentMesh; ///< index into shapes mesh list
+   S32 mParentMesh; ///< index into shapes mesh list
    S32 numFrames;
    S32 numMatFrames;
    S32 vertsPerFrame;
@@ -333,7 +333,7 @@ protected:
 
    Vector<TSDrawPrimitive> primitives;
    Vector<U8> encodedNorms;
-   Vector<U32> indices;
+   Vector<U32> mIndices;
 
    /// billboard data
    Point3F billboardAxis;

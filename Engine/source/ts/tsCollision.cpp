@@ -1377,16 +1377,16 @@ void TSMesh::prepOpcodeCollision()
       else
       {
          // Have to walk the tristrip to get a count... may have degenerates
-         U32 idx0 = base + indices[start + 0];
+         U32 idx0 = base + mIndices[start + 0];
          U32 idx1;
-         U32 idx2 = base + indices[start + 1];
+         U32 idx2 = base + mIndices[start + 1];
          U32 * nextIdx = &idx1;
          for ( S32 j = 2; j < draw.numElements; j++ )
          {
             *nextIdx = idx2;
             //            nextIdx = (j%2)==0 ? &idx0 : &idx1;
             nextIdx = (U32*) ( (dsize_t)nextIdx ^ (dsize_t)&idx0 ^ (dsize_t)&idx1);
-            idx2 = base + indices[start + j];
+            idx2 = base + mIndices[start + j];
             if ( idx0 == idx1 || idx0 == idx2 || idx1 == idx2 )
                continue;
 
@@ -1421,9 +1421,9 @@ void TSMesh::prepOpcodeCollision()
       {
          for ( S32 j = 0; j < draw.numElements; )
          {
-            curIts->mVRef[2] = base + indices[start + j + 0];
-            curIts->mVRef[1] = base + indices[start + j + 1];
-            curIts->mVRef[0] = base + indices[start + j + 2];
+            curIts->mVRef[2] = base + mIndices[start + j + 0];
+            curIts->mVRef[1] = base + mIndices[start + j + 1];
+            curIts->mVRef[0] = base + mIndices[start + j + 2];
             curIts->mMatIdx = matIndex;
             curIts++;
 
@@ -1434,16 +1434,16 @@ void TSMesh::prepOpcodeCollision()
       {
          AssertFatal( (draw.matIndex & TSDrawPrimitive::TypeMask) == TSDrawPrimitive::Strip,"TSMesh::buildPolyList (2)" );
 
-         U32 idx0 = base + indices[start + 0];
+         U32 idx0 = base + mIndices[start + 0];
          U32 idx1;
-         U32 idx2 = base + indices[start + 1];
+         U32 idx2 = base + mIndices[start + 1];
          U32 * nextIdx = &idx1;
          for ( S32 j = 2; j < draw.numElements; j++ )
          {
             *nextIdx = idx2;
             //            nextIdx = (j%2)==0 ? &idx0 : &idx1;
             nextIdx = (U32*) ( (dsize_t)nextIdx ^ (dsize_t)&idx0 ^ (dsize_t)&idx1);
-            idx2 = base + indices[start + j];
+            idx2 = base + mIndices[start + j];
             if ( idx0 == idx1 || idx0 == idx2 || idx1 == idx2 )
                continue;
 

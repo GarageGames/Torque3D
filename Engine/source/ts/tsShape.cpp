@@ -585,14 +585,14 @@ void TSShape::initObjects()
       if (!mesh)
          continue;
 
-      if (mesh->parentMesh >= meshes.size())
+      if (mesh->mParentMesh >= meshes.size())
       {
-         Con::warnf("Mesh %i has a bad parentMeshObject (%i)", iter - meshes.begin(), mesh->parentMesh);
+         Con::warnf("Mesh %i has a bad parentMeshObject (%i)", iter - meshes.begin(), mesh->mParentMesh);
       }
 
-      if (mesh->parentMesh >= 0 && mesh->parentMesh < meshes.size())
+      if (mesh->mParentMesh >= 0 && mesh->mParentMesh < meshes.size())
       {
-         mesh->parentMeshObject = meshes[mesh->parentMesh];
+         mesh->parentMeshObject = meshes[mesh->mParentMesh];
       }
       else
       {
@@ -622,7 +622,7 @@ void TSShape::initVertexBuffers()
             mesh->getMeshType() != TSMesh::SkinMeshType))
          continue;
 
-      destIndices += mesh->indices.size();
+      destIndices += mesh->mIndices.size();
       destPrims += mesh->primitives.size();
    }
 
@@ -661,14 +661,14 @@ void TSShape::initVertexBuffers()
 
       vertStart += mesh->mNumVerts;
       primStart += mesh->primitives.size();
-      indStart += mesh->indices.size();
+      indStart += mesh->mIndices.size();
 
       mesh->mVB = mShapeVertexBuffer;
       mesh->mPB = mShapeVertexIndices;
 
       // Advance
       piInput += mesh->primitives.size();
-      ibIndices += mesh->indices.size();
+      ibIndices += mesh->mIndices.size();
 
       if (TSSkinMesh::smDebugSkinVerts && mesh->getMeshType() == TSMesh::SkinMeshType)
       {
@@ -845,7 +845,7 @@ void TSShape::initVertexFeatures()
       mesh->mVertOffset = destVertex;
 
       destVertex += mesh->mVertSize * mesh->getNumVerts();
-      destIndices += mesh->indices.size();
+      destIndices += mesh->mIndices.size();
 
       count += 1;
    }
