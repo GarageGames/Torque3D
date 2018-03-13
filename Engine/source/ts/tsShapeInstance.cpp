@@ -662,7 +662,7 @@ S32 TSShapeInstance::setDetailFromDistance( const SceneRenderState *state, F32 s
 
    // We're inlining SceneRenderState::projectRadius here to 
    // skip the unnessasary divide by zero protection.
-   F32 pixelRadius = ( mShape->radius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
+   F32 pixelRadius = ( mShape->mRadius / scaledDistance ) * state->getWorldToScreenScale().y * pixelScale;
    F32 pixelSize = pixelRadius * smDetailAdjust;
 
    if ( pixelSize < smSmallestVisiblePixelSize ) {

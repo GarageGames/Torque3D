@@ -366,8 +366,8 @@ bool GuiShapeEdPreview::setObjectModel(const char* modelName)
       mOrbitPos = shape->center;
 
       // Set camera move and zoom speed according to model size
-      mMoveSpeed = shape->radius / sMoveScaler;
-      mZoomSpeed = shape->radius / sZoomScaler;
+      mMoveSpeed = shape->mRadius / sMoveScaler;
+      mZoomSpeed = shape->mRadius / sZoomScaler;
 
       // Reset node selection
       mHoverNode = -1;

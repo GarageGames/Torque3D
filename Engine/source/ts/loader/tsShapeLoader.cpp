@@ -1225,8 +1225,8 @@ void TSShapeLoader::install()
       shape->mBounds = Box3F(1.0f);
 
    shape->mBounds.getCenter(&shape->center);
-   shape->radius = (shape->mBounds.maxExtents - shape->center).len();
-   shape->tubeRadius = shape->radius;
+   shape->mRadius = (shape->mBounds.maxExtents - shape->center).len();
+   shape->tubeRadius = shape->mRadius;
 
    shape->init();
    shape->finalizeEditable();

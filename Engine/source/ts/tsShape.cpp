@@ -1195,7 +1195,7 @@ void TSShape::assembleShape()
    tsalloc.checkGuard();
 
    // get bounds...
-   tsalloc.get32((S32*)&radius,1);
+   tsalloc.get32((S32*)&mRadius,1);
    tsalloc.get32((S32*)&tubeRadius,1);
    tsalloc.get32((S32*)&center,3);
    tsalloc.get32((S32*)&mBounds,6);
@@ -1670,7 +1670,7 @@ void TSShape::disassembleShape()
    tsalloc.setGuard();
 
    // get bounds...
-   tsalloc.copyToBuffer32((S32*)&radius,1);
+   tsalloc.copyToBuffer32((S32*)&mRadius,1);
    tsalloc.copyToBuffer32((S32*)&tubeRadius,1);
    tsalloc.copyToBuffer32((S32*)&center,3);
    tsalloc.copyToBuffer32((S32*)&mBounds,6);
@@ -2060,7 +2060,7 @@ void TSShape::createEmptyShape()
       names[1] = StringTable->insert("Mesh2");
       names[2] = StringTable->insert("Mesh");
 
-   radius = 0.866025f;
+   mRadius = 0.866025f;
    tubeRadius = 0.707107f;
    center.set(0.0f, 0.5f, 0.0f);
    mBounds.minExtents.set(-0.5f, 0.0f, -0.5f);

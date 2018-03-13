@@ -400,7 +400,7 @@ bool WheeledVehicleData::preload(bool server, String &errorStr)
       MatrixF imat(1);
       SphereF sphere;
       sphere.center = mShape->center;
-      sphere.radius = mShape->radius;
+      sphere.radius = mShape->mRadius;
       PlaneExtractorPolyList polyList;
       polyList.mPlaneList = &rigidBody.mPlaneList;
       polyList.setTransform(&imat, Point3F(1,1,1));

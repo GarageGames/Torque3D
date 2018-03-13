@@ -95,7 +95,7 @@ bool BlobShadow::shouldRender(F32 camDist)
    if (mShapeBase && mShapeBase->getFadeVal() < TSMesh::VISIBILITY_EPSILON)
       return false;
 
-   F32 shadowLen = 10.0f * mShapeInstance->getShape()->radius;
+   F32 shadowLen = 10.0f * mShapeInstance->getShape()->mRadius;
    Point3F pos = mShapeInstance->getShape()->center;
 
    // this is a bit of a hack...move generic shadows towards feet/base of shape

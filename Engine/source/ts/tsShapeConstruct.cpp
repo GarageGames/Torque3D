@@ -1459,8 +1459,8 @@ DefineTSShapeConstructorMethod( setBounds, bool, ( Box3F bbox ),,
 
    shape->mBounds = bbox;
    shape->mBounds.getCenter( &shape->center );
-   shape->radius = ( shape->mBounds.maxExtents - shape->center ).len();
-   shape->tubeRadius = shape->radius;
+   shape->mRadius = ( shape->mBounds.maxExtents - shape->center ).len();
+   shape->tubeRadius = shape->mRadius;
 
    ADD_TO_CHANGE_SET();
    return true;
