@@ -1454,16 +1454,16 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
 
       }
 
-      CameraSpline::Knot::Path path;
+      CameraSpline::Knot::Path tPath;
       switch (pathmarker->mSmoothingType)
       {
-         case Marker::SmoothingTypeLinear:   path = CameraSpline::Knot::LINEAR; break;
+         case Marker::SmoothingTypeLinear:   tPath = CameraSpline::Knot::LINEAR; break;
          case Marker::SmoothingTypeSpline:
-         default:                            path = CameraSpline::Knot::SPLINE; break;
+         default:                            tPath = CameraSpline::Knot::SPLINE; break;
 
       }
 
-      spline.push_back(new CameraSpline::Knot(pos, rot, 1.0f, type, path));
+      spline.push_back(new CameraSpline::Knot(pos, rot, 1.0f, type, tPath));
    }
 
    F32 t = 0.0f;
@@ -1559,8 +1559,8 @@ void WorldEditor::renderSplinePath(SimPath::Path *path)
 
          // Reset for next pass...
          vIdx = 0;
-         void *lockPtr = vb.lock();
-         if(!lockPtr) return;
+         void *nextlockPtr = vb.lock();
+         if(!nextlockPtr) return;
       }
    }
 
