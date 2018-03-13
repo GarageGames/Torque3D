@@ -569,9 +569,6 @@ void TerrainDetailMapFeatGLSL::processPix(   Vector<ShaderComponent*> &component
    // amount so that it fades out with the layer blending.
    if ( fd.features.hasFeature( MFT_TerrainParallaxMap, detailIndex ) )
    {
-      // Get the rest of our inputs.
-      Var *normalMap = _getNormalMapTex();
-
       // Call the library function to do the rest.
       if (fd.features.hasFeature(MFT_IsBC3nm, detailIndex))
       {
