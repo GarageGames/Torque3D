@@ -620,25 +620,20 @@ void VolumetricFog::unpackUpdate(NetConnection *con, BitStream *stream)
       stream->read(&mLightRayMod);
       if (isTicking())
       {
-         char buf[20];
-         dSprintf(buf, sizeof(buf), "%3.7f", mGlowStrength);
-         Con::setVariable("$VolFogGlowPostFx::glowStrength", buf);
+         char glowStrBuf[20];
+         dSprintf(glowStrBuf, sizeof(glowStrBuf), "%3.7f", mGlowStrength);
+         Con::setVariable("$VolFogGlowPostFx::glowStrength", glowStrBuf);
          if (mUseGlow && !glowFX->isEnabled())
             glowFX->enable();
          if (!mUseGlow && glowFX->isEnabled())
             glowFX->disable();
-         if (mModifLightRays)
-         {
-            char buf[20];
-            dSprintf(buf, sizeof(buf), "%3.7f", mOldLightRayStrength * mLightRayMod);
-            Con::setVariable("$LightRayPostFX::brightScalar", buf);
-         }
-         if (!mModifLightRays)
-         {
-            char buf[20];
-            dSprintf(buf, sizeof(buf), "%3.7f", mOldLightRayStrength);
-            Con::setVariable("$LightRayPostFX::brightScalar", buf);
-         }
+
+		 F32 rayStrength = mOldLightRayStrength;
+		 if (mModifLightRays)
+			 rayStrength *= mLightRayMod;
+		 char rayStrBuf[20];
+		 dSprintf(rayStrBuf, sizeof(rayStrBuf), "%3.7f", rayStrength);
+		 Con::setVariable("$LightRayPostFX::brightScalar", rayStrBuf);
       }
    }
    if (stream->readFlag())//Volumetric Fog
