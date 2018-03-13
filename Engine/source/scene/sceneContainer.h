@@ -151,8 +151,8 @@ class SceneContainer
 
       struct Link
       {
-         Link* next;
-         Link* prev;
+         Link* mNext;
+         Link* mPrev;
          Link();
          void unlink();
          void linkAfter(Link* ptr);
