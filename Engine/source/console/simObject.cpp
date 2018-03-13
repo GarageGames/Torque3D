@@ -529,17 +529,17 @@ void SimObject::onTamlCustomRead(TamlCustomNodes const& customNodes)
                for (TamlCustomFieldVector::const_iterator fieldItr = fields.begin(); fieldItr != fields.end(); ++fieldItr)
                {
                   // Fetch field.
-                  const TamlCustomField* pField = *fieldItr;
+                  const TamlCustomField* cField = *fieldItr;
 
                   // Fetch field name.
-                  StringTableEntry fieldName = pField->getFieldName();
+                  StringTableEntry fieldName = cField->getFieldName();
 
                   const AbstractClassRep::Field* field = findField(fieldName);
 
                   // Check common fields.
                   if (field)
                   {
-                     setDataField(fieldName, buf, pField->getFieldValue());
+                     setDataField(fieldName, buf, cField->getFieldValue());
                   }
                   else
                   {
