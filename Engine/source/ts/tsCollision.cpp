@@ -414,7 +414,7 @@ void TSShapeInstance::computeBounds(S32 dl, Box3F & bounds)
    // use shape bounds for imposter details
    if (ss < 0)
    {
-      bounds = mShape->bounds;
+      bounds = mShape->mBounds;
       return;
    }
 

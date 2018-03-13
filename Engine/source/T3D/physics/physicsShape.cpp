@@ -308,10 +308,10 @@ bool PhysicsShapeData::preload( bool server, String &errorBuffer )
       {
          //no collision so we create a simple box collision shape from the shapes bounds and alert the user
          Con::warnf( "PhysicsShapeData::preload - No collision found for shape '%s', auto-creating one", shapeName );
-         Point3F halfWidth = shape->bounds.getExtents() * 0.5f;
+         Point3F halfWidth = shape->mBounds.getExtents() * 0.5f;
          colShape = PHYSICSMGR->createCollision();
          MatrixF centerXfm(true);
-         centerXfm.setPosition(shape->bounds.getCenter());
+         centerXfm.setPosition(shape->mBounds.getCenter());
          colShape->addBox(halfWidth, centerXfm);
          return true;
       }
@@ -707,7 +707,7 @@ bool PhysicsShape::_createShape()
       return false;
 
    // Set the world box.
-   mObjBox = db->shape->bounds;
+   mObjBox = db->shape->mBounds;
    resetWorldBox();
 
    // If this is the server and its a client only simulation

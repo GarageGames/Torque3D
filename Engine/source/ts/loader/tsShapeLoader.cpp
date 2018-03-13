@@ -1220,12 +1220,12 @@ void TSShapeLoader::install()
       }
    }
 
-   computeBounds(shape->bounds);
-   if (!shape->bounds.isValidBox())
-      shape->bounds = Box3F(1.0f);
+   computeBounds(shape->mBounds);
+   if (!shape->mBounds.isValidBox())
+      shape->mBounds = Box3F(1.0f);
 
-   shape->bounds.getCenter(&shape->center);
-   shape->radius = (shape->bounds.maxExtents - shape->center).len();
+   shape->mBounds.getCenter(&shape->center);
+   shape->radius = (shape->mBounds.maxExtents - shape->center).len();
    shape->tubeRadius = shape->radius;
 
    shape->init();

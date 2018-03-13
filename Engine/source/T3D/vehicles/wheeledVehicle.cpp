@@ -111,7 +111,7 @@ bool WheeledVehicleTire::preload(bool server, String &errorStr)
       // Determinw wheel radius from the shape's bounding box.
       // The tire should be built with it's hub axis along the
       // object's Y axis.
-      radius = shape->bounds.len_z() / 2;
+      radius = shape->mBounds.len_z() / 2;
    }
 
    return true;

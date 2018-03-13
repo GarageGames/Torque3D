@@ -347,7 +347,7 @@ bool VolumetricFog::LoadShape()
       return false;
    }
 
-   mObjBox = mShape->bounds;
+   mObjBox = mShape->mBounds;
    mRadius = mShape->radius;
    resetWorldBox();
 
@@ -560,7 +560,7 @@ U32 VolumetricFog::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       mShape = ResourceManager::get().load(mShapeName);
       if (bool(mShape) == false)
          return retMask;
-      mObjBox = mShape->bounds;
+      mObjBox = mShape->mBounds;
       mRadius = mShape->radius;
       resetWorldBox();
       mObjSize = mWorldBox.getGreatestDiagonalLength();

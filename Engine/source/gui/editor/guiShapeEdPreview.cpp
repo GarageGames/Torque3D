@@ -853,7 +853,7 @@ void GuiShapeEdPreview::exportToCollada( const String& path )
    if ( mModel )
    {
       MatrixF orientation( true );
-      orientation.setPosition( mModel->getShape()->bounds.getCenter() );
+      orientation.setPosition( mModel->getShape()->mBounds.getCenter() );
       orientation.inverse();
 
       OptimizedPolyList polyList;
@@ -1138,8 +1138,8 @@ bool GuiShapeEdPreview::getCameraTransform(MatrixF* cameraMatrix)
       cameraMatrix->identity();
       if ( mModel )
       {
-         Point3F camPos = mModel->getShape()->bounds.getCenter();
-         F32 offset = mModel->getShape()->bounds.len();
+         Point3F camPos = mModel->getShape()->mBounds.getCenter();
+         F32 offset = mModel->getShape()->mBounds.len();
 
          switch (mDisplayType)
          {
@@ -1442,7 +1442,7 @@ void GuiShapeEdPreview::renderWorld(const RectI &updateRect)
       // Render the shape bounding box
       if ( mRenderBounds )
       {
-         Point3F boxSize = mModel->getShape()->bounds.maxExtents - mModel->getShape()->bounds.minExtents;
+         Point3F boxSize = mModel->getShape()->mBounds.maxExtents - mModel->getShape()->mBounds.minExtents;
 
          GFXStateBlockDesc desc;
          desc.fillMode = GFXFillWireframe;
@@ -1544,7 +1544,7 @@ void GuiShapeEdPreview::renderSunDirection() const
    {
       // Render four arrows aiming in the direction of the sun's light
       ColorI color = LinearColorF( mFakeSun->getColor()).toColorI();
-      F32 length = mModel->getShape()->bounds.len() * 0.8f;
+      F32 length = mModel->getShape()->mBounds.len() * 0.8f;
 
       // Get the sun's vectors
       Point3F fwd = mFakeSun->getTransform().getForwardVector();

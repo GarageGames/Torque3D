@@ -357,7 +357,7 @@ class TSShape
    F32 radius;
    F32 tubeRadius;
    Point3F center;
-   Box3F bounds;
+   Box3F mBounds;
 
    /// @}
 

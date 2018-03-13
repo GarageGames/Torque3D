@@ -1198,7 +1198,7 @@ void TSShape::assembleShape()
    tsalloc.get32((S32*)&radius,1);
    tsalloc.get32((S32*)&tubeRadius,1);
    tsalloc.get32((S32*)&center,3);
-   tsalloc.get32((S32*)&bounds,6);
+   tsalloc.get32((S32*)&mBounds,6);
 
    tsalloc.checkGuard();
 
@@ -1673,7 +1673,7 @@ void TSShape::disassembleShape()
    tsalloc.copyToBuffer32((S32*)&radius,1);
    tsalloc.copyToBuffer32((S32*)&tubeRadius,1);
    tsalloc.copyToBuffer32((S32*)&center,3);
-   tsalloc.copyToBuffer32((S32*)&bounds,6);
+   tsalloc.copyToBuffer32((S32*)&mBounds,6);
 
    tsalloc.setGuard();
 
@@ -2063,8 +2063,8 @@ void TSShape::createEmptyShape()
    radius = 0.866025f;
    tubeRadius = 0.707107f;
    center.set(0.0f, 0.5f, 0.0f);
-   bounds.minExtents.set(-0.5f, 0.0f, -0.5f);
-   bounds.maxExtents.set(0.5f, 1.0f, 0.5f);
+   mBounds.minExtents.set(-0.5f, 0.0f, -0.5f);
+   mBounds.maxExtents.set(0.5f, 1.0f, 0.5f);
 
    mExporterVersion = 124;
    mSmallestVisibleSize = 2;

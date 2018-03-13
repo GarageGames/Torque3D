@@ -397,7 +397,7 @@ bool afxModel::onAdd()
 
   // setup our bounding box
   if (mDataBlock->shape)
-    mObjBox = mDataBlock->shape->bounds;
+    mObjBox = mDataBlock->shape->mBounds;
   else
     mObjBox = Box3F(Point3F(-1, -1, -1), Point3F(1, 1, 1));
 

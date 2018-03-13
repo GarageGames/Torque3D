@@ -1142,7 +1142,7 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
       const F32 typeMaxElevation = mMaxElevation[type];
       const F32 typeMinElevation = mMinElevation[type];
       const bool typeIsShape = mShapeInstances[ type ] != NULL;
-      const Box3F typeShapeBounds = typeIsShape ? mShapeInstances[ type ]->getShape()->bounds : Box3F();
+      const Box3F typeShapeBounds = typeIsShape ? mShapeInstances[ type ]->getShape()->mBounds : Box3F();
       const F32 typeWindScale = mWindScale[type];
       StringTableEntry typeLayer = mLayer[type];
       const bool typeInvertLayer = mInvertLayer[type];

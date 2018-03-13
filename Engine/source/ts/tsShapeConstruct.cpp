@@ -1445,7 +1445,7 @@ DefineTSShapeConstructorMethod( getBounds, Box3F, (),,
    "Get the bounding box for the shape.\n"
    "@return Bounding box \"minX minY minZ maxX maxY maxZ\"" )
 {
-   return mShape->bounds;
+   return mShape->mBounds;
 }}
 
 DefineTSShapeConstructorMethod( setBounds, bool, ( Box3F bbox ),,
@@ -1457,9 +1457,9 @@ DefineTSShapeConstructorMethod( setBounds, bool, ( Box3F bbox ),,
    // Set shape bounds
    TSShape* shape = mShape;
 
-   shape->bounds = bbox;
-   shape->bounds.getCenter( &shape->center );
-   shape->radius = ( shape->bounds.maxExtents - shape->center ).len();
+   shape->mBounds = bbox;
+   shape->mBounds.getCenter( &shape->center );
+   shape->radius = ( shape->mBounds.maxExtents - shape->center ).len();
    shape->tubeRadius = shape->radius;
 
    ADD_TO_CHANGE_SET();
@@ -2200,12 +2200,12 @@ void TSShapeConstructor::ChangeSet::write(TSShape* shape, Stream& stream, const 
          for (U32 j = 1; j < cmd.argc; j++)
          {
             // Use relative paths when possible
-            String str( cmd.argv[j] );
-            if ( str.startsWith( savePath ) )
-               str = str.substr( savePath.length() + 1 );
+            String relStr( cmd.argv[j] );
+            if (relStr.startsWith( savePath ) )
+				relStr = relStr.substr( savePath.length() + 1 );
 
             stream.writeText( ", \"" );
-            stream.write( str.length(), str.c_str() );
+            stream.write(relStr.length(), relStr.c_str() );
             stream.writeText( "\"" );
          }
       }

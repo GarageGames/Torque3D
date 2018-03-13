@@ -405,17 +405,17 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
             mShape->computeBounds(collisionDetails.last(), collisionBounds.last());
             mShape->getAccelerator(collisionDetails.last());
 
-            if (!mShape->bounds.isContained(collisionBounds.last()))
+            if (!mShape->mBounds.isContained(collisionBounds.last()))
             {
                if (!silent_bbox_check)
                Con::warnf("Warning: shape %s collision detail %d (Collision-%d) bounds exceed that of shape.", shapeName, collisionDetails.size() - 1, collisionDetails.last());
-               collisionBounds.last() = mShape->bounds;
+               collisionBounds.last() = mShape->mBounds;
             }
             else if (collisionBounds.last().isValidBox() == false)
             {
                if (!silent_bbox_check)
                Con::errorf("Error: shape %s-collision detail %d (Collision-%d) bounds box invalid!", shapeName, collisionDetails.size() - 1, collisionDetails.last());
-               collisionBounds.last() = mShape->bounds;
+               collisionBounds.last() = mShape->mBounds;
             }
 
             // The way LOS works is that it will check to see if there is a LOS detail that matches
@@ -482,7 +482,7 @@ bool ShapeBaseData::preload(bool server, String &errorStr)
       damageSequence = mShape->findSequence("Damage");
 
       //
-      F32 w = mShape->bounds.len_y() / 2;
+      F32 w = mShape->mBounds.len_y() / 2;
       if (cameraMaxDist < w)
          cameraMaxDist = w;
       // just parse up the string and collect the remappings in txr_tag_remappings.
@@ -707,7 +707,7 @@ DefineEngineMethod( ShapeBaseData, checkDeployPos, bool, ( TransformF txfm ),,
 
    MatrixF mat = txfm.getMatrix();
 
-   Box3F objBox = object->mShape->bounds;
+   Box3F objBox = object->mShape->mBounds;
    Point3F boxCenter = (objBox.minExtents + objBox.maxExtents) * 0.5f;
    objBox.minExtents = boxCenter + (objBox.minExtents - boxCenter) * 0.9f;
    objBox.maxExtents = boxCenter + (objBox.maxExtents - boxCenter) * 0.9f;
@@ -1275,7 +1275,7 @@ bool ShapeBase::onNewDataBlock( GameBaseData *dptr, bool reload )
          }
       }
 
-      mObjBox = mDataBlock->mShape->bounds;
+      mObjBox = mDataBlock->mShape->mBounds;
       resetWorldBox();
 
       // Set the initial mesh hidden state.
@@ -2801,7 +2801,7 @@ void ShapeBase::_renderBoundingBox( ObjectRenderInst *ri, SceneRenderState *stat
          MatrixF mat;
          getRenderImageTransform( ri->objectIndex, &mat );         
 
-         const Box3F &objBox = image.shapeInstance[getImageShapeIndex(image)]->getShape()->bounds;
+         const Box3F &objBox = image.shapeInstance[getImageShapeIndex(image)]->getShape()->mBounds;
 
          drawer->drawCube( desc, objBox, ColorI( 255, 255, 255 ), &mat );
       }

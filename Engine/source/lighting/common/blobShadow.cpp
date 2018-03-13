@@ -182,7 +182,7 @@ void BlobShadow::setRadius(F32 radius)
 
 void BlobShadow::setRadius(TSShapeInstance * shapeInstance, const Point3F & scale)
 {
-   const Box3F & bounds = shapeInstance->getShape()->bounds;
+   const Box3F & bounds = shapeInstance->getShape()->mBounds;
    F32 dx = 0.5f * (bounds.maxExtents.x-bounds.minExtents.x) * scale.x;
    F32 dy = 0.5f * (bounds.maxExtents.y-bounds.minExtents.y) * scale.y;
    F32 dz = 0.5f * (bounds.maxExtents.z-bounds.minExtents.z) * scale.z;

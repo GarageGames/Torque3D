@@ -254,8 +254,8 @@ void MeshComponent::updateShape()
 
          mOwner->getWorldToObj().mulP(pos);
 
-         min = mMeshAsset->getShape()->bounds.minExtents;
-         max = mMeshAsset->getShape()->bounds.maxExtents;
+         min = mMeshAsset->getShape()->mBounds.minExtents;
+         max = mMeshAsset->getShape()->mBounds.maxExtents;
 
          if (mInterfaceData)
          {
