@@ -965,10 +965,10 @@ void HoverVehicle::updateEmitter(bool active,F32 dt,ParticleEmitterData *emitter
          }
       }
       else {
-         for (S32 j = idx; j < idx + count; j++)
-            if (bool(mJetEmitter[j])) {
-               mJetEmitter[j]->deleteWhenEmpty();
-               mJetEmitter[j] = 0;
+         for (S32 k = idx; k < idx + count; k++)
+            if (bool(mJetEmitter[k])) {
+               mJetEmitter[k]->deleteWhenEmpty();
+               mJetEmitter[k] = 0;
             }
       }
 }
