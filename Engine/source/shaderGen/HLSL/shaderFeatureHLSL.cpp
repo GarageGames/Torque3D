@@ -1116,7 +1116,7 @@ void DiffuseFeatureHLSL::processPix(   Vector<ShaderComponent*> &componentList,
          col->setType("fragout");
          col->setName(getOutputTargetVarName(targ));
          col->setStructName("OUT");
-         meta->addStatement(new GenOp("   @ = float4(1.0);\r\n", col));
+         meta->addStatement(new GenOp("   @ = float4(1.0,1.0,1.0,1.0);\r\n", col));
       }
    }
 
