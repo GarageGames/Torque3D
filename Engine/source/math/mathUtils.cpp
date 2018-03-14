@@ -1086,9 +1086,9 @@ bool mRayQuadCollide(   const Quad &quad,
          - (beta * (alpha_11 - 1.0f)) - 1.0f;
       F32 C = alpha;
       F32 D = (B * B) - (4.0f * A * C);
-      F32 Q = -0.5f * (B + (B < 0.0f ? -1.0f : 1.0f) ) * mSqrt(D);
-      u = Q / A;
-      if ((u < 0.0f) || (u > 1.0f)) u = C / Q;
+      F32 F = -0.5f * (B + (B < 0.0f ? -1.0f : 1.0f) ) * mSqrt(D);
+      u = F / A;
+      if ((u < 0.0f) || (u > 1.0f)) u = C / F;
       v = beta / ((u * (beta_11 - 1.0f)) + 1.0f); 
    }
 
