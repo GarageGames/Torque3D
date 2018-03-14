@@ -586,10 +586,10 @@ void SceneContainer::polyhedronFindObjects(const Polyhedron& polyhedron, U32 mas
    Box3F box;
    box.minExtents.set(1e9, 1e9, 1e9);
    box.maxExtents.set(-1e9, -1e9, -1e9);
-   for (i = 0; i < polyhedron.pointList.size(); i++)
+   for (i = 0; i < polyhedron.mPointList.size(); i++)
    {
-      box.minExtents.setMin(polyhedron.pointList[i]);
-      box.maxExtents.setMax(polyhedron.pointList[i]);
+      box.minExtents.setMin(polyhedron.mPointList[i]);
+      box.maxExtents.setMax(polyhedron.mPointList[i]);
    }
 
    if (  mask == WaterObjectType || 
