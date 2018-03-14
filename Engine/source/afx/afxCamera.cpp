@@ -450,8 +450,6 @@ const char* afxCamera::getMode()
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 // Console Methods
 
-static char buffer[100];
-
 ConsoleMethod(afxCamera, setOrbitMode, void, 7, 8, 
   "(GameBase orbitObject, TransformF mat, float minDistance, float maxDistance, float curDistance, bool ownClientObject)"
   "Set the camera to orbit around some given object.\n\n"
@@ -493,6 +491,7 @@ ConsoleMethod( afxCamera, getPosition, const char *, 2, 2, "()"
               "@returns A string of form \"x y z\".")
 { 
   Point3F& pos = object->getPosition();
+  char buffer[100];
   dSprintf(buffer, sizeof(buffer),"%f %f %f",pos.x,pos.y,pos.z);
   return buffer;
 }
@@ -558,6 +557,7 @@ ConsoleMethod(afxCamera, setThirdPersonOffset, void, 3, 4, "(Point3F offset [, P
 ConsoleMethod(afxCamera, getThirdPersonOffset, const char *, 2, 2, "()")
 {
   const Point3F& pos = object->getThirdPersonOffset();
+  char buffer[100];
   dSprintf(buffer, sizeof(buffer),"%f %f %f",pos.x,pos.y,pos.z);
   return buffer;
 }
@@ -565,6 +565,7 @@ ConsoleMethod(afxCamera, getThirdPersonOffset, const char *, 2, 2, "()")
 ConsoleMethod(afxCamera, getThirdPersonCOIOffset, const char *, 2, 2, "()")
 {
   const Point3F& pos = object->getThirdPersonCOIOffset();
+  char buffer[100];
   dSprintf(buffer, sizeof(buffer),"%f %f %f",pos.x,pos.y,pos.z);
   return buffer;
 }
