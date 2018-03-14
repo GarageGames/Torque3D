@@ -1132,11 +1132,11 @@ void GuiMeshRoadEditorCtrl::setSelectedNode( S32 node )
    mSelNode = node;
    if ( mSelNode != -1 )
    {
-      const MeshRoadNode &node = mSelRoad->mNodes[mSelNode];
+      const MeshRoadNode &curNode = mSelRoad->mNodes[mSelNode];
 
       MatrixF objMat = mSelRoad->getNodeTransform(mSelNode);      
-      Point3F objScale( node.width, 1.0f, node.depth );
-      Point3F worldPos = node.point;
+      Point3F objScale(curNode.width, 1.0f, curNode.depth );
+      Point3F worldPos = curNode.point;
       
       mGizmo->set( objMat, worldPos, objScale );
    }
