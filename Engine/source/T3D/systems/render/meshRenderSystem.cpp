@@ -350,9 +350,9 @@ void MeshRenderSystem::rebuildBuffers()
          U16 *pIndex;
          buffers.primitiveBuffer.lock(&pIndex);
 
-         for (U16 i = 0; i < buffers.primData.size(); i++)
+         for (U16 primDataIDx = 0; primDataIDx < buffers.primData.size(); primDataIDx++)
          {
-            *pIndex = i;
+            *pIndex = primDataIDx;
             pIndex++;
          }
 
