@@ -436,7 +436,7 @@ protected:
       Point3F rotOffset;
      /// @}
    };
-   StateDelta delta;                ///< Used for interpolation on the client.  @see StateDelta
+   StateDelta mDelta;                ///< Used for interpolation on the client.  @see StateDelta
    S32 mPredictionCount;            ///< Number of ticks to predict
 
    // Current pos, vel etc.

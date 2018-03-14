@@ -441,16 +441,15 @@ void PlayerControllerComponent::updateMove()
 
       // get the head pitch and add it to the moveVec
       // This more accurate swim vector calc comes from Matt Fairfax
-      MatrixF xRot, zRot;
+      MatrixF xRot;
       xRot.set(EulerF(mOwner->getRotation().asEulerF().x, 0, 0));
-      zRot.set(EulerF(0, 0, mOwner->getRotation().asEulerF().z));
+      zRot.set(EulerF(0, 0, mOwner->getRotation().asEulerF().z));//reset prior uses
       MatrixF rot;
       rot.mul(zRot, xRot);
       rot.getColumn(0, &moveVec);
 
       moveVec *= move->x;
-      VectorF tv;
-      rot.getColumn(1, &tv);
+      rot.getColumn(1, &tv);//reset prior uses
       moveVec += tv * move->y;
       rot.getColumn(2, &tv);
       moveVec += tv * move->z;
