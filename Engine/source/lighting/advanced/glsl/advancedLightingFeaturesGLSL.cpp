@@ -350,7 +350,7 @@ void DeferredBumpFeatGLSL::processPix( Vector<ShaderComponent*> &componentList,
 
          if (fd.features.hasFeature(MFT_DetailNormalMap))
          {
-            Var *bumpMap = (Var*)LangElement::find("detailBumpMap");
+            bumpMap = (Var*)LangElement::find("detailBumpMap");
             if (!bumpMap) {
                bumpMap = new Var;
                bumpMap->setType("sampler2D");
