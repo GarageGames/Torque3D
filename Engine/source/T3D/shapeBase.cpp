@@ -3315,23 +3315,23 @@ void ShapeBase::unpackUpdate(NetConnection *con, BitStream *stream)
             bool datablockChange = image.dataBlock != imageData;
             if (datablockChange || (image.skinNameHandle != skinDesiredNameHandle))
             {
-               MountedImage& image = mMountedImageList[i];
-               image.scriptAnimPrefix = scriptDesiredAnimPrefix;
+               MountedImage& neoImage = mMountedImageList[i];
+			   neoImage.scriptAnimPrefix = scriptDesiredAnimPrefix;
 
                setImage(   i, imageData, 
-                           skinDesiredNameHandle, image.loaded, 
-                           image.ammo, image.triggerDown, image.altTriggerDown,
-                           image.motion, image.genericTrigger[0], image.genericTrigger[1], image.genericTrigger[2], image.genericTrigger[3],
-                           image.target);
+                           skinDesiredNameHandle, neoImage.loaded,
+                           neoImage.ammo, neoImage.triggerDown, neoImage.altTriggerDown,
+                           neoImage.motion, neoImage.genericTrigger[0], neoImage.genericTrigger[1], neoImage.genericTrigger[2], neoImage.genericTrigger[3],
+                           neoImage.target);
             }
             
             if (!datablockChange && image.scriptAnimPrefix != scriptDesiredAnimPrefix)
             {
                // We don't have a new image, but we do have a new script anim prefix to work with.
                // Notify the image of this change.
-               MountedImage& image = mMountedImageList[i];
-               image.scriptAnimPrefix = scriptDesiredAnimPrefix;
-               updateAnimThread(i, getImageShapeIndex(image));
+               MountedImage& animImage = mMountedImageList[i];
+			   animImage.scriptAnimPrefix = scriptDesiredAnimPrefix;
+               updateAnimThread(i, getImageShapeIndex(animImage));
             }
 
             bool isFiring = stream->readFlag();
@@ -3586,8 +3586,8 @@ void ShapeBaseConvex::getFeatures(const MatrixF& mat, const VectorF& n, ConvexFe
    U32 numVerts = emitString[currPos++];
    for (i = 0; i < numVerts; i++) {
       cf->mVertexList.increment();
-      U32 index = emitString[currPos++];
-      mat.mulP(pAccel->vertexList[index], &cf->mVertexList.last());
+      U32 vListIDx = emitString[currPos++];
+      mat.mulP(pAccel->vertexList[vListIDx], &cf->mVertexList.last());
    }
 
    U32 numEdges = emitString[currPos++];
