@@ -891,9 +891,9 @@ void Item::updatePos(const U32 /*mask*/, const F32 dt)
          if (collisionList.getTime() < 1.0)
          {
             // Set to collision point
-            F32 dt = time * collisionList.getTime();
-            pos += mVelocity * dt;
-            time -= dt;
+            F32 cdt = time * collisionList.getTime();
+            pos += mVelocity * cdt;
+            time -= cdt;
 
             // Pick the most resistant surface
             F32 bd = 0;
