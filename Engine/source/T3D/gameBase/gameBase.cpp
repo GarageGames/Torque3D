@@ -259,7 +259,7 @@ GameBase::GameBase()
 GameBase::~GameBase()
 {
 #ifdef TORQUE_AFX_ENABLED
-   if (scope_registered)
+   if (mScope_registered)
       arcaneFX::unregisterScopedObject(this);
 #endif
 }
@@ -277,7 +277,7 @@ bool GameBase::onAdd()
 #ifdef TORQUE_AFX_ENABLED
    if (isClientObject())
    {
-      if (scope_id > 0 && !scope_registered)
+      if (mScope_id > 0 && !mScope_registered)
          arcaneFX::registerScopedObject(this);
    }
    else
@@ -298,7 +298,7 @@ bool GameBase::onAdd()
 void GameBase::onRemove()
 {
 #ifdef TORQUE_AFX_ENABLED
-   if (scope_registered)
+   if (mScope_registered)
       arcaneFX::unregisterScopedObject(this);
 #endif
    // EDITOR FEATURE: Remove us from the reload signal of our datablock.
@@ -586,8 +586,8 @@ U32 GameBase::packUpdate( NetConnection *connection, U32 mask, BitStream *stream
 #ifdef TORQUE_AFX_ENABLED
    if (stream->writeFlag(mask & ScopeIdMask))
    {
-      if (stream->writeFlag(scope_refs > 0))
-         stream->writeInt(scope_id, SCOPE_ID_BITS);
+      if (stream->writeFlag(mScope_refs > 0))
+         stream->writeInt(mScope_id, SCOPE_ID_BITS);
    }
 #endif
    return retMask;
@@ -631,8 +631,8 @@ void GameBase::unpackUpdate(NetConnection *con, BitStream *stream)
 #ifdef TORQUE_AFX_ENABLED
    if (stream->readFlag())
    {
-      scope_id = (stream->readFlag()) ? (U16) stream->readInt(SCOPE_ID_BITS) : 0;
-      scope_refs = 0;
+      mScope_id = (stream->readFlag()) ? (U16) stream->readInt(SCOPE_ID_BITS) : 0;
+	  mScope_refs = 0;
    }
 #endif
 }

@@ -331,9 +331,9 @@ void afxChoreographer::unpack_constraint_info(NetConnection* conn, BitStream* st
       {
         if (stream->readFlag())
         {
-          U16 scope_id = stream->readInt(NetObject::SCOPE_ID_BITS);
+          mScope_id = stream->readInt(NetObject::SCOPE_ID_BITS);
           bool is_shape = stream->readFlag();
-          addObjectConstraint(scope_id, cons_name, is_shape);                                                                   
+          addObjectConstraint(mScope_id, cons_name, is_shape);
         }
       }
     }
