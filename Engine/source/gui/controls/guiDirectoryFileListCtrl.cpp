@@ -189,7 +189,7 @@ DefineEngineMethod( GuiDirectoryFileListCtrl, getSelectedFiles, const char*, (),
    // Fetch the remaining entries
    for( S32 i = 1; i < ItemVector.size(); i++ )
    {
-      StringTableEntry itemText = object->getItemText( ItemVector[i] );
+      itemText = object->getItemText( ItemVector[i] );
       if( !itemText )
          continue;
 

@@ -3004,10 +3004,10 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
 {
    if( !mActive || !mAwake || !mVisible )
       return;
-
+   
+   BitSet32 hitFlags = 0;
    if( isMethod("onMouseUp") )
    {
-      BitSet32 hitFlags = 0;
       Item* item;
       
       S32 hitItemId = -1;
@@ -3025,7 +3025,7 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
       return;
    }
 
-   BitSet32 hitFlags = 0;
+   hitFlags = 0;
    Item *item;
    bool hitCheck = _hitTest( event.mousePoint, item, hitFlags );
    mRenamingItem = NULL;
@@ -3061,7 +3061,7 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
    {
       Parent::onMouseMove( event );
          
-      BitSet32 hitFlags = 0;
+      hitFlags = 0;
       if( !_hitTest( event.mousePoint, newItem2, hitFlags ) )
       {
          if( !mShowRoot )
@@ -3794,16 +3794,12 @@ void GuiTreeViewCtrl::onMouseDown(const GuiEvent & event)
       if (item->isInspectorData())
       {
          Entity* e = dynamic_cast<Entity*>(item->getObject());
-         //if (item->mScriptInfo.mText != StringTable->insert("Components"))
-         {
-            Entity* e = dynamic_cast<Entity*>(item->getObject());
-            if (e)
-            {
-               if (item->isExpanded())
-                  e->onInspect();
-               else
-                  e->onEndInspect();
-            }
+		 if (e)
+		 {
+			 if (item->isExpanded())
+				 e->onInspect();
+			 else
+				 e->onEndInspect();
          }
       }
       

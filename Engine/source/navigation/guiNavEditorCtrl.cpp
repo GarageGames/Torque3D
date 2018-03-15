@@ -535,10 +535,10 @@ void GuiNavEditorCtrl::renderScene(const RectI & updateRect)
          GFXStateBlockDesc desc;
          desc.setBlend(false);
          desc.setZReadWrite(true ,true);
-         MatrixF mat(true);
-         mat.setPosition(mLinkStart);
+         MatrixF linkMat(true);
+		 linkMat.setPosition(mLinkStart);
          Point3F scale(0.8f, 0.8f, 0.8f);
-         GFX->getDrawUtil()->drawTransform(desc, mat, &scale);
+         GFX->getDrawUtil()->drawTransform(desc, linkMat, &scale);
       }
    }
 
