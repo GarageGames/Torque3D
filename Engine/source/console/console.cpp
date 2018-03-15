@@ -841,9 +841,9 @@ void setIntVariable(const char *varName, S32 value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-      char scratchBuffer[32];
-      dSprintf(scratchBuffer, sizeof(scratchBuffer), "%d", value);
-      obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+      char varBuffer[32];
+      dSprintf(varBuffer, sizeof(varBuffer), "%d", value);
+      obj->setDataField(StringTable->insert(objField), 0, varBuffer);
    }
    else
    {
@@ -860,9 +860,9 @@ void setFloatVariable(const char *varName, F32 value)
 
    if (getVariableObjectField(varName, &obj, &objField))
    {
-      char scratchBuffer[32];
-      dSprintf(scratchBuffer, sizeof(scratchBuffer), "%g", value);
-      obj->setDataField(StringTable->insert(objField), 0, scratchBuffer);
+      char varBuffer[32];
+      dSprintf(varBuffer, sizeof(varBuffer), "%g", value);
+      obj->setDataField(StringTable->insert(objField), 0, varBuffer);
    }
    else
    {
