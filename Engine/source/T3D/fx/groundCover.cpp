@@ -1184,9 +1184,9 @@ GroundCoverCell* GroundCover::_generateCell( const Point2I& index,
             terrainBlock = dynamic_cast< TerrainBlock* >( terrainBlocks.first() );
          else
          {
-            for ( U32 i = 0; i < terrainBlocks.size(); i++ )
+            for ( U32 blockIDx = 0; blockIDx < terrainBlocks.size(); blockIDx++ )
             {
-               TerrainBlock *terrain = dynamic_cast< TerrainBlock* >( terrainBlocks[ i ] );
+               TerrainBlock *terrain = dynamic_cast< TerrainBlock* >( terrainBlocks[ blockIDx ] );
                if( !terrain )
                   continue;
 
