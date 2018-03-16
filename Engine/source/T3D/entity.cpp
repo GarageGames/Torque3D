@@ -1542,11 +1542,9 @@ void Entity::write(Stream &stream, U32 tabStop, U32 flags)
    if (mComponents.size() > 0)
    {
       // Pack out the behaviors into fields
-      U32 i = 0;
       for (U32 i = 0; i < mComponents.size(); i++)
       {
          writeTabs(stream, tabStop + 1);
-         char buffer[1024];
          dSprintf(buffer, sizeof(buffer), "new %s() {\r\n", mComponents[i]->getClassName());
          stream.write(dStrlen(buffer), buffer);
          //bi->writeFields( stream, tabStop + 2 );
