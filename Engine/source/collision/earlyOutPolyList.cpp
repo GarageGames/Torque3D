@@ -237,7 +237,7 @@ void EarlyOutPolyList::end()
                iv.mask = 0;
 
                // Test against the remaining planes
-               for (U32 i = p + 1; i < mPlaneList.size(); i++)
+               for (i = p + 1; i < mPlaneList.size(); i++)
                   if (mPlaneList[i].distToPlane(iv.point) > 0) {
                      iv.mask = 1 << i;
                      break;
