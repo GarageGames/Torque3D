@@ -673,8 +673,8 @@ void GuiInspector::refresh()
                }
                else
                {
-                  mGroups.push_back( group );
-                  addObject( group );
+                  mGroups.push_back(newGroup);
+                  addObject(newGroup);
                }
             }
          }
