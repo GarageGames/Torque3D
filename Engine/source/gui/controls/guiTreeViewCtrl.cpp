@@ -3026,25 +3026,25 @@ void GuiTreeViewCtrl::onMouseUp(const GuiEvent &event)
    }
 
    hitFlags = 0;
-   Item *item;
-   bool hitCheck = _hitTest( event.mousePoint, item, hitFlags );
+   Item *hitItem;
+   bool hitCheck = _hitTest( event.mousePoint, hitItem, hitFlags );
    mRenamingItem = NULL;
 
    if( hitCheck )
    {
       if ( event.mouseClickCount == 1 && !mMouseDragged && mPossibleRenameItem != NULL )
       {
-         if ( item == mPossibleRenameItem )
-            showItemRenameCtrl( item );
+         if (hitItem == mPossibleRenameItem )
+            showItemRenameCtrl(hitItem);
       }
       else // If mouseUp occurs on the same item as mouse down
       {
-         bool wasSelected = isSelected( item );
+         bool wasSelected = isSelected(hitItem);
          bool multiSelect = getSelectedItemsCount() > 1;
-         if( wasSelected && multiSelect && item == mTempItem )
+         if( wasSelected && multiSelect && hitItem == mTempItem )
          {
             clearSelection();
-            addSelection( item->mId );
+            addSelection( hitItem->mId );
          }
       }
    }
