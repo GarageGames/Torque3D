@@ -1041,9 +1041,9 @@ void GFXDrawUtil::_drawSolidPolyhedron( const GFXStateBlockDesc &desc, const Any
             continue;
       }
 
-      U32 numPoints = poly.extractFace( i, &indices[ idx ], numIndices - idx );
-      numIndicesForPoly[ numPolys ] = numPoints;
-      idx += numPoints;
+      U32 polyIDx = poly.extractFace( i, &indices[ idx ], numIndices - idx );
+      numIndicesForPoly[ numPolys ] = polyIDx;
+      idx += polyIDx;
 
       numPolys ++;
    }
@@ -1083,11 +1083,11 @@ void GFXDrawUtil::drawObjectBox( const GFXStateBlockDesc &desc, const Point3F &s
    PrimBuild::color( color );
    PrimBuild::begin( GFXLineList, 48 );
 
-   static const Point3F cubePoints[8] = 
+   Point3F cubePts[8];
+   for (U32 i = 0; i < 8; i++)
    {
-      Point3F(-0.5, -0.5, -0.5), Point3F(-0.5, -0.5,  0.5), Point3F(-0.5,  0.5, -0.5), Point3F(-0.5,  0.5,  0.5),
-      Point3F( 0.5, -0.5, -0.5), Point3F( 0.5, -0.5,  0.5), Point3F( 0.5,  0.5, -0.5), Point3F( 0.5,  0.5,  0.5)
-   };
+	   cubePts[i] = cubePoints[i]/2;
+   }
 
    // 8 corner points of the box   
    for ( U32 i = 0; i < 8; i++ )
