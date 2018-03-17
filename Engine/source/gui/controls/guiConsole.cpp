@@ -285,3 +285,9 @@ DefineEngineMethod(GuiConsole, toggleNormalFilter, void, (), ,
 {
    object->toggleNormalFilter();
 }
+
+DefineEngineMethod(GuiConsole, refresh, void, (), ,
+   "Refreshes the displayed messages.")
+{
+   object->refresh();
+}
