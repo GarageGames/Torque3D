@@ -78,7 +78,7 @@ ResizeBitStream::ResizeBitStream(U32 minSpace, U32 initialSize) : BitStream(NULL
 
 ResizeBitStream::~ResizeBitStream()
 {
-   dFree(dataPtr);
+   dFree(mDataPtr);
 }
 
 void ResizeBitStream::validate()
@@ -86,7 +86,7 @@ void ResizeBitStream::validate()
    if(getPosition() + mMinSpace > bufSize)
    {
       bufSize = getPosition() + mMinSpace * 2;
-      dataPtr = (U8 *) dRealloc(dataPtr, bufSize);
+	  mDataPtr = (U8 *) dRealloc(mDataPtr, bufSize);
 
       maxReadBitNum = bufSize << 3;
       maxWriteBitNum = bufSize << 3;
@@ -148,7 +148,7 @@ HuffmanProcessor HuffmanProcessor::g_huffProcessor;
 
 void BitStream::setBuffer(void *bufPtr, S32 size, S32 maxSize)
 {
-   dataPtr = (U8 *) bufPtr;
+   mDataPtr = (U8 *) bufPtr;
    bitNum = 0;
    bufSize = size;
    maxReadBitNum = size << 3;
@@ -178,7 +178,7 @@ U32 BitStream::getStreamSize()
 
 U8 *BitStream::getBytePtr()
 {
-   return dataPtr + getPosition();
+   return mDataPtr + getPosition();
 }
 
 
@@ -194,7 +194,7 @@ U32 BitStream::getWriteByteSize()
 
 void BitStream::clear()
 {
-   dMemset(dataPtr, 0, bufSize);
+   dMemset(mDataPtr, 0, bufSize);
 }
 
 void BitStream::writeClassId(U32 classId, U32 classType, U32 classGroup)
@@ -242,9 +242,9 @@ void BitStream::writeBits(S32 bitCount, const void *bitPtr)
    for(S32 srcBitNum = 0;srcBitNum < bitCount;srcBitNum++)
    {
       if((*(ptr + (srcBitNum >> 3)) & (1 << (srcBitNum & 0x7))) != 0)
-         *(dataPtr + (bitNum >> 3)) |= (1 << (bitNum & 0x7));
+         *(mDataPtr + (bitNum >> 3)) |= (1 << (bitNum & 0x7));
       else
-         *(dataPtr + (bitNum >> 3)) &= ~(1 << (bitNum & 0x7));
+         *(mDataPtr + (bitNum >> 3)) &= ~(1 << (bitNum & 0x7));
       bitNum++;
    }
 }
@@ -252,14 +252,14 @@ void BitStream::writeBits(S32 bitCount, const void *bitPtr)
 void BitStream::setBit(S32 bitCount, bool set)
 {
    if(set)
-      *(dataPtr + (bitCount >> 3)) |= (1 << (bitCount & 0x7));
+      *(mDataPtr + (bitCount >> 3)) |= (1 << (bitCount & 0x7));
    else
-      *(dataPtr + (bitCount >> 3)) &= ~(1 << (bitCount & 0x7));
+      *(mDataPtr + (bitCount >> 3)) &= ~(1 << (bitCount & 0x7));
 }
 
 bool BitStream::testBit(S32 bitCount)
 {
-   return (*(dataPtr + (bitCount >> 3)) & (1 << (bitCount & 0x7))) != 0;
+   return (*(mDataPtr + (bitCount >> 3)) & (1 << (bitCount & 0x7))) != 0;
 }
 
 bool BitStream::writeFlag(bool val)
@@ -271,9 +271,9 @@ bool BitStream::writeFlag(bool val)
       return false;
    }
    if(val)
-      *(dataPtr + (bitNum >> 3)) |= (1 << (bitNum & 0x7));
+      *(mDataPtr + (bitNum >> 3)) |= (1 << (bitNum & 0x7));
    else
-      *(dataPtr + (bitNum >> 3)) &= ~(1 << (bitNum & 0x7));
+      *(mDataPtr + (bitNum >> 3)) &= ~(1 << (bitNum & 0x7));
    bitNum++;
    return (val);
 }
@@ -289,7 +289,7 @@ void BitStream::readBits(S32 bitCount, void *bitPtr)
       AssertWarn(false, "Out of range read");
       return;
    }
-   U8 *stPtr = dataPtr + (bitNum >> 3);
+   U8 *stPtr = mDataPtr + (bitNum >> 3);
    S32 byteCount = (bitCount + 7) >> 3;
 
    U8 *ptr = (U8 *) bitPtr;
@@ -298,7 +298,7 @@ void BitStream::readBits(S32 bitCount, void *bitPtr)
    S32 upShift = 8 - downShift;
 
    U8 curB = *stPtr;
-   const U8 *stEnd = dataPtr + bufSize;
+   const U8 *stEnd = mDataPtr + bufSize;
    while(byteCount--)
    {
       stPtr++;
@@ -628,7 +628,7 @@ void InfiniteBitStream::validate(U32 upcomingBytes)
    if(getPosition() + upcomingBytes + mMinSpace > bufSize)
    {
       bufSize = getPosition() + upcomingBytes + mMinSpace;
-      dataPtr = (U8 *) dRealloc(dataPtr, bufSize);
+	  mDataPtr = (U8 *) dRealloc(mDataPtr, bufSize);
 
       maxReadBitNum = bufSize << 3;
       maxWriteBitNum = bufSize << 3;
@@ -643,11 +643,11 @@ void InfiniteBitStream::compact()
 
    // Copy things...
    bufSize = getPosition() + mMinSpace * 2;
-   dMemcpy(tmp, dataPtr, oldSize);
+   dMemcpy(tmp, mDataPtr, oldSize);
 
    // And clean up.
-   dFree(dataPtr);
-   dataPtr = tmp;
+   dFree(mDataPtr);
+   mDataPtr = tmp;
 
    maxReadBitNum = bufSize << 3;
    maxWriteBitNum = bufSize << 3;
@@ -655,7 +655,7 @@ void InfiniteBitStream::compact()
 
 void InfiniteBitStream::writeToStream(Stream &s)
 {
-   s.write(getPosition(), dataPtr);
+   s.write(getPosition(), mDataPtr);
 }
 
 //------------------------------------------------------------------------------
@@ -781,7 +781,7 @@ void HuffmanProcessor::generateCodes(BitStream& rBS, S32 index, S32 depth)
       // leaf node, copy the code in, and back out...
       HuffLeaf& rLeaf = m_huffLeaves[-(index + 1)];
 
-      dMemcpy(&rLeaf.code, rBS.dataPtr, sizeof(rLeaf.code));
+      dMemcpy(&rLeaf.code, rBS.mDataPtr, sizeof(rLeaf.code));
       rLeaf.numBits = depth;
    } else {
       HuffNode& rNode = m_huffNodes[index];

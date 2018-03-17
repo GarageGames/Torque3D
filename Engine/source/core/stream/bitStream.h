@@ -53,7 +53,7 @@ class QuatF;
 class BitStream : public Stream
 {
 protected:
-   U8 *dataPtr;
+   U8 *mDataPtr;
    S32  bitNum;
    S32  bufSize;
    bool error;
@@ -68,7 +68,7 @@ public:
    static void sendPacketStream(const NetAddress *addr);
 
    void setBuffer(void *bufPtr, S32 bufSize, S32 maxSize = 0);
-   U8*  getBuffer() { return dataPtr; }
+   U8*  getBuffer() { return mDataPtr; }
    U8*  getBytePtr();
 
    U32 getReadByteSize();
@@ -337,7 +337,7 @@ inline bool BitStream::readFlag()
       return false;
    }
    S32 mask = 1 << (bitNum & 0x7);
-   bool ret = (*(dataPtr + (bitNum >> 3)) & mask) != 0;
+   bool ret = (*(mDataPtr + (bitNum >> 3)) & mask) != 0;
    bitNum++;
    return ret;
 }
