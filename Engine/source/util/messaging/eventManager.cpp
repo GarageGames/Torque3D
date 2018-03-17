@@ -288,8 +288,9 @@ bool EventManager::subscribe(SimObject *callbackObj, const char* event, const ch
    }
    else
    {
-      cb = new char[dStrlen(callback) + 1];
-      dStrcpy(cb, callback);
+      dsize_t cbLen = dStrlen(callback) + 1;
+      cb = new char[cbLen];
+      dStrcpy(cb, callback, cbLen);
    }
 
    // Create the subscriber object.

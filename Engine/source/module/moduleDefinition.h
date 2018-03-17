@@ -254,11 +254,11 @@ protected:
             for ( U32 dependencyIndex = 0; dependencyIndex < dependencyWordCount; ++dependencyIndex )
             {
                 // Fetch slot.
-                dStrcpy( slotUnit, StringUnit::getUnit( pDependencyValue, dependencyIndex, "," ) );
+                dStrcpy( slotUnit, StringUnit::getUnit( pDependencyValue, dependencyIndex, "," ), 256 );
         
                 // Fetch slot name and value.
-                dStrcpy( slotName, StringUnit::getUnit( slotUnit, 0, "=" ) );
-                dStrcpy( slotValue, StringUnit::getUnit( slotUnit, 1, "=" ) );
+                dStrcpy( slotName, StringUnit::getUnit( slotUnit, 0, "=" ), 256 );
+                dStrcpy( slotValue, StringUnit::getUnit( slotUnit, 1, "=" ), 256 );
 
                 // Fetch module Id.
                 StringTableEntry moduleId = StringTable->insert( slotName );

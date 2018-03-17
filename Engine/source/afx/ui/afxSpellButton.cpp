@@ -171,10 +171,11 @@ void afxSpellButton::setBitmap(const char *name, bool placeholder)
 
     if (placeholder)
     {
-      dStrcpy(buffer, name);
+      dStrcpy(buffer, name, 1024);
+      S32 pLen = 1024 - dStrlen(buffer);
       p = buffer + dStrlen(buffer);
     
-      dStrcpy(p, "_i");
+      dStrcpy(p, "_i", pLen);
       mTextureInactive.set(buffer, COOLDOWN_PROFILE);
       mTextureNormal = mTextureInactive;
       mTextureHilight = mTextureInactive;
@@ -183,19 +184,20 @@ void afxSpellButton::setBitmap(const char *name, bool placeholder)
     }
     else
     {
-      dStrcpy(buffer, name);
+      dStrcpy(buffer, name, 1024);
+      S32 pLen = 1024 - dStrlen(buffer);
       p = buffer + dStrlen(buffer);   
-      dStrcpy(p, "_n");
+      dStrcpy(p, "_n", pLen);
       mTextureNormal.set(buffer, COOLDOWN_PROFILE);
-      dStrcpy(p, "_h");
+      dStrcpy(p, "_h", pLen);
       mTextureHilight.set(buffer, COOLDOWN_PROFILE);
       if (!mTextureHilight)
         mTextureHilight = mTextureNormal;
-      dStrcpy(p, "_d");
+      dStrcpy(p, "_d", pLen);
       mTextureDepressed.set(buffer, COOLDOWN_PROFILE);
       if (!mTextureDepressed)
         mTextureDepressed = mTextureHilight;
-      dStrcpy(p, "_i");
+      dStrcpy(p, "_i", pLen);
       mTextureInactive.set(buffer, COOLDOWN_PROFILE);
       if (!mTextureInactive)
         mTextureInactive = mTextureNormal;

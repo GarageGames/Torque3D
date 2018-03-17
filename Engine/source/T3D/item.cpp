@@ -1254,7 +1254,7 @@ DefineEngineMethod( Item, getLastStickyPos, const char*, (),,
                object->mStickyCollisionPos.y,
                object->mStickyCollisionPos.z);
    else
-      dStrcpy(ret, "0 0 0");
+      dStrcpy(ret, "0 0 0", bufSize);
 
    return ret;
 }
@@ -1277,7 +1277,7 @@ DefineEngineMethod( Item, getLastStickyNormal, const char *, (),,
                object->mStickyCollisionNormal.y,
                object->mStickyCollisionNormal.z);
    else
-      dStrcpy(ret, "0 0 0");
+      dStrcpy(ret, "0 0 0", bufSize);
 
    return ret;
 }

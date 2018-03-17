@@ -70,9 +70,9 @@ namespace Con
       ret[0] = 0;
       for (walk = ns; walk; walk = walk->mParent)
       {
-         dStrcat(ret, walk->mName);
+         dStrcat(ret, walk->mName, size);
          if (walk->mParent)
-            dStrcat(ret, " -> ");
+            dStrcat(ret, " -> ", size);
       }
       return ret;
    }

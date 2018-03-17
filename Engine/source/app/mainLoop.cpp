@@ -495,7 +495,7 @@ bool StandardMainLoop::handleCommandLine( S32 argc, const char **argv )
          S32 pathLen = dStrlen( fdd.mFile );
          FrameTemp<char> szPathCopy( pathLen + 1);
 
-         dStrcpy( szPathCopy, fdd.mFile );
+         dStrcpy( szPathCopy, fdd.mFile, pathLen + 1 );
          //forwardslash( szPathCopy );
 
          const char *path = dStrrchr(szPathCopy, '/');

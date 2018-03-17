@@ -356,7 +356,7 @@ void ConsoleObject::addGroup(const char* in_pGroupname, const char* in_pGroupDoc
    char* pFieldNameBuf = suppressSpaces(in_pGroupname);
 
    // Append group type to fieldname.
-   dStrcat(pFieldNameBuf, "_begingroup");
+   dStrcat(pFieldNameBuf, "_begingroup", 1024);
 
    // Create Field.
    AbstractClassRep::Field f;
@@ -385,7 +385,7 @@ void ConsoleObject::endGroup(const char*  in_pGroupname)
    char* pFieldNameBuf = suppressSpaces(in_pGroupname);
 
    // Append group type to fieldname.
-   dStrcat(pFieldNameBuf, "_endgroup");
+   dStrcat(pFieldNameBuf, "_endgroup", 1024);
 
    // Create Field.
    AbstractClassRep::Field f;
@@ -407,7 +407,7 @@ void ConsoleObject::endGroup(const char*  in_pGroupname)
 void ConsoleObject::addArray( const char *arrayName, S32 count )
 {
    char *nameBuff = suppressSpaces(arrayName);
-   dStrcat(nameBuff, "_beginarray");
+   dStrcat(nameBuff, "_beginarray", 1024);
 
    // Create Field.
    AbstractClassRep::Field f;
@@ -430,7 +430,7 @@ void ConsoleObject::addArray( const char *arrayName, S32 count )
 void ConsoleObject::endArray( const char *arrayName )
 {
    char *nameBuff = suppressSpaces(arrayName);
-   dStrcat(nameBuff, "_endarray");
+   dStrcat(nameBuff, "_endarray", 1024);
 
    // Create Field.
    AbstractClassRep::Field f;
@@ -773,11 +773,11 @@ static const char* returnClassList( Vector< AbstractClassRep* >& classes, U32 bu
    dQsort( classes.address(), classes.size(), sizeof( AbstractClassRep* ), ACRCompare );
 
    char* ret = Con::getReturnBuffer( bufSize );
-   dStrcpy( ret, classes[ 0 ]->getClassName() );
+   dStrcpy( ret, classes[ 0 ]->getClassName(), bufSize );
    for( U32 i = 1; i < classes.size(); i ++ )
    {
-      dStrcat( ret, "\t" );
-      dStrcat( ret, classes[ i ]->getClassName() );
+      dStrcat( ret, "\t", bufSize );
+      dStrcat( ret, classes[ i ]->getClassName(), bufSize );
    }
    
    return ret;
@@ -888,7 +888,7 @@ DefineEngineFunction( enumerateConsoleClassesByCategory, const char*, ( String c
           && ( repCategory[ categoryLength ] == ' ' || repCategory[ categoryLength ] == '\0' ) )
       {
          classes.push_back( rep );
-         bufSize += dStrlen( rep->getClassName() + 1 );
+         bufSize += dStrlen( rep->getClassName() ) + 1;
       }
    }
 

@@ -94,7 +94,7 @@ void RedBook::setLastError(const char * error)
    if(!error || dStrlen(error) >= sizeof(smLastError))
       setLastError("Invalid error string passed");
    else
-      dStrcpy(smLastError, error);
+      dStrcpy(smLastError, error, 1024);
 }
 
 const char * RedBook::getLastError()

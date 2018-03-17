@@ -86,7 +86,7 @@ F32 OculusVRDevice::smPositionTrackingScale = 1.0f;
 OculusVRDevice::OculusVRDevice()
 {
    // From IInputDevice
-   dStrcpy(mName, "oculusvr");
+   dStrcpy(mName, "oculusvr", 30);
    mDeviceType = INPUTMGR->getNextDeviceType();
 
    //

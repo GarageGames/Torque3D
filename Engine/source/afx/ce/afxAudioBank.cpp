@@ -184,7 +184,7 @@ void afxAudioBank::packData(BitStream* stream)
   if(!mFilename)
     buffer[0] = 0;
   else
-    dStrcpy(buffer, mFilename);
+    dStrcpy(buffer, mFilename, 256);
   stream->writeString(buffer);
   */
 

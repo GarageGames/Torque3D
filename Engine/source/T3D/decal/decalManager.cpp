@@ -1495,7 +1495,7 @@ bool DecalManager::_createDataFile()
 
    // See if we know our current mission name
    char missionName[1024];
-   dStrcpy( missionName, Con::getVariable( "$Client::MissionFile" ) );
+   dStrcpy( missionName, Con::getVariable( "$Client::MissionFile" ), 1024 );
    char *dot = dStrstr((const char*)missionName, ".mis");
    if(dot)
       *dot = '\0';

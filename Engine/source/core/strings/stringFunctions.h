@@ -32,6 +32,10 @@
 #include "platform/types.h"
 #endif
 
+#ifndef _PLATFORMASSERT_H_
+#include "platform/platformAssert.h"
+#endif
+
 #if defined(TORQUE_OS_WIN)
 // These standard functions are not defined on Win32 and other Microsoft platforms...
 #define strcasecmp   _stricmp
@@ -43,18 +47,37 @@
 
 #endif // defined(TORQUE_OS_WIN)
 
-
 //------------------------------------------------------------------------------
 // standard string functions [defined in platformString.cpp]
 
+// Buffer size bounds checking "safe" versions of strcat and strcpy. Ideally you
+// should use these and check if they return >= dstSize and throw an error if so.
+extern S32  dStrlcat(char *dst, const char *src, dsize_t dstSize);
+extern S32  dStrlcpy(char *dst, const char *src, dsize_t dstSize);
+
+#ifdef UNSAFE_STRING_FUNCTIONS
+/// @deprecated Use dStrcat(char *, const char *, dsize_t) instead
 inline char *dStrcat(char *dst, const char *src)
 {
+   AssertFatal(false, "dStrcat without length is deprecated");
    return strcat(dst,src);
 }   
+#endif
+
+/// Concatenate strings.
+/// @note The third parameter is the size of the destination buffer like strlcat
+///       instead of the number of characters to copy like strncat. This is done
+///       under the assumption that being easier to use will make this safer.
+///       If you want the original behavior use dStrncat.
+inline char *dStrcat(char *dst, const char *src, dsize_t dstSize)
+{
+   dStrlcat(dst, src, dstSize);
+   return dst;
+}
 
 inline char *dStrncat(char *dst, const char *src, dsize_t len)
 {
-   return strncat(dst,src,len);
+   return strncat(dst, src, len);
 }
 
 inline S32  dStrcmp(const char *str1, const char *str2)
@@ -82,9 +105,19 @@ inline S32  dStrnicmp(const char *str1, const char *str2, dsize_t len)
    return strncasecmp( str1, str2, len );
 }
 
+#ifdef UNSAFE_STRING_FUNCTIONS
+/// @deprecated Use strcpy(char *, const char *, dsize_t) instead
 inline char *dStrcpy(char *dst, const char *src)
 {
+   AssertFatal(false, "dStrcpy without length is deprecated");
    return strcpy(dst,src);
+}
+#endif
+
+inline char *dStrcpy(char *dst, const char *src, dsize_t dstSize)
+{
+   dStrlcpy(dst, src, dstSize);
+   return dst;
 }   
 
 inline char *dStrncpy(char *dst, const char *src, dsize_t len)

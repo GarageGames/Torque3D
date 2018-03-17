@@ -708,7 +708,7 @@ ImplementEnumType(_TamlFormatMode,
 
             U32 nBufferSize = dStrlen(pFieldValue) + 1;
             FrameTemp<char> valueCopy(nBufferSize);
-            dStrcpy((char *)valueCopy, pFieldValue);
+            dStrcpy((char *)valueCopy, pFieldValue, nBufferSize);
 
             // Skip if field should not be written.
             if (!pSimObject->writeField(fieldName, valueCopy))

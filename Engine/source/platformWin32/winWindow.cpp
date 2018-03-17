@@ -606,7 +606,7 @@ const char* Platform::getLoginPassword()
       if ( RegQueryValueEx( regKey, dT("LoginPassword"), NULL, NULL, buf, &size ) == ERROR_SUCCESS )
       {
          returnString = Con::getReturnBuffer( size + 1 );
-         dStrcpy( returnString, (const char*) buf );
+         dStrcpy( returnString, (const char*) buf, size + 1 );
       }
 
       RegCloseKey( regKey );

@@ -433,7 +433,7 @@ bool FileDialog::setDefaultPath(void *object, const char *index, const char *dat
 
    // Copy and Backslash the path (Windows dialogs are VERY picky about this format)
    static char szPathValidate[512];
-   dStrcpy(szPathValidate, data);
+   dStrcpy(szPathValidate, data, 512);
 
    Platform::makeFullPathName(data, szPathValidate, sizeof(szPathValidate));
    //backslash( szPathValidate );

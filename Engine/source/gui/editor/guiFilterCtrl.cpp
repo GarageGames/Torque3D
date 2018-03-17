@@ -70,8 +70,8 @@ DefineConsoleMethod( GuiFilterCtrl, getValue, const char*, (), , "Return a tuple
    for (U32 i=0; i < filter->size(); i++)
    {
       char value[32];
-      dSprintf(value, 31, "%1.5f ", *(filter->begin()+i) );
-      dStrcat(buffer, value);
+      dSprintf(value, 32, "%1.5f ", *(filter->begin()+i) );
+      dStrcat(buffer, value, 32);
    }
 
    return buffer;
@@ -239,7 +239,7 @@ void Filter::set(S32 argc, const char *argv[])
    if (argc == 1)
    {  // in the form of one string "1.0 1.0 1.0"
       char list[1024];
-      dStrcpy(list, *argv);    // strtok modifies the string so we need to copy it
+      dStrcpy(list, *argv, 1024);    // strtok modifies the string so we need to copy it
       char *value = dStrtok(list, " ");
       while (value)
       {
