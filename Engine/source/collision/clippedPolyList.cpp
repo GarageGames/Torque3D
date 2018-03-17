@@ -270,10 +270,10 @@ void ClippedPolyList::end()
             iv.mask = 0;
 
             // Test against the remaining planes
-            for (U32 i = p + 1; i < mPlaneList.size(); i++)
-               if (mPlaneList[i].distToPlane(iv.point) > 0) 
+            for (U32 rP = p + 1; rP < mPlaneList.size(); rP++)
+               if (mPlaneList[rP].distToPlane(iv.point) > 0)
                {
-                  iv.mask = 1 << i;
+                  iv.mask = 1 << rP;
                   break;
                }
          }
