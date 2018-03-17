@@ -135,6 +135,20 @@ IMPLEMENT_CONOBJECT(TSShapeConstructor);
 TSShapeConstructor::TSShapeConstructor()
  : mShapePath(""), mLoadingShape(false)
 {
+   mOptions.upAxis = UPAXISTYPE_COUNT;
+   mOptions.unit = -1.0f;
+   mOptions.lodType = ColladaUtils::ImportOptions::TrailingNumber;
+   mOptions.singleDetailSize = 2;
+   mOptions.matNamePrefix = "";
+   mOptions.alwaysImport = "";
+   mOptions.neverImport = String(Con::getVariable("$TSShapeConstructor::neverImport"));
+   mOptions.alwaysImportMesh = "";
+   mOptions.neverImportMesh = String(Con::getVariable("$TSShapeConstructor::neverImportMesh"));
+   mOptions.ignoreNodeScale = false;
+   mOptions.adjustCenter = false;
+   mOptions.adjustFloor = false;
+   mOptions.forceUpdateMaterials = false;
+   mOptions.useDiffuseNames = false;
    mShape = NULL;
 }
 
