@@ -89,6 +89,10 @@ class GuiConsole : public GuiArrayCtrl
       {
          setDisplayFilters(mDisplayErrors, mDisplayWarnings, !mDisplayNormalMessages);
       }
+      void refresh()
+      {
+         setDisplayFilters(mDisplayErrors, mDisplayWarnings, mDisplayNormalMessages);
+      }
 
       void refreshLogText();
 };

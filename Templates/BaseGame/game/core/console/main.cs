@@ -104,6 +104,8 @@ function ConsoleDlg::onWake(%this)
    ConsoleDlgErrorFilterBtn.setStateOn(ConsoleMessageLogView.getErrorFilter());
    ConsoleDlgWarnFilterBtn.setStateOn(ConsoleMessageLogView.getWarnFilter());
    ConsoleDlgNormalFilterBtn.setStateOn(ConsoleMessageLogView.getNormalFilter());
+   
+   ConsoleMessageLogView.refresh();
 }
 
 function ConsoleDlg::setAlpha( %this, %alpha)
