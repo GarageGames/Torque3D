@@ -52,7 +52,7 @@ enum TypeReq
 /// each representing a different language construct.
 struct StmtNode
 {
-   StmtNode *next;   ///< Next entry in parse tree.
+   StmtNode *mNext;   ///< Next entry in parse tree.
 
    StmtNode();
    virtual ~StmtNode() {}
@@ -62,7 +62,7 @@ struct StmtNode
 
    ///
    void append(StmtNode *next);
-   StmtNode *getNext() const { return next; }
+   StmtNode *getNext() const { return mNext; }
 
    /// @}
 
