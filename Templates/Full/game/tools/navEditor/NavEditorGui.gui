@@ -237,6 +237,7 @@
                   canSave = "1";
                   canSaveDynamicFields = "0";
                };
+			   /* this went from leaking to ap crashing. surpress even the option till somoene can focus fire on the subsystem -BJR
                new GuiCheckboxCtrl() {
                   position = "75 0";
                   internalName = "SaveIntermediatesButton";
@@ -255,6 +256,7 @@
                   canSave = "1";
                   canSaveDynamicFields = "0";
                };
+			   */
             };
             new GuiCheckboxCtrl() {
                internalName = "BuildSoundButton";
