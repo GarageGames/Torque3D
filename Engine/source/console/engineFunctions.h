@@ -108,11 +108,11 @@ private:
       std::tie(std::get<I + (sizeof...(ArgTs) - sizeof...(TailTs))>(args)...) = defaultArgs;
    }
    
-#if _MSC_VER >= 1910
+#if defined(_MSC_VER) && (_MSC_VER >= 1910)
    template<typename ...TailTs>
    struct DodgyVCHelper
    {
-      using type = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
+	   using type = typename std::enable_if<sizeof...(TailTs) <= sizeof...(ArgTs), decltype(mArgs)>::type;
    };
 
    template<typename ...TailTs> using MaybeSelfEnabled = typename DodgyVCHelper<TailTs...>::type;
