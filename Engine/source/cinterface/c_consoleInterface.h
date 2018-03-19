@@ -20,20 +20,22 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_simdatablockInterface.h"
+#ifndef C_CONSOLEINTERFACE_H
+#define C_CONSOLEINTERFACE_H
+#include "platform/platformDlibrary.h"
+#include "console/consoleInternal.h"
 
-void fnSimDataBlock_AssignId(SimDataBlock* db)
-{
-   db->assignId();
-}
+extern "C" {
+   DLL_DECL void Con_AddConsumer(ConsumerCallback cb);
+   DLL_DECL void Con_RemoveConsumer(ConsumerCallback cb);
 
-void fnSimDataBlock_Preload(SimDataBlock* db)
-{
-   static String errorStr;
-   if (!db->preload(true, errorStr))
-   {
-      Con::errorf(ConsoleLogEntry::General, "Preload failed for %s: %s.",
-         db->getName(), errorStr.c_str());
-      db->deleteObject();
-   }
+   DLL_DECL const char* Con_getConsoleString(const char* name);
+   DLL_DECL void Con_setConsoleString(const char* name, const char* value);
+   DLL_DECL S32 Con_getConsoleInt(const char* name);
+   DLL_DECL void Con_setConsoleInt(const char* name, S32 value);
+   DLL_DECL F32 Con_getConsoleFloat(const char* name);
+   DLL_DECL void Con_setConsoleFloat(const char* name, F32 value);
+   DLL_DECL bool Con_getConsoleBool(const char* name);
+   DLL_DECL void Con_setConsoleBool(const char* name, bool value);
 }
+#endif // C_CONSOLEINTERFACE_H

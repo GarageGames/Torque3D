@@ -20,37 +20,32 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "c_simInterface.h"
 #include "console/consoleInternal.h"
 #include "console/simDatablock.h"
 #include "console/simSet.h"
 
-// External scripting cinterface, suitable for import into any scripting system which support "C" interfaces (C#, Python, Lua, Java, etc)
+SimObject* Sim_FindObjectById(U32 pId)
+{
+   return Sim::findObject(pId);
+}
 
+SimObject* Sim_FindObjectByName(const char* pName)
+{
+   return Sim::findObject(StringTable->insert(pName));
+}
 
-extern "C" {
+SimObject* Sim_FindDataBlockByName(const char* pName)
+{
+   return Sim::getDataBlockGroup()->findObject(StringTable->insert(pName));
+}
 
-   SimObject* Sim_FindObjectById(U32 pId)
-   {
-      return Sim::findObject(pId);
-   }
+SimObjectPtr<SimObject>* Sim_WrapObject(SimObject* pObject)
+{
+   return new SimObjectPtr<SimObject>(pObject);
+}
 
-   SimObject* Sim_FindObjectByName(const char* pName)
-   {
-      return Sim::findObject(StringTable->insert(pName));
-   }
-
-   SimObject* Sim_FindDataBlockByName(const char* pName)
-   {
-      return Sim::getDataBlockGroup()->findObject(StringTable->insert(pName));
-   }
-
-   SimObjectPtr<SimObject>* Sim_WrapObject(SimObject* pObject)
-   {
-      return new SimObjectPtr<SimObject>(pObject);
-   }
-
-   void Sim_DeleteObjectPtr(SimObjectPtr<SimObject>* pObjectPtr)
-   {
-      delete pObjectPtr;
-   }
-};
+void Sim_DeleteObjectPtr(SimObjectPtr<SimObject>* pObjectPtr)
+{
+   delete pObjectPtr;
+}

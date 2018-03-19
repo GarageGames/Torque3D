@@ -20,20 +20,27 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_simdatablockInterface.h"
+#ifndef C_CONTROLINTERFACE_H
+#define C_CONTROLINTERFACE_H
+#include "platform/platformDlibrary.h"
 
-void fnSimDataBlock_AssignId(SimDataBlock* db)
-{
-   db->assignId();
-}
+extern "C" {
+   DLL_DECL void torque_reset();
+   DLL_DECL bool torque_engineinit(S32 argc, const char **argv);
+   DLL_DECL S32 torque_enginetick();
+   DLL_DECL S32 torque_getreturnstatus();
+   DLL_DECL void torque_enginesignalshutdown();
+   DLL_DECL S32 torque_engineshutdown();
+   DLL_DECL bool torque_isdebugbuild();
+   DLL_DECL void torque_setwebdeployment();
+   DLL_DECL void torque_resizewindow(S32 width, S32 height);
 
-void fnSimDataBlock_Preload(SimDataBlock* db)
-{
-   static String errorStr;
-   if (!db->preload(true, errorStr))
-   {
-      Con::errorf(ConsoleLogEntry::General, "Preload failed for %s: %s.",
-         db->getName(), errorStr.c_str());
-      db->deleteObject();
-   }
+#if defined(TORQUE_OS_WIN) && !defined(TORQUE_SDL)
+   DLL_DECL void* torque_gethwnd();
+   DLL_DECL void torque_directmessage(U32 message, U32 wparam, U32 lparam);
+#endif
+#ifdef TORQUE_OS_WIN
+   DLL_DECL void torque_inputevent(S32 type, S32 value1, S32 value2);
+#endif
 }
+#endif // C_CONTROLINTERFACE_H

@@ -20,20 +20,19 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_simdatablockInterface.h"
+#ifndef C_SIMOBJECTINTERFACE_H
+#define C_SIMOBJECTINTERFACE_H
+#include "platform/platformDlibrary.h"
+#include "console/simObject.h"
 
-void fnSimDataBlock_AssignId(SimDataBlock* db)
-{
-   db->assignId();
+extern "C" {
+   DLL_DECL bool fnSimObject_registerObject(SimObject* pObject);
+   DLL_DECL void fnSimObject_GetField(SimObject* obj, const char* fieldName, const char* arrayIndex);
+   DLL_DECL void fnSimObject_SetField(SimObject* obj, const char* fieldName, const char* arrayIndex, const char* value);
+   DLL_DECL void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent);
+   DLL_DECL void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields);
+   DLL_DECL bool fnSimObject_IsLocked(SimObject *so);
+   DLL_DECL void fnSimObject_InspectPreApply(SimObject *so);
+   DLL_DECL void fnSimObject_InspectPostApply(SimObject *so);
 }
-
-void fnSimDataBlock_Preload(SimDataBlock* db)
-{
-   static String errorStr;
-   if (!db->preload(true, errorStr))
-   {
-      Con::errorf(ConsoleLogEntry::General, "Preload failed for %s: %s.",
-         db->getName(), errorStr.c_str());
-      db->deleteObject();
-   }
-}
+#endif // C_SIMOBJECTINTERFACE_H

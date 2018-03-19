@@ -20,20 +20,13 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_simdatablockInterface.h"
+#ifndef C_SIMDATABLOCKINTERFACE_H
+#define C_SIMDATABLOCKINTERFACE_H
+#include "console/simDatablock.h"
+#include "platform/platformDlibrary.h"
 
-void fnSimDataBlock_AssignId(SimDataBlock* db)
-{
-   db->assignId();
+extern "C" {
+   DLL_DECL void fnSimDataBlock_AssignId(SimDataBlock* db);
+   DLL_DECL void fnSimDataBlock_Preload(SimDataBlock* db);
 }
-
-void fnSimDataBlock_Preload(SimDataBlock* db)
-{
-   static String errorStr;
-   if (!db->preload(true, errorStr))
-   {
-      Con::errorf(ConsoleLogEntry::General, "Preload failed for %s: %s.",
-         db->getName(), errorStr.c_str());
-      db->deleteObject();
-   }
-}
+#endif // C_SIMDATABLOCKINTERFACE_H

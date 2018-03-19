@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "c_controlInterface.h"
+
 #include "console/consoleInternal.h"
 #include "console/simSet.h"
 #include "app/mainLoop.h"
@@ -41,184 +43,181 @@ extern S32 CreateMiniDump(LPEXCEPTION_POINTERS ExceptionInfo);
 
 extern bool LinkConsoleFunctions;
 
-extern "C" {
+// reset the engine, unloading any current level and returning to the main menu
+void torque_reset()
+{
+   Con::evaluate("disconnect();");
+}
 
-   // reset the engine, unloading any current level and returning to the main menu
-   void torque_reset()
-   {
-      Con::evaluate("disconnect();");
-   }
-
-   // initialize Torque 3D including argument handling
-   bool torque_engineinit(S32 argc, const char **argv)
-   {
+// initialize Torque 3D including argument handling
+bool torque_engineinit(S32 argc, const char **argv)
+{
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      __try {
+   __try {
 #endif
 
-         LinkConsoleFunctions = true;
+      LinkConsoleFunctions = true;
 
 #if !defined(TORQUE_OS_XENON) && !defined(TORQUE_OS_PS3) && defined(_MSC_VER)
-         createFontInit();
+      createFontInit();
 #endif
 
-         // Initialize the subsystems.
-         StandardMainLoop::init();
+      // Initialize the subsystems.
+      StandardMainLoop::init();
 
-         // Handle any command line args.
-         if (!StandardMainLoop::handleCommandLine(argc, argv))
-         {
-            Platform::AlertOK("Error", "Failed to initialize game, shutting down.");
-            return false;
-         }
-
-#if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      }
-
-      __except (CreateMiniDump(GetExceptionInformation()))
+      // Handle any command line args.
+      if (!StandardMainLoop::handleCommandLine(argc, argv))
       {
-         _exit(0);
+         Platform::AlertOK("Error", "Failed to initialize game, shutting down.");
+         return false;
       }
-#endif
-
-      return true;
-
-   }
-
-   // tick Torque 3D's main loop
-   S32 torque_enginetick()
-   {
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      __try {
+   }
+
+   __except (CreateMiniDump(GetExceptionInformation()))
+   {
+      _exit(0);
+   }
 #endif
 
-         bool ret = StandardMainLoop::doMainLoop();
-         return ret;
+   return true;
+
+}
+
+// tick Torque 3D's main loop
+S32 torque_enginetick()
+{
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      }
-      __except (CreateMiniDump(GetExceptionInformation()))
-      {
-         _exit(0);
-      }
+   __try {
 #endif
 
-   }
-
-   S32 torque_getreturnstatus()
-   {
-      return StandardMainLoop::getReturnStatus();
-   }
-
-   // signal an engine shutdown (as with the quit(); console command)
-   void torque_enginesignalshutdown()
-   {
-      Con::evaluate("quit();");
-   }
-
-   // shutdown the engine
-   S32 torque_engineshutdown()
-   {
+      bool ret = StandardMainLoop::doMainLoop();
+      return ret;
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      __try {
+   }
+   __except (CreateMiniDump(GetExceptionInformation()))
+   {
+      _exit(0);
+   }
 #endif
 
-         // Clean everything up.
-         StandardMainLoop::shutdown();
+}
+
+S32 torque_getreturnstatus()
+{
+   return StandardMainLoop::getReturnStatus();
+}
+
+// signal an engine shutdown (as with the quit(); console command)
+void torque_enginesignalshutdown()
+{
+   Con::evaluate("quit();");
+}
+
+// shutdown the engine
+S32 torque_engineshutdown()
+{
+
+#if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
+   __try {
+#endif
+
+      // Clean everything up.
+      StandardMainLoop::shutdown();
 
 #if !defined(TORQUE_OS_XENON) && !defined(TORQUE_OS_PS3) && defined(_MSC_VER)
-         createFontShutdown();
+      createFontShutdown();
 #endif
 
 #if defined( TORQUE_MINIDUMP ) && defined( TORQUE_RELEASE )
-      }
-
-      __except (CreateMiniDump(GetExceptionInformation()))
-      {
-         _exit(0);
-      }
-#endif
-
-      // Return.  
-      return true;
-
    }
 
-   bool torque_isdebugbuild()
+   __except (CreateMiniDump(GetExceptionInformation()))
    {
+      _exit(0);
+   }
+#endif
+
+   // Return.  
+   return true;
+
+}
+
+bool torque_isdebugbuild()
+{
 #ifdef _DEBUG
-      return true;
+   return true;
 #else
-      return false;
+   return false;
 #endif
 
-   }
+}
 
-   // set Torque 3D into web deployment mode (disable fullscreen exlusive mode, etc)
-   void torque_setwebdeployment()
-   {
-      Platform::setWebDeployment(true);
-   }
+// set Torque 3D into web deployment mode (disable fullscreen exlusive mode, etc)
+void torque_setwebdeployment()
+{
+   Platform::setWebDeployment(true);
+}
 
-   // resize the Torque 3D child window to the specified width and height
-   void torque_resizewindow(S32 width, S32 height)
-   {
-      if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
-         PlatformWindowManager::get()->getFirstWindow()->setSize(Point2I(width, height));
-   }
+// resize the Torque 3D child window to the specified width and height
+void torque_resizewindow(S32 width, S32 height)
+{
+   if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
+      PlatformWindowManager::get()->getFirstWindow()->setSize(Point2I(width, height));
+}
 
 #if defined(TORQUE_OS_WIN) && !defined(TORQUE_SDL)
-   // retrieve the hwnd of our render window
-   void* torque_gethwnd()
+// retrieve the hwnd of our render window
+void* torque_gethwnd()
+{
+   if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
    {
-      if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
-      {
-         Win32Window* w = (Win32Window*)PlatformWindowManager::get()->getFirstWindow();
-         return (void *)w->getHWND();
-      }
-
-      return NULL;
+      Win32Window* w = (Win32Window*)PlatformWindowManager::get()->getFirstWindow();
+      return (void *)w->getHWND();
    }
 
-   // directly add a message to the Torque 3D event queue, bypassing the Windows event queue
-   // this is useful in the case of the IE plugin, where we are hooking into an application 
-   // level message, and posting to the windows queue would cause a hang
-   void torque_directmessage(U32 message, U32 wparam, U32 lparam)
+   return NULL;
+}
+
+// directly add a message to the Torque 3D event queue, bypassing the Windows event queue
+// this is useful in the case of the IE plugin, where we are hooking into an application 
+// level message, and posting to the windows queue would cause a hang
+void torque_directmessage(U32 message, U32 wparam, U32 lparam)
+{
+   if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
    {
-      if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
-      {
-         Win32Window* w = (Win32Window*)PlatformWindowManager::get()->getFirstWindow();
-         Dispatch(DelayedDispatch, w->getHWND(), message, wparam, lparam);
-      }
+      Win32Window* w = (Win32Window*)PlatformWindowManager::get()->getFirstWindow();
+      Dispatch(DelayedDispatch, w->getHWND(), message, wparam, lparam);
    }
+}
 
 #endif
 
 #ifdef TORQUE_OS_WIN
-   void torque_inputevent(S32 type, S32 value1, S32 value2)
+void torque_inputevent(S32 type, S32 value1, S32 value2)
+{
+   if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
    {
-      if (PlatformWindowManager::get() && PlatformWindowManager::get()->getFirstWindow())
+      Win32Window* w = (Win32Window*)PlatformWindowManager::get()->getFirstWindow();
+      WindowId devId = w->getWindowId();
+
+      switch (type)
       {
-         Win32Window* w = (Win32Window*)PlatformWindowManager::get()->getFirstWindow();
-         WindowId devId = w->getWindowId();
+      case 0:
+         w->mouseEvent.trigger(devId, 0, value1, value2, w->isMouseLocked());
+         break;
+      case 1:
+         if (value2)
+            w->buttonEvent.trigger(devId, 0, IA_MAKE, value1);
+         else
+            w->buttonEvent.trigger(devId, 0, IA_BREAK, value1);
+         break;
 
-         switch (type)
-         {
-         case 0:
-            w->mouseEvent.trigger(devId, 0, value1, value2, w->isMouseLocked());
-            break;
-         case 1:
-            if (value2)
-               w->buttonEvent.trigger(devId, 0, IA_MAKE, value1);
-            else
-               w->buttonEvent.trigger(devId, 0, IA_BREAK, value1);
-            break;
-
-         }
       }
    }
+}
 #endif
-};

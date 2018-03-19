@@ -20,51 +20,49 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "console/simObject.h"
+#include "c_simobjectInterface.h"
 
-extern "C" {
-   bool fnSimObject_registerObject(SimObject* pObject)
-   {
-      return pObject->registerObject();
-   }
+bool fnSimObject_registerObject(SimObject* pObject)
+{
+   return pObject->registerObject();
+}
 
-   void fnSimObject_GetField(SimObject* obj, const char* fieldName, const char* arrayIndex)
-   {
-      obj->getDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex));
-   }
+void fnSimObject_GetField(SimObject* obj, const char* fieldName, const char* arrayIndex)
+{
+   obj->getDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex));
+}
 
-   void fnSimObject_SetField(SimObject* obj, const char* fieldName, const char* arrayIndex, const char* value)
-   {
-      obj->setDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex), StringTable->insert(value));
-   }
+void fnSimObject_SetField(SimObject* obj, const char* fieldName, const char* arrayIndex, const char* value)
+{
+   obj->setDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex), StringTable->insert(value));
+}
 
-   void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent)
+void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent)
+{
+   if (parent)
    {
-      if (parent)
-      {
-         obj->setCopySource(parent);
-         obj->assignFieldsFrom(parent);
-      }
+      obj->setCopySource(parent);
+      obj->assignFieldsFrom(parent);
    }
+}
 
-   void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields)
-   {
-      obj->setModStaticFields(modStaticFields);
-      obj->setModDynamicFields(modDynamicFields);
-   }
+void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields)
+{
+   obj->setModStaticFields(modStaticFields);
+   obj->setModDynamicFields(modDynamicFields);
+}
 
-   bool fnSimObject_IsLocked(SimObject *so)
-   {
-      return so->isLocked();
-   }
+bool fnSimObject_IsLocked(SimObject *so)
+{
+   return so->isLocked();
+}
 
-   void fnSimObject_InspectPreApply(SimObject *so)
-   {
-      so->inspectPreApply();
-   }
+void fnSimObject_InspectPreApply(SimObject *so)
+{
+   so->inspectPreApply();
+}
 
-   void fnSimObject_InspectPostApply(SimObject *so)
-   {
-      so->inspectPostApply();
-   }
+void fnSimObject_InspectPostApply(SimObject *so)
+{
+   so->inspectPostApply();
 }

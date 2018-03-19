@@ -20,20 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_simdatablockInterface.h"
+#ifndef C_SIMINTERFACE_H
+#define C_SIMINTERFACE_H
+#include "platform/platformDlibrary.h"
+#include "console/consoleInternal.h"
 
-void fnSimDataBlock_AssignId(SimDataBlock* db)
-{
-   db->assignId();
+extern "C" {
+   DLL_DECL SimObject* Sim_FindObjectById(U32 pId);
+   DLL_DECL SimObject* Sim_FindObjectByName(const char* pName);
+   DLL_DECL SimObject* Sim_FindDataBlockByName(const char* pName);
+   DLL_DECL SimObjectPtr<SimObject>* Sim_WrapObject(SimObject* pObject);
+   DLL_DECL void Sim_DeleteObjectPtr(SimObjectPtr<SimObject>* pObjectPtr);
 }
-
-void fnSimDataBlock_Preload(SimDataBlock* db)
-{
-   static String errorStr;
-   if (!db->preload(true, errorStr))
-   {
-      Con::errorf(ConsoleLogEntry::General, "Preload failed for %s: %s.",
-         db->getName(), errorStr.c_str());
-      db->deleteObject();
-   }
-}
+#endif // C_SIMINTERFACE_H
