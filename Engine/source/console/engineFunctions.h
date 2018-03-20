@@ -24,6 +24,7 @@
 #define _ENGINEFUNCTIONS_H_
 
 #include <tuple>
+#include "fixedTuple.h"
 
 #ifndef _ENGINEEXPORTS_H_
    #include "console/engineExports.h"
@@ -94,6 +95,7 @@ template<typename ...ArgTs>
 struct _EngineFunctionDefaultArguments< void(ArgTs...) > : public EngineFunctionDefaultArguments
 {
    template<typename T> using DefVST = typename EngineTypeTraits<T>::DefaultArgumentValueStoreType;
+   fixed_tuple<DefVST<ArgTs>  ...> mFixedArgs;
    std::tuple<DefVST<ArgTs>  ...> mArgs;
 private:
    using SelfType = _EngineFunctionDefaultArguments< void(ArgTs...) >;
@@ -130,7 +132,9 @@ private:
 public:
    template<typename ...TailTs> _EngineFunctionDefaultArguments(TailTs ...tail)
    : EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(SelfType::tailInit(tail...))
-   {}
+   {
+      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(mArgs, mFixedArgs);
+   }
 };
 
 #pragma pack( pop )

@@ -113,6 +113,40 @@ struct fixed_tuple_accessor<0>
    }
 };
 
+template< typename T1, typename T2 >
+struct fixed_tuple_mutator {};
+
+template<typename... Tdest, typename... Tsrc>
+struct fixed_tuple_mutator<void(Tdest...), void(Tsrc...)>
+{
+   template<std::size_t I = 0>
+   static inline typename std::enable_if<I == sizeof...(Tsrc), void>::type
+      copy_r_t_l(fixed_tuple<Tsrc...>& src, fixed_tuple<Tdest...>& dest)
+   { }
+
+   template<std::size_t I = 0>
+   static inline typename std::enable_if<I < sizeof...(Tsrc), void>::type
+      copy_r_t_l(fixed_tuple<Tsrc...>& src, fixed_tuple<Tdest...>& dest)
+   {
+      fixed_tuple_accessor<I + (sizeof...(Tdest)-sizeof...(Tsrc))>::get(dest) = fixed_tuple_accessor<I>::get(src);
+      copy_r_t_l<I + 1>(src, dest);
+   }
+
+   template<std::size_t I = 0>
+   static inline typename std::enable_if<I == sizeof...(Tsrc), void>::type
+      copy(std::tuple<Tsrc...>& src, fixed_tuple<Tdest...>& dest)
+   { }
+
+   template<std::size_t I = 0>
+   static inline typename std::enable_if<I < sizeof...(Tsrc), void>::type
+      copy(std::tuple<Tsrc...>& src, fixed_tuple<Tdest...>& dest)
+   {
+      fixed_tuple_accessor<I>::get(dest) = std::get<I>(src);
+      copy<I + 1>(src, dest);
+   }
+};
+
+
 /// @}
 
 
