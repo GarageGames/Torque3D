@@ -474,6 +474,12 @@ void PlatformWindowSDL::_triggerMouseButtonNotify(const SDL_Event& event)
       case SDL_BUTTON_MIDDLE:
          button = 2;
          break;
+      case SDL_BUTTON_X1:
+         button = 3;
+         break;
+      case SDL_BUTTON_X2:
+         button = 4;
+         break;
       default:
          return;
    }
