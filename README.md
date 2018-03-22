@@ -1,6 +1,8 @@
 # Torque 3D
 
-MIT Licensed Open Source version of [Torque 3D](http://torque3d.org) from [GarageGames](http://www.garagegames.com)
+This repository hosts the MIT Licensed Open Source version of [Torque 3D](http://torque3d.org) from [GarageGames](http://www.garagegames.com)
+
+Torque 3D is an open-source, cross-platform game engine. It has been used for projects including driving simulators, MMOs and real-world interactive experiences. The engine includes high-performance 3D rendering, a suite of environment and level editing tools, high-performance networking capabilities, a plugin-based physics engine, and a mature and extensible codebase. The entire source code is yours to modify under the permissive MIT licence, and is always evolving through community development.
 
 [![GitHub tag](https://img.shields.io/github/tag/GarageGames/Torque3D.svg)](https://github.com/GarageGames/Torque3D/tags)
 [![GitHub release](https://img.shields.io/github/release/GarageGames/Torque3D.svg)](https://github.com/GarageGames/Torque3D/releases/latest)
