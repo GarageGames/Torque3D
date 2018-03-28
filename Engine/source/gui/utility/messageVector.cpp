@@ -500,7 +500,7 @@ void MessageVector::insertLine(const U32   position,
 
    U32 len = dStrlen(newMessage) + 1;
    char* copy = new char[len];
-   dStrcpy(copy, newMessage);
+   dStrcpy(copy, newMessage, len);
 
    mMessageLines.insert(position);
    mMessageLines[position].message    = copy;

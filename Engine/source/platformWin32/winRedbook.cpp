@@ -83,8 +83,9 @@ void installRedBookDevices()
       if(::GetDriveTypeA(str) == DRIVE_CDROM)
       {
          Win32RedBookDevice * device = new Win32RedBookDevice;
-         device->mDeviceName = new char[dStrlen(str) + 1];
-         dStrcpy(device->mDeviceName, str);
+         dsize_t deviceNameLen = dStrlen(str) + 1;
+         device->mDeviceName = new char[deviceNameLen];
+         dStrcpy(device->mDeviceName, str, deviceNameLen);
 
          RedBook::installDevice(device);
       }

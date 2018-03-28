@@ -60,6 +60,9 @@
 #include "gfx/gfxDevice.h"
 #endif
 
+#ifndef _COLLADA_UTILS_H_
+#include "ts/collada/colladaUtils.h"
+#endif
 
 class SceneManager;
 class SceneRenderState;
@@ -549,6 +552,23 @@ class SceneObject : public NetObject, private SceneContainer::Link, public Proce
                                     AbstractPolyList* polyList, 
                                     const Box3F& box, 
                                     const SphereF& sphere ) { return false; }
+
+      /// Builds a list of polygons which intersect a bounding volume for exporting
+      ///
+      /// This will use either the sphere or the box, not both, the
+      /// SceneObject implementation ignores sphere.
+      ///
+      /// @see AbstractPolyList
+      /// @param   context    A contentual hint as to the type of polylist to build.
+      /// @param   polyList   Poly list build (out)
+      /// @param   box        Box bounding volume
+      /// @param   sphere     Sphere bounding volume
+      ///
+      virtual bool buildExportPolyList(ColladaUtils::ExportData *exportData,
+         const Box3F& box,
+         const SphereF& sphere) {
+         return false;
+      }
 
       /// Casts a ray and obtain collision information, returns true if RayInfo is modified.
       ///

@@ -446,8 +446,9 @@ bool afxMagicMissileData::onAdd()
       Vector<char*> dataBlocks(__FILE__, __LINE__);
 
       // make a copy of points_string
-      char* tokCopy = new char[dStrlen(wiggle_axis_string) + 1];
-      dStrcpy(tokCopy, wiggle_axis_string);
+      dsize_t tokCopyLen = dStrlen(wiggle_axis_string) + 1;
+      char* tokCopy = new char[tokCopyLen];
+      dStrcpy(tokCopy, wiggle_axis_string, tokCopyLen);
 
       // extract tokens one by one, adding them to dataBlocks
       char* currTok = dStrtok(tokCopy, " \t");

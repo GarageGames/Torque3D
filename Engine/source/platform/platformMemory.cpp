@@ -1130,7 +1130,7 @@ static void logFree(const AllocatedHeader* hdr)
 
 void enableLogging(const char* fileName)
 {
-   dStrcpy(gLogFilename, fileName);
+   dStrcpy(gLogFilename, fileName, 256);
    if (!gEnableLogging)
    {
       gEnableLogging = true;

@@ -280,7 +280,7 @@ namespace PlatformNetState
       if (addressString[0] == '[')
       {
          // Must be ipv6 notation
-         dStrcpy(outAddress, addressString+1);
+         dStrcpy(outAddress, addressString+1, 256);
          addressString = outAddress;
 
          portString = dStrchr(outAddress, ']');
@@ -305,7 +305,7 @@ namespace PlatformNetState
       }
       else
       {
-         dStrcpy(outAddress, addressString);
+         dStrcpy(outAddress, addressString, 256);
          addressString = outAddress;
 
          // Check to see if we have multiple ":" which would indicate this is an ipv6 address
@@ -546,7 +546,7 @@ static PolledSocket* addPolledSocket(NetSocket handleFd, SOCKET fd, S32 state,
    sock->handleFd = handleFd;
    sock->state = state;
    if (remoteAddr)
-      dStrcpy(sock->remoteAddr, remoteAddr);
+      dStrcpy(sock->remoteAddr, remoteAddr, 256);
    if (port != -1)
       sock->remotePort = port;
    gPolledSockets.push_back(sock);

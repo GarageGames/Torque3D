@@ -545,8 +545,9 @@ DefineConsoleMethod(UndoManager, getNextUndoName, const char *, (),, "UndoManage
    const char *name = object->getNextUndoName();
    if(!name)
       return NULL;
-   char *ret = Con::getReturnBuffer(dStrlen(name) + 1);
-   dStrcpy(ret, name);
+   dsize_t retLen = dStrlen(name) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, name, retLen);
    return ret;
 }
 
@@ -556,8 +557,9 @@ DefineConsoleMethod(UndoManager, getNextRedoName, const char *, (),, "UndoManage
    const char *name = object->getNextRedoName();
    if(!name)
       return NULL;
-   char *ret = Con::getReturnBuffer(dStrlen(name) + 1);
-   dStrcpy(ret, name);
+   dsize_t retLen = dStrlen(name) + 1;
+   char *ret = Con::getReturnBuffer(retLen);
+   dStrcpy(ret, name, retLen);
    return ret;
 }
 

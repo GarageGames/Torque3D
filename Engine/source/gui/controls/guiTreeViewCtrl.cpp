@@ -4750,15 +4750,15 @@ StringTableEntry GuiTreeViewCtrl::getTextToRoot( S32 itemId, const char * delimi
    dMemset( bufferOne, 0, sizeof(bufferOne) );
    dMemset( bufferTwo, 0, sizeof(bufferTwo) );
 
-   dStrcpy( bufferOne, item->getText() );
+   dStrcpy( bufferOne, item->getText(), 1024 );
 
    Item *prevNode = item->mParent;
    while ( prevNode )
    {
       dMemset( bufferNodeText, 0, sizeof(bufferNodeText) );
-      dStrcpy( bufferNodeText, prevNode->getText() );
+      dStrcpy( bufferNodeText, prevNode->getText(), 128 );
       dSprintf( bufferTwo, 1024, "%s%s%s",bufferNodeText, delimiter, bufferOne );
-      dStrcpy( bufferOne, bufferTwo );
+      dStrcpy( bufferOne, bufferTwo, 1024 );
       dMemset( bufferTwo, 0, sizeof(bufferTwo) );
       prevNode = prevNode->mParent;
    }

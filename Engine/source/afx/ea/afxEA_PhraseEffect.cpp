@@ -272,10 +272,10 @@ void afxEA_PhraseEffect::trigger_new_phrase()
   if (phrase_fx_data->on_trig_cmd != ST_NULLSTRING)
   {
     char obj_str[32];
-    dStrcpy(obj_str, Con::getIntArg(choreographer->getId()));
+    dStrcpy(obj_str, Con::getIntArg(choreographer->getId()), 32);
 
     char index_str[32];
-    dStrcpy(index_str, Con::getIntArg(group_index));
+    dStrcpy(index_str, Con::getIntArg(group_index), 32);
 
     char buffer[1024];
     char* b = buffer;

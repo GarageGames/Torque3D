@@ -534,7 +534,7 @@ StringTableEntry Platform::makeRelativePathName(const char *path, const char *to
 
       // Copy the rest
       if(*branch)
-         dStrcpy(bufPtr, branch + 1);
+         dStrcpy(bufPtr, branch + 1, temp.size - (bufPtr - temp.ptr));
       else
          *--bufPtr = 0;
 

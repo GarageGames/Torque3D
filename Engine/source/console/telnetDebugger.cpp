@@ -470,19 +470,19 @@ void TelnetDebugger::sendBreak()
       if ( ns ) {
 
          if ( ns->mParent && ns->mParent->mPackage && ns->mParent->mPackage[0] ) {
-            dStrcat( scope, ns->mParent->mPackage );
-            dStrcat( scope, "::" );
+            dStrcat( scope, ns->mParent->mPackage, MaxCommandSize );
+            dStrcat( scope, "::", MaxCommandSize );
          }
          if ( ns->mName && ns->mName[0] ) {
-            dStrcat( scope, ns->mName );
-            dStrcat( scope, "::" );
+            dStrcat( scope, ns->mName, MaxCommandSize );
+            dStrcat( scope, "::", MaxCommandSize );
          }
       }
 
       const char *function = gEvalState.stack[i]->scopeName;
       if ((!function) || (!function[0]))
          function = "<none>";
-      dStrcat( scope, function );
+      dStrcat( scope, function, MaxCommandSize );
 
       U32 line=0, inst;
       U32 ip = gEvalState.stack[i]->ip;

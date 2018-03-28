@@ -27,10 +27,11 @@
 #define FN_CDECL
 #define STDCALL
 
+#include <stddef.h>
 // size_t is needed to overload new
 // size_t tends to be OS and compiler specific and may need to 
 // be if/def'ed in the future
-typedef unsigned long  dsize_t;
+typedef size_t dsize_t;
 
 
 /** Platform dependent file date-time structure.  The defination of this structure

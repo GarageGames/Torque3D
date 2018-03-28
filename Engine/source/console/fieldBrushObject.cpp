@@ -273,9 +273,9 @@ DefineConsoleMethod(FieldBrushObject, queryFields, const char*, (const char* sim
     for ( U32 groupIndex = 0; groupIndex < groupCount; ++groupIndex )
     {
         // Copy string element.
-        dStrcpy( tempBuf, StringUnit::getUnit( groupList, groupIndex, " \t\n" ) );
+        dStrcpy( tempBuf, StringUnit::getUnit( groupList, groupIndex, " \t\n" ), 256 );
         // Append internal name.
-        dStrcat( tempBuf, "_begingroup" );
+        dStrcat( tempBuf, "_begingroup", 256 );
         // Store Group.
         groups.push_back( StringTable->insert( tempBuf ) );
     }
@@ -416,7 +416,7 @@ void FieldBrushObject::copyFields( SimObject* pSimObject, const char* fieldList 
         for ( U32 fieldIndex = 0; fieldIndex < fieldCount; ++fieldIndex )
         {
             // Copy string element.
-            dStrcpy( tempBuf, StringUnit::getUnit( fieldList, fieldIndex, " \t\n" ) );
+            dStrcpy( tempBuf, StringUnit::getUnit( fieldList, fieldIndex, " \t\n" ), bufferSizes );
 
             // Store field.
             fields.push_back( StringTable->insert( tempBuf ) );

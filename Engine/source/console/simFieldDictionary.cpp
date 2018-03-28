@@ -281,7 +281,7 @@ void SimFieldDictionary::writeFields(SimObject *obj, Stream &stream, U32 tabStop
       dSprintf(expandedBuffer, nBufferSize, "%s%s%s = \"", typeName, *typeName ? " " : "", (*itr)->slotName);
       if ((*itr)->value)
          expandEscape((char*)expandedBuffer + dStrlen(expandedBuffer), (*itr)->value);
-      dStrcat(expandedBuffer, "\";\r\n");
+      dStrcat(expandedBuffer, "\";\r\n", nBufferSize);
 
       stream.write(dStrlen(expandedBuffer), expandedBuffer);
    }

@@ -245,11 +245,11 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
       else
       {
          // IMPORTANT -- do NOT change the following line, it identifies the file as an input map file
-         dStrcpy( lineBuffer, "// Torque Input Map File\n" );
+         dStrcpy( lineBuffer, "// Torque Input Map File\n", 1024 );
          iostrm->write( dStrlen( lineBuffer ), lineBuffer );
       }
 
-      dSprintf(lineBuffer, 1023, "if (isObject(%s)) %s.delete();\n"
+      dSprintf(lineBuffer, 1024, "if (isObject(%s)) %s.delete();\n"
                                  "new ActionMap(%s);\n", getName(), getName(), getName());
       iostrm->write(dStrlen(lineBuffer), lineBuffer);
 
@@ -277,7 +277,7 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
             else
                command = "bind";
 
-            dSprintf(lineBuffer, 1023, "%s.%s(%s, \"%s%s\"",
+            dSprintf(lineBuffer, 1024, "%s.%s(%s, \"%s%s\"",
                                         getName(),
                                         command,
                                         devbuffer,
@@ -298,53 +298,53 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
                   buff[curr++] = 'I';
                buff[curr] = '\0';
 
-               dStrcat(lineBuffer, buff);
+               dStrcat(lineBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::HasDeadZone) {
                char buff[64];
                dSprintf(buff, 63, ", \"%g %g\"", rNode.deadZoneBegin, rNode.deadZoneEnd);
-               dStrcat(lineBuffer, buff);
+               dStrcat(lineBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::HasScale) {
                char buff[64];
                dSprintf(buff, 63, ", %g", rNode.scaleFactor);
-               dStrcat(lineBuffer, buff);
+               dStrcat(lineBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::BindCmd) {
                if (rNode.makeConsoleCommand) {
-                  dStrcat(lineBuffer, ", \"");
+                  dStrcat(lineBuffer, ", \"", 1024);
                   U32 pos = dStrlen(lineBuffer);
                   expandEscape(lineBuffer + pos, rNode.makeConsoleCommand);
-                  dStrcat(lineBuffer, "\"");
+                  dStrcat(lineBuffer, "\"", 1024);
                } else {
-                  dStrcat(lineBuffer, ", \"\"");
+                  dStrcat(lineBuffer, ", \"\"", 1024);
                }
                if (rNode.breakConsoleCommand) {
-                  dStrcat(lineBuffer, ", \"");
+                  dStrcat(lineBuffer, ", \"", 1024);
                   U32 pos = dStrlen(lineBuffer);
                   expandEscape(lineBuffer + pos, rNode.breakConsoleCommand);
-                  dStrcat(lineBuffer, "\"");
+                  dStrcat(lineBuffer, "\"", 1024);
                }
                else
-                  dStrcat(lineBuffer, ", \"\"");
+                  dStrcat(lineBuffer, ", \"\"", 1024);
             }
             else if (rNode.flags & Node::Held) 
             {
-               dStrcat(lineBuffer, ", ");
-               dStrcat(lineBuffer, rNode.consoleFunction);
+               dStrcat(lineBuffer, ", ", 1024);
+               dStrcat(lineBuffer, rNode.consoleFunction, 1024);
 
-               dStrcat(lineBuffer, ", ");
-               dStrcat(lineBuffer, rNode.contextEvent->mConsoleFunctionHeld);
+               dStrcat(lineBuffer, ", ", 1024);
+               dStrcat(lineBuffer, rNode.contextEvent->mConsoleFunctionHeld, 1024);
             } 
             else {
-               dStrcat(lineBuffer, ", ");
-               dStrcat(lineBuffer, rNode.consoleFunction);
+               dStrcat(lineBuffer, ", ", 1024);
+               dStrcat(lineBuffer, rNode.consoleFunction, 1024);
             }
 
-            dStrcat(lineBuffer, ");\n");
+            dStrcat(lineBuffer, ");\n", 1024);
             iostrm->write(dStrlen(lineBuffer), lineBuffer);
          }
       }
@@ -377,7 +377,7 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
                command = "bind";
 
             char finalBuffer[1024];
-            dSprintf(finalBuffer, 1023, "%s.%s(%s, \"%s%s\"",
+            dSprintf(finalBuffer, 1024, "%s.%s(%s, \"%s%s\"",
                                         getName(),
                                         command,
                                         devbuffer,
@@ -398,51 +398,51 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
                   buff[curr++] = 'I';
                buff[curr] = '\0';
 
-               dStrcat(finalBuffer, buff);
+               dStrcat(finalBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::HasDeadZone) {
                char buff[64];
                dSprintf(buff, 63, ", \"%g %g\"", rNode.deadZoneBegin, rNode.deadZoneEnd);
-               dStrcat(finalBuffer, buff);
+               dStrcat(finalBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::HasScale) {
                char buff[64];
                dSprintf(buff, 63, ", %g", rNode.scaleFactor);
-               dStrcat(finalBuffer, buff);
+               dStrcat(finalBuffer, buff, 1024);
             }
 
             if (rNode.flags & Node::BindCmd) {
                if (rNode.makeConsoleCommand) {
-                  dStrcat(finalBuffer, ", \"");
-                  dStrcat(finalBuffer, rNode.makeConsoleCommand);
-                  dStrcat(finalBuffer, "\"");
+                  dStrcat(finalBuffer, ", \"", 1024);
+                  dStrcat(finalBuffer, rNode.makeConsoleCommand, 1024);
+                  dStrcat(finalBuffer, "\"", 1024);
                } else {
-                  dStrcat(finalBuffer, ", \"\"");
+                  dStrcat(finalBuffer, ", \"\"", 1024);
                }
                if (rNode.breakConsoleCommand) {
-                  dStrcat(finalBuffer, ", \"");
-                  dStrcat(finalBuffer, rNode.breakConsoleCommand);
-                  dStrcat(finalBuffer, "\"");
+                  dStrcat(finalBuffer, ", \"", 1024);
+                  dStrcat(finalBuffer, rNode.breakConsoleCommand, 1024);
+                  dStrcat(finalBuffer, "\"", 1024);
                }
                else
-                  dStrcat(finalBuffer, ", \"\"");
+                  dStrcat(finalBuffer, ", \"\"", 1024);
             }
             else if (rNode.flags & Node::Held)
             {
-               dStrcat(finalBuffer, ", ");
-               dStrcat(finalBuffer, rNode.consoleFunction);
+               dStrcat(finalBuffer, ", ", 1024);
+               dStrcat(finalBuffer, rNode.consoleFunction, 1024);
 
-               dStrcat(finalBuffer, ", ");
-               dStrcat(finalBuffer, rNode.contextEvent->mConsoleFunctionHeld);
+               dStrcat(finalBuffer, ", ", 1024);
+               dStrcat(finalBuffer, rNode.contextEvent->mConsoleFunctionHeld, 1024);
             } 
             else {
-               dStrcat(finalBuffer, ", ");
-               dStrcat(finalBuffer, rNode.consoleFunction);
+               dStrcat(finalBuffer, ", ", 1024);
+               dStrcat(finalBuffer, rNode.consoleFunction, 1024);
             }
 
-            dStrcat(finalBuffer, ");");
+            dStrcat(finalBuffer, ");", 1024);
             Con::printf(finalBuffer);
          }
       }
@@ -453,7 +453,7 @@ void ActionMap::dumpActionMap(const char* fileName, const bool append) const
 bool ActionMap::createEventDescriptor(const char* pEventString, EventDescriptor* pDescriptor)
 {
    char copyBuffer[256];
-   dStrcpy(copyBuffer, pEventString);
+   dStrcpy(copyBuffer, pEventString, 256);
 
    // Do we have modifiers?
    char* pSpace = dStrchr(copyBuffer, ' ');
@@ -786,8 +786,8 @@ const char* ActionMap::getBinding( const char* command )
          {
             dSprintf( buffer, sizeof( buffer ), "%s\t%s%s", deviceBuffer, modifierString, keyBuffer );
             if ( returnString[0] )
-               dStrcat( returnString, "\t" );
-            dStrcat( returnString, buffer );
+               dStrcat( returnString, "\t", 1024 );
+            dStrcat( returnString, buffer, 1024 );
          }
       }
 
@@ -908,8 +908,9 @@ const char* ActionMap::getDeadZone( const char* device, const char* action )
             {
                char buf[64];
                dSprintf( buf, sizeof( buf ), "%g %g", mapNode->deadZoneBegin, mapNode->deadZoneEnd );
-               char* returnString = Con::getReturnBuffer( dStrlen( buf ) + 1 );
-               dStrcpy( returnString, buf );
+               dsize_t returnLen = dStrlen(buf) + 1;
+               char* returnString = Con::getReturnBuffer( returnLen );
+               dStrcpy( returnString, buf, returnLen );
                return( returnString );
             }
             else
@@ -995,7 +996,7 @@ bool ActionMap::getDeviceName(const U32 deviceType, const U32 deviceInstance, ch
 {
    switch (deviceType) {
      case KeyboardDeviceType:
-      dStrcpy(buffer, "keyboard");
+      dStrcpy(buffer, "keyboard", 16);
       break;
 
      case MouseDeviceType:
@@ -1135,7 +1136,7 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
       for (U32 i = 0; gAsciiMap[i].asciiCode != 0xFFFF; i++) {
          if (gAsciiMap[i].asciiCode == asciiCode)
          {
-            dStrcpy(buffer, gAsciiMap[i].pDescription);
+            dStrcpy(buffer, gAsciiMap[i].pDescription, 16);
             return true;
          }
       }
@@ -1159,14 +1160,14 @@ bool ActionMap::getKeyString(const U32 action, char* buffer)
       }
       //for (U32 i = 0; gVirtualMap[i].code != 0xFFFFFFFF; i++) {
       //   if (gVirtualMap[i].code == action) {
-      //      dStrcpy(buffer, gVirtualMap[i].pDescription);
+      //      dStrcpy(buffer, gVirtualMap[i].pDescription, 16);
       //      return true;
       //   }
       //}
       const char* desc = INPUTMGR->findVirtualMapDescFromCode(action);
       if(desc)
       {
-         dStrcpy(buffer, desc);
+         dStrcpy(buffer, desc, 16);
          return true;
       }
    }

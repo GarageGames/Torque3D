@@ -491,7 +491,7 @@ namespace Con
    bool expandPath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint = NULL, const bool ensureTrailingSlash = false);
    void collapsePath(char* pDstPath, U32 size, const char* pSrcPath, const char* pWorkingDirectoryHint = NULL);
    bool isBasePath(const char* SrcPath, const char* pBasePath);
-   void ensureTrailingSlash(char* pDstPath, const char* pSrcPath);
+   void ensureTrailingSlash(char* pDstPath, const char* pSrcPath, S32 dstSize);
    bool stripRepeatSlashes(char* pDstPath, const char* pSrcPath, S32 dstSize);
    StringTableEntry getDSOPath(const char *scriptPath);
 

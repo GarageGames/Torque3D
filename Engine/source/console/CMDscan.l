@@ -71,7 +71,7 @@ inline int isatty(int) { return 0; }
          buf[n++] = (char) c; \
       result = n; \
    }
-   
+
 // General helper stuff.
 static int lineIndex;
 
@@ -411,10 +411,11 @@ static int Sc_ScanString(int ret)
    CMDtext[CMDleng - 1] = 0;
    if(!collapseEscape(CMDtext+1))
       return -1;
-      
-   char* buffer = ( char* ) consoleAlloc( dStrlen( CMDtext ) );
-   dStrcpy( buffer, CMDtext + 1 );
-   
+
+   dsize_t bufferLen = dStrlen( CMDtext );
+   char* buffer = ( char* ) consoleAlloc( bufferLen );
+   dStrcpy( buffer, CMDtext + 1, bufferLen );
+
    CMDlval.str = MakeToken< char* >( buffer, lineIndex );
    return ret;
 }

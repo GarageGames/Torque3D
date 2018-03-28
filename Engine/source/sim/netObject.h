@@ -132,8 +132,8 @@ struct GhostInfo;
 ///       // the ScopeAlways flag indicates that the object is always scoped
 ///       // on all active connections.
 ///       mNetFlags.set(ScopeAlways | Ghostable);
-///       dStrcpy(message1, "Hello World 1!");
-///       dStrcpy(message2, "Hello World 2!");
+///       dStrcpy(message1, "Hello World 1!", bufLen);
+///       dStrcpy(message2, "Hello World 2!", bufLen);
 ///    }
 /// @endcode
 ///
@@ -187,12 +187,12 @@ struct GhostInfo;
 ///    void setMessage1(const char *msg)
 ///    {
 ///       setMaskBits(Message1Mask);
-///       dStrcpy(message1, msg);
+///       dStrcpy(message1, msg, bufLen);
 ///    }
 ///    void setMessage2(const char *msg)
 ///    {
 ///       setMaskBits(Message2Mask);
-///       dStrcpy(message2, msg);
+///       dStrcpy(message2, msg, bufLen);
 ///    }
 /// @endcode
 ///
