@@ -47,17 +47,17 @@ struct afxConstraintDef : public afxEffectDefs
     CONS_GHOST
   };
 
-  DefType           def_type;
+  DefType           mDef_type;
 
-  StringTableEntry  cons_src_name;
-  StringTableEntry  cons_node_name;
-  F32               history_time;
-  U8                sample_rate;
+  StringTableEntry  mCons_src_name;
+  StringTableEntry  mCons_node_name;
+  F32               mHistory_time;
+  U8                mSample_rate;
 
-  bool              runs_on_server;
-  bool              runs_on_client;
-  bool              pos_at_box_center;
-  bool              treat_as_camera;
+  bool              mRuns_on_server;
+  bool              mRuns_on_client;
+  bool              mPos_at_box_center;
+  bool              mTreat_as_camera;
 
   /*C*/             afxConstraintDef();
 
@@ -298,7 +298,7 @@ class afxTransformConstraint : public afxConstraint
   typedef afxConstraint  Parent;
 
 protected:
-  MatrixF           xfm;
+  MatrixF           mXfm;
 
 public:
   /*C*/             afxTransformConstraint(afxConstraintMgr*);
@@ -404,10 +404,10 @@ class afxObjectConstraint : public afxConstraint
   typedef afxConstraint  Parent;
 
 protected:
-  StringTableEntry  arb_name;
-  SceneObject*      obj;
-  U16               scope_id;
-  bool              is_camera;
+  StringTableEntry  mArb_name;
+  SceneObject*      mObj;
+  U16               mScope_id;
+  bool              mIs_camera;
 
 public:
                     afxObjectConstraint(afxConstraintMgr*);
@@ -418,9 +418,9 @@ public:
   virtual void      set_scope_id(U16 scope_id);
   virtual void      sample(F32 dt, U32 elapsed_ms, const Point3F* cam_pos);
 
-  virtual SceneObject* getSceneObject() { return obj; }
+  virtual SceneObject* getSceneObject() { return mObj; }
   virtual void      restoreObject(SceneObject*);
-  virtual U16       getScopeId() { return scope_id; }
+  virtual U16       getScopeId() { return mScope_id; }
   virtual U32       getTriggers();
 
   virtual void      onDeleteNotify(SimObject*);

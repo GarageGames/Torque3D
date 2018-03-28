@@ -56,25 +56,25 @@ afxConstraintDef::afxConstraintDef()
 
 bool afxConstraintDef::isDefined() 
 {
-  return (def_type != CONS_UNDEFINED); 
+  return (mDef_type != CONS_UNDEFINED); 
 }
 
 bool afxConstraintDef::isArbitraryObject() 
 { 
-  return ((cons_src_name != ST_NULLSTRING) && (def_type == CONS_SCENE)); 
+  return ((mCons_src_name != ST_NULLSTRING) && (mDef_type == CONS_SCENE)); 
 }
 
 void afxConstraintDef::reset()
 {
-  cons_src_name = ST_NULLSTRING;
-  cons_node_name = ST_NULLSTRING;
-  def_type = CONS_UNDEFINED;
-  history_time = 0;
-  sample_rate = 30;
-  runs_on_server = false;
-  runs_on_client = false;
-  pos_at_box_center = false;
-  treat_as_camera = false;
+  mCons_src_name = ST_NULLSTRING;
+  mCons_node_name = ST_NULLSTRING;
+  mDef_type = CONS_UNDEFINED;
+  mHistory_time = 0;
+  mSample_rate = 30;
+  mRuns_on_server = false;
+  mRuns_on_client = false;
+  mPos_at_box_center = false;
+  mTreat_as_camera = false;
 }
 
 bool afxConstraintDef::parseSpec(const char* spec, bool runs_on_server, 
@@ -85,11 +85,11 @@ bool afxConstraintDef::parseSpec(const char* spec, bool runs_on_server,
   if (spec == 0 || spec[0] == '\0')
     return false;
 
-  history_time = 0.0f;
-  sample_rate = 30;
+  mHistory_time = 0.0f;
+  mSample_rate = 30;
 
-  this->runs_on_server = runs_on_server;
-  this->runs_on_client = runs_on_client;
+  mRuns_on_server = runs_on_server;
+  mRuns_on_client = runs_on_client;
 
   // spec should be in one of these forms:
   //    CONSTRAINT_NAME (only)
@@ -157,7 +157,7 @@ bool afxConstraintDef::parseSpec(const char* spec, bool runs_on_server,
   for (S32 i = 0; i < n_words; i++)
   {
     if (dStrcmp(words[i], "#center") == 0)
-      pos_at_box_center = true;
+      mPos_at_box_center = true;
     else if (dStrncmp(words[i], "#history(", 9) == 0)
       hist_spec = words[i];
     else
@@ -193,9 +193,9 @@ bool afxConstraintDef::parseSpec(const char* spec, bool runs_on_server,
         S32 args = dSscanf(hist_spec,"%g %d", &hist_age, &hist_rate);
 
         if (args > 0)
-          history_time = hist_age;
+          mHistory_time = hist_age;
         if (args > 1)
-          sample_rate = hist_rate;
+          mSample_rate = hist_rate;
       }
     }
   }
@@ -212,8 +212,8 @@ bool afxConstraintDef::parseSpec(const char* spec, bool runs_on_server,
       return false;
     }
 
-    cons_src_name = cons_name_key;
-    def_type = CONS_PREDEFINED;
+    mCons_src_name = cons_name_key;
+    mDef_type = CONS_PREDEFINED;
     dFree(buffer);
     return true;
   }
@@ -221,10 +221,10 @@ bool afxConstraintDef::parseSpec(const char* spec, bool runs_on_server,
   // "#scene.NAME" or "#scene.NAME.NODE""
   if (cons_name_key == SCENE_CONS_KEY)
   {
-    cons_src_name = StringTable->insert(words2[1]);
+    mCons_src_name = StringTable->insert(words2[1]);
     if (n_words2 > 2)
-      cons_node_name = StringTable->insert(words2[2]);
-    def_type = CONS_SCENE;
+      mCons_node_name = StringTable->insert(words2[2]);
+    mDef_type = CONS_SCENE;
     dFree(buffer);
     return true;
   }
@@ -232,10 +232,10 @@ bool afxConstraintDef::parseSpec(const char* spec, bool runs_on_server,
   // "#effect.NAME" or "#effect.NAME.NODE"
   if (cons_name_key == EFFECT_CONS_KEY)
   {
-    cons_src_name = StringTable->insert(words2[1]);
+    mCons_src_name = StringTable->insert(words2[1]);
     if (n_words2 > 2)
-      cons_node_name = StringTable->insert(words2[2]);
-    def_type = CONS_EFFECT;
+      mCons_node_name = StringTable->insert(words2[2]);
+    mDef_type = CONS_EFFECT;
     dFree(buffer);
     return true;
   }
@@ -249,10 +249,10 @@ bool afxConstraintDef::parseSpec(const char* spec, bool runs_on_server,
       return false;
     }
 
-    cons_src_name = StringTable->insert(words2[1]);
+    mCons_src_name = StringTable->insert(words2[1]);
     if (n_words2 > 2)
-      cons_node_name = StringTable->insert(words2[2]);
-    def_type = CONS_GHOST;
+      mCons_node_name = StringTable->insert(words2[2]);
+    mDef_type = CONS_GHOST;
     dFree(buffer);
     return true;
   }
@@ -260,9 +260,9 @@ bool afxConstraintDef::parseSpec(const char* spec, bool runs_on_server,
   // "CONSTRAINT_NAME.NODE"
   if (n_words2 == 2)
   {
-    cons_src_name = cons_name_key;
-    cons_node_name = StringTable->insert(words2[1]);
-    def_type = CONS_PREDEFINED;
+    mCons_src_name = cons_name_key;
+    mCons_node_name = StringTable->insert(words2[1]);
+    mDef_type = CONS_PREDEFINED;
     dFree(buffer);
     return true;
   }
@@ -372,8 +372,8 @@ S32 afxConstraintMgr::find_cons_idx_from_name(StringTableEntry which)
   for (S32 i = 0; i < constraints_v.size(); i++)
   {
     afxConstraint* cons = CONS_BY_IJ(i,0);
-    if (cons && afxConstraintDef::CONS_EFFECT != cons->cons_def.def_type && 
-        which == cons->cons_def.cons_src_name)
+    if (cons && afxConstraintDef::CONS_EFFECT != cons->cons_def.mDef_type && 
+        which == cons->cons_def.mCons_src_name)
     {
         return i;
     }
@@ -387,8 +387,8 @@ S32 afxConstraintMgr::find_effect_cons_idx_from_name(StringTableEntry which)
   for (S32 i = 0; i < constraints_v.size(); i++)
   {
     afxConstraint* cons = CONS_BY_IJ(i,0);
-    if (cons && afxConstraintDef::CONS_EFFECT == cons->cons_def.def_type && 
-        which == cons->cons_def.cons_src_name)
+    if (cons && afxConstraintDef::CONS_EFFECT == cons->cons_def.mDef_type &&
+        which == cons->cons_def.mCons_src_name)
     {
       return i;
     }
@@ -472,8 +472,8 @@ afxConstraintID afxConstraintMgr::createReferenceEffect(StringTableEntry which, 
 {
   afxEffectConstraint* cons = new afxEffectConstraint(this, which);
   //cons->cons_def = def;
-  cons->cons_def.def_type = afxConstraintDef::CONS_EFFECT;
-  cons->cons_def.cons_src_name = which;
+  cons->cons_def.mDef_type = afxConstraintDef::CONS_EFFECT;
+  cons->cons_def.mCons_src_name = which;
   afxConstraintList* list = new afxConstraintList();
   list->push_back(cons);
   constraints_v.push_back(list);
@@ -489,7 +489,7 @@ void afxConstraintMgr::setReferencePoint(afxConstraintID id, Point3F point, Poin
   if (!pt_cons)
   {
     afxConstraint* cons = CONS_BY_ID(id);
-    pt_cons = newPointCons(this, cons->cons_def.history_time > 0.0f);
+    pt_cons = newPointCons(this, cons->cons_def.mHistory_time > 0.0f);
     pt_cons->cons_def = cons->cons_def;
     CONS_BY_ID(id) = pt_cons;
     delete cons;
@@ -514,7 +514,7 @@ void afxConstraintMgr::setReferenceTransform(afxConstraintID id, MatrixF& xfm)
   if (!xfm_cons)
   {
     afxConstraint* cons = CONS_BY_ID(id);
-    xfm_cons = newTransformCons(this, cons->cons_def.history_time > 0.0f);
+    xfm_cons = newTransformCons(this, cons->cons_def.mHistory_time > 0.0f);
     xfm_cons->cons_def = cons->cons_def;
     CONS_BY_ID(id) = xfm_cons;
     delete cons;
@@ -541,7 +541,7 @@ void afxConstraintMgr::set_ref_shape(afxConstraintID id, ShapeBase* shape)
   if (!shape_cons)
   {
     afxConstraint* cons = CONS_BY_ID(id);
-    shape_cons = newShapeCons(this, cons->cons_def.history_time > 0.0f);
+    shape_cons = newShapeCons(this, cons->cons_def.mHistory_time > 0.0f);
     shape_cons->cons_def = cons->cons_def;
     CONS_BY_ID(id) = shape_cons;
     delete cons;
@@ -578,7 +578,7 @@ void afxConstraintMgr::set_ref_shape(afxConstraintID id, U16 scope_id)
   if (!shape_cons)
   {
     afxConstraint* cons = CONS_BY_ID(id);
-    shape_cons = newShapeCons(this, cons->cons_def.history_time > 0.0f);
+    shape_cons = newShapeCons(this, cons->cons_def.mHistory_time > 0.0f);
     shape_cons->cons_def = cons->cons_def;
     CONS_BY_ID(id) = shape_cons;
     delete cons;
@@ -602,7 +602,7 @@ void afxConstraintMgr::setReferenceObject(afxConstraintID id, SceneObject* obj)
   if (!initialized)
     Con::errorf("afxConstraintMgr::setReferenceObject() -- constraint manager not initialized");
 
-  if (!CONS_BY_ID(id)->cons_def.treat_as_camera)
+  if (!CONS_BY_ID(id)->cons_def.mTreat_as_camera)
   {
     ShapeBase* shape = dynamic_cast<ShapeBase*>(obj);
     if (shape)
@@ -618,7 +618,7 @@ void afxConstraintMgr::setReferenceObject(afxConstraintID id, SceneObject* obj)
   if (!obj_cons)
   {
     afxConstraint* cons = CONS_BY_ID(id);
-    obj_cons = newObjectCons(this, cons->cons_def.history_time > 0.0f);
+    obj_cons = newObjectCons(this, cons->cons_def.mHistory_time > 0.0f);
     obj_cons->cons_def = cons->cons_def;
     CONS_BY_ID(id) = obj_cons;
     delete cons;
@@ -659,7 +659,7 @@ void afxConstraintMgr::setReferenceObjectByScopeId(afxConstraintID id, U16 scope
   if (!obj_cons)
   {
     afxConstraint* cons = CONS_BY_ID(id);
-    obj_cons = newObjectCons(this, cons->cons_def.history_time > 0.0f);
+    obj_cons = newObjectCons(this, cons->cons_def.mHistory_time > 0.0f);
     obj_cons->cons_def = cons->cons_def;
     CONS_BY_ID(id) = obj_cons;
     delete cons;
@@ -709,52 +709,52 @@ void afxConstraintMgr::invalidateReference(afxConstraintID id)
 
 void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
 {
-  if (def.def_type == afxConstraintDef::CONS_UNDEFINED)
+  if (def.mDef_type == afxConstraintDef::CONS_UNDEFINED)
     return;
 
   //Con::printf("CON - %s [%s] [%s] h=%g", def.cons_type_name, def.cons_src_name, def.cons_node_name, def.history_time);
 
-  bool want_history = (def.history_time > 0.0f);
+  bool want_history = (def.mHistory_time > 0.0f);
 
   // constraint is an arbitrary named scene object
   //
-  if (def.def_type == afxConstraintDef::CONS_SCENE)
+  if (def.mDef_type == afxConstraintDef::CONS_SCENE)
   {
-    if (def.cons_src_name == ST_NULLSTRING)
+    if (def.mCons_src_name == ST_NULLSTRING)
       return;
 
     // find the arbitrary object by name
     SceneObject* arb_obj;
     if (on_server)
     {
-      arb_obj = dynamic_cast<SceneObject*>(Sim::findObject(def.cons_src_name));
+      arb_obj = dynamic_cast<SceneObject*>(Sim::findObject(def.mCons_src_name));
       if (!arb_obj)
          Con::errorf("afxConstraintMgr -- failed to find scene constraint source, \"%s\" on server.", 
-                     def.cons_src_name);
+                     def.mCons_src_name);
     }
     else
     {
-      arb_obj = find_object_from_name(def.cons_src_name);
+      arb_obj = find_object_from_name(def.mCons_src_name);
       if (!arb_obj)
          Con::errorf("afxConstraintMgr -- failed to find scene constraint source, \"%s\" on client.", 
-                     def.cons_src_name);
+                     def.mCons_src_name);
     }
 
     // if it's a shapeBase object, create a Shape or ShapeNode constraint
     if (dynamic_cast<ShapeBase*>(arb_obj))
     {
-      if (def.cons_node_name == ST_NULLSTRING && !def.pos_at_box_center)
+      if (def.mCons_node_name == ST_NULLSTRING && !def.mPos_at_box_center)
       {
-        afxShapeConstraint* cons = newShapeCons(this, def.cons_src_name, want_history);
+        afxShapeConstraint* cons = newShapeCons(this, def.mCons_src_name, want_history);
         cons->cons_def = def;
         cons->set((ShapeBase*)arb_obj); 
         afxConstraintList* list = new afxConstraintList();
         list->push_back(cons);
         constraints_v.push_back(list);
       }
-      else if (def.pos_at_box_center)
+      else if (def.mPos_at_box_center)
       {
-        afxShapeConstraint* cons = newShapeCons(this, def.cons_src_name, want_history);
+        afxShapeConstraint* cons = newShapeCons(this, def.mCons_src_name, want_history);
         cons->cons_def = def;
         cons->set((ShapeBase*)arb_obj); 
         afxConstraintList* list = constraints_v[constraints_v.size()-1]; // SHAPE-NODE CONS-LIST (#scene)(#center)
@@ -763,7 +763,7 @@ void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
       }
       else
       {
-        afxShapeNodeConstraint* sub = newShapeNodeCons(this, def.cons_src_name, def.cons_node_name, want_history);
+        afxShapeNodeConstraint* sub = newShapeNodeCons(this, def.mCons_src_name, def.mCons_node_name, want_history);
         sub->cons_def = def;
         sub->set((ShapeBase*)arb_obj); 
         afxConstraintList* list = constraints_v[constraints_v.size()-1];
@@ -774,9 +774,9 @@ void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
     // if it's not a shapeBase object, create an Object constraint
     else if (arb_obj)
     {
-      if (!def.pos_at_box_center)
+      if (!def.mPos_at_box_center)
       {
-        afxObjectConstraint* cons = newObjectCons(this, def.cons_src_name, want_history);
+        afxObjectConstraint* cons = newObjectCons(this, def.mCons_src_name, want_history);
         cons->cons_def = def;
         cons->set(arb_obj);
         afxConstraintList* list = new afxConstraintList(); // OBJECT CONS-LIST (#scene)
@@ -785,7 +785,7 @@ void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
       }
       else // if (def.pos_at_box_center)
       {
-        afxObjectConstraint* cons = newObjectCons(this, def.cons_src_name, want_history);
+        afxObjectConstraint* cons = newObjectCons(this, def.mCons_src_name, want_history);
         cons->cons_def = def;
         cons->set(arb_obj); 
         afxConstraintList* list = constraints_v[constraints_v.size()-1]; // OBJECT CONS-LIST (#scene)(#center)
@@ -797,24 +797,24 @@ void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
 
   // constraint is an arbitrary named effect
   //
-  else if (def.def_type == afxConstraintDef::CONS_EFFECT)
+  else if (def.mDef_type == afxConstraintDef::CONS_EFFECT)
   {
-    if (def.cons_src_name == ST_NULLSTRING)
+    if (def.mCons_src_name == ST_NULLSTRING)
       return;
 
     // create an Effect constraint
-    if (def.cons_node_name == ST_NULLSTRING && !def.pos_at_box_center)
+    if (def.mCons_node_name == ST_NULLSTRING && !def.mPos_at_box_center)
     {
-      afxEffectConstraint* cons = new afxEffectConstraint(this, def.cons_src_name);
+      afxEffectConstraint* cons = new afxEffectConstraint(this, def.mCons_src_name);
       cons->cons_def = def;
       afxConstraintList* list = new afxConstraintList();
       list->push_back(cons);
       constraints_v.push_back(list);
     }
     // create an Effect #center constraint
-    else if (def.pos_at_box_center)
+    else if (def.mPos_at_box_center)
     {
-      afxEffectConstraint* cons = new afxEffectConstraint(this, def.cons_src_name);
+      afxEffectConstraint* cons = new afxEffectConstraint(this, def.mCons_src_name);
       cons->cons_def = def;
       afxConstraintList* list = constraints_v[constraints_v.size()-1]; // EFFECT-NODE CONS-LIST (#effect)
       if (list && (*list)[0])
@@ -823,7 +823,7 @@ void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
     // create an EffectNode constraint
     else
     {
-      afxEffectNodeConstraint* sub = new afxEffectNodeConstraint(this, def.cons_src_name, def.cons_node_name);
+      afxEffectNodeConstraint* sub = new afxEffectNodeConstraint(this, def.mCons_src_name, def.mCons_node_name);
       sub->cons_def = def;
       afxConstraintList* list = constraints_v[constraints_v.size()-1];
       if (list && (*list)[0])
@@ -839,25 +839,25 @@ void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
     afxConstraint* cons_ctr = 0;
     afxConstraint* sub = 0;
 
-    if (def.def_type == afxConstraintDef::CONS_GHOST)
+    if (def.mDef_type == afxConstraintDef::CONS_GHOST)
     {
       for (S32 i = 0; i < predefs.size(); i++)
       {
-        if (predefs[i].name == def.cons_src_name)
+        if (predefs[i].name == def.mCons_src_name)
         {
-          if (def.cons_node_name == ST_NULLSTRING && !def.pos_at_box_center)
+          if (def.mCons_node_name == ST_NULLSTRING && !def.mPos_at_box_center)
           {
             cons = newShapeCons(this, want_history);
             cons->cons_def = def;
           }
-          else if (def.pos_at_box_center)
+          else if (def.mPos_at_box_center)
           {
             cons_ctr = newShapeCons(this, want_history);
             cons_ctr->cons_def = def;
           }
           else
           {
-            sub = newShapeNodeCons(this, ST_NULLSTRING, def.cons_node_name, want_history);
+            sub = newShapeNodeCons(this, ST_NULLSTRING, def.mCons_node_name, want_history);
             sub->cons_def = def;
           }
           break;
@@ -868,7 +868,7 @@ void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
     {
       for (S32 i = 0; i < predefs.size(); i++)
       {
-        if (predefs[i].name == def.cons_src_name)
+        if (predefs[i].name == def.mCons_src_name)
         {
           switch (predefs[i].type)
           {
@@ -881,26 +881,26 @@ void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
             cons->cons_def = def;
             break;
           case OBJECT_CONSTRAINT:
-            if (def.cons_node_name == ST_NULLSTRING && !def.pos_at_box_center)
+            if (def.mCons_node_name == ST_NULLSTRING && !def.mPos_at_box_center)
             {
               cons = newShapeCons(this, want_history);
               cons->cons_def = def;
             }
-            else if (def.pos_at_box_center)
+            else if (def.mPos_at_box_center)
             {
               cons_ctr = newShapeCons(this, want_history);
               cons_ctr->cons_def = def;
             }
             else
             {
-              sub = newShapeNodeCons(this, ST_NULLSTRING, def.cons_node_name, want_history);
+              sub = newShapeNodeCons(this, ST_NULLSTRING, def.mCons_node_name, want_history);
               sub->cons_def = def;
             }
             break;
           case CAMERA_CONSTRAINT:
             cons = newObjectCons(this, want_history);
             cons->cons_def = def;
-            cons->cons_def.treat_as_camera = true;
+            cons->cons_def.mTreat_as_camera = true;
             break;
           }
           break;
@@ -927,29 +927,29 @@ void afxConstraintMgr::create_constraint(const afxConstraintDef& def)
         list->push_back(sub);
     }
     else
-      Con::printf("predef not found %s", def.cons_src_name);
+      Con::printf("predef not found %s", def.mCons_src_name);
   }
 }
 
 afxConstraintID afxConstraintMgr::getConstraintId(const afxConstraintDef& def)
 {
-  if (def.def_type == afxConstraintDef::CONS_UNDEFINED)
+  if (def.mDef_type == afxConstraintDef::CONS_UNDEFINED)
     return afxConstraintID();
 
-  if (def.cons_src_name != ST_NULLSTRING)
+  if (def.mCons_src_name != ST_NULLSTRING)
   {
     for (S32 i = 0; i < constraints_v.size(); i++)
     {
       afxConstraintList* list = constraints_v[i];
       afxConstraint* cons = (*list)[0];
-      if (def.cons_src_name == cons->cons_def.cons_src_name)
+      if (def.mCons_src_name == cons->cons_def.mCons_src_name)
       {
         for (S32 j = 0; j < list->size(); j++)
         {
           afxConstraint* sub = (*list)[j];
-          if (def.cons_node_name == sub->cons_def.cons_node_name && 
-              def.pos_at_box_center == sub->cons_def.pos_at_box_center && 
-              def.cons_src_name == sub->cons_def.cons_src_name)
+          if (def.mCons_node_name == sub->cons_def.mCons_node_name &&
+              def.mPos_at_box_center == sub->cons_def.mPos_at_box_center &&
+              def.mCons_src_name == sub->cons_def.mCons_src_name)
           {
             return afxConstraintID(i, j);
           }
@@ -957,14 +957,14 @@ afxConstraintID afxConstraintMgr::getConstraintId(const afxConstraintDef& def)
 
         // if we're here, it means the root object name matched but the node name
         // did not.
-        if (def.def_type == afxConstraintDef::CONS_PREDEFINED && !def.pos_at_box_center)
+        if (def.mDef_type == afxConstraintDef::CONS_PREDEFINED && !def.mPos_at_box_center)
         {
           afxShapeConstraint* shape_cons = dynamic_cast<afxShapeConstraint*>(cons);
           if (shape_cons)
           {
              //Con::errorf("Append a Node constraint [%s.%s] [%d,%d]", def.cons_src_name, def.cons_node_name, i, list->size());
-             bool want_history = (def.history_time > 0.0f);
-             afxConstraint* sub = newShapeNodeCons(this, ST_NULLSTRING, def.cons_node_name, want_history);
+             bool want_history = (def.mHistory_time > 0.0f);
+             afxConstraint* sub = newShapeNodeCons(this, ST_NULLSTRING, def.mCons_node_name, want_history);
              sub->cons_def = def;
              ((afxShapeConstraint*)sub)->set(shape_cons->shape);
              list->push_back(sub);
@@ -1010,19 +1010,19 @@ S32 QSORT_CALLBACK cmp_cons_defs(const void* a, const void* b)
   afxConstraintDef* def_a = (afxConstraintDef*) a;
   afxConstraintDef* def_b = (afxConstraintDef*) b;
 
-  if (def_a->def_type == def_b->def_type)
+  if (def_a->mDef_type == def_b->mDef_type)
   {
-    if (def_a->cons_src_name == def_b->cons_src_name)
+    if (def_a->mCons_src_name == def_b->mCons_src_name)
     {
-      if (def_a->pos_at_box_center == def_b->pos_at_box_center)
-        return (def_a->cons_node_name - def_b->cons_node_name);
+      if (def_a->mPos_at_box_center == def_b->mPos_at_box_center)
+        return (def_a->mCons_node_name - def_b->mCons_node_name);
       else
-        return (def_a->pos_at_box_center) ? 1 : -1;
+        return (def_a->mPos_at_box_center) ? 1 : -1;
     }
-    return (def_a->cons_src_name - def_b->cons_src_name);
+    return (def_a->mCons_src_name - def_b->mCons_src_name);
   }
 
-  return (def_a->def_type - def_b->def_type);
+  return (def_a->mDef_type - def_b->mDef_type);
 }
 
 void afxConstraintMgr::initConstraintDefs(Vector<afxConstraintDef>& all_defs, bool on_server, F32 scoping_dist)
@@ -1048,7 +1048,7 @@ void afxConstraintMgr::initConstraintDefs(Vector<afxConstraintDef>& all_defs, bo
     Vector<afxConstraintDef> ghost_defs;
 
     for (S32 i = 0; i < all_defs.size(); i++)
-      if (all_defs[i].def_type == afxConstraintDef::CONS_GHOST && all_defs[i].cons_src_name != ST_NULLSTRING)
+      if (all_defs[i].mDef_type == afxConstraintDef::CONS_GHOST && all_defs[i].mCons_src_name != ST_NULLSTRING)
         ghost_defs.push_back(all_defs[i]);
     
     if (ghost_defs.size() > 0)
@@ -1058,13 +1058,13 @@ void afxConstraintMgr::initConstraintDefs(Vector<afxConstraintDef>& all_defs, bo
         dQsort(ghost_defs.address(), ghost_defs.size(), sizeof(afxConstraintDef), cmp_cons_defs);
       
       S32 last = 0;
-      defineConstraint(OBJECT_CONSTRAINT, ghost_defs[0].cons_src_name);
+      defineConstraint(OBJECT_CONSTRAINT, ghost_defs[0].mCons_src_name);
 
       for (S32 i = 1; i < ghost_defs.size(); i++)
       {
-        if (ghost_defs[last].cons_src_name != ghost_defs[i].cons_src_name)
+        if (ghost_defs[last].mCons_src_name != ghost_defs[i].mCons_src_name)
         {
-          defineConstraint(OBJECT_CONSTRAINT, ghost_defs[i].cons_src_name);
+          defineConstraint(OBJECT_CONSTRAINT, ghost_defs[i].mCons_src_name);
           last++;
         }
       }
@@ -1077,13 +1077,13 @@ void afxConstraintMgr::initConstraintDefs(Vector<afxConstraintDef>& all_defs, bo
   if (on_server)
   {
     for (S32 i = 0; i < all_defs.size(); i++)
-      if (all_defs[i].runs_on_server)
+      if (all_defs[i].mRuns_on_server)
         defs.push_back(all_defs[i]);
   }
   else
   {
     for (S32 i = 0; i < all_defs.size(); i++)
-      if (all_defs[i].runs_on_client)
+      if (all_defs[i].mRuns_on_client)
         defs.push_back(all_defs[i]);
   }
 
@@ -1099,17 +1099,17 @@ void afxConstraintMgr::initConstraintDefs(Vector<afxConstraintDef>& all_defs, bo
     S32 last = 0;
     
     // manufacture root-object def if absent
-    if (defs[0].cons_node_name != ST_NULLSTRING)
+    if (defs[0].mCons_node_name != ST_NULLSTRING)
     {
       afxConstraintDef root_def = defs[0];
-      root_def.cons_node_name = ST_NULLSTRING;
+      root_def.mCons_node_name = ST_NULLSTRING;
       unique_defs.push_back(root_def);
       last++;
     }
-    else if (defs[0].pos_at_box_center)
+    else if (defs[0].mPos_at_box_center)
     {
       afxConstraintDef root_def = defs[0];
-      root_def.pos_at_box_center = false;
+      root_def.mPos_at_box_center = false;
       unique_defs.push_back(root_def);
       last++;
     }
@@ -1118,19 +1118,19 @@ void afxConstraintMgr::initConstraintDefs(Vector<afxConstraintDef>& all_defs, bo
     
     for (S32 i = 1; i < defs.size(); i++)
     {
-      if (unique_defs[last].cons_node_name != defs[i].cons_node_name ||
-          unique_defs[last].cons_src_name != defs[i].cons_src_name || 
-          unique_defs[last].pos_at_box_center != defs[i].pos_at_box_center || 
-          unique_defs[last].def_type != defs[i].def_type)
+      if (unique_defs[last].mCons_node_name != defs[i].mCons_node_name ||
+          unique_defs[last].mCons_src_name != defs[i].mCons_src_name ||
+          unique_defs[last].mPos_at_box_center != defs[i].mPos_at_box_center ||
+          unique_defs[last].mDef_type != defs[i].mDef_type)
       {
         // manufacture root-object def if absent
-        if (defs[i].cons_src_name != ST_NULLSTRING && unique_defs[last].cons_src_name != defs[i].cons_src_name)
+        if (defs[i].mCons_src_name != ST_NULLSTRING && unique_defs[last].mCons_src_name != defs[i].mCons_src_name)
         {
-          if (defs[i].cons_node_name != ST_NULLSTRING || defs[i].pos_at_box_center)
+          if (defs[i].mCons_node_name != ST_NULLSTRING || defs[i].mPos_at_box_center)
           {
             afxConstraintDef root_def = defs[i];
-            root_def.cons_node_name = ST_NULLSTRING;
-            root_def.pos_at_box_center = false;
+            root_def.mCons_node_name = ST_NULLSTRING;
+            root_def.mPos_at_box_center = false;
             unique_defs.push_back(root_def);
             last++;
           }
@@ -1140,10 +1140,10 @@ void afxConstraintMgr::initConstraintDefs(Vector<afxConstraintDef>& all_defs, bo
       }
       else
       {
-        if (defs[i].history_time > unique_defs[last].history_time)
-          unique_defs[last].history_time = defs[i].history_time;
-        if (defs[i].sample_rate > unique_defs[last].sample_rate)
-          unique_defs[last].sample_rate = defs[i].sample_rate;
+        if (defs[i].mHistory_time > unique_defs[last].mHistory_time)
+          unique_defs[last].mHistory_time = defs[i].mHistory_time;
+        if (defs[i].mSample_rate > unique_defs[last].mSample_rate)
+          unique_defs[last].mSample_rate = defs[i].mSample_rate;
       }
     }
     
@@ -1161,7 +1161,7 @@ void afxConstraintMgr::initConstraintDefs(Vector<afxConstraintDef>& all_defs, bo
     defs.clear();
 
     for (S32 i = 0; i < all_defs.size(); i++)
-      if (all_defs[i].runs_on_client && all_defs[i].isArbitraryObject())
+      if (all_defs[i].mRuns_on_client && all_defs[i].isArbitraryObject())
         defs.push_back(all_defs[i]);
 
     if (defs.size() < 1)
@@ -1172,13 +1172,13 @@ void afxConstraintMgr::initConstraintDefs(Vector<afxConstraintDef>& all_defs, bo
       dQsort(defs.address(), defs.size(), sizeof(afxConstraintDef), cmp_cons_defs);
 
     S32 last = 0;
-    names_on_server.push_back(defs[0].cons_src_name);
+    names_on_server.push_back(defs[0].mCons_src_name);
 
     for (S32 i = 1; i < defs.size(); i++)
     {
-      if (names_on_server[last] != defs[i].cons_src_name)
+      if (names_on_server[last] != defs[i].mCons_src_name)
       {
-        names_on_server.push_back(defs[i].cons_src_name);
+        names_on_server.push_back(defs[i].mCons_src_name);
         last++;
       }
     }
@@ -1418,7 +1418,7 @@ void afxPointConstraint::sample(F32 dt, U32 elapsed_ms, const Point3F* cam_pos)
 afxTransformConstraint::afxTransformConstraint(afxConstraintMgr* mgr) 
   : afxConstraint(mgr)
 {
-  xfm.identity();
+   mXfm.identity();
 }
 
 afxTransformConstraint::~afxTransformConstraint()
@@ -1427,7 +1427,7 @@ afxTransformConstraint::~afxTransformConstraint()
 
 void afxTransformConstraint::set(const MatrixF& xfm)
 {
-  this->xfm = xfm;
+  mXfm = xfm;
   is_defined = true;
   is_valid = true;
   change_code++;
@@ -1438,7 +1438,7 @@ void afxTransformConstraint::sample(F32 dt, U32 elapsed_ms, const Point3F* cam_p
 {
   if (cam_pos)
   {
-    Point3F dir = (*cam_pos) - xfm.getPosition();
+    Point3F dir = (*cam_pos) - mXfm.getPosition();
     F32 dist_sq = dir.lenSquared();
     if (dist_sq > mgr->getScopingDistanceSquared())
     {
@@ -1448,8 +1448,8 @@ void afxTransformConstraint::sample(F32 dt, U32 elapsed_ms, const Point3F* cam_p
     is_valid = true;
   }
 
-  last_xfm = xfm;
-  last_pos = xfm.getPosition();
+  last_xfm = mXfm;
+  last_pos = mXfm.getPosition();
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
@@ -1533,7 +1533,7 @@ void afxShapeConstraint::sample(F32 dt, U32 elapsed_ms, const Point3F* cam_pos)
   if (shape)
   {
     last_xfm = shape->getRenderTransform();
-    if (cons_def.pos_at_box_center)
+    if (cons_def.mPos_at_box_center)
       last_pos = shape->getBoxCenter();
     else
       last_pos = shape->getRenderPosition();
@@ -1757,46 +1757,46 @@ void afxShapeNodeConstraint::onDeleteNotify(SimObject* obj)
 afxObjectConstraint::afxObjectConstraint(afxConstraintMgr* mgr) 
   : afxConstraint(mgr)
 {
-  arb_name = ST_NULLSTRING;
-  obj = 0;
-  scope_id = 0;
-  is_camera = false;
+	mArb_name = ST_NULLSTRING;
+  mObj = 0;
+  mScope_id = 0;
+  mIs_camera = false;
 }
 
 afxObjectConstraint::afxObjectConstraint(afxConstraintMgr* mgr, StringTableEntry arb_name) 
   : afxConstraint(mgr)
 {
-  this->arb_name = arb_name;
-  obj = 0;
-  scope_id = 0;
-  is_camera = false;
+  mArb_name = arb_name;
+  mObj = 0;
+  mScope_id = 0;
+  mIs_camera = false;
 }
 
 afxObjectConstraint::~afxObjectConstraint()
 {
-  if (obj)
-    clearNotify(obj);
+  if (mObj)
+    clearNotify(mObj);
 }
 
 void afxObjectConstraint::set(SceneObject* obj)
 {
-  if (this->obj)
+  if (mObj)
   {
-    scope_id = 0;
-    clearNotify(this->obj);
+    mScope_id = 0;
+    clearNotify(mObj);
   }
 
-  this->obj = obj;
+  mObj = obj;
 
-  if (this->obj)
+  if (mObj)
   {
-    deleteNotify(this->obj);
-    scope_id = this->obj->getScopeId();
+    deleteNotify(mObj);
+	mScope_id = mObj->getScopeId();
   }
 
-  if (this->obj != NULL)
+  if (mObj != NULL)
   {
-    is_camera = this->obj->isCamera();
+    mIs_camera = mObj->isCamera();
 
     is_defined = true;
     is_valid = true;
@@ -1809,11 +1809,11 @@ void afxObjectConstraint::set(SceneObject* obj)
 
 void afxObjectConstraint::set_scope_id(U16 scope_id)
 {
-  if (obj)
-    clearNotify(obj);
+  if (mObj)
+    clearNotify(mObj);
 
-  obj = 0;
-  this->scope_id = scope_id;
+  mObj = 0;
+  mScope_id = scope_id;
 
   is_defined = (scope_id > 0);
   is_valid = false;
@@ -1825,52 +1825,52 @@ void afxObjectConstraint::sample(F32 dt, U32 elapsed_ms, const Point3F* cam_pos)
   if (gone_missing)
     return;
 
-  if (obj)
+  if (mObj)
   {
-    if (!is_camera && cons_def.treat_as_camera && dynamic_cast<ShapeBase*>(obj))
+    if (!mIs_camera && cons_def.mTreat_as_camera && dynamic_cast<ShapeBase*>(mObj))
     {
-      ShapeBase* cam_obj = (ShapeBase*) obj;
+      ShapeBase* cam_obj = (ShapeBase*) mObj;
       F32 pov = 1.0f;
       cam_obj->getCameraTransform(&pov, &last_xfm);
       last_xfm.getColumn(3, &last_pos);
     }
     else
     {
-      last_xfm = obj->getRenderTransform();
-      if (cons_def.pos_at_box_center)
-        last_pos = obj->getBoxCenter();
+      last_xfm = mObj->getRenderTransform();
+      if (cons_def.mPos_at_box_center)
+        last_pos = mObj->getBoxCenter();
       else
-        last_pos = obj->getRenderPosition();
+        last_pos = mObj->getRenderPosition();
     }
   }
 }
 
 void afxObjectConstraint::restoreObject(SceneObject* obj)
 {
-  if (this->obj)
+  if (mObj)
   {
-    scope_id = 0;
-    clearNotify(this->obj);
+    mScope_id = 0;
+    clearNotify(mObj);
   }
 
-  this->obj = obj;
+  mObj = obj;
 
-  if (this->obj)
+  if (mObj)
   {
-    deleteNotify(this->obj);
-    scope_id = this->obj->getScopeId();
+    deleteNotify(mObj);
+    mScope_id = mObj->getScopeId();
   }
 
-  is_valid = (this->obj != NULL);
+  is_valid = (mObj != NULL);
 }
 
 void afxObjectConstraint::onDeleteNotify(SimObject* obj)
 {
-  if (this->obj == dynamic_cast<SceneObject*>(obj))
+  if (mObj == dynamic_cast<SceneObject*>(obj))
   {
-    this->obj = 0;
+    mObj = 0;
     is_valid = false;
-    if (scope_id > 0)
+    if (mScope_id > 0)
       mgr->postMissingConstraintObject(this, true);
   }
 
@@ -1879,14 +1879,14 @@ void afxObjectConstraint::onDeleteNotify(SimObject* obj)
 
 U32 afxObjectConstraint::getTriggers()
 {
-  TSStatic* ts_static = dynamic_cast<TSStatic*>(obj);
+  TSStatic* ts_static = dynamic_cast<TSStatic*>(mObj);
   if (ts_static)
   {
     TSShapeInstance* obj_inst = ts_static->getShapeInstance();
     return (obj_inst) ? obj_inst->getTriggerStateMask() : 0;
   }
 
-  ShapeBase* shape_base = dynamic_cast<ShapeBase*>(obj);
+  ShapeBase* shape_base = dynamic_cast<ShapeBase*>(mObj);
   if (shape_base)
   {
     TSShapeInstance* obj_inst = shape_base->getShapeInstance();
@@ -1922,7 +1922,7 @@ bool afxEffectConstraint::getPosition(Point3F& pos, F32 hist)
   if (!effect || !effect->inScope())
     return false;
  
-  if (cons_def.pos_at_box_center)
+  if (cons_def.mPos_at_box_center)
     effect->getUpdatedBoxCenter(pos);
   else
     effect->getUpdatedPosition(pos);
@@ -2266,7 +2266,7 @@ void afxPointHistConstraint::set(Point3F point, Point3F vector)
   if (!samples)
   {
     samples = new afxSampleXfmBuffer;
-    samples->configHistory(cons_def.history_time, cons_def.sample_rate);
+    samples->configHistory(cons_def.mHistory_time, cons_def.mSample_rate);
   }
   
   Parent::set(point, vector);
@@ -2325,7 +2325,7 @@ void afxTransformHistConstraint::set(const MatrixF& xfm)
   if (!samples)
   {
     samples = new afxSampleXfmBuffer;
-    samples->configHistory(cons_def.history_time, cons_def.sample_rate);
+    samples->configHistory(cons_def.mHistory_time, cons_def.mSample_rate);
   }
   
   Parent::set(xfm);
@@ -2390,7 +2390,7 @@ void afxShapeHistConstraint::set(ShapeBase* shape)
   if (shape && !samples)
   {
     samples = new afxSampleXfmBuffer;
-    samples->configHistory(cons_def.history_time, cons_def.sample_rate);
+    samples->configHistory(cons_def.mHistory_time, cons_def.mSample_rate);
   }
   
   Parent::set(shape);
@@ -2401,7 +2401,7 @@ void afxShapeHistConstraint::set_scope_id(U16 scope_id)
   if (scope_id > 0 && !samples)
   {
     samples = new afxSampleXfmBuffer;
-    samples->configHistory(cons_def.history_time, cons_def.sample_rate);
+    samples->configHistory(cons_def.mHistory_time, cons_def.mSample_rate);
   }
   
   Parent::set_scope_id(scope_id);
@@ -2472,7 +2472,7 @@ void afxShapeNodeHistConstraint::set(ShapeBase* shape)
   if (shape && !samples)
   {
     samples = new afxSampleXfmBuffer;
-    samples->configHistory(cons_def.history_time, cons_def.sample_rate);
+    samples->configHistory(cons_def.mHistory_time, cons_def.mSample_rate);
   }
   
   Parent::set(shape);
@@ -2483,7 +2483,7 @@ void afxShapeNodeHistConstraint::set_scope_id(U16 scope_id)
   if (scope_id > 0 && !samples)
   {
     samples = new afxSampleXfmBuffer;
-    samples->configHistory(cons_def.history_time, cons_def.sample_rate);
+    samples->configHistory(cons_def.mHistory_time, cons_def.mSample_rate);
   }
   
   Parent::set_scope_id(scope_id);
@@ -2553,7 +2553,7 @@ void afxObjectHistConstraint::set(SceneObject* obj)
   if (obj && !samples)
   {
     samples = new afxSampleXfmBuffer;
-    samples->configHistory(cons_def.history_time, cons_def.sample_rate);
+    samples->configHistory(cons_def.mHistory_time, cons_def.mSample_rate);
   }
   
   Parent::set(obj);
@@ -2564,7 +2564,7 @@ void afxObjectHistConstraint::set_scope_id(U16 scope_id)
   if (scope_id > 0 && !samples)
   {
     samples = new afxSampleXfmBuffer;
-    samples->configHistory(cons_def.history_time, cons_def.sample_rate);
+    samples->configHistory(cons_def.mHistory_time, cons_def.mSample_rate);
   }
   
   Parent::set_scope_id(scope_id);

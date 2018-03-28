@@ -990,7 +990,7 @@ bool afxEffectWrapper::update(F32 dt)
   afxConstraint* pos_constraint = getPosConstraint();
   if (pos_constraint)
   {
-    bool valid = pos_constraint->getPosition(CONS_POS, datablock->pos_cons_def.history_time);
+    bool valid = pos_constraint->getPosition(CONS_POS, datablock->pos_cons_def.mHistory_time);
     if (!valid)
       getUnconstrainedPosition(CONS_POS);
     setScopeStatus(valid);
@@ -1013,7 +1013,7 @@ bool afxEffectWrapper::update(F32 dt)
   afxConstraint* orient_constraint = getOrientConstraint();
   if (orient_constraint) 
   {
-    orient_constraint->getTransform(CONS_XFM, datablock->pos_cons_def.history_time);
+    orient_constraint->getTransform(CONS_XFM, datablock->pos_cons_def.mHistory_time);
   }
   else
   {
@@ -1022,7 +1022,7 @@ bool afxEffectWrapper::update(F32 dt)
 
   afxConstraint* aim_constraint = getAimConstraint();
   if (aim_constraint)
-    aim_constraint->getPosition(CONS_AIM, datablock->pos_cons_def.history_time);
+    aim_constraint->getPosition(CONS_AIM, datablock->pos_cons_def.mHistory_time);
   else
     CONS_AIM.zero();
 
