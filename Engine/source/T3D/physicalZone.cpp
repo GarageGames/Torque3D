@@ -297,7 +297,7 @@ void PhysicalZone::renderObject(ObjectRenderInst *ri,
 	   F32 rad = obb.getBoundingSphere().radius/ 2;
       drawer->drawSphere(desc, rad, start, ColorI(0, 255, 0, 45));
 
-	  rad = (rad + forceLen / 2)/2;
+	  rad = (rad + (mAppliedForce.most() / baseForce))/2;
 	  desc.setFillModeWireframe();
 	  drawer->drawSphere(desc, rad, start, ColorI(0, 0, 255, 255));
    }
