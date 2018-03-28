@@ -35,10 +35,10 @@
 class afxXM_WaveInterp_Color : public afxXM_WaveInterp
 {
 protected:
-  LinearColorF   a_set, b_set;
-  LinearColorF   a_var, b_var;
-  LinearColorF   a, b;
-  bool     sync_var;
+  LinearColorF   mA_set, mB_set;
+  LinearColorF   mA_var, mB_var;
+  LinearColorF   mA, mB;
+  bool     mSync_var;
 
 public:
   afxXM_WaveInterp_Color(); 
@@ -51,36 +51,36 @@ public:
 
 afxXM_WaveInterp_Color::afxXM_WaveInterp_Color() 
 { 
-  a_set.set(0.0f, 0.0f, 0.0f, 0.0f); 
-  b_set.set(1.0f, 1.0f, 1.0f, 1.0f); 
-  a_var.set(0.0f, 0.0f, 0.0f, 0.0f); 
-  b_var.set(0.0f, 0.0f, 0.0f, 0.0f); 
-  sync_var = false;
-  a.set(0.0f, 0.0f, 0.0f, 0.0f);
-  b.set(1.0f, 1.0f, 1.0f, 1.0f);
+  mA_set.set(0.0f, 0.0f, 0.0f, 0.0f); 
+  mB_set.set(1.0f, 1.0f, 1.0f, 1.0f); 
+  mA_var.set(0.0f, 0.0f, 0.0f, 0.0f); 
+  mB_var.set(0.0f, 0.0f, 0.0f, 0.0f); 
+  mSync_var = false;
+  mA.set(0.0f, 0.0f, 0.0f, 0.0f);
+  mB.set(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 void afxXM_WaveInterp_Color::set(LinearColorF& a, LinearColorF& b, LinearColorF& a_var, LinearColorF& b_var, bool sync_var)
 {
-  a_set = a; 
-  b_set = b;
-  this->a_var = a_var;
-  this->b_var = b_var;
-  this->sync_var = sync_var;
-  this->a = a; 
-  this->b = b;
+  mA_set = a; 
+  mB_set = b;
+  mA_var = a_var;
+  mB_var = b_var;
+  mSync_var = sync_var;
+  mA = a; 
+  mB = b;
 }
 
 inline void afxXM_WaveInterp_Color::pulse()
 {
   LinearColorF temp_color;
   F32 rand_t = gRandGen.randF()*2.0f;
-  temp_color.interpolate(-a_var, a_var, rand_t);
-  a = a_set + temp_color;
-  if (!sync_var) 
+  temp_color.interpolate(-mA_var, mA_var, rand_t);
+  mA = mA_set + temp_color;
+  if (!mSync_var) 
     rand_t = gRandGen.randF()*2.0f;
-  temp_color.interpolate(-b_var, b_var, rand_t);
-  b = b_set + temp_color;
+  temp_color.interpolate(-mB_var, mB_var, rand_t);
+  mB = mB_set + temp_color;
 }
 
 //~~~~~~~~~~~~~~~~~~~~//
@@ -91,7 +91,7 @@ public:
   virtual void interpolate(F32 t, afxXM_Params& params)
   {
     LinearColorF temp_color;
-    temp_color.interpolate(a, b, t);
+    temp_color.interpolate(mA, mB, t);
     params.color += temp_color;
   }
 };
@@ -104,7 +104,7 @@ public:
   virtual void interpolate(F32 t, afxXM_Params& params)
   {
     LinearColorF temp_color;
-    temp_color.interpolate(a, b, t);
+    temp_color.interpolate(mA, mB, t);
     params.color *= temp_color;
   }
 };
@@ -116,7 +116,7 @@ class afxXM_WaveInterp_Color_Rep : public afxXM_WaveInterp_Color
 public:
   virtual void interpolate(F32 t, afxXM_Params& params)
   {
-    params.color.interpolate(a, b, t);
+    params.color.interpolate(mA, mB, t);
   }
 };
 
