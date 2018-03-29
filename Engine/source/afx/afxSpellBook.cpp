@@ -116,7 +116,7 @@ void afxSpellBookData::packData(BitStream* stream)
   stream->write(pages_per_book);
 
   for (S32 i = 0; i < pages_per_book*spells_per_page; i++)
-    writeDatablockID(stream, rpg_spells[i], packed);
+    writeDatablockID(stream, rpg_spells[i], mPacked);
 }
 
 void afxSpellBookData::unpackData(BitStream* stream)

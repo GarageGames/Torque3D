@@ -380,7 +380,7 @@ void afxEffectWrapperData::packData(BitStream* stream)
 {
   Parent::packData(stream);
 
-  writeDatablockID(stream, effect_data, packed);
+  writeDatablockID(stream, effect_data, mPacked);
 
   stream->writeString(effect_name);
 
@@ -419,7 +419,7 @@ void afxEffectWrapperData::packData(BitStream* stream)
   stream->write(scale_factor);
 
   // modifiers
-  pack_mods(stream, xfm_modifiers, packed);
+  pack_mods(stream, xfm_modifiers, mPacked);
 
   mathWrite(*stream, forced_bbox);
   stream->write(update_forced_bbox);

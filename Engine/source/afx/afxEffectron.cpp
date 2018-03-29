@@ -157,7 +157,7 @@ void afxEffectronData::packData(BitStream* stream)
   stream->write(duration);
   stream->write(n_loops);
 
-  pack_fx(stream, fx_list, packed);
+  pack_fx(stream, fx_list, mPacked);
 }
 
 void afxEffectronData::unpackData(BitStream* stream)

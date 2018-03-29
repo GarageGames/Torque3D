@@ -244,7 +244,7 @@ void FlyingVehicleData::packData(BitStream* stream)
    {
       if (stream->writeFlag(sound[i]))
       {
-         SimObjectId writtenId = packed ? SimObjectId((uintptr_t)sound[i]) : sound[i]->getId();
+         SimObjectId writtenId = mPacked ? SimObjectId((uintptr_t)sound[i]) : sound[i]->getId();
          stream->writeRangedU32(writtenId, DataBlockObjectIdFirst, DataBlockObjectIdLast);
       }
    }
@@ -253,7 +253,7 @@ void FlyingVehicleData::packData(BitStream* stream)
    {
       if (stream->writeFlag(jetEmitter[j]))
       {
-         SimObjectId writtenId = packed ? SimObjectId((uintptr_t)jetEmitter[j]) : jetEmitter[j]->getId();
+         SimObjectId writtenId = mPacked ? SimObjectId((uintptr_t)jetEmitter[j]) : jetEmitter[j]->getId();
          stream->writeRangedU32(writtenId, DataBlockObjectIdFirst,DataBlockObjectIdLast);
       }
    }

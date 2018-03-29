@@ -326,15 +326,15 @@ void afxMagicSpellData::packData(BitStream* stream)
   stream->writeFlag(do_move_interrupts);
   stream->write(move_interrupt_speed);
 
-  writeDatablockID(stream, missile_db, packed);
+  writeDatablockID(stream, missile_db, mPacked);
   stream->write(launch_on_server_signal);
   stream->write(primary_target_types);
 
-  pack_fx(stream, casting_fx_list, packed);
-  pack_fx(stream, launch_fx_list, packed);
-  pack_fx(stream, delivery_fx_list, packed);
-  pack_fx(stream, impact_fx_list, packed);
-  pack_fx(stream, linger_fx_list, packed);
+  pack_fx(stream, casting_fx_list, mPacked);
+  pack_fx(stream, launch_fx_list, mPacked);
+  pack_fx(stream, delivery_fx_list, mPacked);
+  pack_fx(stream, impact_fx_list, mPacked);
+  pack_fx(stream, linger_fx_list, mPacked);
 }
 
 void afxMagicSpellData::unpackData(BitStream* stream)

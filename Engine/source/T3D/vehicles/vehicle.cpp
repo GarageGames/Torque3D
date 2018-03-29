@@ -277,7 +277,7 @@ void VehicleData::packData(BitStream* stream)
    stream->write(body.friction);
    for (i = 0; i < Body::MaxSounds; i++)
       if (stream->writeFlag(body.sound[i]))
-         stream->writeRangedU32(packed? SimObjectId((uintptr_t)body.sound[i]):
+         stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)body.sound[i]):
                                 body.sound[i]->getId(),DataBlockObjectIdFirst,
                                 DataBlockObjectIdLast);
 

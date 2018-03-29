@@ -127,13 +127,13 @@ IMPLEMENT_CALLBACK( GameBase, setControl, void, ( bool controlled ), ( controlle
 
 GameBaseData::GameBaseData()
 {
-   category = "";
-   packed = false;
+   mCategory = "";
+   mPacked = false;
 }
 GameBaseData::GameBaseData(const GameBaseData& other, bool temp_clone) : SimDataBlock(other, temp_clone)
 {
-   packed = other.packed;
-   category = other.category;
+   mPacked = other.mPacked;
+   mCategory = other.mCategory;
    //mReloadSignal = other.mReloadSignal; // DO NOT copy the mReloadSignal member. 
 }
 
@@ -158,7 +158,7 @@ void GameBaseData::initPersistFields()
 {
    addGroup("Scripting");
 
-      addField( "category", TypeCaseString, Offset( category, GameBaseData ),
+      addField( "category", TypeCaseString, Offset(mCategory, GameBaseData ),
          "The group that this datablock will show up in under the \"Scripted\" "
          "tab in the World Editor Library." );
 
@@ -171,14 +171,14 @@ bool GameBaseData::preload(bool server, String &errorStr)
 {
    if (!Parent::preload(server, errorStr))
       return false;
-   packed = false;
+   mPacked = false;
    return true;
 }
 
 void GameBaseData::unpackData(BitStream* stream)
 {
    Parent::unpackData(stream);
-   packed = true;
+   mPacked = true;
 }
 
 //----------------------------------------------------------------------------

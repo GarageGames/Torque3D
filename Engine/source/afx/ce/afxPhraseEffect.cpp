@@ -235,7 +235,7 @@ void afxPhraseEffectData::packData(BitStream* stream)
 
   stream->writeString(on_trig_cmd);
 
-  pack_fx(stream, fx_list, packed);
+  pack_fx(stream, fx_list, mPacked);
 }
 
 void afxPhraseEffectData::unpackData(BitStream* stream)

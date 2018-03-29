@@ -362,14 +362,14 @@ void HoverVehicleData::packData(BitStream* stream)
 
    for (S32 i = 0; i < MaxSounds; i++)
       if (stream->writeFlag(sound[i]))
-         stream->writeRangedU32(packed? SimObjectId((uintptr_t)sound[i]):
+         stream->writeRangedU32(mPacked ? SimObjectId((uintptr_t)sound[i]):
                                 sound[i]->getId(),DataBlockObjectIdFirst,DataBlockObjectIdLast);
 
    for (S32 j = 0; j < MaxJetEmitters; j++)
    {
       if (stream->writeFlag(jetEmitter[j]))
       {
-         SimObjectId writtenId = packed ? SimObjectId((uintptr_t)jetEmitter[j]) : jetEmitter[j]->getId();
+         SimObjectId writtenId = mPacked ? SimObjectId((uintptr_t)jetEmitter[j]) : jetEmitter[j]->getId();
          stream->writeRangedU32(writtenId, DataBlockObjectIdFirst,DataBlockObjectIdLast);
       }
    }
