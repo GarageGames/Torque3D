@@ -92,11 +92,11 @@ bool afxEA_Mooring::ea_update(F32 dt)
 {
   if (!obj)
   {
-    if (datablock->use_ghost_as_cons_obj && datablock->effect_name != ST_NULLSTRING)
+    if (mDatablock->use_ghost_as_cons_obj && mDatablock->effect_name != ST_NULLSTRING)
     {
       obj = new afxMooring(mooring_data->networking, 
-                           choreographer->getChoreographerId(), 
-                           datablock->effect_name);
+                           mChoreographer->getChoreographerId(), 
+                           mDatablock->effect_name);
     }
     else
     {
@@ -116,7 +116,7 @@ bool afxEA_Mooring::ea_update(F32 dt)
 
   if (obj)
   {
-    obj->setTransform(updated_xfm);
+    obj->setTransform(mUpdated_xfm);
   }
 
   return true;
@@ -142,7 +142,7 @@ void afxEA_Mooring::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxMooringData* orig_db = mooring_data;
     mooring_data = new afxMooringData(*orig_db, true);
-    orig_db->performSubstitutions(mooring_data, choreographer, group_index);
+    orig_db->performSubstitutions(mooring_data, mChoreographer, mGroup_index);
   }
 }
 

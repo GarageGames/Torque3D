@@ -108,15 +108,15 @@ bool afxEA_Sound::ea_update(F32 dt)
 {
   if (!sound_handle)
   {
-    sound_handle = SFX->createSource(sound_prof, &updated_xfm, 0);
+    sound_handle = SFX->createSource(sound_prof, &mUpdated_xfm, 0);
     if (sound_handle)
         sound_handle->play();
   }
 
   if (sound_handle)
   {
-    sound_handle->setTransform(updated_xfm);
-    sound_handle->setVolume((in_scope) ? updated_scale.x*fade_value : 0.0f);
+    sound_handle->setTransform(mUpdated_xfm);
+    sound_handle->setVolume((mIn_scope) ? mUpdated_scale.x*mFade_value : 0.0f);
 	  deleteNotify(sound_handle);
   }
 
@@ -134,7 +134,7 @@ void afxEA_Sound::ea_finish(bool was_stopped)
 
 void afxEA_Sound::do_runtime_substitutions()
 {
-  sound_prof = sound_prof->cloneAndPerformSubstitutions(choreographer, group_index);
+  sound_prof = sound_prof->cloneAndPerformSubstitutions(mChoreographer, mGroup_index);
   sound_desc = sound_prof->getDescription();
 }
 

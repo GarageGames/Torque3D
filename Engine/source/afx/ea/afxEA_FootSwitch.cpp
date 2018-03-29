@@ -145,7 +145,7 @@ void afxEA_FootSwitch::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxFootSwitchData* orig_db = footfall_data;
     footfall_data = new afxFootSwitchData(*orig_db, true);
-    orig_db->performSubstitutions(footfall_data, choreographer, group_index);
+    orig_db->performSubstitutions(footfall_data, mChoreographer, mGroup_index);
   }
 }
 

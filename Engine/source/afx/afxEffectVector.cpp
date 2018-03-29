@@ -40,7 +40,7 @@ void afxEffectVector::filter_client_server()
 
   for (S32 i = 0; i < fx_v->size(); i++)
   {
-    if ((*fx_v)[i]->datablock->runsHere(on_server))
+    if ((*fx_v)[i]->mDatablock->runsHere(on_server))
       fx_v2->push_back((*fx_v)[i]);
     else
     {
@@ -68,15 +68,15 @@ void afxEffectVector::calc_fx_dur_and_afterlife()
     if (ew)
     {
       F32 ew_dur;
-      if (ew->ew_timing.lifetime < 0)
+      if (ew->mEW_timing.lifetime < 0)
       {
-        if (phrase_dur > ew->ew_timing.delay)
+        if (phrase_dur > ew->mEW_timing.delay)
           ew_dur = phrase_dur + ew->afterStopTime();
         else
-          ew_dur = ew->ew_timing.delay + ew->afterStopTime();
+          ew_dur = ew->mEW_timing.delay + ew->afterStopTime();
       }
       else
-        ew_dur = ew->ew_timing.delay + ew->ew_timing.lifetime + ew->ew_timing.fade_out_time;
+        ew_dur = ew->mEW_timing.delay + ew->mEW_timing.lifetime + ew->mEW_timing.fade_out_time;
 
       if (ew_dur > total_fx_dur)
         total_fx_dur = ew_dur;

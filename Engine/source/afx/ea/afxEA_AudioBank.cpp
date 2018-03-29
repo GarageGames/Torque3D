@@ -125,8 +125,8 @@ bool afxEA_AudioBank::ea_update(F32 dt)
 
   if (sound_handle)
   {
-    sound_handle->setTransform(updated_xfm);
-    sound_handle->setVolume(updated_scale.x*fade_value);  
+    sound_handle->setTransform(mUpdated_xfm);
+    sound_handle->setVolume(mUpdated_scale.x*mFade_value);  
   }
 
   return true;
@@ -143,7 +143,7 @@ void afxEA_AudioBank::ea_finish(bool was_stopped)
 
 void afxEA_AudioBank::do_runtime_substitutions()
 {
-  sound_bank = sound_bank->cloneAndPerformSubstitutions(choreographer, group_index);
+  sound_bank = sound_bank->cloneAndPerformSubstitutions(mChoreographer, mGroup_index);
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//

@@ -105,9 +105,9 @@ bool afxEA_GuiText::ea_update(F32 dt)
   case USER_TEXT:
     {
       LinearColorF temp_clr = text_clr;
-      if (do_fades)
-        temp_clr.alpha = fade_value;
-      afxGuiTextHud::addTextItem(updated_pos, text_data->text_str, temp_clr);
+      if (mDo_fades)
+        temp_clr.alpha = mFade_value;
+      afxGuiTextHud::addTextItem(mUpdated_pos, text_data->text_str, temp_clr);
     }
     break;
   case SHAPE_NAME:
@@ -127,9 +127,9 @@ bool afxEA_GuiText::ea_update(F32 dt)
       if (name && name[0] != '\0')
       {
         LinearColorF temp_clr = text_clr;
-        if (do_fades)
-          temp_clr.alpha = fade_value;
-        afxGuiTextHud::addTextItem(updated_pos, name, temp_clr, cons_obj);
+        if (mDo_fades)
+          temp_clr.alpha = mFade_value;
+        afxGuiTextHud::addTextItem(mUpdated_pos, name, temp_clr, cons_obj);
       }
     }
     break;
@@ -146,7 +146,7 @@ void afxEA_GuiText::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxGuiTextData* orig_db = text_data;
     text_data = new afxGuiTextData(*orig_db, true);
-    orig_db->performSubstitutions(text_data, choreographer, group_index);
+    orig_db->performSubstitutions(text_data, mChoreographer, mGroup_index);
   }
 }
 

@@ -97,7 +97,7 @@ bool afxEA_StaticShape::ea_start()
   do_runtime_substitutions();
 
   // fades are handled using startFade() calls.
-  do_fades = false;
+  mDo_fades = false;
 
   return true;
 }
@@ -108,8 +108,8 @@ bool afxEA_StaticShape::ea_update(F32 dt)
   {
     // create and register effect
     static_shape = new afxStaticShape();
-    if (datablock->use_ghost_as_cons_obj && datablock->effect_name != ST_NULLSTRING)
-      static_shape->init(choreographer->getChoreographerId(), datablock->effect_name);
+    if (mDatablock->use_ghost_as_cons_obj && mDatablock->effect_name != ST_NULLSTRING)
+      static_shape->init(mChoreographer->getChoreographerId(), mDatablock->effect_name);
 
     static_shape->onNewDataBlock(shape_data, false);
     if (!static_shape->registerObject())
@@ -122,26 +122,26 @@ bool afxEA_StaticShape::ea_update(F32 dt)
     deleteNotify(static_shape);
     registerForCleanup(static_shape);
 
-    if (ew_timing.fade_in_time > 0.0f)
-      static_shape->startFade(ew_timing.fade_in_time, 0, false);
+    if (mEW_timing.fade_in_time > 0.0f)
+      static_shape->startFade(mEW_timing.fade_in_time, 0, false);
   }
 
   if (static_shape)
   {
-    if (!fade_out_started && elapsed > fade_out_start)
+    if (!fade_out_started && mElapsed > mFade_out_start)
     {
       if (!do_spawn)
       {
-        if (ew_timing.fade_out_time > 0.0f)
-          static_shape->startFade(ew_timing.fade_out_time, 0, true);
+        if (mEW_timing.fade_out_time > 0.0f)
+          static_shape->startFade(mEW_timing.fade_out_time, 0, true);
       }
       fade_out_started = true;
     }
 
-    if (in_scope)
+    if (mIn_scope)
     {
-      static_shape->setTransform(updated_xfm);
-      static_shape->setScale(updated_scale);
+      static_shape->setTransform(mUpdated_xfm);
+      static_shape->setScale(mUpdated_scale);
     }
   }
 
@@ -155,7 +155,7 @@ void afxEA_StaticShape::ea_finish(bool was_stopped)
   
   if (do_spawn)
   {
-    Con::executef(shape_data, "onSpawn", static_shape->getIdString(), datablock->effect_name);
+    Con::executef(shape_data, "onSpawn", static_shape->getIdString(), mDatablock->effect_name);
     clearNotify(static_shape);
   }
   else
@@ -204,13 +204,13 @@ void afxEA_StaticShape::do_runtime_substitutions()
     {
       afxStaticShapeData* orig_db = (afxStaticShapeData*)shape_data;
       shape_data = new afxStaticShapeData(*orig_db, true);
-      orig_db->performSubstitutions(shape_data, choreographer, group_index);
+      orig_db->performSubstitutions(shape_data, mChoreographer, mGroup_index);
     }
     else
     {
       StaticShapeData* orig_db = shape_data;
       shape_data = new StaticShapeData(*orig_db, true);
-      orig_db->performSubstitutions(shape_data, choreographer, group_index);
+      orig_db->performSubstitutions(shape_data, mChoreographer, mGroup_index);
     }
   }
 }

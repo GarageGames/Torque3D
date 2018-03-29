@@ -136,7 +136,7 @@ void afxEA_PlayerMovement::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxPlayerMovementData* orig_db = movement_data;
     movement_data = new afxPlayerMovementData(*orig_db, true);
-    orig_db->performSubstitutions(movement_data, choreographer, group_index);
+    orig_db->performSubstitutions(movement_data, mChoreographer, mGroup_index);
   }
 }
 

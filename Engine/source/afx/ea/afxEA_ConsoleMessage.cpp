@@ -98,7 +98,7 @@ void afxEA_ConsoleMessage::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxConsoleMessageData* orig_db = message_data;
     message_data = new afxConsoleMessageData(*orig_db, true);
-    orig_db->performSubstitutions(message_data, choreographer, group_index);
+    orig_db->performSubstitutions(message_data, mChoreographer, mGroup_index);
   }
 }
 

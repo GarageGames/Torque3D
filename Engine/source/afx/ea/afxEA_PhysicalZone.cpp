@@ -127,9 +127,9 @@ bool afxEA_PhysicalZone::ea_update(F32 dt)
       set_cons_object((pos_constraint) ? pos_constraint->getSceneObject() : 0);
     }
 
-    if (do_fades)
-      physical_zone->setFadeAmount(fade_value);
-    physical_zone->setTransform(updated_xfm);
+    if (mDo_fades)
+      physical_zone->setFadeAmount(mFade_value);
+    physical_zone->setTransform(mUpdated_xfm);
   }
 
   return true;
@@ -172,7 +172,7 @@ void afxEA_PhysicalZone::do_runtime_substitutions()
     // clone the datablock and perform substitutions
     afxPhysicalZoneData* orig_db = zone_data;
     zone_data = new afxPhysicalZoneData(*orig_db, true);
-    orig_db->performSubstitutions(zone_data, choreographer, group_index);
+    orig_db->performSubstitutions(zone_data, mChoreographer, mGroup_index);
   }
 }
 
