@@ -150,7 +150,7 @@ void afxEA_AudioBank::do_runtime_substitutions()
 
 class afxEA_SoundBankDesc : public afxEffectAdapterDesc, public afxEffectDefs 
 {
-  static afxEA_SoundBankDesc desc;
+  static afxEA_SoundBankDesc mDesc;
 
 public:
   virtual bool  testEffectType(const SimDataBlock*) const;
@@ -162,7 +162,7 @@ public:
   virtual afxEffectWrapper* create() const { return new afxEA_AudioBank; }
 };
 
-afxEA_SoundBankDesc afxEA_SoundBankDesc::desc;
+afxEA_SoundBankDesc afxEA_SoundBankDesc::mDesc;
 
 bool afxEA_SoundBankDesc::testEffectType(const SimDataBlock* db) const
 {

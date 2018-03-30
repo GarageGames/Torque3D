@@ -150,7 +150,7 @@ void afxEA_Sound::onDeleteNotify(SimObject* obj)
 
 class afxEA_SoundDesc : public afxEffectAdapterDesc, public afxEffectDefs 
 {
-  static afxEA_SoundDesc desc;
+  static afxEA_SoundDesc mDesc;
 
 public:
   virtual bool  testEffectType(const SimDataBlock*) const;
@@ -162,7 +162,7 @@ public:
   virtual afxEffectWrapper* create() const { return new afxEA_Sound; }
 };
 
-afxEA_SoundDesc afxEA_SoundDesc::desc;
+afxEA_SoundDesc afxEA_SoundDesc::mDesc;
 
 bool afxEA_SoundDesc::testEffectType(const SimDataBlock* db) const
 {
