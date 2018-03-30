@@ -66,10 +66,10 @@ public:
 
 class SpotLightProxy : public SpotLight
 {
-  F32 fade_amt;
+  F32 mFade_amt;
 
 public:
-  SpotLightProxy() { fade_amt = 1.0f; }
+  SpotLightProxy() { mFade_amt = 1.0f; }
 
   void force_ghost() 
   {
@@ -79,7 +79,7 @@ public:
 
   void setFadeAmount(F32 fade_amt)
   {
-    this->fade_amt = fade_amt;
+    mFade_amt = fade_amt;
     mLight->setBrightness(mBrightness*fade_amt);
   }
 
@@ -130,10 +130,10 @@ public:
 
   void submitLights(LightManager* lm, bool staticLighting)
   {
-    if (mAnimState.active && mAnimationData && fade_amt < 1.0f)
+    if (mAnimState.active && mAnimationData && mFade_amt < 1.0f)
     {
       F32 mBrightness_save = mBrightness;
-      mBrightness *= fade_amt;
+      mBrightness *= mFade_amt;
       SpotLight::submitLights(lm, staticLighting);
       mBrightness = mBrightness_save;
       return;
