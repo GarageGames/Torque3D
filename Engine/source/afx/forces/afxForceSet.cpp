@@ -32,21 +32,21 @@
 
 afxForceSet::afxForceSet(const char* name)
 {
-  this->name = (name) ? StringTable->insert(name) : ST_NULLSTRING;
-  update_dt = 10.0f; // seems like an ok maximum, force-xmods will probably lower it.
-  elapsed_dt = 0.0f;
-  elapsed_ms = 0;
-  num_updates = 0;
-  last_num_updates = 0;
+  mName = (name) ? StringTable->insert(name) : ST_NULLSTRING;
+  mUpdate_dt = 10.0f; // seems like an ok maximum, force-xmods will probably lower it.
+  mElapsed_dt = 0.0f;
+  mElapsed_ms = 0;
+  mNum_updates = 0;
+  mLast_num_updates = 0;
 }
 
 void afxForceSet::remove(afxForce* force)
 {
-  for (S32 i = 0; i < force_v.size(); i++)
+  for (S32 i = 0; i < mForce_v.size(); i++)
   {
-    if (force_v[i] == force)
+    if (mForce_v[i] == force)
     {
-      force_v.erase(i);
+      mForce_v.erase(i);
       return;
     }
   }
@@ -56,23 +56,23 @@ S32 afxForceSet::updateDT(F32 dt)
 {
   U32 now = Platform::getVirtualMilliseconds();
 
-  if (elapsed_ms == now) 
-    return last_num_updates;
+  if (mElapsed_ms == now) 
+    return mLast_num_updates;
 
-  elapsed_ms = now;
-  elapsed_dt += dt;
+  mElapsed_ms = now;
+  mElapsed_dt += dt;
 
-  if (elapsed_dt < update_dt) 
+  if (mElapsed_dt < mUpdate_dt) 
   {
-    last_num_updates = 0;
+    mLast_num_updates = 0;
     return 0;
   }
 
-  num_updates = mFloor(elapsed_dt/update_dt);
-  elapsed_dt -= update_dt*num_updates;
-  last_num_updates = num_updates;
+  mNum_updates = mFloor(mElapsed_dt/mUpdate_dt);
+  mElapsed_dt -= mUpdate_dt*mNum_updates;
+  mLast_num_updates = mNum_updates;
 
-  return num_updates;
+  return mNum_updates;
 }
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
