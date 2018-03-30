@@ -698,10 +698,10 @@ String CodeBlock::getFunctionArgs(U32 ip)
 {
    StringBuilder str;
 
-   U32 fnArgc = code[ip + 5];
+   U32 fnArgc = code[ip + 8];
    for (U32 i = 0; i < fnArgc; ++i)
    {
-      StringTableEntry var = CodeToSTE(code, ip + (i * 2) + 6);
+      StringTableEntry var = CodeToSTE(code, ip + (i * 2) + 9);
 
       if (i != 0)
          str.append(", ");
