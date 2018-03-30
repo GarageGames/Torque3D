@@ -88,9 +88,9 @@ class afxCamera: public ShapeBase
   };
 
 private:
-  int             mode;
+  int             mMode;
   Point3F         mRot;
-  StateDelta      delta;
+  StateDelta      mDelta;
 
   SimObjectPtr<GameBase> mOrbitObject;
   F32             mMinOrbitDist;
@@ -99,17 +99,17 @@ private:
   Point3F         mPosition;
   bool            mObservingClientObject;
 
-  SceneObject*    cam_subject;
-  Point3F         cam_offset;
-  Point3F         coi_offset;
-  F32             cam_distance;
-  F32             cam_angle;
-  bool            cam_dirty;
+  SceneObject*    mCam_subject;
+  Point3F         mCam_offset;
+  Point3F         mCoi_offset;
+  F32             mCam_distance;
+  F32             mCam_angle;
+  bool            mCam_dirty;
 
-  bool            flymode_saved;
-  Point3F         flymode_saved_pos;
-  S8              third_person_snap_c;
-  S8              third_person_snap_s;
+  bool            mFlymode_saved;
+  Point3F         mFlymode_saved_pos;
+  S8              mThird_person_snap_c;
+  S8              mThird_person_snap_s;
 
   void            set_cam_pos(const Point3F& pos, const Point3F& viewRot);
   void            cam_update(F32 dt, bool on_server);
@@ -130,8 +130,8 @@ public:
   void            setCameraSubject(SceneObject* subject);
   void            setThirdPersonOffset(const Point3F& offset);
   void            setThirdPersonOffset(const Point3F& offset, const Point3F& coi_offset);
-  const Point3F&  getThirdPersonOffset() const { return cam_offset; }
-  const Point3F&  getThirdPersonCOIOffset() const { return coi_offset; }
+  const Point3F&  getThirdPersonOffset() const { return mCam_offset; }
+  const Point3F&  getThirdPersonCOIOffset() const { return mCoi_offset; }
   void            setThirdPersonDistance(F32 distance);
   F32             getThirdPersonDistance();
   void            setThirdPersonAngle(F32 angle);
@@ -147,7 +147,7 @@ public:
   DECLARE_CATEGORY("AFX");
 
 private:          // 3POV SECTION
-  U32             blockers_mask_3pov;
+  U32             mBlockers_mask_3pov;
 
   void            cam_update_3pov(F32 dt, bool on_server);
   bool            avoid_blocked_view(const Point3F& start, const Point3F& end, Point3F& newpos);
