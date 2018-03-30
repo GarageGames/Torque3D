@@ -604,9 +604,9 @@ void CastingPhrase_C::update(F32 dt, F32 timestamp)
   if (!mNotify_castbar)
     return;
 
-  if (dur > 0 && n_loops > 0)
+  if (mDur > 0 && mNum_loops > 0)
   {
-    F32 nfrac = (timestamp - starttime)/(dur*n_loops);
+    F32 nfrac = (timestamp - mStartTime)/(mDur*mNum_loops);
     if (nfrac - mCastbar_progress > 1.0f/200.0f)
     {
       mCastbar_progress = (nfrac < 1.0f) ? nfrac : 1.0f;
