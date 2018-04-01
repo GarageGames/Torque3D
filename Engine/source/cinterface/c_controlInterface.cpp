@@ -25,9 +25,8 @@
 #include "console/consoleInternal.h"
 #include "console/simSet.h"
 #include "app/mainLoop.h"
-
-// External scripting cinterface, suitable for import into any scripting system 
-// which support "C" interfaces (C#, Python, Lua, Java, etc)
+#include "windowManager/platformWindow.h"
+#include "windowManager/platformWindowMgr.h"
 
 #ifdef TORQUE_OS_WIN
 #include "windowManager/win32/win32Window.h"
@@ -61,7 +60,7 @@ extern "C" {
 
          LinkConsoleFunctions = true;
 
-#if !defined(TORQUE_OS_XENON) && !defined(TORQUE_OS_PS3) && defined(_MSC_VER)
+#if defined(_MSC_VER)
          createFontInit();
 #endif
 
@@ -131,7 +130,7 @@ extern "C" {
          // Clean everything up.
          StandardMainLoop::shutdown();
 
-#if !defined(TORQUE_OS_XENON) && !defined(TORQUE_OS_PS3) && defined(_MSC_VER)
+#if defined(_MSC_VER)
          createFontShutdown();
 #endif
 
@@ -223,4 +222,18 @@ extern "C" {
       }
    }
 #endif
+
+   static char* gExecutablePath = NULL;
+
+   const char* torque_getexecutablepath()
+   {
+      return gExecutablePath;
+   }
+
+   void torque_setexecutablepath(const char* directory)
+   {
+      dsize_t pathLen = dStrlen(directory) + 1;
+      gExecutablePath = new char[pathLen];
+      dStrcpy(gExecutablePath, directory);
+   }
 }

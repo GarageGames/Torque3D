@@ -42,5 +42,7 @@ extern "C" {
 #ifdef TORQUE_OS_WIN
    void torque_inputevent(S32 type, S32 value1, S32 value2);
 #endif
+
+   const char* torque_getexecutablepath();
 }
 #endif // C_CONTROLINTERFACE_H
