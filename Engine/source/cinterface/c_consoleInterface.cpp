@@ -20,6 +20,7 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "c_consoleInterface.h"
 #include "console/consoleInternal.h"
 #include "console/simSet.h"
 
@@ -77,6 +78,5 @@ extern "C" {
    {
       Con::setBoolVariable(StringTable->insert(name), value);
    }
-};
 
-
+}

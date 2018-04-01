@@ -20,52 +20,22 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_simobjectInterface.h"
+#ifndef C_CONSOLEINTERFACE_H
+#define C_CONSOLEINTERFACE_H
+#include "platform/platformDlibrary.h"
+#include "console/consoleInternal.h"
 
 extern "C" {
+   void Con_AddConsumer(ConsumerCallback cb);
+   void Con_RemoveConsumer(ConsumerCallback cb);
 
-   bool fnSimObject_registerObject(SimObject* pObject)
-   {
-      return pObject->registerObject();
-   }
-
-   void fnSimObject_GetField(SimObject* obj, const char* fieldName, const char* arrayIndex)
-   {
-      obj->getDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex));
-   }
-
-   void fnSimObject_SetField(SimObject* obj, const char* fieldName, const char* arrayIndex, const char* value)
-   {
-      obj->setDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex), StringTable->insert(value));
-   }
-
-   void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent)
-   {
-      if (parent)
-      {
-         obj->setCopySource(parent);
-         obj->assignFieldsFrom(parent);
-      }
-   }
-
-   void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields)
-   {
-      obj->setModStaticFields(modStaticFields);
-      obj->setModDynamicFields(modDynamicFields);
-   }
-
-   bool fnSimObject_IsLocked(SimObject *so)
-   {
-      return so->isLocked();
-   }
-
-   void fnSimObject_InspectPreApply(SimObject *so)
-   {
-      so->inspectPreApply();
-   }
-
-   void fnSimObject_InspectPostApply(SimObject *so)
-   {
-      so->inspectPostApply();
-   }
+   const char* Con_getConsoleString(const char* name);
+   void Con_setConsoleString(const char* name, const char* value);
+   S32 Con_getConsoleInt(const char* name);
+   void Con_setConsoleInt(const char* name, S32 value);
+   F32 Con_getConsoleFloat(const char* name);
+   void Con_setConsoleFloat(const char* name, F32 value);
+   bool Con_getConsoleBool(const char* name);
+   void Con_setConsoleBool(const char* name, bool value);
 }
+#endif // C_CONSOLEINTERFACE_H

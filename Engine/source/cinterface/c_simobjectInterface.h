@@ -20,52 +20,19 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_simobjectInterface.h"
+#ifndef C_SIMOBJECTINTERFACE_H
+#define C_SIMOBJECTINTERFACE_H
+#include "platform/platformDlibrary.h"
+#include "console/simObject.h"
 
 extern "C" {
-
-   bool fnSimObject_registerObject(SimObject* pObject)
-   {
-      return pObject->registerObject();
-   }
-
-   void fnSimObject_GetField(SimObject* obj, const char* fieldName, const char* arrayIndex)
-   {
-      obj->getDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex));
-   }
-
-   void fnSimObject_SetField(SimObject* obj, const char* fieldName, const char* arrayIndex, const char* value)
-   {
-      obj->setDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex), StringTable->insert(value));
-   }
-
-   void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent)
-   {
-      if (parent)
-      {
-         obj->setCopySource(parent);
-         obj->assignFieldsFrom(parent);
-      }
-   }
-
-   void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields)
-   {
-      obj->setModStaticFields(modStaticFields);
-      obj->setModDynamicFields(modDynamicFields);
-   }
-
-   bool fnSimObject_IsLocked(SimObject *so)
-   {
-      return so->isLocked();
-   }
-
-   void fnSimObject_InspectPreApply(SimObject *so)
-   {
-      so->inspectPreApply();
-   }
-
-   void fnSimObject_InspectPostApply(SimObject *so)
-   {
-      so->inspectPostApply();
-   }
+   bool fnSimObject_registerObject(SimObject* pObject);
+   void fnSimObject_GetField(SimObject* obj, const char* fieldName, const char* arrayIndex);
+   void fnSimObject_SetField(SimObject* obj, const char* fieldName, const char* arrayIndex, const char* value);
+   void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent);
+   void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields);
+   bool fnSimObject_IsLocked(SimObject *so);
+   void fnSimObject_InspectPreApply(SimObject *so);
+   void fnSimObject_InspectPostApply(SimObject *so);
 }
+#endif // C_SIMOBJECTINTERFACE_H

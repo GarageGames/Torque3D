@@ -20,6 +20,8 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "c_controlInterface.h"
+
 #include "console/consoleInternal.h"
 #include "console/simSet.h"
 #include "app/mainLoop.h"
@@ -221,4 +223,4 @@ extern "C" {
       }
    }
 #endif
-};
+}

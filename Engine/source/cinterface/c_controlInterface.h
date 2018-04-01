@@ -20,52 +20,27 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_simobjectInterface.h"
+#ifndef C_CONTROLINTERFACE_H
+#define C_CONTROLINTERFACE_H
+#include "platform/platformDlibrary.h"
 
 extern "C" {
+   void torque_reset();
+   bool torque_engineinit(S32 argc, const char **argv);
+   S32 torque_enginetick();
+   S32 torque_getreturnstatus();
+   void torque_enginesignalshutdown();
+   S32 torque_engineshutdown();
+   bool torque_isdebugbuild();
+   void torque_setwebdeployment();
+   void torque_resizewindow(S32 width, S32 height);
 
-   bool fnSimObject_registerObject(SimObject* pObject)
-   {
-      return pObject->registerObject();
-   }
-
-   void fnSimObject_GetField(SimObject* obj, const char* fieldName, const char* arrayIndex)
-   {
-      obj->getDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex));
-   }
-
-   void fnSimObject_SetField(SimObject* obj, const char* fieldName, const char* arrayIndex, const char* value)
-   {
-      obj->setDataField(StringTable->insert(fieldName), StringTable->insert(arrayIndex), StringTable->insert(value));
-   }
-
-   void fnSimObject_CopyFrom(SimObject* obj, SimObject* parent)
-   {
-      if (parent)
-      {
-         obj->setCopySource(parent);
-         obj->assignFieldsFrom(parent);
-      }
-   }
-
-   void fnSimObject_SetMods(SimObject* obj, bool modStaticFields, bool modDynamicFields)
-   {
-      obj->setModStaticFields(modStaticFields);
-      obj->setModDynamicFields(modDynamicFields);
-   }
-
-   bool fnSimObject_IsLocked(SimObject *so)
-   {
-      return so->isLocked();
-   }
-
-   void fnSimObject_InspectPreApply(SimObject *so)
-   {
-      so->inspectPreApply();
-   }
-
-   void fnSimObject_InspectPostApply(SimObject *so)
-   {
-      so->inspectPostApply();
-   }
+#if defined(TORQUE_OS_WIN) && !defined(TORQUE_SDL)
+   void* torque_gethwnd();
+   void torque_directmessage(U32 message, U32 wparam, U32 lparam);
+#endif
+#ifdef TORQUE_OS_WIN
+   void torque_inputevent(S32 type, S32 value1, S32 value2);
+#endif
 }
+#endif // C_CONTROLINTERFACE_H

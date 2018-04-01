@@ -27,7 +27,7 @@
 
 // cinterface can override this (useful for plugins, etc)
 extern "C" {
-   DLL_DECL void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void *mainPtr);
+   void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void *mainPtr);
 }
 
 #define CALL_CINTERFACE_FUNCTION(name, ...){const char *v[] = { __VA_ARGS__ }; CInterface::CallFunction(name, v, sizeof(v) / sizeof(*v));}

@@ -20,12 +20,10 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
+#include "c_simInterface.h"
 #include "console/consoleInternal.h"
 #include "console/simDatablock.h"
 #include "console/simSet.h"
-
-// External scripting cinterface, suitable for import into any scripting system which support "C" interfaces (C#, Python, Lua, Java, etc)
-
 
 extern "C" {
 
@@ -53,4 +51,4 @@ extern "C" {
    {
       delete pObjectPtr;
    }
-};
+}

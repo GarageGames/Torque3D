@@ -88,9 +88,13 @@ void CInterface::_CallMain(bool *res) const
    *res = false;
 }
 
-void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void* mainPtr) {
-   CInterface::GetCInterface().SetCallFunctionCallback(ptr);
-   CInterface::GetCInterface().SetCallMethodCallback(methodPtr);
-   CInterface::GetCInterface().SetCallIsMethodCallback(isMethodPtr);
-   CInterface::GetCInterface().SetMainCallback(mainPtr);
+extern "C" {
+
+   void SetCallbacks(void* ptr, void* methodPtr, void* isMethodPtr, void* mainPtr) {
+      CInterface::GetCInterface().SetCallFunctionCallback(ptr);
+      CInterface::GetCInterface().SetCallMethodCallback(methodPtr);
+      CInterface::GetCInterface().SetCallIsMethodCallback(isMethodPtr);
+      CInterface::GetCInterface().SetMainCallback(mainPtr);
+   }
+
 }
