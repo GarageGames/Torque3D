@@ -276,7 +276,7 @@ void GuiFileTreeCtrl::recurseInsert( Item* parent, StringTableEntry path )
 
    char szPathCopy [ 1024 ];
    dMemset( szPathCopy, 0, 1024 );
-   dStrcpy( szPathCopy, path );
+   dStrcpy( szPathCopy, path, 1024 );
 
    // Jump over the first character if it's a root /
    char *curPos = szPathCopy;

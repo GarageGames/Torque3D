@@ -142,7 +142,7 @@ void AppVertConnectorGLSL::sortVars()
 
 void AppVertConnectorGLSL::setName( char *newName )
 {
-   dStrcpy( (char*)mName, newName );
+   dStrcpy( (char*)mName, newName, 32 );
 }
 
 void AppVertConnectorGLSL::reset()
@@ -287,7 +287,7 @@ void VertPixelConnectorGLSL::sortVars()
 
 void VertPixelConnectorGLSL::setName( char *newName )
 {
-   dStrcpy( (char*)mName, newName );
+   dStrcpy( (char*)mName, newName, 32 );
 }
 
 void VertPixelConnectorGLSL::reset()

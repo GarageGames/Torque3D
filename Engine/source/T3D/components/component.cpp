@@ -31,6 +31,7 @@
 #include "console/engineAPI.h"
 #include "sim/netConnection.h"
 #include "console/consoleInternal.h"
+#include "T3D/assets/MaterialAsset.h"
 
 #define DECLARE_NATIVE_COMPONENT( ComponentType )                   \
 	 Component* staticComponentTemplate = new ComponentType; \
@@ -52,7 +53,6 @@ Component::Component()
 
    mNetworked = false;
 
-
    // [tom, 1/12/2007] We manage the memory for the description since it
    // could be loaded from a file and thus massive. This is accomplished with
    // protected fields, but since they still call Con::getData() the field
@@ -66,7 +66,14 @@ Component::Component()
 
    mOriginatingAssetId = StringTable->EmptyString();
 
-   mNetFlags.set(Ghostable);
+   mIsServerObject = true;
+
+   componentIdx = 0;
+
+   mHidden = false;
+   mEnabled = true;
+
+   mDirtyMaskBits = 0;
 }
 
 Component::~Component()
@@ -198,7 +205,6 @@ void Component::onComponentRemove()
    {
       mOwner->onComponentAdded.remove(this, &Component::componentAddedToOwner);
       mOwner->onComponentRemoved.remove(this, &Component::componentRemovedFromOwner);
-      mOwner->onTransformSet.remove(this, &Component::ownerTransformSet);
    }
 
    mOwner = NULL;
@@ -212,7 +218,6 @@ void Component::setOwner(Entity* owner)
    {
       mOwner->onComponentAdded.remove(this, &Component::componentAddedToOwner);
       mOwner->onComponentRemoved.remove(this, &Component::componentRemovedFromOwner);
-      mOwner->onTransformSet.remove(this, &Component::ownerTransformSet);
 
       mOwner->removeComponent(this, false);
    }
@@ -223,11 +228,18 @@ void Component::setOwner(Entity* owner)
    {
       mOwner->onComponentAdded.notify(this, &Component::componentAddedToOwner);
       mOwner->onComponentRemoved.notify(this, &Component::componentRemovedFromOwner);
-      mOwner->onTransformSet.notify(this, &Component::ownerTransformSet);
    }
 
    if (isServerObject())
+   {
       setMaskBits(OwnerMask);
+
+      //if we have any outstanding maskbits, push them along to have the network update happen on the entity
+      if (mDirtyMaskBits != 0 && mOwner)
+      {
+         mOwner->setMaskBits(Entity::ComponentsUpdateMask);
+      }
+   }
 }
 
 void Component::componentAddedToOwner(Component *comp)
@@ -240,16 +252,19 @@ void Component::componentRemovedFromOwner(Component *comp)
    return;
 }
 
-void Component::ownerTransformSet(MatrixF *mat)
+void Component::setMaskBits(U32 orMask)
 {
-   return;
+   AssertFatal(orMask != 0, "Invalid net mask bits set.");
+   
+   if (mOwner)
+      mOwner->setComponentNetMask(this, orMask);
 }
 
 U32 Component::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 {
-   U32 retMask = Parent::packUpdate(con, mask, stream);
+   U32 retMask = 0;
 
-   if (mask & OwnerMask)
+   /*if (mask & OwnerMask)
    {
       if (mOwner != NULL)
       {
@@ -274,7 +289,7 @@ U32 Component::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
       }
    }
    else
-      stream->writeFlag(false);
+      stream->writeFlag(false);*/
 
    if (stream->writeFlag(mask & EnableMask))
    {
@@ -299,9 +314,7 @@ U32 Component::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
 void Component::unpackUpdate(NetConnection *con, BitStream *stream)
 {
-   Parent::unpackUpdate(con, stream);
-
-   if (stream->readFlag())
+   /*if (stream->readFlag())
    {
       if (stream->readFlag())
       {
@@ -317,7 +330,7 @@ void Component::unpackUpdate(NetConnection *con, BitStream *stream)
          //it's being nulled out
          setOwner(NULL);
       }
-   }
+   }*/
 
    if (stream->readFlag())
    {
@@ -467,7 +480,7 @@ void Component::addComponentField(const char *fieldName, const char *desc, const
    else if (fieldType == StringTable->insert("vector"))
       fieldTypeMask = TypePoint3F;
    else if (fieldType == StringTable->insert("material"))
-      fieldTypeMask = TypeMaterialName;
+      fieldTypeMask = TypeMaterialAssetPtr;
    else if (fieldType == StringTable->insert("image"))
       fieldTypeMask = TypeImageFilename;
    else if (fieldType == StringTable->insert("shape"))
@@ -488,6 +501,7 @@ void Component::addComponentField(const char *fieldName, const char *desc, const
       fieldTypeMask = TypeGameObjectAssetPtr;
    else
       fieldTypeMask = TypeString;
+   field.mFieldTypeName = fieldType;
 
    field.mFieldType = fieldTypeMask;
 
@@ -528,13 +542,14 @@ const char * Component::getDescriptionText(const char *desc)
    if (desc == NULL)
       return NULL;
 
-   char *newDesc;
+   char *newDesc = "";
 
    // [tom, 1/12/2007] If it isn't a file, just do it the easy way
    if (!Platform::isFile(desc))
    {
-      newDesc = new char[dStrlen(desc) + 1];
-      dStrcpy(newDesc, desc);
+      dsize_t newDescLen = dStrlen(desc) + 1;
+      newDesc = new char[newDescLen];
+      dStrcpy(newDesc, desc, newDescLen);
 
       return newDesc;
    }
@@ -561,7 +576,7 @@ const char * Component::getDescriptionText(const char *desc)
    }
 
    str.close();
-   delete stream;
+   //delete stream;
 
    return newDesc;
 }

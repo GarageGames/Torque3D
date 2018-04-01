@@ -99,8 +99,8 @@ DefineConsoleFunction( runAllUnitTests, int, (const char* testSpecs), (""),
       testArgc = 2;
       testArgv = new char*[2];
       testArgv[0] = NULL; // Program name is unused by googletest.
-      testArgv[1] = new char[specs.length()+1];
-      dStrcpy(testArgv[1], specs);
+      testArgv[1] = new char[specs.size()];
+      dStrcpy(testArgv[1], specs, specs.size());
    }
 
    // Initialize Google Test.

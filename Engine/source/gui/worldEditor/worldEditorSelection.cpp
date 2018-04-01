@@ -23,7 +23,7 @@
 #include "gui/worldEditor/worldEditorSelection.h"
 #include "gui/worldEditor/worldEditor.h"
 #include "scene/sceneObject.h"
-
+#include "T3D/entity.h"
 
 IMPLEMENT_CONOBJECT( WorldEditorSelection );
 
@@ -410,26 +410,34 @@ void WorldEditorSelection::rotate(const EulerF & rot, const Point3F & center)
    // single selections will rotate around own axis, multiple about world
    if(size() == 1)
    {
-      SceneObject* object = dynamic_cast< SceneObject* >( at( 0 ) );
-      if( object )
+      Entity* eO = dynamic_cast< Entity* >(at(0));
+      if (eO)
       {
-         MatrixF mat = object->getTransform();
+         eO->setTransform(eO->getPosition(), eO->getRotation() + RotationF(rot));
+      }
+      else
+      {
+         SceneObject* object = dynamic_cast<SceneObject*>(at(0));
+         if (object)
+         {
+            MatrixF mat = object->getTransform();
 
-         Point3F pos;
-         mat.getColumn(3, &pos);
+            Point3F pos;
+            mat.getColumn(3, &pos);
 
-         // get offset in obj space
-         Point3F offset = pos - center;
-         MatrixF wMat = object->getWorldTransform();
-         wMat.mulV(offset);
+            // get offset in obj space
+            Point3F offset = pos - center;
+            MatrixF wMat = object->getWorldTransform();
+            wMat.mulV(offset);
 
-         //
-         MatrixF transform(EulerF(0,0,0), -offset);
-         transform.mul(MatrixF(rot));
-         transform.mul(MatrixF(EulerF(0,0,0), offset));
-         mat.mul(transform);
+            //
+            MatrixF transform(EulerF(0, 0, 0), -offset);
+            transform.mul(MatrixF(rot));
+            transform.mul(MatrixF(EulerF(0, 0, 0), offset));
+            mat.mul(transform);
 
-         object->setTransform(mat);
+            object->setTransform(mat);
+         }
       }
    }
    else

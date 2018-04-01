@@ -39,7 +39,14 @@ class GuiConsole : public GuiArrayCtrl
 
       Resource<GFont> mFont;
 
+      bool mDisplayErrors;
+      bool mDisplayWarnings;
+      bool mDisplayNormalMessages;
+      bool mFiltersDirty;
+
       S32 getMaxWidth(S32 startIndex, S32 endIndex);
+
+      Vector<ConsoleLogEntry> mFilteredLog;
 
    protected:
 
@@ -47,6 +54,7 @@ class GuiConsole : public GuiArrayCtrl
       /// @{
 
       DECLARE_CALLBACK( void, onMessageSelected, ( ConsoleLogEntry::Level level, const char* message ) );
+      DECLARE_CALLBACK(void, onNewMessage, (U32 errorCount, U32 warnCount, U32 normalCount));
 
       /// @}
 
@@ -63,6 +71,30 @@ class GuiConsole : public GuiArrayCtrl
       virtual bool onWake();
       virtual void onPreRender();
       virtual void onRenderCell(Point2I offset, Point2I cell, bool selected, bool mouseOver);
+
+      void setDisplayFilters(bool errors, bool warns, bool normal);
+      bool getErrorFilter() { return mDisplayErrors; }
+      bool getWarnFilter() { return mDisplayWarnings; }
+      bool getNormalFilter() { return mDisplayNormalMessages; }
+
+      void toggleErrorFilter()
+      {
+         setDisplayFilters(!mDisplayErrors, mDisplayWarnings, mDisplayNormalMessages);
+      }
+      void toggleWarnFilter()
+      {
+         setDisplayFilters(mDisplayErrors, !mDisplayWarnings, mDisplayNormalMessages);
+      }
+      void toggleNormalFilter()
+      {
+         setDisplayFilters(mDisplayErrors, mDisplayWarnings, !mDisplayNormalMessages);
+      }
+      void refresh()
+      {
+         setDisplayFilters(mDisplayErrors, mDisplayWarnings, mDisplayNormalMessages);
+      }
+
+      void refreshLogText();
 };
 
 #endif

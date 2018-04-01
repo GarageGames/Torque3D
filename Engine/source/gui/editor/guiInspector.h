@@ -89,6 +89,9 @@ public:
       else
          return nullptr;
    }
+
+   S32 getComponentGroupTargetId() { return mComponentGroupTargetId; }
+   void setComponentGroupTargetId(S32 compId) { mComponentGroupTargetId = compId; }
    
    /// Return the number of objects being inspected by this GuiInspector.
    U32 getNumInspectObjects() const { return mTargets.size(); }
@@ -146,6 +149,8 @@ protected:
 
    /// Objects being inspected by this GuiInspector.
    TargetVector mTargets;
+
+   S32 mComponentGroupTargetId;
    
    F32 mDividerPos;   
    S32 mDividerMargin;

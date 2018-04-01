@@ -3,7 +3,8 @@
 #
 # Scons build script -- GCC, Clang, Visual Studio
 # Does not build test
-
+#
+# SCons builds are deprecated -- see README.md for details.
 
 import os
         
@@ -97,3 +98,5 @@ set_warnings(nfd_env)
 
 nfd_env.Append( CPPPATH=['.','./include'] )
 nfd_env.StaticLibrary( get_lib_name('nfd', debug), nfd_files )
+
+print "*** Scons builds are deprecated!  See README.md for details."

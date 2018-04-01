@@ -216,7 +216,7 @@ DefineConsoleFunction( getUniqueName, const char*, (const char * baseName), ,
       return NULL;
 
    char *buffer = Con::getReturnBuffer( outName.size() );
-   dStrcpy( buffer, outName );
+   dStrcpy( buffer, outName, outName.size() );
 
    return buffer;
 }
@@ -241,7 +241,7 @@ DefineConsoleFunction( getUniqueInternalName, const char*, (const char * baseNam
       return NULL;
 
    char *buffer = Con::getReturnBuffer( outName.size() );
-   dStrcpy( buffer, outName );
+   dStrcpy( buffer, outName, outName.size() );
 
    return buffer;
 }

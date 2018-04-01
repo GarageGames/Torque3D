@@ -38,6 +38,9 @@
 #include "T3D/gameBase/gameConnection.h"
 #include "math/mathUtils.h"
 
+#include "T3D/components/render/renderComponentInterface.h"
+#include "T3D/systems/render/meshRenderSystem.h"
+
 // For player object bounds workaround.
 #include "T3D/player.h"
 
@@ -357,6 +360,8 @@ void SceneManager::_renderScene( SceneRenderState* state, U32 objectMask, SceneZ
 
    if( gEditingMission && state->isDiffusePass() )
       objectMask = EDITOR_RENDER_TYPEMASK;
+
+   MeshRenderSystem::render(this, state);
 
    // Update the zoning state and traverse zones.
 
@@ -740,7 +745,7 @@ DefineConsoleFunction( sceneDumpZoneStates, void, ( bool updateFirst ), ( true )
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( sceneGetZoneOwner, SceneObject*, ( U32 zoneId ), ( true ),
+DefineConsoleFunction( sceneGetZoneOwner, SceneObject*, ( U32 zoneId ),,
    "Return the SceneObject that contains the given zone.\n\n"
    "@param zoneId ID of zone.\n"
    "@return A SceneObject or NULL if the given @a zoneId is invalid.\n\n"

@@ -50,6 +50,12 @@ IMPLEMENT_CALLBACK( GuiConsole, onMessageSelected, void, ( ConsoleLogEntry::Leve
    "@param level Diagnostic level of the message.\n"
    "@param message Message text.\n" );
 
+IMPLEMENT_CALLBACK(GuiConsole, onNewMessage, void, (U32 errorCount, U32 warnCount, U32 normalCount), (errorCount, warnCount, normalCount),
+   "Called when a new message is logged.\n\n"
+   "@param errorCount The number of error messages logged.\n"
+   "@param warnCount The number of warning messages logged.\n"
+   "@param normalCount The number of normal messages logged.\n");
+
 
 //-----------------------------------------------------------------------------
 
@@ -58,6 +64,11 @@ GuiConsole::GuiConsole()
    setExtent(64, 64);
    mCellSize.set(1, 1);
    mSize.set(1, 0);
+
+   mDisplayErrors = true;
+   mDisplayWarnings = true;
+   mDisplayNormalMessages = true;
+   mFiltersDirty = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,18 +92,66 @@ S32 GuiConsole::getMaxWidth(S32 startIndex, S32 endIndex)
    U32 size;
    ConsoleLogEntry *log;
 
-   Con::getLockLog(log, size);
-
-   if(startIndex < 0 || (U32)endIndex >= size || startIndex > endIndex)
+   if (startIndex < 0 || (U32)endIndex >= mFilteredLog.size() || startIndex > endIndex)
       return 0;
 
    S32 result = 0;
    for(S32 i = startIndex; i <= endIndex; i++)
-      result = getMax(result, (S32)(mFont->getStrWidth((const UTF8 *)log[i].mString)));
-   
-   Con::unlockLog();
+      result = getMax(result, (S32)(mFont->getStrWidth((const UTF8 *)mFilteredLog[i].mString)));
    
    return(result + 6);
+}
+
+void GuiConsole::refreshLogText()
+{
+   U32 size;
+   ConsoleLogEntry *log;
+
+   Con::getLockLog(log, size);
+
+   if (mFilteredLog.size() != size || mFiltersDirty)
+   {
+      mFilteredLog.clear();
+
+      U32 errorCount = 0;
+      U32 warnCount = 0;
+      U32 normalCount = 0;
+
+      //Filter the log if needed
+      for (U32 i = 0; i < size; ++i)
+      {
+         ConsoleLogEntry &entry = log[i];
+
+         if (entry.mLevel == ConsoleLogEntry::Error)
+         {
+            errorCount++;
+            if (mDisplayErrors)
+            {
+               mFilteredLog.push_back(entry);
+            }
+         }
+         else if (entry.mLevel == ConsoleLogEntry::Warning)
+         {
+            warnCount++;
+            if (mDisplayWarnings)
+            {
+               mFilteredLog.push_back(entry);
+            }
+         }
+         else if (entry.mLevel == ConsoleLogEntry::Normal)
+         {
+            normalCount++;
+            if (mDisplayNormalMessages)
+            {
+               mFilteredLog.push_back(entry);
+            }
+         }
+      }
+
+      onNewMessage_callback(errorCount, warnCount, normalCount);
+   }
+
+   Con::unlockLog();
 }
 
 //-----------------------------------------------------------------------------
@@ -101,36 +160,30 @@ void GuiConsole::onPreRender()
 {
    //see if the size has changed
    U32 prevSize = getHeight() / mCellSize.y;
-   U32 size;
-   ConsoleLogEntry *log;
 
-   Con::getLockLog(log, size);
-   Con::unlockLog(); // we unlock immediately because we only use size here, not log.
+   refreshLogText();
    
-   if(size != prevSize)
-   {
-      //first, find out if the console was scrolled up
-      bool scrolled = false;
-      GuiScrollCtrl *parent = dynamic_cast<GuiScrollCtrl*>(getParent());
+   //first, find out if the console was scrolled up
+   bool scrolled = false;
+   GuiScrollCtrl *parent = dynamic_cast<GuiScrollCtrl*>(getParent());
 
-      if(parent)
-         scrolled = parent->isScrolledToBottom();
+   if(parent)
+      scrolled = parent->isScrolledToBottom();
 
-      //find the max cell width for the new entries
-      S32 newMax = getMaxWidth(prevSize, size - 1);
-      if(newMax > mCellSize.x)
-         mCellSize.set(newMax, mFont->getHeight());
+   //find the max cell width for the new entries
+   S32 newMax = getMaxWidth(prevSize, mFilteredLog.size() - 1);
+   if(newMax > mCellSize.x)
+      mCellSize.set(newMax, mFont->getHeight());
 
-      //set the array size
-      mSize.set(1, size);
+   //set the array size
+   mSize.set(1, mFilteredLog.size());
 
-      //resize the control
-      setExtent( Point2I(mCellSize.x, mCellSize.y * size));
+   //resize the control
+   setExtent(Point2I(mCellSize.x, mCellSize.y * mFilteredLog.size()));
 
-      //if the console was not scrolled, make the last entry visible
-      if (scrolled)
-         scrollCellVisible(Point2I(0,mSize.y - 1));
-   }
+   //if the console was not scrolled, make the last entry visible
+   if (scrolled)
+      scrollCellVisible(Point2I(0,mSize.y - 1));
 }
 
 //-----------------------------------------------------------------------------
@@ -139,10 +192,8 @@ void GuiConsole::onRenderCell(Point2I offset, Point2I cell, bool /*selected*/, b
 {
    U32 size;
    ConsoleLogEntry *log;
-
-   Con::getLockLog(log, size);
-
-   ConsoleLogEntry &entry = log[cell.y];
+   
+   ConsoleLogEntry &entry = mFilteredLog[cell.y];
    switch (entry.mLevel)
    {
       case ConsoleLogEntry::Normal:   GFX->getDrawUtil()->setBitmapModulation(mProfile->mFontColor); break;
@@ -151,8 +202,6 @@ void GuiConsole::onRenderCell(Point2I offset, Point2I cell, bool /*selected*/, b
       default: AssertFatal(false, "GuiConsole::onRenderCell - Unrecognized ConsoleLogEntry type, update this.");
    }
    GFX->getDrawUtil()->drawText(mFont, Point2I(offset.x + 3, offset.y), entry.mString, mProfile->mFontColors);
-   
-   Con::unlockLog();
 }
 
 //-----------------------------------------------------------------------------
@@ -164,10 +213,81 @@ void GuiConsole::onCellSelected( Point2I cell )
    U32 size;
    ConsoleLogEntry* log;
 
-   Con::getLockLog(log, size);
-
-   ConsoleLogEntry& entry = log[ cell.y ];
+   ConsoleLogEntry& entry = mFilteredLog[cell.y];
    onMessageSelected_callback( entry.mLevel, entry.mString );
+}
 
-   Con::unlockLog();
+void GuiConsole::setDisplayFilters(bool errors, bool warns, bool normal)
+{
+   mDisplayErrors = errors;
+   mDisplayWarnings = warns;
+   mDisplayNormalMessages = normal;
+   mFiltersDirty = true;
+
+   refreshLogText();
+
+   //find the max cell width for the new entries
+   S32 newMax = getMaxWidth(0, mFilteredLog.size() - 1);
+   mCellSize.set(newMax, mFont->getHeight());
+
+   //set the array size
+   mSize.set(1, mFilteredLog.size());
+
+   //resize the control
+   setExtent(Point2I(mCellSize.x, mCellSize.y * mFilteredLog.size()));
+
+   scrollCellVisible(Point2I(0, mSize.y - 1));
+
+   mFiltersDirty = false;
+}
+
+DefineEngineMethod(GuiConsole, setDisplayFilters, void, (bool errors, bool warns, bool normal), (true, true, true),
+   "Sets the current display filters for the console gui. Allows you to indicate if it should display errors, warns and/or normal messages.\n\n"
+   "@param errors If true, the console gui will display any error messages that were emitted.\n\n"
+   "@param warns If true, the console gui will display any warning messages that were emitted.\n\n"
+   "@param normal If true, the console gui will display any regular messages that were emitted.\n\n")
+{
+   object->setDisplayFilters(errors, warns, normal);
+}
+
+DefineEngineMethod(GuiConsole, getErrorFilter, bool, (), ,
+   "Returns if the error filter is on or not.")
+{
+   return object->getErrorFilter();
+}
+
+DefineEngineMethod(GuiConsole, getWarnFilter, bool, (), ,
+   "Returns if the warning filter is on or not.")
+{
+   return object->getWarnFilter();
+}
+
+DefineEngineMethod(GuiConsole, getNormalFilter, bool, (), ,
+   "Returns if the normal message filter is on or not.")
+{
+   return object->getNormalFilter();
+}
+
+DefineEngineMethod(GuiConsole, toggleErrorFilter, void, (), ,
+   "Toggles the error filter.")
+{
+   object->toggleErrorFilter();
+}
+
+DefineEngineMethod(GuiConsole, toggleWarnFilter, void, (), ,
+   "Toggles the warning filter.")
+{
+   object->toggleWarnFilter();
+}
+
+DefineEngineMethod(GuiConsole, toggleNormalFilter, void, (), ,
+   "Toggles the normal messages filter.")
+{
+   object->toggleNormalFilter();
+}
+
+DefineEngineMethod(GuiConsole, refresh, void, (), ,
+   "Refreshes the displayed messages.")
+{
+   object->refresh();
 }

@@ -6,5 +6,5 @@
     componentClass="Component"
     friendlyName="Item Rotation"
     componentType="Game"
-    scriptFile="core/components/game/itemRotate.cs"
-    description="Rotates the entity around an axis, like an item pickup." />
+    description="Rotates the entity around an axis, like an item pickup."
+    scriptFile="core/components/game/itemRotate.cs" />

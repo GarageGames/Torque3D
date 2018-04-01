@@ -151,6 +151,9 @@ bool GuiInspectorVariableGroup::inspectGroup()
       fieldGui->setInspectorField(NULL, mFields[i]->mFieldLabel);
       fieldGui->setDocs(mFields[i]->mFieldDescription);
 
+      if(mFields[i]->mSetCallbackName != StringTable->EmptyString())
+         fieldGui->setSpecialEditCallbackName(mFields[i]->mSetCallbackName);
+
       /*if (mFields[i]->mSetCallbackName != StringTable->EmptyString())
       {
          fieldGui->on.notify()

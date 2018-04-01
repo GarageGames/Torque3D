@@ -128,8 +128,8 @@
       const char *rmtCommandName = dStrchr(mArgv[1], ' ') + 1;
       if(conn->isConnectionToServer())
       {
-         dStrcpy(mBuf, "clientCmd");
-         dStrcat(mBuf, rmtCommandName);
+         dStrcpy(mBuf, "clientCmd", 1024);
+         dStrcat(mBuf, rmtCommandName, 1024);
 
          char *temp = mArgv[1];
          mArgv[1] = mBuf;
@@ -139,8 +139,8 @@
       }
       else
       {
-         dStrcpy(mBuf, "serverCmd");
-         dStrcat(mBuf, rmtCommandName);
+         dStrcpy(mBuf, "serverCmd", 1024);
+         dStrcat(mBuf, rmtCommandName, 1024);
          char *temp = mArgv[1];
 
          dSprintf(idBuf, sizeof(idBuf), "%d", conn->getId());
@@ -409,7 +409,7 @@ ConsoleFunction( buildTaggedString, const char*, 2, 11, "(string format, ...)"
             S32 strLength = dStrlen(argStr);
             if (strLength > strMaxLength)
                goto done;
-            dStrcpy(strBufPtr, argStr);
+            dStrcpy(strBufPtr, argStr, strMaxLength);
             strBufPtr += strLength;
             strMaxLength -= strLength;
             fmtStrPtr += 2;

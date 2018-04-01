@@ -171,10 +171,11 @@ void afxSpellButton::setBitmap(const char *name, bool placeholder)
 
     if (placeholder)
     {
-      dStrcpy(buffer, name);
+      dStrcpy(buffer, name, 1024);
+      S32 pLen = 1024 - dStrlen(buffer);
       p = buffer + dStrlen(buffer);
     
-      dStrcpy(p, "_i");
+      dStrcpy(p, "_i", pLen);
       mTextureInactive.set(buffer, COOLDOWN_PROFILE);
       mTextureNormal = mTextureInactive;
       mTextureHilight = mTextureInactive;
@@ -183,19 +184,20 @@ void afxSpellButton::setBitmap(const char *name, bool placeholder)
     }
     else
     {
-      dStrcpy(buffer, name);
+      dStrcpy(buffer, name, 1024);
+      S32 pLen = 1024 - dStrlen(buffer);
       p = buffer + dStrlen(buffer);   
-      dStrcpy(p, "_n");
+      dStrcpy(p, "_n", pLen);
       mTextureNormal.set(buffer, COOLDOWN_PROFILE);
-      dStrcpy(p, "_h");
+      dStrcpy(p, "_h", pLen);
       mTextureHilight.set(buffer, COOLDOWN_PROFILE);
       if (!mTextureHilight)
         mTextureHilight = mTextureNormal;
-      dStrcpy(p, "_d");
+      dStrcpy(p, "_d", pLen);
       mTextureDepressed.set(buffer, COOLDOWN_PROFILE);
       if (!mTextureDepressed)
         mTextureDepressed = mTextureHilight;
-      dStrcpy(p, "_i");
+      dStrcpy(p, "_i", pLen);
       mTextureInactive.set(buffer, COOLDOWN_PROFILE);
       if (!mTextureInactive)
         mTextureInactive = mTextureNormal;
@@ -343,13 +345,13 @@ afxRPGMagicSpellData* afxSpellButton::getSpellRPGDataBlock() const
 
 //~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~//~~~~~~~~~~~~~~~~~~~~~//
 
-DefineEngineMethod( afxSpellButton, onSpellbookChange, void, ( afxSpellBook* spellbook, unsigned int page ),,
+DefineEngineMethod( afxSpellButton, onSpellbookChange, void, ( afxSpellBook* spellbook, U32 page ),,
    "Notify an afxSpellButton when its associated spellbook has changed.\n" )
 {
   object->setSpellBook(spellbook, (U8)page);
 }
 
-DefineEngineMethod( afxSpellButton, onTurnPage, void, ( unsigned int page ),,
+DefineEngineMethod( afxSpellButton, onTurnPage, void, (U32 page ),,
    "Notify an afxSpellButton when the spellbook turns to a new page.\n" )
 {
   object->setPage((U8)page);

@@ -2501,6 +2501,19 @@ const char * GuiTreeViewCtrl::getItemValue(S32 itemId)
 
 //-----------------------------------------------------------------------------
 
+S32 GuiTreeViewCtrl::getItemAtPosition(Point2I position)
+{
+   BitSet32 hitFlags = 0;
+   Item* item;
+
+   if (_hitTest(position, item, hitFlags))
+      return item->mId;
+   else
+      return -1;
+}
+
+//-----------------------------------------------------------------------------
+
 bool GuiTreeViewCtrl::editItem( S32 itemId, const char* newText, const char* newValue )
 {
    Item* item = getItem( itemId );
@@ -4741,15 +4754,15 @@ StringTableEntry GuiTreeViewCtrl::getTextToRoot( S32 itemId, const char * delimi
    dMemset( bufferOne, 0, sizeof(bufferOne) );
    dMemset( bufferTwo, 0, sizeof(bufferTwo) );
 
-   dStrcpy( bufferOne, item->getText() );
+   dStrcpy( bufferOne, item->getText(), 1024 );
 
    Item *prevNode = item->mParent;
    while ( prevNode )
    {
       dMemset( bufferNodeText, 0, sizeof(bufferNodeText) );
-      dStrcpy( bufferNodeText, prevNode->getText() );
+      dStrcpy( bufferNodeText, prevNode->getText(), 128 );
       dSprintf( bufferTwo, 1024, "%s%s%s",bufferNodeText, delimiter, bufferOne );
-      dStrcpy( bufferOne, bufferTwo );
+      dStrcpy( bufferOne, bufferTwo, 1024 );
       dMemset( bufferTwo, 0, sizeof(bufferTwo) );
       prevNode = prevNode->mParent;
    }
@@ -5549,4 +5562,12 @@ DefineEngineMethod( GuiTreeViewCtrl, clearFilterText, void, (),,
    "@see getFilterText" )
 {
    object->clearFilterText();
+}
+
+DefineEngineMethod(GuiTreeViewCtrl, getItemAtPosition, S32, (Point2I position), (Point2I::Zero),
+   "Get the tree item at the passed in position.\n\n"
+   "@param position The position to check for what item is below it.\n"
+   "@return The id of the item under the position.")
+{
+   return object->getItemAtPosition(position);
 }

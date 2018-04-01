@@ -195,7 +195,7 @@ DefineEngineMethod( GuiDirectoryFileListCtrl, getSelectedFiles, const char*, (),
 
       dMemset( itemBuffer, 0, itemBufSize );
       dSprintf( itemBuffer, itemBufSize, " %s", itemText );
-      dStrcat( returnBuffer, itemBuffer );
+      dStrcat( returnBuffer, itemBuffer, itemBufSize );
    }
 
    return returnBuffer;

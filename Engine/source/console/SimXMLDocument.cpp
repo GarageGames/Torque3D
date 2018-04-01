@@ -833,7 +833,7 @@ void SimXMLDocument::setObjectAttributes(const char* objectID)
             continue;
 
          FrameTemp<char> valCopy( dStrlen( val ) + 1 );
-         dStrcpy( (char *)valCopy, val );
+         dStrcpy( (char *)valCopy, val, valCopy.size() );
 
          if (!pObject->writeField(itr->pFieldname, valCopy))
             continue;
@@ -873,7 +873,7 @@ void SimXMLDocument::setObjectAttributes(const char* objectID)
    //      continue;
 
    //   FrameTemp<char> valCopy( dStrlen( val ) + 1 );
-   //   dStrcpy( (char *)valCopy, val );
+   //   dStrcpy( (char *)valCopy, val, valCopy.size() );
 
    //   if (!pObject->writeField(itr->pFieldname, valCopy))
    //      continue;

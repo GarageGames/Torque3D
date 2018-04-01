@@ -495,7 +495,8 @@ public:
             table( NULL ),
             validator( NULL ),
             setDataFn( NULL ),
-            getDataFn( NULL )
+            getDataFn( NULL ),
+            networkMask(0)
       {
          doNotSubstitute = keepClearSubsOnly = false;
       }
@@ -515,9 +516,11 @@ public:
       TypeValidator *validator;     ///< Validator, if any.
       SetDataNotify  setDataFn;     ///< Set data notify Fn
       GetDataNotify  getDataFn;     ///< Get data notify Fn
+	    WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
       bool           doNotSubstitute;
       bool           keepClearSubsOnly;
-      WriteDataNotify writeDataFn;  ///< Function to determine whether data should be written or not.
+
+      U32            networkMask;
    };
    typedef Vector<Field> FieldList;
 
@@ -1262,10 +1265,6 @@ inline bool& ConsoleObject::getDynamicGroupExpand()
       };                                                                                                 \
       EnginePropertyTable _propTable( sizeof( _props ) / sizeof( _props[ 0 ] ) - 1, _props );            \
    } }
-
-/// Add an auto-doc for a class.
-#define ConsoleDocClass( className, docString ) \
-   CLASSDOC( className, docString )
 
 /// @}
 

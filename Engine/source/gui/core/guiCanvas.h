@@ -198,6 +198,7 @@ protected:
 	static CanvasSizeChangeSignal smCanvasSizeChangeSignal;
 
    GuiControl *mMenuBarCtrl;
+   GuiControl* mMenuBackground;
 
 public:
    DECLARE_CONOBJECT(GuiCanvas);
@@ -210,6 +211,7 @@ public:
    virtual void onRemove();
 
    void setMenuBar(SimObject *obj);
+   SimObject* getMenuBar() { return mMenuBarCtrl; }
 
    static void initPersistFields();
 

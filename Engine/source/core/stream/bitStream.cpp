@@ -668,13 +668,13 @@ void BitStream::readString(char buf[256])
       {
          S32 offset = readInt(8);
          HuffmanProcessor::g_huffProcessor.readHuffBuffer(this, stringBuffer + offset);
-         dStrcpy(buf, stringBuffer);
+         dStrcpy(buf, stringBuffer, 256);
          return;
       }
    }
    HuffmanProcessor::g_huffProcessor.readHuffBuffer(this, buf);
    if(stringBuffer)
-      dStrcpy(stringBuffer, buf);
+      dStrcpy(stringBuffer, buf, 256);
 }
 
 void BitStream::writeString(const char *string, S32 maxLen)

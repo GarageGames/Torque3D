@@ -950,7 +950,7 @@ void PersistenceManager::updateToken( const U32 lineNumber, const U32 linePositi
    char* postString = ( char* ) dMalloc( postStringLen + 1 );
    if( needQuotes )
       postString[ 0 ] = '"';
-   dStrcpy( &postString[ needQuotes ? 1 : 0 ], postStringSrc );
+   dStrcpy( &postString[ needQuotes ? 1 : 0 ], postStringSrc, postStringLen + (needQuotes ? 0 : 1) );
    postString[ postStringLen ] = 0;
 
    // Calculate the length of our new line
@@ -967,10 +967,10 @@ void PersistenceManager::updateToken( const U32 lineNumber, const U32 linePositi
 
    // Build the new line with the
    // preString + newValue + postString
-   dStrcat(newLine, preString);
+   dStrcat(newLine, preString, newLineLen + 1);
    if ( newValue )
-      dStrcat(newLine, newValue);
-   dStrcat(newLine, postString);
+      dStrcat(newLine, newValue, newLineLen + 1);
+   dStrcat(newLine, postString, newLineLen + 1);
 
    // Clear our existing line
    if (mLineBuffer[lineNumber])
@@ -1243,7 +1243,7 @@ PersistenceManager::ParsedObject* PersistenceManager::writeNewObject(SimObject* 
    char* indent = getObjectIndent(parentObject);
 
    if (parentObject)
-      dStrcat(indent, "   \0");
+      dStrcat(indent, "   \0", 2048);
 
    // Write out the beginning of the object declaration
    const char* dclToken = "new";

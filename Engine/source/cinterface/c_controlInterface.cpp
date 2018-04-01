@@ -234,6 +234,6 @@ extern "C" {
    {
       dsize_t pathLen = dStrlen(directory) + 1;
       gExecutablePath = new char[pathLen];
-      dStrcpy(gExecutablePath, directory);
+      dStrcpy(gExecutablePath, directory, pathLen);
    }
 }

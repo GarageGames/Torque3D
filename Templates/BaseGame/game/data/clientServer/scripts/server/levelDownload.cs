@@ -131,6 +131,22 @@ function serverCmdMissionStartPhase3Ack(%client, %seq)
    %client.currentPhase = 3;
    
    // Server is ready to drop into the game
+   %entityIds = parseMissionGroupForIds("Entity", "");
+   %entityCount = getWordCount(%entityIds);
+   
+   for(%i=0; %i < %entityCount; %i++)
+   {
+      %entity = getWord(%entityIds, %i);
+      
+      for(%e=0; %e < %entity.getCount(); %e++)
+      {
+         %child = %entity.getObject(%e);
+         if(%child.getCLassName() $= "Entity")
+            %entityIds = %entityIds SPC %child.getID();  
+      }
+      
+      %entity.notify("onClientConnect", %client);
+   }
    
    //Have any special game-play handling here
    if(theLevelInfo.isMethod("onClientEnterGame"))
@@ -151,7 +167,7 @@ function serverCmdMissionStartPhase3Ack(%client, %seq)
             };  
          }
          
-         if (isDefined("$Game::DefaultCameraClass"))
+         //if (isDefined("$Game::DefaultCameraClass"))
             %client.camera = spawnObject("Camera", Observer);
       }
 

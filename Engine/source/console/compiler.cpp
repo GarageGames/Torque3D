@@ -164,7 +164,7 @@ U32 CompilerStringTable::add(const char *str, bool caseSens, bool tag)
    newStr->string = (char *)consoleAlloc(len);
    newStr->len = len;
    newStr->tag = tag;
-   dStrcpy(newStr->string, str);
+   dStrcpy(newStr->string, str, len);
 
    // Put into the hash table.
    hashTable[str] = newStr;
@@ -195,7 +195,7 @@ char *CompilerStringTable::build()
    char *ret = new char[totalLen];
    dMemset(ret, 0, totalLen);
    for (Entry *walk = list; walk; walk = walk->next)
-      dStrcpy(ret + walk->start, walk->string);
+      dStrcpy(ret + walk->start, walk->string, totalLen - walk->start);
    return ret;
 }
 
