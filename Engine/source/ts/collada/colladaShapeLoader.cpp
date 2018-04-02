@@ -239,14 +239,14 @@ void ColladaShapeLoader::enumerateScene()
    for (S32 iClipLib = 0; iClipLib < root->getLibrary_animation_clips_array().getCount(); iClipLib++) {
       const domLibrary_animation_clips* libraryClips = root->getLibrary_animation_clips_array()[iClipLib];
       for (S32 iClip = 0; iClip < libraryClips->getAnimation_clip_array().getCount(); iClip++)
-         mAppSequences.push_back(new ColladaAppSequence(libraryClips->getAnimation_clip_array()[iClip]));
+         appSequences.push_back(new ColladaAppSequence(libraryClips->getAnimation_clip_array()[iClip]));
    }
 
    // Process all animations => this attaches animation channels to the targeted
    // Collada elements, and determines the length of the sequence if it is not
    // already specified in the Collada <animation_clip> element
-   for (S32 iSeq = 0; iSeq < mAppSequences.size(); iSeq++) {
-      ColladaAppSequence* appSeq = dynamic_cast<ColladaAppSequence*>(mAppSequences[iSeq]);
+   for (S32 iSeq = 0; iSeq < appSequences.size(); iSeq++) {
+      ColladaAppSequence* appSeq = dynamic_cast<ColladaAppSequence*>(appSequences[iSeq]);
       F32 maxEndTime = 0;
       F32 minFrameTime = 1000.0f;
       for (S32 iAnim = 0; iAnim < appSeq->getClip()->getInstance_animation_array().getCount(); iAnim++) {
@@ -317,7 +317,7 @@ void ColladaShapeLoader::enumerateScene()
    }
 
    // Make sure that the scene has a bounds node (for getting the root scene transform)
-   if (!mBoundsNode)
+   if (!boundsNode)
    {
       domVisual_scene* visualScene = root->getLibrary_visual_scenes_array()[0]->getVisual_scene_array()[0];
       domNode* dombounds = daeSafeCast<domNode>( visualScene->createAndPlace( "node" ) );
@@ -354,7 +354,7 @@ void ColladaShapeLoader::computeBounds(Box3F& bounds)
         ColladaUtils::getOptions().adjustFloor) )
    {
       // Compute shape offset
-	   Point3F shapeOffset = Point3F::Zero;
+      Point3F shapeOffset = Point3F::Zero;
       if ( ColladaUtils::getOptions().adjustCenter )
       {
          bounds.getCenter( &shapeOffset );
@@ -368,24 +368,24 @@ void ColladaShapeLoader::computeBounds(Box3F& bounds)
       bounds.maxExtents += shapeOffset;
 
       // Now adjust all positions for root level nodes (nodes with no parent)
-      for (S32 iNode = 0; iNode < mShape->nodes.size(); iNode++)
+      for (S32 iNode = 0; iNode < shape->nodes.size(); iNode++)
       {
-         if ( !mAppNodes[iNode]->isParentRoot() )
+         if ( !appNodes[iNode]->isParentRoot() )
             continue;
 
          // Adjust default translation
-         mShape->defaultTranslations[iNode] += shapeOffset;
+         shape->defaultTranslations[iNode] += shapeOffset;
 
          // Adjust animated translations
-         for (S32 iSeq = 0; iSeq < mShape->sequences.size(); iSeq++)
+         for (S32 iSeq = 0; iSeq < shape->sequences.size(); iSeq++)
          {
-            const TSShape::Sequence& seq = mShape->sequences[iSeq];
+            const TSShape::Sequence& seq = shape->sequences[iSeq];
             if ( seq.translationMatters.test(iNode) )
             {
                for (S32 iFrame = 0; iFrame < seq.numKeyframes; iFrame++)
                {
                   S32 index = seq.baseTranslation + seq.translationMatters.count(iNode)*seq.numKeyframes + iFrame;
-				  mShape->nodeTranslations[index] += shapeOffset;
+                  shape->nodeTranslations[index] += shapeOffset;
                }
             }
          }

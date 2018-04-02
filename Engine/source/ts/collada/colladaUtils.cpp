@@ -266,10 +266,10 @@ void AnimData::parseTargetString(const char* target, S32 fullCount, const char* 
          targetValueCount = 1;
       }
    }
-   else if (const char* p2 = dStrrchr(target, '.')) {
+   else if (const char* p = dStrrchr(target, '.')) {
       // Check for named elements
       for (S32 iElem = 0; elements[iElem][0] != 0; iElem++) {
-         if (!dStrcmp(p2, elements[iElem])) {
+         if (!dStrcmp(p, elements[iElem])) {
             targetValueOffset = iElem;
             targetValueCount = 1;
             break;
