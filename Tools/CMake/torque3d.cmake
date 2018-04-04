@@ -337,6 +337,14 @@ addPathRec("${srcDir}/ts/collada")
 addPathRec("${srcDir}/ts/loader")
 addPathRec("${projectSrcDir}")
 
+# Load module-based files
+if(EXISTS ${TORQUE_APP_DIR}/game/data)
+    message("Reading modules in ${TORQUE_APP_DIR}/game/data path...")
+
+    addInclude("${TORQUE_APP_DIR}/game/data")
+    addPathRec("${TORQUE_APP_DIR}/game/data")
+endif()
+
 ###############################################################################
 # modular paths
 ###############################################################################

@@ -1,0 +1,9 @@
+<ModuleDefinition
+	ModuleId="GOAPAI"
+	VersionId="1"
+	Description="Module that implements Goal-Oriented Action Planning AI."
+	ScriptFile="GOAPAI.cs"
+	CreateFunction="create"
+	DestroyFunction="destroy"
+	Group="Game">
+</ModuleDefinition>
