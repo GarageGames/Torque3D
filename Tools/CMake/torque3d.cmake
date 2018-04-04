@@ -477,7 +477,7 @@ if(TORQUE_SDL)
       set(SDL_SHARED ON CACHE BOOL "Build a shared version of the library" FORCE)
       set(SDL_STATIC OFF CACHE BOOL "Build a static version of the library" FORCE)
     endif()
-    add_subdirectory( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
+    add_subdirectory( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2 EXCLUDE_FROM_ALL)
     link_directories( ${libDir}/sdl ${CMAKE_CURRENT_BINARY_DIR}/sdl2)
 endif()
 
