@@ -92,6 +92,23 @@ function AssetBrowser::buildPopupMenus(%this)
          item[ 12 ] = "Create Particle Effect" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"ParticleEffectAsset\", AssetBrowser.selectedModule);";//"AssetBrowser.createNewParticleEffectAsset(\"NewParticleEffect\", AssetBrowser.selectedModule);";
       };
    }
+   
+   if( !isObject( AddNewCppAssetPopup ) )
+   {
+      %this.AddNewCppAssetPopup = new PopupMenu( AddNewCppAssetPopup )
+      {
+         superClass = "MenuBuilder";
+         class = "EditorWorldMenu";
+         //isPopup = true;
+
+         item[ 0 ] = "Create Static Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppStaticClassAsset\", AssetBrowser.selectedModule);";
+         item[ 1 ] = "Create Regular Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppRegularClassAsset\", AssetBrowser.selectedModule);";
+         item[ 2 ] = "Create GameObject Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppGameObjectAsset\", AssetBrowser.selectedModule);";
+         item[ 3 ] = "Create Component Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppComponentAsset\", AssetBrowser.selectedModule);";
+         item[ 4 ] = "Create Script Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppScriptClass\", AssetBrowser.selectedModule);";
+      };
+      //%this.AddNewScriptAssetPopup.insertSubMenu(0, "Create Component", AddNewComponentAssetPopup);
+   }
       
    if( !isObject( AddNewAssetPopup ) )
    {
@@ -105,6 +122,9 @@ function AssetBrowser::buildPopupMenus(%this)
          item[2] = "Create Art Asset" TAB AddNewArtAssetPopup;
          item[3] = "-";
          item[4] = "Create Level" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"LevelAsset\", AssetBrowser.selectedModule);";//"AssetBrowser.createNewLevelAsset(\"NewLevel\", AssetBrowser.selectedModule);";
+         item[5] = "-";
+         item[6] = "Create C++ Asset" TAB AddNewCppAssetPopup;
+      
       };
    }
    
