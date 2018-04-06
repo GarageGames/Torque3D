@@ -105,7 +105,10 @@ function AssetBrowser::buildPopupMenus(%this)
          item[ 1 ] = "Create Regular Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppRegularClassAsset\", AssetBrowser.selectedModule);";
          item[ 2 ] = "Create GameObject Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppGameObjectAsset\", AssetBrowser.selectedModule);";
          item[ 3 ] = "Create Component Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppComponentAsset\", AssetBrowser.selectedModule);";
-         item[ 4 ] = "Create Script Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppScriptClass\", AssetBrowser.selectedModule);";
+         item[ 4 ] = "Create Script Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppScriptAsset\", AssetBrowser.selectedModule);";
+         item[ 5 ] = "Create Datablock Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppDatanblockAsset\", AssetBrowser.selectedModule);";
+         item[ 6 ] = "Create Editor Tool Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppEditorToolAsset\", AssetBrowser.selectedModule);";
+         item[ 7 ] = "Create Gui Class" TAB "" TAB "AssetBrowser.setupCreateNewAsset(\"CppGuiControlAsset\", AssetBrowser.selectedModule);";
       };
       //%this.AddNewScriptAssetPopup.insertSubMenu(0, "Create Component", AddNewComponentAssetPopup);
    }

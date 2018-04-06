@@ -640,6 +640,41 @@ function createNewCppAsset()
 	   %cppTemplateCodeFilePath = %templateFilesPath @ "CppStaticClassFile.cpp";
 	   %cppTemplateHeaderFilePath = %templateFilesPath @ "CppStaticClassFile.h";
 	}
+	else if(%assetType $= "CppRegularClassAsset")
+	{
+	   %cppTemplateCodeFilePath = %templateFilesPath @ "CppRegularClassFile.cpp";
+	   %cppTemplateHeaderFilePath = %templateFilesPath @ "CppRegularClassFile.h";
+	}
+	else if(%assetType $= "CppGameObjectAsset")
+	{
+	   %cppTemplateCodeFilePath = %templateFilesPath @ "CppGameObjectFile.cpp";
+	   %cppTemplateHeaderFilePath = %templateFilesPath @ "CppGameObjectFile.h";
+	}
+	else if(%assetType $= "CppComponentAsset")
+	{
+	   %cppTemplateCodeFilePath = %templateFilesPath @ "CppComponentFile.cpp";
+	   %cppTemplateHeaderFilePath = %templateFilesPath @ "CppComponentFile.h";
+	}
+	else if(%assetType $= "CppScriptObjectAsset")
+	{
+	   %cppTemplateCodeFilePath = %templateFilesPath @ "CppScriptObjectFile.cpp";
+	   %cppTemplateHeaderFilePath = %templateFilesPath @ "CppScriptObjectFile.h";
+	}
+	else if(%assetType $= "CppDatablockAsset")
+	{
+	   %cppTemplateCodeFilePath = %templateFilesPath @ "CppDatablockFile.cpp";
+	   %cppTemplateHeaderFilePath = %templateFilesPath @ "CppDatablockFile.h";
+	}
+	else if(%assetType $= "CppEditorToolAsset")
+	{
+	   %cppTemplateCodeFilePath = %templateFilesPath @ "CppEditorToolFile.cpp";
+	   %cppTemplateHeaderFilePath = %templateFilesPath @ "CppEditorToolFile.h";
+	}
+	else if(%assetType $= "CppGuiControlAsset")
+	{
+	   %cppTemplateCodeFilePath = %templateFilesPath @ "CppGuiControlFile.cpp";
+	   %cppTemplateHeaderFilePath = %templateFilesPath @ "CppGuiControlFile.h";
+	}
    
    if(%file.openForWrite(%codePath) && %templateFile.openForRead(%cppTemplateCodeFilePath))
    {
