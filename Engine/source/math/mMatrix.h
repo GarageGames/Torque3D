@@ -41,7 +41,7 @@
 
 class MatrixF
 {
-private:
+public:
    F32 m[16];     ///< Note: Torque uses row-major matrices
 
 public:

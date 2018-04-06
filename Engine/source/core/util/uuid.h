@@ -36,8 +36,6 @@ namespace Torque
       public:
       
          typedef void Parent;
-         
-      protected:
 
          U32   a;
          U16   b;
@@ -45,6 +43,8 @@ namespace Torque
          U8    d;
          U8    e;
          U8    f[ 6 ];
+
+      protected:
          
          static UUID smNull;
          

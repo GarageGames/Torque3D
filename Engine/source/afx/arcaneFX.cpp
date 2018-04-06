@@ -754,6 +754,8 @@ DefineEngineMethod(NetConnection, ResolveGhost, S32, (int ghostIndex),,
 
 IMPLEMENT_STRUCT( ByteRange, ByteRange,,
    "" )
+   FIELD(low, low, 1, "")
+   FIELD(high, high, 1, "")
 END_IMPLEMENT_STRUCT;
 
 ConsoleType( ByteRange, TypeByteRange, ByteRange, "")

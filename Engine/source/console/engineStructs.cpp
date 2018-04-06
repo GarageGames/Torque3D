@@ -30,24 +30,40 @@
 IMPLEMENT_STRUCT( Vector< bool >,
    BoolVector,,
    "" )
+   FIELD(mElementCount, elementCount, 1, "")
+   FIELD(mArraySize, arraySize, 1, "")
+   FIELD(mArray, elements, 1, "")
 END_IMPLEMENT_STRUCT;
 
 
 IMPLEMENT_STRUCT( Vector< S32 >,
    IntVector,,
    "" )
+   FIELD(mElementCount, elementCount, 1, "")
+   FIELD(mArraySize, arraySize, 1, "")
+   FIELD(mArray, elements, 1, "")
 END_IMPLEMENT_STRUCT;
 
 
 IMPLEMENT_STRUCT( Vector< F32 >,
    FloatVector,,
    "" )
+   FIELD(mElementCount, elementCount, 1, "")
+   FIELD(mArraySize, arraySize, 1, "")
+   FIELD(mArray, elements, 1, "")
 END_IMPLEMENT_STRUCT;
 
 
 IMPLEMENT_STRUCT( Torque::UUID,
    UUID,,
    "" )
+   FIELD(a, a, 1, "")
+   FIELD(b, b, 1, "")
+   FIELD(c, c, 1, "")
+   FIELD(d, d, 1, "")
+   FIELD(e, e, 1, "")
+   FIELD(f, f, 6, "")
+   
 END_IMPLEMENT_STRUCT;
 
 

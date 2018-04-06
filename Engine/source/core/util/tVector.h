@@ -63,11 +63,12 @@ extern bool VectorResize(U32 *aSize, U32 *aCount, void **arrayPtr, U32 newCount,
 template<class T>
 class Vector
 {
-  protected:
+public:
    U32 mElementCount; ///< Number of elements currently in the Vector.
    U32 mArraySize;    ///< Number of elements allocated for the Vector.
    T*  mArray;        ///< Pointer to the Vector elements.
 
+protected:
 #ifdef TORQUE_DEBUG_GUARD
    const char* mFileAssociation;
    U32         mLineAssociation;
