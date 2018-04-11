@@ -400,11 +400,11 @@ ConsoleValueRef CodeInterpreter::exec(U32 ip,
    breakContinueLabel:
       OPCodeReturn ret = (this->*gOpCodeArray[mCurrentInstruction])(ip);
       if (ret == OPCodeReturn::exitCode)
-         goto exitLabel;
+         break;
       else if (ret == OPCodeReturn::breakContinue)
          goto breakContinueLabel;
    }
-exitLabel:
+
    if (telDebuggerOn && setFrame < 0)
       TelDebugger->popStackFrame();
 
@@ -2133,7 +2133,7 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
       if (!mExec.noCalls && !(routingId == MethodOnComponent))
       {
          Con::warnf(ConsoleLogEntry::General, "%s: Unknown command %s.", mCodeBlock->getFileLine(ip - 6), fnName);
-         if (callType == FuncCallExprNode::MethodCall)
+         if (callType == FuncCallExprNode::MethodCall && gEvalState.thisObject != NULL)
          {
             Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s",
                gEvalState.thisObject->getName() ? gEvalState.thisObject->getName() : "",
@@ -2522,9 +2522,17 @@ OPCodeReturn CodeInterpreter::op_callfunc_this(U32 &ip)
       if (!mExec.noCalls)
       {
          Con::warnf(ConsoleLogEntry::General, "%s: Unknown command %s.", mCodeBlock->getFileLine(ip - 6), fnName);
-         Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s",
-            mThisObject->getName() ? mThisObject->getName() : "",
-            mThisObject->getId(), Con::getNamespaceList(ns));
+         if (mThisObject)
+         {
+            Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s",
+               mThisObject->getName() ? mThisObject->getName() : "",
+               mThisObject->getId(), Con::getNamespaceList(ns));
+         }
+         else
+         {
+            // At least let the scripter know that they access the object.
+            Con::warnf(ConsoleLogEntry::General, "  Object is NULL.");
+         }
       }
       STR.popFrame();
       CSTK.popFrame();
