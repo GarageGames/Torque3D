@@ -2511,7 +2511,7 @@ OPCodeReturn CodeInterpreter::op_callfunc_this(U32 &ip)
    ip += 2;
    CSTK.getArgcArgv(fnName, &mCallArgc, &mCallArgv);
 
-   Namespace *ns = mThisObject->getNamespace();
+   Namespace *ns = mThisObject ? mThisObject->getNamespace() : NULL;
    if (ns)
       mNSEntry = ns->lookup(fnName);
    else
