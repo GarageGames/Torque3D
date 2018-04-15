@@ -53,37 +53,31 @@ namespace
       if (mod & KMOD_LSHIFT)
       {
          ret |= SI_LSHIFT;
-         ret |= SI_SHIFT;
       }
 
       if (mod & KMOD_RSHIFT)
       {
          ret |= SI_RSHIFT;
-         ret |= SI_SHIFT;
       }
 
       if (mod & KMOD_LCTRL)
       {
          ret |= SI_LCTRL;
-         ret |= SI_CTRL;
       }
 
       if (mod & KMOD_RCTRL)
       {
          ret |= SI_RCTRL;
-         ret |= SI_CTRL;
       }
 
       if (mod & KMOD_LALT)
       {
          ret |= SI_LALT;
-         ret |= SI_ALT;
       }
 
       if (mod & KMOD_RALT)
       {
          ret |= SI_RALT;
-         ret |= SI_ALT;
       }
 
       return ret;
