@@ -103,7 +103,7 @@ ProcessedMaterial::ProcessedMaterial()
 
 ProcessedMaterial::~ProcessedMaterial()
 {
-   for_each( mPasses.begin(), mPasses.end(), delete_pointer() );
+	T3D::for_each( mPasses.begin(), mPasses.end(), T3D::delete_pointer() );
 }
 
 void ProcessedMaterial::_setBlendState(Material::BlendOp blendOp, GFXStateBlockDesc& desc )

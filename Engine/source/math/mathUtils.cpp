@@ -1706,7 +1706,7 @@ bool clipFrustumByPolygon( const Point3F* points, U32 numPoints, const RectI& vi
       // Make the output of the last iteration the
       // input of this iteration.
 
-      swap( tempPolygon, clippedPolygon );
+	  T3D::swap( tempPolygon, clippedPolygon );
       numTempPolygonVertices = numClippedPolygonVertices;
 
       // Clip our current remainder of the original polygon

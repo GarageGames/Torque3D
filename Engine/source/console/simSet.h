@@ -154,9 +154,9 @@ class SimSet : public SimObject, public TamlChildren
       value operator[] (S32 index) { return objectList[U32(index)]; }
 
       inline iterator find( iterator first, iterator last, SimObject *obj)
-      { return ::find(first, last, obj); }
+      { return T3D::find(first, last, obj); }
       inline iterator find(SimObject *obj) 
-      { return ::find(begin(), end(), obj); }
+      { return T3D::find(begin(), end(), obj); }
 
       /// Reorder the position of "obj" to either be the last object in the list or, if
       /// "target" is given, to come before "target" in the list of children.

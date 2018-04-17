@@ -330,7 +330,7 @@ void ClippedPolyList::cullUnusedVerts()
    for ( vIter = mVertexList.begin(); vIter != mVertexList.end(); vIter++, i++ )
    {
       // Is this vertex used?
-      iNextIter = find( mIndexList.begin(), mIndexList.end(), i );
+      iNextIter = T3D::find( mIndexList.begin(), mIndexList.end(), i );
       if ( iNextIter != mIndexList.end() )
          continue;
 
@@ -346,7 +346,7 @@ void ClippedPolyList::cullUnusedVerts()
 
       for ( nextVIter = vIter + 1; nextVIter != mVertexList.end(); nextVIter++, n++ )
       {
-         iNextIter = find( mIndexList.begin(), mIndexList.end(), n );
+         iNextIter = T3D::find( mIndexList.begin(), mIndexList.end(), n );
          
          // If we found a used vertex
          // grab its index for later use

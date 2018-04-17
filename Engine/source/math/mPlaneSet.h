@@ -441,7 +441,7 @@ U32 PlaneSet< T >::clipPolygon( const Point3F* inVertices, U32 inNumVertices, Po
       // Make the output of the last iteration the
       // input of this iteration.
 
-      swap( tempPolygon, clippedPolygon );
+	  T3D::swap( tempPolygon, clippedPolygon );
       numTempPolygonVertices = numClippedPolygonVertices;
 
       if( maxOutVertices < numTempPolygonVertices + 1 )
