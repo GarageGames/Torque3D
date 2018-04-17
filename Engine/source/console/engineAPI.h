@@ -889,6 +889,17 @@ public:
    static inline returnType _fn ## name ## impl args;                                                                            \
    _DefineFunctionTrampoline(name, returnType, args)                                                                          \
    static _EngineFunctionDefaultArguments< void args > _fn ## name ## DefaultArgs defaultArgs;                                   \
+   static EngineFunctionInfo _fn ## name ## FunctionInfo(                                                                        \
+      #name,                                                                                                                     \
+      &_SCOPE<>()(),                                                                                                             \
+      usage,                                                                                                                     \
+      #returnType " " #name #args,                                                                                               \
+      "fn" #name,                                                                                                                \
+      TYPE< returnType args >(),                                                                                                 \
+      &_fn ## name ## DefaultArgs,                                                                                               \
+      ( void* ) &fn ## name,                                                                                                     \
+      0                                                                                                                          \
+   );                                                                                                                            \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## name ## caster( SimObject*, S32 argc, ConsoleValueRef *argv )       \
    {                                                                                                                             \
       return _EngineConsoleThunkType< returnType >::ReturnType( _EngineConsoleThunk< 1, returnType args >::thunk(                \
@@ -909,6 +920,17 @@ public:
    _DefineMethodTrampoline( className, name, returnType, args );                                                                                \
    static _EngineFunctionDefaultArguments< _EngineMethodTrampoline< _ ## className ## _ ## name ## frame, void args >::FunctionType >                \
       _fn ## className ## _ ## name ## DefaultArgs defaultArgs;                                                                                      \
+   static EngineFunctionInfo _fn ## className ## _ ## name ## FunctionInfo(                                                                          \
+      #name,                                                                                                                                    \
+      &_SCOPE< className >()(),                                                                                                                 \
+      usage,                                                                                                                                    \
+      "virtual " #returnType " " #name #args,                                                                                                   \
+      "fn" #className "_" #name,                                                                                                                \
+      TYPE< _EngineMethodTrampoline< _ ## className ## _ ## name ## frame, returnType args >::FunctionType >(),                                      \
+      &_fn ## className ## _ ## name ## DefaultArgs,                                                                                                 \
+      ( void* ) &fn ## className ## _ ## name,                                                                                                  \
+      0                                                                                                                                         \
+   );                                                                                                                                           \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## className ## _ ## name ## caster( SimObject* object, S32 argc, ConsoleValueRef *argv )  \
    {                                                                                                                                            \
       _ ## className ## _ ## name ## frame frame;                                                                                                    \
@@ -930,7 +952,19 @@ public:
 
 #define DefineConsoleStaticMethod( className, name, returnType, args, defaultArgs, usage )                                             \
    static inline returnType _fn ## className ## _ ## name ## impl args;                                                                \
-   static _EngineFunctionDefaultArguments< void args > _fn ## className ## _ ## name ## DefaultArgs defaultArgs;                            \
+   _DefineFunctionTrampoline(className ## _ ## name, returnType, args)                                                                 \
+   static _EngineFunctionDefaultArguments< void args > _fn ## className ## _ ## name ## DefaultArgs defaultArgs;                       \
+   static EngineFunctionInfo _fn ## name ## FunctionInfo(                                                                              \
+      #name,                                                                                                                           \
+      &_SCOPE< className >()(),                                                                                                        \
+      usage,                                                                                                                           \
+      #returnType " " #name #args,                                                                                                     \
+      "fn" #className "_" #name,                                                                                                       \
+      TYPE< returnType args >(),                                                                                                       \
+      &_fn ## className ## _ ## name ## DefaultArgs,                                                                                   \
+      ( void* ) &fn ## className ## _ ## name,                                                                                         \
+      0                                                                                                                                \
+   );                                                                                                                                  \
    static _EngineConsoleThunkType< returnType >::ReturnType _ ## className ## _ ## name ## caster( SimObject*, S32 argc, ConsoleValueRef *argv )\
    {                                                                                                                                   \
       return _EngineConsoleThunkType< returnType >::ReturnType( _EngineConsoleThunk< 1, returnType args >::thunk(                      \
