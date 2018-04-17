@@ -20,63 +20,16 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_consoleInterface.h"
+#ifndef C_SIMINTERFACE_H
+#define C_SIMINTERFACE_H
+#include "platform/platformDlibrary.h"
 #include "console/consoleInternal.h"
-#include "console/simSet.h"
 
 extern "C" {
-
-   // Con C interface
-   void Con_AddConsumer(ConsumerCallback cb)
-   {
-      Con::addConsumer(cb);
-   }
-
-   void Con_RemoveConsumer(ConsumerCallback cb)
-   {
-      Con::removeConsumer(cb);
-   }
-
-   // StringTable->insert?
-
-   const char* Con_getConsoleString(const char* name)
-   {
-      return Con::getVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleString(const char* name, const char* value)
-   {
-      Con::setVariable(StringTable->insert(name), StringTable->insert(value));
-   }
-
-   S32 Con_getConsoleInt(const char* name)
-   {
-      return Con::getIntVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleInt(const char* name, S32 value)
-   {
-      Con::setIntVariable(StringTable->insert(name), value);
-   }
-
-   F32 Con_getConsoleFloat(const char* name)
-   {
-      return Con::getFloatVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleFloat(const char* name, F32 value)
-   {
-      Con::setFloatVariable(StringTable->insert(name), value);
-   }
-
-   bool Con_getConsoleBool(const char* name)
-   {
-      return Con::getBoolVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleBool(const char* name, bool value)
-   {
-      Con::setBoolVariable(StringTable->insert(name), value);
-   }
-
+   SimObject* Sim_FindObjectById(U32 pId);
+   SimObject* Sim_FindObjectByName(const char* pName);
+   SimObject* Sim_FindDataBlockByName(const char* pName);
+   SimObjectPtr<SimObject>* Sim_WrapObject(SimObject* pObject);
+   void Sim_DeleteObjectPtr(SimObjectPtr<SimObject>* pObjectPtr);
 }
+#endif // C_SIMINTERFACE_H

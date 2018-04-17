@@ -20,63 +20,22 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_consoleInterface.h"
+#ifndef C_CONSOLEINTERFACE_H
+#define C_CONSOLEINTERFACE_H
+#include "platform/platformDlibrary.h"
 #include "console/consoleInternal.h"
-#include "console/simSet.h"
 
 extern "C" {
+   void Con_AddConsumer(ConsumerCallback cb);
+   void Con_RemoveConsumer(ConsumerCallback cb);
 
-   // Con C interface
-   void Con_AddConsumer(ConsumerCallback cb)
-   {
-      Con::addConsumer(cb);
-   }
-
-   void Con_RemoveConsumer(ConsumerCallback cb)
-   {
-      Con::removeConsumer(cb);
-   }
-
-   // StringTable->insert?
-
-   const char* Con_getConsoleString(const char* name)
-   {
-      return Con::getVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleString(const char* name, const char* value)
-   {
-      Con::setVariable(StringTable->insert(name), StringTable->insert(value));
-   }
-
-   S32 Con_getConsoleInt(const char* name)
-   {
-      return Con::getIntVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleInt(const char* name, S32 value)
-   {
-      Con::setIntVariable(StringTable->insert(name), value);
-   }
-
-   F32 Con_getConsoleFloat(const char* name)
-   {
-      return Con::getFloatVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleFloat(const char* name, F32 value)
-   {
-      Con::setFloatVariable(StringTable->insert(name), value);
-   }
-
-   bool Con_getConsoleBool(const char* name)
-   {
-      return Con::getBoolVariable(StringTable->insert(name));
-   }
-
-   void Con_setConsoleBool(const char* name, bool value)
-   {
-      Con::setBoolVariable(StringTable->insert(name), value);
-   }
-
+   const char* Con_getConsoleString(const char* name);
+   void Con_setConsoleString(const char* name, const char* value);
+   S32 Con_getConsoleInt(const char* name);
+   void Con_setConsoleInt(const char* name, S32 value);
+   F32 Con_getConsoleFloat(const char* name);
+   void Con_setConsoleFloat(const char* name, F32 value);
+   bool Con_getConsoleBool(const char* name);
+   void Con_setConsoleBool(const char* name, bool value);
 }
+#endif // C_CONSOLEINTERFACE_H
