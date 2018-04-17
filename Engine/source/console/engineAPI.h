@@ -855,60 +855,6 @@ public:
       );                                                                                                                               \
    static inline returnType _fn ## className ## name ## impl args
 
-
-// Convenience macros to allow defining functions that use the new marshalling features
-// while being only visible in the console interop.  When we drop the console system,
-// these macros can be removed and all definitions that make use of them can be removed
-// as well.
-
-#define DefineEngineMethod( className, name, returnType, args, defaultArgs, usage )                                                            \
-   struct _ ## className ## name ## frame                                                                                                       \
-   {                                                                                                                                            \
-      typedef className ObjectType;                                                                                                             \
-      className* object;                                                                                                                        \
-      inline returnType _exec args const;                                                                                                       \
-   };                                                                                                                                           \
-   static _EngineFunctionDefaultArguments< _EngineMethodTrampoline< _ ## className ## name ## frame, void args >::FunctionType >                \
-      _fn ## className ## name ## DefaultArgs defaultArgs;                                                                                      \
-   static _EngineConsoleThunkType< returnType >::ReturnType _ ## className ## name ## caster( SimObject* object, S32 argc, ConsoleValueRef *argv )  \
-   {                                                                                                                                            \
-      _ ## className ## name ## frame frame;                                                                                                    \
-      frame.object = static_cast< className* >( object );                                                                                       \
-      return _EngineConsoleThunkType< returnType >::ReturnType( _EngineConsoleThunk< 2, returnType args >::thunk(                               \
-         argc, argv, &_ ## className ## name ## frame::_exec, &frame, _fn ## className ## name ## DefaultArgs                                   \
-      ) );                                                                                                                                      \
-   }                                                                                                                                            \
-   static ConsoleFunctionHeader _ ## className ## name ## header                                                                                \
-      ( #returnType, #args, #defaultArgs );                                                                                                     \
-   static ConsoleConstructor                                                                                                                    \
-      className ## name ## obj( #className, #name,                                                                                              \
-         _EngineConsoleThunkType< returnType >::CallbackType( _ ## className ## name ## caster ), usage,                                        \
-         _EngineConsoleThunk< 2, returnType args >::NUM_ARGS - _EngineConsoleThunkCountArgs() defaultArgs,                                      \
-         _EngineConsoleThunk< 2, returnType args >::NUM_ARGS,                                                                                   \
-         false, &_ ## className ## name ## header                                                                                               \
-      );                                                                                                                                        \
-   returnType _ ## className ## name ## frame::_exec args const
-
-#define DefineConsoleStaticMethod( className, name, returnType, args, defaultArgs, usage )                                             \
-   static inline returnType _fn ## className ## name ## impl args;                                                                     \
-   static _EngineFunctionDefaultArguments< void args > _fn ## className ## name ## DefaultArgs defaultArgs;                            \
-   static _EngineConsoleThunkType< returnType >::ReturnType _ ## className ## name ## caster( SimObject*, S32 argc, ConsoleValueRef *argv )\
-   {                                                                                                                                   \
-      return _EngineConsoleThunkType< returnType >::ReturnType( _EngineConsoleThunk< 1, returnType args >::thunk(                      \
-         argc, argv, &_fn ## className ## name ## impl, _fn ## className ## name ## DefaultArgs                                        \
-      ) );                                                                                                                             \
-   }                                                                                                                                   \
-   static ConsoleFunctionHeader _ ## className ## name ## header                                                                       \
-      ( #returnType, #args, #defaultArgs, true );                                                                                      \
-   static ConsoleConstructor                                                                                                           \
-      _ ## className ## name ## obj( #className, #name, _EngineConsoleThunkType< returnType >::CallbackType( _ ## className ## name ## caster ), usage, \
-         _EngineConsoleThunk< 1, returnType args >::NUM_ARGS - _EngineConsoleThunkCountArgs() defaultArgs,                             \
-         _EngineConsoleThunk< 1, returnType args >::NUM_ARGS,                                                                          \
-         false, &_ ## className ## name ## header                                                                                      \
-      );                                                                                                                               \
-   static inline returnType _fn ## className ## name ## impl args
-
-
 // The following three macros are only temporary.  They allow to define engineAPI functions using the framework
 // here in this file while being visible only in the new API.  When the console interop is removed, these macros
 // can be removed and all their uses be replaced with their corresponding versions that now still include support

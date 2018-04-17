@@ -536,7 +536,7 @@ DefineEngineStaticMethod( GFXInit, getAdapterModeCount, S32, ( S32 index ),,
    return adapters[index]->mAvailableModes.size();
 }
 
-DefineConsoleStaticMethod( GFXInit, getAdapterMode, String, ( S32 index, S32 modeIndex ),,
+DefineEngineStaticMethod( GFXInit, getAdapterMode, String, ( S32 index, S32 modeIndex ),,
    "Gets the details of the specified adapter mode.\n\n"
    "@param index Index of the adapter to query.\n"
    "@param modeIndex Index of the mode to get data from.\n"
