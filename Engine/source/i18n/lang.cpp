@@ -508,14 +508,15 @@ bool compiledFileNeedsUpdate(UTF8* filename)
    return false;
 }
 
-ConsoleFunction(CompileLanguage, void, 2, 3, "(string inputFile, [bool createMap]) Compiles a LSO language file."
+DefineEngineFunction(CompileLanguage, void, (const char* inputFile, bool createMap), (false), 
+   "@brief Compiles a LSO language file."
    " if createIndex is true, will also create languageMap.cs with"
    " the global variables for each string index."
    " The input file must follow this example layout:"
    " TXT_HELLO_WORLD = Hello world in english!")
 {
    UTF8 scriptFilenameBuffer[1024];
-   Con::expandScriptFilename((char*)scriptFilenameBuffer, sizeof(scriptFilenameBuffer), argv[1]);
+   Con::expandScriptFilename((char*)scriptFilenameBuffer, sizeof(scriptFilenameBuffer), inputFile);
 
    if (!Torque::FS::IsFile(scriptFilenameBuffer))
    {
@@ -532,7 +533,6 @@ ConsoleFunction(CompileLanguage, void, 2, 3, "(string inputFile, [bool createMap
 
    if (compiledFileNeedsUpdate(scriptFilenameBuffer))
    {
-      bool createMap = argc > 2 ? dAtob(argv[2]) : false;
       FileStream *mapStream = NULL;
       if (createMap)
       {

@@ -536,80 +536,67 @@ float LinearColorF::sSrgbToLinear[256] =
 #endif
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( getStockColorCount, S32, 1, 1, "() - Gets a count of available stock colors.\n"
-   "@return A count of available stock colors." )
+DefineEngineFunction(getStockColorCount, S32, (),,
+   "@brief Gets a count of available stock colors.\n"
+   "@return A count of available stock colors.")
 {
    return StockColor::getCount();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( getStockColorName, const char*, 2, 2,  "(stockColorIndex) - Gets the stock color name at the specified index.\n"
+DefineEngineFunction(getStockColorName, const char*, (S32 stockColorIndex),,
+   "@brief Gets the stock color name at the specified index.\n"
    "@param stockColorIndex The zero-based index of the stock color name to retrieve.\n"
-   "@return The stock color name at the specified index or nothing if the string is invalid." )
+   "@return The stock color name at the specified index or nothing if the string is invalid.")
 {
-   // Fetch stock color index.
-   const S32 stockColorIndex = dAtoi(argv[1]);
-
    // Fetch the color item.
-   const StockColorItem* pColorItem = StockColor::getColorItem( stockColorIndex );
+   const StockColorItem* pColorItem = StockColor::getColorItem(stockColorIndex);
 
    return pColorItem == NULL ? NULL : pColorItem->getColorName();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( isStockColor, bool, 2, 2,  "(stockColorName) - Gets whether the specified name is a stock color or not.\n"
+DefineEngineFunction(isStockColor, bool, (const char* stockColorName),,
+   "@brief Gets whether the specified name is a stock color or not.\n"
    "@param stockColorName - The stock color name to test for.\n"
-   "@return Whether the specified name is a stock color or not.\n" )
+   "@return Whether the specified name is a stock color or not.\n")
 {
-   // Fetch stock color name.
-   const char* pStockColorName = argv[1];
-
    // Return whether this is a stock color name or not.
-   return StockColor::isColor( pStockColorName );
+   return StockColor::isColor(stockColorName);
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( getStockColorF, const char*, 2, 2, "(stockColorName) - Gets a floating-point-based stock color by name.\n"
+DefineEngineFunction(getStockColorF, LinearColorF, (const char* stockColorName),,
+   "@brief Gets a floating-point-based stock color by name.\n"
    "@param stockColorName - The stock color name to retrieve.\n"
-   "@return The stock color that matches the specified color name.  Returns nothing if the color name is not found.\n" )
+   "@return The stock color that matches the specified color name.  Returns nothing if the color name is not found.\n")
 {
-   // Fetch stock color name.
-   const char* pStockColorName = argv[1];
-
    // Return nothing if stock color name is invalid.
-   if ( !StockColor::isColor( pStockColorName ) )
+   if (!StockColor::isColor(stockColorName))
       return StringTable->EmptyString();
 
    // Fetch stock color.
-   const LinearColorF& color = StockColor::colorF( pStockColorName );
+   const LinearColorF& color = StockColor::colorF(stockColorName);
 
-   // Format stock color.
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%g %g %g %g", color.red, color.green, color.blue, color.alpha);
-   return(returnBuffer);
+   return color;
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( getStockColorI, const char*, 2, 2, "(stockColorName) - Gets a byte-based stock color by name.\n"
+DefineEngineFunction(getStockColorI, ColorI, (const char* stockColorName),,
+   "@brief Gets a byte-based stock color by name.\n"
    "@param stockColorName - The stock color name to retrieve.\n"
-   "@return The stock color that matches the specified color name.  Returns nothing if the color name is not found.\n" )
+   "@return The stock color that matches the specified color name.  Returns nothing if the color name is not found.\n")
 {
-   // Fetch stock color name.
-   const char* pStockColorName = argv[1];
-
    // Return nothing if stock color name is invalid.
-   if ( !StockColor::isColor( pStockColorName ) )
+   if (!StockColor::isColor(stockColorName))
       return StringTable->EmptyString();
 
    // Fetch stock color.
-   const ColorI& color = StockColor::colorI( pStockColorName );
+   const ColorI& color = StockColor::colorI(stockColorName);
 
-   // Format stock color.
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 256, "%d %d %d %d", color.red, color.green, color.blue, color.alpha);
-   return(returnBuffer);
+   return color;
 }

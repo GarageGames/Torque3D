@@ -21,7 +21,7 @@
 //-----------------------------------------------------------------------------
 
 #include "platform/platformInput.h"
-#include "console/console.h"
+#include "console/engineAPI.h"
 #include "core/util/journal/process.h"
 #include "windowManager/platformWindowMgr.h"
 
@@ -97,16 +97,16 @@ void Input::init()
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( isJoystickDetected, bool, 1, 1, "isJoystickDetected()" )
+DefineEngineFunction(isJoystickDetected, bool, (),, "")
 {
-   return( SDL_NumJoysticks() > 0 );
+   return(SDL_NumJoysticks() > 0);
 }
 
 //------------------------------------------------------------------------------
-ConsoleFunction( getJoystickAxes, const char*, 2, 2, "getJoystickAxes( instance )" )
+DefineEngineFunction(getJoystickAxes, const char*, (const char* instance), , "")
 {
    // TODO SDL
-   return( "" );
+   return("");
 }
 
 //------------------------------------------------------------------------------

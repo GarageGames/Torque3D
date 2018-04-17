@@ -218,8 +218,10 @@ DefineEngineFunction( getRealTime, S32, (), , "()"
    return Platform::getRealMilliseconds();
 }
 
-ConsoleFunction( getLocalTime, const char *, 1, 1, "Return the current local time as: weekday month day year hour min sec.\n\n"
-                "Local time is platform defined.")
+DefineEngineFunction(getLocalTime, const char*, (),,
+   "@brief Return the current local time as: weekday month day year hour min sec.\n\n"
+   "Local time is platform defined."
+   "@ingroup Platform")
 {
    Platform::LocalTime lt;
    Platform::getLocalTime(lt);

@@ -584,69 +584,33 @@ DefineEngineFunction(getRandomDir, Point3F, (Point3F axis, float thetaMin, float
   return MathUtils::randomDir(axis, thetaMin, thetaMax, phiMin, phiMax);
 }
 
-ConsoleFunction( MatrixInverseMulVector, const char*, 3, 3, "(MatrixF xfrm, Point3F vector)"
-                "@brief Multiply the vector by the affine inverse of the transform.\n\n"
-                "@ingroup AFX")
+DefineEngineFunction(MatrixInverseMulVector, Point3F, (MatrixF xfrm, Point3F vector),,
+   "@brief Multiply the vector by the affine inverse of the transform.\n\n"
+   "@ingroup AFX")
 {
-   Point3F pos1(0.0f,0.0f,0.0f);
-   AngAxisF aa1(Point3F(0.0f,0.0f,0.0f),0.0f);
-   dSscanf(argv[1], "%g %g %g %g %g %g %g", &pos1.x, &pos1.y, &pos1.z, &aa1.axis.x, &aa1.axis.y, &aa1.axis.z, &aa1.angle);
-
-   MatrixF temp1(true);
-   aa1.setMatrix(&temp1);
-   temp1.setColumn(3, pos1);
-
-   Point3F vec1(0.0f,0.0f,0.0f);
-   dSscanf(argv[2], "%g %g %g", &vec1.x, &vec1.y, &vec1.z);
-
-   temp1.affineInverse();
+   xfrm.affineInverse();
 
    Point3F result;
-   temp1.mulV(vec1, &result);
+   xfrm.mulV(vector, &result);
 
-   char* ret = Con::getReturnBuffer(256);
-   dSprintf(ret, 255, "%g %g %g", result.x, result.y, result.z);
-   return ret;
+   return result;
 }
 
-ConsoleFunction(moveTransformAbs, const char*, 3, 3, "(MatrixF xfrm, Point3F pos)"
-                "@brief Move the transform to the new absolute position.\n\n"
-                "@ingroup AFX")
+DefineEngineFunction(moveTransformAbs, MatrixF, (MatrixF xfrm, Point3F pos),,
+   "@brief Move the transform to the new absolute position.\n\n"
+   "@ingroup AFX")
 {
-   Point3F pos1(0.0f,0.0f,0.0f);
-   AngAxisF aa1(Point3F(0.0f,0.0f,0.0f),0.0f);
-   dSscanf(argv[1], "%g %g %g %g %g %g %g", &pos1.x, &pos1.y, &pos1.z, &aa1.axis.x, &aa1.axis.y, &aa1.axis.z, &aa1.angle);
-
-   Point3F pos2(0.0f,0.0f,0.0f);
-   dSscanf(argv[2], "%g %g %g", &pos2.x, &pos2.y, &pos2.z);
-
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 255, "%g %g %g %g %g %g %g",
-            pos2.x, pos2.y, pos2.z,
-            aa1.axis.x, aa1.axis.y, aa1.axis.z,
-            aa1.angle);
-   return returnBuffer;
+   xfrm.setPosition(pos);
+   return xfrm;
 }
 
-ConsoleFunction(moveTransformRel, const char*, 3, 3, "(MatrixF xfrm, Point3F pos)"
-                "@brief Move the transform to the new relative position.\n\n"
-                "@ingroup AFX")
+DefineEngineFunction(moveTransformRel, MatrixF, (MatrixF xfrm, Point3F pos),,
+   "@brief Move the transform to the new relative position.\n\n"
+   "@ingroup AFX")
 {
-   Point3F pos1(0.0f,0.0f,0.0f);
-   AngAxisF aa1(Point3F(0.0f,0.0f,0.0f),0.0f);
-   dSscanf(argv[1], "%g %g %g %g %g %g %g", &pos1.x, &pos1.y, &pos1.z, &aa1.axis.x, &aa1.axis.y, &aa1.axis.z, &aa1.angle);
-
-   Point3F pos2(0.0f,0.0f,0.0f);
-   dSscanf(argv[2], "%g %g %g", &pos2.x, &pos2.y, &pos2.z);
-
-   pos2 += pos1;
-
-   char* returnBuffer = Con::getReturnBuffer(256);
-   dSprintf(returnBuffer, 255, "%g %g %g %g %g %g %g",
-            pos2.x, pos2.y, pos2.z,
-            aa1.axis.x, aa1.axis.y, aa1.axis.z,
-            aa1.angle);
-   return returnBuffer;
+   pos += xfrm.getPosition();
+   xfrm.setPosition(pos);
+   return xfrm;
 }
 
 DefineEngineFunction(getFreeTargetPosition, Point3F, (),,

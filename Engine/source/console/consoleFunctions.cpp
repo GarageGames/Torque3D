@@ -2646,26 +2646,23 @@ DefineEngineFunction( getPrefsPath, const char *, ( const char* relativeFileName
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( execPrefs, bool, 2, 4, "( string relativeFileName, bool noCalls=false, bool journalScript=false )"
-            "@brief Manually execute a special script file that contains game or editor preferences\n\n"
-            "@param relativeFileName Name and path to file from project folder\n"
-            "@param noCalls Deprecated\n"
-            "@param journalScript Deprecated\n"
-            "@return True if script was successfully executed\n"
-            "@note Appears to be useless in Torque 3D, should be deprecated\n"
-            "@ingroup Scripting")
+DefineEngineFunction(execPrefs, bool, (const char* relativeFileName, bool noCalls, bool journalScript),(false, false),
+   "@brief Manually execute a special script file that contains game or editor preferences\n\n"
+   "@param relativeFileName Name and path to file from project folder\n"
+   "@param noCalls Deprecated\n"
+   "@param journalScript Deprecated\n"
+   "@return True if script was successfully executed\n"
+   "@note Appears to be useless in Torque 3D, should be deprecated\n"
+   "@ingroup Scripting")
 {
-   const char *filename = Platform::getPrefsPath(argv[1]);
-   if(filename == NULL || *filename == 0)
+   if (relativeFileName == NULL || *relativeFileName == 0)
       return false;
 
    // Scripts do this a lot, so we may as well help them out
-   if(! Platform::isFile(filename) && ! Torque::FS::IsFile(filename))
+   if (!Platform::isFile(relativeFileName) && !Torque::FS::IsFile(relativeFileName))
       return true;
 
-   argv[0] = "exec";
-   argv[1] = filename;
-   return dAtob(Con::execute(argc, argv));
+   return Con::executeFile(relativeFileName, noCalls, journalScript);
 }
 
 //-----------------------------------------------------------------------------
