@@ -681,9 +681,8 @@ DefineEngineMethod(Settings, remove, void, (const char * settingName, bool inclu
 	object->remove( settingName, includeDefaults );
 }
 
-ConsoleMethod(Settings, write, bool, 2, 2, "%success = settingObj.write();")
+DefineEngineMethod(Settings, write, bool, (),, "%success = settingObj.write();")
 {
-   TORQUE_UNUSED(argc); TORQUE_UNUSED(argv);
    return object->write();
 }
 

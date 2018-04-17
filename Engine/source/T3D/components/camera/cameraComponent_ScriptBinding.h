@@ -24,7 +24,8 @@
 #include "T3D/components/camera/cameraComponent.h"
 
 //Basically, this only exists for backwards compatibility for parts of the editors
-ConsoleMethod(CameraComponent, getMode, const char*, 2, 2, "() - We get the first behavior of the requested type on our owner object.\n"
+DefineEngineMethod(CameraComponent, getMode, const char*, (),, 
+   "@brief We get the first behavior of the requested type on our owner object.\n"
    "@return (string name) The type of the behavior we're requesting")
 {
    return "fly";

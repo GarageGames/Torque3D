@@ -2451,41 +2451,37 @@ DefineEngineMethod( GameConnection, getVisibleGhostDistance, F32, (),,
 // Object Selection in Torque by Dave Myers 
 //   http://www.garagegames.com/index.php?sec=mg&mod=resource&page=view&qid=7335
 
-ConsoleMethod(GameConnection, setSelectedObj, bool, 3, 4, "(object, [propagate_to_client])")
+DefineEngineMethod(GameConnection, setSelectedObj, bool, (SceneObject* obj, bool propagate_to_client), (false), "")
 {
-   SceneObject* pending_selection;
-   if (!Sim::findObject(argv[2], pending_selection))
+   if (!obj)
       return false;
 
-   bool propagate_to_client = (argc > 3) ? dAtob(argv[3]) : false;
-   object->setSelectedObj(pending_selection, propagate_to_client);
+   object->setSelectedObj(obj, propagate_to_client);
 
    return true;
 }
 
-ConsoleMethod(GameConnection, getSelectedObj, S32, 2, 2, "()")
+DefineEngineMethod(GameConnection, getSelectedObj, SimObject*, (),, "")
 {
-   SimObject* selected = object->getSelectedObj();
-   return (selected) ? selected->getId(): -1;
+   return object->getSelectedObj();
 }
 
-ConsoleMethod(GameConnection, clearSelectedObj, void, 2, 3, "([propagate_to_client])")
+DefineEngineMethod(GameConnection, clearSelectedObj, void, (bool propagate_to_client), (false), "")
 {
-   bool propagate_to_client = (argc > 2) ? dAtob(argv[2]) : false;
    object->setSelectedObj(NULL, propagate_to_client);
 }
 
-ConsoleMethod(GameConnection, setPreSelectedObjFromRollover, void, 2, 2, "()")
+DefineEngineMethod(GameConnection, setPreSelectedObjFromRollover, void, (),, "")
 {
    object->setPreSelectedObjFromRollover();
 }
 
-ConsoleMethod(GameConnection, clearPreSelectedObj, void, 2, 2, "()")
+DefineEngineMethod(GameConnection, clearPreSelectedObj, void, (),, "")
 {
    object->clearPreSelectedObj();
 }
 
-ConsoleMethod(GameConnection, setSelectedObjFromPreSelected, void, 2, 2, "()")
+DefineEngineMethod(GameConnection, setSelectedObjFromPreSelected, void, (),, "")
 {
    object->setSelectedObjFromPreSelected();
 }

@@ -657,58 +657,42 @@ void WorldEditorSelection::setSize(const VectorF & newsize)
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditorSelection, containsGlobalBounds, bool, 2, 2, "() - True if an object with global bounds is contained in the selection." )
+DefineEngineMethod( WorldEditorSelection, containsGlobalBounds, bool, (),, "True if an object with global bounds is contained in the selection." )
 {
    return object->containsGlobalBounds();
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditorSelection, getCentroid, const char*, 2, 2, "() - Return the median of all object positions in the selection." )
+DefineEngineMethod( WorldEditorSelection, getCentroid, Point3F, (),, "Return the median of all object positions in the selection." )
 {
-   static const U32 bufSize = 256;
-   char* buffer = Con::getReturnBuffer( bufSize );
    const Point3F& centroid = object->getCentroid();
-   
-   dSprintf( buffer, bufSize, "%g %g %g", centroid.x, centroid.y, centroid.z );
-   return buffer;
+   return centroid;
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditorSelection, getBoxCentroid, const char*, 2, 2, "() - Return the center of the bounding box around the selection." )
+DefineEngineMethod( WorldEditorSelection, getBoxCentroid, Point3F, (),, "Return the center of the bounding box around the selection." )
 {
-   static const U32 bufSize = 256;
-   char* buffer = Con::getReturnBuffer( bufSize );
    const Point3F& boxCentroid = object->getBoxCentroid();
-   
-   dSprintf( buffer, bufSize, "%g %g %g", boxCentroid.x, boxCentroid.y, boxCentroid.z );
-   return buffer;
+   return boxCentroid;
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditorSelection, offset, void, 3, 4, "( vector delta, float gridSnap=0 ) - Move all objects in the selection by the given delta." )
-{
-   F32 x, y, z;
-   dSscanf( argv[ 3 ], "%g %g %g", &x, &y, &z );
-   
-   F32 gridSnap = 0.f;
-   if( argc > 3 )
-      gridSnap = dAtof( argv[ 3 ] );
-      
-   object->offset( Point3F( x, y, z ), gridSnap );
+DefineEngineMethod(WorldEditorSelection, offset, void, (Point3F delta, F32 gridSnap), (0.0f), "Move all objects in the selection by the given delta.")
+{     
+   object->offset( delta, gridSnap );
    WorldEditor::updateClientTransforms( object );
 }
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditorSelection, union, void, 3, 3, "( SimSet set ) - Add all objects in the given set to this selection." )
+DefineEngineMethod( WorldEditorSelection, union, void, (SimSet* selection),, "Add all objects in the given set to this selection." )
 {
-   SimSet* selection;
-   if( !Sim::findObject( argv[ 2 ], selection ) )
+   if( !selection)
    {
-      Con::errorf( "WorldEditorSelection::union - no SimSet '%s'", (const char*)argv[ 2 ] );
+      Con::errorf( "WorldEditorSelection::union - no SimSet");
       return;
    }
    
@@ -719,12 +703,11 @@ ConsoleMethod( WorldEditorSelection, union, void, 3, 3, "( SimSet set ) - Add al
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditorSelection, subtract, void, 3, 3, "( SimSet ) - Remove all objects in the given set from this selection." )
+DefineEngineMethod( WorldEditorSelection, subtract, void, (SimSet* selection),, "Remove all objects in the given set from this selection." )
 {
-   SimSet* selection;
-   if( !Sim::findObject( argv[ 2 ], selection ) )
+   if( !selection )
    {
-      Con::errorf( "WorldEditorSelection::subtract - no SimSet '%s'", (const char*)argv[ 2 ] );
+      Con::errorf( "WorldEditorSelection::subtract - no SimSet" );
       return;
    }
    

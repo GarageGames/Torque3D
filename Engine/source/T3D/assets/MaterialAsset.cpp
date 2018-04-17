@@ -157,7 +157,7 @@ void MaterialAsset::copyTo(SimObject* object)
    Parent::copyTo(object);
 }
 
-ConsoleMethod(MaterialAsset, compileShader, void, 2, 2, "() - Compiles the material's generated shader, if any. Not yet implemented\n")
+DefineEngineMethod(MaterialAsset, compileShader, void, (), , "Compiles the material's generated shader, if any. Not yet implemented\n")
 {
    object->compileShader();
 }

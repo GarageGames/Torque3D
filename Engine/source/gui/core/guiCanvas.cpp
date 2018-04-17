@@ -2812,7 +2812,7 @@ DefineEngineMethod( GuiCanvas, setVideoMode, void,
    Con::setVariable( "$pref::Video::mode", vm.toString() );
 }
 
-ConsoleMethod( GuiCanvas, showWindow, void, 2, 2, "" )
+DefineEngineMethod(GuiCanvas, showWindow, void, (),, "")
 {
    if (!object->getPlatformWindow())
       return;
@@ -2822,7 +2822,7 @@ ConsoleMethod( GuiCanvas, showWindow, void, 2, 2, "" )
    object->getPlatformWindow()->setDisplayWindow(true);
 }
 
-ConsoleMethod( GuiCanvas, hideWindow, void, 2, 2, "" )
+DefineEngineMethod(GuiCanvas, hideWindow, void, (),, "")
 {
    if (!object->getPlatformWindow())
       return;
@@ -2832,30 +2832,29 @@ ConsoleMethod( GuiCanvas, hideWindow, void, 2, 2, "" )
    object->getPlatformWindow()->setDisplayWindow(false);
 }
 
-ConsoleMethod( GuiCanvas, cursorClick, void, 4, 4, "button, isDown" )
+DefineEngineMethod(GuiCanvas, cursorClick, void, (S32 buttonId, bool isDown), , "")
 {
-   const S32 buttonId = dAtoi(argv[2]);
-   const bool isDown = dAtob(argv[3]);
-
    object->cursorClick(buttonId, isDown);
 }
 
-ConsoleMethod( GuiCanvas, cursorNudge, void, 4, 4, "x, y" )
+DefineEngineMethod(GuiCanvas, cursorNudge, void, (F32 x, F32 y), , "")
 {
-   object->cursorNudge(dAtof(argv[2]), dAtof(argv[3]));
+   object->cursorNudge(x, y);
 }
+
 // This function allows resetting of the video-mode from script. It was motivated by
 // the need to temporarily disable vsync during datablock cache load to avoid a 
 // significant slowdown.
 bool AFX_forceVideoReset = false;
 
-ConsoleMethod( GuiCanvas, resetVideoMode, void, 2,2, "()")
+
+DefineEngineMethod(GuiCanvas, resetVideoMode, void, (), , "")
 {
    PlatformWindow* window = object->getPlatformWindow();
-   if( window )
+   if (window)
    {
-      GFXWindowTarget* gfx_target =  window->getGFXTarget();
-      if ( gfx_target )
+      GFXWindowTarget* gfx_target = window->getGFXTarget();
+      if (gfx_target)
       {
          AFX_forceVideoReset = true;
          gfx_target->resetMode();
