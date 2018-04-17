@@ -860,24 +860,6 @@ public:
 // while being only visible in the console interop.  When we drop the console system,
 // these macros can be removed and all definitions that make use of them can be removed
 // as well.
-#define DefineConsoleFunction( name, returnType, args, defaultArgs, usage )                                                      \
-   static inline returnType _fn ## name ## impl args;                                                                            \
-   static _EngineFunctionDefaultArguments< void args > _fn ## name ## DefaultArgs defaultArgs;                                   \
-   static _EngineConsoleThunkType< returnType >::ReturnType _ ## name ## caster( SimObject*, S32 argc, ConsoleValueRef *argv )       \
-   {                                                                                                                             \
-      return _EngineConsoleThunkType< returnType >::ReturnType( _EngineConsoleThunk< 1, returnType args >::thunk(                \
-         argc, argv, &_fn ## name ## impl, _fn ## name ## DefaultArgs                                                            \
-      ) );                                                                                                                       \
-   }                                                                                                                             \
-   static ConsoleFunctionHeader _ ## name ## header                                                                              \
-      ( #returnType, #args, #defaultArgs );                                                                                      \
-   static ConsoleConstructor                                                                                                     \
-      _ ## name ## obj( NULL, #name, _EngineConsoleThunkType< returnType >::CallbackType( _ ## name ## caster ), usage,          \
-         _EngineConsoleThunk< 1, returnType args >::NUM_ARGS - _EngineConsoleThunkCountArgs() defaultArgs,                       \
-         _EngineConsoleThunk< 1, returnType args >::NUM_ARGS,                                                                    \
-         false, &_ ## name ## header                                                                                             \
-      );                                                                                                                         \
-   static inline returnType _fn ## name ## impl args
 
 #define DefineConsoleMethod( className, name, returnType, args, defaultArgs, usage )                                                            \
    struct _ ## className ## name ## frame                                                                                                       \

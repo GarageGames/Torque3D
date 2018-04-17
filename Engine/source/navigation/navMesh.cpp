@@ -95,13 +95,13 @@ EventManager *NavMesh::getEventManager()
    return smEventManager;
 }
 
-DefineConsoleFunction(getNavMeshEventManager, S32, (),,
+DefineEngineFunction(getNavMeshEventManager, S32, (),,
    "@brief Get the EventManager object for all NavMesh updates.")
 {
    return NavMesh::getEventManager()->getId();
 }
 
-DefineConsoleFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, false),
+DefineEngineFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, false),
    "@brief Update all NavMesh tiles that intersect the given object's world box.")
 {
    SceneObject *obj;
@@ -123,7 +123,7 @@ DefineConsoleFunction(NavMeshUpdateAll, void, (S32 objid, bool remove), (0, fals
       obj->enableCollision();
 }
 
-DefineConsoleFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove), (0, false),
+DefineEngineFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove), (0, false),
    "@brief Update all NavMesh tiles that intersect the given object's world box.")
 {
    SceneObject *obj;
@@ -146,7 +146,7 @@ DefineConsoleFunction(NavMeshUpdateAroundObject, void, (S32 objid, bool remove),
 }
 
 
-DefineConsoleFunction(NavMeshIgnore, void, (S32 objid, bool _ignore), (0, true),
+DefineEngineFunction(NavMeshIgnore, void, (S32 objid, bool _ignore), (0, true),
    "@brief Flag this object as not generating a navmesh result.")
 {
    SceneObject *obj;
@@ -156,7 +156,7 @@ DefineConsoleFunction(NavMeshIgnore, void, (S32 objid, bool _ignore), (0, true),
       obj->mPathfindingIgnore = _ignore;
 }
 
-DefineConsoleFunction(NavMeshUpdateOne, void, (S32 meshid, S32 objid, bool remove), (0, 0, false),
+DefineEngineFunction(NavMeshUpdateOne, void, (S32 meshid, S32 objid, bool remove), (0, 0, false),
    "@brief Update all tiles in a given NavMesh that intersect the given object's world box.")
 {
    NavMesh *mesh;

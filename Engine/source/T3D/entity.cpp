@@ -2005,7 +2005,7 @@ DefineConsoleMethod(Entity, notify, void, (String signalFunction, String argA, S
    object->notifyComponents(signalFunction, argA, argB, argC, argD, argE);
 }
 
-DefineConsoleFunction(findEntitiesByTag, const char*, (SimGroup* searchingGroup, String tags), (nullAsType<SimGroup*>(), ""),
+DefineEngineFunction(findEntitiesByTag, const char*, (SimGroup* searchingGroup, String tags), (nullAsType<SimGroup*>(), ""),
 "Finds all entities that have the provided tags.\n"
 "@param searchingGroup The SimGroup to search inside. If null, we'll search the entire dictionary(this can be slow!).\n"
 "@param tags Word delimited list of tags to search for. If multiple tags are included, the list is eclusively parsed, requiring all tags provided to be found on an entity for a match.\n"

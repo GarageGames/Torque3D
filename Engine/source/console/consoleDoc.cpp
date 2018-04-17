@@ -41,7 +41,7 @@
 
 ConsoleFunctionGroupBegin(ConsoleDoc, "Console self-documentation functions. These output psuedo C++ suitable for feeeding through Doxygen or another auto documentation tool.");
 
-DefineConsoleFunction( dumpConsoleClasses, void, (bool dumpScript, bool dumpEngine), ( true, true ),
+DefineEngineFunction( dumpConsoleClasses, void, (bool dumpScript, bool dumpEngine), ( true, true ),
             "@brief Dumps all declared console classes to the console.\n\n"
             "@param dumpScript Optional parameter specifying whether or not classes defined in script should be dumped.\n"
             "@param dumpEngine Optional parameter specifying whether or not classes defined in the engine should be dumped.\n"
@@ -50,7 +50,7 @@ DefineConsoleFunction( dumpConsoleClasses, void, (bool dumpScript, bool dumpEngi
    Namespace::dumpClasses( dumpScript, dumpEngine );
 }
 
-DefineConsoleFunction(dumpConsoleFunctions, void, ( bool dumpScript, bool dumpEngine ), ( true, true ),
+DefineEngineFunction(dumpConsoleFunctions, void, ( bool dumpScript, bool dumpEngine ), ( true, true ),
             "@brief Dumps all declared console functions to the console.\n"
             "@param dumpScript Optional parameter specifying whether or not functions defined in script should be dumped.\n"
             "@param dumpEngine Optional parameter specitying whether or not functions defined in the engine should be dumped.\n"

@@ -526,7 +526,7 @@ DefineConsoleMethod( AIClient, getLocation, Point3F, (),, "ai.getLocation();" )
 /**
  * Adds an AI Player to the game
  */
-DefineConsoleFunction( aiAddPlayer, S32, (const char * name, const char * ns), (""), "'playerName'[, 'AIClassType'] );")
+DefineEngineFunction( aiAddPlayer, S32, (const char * name, const char * ns), (""), "'playerName'[, 'AIClassType'] );")
 {
    // Create the player
    AIClient *aiPlayer = new AIClient();

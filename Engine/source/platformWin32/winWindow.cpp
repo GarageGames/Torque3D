@@ -643,7 +643,7 @@ bool Platform::setLoginPassword( const char* password )
 //       as commentary on Koreans as a nationality. Thank you for your
 //       attention.
 //--------------------------------------
-DefineConsoleFunction( isKoreanBuild, bool, ( ), , "isKoreanBuild()")
+DefineEngineFunction( isKoreanBuild, bool, ( ), , "isKoreanBuild()")
 {
    HKEY regKey;
    bool result = false;

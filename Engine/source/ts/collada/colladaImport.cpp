@@ -126,7 +126,7 @@ static void processNode(GuiTreeViewCtrl* tree, domNode* node, S32 parentID, Scen
    }
 }
 
-DefineConsoleFunction( enumColladaForImport, bool, (const char * shapePath, const char * ctrl), , 
+DefineEngineFunction( enumColladaForImport, bool, (const char * shapePath, const char * ctrl), ,
    "(string shapePath, GuiTreeViewCtrl ctrl) Collect scene information from "
    "a COLLADA file and store it in a GuiTreeView control. This function is "
    "used by the COLLADA import gui to show a preview of the scene contents "

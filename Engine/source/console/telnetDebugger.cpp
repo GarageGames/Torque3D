@@ -113,7 +113,7 @@ MODULE_END;
 // BRKCLR file line - sent when a breakpoint cannot be moved to a breakable line on the client.
 //
 
-DefineConsoleFunction( dbgSetParameters, void, (S32 port, const char * password, bool waitForClient ), (false), "( int port, string password, bool waitForClient )"
+DefineEngineFunction( dbgSetParameters, void, (S32 port, const char * password, bool waitForClient ), (false), "( int port, string password, bool waitForClient )"
                 "Open a debug server port on the specified port, requiring the specified password, "
             "and optionally waiting for the debug client to connect.\n"
             "@internal Primarily used for Torsion and other debugging tools")
@@ -124,14 +124,14 @@ DefineConsoleFunction( dbgSetParameters, void, (S32 port, const char * password,
    }
 }
 
-DefineConsoleFunction( dbgIsConnected, bool, (), , "()"
+DefineEngineFunction( dbgIsConnected, bool, (), , "()"
                 "Returns true if a script debugging client is connected else return false.\n"
             "@internal Primarily used for Torsion and other debugging tools")
 {
    return TelDebugger && TelDebugger->isConnected();
 }
 
-DefineConsoleFunction( dbgDisconnect, void, (), , "()"
+DefineEngineFunction( dbgDisconnect, void, (), , "()"
                 "Forcibly disconnects any attached script debugging client.\n"
             "@internal Primarily used for Torsion and other debugging tools")
 {

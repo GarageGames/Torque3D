@@ -429,7 +429,7 @@ void queryLanServers(U32 port, U8 flags, const char* gameType, const char* missi
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( queryAllServers
+DefineEngineFunction( queryAllServers
                      , void, ( U32 lanPort
                              , U32 flags
                              , const char * gameType
@@ -455,7 +455,7 @@ DefineConsoleFunction( queryAllServers
 
 }
 
-DefineConsoleFunction( queryLanServers
+DefineEngineFunction( queryLanServers
                      , void, ( U32 lanPort
                              , U32 flags
                              , const char * gameType
@@ -560,7 +560,7 @@ void queryMasterServer(U8 flags, const char* gameType, const char* missionType,
       processMasterServerQuery( gPingSession );
 }
 
-DefineConsoleFunction( queryMasterServer
+DefineEngineFunction( queryMasterServer
                      , void, (  U32 flags
                              , const char * gameType
                              , const char * missionType
@@ -582,7 +582,7 @@ DefineConsoleFunction( queryMasterServer
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( querySingleServer
+DefineEngineFunction( querySingleServer
                      , void, ( const char* addrText, U8 flags )
                      , (0), "querySingleServer(address, flags);" )
 {
@@ -668,7 +668,7 @@ void cancelServerQuery()
    }
 }
 
-DefineConsoleFunction( cancelServerQuery, void, (), , "cancelServerQuery();" )
+DefineEngineFunction( cancelServerQuery, void, (), , "cancelServerQuery();" )
 {
    cancelServerQuery();
 }
@@ -696,14 +696,14 @@ void stopServerQuery()
    }
 }
 
-DefineConsoleFunction( stopServerQuery, void, (), , "stopServerQuery();" )
+DefineEngineFunction( stopServerQuery, void, (), , "stopServerQuery();" )
 {
    stopServerQuery();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( startHeartbeat, void, (), , "startHeartbeat();" )
+DefineEngineFunction( startHeartbeat, void, (), , "startHeartbeat();" )
 {
    if (validateAuthenticatedServer()) {
       gHeartbeatSeq++;
@@ -711,19 +711,19 @@ DefineConsoleFunction( startHeartbeat, void, (), , "startHeartbeat();" )
    }
 }
 
-DefineConsoleFunction( stopHeartbeat, void, (), , "stopHeartbeat();" )
+DefineEngineFunction( stopHeartbeat, void, (), , "stopHeartbeat();" )
 {
    gHeartbeatSeq++;
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleFunction( getServerCount, int, (), , "getServerCount();" )
+DefineEngineFunction( getServerCount, int, (), , "getServerCount();" )
 {
    return gServerList.size();
 }
 
-DefineConsoleFunction( setServerInfo, bool, (U32 index), , "setServerInfo(index);" )
+DefineEngineFunction( setServerInfo, bool, (U32 index), , "setServerInfo(index);" )
 {
    if (index < gServerList.size()) {
       ServerInfo& info = gServerList[index];

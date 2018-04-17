@@ -543,7 +543,7 @@ void TSLastDetail::updateImposterImages( bool forceUpdate )
       GFX->endScene();
 }
 
-DefineConsoleFunction( tsUpdateImposterImages, void, (bool forceUpdate), (false), "tsUpdateImposterImages( bool forceupdate )")
+DefineEngineFunction( tsUpdateImposterImages, void, (bool forceUpdate), (false), "tsUpdateImposterImages( bool forceupdate )")
 {
    TSLastDetail::updateImposterImages(forceUpdate);
 }

@@ -26,7 +26,7 @@
 
 #include "console/engineAPI.h"
 
-DefineConsoleMethod(AssetQuery, clear, void, (),,"Clears all asset Id results."
+DefineEngineMethod(AssetQuery, clear, void, (),,"Clears all asset Id results."
    "Clears all asset Id results.\n"
    "@return () No return value.\n")
 {
@@ -36,7 +36,7 @@ DefineConsoleMethod(AssetQuery, clear, void, (),,"Clears all asset Id results."
 //-----------------------------------------------------------------------------
 
 
-DefineConsoleMethod(AssetQuery, set, bool, (S32 queryId), ,
+DefineEngineMethod(AssetQuery, set, bool, (S32 queryId), ,
    "Sets the asset query to a copy of the specified asset query.\n"
    "@param assetQuery The asset query to copy.\n"
    "@return Whether the operation succeeded or not.\n")

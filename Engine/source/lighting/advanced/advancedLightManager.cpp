@@ -705,7 +705,7 @@ LightShadowMap* AdvancedLightManager::findShadowMapForObject( SimObject *object 
    return sceneLight->getLight()->getExtended<ShadowMapParams>()->getShadowMap();
 }
 
-DefineConsoleFunction( setShadowVizLight, const char*, (const char* name), (""), "")
+DefineEngineFunction( setShadowVizLight, const char*, (const char* name), (""), "")
 {
    static const String DebugTargetName( "AL_ShadowVizTexture" );
 
