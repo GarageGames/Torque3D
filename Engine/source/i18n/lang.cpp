@@ -329,7 +329,7 @@ void LangTable::setCurrentLanguage(S32 langid)
 
 
 
-DefineConsoleMethod(LangTable, addLanguage, S32, (String filename, String languageName), ("", ""), 
+DefineEngineMethod(LangTable, addLanguage, S32, (String filename, String languageName), ("", ""), 
 			  "(string filename, [string languageName])"
 			  "@brief Adds a language to the table\n\n"
 			  "@param filename Name and path to the language file\n"
@@ -343,7 +343,7 @@ DefineConsoleMethod(LangTable, addLanguage, S32, (String filename, String langua
 	return object->addLanguage(scriptFilenameBuffer, (const UTF8*)languageName);
 }
 
-DefineConsoleMethod(LangTable, getString, const char *, (U32 id), , 
+DefineEngineMethod(LangTable, getString, const char *, (U32 id), , 
 			  "(string filename)"
 			  "@brief Grabs a string from the specified table\n\n"
 			  "If an invalid is passed, the function will attempt to "
@@ -363,14 +363,14 @@ DefineConsoleMethod(LangTable, getString, const char *, (U32 id), ,
 	return "";
 }
 
-DefineConsoleMethod(LangTable, setDefaultLanguage, void, (S32 langId), , "(int language)"
+DefineEngineMethod(LangTable, setDefaultLanguage, void, (S32 langId), , "(int language)"
 			  "@brief Sets the default language table\n\n"
 			  "@param language ID of the table\n")
 {
 	object->setDefaultLanguage(langId);
 }
 
-DefineConsoleMethod(LangTable, setCurrentLanguage, void, (S32 langId), , 
+DefineEngineMethod(LangTable, setCurrentLanguage, void, (S32 langId), , 
 			  "(int language)"
 			  "@brief Sets the current language table for grabbing text\n\n"
 			  "@param language ID of the table\n")
@@ -378,14 +378,14 @@ DefineConsoleMethod(LangTable, setCurrentLanguage, void, (S32 langId), ,
 	object->setCurrentLanguage(langId);
 }
 
-DefineConsoleMethod(LangTable, getCurrentLanguage, S32, (), , "()"
+DefineEngineMethod(LangTable, getCurrentLanguage, S32, (), , "()"
 			  "@brief Get the ID of the current language table\n\n"
 			  "@return Numerical ID of the current language table")
 {
 	return object->getCurrentLanguage();
 }
 
-DefineConsoleMethod(LangTable, getLangName, const char *, (S32 langId), , "(int language)"
+DefineEngineMethod(LangTable, getLangName, const char *, (S32 langId), , "(int language)"
 			  "@brief Return the readable name of the language table\n\n"
 			  "@param language Numerical ID of the language table to access\n\n"
 			  "@return String containing the name of the table, NULL if ID was invalid or name was never specified")
@@ -402,7 +402,7 @@ DefineConsoleMethod(LangTable, getLangName, const char *, (S32 langId), , "(int 
 	return "";
 }
 
-DefineConsoleMethod(LangTable, getNumLang, S32, (), , "()"
+DefineEngineMethod(LangTable, getNumLang, S32, (), , "()"
 			  "@brief Used to find out how many languages are in the table\n\n"
 			  "@return Size of the vector containing the languages, numerical")
 {

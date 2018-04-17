@@ -428,7 +428,7 @@ void SimDataBlock::write(Stream &stream, U32 tabStop, U32 flags)
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( SimDataBlock, reloadOnLocalClient, void, (),,
+DefineEngineMethod( SimDataBlock, reloadOnLocalClient, void, (),,
    "Reload the datablock.  This can only be used with a local client configuration." )
 {
    // Make sure we're running a local client.

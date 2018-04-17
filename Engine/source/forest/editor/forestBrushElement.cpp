@@ -187,7 +187,7 @@ bool ForestBrush::containsItemData( const ForestItemData *inData )
    return false;
 }
 
-DefineConsoleMethod( ForestBrush, containsItemData, bool, ( const char * obj ), , "( ForestItemData obj )" )
+DefineEngineMethod( ForestBrush, containsItemData, bool, ( const char * obj ), , "( ForestItemData obj )" )
 {
    ForestItemData *data = NULL;
    if ( !Sim::findObject( obj, data ) )

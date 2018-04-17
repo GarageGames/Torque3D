@@ -2139,7 +2139,7 @@ ConsoleDocFragment _pushDialog(
    "void pushDialog( GuiControl ctrl, int layer=0, bool center=false);"
 );
 
-DefineConsoleMethod( GuiCanvas, pushDialog, void, (const char * ctrlName, S32 layer, bool center), ( 0, false), "(GuiControl ctrl, int layer=0, bool center=false)"
+DefineEngineMethod( GuiCanvas, pushDialog, void, (const char * ctrlName, S32 layer, bool center), ( 0, false), "(GuiControl ctrl, int layer=0, bool center=false)"
            "@hide")
 {
    GuiControl *gui;
@@ -2176,7 +2176,7 @@ ConsoleDocFragment _popDialog2(
    "void popDialog();"
 );
 
-DefineConsoleMethod( GuiCanvas, popDialog, void, (GuiControl * gui), (nullAsType<GuiControl*>()), "(GuiControl ctrl=NULL)"
+DefineEngineMethod( GuiCanvas, popDialog, void, (GuiControl * gui), (nullAsType<GuiControl*>()), "(GuiControl ctrl=NULL)"
            "@hide")
 {
    if (gui)
@@ -2204,7 +2204,7 @@ ConsoleDocFragment _popLayer2(
    "void popLayer(S32 layer);"
 );
 
-DefineConsoleMethod( GuiCanvas, popLayer, void, (S32 layer), (0), "(int layer)" 
+DefineEngineMethod( GuiCanvas, popLayer, void, (S32 layer), (0), "(int layer)" 
            "@hide")
 {
 
@@ -2362,7 +2362,7 @@ ConsoleDocFragment _setCursorPos2(
    "bool setCursorPos( F32 posX, F32 posY);"
 );
 
-DefineConsoleMethod( GuiCanvas, setCursorPos, void, (Point2I pos), , "(Point2I pos)"
+DefineEngineMethod( GuiCanvas, setCursorPos, void, (Point2I pos), , "(Point2I pos)"
            "@hide")
 {
 
@@ -2647,7 +2647,7 @@ DefineEngineMethod( GuiCanvas, setWindowPosition, void, ( Point2I position ),,
    object->getPlatformWindow()->setPosition( position );
 }
 
-DefineConsoleMethod( GuiCanvas, isFullscreen, bool, (), , "() - Is this canvas currently fullscreen?" )
+DefineEngineMethod( GuiCanvas, isFullscreen, bool, (), , "() - Is this canvas currently fullscreen?" )
 {
    if (Platform::getWebDeployment())
       return false;
@@ -2658,14 +2658,14 @@ DefineConsoleMethod( GuiCanvas, isFullscreen, bool, (), , "() - Is this canvas c
    return object->getPlatformWindow()->getVideoMode().fullScreen;
 }
 
-DefineConsoleMethod( GuiCanvas, minimizeWindow, void, (), , "() - minimize this canvas' window." )
+DefineEngineMethod( GuiCanvas, minimizeWindow, void, (), , "() - minimize this canvas' window." )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
       window->minimize();
 }
 
-DefineConsoleMethod( GuiCanvas, isMinimized, bool, (), , "()" )
+DefineEngineMethod( GuiCanvas, isMinimized, bool, (), , "()" )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
@@ -2674,7 +2674,7 @@ DefineConsoleMethod( GuiCanvas, isMinimized, bool, (), , "()" )
    return false;
 }
 
-DefineConsoleMethod( GuiCanvas, isMaximized, bool, (), , "()" )
+DefineEngineMethod( GuiCanvas, isMaximized, bool, (), , "()" )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
@@ -2683,21 +2683,21 @@ DefineConsoleMethod( GuiCanvas, isMaximized, bool, (), , "()" )
    return false;
 }
 
-DefineConsoleMethod( GuiCanvas, maximizeWindow, void, (), , "() - maximize this canvas' window." )
+DefineEngineMethod( GuiCanvas, maximizeWindow, void, (), , "() - maximize this canvas' window." )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if ( window )
       window->maximize();
 }
 
-DefineConsoleMethod( GuiCanvas, restoreWindow, void, (), , "() - restore this canvas' window." )
+DefineEngineMethod( GuiCanvas, restoreWindow, void, (), , "() - restore this canvas' window." )
 {
    PlatformWindow* window = object->getPlatformWindow();
    if( window )
       window->restore();
 }
 
-DefineConsoleMethod( GuiCanvas, setFocus, void, (), , "() - Claim OS input focus for this canvas' window.")
+DefineEngineMethod( GuiCanvas, setFocus, void, (), , "() - Claim OS input focus for this canvas' window.")
 {
    PlatformWindow* window = object->getPlatformWindow();
    if( window )
@@ -2712,7 +2712,7 @@ DefineEngineMethod( GuiCanvas, setMenuBar, void, ( GuiControl* menu ),,
    return object->setMenuBar( menu );
 }
 
-DefineConsoleMethod( GuiCanvas, setVideoMode, void, 
+DefineEngineMethod( GuiCanvas, setVideoMode, void, 
                (U32 width, U32 height, bool fullscreen, U32 bitDepth, U32 refreshRate, U32 antialiasLevel), 
                ( false, 0, 0, 0),
                "(int width, int height, bool fullscreen, [int bitDepth], [int refreshRate], [int antialiasLevel] )\n"

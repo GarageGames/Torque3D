@@ -524,7 +524,7 @@ ConsoleMethod(GuiInspectorComponentGroup, removeDynamicField, void, 3, 3, "")
 {
 }
 
-DefineConsoleMethod(GuiInspectorComponentGroup, getComponent, S32, (), ,"")
+DefineEngineMethod(GuiInspectorComponentGroup, getComponent, S32, (), ,"")
 {
    return object->getComponent()->getId();
 }

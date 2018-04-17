@@ -1517,7 +1517,7 @@ DefineEngineMethod( SceneObject, isGlobalBounds, bool, (),,
    return object->isGlobalBounds();
 }
 
-DefineConsoleMethod(SceneObject, setForwardVector, void, (VectorF newForward, VectorF upVector), (VectorF(0, 0, 0), VectorF(0, 0, 1)),
+DefineEngineMethod(SceneObject, setForwardVector, void, (VectorF newForward, VectorF upVector), (VectorF(0, 0, 0), VectorF(0, 0, 1)),
    "Sets the forward vector of a scene object, making it face Y+ along the new vector.\n"
    "@param The new forward vector to set.\n"
    "@param (Optional) The up vector to use to help orient the rotation.")

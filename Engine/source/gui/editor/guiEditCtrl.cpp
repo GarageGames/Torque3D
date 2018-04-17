@@ -2468,7 +2468,7 @@ void GuiEditCtrl::startMouseGuideDrag( guideAxis axis, U32 guideIndex, bool lock
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, getContentControl, S32, (), , "() - Return the toplevel control edited inside the GUI editor." )
+DefineEngineMethod( GuiEditCtrl, getContentControl, S32, (), , "() - Return the toplevel control edited inside the GUI editor." )
 {
    GuiControl* ctrl = object->getContentControl();
    if( ctrl )
@@ -2479,7 +2479,7 @@ DefineConsoleMethod( GuiEditCtrl, getContentControl, S32, (), , "() - Return the
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, setContentControl, void, (GuiControl *ctrl ), , "( GuiControl ctrl ) - Set the toplevel control to edit in the GUI editor." )
+DefineEngineMethod( GuiEditCtrl, setContentControl, void, (GuiControl *ctrl ), , "( GuiControl ctrl ) - Set the toplevel control to edit in the GUI editor." )
 {
    if (ctrl)
       object->setContentControl(ctrl);
@@ -2487,7 +2487,7 @@ DefineConsoleMethod( GuiEditCtrl, setContentControl, void, (GuiControl *ctrl ), 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, addNewCtrl, void, (GuiControl *ctrl), , "(GuiControl ctrl)")
+DefineEngineMethod( GuiEditCtrl, addNewCtrl, void, (GuiControl *ctrl), , "(GuiControl ctrl)")
 {
    if (ctrl)
       object->addNewControl(ctrl);
@@ -2495,28 +2495,28 @@ DefineConsoleMethod( GuiEditCtrl, addNewCtrl, void, (GuiControl *ctrl), , "(GuiC
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, addSelection, void, (S32 id), , "selects a control.")
+DefineEngineMethod( GuiEditCtrl, addSelection, void, (S32 id), , "selects a control.")
 {
    object->addSelection(id);
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, removeSelection, void, (S32 id), , "deselects a control.")
+DefineEngineMethod( GuiEditCtrl, removeSelection, void, (S32 id), , "deselects a control.")
 {
    object->removeSelection(id);
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, clearSelection, void, (), , "Clear selected controls list.")
+DefineEngineMethod( GuiEditCtrl, clearSelection, void, (), , "Clear selected controls list.")
 {
    object->clearSelection();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, select, void, (GuiControl *ctrl), , "(GuiControl ctrl)")
+DefineEngineMethod( GuiEditCtrl, select, void, (GuiControl *ctrl), , "(GuiControl ctrl)")
 {
    if (ctrl)
    object->setSelection(ctrl, false);
@@ -2524,7 +2524,7 @@ DefineConsoleMethod( GuiEditCtrl, select, void, (GuiControl *ctrl), , "(GuiContr
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, setCurrentAddSet, void, (GuiControl *addSet), , "(GuiControl ctrl)")
+DefineEngineMethod( GuiEditCtrl, setCurrentAddSet, void, (GuiControl *addSet), , "(GuiControl ctrl)")
 {
    if (addSet)
    object->setCurrentAddSet(addSet);
@@ -2532,7 +2532,7 @@ DefineConsoleMethod( GuiEditCtrl, setCurrentAddSet, void, (GuiControl *addSet), 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, getCurrentAddSet, S32, (), , "Returns the set to which new controls will be added")
+DefineEngineMethod( GuiEditCtrl, getCurrentAddSet, S32, (), , "Returns the set to which new controls will be added")
 {
    const GuiControl* add = object->getCurrentAddSet();
    return add ? add->getId() : 0;
@@ -2540,49 +2540,49 @@ DefineConsoleMethod( GuiEditCtrl, getCurrentAddSet, S32, (), , "Returns the set 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, toggle, void, (), , "Toggle activation.")
+DefineEngineMethod( GuiEditCtrl, toggle, void, (), , "Toggle activation.")
 {
    object->setEditMode( !object->isActive() );
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, justify, void, (U32 mode), , "(int mode)" )
+DefineEngineMethod( GuiEditCtrl, justify, void, (U32 mode), , "(int mode)" )
 {
    object->justifySelection( (GuiEditCtrl::Justification)mode );
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, bringToFront, void, (), , "")
+DefineEngineMethod( GuiEditCtrl, bringToFront, void, (), , "")
 {
    object->bringToFront();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, pushToBack, void, (), , "")
+DefineEngineMethod( GuiEditCtrl, pushToBack, void, (), , "")
 {
    object->pushToBack();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, deleteSelection, void, (), , "() - Delete the selected controls.")
+DefineEngineMethod( GuiEditCtrl, deleteSelection, void, (), , "() - Delete the selected controls.")
 {
    object->deleteSelection();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, moveSelection, void, (S32 dx, S32 dy), , "Move all controls in the selection by (dx,dy) pixels.")
+DefineEngineMethod( GuiEditCtrl, moveSelection, void, (S32 dx, S32 dy), , "Move all controls in the selection by (dx,dy) pixels.")
 {
    object->moveAndSnapSelection(Point2I(dx, dy));
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, saveSelection, void, (const char * filename), (nullAsType<const char*>()), "( string fileName=null ) - Save selection to file or clipboard.")
+DefineEngineMethod( GuiEditCtrl, saveSelection, void, (const char * filename), (nullAsType<const char*>()), "( string fileName=null ) - Save selection to file or clipboard.")
 {
       
    object->saveSelection( filename );
@@ -2590,7 +2590,7 @@ DefineConsoleMethod( GuiEditCtrl, saveSelection, void, (const char * filename), 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, loadSelection, void, (const char * filename), (nullAsType<const char*>()), "( string fileName=null ) - Load selection from file or clipboard.")
+DefineEngineMethod( GuiEditCtrl, loadSelection, void, (const char * filename), (nullAsType<const char*>()), "( string fileName=null ) - Load selection from file or clipboard.")
 {
 
    object->loadSelection( filename );
@@ -2598,7 +2598,7 @@ DefineConsoleMethod( GuiEditCtrl, loadSelection, void, (const char * filename), 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, selectAll, void, (), , "()")
+DefineEngineMethod( GuiEditCtrl, selectAll, void, (), , "()")
 {
    object->selectAll();
 }
@@ -2613,14 +2613,14 @@ DefineEngineMethod( GuiEditCtrl, getSelection, SimSet*, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, getNumSelected, S32, (), , "() - Return the number of controls currently selected." )
+DefineEngineMethod( GuiEditCtrl, getNumSelected, S32, (), , "() - Return the number of controls currently selected." )
 {
    return object->getNumSelected();
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, getSelectionGlobalBounds, const char*, (), , "() - Returns global bounds of current selection as vector 'x y width height'." )
+DefineEngineMethod( GuiEditCtrl, getSelectionGlobalBounds, const char*, (), , "() - Returns global bounds of current selection as vector 'x y width height'." )
 {
    RectI bounds = object->getSelectionGlobalBounds();
    String str = String::ToString( "%i %i %i %i", bounds.point.x, bounds.point.y, bounds.extent.x, bounds.extent.y );
@@ -2633,7 +2633,7 @@ DefineConsoleMethod( GuiEditCtrl, getSelectionGlobalBounds, const char*, (), , "
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, selectParents, void, ( bool addToSelection ), (false), "( bool addToSelection=false ) - Select parents of currently selected controls." )
+DefineEngineMethod( GuiEditCtrl, selectParents, void, ( bool addToSelection ), (false), "( bool addToSelection=false ) - Select parents of currently selected controls." )
 {
       
    object->selectParents( addToSelection );
@@ -2641,7 +2641,7 @@ DefineConsoleMethod( GuiEditCtrl, selectParents, void, ( bool addToSelection ), 
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, selectChildren, void, ( bool addToSelection ), (false), "( bool addToSelection=false ) - Select children of currently selected controls." )
+DefineEngineMethod( GuiEditCtrl, selectChildren, void, ( bool addToSelection ), (false), "( bool addToSelection=false ) - Select children of currently selected controls." )
 {
       
    object->selectChildren( addToSelection );
@@ -2657,14 +2657,14 @@ DefineEngineMethod( GuiEditCtrl, getTrash, SimGroup*, (),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(GuiEditCtrl, setSnapToGrid, void, (U32 gridsize), , "GuiEditCtrl.setSnapToGrid(gridsize)")
+DefineEngineMethod(GuiEditCtrl, setSnapToGrid, void, (U32 gridsize), , "GuiEditCtrl.setSnapToGrid(gridsize)")
 {
    object->setSnapToGrid(gridsize);
 }
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, readGuides, void, ( GuiControl* ctrl, S32 axis ), (-1), "( GuiControl ctrl [, int axis ] ) - Read the guides from the given control." )
+DefineEngineMethod( GuiEditCtrl, readGuides, void, ( GuiControl* ctrl, S32 axis ), (-1), "( GuiControl ctrl [, int axis ] ) - Read the guides from the given control." )
 {
    // Find the control.
    
@@ -2694,7 +2694,7 @@ DefineConsoleMethod( GuiEditCtrl, readGuides, void, ( GuiControl* ctrl, S32 axis
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, writeGuides, void, ( GuiControl* ctrl, S32 axis ), ( -1), "( GuiControl ctrl [, int axis ] ) - Write the guides to the given control." )
+DefineEngineMethod( GuiEditCtrl, writeGuides, void, ( GuiControl* ctrl, S32 axis ), ( -1), "( GuiControl ctrl [, int axis ] ) - Write the guides to the given control." )
 {
    // Find the control.
    
@@ -2724,7 +2724,7 @@ DefineConsoleMethod( GuiEditCtrl, writeGuides, void, ( GuiControl* ctrl, S32 axi
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, clearGuides, void, ( S32 axis ), (-1), "( [ int axis ] ) - Clear all currently set guide lines." )
+DefineEngineMethod( GuiEditCtrl, clearGuides, void, ( S32 axis ), (-1), "( [ int axis ] ) - Clear all currently set guide lines." )
 {
    if( axis != -1 )
    {
@@ -2745,7 +2745,7 @@ DefineConsoleMethod( GuiEditCtrl, clearGuides, void, ( S32 axis ), (-1), "( [ in
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, fitIntoParents, void, (bool width, bool height), (true, true), "( bool width=true, bool height=true ) - Fit selected controls into their parents." )
+DefineEngineMethod( GuiEditCtrl, fitIntoParents, void, (bool width, bool height), (true, true), "( bool width=true, bool height=true ) - Fit selected controls into their parents." )
 {
       
    object->fitIntoParents( width, height );
@@ -2753,7 +2753,7 @@ DefineConsoleMethod( GuiEditCtrl, fitIntoParents, void, (bool width, bool height
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( GuiEditCtrl, getMouseMode, const char*, (), , "() - Return the current mouse mode." )
+DefineEngineMethod( GuiEditCtrl, getMouseMode, const char*, (), , "() - Return the current mouse mode." )
 {
    switch( object->getMouseMode() )
    {

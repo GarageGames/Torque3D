@@ -59,7 +59,7 @@ DefineEngineMethod(AssetQuery, set, bool, (S32 queryId), ,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(AssetQuery, getCount, S32, (), , 
+DefineEngineMethod(AssetQuery, getCount, S32, (), , 
    "Gets the count of asset Id results.\n"
    "@return (int)The count of asset Id results.\n")
 {
@@ -68,7 +68,7 @@ DefineConsoleMethod(AssetQuery, getCount, S32, (), ,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod(AssetQuery, getAsset, const char*, (S32 resultIndex), (-1), 
+DefineEngineMethod(AssetQuery, getAsset, const char*, (S32 resultIndex), (-1), 
    "Gets the asset Id at the specified query result index.\n"
    "@param resultIndex The query result index to use.\n"
    "@return (assetId)The asset Id at the specified index or NULL if not valid.\n")

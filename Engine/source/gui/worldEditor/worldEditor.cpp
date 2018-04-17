@@ -3252,7 +3252,7 @@ DefineEngineMethod( WorldEditor, getActiveSelection, S32, (),,
    return object->getActiveSelectionSet()->getId();
 }
 
-DefineConsoleMethod( WorldEditor, setActiveSelection, void, ( WorldEditorSelection* selection), ,
+DefineEngineMethod( WorldEditor, setActiveSelection, void, ( WorldEditorSelection* selection), ,
    "Set the currently active WorldEditorSelection object.\n"
    "@param	selection A WorldEditorSelectionSet object to use for the selection container.")
 {

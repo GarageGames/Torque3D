@@ -238,7 +238,7 @@ void PhysicsDebrisData::unpackData(BitStream* stream)
    shapeName   = stream->readSTString();
 }
 
-DefineConsoleMethod( PhysicsDebrisData, preload, void, (), , 
+DefineEngineMethod( PhysicsDebrisData, preload, void, (), , 
    "@brief Loads some information to have readily available at simulation time.\n\n"
    "Forces generation of shaders, materials, and other data used by the %PhysicsDebris object. "
    "This function should be used while a level is loading in order to shorten "

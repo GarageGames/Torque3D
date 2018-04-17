@@ -1800,7 +1800,7 @@ DefineEngineMethod(Entity, setBox, void,
 }
 
 
-/*DefineConsoleMethod(Entity, callOnComponents, void, (const char* functionName), ,
+/*DefineEngineMethod(Entity, callOnComponents, void, (const char* functionName), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1875,7 +1875,7 @@ ConsoleMethod(Entity, getComponentByIndex, S32, 3, 3, "(int index) - Gets a part
    return (comp != NULL) ? comp->getId() : 0;
 }
 
-DefineConsoleMethod(Entity, getComponent, S32, (String componentName), (""),
+DefineEngineMethod(Entity, getComponent, S32, (String componentName), (""),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1916,7 +1916,7 @@ ConsoleMethod(Entity, getComponentCount, S32, 2, 2, "() - Get the count of behav
    return object->getComponentCount();
 }
 
-DefineConsoleMethod(Entity, setComponentDirty, void, (S32 componentID, bool forceUpdate), (0, false),
+DefineEngineMethod(Entity, setComponentDirty, void, (S32 componentID, bool forceUpdate), (0, false),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1925,7 +1925,7 @@ DefineConsoleMethod(Entity, setComponentDirty, void, (S32 componentID, bool forc
       object->setComponentDirty(comp, forceUpdate);*/
 }
 
-DefineConsoleMethod(Entity, getMoveVector, VectorF, (),,
+DefineEngineMethod(Entity, getMoveVector, VectorF, (),,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1939,7 +1939,7 @@ DefineConsoleMethod(Entity, getMoveVector, VectorF, (),,
    return VectorF::Zero;
 }
 
-DefineConsoleMethod(Entity, getMoveRotation, VectorF, (), ,
+DefineEngineMethod(Entity, getMoveRotation, VectorF, (), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1953,7 +1953,7 @@ DefineConsoleMethod(Entity, getMoveRotation, VectorF, (), ,
    return VectorF::Zero;
 }
 
-DefineConsoleMethod(Entity, getMoveTrigger, bool, (S32 triggerNum), (0),
+DefineEngineMethod(Entity, getMoveTrigger, bool, (S32 triggerNum), (0),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
@@ -1974,28 +1974,28 @@ DefineEngineMethod(Entity, getForwardVector, VectorF, (), ,
    return forVec;
 }
 
-DefineConsoleMethod(Entity, setForwardVector, void, (VectorF newForward), (VectorF(0,0,0)),
+DefineEngineMethod(Entity, setForwardVector, void, (VectorF newForward), (VectorF(0,0,0)),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(Entity, lookAt, void, (Point3F lookPosition),,
+DefineEngineMethod(Entity, lookAt, void, (Point3F lookPosition),,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    //object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(Entity, rotateTo, void, (Point3F lookPosition, F32 degreePerSecond), (1.0),
+DefineEngineMethod(Entity, rotateTo, void, (Point3F lookPosition, F32 degreePerSecond), (1.0),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {
    //object->setForwardVector(newForward);
 }
 
-DefineConsoleMethod(Entity, notify, void, (String signalFunction, String argA, String argB, String argC, String argD, String argE),
+DefineEngineMethod(Entity, notify, void, (String signalFunction, String argA, String argB, String argC, String argD, String argE),
 ("", "", "", "", "", ""),
 "Triggers a signal call to all components for a certain function.")
 {

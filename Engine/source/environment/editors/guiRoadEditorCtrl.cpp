@@ -1037,45 +1037,45 @@ void GuiRoadEditorCtrl::submitUndo( const UTF8 *name )
    undoMan->addAction( action );
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, deleteNode, void, (), , "deleteNode()" )
+DefineEngineMethod( GuiRoadEditorCtrl, deleteNode, void, (), , "deleteNode()" )
 {
    object->deleteSelectedNode();
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, getMode, const char*, (), , "" )
+DefineEngineMethod( GuiRoadEditorCtrl, getMode, const char*, (), , "" )
 {
    return object->getMode();
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, setMode, void, ( const char * mode ), , "setMode( String mode )" )
+DefineEngineMethod( GuiRoadEditorCtrl, setMode, void, ( const char * mode ), , "setMode( String mode )" )
 {
    String newMode = ( mode );
    object->setMode( newMode );
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, getNodeWidth, F32, (), , "" )
+DefineEngineMethod( GuiRoadEditorCtrl, getNodeWidth, F32, (), , "" )
 {
    return object->getNodeWidth();
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, setNodeWidth, void, ( F32 width ), , "" )
+DefineEngineMethod( GuiRoadEditorCtrl, setNodeWidth, void, ( F32 width ), , "" )
 {
    object->setNodeWidth( width );
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, getNodePosition, Point3F, (), , "" )
+DefineEngineMethod( GuiRoadEditorCtrl, getNodePosition, Point3F, (), , "" )
 {
 
 	return object->getNodePosition();
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, setNodePosition, void, ( Point3F pos ), , "" )
+DefineEngineMethod( GuiRoadEditorCtrl, setNodePosition, void, ( Point3F pos ), , "" )
 {
 
    object->setNodePosition( pos );
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, setSelectedRoad, void, ( const char * pathRoad ), (""), "" )
+DefineEngineMethod( GuiRoadEditorCtrl, setSelectedRoad, void, ( const char * pathRoad ), (""), "" )
 {
    if (dStrcmp( pathRoad,"")==0 )
       object->setSelectedRoad(NULL);
@@ -1087,7 +1087,7 @@ DefineConsoleMethod( GuiRoadEditorCtrl, setSelectedRoad, void, ( const char * pa
    }
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, getSelectedRoad, S32, (), , "" )
+DefineEngineMethod( GuiRoadEditorCtrl, getSelectedRoad, S32, (), , "" )
 {
    DecalRoad *road = object->getSelectedRoad();
    if ( road )
@@ -1096,12 +1096,12 @@ DefineConsoleMethod( GuiRoadEditorCtrl, getSelectedRoad, S32, (), , "" )
    return NULL;
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, getSelectedNode, S32, (), , "" )
+DefineEngineMethod( GuiRoadEditorCtrl, getSelectedNode, S32, (), , "" )
 {
    return object->getSelectedNode();
 }
 
-DefineConsoleMethod( GuiRoadEditorCtrl, deleteRoad, void, (), , "" )
+DefineEngineMethod( GuiRoadEditorCtrl, deleteRoad, void, (), , "" )
 {
    object->deleteSelectedRoad();
 }

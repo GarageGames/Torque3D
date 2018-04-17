@@ -954,7 +954,7 @@ DefineEngineMethod( SimSet, clear, void, (),,
 //-----------------------------------------------------------------------------
 
 //UNSAFE; don't want this in the new API
-DefineConsoleMethod( SimSet, deleteAllObjects, void, (), , "() Delete all objects in the set." )
+DefineEngineMethod( SimSet, deleteAllObjects, void, (), , "() Delete all objects in the set." )
 {
    object->deleteAllObjects();
 }
@@ -1026,7 +1026,7 @@ DEFINE_CALLIN( fnSimSet_getCountRecursive, getCountRecursive, SimSet, U32, ( Sim
    return set->sizeRecursive();
 }
 
-DefineConsoleMethod( SimSet, getFullCount, S32, (), , "() Get the number of direct and indirect child objects contained in the set.\n"
+DefineEngineMethod( SimSet, getFullCount, S32, (), , "() Get the number of direct and indirect child objects contained in the set.\n"
    "@return The number of objects contained in the set as well as in other sets contained directly or indirectly in the set." )
 {
    return object->sizeRecursive();
@@ -1122,7 +1122,7 @@ DefineEngineMethod( SimSet, pushToBack, void, ( SimObject* obj ),,
 
 //-----------------------------------------------------------------------------
 
-DefineConsoleMethod( SimSet, sort, void, ( const char * callbackFunction ), , "( string callbackFunction ) Sort the objects in the set using the given comparison function.\n"
+DefineEngineMethod( SimSet, sort, void, ( const char * callbackFunction ), , "( string callbackFunction ) Sort the objects in the set using the given comparison function.\n"
    "@param callbackFunction Name of a function that takes two object arguments A and B and returns -1 if A is less, 1 if B is less, and 0 if both are equal." )
 {
    object->scriptSort( callbackFunction );

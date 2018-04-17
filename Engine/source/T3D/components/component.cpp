@@ -633,7 +633,7 @@ ConsoleMethod(Component, endGroup, void, 2, 2, "()\n"
    object->endFieldGroup();
 }
 
-DefineConsoleMethod(Component, addComponentField, void, (String fieldName, String fieldDesc, String fieldType, String defValue, String userData, bool hidden),
+DefineEngineMethod(Component, addComponentField, void, (String fieldName, String fieldDesc, String fieldType, String defValue, String userData, bool hidden),
    ("", "", "", "", "", false),
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
@@ -678,7 +678,7 @@ ConsoleMethod(Component, setComponentield, const char *, 3, 3, "(int index) - Ge
    return buf;
 }
 
-DefineConsoleMethod(Component, getComponentFieldType, const char *, (String fieldName), ,
+DefineEngineMethod(Component, getComponentFieldType, const char *, (String fieldName), ,
    "Get the number of static fields on the object.\n"
    "@return The number of static fields defined on the object.")
 {

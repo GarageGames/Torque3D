@@ -60,7 +60,7 @@ void GuiFilterCtrl::initPersistFields()
    Parent::initPersistFields();
 }
 
-DefineConsoleMethod( GuiFilterCtrl, getValue, const char*, (), , "Return a tuple containing all the values in the filter."
+DefineEngineMethod( GuiFilterCtrl, getValue, const char*, (), , "Return a tuple containing all the values in the filter."
 			  "@internal")
 {
    static char buffer[512];
@@ -89,7 +89,7 @@ ConsoleMethod( GuiFilterCtrl, setValue, void, 3, 20, "(f1, f2, ...)"
 	object->set(filter);
 }
 
-DefineConsoleMethod( GuiFilterCtrl, identity, void, (), , "Reset the filtering."
+DefineEngineMethod( GuiFilterCtrl, identity, void, (), , "Reset the filtering."
 			  "@internal")
 {
    object->identity();

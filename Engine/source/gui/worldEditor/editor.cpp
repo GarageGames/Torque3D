@@ -128,7 +128,7 @@ static GameBase * getControlObj()
    return(control);
 }
 
-DefineConsoleMethod( EditManager, setBookmark, void, (S32 val), , "(int slot)")
+DefineEngineMethod( EditManager, setBookmark, void, (S32 val), , "(int slot)")
 {
    if(val < 0 || val > 9)
       return;
@@ -138,7 +138,7 @@ DefineConsoleMethod( EditManager, setBookmark, void, (S32 val), , "(int slot)")
       object->mBookmarks[val] = control->getTransform();
 }
 
-DefineConsoleMethod( EditManager, gotoBookmark, void, (S32 val), , "(int slot)")
+DefineEngineMethod( EditManager, gotoBookmark, void, (S32 val), , "(int slot)")
 {
    if(val < 0 || val > 9)
       return;
@@ -148,17 +148,17 @@ DefineConsoleMethod( EditManager, gotoBookmark, void, (S32 val), , "(int slot)")
       control->setTransform(object->mBookmarks[val]);
 }
 
-DefineConsoleMethod( EditManager, editorEnabled, void, (), , "Perform the onEditorEnabled callback on all SimObjects and set gEditingMission true" )
+DefineEngineMethod( EditManager, editorEnabled, void, (), , "Perform the onEditorEnabled callback on all SimObjects and set gEditingMission true" )
 {
    object->editorEnabled();
 }
 
-DefineConsoleMethod( EditManager, editorDisabled, void, (), , "Perform the onEditorDisabled callback on all SimObjects and set gEditingMission false" )
+DefineEngineMethod( EditManager, editorDisabled, void, (), , "Perform the onEditorDisabled callback on all SimObjects and set gEditingMission false" )
 {
    object->editorDisabled();
 }
 
-DefineConsoleMethod( EditManager, isEditorEnabled, bool, (), , "Return the value of gEditingMission." )
+DefineEngineMethod( EditManager, isEditorEnabled, bool, (), , "Return the value of gEditingMission." )
 {
    return gEditingMission;
 }

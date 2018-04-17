@@ -861,7 +861,7 @@ public:
 // these macros can be removed and all definitions that make use of them can be removed
 // as well.
 
-#define DefineConsoleMethod( className, name, returnType, args, defaultArgs, usage )                                                            \
+#define DefineEngineMethod( className, name, returnType, args, defaultArgs, usage )                                                            \
    struct _ ## className ## name ## frame                                                                                                       \
    {                                                                                                                                            \
       typedef className ObjectType;                                                                                                             \

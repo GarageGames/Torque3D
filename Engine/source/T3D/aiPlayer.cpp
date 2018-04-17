@@ -1251,7 +1251,7 @@ ConsoleDocFragment _setAimObject(
    "void setAimObject(GameBase targetObject, Point3F offset);"
 );
 
-DefineConsoleMethod( AIPlayer, setAimObject, void, ( const char * objName, Point3F offset ), (Point3F::Zero), "( GameBase obj, [Point3F offset] )"
+DefineEngineMethod( AIPlayer, setAimObject, void, ( const char * objName, Point3F offset ), (Point3F::Zero), "( GameBase obj, [Point3F offset] )"
               "Sets the bot's target object. Optionally set an offset from target location."
            "@hide")
 {
