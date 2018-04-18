@@ -1220,15 +1220,6 @@ public:
       ConsoleConstructor cc_##className##_##name##_obj(#className,#name,cm_##className##_##name##_caster,usage1,minArgs,maxArgs); \
       inline returnType cm_##className##_##name(className *object, S32 argc, ConsoleValueRef *argv)
 
-#  define ConsoleStaticMethod(className,name,returnType,minArgs,maxArgs,usage1) \
-   inline returnType cm_##className##_##name(S32, ConsoleValueRef *); \
-   returnType cm_##className##_##name##_caster(SimObject *object, S32 argc, ConsoleValueRef *argv) { \
-   conmethod_return_##returnType ) cm_##className##_##name(argc,argv); \
-   }; \
-   ConsoleConstructor \
-   cc_##className##_##name##_obj(#className,#name,cm_##className##_##name##_caster,usage1,minArgs,maxArgs); \
-   inline returnType cm_##className##_##name(S32 argc, ConsoleValueRef *argv)
-
 #  define ConsoleMethodGroupEnd(className, groupName) \
    static ConsoleConstructor cc_##className##_##groupName##_GroupEnd(#className,#groupName,NULL)
 
@@ -1267,15 +1258,6 @@ public:
       static ConsoleConstructor                                                                       \
          className##name##obj(#className,#name,c##className##name##caster,"",minArgs,maxArgs);        \
       static inline returnType c##className##name(className *object, S32 argc, ConsoleValueRef *argv)
-
-#  define ConsoleStaticMethod(className,name,returnType,minArgs,maxArgs,usage1)                       \
-      static inline returnType c##className##name(S32, ConsoleValueRef*);                                \
-      static returnType c##className##name##caster(SimObject *object, S32 argc, ConsoleValueRef *argv) {  \
-         conmethod_return_##returnType ) c##className##name(argc,argv);                                                        \
-      };                                                                                              \
-      static ConsoleConstructor                                                                       \
-         className##name##obj(#className,#name,c##className##name##caster,"",minArgs,maxArgs);        \
-      static inline returnType c##className##name(S32 argc, ConsoleValueRef *argv)
 
 #define ConsoleDoc( text )
 
