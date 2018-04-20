@@ -420,7 +420,7 @@ extern "C" {
 }
 
 
-ConsoleFunction(TestFunction2Args, const char *, 3, 3, "testFunction(arg1, arg2)")
+DefineEngineStringlyVariadicFunction(TestFunction2Args, const char *, 3, 3, "testFunction(arg1, arg2)")
 {
    return "Return Value";
 }

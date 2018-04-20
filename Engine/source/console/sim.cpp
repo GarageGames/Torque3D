@@ -181,7 +181,7 @@ DefineEngineFunction( getTimeSinceStart, S32, (S32 scheduleId), ,"getTimeSinceSt
    return ret;
 }
 
-ConsoleFunction(schedule, S32, 4, 0, "schedule(time, refobject|0, command, <arg1...argN>)")
+DefineEngineStringlyVariadicFunction(schedule, S32, 4, 0, "schedule(time, refobject|0, command, <arg1...argN>)")
 {
    U32 timeDelta = U32(dAtof(argv[1]));
    SimObject *refObject = Sim::findObject(argv[2]);

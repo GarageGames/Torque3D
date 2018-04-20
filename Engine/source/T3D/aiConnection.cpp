@@ -130,7 +130,7 @@ static inline F32 moveClamp(F32 v)
 
 //-----------------------------------------------------------------------------
 /// Construct and connect an AI connection object
-ConsoleFunction(aiConnect, S32 , 2, 20, "(...)"
+DefineEngineStringlyVariadicFunction(aiConnect, S32 , 2, 20, "(...)"
    "@brief Creates a new AIConnection, and passes arguments to its onConnect script callback.\n\n"
    "@returns The newly created AIConnection\n"
    "@see GameConnection for parameter information\n"

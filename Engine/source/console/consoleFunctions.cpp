@@ -1200,7 +1200,7 @@ DefineEngineFunction( isValidIP, bool, ( const char* str),,
 
 // Torque won't normally add another string if it already exists with another casing,
 // so this forces the addition. It should be called once near the start, such as in main.cs.
-ConsoleFunction(addCaseSensitiveStrings,void,2,0,"[string1, string2, ...]"
+DefineEngineStringlyVariadicFunction(addCaseSensitiveStrings,void,2,0,"[string1, string2, ...]"
                 "Adds case sensitive strings to the StringTable.")
 {
    for(int i = 1; i < argc; i++)
@@ -1879,7 +1879,7 @@ DefineEngineFunction( getTag, const char*, ( const char* textTagString ), , "( s
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( echo, void, 2, 0, "( string message... ) "
+DefineEngineStringlyVariadicFunction( echo, void, 2, 0, "( string message... ) "
    "@brief Logs a message to the console.\n\n"
    "Concatenates all given arguments to a single string and prints the string to the console. "
    "A newline is added automatically after the text.\n\n"
@@ -1902,7 +1902,7 @@ ConsoleFunction( echo, void, 2, 0, "( string message... ) "
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( warn, void, 2, 0, "( string message... ) "
+DefineEngineStringlyVariadicFunction( warn, void, 2, 0, "( string message... ) "
    "@brief Logs a warning message to the console.\n\n"
    "Concatenates all given arguments to a single string and prints the string to the console as a warning "
    "message (in the in-game console, these will show up using a turquoise font by default). "
@@ -1926,7 +1926,7 @@ ConsoleFunction( warn, void, 2, 0, "( string message... ) "
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( error, void, 2, 0, "( string message... ) "
+DefineEngineStringlyVariadicFunction( error, void, 2, 0, "( string message... ) "
    "@brief Logs an error message to the console.\n\n"
    "Concatenates all given arguments to a single string and prints the string to the console as an error "
    "message (in the in-game console, these will show up using a red font by default). "
@@ -2236,7 +2236,7 @@ DefineEngineFunction( generateUUID, Torque::UUID, (),,
 
 //-----------------------------------------------------------------------------
 
-ConsoleFunction( call, const char *, 2, 0, "( string functionName, string args... ) "
+DefineEngineStringlyVariadicFunction( call, const char *, 2, 0, "( string functionName, string args... ) "
    "Apply the given arguments to the specified global function and return the result of the call.\n\n"
    "@param functionName The name of the function to call.  This function must be in the global namespace, i.e. "
       "you cannot call a function in a namespace through #call.  Use eval() for that.\n"

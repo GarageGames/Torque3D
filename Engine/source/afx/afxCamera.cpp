@@ -452,7 +452,7 @@ const char* afxCamera::getMode()
 
 static char buffer[100];
 
-ConsoleMethod(afxCamera, setOrbitMode, void, 7, 8, 
+DefineEngineStringlyVariadicMethod(afxCamera, setOrbitMode, void, 7, 8,
   "(GameBase orbitObject, TransformF mat, float minDistance, float maxDistance, float curDistance, bool ownClientObject)"
   "Set the camera to orbit around some given object.\n\n"
   "@param   orbitObject  Object we want to orbit.\n"

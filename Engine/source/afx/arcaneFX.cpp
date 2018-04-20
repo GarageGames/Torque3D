@@ -860,18 +860,18 @@ DefineEngineFunction(getMaxF, F32, (float a, float b),,
    return getMax(a, b);
 }
 
-ConsoleFunction(echoThru, const char*, 2, 0, "(string passthru, string text...)"
-                "Like echo(), but first argument is returned.\n"
-                "@ingroup AFX")
+DefineEngineStringlyVariadicFunction(echoThru, const char*, 2, 0, "(string passthru, string text...)"
+   "Like echo(), but first argument is returned.\n"
+   "@ingroup AFX")
 {
    U32 len = 0;
    S32 i;
-   for(i = 2; i < argc; i++)
+   for (i = 2; i < argc; i++)
       len += dStrlen(argv[i]);
 
    char *ret = Con::getReturnBuffer(len + 1);
    ret[0] = 0;
-   for(i = 2; i < argc; i++)
+   for (i = 2; i < argc; i++)
       dStrcat(ret, argv[i], len + 1);
 
    Con::printf("%s -- [%s]", ret, argv[1].getStringValue());
@@ -880,7 +880,7 @@ ConsoleFunction(echoThru, const char*, 2, 0, "(string passthru, string text...)"
    return argv[1];
 }
 
-ConsoleFunction(warnThru, const char*, 2, 0, "(string passthru, string text...)"
+DefineEngineStringlyVariadicFunction(warnThru, const char*, 2, 0, "(string passthru, string text...)"
                 "Like warn(), but first argument is returned.\n"
                 "@ingroup AFX")
 {
@@ -900,7 +900,7 @@ ConsoleFunction(warnThru, const char*, 2, 0, "(string passthru, string text...)"
    return argv[1];
 }
 
-ConsoleFunction(errorThru, const char*, 2, 0, "(string passthru, string text...)"
+DefineEngineStringlyVariadicFunction(errorThru, const char*, 2, 0, "(string passthru, string text...)"
                 "Like error(), but first argument is returned.\n"
                 "@ingroup AFX")
 {

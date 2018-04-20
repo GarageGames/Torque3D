@@ -2633,29 +2633,29 @@ DefineEngineMethod(afxMagicSpell, getImpactedObject, S32, (),,
   return (imp_obj) ? imp_obj->getId() : -1;
 }
 
-ConsoleMethod(afxMagicSpell, setTimeFactor, void, 3, 4, "(F32 factor) or (string phase, F32 factor)"
-              "Sets the time-factor for the spell, either overall or for a specific phrase.\n\n"
-              "@ingroup AFX")
+DefineEngineStringlyVariadicMethod(afxMagicSpell, setTimeFactor, void, 3, 4, "(F32 factor) or (string phase, F32 factor)"
+   "Sets the time-factor for the spell, either overall or for a specific phrase.\n\n"
+   "@ingroup AFX")
 {
-  if (argc == 3)
-    object->setTimeFactor(dAtof(argv[2]));
-  else
-  {
-    if (dStricmp(argv[2], "overall") == 0)
-      object->setTimeFactor(dAtof(argv[3]));
-    else if (dStricmp(argv[2], "casting") == 0)
-      object->setTimeFactor(afxMagicSpell::CASTING_PHRASE, dAtof(argv[3]));
-    else if (dStricmp(argv[2], "launch") == 0)
-      object->setTimeFactor(afxMagicSpell::LAUNCH_PHRASE, dAtof(argv[3]));
-    else if (dStricmp(argv[2], "delivery") == 0)
-      object->setTimeFactor(afxMagicSpell::DELIVERY_PHRASE, dAtof(argv[3]));
-    else if (dStricmp(argv[2], "impact") == 0)
-      object->setTimeFactor(afxMagicSpell::IMPACT_PHRASE, dAtof(argv[3]));
-    else if (dStricmp(argv[2], "linger") == 0)
-      object->setTimeFactor(afxMagicSpell::LINGER_PHRASE, dAtof(argv[3]));
-    else
-      Con::errorf("afxMagicSpell::setTimeFactor() -- unknown spell phrase [%s].", argv[2].getStringValue());
-  }
+   if (argc == 3)
+      object->setTimeFactor(dAtof(argv[2]));
+   else
+   {
+      if (dStricmp(argv[2], "overall") == 0)
+         object->setTimeFactor(dAtof(argv[3]));
+      else if (dStricmp(argv[2], "casting") == 0)
+         object->setTimeFactor(afxMagicSpell::CASTING_PHRASE, dAtof(argv[3]));
+      else if (dStricmp(argv[2], "launch") == 0)
+         object->setTimeFactor(afxMagicSpell::LAUNCH_PHRASE, dAtof(argv[3]));
+      else if (dStricmp(argv[2], "delivery") == 0)
+         object->setTimeFactor(afxMagicSpell::DELIVERY_PHRASE, dAtof(argv[3]));
+      else if (dStricmp(argv[2], "impact") == 0)
+         object->setTimeFactor(afxMagicSpell::IMPACT_PHRASE, dAtof(argv[3]));
+      else if (dStricmp(argv[2], "linger") == 0)
+         object->setTimeFactor(afxMagicSpell::LINGER_PHRASE, dAtof(argv[3]));
+      else
+         Con::errorf("afxMagicSpell::setTimeFactor() -- unknown spell phrase [%s].", argv[2].getStringValue());
+   }
 }
 
 DefineEngineMethod(afxMagicSpell, interruptStage, void, (),,

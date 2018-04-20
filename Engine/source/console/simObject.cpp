@@ -2945,7 +2945,7 @@ DefineEngineMethod( SimObject, setFieldType, void, ( const char* fieldName, cons
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( SimObject, call, const char*, 3, 0, "( string method, string args... ) Dynamically call a method on an object.\n"
+DefineEngineStringlyVariadicMethod( SimObject, call, const char*, 3, 0, "( string method, string args... ) Dynamically call a method on an object.\n"
    "@param method Name of method to call.\n"
    "@param args Zero or more arguments for the method.\n"
    "@return The result of the method call." )
@@ -3047,7 +3047,7 @@ DefineEngineMethod( SimObject, delete, void, (),,
 
 //-----------------------------------------------------------------------------
 
-ConsoleMethod( SimObject,schedule, S32, 4, 0, "( float time, string method, string args... ) Delay an invocation of a method.\n"
+DefineEngineStringlyVariadicMethod( SimObject,schedule, S32, 4, 0, "( float time, string method, string args... ) Delay an invocation of a method.\n"
    "@param time The number of milliseconds after which to invoke the method.  This is a soft limit.\n"
    "@param method The method to call.\n"
    "@param args The arguments with which to call the method.\n"

@@ -77,7 +77,7 @@ DefineEngineMethod( GuiFilterCtrl, getValue, const char*, (), , "Return a tuple 
    return buffer;
 }
 
-ConsoleMethod( GuiFilterCtrl, setValue, void, 3, 20, "(f1, f2, ...)"
+DefineEngineStringlyVariadicMethod( GuiFilterCtrl, setValue, void, 3, 20, "(f1, f2, ...)"
               "Reset the filter to use the specified points, spread equidistantly across the domain."
 			  "@internal")
 {

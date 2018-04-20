@@ -3225,7 +3225,7 @@ void WorldEditor::setEditorTool(EditorTool* newTool)
 
 //------------------------------------------------------------------------------
 
-ConsoleMethod( WorldEditor, ignoreObjClass, void, 3, 0, "(string class_name, ...)")
+DefineEngineStringlyVariadicMethod( WorldEditor, ignoreObjClass, void, 3, 0, "(string class_name, ...)")
 {
 	object->ignoreObjClass(argc, argv);
 }

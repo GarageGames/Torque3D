@@ -326,7 +326,7 @@ DefineEngineMethod( GameConnection, setJoinPassword, void, (const char* password
    object->setJoinPassword(password);
 }
 
-ConsoleMethod(GameConnection, setConnectArgs, void, 3, 17,
+DefineEngineStringlyVariadicMethod(GameConnection, setConnectArgs, void, 3, 17,
    "(const char* args) @brief On the client, pass along a variable set of parameters to the server.\n\n"
    
    "Once the connection is established with the server, the server calls its onConnect() method "
