@@ -21,58 +21,34 @@
 //-----------------------------------------------------------------------------
 
 #include "console/consoleInternal.h"
+#include "console/simDatablock.h"
 #include "console/simSet.h"
 #include "console/engineAPI.h"
 
-namespace Con
+namespace Sim
 {
-   DefineNewEngineFunction(AddConsumer, void, (ConsumerCallback cb), , "")
+   DefineNewEngineFunction(FindObjectById, SimObject*, (U32 pId), , "")
    {
-      addConsumer(cb);
+      return Sim::findObject(pId);
    }
 
-   DefineNewEngineFunction(RemoveConsumer, void, (ConsumerCallback cb), , "")
+   DefineNewEngineFunction(FindObjectByName, SimObject*, (String pName), , "")
    {
-      removeConsumer(cb);
+      return Sim::findObject(StringTable->insert(pName));
    }
 
-   DefineNewEngineFunction(GetConsoleString, String, (String name),, "")
+   DefineNewEngineFunction(FindDataBlockByName, SimObject*, (String pName), , "")
    {
-      return getVariable(StringTable->insert(name));
+      return Sim::getDataBlockGroup()->findObject(StringTable->insert(pName));
    }
 
-   DefineNewEngineFunction(SetConsoleString, void, (String name, String value),, "")
+   DefineNewEngineFunction(WrapObject, SimObjectPtr<SimObject>*, (SimObject* pObject), , "")
    {
-      setVariable(StringTable->insert(name), StringTable->insert(value));
+      return new SimObjectPtr<SimObject>(pObject);
    }
 
-   DefineNewEngineFunction(GetConsoleInt, S32, (String name),, "")
+   DefineNewEngineFunction(DeleteObjectPtr, void, (SimObjectPtr<SimObject>* pObjectPtr), , "")
    {
-      return getIntVariable(StringTable->insert(name));
-   }
-
-   DefineNewEngineFunction(SetConsoleInt, void, (String name, S32 value),, "")
-   {
-      setIntVariable(StringTable->insert(name), value);
-   }
-
-   DefineNewEngineFunction(GetConsoleFloat, F32, (String name),, "")
-   {
-      return getFloatVariable(StringTable->insert(name));
-   }
-
-   DefineNewEngineFunction(SetConsoleFloat, void, (String name, F32 value),, "")
-   {
-      setFloatVariable(StringTable->insert(name), value);
-   }
-
-   DefineNewEngineFunction(GetConsoleBool, bool, (String name),, "")
-   {
-      return getBoolVariable(StringTable->insert(name));
-   }
-
-   DefineNewEngineFunction(SetConsoleBool, void, (String name, bool value),, "")
-   {
-      setBoolVariable(StringTable->insert(name), value);
+      delete pObjectPtr;
    }
 }
