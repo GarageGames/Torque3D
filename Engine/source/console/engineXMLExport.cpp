@@ -197,7 +197,7 @@ static String getDefaultArgumentValue( const EngineFunctionInfo* function, const
          //TODO: for now we store string literals in ASCII; needs to be sorted out
          if( TYPE< const char* >() == type )
          {
-            const char* val = getArgValue< const char* >( defaultArgs, offset );
+            const char* val = reinterpret_cast< const char* >(defaultArgs->getArgs() + offset);
             value = val;
          }
             
