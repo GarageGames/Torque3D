@@ -676,6 +676,8 @@ public:
             prop.mFlags |= EnginePropertyGroupBegin;
          if (sg_tempFieldList[i].type == EndGroupFieldType)
             prop.mFlags |= EnginePropertyGroupEnd;
+         prop.mType = sg_tempFieldList[i].type;
+
          props[i] = prop;
       }
 
