@@ -20,8 +20,6 @@
 // IN THE SOFTWARE.
 //-----------------------------------------------------------------------------
 
-#include "c_simobjectInterface.h"
-
 #include "console/engineAPI.h"
 #include "console/simObject.h"
 

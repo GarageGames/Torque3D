@@ -42,12 +42,13 @@ namespace Sim
       return Sim::getDataBlockGroup()->findObject(StringTable->insert(pName));
    }
 
-   DefineNewEngineFunction(WrapObject, SimObjectPtr<SimObject>*, (SimObject* pObject), , "")
+   // EngineAPI doesn't work with SimObjectPtr
+   TORQUE_API SimObjectPtr<SimObject>* fnWrapObject (SimObject* pObject)
    {
       return new SimObjectPtr<SimObject>(pObject);
    }
 
-   DefineNewEngineFunction(DeleteObjectPtr, void, (SimObjectPtr<SimObject>* pObjectPtr), , "")
+   TORQUE_API void fnDeleteObjectPtr(SimObjectPtr<SimObject>* pObjectPtr)
    {
       delete pObjectPtr;
    }
