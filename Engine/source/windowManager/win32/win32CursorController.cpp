@@ -43,7 +43,8 @@ static struct { U32 id; LPTSTR resourceID; } sgCursorShapeMap[]=
    { PlatformCursorController::curResizeNESW,  IDC_SIZENESW },
    { PlatformCursorController::curResizeNWSE,  IDC_SIZENWSE },
    { PlatformCursorController::curHand,        IDC_HAND },
-   { 0,                             0 },
+   { PlatformCursorController::curWaitArrow,   IDC_WAIT },
+   { PlatformCursorController::curNoNo,        IDC_NO },
 };
 
 //static const EnumTable::Enums curManagerShapesEnums[] = 
@@ -129,7 +130,7 @@ void Win32CursorController::setCursorShape(U32 cursorID)
 {
    LPTSTR resourceID = NULL;
 
-   for(S32 i = 0;sgCursorShapeMap[i].resourceID != NULL;++i)
+   for(S32 i = 0; i < numPlatformCursors; ++i)
    {
       if(cursorID == sgCursorShapeMap[i].id)
       {
