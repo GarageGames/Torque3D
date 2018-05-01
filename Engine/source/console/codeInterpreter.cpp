@@ -400,11 +400,11 @@ ConsoleValueRef CodeInterpreter::exec(U32 ip,
    breakContinueLabel:
       OPCodeReturn ret = (this->*gOpCodeArray[mCurrentInstruction])(ip);
       if (ret == OPCodeReturn::exitCode)
-         goto exitLabel;
+         break;
       else if (ret == OPCodeReturn::breakContinue)
          goto breakContinueLabel;
    }
-exitLabel:
+
    if (telDebuggerOn && setFrame < 0)
       TelDebugger->popStackFrame();
 
@@ -2132,12 +2132,27 @@ OPCodeReturn CodeInterpreter::op_callfunc(U32 &ip)
    {
       if (!mExec.noCalls && !(routingId == MethodOnComponent))
       {
-         Con::warnf(ConsoleLogEntry::General, "%s: Unknown command %s.", mCodeBlock->getFileLine(ip - 6), fnName);
          if (callType == FuncCallExprNode::MethodCall)
          {
-            Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s",
-               gEvalState.thisObject->getName() ? gEvalState.thisObject->getName() : "",
-               gEvalState.thisObject->getId(), Con::getNamespaceList(ns));
+            if (gEvalState.thisObject != NULL)
+            {
+               // Try to use the name instead of the id
+               StringTableEntry name = gEvalState.thisObject->getName() ? gEvalState.thisObject->getName() : gEvalState.thisObject->getIdString();
+               Con::warnf(ConsoleLogEntry::General, "%s: Unknown method %s.%s Namespace List: %s", mCodeBlock->getFileLine(ip - 6), name, fnName, Con::getNamespaceList(ns));
+            }
+            else
+            {
+               // NULL.
+               Con::warnf(ConsoleLogEntry::General, "%s: Unknown method NULL.%s", mCodeBlock->getFileLine(ip - 6), fnName);
+            }
+         }
+         else if (callType == FuncCallExprNode::ParentCall)
+         {
+            Con::warnf(ConsoleLogEntry::General, "%s: Unknown parent call %s.", mCodeBlock->getFileLine(ip - 6), fnName);
+         }
+         else 
+         {
+            Con::warnf(ConsoleLogEntry::General, "%s: Unknown function %s.", mCodeBlock->getFileLine(ip - 6), fnName);
          }
       }
       STR.popFrame();
@@ -2328,7 +2343,7 @@ OPCodeReturn CodeInterpreter::op_callfunc_pointer(U32 &ip)
    {
       if (!mExec.noCalls)
       {
-         Con::warnf(ConsoleLogEntry::General, "%s: Unknown command %s.", mCodeBlock->getFileLine(ip - 6), fnName);
+         Con::warnf(ConsoleLogEntry::General, "%s: Unknown function %s.", mCodeBlock->getFileLine(ip - 6), fnName);
       }
       STR.popFrame();
       CSTK.popFrame();
@@ -2511,7 +2526,7 @@ OPCodeReturn CodeInterpreter::op_callfunc_this(U32 &ip)
    ip += 2;
    CSTK.getArgcArgv(fnName, &mCallArgc, &mCallArgv);
 
-   Namespace *ns = mThisObject->getNamespace();
+   Namespace *ns = mThisObject ? mThisObject->getNamespace() : NULL;
    if (ns)
       mNSEntry = ns->lookup(fnName);
    else
@@ -2521,10 +2536,17 @@ OPCodeReturn CodeInterpreter::op_callfunc_this(U32 &ip)
    {
       if (!mExec.noCalls)
       {
-         Con::warnf(ConsoleLogEntry::General, "%s: Unknown command %s.", mCodeBlock->getFileLine(ip - 6), fnName);
-         Con::warnf(ConsoleLogEntry::General, "  Object %s(%d) %s",
-            mThisObject->getName() ? mThisObject->getName() : "",
-            mThisObject->getId(), Con::getNamespaceList(ns));
+         if (mThisObject)
+         {
+            // Try to use the name instead of the id
+            StringTableEntry name = mThisObject->getName() ? mThisObject->getName() : mThisObject->getIdString();
+            Con::warnf(ConsoleLogEntry::General, "%s: Unknown method %s.%s Namespace List: %s", mCodeBlock->getFileLine(ip - 6), name, fnName, Con::getNamespaceList(ns));
+         }
+         else
+         {
+            // At least let the scripter know that they access the object.
+            Con::warnf(ConsoleLogEntry::General, "%s: Unknown method NULL.%s", mCodeBlock->getFileLine(ip - 6), fnName);
+         }
       }
       STR.popFrame();
       CSTK.popFrame();
