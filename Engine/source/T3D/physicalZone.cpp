@@ -212,8 +212,10 @@ void PhysicalZone::onRemove()
 
 void PhysicalZone::inspectPostApply()
 {
-   setPolyhedron(mPolyhedron);
    Parent::inspectPostApply();
+
+   setPolyhedron(mPolyhedron);
+   setMaskBits(PolyhedronMask | MoveMask | SettingsMask | FadeMask);
 }
 
 //------------------------------------------------------------------------------
@@ -248,30 +250,87 @@ void PhysicalZone::prepRenderImage( SceneRenderState *state )
 }
 
 
-void PhysicalZone::renderObject( ObjectRenderInst *ri,
-                                 SceneRenderState *state,
-                                 BaseMatInstance *overrideMat )
+void PhysicalZone::renderObject(ObjectRenderInst *ri,
+   SceneRenderState *state,
+   BaseMatInstance *overrideMat)
 {
    if (overrideMat)
       return;
-
+ 
    GFXStateBlockDesc desc;
-   desc.setZReadWrite( true, false );
-   desc.setBlend( true );
-   desc.setCullMode( GFXCullNone );
-
+   desc.setZReadWrite(true, false);
+   desc.setBlend(true);
+   desc.setCullMode(GFXCullNone);
+ 
    GFXTransformSaver saver;
+ 
+   GFXDrawUtil *drawer = GFX->getDrawUtil();
+ 
+   Point3F start = getBoxCenter();
+   Box3F obb = mObjBox; //object bounding box 
+
+   F32 baseForce = 10000; //roughly the ammount of force needed to push a player back as it walks into a zone. (used for visual scaling)
+
+   Point3F forceDir = getForce(&start);
+   F32 forceLen = forceDir.len()/ baseForce;
+   forceDir.normalizeSafe();
+   ColorI guideCol = LinearColorF(mFabs(forceDir.x), mFabs(forceDir.y), mFabs(forceDir.z), 0.125).toColorI();
+
+   if (force_type == VECTOR)
+   {
+	   Point3F endPos = start + (forceDir * mMax(forceLen,0.75f));
+	   drawer->drawArrow(desc, start, endPos, guideCol, 0.05f);
+   }
 
    MatrixF mat = getRenderTransform();
-   mat.scale( getScale() );
+   mat.scale(getScale());
+ 
+   GFX->multWorld(mat);
+   start = obb.getCenter();
+ 
+   if (force_type == VECTOR)
+   {
+      drawer->drawPolyhedron(desc, mPolyhedron, ColorI(0, 255, 0, 45));
+   }
+   else if (force_type == SPHERICAL)
+   {
+	   F32 rad = obb.getBoundingSphere().radius/ 2;
+      drawer->drawSphere(desc, rad, start, ColorI(0, 255, 0, 45));
 
-   GFX->multWorld( mat );
+	  rad = (rad + (mAppliedForce.most() / baseForce))/2;
+	  desc.setFillModeWireframe();
+	  drawer->drawSphere(desc, rad, start, ColorI(0, 0, 255, 255));
+   }
+   else
+   {
+      Point3F bottomPos = start;
+      bottomPos.z -= obb.len_z() / 2;
+ 
+      Point3F topPos = start;
+      topPos.z += obb.len_z() / 2;
+	  F32 rad = obb.len_x() / 2;
+      drawer->drawCylinder(desc, bottomPos, topPos, rad, ColorI(0, 255, 0, 45));
 
-   GFXDrawUtil *drawer = GFX->getDrawUtil();
-   drawer->drawPolyhedron( desc, mPolyhedron, ColorI( 0, 255, 0, 45 ) );
+	  Point3F force_vec = mAppliedForce; //raw relative-applied force here as oposed to derived
+	  F32 hieght = (force_vec.z / baseForce);
 
+	  if (force_vec.z<0)
+		  bottomPos.z = (bottomPos.z + hieght)/2;
+	  else
+		  topPos.z = (topPos.z + hieght) / 2;
+
+	  if (force_vec.x > force_vec.y)
+		  rad = (rad + (force_vec.x / baseForce)) / 2;
+	  else
+		  rad = (rad + (force_vec.y / baseForce)) / 2;
+
+
+	  desc.setFillModeWireframe();
+	  drawer->drawCylinder(desc, bottomPos, topPos, rad, guideCol);
+   }
+ 
    desc.setFillModeWireframe();
-   drawer->drawPolyhedron( desc, mPolyhedron, ColorI::BLACK );
+   drawer->drawPolyhedron(desc, mPolyhedron, ColorI::BLACK);
 }
 
 //--------------------------------------------------------------------------
@@ -325,7 +384,7 @@ U32 PhysicalZone::packUpdate(NetConnection* con, U32 mask, BitStream* stream)
 
    stream->writeFlag(mActive);
 
-     return retMask;
+   return retMask;
 }
 
 void PhysicalZone::unpackUpdate(NetConnection* con, BitStream* stream)

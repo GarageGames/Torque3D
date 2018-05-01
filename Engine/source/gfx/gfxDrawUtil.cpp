@@ -1382,7 +1382,7 @@ void GFXDrawUtil::drawCylinder( const GFXStateBlockDesc &desc, const Point3F &ba
    mDevice->popWorldMatrix();
 }
 
-void GFXDrawUtil::drawArrow( const GFXStateBlockDesc &desc, const Point3F &start, const Point3F &end, const ColorI &color )
+void GFXDrawUtil::drawArrow( const GFXStateBlockDesc &desc, const Point3F &start, const Point3F &end, const ColorI &color, F32 baseRad )
 {   
    GFXTransformSaver saver;
 
@@ -1398,8 +1398,8 @@ void GFXDrawUtil::drawArrow( const GFXStateBlockDesc &desc, const Point3F &start
 
    // Calculate the radius of the cone given that we want the cone to have
    // an angle of 25 degrees (just because it looks good).
-   F32 coneLen = ( end - coneBase ).len();
-   F32 coneDiameter = mTan( mDegToRad(25.0f) ) * coneLen;
+   F32 coneLen = (baseRad != 0.0f) ? baseRad * 4.0 :( end - coneBase ).len();
+   F32 coneDiameter = (baseRad != 0.0f) ? baseRad*4.0f : mTan( mDegToRad(25.0f) ) * coneLen;
 
    // Draw the cone on at the arrow's tip.
    drawCone( desc, coneBase, end, coneDiameter / 2.0f, color );
@@ -1412,7 +1412,7 @@ void GFXDrawUtil::drawArrow( const GFXStateBlockDesc &desc, const Point3F &start
    Point3F coneDiff = end - coneBase;
 
    // Draw the cylinder.
-   F32 stickRadius = len * 0.025f;   
+   F32 stickRadius = (baseRad != 0.0f) ? baseRad : len * 0.025f;
    drawCylinder( desc, start, end - coneDiff, stickRadius, color );
 }
 
