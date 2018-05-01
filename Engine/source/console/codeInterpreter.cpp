@@ -426,12 +426,12 @@ ConsoleValueRef CodeInterpreter::exec(U32 ip,
          }
          if (thisNamespace && thisNamespace->mName)
          {
-            dSprintf(sTraceBuffer + dStrlen(sTraceBuffer), sizeof(sTraceBuffer) - dStrlen(sTraceBuffer),
+            dSprintf(sTraceBuffer + dStrlen(sTraceBuffer), (U32)(sizeof(sTraceBuffer) - dStrlen(sTraceBuffer)),
                "%s::%s() - return %s", thisNamespace->mName, mThisFunctionName, STR.getStringValue());
          }
          else
          {
-            dSprintf(sTraceBuffer + dStrlen(sTraceBuffer), sizeof(sTraceBuffer) - dStrlen(sTraceBuffer),
+            dSprintf(sTraceBuffer + dStrlen(sTraceBuffer), (U32)(sizeof(sTraceBuffer) - dStrlen(sTraceBuffer)),
                "%s() - return %s", mThisFunctionName, STR.getStringValue());
          }
          Con::printf("%s", sTraceBuffer);
@@ -477,12 +477,12 @@ void CodeInterpreter::parseArgs(U32 &ip)
          }
          if (mExec.thisNamespace && mExec.thisNamespace->mName)
          {
-            dSprintf(sTraceBuffer + dStrlen(sTraceBuffer), sizeof(sTraceBuffer) - dStrlen(sTraceBuffer),
+            dSprintf(sTraceBuffer + dStrlen(sTraceBuffer), (U32)(sizeof(sTraceBuffer) - dStrlen(sTraceBuffer)),
                "%s::%s(", mExec.thisNamespace->mName, mThisFunctionName);
          }
          else
          {
-            dSprintf(sTraceBuffer + dStrlen(sTraceBuffer), sizeof(sTraceBuffer) - dStrlen(sTraceBuffer),
+            dSprintf(sTraceBuffer + dStrlen(sTraceBuffer), (U32)(sizeof(sTraceBuffer) - dStrlen(sTraceBuffer)),
                "%s(", mThisFunctionName);
          }
          for (S32 i = 0; i < wantedArgc; i++)
@@ -2388,9 +2388,6 @@ OPCodeReturn CodeInterpreter::op_callfunc_pointer(U32 &ip)
    {
       const char* nsName = "";
 
-      Namespace::Entry::CallbackUnion * nsCb = &mNSEntry->cb;
-      const char * nsUsage = mNSEntry->mUsage;
-
 #ifndef TORQUE_DEBUG
       // [tom, 12/13/2006] This stops tools functions from working in the console,
       // which is useful behavior when debugging so I'm ifdefing this out for debug builds.
@@ -2589,8 +2586,6 @@ OPCodeReturn CodeInterpreter::op_callfunc_this(U32 &ip)
    }
    else
    {
-      Namespace::Entry::CallbackUnion * nsCb = &mNSEntry->cb;
-      const char * nsUsage = mNSEntry->mUsage;
       const char* nsName = ns ? ns->mName : "";
 #ifndef TORQUE_DEBUG
       // [tom, 12/13/2006] This stops tools functions from working in the console,
