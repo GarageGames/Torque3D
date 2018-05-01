@@ -3689,6 +3689,7 @@ void ShapeBase::reSkin()
 {
    if ( isGhost() && mShapeInstance && mSkinNameHandle.isValidString() )
    {
+	  mShapeInstance->resetMaterialList();
       Vector<String> skins;
       String(mSkinNameHandle.getString()).split( ";", skins );
 

@@ -377,7 +377,7 @@ protected:
    }
 
    void reSkin( String newBaseName, String oldBaseName = String::EmptyString );
-
+   void resetMaterialList();
    enum
    {
       MaskNodeRotation       = 0x01,
