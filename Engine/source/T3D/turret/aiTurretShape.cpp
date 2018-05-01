@@ -249,14 +249,11 @@ bool AITurretShapeData::preload(bool server, String &errorStr)
    // We have mShape at this point.  Resolve nodes.
    scanNode = mShape->findNode("scanPoint");
    aimNode = mShape->findNode("aimPoint");
-   if (aimNode == -1)
-   {
-      aimNode = pitchNode;
-   }
-   if (aimNode == -1)
-   {
-      aimNode = headingNode;
-   }
+
+   if (scanNode == -1) scanNode = pitchNode;
+   if (scanNode == -1) scanNode = headingNode;
+   if (aimNode == -1) aimNode = pitchNode;
+   if (aimNode == -1) aimNode = headingNode;
 
    // Resolve state sequence names & emitter nodes
    isAnimated = false;
