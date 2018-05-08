@@ -199,7 +199,7 @@ bool PopupMenu::setItem(S32 pos, const char *title, const char* accelerator, con
 
 void PopupMenu::removeItem(S32 itemPos)
 {
-   if (mMenuItems.size() < itemPos || itemPos < 0)
+   if (mMenuItems.empty() || mMenuItems.size() < itemPos || itemPos < 0)
       return;
 
    mMenuItems.erase(itemPos);
@@ -208,7 +208,7 @@ void PopupMenu::removeItem(S32 itemPos)
 //////////////////////////////////////////////////////////////////////////
 void PopupMenu::enableItem(S32 pos, bool enable)
 {
-   if (mMenuItems.size() < pos || pos < 0)
+   if (mMenuItems.empty() || mMenuItems.size() < pos || pos < 0)
       return;
 
    mMenuItems[pos].enabled = enable;
@@ -216,7 +216,7 @@ void PopupMenu::enableItem(S32 pos, bool enable)
 
 void PopupMenu::checkItem(S32 pos, bool checked)
 {
-   if (mMenuItems.size() < pos || pos < 0)
+   if (mMenuItems.empty() || mMenuItems.size() < pos || pos < 0)
       return;
 
    if (checked && mMenuItems[pos].checkGroup != -1)
@@ -243,7 +243,7 @@ void PopupMenu::checkRadioItem(S32 firstPos, S32 lastPos, S32 checkPos)
 
 bool PopupMenu::isItemChecked(S32 pos)
 {
-   if (mMenuItems.size() < pos || pos < 0)
+   if (mMenuItems.empty() || mMenuItems.size() < pos || pos < 0)
       return false;
 
    return mMenuItems[pos].isChecked;
@@ -252,6 +252,11 @@ bool PopupMenu::isItemChecked(S32 pos)
 U32 PopupMenu::getItemCount()
 {
    return mMenuItems.size();
+}
+
+void PopupMenu::clearItems()
+{
+	mMenuItems.clear();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -496,6 +501,11 @@ DefineConsoleMethod(PopupMenu, isItemChecked, bool, (S32 pos), , "(pos)")
 DefineConsoleMethod(PopupMenu, getItemCount, S32, (), , "()")
 {
    return object->getItemCount();
+}
+
+DefineConsoleMethod(PopupMenu, clearItems, void, (), , "()")
+{
+	return object->clearItems();
 }
 
 //-----------------------------------------------------------------------------

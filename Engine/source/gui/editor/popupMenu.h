@@ -137,6 +137,9 @@ public:
    /// Returns the number of items in the menu.
    U32 getItemCount();
 
+   ///Clears all items
+   void clearItems();
+
    //-----------------------------------------------------------------------------
    /// Displays this menu as a popup menu and blocks until the user has selected
    /// an item.
