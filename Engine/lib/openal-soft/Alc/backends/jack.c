@@ -26,6 +26,8 @@
 
 #include "alMain.h"
 #include "alu.h"
+#include "alconfig.h"
+#include "ringbuffer.h"
 #include "threads.h"
 #include "compat.h"
 
@@ -63,6 +65,7 @@ static const ALCchar jackDevice[] = "JACK Default";
 static void *jack_handle;
 #define MAKE_FUNC(f) static __typeof(f) * p##f
 JACK_FUNCS(MAKE_FUNC);
+static __typeof(jack_error_callback) * pjack_error_callback;
 #undef MAKE_FUNC
 
 #define jack_client_open pjack_client_open
@@ -84,6 +87,7 @@ JACK_FUNCS(MAKE_FUNC);
 #define jack_set_buffer_size_callback pjack_set_buffer_size_callback
 #define jack_set_buffer_size pjack_set_buffer_size
 #define jack_get_buffer_size pjack_get_buffer_size
+#define jack_error_callback (*pjack_error_callback)
 #endif
 
 
@@ -96,6 +100,8 @@ static ALCboolean jack_load(void)
 #ifdef HAVE_DYNLOAD
     if(!jack_handle)
     {
+        al_string missing_funcs = AL_STRING_INIT_STATIC();
+
 #ifdef _WIN32
 #define JACKLIB "libjack.dll"
 #else
@@ -103,24 +109,33 @@ static ALCboolean jack_load(void)
 #endif
         jack_handle = LoadLib(JACKLIB);
         if(!jack_handle)
+        {
+            WARN("Failed to load %s\n", JACKLIB);
             return ALC_FALSE;
+        }
 
         error = ALC_FALSE;
 #define LOAD_FUNC(f) do {                                                     \
     p##f = GetSymbol(jack_handle, #f);                                        \
     if(p##f == NULL) {                                                        \
         error = ALC_TRUE;                                                     \
+        alstr_append_cstr(&missing_funcs, "\n" #f);                           \
     }                                                                         \
 } while(0)
         JACK_FUNCS(LOAD_FUNC);
 #undef LOAD_FUNC
+        /* Optional symbols. These don't exist in all versions of JACK. */
+#define LOAD_SYM(f) p##f = GetSymbol(jack_handle, #f)
+        LOAD_SYM(jack_error_callback);
+#undef LOAD_SYM
 
         if(error)
         {
+            WARN("Missing expected functions:%s\n", alstr_get_cstr(missing_funcs));
             CloseLib(jack_handle);
             jack_handle = NULL;
-            return ALC_FALSE;
         }
+        alstr_reset(&missing_funcs);
     }
 #endif
 
@@ -135,9 +150,9 @@ typedef struct ALCjackPlayback {
     jack_port_t *Port[MAX_OUTPUT_CHANNELS];
 
     ll_ringbuffer_t *Ring;
-    alcnd_t Cond;
+    alsem_t Sem;
 
-    volatile int killNow;
+    ATOMIC(ALenum) killNow;
     althrd_t thread;
 } ALCjackPlayback;
 
@@ -149,15 +164,14 @@ static int ALCjackPlayback_mixerProc(void *arg);
 static void ALCjackPlayback_Construct(ALCjackPlayback *self, ALCdevice *device);
 static void ALCjackPlayback_Destruct(ALCjackPlayback *self);
 static ALCenum ALCjackPlayback_open(ALCjackPlayback *self, const ALCchar *name);
-static void ALCjackPlayback_close(ALCjackPlayback *self);
 static ALCboolean ALCjackPlayback_reset(ALCjackPlayback *self);
 static ALCboolean ALCjackPlayback_start(ALCjackPlayback *self);
 static void ALCjackPlayback_stop(ALCjackPlayback *self);
 static DECLARE_FORWARD2(ALCjackPlayback, ALCbackend, ALCenum, captureSamples, void*, ALCuint)
 static DECLARE_FORWARD(ALCjackPlayback, ALCbackend, ALCuint, availableSamples)
 static ClockLatency ALCjackPlayback_getClockLatency(ALCjackPlayback *self);
-static void ALCjackPlayback_lock(ALCjackPlayback *self);
-static void ALCjackPlayback_unlock(ALCjackPlayback *self);
+static DECLARE_FORWARD(ALCjackPlayback, ALCbackend, void, lock)
+static DECLARE_FORWARD(ALCjackPlayback, ALCbackend, void, unlock)
 DECLARE_DEFAULT_ALLOCATORS(ALCjackPlayback)
 
 DEFINE_ALCBACKEND_VTABLE(ALCjackPlayback);
@@ -170,14 +184,14 @@ static void ALCjackPlayback_Construct(ALCjackPlayback *self, ALCdevice *device)
     ALCbackend_Construct(STATIC_CAST(ALCbackend, self), device);
     SET_VTABLE2(ALCjackPlayback, ALCbackend, self);
 
-    alcnd_init(&self->Cond);
+    alsem_init(&self->Sem, 0);
 
     self->Client = NULL;
     for(i = 0;i < MAX_OUTPUT_CHANNELS;i++)
         self->Port[i] = NULL;
     self->Ring = NULL;
 
-    self->killNow = 1;
+    ATOMIC_INIT(&self->killNow, AL_TRUE);
 }
 
 static void ALCjackPlayback_Destruct(ALCjackPlayback *self)
@@ -196,7 +210,7 @@ static void ALCjackPlayback_Destruct(ALCjackPlayback *self)
         self->Client = NULL;
     }
 
-    alcnd_destroy(&self->Cond);
+    alsem_destroy(&self->Sem);
 
     ALCbackend_Destruct(STATIC_CAST(ALCbackend, self));
 }
@@ -211,19 +225,23 @@ static int ALCjackPlayback_bufferSizeNotify(jack_nframes_t numframes, void *arg)
     ALCjackPlayback_lock(self);
     device->UpdateSize = numframes;
     device->NumUpdates = 2;
-    TRACE("%u update size x%u\n", device->UpdateSize, device->NumUpdates);
 
     bufsize = device->UpdateSize;
-    if(ConfigValueUInt(al_string_get_cstr(device->DeviceName), "jack", "buffer-size", &bufsize))
+    if(ConfigValueUInt(alstr_get_cstr(device->DeviceName), "jack", "buffer-size", &bufsize))
         bufsize = maxu(NextPowerOf2(bufsize), device->UpdateSize);
-    bufsize += device->UpdateSize;
+    device->NumUpdates = (bufsize+device->UpdateSize) / device->UpdateSize;
+
+    TRACE("%u update size x%u\n", device->UpdateSize, device->NumUpdates);
 
     ll_ringbuffer_free(self->Ring);
-    self->Ring = ll_ringbuffer_create(bufsize, FrameSizeFromDevFmt(device->FmtChans, device->FmtType));
+    self->Ring = ll_ringbuffer_create(bufsize,
+        FrameSizeFromDevFmt(device->FmtChans, device->FmtType, device->AmbiOrder),
+        true
+    );
     if(!self->Ring)
     {
         ERR("Failed to reallocate ringbuffer\n");
-        aluHandleDisconnect(device);
+        aluHandleDisconnect(device, "Failed to reallocate %u-sample buffer", bufsize);
     }
     ALCjackPlayback_unlock(self);
     return 0;
@@ -237,7 +255,7 @@ static int ALCjackPlayback_process(jack_nframes_t numframes, void *arg)
     ll_ringbuffer_data_t data[2];
     jack_nframes_t total = 0;
     jack_nframes_t todo;
-    ALuint i, c, numchans;
+    ALsizei i, c, numchans;
 
     ll_ringbuffer_get_read_vector(self->Ring, data);
 
@@ -248,8 +266,9 @@ static int ALCjackPlayback_process(jack_nframes_t numframes, void *arg)
     todo = minu(numframes, data[0].len);
     for(c = 0;c < numchans;c++)
     {
-        for(i = 0;i < todo;i++)
-            out[c][i] = ((ALfloat*)data[0].buf)[i*numchans + c];
+        const ALfloat *restrict in = ((ALfloat*)data[0].buf) + c;
+        for(i = 0;(jack_nframes_t)i < todo;i++)
+            out[c][i] = in[i*numchans];
         out[c] += todo;
     }
     total += todo;
@@ -259,22 +278,23 @@ static int ALCjackPlayback_process(jack_nframes_t numframes, void *arg)
     {
         for(c = 0;c < numchans;c++)
         {
-            for(i = 0;i < todo;i++)
-                out[c][i] = ((ALfloat*)data[1].buf)[i*numchans + c];
+            const ALfloat *restrict in = ((ALfloat*)data[1].buf) + c;
+            for(i = 0;(jack_nframes_t)i < todo;i++)
+                out[c][i] = in[i*numchans];
             out[c] += todo;
         }
         total += todo;
     }
 
     ll_ringbuffer_read_advance(self->Ring, total);
-    alcnd_signal(&self->Cond);
+    alsem_post(&self->Sem);
 
     if(numframes > total)
     {
         todo = numframes-total;
         for(c = 0;c < numchans;c++)
         {
-            for(i = 0;i < todo;i++)
+            for(i = 0;(jack_nframes_t)i < todo;i++)
                 out[c][i] = 0.0f;
         }
     }
@@ -292,27 +312,16 @@ static int ALCjackPlayback_mixerProc(void *arg)
     althrd_setname(althrd_current(), MIXER_THREAD_NAME);
 
     ALCjackPlayback_lock(self);
-    while(!self->killNow && device->Connected)
+    while(!ATOMIC_LOAD(&self->killNow, almemory_order_acquire) &&
+          ATOMIC_LOAD(&device->Connected, almemory_order_acquire))
     {
         ALuint todo, len1, len2;
 
-        /* NOTE: Unfortunately, there is an unavoidable race condition here.
-         * It's possible for the process() method to run, updating the read
-         * pointer and signaling the condition variable, in between the mixer
-         * loop checking the write size and waiting for the condition variable.
-         * This will cause the mixer loop to wait until the *next* process()
-         * invocation, most likely writing silence for it.
-         *
-         * However, this should only happen if the mixer is running behind
-         * anyway (as ideally we'll be asleep in alcnd_wait by the time the
-         * process() method is invoked), so this behavior is not unwarranted.
-         * It's unfortunate since it'll be wasting time sleeping that could be
-         * used to catch up, but there's no way around it without blocking in
-         * the process() method.
-         */
         if(ll_ringbuffer_write_space(self->Ring) < device->UpdateSize)
         {
-            alcnd_wait(&self->Cond, &STATIC_CAST(ALCbackend,self)->mMutex);
+            ALCjackPlayback_unlock(self);
+            alsem_wait(&self->Sem);
+            ALCjackPlayback_lock(self);
             continue;
         }
 
@@ -362,29 +371,15 @@ static ALCenum ALCjackPlayback_open(ALCjackPlayback *self, const ALCchar *name)
     jack_set_process_callback(self->Client, ALCjackPlayback_process, self);
     jack_set_buffer_size_callback(self->Client, ALCjackPlayback_bufferSizeNotify, self);
 
-    al_string_copy_cstr(&device->DeviceName, name);
+    alstr_copy_cstr(&device->DeviceName, name);
 
     return ALC_NO_ERROR;
-}
-
-static void ALCjackPlayback_close(ALCjackPlayback *self)
-{
-    ALuint i;
-
-    for(i = 0;i < MAX_OUTPUT_CHANNELS;i++)
-    {
-        if(self->Port[i])
-            jack_port_unregister(self->Client, self->Port[i]);
-        self->Port[i] = NULL;
-    }
-    jack_client_close(self->Client);
-    self->Client = NULL;
 }
 
 static ALCboolean ALCjackPlayback_reset(ALCjackPlayback *self)
 {
     ALCdevice *device = STATIC_CAST(ALCbackend, self)->mDevice;
-    ALuint numchans, i;
+    ALsizei numchans, i;
     ALuint bufsize;
 
     for(i = 0;i < MAX_OUTPUT_CHANNELS;i++)
@@ -395,23 +390,21 @@ static ALCboolean ALCjackPlayback_reset(ALCjackPlayback *self)
     }
 
     /* Ignore the requested buffer metrics and just keep one JACK-sized buffer
-     * ready for when requested. Note that one period's worth of audio in the
-     * ring buffer will always be left unfilled because one element of the ring
-     * buffer will not be writeable, and we only write in period-sized chunks.
+     * ready for when requested.
      */
     device->Frequency = jack_get_sample_rate(self->Client);
     device->UpdateSize = jack_get_buffer_size(self->Client);
     device->NumUpdates = 2;
 
     bufsize = device->UpdateSize;
-    if(ConfigValueUInt(al_string_get_cstr(device->DeviceName), "jack", "buffer-size", &bufsize))
+    if(ConfigValueUInt(alstr_get_cstr(device->DeviceName), "jack", "buffer-size", &bufsize))
         bufsize = maxu(NextPowerOf2(bufsize), device->UpdateSize);
-    bufsize += device->UpdateSize;
+    device->NumUpdates = (bufsize+device->UpdateSize) / device->UpdateSize;
 
     /* Force 32-bit float output. */
     device->FmtType = DevFmtFloat;
 
-    numchans = ChannelsFromDevFmt(device->FmtChans);
+    numchans = ChannelsFromDevFmt(device->FmtChans, device->AmbiOrder);
     for(i = 0;i < numchans;i++)
     {
         char name[64];
@@ -440,7 +433,10 @@ static ALCboolean ALCjackPlayback_reset(ALCjackPlayback *self)
     }
 
     ll_ringbuffer_free(self->Ring);
-    self->Ring = ll_ringbuffer_create(bufsize, FrameSizeFromDevFmt(device->FmtChans, device->FmtType));
+    self->Ring = ll_ringbuffer_create(bufsize,
+        FrameSizeFromDevFmt(device->FmtChans, device->FmtType, device->AmbiOrder),
+        true
+    );
     if(!self->Ring)
     {
         ERR("Failed to allocate ringbuffer\n");
@@ -455,7 +451,7 @@ static ALCboolean ALCjackPlayback_reset(ALCjackPlayback *self)
 static ALCboolean ALCjackPlayback_start(ALCjackPlayback *self)
 {
     const char **ports;
-    ALuint i;
+    ALsizei i;
 
     if(jack_activate(self->Client))
     {
@@ -482,7 +478,7 @@ static ALCboolean ALCjackPlayback_start(ALCjackPlayback *self)
     }
     jack_free(ports);
 
-    self->killNow = 0;
+    ATOMIC_STORE(&self->killNow, AL_FALSE, almemory_order_release);
     if(althrd_create(&self->thread, ALCjackPlayback_mixerProc, self) != althrd_success)
     {
         jack_deactivate(self->Client);
@@ -496,17 +492,10 @@ static void ALCjackPlayback_stop(ALCjackPlayback *self)
 {
     int res;
 
-    if(self->killNow)
+    if(ATOMIC_EXCHANGE(&self->killNow, AL_TRUE, almemory_order_acq_rel))
         return;
 
-    self->killNow = 1;
-    /* Lock the backend to ensure we don't flag the mixer to die and signal the
-     * mixer to wake up in between it checking the flag and going to sleep and
-     * wait for a wakeup (potentially leading to it never waking back up to see
-     * the flag). */
-    ALCjackPlayback_lock(self);
-    ALCjackPlayback_unlock(self);
-    alcnd_signal(&self->Cond);
+    alsem_post(&self->Sem);
     althrd_join(self->thread, &res);
 
     jack_deactivate(self->Client);
@@ -528,17 +517,6 @@ static ClockLatency ALCjackPlayback_getClockLatency(ALCjackPlayback *self)
 }
 
 
-static void ALCjackPlayback_lock(ALCjackPlayback *self)
-{
-    almtx_lock(&STATIC_CAST(ALCbackend,self)->mMutex);
-}
-
-static void ALCjackPlayback_unlock(ALCjackPlayback *self)
-{
-    almtx_unlock(&STATIC_CAST(ALCbackend,self)->mMutex);
-}
-
-
 static void jack_msg_handler(const char *message)
 {
     WARN("%s\n", message);
@@ -551,6 +529,7 @@ typedef struct ALCjackBackendFactory {
 
 static ALCboolean ALCjackBackendFactory_init(ALCjackBackendFactory* UNUSED(self))
 {
+    void (*old_error_cb)(const char*);
     jack_client_t *client;
     jack_status_t status;
 
@@ -560,9 +539,10 @@ static ALCboolean ALCjackBackendFactory_init(ALCjackBackendFactory* UNUSED(self)
     if(!GetConfigValueBool(NULL, "jack", "spawn-server", 0))
         ClientOptions |= JackNoStartServer;
 
+    old_error_cb = (&jack_error_callback ? jack_error_callback : NULL);
     jack_set_error_function(jack_msg_handler);
     client = jack_client_open("alsoft", ClientOptions, &status, NULL);
-    jack_set_error_function(NULL);
+    jack_set_error_function(old_error_cb);
     if(client == NULL)
     {
         WARN("jack_client_open() failed, 0x%02x\n", status);

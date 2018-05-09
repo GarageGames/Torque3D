@@ -142,6 +142,12 @@ foreach(_component ${FFmpeg_FIND_COMPONENTS})
     endif()
 endforeach()
 
+# Add libz if it exists (needed for static ffmpeg builds)
+find_library(_FFmpeg_HAVE_LIBZ NAMES z)
+if(_FFmpeg_HAVE_LIBZ)
+    set(FFMPEG_LIBRARIES ${FFMPEG_LIBRARIES} ${_FFmpeg_HAVE_LIBZ})
+endif()
+
 # Build the include path and library list with duplicates removed.
 if(FFMPEG_INCLUDE_DIRS)
     list(REMOVE_DUPLICATES FFMPEG_INCLUDE_DIRS)
