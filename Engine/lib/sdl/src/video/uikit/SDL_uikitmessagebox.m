@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -31,7 +31,7 @@
 static SDL_bool s_showingMessageBox = SDL_FALSE;
 
 SDL_bool
-UIKit_ShowingMessageBox()
+UIKit_ShowingMessageBox(void)
 {
     return s_showingMessageBox;
 }
@@ -107,6 +107,18 @@ UIKit_ShowMessageBoxAlertController(const SDL_MessageBoxData *messageboxdata, in
 
     if (alertwindow) {
         alertwindow.hidden = YES;
+    }
+
+    /* Force the main SDL window to re-evaluate home indicator state */
+    SDL_Window *focus = SDL_GetFocusWindow();
+    if (focus) {
+        SDL_WindowData *data = (__bridge SDL_WindowData *) focus->driverdata;
+        if (data != nil) {
+            if (@available(iOS 11.0, *)) {
+                [data.viewcontroller performSelectorOnMainThread:@selector(setNeedsUpdateOfHomeIndicatorAutoHidden) withObject:nil waitUntilDone:NO];
+                [data.viewcontroller performSelectorOnMainThread:@selector(setNeedsUpdateOfScreenEdgesDeferringSystemGestures) withObject:nil waitUntilDone:NO];
+            }
+        }
     }
 
     *buttonid = messageboxdata->buttons[clickedindex].buttonid;
