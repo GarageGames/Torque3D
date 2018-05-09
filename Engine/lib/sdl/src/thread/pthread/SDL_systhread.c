@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2016 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2018 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -52,7 +52,7 @@
 #endif
 
 #ifdef __HAIKU__
-#include <be/kernel/OS.h>
+#include <kernel/OS.h>
 #endif
 
 #include "SDL_assert.h"
@@ -212,7 +212,7 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
     int policy;
     pthread_t thread = pthread_self();
 
-    if (pthread_getschedparam(thread, &policy, &sched) < 0) {
+    if (pthread_getschedparam(thread, &policy, &sched) != 0) {
         return SDL_SetError("pthread_getschedparam() failed");
     }
     if (priority == SDL_THREAD_PRIORITY_LOW) {
@@ -224,7 +224,7 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
         int max_priority = sched_get_priority_max(policy);
         sched.sched_priority = (min_priority + (max_priority - min_priority) / 2);
     }
-    if (pthread_setschedparam(thread, policy, &sched) < 0) {
+    if (pthread_setschedparam(thread, policy, &sched) != 0) {
         return SDL_SetError("pthread_setschedparam() failed");
     }
     return 0;
