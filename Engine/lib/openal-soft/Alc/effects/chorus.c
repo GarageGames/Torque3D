@@ -24,32 +24,40 @@
 #include <stdlib.h>
 
 #include "alMain.h"
-#include "alFilter.h"
 #include "alAuxEffectSlot.h"
 #include "alError.h"
 #include "alu.h"
+#include "filters/defs.h"
 
 
-enum ChorusWaveForm {
-    CWF_Triangle = AL_CHORUS_WAVEFORM_TRIANGLE,
-    CWF_Sinusoid = AL_CHORUS_WAVEFORM_SINUSOID
+static_assert(AL_CHORUS_WAVEFORM_SINUSOID == AL_FLANGER_WAVEFORM_SINUSOID, "Chorus/Flanger waveform value mismatch");
+static_assert(AL_CHORUS_WAVEFORM_TRIANGLE == AL_FLANGER_WAVEFORM_TRIANGLE, "Chorus/Flanger waveform value mismatch");
+
+enum WaveForm {
+    WF_Sinusoid,
+    WF_Triangle
 };
 
 typedef struct ALchorusState {
     DERIVE_FROM_TYPE(ALeffectState);
 
-    ALfloat *SampleBuffer[2];
-    ALuint BufferLength;
-    ALuint offset;
-    ALuint lfo_range;
+    ALfloat *SampleBuffer;
+    ALsizei BufferLength;
+    ALsizei offset;
+
+    ALsizei lfo_offset;
+    ALsizei lfo_range;
     ALfloat lfo_scale;
     ALint lfo_disp;
 
     /* Gains for left and right sides */
-    ALfloat Gain[2][MAX_OUTPUT_CHANNELS];
+    struct {
+        ALfloat Current[MAX_OUTPUT_CHANNELS];
+        ALfloat Target[MAX_OUTPUT_CHANNELS];
+    } Gains[2];
 
     /* effect parameters */
-    enum ChorusWaveForm waveform;
+    enum WaveForm waveform;
     ALint delay;
     ALfloat depth;
     ALfloat feedback;
@@ -57,8 +65,8 @@ typedef struct ALchorusState {
 
 static ALvoid ALchorusState_Destruct(ALchorusState *state);
 static ALboolean ALchorusState_deviceUpdate(ALchorusState *state, ALCdevice *Device);
-static ALvoid ALchorusState_update(ALchorusState *state, const ALCdevice *Device, const ALeffectslot *Slot, const ALeffectProps *props);
-static ALvoid ALchorusState_process(ALchorusState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels);
+static ALvoid ALchorusState_update(ALchorusState *state, const ALCcontext *Context, const ALeffectslot *Slot, const ALeffectProps *props);
+static ALvoid ALchorusState_process(ALchorusState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels);
 DECLARE_DEFAULT_ALLOCATORS(ALchorusState)
 
 DEFINE_ALEFFECTSTATE_VTABLE(ALchorusState);
@@ -70,54 +78,51 @@ static void ALchorusState_Construct(ALchorusState *state)
     SET_VTABLE2(ALchorusState, ALeffectState, state);
 
     state->BufferLength = 0;
-    state->SampleBuffer[0] = NULL;
-    state->SampleBuffer[1] = NULL;
+    state->SampleBuffer = NULL;
     state->offset = 0;
+    state->lfo_offset = 0;
     state->lfo_range = 1;
-    state->waveform = CWF_Triangle;
+    state->waveform = WF_Triangle;
 }
 
 static ALvoid ALchorusState_Destruct(ALchorusState *state)
 {
-    al_free(state->SampleBuffer[0]);
-    state->SampleBuffer[0] = NULL;
-    state->SampleBuffer[1] = NULL;
+    al_free(state->SampleBuffer);
+    state->SampleBuffer = NULL;
 
     ALeffectState_Destruct(STATIC_CAST(ALeffectState,state));
 }
 
 static ALboolean ALchorusState_deviceUpdate(ALchorusState *state, ALCdevice *Device)
 {
-    ALuint maxlen;
-    ALuint it;
+    const ALfloat max_delay = maxf(AL_CHORUS_MAX_DELAY, AL_FLANGER_MAX_DELAY);
+    ALsizei maxlen;
 
-    maxlen = fastf2u(AL_CHORUS_MAX_DELAY * 3.0f * Device->Frequency) + 1;
-    maxlen = NextPowerOf2(maxlen);
+    maxlen = NextPowerOf2(float2int(max_delay*2.0f*Device->Frequency) + 1u);
+    if(maxlen <= 0) return AL_FALSE;
 
     if(maxlen != state->BufferLength)
     {
-        void *temp = al_calloc(16, maxlen * sizeof(ALfloat) * 2);
+        void *temp = al_calloc(16, maxlen * sizeof(ALfloat));
         if(!temp) return AL_FALSE;
 
-        al_free(state->SampleBuffer[0]);
-        state->SampleBuffer[0] = temp;
-        state->SampleBuffer[1] = state->SampleBuffer[0] + maxlen;
+        al_free(state->SampleBuffer);
+        state->SampleBuffer = temp;
 
         state->BufferLength = maxlen;
     }
 
-    for(it = 0;it < state->BufferLength;it++)
-    {
-        state->SampleBuffer[0][it] = 0.0f;
-        state->SampleBuffer[1][it] = 0.0f;
-    }
+    memset(state->SampleBuffer, 0, state->BufferLength*sizeof(ALfloat));
+    memset(state->Gains, 0, sizeof(state->Gains));
 
     return AL_TRUE;
 }
 
-static ALvoid ALchorusState_update(ALchorusState *state, const ALCdevice *Device, const ALeffectslot *Slot, const ALeffectProps *props)
+static ALvoid ALchorusState_update(ALchorusState *state, const ALCcontext *Context, const ALeffectslot *Slot, const ALeffectProps *props)
 {
-    ALfloat frequency = (ALfloat)Device->Frequency;
+    const ALsizei mindelay = MAX_RESAMPLE_PADDING << FRACTIONBITS;
+    const ALCdevice *device = Context->Device;
+    ALfloat frequency = (ALfloat)device->Frequency;
     ALfloat coeffs[MAX_AMBI_COEFFS];
     ALfloat rate;
     ALint phase;
@@ -125,156 +130,166 @@ static ALvoid ALchorusState_update(ALchorusState *state, const ALCdevice *Device
     switch(props->Chorus.Waveform)
     {
         case AL_CHORUS_WAVEFORM_TRIANGLE:
-            state->waveform = CWF_Triangle;
+            state->waveform = WF_Triangle;
             break;
         case AL_CHORUS_WAVEFORM_SINUSOID:
-            state->waveform = CWF_Sinusoid;
+            state->waveform = WF_Sinusoid;
             break;
     }
-    state->depth = props->Chorus.Depth;
+
+    /* The LFO depth is scaled to be relative to the sample delay. Clamp the
+     * delay and depth to allow enough padding for resampling.
+     */
+    state->delay = maxi(float2int(props->Chorus.Delay*frequency*FRACTIONONE + 0.5f),
+                        mindelay);
+    state->depth = minf(props->Chorus.Depth * state->delay,
+                        (ALfloat)(state->delay - mindelay));
+
     state->feedback = props->Chorus.Feedback;
-    state->delay = fastf2i(props->Chorus.Delay * frequency);
 
     /* Gains for left and right sides */
-    CalcXYZCoeffs(-1.0f, 0.0f, 0.0f, 0.0f, coeffs);
-    ComputePanningGains(Device->Dry, coeffs, Slot->Params.Gain, state->Gain[0]);
-    CalcXYZCoeffs( 1.0f, 0.0f, 0.0f, 0.0f, coeffs);
-    ComputePanningGains(Device->Dry, coeffs, Slot->Params.Gain, state->Gain[1]);
+    CalcAngleCoeffs(-F_PI_2, 0.0f, 0.0f, coeffs);
+    ComputeDryPanGains(&device->Dry, coeffs, Slot->Params.Gain, state->Gains[0].Target);
+    CalcAngleCoeffs( F_PI_2, 0.0f, 0.0f, coeffs);
+    ComputeDryPanGains(&device->Dry, coeffs, Slot->Params.Gain, state->Gains[1].Target);
 
     phase = props->Chorus.Phase;
     rate = props->Chorus.Rate;
     if(!(rate > 0.0f))
     {
-        state->lfo_scale = 0.0f;
+        state->lfo_offset = 0;
         state->lfo_range = 1;
+        state->lfo_scale = 0.0f;
         state->lfo_disp = 0;
     }
     else
     {
-        /* Calculate LFO coefficient */
-        state->lfo_range = fastf2u(frequency/rate + 0.5f);
+        /* Calculate LFO coefficient (number of samples per cycle). Limit the
+         * max range to avoid overflow when calculating the displacement.
+         */
+        ALsizei lfo_range = float2int(minf(frequency/rate + 0.5f, (ALfloat)(INT_MAX/360 - 180)));
+
+        state->lfo_offset = float2int((ALfloat)state->lfo_offset/state->lfo_range*
+                                      lfo_range + 0.5f) % lfo_range;
+        state->lfo_range = lfo_range;
         switch(state->waveform)
         {
-            case CWF_Triangle:
+            case WF_Triangle:
                 state->lfo_scale = 4.0f / state->lfo_range;
                 break;
-            case CWF_Sinusoid:
+            case WF_Sinusoid:
                 state->lfo_scale = F_TAU / state->lfo_range;
                 break;
         }
 
         /* Calculate lfo phase displacement */
-        state->lfo_disp = fastf2i(state->lfo_range * (phase/360.0f));
+        if(phase < 0) phase = 360 + phase;
+        state->lfo_disp = (state->lfo_range*phase + 180) / 360;
     }
 }
 
-static inline void Triangle(ALint *delay_left, ALint *delay_right, ALuint offset, const ALchorusState *state)
+static void GetTriangleDelays(ALint *restrict delays, ALsizei offset, const ALsizei lfo_range,
+                              const ALfloat lfo_scale, const ALfloat depth, const ALsizei delay,
+                              const ALsizei todo)
 {
-    ALfloat lfo_value;
-
-    lfo_value = 2.0f - fabsf(2.0f - state->lfo_scale*(offset%state->lfo_range));
-    lfo_value *= state->depth * state->delay;
-    *delay_left = fastf2i(lfo_value) + state->delay;
-
-    offset += state->lfo_disp;
-    lfo_value = 2.0f - fabsf(2.0f - state->lfo_scale*(offset%state->lfo_range));
-    lfo_value *= state->depth * state->delay;
-    *delay_right = fastf2i(lfo_value) + state->delay;
+    ALsizei i;
+    for(i = 0;i < todo;i++)
+    {
+        delays[i] = fastf2i((1.0f - fabsf(2.0f - lfo_scale*offset)) * depth) + delay;
+        offset = (offset+1)%lfo_range;
+    }
 }
 
-static inline void Sinusoid(ALint *delay_left, ALint *delay_right, ALuint offset, const ALchorusState *state)
+static void GetSinusoidDelays(ALint *restrict delays, ALsizei offset, const ALsizei lfo_range,
+                              const ALfloat lfo_scale, const ALfloat depth, const ALsizei delay,
+                              const ALsizei todo)
 {
-    ALfloat lfo_value;
-
-    lfo_value = 1.0f + sinf(state->lfo_scale*(offset%state->lfo_range));
-    lfo_value *= state->depth * state->delay;
-    *delay_left = fastf2i(lfo_value) + state->delay;
-
-    offset += state->lfo_disp;
-    lfo_value = 1.0f + sinf(state->lfo_scale*(offset%state->lfo_range));
-    lfo_value *= state->depth * state->delay;
-    *delay_right = fastf2i(lfo_value) + state->delay;
+    ALsizei i;
+    for(i = 0;i < todo;i++)
+    {
+        delays[i] = fastf2i(sinf(lfo_scale*offset) * depth) + delay;
+        offset = (offset+1)%lfo_range;
+    }
 }
 
-#define DECL_TEMPLATE(Func)                                                   \
-static void Process##Func(ALchorusState *state, const ALuint SamplesToDo,     \
-  const ALfloat *restrict SamplesIn, ALfloat (*restrict out)[2])              \
-{                                                                             \
-    const ALuint bufmask = state->BufferLength-1;                             \
-    ALfloat *restrict leftbuf = state->SampleBuffer[0];                       \
-    ALfloat *restrict rightbuf = state->SampleBuffer[1];                      \
-    ALuint offset = state->offset;                                            \
-    const ALfloat feedback = state->feedback;                                 \
-    ALuint it;                                                                \
-                                                                              \
-    for(it = 0;it < SamplesToDo;it++)                                         \
-    {                                                                         \
-        ALint delay_left, delay_right;                                        \
-        Func(&delay_left, &delay_right, offset, state);                       \
-                                                                              \
-        out[it][0] = leftbuf[(offset-delay_left)&bufmask];                    \
-        leftbuf[offset&bufmask] = (out[it][0]+SamplesIn[it]) * feedback;      \
-                                                                              \
-        out[it][1] = rightbuf[(offset-delay_right)&bufmask];                  \
-        rightbuf[offset&bufmask] = (out[it][1]+SamplesIn[it]) * feedback;     \
-                                                                              \
-        offset++;                                                             \
-    }                                                                         \
-    state->offset = offset;                                                   \
-}
 
-DECL_TEMPLATE(Triangle)
-DECL_TEMPLATE(Sinusoid)
-
-#undef DECL_TEMPLATE
-
-static ALvoid ALchorusState_process(ALchorusState *state, ALuint SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALuint NumChannels)
+static ALvoid ALchorusState_process(ALchorusState *state, ALsizei SamplesToDo, const ALfloat (*restrict SamplesIn)[BUFFERSIZE], ALfloat (*restrict SamplesOut)[BUFFERSIZE], ALsizei NumChannels)
 {
-    ALuint it, kt;
-    ALuint base;
+    const ALsizei bufmask = state->BufferLength-1;
+    const ALfloat feedback = state->feedback;
+    const ALsizei avgdelay = (state->delay + (FRACTIONONE>>1)) >> FRACTIONBITS;
+    ALfloat *restrict delaybuf = state->SampleBuffer;
+    ALsizei offset = state->offset;
+    ALsizei i, c;
+    ALsizei base;
 
     for(base = 0;base < SamplesToDo;)
     {
-        ALfloat temps[128][2];
-        ALuint td = minu(128, SamplesToDo-base);
+        const ALsizei todo = mini(256, SamplesToDo-base);
+        ALint moddelays[2][256];
+        alignas(16) ALfloat temps[2][256];
 
-        switch(state->waveform)
+        if(state->waveform == WF_Sinusoid)
         {
-            case CWF_Triangle:
-                ProcessTriangle(state, td, SamplesIn[0]+base, temps);
-                break;
-            case CWF_Sinusoid:
-                ProcessSinusoid(state, td, SamplesIn[0]+base, temps);
-                break;
+            GetSinusoidDelays(moddelays[0], state->lfo_offset, state->lfo_range, state->lfo_scale,
+                              state->depth, state->delay, todo);
+            GetSinusoidDelays(moddelays[1], (state->lfo_offset+state->lfo_disp)%state->lfo_range,
+                              state->lfo_range, state->lfo_scale, state->depth, state->delay,
+                              todo);
+        }
+        else /*if(state->waveform == WF_Triangle)*/
+        {
+            GetTriangleDelays(moddelays[0], state->lfo_offset, state->lfo_range, state->lfo_scale,
+                              state->depth, state->delay, todo);
+            GetTriangleDelays(moddelays[1], (state->lfo_offset+state->lfo_disp)%state->lfo_range,
+                              state->lfo_range, state->lfo_scale, state->depth, state->delay,
+                              todo);
+        }
+        state->lfo_offset = (state->lfo_offset+todo) % state->lfo_range;
+
+        for(i = 0;i < todo;i++)
+        {
+            ALint delay;
+            ALfloat mu;
+
+            // Feed the buffer's input first (necessary for delays < 1).
+            delaybuf[offset&bufmask] = SamplesIn[0][base+i];
+
+            // Tap for the left output.
+            delay = offset - (moddelays[0][i]>>FRACTIONBITS);
+            mu = (moddelays[0][i]&FRACTIONMASK) * (1.0f/FRACTIONONE);
+            temps[0][i] = cubic(delaybuf[(delay+1) & bufmask], delaybuf[(delay  ) & bufmask],
+                                delaybuf[(delay-1) & bufmask], delaybuf[(delay-2) & bufmask],
+                                mu);
+
+            // Tap for the right output.
+            delay = offset - (moddelays[1][i]>>FRACTIONBITS);
+            mu = (moddelays[1][i]&FRACTIONMASK) * (1.0f/FRACTIONONE);
+            temps[1][i] = cubic(delaybuf[(delay+1) & bufmask], delaybuf[(delay  ) & bufmask],
+                                delaybuf[(delay-1) & bufmask], delaybuf[(delay-2) & bufmask],
+                                mu);
+
+            // Accumulate feedback from the average delay of the taps.
+            delaybuf[offset&bufmask] += delaybuf[(offset-avgdelay) & bufmask] * feedback;
+            offset++;
         }
 
-        for(kt = 0;kt < NumChannels;kt++)
-        {
-            ALfloat gain = state->Gain[0][kt];
-            if(fabsf(gain) > GAIN_SILENCE_THRESHOLD)
-            {
-                for(it = 0;it < td;it++)
-                    SamplesOut[kt][it+base] += temps[it][0] * gain;
-            }
+        for(c = 0;c < 2;c++)
+            MixSamples(temps[c], NumChannels, SamplesOut, state->Gains[c].Current,
+                       state->Gains[c].Target, SamplesToDo-base, base, todo);
 
-            gain = state->Gain[1][kt];
-            if(fabsf(gain) > GAIN_SILENCE_THRESHOLD)
-            {
-                for(it = 0;it < td;it++)
-                    SamplesOut[kt][it+base] += temps[it][1] * gain;
-            }
-        }
-
-        base += td;
+        base += todo;
     }
+
+    state->offset = offset;
 }
 
 
-typedef struct ALchorusStateFactory {
-    DERIVE_FROM_TYPE(ALeffectStateFactory);
-} ALchorusStateFactory;
+typedef struct ChorusStateFactory {
+    DERIVE_FROM_TYPE(EffectStateFactory);
+} ChorusStateFactory;
 
-static ALeffectState *ALchorusStateFactory_create(ALchorusStateFactory *UNUSED(factory))
+static ALeffectState *ChorusStateFactory_create(ChorusStateFactory *UNUSED(factory))
 {
     ALchorusState *state;
 
@@ -284,14 +299,14 @@ static ALeffectState *ALchorusStateFactory_create(ALchorusStateFactory *UNUSED(f
     return STATIC_CAST(ALeffectState, state);
 }
 
-DEFINE_ALEFFECTSTATEFACTORY_VTABLE(ALchorusStateFactory);
+DEFINE_EFFECTSTATEFACTORY_VTABLE(ChorusStateFactory);
 
 
-ALeffectStateFactory *ALchorusStateFactory_getFactory(void)
+EffectStateFactory *ChorusStateFactory_getFactory(void)
 {
-    static ALchorusStateFactory ChorusFactory = { { GET_VTABLE2(ALchorusStateFactory, ALeffectStateFactory) } };
+    static ChorusStateFactory ChorusFactory = { { GET_VTABLE2(ChorusStateFactory, EffectStateFactory) } };
 
-    return STATIC_CAST(ALeffectStateFactory, &ChorusFactory);
+    return STATIC_CAST(EffectStateFactory, &ChorusFactory);
 }
 
 
@@ -302,24 +317,22 @@ void ALchorus_setParami(ALeffect *effect, ALCcontext *context, ALenum param, ALi
     {
         case AL_CHORUS_WAVEFORM:
             if(!(val >= AL_CHORUS_MIN_WAVEFORM && val <= AL_CHORUS_MAX_WAVEFORM))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Invalid chorus waveform");
             props->Chorus.Waveform = val;
             break;
 
         case AL_CHORUS_PHASE:
             if(!(val >= AL_CHORUS_MIN_PHASE && val <= AL_CHORUS_MAX_PHASE))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Chorus phase out of range");
             props->Chorus.Phase = val;
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid chorus integer property 0x%04x", param);
     }
 }
 void ALchorus_setParamiv(ALeffect *effect, ALCcontext *context, ALenum param, const ALint *vals)
-{
-    ALchorus_setParami(effect, context, param, vals[0]);
-}
+{ ALchorus_setParami(effect, context, param, vals[0]); }
 void ALchorus_setParamf(ALeffect *effect, ALCcontext *context, ALenum param, ALfloat val)
 {
     ALeffectProps *props = &effect->Props;
@@ -327,36 +340,34 @@ void ALchorus_setParamf(ALeffect *effect, ALCcontext *context, ALenum param, ALf
     {
         case AL_CHORUS_RATE:
             if(!(val >= AL_CHORUS_MIN_RATE && val <= AL_CHORUS_MAX_RATE))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Chorus rate out of range");
             props->Chorus.Rate = val;
             break;
 
         case AL_CHORUS_DEPTH:
             if(!(val >= AL_CHORUS_MIN_DEPTH && val <= AL_CHORUS_MAX_DEPTH))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Chorus depth out of range");
             props->Chorus.Depth = val;
             break;
 
         case AL_CHORUS_FEEDBACK:
             if(!(val >= AL_CHORUS_MIN_FEEDBACK && val <= AL_CHORUS_MAX_FEEDBACK))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Chorus feedback out of range");
             props->Chorus.Feedback = val;
             break;
 
         case AL_CHORUS_DELAY:
             if(!(val >= AL_CHORUS_MIN_DELAY && val <= AL_CHORUS_MAX_DELAY))
-                SET_ERROR_AND_RETURN(context, AL_INVALID_VALUE);
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Chorus delay out of range");
             props->Chorus.Delay = val;
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid chorus float property 0x%04x", param);
     }
 }
 void ALchorus_setParamfv(ALeffect *effect, ALCcontext *context, ALenum param, const ALfloat *vals)
-{
-    ALchorus_setParamf(effect, context, param, vals[0]);
-}
+{ ALchorus_setParamf(effect, context, param, vals[0]); }
 
 void ALchorus_getParami(const ALeffect *effect, ALCcontext *context, ALenum param, ALint *val)
 {
@@ -372,13 +383,11 @@ void ALchorus_getParami(const ALeffect *effect, ALCcontext *context, ALenum para
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid chorus integer property 0x%04x", param);
     }
 }
 void ALchorus_getParamiv(const ALeffect *effect, ALCcontext *context, ALenum param, ALint *vals)
-{
-    ALchorus_getParami(effect, context, param, vals);
-}
+{ ALchorus_getParami(effect, context, param, vals); }
 void ALchorus_getParamf(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *val)
 {
     const ALeffectProps *props = &effect->Props;
@@ -401,12 +410,146 @@ void ALchorus_getParamf(const ALeffect *effect, ALCcontext *context, ALenum para
             break;
 
         default:
-            SET_ERROR_AND_RETURN(context, AL_INVALID_ENUM);
+            alSetError(context, AL_INVALID_ENUM, "Invalid chorus float property 0x%04x", param);
     }
 }
 void ALchorus_getParamfv(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *vals)
-{
-    ALchorus_getParamf(effect, context, param, vals);
-}
+{ ALchorus_getParamf(effect, context, param, vals); }
 
 DEFINE_ALEFFECT_VTABLE(ALchorus);
+
+
+/* Flanger is basically a chorus with a really short delay. They can both use
+ * the same processing functions, so piggyback flanger on the chorus functions.
+ */
+typedef struct FlangerStateFactory {
+    DERIVE_FROM_TYPE(EffectStateFactory);
+} FlangerStateFactory;
+
+ALeffectState *FlangerStateFactory_create(FlangerStateFactory *UNUSED(factory))
+{
+    ALchorusState *state;
+
+    NEW_OBJ0(state, ALchorusState)();
+    if(!state) return NULL;
+
+    return STATIC_CAST(ALeffectState, state);
+}
+
+DEFINE_EFFECTSTATEFACTORY_VTABLE(FlangerStateFactory);
+
+EffectStateFactory *FlangerStateFactory_getFactory(void)
+{
+    static FlangerStateFactory FlangerFactory = { { GET_VTABLE2(FlangerStateFactory, EffectStateFactory) } };
+
+    return STATIC_CAST(EffectStateFactory, &FlangerFactory);
+}
+
+
+void ALflanger_setParami(ALeffect *effect, ALCcontext *context, ALenum param, ALint val)
+{
+    ALeffectProps *props = &effect->Props;
+    switch(param)
+    {
+        case AL_FLANGER_WAVEFORM:
+            if(!(val >= AL_FLANGER_MIN_WAVEFORM && val <= AL_FLANGER_MAX_WAVEFORM))
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Invalid flanger waveform");
+            props->Chorus.Waveform = val;
+            break;
+
+        case AL_FLANGER_PHASE:
+            if(!(val >= AL_FLANGER_MIN_PHASE && val <= AL_FLANGER_MAX_PHASE))
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Flanger phase out of range");
+            props->Chorus.Phase = val;
+            break;
+
+        default:
+            alSetError(context, AL_INVALID_ENUM, "Invalid flanger integer property 0x%04x", param);
+    }
+}
+void ALflanger_setParamiv(ALeffect *effect, ALCcontext *context, ALenum param, const ALint *vals)
+{ ALflanger_setParami(effect, context, param, vals[0]); }
+void ALflanger_setParamf(ALeffect *effect, ALCcontext *context, ALenum param, ALfloat val)
+{
+    ALeffectProps *props = &effect->Props;
+    switch(param)
+    {
+        case AL_FLANGER_RATE:
+            if(!(val >= AL_FLANGER_MIN_RATE && val <= AL_FLANGER_MAX_RATE))
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Flanger rate out of range");
+            props->Chorus.Rate = val;
+            break;
+
+        case AL_FLANGER_DEPTH:
+            if(!(val >= AL_FLANGER_MIN_DEPTH && val <= AL_FLANGER_MAX_DEPTH))
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Flanger depth out of range");
+            props->Chorus.Depth = val;
+            break;
+
+        case AL_FLANGER_FEEDBACK:
+            if(!(val >= AL_FLANGER_MIN_FEEDBACK && val <= AL_FLANGER_MAX_FEEDBACK))
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Flanger feedback out of range");
+            props->Chorus.Feedback = val;
+            break;
+
+        case AL_FLANGER_DELAY:
+            if(!(val >= AL_FLANGER_MIN_DELAY && val <= AL_FLANGER_MAX_DELAY))
+                SETERR_RETURN(context, AL_INVALID_VALUE,, "Flanger delay out of range");
+            props->Chorus.Delay = val;
+            break;
+
+        default:
+            alSetError(context, AL_INVALID_ENUM, "Invalid flanger float property 0x%04x", param);
+    }
+}
+void ALflanger_setParamfv(ALeffect *effect, ALCcontext *context, ALenum param, const ALfloat *vals)
+{ ALflanger_setParamf(effect, context, param, vals[0]); }
+
+void ALflanger_getParami(const ALeffect *effect, ALCcontext *context, ALenum param, ALint *val)
+{
+    const ALeffectProps *props = &effect->Props;
+    switch(param)
+    {
+        case AL_FLANGER_WAVEFORM:
+            *val = props->Chorus.Waveform;
+            break;
+
+        case AL_FLANGER_PHASE:
+            *val = props->Chorus.Phase;
+            break;
+
+        default:
+            alSetError(context, AL_INVALID_ENUM, "Invalid flanger integer property 0x%04x", param);
+    }
+}
+void ALflanger_getParamiv(const ALeffect *effect, ALCcontext *context, ALenum param, ALint *vals)
+{ ALflanger_getParami(effect, context, param, vals); }
+void ALflanger_getParamf(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *val)
+{
+    const ALeffectProps *props = &effect->Props;
+    switch(param)
+    {
+        case AL_FLANGER_RATE:
+            *val = props->Chorus.Rate;
+            break;
+
+        case AL_FLANGER_DEPTH:
+            *val = props->Chorus.Depth;
+            break;
+
+        case AL_FLANGER_FEEDBACK:
+            *val = props->Chorus.Feedback;
+            break;
+
+        case AL_FLANGER_DELAY:
+            *val = props->Chorus.Delay;
+            break;
+
+        default:
+            alSetError(context, AL_INVALID_ENUM, "Invalid flanger float property 0x%04x", param);
+    }
+}
+void ALflanger_getParamfv(const ALeffect *effect, ALCcontext *context, ALenum param, ALfloat *vals)
+{ ALflanger_getParamf(effect, context, param, vals); }
+
+DEFINE_ALEFFECT_VTABLE(ALflanger);

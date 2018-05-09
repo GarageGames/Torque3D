@@ -28,26 +28,51 @@
 #include "AL/alc.h"
 #include "alMain.h"
 #include "alEffect.h"
-#include "alThunk.h"
 #include "alError.h"
 
 
-ALboolean DisabledEffects[MAX_EFFECTS];
-
-extern inline void LockEffectsRead(ALCdevice *device);
-extern inline void UnlockEffectsRead(ALCdevice *device);
-extern inline void LockEffectsWrite(ALCdevice *device);
-extern inline void UnlockEffectsWrite(ALCdevice *device);
-extern inline struct ALeffect *LookupEffect(ALCdevice *device, ALuint id);
-extern inline struct ALeffect *RemoveEffect(ALCdevice *device, ALuint id);
+extern inline void LockEffectList(ALCdevice *device);
+extern inline void UnlockEffectList(ALCdevice *device);
 extern inline ALboolean IsReverbEffect(ALenum type);
 
+const struct EffectList EffectList[EFFECTLIST_SIZE] = {
+    { "eaxreverb",  EAXREVERB_EFFECT,  AL_EFFECT_EAXREVERB },
+    { "reverb",     REVERB_EFFECT,     AL_EFFECT_REVERB },
+    { "chorus",     CHORUS_EFFECT,     AL_EFFECT_CHORUS },
+    { "compressor", COMPRESSOR_EFFECT, AL_EFFECT_COMPRESSOR },
+    { "distortion", DISTORTION_EFFECT, AL_EFFECT_DISTORTION },
+    { "echo",       ECHO_EFFECT,       AL_EFFECT_ECHO },
+    { "equalizer",  EQUALIZER_EFFECT,  AL_EFFECT_EQUALIZER },
+    { "flanger",    FLANGER_EFFECT,    AL_EFFECT_FLANGER },
+    { "modulator",  MODULATOR_EFFECT,  AL_EFFECT_RING_MODULATOR },
+    { "pshifter",   PSHIFTER_EFFECT,   AL_EFFECT_PITCH_SHIFTER },
+    { "dedicated",  DEDICATED_EFFECT,  AL_EFFECT_DEDICATED_LOW_FREQUENCY_EFFECT },
+    { "dedicated",  DEDICATED_EFFECT,  AL_EFFECT_DEDICATED_DIALOGUE },
+};
+
+ALboolean DisabledEffects[MAX_EFFECTS];
+
+static ALeffect *AllocEffect(ALCcontext *context);
+static void FreeEffect(ALCdevice *device, ALeffect *effect);
 static void InitEffectParams(ALeffect *effect, ALenum type);
+
+static inline ALeffect *LookupEffect(ALCdevice *device, ALuint id)
+{
+    EffectSubList *sublist;
+    ALuint lidx = (id-1) >> 6;
+    ALsizei slidx = (id-1) & 0x3f;
+
+    if(UNLIKELY(lidx >= VECTOR_SIZE(device->EffectList)))
+        return NULL;
+    sublist = &VECTOR_ELEM(device->EffectList, lidx);
+    if(UNLIKELY(sublist->FreeMask & (U64(1)<<slidx)))
+        return NULL;
+    return sublist->Effects + slidx;
+}
 
 
 AL_API ALvoid AL_APIENTRY alGenEffects(ALsizei n, ALuint *effects)
 {
-    ALCdevice *device;
     ALCcontext *context;
     ALsizei cur;
 
@@ -55,37 +80,18 @@ AL_API ALvoid AL_APIENTRY alGenEffects(ALsizei n, ALuint *effects)
     if(!context) return;
 
     if(!(n >= 0))
-        SET_ERROR_AND_GOTO(context, AL_INVALID_VALUE, done);
-
-    device = context->Device;
-    for(cur = 0;cur < n;cur++)
+        alSetError(context, AL_INVALID_VALUE, "Generating %d effects", n);
+    else for(cur = 0;cur < n;cur++)
     {
-        ALeffect *effect = al_calloc(16, sizeof(ALeffect));
-        ALenum err = AL_OUT_OF_MEMORY;
-        if(!effect || (err=InitEffect(effect)) != AL_NO_ERROR)
+        ALeffect *effect = AllocEffect(context);
+        if(!effect)
         {
-            al_free(effect);
             alDeleteEffects(cur, effects);
-            SET_ERROR_AND_GOTO(context, err, done);
+            break;
         }
-
-        err = NewThunkEntry(&effect->id);
-        if(err == AL_NO_ERROR)
-            err = InsertUIntMapEntry(&device->EffectMap, effect->id, effect);
-        if(err != AL_NO_ERROR)
-        {
-            FreeThunkEntry(effect->id);
-            memset(effect, 0, sizeof(ALeffect));
-            al_free(effect);
-
-            alDeleteEffects(cur, effects);
-            SET_ERROR_AND_GOTO(context, err, done);
-        }
-
         effects[cur] = effect->id;
     }
 
-done:
     ALCcontext_DecRef(context);
 }
 
@@ -100,26 +106,22 @@ AL_API ALvoid AL_APIENTRY alDeleteEffects(ALsizei n, const ALuint *effects)
     if(!context) return;
 
     device = context->Device;
-    LockEffectsWrite(device);
+    LockEffectList(device);
     if(!(n >= 0))
-        SET_ERROR_AND_GOTO(context, AL_INVALID_VALUE, done);
+        SETERR_GOTO(context, AL_INVALID_VALUE, done, "Deleting %d effects", n);
     for(i = 0;i < n;i++)
     {
         if(effects[i] && LookupEffect(device, effects[i]) == NULL)
-            SET_ERROR_AND_GOTO(context, AL_INVALID_NAME, done);
+            SETERR_GOTO(context, AL_INVALID_NAME, done, "Invalid effect ID %u", effects[i]);
     }
     for(i = 0;i < n;i++)
     {
-        if((effect=RemoveEffect(device, effects[i])) == NULL)
-            continue;
-        FreeThunkEntry(effect->id);
-
-        memset(effect, 0, sizeof(*effect));
-        al_free(effect);
+        if((effect=LookupEffect(device, effects[i])) != NULL)
+            FreeEffect(device, effect);
     }
 
 done:
-    UnlockEffectsWrite(device);
+    UnlockEffectList(device);
     ALCcontext_DecRef(context);
 }
 
@@ -131,10 +133,10 @@ AL_API ALboolean AL_APIENTRY alIsEffect(ALuint effect)
     Context = GetContextRef();
     if(!Context) return AL_FALSE;
 
-    LockEffectsRead(Context->Device);
+    LockEffectList(Context->Device);
     result = ((!effect || LookupEffect(Context->Device, effect)) ?
               AL_TRUE : AL_FALSE);
-    UnlockEffectsRead(Context->Device);
+    UnlockEffectList(Context->Device);
 
     ALCcontext_DecRef(Context);
 
@@ -151,16 +153,16 @@ AL_API ALvoid AL_APIENTRY alEffecti(ALuint effect, ALenum param, ALint value)
     if(!Context) return;
 
     Device = Context->Device;
-    LockEffectsWrite(Device);
+    LockEffectList(Device);
     if((ALEffect=LookupEffect(Device, effect)) == NULL)
-        alSetError(Context, AL_INVALID_NAME);
+        alSetError(Context, AL_INVALID_NAME, "Invalid effect ID %u", effect);
     else
     {
         if(param == AL_EFFECT_TYPE)
         {
             ALboolean isOk = (value == AL_EFFECT_NULL);
             ALint i;
-            for(i = 0;!isOk && EffectList[i].val;i++)
+            for(i = 0;!isOk && i < EFFECTLIST_SIZE;i++)
             {
                 if(value == EffectList[i].val &&
                    !DisabledEffects[EffectList[i].type])
@@ -170,15 +172,15 @@ AL_API ALvoid AL_APIENTRY alEffecti(ALuint effect, ALenum param, ALint value)
             if(isOk)
                 InitEffectParams(ALEffect, value);
             else
-                alSetError(Context, AL_INVALID_VALUE);
+                alSetError(Context, AL_INVALID_VALUE, "Effect type 0x%04x not supported", value);
         }
         else
         {
             /* Call the appropriate handler */
-            V(ALEffect,setParami)(Context, param, value);
+            ALeffect_setParami(ALEffect, Context, param, value);
         }
     }
-    UnlockEffectsWrite(Device);
+    UnlockEffectList(Device);
 
     ALCcontext_DecRef(Context);
 }
@@ -200,15 +202,15 @@ AL_API ALvoid AL_APIENTRY alEffectiv(ALuint effect, ALenum param, const ALint *v
     if(!Context) return;
 
     Device = Context->Device;
-    LockEffectsWrite(Device);
+    LockEffectList(Device);
     if((ALEffect=LookupEffect(Device, effect)) == NULL)
-        alSetError(Context, AL_INVALID_NAME);
+        alSetError(Context, AL_INVALID_NAME, "Invalid effect ID %u", effect);
     else
     {
         /* Call the appropriate handler */
-        V(ALEffect,setParamiv)(Context, param, values);
+        ALeffect_setParamiv(ALEffect, Context, param, values);
     }
-    UnlockEffectsWrite(Device);
+    UnlockEffectList(Device);
 
     ALCcontext_DecRef(Context);
 }
@@ -223,15 +225,15 @@ AL_API ALvoid AL_APIENTRY alEffectf(ALuint effect, ALenum param, ALfloat value)
     if(!Context) return;
 
     Device = Context->Device;
-    LockEffectsWrite(Device);
+    LockEffectList(Device);
     if((ALEffect=LookupEffect(Device, effect)) == NULL)
-        alSetError(Context, AL_INVALID_NAME);
+        alSetError(Context, AL_INVALID_NAME, "Invalid effect ID %u", effect);
     else
     {
         /* Call the appropriate handler */
-        V(ALEffect,setParamf)(Context, param, value);
+        ALeffect_setParamf(ALEffect, Context, param, value);
     }
-    UnlockEffectsWrite(Device);
+    UnlockEffectList(Device);
 
     ALCcontext_DecRef(Context);
 }
@@ -246,15 +248,15 @@ AL_API ALvoid AL_APIENTRY alEffectfv(ALuint effect, ALenum param, const ALfloat 
     if(!Context) return;
 
     Device = Context->Device;
-    LockEffectsWrite(Device);
+    LockEffectList(Device);
     if((ALEffect=LookupEffect(Device, effect)) == NULL)
-        alSetError(Context, AL_INVALID_NAME);
+        alSetError(Context, AL_INVALID_NAME, "Invalid effect ID %u", effect);
     else
     {
         /* Call the appropriate handler */
-        V(ALEffect,setParamfv)(Context, param, values);
+        ALeffect_setParamfv(ALEffect, Context, param, values);
     }
-    UnlockEffectsWrite(Device);
+    UnlockEffectList(Device);
 
     ALCcontext_DecRef(Context);
 }
@@ -269,9 +271,9 @@ AL_API ALvoid AL_APIENTRY alGetEffecti(ALuint effect, ALenum param, ALint *value
     if(!Context) return;
 
     Device = Context->Device;
-    LockEffectsRead(Device);
+    LockEffectList(Device);
     if((ALEffect=LookupEffect(Device, effect)) == NULL)
-        alSetError(Context, AL_INVALID_NAME);
+        alSetError(Context, AL_INVALID_NAME, "Invalid effect ID %u", effect);
     else
     {
         if(param == AL_EFFECT_TYPE)
@@ -279,10 +281,10 @@ AL_API ALvoid AL_APIENTRY alGetEffecti(ALuint effect, ALenum param, ALint *value
         else
         {
             /* Call the appropriate handler */
-            V(ALEffect,getParami)(Context, param, value);
+            ALeffect_getParami(ALEffect, Context, param, value);
         }
     }
-    UnlockEffectsRead(Device);
+    UnlockEffectList(Device);
 
     ALCcontext_DecRef(Context);
 }
@@ -304,15 +306,15 @@ AL_API ALvoid AL_APIENTRY alGetEffectiv(ALuint effect, ALenum param, ALint *valu
     if(!Context) return;
 
     Device = Context->Device;
-    LockEffectsRead(Device);
+    LockEffectList(Device);
     if((ALEffect=LookupEffect(Device, effect)) == NULL)
-        alSetError(Context, AL_INVALID_NAME);
+        alSetError(Context, AL_INVALID_NAME, "Invalid effect ID %u", effect);
     else
     {
         /* Call the appropriate handler */
-        V(ALEffect,getParamiv)(Context, param, values);
+        ALeffect_getParamiv(ALEffect, Context, param, values);
     }
-    UnlockEffectsRead(Device);
+    UnlockEffectList(Device);
 
     ALCcontext_DecRef(Context);
 }
@@ -327,15 +329,15 @@ AL_API ALvoid AL_APIENTRY alGetEffectf(ALuint effect, ALenum param, ALfloat *val
     if(!Context) return;
 
     Device = Context->Device;
-    LockEffectsRead(Device);
+    LockEffectList(Device);
     if((ALEffect=LookupEffect(Device, effect)) == NULL)
-        alSetError(Context, AL_INVALID_NAME);
+        alSetError(Context, AL_INVALID_NAME, "Invalid effect ID %u", effect);
     else
     {
         /* Call the appropriate handler */
-        V(ALEffect,getParamf)(Context, param, value);
+        ALeffect_getParamf(ALEffect, Context, param, value);
     }
-    UnlockEffectsRead(Device);
+    UnlockEffectList(Device);
 
     ALCcontext_DecRef(Context);
 }
@@ -350,39 +352,120 @@ AL_API ALvoid AL_APIENTRY alGetEffectfv(ALuint effect, ALenum param, ALfloat *va
     if(!Context) return;
 
     Device = Context->Device;
-    LockEffectsRead(Device);
+    LockEffectList(Device);
     if((ALEffect=LookupEffect(Device, effect)) == NULL)
-        alSetError(Context, AL_INVALID_NAME);
+        alSetError(Context, AL_INVALID_NAME, "Invalid effect ID %u", effect);
     else
     {
         /* Call the appropriate handler */
-        V(ALEffect,getParamfv)(Context, param, values);
+        ALeffect_getParamfv(ALEffect, Context, param, values);
     }
-    UnlockEffectsRead(Device);
+    UnlockEffectList(Device);
 
     ALCcontext_DecRef(Context);
 }
 
 
-ALenum InitEffect(ALeffect *effect)
+void InitEffect(ALeffect *effect)
 {
     InitEffectParams(effect, AL_EFFECT_NULL);
-    return AL_NO_ERROR;
 }
 
-ALvoid ReleaseALEffects(ALCdevice *device)
+static ALeffect *AllocEffect(ALCcontext *context)
 {
-    ALsizei i;
-    for(i = 0;i < device->EffectMap.size;i++)
-    {
-        ALeffect *temp = device->EffectMap.values[i];
-        device->EffectMap.values[i] = NULL;
+    ALCdevice *device = context->Device;
+    EffectSubList *sublist, *subend;
+    ALeffect *effect = NULL;
+    ALsizei lidx = 0;
+    ALsizei slidx;
 
-        // Release effect structure
-        FreeThunkEntry(temp->id);
-        memset(temp, 0, sizeof(ALeffect));
-        al_free(temp);
+    almtx_lock(&device->EffectLock);
+    sublist = VECTOR_BEGIN(device->EffectList);
+    subend = VECTOR_END(device->EffectList);
+    for(;sublist != subend;++sublist)
+    {
+        if(sublist->FreeMask)
+        {
+            slidx = CTZ64(sublist->FreeMask);
+            effect = sublist->Effects + slidx;
+            break;
+        }
+        ++lidx;
     }
+    if(UNLIKELY(!effect))
+    {
+        const EffectSubList empty_sublist = { 0, NULL };
+        /* Don't allocate so many list entries that the 32-bit ID could
+         * overflow...
+         */
+        if(UNLIKELY(VECTOR_SIZE(device->EffectList) >= 1<<25))
+        {
+            almtx_unlock(&device->EffectLock);
+            alSetError(context, AL_OUT_OF_MEMORY, "Too many effects allocated");
+            return NULL;
+        }
+        lidx = (ALsizei)VECTOR_SIZE(device->EffectList);
+        VECTOR_PUSH_BACK(device->EffectList, empty_sublist);
+        sublist = &VECTOR_BACK(device->EffectList);
+        sublist->FreeMask = ~U64(0);
+        sublist->Effects = al_calloc(16, sizeof(ALeffect)*64);
+        if(UNLIKELY(!sublist->Effects))
+        {
+            VECTOR_POP_BACK(device->EffectList);
+            almtx_unlock(&device->EffectLock);
+            alSetError(context, AL_OUT_OF_MEMORY, "Failed to allocate effect batch");
+            return NULL;
+        }
+
+        slidx = 0;
+        effect = sublist->Effects + slidx;
+    }
+
+    memset(effect, 0, sizeof(*effect));
+    InitEffectParams(effect, AL_EFFECT_NULL);
+
+    /* Add 1 to avoid effect ID 0. */
+    effect->id = ((lidx<<6) | slidx) + 1;
+
+    sublist->FreeMask &= ~(U64(1)<<slidx);
+    almtx_unlock(&device->EffectLock);
+
+    return effect;
+}
+
+static void FreeEffect(ALCdevice *device, ALeffect *effect)
+{
+    ALuint id = effect->id - 1;
+    ALsizei lidx = id >> 6;
+    ALsizei slidx = id & 0x3f;
+
+    memset(effect, 0, sizeof(*effect));
+
+    VECTOR_ELEM(device->EffectList, lidx).FreeMask |= U64(1) << slidx;
+}
+
+void ReleaseALEffects(ALCdevice *device)
+{
+    EffectSubList *sublist = VECTOR_BEGIN(device->EffectList);
+    EffectSubList *subend = VECTOR_END(device->EffectList);
+    size_t leftover = 0;
+    for(;sublist != subend;++sublist)
+    {
+        ALuint64 usemask = ~sublist->FreeMask;
+        while(usemask)
+        {
+            ALsizei idx = CTZ64(usemask);
+            ALeffect *effect = sublist->Effects + idx;
+
+            memset(effect, 0, sizeof(*effect));
+            ++leftover;
+
+            usemask &= ~(U64(1) << idx);
+        }
+        sublist->FreeMask = ~usemask;
+    }
+    if(leftover > 0)
+        WARN("(%p) Deleted "SZFMT" Effect%s\n", device, leftover, (leftover==1)?"":"s");
 }
 
 
@@ -418,7 +501,7 @@ static void InitEffectParams(ALeffect *effect, ALenum type)
         effect->Props.Reverb.LFReference = AL_EAXREVERB_DEFAULT_LFREFERENCE;
         effect->Props.Reverb.RoomRolloffFactor = AL_EAXREVERB_DEFAULT_ROOM_ROLLOFF_FACTOR;
         effect->Props.Reverb.DecayHFLimit = AL_EAXREVERB_DEFAULT_DECAY_HFLIMIT;
-        SET_VTABLE1(ALeaxreverb, effect);
+        effect->vtab = &ALeaxreverb_vtable;
         break;
     case AL_EFFECT_REVERB:
         effect->Props.Reverb.Density   = AL_REVERB_DEFAULT_DENSITY;
@@ -448,7 +531,7 @@ static void InitEffectParams(ALeffect *effect, ALenum type)
         effect->Props.Reverb.LFReference = 250.0f;
         effect->Props.Reverb.RoomRolloffFactor = AL_REVERB_DEFAULT_ROOM_ROLLOFF_FACTOR;
         effect->Props.Reverb.DecayHFLimit = AL_REVERB_DEFAULT_DECAY_HFLIMIT;
-        SET_VTABLE1(ALreverb, effect);
+        effect->vtab = &ALreverb_vtable;
         break;
     case AL_EFFECT_CHORUS:
         effect->Props.Chorus.Waveform = AL_CHORUS_DEFAULT_WAVEFORM;
@@ -457,11 +540,11 @@ static void InitEffectParams(ALeffect *effect, ALenum type)
         effect->Props.Chorus.Depth = AL_CHORUS_DEFAULT_DEPTH;
         effect->Props.Chorus.Feedback = AL_CHORUS_DEFAULT_FEEDBACK;
         effect->Props.Chorus.Delay = AL_CHORUS_DEFAULT_DELAY;
-        SET_VTABLE1(ALchorus, effect);
+        effect->vtab = &ALchorus_vtable;
         break;
     case AL_EFFECT_COMPRESSOR:
         effect->Props.Compressor.OnOff = AL_COMPRESSOR_DEFAULT_ONOFF;
-        SET_VTABLE1(ALcompressor, effect);
+        effect->vtab = &ALcompressor_vtable;
         break;
     case AL_EFFECT_DISTORTION:
         effect->Props.Distortion.Edge = AL_DISTORTION_DEFAULT_EDGE;
@@ -469,7 +552,7 @@ static void InitEffectParams(ALeffect *effect, ALenum type)
         effect->Props.Distortion.LowpassCutoff = AL_DISTORTION_DEFAULT_LOWPASS_CUTOFF;
         effect->Props.Distortion.EQCenter = AL_DISTORTION_DEFAULT_EQCENTER;
         effect->Props.Distortion.EQBandwidth = AL_DISTORTION_DEFAULT_EQBANDWIDTH;
-        SET_VTABLE1(ALdistortion, effect);
+        effect->vtab = &ALdistortion_vtable;
         break;
     case AL_EFFECT_ECHO:
         effect->Props.Echo.Delay    = AL_ECHO_DEFAULT_DELAY;
@@ -477,7 +560,7 @@ static void InitEffectParams(ALeffect *effect, ALenum type)
         effect->Props.Echo.Damping  = AL_ECHO_DEFAULT_DAMPING;
         effect->Props.Echo.Feedback = AL_ECHO_DEFAULT_FEEDBACK;
         effect->Props.Echo.Spread   = AL_ECHO_DEFAULT_SPREAD;
-        SET_VTABLE1(ALecho, effect);
+        effect->vtab = &ALecho_vtable;
         break;
     case AL_EFFECT_EQUALIZER:
         effect->Props.Equalizer.LowCutoff = AL_EQUALIZER_DEFAULT_LOW_CUTOFF;
@@ -490,30 +573,35 @@ static void InitEffectParams(ALeffect *effect, ALenum type)
         effect->Props.Equalizer.Mid2Width = AL_EQUALIZER_DEFAULT_MID2_WIDTH;
         effect->Props.Equalizer.HighCutoff = AL_EQUALIZER_DEFAULT_HIGH_CUTOFF;
         effect->Props.Equalizer.HighGain = AL_EQUALIZER_DEFAULT_HIGH_GAIN;
-        SET_VTABLE1(ALequalizer, effect);
+        effect->vtab = &ALequalizer_vtable;
         break;
     case AL_EFFECT_FLANGER:
-        effect->Props.Flanger.Waveform = AL_FLANGER_DEFAULT_WAVEFORM;
-        effect->Props.Flanger.Phase = AL_FLANGER_DEFAULT_PHASE;
-        effect->Props.Flanger.Rate = AL_FLANGER_DEFAULT_RATE;
-        effect->Props.Flanger.Depth = AL_FLANGER_DEFAULT_DEPTH;
-        effect->Props.Flanger.Feedback = AL_FLANGER_DEFAULT_FEEDBACK;
-        effect->Props.Flanger.Delay = AL_FLANGER_DEFAULT_DELAY;
-        SET_VTABLE1(ALflanger, effect);
+        effect->Props.Chorus.Waveform = AL_FLANGER_DEFAULT_WAVEFORM;
+        effect->Props.Chorus.Phase = AL_FLANGER_DEFAULT_PHASE;
+        effect->Props.Chorus.Rate = AL_FLANGER_DEFAULT_RATE;
+        effect->Props.Chorus.Depth = AL_FLANGER_DEFAULT_DEPTH;
+        effect->Props.Chorus.Feedback = AL_FLANGER_DEFAULT_FEEDBACK;
+        effect->Props.Chorus.Delay = AL_FLANGER_DEFAULT_DELAY;
+        effect->vtab = &ALflanger_vtable;
         break;
     case AL_EFFECT_RING_MODULATOR:
         effect->Props.Modulator.Frequency      = AL_RING_MODULATOR_DEFAULT_FREQUENCY;
         effect->Props.Modulator.HighPassCutoff = AL_RING_MODULATOR_DEFAULT_HIGHPASS_CUTOFF;
         effect->Props.Modulator.Waveform       = AL_RING_MODULATOR_DEFAULT_WAVEFORM;
-        SET_VTABLE1(ALmodulator, effect);
+        effect->vtab = &ALmodulator_vtable;
+        break;
+    case AL_EFFECT_PITCH_SHIFTER:
+        effect->Props.Pshifter.CoarseTune      = AL_PITCH_SHIFTER_DEFAULT_COARSE_TUNE;
+        effect->Props.Pshifter.FineTune        = AL_PITCH_SHIFTER_DEFAULT_FINE_TUNE;
+        effect->vtab = &ALpshifter_vtable;
         break;
     case AL_EFFECT_DEDICATED_LOW_FREQUENCY_EFFECT:
     case AL_EFFECT_DEDICATED_DIALOGUE:
         effect->Props.Dedicated.Gain = 1.0f;
-        SET_VTABLE1(ALdedicated, effect);
+        effect->vtab = &ALdedicated_vtable;
         break;
     default:
-        SET_VTABLE1(ALnull, effect);
+        effect->vtab = &ALnull_vtable;
         break;
     }
     effect->type = type;
@@ -656,7 +744,7 @@ static const struct {
 };
 #undef DECL
 
-ALvoid LoadReverbPreset(const char *name, ALeffect *effect)
+void LoadReverbPreset(const char *name, ALeffect *effect)
 {
     size_t i;
 
@@ -667,9 +755,9 @@ ALvoid LoadReverbPreset(const char *name, ALeffect *effect)
         return;
     }
 
-    if(!DisabledEffects[EAXREVERB])
+    if(!DisabledEffects[EAXREVERB_EFFECT])
         InitEffectParams(effect, AL_EFFECT_EAXREVERB);
-    else if(!DisabledEffects[REVERB])
+    else if(!DisabledEffects[REVERB_EFFECT])
         InitEffectParams(effect, AL_EFFECT_REVERB);
     else
         InitEffectParams(effect, AL_EFFECT_NULL);

@@ -3,6 +3,10 @@
 
 #include "alstring.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef _WIN32
 
 #define WIN32_LEAN_AND_MEAN
@@ -38,12 +42,24 @@ struct FileMapping {
 struct FileMapping MapFileToMem(const char *fname);
 void UnmapFileMem(const struct FileMapping *mapping);
 
-al_string GetProcPath(void);
+void GetProcBinary(al_string *path, al_string *fname);
 
 #ifdef HAVE_DYNLOAD
 void *LoadLib(const char *name);
 void CloseLib(void *handle);
 void *GetSymbol(void *handle, const char *name);
+#endif
+
+#ifdef __ANDROID__
+#define JCALL(obj, func)  ((*(obj))->func((obj), EXTRACT_VCALL_ARGS
+#define JCALL0(obj, func)  ((*(obj))->func((obj) EXTRACT_VCALL_ARGS
+
+/** Returns a JNIEnv*. */
+void *Android_GetJNIEnv(void);
+#endif
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
 #endif /* AL_COMPAT_H */

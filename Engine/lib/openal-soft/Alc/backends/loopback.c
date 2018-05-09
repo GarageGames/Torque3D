@@ -35,7 +35,6 @@ typedef struct ALCloopback {
 static void ALCloopback_Construct(ALCloopback *self, ALCdevice *device);
 static DECLARE_FORWARD(ALCloopback, ALCbackend, void, Destruct)
 static ALCenum ALCloopback_open(ALCloopback *self, const ALCchar *name);
-static void ALCloopback_close(ALCloopback *self);
 static ALCboolean ALCloopback_reset(ALCloopback *self);
 static ALCboolean ALCloopback_start(ALCloopback *self);
 static void ALCloopback_stop(ALCloopback *self);
@@ -59,12 +58,8 @@ static ALCenum ALCloopback_open(ALCloopback *self, const ALCchar *name)
 {
     ALCdevice *device = STATIC_CAST(ALCbackend, self)->mDevice;
 
-    al_string_copy_cstr(&device->DeviceName, name);
+    alstr_copy_cstr(&device->DeviceName, name);
     return ALC_NO_ERROR;
-}
-
-static void ALCloopback_close(ALCloopback* UNUSED(self))
-{
 }
 
 static ALCboolean ALCloopback_reset(ALCloopback *self)
