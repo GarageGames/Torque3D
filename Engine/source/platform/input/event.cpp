@@ -382,10 +382,17 @@ CodeMapping gVirtualMap[] =
    { "lpov2",         SI_POV,    SI_LPOV2       },
    { "rpov2",         SI_POV,    SI_RPOV2       },
 
-#if defined( TORQUE_OS_WIN )
-   //-------------------------------------- XINPUT EVENTS
+   //-------------------------------------- BALL EVENTS
+   // Joystick Trackball:
+   { "xball",         SI_AXIS,   SI_XBALL       },
+   { "yball",         SI_AXIS,   SI_YBALL       },
+   { "xball2",        SI_AXIS,   SI_XBALL2      },
+   { "yball2",        SI_AXIS,   SI_YBALL2      },
+
+   //-------------------------------------- XINPUT/SDL CONTROLLER EVENTS
    // Controller connect / disconnect:
    { "connect",       SI_BUTTON, XI_CONNECT     },
+   { "disconnect",    SI_BUTTON, XI_DISCONNECT  },
    
    // L & R Thumbsticks:
    { "thumblx",       SI_AXIS,   XI_THUMBLX     },
@@ -403,9 +410,10 @@ CodeMapping gVirtualMap[] =
    { "dpadl",         SI_BUTTON, SI_LPOV   },
    { "dpadr",         SI_BUTTON, SI_RPOV  },
 
-   // START & BACK Buttons:
+   // START, BACK & GUIDE Buttons:
    { "btn_start",     SI_BUTTON, XI_START       },
    { "btn_back",      SI_BUTTON, XI_BACK        },
+   { "btn_guide",     SI_BUTTON, XI_GUIDE       },
 
    // L & R Thumbstick Buttons:
    { "btn_lt",        SI_BUTTON, XI_LEFT_THUMB  },
@@ -420,7 +428,6 @@ CodeMapping gVirtualMap[] =
    { "btn_b",         SI_BUTTON, XI_B           },
    { "btn_x",         SI_BUTTON, XI_X           },
    { "btn_y",         SI_BUTTON, XI_Y           },
-#endif
 
    //-------------------------------------- MISCELLANEOUS EVENTS
    //
