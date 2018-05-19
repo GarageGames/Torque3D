@@ -18,28 +18,28 @@
 
 #include "gfx/sim/debugDraw.h"
 
-IMPLEMENT_CALLBACK( TriggerComponent, onEnterViewCmd, void, 
+IMPLEMENT_CALLBACK( TriggerComponent, onEnterView, void, 
    ( Entity* cameraEnt, bool firstTimeSeeing ), ( cameraEnt, firstTimeSeeing ),
    "@brief Called when an object enters the volume of the Trigger instance using this TriggerData.\n\n"
 
    "@param trigger the Trigger instance whose volume the object entered\n"
    "@param obj the object that entered the volume of the Trigger instance\n" );
 
-IMPLEMENT_CALLBACK( TriggerComponent, onExitViewCmd, void, 
+IMPLEMENT_CALLBACK( TriggerComponent, onExitView, void, 
    ( Entity* cameraEnt ), ( cameraEnt ),
    "@brief Called when an object enters the volume of the Trigger instance using this TriggerData.\n\n"
 
    "@param trigger the Trigger instance whose volume the object entered\n"
    "@param obj the object that entered the volume of the Trigger instance\n" );
 
-IMPLEMENT_CALLBACK( TriggerComponent, onUpdateInViewCmd, void, 
+IMPLEMENT_CALLBACK( TriggerComponent, onUpdateInView, void, 
    ( Entity* cameraEnt ), ( cameraEnt ),
    "@brief Called when an object enters the volume of the Trigger instance using this TriggerData.\n\n"
 
    "@param trigger the Trigger instance whose volume the object entered\n"
    "@param obj the object that entered the volume of the Trigger instance\n" );
 
-IMPLEMENT_CALLBACK( TriggerComponent, onUpdateOutOfViewCmd, void, 
+IMPLEMENT_CALLBACK( TriggerComponent, onUpdateOutOfView, void, 
    ( Entity* cameraEnt ), ( cameraEnt ),
    "@brief Called when an object enters the volume of the Trigger instance using this TriggerData.\n\n"
 

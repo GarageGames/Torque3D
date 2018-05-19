@@ -162,7 +162,7 @@ void afxEffectGroupData::initPersistFields()
   // for each of these, dummy_fx_entry is set and then a validator adds it to the appropriate effects list 
   static egValidator emptyValidator(0);
   
-  addFieldV("addEffect",  TYPEID<afxEffectBaseData>(),  myOffset(dummy_fx_entry), &emptyValidator,
+  addFieldV("effect",  TYPEID<afxEffectBaseData>(),  myOffset(dummy_fx_entry), &emptyValidator,
     "...");
 
   Parent::initPersistFields();

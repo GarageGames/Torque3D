@@ -26,12 +26,12 @@
 
 namespace Con
 {
-   DefineNewEngineFunction(AddConsumer, void, (ConsumerCallback cb), , "")
+   TORQUE_API void fnAddConsumer(ConsumerCallback cb)
    {
       addConsumer(cb);
    }
 
-   DefineNewEngineFunction(RemoveConsumer, void, (ConsumerCallback cb), , "")
+   TORQUE_API void fnRemoveConsumer(ConsumerCallback cb)
    {
       removeConsumer(cb);
    }

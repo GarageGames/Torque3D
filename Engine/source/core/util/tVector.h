@@ -77,7 +77,10 @@ class Vector
    void  destroy(U32 start, U32 end);   ///< Destructs elements from <i>start</i> to <i>end-1</i>
    void  construct(U32 start, U32 end); ///< Constructs elements from <i>start</i> to <i>end-1</i>
    void  construct(U32 start, U32 end, const T* array);
+
   public:
+   static const U32 offset[];
+
    Vector(const U32 initialSize = 0);
    Vector(const U32 initialSize, const char* fileName, const U32 lineNum);
    Vector(const char* fileName, const U32 lineNum);

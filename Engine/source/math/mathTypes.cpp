@@ -88,30 +88,51 @@ END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( RectI,
    RectI, MathTypes,
    "" )
+   FIELD(point, point, 1, "The XY coordinate of the Rect.")
+   FIELD(extent, extent, 1, "The width and height of the Rect.")
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( RectF,
    RectF, MathTypes,
    "" )
+   FIELD(point, point, 1, "The XY coordinate of the Rect.")
+   FIELD(extent, extent, 1, "The width and height of the Rect.")
 END_IMPLEMENT_STRUCT;
+
+
+// Compute the offsets for vectors
+const U32 MatrixF::offset[] = { Offset(m, MatrixF) };
+
 IMPLEMENT_STRUCT( MatrixF,
    MatrixF, MathTypes,
    "" )
+   {"m", "", 16, TYPE<F32>(), MatrixF::offset[0]},
 END_IMPLEMENT_STRUCT;
+
 IMPLEMENT_STRUCT( AngAxisF,
    AngAxisF, MathTypes,
    "" )
+   FIELD(axis, axis, 1, "")
+   FIELD(angle, angle, 1, "")
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( TransformF,
    TransformF, MathTypes,
    "" )
+   FIELD(mPosition, position, 1, "")
+   FIELD(mOrientation, orientation, 1, "")
+   FIELD(mHasRotation, hasRotation, 1, "")
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( Box3F,
    Box3F, MathTypes,
    "" )
+   FIELD(minExtents, minExtents, 1, "Minimum extents of box")
+   FIELD(maxExtents, maxExtents, 1, "Maximum extents of box")
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT( EaseF,
    EaseF, MathTypes,
    "" )
+   FIELD(dir, dir, 1, "inout, in, out")
+   FIELD(type, type, 1, "linear, etc...")
+   { "param", "optional params", 2, TYPE<F32>(), (U32)FIELDOFFSET( param ) },
 END_IMPLEMENT_STRUCT;
 IMPLEMENT_STRUCT(RotationF,
    RotationF, MathTypes,

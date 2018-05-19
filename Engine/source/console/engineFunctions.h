@@ -98,6 +98,7 @@ template<typename ...ArgTs>
 struct _EngineFunctionDefaultArguments< void(ArgTs...) > : public EngineFunctionDefaultArguments
 {
    template<typename T> using DefVST = typename EngineTypeTraits<T>::DefaultArgumentValueStoreType;
+   fixed_tuple<DefVST<ArgTs>*  ...> mArgPointers;
    fixed_tuple<DefVST<ArgTs>  ...> mFixedArgs;
    std::tuple<DefVST<ArgTs>  ...> mArgs;
 private:
@@ -137,6 +138,7 @@ public:
    : EngineFunctionDefaultArguments({sizeof...(TailTs)}), mArgs(SelfType::tailInit(tail...))
    {
       fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>...)>::copy(mArgs, mFixedArgs);
+      fixed_tuple_mutator<void(DefVST<ArgTs>...), void(DefVST<ArgTs>*...)>::copyPtrs(mArgs, mArgPointers);
    }
 };
 

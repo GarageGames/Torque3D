@@ -45,6 +45,8 @@ private:
    F32 m[16];     ///< Note: Torque uses row-major matrices
 
 public:
+   static const U32 offset[];
+
    /// Create an uninitialized matrix.
    ///
    /// @param   identity    If true, initialize to the identity matrix.

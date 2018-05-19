@@ -886,61 +886,71 @@ public:
       );                                                                                                                               \
    static inline returnType _fn ## className ## name ## impl args
 
-#  define DefineEngineStringlyVariadicFunction(name,returnType,minArgs,maxArgs,usage) \
-   static inline returnType _fn ## name ## impl (SimObject *, S32 argc, ConsoleValueRef *argv);                                  \
+#  define DefineEngineStringlyVariadicFunction(name,returnType,minArgs,maxArgs,usage)                                            \
+   static inline returnType _fn ## name ## impl (SimObject *, S32, ConsoleValueRef*);                                            \
    TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## name                                                         \
-      (S32 argc, const char** argv)                                                                                              \
+      (Vector<const char*>* vec)                                                                                                  \
    {                                                                                                                             \
       _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
-      StringStackConsoleWrapper args(argc, argv);                                                                                \
+      StringStackConsoleWrapper args(vec->size(), vec->address());                                                                 \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                        \
          _fn ## name ## impl(NULL, args.count(), args)                                                                           \
       );                                                                                                                         \
    }                                                                                                                             \
-   static _EngineFunctionDefaultArguments< void (S32 argc, const char** argv) > _fn ## name ## DefaultArgs;                      \
+   static _EngineFunctionDefaultArguments< void (Vector<const char*> vec) > _fn ## name ## DefaultArgs;                          \
    static EngineFunctionInfo _fn ## name ## FunctionInfo(                                                                        \
       #name,                                                                                                                     \
       &_SCOPE<>()(),                                                                                                             \
       usage,                                                                                                                     \
-      #returnType " " #name "(S32 argc, const char** argv)",                                                                     \
+      #returnType " " #name "(Vector<String> args)",                                                                             \
       "fn" #name,                                                                                                                \
-      TYPE< returnType (S32 argc, const char** argv) >(),                                                                        \
+      TYPE< returnType (Vector<const char*> vec) >(),                                                                            \
       &_fn ## name ## DefaultArgs,                                                                                               \
       ( void* ) &fn ## name,                                                                                                     \
       0                                                                                                                          \
    );                                                                                                                            \
-   ConsoleConstructor cc_##name##_obj(NULL,#name,_fn ## name ## impl,usage,minArgs,maxArgs); \
+   ConsoleConstructor cc_##name##_obj(NULL,#name,_fn ## name ## impl,usage,minArgs,maxArgs);                                     \
       returnType _fn ## name ## impl(SimObject *, S32 argc, ConsoleValueRef *argv)
 
 #  define DefineEngineStringlyVariadicMethod(className, name,returnType,minArgs,maxArgs,usage)                                   \
-   static inline returnType _fn ## className ## _ ## name ## impl (className* object, S32 argc, ConsoleValueRef* argv);          \
+   struct _ ## className ## name ## frame                                                                                        \
+   {                                                                                                                             \
+      typedef className ObjectType;                                                                                              \
+      className* object;                                                                                                         \
+      inline returnType _exec (S32 argc, ConsoleValueRef* argv) const;                                                           \
+   };                                                                                                                            \
    TORQUE_API EngineTypeTraits< returnType >::ReturnValueType fn ## className ## _ ## name                                       \
-      (className* object, S32 argc, const char** argv)                                                                           \
+      (className* object, Vector<const char*>* vec)                                                                               \
    {                                                                                                                             \
       _CHECK_ENGINE_INITIALIZED( name, returnType );                                                                             \
-      StringStackConsoleWrapper args(argc, argv);                                                                                \
+      StringStackConsoleWrapper args(vec->size(), vec->address());                                                                 \
+      _ ## className ## name ## frame frame {};                                                                                  \
+      frame.object = static_cast< className* >( object );                                                                        \
       return EngineTypeTraits< returnType >::ReturnValue(                                                                        \
-         _fn ## className ## _ ## name ## impl(object, args.count(), args)                                                       \
+         frame._exec(args.count(), args)                                                                                         \
       );                                                                                                                         \
    }                                                                                                                             \
-   static _EngineFunctionDefaultArguments< void (className* object, S32 argc, const char** argv) > _fn ## className ## _ ## name ## DefaultArgs;   \
-   static EngineFunctionInfo _fn ## className ## _ ## name ## FunctionInfo(                                                      \
+   static _EngineFunctionDefaultArguments< void (className* object, S32 argc, const char** argv) >                               \
+      _fn ## className ## name ## DefaultArgs;                                                                                   \
+   static EngineFunctionInfo _fn ## className ## name ## FunctionInfo(                                                           \
       #name,                                                                                                                     \
-      &_SCOPE<>()(),                                                                                                             \
+      &_SCOPE< className >()(),                                                                                                  \
       usage,                                                                                                                     \
-      #returnType " " #name "(SimObject* object, S32 argc, const char** argv)",                                                  \
+      "virtual " #returnType " " #name "(Vector<String> args)",                                                                  \
       "fn" #className "_" #name,                                                                                                 \
-      TYPE< returnType (SimObject* object, S32 argc, const char** argv) >(),                                                     \
-      &_fn ## className ## _ ## name ## DefaultArgs,                                                                             \
+      TYPE< _EngineMethodTrampoline< _ ## className ## name ## frame, returnType (Vector<const char*> vec) >::FunctionType >(),  \
+      &_fn ## className ## name ## DefaultArgs,                                                                                  \
       ( void* ) &fn ## className ## _ ## name,                                                                                   \
       0                                                                                                                          \
    );                                                                                                                            \
    returnType cm_##className##_##name##_caster(SimObject* object, S32 argc, ConsoleValueRef* argv) {                             \
       AssertFatal( dynamic_cast<className*>( object ), "Object passed to " #name " is not a " #className "!" );                  \
-      conmethod_return_##returnType ) _fn ## className ## _ ## name ## impl(static_cast<className*>(object),argc,argv);          \
+      _ ## className ## name ## frame frame {};                                                                                  \
+      frame.object = static_cast< className* >( object );                                                                        \
+      conmethod_return_##returnType ) frame._exec(argc,argv);                                                                    \
    };                                                                                                                            \
    ConsoleConstructor cc_##className##_##name##_obj(#className,#name,cm_##className##_##name##_caster,usage,minArgs,maxArgs);    \
-   static inline returnType _fn ## className ## _ ## name ## impl(className *object, S32 argc, ConsoleValueRef *argv)
+   inline returnType _ ## className ## name ## frame::_exec(S32 argc, ConsoleValueRef *argv) const
 
 
 

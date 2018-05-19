@@ -27,6 +27,8 @@
 IMPLEMENT_PRIMITIVE( bool,          bool,,      "Boolean true/false." );
 IMPLEMENT_PRIMITIVE( S8,            byte,,      "8bit signed integer." );
 IMPLEMENT_PRIMITIVE( U8,            ubyte,,     "8bit unsigned integer." );
+IMPLEMENT_PRIMITIVE( S16,           short,,     "16bit signed integer." );
+IMPLEMENT_PRIMITIVE( U16,           ushort,,    "16bit unsigned integer." );
 IMPLEMENT_PRIMITIVE( S32,           int,,       "32bit signed integer." );
 IMPLEMENT_PRIMITIVE( U32,           uint,,      "32bit unsigned integer." );
 IMPLEMENT_PRIMITIVE( F32,           float,,     "32bit single-precision floating-point." );

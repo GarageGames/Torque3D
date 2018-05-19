@@ -60,7 +60,8 @@ static const char* getDocString(const EngineExport* exportInfo)
 template< typename T >
 inline T getArgValue(const EngineFunctionDefaultArguments* defaultArgs, U32 offset)
 {
-   return *reinterpret_cast< const T* >(defaultArgs->getArgs() + offset);
+   return **(const T**)(defaultArgs->getArgs() + offset);
+   //return *reinterpret_cast< const T* >(defaultArgs->getArgs() + offset);
 }
 
 
@@ -122,7 +123,7 @@ static Vector< String > parseFunctionArgumentNames(const EngineFunctionInfo* fun
       // Parse out name.
 
       const char* end = ptr + 1;
-      while (ptr > prototype && dIsalnum(*ptr))
+      while (ptr > prototype && (dIsalnum(*ptr) || *ptr == '_'))
          ptr--;
       const char* start = ptr + 1;
 
@@ -170,19 +171,20 @@ static Vector< String > parseFunctionArgumentNames(const EngineFunctionInfo* fun
 
 //-----------------------------------------------------------------------------
 
-static String getDefaultArgumentValue(const EngineFunctionInfo* function, const EngineTypeInfo* type, U32 offset)
+static String getValueForType(const EngineTypeInfo* type, void* addr)
 {
    String value;
-   const EngineFunctionDefaultArguments* defaultArgs = function->getDefaultArguments();
+
+#define ADDRESS_TO_TYPE(tp) *(const tp*)(addr);
 
    switch (type->getTypeKind())
    {
    case EngineTypeKindPrimitive:
    {
-#define PRIMTYPE( tp )                                               \
+      #define PRIMTYPE( tp )                                                  \
             if( TYPE< tp >() == type )                                        \
             {                                                                 \
-               tp val = getArgValue< tp >( defaultArgs, offset );             \
+               tp val = ADDRESS_TO_TYPE(tp);                                  \
                value = String::ToString( val );                               \
             }
 
@@ -195,10 +197,10 @@ static String getDefaultArgumentValue(const EngineFunctionInfo* function, const 
       PRIMTYPE(F64);
 
       //TODO: for now we store string literals in ASCII; needs to be sorted out
-      if (TYPE< const char* >() == type)
+      if (TYPE< String >() == type)
       {
-         const char* val = reinterpret_cast<const char*>(defaultArgs->getArgs() + offset);
-         value = val;
+         const char* val = ADDRESS_TO_TYPE(const char*);
+         value = String(val);
       }
 
 #undef PRIMTYPE
@@ -207,7 +209,7 @@ static String getDefaultArgumentValue(const EngineFunctionInfo* function, const 
 
    case EngineTypeKindEnum:
    {
-      S32 val = getArgValue< S32 >(defaultArgs, offset);
+      S32 val = ADDRESS_TO_TYPE(S32);
       AssertFatal(type->getEnumTable(), "engineXMLExport - Enum type without table!");
 
       const EngineEnumTable& table = *(type->getEnumTable());
@@ -225,7 +227,7 @@ static String getDefaultArgumentValue(const EngineFunctionInfo* function, const 
 
    case EngineTypeKindBitfield:
    {
-      S32 val = getArgValue< S32 >(defaultArgs, offset);
+      S32 val = ADDRESS_TO_TYPE(S32);
       AssertFatal(type->getEnumTable(), "engineXMLExport - Bitfield type without table!");
 
       const EngineEnumTable& table = *(type->getEnumTable());
@@ -248,6 +250,24 @@ static String getDefaultArgumentValue(const EngineFunctionInfo* function, const 
    case EngineTypeKindStruct:
    {
       //TODO: struct type default argument values
+
+      AssertFatal(type->getFieldTable(), "engineXMLExport - Struct type without table!");
+      const EngineFieldTable* fieldTable = type->getFieldTable();
+      U32 numFields = fieldTable->getNumFields();
+
+
+      for (int i = 0; i < numFields; ++i)
+      {
+         const EngineTypeInfo* fieldType = (*fieldTable)[i].getType();
+         U32 fieldOffset = (*fieldTable)[i].getOffset();
+         AssertFatal((*fieldTable)[i].getNumElements() == 1, "engineXMLExport - numElements != 1 not supported currently.");
+         if (i == 0) {
+            value = getValueForType(fieldType, (void*)((size_t)addr + fieldOffset));
+         } else {
+            value += " " + getValueForType(fieldType, (void*)((size_t)addr + fieldOffset));
+         }
+      }
+
       break;
    }
 
@@ -257,17 +277,27 @@ static String getDefaultArgumentValue(const EngineFunctionInfo* function, const 
       // For these two kinds, we support "null" as the only valid
       // default value.
 
-      const void* ptr = getArgValue< const void* >(defaultArgs, offset);
+      const void* ptr = ADDRESS_TO_TYPE(void*);
       if (!ptr)
          value = "null";
       break;
    }
 
    default:
+      Con::printf("Uuuh");
       break;
    }
 
+#undef ADDRESS_TO_TYPE
    return value;
+}
+
+//-----------------------------------------------------------------------------
+
+static String getDefaultArgumentValue(const EngineFunctionInfo* function, const EngineTypeInfo* type, U32 offset)
+{
+   const EngineFunctionDefaultArguments* defaultArgs = function->getDefaultArguments();
+   return getValueForType(type, *(void**)(defaultArgs->getArgs() + offset));
 }
 
 //-----------------------------------------------------------------------------
@@ -319,10 +349,10 @@ static void exportFunction(const EngineFunctionInfo* function, SimXMLDocument* x
 
       xml->popElement();
 
-      if (type->getTypeKind() == EngineTypeKindStruct)
-         argFrameOffset += type->getInstanceSize();
-      else
-         argFrameOffset += type->getValueSize();
+      //if (type->getTypeKind() == EngineTypeKindStruct)
+      //   argFrameOffset += type->getInstanceSize();
+      //else
+         argFrameOffset += sizeof(void*);// type->getValueSize();
 
 #ifdef _PACK_BUG_WORKAROUNDS
       if (argFrameOffset % 4 > 0)

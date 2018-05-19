@@ -225,7 +225,7 @@ void afxMagicSpellData::initPersistFields()
     "...");
   addField("extraCastingTime",      TypeF32,        myOffset(mExtra_casting_time),
     "...");
-  addFieldV("addCastingEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_castingPhrase,
+  addFieldV("castingEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_castingPhrase,
     "...");
   endGroup("Casting Stage");
 
@@ -236,9 +236,9 @@ void afxMagicSpellData::initPersistFields()
     "...");
   addField("extraDeliveryTime",     TypeF32,        myOffset(mExtra_delivery_time),
     "...");
-  addFieldV("addLaunchEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_launchPhrase,
+  addFieldV("launchEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_launchPhrase,
     "...");
-  addFieldV("addDeliveryEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_deliveryPhrase,
+  addFieldV("deliveryEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_deliveryPhrase,
     "...");
   endGroup("Delivery Stage");
 
@@ -249,9 +249,9 @@ void afxMagicSpellData::initPersistFields()
     "...");
   addField("extraLingerTime",       TypeF32,        myOffset(mExtra_linger_time),
     "...");
-  addFieldV("addImpactEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_impactPhrase,
+  addFieldV("impactEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_impactPhrase,
     "...");
-  addFieldV("addLingerEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_lingerPhrase,
+  addFieldV("lingerEffect", TYPEID<afxEffectBaseData>(), Offset(mDummy_fx_entry, afxMagicSpellData), &_lingerPhrase,
     "...");
   endGroup("Linger Stage");
 

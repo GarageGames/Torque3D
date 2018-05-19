@@ -65,10 +65,10 @@ public:
 
    void visualizeFrustums(F32 renderTimeMS);
 
-   DECLARE_CALLBACK(void, onEnterViewCmd, (Entity* cameraEnt, bool firstTimeSeeing));
-   DECLARE_CALLBACK(void, onExitViewCmd, (Entity* cameraEnt));
-   DECLARE_CALLBACK(void, onUpdateInViewCmd, (Entity* cameraEnt));
-   DECLARE_CALLBACK(void, onUpdateOutOfViewCmd, (Entity* cameraEnt));
+   DECLARE_CALLBACK(void, onEnterView, (Entity* cameraEnt, bool firstTimeSeeing));
+   DECLARE_CALLBACK(void, onExitView, (Entity* cameraEnt));
+   DECLARE_CALLBACK(void, onUpdateInView, (Entity* cameraEnt));
+   DECLARE_CALLBACK(void, onUpdateOutOfView, (Entity* cameraEnt));
 };
 
 #endif // _EXAMPLEBEHAVIOR_H_

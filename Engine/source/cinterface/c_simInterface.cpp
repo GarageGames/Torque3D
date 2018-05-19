@@ -32,7 +32,7 @@ namespace Sim
       return Sim::findObject(pId);
    }
 
-   DefineNewEngineFunction(FindObjectByName, SimObject*, (String pName), , "")
+   DefineNewEngineFunction(FindObjectByName, SimObject*, (const char* pName), , "")
    {
       return Sim::findObject(StringTable->insert(pName));
    }

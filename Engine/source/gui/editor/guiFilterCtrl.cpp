@@ -89,7 +89,7 @@ DefineEngineStringlyVariadicMethod( GuiFilterCtrl, setValue, void, 3, 20, "(f1, 
 	object->set(filter);
 }
 
-DefineEngineMethod( GuiFilterCtrl, identity, void, (), , "Reset the filtering."
+DefineEngineMethod( GuiFilterCtrl, resetFiltering, void, (), , "Reset the filtering."
 			  "@internal")
 {
    object->identity();

@@ -49,6 +49,7 @@ namespace Torque
          static UUID smNull;
          
       public:
+         static const U32 offset[];
       
          UUID()
          {

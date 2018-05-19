@@ -183,7 +183,7 @@ void afxPhraseEffectData::initPersistFields()
   // effect lists
   // for each of these, dummy_fx_entry is set and then a validator adds it to the appropriate effects list 
   static ewValidator emptyValidator(0);  
-  addFieldV("addEffect",  TYPEID< afxEffectBaseData >(),  myOffset(dummy_fx_entry), &emptyValidator,
+  addFieldV("effect",  TYPEID< afxEffectBaseData >(),  myOffset(dummy_fx_entry), &emptyValidator,
     "A field macro which adds an effect wrapper datablock to a list of effects associated "
     "with the phrase-effect's single phrase. Unlike other fields, addEffect follows an "
     "unusual syntax. Order is important since the effects will resolve in the order they "
